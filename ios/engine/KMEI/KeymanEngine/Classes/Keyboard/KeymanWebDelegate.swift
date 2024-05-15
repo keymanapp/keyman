@@ -12,7 +12,7 @@ import WebKit
 protocol KeymanWebDelegate: class {
   /// Keyman Web has loaded (or reloaded).
   func keyboardLoaded(_ keymanWeb: KeymanWebViewController)
-
+  
   /// - Parameters:
   ///   - numCharsToDelete: The number of UTF-16 code units to delete before inserting the new text.
   ///   - newText: The string to insert.
@@ -20,14 +20,14 @@ protocol KeymanWebDelegate: class {
   
   /// - Parameters:
   func beep(_ keymanWeb: KeymanWebViewController)
-
+  
   /// - Parameters:
   ///   - keyFrame: The frame of the anchor key.
   ///   - preview: The text to preview.
   func showKeyPreview(_ keymanWeb: KeymanWebViewController, keyFrame: CGRect, preview: String)
-
+  
   func dismissKeyPreview(_ keymanWeb: KeymanWebViewController)
-
+  
   /// - Parameters:
   ///   - keyFrame: The frame of the anchor key.
   ///   - subkeyIDs: The IDs of the subkeys.

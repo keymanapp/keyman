@@ -11,7 +11,7 @@ import os.log
 
 public class LexicalModelKeymanPackage : TypedKeymanPackage<InstallableLexicalModel> {
   internal var models : [KMPLexicalModel]!
-
+  
   override internal init(metadata: KMPMetadata, folder: URL) {
     super.init(metadata: metadata, folder: folder)
     self.models = []
@@ -31,10 +31,10 @@ public class LexicalModelKeymanPackage : TypedKeymanPackage<InstallableLexicalMo
         }
       }
     }
-
+    
     self.setInstallableResourceSets(for: models)
   }
-
+  
   public override func defaultInfoHtml() -> String {
     let formatString = NSLocalizedString("package-default-found-lexical-models", bundle: engineBundle, comment: "See Localized.stringsdict")
     var str = String.localizedStringWithFormat(formatString, models.count) + "<br/>"
@@ -43,7 +43,7 @@ public class LexicalModelKeymanPackage : TypedKeymanPackage<InstallableLexicalMo
     }
     return str
   }
-
+  
   override var resources: [AnyKMPResource] {
     return models
   }

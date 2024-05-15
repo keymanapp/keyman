@@ -49,11 +49,11 @@ internal let engineBundle: Bundle = Bundle(for: Manager.self)
 public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// Application group identifier for shared container. Set this before accessing the shared manager.
   public static var applicationGroupIdentifier: String?
-
+  
   public static let shared = Manager()
-
+  
   public var fileBrowserLauncher: ((UINavigationController) -> Void)? = nil
-
+  
   /// Display the help bubble on first use.
   public var isKeymanHelpOn = true
   
@@ -61,10 +61,10 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     guard let kbd = self._inputViewController else {
       return false
     }
-
+    
     return kbd.isSystemKeyboard
   }
-
+  
   // TODO: Change API to not disable removing as well
   /// Allow users to add new keyboards in the keyboard picker.
   ///  - Default value is true.
@@ -82,18 +82,18 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
   }
   private var _canAddNewKeyboards = true
-
+  
   /// Allow users to remove keyboards.
   /// - Default value is true.
   /// - The default keyboard is additionally prevented from being removed by canRemoveDefaultkeyboard.
   public var canRemoveKeyboards = true
-
+  
   /// Allow the default keyboard to be removed.
   /// The last keyboard cannot be removed, so the default keyboard cannot be removed if it
   /// is the only keyboard in the list, regardless of the value of this property.
   /// The default value is false.
   public var canRemoveDefaultKeyboard = false
-
+  
   // TODO: Change API to not disable removing as well
   /// Allow users to add new lexical models in the lexical model picker.
   ///  - Default value is true.
@@ -121,7 +121,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// The last lexical model CAN be removed, as this is an optional feature
   /// The default value is true.
   public var canRemoveDefaultLexicalModel = true
-
+  
   /// In keyboard extensions (system keyboard), `UIApplication.openURL(_:)` is unavailable. The API is not called in
   /// the system keyboard since `KeyboardInfoViewController` is never used. `openURL(:_)` is only used in applications,
   /// where it is safe. However, the entire Keyman Engine framework must be compiled with extension-safe APIs.
@@ -129,7 +129,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   /// Set this to `UIApplication.shared.openURL` in your application.
   @available(*, deprecated)
   public var openURL: ((URL) -> Bool)?
-
+  
   var currentKeyboardID: FullKeyboardID?
   private var _currentLexicalModelID: FullLexicalModelID?
   var currentLexicalModelID: FullLexicalModelID? {
@@ -148,9 +148,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       userData.synchronize()
     }
   }
-
+  
   var shouldReloadLexicalModel = false
-
+  
   var _inputViewController: InputViewController?
   var currentResponder: KeymanResponder?
   
@@ -163,12 +163,12 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       }
       return _inputViewController
     }
-
+    
     set(value) {
       _inputViewController = value
     }
   }
-
+  
   //private var downloadQueue: HTTPDownloader?
   private var reachability: Reachability!
   var didSynchronize = false
@@ -180,7 +180,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
     set(value) {
       _spacebarText = value
-
+      
       let userData = Storage.active.userDefaults
       userData.optSpacebarText = _spacebarText
       userData.synchronize()
@@ -188,26 +188,26 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       inputViewController.updateSpacebarText()
     }
   }
-
+  
   // MARK: - Object Admin
-
+  
   private override init() {
     
     _spacebarText = Storage.active.userDefaults.optSpacebarText
     super.init()
-
+    
     URLProtocol.registerClass(KeymanURLProtocol.self)
-
+    
     /**
      * As of 14.0, ResourceFileManager is responsible for handlng resources... including
      * any necessary "migration" of their internal storage structure & tracked metadata.
      */
     ResourceFileManager.shared.runMigrationsIfNeeded()
-
+    
     if Util.isSystemKeyboard || Storage.active.userDefaults.bool(forKey: Key.keyboardPickerDisplayed) {
       isKeymanHelpOn = false
     }
-
+    
     do {
       try Storage.active.copyKMWFiles(from: Resources.bundle)
     } catch {
@@ -215,9 +215,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
       SentryManager.capture(error, message:message)
     }
-
+    
     updateUserKeyboards(with: Defaults.keyboard)
-
+    
     do {
       try reachability = Reachability(hostname: KeymanHosts.API_KEYMAN_COM.host!)
     } catch {
@@ -225,10 +225,10 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
       SentryManager.capture(error, message:message)
     }
-
+    
     if(!Util.isSystemKeyboard) {
       NotificationCenter.default.addObserver(self, selector: #selector(self.reachabilityChanged),
-                                           name: .reachabilityChanged, object: reachability)
+                                             name: .reachabilityChanged, object: reachability)
       do {
         try reachability.startNotifier()
       } catch {
@@ -237,11 +237,11 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
         SentryManager.capture(error, message:message)
       }
     }
-
+    
     // We used to preload the old KeymanWebViewController, but now that it's embedded within the
     // InputViewController, that's not exactly viable.
   }
-
+  
   // MARK: - Keyboard management
   
   public func showKeymanEngineSettings(inVC: UIViewController) -> Void {
@@ -262,7 +262,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     nc.modalPresentationStyle = .pageSheet
     inVC.present(nc, animated: true)
   }
-
+  
   /// Sets the current keyboard, querying from the user's list of keyboards.
   ///
   /// - Precondition:
@@ -274,7 +274,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   //TODO: this method appears unused, should we remove it?
   public func setKeyboard(withFullID fullID: FullKeyboardID) -> Bool {
     if let keyboard = Storage.active.userDefaults.userKeyboard(withFullID: fullID) {
-        return setKeyboard(keyboard)
+      return setKeyboard(keyboard)
     }
     return false
   }
@@ -289,7 +289,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     return nil
   }
   
-
+  
   /// Set the current keyboard.
   ///
   /// - Returns: `false` if the requested keyboard could not be set
@@ -305,31 +305,31 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       SentryManager.breadcrumb(message)
       return false
     }
-
+    
     let message = "Setting language: \(kb.fullID)"
     os_log("%{public}s", log:KeymanEngineLogger.settings, type: .info, message)
     SentryManager.breadcrumb("Setting language: \(kb.fullID)")
-
+    
     currentKeyboardID = kb.fullID
-
+    
     if let fontFilename = kb.font?.source.first(where: { $0.hasFontExtension }) {
       _ = FontManager.shared.registerFont(at: Storage.active.fontURL(forResource: kb, filename: fontFilename)!)
     }
     if let oskFontFilename = kb.oskFont?.source.first(where: { $0.hasFontExtension }) {
       _ = FontManager.shared.registerFont(at: Storage.active.fontURL(forResource: kb, filename: oskFontFilename)!)
     }
-
+    
     do {
       try inputViewController.setKeyboard(kb)
     } catch {
       // Here, errors are logged by the error's thrower.
       return false
     }
-
+    
     let userData = Util.isSystemKeyboard ? UserDefaults.standard : Storage.active.userDefaults
     userData.currentKeyboardID = kb.fullID
     userData.synchronize()
-
+    
     if isKeymanHelpOn {
       inputViewController.showHelpBubble(afterDelay: 1.5)
     }
@@ -339,7 +339,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     NotificationCenter.default.post(name: Notifications.keyboardChanged,
                                     object: self,
                                     value: kb)
-
+    
     // Now to handle lexical model + banner management
     inputViewController.clearModel()
     
@@ -355,13 +355,13 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     
     return true
   }
-
+  
   /// Adds a new keyboard to the list in the keyboard picker if it doesn't already exist.
   /// The keyboard must be downloaded (see `downloadKeyboard()`) or preloaded (see `preloadLanguageFile()`)
   @available(*, deprecated, message: "Deprecated in favor of ResourceFileManager.install(resourceWithID:from:)")
   public func addKeyboard(_ keyboard: InstallableKeyboard) {
     var kbdToInstall = keyboard
-
+    
     // 3rd party installation of keyboards (13.0 and before):
     // - Manager.shared.preloadFiles was called first to import the file resources
     // - Then Manager.shared.addKeyboard installs the keyboard.
@@ -373,7 +373,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       guard wrappedKbds.count == 1 else {
         let message = "Could not properly import keyboard"
         os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
-       SentryManager.capture(message)
+        SentryManager.capture(message)
         return
       }
       kbdToInstall = wrappedKbds[0]
@@ -381,8 +381,8 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       ResourceFileManager.shared.addResource(kbdToInstall)
     }
   }
-    
-    
+  
+  
   /// Sets the current lexical model, querying from the user's list of lexical models.
   ///
   /// - Precondition:
@@ -398,14 +398,14 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
     return false
   }
-
+  
   
   /*
    * Called from FirstVoices app to add a lexical model.
    */
   public func addLexicalModel(lexicalModelId: String, languageId: String, from package: LexicalModelKeymanPackage) -> Bool {
     let fullId = FullLexicalModelID(lexicalModelID: lexicalModelId, languageID: languageId)
-
+    
     do {
       try ResourceFileManager.shared.install(resourceWithID: fullId, from: package)
     }
@@ -419,19 +419,19 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
     return false
   }
-
+  
   /*
    * Called from FirstVoices app as a workaround to cause dictionary options to be applied.
    */
   public func registerLexicalModel(lexicalModelId: String, languageId: String) -> Bool {
     let fullId = FullLexicalModelID(lexicalModelID: lexicalModelId, languageID: languageId)
-
+    
     if let lexicalModel = Storage.active.userDefaults.userLexicalModel(withFullID: fullId) {
       return registerLexicalModel(lexicalModel)
     }
     return false
   }
-
+  
   /// Registers a lexical model with KMW.
   public func registerLexicalModel(_ lm: InstallableLexicalModel) -> Bool {
     let message = "Setting lexical model: \(lm.fullID)"
@@ -461,13 +461,13 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   }
   
   /** Adds a new lexical model to the list in the lexical model picker if it doesn't already exist.
-  *   The lexical model must be downloaded (see `downloadLexicalModel()`) or preloaded (see `preloadLanguageFile()`)
-  *   I believe this is background-thread-safe (no UI done)
-  */
+   *   The lexical model must be downloaded (see `downloadLexicalModel()`) or preloaded (see `preloadLanguageFile()`)
+   *   I believe this is background-thread-safe (no UI done)
+   */
   @available(*, deprecated, message: "Deprecated in favor of ResourceFileManager.install(resourceWithID:from:)")
   static public func addLexicalModel(_ lexicalModel: InstallableLexicalModel) {
     var modelToInstall = lexicalModel
-
+    
     // Potential 3rd party installation of lexical models (12.0, 13.0):
     // - Manager.shared.preloadFiles was called first to import the file resources
     // - Then Manager.addLexicalModel installs the lexical model.
@@ -487,7 +487,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       ResourceFileManager.shared.addResource(modelToInstall)
     }
   }
-
+  
   /// Removes a keyboard from the list in the keyboard picker if it exists.
   /// - Returns: The keyboard exists and was removed
   public func removeKeyboard(withFullID fullID: FullKeyboardID) -> Bool {
@@ -498,38 +498,38 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
     return false
   }
-
+  
   /// Removes the keyboard at index from the keyboards list if it exists.
   /// - Returns: The keyboard exists and was removed
   public func removeKeyboard(at index: Int) -> Bool {
     let userData = Storage.active.userDefaults
-
+    
     // If user defaults for keyboards list does not exist, do nothing.
     guard var userKeyboards = userData.userKeyboards else {
       return false
     }
-
+    
     guard index < userKeyboards.count else {
       return false
     }
-
+    
     let kb = userKeyboards[index]
     userKeyboards.remove(at: index)
     userData.userKeyboards = userKeyboards
     userData.set([Date()], forKey: Key.synchronizeSWKeyboard)
     userData.synchronize()
-
+    
     let message = ("Removing keyboard with ID \(kb.id) and languageID \(kb.languageID)")
     os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
     SentryManager.breadcrumb(message)
-
+    
     // Set a new keyboard if deleting the current one
     if kb.fullID == currentKeyboardID {
       if userKeyboards.count > 0 {
         _ = setKeyboard(userKeyboards[0])
       }
     }
-
+    
     if !userKeyboards.contains(where: { $0.id == kb.id }) {
       // TODO:  should make sure that there are no resources in the package,
       //        rather than just 'no matching keyboards'.
@@ -548,11 +548,11 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       os_log("%{public}s", log:KeymanEngineLogger.settings, type: .info, message)
       SentryManager.breadcrumb(message)
     }
-
+    
     NotificationCenter.default.post(name: Notifications.keyboardRemoved, object: self, value: kb)
     return true
   }
-
+  
   /// - Returns: Info for the current keyboard, if a keyboard is set
   public var currentKeyboard: InstallableKeyboard? {
     guard let fullID = currentKeyboardID else {
@@ -566,11 +566,11 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
    */
   public func removeLexicalModel(lexicalModelId: String, languageId: String) -> Bool {
     let fullId = FullLexicalModelID(lexicalModelID: lexicalModelId, languageID: languageId)
-
+    
     return removeLexicalModel(withFullID: fullId)
   }
-
-
+  
+  
   
   /// Removes a lexical model from the list in the lexical model picker if it exists.
   /// - Returns: The lexical model exists and was removed
@@ -603,7 +603,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     ud.set([Date()], forKey: Key.synchronizeSWLexicalModel)
     ud.synchronize()
     return lm
-}
+  }
   
   /// Removes the lexical model at index from the lexical models list if it exists.
   public func removeLexicalModelFromLanguagePreference(userDefs ud: UserDefaults, _ lm: InstallableLexicalModel) {
@@ -612,7 +612,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     SentryManager.breadcrumb(message)
     ud.set(preferredLexicalModelID: nil, forKey: lm.languageID)
   }
-
+  
   /// Removes the lexical model at index from the lexical models list if it exists.
   /// - Returns: The lexical model exists and was removed
   public func removeLexicalModel(at index: Int) -> Bool {
@@ -620,12 +620,12 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     guard let lm = removeLexicalModelFromUserList(userDefs: userData, at: index) else {
       return false
     }
-
+    
     removeLexicalModelFromLanguagePreference(userDefs: userData, lm)
     inputViewController.deregisterLexicalModel(lm);
     // Set a new lexical model if deleting the current one
     let userLexicalModels = userData.userLexicalModels! //removeLexicalModelFromUserList fails above if this is not present
-
+    
     if lm.fullID == currentLexicalModelID {
       if let first_lm = userLexicalModels.first(where: {$0.languageID == lm.languageID}) {
         _ = registerLexicalModel(first_lm)
@@ -649,9 +649,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
         SentryManager.capture(message)
       }
     } else {
-        let message = "User has another language installed. Skipping delete of lexical model files."
-        os_log("%{public}s", log:KeymanEngineLogger.settings, type: .info, message)
-        SentryManager.breadcrumb(message)
+      let message = "User has another language installed. Skipping delete of lexical model files."
+      os_log("%{public}s", log:KeymanEngineLogger.settings, type: .info, message)
+      SentryManager.breadcrumb(message)
     }
     
     NotificationCenter.default.post(name: Notifications.lexicalModelRemoved, object: self, value: lm)
@@ -665,12 +665,12 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
     return Storage.active.userDefaults.userLexicalModel(withFullID: fullID)
   }
-
+  
   /// Switch to the next keyboard.
   /// - Returns: Index of the newly selected keyboard.
   public func switchToNextKeyboard() -> Int? {
     guard let userKeyboards = Storage.active.userDefaults.userKeyboards,
-      let index = userKeyboards.firstIndex(where: { self.currentKeyboardID == $0.fullID })
+          let index = userKeyboards.firstIndex(where: { self.currentKeyboardID == $0.fullID })
     else {
       return nil
     }
@@ -678,7 +678,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     _ = setKeyboard(userKeyboards[newIndex])
     return newIndex
   }
-
+  
   /// - Returns: The font name for the given keyboard ID and languageID, or returns nil if
   ///   - The keyboard doesn't have a font
   ///   - The keyboard info is not available in the user keyboards list
@@ -690,7 +690,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
     return nil
   }
-
+  
   /// - Returns: The font name for the given keyboard ID and languageID, or returns nil if
   ///   - The keyboard doesn't have a font
   ///   - The keyboard info is not available in the user keyboards list
@@ -701,7 +701,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
     return nil
   }
-
+  
   /// - Returns: the OSK font name for the given keyboard ID and languageID, or returns nil if
   ///   - The keyboard doesn't have an OSK font
   ///   - The keyboard info is not available in the user keyboards list
@@ -713,13 +713,13 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
     return nil
   }
-    
+  
   // MARK: - Adhoc keyboards
   public func parseKbdKMP(_ folder: URL, isCustom: Bool) throws -> Void {
     guard let kmp = try? KeymanPackage.parse(folder) as? KeyboardKeymanPackage else {
       throw KMPError.wrongPackageType
     }
-
+    
     for resourceSet in kmp.installables {
       for resource in resourceSet {
         try ResourceFileManager.shared.install(resourceWithID: resource.fullID, from: kmp)
@@ -728,13 +728,13 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       }
     }
   }
-    
+  
   // MARK: - Adhoc lexical models
   static public func parseLMKMP(_ folder: URL, isCustom: Bool) throws -> Void {
     guard let kmp = try? KeymanPackage.parse(folder) as? LexicalModelKeymanPackage else {
       throw KMPError.wrongPackageType
     }
-
+    
     try kmp.installables.forEach { resourceSet in
       try resourceSet.forEach { resource in
         try ResourceFileManager.shared.install(resourceWithID: resource.fullID, from: kmp)
@@ -757,7 +757,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
     os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, message())
   }
-
+  
   // MARK: - Loading custom keyboards
   /// Preloads the JS and font files required for a keyboard.
   @available(*, deprecated, message: "Use ResourceFileManager's methods to install resources from KMPs.")
@@ -771,9 +771,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
                        excludeFromBackup: true)
     }
   }
-
+  
   // MARK: - File system and UserData management
-
+  
   /// Updates the user's installed keyboards and current keyboard with information in newKeyboard.
   /// - Parameter newKeyboard: Info for updated keyboard.
   func updateUserKeyboards(with newKeyboard: InstallableKeyboard) {
@@ -781,7 +781,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     guard var userKeyboards = userData.userKeyboards else {
       return
     }
-
+    
     // Set version in user keyboards list
     for i in userKeyboards.indices {
       var kb = userKeyboards[i]
@@ -797,7 +797,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     userData.userKeyboards = userKeyboards
     userData.synchronize()
   }
-    
+  
   /// Updates the user's installed lexical models and current lexical model with information in newLexicalModel.
   /// - Parameter newLexicalModel: Info for updated lexical model.
   func updateUserLexicalModels(with newLexicalModel: InstallableLexicalModel) {
@@ -821,10 +821,10 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     userData.userLexicalModels = userLexicalModels
     userData.synchronize()
   }
-
+  
   func synchronizeSWKeyboard() {
     if let shared = Storage.shared,
-      let nonShared = Storage.nonShared {
+       let nonShared = Storage.nonShared {
       let keysToCopy = [Key.userKeyboardsList, Key.engineVersion]
       shared.copyUserDefaults(to: nonShared, withKeys: keysToCopy, shouldOverwrite: true)
       do {
@@ -837,9 +837,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       }
     }
   }
-
+  
   // MARK: - View management
-
+  
   /// Displays a list of available keyboards and allows a user to add/download new keyboards
   /// or remove existing ones.
   ///
@@ -865,7 +865,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       }
     }
   }
-
+  
   public func dismissKeyboardPicker(_ viewController: UIViewController) {
     // #1045 - Setting animated to false "fixes" the display problems and prevents the crash (on iPad 10.5"
     // and 12.9"), but it makes the transition less smooth (obviously) and probably isn't the "right"
@@ -877,7 +877,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     
     NotificationCenter.default.post(name: Notifications.keyboardPickerDismissed, object: self, value: ())
   }
-    
+  
   public func dismissLexicalModelPicker(_ viewController: UIViewController) {
     // #1045 - Setting animated to false "fixes" the display problems and prevents the crash (on iPad 10.5"
     // and 12.9"), but it makes the transition less smooth (obviously) and probably isn't the "right"
@@ -890,9 +890,9 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     }
     NotificationCenter.default.post(name: Notifications.lexicalModelPickerDismissed, object: self, value: ())
   }
-
+  
   // MARK: - Text
-
+  
   public func showKeyboard() {
     currentResponder?.summonKeyboard()
   }
@@ -901,7 +901,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
     currentResponder?.dismissKeyboard()
     Manager.shared.inputViewController.resetKeyboardState()
   }
-
+  
   func clearText() {
     inputViewController.clearText()
   }
@@ -909,14 +909,14 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   func resetContext() {
     inputViewController.resetContext()
   }
-
+  
   func setContextState(text: String?, range: NSRange) {
     inputViewController.setContextState(text: text, range: range)
   }
   
   var vibrationSupportLevel: VibrationSupport {
     let device = Device.current
-
+    
     if device.isPod {
       return .none
     } else if device.isPad {
@@ -941,7 +941,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       return .none
     }
   }
-
+  
   /*-----------------------------
    *    Legacy API endpoints    -
    *-----------------------------
@@ -950,7 +950,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
    * No reason we can't add a couple of helper functions to help forward
    * the data for apps built on older versions of KMEI, though.
    */
-
+  
   public func downloadKeyboard(withID: String, languageID: String, isUpdate: Bool, fetchRepositoryIfNeeded: Bool = true) {
     let kbdFullID = FullKeyboardID(keyboardID: withID, languageID: languageID)
     let completionBlock = ResourceDownloadManager.shared.standardKeyboardInstallCompletionBlock(forFullID: kbdFullID, withModel: true)
@@ -960,7 +960,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
                                                     fetchRepositoryIfNeeded: fetchRepositoryIfNeeded,
                                                     completionBlock: completionBlock)
   }
-
+  
   // A new API, but it so closely parallels downloadKeyboard that we should add a 'helper' handler here.
   public func downloadLexicalModel(withID: String, languageID: String, isUpdate: Bool, fetchRepositoryIfNeeded: Bool = true) {
     let lmFullID = FullLexicalModelID(lexicalModelID: withID, languageID: languageID)
@@ -971,30 +971,30 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
                                                         fetchRepositoryIfNeeded: fetchRepositoryIfNeeded,
                                                         completionBlock: completionBlock)
   }
-
+  
   @available(*, deprecated, message: "") // TODO:  Write method on KeymanPackage for this.
   public func stateForKeyboard(withID keyboardID: String) -> KeyboardState {
     return ResourceDownloadManager.shared.stateForKeyboard(withID: keyboardID)
   }
-
+  
   // Technically new, but it does closely parallel an old API point.
   @available(*, deprecated, message: "") // TODO:  Write method on KeymanPackage for this.
   public func stateForLexicalModel(withID modelID: String) -> KeyboardState {
     return ResourceDownloadManager.shared.stateForLexicalModel(withID: modelID)
   }
-
+  
   public func parseKMP(_ folder: URL, type: LanguageResourceType = .keyboard, isCustom: Bool) throws -> Void {
     switch type {
-      case .keyboard:
-        try! parseKbdKMP(folder, isCustom: isCustom)
-        break
-      case .lexicalModel:
-        // Yep.  Unlike the original, THIS one is static.
-        try! Manager.parseLMKMP(folder, isCustom: isCustom)
-        break
+    case .keyboard:
+      try! parseKbdKMP(folder, isCustom: isCustom)
+      break
+    case .lexicalModel:
+      // Yep.  Unlike the original, THIS one is static.
+      try! Manager.parseLMKMP(folder, isCustom: isCustom)
+      break
     }
   }
-
+  
   // To re-implement the old API (missing from v11!) we need to pick one version of height.
   // For library users, the total height of the InputViewController should be most useful.
   public func keyboardHeight() -> CGFloat {

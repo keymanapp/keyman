@@ -11,19 +11,19 @@ import Foundation
 struct KMPLanguage: Codable {
   public var name: String
   public var languageId: String
-
+  
   enum CodingKeys: String, CodingKey {
     case name
     case languageId = "id"
   }
-
+  
   public init(from decoder: Decoder) throws {
     let values = try decoder.container(keyedBy: CodingKeys.self)
-
+    
     name = try values.decode(String.self, forKey: .name)
     languageId = try values.decode(String.self, forKey: .languageId).lowercased()
   }
-
+  
   public init?<Resource: KMPInitializableLanguageResource>(from resource: Resource) {
     if let kbd = resource as? InstallableKeyboard {
       self.name = kbd.languageName
@@ -35,7 +35,7 @@ struct KMPLanguage: Codable {
       return nil
     }
   }
-
+  
   public init(name: String, languageId: String) {
     self.name = name
     self.languageId = languageId

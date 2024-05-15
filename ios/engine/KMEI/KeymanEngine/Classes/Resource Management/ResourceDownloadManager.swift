@@ -15,20 +15,20 @@ public enum DownloadError : Error {
     // code, message, triggering link
     case responseCode(Int, String, URL)
   }
-
+  
   // The value:  the translation-lookup key.
   case failed(Cause)
   case busy
   case noInternet
-
+  
   var localizedDescription: String {
     switch self {
-      case .failed(_):
-        return engineBundle.localizedString(forKey: "alert-download-error-detail", value: nil, table: nil)
-      case .busy:
-        return engineBundle.localizedString(forKey: "alert-download-error-busy", value: nil, table: nil)
-      case .noInternet:
-        return engineBundle.localizedString(forKey: "alert-no-connection-detail", value: nil, table: nil)
+    case .failed(_):
+      return engineBundle.localizedString(forKey: "alert-download-error-detail", value: nil, table: nil)
+    case .busy:
+      return engineBundle.localizedString(forKey: "alert-download-error-busy", value: nil, table: nil)
+    case .noInternet:
+      return engineBundle.localizedString(forKey: "alert-no-connection-detail", value: nil, table: nil)
     }
   }
 }
@@ -39,17 +39,17 @@ public enum UpdateError : Error {
     // code, message, triggering link
     case responseCode(Int, String, URL)
   }
-
+  
   // The value:  the translation-lookup key.
   case unmanaged
   case sourceUnavailable
-
+  
   var localizedDescription: String {
     switch self {
-      case .unmanaged:
-        return engineBundle.localizedString(forKey: "error-update-not-managed", value: nil, table: nil)
-      case .sourceUnavailable:
-        return engineBundle.localizedString(forKey: "error-update-no-link", value: nil, table: nil)
+    case .unmanaged:
+      return engineBundle.localizedString(forKey: "error-update-not-managed", value: nil, table: nil)
+    case .sourceUnavailable:
+      return engineBundle.localizedString(forKey: "error-update-no-link", value: nil, table: nil)
     }
   }
 }
@@ -65,20 +65,20 @@ public class ResourceDownloadManager {
   internal var downloader: ResourceDownloadQueue
   private var isDidUpdateCheck = false
   internal var unitTestCurrentDate: Date?
-
+  
   public static let DISTRIBUTION_CACHE_VALIDITY_THRESHOLD = TimeInterval(60*24*7) // in seconds.  60 minutes, 24 hrs, 7 days.
-
+  
   public typealias CompletionHandler<Package: KeymanPackage> = (Package?, Error?) throws -> Void
   public typealias BatchCompletionHandler = () -> Void
   internal typealias InternalBatchCompletionHandler = (CompositeBatch) -> Void
   
   public static let shared = ResourceDownloadManager()
-
+  
   internal init() {
     session = URLSession.shared
     downloader = ResourceDownloadQueue()
   }
-
+  
   // Intended only for use in testing!
   internal init(session: URLSession, autoExecute: Bool) {
     self.session = session
@@ -86,7 +86,7 @@ public class ResourceDownloadManager {
   }
   
   // MARK - Downloading resources
-
+  
   // TODO:  Consider renaming this if the format will only ever be used for keyboard packages.
   /**
    * Generates a download link for the specified package.  The resulting link is planned to be evergreen, with redirects as
@@ -101,38 +101,38 @@ public class ResourceDownloadManager {
     baseURL.appendPathComponent("package")
     baseURL.appendPathComponent("download")
     baseURL.appendPathComponent(packageKey.id)
-
+    
     var typeForEndpoint: String
     switch(packageKey.type) {
-      case .keyboard:
-        typeForEndpoint = "keyboard"
-      case .lexicalModel:
-        typeForEndpoint = "model"
+    case .keyboard:
+      typeForEndpoint = "keyboard"
+    case .lexicalModel:
+      typeForEndpoint = "model"
     }
-
+    
     var urlComponents = URLComponents(string: baseURL.absoluteString)!
     var queryItems: [URLQueryItem] = [
       URLQueryItem(name: "platform", value: "ios"),
       URLQueryItem(name: "tier", value: (Version.currentTagged.tier ?? .stable).rawValue),
       URLQueryItem(name: "type", value: typeForEndpoint)
     ]
-
+    
     if let version = version {
       queryItems.append(URLQueryItem(name: "version", value: version.description))
     }
-
+    
     if let resourceKey = resourceKey {
       queryItems.append(URLQueryItem(name: "bcp47", value: resourceKey.languageID))
     }
-
+    
     if let asUpdate = asUpdate {
       queryItems.append(URLQueryItem(name: "update", value: asUpdate ? "1" : "0"))
     }
-
+    
     urlComponents.queryItems = queryItems
     return urlComponents.url!
   }
-
+  
   // Used to maintain legacy API:  downloadKeyboard and downloadLexicalModel (based on ID, language ID)
   private func downloadResource<FullID: LanguageResourceFullID>(withFullID fullID: FullID,
                                                                 sendNotifications: Bool,
@@ -143,7 +143,7 @@ public class ResourceDownloadManager {
     let packageURL = defaultDownloadURL(forPackage: KeymanPackage.Key(id: fullID.id, type: fullID.type),
                                         andResource: fullID,
                                         asUpdate: asUpdate)
-
+    
     // Perform common 'can download' check.  We need positive reachability and no prior download queue.
     guard self.downloader.state == .clear else {
       let err = self.downloader.state.error ?? DownloadError.busy
@@ -151,20 +151,20 @@ public class ResourceDownloadManager {
       try? completionBlock?(nil, err)
       return
     }
-
+    
     let completionClosure: CompletionHandler<FullID.Resource.Package> = completionBlock ?? { package, error in
       // If the caller doesn't specify a completion block, this will carry out a default installation.
       if let package = package {
         try? ResourceFileManager.shared.install(resourceWithID: fullID, from: package)
       }
     }
-
+    
     self.downloadPackage(withKey: packageKey,
                          from: packageURL,
                          withNotifications: sendNotifications,
                          completionBlock: completionClosure)
   }
-
+  
   /// Asynchronously fetches the .js file for the keyboard with given IDs.
   /// See `Notifications` for notification on success/failiure.
   /// - Parameters:
@@ -178,29 +178,29 @@ public class ResourceDownloadManager {
     let kbdFullID = FullKeyboardID(keyboardID: keyboardID, languageID: languageID)
     downloadResource(withFullID: kbdFullID, sendNotifications: !isUpdate, completionBlock: completionBlock)
   }
-
+  
   @available(*, deprecated) // Used to maintain deprecated methods stateForKeyboard, stateForLexicalModel.
   private func keyboardState(for key: KeymanPackage.Key) -> KeyboardState {
     switch(ResourceFileManager.shared.installState(forPackage: key)) {
-      case .none:
-        return .needsDownload
-      case .downloading:
-        return .downloading
-      case .pending:
-        return .downloading
-      case .installed:
-        let package = ResourceFileManager.shared.getInstalledPackage(withKey: key)!
-        switch(package.versionState) {
-          case .unknown:
-            return .upToDate
-          case .upToDate:
-            return .upToDate
-          case .needsUpdate:
-            return .needsUpdate
-        }
+    case .none:
+      return .needsDownload
+    case .downloading:
+      return .downloading
+    case .pending:
+      return .downloading
+    case .installed:
+      let package = ResourceFileManager.shared.getInstalledPackage(withKey: key)!
+      switch(package.versionState) {
+      case .unknown:
+        return .upToDate
+      case .upToDate:
+        return .upToDate
+      case .needsUpdate:
+        return .needsUpdate
+      }
     }
   }
-
+  
   // Deprecating due to tricky assumption - a keyboard _can_ be installed from two separate packages.
   /// - Returns: The current state for a keyboard
   @available(*, deprecated, message: "Use `ResourceFileManager.shared.installState(forPackage:)` instead.  Keyboard states are now tied to the state of their package.")
@@ -215,7 +215,7 @@ public class ResourceDownloadManager {
         return .needsDownload
       }
     }
-
+    
     // Check version
     let packageKey = KeymanPackage.Key(forResource: userKeyboard)
     if downloader.containsPackageKeyInQueue(matchingKey: packageKey) {
@@ -224,7 +224,7 @@ public class ResourceDownloadManager {
       return keyboardState(for: packageKey)
     }
   }
-
+  
   // MARK - Lexical models
   
   // Can be called by the keyboard downloader and utilized.
@@ -247,7 +247,7 @@ public class ResourceDownloadManager {
         try? completionClosure?(nil, error)
         return
       }
-
+      
       guard let results = results else {  // Should not be possible.
         //TODO: put up an alert instead
         let message = "No lexical models available for language \(languageID) (nil)"
@@ -255,7 +255,7 @@ public class ResourceDownloadManager {
         try? completionClosure?(nil, nil)
         return
       }
-
+      
       if results.count == 0 {
         let message = "No lexical models available for language \(languageID) (empty)"
         os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
@@ -266,17 +266,17 @@ public class ResourceDownloadManager {
         let lmFullID = results[0].0.fullID
         let message = "Fetched lexical model list for \(languageID)."
         os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
-
+        
         let closure = completionClosure ?? self.standardLexicalModelInstallCompletionBlock(forFullID: lmFullID)
         let downloadURL = self.defaultDownloadURL(forPackage: lexicalModel.packageKey,
                                                   andResource: lexicalModel.fullID,
                                                   asUpdate: false)
-
+        
         self.downloadPackage(withKey: lexicalModel.packageKey, from: downloadURL, completionBlock: closure)
       }
     }
   }
-
+  
   /// Asynchronously fetches the .js file for the lexical model with given IDs.
   /// See `Notifications` for notification on success/failiure.
   /// - Parameters:
@@ -290,12 +290,12 @@ public class ResourceDownloadManager {
     // Note:  in this case, someone knows the "full ID" of the model already, but NOT its location.
     //        For lexical models, we can use either the LexicalModel query or the PackageVersion query.
     //        For consistency with keyboard download behavior, we use the PackageVersion query here.
-
+    
     let lmFullID = FullLexicalModelID(lexicalModelID: lexicalModelID, languageID: languageID)
     downloadResource(withFullID: lmFullID, sendNotifications: !isUpdate, completionBlock: completionBlock)
   }
-
-
+  
+  
   
   /// - Returns: The current state for a lexical model
   @available(*, deprecated, message: "Use `ResourceFileManager.shared.installState(forPackage:)` instead.  Lexical model states are tied to the state of their package.")
@@ -310,7 +310,7 @@ public class ResourceDownloadManager {
         return .needsDownload
       }
     }
-
+    
     // Check version
     let packageKey = KeymanPackage.Key(forResource: userLexicalModel)
     if downloader.containsPackageKeyInQueue(matchingKey: packageKey) {
@@ -319,7 +319,7 @@ public class ResourceDownloadManager {
       return keyboardState(for: packageKey)
     }
   }
-
+  
   /**
    * Downloads a package for the specified `LanguageResourceFullID` (`FullKeyboardID` / `FullLexicalModelID`)
    * and parses it automatically, given a pre-known URL.  The fully parsed package (`KeyboardKeymanPackage` /
@@ -340,7 +340,7 @@ public class ResourceDownloadManager {
                                   completionBlock: completionBlock)
     downloader.queue(.simpleBatch(batch))
   }
-
+  
   // Facilitates re-use of the downloadPackage core for updates.
   // Also allows specifying LanguageResource instances for use in notifications.
   internal func buildPackageBatch<Package: KeymanPackage>(withKey packageKey: KeymanPackage.Key,
@@ -350,12 +350,12 @@ public class ResourceDownloadManager {
                                                           completionBlock: @escaping CompletionHandler<Package>) -> DownloadBatch<Package> {
     var startClosure: (() -> Void)? = nil
     var completionClosure: CompletionHandler<Package>? = completionBlock
-
+    
     if withNotifications {
       startClosure = resourceDownloadStartClosure(withKey: packageKey)
       completionClosure = resourceDownloadCompletionClosure(withKey: packageKey, handler: completionBlock)
     }
-
+    
     // build batch for package
     return DownloadBatch(forPackageWithKey: packageKey, from: url, startBlock: startClosure, completionBlock: completionClosure)
   }
@@ -366,7 +366,7 @@ public class ResourceDownloadManager {
    */
   public var updateCacheIsCurrent: Bool {
     let packages = ResourceFileManager.shared.installedPackages
-
+    
     let packageWithOldestCache = packages.min { lhs, rhs in
       if let lhsTimestamp = lhs.versionQueryCache.timestampForLastQuery,
          let rhsTimestamp = rhs.versionQueryCache.timestampForLastQuery {
@@ -376,26 +376,26 @@ public class ResourceDownloadManager {
         return rhs.versionQueryCache.timestampForLastQuery != nil
       }
     }
-
+    
     // If there are no packages, the cache is considered 'current' - there's nothing to update.
     guard let package = packageWithOldestCache else {
       return true
     }
-
+    
     // If there is no timestamp for the 'oldest' entry, there's nothing cached for at least one package.
     // We should run the query to initialize its distribution-state metadata.
     guard let timestamp = package.versionQueryCache.timestampForLastQuery else {
       return false
     }
-
+    
     // Every package has a cached entry... but are they recent enough?
     let date = unitTestCurrentDate ?? Date()
     let now = date.timeIntervalSince1970
     let timeDelta = now - timestamp
-
+    
     return timeDelta <= ResourceDownloadManager.DISTRIBUTION_CACHE_VALIDITY_THRESHOLD
   }
-
+  
   /**
    * Indicates whether any packages are known to be updatable based on the most recently
    * cached package-version query for each.  To bypass the cache and query for updated results,
@@ -406,7 +406,7 @@ public class ResourceDownloadManager {
       return getKeysForUpdatablePackages().count > 0
     }
   }
-
+  
   /**
    * Returns a Set of package keys for packages known to be updatable,
    * based upon the results of their most recently-run latest-version queries.
@@ -416,7 +416,7 @@ public class ResourceDownloadManager {
    */
   public func getKeysForUpdatablePackages() -> Set<KeymanPackage.Key> {
     let packages = ResourceFileManager.shared.installedPackages
-
+    
     let keys: [KeymanPackage.Key] = packages.compactMap { package in
       guard package.versionQueryCache.distributionMethod == .cloud,
             let versionString = package.versionQueryCache.latestVersion,
@@ -424,17 +424,17 @@ public class ResourceDownloadManager {
         // We only update packages with full cloud support.
         return nil
       }
-
+      
       if package.version < latestVersion {
         return package.key
       } else {
         return nil
       }
     }
-
+    
     return Set(keys)
   }
-
+  
   /**
    * Queries the cloud for the latest version of every installed package, returning a Set
    * of keys for packages with available updates.  The results will also be cached for use
@@ -442,40 +442,40 @@ public class ResourceDownloadManager {
    */
   public func queryKeysForUpdatablePackages(completionBlock: @escaping (Set<KeymanPackage.Key>?, Error?) -> Void) {
     let allPackages = ResourceFileManager.shared.installedPackages
-
+    
     // This call will automatically cache the results for future use / access by the 'get' equivalent.
     KeymanPackage.queryCurrentVersions(for: allPackages.map { $0.key }, withSession: session) { results, error in
       guard error == nil, let results = results else {
         completionBlock(nil, error)
         return
       }
-
+      
       let updatables: [KeymanPackage.Key] = allPackages.compactMap { package in
         guard let result = results[package.key] else {
           return nil
         }
-
+        
         return package.version < result ? package.key : nil
       }
-
+      
       completionBlock(Set(updatables), nil)
     }
   }
-
+  
   public func performBatchUpdate(forPackageKeys keysToUpdate: Set<KeymanPackage.Key>? = nil,
                                  withNotifications: Bool = true,
                                  completionBlock: (([KeymanPackage.Key], [(KeymanPackage.Key, Error)]) -> Void)? = nil) {
     let engineUpdatables = getKeysForUpdatablePackages()
     var updatables = Set<KeymanPackage.Key>()
-
+    
     var invalids: [(KeymanPackage.Key, Error)] = []
-
+    
     if keysToUpdate == nil {
       updatables = engineUpdatables
     } else {
       // Verify that KeymanEngine actually can update the entry.
       updatables = engineUpdatables.intersection(keysToUpdate!)
-
+      
       // Generate errors for any entries that KeymanEngine cannot update.
       keysToUpdate!.forEach { key in
         if !updatables.contains(key) {
@@ -483,12 +483,12 @@ public class ResourceDownloadManager {
         }
       }
     }
-
+    
     if updatables.count == 0 {
       completionBlock?([], invalids)
       return
     }
-
+    
     var updateMapping: Dictionary<KeymanPackage.Key, AnyDownloadBatch> = [:]
     updatables.forEach { key in
       guard let downloadURL = Storage.active.userDefaults.cachedPackageQueryResult(forPackageKey: key)!.downloadURL else {
@@ -496,7 +496,7 @@ public class ResourceDownloadManager {
         invalids.append( (key, UpdateError.sourceUnavailable) )
         return
       }
-
+      
       updateMapping[key] = self.buildPackageBatch(withKey: key,
                                                   from: downloadURL) { package, error in
         guard let package = package, error == nil else {
@@ -505,7 +505,7 @@ public class ResourceDownloadManager {
           os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, errorMessage)
           return
         }
-
+        
         if let kbdPackage = package as? KeyboardKeymanPackage {
           let updatables = ResourceFileManager.shared.findPotentialUpdates(in: kbdPackage)
           try ResourceFileManager.shared.install(resourcesWithIDs: updatables.map { $0.fullID }, from: kbdPackage)
@@ -515,20 +515,20 @@ public class ResourceDownloadManager {
         }
       }
     }
-
+    
     // Build the composite batch.
     let batchNodes: [DownloadNode] = updateMapping.values.map { .simpleBatch($0) }
     let updateCompletionClosure = resourceBatchUpdateCompletionClosure(withNotifications: withNotifications, completionBlock: completionBlock)
     let updateBatch = CompositeBatch(queue: batchNodes, startBlock: nil, completionBlock: updateCompletionClosure)
-
+    
     downloader.queue(.compositeBatch(updateBatch))
   }
-
+  
   static func packageKeys(forResources resources: [AnyLanguageResource]) -> Set<KeymanPackage.Key> {
     let keys = resources.map { $0.packageKey }
     return Set(keys)
   }
-
+  
   @available(*, deprecated)
   public func installLexicalModelPackage(at packageURL: URL) -> InstallableLexicalModel? {
     do {
@@ -549,13 +549,13 @@ public class ResourceDownloadManager {
       return nil
     }
   }
-
+  
   // MARK - Completion handlers.
-
+  
   internal func resourceDownloadStartClosure(withKey packageKey: KeymanPackage.Key) -> (() -> Void) {
     return { self.resourceDownloadStarted(withKey: packageKey) }
   }
-
+  
   // Only for use with individual downloads.  Updates should have different completion handling.
   internal func resourceDownloadCompletionClosure<Package: KeymanPackage>(withKey packageKey: KeymanPackage.Key, handler: CompletionHandler<Package>?) -> CompletionHandler<Package> {
     return { package, error in
@@ -565,7 +565,7 @@ public class ResourceDownloadManager {
         try? handler?(nil, error)
         return
       }
-
+      
       do {
         try handler?(package, error)
         self.resourceDownloadCompleted(with: package)
@@ -575,7 +575,7 @@ public class ResourceDownloadManager {
         SentryManager.capture(error, message: message)
         self.resourceDownloadFailed(withKey: packageKey, with: error)
       }
-
+      
       // After the custom handler operates, ensure that any changes it made are synchronized for use
       // with the app extension, too.
       let userDefaults = Storage.active.userDefaults
@@ -583,7 +583,7 @@ public class ResourceDownloadManager {
       userDefaults.synchronize()
     }
   }
-
+  
   internal func resourceBatchUpdateStartClosure(for resources: [AnyLanguageResource]) -> (() -> Void) {
     return {
       let notification = BatchUpdateStartedNotification(resources)
@@ -592,14 +592,14 @@ public class ResourceDownloadManager {
                                       value: notification)
     }
   }
-
+  
   internal func resourceBatchUpdateCompletionClosure(withNotifications: Bool,
                                                      completionBlock: (([KeymanPackage.Key], [(KeymanPackage.Key, Error)]) -> Void)? = nil)
-                                                     -> InternalBatchCompletionHandler {
+  -> InternalBatchCompletionHandler {
     return { batch in
       var successes: [KeymanPackage.Key] = []
       var failures: [(KeymanPackage.Key, Error)] = []
-
+      
       batch.batchQueue.forEach{ tuple in
         if case let .simpleBatch(node) = tuple.0 {
           if let err = node.errors.first(where: { $0 != nil }), let error = err {
@@ -609,7 +609,7 @@ public class ResourceDownloadManager {
           }
         }
       }
-
+      
       if withNotifications {
         // Send update notification to the UI.
         let notification = BatchUpdateCompletedNotification(successes: successes, failures: failures)
@@ -617,11 +617,11 @@ public class ResourceDownloadManager {
                                         object: self,
                                         value: notification)
       }
-
+      
       completionBlock?(successes, failures)
     }
   }
-
+  
   public func standardKeyboardInstallCompletionBlock(forFullID fullID: FullKeyboardID, withModel: Bool = true) -> CompletionHandler<KeyboardKeymanPackage> {
     return { package, error in
       if let package = package {
@@ -630,12 +630,12 @@ public class ResourceDownloadManager {
           let message = "successfully parsed the keyboard in: \(package.sourceFolder)"
           os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
           SentryManager.breadcrumb(message)
-
+          
           // Maintains legacy behavior; automatically sets the newly-downloaded keyboard as active.
           if let keyboard = package.findResource(withID: fullID) {
             _ = Manager.shared.setKeyboard(keyboard)
           }
-
+          
           if withModel {
             self.downloadLexicalModelsForLanguageIfExists(languageID: fullID.languageID)
           }
@@ -655,7 +655,7 @@ public class ResourceDownloadManager {
       }
     }
   }
-
+  
   public func standardLexicalModelInstallCompletionBlock(forFullID fullID: FullLexicalModelID) -> CompletionHandler<LexicalModelKeymanPackage> {
     return { package, error in
       if let package = package {
@@ -665,7 +665,7 @@ public class ResourceDownloadManager {
           let message = "successfully parsed the lexical model in: \(package.sourceFolder)"
           os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
           SentryManager.breadcrumb(message)
-
+          
           if let installedLexicalModel = package.findResource(withID: fullID) {
             _ = Manager.shared.registerLexicalModel(installedLexicalModel)
           }
@@ -684,7 +684,7 @@ public class ResourceDownloadManager {
       }
     }
   }
-
+  
   // MARK - Notifications
   internal func resourceDownloadStarted(withKey packageKey: KeymanPackage.Key) {
     DispatchQueue.main.async {
@@ -693,7 +693,7 @@ public class ResourceDownloadManager {
                                       value: packageKey)
     }
   }
-
+  
   internal func resourceDownloadCompleted(with package: KeymanPackage) {
     DispatchQueue.main.async {
       NotificationCenter.default.post(name: Notifications.packageDownloadCompleted,
@@ -701,7 +701,7 @@ public class ResourceDownloadManager {
                                       value: package)
     }
   }
-
+  
   internal func resourceDownloadFailed(withKey packageKey: KeymanPackage.Key, with error: Error) {
     DispatchQueue.main.async {
       NotificationCenter.default.post(name: Notifications.packageDownloadFailed,
@@ -709,31 +709,31 @@ public class ResourceDownloadManager {
                                       value: PackageDownloadFailedNotification(packageKey: packageKey, error: error))
     }
   }
-
+  
   /**
    * Designed for downloading KMP files when no metadata is available in advance.
    */
   public func downloadRawKMP(from url: URL, handler: @escaping (URL?, Error?) -> Void) {
-
+    
     // First, we need something to handle the download.
     class NoMetadataDelegate: HTTPDownloadDelegate {
       private let closure: (URL?, Error?) -> Void
-
+      
       init(withHandler handler: @escaping (URL?, Error?) -> Void) {
         self.closure = handler;
       }
-
+      
       func downloadRequestStarted(_ request: HTTPDownloadRequest) {
         // Not relevant
       }
-
+      
       func downloadRequestFinished(_ request: HTTPDownloadRequest) {
         if request.responseStatusCode != 200 {
           // Possible request error (400 Bad Request, 404 Not Found, etc.)
           let error = DownloadError.failed(.responseCode(request.responseStatusCode ?? 400,
                                                          request.responseStatusMessage ?? "",
                                                          request.url))
-
+          
           // Now that we've synthesized an appropriate error instance, use the same handler
           // as for HTTPDownloader's 'failed' condition.
           downloadRequestFailed(request, with: error)
@@ -741,33 +741,33 @@ public class ResourceDownloadManager {
           self.closure(URL(fileURLWithPath: request.destinationFile!), nil)
         }
       }
-
+      
       func downloadRequestFailed(_ request: HTTPDownloadRequest, with error: Error?) {
         self.closure(nil, error)
       }
-
+      
       func downloadQueueFinished(_ queue: HTTPDownloader) {
         // Not relevant
       }
-
+      
       func downloadQueueCancelled(_ queue: HTTPDownloader) {
         // Not relevant, but to be safe...
         self.closure(nil, nil)
       }
     }
-
+    
     let delegate = NoMetadataDelegate(withHandler: handler)
     let downloader = HTTPDownloader(delegate, session: self.session)
     let request = HTTPDownloadRequest(url: url, downloadType: .downloadFile)
-
+    
     // Since we don't know the package key in advance, we'll download it to
     // the app's cache directory, then figure everything out once we open it.
     let cachesDir = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
     let tempFilename = url.lastPathComponent
     let cachedDest = cachesDir.appendingPathComponent(tempFilename)
-
+    
     request.destinationFile = cachedDest.path
-
+    
     downloader.addRequest(request)
     downloader.run()
   }

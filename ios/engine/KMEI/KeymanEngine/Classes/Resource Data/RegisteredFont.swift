@@ -9,7 +9,7 @@
 public struct RegisteredFont {
   public let name: String
   public var isRegistered: Bool
-
+  
   public init(name: String, isRegistered: Bool) {
     self.name = name
     self.isRegistered = isRegistered

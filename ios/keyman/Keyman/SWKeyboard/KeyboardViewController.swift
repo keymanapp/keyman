@@ -13,7 +13,7 @@ import os.log
 
 class KeyboardViewController: InputViewController {
   var topBarImageSource: ImageBannerViewController!
-
+  
   // The entrypoint for the app-extension.
   override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
     // Only true if it's the first init of the class under app-extension mode.
@@ -22,43 +22,43 @@ class KeyboardViewController: InputViewController {
       // is enabled.  They seem to get blocked otherwise, except in the Simulator.
       SentryManager.start(sendingEnabled: true)
     }
-
+    
     Manager.applicationGroupIdentifier = "group.KM4I"
-
+    
     let bundle = Bundle(for: KeyboardViewController.self)
     topBarImageSource = ImageBannerViewController(nibName: "ImageBanner", bundle: bundle)
-
+    
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
   }
-
+  
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-
+  
   override func updateViewConstraints() {
     super.updateViewConstraints()
-
+    
     if view.frame.size.width == 0 || self.view.frame.size.height == 0 {
       return
     }
-
+    
     setupTopBarImage(size: view.frame.size)
   }
-
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     setupTopBarImage(size: view.frame.size)
   }
-
+  
   override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
     super.viewWillTransition(to: size, with: coordinator)
     setupTopBarImage(size: size)
   }
-
+  
   func getTopBarImage(size: CGSize) -> String? {
     return topBarImageSource.renderAsBase64(size: CGSize(width: size.width, height: InputViewController.topBarHeight))
   }
-
+  
   func setupTopBarImage(size: CGSize) {
     // We override the height in getTopBarImage, but not width.
     // If width is 0, we return null from that function; this'll
@@ -66,7 +66,7 @@ class KeyboardViewController: InputViewController {
     if size.width == 0 {
       return
     }
-
+    
     let imgPath = getTopBarImage(size: size)
     guard let path = imgPath else {
       let message = "No image specified for the image banner!"
@@ -74,10 +74,10 @@ class KeyboardViewController: InputViewController {
       SentryManager.capture(message)
       return
     }
-
+    
     self.setBannerImage(to: path)
   }
-
+  
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     guard let previousTraitCollection = previousTraitCollection else {return}

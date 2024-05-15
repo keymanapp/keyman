@@ -15,43 +15,43 @@ private let bookmarkUrlKey = "BookMarkUrl"
 
 class BookmarksViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UIAlertViewDelegate {
   weak var webBrowser: WebBrowserViewController?
-
+  
   @IBOutlet var tableView: UITableView!
   @IBOutlet var doneButton: UIBarButtonItem!
   @IBOutlet var navBarTopConstraint: NSLayoutConstraint!
   @IBOutlet weak var navBar: UINavigationBar!
   // TODO: Create struct for bookmarks
   private var bookmarks = [[String: String]]()
-
+  
   weak var inputTitleField: UITextField?
   weak var inputUrlField: UITextField?
   weak var addAction: UIAlertAction?
-
+  
   convenience init() {
     self.init(nibName: "BookmarksViewController", bundle: nil)
   }
-
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     loadBookmarks()
     tableView.tableFooterView = UIView(frame: CGRect.zero)
     navBar.topItem?.title = NSLocalizedString("browser-bookmarks-title", comment: "")
   }
-
+  
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     navBarTopConstraint.constant = AppDelegate.statusBarHeight()
     checkIfEmpty()
   }
-
+  
   override func didRotate(from fromInterfaceOrientation: UIInterfaceOrientation) {
     navBarTopConstraint.constant = AppDelegate.statusBarHeight()
   }
-
+  
   @IBAction func done(_ sender: Any) {
     dismiss(animated: true, completion: nil)
   }
-
+  
   @IBAction func addBookmark(_ sender: Any) {
     let alertController = UIAlertController(title: NSLocalizedString("browser-bookmarks-add-title", comment: ""),
                                             message: "",
@@ -59,8 +59,8 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
     alertController.addTextField(configurationHandler: { (textField) in
       // listen for changes
       NotificationCenter.default.addObserver(self,
-        selector: #selector(BookmarksViewController.handleTextFieldTextChangedNotification(notification:)),
-        name: UITextField.textDidChangeNotification, object: textField)
+                                             selector: #selector(BookmarksViewController.handleTextFieldTextChangedNotification(notification:)),
+                                             name: UITextField.textDidChangeNotification, object: textField)
       textField.placeholder = "Title"
       self.webBrowser?.webView?.evaluateJavaScript("document.title") { val, _ in
         if let str = val as? String {
@@ -77,8 +77,8 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
     alertController.addTextField(configurationHandler: { (textField) in
       // listen for changes
       NotificationCenter.default.addObserver(self,
-          selector: #selector(BookmarksViewController.handleTextFieldTextChangedNotification(notification:)),
-          name: UITextField.textDidChangeNotification, object: textField)
+                                             selector: #selector(BookmarksViewController.handleTextFieldTextChangedNotification(notification:)),
+                                             name: UITextField.textDidChangeNotification, object: textField)
       textField.placeholder = "URL"
       textField.text = self.webBrowser?.webView?.url?.absoluteString
       textField.autocapitalizationType = .none
@@ -90,19 +90,19 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
     alertController.addAction(UIAlertAction(title: NSLocalizedString("menu-cancel", comment: ""),
                                             style: UIAlertAction.Style.cancel,
                                             handler: nil))
-
+    
     let addAlertAction = UIAlertAction(title: NSLocalizedString("menu-add", comment: ""),
-                                  style: UIAlertAction.Style.default,
-                                  handler: {_ in self.addBookmarkHandler()
+                                       style: UIAlertAction.Style.default,
+                                       handler: {_ in self.addBookmarkHandler()
     })
     alertController.addAction(addAlertAction)
     // save add action to toggle the enabled/disabled state when the text changes.
     addAction = addAlertAction
     updateAddButtonEnableState()
-
+    
     self.present(alertController, animated: true, completion: nil)
   }
-
+  
   private func checkIfEmpty() {
     if tableView.numberOfSections == 0 {
       let label = UILabel(frame: tableView.frame)
@@ -113,12 +113,12 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
       tableView.backgroundView = label
     }
   }
-
+  
   private func loadBookmarks() {
     let userData = AppDelegate.activeUserDefaults()
     bookmarks = userData.object(forKey: webBrowserBookmarksKey) as? [[String: String]] ?? [[String: String]]()
   }
-
+  
   private func saveBookmarks() {
     let userData = AppDelegate.activeUserDefaults()
     if !bookmarks.isEmpty {
@@ -128,7 +128,7 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     userData.synchronize()
   }
-
+  
   func numberOfSections(in tableView: UITableView) -> Int {
     // Return the number of sections.
     let sections = bookmarks.count
@@ -137,12 +137,12 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     return sections
   }
-
+  
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     // Return the number of rows in the section.
     return 1
   }
-
+  
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cellIdentifier = "Cell"
     if let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
@@ -156,18 +156,18 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
     cell.detailTextLabel?.font = cell.detailTextLabel?.font?.withSize(10.0)
     return cell
   }
-
+  
   func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     let bookmark = bookmarks[indexPath.section]
     cell.textLabel?.text = bookmark[bookmarkTitleKey]
     cell.detailTextLabel?.text = bookmark[bookmarkUrlKey]
     cell.accessoryType = UITableViewCell.AccessoryType.none
   }
-
+  
   func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
     return true
   }
-
+  
   func tableView(_ tableView: UITableView,
                  commit editingStyle: UITableViewCell.EditingStyle,
                  forRowAt indexPath: IndexPath) {
@@ -178,16 +178,16 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
       checkIfEmpty()
     }
   }
-
+  
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.cellForRow(at: indexPath)?.isSelected = false
     performAction(for: indexPath)
   }
-
+  
   func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
     performAction(for: indexPath)
   }
-
+  
   private func performAction(for indexPath: IndexPath) {
     let bookmark = bookmarks[indexPath.section]
     if let urlString = bookmark[bookmarkUrlKey], let url = URL(string: urlString) {
@@ -195,7 +195,7 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     dismiss(animated: true, completion: nil)
   }
-
+  
   func addBookmarkHandler() {
     guard let title = inputTitleField?.text, var urlString = inputUrlField?.text else {
       // This should be impossible.
@@ -211,18 +211,18 @@ class BookmarksViewController: UIViewController, UITableViewDelegate, UITableVie
     saveBookmarks()
     tableView.reloadData()
   }
-
+  
   // handler
   @objc func handleTextFieldTextChangedNotification(notification: NSNotification) {
     updateAddButtonEnableState()
   }
-
+  
   func updateAddButtonEnableState() {
     guard let title = inputTitleField?.text, let url = inputUrlField?.text else {
       addAction!.isEnabled = false
       return
     }
-
+    
     // Enforce a minimum length of >= 1 for both the title and url text fields.
     addAction!.isEnabled = title.count > 0 && url.count > 0
   }

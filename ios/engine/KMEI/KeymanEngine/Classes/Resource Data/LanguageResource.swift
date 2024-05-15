@@ -18,7 +18,7 @@ public protocol AnyLanguageResourceFullID {
   var id: String { get }
   var languageID: String { get }
   var type: LanguageResourceType { get }
-
+  
   func matches(_ other: AnyLanguageResourceFullID, requireLanguageMatch: Bool) -> Bool
 }
 
@@ -63,10 +63,10 @@ public protocol AnyLanguageResource {
   var packageKey: KeymanPackage.Key { get }
   var fullID: AnyLanguageResourceFullID { get }
   var version: String { get }
-
+  
   // Used for generating QR codes.
   var sharableURL: String? { get }
-
+  
   // Used during resource installation
   var fonts: [Font] { get }
   var sourceFilename: String { get }

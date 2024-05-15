@@ -29,7 +29,7 @@ public struct InstallableKeyboard: Codable, KMPInitializableLanguageResource {
     case isCustom
     case displayName
   }
-
+  
   public private(set) var id: String
   public private(set) var packageID: String? = nil
   public var name: String
@@ -41,9 +41,9 @@ public struct InstallableKeyboard: Codable, KMPInitializableLanguageResource {
   public var oskFont: Font?
   public var isCustom: Bool
   public var displayName: String?
-
+  
   public static let sharingLink = "\(KeymanHosts.KEYMAN_COM)/go/keyboard/%@/share"
-
+  
   public var sharableURL: String? {
     get {
       // We don't host custom keyboards, so we can't provide a QR link to share
@@ -55,20 +55,20 @@ public struct InstallableKeyboard: Codable, KMPInitializableLanguageResource {
       }
     }
   }
-
+  
   public var languageID: String {
     return lgCode.lowercased()
   }
-
+  
   // Weird scheme due to https://stackoverflow.com/a/58774558.
   public var typedFullID: FullKeyboardID {
     return FullKeyboardID(keyboardID: id, languageID: languageID)
   }
-
+  
   public var fullID: FullKeyboardID {
     return typedFullID
   }
-
+  
   public init(id: String,
               name: String,
               languageID: String,
@@ -88,7 +88,7 @@ public struct InstallableKeyboard: Codable, KMPInitializableLanguageResource {
     self.oskFont = oskFont
     self.isCustom = isCustom
   }
-
+  
   public init(keyboard: Keyboard, language: Language, isCustom: Bool) {
     self.id = keyboard.id
     self.name = keyboard.name
@@ -100,12 +100,12 @@ public struct InstallableKeyboard: Codable, KMPInitializableLanguageResource {
     self.oskFont = keyboard.oskFont
     self.isCustom = isCustom
   }
-
+  
   internal init?(from metadata: KMPKeyboard, packageID: String, lgCode: String) {
     self.id = metadata.id
     self.name = metadata.name
     self.lgCode = lgCode
-
+    
     let languageMatches = metadata.languages.compactMap { return $0.languageId == lgCode ? $0.name : nil }
     if (languageMatches.isEmpty) {
       let message = "Could not find languageId '\(lgCode)' for package '\(packageID)'"
@@ -115,7 +115,7 @@ public struct InstallableKeyboard: Codable, KMPInitializableLanguageResource {
     guard languageMatches.count >= 1 else {
       return nil
     }
-
+    
     self.languageName = languageMatches[0]
     self.version = metadata.version
     self.isRTL = metadata.isRTL
@@ -124,21 +124,21 @@ public struct InstallableKeyboard: Codable, KMPInitializableLanguageResource {
     self.packageID = packageID
     self.isCustom = false
   }
-
+  
   public var fonts: [Font] {
     var fonts: [Font] = []
-
+    
     if let displayFont = self.font {
       fonts.append(displayFont)
     }
-
+    
     if let oskFont = self.oskFont {
       fonts.append(oskFont)
     }
-
+    
     return fonts
   }
-
+  
   public var sourceFilename: String {
     return "\(id).js"
   }

@@ -18,11 +18,11 @@ public struct NotificationName<T> {
   /// - Important: For most usages, this property should not be accessed directly. Use the typed version of
   /// `NotificationCenter.addObserver(forName:object:queue:using:)` instead.
   public let name: NSNotification.Name
-
+  
   public init(name: NSNotification.Name) {
     self.name = name
   }
-
+  
   public init(_ string: String) {
     self.name = NSNotification.Name(string)
   }

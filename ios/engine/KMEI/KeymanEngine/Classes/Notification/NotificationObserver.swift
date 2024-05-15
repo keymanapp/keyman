@@ -12,12 +12,12 @@ import Foundation
 public class NotificationObserver {
   private let observer: NSObjectProtocol
   private let center: NotificationCenter
-
+  
   public init(observer: NSObjectProtocol, center: NotificationCenter) {
     self.observer = observer
     self.center = center
   }
-
+  
   deinit {
     center.removeObserver(observer)
   }

@@ -58,49 +58,49 @@ public struct Notifications {
   public static let packageDownloadStarted = NotificationName<PackageDownloadStartedNotification>("KeymanPackageDownloadStarted")
   public static let packageDownloadCompleted = NotificationName<PackageDownloadCompletedNotification>("KeymanPackageDownloadCompleted")
   public static let packageDownloadFailed = NotificationName<PackageDownloadFailedNotification>("KeymanPackageDownloadFailed")
-
+  
   @available(swift, deprecated: 0.1, obsoleted: 0.1, message: "Download notifications are now package-based.  Use `packageDownloadStarted` instead.", renamed: "packageDownloadStarted")
   public static let keyboardDownloadStarted =
-    NotificationName<KeyboardDownloadStartedNotification>("KeymanKeyboardDownloadStarted")
+  NotificationName<KeyboardDownloadStartedNotification>("KeymanKeyboardDownloadStarted")
   @available(swift, deprecated: 0.1, obsoleted: 0.1, message: "Download notifications are now package-based.  Use `packageDownloadCompleted` instead.", renamed: "packageDownloadCompleted")
   public static let keyboardDownloadCompleted =
-    NotificationName<KeyboardDownloadCompletedNotification>("KeymanKeyboardDownloadCompleted")
+  NotificationName<KeyboardDownloadCompletedNotification>("KeymanKeyboardDownloadCompleted")
   @available(swift, deprecated: 0.1, obsoleted: 0.1, message: "Download notifications are now package-based.  Use `packageDownloadFailed` instead.", renamed: "packageDownloadFailed")
   public static let keyboardDownloadFailed =
-    NotificationName<KeyboardDownloadFailedNotification>("KeymanKeyboardDownloadFailed")
-
+  NotificationName<KeyboardDownloadFailedNotification>("KeymanKeyboardDownloadFailed")
+  
   public static let keyboardLoaded =
-    NotificationName<KeyboardLoadedNotification>("KeymanKeyboardLoaded")
+  NotificationName<KeyboardLoadedNotification>("KeymanKeyboardLoaded")
   public static let keyboardChanged =
-    NotificationName<KeyboardChangedNotification>("KeymanKeyboardChanged")
+  NotificationName<KeyboardChangedNotification>("KeymanKeyboardChanged")
   public static let keyboardRemoved =
-    NotificationName<KeyboardRemovedNotification>("KeymanKeyboardRemoved")
-
+  NotificationName<KeyboardRemovedNotification>("KeymanKeyboardRemoved")
+  
   public static let keyboardPickerDismissed =
-    NotificationName<KeyboardPickerDismissedNotification>("KeymanKeyboardPickerDismissed")
-
+  NotificationName<KeyboardPickerDismissedNotification>("KeymanKeyboardPickerDismissed")
+  
   @available(swift, deprecated: 0.1, obsoleted: 0.1, message: "Download notifications are now package-based.  Use `packageDownloadStarted` instead.", renamed: "packageDownloadStarted")
   public static let lexicalModelDownloadStarted =
-    NotificationName<LexicalModelDownloadStartedNotification>("KeymanLexicalModelDownloadStarted")
+  NotificationName<LexicalModelDownloadStartedNotification>("KeymanLexicalModelDownloadStarted")
   @available(swift, deprecated: 0.1, obsoleted: 0.1, message: "Download notifications are now package-based.  Use `packageDownloadCompleted` instead.", renamed: "packageDownloadCompleted")
   public static let lexicalModelDownloadCompleted =
-    NotificationName<LexicalModelDownloadCompletedNotification>("KeymanLexicalModelDownloadCompleted")
+  NotificationName<LexicalModelDownloadCompletedNotification>("KeymanLexicalModelDownloadCompleted")
   @available(swift, deprecated: 0.1, obsoleted: 0.1, message: "Download notifications are now package-based.  Use `packageDownloadFailed` instead.", renamed: "packageDownloadFailed")
   public static let lexicalModelDownloadFailed =
-    NotificationName<LexicalModelDownloadFailedNotification>("KeymanLexicalModelDownloadFailed")
-    
+  NotificationName<LexicalModelDownloadFailedNotification>("KeymanLexicalModelDownloadFailed")
+  
   public static let lexicalModelLoaded =
-    NotificationName<LexicalModelLoadedNotification>("KeymanLexicalModelLoaded")
+  NotificationName<LexicalModelLoadedNotification>("KeymanLexicalModelLoaded")
   public static let lexicalModelChanged =
-    NotificationName<LexicalModelChangedNotification>("KeymanLexicalModelChanged")
+  NotificationName<LexicalModelChangedNotification>("KeymanLexicalModelChanged")
   public static let lexicalModelRemoved =
-    NotificationName<LexicalModelRemovedNotification>("KeymanLexicalModelRemoved")
-    
+  NotificationName<LexicalModelRemovedNotification>("KeymanLexicalModelRemoved")
+  
   public static let lexicalModelPickerDismissed =
-    NotificationName<LexicalModelPickerDismissedNotification>("KeymanLexicalModelPickerDismissed")
+  NotificationName<LexicalModelPickerDismissedNotification>("KeymanLexicalModelPickerDismissed")
   
   public static let batchUpdateStarted =
-    NotificationName<BatchUpdateStartedNotification>("KeymanBatchUpdateStarted")
+  NotificationName<BatchUpdateStartedNotification>("KeymanBatchUpdateStarted")
   public static let batchUpdateCompleted =
-    NotificationName<BatchUpdateCompletedNotification>("KeymanBatchUpdateCompleted")
+  NotificationName<BatchUpdateCompletedNotification>("KeymanBatchUpdateCompleted")
 }

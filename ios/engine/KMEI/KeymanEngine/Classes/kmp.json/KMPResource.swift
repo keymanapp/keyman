@@ -17,12 +17,12 @@ internal protocol AnyKMPResource {
 
 protocol KMPResource: AnyKMPResource {
   associatedtype LanguageResourceType: KMPInitializableLanguageResource where LanguageResourceType.Metadata == Self
-
+  
   // Used to convert old cloud resources into the extracted KMP format for 14.0+ file management.
   init?(from resource: LanguageResourceType)
-
+  
   var typedInstallableResources: [LanguageResourceType] { get }
-
+  
   /**
    * Designed to facilitate de-duplication of KMPResources when migrating cloud resources into the extracted KMP format
    * for 14.0+ file management.

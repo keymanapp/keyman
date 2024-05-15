@@ -20,21 +20,21 @@ class ImageBannerViewController: UIViewController {
   // to control the actual frame size.
   var widthConstraint: NSLayoutConstraint?
   var heightConstraint: NSLayoutConstraint?
-
+  
   init(nibName: String, bundle: Bundle) {
     super.init(nibName: nibName, bundle: bundle)
   }
-
+  
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-
+  
   override func loadView() {
     super.loadView()
-
+    
     view.translatesAutoresizingMaskIntoConstraints = false
     view.clipsToBounds = true
-
+    
     // Usually these would be in viewDidLoad, but they need to be redone with our manual-reload,
     // and that method doesn't retrigger.
     widthConstraint = view.widthAnchor.constraint(equalToConstant: 0)
@@ -42,22 +42,22 @@ class ImageBannerViewController: UIViewController {
     heightConstraint = view.heightAnchor.constraint(equalToConstant: 0)
     heightConstraint!.isActive = true
   }
-
+  
   func renderToImage(size: CGSize) -> UIImage? {
     if size.width == 0 || size.height == 0 {
       return nil
     }
-
+    
     let frame = CGRect(origin: self.view.frame.origin, size: size)
-
+    
     os_log("Rendering banner image of size %{public}s", log: KeymanLogger.ui, type: .debug, NSCoder.string(for: size))
-
+    
     self.view.frame = frame
     widthConstraint?.constant = size.width
     heightConstraint?.constant = size.height
     self.view.setNeedsLayout()
     self.view.layoutIfNeeded()
-
+    
     // Many thanks to https://stackoverflow.com/a/4334902
     var image: UIImage?
     UIGraphicsBeginImageContextWithOptions(size, true, 0.0)
@@ -66,10 +66,10 @@ class ImageBannerViewController: UIViewController {
       image = UIGraphicsGetImageFromCurrentImageContext()
     }
     UIGraphicsEndImageContext()
-
+    
     return image
   }
-
+  
   public func renderAsBase64(size: CGSize) -> String? {
     if let image = renderToImage(size: size), let data = image.pngData() {
       // Thanks to https://stackoverflow.com/a/38748135

@@ -14,24 +14,24 @@ import os
 // TODO: Refactor common functionality from InfoViewController
 class SetUpViewController: UIViewController, WKNavigationDelegate {
   @IBOutlet var webView: WKWebView!
-
+  
   private var networkReachable: Reachability?
-
+  
   convenience init() {
     self.init(nibName: "SetUpViewController", bundle: nil)
   }
-
+  
   override func viewDidLoad() {
     super.viewDidLoad()
-
+    
     let navBar = view.viewWithTag(786586) as? UINavigationBar
     let doneButton = navBar?.topItem?.rightBarButtonItem
     doneButton?.target = self
     doneButton?.action = #selector(self.dismissView)
     webView?.navigationDelegate = self
     NotificationCenter.default.addObserver(self, selector: #selector(self.networkStatusChanged),
-        name: NSNotification.Name.reachabilityChanged, object: nil)
-
+                                           name: NSNotification.Name.reachabilityChanged, object: nil)
+    
     do {
       try networkReachable = Reachability(hostname: "keyman.com")
       try networkReachable?.startNotifier()
@@ -41,11 +41,11 @@ class SetUpViewController: UIViewController, WKNavigationDelegate {
       SentryManager.capture(error, message: message)
     }
   }
-
+  
   @objc func networkStatusChanged(_ notification: Notification) {
     reloadKeymanHelp()
   }
-
+  
   func reloadKeymanHelp() {
     if let networkStatus = networkReachable?.connection {
       switch networkStatus {
@@ -58,24 +58,24 @@ class SetUpViewController: UIViewController, WKNavigationDelegate {
       loadFromLocal()
     }
   }
-
+  
   @objc func dismissView() {
     dismiss(animated: true, completion: nil)
   }
-
+  
   private func loadFromLocal() {
     let offlineHelpBundle = Bundle(path: Bundle.main.path(forResource: "OfflineHelp", ofType: "bundle")!)!
-
+    
     let filePath = offlineHelpBundle.path(forResource: "installing-system-keyboard",
                                           ofType: "html",
                                           inDirectory: "start")
     webView.load(URLRequest(url: URL.init(fileURLWithPath: filePath!)))
   }
-
+  
   private func loadFromServer() {
     let appVersion = Version.current.majorMinor
     let url = "\(KeymanHosts.HELP_KEYMAN_COM)/products/iphone-and-ipad/\(appVersion.plainString)"
-      + "/start/installing-system-keyboard?embed=ios"
+    + "/start/installing-system-keyboard?embed=ios"
     webView.load(URLRequest(url: URL(string: url)!))
     os_log("Set up page URL: %{public}s", log: KeymanLogger.resources, type: .debug, url)
   }

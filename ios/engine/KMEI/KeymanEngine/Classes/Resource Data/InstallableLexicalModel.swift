@@ -16,7 +16,7 @@ struct InstallableConstants {
 public struct InstallableLexicalModel: Codable, KMPInitializableLanguageResource {
   typealias Metadata = KMPLexicalModel
   public typealias Package = LexicalModelKeymanPackage
-
+  
   // Details what properties are coded and decoded re: serialization.
   enum CodingKeys: String, CodingKey {
     case id
@@ -26,30 +26,30 @@ public struct InstallableLexicalModel: Codable, KMPInitializableLanguageResource
     case version
     case isCustom
   }
-
+  
   public private(set) var id: String
   public internal(set) var packageID: String? = nil
   public var name: String
   private var lgCode: String
   public var version: String
   public var isCustom: Bool
-
+  
   public var languageID: String {
     return lgCode.lowercased()
   }
-
+  
   public var sharableURL: String? {
     get {
       // We currently don't have any available sharing links for lexical models online.
       return nil
     }
   }
-
+  
   // Weird scheme due to https://stackoverflow.com/a/58774558
   public var typedFullID: FullLexicalModelID {
     return FullLexicalModelID(lexicalModelID: id, languageID: languageID)
   }
-
+  
   public var fullID: FullLexicalModelID {
     return typedFullID
   }
@@ -73,7 +73,7 @@ public struct InstallableLexicalModel: Codable, KMPInitializableLanguageResource
     self.version = lexicalModel.version ?? InstallableConstants.defaultVersion
     self.isCustom = isCustom
   }
-
+  
   internal init?(from metadata: KMPLexicalModel, packageID: String, lgCode: String) {
     self.id = metadata.id
     self.name = metadata.name
@@ -82,12 +82,12 @@ public struct InstallableLexicalModel: Codable, KMPInitializableLanguageResource
     self.isCustom = false
     self.packageID = packageID
   }
-
+  
   // Lexical models don't bundle fonts.  At least, not yet?
   public var fonts: [Font] {
     return []
   }
-
+  
   public var sourceFilename: String {
     return "\(id).model.js"
   }

@@ -13,22 +13,22 @@ private let htmlMailFormat = """
   </head><body><pre>%@</pre>%@</body></html>
   """
 private let mailFooterTextForPad =
-    "<br><br>Sent from&nbsp;<a href=\"https://keyman.com/ipad\">Keyman for iPad</a>"
+"<br><br>Sent from&nbsp;<a href=\"https://keyman.com/ipad\">Keyman for iPad</a>"
 private let mailFooterTextForPhone =
-    "<br><br>Sent from&nbsp;<a href=\"https://keyman.com/iphone\">Keyman for iPhone</a>"
+"<br><br>Sent from&nbsp;<a href=\"https://keyman.com/iphone\">Keyman for iPhone</a>"
 private let fbText = "Can't read this? Help at https://keyman.com/fonts"
 
 // Prepares the share text
 class ActivityItemProvider: UIActivityItemProvider {
   private let text: String
   private let font: UIFont
-
+  
   init(text: String, font: UIFont?) {
     self.text = text
     self.font = font ?? UIFont.systemFont(ofSize: UIFont.systemFontSize)
     super.init(placeholderItem: text)
   }
-
+  
   override var item: Any {
     switch activityType {
     case UIActivity.ActivityType.mail?:
@@ -41,7 +41,7 @@ class ActivityItemProvider: UIActivityItemProvider {
       return text
     }
   }
-
+  
   private func htmlMail(withText text: String, font: UIFont) -> String {
     let mailText = text.replacingOccurrences(of: "&", with: "&amp;")
       .replacingOccurrences(of: "<", with: "&lt;")

@@ -14,21 +14,21 @@ class DropDownListView: UIView {
     let frameHeight = items.count > 0 ? size.height * CGFloat(items.count) : size.height
     let frame = CGRect(x: pos.x, y: pos.y, width: size.width, height: frameHeight)
     super.init(frame: frame)
-
+    
     backgroundColor = UIColor.clear
     let dropDownView = DropDownView(frame: CGRect.zero)
     let arrowHeight = dropDownView.arrowHeight
     dropDownView.frame = CGRect(x: 0, y: -arrowHeight, width: frame.size.width,
-        height: frame.size.height + arrowHeight)
+                                height: frame.size.height + arrowHeight)
     dropDownView.arrowPosX = frame.size.width - 29
     addSubview(dropDownView)
-
+    
     let count: Int = items.count
     let w: CGFloat = frame.width
     let h: CGFloat = size.height
     let x: CGFloat = 0
     var y: CGFloat = 0
-
+    
     for (index, item) in items.enumerated() {
       let button = UIButton(type: .custom)
       button.setTitleColor(Colors.labelNormal, for: .normal)
@@ -37,7 +37,7 @@ class DropDownListView: UIView {
       button.setTitle(item.title, for: .normal)
       addSubview(button)
       if let subviews = item.customView?.subviews, subviews.count > 0,
-          let btn = subviews[0] as? UIButton {
+         let btn = subviews[0] as? UIButton {
         let icon = btn.image(for: .normal)
         let iconSelected = btn.image(for: .highlighted)
         button.setImage(icon, for: .normal)
@@ -54,7 +54,7 @@ class DropDownListView: UIView {
           }
         }
       }
-
+      
       if index < count - 1 {
         let seperator = UIView(frame: CGRect(x: x + 1, y: y + h, width: w - 2, height: 1))
         seperator.backgroundColor = Colors.listSeparator
@@ -62,9 +62,9 @@ class DropDownListView: UIView {
       }
       y += h + 1
     }
-
+    
   }
-
+  
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }

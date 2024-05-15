@@ -12,23 +12,23 @@ private let cellSelectedTag = 4576 // arbitrary number
 
 class KeyboardNameTableViewCell: UITableViewCell, UIAlertViewDelegate {
   var indexPath: IndexPath?
-
+  
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     indentationLevel = 0
   }
-
+  
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-
+  
   func setInstallState(_ state: KeymanPackage.InstallationState, selected isSelected: Bool,
-                        defaultAccessoryType accessoryType: UITableViewCell.AccessoryType) {
+                       defaultAccessoryType accessoryType: UITableViewCell.AccessoryType) {
     if state != .downloading {
       accessoryView = nil
     }
     self.accessoryType = accessoryType
-
+    
     let selectedView = viewWithTag(cellSelectedTag)
     if isSelected {
       if selectedView == nil {

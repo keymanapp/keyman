@@ -24,7 +24,7 @@ extension TestUtils {
                                                    font: nil,
                                                    oskFont: nil,
                                                    isCustom: false)
-
+    
     static let khmer10 =  InstallableKeyboard(id: "khmer10",
                                               name: "Khmer (NiDA)",
                                               languageID: "km",
@@ -34,17 +34,17 @@ extension TestUtils {
                                               font: nil,
                                               oskFont: nil,
                                               isCustom: false)
-
+    
     static let sil_euro_latin = InstallableKeyboard(id: "sil_euro_latin",
-                                                   name: "EuroLatin (SIL)",
-                                                   languageID: "en",
-                                                   languageName: "English",
-                                                   version: "1.9.1",
-                                                   isRTL: false,
-                                                   font: Font(family: "LatinWeb", source: ["DejaVuSans.ttf"], size: nil),
-                                                   oskFont: nil,
-                                                   isCustom: false)
-
+                                                    name: "EuroLatin (SIL)",
+                                                    languageID: "en",
+                                                    languageName: "English",
+                                                    version: "1.9.1",
+                                                    isRTL: false,
+                                                    font: Font(family: "LatinWeb", source: ["DejaVuSans.ttf"], size: nil),
+                                                    oskFont: nil,
+                                                    isCustom: false)
+    
     static let fv_sencoten = InstallableKeyboard(id: "fv_sencoten",
                                                  name: "SENĆOŦEN",
                                                  languageID: "str-latn",

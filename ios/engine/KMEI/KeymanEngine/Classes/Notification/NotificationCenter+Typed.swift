@@ -22,7 +22,7 @@ public extension NotificationCenter {
     let userInfo = [userInfoKey: value]
     post(name: name.name, object: object, userInfo: userInfo)
   }
-
+  
   /// Typed version of addObserver(forName:object:queue:using:)
   /// - Important: `block` is retained with a strong reference. Beware of a reference cycle if `block` captures `self`
   /// with a strong reference.
@@ -36,9 +36,9 @@ public extension NotificationCenter {
   /// - SeeAlso: `addObserver(name:object:queue:observer:function:)` to add an instance method with a weak reference to
   /// the object instance.
   func addObserver<T>(forName name: NotificationName<T>,
-                             object: Any? = nil,
-                             queue: OperationQueue? = nil,
-                             using block: @escaping (T) -> Void) -> NotificationObserver {
+                      object: Any? = nil,
+                      queue: OperationQueue? = nil,
+                      using block: @escaping (T) -> Void) -> NotificationObserver {
     let observer = addObserver(forName: name.name, object: object, queue: queue) { notification in
       if let value = notification.userInfo?[userInfoKey] as? T {
         block(value)
@@ -50,7 +50,7 @@ public extension NotificationCenter {
     }
     return NotificationObserver(observer: observer, center: self)
   }
-
+  
   /// Typed version of addObserver(forName:object:queue:using:) that registers an instance method with a weak reference
   /// to the object instance.
   /// - Parameters:
@@ -63,10 +63,10 @@ public extension NotificationCenter {
   ///   (eg. `Class.instanceMethod`).
   /// - Returns: Observer that automatically deregisters itself when deinitializing.
   func addObserver<O: AnyObject, T>(forName name: NotificationName<T>,
-                                           object: Any? = nil,
-                                           queue: OperationQueue? = nil,
-                                           observer: O,
-                                           function: @escaping (O) -> (T) -> Void) -> NotificationObserver {
+                                    object: Any? = nil,
+                                    queue: OperationQueue? = nil,
+                                    observer: O,
+                                    function: @escaping (O) -> (T) -> Void) -> NotificationObserver {
     let block = { [weak observer] (value: T) -> Void in
       if let observer = observer {
         function(observer)(value)
@@ -74,7 +74,7 @@ public extension NotificationCenter {
     }
     return addObserver(forName: name, object: object, queue: queue, using: block)
   }
-
+  
   /// Typed version of addObserver(forName:object:queue:using:) that registers an instance method with a weak reference
   /// to the object instance. This is a convenience variant for instance methods that ignore the notification value.
   /// - Parameters:
@@ -87,10 +87,10 @@ public extension NotificationCenter {
   ///   (eg. `Class.instanceMethod`).
   /// - Returns: Observer that automatically deregisters itself when deinitializing.
   func addObserver<O: AnyObject, T>(forName name: NotificationName<T>,
-                                           object: Any? = nil,
-                                           queue: OperationQueue? = nil,
-                                           observer: O,
-                                           function: @escaping (O) -> () -> Void) -> NotificationObserver {
+                                    object: Any? = nil,
+                                    queue: OperationQueue? = nil,
+                                    observer: O,
+                                    function: @escaping (O) -> () -> Void) -> NotificationObserver {
     let block = { [weak observer] (_: T) -> Void in
       if let observer = observer {
         function(observer)()

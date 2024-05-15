@@ -14,14 +14,14 @@ extension TestUtils.Downloading {
     let location: URL?
     let error: Error?
     let statusCode: Int
-
+    
     init(location: URL?, error: Error?, statusCode: Int = 200) {
       self.location = location
       self.error = error
       self.statusCode = statusCode
     }
   }
-
+  
   /**
    * Many thanks to https://www.swiftbysundell.com/articles/mocking-in-swift/ for the approach used here.
    */
@@ -30,32 +30,32 @@ extension TestUtils.Downloading {
       case data(MockResult)
       case download(MockResult)
     }
-
+    
     enum URLSessionMockError: Error {
       case unexpectedTaskType
       case mockedFileNotFound
       case dataInitializationError
       case mockQueueEmpty
     }
-
+    
     private var mockedResultQueue: [(Task, XCTestExpectation?)]
-
+    
     override init() {
       mockedResultQueue = []
     }
-
+    
     func queueMockResult(_ result: Task, expectation: XCTestExpectation? = nil) {
       mockedResultQueue.append((result, expectation))
     }
-
+    
     var queueIsEmpty: Bool {
       get {
         return mockedResultQueue.isEmpty
       }
     }
-
+    
     override func downloadTask(with url: URL, completionHandler: @escaping (URL?, URLResponse?, Error?) -> Void) -> URLSessionDownloadTask {
-
+      
       if(mockedResultQueue.count <= 0) {
         return URLSessionDownloadTaskMock {
           completionHandler(nil, nil, URLSessionMockError.mockQueueEmpty)
@@ -74,7 +74,7 @@ extension TestUtils.Downloading {
         }
       }
     }
-
+    
     override func dataTask(with url: URL, completionHandler: @escaping (Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
       if(mockedResultQueue.count <= 0) {
         return URLSessionDataTaskMock {
@@ -89,13 +89,13 @@ extension TestUtils.Downloading {
               expectation?.fulfill()
               return
             }
-
+            
             do {
               let data = try Data(contentsOf: response.location!, options: .mappedIfSafe)
               if(data.isEmpty) {
                 completionHandler(nil, nil, URLSessionMockError.dataInitializationError)
               }
-
+              
               // A bit of white-box testing - we know that HTTPDownloader doesn't actually examine
               // the URLResponse headers, so we don't provide any.
               completionHandler(data, nil, response.error)

@@ -11,19 +11,19 @@ import Foundation
 public enum Key {
   public static let keyboardInfo = "keyboardInfo"
   public static let lexicalModelInfo = "lexicalModelInfo"
-
+  
   /// Array of user keyboards info list in UserDefaults
   static let userKeyboardsList = "UserKeyboardsList"
-
+  
   /// Array of user lexical models info list in UserDefaults
   static let userLexicalModelsList = "UserLexicalModelsList"
-
+  
   /// Dictionary of cached query results for a user's installed packages
   static let userPackageQueryCacheDict = "UserQueryDistributionStateCache"
-
+  
   /// Currently/last selected keyboard info in UserDefaults
   static let userCurrentKeyboard = "UserCurrentKeyboard"
-
+  
   /// Currently/last selected lexical model info in UserDefaults
   static let userCurrentLexicalModel = "UserCurrentLexicalModel"
   
@@ -33,24 +33,24 @@ public enum Key {
   /// Dictionary of prediction/correction toggle settings keyed by language id in UserDefaults
   static let userPredictSettings = "UserPredictionEnablementSettings"
   static let userCorrectSettings = "UserCorrectionEnablementSettings"
-
+  
   // Internal user defaults keys
   static let engineVersion = "KeymanEngineVersion"
   static let keyboardPickerDisplayed = "KeyboardPickerDisplayed"
   static let synchronizeSWKeyboard = "KeymanSynchronizeSWKeyboard"
   static let synchronizeSWLexicalModel = "KeymanSynchronizeSWLexicalModel"
-
+  
   static let migrationLevel = "KeymanEngineMigrationLevel"
-
+  
   // JSON keys for language REST calls
   static let options = "options"
   static let language = "language"
-
+  
   // TODO: Check if it matches with the key in Keyman Cloud API
   static let keyboardCopyright = "copyright"
   static let lexicalModelCopyright = "lexicalmodelcopyright"
   static let languages = "languages"
-
+  
   // Other keys
   static let update = "update"
   
@@ -58,7 +58,7 @@ public enum Key {
   static let downloadTask = "downloadTask"
   static let downloadBatch = "downloadBatch"
   static let downloadQueueFrame = "queueFrame"
-
+  
   // Settings-related keys
   static let optShouldReportErrors = "ShouldReportErrors"
   // Deprecated - no longer used
@@ -71,25 +71,25 @@ public enum Key {
 
 public enum Defaults {
   private static let font = Font(family: "LatinWeb", source: ["DejaVuSans.ttf"], size: nil)
-
+  
   public static let keyboardID = FullKeyboardID(keyboardID: "sil_euro_latin", languageID: "en")
   public static let lexicalModelID = FullLexicalModelID(lexicalModelID: "nrc.en.mtnt", languageID: "en")
-
+  
   public static var keyboardPackage: KeyboardKeymanPackage = {
     let bundledKMP = Resources.bundle.url(forResource: keyboardID.keyboardID, withExtension: ".kmp")!
     return try! ResourceFileManager.shared.prepareKMPInstall(from: bundledKMP) as! KeyboardKeymanPackage
   }()
-
+  
   public static let lexicalModelPackage: LexicalModelKeymanPackage = {
     let bundledKMP = Resources.bundle.url(forResource: lexicalModelID.lexicalModelID, withExtension: ".model.kmp")!
     return try! ResourceFileManager.shared.prepareKMPInstall(from: bundledKMP) as! LexicalModelKeymanPackage
   }()
-
+  
   // Must be retrieved from their packages!
   public static let keyboard: InstallableKeyboard = {
     return keyboardPackage.findResource(withID: keyboardID)!
   }()
-
+  
   public static let lexicalModel: InstallableLexicalModel = {
     return lexicalModelPackage.findResource(withID: lexicalModelID)!
   }()
@@ -102,7 +102,7 @@ public enum Resources {
     let frameworkBundle = Bundle(for: Manager.self) //Bundle(identifier: "org.sil.Keyman.ios.Engine")!
     return Bundle(path: frameworkBundle.path(forResource: "Keyman", ofType: "bundle")!)!
   }()
-
+  
   public static let oskFontFilename = "keymanweb-osk.ttf"
   static let kmwFilename = "keyboard.html"
 }
@@ -120,7 +120,7 @@ public enum Util {
     let extensionID = extensionInfo?["NSExtensionPointIdentifier"] as? String
     return extensionID == "com.apple.keyboard-service"
   }()
-
+  
   /// The version of the Keyman SDK
   public static let sdkVersion: String = {
     return Version.current.plainString
@@ -138,17 +138,17 @@ public enum KeymanError: Error, LocalizedError {
   case unknown
   // file that is missing, is the file critical?
   case missingFile(String, Bool)
-
+  
   var localizedDescription: String {
     switch self {
-      case .unknown:
-        return engineBundle.localizedString(forKey: "error-unknown", value: nil, table: nil)
-      case .missingFile(_, let isCritical):
-        if isCritical {
-          return engineBundle.localizedString(forKey: "error-missing-file-critical", value: nil, table: nil)
-        } else {
-          return engineBundle.localizedString(forKey: "error-missing-file", value: nil, table: nil)
-        }
+    case .unknown:
+      return engineBundle.localizedString(forKey: "error-unknown", value: nil, table: nil)
+    case .missingFile(_, let isCritical):
+      if isCritical {
+        return engineBundle.localizedString(forKey: "error-missing-file-critical", value: nil, table: nil)
+      } else {
+        return engineBundle.localizedString(forKey: "error-missing-file", value: nil, table: nil)
+      }
     }
   }
 }

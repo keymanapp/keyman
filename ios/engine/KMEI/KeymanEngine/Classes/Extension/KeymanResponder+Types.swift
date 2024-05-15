@@ -15,7 +15,7 @@ public protocol KeymanResponder {
   
   /// Used internally and by API to hide the keyboard.
   func dismissKeyboard()
-
+  
   /// Called to request display of the keyboard picker.
   /// Returns `false` if it cannot.
   func showKeyboardPicker() -> Bool

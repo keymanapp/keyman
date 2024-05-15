@@ -12,13 +12,13 @@ import os.log
 open class SettingsViewController: UITableViewController {
   private var itemsArray = [[String: String]]()
   private var userLanguages: [String: Language] = [:]
-
+  
   override open func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     
     loadUserLanguages()
     os_log("viewWillAppear: SettingsViewController", log:KeymanEngineLogger.settings, type: .info)
- }
+  }
   
   override open func viewDidLoad() {
     super.viewDidLoad()
@@ -27,7 +27,7 @@ open class SettingsViewController: UITableViewController {
     let doneButton = UIBarButtonItem(title: NSLocalizedString("Done", bundle: engineBundle, comment: ""), style: .plain, target: self,
                                      action: #selector(self.doneClicked))
     navigationItem.leftBarButtonItem = doneButton
-
+    
     navigationController?.toolbar?.barTintColor = Colors.statusToolbar
   }
   
@@ -45,13 +45,13 @@ open class SettingsViewController: UITableViewController {
       })
     }
   }
-//
-//  convenience init() {
-//    self.init(style: UITableViewStyle.grouped)
-//  }
+  //
+  //  convenience init() {
+  //    self.init(style: UITableViewStyle.grouped)
+  //  }
   
   public init(/*storage: Storage*/) {
-//    self.storage = storage
+    //    self.storage = storage
     super.init(nibName: nil, bundle: nil)
     
     itemsArray = [[String: String]]()
@@ -59,65 +59,65 @@ open class SettingsViewController: UITableViewController {
       "title": NSLocalizedString("menu-installed-languages-title", bundle: engineBundle, comment: ""),
       "subtitle": "0", //count of installed languages as string
       "reuseid" : "languages"
-      ])
+    ])
     
     itemsArray.append([
       "title": NSLocalizedString("menu-settings-startup-get-started", bundle: engineBundle, comment: ""),
       "subtitle": "",
       "reuseid" : "showgetstarted"
-      ])
-
+    ])
+    
     itemsArray.append([
       "title": NSLocalizedString("menu-settings-error-report", bundle: engineBundle, comment: ""),
       "subtitle": NSLocalizedString("menu-settings-error-report-description", bundle: engineBundle, comment: ""),
       "reuseid": "enablecrashreporting"
-      ])
-
+    ])
+    
     itemsArray.append([
       "title": NSLocalizedString("menu-settings-spacebar-text", bundle: engineBundle, comment: ""),
       "subtitle": "",
       "reuseid": "spacebartext"
-      ])
+    ])
     
     if let _ = URL(string: UIApplication.openSettingsURLString) {
       itemsArray.append([
         "title": NSLocalizedString("menu-settings-system-keyboard-menu", bundle: engineBundle, comment: ""),
         "subtitle": "",
         "reuseid": "systemkeyboardsettings"
-        ])
+      ])
     }
-
+    
     itemsArray.append([
       "title": NSLocalizedString("menu-settings-install-from-file", bundle: engineBundle, comment: ""),
       "subtitle": NSLocalizedString("menu-settings-install-from-file-description", bundle: engineBundle, comment: ""),
       "reuseid" : "installfile"
-      ])
-
-    #if DEBUG && !NO_SENTRY
-            itemsArray.append([
+    ])
+    
+#if DEBUG && !NO_SENTRY
+    itemsArray.append([
       "title": "Force a crash",
       "subtitle": "Test Sentry error-reporting integration",
       "reuseid" : "forcederror"
-      ])
-    #endif
-
+    ])
+#endif
+    
     _ = view
   }
-
+  
   required public init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
-
-    // MARK: - Table view data source
-
+  
+  // MARK: - Table view data source
+  
   override open func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 1
-    }
-
+    // #warning Incomplete implementation, return the number of sections
+    return 1
+  }
+  
   override open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return itemsArray.count
-    }
+    return itemsArray.count
+  }
   
   public func frameAtRightOfCell(cell cellFrame: CGRect, controlSize: CGSize) -> CGRect {
     let rightOffset = cellFrame.size.width
@@ -133,7 +133,7 @@ open class SettingsViewController: UITableViewController {
                              height: cellFrame.size.height)
     return switchFrame
   }
-
+  
   override open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cellIdentifier = itemsArray[indexPath.row]["reuseid"]
     if let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier!) {
@@ -143,51 +143,51 @@ open class SettingsViewController: UITableViewController {
     cell.selectionStyle = .none
     
     switch(cellIdentifier) {
-      case "languages":
-        break
-      case "showgetstarted":
-        let showAgainSwitch = UISwitch()
-        showAgainSwitch.translatesAutoresizingMaskIntoConstraints = false
-        
-        let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: showAgainSwitch.frame.size)
-        showAgainSwitch.frame = switchFrame
-        
-        showAgainSwitch.isOn = showGetStarted
-        showAgainSwitch.addTarget(self, action: #selector(self.showGetStartedSwitchValueChanged),
+    case "languages":
+      break
+    case "showgetstarted":
+      let showAgainSwitch = UISwitch()
+      showAgainSwitch.translatesAutoresizingMaskIntoConstraints = false
+      
+      let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: showAgainSwitch.frame.size)
+      showAgainSwitch.frame = switchFrame
+      
+      showAgainSwitch.isOn = showGetStarted
+      showAgainSwitch.addTarget(self, action: #selector(self.showGetStartedSwitchValueChanged),
+                                for: .valueChanged)
+      cell.addSubview(showAgainSwitch)
+      cell.contentView.isUserInteractionEnabled = false
+      
+      showAgainSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
+      showAgainSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
+    case "enablecrashreporting":
+      let enableReportingSwitch = UISwitch()
+      enableReportingSwitch.translatesAutoresizingMaskIntoConstraints = false
+      
+      let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: enableReportingSwitch.frame.size)
+      enableReportingSwitch.frame = switchFrame
+      
+      enableReportingSwitch.isOn = SentryManager.enabled
+      enableReportingSwitch.addTarget(self, action: #selector(self.reportingSwitchValueChanged),
                                       for: .valueChanged)
-        cell.addSubview(showAgainSwitch)
-        cell.contentView.isUserInteractionEnabled = false
-
-        showAgainSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
-        showAgainSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
-      case "enablecrashreporting":
-        let enableReportingSwitch = UISwitch()
-        enableReportingSwitch.translatesAutoresizingMaskIntoConstraints = false
-
-        let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: enableReportingSwitch.frame.size)
-        enableReportingSwitch.frame = switchFrame
-
-        enableReportingSwitch.isOn = SentryManager.enabled
-        enableReportingSwitch.addTarget(self, action: #selector(self.reportingSwitchValueChanged),
-                                      for: .valueChanged)
-        cell.addSubview(enableReportingSwitch)
-        cell.contentView.isUserInteractionEnabled = false
-
-        enableReportingSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
-        enableReportingSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
-        
-      case "systemkeyboardsettings", "installfile", "forcederror", "spacebartext":
-        break
-      default:
-        let message = "unknown cellIdentifier(\"\(cellIdentifier ?? "EMPTY")\")"
-        os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
-        SentryManager.capture(message)
-        cell.accessoryType = .none
+      cell.addSubview(enableReportingSwitch)
+      cell.contentView.isUserInteractionEnabled = false
+      
+      enableReportingSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
+      enableReportingSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
+      
+    case "systemkeyboardsettings", "installfile", "forcederror", "spacebartext":
+      break
+    default:
+      let message = "unknown cellIdentifier(\"\(cellIdentifier ?? "EMPTY")\")"
+      os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
+      SentryManager.capture(message)
+      cell.accessoryType = .none
     }
     
     return cell
   }
-
+  
   @objc func reportingSwitchValueChanged(_ sender: Any) {
     if let toggle = sender as? UISwitch {
       // Propagate the effects
@@ -207,38 +207,38 @@ open class SettingsViewController: UITableViewController {
     let userData = Storage.active.userDefaults
     return userData.bool(forKey: Key.optShouldShowGetStarted)
   }
-
+  
   override open func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     cell.accessoryType = .none
-
+    
     // Remember, UITableViewCells may be reused, so we should always reset relevant properties.
     cell.textLabel?.text = itemsArray[indexPath.row]["title"]
     cell.detailTextLabel?.text = itemsArray[indexPath.row]["subtitle"]
     cell.textLabel?.isEnabled = true
-
+    
     cell.tag = indexPath.row
     cell.isUserInteractionEnabled = true
-
+    
     let cellIdentifier = itemsArray[indexPath.row]["reuseid"]
-
+    
     switch (cellIdentifier) {
-      case "languages", "installfile", "systemkeyboardsettings", "forcederror":
-        cell.accessoryType = .disclosureIndicator
-        cell.detailTextLabel?.isEnabled = true
-      case "enablecrashreporting":
-        cell.detailTextLabel?.isEnabled = true
-        break
-      case "spacebartext":
-        cell.accessoryType = .disclosureIndicator
-        cell.detailTextLabel?.text = NSLocalizedString("menu-settings-spacebar-hint-"+Manager.shared.spacebarText.rawValue, bundle: engineBundle, comment: "")
-        cell.detailTextLabel?.isEnabled = true
-        break
-      case "showbanner", "showgetstarted":
-        cell.detailTextLabel?.isEnabled = false
-      default:
-        let message = "unknown cellIdentifier(\"\(cellIdentifier ?? "EMPTY")\")"
-        os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
-        SentryManager.capture(message)
+    case "languages", "installfile", "systemkeyboardsettings", "forcederror":
+      cell.accessoryType = .disclosureIndicator
+      cell.detailTextLabel?.isEnabled = true
+    case "enablecrashreporting":
+      cell.detailTextLabel?.isEnabled = true
+      break
+    case "spacebartext":
+      cell.accessoryType = .disclosureIndicator
+      cell.detailTextLabel?.text = NSLocalizedString("menu-settings-spacebar-hint-"+Manager.shared.spacebarText.rawValue, bundle: engineBundle, comment: "")
+      cell.detailTextLabel?.isEnabled = true
+      break
+    case "showbanner", "showgetstarted":
+      cell.detailTextLabel?.isEnabled = false
+    default:
+      let message = "unknown cellIdentifier(\"\(cellIdentifier ?? "EMPTY")\")"
+      os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
+      SentryManager.capture(message)
     }
   }
   
@@ -257,75 +257,75 @@ open class SettingsViewController: UITableViewController {
     case 0:
       let cellIdentifier = itemsArray[indexPath.row]["reuseid"]
       switch cellIdentifier {
-        case "languages":
-          showLanguages()
-        case "systemkeyboardsettings":
-          guard let appSettings = URL(string: UIApplication.openSettingsURLString) else {
-            // It is an error if the option is displayed but unusable.  That's bad UI.
-            let message = "Could not launch keyboard settings menu"
-            os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
-            SentryManager.capture(message)
-            return
-          }
-          UniversalLinks.externalLinkLauncher?(appSettings)
-        case "installfile":
-          if let block = Manager.shared.fileBrowserLauncher {
-            block(navigationController!)
-          } else {
-            let message = "Listener for framework signal to launch file browser is missing"
-            os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
-            SentryManager.capture(message)
-          }
-        case "forcederror":
-          SentryManager.forceError()
-        case "spacebartext":
-          showSpacebarText()
-        default:
-          break
+      case "languages":
+        showLanguages()
+      case "systemkeyboardsettings":
+        guard let appSettings = URL(string: UIApplication.openSettingsURLString) else {
+          // It is an error if the option is displayed but unusable.  That's bad UI.
+          let message = "Could not launch keyboard settings menu"
+          os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
+          SentryManager.capture(message)
+          return
+        }
+        UniversalLinks.externalLinkLauncher?(appSettings)
+      case "installfile":
+        if let block = Manager.shared.fileBrowserLauncher {
+          block(navigationController!)
+        } else {
+          let message = "Listener for framework signal to launch file browser is missing"
+          os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
+          SentryManager.capture(message)
+        }
+      case "forcederror":
+        SentryManager.forceError()
+      case "spacebartext":
+        showSpacebarText()
+      default:
+        break
       }
     default:
       break
     }
   }
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
+  
+  /*
+   // Override to support conditional editing of the table view.
+   override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+   // Return false if you do not want the specified item to be editable.
+   return true
+   }
+   */
+  
+  /*
+   // Override to support editing the table view.
+   override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+   if editingStyle == .delete {
+   // Delete the row from the data source
+   tableView.deleteRows(at: [indexPath], with: .fade)
+   } else if editingStyle == .insert {
+   // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
+   }    
+   }
+   */
+  
+  /*
+   // Override to support rearranging the table view.
+   override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
+   
+   }
+   */
+  
+  /*
+   // Override to support conditional rearranging of the table view.
+   override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+   // Return false if you do not want the item to be re-orderable.
+   return true
+   }
+   */
+  
+  // MARK: - Navigation
+  
+  // In a storyboard-based application, you will often want to do a little preparation before navigation
   override open func prepare(for segue: UIStoryboardSegue, sender: Any?) {
     os_log("prepare for segue", log:KeymanEngineLogger.settings, type: .info)
     // Get the new view controller using segue.destination.
@@ -353,7 +353,7 @@ open class SettingsViewController: UITableViewController {
     // Get keyboards list if it exists in user defaults, otherwise create a new one
     let userDefaults = Storage.active.userDefaults
     let userKeyboards = userDefaults.userKeyboards ?? []
-
+    
     var keyboardLanguages = [String: Language]()
     for k in userKeyboards {
       let l = k.languageID
@@ -385,7 +385,7 @@ open class SettingsViewController: UITableViewController {
         SentryManager.breadcrumb(message)
       }
     }
-
+    
     userLanguages = keyboardLanguages
     let formatString = NSLocalizedString("settings-languages-installed-count", bundle: engineBundle, comment: "")
     itemsArray[0]["subtitle"] = String.localizedStringWithFormat(formatString, userLanguages.count)
@@ -404,7 +404,7 @@ open class SettingsViewController: UITableViewController {
       nc.navigationItem.leftBarButtonItem = cancelButton
     }
   }
-
+  
   func showLanguages() {
     let vc = InstalledLanguagesViewController(userLanguages)
     if let nc = navigationController {

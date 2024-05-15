@@ -14,11 +14,11 @@ public struct FullLexicalModelID: Codable, LanguageResourceFullID, Equatable {
   
   public var lexicalModelID: String
   public var languageID: String
-
+  
   public var id: String {
     return lexicalModelID
   }
-
+  
   public var type: LanguageResourceType {
     return .lexicalModel
   }

@@ -34,7 +34,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   
   override func viewDidLoad() {
     super.viewDidLoad()
-
+    
     let format = NSLocalizedString("menu-lexical-model-title", bundle: engineBundle, comment: "")
     title = String.localizedStringWithFormat(format, language.name)
     if Manager.shared.canAddNewLexicalModels {
@@ -71,9 +71,9 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     os_log("viewDidAppear: LexicalModelPickerViewController", log:KeymanEngineLogger.ui, type: .info)
-
+    
     scroll(toSelectedLexicalModel: false)
-}
+  }
   
   // MARK: - Table view data source UITableViewDataSource
   
@@ -97,7 +97,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     cell.selectedBackgroundView = selectionColor
     return cell
   }
-
+  
   override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
     if !Manager.shared.canRemoveLexicalModels {
       return false
@@ -125,13 +125,13 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   
   func showLexicalModelInfoView(with index: Int) {
     let lm = userLexicalModels[index]
-
+    
     let infoView = ResourceInfoViewController(for: lm, mayDelete: Manager.shared.canRemoveLexicalModels)
     navigationController?.pushViewController(infoView, animated: true)
   }
   
   // MARK: - UITableViewDelegate
-
+  
   override func tableView(_ tableView: UITableView,
                           willDisplay cell: UITableViewCell,
                           forRowAt indexPath: IndexPath) {
@@ -178,7 +178,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   
   private func lexicalModelDownloadCompleted() {
     os_log("lexicalModelDownloadCompleted LexicalModelPicker", log:KeymanEngineLogger.ui, type: .info)
-
+    
     // Actually used now.
     view.isUserInteractionEnabled = true
     navigationItem.leftBarButtonItem?.isEnabled = true
@@ -204,8 +204,8 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     alertController.addAction(UIAlertAction(title: NSLocalizedString("command-ok", bundle: engineBundle, comment: ""),
                                             style: UIAlertAction.Style.cancel,
                                             handler: { _ in
-                                              self.navigationController?.popToRootViewController(animated: true)
-                                            }))
+      self.navigationController?.popToRootViewController(animated: true)
+    }))
     
     self.present(alertController, animated: true, completion: nil)
   }
@@ -294,12 +294,12 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
         }
         return
       }
-
+      
       guard let result = result else {
         self.noModelsAvailable(cause: "nil")
         return
       }
-
+      
       if result.count == 0 {
         self.noModelsAvailable(cause: "empty")
       } else {
@@ -318,20 +318,20 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
       }
     }
   }
-
+  
   func noModelsAvailable(cause: String = "nil") {
     let message = NSLocalizedString("menu-lexical-model-none-message", bundle: engineBundle, comment: "")
     let logMessage = "No lexical models available for language \(language.id): (\(cause))"
     os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, logMessage)
-
+    
     let alertController = UIAlertController(title: title, message: message,
                                             preferredStyle: UIAlertController.Style.alert)
     alertController.addAction(UIAlertAction(title: NSLocalizedString("command-ok", bundle: engineBundle, comment: ""),
                                             style: UIAlertAction.Style.default,
                                             handler: { _ in
-                                              self.navigationController?.popViewController(animated: true)
-                                            }))
-
+      self.navigationController?.popViewController(animated: true)
+    }))
+    
     self.present(alertController, animated: true, completion: nil)
   }
   

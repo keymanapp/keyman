@@ -11,7 +11,7 @@ import Foundation
 struct KMPOptions: Codable {
   public var readmeFile: String? = nil
   public var graphicFile: String? = nil
-
+  
   // We do this so that we can safely ignore any other entries.
   // iOS cares not for .msis or 'executeProgram'.
   enum CodingKeys: String, CodingKey {

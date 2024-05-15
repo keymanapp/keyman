@@ -16,7 +16,7 @@ private let toolbarButtonTag = 100
 class KeyboardSwitcherViewController: UITableViewController, UIAlertViewDelegate {
   public var userKeyboards: [InstallableKeyboard] = [InstallableKeyboard]()
   public var accessoryType: UITableViewCell.AccessoryType = .none
-
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     
@@ -30,7 +30,7 @@ class KeyboardSwitcherViewController: UITableViewController, UIAlertViewDelegate
     
     os_log("didLoad: KeyboardSwitcherViewController", log: KeymanEngineLogger.ui, type: .info)
   }
-
+  
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     
@@ -57,7 +57,7 @@ class KeyboardSwitcherViewController: UITableViewController, UIAlertViewDelegate
   }
   
   // MARK: - table view delegate UITableViewDelegate
-
+  
   override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     return userKeyboards.count
   }
@@ -114,7 +114,7 @@ class KeyboardSwitcherViewController: UITableViewController, UIAlertViewDelegate
   // never called but on the subclass
   public func showAddKeyboard() {
   }
-
+  
   
   public func loadUserKeyboards() {
     userKeyboards = Storage.active.userDefaults.userKeyboards ?? []

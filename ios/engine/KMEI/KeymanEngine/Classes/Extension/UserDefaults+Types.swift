@@ -11,7 +11,7 @@ import os.log
 
 public extension UserDefaults {
   func installableKeyboards(forKey key: String) -> [InstallableKeyboard]? {
-
+    
     guard let array = array(forKey: key) as? [Data] else {
       return nil
     }
@@ -40,13 +40,13 @@ public extension UserDefaults {
       return nil
     }
   }
-
+  
   internal func cachedPackageQueryMetadata(forKey key: String) -> [KeymanPackage.Key: KeymanPackage.DistributionStateMetadata]? {
     guard let data = self.data(forKey: key) else {
       // May not have been initialized.  Also, it IS just cache data.
       return nil
     }
-
+    
     // Since we're dealing with dictionaries & Codable, it's probably better to use JSON here.
     let decoder = JSONDecoder()
     if let dict = try? decoder.decode([KeymanPackage.Key: KeymanPackage.DistributionStateMetadata].self, from: data) {
@@ -55,7 +55,7 @@ public extension UserDefaults {
       return nil
     }
   }
-
+  
   func set(_ keyboards: [InstallableKeyboard]?, forKey key: String) {
     guard let keyboards = keyboards else {
       removeObject(forKey: key)
@@ -71,7 +71,7 @@ public extension UserDefaults {
       SentryManager.capture(error, message: message)
     }
   }
-    
+  
   func set(_ lexicalModels: [InstallableLexicalModel]?, forKey key: String) {
     guard let lexicalModels = lexicalModels else {
       removeObject(forKey: key)
@@ -87,7 +87,7 @@ public extension UserDefaults {
       SentryManager.capture(error, message: message)
     }
   }
-
+  
   func fullKeyboardID(forKey key: String) -> FullKeyboardID? {
     guard let data = data(forKey: key) else {
       return nil
@@ -101,7 +101,7 @@ public extension UserDefaults {
       return nil
     }
   }
-
+  
   func set(_ fullKeyboardID: FullKeyboardID?, forKey key: String) {
     guard let id = fullKeyboardID else {
       removeObject(forKey: key)
@@ -116,7 +116,7 @@ public extension UserDefaults {
       SentryManager.capture(error, message: message)
     }
   }
-    
+  
   func fullLexicalModelID(forKey key: String) -> FullLexicalModelID? {
     guard let data = data(forKey: key) else {
       return nil
@@ -130,7 +130,7 @@ public extension UserDefaults {
       return nil
     }
   }
-    
+  
   func set(_ fullLexicalModelID: FullLexicalModelID?, forKey key: String) {
     guard let id = fullLexicalModelID else {
       removeObject(forKey: key)
@@ -145,17 +145,17 @@ public extension UserDefaults {
       SentryManager.capture(error, message: message)
     }
   }
-
+  
   var userKeyboards: [InstallableKeyboard]? {
     get {
       return installableKeyboards(forKey: Key.userKeyboardsList)
     }
-
+    
     set(keyboards) {
       set(keyboards, forKey: Key.userKeyboardsList)
     }
   }
-    
+  
   var userLexicalModels: [InstallableLexicalModel]? {
     get {
       return installableLexicalModels(forKey: Key.userLexicalModelsList)
@@ -165,12 +165,12 @@ public extension UserDefaults {
       set(lexicalModels, forKey: Key.userLexicalModelsList)
     }
   }
-
+  
   internal var cachedPackageQueryMetadata: [KeymanPackage.Key: KeymanPackage.DistributionStateMetadata] {
     get {
       return cachedPackageQueryMetadata(forKey: Key.userPackageQueryCacheDict) ?? [:]
     }
-
+    
     set(metadata) {
       let encoder = JSONEncoder()
       if let data = try? encoder.encode(metadata) {
@@ -178,7 +178,7 @@ public extension UserDefaults {
       }
     }
   }
-
+  
   func userResources<Resource: LanguageResource>(ofType: Resource.Type) -> [Resource]? {
     if ofType == InstallableKeyboard.self {
       return (userKeyboards as? [Resource])
@@ -188,7 +188,7 @@ public extension UserDefaults {
       return nil
     }
   }
-
+  
   var userResources: [AnyLanguageResource]? {
     get {
       let keyboards = userKeyboards ?? []
@@ -232,17 +232,17 @@ public extension UserDefaults {
     modelPrefs?[key] = preferredLexicalModelID
     languageModelSelections = modelPrefs
   }
-
+  
   var currentKeyboardID: FullKeyboardID? {
     get {
       return fullKeyboardID(forKey: Key.userCurrentKeyboard)
     }
-
+    
     set(fullKeyboardID) {
       set(fullKeyboardID, forKey: Key.userCurrentKeyboard)
     }
   }
-    
+  
   var currentLexicalModelID: FullLexicalModelID? {
     get {
       return fullLexicalModelID(forKey: Key.userCurrentLexicalModel)
@@ -252,11 +252,11 @@ public extension UserDefaults {
       set(fullLexicalModelID, forKey: Key.userCurrentLexicalModel)
     }
   }
-
+  
   func userKeyboard(withFullID fullID: FullKeyboardID) -> InstallableKeyboard? {
     return userKeyboards?.first { $0.fullID == fullID }
   }
-    
+  
   func userLexicalModel(withFullID fullID: FullLexicalModelID) -> InstallableLexicalModel? {
     return userLexicalModels?.first { $0.fullID == fullID }
   }
@@ -266,21 +266,21 @@ public extension UserDefaults {
       $0.languageID == languageID
     }) ?? []
   }
-
+  
   internal func cachedPackageQueryResult(forPackageKey packageKey: KeymanPackage.Key) -> KeymanPackage.DistributionStateMetadata? {
     return cachedPackageQueryMetadata[packageKey]
   }
-
+  
   var migrationLevel: Int {
     get {
       return integer(forKey: Key.migrationLevel)
     }
-
+    
     set(level) {
       set(level, forKey: Key.migrationLevel)
     }
   }
-
+  
   var lastEngineVersion: Version? {
     get {
       if let valueString = string(forKey: Key.engineVersion) {
@@ -289,7 +289,7 @@ public extension UserDefaults {
         return nil
       }
     }
-
+    
     set(version) {
       set(version?.plainString, forKey: Key.engineVersion)
     }
@@ -309,7 +309,7 @@ public extension UserDefaults {
       set(value.rawValue, forKey: Key.optSpacebarText)
     }
   }
- 
+  
   // stores a dictionary of predict-enablement settings keyed to language ids, i.e., [langID: Bool]
   var predictionEnablements: [String: Bool]? {
     get {

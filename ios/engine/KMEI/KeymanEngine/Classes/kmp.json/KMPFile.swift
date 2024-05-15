@@ -11,13 +11,13 @@ import Foundation
 struct KMPFile: Codable {
   var name: String
   var description: String
-
+  
   enum CodingKeys: String, CodingKey {
     case name
     case description
     // case copyLocation // deliberately omitted
   }
-
+  
   init(_ name: String, description: String? = nil) {
     let desc = description ?? name
     self.name = name

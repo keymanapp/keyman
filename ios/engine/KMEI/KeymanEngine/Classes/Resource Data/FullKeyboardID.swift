@@ -14,15 +14,15 @@ public struct FullKeyboardID: Codable, LanguageResourceFullID, Equatable {
   
   public var keyboardID: String
   public var languageID: String
-
+  
   public var id: String {
     return keyboardID
   }
-
+  
   public var type: LanguageResourceType {
     return .keyboard
   }
-
+  
   public init(keyboardID: String, languageID: String) {
     self.keyboardID = keyboardID
     self.languageID = languageID

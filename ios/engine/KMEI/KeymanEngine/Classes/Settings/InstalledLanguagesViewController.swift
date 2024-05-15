@@ -31,7 +31,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
   private var packageDownloadFailedObserver: NotificationObserver?
   private var batchUpdateStartedObserver: NotificationObserver?
   private var batchUpdateCompletedObserver: NotificationObserver?
-
+  
   public init(_ givenLanguages: [String: Language]? = nil) {
     if(givenLanguages == nil) {
       self.installedLanguages = InstalledLanguagesViewController.loadUserLanguages()
@@ -49,7 +49,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
     super.loadView()
     languages = languageList(installedLanguages)
   }
-
+  
   private func languageList(_ languageDict: [String: Language]) -> [Language] {
     return languageDict.values.sorted { a, b -> Bool in
       a.name.localizedCaseInsensitiveCompare(b.name) == .orderedAscending
@@ -58,7 +58,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
   
   override public func viewDidLoad() {
     super.viewDidLoad()
-
+    
     title = NSLocalizedString("menu-installed-languages-title", bundle: engineBundle, comment: "")
     selectedSection = NSNotFound
     packageDownloadStartedObserver = NotificationCenter.default.addObserver(
@@ -106,7 +106,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
       showActivityView()
     }
     os_log("didAppear: InstalledLanguagesViewController", log:KeymanEngineLogger.ui, type: .info)
-
+    
     // Are there updates worth doing?
     if isDidUpdateCheck {
       // Nope; don't make an 'update' button.
@@ -136,9 +136,9 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
     ResourceDownloadManager.shared.performBatchUpdate(forPackageKeys: availableUpdates,
                                                       withNotifications: true,
                                                       completionBlock: { successes, failures in
-        // TODO:  future feature:  consider reworking the notification listener for use with this callback.
-        //        (See `batchUpdateCompleted` later in this file.)
-      })
+      // TODO:  future feature:  consider reworking the notification listener for use with this callback.
+      //        (See `batchUpdateCompleted` later in this file.)
+    })
   }
   
   override public func numberOfSections(in tableView: UITableView) -> Int {
@@ -150,7 +150,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
     // Get keyboards list if it exists in user defaults, otherwise create a new one
     let userDefaults = Storage.active.userDefaults
     let userKeyboards = userDefaults.userKeyboards ?? []
-
+    
     var keyboardLanguages = [String: Language]()
     for k in userKeyboards {
       let l = k.languageID
@@ -182,7 +182,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
         SentryManager.breadcrumb(message)
       }
     }
-
+    
     return keyboardLanguages
   }
   
@@ -200,9 +200,9 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
       cell = reusedCell
     } else {
       let selectionColor = UIView()
-
+      
       selectionColor.backgroundColor = Colors.selectionPrimary
-
+      
       if keyboards.count < 2 {
         cell = KeyboardNameTableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
       } else {
@@ -211,11 +211,11 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
       cell.selectedBackgroundView = selectionColor
       cell.accessoryType = .disclosureIndicator
     }
-
+    
     let formatString = NSLocalizedString("settings-keyboards-installed-count", bundle: engineBundle, comment: "")
     cell.detailTextLabel?.text = keyboards.count < 2 ?
-      (keyboards.first?.name ?? "") :
-      String.localizedStringWithFormat(formatString, keyboards.count)
+    (keyboards.first?.name ?? "") :
+    String.localizedStringWithFormat(formatString, keyboards.count)
     return cell
   }
   
@@ -281,48 +281,48 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
       navigationItem.rightBarButtonItem?.isEnabled = true
     }
   }
-
+  
   private func packageDownloadStarted(key: KeymanPackage.Key) {
     let message = "download started for \(key.type.rawValue): InstalledLanguagesViewController"
     os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
     view.isUserInteractionEnabled = false
     navigationItem.setHidesBackButton(true, animated: true)
-
+    
     guard let toolbar = navigationController?.toolbar as? ResourceDownloadStatusToolbar else {
       return
     }
-
+    
     var msg: String
     switch(key.type) {
-      case .keyboard:
-        msg = NSLocalizedString("notification-downloading-keyboard", bundle: engineBundle, comment: "")
-      case .lexicalModel:
-        msg = NSLocalizedString("notification-downloading-lexical-model", bundle: engineBundle, comment: "")
+    case .keyboard:
+      msg = NSLocalizedString("notification-downloading-keyboard", bundle: engineBundle, comment: "")
+    case .lexicalModel:
+      msg = NSLocalizedString("notification-downloading-lexical-model", bundle: engineBundle, comment: "")
     }
-
+    
     toolbar.displayStatus(msg, withIndicator: true)
   }
-
+  
   private func packageDownloadCompleted(package: KeymanPackage) {
     os_log("lexicalModelDownloadCompleted: InstalledLanguagesViewController", log:KeymanEngineLogger.resources, type: .info)
-
+    
     DispatchQueue.main.async {
       var msg: String
-
+      
       switch(package.resourceType()) {
-        case .keyboard:
-          Manager.shared.inputViewController.setShouldReload()
-          msg = NSLocalizedString("notification-download-success-keyboard", bundle: engineBundle, comment: "")
-        case .lexicalModel:
-          msg = NSLocalizedString("notification-download-success-lexical-model", bundle: engineBundle, comment: "")
+      case .keyboard:
+        Manager.shared.inputViewController.setShouldReload()
+        msg = NSLocalizedString("notification-download-success-keyboard", bundle: engineBundle, comment: "")
+      case .lexicalModel:
+        msg = NSLocalizedString("notification-download-success-lexical-model", bundle: engineBundle, comment: "")
       }
-
+      
       if let toolbar = self.navigationController?.toolbar as? ResourceDownloadStatusToolbar {
         toolbar.displayStatus(msg, withIndicator: false, duration: 3.0)
       }
-
+      
       self.restoreNavigation()
-
+      
       // Do NOT do this for keyboards; they're not yet installed and have a managed installer
       // yet to operate.
       if package.resourceType() == .lexicalModel {
@@ -330,29 +330,29 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
       }
     }
   }
-
+  
   private func packageDownloadFailed(notification: PackageDownloadFailedNotification) {
     guard let packageKey = notification.packageKey else {
       return
     }
-
+    
     os_log("keyboardDownloadFailed: InstalledLanguagesViewController", log:KeymanEngineLogger.resources, type: .info)
-
+    
     DispatchQueue.main.async {
       var msg: String
       switch(packageKey.type) {
-        case .keyboard:
-          msg = NSLocalizedString("notification-download-failure-keyboard", bundle: engineBundle, comment: "")
-        case .lexicalModel:
-          msg = NSLocalizedString("notification-download-failure-lexical-model", bundle: engineBundle, comment: "")
+      case .keyboard:
+        msg = NSLocalizedString("notification-download-failure-keyboard", bundle: engineBundle, comment: "")
+      case .lexicalModel:
+        msg = NSLocalizedString("notification-download-failure-lexical-model", bundle: engineBundle, comment: "")
       }
-
+      
       if let toolbar = self.navigationController?.toolbar as? ResourceDownloadStatusToolbar {
         toolbar.displayStatus(msg, withIndicator: false, duration: 3.0)
       }
-
+      
       self.restoreNavigation()
-
+      
       self.navigationController?.popToRootViewController(animated: true)
     }
   }
@@ -368,7 +368,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
     
     toolbar.displayStatus(NSLocalizedString("notification-update-available", bundle: engineBundle, comment: ""), withIndicator: true)
   }
-
+  
   private func batchUpdateCompleted(results: BatchUpdateCompletedNotification) {
     DispatchQueue.main.async {
       if let toolbar = self.navigationController?.toolbar as? ResourceDownloadStatusToolbar {
@@ -382,7 +382,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
           toolbar.displayStatus(String.localizedStringWithFormat(formatString, results.failures.count), withIndicator: false, duration: 3.0)
         }
       }
-
+      
       self.restoreNavigation()
     }
   }
@@ -434,7 +434,7 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
       userLexicalModels[dictKey] = lm
     }
     tableView.reloadData()
- }
+  }
   
   private func showConnectionErrorAlert() {
     dismissActivityView()
@@ -443,29 +443,29 @@ public class InstalledLanguagesViewController: UITableViewController, UIAlertVie
 }
 
 extension InstalledLanguagesViewController {
-
+  
   public func launchKeyboardSearch() {
     let keyboardSearchVC = KeyboardSearchViewController(keyboardSelectionBlock: KeyboardSearchViewController.defaultDownloadClosure() { result in
       switch result {
-        case .cancelled:
-          break
-        case .error(let error):
-          // Note: Errors may result from network issues.
-          if let error = error {
-            let errorMessage = "\(String(describing: error))"
-            os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, errorMessage)
-          }
-        case .success(let package, let fullID):
-          ResourceFileManager.shared.doInstallPrompt(for: package as! KeyboardKeymanPackage,
-                                                     defaultLanguageCode: fullID.languageID,
-                                                     in: self.navigationController!,
-                                                     withAssociators: [.lexicalModels])
+      case .cancelled:
+        break
+      case .error(let error):
+        // Note: Errors may result from network issues.
+        if let error = error {
+          let errorMessage = "\(String(describing: error))"
+          os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, errorMessage)
+        }
+      case .success(let package, let fullID):
+        ResourceFileManager.shared.doInstallPrompt(for: package as! KeyboardKeymanPackage,
+                                                   defaultLanguageCode: fullID.languageID,
+                                                   in: self.navigationController!,
+                                                   withAssociators: [.lexicalModels])
       }
     })
-
+    
     navigationController!.pushViewController(keyboardSearchVC, animated: true)
   }
-
+  
   @objc func addClicked(_ sender: Any) {
     launchKeyboardSearch()
   }

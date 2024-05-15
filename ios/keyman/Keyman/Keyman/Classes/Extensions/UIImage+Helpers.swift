@@ -16,15 +16,15 @@ extension UIImage {
     UIGraphicsEndImageContext()
     return newImage!
   }
-
+  
   func tintedImage(using tintColor: UIColor) -> UIImage {
-      UIGraphicsBeginImageContextWithOptions(size, false, scale)
-      let drawRect = CGRect(x: 0, y: 0, width: size.width, height: size.height)
-      draw(in: drawRect)
-      tintColor.set()
-      UIRectFillUsingBlendMode(drawRect, CGBlendMode.sourceAtop)
-      let tintedImage = UIGraphicsGetImageFromCurrentImageContext()
-      UIGraphicsEndImageContext()
-      return tintedImage!
+    UIGraphicsBeginImageContextWithOptions(size, false, scale)
+    let drawRect = CGRect(x: 0, y: 0, width: size.width, height: size.height)
+    draw(in: drawRect)
+    tintColor.set()
+    UIRectFillUsingBlendMode(drawRect, CGBlendMode.sourceAtop)
+    let tintedImage = UIGraphicsGetImageFromCurrentImageContext()
+    UIGraphicsEndImageContext()
+    return tintedImage!
   }
 }

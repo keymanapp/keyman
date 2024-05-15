@@ -15,16 +15,16 @@ extension TestUtils.Downloading {
   class URLSessionDownloadTaskMock: URLSessionDownloadTask {
     private let closure: () -> Void
     private let _response: URLResponse?
-
+    
     init(response: URLResponse? = nil, closure: @escaping () -> Void) {
       self.closure = closure
       self._response = response
     }
-
+    
     public override var response: URLResponse? {
       return _response
     }
-
+    
     /*
      * For mocked DownloadTasks, just use the precomputed completion closure
      * provided to the constructor.
@@ -32,7 +32,7 @@ extension TestUtils.Downloading {
     override func resume() {
       closure()
     }
-
+    
     override func cancel() {
       // We must prevent the original cancel() from occurring, as it'll
       // cause asynchronous errors otherwise.

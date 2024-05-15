@@ -10,16 +10,16 @@ import Foundation
 import UIKit
 
 class KMView: UIView {
-    required public init?(coder: NSCoder) {
-        super.init(coder: coder)
-        self.commonInit()
-    }
-
-    public override init(frame: CGRect) {
-        super.init(frame: frame)
-        self.commonInit()
-    }
-
-    func commonInit() {
-    }
+  required public init?(coder: NSCoder) {
+    super.init(coder: coder)
+    self.commonInit()
+  }
+  
+  public override init(frame: CGRect) {
+    super.init(frame: frame)
+    self.commonInit()
+  }
+  
+  func commonInit() {
+  }
 }

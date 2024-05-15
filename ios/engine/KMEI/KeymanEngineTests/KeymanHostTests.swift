@@ -16,7 +16,7 @@ class KeymanHostTests: XCTestCase {
   func testUseLocalDisabled() throws {
     XCTAssertFalse(KeymanHosts.useLocal)
   }
-
+  
   /**
    * Ensures no accidental permanent edits to the .local variant URLs occur.
    */

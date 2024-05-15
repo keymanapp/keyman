@@ -11,15 +11,15 @@ import os.log
 
 public class KeyboardKeymanPackage : TypedKeymanPackage<InstallableKeyboard> {
   internal var keyboards: [KMPKeyboard]!
-
+  
   override internal init(metadata: KMPMetadata, folder: URL) {
     super.init(metadata: metadata, folder: folder)
     self.keyboards = []
-
+    
     if let packagedKeyboards = metadata.keyboards {
       for keyboard in packagedKeyboards {
         keyboard.packageId = self.id
-
+        
         if(keyboard.isValid && FileManager.default.fileExists(atPath: self.sourceFolder.appendingPathComponent("\(keyboard.keyboardId).js").path)) {
           keyboards.append(keyboard)
         } else {
@@ -29,7 +29,7 @@ public class KeyboardKeymanPackage : TypedKeymanPackage<InstallableKeyboard> {
         }
       }
     }
-
+    
     self.setInstallableResourceSets(for: keyboards)
   }
   
@@ -41,7 +41,7 @@ public class KeyboardKeymanPackage : TypedKeymanPackage<InstallableKeyboard> {
     }
     return str
   }
-
+  
   override var resources: [AnyKMPResource] {
     return keyboards
   }

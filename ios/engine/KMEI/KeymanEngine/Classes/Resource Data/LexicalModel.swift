@@ -42,16 +42,16 @@ public struct LexicalModel: Codable {
   
   /// description of the lexical model (optional)
   public var description: String?
-
+  
   /// Size in bytes of the lexical model KMP file
   public var packageFileSize: Int?
-
+  
   /// Full URL of the lexical model KMP file. [Note: yes, this capitalization is correct.]
   public var packageFilename: String
-
+  
   /// Array of Full URLs of the other files included by reference in the lexical model
   public var packageIncludes: [String]?
-
+  
   /// Whether the lexical model is the recommended default for the language
   public var isDefault: Bool?
   
@@ -60,7 +60,7 @@ public struct LexicalModel: Codable {
   
   /// Dot-decimal version number of the earliest Keyman version that supports this lexical model. (optional)
   public var minKeymanVersion: String?
-
+  
   enum CodingKeys: String, CodingKey {
     case id
     case name
@@ -139,7 +139,7 @@ public struct LexicalModel: Codable {
     let lastModifiedStr = try container.decode(String.self, forKey: .lastModifiedDate)
     let lastModified : Date? = Formatter.iso8601.date(from: lastModifiedStr) ?? Formatter.iso8601noFS.date(from: lastModifiedStr)
     let minKeymanVersion = try container.decodeIfPresent(String.self, forKey: .minKeymanVersion)
-
+    
     self.init(id: id,
               name: name,
               license: license,

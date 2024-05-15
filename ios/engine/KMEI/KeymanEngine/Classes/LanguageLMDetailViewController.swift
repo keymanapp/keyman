@@ -24,7 +24,7 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
   //NOTE: there is no need for a CompletedObserver, as our parent LexicalModelPickerViewController
   //  is registered for that and deals with it by popping us out to root.
   private var lexicalModelDownloadFailedObserver: NotificationObserver?
-
+  
   private var onSuccessClosure: ((InstallableLexicalModel) -> Void)?
   
   init(language: Language, packages: [(InstallableLexicalModel, URL)], onSuccess: ((InstallableLexicalModel) -> Void)?) {
@@ -66,12 +66,12 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     os_log("viewDidAppear: LanguageLMDetailViewController", log:KeymanEngineLogger.ui, type: .info)
-
+    
     navigationController?.setToolbarHidden(true, animated: true)
   }
   
   // MARK: - Table view data source UITableViewDataSource
-
+  
   override func numberOfSections(in tableView: UITableView) -> Int {
     return packages.count
   }
@@ -109,7 +109,7 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
       cell.textLabel?.isEnabled = true
       cell.detailTextLabel?.isEnabled = true
     }
-
+    
     let state = ResourceFileManager.shared.installState(forPackage: KeymanPackage.Key(id: lexicalModel.id, type: .lexicalModel))
     cell.setInstallState(state, selected: false, defaultAccessoryType: cell.accessoryType)
   }
@@ -118,7 +118,7 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
     tableView.cellForRow(at: indexPath)?.isSelected = false
     let lexicalModelIndex = indexPath.section
     let lexicalModel = packages[lexicalModelIndex].0
-
+    
     let state = ResourceFileManager.shared.installState(forPackage: KeymanPackage.Key(id: lexicalModel.id, type: .lexicalModel))
     if state != .downloading {
       if state == .none {
@@ -126,11 +126,11 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
       } else {
         isUpdate = true
       }
-
+      
       let format = NSLocalizedString("menu-lexical-model-install-title", bundle: engineBundle, comment: "")
       let alertController = UIAlertController(title: String.localizedStringWithFormat(format, language.name, lexicalModel.name),
-        message: NSLocalizedString("menu-lexical-model-install-message", bundle: engineBundle, comment: ""),
-        preferredStyle: UIAlertController.Style.alert)
+                                              message: NSLocalizedString("menu-lexical-model-install-message", bundle: engineBundle, comment: ""),
+                                              preferredStyle: UIAlertController.Style.alert)
       alertController.addAction(UIAlertAction(title: NSLocalizedString("command-cancel", bundle: engineBundle, comment: ""),
                                               style: UIAlertAction.Style.cancel,
                                               handler: nil))
@@ -147,12 +147,12 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
     let lmFullID = package.0.fullID
     let completionClosure: ResourceDownloadManager.CompletionHandler<LexicalModelKeymanPackage> = { package, error in
       try? ResourceDownloadManager.shared.standardLexicalModelInstallCompletionBlock(forFullID: lmFullID)(package, error)
-
+      
       if let lm = package?.findResource(withID: lmFullID) {
         self.onSuccessClosure?(lm)
       }
     }
-
+    
     ResourceDownloadManager.shared.downloadPackage(withKey: package.0.packageKey, from: package.1, withNotifications: true, completionBlock: completionClosure)
   }
   
@@ -166,7 +166,7 @@ class LanguageLMDetailViewController: UITableViewController, UIAlertViewDelegate
   
   private func lexicalModelDownloadFailed() {
     os_log("lexicalModelDownloadFailed: LanguageLMDetailViewController", log:KeymanEngineLogger.resources, type: .info)
-   view.isUserInteractionEnabled = true
+    view.isUserInteractionEnabled = true
     navigationItem.setHidesBackButton(false, animated: true)
   }
   

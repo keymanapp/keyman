@@ -15,7 +15,7 @@ public class ResourceDownloadStatusToolbar: UIToolbar {
   private var actionButton: UIButton?
   
   private var _navigationController: UINavigationController?
-
+  
   override init(frame: CGRect) {
     super.init(frame: frame)
     
@@ -47,7 +47,7 @@ public class ResourceDownloadStatusToolbar: UIToolbar {
   private func setupStatusLabel() -> UILabel {
     let labelFrame = CGRect(origin: frame.origin,
                             size: CGSize(width: frame.width * 0.95,
-                            height: frame.height * 0.7))
+                                         height: frame.height * 0.7))
     let label = UILabel(frame: labelFrame)
     label.backgroundColor = UIColor.clear
     label.textColor = UIColor.white
@@ -75,7 +75,7 @@ public class ResourceDownloadStatusToolbar: UIToolbar {
   private func setupActionButton(_ text: String, for handler: Any?, onClick: Selector) -> UIButton {
     let button = UIButton(type: .roundedRect)
     button.addTarget(handler, action: onClick, for: .touchUpInside)
-
+    
     button.frame = CGRect(x: frame.origin.x, y: frame.origin.y,
                           width: frame.width * 0.95, height: frame.height * 0.7)
     button.center = CGPoint(x: frame.width / 2, y: frame.height / 2)
@@ -84,7 +84,7 @@ public class ResourceDownloadStatusToolbar: UIToolbar {
     button.setTitle(text, for: .normal)
     button.autoresizingMask =  [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin,
                                 .flexibleBottomMargin, .flexibleWidth, .flexibleHeight]
-
+    
     return button
   }
   
