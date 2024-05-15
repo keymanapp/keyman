@@ -12,14 +12,9 @@ const KEYMAN_ROOT = resolve(dir, '../../../../');
 /** @type {import('@web/test-runner').TestRunnerConfig} */
 export default {
   browsers: [
-    // These are the same type - and probably the same _instances_ - as are visible within the reporter!
-    // Probably a helpful fact to resolve name disambiguation.
     playwrightLauncher({ product: 'chromium' }),
     playwrightLauncher({ product: 'webkit', concurrency: 1 }),
-    playwrightLauncher({ product: 'firefox' }),
-    // playwrightLauncher({ product: 'webkit', concurrency: 1, createBrowserContext({browser}) {
-    //   return browser.newContext({...devices['iPhone X'] }); // to resolve:  name disambiguation.
-    // }})
+    playwrightLauncher({ product: 'firefox' })
   ],
   concurrency: 10,
   nodeResolve: true,
