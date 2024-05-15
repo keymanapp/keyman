@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.325 stable 2024-05-15
+
+* chore: update history for stable (#11448)
+
 ## 17.0.324 stable 2024-05-15
 
 * chore(android): 17.0 stable release
