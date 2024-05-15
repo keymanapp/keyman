@@ -178,42 +178,48 @@ set_npm_version () {
   npm version --allow-same-version --no-git-tag-version --no-commit-hooks "$VERSION_WITH_TAG"
 }
 
-NUM_RE='^[0-9]+$'
+#
+# Re-runs the specified command-line instruction up to 5 times should it fail, waiting a
+# random delay between each attempt.  No re-runs are attempted after successful commands.
+#
+# ### Usage
+#   try_multiple_times "$@"
+#
+# ### Parameters
+#   1: $@         command-line arguments
+try_multiple_times ( ) {
+  _try_multiple_times 0 "$@"
+}
 
-RETRY_MAX=5
-
-# Configuration:  wait between 10 sec and 120 sec.
-
-# in seconds.
-RETRY_MAX_WAIT_RANGE=111
-# in seconds
-RETRY_MIN_WAIT=10
-
-# $1  The current retry count (optional - defaults to 0 if not a non-negative whole number)
+# $1  The current retry count
 # $2+ (everything else) the command to retry should it fail
-reattempt_if_failing ( ) {
+_try_multiple_times ( ) {
+  local RETRY_MAX=5
+
+  # Configuration:  wait between 10 sec and 120 sec.
+
+  # in seconds.
+  local RETRY_MAX_WAIT_RANGE=111
+  # in seconds
+  local RETRY_MIN_WAIT=10
+
   local retryCount=$1
+  shift
 
-  if ! [[ "$retryCount" =~ $NUM_RE ]]; then
-    retryCount=0
-  else
-    shift
-  fi
-
-  if [[ "$retryCount" -eq "$RETRY_MAX" ]]; then
+  if (( "$retryCount" == "$RETRY_MAX" )); then
     builder_die "Retry limit of $RETRY_MAX attempts reached."
   fi
 
   retryCount=$(( $retryCount + 1 ))
 
-  if [[ "$retryCount" -ne "1" ]]; then
+  if (( $retryCount != 1 )); then
     local wait_length=$(( RANDOM % RETRY_MAX_WAIT_RANGE + RETRY_MIN_WAIT ))
     echo "Delaying $wait_length seconds before attempt $retryCount: \`$@\`"
     sleep $wait_length
   fi
 
   if ! "${@:1}"; then
-    reattempt_if_failing $retryCount "$@"
+    _try_multiple_times $retryCount "$@"
   fi
 }
 
@@ -222,7 +228,7 @@ reattempt_if_failing ( ) {
 # build invocation
 #
 verify_npm_setup() {
-  reattempt_if_failing _verify_npm_setup
+  try_multiple_times _verify_npm_setup
 }
 
 _verify_npm_setup() {
