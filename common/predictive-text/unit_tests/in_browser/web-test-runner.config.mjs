@@ -15,13 +15,13 @@ export default {
     // These are the same type - and probably the same _instances_ - as are visible within the reporter!
     // Probably a helpful fact to resolve name disambiguation.
     playwrightLauncher({ product: 'chromium' }),
-    playwrightLauncher({ product: 'webkit' }),
+    playwrightLauncher({ product: 'webkit', concurrency: 1 }),
     playwrightLauncher({ product: 'firefox' }),
-    // playwrightLauncher({ product: 'webkit', createBrowserContext({browser}) {
+    // playwrightLauncher({ product: 'webkit', concurrency: 1, createBrowserContext({browser}) {
     //   return browser.newContext({...devices['iPhone X'] }); // to resolve:  name disambiguation.
     // }})
   ],
-  concurrency: 1,
+  concurrency: 10,
   nodeResolve: true,
   files: [
     '**/*.spec.ts'
