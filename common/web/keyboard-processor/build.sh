@@ -33,6 +33,14 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
+function do_configure() {
+  verify_npm_setup
+
+  # Configure Web browser-engine testing environments.  As is, this should only
+  # make changes when we update the dependency, even on our CI build agents.
+  playwright install
+}
+
 function do_build() {
   tsc --build "$THIS_SCRIPT_PATH/tsconfig.all.json"
 
@@ -71,7 +79,7 @@ function do_test() {
   web-test-runner --config tests/dom/web-test-runner${WTR_CONFIG}.config.mjs
 }
 
-builder_run_action configure  verify_npm_setup
+builder_run_action configure  do_configure
 builder_run_action clean      rm -rf ./build
 builder_run_action build      do_build
 builder_run_action test       do_test
