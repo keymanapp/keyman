@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 18.0.36 alpha 2024-05-15
+
+* chore: merge beta into master, final (#11445)
+* chore(web): updates chai, @types/chai dependencies (#11318)
+* chore(web): updates most @types/node dependencies, makes them consistent (#11319)
+* chore(web): adds '@web/test-runner' and related packages (#11323)
+* chore(web): EventEmitter3, sinon dependency updates (#11402)
+
 ## 18.0.35 alpha 2024-05-14
 
 *  (#11340)
