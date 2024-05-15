@@ -1,4 +1,4 @@
-import EventEmitter from "eventemitter3";
+import { EventEmitter } from "eventemitter3";
 import type LanguageProcessor from "./languageProcessor.js";
 import { type ReadySuggestions, type InvalidateSourceEnum, StateChangeEnum, StateChangeHandler } from './languageProcessor.js';
 import { type KeyboardProcessor, type OutputTarget } from "@keymanapp/keyboard-processor";
