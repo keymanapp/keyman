@@ -237,10 +237,10 @@ void mac_KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, 
       shift &= ~LCTRLFLAG;
 
     if(key->ShiftFlags == 0) {
-      mac_KMX_LogError(L"Converted ddkk mnemonic rule on line %d, + '%c' TO dk(%d) + [%x K_%d]", key->Line, key->Key, deadkey, shift, vk);
+      mac_KMX_LogError(L"Converted mnemonic rule on line %d, + '%c' TO dk(%d) + [%x K_%d]", key->Line, key->Key, deadkey, shift, vk);
       key->ShiftFlags = ISVIRTUALKEY | shift;
     } else {
-      mac_KMX_LogError(L"Converted ddkk mnemonic virtual char key rule on line %d, + [%x '%c'] TO dk(%d) + [%x K_%d]", key->Line, key->ShiftFlags, key->Key, deadkey, key->ShiftFlags & ~VIRTUALCHARKEY, vk);
+      mac_KMX_LogError(L"Converted mnemonic virtual char key rule on line %d, + [%x '%c'] TO dk(%d) + [%x K_%d]", key->Line, key->ShiftFlags, key->Key, deadkey, key->ShiftFlags & ~VIRTUALCHARKEY, vk);
       key->ShiftFlags &= ~VIRTUALCHARKEY;
     }
 
@@ -517,7 +517,7 @@ int mac_KMX_GetDeadkeys( KMX_WCHAR DeadKey, UINT shift_dk, KMX_WORD *OutputPairs
 
   KMX_DWORD sc_dk = mac_KMX_get_KeyCodeUnderlying_From_KeyValUnderlying( All_Vector, (KMX_DWORD) DeadKey);
 
-  // _S2
+  /*// _S2
   // we go in this order because we need to make sure that the most obvious keycombination is taken into account for deadkeys.
   // This is important since it catches only the first key that matches a given rule, but multiple keys may match that rule.
   // (see explanation in mcompile.cpp DoConvert() )
@@ -530,17 +530,18 @@ int mac_KMX_GetDeadkeys( KMX_WCHAR DeadKey, UINT shift_dk, KMX_WORD *OutputPairs
       0,  11,   8,   2,  14,   3,   5,   4,  34,  38,  40,  37,  46,  45,  31,  35,  12,  15,   1,  17,  32,   9,  13,   7,  16,   6,
       29,  18,  19,  20,  21,  23,  22,  26,  28,  25,
       42,  27,  24,  33,  30,  42,  41,  39,  43,  47,  44, 223, 226, 0xFFFF
-  };
+  };*/
 
   for ( int j=0; j < sizeof(shift)/sizeof(shift[0]); j++) {
-    //for ( int i=0; i < keycount;i++) {
-    //for ( int i=keycount-1; i >=0; i--) {
-    for (int i = 0; keyarray[i] != 0xFFFF; i++) {
+    // we start calculating SPACE(49) since most obvious deadkeys combinations use space.
+    for ( int i=keycount-1; i >=0; i--) {
+    //for ( int i=0; i< keycount-1; i++) {
+    //for (int i = 0; keyarray[i] != 0xFFFF; i++) {
       status = UCKeyTranslate(keyboard_layout, sc_dk ,kUCKeyActionDown, mac_map_VKShiftState_to_MacModifier(shift_dk), LMGetKbdType(), 0, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
       if(deadkeystate !=0) {
-        status = UCKeyTranslate(keyboard_layout, keyarray[i] ,kUCKeyActionDown, shift[j], LMGetKbdType(), 0, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
+        status = UCKeyTranslate(keyboard_layout, i ,kUCKeyActionDown, shift[j], LMGetKbdType(), 0, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
         if(deadkeystate !=0) {
-          KMX_WORD vk = mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(keyboard_layout, keyarray[i], 1);
+          KMX_WORD vk = mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(keyboard_layout, i, 1);
           *p++ = vk;
           *p++ = shift[j];
           *p++ =unicodeString[0];
