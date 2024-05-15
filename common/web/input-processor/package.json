@@ -20,7 +20,6 @@
     "@keymanapp/kmc": "*",
     "@keymanapp/resources-gosh": "*",
     "@types/node": "^11.9.4",
-    "chai": "^4.3.4",
     "mocha": "^10.0.0",
     "mocha-teamcity-reporter": "^4.0.0",
     "ts-node": "^10.9.1",

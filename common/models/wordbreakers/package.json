@@ -50,10 +50,8 @@
   "devDependencies": {
     "@keymanapp/models-types": "*",
     "@keymanapp/resources-gosh": "*",
-    "@types/chai": "^4.2.11",
     "@types/mocha": "^7.0.2",
     "c8": "^7.12.0",
-    "chai": "^4.3.4",
     "mocha": "^10.0.0",
     "mocha-teamcity-reporter": "^4.0.0",
     "ts-node": "^10.9.1",

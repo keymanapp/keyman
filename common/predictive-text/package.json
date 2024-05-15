@@ -45,7 +45,6 @@
     "@keymanapp/models-types": "*",
     "@keymanapp/resources-gosh": "*",
     "@types/node": "^10.17.21",
-    "chai": "^4.3.4",
     "karma": "^6.4.1",
     "karma-browserstack-launcher": "^1.6.0",
     "karma-chai": "^0.1.0",

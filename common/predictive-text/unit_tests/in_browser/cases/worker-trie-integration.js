@@ -1,4 +1,4 @@
-var assert = chai.assert;
+import { assert } from '../../../../../node_modules/chai/chai.js';
 
 import { LMLayer, Worker }   from "../../../build/lib/web/index.mjs";
 import * as helpers from "../helpers.mjs";

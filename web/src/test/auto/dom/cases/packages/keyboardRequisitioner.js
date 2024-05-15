@@ -1,4 +1,4 @@
-const assert = chai.assert;
+import { assert } from '/node_modules/chai/chai.js';
 import sinon from '/node_modules/sinon/pkg/sinon-esm.js';
 
 import { KeyboardHarness, MinimalKeymanGlobal } from '/@keymanapp/keyboard-processor/build/lib/index.mjs';

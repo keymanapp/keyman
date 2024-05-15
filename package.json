@@ -9,7 +9,7 @@
     "ajv": "^8.12.0",
     "ajv-cli": "^5.0.0",
     "ajv-formats": "^2.1.1",
-    "chai": "^4.3.4",
+    "chai": "^5.1.0",
     "esbuild": "^0.15.16",
     "eslint": "^8.39.0",
     "eslint-config-standard-with-typescript": "^34.0.1",
