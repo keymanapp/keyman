@@ -59,11 +59,6 @@ export default {
   /*
     Un-comment the next two lines for easy interactive debugging; it'll launch the
     test page in your preferred browser.
-
-    WARNING: https://github.com/modernweb-dev/web/issues/2721 may cause issues when
-    using manual mode.  Changing rootDir to the drive root (or similar) may provide
-    a decent workaround; it appears that Web Test Runner can do a little searching
-    for node_modules if and when necessary.
   */
   // debug: true,
   // open: true,
