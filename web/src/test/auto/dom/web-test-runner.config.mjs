@@ -15,8 +15,6 @@ const KEYMAN_ROOT = resolve(dir, '../../../../../');
 export default {
   // debug: true,
   browsers: [
-    // These are the same type - and probably the same _instances_ - as are visible within the reporter!
-    // Probably a helpful fact to resolve name disambiguation.
     new LauncherWrapper(playwrightLauncher({ product: 'chromium' })),
     new LauncherWrapper(playwrightLauncher({ product: 'firefox' })),
     new LauncherWrapper(playwrightLauncher({ product: 'webkit', concurrency: 1 }))
@@ -92,15 +90,6 @@ export default {
     sessionStabilityReporter({}),
     defaultReporter()
   ],
-  /*
-    Un-comment the next two lines for easy interactive debugging; it'll launch the
-    test page in your preferred browser.
-
-    WARNING: https://github.com/modernweb-dev/web/issues/2721 may cause issues when
-    using manual mode.  Changing rootDir to the drive root (or similar) may provide
-    a decent workaround; it appears that Web Test Runner can do a little searching
-    for node_modules if and when necessary.
-  */
   // open: true,
   // manual: true,
   rootDir: KEYMAN_ROOT
