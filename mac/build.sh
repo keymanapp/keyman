@@ -202,6 +202,7 @@ do_clean ( ) {
   rm -rf "$KME4M_BASE_PATH/build"
   rm -rf "$KM4MIM_BASE_PATH/build"
   rm -rf "$KMTESTAPP_BASE_PATH/build"
+  rm -rf "$KEYMAN_ROOT/mac/setup/Install Keyman.app"
   
   builder_heading "Cleaning pods folder (CocoaPods)"
   rm -rf "$PODS_FOLDER"
