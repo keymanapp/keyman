@@ -178,11 +178,54 @@ set_npm_version () {
   npm version --allow-same-version --no-git-tag-version --no-commit-hooks "$VERSION_WITH_TAG"
 }
 
+NUM_RE='^[0-9]+$'
+
+RETRY_MAX=5
+
+# Configuration:  wait between 10 sec and 120 sec.
+
+# in seconds.
+RETRY_MAX_WAIT_RANGE=111
+# in seconds
+RETRY_MIN_WAIT=10
+
+# $1  The current retry count (optional - defaults to 0 if not a non-negative whole number)
+# $2+ (everything else) the command to retry should it fail
+reattempt_if_failing ( ) {
+  local retryCount=$1
+
+  if ! [[ "$retryCount" =~ $NUM_RE ]]; then
+    retryCount=0
+  else
+    shift
+  fi
+
+  if [[ "$retryCount" -eq "$RETRY_MAX" ]]; then
+    builder_die "Retry limit of $RETRY_MAX attempts reached."
+  fi
+
+  retryCount=$(( $retryCount + 1 ))
+
+  if [[ "$retryCount" -ne "1" ]]; then
+    local wait_length=$(( RANDOM % RETRY_MAX_WAIT_RANGE + RETRY_MIN_WAIT ))
+    echo "Delaying $wait_length seconds before attempt $retryCount: \`$@\`"
+    sleep $wait_length
+  fi
+
+  if ! "${@:1}"; then
+    reattempt_if_failing $retryCount "$@"
+  fi
+}
+
 #
 # Verifies that node is installed, and installs npm packages, but only once per
 # build invocation
 #
 verify_npm_setup() {
+  reattempt_if_failing _verify_npm_setup
+}
+
+_verify_npm_setup() {
   # We'll piggy-back on the builder module dependency build state to determine
   # if npm ci has been called in the current script invocation. Adding the
   # prefix /external/ to module name in order to differentiate between this and
