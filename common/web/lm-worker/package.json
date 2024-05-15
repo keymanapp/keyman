@@ -28,7 +28,6 @@
     "@keymanapp/common-test-resources": "*",
     "@keymanapp/models-types": "*",
     "@keymanapp/resources-gosh": "*",
-    "@types/node": "^10.17.21",
     "c8": "^7.12.0",
     "combine-source-map": "^0.8.0",
     "karma": "^6.4.1",
