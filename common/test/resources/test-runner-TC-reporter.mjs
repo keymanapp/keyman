@@ -4,8 +4,6 @@ import path from 'path';
 // https://www.jetbrains.com/help/teamcity/service-messages.html#Supported+Test+ServiceMessages
 // https://modern-web.dev/docs/test-runner/reporters/write-your-own/
 export default function teamcityReporter({ name="Web Test Runner JavaScript testing", reportResults = true, reportProgress = false } = {}) {
-  /** @type {Map<import('@web/test-runner').BrowserLauncher, number>} */
-  let browserFlowIdMap = new Map();
   /** @type {import('@web/test-runner').Logger} */
   let logger;
 
@@ -39,13 +37,8 @@ export default function teamcityReporter({ name="Web Test Runner JavaScript test
   /**
    * @param {import('@web/test-runner').Logger} logger
    * @param {import('@web/test-runner').TestSuiteResult} suiteResult
-   * @param {number=} flowId Not actually used... but the pattern may prove very useful for custom naming in the reports.
    */
-  const generateSuiteReport = (logger, suiteResult, flowId) => {
-    // TODO:  have seen in some outputs:  [, ] escaped by |.
-    // Need to check re: ' and | as well, since formatting will matter.
-    // Also need to check \n.
-
+  const generateSuiteReport = (logger, suiteResult) => {
     if(suiteResult.name) {
       logger.log(`##teamcity[testSuiteStarted name='${e(suiteResult.name)}']`);
     }
@@ -79,7 +72,7 @@ export default function teamcityReporter({ name="Web Test Runner JavaScript test
       }
     }
     for(const suite of suiteResult?.suites ?? []) {
-      const subSummary = generateSuiteReport(logger, suite, flowId);
+      const subSummary = generateSuiteReport(logger, suite);
       summary.passed += subSummary.passed;
       summary.failed += subSummary.failed;
       summary.skipped += subSummary.skipped;
@@ -98,19 +91,8 @@ export default function teamcityReporter({ name="Web Test Runner JavaScript test
 
   /** @type {import('@web/test-runner').Reporter} */
   const reporter = {
-    start({browsers, config, sessions}) {
+    start({config, sessions}) {
       rootDir = config.rootDir;
-      const existingIds = Array.from(browserFlowIdMap.values());
-
-      for(const browser of browsers) {
-        /** @type {number} */
-        let flowId;
-        do {
-        flowId = Math.floor(Math.random() * 1e9);
-        } while(existingIds.find((val) => val == flowId));
-
-        browserFlowIdMap.set(browser, flowId);
-      }
 
       for(const session of sessions.all()) {
         testDefMap.set(buildSessionName(session), new Map());
@@ -177,9 +159,6 @@ export default function teamcityReporter({ name="Web Test Runner JavaScript test
 
       // Add extra "suite" layers:  testFile (filename), then group-browser.
 
-      // What is TC's "flowId" bit for?  [Answer: resolving asynchronous text output -
-      // which mattered for BrowserStack.  @web/test-runner handles that for us.]
-
       const repoPath = path.relative(rootDir, testFile);
 
       logger.log(`##teamcity[testSuiteStarted name='file ${e(repoPath)}']`);
@@ -189,7 +168,7 @@ export default function teamcityReporter({ name="Web Test Runner JavaScript test
 
         const results = session.testResults;
         if(results) {
-          const summary = generateSuiteReport(logger, results, browserFlowIdMap.get(session.browser));
+          const summary = generateSuiteReport(logger, results);
           testDefMap.get(sessionName).set(testFile, summary);
         }
 
