@@ -391,6 +391,8 @@ public:
 void print_All_Entries_S2(std::vector<mac_KMX_VirtualKey*> rgKey);
 bool run_verify_S2(std::vector<mac_KMX_VirtualKey*> rgKey);
 
+void print_All_Keys(const UCKeyboardLayout * keyboard_layout);
+void print_certain_Keys(const UCKeyboardLayout * keyboard_layout, int keycode);
 bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, const UCKeyboardLayout **keyboard_layout,std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) { // I4353   // I4327
  mac_KMX_Loader loader;
 
@@ -442,10 +444,10 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, const UCKeyboar
             continue;
           }
 
-     //     //_S2 TOP_6 TODO to compare win-lin kmn-files skip ss6+7; MUST BE removed later!!!!
-     //    if(ss == MenuCtrl|| ss == ShftMenuCtrl) {
-     //       continue;
-     //     }
+          //_S2 TOP_6 TODO to compare win-lin kmn-files skip ss6+7; MUST BE removed later!!!!
+          if(ss == MenuCtrl|| ss == ShftMenuCtrl) {
+           continue;
+          }
           // _S2 ToDo what about not used keys??
           KMX_DWORD KC_US = (KMX_DWORD) mac_KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 
@@ -485,6 +487,9 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, const UCKeyboar
 
   // _S2 needs to go
   //print_All_Entries_S2(rgKey);
+  //print_All_Keys( * keyboard_layout);
+  //print_certain_Keys( * keyboard_layout, 10);
+
   if ( ! run_verify_S2(rgKey))
     printf(" \n::::::::::::::::::::::::::::::::::::::::::::::::::: THERE ARE SOME WRONG ENTRIES ::::::::::::::::::::::::::::::::::::::::::::::::::: \n");
   else
@@ -756,6 +761,54 @@ void print_All_Entries_S2( std::vector<mac_KMX_VirtualKey*> rgKey) {
     print_entries_S2(222, rgKey, "ä", "Ä", "ä Ä Ä Ä");
     print_entries_S2(226, rgKey, "<", ">", "< < > >");
 }
+
+void print_certain_Keys(const UCKeyboardLayout * keyboard_layout, int keycode) {
+  UniCharCount maxStringlength    = 5;
+  UniCharCount actualStringlength = 0;
+  UniChar unicodeString[maxStringlength];
+  UInt32 deadkeystate = 0;
+  OSStatus status;
+  int shiftarray[] ={0,2,8,10};
+
+  for(int k=0; k<2;k++) {
+    for(int j=0; j<4;j++) {
+      status = UCKeyTranslate(keyboard_layout, keycode ,kUCKeyActionDown, (shiftarray[j]+ 4*k), LMGetKbdType(), 0, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
+       if(deadkeystate ==0)
+        printf("    key nr %i , ss %i has values %i(%c)\n", keycode, shiftarray[j]+ 4*k, unicodeString[0],unicodeString[0] );
+      // If this was a deadkey, append a space
+      if(deadkeystate !=0) {
+        status = UCKeyTranslate(keyboard_layout, 49 ,kUCKeyActionDown, (shiftarray[j]+ 4*k), LMGetKbdType(), 0, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
+        printf(" dk key nr %i , ss %i has values %i(%c)\n", keycode,shiftarray[j]+ 4*k, unicodeString[0],unicodeString[0] );
+      }
+    }
+  }
+}
+
+
+void print_All_Keys(const UCKeyboardLayout * keyboard_layout){
+  UniCharCount maxStringlength    = 5;
+  UniCharCount actualStringlength = 0;
+  UniChar unicodeString[maxStringlength];
+  UInt32 deadkeystate = 0;
+  OSStatus status;
+  int shiftarray[] ={0,2,8,10};
+
+  for(int k=0; k<2;k++) {
+    for(int j=0; j<4;j++) {
+      for(int i=0; i<50;i++) {
+        status = UCKeyTranslate(keyboard_layout, i ,kUCKeyActionDown, (shiftarray[j]+ 4*k), LMGetKbdType(), 0, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
+        if(deadkeystate ==0)
+          printf("    key nr %i , ss %i has values %i(%c)\n", i, shiftarray[j]+ 4*k, unicodeString[0],unicodeString[0] );
+        // If this was a deadkey, append a space
+        if(deadkeystate !=0) {
+          status = UCKeyTranslate(keyboard_layout, 49 ,kUCKeyActionDown, (shiftarray[j]+ 4*k), LMGetKbdType(), 0, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
+          printf(" dk key nr %i , ss %i has values %i(%c)\n", i,shiftarray[j]+ 4*k, unicodeString[0],unicodeString[0] );
+        }
+      }
+    }
+  }
+}
+
 
 bool run_verify_S2(std::vector<mac_KMX_VirtualKey*> rgKey) {
 

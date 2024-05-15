@@ -110,7 +110,7 @@ int mac_append_underlying_ToVector(v_dw_3D &All_Vector, const UCKeyboardLayout *
 // initialize UCHR
 bool mac_InitializeUCHR(const UCKeyboardLayout **keyboard_layout);
 //------------------------------
-
+/*
 const UINT USVirtualKeyToScanCode[256] = {
 	0x00, // L"K_?00",				// &H0
 	0x00, // L"K_LBUTTON",		// &H1
@@ -509,7 +509,7 @@ const UINT ScanCodeToUSVirtualKey[128] = {
   0x6c, // 0x7e => K_SEPARATOR
   0x00  // 0x7f => No match
 };
-
+*/
 // _S2 many keys still need to be defined !!  
 //( on x. place there is key e.g. 
 // on (US) position 24 we find key xBB ( = + ) 
@@ -746,7 +746,7 @@ const UINT mac_USVirtualKeyToScanCode[256] = {
 		0x999,      //0x5B, // L"K_?5B",				// &H5B
 		0x999,      //0x5C, // L"K_?5C",				// &H5C
 		0x999,      //0x5D, // L"K_?5D",				// &H5D
-		0x999,      //0x00, // L"K_?5E",				// &H5E
+		10,      //0x00, // L"K_?5E",				// &H5E 
 		0x999,      //0x5F, // L"K_?5F",				// &H5F
 		0x999,      //0x52, // L"K_NP0",				// &H60
 		0x999,      //0x4F, // L"K_NP1",				// &H61
@@ -875,7 +875,7 @@ const UINT mac_USVirtualKeyToScanCode[256] = {
 	0x2A, // L"K_BKSLASH",			// &HDC
 		0x1E, // L"K_RBRKT",				// &HDD
 		0x27, // L"K_QUOTE",				// &HDE
-		0x32, // L"K_oDF",				// &HDF			// MCD 01-11-02: Brazilian fix: 00 -> 73
+		27, // L"K_oDF",				// &HDF			// MCD 01-11-02: Brazilian fix: 00 -> 73
 		0x999,      //0x00, // L"K_oE0",				// &HE0
 		0x999,      //0x00, // L"K_oE1",				// &HE1
 		50,      //0x56, // L"K_oE2",				// &HE2
