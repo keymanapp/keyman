@@ -291,12 +291,9 @@ do_publish() {
   do_notarize
 
   builder_heading "Preparing files for release deployment..."
-  # Create the disk image
-  pushd setup
-  eval "./build.sh"
-  popd
+  eval "./setup/build.sh"
 
-  eval "$KM4MIM_BASE_PATH/make-km-dmg.sh" $BUILD_OPTIONS
+  eval "$KM4MIM_BASE_PATH/make-km-dmg.sh" $QUIET_FLAG
   if [ $? == 0 ]; then
       displayInfo "Creating disk image succeeded!" ""
   else
