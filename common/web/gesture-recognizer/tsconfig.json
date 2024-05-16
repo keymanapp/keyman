@@ -11,8 +11,6 @@
     //       but existing code in web/ breaks some of these settings
     //
     // At present, the code actually compiles without them... but the TS tests are a different matter.
-    "noImplicitAny": false,
-    "strictFunctionTypes": false,
     "noImplicitReturns": false
   },
   "include": ["./src/engine/**/*.ts"],
