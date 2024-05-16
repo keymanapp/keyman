@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.37 alpha 2024-05-16
+
+* chore(android): update Gradle wrapper version (#11437)
+* fix(android/engine): Handle globe key on lock screen (#11458)
+* chore(oem/fv/ios): Remove build_keyboards.sh script (#11438)
+
 ## 18.0.36 alpha 2024-05-15
 
 * chore: merge beta into master, final (#11445)
