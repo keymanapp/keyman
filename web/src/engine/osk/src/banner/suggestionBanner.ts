@@ -110,6 +110,7 @@ export class BannerSuggestion {
     div.className = "kmw-suggest-option";
     div.id = BannerSuggestion.BASE_ID + this.index;
 
+    // @ts-ignore // Tags the element with its backing object.
     this.div['suggestion'] = this;
 
     let container = this.container = document.createElement('div');

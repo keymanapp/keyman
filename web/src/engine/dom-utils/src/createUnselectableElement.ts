@@ -3,7 +3,5 @@ export default function createUnselectableElement<E extends "p"|"style"|"script"
   const e = document.createElement<E>(nodeName);
 
   e.style.userSelect="none";
-  e.style.webkitUserSelect="none";
-  e.style['MozUserSelect'] = "none";
   return e;
 }

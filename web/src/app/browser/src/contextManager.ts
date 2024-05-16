@@ -803,7 +803,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   /**
    * Restore the most recently used keyboard, if still available
    */
-  restoreSavedKeyboard(kbd) {
+  restoreSavedKeyboard(kbd: string) {
     // If no saved keyboard, defaults to US English
     const d=kbd;
 

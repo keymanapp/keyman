@@ -6,5 +6,5 @@ export default interface KeyTip {
   state: boolean;
   element?: HTMLDivElement;
 
-  show(key: KeyElement, on: boolean, previewHost: GesturePreviewHost);
+  show(key: KeyElement, on: boolean, previewHost: GesturePreviewHost): void;
 }

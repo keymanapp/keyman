@@ -17,6 +17,11 @@ interface KeyboardTag {
   kc: string;
 }
 
+interface LangBarTag {
+  kList: KeyboardStub[],
+  scrolled: boolean;
+}
+
 // Used by 'native'-mode KMW only - the Android and iOS embedding apps implement their own menus.
 export class LanguageMenu {
   private readonly keyman: KeymanEngine;
@@ -315,9 +320,9 @@ export class LanguageMenu {
     let device = this.keyman.config.hostDevice;
 
     // Create and sort a list of languages
-    var k,n,lg,langs=[];
-    for(n=0; n<nStubs; n++) {
-      lg=kbdList[n]['KL'];
+    let langs: string[] = [];
+    for(let n=0; n<nStubs; n++) {
+      const lg=kbdList[n]['KL'];
       if(langs.indexOf(lg) == -1) {
         langs.push(lg);
       }
@@ -327,14 +332,15 @@ export class LanguageMenu {
     // Get current scale factor (reciprocal of viewport scale)
     var scale=Math.round(100/util.getViewportScale(device.formFactor))/100;
 
-    var dx,lgBar,i,kb,activeLanguageIndex=-1;
-    for(k=0; k<langs.length; k++) {
-      dx=util._CreateElement('div');
+    let activeLanguageIndex=-1;
+
+    for(let k=0; k<langs.length; k++) {
+      const dx=util._CreateElement('div');
       dx.className='kbd-list-closed';
-      lgBar=util._CreateElement('p');
+      const lgBar = util._CreateElement('p') as HTMLParagraphElement & LangBarTag & KeyboardTag;
       lgBar.kList=[];
 
-      for(n=0; n<nStubs; n++) {
+      for(let n=0; n<nStubs; n++) {
         if(kbdList[n]['KL'] == langs[k]) {
           lgBar.kList.push(kbdList[n]);
         }
@@ -353,39 +359,41 @@ export class LanguageMenu {
         activeLanguageIndex=k;
       }
 
-      let languageMenu = this;
+      const languageMenu = this;
       // Several keyboards for this language
       if(lgBar.kList.length > 1) {
         lgBar.className='kbd-list';
         lgBar.innerHTML=langs[k]+'...';
         lgBar.scrolled=false;
-        lgBar.ontouchend=function(e) {
+        lgBar.ontouchend = (e) => {
           e.stopPropagation();
-          if(e.target.scrolled)
-            e.target.scrolled=false;
-          else
-            this.parentNode.className=(this.parentNode.className=='kbd-list-closed'?'kbd-list-open':'kbd-list-closed');
+          if(lgBar.scrolled) {
+            lgBar.scrolled=false;
+          } else {
+            lgBar.parentElement.className=(lgBar.parentElement.className=='kbd-list-closed'?'kbd-list-open':'kbd-list-closed');
+          }
 
           // Adjust top of menu to allow for expanded list
-          languageMenu.adjust(this.parentNode.className=='kbd-list-closed'?0:this.kList.length);
+          languageMenu.adjust(lgBar.parentElement.className=='kbd-list-closed' ? 0 : lgBar.kList.length);
         }
-        lgBar.addEventListener('touchstart',function(e){e.stopPropagation();},false);
-        lgBar.addEventListener('touchmove',function(e){e.target.scrolled=true;e.stopPropagation();},false);
 
-        for(i=0; i<lgBar.kList.length; i++) {
-          kb=util._CreateElement('p');
+        lgBar.addEventListener('touchstart',function(e){e.stopPropagation();},false);
+        lgBar.addEventListener('touchmove',function(e){lgBar.scrolled=true;e.stopPropagation();},false);
+
+        for(let i=0; i<lgBar.kList.length; i++) {
+          const kb=util._CreateElement('p') as HTMLParagraphElement & KeyboardTag;
           kb.className='kbd-list-entry';
           if(device.OS == 'ios') {
             kb.style.fontSize=scale+'em';
           }
-          this.addKeyboard(lgBar.kList[i],kb,false);
+          this.addKeyboard(lgBar.kList[i], kb, false);
           dx.appendChild(kb);
         }
         // Only one keyboard for this language
       } else {
         lgBar.innerHTML=langs[k];
         lgBar.className='kbd-single-entry';
-        this.addKeyboard(lgBar.kList[0],lgBar,true);
+        this.addKeyboard(lgBar.kList[0], lgBar, true);
       }
 
       if(k == activeLanguageIndex) {
@@ -396,7 +404,7 @@ export class LanguageMenu {
     // Add a non-selectable bottom bar so to allow scrolling to the last language
     var padLast=util._CreateElement('div');
     padLast.id='kmw-menu-footer';
-    var cancelTouch=function(e){
+    var cancelTouch=function(e: TouchEvent){
       if(e.cancelable) {
         e.preventDefault();
       }
@@ -420,7 +428,7 @@ export class LanguageMenu {
   addKeyboard(kbd: KeyboardStub, kb: HTMLParagraphElement & KeyboardTag, unique: boolean) {
     kb.kn=kbd['KI'];        // InternalName;
     kb.kc=kbd['KLC'];       // LanguageCode;
-    kb.innerHTML=unique?kbd['KL']:kbd['KN'].replace(' Keyboard',''); // Name
+    kb.innerHTML=unique ? kbd['KL'] : kbd['KN'].replace(' Keyboard',''); // Name
 
     // We're setting up a few events - this alias helps avoid scoping issues.
     const languageMenu = this;

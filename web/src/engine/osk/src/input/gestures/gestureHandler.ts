@@ -4,7 +4,7 @@ export interface GestureHandler {
   /**
    * Triggers cancellation of any further processing for the gesture being handled.
    */
-  cancel();
+  cancel(): void;
 
   /**
    * Indicates when a gesture is actively displaying modal visual feedback - a

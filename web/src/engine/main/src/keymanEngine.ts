@@ -20,7 +20,9 @@ type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 type ProcessorConfiguration = WithRequired<WithRequired<ProcessorInitOptions, 'keyboardInterface'>, 'defaultOutputRules'>;
 
 function determineBaseLayout(): string {
+  // @ts-ignore
   if(typeof(window['KeymanWeb_BaseLayout']) !== 'undefined') {
+    // @ts-ignore
     return window['KeymanWeb_BaseLayout'];
   } else {
     return 'us';

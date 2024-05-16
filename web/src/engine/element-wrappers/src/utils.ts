@@ -17,11 +17,16 @@ export function nestedInstanceOf(Pelem: EventTarget, className: string): boolean
     // what we're looking for.
     return false;
   }
+  // @ts-ignore
   if (Pelem['Window']) { // Window objects contain the class definitions for types held within them.  So, we can check for those.
     return className == 'Window';
+    // @ts-ignore
   } else if (Pelem['defaultView']) { // Covers Document.
-    scopedClass = Pelem['defaultView'][className];
+    // @ts-ignore
+    scopedClass = (Pelem as Document)['defaultView'][className];
+    // @ts-ignore
   } else if(Pelem['ownerDocument']) {
+    // @ts-ignore
     scopedClass = (Pelem as Node).ownerDocument.defaultView[className];
   }
 

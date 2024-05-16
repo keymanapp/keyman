@@ -235,6 +235,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
       matchBehavior = this.defaultRuleBehavior(keyEvent, outputTarget, false);
       matchBehavior.triggerKeyDefault = true;
       // Force a single `deleteLeft`.
+      // @ts-ignore // In order to force a value override.
       matchBehavior.transcription.transform.deleteLeft = 1;
     } else if(!matchBehavior || matchBehavior.triggerKeyDefault) {
       // Restore the virtual key code if a mnemonic keyboard is being used

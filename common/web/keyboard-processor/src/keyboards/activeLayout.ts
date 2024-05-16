@@ -761,6 +761,8 @@ export class ActiveLayout implements LayoutFormFactor{
   keyboard: Keyboard;
   formFactor: DeviceSpec.FormFactor;
   defaultHint: TouchLayoutDefaultHint;
+  displayUnderlying?: boolean;
+  fontsize?: string;
 
   hasFlicks: boolean = false;
   hasLongpresses: boolean = false;

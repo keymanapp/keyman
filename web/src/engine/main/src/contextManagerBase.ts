@@ -142,7 +142,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
    * @param kbd
    * @param target
    */
-  protected abstract activateKeyboardForTarget(kbd: {keyboard: Keyboard, metadata: KeyboardStub}, target: OutputTarget);
+  protected abstract activateKeyboardForTarget(kbd: {keyboard: Keyboard, metadata: KeyboardStub}, target: OutputTarget): void;
 
   /**
    * Checks the pending keyboard-activation array for an entry corresponding to the specified
@@ -300,7 +300,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     languageCode ||= '';
 
     // Check that the saved keyboard is currently registered
-    let requestedStub = null;
+    let requestedStub: KeyboardStub = null;
     if(keyboardId) {
       requestedStub = this.keyboardCache.getStub(keyboardId, languageCode);
     } else {

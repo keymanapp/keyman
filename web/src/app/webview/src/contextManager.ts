@@ -1,4 +1,4 @@
-import { type Keyboard, Mock, OutputTarget, Transcription, findCommonSubstringEndIndex, isEmptyTransform } from '@keymanapp/keyboard-processor';
+import { type Keyboard, Mock, OutputTarget, Transcription, findCommonSubstringEndIndex, isEmptyTransform, TextTransform } from '@keymanapp/keyboard-processor';
 import { KeyboardStub } from 'keyman/engine/package-cache';
 import { ContextManagerBase } from 'keyman/engine/main';
 import { WebviewConfiguration } from './configuration.js';
@@ -24,7 +24,7 @@ export class ContextHost extends Mock {
     const savedState = this.savedState;
 
     if(this.savedState) {
-      let transform = null;
+      let transform: TextTransform = null;
 
       if(transcription) {
         const preInput = transcription.preInput;
