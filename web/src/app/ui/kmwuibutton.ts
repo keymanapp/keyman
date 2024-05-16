@@ -405,6 +405,7 @@ if(!keyman?.ui?.name) {
         // ... wait, what?  I can't find any evidence of this reference point existing.
         // Even tag `release-web-stable-2.0` turns up results only for this specific sourcefile.
         // Thus, in essence:  if(true) { /* ... */ }
+        // @ts-ignore
         if(!keymanweb['iOS']) {
           var _li = util.createElement('li');
           var _a = util.createElement('a');

@@ -442,7 +442,7 @@ if(!keyman?.ui?.name) {
        * @param       {Object}    e       event
        * Description  Change active keyboard in response to user selection event
        */
-      readonly SelectKeyboardChange = (e) => {
+      readonly SelectKeyboardChange = (e: Event) => {
         keymanweb.activatingUI(true);
 
         if(this.KeyboardSelector.value != '-') {
@@ -465,7 +465,7 @@ if(!keyman?.ui?.name) {
        * @param       {Object}    e       event
        * Description  Ensure OSK is hidden when moving focus after reselecting a keyboard
        */
-      readonly SelectBlur = (e) => {
+      readonly SelectBlur = (e: Event) => {
         if(!this.selecting) {
           keymanweb.focusLastActiveElement();
         }
@@ -542,7 +542,7 @@ if(!keyman?.ui?.name) {
        * @return      {boolean}
        * Description  Display KMW OSK at specified position (returns nothing)
        */
-      readonly _Resize = (e) => {
+      readonly _Resize = (e: Event) => {
         if(this.outerDiv.style.display =='block') {
           var elem = keymanweb.getLastActiveElement();
           if(this.floatRight) {  // I1296
