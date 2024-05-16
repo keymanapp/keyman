@@ -1,7 +1,6 @@
 import {
   gestures,
   GestureModelDefs,
-  InputSample,
   CumulativePathStats
 } from '@keymanapp/gesture-recognizer';
 
@@ -199,6 +198,7 @@ interface LayoutGestureSupportFlags {
 
 // Simple compile-time validation that OSKLayerGroup's spec object provides the fields expected above.
 let dummy: ActiveLayout;
+// @ts-ignore // so that we don't trigger "unused local" warnings.
 let dummy2: LayoutGestureSupportFlags = dummy;
 
 /**

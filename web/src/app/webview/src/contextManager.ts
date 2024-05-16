@@ -1,6 +1,6 @@
 import { type Keyboard, Mock, OutputTarget, Transcription, findCommonSubstringEndIndex, isEmptyTransform } from '@keymanapp/keyboard-processor';
 import { KeyboardStub } from 'keyman/engine/package-cache';
-import { ContextManagerBase, ContextManagerConfiguration } from 'keyman/engine/main';
+import { ContextManagerBase } from 'keyman/engine/main';
 import { WebviewConfiguration } from './configuration.js';
 
 export type OnInsertTextFunc = (deleteLeft: number, text: string, deleteRight: number) => void;

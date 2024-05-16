@@ -3,12 +3,11 @@ import { Device as DeviceDetector } from 'keyman/engine/device-detect';
 import { getAbsoluteY } from 'keyman/engine/dom-utils';
 import { OutputTarget } from 'keyman/engine/element-wrappers';
 import {
-  OSKView,
   TwoStateActivator,
   VisualKeyboard
 } from 'keyman/engine/osk';
 import { ErrorStub, KeyboardStub, CloudQueryResult, toPrefixedKeyboardId as prefixed } from 'keyman/engine/package-cache';
-import { DeviceSpec, Keyboard, extendString } from "@keymanapp/keyboard-processor";
+import { DeviceSpec, Keyboard } from "@keymanapp/keyboard-processor";
 
 import * as views from './viewsAnchorpoint.js';
 import { BrowserConfiguration, BrowserInitOptionDefaults, BrowserInitOptionSpec } from './configuration.js';

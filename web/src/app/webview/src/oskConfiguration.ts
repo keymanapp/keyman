@@ -1,5 +1,4 @@
-import { type KeyElement, OSKView, VisualKeyboard } from "keyman/engine/osk";
-import { getAbsoluteX, getAbsoluteY } from "keyman/engine/dom-utils";
+import { OSKView } from "keyman/engine/osk";
 import { DeviceSpec } from "@keymanapp/keyboard-processor";
 import { type EmbeddedGestureConfig } from "keyman/engine/osk";
 

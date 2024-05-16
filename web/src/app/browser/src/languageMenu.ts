@@ -88,7 +88,7 @@ export class LanguageMenu {
     // Add two nested DIVs to properly support iOS scrolling with momentum
     //  c.f. https://github.com/joelambert/ScrollFix/issues/2
     var m2=util._CreateElement('div'),s2=m2.style,
-        m3=util._CreateElement('div'),s3=m3.style;
+        m3=util._CreateElement('div');
     m2.id='kmw-menu-scroll-container'; m3.id='kmw-menu-scroller';
 
     // Support momentum scrolling on iOS
@@ -100,9 +100,9 @@ export class LanguageMenu {
     menu.appendChild(m2);
 
     // Add menu index strip
-    var i,x,mx=util._CreateElement('div');
+    let x,mx=util._CreateElement('div');
     mx.id='kmw-menu-index';
-    for(i=1; i<=26; i++) {
+    for(let i=1; i<=26; i++) {
       x=util._CreateElement('p');
       x.innerHTML=String.fromCharCode(i+64);
       mx.appendChild(x);
@@ -134,9 +134,6 @@ export class LanguageMenu {
 
     // Add a list of keyboards to the innermost DIV
     this.activeLgNo=this.addLanguages(m3,kbdList);
-
-    // Get number of visible (language) selectors
-    var nLgs=m3.childNodes.length-1;
 
     // Do not display until sizes have been calculated
     this.lgList.style.visibility='hidden';
@@ -182,7 +179,7 @@ export class LanguageMenu {
       scale=1.25;
     }
 
-    for(i=0;i<26;i++) {
+    for(let i=0;i<26;i++) {
       var qs=(<HTMLElement>mx.childNodes[i]).style;
       if(factor == 2 && (i%2) == 1) {
         qs.display='none';

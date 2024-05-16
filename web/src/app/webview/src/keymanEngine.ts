@@ -1,8 +1,8 @@
-import { DefaultRules, DeviceSpec, RuleBehavior, isEmptyTransform, Keyboard } from '@keymanapp/keyboard-processor'
+import { DefaultRules, DeviceSpec, RuleBehavior, Keyboard } from '@keymanapp/keyboard-processor'
 import { KeymanEngine as KeymanEngineBase, KeyboardInterface } from 'keyman/engine/main';
 import { AnchoredOSKView, ViewConfiguration, StaticActivator } from 'keyman/engine/osk';
 import { getAbsoluteX, getAbsoluteY } from 'keyman/engine/dom-utils';
-import { type KeyboardStub, toPrefixedKeyboardId, toUnprefixedKeyboardId } from 'keyman/engine/package-cache';
+import { toPrefixedKeyboardId, toUnprefixedKeyboardId } from 'keyman/engine/package-cache';
 
 import { WebviewConfiguration, WebviewInitOptionDefaults, WebviewInitOptionSpec } from './configuration.js';
 import ContextManager, { ContextHost } from './contextManager.js';

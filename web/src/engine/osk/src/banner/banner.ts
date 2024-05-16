@@ -1,16 +1,4 @@
 import { Keyboard, KeyboardProperties } from '@keymanapp/keyboard-processor';
-import { type PredictionContext } from '@keymanapp/input-processor';
-
-import {
-  GestureRecognizer,
-  GestureRecognizerConfiguration,
-  GestureSource,
-  InputSample,
-  PaddedZoneSource
-} from '@keymanapp/gesture-recognizer';
-
-import { BANNER_GESTURE_SET } from './bannerGestureSet.js';
-
 import { createUnselectableElement } from 'keyman/engine/dom-utils';
 
 // Base class for a banner above the keyboard in the OSK
@@ -114,7 +102,7 @@ export abstract class Banner {
 
   public readonly refreshLayout?: () => void;
 
-  abstract get type();
+  abstract get type(): string;
 
   public shutdown() { };
 }

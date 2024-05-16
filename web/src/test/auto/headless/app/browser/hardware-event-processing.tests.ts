@@ -1,5 +1,4 @@
 import { assert } from 'chai';
-import sinon from 'sinon';
 
 import { preprocessKeyboardEvent } from 'keyman/app/browser';
 import { processForMnemonicsAndLegacy } from 'keyman/engine/main';
