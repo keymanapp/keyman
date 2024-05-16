@@ -271,10 +271,10 @@ export default class Flick implements GestureHandler {
       coord: [NaN, 0]
     }];
 
-    keys = keys.concat(Object.keys(flickSet).map((dir: (typeof OrderedFlickDirections[number])) => {
+    keys = keys.concat(Object.keys(flickSet).map((dir) => {
       return {
-        spec: flickSet[dir] as ActiveSubKey,
-        coord: FlickNameCoordMap.get(dir)
+        spec: flickSet[dir as typeof OrderedFlickDirections[number]] as ActiveSubKey,
+        coord: FlickNameCoordMap.get(dir as typeof OrderedFlickDirections[number])
       };
     }));
 

@@ -69,7 +69,7 @@ describe('PageContextAttachment', () => {
       sut.listInputs();
 
       const expected = ['email', 'search', 'text', 'url', 'textarea'];
-      const types = sut.sortedInputs.map((e: HTMLInputElement) => (e.type));
+      const types = sut.sortedInputs.map((e) => ((e as HTMLInputElement).type));
       assert.equal(types.length, expected.length);
       assert.deepEqual(types, expected, `Actual [${types}]`);
     });
@@ -86,7 +86,7 @@ describe('PageContextAttachment', () => {
       sut.listInputs();
 
       const expected = ['1', '3'];
-      const types = sut.sortedInputs.map((e: HTMLInputElement) => (e.id));
+      const types = sut.sortedInputs.map((e) => (e as HTMLInputElement).id);
       assert.equal(types.length, expected.length);
       assert.deepEqual(types, expected, `Actual [${types}]`);
     });
