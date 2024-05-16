@@ -212,8 +212,40 @@ int mac_KMX_get_KeyVal_From_KeyCode(const UCKeyboardLayout * keyboard_layout, in
       return (int) unicodeString[0];    // even:    combine char -> è
     }
   }
+  return 0;
+}
+// _S2 TODO dk/non-dk
+// _S2 can I use mac_KMX_get_KeyVal_From_KeyCode_dk?
+int mac_KMX_get_KeyVal_From_KeyCode_S2(const UCKeyboardLayout * keyboard_layout, int keycode, int shiftstate, int caps) {
+  // _S2 not finished yet - needs deadkeys...
+  KMX_DWORD in_array[2] = {0,0};
+  UInt32 deadkeystate             = 0;
+  UniCharCount maxStringlength    = 5;
+  UniCharCount actualStringlength = 0;
+  UniChar unicodeString[maxStringlength];
+  OSStatus status;
+  int Keycode_Spacebar =49;
 
+  // _S2 bette solution for 4*CAPS ????
+  status = UCKeyTranslate(keyboard_layout, keycode ,kUCKeyActionDown, (shiftstate+ 4*caps), LMGetKbdType(), 0, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
+  // If this was a deadkey, append a space
+  if(deadkeystate !=0)
+    status = UCKeyTranslate(keyboard_layout, Keycode_Spacebar ,kUCKeyActionDown, (shiftstate+ 4*caps), LMGetKbdType(), 0, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
 
+  // UCKeyTranslate writes 0x01 into unicodeString[0] if there is no character assigned to the Key+Shift+CAPS
+  // ( then returnes 0 -> 0 is then propagated to  ... mac_KMX_ToUnicodeEx (-> rc=0)  .. ImportRules (rc=0-> do nothing ) )
+
+  // _S2 no deadkeys yet  or check last bit
+  if( shiftstate %2 == 1)
+    return 0;       // _S2 what to return if deadkeys are used??
+
+  else {
+    if( (int) unicodeString[0] == 1 )   // impossible character
+      return 0;
+    else {
+      return (int) unicodeString[0];    // even:    combine char -> è
+    }
+  }
   return 0;
 }
 
@@ -233,6 +265,8 @@ int mac_KMX_get_KeyVal_From_KeyCode_dk(const UCKeyboardLayout * keyboard_layout,
     status = UCKeyTranslate(keyboard_layout, Keycode_Spacebar ,kUCKeyActionDown, (shiftstate+ 4*caps), LMGetKbdType(), 0, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
   }
 
+  if( keycode==0x999)
+    return L'\0';
   return (int) unicodeString[0];
 }
 
@@ -516,7 +550,7 @@ std::u16string mac_get_character_From_Keycode(std::vector<int> keyval, int shift
   return returnString;
 }
 
-KMX_DWORD  mac_get_keyval_From_Keycode_new(int charVal,const UCKeyboardLayout* keyboard_layout , KMX_DWORD shiftstate) {
+KMX_DWORD  mac_get_keyval_From_Keycode_new(int VK_dk,const UCKeyboardLayout* keyboard_layout , KMX_DWORD shiftstate) {
 
   UInt32 deadkeystate             = 0;
   UniCharCount maxStringlength    = 5;
@@ -524,7 +558,7 @@ KMX_DWORD  mac_get_keyval_From_Keycode_new(int charVal,const UCKeyboardLayout* k
   UniChar unicodeString[maxStringlength];
   OSStatus status;
 
-  status = UCKeyTranslate(keyboard_layout, charVal ,kUCKeyActionDown, shiftstate, LMGetKbdType(), 0, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
+  status = UCKeyTranslate(keyboard_layout, VK_dk ,kUCKeyActionDown, shiftstate, LMGetKbdType(), 0, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
 
   // If this was a deadkey, append a space
   if(deadkeystate !=0)
@@ -532,6 +566,25 @@ KMX_DWORD  mac_get_keyval_From_Keycode_new(int charVal,const UCKeyboardLayout* k
     status = UCKeyTranslate(keyboard_layout, 49 ,kUCKeyActionDown, 0, LMGetKbdType(), 0, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
 
   return unicodeString[0];
+}
+
+KMX_DWORD  mac_get_CombinedChar_From_DK(int VK_dk,KMX_DWORD ss_dk,const UCKeyboardLayout* keyboard_layout, KMX_DWORD VK_US, KMX_DWORD shiftstate, int caps) {
+
+  UInt32 deadkeystate             = 0;
+  UniCharCount maxStringlength    = 5;
+  UniCharCount actualStringlength = 0;
+  UniChar unicodeString[maxStringlength];
+  OSStatus status;
+
+  status = UCKeyTranslate(keyboard_layout, VK_dk ,kUCKeyActionDown, ss_dk, LMGetKbdType(), 0, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
+
+  // If this was a deadkey, append a space
+  if(deadkeystate !=0) {
+    status = UCKeyTranslate(keyboard_layout, (UInt16) VK_US ,kUCKeyActionDown, shiftstate+4*caps, LMGetKbdType(), 0, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
+    return unicodeString[0];
+  }
+  else
+   return 0;
 }
 
 /*  KMX_DWORD mac_get_keyval_From_Keycode(int keyval, int shiftstate, const UCKeyboardLayout* keyboard_layout ) {

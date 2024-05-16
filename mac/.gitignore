@@ -21,3 +21,4 @@ setup/Install Keyman.app
 **/mcompile/*.kmx
 **/mcompile/X*.cpp
 **/mcompile/X_bak
+**/mcompile/X*.*

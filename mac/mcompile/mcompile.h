@@ -54,6 +54,10 @@ void mac_KMX_LogError(const wchar_t* fmt, ...);
 //################################################################################################################################################
 
 bool test_dk_S2(KMX_WORD deadkeys[512], KMX_WORD deadkeys1[512]);
+bool test_dk_find_entries_S2(KMX_WORD deadkeys[512], int search);
+bool test_dk_write_entries_S2(KMX_WORD deadkeys[512]);
+
+
 void fun2();
 void testmyFunctions_S2();
 #endif // MCOMPILE_H

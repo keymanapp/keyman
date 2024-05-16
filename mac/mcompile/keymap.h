@@ -16,7 +16,7 @@
 std::u16string mac_get_character_From_Keycode(std::vector<int> keyval, int shiftstate,const UCKeyboardLayout* keyboard_layout);
 
 KMX_DWORD  mac_get_keyval_From_Keycode_new(int charVal,const UCKeyboardLayout* keyboard_layout , KMX_DWORD shiftstate);
-
+KMX_DWORD  mac_get_CombinedChar_From_DK(int charVal,KMX_DWORD ss_dk,const UCKeyboardLayout* keyboard_layout, KMX_DWORD VK_US, KMX_DWORD shiftstate, int caps);
 //################################################################################################################################################
 //################################# Code beyond these lines needs to be included in mcompile #####################################################
 //################################################################################################################################################
@@ -88,6 +88,8 @@ static KMX_DWORD max_shiftstate = 2;		// _S2 only base+Shift
 static KMX_DWORD keycode_max = 94;			// _S2 needed??
 static KMX_DWORD deadkey_min = 0xfe50;	// _S2 needed??
 static KMX_DWORD deadkey_max = 0xfe93;	// _S2 needed??
+
+static int maxKeyCodeMac =50;
 //static KMX_DWORD deadkey_max = 0xfe52;  // _S2 TOP_6 TODO This has to go! my test: to only return 3 dk
 
 // map VKShiftstate to modifier (use 0,2,4,8,10 instead of 0,16,9,25 )
@@ -919,6 +921,7 @@ std::u16string mac_convert_DeadkeyValues_To_U16str(int in);
 // use gdk_keymap_translate_keyboard_state to get keyval - base function to get keyvals
 // _S2 can I use mac_KMX_get_KeyVal_From_KeyCode_dk only?
 int mac_KMX_get_KeyVal_From_KeyCode(const UCKeyboardLayout * keyboard_layout, int keycode, int ss, int caps);
+int mac_KMX_get_KeyVal_From_KeyCode_S2(const UCKeyboardLayout * keyboard_layout, int keycode, int ss, int caps);
 int mac_KMX_get_KeyVal_From_KeyCode_dk(const UCKeyboardLayout * keyboard_layout, int keycode, int shiftstate, int caps, UInt32 &deadkeystate_ret);
 
 // use mac_KMX_get_KeyVal_From_KeyCode and prevent use of certain keycodes
@@ -960,9 +963,9 @@ KMX_DWORD mac_convertNamesTo_DWORD_Value(std::string tok_str);
 bool mac_createCompleteRow_US(v_str_1D &complete_List, FILE *fpp, const char *text, std::string language);
 
 void printoutKeyboards(v_dw_3D &All_Vector);
-KMX_DWORD  X_playWithDK(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal) ;
-KMX_DWORD  X_playWithDK_one(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal);
-KMX_DWORD X_compare_Shiftstates(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal=0);
-KMX_DWORD X_find_Shiftstates(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal=0);
+KMX_DWORD X_playWithDK_S2(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal) ;
+KMX_DWORD X_playWithDK_S2_one(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal);
+KMX_DWORD X_compare_Shiftstates_S2(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal=0);
+KMX_DWORD X_find_Shiftstates_S2(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal=0);
 KMX_DWORD  printout_dk(const UCKeyboardLayout* keyboard_layout);/**/
 #endif  // KEYMAP_H
