@@ -12,7 +12,6 @@
     //
     // At present, the code actually compiles without them... but the TS tests are a different matter.
     "noImplicitAny": false,
-    "noUnusedLocals": false,
     "strictFunctionTypes": false,
     "noImplicitReturns": false
   },
