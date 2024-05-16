@@ -8,12 +8,11 @@ import { assertingPromiseStatus as promiseStatus } from '../../../resources/asse
 import { simulateMultiSourceMatcherInput, simulateSelectorInput } from "../../../resources/simulateMultiSourceInput.js";
 
 import { timedPromise } from '@keymanapp/web-utils';
-import { GestureSource, gestures } from '@keymanapp/gesture-recognizer';
+import { gestures } from '@keymanapp/gesture-recognizer';
 
 import { TouchpathTurtle } from '#tools';
 
 type MatcherSelection<Type> = gestures.matchers.MatcherSelection<Type>;
-type MatcherSelector<Type> = gestures.matchers.MatcherSelector<Type>;
 type GestureModel<Type> = gestures.specs.GestureModel<Type>;
 
 import {
@@ -24,8 +23,7 @@ import {
 } from './isolatedGestureSpecs.js';
 
 import {
-  LongpressDistanceThreshold,
-  MainLongpressSourceModel
+  LongpressDistanceThreshold
 } from './isolatedPathSpecs.js';
 
 describe("MatcherSelector", function () {
