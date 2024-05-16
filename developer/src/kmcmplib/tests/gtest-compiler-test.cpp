@@ -16,19 +16,6 @@ bool hasPreamble(std::u16string result);
 
 extern kmcmp_CompilerMessageProc msgproc;
 
-#define COMPILE_ERROR_MAX_LEN (SZMAX_ERRORTEXT + 1 + 280)
-KMX_CHAR szText_stub[COMPILE_ERROR_MAX_LEN];
-
-int msgproc_stub(int line, uint32_t dwMsgCode, const char* szText, void* context) {
-    strcpy(szText_stub, szText);
-    return 1;
-}
-
-int msgproc_false_stub(int line, uint32_t dwMsgCode, const char* szText, void* context) {
-    strcpy(szText_stub, szText);
-    return 0;
-}
-
 namespace kmcmp {
     extern int nErrors;
     extern int ErrChr;
@@ -49,7 +36,23 @@ class CompilerTest : public testing::Test {
             kmcmp::ErrChr = 0;
             ErrExtraLIB[0] = '\0';
         }
+
+    public:
+        static KMX_CHAR szText_stub[];
+
+        static int msgproc_stub(int line, uint32_t dwMsgCode, const char* szText, void* context) {
+            strcpy(szText_stub, szText);
+            return 1;
+        };
+
+        static int msgproc_false_stub(int line, uint32_t dwMsgCode, const char* szText, void* context) {
+            strcpy(szText_stub, szText);
+            return 0;
+        };
 };
+
+#define COMPILE_ERROR_MAX_LEN (SZMAX_ERRORTEXT + 1 + 280)
+KMX_CHAR CompilerTest::szText_stub[COMPILE_ERROR_MAX_LEN];
 
 TEST_F(CompilerTest, strtowstr_test) {
     EXPECT_EQ(0, u16cmp(u"hello", strtowstr((PKMX_STR)"hello")));
