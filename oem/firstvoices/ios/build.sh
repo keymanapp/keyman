@@ -65,7 +65,7 @@ function do_configure() {
 
   mkdir -p "$KEYMAN_ROOT/oem/firstvoices/ios/FirstVoices/Keyboards"
   cp "$KEYBOARDS_CSV" "$KEYBOARDS_CSV_TARGET"
-  downloadKeyboardPackage "$KEYBOARD_PACKAGE_ID" "KEYBOARDS_TARGET"
+  downloadKeyboardPackage "$KEYBOARD_PACKAGE_ID" "$KEYBOARDS_TARGET"
 
   echo
   echo "Load dependencies with Carthage"
