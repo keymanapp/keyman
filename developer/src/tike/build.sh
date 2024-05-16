@@ -59,6 +59,9 @@ function do_monaco_copy() {
   run_in_vs_env rc icons.rc
 }
 
+KEYMANCORE_DLL=keymancore-2.dll
+KEYMANCORE_PDB=keymancore-2.pdb
+
 function do_build() {
   create-developer-output-folders
   build_version.res
@@ -76,12 +79,12 @@ function do_build() {
   cp kmlmc.cmd "$DEVELOPER_PROGRAM"
   cp kmlmp.cmd "$DEVELOPER_PROGRAM"
   cp kmc.cmd "$DEVELOPER_PROGRAM"
-  cp "$KEYMAN_ROOT/core/build/x86/$TARGET_PATH/src/keymancore-1.dll" "$DEVELOPER_PROGRAM"
+  cp "$KEYMAN_ROOT/core/build/x86/$TARGET_PATH/src/$KEYMANCORE_DLL" "$DEVELOPER_PROGRAM"
   if [[ -f "$WIN32_TARGET_PATH/tike.dbg" ]]; then
     cp "$WIN32_TARGET_PATH/tike.dbg" "$DEVELOPER_DEBUGPATH"
   fi
-  cp "$KEYMAN_ROOT/core/build/x86/$TARGET_PATH/src/keymancore-1.dll" "$WIN32_TARGET_PATH"
-  cp "$KEYMAN_ROOT/core/build/x86/$TARGET_PATH/src/keymancore-1.pdb" "$WIN32_TARGET_PATH"
+  cp "$KEYMAN_ROOT/core/build/x86/$TARGET_PATH/src/$KEYMANCORE_DLL" "$WIN32_TARGET_PATH"
+  cp "$KEYMAN_ROOT/core/build/x86/$TARGET_PATH/src/$KEYMANCORE_PDB" "$WIN32_TARGET_PATH"
 
   cp "$KEYMAN_ROOT/common/windows/delphi/ext/sentry/sentry.dll" "$DEVELOPER_PROGRAM/"
   cp "$KEYMAN_ROOT/common/windows/delphi/ext/sentry/sentry.x64.dll" "$DEVELOPER_PROGRAM/"
@@ -94,7 +97,7 @@ function do_publish() {
   wrap-mt -nologo -inputresource:"$DEVELOPER_PROGRAM"/tike.exe -validate_manifest
 
   wrap-signcode //d "Keyman Developer" "$DEVELOPER_PROGRAM/tike.exe"
-  wrap-signcode //d "Keyman Core" "$DEVELOPER_PROGRAM/keymancore-1.dll"
+  wrap-signcode //d "Keyman Core" "$DEVELOPER_PROGRAM/$KEYMANCORE_DLL"
   # Sign the Sentry executables and libraries here
   wrap-signcode //d "Keyman Developer" "$DEVELOPER_PROGRAM/sentry.dll"
   wrap-signcode //d "Keyman Developer" "$DEVELOPER_PROGRAM/sentry.x64.dll"
@@ -105,7 +108,7 @@ function do_publish() {
 
 function do_install() {
   cp "$DEVELOPER_PROGRAM/tike.exe" "$INSTALLPATH_KEYMANDEVELOPER/tike.exe"
-  cp "$DEVELOPER_PROGRAM/keymancore-1.dll" "$INSTALLPATH_KEYMANDEVELOPER/keymancore-1.dll"
+  cp "$DEVELOPER_PROGRAM/$KEYMANCORE_DLL" "$INSTALLPATH_KEYMANDEVELOPER/$KEYMANCORE_DLL"
 }
 
 builder_run_action clean:project        do_clean
