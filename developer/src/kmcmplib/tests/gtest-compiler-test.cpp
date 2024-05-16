@@ -77,15 +77,13 @@ TEST_F(CompilerTest, AddCompileError_test) {
     EXPECT_EQ(0, kmcmp::nErrors);
     EXPECT_EQ(CERR_FATAL, CERR_CannotCreateTempfile & CERR_FATAL);
     EXPECT_TRUE(AddCompileError(CERR_CannotCreateTempfile));
-    strcpy(expected, GetCompilerErrorString(CERR_CannotCreateTempfile));
-    EXPECT_EQ(0, strcmp(expected, szText_stub));
+    EXPECT_EQ(0, strcmp(GetCompilerErrorString(CERR_CannotCreateTempfile), szText_stub));
     EXPECT_EQ(1, kmcmp::nErrors);
 
     // CERR_ERROR
     EXPECT_EQ(CERR_ERROR, CERR_InvalidLayoutLine & CERR_ERROR);
     EXPECT_FALSE(AddCompileError(CERR_InvalidLayoutLine));
-    strcpy(expected, GetCompilerErrorString(CERR_InvalidLayoutLine));
-    EXPECT_EQ(0, strcmp(expected, szText_stub));
+    EXPECT_EQ(0, strcmp(GetCompilerErrorString(CERR_InvalidLayoutLine), szText_stub));
     EXPECT_EQ(2, kmcmp::nErrors);
 
     // Unknown
@@ -120,8 +118,7 @@ TEST_F(CompilerTest, AddCompileError_test) {
     msgproc = msgproc_false_stub;
     EXPECT_EQ(CERR_ERROR, CERR_InvalidLayoutLine & CERR_ERROR);
     EXPECT_TRUE(AddCompileError(CERR_InvalidLayoutLine));
-    strcpy(expected, GetCompilerErrorString(CERR_InvalidLayoutLine));
-    EXPECT_EQ(0, strcmp(expected, szText_stub));
+    EXPECT_EQ(0, strcmp(GetCompilerErrorString(CERR_InvalidLayoutLine), szText_stub));
     EXPECT_EQ(6, kmcmp::nErrors);
 };
 
