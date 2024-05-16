@@ -89,27 +89,29 @@ TEST_F(CompilerTest, AddCompileError_test) {
     EXPECT_EQ(2, kmcmp::nErrors);
 
     // Unknown
-    EXPECT_EQ(CERR_ERROR, 0x00004FFF & CERR_ERROR);
-    EXPECT_FALSE(AddCompileError(0x00004FFF)); // top of range ERROR
-    EXPECT_EQ(0, strcmp("Unknown error 4fff", szText_stub));
+    const KMX_DWORD UNKNOWN_ERROR = 0x00004FFF; // top of range ERROR
+    EXPECT_EQ(CERR_ERROR, UNKNOWN_ERROR & CERR_ERROR);
+    EXPECT_FALSE(AddCompileError(UNKNOWN_ERROR));
+    sprintf(expected, "Unknown error %x", UNKNOWN_ERROR);
+    EXPECT_EQ(0, strcmp(expected, szText_stub));
     EXPECT_EQ(3, kmcmp::nErrors);
 
     // ErrChr
-    kmcmp::ErrChr = 42;
+    const int ERROR_CHAR_INDEX = 42;
+    kmcmp::ErrChr = ERROR_CHAR_INDEX ;
     EXPECT_EQ(CERR_ERROR, CERR_InvalidLayoutLine & CERR_ERROR);
     EXPECT_FALSE(AddCompileError(CERR_InvalidLayoutLine));
-    strcpy(expected, GetCompilerErrorString(CERR_InvalidLayoutLine));
-    strcat(expected, " character offset: 42");
+    sprintf(expected, "%s character offset: %d", GetCompilerErrorString(CERR_InvalidLayoutLine), ERROR_CHAR_INDEX);
     EXPECT_EQ(0, strcmp(expected, szText_stub));
     kmcmp::ErrChr = 0;
     EXPECT_EQ(4, kmcmp::nErrors);
 
     // ErrExtraLIB
-    strcpy(ErrExtraLIB, " extra lib");
+    const char *const EXTRA_LIB_TEXT = " extra lib";
+    strcpy(ErrExtraLIB, EXTRA_LIB_TEXT);
     EXPECT_EQ(CERR_ERROR, CERR_InvalidLayoutLine & CERR_ERROR);
     EXPECT_FALSE(AddCompileError(CERR_InvalidLayoutLine));
-    strcpy(expected, GetCompilerErrorString(CERR_InvalidLayoutLine));
-    strcat(expected, " extra lib");
+    sprintf(expected, "%s%s", GetCompilerErrorString(CERR_InvalidLayoutLine), EXTRA_LIB_TEXT);
     EXPECT_EQ(0, strcmp(expected, szText_stub));
     ErrExtraLIB[0] = '\0';
     EXPECT_EQ(5, kmcmp::nErrors);
