@@ -6,7 +6,7 @@ type FontFamilyStyleMap = {[family: string]: HTMLStyleElement};
 export class StylesheetManager {
   private fontStyleDefinitions: { [os: string]: FontFamilyStyleMap} = {};
   private linkedSheets: HTMLStyleElement[] = [];
-  private fontPromises: Promise<FontFace>[] = [];
+  private fontPromises: Promise<FontFace | void>[] = [];
   private doCacheBusting: boolean;
 
   public readonly linkNode: Node;
@@ -180,9 +180,11 @@ export class StylesheetManager {
      */
     const fontFace = new FontFace(fd.family, source);
 
-    const clearPromise = () => this.fontPromises = this.fontPromises.filter((entry) => entry != loadPromise);
-    const loadPromise = fontFace.load().then(clearPromise).catch(clearPromise);
-    this.fontPromises.push(loadPromise);
+    let loadPromise = fontFace.load();
+    const clearPromise = () => {
+      this.fontPromises = this.fontPromises.filter((entry) => entry != loadPromise);
+    }
+    this.fontPromises.push(loadPromise.then(clearPromise).catch(clearPromise));
 
     this.linkStylesheet(sheet);
 
