@@ -3,6 +3,7 @@
 #include "..\include\kmcmplibapi.h"
 #include "..\src\kmx_u16.h"
 #include "..\src\compfile.h"
+#include "..\src\CompMsg.h"
 #include "..\..\..\..\common\include\km_types.h"
 #include "..\..\..\..\common\include\kmx_file.h"
 #include "..\..\..\..\common\include\kmn_compiler_errors.h"
@@ -70,18 +71,21 @@ TEST_F(CompilerTest, AddCompileError_test) {
     msgproc = msgproc_stub;
     kmcmp::ErrChr = 0;
     ErrExtraLIB[0] = '\0';
+    KMX_CHAR expected[COMPILE_ERROR_MAX_LEN];
 
     // CERR_FATAL
     EXPECT_EQ(0, kmcmp::nErrors);
     EXPECT_EQ(CERR_FATAL, CERR_CannotCreateTempfile & CERR_FATAL);
     EXPECT_TRUE(AddCompileError(CERR_CannotCreateTempfile));
-    EXPECT_EQ(0, strcmp("Cannot create temp file", szText_stub));
+    strcpy(expected, GetCompilerErrorString(CERR_CannotCreateTempfile));
+    EXPECT_EQ(0, strcmp(expected, szText_stub));
     EXPECT_EQ(1, kmcmp::nErrors);
 
     // CERR_ERROR
     EXPECT_EQ(CERR_ERROR, CERR_InvalidLayoutLine & CERR_ERROR);
     EXPECT_FALSE(AddCompileError(CERR_InvalidLayoutLine));
-    EXPECT_EQ(0, strcmp("Invalid 'layout' command", szText_stub));
+    strcpy(expected, GetCompilerErrorString(CERR_InvalidLayoutLine));
+    EXPECT_EQ(0, strcmp(expected, szText_stub));
     EXPECT_EQ(2, kmcmp::nErrors);
 
     // Unknown
@@ -94,7 +98,9 @@ TEST_F(CompilerTest, AddCompileError_test) {
     kmcmp::ErrChr = 42;
     EXPECT_EQ(CERR_ERROR, CERR_InvalidLayoutLine & CERR_ERROR);
     EXPECT_FALSE(AddCompileError(CERR_InvalidLayoutLine));
-    EXPECT_EQ(0, strcmp("Invalid 'layout' command character offset: 42", szText_stub));
+    strcpy(expected, GetCompilerErrorString(CERR_InvalidLayoutLine));
+    strcat(expected, " character offset: 42");
+    EXPECT_EQ(0, strcmp(expected, szText_stub));
     kmcmp::ErrChr = 0;
     EXPECT_EQ(4, kmcmp::nErrors);
 
@@ -102,7 +108,9 @@ TEST_F(CompilerTest, AddCompileError_test) {
     strcpy(ErrExtraLIB, " extra lib");
     EXPECT_EQ(CERR_ERROR, CERR_InvalidLayoutLine & CERR_ERROR);
     EXPECT_FALSE(AddCompileError(CERR_InvalidLayoutLine));
-    EXPECT_EQ(0, strcmp("Invalid 'layout' command extra lib", szText_stub));
+    strcpy(expected, GetCompilerErrorString(CERR_InvalidLayoutLine));
+    strcat(expected, " extra lib");
+    EXPECT_EQ(0, strcmp(expected, szText_stub));
     ErrExtraLIB[0] = '\0';
     EXPECT_EQ(5, kmcmp::nErrors);
     
@@ -110,7 +118,8 @@ TEST_F(CompilerTest, AddCompileError_test) {
     msgproc = msgproc_false_stub;
     EXPECT_EQ(CERR_ERROR, CERR_InvalidLayoutLine & CERR_ERROR);
     EXPECT_TRUE(AddCompileError(CERR_InvalidLayoutLine));
-    EXPECT_EQ(0, strcmp("Invalid 'layout' command", szText_stub));
+    strcpy(expected, GetCompilerErrorString(CERR_InvalidLayoutLine));
+    EXPECT_EQ(0, strcmp(expected, szText_stub));
     EXPECT_EQ(6, kmcmp::nErrors);
 };
 
