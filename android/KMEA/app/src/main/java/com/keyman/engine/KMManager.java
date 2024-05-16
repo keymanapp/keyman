@@ -2078,17 +2078,17 @@ public final class KMManager {
    */
   public static Point getWindowSize(Context context) {
     WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-      WindowMetrics windowMetrics = wm.getCurrentWindowMetrics();
-      return new Point(
-        windowMetrics.getBounds().width(),
-        windowMetrics.getBounds().height());
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+      // Deprecated in API 30
+      Point size = new Point(0, 0);
+      wm.getDefaultDisplay().getSize(size);
+      return size;
     }
-
-    // Deprecated in API 30
-    Point size = new Point(0, 0);
-    wm.getDefaultDisplay().getSize(size);
-    return size;
+    
+    WindowMetrics windowMetrics = wm.getCurrentWindowMetrics();
+    return new Point(
+      windowMetrics.getBounds().width(),
+      windowMetrics.getBounds().height());    
   }
 
   public static float getWindowDensity(Context context) {
