@@ -58,7 +58,7 @@ describe("MatcherSelector", function () {
         }, this.fakeClock);
 
         let completion = executor();
-        const selector = await selectorPromise;
+        await selectorPromise;
         await Promise.race([completion, selectionPromises[0]]);
 
         assert.equal(await promiseStatus(selectionPromises[0]), PromiseStatuses.PROMISE_RESOLVED);
@@ -129,7 +129,6 @@ describe("MatcherSelector", function () {
         turtle.commitPending();
 
         const {
-          sources,
           selectionPromises,
           selectorPromise,
           executor
@@ -432,7 +431,7 @@ describe("MatcherSelector", function () {
         , this.fakeClock);
 
         let completion = executor();
-        const selector = await selectorPromise;
+        await selectorPromise;
         await Promise.race([completion, selectionPromises[0]]);
 
         assert.equal(await promiseStatus(selectionPromises[0]), PromiseStatuses.PROMISE_RESOLVED);
@@ -481,7 +480,7 @@ describe("MatcherSelector", function () {
         }, this.fakeClock);
 
         let completion = executor();
-        const selector = await selectorPromise;
+        await selectorPromise;
         await Promise.race([completion, selectionPromises[0]]);
 
         // So, the terminate signal didn't complete the selection?
@@ -634,7 +633,7 @@ describe("MatcherSelector", function () {
         , this.fakeClock);
 
         let completion = executor();
-        const selector = await selectorPromise;
+        await selectorPromise;
         await Promise.race([completion, selectionPromises[0]]);
 
         assert.equal(await promiseStatus(selectionPromises[0]), PromiseStatuses.PROMISE_RESOLVED);
@@ -721,7 +720,7 @@ describe("MatcherSelector", function () {
         , this.fakeClock);
 
         let completion = executor();
-        const selector = await selectorPromise;
+        await selectorPromise;
         await Promise.race([completion, selectionPromises[0]]);
 
         assert.equal(await promiseStatus(selectionPromises[0]), PromiseStatuses.PROMISE_RESOLVED);
