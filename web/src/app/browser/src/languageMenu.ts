@@ -440,7 +440,7 @@ export class LanguageMenu {
       // preserve the original state so that we can still restore it later!
       if(this.originalBodyStyle) {
         console.error("Unexpected state:  `originalBodyStyle` was not cleared by a previous `unlockBodyScroll()` call");
-        return;
+        return false;
       }
 
       // Preserve the original style for the body element; we're going to change
@@ -510,7 +510,7 @@ export class LanguageMenu {
       } else if("undefined" != typeof e.touches) {
         y = e.touches[0].pageY;
       } else {
-        return;
+        return false;
       }
 
       dy=y-languageMenu.y0;
@@ -527,7 +527,7 @@ export class LanguageMenu {
         }
         // Dont' scroll - can happen if changing scroll direction
       } else {
-        return;
+        return false;
       }
 
       // Disable selected language if drag more than 5px

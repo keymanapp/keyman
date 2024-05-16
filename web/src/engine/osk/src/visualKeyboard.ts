@@ -1137,7 +1137,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    **/
   highlightKey(key: KeyElement, on: boolean): GesturePreviewHost {
     // Do not change element class unless a key
-    if (!key || !key.key || (key.className == '') || (key.className.indexOf('kmw-key-row') >= 0)) return;
+    if (!key || !key.key || (key.className == '') || (key.className.indexOf('kmw-key-row') >= 0)) {
+      return null;
+    }
 
     // For phones, use key preview rather than highlighting the key,
     const usePreview = key.key.allowsKeyTip();
