@@ -183,7 +183,7 @@ set_npm_version () {
 # random delay between each attempt.  No re-runs are attempted after successful commands.
 #
 # ### Usage
-#   try_multiple_times "$@"
+#   try_multiple_times command [param1 param2...]
 #
 # ### Parameters
 #   1: $@         command-line arguments
@@ -214,7 +214,7 @@ _try_multiple_times ( ) {
 
   if (( $retryCount != 1 )); then
     local wait_length=$(( RANDOM % RETRY_MAX_WAIT_RANGE + RETRY_MIN_WAIT ))
-    echo "Delaying $wait_length seconds before attempt $retryCount: \`$@\`"
+    builder_echo "Delaying $wait_length seconds before attempt $retryCount: \`$@\`"
     sleep $wait_length
   fi
 
