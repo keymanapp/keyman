@@ -17,8 +17,6 @@
 #import "CoreWrapper.h"
 @import Carbon;
 
-//DWORD VKMap[0x80];
-
 @interface KMEngine ()
 @property (readonly) CoreHelper *coreHelper;
 @property (nonatomic, retain) CoreWrapper * coreWrapper;
