@@ -71,14 +71,8 @@ bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
 bool test_alDead_S2(std::vector <DeadKey*> ald);
 
 int mac_KMX_ToUnicodeEx(int keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int caps,const UCKeyboardLayout * keyboard_layout) {
-
-  /*GdkKeymapKey *maps;
-  guint *keyvals;
-  gint count;
-
-  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
-    return 0;
-
+// _S2 ToDo cleanup!!
+  /*
   if (!(shift_state_pos <= count))
    return 0;
 
@@ -101,8 +95,6 @@ int mac_KMX_ToUnicodeEx(int keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, i
   pwszBuff[0]= * (PKMX_WCHAR)  str.c_str();
 
   /*
-  g_free(keyvals);
-  g_free(maps);
 
   if((KeyVal >=  deadkey_min) && (KeyVal <=  deadkey_max))          // deadkeys
     return -1;
@@ -352,7 +344,7 @@ public:
 };
 
 
- class mac_KMX_Loader {
+class mac_KMX_Loader {
 private:
   KMX_BYTE lpKeyStateNull[256];
   UINT m_XxxxVk;
@@ -380,39 +372,39 @@ public:
   }
 
   DeadKey *ProcessDeadKey(
-    UINT iKeyDead,              // The index into the VirtualKey of the dead key       IKey US 187 for key nr 24
+    UINT iKeyDead,              // The index into the VirtualKey of the dead key
     ShiftState shiftStateDead,  // The shiftstate that contains the dead key
     std::vector<mac_KMX_VirtualKey*> rgKey,          // Our array of dead keys
-    bool fCapsLock,     // Was the caps lock key pressed?
-    const UCKeyboardLayout * keyboard_layout, v_dw_3D & All_Vector ) {                  // The keyboard layout
-
-    DeadKey *deadKey = new DeadKey(rgKey[iKeyDead]->mac_KMX_GetShiftState(shiftStateDead, fCapsLock)[0]);
+    bool fCapsLock,             // Was the caps lock key pressed?
+    const UCKeyboardLayout * keyboard_layout) {   // The keyboard layout
 
     int ss[]={0,2,8,10};
-    int iindex=0;
-    // e.g.   ^   keyval_underlying_dk
+    int maxshiftstate=2;
+    DeadKey *deadKey = new DeadKey(rgKey[iKeyDead]->mac_KMX_GetShiftState(shiftStateDead, fCapsLock)[0]);
+
+    // e.g.   ^   keyval
     int ss_dead = mac_map_ShiftState_to_MacModifier(shiftStateDead);
-    int keyval_underlying_dk  = mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout, mac_USVirtualKeyToScanCode[iKeyDead],mac_map_ShiftState_to_MacModifier(shiftStateDead),0);
+    int keyval_underlying_dk  = mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout, mac_USVirtualKeyToScanCode[iKeyDead],ss_dead,0);
 
-    for( int i=0; i< maxKeyCodeMac; i++) {
+    for( int i=0; i< Keycode_Spacebar+1; i++) {
+      for( int j=0; j< maxshiftstate ; j++) {
+        // _S2 do we need caps??
+        for( int caps = 0; caps < 1; caps++) {
 
-    for( int j=0; j< 2; j++) {
-      for( int caps = 0; caps < 1; caps++) {
-          // e.g.   a   basechar_
-          int basechar_  = mac_KMX_get_KeyVal_From_KeyCode_S2(keyboard_layout, i,ss[j],caps);
+          // e.g.   a   basechar
+          int basechar  = mac_KMX_get_KeyVal_From_KeyCode_S2(keyboard_layout, i,ss[j],caps);
 
-          // e.g.   â   combchar_
-          KMX_DWORD KC_u_dk = (KMX_DWORD) mac_KMX_get_KeyCodeUnderlying_From_VKUS(iKeyDead);
-          KMX_DWORD combchar_=  mac_get_CombinedChar_From_DK(KC_u_dk, ss_dead, keyboard_layout , i, ss[j],caps);
+          // e.g.   â   combchar
+          KMX_DWORD KC_Underlying_dk = (KMX_DWORD) mac_KMX_get_KeyCodeUnderlying_From_VKUS(iKeyDead);
+          KMX_DWORD combchar=  mac_get_CombinedChar_From_DK(KC_Underlying_dk, ss_dead, keyboard_layout , i, ss[j],caps);
 
-          if(combchar_== 0)
+          if(combchar== 0)
             continue;
 
-          // write only for if combchar_ is not dk or combchar_ is dk with space Â
-          if( (!(combchar_== keyval_underlying_dk)) || (basechar_ == mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout, 49,ss[j],caps))) {
-            deadKey->KMX_AddDeadKeyRow(basechar_, combchar_);
-            iindex++;
-            printf( " [%i] processed basechar_ %i(%c) with  dk %i(%c) ===> combchar_%i(%c)  \t\t ss[%i](%i)  caps%i  \n",iindex-1, basechar_,basechar_ ,keyval_underlying_dk,keyval_underlying_dk, combchar_,combchar_ ,j,ss[j], caps );
+          // push only for if combchar is not dk or combchar is dk with space
+          if( (!(combchar== keyval_underlying_dk)) || (basechar == mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout, Keycode_Spacebar,ss[j],caps))) {
+            deadKey->KMX_AddDeadKeyRow(basechar, combchar);
+            printf( " processed basechar %i(%c) with  dk %i(%c) ===> combchar%i(%c)  \t\t ss[%i](%i)  caps%i  \n", basechar,basechar ,keyval_underlying_dk,keyval_underlying_dk, combchar,combchar ,j,ss[j], caps );
           }
         }
       }
@@ -443,7 +435,6 @@ public:
 // _S2 need to go
 void print_All_Entries_S2(std::vector<mac_KMX_VirtualKey*> rgKey);
 bool run_verify_S2(std::vector<mac_KMX_VirtualKey*> rgKey);
-
 void print_All_Keys(const UCKeyboardLayout * keyboard_layout);
 void print_certain_Keys(const UCKeyboardLayout * keyboard_layout, int keycode);
 
@@ -452,7 +443,6 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, const UCKeyboar
 
   std::vector<mac_KMX_VirtualKey*> rgKey; //= new VirtualKey[256];
   std::vector<DeadKey*> alDead;
-  std::vector<DeadKey*> alDead_cpl = mac_create_alDead();
 
   rgKey.resize(256);
 
@@ -460,7 +450,7 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, const UCKeyboar
   // values in it. Then, store the SC in each valid VK so it can act as both a
   // flag that the VK is valid, and it can store the SC value.
 
-  //for(UINT sc = 0x01; sc <= 0x7f; sc++) {   _S2 winL lin keycode start with 1; mac with 0
+  //for(UINT sc = 0x01; sc <= 0x7f; sc++) {   _S2 win lin keycode start with 1; mac with 0
   for(UINT sc = 0x00; sc <= 0x7f; sc++) {
 
     // HERE IS A BIG DIFFERENCE COMPARED TO MCOMPILE FOR WINDOWS:
@@ -507,7 +497,7 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, const UCKeyboar
           for(int caps = 0; caps <= 1; caps++) {
 
             int rc = mac_KMX_ToUnicodeEx(KC_US, sbBuffer, ss, caps, *keyboard_layout);
-            //rc>0:  character
+            //rc>0:  character  //_S2
             //rc==0:  no translation
             //rc<0:  dk
             if(rc > 0) {
@@ -526,8 +516,8 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, const UCKeyboar
             sbBuffer[2] = 0;
             rgKey[iKey]->mac_KMX_SetShiftState(ss, sbBuffer, true, (caps ));      // different to windows since behavior on Linux is different
             // _S2 does not work - deadkeys
-            if (!caps)
-              printf(" _S2 we have dk: %i(%i) %i  %i(%c) \n", KC_US, iKey,ss, sbBuffer[0],sbBuffer[0] );
+            if (!caps)  // _S2 can go later
+              printf(" _S2 we use dk: %i(%i) %i  %i(%c) \n", KC_US, iKey,ss, sbBuffer[0],sbBuffer[0] );
 
             sbBuffer[2] = 0;
             rgKey[iKey]->mac_KMX_SetShiftState(ss, sbBuffer, true, (caps == 0));
@@ -540,8 +530,8 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, const UCKeyboar
                 dk = NULL;
             }
             if(dk == NULL) {
-              alDead.push_back(loader.ProcessDeadKey(iKey, ss, rgKey, caps == 0, *keyboard_layout, All_Vector));
-              printf(" WOULD DO alDead.push_back for caps: %i sbBuffer[0]%i\n", caps,sbBuffer[0]);
+              alDead.push_back(loader.ProcessDeadKey(iKey, ss, rgKey, caps == 0, *keyboard_layout));
+              printf(" WOULD DO alDead.push_back for caps: %i sbBuffer[0] %i\n", caps,sbBuffer[0]);
             }
           }
         }
@@ -554,17 +544,16 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, const UCKeyboar
   // translate it to kmx and append to the existing keyboar
   //-------------------------------------------------------------
 
-  // _S2 needs to go
+  // _S2 need to go
   //print_All_Entries_S2(rgKey);
   //print_All_Keys( * keyboard_layout);
   //print_certain_Keys( * keyboard_layout, 10);
-
-
- bool allOK =test_alDead_S2(alDead);
+  bool allOK =test_alDead_S2(alDead);
   if ( ! run_verify_S2(rgKey))
     printf(" \n::::::::::::::::::::::::::::::::::::::::::::::::::: THERE ARE SOME WRONG ENTRIES ::::::::::::::::::::::::::::::::::::::::::::::::::: \n");
   else
     printf("\n ::::::::::::::::::::::::::::::::::::::::::::::::::::::::: :) :) :) ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: \n");
+
 
   int nDeadkey = 0;
   LPKMX_GROUP gp = new KMX_GROUP[kp->cxGroupArray+4];  // leave space for old
@@ -775,7 +764,6 @@ const int CODE__SIZE[] = {
 
 
 // _S2 need to go
-
 void print_entries_S2(int i, std::vector<mac_KMX_VirtualKey*> rgKey , std::string comp1,std::string comp2,std::string erg) {
   std::string b0 =string_from_u16string(rgKey[i]->mac_KMX_GetShiftState(Base,  0 ));
   std::string b1 =string_from_u16string(rgKey[i]->mac_KMX_GetShiftState(Base,  1 ));
@@ -783,7 +771,6 @@ void print_entries_S2(int i, std::vector<mac_KMX_VirtualKey*> rgKey , std::strin
   std::string s1 =string_from_u16string(rgKey[i]->mac_KMX_GetShiftState(Shft,  1 ));
   printf("\n entry nr %i has characters %-30s:(%s|%s|%s|%s)",i, erg.c_str(), (const char * ) b0.c_str(),(const char * ) b1.c_str(),(const char * ) s0.c_str(),(const char * ) s1.c_str());
 }
-
 bool verify_entries_S2(int i, std::vector<mac_KMX_VirtualKey*> rgKey, int res1,int res2,int res3,int res4 ,int res5=0, int res6=0, int res7=0, int res8=0 ) {
     std::vector <std::u16string> st_vec;
     std::vector <int> r_vec;
@@ -810,7 +797,6 @@ bool verify_entries_S2(int i, std::vector<mac_KMX_VirtualKey*> rgKey, int res1,i
       printf(" ERROR FOR i= Nr:%i, %i(%c) - %i (%c) - %i (%c) - %i (%c) \n",i, *st_vec[0].c_str(),*st_vec[1].c_str(),*st_vec[2].c_str(),*st_vec[3].c_str(),*st_vec[4].c_str(),*st_vec[5].c_str(),*st_vec[6].c_str(),*st_vec[7].c_str());
     return all_OK;
 }
-
 void print_All_Entries_S2( std::vector<mac_KMX_VirtualKey*> rgKey) {
   for ( int i=48; i<58; i++)
     print_entries_S2(i, rgKey," ","","");
@@ -832,7 +818,6 @@ void print_All_Entries_S2( std::vector<mac_KMX_VirtualKey*> rgKey) {
     print_entries_S2(222, rgKey, "ä", "Ä", "ä Ä Ä Ä");
     print_entries_S2(226, rgKey, "<", ">", "< < > >");
 }
-
 void print_certain_Keys(const UCKeyboardLayout * keyboard_layout, int keycode) {
   UniCharCount maxStringlength    = 5;
   UniCharCount actualStringlength = 0;
@@ -854,8 +839,6 @@ void print_certain_Keys(const UCKeyboardLayout * keyboard_layout, int keycode) {
     }
   }
 }
-
-
 void print_All_Keys(const UCKeyboardLayout * keyboard_layout){
   UniCharCount maxStringlength    = 5;
   UniCharCount actualStringlength = 0;
@@ -866,7 +849,7 @@ void print_All_Keys(const UCKeyboardLayout * keyboard_layout){
 
   for(int k=0; k<2;k++) {
     for(int j=0; j<4;j++) {
-      for(int i=0; i< maxKeyCodeMac ;i++) {
+      for(int i=0; i< Keycode_Spacebar+1 ;i++) {
         status = UCKeyTranslate(keyboard_layout, i ,kUCKeyActionDown, (shiftarray[j]+ 4*k), LMGetKbdType(), 0, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
         if(deadkeystate ==0)
           printf("    key nr %i , ss %i has values %i(%c)\n", i, shiftarray[j]+ 4*k, unicodeString[0],unicodeString[0] );
@@ -967,7 +950,6 @@ bool  test_alDead_S2(std::vector <DeadKey*> ald) {
       OK = OK && checkCombchar_S2(ald[2],17 ,0x60 );
 return OK;
 }
-
 bool run_verify_S2(std::vector<mac_KMX_VirtualKey*> rgKey) {
 
   bool allOK= true;

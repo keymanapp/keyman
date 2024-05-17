@@ -15,9 +15,9 @@
 	return line;
 }*/
 
-std::vector<DeadKey*> mac_create_alDead() {
+/*std::vector<DeadKey*> mac_create_alDead() {
 	std::vector<DeadKey*> alDead;
-	/*v_dw_2D dk_ComposeTable;
+	v_dw_2D dk_ComposeTable;
 
   mac_create_DKTable(dk_ComposeTable);
 
@@ -28,12 +28,12 @@ std::vector<DeadKey*> mac_create_alDead() {
 				dk2->KMX_AddDeadKeyRow(dk_ComposeTable[j][1],dk_ComposeTable[j][2]);
 		}
 		alDead.push_back(dk2);
-	}*/
+	}
 	return alDead;
-}
+}*/
 
-void mac_refine_alDead(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec, std::vector<DeadKey*> *p_All_Vec) {
-	/*if( dk == 0)
+/*void mac_refine_alDead(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec, std::vector<DeadKey*> *p_All_Vec) {
+	if( dk == 0)
 		return;
 
 	for (int j=0; j < (int) (*p_All_Vec).size()-1;j++) {
@@ -44,8 +44,8 @@ void mac_refine_alDead(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec, std::vector<D
 			}
 			else return;
 		}
-	}*/
-}
+	}
+}*/
 
 /* bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec) {
 	int i=0;
@@ -98,8 +98,8 @@ void mac_refine_alDead(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec, std::vector<D
 	return out_S2;
 }*/
 
-void mac_create_DKTable(v_dw_2D & dk_ComposeTable) {
-/*  //create a 2D-Vector which contains data for ALL existing deadkey combinations on a Linux Keyboard:
+/* void mac_create_DKTable(v_dw_2D & dk_ComposeTable) {
+//create a 2D-Vector which contains data for ALL existing deadkey combinations on a Linux Keyboard:
   //dk_ComposeTable[i][0] : First    (e.g. dead_circumflex)
   //dk_ComposeTable[i][1] : Second   (e.g. a)
   //dk_ComposeTable[i][3] : Unicode-Value   (e.g. 0x00E2)
@@ -473,5 +473,4 @@ void mac_create_DKTable(v_dw_2D & dk_ComposeTable) {
 	  dk_ComposeTable.push_back(line);	line.clear();
 	line = mac_createLine("dead_tilde",  "dead_tilde",  0x007E, "TILDE");
 	  dk_ComposeTable.push_back(line);	line.clear();
-*/
-}
+}*/

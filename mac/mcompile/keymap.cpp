@@ -129,15 +129,6 @@ bool mac_InitializeUCHR(const UCKeyboardLayout **keyboard_layout) {
     return 2;
   }
 
-    /*// _S2 can go later
-    char layout[128];
-    memset(layout, '\0', sizeof(layout));
-    // get input source id - kTISPropertyInputSourceID
-    // get layout name - kTISPropertyLocalizedName
-    CFStringRef layoutID =static_cast<CFStringRef>( TISGetInputSourceProperty(source, kTISPropertyInputSourceID));
-    CFStringGetCString(layoutID, layout, sizeof(layout), kCFStringEncodingUTF8);
-    printf("++++++++++++++++++  we use keyboardLayout *** %s *** as underlying keyboard ++++++++++++++++++\n", layout);*/
-
   return 0;
 }
 
@@ -190,7 +181,6 @@ int mac_KMX_get_KeyVal_From_KeyCode(const UCKeyboardLayout * keyboard_layout, in
   UniCharCount actualStringlength = 0;
   UniChar unicodeString[maxStringlength];
   OSStatus status;
-  int Keycode_Spacebar =49;
 
   // _S2 bette solution for 4*CAPS ????
   status = UCKeyTranslate(keyboard_layout, keycode ,kUCKeyActionDown, (shiftstate+ 4*caps), LMGetKbdType(), 0, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
@@ -224,7 +214,7 @@ int mac_KMX_get_KeyVal_From_KeyCode_S2(const UCKeyboardLayout * keyboard_layout,
   UniCharCount actualStringlength = 0;
   UniChar unicodeString[maxStringlength];
   OSStatus status;
-  int Keycode_Spacebar =49;
+  //int Keycode_Spacebar =49;
 
   // _S2 bette solution for 4*CAPS ????
   status = UCKeyTranslate(keyboard_layout, keycode ,kUCKeyActionDown, (shiftstate+ 4*caps), LMGetKbdType(), 0, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
@@ -254,7 +244,7 @@ int mac_KMX_get_KeyVal_From_KeyCode_dk(const UCKeyboardLayout * keyboard_layout,
   UniCharCount maxStringlength    = 5;
   UniCharCount actualStringlength = 0;
   UniChar unicodeString[maxStringlength];
-  int Keycode_Spacebar =49;
+  //int Keycode_Spacebar =49;
   OSStatus status;
 
   // _S2 bette solution for 4*CAPS ????

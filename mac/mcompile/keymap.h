@@ -86,10 +86,9 @@ typedef std::vector<std::vector<std::vector<KMX_DWORD> > > v_dw_3D;
 static KMX_DWORD returnIfCharInvalid = 0;
 static KMX_DWORD max_shiftstate = 2;		// _S2 only base+Shift
 static KMX_DWORD keycode_max = 94;			// _S2 needed??
-static KMX_DWORD deadkey_min = 0xfe50;	// _S2 needed??
-static KMX_DWORD deadkey_max = 0xfe93;	// _S2 needed??
-
-static int maxKeyCodeMac =50;
+//static KMX_DWORD deadkey_min = 0xfe50;	// _S2 needed??
+//static KMX_DWORD deadkey_max = 0xfe93;	// _S2 needed??
+static int Keycode_Spacebar =49;
 //static KMX_DWORD deadkey_max = 0xfe52;  // _S2 TOP_6 TODO This has to go! my test: to only return 3 dk
 
 // map VKShiftstate to modifier (use 0,2,4,8,10 instead of 0,16,9,25 )
@@ -652,7 +651,6 @@ const UINT mac_ScanCodeToUSVirtualKey[128] = {
 // for character A  (65) we look at pos  65 and find keycode 0
 // for character X  (87) we look at pos  87 and find keycode 7
 // for character + (187) we look at pos 187 and find keycode 24
-
 const UINT mac_USVirtualKeyToScanCode[256] = {
 		0x999, // L"K_?00",				// &H0 ................................................... 0 ...........................................
 		0x999, // L"K_LBUTTON",			// &H1
@@ -946,7 +944,7 @@ UINT mac_KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS);
 KMX_DWORD mac_KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode);
 
 // convert codePoint to u16string
-std::u16string mac_CodePointToU16String(unsigned int codepoint);
+//std::u16string mac_CodePointToU16String(unsigned int codepoint);
 
 //################################################################################################################################################
 //################################################################################################################################################
@@ -954,18 +952,19 @@ std::u16string mac_CodePointToU16String(unsigned int codepoint);
 // _S2 need to go
 
 // replace Name of Key (e.g. <AD06>)  wih Keycode ( e.g. 15 )
-int mac_replace_KeyName_with_Keycode(std::string  in);
+//int mac_replace_KeyName_with_Keycode(std::string  in);
 
 // take a std::string (=contents of line symbols-file ) and returns the (int) value of the character
-KMX_DWORD mac_convertNamesTo_DWORD_Value(std::string tok_str);
+//KMX_DWORD mac_convertNamesTo_DWORD_Value(std::string tok_str);
 
 // 1. step: read complete Row of Configuration file US
-bool mac_createCompleteRow_US(v_str_1D &complete_List, FILE *fpp, const char *text, std::string language);
+//bool mac_createCompleteRow_US(v_str_1D &complete_List, FILE *fpp, const char *text, std::string language);
 
 void printoutKeyboards(v_dw_3D &All_Vector);
 KMX_DWORD X_playWithDK_S2(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal) ;
 KMX_DWORD X_playWithDK_S2_one(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal);
 KMX_DWORD X_compare_Shiftstates_S2(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal=0);
 KMX_DWORD X_find_Shiftstates_S2(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal=0);
-KMX_DWORD  printout_dk(const UCKeyboardLayout* keyboard_layout);/**/
+KMX_DWORD  printout_dk(const UCKeyboardLayout* keyboard_layout);
+
 #endif  // KEYMAP_H
