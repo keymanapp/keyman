@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.38 alpha 2024-05-17
+
+* chore(common): Auto-generate minimum-versions.md from min-ver.sh (#11399)
+* fix(android): Replace deprecated APIs for Display, Size, Metrics (#11436)
+* chore(common): Clear whatsnew help files (#11469)
+
 ## 18.0.37 alpha 2024-05-16
 
 * chore(android): update Gradle wrapper version (#11437)
