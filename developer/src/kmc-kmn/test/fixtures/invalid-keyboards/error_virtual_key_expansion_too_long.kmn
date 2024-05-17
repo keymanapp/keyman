@@ -1,0 +1,17 @@
+store(&NAME) 'error_virtual_key_expansion_too_long'
+store(&VERSION) '9.0'
+
+begin unicode > use(main)
+
+group(main) using keys
+
+c maximum store length is 4096 UTF-16 code units, including U+0000 terminator
+c #define GLOBAL_BUFSIZE  4096   // compfile.h
+c so we need 0x101E - 0x0020 + 1 = 0x0FFF --> 4095 words
+c each vk is 5 words long UC_SENTINEL CODE_EXTENDED shift key CODE_EXTENDEDEND (some long history here!)
+c we start filling the buffer with 4066 words and then the remaining 30 bytes = 6 VKs A-F
+c See #11136 for calculation adjustment TODO
+
+store(x)    U+0020 .. U+1000 [K_A] .. [K_F]
+
+any(x) + 'x' > 'x' context

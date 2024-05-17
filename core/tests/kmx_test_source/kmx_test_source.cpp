@@ -62,10 +62,10 @@ KmxTestSource::parse_source_string(std::string const &s) {
         assert(v >= 0x0001 && v <= 0x10FFFF);
         p += n - 1;
         if (v < 0x10000) {
-          t += km_core_cp(v);
+          t += km_core_cu(v);
         } else {
-          t += km_core_cp(Uni_UTF32ToSurrogate1(v));
-          t += km_core_cp(Uni_UTF32ToSurrogate2(v));
+          t += km_core_cu(Uni_UTF32ToSurrogate1(v));
+          t += km_core_cu(Uni_UTF32ToSurrogate2(v));
         }
       } else if (*p == 'd') {
         // Deadkey
@@ -191,13 +191,13 @@ KmxTestSource::get_keyboard_options(kmx_options options) {
       keyboard_opts[i].scope = KM_CORE_OPT_KEYBOARD;
     }
 
-    km_core_cp *cp = new km_core_cp[key.length() + 1];
+    km_core_cu *cp = new km_core_cu[key.length() + 1];
     key.copy(cp, key.length());
     cp[key.length()] = 0;
 
     keyboard_opts[i].key = cp;
 
-    cp = new km_core_cp[it->value.length() + 1];
+    cp = new km_core_cu[it->value.length() + 1];
     it->value.copy(cp, it->value.length());
     cp[it->value.length()] = 0;
 

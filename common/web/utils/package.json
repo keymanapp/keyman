@@ -26,9 +26,7 @@
   "devDependencies": {
     "@keymanapp/keyman-version": "*",
     "@keymanapp/resources-gosh": "*",
-    "@types/node": "^14.0.5",
     "c8": "^7.12.0",
-    "chai": "^4.3.4",
     "mocha": "^10.0.0",
     "mocha-teamcity-reporter": "^4.0.0",
     "typescript": "^4.9.5"

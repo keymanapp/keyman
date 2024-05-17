@@ -33,10 +33,11 @@ module.exports = {
 
   // frameworks to use
   // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-  frameworks: ['mocha', 'chai', 'fixture'],
+  frameworks: ['mocha', 'fixture'],
 
   // list of files / patterns to load in the browser
   files: [
+    { pattern: 'node_modules/chai/chai.js', watched: true, served: true, included: false, type: 'module'},
     {pattern: 'web/src/test/auto/dom/kbdLoader.mjs', type: 'module', watched: true, served: true, included: false},
 
     {pattern: 'web/src/test/auto/dom/test_init_check.js', type: 'module'},         // Ensures that tests will initialize properly

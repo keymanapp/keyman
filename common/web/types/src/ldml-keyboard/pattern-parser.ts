@@ -400,7 +400,7 @@ export class VariableParser {
   /**
    * Pattern for matching a capture set reference `($[set])`
    */
-  public static readonly CAPTURE_SET_REFERENCE = /\(\$\[([0-9A-Za-z_]{1,32})\]\)/g;
+  public static readonly CAPTURE_SET_REFERENCE = /\(\$\[([0-9A-Za-z_]{1,32})\]\)/;
 
   /**
    * `$[1:variable]`

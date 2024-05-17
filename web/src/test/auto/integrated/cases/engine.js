@@ -1,4 +1,5 @@
-var assert = chai.assert;
+import { assert } from '/node_modules/chai/chai.js';
+
 import {
   loadKeyboardFromJSON,
   runKeyboardTestFromJSON,

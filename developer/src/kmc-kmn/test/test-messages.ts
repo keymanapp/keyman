@@ -6,11 +6,11 @@ import { makePathToFixture } from './helpers/index.js';
 import { KmnCompiler } from '../src/main.js';
 import { CompilerErrorNamespace } from '@keymanapp/common-types';
 
-describe('CompilerMessages', function () {
+describe('KmnCompilerMessages', function () {
   const callbacks = new TestCompilerCallbacks();
 
-  it('should have a valid CompilerMessages object', function() {
-    return verifyCompilerMessagesObject(CompilerMessages, CompilerErrorNamespace.KmnCompiler);
+  it('should have a valid KmnCompilerMessages object', function() {
+    return verifyCompilerMessagesObject(KmnCompilerMessages, CompilerErrorNamespace.KmnCompiler);
   });
 
   //
@@ -92,6 +92,34 @@ describe('CompilerMessages', function () {
   it('should generate WARN_VirtualKeyInOutput if a virtual key is found in the output part of a rule', async function() {
     await testForMessage(this, ['invalid-keyboards', 'warn_virtual_key_in_output.kmn'], KmnCompilerMessages.WARN_VirtualKeyInOutput);
     assert.equal(callbacks.messages[0].message, "Virtual keys are not supported in output");
+  });
+
+  // ERROR_OutsTooLong
+
+  it('should generate ERROR_OutsTooLong if a store referenced in outs() is too long (more than GLOBAL_BUFSIZE elements)', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'error_outs_too_long.kmn'], KmnCompilerMessages.ERROR_OutsTooLong);
+    // callbacks.printMessages();
+  });
+
+  // ERROR_ExtendedStringTooLong
+
+  it('should generate ERROR_ExtendedStringTooLong if an extended string is too long (more than GLOBAL_BUFSIZE elements)', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'error_extended_string_too_long.kmn'], KmnCompilerMessages.ERROR_ExtendedStringTooLong);
+    // callbacks.printMessages();
+  });
+
+  // ERROR_VirtualKeyExpansionTooLong
+
+  it('should generate ERROR_VirtualKeyExpansionTooLong if a virtual key expansion is too long (more than GLOBAL_BUFSIZE elements)', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'error_virtual_key_expansion_too_long.kmn'], KmnCompilerMessages.ERROR_VirtualKeyExpansionTooLong);
+    // callbacks.printMessages();
+  });
+
+  // ERROR_CharacterRangeTooLong
+
+  it('should generate ERROR_CharacterRangeTooLong if a character range would expand to be too long (more than GLOBAL_BUFSIZE elements)', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'error_character_range_too_long.kmn'], KmnCompilerMessages.ERROR_CharacterRangeTooLong);
+    // callbacks.printMessages();
   });
 
 });

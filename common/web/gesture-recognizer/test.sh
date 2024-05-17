@@ -18,8 +18,7 @@ builder_describe "Runs all tests for the gesture-recognizer module" \
   "test+" \
   ":headless   Runs headless user tests" \
   ":browser    Runs browser-based user tests" \
-  "--ci        Uses CI-based test configurations & emits CI-friendly test reports" \
-  "--debug,-d  Activates developer-friendly debug mode for unit tests where applicable"
+  "--ci        Uses CI-based test configurations & emits CI-friendly test reports"
 
 builder_parse "$@"
 

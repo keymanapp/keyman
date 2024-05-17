@@ -16,11 +16,11 @@
 #pragma once
 
 #define LDML_BKSP_FLAGS_ERROR 0x1
-#define LDML_CLDR_IMPLIED_FORMS_IMPORT "techpreview/scanCodes-implied.xml"
-#define LDML_CLDR_IMPLIED_KEYS_IMPORT "techpreview/keys-Latn-implied.xml"
+#define LDML_CLDR_IMPLIED_FORMS_IMPORT "45/scanCodes-implied.xml"
+#define LDML_CLDR_IMPLIED_KEYS_IMPORT "45/keys-Latn-implied.xml"
 #define LDML_CLDR_IMPORT_BASE "cldr"
-#define LDML_CLDR_VERSION_LATEST "techpreview"
-#define LDML_CLDR_VERSION_TECHPREVIEW "techpreview"
+#define LDML_CLDR_TEST_VERSION_LATEST "techpreview"
+#define LDML_CLDR_VERSION_LATEST "45"
 #define LDML_ELEM_FLAGS_ORDER_BITSHIFT 0x10
 #define LDML_ELEM_FLAGS_ORDER_MASK 0xFF0000
 #define LDML_ELEM_FLAGS_PREBASE 0x8
@@ -34,7 +34,7 @@
 #define LDML_FINL_FLAGS_ERROR 0x1
 #define LDML_KEYS_KEY_FLAGS_EXTEND 0x1
 #define LDML_KEYS_KEY_FLAGS_GAP 0x2
-#define LDML_KEYS_MOD_ALL 0x17F
+#define LDML_KEYS_MOD_ALL 0x1017F
 #define LDML_KEYS_MOD_ALT 0x40
 #define LDML_KEYS_MOD_ALTL 0x4
 #define LDML_KEYS_MOD_ALTR 0x8
@@ -43,6 +43,7 @@
 #define LDML_KEYS_MOD_CTRLL 0x1
 #define LDML_KEYS_MOD_CTRLR 0x2
 #define LDML_KEYS_MOD_NONE 0x0
+#define LDML_KEYS_MOD_OTHER 0x10000
 #define LDML_KEYS_MOD_SHIFT 0x10
 #define LDML_LAYR_LIST_HARDWARE_TOUCH "touch"
 #define LDML_LENGTH_BKSP 0xC

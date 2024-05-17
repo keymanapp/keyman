@@ -391,6 +391,37 @@ describe('keys.kmap', function () {
         CompilerMessages.Error_InvalidScanCode({ form: "zzz", codes: ['ff'] }),
       ],
     },
+    {
+      subpath: 'sections/keys/invalid-undefined-var-1.xml',
+      errors: [
+        CompilerMessages.Error_MissingStringVariable({id: "varsok"}),
+      ],
+    },
+    {
+      subpath: 'sections/keys/invalid-undefined-var-1b.xml',
+      errors: [
+        CompilerMessages.Error_MissingStringVariable({id: "varsok"}),
+      ],
+    },
+    // modifiers test
+    {
+      // keep in sync with similar test in test-layr.ts
+      subpath: 'sections/keys/many-modifiers.xml',
+      callback(sect) {
+        const keys = <Keys> sect;
+        assert.ok(keys);
+        const { kmap } = keys;
+        const aMods = kmap.filter(({ key }) => key === 'a').map(({ mod }) => mod);
+        assert.sameDeepMembers(aMods, [
+          constants.keys_mod_none,
+        ], 'modifiers for a');
+        const cMods = kmap.filter(({ key }) => key === 'c').map(({ mod }) => mod);
+        assert.sameDeepMembers(cMods, [
+          constants.keys_mod_altR,
+          constants.keys_mod_ctrl | constants.keys_mod_shift,
+        ], 'modifiers for c');
+      },
+    },
   ], keysDependencies);
 
   it('should reject layouts with too many hardware rows', async function() {

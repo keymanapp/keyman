@@ -73,7 +73,6 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
 
   func setConstraints() {
     let innerView = keymanWeb.view!
-
     let guide = self.safeAreaLayoutGuide
 
     // Fallback on earlier versions
@@ -89,11 +88,13 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
     kbdWidthConstraint.priority = .defaultHigh
     kbdWidthConstraint.isActive = true
 
+    let bannerHeight = InputViewController.topBarHeight
+
     // Cannot be met by the in-app keyboard, but helps to 'force' height for the system keyboard.
-    let portraitHeight = innerView.heightAnchor.constraint(equalToConstant: keymanWeb.constraintTargetHeight(isPortrait: true))
+    let portraitHeight = innerView.heightAnchor.constraint(equalToConstant: bannerHeight +  keymanWeb.constraintTargetHeight(isPortrait: true))
     portraitHeight.identifier = "Height constraint for portrait mode"
     portraitHeight.priority = .defaultHigh
-    let landscapeHeight = innerView.heightAnchor.constraint(equalToConstant: keymanWeb.constraintTargetHeight(isPortrait: false))
+    let landscapeHeight = innerView.heightAnchor.constraint(equalToConstant: bannerHeight + keymanWeb.constraintTargetHeight(isPortrait: false))
     landscapeHeight.identifier = "Height constraint for landscape mode"
     landscapeHeight.priority = .defaultHigh
 
@@ -104,22 +105,6 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
 
   override func updateConstraints() {
     super.updateConstraints()
-
-    // Keep the constraints up-to-date!  They should vary based upon the selected keyboard.
-    let userData = Storage.active.userDefaults
-    let alwaysShow = userData.bool(forKey: Key.optShouldShowBanner)
-
-    var hideBanner = true
-    if alwaysShow || Manager.shared.isSystemKeyboard || keymanWeb.activeModel {
-      hideBanner = false
-    }
-    let topBarDelta = hideBanner ? 0 : InputViewController.topBarHeight
-
-    // Sets height before the constraints, as it's the height constraint that triggers OSK resizing.
-    keymanWeb.setBannerHeight(to: Int(InputViewController.topBarHeight))
-
-    portraitConstraint?.constant = topBarDelta + keymanWeb.constraintTargetHeight(isPortrait: true)
-    landscapeConstraint?.constant = topBarDelta + keymanWeb.constraintTargetHeight(isPortrait: false)
 
     // Activate / deactivate layout-specific constraints.
     if InputViewController.isPortrait {
@@ -168,7 +153,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   var expandedHeight: CGFloat {
-    return keymanWeb.keyboardHeight + activeTopBarHeight
+    return keymanWeb.keyboardHeight + InputViewController.topBarHeight
   }
 
   public convenience init() {
@@ -317,7 +302,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
 
       let range = NSRange(location: before.unicodeScalars.count, length: 0)
 
-      self.setContextState(text: contextWindowText, range: range)
+      self.setContextState(text: contextWindowText, range: range, doSync: true)
     }
 
     updater(preCaretContext, postCaretContext)
@@ -348,6 +333,55 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       }
     }
   }
+  
+  func deleteSelection() -> Bool {
+    if let selected = textDocumentProxy.selectedText, selected.count > 0 {
+      /*
+        Since we're doing some funky text manipulation, it's best to add
+        a "canary" check in case something does go awry with it in
+        the future.
+      */
+      let beforeManipulation = textDocumentProxy.documentContextBeforeInput ?? ""
+
+      /*
+        We have a problem to resolve here: we cannot simply delete the selection
+        with either .deleteBackward() or .insertText(""):
+       
+        - If there is selected text immediately following a space (U+0020),
+          .deleteBackward() will delete that space IN ADDITION to the selected text.
+        - Unlike .insertText("-any-string-here"), .insertText("") does nothing;
+          it does not replace the selection with the new string.
+       
+        Our policy (#9073) on handling the backspace key when there is a
+        text selection is to just delete the selection. We have to override
+        the special case of space being deleted by .deleteBackward() ourselves.
+        Additionally, the internal Web engine cannot anticipate the special
+        case and requires precise and consistent backspace handling in line
+        with our policy in order to keep the context on both sides synchronized.
+       
+        As .insertText() does not delete the selection if the string to
+        be inserted is empty, we insert something that won't combine,
+        like a ZWNJ, and then delete it.
+       
+        iOS does not allow users to select text in a way that splits
+        character clusters.  This implies that it's impossible for an
+        inserted ZWNJ to combine with existing context, making this
+        operation safe.
+      */
+      textDocumentProxy.insertText("\u{200c}")
+      textDocumentProxy.deleteBackward()
+      
+      let afterManipulation = textDocumentProxy.documentContextBeforeInput ?? ""
+      
+      // And now to finish our 'canary' check.
+      if beforeManipulation != afterManipulation {
+        os_log(.error, log: KeymanEngineLogger.engine, "Could not cleanly execute backspace for selected text")
+      }
+      
+      return true
+    }
+    return false
+  }
 
   func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
     if keymanWeb.isSubKeysMenuVisible {
@@ -362,18 +396,13 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       perform(#selector(self.enableInputClickSound), with: nil, afterDelay: 0.1)
     }
 
-    var hasDeletedSelection = false
+    // `true` if there was selected text to be deleted
+    let deletedSelection = self.deleteSelection()
 
-    if let selected = textDocumentProxy.selectedText {
-      if selected.count > 0 {
-        textDocumentProxy.deleteBackward()
-        hasDeletedSelection = true
-      }
-    }
-
-    if numCharsToDelete <= 0 || hasDeletedSelection {
+    // If text was selected, we generally act as if the context is nil - no back
+    // deletions allowed, so we skip that section.
+    if numCharsToDelete <= 0 || deletedSelection {
       textDocumentProxy.insertText(newText)
-
       sendContextUpdate()
       return
     }
@@ -389,7 +418,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       textDocumentProxy.deleteBackward()
       let newContext = textDocumentProxy.documentContextBeforeInput ?? ""
       let unitsDeleted = oldContext.utf16.count - newContext.utf16.count
-      let unitsInPoint = InputViewController.isSurrogate(oldContext.utf16.last!) ? 2 : 1
+      let unitsInPoint = InputViewController.isSurrogate(oldContext.utf16.last ?? 0) ? 2 : 1
 
       // This CAN happen when a surrogate pair is deleted.
       // For example, the emoji 👍🏻 is made of TWO surrogate pairs.
@@ -416,7 +445,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
           os_log("Failed to swallow a recent textDidChange call!", log: KeymanEngineLogger.ui, type: .default)
         }
         self.swallowBackspaceTextChange = true
-        break
       }
     }
 
@@ -443,20 +471,11 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       case .doNothing:
         break
       }
-
-      // If we allow the system keyboard to show no banners, this line is needed
-      // for variable system keyboard height.
-      updateShowBannerSetting()
     } else { // Use in-app keyboard behavior instead.
       if !(Manager.shared.currentResponder?.showKeyboardPicker() ?? false) {
         _ = Manager.shared.switchToNextKeyboard
       }
     }
-  }
-
-  // Needed due to protection level on the `keymanWeb` property
-  func updateShowBannerSetting() {
-    keymanWeb.updateShowBannerSetting()
   }
 
   func updateSpacebarText() {
@@ -482,22 +501,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     baseWidthConstraint = self.inputView!.widthAnchor.constraint(equalTo: parent!.view.safeAreaLayoutGuide.widthAnchor)
     baseWidthConstraint.priority = UILayoutPriority(rawValue: 999)
     baseWidthConstraint.isActive = true
-  }
-
-  public var isTopBarActive: Bool {
-    let userData = Storage.active.userDefaults
-    let alwaysShow = userData.bool(forKey: Key.optShouldShowBanner)
-
-    if alwaysShow || Manager.shared.isSystemKeyboard || keymanWeb.activeModel {
-      return true
-    }
-
-    return false
-  }
-
-  public var activeTopBarHeight: CGFloat {
-    // If 'isSystemKeyboard' is true, always show the top bar.
-    return isTopBarActive ? CGFloat(InputViewController.topBarHeight) : 0
   }
 
   public var kmwHeight: CGFloat {
@@ -606,19 +609,14 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
    * will be expecting SMP-aware measurements.  Swift's `.unicodeScalars`
    * property on `String`s lines up best with this.
    */
-  func setContextState(text: String?, range: NSRange) {
+  func setContextState(text: String?, range: NSRange, doSync: Bool = false) {
     // Check for any LTR or RTL marks at the context's start; if they exist, we should
     // offset the selection range.
-    let characterOrderingChecks = [ "\u{200e}" /*LTR*/, "\u{202e}" /*RTL 1*/, "\u{200f}" /*RTL 2*/ ]
     var offsetPrefix = false;
 
-    let context = text ?? ""
-
-    for codepoint in characterOrderingChecks {
-      if(context.hasPrefix(codepoint)) {
-        offsetPrefix = true;
-        break;
-      }
+    let context = trimDirectionalMarkPrefix(text)
+    if context.count != (text?.count ?? 0) {
+      offsetPrefix = true
     }
 
     var selRange = range;
@@ -626,10 +624,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       selRange = NSRange(location: selRange.location - 1, length: selRange.length)
     }
 
-    keymanWeb.setText(context)
-    if range.location != NSNotFound {
-      keymanWeb.setCursorRange(selRange)
-    }
+    keymanWeb.setContext(text: context, range: selRange, doSync: doSync)
   }
 
   func resetKeyboardState() {

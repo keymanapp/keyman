@@ -2,17 +2,11 @@
 #
 # Compiles the developer tools, including the language model compilers.
 #
-
-# Exit on command failure and when using unset variables:
-set -eu
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
-
-cd "$THIS_SCRIPT_PATH"
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
@@ -32,6 +26,7 @@ builder_describe "Build Keyman Keyboard Compiler kmc" \
   "build                     (default) builds kmc to build/" \
   "clean                     cleans build/ folder" \
   "bundle                    creates a bundled version of kmc" \
+  "api                       prepare compiler error documentation" \
   "test                      run automated tests for kmc" \
   "pack                      build a local .tgz pack for testing (note: all npm modules in the repo will be packed by this script)" \
   "publish                   publish to npm (note: all npm modules in the repo will be published by this script)" \
@@ -69,6 +64,15 @@ if builder_start_action build; then
   tsc -b
   cp "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/unicode-license.txt" ./build/unicode-license.txt
   builder_finish_action success build
+fi
+
+#-------------------------------------------------------------------------------------------------------------------
+
+if builder_start_action api; then
+  rm -rf ./build/messages
+  mkdir -p ./build/messages
+  node . message --format markdown --out-path build/messages
+  builder_finish_action success api
 fi
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -116,11 +120,11 @@ if builder_start_action bundle; then
   mkdir -p build/dist
   node build-bundler.js
 
-  ./node_modules/.bin/sentry-cli sourcemaps inject \
+  sentry-cli sourcemaps inject \
     --org keyman \
     --project keyman-developer \
     --release "$VERSION_GIT_TAG"  \
-    build/ "${SOURCEMAP_PATHS[@]}"
+    build/dist/ "${SOURCEMAP_PATHS[@]}"
 
   # Manually copy over kmcmplib module
   cp ../kmc-kmn/build/src/import/kmcmplib/wasm-host.wasm build/dist/

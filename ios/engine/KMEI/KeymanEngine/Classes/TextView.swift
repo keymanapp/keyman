@@ -262,22 +262,6 @@ extension TextView: UITextViewDelegate {
     os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, messageTwo)
   }
 
-  public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange,
-                       replacementText text: String) -> Bool {
-    // Enable text update to catch copy/paste operations
-    shouldUpdateKMText = true
-    return true
-  }
-
-  public func textViewDidChange(_ textView: UITextView) {
-    if shouldUpdateKMText {
-      // Catches copy/paste operations
-      Manager.shared.setContextState(text: textView.text, range: textView.selectedRange)
-      // This is called when editing in-app; do not reset context here.
-      shouldUpdateKMText = false
-    }
-  }
-
   public func textViewShouldEndEditing(_ textView: UITextView) -> Bool {
     if textView == self {
       resignFirstResponder()

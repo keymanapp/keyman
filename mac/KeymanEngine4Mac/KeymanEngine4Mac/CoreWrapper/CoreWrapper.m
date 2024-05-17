@@ -181,8 +181,9 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   NSString* text = [self.coreHelper utf32CStringToString:actions->output];
   NSDictionary* options = [self convertOptionsArray:actions->persist_options];
   CapsLockState capsLock = [self convertCapsLockState:actions->new_caps_lock_state];
+  NSString* deletedText = [self.coreHelper utf32CStringToString:actions->deleted_context];
 
-  CoreKeyOutput* coreKeyOutput = [[CoreKeyOutput alloc] init: actions->code_points_to_delete textToInsert:text optionsToPersist:options alert:actions->do_alert emitKeystroke:actions->emit_keystroke capsLockState:capsLock];
+  CoreKeyOutput* coreKeyOutput = [[CoreKeyOutput alloc] init: actions->code_points_to_delete textToDelete:deletedText textToInsert:text optionsToPersist:options alert:actions->do_alert emitKeystroke:actions->emit_keystroke capsLockState:capsLock];
 
   return coreKeyOutput;
 }
@@ -234,9 +235,9 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
 }
 
 -(NSString*)contextDebug {
-  km_core_cp * context = km_core_state_context_debug(self.coreState, KM_CORE_DEBUG_CONTEXT_CACHED);
+  km_core_cu * context = km_core_state_context_debug(self.coreState, KM_CORE_DEBUG_CONTEXT_CACHED);
   NSString *debugString = [self.coreHelper createNSStringFromUnicharString:context];
-  km_core_cp_dispose(context);
+  km_core_cu_dispose(context);
 
   [self.coreHelper logDebugMessage:@"CoreWrapper contextDebug = %@", debugString];
   return debugString;
@@ -284,8 +285,8 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   return (result==KM_CORE_STATUS_OK);
 }
 
--(void)readCoreOptions: (km_core_cp const *) key {
-  km_core_cp const * valueFromCore = nil;
+-(void)readCoreOptions: (km_core_cu const *) key {
+  km_core_cu const * valueFromCore = nil;
   km_core_status result =
   km_core_state_option_lookup(self.coreState,
                              KM_CORE_OPT_KEYBOARD,

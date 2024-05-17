@@ -3,7 +3,17 @@ import { ActiveLayer, ActiveLayout } from '@keymanapp/keyboard-processor';
 import OSKRow from './oskRow.js';
 import OSKBaseKey from './oskBaseKey.js';
 import VisualKeyboard from '../visualKeyboard.js';
+import { ParsedLengthStyle } from '../lengthStyle.js';
 
+export interface LayerLayoutParams {
+  keyboardWidth: number;
+  keyboardHeight: number;
+  widthStyle: ParsedLengthStyle;
+  heightStyle: ParsedLengthStyle;
+  baseEmFontSize: ParsedLengthStyle;
+  layoutFontSize: ParsedLengthStyle;
+  spacebarText: string;
+}
 export default class OSKLayer {
   public readonly element: HTMLDivElement;
   public readonly rows: OSKRow[];
@@ -76,6 +86,21 @@ export default class OSKLayer {
     this.capsKey     = this.findKey('K_CAPS');
     this.numKey      = this.findKey('K_NUMLOCK');
     this.scrollKey   = this.findKey('K_SCROLL');
+
+    if(this.spaceBarKey) {
+      const spacebarLabel = this.spaceBarKey.label;
+      let tButton = this.spaceBarKey.btn;
+
+      if (typeof (tButton.className) == 'undefined' || tButton.className == '') {
+        tButton.className = 'kmw-spacebar';
+      } else if (tButton.className.indexOf('kmw-spacebar') == -1) {
+        tButton.className += ' kmw-spacebar';
+      }
+
+      if (spacebarLabel.className != 'kmw-spacebar-caption') {
+        spacebarLabel.className = 'kmw-spacebar-caption';
+      }
+    }
   }
 
   /**
@@ -96,29 +121,70 @@ export default class OSKLayer {
     return null;
   }
 
-  public refreshLayout(vkbd: VisualKeyboard, layerHeight: number) {
+  /**
+   * Indicate the current language and keyboard on the space bar
+   **/
+  showLanguage(displayName: string) {
+    if(!this.spaceBarKey) {
+      return;
+    }
+
+    try {
+      const spacebarLabel = this.spaceBarKey.label;
+
+      // The key can read the text from here during the display update without
+      // triggering a reflow.
+      this.spaceBarKey.spec.text = displayName;
+
+      // It sounds redundant, but this dramatically cuts down on browser DOM processing;
+      // but sometimes innerText is reported empty when it actually isn't, so set it
+      // anyway in that case (Safari, iOS 14.4)
+      if (spacebarLabel.innerText != displayName || displayName == '') {
+        spacebarLabel.innerText = displayName;
+      }
+    }
+    catch (ex) { }
+  }
+
+  public refreshLayout(layoutParams: LayerLayoutParams) {
+    // Do all layout-reflow / style-refresh dependent precalculations here,
+    // before we perform any DOM manipulation.
+    this.rows.forEach((row) => row.detectStyles(layoutParams));
+
+    // Hereafter, avoid any references to getComputedStyle, offset_, or other
+    // layout-reflow dependent values.  Refer to
+    // https://gist.github.com/paulirish/5d52fb081b3570c81e3a.
+
     // Check the heights of each row, in case different layers have different row counts.
+    const layerHeight = layoutParams.keyboardHeight;
     const nRows = this.rows.length;
     const rowHeight = this._rowHeight = Math.floor(layerHeight/(nRows == 0 ? 1 : nRows));
 
-    if(vkbd.usesFixedHeightScaling) {
+    const usesFixedWidthScaling = layoutParams.widthStyle.absolute;
+    if(usesFixedWidthScaling) {
       this.element.style.height=(layerHeight)+'px';
     }
 
+    this.showLanguage(layoutParams.spacebarText);
+
+    // Update row layout properties
     for(let nRow=0; nRow<nRows; nRow++) {
       const oskRow = this.rows[nRow];
       const bottom = (nRows-nRow-1)*rowHeight+1;
 
-      if(vkbd.usesFixedHeightScaling) {
+      if(usesFixedWidthScaling) {
         // Calculate the exact vertical coordinate of the row's center.
         this.spec.row[nRow].proportionalY = ((layerHeight - bottom) - rowHeight/2) / layerHeight;
-
-        if(nRow == nRows-1) {
-          oskRow.element.style.bottom = '1px';
-        }
       }
 
-      oskRow.refreshLayout(vkbd);
+      oskRow.refreshLayout(layoutParams);
+      if(nRow == nRows-1) {
+        oskRow.element.style.bottom = '1px';
+      }
+    }
+
+    for(const row of this.rows) {
+      row.refreshKeyLayouts(layoutParams);
     }
   }
 }

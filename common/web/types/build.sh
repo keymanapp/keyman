@@ -2,14 +2,13 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-cd "$THIS_SCRIPT_PATH"
-
 builder_describe "Build Keyman common file types module" \
+  "@/core/include/ldml" \
   "@/common/web/keyman-version" \
   "configure" \
   "build" \
@@ -29,8 +28,8 @@ builder_parse "$@"
 function compile_schemas() {
   # We need the schema files at runtime and bundled, so always copy it for all actions except `clean`
   local schemas=(
-    "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboard3.schema.json"
-    "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/techpreview/ldml-keyboardtest3.schema.json"
+    "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/45/ldml-keyboard3.schema.json"
+    "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/45/ldml-keyboardtest3.schema.json"
     "$KEYMAN_ROOT/common/schemas/kvks/kvks.schema.json"
     "$KEYMAN_ROOT/common/schemas/kpj/kpj.schema.json"
     "$KEYMAN_ROOT/common/schemas/kpj-9.0/kpj-9.0.schema.json"

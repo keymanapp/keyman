@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 conformsTo="45" xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" >
+  <info name="keys-minimal"/>
+
+  <keys>
+    <key id="5" output="5:vars:${varsok}"/>
+    <key id="7" output="7:vars:${varsok}"/>
+  </keys>
+
+  <layers formId="us">
+    <layer id="base">
+      <row keys="7" />
+    </layer>
+  </layers>
+</keyboard3>

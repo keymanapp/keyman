@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 #import <KeymanEngine4Mac/KeymanEngine4Mac.h>
+#import <os/log.h>
 
 static BOOL debugMode = YES;
 
@@ -67,7 +68,9 @@ NSString *const kKMXFileKey = @"KMXFile";
 }
 
 - (void)windowDidResize:(NSNotification *)notification {
-    [self.oskView resizeOSKLayout];
+    os_log_t oskLog = os_log_create("org.sil.keyman", "osk");
+    os_log_with_type(oskLog, OS_LOG_TYPE_DEBUG, "AppDelegate windowDidResize");
+   [self.oskView resizeOSKLayout];
 }
 
 - (BOOL)createEventTap {
@@ -205,7 +208,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
             [alert addButtonWithTitle:@"OK"];
             [alert setMessageText:@"Invalid KMX file"];
             [alert setInformativeText:@"This KMX file contains some invalid code!"];
-            [alert setAlertStyle:NSWarningAlertStyle];
+            [alert setAlertStyle:NSAlertStyleWarning];
             [alert runModal];
         }
         

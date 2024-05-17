@@ -2,17 +2,11 @@
 #
 # Compiles the kmc lexical model package compiler.
 #
-
-# Exit on command failure and when using unset variables:
-set -eu
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
-
-cd "$THIS_SCRIPT_PATH"
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
@@ -21,6 +15,7 @@ builder_describe "Build Keyman kmc Package Compiler module" \
   "@/developer/src/common/web/test-helpers" \
   "configure" \
   "build" \
+  "api                       analyze API and prepare API documentation" \
   "clean" \
   "test" \
   "pack                      build a local .tgz pack for testing" \
@@ -28,7 +23,9 @@ builder_describe "Build Keyman kmc Package Compiler module" \
   "--dry-run,-n              don't actually publish, just dry run"
 builder_describe_outputs \
   configure     /node_modules \
-  build         /developer/src/kmc-package/build/src/main.js
+  build         /developer/src/kmc-package/build/src/main.js \
+  api           /developer/build/api/kmc-package.api.json
+
 builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -51,6 +48,8 @@ if builder_start_action build; then
   npm run build
   builder_finish_action success build
 fi
+
+builder_run_action api        api-extractor run --local --verbose
 
 #-------------------------------------------------------------------------------------------------------------------
 

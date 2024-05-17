@@ -18,8 +18,8 @@ $(function() {
   this.saveSelection = function() {
     let key = builder.selectedKey(), subKey = builder.selectedSubKey();
     return {
-      id: key ? $(key).data('id') : null,
-      subId: subKey ? $(subKey).data('id') : null
+      id: key.length ? $(key).data('id') : null,
+      subId: subKey.length ? $(subKey).data('id') : null
     };
   }
 
@@ -268,6 +268,20 @@ $(function() {
     }
   }
 
+  this.hexToCodePoint = function(codePoint) {
+    const codePointValue = parseInt(codePoint, 16);
+    if (
+      isNaN(codePointValue) ||
+      codePointValue < 0 ||
+      codePointValue > 0x10FFFF ||
+      (0x0 <= codePointValue && codePointValue <= 0x1F) ||
+      (0x80 <= codePointValue && codePointValue <= 0x9F)
+    ) {
+      return null;
+    }
+    return String.fromCodePoint(codePointValue);
+  }
+
   this.unicodeKeyIdToString = function(id) {
     // duplicated from oskKey.ts
     if(!id || id.substr(0,2) != 'U_') {
@@ -277,13 +291,9 @@ $(function() {
     let result = '';
     const codePoints = id.substr(2).split('_');
     for(let codePoint of codePoints) {
-      const codePointValue = parseInt(codePoint, 16);
-      if (((0x0 <= codePointValue) && (codePointValue <= 0x1F)) ||
-          ((0x80 <= codePointValue) && (codePointValue <= 0x9F)) ||
-          isNaN(codePointValue)) {
-        continue;
-      } else {
-        result += String.fromCodePoint(codePointValue);
+      const codePointValue = this.hexToCodePoint(codePoint);
+      if(codePointValue) {
+        result += codePointValue;
       }
     }
     return result ? result : null;
@@ -333,7 +343,7 @@ $(function() {
     }
 
     if(hint == null) return '';
-    return hint;
+    return builder.renameSpecialKey(hint);
   }
 
   this.prepareLayer = function () {
@@ -418,7 +428,8 @@ $(function() {
         builder.addKeyAnnotations(nkey);
 
         $('.text', nkey).text(this.renameSpecialKey(text));
-        $('.hint', nkey).text(this.inferKeyHintText(key.hint, key.sk, key.flick, key.multitap));
+        builder.updateHint($(nkey));
+
         if(KVKL[builder.lastPlatform].displayUnderlying) $('.underlying', nkey).text(this.getStandardKeyCap(key.id, key.layer ? builder.isLayerIdShifted(key.layer) : isLayerShifted));
 
 
@@ -714,7 +725,10 @@ $(function() {
     let chars = s.split(' '), r = '';
     for(let ch of chars) {
       if(!ch.match(/^u\+[0-9a-f]{1,6}$/i)) continue;
-      r += String.fromCodePoint(parseInt(ch.substring(2), 16));
+      const codePointValue = this.hexToCodePoint(ch.substring(2));
+      if(codePointValue) {
+        r += codePointValue;
+      }
     }
     return r;
   }
@@ -744,15 +758,27 @@ $(function() {
     builder.keyCapChange(val);
   }, {saveOnce: true});
 
+  builder.updateHint = function(key) {
+    const val = key.data('hint');
+    const hintElement = $('.hint', key);
+    hintElement.text(builder.inferKeyHintText(val, $(key).data('longpress'), $(key).data('flick'), $(key).data('multitap')));
+    if(val && val.length) {
+      hintElement.addClass('custom-hint');
+    } else {
+      hintElement.removeClass('custom-hint');
+    }
+    if(builder.specialCharacters[val]) {
+      hintElement.addClass('key-special-text');
+    } else {
+      hintElement.removeClass('key-special-text');
+    }
+
+  }
+
   builder.keyHintChange = function(val) {
     const key = builder.selectedKey();
     key.data('hint', val);
-    $('.hint', key).text(builder.inferKeyHintText(val, $(key).data('longpress'), $(key).data('flick'), $(key).data('multitap')));
-    if(val && val.length) {
-      $('.hint', key).addClass('custom-hint');
-    } else {
-      $('.hint', key).removeClass('custom-hint');
-    }
+    builder.updateHint(key);
   }
 
   const inpKeyHintChange = builder.wrapChange(function (e) {
@@ -958,7 +984,7 @@ $(function() {
 
   $('#kbd-scroll-container').on('scroll', function () {
     const key = builder.selectedKey();
-    if(key) {
+    if(key.length) {
       builder.moveWedgesAround(key[0]);
     }
   });

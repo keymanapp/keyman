@@ -1,4 +1,4 @@
-import EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter3';
 
 import {
   ActiveKey,
@@ -40,11 +40,11 @@ import KeyboardView from './components/keyboardView.interface.js';
 import { type KeyElement, getKeyFrom } from './keyElement.js';
 import KeyTip from './keytip.interface.js';
 import OSKKey from './keyboard-layout/oskKey.js';
-import OSKLayer from './keyboard-layout/oskLayer.js';
+import OSKLayer, { LayerLayoutParams } from './keyboard-layout/oskLayer.js';
 import OSKLayerGroup from './keyboard-layout/oskLayerGroup.js';
 import OSKView from './views/oskView.js';
 import { LengthStyle, ParsedLengthStyle } from './lengthStyle.js';
-import { defaultFontSize, getFontSizeStyle } from './fontSizeUtils.js';
+import { defaultFontSize } from './fontSizeUtils.js';
 import PhoneKeyTip from './input/gestures/browser/keytip.js';
 import { TabletKeyTip } from './input/gestures/browser/tabletPreview.js';
 import CommonConfiguration from './config/commonConfiguration.js';
@@ -61,12 +61,30 @@ import Flick, { buildFlickScroller } from './input/gestures/browser/flick.js';
 import { GesturePreviewHost } from './keyboard-layout/gesturePreviewHost.js';
 import OSKBaseKey from './keyboard-layout/oskBaseKey.js';
 import { OSKResourcePathConfiguration } from './index.js';
+import KEYMAN_VERSION from '@keymanapp/keyman-version';
 
+/**
+ * Gesture history data will include each touchpath sample observed during its
+ * lifetime in addition to its lifetime stats.
+ */
+// @ts-ignore
+const DEBUG_GESTURES: boolean = KEYMAN_VERSION.TIER != 'stable' || KEYMAN_VERSION.VERSION_ENVIRONMENT != '';
+
+/**
+ * If greater than zero, `this.gestureEngine.history` & `this.gestureEngine.historyJSON`
+ * will contain report-data this many of the most-recently completed gesture inputs in
+ * order of their time of completion.
+ */
+const DEBUG_HISTORY_COUNT: number = DEBUG_GESTURES ? 10 : 0;
+
+// #region KeyRuleEffects
 interface KeyRuleEffects {
   contextToken?: number,
   alteredText?: boolean
 };
+// #endregion
 
+// #region VisualKeyboardConfiguration
 export interface VisualKeyboardConfiguration extends CommonConfiguration {
   /**
    * The Keyman keyboard on which to base the on-screen keyboard being represented.
@@ -106,6 +124,7 @@ export interface VisualKeyboardConfiguration extends CommonConfiguration {
    */
   specialFont?: InternalKeyboardFont;
 }
+// #endregion
 
 interface BoundingRect {
   left: number,
@@ -128,6 +147,7 @@ interface EventMap {
   'globekey': (keyElement: KeyElement, on: boolean) => void
 }
 
+// #region VisualKeyboard
 export default class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardView {
   /**
    * The gesture-engine used to support user interaction with this keyboard.
@@ -158,7 +178,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
   readonly config: VisualKeyboardConfiguration;
 
-  private _layerId: string = "default";
   layerLocked: boolean = false;
   layerIndex: number = 0; // the index of the default layer
   readonly isRTL: boolean;
@@ -182,6 +201,13 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    * to allow automatic height scaling.
    */
   private _height: number;
+
+  /**
+   * The main VisualKeyboard element's border-width styling.
+   *
+   * Assumption:  is a fixed, uniform length that doesn't vary between refreshLayout() calls.
+   */
+  private _borderWidth: number = 0;
 
   /**
    * The computed width for this VisualKeyboard.  May be null if auto sizing
@@ -225,21 +251,21 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
   activeGestures: GestureHandler[] = [];
   activeModipress: Modipress = null;
+  public deferLayout: boolean;
 
   // The keyboard object corresponding to this VisualKeyboard.
   public readonly layoutKeyboard: Keyboard;
   public readonly layoutKeyboardProperties: KeyboardProperties;
 
   get layerId(): string {
-    return this._layerId;
+    return this.layerGroup?.activeLayerId ?? 'default';
   }
 
   set layerId(value: string) {
-    const changedLayer = value != this._layerId;
+    const changedLayer = value != this.layerId;
     if(!this.layerGroup.layers[value]) {
       throw new Error(`Keyboard ${this.layoutKeyboard.id} does not have a layer with id ${value}`);
     } else {
-      this._layerId = value;
       this.layerGroup.activeLayerId = value;
 
       // Does not exist for documentation keyboards!
@@ -248,14 +274,15 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       }
     }
 
-    if(changedLayer) {
+    if(changedLayer && !this.deferLayout) {
       this.updateState();
-      this.refreshLayout();
+      // We changed the active layer, but not any layout property of the keyboard as a whole.
+      this.layerGroup.refreshLayout(this.constructLayoutParams());
     }
   }
 
   get currentLayer(): OSKLayer {
-    return this.layerId ? this.layerGroup?.layers[this.layerId] : null;
+    return this.layerGroup?.activeLayer;
   }
 
   // Special keys (for the currently-visible layer)
@@ -271,7 +298,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     return this.currentLayer?.spaceBarKey?.btn;
   }
 
-  //#region OSK constructor and helpers
+  //#region VisualKeyboard - constructor and helpers
 
   /**
    * @param       {Object}      PVK         Visual keyboard name
@@ -396,7 +423,14 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
          */
 
         return this.layerGroup.findNearestKey(sample);
-      }
+      },
+      /* When enabled, facilitates investigation of perceived odd behaviors observed on Android devices
+        in association with issues like #11221 and #11183.  "Recordings" are only accessible within
+        the mobile apps via WebView inspection and outside the apps via Developer mode in the browser;
+        they are not transmitted or uploaded automatically.
+      */
+      recordingMode: DEBUG_GESTURES,
+      historyLength: DEBUG_HISTORY_COUNT
     };
 
     this.gestureParams.longpress.permitsFlick = (key) => {
@@ -484,13 +518,14 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           this.highlightKey(oldKey, false);
           this.gesturePreviewHost?.cancel();
           this.gesturePreviewHost = null;
+          trackingEntry.previewHost = null;
 
           const previewHost = this.highlightKey(key, true);
           if(previewHost) {
             this.gesturePreviewHost = previewHost;
             trackingEntry.previewHost = previewHost;
-            sourceTrackingMap[source.identifier].key = key;
           }
+          sourceTrackingMap[source.identifier].key = key;
         }
       }
 
@@ -530,6 +565,13 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         const existingPreviewHost = gestureSequence.allSourceIds.map((id) => {
           return sourceTrackingMap[id]?.previewHost;
         }).find((obj) => !!obj);
+
+        const clearPreviewHost = () => {
+          if(existingPreviewHost) {
+            existingPreviewHost.cancel();
+            this.gesturePreviewHost = null;
+          }
+        }
 
         let handlers: GestureHandler[] = gestureHandlerMap.get(gestureSequence);
         if(!handlers && existingPreviewHost && !gestureStage.matchedId.includes('flick')) {
@@ -625,7 +667,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
         if(gestureStage.matchedId == 'special-key-start') {
           if(gestureKey.key.spec.baseKeyID == 'K_BKSP') {
             // There shouldn't be a preview host for special keys... but it doesn't hurt to add the check.
-            existingPreviewHost?.cancel();
+            clearPreviewHost();
 
             // Possible enhancement:  maybe update the held location for the backspace if there's movement?
             // But... that seems pretty low-priority.
@@ -634,13 +676,20 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
             // handle everything that remains for the backspace from here.
             handlers = [new HeldRepeater(gestureSequence, () => this.modelKeyClick(gestureKey, coord))];
           } else if(gestureKey.key.spec.baseKeyID == "K_LOPT") { // globe key
-            gestureSequence.on('complete', () => this.emit('globekey', gestureKey, false));
+            gestureSequence.on('complete', () => {
+              gestureKey.key.highlight(false);
+              this.emit('globekey', gestureKey, false);
+            });
+
             // Cancel all other gesture sources; a language-menu interaction voids all previously-active
             // gestures that haven't completed.
             clearActiveGestures(coordSource.identifier);
+
+            // Re-highlight the key - it was auto de-highlighted upon stage-select.
+            gestureKey.key.highlight(true);
           }
         } else if(gestureStage.matchedId.indexOf('longpress') > -1) {
-          existingPreviewHost?.cancel();
+          clearPreviewHost();
 
           // Matches:  'longpress', 'longpress-reset'.
           // Likewise.
@@ -659,8 +708,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           trackingEntry.previewHost = null;
 
           gestureSequence.on('complete', () => {
-            existingPreviewHost?.cancel();
-            this.gesturePreviewHost = null;
+            clearPreviewHost();
           })
 
           // Past that, mere construction of the class for delegation is enough.
@@ -676,7 +724,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           )];
         } else if(gestureStage.matchedId.includes('modipress') && gestureStage.matchedId.includes('-start')) {
           // There shouldn't be a preview host for modipress keys... but it doesn't hurt to add the check.
-          existingPreviewHost?.cancel();
+          clearPreviewHost();
 
           if(this.layerLocked) {
             console.warn("Unexpected state:  modipress start attempt during an active modipress");
@@ -696,7 +744,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           }
         } else {
           // Probably an initial-tap or a simple-tap.
-          existingPreviewHost?.cancel();
+          clearPreviewHost();
         }
 
         if(handlers) {
@@ -769,11 +817,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   get layoutWidth(): ParsedLengthStyle {
     if (this.usesFixedWidthScaling) {
       let baseWidth = this.width;
-      let cs = getComputedStyle(this.element);
-      if (cs.border) {
-        let borderWidth = new ParsedLengthStyle(cs.borderWidth).val;
-        baseWidth -= borderWidth * 2;
-      }
+      baseWidth -= this._borderWidth * 2;
       return ParsedLengthStyle.inPixels(baseWidth);
     } else {
       return ParsedLengthStyle.forScalar(1);
@@ -783,11 +827,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   get layoutHeight(): ParsedLengthStyle {
     if (this.usesFixedHeightScaling) {
       let baseHeight = this.height;
-      let cs = getComputedStyle(this.element);
-      if (cs.border) {
-        let borderHeight = new ParsedLengthStyle(cs.borderWidth).val;
-        baseHeight -= borderHeight * 2;
-      }
+      baseHeight -= this._borderWidth * 2;
       return ParsedLengthStyle.inPixels(baseHeight);
     } else {
       return ParsedLengthStyle.forScalar(1);
@@ -797,7 +837,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   get internalHeight(): ParsedLengthStyle {
     if (this.usesFixedHeightScaling) {
       // Touch OSKs may apply internal padding to prevent row cropping at the edges.
-      return ParsedLengthStyle.inPixels(this.layoutHeight.val - this.getVerticalLayerGroupPadding());
+      // ... why not precompute both, rather than recalculate each time?
+      // - appears to contribute to layout reflow costs on layer swaps!
+      return ParsedLengthStyle.inPixels(this.layoutHeight.val - this._borderWidth * 2 - this.layerGroup.verticalPadding);
     } else {
       return ParsedLengthStyle.forScalar(1);
     }
@@ -893,7 +935,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   };
   //#endregion
 
-  //#region OSK touch handlers
+  //#region VisualKeyboard - OSK touch handlers
   getTouchCoordinatesOnKeyboard(input: InputSample<KeyElement, string>) {
     // `input` is already in keyboard-local coordinates.  It's not scaled, though.
     let offsetCoords = { x: input.targetX, y: input.targetY };
@@ -1099,40 +1141,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     this._UpdateVKShiftStyle();
   }
 
-  //#endregion
-
-  /**
-   * Indicate the current language and keyboard on the space bar
-   **/
-  showLanguage() {
-    let activeStub = this.layoutKeyboardProperties;
-    let displayName: string = activeStub?.displayName ?? '(System keyboard)';
-
-    try {
-      var t = <HTMLElement>this.spaceBar.key.label;
-      let tParent = <HTMLElement>t.parentNode;
-      if (typeof (tParent.className) == 'undefined' || tParent.className == '') {
-        tParent.className = 'kmw-spacebar';
-      } else if (tParent.className.indexOf('kmw-spacebar') == -1) {
-        tParent.className += ' kmw-spacebar';
-      }
-
-      if (t.className != 'kmw-spacebar-caption') {
-        t.className = 'kmw-spacebar-caption';
-      }
-
-      // It sounds redundant, but this dramatically cuts down on browser DOM processing;
-      // but sometimes innerText is reported empty when it actually isn't, so set it
-      // anyway in that case (Safari, iOS 14.4)
-      if (t.innerText != displayName || displayName == '') {
-        t.innerText = displayName;
-      }
-
-      this.spaceBar.key.refreshLayout(this);
-    }
-    catch (ex) { }
-  }
-
   /**
    *  Add or remove a class from a keyboard key (when touched or clicked)
    *  or add a key preview for phone devices
@@ -1172,28 +1180,28 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    * Use of `getComputedStyle` is ideal, but in many of our use cases its preconditions are not met.
    * This function allows us to calculate the font size in those situations.
    */
-  getKeyEmFontSize(): number {
+  getKeyEmFontSize(): ParsedLengthStyle {
     if (!this.fontSize) {
-      return 0;
+      return new ParsedLengthStyle('0px');
     }
 
     if (this.device.formFactor == 'desktop') {
       let keySquareScale = 0.8; // Set in kmwosk.css, is relative.
-      return this.fontSize.scaledBy(keySquareScale).val;
+      return this.fontSize.scaledBy(keySquareScale);
     } else {
-      let emSizeStr = getComputedStyle(document.body).fontSize;
-      let emSize = getFontSizeStyle(emSizeStr).val;
+      const emSizeStr = getComputedStyle(document.body).fontSize;
+      const emSize = new ParsedLengthStyle(emSizeStr);
 
-      var emScale = 1;
+      let emScale = 1;
       if (!this.isStatic) {
         // Double-check against the font scaling applied to the _Box element.
         if (this.fontSize.absolute) {
-          return this.fontSize.val;
+          return this.fontSize;
         } else {
           emScale = this.fontSize.val;
         }
       }
-      return emSize * emScale;
+      return emSize.scaledBy(emScale);
     }
   }
 
@@ -1205,7 +1213,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return;
     }
 
-    var n, b = this.kbdDiv.childNodes[0].childNodes;
     this.nextLayer = this.layerId;
 
     if (this.currentLayer.nextlayer) {
@@ -1225,7 +1232,15 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    * when needed.
    */
   refreshLayout() {
-    //let keyman = com.keyman.singleton;
+    if(this.deferLayout) {
+      return;
+    }
+
+    /*
+      Phase 1:  calculations possible at the start without triggering _any_ additional layout reflow.
+      (A single, initial reflow may happen depending on DOM manipulations before this method...,
+      but no extras until phase 2.)
+    */
     let device = this.device;
 
     var fs = 1.0;
@@ -1234,11 +1249,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       fs = fs / getViewportScale(this.device.formFactor);
     }
 
-    let paddedHeight: number;
-    if (this.height) {
-      paddedHeight = this.computedAdjustedOskHeight(this.height);
-    }
-
+    /*
+      Phase 2:  first self-triggered reflow - locking in the keyboard's base property styling.
+    */
     let gs = this.kbdDiv.style;
     if (this.usesFixedHeightScaling && this.height) {
       // Sets the layer group to the correct height.
@@ -1249,13 +1262,20 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     // Layer-group font-scaling is applied separately.
     gs.fontSize = this.fontSize.scaledBy(fs).styleString;
 
+    // Phase 3:  reflow from top-level getComputedStyle calls
+
     // Step 1:  have the necessary conditions been met?
     const fixedSize = this.width && this.height;
     const computedStyle = getComputedStyle(this.kbdDiv);
+    const groupStyle = getComputedStyle(this.kbdDiv.firstElementChild);
+
     const isInDOM = computedStyle.height != '' && computedStyle.height != 'auto';
 
+    if (computedStyle.border) {
+      this._borderWidth = new ParsedLengthStyle(computedStyle.borderWidth).val;
+    }
+
     // Step 2:  determine basic layout geometry, refresh things that might update.
-    this.showLanguage(); // In case the spacebar-text mode setting has changed.
 
     if (fixedSize) {
       this._computedWidth = this.width;
@@ -1263,9 +1283,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     } else if (isInDOM) {
       this._computedWidth = parseInt(computedStyle.width, 10);
       if (!this._computedWidth) {
-        // For touch keyboards, the width _was_ specified on the layer group,
-        // not the root element (`kbdDiv`).
-        const groupStyle = getComputedStyle(this.kbdDiv.firstElementChild);
         this._computedWidth = parseInt(groupStyle.width, 10);
       }
       this._computedHeight = parseInt(computedStyle.height, 10);
@@ -1280,29 +1297,43 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       const paddingZone = this.gestureEngine.config.maxRoamingBounds as PaddedZoneSource;
       paddingZone.updatePadding([-0.333 * this.currentLayer.rowHeight]);
 
-      this.gestureParams.longpress.flickDist = 0.25 * this.currentLayer.rowHeight;
-      this.gestureParams.flick.startDist     = 0.15 * this.currentLayer.rowHeight;
-      this.gestureParams.flick.dirLockDist   = 0.35 * this.currentLayer.rowHeight;
-      this.gestureParams.flick.triggerDist   = 0.75 * this.currentLayer.rowHeight;
+      /*
+        Note:  longpress.flickDist needs to be no greater than flick.startDist.
+        Otherwise, the longpress up-flick shortcut will not work on keys that
+        support flick gestures.  (Such as sil_euro_latin 3.0+)
+
+        Since it's also based on the purely northward component, it's best to
+        have it be slightly lower.  80% of flick.startDist gives a range of
+        about 37 degrees to each side before a flick-start would win, while
+        70.7% gives 45 degrees.
+
+        (The range _will_ be notably tighter on keys with both longpresses and
+        flicks as a result.)
+      */
+      this.gestureParams.longpress.flickDistStart = 0.24 * this.currentLayer.rowHeight;
+      this.gestureParams.flick.startDist          = 0.30 * this.currentLayer.rowHeight;
+      this.gestureParams.flick.dirLockDist        = 0.35 * this.currentLayer.rowHeight;
+      this.gestureParams.flick.triggerDist        = 0.75 * this.currentLayer.rowHeight;
+      this.gestureParams.longpress.flickDistFinal = 0.75 * this.currentLayer.rowHeight;
     }
 
-    // Step 4:  perform layout operations.
-    // Needs the refreshed layout info to work correctly.
-    if(this.currentLayer) {
-      this.currentLayer.refreshLayout(this, this._computedHeight - this.getVerticalLayerGroupPadding());
-    }
+    // Phase 4:  Refresh the layout of the layer-group and active layer.
+    this.layerGroup.refreshLayout(this.constructLayoutParams());
   }
 
-  private getVerticalLayerGroupPadding(): number {
-    // For touch-based OSK layouts, kmwosk.css may include top & bottom padding on the layer-group element.
-    const computedGroupStyle = getComputedStyle(this.layerGroup.element);
-
-    // parseInt('') => NaN, which is falsy; we want to fallback to zero.
-    let pt = parseInt(computedGroupStyle.paddingTop, 10) || 0;
-    let pb = parseInt(computedGroupStyle.paddingBottom, 10) || 0;
-    return pt + pb;
+  private constructLayoutParams(): LayerLayoutParams {
+    return {
+      keyboardWidth: this._computedWidth - 2 * this._borderWidth,
+      keyboardHeight: this._computedHeight - 2 * this._borderWidth - this.layerGroup.verticalPadding,
+      widthStyle: this.layoutWidth,
+      heightStyle: this.internalHeight,
+      baseEmFontSize: this.getKeyEmFontSize(),
+      layoutFontSize: new ParsedLengthStyle(this.layerGroup.element.style.fontSize),
+      spacebarText: this.layoutKeyboardProperties?.displayName ?? '(System keyboard)'
+    };
   }
 
+  // Appears to be abandoned now - candidate for removal in future.
   /*private*/ computedAdjustedOskHeight(allottedHeight: number): number {
     if (!this.layerGroup) {
       return allottedHeight;
@@ -1375,7 +1406,12 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     }
 
     // Once any related fonts are loaded, we can re-adjust key-cap scaling.
-    this.styleSheetManager.allLoadedPromise().then(() => this.refreshLayout());
+    this.styleSheetManager.allLoadedPromise().then(() => {
+      // All existing font-precalculations will need to be reset, as the font
+      // was previously unavailable.
+      this.layerGroup.resetPrecalcFontSizes();
+      this.refreshLayout()
+    });
   }
 
   /**
@@ -1612,10 +1648,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   showGesturePreview(key: KeyElement) {
     const tip = this.keytip;
 
-    const keyCS = getComputedStyle(key);
-    const parsedHeight = Number.parseInt(keyCS.height, 10);
-    const parsedWidth  = Number.parseInt(keyCS.width,  10);
-    const previewHost = new GesturePreviewHost(key, this.device.formFactor == 'phone', parsedWidth, parsedHeight);
+    const layoutParams = this.constructLayoutParams();
+    const keyWidth = layoutParams.keyboardWidth * key.key.spec.proportionalWidth;
+    const keyHeight = layoutParams.keyboardHeight / this.currentLayer.rows.length;
+    const previewHost = new GesturePreviewHost(key, this.device.formFactor == 'phone', keyWidth, keyHeight);
 
     if (tip == null) {
       const baseKey = key.key as OSKBaseKey;
@@ -1703,4 +1739,5 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
     return callbackData;
   }
+  // #endregion VisualKeyboard
 }

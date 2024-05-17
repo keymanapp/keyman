@@ -74,6 +74,14 @@ class KeymanWebViewController: UIViewController {
     super.init(nibName: nil, bundle: nil)
 
     _ = view
+
+    NotificationCenter.default.addObserver(
+      forName: UIApplication.willEnterForegroundNotification,
+      object: nil,
+      queue: OperationQueue.main
+    ) { _ in
+      self.reloadKeyboard()
+    }
   }
 
   required init?(coder aDecoder: NSCoder) {
@@ -130,6 +138,14 @@ class KeymanWebViewController: UIViewController {
     webView!.backgroundColor = UIColor.clear
     webView!.navigationDelegate = self
     webView!.scrollView.isScrollEnabled = false
+
+    // Disable WKWebView default layout-constraint manipulations. We ensure
+    // safe-area boundaries are respected via InputView / InputViewController
+    // constraints.
+    //
+    // Fixes #10859.
+    // Ref: https://stackoverflow.com/a/63741514
+    webView!.scrollView.contentInsetAdjustmentBehavior = .never
 
     view = webView
 
@@ -223,30 +239,30 @@ extension KeymanWebViewController {
     setSpacebarText(userData.optSpacebarText)
   }
 
-  func setCursorRange(_ range: NSRange) {
-    if range.location != NSNotFound {
-      webView!.evaluateJavaScript("setCursorRange(\(range.location),\(range.length));", completionHandler: nil)
-      self.currentCursorRange = range
-    }
-  }
-
-  func setText(_ text: String?) {
-    var text = text ?? ""
-
-    // Remove any system-added LTR/RTL marks.
-    text = text.replacingOccurrences(of: "\u{200e}", with: "") // Unicode's LTR codepoint
-    text = text.replacingOccurrences(of: "\u{200f}", with: "") // Unicode's RTL codepoint (v1)
-    text = text.replacingOccurrences(of: "\u{202e}", with: "") // Unicode's RTL codepoint (v2)
+  func setContext(text: String?, range: NSRange?, doSync: Bool = false) {
+    // Remove any LTR / RTL marks we added within TextView and TextField.
+    let context = trimDirectionalMarkPrefix(text ?? "")
 
     do {
-      let encodingArray = [ text ];
+      let encodingArray = [ context ];
       let jsonString = try String(data: JSONSerialization.data(withJSONObject: encodingArray), encoding: .utf8)!
-      let start = jsonString.index(jsonString.startIndex, offsetBy: 2)
-      let end = jsonString.index(jsonString.endIndex, offsetBy: -2)
-      let jsonText = jsonString[start..<end]
+      // Must use utf16-mode - default Swift string handling will include a leading U+0300 with the opening double-quote
+      // being removed by the substring op below.
+      let start = jsonString.utf16.index(jsonString.utf16.startIndex, offsetBy: 2)
+      let end = jsonString.utf16.index(jsonString.utf16.endIndex, offsetBy: -2)
+      let jsonText = String(jsonString.utf16[start..<end])!
 
       self.currentText = String(jsonText)
-      webView!.evaluateJavaScript("setKeymanVal(\"\(jsonText)\");", completionHandler: nil)
+
+      var finalRange = range ?? self.currentCursorRange ?? nil
+      self.currentCursorRange = finalRange
+
+      //
+      if (finalRange?.location ?? NSNotFound) != NSNotFound {
+        webView!.evaluateJavaScript("setKeymanContext(\"\(jsonText)\", \(doSync ? "true" : "false"), \(finalRange!.location), \(finalRange!.length));", completionHandler: nil)
+      } else {
+        webView!.evaluateJavaScript("setKeymanContext(\"\(jsonText)\", \(doSync ? "true" : "false"));", completionHandler: nil)
+      }
     } catch {
       os_log("%{public}s", log: KeymanEngineLogger.engine, type: .error, error.localizedDescription)
       SentryManager.capture(error.localizedDescription)
@@ -363,7 +379,7 @@ extension KeymanWebViewController {
       if let packageID = lexicalModel.packageID {
         event.extra?["package"] = packageID
       }
-      
+
       os_log("%{public}s: %{public}s", log: KeymanEngineLogger.resources, type: .error, errorMessage, lexicalModel.id)
       SentryManager.capture(event)
       throw KeyboardError.fileMissing
@@ -415,15 +431,6 @@ extension KeymanWebViewController {
     } else {  // We're registering a model in the background - don't change settings.
       webView!.evaluateJavaScript("keyman.addModel(\(stubString));", completionHandler: nil)
     }
-
-    setBannerHeight(to: Int(InputViewController.topBarHeight))
-  }
-
-  func showBanner(_ display: Bool) {
-    let message = "Changing banner's alwaysShow property to \(display)"
-    os_log("%{public}s", log: KeymanEngineLogger.settings, type: .debug, message)
-    SentryManager.breadcrumb(message, category: "engine", sentryLevel: .debug)
-    webView?.evaluateJavaScript("showBanner(\(display ? "true" : "false"))", completionHandler: nil)
   }
 
   func setBannerImage(to path: String) {
@@ -572,7 +579,7 @@ extension KeymanWebViewController: WKScriptMessageHandler {
       // This may need filtering for proper use with Sentry?
       // Then again, if KMW is logging it... we already have to worry
       // about it showing up in Web-oriented Sentry logs.
-      
+
       let logMessage = "KMW Log: \(message)"
       os_log("%{public}s", log: KeymanEngineLogger.engine, type: .info, logMessage)
       SentryManager.breadcrumb(logMessage)
@@ -672,10 +679,7 @@ extension KeymanWebViewController: KeymanWebDelegate {
     resizeKeyboard()
 
     // There may have been attempts to set these values before the keyboard loaded!
-    self.setText(self.currentText)
-    if let cursorRange = self.currentCursorRange {
-      self.setCursorRange(cursorRange)
-    }
+    self.setContext(text: self.currentText, range: self.currentCursorRange)
 
     var newKb = Manager.shared.currentKeyboard
 
@@ -734,10 +738,11 @@ extension KeymanWebViewController: KeymanWebDelegate {
     }
 
     updateSpacebarText()
-    updateShowBannerSetting()
     setBannerImage(to: bannerImgPath)
     // Reset the keyboard's size.
     keyboardSize = kbSize
+
+    setBannerHeight(to: Int(InputViewController.topBarHeight))
 
     fixLayout()
 
@@ -749,16 +754,6 @@ extension KeymanWebViewController: KeymanWebDelegate {
       NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(self.resetKeyboard), object: nil)
       perform(#selector(self.resetKeyboard), with: nil, afterDelay: 0.25)
       shouldReload = false
-    }
-  }
-
-  func updateShowBannerSetting() {
-    let userData = Storage.active.userDefaults
-    let alwaysShow = userData.bool(forKey: Key.optShouldShowBanner)
-    if !Manager.shared.isSystemKeyboard {
-      showBanner(false)
-    } else {
-      showBanner(alwaysShow)
     }
   }
 
@@ -1123,8 +1118,6 @@ extension KeymanWebViewController {
     isLoading = true
 
     updateSpacebarText()
-    // Check for a change of "always show banner" state
-    updateShowBannerSetting()
   }
 
   /*

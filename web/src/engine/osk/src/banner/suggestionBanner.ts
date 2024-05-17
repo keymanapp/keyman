@@ -15,7 +15,7 @@ import { BANNER_GESTURE_SET } from './bannerGestureSet.js';
 
 import { DeviceSpec, Keyboard, KeyboardProperties } from '@keymanapp/keyboard-processor';
 import { Banner } from './banner.js';
-import EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter3';
 import { ParsedLengthStyle } from '../lengthStyle.js';
 import { getFontSizeStyle } from '../fontSizeUtils.js';
 import { getTextMetrics } from '../keyboard-layout/getTextMetrics.js';
@@ -498,7 +498,9 @@ export class SuggestionBanner extends Banner {
           const optionBounding = option.div.getBoundingClientRect();
 
           if(optionBounding.left <= sample.clientX && sample.clientX < optionBounding.right) {
-            return option;
+            // If there is no backing suggestion, then there's no real selection.
+            // May happen when no suggestions are available.
+            return option.suggestion ? option : null;
           } else {
             const dist = (sample.clientX < optionBounding.left ? -1 : 1) * (sample.clientX - optionBounding.left);
 
@@ -509,7 +511,8 @@ export class SuggestionBanner extends Banner {
           }
         }
 
-        return bestMatch;
+        // If there is no backing suggestion, then there's no real selection.
+        return bestMatch.suggestion ? bestMatch : null;
       }
     };
 
@@ -557,7 +560,7 @@ export class SuggestionBanner extends Banner {
       sourceTracker.source = source;
       sourceTracker.scrollingHandler = (sample) => {
         const newScrollLeft = this.scrollState.updateTo(sample);
-        this.highlightAnimation.setBaseScroll(newScrollLeft);
+        this.highlightAnimation?.setBaseScroll(newScrollLeft);
 
           // Only re-enable the original suggestion, even if the touchpoint finds
           // itself over a different suggestion.  Might happen if a scroll boundary
@@ -578,9 +581,9 @@ export class SuggestionBanner extends Banner {
       };
 
       sourceTracker.suggestion = source.currentSample.item;
-      markSelection(sourceTracker.suggestion);
-
-      source.currentSample.item.highlight(true);
+      if(sourceTracker.suggestion) {
+        markSelection(sourceTracker.suggestion);
+      }
 
       const terminationHandler = () => {
         if(sourceTracker.suggestion) {

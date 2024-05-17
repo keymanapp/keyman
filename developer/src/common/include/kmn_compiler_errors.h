@@ -41,19 +41,20 @@
 
 // Message codes
 //
-// All errors here and below are mirrored in kmc-kmn/src/compiler/messages.ts;
-// if you add a new error here be sure to update that file also. Note that this
-// correlation is currently maintained manually. All values must be below
-// 0x1000 (exclusive of severity code).
+// All errors here and below are mirrored in
+// kmc-kmn/src/compiler/kmn-compiler-messages.ts; if you add a new error here be
+// sure to update that file also. Note that this correlation is currently
+// maintained manually. All values must be below 0x1000 (exclusive of severity
+// code).
 #define CERR_None                                          0x00000000
 #define CERR_EndOfFile                                     0x00000001
 
 #define CERR_BadCallParams                                 0x00008002
 #define CERR_CannotAllocateMemory                          0x00008004
-#define CERR_InfileNotExist                                0x00008005
-#define CERR_CannotCreateOutfile                           0x00008006
+#define CERR_InfileNotExist                                0x00004005   // #10678: reduced from fatal to error in 17.0
+// #define CERR_CannotCreateOutfile                           0x00004006   // #10678: reduced from fatal to error in 17.0, but unused
 #define CERR_UnableToWriteFully                            0x00008007
-#define CERR_CannotReadInfile                              0x00008008
+#define CERR_CannotReadInfile                              0x00004008   // #10678: reduced from fatal to error in 17.0
 #define CERR_SomewhereIGotItWrong                          0x00008009
 
 #define CERR_InvalidToken                                  0x0000400A
@@ -173,6 +174,11 @@
 #define CERR_DuplicateStore                                0x00004072
 #define CERR_RepeatedBegin                                 0x00004073
 #define CERR_VirtualKeyInContext                           0x00004074
+
+#define CERR_OutsTooLong                                   0x00004075
+#define CERR_ExtendedStringTooLong                         0x00004076
+#define CERR_VirtualKeyExpansionTooLong                    0x00004077
+#define CERR_CharacterRangeTooLong                         0x00004078
 
 #define CWARN_TooManyWarnings                              0x00002080
 #define CWARN_OldVersion                                   0x00002081

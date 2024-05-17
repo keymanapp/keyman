@@ -13,9 +13,9 @@
 using namespace km::core;
 
 /**
- * Retrieves the context as a km_core_cp string, dropping markers
+ * Retrieves the context as a km_core_cu string, dropping markers
  */
-km_core_cp* km::core::get_context_as_string(km_core_context *context) {
+km_core_cu* km::core::get_context_as_string(km_core_context *context) {
   assert(context != nullptr);
   if(context == nullptr) {
     return nullptr;
@@ -33,7 +33,7 @@ km_core_cp* km::core::get_context_as_string(km_core_context *context) {
     return nullptr;
   }
 
-  km_core_cp *app_context_string = new km_core_cp[buf_size];
+  km_core_cu *app_context_string = new km_core_cu[buf_size];
 
   km_core_status status = context_items_to_utf16(context_items, app_context_string, &buf_size);
   km_core_context_items_dispose(context_items);
@@ -46,9 +46,9 @@ km_core_cp* km::core::get_context_as_string(km_core_context *context) {
 }
 
 /**
- * Updates the context from the new_context km_core_cp string
+ * Updates the context from the new_context km_core_cu string
  */
-km_core_status km::core::set_context_from_string(km_core_context *context, km_core_cp const *new_context) {
+km_core_status km::core::set_context_from_string(km_core_context *context, km_core_cu const *new_context) {
   assert(context != nullptr);
   assert(new_context != nullptr);
   if(context == nullptr || new_context == nullptr) {

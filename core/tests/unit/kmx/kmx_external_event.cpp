@@ -17,7 +17,6 @@
 
 #include <map>
 #include <iostream>
-#include <sstream>
 
 /**
  * This test will test the infrastructure around the external event processing

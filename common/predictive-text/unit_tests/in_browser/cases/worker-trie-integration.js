@@ -1,4 +1,4 @@
-var assert = chai.assert;
+import { assert } from '../../../../../node_modules/chai/chai.js';
 
 import { LMLayer, Worker }   from "../../../build/lib/web/index.mjs";
 import * as helpers from "../helpers.mjs";
@@ -60,7 +60,7 @@ describe('LMLayer using the trie model', function () {
     //
     // https://community.software.sil.org/t/search-term-to-key-in-lexical-model-not-working-both-ways-by-default/3133
     it('should use the default searchTermToKey()', function () {
-      var lmLayer = new LMLayer(helpers.defaultCapabilities, Worker.constructInstance());
+      var lmLayer = new LMLayer(helpers.defaultCapabilities, Worker.constructInstance(), /* testMode */ true);
 
       return lmLayer.loadModel(
         // We need to provide an absolute path since the worker is based within a blob.

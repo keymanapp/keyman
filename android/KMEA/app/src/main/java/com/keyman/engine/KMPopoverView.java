@@ -10,6 +10,7 @@ import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Path;
+import android.graphics.Point;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.util.AttributeSet;
@@ -31,13 +32,11 @@ final class KMPopoverView extends View {
 
   public KMPopoverView(Context context, AttributeSet attrs) {
     super(context, attrs);
-    WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-    DisplayMetrics metrics = new DisplayMetrics();
-    wm.getDefaultDisplay().getMetrics(metrics);
-    density = metrics.density;
+    Point size = KMManager.getWindowSize(context);
+    density = KMManager.getWindowDensity(context);
 
-    viewWidth = metrics.widthPixels;
-    viewHeight = metrics.heightPixels;
+    viewWidth = size.x;
+    viewHeight = size.y;
     borderRadius = 6 * density;
     strokeWidth = 2.0f;
     bgColor = context.getResources().getColor(R.color.popup_bg);

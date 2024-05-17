@@ -45,8 +45,8 @@ void context::push_marker(uint32_t marker) {
 
 // Context helper functions
 
-km_core_cp* get_context_as_string(km_core_context *context);
-km_core_status set_context_from_string(km_core_context *context, km_core_cp const *new_context);
+km_core_cu* get_context_as_string(km_core_context *context);
+km_core_status set_context_from_string(km_core_context *context, km_core_cu const *new_context);
 
 } // namespace core
 } // namespace km
@@ -84,7 +84,7 @@ struct km_core_context : public km::core::context
  *                `km_core_context_items_dispose`.
  */
 km_core_status
-context_items_from_utf16(km_core_cp const *text,
+context_items_from_utf16(km_core_cu const *text,
                                 km_core_context_item **out_ptr);
 
 /**
@@ -113,7 +113,7 @@ context_items_from_utf16(km_core_cp const *text,
  */
 km_core_status
 context_items_to_utf16(km_core_context_item const *item,
-                              km_core_cp *buf,
+                              km_core_cu *buf,
                               size_t *buf_size);
 
 /**

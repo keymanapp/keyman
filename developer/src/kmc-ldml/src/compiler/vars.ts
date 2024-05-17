@@ -12,7 +12,7 @@ import { CompilerMessages } from "./messages.js";
 import { KeysCompiler } from "./keys.js";
 import { TransformCompiler } from "./tran.js";
 import { DispCompiler } from "./disp.js";
-import { MarkerTracker, MarkerUse } from "./marker-tracker.js";
+import { SubstitutionUse, Substitutions } from "./substitution-tracker.js";
 export class VarsCompiler extends SectionCompiler {
   public get id() {
     return constants.section.vars;
@@ -35,19 +35,14 @@ export class VarsCompiler extends SectionCompiler {
   public validate(): boolean {
     let valid = true;
 
-    valid = this.validateVars() && valid; // accumulate validity
-    valid = this.validateMarkers() && valid; // accumulate validity
+    valid = this.validateAllSubstitutions() && valid; // accumulate validity
 
     return valid;
   }
 
-  private validateVars(): boolean {
+  private validateVars(st: Substitutions): boolean {
     let valid = true;
     const variables = this.keyboard3?.variables;
-
-    if (!variables) {
-      return true; // nothing to check
-    }
 
     // Check for duplicate ids
     const allIds = new Set();
@@ -69,75 +64,56 @@ export class VarsCompiler extends SectionCompiler {
       }
     }
 
-    // Strings
-    for (const { id, value } of variables?.string) {
-      addId(id);
-      allStrings.add(id);
-      const stringrefs = VariableParser.allStringReferences(value);
-      for (const id2 of stringrefs) {
-        if (!allStrings.has(id2)) {
-          valid = false;
-          this.callbacks.reportMessage(CompilerMessages.Error_MissingStringVariable({ id: id2 }));
-        }
+    if (variables) {
+      // Strings
+      for (const { id, value } of variables.string) {
+        addId(id);
+        allStrings.add(id);
+        const stringrefs = VariableParser.allStringReferences(value);
+        st.string.add(SubstitutionUse.variable, stringrefs);
       }
-    }
-    // Sets
-    for (const { id, value } of variables.set) {
-      addId(id);
-      allSets.add(id);
-      // check for illegal references, here.
-      const stringrefs = VariableParser.allStringReferences(value);
-      for (const id2 of stringrefs) {
-        if (!allStrings.has(id2)) {
-          valid = false;
-          this.callbacks.reportMessage(CompilerMessages.Error_MissingStringVariable({ id: id2 }));
-        }
-      }
+      // Sets
+      for (const { id, value } of variables.set) {
+        addId(id);
+        allSets.add(id);
+        // check for illegal references, here.
+        const stringrefs = VariableParser.allStringReferences(value);
+        st.string.add(SubstitutionUse.variable, stringrefs);
 
-      // Now split into spaces.
-      const items: string[] = VariableParser.setSplitter(value);
-      for (const item of items) {
-        const setrefs = VariableParser.allSetReferences(item);
-        if (setrefs.length > 1) {
-          // this is the form $[seta]$[setb]
-          valid = false;
-          this.callbacks.reportMessage(CompilerMessages.Error_NeedSpacesBetweenSetVariables({ item }));
-        } else {
-          for (const id2 of setrefs) {
-            if (!allSets.has(id2)) {
-              valid = false;
-              this.callbacks.reportMessage(CompilerMessages.Error_MissingSetVariable({ id: id2 }));
+        // Now split into spaces.
+        const items: string[] = VariableParser.setSplitter(value);
+        for (const item of items) {
+          const setrefs = VariableParser.allSetReferences(item);
+          if (setrefs.length > 1) {
+            // this is the form $[seta]$[setb]
+            valid = false;
+            this.callbacks.reportMessage(CompilerMessages.Error_NeedSpacesBetweenSetVariables({ item }));
+          } else {
+            st.set.add(SubstitutionUse.variable, setrefs); // the reference to a 'map'
+          }
+          // TODO-LDML: Are there other illegal cases here? what about "x$[set]"?
+        }
+      }
+      // UnicodeSets
+      for (const { id, value } of variables.uset) {
+        addId(id);
+        allUnicodeSets.add(id);
+        const stringrefs = VariableParser.allStringReferences(value);
+        st.string.add(SubstitutionUse.variable, stringrefs);
+        const setrefs = VariableParser.allSetReferences(value);
+        for (const id2 of setrefs) {
+          if (!allUnicodeSets.has(id2)) {
+            valid = false;
+            if (allSets.has(id2)) {
+              // $[set] in a UnicodeSet must be another UnicodeSet.
+              this.callbacks.reportMessage(CompilerMessages.Error_CantReferenceSetFromUnicodeSet({ id: id2 }));
+            } else {
+              st.uset.add(SubstitutionUse.variable, [id2]);
             }
           }
         }
-        // TODO-LDML: Are there other illegal cases here? what about "x$[set]"?
       }
     }
-    // UnicodeSets
-    for (const { id, value } of variables.unicodeSet) {
-      addId(id);
-      allUnicodeSets.add(id);
-      const stringrefs = VariableParser.allStringReferences(value);
-      for (const id2 of stringrefs) {
-        if (!allStrings.has(id2)) {
-          valid = false;
-          this.callbacks.reportMessage(CompilerMessages.Error_MissingStringVariable({ id: id2 }));
-        }
-      }
-      const setrefs = VariableParser.allSetReferences(value);
-      for (const id2 of setrefs) {
-        if (!allUnicodeSets.has(id2)) {
-          valid = false;
-          if (allSets.has(id2)) {
-            // $[set] in a UnicodeSet must be another UnicodeSet.
-            this.callbacks.reportMessage(CompilerMessages.Error_CantReferenceSetFromUnicodeSet({ id: id2 }));
-          } else {
-            this.callbacks.reportMessage(CompilerMessages.Error_MissingUnicodeSetVariable({ id: id2 }));
-          }
-        }
-      }
-    }
-
     // one report if any dups
     if (dups.size > 0) {
       this.callbacks.reportMessage(CompilerMessages.Error_DuplicateVariable({
@@ -145,26 +121,49 @@ export class VarsCompiler extends SectionCompiler {
       }));
       valid = false;
     }
+
+    // check for any missing vars
+    for (const id of st.set.all) {
+      // note: we check the uset list also. we don't know until later which was
+      // intended. collisions are handled separately.
+      if (!allSets.has(id) && !allUnicodeSets.has(id)) {
+        valid = false;
+        this.callbacks.reportMessage(CompilerMessages.Error_MissingSetVariable({ id }));
+      }
+    }
+    for (const id of st.string.all) {
+      if (!allStrings.has(id)) {
+        valid = false;
+        this.callbacks.reportMessage(CompilerMessages.Error_MissingStringVariable({ id }));
+      }
+    }
+    for (const id of st.uset.all) {
+      if (!allUnicodeSets.has(id)) {
+        valid = false;
+        this.callbacks.reportMessage(CompilerMessages.Error_MissingUnicodeSetVariable({ id }));
+      }
+    }
+
     return valid;
   }
 
-  private collectMarkers(mt : MarkerTracker) : boolean {
+  private collectSubstitutions(st: Substitutions): boolean {
     let valid = true;
 
     // call our friends to validate
-    valid = this.validateVarsMarkers(this.keyboard3, mt) && valid; // accumulate validity
-    valid = KeysCompiler.validateMarkers(this.keyboard3, mt) && valid; // accumulate validity
-    valid = TransformCompiler.validateMarkers(this.keyboard3, mt) && valid; // accumulate validity
-    valid = DispCompiler.validateMarkers(this.keyboard3, mt) && valid; // accumulate validity
-
+    valid = this.validateSubstitutions(this.keyboard3, st) && valid; // accumulate validity
+    valid = KeysCompiler.validateSubstitutions(this.keyboard3, st) && valid; // accumulate validity
+    valid = TransformCompiler.validateSubstitutions(this.keyboard3, st) && valid; // accumulate validity
+    valid = DispCompiler.validateSubstitutions(this.keyboard3, st) && valid; // accumulate validity
     return valid;
   }
 
-  private validateMarkers(): boolean {
-    const mt = new MarkerTracker();
-    let valid = this.collectMarkers(mt);
-    // see if there are any matched-but-not-emitted
+  private validateAllSubstitutions(): boolean {
+    const st = new Substitutions();
+    let valid = this.collectSubstitutions(st);
+    // see if there are any matched-but-not-emitted markers
     const matchedNotEmitted : Set<string> = new Set<string>();
+    const mt = st.markers;
     for (const m of mt.matched.values()) {
       if (m === MarkerParser.ANY_MARKER_ID) continue; // match-all marker
       if (!mt.emitted.has(m)) {
@@ -183,12 +182,19 @@ export class VarsCompiler extends SectionCompiler {
       this.callbacks.reportMessage(CompilerMessages.Error_MissingMarkers({ ids: Array.from(matchedNotEmitted.values()).sort() }));
       valid = false;
     }
+
+    // now, validate the variables.
+    valid = this.validateVars(st) && valid;
+
     return valid;
   }
 
-  validateVarsMarkers(keyboard: LDMLKeyboard.LKKeyboard, mt : MarkerTracker) : boolean {
+  validateSubstitutions(keyboard: LDMLKeyboard.LKKeyboard, st : Substitutions) : boolean {
     keyboard?.variables?.string?.forEach(({value}) =>
-          mt.add(MarkerUse.variable, MarkerParser.allReferences(value)));
+          st.markers.add(SubstitutionUse.variable, MarkerParser.allReferences(value)));
+    // get markers mentioned in a set
+    keyboard?.variables?.set?.forEach(({ value }) =>
+      VariableParser.setSplitter(value).forEach(v => st.markers.add(SubstitutionUse.match, MarkerParser.allReferences(v))));
     return true;
   }
 
@@ -205,18 +211,21 @@ export class VarsCompiler extends SectionCompiler {
     // first, strings.
     variables?.string?.forEach((e) =>
       this.addString(result, e, sections));
-    variables?.set?.forEach((e) =>
-      this.addSet(result, e, sections));
-    variables?.unicodeSet?.forEach((e) =>
+    variables?.uset?.forEach((e) =>
       this.addUnicodeSet(result, e, sections));
 
     // reload markers - TODO-LDML: double work!
-    const mt = new MarkerTracker();
-    this.collectMarkers(mt);
+    const st = new Substitutions();
+    this.collectSubstitutions(st);
+    const mt = st.markers;
 
     // collect all markers, excluding the match-all
     const allMarkers : string[] = Array.from(mt.all).filter(m => m !== MarkerParser.ANY_MARKER_ID).sort();
     result.markers = sections.list.allocList(allMarkers, {}, sections);
+
+    // sets need to be added late, because they can refer to markers
+    variables?.set?.forEach((e) =>
+      this.addSet(result, e, sections));
 
     return result.valid() ? result : null;
   }
@@ -236,15 +245,20 @@ export class VarsCompiler extends SectionCompiler {
     value = result.substituteStrings(value, sections);
     // OK to do this as a substitute, because we've already validated the set above.
     value = result.substituteSets(value, sections);
-    const items : string[] = VariableParser.setSplitter(value);
-    result.sets.push(new SetVarItem(id, items, sections));
+    // raw items - without marker substitution
+    const rawItems: string[] = VariableParser.setSplitter(value);
+    // cooked items - has substutition of markers
+    // this is not 'forMatch', all variables are to be assumed as string literals, not regex
+    // content.
+    const cookedItems: string[] = rawItems.map(v => result.substituteMarkerString(v, false));
+    result.sets.push(new SetVarItem(id, cookedItems, sections, rawItems));
   }
-  addUnicodeSet(result: Vars, e: LDMLKeyboard.LKUnicodeSet, sections: DependencySections): void {
+  addUnicodeSet(result: Vars, e: LDMLKeyboard.LKUSet, sections: DependencySections): void {
     const { id } = e;
     let { value } = e;
     value = result.substituteStrings(value, sections);
     value = result.substituteUnicodeSets(value, sections);
-    result.unicodeSets.push(new UnicodeSetItem(id, value, sections, sections.usetparser));
+    result.usets.push(new UnicodeSetItem(id, value, sections, sections.usetparser));
   }
   // routines for using/substituting variables have been moved to the Vars class and its
   // properties

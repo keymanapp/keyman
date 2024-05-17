@@ -5,8 +5,8 @@
 package com.keyman.android;
 
 import com.tavultesoft.kmapro.BuildConfig;
+import com.tavultesoft.kmapro.DefaultLanguageResource;
 import com.tavultesoft.kmapro.KeymanSettingsActivity;
-import com.keyman.android.BannerController;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.KMManager.KeyboardType;
 import com.keyman.engine.KMHardwareKeyboardInterpreter;
@@ -42,6 +42,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   private static View inputView = null;
   private static ExtractedText exText = null;
   private KMHardwareKeyboardInterpreter interpreter = null;
+  private int lastOrientation = Configuration.ORIENTATION_UNDEFINED;
 
   private static final String TAG = "SystemKeyboard";
 
@@ -56,6 +57,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     if (DependencyUtil.libraryExists(LibraryType.SENTRY) && !Sentry.isEnabled()) {
       Log.d(TAG, "Initializing Sentry");
       SentryAndroid.init(getApplicationContext(), options -> {
+        options.setEnableAutoSessionTracking(false);
         options.setRelease(com.tavultesoft.kmapro.BuildConfig.VERSION_GIT_TAG);
         options.setEnvironment(com.tavultesoft.kmapro.BuildConfig.VERSION_ENVIRONMENT);
       });
@@ -64,11 +66,13 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       KMManager.setDebugMode(true);
     }
     KMManager.addKeyboardEventListener(this);
-    KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
-    interpreter = new KMHardwareKeyboardInterpreter(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
+    Context context = getApplicationContext();
+    KMManager.initialize(context, KeyboardType.KEYBOARD_TYPE_SYSTEM);
+    DefaultLanguageResource.install(context);
+    interpreter = new KMHardwareKeyboardInterpreter(context, KeyboardType.KEYBOARD_TYPE_SYSTEM);
     KMManager.setInputMethodService(this); // for HW interface
 
-    SharedPreferences prefs = getApplicationContext().getSharedPreferences(getApplicationContext().getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     KMManager.SpacebarText spacebarText = KMManager.SpacebarText.fromString(prefs.getString(KeymanSettingsActivity.spacebarTextKey, KMManager.SpacebarText.LANGUAGE_KEYBOARD.toString()));
     KMManager.setSpacebarText(spacebarText);
 
@@ -127,7 +131,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   @Override
   public void onUpdateSelection(int oldSelStart, int oldSelEnd, int newSelStart, int newSelEnd, int candidatesStart, int candidatesEnd) {
     super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd, candidatesStart, candidatesEnd);
-    KMManager.updateSelectionRange(KMManager.KeyboardType.KEYBOARD_TYPE_SYSTEM, newSelStart, newSelEnd);
+    KMManager.updateSelectionRange(KMManager.KeyboardType.KEYBOARD_TYPE_SYSTEM);
   }
 
   /**
@@ -167,9 +171,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
       if (icText != null) {
         boolean didUpdateText = KMManager.updateText(KeyboardType.KEYBOARD_TYPE_SYSTEM, icText.text.toString());
-        int selStart = icText.startOffset + icText.selectionStart;
-        int selEnd = icText.startOffset + icText.selectionEnd;
-        boolean didUpdateSelection = KMManager.updateSelectionRange(KeyboardType.KEYBOARD_TYPE_SYSTEM, selStart, selEnd);
+        boolean didUpdateSelection = KMManager.updateSelectionRange(KeyboardType.KEYBOARD_TYPE_SYSTEM);
         if (!didUpdateText || !didUpdateSelection)
           exText = icText;
       }
@@ -195,7 +197,10 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   @Override
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
-    KMManager.onConfigurationChanged(newConfig);
+    if (newConfig.orientation != lastOrientation) {
+      lastOrientation = newConfig.orientation;
+      KMManager.onConfigurationChanged(newConfig);
+    }
   }
 
   @Override
@@ -213,13 +218,12 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     super.onComputeInsets(outInsets);
 
     // We should extend the touchable region so that Keyman sub keys menu can receive touch events outside the keyboard frame
-    WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-    Point size = new Point(0, 0);
-    wm.getDefaultDisplay().getSize(size);
+    Point size = KMManager.getWindowSize(getApplicationContext());
 
     int inputViewHeight = 0;
-    if (inputView != null)
+    if (inputView != null) {
       inputViewHeight = inputView.getHeight();
+    }
 
     int bannerHeight = KMManager.getBannerHeight(this);
     int kbHeight = KMManager.getKeyboardHeight(this);

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 conformsTo="45" xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" >
+  <info name="fail-missing-var-1"/>
+
+  <keys />
+
+  <variables>
+    <set id="aset" value="A B C" />
+  </variables>
+
+  <transforms type="simple">
+    <transformGroup>
+      <transform from="($[missingset])" to="$[1:aset]" /> <!-- fail: undefined var -->
+    </transformGroup>
+  </transforms>
+</keyboard3>

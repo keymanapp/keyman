@@ -1,4 +1,4 @@
-let assert = chai.assert;
+import { assert } from '../../../../../../node_modules/chai/chai.js';
 
 import { DOMKeyboardLoader } from '../../../build/lib/dom-keyboard-loader.mjs';
 import { extendString, KeyboardHarness, KeyboardInterface, MinimalKeymanGlobal, Mock } from '../../../build/lib/index.mjs';

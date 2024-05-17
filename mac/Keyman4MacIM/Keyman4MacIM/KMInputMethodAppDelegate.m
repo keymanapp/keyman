@@ -224,12 +224,7 @@ NSString* _keymanDataPath = nil;
                 _downloadFilename = [NSString stringWithString:[value substringFromIndex:index+9]];
             else if ((index = [value rangeOfString:@"url="].location) != NSNotFound) {
                 NSString *urlString = [NSString stringWithString:[value substringFromIndex:index+4]];
-                if ([urlString respondsToSelector:@selector(stringByRemovingPercentEncoding)])
-                    urlString = [urlString stringByRemovingPercentEncoding];
-                else if ([urlString respondsToSelector:@selector(stringByReplacingPercentEscapesUsingEncoding:)]) {
-                    // OS version prior to 10.9 - use this (now deprecated) method instead:
-                    urlString = [urlString stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-                }
+                urlString = [urlString stringByRemovingPercentEncoding];
                 downloadUrl = [NSURL URLWithString:urlString];
             }
         }
@@ -335,9 +330,14 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
                 // of events)
                 if(sysEvent.keyCode == kVK_Delete && appDelegate.inputController != nil) {
                     NSLog(@"Event tap handling kVK_Delete.");
-                    [appDelegate.inputController handleBackspace:sysEvent];
+                  [appDelegate.inputController handleBackspace:sysEvent];
+                } else if(sysEvent.keyCode == kVK_Delete) {
+                    NSLog(@"Event tap not handling kVK_Delete, appDelegate.inputController = %@", appDelegate.inputController);
+                }
+                if(sysEvent.keyCode == 255) {
+                  NSLog(@"*** kKeymanEventKeyCode = 0xFF");
                 } else {
-                  NSLog(@"Event tap not handling kVK_Delete, appDelegate.inputController = %@", appDelegate.inputController);
+                  NSLog(@"*** other: %d(%x)", (char) sysEvent.keyCode, sysEvent.keyCode);
                 }
 
                 switch(sysEvent.keyCode) {
@@ -443,7 +443,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         return;
     }
 
-  // TODO pass array instead of making repeated calls
+  // TODO: pass array instead of making repeated calls
     for (NSString *key in persistedOptionsForSelectedKeyboard) {
         NSString *value = [persistedOptionsForSelectedKeyboard objectForKey:key];
         NSLog(@"persisted options found in UserDefaults for keyboard %@, key: %@, value: %@", _selectedKeyboard, key, value);
@@ -1156,7 +1156,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         [_downloadInfoView setMessageText:NSLocalizedString(@"message-keyboard-downloading", nil)];
         [_downloadInfoView setInformativeText:@""];
         [_downloadInfoView addButtonWithTitle:NSLocalizedString(@"button-cancel-downloading", nil)];
-        [_downloadInfoView setAlertStyle:NSInformationalAlertStyle];
+        [_downloadInfoView setAlertStyle:NSAlertStyleInformational];
         [_downloadInfoView setAccessoryView:self.progressIndicator];
     }
 

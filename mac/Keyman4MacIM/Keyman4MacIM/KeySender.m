@@ -29,33 +29,6 @@ const CGKeyCode kKeymanEventKeyCode = 0xFF;
   return self;
 }
 
-- (void)sendKeyDown:(NSUInteger)keyCode forSourceEvent:(NSEvent *)event includeKeyUp:(BOOL)includeKeyUpEvent {
-  // Returns the frontmost app, which is the app that receives key events.
-  NSRunningApplication *app = NSWorkspace.sharedWorkspace.frontmostApplication;
-  pid_t processId = app.processIdentifier;
-  NSString *bundleId = app.bundleIdentifier;
-
-  [self.appDelegate logDebugMessage:@"sendKeyDown keyCode %lu to app %@ with pid %d", (unsigned long)keyCode, bundleId, processId];
-
-  if (keyCode < 0x100) {
-    CGEventRef cgevent = [event CGEvent];
-
-    // use source from event to generate new event
-    CGEventSourceRef source = CGEventCreateSourceFromEvent(cgevent);
-    CGEventRef keyDownEvent = CGEventCreateKeyboardEvent(source, (CGKeyCode)keyCode, true);
-
-    // TODO: add version check
-    CGEventPostToPid(processId, keyDownEvent);
-    CFRelease(keyDownEvent);
-
-    if (includeKeyUpEvent) {
-      CGEventRef keyUpEvent = CGEventCreateKeyboardEvent(source, (CGKeyCode)keyCode, false);
-      CGEventPostToPid(processId, keyUpEvent);
-      CFRelease(keyUpEvent);
-    }
-  }
-}
-
 - (void)sendBackspaceforEventSource:(CGEventSourceRef)eventSource {
   [self.appDelegate logDebugMessage:@"KeySender sendBackspaceforEventSource"];
 
@@ -90,8 +63,8 @@ const CGKeyCode kKeymanEventKeyCode = 0xFF;
 - (void)sendKeymanKeyCodeForEvent:(NSEvent *)event {
   [self.appDelegate logDebugMessage:@"KeySender sendKeymanKeyCodeForEvent"];
   
-  [self sendKeyDown:kKeymanEventKeyCode forSourceEvent:event includeKeyUp:NO];
-  
+  ProcessSerialNumber psn;
+
   // Returns the frontmost app, which is the app that receives key events.
   NSRunningApplication *app = NSWorkspace.sharedWorkspace.frontmostApplication;
   pid_t processId = app.processIdentifier;
@@ -99,13 +72,9 @@ const CGKeyCode kKeymanEventKeyCode = 0xFF;
   
   [self.appDelegate logDebugMessage:@"sendKeymanKeyCodeForEvent keyCode %lu to app %@ with pid %d", (unsigned long)kKeymanEventKeyCode, bundleId, processId];
   
-  CGEventRef cgevent = [event CGEvent];
-  
-  // use source from event to generate new event
-  CGEventSourceRef source = CGEventCreateSourceFromEvent(cgevent);
-  CGEventRef keyDownEvent = CGEventCreateKeyboardEvent(source, kKeymanEventKeyCode, true);
-  
-  // TODO: add version check
+  // use nil as source, as this generated event is not directly tied to the originating event
+  CGEventRef keyDownEvent = CGEventCreateKeyboardEvent(nil, kKeymanEventKeyCode, true);
+
   CGEventPostToPid(processId, keyDownEvent);
   CFRelease(keyDownEvent);
   

@@ -1,5 +1,5 @@
 import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
-import { LDMLKeyboard, KMXPlus, Constants, MarkerParser } from '@keymanapp/common-types';
+import { LDMLKeyboard, KMXPlus, Constants } from '@keymanapp/common-types';
 import { CompilerMessages } from './messages.js';
 import { SectionCompiler } from "./section-compiler.js";
 
@@ -9,19 +9,17 @@ import KeysKeys = KMXPlus.KeysKeys;
 import ListItem = KMXPlus.ListItem;
 import KeysFlicks = KMXPlus.KeysFlicks;
 import { allUsedKeyIdsInFlick, allUsedKeyIdsInKey, allUsedKeyIdsInLayers, calculateUniqueKeys, hashFlicks, hashKeys, translateLayerAttrToModifier, validModifier } from '../util/util.js';
-import { MarkerTracker, MarkerUse } from './marker-tracker.js';
+import { SubstitutionUse, Substitutions } from './substitution-tracker.js';
 
 /** reserved name for the special gap key. space is not allowed in key ids. */
 const reserved_gap = "gap (reserved)";
 
 
 export class KeysCompiler extends SectionCompiler {
-  static validateMarkers(
+  static validateSubstitutions(
     keyboard: LDMLKeyboard.LKKeyboard,
-    mt: MarkerTracker
+    st: Substitutions
   ): boolean {
-    // TODO-LDML: repetition
-
     const uniqueKeys = calculateUniqueKeys([...keyboard.keys?.key]);
     const keyBag = hashKeys(uniqueKeys); // for easier lookup
     // will be the set of ALL keys used in this keyboard
@@ -33,11 +31,11 @@ export class KeysCompiler extends SectionCompiler {
     KeysCompiler.addKeysFromFlicks(usedFlicks, flickHash, usedKeys);
     KeysCompiler.addUsedGestureKeys(layerKeyIds, keyBag, usedKeys);
 
-    // process each key
+    // process each used key. unused keys don't get checked.
     for (let keyId of usedKeys.values()) {
       const key = keyBag.get(keyId);
-      if (!key) continue;
-      mt.add(MarkerUse.emit, MarkerParser.allReferences(key.output));
+      if (!key) continue; // key not found is handled elsewhere.
+      st.addStringAndMarkerSubstitution(SubstitutionUse.emit, key.output);
     }
     return true;
   }
@@ -489,7 +487,7 @@ export class KeysCompiler extends SectionCompiler {
     sect: Keys,
     hardware: string
   ): Keys {
-    const mod = translateLayerAttrToModifier(layer);
+    const mods = translateLayerAttrToModifier(layer);
     const keymap = this.getKeymapFromForm(hardware);
 
     // Iterate over rows (y) and cols (x) of the scancodes table.
@@ -515,11 +513,14 @@ export class KeysCompiler extends SectionCompiler {
         if (x < keys.length) {
           key = keys[x];
         }
-        sect.kmap.push({
-          vkey,
-          mod,
-          key, // key id, to be changed into key index at finalization
-        });
+        // push every combination
+        for (const mod of mods) {
+          sect.kmap.push({
+            vkey,
+            mod,
+            key, // key id, to be changed into key index at finalization
+          });
+        }
       }
     }
     return sect;

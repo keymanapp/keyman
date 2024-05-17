@@ -1,5 +1,4 @@
-var assert = chai.assert;
-var expect = chai.expect;
+import { assert, expect } from '../../../../../../../../node_modules/chai/chai.js';
 
 import {
   HostFixtureLayoutController,
@@ -91,12 +90,12 @@ describe("Layer one - DOM -> InputSequence", function() {
             const sampleResult = resultContactPath[j];
             const sampleOriginal = originalContactPath[j];
 
-            assert.isOk(sampleResult, `An expected sample was missing during simulation - failed at path entry ${j}`);
-            assert.isOk(sampleOriginal, `An extra sample was generated during simulation - failed at path entry ${j}`);
+            assert.isOk(sampleResult, `An expected sample was missing during simulation - failed at path entry ${j}, path ${i}`);
+            assert.isOk(sampleOriginal, `An extra sample was generated during simulation - failed at path entry ${j}, path ${i}`);
 
             // During test runs against a real Android device, we tend to get almost, but not-quite, integer targetX and targetY values.
-            expect(sampleResult.targetX).to.be.closeTo(sampleOriginal.targetX, 1e-4, `Mismatch in x-coord at path entry ${j}`);
-            expect(sampleResult.targetY).to.be.closeTo(sampleOriginal.targetY, 1e-4, `Mismatch in y-coord at path entry ${j}`);
+            expect(sampleResult.targetX).to.be.closeTo(sampleOriginal.targetX, 1e-4, `Mismatch in x-coord at path entry ${j}, path ${i}`);
+            expect(sampleResult.targetY).to.be.closeTo(sampleOriginal.targetY, 1e-4, `Mismatch in y-coord at path entry ${j}, path ${i}`);
           }
         }
 

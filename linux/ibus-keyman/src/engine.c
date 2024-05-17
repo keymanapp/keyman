@@ -219,9 +219,9 @@ static gchar *
 get_context_debug(IBusEngine *engine) {
   IBusKeymanEngine *keyman       = (IBusKeymanEngine *)engine;
 
-  km_core_cp *buf = km_core_state_context_debug(keyman->state, KM_CORE_DEBUG_CONTEXT_CACHED);
+  km_core_cu *buf = km_core_state_context_debug(keyman->state, KM_CORE_DEBUG_CONTEXT_CACHED);
   gchar *result = g_utf16_to_utf8((gunichar2 *)buf, -1, NULL, NULL, NULL);
-  km_core_cp_dispose(buf);
+  km_core_cu_dispose(buf);
   if(result) {
     return result;
   }
@@ -292,7 +292,7 @@ set_context_if_needed(IBusEngine *engine) {
   g_message("%s: new application context: |%s| (len:%u) cursor:%d anchor:%d", __FUNCTION__,
     application_context_utf8, context_end - context_start, cursor_pos, anchor_pos);
 
-  km_core_cp *application_context_utf16 = g_utf8_to_utf16(application_context_utf8, -1, NULL, NULL, NULL);
+  km_core_cu *application_context_utf16 = g_utf8_to_utf16(application_context_utf8, -1, NULL, NULL, NULL);
   km_core_context_status result;
   result = km_core_state_context_set_if_needed(keyman->state, application_context_utf16);
   g_free(application_context_utf16);
@@ -326,7 +326,7 @@ ibus_keyman_engine_init(IBusKeymanEngine *keyman) {
   keyman->state = NULL;
 }
 
-static km_core_cp* get_base_layout()
+static km_core_cu* get_base_layout()
 {
   return u"en-US";
 
@@ -354,7 +354,7 @@ static km_core_cp* get_base_layout()
     lang = strdup("en-US");
   }
   g_message("lang is %s", lang);
-  km_core_cp *cp = g_utf8_to_utf16(lang, -1, NULL, NULL, NULL);
+  km_core_cu *cp = g_utf8_to_utf16(lang, -1, NULL, NULL, NULL);
   return cp;
   // g_free(lang);
 #endif
@@ -395,8 +395,8 @@ free_km_core_option_item(gpointer data) {
     return;
 
   km_core_option_item *opt = (km_core_option_item *)data;
-  g_free((km_core_cp *)opt->key);
-  g_free((km_core_cp *)opt->value);
+  g_free((km_core_cu *)opt->key);
+  g_free((km_core_cu *)opt->value);
   g_free(opt);
 }
 

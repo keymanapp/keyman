@@ -4,7 +4,7 @@ import Device from '/@keymanapp/keyman/build/engine/device-detect/lib/index.mjs'
 import { loadKeyboardsFromStubs } from '../../kbdLoader.mjs';
 import { timedPromise } from '/@keymanapp/web-utils/build/lib/index.mjs';
 
-let assert = chai.assert;
+import { assert } from '/node_modules/chai/chai.js';
 
 const device = new Device();
 device.detect();

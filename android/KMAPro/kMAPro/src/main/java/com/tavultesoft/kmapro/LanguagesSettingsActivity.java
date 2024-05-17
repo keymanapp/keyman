@@ -152,6 +152,7 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
 
   @Override
   public void onBackPressed() {
+    super.onBackPressed();
     finish();
   }
 

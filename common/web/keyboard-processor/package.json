@@ -19,7 +19,6 @@
   "devDependencies": {
     "@keymanapp/resources-gosh": "*",
     "c8": "^7.12.0",
-    "chai": "^4.3.4",
     "karma": "^6.4.1",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^2.2.0",
@@ -40,8 +39,7 @@
     "@keymanapp/common-types": "*",
     "@keymanapp/models-types": "*",
     "@keymanapp/keyman-version": "*",
-    "@keymanapp/web-utils": "*",
-    "@types/node": "^11.9.4"
+    "@keymanapp/web-utils": "*"
   },
   "type": "module",
   "main": "./build/obj/index.js",

@@ -38,7 +38,7 @@ export function build_vars(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_e
     value: build_strs_index(sect_strs, v.value),
     elem: build_elem_index(sect_elem, v.items),
   });
-  const uniSetVars = kmxplus.vars.unicodeSets.map(v => <BUILDER_VARS_ITEM>{
+  const uniSetVars = kmxplus.vars.usets.map(v => <BUILDER_VARS_ITEM>{
     type: constants.vars_entry_type_unicodeSet,
     id: build_strs_index(sect_strs, v.id),
     value: build_strs_index(sect_strs, v.value),

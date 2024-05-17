@@ -1,0 +1,16 @@
+store(&NAME) 'error_extended_string_too_long'
+store(&VERSION) '9.0'
+
+begin unicode > use(main)
+
+group(main) using keys
+
+c
+c maximum store length is 4096 UTF-16 code units, including U+0000 terminator
+c #define GLOBAL_BUFSIZE  4096   // compfile.h
+c so we need 0x101B - 0x0020 + 1 = 0x0FFD --> 4092 words, + 4 = 4096 = too long
+c See #11136 for calculation adjustment TODO
+
+store(x)    U+0020 .. U+101B
+
+outs(x) 'abcd' + 'x' > 'x' context

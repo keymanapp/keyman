@@ -28,7 +28,7 @@ config.engineVersion = program.engineVersion;
 let keyboards = util.getKeyboardFolders(KEYBOARDS_ROOT, true);
 
 let code = `
-  let assert = chai.assert;
+  import { assert } from '../../../../../../node_modules/chai/chai.js';
 `;
 
 keyboards.forEach(function(keyboard) {

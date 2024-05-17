@@ -30,9 +30,9 @@
 //    NSLog(@"topFill origin x %f y %f  size h %f w %f after raising to imgHeight %ld", topFill.origin.x, topFill.origin.y, topFill.size.height, topFill.size.width, imgOriginHeightDelta);
 //    NSLog(@"botFill origin x %f y %f  size h %f w %f after reducing by imgHeight %ld", botFill.origin.x, botFill.origin.y, botFill.size.height, botFill.size.width, imgOriginHeightDelta);
     [[NSColor whiteColor] setFill];
-    NSRectFillUsingOperation(topFill, NSCompositeSourceOver);
+    NSRectFillUsingOperation(topFill, NSCompositingOperationSourceOver);
     [[NSColor windowBackgroundColor] setFill];
-    NSRectFillUsingOperation(botFill, NSCompositeSourceOver);
+    NSRectFillUsingOperation(botFill, NSCompositingOperationSourceOver);
 }
 
 - (BOOL)mouseDownCanMoveWindow {

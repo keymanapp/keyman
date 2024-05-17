@@ -64,7 +64,7 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
     
     // if we do not have hard-coded noncompliance, then test the app
     if (![self applyNoncompliantAppLists:appId]) {
-      [self testCompliance:client];
+      [self checkCompliance:client];
     }
   }
   return self;
@@ -76,77 +76,116 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
 }
 
 /** test to see if the API selectedRange functions properly for the text input client  */
--(void) testCompliance:(id) client {
-  BOOL selectionApiVerified = NO;
-
+-(void) checkCompliance:(id) client {
   // confirm that the API actually exists (this always seems to return true)
-  selectionApiVerified = [client respondsToSelector:@selector(selectedRange)];
+  self.hasCompliantSelectionApi = [client respondsToSelector:@selector(selectedRange)];
   
-  if (!selectionApiVerified) {
+  if (!self.hasCompliantSelectionApi) {
     self.complianceUncertain = NO;
-    self.hasCompliantSelectionApi = NO;
   }
   else {
     // if API exists, call it and see if it works as expected
-    NSRange selectionRange = [client selectedRange];
-    self.initialSelection = selectionRange;
-    [self.appDelegate logDebugMessage:@"TextApiCompliance testCompliance, location = %lu, length = %lu", selectionRange.location, selectionRange.length];
-    
-    if (selectionRange.location == NSNotFound) {
-      // NSNotFound may just mean that we don't have the focus yet; say NO for
-      // now, but this may toggle back to YES after the first insertText
-      selectionApiVerified = NO;
-      self.complianceUncertain = YES;
-      [self.appDelegate logDebugMessage:@"TextApiCompliance testCompliance not compliant but uncertain, range is NSNotFound"];
-    } else if (selectionRange.location >= 0) {
-      // location greater than or equal to zero may just mean that the client
-      // returns an inaccurate value; say YES for now, but set back to NO if the
-      // first insertText does not cause a change in the selection
-      selectionApiVerified = YES;
-      self.complianceUncertain = YES;
-      [self.appDelegate logDebugMessage:@"TextApiCompliance testCompliance compliant but uncertain, location >= 0"];
-    }
+    self.initialSelection = [client selectedRange];
+    [self.appDelegate logDebugMessage:@"TextApiCompliance checkCompliance, location = %lu, length = %lu", self.initialSelection.location, self.initialSelection.length];
+    [self checkComplianceUsingInitialSelection];
   }
-  [self.appDelegate logDebugMessage:@"TextApiCompliance testCompliance workingSelectionApi for app %@: set to %@", self.clientApplicationId, selectionApiVerified?@"yes":@"no"];
-
-  self.hasCompliantSelectionApi = selectionApiVerified;
+  [self.appDelegate logDebugMessage:@"TextApiCompliance checkCompliance workingSelectionApi for app %@: set to %@", self.clientApplicationId, self.complianceUncertain?@"YES":@"NO"];
 }
 
-/** if complianceUncertain is true, checking the selection after an insert can make it clear  */
--(void) testComplianceAfterInsert:(id) client {
-  if(self.complianceUncertain) {
-    NSRange selectionRange = [client selectedRange];
-    [self.appDelegate logDebugMessage:@"TextApiCompliance testSelectionApiAfterInsert, location = %lu, length = %lu", selectionRange.location, selectionRange.length];
-    
-    if (selectionRange.location == NSNotFound) {
-      // NO for certain, insertText means we have focus, NSNotFound means that the selection API does not work
-      self.hasCompliantSelectionApi = NO;
-      self.complianceUncertain = NO;
-      [self.appDelegate logDebugMessage:@"TextApiCompliance testComplianceAfterInsert certain, non-compliant, range is NSNotFound"];
-    } else if (selectionRange.location == 0) {
-      // NO for certain, after an insertText we cannot be at location 0
-      self.hasCompliantSelectionApi = NO;
-      self.complianceUncertain = NO;
-      [self.appDelegate logDebugMessage:@"TextApiCompliance testComplianceAfterInsert certain, non-compliant, location = 0"];
-    } else if (selectionRange.location > 0) {
-      if (NSEqualRanges(selectionRange, self.initialSelection)) {
-        // NO for certain, when the selection is unchanged after an insert
-        self.hasCompliantSelectionApi = NO;
-        self.complianceUncertain = NO;
-        [self.appDelegate logDebugMessage:@"TextApiCompliance testComplianceAfterInsert certain, non-compliant, selection the same: initial location = %@, new location = %@", NSStringFromRange(self.initialSelection), NSStringFromRange(selectionRange)];
-      } else {
-        // YES for certain, when the selection is changed after an insert
-        self.hasCompliantSelectionApi = YES;
-        self.complianceUncertain = NO;
-        [self.appDelegate logDebugMessage:@"TextApiCompliance testComplianceAfterInsert certain, compliant, selection changed from initial location = %@ to new location = %@", NSStringFromRange(self.initialSelection), NSStringFromRange(selectionRange)];
-      }
-    }
-    
-    [self.appDelegate logDebugMessage:@"TextApiCompliance testComplianceAfterInsert, self.hasWorkingSelectionApi = %@ for app %@", self.hasCompliantSelectionApi?@"yes":@"no", self.clientApplicationId];
-    [self.appDelegate logDebugMessage:@"TextApiCompliance testComplianceAfterInsert TextApiCompliance: %@", self];
- } else {
-   [self.appDelegate logDebugMessage:@"TextApiCompliance testSelectionApiAfterInsert, compliance is already known"];
+-(void) checkComplianceUsingInitialSelection {
+  if (self.initialSelection.location == NSNotFound) {
+    /**
+     * NSNotFound may just mean that we don't have the focus yet; say NO for now
+     * now, but this may toggle back to YES after the first insertText
+     */
+    self.hasCompliantSelectionApi = NO;
+    self.complianceUncertain = YES;
+    [self.appDelegate logDebugMessage:@"TextApiCompliance checkComplianceUsingInitialSelection not compliant but uncertain, range is NSNotFound"];
+  } else if (self.initialSelection.location >= 0) {
+    /**
+     * location greater than or equal to zero may just mean that the client
+     * returns an inaccurate value; say YES for now, but set back to NO if the
+     * if the selection is not consistent with the first insert
+     */
+    self.hasCompliantSelectionApi = YES;
+    self.complianceUncertain = YES;
+    [self.appDelegate logDebugMessage:@"TextApiCompliance checkComplianceUsingInitialSelection compliant but uncertain, location >= 0"];
   }
+}
+
+/**
+ * If complianceUncertain is true, checking the location after an insert can confirm whether the app is compliant.
+ * Delete and insert are what core instructed us to do.
+ * Text that was selected in the client when the key was processed is irrelevant as it does not affect the location.
+ */
+-(void) checkComplianceAfterInsert:(id) client delete:(NSString *)textToDelete insert:(NSString *)textToInsert {
+  
+  // return if compliance is already certain
+  if(!self.complianceUncertain) {
+    [self.appDelegate logDebugMessage:@"TextApiCompliance checkComplianceAfterInsert, compliance is already known"];
+    return;
+  }
+  
+  NSRange selectionRange = [client selectedRange];
+  if ([self validateNewLocation:selectionRange.location delete:textToDelete]) {
+    BOOL changeExpected = [self isLocationChangeExpectedOnInsert:textToDelete insert:textToInsert];
+    BOOL locationChanged = [self hasLocationChanged:selectionRange];
+    [self validateLocationChange:changeExpected hasLocationChanged:locationChanged];
+  }
+
+  [self.appDelegate logDebugMessage:@"TextApiCompliance checkComplianceAfterInsert, self.hasWorkingSelectionApi = %@ for app %@", self.hasCompliantSelectionApi?@"YES":@"NO", self.clientApplicationId];
+}
+
+- (BOOL)validateNewLocation:(NSUInteger)location delete:(NSString *)textToDelete  {
+  BOOL validLocation = NO;
+  
+  if (location == NSNotFound) {
+    // invalid location: insertText means we have focus, NSNotFound means selection API not functioning
+    self.hasCompliantSelectionApi = NO;
+    self.complianceUncertain = NO;
+    [self.appDelegate logDebugMessage:@"TextApiCompliance validateNewLocation = NO, location is NSNotFound"];
+  } else if ((location == 0) && (textToDelete.length > 0)) {
+    // invalid location: cannot have text to delete at location zero
+    self.hasCompliantSelectionApi = NO;
+    self.complianceUncertain = NO;
+    [self.appDelegate logDebugMessage:@"TextApiCompliance validateNewLocation = NO, location is zero with textToDelete.length > 0"];
+  } else {
+    // location is valid, but do not know if it is compliant yet
+    validLocation = YES;
+    [self.appDelegate logDebugMessage:@"TextApiCompliance validateNewLocation = YES, newLocation = %d, oldLocation = %d", location, self.initialSelection.location];
+  }
+  return validLocation;
+}
+
+- (void) validateLocationChange:(BOOL) changeExpected hasLocationChanged:(BOOL) locationChanged {
+
+  if (changeExpected == locationChanged) {
+    // YES for certain, the location is where we expect it
+    self.hasCompliantSelectionApi = YES;
+    self.complianceUncertain = NO;
+    [self.appDelegate logDebugMessage:@"TextApiCompliance validateLocationChange compliant, locationChanged = %@, changeExpected = %@", locationChanged?@"YES":@"NO", changeExpected?@"YES":@"NO"];
+  } else if (changeExpected != locationChanged) {
+    // NO for certain, when the selection is unchanged after an insert
+    self.hasCompliantSelectionApi = NO;
+    self.complianceUncertain = NO;
+    [self.appDelegate logDebugMessage:@"TextApiCompliance validateLocationChange non-compliant, locationChanged = %@, changeExpected = %@", locationChanged?@"YES":@"NO", changeExpected?@"YES":@"NO"];
+  }
+}
+
+- (BOOL)isLocationChangeExpectedOnInsert:(NSString *)textToDelete insert:(NSString *)textToInsert {
+  BOOL changeExpected = textToInsert.length != textToDelete.length;
+  [self.appDelegate logDebugMessage:@"TextApiCompliance isLocationChangeExpected, changeExpected = %@", changeExpected?@"YES":@"NO"];
+
+  return changeExpected;
+}
+
+- (BOOL)hasLocationChanged:(NSRange)newSelection {
+  NSUInteger newLocation = newSelection.location;
+  NSUInteger oldLocation = self.initialSelection.location;
+  BOOL locationChanged = newLocation != oldLocation;
+  [self.appDelegate logDebugMessage:@"TextApiCompliance hasLocationChanged, currentSelection = %lu, length = %lu", newSelection.location, newSelection.length];
+
+  return locationChanged;
 }
 
 /**
@@ -159,7 +198,7 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
     isAppNonCompliant = [self containedInUserManagedNoncompliantAppList:clientAppId];
   }
   
-  [self.appDelegate logDebugMessage:@"containedInNoncompliantAppLists: for app %@: %@", clientAppId, isAppNonCompliant?@"yes":@"no"];
+  [self.appDelegate logDebugMessage:@"applyNoncompliantAppLists: for app %@: %@", clientAppId, isAppNonCompliant?@"YES":@"NO"];
   
   if (isAppNonCompliant) {
     self.complianceUncertain = NO;

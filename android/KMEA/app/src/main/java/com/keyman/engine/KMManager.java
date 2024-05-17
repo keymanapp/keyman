@@ -25,6 +25,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.graphics.Point;
 import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
 import android.net.ConnectivityManager;
@@ -32,6 +34,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.IBinder;
 import android.text.InputType;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.Display;
@@ -39,6 +42,7 @@ import android.view.Surface;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.WindowMetrics;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
@@ -1632,6 +1636,12 @@ public final class KMManager {
     return KeyboardPickerActivity.removeKeyboard(context, position);
   }
 
+  public static boolean isDefaultKey(String key) {
+    return (
+      key != null && 
+      key.equals(KMString.format("%s_%s", KMDefault_LanguageID, KMDefault_KeyboardID)));
+  }
+
   /**
    * Some apps have the user select which keyboard to add. To ensure there's always a fallback
    * system keyboard when the keyboard list is empty, use this method.
@@ -1999,7 +2009,20 @@ public final class KMManager {
   }
 
   public static int getOrientation(Context context) {
-    Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+    Display display;
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+      // https://developer.android.com/reference/android/content/Context#getDisplay()
+      try {
+        display = context.getDisplay();
+      } catch (UnsupportedOperationException e) {
+        // if the method is called on an instance that is not associated with any display.
+        return context.getResources().getConfiguration().orientation;
+      }
+    } else {
+      WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+      // Deprecated in API 30
+      display = wm.getDefaultDisplay();
+    }
     int rotation = display.getRotation();
     if (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180) {
       return Configuration.ORIENTATION_PORTRAIT;
@@ -2044,6 +2067,34 @@ public final class KMManager {
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
     }
+  }
+
+  /**
+   * Get the size of the area the window would occupy.
+   * API 30+
+   * https://developer.android.com/reference/android/view/WindowManager#getCurrentWindowMetrics()
+   * @param context
+   * @return Point (width, height)
+   */
+  public static Point getWindowSize(Context context) {
+    WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+      // Deprecated in API 30
+      Point size = new Point(0, 0);
+      wm.getDefaultDisplay().getSize(size);
+      return size;
+    }
+    
+    WindowMetrics windowMetrics = wm.getCurrentWindowMetrics();
+    return new Point(
+      windowMetrics.getBounds().width(),
+      windowMetrics.getBounds().height());    
+  }
+
+  public static float getWindowDensity(Context context) {
+    DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+    Log.d(TAG, "KMManager: metrics.density " + metrics.density);
+    return metrics.density;
   }
 
   protected static void setPersistentShouldShowHelpBubble(boolean flag) {
@@ -2092,7 +2143,6 @@ public final class KMManager {
 
     if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-      i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
     }
 
     i.putExtra(KMKey_DisplayKeyboardSwitcher, kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM);
@@ -2132,17 +2182,40 @@ public final class KMManager {
     return result;
   }
 
+  /**
+   * Updates the active range for selected text.
+   * @deprecated
+   * This method no longer needs the `selStart` and `selEnd` parameters.
+   * <p>Use {@link KMManager#updateSelectionRange(KeyboardType)} instead.</p>
+   *
+   * @param kbType    A value indicating if this request is for the in-app keyboard or the system keyboard
+   * @param selStart  (deprecated) the start index for the range
+   * @param selEnd  (deprecated) the end index for the selected range
+   * @return
+   */
+  @Deprecated
   public static boolean updateSelectionRange(KeyboardType kbType, int selStart, int selEnd) {
+    return updateSelectionRange(kbType);
+  }
+
+  /**
+   * Performs a synchronization check for the active range for selected text,
+   * ensuring it matches the text-editor's current state.
+   * @param kbType  A value indicating if this request is for the in-app or system keyboard.
+   * @return
+   */
+  public static boolean updateSelectionRange(KeyboardType kbType) {
     boolean result = false;
+
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreSelectionChange()) {
-        result = InAppKeyboard.updateSelectionRange(selStart, selEnd);
+        result = InAppKeyboard.updateSelectionRange();
       }
 
       InAppKeyboard.setShouldIgnoreSelectionChange(false);
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreSelectionChange()) {
-        result = SystemKeyboard.updateSelectionRange(selStart, selEnd);
+        result = SystemKeyboard.updateSelectionRange();
       }
 
       SystemKeyboard.setShouldIgnoreSelectionChange(false);
@@ -2171,13 +2244,13 @@ public final class KMManager {
   public static Keyboard getCurrentKeyboardInfo(Context context) {
     int index = getCurrentKeyboardIndex(context);
     if(index < 0) {
-      // As of 15.0-beta and 15.0-stable, this only appears to occur when
-      // #6703 would trigger.  This logging may help us better identify the
-      // root cause.
+      // index can be undefined if user installs Keyman (without launching it)
+      // and then enables Keyaman as a system keyboard from the Android settings menus.
+      // We'll only log if key isn't for fallback keyboard
       String key = KMKeyboard.currentKeyboard();
-      // Even if it's null, it's still a notable error.  This function shouldn't
-      // be reachable in execution (15.0) at a time this variable would be set to `null`.
-      KMLog.LogError(TAG, "Failed getCurrentKeyboardIndex check for keyboard: " + key);
+      if (!isDefaultKey(key)) {
+        KMLog.LogError(TAG, "Failed getCurrentKeyboardIndex check for keyboard: " + key);
+      }
       return null;
     }
     return KeyboardController.getInstance().getKeyboardInfo(index);
@@ -2333,7 +2406,7 @@ public final class KMManager {
     if (KMManager.shouldAllowSetKeyboard()) {
       // inKeyguardRestrictedInputMode() deprecated, so check isKeyguardLocked() to determine if screen is locked
       if (isLocked()) {
-        if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_UP) {
+        if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_DOWN) {
           doGlobeKeyLockscreenAction(context);
         }
         // clear globeKeyState

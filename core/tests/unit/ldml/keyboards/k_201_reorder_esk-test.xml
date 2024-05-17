@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE keyboardTest3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboardTest3.dtd">
+<!DOCTYPE keyboardTest3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/45/dtd/ldmlKeyboardTest3.dtd">
 <keyboardTest3 conformsTo="techpreview">
   <info keyboard="k_201_reorder_esk.xml" author="Team Keyboard" name="esk-reorder-test" />
   <tests name="basic">

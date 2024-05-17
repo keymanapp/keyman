@@ -136,7 +136,7 @@ ContextItemToAppContext(km_core_context_item *contextItems, PWSTR outBuf, DWORD 
         buf[idx++] = static_cast<WCHAR> Uni_UTF32ToSurrogate1(km_core_context_it->character);
         buf[idx++] = static_cast<WCHAR> Uni_UTF32ToSurrogate2(km_core_context_it->character);
       } else {
-        buf[idx++] = (km_core_cp)km_core_context_it->character;
+        buf[idx++] = (km_core_cu)km_core_context_it->character;
       }
       break;
     case KM_CORE_CT_MARKER:

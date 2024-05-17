@@ -39,10 +39,10 @@ describe('KmwCompilerMessages', function () {
     }
   }
 
-  // WARN_TouchLayoutUsesUnsupportedGesturesDownlevel
+  // HINT_TouchLayoutUsesUnsupportedGesturesDownlevel
 
-  it('should generate WARN_TouchLayoutUsesUnsupportedGesturesDownlevel if the touch layout has gestures but the keyboard is an old version', async function() {
-    await testForMessage(this, ['kmw', 'validate_gesture.kmn'], KmwCompilerMessages.WARN_TouchLayoutUsesUnsupportedGesturesDownlevel);
+  it('should generate HINT_TouchLayoutUsesUnsupportedGesturesDownlevel if the touch layout has gestures but the keyboard is an old version', async function() {
+    await testForMessage(this, ['kmw', 'validate_gesture.kmn'], KmwCompilerMessages.HINT_TouchLayoutUsesUnsupportedGesturesDownlevel);
   });
 
   // TODO: other messages
