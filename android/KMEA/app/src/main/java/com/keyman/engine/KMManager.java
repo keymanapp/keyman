@@ -25,6 +25,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.graphics.Point;
 import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
 import android.net.ConnectivityManager;
@@ -32,6 +34,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.IBinder;
 import android.text.InputType;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.Display;
@@ -39,6 +42,7 @@ import android.view.Surface;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.WindowMetrics;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
@@ -2005,7 +2009,20 @@ public final class KMManager {
   }
 
   public static int getOrientation(Context context) {
-    Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+    Display display;
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+      // https://developer.android.com/reference/android/content/Context#getDisplay()
+      try {
+        display = context.getDisplay();
+      } catch (UnsupportedOperationException e) {
+        // if the method is called on an instance that is not associated with any display.
+        return context.getResources().getConfiguration().orientation;
+      }
+    } else {
+      WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+      // Deprecated in API 30
+      display = wm.getDefaultDisplay();
+    }
     int rotation = display.getRotation();
     if (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180) {
       return Configuration.ORIENTATION_PORTRAIT;
@@ -2050,6 +2067,34 @@ public final class KMManager {
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
     }
+  }
+
+  /**
+   * Get the size of the area the window would occupy.
+   * API 30+
+   * https://developer.android.com/reference/android/view/WindowManager#getCurrentWindowMetrics()
+   * @param context
+   * @return Point (width, height)
+   */
+  public static Point getWindowSize(Context context) {
+    WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+      // Deprecated in API 30
+      Point size = new Point(0, 0);
+      wm.getDefaultDisplay().getSize(size);
+      return size;
+    }
+    
+    WindowMetrics windowMetrics = wm.getCurrentWindowMetrics();
+    return new Point(
+      windowMetrics.getBounds().width(),
+      windowMetrics.getBounds().height());    
+  }
+
+  public static float getWindowDensity(Context context) {
+    DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+    Log.d(TAG, "KMManager: metrics.density " + metrics.density);
+    return metrics.density;
   }
 
   protected static void setPersistentShouldShowHelpBubble(boolean flag) {

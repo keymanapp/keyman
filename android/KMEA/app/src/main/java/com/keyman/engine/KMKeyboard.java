@@ -907,10 +907,7 @@ final class KMKeyboard extends WebView {
     rotateSuggestions.setClickable(false);
 
     // Compute the actual display position (offset coordinate by actual screen pos of kbd)
-    WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-    DisplayMetrics metrics = new DisplayMetrics();
-    wm.getDefaultDisplay().getMetrics(metrics);
-    float density = metrics.density;
+    float density = KMManager.getWindowDensity(context);
 
     int posX, posY;
     if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
