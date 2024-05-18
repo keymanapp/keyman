@@ -2361,7 +2361,7 @@ public final class KMManager {
     if (KMManager.shouldAllowSetKeyboard()) {
       // inKeyguardRestrictedInputMode() deprecated, so check isKeyguardLocked() to determine if screen is locked
       if (isLocked()) {
-        if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_UP) {
+        if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_DOWN) {
           doGlobeKeyLockscreenAction(context);
         }
         // clear globeKeyState
