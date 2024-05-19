@@ -19,3 +19,11 @@ signtime() {
   cmd //c "$KEYMAN_ROOT/common/windows/signtime.bat" "$@"
 }
 
+function verify-all-executable-signatures-in-folder() {
+  # ignore return value from sigcheck; we validate the response with verify_signatures
+  # "*" needs to be inside the quotes as it is passed as-is to sigcheck, not as an expansion
+  # note: it seems that sigcheck rejects forward-slash in paths, so cygpath is our friend
+  ("$SIGCHECK" -q -s -e -v -accepteula "$(cygpath -w "$1")\\*" || true) > sig1
+  "$VERIFY_SIGNATURES" -d "$KEYMAN_ROOT/VERSION.md" < sig1
+  rm -f sig1
+}

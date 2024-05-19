@@ -6,6 +6,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe "Build Keyman Developer IDE" \
+  @/common/include \
   @/core:x86 \
   @/common/windows/delphi \
   clean configure build test publish install
@@ -22,10 +23,6 @@ builder_describe_outputs \
   build:project        /developer/src/tike/$WIN32_TARGET
 
 #-------------------------------------------------------------------------------------------------------------------
-
-function do_clean() {
-  rm -rf bin obj manifest.res manifest.xml *.dproj.local version.res icons.RES icons.res *.identcache icons.res
-}
 
 function do_configure() {
   configure_windows_build_environment
@@ -111,7 +108,7 @@ function do_install() {
   cp "$DEVELOPER_PROGRAM/$KEYMANCORE_DLL" "$INSTALLPATH_KEYMANDEVELOPER/$KEYMANCORE_DLL"
 }
 
-builder_run_action clean:project        do_clean
+builder_run_action clean:project        clean_windows_project_files
 builder_run_action configure:project    do_configure
 builder_run_action build:project        do_build
 # builder_run_action test:project         do_test

@@ -19,7 +19,7 @@ builder_describe_outputs \
 
 #-------------------------------------------------------------------------------------------------------------------
 
-builder_run_action clean:project        rm -rf bin obj manifest.res manifest.xml *.dproj.local version.res icons.RES icons.res *.identcache
+builder_run_action clean:project        clean_windows_project_files
 builder_run_action configure:project    configure_windows_build_environment
 builder_run_action build:project        delphi_msbuild KeyboardJSInfoTestSuite.dproj "//p:Platform=Win32" "//p:CI=CI"
 builder_run_action test:project         "$WIN32_TARGET" -b -exit:continue

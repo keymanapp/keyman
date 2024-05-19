@@ -21,7 +21,10 @@ source "$KEYMAN_ROOT/resources/build/win/environment_generated.inc.sh"
 # Windows common environment variables
 
 WINDOWS_ROOT="$KEYMAN_ROOT/windows"
-WINDOWS_PROGRAM="$WINDOWS_ROOT/bin"
+WINDOWS_PROGRAM_APP="$WINDOWS_ROOT/bin/desktop"
+WINDOWS_PROGRAM_ENGINE="$WINDOWS_ROOT/bin/engine"
+WINDOWS_DEBUGPATH_APP="$WINDOWS_ROOT/debug/desktop"
+WINDOWS_DEBUGPATH_ENGINE="$WINDOWS_ROOT/debug/engine"
 
 COMMON_ROOT="$KEYMAN_ROOT/common/windows/delphi"
 OUTLIB="$WINDOWS_ROOT/lib"
@@ -43,6 +46,13 @@ source "$KEYMAN_ROOT/resources/build/win/signtime.inc.sh"
 VERIFY_SIGNATURES_PATH="$KEYMAN_ROOT/common/windows/delphi/tools/verify_signatures"
 VERIFY_SIGNATURES="$VERIFY_SIGNATURES_PATH/$WIN32_TARGET_PATH/verify_signatures.exe"
 SIGCHECK="$VERIFY_SIGNATURES_PATH/$WIN32_TARGET_PATH/sigcheck.exe"
+
+generate_uuid() {
+  (
+    source "$KEYMAN_ROOT/resources/build/win/visualstudio_environment.inc.sh"
+    uuidgen
+  )
+}
 
 run_in_vs_env() {
   (
@@ -125,4 +135,12 @@ wrap-mt() {
 create-developer-output-folders() {
   mkdir -p "$DEVELOPER_PROGRAM/xml"
   mkdir -p "$DEVELOPER_DEBUGPATH"
+}
+
+create-windows-output-folders() {
+  mkdir -p "$OUTLIB"
+  mkdir -p "$WINDOWS_PROGRAM_APP"
+  mkdir -p "$WINDOWS_PROGRAM_ENGINE"
+  mkdir -p "$WINDOWS_DEBUGPATH_APP"
+  mkdir -p "$WINDOWS_DEBUGPATH_ENGINE"
 }

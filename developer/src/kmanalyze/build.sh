@@ -6,6 +6,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe "Legacy keyboard source analysis tool" \
+  @/common/include \
   clean configure build test publish install
 
 builder_parse "$@"
@@ -23,7 +24,7 @@ builder_describe_outputs \
 
 function do_clean() {
   vs_msbuild kmanalyze.vcxproj //t:Clean
-  rm -rf bin obj manifest.res manifest.xml version.res
+  clean_windows_project_files
 }
 
 function do_build() {
@@ -40,13 +41,10 @@ function do_publish() {
   wrap-symstore "$DEVELOPER_DEBUGPATH/kmanalyze.pdb" //t keyman-developer
 }
 
-function do_install() {
-  cp "$DEVELOPER_PROGRAM/kmanalyze.exe" "$INSTALLPATH_KEYMANDEVELOPER/kmanalyze.exe"
-}
 
 builder_run_action clean:project        do_clean
 builder_run_action configure:project    configure_windows_build_environment
 builder_run_action build:project        do_build
 # builder_run_action test:project         do_test
 builder_run_action publish:project      do_publish
-builder_run_action install:project      do_install
+builder_run_action install:project      cp "$DEVELOPER_PROGRAM/kmanalyze.exe" "$INSTALLPATH_KEYMANDEVELOPER/kmanalyze.exe"

@@ -80,20 +80,22 @@ function do_prepublish() {
   if [[ ! -f "$DEVTOOLS" ]]; then
     # We'll build devtools here directly because we are before the configure /
     # build steps which would trigger it in via dependencies
-    "$KEYMAN_ROOT"/common/windows/delphi/tools/devtools/build.sh configure build prepublish
+    "$KEYMAN_ROOT"/common/windows/delphi/tools/devtools/build.sh configure build
   fi
+
+  "$KEYMAN_ROOT"/common/windows/delphi/tools/devtools/build.sh prepublish
 
   #
   # Verify that klog is disabled
   #
 
   if [[ ! -f /common/windows/delphi/tools/test-klog/$WIN32_TARGET_PATH/test_klog.exe ]]; then
-    # We'll build devtools here directly because we are before the configure /
+    # We'll build test_klog here directly because we are before the configure /
     # build steps which would trigger it in via dependencies
-    "$KEYMAN_ROOT"/common/windows/delphi/tools/test-klog/build.sh configure build prepublish
+    "$KEYMAN_ROOT"/common/windows/delphi/tools/test-klog/build.sh configure build
   fi
 
-  "$DEVTOOLS" -rt
+  "$KEYMAN_ROOT"/common/windows/delphi/tools/test-klog/build.sh prepublish
 
   # All prepublish steps finished
 }

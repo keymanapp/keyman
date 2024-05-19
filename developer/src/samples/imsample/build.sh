@@ -7,6 +7,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe \
   "Sample Input Method eXtension (IMX)" \
+  @/common/include \
   clean configure build test publish
 builder_parse "$@"
 
@@ -24,7 +25,7 @@ builder_describe_outputs \
 
 function do_clean() {
   vs_msbuild imsample.sln //t:Clean
-  rm -rf bin obj manifest.res manifest.xml version.res
+  clean_windows_project_files
 }
 
 function do_build() {

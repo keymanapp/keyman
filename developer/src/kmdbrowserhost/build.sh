@@ -6,6 +6,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe "Chromium browser host process for Keyman Developer" \
+  @/common/include \
   @/common/windows/delphi \
   clean configure build test publish install
 

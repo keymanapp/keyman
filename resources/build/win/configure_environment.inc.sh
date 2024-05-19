@@ -24,7 +24,7 @@ _build_win_environment() {
   echo "ProgramFiles=\"$(cygpath -u "$ProgramFiles")\"" >> "$ENVSH"
   echo "ProgramFilesx86=\"$(cygpath -u "$ProgramFilesx86")\"" >> "$ENVSH"
   echo "CommonProgramFilesx86=\"$(cygpath -u "$CommonProgramFilesx86")\"" >> "$ENVSH"
-  echo "INSTALLPATH_KEYMANDESKTOP=\"$(cygpath -u "$ProgramFilesx86")/Keyman/Keyman Desktop\"" >> "$ENVSH"
+  echo "INSTALLPATH_KEYMANAPP=\"$(cygpath -u "$ProgramFilesx86")/Keyman/Keyman Desktop\"" >> "$ENVSH"
   echo "INSTALLPATH_KEYMANDEVELOPER=\"$(cygpath -u "$ProgramFilesx86")/Keyman/Keyman Developer\"" >> "$ENVSH"
   echo "INSTALLPATH_KEYMANENGINE=\"$(cygpath -u "$CommonProgramFilesx86")/Keyman/Keyman Engine\"" >> "$ENVSH"
 }

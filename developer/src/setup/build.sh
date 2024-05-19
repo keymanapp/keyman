@@ -7,6 +7,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe \
   "Keyman Developer Setup bootstrap executable" \
+  @/common/include \
   @/common/windows/delphi \
   clean configure build test publish
 

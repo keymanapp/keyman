@@ -6,6 +6,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 builder_describe "Keyboard project generation and conversion tool" \
+  @/common/include \
   @/common/windows/delphi \
   clean configure build test publish install
 
@@ -32,9 +33,7 @@ function do_build() {
   tds2dbg "$WIN32_TARGET"
 
   cp "$WIN32_TARGET" "$DEVELOPER_PROGRAM"
-  if [[ -f "$WIN32_TARGET_PATH/kmconvert.dbg" ]]; then
-    cp "$WIN32_TARGET_PATH/kmconvert.dbg" "$DEVELOPER_DEBUGPATH"
-  fi
+  cp "$WIN32_TARGET_PATH/kmconvert.dbg" "$DEVELOPER_DEBUGPATH"
 
   rm -rf "$DEVELOPER_PROGRAM/projects/templates"
   mkdir -p "$DEVELOPER_PROGRAM/projects/templates"
