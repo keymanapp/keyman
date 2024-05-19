@@ -52,6 +52,8 @@ function do_clean() {
 function do_publish() {
   verify-program-signatures
 
+  "$KEYMAN_ROOT/common/windows/cef-checkout.sh"
+
   #
   # Build the installation archive
   #
