@@ -169,6 +169,11 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     InputConnection ic = getCurrentInputConnection();
     if (ic != null) {
       ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
+      /*
+        We do sometimes receive null `icText.text`, even though
+        getExtractedText() docs does not list this as a possible 
+        return value, so we test for that as well (#11479)
+      */
       if (icText != null && icText.text != null) {
         boolean didUpdateText = KMManager.updateText(KeyboardType.KEYBOARD_TYPE_SYSTEM, icText.text.toString());
         boolean didUpdateSelection = KMManager.updateSelectionRange(KeyboardType.KEYBOARD_TYPE_SYSTEM);
