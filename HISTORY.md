@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 18.0.39 alpha 2024-05-20
+
+* chore(mac): change indentation of source code to equal standard two spaces (#11432)
+* fix(common): calculate already-build dependency targets correctly (#11477)
+* fix(common): properly quote `builder_run_action` call (#11478)
+* fix(android/app): Verify extracted text is not null (#11481)
+
 ## 18.0.38 alpha 2024-05-17
 
 * chore(common): Auto-generate minimum-versions.md from min-ver.sh (#11399)
