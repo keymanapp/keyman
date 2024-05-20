@@ -169,7 +169,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     InputConnection ic = getCurrentInputConnection();
     if (ic != null) {
       ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
-      if (icText != null) {
+      if (icText != null && icText.text != null) {
         boolean didUpdateText = KMManager.updateText(KeyboardType.KEYBOARD_TYPE_SYSTEM, icText.text.toString());
         boolean didUpdateSelection = KMManager.updateSelectionRange(KeyboardType.KEYBOARD_TYPE_SYSTEM);
         if (!didUpdateText || !didUpdateSelection)
