@@ -11,6 +11,7 @@
 PKMX_WCHAR strtowstr(PKMX_STR in);
 PKMX_STR wstrtostr(PKMX_WCHAR in);
 KMX_BOOL AddCompileError(KMX_DWORD msg);
+KMX_DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 KMX_DWORD ValidateMatchNomatchOutput(PKMX_WCHAR p);
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString);
 bool hasPreamble(std::u16string result);
@@ -20,6 +21,7 @@ extern kmcmp_CompilerMessageProc msgproc;
 namespace kmcmp {
     extern int nErrors;
     extern int ErrChr;
+    extern int BeginLine[4];
     KMX_BOOL AddCompileWarning(char* buf);
 }
 
@@ -30,13 +32,22 @@ class CompilerTest : public testing::Test {
     protected:
     	CompilerTest() {}
 	    ~CompilerTest() override {}
-	    void SetUp() override {}
+	    void SetUp() override {
+            kmcmp::BeginLine[BEGIN_ANSI] = -1;
+            kmcmp::BeginLine[BEGIN_UNICODE] = -1;
+            kmcmp::BeginLine[BEGIN_NEWCONTEXT] = -1;
+            kmcmp::BeginLine[BEGIN_POSTKEYSTROKE] = -1;
+        }
 	    void TearDown() override {
             msgproc = NULL;
             szText_stub[0] = '\0';
             kmcmp::nErrors = 0;
             kmcmp::ErrChr = 0;
             ErrExtraLIB[0] = '\0';
+            kmcmp::BeginLine[BEGIN_ANSI] = -1;
+            kmcmp::BeginLine[BEGIN_UNICODE] = -1;
+            kmcmp::BeginLine[BEGIN_NEWCONTEXT] = -1;
+            kmcmp::BeginLine[BEGIN_POSTKEYSTROKE] = -1;
         }
 
     public:
@@ -65,8 +76,6 @@ TEST_F(CompilerTest, wstrtostr_test) {
     EXPECT_EQ(0, strcmp("hello", wstrtostr((PKMX_WCHAR)u"hello")));
     EXPECT_EQ(0, strcmp("", wstrtostr((PKMX_WCHAR)u"")));
 };
-
-// KMX_BOOL kmcmp::AddCompileWarning(PKMX_CHAR buf)
 
 TEST_F(CompilerTest, AddCompileWarning_test) {
     msgproc = msgproc_false_stub;
@@ -132,7 +141,43 @@ TEST_F(CompilerTest, AddCompileError_test) {
     EXPECT_EQ(6, kmcmp::nErrors);
 };
 
-// KMX_DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
+TEST_F(CompilerTest, ProcessBeginLine_test) {
+    FILE_KEYBOARD fk;
+    KMX_WCHAR str[LINESIZE];
+    KMX_DWORD msg;
+
+    // CERR_NoTokensFound
+    str[0] = '\0';
+    EXPECT_EQ(CERR_NoTokensFound, ProcessBeginLine(&fk, str));
+
+    // CERR_InvalidToken
+    u16cpy(str, u"abc >");
+    EXPECT_EQ(CERR_InvalidToken, ProcessBeginLine(&fk, str));
+
+    // CERR_RepeatedBegin, BEGIN_UNICODE
+    kmcmp::BeginLine[BEGIN_UNICODE] = 0; // not -1
+    u16cpy(str, u" unicode>");
+    EXPECT_EQ(CERR_RepeatedBegin, ProcessBeginLine(&fk, str));
+    kmcmp::BeginLine[BEGIN_UNICODE] = -1;
+
+    // CERR_RepeatedBegin, BEGIN_ANSI
+    kmcmp::BeginLine[BEGIN_ANSI] = 0; // not -1
+    u16cpy(str, u" ansi>");
+    EXPECT_EQ(CERR_RepeatedBegin, ProcessBeginLine(&fk, str));
+    kmcmp::BeginLine[BEGIN_ANSI] = -1;
+
+    // CERR_RepeatedBegin, BEGIN_NEWCONTEXT
+    kmcmp::BeginLine[BEGIN_NEWCONTEXT] = 0; // not -1
+    u16cpy(str, u" newContext>");
+    EXPECT_EQ(CERR_RepeatedBegin, ProcessBeginLine(&fk, str));
+    kmcmp::BeginLine[BEGIN_NEWCONTEXT] = -1;
+
+    // CERR_RepeatedBegin, BEGIN_POSTKEYSTROKE
+    kmcmp::BeginLine[BEGIN_POSTKEYSTROKE] = 0; // not -1
+    u16cpy(str, u" postKeystroke>");
+    EXPECT_EQ(CERR_RepeatedBegin, ProcessBeginLine(&fk, str));
+    kmcmp::BeginLine[BEGIN_POSTKEYSTROKE] = -1;
+};
 
 TEST_F(CompilerTest, ValidateMatchNomatchOutput_test) {
     EXPECT_EQ(CERR_None, ValidateMatchNomatchOutput(NULL));
