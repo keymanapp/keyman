@@ -17,13 +17,13 @@ builder_describe "Builds Keyman for macOS." \
   "clean" \
   "configure" \
   "build" \
-  "publish   Publishes debug info to Sentry and builds DMG, .download_info for distribution" \
+  "publish     Publishes debug info to Sentry and builds DMG, .download_info for distribution" \
   "test" \
-  "install   Installs result of Keyman4MacIM locally." \
-  ":engine   KeymanEngine4Mac" \
-  ":im   Keyman4MacIM" \
-  ":testapp   Keyman4Mac (test harness)" \
-  "--quick,-q  Bypasses notarization for $(builder_term install)" 
+  "install     Installs result of Keyman4MacIM locally." \
+  ":engine     KeymanEngine4Mac" \
+  ":app        Keyman4MacIM" \
+  ":testapp    Keyman4Mac (test harness)" \
+  "--quick,-q  Bypasses notarization for $(builder_term install)"
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 verify_on_mac
@@ -37,12 +37,6 @@ if builder_is_debug_build; then
 else
   CONFIG="Release"
   CONFIG_TARGET=Pods-Keyman.release.xcconfig
-fi
-
-QUIET=true
-
-if builder_verbose; then
-  QUIET=false
 fi
 
 ### SET PATHS ###
@@ -66,7 +60,7 @@ PODS_FOLDER="/mac/Keyman4MacIM/Pods/Target Support Files/Pods-Keyman"
 builder_describe_outputs \
   configure     "$PODS_FOLDER/$CONFIG_TARGET" \
   build:engine  "/mac/$ENGINE_NAME/build/$CONFIG" \
-  build:im      "/mac/$IM_NAME/build/$CONFIG" \
+  build:app     "/mac/$IM_NAME/build/$CONFIG" \
   build:testapp "/mac/$TESTAPP_NAME/build/$CONFIG"
 
 ### DEFINE HELPER FUNCTIONS ###
@@ -77,9 +71,12 @@ UPDATE_VERSION_IN_PLIST=true
 DO_CODESIGN=true
 CODESIGNING_SUPPRESSION="CODE_SIGN_IDENTITY=\"\" CODE_SIGNING_REQUIRED=NO"
 
+QUIET=true
+
 if builder_verbose; then
   BUILD_OPTIONS=""
   QUIET_FLAG=
+  QUIET=false
 else
   BUILD_OPTIONS="-quiet"
   QUIET_FLAG="-quiet"
@@ -91,8 +88,8 @@ SKIP_BUILD=false
 UPLOAD_SENTRY=false
 
 # Import local environment variables for build
-if [[ -f $(dirname "$THIS_SCRIPT")/localenv.sh ]]; then
-    . $(dirname "$THIS_SCRIPT")/localenv.sh
+if [[ -f "$THIS_SCRIPT_PATH/localenv.sh" ]]; then
+    . "$THIS_SCRIPT_PATH/localenv.sh"
 fi
 
 BUILD_OPTIONS="-configuration $CONFIG $BUILD_OPTIONS PRODUCT_VERSION=$VERSION"
@@ -107,7 +104,7 @@ execBuildCommand() {
 
     displayInfo "Building $component:" "$cmnd"
     set +e
-    eval $cmnd
+    eval "$cmnd"
     ret_code=$?
     set -e
 
@@ -123,7 +120,7 @@ do_clean ( ) {
   rm -rf "$KM4MIM_BASE_PATH/build"
   rm -rf "$KMTESTAPP_BASE_PATH/build"
   rm -rf "$KEYMAN_ROOT/mac/setup/Install Keyman.app"
-  
+
   builder_heading "Cleaning pods folder (CocoaPods)"
   rm -rf "$PODS_FOLDER"
   builder_heading "Cleaning source (Carthage)"
@@ -172,7 +169,7 @@ do_build_engine ( ) {
   updatePlist "$KME4M_BASE_PATH/build/$CONFIG/$ENGINE_NAME.framework/Resources/Info.plist" "Keyman Engine"
 }
 
-do_build_im ( ) {
+do_build_app ( ) {
   ### Build Keyman.app (Input Method and Configuration app) ###
   builder_heading "Building help"
   build_help_html mac Keyman4MacIM/Keyman4MacIM/Help
@@ -280,36 +277,19 @@ do_install() {
   builder_heading "Attempting local deployment with command:"
   KM4MIM_APP_BASE_PATH="$KM4MIM_BASE_PATH/build/$CONFIG"
   displayInfo "$KM4MIM_BASE_PATH/localdeploy.sh \"$KM4MIM_APP_BASE_PATH\""
-  eval "$KM4MIM_BASE_PATH/localdeploy.sh" "$KM4MIM_APP_BASE_PATH"
-  
-  # TODO:  Consider removal?  Or can we not auto-crash if the prior line fails?
-  if [ $? == 0 ]; then
-      displayInfo "Local deployment succeeded!"
-  else
-      builder_die "Local deployment failed!"
-  fi
+  "$KM4MIM_BASE_PATH/localdeploy.sh" "$KM4MIM_APP_BASE_PATH"
 }
 
 do_publish() {
   do_notarize
 
   builder_heading "Preparing files for release deployment..."
-  eval "./setup/build.sh"
+  ./setup/build.sh
 
-  eval "$KM4MIM_BASE_PATH/make-km-dmg.sh" $QUIET_FLAG
-  if [ $? == 0 ]; then
-      displayInfo "Creating disk image succeeded!" ""
-  else
-      builder_die "Creating disk image failed!"
-  fi
+  "$KM4MIM_BASE_PATH/make-km-dmg.sh" $QUIET_FLAG
 
   # Create download info
-  eval "$KM4MIM_BASE_PATH/write-download_info.sh"
-  if [ $? == 0 ]; then
-      displayInfo "Writing download_info file succeeded!" ""
-  else
-      builder_die "Writing download_info file failed!"
-  fi
+  "$KM4MIM_BASE_PATH/write-download_info.sh"
 
   do_sentry
 }
@@ -317,14 +297,14 @@ do_publish() {
 ### PROCESS COMMAND-LINE ARGUMENTS ###
 
 builder_run_action clean          do_clean
-builder_run_action configure      do_configure 
+builder_run_action configure      do_configure
 
 builder_run_action build:engine   do_build_engine
-builder_run_action build:im       do_build_im
+builder_run_action build:app      do_build_app
 builder_run_action build:testapp  do_build_testapp
 
-builder_run_action test:engine execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $QUIET_FLAG test -scheme $ENGINE_NAME"
-builder_run_action test:im execBuildCommand "$IM_NAME-tests" "xcodebuild test -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
+builder_run_action test:engine    execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $QUIET_FLAG test -scheme $ENGINE_NAME"
+builder_run_action test:app       execBuildCommand "$IM_NAME-tests" "xcodebuild test -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
 
 builder_run_action install do_install
 
