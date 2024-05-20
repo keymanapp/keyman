@@ -36,6 +36,8 @@
 #include "unicode/uniset.h"
 #include "unicode/usetiter.h"
 
+#include <test_color.h>
+
 #define assert_or_return(expr) if(!(expr)) { \
   std::wcerr << __FILE__ << ":" << __LINE__ << ": " << \
   console_color::fg(console_color::BRIGHT_RED) \
@@ -49,7 +51,6 @@
 namespace km {
 namespace tests {
 
-#include <test_color.h>
 
 
 
