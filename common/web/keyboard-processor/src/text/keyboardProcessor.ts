@@ -1,6 +1,6 @@
 // #region Big ol' list of imports
 
-import EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter3';
 
 import Codes from "./codes.js";
 import type Keyboard from "../keyboards/keyboard.js";

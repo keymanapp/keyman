@@ -12,11 +12,11 @@
 @implementation NoContextTestClient
 
 - (void)insertText:(id)string replacementRange:(NSRange)replacementRange {
-    [super insertTextProtected: string replacementRange:replacementRange];
+  [super insertTextProtected: string replacementRange:replacementRange];
 }
 
 - (NSAttributedString*)attributedSubstringFromRange:(NSRange)range {
-    return nil;
+  return nil;
 }
 
 @end

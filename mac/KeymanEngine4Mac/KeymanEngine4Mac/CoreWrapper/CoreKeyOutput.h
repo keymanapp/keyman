@@ -1,9 +1,9 @@
 /**
  * Keyman is copyright (C) SIL International. MIT License.
- * 
+ *
  * CoreKeyOutput.h
  * Keyman
- * 
+ *
  * Created by Shawn Schantz on 2023-10-31.
  */
 

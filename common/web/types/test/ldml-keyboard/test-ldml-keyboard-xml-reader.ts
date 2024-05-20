@@ -36,7 +36,13 @@ describe('ldml keyboard xml reader tests', function () {
       callback: (data, source, subpath, callbacks) => {
         assert.ok(source?.keyboard3?.keys);
         const k = pluckKeysFromKeybag(source?.keyboard3?.keys.key, ['a', 'b', 'c']);
-        assert.sameDeepOrderedMembers(k, [
+        assert.sameDeepOrderedMembers(k.map((entry) => {
+          // Drop the Symbol members from the returned keys; assertions may expect their presence.
+          return {
+            id: entry.id,
+            output: entry.output
+          };
+        }), [
           {id: 'a', output: 'a'},
           {id: 'b', output: 'b'},
           {id: 'c', output: 'c'},
@@ -51,7 +57,13 @@ describe('ldml keyboard xml reader tests', function () {
       callback: (data, source, subpath, callbacks) => {
         assert.ok(source?.keyboard3?.keys);
         const k = pluckKeysFromKeybag(source?.keyboard3?.keys.key, ['a', 'b', 'c']);
-        assert.sameDeepOrderedMembers(k, [
+        assert.sameDeepOrderedMembers(k.map((entry) => {
+          // Drop the Symbol members from the returned keys; assertions may expect their presence.
+          return {
+            id: entry.id,
+            output: entry.output
+          };
+        }), [
           {id: 'a', output: 'a'},
           {id: 'b', output: 'b'},
           {id: 'c', output: 'c'},
@@ -63,7 +75,13 @@ describe('ldml keyboard xml reader tests', function () {
       callback: (data, source, subpath, callbacks) => {
         assert.ok(source?.keyboard3?.keys);
         const k = pluckKeysFromKeybag(source?.keyboard3?.keys.key, ['a', 'b', 'c']);
-        assert.sameDeepOrderedMembers(k, [
+        assert.sameDeepOrderedMembers(k.map((entry) => {
+          // Drop the Symbol members from the returned keys; assertions may expect their presence.
+          return {
+            id: entry.id,
+            output: entry.output
+          };
+        }), [
           {id: 'a', output: 'a'},
           {id: 'b', output: 'b'},
           {id: 'c', output: 'c'},
@@ -76,7 +94,13 @@ describe('ldml keyboard xml reader tests', function () {
       callback: (data, source, subpath, callbacks) => {
         assert.ok(source?.keyboard3?.keys);
         const k = pluckKeysFromKeybag(source?.keyboard3?.keys.key, ['a', 'b', 'c', 'zz', 'hash', 'hyphen']);
-        assert.sameDeepOrderedMembers(k, [
+        assert.sameDeepOrderedMembers(k.map((entry) => {
+          // Drop the Symbol members from the returned keys; assertions may expect their presence.
+          return {
+            id: entry.id,
+            output: entry.output
+          };
+        }), [
           { id: 'a',      output: 'a' },       // implied
           { id: 'b',      output: 'b' },
           { id: 'c',      output: 'c' },

@@ -4,7 +4,6 @@
 */
 #include <vector>
 #include <iterator>
-#include <codecvt>
 #include <locale>
 #include "kmx_processevent.h"
 #include "utfcodec.hpp"

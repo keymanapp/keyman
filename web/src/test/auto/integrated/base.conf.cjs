@@ -33,10 +33,11 @@ module.exports = {
 
   // frameworks to use
   // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-  frameworks: ['mocha', 'chai', 'fixture'],
+  frameworks: ['mocha', 'fixture'],
 
   // list of files / patterns to load in the browser
   files: [
+    { pattern: 'node_modules/chai/chai.js', watched: true, served: true, included: false, type: 'module'},
     'web/src/test/auto/integrated/modernizr.js',               // A dependency-managed utility script that helps with browser feature detection.
     {pattern: 'web/src/test/auto/integrated/test_init_check.js', type: 'module'},         // Ensures that tests will initialize properly
     'common/test/resources/timeout-adapter.js',  // Handles configuration timeout setup at runtime.

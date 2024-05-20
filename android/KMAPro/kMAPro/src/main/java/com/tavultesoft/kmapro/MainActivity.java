@@ -603,8 +603,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     if (resourceId > 0)
       statusBarHeight = getResources().getDimensionPixelSize(resourceId);
 
-    Point size = new Point(0, 0);
-    getWindowManager().getDefaultDisplay().getSize(size);
+    Point size = KMManager.getWindowSize(context);
     int screenHeight = size.y;
     Log.d(TAG, "Main resizeTextView bannerHeight: " + bannerHeight);
     textView.setHeight(screenHeight - statusBarHeight - actionBarHeight - bannerHeight - keyboardHeight);
@@ -867,9 +866,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   }
 
   public static Drawable getActionBarDrawable(Context context) {
-    Point size = new Point();
-    WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-    wm.getDefaultDisplay().getSize(size);
+    Point size = KMManager.getWindowSize(context);
     int width = size.x;
 
     TypedValue outValue = new TypedValue();

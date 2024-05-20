@@ -1,6 +1,6 @@
 // A simple "does device detection work properly" unit test.
 // We'll let things break after this reports, since this will likely signal a LOT of other failures.
-var assert = chai.assert;
+import { assert } from '/node_modules/chai/chai.js';
 
 import Device from '/@keymanapp/keyman/build/engine/device-detect/lib/index.mjs';
 

@@ -5,8 +5,8 @@
 
 module.exports = {
   // base path that will be used to resolve all patterns (eg. files, exclude),
-  // set to this module's base folder.
-  basePath: '../../../..',
+  // set to the base folder of the repository.
+  basePath: '../../../../../../..',
 
   // Safeguards against disconnecting after starting tests.
   browserNoActivityTimeout: 60000,
@@ -32,29 +32,30 @@ module.exports = {
 
   // frameworks to use
   // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-  frameworks: ['mocha', 'chai', 'fixture'],
+  frameworks: ['mocha', 'fixture'],
 
   // list of files / patterns to load in the browser
   files: [
-    { pattern: 'build/lib/index.mjs', type: 'module' }, // The primary gesture-recognizer script.
-    { pattern: 'build/lib/index.mjs.map', watched: true, served: true, included: false },
+    { pattern: 'common/web/gesture-recognizer/build/lib/index.mjs', type: 'module' }, // The primary gesture-recognizer script.
+    { pattern: 'common/web/gesture-recognizer/build/lib/index.mjs.map', watched: true, served: true, included: false },
 
-    { pattern: 'build/tools/lib/index.mjs', type: 'module' }, // The primary unit-test-resources script.
-    { pattern: 'build/tools/lib/index.js.map', watched: true, served: true, included: false },
+    { pattern: 'common/web/gesture-recognizer/build/tools/lib/index.mjs', type: 'module' }, // The primary unit-test-resources script.
+    { pattern: 'common/web/gesture-recognizer/build/tools/lib/index.js.map', watched: true, served: true, included: false },
 
-    '../../../node_modules/sinon/pkg/sinon.js',
+    { pattern: 'node_modules/chai/chai.js', watched: true, served: true, included: false, type: 'module'},
+    'node_modules/sinon/pkg/sinon.js',
 
-    '../../../common/test/resources/timeout-adapter.js', // Handles timeout configuration for local vs BrowserStack-based testing
+    'common/test/resources/timeout-adapter.js', // Handles timeout configuration for local vs BrowserStack-based testing
 
-    { pattern: 'src/test/auto/browser/cases/**/*.js', type: 'module' }, // Where the tests actually reside.
+    { pattern: 'common/web/gesture-recognizer/src/test/auto/browser/cases/**/*.js', type: 'module' }, // Where the tests actually reside.
 
-    'build/tools/host-fixture.html', // The primary test fixture's build output location
-    'build/tools/gestureHost.css', // The primary test fixture's backing CSS stylesheet.  Note:  Karma will auto-link it!
-    'src/test/resources/json/**/*.json', // Where pre-loaded JSON resides.
+    'common/web/gesture-recognizer/build/tools/host-fixture.html', // The primary test fixture's build output location
+    'common/web/gesture-recognizer/build/tools/gestureHost.css', // The primary test fixture's backing CSS stylesheet.  Note:  Karma will auto-link it!
+    'common/web/gesture-recognizer/src/test/resources/json/**/*.json', // Where pre-loaded JSON resides.
   ],
 
   proxies: {
-    "/resources/": "/src/test/resources/",
+    "/resources/": "common/web/gesture-recognizer/src/test/resources/",
   },
 
 
@@ -65,18 +66,18 @@ module.exports = {
   // preprocess matching files before serving them to the browser
   // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
   preprocessors: {
-    'build/tools/host-fixture.html': ['html2js'],
-    'src/test/resources/fixtures/**/*.html'	: ['html2js'],
-    'src/test/resources/json/**/*.json' : ['json_fixtures']
+    'common/web/gesture-recognizer/build/tools/host-fixture.html': ['html2js'],
+    'common/web/gesture-recognizer/src/test/resources/fixtures/**/*.html'	: ['html2js'],
+    'common/web/gesture-recognizer/src/test/resources/json/**/*.json' : ['json_fixtures']
   },
 
   html2JsPreprocessor: {
-    stripPrefix: 'build/tools'
+    stripPrefix: 'common/web/gesture-recognizer/build/tools'
   },
 
   // Settings to properly configure how JSON fixtures are automatically loaded by Karma.
   jsonFixturesPreprocessor: {
-    stripPrefix: 'src/test/resources/json/',
+    stripPrefix: 'common/web/gesture-recognizer/src/test/resources/json/',
     variableName: '__json__'
   },
 

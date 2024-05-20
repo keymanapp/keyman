@@ -57,14 +57,6 @@ if builder_start_action test:libraries; then
   "$KEYMAN_ROOT/common/models/templates/build.sh" test $TEST_OPTS
   popd
 
-  pushd "$KEYMAN_ROOT/common/models/types"
-  echo
-  echo "### Running $(builder_term common/models/types) tests"
-  # Is not mocha-based; it's TSC-based instead, as we're just ensuring that the .d.ts
-  # file is a proper TS declaration file.
-  npm run test
-  popd
-
   pushd "$KEYMAN_ROOT/common/web/lm-worker"
   echo
   echo "### Running ${BUILDER_TERM_START}common/web/lm-worker${BUILDER_TERM_END} tests"

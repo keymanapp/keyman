@@ -1,5 +1,36 @@
 # Keyman Version History
 
+## 18.0.38 alpha 2024-05-17
+
+* chore(common): Auto-generate minimum-versions.md from min-ver.sh (#11399)
+* fix(android): Replace deprecated APIs for Display, Size, Metrics (#11436)
+* chore(common): Clear whatsnew help files (#11469)
+
+## 18.0.37 alpha 2024-05-16
+
+* chore(android): update Gradle wrapper version (#11437)
+* fix(android/engine): Handle globe key on lock screen (#11458)
+* chore(oem/fv/ios): Remove build_keyboards.sh script (#11438)
+
+## 18.0.36 alpha 2024-05-15
+
+* chore: merge beta into master, final (#11445)
+* chore(web): updates chai, @types/chai dependencies (#11318)
+* chore(web): updates most @types/node dependencies, makes them consistent (#11319)
+* chore(web): adds '@web/test-runner' and related packages (#11323)
+* chore(web): EventEmitter3, sinon dependency updates (#11402)
+
+## 18.0.35 alpha 2024-05-14
+
+*  (#11340)
+
+## 18.0.34 alpha 2024-05-13
+
+* feat(windows): Don't install desktop shortcut for Keyman for windows on installation (#11401)
+* feat(common): improve builder parameter passing for child and dep builds (#11410)
+* chore: merge 17.0 beta into master A17S2 (#11431)
+* chore(android): Update dependencies (#11393)
+
 ## 18.0.33 alpha 2024-05-10
 
 * chore(common): Merge beta to master for Sprint A18S1 (part 2) (#11413)
@@ -143,6 +174,13 @@
 
 * chore(common): move to 18.0 alpha (#10713)
 * chore: move to 18.0 alpha
+
+## 17.0.323 beta 2024-05-13
+
+* chore(windows): Update crowdin string for Khmer (#11409)
+* fix(android): disable Sentry session tracking (#11419)
+* fix(mac): restore OSK keys that became invisible in mac OS 14 Sonoma (#11388)
+* chore(android,ios): Add fv_nlakapamuxcheen (#11405)
 
 ## 17.0.322 beta 2024-05-10
 

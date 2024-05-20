@@ -1,4 +1,4 @@
-import EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter3';
 
 import { BannerView } from '../banner/bannerView.js';
 import { BannerController } from '../banner/bannerController.js';

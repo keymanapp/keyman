@@ -1,4 +1,7 @@
-import EventEmitter, { EventNames, EventListener } from "eventemitter3";
+import { EventEmitter } from "eventemitter3";
+import EventNames = EventEmitter.EventNames;
+import EventListener = EventEmitter.EventListener;
+
 import { LegacyEventEmitter } from "./legacyEventEmitter.js";
 
 interface EventMap<BaseEventMap extends Object> {

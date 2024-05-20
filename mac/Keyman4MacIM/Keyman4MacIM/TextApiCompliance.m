@@ -72,7 +72,7 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
 
 -(NSString *)description
 {
-return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelectionApi: %d, canReadText: %d, canReplaceText: %d, mustBackspaceUsingEvents: %d, clientAppId: %@, client: %@", self.complianceUncertain, self.hasCompliantSelectionApi, [self canReadText], [self canReplaceText], [self mustBackspaceUsingEvents], _clientApplicationId, _client];
+  return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelectionApi: %d, canReadText: %d, canReplaceText: %d, mustBackspaceUsingEvents: %d, clientAppId: %@, client: %@", self.complianceUncertain, self.hasCompliantSelectionApi, [self canReadText], [self canReplaceText], [self mustBackspaceUsingEvents], _clientApplicationId, _client];
 }
 
 /** test to see if the API selectedRange functions properly for the text input client  */
@@ -132,7 +132,7 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
     BOOL locationChanged = [self hasLocationChanged:selectionRange];
     [self validateLocationChange:changeExpected hasLocationChanged:locationChanged];
   }
-
+  
   [self.appDelegate logDebugMessage:@"TextApiCompliance checkComplianceAfterInsert, self.hasWorkingSelectionApi = %@ for app %@", self.hasCompliantSelectionApi?@"YES":@"NO", self.clientApplicationId];
 }
 
@@ -158,7 +158,7 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
 }
 
 - (void) validateLocationChange:(BOOL) changeExpected hasLocationChanged:(BOOL) locationChanged {
-
+  
   if (changeExpected == locationChanged) {
     // YES for certain, the location is where we expect it
     self.hasCompliantSelectionApi = YES;
@@ -175,7 +175,7 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
 - (BOOL)isLocationChangeExpectedOnInsert:(NSString *)textToDelete insert:(NSString *)textToInsert {
   BOOL changeExpected = textToInsert.length != textToDelete.length;
   [self.appDelegate logDebugMessage:@"TextApiCompliance isLocationChangeExpected, changeExpected = %@", changeExpected?@"YES":@"NO"];
-
+  
   return changeExpected;
 }
 
@@ -184,7 +184,7 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
   NSUInteger oldLocation = self.initialSelection.location;
   BOOL locationChanged = newLocation != oldLocation;
   [self.appDelegate logDebugMessage:@"TextApiCompliance hasLocationChanged, currentSelection = %lu, length = %lu", newSelection.location, newSelection.length];
-
+  
   return locationChanged;
 }
 
@@ -209,35 +209,35 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
 }
 
 /** Check this hard-coded list to see if the application ID is among those
-* that are known to not implement selectionRange correctly.
-*  This was formerly called the legacy app list, renamed to improve clarity.
-*/
+ * that are known to not implement selectionRange correctly.
+ *  This was formerly called the legacy app list, renamed to improve clarity.
+ */
 - (BOOL)containedInHardCodedNoncompliantAppList:(NSString *)clientAppId {
-    BOOL isAppNonCompliant = (//[clientAppId isEqual: @"com.github.atom"] ||
-                              // 2023-12-19[sgs] Atom is now automatically detected as non-compliant
-                     [clientAppId isEqual: @"com.collabora.libreoffice-free"] ||
-                     [clientAppId isEqual: @"org.libreoffice.script"] ||
-                     [clientAppId isEqual: @"org.vim.MacVim"] ||
-                     [clientAppId isEqual: @"io.brackets.appshell"] ||
-                     [clientAppId isEqual: @"com.axosoft.gitkraken"] ||
-                     [clientAppId isEqual: @"org.sil.app.builder.scripture.ScriptureAppBuilder"] ||
-                     [clientAppId isEqual: @"org.sil.app.builder.reading.ReadingAppBuilder"] ||
-                     [clientAppId isEqual: @"org.sil.app.builder.dictionary.DictionaryAppBuilder"] ||
-                     //[clientAppId isEqual: @"com.microsoft.Word"] || // 2020-11-24[mcd]: Appears to work well in Word 16.43, disable legacy by default
-                     [clientAppId isEqual: @"org.openoffice.script"] ||
-                     // 2023-12-13[sgs]: Adobe apps automatically detected as non-compliant
-                     //[clientAppId isEqual: @"com.adobe.illustrator"] ||
-                     //[clientAppId isEqual: @"com.adobe.InDesign"] ||
-                     //[clientAppId isEqual: @"com.adobe.Photoshop"] ||
-                     //[clientAppId isEqual: @"com.adobe.AfterEffects"] ||
-                     //[clientAppId isEqual: @"com.microsoft.VSCode"] || // 2023-05-29[sgs]: Works with 1.78.2, disable legacy by default
-                     [clientAppId isEqual: @"com.google.Chrome"] ||
-                              // 2023-12-13[sgs]: must hard-code for Chrome because Google Docs returns relative but incorrect location so no way to auto-detect
-                     [clientAppId hasPrefix: @"net.java"] ||
-                     [clientAppId isEqual: @"com.Keyman.test.legacyInput"]
-                     /*||[clientAppId isEqual: @"ro.sync.exml.Oxygen"] - Oxygen has worse problems */
-                     );
-
+  BOOL isAppNonCompliant = (//[clientAppId isEqual: @"com.github.atom"] ||
+                            // 2023-12-19[sgs] Atom is now automatically detected as non-compliant
+                            [clientAppId isEqual: @"com.collabora.libreoffice-free"] ||
+                            [clientAppId isEqual: @"org.libreoffice.script"] ||
+                            [clientAppId isEqual: @"org.vim.MacVim"] ||
+                            [clientAppId isEqual: @"io.brackets.appshell"] ||
+                            [clientAppId isEqual: @"com.axosoft.gitkraken"] ||
+                            [clientAppId isEqual: @"org.sil.app.builder.scripture.ScriptureAppBuilder"] ||
+                            [clientAppId isEqual: @"org.sil.app.builder.reading.ReadingAppBuilder"] ||
+                            [clientAppId isEqual: @"org.sil.app.builder.dictionary.DictionaryAppBuilder"] ||
+                            //[clientAppId isEqual: @"com.microsoft.Word"] || // 2020-11-24[mcd]: Appears to work well in Word 16.43, disable legacy by default
+                            [clientAppId isEqual: @"org.openoffice.script"] ||
+                            // 2023-12-13[sgs]: Adobe apps automatically detected as non-compliant
+                            //[clientAppId isEqual: @"com.adobe.illustrator"] ||
+                            //[clientAppId isEqual: @"com.adobe.InDesign"] ||
+                            //[clientAppId isEqual: @"com.adobe.Photoshop"] ||
+                            //[clientAppId isEqual: @"com.adobe.AfterEffects"] ||
+                            //[clientAppId isEqual: @"com.microsoft.VSCode"] || // 2023-05-29[sgs]: Works with 1.78.2, disable legacy by default
+                            [clientAppId isEqual: @"com.google.Chrome"] ||
+                            // 2023-12-13[sgs]: must hard-code for Chrome because Google Docs returns relative but incorrect location so no way to auto-detect
+                            [clientAppId hasPrefix: @"net.java"] ||
+                            [clientAppId isEqual: @"com.Keyman.test.legacyInput"]
+                            /*||[clientAppId isEqual: @"ro.sync.exml.Oxygen"] - Oxygen has worse problems */
+                            );
+  
   [self.appDelegate logDebugMessage:@"containedInHardCodedNoncompliantAppList: for app %@: %@", clientAppId, isAppNonCompliant?@"yes":@"no"];
   return isAppNonCompliant;
 }
@@ -246,17 +246,17 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
  * Returns the list of application IDs for non-compliant apps
  */
 - (NSArray *)noncompliantAppsUserDefaults {
-    NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-    return [userData arrayForKey:kKMLegacyApps];
+  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
+  return [userData arrayForKey:kKMLegacyApps];
 }
 
 /**
-* Check this user-managed list to see if the application ID is among those known to be non-compliant.
-*/
+ * Check this user-managed list to see if the application ID is among those known to be non-compliant.
+ */
 - (BOOL)containedInUserManagedNoncompliantAppList:(NSString *)clientAppId {
   BOOL isAppNonCompliant = NO;
   NSArray *legacyAppsUserDefaults = [self noncompliantAppsUserDefaults];
-
+  
   if(legacyAppsUserDefaults != nil) {
     isAppNonCompliant = [self arrayContainsApplicationId:clientAppId fromArray:legacyAppsUserDefaults];
   }
@@ -268,24 +268,24 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
  * Checks array for a list of possible regexes to match a client app id
  */
 - (BOOL)arrayContainsApplicationId:(NSString *)applicationId fromArray:(NSArray *)applicationArray {
-    for(id appId in applicationArray) {
-        if(![appId isKindOfClass:[NSString class]]) {
-          // always log this: bad data in UserDefaults
-          NSLog(@"arrayContainsApplicationId:fromArray: LegacyApps user defaults array should contain only strings");
-        } else {
-            NSError *error = nil;
-            NSRange range =  NSMakeRange(0, applicationId.length);
-            
-            NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern: (NSString *) appId options: 0 error: &error];
-            NSArray *matchesArray = [regex matchesInString:applicationId options:0 range:range];
-            if(matchesArray.count>0) {
-              [self.appDelegate logDebugMessage:@"arrayContainsApplicationId: found match for application ID %@: ", applicationId];
-              return YES;
-            }
-        }
+  for(id appId in applicationArray) {
+    if(![appId isKindOfClass:[NSString class]]) {
+      // always log this: bad data in UserDefaults
+      NSLog(@"arrayContainsApplicationId:fromArray: LegacyApps user defaults array should contain only strings");
+    } else {
+      NSError *error = nil;
+      NSRange range =  NSMakeRange(0, applicationId.length);
+      
+      NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern: (NSString *) appId options: 0 error: &error];
+      NSArray *matchesArray = [regex matchesInString:applicationId options:0 range:range];
+      if(matchesArray.count>0) {
+        [self.appDelegate logDebugMessage:@"arrayContainsApplicationId: found match for application ID %@: ", applicationId];
+        return YES;
+      }
     }
-
-    return NO;
+  }
+  
+  return NO;
 }
 
 -(BOOL) isComplianceUncertain {
