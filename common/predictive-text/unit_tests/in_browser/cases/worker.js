@@ -1,4 +1,4 @@
-var assert = chai.assert;
+import { assert } from '../../../../../node_modules/chai/chai.js';
 
 import { Worker as WorkerBuilder }   from "../../../build/lib/web/index.mjs";
 import { LMLayerWorkerCode } from "/base/common/web/lm-worker/build/lib/worker-main.wrapped.min.js";

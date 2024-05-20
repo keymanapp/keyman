@@ -1,7 +1,7 @@
 import { PageContextAttachment } from '/@keymanapp/keyman/build/engine/attachment/lib/index.mjs';
 import { timedPromise } from '/@keymanapp/web-utils/build/lib/index.mjs';
 
-let assert = chai.assert;
+import { assert } from '/node_modules/chai/chai.js';
 
 let STANDARD_OPTIONS = {
   owner: null,

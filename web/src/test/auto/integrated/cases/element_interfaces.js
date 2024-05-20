@@ -1,4 +1,4 @@
-var assert = chai.assert;
+import { assert } from '/node_modules/chai/chai.js';
 
 import { extendString, Mock } from '/@keymanapp/keyboard-processor/build/lib/index.mjs';
 import * as wrappers from '/@keymanapp/keyman/build/engine/element-wrappers/lib/index.mjs';

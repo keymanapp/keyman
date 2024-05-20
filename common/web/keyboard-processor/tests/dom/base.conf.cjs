@@ -33,10 +33,11 @@ module.exports = {
 
   // frameworks to use
   // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-  frameworks: ['mocha', 'chai'],
+  frameworks: ['mocha'],
 
   // list of files / patterns to load in the browser
   files: [
+    { pattern: 'node_modules/chai/chai.js', watched: true, served: true, included: false, type: 'module'},
     {pattern: 'common/web/keyboard-processor/tests/dom/cases/*.js', type: "module"},
 
     {pattern: 'common/web/**/*.mjs', watched: true, served: true, included: false},

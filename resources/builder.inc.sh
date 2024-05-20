@@ -577,7 +577,7 @@ function builder_run_action() {
   local action=$1
   shift
   if builder_start_action $action; then
-    ($@)
+    ("$@")
     builder_finish_action success $action
   fi
   return 0
@@ -1682,11 +1682,6 @@ _builder_do_build_deps() {
       continue
     fi
 
-    # Only configure and build the dependency once per invocation
-    if builder_has_module_been_built "$dep"; then
-      continue
-    fi
-
     dep_target=
     if [[ ! -z ${_builder_dep_targets[$dep]+x} ]]; then
       # TODO: in the future split _builder_dep_targets into comma-separated
@@ -1694,14 +1689,19 @@ _builder_do_build_deps() {
       dep_target=${_builder_dep_targets[$dep]}
     fi
 
-    builder_set_module_has_been_built "$dep"
+    # Only configure and build the dependency once per invocation
+    if builder_has_module_been_built "$dep$dep_target"; then
+      continue
+    fi
+
+    builder_set_module_has_been_built "$dep$dep_target"
     "$REPO_ROOT/$dep/build.sh" "configure$dep_target" "build$dep_target" \
       $builder_verbose \
       $builder_debug \
       $_builder_build_deps \
       --builder-dep-parent "$THIS_SCRIPT_IDENTIFIER" && (
       if $_builder_debug_internal; then
-        builder_echo success "## Dependency $dep for $_builder_matched_action_name successfully"
+        builder_echo success "## Dependency $dep$dep_target for $_builder_matched_action_name successfully"
       fi
     ) || (
       result=$?

@@ -54,11 +54,11 @@ NS_ASSUME_NONNULL_BEGIN
               packageVersion:(NSString*)packageVersion
               readmeFilename:(NSString*)readmeFilename
              graphicFilename:(NSString*)graphicFilename
-                     fileVersion:(NSString*)fileVersion
+                 fileVersion:(NSString*)fileVersion
       keymanDeveloperVersion:(NSString*)keymanDeveloperVersion
                    copyright:(NSString*)copyright
                   authorName:(NSString*)authorName
-                  authorUrl:(NSString*)authorUrl
+                   authorUrl:(NSString*)authorUrl
                      website:(NSString*)website
                    keyboards:(NSArray*)keyboards
                        fonts:(NSArray*)fonts

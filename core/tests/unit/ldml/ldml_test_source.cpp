@@ -8,7 +8,6 @@
 #include <sstream>
 #include <string>
 #include <type_traits>
-#include <codecvt>
 
 #if 0
 // TODO-LDML If we need to avoid exceptions in JSON
@@ -200,7 +199,7 @@ LdmlTestSource::parse_source_string(std::string const &s) {
 std::u16string
 LdmlTestSource::parse_u8_source_string(std::string const &u8s) {
   // convert from utf-8 to utf-16 first
-  std::u16string s = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.from_bytes(u8s);
+  std::u16string s = convert<char, char16_t>(u8s);
   std::u16string t;
   for (auto p = s.begin(); p != s.end(); p++) {
     if (*p == '\\') {
@@ -219,7 +218,7 @@ LdmlTestSource::parse_u8_source_string(std::string const &u8s) {
         size_t n;
         std::u16string s1 = s.substr(p - s.begin(), 8);
         // TODO-LDML: convert back first?
-        std::string s1b = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(s1);
+        std::string s1b = convert<char16_t, char>(s1);
         v              = std::stoul(s1b, &n, 16);
         // Allow deadkey_number (U+0001) characters and onward
         assert(v >= 0x0001 && v <= 0x10FFFF);

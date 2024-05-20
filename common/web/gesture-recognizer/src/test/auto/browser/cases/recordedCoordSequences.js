@@ -1,5 +1,4 @@
-var assert = chai.assert;
-var expect = chai.expect;
+import { assert, expect } from '../../../../../../../../node_modules/chai/chai.js';
 
 import {
   HostFixtureLayoutController,
