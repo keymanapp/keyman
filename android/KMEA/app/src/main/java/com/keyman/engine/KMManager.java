@@ -25,7 +25,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
@@ -317,6 +316,8 @@ public final class KMManager {
   public static final String KMGRAY_BANNER = "<div style=\"background: #b4b4b8; width: 100%; height: 100%; position: absolute; left: 0; top: 0\"></div>";
 
   private static Context appContext;
+
+  private static int orientation;
 
   public static String getResourceRoot() {
     return appContext.getDir("data", Context.MODE_PRIVATE).toString() + File.separator;
@@ -626,6 +627,7 @@ public final class KMManager {
    * @return RelativeLayout.LayoutParams
    */
   public static RelativeLayout.LayoutParams getKeyboardLayoutParams() {
+    // Note: this func always has a reference to app context b/c class field.
     int bannerHeight = getBannerHeight(appContext);
     int kbHeight = getKeyboardHeight(appContext);
     RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
@@ -726,6 +728,9 @@ public final class KMManager {
 
     RelativeLayout keyboardLayout = new RelativeLayout(appContext);
     keyboardLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+
+    // sticks the keyboard's webview into our locally-generated keyboard-hosting
+    // view hierarchy (after ensuring that it's removed from a prior one if applicable)
     ViewGroup parent = (ViewGroup) SystemKeyboard.getParent();
     if (parent != null)
       parent.removeView(SystemKeyboard);
@@ -750,13 +755,16 @@ public final class KMManager {
 
   public static void onResume() {
     if (InAppKeyboard != null) {
-      InAppKeyboard.resumeTimers();
       InAppKeyboard.onResume();
+      InAppKeyboard.resumeTimers();
     }
     if (SystemKeyboard != null) {
-      SystemKeyboard.resumeTimers();
       SystemKeyboard.onResume();
+      SystemKeyboard.resumeTimers();
     }
+
+    detectOrientation(appContext);
+    updateOrientation();
   }
 
   public static void onPause() {
@@ -783,14 +791,28 @@ public final class KMManager {
   }
 
   public static void onConfigurationChanged(Configuration newConfig) {
+    KMManager.setOrientation((newConfig.orientation));
+
     // KMKeyboard
     if (InAppKeyboard != null) {
-      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       InAppKeyboard.onConfigurationChanged(newConfig);
     }
     if (SystemKeyboard != null) {
-      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       SystemKeyboard.onConfigurationChanged(newConfig);
+    }
+
+    updateOrientation();
+  }
+
+  static void updateOrientation() {
+    // KMKeyboard
+    if (InAppKeyboard != null) {
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+      InAppKeyboard.updateOrientation();
+    }
+    if (SystemKeyboard != null) {
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+      SystemKeyboard.updateOrientation();
     }
   }
 
@@ -1638,7 +1660,7 @@ public final class KMManager {
 
   public static boolean isDefaultKey(String key) {
     return (
-      key != null && 
+      key != null &&
       key.equals(KMString.format("%s_%s", KMDefault_LanguageID, KMDefault_KeyboardID)));
   }
 
@@ -2008,7 +2030,12 @@ public final class KMManager {
     KMKeyboard.removeOnKeyboardEventListener(listener);
   }
 
-  public static int getOrientation(Context context) {
+  /* package-private */
+  static void setOrientation(int orientationFlag) {
+    orientation = orientationFlag;
+  }
+
+  public static int detectOrientation(Context context) {
     Display display;
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
       // https://developer.android.com/reference/android/content/Context#getDisplay()
@@ -2016,20 +2043,24 @@ public final class KMManager {
         display = context.getDisplay();
       } catch (UnsupportedOperationException e) {
         // if the method is called on an instance that is not associated with any display.
-        return context.getResources().getConfiguration().orientation;
+        orientation = context.getResources().getConfiguration().orientation;
+        return orientation;
       }
     } else {
       WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
       // Deprecated in API 30
       display = wm.getDefaultDisplay();
     }
+
     int rotation = display.getRotation();
     if (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180) {
-      return Configuration.ORIENTATION_PORTRAIT;
+      orientation = Configuration.ORIENTATION_PORTRAIT;
     } else if (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
-      return Configuration.ORIENTATION_LANDSCAPE;
+      orientation = Configuration.ORIENTATION_LANDSCAPE;
+    } else {
+      orientation = Configuration.ORIENTATION_UNDEFINED;
     }
-    return Configuration.ORIENTATION_UNDEFINED;
+    return orientation;
   }
 
   public static int getBannerHeight(Context context) {
@@ -2046,7 +2077,6 @@ public final class KMManager {
     int defaultHeight = (int) context.getResources().getDimension(R.dimen.keyboard_height);
     SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
 
-    int orientation = getOrientation(context);
     if (orientation == Configuration.ORIENTATION_PORTRAIT) {
       return prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, defaultHeight);
     } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -2084,11 +2114,11 @@ public final class KMManager {
       wm.getDefaultDisplay().getSize(size);
       return size;
     }
-    
+
     WindowMetrics windowMetrics = wm.getCurrentWindowMetrics();
     return new Point(
       windowMetrics.getBounds().width(),
-      windowMetrics.getBounds().height());    
+      windowMetrics.getBounds().height());
   }
 
   public static float getWindowDensity(Context context) {

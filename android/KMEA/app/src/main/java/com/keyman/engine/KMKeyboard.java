@@ -225,7 +225,7 @@ final class KMKeyboard extends WebView {
     selMin -= pairsAtStart;
     selMax -= (pairsAtStart + pairsSelected);
     this.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selMin, selMax));
-  
+
     return true;
   }
 
@@ -256,7 +256,7 @@ final class KMKeyboard extends WebView {
     // When `.isTestMode() == true`, the setWebContentsDebuggingEnabled method is not available
     // and thus will trigger unit-test failures.
     if (!KMManager.isTestMode() && (
-      (context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0 || 
+      (context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0 ||
       KMManager.getTier(null) != KMManager.Tier.STABLE
     )) {
       // Enable debugging of WebView via adb. Not used during unit tests
@@ -417,13 +417,8 @@ final class KMKeyboard extends WebView {
     return super.onTouchEvent(event);
   }
 
+  @Override
   public void onResume() {
-    DisplayMetrics dms = context.getResources().getDisplayMetrics();
-    int kbWidth = (int) (dms.widthPixels / dms.density);
-    // Ensure window is loaded for javascript functions
-    loadJavascript(KMString.format(
-      "window.onload = function(){ setOskWidth(\"%d\");"+
-      "setOskHeight(\"0\"); };", kbWidth));
     if (this.getShouldShowHelpBubble()) {
       this.showHelpBubbleAfterDelay(2000);
     }
@@ -439,7 +434,14 @@ final class KMKeyboard extends WebView {
 
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
+    this.dismissHelpBubble();
 
+    if(this.getShouldShowHelpBubble()) {
+      this.showHelpBubbleAfterDelay(2000);
+    }
+  }
+
+  void updateOrientation() {
     RelativeLayout.LayoutParams params = KMManager.getKeyboardLayoutParams();
     this.setLayoutParams(params);
 
@@ -448,15 +450,13 @@ final class KMKeyboard extends WebView {
     if (this.htmlBannerString != null && !this.htmlBannerString.isEmpty()) {
       setHTMLBanner(this.htmlBannerString);
     }
+
+    DisplayMetrics dms = context.getResources().getDisplayMetrics();
+    int kbWidth = (int) (dms.widthPixels / dms.density);
+
     loadJavascript(KMString.format("setBannerHeight(%d)", bannerHeight));
-    loadJavascript(KMString.format("setOskWidth(%d)", newConfig.screenWidthDp));
+    loadJavascript(KMString.format("setOskWidth(%d)", kbWidth));
     loadJavascript(KMString.format("setOskHeight(%d)", oskHeight));
-
-    this.dismissHelpBubble();
-
-    if(this.getShouldShowHelpBubble()) {
-      this.showHelpBubbleAfterDelay(2000);
-    }
   }
 
   public void dismissSuggestionMenuWindow() {
