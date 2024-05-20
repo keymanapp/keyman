@@ -8,14 +8,13 @@
 
 #import <Cocoa/Cocoa.h>
 #import <InputMethodKit/InputMethodKit.h>
-#import <os/log.h>
+#import "KMLogs.h"
 
 const NSString *kConnectionName = @"Keyman_Input_Connection";
 IMKServer *server;
 
 int main(int argc, const char * argv[]) {
-  NSString *identifier;
-  os_log_t configLog = os_log_create("org.sil.keyman", "startup");
+    NSString *identifier;
   
   @autoreleasepool {
     identifier = [[NSBundle mainBundle] bundleIdentifier];
@@ -23,7 +22,7 @@ int main(int argc, const char * argv[]) {
     
     BOOL didLoadNib = [[NSBundle mainBundle] loadNibNamed:@"MainMenu" owner:[NSApplication sharedApplication] topLevelObjects: nil];
     
-    os_log_with_type(configLog, OS_LOG_TYPE_DEBUG, "main Did load MainMenu nib: %@", didLoadNib?@"YES":@"NO");
+    os_log_with_type([KMLogs startupLog], OS_LOG_TYPE_INFO, "main Did load MainMenu nib: %@", didLoadNib?@"YES":@"NO");
     
     [[NSApplication sharedApplication] run];
   }
