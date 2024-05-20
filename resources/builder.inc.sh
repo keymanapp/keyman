@@ -577,7 +577,7 @@ function builder_run_action() {
   local action=$1
   shift
   if builder_start_action $action; then
-    ($@)
+    ("$@")
     builder_finish_action success $action
   fi
   return 0
