@@ -4,9 +4,9 @@
 #include "..\src\kmx_u16.h"
 #include "..\src\compfile.h"
 #include "..\src\CompMsg.h"
+#include "..\..\common\include\kmn_compiler_errors.h"
 #include "..\..\..\..\common\include\km_types.h"
 #include "..\..\..\..\common\include\kmx_file.h"
-#include "..\..\..\..\common\include\kmn_compiler_errors.h"
 
 PKMX_WCHAR strtowstr(PKMX_STR in);
 PKMX_STR wstrtostr(PKMX_WCHAR in);
