@@ -20,6 +20,7 @@ extern kmcmp_CompilerMessageProc msgproc;
 namespace kmcmp {
     extern int nErrors;
     extern int ErrChr;
+    KMX_BOOL AddCompileWarning(char* buf);
 }
 
 #define ERR_EXTRA_LIB_LEN 256
@@ -41,7 +42,7 @@ class CompilerTest : public testing::Test {
     public:
         static KMX_CHAR szText_stub[];
 
-        static int msgproc_stub(int line, uint32_t dwMsgCode, const char* szText, void* context) {
+        static int msgproc_true_stub(int line, uint32_t dwMsgCode, const char* szText, void* context) {
             strcpy(szText_stub, szText);
             return 1;
         };
@@ -67,8 +68,17 @@ TEST_F(CompilerTest, wstrtostr_test) {
 
 // KMX_BOOL kmcmp::AddCompileWarning(PKMX_CHAR buf)
 
+TEST_F(CompilerTest, AddCompileWarning_test) {
+    msgproc = msgproc_false_stub;
+    const char *const WARNING_TEXT = "warning";
+    EXPECT_EQ(0, kmcmp::nErrors);
+    EXPECT_FALSE(kmcmp::AddCompileWarning((PKMX_CHAR)WARNING_TEXT));
+    EXPECT_EQ(0, strcmp(WARNING_TEXT, szText_stub));
+    EXPECT_EQ(0, kmcmp::nErrors);
+};
+
 TEST_F(CompilerTest, AddCompileError_test) {
-    msgproc = msgproc_stub;
+    msgproc = msgproc_true_stub;
     kmcmp::ErrChr = 0;
     ErrExtraLIB[0] = '\0';
     KMX_CHAR expected[COMPILE_ERROR_MAX_LEN];
