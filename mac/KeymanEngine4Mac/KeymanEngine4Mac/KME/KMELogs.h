@@ -1,8 +1,8 @@
 /**
  * Keyman is copyright (C) SIL International. MIT License.
  * 
- * KMLogs.h
- * Keyman
+ * KMELogs.h
+ * KeymanEngine4Mac
  * 
  * Created by Shawn Schantz on 2024-05-16.
  *
@@ -14,17 +14,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface KMLogs : NSObject
+@interface KMELogs : NSObject
 
-+ (void)reportLogStatus;
 + (os_log_t)startupLog;
-+ (os_log_t)lifecycleLog;
 + (os_log_t)configLog;
-+ (os_log_t)uiLog;
-+ (os_log_t)eventsLog;
-+ (os_log_t)keyboardLog;
 + (os_log_t)keyLog;
++ (os_log_t)coreLog;
 + (os_log_t)oskLog;
++ (os_log_t)uiLog;
++ (os_log_t)testLog;
 
 @end
 

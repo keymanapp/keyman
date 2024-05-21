@@ -1,26 +1,67 @@
-/*
+/**
  * Keyman is copyright (C) SIL International. MIT License.
  * 
- * LoggerUtil.m
- * CoreTesterApp
- * 
+ * KMLogs.m
+ * Keyman
+ *
  * Created by Shawn Schantz on 2024-05-16.
  * 
- * Description...
+ * Contains methods to get singleton logger objects and constants for subsystem and category names.
+ */
+
+/**
+ *
+ * The loggers do not appear to be singletons, but the API which creates them manages
+ * them as singletons within macOS so that any subsequent call to create a log object
+ * using the same subsystem and category will return the existing instance.
+ *
+ * For any new log categories used anywhere in the Keyman Input method, the name should be defined here.
+ * Keyman Engine may define and use the same category name but will use a different subsystem name. 
  */
 
 #import "KMLogs.h"
-#import <os/log.h>
 
 @implementation KMLogs
 
 char *const keymanSubsystem = "org.sil.keyman";
 char *const startupCategory = "startup";
+char *const lifecycleCategory = "lifecycle";
+char *const configCategory = "config";
+char *const uiCategory = "ui";
+char *const eventsCategory = "events";
+char *const keyboardCategory = "keyboard";
 char *const keyCategory = "key";
 char *const oskCategory = "osk";
 
++ (void)reportLogStatus {
+  bool debugLogEnabled = os_log_type_enabled([KMLogs startupLog], OS_LOG_TYPE_DEBUG);
+  os_log([KMLogs startupLog], "startupLog has debug messages enabled: %@", debugLogEnabled?@"YES":@"NO");
+  bool infoLogEnabled = os_log_type_enabled([KMLogs startupLog], OS_LOG_TYPE_INFO);
+  os_log([KMLogs startupLog], "startupLog has info messages enabled: %@", infoLogEnabled?@"YES":@"NO");
+}
+
 + (os_log_t)startupLog {
   return os_log_create(keymanSubsystem, startupCategory);
+}
+
++ (os_log_t)lifecycleLog {
+  return os_log_create(keymanSubsystem, lifecycleCategory);
+}
+
++ (os_log_t)configLog {
+  return os_log_create(keymanSubsystem, configCategory);
+}
+
++ (os_log_t)uiLog {
+  return os_log_create(keymanSubsystem, uiCategory);
+}
+
++ (os_log_t)eventsLog {
+  return os_log_create(keymanSubsystem, eventsCategory);
+}
+
++ (os_log_t)keyboardLog {
+  return os_log_create(keymanSubsystem, keyboardCategory);
 }
 
 + (os_log_t)keyLog {

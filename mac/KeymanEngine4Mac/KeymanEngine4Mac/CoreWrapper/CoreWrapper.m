@@ -15,6 +15,7 @@
 #import "CoreWrapper.h"
 #import "keyman_core_api.h"
 #import "keyman_core_api_consts.h"
+#import "KMELogs.h"
 
 @interface CoreWrapper()
 
@@ -73,7 +74,7 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   if (self.coreKeyboard) {
     km_core_keyboard_dispose(self.coreKeyboard);
   }
-  [self.coreHelper logDebugMessage:@"CoreWrapper dealloc called."];
+  os_log_debug([KMELogs coreLog], "CoreWrapper dealloc called.");
 }
 
 -(void)loadKeyboardUsingCore:(NSString*) path {
@@ -94,9 +95,9 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
     if (result==KM_CORE_STATUS_OK) {
       _keyboardVersion = [self.coreHelper createNSStringFromUnicharString:keyboardAttributes->version_string];
       _keyboardId = [self.coreHelper createNSStringFromUnicharString:keyboardAttributes->id];
-      [self.coreHelper logDebugMessage:@"keyboardVersion = %@\n, keyboardId  = %@\n", _keyboardVersion, _keyboardId];
+      os_log_debug([KMELogs coreLog], "keyboardVersion = %{public}@\n, keyboardId  = %{public}@\n", _keyboardVersion, _keyboardId);
     } else {
-      NSLog(@"km_core_keyboard_get_attrs() failed with result = %u\n", result );
+      os_log_error([KMELogs coreLog], "km_core_keyboard_get_attrs() failed with result = %u\n", result);
     }
   }
 }
@@ -117,7 +118,7 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
       [NSException raise:@"CreateKeyboardStateException" format:@"%@", message];
     }
   } else {
-    NSLog(@"CoreWrapper, Unable to set environment options for keyboard" );
+    os_log_error([KMELogs coreLog], "CoreWrapper, Unable to set environment options for keyboard");
   }
 }
 
@@ -160,7 +161,7 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   km_core_status result = km_core_process_event(self.coreState, keyCode, modifierState, isKeyDown, KM_CORE_EVENT_FLAG_DEFAULT);
   
   if (result!=KM_CORE_STATUS_OK) {
-    [self.coreHelper logDebugMessage:@"km_core_process_event() result = %u\n", result];
+    os_log_error([KMELogs coreLog], "km_core_process_event() result = %u\n", result);
   }
   
   return (result==KM_CORE_STATUS_OK);
@@ -171,7 +172,7 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
 }
 
 -(CoreKeyOutput*)loadActionStructUsingCore {
-  [self.coreHelper logDebugMessage:@"CoreWrapper loadActionStructUsingCore"];
+  os_log_debug([KMELogs coreLog], "CoreWrapper loadActionStructUsingCore");
   km_core_actions * actions = km_core_state_get_actions(self.coreState);
   CoreKeyOutput *output = [self createCoreKeyOutputForActionsStruct:actions];
   return output;
@@ -225,13 +226,13 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
 
 -(void)clearContextUsingCore {
   km_core_state_context_clear(self.coreState);
-  [self.coreHelper logDebugMessage:@"km_core_state_context_clear called"];
+  os_log_debug([KMELogs coreLog], "km_core_state_context_clear called");
 }
 
 -(void)setContextIfNeeded:(NSString*)context {
   unichar const * unicharContext = [self.coreHelper createUnicharStringFromNSString:context];
   km_core_status result = km_core_state_context_set_if_needed(self.coreState, unicharContext);
-  [self.coreHelper logDebugMessage:@"CoreWrapper setContextIfNeeded, context=%@, km_core_state_context_set_if_needed result=%i", context, result];
+  os_log_debug([KMELogs coreLog], "CoreWrapper setContextIfNeeded, context=%{public}@, km_core_state_context_set_if_needed result=%d", context, result);
 }
 
 -(NSString*)contextDebug {
@@ -239,7 +240,7 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   NSString *debugString = [self.coreHelper createNSStringFromUnicharString:context];
   km_core_cu_dispose(context);
   
-  [self.coreHelper logDebugMessage:@"CoreWrapper contextDebug = %@", debugString];
+  os_log_debug([KMELogs coreLog], "CoreWrapper contextDebug = %{public}@", debugString);
   return debugString;
 }
 
@@ -271,8 +272,8 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
 }
 
 -(BOOL)setOptionsForCore: (NSString *) key value:(NSString *) value {
-  [self.coreHelper logDebugMessage:@"setOptionsForCore, key = %@, value = %@", key, value];
-  
+  os_log_debug([KMELogs coreLog], "setOptionsForCore, key = %@, value = %@", key, value);
+
   // array of length 2, second item is terminating null struct
   km_core_option_item option[2] = {0};
   option[0].key = [self.coreHelper createUnicharStringFromNSString: key];
@@ -280,8 +281,8 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   option[0].scope = KM_CORE_OPT_KEYBOARD;
   
   km_core_status result = km_core_state_options_update(self.coreState, &option[0]);
-  [self.coreHelper logDebugMessage:@"setOptionsForCore, km_core_state_options_update result = %d", result];
-  
+  os_log_debug([KMELogs coreLog], "setOptionsForCore, km_core_state_options_update result = %d", result);
+
   return (result==KM_CORE_STATUS_OK);
 }
 
@@ -294,15 +295,15 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
                               &valueFromCore);
   if (result == KM_CORE_STATUS_OK) {
     if (valueFromCore) {
-      [self.coreHelper logDebugMessage:@"km_core_state_option_lookup successful, current value set in core= %@", [self.coreHelper createNSStringFromUnicharString:valueFromCore]];
+      os_log_debug([KMELogs coreLog], "km_core_state_option_lookup successful, current value set in core= %@", [self.coreHelper createNSStringFromUnicharString:valueFromCore]);
     } else {
-      [self.coreHelper logDebugMessage:@"km_core_state_option_lookup returned nil"];
+      os_log_debug([KMELogs coreLog], "km_core_state_option_lookup returned nil");
     }
   } else {
     if (valueFromCore) {
-      [self.coreHelper logDebugMessage:@"km_core_state_option_lookup failed, result = %d", result];
+      os_log_debug([KMELogs coreLog], "km_core_state_option_lookup failed, result = %d", result);
     } else {
-      [self.coreHelper logDebugMessage:@"km_core_state_option_lookup returned nil, result = %d", result];
+      os_log_debug([KMELogs coreLog], "km_core_state_option_lookup returned nil, result = %d", result);
     }
   }
   

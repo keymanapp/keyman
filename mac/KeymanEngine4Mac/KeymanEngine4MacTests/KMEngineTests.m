@@ -11,6 +11,7 @@
 #import "KeymanEngineTestsStaticHelperMethods.h"
 #import "KMEngine.h"
 #import "CoreAction.h"
+#import "KMELogs.h"
 
 @interface KMEngineTests : XCTestCase
 @end
@@ -106,7 +107,7 @@ NSString * names[nCombinations];
   KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"" verboseLogging:YES];
   NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"a" charactersIgnoringModifiers:@"a" isARepeat:NO keyCode:kVK_ANSI_A];
   CoreKeyOutput *output = [engine processEvent:event];
-  NSLog(@"output = %@", output);
+  os_log_debug([KMELogs testLog], "output = %{public}@", output);
   XCTAssert(output.hasTextToInsert, @"output has text to insert");
   XCTAssert([output.textToInsert isEqualToString:@"\u00C7"], @"Expected capital C cedille (U+00C7)");
 }
@@ -287,14 +288,14 @@ NSString * names[nCombinations];
     if (modifiers[i] & (LEFT_ALT_FLAG | RIGHT_ALT_FLAG))
       characters = [characters stringByAppendingString:@"\u030A"];
     
-    NSLog(@"Test case: %lu", (NSUInteger)modifiers[i]);
+    os_log_debug([KMELogs testLog], "Test case: %lu", (NSUInteger)modifiers[i]);
     // NOTE: 'a' happens to be keyCode 0 (see initVirtualKeyMapping in CoreHelper)
     NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:modifiers[i] timestamp:0 windowNumber:0 context:nil characters:characters charactersIgnoringModifiers:charactersIgnoringModifiers isARepeat:NO keyCode:0];
     NSString * keyCombination = [names[i] stringByAppendingFormat:@" %@", charactersIgnoringModifiers];
     CoreKeyOutput *coreKeyOutput = [engine processEvent:event];
     XCTAssert(coreKeyOutput.hasTextToInsert, @"hasTextToInsert for %@", keyCombination);
     NSString *output = coreKeyOutput.textToInsert;
-    NSLog(@"output = %@", output);
+    os_log_debug([KMELogs testLog], "output = %{public}@", output);
     switch (modifiers[i]) {
       case LEFT_SHIFT_FLAG:
       case RIGHT_SHIFT_FLAG:
@@ -358,13 +359,13 @@ NSString * names[nCombinations];
         characters = @"ß";
     }
     
-    NSLog(@"Test case: %lu", (NSUInteger)modifiers[i]);
+    os_log_debug([KMELogs testLog], "Test case: %lu", (NSUInteger)modifiers[i]);
     // NOTE: 's' happens to be keyCode 1 (see initVirtualKeyMapping in CoreHelper)
     NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:modifiers[i] timestamp:0 windowNumber:0 context:nil characters:characters charactersIgnoringModifiers:charactersIgnoringModifiers isARepeat:NO keyCode:1];
     NSString * keyCombination = [names[i] stringByAppendingFormat:@" %@", charactersIgnoringModifiers];
     CoreKeyOutput *coreKeyOutput = [engine processEvent:event];
     NSString *output = coreKeyOutput.textToInsert;
-    NSLog(@"output = %@", output);
+    os_log_debug([KMELogs testLog], "output = %@", output);
     switch (modifiers[i]) {
       case LEFT_SHIFT_FLAG:
       case RIGHT_SHIFT_FLAG:
@@ -548,7 +549,7 @@ NSString * names[nCombinations];
   KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"" verboseLogging:YES];
   NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"\b" charactersIgnoringModifiers:@"\b" isARepeat:NO keyCode:kVK_Delete];
   CoreKeyOutput *output = [engine processEvent:event];
-  NSLog(@"output: %@", output);
+  os_log_debug([KMELogs testLog], "output = %{public}@", output);
   XCTAssert(!output.hasTextToInsert, @"expected to insert nothing");
   XCTAssert(!output.hasCodePointsToDelete, @"expected to delete nothing");
   XCTAssert(output.emitKeystroke, @"expected to emit key");
@@ -559,7 +560,7 @@ NSString * names[nCombinations];
   KMEngine *engine = [[KMEngine alloc] initWithKMX:kmxFile context:@"ɣ" verboseLogging:YES];
   NSEvent *event = [NSEvent keyEventWithType:NSEventTypeKeyDown location:NSMakePoint(0, 0) modifierFlags:0 timestamp:0 windowNumber:0 context:nil characters:@"\b" charactersIgnoringModifiers:@"\b" isARepeat:NO keyCode:kVK_Delete];
   CoreKeyOutput *output = [engine processEvent:event];
-  NSLog(@"output: %@", output);
+  os_log_debug([KMELogs testLog], "output = %{public}@", output);
   XCTAssert(output.codePointsToDeleteBeforeInsert == 1, @"Expected output to delete one code point");
   XCTAssert(!output.hasTextToInsert, @"expected to insert nothing");
   NSString *context = engine.getCoreContextDebug;

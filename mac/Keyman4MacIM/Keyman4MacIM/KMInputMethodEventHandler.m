@@ -377,7 +377,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
      // assume that all non-compliant apps which require backspaces apply an extra backspace if the original event is a backspace
      if ((self.apiCompliance.mustBackspaceUsingEvents) && (event.keyCode == kVK_Delete)) {
      output.codePointsToDeleteBeforeInsert--;
-     os_log_with_type(keymanLog, OS_LOG_TYPE_INFO, "isDeleteAndInsertScenario, after delete pressed subtracting one backspace to reach %d and insert text '%{public}@'", output.codePointsToDeleteBeforeInsert, output.textToInsert);
+     os_log_info(keymanLog, "isDeleteAndInsertScenario, after delete pressed subtracting one backspace to reach %d and insert text '%{public}@'", output.codePointsToDeleteBeforeInsert, output.textToInsert);
      if (output.codePointsToDeleteBeforeInsert == 0) {
      // no backspace events needed
      [self insertAndReplaceTextForOutput:output client:client];

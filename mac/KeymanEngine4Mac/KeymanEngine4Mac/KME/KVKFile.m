@@ -8,6 +8,7 @@
 
 #import "KVKFile.h"
 #import "NKey.h"
+#import "KMELogs.h"
 
 @implementation KVKFile
 
@@ -21,7 +22,7 @@
     
     NSFileHandle *file = [NSFileHandle fileHandleForReadingAtPath:path];
     if (file == nil) {
-      //NSLog(@"Failed to open kvk file");
+      os_log_error([KMELogs configLog], "Failed to open kmx file");
       _filePath = nil;
       return nil;
     }

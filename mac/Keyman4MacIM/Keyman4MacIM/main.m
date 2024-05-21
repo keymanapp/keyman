@@ -22,7 +22,7 @@ int main(int argc, const char * argv[]) {
     
     BOOL didLoadNib = [[NSBundle mainBundle] loadNibNamed:@"MainMenu" owner:[NSApplication sharedApplication] topLevelObjects: nil];
     
-    os_log_with_type([KMLogs startupLog], OS_LOG_TYPE_INFO, "main Did load MainMenu nib: %@", didLoadNib?@"YES":@"NO");
+    os_log_info([KMLogs startupLog], "main Did load MainMenu nib: %@", didLoadNib?@"YES":@"NO");
     
     [[NSApplication sharedApplication] run];
   }

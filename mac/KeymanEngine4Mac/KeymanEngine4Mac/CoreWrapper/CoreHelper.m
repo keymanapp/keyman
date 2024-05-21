@@ -19,6 +19,7 @@
 #import "keyman_core_api.h"
 #import "MacVKCodes.h"
 #import "WindowsVKCodes.h"
+#import "KMELogs.h"
 
 const int VIRTUAL_KEY_ARRAY_SIZE = 0x80;
 UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
@@ -32,7 +33,7 @@ UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
 -(unichar const *) createUnicharStringFromNSString:(NSString *)string {
   NSString *nullTerminatedString = [string stringByAppendingString:@"\0"];
   if (![nullTerminatedString canBeConvertedToEncoding:NSUTF16LittleEndianStringEncoding]) {
-    [self logDebugMessage:@"createUnicharStringFromNSString, canBeConvertedToEncoding false for NSUTF16LittleEndianStringEncoding"];
+    os_log_debug([KMELogs coreLog], "createUnicharStringFromNSString, canBeConvertedToEncoding false for NSUTF16LittleEndianStringEncoding");
     return nil;
   }
   
@@ -77,15 +78,6 @@ UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
   return self;
 }
 
--(void)logDebugMessage:(NSString *)format, ... {
-  if (self.debugMode) {
-    va_list args;
-    va_start(args, format);
-    NSLogv(format, args);
-    va_end(args);
-  }
-}
-
 -(unsigned short) macVirtualKeyToWindowsVirtualKey:(unsigned short) keyCode {
   if ((keyCode<0) || (keyCode>=VIRTUAL_KEY_ARRAY_SIZE)) {
     return 0;
@@ -125,7 +117,7 @@ UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
    keymanModifiers |= KM_CORE_MODIFIER_NOCAPS;
    }*/
   
-  [self logDebugMessage:@"macToKeymanModifier result  = %u", (unsigned int)keymanModifiers];
+  os_log_debug([KMELogs coreLog], "macToKeymanModifier result  = %u", (unsigned int)keymanModifiers);
   return keymanModifiers;
 }
 
@@ -169,7 +161,7 @@ UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
   NSData * characterData = [[NSData alloc] initWithBytes:&scalarValue length:sizeof(scalarValue)];
   
   NSString *characterString=[[NSString alloc] initWithBytes:[characterData bytes] length:[characterData length] encoding:NSUTF32LittleEndianStringEncoding];
-  [self logDebugMessage:@"utf32ValueToString data: '%@', string: %@", characterData, characterString];
+  os_log_debug([KMELogs coreLog], "utf32ValueToString data: '%@', string: %@", characterData, characterString);
   return characterString;
 }
 
