@@ -6,7 +6,7 @@
 
 #include "km_types.h"
 #include "kmx_file.h"
-#include "filesystem.h"
+#include "util_filesystem.h"			//_S2 TODO include from keyman; not from this folder
 #include "mcompile.h"
 
 
@@ -82,6 +82,3 @@ KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL 
 
 #endif //MC_KMXFILE_H
 
-//################################################################################################################################################
-//################################# Code beyond these lines needs to be included in mcompile #####################################################
-//################################################################################################################################################

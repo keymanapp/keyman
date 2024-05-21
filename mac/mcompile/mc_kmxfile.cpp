@@ -205,7 +205,7 @@ KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL 
     return CERR_SomewhereIGotItWrong;
   }
 
-  fwrite(buf, size,1,hOutfile);
+  fwrite(buf, size,1, hOutfile);
 	if(offset != size)
   {
     delete[] buf;
