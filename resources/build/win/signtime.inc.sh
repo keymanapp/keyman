@@ -16,7 +16,7 @@ fi
 
 signtime() {
   # TODO: convert to bash script
-  cmd //c "$KEYMAN_ROOT/common/windows/signtime.bat" "$@"
+  run_in_vs_env cmd //c "$KEYMAN_ROOT/common/windows/signtime.bat" "$@"
 }
 
 function verify-all-executable-signatures-in-folder() {
