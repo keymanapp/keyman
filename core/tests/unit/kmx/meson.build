@@ -27,7 +27,7 @@ if cpp_compiler.get_id() == 'emscripten'
 endif
 
 kmx = executable('kmx',
-    ['kmx.cpp', '../emscripten_filesystem.cpp'],
+    ['kmx.cpp', common_test_files],
     cpp_args: defns + warns,
     include_directories: [inc, libsrc, '../../kmx_test_source'],
     link_args: links + tests_flags,
@@ -176,7 +176,7 @@ subdir('fixtures')
 # should work for Linux, macOS, and WASM.
 test_path = source_path
 
-key_e = executable('key_list', ['kmx_key_list.cpp', '../emscripten_filesystem.cpp'],
+key_e = executable('key_list', ['kmx_key_list.cpp', common_test_files],
                 cpp_args: defns + warns,
                 include_directories: [inc, libsrc],
                 link_args: links + tests_flags,
@@ -195,7 +195,7 @@ test('key_list', key_e,  depends: kbd_log, args: [kbd_obj] )
 
 # test for imx list
 
-imx_e = executable('imx_list', ['kmx_imx.cpp', '../emscripten_filesystem.cpp'],
+imx_e = executable('imx_list', ['kmx_imx.cpp', common_test_files],
                 cpp_args: defns + warns,
                 include_directories: [inc, libsrc],
                 link_args: links + tests_flags,
@@ -213,7 +213,7 @@ kbd_log = custom_target(test_kbd + '.kmx'.underscorify(),
 )
   test('imx_list', imx_e,  depends: kbd_log, args: [kbd_obj] )
 
-external_e = executable('ext_event', ['kmx_external_event.cpp', '../emscripten_filesystem.cpp'],
+external_e = executable('ext_event', ['kmx_external_event.cpp', common_test_files],
                 cpp_args: defns + warns,
                 include_directories: [inc, libsrc],
                 link_args: links + tests_flags,

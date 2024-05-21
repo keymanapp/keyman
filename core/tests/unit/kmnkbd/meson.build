@@ -38,7 +38,7 @@ if cpp_compiler.get_id() == 'emscripten'
 endif
 
 foreach t : tests
-  bin = executable(t[0], [t[1], '../emscripten_filesystem.cpp'],
+  bin = executable(t[0], [t[1], common_test_files],
     cpp_args: local_defns + defns + warns,
     include_directories: [inc, libsrc],
     link_args: links + tests_flags,
