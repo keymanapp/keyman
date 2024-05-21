@@ -2,11 +2,10 @@
 #ifndef MC_IMPORT_RULES_H
 #define MC_IMPORT_RULES_H
 
-//################################################################################################################################################
-//################################# Code beyond these lines needs to be included in mcompile #####################################################
-//################################################################################################################################################
-int mac_KMX_ToUnicodeEx(int keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int caps,const UCKeyboardLayout * keyboard_layout);
+//  _S2 CHECKED OK
+int mac_KMX_ToUnicodeEx(int keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int caps, const UCKeyboardLayout * keyboard_layout);
 
+//  _S2 CHECKED OK
 class DeadKey {
 private:
   KMX_WCHAR m_deadchar;

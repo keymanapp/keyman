@@ -7,7 +7,7 @@
 #include <cassert>
 #include <algorithm>
 #include <iostream>
-#include "filesystem.h"
+#include "util_filesystem.h"
 
 #ifdef _MSC_VER
 #include <io.h>
@@ -187,6 +187,41 @@ KMX_BOOL kmcmp_FileExists(const KMX_WCHAR* filename) {
   return FALSE;
 };
 
-//################################################################################################################################################
-//################################# Code beyond these lines needs to be included in mcompile #####################################################
-//################################################################################################################################################
+
+bool IsRelativePath(KMX_CHAR const * p) {
+  // Relative path (returns TRUE):
+  //  ..\...\BITMAP.BMP
+  //  PATH\BITMAP.BMP
+  //  BITMAP.BMP
+
+  // Semi-absolute path (returns FALSE):
+  //  \...\BITMAP.BMP
+
+  // Absolute path (returns FALSE):
+  //  C:\...\BITMAP.BMP
+  //  \\SERVER\SHARE\...\BITMAP.BMP
+
+  if ((*p == '\\') || (*p == '/')) return FALSE;
+  if (*p && *(p + 1) == ':') return FALSE;
+
+  return TRUE;
+}
+
+bool IsRelativePath(KMX_WCHAR const * p) {
+  // Relative path (returns TRUE):
+  //  ..\...\BITMAP.BMP
+  //  PATH\BITMAP.BMP
+  //  BITMAP.BMP
+
+  // Semi-absolute path (returns FALSE):
+  //  \...\BITMAP.BMP
+
+  // Absolute path (returns FALSE):
+  //  C:\...\BITMAP.BMP
+  //  \\SERVER\SHARE\...\BITMAP.BMP
+
+  if ((*p == u'\\') || (*p == u'/'))return FALSE;
+  if (*p && *(p + 1) == u':') return FALSE;
+
+  return TRUE;
+}
