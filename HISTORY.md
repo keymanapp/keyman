@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.40 alpha 2024-05-21
+
+* refactor(common): move `enabled` declaration into test_color.cpp (#11483)
+* test(developer) kmn compiler messages unit tests (#11284)
+* chore(linux): Move API verification to separate action (#10637)
+
 ## 18.0.39 alpha 2024-05-20
 
 * chore(mac): change indentation of source code to equal standard two spaces (#11432)
