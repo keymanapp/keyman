@@ -154,7 +154,7 @@ int mac_run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NU
 //################################################################################################################################################
 //################################# Code beyond these lines needs to be included in mcompile #####################################################
 //################################################################################################################################################
-
+// _S2 _84
 // Map of all shift states that we will work with
 const UINT VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG|RALTFLAG, K_SHIFTFLAG|LCTRLFLAG|RALTFLAG, 0xFFFF};
 
@@ -427,9 +427,11 @@ KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, int 
   // evident for the 102nd key on UK, for example, where \ can be generated with VK_OEM_102 or AltGr+VK_QUOTE.
   // For now, we get the least shifted version, which is hopefully adequate.
 
-  // _S2 : Sadly it`s not: on a german WINDOWS keyboard one will get '~' with  ALTGR + K_221(+) only.
-  //                       on a german MAC keyboard one will get '~' with either OPT + K_221(+) or OPT + K_84(T).
-  // K_84 will be caught first, so the least obvious version for creating the '~' is found and processed.
+  // _S2 : Sadly it`s not: on a German WINDOWS keyboard one will get '~' with  ALTGR + K_221(+) only.
+  //                       on a German MAC keyboard one will get '~' with either   OPT + K_221(+)    or     OPT + K_84(T)    or    CAPS + OPT + K_78(N)
+  // K_84 will be caught first, so one of the the least obvious version for creating the '~' is found and processed.
+
+  // -> meeting with Marc May 21 2024: We leave it as it is for now; it is OK if different combinations are found.
 
   const UCKeyboardLayout* keyboard_layout;
   if(mac_InitializeUCHR(&keyboard_layout)) {
@@ -461,6 +463,8 @@ KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, int 
           ch = DeadKey;
         }
       }
+
+      // _S2 ?5E OK till here
       switch(ch) {
         case 0x0000: break;
         case 0xFFFF: mac_KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, All_Vector, keyboard_layout); break;
@@ -507,6 +511,7 @@ int mac_KMX_GetDeadkeys( KMX_WCHAR DeadKey, UINT shift_dk, KMX_WORD *OutputPairs
 
   for ( int j=0; j < sizeof(shift)/sizeof(shift[0]); j++) {
 
+// _S2 _84
     // we start calculating SPACE(49) since most obvious deadkeys combinations use space.
     // _S2 for (int i = 0; keyarray[i] != 0xFFFF; i++) {
     for ( int i=Keycode_Spacebar; i >=0; i--) {

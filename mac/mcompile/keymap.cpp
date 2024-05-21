@@ -1,21 +1,26 @@
 #include "keymap.h"
 
+// _S2 _84 Shiftstates
 // Base, Shift, OPT, Shift+OPT
+
+// mapping for VKShiftState -> UcKeyTranslate uses 0,2,8,10  ( 4,6,12,14 with caps)
 int mac_map_VKShiftState_to_MacModifier(int VKShiftState) {
-  if      (VKShiftState == 0 )    return 0;	 // 0000 0000
-  else if (VKShiftState == 16)    return 2;  // 0000 0111
-  else if (VKShiftState == 9)     return 8;  // 0000 0111
-  else if (VKShiftState == 25)    return 10; // 0000 0111
+  if      (VKShiftState == 0 )    return 0;
+  else if (VKShiftState == 16)    return 2;
+  else if (VKShiftState == 9)     return 8;
+  else if (VKShiftState == 25)    return 10;
   else return VKShiftState;               // _S2 what to return if no match??
 }
 
 // Base, Shift, OPT, Shift+OPT
+// mapping for rgkey -> UcKeyTranslate uses 0,2,8,10  ( 4,6,12,14 with caps)
 int mac_map_ShiftState_to_MacModifier(int ShiftState) {
-  if      (ShiftState == 0 )        return 0;		// 0000 0000
-  else if (ShiftState == 1)         return 2;		// 0000 0010
-  else if (ShiftState == 6 )        return 8;		// 0000 0110
-  else if (ShiftState == 7)         return 10; 	// 0000 0111
-  else return ShiftState;  //;return 999;     // _S2 what to return if no match??
+  if      (ShiftState == 0 )        return 0;
+  else if (ShiftState == 1)         return 2;
+  else if (ShiftState == 6 )        return 8;
+  else if (ShiftState == 7)         return 10;
+  // more??
+  else return ShiftState;                 // _S2 what to return if no match??
 }
 
 int mac_createOneVectorFromBothKeyboards(v_dw_3D &All_Vector, const UCKeyboardLayout * keyboard_layout) {

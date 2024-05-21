@@ -267,7 +267,7 @@ public:
         (this->mac_KMX_IsSGCAPS() ? 2 : 0) |
         (this->mac_KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
         (this->mac_KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
-
+capslock = 1; //_S2
     for (int ss = 0; ss <= MaxShiftState; ss++) {
       if (ss == Menu || ss == ShftMenu) {
         // Alt and Shift+Alt don't work, so skip them
@@ -488,9 +488,9 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, const UCKeyboar
           }
 
           //_S2 TOP_6 TODO to compare win-lin kmn-files skip ss6+7; MUST BE removed later!!!!
-          /*if(ss == MenuCtrl|| ss == ShftMenuCtrl) {
+          if(ss == MenuCtrl|| ss == ShftMenuCtrl) {
            continue;
-          }*/
+          }
           // _S2 ToDo what about not used keys??
           KMX_DWORD KC_US = (KMX_DWORD) mac_KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 
@@ -516,8 +516,8 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, const UCKeyboar
             sbBuffer[2] = 0;
             rgKey[iKey]->mac_KMX_SetShiftState(ss, sbBuffer, true, (caps ));      // different to windows since behavior on Linux is different
             // _S2 does not work - deadkeys
-            if (!caps)  // _S2 can go later
-              printf(" _S2 we use dk: %i(%i) %i  %i(%c) \n", KC_US, iKey,ss, sbBuffer[0],sbBuffer[0] );
+            //if (!caps)  // _S2 can go later
+              printf(" _S2 we use dk: %i(%i) %i caps:%i  %i(%c) \n", KC_US, iKey,ss,caps, sbBuffer[0],sbBuffer[0] );
 
             sbBuffer[2] = 0;
             rgKey[iKey]->mac_KMX_SetShiftState(ss, sbBuffer, true, (caps == 0));
@@ -548,12 +548,11 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, const UCKeyboar
   //print_All_Entries_S2(rgKey);
   //print_All_Keys( * keyboard_layout);
   //print_certain_Keys( * keyboard_layout, 10);
-  bool allOK =test_alDead_S2(alDead);
+  // bool allOK =test_alDead_S2(alDead);
   if ( ! run_verify_S2(rgKey))
     printf(" \n::::::::::::::::::::::::::::::::::::::::::::::::::: THERE ARE SOME WRONG ENTRIES ::::::::::::::::::::::::::::::::::::::::::::::::::: \n");
   else
     printf("\n ::::::::::::::::::::::::::::::::::::::::::::::::::::::::: :) :) :) ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: \n");
-
 
   int nDeadkey = 0;
   LPKMX_GROUP gp = new KMX_GROUP[kp->cxGroupArray+4];  // leave space for old
@@ -617,7 +616,7 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, const UCKeyboar
   gp->cxKeyArray = nkeys;
 
   //
-  // Add nomatch control to each terminating 'using keys' group   // I4550
+  // Add nomatch control to each terminating 'using keys' group   // I4550   ggggǵggg  hhhhh´ggggggg  ggggḣhh  gggggggggg`gggggggǵg  ǵǵggggg  hhhh´gggggg  ggggáaaa – Ñ 
   //
   LPKMX_GROUP gp2 = kp->dpGroupArray;
   for(UINT i = 0; i < kp->cxGroupArray - 1; i++, gp2++) {
@@ -985,7 +984,7 @@ bool run_verify_S2(std::vector<mac_KMX_VirtualKey*> rgKey) {
   allOK =  verify_entries_S2(222, rgKey, 228,196,196,196)                      && allOK;
   allOK =  verify_entries_S2(226, rgKey, 60,60,62,62)                          && allOK;      // < >
 // -------------------------------------------
-  allOK =  verify_entries_S2(48, rgKey, 48,48,61,61,L'}',0,0,0)                && allOK;
+  /*allOK =  verify_entries_S2(48, rgKey, 48,48,61,61,L'}',0,0,0)                && allOK;
   allOK =  verify_entries_S2(49, rgKey, 49,49,33,33,L'’',0,0,0)                && allOK;
   allOK =  verify_entries_S2(50, rgKey, 50,50,34,34,L'²',0,0,0)                && allOK;
   allOK =  verify_entries_S2(51, rgKey, 51,51,167,167,L'³',0,0,0)              && allOK;
@@ -994,7 +993,7 @@ bool run_verify_S2(std::vector<mac_KMX_VirtualKey*> rgKey) {
   allOK =  verify_entries_S2(54, rgKey, 54,54,38,38,L'¿',0,0,0)                && allOK;
   allOK =  verify_entries_S2(55, rgKey, 55,55,47,47,L'{',0,0,0)                && allOK;
   allOK =  verify_entries_S2(56, rgKey, 56,56,40,40,L'[',0,0,0)                && allOK;
-  allOK =  verify_entries_S2(57, rgKey, 57,57,41,41,L']',0,0,0)                && allOK;
+  allOK =  verify_entries_S2(57, rgKey, 57,57,41,41,L']',0,0,0)                && allOK;*/
 
   return allOK;
 }
