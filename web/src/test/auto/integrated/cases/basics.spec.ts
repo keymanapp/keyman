@@ -41,7 +41,7 @@ describe('Basic KeymanWeb', function() {
 
     it('KMW\'s initialization variable should indicate completion.', function() {
       const keyman = window['keyman'] as KeymanEngine;
-      assert(keyman.initialized == 2, 'Keyman indicates incomplete initialization!');
+      assert.equal(keyman.initialized, 2, 'Keyman indicates incomplete initialization!');
     });
   });
 });
@@ -86,7 +86,7 @@ if(!device.touchable) {
         }
       }
 
-      assert(match, 'Controller element has not been added to the page!');
+      assert.isTrue(match, 'Controller element has not been added to the page!');
     })
   });
 
@@ -114,7 +114,7 @@ if(!device.touchable) {
       // UI-module specific typings are currently not available.
       const ui = keyman.ui as any;
 
-      assert(ui.init, 'Initialization flag is set to false!');
+      assert.isTrue(ui.init, 'Initialization flag is set to false!');
     })
   });
 
@@ -142,7 +142,7 @@ if(!device.touchable) {
       // UI-module specific typings are currently not available.
       const ui = keyman.ui as any;
 
-      assert(ui.initialized, 'Initialization flag is set to false!');
+      assert.isTrue(ui.initialized, 'Initialization flag is set to false!');
 
       assert.isNotNull(ui.outerDiv, 'Failed to create the floating controller element!');
 
@@ -155,7 +155,7 @@ if(!device.touchable) {
         }
       }
 
-      assert(match, 'Floating controller element has not been added to the page!');
+      assert.isTrue(match, 'Floating controller element has not been added to the page!');
     })
   });
 
@@ -183,7 +183,7 @@ if(!device.touchable) {
       // UI-module specific typings are currently not available.
       const ui = keyman.ui as any;
 
-      assert(ui.init, 'Initialization flag is set to false!');
+      assert.isTrue(ui.init, 'Initialization flag is set to false!');
 
       var kwc = document.getElementById('KeymanWebControl');
       assert.isNotNull(kwc, 'Toolbar DIV was not added to the page!');
