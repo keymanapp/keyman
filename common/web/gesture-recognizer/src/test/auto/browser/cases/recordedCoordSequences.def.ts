@@ -1,32 +1,40 @@
-import { assert, expect } from '../../../../../../../../node_modules/chai/chai.js';
+import { assert, expect } from 'chai';
+import sinon from 'sinon';
+
+import type { GestureDebugSource, InputSample, SerializedGestureSource } from '@keymanapp/gesture-recognizer';
 
 import {
   HostFixtureLayoutController,
   InputSequenceSimulator
-} from '../../../../../build/tools/lib/index.mjs';
+} from '#tools';
 
 function isOnAndroid() {
   const agent=navigator.userAgent;
   return agent.indexOf('Android' >= 0);
 }
 
-describe("Layer one - DOM -> InputSequence", function() {
-  this.timeout(testconfig.timeouts.standard);
+const loc = document.location;
+// config.testFile generally starts with a '/', with the path resembling the actual full local
+// filesystem for the drive.
+const domain = `${loc.protocol}/${loc.host}`
 
-  before(function() {
-    fixture.setBase('');
-  });
+async function fetchRecording(jsonFilename) {
+  const jsonResponse = await fetch(new URL(`${domain}/resources/json/${jsonFilename}.json`));
+  return await jsonResponse.json();
+}
+
+describe("Layer one - DOM -> InputSequence", function() {
+  this.timeout(20000);
+
+  let controller: HostFixtureLayoutController;
 
   beforeEach(function(done) {
-    fixture.load('host-fixture.html');
-    this.controller = new HostFixtureLayoutController();
-    this.controller.connect().then(() => done());
+    controller = new HostFixtureLayoutController();
+    controller.connect().then(() => done());
   });
 
   afterEach(function() {
-    this.controller.destroy();
-    fixture.cleanup();
-    fixture.cleanup();
+    controller.destroy();
   });
 
   describe('recorded input sequences', function() {
@@ -40,9 +48,7 @@ describe("Layer one - DOM -> InputSequence", function() {
 
     // We rely on this function to have the same context as `it` - the test-definition function.
     let replayAndCompare = function(testObj) {
-      let resultPromise;
-
-      let playbackEngine = new InputSequenceSimulator(this.controller);
+      let playbackEngine = new InputSequenceSimulator(controller);
 
       // **********************************
       // Android-Chrome sequence simulation does not allow fractional values in MouseEvent clientX/clientY...
@@ -58,7 +64,7 @@ describe("Layer one - DOM -> InputSequence", function() {
         }
       }
 
-      resultPromise = playbackEngine.replayAsync(testObj);
+      let resultPromise = playbackEngine.replayAsync(testObj);
 
       // replayAsync sets up timeouts against the `clock` object.
       // This will run through the simulated timeout queue asynchronously.
@@ -102,8 +108,8 @@ describe("Layer one - DOM -> InputSequence", function() {
         // Now to compare just the timestamp elements.  We'll tolerate a difference of up to 1.
         // Note:  if using the `replaySync` function instead, disable this section!
         // (Through to the nested for-loop `assert.closeTo`)
-        let sampleTimeExtractor = (sample) => sample.t;
-        let inputTimeExtractor = (input) => {
+        let sampleTimeExtractor = (sample: InputSample<any>) => sample.t;
+        let inputTimeExtractor = (input: GestureDebugSource<any> | SerializedGestureSource) => {
           return input.path.coords.map(sampleTimeExtractor);
         }
 
@@ -140,9 +146,8 @@ describe("Layer one - DOM -> InputSequence", function() {
     ];
 
     for(let recordingID of testRecordings) {
-      it(`${recordingID}.json`, function() {
-        this.timeout(2 * testconfig.timeouts.standard);
-        let testObj = __json__['receiver/' + recordingID];
+      it(`${recordingID}.json`, async function() {
+        let testObj = await fetchRecording('receiver/' + recordingID);
 
         // 'describe' has a notably different `this` reference than `it`, `before`, etc,
         // hence the `.call` construction.

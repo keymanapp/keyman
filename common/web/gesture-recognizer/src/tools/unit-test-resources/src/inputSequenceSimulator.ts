@@ -96,13 +96,14 @@ export class InputSequenceSimulator<HoveredItemType> {
       };
 
       if(window['Touch'] !== undefined) {
-        touch = new Touch(touchDict);
-      } else {
-        // When not performing touch-emulation, some desktop browsers will leave `Touch` undefined.
-        touch = touchDict as any;
+        try {
+          touch = new Touch(touchDict);
+          return touch;
+        } catch {}
       }
 
-      return touch;
+      // When not performing touch-emulation, some desktop browsers will leave `Touch` undefined.
+      return touchDict as any;
     });
 
     // Now that we've removed the entries that match any changed touchpoints, filter out any null entries.
@@ -119,11 +120,13 @@ export class InputSequenceSimulator<HoveredItemType> {
     let buildEvent = (type: string, dict: TouchEventInit) => {
       if(window['TouchEvent'] !== undefined) {
         // Nothing beats the real thing.
-        return new TouchEvent(type, dict);
-      } else {
-        // Effectively, an internal polyfill.  But, if at ALL possible, use a real version instead!
-        return this.buildSyntheticTouchEvent(type, dict);
+        try {
+          return new TouchEvent(type, dict);
+        } catch {};
       }
+
+      // Effectively, an internal polyfill.  But, if at ALL possible, use a real version instead!
+      return this.buildSyntheticTouchEvent(type, dict);
     }
 
     switch(state) {

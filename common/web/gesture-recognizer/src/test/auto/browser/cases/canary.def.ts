@@ -1,31 +1,40 @@
-import { assert } from '../../../../../../../../node_modules/chai/chai.js';
+import { assert } from 'chai';
+import sinon from 'sinon';
 
 import {
   FixtureLayoutConfiguration,
   HostFixtureLayoutController,
   InputSequenceSimulator
-} from '../../../../../build/tools/lib/index.mjs';
+} from '#tools';
 
 describe("'Canary' checks", function() {
-  this.timeout(testconfig.timeouts.standard);
+  this.timeout(5000);
 
-  before(function() {
-    fixture.setBase('');
-  })
+  let domain: string;
+
+  before(async () => {
+    let loc = document.location;
+    // config.testFile generally starts with a '/', with the path resembling the actual full local
+    // filesystem for the drive.
+    domain = `${loc.protocol}/${loc.host}`
+
+    // Test-config setups will take care of the rest; the server-path will be rooted at the repo root.
+    // With aliasing for resources/.
+  });
 
   it('host-fixture.html + gestureHost.css', function() {
-    let element = fixture.load('host-fixture.html')[0];
+    let element = document.getElementById('host-fixture');
 
     // Ensure that not only did we get an element, we got the expected element.
     assert.isNotNull(element);
     assert.isDefined(element);
-    assert.equal(element.id, 'host-fixture');
     // If the CSS is missing, the element will default to zero height.
     assert.notEqual(element.getBoundingClientRect().height, 0);
   });
 
-  it('canaryRecording.json', function() {
-    let jsonObject = window['__json__'].canaryRecording;
+  it('canaryRecording.json', async function() {
+    const jsonResponse = await fetch(new URL(`${domain}/resources/json/canaryRecording.json`));
+    const jsonObject = await jsonResponse.json();
 
     assert.isNotNull(jsonObject);
     assert.isDefined(jsonObject);
@@ -34,34 +43,32 @@ describe("'Canary' checks", function() {
     assert.equal(config.deviceStyle, 'screen4');
   });
 
-  it('Testing.HostFixtureLayoutController', function(done) {
-    let targetRoot = fixture.load('host-fixture.html')[0];
-    let jsonObject = window['__json__'].canaryRecording;
+  it('Testing.HostFixtureLayoutController', async function() {
+    const jsonResponse = await fetch(new URL(`${domain}/resources/json/canaryRecording.json`));
+    const jsonObject = await jsonResponse.json();
 
+    const targetRoot = document.getElementById('host-fixture');
     let controller = new HostFixtureLayoutController();
     // Note:  this is set BEFORE the controller is configured (in the following line).
     // The class is designed to support this.
     controller.layoutConfiguration = new FixtureLayoutConfiguration(jsonObject.config);
-    controller.connect().then(() => {
-      assert.isTrue(targetRoot.className.indexOf('screen4') > -1, "Could not apply configuration spec from recorded JSON!");
-      done();
-    }).finally(() => controller.destroy());
-  })
 
-  afterEach(function() {
-    fixture.cleanup();
+    try {
+      await controller.connect();
+      assert.isTrue(targetRoot.className.indexOf('screen4') > -1, "Could not apply configuration spec from recorded JSON!");
+    } finally {
+      controller.destroy();
+    }
   })
 
   describe('event simulation', function() {
     beforeEach(function(done) {
-      fixture.load('host-fixture.html');
       this.controller = new HostFixtureLayoutController();
       this.controller.connect().then(() => done());
     });
 
     afterEach(function() {
       this.controller.destroy();
-      fixture.cleanup();
     });
 
     it("InputSequenceSimulator.replayTouchSample", async function() {
