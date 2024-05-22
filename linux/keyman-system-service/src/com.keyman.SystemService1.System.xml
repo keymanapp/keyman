@@ -25,5 +25,16 @@
     <method name="GetCapsLockIndicator">
       <arg name="state" type="b" direction="out" />
     </method>
+
+    <!--
+      CallOrderedOutputSentinel:
+      @isKeyDown: Whether or not we're dealing with a keydown or keyup
+
+      Press the orderd output sentinel key to serialize the output.
+    -->
+    <method name="CallOrderedOutputSentinel">
+      <arg name="isKeyDown" type="b" direction="in"/>
+    </method>
+
   </interface>
 </node>
