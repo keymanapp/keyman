@@ -10,6 +10,7 @@
 #import <Carbon/Carbon.h> /* For kVK_ constants. */
 #import "KeySender.h"
 #import "TextApiCompliance.h"
+#import "KMLogs.h"
 @import Sentry;
 
 @interface KMInputMethodEventHandler ()
@@ -91,7 +92,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   // the only downside to treating all commands as having the potential to change the selection
   // is that some non-compliant apps can't get their context at all. This can be overridden so that
   // non-compliant apps can mitigate this problem as appropriate.
-  [self.appDelegate logDebugMessage:@"KMInputMethodEventHandler handleCommand, event type=%@, must refresh context", event.type];
+  os_log_debug([KMLogs keyLog], "KMInputMethodEventHandler handleCommand, event type=%lu, must refresh context", (unsigned long)event.type);
   self.contextChanged = YES;
 }
 
@@ -104,7 +105,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
 }
 
 - (BOOL) handleEventWithKeymanEngine:(NSEvent *)event in:(id) sender {
-  [self.appDelegate logDebugMessage:@"handleEventWithKeymanEngine, event = %@", event];
+  os_log_debug([KMLogs eventsLog], "handleEventWithKeymanEngine, event = %{public}@", event);
   CoreKeyOutput *output = nil;
   
   output = [self processEventWithKeymanEngine:event in:sender];
@@ -121,7 +122,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   if (self.appDelegate.lowLevelEventTap != nil) {
     NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:self.appDelegate.currentModifierFlags timestamp:event.timestamp windowNumber:event.windowNumber context:[NSGraphicsContext currentContext] characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
     coreKeyOutput = [self.kme processEvent:eventWithOriginalModifierFlags];
-    [self.appDelegate logDebugMessage:@"processEventWithKeymanEngine, using AppDelegate.currentModifierFlags %lu, instead of event.modifiers = %lu", (unsigned long)self.appDelegate.currentModifierFlags, (unsigned long)event.modifierFlags];
+    os_log_debug([KMLogs eventsLog], "processEventWithKeymanEngine, using AppDelegate.currentModifierFlags %lu, instead of event.modifiers = %lu", (unsigned long)self.appDelegate.currentModifierFlags, (unsigned long)event.modifierFlags);
   }
   else {
     // Depending on the client app and the keyboard, using the passed-in event as it is should work okay.
@@ -129,28 +130,28 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
     // context might go undetected in some apps, resulting in errant behavior for subsequent typing.
     coreKeyOutput = [self.kme processEvent:event];
   }
-  [self.appDelegate logDebugMessage:@"processEventWithKeymanEngine, coreKeyOutput = %@", coreKeyOutput];
+  os_log_debug([KMLogs eventsLog], "processEventWithKeymanEngine, coreKeyOutput = %{public}@", coreKeyOutput);
   return coreKeyOutput;
 }
 
 - (void)checkEventForSentryEasterEgg:(NSEvent *)event {
   if (_easterEggForSentry != nil) {
     NSString * kmxName = [[self.kme.kmx filePath] lastPathComponent];
-    NSLog(@"Sentry - KMX name: %@", kmxName);
+    os_log_debug([KMLogs testLog], "Sentry - KMX name: %{public}@", kmxName);
     if ([kmxName isEqualToString:kEasterEggKmxName]) {
       NSUInteger len = [_easterEggForSentry length];
-      NSLog(@"Sentry - Processing character(s): %@", [event characters]);
+      os_log_debug([KMLogs testLog], "Sentry - Processing character(s): %{public}@", [event characters]);
       if ([[event characters] characterAtIndex:0] == [kEasterEggText characterAtIndex:len]) {
         NSString *characterToAdd = [kEasterEggText substringWithRange:NSMakeRange(len, 1)];
         NSLog(@"Sentry - Adding character to Easter Egg code string: %@", characterToAdd);
         [_easterEggForSentry appendString:characterToAdd];
         if ([_easterEggForSentry isEqualToString:kEasterEggText]) {
-          NSLog(@"Sentry - Forcing crash now");
+          os_log_debug([KMLogs testLog], "Sentry - Forcing crash now");
           [SentrySDK crash];
         }
       }
       else if (len > 0) {
-        NSLog(@"Sentry - Clearing Easter Egg code string.");
+        os_log_debug([KMLogs testLog], "Sentry - Clearing Easter Egg code string.");
         [_easterEggForSentry setString:@""];
       }
     }
@@ -167,7 +168,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
  Core for processing, as it is already the result of processing.
  */
 - (void)handleBackspace:(NSEvent *)event {
-  [self.appDelegate logDebugMessage:@"KMInputMethodEventHandler handleBackspace, event = %@", event];
+  os_log_debug([KMLogs eventsLog], "KMInputMethodEventHandler handleBackspace, event = %{public}@", event);
   
   if (self.generatedBackspaceCount > 0) {
     self.generatedBackspaceCount--;
@@ -181,7 +182,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
 }
 
 - (void)triggerInsertQueuedText:(NSEvent *)event {
-  [self.appDelegate logDebugMessage:@"KMInputMethodEventHandler triggerInsertQueuedText"];
+  os_log_debug([KMLogs eventsLog], "KMInputMethodEventHandler triggerInsertQueuedText");
   [self.keySender sendKeymanKeyCodeForEvent:event];
 }
 
@@ -196,7 +197,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
       (![self.apiCompliance.clientApplicationId isEqualTo:self.clientApplicationId]) ||
       self.contextChanged) {
     self.apiCompliance = [[TextApiCompliance alloc]initWithClient:client applicationId:self.clientApplicationId];
-    [self.appDelegate logDebugMessage:@"KMInputMethodHandler initWithClient checkTextApiCompliance: %@", _apiCompliance];
+    os_log_debug([KMLogs complianceLog], "KMInputMethodHandler initWithClient checkTextApiCompliance: %{public}@", _apiCompliance);
   } else if (self.apiCompliance.isComplianceUncertain) {
     // We have a valid TextApiCompliance object, but compliance is uncertain, so test it
     [self.apiCompliance checkCompliance:client];
@@ -206,7 +207,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
 - (void) handleContextChangedByLowLevelEvent {
   if (self.appDelegate.contextChangedByLowLevelEvent) {
     if (!self.contextChanged) {
-      [self.appDelegate logDebugMessage:@"Low-level event has changed the context."];
+      os_log_debug([KMLogs complianceLog], "Low-level event has changed the context.");
       self.contextChanged = YES;
     }
     self.appDelegate.contextChangedByLowLevelEvent = NO;
@@ -216,8 +217,8 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
 // handleEvent implementation for core event processing
 - (BOOL)handleEvent:(NSEvent *)event client:(id)sender {
   BOOL handled = NO;
-  [self.appDelegate logDebugMessage:@"handleEvent event = %@", event];
-  
+  os_log_debug([KMLogs eventsLog], "handleEvent event = %{public}@", event);
+
   [self checkTextApiCompliance:sender];
   
   // mouse movement requires that the context be invalidated
@@ -227,7 +228,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
     // indicates that our generated backspace event(s) are consumed
     // and we can insert text that followed the backspace(s)
     if (event.keyCode == kKeymanEventKeyCode) {
-      [self.appDelegate logDebugMessage:@"handleEvent, handling kKeymanEventKeyCode"];
+      os_log_debug([KMLogs eventsLog], "handleEvent, handling kKeymanEventKeyCode");
       [self insertQueuedText: event client:sender];
       return YES;
     }
@@ -235,7 +236,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
     // for some apps, handleEvent will not be called for the generated backspace
     // but if it is, we need to let it pass through rather than process again in core
     if((event.keyCode == kVK_Delete) && (self.lowLevelBackspaceCount > 0)) {
-      [self.appDelegate logDebugMessage:@"handleEvent, allowing generated backspace to pass through"];
+      os_log_debug([KMLogs eventsLog], "handleEvent, allowing generated backspace to pass through");
       self.lowLevelBackspaceCount--;
       
       // return NO to pass through to client app
@@ -258,7 +259,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
     handled = [self handleEventWithKeymanEngine:event in: sender];
   }
   
-  [self.appDelegate logDebugMessage:@"event, keycode: %u, characters='%@' handled = %@", event.keyCode, event.characters, handled?@"yes":@"no"];
+  os_log_debug([KMLogs eventsLog], "event, keycode: %u, characters='%{public}@' handled = %{public}@", event.keyCode, event.characters, handled?@"yes":@"no");
   return handled;
 }
 
@@ -293,11 +294,11 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   // we do this whether the context has changed or not
   if (self.apiCompliance.canReadText) {
     contextString = [self readContext:event forClient:client];
-    [self.appDelegate logDebugMessage:@"reportContext, setting new context='%@' for compliant app (if needed)", contextString];
+    os_log_debug([KMLogs eventsLog], "reportContext, setting new context='%{public}@' for compliant app (if needed)", contextString);
     [self.kme setCoreContextIfNeeded:contextString];
   } else if (self.contextChanged) {
     // we cannot read the text but know the context has changed, so we must clear it
-    [self.appDelegate logDebugMessage:@"reportContext, clearing context for non-compliant app"];
+    os_log_debug([KMLogs eventsLog], "reportContext, clearing context for non-compliant app");
     [self.kme clearCoreContext];
   }
   
@@ -316,7 +317,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
     NSUInteger contextStart = selectionRange.location - contextLength;
     
     if (contextLength > 0) {
-      [self.appDelegate logDebugMessage:@"   *** InputMethodEventHandler readContext, %d characters", contextLength];
+      os_log_debug([KMLogs eventsLog], "   *** InputMethodEventHandler readContext, %lu characters", (unsigned long)contextLength);
       NSRange contextRange = NSMakeRange(contextStart, contextLength);
       attributedString = [client attributedSubstringFromRange:contextRange];
       
@@ -324,7 +325,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
       // the API appears to always return a full code point, but this could vary by app
       if (attributedString.length > 0) {
         if (CFStringIsSurrogateLowCharacter([attributedString.string characterAtIndex:0])) {
-          [self.appDelegate logDebugMessage:@"   *** InputMethodEventHandler readContext, first char is low surrogate, reducing context by one character"];
+          os_log_debug([KMLogs eventsLog], "   *** InputMethodEventHandler readContext, first char is low surrogate, reducing context by one character");
           contextString = [attributedString.string substringFromIndex:1];
         } else {
           contextString = attributedString.string;
@@ -340,7 +341,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
  * Returns NO if we have not applied an event to the client or if Keyman Core determines that we should emit the keystroke
  */
 -(BOOL)applyKeymanCoreActions:(CoreKeyOutput*)output event: (NSEvent*)event client:(id) client {
-  [self.appDelegate logDebugMessage:@"   *** InputMethodEventHandler applyKeymanCoreActions: output = %@ ", output];
+  os_log_debug([KMLogs eventsLog], "   *** InputMethodEventHandler applyKeymanCoreActions: output = %{public}@ ", output);
   
   BOOL handledEvent = [self applyKeyOutputToTextInputClient:output keyDownEvent:event client:client];
   [self applyNonTextualOutput:output];
@@ -348,7 +349,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   // if output from Keyman Core indicates to emit the keystroke,
   // then return NO, so that the OS still handles the event
   if (handledEvent && output.emitKeystroke) {
-    [self.appDelegate logDebugMessage:@"   *** InputMethodEventHandler applyKeymanCoreActions: emit keystroke true, returning false for handledEvent"];
+    os_log_debug([KMLogs eventsLog], "   *** InputMethodEventHandler applyKeymanCoreActions: output = %{public}@ ", output);
     handledEvent = NO;
   }
   
@@ -359,15 +360,16 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   BOOL handledEvent = YES;
   
   if (output.isInsertOnlyScenario) {
-    [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, insert only scenario"];
+    os_log_debug([KMLogs keyLog], "KXMInputMethodHandler applyOutputToTextInputClient, insert only scenario");
+    os_log_debug([KMLogs keyLog], "KXMInputMethodHandler applyOutputToTextInputClient, insert only scenario");
     [self insertAndReplaceTextForOutput:output client:client];
   } else if (output.isDeleteOnlyScenario) {
     if ((event.keyCode == kVK_Delete) && output.codePointsToDeleteBeforeInsert == 1) {
       // let the delete pass through in the original event rather than sending a new delete
-      [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, delete only scenario with passthrough"];
+      os_log_debug([KMLogs keyLog], "KXMInputMethodHandler applyOutputToTextInputClient, delete only scenario with passthrough");
       handledEvent = NO;
     } else {
-      [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, delete only scenario"];
+      os_log_debug([KMLogs keyLog], "KXMInputMethodHandler applyOutputToTextInputClient, delete only scenario");
       [self sendEvents:event forOutput:output];
     }
   } else if (output.isDeleteAndInsertScenario) {
@@ -389,10 +391,10 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
      */
     
     if (self.apiCompliance.mustBackspaceUsingEvents) {
-      [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, delete and insert scenario with events"];
+      os_log_debug([KMLogs keyLog], "KXMInputMethodHandler applyOutputToTextInputClient, delete and insert scenario with events");
       [self sendEvents:event forOutput:output];
     } else {
-      [self.appDelegate logDebugMessage:@"KXMInputMethodHandler applyOutputToTextInputClient, delete and insert scenario with insert API"];
+      os_log_debug([KMLogs keyLog], "KXMInputMethodHandler applyOutputToTextInputClient, delete and insert scenario with insert API");
       // directly insert text and handle backspaces by using replace
       [self insertAndReplaceTextForOutput:output client:client];
     }
@@ -415,11 +417,11 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   for(NSString *key in options) {
     NSString *value = [options objectForKey:key];
     if(key && value) {
-      [self.appDelegate logDebugMessage:@"applyNonTextualOutput calling writePersistedOptions, key: %@, value: %@", key, value];
+      os_log_debug([KMLogs keyLog], "applyNonTextualOutput calling writePersistedOptions, key: %{public}@, value: %{public}@", key, value);
       [self.appDelegate writePersistedOptions:key withValue:value];
     }
     else {
-      [self.appDelegate logDebugMessage:@"applyNonTextualOutput, invalid values in optionsToPersist, not writing to UserDefaults, key: %@, value: %@", key, value];
+      os_log_debug([KMLogs keyLog], "applyNonTextualOutput, invalid values in optionsToPersist, not writing to UserDefaults, key: %{public}@, value: %{public}@", key, value);
     }
   }
 }
@@ -448,7 +450,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
  * this method can only be used if approved by TextApiCompliance
  */
 -(void)insertAndReplaceText:(NSString *)text deleteCount:(int) replacementCount toReplace:(NSString*)textToDelete client:(id) client {
-  [self.appDelegate logDebugMessage:@"KXMInputMethodHandler insertAndReplaceText: %@ replacementCount: %d", text, replacementCount];
+  os_log_debug([KMLogs keyLog], "KXMInputMethodHandler insertAndReplaceText: %{public}@ replacementCount: %d", text, replacementCount);
   NSRange selectionRange = [client selectedRange];
   NSRange replacementRange = [self calculateInsertRangeForDeletedText:textToDelete selectionRange:selectionRange];
   
@@ -481,8 +483,8 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
 }
 
 -(void)sendEvents:(NSEvent *)event forOutput:(CoreKeyOutput*)output {
-  [self.appDelegate logDebugMessage:@"sendEvents called, output = %@", output];
-  
+  os_log_debug([KMLogs keyLog], "sendEvents called, output = %{public}@", output);
+
   _sourceForGeneratedEvent = CGEventCreateSourceFromEvent([event CGEvent]);
   
   self.generatedBackspaceCount = output.codePointsToDeleteBeforeInsert;
@@ -490,13 +492,13 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   
   if (output.hasCodePointsToDelete) {
     for (int i = 0; i < output.codePointsToDeleteBeforeInsert; i++) {
-      [self.appDelegate logDebugMessage:@"sendEvents sending backspace key event"];
+      os_log_debug([KMLogs keyLog], "sendEvents sending backspace key event");
       [self.keySender sendBackspaceforEventSource:_sourceForGeneratedEvent];
     }
   }
   
   if (output.hasTextToInsert) {
-    [self.appDelegate logDebugMessage:@"sendEvents, queueing text to insert: %@", output.textToInsert];
+    os_log_debug([KMLogs keyLog], "sendEvents, queueing text to insert: %{public}@", output.textToInsert);
     
     self.queuedText = output.textToInsert;
   }
@@ -504,11 +506,11 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
 
 -(void)insertQueuedText: (NSEvent *)event client:(id) client  {
   if (self.queuedText.length> 0) {
-    [self.appDelegate logDebugMessage:@"insertQueuedText, inserting %@", self.queuedText];
+    os_log_debug([KMLogs keyLog], "insertQueuedText, inserting %{public}@", self.queuedText);
     [self insertAndReplaceText:self.queuedText deleteCount:0 toReplace:nil client:client];
     self.queuedText = nil;
   } else {
-    [self.appDelegate logDebugMessage:@"insertQueuedText called but no text to insert"];
+    os_log_debug([KMLogs keyLog], "insertQueuedText called but no text to insert");
   }
 }
 

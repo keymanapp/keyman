@@ -72,20 +72,20 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
   }
   
   if (useVerboseLogging) {
-    os_log_debug([KMELogs keyLog], "KMEngine - Turning verbose logging on");
+    os_log_debug([KMELogs testLog], "KMEngine - Turning verbose logging on");
     // In Keyman Engine if "debugMode" is turned on (explicitly) with "English plus Spanish" as the current keyboard and you type "Sentrycrash#KME",
     // it will force a simulated crash to test reporting to sentry.keyman.com.
     NSString * kmxName = [[_kmx filePath] lastPathComponent];
-    os_log_debug([KMELogs keyLog], "Sentry - KME: _kmx name = %{public}@", kmxName);
+    os_log_debug([KMELogs testLog], "Sentry - KME: _kmx name = %{public}@", kmxName);
     if ([kEasterEggKmxName isEqualToString:kmxName]) {
-      os_log_debug([KMELogs keyLog], "Sentry - KME: Preparing to detect Easter egg.");
+      os_log_debug([KMELogs testLog], "Sentry - KME: Preparing to detect Easter egg.");
       _easterEggForSentry = [[NSMutableString alloc] init];
     }
     else
       _easterEggForSentry = nil;
   }
   else {
-    os_log_debug([KMELogs keyLog], "KMEngine - Turning verbose logging off");
+    os_log_debug([KMELogs testLog], "KMEngine - Turning verbose logging off");
   }
 }
 

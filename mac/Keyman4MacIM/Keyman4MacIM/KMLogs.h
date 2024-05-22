@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void)reportLogStatus;
 + (os_log_t)startupLog;
++ (os_log_t)complianceLog;
 + (os_log_t)lifecycleLog;
 + (os_log_t)configLog;
 + (os_log_t)uiLog;
@@ -25,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (os_log_t)keyboardLog;
 + (os_log_t)keyLog;
 + (os_log_t)oskLog;
++ (os_log_t)testLog;
 
 @end
 

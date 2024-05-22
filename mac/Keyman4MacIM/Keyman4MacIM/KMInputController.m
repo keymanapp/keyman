@@ -10,6 +10,7 @@
 #import "KMInputMethodEventHandler.h"
 #import "KMOSVersion.h"
 #include <Carbon/Carbon.h> /* For kVK_ constants. */
+#import "KMLogs.h"
 
 @implementation KMInputController
 
@@ -58,7 +59,7 @@ NSMutableArray *servers;
 // Passthrough from the app delegate low level event hook
 // to the input method event handler for handleBackspace.
 - (void)handleBackspace:(NSEvent *)event {
-  [self.AppDelegate logDebugMessage:@"KMInputController handleBackspace, event = %@", event];
+  os_log_debug([KMLogs keyLog], "KMInputController handleBackspace, event = %{public}@", event);
   if(_eventHandler != nil) {
     [_eventHandler handleBackspace:event];
   }

@@ -25,6 +25,7 @@
 
 char *const keymanSubsystem = "org.sil.keyman";
 char *const startupCategory = "startup";
+char *const complianceCategory = "compliance";
 char *const lifecycleCategory = "lifecycle";
 char *const configCategory = "config";
 char *const uiCategory = "ui";
@@ -32,6 +33,7 @@ char *const eventsCategory = "events";
 char *const keyboardCategory = "keyboard";
 char *const keyCategory = "key";
 char *const oskCategory = "osk";
+char *const testCategory = "test";
 
 + (void)reportLogStatus {
   bool debugLogEnabled = os_log_type_enabled([KMLogs startupLog], OS_LOG_TYPE_DEBUG);
@@ -42,6 +44,10 @@ char *const oskCategory = "osk";
 
 + (os_log_t)startupLog {
   return os_log_create(keymanSubsystem, startupCategory);
+}
+
++ (os_log_t)complianceLog {
+  return os_log_create(keymanSubsystem, complianceCategory);
 }
 
 + (os_log_t)lifecycleLog {
@@ -70,6 +76,10 @@ char *const oskCategory = "osk";
 
 + (os_log_t)oskLog {
   return os_log_create(keymanSubsystem, oskCategory);
+}
+
++ (os_log_t)testLog {
+  return os_log_create(keymanSubsystem, testCategory);
 }
 
 @end
