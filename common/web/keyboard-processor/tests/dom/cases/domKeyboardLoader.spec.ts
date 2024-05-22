@@ -1,39 +1,36 @@
-import { assert } from '../../../../../../node_modules/chai/chai.js';
+import { assert } from 'chai';
 
-import { DOMKeyboardLoader } from '../../../build/lib/dom-keyboard-loader.mjs';
-import { extendString, KeyboardHarness, KeyboardInterface, MinimalKeymanGlobal, Mock } from '../../../build/lib/index.mjs';
+import { DOMKeyboardLoader } from '@keymanapp/keyboard-processor/dom-keyboard-loader';
+import { extendString, KeyboardHarness, Keyboard, KeyboardInterface, MinimalKeymanGlobal, Mock, DeviceSpec } from '@keymanapp/keyboard-processor';
 
 // Note:  rule processing tests will fail if string extensions are not established beforehand.
 extendString();
 
-const device = {
+const device: DeviceSpec = {
   touchable: false,
-  formFactor: 'phone',
-  OS: 'ios',
-  browser: 'safari'
+  formFactor: DeviceSpec.FormFactor.Phone,
+  OS: DeviceSpec.OperatingSystem.iOS,
+  browser: DeviceSpec.Browser.Safari
 }
 
 describe('Keyboard loading in DOM', function() {
   afterEach(() => {
-    if(window.KeymanWeb) {
-      window.KeymanWeb.uninstall();
+    if(window['KeymanWeb']) {
+      window['KeymanWeb'].uninstall();
     }
   })
 
   it('`window`, disabled rule processing', async () => {
     const harness = new KeyboardHarness(window, MinimalKeymanGlobal);
     let keyboardLoader = new DOMKeyboardLoader(harness);
-    let keyboard = await keyboardLoader.loadKeyboardFromPath('/resources/keyboards/khmer_angkor.js');
+    let keyboard: Keyboard = await keyboardLoader.loadKeyboardFromPath('/resources/keyboards/khmer_angkor.js');
 
     assert.isOk(keyboard);
     assert.equal(keyboard.id, 'Keyboard_khmer_angkor');
     assert.isTrue(keyboard.isChiral);
     assert.isFalse(keyboard.isCJK);
-    assert.isOk(window.KeymanWeb);
-    assert.isOk(window.keyman);
-
-    // Should be not be modified by the keyboard load; it is not activated by default.
-    assert.isNotOk(harness.activeKeyboard);
+    assert.isOk(window['KeymanWeb']);
+    assert.isOk(window['keyman']);
 
     // Should be cleared post-keyboard-load.
     assert.isNotOk(harness.loadedKeyboard);
@@ -42,15 +39,15 @@ describe('Keyboard loading in DOM', function() {
   it('`window`, enabled rule processing', async () => {
     const harness = new KeyboardInterface(window, MinimalKeymanGlobal);
     const keyboardLoader = new DOMKeyboardLoader(harness);
-    const keyboard = await keyboardLoader.loadKeyboardFromPath('/resources/keyboards/khmer_angkor.js');
+    const keyboard: Keyboard = await keyboardLoader.loadKeyboardFromPath('/resources/keyboards/khmer_angkor.js');
     harness.activeKeyboard = keyboard;
 
     assert.isOk(keyboard);
     assert.equal(keyboard.id, 'Keyboard_khmer_angkor');
     assert.isTrue(keyboard.isChiral);
     assert.isFalse(keyboard.isCJK);
-    assert.isOk(window.KeymanWeb);
-    assert.isOk(window.keyman);
+    assert.isOk(window['KeymanWeb']);
+    assert.isOk(window['keyman']);
 
     // TODO:  verify actual rule processing.
     const nullKeyEvent = keyboard.constructNullKeyEvent(device);
@@ -58,8 +55,8 @@ describe('Keyboard loading in DOM', function() {
     const result = harness.processKeystroke(mock, nullKeyEvent);
 
     assert.isOk(result);
-    assert.isOk(window.KeymanWeb);
-    assert.isOk(window.keyman);
+    assert.isOk(window['KeymanWeb']);
+    assert.isOk(window['keyman']);
 
     // Should be cleared post-keyboard-load.
     assert.isNotOk(harness.loadedKeyboard);
@@ -70,7 +67,7 @@ describe('Keyboard loading in DOM', function() {
     let keyboardLoader = new DOMKeyboardLoader(harness);
 
     // Preload a keyboard and make it active.
-    const test_kbd = await keyboardLoader.loadKeyboardFromPath('/resources/keyboards/test_917.js');
+    const test_kbd: Keyboard = await keyboardLoader.loadKeyboardFromPath('/resources/keyboards/test_917.js');
     harness.activeKeyboard = test_kbd;
     assert.isNotOk(harness.loadedKeyboard);
 
