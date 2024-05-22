@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 18.0.41 alpha 2024-05-22
+
+* fix(developer): handle `KM_CORE_IT_INVALIDATE_CONTEXT` in debugger (#11488)
+* chore(linux): Trigger GHA packaging for stable builds :cherries: (#11495)
+* chore(android,mac,windows): Update crowdin strings for DE (#11497)
+* feat(web): custom infrastructure for @web/test-runner use (#11403)
+* chore(web): conversion of lm-worker browser-test for @web/test-runner use (#11404)
+* chore(web): conversion of lm-layer browser-tests for @web/test-runner use (#11452)
+* chore(web): conversion of Web keyboard-loading browser-tests for @web/test-runner use (#11453)
+* chore(web): conversion of Web gesture-engine browser-tests for @web/test-runner use (#11454)
+
 ## 18.0.40 alpha 2024-05-21
 
 * refactor(common): move `enabled` declaration into test_color.cpp (#11483)
