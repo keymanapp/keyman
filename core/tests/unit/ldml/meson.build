@@ -50,7 +50,7 @@ if cpp_compiler.get_id() == 'emscripten'
   invalid_test_path = '/'
   tests_flags += ['-lnodefs.js',
                   '-sNO_DISABLE_EXCEPTION_CATCHING', # for test exceptions
-                  '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
+                  wasm_exported_runtime_methods]
 else
   tests_flags = []
   test_path = join_paths(meson.current_build_dir(),'keyboards')
@@ -117,7 +117,7 @@ test('test_transforms', t, suite: 'ldml')
 normalization_tests_flags = tests_flags
 
 if cpp_compiler.get_id() == 'emscripten'
-  normalization_tests_flags += ['-lnodefs.js', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
+  normalization_tests_flags += ['-lnodefs.js', wasm_exported_runtime_methods]
 endif
 
 tc = executable('test_context_normalization',
