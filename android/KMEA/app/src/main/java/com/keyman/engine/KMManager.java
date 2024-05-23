@@ -800,8 +800,8 @@ public final class KMManager {
     updateOrientation();
   }
 
+  /* package-private */
   static void updateOrientation() {
-    // KMKeyboard
     if (InAppKeyboard != null) {
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       InAppKeyboard.updateOrientation();
