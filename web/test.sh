@@ -69,26 +69,4 @@ fi
 
 builder_run_action test:dom web-test-runner --config "src/test/auto/dom/web-test-runner${WTR_CONFIG}.config.mjs" "${WTR_DEBUG}"
 
-# The multi-browser test suite, which uses BrowserStack when run by our CI.
-if builder_start_action test:integrated; then
-  if builder_has_option --ci && builder_is_debug_build; then
-    builder_die "Options --ci and --debug are incompatible."
-  fi
-
-  # Auto-select browsers if not specified as an option
-  if ! builder_has_option --browsers; then
-    get_default_browser_set
-  fi
-
-  KARMA_EXT_FLAGS=
-  if ! builder_has_option --ci; then
-    KARMA_EXT_FLAGS="${BROWSERS}"
-  fi
-
-  # Build modernizr module
-  modernizr -c src/test/auto/integrated/modernizr.config.json -d src/test/auto/integrated/modernizr.js
-  # shellcheck disable=SC2086
-  karma start ${KARMA_FLAGS} ${KARMA_EXT_FLAGS} "${KEYMAN_ROOT}/web/src/test/auto/integrated/${CONFIG}"
-
-  builder_finish_action success test:integrated
-fi
+builder_run_action test:integrated web-test-runner --config "src/test/auto/integrated/web-test-runner${WTR_CONFIG}.config.mjs" "${WTR_DEBUG}"

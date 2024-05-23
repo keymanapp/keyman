@@ -1,4 +1,4 @@
-import { assert } from '/node_modules/chai/chai.js';
+import { assert } from 'chai';
 
 import {
   loadKeyboardFromJSON,
@@ -6,22 +6,37 @@ import {
   setupKMW,
   teardownKMW
 } from "../test_utils.js";
-import * as KMWRecorder from '/@keymanapp/keyman/build/tools/testing/recorder/lib/index.mjs';
+import * as KMWRecorder from '#recorder';
+
+import { type KeymanEngine, type KeyboardInterface } from 'keyman/app/browser';
+import { type KeyboardStub } from 'keyman/engine/package-cache';
+import { type OSKInputEventSpec } from '#recorder';
+
+/** @type {HTMLInputElement} */
+let inputElem;
+
+// The OSK is appended to the body; we need the ability to clear things out without nullifying the OSK.
+const host = document.createElement('div');
+document.body.appendChild(host);
+
+const baseTimeout = 5000;
+const eventTimeout = 500;
 
 describe('Engine - Browser Interactions', function() {
-  this.timeout(testconfig.timeouts.scriptLoad);
+  this.timeout(baseTimeout);
 
   before(function() {
-    fixture.setBase('fixtures');
-    return setupKMW(null, testconfig.timeouts.scriptLoad);
+    return setupKMW(null, baseTimeout);
   });
 
   beforeEach(function(done) {
-    fixture.load("singleInput.html");
+    inputElem = document.createElement('input');
+    inputElem.id = 'singleton';
+    host.appendChild(inputElem);
 
     window.setTimeout(function() {
       done()
-    }, testconfig.timeouts.eventDelay);
+    }, eventTimeout);
   });
 
   after(function() {
@@ -29,53 +44,50 @@ describe('Engine - Browser Interactions', function() {
   });
 
   afterEach(function() {
-    fixture.cleanup();
+    host.innerHTML = '';
   });
 
   describe('RegisterStub', function() {
     it('RegisterStub on same keyboard twice', async function() {
-      this.timeout(testconfig.timeouts.scriptLoad);
+      this.timeout(baseTimeout);
+      const keyman: KeymanEngine = window['keyman'];
+      const KeymanWeb: KeyboardInterface = window['KeymanWeb'];
 
-      var test_callback = async function() {
-        assert.isNotNull(keyman.getKeyboard("lao_2008_basic", "lo"), "Keyboard stub was not registered!");
-        assert.equal(keyman.getActiveKeyboard(), "Keyboard_lao_2008_basic", "Keyboard not set automatically!");
-        keyman.removeKeyboards('lao_2008_basic');
-        await Promise.resolve(); // so that the keyboard can reset.
-        assert.equal(keyman.getActiveKeyboard(), '', "Keyboard not removed correctly!");
-      }
+      await loadKeyboardFromJSON("resources/json/keyboards/lao_2008_basic.json", baseTimeout);
 
-      let finalPromise = loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", testconfig.timeouts.scriptLoad)
-        .then(test_callback);
+      assert.isNotNull(keyman.getKeyboard("lao_2008_basic", "lo"), "Keyboard stub was not registered!");
+      assert.equal(keyman.getActiveKeyboard(), "Keyboard_lao_2008_basic", "Keyboard not set automatically!");
 
-      var stub = {
+      let stub = {
         'KI': 'Keyboard_lao_2008_basic',
         'KN': 'Lao 2008 Basic',
         'KLC': 'lo',
         'KL': 'Lao',
         'KF': 'resources/keyboards/lao_2008_basic.js'
-      };
+      } as KeyboardStub;
 
       await Promise.resolve();
 
       assert.equal(KeymanWeb.registerStub(stub), 1, "Registering existing keyboard should return 1!");
-      return finalPromise;
     });
-
   });
 
   describe('Variable Stores', function() {
-    this.timeout(testconfig.timeouts.scriptLoad + testconfig.timeouts.standard);
+    this.timeout(baseTimeout + baseTimeout);
 
     beforeEach(function() {
-      return loadKeyboardFromJSON("/keyboards/options_with_save.json", testconfig.timeouts.scriptLoad);
+      return loadKeyboardFromJSON("resources/json/keyboards/options_with_save.json", baseTimeout);
     });
 
     after(function() {
+      const keyman: KeymanEngine = window['keyman'];
       keyman.removeKeyboards('options_with_save');
-      fixture.cleanup();
     });
 
     it('Backing up and restoring (loadStore/saveStore)', function() {
+      const keyman: KeymanEngine = window['keyman'];
+      const KeymanWeb: KeyboardInterface = window['KeymanWeb'];
+
       // Keyboard's default value is 0, corresponding to "no foo."
       var keyboardID = "options_with_save";
       var prefixedKeyboardID = "Keyboard_" + keyboardID;
@@ -83,45 +95,48 @@ describe('Engine - Browser Interactions', function() {
 
       return keyman.setActiveKeyboard(keyboardID, 'en').then(function() {
         // Alas, saveStore itself requires the keyboard to be active!
-        KeymanWeb.saveStore(storeName, 1);
+        KeymanWeb.saveStore(storeName, '1');
 
         // First, ensure that we get the same thing if we load the value immediately.
-        var value = KeymanWeb.loadStore(prefixedKeyboardID, storeName, 0);
-        assert.equal(value, 1, "loadStore did not see the value saved to initialize the test before resetting keyboard");
+        var value = KeymanWeb.loadStore(prefixedKeyboardID, storeName, '0');
+        assert.equal(value, '1', "loadStore did not see the value saved to initialize the test before resetting keyboard");
 
         // Reload the keyboard so that we can test its loaded value.
         keyman.removeKeyboards(keyboardID);
 
         return Promise.resolve();
       }).then(() => {
-        return loadKeyboardFromJSON("/keyboards/options_with_save.json", testconfig.timeouts.scriptLoad);
+        return loadKeyboardFromJSON("resources/json/keyboards/options_with_save.json", baseTimeout);
       }).then(() => {
         return keyman.setActiveKeyboard(keyboardID, 'en');
       }).then(() => {
         // This requires proper storage to a cookie, as we'll be on a new instance of the same keyboard.
-        var value = KeymanWeb.loadStore(prefixedKeyboardID, storeName, 0);
-        assert.equal(value, 1, "Did not properly save and reload variable store setting");
+        var value = KeymanWeb.loadStore(prefixedKeyboardID, storeName, '0');
+        assert.equal(value, '1', "Did not properly save and reload variable store setting");
       }).finally(() => {
-        KeymanWeb.saveStore(storeName, 0);
+        KeymanWeb.saveStore(storeName, '0');
       });
     });
 
     it("Multiple-sequence check", function() {
-      this.timeout(testconfig.timeouts.standard + testconfig.timeouts.scriptLoad * 3);
+      this.timeout(baseTimeout + baseTimeout * 3);
+      const keyman: KeymanEngine = window['keyman'];
+      const KeymanWeb: KeyboardInterface = window['KeymanWeb'];
+
       var keyboardID = "options_with_save";
       var storeName = "foo";
 
       return keyman.setActiveKeyboard(keyboardID, 'en').then(async function() {
-        KeymanWeb.saveStore(storeName, 1);
+        KeymanWeb.saveStore(storeName, '1');
         keyman.removeKeyboards(keyboardID);
 
         await Promise.resolve();
       }).then(() => {
         // First test:  expects option to be "on" from cookie-init setting, emitting "foo.", then turning option "off".
-        return runKeyboardTestFromJSON('/engine_tests/options_with_save_1.json',
+        return runKeyboardTestFromJSON('resources/json/engine_tests/options_with_save_1.json',
                                       {usingOSK: false},
                                       assert.equal,
-                                      testconfig.timeouts.scriptLoad)
+                                      baseTimeout)
       }).then(async () => {
         // Reset the keyboard... again.
         keyman.removeKeyboards(keyboardID);
@@ -129,10 +144,10 @@ describe('Engine - Browser Interactions', function() {
         await Promise.resolve();
 
         // Second test:  expects option to still be "off" b/c cookies.
-        return runKeyboardTestFromJSON('/engine_tests/options_with_save_2.json',
+        return runKeyboardTestFromJSON('resources/json/engine_tests/options_with_save_2.json',
                                       {usingOSK: false},
                                       assert.equal,
-                                      testconfig.timeouts.scriptLoad);
+                                      baseTimeout);
       });
     });
   });
@@ -140,22 +155,22 @@ describe('Engine - Browser Interactions', function() {
   // Performs basic processing system checks/tests to ensure the sequence testing
   // is based on correct assumptions about the code.
   describe('Integrated Simulation Checks', function() {
-    this.timeout(testconfig.timeouts.standard);
+    this.timeout(baseTimeout);
 
     before(function() {
-      this.timeout = testconfig.timeouts.scriptLoad;
-      return loadKeyboardFromJSON("/keyboards/lao_2008_basic.json", testconfig.timeouts.scriptLoad);
+      this.timeout(baseTimeout);
+      return loadKeyboardFromJSON("resources/json/keyboards/lao_2008_basic.json", baseTimeout);
     });
 
     beforeEach(function() {
-      var inputElem = document.getElementById('singleton');
+      const keyman: KeymanEngine = window['keyman'];
       keyman.setActiveElement(inputElem);
       inputElem.value = "";
     });
 
     after(function() {
+      const keyman: KeymanEngine = window['keyman'];
       keyman.removeKeyboards('lao_2008_basic');
-      fixture.cleanup();
     });
 
     /**
@@ -165,8 +180,6 @@ describe('Engine - Browser Interactions', function() {
      * See #8830.
      */
     it('Simple Keypress', function() {
-      var inputElem = document.getElementById('singleton');
-
       var lao_s_key_json = {"type": "key", "key":"s", "code":"KeyS","keyCode":83,"modifierSet":0,"location":0};
       var lao_s_event = new KMWRecorder.PhysicalInputEventSpec(lao_s_key_json);
 
@@ -180,10 +193,8 @@ describe('Engine - Browser Interactions', function() {
     });
 
     it('Simple OSK click', async function() {
-      var inputElem = document.getElementById('singleton');
-
       var lao_s_osk_json = {"type": "osk", "keyID": 'shift-K_S'};
-      var lao_s_event = new KMWRecorder.OSKInputEventSpec(lao_s_osk_json);
+      var lao_s_event = new KMWRecorder.OSKInputEventSpec(lao_s_osk_json as OSKInputEventSpec);
 
       let eventDriver = new KMWRecorder.BrowserDriver(inputElem);
       await eventDriver.simulateEvent(lao_s_event);
@@ -196,32 +207,35 @@ describe('Engine - Browser Interactions', function() {
   });
 
   describe('Sequence Simulation Checks', function() {
-    this.timeout(testconfig.timeouts.scriptLoad);
+    this.timeout(baseTimeout);
 
     it('Keyboard simulation', async function() {
-      return await runKeyboardTestFromJSON('/engine_tests/basic_lao_simulation.json', {usingOSK: false}, assert.equal, testconfig.timeouts.scriptLoad);
+      return await runKeyboardTestFromJSON('resources/json/engine_tests/basic_lao_simulation.json', {usingOSK: false}, assert.equal, baseTimeout);
     });
 
     it('OSK simulation', async function() {
-      return await runKeyboardTestFromJSON('/engine_tests/basic_lao_simulation.json', {usingOSK: true}, assert.equal, testconfig.timeouts.scriptLoad);
+      return await runKeyboardTestFromJSON('resources/json/engine_tests/basic_lao_simulation.json', {usingOSK: true}, assert.equal, baseTimeout);
     })
   });
 });
 
 describe('Unmatched Final Groups', function() {
-  this.timeout(testconfig.timeouts.scriptLoad);
+  this.timeout(baseTimeout);
 
   before(function() {
-    fixture.setBase('fixtures');
-    return setupKMW(null, testconfig.timeouts.scriptLoad + testconfig.timeouts.eventDelay);
+    return setupKMW(null, baseTimeout + eventTimeout);
   });
 
   beforeEach(function(done) {
-    fixture.load("singleTextArea.html");
+    // Do NOT use an <input> here, as that has special return-char handling that
+    // complicates matters.
+    const textArea = document.createElement('textarea');
+    textArea.id = 'singleton';
+    host.appendChild(textArea);
 
     window.setTimeout(function() {
       done()
-    }, testconfig.timeouts.eventDelay);
+    }, eventTimeout);
   });
 
   after(function() {
@@ -229,40 +243,41 @@ describe('Unmatched Final Groups', function() {
   });
 
   afterEach(function() {
-    fixture.cleanup();
+    host.innerHTML = '';
   });
 
   it('matches rule from early group AND performs default behavior', async function() {
     // While a TAB-oriented version would be nice, it's much harder to write the test
     // to detect change in last input element.
-    return await runKeyboardTestFromJSON('/engine_tests/ghp_enter.json', {usingOSK: true}, assert.equal, testconfig.timeouts.scriptLoad);
+    return await runKeyboardTestFromJSON('resources/json/engine_tests/ghp_enter.json', {usingOSK: true}, assert.equal, baseTimeout);
   });
 });
 
 // Kept separate to maintain an extra-clean setup for this test.
 describe('Engine - Browser Interactions', function() {
-  this.timeout(testconfig.timeouts.scriptLoad);
-
-  before(function() {
-    fixture.setBase('fixtures');
-  });
+  this.timeout(baseTimeout);
 
   beforeEach(function() {
-    fixture.load("singleInput.html");
-    return setupKMW(null, testconfig.timeouts.scriptLoad);
+    inputElem = document.createElement('input');
+    inputElem.id = 'singleton';
+    host.appendChild(inputElem);
+
+    return setupKMW(null, baseTimeout);
   });
 
   afterEach(function() {
-    fixture.cleanup();
+    host.innerHTML = '';
     teardownKMW();
   });
 
   describe('Keyboard Loading', function() {
     it('Local', function() {
-      this.timeout(testconfig.timeouts.scriptLoad);
+      this.timeout(baseTimeout);
+      const keyman: KeymanEngine = window['keyman'];
+      const KeymanWeb: KeyboardInterface = window['KeymanWeb'];
 
-      return loadKeyboardFromJSON("/keyboards/lao_2008_basic.json",
-                                  testconfig.timeouts.scriptLoad).then(async function() {
+      return loadKeyboardFromJSON("resources/json/keyboards/lao_2008_basic.json",
+                                  baseTimeout).then(async function() {
         assert.isNotNull(keyman.getKeyboard("lao_2008_basic", "lo"), "Keyboard stub was not registered!");
         assert.equal(keyman.getActiveKeyboard(), "Keyboard_lao_2008_basic", "Keyboard not set automatically!");
         keyman.removeKeyboards('lao_2008_basic');
@@ -273,15 +288,17 @@ describe('Engine - Browser Interactions', function() {
     });
 
     it('Automatically sets first available keyboard', function() {
-      this.timeout(2 * testconfig.timeouts.scriptLoad);
+      this.timeout(2 * baseTimeout);
+      const keyman: KeymanEngine = window['keyman'];
+      const KeymanWeb: KeyboardInterface = window['KeymanWeb'];
 
-      return loadKeyboardFromJSON("/keyboards/lao_2008_basic.json",
-                                  testconfig.timeouts.scriptLoad,
+      return loadKeyboardFromJSON("resources/json/keyboards/lao_2008_basic.json",
+                                  baseTimeout,
                                   {passive: true}).then(() => {
         // Because we're loading the keyboard 'passively', KMW's setActiveKeyboard function is auto-called
         // on the stub-add.  That specific call (for first keyboard auto-activation) is outside of KMW's
         // current Promise chain, so we can't _directly_ rely on a KMW Promise to test it.
-        return new Promise((resolve) => {
+        return new Promise<void>((resolve) => {
           let hasResolved = false;
           // So, we give KMW the time needed for auto-activation to happen, polling a bit actively so that we don't
           // wait unnecessarily long after it occurs.
@@ -292,7 +309,7 @@ describe('Engine - Browser Interactions', function() {
             }
 
             window.clearTimeout(intervalTimer);
-          }, testconfig.timeouts.scriptLoad);
+          }, baseTimeout);
 
           let intervalTimer = window.setInterval(() => {
             if(keyman.getActiveKeyboard() != '') {

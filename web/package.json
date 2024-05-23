@@ -68,6 +68,9 @@
       "import": "./build/engine/osk/obj/test-index.js"
     }
   },
+  "imports": {
+    "#recorder": "./build/tools/testing/recorder/obj/index.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/keymanapp/keyman.git"

@@ -1,9 +1,16 @@
 // // KeymanWeb test suite - processing of the Karma configuration's client.args parameter.
 
-import Device from '/@keymanapp/keyman/build/engine/device-detect/lib/index.mjs';
-import * as KMWRecorder from '/@keymanapp/keyman/build/tools/testing/recorder/lib/index.mjs';
+import Device from 'keyman/engine/device-detect';
+import * as KMWRecorder from '#recorder';
+import { type BrowserInitOptionSpec, type KeymanEngine } from 'keyman/app/browser';
+import { ErrorStub, type KeyboardAPISpec, type KeyboardStub } from 'keyman/engine/package-cache';
 
 export let DEVICE_DETECT_FAILURE = false;
+
+const loc = document.location;
+// config.testFile generally starts with a '/', with the path resembling the actual full local
+// filesystem for the drive.
+const domain = `${loc.protocol}/${loc.host}`
 
 // If we've set things up to support Device dection without loading KMW...
 try {
@@ -16,16 +23,17 @@ try {
 
 // // Keyman test suite utility methods
 
-export function setupKMW(kmwOptions, timeout) {
-  let ui;
+export function setupKMW(kmwOptions: BrowserInitOptionSpec | string, timeout: number) {
+  let ui: string;
 
   if(typeof(kmwOptions) == 'string' || typeof(kmwOptions) == 'undefined' || kmwOptions == null) {
-    ui = kmwOptions;
+    ui = kmwOptions as string;
 
-    var kmwOptions = {
+    kmwOptions = {
       attachType:'auto',
       root:'/',
-      resources:'/build/app/resources'
+      // up from 'browser/debug'
+      resources:'../../resources'
     };
 
     if(ui) {
@@ -33,27 +41,27 @@ export function setupKMW(kmwOptions, timeout) {
     }
   }
 
-  const kmwPromise = setupScript('build/app/browser/keymanweb.js', timeout);
+  const kmwPromise = setupScript('web/build/app/browser/debug/keymanweb.js', timeout);
 
   ui = kmwOptions.ui;
 
   kmwOptions.attachType = kmwOptions.attachType ? kmwOptions.attachType : 'auto';
 
   if(!kmwOptions.root) {
-    kmwOptions.root = '/build/app/browser';
+    kmwOptions.root = 'web/build/app/browser/debug';
   }
 
   if(!kmwOptions.resources) {
-    kmwOptions.resources = '/build/resources';
+    kmwOptions.resources = 'web/build/app/resources';
   }
 
   let uiPromise;
   if(ui) {
-    uiPromise = setupScript('build/app/ui/kmwui' + ui + '.js', timeout);
+    uiPromise = setupScript('web/build/app/ui/debug/kmwui' + ui + '.js', timeout);
     kmwOptions.ui=ui;
   }
 
-  let compositePromise = kmwPromise;
+  let compositePromise: Promise<any> = kmwPromise;
   if(uiPromise) {
     compositePromise = Promise.all([kmwPromise, uiPromise]);
   }
@@ -76,17 +84,17 @@ export function setupKMW(kmwOptions, timeout) {
  * @param {*} timeout
  * @returns
  */
-export function setupScript(src, timeout) {
+export function setupScript(src: string, timeout: number) {
   return setupScriptInternal(src, timeout);
 }
 
-function setupScriptInternal(src, timeout, attemptCount, existingTimer) {
+function setupScriptInternal(src: string, timeout: number, attemptCount?: number, existingTimer?: number) {
   attemptCount = attemptCount || 1;
   if(attemptCount > 1) {
     console.log("Re-attempting load of script '" + src + "': retry #" + attemptCount);
   }
 
-  let promise = new Promise((resolve, reject) => {
+  let promise = new Promise<void>((resolve, reject) => {
     const Lscript = document.createElement('script');
     let hasResolved = false;
     Lscript.charset="UTF-8";        // KMEW-89
@@ -100,9 +108,11 @@ function setupScriptInternal(src, timeout, attemptCount, existingTimer) {
       reject(new Error("Script load attempt for '" + src + "' timed out."));
     }, timeout);
 
+    // @ts-ignore // TS does not recognize that <script> elements have this event.
     Lscript.onload = Lscript.onreadystatechange = () => {
       Lscript.parentElement.removeChild(Lscript);
       window.clearTimeout(timer);
+      // @ts-ignore // nor the `readyState` property.
       if(!hasResolved && (Lscript.readyState === undefined || Lscript.readyState == "complete")) {
         hasResolved = true;
 
@@ -140,7 +150,7 @@ function setupScriptInternal(src, timeout, attemptCount, existingTimer) {
     }
 
     Lscript.src = src;
-    fixture.el.appendChild(Lscript);
+    document.body.appendChild(Lscript);
   });
 
   return promise;
@@ -148,9 +158,10 @@ function setupScriptInternal(src, timeout, attemptCount, existingTimer) {
 
 export function teardownKMW() {
   var error = null;
+  const keyman: KeymanEngine = window['keyman'];
 
   // If our setupKMW fails somehow, this guard prevents a second error report on teardown.
-  if(window.keyman) {
+  if(keyman) {
     // We want to be SURE teardown works correctly, or we'll get lots of strange errors on other tests.
     // Thus, error-handling on shutdown itself.  It HAS mattered.
     try {
@@ -173,21 +184,25 @@ export function teardownKMW() {
   }
 }
 
-export async function loadKeyboardStub(stub, timeout, params) {
+export async function loadKeyboardStub(stub: KeyboardAPISpec | KeyboardStub, timeout: number, params?: { passive: boolean }) {
   var kbdName = "Keyboard_" + stub.id;
+  const keyman: KeymanEngine = window['keyman'];
 
   // Returning an "error stub" does not actually throw an error.  Makes
   // picking up on related errors in unit-test dev a bit trickier, but
   // we can manually throw the error from here.
   let result = await keyman.addKeyboards(stub);
   for(let i=0; i < result.length; i++) {
-    if(result[i].error) {
-      throw result[i].error;
+    if('error' in result[i]) {
+      const errStub = result[i] as ErrorStub;
+      throw errStub.error;
     }
   }
 
   if(!params || !params.passive) {
-    return keyman.setActiveKeyboard(kbdName, stub.languages.id);
+    const languages = 'languages' in stub ? stub.languages : null;
+    const langCode = (Array.isArray(languages) ? languages[0].id : languages.id) ?? '';
+    return keyman.setActiveKeyboard(kbdName, langCode);
   } else if(keyman.getActiveKeyboard() != kbdName) {
     return setupScript(stub.filename, timeout);
   } else {
@@ -195,8 +210,9 @@ export async function loadKeyboardStub(stub, timeout, params) {
   }
 }
 
-export async function loadKeyboardFromJSON(jsonPath, timeout, params) {
-  var stub = fixture.load(jsonPath, true);
+export async function loadKeyboardFromJSON(jsonPath: string, timeout: number, params?: { passive: boolean }) {
+  const jsonResponse = await fetch(new URL(`${domain}/${jsonPath}`));
+  const stub = await jsonResponse.json();
 
   return loadKeyboardStub(stub, timeout, params);
 }
@@ -209,10 +225,15 @@ async function runLoadedKeyboardTest(testDef, device, usingOSK, assertCallback) 
 }
 
 export async function runKeyboardTestFromJSON(jsonPath, params, assertCallback, timeout) {
-  var testSpec = new KMWRecorder.KeyboardTest(fixture.load(jsonPath, true));
+  const keyman: KeymanEngine = window['keyman'];
+  const jsonResponse = await fetch(new URL(`${domain}/${jsonPath}`));
+  const testJSON = await jsonResponse.json();
+
+  var testSpec = new KMWRecorder.KeyboardTest(testJSON);
   let device = new Device();
   device.detect();
 
+  // @ts-ignore // Types are a bit messy here.
   return loadKeyboardStub(testSpec.keyboard, timeout).then(() => {
     return runLoadedKeyboardTest(testSpec, device.coreSpec, params.usingOSK, assertCallback);
   }).finally(() => {
@@ -221,6 +242,7 @@ export async function runKeyboardTestFromJSON(jsonPath, params, assertCallback, 
 }
 
 export async function oskResourceLoadPromise() {
+  const keyman: KeymanEngine = window['keyman'];
   // If the CSS isn't fully loaded, the element positions will not match their expected
   // locations in the keyboard layout and OSK keys won't be triggered properly by the
   // gesture engine.
@@ -241,120 +263,4 @@ export function toEscapedSupplementaryPairString(code) {
   var L = ((code - 0x10000) % 0x400 + 0xDC00).toString(16);
 
   return "\\u"+H+"\\u"+L;
-}
-
-// Defines an object for dynamically adding elements for testing purposes.
-// Designed for use with the robustAttachment.html fixture.
-
-export let DynamicElements;
-var inputCounter = 0;
-
-if(typeof(DynamicElements) == 'undefined') {
-  DynamicElements = {};
-
-  DynamicElements.addInput = function() {
-    var masterDiv = document.getElementById('DynamicElements');
-    var newInput = document.createElement("input");
-    var i = inputCounter++;
-
-    newInput.id = 'input' + i;
-    newInput.className = 'test';
-    newInput.placeholder = "Dynamic area #" + i + "!";
-
-    masterDiv.appendChild(newInput);
-    return newInput.id;
-  }
-
-  DynamicElements.addText = function () {
-    var masterDiv = document.getElementById('DynamicElements');
-    var newTextArea = document.createElement("textarea");
-    var i = inputCounter++;
-
-    newTextArea.id = 'textarea' + i;
-    newTextArea.className = 'test';
-    newTextArea.placeholder = "Dynamic area #" + i + "!";
-
-    masterDiv.appendChild(newTextArea);
-    return newTextArea.id;
-  }
-
-  DynamicElements.addIFrame = function(loadCallback) {
-    var masterDiv = document.getElementById('DynamicElements');
-    var frame = document.createElement("iframe");
-    var i = inputCounter++;
-
-    frame.height = "100";
-    frame.id = 'iframe' + i;
-    if(loadCallback) {
-      frame.addEventListener('load', function() {
-        // Give KMW's attachment events a chance to run first.
-        window.setTimeout(loadCallback, Math.max(100, testconfig.timeouts.scriptLoad));
-      });
-    }
-    frame.setAttribute("src", "resources/html/iframe.html");
-
-    masterDiv.appendChild(frame);
-    return frame.id;
-  }
-
-  DynamicElements.addDesignIFrame = function(loadCallback) {
-    var masterDiv = document.getElementById('DynamicElements');
-    var frame = document.createElement("iframe");
-    var i = inputCounter++;
-
-    frame.height = "100";
-    frame.id = 'designIFrame' + i;
-    frame.src = "resources/html/editableFrame.html";
-
-    if(loadCallback) {
-      frame.addEventListener('load', function() {
-        loadCallback();
-      });
-    }
-
-    masterDiv.appendChild(frame);
-    return frame.id;
-  }
-
-  DynamicElements.addEditable = function() {
-    var masterDiv = document.getElementById('DynamicElements');
-    var editable = document.createElement("div");
-    var i = inputCounter++;
-
-    editable.contentEditable = true;
-    editable.textContent = "Edit me!";
-    editable.id = 'editable' + i;
-    editable.style.width="500px";
-
-    masterDiv.appendChild(editable);
-    return editable.id;
-  }
-
-  DynamicElements.assertAttached = function(ele, done) {
-    var assertion = function() {
-      assert.isTrue(keyman.isAttached(ele), "Element tag '" + ele.tagName + "', id '" + ele.id + "' was not attached!");
-    }
-    if(done) {
-      window.setTimeout(function() {
-        assertion();
-        done();
-      }, testconfig.timeouts.eventDelay);
-    } else {
-      assertion();
-    }
-  }
-
-  DynamicElements.assertDetached = function(ele, done) {
-    var assertion = function() {
-      assert.isFalse(keyman.isAttached(ele), "Element tag '" + ele.tagName + "', id '" + ele.id + "' was not detached!");
-    }
-    if(done) {
-      window.setTimeout(function() {
-        assertion();
-        done();
-      }, testconfig.timeouts.eventDelay);
-    } else {
-      assertion();
-    }
-  }
 }
