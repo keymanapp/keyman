@@ -76,7 +76,7 @@ export class TouchEventEngine<ItemType, StateToken = any> extends InputEventEngi
     super.dropTouchpoint(source);
 
     for(const key of Object.keys(this.safeBoundMaskMap)) {
-      const keyVal = Number.parseInt(key, 10)
+      const keyVal = Number.parseInt(key, 10);
       if(this.getTouchpointWithId(keyVal) == source) {
         delete this.safeBoundMaskMap[keyVal];
       }

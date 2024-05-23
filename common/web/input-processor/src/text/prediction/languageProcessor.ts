@@ -286,6 +286,7 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
     let original = this.getPredictionState(-reversion.transformId);
     if(!original) {
       console.warn("Could not apply the Suggestion!");
+      return Promise.resolve([]);
     }
 
     // Apply the Reversion!
