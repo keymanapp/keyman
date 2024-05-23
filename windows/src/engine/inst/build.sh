@@ -14,7 +14,7 @@ builder_describe "Installation files for Keyman Engine for Windows" \
 # after all other builds complete
 
 builder_describe_outputs \
-  publish       /windows/src/desktop/inst/keymanengine.msm
+  publish       /windows/release/${VERSION}/keymanengine-${VERSION}.msm
 
 builder_parse "$@"
 
@@ -51,7 +51,7 @@ function do_publish() {
 function copy-installer() {
   builder_heading copy-installer
   mkdir -p "$KEYMAN_ROOT/windows/release/${VERSION}"
-  cp keymanengine.msm "$KEYMAN_ROOT/windows/release/${VERSION}/keymanengine.msm"
+  cp keymanengine.msm "$KEYMAN_ROOT/windows/release/${VERSION}/keymanengine-${VERSION}.msm"
 }
 
 function verify-program-signatures() {
