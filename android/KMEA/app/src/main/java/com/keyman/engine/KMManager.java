@@ -2032,7 +2032,11 @@ public final class KMManager {
   }
 
   public static int getOrientation(Context context) {
-    return orientation;
+    if(orientation == Configuration.ORIENTATION_UNDEFINED) {
+      return detectOrientation(context);
+    } else {
+      return orientation;
+    }
   }
 
   public static int detectOrientation(Context context) {
