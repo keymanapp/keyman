@@ -117,7 +117,7 @@ UInt32 VirtualKeyMap[VIRTUAL_KEY_ARRAY_SIZE];
    keymanModifiers |= KM_CORE_MODIFIER_NOCAPS;
    }*/
   
-  os_log_debug([KMELogs coreLog], "macToKeymanModifier result  = %u", (unsigned int)keymanModifiers);
+  os_log_debug([KMELogs coreLog], "macToKeymanModifier, macModifiers: %lu / ox%lX keymanModifiers: %d / 0x%X", (unsigned long)modifiers, modifiers, keymanModifiers, keymanModifiers);
   return keymanModifiers;
 }
 

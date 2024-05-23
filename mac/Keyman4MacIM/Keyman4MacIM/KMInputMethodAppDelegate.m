@@ -285,8 +285,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     NSEvent* sysEvent = [NSEvent eventWithCGEvent:event];
     // Too many of these to be useful for most debugging sessions, but we'll keep this around to be
     // un-commented when needed.
-    //if (appDelegate.debugMode)
-    //    NSLog(@"System Event: %@", sysEvent);
+    //    os_log_debug([KMLogs eventsLog], "System Event: %@", sysEvent);
     
     switch (type) {
       case kCGEventFlagsChanged:
@@ -301,12 +300,12 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
       case kCGEventLeftMouseDown:
       case kCGEventOtherMouseUp:
       case kCGEventOtherMouseDown:
-        os_log_debug([KMLogs eventsLog], "Event tap context invalidation flagged due to event: %{public}@", event);
+        os_log_debug([KMLogs eventsLog], "Event tap context invalidation flagged due to event of type: %u", type);
         appDelegate.contextChangedByLowLevelEvent = YES;
         break;
         
       case kCGEventKeyDown:
-        os_log_debug([KMLogs eventsLog], "Event tap keydown event, keyCode: %hu, event: %{public}@", sysEvent.keyCode, event);
+        os_log_debug([KMLogs eventsLog], "Event tap keydown event, keyCode: %hu", sysEvent.keyCode);
         // Pass back low-level backspace events to the input method event handler
         // because some non-compliant apps do not allow us to see backspace events
         // that we have generated (and we need to see them, for serialization

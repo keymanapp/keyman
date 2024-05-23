@@ -25,9 +25,11 @@
 
 char *const keymanSubsystem = "org.sil.keyman";
 char *const startupCategory = "startup";
+char *const privacyCategory = "privacy";
 char *const complianceCategory = "compliance";
 char *const lifecycleCategory = "lifecycle";
 char *const configCategory = "config";
+char *const dataCategory = "data";
 char *const uiCategory = "ui";
 char *const eventsCategory = "events";
 char *const keyboardCategory = "keyboard";
@@ -46,6 +48,10 @@ char *const testCategory = "test";
   return os_log_create(keymanSubsystem, startupCategory);
 }
 
++ (os_log_t)privacyLog {
+  return os_log_create(keymanSubsystem, privacyCategory);
+}
+
 + (os_log_t)complianceLog {
   return os_log_create(keymanSubsystem, complianceCategory);
 }
@@ -56,6 +62,10 @@ char *const testCategory = "test";
 
 + (os_log_t)configLog {
   return os_log_create(keymanSubsystem, configCategory);
+}
+
++ (os_log_t)dataLog{
+  return os_log_create(keymanSubsystem, dataCategory);
 }
 
 + (os_log_t)uiLog {

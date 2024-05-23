@@ -23,9 +23,7 @@ NSMutableArray *servers;
 
 - (id)initWithServer:(IMKServer *)server delegate:(id)delegate client:(id)inputClient
 {
-  if ([self.AppDelegate debugMode]) {
-    NSLog(@"Initializing Keyman Input Method with server: %@", server);
-  }
+  os_log_debug([KMLogs lifecycleLog], "Initializing Keyman Input Method for server with bundleID: %{public}@", server.bundle.bundleIdentifier);
   
   self = [super initWithServer:server delegate:delegate client:inputClient];
   if (self) {
@@ -44,12 +42,8 @@ NSMutableArray *servers;
 }
 
 - (BOOL)handleEvent:(NSEvent *)event client:(id)sender {
-  if ([self.AppDelegate debugMode])
-    NSLog(@"handleEvent: event = %@", event);
-  
   if (event == nil || sender == nil || self.kmx == nil || _eventHandler == nil) {
-    if ([self.AppDelegate debugMode])
-      NSLog(@"handleEvent: not handling event");
+    os_log_error([KMLogs eventsLog], "IMInputController handleEvent: not prepared to handle event = %{public}@", event);
     return NO; // Not sure this can ever happen.
   }
   
@@ -78,9 +72,7 @@ NSMutableArray *servers;
     
     NSRunningApplication *currApp = [[NSWorkspace sharedWorkspace] frontmostApplication];
     NSString *clientAppId = [currApp bundleIdentifier];
-    if ([self.AppDelegate debugMode]) {
-      NSLog(@"activateServer, new active app: '%@', sender %@", clientAppId, sender);
-    }
+    os_log_debug([KMLogs lifecycleLog], "activateServer, new active app: '%{public}@'", clientAppId);
     
     _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:clientAppId client:sender];
     
@@ -89,9 +81,7 @@ NSMutableArray *servers;
 
 - (void)deactivateServer:(id)sender {
   if ([self.AppDelegate debugMode]) {
-    NSLog(@"*** deactivateServer ***");
-    NSLog(@"sender: %@", sender);
-    NSLog(@"***");
+    os_log_debug([KMLogs lifecycleLog], "deactivateServer, sender %{public}@", sender);
   }
   @synchronized(servers) {
     for (int i = 0; i < servers.count; i++) {
@@ -101,9 +91,7 @@ NSMutableArray *servers;
       }
     }
     if (servers.count == 0) {
-      if ([self.AppDelegate debugMode]) {
-        NSLog(@"No known active server for Keyman IM. Starting countdown to sleep...");
-      }
+      os_log_debug([KMLogs lifecycleLog], "No known active server for Keyman IM. Starting countdown to sleep...");
       [self performSelector:@selector(timerAction:) withObject:sender afterDelay:0.7];
     }
   }
@@ -125,7 +113,7 @@ NSMutableArray *servers;
 /*
  - (NSDictionary *)modes:(id)sender {
  if ([self.AppDelegate debugMode])
- NSLog(@"*** Modes ***");
+ os_log_debug([KMLogs lifecycleLog], "*** Modes ***");
  if (_kmModes == nil) {
  NSDictionary *amhMode = [[NSDictionary alloc] initWithObjectsAndKeys:@"keyman.png", kTSInputModeAlternateMenuIconFileKey,
  [NSNumber numberWithBool:YES], kTSInputModeDefaultStateKey,
@@ -172,8 +160,7 @@ NSMutableArray *servers;
 - (void)menuAction:(id)sender {
   NSMenuItem *mItem = [sender objectForKey:kIMKCommandMenuItemName];
   NSInteger itag = mItem.tag;
-  if ([self.AppDelegate debugMode])
-    NSLog(@"Keyman menu clicked - tag: %lu", itag);
+  os_log_debug([KMLogs uiLog], "Keyman menu clicked - tag: %lu", itag);
   if (itag == CONFIG_MENUITEM_TAG) {
     [self showConfigurationWindow:sender];
   }
@@ -195,12 +182,12 @@ NSMutableArray *servers;
   u_int16_t systemVersion = [KMOSVersion SystemVersion];
   if ([KMOSVersion Version_10_13_1] <= systemVersion && systemVersion <= [KMOSVersion Version_10_13_3]) // between 10.13.1 and 10.13.3 inclusive
   {
-    NSLog(@"Input Menu: calling workaround instead of showPreferences (sys ver %x)", systemVersion);
+    os_log_info([KMLogs uiLog], "Input Menu: calling workaround instead of showPreferences (sys ver %x)", systemVersion);
     [self.AppDelegate showConfigurationWindow]; // call our workaround
   }
   else
   {
-    NSLog(@"Input Menu: calling Apple's showPreferences (sys ver %x)", systemVersion);
+    os_log_info([KMLogs uiLog], "Input Menu: calling Apple's showPreferences (sys ver %x)", systemVersion);
     [self showPreferences:sender]; // call Apple API
   }
 }

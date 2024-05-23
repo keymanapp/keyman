@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		290BC680274B9DB1005CD1C3 /* KMPackageInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 290BC67F274B9DB1005CD1C3 /* KMPackageInfo.m */; };
 		290BC75E274F3FD7005CD1C3 /* KMKeyboardInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 290BC75D274F3FD7005CD1C3 /* KMKeyboardInfo.m */; };
+		2915DC512BFE35DB0051FC52 /* KMLogs.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B4A0D32BF7675A00682049 /* KMLogs.m */; };
 		293EA3E627140D8100545EED /* KMAboutWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 293EA3E827140D8100545EED /* KMAboutWindowController.xib */; };
 		293EA3EB27140DEC00545EED /* preferences.xib in Resources */ = {isa = PBXBuildFile; fileRef = 293EA3ED27140DEC00545EED /* preferences.xib */; };
 		293EA3F427181FDA00545EED /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 293EA3F627181FDA00545EED /* Localizable.strings */; };
@@ -1004,6 +1005,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2915DC512BFE35DB0051FC52 /* KMLogs.m in Sources */,
 				2992F4202A28482800E08929 /* PrivacyWindowController.m in Sources */,
 				2992F41F2A2847C900E08929 /* TextApiCompliance.m in Sources */,
 				2992F41E2A2847AF00E08929 /* PrivacyConsent.m in Sources */,

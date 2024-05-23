@@ -74,7 +74,7 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   if (self.coreKeyboard) {
     km_core_keyboard_dispose(self.coreKeyboard);
   }
-  os_log_debug([KMELogs coreLog], "CoreWrapper dealloc called.");
+  os_log_debug([KMELogs coreLog], "dealloc called.");
 }
 
 -(void)loadKeyboardUsingCore:(NSString*) path {
@@ -95,7 +95,7 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
     if (result==KM_CORE_STATUS_OK) {
       _keyboardVersion = [self.coreHelper createNSStringFromUnicharString:keyboardAttributes->version_string];
       _keyboardId = [self.coreHelper createNSStringFromUnicharString:keyboardAttributes->id];
-      os_log_debug([KMELogs coreLog], "keyboardVersion = %{public}@\n, keyboardId  = %{public}@\n", _keyboardVersion, _keyboardId);
+      os_log_debug([KMELogs coreLog], "readKeyboardAttributesUsingCore, keyboardVersion: %{public}@\n, keyboardId: %{public}@\n", _keyboardVersion, _keyboardId);
     } else {
       os_log_error([KMELogs coreLog], "km_core_keyboard_get_attrs() failed with result = %u\n", result);
     }
@@ -150,6 +150,7 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
                  withModifier:modifierState
                   withKeyDown:keyDown]) {
     output = [self loadOutputForLastKeyProcessed];
+    os_log_debug([KMELogs coreLog], "processMacVirtualKey for macKeyCode: %d / 0x%X, core output: %{public}@", macKeyCode, macKeyCode, output);
   }
   return output;
 }
@@ -172,7 +173,6 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
 }
 
 -(CoreKeyOutput*)loadActionStructUsingCore {
-  os_log_debug([KMELogs coreLog], "CoreWrapper loadActionStructUsingCore");
   km_core_actions * actions = km_core_state_get_actions(self.coreState);
   CoreKeyOutput *output = [self createCoreKeyOutputForActionsStruct:actions];
   return output;
@@ -185,7 +185,7 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   NSString* deletedText = [self.coreHelper utf32CStringToString:actions->deleted_context];
   
   CoreKeyOutput* coreKeyOutput = [[CoreKeyOutput alloc] init: actions->code_points_to_delete textToDelete:deletedText textToInsert:text optionsToPersist:options alert:actions->do_alert emitKeystroke:actions->emit_keystroke capsLockState:capsLock];
-  
+
   return coreKeyOutput;
 }
 
@@ -232,7 +232,7 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
 -(void)setContextIfNeeded:(NSString*)context {
   unichar const * unicharContext = [self.coreHelper createUnicharStringFromNSString:context];
   km_core_status result = km_core_state_context_set_if_needed(self.coreState, unicharContext);
-  os_log_debug([KMELogs coreLog], "CoreWrapper setContextIfNeeded, context=%{public}@, km_core_state_context_set_if_needed result=%d", context, result);
+  os_log_debug([KMELogs coreLog], "setContextIfNeeded, context=%{public}@, km_core_state_context_set_if_needed result=%d", context, result);
 }
 
 -(NSString*)contextDebug {
@@ -240,7 +240,7 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   NSString *debugString = [self.coreHelper createNSStringFromUnicharString:context];
   km_core_cu_dispose(context);
   
-  os_log_debug([KMELogs coreLog], "CoreWrapper contextDebug = %{public}@", debugString);
+  os_log_debug([KMELogs coreLog], "contextDebug = %{public}@", debugString);
   return debugString;
 }
 

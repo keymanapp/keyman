@@ -304,7 +304,7 @@ static CGFloat const kRelativeModifierLabelHeight = 0.30f;
 
 - (void)stopTimer {
   @synchronized(self.target) {
-    //NSLog(@"KeyView TIMER - stopping");
+    //os_log_debug([KMELogs uiLog], "KeyView TIMER - stopping");
     if (_keyEventTimer != nil) {
       [_keyEventTimer invalidate];
       _keyEventTimer = nil;
@@ -314,7 +314,7 @@ static CGFloat const kRelativeModifierLabelHeight = 0.30f;
 
 - (void)timerAction:(NSTimer *)timer {
   @synchronized(self.target) {
-    //NSLog(@"KeyView TIMER - Fired for key %lu", [self keyCode]);
+    //os_log_debug([KMELogs uiLog], "KeyView TIMER - Fired for key %lu", [self keyCode]);
     [self processKeyClick];
     
     if ([timer timeInterval] == delayBeforeRepeating) {

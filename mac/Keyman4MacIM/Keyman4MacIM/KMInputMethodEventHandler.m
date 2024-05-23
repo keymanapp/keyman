@@ -48,7 +48,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   // the current keyboard and you type "Sentry force now", it will force a simulated crash to 
   // test reporting to sentry.keyman.com
   if ([self.appDelegate debugMode] && [clientAppId isEqual: @"com.apple.dt.Xcode"]) {
-    NSLog(@"Sentry - Preparing to detect Easter egg.");
+    os_log_debug([KMLogs testLog], "Sentry - Preparing to detect Easter egg.");
     _easterEggForSentry = [[NSMutableString alloc] init];
   }
   else
@@ -62,10 +62,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
       _keyCodeOfOriginalEvent != 0 || _sourceFromOriginalEvent != nil)
   {
     if ([self.appDelegate debugMode]) {
-      NSLog(@"ERROR: new app activated before previous app finished processing pending events!");
-      NSLog(@"  _generatedBackspaceCount = %lu", _generatedBackspaceCount);
-      NSLog(@"  _queuedText = \"%@\"", _queuedText == nil ? @"(NIL)" : (NSString*)[self queuedText]);
-      NSLog(@"  _keyCodeOfOriginalEvent = %hu", _keyCodeOfOriginalEvent);
+      os_log_error([KMLogs lifecycleLog], "ERROR: new app activated before previous app finished processing pending events! _generatedBackspaceCount: %lu, _queuedText: '%{public}@' _keyCodeOfOriginalEvent: %hu", _generatedBackspaceCount, _queuedText == nil ? @"(NIL)" : (NSString*)[self queuedText], _keyCodeOfOriginalEvent);
     }
     _keyCodeOfOriginalEvent = 0;
     _generatedBackspaceCount = 0;
@@ -105,7 +102,6 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
 }
 
 - (BOOL) handleEventWithKeymanEngine:(NSEvent *)event in:(id) sender {
-  os_log_debug([KMLogs eventsLog], "handleEventWithKeymanEngine, event = %{public}@", event);
   CoreKeyOutput *output = nil;
   
   output = [self processEventWithKeymanEngine:event in:sender];
@@ -122,7 +118,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   if (self.appDelegate.lowLevelEventTap != nil) {
     NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:self.appDelegate.currentModifierFlags timestamp:event.timestamp windowNumber:event.windowNumber context:[NSGraphicsContext currentContext] characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
     coreKeyOutput = [self.kme processEvent:eventWithOriginalModifierFlags];
-    os_log_debug([KMLogs eventsLog], "processEventWithKeymanEngine, using AppDelegate.currentModifierFlags %lu, instead of event.modifiers = %lu", (unsigned long)self.appDelegate.currentModifierFlags, (unsigned long)event.modifierFlags);
+    os_log_debug([KMLogs eventsLog], "processEventWithKeymanEngine, using AppDelegate.currentModifierFlags: %lu / 0x%lX, instead of event.modifiers = %lu / 0x%lX", self.appDelegate.currentModifierFlags, self.appDelegate.currentModifierFlags, event.modifierFlags, event.modifierFlags);
   }
   else {
     // Depending on the client app and the keyboard, using the passed-in event as it is should work okay.
@@ -130,7 +126,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
     // context might go undetected in some apps, resulting in errant behavior for subsequent typing.
     coreKeyOutput = [self.kme processEvent:event];
   }
-  os_log_debug([KMLogs eventsLog], "processEventWithKeymanEngine, coreKeyOutput = %{public}@", coreKeyOutput);
+  //os_log_debug([KMLogs eventsLog], "processEventWithKeymanEngine, coreKeyOutput = %{public}@", coreKeyOutput);
   return coreKeyOutput;
 }
 
@@ -143,7 +139,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
       os_log_debug([KMLogs testLog], "Sentry - Processing character(s): %{public}@", [event characters]);
       if ([[event characters] characterAtIndex:0] == [kEasterEggText characterAtIndex:len]) {
         NSString *characterToAdd = [kEasterEggText substringWithRange:NSMakeRange(len, 1)];
-        NSLog(@"Sentry - Adding character to Easter Egg code string: %@", characterToAdd);
+        os_log_debug([KMLogs testLog], "Sentry - Adding character to Easter Egg code string: %{public}@", characterToAdd);
         [_easterEggForSentry appendString:characterToAdd];
         if ([_easterEggForSentry isEqualToString:kEasterEggText]) {
           os_log_debug([KMLogs testLog], "Sentry - Forcing crash now");
@@ -217,7 +213,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
 // handleEvent implementation for core event processing
 - (BOOL)handleEvent:(NSEvent *)event client:(id)sender {
   BOOL handled = NO;
-  os_log_debug([KMLogs eventsLog], "handleEvent event = %{public}@", event);
+  os_log_debug([KMLogs eventsLog], "handleEvent፡ event = %{public}@", event);
 
   [self checkTextApiCompliance:sender];
   
@@ -341,7 +337,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
  * Returns NO if we have not applied an event to the client or if Keyman Core determines that we should emit the keystroke
  */
 -(BOOL)applyKeymanCoreActions:(CoreKeyOutput*)output event: (NSEvent*)event client:(id) client {
-  os_log_debug([KMLogs eventsLog], "   *** InputMethodEventHandler applyKeymanCoreActions: output = %{public}@ ", output);
+  //os_log_debug([KMLogs eventsLog], "InputMethodEventHandler applyKeymanCoreActions: output = %{public}@ ", output);
   
   BOOL handledEvent = [self applyKeyOutputToTextInputClient:output keyDownEvent:event client:client];
   [self applyNonTextualOutput:output];
@@ -349,7 +345,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   // if output from Keyman Core indicates to emit the keystroke,
   // then return NO, so that the OS still handles the event
   if (handledEvent && output.emitKeystroke) {
-    os_log_debug([KMLogs eventsLog], "   *** InputMethodEventHandler applyKeymanCoreActions: output = %{public}@ ", output);
+    os_log_debug([KMLogs eventsLog], "   *** emitKeystroke, not handling event");
     handledEvent = NO;
   }
   
@@ -360,16 +356,15 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   BOOL handledEvent = YES;
   
   if (output.isInsertOnlyScenario) {
-    os_log_debug([KMLogs keyLog], "KXMInputMethodHandler applyOutputToTextInputClient, insert only scenario");
-    os_log_debug([KMLogs keyLog], "KXMInputMethodHandler applyOutputToTextInputClient, insert only scenario");
+    os_log_debug([KMLogs keyLog], "applyOutputToTextInputClient, insert only scenario");
     [self insertAndReplaceTextForOutput:output client:client];
   } else if (output.isDeleteOnlyScenario) {
     if ((event.keyCode == kVK_Delete) && output.codePointsToDeleteBeforeInsert == 1) {
       // let the delete pass through in the original event rather than sending a new delete
-      os_log_debug([KMLogs keyLog], "KXMInputMethodHandler applyOutputToTextInputClient, delete only scenario with passthrough");
+      os_log_debug([KMLogs keyLog], "applyOutputToTextInputClient, delete only scenario with passthrough");
       handledEvent = NO;
     } else {
-      os_log_debug([KMLogs keyLog], "KXMInputMethodHandler applyOutputToTextInputClient, delete only scenario");
+      os_log_debug([KMLogs keyLog], "applyOutputToTextInputClient, delete only scenario");
       [self sendEvents:event forOutput:output];
     }
   } else if (output.isDeleteAndInsertScenario) {
@@ -391,10 +386,10 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
      */
     
     if (self.apiCompliance.mustBackspaceUsingEvents) {
-      os_log_debug([KMLogs keyLog], "KXMInputMethodHandler applyOutputToTextInputClient, delete and insert scenario with events");
+      os_log_debug([KMLogs keyLog], "applyOutputToTextInputClient, delete and insert scenario with events");
       [self sendEvents:event forOutput:output];
     } else {
-      os_log_debug([KMLogs keyLog], "KXMInputMethodHandler applyOutputToTextInputClient, delete and insert scenario with insert API");
+      os_log_debug([KMLogs keyLog], "applyOutputToTextInputClient, delete and insert scenario with insert API");
       // directly insert text and handle backspaces by using replace
       [self insertAndReplaceTextForOutput:output client:client];
     }
@@ -450,7 +445,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
  * this method can only be used if approved by TextApiCompliance
  */
 -(void)insertAndReplaceText:(NSString *)text deleteCount:(int) replacementCount toReplace:(NSString*)textToDelete client:(id) client {
-  os_log_debug([KMLogs keyLog], "KXMInputMethodHandler insertAndReplaceText: %{public}@ replacementCount: %d", text, replacementCount);
+  os_log_debug([KMLogs keyLog], "insertAndReplaceText, insert: %{public}@, delete: %{public}@, replacementCount: %d", text, textToDelete, replacementCount);
   NSRange selectionRange = [client selectedRange];
   NSRange replacementRange = [self calculateInsertRangeForDeletedText:textToDelete selectionRange:selectionRange];
   

@@ -48,7 +48,6 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 -(void)loadCoreWrapperFromKmxFile:(NSString *)kmxFilePath {
   @try {
     _coreWrapper = [[CoreWrapper alloc] initWithHelper:_coreHelper kmxFilePath:kmxFilePath];
-    os_log([KMELogs coreLog], "loadCoreWrapperFromKmxFile, keyboardId = %{public}@", [self.coreWrapper keyboardId]);
   }
   @catch (NSException *exception) {
     os_log_error([KMELogs coreLog], "loadCoreWrapperFromKmxFile, failed to create keyboard for path '%{public}@' with exception: %{public}@", kmxFilePath, exception.description);
