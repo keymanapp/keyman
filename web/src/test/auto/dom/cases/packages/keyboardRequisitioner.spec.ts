@@ -1,11 +1,11 @@
-import { assert } from '/node_modules/chai/chai.js';
-import sinon from '/node_modules/sinon/pkg/sinon-esm.js';
+import { assert } from 'chai';
+import sinon from 'sinon';
 
-import { KeyboardHarness, MinimalKeymanGlobal } from '/@keymanapp/keyboard-processor/build/lib/index.mjs';
-import { DOMKeyboardLoader } from '/@keymanapp/keyboard-processor/build/lib/dom-keyboard-loader.mjs';
-import { PathConfiguration } from '/@keymanapp/keyman/build/engine/paths/lib/index.mjs';
-import { KeyboardRequisitioner } from '/@keymanapp/keyman/build/engine/package-cache/lib/index.mjs';
-import DOMCloudRequester from '/@keymanapp/keyman/build/engine/package-cache/lib/dom-cloud-requester.mjs';
+import { KeyboardHarness, MinimalKeymanGlobal } from '@keymanapp/keyboard-processor';
+import { DOMKeyboardLoader } from '@keymanapp/keyboard-processor/dom-keyboard-loader';
+import { PathConfiguration } from 'keyman/engine/paths';
+import { KeyboardRequisitioner, type KeyboardStub } from 'keyman/engine/package-cache';
+import DOMCloudRequester from 'keyman/engine/package-cache/dom-requester';
 
 const pathConfig = new PathConfiguration({
   root: '',
@@ -34,7 +34,8 @@ function mockQuery(querier, queryResultsFile) {
       x.timerid = idInjector.injectionId;
 
       querier.registerFromCloud(x);
-    }
+    },
+    injectionId: undefined as undefined | number
   }
 
   /*
@@ -53,7 +54,7 @@ function mockQuery(querier, queryResultsFile) {
   });
 
   // Install the queryId-injection register as the global registration point for returned queries.
-  window.keyman = {
+  window['keyman'] = {
     register: idInjector.registerFromCloud
   };
 }
@@ -69,8 +70,8 @@ describe("KeyboardRequisitioner", function () {
     //
     // The edits are minimal and notated within the fixture file.
     // Path becomes /resources/keyboards/khmer_angkor.js.
-    mockQuery(keyboardRequisitioner.cloudQueryEngine, `base/web/src/test/auto/resources/query-mock-results/khmer_angkor.hand-edited.js.fixture`);
-    const [stub] = await keyboardRequisitioner.addKeyboardArray(['khmer_angkor']);
+    mockQuery(keyboardRequisitioner.cloudQueryEngine, `resources/query-mock-results/khmer_angkor.hand-edited.js.fixture`);
+    const [stub] = await keyboardRequisitioner.addKeyboardArray(['khmer_angkor']) as KeyboardStub[];
     assert.strictEqual(cache.getStub(stub.KI, stub.KLC), stub);
 
     const kbd_promise = cache.fetchKeyboard('khmer_angkor');
@@ -87,8 +88,9 @@ describe("KeyboardRequisitioner", function () {
     const cache = keyboardRequisitioner.cache;
 
     // Expects the keyboard at resources/keyboards/khmer_angkor.js; this would resolve to
-    // http://localhost:9876/resources/keyboards/khmer_angkor.js aased on our configured path.
-    const stubJSON = fixture.load("/keyboards/khmer_angkor.json", true);
+    // http://localhost:9876/resources/keyboards/khmer_angkor.js based on our configured path.
+    const fixture = await fetch('resources/stubs/khmer_angkor.json');
+    const stubJSON = await fixture.json();
 
     // But we can't be sure that `localhost:9876` is the actual path it will have on EVERYONE's machine.  Let's fix it.
     // We'll make it match the path for the previous test by ensuring a '/' for absolute pathing based on server root.
@@ -96,7 +98,7 @@ describe("KeyboardRequisitioner", function () {
 
     // The `pathConfig` setup + internal logic should ensure that the filepath points to the correct location
     // with no additional effort required here.
-    const [stub] = await keyboardRequisitioner.addKeyboardArray([stubJSON]);
+    const [stub] = await keyboardRequisitioner.addKeyboardArray([stubJSON]) as KeyboardStub[];
     assert.strictEqual(cache.getStub(stub.KI, stub.KLC), stub);
 
     const kbd_promise = cache.fetchKeyboard('khmer_angkor');

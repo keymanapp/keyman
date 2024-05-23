@@ -1,13 +1,14 @@
-import { assert } from '/node_modules/chai/chai.js';
+import { assert } from 'chai';
 
-import { extendString, Mock } from '/@keymanapp/keyboard-processor/build/lib/index.mjs';
-import { Input } from '/@keymanapp/keyman/build/engine/element-wrappers/lib/index.mjs';
-
-import { toSupplementaryPairString, DynamicElements } from '../../test_utils.js';
+import { extendString, Mock } from '@keymanapp/keyboard-processor';
+import { Input } from 'keyman/engine/element-wrappers';
 
 extendString();
 
 var MockTests;
+
+const host = document.createElement('div');
+document.body.appendChild(host);
 
 // Define common interface testing functions that can be run upon the OutputTarget interface.
 if(typeof MockTests == 'undefined') {
@@ -15,7 +16,7 @@ if(typeof MockTests == 'undefined') {
 
   (function(){
     // Makes a nice Unicode shortcut.
-    var u = toSupplementaryPairString;
+    const u = (val) => String.fromCodePoint(val);
 
     MockTests.Apple = {};
     MockTests.Apple.normal = 'apple';
@@ -31,8 +32,8 @@ if(typeof MockTests == 'undefined') {
 
     //#region Defines helpers related to HTMLInputElement / Input test setup.
     MockTests.initBase = function() {
-      var id = DynamicElements.addInput();
-      var elem = document.getElementById(id);
+      var elem = document.createElement('input');
+      host.appendChild(elem);
       var wrapper = new Input(elem);
 
       return wrapper;
@@ -69,21 +70,15 @@ if(typeof MockTests == 'undefined') {
 }
 
 describe('OutputTarget Mocking', function() {
-  this.timeout(testconfig.timeouts.standard);
+  this.timeout(5000);
 
   before(function() {
-    fixture.setBase('fixtures');
-
     // Make sure the basic SMP extension hooks exist to prevent errors later.
     String.kmwEnableSupplementaryPlane(true);
   });
 
-  beforeEach(function() {
-    fixture.load("dynamic-element-container.html");
-  })
-
   afterEach(function() {
-    fixture.cleanup();
+    host.innerHTML = '';
   });
 
   after(function() {

@@ -1,10 +1,11 @@
-import * as KeymanOSK from '/@keymanapp/keyman/build/engine/osk/lib/index.mjs';
-import Device from '/@keymanapp/keyman/build/engine/device-detect/lib/index.mjs';
+import * as KeymanOSK from 'keyman/engine/osk';
+import Device from 'keyman/engine/device-detect';
 
-import { loadKeyboardsFromStubs } from '../../kbdLoader.mjs';
-import { timedPromise } from '/@keymanapp/web-utils/build/lib/index.mjs';
+import { loadKeyboardsFromStubs } from '../../kbdLoader.js';
+import { timedPromise } from '@keymanapp/web-utils';
+import { type Keyboard } from '@keymanapp/keyboard-processor';
 
-import { assert } from '/node_modules/chai/chai.js';
+import { assert } from 'chai';
 
 const device = new Device();
 device.detect();
@@ -14,27 +15,32 @@ const TestResources = {
     isEmbedded: false,
     pathConfig: {
       fonts: '',
-      resources: '/@keymanapp/keyman/src/resources'
+      resources: '/web/build/publish/debug/'
     },
     hostDevice: device.coreSpec,
     allowHideAnimations: false // shortens timings.
-  }
+  },
+  Keyboards: null as Awaited<ReturnType<typeof loadKeyboardsFromStubs>>
 }
 
+const host = document.createElement('div');
+document.body.appendChild(host);
+
 describe('OSK activation', function () {
-  this.timeout(__karma__.config.args.find((arg) => arg.type == "timeouts").standard);
+  this.timeout(5000);
 
   before(async () => {
-    const stubs = [__json__['/keyboards/khmer_angkor']];
-    TestResources.Keyboards = await loadKeyboardsFromStubs(stubs, '/');
+    const fixture = await fetch('resources/stubs/khmer_angkor.json');
+    const stubJSON = await fixture.json();
+    TestResources.Keyboards = await loadKeyboardsFromStubs([stubJSON], '/');
   });
 
   beforeEach(() => {
-    fixture.set('<div id="osk-container" style="width: fit-content"></div>');
+    host.innerHTML = '<div id="osk-container" style="width: fit-content"></div>';
   });
 
   afterEach(() => {
-    fixture.cleanup();
+    host.innerHTML = '';
   });
 
   it('InlinedOSK - standard case', async () => {
@@ -54,6 +60,7 @@ describe('OSK activation', function () {
     assert.equal(container.offsetWidth, 600);
     assert.equal(container.offsetHeight, 400);
 
+    // @ts-ignore // mayHide is protected.
     assert.equal(osk.mayHide(false), true);
 
     osk.activationModel.enabled = false;
@@ -97,6 +104,7 @@ describe('OSK activation', function () {
       // An error should have been thrown - .enabled is an unsettable property here.
     }
 
+    // @ts-ignore // mayHide is protected.
     assert.equal(osk.mayHide(false), false);
 
     // Must not throw an error!
