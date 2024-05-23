@@ -8,6 +8,7 @@ on:
 env:
   STATUS_CONTEXT: 'API Verification'
   PKG_NAME: 'libkeymancore'
+  GH_TOKEN: ${{ github.token }}
 
 jobs:
   setup_environment:
