@@ -132,7 +132,7 @@ test('test_context_normalization', tc, suite: 'ldml')
 # Build and run additional test_unicode test
 
 u = executable('test_unicode', 'test_unicode.cpp',
-    ['test_unicode.cpp', '../emscripten_filesystem.cpp'],
+    ['test_unicode.cpp', common_test_files],
     cpp_args: defns + warns,
     include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
     link_args: links + tests_flags,
