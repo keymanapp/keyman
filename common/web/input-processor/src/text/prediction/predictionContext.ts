@@ -81,7 +81,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
       if(validSuggestionState()) {
         return langProcessor.applySuggestion(suggestion, this.currentTarget, () => kbdProcessor.layerId);
       } else {
-        return Promise.resolve(null);
+        return null;
       }
     }
 
