@@ -194,12 +194,15 @@ final class KMKeyboard extends WebView {
 
     int selMin = icText.selectionStart, selMax = icText.selectionEnd;
 
-    if (selMin < 0 || selMax < 0 || rawText.length() == 0) {
+    int textLength = rawText.length();
+    
+    if (selMin < 0 || selMax < 0) {
       // There is no selection or cursor
       // Reference https://developer.android.com/reference/android/text/Selection#getSelectionEnd(java.lang.CharSequence)
       return false;
-    } else if (selMin > rawText.length()-1 || selMax > rawText.length()-1) {
-      // Selection is past existing text
+    } else if (selMin > textLength || selMax > textLength) {
+      // Selection is past end of existing text -- should not be possible but we 
+      // are seeing it happen; #11506
       return false;
     }
 
