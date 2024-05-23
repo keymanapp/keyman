@@ -600,7 +600,7 @@ export default class Keyboard {
       this.scriptObject['VKDictionary']=dict;
     }
 
-    const res=this.scriptObject['VKDictionary'][keyName.toUpperCase()];
+    const res=dict[keyName.toUpperCase()];
     return res ? res : 0;
   }
 }
