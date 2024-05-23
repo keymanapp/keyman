@@ -76,7 +76,7 @@ begin
     if RunCrashReportHandler then
       Exit;
 
-    FInitializeCEF := TCEFManager.Create;
+    FInitializeCEF := TCEFManager.Create(False);
     try
       try
         if FInitializeCEF.Start then
