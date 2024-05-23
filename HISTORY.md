@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 18.0.42 alpha 2024-05-23
+
+* chore(web): conversion of Web's browser-integration auto-tests for @web/test-runner use (#11455)
+* chore(web): conversion of Web's end-to-end style auto-tests for @web/test-runner use (#11456)
+* chore(web): finalization for replacement of Karma with Web Test Runner (#11300)
+* fix(android): Delete sentry-cli-2.31.1.exe during CI builds (#11493)
+* change(common): remove `is:open` from issue templates (#11492)
+* chore(developer): build.sh for developer (#11421)
+* chore(windows): move from Makefile to build.sh (#11461)
+* fix(linux): Add missing variable to API verification GHA (#11511)
+* chore(common): Update standards data (#11003)
+
 ## 18.0.41 alpha 2024-05-22
 
 * fix(developer): handle `KM_CORE_IT_INVALIDATE_CONTEXT` in debugger (#11488)
