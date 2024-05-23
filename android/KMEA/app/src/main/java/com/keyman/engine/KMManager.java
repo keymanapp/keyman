@@ -627,7 +627,6 @@ public final class KMManager {
    * @return RelativeLayout.LayoutParams
    */
   public static RelativeLayout.LayoutParams getKeyboardLayoutParams() {
-    // Note: this func always has a reference to app context b/c class field.
     int bannerHeight = getBannerHeight(appContext);
     int kbHeight = getKeyboardHeight(appContext);
     RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
@@ -720,7 +719,6 @@ public final class KMManager {
 
   @SuppressLint("InflateParams")
   public static View createInputView(InputMethodService inputMethodService) {
-    //final Context context = appContext;
     IMService = inputMethodService;
     Context appContext = IMService.getApplicationContext();
     final FrameLayout mainLayout = new FrameLayout(appContext);
@@ -729,8 +727,6 @@ public final class KMManager {
     RelativeLayout keyboardLayout = new RelativeLayout(appContext);
     keyboardLayout.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
 
-    // sticks the keyboard's webview into our locally-generated keyboard-hosting
-    // view hierarchy (after ensuring that it's removed from a prior one if applicable)
     ViewGroup parent = (ViewGroup) SystemKeyboard.getParent();
     if (parent != null)
       parent.removeView(SystemKeyboard);
@@ -2033,6 +2029,10 @@ public final class KMManager {
   /* package-private */
   static void setOrientation(int orientationFlag) {
     orientation = orientationFlag;
+  }
+
+  public static int getOrientation(Context context) {
+    return orientation;
   }
 
   public static int detectOrientation(Context context) {
