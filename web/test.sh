@@ -62,7 +62,7 @@ fi
 # Prepare the flags for the karma command.
 WTR_DEBUG=
 if builder_is_debug_build; then
-  WTR_DEBUG=" --manual"
+  WTR_DEBUG="--manual"
 fi
 
 # End common configs.
