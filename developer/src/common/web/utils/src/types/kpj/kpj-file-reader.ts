@@ -28,7 +28,7 @@ export class KPJFileReader {
     });
     data = this.boxArrays(data);
     if(data.KeymanDeveloperProject?.Files?.File?.length) {
-      for(let file of data.KeymanDeveloperProject?.Files?.File) {
+      for(const file of data.KeymanDeveloperProject?.Files?.File) {
         // xml2js imports <Details/> as '' so we will just delete the empty string
         if(typeof file.Details == 'string') {
           delete file.Details;
@@ -59,8 +59,8 @@ export class KPJFileReader {
     // NOTE: at this point, the xml should have been validated
     // and matched the schema result so we can assume the source
     // is a valid shape
-    let project = source.KeymanDeveloperProject;
-    let result: KeymanDeveloperProject = new KeymanDeveloperProject(projectFilename, project.Options?.Version || "1.0", this.callbacks);
+    const project = source.KeymanDeveloperProject;
+    const result: KeymanDeveloperProject = new KeymanDeveloperProject(projectFilename, project.Options?.Version || "1.0", this.callbacks);
     if(result.options.version == '2.0') {
       result.options.buildPath = (project.Options?.BuildPath || result.options.buildPath).replace(/\\/g, '/');
       result.options.sourcePath = (project.Options?.SourcePath || result.options.sourcePath).replace(/\\/g, '/');
@@ -87,9 +87,9 @@ export class KPJFileReader {
   }
 
   private transformFilesVersion10(project: KPJFileProject, result: KeymanDeveloperProject) {
-    let ids: { [id: string]: KeymanDeveloperProjectFile10; } = {};
-    for (let sourceFile of project.Files?.File) {
-      let file: KeymanDeveloperProjectFile10 = new KeymanDeveloperProjectFile10(
+    const ids: { [id: string]: KeymanDeveloperProjectFile10; } = {};
+    for (const sourceFile of project.Files?.File) {
+      const file: KeymanDeveloperProjectFile10 = new KeymanDeveloperProjectFile10(
         sourceFile.ID || '',
         (sourceFile.Filepath || '').replace(/\\/g, '/'),
         sourceFile.FileVersion || '',

@@ -28,13 +28,13 @@ export class KeymanDeveloperProject {
     if(this.options.version != '2.0') {
       throw new Error('populateFiles can only be called on a v2.0 project');
     }
-    let sourcePath = this.resolveProjectPath(this.options.sourcePath);
+    const sourcePath = this.resolveProjectPath(this.options.sourcePath);
     if(!this.callbacks.fs.existsSync(sourcePath)) {
       return false;
     }
-    let files = this.callbacks.fs.readdirSync(sourcePath);
-    for(let filename of files) {
-      let fullPath = this.callbacks.path.join(sourcePath, filename);
+    const files = this.callbacks.fs.readdirSync(sourcePath);
+    for(const filename of files) {
+      const fullPath = this.callbacks.path.join(sourcePath, filename);
       if(KeymanFileTypes.filenameIs(filename, KeymanFileTypes.Source.LdmlKeyboard)) {
         try {
           const data = this.callbacks.loadFile(fullPath);
@@ -50,7 +50,7 @@ export class KeymanDeveloperProject {
         }
       }
       if(KeymanFileTypes.sourceTypeFromFilename(filename) !== null) {
-        let file = new KeymanDeveloperProjectFile20(fullPath, this.callbacks);
+        const file = new KeymanDeveloperProjectFile20(fullPath, this.callbacks);
         this.files.push(file);
       }
     }
@@ -108,7 +108,7 @@ export class KeymanDeveloperProject {
 
     p = this.resolveProjectPath(p);
 
-    let f = file.filename.replace(new RegExp(`\\${sourceExt}$`, 'i'), targetExt);
+    const f = file.filename.replace(new RegExp(`\\${sourceExt}$`, 'i'), targetExt);
     return this.callbacks.path.normalize(this.callbacks.path.join(p, f));
   }
 
