@@ -70,6 +70,10 @@ jobs:
 
     - name: "Verify API for libkeymancore.so (${{ needs.setup_environment.outputs.GIT_BRANCH }}, branch ${{ needs.setup_environment.outputs.GIT_BASE_BRANCH }}, by ${{ needs.setup_environment.outputs.GIT_USER }}) - "
       run: |
+        ls -al ${GITHUB_WORKSPACE}
+        ls -al ${GITHUB_WORKSPACE}/artifacts/
+        ls -al "${GITHUB_WORKSPACE}/artifacts/${PKG_NAME}_${{ needs.setup_environment.outputs.VERSION }}-1${{ needs.setup_environment.outputs.PRERELEASE_TAG }}+$(lsb_release -c -s)1_amd64.deb"
+
         cd linux
         ./scripts/deb-packaging.sh \
           --gha \
