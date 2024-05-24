@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.43 alpha 2024-05-24
+
+* fix(android): Revert Sentry version for FV Android (#11522)
+* chore(windows): remove schedule task clean up introduced in 15.0 Alpha (#11521)
+* fix(windows): add FirstVoices Keyboards build to Windows release build (#11524)
+
 ## 18.0.42 alpha 2024-05-23
 
 * chore(web): conversion of Web's browser-integration auto-tests for @web/test-runner use (#11455)

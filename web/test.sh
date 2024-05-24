@@ -62,11 +62,11 @@ fi
 # Prepare the flags for the karma command.
 WTR_DEBUG=
 if builder_is_debug_build; then
-  WTR_DEBUG=" --manual"
+  WTR_DEBUG="--manual"
 fi
 
 # End common configs.
 
-builder_run_action test:dom web-test-runner --config "src/test/auto/dom/web-test-runner${WTR_CONFIG}.config.mjs" "${WTR_DEBUG}"
+builder_run_action test:dom web-test-runner --config "src/test/auto/dom/web-test-runner${WTR_CONFIG}.config.mjs" ${WTR_DEBUG}
 
-builder_run_action test:integrated web-test-runner --config "src/test/auto/integrated/web-test-runner${WTR_CONFIG}.config.mjs" "${WTR_DEBUG}"
+builder_run_action test:integrated web-test-runner --config "src/test/auto/integrated/web-test-runner${WTR_CONFIG}.config.mjs" ${WTR_DEBUG}
