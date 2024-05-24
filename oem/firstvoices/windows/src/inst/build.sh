@@ -2,10 +2,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../..../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 source "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+source "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
 
 builder_describe "Installation files for FirstVoices Keyboards" \
   @/common/windows/data \
@@ -63,7 +64,17 @@ function do_publish() {
      -dVERSION=$VERSION_WIN -dRELEASE=$VERSION_RELEASE \
      -dPRODUCTID=$GUID1 -dDESKTOPUISOURCE=../xml \
      firstvoices.wxs desktopui.wxs
-  "$WIXLIGHT" -dWixUILicenseRtf=License.rtf -out firstvoices.msi -ext WixUIExtension firstvoices.wixobj desktopui.wixobj
+
+  # ICE82: we suppress because it reports spurious errors with merge module
+  #        keymanengine to do with duplicate sequence numbers.  Safely ignored.
+  # ICE80: we suppress because it reports x64 components without targeting x64.
+  #        Safely ignored.
+
+  "$WIXLIGHT" \
+    -sice:ICE82 -sice:ICE80 \
+    -dWixUILicenseRtf=License.rtf \
+    -out firstvoices.msi \
+    -ext WixUIExtension firstvoices.wixobj desktopui.wixobj
 
   #
   # Sign the installation archive
@@ -107,7 +118,7 @@ function create-setup-inf() {
   builder_heading create-setup-inf
 
   echo "[Setup]" > setup.inf
-  echo "Version=$VersionWin" >> setup.inf
+  echo "Version=$VERSION_WIN" >> setup.inf
   echo "MSIFileName=firstvoices.msi" >> setup.inf
   echo "MSIOptions=" >> setup.inf
   echo "AppName=FirstVoices Keyboards" >> setup.inf
