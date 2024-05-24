@@ -24,8 +24,7 @@ km_core_usv *unicode_string_to_usv(icu::UnicodeString& src) {
 
   src.toUTF32(reinterpret_cast<UChar32*>(dst), src.length(), icu_status);
 
-  assert(U_SUCCESS(icu_status));
-  if(!U_SUCCESS(icu_status)) {
+  if(!UASSERT_SUCCESS(icu_status)) {
     DebugLog("toUTF32 failed with %x", icu_status);
     delete[] dst;
     return nullptr;
@@ -49,16 +48,20 @@ km_core_usv *unicode_string_to_usv(icu::UnicodeString& src) {
  * @return false if failure
  */
 bool normalize(const icu::Normalizer2 *n, std::u16string &str, UErrorCode &status) {
-  UASSERT_SUCCESS(status);
+  if(!UASSERT_SUCCESS(status)) {
+    return false;
+  }
   assert(n != nullptr);
   icu::UnicodeString dest;
   icu::UnicodeString src = icu::UnicodeString(str.data(), (int32_t)str.length());
   n->normalize(src, dest, status);
   // the next line here will assert
-  if (UASSERT_SUCCESS(status)) {
+  if (!UASSERT_SUCCESS(status)) {
+    return false;
+  } else {
     str.assign(dest.getBuffer(), dest.length());
+    return true;
   }
-  return U_SUCCESS(status);
 }
 
 
