@@ -268,15 +268,14 @@ add_pending_markers(
     marker_map *markers,
     marker_list &last_markers,
     const std::u32string::const_iterator &last,
-    const std::u32string::const_iterator &end,
-    const icu::Normalizer2 *nfd) {
+    const std::u32string::const_iterator &end) {
   // quick check to see if there's no work to do.
   if(markers == nullptr) {
     return;
   }
   /** which character this marker is 'glued' to. */
   char32_t marker_ch;
-  icu::UnicodeString decomposition;
+  std::u32string decomposition;
   if (last == end) {
     // at end of text, so use a special value to indicate 'EOT'.
     marker_ch = MARKER_BEFORE_EOT;
@@ -285,17 +284,13 @@ add_pending_markers(
 
     // if the character is composed, we need to use the first decomposed char
     // as the 'glue'.
-    if(!nfd->getDecomposition(ch, decomposition)) {
+    if(!km::core::util::normalize_nfd(ch, decomposition)) {
       // char does not have a decomposition - so it may be used for the glue
-      marker_ch = ch;
-      decomposition.remove(); // no other entries needed
-    } else {
-      // 'glue' is the first codepoint of the decomposition.
-      marker_ch = decomposition.char32At(0);
-      if (decomposition.countChar32() == 1) {
-        decomposition.remove(); // no other entries needed
-      } // else: will add the remainder below
+      // the 'if' is only for the assertions here.
+      assert(decomposition.length() == 1); // should be a single UTF-32 char
+      assert(decomposition.at(0) == ch); // should be the same char
     }
+    marker_ch = decomposition.at(0); // always the first char
   }
   markers->emplace_back(marker_ch);
   // now, update the map with these markers (in order) on this character.
@@ -304,10 +299,10 @@ add_pending_markers(
     markers->emplace_back(marker_ch, *i);
   }
   // add any further entries due to decomposition
-  if (!decomposition.isEmpty()) {
-    // We already added the base char above, add teh rest
-    for (auto i=1; i<decomposition.countChar32(); i++) {
-      markers->emplace_back(decomposition.char32At(i));
+  if (decomposition.length() > 1) {
+    // We already added the base char above, add the rest
+    for (size_t i=1; i<decomposition.length(); i++) {
+      markers->emplace_back(decomposition.at(i));
     }
   }
   // clear the list
@@ -318,10 +313,6 @@ std::u32string
 remove_markers(const std::u32string &str, marker_map *markers, marker_encoding encoding) {
   std::u32string out;
   marker_list last_markers;
-  UErrorCode status = U_ZERO_ERROR;
-  const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
-  UASSERT_SUCCESS(status);
-
   auto last = str.begin();  // points to the part of the string after the last matched marker
   for (auto i = str.begin(); i != str.end();) {
     auto marker_no = parse_next_marker(i, str.end(), encoding);
@@ -329,7 +320,7 @@ remove_markers(const std::u32string &str, marker_map *markers, marker_encoding e
       // add any markers found before this entry, but only if there is intervening
       // text. This prevents the sentinel or the '\u' from becoming the attachment char.
       if (i != last) {
-        add_pending_markers(markers, last_markers, last, str.end(), nfd);
+        add_pending_markers(markers, last_markers, last, str.end());
         out.append(last, i); // append any non-marker text since the end of the last marker
         last = i; // advance over text we've already appended
       }
@@ -347,7 +338,7 @@ remove_markers(const std::u32string &str, marker_map *markers, marker_encoding e
   // add any remaining pending markers.
   // if last == str.end() then this wil be MARKER_BEFORE_EOT
   // otherwise it will be the glue character
-  add_pending_markers(markers, last_markers, last, str.end(), nfd);
+  add_pending_markers(markers, last_markers, last, str.end());
   // get the suffix between the last marker and the end (could be nothing)
   out.append(last, str.end());
   return out;

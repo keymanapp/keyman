@@ -13,6 +13,7 @@
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #include "utfcodec.hpp"
+#include <assert.h>
 // JS implementations
 
 EM_JS(char*, NormalizeNFD, (const char* input), {
@@ -62,6 +63,10 @@ bool normalize_nfd(std::u16string &str) {
  * Normalize the input string using ICU, out of place
  */
 bool normalize_nfd(km_core_cu const * src, std::u16string &dst) {
+#ifdef __EMSCRIPTEN__
+  dst = std::u16string(src);
+  return normalize_nfd(dst); // vector to above fcn
+#else
   UErrorCode icu_status = U_ZERO_ERROR;
   const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(icu_status);
   assert(U_SUCCESS(icu_status));
@@ -80,6 +85,42 @@ bool normalize_nfd(km_core_cu const * src, std::u16string &dst) {
 
   dst.assign(udst.getBuffer(), udst.length());
   return true;
+#endif
+}
+
+bool
+normalize_nfd(km_core_usv cp, std::u32string &dst) {
+  // set the output string to the original string
+  dst.clear();
+  dst.append(1, cp);
+#ifdef __EMSCRIPTEN__
+  auto str16 = convert<char32_t, char16_t>(dst);
+  if (!normalize_nfd(str16)) {
+    return false;  // failed, retain original str
+  } else {
+    dst = convert<char16_t, char32_t>(str16);
+    return true;
+  }
+#else
+  UErrorCode icu_status = U_ZERO_ERROR;
+  const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(icu_status);
+  assert(U_SUCCESS(icu_status));
+  if (!U_SUCCESS(icu_status)) {
+    // TODO: log the failure code
+    return false;
+  }
+  icu::UnicodeString decomposition;
+  if (!nfd->getDecomposition(cp, decomposition)) {
+    return false;  // no error, just no decomposition
+  } else {
+    dst.clear();
+    auto len = decomposition.countChar32();
+    for (int i = 0; i < len; i++) {
+      dst.append(1, decomposition.char32At(i));
+    }
+    return true;
+  }
+#endif
 }
 
 }

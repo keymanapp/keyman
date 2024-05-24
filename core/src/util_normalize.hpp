@@ -23,6 +23,9 @@ bool normalize_nfd(std::u16string &str);
 /** normalize src to dst in NFD. @return false on failure */
 bool normalize_nfd(km_core_cu const * src, std::u16string &dst);
 
+/** normalize (decompose) a single cp to string. @return false on failure */
+bool normalize_nfd(km_core_usv cp, std::u32string &dst);
+
 }
 }
 }

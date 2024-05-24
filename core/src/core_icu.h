@@ -3,8 +3,6 @@
  */
 #pragma once
 
-#define KMN_NO_ICU 0 /* Temporary - keep ICU in for now while checking out build issues */
-
 #ifdef __EMSCRIPTEN__
 // define this in tests to keep ICU around
 # if !defined(KMN_IN_LDML_TESTS)

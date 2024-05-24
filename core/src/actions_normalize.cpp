@@ -1,3 +1,5 @@
+// TEMP
+#define KMN_NO_ICU 0
 /*
   Copyright:    © 2024 SIL International.
   Description:  Implementation of the action output normalization.
@@ -21,6 +23,34 @@
 
 icu::UnicodeString context_items_to_unicode_string(km::core::context const *context);
 
+
+// TEMP
+namespace km {
+namespace core {
+namespace util {
+
+/**
+ * Helper to convert icu::UnicodeString to a UTF-32 km_core_usv buffer,
+ * nul-terminated
+ */
+inline km_core_usv *unicode_string_to_usv(icu::UnicodeString& src) {
+  UErrorCode icu_status = U_ZERO_ERROR;
+
+  km_core_usv *dst = new km_core_usv[src.length() + 1];
+
+  src.toUTF32(reinterpret_cast<UChar32*>(dst), src.length(), icu_status);
+
+  assert(U_SUCCESS(icu_status));
+  if(!U_SUCCESS(icu_status)) {
+    DebugLog("toUTF32 failed with %x", icu_status);
+    delete[] dst;
+    return nullptr;
+  }
+
+  dst[src.length()] = 0;
+  return dst;
+}
+}}}
 /**
  * Normalize the output from an action to NFC, across the context | output
  * boundary, fixing up the app_context and the output actions to take into
