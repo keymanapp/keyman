@@ -315,11 +315,11 @@ jobs:
         echo "GIT_USER=${{ github.event.client_payload.user }}" >> artifacts/env
 
     - name: Cache artifacts
-      uses: actions/cache/save@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # v4.0.0
+      uses: actions/cache/save@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
       with:
         path: |
           artifacts
-        key: artifacts-key-${GITHUB_RUN_ID}
+        key: artifacts-key-${{ github.run_id }}
 
   # We intentionally ignore the results of binary_packages_unreleased
   set_status:
