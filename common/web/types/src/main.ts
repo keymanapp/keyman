@@ -43,10 +43,6 @@ export * as TouchLayout from './keyman-touch-layout/keyman-touch-layout-file.js'
 export { TouchLayoutFileReader } from './keyman-touch-layout/keyman-touch-layout-file-reader.js';
 export { TouchLayoutFileWriter, TouchLayoutFileWriterOptions } from './keyman-touch-layout/keyman-touch-layout-file-writer.js';
 
-export * as KPJ from './kpj/kpj-file.js';
-export { KPJFileReader } from './kpj/kpj-file-reader.js';
-export { KeymanDeveloperProject, KeymanDeveloperProjectFile, KeymanDeveloperProjectType, } from './kpj/keyman-developer-project.js';
-
 export * as KpsFile from './package/kps-file.js';
 export * as KmpJsonFile from './package/kmp-json-file.js';
 

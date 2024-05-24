@@ -1,9 +1,8 @@
 import * as xml2js from '../deps/xml2js/xml2js.js';
 import { KPJFile, KPJFileProject } from './kpj-file.js';
-import { boxXmlArray } from '../util/util.js';
+import { util } from '@keymanapp/common-types';
 import { KeymanDeveloperProject, KeymanDeveloperProjectFile10, KeymanDeveloperProjectType } from './keyman-developer-project.js';
-import { CompilerCallbacks } from '../util/compiler-interfaces.js';
-import SchemaValidators from '../schema-validators.js';
+import { CompilerCallbacks, SchemaValidators } from '@keymanapp/common-types';
 
 export class KPJFileReader {
   constructor(private callbacks: CompilerCallbacks) {
@@ -40,11 +39,11 @@ export class KPJFileReader {
   }
 
   public validate(source: KPJFile): void {
-    if(!SchemaValidators.kpj(source)) {
-      if(!SchemaValidators.kpj90(source)) {
+    if(!SchemaValidators.default.kpj(source)) {
+      if(!SchemaValidators.default.kpj90(source)) {
         // If the legacy schema also does not validate, then we will only report
         // the errors against the modern schema
-        throw new Error(JSON.stringify((<any>SchemaValidators.kpj).errors));
+        throw new Error(JSON.stringify((<any>SchemaValidators.default.kpj).errors));
       }
     }
   }
@@ -123,7 +122,7 @@ export class KPJFileReader {
     if(!source.KeymanDeveloperProject.Files || typeof source.KeymanDeveloperProject.Files == 'string') {
       source.KeymanDeveloperProject.Files = {File:[]};
     }
-    boxXmlArray(source.KeymanDeveloperProject.Files, 'File');
+    util.boxXmlArray(source.KeymanDeveloperProject.Files, 'File');
     return source;
   }
 }
