@@ -22,20 +22,21 @@ jobs:
       GIT_BRANCH: ${{ steps.environment_step.outputs.GIT_BRANCH }}
       GIT_BASE_BRANCH: ${{ steps.environment_step.outputs.GIT_BASE_BRANCH }}
       GIT_USER: ${{ steps.environment_step.outputs.GIT_USER }}
+      ARTIFACTS_KEY: ${{ steps.environment_step.outputs.ARTIFACTS_KEY }}
 
     steps:
-    - name: Restore artifacts
-      uses: actions/cache/restore@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # v4.0.0
-      with:
-        path: |
-          artifacts
-        key: artifacts-key-${GITHUB_RUN_ID}
-        restore-keys: artifacts-key-
-
     - name: Read environment
       id: environment_step
       run: |
         cat artifacts/env >> $GITHUB_OUTPUT
+
+    - name: Restore artifacts
+      uses: actions/cache/restore@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+      with:
+        path: |
+          artifacts
+        key: ${ARTIFACTS_KEY}
+        restore-keys: artifacts-key-
 
   api_verification:
     name: Verify API for libkeymancore.so
