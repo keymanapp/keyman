@@ -13,7 +13,7 @@ project('keyman_core', 'cpp', 'c',
                            'b_vscrt=static_from_buildtype',
                            'warning_level=2',
                            'debug=true'],
-        meson_version: '>=0.57.0')
+        meson_version: '>=1.0')
 
 # Import our standard compiler defines; this is copied from
 # /resources/build/standard.meson.build by build.sh, because
