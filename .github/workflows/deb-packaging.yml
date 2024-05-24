@@ -313,14 +313,13 @@ jobs:
         echo "GIT_BRANCH=${{ github.event.client_payload.branch }}" >> artifacts/env
         echo "GIT_BASE_BRANCH=${{ github.event.client_payload.baseBranch }}" >> artifacts/env
         echo "GIT_USER=${{ github.event.client_payload.user }}" >> artifacts/env
-        echo "ARTIFACTS_KEY=artifacts-key-${GITHUB_RUN_ID}" >> artifacts/env
 
     - name: Cache artifacts
       uses: actions/cache/save@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
       with:
         path: |
           artifacts
-        key: ${ARTIFACTS_KEY}
+        key: artifacts-key-${{ github.run_id }}
 
   # We intentionally ignore the results of binary_packages_unreleased
   set_status:
