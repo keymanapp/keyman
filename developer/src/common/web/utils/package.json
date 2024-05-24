@@ -3,7 +3,7 @@
   "description": "Keyman Developer utilities",
   "type": "module",
   "exports": {
-    ".": "./build/index.js"
+    ".": "./build/src/index.js"
   },
   "files": [
     "/build/"
