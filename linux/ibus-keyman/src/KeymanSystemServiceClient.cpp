@@ -25,6 +25,7 @@ public:
 
   void SetCapsLockIndicator(guint32 capsLock);
   gint32 GetCapsLockIndicator();
+  void CallOrderedOutputSentinel();
 };
 
 KeymanSystemServiceClient::KeymanSystemServiceClient() {
@@ -98,9 +99,26 @@ gint32 KeymanSystemServiceClient::GetCapsLockIndicator() {
   return capsLock;
 }
 
-void set_capslock_indicator(
-  guint32 capsLock
-) {
+void
+KeymanSystemServiceClient::CallOrderedOutputSentinel() {
+  assert(error == NULL);
+
+  if (!bus) {
+    // we already reported the error, so just return
+    return;
+  }
+
+  int result = sd_bus_call_method(bus, KEYMAN_BUS_NAME, KEYMAN_OBJECT_PATH,
+    KEYMAN_INTERFACE_NAME, "CallOrderedOutputSentinel", error, &msg, "");
+  if (result < 0) {
+    g_error("%s: Failed to call method CallOrderedOutputSentinel: %s. %s. %s.",
+      __FUNCTION__, strerror(-result), error ? error->name : "-", error ? error->message : "-");
+    return;
+  }
+}
+
+void
+set_capslock_indicator(guint32 capsLock) {
   KeymanSystemServiceClient client;
   client.SetCapsLockIndicator(capsLock);
 }
@@ -108,4 +126,11 @@ void set_capslock_indicator(
 gint32 get_capslock_indicator() {
   KeymanSystemServiceClient client;
   return client.GetCapsLockIndicator();
+}
+
+void
+call_ordered_output_sentinel() {
+  g_message("%s: Calling order output sentinel on keyman-system-service", __FUNCTION__);
+  KeymanSystemServiceClient client;
+  client.CallOrderedOutputSentinel();
 }
