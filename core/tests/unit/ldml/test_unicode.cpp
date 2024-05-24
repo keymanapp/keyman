@@ -10,6 +10,9 @@
 #include <fstream>
 #include <iostream>
 
+// Ensure that ICU gets included even on wasm.
+#define KMN_IN_LDML_TESTS
+
 #include "keyman_core.h"
 
 #include "path.hpp"

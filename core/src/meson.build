@@ -60,6 +60,7 @@ kmx_files = files(
   'km_core_processevent_api.cpp',
   'jsonpp.cpp',
   'util_normalize.cpp',
+  'core_icu.cpp',
   'ldml/ldml_processor.cpp',
   'ldml/ldml_transforms.cpp',
   'ldml/ldml_markers.cpp',
