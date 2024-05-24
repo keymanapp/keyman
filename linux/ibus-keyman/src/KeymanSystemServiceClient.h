@@ -9,6 +9,7 @@ extern "C" {
 
 void set_capslock_indicator(guint32 capsLockState);
 gint32 get_capslock_indicator();
+void call_ordered_output_sentinel();
 
 #ifdef __cplusplus
 }
