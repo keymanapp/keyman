@@ -130,5 +130,9 @@ export class CompilerMessages {
   static ERROR_InvalidPackageFile = SevError | 0x001E;
   static Error_InvalidPackageFile = (o:{e:any}) => m(this.ERROR_InvalidPackageFile,
     `Package source file is invalid: ${(o.e ?? 'unknown error').toString()}`);
+
+  static ERROR_FileRecordIsMissingName = SevError | 0x001F;
+  static Error_FileRecordIsMissingName = (o:{description:string}) => m(this.ERROR_FileRecordIsMissingName,
+    `File record in the package with description '${o.description}' is missing a filename.`);
 }
 

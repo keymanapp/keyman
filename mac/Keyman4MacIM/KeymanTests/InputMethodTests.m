@@ -11,53 +11,78 @@
 
 #import <XCTest/XCTest.h>
 #import "KMInputMethodEventHandler.h"
-#import "LegacyTestClient.h"
 #import "AppleCompliantTestClient.h"
 #import "TextApiCompliance.h"
 
-@interface InputMethodTests : XCTestCase
+KMInputMethodEventHandler *testEventHandler = nil;
 
+@interface InputMethodTests : XCTestCase
 @end
 
-// included following interface that we can see and test private methods of TextApiCompliance
-@interface TextApiCompliance (Testing)
+@interface KMInputMethodEventHandler (Testing)
 
-- (BOOL)arrayContainsApplicationId:(NSString *)clientAppId fromArray:(NSArray *)legacyApps;
+- (instancetype)initWithClient:(NSString *)clientAppId client:(id) sender;
+- (NSRange) calculateInsertRangeForDeletedText:(NSString*)textToDelete selectionRange:(NSRange) selection;
 
 @end
 
 @implementation InputMethodTests
 
 - (void)setUp {
-    // Put setup code here. This method is called before the invocation of each test method in the class.
+  id client = [[AppleCompliantTestClient alloc] init];
+  NSString *clientAppId = @"com.compliant.app";
+  testEventHandler = [[KMInputMethodEventHandler alloc]initWithClient:clientAppId client:client];
 }
 
 - (void)tearDown {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
+  // Put teardown code here. This method is called after the invocation of each test method in the class.
 }
 
-- (void)testIsClientAppLegacy_unlistedClientAppId_returnsNo {
-  id client = [[AppleCompliantTestClient alloc] init];
-  NSString *clientAppId = @"com.compliant.app";
-  TextApiCompliance *apiCompliance = [[TextApiCompliance alloc]initWithClient:client applicationId:clientAppId];
-
-  NSArray *legacyAppsArray = [NSArray arrayWithObjects:@"com.microsoft.VSCode",@"com.adobe.Photoshop",nil];
-
-  BOOL isLegacy = [apiCompliance arrayContainsApplicationId:clientAppId fromArray:legacyAppsArray];
-  NSLog(@"isLegacy = %@", isLegacy?@"yes":@"no");
-    XCTAssert(isLegacy == NO, @"App not expected to be in legacy list");
+- (void)testCalculateInsertRange_noDelete_returnsCurrentLocation {
+  NSRange selectionRange = NSMakeRange(1, 0);
+  NSRange insertRange = [testEventHandler calculateInsertRangeForDeletedText:@"" selectionRange:selectionRange];
+  BOOL notFound = (insertRange.length == NSNotFound) && (insertRange.location == NSNotFound);
+  XCTAssertTrue(notFound, @"insert or replacement range expected to be NSNotFound ");
 }
 
-- (void)testIsClientAppLegacy_listedClientAppId_returnsYes {
-  id client = [[AppleCompliantTestClient alloc] init];
-  NSString *clientAppId = @"com.microsoft.VSCode";
-  TextApiCompliance *apiCompliance = [[TextApiCompliance alloc]initWithClient:client applicationId:clientAppId];
+- (void)testCalculateInsertRange_noDeleteWithOneSelected_returnsCurrentLocation {
+  NSRange selectionRange = NSMakeRange(1, 1);
+  NSRange insertRange = [testEventHandler calculateInsertRangeForDeletedText:@"" selectionRange:selectionRange];
+  BOOL notFound = (insertRange.length == NSNotFound) && (insertRange.location == NSNotFound);
+  XCTAssertTrue(notFound, @"insert or replacement range expected to be NSNotFound ");
+}
 
-  NSArray *legacyAppsArray = [NSArray arrayWithObjects:@"com.adobe.Photoshop",@"com.microsoft.VSCode",nil];
+- (void)testCalculateInsertRange_deleteNonexistentCharacters_returnsCurrentLocation {
+  NSRange selectionRange = NSMakeRange(0, 0);
+  NSRange insertRange = [testEventHandler calculateInsertRangeForDeletedText:@"a" selectionRange:selectionRange];
+  BOOL notFound = (insertRange.length == NSNotFound) && (insertRange.location == NSNotFound);
+  XCTAssertTrue(notFound, @"insert or replacement range expected to be NSNotFound ");
+}
 
-  BOOL isLegacy = [apiCompliance arrayContainsApplicationId:clientAppId fromArray:legacyAppsArray];
-  NSLog(@"isLegacy = %@", isLegacy?@"yes":@"no");
-    XCTAssert(isLegacy == YES, @"App expected to be in legacy list");
+- (void)testCalculateInsertRange_deleteOneSurrogatePair_returnsRangeLengthTwo {
+  // Brahmi 𑀓 D804 DC13 surrogate pair
+  NSRange selectionRange = NSMakeRange(2, 0);
+  NSRange insertRange = [testEventHandler calculateInsertRangeForDeletedText:@"𑀓" selectionRange:selectionRange];
+  BOOL correctResult = (insertRange.location == 0) && (insertRange.length == 2);
+  XCTAssertTrue(correctResult, @"insert or replacement range expected to be {0,2}");
+}
+
+- (void)testCalculateInsertRange_deleteTwoBMPCharacters_returnsRangeLengthTwo {
+  NSRange selectionRange = NSMakeRange(3, 0);
+  // deletedText = KHMER VOWEL SIGN OE, KHMER SIGN COENG
+  NSRange insertRange = [testEventHandler calculateInsertRangeForDeletedText:@"\u17BE\u17D2" selectionRange:selectionRange];
+  BOOL correctResult = (insertRange.location == 1) && (insertRange.length == 2);
+  XCTAssertTrue(correctResult, @"insert or replacement range expected to be {1,2}");
+}
+
+// equivalent to Kenya BTL, type "b^x", select 'x' and type 'u'
+// selected x should be deleted, as should "^" and replaced with 'û'
+
+- (void)testCalculateInsertRange_deleteOneBMPCharacterWithOneSelected_returnsRangeLengthTwo {
+  NSRange selectionRange = NSMakeRange(2, 1); // location = 2, length = 1
+  NSRange insertRange = [testEventHandler calculateInsertRangeForDeletedText:@"'" selectionRange:selectionRange];
+  BOOL correctResult = (insertRange.location == 1) && (insertRange.length == 2);
+  XCTAssertTrue(correctResult, @"insert or replacement range expected to be {1,2}");
 }
 
 @end

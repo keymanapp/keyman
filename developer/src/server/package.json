@@ -25,13 +25,11 @@
   "devDependencies": {
     "@keymanapp/keyman-version": "*",
     "@keymanapp/resources-gosh": "*",
-    "@types/chai": "^4.3.0",
     "@types/express": "^4.17.13",
     "@types/mocha": "^9.1.0",
     "@types/multer": "^1.4.7",
     "@types/node": "^20.4.1",
     "@types/ws": "^8.2.2",
-    "chai": "^4.3.4",
     "copyfiles": "^2.4.1",
     "mocha": "^10.0.0",
     "ts-node": "^10.9.1",

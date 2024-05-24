@@ -201,5 +201,6 @@ verify_npm_setup() {
 
   pushd "$KEYMAN_ROOT" > /dev/null
   npm ci
+
   popd > /dev/null
 }

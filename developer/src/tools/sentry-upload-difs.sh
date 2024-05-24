@@ -65,7 +65,7 @@ sourcemap_paths=(
 )
 
 echo "Uploading symbols for developer/"
-./src/kmc/node_modules/.bin/sentry-cli upload-dif \
+sentry-cli upload-dif \
   --project keyman-developer \
   --include-sources \
   --no-zips \
@@ -73,7 +73,7 @@ echo "Uploading symbols for developer/"
 
 upload_sourcemap() {
   local smpath="$1"
-  "$KEYMAN_ROOT/developer/src/kmc/node_modules/.bin/sentry-cli" sourcemaps upload \
+  sentry-cli sourcemaps upload \
     --no-dedupe \
     --org keyman \
     --project keyman-developer \

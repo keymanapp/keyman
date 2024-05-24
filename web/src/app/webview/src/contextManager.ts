@@ -1,4 +1,4 @@
-import { type Keyboard, Mock, OutputTarget, Transcription, findCommonSubstringEndIndex } from '@keymanapp/keyboard-processor';
+import { type Keyboard, Mock, OutputTarget, Transcription, findCommonSubstringEndIndex, isEmptyTransform } from '@keymanapp/keyboard-processor';
 import { KeyboardStub } from 'keyman/engine/package-cache';
 import { ContextManagerBase, ContextManagerConfiguration } from 'keyman/engine/main';
 import { WebviewConfiguration } from './configuration.js';
@@ -41,7 +41,9 @@ export class ContextHost extends Mock {
 
       // Signal the necessary text changes to the embedding app, if it exists.
       if(this.oninserttext) {
-        this.oninserttext(transform.deleteLeft, transform.insert, transform.deleteRight);
+        if(!isEmptyTransform(transform) || transform.erasedSelection) {
+          this.oninserttext(transform.deleteLeft, transform.insert, transform.deleteRight);
+        }
       }
     }
 

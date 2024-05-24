@@ -1,11 +1,13 @@
 import { LexicalModelCompiler } from '../src/lexical-model-compiler.js';
 import {assert} from 'chai';
+import fs from 'fs';
 import 'mocha';
 
 import {makePathToFixture, compileModelSourceCode} from './helpers/index.js';
 import { createTrieDataStructure } from '../src/build-trie.js';
 import { ModelCompilerError } from '../src/model-compiler-messages.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
+import { TrieModel } from '@keymanapp/models-templates';
 
 describe('LexicalModelCompiler', function () {
   const callbacks = new TestCompilerCallbacks();
@@ -165,8 +167,48 @@ describe('createTrieDataStructure()', function () {
   it('does not create `null`/"undefined"-keyed children', function () {
     const WORDLIST_FILENAME = makePathToFixture('example.qaa.wordlist-ordering', 'wordlist.tsv');
     // check to ensure the Trie is fully well-formed.
+    //
+    // Is pretty much a JSON-encoded Trie spec, stringifying { root: Node, totalWeight: number }
+    // as used to initialize the Trie.
     let sourceCode = createTrieDataStructure([WORDLIST_FILENAME], (wf) => wf);
-    assert.notMatch(sourceCode, /"undefined"/);
+
+    // Simple first-pass check:  the signs of #11073 are not present.
+    assert.notMatch(sourceCode, /undefined/);
     assert.notMatch(sourceCode, /null/);
-  })
+
+    // A more complex check:  load and use the resulting TrieModel to check that all
+    // words are accessible via `.predict`.
+
+    // First, load the model.
+    const trieSpec = JSON.parse(sourceCode);
+    const model = new TrieModel(trieSpec);
+    assert.isOk(model);
+
+    // Gets the list of all words in the wordlist fixture.
+    const rawWordlist = fs.readFileSync(WORDLIST_FILENAME).toString();
+    const words = rawWordlist.split('\n').map((line) => {
+      const columns = line.split('\t')
+      if(!columns.length || !columns[0]) {
+        return undefined;
+      } else {
+        return columns[0];
+      }
+    }).filter((entry) => entry !== undefined);
+
+    // We'll track all _observed_ words from the model here.
+    const set = new Set<string>();
+    const contextFromWord = (word: string) => {
+      return {left: word, startOfBuffer: true, endOfBuffer: true};
+    };
+
+    // Using each word as a prediction prefix, attempt to get a suggestion corresponding to each.
+    for(let word of words) {
+      const rawSuggestions = model.predict({insert: '', deleteLeft: 0}, contextFromWord(word));
+      const suggestions = rawSuggestions.map((entry) => entry.sample.displayAs);
+      suggestions.forEach((suggestion) => set.add(suggestion));
+    }
+
+    // The actual assertion:  did we see each word as a suggestion?
+    assert.sameMembers([...set], words, "Could not suggest all words in the wordlist");
+  });
 });

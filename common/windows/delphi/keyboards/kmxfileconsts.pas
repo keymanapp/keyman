@@ -129,6 +129,10 @@ const
   KMX_ISVIRTUALKEY   = $4000;	// It is a Virtual Key Sequence
   KMX_VIRTUALCHARKEY = $8000; // It is a virtual character key sequence - mnemonic layouts
 
+  // Note: KMX_OTHER_MODIFIER = $10000, used by KMX+ for the
+  // other modifier flag in layers, > 16 bit so not available here.
+  // See keys_mod_other in keyman_core_ldml.ts
+
   // Combinations of key masks
   KMX_MASK_MODIFIER_CHIRAL = KMX_LCTRLFLAG or KMX_RCTRLFLAG or KMX_LALTFLAG or KMX_RALTFLAG;
   KMX_MASK_MODIFIER_SHIFT = KMX_SHIFTFLAG;

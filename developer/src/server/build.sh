@@ -3,14 +3,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
-EX_USAGE=64
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 . "$KEYMAN_ROOT/resources/build/jq.inc.sh"
-
-cd "$THIS_SCRIPT_PATH"
 
 builder_describe "Build Keyman Developer Server" \
   @/common/web/keyman-version \
@@ -21,7 +18,7 @@ builder_describe "Build Keyman Developer Server" \
   build \
   test \
   "installer   Prepare for Keyman Developer installer" \
-  "publish     Publish to NPM" \
+  publish \
   ":server     Keyman Developer Server main program" \
   ":addins     Windows addins for GUI integration"
 
@@ -36,6 +33,8 @@ builder_describe_outputs \
   build:addins         /developer/src/server/build/src/win32/trayicon/addon.node
 
 builder_parse "$@"
+
+. "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
 
 #-------------------------------------------------------------------------------------------------------------------
 
@@ -135,13 +134,22 @@ function test_server() {
   mocha
 }
 
+function publish_server() {
+  installer_server
+  wrap-signcode //d "Keyman Developer" "$DEVELOPER_PROGRAM/server/build/src/win32/console/node-hide-console-window.node"
+  wrap-signcode //d "Keyman Developer" "$DEVELOPER_PROGRAM/server/build/src/win32/console/node-hide-console-window.x64.node"
+  wrap-signcode //d "Keyman Developer" "$DEVELOPER_PROGRAM/server/build/src/win32/trayicon/addon.node"
+  wrap-signcode //d "Keyman Developer" "$DEVELOPER_PROGRAM/server/build/src/win32/trayicon/addon.x64.node"
+}
+
 builder_run_action clean:server        clean_server
 builder_run_action configure:server    configure_server
 builder_run_action build:server        build_server
 builder_run_action build:addins        build_addins
 builder_run_action test:server         test_server
 # builder_run_action test:addins       # no op
-builder_run_action installer:server    installer_server
+builder_run_action installer:server    installer_server # TODO: rename to install-prep
+builder_run_action publish:server      publish_server
 
 # TODO: consider 'watch'
 # function watch_server() {

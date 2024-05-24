@@ -1,0 +1,121 @@
+name: "API Verification"
+on:
+ workflow_run:
+    workflows: [Ubuntu packaging]
+    types:
+      - completed
+
+env:
+  STATUS_CONTEXT: 'API Verification'
+  PKG_NAME: 'libkeymancore'
+  GH_TOKEN: ${{ github.token }}
+
+jobs:
+  setup_environment:
+    runs-on: ubuntu-latest
+    outputs:
+      VERSION: ${{ steps.environment_step.outputs.VERSION }}
+      PRERELEASE_TAG: ${{ steps.environment_step.outputs.PRERELEASE_TAG }}
+      GIT_SHA: ${{ steps.environment_step.outputs.GIT_SHA }}
+      GIT_BASE: ${{ steps.environment_step.outputs.GIT_BASE }}
+      IS_TEST_BUILD: ${{ steps.environment_step.outputs.IS_TEST_BUILD }}
+      GIT_BRANCH: ${{ steps.environment_step.outputs.GIT_BRANCH }}
+      GIT_BASE_BRANCH: ${{ steps.environment_step.outputs.GIT_BASE_BRANCH }}
+      GIT_USER: ${{ steps.environment_step.outputs.GIT_USER }}
+
+    steps:
+    - name: Restore artifacts
+      uses: actions/cache/restore@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+      with:
+        path: |
+          artifacts
+        key: artifacts-key-${{ github.event.workflow_run.id }}
+        restore-keys: artifacts-key-
+
+    - name: Read environment
+      id: environment_step
+      run: |
+        cat artifacts/env >> $GITHUB_OUTPUT
+
+  api_verification:
+    name: Verify API for libkeymancore.so
+    needs: setup_environment
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Set pending status on PR builds
+      id: set_status
+      if: needs.setup_environment.outputs.IS_TEST_BUILD == 'true'
+      shell: bash
+      run: |
+        gh api \
+          --method POST \
+          -H "Accept: application/vnd.github+json" \
+          /repos/$GITHUB_REPOSITORY/statuses/${{ needs.setup_environment.outputs.GIT_SHA }} \
+          -f state='pending' \
+          -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+          -f description='API verification started' \
+          -f context="$STATUS_CONTEXT"
+
+    - name: Checkout
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 #v4.1.1
+      with:
+        ref: '${{ needs.setup_environment.outputs.GIT_SHA }}'
+        fetch-depth: 0
+
+    - name: Install devscripts
+      uses: ./.github/actions/apt-install
+      with:
+        packages: devscripts equivs
+
+    - name: "Verify API for libkeymancore.so (${{ needs.setup_environment.outputs.GIT_BRANCH }}, branch ${{ needs.setup_environment.outputs.GIT_BASE_BRANCH }}, by ${{ needs.setup_environment.outputs.GIT_USER }}) - "
+      run: |
+        cd linux
+        ./scripts/deb-packaging.sh \
+          --gha \
+          --bin-pkg "${GITHUB_WORKSPACE}/artifacts/${PKG_NAME}_${{ needs.setup_environment.outputs.VERSION }}-1${{ needs.setup_environment.outputs.PRERELEASE_TAG }}+$(lsb_release -c -s)1_amd64.deb" \
+          --git-sha "${{ needs.setup_environment.outputs.GIT_SHA }}" \
+          --git-base "${{ needs.setup_environment.outputs.GIT_BASE }}" \
+          verify 2>> $GITHUB_STEP_SUMMARY
+
+    - name: Archive .symbols file
+      uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 # v4.3.0
+      with:
+        name: libkeymancore.symbols
+        path: linux/debian/tmp/DEBIAN/symbols
+      if: always()
+
+  set_status:
+    name: Set result status on PR builds
+    needs: [setup_environment, api_verification]
+    runs-on: ubuntu-latest
+    if: ${{ always() && needs.setup_environment.outputs.IS_TEST_BUILD == 'true' }}
+    steps:
+    - name: Set success
+      if: needs.api_verification.result == 'success'
+      run: |
+        echo "RESULT=success" >> $GITHUB_ENV
+        echo "MSG=Package build succeeded" >> $GITHUB_ENV
+
+    - name: Set cancelled
+      if: needs.api_verification.result == 'cancelled'
+      run: |
+        echo "RESULT=error" >> $GITHUB_ENV
+        echo "MSG=Package build cancelled" >> $GITHUB_ENV
+
+    - name: Set failure
+      if: needs.api_verification.result == 'failure'
+      run: |
+        echo "RESULT=failure" >> $GITHUB_ENV
+        echo "MSG=Package build failed" >> $GITHUB_ENV
+
+    - name: Set final status
+      run: |
+        gh api \
+          --method POST \
+          -H "Accept: application/vnd.github+json" \
+          /repos/$GITHUB_REPOSITORY/statuses/${{ needs.setup_environment.outputs.GIT_SHA }} \
+          -f state="$RESULT" \
+          -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+          -f description="$MSG" \
+          -f context="$STATUS_CONTEXT"

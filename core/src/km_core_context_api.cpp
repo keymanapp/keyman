@@ -108,7 +108,7 @@ namespace {
 }
 
 km_core_status
-context_items_from_utf16(km_core_cp const *text,
+context_items_from_utf16(km_core_cu const *text,
                                 km_core_context_item **out_ptr)
 {
   return _context_items_from<utf16>(reinterpret_cast<utf16::codeunit_t const *>(text), out_ptr);
@@ -125,7 +125,7 @@ km_core_status context_items_to_utf8(km_core_context_item const *ci,
 
 
 km_core_status context_items_to_utf16(km_core_context_item const *ci,
-                                            km_core_cp *buf, size_t * sz_ptr)
+                                            km_core_cu *buf, size_t * sz_ptr)
 {
   return _context_items_to<utf16>(ci,
             reinterpret_cast<utf16::codeunit_t *>(buf),

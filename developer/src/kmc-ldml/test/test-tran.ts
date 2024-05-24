@@ -334,6 +334,49 @@ describe('tran', function () {
         CompilerMessages.Error_MissingStringVariable({ id: "missingstr" }),
       ],
     },
+    // cases that share the same error code
+    ...[1, 2, 3].map(n => ({
+      subpath: `sections/tran/fail-IllegalTransformDollarsign-${n}.xml`,
+      errors: [
+        {
+          code: CompilerMessages.ERROR_IllegalTransformDollarsign,
+          matchMessage: /.*/,
+        }
+      ],
+    })),
+    ...[1, 2].map(n => ({
+      subpath: `sections/tran/fail-IllegalTransformAsterisk-${n}.xml`,
+      errors: [
+        {
+          code: CompilerMessages.ERROR_IllegalTransformAsterisk,
+          matchMessage: /.*/,
+        }
+      ],
+    })),
+    ...[1, 2].map(n => ({
+      subpath: `sections/tran/fail-IllegalTransformPlus-${n}.xml`,
+      errors: [
+        {
+          code: CompilerMessages.ERROR_IllegalTransformPlus,
+          matchMessage: /.*/,
+        }
+      ],
+    })),
+    // successful compile
+    ...[1].map(n => ({
+      subpath: `sections/tran/ok-${n}.xml`,
+      errors: false,
+    })),
+    // cases that share the same error code
+    ...[1, 2, 3].map(n => ({
+      subpath: `sections/tran/fail-matches-nothing-${n}.xml`,
+      errors: [
+        {
+          code: CompilerMessages.ERROR_TransformFromMatchesNothing,
+          matchMessage: /.*/,
+        }
+      ],
+    })),
     // escaping
     {
       subpath: `sections/tran/tran-escape.xml`,

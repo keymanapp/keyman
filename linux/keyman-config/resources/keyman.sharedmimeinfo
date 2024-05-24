@@ -5,6 +5,7 @@
 		<sub-class-of type="application/zip"/>
 		<glob pattern="*.kmp"/>
 		<icon name="application-x-kmp"/>
+		<generic-icon name="application-x-kmp"/>
 	</mime-type>
 	<mime-type type="application/keyman">
 		<comment>Keyman keyboard installation link</comment>

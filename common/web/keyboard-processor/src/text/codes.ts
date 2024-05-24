@@ -1,7 +1,7 @@
 // TODO:  Move to separate folder:  'codes'
 // We should start splitting off code needed by keyboards even without a KeyboardProcessor active.
-// There's an upcoming `/common/web/types` package that 'codes' and 'keyboards' may fit well within.
-// In fact, there's a file there (on its branch) that should be merged with this one!
+
+// see also: common/web/types/src/kmx/kmx.ts
 
 const Codes = {
   // Define Keyman Developer modifier bit-flags (exposed for use by other modules)
@@ -25,6 +25,10 @@ const Codes = {
     "NO_SCROLL_LOCK":0x2000,  // NOTSCROLLFLAG
     "VIRTUAL_KEY":0x4000,     // ISVIRTUALKEY
     "VIRTUAL_CHAR_KEY":0x8000 // VIRTUALCHARKEY // Unused by KMW, but reserved for use by other Keyman engines.
+
+    // Note: keys_mod_other = 0x10000, used by KMX+ for the
+    // other modifier flag in layers, > 16 bit so not available here.
+    // See keys_mod_other in keyman_core_ldml.ts
   },
 
   modifierBitmasks: {

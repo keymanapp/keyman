@@ -58,12 +58,12 @@
 - (instancetype)initWithName:(NSString*)packageName
               packageVersion:(NSString*)packageVersion
               readmeFilename:(NSString*)readmeFilename
-                  graphicFilename:(NSString*)graphicFilename
+             graphicFilename:(NSString*)graphicFilename
                  fileVersion:(NSString*)fileVersion
       keymanDeveloperVersion:(NSString*)keymanDeveloperVersion
                    copyright:(NSString*)copyright
                   authorName:(NSString*)authorName
-                  authorUrl:(NSString*)authorUrl
+                   authorUrl:(NSString*)authorUrl
                      website:(NSString*)website
                    keyboards:(NSArray*)keyboards
                        fonts:(NSArray*)fonts

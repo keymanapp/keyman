@@ -11,7 +11,7 @@
 @implementation TimerTarget
 
 - (void)timerAction:(NSTimer *)timer {
-    [self.target performSelector:@selector(timerAction:) withObject:timer];
+  [self.target performSelector:@selector(timerAction:) withObject:timer];
 }
 
 @end

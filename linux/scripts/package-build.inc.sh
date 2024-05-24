@@ -61,19 +61,19 @@ function checkAndInstallRequirements()
 {
 	local TOINSTALL=""
 
-	for p in devscripts equivs
+	for p in devscripts equivs python3-dev
 	do
-		if ! dpkg -s $p >/dev/null 2>&1; then
-			TOINSTALL="$TOINSTALL $p"
+		if ! dpkg -s "${p}" >/dev/null 2>&1; then
+			TOINSTALL="${TOINSTALL} ${p}"
 		fi
 	done
 
 	export DEBIAN_FRONTEND=noninteractive
 
-	if [ -n "$TOINSTALL" ]; then
+	if [[ -n "${TOINSTALL}" ]]; then
 		wait_for_apt_deb && sudo apt-get update
 		# shellcheck disable=SC2086
-		wait_for_apt_deb && sudo apt-get -qy install $TOINSTALL
+		wait_for_apt_deb && sudo apt-get -qy install ${TOINSTALL}
 	fi
 
 	sudo mk-build-deps debian/control

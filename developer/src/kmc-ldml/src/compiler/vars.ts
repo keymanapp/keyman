@@ -192,6 +192,9 @@ export class VarsCompiler extends SectionCompiler {
   validateSubstitutions(keyboard: LDMLKeyboard.LKKeyboard, st : Substitutions) : boolean {
     keyboard?.variables?.string?.forEach(({value}) =>
           st.markers.add(SubstitutionUse.variable, MarkerParser.allReferences(value)));
+    // get markers mentioned in a set
+    keyboard?.variables?.set?.forEach(({ value }) =>
+      VariableParser.setSplitter(value).forEach(v => st.markers.add(SubstitutionUse.match, MarkerParser.allReferences(v))));
     return true;
   }
 
@@ -208,8 +211,6 @@ export class VarsCompiler extends SectionCompiler {
     // first, strings.
     variables?.string?.forEach((e) =>
       this.addString(result, e, sections));
-    variables?.set?.forEach((e) =>
-      this.addSet(result, e, sections));
     variables?.uset?.forEach((e) =>
       this.addUnicodeSet(result, e, sections));
 
@@ -221,6 +222,10 @@ export class VarsCompiler extends SectionCompiler {
     // collect all markers, excluding the match-all
     const allMarkers : string[] = Array.from(mt.all).filter(m => m !== MarkerParser.ANY_MARKER_ID).sort();
     result.markers = sections.list.allocList(allMarkers, {}, sections);
+
+    // sets need to be added late, because they can refer to markers
+    variables?.set?.forEach((e) =>
+      this.addSet(result, e, sections));
 
     return result.valid() ? result : null;
   }
@@ -240,8 +245,13 @@ export class VarsCompiler extends SectionCompiler {
     value = result.substituteStrings(value, sections);
     // OK to do this as a substitute, because we've already validated the set above.
     value = result.substituteSets(value, sections);
-    const items : string[] = VariableParser.setSplitter(value);
-    result.sets.push(new SetVarItem(id, items, sections));
+    // raw items - without marker substitution
+    const rawItems: string[] = VariableParser.setSplitter(value);
+    // cooked items - has substutition of markers
+    // this is not 'forMatch', all variables are to be assumed as string literals, not regex
+    // content.
+    const cookedItems: string[] = rawItems.map(v => result.substituteMarkerString(v, false));
+    result.sets.push(new SetVarItem(id, cookedItems, sections, rawItems));
   }
   addUnicodeSet(result: Vars, e: LDMLKeyboard.LKUSet, sections: DependencySections): void {
     const { id } = e;
