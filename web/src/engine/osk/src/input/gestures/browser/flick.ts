@@ -118,7 +118,7 @@ export default class Flick implements GestureHandler {
     let source: GestureSource<KeyElement> = baseSource;
 
     sequence.on('complete', () => {
-      previewHost.cancel()
+      previewHost?.cancel()
     });
 
     this.sequence.on('stage', (result) => {

@@ -111,6 +111,10 @@ const struct CompilerError CompilerErrors[] = {
     { CERR_DuplicateStore                                , "A store with this name has already been defined."},
     { CERR_RepeatedBegin                                 , "Begin has already been set"},
     { CERR_VirtualKeyInContext                           , "Virtual keys are not permitted in context"},
+    { CERR_OutsTooLong                                   , "Store cannot be inserted with outs() as it makes the extended string too long" },
+    { CERR_ExtendedStringTooLong                         , "Extended string is too long" },
+    { CERR_VirtualKeyExpansionTooLong                    , "Virtual key expansion is too large" },
+    { CERR_CharacterRangeTooLong                         , "Character range is too large and cannot be expanded" },
 
     { CHINT_UnreachableRule                              , "This rule will never be matched as another rule takes precedence"},
     { CHINT_NonUnicodeFile                               , "Keyman Developer has detected that the file has ANSI encoding. Consider converting this file to UTF-8"},

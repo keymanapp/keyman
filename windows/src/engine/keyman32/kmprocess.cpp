@@ -82,7 +82,7 @@ Process_Event_Core(PKEYMAN64THREADDATA _td) {
   WCHAR application_context[MAXCONTEXT];
   if (_td->app->ReadContext(application_context)) {
     km_core_context_status result;
-    result = km_core_state_context_set_if_needed(_td->lpActiveKeyboard->lpCoreKeyboardState, reinterpret_cast<const km_core_cp *>(application_context));
+    result = km_core_state_context_set_if_needed(_td->lpActiveKeyboard->lpCoreKeyboardState, reinterpret_cast<const km_core_cu *>(application_context));
     if (result == KM_CORE_CONTEXT_STATUS_ERROR || result == KM_CORE_CONTEXT_STATUS_INVALID_ARGUMENT) {
       SendDebugMessageFormat(0, sdmGlobal, 0, "Process_Event_Core: km_core_state_context_set_if_needed returned [%d]", result);
     }
@@ -127,13 +127,13 @@ BOOL ProcessHook()
         SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "Key pressed: %s Context <unavailable>",
           Debug_VirtualKey(_td->state.vkey));
       } else {
-        km_core_cp* debug_context = km_core_state_context_debug(
+        km_core_cu* debug_context = km_core_state_context_debug(
           _td->lpActiveKeyboard->lpCoreKeyboardState,
           KM_CORE_DEBUG_CONTEXT_CACHED
         );
         SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "Key pressed: %s Context '%ls'",
           Debug_VirtualKey(_td->state.vkey), debug_context);
-        km_core_cp_dispose(debug_context);
+        km_core_cu_dispose(debug_context);
       }
     }
 

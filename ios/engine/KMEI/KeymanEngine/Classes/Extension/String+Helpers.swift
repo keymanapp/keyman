@@ -53,10 +53,9 @@ func trimDirectionalMarkPrefix(_ str: String?) -> String {
   // If the first intended char in context is a diacritic (such as U+0300), Swift's
   // standard string-handling will treat it and a preceding directional character
   // as a single unit.  This code block exists to avoid the issue.
-  if text.utf16.count > 0 {
-    let head = UnicodeScalar(text.utf16[text.utf16.startIndex])!
-    let tail = text.utf16.count > 1 ? String(text.utf16[text.utf16.index(text.utf16.startIndex, offsetBy: 1)..<text.utf16.endIndex])! : ""
-
+  if text.unicodeScalars.count > 0 {
+    let head = text.unicodeScalars.first!
+    let tail = String(text.unicodeScalars.dropFirst(1))
 
 //    // "%02X" - to hex-format the integer for the string conversion.
 //    let headEncoding = String(format:"%02X", text.utf16[text.utf16.startIndex])

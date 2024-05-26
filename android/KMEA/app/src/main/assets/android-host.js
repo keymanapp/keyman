@@ -36,7 +36,11 @@ function init() {
   keyman.beepKeyboard = beepKeyboard;
 
   // Readies the keyboard stub for instant loading during the init process.
-  KeymanWeb.registerStub(JSON.parse(jsInterface.initialKeyboard()));
+  try {
+    KeymanWeb.registerStub(JSON.parse(jsInterface.initialKeyboard()));
+  } catch(error) {
+    console.error(error);
+  }
 
   keyman.init({
     'embeddingApp':device,
@@ -172,7 +176,8 @@ function setKeymanLanguage(k) {
 }
 
 function setSpacebarText(mode) {
-  keyman.config.spacebarText = mode;
+  var text = (mode == undefined) || !mode.text ? '' : mode.text;
+  keyman.config.spacebarText = text;
 }
 
 // #6665: we need to know when the user has pressed a hardware key so we don't
@@ -230,10 +235,8 @@ function setNumericLayer() {
   }
 }
 
-function updateKMText(text) {
-  if(text == undefined) {
-      text = '';
-  }
+function updateKMText(k) {
+  var text = (k == undefined) || !k.text ? '' : k.text;
 
   console_debug('updateKMText(text=' + text + ') with: \n' + build_context_string(keyman.context));
 

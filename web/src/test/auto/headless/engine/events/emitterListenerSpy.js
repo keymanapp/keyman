@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
-import EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter3';
 import { EmitterListenerSpy, LegacyEventEmitter } from 'keyman/engine/events';
 
 // Tests the emitter-spy class that may be used to detect registration and

@@ -487,7 +487,7 @@ export class KeysCompiler extends SectionCompiler {
     sect: Keys,
     hardware: string
   ): Keys {
-    const mod = translateLayerAttrToModifier(layer);
+    const mods = translateLayerAttrToModifier(layer);
     const keymap = this.getKeymapFromForm(hardware);
 
     // Iterate over rows (y) and cols (x) of the scancodes table.
@@ -513,11 +513,14 @@ export class KeysCompiler extends SectionCompiler {
         if (x < keys.length) {
           key = keys[x];
         }
-        sect.kmap.push({
-          vkey,
-          mod,
-          key, // key id, to be changed into key index at finalization
-        });
+        // push every combination
+        for (const mod of mods) {
+          sect.kmap.push({
+            vkey,
+            mod,
+            key, // key id, to be changed into key index at finalization
+          });
+        }
       }
     }
     return sect;

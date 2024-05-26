@@ -62,12 +62,6 @@ open class SettingsViewController: UITableViewController {
       ])
     
     itemsArray.append([
-      "title": NSLocalizedString("menu-settings-show-banner", bundle: engineBundle, comment: ""),
-      "subtitle": "",
-      "reuseid" : "showbanner"
-      ])
-    
-    itemsArray.append([
       "title": NSLocalizedString("menu-settings-startup-get-started", bundle: engineBundle, comment: ""),
       "subtitle": "",
       "reuseid" : "showgetstarted"
@@ -151,21 +145,6 @@ open class SettingsViewController: UITableViewController {
     switch(cellIdentifier) {
       case "languages":
         break
-      case "showbanner":
-        let showBannerSwitch = UISwitch()
-        showBannerSwitch.translatesAutoresizingMaskIntoConstraints = false
-        
-        let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: showBannerSwitch.frame.size)
-        showBannerSwitch.frame = switchFrame
-        
-        showBannerSwitch.isOn = showBanner
-        showBannerSwitch.addTarget(self, action: #selector(self.bannerSwitchValueChanged),
-                                      for: .valueChanged)
-        cell.addSubview(showBannerSwitch)
-        cell.contentView.isUserInteractionEnabled = false
-
-        showBannerSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
-        showBannerSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
       case "showgetstarted":
         let showAgainSwitch = UISwitch()
         showAgainSwitch.translatesAutoresizingMaskIntoConstraints = false
@@ -216,30 +195,12 @@ open class SettingsViewController: UITableViewController {
     }
   }
   
-  @objc func bannerSwitchValueChanged(_ sender: Any) {
-    let userData = Storage.active.userDefaults
-    if let toggle = sender as? UISwitch {
-      // actually this should call into KMW, which controls the banner
-      userData.set(toggle.isOn, forKey: Key.optShouldShowBanner)
-      userData.synchronize()
-    }
-
-    // Necessary for the keyboard to visually update to match
-    // the new setting.
-    Manager.shared.inputViewController.setShouldReload()
-  }
-  
   @objc func showGetStartedSwitchValueChanged(_ sender: Any) {
     let userData = Storage.active.userDefaults
     if let toggle = sender as? UISwitch {
       userData.set(toggle.isOn, forKey: Key.optShouldShowGetStarted)
       userData.synchronize()
     }
-  }
-
-  private var showBanner: Bool {
-    let userData = Storage.active.userDefaults
-    return userData.bool(forKey: Key.optShouldShowBanner)
   }
   
   private var showGetStarted: Bool {

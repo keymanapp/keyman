@@ -360,6 +360,13 @@ begin
 
   AddDebugItem(debug, debugkeyboard, vk, modifier_state);
 
+  if action._type = KM_CORE_IT_INVALIDATE_CONTEXT then
+  begin
+    // We always ignore invalidate context which can come when a frame key is
+    // pressed (#11172, #11486)
+    Inc(action);
+  end;
+
   if action._type = KM_CORE_IT_EMIT_KEYSTROKE then
   begin
     // The EMIT_KEYSTROKE action comes after all rules have completed processing

@@ -129,9 +129,11 @@ if get_option('full_test')
 
 endif
 
+common_test_files = [ meson.source_root() / '../../../common/include/test_color.cpp' ]
+
 # Test the API endpoints
 
-apitest = executable('api-test', ['api-test.cpp','util_filesystem.cpp','util_callbacks.cpp'],
+apitest = executable('api-test', ['api-test.cpp','util_filesystem.cpp','util_callbacks.cpp', common_test_files],
     cpp_args: defns + flags,
     include_directories: inc,
     name_suffix: name_suffix,
@@ -142,7 +144,7 @@ apitest = executable('api-test', ['api-test.cpp','util_filesystem.cpp','util_cal
 
 test('api-test', apitest, args: [output_path / 'blank_keyboard.kmx'])
 
-usetapitest = executable('uset-api-test', 'uset-api-test.cpp',
+usetapitest = executable('uset-api-test', 'uset-api-test.cpp', common_test_files,
     cpp_args: defns + flags,
     include_directories: inc,
     name_suffix: name_suffix,

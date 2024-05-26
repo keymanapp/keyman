@@ -11,13 +11,13 @@ fv,fv_uwikala,'Uwik̓ala,BC Coast,fv_uwikala_kmw-9.0.js,9.3,hei,Heiltsuk
 fv,fv_dexwlesucid,Dəxʷləšucid,BC Coast,fv_dexwlesucid_kmw-9.0.js,9.2.1,lut-Latn,Lushootseed (Latin)
 fv,fv_diitiidatx,Diidiitidq,BC Coast,fv_diitiidatx_kmw-9.0.js,9.1.3,nuk-Latn,Nuu-chah-nulth (Latin)
 fv,fv_gitsenimx,Gitsenimx̱,BC Coast,fv_gitsenimx_kmw-9.0.js,10.0.1,git,Gitxsan (Latin)
-fv,fv_hailzaqvla,Haiɫzaqvla,BC Coast,fv_hailzaqvla_kmw-9.0.js,9.5,hei,Heiltsuk (Latin)
-fv,fv_haisla,Haisla,BC Coast,fv_haisla.js,1.0,has-Latn,Haisla (Latin)
-fv,fv_halqemeylem,Halq'eméylem,BC Coast,fv_halqemeylem_kmw-9.0.js,9.1.3,hur-Latn,Halkomelem (Latin)
-fv,fv_henqeminem,Hǝn̓q̓ǝmin̓ǝm,BC Coast,fv_henqeminem_kmw-9.0.js,9.1.3,hur-Latn,Halkomelem (Latin)
-fv,fv_klahoose,Homalco-Klahoose-Sliammon,BC Coast,fv_klahoose_kmw-9.0.js,10.0,coo,Comox
+fv,fv_hailzaqvla,Haiɫzaqvla,BC Coast,fv_hailzaqvla_kmw-9.0.js,9.5.1,hei,Heiltsuk (Latin)
+fv,fv_haisla,Haisla,BC Coast,fv_haisla.js,2.0.1,has-Latn,Haisla (Latin)
+fv,fv_halqemeylem,Halq'eméylem,BC Coast,fv_halqemeylem_kmw-9.0.js,9.2,hur-Latn,Halkomelem (Latin)
+fv,fv_henqeminem,Hǝn̓q̓ǝmin̓ǝm,BC Coast,fv_henqeminem_kmw-9.0.js,10.0.1,hur-Latn,Halkomelem (Latin)
+fv,fv_klahoose,Homalco-Klahoose-Sliammon,BC Coast,fv_klahoose_kmw-9.0.js,10.1,coo,Comox
 fv,fv_hulquminum,Hul’q’umi’num’,BC Coast,fv_hulquminum_kmw-9.0.js,9.1,hur-Latn,Halkomelem (Latin)
-fv,fv_hulquminum_combine,Hul̓q̓umin̓um̓,BC Coast,fv_hulquminum_combine_kmw-9.0.js,1.0,hur-Latn,Halkomelem (Latin)
+fv,fv_hulquminum_combine,Hul̓q̓umin̓um̓,BC Coast,fv_hulquminum_combine_kmw-9.0.js,1.1,hur-Latn,Halkomelem (Latin)
 fv,fv_kwakwala_liqwala,Kʷak̓ʷala,BC Coast,fv_kwakwala_liqwala_kmw-9.0.js,9.2.5,kwk-Latn,Kwakiutl (Latin)
 fv,fv_kwakwala,Kwak̕wala,BC Coast,fv_kwakwala_kmw-9.0.js,9.1.2,kwk-Latn,Kwakiutl (Latin)
 fv,fv_nexwslayemucen,Nəxʷsƛ̓ay̓əmúcən,BC Coast,fv_nexwslayemucen_kmw-9.0.js,9.2.1,clm-Latn,Clallam (Latin)
@@ -25,8 +25,9 @@ fv,fv_nisgaa,Nisg̱a'a,BC Coast,fv_nisgaa_kmw-9.0.js,9.1.2,ncg-Latn,Nisga'a (Lat
 fv,fv_nuucaanul,Nuučaan̓uł,BC Coast,fv_nuucaanul_kmw-9.0.js,9.1.4,nuk-Latn,Nuu-chah-nulth (Latin)
 fv,fv_nuxalk,Nuxalk,BC Coast,fv_nuxalk_kmw-9.0.js,10.0,blc-Latn,Bella Coola (Latin)
 fv,fv_sencoten,SENĆOŦEN,BC Coast,fv_sencoten_kmw-9.0.js,9.2.1,str,Straits Salish
+fv,fv_sguuxs,Sgüüx̱s,BC Coast,fv_sguuxs.js,1.0,tsi,Tsimshian
 fv,fv_shashishalhem,Shashishalhem,BC Coast,fv_shashishalhem_kmw-9.0.js,9.1.3,sec-Latn,Sechelt (Latin)
-fv,fv_skwxwumesh_snichim,Sḵwx̱wúmesh sníchim,BC Coast,fv_skwxwumesh_snichim_kmw-9.0.js,9.2.1,squ-Latn,Squamish (Latin)
+fv,fv_skwxwumesh_snichim,Sḵwx̱wúmesh sníchim,BC Coast,fv_skwxwumesh_snichim_kmw-9.0.js,9.3,squ-Latn,Squamish (Latin)
 fv,fv_smalgyax,Sm'algya̱x,BC Coast,fv_smalgyax_kmw-9.0.js,9.1.3,tsi-Latn,Tsimshian (Latin)
 fv,fv_xaislakala,X̄a'ʼislak̓ala,BC Coast,fv_xaislakala_kmw-9.0.js,9.1.1,has-Latn,Haisla (Latin)
 fv,fv_hlgaagilda_xaayda_kil,X̱aayda-X̱aad Kil,BC Coast,fv_hlgaagilda_xaayda_kil_kmw-9.0.js,9.3,hax,Southern Haida
@@ -35,15 +36,16 @@ fv,fv_ktunaxa,Ktunaxa,BC Interior,fv_ktunaxa_kmw-9.0.js,9.1.3,kut-Latn,Kutenai (
 fv,fv_kwadacha_tsekene,Kwadacha Tsek’ene,BC Interior,fv_kwadacha_tsekene_kmw-9.0.js,1.0,sek-Latn,Sekani
 fv,fv_natwits,Nedut’en-Witsuwit'en,BC Interior,fv_natwits_kmw-9.0.js,9.1.3,caf-Latn,Southern Carrier (Latin)
 fv,fv_nlekepmxcin,Nłeʔkepmxcin,BC Interior,fv_nlekepmxcin_kmw-9.0.js,9.2.3,thp-Latn,Thompson (Latin)
-fv,fv_nlha7kapmxtsin,Nlha7kapmxtsin,BC Interior,fv_nlha7kapmxtsin_kmw-9.0.js,9.1.1,thp-Latn,Thompson (Latin)
+fv,fv_nlha7kapmxtsin,Nlha7kapmxtsin,BC Interior,fv_nlha7kapmxtsin_kmw-9.0.js,10.0,thp-Latn,Thompson (Latin)
+fv,fv_nlakapamuxcheen,Nlakapamuxcheen,BC Interior,fv_nlakapamuxcheen_kmw-9.0.js,1.0,thp,Thompson
 fv,fv_nsilxcen,Nsilxcən,BC Interior,fv_nsilxcen_kmw-9.0.js,9.3,oka,Okanagan
-fv,fv_secwepemctsin,Secwepemctsín,BC Interior,fv_secwepemctsin_kmw-9.0.js,9.1.2,shs-Latn,Shuswap (Latin)
+fv,fv_secwepemctsin,Secwepemctsín,BC Interior,fv_secwepemctsin_kmw-9.0.js,9.2,shs-Latn,Shuswap (Latin)
 fv,fv_stlatlimxec,Sƛ̓aƛ̓imxəc,BC Interior,fv_stlatlimxec_kmw-9.0.js,9.2.3,lil-Latn,Lillooet (Latin)
-fv,fv_statimcets,St̓át̓imcets,BC Interior,fv_statimcets_kmw-9.0.js,9.1.3,lil-Latn,Lillooet (Latin)
+fv,fv_statimcets,St̓át̓imcets,BC Interior,fv_statimcets_kmw-9.0.js,9.1.4,lil-Latn,Lillooet (Latin)
 fv,fv_taltan,Tāłtān,BC Interior,fv_taltan_kmw-9.0.js,9.1.5,tht-Latn,Tahltan (Latin)
 fv,fv_tsekehne,Tsek'ehne,BC Interior,fv_tsekehne_kmw-9.0.js,9.1.2,sek-Latn,Sekani (Latin)
 fv,fv_tsilhqotin,Tŝilhqot'in,BC Interior,fv_tsilhqotin_kmw-9.0.js,9.1.3,clc-Latn,Chilcotin (Latin)
-fv,fv_southern_carrier,ᑐᑊᘁᗕᑋᗸ (Southern Carrier),BC Interior,fv_southern_carrier_kmw-9.0.js,9.2.1,caf-Cans,Southern Carrier (Unified Canadian Aboriginal Syllabics)
+fv,fv_southern_carrier,ᑐᑊᘁᗕᑋᗸ (Southern Carrier),BC Interior,fv_southern_carrier_kmw-9.0.js,10.0.1,caf-Cans,Southern Carrier (Unified Canadian Aboriginal Syllabics)
 fv,fv_anicinapemi8in,Anicinapemi8in/Anishinàbemiwin,Eastern Subarctic,fv_anicinapemi8in_kmw-9.0.js,9.1.1,alq-Latn,Algonquin (Latin)
 fv,fv_atikamekw,Atikamekw,Eastern Subarctic,fv_atikamekw_kmw-9.0.js,9.1.1,atj-Latn,Atikamekw (Latin)
 fv,fv_ilnu_innu_aimun,Ilnu-Innu Aimun,Eastern Subarctic,fv_ilnu_innu_aimun_kmw-9.0.js,9.1.1,moe-Latn,Montagnais (Latin)
@@ -53,7 +55,7 @@ fv,fv_northern_east_cree,ᐄᔨᔫ-ᐄᓅ ᐊᔨᒨᓐ (Northern East Cree),East
 fv,fv_severn_ojibwa,ᐊᓂᔑᓂᓂᒧᐎᐣ (Severn Ojibwa),Eastern Subarctic,fv_severn_ojibwa_kmw-9.0.js,9.3.1,ojs-Cans,Severn Ojibwa (Unified Canadian Aboriginal Syllabics)
 fv,fv_ojibwa,ᐊᓂᔑᓇᐯᒧᐎᓐ (Ojibwa),Eastern Subarctic,fv_ojibwa_kmw-9.0.js,9.3.1,ojb-Cans,Northwestern Ojibwa (Unified Canadian Aboriginal Syllabics)
 fv,fv_naskapi,ᓇᔅᑲᐱ (Naskapi),Eastern Subarctic,fv_naskapi_kmw-9.0.js,9.3.1,nsk-Cans,Naskapi (Unified Canadian Aboriginal Syllabics)
-sil,sil_euro_latin,English,European,european2-1.6.js,3.0.1,en,English
+sil,sil_euro_latin,English,European,european2-1.6.js,3.0.2,en,English
 basic,basic_kbdcan,Français,European,canadian_french-1.0.js,1.1.1,fr-CA,French (Canada)
 fv,fv_anishinaabemowin,Anishinaabemowin,Great Lakes - St. Lawrence,fv_anishinaabemowin_kmw-9.0.js,10.0.1,oj,Ojibwa
 fv,fv_bodewadminwen,Bodéwadminwen-Nishnabémwen,Great Lakes - St. Lawrence,fv_bodewadminwen_kmw-9.0.js,9.1.1,pot-Latn,Potawatomi (Latin)
@@ -69,14 +71,14 @@ fv,fv_wobanakiodwawogan,Wôbanakiôdwawôgan,Great Lakes - St. Lawrence,fv_woban
 fv,fv_australian,Australian,Pacific,fv_australian_kmw-9.0.js,9.3.1,pjt-Latn,Pitjantjatjara (Latin)
 fv,fv_maori,Māori,Pacific,fv_maori_kmw-9.0.js,9.1.1,mi-Latn,Maori (Latin)
 fv,fv_blackfoot,Blackfoot,Prairies,fv_blackfoot_kmw-9.0.js,9.2.1,bla-Latn,Siksika (Latin)
-fv,fv_cree_latin,Cree - Roman Orthography,Prairies,fv_cree_latin_kmw-9.0.js,10.0,cr-Latn,Cree (Latin)
+fv,fv_cree_latin,Cree - Roman Orthography,Prairies,fv_cree_latin_kmw-9.0.js,10.0.1,cr-Latn,Cree (Latin)
 fv,fv_dakota_mb,Dakota,Prairies,fv_dakota_mb_kmw-9.0.js,9.1.1,dak-Latn,Dakota (Latin)
 fv,fv_dakota_sk,Dakot̄a,Prairies,fV_dakota_sk_kmw-9.0.js,9.1.1,dak-Latn,Dakota (Latin)
 fv,fv_isga_iabi,Isga Iʔabi,Prairies,fv_isga_iabi_kmw-9.0.js,9.1.1,sto-Latn,Stoney (Latin)
 fv,fv_lakota,Lak̇ot̄a,Prairies,fv_lakota-9.0.js,9.1.1,lkt-Latn,Lakota (Latin)
 fv,fv_nakoda,Nakoda,Prairies,fv_nakoda_kmw-9.0.js,9.1.1,asb-Latn,Assiniboine (Latin)
 fv,fv_tsuutina,Tsúùt'ínà,Prairies,fv_tsuutina_kmw-9.0.js,9.1.1,srs-Latn,Sarsi (Latin)
-fv,fv_plains_cree,ᓀᐦᐃᔭᐍᐏᐣ (Plains Cree),Prairies,fv_plains_cree_kmw-9.0.js,10.0.2,crk-Cans,ᓀᐦᐃᔭᐍᐏᐣ (Cree syllabics)
+fv,fv_plains_cree,ᓀᐦᐃᔭᐍᐏᐣ (Plains Cree),Prairies,fv_plains_cree_kmw-9.0.js,11.0,crk-Cans,ᓀᐦᐃᔭᐍᐏᐣ (Cree syllabics)
 fv,fv_dine_bizaad,Diné Bizaad,South West,fv_dine_bizaad_kmw-9.0.js,9.1.1,nv-Latn,Navajo (Latin)
 fv,fv_dane_zaa_zaage,Dane-Z̲aa Z̲áágéʔ,Western Subarctic,fv_dane_zaa_zaage_kmw-9.0.js,9.3,bea,Beaver
 fv,fv_dene_dzage,Dene Dzage,Western Subarctic,fv_dene_dzage_kmw-9.0.js,9.1.1,kkz-Latn,Kaska (Latin)

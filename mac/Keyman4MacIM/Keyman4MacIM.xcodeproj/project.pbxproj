@@ -27,6 +27,7 @@
 		299B5E2129126CA20070841D /* keyman-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 299B5E1F29126CA20070841D /* keyman-icon.png */; };
 		29B42A572728339900EDD5D3 /* KMInfoWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 29B42A592728339900EDD5D3 /* KMInfoWindowController.xib */; };
 		29B42A602728343B00EDD5D3 /* KMKeyboardHelpWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 29B42A622728343B00EDD5D3 /* KMKeyboardHelpWindowController.xib */; };
+		29B6FB732BC39DD60074BF7F /* TextApiComplianceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B6FB722BC39DD60074BF7F /* TextApiComplianceTests.m */; };
 		37A245C12565DFA6000BBF92 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37A245C02565DFA6000BBF92 /* Assets.xcassets */; };
 		37AE5C9D239A7B770086CC7C /* qrcode.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 37AE5C9C239A7B770086CC7C /* qrcode.min.js */; };
 		37C2B0CB25FF2C350092E16A /* Help in Resources */ = {isa = PBXBuildFile; fileRef = 37C2B0CA25FF2C340092E16A /* Help */; };
@@ -227,6 +228,7 @@
 		29B6BB5E292239B4008F04BD /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/KMKeyboardHelpWindowController.strings"; sourceTree = "<group>"; };
 		29B6BB5F292239B4008F04BD /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/MainMenu.strings"; sourceTree = "<group>"; };
 		29B6BB60292239DC008F04BD /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		29B6FB722BC39DD60074BF7F /* TextApiComplianceTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TextApiComplianceTests.m; sourceTree = "<group>"; };
 		29B70A23283CB6680086B580 /* es-419 */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-419"; path = "es-419.lproj/KMAboutWindowController.strings"; sourceTree = "<group>"; };
 		29B70A24283CB6690086B580 /* es-419 */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-419"; path = "es-419.lproj/preferences.strings"; sourceTree = "<group>"; };
 		29B70A25283CB66A0086B580 /* es-419 */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-419"; path = "es-419.lproj/KMInfoWindowController.strings"; sourceTree = "<group>"; };
@@ -682,6 +684,7 @@
 				E211769E20E18C0B00F8065D /* AppleCompliantTestClient.h */,
 				E211769F20E18C5200F8065D /* AppleCompliantTestClient.m */,
 				2999C69829D3E4CE006366F5 /* InputMethodTests.m */,
+				29B6FB722BC39DD60074BF7F /* TextApiComplianceTests.m */,
 			);
 			path = KeymanTests;
 			sourceTree = "<group>";
@@ -1002,6 +1005,7 @@
 				2999C69929D3E4CE006366F5 /* InputMethodTests.m in Sources */,
 				E211769D20E182DD00F8065D /* NoContextTestClient.m in Sources */,
 				E2D5529D20DD8E0200D77CFB /* LegacyTestClient.m in Sources */,
+				29B6FB732BC39DD60074BF7F /* TextApiComplianceTests.m in Sources */,
 				E21176A020E18C5200F8065D /* AppleCompliantTestClient.m in Sources */,
 				E2585A8120DD7CF100CBB994 /* TestAppDelegate.m in Sources */,
 				E28914D62024E4010048E71E /* KMInputMethodEventHandler.m in Sources */,
@@ -1227,7 +1231,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -1275,7 +1279,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 			};
@@ -1314,7 +1318,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp --verbose";
 				PRODUCT_BUNDLE_IDENTIFIER = "keyman.inputmethod.$(PRODUCT_NAME:rfc1034identifier)";
@@ -1358,7 +1362,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				OTHER_CODE_SIGN_FLAGS = "--timestamp --verbose";
 				PRODUCT_BUNDLE_IDENTIFIER = "keyman.inputmethod.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1402,7 +1406,7 @@
 					"@loader_path/../Frameworks",
 					"@loader_path/Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_BUNDLE_IDENTIFIER = org.sil.consoleTestbed.KeymanTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1436,7 +1440,7 @@
 					"@executable_path/../Frameworks",
 					"@loader_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_BUNDLE_IDENTIFIER = org.sil.consoleTestbed.KeymanTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

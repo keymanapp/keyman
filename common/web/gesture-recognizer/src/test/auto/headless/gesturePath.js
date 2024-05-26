@@ -31,8 +31,10 @@ describe("GesturePath", function() {
       assert.isFalse(reconstructedPath.wasCancelled);
 
       assert.sameDeepOrderedMembers(reconstructedPath.coords, rawPathObject.coords);
-      assert.notEqual(reconstructedPath.toJSON(), rawPathObject);
-      assert.deepEqual(reconstructedPath.toJSON(), rawPathObject);
+      const reconstructedPathJSON = reconstructedPath.toJSON();
+      delete reconstructedPathJSON.stats;
+      assert.notEqual(reconstructedPathJSON, rawPathObject);
+      assert.deepEqual(reconstructedPathJSON, rawPathObject);
     });
 
     it('synthetic', () => {
@@ -92,8 +94,7 @@ describe("GesturePath", function() {
   "wasCancelled": true
 }
       `.trim();
-
-      assert.equal(JSON.stringify(serializationObj, null, 2), SERIALIZATION_TO_MATCH);
+      assert.equal(JSON.stringify(serializationObj, (key, value) => key == 'stats' ? undefined : value, 2), SERIALIZATION_TO_MATCH);
     });
   });
 

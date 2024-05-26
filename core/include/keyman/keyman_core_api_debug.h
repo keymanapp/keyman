@@ -24,7 +24,7 @@ extern "C"
 #endif
 
 /**
- * The maximum size of context in km_core_cp units for a single debug
+ * The maximum size of context in km_core_cu units for a single debug
  * event. This is taken from MAXCONTEXT in keyman32 (Windows) and is purely
  * a convenience value. We can increase it if there is a demonstrated need.
  */
@@ -65,7 +65,7 @@ typedef struct {
  */
 typedef struct {
   void *store;      // LPSTORE
-  km_core_cp value[DEBUG_MAX_CONTEXT];  // value to be saved into the store
+  km_core_cu value[DEBUG_MAX_CONTEXT];  // value to be saved into the store
 } km_core_state_debug_kmx_option_info;
 
 /**
@@ -80,7 +80,7 @@ typedef struct {
  */
 
 typedef struct {
-  km_core_cp context[DEBUG_MAX_CONTEXT];     // The context matched by the rule (? may not need this?) // TODO: rename to context_matched
+  km_core_cu context[DEBUG_MAX_CONTEXT];     // The context matched by the rule (? may not need this?) // TODO: rename to context_matched
   void *group;  // LPGROUP
   void *rule;   // LPKEY
   uint16_t store_offsets[DEBUG_STORE_OFFSETS_SIZE];	// pairs--store, char position, terminated by 0xFFFF // TODO use a better structure here

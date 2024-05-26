@@ -559,6 +559,19 @@ export class KmnCompilerMessages {
   static ERROR_VirtualKeyInContext                            = SevError | 0x074;
   static Error_VirtualKeyInContext                            = () => m(this.ERROR_VirtualKeyInContext, `Virtual keys are not permitted in context`);
 
+  static ERROR_OutsTooLong                                    = SevError | 0x075;
+  static Error_OutsTooLong                                    = () => m(this.ERROR_OutsTooLong, `Store cannot be inserted with outs() as it makes the extended string too long`);
+
+  static ERROR_ExtendedStringTooLong                          = SevError | 0x076;
+  static Error_ExtendedStringTooLong                          = () => m(this.ERROR_ExtendedStringTooLong, `Extended string is too long`);
+
+  static ERROR_VirtualKeyExpansionTooLong                     = SevError | 0x077;
+  static Error_VirtualKeyExpansionTooLong                     = () => m(this.ERROR_VirtualKeyExpansionTooLong, `Virtual key expansion is too large`);
+
+  static ERROR_CharacterRangeTooLong                          = SevError | 0x078;
+  static Error_CharacterRangeTooLong                          = () => m(this.ERROR_CharacterRangeTooLong, `Character range is too large and cannot be expanded`);
+
+
   static WARN_TooManyWarnings                                 = SevWarn | 0x080;
   static Warn_TooManyWarnings                                 = () => m(this.WARN_TooManyWarnings, `Too many warnings or errors`);
 

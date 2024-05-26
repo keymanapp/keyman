@@ -1,4 +1,4 @@
-import EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter3';
 import { DeviceSpec, ManagedPromise, type Keyboard, type KeyboardInterface, type OutputTarget } from '@keymanapp/keyboard-processor';
 import { StubAndKeyboardCache, type KeyboardStub } from 'keyman/engine/package-cache';
 import { PredictionContext } from '@keymanapp/input-processor';
@@ -274,8 +274,6 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     // (!wasNull || !!keyboard) - blocks events for `null` -> `null` transitions.
     // (keyman/keymanweb.com#96)
     if(this.currentKeyboardSrcTarget() == originalKeyboardTarget && (!wasNull || !!keyboard)) {
-      // Perform standard context-reset ops, including the processing of new-context events.
-      this.resetContext();
       // Will trigger KeymanEngine handler that passes keyboard to the OSK, displays it.
       this.emit('keyboardchange', this.activeKeyboard);
     }

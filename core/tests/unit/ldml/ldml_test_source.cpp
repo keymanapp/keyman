@@ -8,7 +8,6 @@
 #include <sstream>
 #include <string>
 #include <type_traits>
-#include <codecvt>
 
 #if 0
 // TODO-LDML If we need to avoid exceptions in JSON
@@ -37,6 +36,8 @@
 #include "unicode/uniset.h"
 #include "unicode/usetiter.h"
 
+#include <test_color.h>
+
 #define assert_or_return(expr) if(!(expr)) { \
   std::wcerr << __FILE__ << ":" << __LINE__ << ": " << \
   console_color::fg(console_color::BRIGHT_RED) \
@@ -50,7 +51,6 @@
 namespace km {
 namespace tests {
 
-#include <test_color.h>
 
 
 
@@ -174,10 +174,10 @@ LdmlTestSource::parse_source_string(std::string const &s) {
         assert(v >= 0x0001 && v <= 0x10FFFF);
         p += n - 1;
         if (v < 0x10000) {
-          t += km_core_cp(v);
+          t += km_core_cu(v);
         } else {
-          t += km_core_cp(Uni_UTF32ToSurrogate1(v));
-          t += km_core_cp(Uni_UTF32ToSurrogate2(v));
+          t += km_core_cu(Uni_UTF32ToSurrogate1(v));
+          t += km_core_cu(Uni_UTF32ToSurrogate2(v));
         }
         if (had_open_curly) {
           p++;
@@ -200,7 +200,7 @@ LdmlTestSource::parse_source_string(std::string const &s) {
 std::u16string
 LdmlTestSource::parse_u8_source_string(std::string const &u8s) {
   // convert from utf-8 to utf-16 first
-  std::u16string s = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.from_bytes(u8s);
+  std::u16string s = convert<char, char16_t>(u8s);
   std::u16string t;
   for (auto p = s.begin(); p != s.end(); p++) {
     if (*p == '\\') {
@@ -219,16 +219,16 @@ LdmlTestSource::parse_u8_source_string(std::string const &u8s) {
         size_t n;
         std::u16string s1 = s.substr(p - s.begin(), 8);
         // TODO-LDML: convert back first?
-        std::string s1b = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(s1);
+        std::string s1b = convert<char16_t, char>(s1);
         v              = std::stoul(s1b, &n, 16);
         // Allow deadkey_number (U+0001) characters and onward
         assert(v >= 0x0001 && v <= 0x10FFFF);
         p += n - 1;
         if (v < 0x10000) {
-          t += km_core_cp(v);
+          t += km_core_cu(v);
         } else {
-          t += km_core_cp(Uni_UTF32ToSurrogate1(v));
-          t += km_core_cp(Uni_UTF32ToSurrogate2(v));
+          t += km_core_cu(Uni_UTF32ToSurrogate1(v));
+          t += km_core_cu(Uni_UTF32ToSurrogate2(v));
         }
         if (had_open_curly) {
           p++;
@@ -280,13 +280,15 @@ LdmlEmbeddedTestSource::load_source( const km::core::path &path ) {
     if (!line.length())
       continue;
     if (line.compare(0, s_keys.length(), s_keys) == 0) {
-      keys = line.substr(s_keys.length());
-      trim(keys);
+      auto k = line.substr(s_keys.length());
+      trim(k);
+      keys.emplace_back(k);
     } else if (is_token(s_expected, line)) {
       if (line == "\\b") {
         expected_beep = true;
       } else {
-        expected = parse_source_string(line);
+        // allow multiple expected lines
+        expected.emplace_back(parse_source_string(line));
       }
     } else if (is_token(s_expecterror, line)) {
       expected_error = true;
@@ -297,8 +299,15 @@ LdmlEmbeddedTestSource::load_source( const km::core::path &path ) {
     }
   }
 
-  if (keys == "") {
+  if (keys.empty() && expected.empty() && !expected_error) {
+    // don't note this, the parent will complain if there's neither json nor embedded
+    return __LINE__;
+  } else if (keys.empty()) {
     // We must at least have a key sequence to run the test
+    std::cerr << "Need at least one key sequence." << std::endl;
+    return __LINE__;
+  } else if(!expected_error && (keys.size() != expected.size())) {
+    std::cerr << "Need the same number of " << s_keys << " and " << s_expected << " lines." << std::endl;
     return __LINE__;
   }
 
@@ -367,12 +376,19 @@ LdmlEmbeddedTestSource::vkey_to_event(std::string const &vk_event) {
       modifier_state |= modifier;
     } else {
       vk = get_vk(s);
-      break;
+      if (vk == 0) {
+        std::cerr << "Error parsing [" << vk_event << "] - could not find vkey or modifier: " << s << std::endl;
+      }
+      assert(vk != 0);
+      break; // only one vkey allowed
     }
   }
 
   // The string should be empty at this point
-  assert(!std::getline(f, s, ' '));
+  if (std::getline(f, s, ' ')) {
+    std::cerr << "Error parsing vkey ["<<vk_event<<"] - excess string after key: " << s << std::endl;
+    assert(false);
+  }
   assert(vk != 0);
 
   return {vk, modifier_state};
@@ -380,15 +396,19 @@ LdmlEmbeddedTestSource::vkey_to_event(std::string const &vk_event) {
 
 void
 LdmlEmbeddedTestSource::next_action(ldml_action &fillin) {
-  if (is_done) {
+  if (is_done || keys.empty()) {
     // We were already done. return done.
     fillin.type = LDML_ACTION_DONE;
     return;
-  } else if(keys.empty()) {
-    // Got to the end of the keys. time to check
+  } else if(keys[0].empty()) {
+    // Got to the end of a key set. time to check
     fillin.type = LDML_ACTION_CHECK_EXPECTED;
-    fillin.string = expected; // copy expected
-    is_done = true; // so we get DONE next time
+    fillin.string = expected[0]; // copy expected
+    expected.pop_front();
+    keys.pop_front();
+    if (keys.empty()) {
+      is_done = true; // so we get DONE next time
+    }
   } else {
     fillin.type = LDML_ACTION_KEY_EVENT;
     fillin.k = next_key();
@@ -399,7 +419,7 @@ LdmlEmbeddedTestSource::next_action(ldml_action &fillin) {
 key_event
 LdmlEmbeddedTestSource::next_key() {
   // mutate this->keys
-  return next_key(keys);
+  return next_key(keys[0]);
 }
 
 key_event

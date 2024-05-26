@@ -2,21 +2,16 @@
 #
 # Compiles the kmc-kmn keyboard compiler.
 #
-
-# Exit on command failure and when using unset variables:
-set -eu
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-cd "$THIS_SCRIPT_PATH"
-
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
-builder_describe "Build Keyman Developer Compiler Module for .kmn to .kmx" \
+builder_describe "Keyman Developer Compiler Module for .kmn to .kmx" \
   "@/common/web/keyman-version" \
   "@/common/web/types" \
   "@/developer/src/common/web/test-helpers" \
@@ -26,8 +21,8 @@ builder_describe "Build Keyman Developer Compiler Module for .kmn to .kmx" \
   "clean" \
   "api                       analyze API and prepare API documentation" \
   "test" \
-  "pack                      build a local .tgz pack for testing" \
   "publish                   publish to npm" \
+  "--npm-publish+            For publish, do a npm publish, not npm pack (only for CI)" \
   "--dry-run,-n              don't actually publish, just dry run"
 
 builder_describe_outputs \
@@ -84,12 +79,4 @@ fi
 
 #-------------------------------------------------------------------------------------------------------------------
 
-if builder_start_action publish; then
-  . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
-  builder_publish_to_npm
-  builder_finish_action success publish
-elif builder_start_action pack; then
-  . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
-  builder_publish_to_pack
-  builder_finish_action success pack
-fi
+builder_run_action publish  builder_publish_npm
