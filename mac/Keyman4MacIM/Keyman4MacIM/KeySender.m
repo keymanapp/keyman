@@ -12,6 +12,7 @@
 #import <InputMethodKit/InputMethodKit.h>
 #import "KeySender.h"
 #import "KMInputMethodAppDelegate.h"
+#import "KMLogs.h"
 
 const CGKeyCode kKeymanEventKeyCode = 0xFF;
 
@@ -30,8 +31,8 @@ const CGKeyCode kKeymanEventKeyCode = 0xFF;
 }
 
 - (void)sendBackspaceforEventSource:(CGEventSourceRef)eventSource {
-  [self.appDelegate logDebugMessage:@"KeySender sendBackspaceforEventSource"];
-  
+  os_log_debug([KMLogs keyLog], "KeySender sendBackspaceforEventSource");
+
   [self postKeyboardEventWithSource:eventSource code:kVK_Delete postCallback:^(CGEventRef eventToPost) {
     CGEventPost(kCGHIDEventTap, eventToPost);
   }];
@@ -40,11 +41,11 @@ const CGKeyCode kKeymanEventKeyCode = 0xFF;
 - (void)postKeyboardEventWithSource: (CGEventSourceRef)source code:(CGKeyCode) virtualKey postCallback:(PostEventCallback)postEvent{
   
   if (!postEvent) {
-    [self.appDelegate logDebugMessage:@"KeySender postKeyboardEventWithSource callback not specified", virtualKey];
+    os_log_debug([KMLogs keyLog], "KeySender postKeyboardEventWithSource callback not specified for virtualKey: %u", virtualKey);
     return;
   }
   
-  [self.appDelegate logDebugMessage:@"KeySender postKeyboardEventWithSource for virtualKey: @%", virtualKey];
+  os_log_debug([KMLogs keyLog], "KeySender postKeyboardEventWithSource for virtualKey: %u", virtualKey);
   
   CGEventRef ev = CGEventCreateKeyboardEvent (source, virtualKey, true); //down
   postEvent(ev);
@@ -61,8 +62,8 @@ const CGKeyCode kKeymanEventKeyCode = 0xFF;
  */
 
 - (void)sendKeymanKeyCodeForEvent:(NSEvent *)event {
-  [self.appDelegate logDebugMessage:@"KeySender sendKeymanKeyCodeForEvent"];
-  
+  os_log_debug([KMLogs keyLog], "KeySender sendKeymanKeyCodeForEvent");
+
   ProcessSerialNumber psn;
   
   // Returns the frontmost app, which is the app that receives key events.
@@ -70,7 +71,7 @@ const CGKeyCode kKeymanEventKeyCode = 0xFF;
   pid_t processId = app.processIdentifier;
   NSString *bundleId = app.bundleIdentifier;
   
-  [self.appDelegate logDebugMessage:@"sendKeymanKeyCodeForEvent keyCode %lu to app %@ with pid %d", (unsigned long)kKeymanEventKeyCode, bundleId, processId];
+  os_log_debug([KMLogs keyLog], "sendKeymanKeyCodeForEvent keyCode %lu to app %{public}@ with pid %d", (unsigned long)kKeymanEventKeyCode, bundleId, processId);
   
   // use nil as source, as this generated event is not directly tied to the originating event
   CGEventRef keyDownEvent = CGEventCreateKeyboardEvent(nil, kKeymanEventKeyCode, true);

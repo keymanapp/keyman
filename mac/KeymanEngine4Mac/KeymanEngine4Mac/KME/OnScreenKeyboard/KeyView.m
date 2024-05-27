@@ -10,7 +10,7 @@
 #import "KeyLabel.h"
 #import "MacVKCodes.h"
 #import "TimerTarget.h"
-#import <os/log.h>
+#import "KMELogs.h"
 
 CGFloat lw = 1.0;
 CGFloat r = 7.0;
@@ -39,10 +39,9 @@ static CGFloat const kRelativeModifierLabelHeight = 0.30f;
 @synthesize bgColorRegularKey, bgColorSpecialKey;
 
 - (id)initWithFrame:(NSRect)frame {
-  os_log_t oskKeyLog = os_log_create("org.sil.keyman", "osk-key");
   self = [super initWithFrame:frame];
   if (self) {
-    os_log_with_type(oskKeyLog, OS_LOG_TYPE_DEBUG, "KeyView initWithFrame: %{public}@, bounds: %{public}@, default clipsToBounds %{public}@", NSStringFromRect(frame), NSStringFromRect(self.bounds), self.clipsToBounds?@"YES":@"NO");
+    os_log_debug([KMELogs oskLog], "KeyView initWithFrame: %{public}@, bounds: %{public}@, default clipsToBounds %{public}@", NSStringFromRect(frame), NSStringFromRect(self.bounds), self.clipsToBounds?@"YES":@"NO");
     self.clipsToBounds = true;
     CGSize size = frame.size;
     CGFloat x = size.width*0.05;
@@ -71,8 +70,7 @@ static CGFloat const kRelativeModifierLabelHeight = 0.30f;
 }
 
 - (void)drawRect:(NSRect)rect {
-  os_log_t oskKeyLog = os_log_create("org.sil.keyman", "osk-key");
-  os_log_with_type(oskKeyLog, OS_LOG_TYPE_DEBUG, "KeyView drawRect: %{public}@, bounds: %{public}@, keyCode: 0x%lx, caption: %{public}@, label: %{public}@", NSStringFromRect(rect), NSStringFromRect(self.bounds), self.keyCode, self.caption.stringValue, self.label.stringValue);
+  os_log_debug([KMELogs uiLog], "KeyView drawRect: %{public}@, bounds: %{public}@, keyCode: 0x%lx, caption: %{public}@, label: %{public}@", NSStringFromRect(rect), NSStringFromRect(self.bounds), self.keyCode, self.caption.stringValue, self.label.stringValue);
   
   [[self getOpaqueColorWithRed:241 green:242 blue:242] setFill];
   NSRectFillUsingOperation(rect, NSCompositingOperationSourceOver);
@@ -306,7 +304,7 @@ static CGFloat const kRelativeModifierLabelHeight = 0.30f;
 
 - (void)stopTimer {
   @synchronized(self.target) {
-    //NSLog(@"KeyView TIMER - stopping");
+    //os_log_debug([KMELogs uiLog], "KeyView TIMER - stopping");
     if (_keyEventTimer != nil) {
       [_keyEventTimer invalidate];
       _keyEventTimer = nil;
@@ -316,7 +314,7 @@ static CGFloat const kRelativeModifierLabelHeight = 0.30f;
 
 - (void)timerAction:(NSTimer *)timer {
   @synchronized(self.target) {
-    //NSLog(@"KeyView TIMER - Fired for key %lu", [self keyCode]);
+    //os_log_debug([KMELogs uiLog], "KeyView TIMER - Fired for key %lu", [self keyCode]);
     [self processKeyClick];
     
     if ([timer timeInterval] == delayBeforeRepeating) {
