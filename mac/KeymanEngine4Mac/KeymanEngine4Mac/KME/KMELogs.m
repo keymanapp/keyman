@@ -23,7 +23,7 @@
 
 @implementation KMELogs
 
-char *const keymanEngineSubsystem = "org.sil.keymanengine";
+char *const keymanEngineSubsystem = "com.keyman.engine";
 char *const startupCategory = "startup";
 char *const configCategory = "config";
 char *const keyCategory = "key";

@@ -14,7 +14,7 @@ const NSString *kConnectionName = @"Keyman_Input_Connection";
 IMKServer *server;
 
 int main(int argc, const char * argv[]) {
-    NSString *identifier;
+  NSString *identifier;
   
   @autoreleasepool {
     identifier = [[NSBundle mainBundle] bundleIdentifier];

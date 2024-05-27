@@ -23,7 +23,7 @@
 
 @implementation KMLogs
 
-char *const keymanSubsystem = "org.sil.keyman";
+char *const keymanSubsystem = "com.keyman.app";
 char *const startupCategory = "startup";
 char *const privacyCategory = "privacy";
 char *const complianceCategory = "compliance";

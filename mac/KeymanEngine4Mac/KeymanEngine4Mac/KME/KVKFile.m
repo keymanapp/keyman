@@ -22,7 +22,7 @@
     
     NSFileHandle *file = [NSFileHandle fileHandleForReadingAtPath:path];
     if (file == nil) {
-      os_log_error([KMELogs configLog], "Failed to open kmx file");
+      os_log_error([KMELogs configLog], "Failed to open kvk file");
       _filePath = nil;
       return nil;
     }
