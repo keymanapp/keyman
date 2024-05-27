@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "KMPackage.h"
 #import "KMConfigurationWindowController.h"
+#import "KMLogs.h"
 
 @implementation KMPackage
 
@@ -33,9 +34,8 @@ NSString *filename = nil; // This is the filename from the FileWrapper (if any)
 // they decide to install it or cancel the installation. It also gets called one time up-front
 // when Keyman first loads.
 - (void)makeWindowControllers {
-  if ([self.AppDelegate debugMode])
-    NSLog(@"KMP - in KMPackage.makeWindowControllers");
-  
+  os_log_debug([KMLogs dataLog], "KMP - in KMPackage.makeWindowControllers");
+
   if (filename != nil) { // Should be true every time except maybe the very first time (when loading).
     filename = nil;
     [self closeIfFilesAreReleased];
@@ -47,8 +47,8 @@ NSString *filename = nil; // This is the filename from the FileWrapper (if any)
   // we need to close this document so the controller doesn't hold onto it. Otherwise, if the user
   // double-clicks the same KMP file a second time it will just assume we want to open the window
   // to display the already open document, rather than attempting to read it again.
-  if ([self.AppDelegate debugMode])
-    NSLog(@"Closing document to release presenter...");
+
+  os_log_debug([KMLogs dataLog], "Closing document to release presenter...");
   if (filename == nil && filenameTempKMP == nil)
     [self close];
 }
@@ -61,9 +61,8 @@ NSString *filename = nil; // This is the filename from the FileWrapper (if any)
   
   filename = [fileWrapper filename];
   
-  if ([self.AppDelegate debugMode])
-    NSLog(@"readFromFileWrapper called with file: %@", filename);
-  
+  os_log_debug([KMLogs dataLog], "readFromFileWrapper called with file: %{public}@", filename);
+
   if (![typeName isEqualToString: @"Keyman Package"]) {
     if (outError != NULL) {
       NSString *description = [@"Unexpected file association for type " stringByAppendingString:typeName];

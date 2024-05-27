@@ -23,6 +23,8 @@
 		29A1971E2AF091E600512A37 /* CoreKeyOutput.h in Headers */ = {isa = PBXBuildFile; fileRef = 29A1971C2AF091E600512A37 /* CoreKeyOutput.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		29A1971F2AF091E600512A37 /* CoreKeyOutput.m in Sources */ = {isa = PBXBuildFile; fileRef = 29A1971D2AF091E600512A37 /* CoreKeyOutput.m */; };
 		29A658C82AF394560038DCFE /* armenian_mnemonic.kmx in Resources */ = {isa = PBXBuildFile; fileRef = 29A658C72AF394560038DCFE /* armenian_mnemonic.kmx */; };
+		29B4A0D82BFAE8A400682049 /* KMELogs.h in Headers */ = {isa = PBXBuildFile; fileRef = 29B4A0D62BFAE8A400682049 /* KMELogs.h */; };
+		29B4A0D92BFAE8A400682049 /* KMELogs.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B4A0D72BFAE8A400682049 /* KMELogs.m */; };
 		378568D122FCCF0A00B481B5 /* sil_ipa.kmx in Resources */ = {isa = PBXBuildFile; fileRef = 378568D022FCCF0A00B481B5 /* sil_ipa.kmx */; };
 		378568D322FCD93300B481B5 /* indexoffset1892.kmx in Resources */ = {isa = PBXBuildFile; fileRef = 378568D222FCD93300B481B5 /* indexoffset1892.kmx */; };
 		980053351B37C9B50088DDDD /* NFont.h in Headers */ = {isa = PBXBuildFile; fileRef = 980053311B37C9B50088DDDD /* NFont.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -97,6 +99,8 @@
 		29A205D82AC2E446000750C0 /* libsicuuc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsicuuc.a; path = "../../core/build/mac-arm64/release/subprojects/icu/source/common/libsicuuc.a"; sourceTree = "<group>"; };
 		29A205DA2AC2E46A000750C0 /* libsicui18n.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsicui18n.a; path = "../../core/build/mac-arm64/release/subprojects/icu/source/i18n/libsicui18n.a"; sourceTree = "<group>"; };
 		29A658C72AF394560038DCFE /* armenian_mnemonic.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = armenian_mnemonic.kmx; sourceTree = "<group>"; };
+		29B4A0D62BFAE8A400682049 /* KMELogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMELogs.h; sourceTree = "<group>"; };
+		29B4A0D72BFAE8A400682049 /* KMELogs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMELogs.m; sourceTree = "<group>"; };
 		378568D022FCCF0A00B481B5 /* sil_ipa.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = sil_ipa.kmx; sourceTree = "<group>"; };
 		378568D222FCD93300B481B5 /* indexoffset1892.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = indexoffset1892.kmx; sourceTree = "<group>"; };
 		980053311B37C9B50088DDDD /* NFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NFont.h; sourceTree = "<group>"; };
@@ -286,6 +290,8 @@
 		984C2AEE1A79CA4F0023F89D /* KME */ = {
 			isa = PBXGroup;
 			children = (
+				29B4A0D62BFAE8A400682049 /* KMELogs.h */,
+				29B4A0D72BFAE8A400682049 /* KMELogs.m */,
 				981880641BC1EA5800A1FBA5 /* OnScreenKeyboard */,
 				984C2AEF1A79CA4F0023F89D /* Categories */,
 				984C2AF51A79CA4F0023F89D /* KMBinaryFileFormat.h */,
@@ -351,6 +357,7 @@
 				2993C33229B1D92E00FB5E95 /* CoreWrapper.h in Headers */,
 				9818806F1BC1EA5800A1FBA5 /* KeyLabel.h in Headers */,
 				981880751BC1EA5800A1FBA5 /* OSKKey.h in Headers */,
+				29B4A0D82BFAE8A400682049 /* KMELogs.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -501,6 +508,7 @@
 				980053381B37C9B50088DDDD /* NKey.m in Sources */,
 				981880701BC1EA5800A1FBA5 /* KeyLabel.m in Sources */,
 				981880721BC1EA5800A1FBA5 /* KeyLabelCell.m in Sources */,
+				29B4A0D92BFAE8A400682049 /* KMELogs.m in Sources */,
 				981880781BC1EA5800A1FBA5 /* OSKView.m in Sources */,
 				2993C32E29B1D92E00FB5E95 /* CoreWrapper.m in Sources */,
 				984C2B0F1A79CA4F0023F89D /* KMCompKey.m in Sources */,

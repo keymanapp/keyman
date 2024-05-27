@@ -97,12 +97,22 @@ For every release of **Keyman Developer**, the CI publishes a release of
 `@keymanapp/kmc`. The version number is locked with the particular version of
 Keyman Developer.
 
-### `builder_publish_to_npm`
+### `builder_publish_npm`
 
-This helper function updates version numbers and does the publish step for the
-package.json in the working directory, using the VERSION_WITH_TAG variable.
+Publishes the package in `cwd` to npm
+
+If the `--dry-run` option is available and specified as a command-line
+parameter, will do a dry run
+
+Note that `package.json` will be dirty after this command, as the `version`
+field will be added to it, and @keymanapp dependency versions will also be
+modified. This change should not be committed to the repository.
+
+If --npm-publish is set:
+* then builder_publish_npm publishes to the public registry
+* else builder_publish_npm creates a local tarball which can be used to test
 
 ```bash
   . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
-  builder_publish_to_npm
+  builder_publish_npm
 ```

@@ -15,6 +15,7 @@
 #import "CoreTestStaticHelperMethods.h"
 #import "CoreAction.h"
 #import "MacVKCodes.h"
+#import "KMELogs.h"
 
 @interface CoreWrapperTests : XCTestCase
 
@@ -28,8 +29,8 @@ CoreWrapper *mockWrapper;
 + (void)setUp {
   NSString *khmerKeyboardPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"khmer_angkor.kmx"];
   
-  NSLog(@"mockKmxFilePath  = %@\n", mockKmxFilePath);
-  
+  os_log_debug([KMELogs testLog], "mockKmxFilePath  = %@\n", mockKmxFilePath);
+
   mockWrapper = [[CoreWrapper alloc] initWithHelper: [CoreTestStaticHelperMethods helper] kmxFilePath:mockKmxFilePath];
 }
 

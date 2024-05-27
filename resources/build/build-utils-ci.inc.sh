@@ -71,21 +71,25 @@ function builder_pull_has_label() {
 # field will be added to it, and @keymanapp dependency versions will also be
 # modified. This change should not be committed to the repository.
 #
-# builder_publish_to_pack and builder_publish_to_npm are similar:
-#  * builder_publish_to_npm publishes to the public registry
-#  * builder_publish_to_pack creates a local tarball which can be used to test
+# If --npm-publish is set:
+#  * then builder_publish_npm publishes to the public registry
+#  * else builder_publish_npm creates a local tarball which can be used to test
 #
 # Usage:
 # ```bash
-#   builder_publish_to_npm
+#   builder_publish_npm
 # ```
 #
-function builder_publish_to_npm() {
-  _builder_publish_npm_package publish
-}
-
-function builder_publish_to_pack() {
-  _builder_publish_npm_package pack
+function builder_publish_npm() {
+  if builder_has_option --npm-publish; then
+    # Require --dry-run if local or test to avoid accidentally clobbering npm packages
+    if [[ $VERSION_ENVIRONMENT =~ local|test ]] && ! builder_has_option --dry-run; then
+      builder_die "publish --npm-publish must use --dry-run flag for local or test builds"
+    fi
+    _builder_publish_npm_package publish
+  else
+    _builder_publish_npm_package pack
+  fi
 }
 
 function _builder_publish_npm_package() {

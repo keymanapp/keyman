@@ -44,11 +44,13 @@ procedure TLexicalModelParserTest.Setup;
 begin
   Assert.IgnoreCaseDefault := False;
 
-  // Running from platform/configuration/ folder has
+  // Running from bin/platform/configuration/ folder has
   // assets two levels up.
-  if FileExists('..\..\assets\nrc.en.mtnt.model.ts')
-    then AssetRootPath := '..\..\assets\'
-    else AssetRootPath := '';
+  if FileExists('..\..\..\assets\nrc.en.mtnt.model.ts') then AssetRootPath := '..\..\..\assets\'
+  // Running from project folder
+  else if FileExists('assets\nrc.en.mtnt.model.ts') then AssetRootPath := 'assets\'
+  // You must know what you are doing
+  else AssetRootPath := '';
 
   m := TStringList.Create;
   m.LoadFromFile(AssetRootPath + 'nrc.en.mtnt.model.ts');

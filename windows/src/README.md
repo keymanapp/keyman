@@ -64,14 +64,11 @@ You can use your own certificate, or you can use test certificates which are not
 globally trusted. The environment variables `SC_PFX_SHA1` and `SC_PFX_SHA256`
 can be set to custom certificate paths.
 
-The Keyman repo no longer includes test certificates.  To build your own, run
-`nmake test-certificate` from **common/windows/delphi/tools/certificates** to
+The Keyman repo can build test certificates for you.  To build your own, run
+`./build.sh certificates` from **common/windows/delphi/tools/certificates** to
 build and install your own local root CA "**KeymanTestCA**" certificates. If you
 specify a password for the certificate, you'll need to set that in the
 environment variable `SC_PWD`.
-
-(Note: these `SC_` values can be defined in `UserDefines.mak` instead of as
-environment variables.)
 
 ### Manual certificate installation
 

@@ -10,6 +10,7 @@
 #import "KMInputMethodAppDelegate.h"
 #import "KMPackageInfo.h"
 #import <WebKit/WebKit.h>
+#import "KMLogs.h"
 
 @interface KMKeyboardHelpWindowController ()
 @property (nonatomic, weak) IBOutlet WebView *welcomeView;
@@ -39,7 +40,7 @@
         [self.window setTitle:title];
     }
     @catch (NSException *e) {
-      NSLog(@"Error = %@", e.description);
+      os_log_error([KMLogs dataLog], "Error = %{public}@", e.description);
     }
     
     NSString *welcomeFile = [packagePath stringByAppendingPathComponent:@"welcome.htm"];
