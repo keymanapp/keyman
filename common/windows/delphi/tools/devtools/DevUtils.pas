@@ -70,9 +70,9 @@ begin
       writeln('  -rp                  : reset packages');
       writeln('  -ai path[;path...]   : add include path(s)');
       writeln('  -ri                  : reset include paths');
-      writeln('  -ti                  : touch PathDefines.mak (create if not present)');
+      writeln('  -ti                  : touch PathDefines.mak (create if not present)');  //TODO: remove as unused
       writeln('  -rt                  : check release build prereqs, e.g. HKCU\'+SRegKey_KeymanDebug_CU);   // I3726
-      writeln('  -git                 : check git repository commit/update status');   // I3726   // I5087
+      writeln('  -git                 : check git repository commit/update status');   // I3726   // I5087   //TODO: remove as unused
       writeln('  -buildmessageconstants <strings.xml> <messageidentifierconsts.pas>: build MessageIdentifierConsts.pas from current strings.xml');
       writeln('  -buildsetupstrings <sourcepath> <destinationpath>: build Keyman.Setup.System.Locale.*.pas from strings.xml found in sourcepath');
       ExitCode := 1;

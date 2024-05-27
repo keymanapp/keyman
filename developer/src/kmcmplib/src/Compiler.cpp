@@ -1060,7 +1060,7 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
       u16ncpy(q, pp2, u16len(pp2) + 1);
 
       // Change compiled reference file extension to .kvk
-      pp2 = ( km_core_cp *) u16chr(q, 0) - 5;
+      pp2 = ( km_core_cu *) u16chr(q, 0) - 5;
       if (pp2 > q && u16icmp(pp2, u".kvks") == 0) {
         pp2[4] = 0;
       }

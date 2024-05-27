@@ -1,2 +1,0 @@
-1.	Check all code completely & cleanup any new portions
-2.	Fully comment

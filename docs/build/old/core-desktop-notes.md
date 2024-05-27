@@ -6,7 +6,7 @@ WARNING: these are old configuration notes. See [index.md](../index.md) for curr
 - Python 3
 - Meson build system 0.45+ (0.56+ for WASM)
 - ninja 1.8+
-- C++14 or later compiler (VC++ 2019 or later for Windows).
+- C++17 or later compiler (VC++ 2019 or later for Windows).
 - lib std::fs
 - kmc (for tests) -- must be added to path
 

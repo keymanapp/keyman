@@ -33,10 +33,15 @@ builder_parse "$@"
 # TODO: build if out-of-date if test is specified
 # TODO: configure if npm has not been run, and build is specified
 
-if builder_start_action configure; then
+function do_configure() {
   verify_npm_setup
-  builder_finish_action success configure
-fi
+
+  # Configure Web browser-engine testing environments.  As is, this should only
+  # make changes when we update the dependency, even on our CI build agents.
+  playwright install
+}
+
+builder_run_action configure do_configure
 
 if builder_start_action clean; then
   rm -rf build/
