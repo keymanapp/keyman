@@ -5,8 +5,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-KEYMAN_MAC_BASE_PATH="$KEYMAN_ROOT/mac"
-
 # Include our resource functions; they're pretty useful!
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 . "$KEYMAN_ROOT/resources/build/build-help.inc.sh"
@@ -46,6 +44,8 @@ TESTAPP_NAME="Keyman4Mac"
 IM_NAME="Keyman4MacIM"
 XCODE_PROJ_EXT=".xcodeproj"
 PRODUCT_NAME="Keyman"
+
+KEYMAN_MAC_BASE_PATH="$KEYMAN_ROOT/mac"
 
 KME4M_BASE_PATH="$KEYMAN_MAC_BASE_PATH/$ENGINE_NAME"
 KMTESTAPP_BASE_PATH="$KEYMAN_MAC_BASE_PATH/$TESTAPP_NAME"
