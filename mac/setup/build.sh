@@ -27,7 +27,7 @@ KEYMANAPP=../Keyman4MacIM/build/Release/Keyman.app
 # Build basic app and copy icons
 #
 
-if [ -f "$SOURCEAPP" ]; then
+if [ -e "$SOURCEAPP" ]; then
   rm -rf "$SOURCEAPP"
 fi
 
