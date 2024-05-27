@@ -8,6 +8,7 @@
 
 #import "KMConfigurationWindowController.h"
 #import "KMDownloadKBWindowController.h"
+#import "KMLogs.h"
 
 @interface KMConfigurationWindowController ()
 @property (nonatomic, weak) IBOutlet NSTableView *tableView;
@@ -79,8 +80,7 @@
 
 - (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener {
   NSString* url = [[request URL] absoluteString];
-  if (self.AppDelegate.debugMode)
-    NSLog(@"decidePolicyForNavigationAction, navigating to %@", url);
+  os_log_debug([KMLogs uiLog], "decidePolicyForNavigationAction, navigating to %{public}@", url);
   
   if([url hasPrefix: @"file:"]) {
     [listener use];
@@ -358,14 +358,12 @@
   NSButton *checkBox = (NSButton *)sender;
   NSString *kmxFilePath = [self kmxFilePathAtIndex:checkBox.tag];
   if (checkBox.state == NSOnState) {
-    if ([self.AppDelegate debugMode])
-      NSLog(@"Adding active keyboard: %@", kmxFilePath);
+    os_log_debug([KMLogs uiLog], "Adding active keyboard: %{public}@", kmxFilePath);
     [self.activeKeyboards addObject:kmxFilePath];
     [self saveActiveKeyboards];
   }
   else if (checkBox.state == NSOffState) {
-    if ([self.AppDelegate debugMode])
-      NSLog(@"Disabling active keyboard: %@", kmxFilePath);
+    os_log_debug([KMLogs uiLog], "Disabling active keyboard: %{public}@", kmxFilePath);
     [self.activeKeyboards removeObject:kmxFilePath];
     [self saveActiveKeyboards];
   }
@@ -443,10 +441,7 @@
   NSString *keyboardInfoString = NSLocalizedString(@"info-install-keyboard-filename", nil);
   [self.confirmKmpInstallAlertView setInformativeText:[NSString localizedStringWithFormat:keyboardInfoString, package.getOrigKmpFilename]];
   
-  if ([self.AppDelegate debugMode]) {
-    NSLog(@"Asking user to confirm installation of %@...", package.getOrigKmpFilename);
-    NSLog(@"KMP - temp file name: %@", package.getTempKmpFilename);
-  }
+  os_log_debug([KMLogs uiLog], "Asking user to confirm installation of %{public}@, KMP - temp file name: %{public}@", package.getOrigKmpFilename, package.getTempKmpFilename);
   
   [self.confirmKmpInstallAlertView beginSheetModalForWindow:self.window
                                               modalDelegate:self
@@ -457,9 +452,7 @@
 - (void)installPackageFile:(NSString *)kmpFile {
   // kmpFile could be a temp file (in fact, it always is!), so don't display the name.
   
-  if ([self.AppDelegate debugMode]) {
-    NSLog(@"KMP - Ready to unzip/install Package File: %@", kmpFile);
-  }
+  os_log_debug([KMLogs dataLog], "KMP - Ready to unzip/install Package File: %{public}@", kmpFile);
   
   BOOL didUnzip = [self.AppDelegate unzipFile:kmpFile];
   
@@ -477,8 +470,8 @@
                        didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
                           contextInfo:nil];
   }
-  else if ([self.AppDelegate debugMode]) {
-    NSLog(@"Completed installation of KMP file.");
+  else {
+    os_log_debug([KMLogs dataLog], "Completed installation of KMP file.");
   }
 }
 
@@ -555,9 +548,7 @@
 }
 
 - (void)alertDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo {
-  if ([self.AppDelegate debugMode]) {
-    NSLog(@"User responded to NSAlert");
-  }
+  os_log_debug([KMLogs uiLog], "User responded to NSAlert");
   if (alert == _deleteAlertView) {
     if (returnCode == NSAlertFirstButtonReturn) { // Delete
       [self deleteFileAtIndex:(__bridge NSNumber *)contextInfo];
@@ -567,9 +558,7 @@
   }
   else if (alert == _confirmKmpInstallAlertView) {
     KMPackage *package = (__bridge KMPackage *)contextInfo;
-    if ([self.AppDelegate debugMode]) {
-      NSLog(@"KMP - Temp file: %@", package.getTempKmpFilename);
-    }
+    os_log_debug([KMLogs uiLog], "KMP - Temp file: %{public}@", package.getTempKmpFilename);
     if (returnCode == NSAlertFirstButtonReturn) { // Install
       [self installPackageFile: package.getTempKmpFilename];
     }

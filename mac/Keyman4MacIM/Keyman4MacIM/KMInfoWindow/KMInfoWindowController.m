@@ -10,6 +10,7 @@
 #import "KMInputMethodAppDelegate.h"
 #import "KMPackageInfo.h"
 #import "KMKeyboardInfo.h"
+#import "KMLogs.h"
 #import <WebKit/WebKit.h>
 
 @interface KMInfoWindowController ()
@@ -199,7 +200,7 @@
     return htmlStr;
   }
   @catch (NSException *e) {
-    NSLog(@"Error = %@", e.description);
+    os_log_error([KMLogs uiLog], "Error = %@", e.description);
     return nil;
   }
 }

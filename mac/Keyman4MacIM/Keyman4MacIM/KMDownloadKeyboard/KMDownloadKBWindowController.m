@@ -8,6 +8,7 @@
 
 #import "KMDownloadKBWindowController.h"
 #import "KMInputMethodAppDelegate.h"
+#import "KMLogs.h"
 
 @interface KMDownloadKBWindowController ()
 @property (nonatomic, weak) IBOutlet WebView *webView;
@@ -29,8 +30,8 @@
   NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
   KeymanVersionInfo keymanVersionInfo = [[self AppDelegate] versionInfo];
   NSString *url = [NSString stringWithFormat:@"https://%@/go/macos/14.0/download-keyboards/?version=%@", keymanVersionInfo.keymanCom, version];
-  if (self.AppDelegate.debugMode)
-    NSLog(@"KMDownloadKBWindowController opening url = %@, version = '%@'", url, version);
+  
+  os_log_debug([KMLogs uiLog], "KMDownloadKBWindowController opening url = %@, version = '%@'", url, version);
   [self.webView.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:url]]];
 }
 
@@ -41,9 +42,8 @@
 
 - (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener {
   NSString* url = [[request URL] absoluteString];
-  if (self.AppDelegate.debugMode)
-    NSLog(@"decidePolicyForNavigationAction, navigating to %@", url);
-  
+  os_log_debug([KMLogs uiLog], "decidePolicyForNavigationAction, navigating to %@", url);
+
   // The pattern for matching links matches work in #3602
   NSString* urlPathMatchKeyboardsInstall = @"^http(?:s)?://keyman(?:-staging)?\\.com(?:\\.local)?/keyboards/install/([^?/]+)(?:\\?(.+))?$";
   // e.g. https://keyman.com/keyboards/install/foo
@@ -61,8 +61,7 @@
   NSArray* matchesInstall = [regexInstall matchesInString:url options:0 range:range];
   
   if(matchesInstall.count > 0) {
-    if (self.AppDelegate.debugMode)
-      NSLog(@"Farming out download to app delegate.");
+    os_log_debug([KMLogs uiLog], "Delegating download to app delegate.");
     [listener ignore];
     NSTextCheckingResult* match = (NSTextCheckingResult*) matchesInstall[0];
     NSString* matchKeyboardId = [url substringWithRange:[match rangeAtIndex:1]];
@@ -74,22 +73,19 @@
           [regexGo numberOfMatchesInString:url options:0 range:range] > 0) {
     // allow https://keyman.com/keyboards* to go through
     // allow https://keyman.com/go/macos/download-keyboards to go through
-    if (self.AppDelegate.debugMode)
-      NSLog(@"Accepting link in this browser.");
+    os_log_debug([KMLogs uiLog], "Accepting link in this browser.");
     [listener use];
   }
   else if([url startsWith:@"keyman:"]) {
     if ([url startsWith:@"keyman:link?url="])
     {
-      if (self.AppDelegate.debugMode)
-        NSLog(@"Opening keyman:link URL in default browser: %@", url);
+      os_log_debug([KMLogs uiLog], "Opening keyman:link URL in default browser: %@", url);
       [listener ignore];
       url = [request.URL.absoluteString substringFromIndex:[@"keyman:link?url=" length]];
       [[NSWorkspace sharedWorkspace] openURL: [[NSURL alloc] initWithString:url]];
     }
     else {
-      if (self.AppDelegate.debugMode)
-        NSLog(@"Farming out download to app delegate.");
+      os_log_debug([KMLogs uiLog], "Delegating download to app delegate.");
       [listener ignore];
       [self.AppDelegate processURL:url];
     }
@@ -97,8 +93,7 @@
   else
   {
     // Open in external browser
-    if (self.AppDelegate.debugMode)
-      NSLog(@"Opening URL in default browser: %@", url);
+    os_log_debug([KMLogs uiLog], "Opening URL in default browser: %@", url);
     [listener ignore];
     [[NSWorkspace sharedWorkspace] openURL: [[NSURL alloc] initWithString:url]];
   }

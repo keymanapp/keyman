@@ -7,6 +7,7 @@
 //
 
 #import "KMAboutBGView.h"
+#import "KMLogs.h"
 
 @implementation KMAboutBGView
 
@@ -20,15 +21,15 @@
   NSRect topFill, botFill;
   topFill = rect;
   botFill = rect;
-  //    NSLog(@"rect origin x %f y %f  size h %f w %f", rect.origin.x, rect.origin.y, rect.size.height, rect.size.width);
+  //os_log_debug([KMLogs uiLog], "rect origin x %f y %f  size h %f w %f", rect.origin.x, rect.origin.y, rect.size.height, rect.size.width);
   NSView *topImgView = [self viewWithTag:1];
-  //    NSLog(@"topImgView origin x %f y %f  size h %f w %f before", topImgView.frame.origin.x, topImgView.frame.origin.y, topImgView.frame.size.height, topImgView.frame.size.width);
+  //os_log_debug([KMLogs uiLog], "topImgView origin x %f y %f  size h %f w %f before", topImgView.frame.origin.x, topImgView.frame.origin.y, topImgView.frame.size.height, topImgView.frame.size.width);
   NSInteger imgOriginHeightDelta = topImgView.frame.origin.y - rect.origin.y;
   topFill.origin.y += imgOriginHeightDelta;
   topFill.size.height -= imgOriginHeightDelta;
   botFill.size.height = imgOriginHeightDelta;
-  //    NSLog(@"topFill origin x %f y %f  size h %f w %f after raising to imgHeight %ld", topFill.origin.x, topFill.origin.y, topFill.size.height, topFill.size.width, imgOriginHeightDelta);
-  //    NSLog(@"botFill origin x %f y %f  size h %f w %f after reducing by imgHeight %ld", botFill.origin.x, botFill.origin.y, botFill.size.height, botFill.size.width, imgOriginHeightDelta);
+  //os_log_debug([KMLogs uiLog], "topFill origin x %f y %f  size h %f w %f after raising to imgHeight %ld", topFill.origin.x, topFill.origin.y, topFill.size.height, topFill.size.width, imgOriginHeightDelta);
+  //os_log_debug([KMLogs uiLog], "botFill origin x %f y %f  size h %f w %f after reducing by imgHeight %ld", botFill.origin.x, botFill.origin.y, botFill.size.height, botFill.size.width, imgOriginHeightDelta);
   [[NSColor whiteColor] setFill];
   NSRectFillUsingOperation(topFill, NSCompositingOperationSourceOver);
   [[NSColor windowBackgroundColor] setFill];
