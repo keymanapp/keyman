@@ -28,6 +28,7 @@
  */
 
 #import "PrivacyConsent.h"
+#import "KMLogs.h"
 
 @implementation PrivacyConsent
 
@@ -49,7 +50,7 @@
   BOOL hasAccessibility = NO;
   
   hasAccessibility = AXIsProcessTrusted();
-  NSLog(@"  hasAccessibility: %@",hasAccessibility ? @"YES" : @"NO");
+  os_log([KMLogs privacyLog], "  hasAccessibility: %@",hasAccessibility ? @"YES" : @"NO" );
   return hasAccessibility;
 }
 
@@ -72,13 +73,13 @@
   }
   
   if (hasAccessibility) {
-    NSLog(@"already have Accessibility: no need to make request.");
+    os_log([KMLogs privacyLog], "already has Accessibility: no need to make request.");
     // call completionHandler immediately -> privacyDialog will not be presented
     withCompletionHandler();
   } else {
     // set completionHandler to be called after privacyDialog is dismissed
     _completionHandler = withCompletionHandler;
-    NSLog(@"do not have Accessibility, present Privacy Dialog");
+    os_log([KMLogs privacyLog], "does not have Accessibility, present Privacy Dialog");
     [self showPrivacyDialog];
   }
 }
@@ -90,7 +91,7 @@
 {
   NSDictionary *options = @{(id)CFBridgingRelease(kAXTrustedCheckOptionPrompt): @YES};
   BOOL hasAccessibility = AXIsProcessTrustedWithOptions((CFDictionaryRef)options);
-  NSLog(@"  hasAccessibility: %@",hasAccessibility ? @"YES" : @"NO, requesting...");
+  os_log([KMLogs privacyLog], "hasAccessibility: %@",hasAccessibility ? @"YES" : @"NO, requesting...");
 }
 
 /**
@@ -100,7 +101,7 @@
 - (NSWindowController *)privacyDialog {
   if (!_privacyDialog) {
     _privacyDialog = [[PrivacyWindowController alloc] initWithWindowNibName:@"PrivacyWindowController"];
-    NSLog(@"privacyDialog created");
+    os_log([KMLogs privacyLog], "privacyDialog created");
     [self configureDialogForOsVersion];
   }
   
@@ -171,9 +172,9 @@
   // below checks for ListenEvent access
   if (@available(macOS 10.15, *)) {
     hasAccess = CGPreflightListenEventAccess();
-    NSLog(@"CGPreflightListenEventAccess() returned %@", hasAccess ? @"YES" : @"NO");
+    os_log([KMLogs privacyLog], "CGPreflightListenEventAccess() returned %@", hasAccess ? @"YES" : @"NO");
   } else {
-    NSLog(@"CGPreflightListenEventAccess not available before macOS version 10.15");
+    os_log([KMLogs privacyLog], "CGPreflightListenEventAccess not available before macOS version 10.15");
   }
   return hasAccess;
 }
@@ -192,9 +193,9 @@
   if (@available(macOS 10.15, *)) {
     hasAccess = CGPreflightPostEventAccess();
     
-    NSLog(@"CGPreflightPostEventAccess() returned %@", hasAccess ? @"YES" : @"NO");
+    os_log([KMLogs privacyLog], "CGPreflightPostEventAccess() returned %@", hasAccess ? @"YES" : @"NO");
   } else {
-    NSLog(@"CGPreflightPostEventAccess not available before macOS version 10.15");
+    os_log([KMLogs privacyLog], "CGPreflightPostEventAccess not available before macOS version 10.15");
   }
   return hasAccess;
 }
@@ -209,9 +210,9 @@
   
   if (@available(macOS 10.15, *)) {
     granted = CGRequestListenEventAccess();
-    NSLog(@"CGRequestListenEventAccess() returned %@", granted ? @"YES" : @"NO");
+    os_log([KMLogs privacyLog], "CGRequestListenEventAccess() returned %@", granted ? @"YES" : @"NO");
   } else {
-    NSLog(@"CGRequestListenEventAccess not available before macOS version 10.15");
+    os_log([KMLogs privacyLog], "CGRequestListenEventAccess not available before macOS version 10.15");
   }
   return granted;
 }
@@ -226,9 +227,9 @@
   
   if (@available(macOS 10.15, *)) {
     granted = CGRequestPostEventAccess();
-    NSLog(@"CGRequestPostEventAccess() returned %@", granted ? @"YES" : @"NO");
+    os_log([KMLogs privacyLog], "CGRequestPostEventAccess() returned %@", granted ? @"YES" : @"NO");
   } else {
-    NSLog(@"CGRequestPostEventAccess not available before macOS version 10.15");
+    os_log([KMLogs privacyLog], "CGRequestPostEventAccess not available before macOS version 10.15");
   }
   return granted;
 }
