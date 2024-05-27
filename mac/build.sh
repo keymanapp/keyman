@@ -303,7 +303,7 @@ builder_run_action build:engine   do_build_engine
 builder_run_action build:app      do_build_app
 builder_run_action build:testapp  do_build_testapp
 
-builder_run_action test:engine    execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $QUIET_FLAG test -scheme $ENGINE_NAME"
+builder_run_action test:engine    execBuildCommand $ENGINE_NAME "xcodebuild -project \"$KME4M_PROJECT_PATH\" $BUILD_OPTIONS test -scheme $ENGINE_NAME"
 builder_run_action test:app       execBuildCommand "$IM_NAME-tests" "xcodebuild test -workspace \"$KMIM_WORKSPACE_PATH\" $CODESIGNING_SUPPRESSION $BUILD_OPTIONS -scheme Keyman SYMROOT=\"$KM4MIM_BASE_PATH/build\""
 
 builder_run_action install do_install
