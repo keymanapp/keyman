@@ -10,11 +10,24 @@
 #include "core_icu.h"
 #include "kmx/kmx_xstring.h"
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#include "utfcodec.hpp"
+// JS implementations
+
+EM_JS(char*, NormalizeNFD, (const char* input), {
+  if (!input) return input; // pass through null
+  const instr = Module.UTF8ToString(input);
+  const nfd = instr.normalize("NFD");
+  return stringToNewUTF8(nfd);
+});
+#endif
 
 namespace km {
 namespace core {
 namespace util {
 
+#ifndef __EMSCRIPTEN__
 
 /**
  * Internal function to normalize with a specified mode.
@@ -41,6 +54,7 @@ static bool normalize(const icu::Normalizer2 *n, std::u16string &str, UErrorCode
   }
   return U_SUCCESS(status);
 }
+#endif
 
 bool normalize_nfd(std::u32string &str) {
   std::u16string rstr = km::core::kmx::u32string_to_u16string(str);
@@ -53,10 +67,24 @@ bool normalize_nfd(std::u32string &str) {
 }
 
 bool normalize_nfd(std::u16string &str) {
+#ifdef __EMSCRIPTEN__
+  std::string instr = convert<char16_t,char>(str);
+  const char *in = instr.c_str();
+  char *out = NormalizeNFD(in);
+  if (out == nullptr) {
+    assert(out != nullptr);
+    return false;
+  }
+  std::string outstr(out);
+  str = convert<char,char16_t>(outstr);
+  free(out);
+  return true;
+#else
   UErrorCode status = U_ZERO_ERROR;
   const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
   UASSERT_SUCCESS(status);
   return normalize(nfd, str, status);
+#endif
 }
 
 /**
