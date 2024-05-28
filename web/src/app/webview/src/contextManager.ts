@@ -197,8 +197,8 @@ export default class ContextManager extends ContextManagerBase<WebviewConfigurat
     return activatingKeyboard;
   }
 
-  public resetContext(): void {
-    super.resetContext();
+  public async resetContext(): Promise<void> {
+    await super.resetContext();
     this._rawContext.saveState();
   }
 }
