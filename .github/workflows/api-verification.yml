@@ -57,6 +57,7 @@ jobs:
       with:
         ref: '${{ steps.environment_step.outputs.GIT_SHA }}'
         fetch-depth: 0
+        clean: false
 
     - name: Install devscripts
       uses: ./.github/actions/apt-install
