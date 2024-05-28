@@ -256,19 +256,23 @@ TEST_F(CompilerTest, IsValidKeyboardVersion_test) {
 // KMX_BOOL kmcmp::CheckStoreUsage(PFILE_KEYBOARD fk, int storeIndex, KMX_BOOL fIsStore, KMX_BOOL fIsOption, KMX_BOOL fIsCall)
 // KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, KMX_BYTE**data, size_t& dataSize)
 // KMX_DWORD ReadLine(KMX_BYTE* infile, int sz, int& offset, PKMX_WCHAR wstr, KMX_BOOL PreProcess)
-// KMX_DWORD GetRHS(PFILE_KEYBOARD fk, PKMX_WCHAR p, PKMX_WCHAR buf, int bufsize, int offset, int IsUnicode)
 
 TEST_F(CompilerTest, GetRHS_test) {
     FILE_KEYBOARD fk;
     KMX_WCHAR str[LINESIZE];
+    KMX_WCHAR tstr[128];
 
     // CERR_NoTokensFound, empty string
     str[0] = '\0';
-    EXPECT_EQ(CERR_NoTokensFound, GetRHS(&fk, str, NULL, 0, 0, FALSE));
+    EXPECT_EQ(CERR_NoTokensFound, GetRHS(&fk, str, tstr, 80, 0, FALSE));
 
     // CERR_NoTokensFound, no '>'
     u16cpy(str, u"abc");
-    EXPECT_EQ(CERR_NoTokensFound, GetRHS(&fk, str, NULL, 0, 0, FALSE));    
+    EXPECT_EQ(CERR_NoTokensFound, GetRHS(&fk, str, tstr, 80, 0, FALSE));
+
+    // CERR_None
+    u16cpy(str, u"> nul c\n");
+    EXPECT_EQ(CERR_None, GetRHS(&fk, str, tstr, 80, 0, FALSE));
 }
 
 // void safe_wcsncpy(PKMX_WCHAR out, PKMX_WCHAR in, int cbMax)
