@@ -241,9 +241,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   touchCount: number;
   currentTarget: KeyElement;
 
-  // Used by embedded-mode's globe key
-  menuEvent: KeyElement; // Used by embedded-mode.
-
   // Popup key management
   keytip: KeyTip;
   gesturePreviewHost: GesturePreviewHost;

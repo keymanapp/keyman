@@ -12,14 +12,10 @@ export function setupEmbeddedListeners(engine: KeymanEngine, osk: OSKView) {
       if(typeof engine.showKeyboardList == 'function') { // OSKView event: shouldShowLanguageMenu
         engine.showKeyboardList();                       // Is connected to VisualKeyboard event: globeKey
       }
-    } else if(osk.vkbd) {
-      if(osk.vkbd.menuEvent) {
-        this.highlightKey(osk.vkbd.menuEvent, false);
-      }
+    } else {
       if(typeof(engine.menuKeyUp) == 'function') { // VisualKeyboard event:  globeKey
         engine.menuKeyUp();
       }
-      osk.vkbd.menuEvent = null;
     }
 
     if(osk.vkbd) {
