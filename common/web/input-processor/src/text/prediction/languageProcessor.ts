@@ -214,7 +214,7 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
     // This may refer to the context before an input keystroke or before application
     // of a predictive suggestion.
     let original = this.getPredictionState(suggestion.transformId);
-    if(!original) {
+    if(!original || !this.isConfigured) {
       console.warn("Could not apply the Suggestion!");
       return null;
     } else {
