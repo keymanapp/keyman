@@ -293,7 +293,7 @@ if(!keyman?.ui?.name) {
 
         /* TODO: why is this still needed??? Does it actually do anything?? */
         osk.addEventListener('hide', function(obj) {
-          if((arguments.length > 0) && obj['hiddenByUser']) {
+          if((arguments.length > 0) && obj.HiddenByUser) {
             let _a = document.getElementById('KMW_Keyboard');
             if(_a) {
               _a.className = 'kmw_hide';
