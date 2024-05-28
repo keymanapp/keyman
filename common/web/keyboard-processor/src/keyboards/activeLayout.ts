@@ -61,6 +61,35 @@ const KeyTypesOfKeyMap = {
 // based on available hints.  (i.e., `layout.defaultHint == 'flick'`)
 const KeyTypesOfFlickList = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] as const;
 
+/**
+ * Copies non-computed properties and enumerable scomputed property definitions
+ * for any properties not yet defined on the target object.
+ * @param rawObj
+ * @param defaults
+ */
+function assignDefaultsWithPropDefs<RawType, Type extends RawType>(rawObj: RawType, defaults: Type) {
+  const proto = Object.getPrototypeOf(defaults);
+
+  for(let prop in defaults) {
+    if(!rawObj.hasOwnProperty(prop)) {
+      let descriptor = Object.getOwnPropertyDescriptor(proto, prop);
+      if(descriptor) {
+        // It's a computed property!  Copy the descriptor onto the key's object.
+        Object.defineProperty(rawObj, prop, descriptor);
+      } else {
+        // Type 'Extract<keyof Type, string>' cannot be used to index type
+        // 'RawType'. (ts2536)
+        // @ts-ignore
+        // the whole point of this function is to polyfill `rawObj` so that it's
+        // duck-typable to `Type`.
+        rawObj[prop] = defaults[prop];
+      }
+    }
+  }
+
+  return rawObj as Type;
+}
+
 export class ActiveKeyBase {
   static readonly DEFAULT_PAD=15;          // Padding to left of key, in virtual units
   static readonly DEFAULT_RIGHT_MARGIN=15; // Padding to right of right-most key, in virtual units
@@ -315,21 +344,7 @@ export class ActiveKeyBase {
       hasMultitaps: false
     }
 
-    // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
-    let dummy = new ActiveKeyBase();
-    let proto = Object.getPrototypeOf(dummy);
-
-    for(let prop in dummy) {
-      if(!key.hasOwnProperty(prop)) {
-        let descriptor = Object.getOwnPropertyDescriptor(proto, prop);
-        if(descriptor) {
-          // It's a computed property!  Copy the descriptor onto the key's object.
-          Object.defineProperty(key, prop, descriptor);
-        } else {
-          key[prop] = dummy[prop];
-        }
-      }
-    }
+    assignDefaultsWithPropDefs(key, new ActiveKeyBase());
 
     if(!key.text && typeof key.id == 'string') {
       key.text = ActiveKey.unicodeIDToText(key.id);
@@ -539,11 +554,16 @@ export class ActiveRow implements LayoutRow {
   ) {
     // Apply defaults, setting the width and other undefined properties for each key
     let keys=row['key'];
+    const DEFAULT_KEY = ActiveKeyBase.DEFAULT_KEY;
     for(let j=0; j<keys.length; j++) {
       let key=keys[j];
-      for(var tp in ActiveKey.DEFAULT_KEY) {
-        if(typeof key[tp] != 'string' && typeof key[tp] != 'number') {
-          key[tp]=ActiveKey.DEFAULT_KEY[tp];
+      let keySet = Object.keys(DEFAULT_KEY);
+      for(let tp in keySet) {
+        const typedKey = tp as keyof typeof DEFAULT_KEY;
+        if(typeof key[typedKey] != 'string' && typeof key[typedKey] != 'number') {
+          // We detected a value of the wrong type.
+          // @ts-ignore  // Type 'string' is not assignable to type 'never'. (ts2322)
+          key[typedKey]=DEFAULT_KEY[typedKey];
         }
       }
 
@@ -615,13 +635,7 @@ export class ActiveRow implements LayoutRow {
       }
     }
 
-    // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
-    let dummy = new ActiveRow();
-    for(let key in dummy) {
-      if(!row.hasOwnProperty(key)) {
-        row[key] = dummy[key];
-      }
-    }
+    assignDefaultsWithPropDefs(row, new ActiveRow());
 
     let aRow = row as ActiveRow;
     aRow.proportionalY = proportionalY;
@@ -703,13 +717,7 @@ export class ActiveLayer implements LayoutLayer {
       ActiveRow.polyfill(layer.row[i], keyboard, layout, layer.id, totalWidth, rowProportionalY, analysisFlagObj);
     }
 
-    // Add class functions and properties to the existing layout object, allowing it to act as an ActiveLayout.
-    let dummy = new ActiveLayer();
-    for(let key in dummy) {
-      if(!layer.hasOwnProperty(key)) {
-        layer[key] = dummy[key];
-      }
-    }
+    assignDefaultsWithPropDefs(layer, new ActiveLayer());
 
     let aLayer = layer as ActiveLayer;
     aLayer.totalWidth = totalWidth;
@@ -838,12 +846,7 @@ export class ActiveLayout implements LayoutFormFactor{
     let layers=layout.layer;
 
     // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
-    let dummy = new ActiveLayout();
-    for(let key in dummy) {
-      if(!layout.hasOwnProperty(key)) {
-        layout[key] = dummy[key];
-      }
-    }
+    assignDefaultsWithPropDefs(layout, new ActiveLayout());
 
     let aLayout = layout as ActiveLayout;
     aLayout.keyboard = keyboard;
