@@ -443,7 +443,7 @@
     </Control>
 
     <Control Name="cmdOK" Title="Options Dialog">
-      <p>Click OK to save changes.</p>
+      <p>Click OK to save changes and close the dialog.</p>
     </Control>
 
     <Control Name="chkUseTab" Title="Use tab character">
