@@ -389,7 +389,7 @@
 
   <Form Name="context/options">
     <Control Name="pages" Title="Options Dialog">
-      <p>The following options are configurable in TIKE in the General tab.</p>
+      <p>The Options dialog display several tabs such as General, Editor, Debugger, Character Map and Server. You can configure the environment of Keyman Developer here.</p>
     </Control>
 
     <Control Name="chkShowStartupDialog" Title="General tab">
@@ -492,7 +492,9 @@
     </Control>
 
     <Control Name="chkDebuggerAutoResetBeforeCompiling" Title="Automatically reset debugger before recompiling">
-      <p>update is coming</p>
+      <p>If you are debugging a keyboard, make a change to the keyboard, and recompile it, then the debugger needs to be 
+        reset in order to get access to the new keyboard. Keyman Developer will normally prompt you to do this, but if you set 
+        this option, then it will reset the debugger automatically instead.</p>
     </Control>
 
     <Control Name="editWebHostDefaultPort" Title="Debugger tab">
@@ -516,7 +518,7 @@
       <p>Rebuilds the Unicode character database from source unicodedata.txt and blocks.txt. 
       These files can be downloaded from the Unicode website at http://www.unicode.org/ucd/. 
       This lets you update the character map with a newer version of Unicode. 
-      Keyman Developer 10.0 was released with Unicode version 10.0 data.</p>
+      Keyman Developer 17.0 was released with Unicode version 15.1 data.</p>
     </Control>
 
     <Control Name="cmdConfigureServer" Title="Configure Server...">
