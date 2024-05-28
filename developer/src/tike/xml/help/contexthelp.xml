@@ -439,7 +439,7 @@
     </Control>
 
     <Control Name="cmdCancel" Title="Options Dialog">
-      <p>Click Cancel to close the tab.</p>
+      <p>Click Cancel to close the dialog without saving changes.</p>
     </Control>
 
     <Control Name="cmdOK" Title="Options Dialog">
