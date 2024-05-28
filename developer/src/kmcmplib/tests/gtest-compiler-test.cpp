@@ -14,6 +14,7 @@ KMX_BOOL AddCompileError(KMX_DWORD msg);
 KMX_DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 KMX_DWORD ValidateMatchNomatchOutput(PKMX_WCHAR p);
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString);
+KMX_DWORD GetRHS(PFILE_KEYBOARD fk, PKMX_WCHAR p, PKMX_WCHAR buf, int bufsize, int offset, int IsUnicode);
 bool hasPreamble(std::u16string result);
 
 extern kmcmp_CompilerMessageProc msgproc;
@@ -256,6 +257,20 @@ TEST_F(CompilerTest, IsValidKeyboardVersion_test) {
 // KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, KMX_BYTE**data, size_t& dataSize)
 // KMX_DWORD ReadLine(KMX_BYTE* infile, int sz, int& offset, PKMX_WCHAR wstr, KMX_BOOL PreProcess)
 // KMX_DWORD GetRHS(PFILE_KEYBOARD fk, PKMX_WCHAR p, PKMX_WCHAR buf, int bufsize, int offset, int IsUnicode)
+
+TEST_F(CompilerTest, GetRHS_test) {
+    FILE_KEYBOARD fk;
+    KMX_WCHAR str[LINESIZE];
+
+    // CERR_NoTokensFound, empty string
+    str[0] = '\0';
+    EXPECT_EQ(CERR_NoTokensFound, GetRHS(&fk, str, NULL, 0, 0, FALSE));
+
+    // CERR_NoTokensFound, no '>'
+    u16cpy(str, u"abc");
+    EXPECT_EQ(CERR_NoTokensFound, GetRHS(&fk, str, NULL, 0, 0, FALSE));    
+}
+
 // void safe_wcsncpy(PKMX_WCHAR out, PKMX_WCHAR in, int cbMax)
 // KMX_BOOL IsSameToken(PKMX_WCHAR *p, KMX_WCHAR const * token)
 // static bool endsWith(const std::string& str, const std::string& suffix)
