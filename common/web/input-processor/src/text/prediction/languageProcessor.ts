@@ -210,10 +210,16 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
       throw "Accepting suggestions requires a destination OutputTarget instance."
     }
 
+    if(!this.isConfigured) {
+      // If we're in this state, the suggestion is now outdated; the user must have swapped keyboard and model.
+      console.warn("Could not apply suggestion; the corresponding model has been unloaded");
+      return null;
+    }
+
     // Find the state of the context at the time the suggestion was generated.
     // This may refer to the context before an input keystroke or before application
     // of a predictive suggestion.
-    let original = this.getPredictionState(suggestion.transformId);
+    const original = this.getPredictionState(suggestion.transformId);
     if(!original) {
       console.warn("Could not apply the Suggestion!");
       return null;
