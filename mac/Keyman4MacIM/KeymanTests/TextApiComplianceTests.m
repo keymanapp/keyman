@@ -12,6 +12,7 @@
 #import <XCTest/XCTest.h>
 #import "TextApiCompliance.h"
 #import "AppleCompliantTestClient.h"
+#import "KMLogs.h"
 
 @interface TextApiComplianceTests : XCTestCase
 @end
@@ -153,7 +154,7 @@
   NSArray *legacyAppsArray = [NSArray arrayWithObjects:@"com.microsoft.VSCode",@"com.adobe.Photoshop",nil];
   
   BOOL isLegacy = [apiCompliance arrayContainsApplicationId:clientAppId fromArray:legacyAppsArray];
-  NSLog(@"isLegacy = %@", isLegacy?@"yes":@"no");
+  os_log_debug([KMLogs testLog], "isLegacy = %@", isLegacy?@"yes":@"no");
   XCTAssertFalse(isLegacy, @"App not expected to be in legacy list");
 }
 

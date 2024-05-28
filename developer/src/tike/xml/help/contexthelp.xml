@@ -386,4 +386,19 @@
       <p>The Project Manager allows you to manage all the files related to a keyboard layout in a single location.</p>
     </Control>
   </Form>
+
+  <Form Name="context/key-test">
+    <Control Name="cmdInsert" Title="Virtual Key Identifier">
+      <p>This dialog lets you check the virtual key code for any key combination (except Window reserved key combinations such as Alt + Tab). You can then insert the virtual key code into the last active edit window at the current cursor position.</p><br></br>
+      <p>Press Shift + Enter to insert the current virtual key code into your source at the insertion point.</p>
+    </Control>
+
+    <Control Name="chkLRDistinguish" Title="Virtual Key Identifier">
+      <p>You can see the virtual key codes for left and right Ctrl / Alt combinations by checking the "Distinguish between left and right ctrl/alt" checkbox.</p>
+    </Control>
+
+    <Control Name="cmdClose" Title="Virtual Key Identifier">
+      <p>To close the dialog, click the Close button or press Shift + Esc.</p>
+    </Control>
+  </Form>
 </ContextHelp>

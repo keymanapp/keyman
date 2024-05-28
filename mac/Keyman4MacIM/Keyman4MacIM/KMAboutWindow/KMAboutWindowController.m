@@ -9,6 +9,7 @@
 #import "KMAboutWindowController.h"
 #import "KMInputMethodAppDelegate.h"
 #import "KMOSVersion.h"
+#import "KMLogs.h"
 
 @interface KMAboutWindowController ()
 @property (nonatomic, weak) IBOutlet NSTextField *versionLabel;
@@ -53,12 +54,12 @@
   u_int16_t systemVersion = [KMOSVersion SystemVersion];
   if ([KMOSVersion Version_10_13_1] <= systemVersion && systemVersion <= [KMOSVersion Version_10_13_3]) // between 10.13.1 and 10.13.3 inclusive
   {
-    NSLog(@"About Box: calling workaround instead of showPreferences (sys ver %x)", systemVersion);
+    os_log([KMLogs uiLog], "About Box: calling workaround instead of showPreferences (sys ver %x)", systemVersion);
     [self.AppDelegate showConfigurationWindow]; // call our workaround
   }
   else
   {
-    NSLog(@"About Box: calling Apple's showPreferences (sys ver %x)", systemVersion);
+    os_log([KMLogs uiLog], "About Box: calling Apple's showPreferences (sys ver %x)", systemVersion);
     [self.AppDelegate.inputController showPreferences:sender]; // call Apple API
   }
   [self close];

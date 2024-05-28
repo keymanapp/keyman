@@ -35,6 +35,7 @@
 #import "TextApiCompliance.h"
 #import <InputMethodKit/InputMethodKit.h>
 #import "KMInputMethodAppDelegate.h"
+#import "KMLogs.h"
 
 // this is the user managed list of non-compliant apps persisted in User Defaults
 NSString *const kKMLegacyApps = @"KMLegacyApps";
@@ -86,10 +87,10 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
   else {
     // if API exists, call it and see if it works as expected
     self.initialSelection = [client selectedRange];
-    [self.appDelegate logDebugMessage:@"TextApiCompliance checkCompliance, location = %lu, length = %lu", self.initialSelection.location, self.initialSelection.length];
+    os_log_debug([KMLogs complianceLog], "checkCompliance, location = %lu, length = %lu", self.initialSelection.location, self.initialSelection.length);
     [self checkComplianceUsingInitialSelection];
   }
-  [self.appDelegate logDebugMessage:@"TextApiCompliance checkCompliance workingSelectionApi for app %@: set to %@", self.clientApplicationId, self.complianceUncertain?@"YES":@"NO"];
+  os_log_debug([KMLogs complianceLog], "checkCompliance workingSelectionApi for app %{public}@: set to %{public}@", self.clientApplicationId, self.complianceUncertain?@"YES":@"NO");
 }
 
 -(void) checkComplianceUsingInitialSelection {
@@ -100,7 +101,7 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
      */
     self.hasCompliantSelectionApi = NO;
     self.complianceUncertain = YES;
-    [self.appDelegate logDebugMessage:@"TextApiCompliance checkComplianceUsingInitialSelection not compliant but uncertain, range is NSNotFound"];
+    os_log_debug([KMLogs complianceLog], "checkComplianceUsingInitialSelection not compliant but uncertain, range is NSNotFound");
   } else if (self.initialSelection.location >= 0) {
     /**
      * location greater than or equal to zero may just mean that the client
@@ -109,7 +110,7 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
      */
     self.hasCompliantSelectionApi = YES;
     self.complianceUncertain = YES;
-    [self.appDelegate logDebugMessage:@"TextApiCompliance checkComplianceUsingInitialSelection compliant but uncertain, location >= 0"];
+    os_log_debug([KMLogs complianceLog], "checkComplianceUsingInitialSelection compliant but uncertain, location >= 0");
   }
 }
 
@@ -122,7 +123,7 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
   
   // return if compliance is already certain
   if(!self.complianceUncertain) {
-    [self.appDelegate logDebugMessage:@"TextApiCompliance checkComplianceAfterInsert, compliance is already known"];
+    os_log_debug([KMLogs complianceLog], "checkComplianceAfterInsert, compliance is already known");
     return;
   }
   
@@ -133,7 +134,7 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
     [self validateLocationChange:changeExpected hasLocationChanged:locationChanged];
   }
   
-  [self.appDelegate logDebugMessage:@"TextApiCompliance checkComplianceAfterInsert, self.hasWorkingSelectionApi = %@ for app %@", self.hasCompliantSelectionApi?@"YES":@"NO", self.clientApplicationId];
+  os_log_info([KMLogs complianceLog], "checkComplianceAfterInsert, self.hasWorkingSelectionApi = %{public}@ for app %{public}@", self.hasCompliantSelectionApi?@"YES":@"NO", self.clientApplicationId);
 }
 
 - (BOOL)validateNewLocation:(NSUInteger)location delete:(NSString *)textToDelete  {
@@ -143,16 +144,16 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
     // invalid location: insertText means we have focus, NSNotFound means selection API not functioning
     self.hasCompliantSelectionApi = NO;
     self.complianceUncertain = NO;
-    [self.appDelegate logDebugMessage:@"TextApiCompliance validateNewLocation = NO, location is NSNotFound"];
+    os_log_debug([KMLogs complianceLog], "validateNewLocation = NO, location is NSNotFound");
   } else if ((location == 0) && (textToDelete.length > 0)) {
     // invalid location: cannot have text to delete at location zero
     self.hasCompliantSelectionApi = NO;
     self.complianceUncertain = NO;
-    [self.appDelegate logDebugMessage:@"TextApiCompliance validateNewLocation = NO, location is zero with textToDelete.length > 0"];
+    os_log_debug([KMLogs complianceLog], "validateNewLocation = NO, location is zero with textToDelete.length > 0");
   } else {
     // location is valid, but do not know if it is compliant yet
     validLocation = YES;
-    [self.appDelegate logDebugMessage:@"TextApiCompliance validateNewLocation = YES, newLocation = %d, oldLocation = %d", location, self.initialSelection.location];
+    os_log_debug([KMLogs complianceLog], "validateNewLocation = YES, newLocation = %lu, oldLocation = %lu", (unsigned long)location, (unsigned long)self.initialSelection.location);
   }
   return validLocation;
 }
@@ -163,18 +164,18 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
     // YES for certain, the location is where we expect it
     self.hasCompliantSelectionApi = YES;
     self.complianceUncertain = NO;
-    [self.appDelegate logDebugMessage:@"TextApiCompliance validateLocationChange compliant, locationChanged = %@, changeExpected = %@", locationChanged?@"YES":@"NO", changeExpected?@"YES":@"NO"];
+    os_log_debug([KMLogs complianceLog], "validateLocationChange compliant, locationChanged = %{public}@, changeExpected = %{public}@", locationChanged?@"YES":@"NO", changeExpected?@"YES":@"NO");
   } else if (changeExpected != locationChanged) {
     // NO for certain, when the selection is unchanged after an insert
     self.hasCompliantSelectionApi = NO;
     self.complianceUncertain = NO;
-    [self.appDelegate logDebugMessage:@"TextApiCompliance validateLocationChange non-compliant, locationChanged = %@, changeExpected = %@", locationChanged?@"YES":@"NO", changeExpected?@"YES":@"NO"];
+    os_log_debug([KMLogs complianceLog], "validateLocationChange non-compliant, locationChanged = %{public}@, changeExpected = %{public}@", locationChanged?@"YES":@"NO", changeExpected?@"YES":@"NO");
   }
 }
 
 - (BOOL)isLocationChangeExpectedOnInsert:(NSString *)textToDelete insert:(NSString *)textToInsert {
   BOOL changeExpected = textToInsert.length != textToDelete.length;
-  [self.appDelegate logDebugMessage:@"TextApiCompliance isLocationChangeExpected, changeExpected = %@", changeExpected?@"YES":@"NO"];
+  os_log_debug([KMLogs complianceLog], "isLocationChangeExpected, changeExpected = %{public}@", changeExpected?@"YES":@"NO");
   
   return changeExpected;
 }
@@ -183,8 +184,7 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
   NSUInteger newLocation = newSelection.location;
   NSUInteger oldLocation = self.initialSelection.location;
   BOOL locationChanged = newLocation != oldLocation;
-  [self.appDelegate logDebugMessage:@"TextApiCompliance hasLocationChanged, currentSelection = %lu, length = %lu", newSelection.location, newSelection.length];
-  
+  os_log_debug([KMLogs complianceLog], "hasLocationChanged: %{public}@, new location: %lu, selection length: %lu", locationChanged?@"YES":@"NO", newSelection.location, newSelection.length);
   return locationChanged;
 }
 
@@ -198,7 +198,7 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
     isAppNonCompliant = [self containedInUserManagedNoncompliantAppList:clientAppId];
   }
   
-  [self.appDelegate logDebugMessage:@"applyNoncompliantAppLists: for app %@: %@", clientAppId, isAppNonCompliant?@"YES":@"NO"];
+  os_log_info([KMLogs complianceLog], "applyNoncompliantAppLists: for app %{public}@: %{public}@", clientAppId, isAppNonCompliant?@"YES":@"NO");
   
   if (isAppNonCompliant) {
     self.complianceUncertain = NO;
@@ -238,7 +238,7 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
                             /*||[clientAppId isEqual: @"ro.sync.exml.Oxygen"] - Oxygen has worse problems */
                             );
   
-  [self.appDelegate logDebugMessage:@"containedInHardCodedNoncompliantAppList: for app %@: %@", clientAppId, isAppNonCompliant?@"yes":@"no"];
+  os_log_debug([KMLogs complianceLog], "containedInHardCodedNoncompliantAppList: for app %{public}@: %{public}@", clientAppId, isAppNonCompliant?@"yes":@"no");
   return isAppNonCompliant;
 }
 
@@ -260,7 +260,7 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
   if(legacyAppsUserDefaults != nil) {
     isAppNonCompliant = [self arrayContainsApplicationId:clientAppId fromArray:legacyAppsUserDefaults];
   }
-  [self.appDelegate logDebugMessage:@"containedInUserManagedNoncompliantAppList: for app %@: %@", clientAppId, isAppNonCompliant?@"yes":@"no"];
+  os_log_debug([KMLogs complianceLog], "containedInUserManagedNoncompliantAppList: for app %{public}@: %{public}@", clientAppId, isAppNonCompliant?@"yes":@"no");
   return isAppNonCompliant;
 }
 
@@ -271,7 +271,7 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
   for(id appId in applicationArray) {
     if(![appId isKindOfClass:[NSString class]]) {
       // always log this: bad data in UserDefaults
-      NSLog(@"arrayContainsApplicationId:fromArray: LegacyApps user defaults array should contain only strings");
+      os_log_error([KMLogs complianceLog], "arrayContainsApplicationId:fromArray: LegacyApps user defaults array should contain only strings");
     } else {
       NSError *error = nil;
       NSRange range =  NSMakeRange(0, applicationId.length);
@@ -279,7 +279,7 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
       NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern: (NSString *) appId options: 0 error: &error];
       NSArray *matchesArray = [regex matchesInString:applicationId options:0 range:range];
       if(matchesArray.count>0) {
-        [self.appDelegate logDebugMessage:@"arrayContainsApplicationId: found match for application ID %@: ", applicationId];
+        os_log_debug([KMLogs complianceLog], "arrayContainsApplicationId: found match for application ID %{public}@: ", applicationId);
         return YES;
       }
     }

@@ -28,7 +28,7 @@ begin
   TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop, LOGGER_DESKTOP_KMSHELL, LoadKeymanDesktopSentryFlags);
   try
     CoInitFlags := COINIT_APARTMENTTHREADED;
-    FInitializeCEF := TCEFManager.Create;
+    FInitializeCEF := TCEFManager.Create(False);
     try
       if FInitializeCEF.Start then
       try

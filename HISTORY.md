@@ -1,5 +1,56 @@
 # Keyman Version History
 
+## 18.0.44 alpha 2024-05-24
+
+* fix(linux): Pass artifacts key to API verification GHA (#11517)
+* fix(web): properly pass test-runner verbose-logging flag (#11509)
+* chore(developer): add context/key-test (#11512)
+* fix(android/engine): Ignore updating invalid selections (#11510)
+* docs(common): update min emscripten version in docs to 3.1.46 (#11530)
+* fix(linux): Properly use and pass run_id (#11533)
+
+## 18.0.43 alpha 2024-05-24
+
+* fix(android): Revert Sentry version for FV Android (#11522)
+* chore(windows): remove schedule task clean up introduced in 15.0 Alpha (#11521)
+* fix(windows): add FirstVoices Keyboards build to Windows release build (#11524)
+
+## 18.0.42 alpha 2024-05-23
+
+* chore(web): conversion of Web's browser-integration auto-tests for @web/test-runner use (#11455)
+* chore(web): conversion of Web's end-to-end style auto-tests for @web/test-runner use (#11456)
+* chore(web): finalization for replacement of Karma with Web Test Runner (#11300)
+* fix(android): Delete sentry-cli-2.31.1.exe during CI builds (#11493)
+* change(common): remove `is:open` from issue templates (#11492)
+* chore(developer): build.sh for developer (#11421)
+* chore(windows): move from Makefile to build.sh (#11461)
+* fix(linux): Add missing variable to API verification GHA (#11511)
+* chore(common): Update standards data (#11003)
+
+## 18.0.41 alpha 2024-05-22
+
+* fix(developer): handle `KM_CORE_IT_INVALIDATE_CONTEXT` in debugger (#11488)
+* chore(linux): Trigger GHA packaging for stable builds :cherries: (#11495)
+* chore(android,mac,windows): Update crowdin strings for DE (#11497)
+* feat(web): custom infrastructure for @web/test-runner use (#11403)
+* chore(web): conversion of lm-worker browser-test for @web/test-runner use (#11404)
+* chore(web): conversion of lm-layer browser-tests for @web/test-runner use (#11452)
+* chore(web): conversion of Web keyboard-loading browser-tests for @web/test-runner use (#11453)
+* chore(web): conversion of Web gesture-engine browser-tests for @web/test-runner use (#11454)
+
+## 18.0.40 alpha 2024-05-21
+
+* refactor(common): move `enabled` declaration into test_color.cpp (#11483)
+* test(developer) kmn compiler messages unit tests (#11284)
+* chore(linux): Move API verification to separate action (#10637)
+
+## 18.0.39 alpha 2024-05-20
+
+* chore(mac): change indentation of source code to equal standard two spaces (#11432)
+* fix(common): calculate already-build dependency targets correctly (#11477)
+* fix(common): properly quote `builder_run_action` call (#11478)
+* fix(android/app): Verify extracted text is not null (#11481)
+
 ## 18.0.38 alpha 2024-05-17
 
 * chore(common): Auto-generate minimum-versions.md from min-ver.sh (#11399)

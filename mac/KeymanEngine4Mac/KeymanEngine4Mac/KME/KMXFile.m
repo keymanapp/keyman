@@ -11,6 +11,7 @@
 #import "KMCompGroup.h"
 #import "KMCompKey.h"
 #import "NSString+XString.h"
+#import "KMELogs.h"
 
 NSString *const kKMKeyboardNameKey = @"KMKeyboardNameKey";
 NSString *const kKMKeyboardVersionKey = @"KMKeyboardVersionKey";
@@ -31,7 +32,7 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
     
     NSFileHandle *file = [NSFileHandle fileHandleForReadingAtPath:path];
     if (file == nil) {
-      //NSLog(@"Failed to open kmx file");
+      os_log_error([KMELogs configLog], "Failed to open kmx file");
       _filePath = nil;
       return nil;
     }
@@ -162,7 +163,7 @@ NSString *const kKMVisualKeyboardKey = @"KMVisualKeyboardKey";
   NSFileHandle *file = [NSFileHandle fileHandleForReadingAtPath:path];
   
   if (file == nil) {
-    //NSLog(@"Failed to open file");
+    os_log_error([KMELogs configLog], "Failed to open file");
     return nil;
   }
   

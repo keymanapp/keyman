@@ -25,6 +25,7 @@
 #include <test_color.h>
 
 #include "keyman_core.h"
+#include "util_normalize.hpp"
 
 #include <kmx/kmx_xstring.h>  // for surrogate pair macros
 
@@ -361,7 +362,7 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
     } break;
     case km::tests::LDML_ACTION_CHECK_EXPECTED: {
       if (!normalization_disabled) {
-        assert(km::core::ldml::normalize_nfd(action.string));  // TODO-LDML: should be NFC
+        assert(km::core::util::normalize_nfd(action.string));  // TODO-LDML: should be NFC
       }
       std::cout << "- check expected" << std::endl;
       std::cout << "expected  : " << string_to_hex(action.string) << " [" << action.string << "]" << std::endl;
