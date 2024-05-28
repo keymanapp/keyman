@@ -82,7 +82,7 @@ type
     procedure optWriteBool(const nm: string; value: Boolean);
     procedure optWriteInt(const nm: string; value: Integer);
     procedure WriteServerConfigurationJson;
-    class function Default_DefaultProjectPath: string; static;
+    class function Get_Initial_DefaultProjectPath: string; static;
   public
     procedure Read;
     procedure Write;
@@ -366,11 +366,11 @@ begin
 
     FFix183_LadderLength := optReadInt(SRegValue_IDEOpt_WebLadderLength, CRegValue_IDEOpt_WebLadderLength_Default);
 
-    FDefaultProjectPath := IncludeTrailingPathDelimiter(optReadString(SRegValue_IDEOpt_DefaultProjectPath, Default_DefaultProjectPath));
+    FDefaultProjectPath := IncludeTrailingPathDelimiter(optReadString(SRegValue_IDEOpt_DefaultProjectPath, Get_Initial_DefaultProjectPath));
     if (FDefaultProjectPath = '\') or IsRelativePath(FDefaultProjectPath) then
     begin
       // #11554
-      FDefaultProjectPath := Default_DefaultProjectPath;
+      FDefaultProjectPath := Get_Initial_DefaultProjectPath;
     end;
 
     // for consistency with Keyman.System.KeymanSentryClient, we need to use
@@ -619,7 +619,7 @@ begin
   Result := DefaultEditorThemeItemIndex(s) >= 0;
 end;
 
-class function TKeymanDeveloperOptions.Default_DefaultProjectPath: string;
+class function TKeymanDeveloperOptions.Get_Initial_DefaultProjectPath: string;
 begin
   Result := GetFolderPath(CSIDL_PERSONAL) + CDefaultProjectPath;
 end;
