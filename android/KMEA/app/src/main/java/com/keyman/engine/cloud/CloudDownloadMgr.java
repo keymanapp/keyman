@@ -48,6 +48,12 @@ public class CloudDownloadMgr{
    */
   boolean isInitialized = false;
 
+  /**
+   * Marks that `registerReceiver` was successfully called, and thus should be unregistered
+   * at some later point in time.
+   */
+  boolean hasRegistered = false;
+
   private HashMap<Long,String> internalDownloadIdToDownloadIdentifier = new HashMap<>();
   private HashMap<String, CloudApiTypes.CloudDownloadSet> downloadSetByDownloadIdentifier = new HashMap<>();
 
@@ -69,6 +75,7 @@ public class CloudDownloadMgr{
       } else {
         aContext.registerReceiver(completeListener, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
       }
+      hasRegistered = true;
     } catch (IllegalStateException e) {
       String message = "initialize error: ";
       KMLog.LogException(TAG, message, e);
@@ -80,9 +87,8 @@ public class CloudDownloadMgr{
    * Remove downloadreceiver from the main context.
    * @param aContext the context
    */
-  public synchronized void shutdown(Context aContext)
-  {
-    if(!isInitialized)
+  public synchronized void shutdown(Context aContext) {
+    if(!isInitialized || !hasRegistered)
       return;
     try {
       aContext.unregisterReceiver(completeListener);
@@ -91,6 +97,7 @@ public class CloudDownloadMgr{
       KMLog.LogException(TAG, message, e);
     }
     isInitialized = false;
+    hasRegistered = false;
   }
 
   /**
