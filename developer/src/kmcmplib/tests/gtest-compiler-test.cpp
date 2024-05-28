@@ -14,6 +14,9 @@ KMX_BOOL AddCompileError(KMX_DWORD msg);
 KMX_DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 KMX_DWORD ValidateMatchNomatchOutput(PKMX_WCHAR p);
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString);
+KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
+  PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isUnicode
+);
 KMX_DWORD GetRHS(PFILE_KEYBOARD fk, PKMX_WCHAR p, PKMX_WCHAR buf, int bufsize, int offset, int IsUnicode);
 bool hasPreamble(std::u16string result);
 
@@ -239,6 +242,27 @@ TEST_F(CompilerTest, IsValidKeyboardVersion_test) {
 // KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
 //  PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isUnicode
 // )
+
+TEST_F(CompilerTest, GetXStringImpl_test) {
+    KMX_WCHAR tstr[128];
+    FILE_KEYBOARD fk;
+    KMX_WCHAR str[LINESIZE];
+    KMX_WCHAR output[GLOBAL_BUFSIZE];
+    PKMX_WCHAR newp = NULL;
+
+    // CERR_BufferOverflow, max=0
+    EXPECT_EQ(CERR_BufferOverflow, GetXStringImpl(tstr, &fk, str, u"", output, 0, 0, &newp, FALSE));
+
+    // CERR_None, no token
+    str[0] = '\0';
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+
+    // CERR_NoTokensFound
+    u16cpy(str, u"");
+    //std::cerr << std::hex << GetXStringImpl(tstr, &fk, str, u"c", output, 80, 0, &newp, FALSE) << std::dec << std::endl;
+    EXPECT_EQ(CERR_NoTokensFound, GetXStringImpl(tstr, &fk, str, u"c", output, 80, 0, &newp, FALSE));
+}
+
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
 // KMX_DWORD process_platform(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
 // KMX_DWORD process_if_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
