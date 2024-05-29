@@ -61,7 +61,10 @@ export class Layouts {
   static readonly dfltText='`1234567890-=\xA7~~qwertyuiop[]\\~~~asdfghjkl;\'~~~~~?zxcvbnm,./~~~~~ '
     +'~!@#$%^&*()_+\xA7~~QWERTYUIOP{}\\~~~ASDFGHJKL:"~~~~~?ZXCVBNM<>?~~~~~ ';
 
-  static readonly DEFAULT_RAW_SPEC = {'F':'Tahoma', 'BK': Layouts.dfltText} as const;
+  // The function baked into keyboards by the current Web compiler creates an
+  // array of single-char strings for BK. Refer to
+  // developer/src/kmc-kmn/src/kmw-compiler/visual-keyboard-compiler.ts.
+  static readonly DEFAULT_RAW_SPEC = {'F':'Tahoma', 'BK': Layouts.dfltText.split('')} as const;
 
   static modifierSpecials = {
     'leftalt': '*LAlt*',
