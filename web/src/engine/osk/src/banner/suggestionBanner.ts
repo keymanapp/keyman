@@ -419,6 +419,10 @@ export class SuggestionBanner extends Banner {
     this.gestureEngine = this.setupInputHandling();
   }
 
+  shutdown() {
+    this.gestureEngine.destroy();
+  }
+
   buildInternals(rtl: boolean) {
     this.isRTL = rtl;
     if(this.options.length > 0) {
