@@ -938,6 +938,7 @@ export default class KeyboardInterface extends KeyboardHarness {
     if(systemId == SystemStoreIDs.TSS_LAYER && this.activeDevice.touchable) {
       // Denote the changed store as part of the matched rule's behavior.
       this.ruleBehavior.setStore[systemId] = strValue;
+      return true;
     } else {
       return false;
     }
