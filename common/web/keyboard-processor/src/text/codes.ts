@@ -86,7 +86,7 @@ const Codes = {
     [')!@#$%^&*(',':+<_>?~', '{|}"']
   ],
 
-  isKnownOSKModifierKey(keyID: string): boolean {
+  isKeyNotCorrected(keyID: string): boolean {
     switch(keyID) {
       case 'K_SHIFT':
       case 'K_LOPT':
@@ -97,13 +97,6 @@ const Codes = {
       default:
         if(Codes.keyCodes[keyID] >= 50000) { // A few are used by `sil_euro_latin`.
           return true; // is a 'K_' key defined for layer shifting or 'control' use.
-        }
-        // Refer to text/codes.ts - these are Keyman-custom "keycodes" used for
-        // layer shifting keys.  To be safe, we currently let K_TABBACK and
-        // K_TABFWD through, though we might be able to drop them too.
-        const code = Codes[keyID];
-        if(code > 50000 && code < 50011) {
-          return true;
         }
     }
 
