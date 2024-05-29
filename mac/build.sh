@@ -88,6 +88,12 @@ SKIP_BUILD=false
 UPLOAD_SENTRY=false
 
 # Import local environment variables for build
+#
+# /mac/localenv.sh can be used to define CERTIFICATE_ID, 
+# APPSTORECONNECT_PROVIDER, APPSTORECONNECT_USERNAME, 
+# APPSTORECONNECT_PASSWORD, DEVELOPMENT_TEAM variables;
+# see /mac/README.md for details.
+#
 if [[ -f "$THIS_SCRIPT_PATH/localenv.sh" ]]; then
     . "$THIS_SCRIPT_PATH/localenv.sh"
 fi
@@ -97,7 +103,7 @@ BUILD_OPTIONS="-configuration $CONFIG $BUILD_OPTIONS PRODUCT_VERSION=$VERSION"
 ### START OF THE BUILD ###
 
 execBuildCommand() {
-    typeset component="$1"
+    declare -r component="$1"
     shift
     typeset cmnd="$*"
     typeset ret_code
@@ -250,16 +256,10 @@ do_sentry() {
   # Upload symbols
   builder_heading "Uploading symbols to sentry.keyman.com"
 
-  if which sentry-cli >/dev/null; then
-    pushd "$KM4MIM_BASE_PATH" > /dev/null
-    sentry-cli upload-dif "build/$CONFIG"
+  pushd "$KM4MIM_BASE_PATH" > /dev/null
+  sentry-cli upload-dif "build/$CONFIG"
+  popd > /dev/null
 
-    popd > /dev/null
-  else
-    builder_die "Error: sentry-cli not installed, download from https://github.com/getsentry/sentry-cli/releases"
-  fi
-
-  builder_finish_action success publish
 }
 
 do_install() {
