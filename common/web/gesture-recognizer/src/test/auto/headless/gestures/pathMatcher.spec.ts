@@ -5,7 +5,7 @@ import * as PromiseStatusModule from 'promise-status-async';
 const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
 import { assertingPromiseStatus as promiseStatus } from '../../../resources/assertingPromiseStatus.js';
 
-import { InputSample, GestureSource, gestures } from '@keymanapp/gesture-recognizer';
+import { InputSample, GestureSource, gestures, CumulativePathStats } from '@keymanapp/gesture-recognizer';
 import { timedPromise } from '@keymanapp/web-utils';
 
 import {
@@ -141,7 +141,15 @@ describe("PathMatcher", function() {
     });
 
     describe("Second stage", async function() {
-      let commonBase;
+      let commonBase: {
+        samples: {
+            targetX: number;
+            targetY: number;
+            t: number;
+            item: string;
+        }[];
+        stats: CumulativePathStats<string>;
+      };
 
       before(async function() {
         const emulatedContactPoint = new GestureSource<string>(1, null, true);
