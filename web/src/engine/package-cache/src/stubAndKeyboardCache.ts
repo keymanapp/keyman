@@ -6,7 +6,7 @@ import KeyboardStub from "./keyboardStub.js";
 const KEYBOARD_PREFIX = "Keyboard_";
 
 function prefixed(text: string) {
-  if(!text.startsWith(KEYBOARD_PREFIX)) {
+  if(text && !text.startsWith(KEYBOARD_PREFIX)) {
     return KEYBOARD_PREFIX + text;
   } else {
     return text;
