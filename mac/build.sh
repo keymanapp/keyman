@@ -105,14 +105,13 @@ BUILD_OPTIONS="-configuration $CONFIG $BUILD_OPTIONS PRODUCT_VERSION=$VERSION"
 execBuildCommand() {
     declare -r component="$1"
     shift
-    typeset cmnd="$*"
-    typeset ret_code
+    declare -r cmnd="$*"
 
     displayInfo "Building $component:" "$cmnd"
     set +e
-    eval "$cmnd"
-    ret_code=$?
-    set -e
+    local ret_code=0
+    eval "$cmnd" || ret_code=$?
+    set -ex
 
     printXCodeBuildScriptLogs
 
