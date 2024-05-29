@@ -621,8 +621,8 @@ export class RecordedSequenceTestSet implements TestSet<RecordedKeystrokeSequenc
     let testSet = this.testSet;
 
     for(var i=0; i < testSet.length; i++) {
-      var testSeq = this.testSet[i];
-      var simResult = await testSet[i].test(proctor);
+      const testSeq = this.testSet[i];
+      const simResult = await testSet[i].test(proctor);
       if(!simResult.success) {
         // Failed test!
         failures.push(new TestFailure(this.constraint, testSeq, simResult.result));
