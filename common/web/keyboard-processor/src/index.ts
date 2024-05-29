@@ -39,6 +39,7 @@ export { default as KeyMapping } from "./text/keyMapping.js";
 export { default as OutputTarget } from "./text/outputTarget.js";
 export * from "./text/outputTarget.js";
 export { default as RuleBehavior } from "./text/ruleBehavior.js";
+export * from "./text/stringDivergence.js";
 export * from "./text/systemStores.js";
 
 export * from "@keymanapp/web-utils";

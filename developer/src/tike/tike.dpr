@@ -161,6 +161,7 @@ uses
   UfrmVisualKeyboardKeyBitmap in '..\..\..\common\windows\delphi\visualkeyboard\UfrmVisualKeyboardKeyBitmap.pas' {frmVisualKeyboardKeyBitmap},
   UfrmOptions in 'dialogs\UfrmOptions.pas' {frmOptions},
   UfrmDebug in 'child\UfrmDebug.pas' {frmDebug},
+  Keyman.Developer.UI.Debug.UfrmLdmlKeyboardDebug in 'child\Keyman.Developer.UI.Debug.UfrmLdmlKeyboardDebug.pas' {frmLdmlKeyboardDebug},
   UfrmPackageEditor in 'child\UfrmPackageEditor.pas' {frmPackageEditor},
   utilexecute in '..\..\..\common\windows\delphi\general\utilexecute.pas',
   KeymanVersion in '..\..\..\common\windows\delphi\general\KeymanVersion.pas',
@@ -228,8 +229,10 @@ uses
   Keyman.Developer.System.Project.kmnProjectFileAction in 'project\Keyman.Developer.System.Project.kmnProjectFileAction.pas',
   Keyman.Developer.System.Project.kpsProjectFileAction in 'project\Keyman.Developer.System.Project.kpsProjectFileAction.pas',
   Keyman.Developer.UI.Project.UfrmNewProjectParameters in 'project\Keyman.Developer.UI.Project.UfrmNewProjectParameters.pas' {frmNewProjectParameters},
+  Keyman.Developer.UI.Project.UfrmNewLDMLKeyboardProjectParameters in 'project\Keyman.Developer.UI.Project.UfrmNewLDMLKeyboardProjectParameters.pas' {frmNewLDMLKeyboardProjectParameters},
   Keyman.Developer.UI.Project.UfrmNewProject in 'project\Keyman.Developer.UI.Project.UfrmNewProject.pas' {frmNewProject},
   Keyman.Developer.System.KeyboardProjectTemplate in '..\kmconvert\Keyman.Developer.System.KeyboardProjectTemplate.pas',
+  Keyman.Developer.System.LdmlKeyboardProjectTemplate in '..\kmconvert\Keyman.Developer.System.LdmlKeyboardProjectTemplate.pas',
   Keyman.Developer.UI.ImportWindowsKeyboardDialogManager in 'main\Keyman.Developer.UI.ImportWindowsKeyboardDialogManager.pas',
   Keyman.Developer.System.ImportWindowsKeyboard in '..\kmconvert\Keyman.Developer.System.ImportWindowsKeyboard.pas',
   Keyman.Developer.System.ImportKeyboardDLL in '..\kmconvert\Keyman.Developer.System.ImportKeyboardDLL.pas',
@@ -295,7 +298,8 @@ uses
   Keyman.System.CopyDataHelper in 'main\Keyman.System.CopyDataHelper.pas',
   Keyman.Developer.System.ProjectOwningFile in 'main\Keyman.Developer.System.ProjectOwningFile.pas',
   Keyman.Developer.System.Main in 'main\Keyman.Developer.System.Main.pas',
-  Keyman.Developer.System.LaunchProjects in 'main\Keyman.Developer.System.LaunchProjects.pas';
+  Keyman.Developer.System.LaunchProjects in 'main\Keyman.Developer.System.LaunchProjects.pas',
+  Keyman.System.Debug.DebugUtils in 'debug\Keyman.System.Debug.DebugUtils.pas';
 
 {$R *.RES}
 {$R ICONS.RES}

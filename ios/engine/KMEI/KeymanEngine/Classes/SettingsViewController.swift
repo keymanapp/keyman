@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import os.log
 
 open class SettingsViewController: UITableViewController {
   private var itemsArray = [[String: String]]()
@@ -16,7 +17,7 @@ open class SettingsViewController: UITableViewController {
     super.viewWillAppear(animated)
     
     loadUserLanguages()
-    log.info("willAppear: SettingsViewController")
+    os_log("viewWillAppear: SettingsViewController", log:KeymanEngineLogger.settings, type: .info)
  }
   
   override open func viewDidLoad() {
@@ -40,7 +41,7 @@ open class SettingsViewController: UITableViewController {
     let sb : UIStoryboard = UIStoryboard(name: "Settings", bundle: nil)
     if let vc = sb.instantiateInitialViewController() {
       launchingVC.present(vc, animated: true, completion: {
-        log.info("presented settings")
+        os_log("presented settings", log:KeymanEngineLogger.settings, type: .info)
       })
     }
   }
@@ -58,12 +59,6 @@ open class SettingsViewController: UITableViewController {
       "title": NSLocalizedString("menu-installed-languages-title", bundle: engineBundle, comment: ""),
       "subtitle": "0", //count of installed languages as string
       "reuseid" : "languages"
-      ])
-    
-    itemsArray.append([
-      "title": NSLocalizedString("menu-settings-show-banner", bundle: engineBundle, comment: ""),
-      "subtitle": "",
-      "reuseid" : "showbanner"
       ])
     
     itemsArray.append([
@@ -150,21 +145,6 @@ open class SettingsViewController: UITableViewController {
     switch(cellIdentifier) {
       case "languages":
         break
-      case "showbanner":
-        let showBannerSwitch = UISwitch()
-        showBannerSwitch.translatesAutoresizingMaskIntoConstraints = false
-        
-        let switchFrame = frameAtRightOfCell(cell: cell.frame, controlSize: showBannerSwitch.frame.size)
-        showBannerSwitch.frame = switchFrame
-        
-        showBannerSwitch.isOn = showBanner
-        showBannerSwitch.addTarget(self, action: #selector(self.bannerSwitchValueChanged),
-                                      for: .valueChanged)
-        cell.addSubview(showBannerSwitch)
-        cell.contentView.isUserInteractionEnabled = false
-
-        showBannerSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
-        showBannerSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
       case "showgetstarted":
         let showAgainSwitch = UISwitch()
         showAgainSwitch.translatesAutoresizingMaskIntoConstraints = false
@@ -199,7 +179,9 @@ open class SettingsViewController: UITableViewController {
       case "systemkeyboardsettings", "installfile", "forcederror", "spacebartext":
         break
       default:
-        SentryManager.captureAndLog("unknown cellIdentifier(\"\(cellIdentifier ?? "EMPTY")\")")
+        let message = "unknown cellIdentifier(\"\(cellIdentifier ?? "EMPTY")\")"
+        os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
+        SentryManager.capture(message)
         cell.accessoryType = .none
     }
     
@@ -213,30 +195,12 @@ open class SettingsViewController: UITableViewController {
     }
   }
   
-  @objc func bannerSwitchValueChanged(_ sender: Any) {
-    let userData = Storage.active.userDefaults
-    if let toggle = sender as? UISwitch {
-      // actually this should call into KMW, which controls the banner
-      userData.set(toggle.isOn, forKey: Key.optShouldShowBanner)
-      userData.synchronize()
-    }
-
-    // Necessary for the keyboard to visually update to match
-    // the new setting.
-    Manager.shared.inputViewController.setShouldReload()
-  }
-  
   @objc func showGetStartedSwitchValueChanged(_ sender: Any) {
     let userData = Storage.active.userDefaults
     if let toggle = sender as? UISwitch {
       userData.set(toggle.isOn, forKey: Key.optShouldShowGetStarted)
       userData.synchronize()
     }
-  }
-
-  private var showBanner: Bool {
-    let userData = Storage.active.userDefaults
-    return userData.bool(forKey: Key.optShouldShowBanner)
   }
   
   private var showGetStarted: Bool {
@@ -272,7 +236,9 @@ open class SettingsViewController: UITableViewController {
       case "showbanner", "showgetstarted":
         cell.detailTextLabel?.isEnabled = false
       default:
-        SentryManager.captureAndLog("unknown cellIdentifier(\"\(cellIdentifier ?? "EMPTY")\")")
+        let message = "unknown cellIdentifier(\"\(cellIdentifier ?? "EMPTY")\")"
+        os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
+        SentryManager.capture(message)
     }
   }
   
@@ -296,7 +262,9 @@ open class SettingsViewController: UITableViewController {
         case "systemkeyboardsettings":
           guard let appSettings = URL(string: UIApplication.openSettingsURLString) else {
             // It is an error if the option is displayed but unusable.  That's bad UI.
-            SentryManager.captureAndLog("Could not launch keyboard settings menu")
+            let message = "Could not launch keyboard settings menu"
+            os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
+            SentryManager.capture(message)
             return
           }
           UniversalLinks.externalLinkLauncher?(appSettings)
@@ -304,7 +272,9 @@ open class SettingsViewController: UITableViewController {
           if let block = Manager.shared.fileBrowserLauncher {
             block(navigationController!)
           } else {
-            SentryManager.captureAndLog("Listener for framework signal to launch file browser is missing")
+            let message = "Listener for framework signal to launch file browser is missing"
+            os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
+            SentryManager.capture(message)
           }
         case "forcederror":
           SentryManager.forceError()
@@ -357,9 +327,9 @@ open class SettingsViewController: UITableViewController {
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
   override open func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-      log.info("prepare for segue")
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    os_log("prepare for segue", log:KeymanEngineLogger.settings, type: .info)
+    // Get the new view controller using segue.destination.
+    // Pass the selected object to the new view controller.
   }
   
   // MARK: - language access -
@@ -405,11 +375,14 @@ open class SettingsViewController: UITableViewController {
     for lm in userLexicalModels {
       let l = lm.languageID
       if let langName = keyboardLanguages[l]?.name {
-        log.info("keyboard language \(l) \(langName) has lexical model")
+        let message = "keyboard language \(l) \(langName) has lexical model"
+        os_log("%{public}s", log:KeymanEngineLogger.settings, type: .info, message)
       } else {
         // Legacy behavior:  we automatically install all MTNT language codes, even without
         // a matching keyboard for the more specific variant(s).
-        SentryManager.breadcrumbAndLog("lexical model language \(l) has no keyboard installed!")
+        let message = "lexical model language \(l) has no keyboard installed!"
+        os_log("%{public}s", log:KeymanEngineLogger.settings, type: .info, message)
+        SentryManager.breadcrumb(message)
       }
     }
 
@@ -438,7 +411,9 @@ open class SettingsViewController: UITableViewController {
       nc.pushViewController(vc, animated: true)
       setIsDoneButtonEnabled(nc, true)
     } else {
-      SentryManager.captureAndLog("no navigation controller for showing languages???")
+      let message = ("No navigation controller for showing languages???")
+      os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
+      SentryManager.capture(message)
     }
   }
   
@@ -448,7 +423,9 @@ open class SettingsViewController: UITableViewController {
       nc.pushViewController(vc, animated: true)
       setIsDoneButtonEnabled(nc, true)
     } else {
-      SentryManager.captureAndLog("no navigation controller for showing spacebarText options")
+      let message = ("No navigation controller for showing spacebarText options")
+      os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
+      SentryManager.capture(message)
     }
   }
   

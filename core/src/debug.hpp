@@ -9,8 +9,7 @@
 #include <cassert>
 #include <vector>
 
-#include <keyman/keyman_core_api.h>
-#include <keyman/keyman_core_api_debug.h>
+#include "keyman_core.h"
 
 namespace km {
 namespace core

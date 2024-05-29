@@ -1,10 +1,6 @@
 project('ibus-keyman', 'c', 'cpp',
         version: run_command('cat', '../../VERSION.md', check: true).stdout().strip(),
         license: 'GPL-2+',
-        # default_options : ['buildtype=release',
-        #                    'cpp_std=c++14',
-        #                    'b_vscrt=static_from_buildtype',
-        #                    'warning_level=2'],
         meson_version: '>=0.53.0')
 cc = meson.get_compiler('c')
 conf = configuration_data()
@@ -22,6 +18,10 @@ keymancore_lib = cc.find_library(
   'keymancore', # meson will prefix 'lib'
   dirs: [ core_dir / 'build/arch' / get_option('buildtype') / 'src' ]
 )
+
+if get_option('keyman_deb_pkg_build')
+  add_global_arguments('-DKEYMAN_PKG_BUILD', language: ['cpp', 'c'])
+endif
 
 env = find_program('env')
 

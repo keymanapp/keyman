@@ -6,9 +6,14 @@ type FontFamilyStyleMap = {[family: string]: HTMLStyleElement};
 export class StylesheetManager {
   private fontStyleDefinitions: { [os: string]: FontFamilyStyleMap} = {};
   private linkedSheets: HTMLStyleElement[] = [];
+  private fontPromises: Promise<FontFace>[] = [];
   private doCacheBusting: boolean;
 
   public readonly linkNode: Node;
+
+  public get sheets(): readonly HTMLStyleElement[] {
+    return this.linkedSheets;
+  }
 
   public constructor(linkNode?: Node, doCacheBusting?: boolean) {
     if(!linkNode) {
@@ -24,6 +29,10 @@ export class StylesheetManager {
   }
 
   linkStylesheet(sheet: HTMLStyleElement) {
+    if(!(sheet instanceof HTMLLinkElement) && !sheet.innerHTML) {
+      return;
+    }
+
     this.linkedSheets.push(sheet);
     this.linkNode.appendChild(sheet);
   }
@@ -32,21 +41,36 @@ export class StylesheetManager {
    * Provides a `Promise` that resolves when all currently-linked stylesheets have loaded.
    * Any change to the set of linked sheets after the initial call will be ignored.
    */
-  async allLoadedPromise() {
+  async allLoadedPromise(): Promise<void> {
     const promises: Promise<void>[] = [];
 
     for(const sheetElem of this.linkedSheets) {
       // Based on https://stackoverflow.com/a/21147238
       if(sheetElem.sheet?.cssRules) {
         promises.push(Promise.resolve());
+      } else if(sheetElem.innerHTML) {
+        // NOT at the StackOverflow link, but something I found experimentally.
+        // Needed for live-constructed sheets with no corresponding file.
+        promises.push(Promise.resolve());
       } else {
         const promise = new ManagedPromise<void>();
         sheetElem.addEventListener('load', () => promise.resolve());
+        sheetElem.addEventListener('error', () => promise.reject());
         promises.push(promise.corePromise);
       }
     }
 
-    await Promise.all(promises);
+    const allPromises = promises.concat(this.fontPromises as Promise<any>[]);
+    if(Promise.allSettled) {
+      // allSettled - Chrome 76 / Safari 13
+      // Delays for settling (either then OR catch) for ALL promises.
+      await Promise.allSettled(allPromises)
+    } else {
+      // all - Chrome 32
+      // If an error happens, .all instantly resolves regardless of state of
+      // other Promises.
+      await Promise.all(allPromises);
+    }
   }
 
   /**
@@ -67,9 +91,9 @@ export class StylesheetManager {
     }
 
     const fontKey = fd.family;
+    let source: string;
 
-    let i, ttf='', woff='', eot='', svg='', fList=[];
-    let data: string;
+    let i, ttf='', woff='', fList=[];
 
     // TODO: 22 Aug 2014: check that font path passed from cloud is actually used!
 
@@ -102,8 +126,6 @@ export class StylesheetManager {
       if(fList[i].toLowerCase().indexOf('.otf') > 0) ttf=fList[i];
       if(fList[i].toLowerCase().indexOf('.ttf') > 0) ttf=fList[i];
       if(fList[i].toLowerCase().indexOf('.woff') > 0) woff=fList[i];
-      if(fList[i].toLowerCase().indexOf('.eot') > 0) eot=fList[i];
-      if(fList[i].toLowerCase().indexOf('.svg') > 0) svg=fList[i];
     }
 
     // Font path qualified to support page-relative fonts (build 347)
@@ -113,14 +135,6 @@ export class StylesheetManager {
 
     if(woff != '' && (woff.indexOf('/') < 0)) {
       woff = fontPathRoot+woff;
-    }
-
-    if(eot != '' && (eot.indexOf('/') < 0)) {
-      eot = fontPathRoot+eot;
-    }
-
-    if(svg != '' && (svg.indexOf('/') < 0)) {
-      svg = fontPathRoot+svg;
     }
 
     // Build the font-face definition according to the browser being used
@@ -141,53 +155,42 @@ export class StylesheetManager {
         if(this.doCacheBusting) {
           ttf = this.cacheBust(ttf);
         }
-        s=s+'src:url(\''+ttf+'\') format(\'truetype\');';
-      } else {
-        return null;
+        source = "url('"+encodeURI(ttf)+"') format('truetype')";
       }
     } else {
-      var s0 = [];
-
-      if(os == DeviceSpec.OperatingSystem.Android) {
-        // Android 4.2 and 4.3 have bugs in their rendering for some scripts
-        // with embedded ttf or woff.  svg mostly works so is a better initial
-        // choice on the Android browser.
-        if(svg != '') {
-          s0.push("url('"+svg+"') format('svg')");
-        }
-
-        if(woff != '') {
-          s0.push("url('"+woff+"') format('woff')");
-        }
-
-        if(ttf != '') {
-          s0.push("url('"+ttf+"') format('truetype')");
-        }
-      } else {
-        if(woff != '') {
-          s0.push("url('"+woff+"') format('woff')");
-        }
-
-        if(ttf != '') {
-          s0.push("url('"+ttf+"') format('truetype')");
-        }
-
-        if(svg != '') {
-          s0.push("url('"+svg+"') format('svg')");
-        }
+      if(woff != '') {
+        source = "url('"+encodeURI(woff)+"') format('woff')";
       }
 
-      if(s0.length == 0) {
-        return null;
+      if(ttf != '') {
+        source = "url('"+encodeURI(ttf)+"') format('truetype')";
       }
-
-      s += 'src:'+s0.join(',')+';';
     }
+
+    if(!source) {
+      return null;
+    }
+
+    s += 'src:'+source+';';
 
     s=s+'\n}\n';
 
     const sheet = createStyleSheet(s);
     fontStyleMap[fontKey] = sheet;
+
+    /* https://developer.mozilla.org/en-US/docs/Web/API/CSS_Font_Loading_API
+     * Compat:  Chrome 35... _just_ on the unupdated-Android 5.0 threshold.
+     *
+     * Note:  this could probably wholesale-replace the stylesheet!
+     * Would need: `document.fonts.add(fontFace)` - does not have to wait for the load() Promise.
+     *
+     * For now, we're using this solely to detect when the font has been succesfully loaded.
+     */
+    const fontFace = new FontFace(fd.family, source);
+
+    const clearPromise = () => this.fontPromises = this.fontPromises.filter((entry) => entry != loadPromise);
+    const loadPromise = fontFace.load().then(clearPromise).catch(clearPromise);
+    this.fontPromises.push(loadPromise);
 
     this.linkStylesheet(sheet);
 
@@ -206,15 +209,15 @@ export class StylesheetManager {
    *
    * @param   {string}  href   path to stylesheet file
    */
-  linkExternalSheet(href: string): void {
+  linkExternalSheet(href: string, force?: boolean): HTMLStyleElement {
     try {
-      if(document.querySelector("link[href="+JSON.stringify(href)+"]") != null) {
+      if(!force && document.querySelector("link[href="+JSON.stringify(href)+"]") != null) {
         // We've already linked this stylesheet, don't do it again
-        return;
+        return null;
       }
     } catch(e) {
       // We've built an invalid href, somehow?
-      return;
+      return null;
     }
 
     const linkElement=document.createElement('link');
@@ -223,6 +226,7 @@ export class StylesheetManager {
     linkElement.href=href;
 
     this.linkStylesheet(linkElement);
+    return linkElement;
   }
 
   public unlink(stylesheet: HTMLStyleElement) {

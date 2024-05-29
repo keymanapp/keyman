@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     Keyboard longpressKBbInfo = new Keyboard(
       "keyboardharness",
       "longpress",
-      "Longpress Keyboard",
+      "longpress '\"\\|5% +",
       "en",
       "English",
       "1.0",

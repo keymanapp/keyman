@@ -5,7 +5,7 @@ import 'mocha';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { SectionCompiler, SectionCompilerNew } from '../../src/compiler/section-compiler.js';
-import { KMXPlus, LDMLKeyboardXMLSourceFileReader, VisualKeyboard, CompilerEvent, LDMLKeyboardTestDataXMLSourceFile, compilerEventFormat, LDMLKeyboard, UnicodeSetParser, CompilerCallbacks } from '@keymanapp/common-types';
+import { util, KMXPlus, LDMLKeyboardXMLSourceFileReader, VisualKeyboard, CompilerEvent, LDMLKeyboardTestDataXMLSourceFile, compilerEventFormat, LDMLKeyboard, UnicodeSetParser, CompilerCallbacks } from '@keymanapp/common-types';
 import { LdmlKeyboardCompiler } from '../../src/main.js'; // make sure main.js compiles
 import { assert } from 'chai';
 import { KMXPlusMetadataCompiler } from '../../src/compiler/metadata-compiler.js';
@@ -185,6 +185,55 @@ export function checkMessages() {
   assert.isEmpty(compilerTestCallbacks.messages, compilerEventFormat(compilerTestCallbacks.messages));
 }
 
+/**
+ * Like CompilerEvent, but supports regex matching.
+ */
+interface CompilerMatch {
+  /** code of the event */
+  code: number;
+  /** regex that matches 'message' */
+  matchMessage: RegExp;
+};
+
+/** Union type for a CompilerEvent or a CompilerMatch */
+export type CompilerEventOrMatch = CompilerEvent | CompilerMatch;
+
+/** @returns true if 'm' matches 'e' */
+export function matchCompilerEvent(e: CompilerEvent, m: CompilerMatch): boolean {
+  return (e.code === m.code) && (m.matchMessage.test(e.message));
+}
+
+/** @returns the first of events which matches m. Or m, if it's a CompilerEvent */
+function findMatchingCompilerEvent(events: CompilerEvent[], m: CompilerEventOrMatch): CompilerEventOrMatch {
+  const asMatch = <CompilerMatch> m;
+  if (!asMatch.matchMessage) {
+    // it's not a valid CompilerMatch, just return it
+    return m;
+  }
+
+  for (const e of events) {
+    if (matchCompilerEvent(e, asMatch)) {
+      return e;
+    }
+  }
+  return null;
+}
+/**
+ * for any matched events, substitute them with the original CompilerEvent
+ * for any non-matching item, leave as is so that tests will fail
+ */
+export function matchCompilerEvents(events: CompilerEvent[], matches?: CompilerEventOrMatch[]): CompilerEventOrMatch[] {
+  // pass through if there's no processing to be done
+  if (!events || !matches) return matches;
+  return matches.map(e => findMatchingCompilerEvent(events, e) || e);
+}
+
+/** as above, but passes through true/false */
+function matchCompilerEventsOrBoolean(events: CompilerEvent[], matches?: CompilerEventOrMatch[] | boolean) : CompilerEventOrMatch[] | boolean {
+  if(matches === true || matches === false) return matches;
+  return matchCompilerEvents(events, matches);
+}
+
 export interface CompilationCase {
   /** if true, expect no further errors than what's in errors.  */
   strictErrors?: boolean;
@@ -195,11 +244,11 @@ export interface CompilationCase {
   /**
    * expected error messages. If falsy, expected to succeed. All must be present to pass.
    */
-  errors?: CompilerEvent[] | boolean;
+  errors?: CompilerEventOrMatch[] | boolean;
   /**
    * expected warning messages. All must be present to pass.
    */
-  warnings?: CompilerEvent[];
+  warnings?: CompilerEventOrMatch[];
   /**
    * optional callback with the section
    */
@@ -245,18 +294,20 @@ export function testCompilationCases(compiler: SectionCompilerNew, cases : Compi
         assert.isNotNull(section, `failed with ${compilerEventFormat(callbacks.messages)}`);
       }
 
+      const testcaseErrors = matchCompilerEventsOrBoolean(callbacks.messages, testcase.errors);
+      const testcaseWarnings = matchCompilerEvents(callbacks.messages, testcase.warnings);
       // if we expected errors or warnings, show them
-      if (testcase.errors && testcase.errors !== true) {
-        assert.includeDeepMembers(callbacks.messages, <CompilerEvent[]> testcase.errors, 'expected errors to be included');
+      if (testcaseErrors && testcaseErrors !== true) {
+        assert.includeDeepMembers(callbacks.messages, <CompilerEventOrMatch[]>testcaseErrors, 'expected errors to be included');
       }
-      if (testcase.errors && testcase.strictErrors) {
-        assert.sameDeepMembers(callbacks.messages, <CompilerEvent[]> testcase.errors, 'expected same errors to be included');
+      if (testcaseErrors && testcase.strictErrors) {
+        assert.sameDeepMembers(callbacks.messages, <CompilerEventOrMatch[]>testcaseErrors, 'expected same errors to be included');
       }
-      if (testcase.warnings) {
-        assert.includeDeepMembers(callbacks.messages, testcase.warnings, 'expected warnings to be included');
+      if (testcaseWarnings) {
+        assert.includeDeepMembers(callbacks.messages, testcaseWarnings, 'expected warnings to be included');
       } else if (!expectFailure) {
         // no warnings, so expect zero messages
-        assert.strictEqual(callbacks.messages.length, 0, 'expected zero messages');
+        assert.sameDeepMembers(callbacks.messages, [], 'expected zero messages but got ' + callbacks.messages);
       }
 
       // run the user-supplied callback if any
@@ -279,3 +330,13 @@ async function getTestUnicodeSetParser(callbacks: CompilerCallbacks): Promise<Un
   }
 }
 
+/** compare actual and expected strings */
+export function assertCodePoints(actual?: string, expected?: string, msg?: string) {
+  assert.strictEqual(actual, expected, `Actual ${msg||':'}\n${hex_str(actual)}\nExpected:\n${hex_str(expected)}\n`);
+}
+
+const dontEscape = /[a-zA-Z0-9\.${}\[\]-]/;
+
+export function hex_str(s?: string) : string {
+  return [...s].map(ch => dontEscape.test(ch) ? ch : util.escapeRegexChar(ch)).join('');
+}

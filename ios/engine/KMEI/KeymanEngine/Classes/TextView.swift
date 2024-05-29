@@ -8,6 +8,7 @@
 
 import AudioToolbox
 import UIKit
+import os.log
 
 public class TextView: UITextView, KeymanResponder {
   // viewController should be set to main view controller to enable keyboard picker.
@@ -80,8 +81,8 @@ public class TextView: UITextView, KeymanResponder {
       }
 
       if delegate !== delegateProxy {
-        log.error("Trying to set TextView's delegate directly. Use setKeymanDelegate() instead.")
-      }
+        os_log("Trying to set TextView's delegate directly. Use setKeymanDelegate() instead.", log:KeymanEngineLogger.ui, type: .error)
+     }
       super.delegate = delegateProxy
     }
   }
@@ -92,7 +93,8 @@ public class TextView: UITextView, KeymanResponder {
   //   - All of the normal UITextViewDelegate methods are supported.
   public func setKeymanDelegate(_ keymanDelegate: TextViewDelegate?) {
     delegateProxy.keymanDelegate = keymanDelegate
-    log.debug("TextView: \(self.hashValue) keymanDelegate set to: \(keymanDelegate.debugDescription)")
+    let message = "TextView: \(self.hashValue) keymanDelegate set to: \(keymanDelegate.debugDescription)"
+    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, message)
   }
 
   public override var text: String! {
@@ -133,12 +135,8 @@ public class TextView: UITextView, KeymanResponder {
       font = UIFont.systemFont(ofSize: fontSize)
     }
 
-    if isFirstResponder {
-      resignFirstResponder()
-      becomeFirstResponder()
-    }
-
-    log.debug("TextView: \(self.hashValue) setFont: \(font?.familyName ?? "nil")")
+    let message = "TextView: \(self.hashValue) setFont: \(font?.familyName ?? "nil")"
+    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, message)
   }
 
   // MARK: iOS 7 TextView Scroll bug fix
@@ -173,7 +171,8 @@ extension KeymanResponder where Self: TextView {
   // Dismisses the keyboard if this textview is the first responder.
   //   - Use this instead of [resignFirstResponder] as it also resigns the Keyman keyboard's responders.
   public func dismissKeyboard() {
-    log.debug("TextView: \(self.hashValue) dismissing keyboard. Was first responder: \(isFirstResponder)")
+    let message = "TextView: \(self.hashValue) dismissing keyboard. Was first responder: \(isFirstResponder)"
+    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, message)
     resignFirstResponder()
     Manager.shared.inputViewController.endEditing(true)
   }
@@ -256,25 +255,11 @@ extension TextView: UITextViewDelegate {
       font = UIFont.systemFont(ofSize: fontSize)
     }
 
-    log.debug("TextView: \(self.hashValue) setFont: \(font?.familyName ?? "nil")")
+    let messageOne = "TextView: \(self.hashValue) setFont: \(font?.familyName ?? "nil")"
+    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, messageOne)
 
-    log.debug("TextView: \(self.hashValue) Became first responder. Value: \(String(describing: text))")
-  }
-
-  public func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange,
-                       replacementText text: String) -> Bool {
-    // Enable text update to catch copy/paste operations
-    shouldUpdateKMText = true
-    return true
-  }
-
-  public func textViewDidChange(_ textView: UITextView) {
-    if shouldUpdateKMText {
-      // Catches copy/paste operations
-      Manager.shared.setContextState(text: textView.text, range: textView.selectedRange)
-      // This is called when editing in-app; do not reset context here.
-      shouldUpdateKMText = false
-    }
+    let messageTwo = "TextView: \(self.hashValue) Became first responder. Value: \(String(describing: text))"
+    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, messageTwo)
   }
 
   public func textViewShouldEndEditing(_ textView: UITextView) -> Bool {

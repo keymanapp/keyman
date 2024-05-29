@@ -1,4 +1,4 @@
-import EventEmitter from "eventemitter3";
+import { EventEmitter } from "eventemitter3";
 
 import { GestureModelDefs, getGestureModel, getGestureModelSet } from "../specs/gestureModelDefs.js";
 import { GestureSource, GestureSourceSubview } from "../../gestureSource.js";
@@ -15,6 +15,12 @@ export class GestureStageReport<Type, StateToken = any> {
    */
   public readonly matchedId: string;
 
+  /**
+   * The set id of gesture models that were allowed for this stage of the
+   * GestureSequence.
+   */
+  public readonly gestureSetId: string;
+
   public readonly linkType: MatchResult<Type>['action']['type'];
   /**
    * The `item`, if any, specified for selection by the matched gesture model.
@@ -29,8 +35,9 @@ export class GestureStageReport<Type, StateToken = any> {
 
   public readonly allSourceIds: string[];
 
-  constructor(selection: MatcherSelection<Type, StateToken>) {
+  constructor(selection: MatcherSelection<Type, StateToken>, gestureSetId: string) {
     const { matcher, result } = selection;
+    this.gestureSetId = gestureSetId;
     this.matchedId = matcher?.model.id;
     this.linkType = result.action.type;
     this.item = result.action.item;
@@ -194,7 +201,8 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
     }
 
   private readonly selectionHandler = async (selection: MatcherSelection<Type, StateToken>) => {
-    const matchReport = new GestureStageReport<Type, StateToken>(selection);
+    const gestureSet = this.pushedSelector?.baseGestureSetId || this.selector?.baseGestureSetId;
+    const matchReport = new GestureStageReport<Type, StateToken>(selection, gestureSet);
     if(selection.matcher) {
       this.stageReports.push(matchReport);
     }
@@ -380,6 +388,10 @@ export class GestureSequence<Type, StateToken = any> extends EventEmitter<EventM
       this.markedComplete = true;
       this.emit('complete');
     }
+  }
+
+  public toJSON(): any {
+    return this.stageReports;
   }
 }
 

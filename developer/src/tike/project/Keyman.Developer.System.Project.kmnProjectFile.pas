@@ -74,8 +74,8 @@ type
     FTargets: TKeymanTargets;
     FKVKFileName: string;
 
-    function GetOutputFilename: string;
     function GetTargetFilename: string;
+    function GetKmxTargetFilename: string;
     function GetJSTargetFilename: string;
   protected
     function GetRelativeOrder: Integer; override;
@@ -92,8 +92,8 @@ type
 
     property Debug: Boolean read FDebug write FDebug;
 
-    property OutputFilename: string read GetOutputFilename;
     property TargetFilename: string read GetTargetFilename;
+    property KmxTargetFilename: string read GetKmxTargetFilename;
     property JSTargetFilename: string read GetJSTargetFilename;
     property Header_Name: WideString read FHeader_Name;
     property Header_Copyright: WideString read FHeader_Copyright;
@@ -112,6 +112,7 @@ uses
   kmxfileconsts,
   KeyboardFonts,
   Keyman.System.KeyboardUtils,
+  utilfiletypes,
   utilsystem;
 
 {-------------------------------------------------------------------------------
@@ -160,15 +161,40 @@ begin
 end;
 
 function TkmnProjectFile.GetTargetFilename: string;
+begin
+  // Always returns the .kmx, even if the keyboard
+  // only compiles to a .js
+  Result := GetKmxTargetFilename;
+end;
+
+function TkmnProjectFile.GetKmxTargetFilename: string;
 var
   FTempFileVersion: string;
 begin
+  if FTargets = [] then
+    GetFileParameters;
+
   // https://github.com/keymanapp/keyman/issues/631
   // This appears to be a Delphi compiler bug (RSP-20457)
   // Workaround is to make a copy of the parameter locally
   // which fixes the reference counting.
   FTempFileVersion := FileVersion;
-  Result := OwnerProject.GetTargetFilename(OutputFileName, FileName, FTempFileVersion);
+  Result := OwnerProject.GetTargetFilename(ChangeFileExt(FileName, Ext_KeymanFile), FileName, FTempFileVersion);
+end;
+
+function TkmnProjectFile.GetJSTargetFilename: string;
+var
+  FTempFileVersion: string;
+begin
+  if FTargets = [] then
+    GetFileParameters;
+
+  // https://github.com/keymanapp/keyman/issues/631
+  // This appears to be a Delphi compiler bug (RSP-20457)
+  // Workaround is to make a copy of the parameter locally
+  // which fixes the reference counting.
+  FTempFileVersion := FileVersion;
+  Result := OwnerProject.GetTargetFilename(ChangeFileExt(FileName, Ext_Javascript), FileName, FTempFileVersion);
 end;
 
 function TkmnProjectFile.IsCompilable: Boolean;
@@ -236,30 +262,6 @@ begin
     Free;
   end;
 end;
-
-function TkmnProjectFile.GetJSTargetFilename: string;
-begin
-  if FTargets = [] then
-    GetFileParameters;
-
-  // There is no JS target if no target is specified
-  if FTargets * KMWKeymanTargets = [] then
-    Exit('');
-  Result := OwnerProject.GetTargetFilename(TKeyboardUtils.GetKeymanWebCompiledFileName(FileName), FileName, FileVersion);
-end;
-
-function TkmnProjectFile.GetOutputFilename: string;
-begin
-  if FTargets = [] then
-    GetFileParameters;
-
-  // If no target is specified, we'll fall back to .kmx
-  // so we always have at least one target filename
-  if (FTargets <> []) and (FTargets * KMXKeymanTargets = []) then
-    Exit('');
-  Result := ChangeFileExt(FileName, '.kmx');
-end;
-
 
 initialization
   RegisterProjectFileType('.kmn', TkmnProjectFile);

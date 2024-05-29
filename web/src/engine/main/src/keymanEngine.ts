@@ -2,7 +2,7 @@ import { type Keyboard, KeyboardKeymanGlobal, ProcessorInitOptions } from "@keym
 import { DOMKeyboardLoader as KeyboardLoader } from "@keymanapp/keyboard-processor/dom-keyboard-loader";
 import { InputProcessor, PredictionContext } from "@keymanapp/input-processor";
 import { OSKView } from "keyman/engine/osk";
-import { KeyboardRequisitioner, ModelCache, ModelSpec, toUnprefixedKeyboardId as unprefixed } from "keyman/engine/package-cache";
+import { KeyboardRequisitioner, KeyboardStub, ModelCache, ModelSpec, toUnprefixedKeyboardId as unprefixed } from "keyman/engine/package-cache";
 
 import { EngineConfiguration, InitOptionSpec } from "./engineConfiguration.js";
 import KeyboardInterface from "./keyboardInterface.js";
@@ -52,6 +52,7 @@ export default class KeymanEngine<
       if(callback) {
         callback(null, null);
       }
+      return;
     }
 
     if(this.keyEventRefocus) {
@@ -119,6 +120,8 @@ export default class KeymanEngine<
       // so we handle that here.
       this.osk?.bannerController.selectBanner(state);
       this.osk?.refreshLayout();
+
+      // If `this.osk` is not yet initialized, the OSK itself will check if the model is loaded
     });
 
     // The OSK does not possess a direct connection to the KeyboardProcessor's state-key
@@ -136,14 +139,6 @@ export default class KeymanEngine<
     });
 
     this.contextManager.on('keyboardchange', (kbd) => {
-      this.refreshModel();
-      this.core.activeKeyboard = kbd?.keyboard;
-
-      this.legacyAPIEvents.callEvent('keyboardchange', {
-        internalName: kbd?.metadata.id ?? '',
-        languageCode: kbd?.metadata.langId ?? ''
-      });
-
       // Hide OSK and do not update keyboard list if using internal keyboard (desktops).
       // Condition will not be met for touch form-factors; they force selection of a
       // default keyboard.
@@ -151,10 +146,46 @@ export default class KeymanEngine<
         this.osk.startHide(false);
       }
 
+      const prepareKeyboardSwap = () => {
+        this.refreshModel();
+        // Triggers context resets that can trigger layout stuff.
+        // It's not the final such context-reset, though.
+        this.core.activeKeyboard = kbd?.keyboard;
+
+        this.legacyAPIEvents.callEvent('keyboardchange', {
+          internalName: kbd?.metadata.id ?? '',
+          languageCode: kbd?.metadata.langId ?? ''
+        });
+      }
+
+      /*
+        This pattern is designed to minimize layout reflow during the keyboard-swap process.
+        The 'default' layer is loaded by default, but some keyboards will start on different
+        layers depending on the current state of the context.
+
+        If possible, we want to only perform layout operations once the correct layer is
+        set to active.
+      */
       if(this.osk) {
-        this.osk.setNeedsLayout();
-        this.osk.activeKeyboard = kbd;
-        this.osk.present();
+        this.osk.batchLayoutAfter(() => {
+          prepareKeyboardSwap();
+          this.osk.activeKeyboard = kbd;
+          // Note:  when embedded within the mobile apps, the keyboard will still be visible
+          // at this time.
+
+          /*
+            Needed to ensure the correct layer is displayed AND that deadkeys from
+            the old keyboard have been wiped.
+
+            Needs to be after the OSK has loaded for the keyboard in case the default
+            layer should be something other than "default" for the current context.
+          */
+          this.contextManager.resetContext();
+          this.osk.present();
+        });
+      } else {
+        prepareKeyboardSwap();
+        this.contextManager.resetContext();
       }
     });
 
@@ -196,6 +227,9 @@ export default class KeymanEngine<
 
     config.initialize(optionSpec);
 
+    // Initialize supplementary plane string extensions
+    String.kmwEnableSupplementaryPlane(true);
+
     // Since we're not sandboxing keyboard loads yet, we just use `window` as the jsGlobal object.
     // All components initialized below require a properly-configured `config.paths` or similar.
     const keyboardLoader = new KeyboardLoader(this.interface, config.applyCacheBusting);
@@ -207,7 +241,13 @@ export default class KeymanEngine<
       resetContext: (target) => {
         // Could reset the target's deadkeys here, but it's really more of a 'core' task.
         // So we delegate that to keyboard-processor.
-        this.core.resetContext(target);
+        if(this.osk) {
+          this.osk.batchLayoutAfter(() => {
+            this.core.resetContext(target);
+          })
+        } else {
+          this.core.resetContext(target);
+        }
       },
       predictionContext: new PredictionContext(this.core.languageProcessor, this.core.keyboardProcessor),
       keyboardCache: this.keyboardRequisitioner.cache

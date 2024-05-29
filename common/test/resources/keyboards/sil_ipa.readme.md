@@ -1,0 +1,1 @@
+From the keyboards repo, release section - version 1.8.6, before any KMW 17.0 gestures were added.

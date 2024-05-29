@@ -1,9 +1,12 @@
 # ldml-keyboards
 
-Data will eventually be versioned, so there would be a `42`, `43` etc directory.
+Data is versioned, so each directory has its version such as `45`.
 
-Currently there is a `techpreview` directory referring to the technical preview—work in progress work in 2022.
-That will very roughly correspond to <https://github.com/unicode-org/cldr/tree/keyboard-preview>, or pull requests thereunto.
+## How to Update
+
+- Checkout CLDR, preferably a release version, somewhere such as /src/cldr
+- run `fetch-latest-cldr.sh 45 /src/cldr`   (where '45' is the CLDR version)
+- check results, run tests, check in and open a PR
 
 ## Data Format
 
@@ -20,3 +23,7 @@ Each directory contains:
     - change /keyboard/keys/key type to "array"
 
 - `imports/` - the importable data files (TODO-LDML)
+
+## License
+
+- [unicode-license.txt](unicode-license.txt) - Unicode license

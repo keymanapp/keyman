@@ -34,6 +34,7 @@ uses
   Keyman.System.Debug.DebugCore,
   Keyman.System.Debug.DebugEvent,
   Keyman.System.Debug.DebugUIStatus,
+  Keyman.System.Debug.DebugUtils,
   Keyman.System.KeymanCore,
   Keyman.System.KeymanCoreDebug,
   UframeTextEditor,
@@ -189,8 +190,6 @@ type
     property DebugVisible: Boolean read FDebugVisible;
 
     procedure ListBreakpoints;
-
-    function ShortcutDisabled(Key: Word): Boolean;
 
     property CurrentEvent: TDebugEvent read GetCurrentEvent;
 
@@ -373,12 +372,7 @@ function TfrmDebug.SetKeyEventContext: Boolean;
 var
   context: pkm_core_context;
   context_items: TArray<km_core_context_item>;
-  n, i: Integer;
-  ch: Char;
-  dk: TDeadKeyInfo;
 begin
-  context := km_core_state_context(FDebugCore.State);
-
   if memo.SelLength > 0 then
   begin
     // When there is a selection, we'll treat it as
@@ -392,41 +386,22 @@ begin
     // backspace in the case of backspace key, rather
     // than deleting the last character of the selection
     // (Keyman Core is not aware of selection).
-    km_core_context_clear(context);
+    km_core_state_context_clear(FDebugCore.State);
     Exit(True);
   end;
 
-  n := 0;
-  SetLength(context_items, Length(memo.Text)+1);
-  i := 1;
-  while i <= memo.SelStart + memo.SelLength do
-  begin
-    ch := memo.Text[i];
-    if Uni_IsSurrogate1(ch) and (i < Length(memo.Text)) and
-      Uni_IsSurrogate2(memo.Text[i+1]) then
-    begin
-      context_items[n]._type := KM_CORE_CT_CHAR;
-      context_items[n].character := Uni_SurrogateToUTF32(ch, memo.Text[i+1]);
-      Inc(i);
-    end
-    else if Ord(ch) = $FFFC then
-    begin
-      context_items[n]._type := KM_CORE_CT_MARKER;
-      dk := FDeadkeys.GetFromPosition(i-1);
-      Assert(Assigned(dk));
-      context_items[n].marker := dk.Deadkey.Value;
-    end
-    else
-    begin
-      context_items[n]._type := KM_CORE_CT_CHAR;
-      context_items[n].character := Ord(ch);
-    end;
-    Inc(i);
-    Inc(n);
-  end;
-
-  context_items[n]._type := KM_CORE_CT_END;
+  // Set the cached context
+  context_items := GetContextFromMemo(memo, FDeadkeys, True);
+  context := km_core_state_context(FDebugCore.State);
   Result := km_core_context_set(context, @context_items[0]) = KM_CORE_STATUS_OK;
+
+  if Result then
+  begin
+    // Set the app context
+    context_items := GetContextFromMemo(memo, FDeadkeys, False);
+    context := km_core_state_app_context(FDebugCore.State);
+    Result := km_core_context_set(context, @context_items[0]) = KM_CORE_STATUS_OK;
+  end;
 end;
 
 function TfrmDebug.ProcessKeyEvent(var Message: TMessage): Boolean;
@@ -457,6 +432,13 @@ begin
   // mapping; the best way to do this is to extract the scan code from
   // the message data and work from that
   vkey := MapScanCodeToUSVK((Message.LParam and $FF0000) shr 16);
+
+  // We don't support the Right Shift modifier in Keyman;
+  // we treat it as Left Shift, even though MapScanCodeToUSVK
+  // recognizes it
+  if vkey = VK_RSHIFT then
+    vkey := VK_SHIFT;
+
   modifier := 0;
 
   if GetKeyState(VK_LCONTROL) < 0 then modifier := modifier or KM_CORE_MODIFIER_LCTRL;
@@ -1338,23 +1320,6 @@ end;
 procedure TfrmDebug.memoClick(Sender: TObject);
 begin
   memoSelMove(memo);
-end;
-
-{-------------------------------------------------------------------------------
- - Control captions                                                            -
- ------------------------------------------------------------------------------}
-
-function TfrmDebug.ShortcutDisabled(Key: Word): Boolean;
-begin
-  Result := False;
-  if not FUIDisabled then Exit;
-  if Key in [VK_F1..VK_F12] then
-    Result := True
-  else if GetKeyState(VK_CONTROL) < 0 then
-  begin
-    if Key in [Ord('A')..Ord('Z'), Ord('0')..Ord('9')] then
-      Result := True;
-  end;
 end;
 
 procedure TfrmDebug.memoSelMove(Sender: TObject);

@@ -92,6 +92,9 @@
   <string name="storage_permission_denied" comment="Keyboard package installation may fail since Android storage permission not granted">
     Storage permission request was denied. May fail to install keyboard package</string>
 
+  <string name="storage_permission_denied2" comment="Keyboard package installation failed. Recommend install from local file">
+    Storage permission request failed. Try Keyman Settings - Install from local file</string>
+
   <!-- Context: Keyman Settings menu -->
   <string name="keyman_settings" comment="Settings menu title">Settings</string>
 

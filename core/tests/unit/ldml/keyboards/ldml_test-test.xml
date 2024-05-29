@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE keyboardTest3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/45/dtd/ldmlKeyboardTest3.dtd">
+<keyboardTest3 conformsTo="techpreview">
+  <info keyboard="ldml_test.xml" author="srl295" name="test" />
+
+  <tests name="separate">
+    <!-- test direct key output
+    https://www.unicode.org/reports/tr35/tr35-keyboards.html#element-key -->
+    <test name="key-1">
+      <keystroke key="1" />
+      <check result="1:basic:OK" />
+    </test>
+    <!-- test a simple transform
+    https://www.unicode.org/reports/tr35/tr35-keyboards.html#element-transform -->
+    <test name="key-2">
+      <keystroke key="2" />
+      <check result="2:simple_transform:OK" />
+    </test>
+    <!-- test a transform using a marker
+    https://www.unicode.org/reports/tr35/tr35-keyboards.html#markers -->
+    <test name="key-3">
+      <keystroke key="3" />
+      <check result="3:simple_marker:OK" />
+    </test>
+    <!-- test a reorder
+    https://www.unicode.org/reports/tr35/tr35-keyboards.html#element-reorder -->
+    <test name="key-4">
+      <keystroke key="4" />
+      <check result="4:simple_reorder:OK" />
+    </test>
+    <!-- test using variable substitution
+    https://www.unicode.org/reports/tr35/tr35-keyboards.html#element-string -->
+    <test name="key-5">
+      <keystroke key="5" />
+      <check result="5:simple_vars:OK" />
+    </test>
+    <!-- test a mapped variable substitution
+    https://www.unicode.org/reports/tr35/tr35-keyboards.html#replacement-syntax -->
+    <test name="key-6">
+      <keystroke key="6" />
+      <check result="6:map_var:OK" />
+    </test>
+    <!-- test a uset substitution
+    https://www.unicode.org/reports/tr35/tr35-keyboards.html#element-unicodeset -->
+    <test name="key-7">
+      <keystroke key="7" />
+      <check result="7:simple_uset:OK" />
+    </test>
+    <!-- test a different uset substitution
+    https://www.unicode.org/reports/tr35/tr35-keyboards.html#element-unicodeset -->
+    <test name="key-shift-7">
+      <keystroke key="shift-7" />
+      <check result="7:simple_uset:FAIL" />
+    </test>
+    <!-- test pre-existing input context
+    https://www.unicode.org/reports/tr35/tr35-keyboards.html#test-element-startcontext -->
+    <test name="key-8">
+      <startContext to="ABC" />
+      <keystroke key="8" />
+      <check result="8:ctxt:OK" />
+    </test>
+    <!-- test that the input context is required
+    https://www.unicode.org/reports/tr35/tr35-keyboards.html#test-element-startcontext -->
+    <test name="key-8-fail">
+      <startContext to="" /> <!-- w/o context -->
+      <keystroke key="8" />
+      <check result="8:ctxt:FAIL"/>
+    </test>
+    <!-- test context with a non-BMP character
+    https://www.unicode.org/reports/tr35/tr35-keyboards.html#test-element-startcontext -->
+    <test name="key-8-osage">
+      <startContext to="𐓏" />
+      <keystroke key="8" />
+      <check result="8:ctxt:OK" />
+    </test>
+    <!-- test using two pieces of context together with non-BMP chars
+    https://www.unicode.org/reports/tr35/tr35-keyboards.html#test-element-startcontext -->
+    <test name="key-8-osage2">
+      <startContext to="𐒻" />
+      <keystroke key="shift-8" />
+      <keystroke key="8" />
+      <check result="8:ctxt:OK" />
+    </test>
+    <!-- test using two markers across two keystrokes
+    https://www.unicode.org/reports/tr35/tr35-keyboards.html#markers -->
+    <test name="key-9">
+      <startContext to="" />
+      <keystroke key="9" />
+      <keystroke key="shift-9" />
+      <check result="9:split_marker:OK" />
+    </test>
+  </tests>
+</keyboardTest3>

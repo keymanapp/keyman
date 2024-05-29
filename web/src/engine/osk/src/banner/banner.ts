@@ -17,6 +17,7 @@ import { createUnselectableElement } from 'keyman/engine/dom-utils';
 
 export abstract class Banner {
   private _height: number; // pixels
+  private _width: number; // pixels
   private div: HTMLDivElement;
 
   public static DEFAULT_HEIGHT: number = 37; // pixels; embedded apps can modify
@@ -44,6 +45,15 @@ export abstract class Banner {
    */
   public set height(height: number) {
     this._height = (height > 0) ?  height : 0;
+    this.update();
+  }
+
+  public get width(): number {
+    return this._width;
+  }
+
+  public set width(width: number) {
+    this._width = width;
     this.update();
   }
 
@@ -88,7 +98,7 @@ export abstract class Banner {
    * Function     getDiv
    * Scope        Public
    * @returns     {HTMLElement} Base element of the banner
-   * Description  Returns the HTMLElelemnt of the banner
+   * Description  Returns the HTMLElement of the banner
    */
   public getDiv(): HTMLElement {
     return this.div;
@@ -101,6 +111,8 @@ export abstract class Banner {
    * @param keyboardProperties
    */
   public configureForKeyboard(keyboard: Keyboard, keyboardProperties: KeyboardProperties) { }
+
+  public readonly refreshLayout?: () => void;
 
   abstract get type();
 }

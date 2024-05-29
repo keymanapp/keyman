@@ -1,16 +1,17 @@
 #!/usr/bin/env bash
+# Build FirstVoices for iOS app
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # Include our resource functions; they're pretty useful!
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
 
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
+# ################################ Main script ################################
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 verify_on_mac
@@ -22,7 +23,6 @@ builder_describe "Builds the $TARGET app for use on iOS devices - iPhone and iPa
   "clean" \
   "configure" \
   "build" \
-  "--debug         Avoids codesigning and adds full sourcemaps for the embedded predictive-text engine" \
   "--sim-artifact  Also outputs a simulator-friendly test artifact corresponding to the build"
 
 builder_parse "$@"
@@ -57,10 +57,15 @@ function carthage_die() {
 }
 
 function do_configure() {
-  export KEYBOARDS_TARGET="$TARGET/Keyboards"
-  export KEYBOARDS_CSV_TARGET="$TARGET/Keyboards/keyboards.csv"
-  # TODO: support passing -copy-keyboards, -debug, -clean etc in to build_keyboards
-  ../common/build_keyboards.sh -download-keyboards
+  KEYBOARDS_CSV="$KEYMAN_ROOT/oem/firstvoices/keyboards.csv"
+  KEYBOARDS_CSV_TARGET="$KEYMAN_ROOT/oem/firstvoices/ios/FirstVoices/Keyboards/keyboards.csv"
+
+  KEYBOARD_PACKAGE_ID="fv_all"
+  KEYBOARDS_TARGET="$KEYMAN_ROOT/oem/firstvoices/ios/FirstVoices/Keyboards/${KEYBOARD_PACKAGE_ID}.kmp"
+
+  mkdir -p "$KEYMAN_ROOT/oem/firstvoices/ios/FirstVoices/Keyboards"
+  cp "$KEYBOARDS_CSV" "$KEYBOARDS_CSV_TARGET"
+  downloadKeyboardPackage "$KEYBOARD_PACKAGE_ID" "$KEYBOARDS_TARGET"
 
   echo
   echo "Load dependencies with Carthage"

@@ -6,9 +6,6 @@
         <Projects Include="keyboard-js-info\KeyboardJSInfoTestSuite.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="kmconvert\kmconverttest.dproj">
-            <Dependencies/>
-        </Projects>
         <Projects Include="kmx-file-languages\KMXFileLanguagesTestSuite.dproj">
             <Dependencies/>
         </Projects>
@@ -34,15 +31,6 @@
     </Target>
     <Target Name="KeyboardJSInfoTestSuite:Make">
         <MSBuild Projects="keyboard-js-info\KeyboardJSInfoTestSuite.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="kmconverttest">
-        <MSBuild Projects="kmconvert\kmconverttest.dproj"/>
-    </Target>
-    <Target Name="kmconverttest:Clean">
-        <MSBuild Projects="kmconvert\kmconverttest.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="kmconverttest:Make">
-        <MSBuild Projects="kmconvert\kmconverttest.dproj" Targets="Make"/>
     </Target>
     <Target Name="KMXFileLanguagesTestSuite">
         <MSBuild Projects="kmx-file-languages\KMXFileLanguagesTestSuite.dproj"/>

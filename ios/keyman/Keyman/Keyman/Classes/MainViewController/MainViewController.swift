@@ -9,6 +9,7 @@
 import KeymanEngine
 import UIKit
 import QuartzCore
+import os
 
 // Internal strings
 private let baseUri = "https://r.keymanweb.com/20/fonts/get_mobileconfig.php?id="
@@ -191,7 +192,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     userData.set(self.textView?.text, forKey: userTextKey)
     userData.set(self.textSize.description, forKey: userTextSizeKey)
     userData.synchronize()
-    log.debug("saving text size: \(textSize.description).")
+    os_log("saving text size: %{public}s", log: KeymanLogger.settings, type: .debug, textSize.description)
   }
 
   private func calculateDefaultTextSize() -> CGFloat {

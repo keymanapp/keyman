@@ -1,4 +1,4 @@
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
 #include <string>
 #include <iostream>
 

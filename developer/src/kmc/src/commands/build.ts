@@ -12,6 +12,7 @@ import { isProject } from '../util/projectLoader.js';
 import { buildTestData } from './buildTestData/index.js';
 import { buildWindowsPackageInstaller } from './buildWindowsPackageInstaller/index.js';
 import { commandOptionsToCompilerOptions } from '../util/extendedCompilerOptions.js';
+import { exitProcess } from '../util/sysexits.js';
 
 export function declareBuild(program: Command) {
   // TODO: localization?
@@ -25,7 +26,8 @@ export function declareBuild(program: Command) {
     .option('-d, --debug', 'Include debug information in output')
     .option('-w, --compiler-warnings-as-errors', 'Causes warnings to fail the build; overrides project-level warnings-as-errors option')
     .option('-W, --no-compiler-warnings-as-errors', 'Warnings do not fail the build; overrides project-level warnings-as-errors option')
-    .option('-m, --message <numbers...>', 'Adjust severity of info, hint or warning message to Disable (default), Info, Hint, Warn or Error')
+    .option('-m, --message <number>', 'Adjust severity of info, hint or warning message to Disable (default), Info, Hint, Warn or Error (option can be repeated)',
+      (value, previous) => previous.concat([value]), [])
     .option('--no-compiler-version', 'Exclude compiler version metadata from output')
     .option('--no-warn-deprecated-code', 'Turn off warnings for deprecated code styles');
 
@@ -75,11 +77,11 @@ function initialize(commanderOptions: any) {
   return options;
 }
 
-async function buildFile(filenames: string[], _options: any, commander: any)  {
+async function buildFile(filenames: string[], _options: any, commander: any): Promise<never|void> {
   const commanderOptions/*:{TODO?} CommandLineCompilerOptions*/ = commander.optsWithGlobals();
   const options = initialize(commanderOptions);
   if(!options) {
-    process.exit(1);
+    return await exitProcess(1);
   }
 
   const callbacks = new NodeCompilerCallbacks(options);
@@ -90,20 +92,22 @@ async function buildFile(filenames: string[], _options: any, commander: any)  {
     filenames.push('.');
   }
 
+  /* c8 ignore next 6 */
+  // full test on console log of error message not justified; check with user test recommended
   if(filenames.length > 1 && commanderOptions.outFile) {
     // -o can only be specified with a single input file
     callbacks.reportMessage(InfrastructureMessages.Error_OutFileCanOnlyBeSpecifiedWithSingleInfile());
-    process.exit(1);
+    return await exitProcess(1);
   }
 
   if(!expandFileLists(filenames, callbacks)) {
-    process.exit(1);
+    return await exitProcess(1);
   }
 
   for(let filename of filenames) {
     if(!await build(filename, commanderOptions.outFile, callbacks, options)) {
       // Once a file fails to build, we bail on subsequent builds
-      process.exit(1);
+      return await exitProcess(1);
     }
   }
 }

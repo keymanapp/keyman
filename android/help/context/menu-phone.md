@@ -9,14 +9,13 @@ title: Keyman for Android (Phone Layout)
 | ![](../android_images/backspace-ap.png) | Backspace |
 | ![](../android_images/return-ap.png) | Return |
 | ![](../android_images/shift-ap.png) | Shift key. Long press this key to access the <kbd>CTRL</kbd>, <kbd>ALT</kbd> and <kbd>CTRL</kbd><kbd>ALT</kbd> keys (which can access additional key layers) |
-| ![](../android_images/touch-hold-ap.png) | Keys with a small dot in the top right corner indicate a long press key. Access further functionality by long pressing the key |
-| ![](../android_images/share-a.png) | Share your text with other apps like Messages, Gmail, or Twitter. Some versions of Android also let you copy your text to the clipboard. |
+| ![](../android_images/touch-hold-ap.png) | There are several [gestures](gestures) to interact with some keys on the keyboard. Keys which have gestures available will normally show a hint in the top right of the key.<br>Gestures include: long press, flick, and multitap. |
 
 ----
 
 |   | Toolbar Icons |
 |---|---|
-| ![](../android_images/browser-a.png) | Open the Keyman Browser to use the web in your language |
+| ![](../android_images/share-a.png) | Share your text with other apps like Messages, Gmail, or Twitter. Some versions of Android also let you copy your text to the clipboard. |
 | ![](../android_images/menu-icon-a.png) | Open the menu for additional options |
 | ![](../android_images/font-size-a.png) | Adjust the font size |
 | ![](../android_images/delete-a.png) | Delete all current text |

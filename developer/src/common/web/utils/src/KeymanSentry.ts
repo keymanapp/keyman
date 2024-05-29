@@ -2,6 +2,8 @@ import Sentry from "@sentry/node";
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { getOption } from "./options.js";
 
+export type SentryNodeOptions = Sentry.NodeOptions;
+
 /**
  * Maximum delay on shutdown of process to send pending events
  * to Sentry, in msec
@@ -12,7 +14,7 @@ let isInit = false;
 
 export class KeymanSentry {
 
-  static async isEnabled() {
+  static isEnabled() {
     if(process.argv.includes('--no-error-reporting')) {
       return false;
     }
@@ -23,8 +25,10 @@ export class KeymanSentry {
     return getOption('automatically report errors', true);
   }
 
-  static init() {
+  static init(options?: SentryNodeOptions) {
+    options = options ?? {};
     Sentry.init({
+      ...options,
       dsn: 'https://39b25a09410349a58fe12aaf721565af@o1005580.ingest.sentry.io/5983519',  // Keyman Developer
       environment: KEYMAN_VERSION.VERSION_ENVIRONMENT,
       release: KEYMAN_VERSION.VERSION_GIT_TAG,

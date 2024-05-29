@@ -19,13 +19,6 @@
   "devDependencies": {
     "@keymanapp/resources-gosh": "*",
     "c8": "^7.12.0",
-    "chai": "^4.3.4",
-    "karma": "^6.4.1",
-    "karma-chai": "^0.1.0",
-    "karma-chrome-launcher": "^2.2.0",
-    "karma-mocha": "^2.0.1",
-    "karma-mocha-reporter": "^2.2.5",
-    "karma-teamcity-reporter": "^1.1.0",
     "mocha": "^10.0.0",
     "mocha-teamcity-reporter": "^4.0.0",
     "ts-node": "^10.9.1",
@@ -40,8 +33,7 @@
     "@keymanapp/common-types": "*",
     "@keymanapp/models-types": "*",
     "@keymanapp/keyman-version": "*",
-    "@keymanapp/web-utils": "*",
-    "@types/node": "^11.9.4"
+    "@keymanapp/web-utils": "*"
   },
   "type": "module",
   "main": "./build/obj/index.js",

@@ -9,6 +9,7 @@
 import CoreText
 import Foundation
 import UIKit // for UIFont
+import os.log
 
 public class FontManager {
   public static let shared = FontManager()
@@ -49,13 +50,15 @@ public class FontManager {
 
   private func readFontName(at url: URL) -> String? {
     guard let provider = CGDataProvider(url: url as CFURL) else {
-      log.error("Failed to open \(url)")
+      let message = "Failed to open \(url)"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
       return nil
     }
     guard let font = CGFont(provider),
       let name = font.postScriptName
     else {
-      log.error("Failed to read font at \(url)")
+      let message = "Failed to read font at \(url)"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
       return nil
     }
     return name as String
@@ -84,13 +87,16 @@ public class FontManager {
       didRegister = CTFontManagerRegisterFontsForURL(url as CFURL, .none, &errorRef)
       let error = errorRef?.takeRetainedValue() // Releases errorRef
       if !didRegister {
-        log.error("Failed to register font \(fontName) at \(url) reason: \(String(describing: error))")
+        let message = "Failed to register font \(fontName) at \(url) reason: \(String(describing: error))"
+        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
       } else {
-        log.info("Registered font \(fontName) at \(url)")
+        let message = "Registered font \(fontName) at \(url)"
+        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
       }
     } else {
       didRegister = false
-      log.info("Did not register font at \(url) because font name \(fontName) is already registered")
+      let message = "Did not register font at \(url) because font name \(fontName) is already registered"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
     }
     let font = RegisteredFont(name: fontName, isRegistered: didRegister)
     fonts[url] = font
@@ -111,11 +117,13 @@ public class FontManager {
       let didUnregister = CTFontManagerUnregisterFontsForURL(url as CFURL, .none, &errorRef)
       let error = errorRef?.takeRetainedValue() // Releases errorRef
       if didUnregister {
-        log.info("Unregistered font \(font.name) at \(url)")
+        let message = "Unregistered font \(font.name) at \(url)"
+        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
         font.isRegistered = false
         fonts[url] = font
       } else {
-        log.error("Failed to unregister font \(font.name) at \(url) reason: \(String(describing: error))")
+        let message = "Failed to unregister font \(font.name) at \(url) reason: \(String(describing: error))"
+        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
       }
     }
 
@@ -128,7 +136,8 @@ public class FontManager {
 
   public func registerFonts(in directory: URL) {
     guard let urls = try? FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil) else {
-      log.error("Could not list contents of directory \(directory)")
+      let message = "Could not list contents of directory \(directory)"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
       return
     }
     for url in urls where url.lastPathComponent.hasFontExtension {
@@ -138,7 +147,8 @@ public class FontManager {
 
   public func unregisterFonts(in directory: URL, fromSystemOnly: Bool = true) {
     guard let urls = try? FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil) else {
-      log.error("Could not list contents of directory \(directory)")
+      let message = "Could not list contents of directory \(directory)"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
       return
     }
     for url in urls where url.lastPathComponent.hasFontExtension {

@@ -23,7 +23,7 @@ enum ansi_code {
     BRIGHT_RED = 196
 };
 
-bool enabled = false;
+extern bool enabled;
 
 class fg {
     ansi_code code;

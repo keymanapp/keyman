@@ -87,7 +87,7 @@ export class LDMLKeyboardXMLSourceFileReader {
     if(source?.keyboard3?.variables) {
       boxXmlArray(source?.keyboard3?.variables, 'set');
       boxXmlArray(source?.keyboard3?.variables, 'string');
-      boxXmlArray(source?.keyboard3?.variables, 'unicodeSet');
+      boxXmlArray(source?.keyboard3?.variables, 'uset');
     }
     if(source?.keyboard3?.transforms) {
       for(let transforms of source.keyboard3.transforms)  {
@@ -156,7 +156,7 @@ export class LDMLKeyboardXMLSourceFileReader {
     }
     // then, the implied imports
     if (subtag === 'keys') {
-      // <import base="cldr" path="techpreview/keys-Latn-implied.xml"/>
+      // <import base="cldr" path="45/keys-Latn-implied.xml"/>
       if (!this.resolveOneImport(obj, subtag, {
         base: constants.cldr_import_base,
         path: constants.cldr_implied_keys_import
@@ -164,7 +164,7 @@ export class LDMLKeyboardXMLSourceFileReader {
         return false;
       }
     } else if (subtag === 'forms') {
-      // <import base="cldr" path="techpreview/scanCodes-implied.xml"/>
+      // <import base="cldr" path="45/scanCodes-implied.xml"/>
       if (!this.resolveOneImport(obj, subtag, {
         base: constants.cldr_import_base,
         path: constants.cldr_implied_forms_import

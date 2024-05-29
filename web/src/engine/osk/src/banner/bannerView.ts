@@ -1,4 +1,4 @@
-import EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter3';
 
 import { createUnselectableElement } from 'keyman/engine/dom-utils';
 
@@ -24,38 +24,8 @@ interface BannerViewEventMap {
 }
 
 /**
- * The `BannerManager` module is designed to serve as a manager for the
- * different `Banner` types.
- * To facilitate this, it will provide a root element property that serves
- * as a container for any active `Banner`, helping KMW to avoid needless
- * DOM element shuffling.
- *
- * Goals for the `BannerManager`:
- *
- * * It will be exposed as `keyman.osk.banner` and will provide the following API:
- *   * `getOptions`, `setOptions` - refer to the `BannerOptions` class for details.
- *   * This provides a persistent point that the web page designers and our
- *     model apps can utilize and can communicate with.
- *   * These API functions are designed for live use and will allow
- *     _hot-swapping_ the `Banner` instance; they're not initialization-only.
- * * Disabling the `Banner` (even for suggestions) outright with
- *   `enablePredictions == false` will auto-unload any loaded predictive model
- *   from `ModelManager` and setting it to `true` will revert this.
- *   * This should help to avoid wasting computational resources.
- * * It will listen to ModelManager events and automatically swap Banner
- *   instances as appropriate:
- *   * The option `persistentBanner == true` is designed to replicate current
- *     iOS system keyboard behavior.
- *     * When true, an `ImageBanner` will be displayed.
- *     * If false, it will be replaced with a `BlankBanner` of zero height,
- *       corresponding to our current default lack of banner.
- *   * It will not automatically set `persistentBanner == true`;
- *     this must be set by the iOS app, and only under the following conditions:
- *     * `keyman.isEmbedded == true`
- *     * `device.OS == 'ios'`
- *     * Keyman is being used as the system keyboard within an app that
- *       needs to reserve this space (i.e: Keyman for iOS),
- *       rather than as its standalone app.
+ * The `BannerView` module is designed to serve as the hot-swap container for the
+ * different `Banner` types, helping KMW to avoid needless DOM element shuffling.
  */
 export class BannerView implements OSKViewComponent {
   private bannerContainer: HTMLDivElement;
@@ -161,5 +131,17 @@ export class BannerView implements OSKViewComponent {
     return ParsedLengthStyle.inPixels(this.height);
   }
 
-  public refreshLayout() {};
+  public get width(): number | undefined {
+    return this.currentBanner?.width;
+  }
+
+  public set width(w: number) {
+    if(this.currentBanner) {
+      this.currentBanner.width = w;
+    }
+  }
+
+  public refreshLayout() {
+    this.currentBanner.refreshLayout?.();
+  }
 }

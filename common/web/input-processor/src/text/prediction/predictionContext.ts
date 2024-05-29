@@ -1,4 +1,4 @@
-import EventEmitter from "eventemitter3";
+import { EventEmitter } from "eventemitter3";
 import type LanguageProcessor from "./languageProcessor.js";
 import { type ReadySuggestions, type InvalidateSourceEnum, StateChangeEnum, StateChangeHandler } from './languageProcessor.js';
 import { type KeyboardProcessor, type OutputTarget } from "@keymanapp/keyboard-processor";
@@ -105,6 +105,10 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     this.connect();
   }
 
+  public get modelState() {
+    return this.langProcessor.state;
+  }
+
   private connect() {
     this.langProcessor.addListener('invalidatesuggestions', this.invalidateSuggestions);
     this.langProcessor.addListener('suggestionsready', this.updateSuggestions);
@@ -172,7 +176,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
    * @param suggestion Either a `Suggestion` or `Reversion`.
    * @returns if `suggestion` is a `Suggestion`, will return a `Promise<Reversion>`; else, `null`.
    */
-  public accept(suggestion: Suggestion): Promise<Reversion> | null {
+  public accept(suggestion: Suggestion): Promise<Reversion> | Promise<null> {
     let _this = this;
 
     // Selecting a suggestion or a reversion should both clear selection
@@ -188,7 +192,8 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
         this.recentAccept = false;
         this.recentRevert = true;
       }
-      return null;
+
+      return Promise.resolve(null);
     }
 
     this.revertAcceptancePromise.then(function(suggestion) {

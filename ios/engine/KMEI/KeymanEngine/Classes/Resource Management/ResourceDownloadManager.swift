@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import os.log
 
 public enum DownloadError : Error {
   public enum Cause: Error {
@@ -241,26 +242,30 @@ public class ResourceDownloadManager {
     Queries.LexicalModel.fetchModels(forLanguageCode: languageID, withSession: session) { results, error in
       if let error = error {
         // We never quite started downloading the lexical model, so there's no download to have failed.
-        log.info("Failed to fetch lexical model list for "+languageID+". error: "+error.localizedDescription)
+        let message = "Failed to fetch lexical model list for \(languageID), error: \(error.localizedDescription)"
+        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
         try? completionClosure?(nil, error)
         return
       }
 
       guard let results = results else {  // Should not be possible.
         //TODO: put up an alert instead
-        log.info("No lexical models available for language \(languageID) (nil)")
+        let message = "No lexical models available for language \(languageID) (nil)"
+        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
         try? completionClosure?(nil, nil)
         return
       }
 
       if results.count == 0 {
-        log.info("No lexical models available for language \(languageID) (empty)")
+        let message = "No lexical models available for language \(languageID) (empty)"
+        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
         try? completionClosure?(nil, nil)
         // We automatically use the first model in the list.
       } else {
         let lexicalModel = results[0].0
         let lmFullID = results[0].0.fullID
-        log.info("Fetched lexical model list for "+languageID+".")
+        let message = "Fetched lexical model list for \(languageID)."
+        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
 
         let closure = completionClosure ?? self.standardLexicalModelInstallCompletionBlock(forFullID: lmFullID)
         let downloadURL = self.defaultDownloadURL(forPackage: lexicalModel.packageKey,
@@ -496,7 +501,8 @@ public class ResourceDownloadManager {
                                                   from: downloadURL) { package, error in
         guard let package = package, error == nil else {
           let errString = error != nil ? String(describing: error!) : ""
-          log.error("Could not successfully download package \(key) for update: \(errString)")
+          let errorMessage = "Could not successfully download package \(key) for update: \(errString)"
+          os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, errorMessage)
           return
         }
 
@@ -531,11 +537,15 @@ public class ResourceDownloadManager {
         // The reason we're deprecating it; only returns the first model, even if more language pairings are installed.
         return package.installables[0][0]
       } else {
-        SentryManager.captureAndLog("Specified package (at \(packageURL)) does not contain lexical models: \(KMPError.invalidPackage)")
+        let message = "Specified package (at \(packageURL)) does not contain lexical models: \(KMPError.invalidPackage)"
+        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
+        SentryManager.capture(message)
         return nil
       }
     } catch {
-      SentryManager.captureAndLog(error, message: "Error occurred while attempting to install package from \(packageURL): \(String(describing: error))")
+      let message = "Error occurred while attempting to install package from \(packageURL): \(String(describing: error))"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
+      SentryManager.capture(error, message: message)
       return nil
     }
   }
@@ -560,7 +570,9 @@ public class ResourceDownloadManager {
         try handler?(package, error)
         self.resourceDownloadCompleted(with: package)
       } catch {
-        SentryManager.captureAndLog(error, message: "Unhandled error occurred after resource successfully downloaded: \(String(describing: error))")
+        let message = "Unhandled error occurred after resource successfully downloaded: \(String(describing: error))"
+        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
+        SentryManager.capture(error, message: message)
         self.resourceDownloadFailed(withKey: packageKey, with: error)
       }
 
@@ -615,7 +627,9 @@ public class ResourceDownloadManager {
       if let package = package {
         do {
           try ResourceFileManager.shared.install(resourceWithID: fullID, from: package)
-          SentryManager.breadcrumbAndLog("successfully parsed the keyboard in: \(package.sourceFolder)")
+          let message = "successfully parsed the keyboard in: \(package.sourceFolder)"
+          os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
+          SentryManager.breadcrumb(message)
 
           // Maintains legacy behavior; automatically sets the newly-downloaded keyboard as active.
           if let keyboard = package.findResource(withID: fullID) {
@@ -626,13 +640,18 @@ public class ResourceDownloadManager {
             self.downloadLexicalModelsForLanguageIfExists(languageID: fullID.languageID)
           }
         } catch {
-          SentryManager.captureAndLog(error, message: "Keyboard installation error: \(String(describing: error))")
+          let message = "Keyboard installation error: \(String(describing: error))"
+          os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
+          SentryManager.capture(error, message: message)
         }
       } else if let error = error {
         // Often a download error.
-        log.error("Installation failed: \(String(describing: error))")
+        let errorMessage = "Installation failed: \(String(describing: error))"
+        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, errorMessage)
       } else {
-        SentryManager.captureAndLog("Unknown error when attempting to install \(fullID.description))")
+        let message = "Unknown error when attempting to install \(fullID.description))"
+        os_log("%{public}s", log:KeymanEngineLogger.migration, type: .error, message)
+        SentryManager.capture(message)
       }
     }
   }
@@ -643,18 +662,25 @@ public class ResourceDownloadManager {
         do {
           // A raw port of the queue's old installation method for lexical models.
           try ResourceFileManager.shared.finalizePackageInstall(package, isCustom: false)
-          SentryManager.breadcrumbAndLog("successfully parsed the lexical model in: \(package.sourceFolder)")
+          let message = "successfully parsed the lexical model in: \(package.sourceFolder)"
+          os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
+          SentryManager.breadcrumb(message)
 
           if let installedLexicalModel = package.findResource(withID: fullID) {
             _ = Manager.shared.registerLexicalModel(installedLexicalModel)
           }
         } catch {
-          SentryManager.captureAndLog(error, message: "Error installing the lexical model: \(String(describing: error))")
+          let message = "Error installing the lexical model: \(String(describing: error))"
+          os_log("%{public}s", log:KeymanEngineLogger.migration, type: .error, message)
+          SentryManager.capture(error, message: message)
         }
       } else if let error = error {
-        log.error("Error downloading the lexical model \(String(describing: error))")
+        let errorMessage = "Error downloading the lexical model \(String(describing: error))"
+        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, errorMessage)
       } else {
-        SentryManager.captureAndLog("Unknown error when attempting to install \(fullID.description)")
+        let message = "Unknown error when attempting to install \(fullID.description)"
+        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
+        SentryManager.capture(message)
       }
     }
   }

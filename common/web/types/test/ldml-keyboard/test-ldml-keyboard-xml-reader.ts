@@ -28,7 +28,7 @@ describe('ldml keyboard xml reader tests', function () {
         instancePath: '/keyboard3/conformsTo',
         keyword: 'enum',
         message: `must be equal to one of the allowed values`,
-        params: 'allowedValues="techpreview"',
+        params: 'allowedValues="45"',
       })],
     },
     {
@@ -36,7 +36,13 @@ describe('ldml keyboard xml reader tests', function () {
       callback: (data, source, subpath, callbacks) => {
         assert.ok(source?.keyboard3?.keys);
         const k = pluckKeysFromKeybag(source?.keyboard3?.keys.key, ['a', 'b', 'c']);
-        assert.sameDeepOrderedMembers(k, [
+        assert.sameDeepOrderedMembers(k.map((entry) => {
+          // Drop the Symbol members from the returned keys; assertions may expect their presence.
+          return {
+            id: entry.id,
+            output: entry.output
+          };
+        }), [
           {id: 'a', output: 'a'},
           {id: 'b', output: 'b'},
           {id: 'c', output: 'c'},
@@ -51,7 +57,13 @@ describe('ldml keyboard xml reader tests', function () {
       callback: (data, source, subpath, callbacks) => {
         assert.ok(source?.keyboard3?.keys);
         const k = pluckKeysFromKeybag(source?.keyboard3?.keys.key, ['a', 'b', 'c']);
-        assert.sameDeepOrderedMembers(k, [
+        assert.sameDeepOrderedMembers(k.map((entry) => {
+          // Drop the Symbol members from the returned keys; assertions may expect their presence.
+          return {
+            id: entry.id,
+            output: entry.output
+          };
+        }), [
           {id: 'a', output: 'a'},
           {id: 'b', output: 'b'},
           {id: 'c', output: 'c'},
@@ -63,7 +75,13 @@ describe('ldml keyboard xml reader tests', function () {
       callback: (data, source, subpath, callbacks) => {
         assert.ok(source?.keyboard3?.keys);
         const k = pluckKeysFromKeybag(source?.keyboard3?.keys.key, ['a', 'b', 'c']);
-        assert.sameDeepOrderedMembers(k, [
+        assert.sameDeepOrderedMembers(k.map((entry) => {
+          // Drop the Symbol members from the returned keys; assertions may expect their presence.
+          return {
+            id: entry.id,
+            output: entry.output
+          };
+        }), [
           {id: 'a', output: 'a'},
           {id: 'b', output: 'b'},
           {id: 'c', output: 'c'},
@@ -76,7 +94,13 @@ describe('ldml keyboard xml reader tests', function () {
       callback: (data, source, subpath, callbacks) => {
         assert.ok(source?.keyboard3?.keys);
         const k = pluckKeysFromKeybag(source?.keyboard3?.keys.key, ['a', 'b', 'c', 'zz', 'hash', 'hyphen']);
-        assert.sameDeepOrderedMembers(k, [
+        assert.sameDeepOrderedMembers(k.map((entry) => {
+          // Drop the Symbol members from the returned keys; assertions may expect their presence.
+          return {
+            id: entry.id,
+            output: entry.output
+          };
+        }), [
           { id: 'a',      output: 'a' },       // implied
           { id: 'b',      output: 'b' },
           { id: 'c',      output: 'c' },
@@ -113,7 +137,7 @@ describe('ldml keyboard xml reader tests', function () {
       errors: [
         CommonTypesMessages.Error_ImportInvalidPath({
           base: null,
-          path: 'techpreview/too/many/slashes/leading/to/nothing-Zxxx-does-not-exist.xml',
+          path: '45/too/many/slashes/leading/to/nothing-Zxxx-does-not-exist.xml',
           subtag: null,
         }),
       ],
@@ -124,7 +148,7 @@ describe('ldml keyboard xml reader tests', function () {
       errors: [
         CommonTypesMessages.Error_ImportReadFail({
           base: null,
-          path: 'techpreview/none-Zxxx-does-not-exist.xml',
+          path: '45/none-Zxxx-does-not-exist.xml',
           subtag: null,
         }),
       ],
@@ -135,7 +159,7 @@ describe('ldml keyboard xml reader tests', function () {
       errors: [
         CommonTypesMessages.Error_ImportWrongRoot({
           base: null,
-          path: 'techpreview/keys-Zyyy-punctuation.xml',
+          path: '45/keys-Zyyy-punctuation.xml',
           subtag: 'flicks',
         }),
       ],

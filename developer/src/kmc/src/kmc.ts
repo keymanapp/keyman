@@ -9,9 +9,14 @@ import { declareAnalyze } from './commands/analyze.js';
 import { KeymanSentry, loadOptions } from '@keymanapp/developer-utils';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { TestKeymanSentry } from './util/TestKeymanSentry.js';
+import { exitProcess } from './util/sysexits.js';
+import { declareMessage } from './commands/messageCommand.js';
+import { kmcSentryOptions } from './util/kmcSentryOptions.js';
 
-await TestKeymanSentry.runTestIfCLRequested();
-KeymanSentry.init();
+await TestKeymanSentry.runTestIfCLRequested(kmcSentryOptions);
+if(KeymanSentry.isEnabled()) {
+  KeymanSentry.init(kmcSentryOptions);
+}
 try {
   await run();
 } catch(e) {
@@ -20,7 +25,7 @@ try {
 
 // Ensure any messages reported to Sentry have had time to be uploaded before we
 // exit. In most cases, this will be a no-op so should not affect performance.
-await KeymanSentry.close();
+await exitProcess(0);
 
 async function run() {
   await loadOptions();
@@ -42,12 +47,9 @@ async function run() {
     .addOption(new Option('--no-error-reporting', 'Disable error reporting to keyman.com (overriding user settings)'))
     .addOption(new Option('--error-reporting', 'Enable error reporting to keyman.com (overriding user settings)'));
 
-  if(await KeymanSentry.isEnabled()) {
-    KeymanSentry.init();
-  }
-
   declareBuild(program);
   declareAnalyze(program);
+  declareMessage(program);
 
   /* Future commands:
   declareClean(program);

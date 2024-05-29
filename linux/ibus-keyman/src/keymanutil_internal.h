@@ -42,6 +42,7 @@ void keyman_set_custom_keyboards(gchar ** keyboards);
 GHashTable * keyman_get_custom_keyboard_dictionary();
 void keyman_add_keyboard(gpointer data, gpointer user_data);
 void keyman_add_keyboards_from_dir(gpointer data, gpointer user_data);
+int keyman_compare_version(const gchar *version1, const gchar *version2);
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC(IBusEngineDesc, g_object_unref)
 G_DEFINE_AUTOPTR_CLEANUP_FUNC(IBusComponent, g_object_unref)

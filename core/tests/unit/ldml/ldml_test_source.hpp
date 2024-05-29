@@ -75,7 +75,7 @@ public:
   virtual void toggle_caps_lock_state();
   virtual void set_caps_lock_on(bool caps_lock_on);
   virtual km_core_status get_expected_load_status();
-  virtual const std::u16string &get_context() const  = 0;
+  virtual const std::u16string &get_context() = 0;
   virtual bool get_expected_beep() const;
 
   // helper functions
@@ -83,6 +83,22 @@ public:
   static uint16_t get_modifier(std::string const m);
   static std::u16string parse_source_string(std::string const &s);
   static std::u16string parse_u8_source_string(std::string const &s);
+
+  // sets the normalization switch.
+  // why is this here? to prevent an additional pass of parsing the KMX+ file.
+  void set_normalization_disabled(bool is_disabled) {
+    normalization_disabled = is_disabled;
+    setup = true;
+  }
+
+  bool get_normalization_disabled() const {
+    assert(setup); // make sure set_ was called first
+    return normalization_disabled;
+  }
+
+private:
+  bool normalization_disabled = false;
+  bool setup = false;
 
 private:
   bool _caps_lock_on = false;
@@ -121,7 +137,7 @@ public:
   int load_source(const km::core::path &path);
 
   virtual km_core_status get_expected_load_status();
-  virtual const std::u16string &get_context() const;
+  virtual const std::u16string &get_context();
   virtual bool get_expected_beep() const;
 
   virtual void next_action(ldml_action &fillin);
@@ -133,8 +149,9 @@ private:
   key_event next_key(std::string &keys);
   key_event next_key();
 
-  std::string keys = "";
-  std::u16string expected = u"", context = u"";
+  std::deque<std::string> keys;
+  std::deque<std::u16string> expected;
+  std::u16string context = u"";
   bool expected_beep = false;
   bool expected_error = false;
   bool is_done = false;

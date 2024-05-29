@@ -5,14 +5,14 @@ from
 https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-keyboards.md#element-transform
 
 -->
-<!DOCTYPE keyboard3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
-<keyboard3 locale="en" conformsTo="techpreview">
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="en" conformsTo="45">
   <info author="srl295" indicator="🙀" layout="qwerty" name="k_008_transform_norm" />
 
   <keys>
     <key id="u-0320" output="\u{0320}" /> <!-- ◌̠ -->
     <key id="u-0300" output="\u{0300}" /> <!-- ◌̀ -->
     <key id="u-00e8" output="\u{00e8}" /> <!-- è -->
+    <key id="u-0344" output="\u{0344}" /> <!-- discouraged greek dialytika tonos -->
     <key id="nfd" output="e\u{0320}\u{0300}" />
     <key id="nfc" output="\u{00E8}\u{0320}" />
     <key id="not-nfd" output="e\u{0300}\u{0320}" />
@@ -29,7 +29,7 @@ https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-keyboar
       <row keys="space" />
     </layer>
     <layer modifiers="shift" id="shift">
-      <row keys="u-0300 u-00e8 nfd nfc not-nfd stampy lgtm" />
+      <row keys="u-0300 u-00e8 nfd nfc not-nfd stampy lgtm u-0344" />
     </layer>
   </layers>
 
@@ -84,6 +84,9 @@ https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-keyboar
       <transform from="9c" to="9ce\u{0300}\m{stampy}\u{0320}\m{lgtm}" /> <!-- marker, denormalized -->
       <transform from="9d" to="9de\u{0320}\m{stampy}\u{0300}\m{lgtm}" /> <!--  marker, NFD -->
 
+      <transform from="9e\u{00E8}\m{stampy}\u{00E8}\u{0320}\m{lgtm}" to="YES9e" /> <!-- NFC in rules-->
+
+      <transform from="9fe\m{stampy}\u{0344}" to="YES9f" />
     </transformGroup>
     <transformGroup>
       <transform from="9ce\m{stampy}[\u{0320}][\u{0300}]\m{lgtm}" to="YES9c" />

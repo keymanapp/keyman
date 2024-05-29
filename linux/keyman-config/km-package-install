@@ -4,15 +4,17 @@ import argparse
 import datetime
 import logging
 import os
-import requests
-import requests_cache
 import sys
 import time
-from pkg_resources import parse_version
 from zipfile import is_zipfile
+import packaging.version
+import requests
+import requests_cache
 
-from keyman_config import KeymanApiUrl, add_standard_arguments, initialize_logging, initialize_sentry, secure_lookup
+from keyman_config import KeymanApiUrl, add_standard_arguments, initialize_logging, initialize_sentry, secure_lookup, verify_dbus_running
+from keyman_config.fcitx_util import is_fcitx_running
 from keyman_config.get_kmp import get_keyboard_data, get_kmp, keyman_cache_dir
+from keyman_config.ibus_util import IbusDaemon, verify_ibus_daemon
 from keyman_config.install_kmp import extract_kmp, InstallError, InstallStatus, install_kmp
 from keyman_config.kmpmetadata import get_metadata
 from keyman_config.list_installed_kmp import get_kmp_version_shared, get_kmp_version_user
@@ -124,6 +126,11 @@ def main():
 
     initialize_logging(args)
     initialize_sentry()
+    verify_dbus_running()
+
+    if (not is_fcitx_running()) and (verify_ibus_daemon(True) != IbusDaemon.RUNNING):
+        logging.error("km-package-install: error: ibus-daemon is not running. You might have to reboot or logout and login again.")
+        sys.exit(4)
 
     if args.package and args.file:
         parser.print_usage()
@@ -175,7 +182,7 @@ def main():
             sys.exit(3)
         pkg_version = secure_lookup(pkgdata, 'version')
         if installed_kmp_ver and pkg_version:
-            if parse_version(installed_kmp_ver) > parse_version(pkg_version):
+            if packaging.version.parse(installed_kmp_ver) > packaging.version.parse(pkg_version):
                 if args.force:
                     logging.warning(f'km-package-install: warning: The {args.package} keyboard ' +
                                     f'is already installed with a newer version {installed_kmp_ver}. ' +

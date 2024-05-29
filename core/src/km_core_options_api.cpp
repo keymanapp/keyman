@@ -11,7 +11,8 @@
 #include <cassert>
 #include <sstream>
 
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
+
 #include "processor.hpp"
 
 #include "jsonpp.hpp"
@@ -35,8 +36,8 @@ km_core_options_list_size(km_core_option_item const *opts)
 
 km_core_status
 km_core_state_option_lookup(km_core_state const *state,
-                      uint8_t scope, km_core_cp const *key,
-                      km_core_cp const **value_out)
+                      uint8_t scope, km_core_cu const *key,
+                      km_core_cu const **value_out)
 {
   assert(state); assert(key); assert(value_out);
   if (!state || !key || !value_out)  return KM_CORE_STATUS_INVALID_ARGUMENT;

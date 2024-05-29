@@ -132,7 +132,7 @@ builder_use_color() {
 # $BUILDER_TERM_END
 #
 function builder_term() {
-  echo "${BUILDER_TERM_START}$*${BUILDER_TERM_END}"
+  echo -e "${BUILDER_TERM_START}$*${BUILDER_TERM_END}"
 }
 
 function builder_die() {
@@ -400,9 +400,19 @@ _builder_execute_child() {
     fi
   done
 
-  "$script" $action \
+  # If the current build is a dependency build, pass the dependency state on to
+  # the child build, so that we don't unnecessarily rebuild children (#11394)
+  local dep_flag= dep_module=
+  if builder_is_dep_build; then
+    dep_flag=--builder-dep-parent
+    dep_module="$builder_dep_parent"
+  fi
+
+  "$script" \
     --builder-child \
     $_builder_build_deps \
+    $dep_flag "$dep_module" \
+    $action \
     ${child_options[@]} \
     $builder_verbose \
     $builder_debug \
@@ -567,7 +577,7 @@ function builder_run_action() {
   local action=$1
   shift
   if builder_start_action $action; then
-    ($@)
+    ("$@")
     builder_finish_action success $action
   fi
   return 0
@@ -1205,7 +1215,6 @@ builder_parse() {
         if [[ $# -eq 0 ]]; then
           _builder_parameter_error "$0" parameter "$key"
         fi
-
         exp+=("$1")
       fi
     else
@@ -1369,9 +1378,12 @@ _builder_parse_expanded_parameters() {
           # internal use parameter for dependency builds - identifier of parent script
           shift
           builder_dep_parent="$1"
+          builder_echo setmark "dependency build, started by $builder_dep_parent"
+          builder_echo grey "build.sh parameters: <${_params[@]}>"
           ;;
         --builder-child)
           _builder_is_child=0
+          builder_echo setmark "child build, parameters: <${_params[@]}>"
           ;;
         --builder-report-dependencies)
           # internal reporting function, ignores all other parameters
@@ -1379,7 +1391,13 @@ _builder_parse_expanded_parameters() {
           ;;
         *)
           # script does not recognize anything of action or target form at this point.
-          _builder_parameter_error "$0" parameter "$key"
+          if builder_is_child_build; then
+            # For child builds, don't fail the build when pass inheritable
+            # parameters (#11408)
+            builder_echo_debug "Parameter '$key' is not supported, ignoring"
+          else
+            _builder_parameter_error "$0" parameter "$key"
+          fi
       esac
     fi
     shift # past the processed argument
@@ -1409,13 +1427,10 @@ _builder_parse_expanded_parameters() {
   fi
 
   if builder_is_dep_build; then
-    builder_echo setmark "dependency build, started by $builder_dep_parent"
-    builder_echo grey "build.sh parameters: <${_params[@]}>"
     if [[ -z ${_builder_deps_built+x} ]]; then
       builder_die "FATAL ERROR: Expected '_builder_deps_built' variable to be set"
     fi
   elif builder_is_child_build; then
-    builder_echo setmark "child build, parameters: <${_params[@]}>"
     if [[ -z ${_builder_deps_built+x} ]]; then
       builder_die "FATAL ERROR: Expected '_builder_deps_built' variable to be set"
     fi
@@ -1667,11 +1682,6 @@ _builder_do_build_deps() {
       continue
     fi
 
-    # Only configure and build the dependency once per invocation
-    if builder_has_module_been_built "$dep"; then
-      continue
-    fi
-
     dep_target=
     if [[ ! -z ${_builder_dep_targets[$dep]+x} ]]; then
       # TODO: in the future split _builder_dep_targets into comma-separated
@@ -1679,14 +1689,19 @@ _builder_do_build_deps() {
       dep_target=${_builder_dep_targets[$dep]}
     fi
 
-    builder_set_module_has_been_built "$dep"
+    # Only configure and build the dependency once per invocation
+    if builder_has_module_been_built "$dep$dep_target"; then
+      continue
+    fi
+
+    builder_set_module_has_been_built "$dep$dep_target"
     "$REPO_ROOT/$dep/build.sh" "configure$dep_target" "build$dep_target" \
       $builder_verbose \
       $builder_debug \
       $_builder_build_deps \
       --builder-dep-parent "$THIS_SCRIPT_IDENTIFIER" && (
       if $_builder_debug_internal; then
-        builder_echo success "## Dependency $dep for $_builder_matched_action_name successfully"
+        builder_echo success "## Dependency $dep$dep_target for $_builder_matched_action_name successfully"
       fi
     ) || (
       result=$?

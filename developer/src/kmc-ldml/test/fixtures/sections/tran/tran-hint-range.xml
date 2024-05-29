@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+    <info name="tran-hint-range" />
+
+    <keys />
+
+    <transforms type="simple">
+        <transformGroup>
+            <!-- all NFD but crosses non-NFD-->
+            <transform from="[\u{0020}-\u{0250}]" to="x" />
+        </transformGroup>
+    </transforms>
+</keyboard3>

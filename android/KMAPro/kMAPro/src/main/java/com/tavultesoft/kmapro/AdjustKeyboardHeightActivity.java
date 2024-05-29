@@ -8,12 +8,9 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.view.Display;
 import android.view.MotionEvent;
-import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -110,9 +107,8 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
             break;
           case MotionEvent.ACTION_UP:
             // Save the currentHeight when the user releases
-            Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-            int rotation = display.getRotation();
-            String keyboardHeightKey = (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) ?
+            int orientation = KMManager.getOrientation(context);
+            String keyboardHeightKey = (orientation == Configuration.ORIENTATION_LANDSCAPE) ?
               KMManager.KMKey_KeyboardHeightLandscape : KMManager.KMKey_KeyboardHeightPortrait;
             editor.putInt(keyboardHeightKey, currentHeight);
             editor.commit();

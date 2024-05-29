@@ -4,7 +4,7 @@ object frmServerOptions: TfrmServerOptions
   BorderIcons = [biSystemMenu]
   BorderStyle = bsDialog
   Caption = 'Keyman Developer Server Options'
-  ClientHeight = 402
+  ClientHeight = 378
   ClientWidth = 433
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -40,7 +40,7 @@ object frmServerOptions: TfrmServerOptions
   end
   object cmdOK: TButton
     Left = 272
-    Top = 367
+    Top = 346
     Width = 73
     Height = 25
     Caption = 'OK'
@@ -51,7 +51,7 @@ object frmServerOptions: TfrmServerOptions
   end
   object cmdCancel: TButton
     Left = 352
-    Top = 367
+    Top = 346
     Width = 73
     Height = 25
     Cancel = True
@@ -63,7 +63,7 @@ object frmServerOptions: TfrmServerOptions
     Left = 8
     Top = 144
     Width = 417
-    Height = 150
+    Height = 129
     Caption = 'Setup'
     TabOrder = 3
     object lblAuthToken: TLabel
@@ -73,14 +73,6 @@ object frmServerOptions: TfrmServerOptions
       Height = 13
       Caption = '&Authentication token'
       FocusControl = editAuthToken
-    end
-    object lblRegion: TLabel
-      Left = 16
-      Top = 120
-      Width = 33
-      Height = 13
-      Caption = '&Region'
-      FocusControl = cbRegion
     end
     object lblVersion: TLabel
       Left = 183
@@ -111,22 +103,6 @@ object frmServerOptions: TfrmServerOptions
       Height = 21
       TabOrder = 2
     end
-    object cbRegion: TComboBox
-      Left = 122
-      Top = 117
-      Width = 145
-      Height = 21
-      Style = csDropDownList
-      TabOrder = 3
-      Items.Strings = (
-        'us (North America)'
-        'eu (Europe)'
-        'au (Australia)'
-        'ap (Asia/Pacific)'
-        'sa (South Africa)'
-        'jp (Japan)'
-        'in (India)')
-    end
     object cmdDownload: TButton
       Left = 16
       Top = 24
@@ -148,7 +124,7 @@ object frmServerOptions: TfrmServerOptions
   end
   object gbAdvanced: TGroupBox
     Left = 8
-    Top = 300
+    Top = 279
     Width = 417
     Height = 61
     Caption = 'Advanced Options'

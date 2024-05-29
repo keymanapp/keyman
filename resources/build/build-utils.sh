@@ -44,11 +44,16 @@ SHLVL=0
 
 function findKeymanRoot() {
   # We don't need readlink here because our standard script prolog does a
-  # readlink -f already so we will have already escaped from any symlinks
-  # But we still need to canonicalize paths to remove ../../..
-  KEYMAN_ROOT="${BASH_SOURCE[0]%/*/*/*}"
-  KEYMAN_ROOT="$( cd "$KEYMAN_ROOT" && echo "$PWD" )"
-  readonly KEYMAN_ROOT
+  # readlink -f already so we will have already escaped from any symlinks but we
+  # still need to canonicalize paths to remove ../../..
+  #
+  # We only want to set KEYMAN_ROOT if it isn't already set and readonly
+  # (https://stackoverflow.com/a/4441178/1836776)
+  if (unset KEYMAN_ROOT 2>/dev/null); then
+    KEYMAN_ROOT="${BASH_SOURCE[0]%/*/*/*}"
+    KEYMAN_ROOT="$( cd "$KEYMAN_ROOT" && echo "$PWD" )"
+    readonly KEYMAN_ROOT
+  fi
 }
 
 function findVersion() {
@@ -79,8 +84,8 @@ function findVersion() {
         VERSION_TAG=
     fi
 
-    if [ -z "${TEAMCITY_VERSION-}" ] && [ -z "${GITHUB_ACTIONS-}" ]; then
-        # Local dev machine, not TeamCity or GitHub Action
+    if [[ -z "${TEAMCITY_VERSION-}" && -z "${GITHUB_ACTIONS-}" && -z "${KEYMAN_PKG_BUILD-}" ]]; then
+        # Local dev machine, not TeamCity or GitHub Action and not .deb package build
         VERSION_TAG="$VERSION_TAG-local"
         VERSION_ENVIRONMENT=local
     elif [ -n "${TEAMCITY_PR_NUMBER-}" ]; then
@@ -299,7 +304,6 @@ replaceVersionStrings_Mkver() {
     s/\$Environment/$VERSION_ENVIRONMENT/g;
     s/\$Version/$VERSION/g;
     s/\$VERSIONNUM/$VERSION_MAJOR,$VERSION_MINOR,$VERSION_PATCH,0/g;
-    s/\$VERSION/$VERSION_WIN/g;
     s/\$RELEASE_MAJOR/$VERSION_MAJOR/g;
     s/\$RELEASE_MINOR/$VERSION_MINOR/g;
     s/\$RELEASE/$VERSION_RELEASE/g;
@@ -314,6 +318,8 @@ replaceVersionStrings_Mkver() {
     s/\$VERSION_WITH_TAG/$VERSION_WITH_TAG/g;
     s/\$VERSION_GIT_TAG/$VERSION_GIT_TAG/g;
     s/\$VERSION_ENVIRONMENT/$VERSION_ENVIRONMENT/g;
+
+    s/\$VERSION/$VERSION_WIN/g;
 
     " "$infile" > "$outfile"
 }

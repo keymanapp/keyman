@@ -105,7 +105,7 @@
     <string name="dictionary_download_start_in_background" comment="Notification that a dictionary download has started">ការទាញយកបញ្ជី​ពាក្យបាន​ចាប់ផ្ដើម​ក្នុង​ផ្ទៃ​ខាងក្រោយ</string>
     <!-- Context: Background download messages-->
     <string name="dictionary_download_is_running_in_background" comment="Notification that a dictionary download is still running">បញ្ជី​ពាក្យ​ដែល​បាន​ជ្រើសរើស​នេះ​កំពុង​ទាញយកហើយ សូម​ព្យាយាម​ម្ដងទៀត​ក្នុង​ពេល​ឆាប់ៗ នេះ!</string>
-    <!-- Context: Background download messages-->
+    <!-- Context: Background download messages. Removed in Keyman 17-->
     <string name="dictionary_download_finished" comment="Notification that a dictionary download has finished">ការទាញយកបញ្ជី​ពាក្យបាន​ចប់​សព្វគ្រប់​ហើយ!</string>
     <!-- Context: Background download messages -->
     <string name="download_failed" comment="Notification that a download failed">ការទាញយកបានបរាជ័យ</string>
@@ -117,7 +117,7 @@
     <string name="update_check_current" comment="Notification that all resources are up to date">"ធនធានទាំង​អស់​គឺ​ថ្មី​បំផុត​ហើយ!"</string>
     <!-- Context: General Updates -->
     <string name="update_failed" comment="Notification that a resource update failed">ធនធាន​មួយ​ឬ​ច្រើន​បាន​បរាជ័យ​ក្នុង​ការអាប់ដេត!</string>
-    <!-- Context: General Updates -->
+    <!-- Context: General Updates. Removed in Keyman 17 -->
     <string name="update_success" comment="Notification that a resource update successfully updated">បាន​អាប់ដេត​ធនធាននានា​ដោយ​ជោគជ័យ!</string>
     <!-- Context: Model Info -->
     <string name="model_version" comment="Title for a dictionary version">ជំនាន់​របស់បញ្ជី​ពាក្យ</string>

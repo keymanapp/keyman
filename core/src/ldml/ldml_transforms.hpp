@@ -16,18 +16,11 @@
 #include <utility>
 #include "debuglog.h"
 
-#if !defined(HAVE_ICU4C)
-#error icu4c is required for this code
-#endif
-
-#define U_FALLTHROUGH
-#include "unicode/utypes.h"
+#include "core_icu.h"
 #include "unicode/uniset.h"
 #include "unicode/usetiter.h"
-#include "unicode/unistr.h"
 #include "unicode/regex.h"
 #include "unicode/utext.h"
-#include "unicode/normalizer2.h"
 
 namespace km {
 namespace core {
@@ -104,7 +97,8 @@ public:
       KMX_DWORD mapFrom,
       KMX_DWORD mapTo,
       const kmx::kmx_plus &kplus,
-      bool &valid);
+      bool &valid,
+      bool normalization_disabled);
 
   /**
    * If matching, apply the match to the output string
@@ -125,6 +119,7 @@ private:
   std::deque<std::u32string> fMapToList;
   /** Internal function to setup pattern string @returns true on success */
   bool init();
+  bool normalization_disabled;
   /** @returns the index of the item in the fMapFromList list, or -1 */
   int32_t findIndexFrom(const std::u32string &match) const;
 public:
@@ -237,6 +232,11 @@ public:
   any_group_type type;  // transform or reorder
   transform_group transform;
   reorder_group reorder;
+  size_t apply(std::u32string &input, std::u32string &output, size_t matched) const;
+
+private:
+  size_t apply_transform(std::u32string &input, std::u32string &output, size_t matched) const;
+  size_t apply_reorder(std::u32string &input, std::u32string &output, size_t matched) const;
 };
 
 /**
@@ -250,9 +250,9 @@ typedef std::deque<any_group> group_list;
 class transforms {
 private:
   group_list transform_groups;
-
+  bool normalization_disabled;
 public:
-  transforms();
+  transforms(bool normalization_disabled);
 
   /**
    * Add a transform group

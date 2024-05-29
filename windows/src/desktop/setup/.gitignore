@@ -5,3 +5,4 @@ Keyman.Setup.System.Locale.*.pas
 *.msi
 *.kmp
 setup.inf
+icons.res

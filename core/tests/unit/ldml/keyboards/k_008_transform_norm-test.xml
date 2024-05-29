@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE keyboardTest3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboardTest3.dtd">
+<!DOCTYPE keyboardTest3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/45/dtd/ldmlKeyboardTest3.dtd">
 <keyboardTest3 conformsTo="techpreview">
   <info keyboard="k_008_transform_norm.xml" author="Team Keyboard" name="transform-norm" />
   <tests name="regex-test-dot0">
@@ -305,5 +305,41 @@
       <check result="YES9d"/>
     </test>
   </tests>
-
+  <!-- separate tests for NFC-->
+  <tests name="regex-tests-9e">
+    <test name="regex-test-9e-0">
+      <keystroke key="9" />
+      <keystroke key="e" />
+      <keystroke key="e" />
+      <keystroke key="u-0300" />
+      <keystroke key="stampy" />
+      <keystroke key="e" />
+      <keystroke key="u-0300" /> <!-- out of order -->
+      <keystroke key="u-0320" />
+      <keystroke key="lgtm" />
+      <check result="YES9e" />
+    </test>
+    <test name="regex-test-9e-0">
+      <keystroke key="9" />
+      <keystroke key="e" />
+      <keystroke key="e" />
+      <keystroke key="u-0300" />
+      <keystroke key="stampy" />
+      <keystroke key="e" />
+      <keystroke key="u-0320" />
+      <keystroke key="u-0300" /> <!-- in order -->
+      <keystroke key="lgtm" />
+      <check result="YES9e" />
+    </test>
+  </tests>
+  <tests name="regex-tests-9f">
+    <test name="regex-test-9f-0">
+      <keystroke key="9" />
+      <keystroke key="f" />
+      <keystroke key="e" />
+      <keystroke key="stampy" />
+      <keystroke key="u-0344" />
+      <check result="YES9f" />
+    </test>
+  </tests>
 </keyboardTest3>

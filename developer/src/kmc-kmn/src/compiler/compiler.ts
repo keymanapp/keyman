@@ -6,8 +6,9 @@ TODO: implement additional interfaces:
 */
 
 // TODO: rename wasm-host?
-import { UnicodeSetParser, UnicodeSet, Osk, VisualKeyboard, KvkFileReader, KeymanCompiler, KeymanCompilerArtifacts, KeymanCompilerArtifactOptional, KeymanCompilerResult, KeymanCompilerArtifact } from '@keymanapp/common-types';
+import { UnicodeSetParser, UnicodeSet, VisualKeyboard, KvkFileReader, KeymanCompiler, KeymanCompilerArtifacts, KeymanCompilerArtifactOptional, KeymanCompilerResult, KeymanCompilerArtifact } from '@keymanapp/common-types';
 import { CompilerCallbacks, CompilerEvent, CompilerOptions, KeymanFileTypes, KvkFileWriter, KvksFileReader } from '@keymanapp/common-types';
+import * as Osk from './osk.js';
 import loadWasmHost from '../import/kmcmplib/wasm-host.js';
 import { CompilerMessages, mapErrorFromKmcmplib } from './kmn-compiler-messages.js';
 import { WriteCompiledKeyboard } from '../kmw-compiler/kmw-compiler.js';
@@ -23,12 +24,14 @@ export const STORETYPE_DEBUG       = 0x08;
 export const STORETYPE_CALL        = 0x10;
 export const STORETYPE__MASK       = 0x1F;
 
+/** @internal */
 export interface CompilerResultExtraStore {
   storeType: number; // STORETYPE__MASK
   name: string;      // when debug=false, the .kmx will not have store names
   line: number;      // source line number where store is defined
 };
 
+/** @internal */
 export interface CompilerResultExtraGroup {
   isReadOnly: boolean;
   name: string;
@@ -39,7 +42,9 @@ export const COMPILETARGETS_JS =    0x02;
 export const COMPILETARGETS__MASK = 0x03;
 
 /**
- * Data in CompilerResultExtra comes from kmcmplib
+ * @internal
+ * Data in CompilerResultExtra comes from kmcmplib. This is used by other
+ * compilers such as KmwCompiler and is not intended for external use.
  */
 export interface KmnCompilerResultExtra {
   /**
@@ -52,22 +57,53 @@ export interface KmnCompilerResultExtra {
   groups: CompilerResultExtraGroup[];
 };
 
-//
-// Internal in-memory result from a successful compilation
-//
-
+/**
+ * @public
+ * Internal in-memory build artifacts from a successful compilation
+ */
 export interface KmnCompilerArtifacts extends KeymanCompilerArtifacts {
+  /**
+   * Binary keyboard filedata and filename - installable into Keyman desktop
+   * projects
+   */
   kmx?: KeymanCompilerArtifactOptional;
+  /**
+   * Binary on screen keyboard filedata and filename - installable into Keyman
+   * desktop projects alongside .kmx
+   */
   kvk?: KeymanCompilerArtifactOptional;
+  /**
+   * Javascript keyboard filedata and filename - installable into KeymanWeb,
+   * Keyman mobile products
+   */
   js?: KeymanCompilerArtifactOptional;
 };
 
+/**
+ * @public
+ * Build artifacts from the .kmn compiler
+ */
 export interface KmnCompilerResult extends KeymanCompilerResult {
+  /**
+   * Internal in-memory build artifacts from a successful compilation. Caller
+   * can write these to disk with {@link KmnCompiler.write}
+   */
   artifacts: KmnCompilerArtifacts;
+  /**
+   * Internal additional metadata used by secondary compile phases such as
+   * KmwCompiler, not intended for external use
+   */
   extra: KmnCompilerResultExtra;
+  /**
+   * Mapping data for `&displayMap`, intended for use by kmc-analyze
+   */
   displayMap?: Osk.PuaMap;
 };
 
+/**
+ * @public
+ * Options for the .kmn compiler
+ */
 export interface KmnCompilerOptions extends CompilerOptions {
 };
 
@@ -96,6 +132,12 @@ interface MallocAndFree {
 let
   Module: any;
 
+/**
+ * @public
+ * Compiles a .kmn file to a .kmx, .kvk, and/or .js. The compiler does not read
+ * or write from filesystem or network directly, but relies on callbacks for all
+ * external IO.
+ */
 export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
   private readonly callbackID: string; // a unique numeric id added to globals with prefixed names
   private callbacks: CompilerCallbacks;
@@ -107,6 +149,14 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
     callbackProcIdentifier++;
   }
 
+  /**
+   * Initialize the compiler, including loading the WASM host for kmcmplib.
+   * Copies options.
+   * @param callbacks - Callbacks for external interfaces, including message
+   *                    reporting and file io
+   * @param options   - Compiler options
+   * @returns false if initialization fails
+   */
   public async init(callbacks: CompilerCallbacks, options: KmnCompilerOptions): Promise<boolean> {
     this.callbacks = callbacks;
     this.options = {...options};
@@ -141,6 +191,17 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
     return true;
   }
 
+  /**
+   * Write artifacts from a successful compile to disk, via callbacks methods.
+   * The artifacts written may include:
+   *
+   * - .kmx file - binary keyboard used by Keyman on desktop platforms
+   * - .kvk file - binary on screen keyboard used by Keyman on desktop platforms
+   * - .js file - Javascript keyboard for web and touch platforms
+   *
+   * @param artifacts - object containing artifact binary data to write out
+   * @returns true on success
+   */
   public async write(artifacts: KmnCompilerArtifacts): Promise<boolean> {
     if(!artifacts) {
       throw Error('artifacts must be defined');
@@ -230,14 +291,27 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
    * a stack trace). Thus, to ensure we don't trip over ourselves, we need to
    * copy the buffer. Fortunately, creating a `Uint8Array` from a `Uint8Array`
    * copies the data, and is pretty quick.
-   * @param offset    Offset into the WASM memory space, in bytes
-   * @param size      Size of the buffer to copy, in bytes
-   * @returns         A _copy_ of the data in a new Uint8Array
+   * @param offset  - Offset into the WASM memory space, in bytes.
+   * @param size    - Size of the buffer to copy, in bytes.
+   * @returns         A _copy_ of the data in a new Uint8Array.
    */
   private copyWasmBuffer(offset: number, size: number): Uint8Array {
     return new Uint8Array(new Uint8Array(Module.HEAP8.buffer, offset, size));
   }
 
+  /**
+   * Compiles a .kmn file to .kmx, .kvk, and/or .js files. Returns an object
+   * containing binary artifacts on success. The files are passed in by name,
+   * and the compiler will use callbacks as passed to the
+   * {@link KmnCompiler.init} function to read any input files by disk.
+   * @param infile  - Path to source file. Path will be parsed to find relative
+   *                  references in the .kmn file, such as icon or On Screen
+   *                  Keyboard file
+   * @param outfile - Path to output file. The file will not be written to, but
+   *                  will be included in the result for use by
+   *                  {@link KmnCompiler.write}.
+   * @returns         Binary artifacts on success, null on failure.
+   */
   public async run(infile: string, outfile: string): Promise<KmnCompilerResult> {
     if(!this.verifyInitialized()) {
       /* c8 ignore next 2 */
@@ -437,6 +511,11 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
     }
   }
 
+  /**
+   * @internal
+   * Generates an exception in kmcmplib to verify that Sentry error capture is
+   * working correctly
+   */
   public testSentry() {
     if(!this.verifyInitialized()) {
       return null;
@@ -445,7 +524,10 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
     return Module.kmcmp_testSentry();
   }
 
-  /** convert `\u{1234}` to `\u1234` etc */
+  /**
+   * @internal
+   * convert `\u{1234}` to `\u1234` etc
+   */
   public static fixNewPattern(pattern: string) : string {
     pattern = pattern.replaceAll(/\\u\{([0-9a-fA-F]{6})\}/g, `\\U00$1`);
     pattern = pattern.replaceAll(/\\u\{([0-9a-fA-F]{5})\}/g, `\\U000$1`);
@@ -457,24 +539,31 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
   }
 
   /**
-   *
-   * @param pattern UnicodeSet pattern such as `[a-z]`
-   * @param rangeCount number of ranges to allocate
-   * @returns UnicodeSet accessor object, or null on failure
+   * @internal
+   * @param pattern    - UnicodeSet pattern such as `[a-z]`
+   * @param rangeCount - number of ranges to allocate
+   * @returns            UnicodeSet accessor object, or null on failure
    */
   public parseUnicodeSet(pattern: string, rangeCount: number) : UnicodeSet | null {
     if(!this.verifyInitialized()) {
       /* c8 ignore next 2 */
+      // verifyInitialized will set a callback if needed
       return null;
     }
 
-    // TODO-LDML: Catch OOM
+    if ((rangeCount * 2) < 0) {
+      throw new RangeError(`Internal error: negative rangeCount * 2 = ${rangeCount * 2}`);
+    }
     const buf = this.wasmExports.malloc(rangeCount * 2 * Module.HEAPU32.BYTES_PER_ELEMENT);
+    if (buf <= 0) {
+      // out of memory will return zero.
+      throw new RangeError(`Internal error: wasm malloc() returned ${buf}`);
+    }
     // fix \u1234 pattern format
     pattern = KmnCompiler.fixNewPattern(pattern);
-    /** If <= 0: return code. If positive: range count */
     const rc = Module.kmcmp_parseUnicodeSet(pattern, buf, rangeCount * 2);
     if (rc >= 0) {
+      // If >= 0: it's a range count (which could be zero, an empty set).
       const ranges = [];
       const startu = (buf / Module.HEAPU32.BYTES_PER_ELEMENT);
       for (let i = 0; i < rc; i++) {
@@ -485,12 +574,17 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
       this.wasmExports.free(buf);
       return new UnicodeSet(pattern, ranges);
     } else {
+      // rc is negative: it's an error code.
       this.wasmExports.free(buf);
       // translate error code into callback
       this.callbacks.reportMessage(getUnicodeSetError(rc));
       return null;
     }
   }
+
+  /**
+   * @internal
+   */
   public sizeUnicodeSet(pattern: string) : number {
     if(!this.verifyInitialized()) {
       /* c8 ignore next 2 */

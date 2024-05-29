@@ -3,15 +3,12 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 SUBPROJECT_NAME=app/browser
 . "$KEYMAN_ROOT/web/common.inc.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
 
 # ################################ Main script ################################
 
@@ -100,6 +97,7 @@ compile_and_copy() {
 builder_run_action configure verify_npm_setup
 builder_run_action clean do_clean
 builder_run_action build compile_and_copy
+builder_run_action test test-headless-typescript $SUBPROJECT_NAME
 
 # No headless tests for this child project.  Currently, DOM-based unit &
 # integrated tests are run solely by the top-level $KEYMAN_ROOT/web project.

@@ -40,14 +40,19 @@ export class PackageMetadataCollector {
   ): KeyboardMetadata {
 
     let isJavascript = false;
-    let file = kmp.files.find(file => this.callbacks.path.basename(file.name, KeymanFileTypes.Binary.Keyboard) == keyboard.id);
+    let file = kmp.files.find(file => this.callbacks.path.basename(file.name ?? '', KeymanFileTypes.Binary.Keyboard) == keyboard.id);
     if(!file) {
       isJavascript = true;
-      file = kmp.files.find(file => this.callbacks.path.basename(file.name, KeymanFileTypes.Binary.WebKeyboard) == keyboard.id);
+      file = kmp.files.find(file => this.callbacks.path.basename(file.name ?? '', KeymanFileTypes.Binary.WebKeyboard) == keyboard.id);
       if(!file) {
         this.callbacks.reportMessage(CompilerMessages.Error_KeyboardContentFileNotFound({id:keyboard.id}));
         return null;
       }
+    }
+
+    if(!file.name) {
+      this.callbacks.reportMessage(CompilerMessages.Error_FileRecordIsMissingName({description: file.description ?? '(no description)'}));
+      return null;
     }
 
     const filename = this.callbacks.resolveFilename(kpsFilename, file.name);

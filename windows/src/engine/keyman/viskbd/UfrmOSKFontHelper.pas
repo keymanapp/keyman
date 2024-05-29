@@ -1,18 +1,18 @@
 (*
   Name:             UfrmOSKFontHelper
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      27 Mar 2008
 
   Modified Date:    25 Sep 2014
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          27 Mar 2008 - mcdurdin - Initial version I1374
                     20 Jul 2008 - mcdurdin - I1533 - Show hint for non-Unicode keyboards
                     29 Mar 2010 - mcdurdin - I2199 - Shift+click
@@ -413,6 +413,11 @@ var
   i: Integer;
   m: Integer;
 begin
+  if FSelectedKeyboard.Fonts.Count = 0 then
+  begin
+    Exit;   // Exit as grid needs at least one font
+  end;
+
   grid.DefaultColWidth := tbSize.Position;
   grid.DefaultRowHeight := tbSize.Position;
 
@@ -447,39 +452,47 @@ begin
   FKeyboard := FCheckFontKeyboards.Keyboards[FLastSelectedKeyboardID];
   if (FLastSelectedKeyboardID <> '') and Assigned(FKeyboard) then
   begin
-    SetLength(FChars, Length(FKeyboard.Chars));
-    J := 0;
-    I := 1;
-    while I <= Length(FKeyboard.Chars) do  // I2712
+    if FKeyboard.Fonts.Count > 0 then
     begin
-      ch := FKeyboard.Chars[I];
-      if Uni_IsSurrogate1(ch) and (I < Length(FKeyboard.Chars)) and Uni_IsSurrogate2(FKeyboard.Chars[I+1]) then
+      SetLength(FChars, Length(FKeyboard.Chars));
+      J := 0;
+      I := 1;
+      while I <= Length(FKeyboard.Chars) do  // I2712
       begin
-        ch2 := FKeyboard.Chars[I+1];
-        FChars[J] := Uni_SurrogateToUTF32(ch, ch2);
+        ch := FKeyboard.Chars[I];
+        if Uni_IsSurrogate1(ch) and (I < Length(FKeyboard.Chars)) and Uni_IsSurrogate2(FKeyboard.Chars[I+1]) then
+        begin
+          ch2 := FKeyboard.Chars[I+1];
+          FChars[J] := Uni_SurrogateToUTF32(ch, ch2);
+          Inc(I);
+        end
+        else
+          FChars[J] := Ord(ch);
         Inc(I);
-      end
-      else
-        FChars[J] := Ord(ch);
-      Inc(I);
-      Inc(J);
-    end;
-
-    SetLength(FChars, J);
-
-    grid.ColCount := Length(FChars) + 2;
-    grid.RowCount := FKeyboard.Fonts.Count;
-
-    for i := 0 to FKeyboard.Fonts.Count - 1 do
-      if FKeyboard.Fonts[i].Coverage < 50 then
-      begin
-        grid.RowCount := i;
-        Break;
+        Inc(J);
       end;
 
-    FSelectedKeyboard := FKeyboard;
-    FormatGrid;
-    SetDisplay('');
+      SetLength(FChars, J);
+
+      grid.ColCount := Length(FChars) + 2;
+      grid.RowCount := FKeyboard.Fonts.Count;
+
+      for i := 0 to FKeyboard.Fonts.Count - 1 do
+        if FKeyboard.Fonts[i].Coverage < 50 then
+        begin
+          grid.RowCount := i;
+          Break;
+        end;
+
+      FSelectedKeyboard := FKeyboard;
+      FormatGrid;
+      SetDisplay('');
+    end
+    else
+    begin
+       FSelectedKeyboard := FKeyboard;
+       SetDisplay(MsgFromIdFormat(S_OSK_FontHelper_NoFonts, [FSelectedKeyboard.Name]));
+    end;
   end
   else
   begin

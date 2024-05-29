@@ -10,7 +10,9 @@
 #include <algorithm>
 #include <iterator>
 #include <string>
-#include <keyman/keyman_core_api.h>
+
+#include "keyman_core.h"
+
 #include "path.hpp"
 #include "state.hpp"
 #include "kmx/kmx_base.h"
@@ -55,7 +57,7 @@ void setup(const char *keyboard) {
 
   try_status(km_core_keyboard_load(path.native().c_str(), &test_kb));
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
-  try_status(km_core_context_items_from_utf16(u"Hello 😁", &citems));
+  try_status(context_items_from_utf16(u"Hello 😁", &citems));
 
   // Pre-test sanity: ensure debugging is disabled
   assert(km_core_state_debug_get(test_state) == 0);
@@ -66,6 +68,7 @@ void setup(const char *keyboard) {
   }));
 
   try_status(km_core_context_set(km_core_state_context(test_state), citems));
+  try_status(km_core_context_set(km_core_state_app_context(test_state), citems));
 }
 
 /**
@@ -117,8 +120,8 @@ void test_debugging_function_key() {
   assert(debug_items(test_state, {
     km_core_state_debug_item{KM_CORE_DEBUG_BEGIN, KM_CORE_DEBUG_FLAG_UNICODE, {KM_CORE_VKEY_F1, 0, 0}},
     km_core_state_debug_item{KM_CORE_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
-    km_core_state_debug_item{KM_CORE_DEBUG_GROUP_EXIT, KM_CORE_DEBUG_FLAG_NOMATCH, {}, {u"", &gp, nullptr, {}, 1}},
-    km_core_state_debug_item{KM_CORE_DEBUG_END, KM_CORE_DEBUG_FLAG_OUTPUTKEYSTROKE, {}, {u"", nullptr, nullptr, {}, 1}}
+    km_core_state_debug_item{KM_CORE_DEBUG_GROUP_EXIT, KM_CORE_DEBUG_FLAG_NOMATCH, {}, {u"", &gp, nullptr, {}, 0}},
+    km_core_state_debug_item{KM_CORE_DEBUG_END, KM_CORE_DEBUG_FLAG_OUTPUTKEYSTROKE, {}, {u"", nullptr, nullptr, {}, 0}}
   }));
 
   assert(action_items(test_state, {
@@ -422,7 +425,11 @@ void test_backspace_markers() {
     {KM_CORE_CT_MARKER, {0,}, {1}},
     {KM_CORE_CT_END}
   };
+  km_core_context_item app_context[] = {
+    {KM_CORE_CT_END}
+  };
   try_status(km_core_context_set(km_core_state_context(test_state), marker_context));
+  try_status(km_core_context_set(km_core_state_app_context(test_state), app_context));
 
   DEBUG_GROUP gp = {u"Main"};
 
@@ -432,8 +439,8 @@ void test_backspace_markers() {
   assert(debug_items(test_state, {
     km_core_state_debug_item{KM_CORE_DEBUG_BEGIN, KM_CORE_DEBUG_FLAG_UNICODE, {KM_CORE_VKEY_BKSP, 0, 0}},
     km_core_state_debug_item{KM_CORE_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
-    km_core_state_debug_item{KM_CORE_DEBUG_GROUP_EXIT, 2, {}, {u"", &gp, nullptr, {}, 3}},
-    km_core_state_debug_item{KM_CORE_DEBUG_END, 1, {}, {u"", nullptr, nullptr, {}, 3}},
+    km_core_state_debug_item{KM_CORE_DEBUG_GROUP_EXIT, 2, {}, {u"", &gp, nullptr, {}, 2}},
+    km_core_state_debug_item{KM_CORE_DEBUG_END, 1, {}, {u"", nullptr, nullptr, {}, 2}},
   }));
 
   km_core_action_item bksp = {KM_CORE_IT_BACK};

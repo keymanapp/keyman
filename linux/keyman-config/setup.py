@@ -17,8 +17,18 @@ setup(
     zip_safe=False,  # don't install a zip
 
     install_requires=[
-        'lxml', 'numpy', 'Pillow', 'requests', 'requests-cache',
-        'python-magic', 'qrcode', 'sentry-sdk'
+        'dbus-python',
+        'lxml',
+        'numpy',
+        'packaging',
+        'pillow',
+        'PyGObject',
+        'python-magic',
+        'pyxdg',
+        'qrcode',
+        'requests-cache',
+        'requests',
+        'sentry-sdk',
     ],
 
     # metadata to display on PyPI

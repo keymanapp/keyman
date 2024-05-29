@@ -105,6 +105,7 @@ type
       State: TDragState; var Accept: Boolean);
     procedure DelayedFindError;
     procedure DoOpenLinkIfExternal(const url: string; var handled: Boolean);
+    procedure cefHelpTopic(Sender: TObject);
 
   protected
     function GetHelpTopic: string; override;
@@ -349,6 +350,7 @@ begin
   cef.OnCommand := cefCommand;
   cef.OnLoadEnd := cefLoadEnd;
   cef.OnBeforeBrowseSync := cefBeforeBrowseSync;
+  cef.OnHelpTopic := cefHelpTopic;
 
   cef.cef.OnBeforeContextMenu := cefBeforeContextMenu;
   cef.cef.OnContextMenuCommand := cefContextMenuCommand;
@@ -364,9 +366,15 @@ begin
   GetCharMapDropTool.Handle(cef, cmimDefault, CharMapDragOver, CharMapDragDrop);
 end;
 
+procedure TframeTextEditor.cefHelpTopic(Sender: TObject);
+begin
+  frmKeymanDeveloper.HelpTopic(Self);
+end;
+
 procedure TframeTextEditor.cefLoadEnd(Sender: TObject);
 begin
   FHasBeenLoaded := True;
+  UpdateEditorFonts;
   SetupCharMapDrop;
   DelayedFindError;
 end;
@@ -1125,7 +1133,11 @@ end;
 function TframeTextEditor.GetHelpTopic: string;
 begin
   if FEditorFormat <> efKMN then
+  begin
+    if Parent is TTIKEForm then
+      Exit((Parent as TTIKEForm).HelpTopic);
     Exit(SHelpTopic_Context_TextEditor);
+  end;
 
   Result := HelpKeyword;
 end;

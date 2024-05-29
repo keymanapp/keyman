@@ -44,8 +44,8 @@ export interface KpsFileOptions {
   LicenseFile?: string;
   WelcomeFile?: string;
   ExecuteProgram?: string;
-  MsiFileName?: string;
-  MsiOptions?: string;
+  MSIFileName?: string;
+  MSIOptions?: string;
 }
 
 export interface KpsFileInfo {

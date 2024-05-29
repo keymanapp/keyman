@@ -69,7 +69,6 @@ type
     FServerUseNgrok: Boolean;
     FServerServerShowConsoleWindow: Boolean;
     FServerNgrokToken: string;
-    FServerNgrokRegion: string;
     FServerKeepAlive: Boolean;
     FToolbarVisible: Boolean;
     FStartupProjectPath: string;
@@ -117,7 +116,6 @@ type
     property ServerUseLocalAddresses: Boolean read FServerUseLocalAddresses write FServerUseLocalAddresses;
 
     property ServerNgrokToken: string read FServerNgrokToken write FServerNgrokToken;
-    property ServerNgrokRegion: string read FServerNgrokRegion write FServerNgrokRegion;
     property ServerUseNgrok: Boolean read FServerUseNgrok write FServerUseNgrok;
     property ServerServerShowConsoleWindow: Boolean read FServerServerShowConsoleWindow write FServerServerShowConsoleWindow;
 
@@ -201,7 +199,6 @@ const
   SRegValue_IDEOptServerPort = 'web host port';   // I4021
   SRegValue_IDEOptServerKeepAlive = 'server keep alive';
   SRegValue_IDEOptServerNgrokToken = 'server ngrok token';
-  SRegValue_IDEOptServerNgrokRegion = 'server ngrok region';
   SRegValue_IDEOptServerUseLocalAddresses = 'server use local addresses';
   SRegValue_IDEOptServerUseNgrok = 'server use ngrok';
   SRegValue_IDEOptServerShowConsoleWindow = 'server show console window';
@@ -348,7 +345,6 @@ begin
     FServerUseLocalAddresses := optReadBool(SRegValue_IDEOptServerUseLocalAddresses, True);
 
     FServerNgrokToken := optReadString(SRegValue_IDEOptServerNgrokToken, '');
-    FServerNgrokRegion := optReadString(SRegValue_IDEOptServerNgrokRegion, 'us');
     FServerUseNgrok := optReadBool(SRegValue_IDEOptServerUseNgrok, False);
     FServerServerShowConsoleWindow := optReadBool(SRegValue_IDEOptServerShowConsoleWindow, False);
 
@@ -434,7 +430,6 @@ begin
     optWriteBool(SRegValue_IDEOptServerUseLocalAddresses, FServerUseLocalAddresses);
 
     optWriteString(SRegValue_IDEOptServerNgrokToken, FServerNgrokToken);
-    optWriteString(SRegValue_IDEOptServerNgrokRegion, FServerNgrokRegion);
     optWriteBool(SRegValue_IDEOptServerUseNgrok, FServerUseNgrok);
     optWriteBool(SRegValue_IDEOptServerShowConsoleWindow, FServerServerShowConsoleWindow);
 
@@ -514,7 +509,6 @@ begin
   try
     o.AddPair('port', TJSONNumber.Create(FServerDefaultPort));
     o.AddPair('ngrokToken', FServerNgrokToken);
-    o.AddPair('ngrokRegion', FServerNgrokRegion);
     o.AddPair('useNgrok', TJSONBool.Create(FServerUseNgrok));
     o.AddPair('ngrokVisible', TJSONBool.Create(FServerServerShowConsoleWindow));
     SaveJSONToFile(TKeymanDeveloperPaths.ServerDataPath + TKeymanDeveloperPaths.S_ServerConfigJson, o);
