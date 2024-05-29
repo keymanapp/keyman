@@ -64,5 +64,8 @@
   },
   "engines": {
     "node": "^18.x"
+  },
+  "overrides": {
+    "@swc/core": "1.5.7"
   }
 }
