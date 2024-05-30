@@ -51,7 +51,7 @@ export type KeyboardObject = {
    * "NewContext" start group, corresponding to `begin NewContext > use(_____)`
    * in Keyman keyboard language.
    * @param outputTarget  The new context to be used with future keystrokes
-   * @param keystroke     Unused, as this group type is inherently `readonly`.
+   * @param keystroke     A 'null' `KeyEvent` providing current modifier + state information.
    */
   gn?(outputTarget: OutputTarget, keystroke: KeyEvent): boolean;
 
@@ -62,7 +62,7 @@ export type KeyboardObject = {
    * @param outputTarget  The context altered by a recent keystroke.  As a
    * precondition, all changes due to `gs` / `begin Unicode` should already be
    * applied.
-   * @param keystroke     Unused, as this group type is inherently `readonly`.
+   * @param keystroke     A 'null' `KeyEvent` providing current modifier + state information.
    */
   gpk?(outputTarget: OutputTarget, keystroke: KeyEvent): boolean;
 
