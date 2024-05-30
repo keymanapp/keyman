@@ -120,7 +120,7 @@ function print_error() {
   echo -e "Tips: "
   echo -e " * Don't include a period at the end of the title"
   echo -e " * Always include a blank line before trailers"
-  echo -e " * Use imperative, present tense ('attach' not 'attaches', 'attached' etc)"
+  echo -e " * Use imperative, present tense ('attach' instead of 'attaches', 'attached' etc)"
   echo -e ""
   echo -e "This script: $0"
 }
