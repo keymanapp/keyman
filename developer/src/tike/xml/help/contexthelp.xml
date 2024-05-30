@@ -392,14 +392,6 @@
       <p>The Options dialog display several tabs such as General, Editor, Debugger, Character Map and Server. You can configure the environment of Keyman Developer here.</p>
     </Control>
 
-    <Control Name="chkShowStartupDialog" Title="General tab">
-      <p></p>
-    </Control>
-
-    <Control Name="chkAllowMultipleInstances" Title="General tab">
-      <p></p>
-    </Control>
-
     <Control Name="chkOpenKeyboardFilesInSourceView" Title="Open keyboard files in source view">
       <p>Instead of opening a keyboard file in the Details tab, open directly into the Layout tab, Source pane.</p>
     </Control>
