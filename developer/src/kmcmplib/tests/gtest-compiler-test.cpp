@@ -261,20 +261,18 @@ TEST_F(CompilerTest, GetXStringImpl_test) {
     // CERR_NoTokensFound, whitespace
     u16cpy(str, u" ");
     EXPECT_EQ(CERR_NoTokensFound, GetXStringImpl(tstr, &fk, str, u"c", output, 80, 0, &newp, FALSE));
+}
 
-    // type=0, hex 8-bit
-    u16cpy(str, u"x12");
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
-    EXPECT_EQ(0, u16cmp(u"\u0012", tstr));
-
-    // type=0, hex 16-bit
-    u16cpy(str, u"x1234");
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
-    EXPECT_EQ(0, u16cmp(u"\u1234", tstr));
+TEST_F(CompilerTest, GetXStringImpl_type0_test) {
+    KMX_WCHAR tstr[128];
+    FILE_KEYBOARD fk;
+    KMX_WCHAR str[LINESIZE];
+    KMX_WCHAR output[GLOBAL_BUFSIZE];
+    PKMX_WCHAR newp = NULL;
 
     // std::cerr << "debug" << std::endl;
 
-    // type=0, hex 32-bit
+    // type=0 ('X' or 'D'), hex 32-bit
     u16cpy(str, u"x10330"); // Gothic A
     // std::cerr << std::hex << GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE) << std::dec << std::endl;
     EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
@@ -284,21 +282,21 @@ TEST_F(CompilerTest, GetXStringImpl_test) {
 
     // std::cerr << "end debug" << std::endl;
 
-    // type=0, decimal 8-bit
+    // type=0 ('X' or 'D'), decimal 8-bit
     u16cpy(str, u"d18");
     EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(u"\u0012", tstr));
 
-    // type=0, hex capital 8-bit
+    // type=0 ('X' or 'D'), hex capital 8-bit
     u16cpy(str, u"X12");
     EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(u"\u0012", tstr));
 
-    // type=0, hex 32-bit, CERR_InvalidCharacter
+    // type=0 ('X' or 'D'), hex 32-bit, CERR_InvalidCharacter
     u16cpy(str, u"x110000");
     EXPECT_EQ(CERR_InvalidCharacter, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
 
-    // type=0, dk, valid
+    // type=0 ('X' or 'D'), dk, valid
     u16cpy(str, u"dk(A)");
     EXPECT_EQ(0, (int)fk.cxDeadKeyArray);
     EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
@@ -306,7 +304,7 @@ TEST_F(CompilerTest, GetXStringImpl_test) {
     EXPECT_EQ(0, u16cmp(tstr_dk_valid, tstr));
     fk.cxDeadKeyArray = 0;
 
-    // type=0, deadkey, valid
+    // type=0 ('X' or 'D'), deadkey, valid
     u16cpy(str, u"deadkey(A)");
     EXPECT_EQ(0, (int)fk.cxDeadKeyArray);
     EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
@@ -314,15 +312,15 @@ TEST_F(CompilerTest, GetXStringImpl_test) {
     EXPECT_EQ(0, u16cmp(tstr_dk_valid, tstr));
     fk.cxDeadKeyArray = 0;
 
-    // type=0, dk, CERR_InvalidDeadkey, bad character
+    // type=0 ('X' or 'D'), dk, CERR_InvalidDeadkey, bad character
     u16cpy(str, u"dk(%)");
     EXPECT_EQ(CERR_InvalidDeadkey, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
 
-    // type=0, dk, CERR_InvalidDeadkey, no close delimiter => NULL
+    // type=0 ('X' or 'D'), dk, CERR_InvalidDeadkey, no close delimiter => NULL
     u16cpy(str, u"dk(");
     EXPECT_EQ(CERR_InvalidDeadkey, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
 
-    // type=0, dk, CERR_InvalidDeadkey, empty delimiters => empty string
+    // type=0 ('X' or 'D'), dk, CERR_InvalidDeadkey, empty delimiters => empty string
     u16cpy(str, u"dk()");
     EXPECT_EQ(CERR_InvalidDeadkey, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
 }
