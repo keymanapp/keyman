@@ -286,6 +286,20 @@ TEST_F(CompilerTest, GetXStringImpl_test) {
     EXPECT_EQ(0, u16cmp(tstr_GothicA, tstr)); 
 
     // std::cerr << "end debug" << std::endl;
+
+    // type=0, decimal 8-bit
+    u16cpy(str, u"d18");
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(u"\u0012", tstr));
+
+    // type=0, hex capital 8-bit
+    u16cpy(str, u"X12");
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(u"\u0012", tstr));
+
+    // type=0, hex 32-bit, CERR_InvalidCharacter
+    u16cpy(str, u"x110000");
+    EXPECT_EQ(CERR_InvalidCharacter, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
