@@ -5,6 +5,18 @@ import { KeyboardStub } from "keyman/engine/package-cache";
 import KeymanEngine from "./keymanEngine.js";
 import * as util from "./utils/index.js";
 
+interface KeyboardTag {
+  /**
+   * Keyboard name
+   */
+  kn: string;
+
+  /**
+   * Keyboard language code
+   */
+  kc: string;
+}
+
 // Used by 'native'-mode KMW only - the Android and iOS embedding apps implement their own menus.
 export class LanguageMenu {
   private readonly keyman: KeymanEngine;
@@ -408,7 +420,7 @@ export class LanguageMenu {
    * @param   {Object}    kb      element being added and styled
    * @param   {boolean}   unique  is this the only keyboard for the language?
    */
-  addKeyboard(kbd, kb, unique: boolean) {
+  addKeyboard(kbd: KeyboardStub, kb: HTMLParagraphElement & KeyboardTag, unique: boolean) {
     kb.kn=kbd['KI'];        // InternalName;
     kb.kc=kbd['KLC'];       // LanguageCode;
     kb.innerHTML=unique?kbd['KL']:kbd['KN'].replace(' Keyboard',''); // Name
@@ -465,7 +477,7 @@ export class LanguageMenu {
     }
 
     // Touchstart (or mspointerdown) event highlights the touched list item
-    const touchStart=function(e) {
+    const touchStart = function(this: HTMLElement & KeyboardTag, e: TouchEvent) {
       e.stopPropagation();
       if(this.className.indexOf('selected') <= 0) {
         this.className=this.className+' selected';
@@ -478,7 +490,7 @@ export class LanguageMenu {
 
     //TODO: Still drags Android background sometimes (not consistently)
     // Touchmove drags the list and prevents release from selecting the language
-    const touchMove=function(e: TouchEvent) {
+    const touchMove=function(this: HTMLElement & KeyboardTag, e: TouchEvent) {
       e.stopImmediatePropagation();
       var scroller=<HTMLElement>languageMenu.lgList.childNodes[0],
           yMax=scroller.scrollHeight-scroller.offsetHeight,
@@ -522,7 +534,7 @@ export class LanguageMenu {
     };
 
     // Touch release (click) event selects touched list item
-    const touchEnd=function(e: TouchEvent) {
+    const touchEnd=function(this: HTMLElement & KeyboardTag, e: TouchEvent) {
       if(typeof(e.stopImmediatePropagation) != 'undefined') {
         e.stopImmediatePropagation();
       } else {
@@ -548,11 +560,8 @@ export class LanguageMenu {
       unlockBodyScroll();
     }
 
-    kb.onmspointerdown=touchStart;
     kb.addEventListener('touchstart',touchStart,false);
-    kb.onmspointermove=touchMove;
     kb.addEventListener('touchmove',touchMove,false);
-    kb.onmspointerout=touchEnd;
     kb.addEventListener('touchend',touchEnd,false);
     kb.addEventListener('touchcancel',touchCancel,false);
   }
