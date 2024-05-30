@@ -36,7 +36,7 @@ begin
   try
     try
       TKeymanSentryClient.Validate;
-      FInitializeCEF := TCEFManager.Create;
+      FInitializeCEF := TCEFManager.Create(False);
       try
         FInitializeCEF.StartSubProcess;
       finally

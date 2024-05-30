@@ -1,4 +1,4 @@
-import EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter3';
 
 import {
   ActiveKey,
@@ -61,12 +61,30 @@ import Flick, { buildFlickScroller } from './input/gestures/browser/flick.js';
 import { GesturePreviewHost } from './keyboard-layout/gesturePreviewHost.js';
 import OSKBaseKey from './keyboard-layout/oskBaseKey.js';
 import { OSKResourcePathConfiguration } from './index.js';
+import KEYMAN_VERSION from '@keymanapp/keyman-version';
 
+/**
+ * Gesture history data will include each touchpath sample observed during its
+ * lifetime in addition to its lifetime stats.
+ */
+// @ts-ignore
+const DEBUG_GESTURES: boolean = KEYMAN_VERSION.TIER != 'stable' || KEYMAN_VERSION.VERSION_ENVIRONMENT != '';
+
+/**
+ * If greater than zero, `this.gestureEngine.history` & `this.gestureEngine.historyJSON`
+ * will contain report-data this many of the most-recently completed gesture inputs in
+ * order of their time of completion.
+ */
+const DEBUG_HISTORY_COUNT: number = DEBUG_GESTURES ? 10 : 0;
+
+// #region KeyRuleEffects
 interface KeyRuleEffects {
   contextToken?: number,
   alteredText?: boolean
 };
+// #endregion
 
+// #region VisualKeyboardConfiguration
 export interface VisualKeyboardConfiguration extends CommonConfiguration {
   /**
    * The Keyman keyboard on which to base the on-screen keyboard being represented.
@@ -106,6 +124,7 @@ export interface VisualKeyboardConfiguration extends CommonConfiguration {
    */
   specialFont?: InternalKeyboardFont;
 }
+// #endregion
 
 interface BoundingRect {
   left: number,
@@ -128,6 +147,7 @@ interface EventMap {
   'globekey': (keyElement: KeyElement, on: boolean) => void
 }
 
+// #region VisualKeyboard
 export default class VisualKeyboard extends EventEmitter<EventMap> implements KeyboardView {
   /**
    * The gesture-engine used to support user interaction with this keyboard.
@@ -231,19 +251,11 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
   activeGestures: GestureHandler[] = [];
   activeModipress: Modipress = null;
-  private _deferLayout: boolean;
+  public deferLayout: boolean;
 
   // The keyboard object corresponding to this VisualKeyboard.
   public readonly layoutKeyboard: Keyboard;
   public readonly layoutKeyboardProperties: KeyboardProperties;
-
-  get deferLayout(): boolean {
-    return this._deferLayout;
-  }
-
-  set deferLayout(value: boolean) {
-    this._deferLayout = value;
-  }
 
   get layerId(): string {
     return this.layerGroup?.activeLayerId ?? 'default';
@@ -262,7 +274,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       }
     }
 
-    if(changedLayer && !this._deferLayout) {
+    if(changedLayer && !this.deferLayout) {
       this.updateState();
       // We changed the active layer, but not any layout property of the keyboard as a whole.
       this.layerGroup.refreshLayout(this.constructLayoutParams());
@@ -286,7 +298,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     return this.currentLayer?.spaceBarKey?.btn;
   }
 
-  //#region OSK constructor and helpers
+  //#region VisualKeyboard - constructor and helpers
 
   /**
    * @param       {Object}      PVK         Visual keyboard name
@@ -411,7 +423,14 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
          */
 
         return this.layerGroup.findNearestKey(sample);
-      }
+      },
+      /* When enabled, facilitates investigation of perceived odd behaviors observed on Android devices
+        in association with issues like #11221 and #11183.  "Recordings" are only accessible within
+        the mobile apps via WebView inspection and outside the apps via Developer mode in the browser;
+        they are not transmitted or uploaded automatically.
+      */
+      recordingMode: DEBUG_GESTURES,
+      historyLength: DEBUG_HISTORY_COUNT
     };
 
     this.gestureParams.longpress.permitsFlick = (key) => {
@@ -916,7 +935,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   };
   //#endregion
 
-  //#region OSK touch handlers
+  //#region VisualKeyboard - OSK touch handlers
   getTouchCoordinatesOnKeyboard(input: InputSample<KeyElement, string>) {
     // `input` is already in keyboard-local coordinates.  It's not scaled, though.
     let offsetCoords = { x: input.targetX, y: input.targetY };
@@ -1122,8 +1141,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     this._UpdateVKShiftStyle();
   }
 
-  //#endregion
-
   /**
    *  Add or remove a class from a keyboard key (when touched or clicked)
    *  or add a key preview for phone devices
@@ -1215,7 +1232,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    * when needed.
    */
   refreshLayout() {
-    if(this._deferLayout) {
+    if(this.deferLayout) {
       return;
     }
 
@@ -1280,10 +1297,24 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       const paddingZone = this.gestureEngine.config.maxRoamingBounds as PaddedZoneSource;
       paddingZone.updatePadding([-0.333 * this.currentLayer.rowHeight]);
 
-      this.gestureParams.longpress.flickDist = 0.25 * this.currentLayer.rowHeight;
-      this.gestureParams.flick.startDist     = 0.15 * this.currentLayer.rowHeight;
-      this.gestureParams.flick.dirLockDist   = 0.35 * this.currentLayer.rowHeight;
-      this.gestureParams.flick.triggerDist   = 0.75 * this.currentLayer.rowHeight;
+      /*
+        Note:  longpress.flickDist needs to be no greater than flick.startDist.
+        Otherwise, the longpress up-flick shortcut will not work on keys that
+        support flick gestures.  (Such as sil_euro_latin 3.0+)
+
+        Since it's also based on the purely northward component, it's best to
+        have it be slightly lower.  80% of flick.startDist gives a range of
+        about 37 degrees to each side before a flick-start would win, while
+        70.7% gives 45 degrees.
+
+        (The range _will_ be notably tighter on keys with both longpresses and
+        flicks as a result.)
+      */
+      this.gestureParams.longpress.flickDistStart = 0.24 * this.currentLayer.rowHeight;
+      this.gestureParams.flick.startDist          = 0.30 * this.currentLayer.rowHeight;
+      this.gestureParams.flick.dirLockDist        = 0.35 * this.currentLayer.rowHeight;
+      this.gestureParams.flick.triggerDist        = 0.75 * this.currentLayer.rowHeight;
+      this.gestureParams.longpress.flickDistFinal = 0.75 * this.currentLayer.rowHeight;
     }
 
     // Phase 4:  Refresh the layout of the layer-group and active layer.
@@ -1708,4 +1739,5 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
     return callbackData;
   }
+  // #endregion VisualKeyboard
 }

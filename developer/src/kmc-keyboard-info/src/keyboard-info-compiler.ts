@@ -232,7 +232,7 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
       if (author.url) {
         // we strip the mailto: from the .kps file for the .keyboard_info
         const match = author.url.match(/^(mailto\:)?(.+)$/);
-        /* c8 ignore next 3 */
+        /* c8 ignore next 4 */
         if (match === null) {
           this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_InvalidAuthorEmail({email:author.url}));
           return null;
@@ -372,6 +372,7 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
 
     const jsonOutput = JSON.stringify(keyboard_info, null, 2);
 
+    /* c8 ignore next 8 */
     if(!SchemaValidators.default.keyboard_info(keyboard_info)) {
       // This is an internal fatal error; we should not be capable of producing
       // invalid output, so it is best to throw and die

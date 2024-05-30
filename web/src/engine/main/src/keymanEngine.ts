@@ -120,6 +120,8 @@ export default class KeymanEngine<
       // so we handle that here.
       this.osk?.bannerController.selectBanner(state);
       this.osk?.refreshLayout();
+
+      // If `this.osk` is not yet initialized, the OSK itself will check if the model is loaded
     });
 
     // The OSK does not possess a direct connection to the KeyboardProcessor's state-key
@@ -144,7 +146,7 @@ export default class KeymanEngine<
         this.osk.startHide(false);
       }
 
-      const earlyBatchClosure = () => {
+      const prepareKeyboardSwap = () => {
         this.refreshModel();
         // Triggers context resets that can trigger layout stuff.
         // It's not the final such context-reset, though.
@@ -157,17 +159,6 @@ export default class KeymanEngine<
       }
 
       /*
-        Needed to ensure the correct layer is displayed AND that deadkeys from
-        the old keyboard have been wiped.
-
-        Needs to be after the OSK has loaded for the keyboard in case the default
-        layer should be something other than "default" for the current context.
-      */
-      const doContextReset = () => {
-        this.contextManager.resetContext();
-      }
-
-      /*
         This pattern is designed to minimize layout reflow during the keyboard-swap process.
         The 'default' layer is loaded by default, but some keyboards will start on different
         layers depending on the current state of the context.
@@ -177,16 +168,24 @@ export default class KeymanEngine<
       */
       if(this.osk) {
         this.osk.batchLayoutAfter(() => {
-          earlyBatchClosure();
+          prepareKeyboardSwap();
           this.osk.activeKeyboard = kbd;
           // Note:  when embedded within the mobile apps, the keyboard will still be visible
           // at this time.
-          doContextReset();
+
+          /*
+            Needed to ensure the correct layer is displayed AND that deadkeys from
+            the old keyboard have been wiped.
+
+            Needs to be after the OSK has loaded for the keyboard in case the default
+            layer should be something other than "default" for the current context.
+          */
+          this.contextManager.resetContext();
           this.osk.present();
         });
       } else {
-        earlyBatchClosure();
-        doContextReset();
+        prepareKeyboardSwap();
+        this.contextManager.resetContext();
       }
     });
 
@@ -242,14 +241,12 @@ export default class KeymanEngine<
       resetContext: (target) => {
         // Could reset the target's deadkeys here, but it's really more of a 'core' task.
         // So we delegate that to keyboard-processor.
-        const doReset = () => this.core.resetContext(target);
-
         if(this.osk) {
           this.osk.batchLayoutAfter(() => {
-            doReset();
+            this.core.resetContext(target);
           })
         } else {
-          doReset();
+          this.core.resetContext(target);
         }
       },
       predictionContext: new PredictionContext(this.core.languageProcessor, this.core.keyboardProcessor),

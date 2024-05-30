@@ -126,29 +126,35 @@ export default class OSKLayer {
    **/
   showLanguage(displayName: string) {
     if(!this.spaceBarKey) {
-      return () => {};
+      return;
     }
 
     try {
       const spacebarLabel = this.spaceBarKey.label;
 
-      // The key can read the text from here during the display update without us
-      // needing to trigger a reflow by running the closure below early.
+      // The key can read the text from here during the display update without
+      // triggering a reflow.
       this.spaceBarKey.spec.text = displayName;
 
-      return () => {
-        // It sounds redundant, but this dramatically cuts down on browser DOM processing;
-        // but sometimes innerText is reported empty when it actually isn't, so set it
-        // anyway in that case (Safari, iOS 14.4)
-        if (spacebarLabel.innerText != displayName || displayName == '') {
-          spacebarLabel.innerText = displayName;
-        }
+      // It sounds redundant, but this dramatically cuts down on browser DOM processing;
+      // but sometimes innerText is reported empty when it actually isn't, so set it
+      // anyway in that case (Safari, iOS 14.4)
+      if (spacebarLabel.innerText != displayName || displayName == '') {
+        spacebarLabel.innerText = displayName;
       }
     }
     catch (ex) { }
   }
 
   public refreshLayout(layoutParams: LayerLayoutParams) {
+    // Do all layout-reflow / style-refresh dependent precalculations here,
+    // before we perform any DOM manipulation.
+    this.rows.forEach((row) => row.detectStyles(layoutParams));
+
+    // Hereafter, avoid any references to getComputedStyle, offset_, or other
+    // layout-reflow dependent values.  Refer to
+    // https://gist.github.com/paulirish/5d52fb081b3570c81e3a.
+
     // Check the heights of each row, in case different layers have different row counts.
     const layerHeight = layoutParams.keyboardHeight;
     const nRows = this.rows.length;
@@ -159,10 +165,9 @@ export default class OSKLayer {
       this.element.style.height=(layerHeight)+'px';
     }
 
-    const spacebarTextClosure = this.showLanguage(layoutParams.spacebarText);
+    this.showLanguage(layoutParams.spacebarText);
 
     // Update row layout properties
-    const rowClosures: (() => void)[] = [];
     for(let nRow=0; nRow<nRows; nRow++) {
       const oskRow = this.rows[nRow];
       const bottom = (nRows-nRow-1)*rowHeight+1;
@@ -172,27 +177,14 @@ export default class OSKLayer {
         this.spec.row[nRow].proportionalY = ((layerHeight - bottom) - rowHeight/2) / layerHeight;
       }
 
-      let rowClosure = oskRow.refreshLayout(layoutParams);
+      oskRow.refreshLayout(layoutParams);
       if(nRow == nRows-1) {
-        const oldRowClosure = rowClosure;
-        rowClosure = () => {
-          oldRowClosure();
-          oskRow.element.style.bottom = '1px';
-        };
+        oskRow.element.style.bottom = '1px';
       }
-      rowClosures.push(rowClosure);
     }
 
-    const rowKeyClosures: (() => void)[] = [];
     for(const row of this.rows) {
-      const batchedUpdates = row.refreshKeyLayouts(layoutParams);
-      rowKeyClosures.push(batchedUpdates);
+      row.refreshKeyLayouts(layoutParams);
     }
-
-    // After row layout properties have been updated, _then_ update key internals.
-    // Doing this separately like this helps to reduce layout reflow.
-    spacebarTextClosure();
-    rowClosures.forEach((closure) => closure());
-    rowKeyClosures.forEach((closure) => closure());
   }
 }

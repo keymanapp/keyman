@@ -13,7 +13,7 @@
 #include <limits>
 
 #include "jsonpp.hpp"
-
+#include "utfcodec.hpp"
 
 #if defined(_MSC_VER)
 #define FORMAT_INTMAX "%lli"
@@ -103,6 +103,15 @@ json & json::operator << (json::string s) throw()
     if (ctxt == member) _stream.put(' ');
 
     return *this;
+}
+
+json & json::operator <<(const char16_t* s) throw()
+{
+  std::u16string str16(s);
+  std::string str = convert<char16_t, char>(str16);
+
+  (*this) << str;
+  return *this;
 }
 
 json & json::operator << (json::number f) throw()

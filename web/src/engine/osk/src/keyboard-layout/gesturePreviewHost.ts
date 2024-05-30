@@ -1,5 +1,5 @@
 import { ActiveKey, ActiveKeyBase } from "@keymanapp/keyboard-processor";
-import EventEmitter from "eventemitter3";
+import { EventEmitter } from "eventemitter3";
 
 import { KeyElement } from "../keyElement.js";
 import { FlickNameCoordMap, OrderedFlickDirections } from "../input/gestures/browser/flick.js";

@@ -446,6 +446,18 @@ export class Mock extends OutputTarget {
     this.text = this.getTextBeforeCaret() + s;
   }
 
+  /**
+   * Indicates if this Mock represents an identical context to that of another Mock.
+   * @param other
+   * @returns
+   */
+  isEqual(other: Mock) {
+    return this.text == other.text
+      && this.selStart == other.selStart
+      && this.selEnd == other.selEnd
+      && this.deadkeys().equal(other.deadkeys());
+  }
+
   doInputEvent() {
     // Mock isn't backed by an element, so it won't have any event listeners.
   }

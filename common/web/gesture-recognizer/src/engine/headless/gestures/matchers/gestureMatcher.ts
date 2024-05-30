@@ -49,7 +49,7 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
 
   public get sources(): GestureSource<Type>[] {
     return this.pathMatchers.map((pathMatch, index) => {
-      if(this.model.contacts[index].resetOnResolve) {
+      if(this.model.contacts[index].resetOnInstantFulfill) {
         return undefined;
       } else {
         return pathMatch.source;
@@ -106,7 +106,7 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
       if(source && entry == source) {
         // Due to internal delays that can occur when an incoming tap triggers
         // completion of a previously-existing gesture but is not included in it
-        // (`resetOnResolve` mechanics), it is technically possible for a very
+        // (`resetOnInstantFulfill` mechanics), it is technically possible for a very
         // quick tap to be 'complete' by the time we start trying to match
         // against it on some devices.  We should still try in such cases.
         return source;
@@ -477,6 +477,13 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
           here, as the decision is made due to a validation check against the initial item.
         */
         this.finalize(false, 'cancelled');
+
+        /*
+         * There's no need to process the gesture-model any further... and the
+         * invalid state may correspond to assumptions in the path-model that
+         * will be invalidated if we continue.
+         */
+        return;
       }
     }
 
@@ -507,6 +514,7 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
         instantly fail and thus cancel.
       */
       this.finalize(false, whileInitializing ? 'cancelled' : 'path');
+      return;
     }
 
     // Standard path:  trigger either resolution or rejection when the contact model signals either.
@@ -516,6 +524,13 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
   }
 
   update() {
-    this.pathMatchers.forEach((matcher) => matcher.update());
+    this.pathMatchers.forEach((matcher) => {
+      try {
+        matcher.update();
+      } catch(err) {
+        console.error(err);
+        this.finalize(false, 'cancelled');
+      }
+    });
   }
 }

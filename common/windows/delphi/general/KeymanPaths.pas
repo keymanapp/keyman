@@ -15,6 +15,7 @@ type
     const S_CEF_SubFolder = 'cef\';
     const S_CEF_LibCef = 'libcef.dll';
     const S_CEF_SubProcess = 'kmbrowserhost.exe';
+    const S_CEF_SubProcess_Developer = 'kmdbrowserhost.exe';
     const S_CustomisationFilename = 'desktop_pro.pxx';
   public
     const S_KMShell = 'kmshell.exe';
@@ -39,7 +40,7 @@ type
     class function KeymanCoreLibraryPath(const Filename: string): string; static;
     class function CEFPath: string; static; // Chromium Embedded Framework
     class function CEFDataPath(const mode: string): string; static;
-    class function CEFSubprocessPath: string; static;
+    class function CEFSubprocessPath(IsDeveloper: Boolean): string; static;
 
     class function RunningFromSource(var keyman_root: string): Boolean; static;
   end;
@@ -267,12 +268,17 @@ begin
   Result := '';
 end;
 
-class function TKeymanPaths.CEFSubprocessPath: string;
+class function TKeymanPaths.CEFSubprocessPath(IsDeveloper: Boolean): string;
 var
   keyman_root: string;
 begin
   // Same folder as executable
-  Result := ExtractFilePath(ParamStr(0)) + S_CEF_SubProcess;
+
+  // TODO: make this a little cleaner by passing in expected subprocess name
+  if IsDeveloper
+    then Result := ExtractFilePath(ParamStr(0)) + S_CEF_SubProcess_Developer
+    else Result := ExtractFilePath(ParamStr(0)) + S_CEF_SubProcess;
+
   if FileExists(Result) then Exit;
 
   // On developer machines, if we are running within the source repo, then use

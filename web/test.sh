@@ -21,91 +21,52 @@ builder_describe "Runs the Keyman Engine for Web unit-testing suites" \
   "test+" \
   ":dom                  Runs DOM-oriented unit tests (reduced footprint, nothing browser-specific)" \
   ":integrated           Runs KMW's integration test suite" \
-  "--ci                  Set to utilize CI-based test configurations & reporting.  May not be set with $(builder_term --debug)." \
-  "--reporters=REPORTERS Set to override the 'reporters' used by the unit testing engines" \
-  "--browsers=BROWSERS   Set to override automatic browser selection for $(builder_term :engine) tests"
+  "--ci                  Set to utilize CI-based test configurations & reporting.  May not be set with $(builder_term --debug)."
 
 builder_parse "$@"
 
 # Browser-based tests: common configs & kill-switches
 
-DO_BROWSER_TEST_SUITE=true
+# DO_BROWSER_TEST_SUITE=true
 
-if [[ $VERSION_ENVIRONMENT == test ]]; then
-  # Implied: CONFIG=CI.conf.js because `-CI` parameter is passed.
-  #
-  # If we are running a TeamCity test build, for now, only run BrowserStack
-  # tests when on a PR branch with a title including "(web)" or with the label
-  # test-browserstack. This is because the BrowserStack tests are currently
-  # unreliable, and the false positive failures are masking actual failures.
-  #
-  # We do not run BrowserStack tests on master, beta, or stable-x.y test
-  # builds.
-  DO_BROWSER_TEST_SUITE=false
-  if builder_pull_get_details; then
-    if [[ $builder_pull_title =~ \(web\) ]] || builder_pull_has_label test-browserstack; then
-      DO_BROWSER_TEST_SUITE=true
-    fi
-  fi
-fi
+# if [[ $VERSION_ENVIRONMENT == test ]]; then
+#   # Implied: CONFIG=CI.conf.js because `-CI` parameter is passed.
+#   #
+#   # If we are running a TeamCity test build, for now, only run BrowserStack
+#   # tests when on a PR branch with a title including "(web)" or with the label
+#   # test-browserstack. This is because the BrowserStack tests are currently
+#   # unreliable, and the false positive failures are masking actual failures.
+#   #
+#   # We do not run BrowserStack tests on master, beta, or stable-x.y test
+#   # builds.
+#   DO_BROWSER_TEST_SUITE=false
+#   if builder_pull_get_details; then
+#     if [[ $builder_pull_title =~ \(web\) ]] || builder_pull_has_label test-browserstack; then
+#       DO_BROWSER_TEST_SUITE=true
+#     fi
+#   fi
+# fi
 
-function get_default_browser_set() {
-  if [[ $BUILDER_OS == mac ]]; then
-    BROWSERS="--browsers Firefox,Chrome,Safari"
-  elif [[ $BUILDER_OS == win ]]; then
-    BROWSERS="--browsers Firefox,Chrome"
-  else
-    BROWSERS="--browsers Firefox,Chrome"
-  fi
-}
-
-if [[ $DO_BROWSER_TEST_SUITE == false ]]; then
-  builder_warn "Skipping action test:engine - this CI build does not appear to be for a Web PR."
-  builder_finish_action success test:engine
-  exit 0
-fi
+# if [[ $DO_BROWSER_TEST_SUITE == false ]]; then
+#   builder_warn "Skipping action test:engine - this CI build does not appear to be for a Web PR."
+#   builder_finish_action success test:engine
+#   exit 0
+# fi
 
 # Select the right CONFIG file.
+WTR_CONFIG=
 if builder_has_option --ci; then
-  CONFIG=CI.conf.cjs
-else
-  CONFIG=manual.conf.cjs
+  WTR_CONFIG=.CI
 fi
 
 # Prepare the flags for the karma command.
-KARMA_FLAGS=
-
+WTR_DEBUG=
 if builder_is_debug_build; then
-  KARMA_FLAGS="$KARMA_FLAGS --no-single-run"
-fi
-
-if builder_has_option --reporters; then
-  KARMA_FLAGS="$KARMA_FLAGS --reporters $REPORTERS"
+  WTR_DEBUG="--manual"
 fi
 
 # End common configs.
 
-builder_run_action test:dom karma start ${KARMA_FLAGS} "${KEYMAN_ROOT}/web/src/test/auto/dom/${CONFIG}"
+builder_run_action test:dom web-test-runner --config "src/test/auto/dom/web-test-runner${WTR_CONFIG}.config.mjs" ${WTR_DEBUG}
 
-# The multi-browser test suite, which uses BrowserStack when run by our CI.
-if builder_start_action test:integrated; then
-  if builder_has_option --ci && builder_is_debug_build; then
-    builder_die "Options --ci and --debug are incompatible."
-  fi
-
-  # Auto-select browsers if not specified as an option
-  if ! builder_has_option --browsers; then
-    get_default_browser_set
-  fi
-
-  KARMA_EXT_FLAGS=
-  if ! builder_has_option --ci; then
-    KARMA_EXT_FLAGS="$KARMA_FLAGS --browsers $BROWSERS"
-  fi
-
-  # Build modernizr module
-  modernizr -c src/test/auto/integrated/modernizr.config.json -d src/test/auto/integrated/modernizr.js
-  karma start $KARMA_FLAGS $KARMA_EXT_FLAGS "${KEYMAN_ROOT}/web/src/test/auto/integrated/$CONFIG"
-
-  builder_finish_action success test:integrated
-fi
+builder_run_action test:integrated web-test-runner --config "src/test/auto/integrated/web-test-runner${WTR_CONFIG}.config.mjs" ${WTR_DEBUG}

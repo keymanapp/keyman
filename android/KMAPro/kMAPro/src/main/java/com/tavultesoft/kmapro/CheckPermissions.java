@@ -26,13 +26,19 @@ public class CheckPermissions {
       return permissionsOK;
     }
 
-    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.R) {
-      permissionsOK = Environment.isExternalStorageManager();
-      if (Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU) {
-        // TODO: Workout scoped storage permission #10659
-      }
-    } else {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+      // < API 30
       permissionsOK = checkPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+      // API 30-32
+      permissionsOK = Environment.isExternalStorageManager() ||
+        checkPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE);
+    } else {
+      // API 33+
+      //https://developer.android.com/about/versions/13/behavior-changes-13#granular-media-permissions
+      // Manifest.permission.READ_MEDIA_AUDIO doesn't seem to be needed
+      permissionsOK = permissionsOK && checkPermission(activity, Manifest.permission.READ_MEDIA_IMAGES);
+      permissionsOK = permissionsOK && checkPermission(activity, Manifest.permission.READ_MEDIA_VIDEO);
     }
 
     return permissionsOK;

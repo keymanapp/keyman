@@ -197,22 +197,15 @@ export default class OSKBaseKey extends OSKKey {
   }
 
   public refreshLayout(layoutParams: KeyLayoutParams) {
-    const keyTextClosure = super.refreshLayout(layoutParams);  // key labels in particular.
+    super.refreshLayout(layoutParams);  // key labels in particular.
 
-    return () => {
-      // part 2:  key internals - these do depend on recalculating internal layout.
-
-      // Ideally, the rest would be in yet another calculation layer... need to figure out a good design for this.
-      keyTextClosure(); // we're already in that phase, so go ahead and run it.
-
-      const emFont = layoutParams.baseEmFontSize;
-      // Rescale keycap labels on small phones
-      if(emFont.val < 12) {
-        this.capLabel.style.fontSize = '6px';
-      } else {
-        // The default value set within kmwosk.css.
-        this.capLabel.style.fontSize = ParsedLengthStyle.forScalar(0.5).styleString;
-      }
+    const emFont = layoutParams.baseEmFontSize;
+    // Rescale keycap labels on small phones
+    if(emFont.val < 12) {
+      this.capLabel.style.fontSize = '6px';
+    } else {
+      // The default value set within kmwosk.css.
+      this.capLabel.style.fontSize = ParsedLengthStyle.forScalar(0.5).styleString;
     }
   }
 

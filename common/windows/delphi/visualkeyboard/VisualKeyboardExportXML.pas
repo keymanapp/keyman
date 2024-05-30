@@ -1,18 +1,18 @@
 (*
   Name:             VisualKeyboardExportXML
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      4 Dec 2006
 
   Modified Date:    26 Jun 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          04 Dec 2006 - mcdurdin - Export to version 7, UTF-8, fix text encoding for key caps
                     22 Jan 2007 - mcdurdin - Export XML files to filename_xml_files subfolder
                     19 Mar 2007 - mcdurdin - I699 - Fix crash when exporting OSK to HTML/XML
@@ -65,7 +65,6 @@ const
   nl: WideString = #13#10;
 begin
   s := '<?xml version="1.0" encoding="UTF-8" ?>' + nl;
-  s := s + '<!DOCTYPE visualkeyboard SYSTEM "http://www.tavultesoft.com/keymandev/visualkeyboard.dtd">' + nl;
   s := s + '<visualkeyboard>' + nl;
   s := s + '  <header>' + nl;
   s := s + '    <version>'+SKeymanVersion70+'</version>' + nl;

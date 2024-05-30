@@ -1,19 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-@@keys: [K_BKQUOTE][K_1][K_ENTER][K_Z][K_Q][K_BKQUOTE][K_Z][K_Q][K_2][K_BKQUOTE][K_Z][K_Q][K_1][K_BKQUOTE][K_Z][K_Q][K_ENTER][K_BKQUOTE][K_Z]
-@@expected: \u0061\u007a\u0041\u007a\u0041\u007a\u0041\u007a\u0041\u007a
--->
+Note that the 'expected' lines are cumulative unless there's a reset event.
 
-<!--
-  Explanation of test case:
-  keys          output      comment
-  ====          ======      =======
-  a1<enter>z     az         1=gap, enter=not mapped/mappable. (z used as a subtest separator)
-  qaz            Az         q\m{q}a => A due to transform
-  q2az           Az         2=not mapped, but NO reset.
-  q1az           Az         1 is a gap (no effect) so no ctx reset
-  q<enter>az     Az         enter=not mappable, should cause context reset of qaz. TODO-LDML no invalidate here?
+@@keys:      [K_BKQUOTE][K_1][K_ENTER][K_Z]
+@@expected:  z
+Comment:     1=gap, enter=not mapped/mappable - reset. (z used as a subtest separator)
+
+@@keys:      [K_Q][K_BKQUOTE][K_Z]
+@@expected:  zAz
+Comment:     q\m{q}a => A due to transform
+
+@@keys:      [K_Q][K_2][K_BKQUOTE][K_Z]
+@@expected:  zAzAz
+Comment:     2=not mapped, but NO reset.
+
+@@keys:      [K_Q][K_1][K_BKQUOTE][K_Z]
+@@expected:  zAzAzAz
+Comment:     1 is a gap (no effect) so no ctx reset
+
+@@keys:      [K_Q][K_ENTER][K_BKQUOTE][K_Z]
+@@expected:  az
+Comment:     enter=not mappable, causes ctx reset.
+
 -->
 
 <keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="en" conformsTo="45">

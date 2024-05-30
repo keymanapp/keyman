@@ -4,9 +4,9 @@
 var PRIMARY_LAUNCHERS = {
   bs_safari_mac_m: {
     browser: 'safari',
-    browser_version: '15.3',
+    browser_version: '17.3',
     os: 'OS X',
-    os_version: 'Monterey'
+    os_version: 'Sonoma'
   },
   bs_chrome_win: {
     os: 'Windows',

@@ -71,29 +71,35 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     // Scrolls the document-body to ensure that a focused element remains visible after the OSK appears.
     this.contextManager.on('targetchange', (target: OutputTarget<any>) => {
       const e = target?.getElement();
-      (this.osk.activationModel as TwoStateActivator<HTMLElement>).activationTrigger = e;
+      if(this.osk) {
+        (this.osk.activationModel as TwoStateActivator<HTMLElement>).activationTrigger = e;
+      }
 
-      if(this.config.hostDevice.touchable) {
-        if(!e || !target || !this.osk) {
-          return;
-        }
-
-        // Get the absolute position of the caret
-        const y = getAbsoluteY(e);
-        const t = window.pageYOffset;
-        let dy = y-t;
-        if(y >= t) {
-          dy -= (window.innerHeight - this.osk._Box.offsetHeight - e.offsetHeight - 2);
-          if(dy < 0) {
-            dy=0;
-          }
-        }
-        // Hide OSK, then scroll, then re-anchor OSK with absolute position (on end of scroll event)
-        if(dy != 0) {
-          window.scrollTo(0, dy + t);
-        }
+      if(this.config.hostDevice.touchable && target) {
+        this.ensureElementVisibility(e);
       }
     });
+  }
+
+  public ensureElementVisibility(e: HTMLElement) {
+    if(!e || !this.osk) {
+      return;
+    }
+
+    // Get the absolute position of the caret
+    const y = getAbsoluteY(e);
+    const t = window.pageYOffset;
+    let dy = y-t;
+    if(y >= t) {
+      dy -= (window.innerHeight - this.osk._Box.offsetHeight - e.offsetHeight - 2);
+      if(dy < 0) {
+        dy=0;
+      }
+    }
+    // Hide OSK, then scroll, then re-anchor OSK with absolute position (on end of scroll event)
+    if(dy != 0) {
+      window.scrollTo(0, dy + t);
+    }
   }
 
   public get util() {
@@ -194,14 +200,6 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     // or do anything that would mutate the value.
     const savedKeyboardStr = this.contextManager.getSavedKeyboardRaw();
 
-    if(device.touchable) {
-      this.osk = new views.AnchoredOSKView(this);
-    } else {
-      this.osk = new views.FloatingOSKView(this);
-    }
-
-    setupOskListeners(this, this.osk, this.contextManager);
-
     // Automatically performs related handler setup & maintains references
     // needed for related cleanup / shutdown.
     this.pageIntegration = new PageIntegrationHandlers(window, this);
@@ -215,16 +213,34 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     this._initialized = 2;
 
     // Let any deferred, pre-init stubs complete registration
-    await Promise.resolve();
+    await this.config.deferForInitialization;
 
-    // Attempt to restore the user's last-used keyboard from their previous session.
-    //
-    // Note:  any cloud stubs will probably not be available yet.
-    // If we tracked cloud requests and awaited a Promise.all on pending queries,
-    // we could handle that too.
-    this.contextManager.restoreSavedKeyboard(savedKeyboardStr);
+    /*
+      Attempt to restore the user's last-used keyboard from their previous session.
+      The method auto-loads the default stub if one is available and the last-used keyboard
+      has no registered stub.
 
-    await Promise.resolve();
+      Note:  any cloud stubs will probably not be available yet.
+      If we tracked cloud requests and awaited a Promise.all on pending queries,
+      we could handle that too.
+    */
+    const loadingKbd: Promise<any> = this.contextManager.restoreSavedKeyboard(savedKeyboardStr);
+
+    // Wait for the initial keyboard to load before setting the OSK; this will avoid building an
+    // empty OSK that we'll instantly discard after.
+    try {
+      await loadingKbd;
+    } catch { /* in case of failed fetch due to network error or bad URI; we must still let the OSK init. */ };
+
+    const firstKbdConfig = {
+      keyboardToActivate: this.contextManager.activeKeyboard
+    };
+    const osk = device.touchable ? new views.AnchoredOSKView(this, firstKbdConfig) : new views.FloatingOSKView(this, firstKbdConfig);
+
+    setupOskListeners(this, osk, this.contextManager);
+    // And, now that we have our loaded active keyboard - or failed, thus must use that default...
+    // Now we set the OSK in place, an act which triggers VisualKeyboard construction.
+    this.osk = osk;
   }
 
   get register(): (x: CloudQueryResult) => void {
@@ -530,7 +546,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *  @param  {Object|string} e         element id or element
    *  @param  {boolean=}      setFocus  optionally set focus  (KMEW-123)
    **/
-  setActiveElement(e: string|HTMLElement, setFocus: boolean) {
+  setActiveElement(e: string|HTMLElement, setFocus?: boolean) {
     if(typeof e == 'string') {
       const id = e;
       e = document.getElementById(e);
