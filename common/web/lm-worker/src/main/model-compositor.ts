@@ -253,6 +253,7 @@ export default class ModelCompositor {
           // Without it, we can't apply the suggestion.
           let finalInput: Transform;
           if(match.inputSequence.length > 0) {
+            // common case:  from the same keystroke `inputTransform`, with matching `.id`.
             finalInput = match.inputSequence[match.inputSequence.length - 1].sample;
           } else {
             finalInput = inputTransform;  // A fallback measure.  Greatly matters for empty contexts.
@@ -262,7 +263,7 @@ export default class ModelCompositor {
           let correctionTransform: Transform = {
             insert: correction,  // insert correction string
             deleteLeft: deleteLeft,
-            id: inputTransform.id // The correction should always be based on the most recent external transform/transcription ID.
+            id: finalInput.id // The correction should always be based on the most recent external transform/transcription ID.
           }
 
           let rootCost = match.totalCost;
