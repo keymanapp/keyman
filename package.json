@@ -25,7 +25,7 @@
     "mocha-teamcity-reporter": "^4.0.0",
     "playwright": "^1.43.1",
     "sinon": "^17.0.1",
-    "ts-node": "^10.9.1",
+    "ts-node": "^10.9.2",
     "tslib": "^2.5.2",
     "typescript": "^5.4.5"
   },
