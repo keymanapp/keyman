@@ -8,7 +8,6 @@
     "allowSyntheticDefaultImports": true,
 
     "lib": ["es6"],
-    "module": "es6",
     "target": "es5",
 
     // TODO: These override ../tsconfig.base.json settings, and so should be removed if possible,

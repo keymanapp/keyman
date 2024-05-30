@@ -81,7 +81,7 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
 
     // We condition on ComplexGestureSource since some unit tests mock the other type without
     // instantiating the actual type.
-    const predecessor = sourceObj instanceof GestureSource<Type> ? null : sourceObj;
+    const predecessor = sourceObj instanceof GestureSource ? null : sourceObj;
     const source = predecessor ? null : (sourceObj as GestureSource<Type>);
 
     this.predecessor = predecessor;

@@ -22,7 +22,7 @@ import type Keyboard from "./keyboard.js";
 export type KLS = {[layerName: string]: string[]};
 
 // The following types provide type definitions for the full JSON format we use for visual keyboard definitions.
-export type ButtonClass       =  0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+export type ButtonClass       =  0 | 1 | 2 | 3 | 4 | /*5 | 6 | 7 |*/ 8 | 9 | 10;
 
 export interface LayoutLayer extends LayoutLayerBase {
   // Post-processing elements.
