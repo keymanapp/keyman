@@ -122,10 +122,10 @@ export class PageIntegrationHandlers {
       // The following tests are needed to prevent the OSK from being hidden during normal input!
       let p=(e.target as HTMLElement).parentElement;
       if(typeof(p) != 'undefined' && p != null) {
-        if(p.className.indexOf('kmw-key-') >= 0) return false;
+        if(p.getAttribute('class')?.indexOf('kmw-key-') >= 0) return false;
         if(typeof(p.parentElement) != 'undefined' && p.parentElement != null) {
           p=p.parentElement;
-          if(p.className.indexOf('kmw-key-') >= 0) return false;
+          if(p.getAttribute('class')?.indexOf('kmw-key-') >= 0) return false;
         }
       }
 

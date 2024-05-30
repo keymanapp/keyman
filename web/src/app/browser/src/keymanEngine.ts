@@ -546,7 +546,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *  @param  {Object|string} e         element id or element
    *  @param  {boolean=}      setFocus  optionally set focus  (KMEW-123)
    **/
-  setActiveElement(e: string|HTMLElement, setFocus: boolean) {
+  setActiveElement(e: string|HTMLElement, setFocus?: boolean) {
     if(typeof e == 'string') {
       const id = e;
       e = document.getElementById(e);

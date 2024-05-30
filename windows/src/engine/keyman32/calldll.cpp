@@ -155,7 +155,7 @@ LogContext(km_core_state *lpCoreKeyboardState, uint8_t context_type) {
     return FALSE;
   }
 
-  km_core_cp* buffer = km_core_state_context_debug(
+  km_core_cu* buffer = km_core_state_context_debug(
     lpCoreKeyboardState,
     context_type == CONTEXT_CORE ? KM_CORE_DEBUG_CONTEXT_CACHED : KM_CORE_DEBUG_CONTEXT_INTERMEDIATE
   );
@@ -163,7 +163,7 @@ LogContext(km_core_state *lpCoreKeyboardState, uint8_t context_type) {
 
   SendDebugMessageFormat(0, sdmKeyboard, 0, "%s: %ls", log_str_title, buffer);
 
-  km_core_cp_dispose(buffer);
+  km_core_cu_dispose(buffer);
 
   return TRUE;
 }

@@ -35,6 +35,14 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
+function do_configure() {
+  verify_npm_setup
+
+  # Configure Web browser-engine testing environments.  As is, this should only
+  # make changes when we update the dependency, even on our CI build agents.
+  playwright install
+}
+
 function do_build() {
   # Builds the top-level JavaScript file for use on Node
   tsc -b ./tsconfig.all.json
@@ -58,7 +66,7 @@ function do_test() {
   ./unit_tests/test.sh test:libraries test:headless test:browser $TEST_OPTIONS
 }
 
-builder_run_action configure  verify_npm_setup
+builder_run_action configure  do_configure
 builder_run_action clean      rm -rf build/
 builder_run_action build      do_build
 builder_run_action test       do_test

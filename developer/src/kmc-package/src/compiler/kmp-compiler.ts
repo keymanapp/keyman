@@ -269,11 +269,21 @@ export class KmpCompiler implements KeymanCompiler {
       kmp.files = this.arrayWrap(kps.Files.File).map((file: KpsFile.KpsFileContentFile) => {
         return {
           name: this.normalizePath(file.Name),
-          description: file.Description.trim(),
+          description: (file.Description ?? '').trim(),
           copyLocation: parseInt(file.CopyLocation, 10) || undefined
           // note: we don't emit fileType as that is not permitted in kmp.json
         };
       });
+      if(!kmp.files.reduce((result: boolean, file) => {
+        if(!file.name) {
+          // as the filename field is missing or blank, we'll try with the description instead
+          this.callbacks.reportMessage(CompilerMessages.Error_FileRecordIsMissingName({description: file.description ?? '(no description)'}));
+          return false;
+        }
+        return result;
+      }, true)) {
+        return null;
+      }
     }
     kmp.files = kmp.files ?? [];
 

@@ -25,6 +25,7 @@
 #include <test_color.h>
 
 #include "keyman_core.h"
+#include "util_normalize.hpp"
 
 #include <kmx/kmx_xstring.h>  // for surrogate pair macros
 
@@ -206,7 +207,7 @@ verify_context(std::u16string &text_store, km_core_state *&test_state, std::vect
   km_core_context_item *citems = nullptr;
   try_status(km_core_context_get(km_core_state_context(test_state), &citems));
   try_status(context_items_to_utf16(citems, nullptr, &n));
-  km_core_cp *buf = new km_core_cp[n];
+  km_core_cu *buf = new km_core_cu[n];
   try_status(context_items_to_utf16(citems, buf, &n));
   std::cout << "context (raw): ";  // output including markers (which aren't in 'buf' here)
   for (auto ci = citems; ci->type != KM_CORE_CT_END; ci++) {
@@ -361,7 +362,7 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
     } break;
     case km::tests::LDML_ACTION_CHECK_EXPECTED: {
       if (!normalization_disabled) {
-        assert(km::core::ldml::normalize_nfd(action.string));  // TODO-LDML: should be NFC
+        assert(km::core::util::normalize_nfd(action.string));  // TODO-LDML: should be NFC
       }
       std::cout << "- check expected" << std::endl;
       std::cout << "expected  : " << string_to_hex(action.string) << " [" << action.string << "]" << std::endl;

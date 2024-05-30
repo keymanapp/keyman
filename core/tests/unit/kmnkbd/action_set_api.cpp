@@ -53,7 +53,7 @@ void teardown() {
   }
 }
 
-void setup(const char *keyboard, const km_core_cp* context) {
+void setup(const char *keyboard, const km_core_cu* context) {
   teardown();
 
   km::core::path path = km::core::path::join(arg_path, keyboard);

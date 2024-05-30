@@ -1,4 +1,4 @@
-import EventEmitter from "eventemitter3";
+import { EventEmitter } from "eventemitter3";
 import { InputEngineBase } from "./inputEngineBase.js";
 import { GestureSource } from "./gestureSource.js";
 import { MatcherSelection, MatcherSelector } from "./gestures/matchers/matcherSelector.js";

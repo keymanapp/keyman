@@ -151,7 +151,7 @@
       </Component>
 
       <Component>
-        <File Name="kmbrowserhost.exe" KeyPath="yes" Source="..\..\..\windows\bin\desktop\kmbrowserhost.exe" />
+        <File Name="kmdbrowserhost.exe" KeyPath="yes" />
       </Component>
 
       <Component>
@@ -167,7 +167,7 @@
       </Component>
 
       <Component>
-        <File Name="keymancore-1.dll" KeyPath="yes" />
+        <File Name="keymancore-2.dll" KeyPath="yes" />
       </Component>
 
       <Component>

@@ -30,7 +30,7 @@
 @implementation KMLanguageInfo
 
 - (instancetype)initWithName:(NSString*)name
-              identifier:(NSString*)identifier
+                  identifier:(NSString*)identifier
 {
   self = [super init];
   if (self) {
@@ -59,8 +59,8 @@
 
 - (instancetype)initWithName:(NSString*)name
                   identifier:(NSString*)identifier
-                  version:(NSString*)version
-                      oskFont:(NSString*)oskFont
+                     version:(NSString*)version
+                     oskFont:(NSString*)oskFont
                  displayFont:(NSString*)displayFont
                    languages:(NSArray*)languages
 {

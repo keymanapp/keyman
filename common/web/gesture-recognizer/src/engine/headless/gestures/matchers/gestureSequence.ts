@@ -1,4 +1,4 @@
-import EventEmitter from "eventemitter3";
+import { EventEmitter } from "eventemitter3";
 
 import { GestureModelDefs, getGestureModel, getGestureModelSet } from "../specs/gestureModelDefs.js";
 import { GestureSource, GestureSourceSubview } from "../../gestureSource.js";

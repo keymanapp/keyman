@@ -24,7 +24,7 @@ jobs:
   sourcepackage:
     name: Build source package
     if: github.repository == 'keymanapp/keyman'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     outputs:
       VERSION: ${{ steps.version_step.outputs.VERSION }}
       PRERELEASE_TAG: ${{ steps.prerelease_tag.outputs.PRERELEASE_TAG }}
@@ -291,70 +291,57 @@ jobs:
         done
         echo "::endgroup::"
 
-  api_verification:
+  prepare_api_verification:
     name: Verify API for libkeymancore.so
     needs: [sourcepackage, binary_packages_released]
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 #v4.1.1
-      with:
-        ref: '${{ github.event.client_payload.buildSha }}'
-        fetch-depth: 0
-
     - name: Download Artifacts
       uses: actions/download-artifact@6b208ae046db98c579e8a3aa621ab581ff575935 # v4.1.1
       with:
         path: artifacts
         merge-multiple: true
 
-    - name: Install devscripts
-      uses: ./.github/actions/apt-install
-      with:
-        packages: devscripts equivs
-
-    - name: Verify API
+    - name: Save environment
       run: |
-        cd linux
-        # Extract line containing "Package: libkeymancore1" and then strip "Package: "
-        PKG_NAME=$(grep -E 'Package: libkeymancore([0-9]+|$)' debian/control)
-        PKG_NAME="${PKG_NAME#Package: }"
-        ./scripts/deb-packaging.sh \
-          --gha \
-          --bin-pkg "${GITHUB_WORKSPACE}/artifacts/${PKG_NAME}_${{ needs.sourcepackage.outputs.VERSION }}-1${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}+jammy1_amd64.deb" \
-          --git-sha "${{ github.event.client_payload.buildSha }}" \
-          --git-base "${{ github.event.client_payload.baseRef }}" \
-          verify 2>> $GITHUB_STEP_SUMMARY
+        echo "VERSION=${{ needs.sourcepackage.outputs.VERSION }}" > artifacts/env
+        echo "PRERELEASE_TAG=${{ needs.sourcepackage.outputs.PRERELEASE_TAG }}" >> artifacts/env
+        echo "GIT_SHA=${{ github.event.client_payload.buildSha }}" >> artifacts/env
+        echo "GIT_BASE=${{ github.event.client_payload.baseRef }}" >> artifacts/env
+        echo "IS_TEST_BUILD=${{ github.event.client_payload.isTestBuild }}" >> artifacts/env
+        echo "GIT_BRANCH=${{ github.event.client_payload.branch }}" >> artifacts/env
+        echo "GIT_BASE_BRANCH=${{ github.event.client_payload.baseBranch }}" >> artifacts/env
+        echo "GIT_USER=${{ github.event.client_payload.user }}" >> artifacts/env
 
-    - name: Archive .symbols file
-      uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 # v4.3.0
+    - name: Cache artifacts
+      uses: actions/cache/save@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
       with:
-        name: libkeymancore.symbols
-        path: linux/debian/tmp/DEBIAN/symbols
-      if: always()
+        path: |
+          artifacts
+        key: artifacts-key-${{ github.run_id }}
 
   # We intentionally ignore the results of binary_packages_unreleased
   set_status:
     name: Set result status on PR builds
-    needs: [sourcepackage, binary_packages_released, api_verification, autopkg_test]
+    needs: [sourcepackage, binary_packages_released, prepare_api_verification, autopkg_test]
     runs-on: ubuntu-latest
     if: ${{ always() && github.event.client_payload.isTestBuild == 'true' }}
     steps:
     - name: Set success
-      if: needs.sourcepackage.result == 'success' && needs.binary_packages_released.result == 'success' && needs.api_verification.result == 'success' && needs.autopkg_test.result == 'success'
+      if: needs.sourcepackage.result == 'success' && needs.binary_packages_released.result == 'success' && needs.prepare_api_verification.result == 'success' && needs.autopkg_test.result == 'success'
       run: |
         echo "RESULT=success" >> $GITHUB_ENV
         echo "MSG=Package build succeeded" >> $GITHUB_ENV
 
     - name: Set cancelled
-      if: needs.sourcepackage.result == 'cancelled' || needs.binary_packages_released.result == 'cancelled' || needs.api_verification.result == 'cancelled' || needs.autopkg_test.result == 'cancelled'
+      if: needs.sourcepackage.result == 'cancelled' || needs.binary_packages_released.result == 'cancelled' || needs.prepare_api_verification.result == 'cancelled' || needs.autopkg_test.result == 'cancelled'
       run: |
         echo "RESULT=error" >> $GITHUB_ENV
         echo "MSG=Package build cancelled" >> $GITHUB_ENV
 
     - name: Set failure
-      if: needs.sourcepackage.result == 'failure' || needs.binary_packages_released.result == 'failure' || needs.api_verification.result == 'failure' || needs.autopkg_test.result == 'failure'
+      if: needs.sourcepackage.result == 'failure' || needs.binary_packages_released.result == 'failure' || needs.prepare_api_verification.result == 'failure' || needs.autopkg_test.result == 'failure'
       run: |
         echo "RESULT=failure" >> $GITHUB_ENV
         echo "MSG=Package build failed" >> $GITHUB_ENV

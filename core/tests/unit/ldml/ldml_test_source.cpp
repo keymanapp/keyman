@@ -8,7 +8,6 @@
 #include <sstream>
 #include <string>
 #include <type_traits>
-#include <codecvt>
 
 #if 0
 // TODO-LDML If we need to avoid exceptions in JSON
@@ -29,6 +28,7 @@
 #include "path.hpp"
 #include "state.hpp"
 #include "utfcodec.hpp"
+#include "util_normalize.hpp"
 
 #include "ldml_test_source.hpp"
 #include "ldml_test_utils.hpp"
@@ -36,6 +36,8 @@
 #include "core_icu.h"
 #include "unicode/uniset.h"
 #include "unicode/usetiter.h"
+
+#include <test_color.h>
 
 #define assert_or_return(expr) if(!(expr)) { \
   std::wcerr << __FILE__ << ":" << __LINE__ << ": " << \
@@ -50,7 +52,6 @@
 namespace km {
 namespace tests {
 
-#include <test_color.h>
 
 
 
@@ -174,10 +175,10 @@ LdmlTestSource::parse_source_string(std::string const &s) {
         assert(v >= 0x0001 && v <= 0x10FFFF);
         p += n - 1;
         if (v < 0x10000) {
-          t += km_core_cp(v);
+          t += km_core_cu(v);
         } else {
-          t += km_core_cp(Uni_UTF32ToSurrogate1(v));
-          t += km_core_cp(Uni_UTF32ToSurrogate2(v));
+          t += km_core_cu(Uni_UTF32ToSurrogate1(v));
+          t += km_core_cu(Uni_UTF32ToSurrogate2(v));
         }
         if (had_open_curly) {
           p++;
@@ -200,7 +201,7 @@ LdmlTestSource::parse_source_string(std::string const &s) {
 std::u16string
 LdmlTestSource::parse_u8_source_string(std::string const &u8s) {
   // convert from utf-8 to utf-16 first
-  std::u16string s = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.from_bytes(u8s);
+  std::u16string s = convert<char, char16_t>(u8s);
   std::u16string t;
   for (auto p = s.begin(); p != s.end(); p++) {
     if (*p == '\\') {
@@ -219,16 +220,16 @@ LdmlTestSource::parse_u8_source_string(std::string const &u8s) {
         size_t n;
         std::u16string s1 = s.substr(p - s.begin(), 8);
         // TODO-LDML: convert back first?
-        std::string s1b = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(s1);
+        std::string s1b = convert<char16_t, char>(s1);
         v              = std::stoul(s1b, &n, 16);
         // Allow deadkey_number (U+0001) characters and onward
         assert(v >= 0x0001 && v <= 0x10FFFF);
         p += n - 1;
         if (v < 0x10000) {
-          t += km_core_cp(v);
+          t += km_core_cu(v);
         } else {
-          t += km_core_cp(Uni_UTF32ToSurrogate1(v));
-          t += km_core_cp(Uni_UTF32ToSurrogate2(v));
+          t += km_core_cu(Uni_UTF32ToSurrogate1(v));
+          t += km_core_cu(Uni_UTF32ToSurrogate2(v));
         }
         if (had_open_curly) {
           p++;
@@ -532,7 +533,7 @@ LdmlJsonTestSource::next_action(ldml_action &fillin) {
     fillin.type   = LDML_ACTION_CHECK_EXPECTED;
     fillin.string = LdmlTestSource::parse_u8_source_string(result.get<std::string>());
     if (!get_normalization_disabled()) {
-      assert(km::core::ldml::normalize_nfd(fillin.string)); // TODO-LDML: will be NFC when core is normalizing to NFC
+      assert(km::core::util::normalize_nfd(fillin.string)); // TODO-LDML: will be NFC when core is normalizing to NFC
     }
     return;
   } else if (type == "keystroke") {
@@ -547,7 +548,7 @@ LdmlJsonTestSource::next_action(ldml_action &fillin) {
     fillin.type   = LDML_ACTION_EMIT_STRING;
     fillin.string = LdmlTestSource::parse_u8_source_string(to.get<std::string>());
     if (!get_normalization_disabled()) {
-      assert(km::core::ldml::normalize_nfd(fillin.string)); // TODO-LDML: will be NFC when core is normalizing to NFC
+      assert(km::core::util::normalize_nfd(fillin.string)); // TODO-LDML: will be NFC when core is normalizing to NFC
     }
     return;
   } else if (type == "backspace") {
@@ -574,7 +575,7 @@ LdmlJsonTestSource::get_context() {
     auto startContext = data["/startContext/to"_json_pointer];
     context = LdmlTestSource::parse_u8_source_string(startContext);
     if (!get_normalization_disabled()) {
-      assert(km::core::ldml::normalize_nfd(context)); // TODO-LDML: should be NFC
+      assert(km::core::util::normalize_nfd(context)); // TODO-LDML: should be NFC
     }
   }
   loaded_context = true;
@@ -645,7 +646,7 @@ LdmlJsonRepertoireTestSource::next_action(ldml_action &fillin) {
   std::size_t len = km::core::kmx::Utf32CharToUtf16(ch, ch16);
   std::u16string chstr = std::u16string(ch16.ch, len);
   if (!get_normalization_disabled()) {
-    assert(km::core::ldml::normalize_nfd(chstr)); // TODO-LDML: will be NFC when core is normalizing to NFC
+    assert(km::core::util::normalize_nfd(chstr)); // TODO-LDML: will be NFC when core is normalizing to NFC
   }
   // append to expected
   expected.append(chstr);
