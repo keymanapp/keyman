@@ -19,11 +19,6 @@ export const MISSING_KEYBOARD = function(kbdid: string) {
   return kbdid + ' keyboard not found.';
 }
 
-type CloudAPIFont = {
-  family: string,
-  source: string | string[]
-}
-
 type CloudQueryOptions = {
   context: 'keyboard' | 'language';
   keyboardid?: string,

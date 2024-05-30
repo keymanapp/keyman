@@ -266,7 +266,6 @@ export default class DesignIFrame extends OutputTarget<{}> {
 
     let caret = this.getCarets().end;
     let delta = s._kmwLength();
-    let Lsel = this.doc.getSelection();
 
     if(delta == 0) {
       return;

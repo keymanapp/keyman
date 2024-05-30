@@ -6,7 +6,6 @@ import { KeyElement } from '../keyElement.js';
 import OSKLayer, { LayerLayoutParams } from './oskLayer.js';
 import VisualKeyboard from '../visualKeyboard.js';
 import OSKBaseKey from './oskBaseKey.js';
-import { ParsedLengthStyle } from '../lengthStyle.js';
 
 const NEAREST_KEY_TOUCH_MARGIN_PERCENT = 0.06;
 
@@ -49,13 +48,13 @@ export default class OSKLayerGroup {
     ls.height = '100%';
 
     // Create a separate OSK div for each OSK layer, only one of which will ever be visible
-    var n: number, i: number, j: number;
+    let n: number;
     var layers: LayoutLayer[];
 
     layers=layout['layer'];
 
     // Set key default attributes (must use exportable names!)
-    var tKey=vkbd.getDefaultKeyObject();
+    let tKey=vkbd.getDefaultKeyObject();
     tKey['fontsize']=ls.fontSize;
 
     for(n=0; n<layers.length; n++) {

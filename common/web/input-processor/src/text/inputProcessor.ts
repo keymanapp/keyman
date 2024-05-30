@@ -20,7 +20,6 @@ import {
   type ProcessorInitOptions,
   RuleBehavior,
   SystemStoreIDs,
-  type TextTransform
 } from "@keymanapp/keyboard-processor";
 import { TranscriptionCache } from "../transcriptionCache.js";
 

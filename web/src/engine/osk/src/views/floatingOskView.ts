@@ -1,6 +1,6 @@
-import { Codes, DeviceSpec, ManagedPromise, Version } from '@keymanapp/keyboard-processor';
+import { DeviceSpec, ManagedPromise, Version } from '@keymanapp/keyboard-processor';
 import { getAbsoluteX, getAbsoluteY, landscapeView } from 'keyman/engine/dom-utils';
-import { EmitterListenerSpy, LegacyEventMap } from 'keyman/engine/events';
+import { EmitterListenerSpy } from 'keyman/engine/events';
 
 import OSKView, { EventMap, type LegacyOSKEventMap, OSKPos, OSKRect } from './oskView.js';
 import TitleBar from '../components/titleBar.js';

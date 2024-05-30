@@ -9,15 +9,9 @@ class InputEventCoordinate {
   public readonly x: number;
   public readonly y: number;
 
-  private readonly source: MouseEvent | TouchEvent;
-
   public constructor(x: number, y: number, source?: MouseEvent | TouchEvent) {
     this.x = x;
     this.y = y;
-
-    if(source) {
-      this.source = source;
-    }
   }
 
   // Converts a MouseEvent or TouchEvent into the base coordinates needed

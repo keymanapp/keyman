@@ -1,4 +1,4 @@
-import { GestureDebugSource, GestureSource } from "@keymanapp/gesture-recognizer";
+import { GestureDebugSource } from "@keymanapp/gesture-recognizer";
 import { HostFixtureLayoutController } from "./hostFixtureLayoutController.js";
 import { RecordedCoordSequenceSet } from "./inputRecording.js";
 

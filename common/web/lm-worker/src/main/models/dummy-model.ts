@@ -62,7 +62,6 @@ export default class DummyModel implements LexicalModel {
   predict(transform: Transform, context: Context, injectedSuggestions?: Suggestion[]): Distribution<Suggestion> {
     let makeUniformDistribution = function(suggestions: Suggestion[]): Distribution<Suggestion> {
       let distribution: Distribution<Suggestion> = [];
-      let n = suggestions.length;
 
       for(let s of suggestions) {
         distribution.push({sample: s, p: 1});  // For a dummy model, this is sufficient.  The uniformness is all that matters.

@@ -3,7 +3,6 @@ import { EventEmitter } from 'eventemitter3';
 import {
   ActiveKey,
   ActiveLayout,
-  ButtonClass,
   DeviceSpec,
   type InternalKeyboardFont,
   Keyboard,
@@ -16,8 +15,7 @@ import {
   ActiveSubKey,
   timedPromise,
   ActiveKeyBase,
-  isEmptyTransform,
-  SystemStoreIDs
+  isEmptyTransform
 } from '@keymanapp/keyboard-processor';
 
 import { buildCorrectiveLayout, distributionFromDistanceMaps, keyTouchDistances } from '@keymanapp/input-processor';
@@ -31,7 +29,7 @@ import {
   PaddedZoneSource
 } from '@keymanapp/gesture-recognizer';
 
-import { createStyleSheet, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
+import { createStyleSheet, StylesheetManager } from 'keyman/engine/dom-utils';
 
 import { KeyEventHandler, KeyEventResultCallback } from 'keyman/engine/events';
 
@@ -43,7 +41,7 @@ import OSKKey from './keyboard-layout/oskKey.js';
 import OSKLayer, { LayerLayoutParams } from './keyboard-layout/oskLayer.js';
 import OSKLayerGroup from './keyboard-layout/oskLayerGroup.js';
 import OSKView from './views/oskView.js';
-import { LengthStyle, ParsedLengthStyle } from './lengthStyle.js';
+import { ParsedLengthStyle } from './lengthStyle.js';
 import { defaultFontSize } from './fontSizeUtils.js';
 import PhoneKeyTip from './input/gestures/browser/keytip.js';
 import { TabletKeyTip } from './input/gestures/browser/tabletPreview.js';
@@ -57,7 +55,7 @@ import SubkeyPopup from './input/gestures/browser/subkeyPopup.js';
 import Multitap from './input/gestures/browser/multitap.js';
 import { GestureHandler } from './input/gestures/gestureHandler.js';
 import Modipress from './input/gestures/browser/modipress.js';
-import Flick, { buildFlickScroller } from './input/gestures/browser/flick.js';
+import Flick from './input/gestures/browser/flick.js';
 import { GesturePreviewHost } from './keyboard-layout/gesturePreviewHost.js';
 import OSKBaseKey from './keyboard-layout/oskBaseKey.js';
 import { OSKResourcePathConfiguration } from './index.js';
@@ -125,13 +123,6 @@ export interface VisualKeyboardConfiguration extends CommonConfiguration {
   specialFont?: InternalKeyboardFont;
 }
 // #endregion
-
-interface BoundingRect {
-  left: number,
-  right: number,
-  top: number,
-  bottom: number
-};
 
 interface EventMap {
   /**
@@ -394,8 +385,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   }
 
   private constructGestureEngine(): GestureRecognizer<KeyElement, string> {
-    const rowCount = this.kbdLayout.layerMap['default'].row.length;
-
     const config: GestureRecognizerConfiguration<KeyElement, string> = {
       targetRoot: this.element,
       // document.body is the event root for mouse interactions b/c we need to track

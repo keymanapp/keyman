@@ -15,7 +15,7 @@
     "noImplicitReturns": false,
     "noImplicitAny": false,
     "strictFunctionTypes": false,
-    "noUnusedLocals": false,
+    "strictNullChecks": false,
 
     // Other settings - declaration files, sourcemapping, and other miscellaneous bits.
     "allowJs": false,

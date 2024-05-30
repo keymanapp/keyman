@@ -2,7 +2,7 @@ import { type Keyboard, KeyboardKeymanGlobal, ProcessorInitOptions } from "@keym
 import { DOMKeyboardLoader as KeyboardLoader } from "@keymanapp/keyboard-processor/dom-keyboard-loader";
 import { InputProcessor, PredictionContext } from "@keymanapp/input-processor";
 import { OSKView } from "keyman/engine/osk";
-import { KeyboardRequisitioner, KeyboardStub, ModelCache, ModelSpec, toUnprefixedKeyboardId as unprefixed } from "keyman/engine/package-cache";
+import { KeyboardRequisitioner, ModelCache, ModelSpec, toUnprefixedKeyboardId as unprefixed } from "keyman/engine/package-cache";
 
 import { EngineConfiguration, InitOptionSpec } from "./engineConfiguration.js";
 import KeyboardInterface from "./keyboardInterface.js";
