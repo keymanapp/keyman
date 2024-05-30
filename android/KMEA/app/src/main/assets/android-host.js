@@ -12,6 +12,7 @@ var bannerHeight = 0;
 var bannerImagePath = '';
 var bannerHTMLContents = '';
 var fragmentToggle = 0;
+var deferredBannerCall;
 
 var sentryManager = new KeymanSentryManager({
   hostPlatform: "android"
@@ -53,6 +54,12 @@ function init() {
 
       // The OSK is not available until initialization is complete.
       keyman.osk.bannerView.activeBannerHeight = bannerHeight;
+
+      if(deferredBannerCall) {
+        deferredBannerCall();
+        deferredBannerCall = null;
+      }
+
       keyman.refreshOskLayout();
     }
   });
@@ -67,10 +74,19 @@ function init() {
 }
 
 function showBanner(flag) {
+  if(!keyman.osk) {
+    deferredBannerCall = function() {
+      showBanner(flag);
+    }
+
+    return;
+  }
+
+  var bc = keyman.osk.bannerController;
+
   console_debug("Setting banner display for dictionaryless keyboards to " + flag);
   console_debug("bannerHTMLContents: " + bannerHTMLContents);
-  var bc = keyman.osk.bannerController;
-  if (bc) {
+  if(bc) {
     if (bannerHTMLContents != '') {
       bc.inactiveBanner = flag ? new bc.HTMLBanner(bannerHTMLContents) : null;
     } else {
