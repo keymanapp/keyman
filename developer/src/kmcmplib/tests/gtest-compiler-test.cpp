@@ -257,10 +257,35 @@ TEST_F(CompilerTest, GetXStringImpl_test) {
     str[0] = '\0';
     EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
 
-    // CERR_NoTokensFound
+    // CERR_NoTokensFound, empty
     u16cpy(str, u"");
-    //std::cerr << std::hex << GetXStringImpl(tstr, &fk, str, u"c", output, 80, 0, &newp, FALSE) << std::dec << std::endl;
     EXPECT_EQ(CERR_NoTokensFound, GetXStringImpl(tstr, &fk, str, u"c", output, 80, 0, &newp, FALSE));
+
+    // CERR_NoTokensFound, whitespace
+    u16cpy(str, u" ");
+    EXPECT_EQ(CERR_NoTokensFound, GetXStringImpl(tstr, &fk, str, u"c", output, 80, 0, &newp, FALSE));
+
+    // type=0, hex 8-bit
+    u16cpy(str, u"x12");
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(u"\u0012", tstr));
+
+    // type=0, hex 16-bit
+    u16cpy(str, u"x1234");
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(u"\u1234", tstr));
+
+    // std::cerr << "debug" << std::endl;
+
+    // type=0, hex 32-bit
+    u16cpy(str, u"x10330"); // Gothic A
+    // std::cerr << std::hex << GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE) << std::dec << std::endl;
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    // std::cerr << std::hex << tstr[0] << ',' << tstr[1] << std::dec << std::endl;
+    const KMX_WCHAR tstr_GothicA[] = { 0xD800, 0xDF30, 0 }; // see UTF32ToUTF16
+    EXPECT_EQ(0, u16cmp(tstr_GothicA, tstr)); 
+
+    // std::cerr << "end debug" << std::endl;
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
