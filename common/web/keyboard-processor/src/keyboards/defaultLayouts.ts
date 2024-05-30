@@ -24,7 +24,19 @@ export interface EncodedVisualKeyboard {
   F: string;
   /** Should there be a 102nd key? */
   K102?: boolean,
+  /**
+   * Keyboard Layer Specification: an object-based map of layer name to the keycaps for its
+   * 65 keys.  The 65 keys are ordered from left to right, then top to bottom.
+   *
+   * There are a few reserved entries.
+   * TODO:  better document the exact ranges involved.
+   */
   KLS?: {[layerName: string]: string[]},
+  /**
+   * @deprecated
+   * The older form for data in KLS - defines keycaps for 'default' keys, then 'shift' keys,
+   * in a single concatenated array.
+   */
   BK?: string[];
 }
 
