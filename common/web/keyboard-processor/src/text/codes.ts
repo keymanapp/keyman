@@ -95,6 +95,8 @@ const Codes = {
       case 'K_CAPS':
         return true;
       default:
+        // 50000:  start of the range defining key-codes for special frame-key symbols
+        // and specialized common layer-switching key IDs.  See .keyCodes above.
         if(Codes.keyCodes[keyID] >= 50000) { // A few are used by `sil_euro_latin`.
           return true; // is a 'K_' key defined for layer shifting or 'control' use.
         }
