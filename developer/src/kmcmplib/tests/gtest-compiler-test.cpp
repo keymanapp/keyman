@@ -270,17 +270,11 @@ TEST_F(CompilerTest, GetXStringImpl_type0_test) {
     KMX_WCHAR output[GLOBAL_BUFSIZE];
     PKMX_WCHAR newp = NULL;
 
-    // std::cerr << "debug" << std::endl;
-
     // type=0 ('X' or 'D'), hex 32-bit
     u16cpy(str, u"x10330"); // Gothic A
-    // std::cerr << std::hex << GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE) << std::dec << std::endl;
     EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
-    // std::cerr << std::hex << tstr[0] << ',' << tstr[1] << std::dec << std::endl;
     const KMX_WCHAR tstr_GothicA[] = { 0xD800, 0xDF30, 0 }; // see UTF32ToUTF16
     EXPECT_EQ(0, u16cmp(tstr_GothicA, tstr)); 
-
-    // std::cerr << "end debug" << std::endl;
 
     // type=0 ('X' or 'D'), decimal 8-bit
     u16cpy(str, u"d18");
@@ -323,6 +317,33 @@ TEST_F(CompilerTest, GetXStringImpl_type0_test) {
     // type=0 ('X' or 'D'), dk, CERR_InvalidDeadkey, empty delimiters => empty string
     u16cpy(str, u"dk()");
     EXPECT_EQ(CERR_InvalidDeadkey, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+}
+
+TEST_F(CompilerTest, GetXStringImpl_type1_test) {
+    KMX_WCHAR tstr[128];
+    FILE_KEYBOARD fk;
+    KMX_WCHAR str[LINESIZE];
+    KMX_WCHAR output[GLOBAL_BUFSIZE];
+    PKMX_WCHAR newp = NULL;
+
+    // std::cerr << "debug" << std::endl;
+    // std::cerr << "end debug" << std::endl;
+    // std::cerr << std::hex << GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE) << std::dec << std::endl;
+
+    // type=1 ('\"'), valid
+    u16cpy(str, u"\"abc\"");
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(u"abc", tstr));
+
+    // type=1 ('\"'), CERR_UnterminatedString
+    u16cpy(str, u"\"abc");
+    EXPECT_EQ(CERR_UnterminatedString, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    
+    // type=1 ('\"'), CERR_ExtendedStringTooLong
+    u16cpy(str, u"\"abc\"");
+    EXPECT_EQ(CERR_ExtendedStringTooLong, GetXStringImpl(tstr, &fk, str, u"", output, 2, 0, &newp, FALSE)); // max reduced to force error    
+
+    // type=1 ('\"'), CERR_ExtendedStringTooLong *** TODO ***
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
