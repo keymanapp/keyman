@@ -239,9 +239,6 @@ TEST_F(CompilerTest, IsValidKeyboardVersion_test) {
 // KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
 //  PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int /*isVKey*/, int isUnicode
 // )
-// KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
-//  PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isUnicode
-// )
 
 TEST_F(CompilerTest, GetXStringImpl_test) {
     KMX_WCHAR tstr[128];
@@ -300,6 +297,34 @@ TEST_F(CompilerTest, GetXStringImpl_test) {
     // type=0, hex 32-bit, CERR_InvalidCharacter
     u16cpy(str, u"x110000");
     EXPECT_EQ(CERR_InvalidCharacter, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+
+    // type=0, dk, valid
+    u16cpy(str, u"dk(A)");
+    EXPECT_EQ(0, (int)fk.cxDeadKeyArray);
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_dk_valid[] = { UC_SENTINEL, CODE_DEADKEY, 1, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_dk_valid, tstr));
+    fk.cxDeadKeyArray = 0;
+
+    // type=0, deadkey, valid
+    u16cpy(str, u"deadkey(A)");
+    EXPECT_EQ(0, (int)fk.cxDeadKeyArray);
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_deadkey_valid[] = { UC_SENTINEL, CODE_DEADKEY, 1, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_dk_valid, tstr));
+    fk.cxDeadKeyArray = 0;
+
+    // type=0, dk, CERR_InvalidDeadkey, bad character
+    u16cpy(str, u"dk(%)");
+    EXPECT_EQ(CERR_InvalidDeadkey, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+
+    // type=0, dk, CERR_InvalidDeadkey, no close delimiter => NULL
+    u16cpy(str, u"dk(");
+    EXPECT_EQ(CERR_InvalidDeadkey, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+
+    // type=0, dk, CERR_InvalidDeadkey, empty delimiters => empty string
+    u16cpy(str, u"dk()");
+    EXPECT_EQ(CERR_InvalidDeadkey, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
