@@ -180,7 +180,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
       /*
         We do sometimes receive null `icText.text`, even though
-        getExtractedText() docs does not list this as a possible 
+        getExtractedText() docs does not list this as a possible
         return value, so we test for that as well (#11479)
       */
       if (icText != null && icText.text != null) {
@@ -206,15 +206,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   @Override
   public void onUpdateExtractingVisibility(EditorInfo ei) {
     super.onUpdateExtractingVisibility(ei);
-  }
-
-  @Override
-  public void onConfigurationChanged(Configuration newConfig) {
-    super.onConfigurationChanged(newConfig);
-    if (newConfig.orientation != lastOrientation) {
-      lastOrientation = newConfig.orientation;
-      KMManager.onConfigurationChanged(newConfig);
-    }
   }
 
   @Override
