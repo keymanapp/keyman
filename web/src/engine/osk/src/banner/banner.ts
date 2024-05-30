@@ -115,4 +115,6 @@ export abstract class Banner {
   public readonly refreshLayout?: () => void;
 
   abstract get type();
+
+  public shutdown() { };
 }
