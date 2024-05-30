@@ -885,7 +885,7 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
         len = -1;
         break;
       default:
-        callbacks.reportMessage(KmwCompilerMessages.Error_NotSupportedInKeymanWebOutput({line: fkp.Line, code: GetCodeName(rec.Code)}));
+        callbacks.reportMessage(KmwCompilerMessages.Error_NotSupportedInKeymanWebOutput({line: fkp?.Line ?? 0, code: GetCodeName(rec.Code)}));
         Result += '';
       }
     }
