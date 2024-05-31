@@ -79,7 +79,17 @@ function name(data) {
     /**
      * @type {string}
      */
-    // var platformId = u16(data,o);
+    var platformId = u16(data,o);
+
+    /**
+     * @type {string}
+     */
+    var encodingId = u16(data,o+2);
+
+    /**
+     * @type {string}
+     */
+    // var languageId = u16(data,o+4);
 
     /**
      * @type {string}
@@ -95,7 +105,20 @@ function name(data) {
     var stringOffset = u16(data,o+10);
 
     if (!info.hasOwnProperty(nameId)) {
-      info[nameId] = utf8(data.buffer.slice(storage+stringOffset, storage+stringOffset+stringLength));
+      let decoder = null;
+      if(platformId == 0) { // unicode
+        decoder = utf16be;
+      } else if(platformId == 1) { // macintosh
+        if(encodingId == 0) decoder = macroman;
+      } else if(platformId == 3) { // windows
+        decoder = utf16be;
+      }
+
+      if(!decoder) {
+        throw new Error(`Unspecified platform ${platformId} and encoding ${encodingId} for font`);
+      } else {
+        info[nameId] = decoder(data.buffer.slice(storage+stringOffset, storage+stringOffset+stringLength));
+      }
 
       // info[nameId] = '';
       // for (var k = 0; k < stringLength; k++) {
@@ -197,11 +220,27 @@ function u32(data,pos) {
 
 /**
  * @param {*} str
- * @returns TextDecoder
+ * @returns string
  */
 function utf8(str) {
   // return new TextDecoder("utf-8").decode(new Uint16Array(str));
   return new TextDecoder("utf-8").decode(new Uint8Array(str));
+}
+
+/**
+ * @param {*} str
+ * @returns string
+ */
+function utf16be(str) {
+  return new TextDecoder("utf-16be").decode(new Uint8Array(str));
+}
+
+/**
+ * @param {*} str
+ * @returns string
+ */
+function macroman(str) {
+  return new TextDecoder("mac").decode(new Uint8Array(str));
 }
 
 /**
