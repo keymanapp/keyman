@@ -6,7 +6,7 @@ keyman.register(
       "device":"any",
       // Change 1:  redirect to /common/test/resources' subfolder.
       // "keyboardBaseUri":"https://s.keyman.com/keyboard/",
-      "keyboardBaseUri":"/resources/keyboards/",
+      "keyboardBaseUri":"common/test/resources/keyboards/",
       "fontBaseUri":"https://s.keyman.com/font/deploy/",
       "keyboardid":"khmer_angkor",
       "keyboardVersion":"current"

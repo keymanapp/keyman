@@ -244,7 +244,6 @@ export default class ContentEditable extends OutputTarget<{}> {
 
     let caret = this.getCarets().end;
     let delta = s._kmwLength();
-    let Lsel = this.root.ownerDocument.getSelection();
 
     if(delta == 0) {
       return;

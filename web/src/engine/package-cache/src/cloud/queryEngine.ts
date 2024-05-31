@@ -1,4 +1,4 @@
-import EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter3';
 
 import { PathConfiguration } from 'keyman/engine/paths';
 
@@ -17,11 +17,6 @@ export const CLOUD_REGISTRATION_ERR = "Error occurred while registering keyboard
 
 export const MISSING_KEYBOARD = function(kbdid: string) {
   return kbdid + ' keyboard not found.';
-}
-
-type CloudAPIFont = {
-  family: string,
-  source: string | string[]
 }
 
 type CloudQueryOptions = {

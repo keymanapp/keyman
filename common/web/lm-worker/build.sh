@@ -38,6 +38,14 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
+function do_configure() {
+  verify_npm_setup
+
+  # Configure Web browser-engine testing environments.  As is, this should only
+  # make changes when we update the dependency, even on our CI build agents.
+  playwright install
+}
+
 function do_build() {
   # Build worker with tsc first
   tsc -b $builder_verbose || builder_die "Could not build worker."
@@ -114,15 +122,24 @@ function do_build() {
 
 function do_test() {
   local MOCHA_FLAGS=
+  local WTR_CONFIG=
+  local WTR_DEBUG=
 
   if builder_has_option --ci; then
     MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
+    WTR_CONFIG=.ci
   fi
 
-  c8 mocha --recursive $MOCHA_FLAGS ./src/test/cases/
+  if builder_has_option --debug; then
+    WTR_DEBUG=" --manual"
+  fi
+
+  c8 mocha --recursive $MOCHA_FLAGS ./src/test/mocha/cases/
+
+  web-test-runner --config ./src/test/test-runner/web-test-runner${WTR_CONFIG}.config.mjs ${WTR_DEBUG}
 }
 
-builder_run_action configure  verify_npm_setup
+builder_run_action configure  do_configure
 builder_run_action clean      rm -rf build/ intermediate/
 builder_run_action build      do_build
 builder_run_action test       do_test

@@ -1,5 +1,5 @@
 import { Keyboard, KeyboardLoaderBase as KeyboardLoader } from "@keymanapp/keyboard-processor";
-import EventEmitter from "eventemitter3";
+import { EventEmitter } from "eventemitter3";
 
 import KeyboardStub from "./keyboardStub.js";
 

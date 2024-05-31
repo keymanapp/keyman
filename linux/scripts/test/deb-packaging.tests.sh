@@ -252,7 +252,7 @@ test_check_updated_version_number__LineRemoved_InAlpha_FileMissingInStable_ApiVe
   # simulate a commit that renamed the .symbols file
   git mv linux/debian/libkeymancore1.symbols linux/debian/libfoo1.symbols
   sed -i 's/libkeymancore/libfoo/' linux/scripts/deb-packaging.sh
-  git add  linux/scripts/deb-packaging.sh
+  git add linux/scripts/deb-packaging.sh
   sed -i 's/libkeymancore/libfoo/' linux/debian/libfoo1.symbols
   git add linux/debian/libfoo1.symbols
   git commit -m "renamed library"

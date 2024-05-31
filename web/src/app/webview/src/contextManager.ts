@@ -1,6 +1,6 @@
 import { type Keyboard, Mock, OutputTarget, Transcription, findCommonSubstringEndIndex, isEmptyTransform } from '@keymanapp/keyboard-processor';
 import { KeyboardStub } from 'keyman/engine/package-cache';
-import { ContextManagerBase, ContextManagerConfiguration } from 'keyman/engine/main';
+import { ContextManagerBase } from 'keyman/engine/main';
 import { WebviewConfiguration } from './configuration.js';
 
 export type OnInsertTextFunc = (deleteLeft: number, text: string, deleteRight: number) => void;
@@ -155,6 +155,18 @@ export default class ContextManager extends ContextManagerBase<WebviewConfigurat
   }
 
   public async activateKeyboard(keyboardId: string, languageCode?: string, saveCookie?: boolean): Promise<boolean> {
+    /*
+      this.keyboardCache isn't set until partway through KMW initialization.
+      Also, keyboard stubs aren't processed until initialization is complete,
+      so it's best to wait for initialization anyway.
+    */
+    if(!this.engineConfig.deferForInitialization.isFulfilled) {
+      await this.engineConfig.deferForInitialization.corePromise;
+
+      // Our mobile app-engines all register the stub before attempting to set the keyboard,
+      // so the Promise ordering here should work in our favor.
+    }
+
     // If the default keyboard is requested, load that.  May vary based on form-factor, which is
     // part of what .getFallbackStubKey() handles.
     if(!keyboardId) {

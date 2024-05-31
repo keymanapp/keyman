@@ -9,7 +9,8 @@ implementation
 uses
   System.SysUtils,
 
-  Keyman.Developer.System.Project.ProjectFile;
+  Keyman.Developer.System.Project.ProjectFile,
+  Keyman.Developer.System.Project.ProjectLoader;
 
 function CheckOwnerProjectForFile(const project, filename: string): Boolean; forward;
 
@@ -71,7 +72,15 @@ begin
   if SameFileName(project, filename) then
     Exit(True);
 
-  p := TProject.Create(ptUnknown, project, True);
+  try
+    p := TProject.Create(ptUnknown, project, True);
+  except
+    on E:EProjectLoader do
+    begin
+      Result := False;
+      Exit;
+    end;
+  end;
   try
     Result := p.Files.IndexOfFileName(filename) >= 0;
   finally

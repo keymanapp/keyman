@@ -1,8 +1,8 @@
-import EventEmitter from "eventemitter3";
+import { EventEmitter } from "eventemitter3";
 
-import { GestureModelDefs, getGestureModel, getGestureModelSet } from "../specs/gestureModelDefs.js";
-import { GestureSource, GestureSourceSubview } from "../../gestureSource.js";
-import { GestureMatcher, MatchResult, PredecessorMatch } from "./gestureMatcher.js";
+import { GestureModelDefs, getGestureModel } from "../specs/gestureModelDefs.js";
+import { GestureSourceSubview } from "../../gestureSource.js";
+import { MatchResult } from "./gestureMatcher.js";
 import { GestureModel, GestureResolution } from "../specs/gestureModel.js";
 import { MatcherSelection, MatcherSelector } from "./matcherSelector.js";
 import { GestureRecognizerConfiguration, TouchpointCoordinator } from "../../../index.js";

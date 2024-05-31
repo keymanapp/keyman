@@ -3,8 +3,7 @@
    Copyright 2019-2023 SIL International
 ***/
 
-import type { KeymanEngine, KeyboardCookie, UIModule } from 'keyman/app/browser';
-import type { FloatingOSKViewCookie } from 'keyman/engine/osk';
+import type { KeymanEngine, UIModule } from 'keyman/app/browser';
 
 declare var keyman: KeymanEngine
 
@@ -46,11 +45,6 @@ if(!keyman?.ui?.name) {
        * Initialization timeout handle.
        */
       private initTimer: number = null;
-      private keyboardSelector = null; // not referenced
-
-      // not referenced
-      private KeymanWeb_DefaultKeyboardHelp='<span style="font-size:7.5pt">KeymanWeb is not running.  Choose a keyboard from the list</span>';
-
 
       private _KeymanWeb_KbdList: HTMLUListElement = null;
 
@@ -60,8 +54,6 @@ if(!keyman?.ui?.name) {
        * Is also set when activating it due to user interaction.
        */
       private _KMWSel: HTMLElement = null;
-      private _IsHelpVisible = false;
-      private _DefaultKeyboardID = '';
 
       updateTimer: number = 0;
       updateList = true;
@@ -301,7 +293,7 @@ if(!keyman?.ui?.name) {
 
         /* TODO: why is this still needed??? Does it actually do anything?? */
         osk.addEventListener('hide', function(obj) {
-          if((arguments.length > 0) && obj['hiddenByUser']) {
+          if((arguments.length > 0) && obj.HiddenByUser) {
             let _a = document.getElementById('KMW_Keyboard');
             if(_a) {
               _a.className = 'kmw_hide';

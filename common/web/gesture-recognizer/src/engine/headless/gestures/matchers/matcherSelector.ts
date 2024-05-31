@@ -1,11 +1,10 @@
-import EventEmitter from "eventemitter3";
+import { EventEmitter } from "eventemitter3";
 
 import { ManagedPromise, timedPromise } from "@keymanapp/web-utils";
 
 import { GestureSource, GestureSourceSubview } from "../../gestureSource.js";
 import { GestureMatcher, MatchResult, PredecessorMatch } from "./gestureMatcher.js";
 import { GestureModel } from "../specs/gestureModel.js";
-import { GestureSequence } from "./index.js";
 
 interface GestureSourceTracker<Type, StateToken> {
   /**

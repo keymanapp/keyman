@@ -12,7 +12,6 @@
 #include <string>
 #include "kmx/kmx_xstring.h"
 #include <assert.h>
-#include "ldml_utils.hpp"
 
 namespace km {
 namespace core {

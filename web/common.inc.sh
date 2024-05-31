@@ -94,7 +94,7 @@ function test-headless() {
     TEST_OPTS="--reporter mocha-teamcity-reporter"
   fi
   if [[ -n "$TEST_EXTENSIONS" ]]; then
-    TEST_OPTS=" --extension $TEST_EXTENSIONS"
+    TEST_OPTS="$TEST_OPTS --extension $TEST_EXTENSIONS"
     TEST_CD_REQD=true
   fi
 

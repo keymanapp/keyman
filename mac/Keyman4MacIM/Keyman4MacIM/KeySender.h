@@ -15,7 +15,6 @@ extern const CGKeyCode kKeymanEventKeyCode;
 @interface KeySender : NSObject
 
 - (instancetype)init;
-- (void)sendKeyDown:(NSUInteger)keyCode forSourceEvent:(NSEvent *)event includeKeyUp:(BOOL)includeKeyUpEvent;
 - (void)sendBackspaceforEventSource:(CGEventSourceRef)eventSource;
 - (void)sendKeymanKeyCodeForEvent:(NSEvent *)event;
 

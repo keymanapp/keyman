@@ -194,9 +194,15 @@ final class KMKeyboard extends WebView {
 
     int selMin = icText.selectionStart, selMax = icText.selectionEnd;
 
+    int textLength = rawText.length();
+    
     if (selMin < 0 || selMax < 0) {
       // There is no selection or cursor
       // Reference https://developer.android.com/reference/android/text/Selection#getSelectionEnd(java.lang.CharSequence)
+      return false;
+    } else if (selMin > textLength || selMax > textLength) {
+      // Selection is past end of existing text -- should not be possible but we 
+      // are seeing it happen; #11506
       return false;
     }
 
@@ -907,10 +913,7 @@ final class KMKeyboard extends WebView {
     rotateSuggestions.setClickable(false);
 
     // Compute the actual display position (offset coordinate by actual screen pos of kbd)
-    WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-    DisplayMetrics metrics = new DisplayMetrics();
-    wm.getDefaultDisplay().getMetrics(metrics);
-    float density = metrics.density;
+    float density = KMManager.getWindowDensity(context);
 
     int posX, posY;
     if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {

@@ -12,12 +12,6 @@ export type SerializedGesturePath<Type, StateToken> = {
   stats?: CumulativePathStats
 }
 
-interface EventMap<Type, StateToken> {
-  'step': (sample: InputSample<Type, StateToken>) => void,
-  'complete': () => void,
-  'invalidated': () => void
-}
-
 /**
  * Models the path over time through coordinate space taken by a touchpoint during
  * its active lifetime.

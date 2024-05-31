@@ -5,6 +5,18 @@ import { KeyboardStub } from "keyman/engine/package-cache";
 import KeymanEngine from "./keymanEngine.js";
 import * as util from "./utils/index.js";
 
+interface KeyboardTag {
+  /**
+   * Keyboard name
+   */
+  kn: string;
+
+  /**
+   * Keyboard language code
+   */
+  kc: string;
+}
+
 // Used by 'native'-mode KMW only - the Android and iOS embedding apps implement their own menus.
 export class LanguageMenu {
   private readonly keyman: KeymanEngine;
@@ -76,7 +88,7 @@ export class LanguageMenu {
     // Add two nested DIVs to properly support iOS scrolling with momentum
     //  c.f. https://github.com/joelambert/ScrollFix/issues/2
     var m2=util._CreateElement('div'),s2=m2.style,
-        m3=util._CreateElement('div'),s3=m3.style;
+        m3=util._CreateElement('div');
     m2.id='kmw-menu-scroll-container'; m3.id='kmw-menu-scroller';
 
     // Support momentum scrolling on iOS
@@ -88,9 +100,9 @@ export class LanguageMenu {
     menu.appendChild(m2);
 
     // Add menu index strip
-    var i,x,mx=util._CreateElement('div');
+    let x,mx=util._CreateElement('div');
     mx.id='kmw-menu-index';
-    for(i=1; i<=26; i++) {
+    for(let i=1; i<=26; i++) {
       x=util._CreateElement('p');
       x.innerHTML=String.fromCharCode(i+64);
       mx.appendChild(x);
@@ -122,9 +134,6 @@ export class LanguageMenu {
 
     // Add a list of keyboards to the innermost DIV
     this.activeLgNo=this.addLanguages(m3,kbdList);
-
-    // Get number of visible (language) selectors
-    var nLgs=m3.childNodes.length-1;
 
     // Do not display until sizes have been calculated
     this.lgList.style.visibility='hidden';
@@ -170,7 +179,7 @@ export class LanguageMenu {
       scale=1.25;
     }
 
-    for(i=0;i<26;i++) {
+    for(let i=0;i<26;i++) {
       var qs=(<HTMLElement>mx.childNodes[i]).style;
       if(factor == 2 && (i%2) == 1) {
         qs.display='none';
@@ -408,7 +417,7 @@ export class LanguageMenu {
    * @param   {Object}    kb      element being added and styled
    * @param   {boolean}   unique  is this the only keyboard for the language?
    */
-  addKeyboard(kbd, kb, unique: boolean) {
+  addKeyboard(kbd: KeyboardStub, kb: HTMLParagraphElement & KeyboardTag, unique: boolean) {
     kb.kn=kbd['KI'];        // InternalName;
     kb.kc=kbd['KLC'];       // LanguageCode;
     kb.innerHTML=unique?kbd['KL']:kbd['KN'].replace(' Keyboard',''); // Name
@@ -465,7 +474,7 @@ export class LanguageMenu {
     }
 
     // Touchstart (or mspointerdown) event highlights the touched list item
-    const touchStart=function(e) {
+    const touchStart = function(this: HTMLElement & KeyboardTag, e: TouchEvent) {
       e.stopPropagation();
       if(this.className.indexOf('selected') <= 0) {
         this.className=this.className+' selected';
@@ -478,7 +487,7 @@ export class LanguageMenu {
 
     //TODO: Still drags Android background sometimes (not consistently)
     // Touchmove drags the list and prevents release from selecting the language
-    const touchMove=function(e: TouchEvent) {
+    const touchMove=function(this: HTMLElement & KeyboardTag, e: TouchEvent) {
       e.stopImmediatePropagation();
       var scroller=<HTMLElement>languageMenu.lgList.childNodes[0],
           yMax=scroller.scrollHeight-scroller.offsetHeight,
@@ -522,7 +531,7 @@ export class LanguageMenu {
     };
 
     // Touch release (click) event selects touched list item
-    const touchEnd=function(e: TouchEvent) {
+    const touchEnd=function(this: HTMLElement & KeyboardTag, e: TouchEvent) {
       if(typeof(e.stopImmediatePropagation) != 'undefined') {
         e.stopImmediatePropagation();
       } else {
@@ -548,11 +557,8 @@ export class LanguageMenu {
       unlockBodyScroll();
     }
 
-    kb.onmspointerdown=touchStart;
     kb.addEventListener('touchstart',touchStart,false);
-    kb.onmspointermove=touchMove;
     kb.addEventListener('touchmove',touchMove,false);
-    kb.onmspointerout=touchEnd;
     kb.addEventListener('touchend',touchEnd,false);
     kb.addEventListener('touchcancel',touchCancel,false);
   }

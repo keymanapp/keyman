@@ -1,4 +1,4 @@
-import { Codes, DeviceSpec } from '@keymanapp/keyboard-processor';
+import { DeviceSpec } from '@keymanapp/keyboard-processor';
 import { landscapeView } from 'keyman/engine/dom-utils';
 
 import OSKView, { OSKPos, OSKRect } from './oskView.js';

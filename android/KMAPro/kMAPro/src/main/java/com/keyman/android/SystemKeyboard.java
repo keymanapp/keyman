@@ -169,7 +169,12 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     InputConnection ic = getCurrentInputConnection();
     if (ic != null) {
       ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
-      if (icText != null) {
+      /*
+        We do sometimes receive null `icText.text`, even though
+        getExtractedText() docs does not list this as a possible 
+        return value, so we test for that as well (#11479)
+      */
+      if (icText != null && icText.text != null) {
         boolean didUpdateText = KMManager.updateText(KeyboardType.KEYBOARD_TYPE_SYSTEM, icText.text.toString());
         boolean didUpdateSelection = KMManager.updateSelectionRange(KeyboardType.KEYBOARD_TYPE_SYSTEM);
         if (!didUpdateText || !didUpdateSelection)
@@ -218,9 +223,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     super.onComputeInsets(outInsets);
 
     // We should extend the touchable region so that Keyman sub keys menu can receive touch events outside the keyboard frame
-    WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-    Point size = new Point(0, 0);
-    wm.getDefaultDisplay().getSize(size);
+    Point size = KMManager.getWindowSize(getApplicationContext());
 
     int inputViewHeight = 0;
     if (inputView != null) {

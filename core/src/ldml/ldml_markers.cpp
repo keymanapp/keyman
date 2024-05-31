@@ -11,8 +11,8 @@
 #include <string>
 #include "kmx/kmx_xstring.h"
 #include <assert.h>
+#include "util_normalize.hpp"
 
-#include "ldml_utils.hpp"
 #include <ldml/keyman_core_ldml.h>
 
 namespace km {
@@ -25,51 +25,6 @@ const std::u32string REGEX_PREFIX       = U"\\uffff\\u0008";
 const std::u32string RAW_PREFIX         = U"\uffff\u0008";
 const std::u32string REGEX_ANY_MATCH    = U"[\\u0001-\\ud7fe]";
 static_assert(LDML_MARKER_NO_INDEX < LDML_MARKER_MIN_INDEX, "LDML_MARKER_NO_INDEX must be < LDML_MARKER_MIN_INDEX");
-
-// string manipulation
-
-/**
- * Internal function to normalize with a specified mode.
- * Note: that this function _does_ assert failure, so it is not
- * required to assert its return code. The return is provided so
- * that callers can exit (such as making no change) if there was failure.
- *
- * Also note that "failure" here is something catastrophic: ICU not initialized,
- * or, more likely, some low memory situation. Does not fail on "bad" data.
- * @param n the ICU Normalizer to use
- * @param str input/output string
- * @param status error code, must be initialized on input
- * @return false if failure
- */
-static bool normalize(const icu::Normalizer2 *n, std::u16string &str, UErrorCode &status) {
-  UASSERT_SUCCESS(status);
-  assert(n != nullptr);
-  icu::UnicodeString dest;
-  icu::UnicodeString src = icu::UnicodeString(str.data(), (int32_t)str.length());
-  n->normalize(src, dest, status);
-  // the next line here will assert
-  if (UASSERT_SUCCESS(status)) {
-    str.assign(dest.getBuffer(), dest.length());
-  }
-  return U_SUCCESS(status);
-}
-
-bool normalize_nfd(std::u32string &str) {
-  std::u16string rstr = km::core::kmx::u32string_to_u16string(str);
-  if(!normalize_nfd(rstr)) {
-    return false;
-  } else {
-    str = km::core::kmx::u16string_to_u32string(rstr);
-    return true;
-  }
-}
-
-bool normalize_nfd(std::u16string &str) {
-  UErrorCode status = U_ZERO_ERROR;
-  const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
-  UASSERT_SUCCESS(status);
-  return normalize(nfd, str, status);
-}
 
 marker_entry::marker_entry(char32_t c) : ch(c), marker(LDML_MARKER_NO_INDEX), processed(false), end(true) {
 }
@@ -146,7 +101,7 @@ bool normalize_nfd_markers_segment(std::u32string &str, marker_map &map, marker_
   std::u32string str_unmarked = remove_markers(str, map, encoding);
   /** original string, no markers, NFD */
   std::u32string str_unmarked_nfd = str_unmarked;
-  if(!normalize_nfd(str_unmarked_nfd)) {
+  if(!km::core::util::normalize_nfd(str_unmarked_nfd)) {
     return false; // normalize failed.
   } else if (str_unmarked_nfd == str_unmarked) {
     // Normalization produced no change when markers were removed.

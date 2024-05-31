@@ -548,15 +548,13 @@ if(!keyman?.ui?.name) {
        * Description  Select a keyboard from the drop down menu
        **/
       selectKbd(_kbd: number) {
-        let _name,_lgCode,_index;
+        let _name,_lgCode;
         if(_kbd < 0) {
           _name = '';
           _lgCode='';
-          _index = '';
         } else {
           _name = this.keyboards[_kbd]._InternalName;
           _lgCode = this.keyboards[_kbd]._LanguageCode;
-          _index = this.keyboards[_kbd]._Index;
         }
 
         keymanweb.setActiveKeyboard(_name,_lgCode);

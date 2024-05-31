@@ -22,7 +22,7 @@ import type Keyboard from "./keyboard.js";
 export type KLS = {[layerName: string]: string[]};
 
 // The following types provide type definitions for the full JSON format we use for visual keyboard definitions.
-export type ButtonClass       =  0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+export type ButtonClass       =  0 | 1 | 2 | 3 | 4 | /*5 | 6 | 7 |*/ 8 | 9 | 10;
 
 export interface LayoutLayer extends LayoutLayerBase {
   // Post-processing elements.
@@ -117,7 +117,7 @@ export class Layouts {
     var layout: LayoutFormFactor = deepCopy(Layouts.dfltLayout[layoutType]);
 
     var n,layers=layout['layer'], keyLabels: KLS=PVK['KLS'], key102=PVK['K102'];
-    var i, j, k, m, row, rows: LayoutRow[], key: LayoutKey, keys: LayoutKey[];
+    var i, j, k, rows: LayoutRow[], key: LayoutKey, keys: LayoutKey[];
     var chiral: boolean = (kbdBitmask & Codes.modifierBitmasks.IS_CHIRAL) != 0;
 
     if(PVK['F']) {
@@ -135,9 +135,6 @@ export class Layouts {
       // Makes things more efficient elsewhere and for reloading after keyboard swaps.
       keyLabels = PVK['KLS'] = Layouts.processLegacyDefinitions(PVK['BK']);
     }
-
-    // Identify key labels (e.g. *Shift*) that require the special OSK font
-    var specialLabel=/\*\w+\*/;
 
     // *** Step 1:  instantiate the layer objects. ***
 
@@ -236,7 +233,7 @@ export class Layouts {
 
     // *** Step 2: Layer objects now exist; time to fill them with the appropriate key labels and key styles ***
     for(n=0; n<layers.length; n++) {
-      var layer=layers[n], kx, shiftKey: LayoutKey = null, nextKey=null, allText='';
+      var layer=layers[n], kx, shiftKey: LayoutKey = null;
       var capsKey: LayoutKey = null, numKey: LayoutKey = null, scrollKey: LayoutKey = null;  // null if not in the OSK layout.
       var layerSpec = keyLabels[layer['id']];
       var isShift = layer['id'] == 'shift' ? 1 : 0;
@@ -274,9 +271,6 @@ export class Layouts {
           switch(key['id']) {
             case "K_SHIFT":
               shiftKey=key;
-              break;
-            case "K_TAB":
-              nextKey=key;
               break;
             case "K_CAPS":
               capsKey=key;

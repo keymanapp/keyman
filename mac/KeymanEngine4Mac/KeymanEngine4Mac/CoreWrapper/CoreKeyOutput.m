@@ -32,9 +32,10 @@
 
 -(NSString *)description
 {
-  NSData* data = [self.textToInsert dataUsingEncoding:NSUTF16LittleEndianStringEncoding];
+  NSData* deleteData = [self.textToDelete dataUsingEncoding:NSUTF16LittleEndianStringEncoding];
+  NSData* insertData = [self.textToInsert dataUsingEncoding:NSUTF16LittleEndianStringEncoding];
 
-  return [[NSString alloc] initWithFormat: @"codePointsToDeleteBeforeInsert: %li, textToInsert: '%@', optionsToPersist: %@, alert: %d, emitKeystroke: %d, capsLockState: %d ", self.codePointsToDeleteBeforeInsert, data, self.optionsToPersist, self.alert, self.emitKeystroke, self.capsLockState];
+  return [[NSString alloc] initWithFormat: @"codePointsToDeleteBeforeInsert: %li, textToDelete: '%@' [data: '%@'], textToInsert: '%@' [data: '%@], optionsToPersist: %@, alert: %d, emitKeystroke: %d, capsLockState: %d ", self.codePointsToDeleteBeforeInsert, self.textToDelete, deleteData, self.textToInsert, insertData, self.optionsToPersist, self.alert, self.emitKeystroke, self.capsLockState];
 }
 
 -(BOOL)hasCodePointsToDelete {

@@ -194,6 +194,14 @@ get_api_version_from_core() {
 #       the last stable version
 # NOTE: it is up to the caller to check if this is a major version
 # change that requires an API version update.
+# Check if the API version got updated
+# Returns:
+#   0 - if the API version got updated
+#   1 - the .symbols file got changed but the API version didn't get updated
+#   2 - if we're in the alpha tier and the API version got updated since
+#       the last stable version
+# NOTE: it is up to the caller to check if this is a major version
+# change that requires an API version update.
 is_api_version_updated() {
   local OLD_API_VERSION NEW_API_VERSION TIER
   OLD_API_VERSION=$(get_api_version_in_symbols_file "${GIT_BASE}")
@@ -209,7 +217,6 @@ is_api_version_updated() {
   case ${TIER} in
     alpha)
       local STABLE_VERSION STABLE_API_VERSION STABLE_BRANCH
-      STABLE_API_VERSION=0
       STABLE_VERSION=$((${VERSION%%.*} - 1))
       STABLE_BRANCH="origin/stable-${STABLE_VERSION}.0"
       STABLE_API_VERSION=$(get_api_version_in_symbols_file "${STABLE_BRANCH}")

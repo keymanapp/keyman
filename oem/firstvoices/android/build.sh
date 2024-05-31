@@ -25,8 +25,7 @@ builder_describe "Builds FirstVoices for Android app." \
   "configure" \
   "build" \
   "test             Runs lint and tests." \
-  "--ci             Don't start the Gradle daemon. For CI" \
-  "--upload-sentry  Upload to sentry"
+  "--ci             Don't start the Gradle daemon. For CI"
 
 # parse before describe_outputs to check debug flags
 builder_parse "$@"
@@ -54,15 +53,10 @@ fi
 
 #### Build action definitions ####
 
-function makeLocalSentryRelease() {
-  echo "Placeholder for uploading symbols to Sentry"
-}
-
-#### Build action definitions ####
-
 # Check about cleaning artifact paths
 if builder_start_action clean; then
   rm -rf "$KEYMAN_ROOT/oem/firstvoices/android/app/build/outputs"
+  rm -rf "$KEYMAN_ROOT/oem/firstvoices/android/app/build/tmp"
   builder_finish_action success clean
 fi
 

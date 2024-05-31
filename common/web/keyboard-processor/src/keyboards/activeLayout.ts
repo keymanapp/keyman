@@ -1,7 +1,6 @@
 import Codes from "../text/codes.js";
 import KeyEvent, { KeyEventSpec } from "../text/keyEvent.js";
 import KeyMapping from "../text/keyMapping.js";
-import type { KeyDistribution } from "../text/keyEvent.js";
 import { ButtonClasses, Layouts } from "./defaultLayouts.js";
 import type { LayoutKey, LayoutSubKey, LayoutRow, LayoutLayer, LayoutFormFactor, ButtonClass } from "./defaultLayouts.js";
 import type Keyboard from "./keyboard.js";
@@ -9,6 +8,7 @@ import type Keyboard from "./keyboard.js";
 import { TouchLayout } from "@keymanapp/common-types";
 import TouchLayoutDefaultHint = TouchLayout.TouchLayoutDefaultHint;
 import TouchLayoutFlick = TouchLayout.TouchLayoutFlick;
+import TouchLayoutKeySp = TouchLayout.TouchLayoutKeySp;
 import { type DeviceSpec } from "@keymanapp/web-utils";
 
 // TS 3.9 changed behavior of getters to make them
@@ -90,7 +90,7 @@ export class ActiveKeyBase {
   layer: string;
   displayLayer: string;
   nextlayer: string;
-  sp?: ButtonClass;
+  sp?: TouchLayoutKeySp;
 
   private _baseKeyEvent: KeyEvent;
   isMnemonic: boolean = false;

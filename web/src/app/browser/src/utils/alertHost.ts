@@ -15,11 +15,6 @@ export class AlertHost {
   private readonly bg: HTMLDivElement;
 
   /**
-   * The "wait box" element - the top-level element comprising the wait/message box itself.
-   */
-  private readonly lb: HTMLDivElement;
-
-  /**
    * The "wait text" / "alert text" element - the element containing any message text associated
    * with the alert or wait being signaled.
    */
@@ -50,7 +45,7 @@ export class AlertHost {
   constructor() {
     // "background" - the clickable shim BEHIND the 'dialog'
     const bg = this.bg = document.createElement('div'),
-          lb = this.lb = document.createElement('div'), // 'wait box' - the main actual message box / 'dialog' element
+          lb = document.createElement('div'), // 'wait box' - the main actual message box / 'dialog' element
           lt = this.lt = document.createElement('div'), // 'wait text' // or alert text - but the host for message text
           gr = this.gr = document.createElement('div'), // 'wait graphic' - the little 'please wait' spinny / faux progress bar
           bx = this.bx = document.createElement('div'); // the little 'close' top-right x button.

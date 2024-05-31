@@ -5,7 +5,6 @@ import { GestureModel, GestureResolution, GestureResolutionSpec, RejectionDefaul
 import { ManagedPromise, TimeoutPromise } from "@keymanapp/web-utils";
 import { FulfillmentCause, PathMatcher } from "./pathMatcher.js";
 import { CumulativePathStats } from "../../cumulativePathStats.js";
-import { SampleCoordReplacement } from "../specs/contactModel.js";
 import { processSampleClientCoords } from "../../../inputEventEngine.js";
 
 /**
@@ -81,7 +80,7 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
 
     // We condition on ComplexGestureSource since some unit tests mock the other type without
     // instantiating the actual type.
-    const predecessor = sourceObj instanceof GestureSource<Type> ? null : sourceObj;
+    const predecessor = sourceObj instanceof GestureSource ? null : sourceObj;
     const source = predecessor ? null : (sourceObj as GestureSource<Type>);
 
     this.predecessor = predecessor;
@@ -131,11 +130,9 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
 
     for(let touchpointIndex = 0; touchpointIndex < sourceTouchpoints.length; touchpointIndex++) {
       const srcContact = sourceTouchpoints[touchpointIndex];
-      let baseContact = srcContact;
 
       if(srcContact instanceof GestureSourceSubview) {
         srcContact.disconnect();  // prevent further updates from mangling tracked path info.
-        baseContact = srcContact.baseSource;
       }
 
       // No need to filter out already-matched contact points, and doing so is more trouble

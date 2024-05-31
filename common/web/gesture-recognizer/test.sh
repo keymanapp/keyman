@@ -49,17 +49,15 @@ test-headless ( ) {
 }
 
 test-browser ( ) {
-  KARMA_FLAGS=
+  local WTR_DEBUG=
+  local WTR_CONFIG=
   if [[ $# -eq 1  && $1 == "debug" ]]; then
-    KARMA_CONFIG="manual.conf.cjs"
-    KARMA_FLAGS="--no-single-run"
-  elif [ $REPORT_STYLE == "local" ]; then
-    KARMA_CONFIG="manual.conf.cjs"
-  else
-    KARMA_CONFIG="CI.conf.cjs"
+    WTR_DEBUG=" --manual"
+  elif [ $REPORT_STYLE != "local" ]; then
+    WTR_CONFIG=.CI
   fi
 
-  karma start src/test/auto/browser/$KARMA_CONFIG "$KARMA_FLAGS"
+  web-test-runner --config src/test/auto/browser/web-test-runner${WTR_CONFIG}.config.mjs ${WTR_DEBUG}
 }
 
 if builder_start_action test:headless; then

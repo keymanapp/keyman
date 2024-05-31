@@ -4,7 +4,6 @@
 ***/
 
 import type { KeymanEngine, KeyboardCookie, UIModule } from 'keyman/app/browser';
-import { type StylesheetManager } from 'keyman/engine/dom-utils';
 
 declare var keyman: KeymanEngine
 
@@ -71,8 +70,6 @@ if(!keyman?.ui?.name) {
     if(util.isTouchDevice()) {
       throw '';
     }
-
-    let controller = document.getElementById('KeymanWebControl');
 
     // User interface local variables
     class ToolbarUI implements UIModule {
@@ -1329,7 +1326,6 @@ if(!keyman?.ui?.name) {
        **/
       loadCookie() {
         let currentKeyboard='';
-        let currentLgCode='';
         const kc=util.loadCookie<KeyboardCookie>("KeymanWeb_Keyboard");
         if(kc.current != undefined) {
           currentKeyboard = kc.current.split(':')[0];

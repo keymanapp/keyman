@@ -42,7 +42,7 @@ export class BatchRenderer {
     video.srcObject = captureStream;
     video.play();
 
-    const result = await new Promise<void>((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
       video.onloadedmetadata = function () {
         resolve();
       }

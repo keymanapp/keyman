@@ -3,12 +3,11 @@ import { Device as DeviceDetector } from 'keyman/engine/device-detect';
 import { getAbsoluteY } from 'keyman/engine/dom-utils';
 import { OutputTarget } from 'keyman/engine/element-wrappers';
 import {
-  OSKView,
   TwoStateActivator,
   VisualKeyboard
 } from 'keyman/engine/osk';
 import { ErrorStub, KeyboardStub, CloudQueryResult, toPrefixedKeyboardId as prefixed } from 'keyman/engine/package-cache';
-import { DeviceSpec, Keyboard, extendString } from "@keymanapp/keyboard-processor";
+import { DeviceSpec, Keyboard } from "@keymanapp/keyboard-processor";
 
 import * as views from './viewsAnchorpoint.js';
 import { BrowserConfiguration, BrowserInitOptionDefaults, BrowserInitOptionSpec } from './configuration.js';
@@ -546,7 +545,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *  @param  {Object|string} e         element id or element
    *  @param  {boolean=}      setFocus  optionally set focus  (KMEW-123)
    **/
-  setActiveElement(e: string|HTMLElement, setFocus: boolean) {
+  setActiveElement(e: string|HTMLElement, setFocus?: boolean) {
     if(typeof e == 'string') {
       const id = e;
       e = document.getElementById(e);

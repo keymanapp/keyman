@@ -15,14 +15,12 @@ import { BANNER_GESTURE_SET } from './bannerGestureSet.js';
 
 import { DeviceSpec, Keyboard, KeyboardProperties } from '@keymanapp/keyboard-processor';
 import { Banner } from './banner.js';
-import EventEmitter from 'eventemitter3';
 import { ParsedLengthStyle } from '../lengthStyle.js';
 import { getFontSizeStyle } from '../fontSizeUtils.js';
 import { getTextMetrics } from '../keyboard-layout/getTextMetrics.js';
 import { BannerScrollState } from './bannerScrollState.js';
 
 const TOUCHED_CLASS: string = 'kmw-suggest-touched';
-const BANNER_CLASS: string = 'kmw-suggest-banner';
 const BANNER_SCROLLER_CLASS = 'kmw-suggest-banner-scroller';
 
 const BANNER_VERT_ROAMING_HEIGHT_RATIO = 0.666;
@@ -81,7 +79,6 @@ export class BannerSuggestion {
   private _minWidth: number;
   private _paddingWidth: number;
 
-  private fontFamily?: string;
   public readonly rtl: boolean;
 
   private _suggestion: Suggestion;
@@ -109,7 +106,7 @@ export class BannerSuggestion {
 
   private constructRoot() {
     // Add OSK suggestion labels
-    let div = this.div = createUnselectableElement('div'), ds=div.style;
+    let div = this.div = createUnselectableElement('div');
     div.className = "kmw-suggest-option";
     div.id = BannerSuggestion.BASE_ID + this.index;
 
@@ -138,7 +135,7 @@ export class BannerSuggestion {
       // Establish base font settings
       let font = keyboardProperties['KFont'];
       if(font && font.family && font.family != '') {
-        div.style.fontFamily = this.fontFamily = font.family;
+        div.style.fontFamily = font.family;
       }
     }
   }
@@ -391,8 +388,6 @@ export class SuggestionBanner extends Banner {
 
   private isRTL: boolean = false;
 
-  private hostDevice: DeviceSpec;
-
   /**
    * The banner 'container', which is also the root element for banner scrolling.
    */
@@ -407,7 +402,6 @@ export class SuggestionBanner extends Banner {
 
   constructor(hostDevice: DeviceSpec, height?: number) {
     super(height || Banner.DEFAULT_HEIGHT);
-    this.hostDevice = hostDevice;
 
     this.getDiv().className = this.getDiv().className + ' ' + SuggestionBanner.BANNER_CLASS;
 
@@ -417,6 +411,10 @@ export class SuggestionBanner extends Banner {
     this.buildInternals(false);
 
     this.gestureEngine = this.setupInputHandling();
+  }
+
+  shutdown() {
+    this.gestureEngine.destroy();
   }
 
   buildInternals(rtl: boolean) {
