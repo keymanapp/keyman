@@ -387,6 +387,89 @@
     </Control>
   </Form>
 
+  <Form Name="context/debug">
+    <Control Name="memo" Title="Debugger input window">
+      <p>The debugger input window is used for typing input to test the keyboard. 
+      In the top half of this window, input you type while testing your keyboard will be 
+      displayed, exactly the same as in use, with one exception: deadkeys will be shown 
+      visually with an OBJ symbol.</p>
+    </Control>
+
+    <Control Name="sgChars" Title="Debugger input window">
+      <p>The lower half of the window shows a grid of the characters to the virtual left 
+      of the insertion point, or the selected characters if you make a selection. Deadkeys 
+      will be identified in the grid. The grid will show characters in right-to-left scripts 
+      in backing store order, from left to right. If there are more characters in your text 
+      than can fit on the screen, then only those that fit will be shown in the grid.</p>
+    </Control>
+  </Form>
+
+  <Form Name="context/debug#toc-regression-testing">
+    <Control Name="lbRegTestLog" Title="Regression Testing">
+      <p>The idea in regression testing is to record a sequence of keystrokes and the 
+      output the keyboard produced, in order to test for the same behaviour when you 
+      make changes to the keyboard.</p>
+    </Control>
+
+    <Control Name="cmdRegTestStartStopLog" Title="Regression Testing">
+      <p>Use Start Log/Stop Log to record the input and output. You can then use Start Test 
+      to run the test again, or go the Options menu to clear the log, or save or load a test, 
+      or use the batch mode to run several tests in a row. </p><br></br>
+      <p>If the output produced while running a test is different to that stored when recording it, 
+      Keyman will halt the test on the line where the failure occurred, and activate 
+      Single Step mode.</p>
+    </Control>
+
+    <Control Name="cmdRegTestOptions" Title="Regression Testing">
+      <p>In the Options menu, you can clear the log, save or load a test, 
+      or use the batch mode to run several tests in a row.</p>
+    </Control>
+  </Form>
+
+  <Form Name="context/debug#toc-state">
+    <Control Name="cmdRestartDebugger" Title="State">
+      <p>Pressing the Restart button will clear the keystroke log as well as
+      clearing the text in the debug window. </p>
+    </Control>
+
+    <Control Name="lbKeystrokeLog" Title="State">
+      <p>This window shows the current keystroke state, and the sequence of 
+      keystrokes that were typed to arrive at this state. </p>
+    </Control>
+  </Form>
+
+  <Form Name="context/debug#toc-elements">
+    <Control Name="lvElements" Title="Elements">
+      <p>This shows the elements that make up rule currently being processed: the context, 
+      the key, and also what the output will be. If the rule uses stores, the contents of 
+      the store will be shown in the right-hand column, with the matched letter in red.</p>
+    </Control>
+  </Form>
+
+  <Form Name="context/debug#toc-call-stack">
+    <Control Name="lbCallStack" Title="Call Stack">
+      <p>Here all the lines that have been processed to this point are shown in a list. 
+      You can double-click on any entry in the list to display the line in the 
+      keyboard source.</p>
+    </Control>
+  </Form>
+
+  <Form Name="context/debug#toc-deadkeys">
+    <Control Name="lbDeadkeys" Title="Deadkeys">
+      <p>This lists all the deadkeys that are currently in the context. 
+      You can select one from the list to see it highlighted in the debug input box. 
+      This information can also be seen in the character grid in the lower half of 
+      the debugger input window.</p>
+    </Control>
+  </Form>
+
+  <Form Name="context/about-tike">
+    <Control Name="cmdOK" Title="About Dialog">
+      <p>The About dialog displays copyright and registration information for Keyman Developer, 
+      and has a link to the Keyman website.</p>
+    </Control>
+  </Form>
+
   <Form Name="context/key-test">
     <Control Name="cmdInsert" Title="Virtual Key Identifier">
       <p>This dialog lets you check the virtual key code for any key combination (except Window reserved key combinations such as Alt + Tab). You can then insert the virtual key code into the last active edit window at the current cursor position.</p><br></br>
