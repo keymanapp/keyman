@@ -104,7 +104,7 @@ export class KeymanSentryManager {
   attachEventMetadata(event: any) {
     // Ensure that the 'extra' object exists.  (May not exist for synthetic/custom Errors.)
     event.extra = event.extra || {};
-    event.extra.keymanState = window['keyman']['getDebugInfo']();
+    event.extra.keymanState = window['keyman']?.['getDebugInfo']?.();
     event.extra.keymanHostPlatform = this.keymanPlatform;
   }
 
