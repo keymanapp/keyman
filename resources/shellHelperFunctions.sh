@@ -246,7 +246,7 @@ verify_npm_setup() {
 
   pushd "$KEYMAN_ROOT" > /dev/null
 
-  try_multiple_times npm install @keymanapp/totally-not-a-package-that-is-distributed-so-it-should-make-an-error
+  try_multiple_times npm ci
   
   popd > /dev/null
 }
