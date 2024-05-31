@@ -211,7 +211,8 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
     }
 
     if(!this.isConfigured) {
-      console.warn("Can't apply suggestions until model is fully loaded");
+      // If we're in this state, the suggestion is now outdated; the user must have swapped keyboard and model.
+      console.warn("Could not apply suggestion; the corresponding model has been unloaded");
       return null;
     }
 
