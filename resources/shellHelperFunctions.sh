@@ -218,7 +218,7 @@ _try_multiple_times ( ) {
     sleep $wait_length
   fi
 
-  if ! "${@:1}"; then
+  if ! "$@"; then
     _try_multiple_times $retryCount "$@"
   fi
 }
@@ -246,7 +246,7 @@ verify_npm_setup() {
 
   pushd "$KEYMAN_ROOT" > /dev/null
 
-  try_multiple_times npm ci
+  try_multiple_times npm install @keymanapp/totally-not-a-package-that-is-distributed-so-it-should-make-an-error
   
   popd > /dev/null
 }
