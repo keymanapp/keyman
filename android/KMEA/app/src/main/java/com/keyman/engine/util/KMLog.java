@@ -13,6 +13,7 @@ import com.keyman.engine.KMManager;
 import com.keyman.engine.util.DependencyUtil;
 import com.keyman.engine.util.DependencyUtil.LibraryType;
 
+import io.sentry.Breadcrumb;
 import io.sentry.Sentry;
 import io.sentry.SentryLevel;
 
@@ -30,6 +31,44 @@ public final class KMLog {
 
       if (DependencyUtil.libraryExists(LibraryType.SENTRY) && Sentry.isEnabled()) {
         Sentry.captureMessage(msg, SentryLevel.INFO);
+      }
+    }
+  }
+
+  /**
+   * Utility to log info and add as a Sentry breadcrumb, rather than
+   * as an independent message
+   * @param tag String of the caller
+   * @param msg String of the info message
+   */
+  public static void LogBreadcrumb(String tag, String msg, boolean addStackTrace) {
+    if (msg != null && !msg.isEmpty()) {
+      Log.i(tag, msg);
+
+      if (DependencyUtil.libraryExists(LibraryType.SENTRY) && Sentry.isEnabled()) {
+        Breadcrumb crumb = new Breadcrumb();
+        crumb.setMessage(msg);
+        crumb.setLevel(SentryLevel.INFO);
+
+        if(addStackTrace) {
+          StackTraceElement[] rawTrace = Thread.currentThread().getStackTrace();
+
+          // The call that gets us the stack-trace above... shows up in the
+          // stack trace, so we'll skip the first few (redundant) entries.
+          int skipCount = 3;
+
+          // Sentry does limit the size of messages... so let's just
+          // keep 10 entries and call it a day.
+          int limit = Math.min(rawTrace.length, 10 + skipCount);
+          if(rawTrace.length > skipCount) {
+            String[] trace = new String[limit - skipCount];
+            for (int i = skipCount; i < limit; i++) {
+              trace[i-skipCount] = rawTrace[i].toString();
+            }
+            crumb.setData("stacktrace", trace);
+          }
+        }
+        Sentry.addBreadcrumb(crumb);
       }
     }
   }
