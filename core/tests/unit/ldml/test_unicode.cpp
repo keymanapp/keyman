@@ -76,23 +76,33 @@ std::string get_major(const std::string& ver) {
   return ver.substr(start, end - start);
 }
 
-/** @return the Unicode version from a Blocks.txt file */
+/**
+ *  @return the Unicode version from a Blocks.txt file, such as `15.1.0`
+ */
 std::string get_block_unicode_ver(const char *blocks_path) {
   std::cout << "= " << __FUNCTION__ << " load " << blocks_path << std::endl;
-  // fetch Blocks.txt
+  // open Blocks.txt
   std::ifstream blocks_file(
       km::core::path(blocks_path).native());
   assert(blocks_file.good());
   std::string block_line;
   assert(std::getline(blocks_file, block_line));  // first line
+
+  // The first line is something such as '# Blocks-15.1.0.txt'
+  // We skip the prefix, and then stop before the suffix
+
   const std::string prefix = "# Blocks-";
+  const std::string txt_suffix = ".txt";
+
+  // find and skip the prefix - "15.1.0.txt"
   assert(block_line.length() > prefix.length());
-  std::string result = block_line.substr(prefix.length());
-  const std::string txt_suffix = ".txt"; // trim off this suffix
+  std::string result = block_line.substr(prefix.length()); // "15.1.0"
+
+  // find and trim before the suffix
   auto txt_pos = result.find(txt_suffix, 0);
-  if (txt_pos != std::string::npos) {
-    result.resize(txt_pos);
-  }
+  assert(txt_pos != std::string::npos);
+  result.resize(txt_pos);
+
   return result;
 }
 
