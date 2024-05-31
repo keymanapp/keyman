@@ -86,8 +86,10 @@ const Codes = {
     [')!@#$%^&*(',':+<_>?~', '{|}"']
   ],
 
-  isKeyNotCorrected(keyID: string): boolean {
+  isFrameKey(keyID: string): boolean {
     switch(keyID) {
+      // TODO:  consider adding K_ALT, K_CTRL.
+      // Not currently here as they typically don't show up on mobile layouts.
       case 'K_SHIFT':
       case 'K_LOPT':
       case 'K_ROPT':
