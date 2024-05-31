@@ -228,10 +228,6 @@ _try_multiple_times ( ) {
 # build invocation
 #
 verify_npm_setup() {
-  try_multiple_times _verify_npm_setup
-}
-
-_verify_npm_setup() {
   # We'll piggy-back on the builder module dependency build state to determine
   # if npm ci has been called in the current script invocation. Adding the
   # prefix /external/ to module name in order to differentiate between this and
@@ -249,6 +245,8 @@ _verify_npm_setup() {
     builder_die "Build environment setup error detected!  Please ensure Node.js is installed!"
 
   pushd "$KEYMAN_ROOT" > /dev/null
-  npm ci
+
+  try_multiple_times npm ci
+  
   popd > /dev/null
 }
