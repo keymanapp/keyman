@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.46 alpha 2024-06-01
+
+* chore(linux): More debugging of API verification (#11639)
+
 ## 18.0.45 alpha 2024-05-31
 
 * change(mac): adopt unified logging APIs (#11515)
