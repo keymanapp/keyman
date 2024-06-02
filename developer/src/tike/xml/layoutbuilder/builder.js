@@ -1111,7 +1111,11 @@ $(function() {
             // The last selected presentation is no longer available; select the first option instead
             $('#selPlatformPresentation').val($('#selPlatformPresentation option:first').val());
           }
+
+          let selection = builder.saveSelection();
           builder.prepareLayer();
+          builder.restoreSelection(selection);
+
           if(data.layer && KVKL[builder.lastPlatform][data.layer]) {
             $('#selLayer').val(data.layer);
             builder.selectLayer();
