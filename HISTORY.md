@@ -271,6 +271,47 @@
 * chore(common): move to 18.0 alpha (#10713)
 * chore: move to 18.0 alpha
 
+## 17.0.326 stable 2024-06-02
+
+* cherrypick(android/engine): Handle globe key on lock screen (#11468)
+* fix(android/app): Verify extracted text is not null (#11482)
+* chore(linux): Trigger GHA packaging for stable builds (#11494)
+* chore(android,mac,windows): Update crowdin strings for DE (#11498)
+* fix(developer): handle `KM_CORE_IT_INVALIDATE_CONTEXT` in debugger (#11489)
+* fix(developer): test existence of ngrok.exe before atttempting to start (#11544)
+* fix(developer): handle unsupported `return` statement in `match` and `nomatch` in web compiler (#11547)
+* fix(developer): ensure folder for MRU list is always created (#11553)
+* fix(developer): handle invalid project file when scanning for owner project (#11559)
+* fix(ios): remove incorrect cast in log statement to prevent crash (#11570)
+* fix(ios): do not write to shared storage from system keyboard (#11622)
+* fix(android): Ignore updating invalid selections (#11529)
+* fix(developer): handle invalid default project path in options (#11556)
+* fix(developer): handle missing data in .kps `<Keyboard>` (#11564)
+* fix(developer): save touch layout editor selection when loading state (#11576)
+* fix(developer): use correct variable when fixing up flick and multitap in Layer Properties dialog (#11578)
+* fix(developer): correct the inference of default hint from flicks (#11583)
+* fix(developer): make top row of Character Map 1 pixel to avoid DIV/0 in gestures (#11591)
+* fix(web): fixes error on tab, enter when only a single input element is on the page (#11615)
+* fix(web): correctly handle cross-origin stylesheets when calculating keyboard size and key cap font size (#11616)
+* fix(web): pre-init keyboard activation awaits init before proceeding (#11617)
+* fix(web): add null guard for missing debug info when reporting to Sentry (#11619)
+* fix(android): host-page banner initialization (#11618)
+* fix(developer): support Windows and Unicode names in .ttf (#11634)
+
+## 17.0.325 stable 2024-05-15
+
+* chore: update history for stable (#11448)
+
+## 17.0.324 stable 2024-05-15
+
+* chore(android): 17.0 stable release
+* chore(ios): 17.0 stable release
+* chore(linux): 17.0 stable release
+* chore(mac): 17.0 stable release
+* chore(web): 17.0 stable release
+* chore(windows): 17.0 stable release
+* chore(developer): 17.0 stable release
+
 ## 17.0.323 beta 2024-05-13
 
 * chore(windows): Update crowdin string for Khmer (#11409)
