@@ -36,6 +36,8 @@ jobs:
       id: environment_step
       run: |
         cat artifacts/env >> $GITHUB_OUTPUT
+        pwd
+        ls -al artifacts/
 
   api_verification:
     name: Verify API for libkeymancore.so
@@ -62,19 +64,24 @@ jobs:
       with:
         ref: '${{ needs.setup_environment.outputs.GIT_SHA }}'
         fetch-depth: 0
+        clean: false
+        path: ${{ github.workspace }}/keyman/
 
     - name: Install devscripts
-      uses: ./.github/actions/apt-install
+      uses: ./keyman/.github/actions/apt-install
       with:
         packages: devscripts equivs
 
     - name: "Verify API for libkeymancore.so (${{ needs.setup_environment.outputs.GIT_BRANCH }}, branch ${{ needs.setup_environment.outputs.GIT_BASE_BRANCH }}, by ${{ needs.setup_environment.outputs.GIT_USER }}) - "
       run: |
+        pwd
+        ls -al artifacts/
+        echo "GITHUB_WORKSPACE=${GITHUB_WORKSPACE}"
         ls -al ${GITHUB_WORKSPACE}
         ls -al ${GITHUB_WORKSPACE}/artifacts/
         ls -al "${GITHUB_WORKSPACE}/artifacts/${PKG_NAME}_${{ needs.setup_environment.outputs.VERSION }}-1${{ needs.setup_environment.outputs.PRERELEASE_TAG }}+$(lsb_release -c -s)1_amd64.deb"
 
-        cd linux
+        cd ${{ github.workspace }}/keyman/linux
         ./scripts/deb-packaging.sh \
           --gha \
           --bin-pkg "${GITHUB_WORKSPACE}/artifacts/${PKG_NAME}_${{ needs.setup_environment.outputs.VERSION }}-1${{ needs.setup_environment.outputs.PRERELEASE_TAG }}+$(lsb_release -c -s)1_amd64.deb" \
@@ -86,7 +93,7 @@ jobs:
       uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 # v4.3.0
       with:
         name: libkeymancore.symbols
-        path: linux/debian/tmp/DEBIAN/symbols
+        path: ${{ github.workspace }}/keyman/linux/debian/tmp/DEBIAN/symbols
       if: always()
 
   set_status:

@@ -106,7 +106,9 @@ export default class KeyboardRequisitioner {
       // Those errors should not be handled here; let them surface.
       if(Array.isArray(registration)) {
         registration.forEach((entry) => {
-          this.cache.addStub(entry);
+          if(entry instanceof KeyboardStub) {
+            this.cache.addStub(entry);
+          }
         });
       }
     });
@@ -122,9 +124,12 @@ export default class KeyboardRequisitioner {
     // #region Parameter preprocessing: is incoming data already 'complete', or do we need to fetch the 'complete' version?
 
     for(let entry of x) {
-      if(typeof entry == 'string' && entry.length > 0) {
-        identifiers.push(entry);
+      if(typeof entry == 'string') {
+        if(entry.length > 0) {
+          identifiers.push(entry);
+        }
       } else { // is some sort of object.
+        // @ts-ignore
         if(entry['KI'] || entry['KL'] || entry['KLC'] || entry['KFont'] || entry['KOskFont']) {
           stubs.push(new KeyboardStub(entry as RawKeyboardStub));
         } else {
@@ -290,7 +295,7 @@ export default class KeyboardRequisitioner {
 
       for(let result of results) {
         // If not an error stub...
-        if(typeof result['error'] == 'undefined') {
+        if(typeof (result as ErrorStub).error == 'undefined') {
           this.cache.addStub(result as KeyboardStub);
         }
       }

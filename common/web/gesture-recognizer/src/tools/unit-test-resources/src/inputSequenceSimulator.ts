@@ -1,7 +1,6 @@
 import {
   GestureDebugPath,
   GestureDebugSource,
-  GestureSource,
   type InputSample
 } from "@keymanapp/gesture-recognizer";
 
@@ -54,9 +53,8 @@ export class InputSequenceSimulator<HoveredItemType> {
 
     // Produces a hacky-but-sufficient implementation of TouchList for our purposes
     // in environments that avoid direct touch-support.
-    const arrToTouchList = (arr: Touch[]): TouchList => {
+    const arrToTouchList = (arr: Touch[]): TouchList & { _arr: Touch[]} => {
       return {
-        //@ts-ignore
         _arr: arr, // Obviously, this isn't a standard member of TouchList.
         length: arr.length,
         item: function(i: number) { return this._arr[i]; }

@@ -57,6 +57,7 @@ export default class LMLayer {
   private _acceptPromises: PromiseStore<Reversion>;
   private _revertPromises: PromiseStore<Suggestion[]>;
   private _nextToken: number;
+  // @ts-ignore // currently unused & unreferenced.
   private capabilities: Capabilities;
 
   /**

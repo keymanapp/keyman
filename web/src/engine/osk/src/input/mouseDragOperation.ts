@@ -9,15 +9,9 @@ class InputEventCoordinate {
   public readonly x: number;
   public readonly y: number;
 
-  private readonly source: MouseEvent | TouchEvent;
-
   public constructor(x: number, y: number, source?: MouseEvent | TouchEvent) {
     this.x = x;
     this.y = y;
-
-    if(source) {
-      this.source = source;
-    }
   }
 
   // Converts a MouseEvent or TouchEvent into the base coordinates needed
@@ -30,8 +24,8 @@ class InputEventCoordinate {
     // 'instanceof' against the type.
     if(window['TouchEvent'] && e instanceof TouchEvent) {
       coordSource = e.changedTouches[0];
-    } else if(e['changedTouches']) {
-      coordSource = e['changedTouches'][0] as Touch;
+    } else if((e as TouchEvent).changedTouches) {
+      coordSource = (e as TouchEvent).changedTouches[0] as Touch;
     } else {
       coordSource = e as MouseEvent;
     }
@@ -153,7 +147,7 @@ export default abstract class MouseDragOperation {
     return false;
   }
 
-  protected abstract onDragStart();
+  protected abstract onDragStart(): void;
 
   /**
    * Process mouse drag on OSK
@@ -189,7 +183,7 @@ export default abstract class MouseDragOperation {
    * @param deltaX The total horizontal distance moved, in pixels, since the start of the drag
    * @param deltaY The total vertical distance moved, in pixels, since the start of the drag
    */
-  protected abstract onDragMove(deltaX: number, deltaY: number);
+  protected abstract onDragMove(deltaX: number, deltaY: number): void;
 
   /**
    * Function     _VMoveMouseUp
@@ -212,5 +206,5 @@ export default abstract class MouseDragOperation {
     return false;
   }
 
-  protected abstract onDragRelease();
+  protected abstract onDragRelease(): void;
 }

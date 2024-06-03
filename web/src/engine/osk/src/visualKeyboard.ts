@@ -3,7 +3,6 @@ import { EventEmitter } from 'eventemitter3';
 import {
   ActiveKey,
   ActiveLayout,
-  ButtonClass,
   DeviceSpec,
   type InternalKeyboardFont,
   Keyboard,
@@ -16,8 +15,7 @@ import {
   ActiveSubKey,
   timedPromise,
   ActiveKeyBase,
-  isEmptyTransform,
-  SystemStoreIDs
+  isEmptyTransform
 } from '@keymanapp/keyboard-processor';
 
 import { buildCorrectiveLayout, distributionFromDistanceMaps, keyTouchDistances } from '@keymanapp/input-processor';
@@ -31,7 +29,7 @@ import {
   PaddedZoneSource
 } from '@keymanapp/gesture-recognizer';
 
-import { createStyleSheet, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
+import { createStyleSheet, StylesheetManager } from 'keyman/engine/dom-utils';
 
 import { KeyEventHandler, KeyEventResultCallback } from 'keyman/engine/events';
 
@@ -43,7 +41,7 @@ import OSKKey from './keyboard-layout/oskKey.js';
 import OSKLayer, { LayerLayoutParams } from './keyboard-layout/oskLayer.js';
 import OSKLayerGroup from './keyboard-layout/oskLayerGroup.js';
 import OSKView from './views/oskView.js';
-import { LengthStyle, ParsedLengthStyle } from './lengthStyle.js';
+import { ParsedLengthStyle } from './lengthStyle.js';
 import { defaultFontSize } from './fontSizeUtils.js';
 import PhoneKeyTip from './input/gestures/browser/keytip.js';
 import { TabletKeyTip } from './input/gestures/browser/tabletPreview.js';
@@ -57,7 +55,7 @@ import SubkeyPopup from './input/gestures/browser/subkeyPopup.js';
 import Multitap from './input/gestures/browser/multitap.js';
 import { GestureHandler } from './input/gestures/gestureHandler.js';
 import Modipress from './input/gestures/browser/modipress.js';
-import Flick, { buildFlickScroller } from './input/gestures/browser/flick.js';
+import Flick from './input/gestures/browser/flick.js';
 import { GesturePreviewHost } from './keyboard-layout/gesturePreviewHost.js';
 import OSKBaseKey from './keyboard-layout/oskBaseKey.js';
 import { OSKResourcePathConfiguration } from './index.js';
@@ -125,13 +123,6 @@ export interface VisualKeyboardConfiguration extends CommonConfiguration {
   specialFont?: InternalKeyboardFont;
 }
 // #endregion
-
-interface BoundingRect {
-  left: number,
-  right: number,
-  top: number,
-  bottom: number
-};
 
 interface EventMap {
   /**
@@ -240,9 +231,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   // Touch-tracking properties
   touchCount: number;
   currentTarget: KeyElement;
-
-  // Used by embedded-mode's globe key
-  menuEvent: KeyElement; // Used by embedded-mode.
 
   // Popup key management
   keytip: KeyTip;
@@ -397,8 +385,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   }
 
   private constructGestureEngine(): GestureRecognizer<KeyElement, string> {
-    const rowCount = this.kbdLayout.layerMap['default'].row.length;
-
     const config: GestureRecognizerConfiguration<KeyElement, string> = {
       targetRoot: this.element,
       // document.body is the event root for mouse interactions b/c we need to track
@@ -477,12 +463,13 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
       // Make sure we're tracking the source and its currently-selected item (the latter, as we're
       // highlighting it)
-      const trackingEntry = sourceTrackingMap[source.identifier] = {
+      sourceTrackingMap[source.identifier] = {
         source: source,
         roamingHighlightHandler: null,
         key: source.currentSample.item,
         previewHost: previewHost
       }
+      const trackingEntry = sourceTrackingMap[source.identifier];
 
       const endHighlighting = () => {
         // The base call will occur before our "is this a multitap?" check otherwise.
@@ -1120,7 +1107,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     }
 
     // Set the on/off state of any visible state keys.
-    const states = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'];
+    const states = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'] as const;
     const keys = [layer.capsKey, layer.numKey, layer.scrollKey];
 
     for (i = 0; i < keys.length; i++) {
@@ -1134,8 +1121,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   }
 
   updateStateKeys(stateKeys: StateKeyMap) {
-    for(let key in this.stateKeys) {
-      this.stateKeys[key] = stateKeys[key];
+    for(let key of Object.keys(this.stateKeys)) {
+      this.stateKeys[key as keyof StateKeyMap] = stateKeys[key as keyof StateKeyMap];
     }
 
     this._UpdateVKShiftStyle();
@@ -1150,7 +1137,9 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    **/
   highlightKey(key: KeyElement, on: boolean): GesturePreviewHost {
     // Do not change element class unless a key
-    if (!key || !key.key || (key.className == '') || (key.className.indexOf('kmw-key-row') >= 0)) return;
+    if (!key || !key.key || (key.className == '') || (key.className.indexOf('kmw-key-row') >= 0)) {
+      return null;
+    }
 
     // For phones, use key preview rather than highlighting the key,
     const usePreview = key.key.allowsKeyTip();
@@ -1267,7 +1256,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     // Step 1:  have the necessary conditions been met?
     const fixedSize = this.width && this.height;
     const computedStyle = getComputedStyle(this.kbdDiv);
-    const groupStyle = getComputedStyle(this.kbdDiv.firstElementChild);
+    const groupStyle = getComputedStyle(this.layerGroup.element);
 
     const isInDOM = computedStyle.height != '' && computedStyle.height != 'auto';
 
@@ -1372,17 +1361,15 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     var activeKeyboard = this.layoutKeyboard;
     var activeStub = this.layoutKeyboardProperties;
 
-    // Do not do anything if a null stub
-    if (activeStub == null) {
-      return;
-    }
-
     // First remove any existing keyboard style sheet
     if (this.styleSheet && this.styleSheet.parentNode) {
       this.styleSheet.parentNode.removeChild(this.styleSheet);
     }
 
-    var kfd = activeStub.textFont, ofd = activeStub.oskFont;
+    // For help.keyman.com, sometimes we aren't given a stub for the keyboard.
+    // We can't get the keyboard's fonts correct in that case, but we can
+    // at least proceed safely.
+    var kfd = activeStub?.textFont, ofd = activeStub?.oskFont;
 
     // Add and define style sheets for embedded fonts if necessary (each font-face style will only be added once)
     this.styleSheetManager.addStyleSheetForFont(kfd, this.fontRootPath, this.device.OS);
@@ -1497,7 +1484,12 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       isStatic: true,
       topContainer: null,
       pathConfig: pathConfig,
-      styleSheetManager: null
+      styleSheetManager: null,
+      specialFont: {
+        family: 'SpecialOSK',
+        files: [`${pathConfig.resources}/osk/keymanweb-osk.ttf`],
+        path: '' // Not actually used.
+      }
     });
 
     kbdObj.layerGroup.element.className = kbdObj.kbdDiv.className; // may contain multiple classes

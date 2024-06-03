@@ -2,7 +2,6 @@ type DecodedCookieFieldValue = string | number | boolean;
 
 type FilteredRecordEncoder = (value: DecodedCookieFieldValue, key: string) => string;
 type FilteredRecordDecoder = (value: string, key: string) => DecodedCookieFieldValue;
-const no_change = (val: string) => val as string;
 
 export default class CookieSerializer<Type extends Record<keyof Type, DecodedCookieFieldValue>> {
   readonly name: string;
@@ -12,11 +11,11 @@ export default class CookieSerializer<Type extends Record<keyof Type, DecodedCoo
   }
 
   load(decoder?: FilteredRecordDecoder): Type {
-    return this.loadCookie(this.name, decoder || no_change) as Type;
+    return this.loadCookie(this.name, decoder || ((val: string) => val as DecodedCookieFieldValue)) as Type;
   }
 
   save(cookie: Type, encoder?: FilteredRecordEncoder) {
-    this.saveCookie(this.name, cookie, encoder || no_change);
+    this.saveCookie(this.name, cookie, encoder || ((val: DecodedCookieFieldValue) => val as string));
   }
 
   /**

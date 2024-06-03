@@ -1,5 +1,3 @@
-import { MatchResult } from "../matchers/gestureMatcher.js";
-import { GestureSequence } from "../matchers/gestureSequence.js";
 import { FulfillmentCause } from "../matchers/pathMatcher.js";
 import { ContactModel } from "./contactModel.js";
 

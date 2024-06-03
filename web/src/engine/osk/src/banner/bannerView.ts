@@ -86,6 +86,7 @@ export class BannerView implements OSKViewComponent {
         let prevBanner = this.currentBanner;
         this.currentBanner = banner;
         this.bannerContainer.replaceChild(banner.getDiv(), prevBanner.getDiv());
+        prevBanner.shutdown();
       }
     } else {
       this.currentBanner = banner;
