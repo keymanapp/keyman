@@ -375,6 +375,12 @@ TEST_F(CompilerTest, GetXStringImpl_type3_test) {
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
     PKMX_WCHAR newp = NULL;
+    FILE_STORE file_store[3];
+    fk.cxStoreArray = 3u;
+    fk.dpStoreArray = file_store;
+    u16cpy(file_store[0].szName, u"a");
+    u16cpy(file_store[1].szName, u"b");
+    u16cpy(file_store[2].szName, u"c");
 
     // type=3 ('A'), CERR_InvalidToken
     u16cpy(str, u"abc");
@@ -389,6 +395,22 @@ TEST_F(CompilerTest, GetXStringImpl_type3_test) {
     // type=3 ('A'), CERR_InvalidAny, empty delimiters => empty string
     u16cpy(str, u"any()");
     EXPECT_EQ(CERR_InvalidAny, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+
+    // type=3 ('A'), CERR_StoreDoesNotExist
+    u16cpy(str, u"any(d)");
+    EXPECT_EQ(CERR_StoreDoesNotExist, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+
+    // type=3 ('A'), CERR_ZeroLengthString
+    u16cpy(str, u"any(b)");
+    file_store[1].dpString = (PKMX_WCHAR)u"";
+    EXPECT_EQ(CERR_ZeroLengthString, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+
+    // type=3 ('A'), valid
+    u16cpy(str, u"any(b)");
+    file_store[1].dpString = (PKMX_WCHAR)u"abc";
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_any_valid[] = { UC_SENTINEL, CODE_ANY, 2, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_any_valid, tstr));
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
