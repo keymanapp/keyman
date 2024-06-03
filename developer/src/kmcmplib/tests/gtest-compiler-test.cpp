@@ -148,7 +148,6 @@ TEST_F(CompilerTest, AddCompileError_test) {
 TEST_F(CompilerTest, ProcessBeginLine_test) {
     FILE_KEYBOARD fk;
     KMX_WCHAR str[LINESIZE];
-    KMX_DWORD msg;
 
     // CERR_NoTokensFound
     str[0] = '\0';
@@ -303,7 +302,7 @@ TEST_F(CompilerTest, GetXStringImpl_type0_test) {
     EXPECT_EQ(0, (int)fk.cxDeadKeyArray);
     EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_deadkey_valid[] = { UC_SENTINEL, CODE_DEADKEY, 1, 0 };
-    EXPECT_EQ(0, u16cmp(tstr_dk_valid, tstr));
+    EXPECT_EQ(0, u16cmp(tstr_deadkey_valid, tstr));
     fk.cxDeadKeyArray = 0;
 
     // type=0 ('X' or 'D'), dk, CERR_InvalidDeadkey, bad character
@@ -434,6 +433,7 @@ TEST_F(CompilerTest, GetXStringImpl_type4_test) {
 
     // type=4 ('B'), baselayout, CERR_90FeatureOnly_IfSystemStores
     fk.version = VERSION_80;
+    fk.dwFlags = 0u;
     u16cpy(str, u"baselayout");
     EXPECT_EQ(CERR_90FeatureOnly_IfSystemStores, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
     fk.version = VERSION_90;
