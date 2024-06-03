@@ -912,7 +912,7 @@ if(!keyman?.ui?.name) {
       readonly showOSK = (event: Event) => {
         let osk = keymanweb.osk;
         if(!osk) {
-          return;
+          return false;
         }
         keymanweb.activatingUI(true);
         //Toggle OSK on or off

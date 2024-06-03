@@ -283,7 +283,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     // Always do the common focus stuff, instantly returning if we're in an editable iframe.
     if(this._CommonFocusHelper(target)) {
-      return true;
+      return;
     };
 
     // Set element directionality (but only if element is empty)

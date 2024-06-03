@@ -81,11 +81,11 @@ export class StylesheetManager {
   addStyleSheetForFont(fd: KeyboardFont, fontPathRoot: string, os?: DeviceSpec.OperatingSystem) {
     // Test if a valid font descriptor
     if(!fd) {
-      return;
+      return null;
     }
 
     if(typeof(fd.files) == 'undefined') {
-      return;
+      return null;
     }
 
     const fontKey = fd.family;
@@ -108,7 +108,7 @@ export class StylesheetManager {
       if(!sheet.parentNode) {
         this.linkStylesheet(sheet);
       }
-      return;
+      return null;
     }
 
     if(typeof(fd.files) == 'string') {
