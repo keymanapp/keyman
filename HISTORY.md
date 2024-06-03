@@ -1,5 +1,24 @@
 # Keyman Version History
 
+## 18.0.47 alpha 2024-06-03
+
+* fix(developer): save touch layout editor selection when loading state (#11575)
+* chore: Update history from 17.0.326 (#11649)
+* refactor(web): refactor keyboard-layout preprocessing property transplantation (#11601)
+* fix(web): fix keyboard-processing bugs uncovered by stricter TS settings (#11603)
+* fix(web): Don't apply suggestion unless fully configured (#11594)
+* chore(web): clean up remaining low-level Web .tsconfig settings (#11424)
+* chore(web): correct cases of implicit-any in web/ (#11462)
+* chore(web): enforce strict function types in web/ (#11463)
+* chore(web): finalize web/ project parity with base-repo TS config settings (aside from JS version target) (#11464)
+* fix(android): include DOMRect polyfill for older ES6-supporting devices (#11653)
+* fix(linux): move environment to separate job and checkout to separate subdirectory (#11659)
+* fix(linux): paths in `uses:` can't use variables (#11661)
+* fix(linux): restore of artifacts still needs to be in same job (#11662)
+* fix(linux): include api version as part of package filename (#11664)
+* fix(linux): don't escape wildcard for package filename (#11666)
+* fix(linux): match digit in package filename (#11667)
+
 ## 18.0.46 alpha 2024-06-01
 
 * chore(linux): More debugging of API verification (#11639)
