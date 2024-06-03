@@ -369,6 +369,28 @@ TEST_F(CompilerTest, GetXStringImpl_type2_test) {
     // type=2 ('\''), CERR_StringInVirtualKeySection *** TODO ***
 }
 
+TEST_F(CompilerTest, GetXStringImpl_type3_test) {
+    KMX_WCHAR tstr[128];
+    FILE_KEYBOARD fk;
+    KMX_WCHAR str[LINESIZE];
+    KMX_WCHAR output[GLOBAL_BUFSIZE];
+    PKMX_WCHAR newp = NULL;
+
+    // type=3 ('A'), CERR_InvalidToken
+    u16cpy(str, u"abc");
+    EXPECT_EQ(CERR_InvalidToken, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+
+    // type=3 ('A'), CERR_AnyInVirtualKeySection *** TODO ***
+
+    // type=3 ('A'), CERR_InvalidAny, no close delimiter => NULL
+    u16cpy(str, u"any(");
+    EXPECT_EQ(CERR_InvalidAny, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+
+    // type=3 ('A'), CERR_InvalidAny, empty delimiters => empty string
+    u16cpy(str, u"any()");
+    EXPECT_EQ(CERR_InvalidAny, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+}
+
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
 // KMX_DWORD process_platform(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
 // KMX_DWORD process_if_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
