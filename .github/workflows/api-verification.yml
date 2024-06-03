@@ -37,6 +37,7 @@ jobs:
       id: environment_step
       run: |
         cat artifacts/env >> $GITHUB_OUTPUT
+        cat artifacts/env
 
     - name: Set pending status on PR builds
       id: set_status
@@ -67,6 +68,10 @@ jobs:
 
     - name: "Verify API for libkeymancore.so (${{ steps.environment_step.outputs.GIT_BRANCH }}, branch ${{ steps.environment_step.outputs.GIT_BASE_BRANCH }}, by ${{ steps.environment_step.outputs.GIT_USER }})"
       run: |
+        echo "VERSION=${{ steps.environment_step.outputs.VERSION }}"
+        echo "PRERELEASE_TAG=${{ steps.environment_step.outputs.PRERELEASE_TAG }}"
+        echo "GIT_SHA=${{ steps.environment_step.outputs.GIT_SHA }}"
+        echo "GIT_BASE=${{ steps.environment_step.outputs.GIT_BASE  }}"
         cd ${{ github.workspace }}/keyman/linux
         ./scripts/deb-packaging.sh \
           --gha \
