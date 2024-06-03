@@ -420,6 +420,10 @@ TEST_F(CompilerTest, GetXStringImpl_type4_test) {
     KMX_WCHAR output[GLOBAL_BUFSIZE];
     PKMX_WCHAR newp = NULL;
 
+    // type=3 ('A'), CERR_InvalidToken
+    u16cpy(str, u"bcd");
+    EXPECT_EQ(CERR_InvalidToken, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+
     // type=4 ('B'), CERR_BeepInVirtualKeySection *** TODO ***
 
     // type=4 ('B'), beep, valid
@@ -445,6 +449,13 @@ TEST_F(CompilerTest, GetXStringImpl_type4_test) {
     fk.version = VERSION_90;
     u16cpy(str, u"baselayout()");
     EXPECT_EQ(CERR_InvalidToken, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+
+    // type=4 ('B'), baselayout, CERR_InvalidToken from process_baselayout
+    fk.version = VERSION_90;
+    u16cpy(str, u"baselayout(abc)");
+    EXPECT_EQ(CERR_InvalidToken, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+
+    // type=4 ('B'), baselayout, valid *** TODO ***
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
