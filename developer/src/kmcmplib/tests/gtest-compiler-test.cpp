@@ -407,10 +407,44 @@ TEST_F(CompilerTest, GetXStringImpl_type3_test) {
 
     // type=3 ('A'), valid
     u16cpy(str, u"any(b)");
-    file_store[1].dpString = (PKMX_WCHAR)u"abc";
+    file_store[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
     EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_any_valid[] = { UC_SENTINEL, CODE_ANY, 2, 0 };
     EXPECT_EQ(0, u16cmp(tstr_any_valid, tstr));
+}
+
+TEST_F(CompilerTest, GetXStringImpl_type4_test) {
+    KMX_WCHAR tstr[128];
+    FILE_KEYBOARD fk;
+    KMX_WCHAR str[LINESIZE];
+    KMX_WCHAR output[GLOBAL_BUFSIZE];
+    PKMX_WCHAR newp = NULL;
+
+    // type=4 ('B'), CERR_BeepInVirtualKeySection *** TODO ***
+
+    // type=4 ('B'), beep, valid
+    u16cpy(str, u"beep");
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_beep_valid[] = { UC_SENTINEL, CODE_BEEP, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_beep_valid, tstr));
+
+    // type=4 ('B'), baselayout, CERR_90FeatureOnly_IfSystemStores
+    fk.version = VERSION_80;
+    u16cpy(str, u"baselayout");
+    EXPECT_EQ(CERR_90FeatureOnly_IfSystemStores, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    fk.version = VERSION_90;
+
+    // type=4 ('B'), baselayout, CERR_InvalidInVirtualKeySection *** TODO ***
+
+    // type=4 ('B'), baselayout, no close delimiter => NULL
+    fk.version = VERSION_90;
+    u16cpy(str, u"baselayout(");
+    EXPECT_EQ(CERR_InvalidToken, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+
+    // type=4 ('B'), baselayout, empty delimiters => empty string
+    fk.version = VERSION_90;
+    u16cpy(str, u"baselayout()");
+    EXPECT_EQ(CERR_InvalidToken, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
