@@ -477,7 +477,7 @@ export class SuggestionBanner extends Banner {
       maxRoamingBounds: safeBounds,
       safeBounds: safeBounds,
       // touchEventRoot:  this.element, // is the default
-      itemIdentifier: (sample, target: HTMLElement) => {
+      itemIdentifier: (sample) => {
         const selBounds = this.selectionBounds.getBoundingClientRect();
 
         // Step 1:  is the coordinate within the range we permit for selecting _anything_?

@@ -57,11 +57,11 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
   constructor(worker: Worker, sourceUri: string) {
     const config = new BrowserConfiguration(sourceUri);  // currently set to perform device auto-detect.
 
-    super(worker, config, new ContextManager(config, () => this.legacyAPIEvents), (engine: KeymanEngine) => {
+    super(worker, config, new ContextManager(config, () => this.legacyAPIEvents), (engine) => {
       return {
         // The `engine` parameter cannot be supplied with the constructing instance before calling
         // `super`, hence the 'fun' rigging to supply it _from_ `super` via this closure.
-        keyboardInterface: new KeyboardInterface(window, engine),
+        keyboardInterface: new KeyboardInterface(window, engine as KeymanEngine),
         defaultOutputRules: new DefaultBrowserRules(engine.contextManager)
       };
     });
@@ -73,8 +73,8 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     this.hardKeyboard = new HardwareEventKeyboard(config.hardDevice, this.core.keyboardProcessor, this.contextManager);
 
     // Scrolls the document-body to ensure that a focused element remains visible after the OSK appears.
-    this.contextManager.on('targetchange', (target: OutputTarget<any>) => {
-      const e = target?.getElement();
+    this.contextManager.on('targetchange', (target) => {
+      const e = (target as OutputTarget<any>)?.getElement();
       if(this.osk) {
         (this.osk.activationModel as TwoStateActivator<HTMLElement>).activationTrigger = e;
       }

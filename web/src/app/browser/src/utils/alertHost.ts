@@ -58,7 +58,7 @@ export class AlertHost {
     bx.className='kmw-alert-close';
 
     // Close alert if anywhere in box is touched, since close box is too small on mobiles
-    lb.onmousedown = lb.onclick = (e) => {
+    const lbClick = lb.onmousedown = lb.onclick = (e: MouseEvent | TouchEvent) => {
       // Ignore if waiting, only handle for alert
       if(bx.style.display == 'block') {
         bg.style.display='none';
@@ -68,13 +68,13 @@ export class AlertHost {
       }
     };
 
-    lb.addEventListener('touchstart', lb.onclick, false);
-    bg.onmousedown = bg.onclick = (e) => {
+    lb.addEventListener('touchstart', lbClick, false);
+    const bgClick = bg.onmousedown = bg.onclick = (e: MouseEvent | TouchEvent) => {
       e.preventDefault();
       e.stopPropagation();
 
     }
-    bg.addEventListener('touchstart', bg.onclick, false);
+    bg.addEventListener('touchstart', bgClick, false);
     lb.appendChild(bx); // [0]
     lb.appendChild(lt); // [1]
     lb.appendChild(gr); // [2]

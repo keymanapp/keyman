@@ -482,7 +482,8 @@ export class LanguageMenu {
     }
 
     // Touchstart (or mspointerdown) event highlights the touched list item
-    const touchStart = function(this: HTMLElement & KeyboardTag, e: TouchEvent) {
+    const touchStart = function(this: HTMLElement, e: TouchEvent) {
+
       e.stopPropagation();
       if(this.className.indexOf('selected') <= 0) {
         this.className=this.className+' selected';
@@ -495,7 +496,7 @@ export class LanguageMenu {
 
     //TODO: Still drags Android background sometimes (not consistently)
     // Touchmove drags the list and prevents release from selecting the language
-    const touchMove=function(this: HTMLElement & KeyboardTag, e: TouchEvent) {
+    const touchMove=function(this: HTMLElement, e: TouchEvent) {
       e.stopImmediatePropagation();
       var scroller=<HTMLElement>languageMenu.lgList.childNodes[0],
           yMax=scroller.scrollHeight-scroller.offsetHeight,
@@ -539,7 +540,8 @@ export class LanguageMenu {
     };
 
     // Touch release (click) event selects touched list item
-    const touchEnd=function(this: HTMLElement & KeyboardTag, e: TouchEvent) {
+    const touchEnd=function(this: HTMLElement, e: TouchEvent) {
+      const entry = this as HTMLElement & KeyboardTag;
       if(typeof(e.stopImmediatePropagation) != 'undefined') {
         e.stopImmediatePropagation();
       } else {
@@ -552,7 +554,7 @@ export class LanguageMenu {
         languageMenu.keyman.contextManager.focusAssistant.setFocusTimer(); // #5946
 
         languageMenu.lgList.style.display='none'; //still allows blank menu momentarily on selection
-        languageMenu.keyman.contextManager.activateKeyboard(this.kn,this.kc,true);
+        languageMenu.keyman.contextManager.activateKeyboard(entry.kn, entry.kc,true);
         languageMenu.keyman.contextManager.restoreLastActiveTarget();
         languageMenu.hide();
       }

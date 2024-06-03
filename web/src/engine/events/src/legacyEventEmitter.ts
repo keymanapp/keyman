@@ -76,7 +76,9 @@ export class LegacyEventEmitter<EventTypes extends LegacyEventMap> {
     func: EventListener<EventTypes, T>
   ): boolean {
     this._removeEventListener(event, func);
-    this.events[event].push(func);
+    // TS gets hung up on the type info here because we can potentially store
+    // different types of listeners for different events.
+    this.events[event].push(func as unknown as any);
     return true;
   }
 

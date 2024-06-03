@@ -1187,7 +1187,7 @@ if(!keyman?.ui?.name) {
        * @param       {Object}  p
        **/
       readonly onHideOSK = (p: {
-        HiddenByUser: boolean
+        HiddenByUser?: boolean
       }) => {
         if(this.init && p.HiddenByUser) {
           this.oskButtonNode.className = 'kmw_button';
@@ -1264,7 +1264,7 @@ if(!keyman?.ui?.name) {
        * A closure to be evaluated upon dismissal of a modal popup generated
        * by this UI module.
        */
-      dismissalCallback: (event: Event) => any = null;
+      dismissalCallback: (event: MouseEvent) => any = null;
 
       /**
        * The root element associated with an active modal popup; related
@@ -1277,7 +1277,7 @@ if(!keyman?.ui?.name) {
        * for the popup, we stash the old event listener here and restore
        * it when we're done.
        */
-      lastDismissalCallback: (event: Event) => any = null;
+      lastDismissalCallback: (event: MouseEvent) => any = null;
 
       /**
        * Function     PopupDismissal
@@ -1309,7 +1309,7 @@ if(!keyman?.ui?.name) {
        * @param       {function(Object)}  callback
        * Description  Prepare for callback dismissal
        **/
-      SetupPopupDismissal(element: HTMLElement, callback: (event: Event) => any) {
+      SetupPopupDismissal(element: HTMLElement, callback: (event: MouseEvent) => any) {
         if(this.PopupDismissal == document.onclick) {
           this.CancelPopupDismissal(this.dismissalCallback);
         }
@@ -1325,7 +1325,7 @@ if(!keyman?.ui?.name) {
        * @param       {?function(Object)}  callback
        * Description  Cancel callback dismissal
        **/
-      CancelPopupDismissal(callback?: (event: Event) => void) {
+      CancelPopupDismissal(callback?: (event: MouseEvent) => void) {
         if(this.PopupDismissal == document.onclick) {
           document.onclick = this.lastDismissalCallback;
           this.lastDismissalCallback = null;
