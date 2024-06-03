@@ -31,8 +31,7 @@
   "dependencies": {
     "@keymanapp/common-types": "*",
     "jszip": "^3.7.0",
-    "marked": "^7.0.0",
-    "xml2js": "git+https://github.com/keymanapp/dependency-node-xml2js#535fe732dc408d697e0f847c944cc45f0baf0829"
+    "marked": "^7.0.0"
   },
   "devDependencies": {
     "@keymanapp/developer-test-helpers": "*",
