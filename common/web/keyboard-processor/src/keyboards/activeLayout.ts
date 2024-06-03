@@ -558,7 +558,7 @@ export class ActiveRow implements LayoutRow {
     for(let j=0; j<keys.length; j++) {
       let key=keys[j];
       let keySet = Object.keys(DEFAULT_KEY);
-      for(let tp in keySet) {
+      for(let tp of keySet) {
         const typedKey = tp as keyof typeof DEFAULT_KEY;
         if(typeof key[typedKey] != 'string' && typeof key[typedKey] != 'number') {
           // We detected a value of the wrong type.

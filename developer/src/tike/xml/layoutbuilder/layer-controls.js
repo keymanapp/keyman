@@ -84,10 +84,10 @@ $(function() {
                     key.sk.forEach(k => fixup(k));
                   }
                   if (key.flick) {
-                    fkey.flick.forEach(k => fixup(k));
+                    key.flick.forEach(k => fixup(k));
                   }
                   if (key.multitap) {
-                    fkey.multitap.forEach(k => fixup(k));
+                    key.multitap.forEach(k => fixup(k));
                   }
                 });
               }

@@ -106,7 +106,7 @@ export class KeymanSentryManager {
     // Ensure that the 'extra' object exists.  (May not exist for synthetic/custom Errors.)
     event.extra = event.extra || {};
     //@ts-ignore
-    event.extra.keymanState = window['keyman']['getDebugInfo']();
+    event.extra.keymanState = window['keyman']?.['getDebugInfo']?.();
     event.extra.keymanHostPlatform = this.keymanPlatform;
   }
 

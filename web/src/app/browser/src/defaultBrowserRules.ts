@@ -38,7 +38,7 @@ export default class DefaultBrowserRules extends DefaultRules {
       const contextManager = this.contextManager;
       const activeElement = contextManager.activeTarget?.getElement();
       const nextElement = contextManager.page.findNeighboringInput(activeElement, back);
-      nextElement.focus();
+      nextElement?.focus();
     }
 
     switch(code) {

@@ -168,6 +168,10 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
       let transcription = outputTarget.buildTranscriptionFrom(outputTarget, null, false);
       return this.predict_internal(transcription, true, layerId);
     } else {
+      // if there's no active context source, there's nothing to 
+      // provide suggestions for. In that case, there's no reason 
+      // to even request suggestions, so bypass the prediction 
+      // engine and say that there aren't any.
       return Promise.resolve([]);
     }
   }

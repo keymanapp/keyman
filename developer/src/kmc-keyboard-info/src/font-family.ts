@@ -1,4 +1,4 @@
-import ttfMeta from 'ttfmeta';
+import ttfMeta from './ttfmeta/lib/index.js';
 
 /**
  * Extracts the font-family from an in-memory TTF or WOFF blob in `source`
@@ -7,7 +7,7 @@ import ttfMeta from 'ttfmeta';
  * @param source   In-memory TTF or WOFF font blob
  *
  * @throws Uncaught exceptions from ttfMeta.promise if the font file is invalid.
- * 
+ *
  * @returns If the file is invalid or cannot be parsed, returns `null`,
  *          otherwise returns the font family as a string.
  */

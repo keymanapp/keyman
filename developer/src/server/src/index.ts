@@ -91,7 +91,10 @@ export async function run() {
 
   configuration.ngrokEndpoint = '';
 
-  if(configuration.useNgrok && os.platform() == 'win32' && fs.existsSync(configuration.ngrokBinPath)) {
+  if(configuration.useNgrok
+    && os.platform() == 'win32'
+    && fs.existsSync(path.join(configuration.ngrokBinPath, 'ngrok.exe'))
+  ) {
     const ngrok: any = await import('ngrok');
     (async function() {
       configuration.ngrokEndpoint = await ngrok.connect({

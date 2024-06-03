@@ -7,12 +7,12 @@
 
   Modified Date:    15 Sep 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          13 May 2005 - mcdurdin - Initial version
                     06 Oct 2006 - mcdurdin - Add support for GET and URL parsing
                     04 Dec 2006 - mcdurdin - Add progress support
@@ -356,6 +356,9 @@ var
   dwReserved: DWord;
   FProxyOptions: INTERNET_PER_CONN_OPTION_LIST;
   FProxyOption: array[0..1] of INTERNET_PER_CONN_OPTION;
+  Port: Integer;
+  PortIndex: Integer;
+  HostName: string;
 begin
   FHTTPS := FRequest.Protocol = 'https';
 
@@ -381,8 +384,18 @@ begin
     InternetSetStatusCallback(hInet, @StaticInternetStatusCallback);
 
     if FHTTPS
-      then hConnect := InternetConnect(hInet, PChar(FRequest.HostName), INTERNET_DEFAULT_HTTPS_PORT, nil, nil, INTERNET_SERVICE_HTTP, 0, DWord(Self))
-      else hConnect := InternetConnect(hInet, PChar(FRequest.HostName), INTERNET_DEFAULT_HTTP_PORT, nil, nil, INTERNET_SERVICE_HTTP, 0, Dword(Self));
+      then Port := INTERNET_DEFAULT_HTTPS_PORT
+      else Port := INTERNET_DEFAULT_HTTP_PORT;
+
+    HostName := FRequest.HostName;
+    PortIndex := HostName.IndexOf(':');
+    if PortIndex >= 0 then
+    begin
+      Port := StrToIntDef(HostName.Substring(PortIndex + 1), Port);
+      HostName := HostName.Substring(0, PortIndex);
+    end;
+
+    hConnect := InternetConnect(hInet, PChar(HostName), Port, nil, nil, INTERNET_SERVICE_HTTP, 0, DWord(Self));
     if hConnect = nil then
       raise EHTTPUploader.Create('InternetConnect failed', GetLastError);
 
