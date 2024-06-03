@@ -420,11 +420,11 @@ TEST_F(CompilerTest, GetXStringImpl_type4_test) {
     KMX_WCHAR output[GLOBAL_BUFSIZE];
     PKMX_WCHAR newp = NULL;
 
-    // type=3 ('A'), CERR_InvalidToken
+    // type=3 ('B'), beep, CERR_InvalidToken
     u16cpy(str, u"bcd");
     EXPECT_EQ(CERR_InvalidToken, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
 
-    // type=4 ('B'), CERR_BeepInVirtualKeySection *** TODO ***
+    // type=4 ('B'), beep, CERR_BeepInVirtualKeySection *** TODO ***
 
     // type=4 ('B'), beep, valid
     u16cpy(str, u"beep");
