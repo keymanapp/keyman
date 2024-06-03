@@ -10,6 +10,6 @@ import { Worker } from '@keymanapp/lexical-model-layer/web'
  */
 const scripts = document.getElementsByTagName('script');
 const ss = scripts[scripts.length-1].src;
-const sPath = ss.slice(0,ss.lastIndexOf('/'));
+const sPath = ss.substring(0,ss.lastIndexOf('/')+1);
 
 window['keyman'] = new KeymanEngine(Worker.constructInstance(), sPath);
