@@ -11,8 +11,7 @@ env:
   GH_TOKEN: ${{ github.token }}
 
 jobs:
-  api_verification:
-    name: Verify API for libkeymancore.so
+  setup_environment:
     runs-on: ubuntu-latest
     outputs:
       VERSION: ${{ steps.environment_step.outputs.VERSION }}
@@ -40,15 +39,21 @@ jobs:
         pwd
         ls -al artifacts/
 
+  api_verification:
+    name: Verify API for libkeymancore.so
+    needs: setup_environment
+    runs-on: ubuntu-latest
+
+    steps:
     - name: Set pending status on PR builds
       id: set_status
-      if: steps.environment_step.outputs.IS_TEST_BUILD == 'true'
+      if: needs.setup_environment.outputs.IS_TEST_BUILD == 'true'
       shell: bash
       run: |
         gh api \
           --method POST \
           -H "Accept: application/vnd.github+json" \
-          /repos/$GITHUB_REPOSITORY/statuses/${{ steps.environment_step.outputs.GIT_SHA }} \
+          /repos/$GITHUB_REPOSITORY/statuses/${{ needs.setup_environment.outputs.GIT_SHA }} \
           -f state='pending' \
           -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
           -f description='API verification started' \
@@ -57,44 +62,45 @@ jobs:
     - name: Checkout
       uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 #v4.1.1
       with:
-        ref: '${{ steps.environment_step.outputs.GIT_SHA }}'
+        ref: '${{ needs.setup_environment.outputs.GIT_SHA }}'
         fetch-depth: 0
         clean: false
+        path: ${{ github.workspace }}/keyman/
 
     - name: Install devscripts
-      uses: ./.github/actions/apt-install
+      uses: ${{ github.workspace }}/keyman/.github/actions/apt-install
       with:
         packages: devscripts equivs
 
-    - name: "Verify API for libkeymancore.so (${{ steps.environment_step.outputs.GIT_BRANCH }}, branch ${{ steps.environment_step.outputs.GIT_BASE_BRANCH }}, by ${{ steps.environment_step.outputs.GIT_USER }}) - "
+    - name: "Verify API for libkeymancore.so (${{ needs.setup_environment.outputs.GIT_BRANCH }}, branch ${{ needs.setup_environment.outputs.GIT_BASE_BRANCH }}, by ${{ needs.setup_environment.outputs.GIT_USER }}) - "
       run: |
         pwd
         ls -al artifacts/
         echo "GITHUB_WORKSPACE=${GITHUB_WORKSPACE}"
         ls -al ${GITHUB_WORKSPACE}
         ls -al ${GITHUB_WORKSPACE}/artifacts/
-        ls -al "${GITHUB_WORKSPACE}/artifacts/${PKG_NAME}_${{ steps.environment_step.outputs.VERSION }}-1${{ steps.environment_step.outputs.PRERELEASE_TAG }}+$(lsb_release -c -s)1_amd64.deb"
+        ls -al "${GITHUB_WORKSPACE}/artifacts/${PKG_NAME}_${{ needs.setup_environment.outputs.VERSION }}-1${{ needs.setup_environment.outputs.PRERELEASE_TAG }}+$(lsb_release -c -s)1_amd64.deb"
 
-        cd linux
+        cd ${{ github.workspace }}/keyman/linux
         ./scripts/deb-packaging.sh \
           --gha \
-          --bin-pkg "${GITHUB_WORKSPACE}/artifacts/${PKG_NAME}_${{ steps.environment_step.outputs.VERSION }}-1${{ steps.environment_step.outputs.PRERELEASE_TAG }}+$(lsb_release -c -s)1_amd64.deb" \
-          --git-sha "${{ steps.environment_step.outputs.GIT_SHA }}" \
-          --git-base "${{ steps.environment_step.outputs.GIT_BASE }}" \
+          --bin-pkg "${GITHUB_WORKSPACE}/artifacts/${PKG_NAME}_${{ needs.setup_environment.outputs.VERSION }}-1${{ needs.setup_environment.outputs.PRERELEASE_TAG }}+$(lsb_release -c -s)1_amd64.deb" \
+          --git-sha "${{ needs.setup_environment.outputs.GIT_SHA }}" \
+          --git-base "${{ needs.setup_environment.outputs.GIT_BASE }}" \
           verify 2>> $GITHUB_STEP_SUMMARY
 
     - name: Archive .symbols file
       uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 # v4.3.0
       with:
         name: libkeymancore.symbols
-        path: linux/debian/tmp/DEBIAN/symbols
+        path: ${{ github.workspace }}/keyman/linux/debian/tmp/DEBIAN/symbols
       if: always()
 
   set_status:
     name: Set result status on PR builds
-    needs: [api_verification]
+    needs: [setup_environment, api_verification]
     runs-on: ubuntu-latest
-    if: ${{ always() && needs.api_verification.outputs.IS_TEST_BUILD == 'true' }}
+    if: ${{ always() && needs.setup_environment.outputs.IS_TEST_BUILD == 'true' }}
     steps:
     - name: Set success
     # TEMP commented until things are working!
@@ -120,7 +126,7 @@ jobs:
         gh api \
           --method POST \
           -H "Accept: application/vnd.github+json" \
-          /repos/$GITHUB_REPOSITORY/statuses/${{ needs.api_verification.outputs.GIT_SHA }} \
+          /repos/$GITHUB_REPOSITORY/statuses/${{ needs.setup_environment.outputs.GIT_SHA }} \
           -f state="$RESULT" \
           -f target_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
           -f description="$MSG" \
