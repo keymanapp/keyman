@@ -104,6 +104,8 @@ export abstract class RecordedKeystroke {
         return new RecordedPhysicalKeystroke(obj as RecordedPhysicalKeystroke);
       } else if(obj.type == "osk") {
         return new RecordedSyntheticKeystroke(obj as RecordedSyntheticKeystroke);
+      } else {
+        return null;
       }
     }
 

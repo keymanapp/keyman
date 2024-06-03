@@ -27,7 +27,7 @@ export type LogMessageHandler = (str: string) => void;
 
 export interface VariableStoreSerializer {
   loadStore(keyboardID: string, storeName: string): VariableStore;
-  saveStore(keyboardID: string, storeName: string, storeMap: VariableStore);
+  saveStore(keyboardID: string, storeName: string, storeMap: VariableStore): void;
 }
 
 export interface ProcessorInitOptions {
@@ -273,8 +273,8 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
   _UpdateVKShift(e: KeyEvent): boolean {
     let keyShiftState=0;
 
-    const lockNames  = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'];
-    const lockKeys   = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'];
+    const lockNames  = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'] as const;
+    const lockKeys   = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'] as const;
 
     if(!this.activeKeyboard) {
       return true;
@@ -322,8 +322,8 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
   }
 
   private updateStates(): void {
-    var lockNames  = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'];
-    var lockKeys   = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'];
+    var lockNames  = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'] as const;
+    var lockKeys   = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'] as const;
 
     for(let i=0; i < lockKeys.length; i++) {
       const key = lockKeys[i];
@@ -443,7 +443,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
 
     // Do not change layer unless needed (27/08/2015)
     if(id == activeLayer && keyEvent.device.formFactor != DeviceSpec.FormFactor.Desktop) {
-      return false;
+      return;
     }
 
     var idx=id;

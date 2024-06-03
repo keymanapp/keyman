@@ -48,12 +48,12 @@ type RuleChar = string;
 class RuleDeadkey {
   /** Discriminant field - 'd' for Deadkey.
    */
-  ['t']: 'd';
+  t: 'd';
 
   /**
    * Value:  the deadkey's ID.
    */
-  ['d']: number; // For 'd'eadkey; also reflects the Deadkey class's 'd' property.
+  d: number; // For 'd'eadkey; also reflects the Deadkey class's 'd' property.
 }
 
 class ContextAny {
@@ -254,7 +254,7 @@ export default class KeyboardInterface extends KeyboardHarness {
    *              In web-core, this also activates the keyboard; in other modules, this method
    *              may be replaced with other implementations.
    */
-  registerKeyboard(Pk): void {
+  registerKeyboard(Pk: any): void {
     // NOTE:  This implementation is web-core specific and is intentionally replaced, whole-sale,
     //        by DOM-aware code.
     let keyboard = new Keyboard(Pk);
@@ -400,7 +400,7 @@ export default class KeyboardInterface extends KeyboardHarness {
       var subCache = cache;
       subCache.valContext = subCache.valContext.slice(0, ln);
       for(var i=0; i < subCache.valContext.length; i++) {
-        if(subCache[i] == '\ufffe') {
+        if(subCache.valContext[i] == '\ufffe') {
           subCache.valContext.splice(0, 1);
           subCache.deadContext.splice(0, 1);
         }
@@ -709,12 +709,14 @@ export default class KeyboardInterface extends KeyboardHarness {
     s = this._ExplodeStore(s);
     var Lix = -1;
     for(var i=0; i < s.length; i++) {
-      if(typeof(s[i]) == 'string') {
+      const entry = s[i];
+      if(typeof(entry) == 'string') {
         if(s[i] == ch) {
           Lix = i;
           break;
         }
-      } else if(s[i]['d'] === ch['d']) {
+        // @ts-ignore // Needs to test against .t for automatic inference, but it's not actually there.
+      } else if(entry.d === (ch as RuleDeadkey).d) {
         Lix = i;
         break;
       }
@@ -765,21 +767,19 @@ export default class KeyboardInterface extends KeyboardHarness {
     if(indexChar !== "") {
       if(typeof indexChar == 'string' ) {
         this.output(Pdn, outputTarget, indexChar);  //I3319
-      } else if(indexChar['t']) {
-        var storeEntry = indexChar as StoreNonCharEntry;
-
-        switch(storeEntry.t) {
+      } else if(indexChar.t) {
+        switch(indexChar.t) {
           case 'b': // Beep commands may appear within stores.
             this.beep(outputTarget);
             break;
           case 'd':
-            this.deadkeyOutput(Pdn, outputTarget, indexChar['d']);
+            this.deadkeyOutput(Pdn, outputTarget, indexChar.d);
             break;
           default:
-            assertNever(storeEntry);
+            assertNever(indexChar);
         }
       } else { // For keyboards developed during 10.0's alpha phase - t:'d' was assumed.
-        this.deadkeyOutput(Pdn, outputTarget, indexChar['d']);
+        this.deadkeyOutput(Pdn, outputTarget, (indexChar as any).d);
       }
     }
   }
@@ -1057,7 +1057,7 @@ export default class KeyboardInterface extends KeyboardHarness {
     return this.process(this.activeKeyboard.process.bind(this.activeKeyboard), outputTarget, keystroke, false);
   }
 
-  private process(callee, outputTarget: OutputTarget, keystroke: KeyEvent, readonly: boolean): RuleBehavior {
+  private process(callee: (outputTarget: OutputTarget, keystroke: KeyEvent) => boolean, outputTarget: OutputTarget, keystroke: KeyEvent, readonly: boolean): RuleBehavior {
     // Clear internal state tracking data from prior keystrokes.
     if(!outputTarget) {
       throw "No target specified for keyboard output!";
@@ -1138,16 +1138,19 @@ export default class KeyboardInterface extends KeyboardHarness {
     // Keyboard callbacks
     let prototype = this.prototype;
 
-    var exportKBCallback = function(miniName: string, longName: string) {
+    var exportKBCallback = function(miniName: string, longName: keyof KeyboardInterface) {
       if(prototype[longName]) {
+        // @ts-ignore
         prototype[miniName] = prototype[longName];
       }
     }
 
     exportKBCallback('KSF', 'saveFocus');
+    // @ts-ignore // is defined at a higher level
     exportKBCallback('KBR', 'beepReset');
     exportKBCallback('KT', 'insertText');
     exportKBCallback('KR', 'registerKeyboard');
+    // @ts-ignore // is defined at a higher level
     exportKBCallback('KRS', 'registerStub');
     exportKBCallback('KC', 'context');
     exportKBCallback('KN', 'nul');

@@ -5,7 +5,16 @@
     "lib": [ "dom", "es6" ],
     "outDir": "./build/obj/",
     "rootDir": "./src/engine",
-    "tsBuildInfoFile": "./build/obj/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "./build/obj/tsconfig.tsbuildinfo",
+
+    // TODO: These override ../tsconfig.base.json settings, and so should be removed if possible,
+    //       but existing code in web/ breaks some of these settings
+    //
+    // At present, the code actually compiles without them... but the TS tests are a different matter.
+    "noImplicitAny": false,
+    "noUnusedLocals": false,
+    "strictFunctionTypes": false,
+    "noImplicitReturns": false
   },
   "include": ["./src/engine/**/*.ts"],
   "exclude": ["./src/test/**/*.ts", "./src/tools/**/*.ts"],

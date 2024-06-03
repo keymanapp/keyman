@@ -297,9 +297,9 @@ export class ActiveKeyBase {
       const value = KeyTypesOfKeyMap[key as keyof typeof KeyTypesOfKeyMap];
       switch(value) {
         case 'subkeys':
-          const arr = rawKey[key] as LayoutSubKey[];
+          const arr = rawKey[key as 'sk' | 'multitap'] as LayoutSubKey[];
           if(!Array.isArray(arr)) {
-            delete rawKey[key];
+            delete rawKey[key as 'sk' | 'multitap'];
           } else {
             for(let i=0; i < arr.length; i++) {
               const sk = arr[i];
@@ -312,9 +312,9 @@ export class ActiveKeyBase {
           }
           break;
         case 'flicks':
-          const flickObj = rawKey[key];
+          const flickObj = rawKey[key as 'flick'];
           if(typeof flickObj != 'object') {
-            delete rawKey[key];
+            delete rawKey[key as 'flick'];
           } else {
             for(const flickKey of KeyTypesOfFlickList) {
               const sk = flickObj[flickKey];
@@ -327,9 +327,9 @@ export class ActiveKeyBase {
           }
           break;
         default:
-          const prop = rawKey[key];
+          const prop = rawKey[key as keyof (LayoutKey | LayoutSubKey)];
           if(typeof prop != value) {
-            delete rawKey[key];
+            delete rawKey[key as keyof (LayoutKey | LayoutSubKey)];
           }
       }
     }
@@ -395,7 +395,7 @@ export class ActiveKeyBase {
     if(defaultHint?.includes('flick-')) {
       if(spec.flick) {
         // 6 = length of 'flick-'
-        const dir = defaultHint.substring(6);
+        const dir = defaultHint.substring(6) as keyof TouchLayoutFlick;
 
         if(spec.flick[dir]?.text) {
           spec.hintSrc = spec.flick[dir];

@@ -211,7 +211,7 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
      */
     const sourceNotYetStaged = source instanceof GestureSource;
 
-    const determinePredecessorSources = (source: PredecessorMatch<Type, StateToken>) => {
+    const determinePredecessorSources = (source: PredecessorMatch<Type, StateToken>): GestureSource<Type>[] => {
       const directSources = (source.sources as GestureSourceSubview<Type>[]).map((source => source.baseSource));
 
       if(directSources && directSources.length > 0) {

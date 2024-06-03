@@ -178,7 +178,7 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
     return this._isCancelled;
   }
 
-  private finalize(matched: boolean, cause: FulfillmentCause) {
+  private finalize(matched: boolean, cause: FulfillmentCause): MatchResult<Type> {
     if(this.publishedPromise.isFulfilled) {
       return this._result;
     }
@@ -242,6 +242,13 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
       /* c8 ignore next 3 */
     } catch(err) {
       this.publishedPromise.reject(err);
+      return {
+        matched: false,
+        action: {
+          type: 'none',
+          item: null
+        }
+      }
     }
   }
 

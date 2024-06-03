@@ -97,7 +97,10 @@ export default class LMLayerWorker {
 
   private _currentModelSource: ModelSourceSpec;
 
-  constructor(options = {
+  constructor(options: {
+    importScripts: typeof importScripts,
+    postMessage: typeof postMessage
+  } = {
     importScripts: null,
     postMessage: null
   }) {
@@ -401,9 +404,13 @@ export default class LMLayerWorker {
 
     // Ensures that the worker instance is accessible for loaded model scripts.
     // Assists unit-testing.
+    // @ts-ignore
     scope['LMLayerWorker'] = worker;
+    // @ts-ignore
     scope['models'] = models;
+    // @ts-ignore
     scope['correction'] = correction;
+    // @ts-ignore
     scope['wordBreakers'] = wordBreakers;
 
     return worker;
