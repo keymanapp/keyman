@@ -68,7 +68,7 @@ jobs:
         path: ${{ github.workspace }}/keyman/
 
     - name: Install devscripts
-      uses: ${{ github.workspace }}/keyman/.github/actions/apt-install
+      uses: ./keyman/.github/actions/apt-install
       with:
         packages: devscripts equivs
 
