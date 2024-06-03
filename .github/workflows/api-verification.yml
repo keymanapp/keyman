@@ -65,12 +65,12 @@ jobs:
       with:
         packages: devscripts equivs
 
-    - name: "Verify API for libkeymancore.so (${{ steps.environment_step.outputs.GIT_BRANCH }}, branch ${{ steps.environment_step.outputs.GIT_BASE_BRANCH }}, by ${{ steps.environment_step.outputs.GIT_USER }}) - "
+    - name: "Verify API for libkeymancore.so (${{ steps.environment_step.outputs.GIT_BRANCH }}, branch ${{ steps.environment_step.outputs.GIT_BASE_BRANCH }}, by ${{ steps.environment_step.outputs.GIT_USER }})"
       run: |
         cd ${{ github.workspace }}/keyman/linux
         ./scripts/deb-packaging.sh \
           --gha \
-          --bin-pkg "${GITHUB_WORKSPACE}/artifacts/${PKG_NAME}_${{ steps.environment_step.outputs.VERSION }}-1${{ steps.environment_step.outputs.PRERELEASE_TAG }}+$(lsb_release -c -s)1_amd64.deb" \
+          --bin-pkg "${GITHUB_WORKSPACE}/artifacts/${PKG_NAME}\*_${{ steps.environment_step.outputs.VERSION }}-1${{ steps.environment_step.outputs.PRERELEASE_TAG }}+$(lsb_release -c -s)1_amd64.deb" \
           --git-sha "${{ steps.environment_step.outputs.GIT_SHA }}" \
           --git-base "${{ steps.environment_step.outputs.GIT_BASE }}" \
           verify 2>> $GITHUB_STEP_SUMMARY
