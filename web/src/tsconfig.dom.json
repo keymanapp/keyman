@@ -5,7 +5,6 @@
     "lib": [ "DOM", "ES6"],
     // TODO: These override ../tsconfig.base.json settings, and so should be removed if possible,
     //       but existing code in web/ breaks some of these settings
-    "noImplicitAny": false,
     "strictFunctionTypes": false,
     "noImplicitReturns": false,
     "strictNullChecks": false,

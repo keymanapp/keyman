@@ -14,6 +14,10 @@ type KeyboardMenuEntry = {
   _Index: number;
 }
 
+interface Owned<T> {
+  _owningObject?: T;
+}
+
 // If a UI module has been loaded, we can rely on the publically-published 'name' property
 // having been set as a way to short-out a UI reload.  Its parent object always exists by
 // this point in the build process.
@@ -80,7 +84,7 @@ if(!keyman?.ui?.name) {
        * @param       {(boolean|number)}  focusing        true if focusing
        * @param       {Object}            activeControl   Object representing API specs for the control, if it exists and is now focused.
        */
-      doFocus(someElement: HTMLElement, focusing: boolean | number, activeControl) {
+      doFocus(someElement: HTMLElement, focusing: boolean | number, activeControl: HTMLElement) {
         // This callback must be ignored until UI is initialized, or for touch devices (which can never initialize the UI)
         if(!this.initialized) {
           return;
@@ -260,9 +264,9 @@ if(!keyman?.ui?.name) {
 
         class Button {
           // Button event-state management fields
-          _onclick = null;
-          _onmouseover = null;
-          _onmouseout = null;
+          _onclick: () => void = null;
+          _onmouseover: () => void = null;
+          _onmouseout: () => void = null;
           _down = false;
           _over = false;
           _selected: boolean;
@@ -270,7 +274,7 @@ if(!keyman?.ui?.name) {
           /**
            * The top-level element of the button.
            */
-          _elem: HTMLDivElement;
+          _elem: HTMLDivElement & Owned<Button>;
 
           getElem() {
             return this._elem;
@@ -338,7 +342,7 @@ if(!keyman?.ui?.name) {
           };
 
 
-          _setSelected(_value) {
+          _setSelected(_value: boolean) {
             keymanweb.activatingUI(false); // Always clear activating UI flag after selecting UI
             this._selected = _value;
             this.__updatestyle();
@@ -360,7 +364,7 @@ if(!keyman?.ui?.name) {
             this._selected = _selected;
 
             let imgPath=util.getOption('resources') + 'ui/toggle/';
-            let _elemImg = util.createElement('img');
+            let _elemImg = util.createElement('img') as HTMLImageElement & Owned<Button>;
             this._elem = util.createElement('div');
             this._elem['_owningObject'] = this;
             _elemImg.style.display = 'block';
@@ -371,7 +375,7 @@ if(!keyman?.ui?.name) {
             this._elem.style.height = '24px';
             this._elem.style.zIndex = '10002';
             this._elem.style.lineHeight = '100%';
-            this._elem.style['styleFloat'] = this._elem.style.cssFloat = 'left';
+            this._elem.style.cssFloat = 'left';
 
             _elemImg.title = _caption;
             _elemImg.alt = _caption;
@@ -704,7 +708,7 @@ if(!keyman?.ui?.name) {
         this.selectedMenuItem=_a;
         this.keyboardMenu.appendChild(_li);
 
-        const _kbds=keymanweb.getKeyboards(), _added=[];
+        const _kbds=keymanweb.getKeyboards(), _added: Record<string, number> = {};
         this.keyboards = [];
         for(var _kbd = 0; _kbd < _kbds.length; _kbd++) {
           var _li1=util.createElement('li');

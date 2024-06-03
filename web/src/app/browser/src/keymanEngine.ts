@@ -7,7 +7,7 @@ import {
   VisualKeyboard
 } from 'keyman/engine/osk';
 import { ErrorStub, KeyboardStub, CloudQueryResult, toPrefixedKeyboardId as prefixed } from 'keyman/engine/package-cache';
-import { DeviceSpec, Keyboard } from "@keymanapp/keyboard-processor";
+import { DeviceSpec, Keyboard, KeyboardObject } from "@keymanapp/keyboard-processor";
 
 import * as views from './viewsAnchorpoint.js';
 import { BrowserConfiguration, BrowserInitOptionDefaults, BrowserInitOptionSpec } from './configuration.js';
@@ -37,6 +37,11 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
   private _ui: UIModule;
   hotkeyManager: HotkeyManager = new HotkeyManager();
   private readonly beepHandler: BeepHandler;
+
+
+  // Properties sometimes set up by a hosting page
+  getOskHeight?: () => number = null;
+  getOskWidth?: () => number = null;
 
   /**
    * Provides a quick link to the base help page for Keyman keyboards.
@@ -312,7 +317,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/getKeyboardForControl
    */
-  public getKeyboardForControl(Pelem) {
+  public getKeyboardForControl(Pelem: HTMLElement) {
     const target = outputTargetForElement(Pelem);
     return this.contextManager.getKeyboardStubForTarget(target).id;
   }
@@ -326,7 +331,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    * Description  Returns the language code used with the current independently-managed keyboard for this control.
    *              If it is currently following the global keyboard setting, returns null instead.
    */
-  getLanguageForControl(Pelem) {
+  getLanguageForControl(Pelem: HTMLElement) {
     const target = outputTargetForElement(Pelem);
     return this.contextManager.getKeyboardStubForTarget(target).langId;
   }
@@ -402,8 +407,11 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
       LanguageCode: Lstub.KLC, // I1702 - Add support for language codes, region names, region codes, country names and country codes
       RegionName: Lstub.KR,
       RegionCode: Lstub.KRC,
+      // @ts-ignore
       CountryName: Lstub['KC'] as string,
+      // @ts-ignore
       CountryCode: Lstub['KCC'] as string,
+      // @ts-ignore
       KeyboardID: Lstub['KD'] as string,
       Font: Lstub.KFont,
       OskFont: Lstub.KOskFont,
@@ -425,12 +433,12 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/isCJK
    */
-  public isCJK(k0? /* keyboard script object | return-type of _GetKeyboardDetail [b/c Toolbar UI]*/) {
+  public isCJK(k0?: KeyboardObject | ReturnType<KeymanEngine['_GetKeyboardDetail']> /* [b/c Toolbar UI]*/) {
     let kbd: Keyboard;
     if(k0) {
       let kbdDetail = k0 as ReturnType<KeymanEngine['_GetKeyboardDetail']>;
       if(kbdDetail.KeyboardID){
-        kbd = this.keyboardRequisitioner.cache.getKeyboard(k0.KeyboardID);
+        kbd = this.keyboardRequisitioner.cache.getKeyboard(kbdDetail.KeyboardID);
       } else {
         kbd = new Keyboard(k0);
       }

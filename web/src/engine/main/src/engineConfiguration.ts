@@ -21,7 +21,7 @@ export class EngineConfiguration extends EventEmitter<EventMap> {
   private _paths: PathConfiguration;
   public activateFirstKeyboard: boolean;
   private _spacebarText: SpacebarText;
-  private _stubNamespacer?: (KeyboardStub) => void;
+  private _stubNamespacer?: (stub: KeyboardStub) => void;
 
   public applyCacheBusting: boolean = false;
 

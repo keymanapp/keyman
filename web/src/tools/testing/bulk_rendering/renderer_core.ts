@@ -55,7 +55,7 @@ export class BatchRenderer {
   private filterKeyboards(): KeyboardMap {
     let kbds = keyman.getKeyboards();
 
-    let keyboardMap = {};
+    let keyboardMap: Record<string, ReturnType<typeof keyman['getKeyboards']>[0]> = {};
 
     for(var i = 0; i < kbds.length; i++) {
       let id: string = kbds[i].InternalName;
@@ -167,24 +167,24 @@ export class BatchRenderer {
       divSummary.appendChild(divRenders);
 
       // Uses 'private' APIs that may be subject to change in the future.  Keep it updated!
-      var layers;
+      let layers: string[];
       if(!isMobile) {
         // The desktop OSK will be overpopulated, with a number of blank layers to display in most cases.
         // We instead rely upon the KLS definition to ensure we keep the renders sparse.
         //
         // _legacyLayoutSpec is technically private, but it's what we've been using, so... yeah.
-        layers = keyman.core.activeKeyboard['_legacyLayoutSpec']?.KLS;
+        layers = Object.keys(keyman.core.activeKeyboard['_legacyLayoutSpec']?.KLS);
       }
 
       // If mobile, or if the desktop definition lacks a `_legacyLayoutSpec` entry.
       // Note:  vkbd will be null for keyboards with desktop help-text, such as sil_euro_latin.
-      layers = layers || keyman.osk.vkbd?.layerGroup.layers;
+      layers = layers || Object.keys(keyman.osk.vkbd?.layerGroup.layers);
 
       let renderLayer = function(i: number) {
         return new Promise(function(resolve) {
           // (Private API) Directly sets the keyboard layer within KMW, then uses .show to force-display it.
           if(keyman.osk.vkbd) {
-            keyman.core.keyboardProcessor.layerId = Object.keys(layers)[i];
+            keyman.core.keyboardProcessor.layerId = layers[i];
           } else {
             // Again, occurs for keyboards with desktop help-text.
             console.error(`Error - keyman.osk.vkbd is undefined for ${kbd.InternalName}!`);
@@ -261,10 +261,11 @@ export class BatchRenderer {
     keyman.setActiveElement(BatchRenderer.dummy, true);
   }
 
-  async run(allLayers, filter) {
+  async run(allLayers: boolean, filter: string) {
     BatchRenderer.allLayers = allLayers;
     BatchRenderer.keyboardMatch = new RegExp('^Keyboard_('+filter+')', 'i');
-    if(window['keyman']) {
+
+    if(keyman) {
       let cc = await this.startCapture();
       BatchRenderer.captureStream = cc.captureStream;
       BatchRenderer.video = cc.video;
@@ -293,7 +294,7 @@ export class BatchRenderer {
 
       let renderer = this;
 
-      let keyboardIterator = function(i) {
+      let keyboardIterator = function(i: number) {
         return new Promise(function(resolve) {
           renderer.processKeyboard(kbds[Object.keys(kbds)[i]]).then(function () {
             //console.log("Keyboard " + i + " processed!");
@@ -319,5 +320,6 @@ export class BatchRenderer {
 (function(){
   // BatchRenderer's internal state stuff is static on the class and is not exposed with
   // the line below.
+  // @ts-ignore
   window['kmw_renderer'] = new BatchRenderer();
 })();

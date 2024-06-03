@@ -56,7 +56,7 @@ export default class Multitap implements GestureHandler {
 
     this.originalLayer = vkbd.layerId;
 
-    const tapLookahead = (offset) => (this.tapIndex + offset) % this.multitaps.length;
+    const tapLookahead = (offset: number) => (this.tapIndex + offset) % this.multitaps.length;
 
     const updatePreview = () => {
       previewHost?.setMultitapHint(this.multitaps[tapLookahead(0)], this.multitaps[tapLookahead(1)], vkbd);

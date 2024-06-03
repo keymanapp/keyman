@@ -291,8 +291,7 @@ export default class Keyboard {
     }
   }
 
-  // TODO:  Better typing.
-  private get _legacyLayoutSpec(): any {
+  private get _legacyLayoutSpec() {
     return this.scriptObject['KV'];  // used with buildDefaultLayout; layout must be constructed at runtime.
   }
 

@@ -42,6 +42,14 @@ type LanguageEntry = {
   keyboards: KeyboardDetail[];
 }
 
+interface ListedKeyboard {
+  priority: number;
+  lang: LanguageEntry,
+  keyboard: KeyboardDetail;
+  buttonNode: HTMLDivElement;
+  aNode: HTMLAnchorElement;
+}
+
 // If a UI module has been loaded, we can rely on the publically-published 'name' property
 // having been set as a way to short-out a UI reload.  Its parent object always exists by
 // this point in the build process.
@@ -76,7 +84,6 @@ if(!keyman?.ui?.name) {
       init = false;
 
       toolbarNode: HTMLDivElement = null;
-      backgroundNode = null;
       browseMapNode: HTMLDivElement = null;
       keyboardsButtonNode: HTMLDivElement = null;
       languageButtonsNode: HTMLDivElement = null;
@@ -87,9 +94,9 @@ if(!keyman?.ui?.name) {
       selectorNode: HTMLDivElement = null;
       regionLanguageListNodes: Record<string, HTMLDivElement> = {};
       regionsNode: HTMLDivElement = null;
-      regionNodes = null;
-      langKeyboardNodes = [];
-      langKeyboardListNodes = [];
+      regionNodes: Record<string, HTMLAnchorElement> = null;
+      langKeyboardNodes: Record<string, HTMLSpanElement> = {};
+      langKeyboardListNodes: Record<string, HTMLUListElement> = {};
       selectedRegion = 'as';
 
       /**
@@ -99,7 +106,7 @@ if(!keyman?.ui?.name) {
        * page refresh.  (If either condition isn't met, it's ignored and the next in line
        * is checked until one is found that meets both conditions.)
        */
-      listedKeyboards = [];
+      listedKeyboards: ListedKeyboard[] = [];
       catchAllRegion = 'un';
 
       /**
@@ -113,14 +120,17 @@ if(!keyman?.ui?.name) {
        * of a new entry will result in pruning the oldest in the list, as with a cache.
        */
       maxListedKeyboards = 1;
-      lastActiveControl = null;
+      lastActiveControl: HTMLElement = null;
       selectedKeyboard: KeyboardDetail = null;
       selectedLanguage = '';
       helpOffsetX = 0;
       helpOffsetY = 0;
 
-      keyboardsForLangPopup = null;
-      lastSelectedKeyboard = null;
+      keyboardsForLangPopup: HTMLUListElement = null;
+      lastSelectedKeyboard: {
+        internalName: string,
+        languageCode: string
+      } = null;
 
       regions: Record<string, MapRegion>;
 
@@ -289,6 +299,7 @@ if(!keyman?.ui?.name) {
           areaNode.alt = '';
           areaNode.href = '#';
           areaNode.title = this.regions[i].t;
+          // @ts-ignore
           areaNode['hidefocus'] = 'true';
           areaNode.onclick =     ((i) => { return (event) => this.selectRegion(event, i);  })(i);
           areaNode.onmouseover = ((i) => { return (event) => this.hoverRegion(event, i);   })(i);
@@ -1038,7 +1049,8 @@ if(!keyman?.ui?.name) {
        * @return      {*}
        * Description  Get the value of an element property
        **/
-      pluck(elem, property) {
+      pluck(elem: HTMLElement, property: string) {
+        // @ts-ignore
         return elem.getAttribute ? elem.getAttribute(property) || elem[property] : elem[property];
       };
 
@@ -1080,13 +1092,17 @@ if(!keyman?.ui?.name) {
             // NOTE:  as best as I can tell, this is to be specified by the site developer, not KMW.
             // I don't see documentation for it on first glance, though.
             let offsetX, offsetY;
+            // @ts-ignore
             if(t['KMW_HelpOffsetX']) {
+              // @ts-ignore
               offsetX = t['KMW_HelpOffsetX'];
             } else {
               offsetX = 64;
             }
 
+            // @ts-ignore
             if(t['KMW_HelpOffsetY']) {
+              // @ts-ignore
               offsetY = t['KMW_HelpOffsetY'];
             } else {
               offsetY = 0;
@@ -1155,7 +1171,7 @@ if(!keyman?.ui?.name) {
        * @param       {Object}  oskPosition
        * @return      {Object}
        **/
-      readonly onShowOSK = (oskPosition) => {
+      readonly onShowOSK = (oskPosition: any) => {
         if(this.init) {
           this.oskButtonNode.className = 'kmw_button_selected';
         }
@@ -1195,7 +1211,7 @@ if(!keyman?.ui?.name) {
        * @return      {boolean}
        * Description  Update the map when displayed
        **/
-      readonly showKeyboardsPopup = (event) => {
+      readonly showKeyboardsPopup = (event: Event) => {
         // Add any newly available keyboards to the map
         this.addKeyboardsToMap();
 
@@ -1293,7 +1309,7 @@ if(!keyman?.ui?.name) {
        * @param       {function(Object)}  callback
        * Description  Prepare for callback dismissal
        **/
-      SetupPopupDismissal(element, callback: (event: Event) => any) {
+      SetupPopupDismissal(element: HTMLElement, callback: (event: Event) => any) {
         if(this.PopupDismissal == document.onclick) {
           this.CancelPopupDismissal(this.dismissalCallback);
         }
@@ -1309,7 +1325,7 @@ if(!keyman?.ui?.name) {
        * @param       {?function(Object)}  callback
        * Description  Cancel callback dismissal
        **/
-      CancelPopupDismissal(callback) {
+      CancelPopupDismissal(callback?: (event: Event) => void) {
         if(this.PopupDismissal == document.onclick) {
           document.onclick = this.lastDismissalCallback;
           this.lastDismissalCallback = null;
@@ -1343,8 +1359,8 @@ if(!keyman?.ui?.name) {
           // Iterate over the implicit array
           for(let i=0; i < c.maxrecent; i++) {
             // Is the entry actually defined?
-            if(c['recent'+i] != undefined) {
-              var r=c['recent'+i].split(',');
+            if(c[`recent${i}`] != undefined) {
+              var r=c[`recent${i}`].split(',');
               // Does its definition have the expected format?  That is: langID,keyboardID
               if(r.length == 2) {
                 var k = this.languages[r[0]];
@@ -1400,7 +1416,7 @@ if(!keyman?.ui?.name) {
         vs.maxrecent = this.listedKeyboards.length;
 
         for(var i=0; i<this.listedKeyboards.length; i++) {
-          vs['recent'+i] = this.listedKeyboards[i].lang.id+","+this.listedKeyboards[i].keyboard.InternalName;
+          vs[`recent${i}`] = this.listedKeyboards[i].lang.id+","+this.listedKeyboards[i].keyboard.InternalName;
         }
 
         util.saveCookie<ToolbarCookie>('KeymanWeb_Toolbar',vs);

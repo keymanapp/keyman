@@ -5,6 +5,6 @@ export default interface GlobeHint {
   state: boolean;
   element?: HTMLDivElement;
 
-  show(key: KeyElement, onDismiss?: () => void);
-  hide(key: KeyElement);
+  show(key: KeyElement, onDismiss?: () => void): void;
+  hide(key: KeyElement): void;
 }

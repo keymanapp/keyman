@@ -45,13 +45,17 @@ export type OSKRect = {
  * https://help.keyman.com/DEVELOPER/ENGINE/WEB/16.0/reference/events/.
  */
 export interface LegacyOSKEventMap {
-  'configclick'(obj: {});
-  'helpclick'(obj: {});
-  'resizemove'(obj: {});
-  'show'(obj: {});
+  'configclick'(obj: {}): void;
+  'helpclick'(obj: {}): void;
+  'resizemove'(obj: {}): void;
+  'show'(obj: {
+    x?: number,
+    y?: number,
+    userLocated?: boolean
+  }): void;
   'hide'(obj: {
-    HiddenByUser: boolean
-  });
+    HiddenByUser?: boolean
+  }): void;
 }
 
 /**
@@ -938,7 +942,7 @@ export default abstract class OSKView
    * Method usable by subclasses of OSKView to control that OSKView type's
    * positioning behavior when needed by the present() method.
    */
-  protected abstract setDisplayPositioning();
+  protected abstract setDisplayPositioning(): void;
 
   /**
    * Method used to start a potentially-asynchronous hide of the OSK.
@@ -1253,7 +1257,11 @@ export default abstract class OSKView
    * @return      {boolean}
    *
    */
-  doShow(p) {
+  doShow(p: {
+    x: number,
+    y: number,
+    userLocated: boolean
+  }) {
     // Newer style 'doShow' emitted from .present by default.
     this.legacyEvents.callEvent('show', p);
   }

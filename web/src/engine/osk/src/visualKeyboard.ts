@@ -463,12 +463,13 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
       // Make sure we're tracking the source and its currently-selected item (the latter, as we're
       // highlighting it)
-      const trackingEntry = sourceTrackingMap[source.identifier] = {
+      sourceTrackingMap[source.identifier] = {
         source: source,
         roamingHighlightHandler: null,
         key: source.currentSample.item,
         previewHost: previewHost
       }
+      const trackingEntry = sourceTrackingMap[source.identifier];
 
       const endHighlighting = () => {
         // The base call will occur before our "is this a multitap?" check otherwise.
@@ -1106,7 +1107,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     }
 
     // Set the on/off state of any visible state keys.
-    const states = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'];
+    const states = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'] as const;
     const keys = [layer.capsKey, layer.numKey, layer.scrollKey];
 
     for (i = 0; i < keys.length; i++) {
@@ -1120,8 +1121,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   }
 
   updateStateKeys(stateKeys: StateKeyMap) {
-    for(let key in this.stateKeys) {
-      this.stateKeys[key] = stateKeys[key];
+    for(let key of Object.keys(this.stateKeys)) {
+      this.stateKeys[key as keyof StateKeyMap] = stateKeys[key as keyof StateKeyMap];
     }
 
     this._UpdateVKShiftStyle();

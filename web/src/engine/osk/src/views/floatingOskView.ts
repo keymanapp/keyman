@@ -365,7 +365,7 @@ export default class FloatingOSKView extends OSKView {
    * @param       {Object=}     p       object with coordinates and userdefined flag
    *
    */
-  doResizeMove(p?) {
+  doResizeMove(p?: any) {
     this.legacyEvents.callEvent('resizemove', p);
   }
 
@@ -568,11 +568,11 @@ export default class FloatingOSKView extends OSKView {
     super.present();
 
     // Allow desktop UI to execute code when showing the OSK
-    var Lpos={};
-    Lpos['x']=this._Box.offsetLeft;
-    Lpos['y']=this._Box.offsetTop;
-    Lpos['userLocated']=this.userPositioned;
-    this.doShow(Lpos);
+    this.doShow({
+      x: this._Box.offsetLeft,
+      y: this._Box.offsetTop,
+      userLocated: this.userPositioned
+    });
   }
 
   public startHide(hiddenByUser: boolean) {
