@@ -28,8 +28,8 @@ export interface EncodedVisualKeyboard {
    * Keyboard Layer Specification: an object-based map of layer name to the keycaps for its
    * 65 keys.  The 65 keys are ordered from left to right, then top to bottom.
    *
-   * There are a few reserved entries.
-   * TODO:  better document the exact ranges involved.
+   * The key ID corresponding to each index of the array is specified within `Codes.dfltCodes`.
+   * Entries corresponding to `K_*` in `Codes.dfltCodes` are reserved for future use.
    */
   KLS?: {[layerName: string]: string[]},
   /**
