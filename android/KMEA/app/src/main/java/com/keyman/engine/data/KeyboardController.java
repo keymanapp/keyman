@@ -12,6 +12,7 @@ import com.keyman.engine.data.Keyboard;
 import com.keyman.engine.KeyboardPickerActivity;
 import com.keyman.engine.util.BCP47;
 import com.keyman.engine.util.FileUtils;
+import com.keyman.engine.util.KMString;
 import com.keyman.engine.util.MapCompat;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.util.KMLog;
@@ -167,7 +168,7 @@ public class KeyboardController {
       KMLog.LogError(TAG, "getKeyboardInfo while KeyboardController() not initialized");
       return null;
     } else if (index < 0) {
-      KMLog.LogError(TAG, "getKeyboardInfo with invalid index: " + index);
+      // Don't need to report to Sentry
       return null;
     }
 
@@ -208,7 +209,10 @@ public class KeyboardController {
       }
     }
 
-    KMLog.LogError(TAG, "getKeyboardIndex failed for key " + key);
+    // We'll only log if key isn't for fallback keyboard
+    if (!KMManager.isDefaultKey(key)) {
+      KMLog.LogError(TAG, "getKeyboardIndex failed for key " + key);
+    }
     return index;
   }
 

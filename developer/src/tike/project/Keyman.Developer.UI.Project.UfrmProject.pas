@@ -407,6 +407,7 @@ var
   FFileType: TKMFileType;
   FDefaultExtension: string;
   i: Integer;
+  frmNewFileDetails: TfrmNewFileDetails;
 begin
   pf := nil;
 
@@ -414,18 +415,19 @@ begin
   if Command = 'fileaddnew' then
   begin
     { create a new file, add it to the project }
-    Assert(FGlobalProject.Options.Version = pv10);
-    with TfrmNewFileDetails.Create(Self) do
-    try
-      BaseFileName := FGlobalProject.FileName;
-      FileType := FileTypeFromParamType;
 
-      if ShowModal = mrOk then
+    frmNewFileDetails := TfrmNewFileDetails.Create(Self);
+    try
+      frmNewFileDetails.BaseFileName := FGlobalProject.ResolveSourcePath;
+      frmNewFileDetails.FileType := FileTypeFromParamType;
+      frmNewFileDetails.CanChangePath := FGlobalProject.Options.Version = pv10;
+
+      if frmNewFileDetails.ShowModal = mrOk then
       begin
-        pf := CreateProjectFile(FGlobalProject, FileName, nil);
+        pf := CreateProjectFile(FGlobalProject, frmNewFileDetails.FileName, nil);
       end;
     finally
-      Free;
+      frmNewFileDetails.Free;
     end;
     if Assigned(pf) then (pf.UI as TProjectFileUI).NewFile;   // I4687
   end

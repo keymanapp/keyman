@@ -1,13 +1,11 @@
-import { ActiveKey, Codes, DeviceSpec } from '@keymanapp/keyboard-processor';
-import { landscapeView } from 'keyman/engine/dom-utils';
+import { ActiveKey, Codes } from '@keymanapp/keyboard-processor';
 
-import OSKKey from './oskKey.js';
+import OSKKey, { KeyLayoutParams, renameSpecialKey } from './oskKey.js';
 import { KeyData, KeyElement, link } from '../keyElement.js';
 import OSKRow from './oskRow.js';
 import VisualKeyboard from '../visualKeyboard.js';
 import { ParsedLengthStyle } from '../lengthStyle.js';
 import { GesturePreviewHost } from './gesturePreviewHost.js';
-
 
 export default class OSKBaseKey extends OSKKey {
   private capLabel: HTMLDivElement;
@@ -78,7 +76,7 @@ export default class OSKBaseKey extends OSKKey {
     for(bsn=0; bsn<bsk.length; bsn++) {
       if(bsk[bsn]['sp'] == 1 || bsk[bsn]['sp'] == 2) {
         var oldText=bsk[bsn]['text'];
-        bsk[bsn]['text']=this.renameSpecialKey(oldText, vkbd);
+        bsk[bsn]['text']=renameSpecialKey(oldText, vkbd);
       }
 
       // If a subkey doesn't have a defined layer property, copy it from the base key's layer by default.
@@ -120,7 +118,7 @@ export default class OSKBaseKey extends OSKKey {
     }
 
     // If a subkey array is defined, add an icon
-    const skIcon = this.generateHint();
+    const skIcon = this.generateHint(vkbd);
     btn.appendChild(skIcon);
 
     // Add text to button and button to placeholder div
@@ -134,7 +132,7 @@ export default class OSKBaseKey extends OSKKey {
     return this.square = kDiv;
   }
 
-  public generateHint(): HTMLDivElement {
+  public generateHint(vkbd: VisualKeyboard): HTMLDivElement {
     // If a hint is defined, add an icon
     const skIcon = document.createElement('div');
     // Ensure that we use the keyboard's text font for hints.
@@ -145,7 +143,7 @@ export default class OSKBaseKey extends OSKKey {
       return skIcon;
     }
 
-    if(hintSpec.font) {
+    if(hintSpec.font && hintSpec.font != 'SpecialOSK') {
       skIcon.style.fontFamily = hintSpec.font;
     } else {
       skIcon.classList.add('kmw-key-text');
@@ -161,11 +159,18 @@ export default class OSKBaseKey extends OSKKey {
 
     // If the base key itself is the source of the hint text, we use `hint` directly.
     // Otherwise, we present the source subkey's key cap as the hint.
-    const text = hintSpec == this.spec ? this.spec.hint : hintSpec.text;
+    const baseText = hintSpec == this.spec ? this.spec.hint : hintSpec.text
+    const text = renameSpecialKey(baseText, vkbd);
     if(text == '\u2022') {
       // The original, pre-17.0 longpress dot-hint used bold-face styling.
       skIcon.style.fontWeight='bold';
     }
+
+    if(baseText != text) {
+      // if the text is from a *Special* shorthand, always use our special-key OSK font.
+      skIcon.style.fontFamily = 'SpecialOSK';
+    }
+
     skIcon.textContent = text;
 
     return skIcon;
@@ -190,29 +195,16 @@ export default class OSKBaseKey extends OSKKey {
     this.btn.replaceChild(this.preview, oldPreview);
   }
 
-  public refreshLayout(vkbd: VisualKeyboard) {
-    let key = this.spec as ActiveKey;
-    this.square.style.width = vkbd.layoutWidth.scaledBy(key.proportionalWidth).styleString;
-    this.square.style.marginLeft = vkbd.layoutWidth.scaledBy(key.proportionalPad).styleString;
-    this.btn.style.width = vkbd.usesFixedWidthScaling ? this.square.style.width : '100%';
+  public refreshLayout(layoutParams: KeyLayoutParams) {
+    super.refreshLayout(layoutParams);  // key labels in particular.
 
-    if(vkbd.usesFixedHeightScaling) {
-      // Matches its row's height.
-      this.square.style.height = vkbd.internalHeight.scaledBy(this.row.heightFraction).styleString;
-    } else {
-      this.square.style.height = '100%'; // use the full row height
-    }
-
-    super.refreshLayout(vkbd);
-
-    const device = vkbd.device;
-    const resizeLabels = (device.OS == DeviceSpec.OperatingSystem.iOS &&
-                          device.formFactor == DeviceSpec.FormFactor.Phone
-                          && landscapeView());
-
-    // Rescale keycap labels on iPhone (iOS 7)
-    if(resizeLabels && this.capLabel) {
+    const emFont = layoutParams.baseEmFontSize;
+    // Rescale keycap labels on small phones
+    if(emFont.val < 12) {
       this.capLabel.style.fontSize = '6px';
+    } else {
+      // The default value set within kmwosk.css.
+      this.capLabel.style.fontSize = ParsedLengthStyle.forScalar(0.5).styleString;
     }
   }
 

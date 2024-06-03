@@ -6,7 +6,7 @@ ltmain.sh
 __pycache__
 *.egg-info
 build-*
-deb-*
+./deb-*
 builddebs
 keyman-config/make_deb
 tmp/

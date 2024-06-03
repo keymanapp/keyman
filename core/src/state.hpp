@@ -11,7 +11,7 @@
 #include <cassert>
 #include <vector>
 
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
 
 #include "context.hpp"
 #include "option.hpp"
@@ -123,8 +123,10 @@ class state
 {
 protected:
     core::context              _ctxt;
+    core::context              _app_ctxt;
     core::abstract_processor & _processor;
     core::actions              _actions;
+    km_core_actions            _action_struct;
     core::debug_items          _debug_items;
     km_core_keyboard_imx_platform _imx_callback;
     void *_imx_object;
@@ -135,14 +137,22 @@ public:
     state(state const &) = default;
     state(state const &&) = delete;
 
+    ~state();
+
     core::context       &  context() noexcept            { return _ctxt; }
     core::context const &  context() const noexcept      { return _ctxt; }
+
+    core::context       &  app_context() noexcept            { return _app_ctxt; }
+    core::context const &  app_context() const noexcept      { return _app_ctxt; }
 
     core::abstract_processor const & processor() const noexcept { return _processor; }
     core::abstract_processor &       processor() noexcept { return _processor; }
 
     core::actions        & actions() noexcept        { return _actions; }
     core::actions const  & actions() const noexcept  { return _actions; }
+
+    km_core_actions       & action_struct() noexcept       { return _action_struct; }
+    km_core_actions const & action_struct() const noexcept { return _action_struct; }
 
     core::debug_items        & debug_items() noexcept        { return _debug_items; }
     core::debug_items const  & debug_items() const noexcept  { return _debug_items; }
@@ -163,6 +173,7 @@ public:
     bool set_actions(
       km_core_actions const &actions
     );
+    void apply_actions_and_merge_app_context();
   };
 } // namespace core
 } // namespace km
@@ -173,3 +184,23 @@ struct km_core_state : public km::core::state
   km_core_state(Args&&... args) : km::core::state(std::forward<Args>(args)...)
   {}
 };
+
+
+/**
+ * Evaluate the state and vkey used.
+ * Determine whether the context should be invalidated.
+ * @param  state          A pointer to the opaque state object.
+ * @param  vk             A virtual key that was processed.
+ * @param  modifier_state The combinations of modifier keys set at the time key
+ *                        `vk` was pressed, bitmask from the
+ *                        km_core_modifier_state enum.
+ * @param  is_key_down    1 if it was a key-down event
+ * @param  event_flags    Event level flags, see km_core_event_flags
+ * @return true if this is a state which should clear the context
+ */
+bool
+state_should_invalidate_context(km_core_state *state,
+                     km_core_virtual_key vk,
+                     uint16_t modifier_state,
+                     uint8_t is_key_down,
+                     uint16_t event_flags);

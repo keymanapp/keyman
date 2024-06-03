@@ -1,6 +1,6 @@
 import { KmpJsonFile, CompilerCallbacks, KmxFileReader, KmxFileReaderError, KMX, KeymanFileTypes } from '@keymanapp/common-types';
 import { getCompiledKmxKeyboardMetadata } from './kmx-keyboard-metadata.js';
-import { CompilerMessages } from './messages.js';
+import { CompilerMessages } from './package-compiler-messages.js';
 import { getCompiledWebKeyboardMetadata, WebKeyboardMetadata } from './web-keyboard-metadata.js';
 
 export type KeyboardMetadata = {
@@ -40,14 +40,19 @@ export class PackageMetadataCollector {
   ): KeyboardMetadata {
 
     let isJavascript = false;
-    let file = kmp.files.find(file => this.callbacks.path.basename(file.name, KeymanFileTypes.Binary.Keyboard) == keyboard.id);
+    let file = kmp.files.find(file => this.callbacks.path.basename(file.name ?? '', KeymanFileTypes.Binary.Keyboard) == keyboard.id);
     if(!file) {
       isJavascript = true;
-      file = kmp.files.find(file => this.callbacks.path.basename(file.name, KeymanFileTypes.Binary.WebKeyboard) == keyboard.id);
+      file = kmp.files.find(file => this.callbacks.path.basename(file.name ?? '', KeymanFileTypes.Binary.WebKeyboard) == keyboard.id);
       if(!file) {
         this.callbacks.reportMessage(CompilerMessages.Error_KeyboardContentFileNotFound({id:keyboard.id}));
         return null;
       }
+    }
+
+    if(!file.name) {
+      this.callbacks.reportMessage(CompilerMessages.Error_FileRecordIsMissingName({description: file.description ?? '(no description)'}));
+      return null;
     }
 
     const filename = this.callbacks.resolveFilename(kpsFilename, file.name);

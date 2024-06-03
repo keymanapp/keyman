@@ -1,9 +1,11 @@
-import { ActiveKey, ActiveKeyBase } from "@keymanapp/keyboard-processor";
-import EventEmitter from "eventemitter3";
+import { ActiveKeyBase } from "@keymanapp/keyboard-processor";
+import { EventEmitter } from "eventemitter3";
 
 import { KeyElement } from "../keyElement.js";
 import { FlickNameCoordMap, OrderedFlickDirections } from "../input/gestures/browser/flick.js";
 import { PhoneKeyTipOrientation } from "../input/gestures/browser/keytip.js";
+import { default as VisualKeyboard } from "../visualKeyboard.js";
+import { renameSpecialKey } from "./oskKey.js";
 
 /**With edge lengths of 1, to keep flick-text invisible at the start, the
  * hypotenuse for an inter-cardinal path is sqrt(2).  To keep a perfect circle
@@ -11,6 +13,10 @@ import { PhoneKeyTipOrientation } from "../input/gestures/browser/keytip.js";
  * paths to match - sqrt(2).
  */
 const FLICK_OVERFLOW_OFFSET = 1.4142;
+
+// If it's a rounding error off of 0, force it to 0.
+// Values such as -1.32e-18 have been seen when 0 was expected.
+const coerceZeroes = (val: number) => Math.abs(val) < 1e-10 ? 0 : val;
 
 interface EventMap {
   preferredOrientation: (orientation: PhoneKeyTipOrientation) => void;
@@ -63,17 +69,18 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
     if(keySpec.flick) {
       const flickSpec = keySpec.flick || {};
 
-      Object.keys(flickSpec).forEach((dir: typeof OrderedFlickDirections[number]) => {
+      Object.keys(flickSpec).forEach((dir) => {
         const flickPreview = document.createElement('div');
         flickPreview.className = 'kmw-flick-preview kmw-key-text';
-        flickPreview.textContent = flickSpec[dir].text;
+        flickPreview.textContent = flickSpec[dir as typeof OrderedFlickDirections[number]].text;
 
         const ps /* preview style */ = flickPreview.style;
 
         // is in polar coords, origin toward north, clockwise.
-        const coords = FlickNameCoordMap.get(dir);
-        const x = -Math.sin(coords[0]); // Put 'e' flick at left
-        const y =  Math.cos(coords[0]); // Put 'n' flick at bottom
+        const coords = FlickNameCoordMap.get(dir as typeof OrderedFlickDirections[number]);
+
+        const x = coerceZeroes(-Math.sin(coords[0])); // Put 'e' flick at left
+        const y = coerceZeroes(Math.cos(coords[0])); // Put 'n' flick at bottom
 
         ps.width = '100%';
         ps.textAlign = 'center';
@@ -88,6 +95,7 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
 
         ps.height = '100%';
         ps.lineHeight = '100%';
+
         if(y < 0) {
           ps.bottom = (-y * FLICK_OVERFLOW_OFFSET * edgeLength) + 'px';
         } else if(y > 0) {
@@ -130,9 +138,15 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
     this.onCancel = handler;
   }
 
-  public setMultitapHint(current: string, next: string) {
+  public setMultitapHint(currentSrc: ActiveKeyBase, nextSrc: ActiveKeyBase, vkbd?: VisualKeyboard) {
+    const current = renameSpecialKey(currentSrc.text, vkbd);
+    const next    = renameSpecialKey(nextSrc.text, vkbd);
+
     this.label.textContent = current;
     this.hintLabel.textContent = next;
+
+    this.label.style.fontFamily     = (current != currentSrc.text) ? 'SpecialOSK' : currentSrc.font ?? this.label.style.fontFamily;
+    this.hintLabel.style.fontFamily = (next != nextSrc.text) ? 'SpecialOSK' : nextSrc.font ?? this.hintLabel.style.fontFamily;
 
     this.emit('startFade');
 
@@ -148,7 +162,7 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
     scrollStyle.marginLeft = `${edge * x}px`;
     scrollStyle.marginTop =  `${edge * y}px`;
 
-    const preferredOrientation = y < 0 ? 'bottom' : 'top';
+    const preferredOrientation = coerceZeroes(y) < 0 ? 'bottom' : 'top';
     if(this.orientation != preferredOrientation) {
       this.orientation = preferredOrientation;
       this.emit('preferredOrientation', preferredOrientation);

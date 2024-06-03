@@ -85,7 +85,7 @@ export class HeadlessInputEngine<Type = any> extends InputEngineBase<Type> {
     const playbackTerminations = recordedObj.inputs.map((recording, index) => this.playbackTerminations(sources[index], recording));
 
     playbackStarts.forEach((promise) => promise.then(() => {
-        this.maintainTouchpointsWithIds(playbackStartTuples.map((tuple) => tuple.internal_id));
+        this.maintainTouchpoints(playbackStartTuples.map((tuple) => tuple.source));
       })
     );
 

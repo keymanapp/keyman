@@ -74,10 +74,14 @@ export class ElementString extends Array<ElemElement> {
         typeFlag |= constants.elem_flags_type_uset;
         // TODO-LDML: err on max buffer size
         const needRanges = sections.usetparser.sizeUnicodeSet(item.segment);
+        if (needRanges < 0) {
+          // Note that sizeUnicodeSet() already will notify via callback if there's an
+          // error. So we can just exit here.
+          return null; // UnicodeSet error
+        }
         const uset = sections.usetparser.parseUnicodeSet(item.segment, needRanges);
         if (!uset) {
-          // TODO-LDML - error callback
-          throw Error(`Could not parse uset ${item.segment}`);
+          return null; // UnicodeSet error already thrown
         }
         elem.uset = sections.uset.allocUset(uset, sections);
         elem.value = sections.strs.allocString('', {singleOk: true}); // no string

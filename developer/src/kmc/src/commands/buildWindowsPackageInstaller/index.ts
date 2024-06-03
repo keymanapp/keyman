@@ -4,6 +4,7 @@ import { CompilerCallbacks, defaultCompilerOptions } from '@keymanapp/common-typ
 import { NodeCompilerCallbacks } from '../../util/NodeCompilerCallbacks.js';
 import { WindowsPackageInstallerCompiler, WindowsPackageInstallerSources } from '@keymanapp/kmc-package';
 import { CommandLineBaseOptions } from 'src/util/baseOptions.js';
+import { exitProcess } from '../../util/sysexits.js';
 
 interface WindowsPackageInstallerCommandLineOptions extends CommandLineBaseOptions {
   msi: string;
@@ -15,7 +16,7 @@ interface WindowsPackageInstallerCommandLineOptions extends CommandLineBaseOptio
   startWithConfiguration: boolean;
 };
 
-export async function buildWindowsPackageInstaller(infile: string, _options: any, commander: any) {
+export async function buildWindowsPackageInstaller(infile: string, _options: any, commander: any): Promise<never|void> {
   // TODO(lowpri): we probably should cleanup the options management here, move
   // translation of command line options to kmc-* options into a separate module
   const options: WindowsPackageInstallerCommandLineOptions = commander.optsWithGlobals();
@@ -38,7 +39,7 @@ export async function buildWindowsPackageInstaller(infile: string, _options: any
   const callbacks: CompilerCallbacks = new NodeCompilerCallbacks({...defaultCompilerOptions, ...options});
   const compiler = new WindowsPackageInstallerCompiler();
   if(!await compiler.init(callbacks, {...options, sources})) {
-    process.exit(1);
+    return await exitProcess(1);
   }
 
   const fileBaseName = outfile ?? infile;
@@ -49,10 +50,10 @@ export async function buildWindowsPackageInstaller(infile: string, _options: any
   const result = await compiler.run(infile, outFileExe);
   if(!result) {
     // errors will have been reported already
-    process.exit(1);
+    return await exitProcess(1);
   }
 
   if(!await compiler.write(result.artifacts)) {
-    process.exit(1);
+    return await exitProcess(1);
   }
 }

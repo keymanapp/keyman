@@ -9,7 +9,7 @@
 #pragma once
 
 #include <string>
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
 #include "kmx/kmx_processevent.h"
 #include "keyboard.hpp"
 #include "processor.hpp"
@@ -80,6 +80,10 @@ namespace core
 
     km_core_keyboard_imx * get_imx_list() const override;
 
+    bool
+    supports_normalization() const override {
+      return false;
+    }
   };
 
 } // namespace core

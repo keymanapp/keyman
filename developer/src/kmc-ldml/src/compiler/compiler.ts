@@ -18,13 +18,15 @@ import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
 import { KmnCompiler } from '@keymanapp/kmc-kmn';
 import { KMXPlusMetadataCompiler } from './metadata-compiler.js';
 import { LdmlKeyboardVisualKeyboardCompiler } from './visual-keyboard-compiler.js';
-import { LdmlKeyboardKeymanWebCompiler } from './keymanweb-compiler.js';
+//KMW17.0: import { LdmlKeyboardKeymanWebCompiler } from './keymanweb-compiler.js';
 
 export const SECTION_COMPILERS = [
   // These are in dependency order.
 
   // First the former 'global' sections
   StrsCompiler,
+  // meta depends on strs, but potentially needed by anything else using strs
+  MetaCompiler,
   ListCompiler,
   ElemCompiler,
   UsetCompiler,
@@ -36,20 +38,45 @@ export const SECTION_COMPILERS = [
   KeysCompiler,
   LayrCompiler,
   LocaCompiler,
-  MetaCompiler,
   TranCompiler,
 ];
 
+/**
+ * @public
+ * Internal in-memory build artifacts from a successful compilation
+ */
 export interface LdmlKeyboardCompilerArtifacts extends KeymanCompilerArtifacts {
+  /**
+   * Binary keyboard filedata and filename - installable into Keyman desktop
+   * projects
+   */
   kmx?: KeymanCompilerArtifactOptional;
+  /**
+   * Binary on screen keyboard filedata and filename - installable into Keyman
+   * desktop projects alongside .kmx
+   */
   kvk?: KeymanCompilerArtifactOptional;
+  /**
+   * Javascript keyboard filedata and filename - installable into KeymanWeb,
+   * Keyman mobile products
+   */
   js?: KeymanCompilerArtifactOptional;
 };
 
 export interface LdmlKeyboardCompilerResult extends KeymanCompilerResult {
+  /**
+   * Internal in-memory build artifacts from a successful compilation. Caller
+   * can write these to disk with {@link LdmlKeyboardCompiler.write}
+   */
   artifacts: LdmlKeyboardCompilerArtifacts;
 };
 
+/**
+ * @public
+ * Compiles a LDML keyboard .xml file to a .kmx (KMXPlus), .kvk, and/or .js. The
+ * compiler does not read or write from filesystem or network directly, but
+ * relies on callbacks for all external IO.
+ */
 export class LdmlKeyboardCompiler implements KeymanCompiler {
   private callbacks: CompilerCallbacks;
   private options: LdmlCompilerOptions;
@@ -57,12 +84,31 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
   // uset parser
   private usetparser?: UnicodeSetParser = undefined;
 
+  /**
+   * Initialize the compiler, including loading the WASM host for uset parsing.
+   * Copies options.
+   * @param callbacks - Callbacks for external interfaces, including message
+   *                    reporting and file io
+   * @param options   - Compiler options
+   * @returns           false if initialization fails
+   */
   async init(callbacks: CompilerCallbacks, options: LdmlCompilerOptions): Promise<boolean> {
     this.options = {...options};
     this.callbacks = callbacks;
     return true;
   }
 
+  /**
+   * Compiles a LDML keyboard .xml file to .kmx, .kvk, and/or .js files. Returns
+   * an object containing binary artifacts on success. The files are passed in
+   * by name, and the compiler will use callbacks as passed to the
+   * {@link LdmlKeyboardCompiler.init} function to read any input files by disk.
+   * @param infile  - Path to source file.
+   * @param outfile - Path to output file. The file will not be written to, but
+   *                  will be included in the result for use by
+   *                  {@link LdmlKeyboardCompiler.write}.
+   * @returns         Binary artifacts on success, null on failure.
+   */
   async run(inputFilename: string, outputFilename?: string): Promise<LdmlKeyboardCompilerResult> {
 
     let compilerOptions: LdmlCompilerOptions = {
@@ -97,10 +143,11 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
     // const tlcompiler = new kmc.TouchLayoutCompiler();
     // const tl = tlcompiler.compile(source);
     // const tlwriter = new TouchLayoutFileWriter();
-    const kmwcompiler = new LdmlKeyboardKeymanWebCompiler(this.callbacks, compilerOptions);
-    const kmw_string = kmwcompiler.compile(inputFilename, source);
-    const encoder = new TextEncoder();
-    const kmw_binary = encoder.encode(kmw_string);
+
+    //KMW17.0: const kmwcompiler = new LdmlKeyboardKeymanWebCompiler(this.callbacks, compilerOptions);
+    //KMW17.0: const kmw_string = kmwcompiler.compile(inputFilename, source);
+    //KMW17.0: const encoder = new TextEncoder();
+    //KMW17.0: const kmw_binary = encoder.encode(kmw_string);
 
     outputFilename = outputFilename ?? inputFilename.replace(/\.xml$/, '.kmx');
 
@@ -108,11 +155,22 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
       artifacts: {
         kmx: { data: kmx_binary, filename: outputFilename },
         kvk: { data: kvk_binary, filename: outputFilename.replace(/\.kmx$/, '.kvk') },
-        js: { data: kmw_binary, filename: outputFilename.replace(/\.kmx$/, '.js') },
+        //KMW17.0: js: { data: kmw_binary, filename: outputFilename.replace(/\.kmx$/, '.js') },
       }
     };
   }
 
+  /**
+   * Write artifacts from a successful compile to disk, via callbacks methods.
+   * The artifacts written may include:
+   *
+   * - .kmx file - binary keyboard used by Keyman on desktop platforms
+   * - .kvk file - binary on screen keyboard used by Keyman on desktop platforms
+   * - .js file - Javascript keyboard for web and touch platforms
+   *
+   * @param artifacts - object containing artifact binary data to write out
+   * @returns true on success
+   */
   async write(artifacts: LdmlKeyboardCompilerArtifacts): Promise<boolean> {
     if(artifacts.kmx) {
       this.callbacks.fs.writeFileSync(artifacts.kmx.filename, artifacts.kmx.data);
@@ -130,6 +188,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
   }
 
   /**
+   * @internal
    * Construct or return a UnicodeSetParser, aka KmnCompiler
    * @returns the held UnicodeSetParser
    */
@@ -153,10 +212,11 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
   }
 
   /**
+   * @internal
    * Loads a LDML Keyboard xml file and compiles into in-memory xml
    * structures.
-   * @param filename  input filename, will use callback to load from disk
-   * @returns the source file, or null if invalid
+   * @param filename - input filename, will use callback to load from disk
+   * @returns          the source file, or null if invalid
    */
   public load(filename: string): LDMLKeyboardXMLSourceFile | null {
     const reader = new LDMLKeyboardXMLSourceFileReader(this.options.readerOptions, this.callbacks);
@@ -186,54 +246,57 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
   }
 
   /**
+   * @internal
    * Loads a LDML Keyboard test data xml file and compiles into in-memory xml
    * structures.
-   * @param filename  input filename, will use callback to load from disk
-   * @returns the source file, or null if invalid
+   * @param filename - input filename, will use callback to load from disk
+   * @returns          the source file, or null if invalid
    */
-    public loadTestData(filename: string): LDMLKeyboardTestDataXMLSourceFile | null {
-      const reader = new LDMLKeyboardXMLSourceFileReader(this.options.readerOptions, this.callbacks);
-      const data = this.callbacks.loadFile(filename);
-      if(!data) {
-        this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: 'Unable to read XML file'}));
-        return null;
-      }
-      const source = reader.loadTestData(data);
-      /* c8 ignore next 4 */
-      if(!source) {
-        this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: 'Unable to load XML file'}));
-        return null;
-      }
-      // TODO-LDML: The unboxed data doesn't match the schema anymore. Skipping validation, for now.
-
-      // try {
-      //   if (!reader.validate(source)) {
-      //     return null;
-      //   }
-      // } catch(e) {
-      //   this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: e.toString()}));
-      //   return null;
-      // }
-
-      return source;
+  public loadTestData(filename: string): LDMLKeyboardTestDataXMLSourceFile | null {
+    const reader = new LDMLKeyboardXMLSourceFileReader(this.options.readerOptions, this.callbacks);
+    const data = this.callbacks.loadFile(filename);
+    if(!data) {
+      this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: 'Unable to read XML file'}));
+      return null;
     }
+    const source = reader.loadTestData(data);
+    /* c8 ignore next 4 */
+    if(!source) {
+      this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: 'Unable to load XML file'}));
+      return null;
+    }
+    // TODO-LDML: The unboxed data doesn't match the schema anymore. Skipping validation, for now.
+
+    // try {
+    //   if (!reader.validate(source)) {
+    //     return null;
+    //   }
+    // } catch(e) {
+    //   this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: e.toString()}));
+    //   return null;
+    // }
+
+    return source;
+  }
 
 
   /**
+   * @internal
    * Validates that the LDML keyboard source file and lints. Actually just
    * compiles the keyboard and returns `true` if everything is good...
-   * @param     source
-   * @returns   true if the file validates
+   * @param   source - in-memory representation of LDML keyboard xml file
+   * @returns          true if the file validates
    */
   public async validate(source: LDMLKeyboardXMLSourceFile): Promise<boolean> {
     return !!(await this.compile(source, true));
   }
 
   /**
+   * @internal
    * Transforms in-memory LDML keyboard xml file to an intermediate
    * representation of a .kmx file.
-   * @param   source  in-memory representation of LDML keyboard xml file
-   * @returns         KMXPlusFile intermediate file
+   * @param   source - in-memory representation of LDML keyboard xml file
+   * @returns          KMXPlusFile intermediate file
    */
   public async compile(source: LDMLKeyboardXMLSourceFile, postValidate?: boolean): Promise<KMXPlus.KMXPlusFile> {
     const sections = this.buildSections(source);
@@ -280,11 +343,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
       }
       const sect = section.compile(globalSections);
 
-      /* c8 ignore next 7 */
       if(!sect) {
-        // This should not happen -- validate() should have told us
-        // if something is going to fail to compile
-        this.callbacks.reportMessage(CompilerMessages.Fatal_SectionCompilerFailed({sect:section.id}));
         passed = false;
         continue;
       }

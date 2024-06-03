@@ -7,6 +7,7 @@ import { GestureHandler } from '../gestureHandler.js';
 import { distributionFromDistanceMaps } from '@keymanapp/input-processor';
 import { GestureParams } from '../specsForLayout.js';
 import { GesturePreviewHost } from '../../../keyboard-layout/gesturePreviewHost.js';
+import { TouchLayout } from '@keymanapp/common-types';
 
 export const OrderedFlickDirections = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] as const;
 
@@ -118,7 +119,7 @@ export default class Flick implements GestureHandler {
     let source: GestureSource<KeyElement> = baseSource;
 
     sequence.on('complete', () => {
-      previewHost.cancel()
+      previewHost?.cancel()
     });
 
     this.sequence.on('stage', (result) => {
@@ -164,7 +165,7 @@ export default class Flick implements GestureHandler {
         }
 
         const dir = Object.keys(this.baseSpec.flick).find(
-          (dir) => this.baseSpec.flick[dir] == baseSelection
+          (dir) => this.baseSpec.flick[dir as keyof TouchLayout.TouchLayoutFlick] == baseSelection
         ) as typeof OrderedFlickDirections[number];
 
         this.lockedDir = dir;
@@ -270,10 +271,10 @@ export default class Flick implements GestureHandler {
       coord: [NaN, 0]
     }];
 
-    keys = keys.concat(Object.keys(flickSet).map((dir: (typeof OrderedFlickDirections[number])) => {
+    keys = keys.concat(Object.keys(flickSet).map((dir) => {
       return {
-        spec: flickSet[dir] as ActiveSubKey,
-        coord: FlickNameCoordMap.get(dir)
+        spec: flickSet[dir as typeof OrderedFlickDirections[number]] as ActiveSubKey,
+        coord: FlickNameCoordMap.get(dir as typeof OrderedFlickDirections[number])
       };
     }));
 

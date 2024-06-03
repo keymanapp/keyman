@@ -1,0 +1,74 @@
+/* Message displayed to confirm delete of the Keyman keyboard selected by the user from the keyboard list  */
+"message-confirm-delete-keyboard" = "Sind Sie sicher, dass Sie die Tastatur '%@ ' löschen möchten?";
+
+/* Delete keyboard confirmation info indicating that the delete action cannot be undone  */
+"info-cannot-undo-delete-keyboard" = "Diese Aktion kann nicht rückgängig gemacht werden.";
+
+/* Button text to cancel delete of the specified installed Keyman keyboard  */
+"button-cancel-delete-keyboard" = "Abbrechen";
+
+/* Button text to confirm delete of the specified installed Keyman keyboard  */
+"button-delete-keyboard" = "Löschen";
+
+/* Message displayed to confirm installation of a keyboard from the specifed .kmp file double-clicked by the user  */
+"message-confirm-install-keyboard" = "Keyman Tastatur installieren?";
+
+/* Message displayed to confirm installation of a keyboard from the specifed .kmp file double-clicked by the user  */
+"info-install-keyboard-filename" = "Möchten Sie, dass Keyman die Tastatur aus der Datei '%@ ' installiert?";
+
+/* Button text to cancel installation of the double-clicked Keyman file  */
+"button-cancel-install-keyboard" = "Abbrechen";
+
+/* Button text to confirm installation of the double-clicked Keyman file  */
+"button-install-keyboard" = "Installieren";
+
+/* Message displayed to inform user that .kmp file could not be read/unzipped  */
+"message-keyboard-file-unreadable" = "Die Keyman-Datei '%@ ' konnte nicht gelesen werden.";
+
+/* Message displayed in Configuration window when keyboard cannot be loaded */
+"message-error-loading-keyboard" = "(Fehler beim Laden der Tastatur)";
+
+/* Message displayed in Configuration window when keyboard metadata cannot be loaded */
+"message-error-unknown-metadata" = "unbekannt";
+
+/* Button text to acknowledge that .kmp file could not be read  */
+"button-keyboard-file-unreadable" = "OK";
+
+/* label text to identify Keyman version */
+"version-label-text" = "Version %@";
+
+/* Status text for keyboard downloading  */
+"message-keyboard-downloading" = "Wird heruntergeladen...";
+
+/* Status text for keyboard download complete  */
+"message-keyboard-download-complete" = "Download abgeschlossen.";
+
+/* Button text to cancel downloading keyboard  */
+"button-cancel-downloading" = "Abbrechen";
+
+/* Button text keyboard download complete  */
+"button-download-complete" = "Fertig";
+
+/* keyboards label in the Package Information window */
+"keyboards-label" = "Tastaturen:";
+
+/* fonts label in the Package Information window */
+"fonts-label" = "Schriftarten:";
+
+/* package version label in the Package Information window */
+"package-version-label" = "Paketversion:";
+
+/* author label in the Package Information window */
+"author-label" = "Autor:";
+
+/* website label in the Package Information window */
+"website-label" = "Webseite:";
+
+/* copyright label in the Package Information window */
+"copyright-label" = "Copyright:";
+
+/* message displayed to alert user to need grant accessibility permission */
+"privacy-alert-text" = "Um richtig zu funktionieren, benötigt Keyman Funktionen zur Barrierefreiheit:\n\nDazu in den Systemeinstellungen, Sicherheit & Privatsphäre den Zugriff gewähren.\nStarten Sie anschließend Ihr System neu.";
+
+/* Text of menu item in Input Menu when no Keyboards are configured -- include parentheses  */
+"no-keyboard-configured-menu-placeholder" = "(Keine Tastatur konfiguriert)";

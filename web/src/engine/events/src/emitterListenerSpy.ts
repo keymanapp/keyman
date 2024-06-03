@@ -1,4 +1,7 @@
-import EventEmitter, { EventNames, EventListener } from "eventemitter3";
+import { EventEmitter } from "eventemitter3";
+import EventNames = EventEmitter.EventNames;
+import EventListener = EventEmitter.EventListener;
+
 import { LegacyEventEmitter } from "./legacyEventEmitter.js";
 
 interface EventMap<BaseEventMap extends Object> {
@@ -9,14 +12,14 @@ interface EventMap<BaseEventMap extends Object> {
    * EventEmitter being spied upon.
    * @param eventName
    */
-  listeneradded(eventName: EventNames<BaseEventMap>);
+  listeneradded(eventName: EventNames<BaseEventMap>): void;
 
   /**
    * Indicates that a listener for the named event has been unregistered from the
    * EventEmitter being spied upon.
    * @param eventName
    */
-  listenerremoved(eventName: EventNames<BaseEventMap>);
+  listenerremoved(eventName: EventNames<BaseEventMap>): void;
 }
 
 type Emitter<BaseEventMap extends Object> = EventEmitter<BaseEventMap> | LegacyEventEmitter<BaseEventMap>;

@@ -1,7 +1,7 @@
 import { type Keyboard, KeyboardScriptError } from '@keymanapp/keyboard-processor';
 import { type KeyboardStub } from 'keyman/engine/package-cache';
 import { CookieSerializer } from 'keyman/engine/dom-utils';
-import { eventOutputTarget, PageContextAttachment } from 'keyman/engine/attachment';
+import { eventOutputTarget, outputTargetForElement, PageContextAttachment } from 'keyman/engine/attachment';
 import { DomEventTracker, LegacyEventEmitter } from 'keyman/engine/events';
 import { DesignIFrame, OutputTarget, nestedInstanceOf } from 'keyman/engine/element-wrappers';
 import {
@@ -122,6 +122,10 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
             this.domEventTracker.attachDOMEvent(Lelem.body,'blur', this._ControlBlur);
           }
         }
+
+        if(elem.ownerDocument.activeElement == elem) {
+          this.setActiveTarget(outputTargetForElement(elem), true);
+        }
       });
 
       // For any elements being detached, disabled, or deliberately not being attached (b/c nonKMWTouchHandler)...
@@ -223,7 +227,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     }
   }
 
-  public setActiveTarget(target: OutputTarget<any>, sendEvents: boolean) {
+  public setActiveTarget(target: OutputTarget<any>, sendEvents?: boolean) {
     const previousTarget = this.mostRecentTarget;
     const originalTarget = this.activeTarget; // may differ, depending on focus state.
 
@@ -279,28 +283,47 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     // Always do the common focus stuff, instantly returning if we're in an editable iframe.
     if(this._CommonFocusHelper(target)) {
-      return true;
+      return;
     };
 
     // Set element directionality (but only if element is empty)
-    let Ltarg = target?.getElement();
+    let focusedElement = target?.getElement();
     if(target instanceof DesignIFrame) {
-      Ltarg = target.docRoot;
+      focusedElement = target.docRoot;
     }
-    if(Ltarg && Ltarg.ownerDocument && Ltarg instanceof Ltarg.ownerDocument.defaultView.HTMLElement) {
-      _SetTargDir(Ltarg, this.activeKeyboard?.keyboard);
+    if(focusedElement && focusedElement.ownerDocument && focusedElement instanceof focusedElement.ownerDocument.defaultView.HTMLElement) {
+      _SetTargDir(focusedElement, this.activeKeyboard?.keyboard);
     }
 
     if(target != originalTarget) {
       this.emit('targetchange', target);
     }
 
+    //Execute external (UI) code needed on focus if required
     if(sendEvents) {
-      // //Execute external (UI) code needed on focus if required
-      this.apiEvents.callEvent('controlfocused', {
-        target: target?.getElement() || null,
-        activeControl: previousTarget?.getElement()
-      });
+      let blurredElement = previousTarget?.getElement();
+      if(previousTarget instanceof DesignIFrame) {
+        blurredElement = previousTarget.docRoot;
+      }
+
+      if(!focusedElement) {
+        if(blurredElement) {
+          this.apiEvents.callEvent('controlblurred', {
+            target: blurredElement,
+            event: null,
+            isActivating: this.focusAssistant.maintainingFocus
+          });
+        }
+      } else {
+        // Note:  indicates the previous control being blurred (as
+        // `activeControl`). 'controlfocused' and 'controlblurred' are
+        // treated as mutually exclusive, with the latter only happening
+        // when nothing KMW-related is focused.
+        this.apiEvents.callEvent('controlfocused', {
+          target: focusedElement,
+          activeControl: blurredElement
+        });
+      }
     }
   }
 
@@ -780,7 +803,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   /**
    * Restore the most recently used keyboard, if still available
    */
-  restoreSavedKeyboard(kbd) {
+  restoreSavedKeyboard(kbd: string) {
     // If no saved keyboard, defaults to US English
     const d=kbd;
 
@@ -795,7 +818,9 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     // Sets the default stub (as specified with the `getSavedKeyboard` call) as active.
     if(stub) {
-      this.activateKeyboard(t[0], t[1]);
+      return this.activateKeyboard(stub.id, stub.langId);
+    } else {
+      return null;
     }
   }
 

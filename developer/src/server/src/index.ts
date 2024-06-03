@@ -5,6 +5,7 @@ import * as ws from 'ws';
 import * as os from 'os';
 import multer from 'multer';
 import * as fs from 'fs';
+import * as path from 'path';
 import setupRoutes from './routes.js';
 import { configuration } from './config.js';
 import { initTray } from './tray.js';
@@ -32,32 +33,21 @@ try {
 await KeymanSentry.close();
 
 export async function run() {
-  // This triggers the exit event for Ctrl+C which allows us to cleanup
-  // consistently
-  process.on('SIGINT', shutdown);
+  /* Ensure single instance */
+
+  if(!writeLockFile()) {
+    return;
+  }
+
+  /* Setup the tray */
 
   const tray = await initTray();
 
-  if(fs.existsSync(configuration.lockFilename)) {
-    // Attempt connection to existing port
-
-    // If that fails, we'll assume the previous process died and delete the lockfile.
-  }
-
-  // TODO: flock with fs-ext
-  let lockFileDescriptor = fs.openSync(configuration.lockFilename, 'w');
-  fs.writeFileSync(configuration.pidFilename, process.pid.toString());
-  fs.writeFileSync(lockFileDescriptor, process.pid.toString());
-
-  process.on('exit', () => {
-    if(fs.existsSync(configuration.pidFilename)) {
-      fs.unlinkSync(configuration.pidFilename);
-    }
-    if(lockFileDescriptor) {
-      fs.closeSync(lockFileDescriptor);
-      lockFileDescriptor = null;
-      fs.unlinkSync(configuration.lockFilename);
-    }
+  // This triggers the exit event for Ctrl+C which allows us to cleanup
+  // consistently
+  process.on('SIGINT', () => {
+    tray.shutdown();
+    shutdown();
   });
 
   /* Server Setup */
@@ -83,7 +73,13 @@ export async function run() {
 
   /* Start the server */
 
-  const server = app.listen(configuration.port);
+  let server = null;
+  try {
+    server = app.listen(configuration.port);
+  } catch(err) {
+    console.error(err);
+    // TODO handle and cleanup EADDRINUSE, throw anything else
+  }
 
   server.on('upgrade', (request, socket, head) => {
     wsServer.handleUpgrade(request, socket, head, socket => {
@@ -95,15 +91,16 @@ export async function run() {
 
   configuration.ngrokEndpoint = '';
 
-  if(configuration.useNgrok && os.platform() == 'win32' && fs.existsSync(configuration.ngrokBinPath)) {
+  if(configuration.useNgrok
+    && os.platform() == 'win32'
+    && fs.existsSync(path.join(configuration.ngrokBinPath, 'ngrok.exe'))
+  ) {
     const ngrok: any = await import('ngrok');
     (async function() {
       configuration.ngrokEndpoint = await ngrok.connect({
         proto: 'http',
-        bind_tls: true,
         addr: configuration.port,
         authtoken: configuration.ngrokToken,
-        region: configuration.ngrokRegion,
         binPath: () => configuration.ngrokBinPath,
         onLogEvent: (msg: string) => {
           if(options.ngrokLog) {
@@ -132,4 +129,68 @@ export async function run() {
     /* Load the tray icon */
     tray.start(configuration.port, configuration.ngrokEndpoint);
   }
+}
+
+function getRunningInstancePid(pidFilename: string) {
+  try {
+    return fs.readFileSync(pidFilename, 'utf-8');
+  } catch(err) {
+    return null;
+  }
+}
+
+function writeLockFile() {
+  const lockFilename = configuration.lockFilename.replaceAll(/[\\\/]/g, path.sep);
+  const pidFilename = configuration.pidFilename.replaceAll(/[\\\/]/g, path.sep);
+
+  // console.debug(`Testing existence of ${lockFilename}`);
+  if(fs.existsSync(lockFilename)) {
+    // If that fails, we'll assume the previous process died and delete the lockfile.
+    try {
+      // console.debug(`Attempting to delete.`);
+      fs.unlinkSync(lockFilename);
+      if(fs.existsSync(lockFilename)) {
+        // console.debug(`Unlink silently failed`);
+        console.warn(`Lock file cannot be deleted, probably owned by ${getRunningInstancePid(pidFilename) ?? 'unknown instance'}`);
+        return false;
+      }
+    } catch(err) {
+      // assume that it is actually locked!
+      console.warn(`Lock file cannot be deleted, probably owned by ${getRunningInstancePid(pidFilename) ?? 'unknown instance'}\n  ${err}`);
+      return false;
+    }
+  }
+
+  // console.debug('Creating lock file');
+  let lockFileDescriptor: number = null;
+  try {
+    lockFileDescriptor = fs.openSync(lockFilename, 'w');
+  } catch(err) {
+    console.warn(`Lock file could not be created, assuming another instance already running, probably ${getRunningInstancePid(pidFilename) ?? 'unknown instance'}\n  ${err}`);
+    return false;
+  }
+  // console.debug(`Lock file descriptor: ${lockFileDescriptor}, pid ${process.pid.toString()}`);
+
+  fs.writeFileSync(pidFilename, process.pid.toString());
+  fs.writeFileSync(lockFileDescriptor, process.pid.toString());
+
+  process.on('exit', () => {
+    if(fs.existsSync(pidFilename)) {
+      fs.unlinkSync(pidFilename);
+    }
+    if(lockFileDescriptor) {
+      fs.closeSync(lockFileDescriptor);
+      lockFileDescriptor = null;
+      try {
+        fs.unlinkSync(lockFilename);
+      } catch(err) {
+        // This can happen if an unlink call is made on a file with an open
+        // descriptor, such as happens above; when the file is closed it is
+        // automatically deleted. On Windows at least.
+        //
+        // console.debug(`Did not unlink ${lockFilename}, probably already deleted`);
+      }
+    }
+  });
+  return true;
 }

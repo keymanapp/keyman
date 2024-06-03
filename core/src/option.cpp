@@ -32,8 +32,8 @@ option::option(km_core_option_scope s, char16_t const *k, char16_t const *v)
   {
     auto n_k = std::char_traits<char16_t>::length(k)+1,
          n_v = std::char_traits<char16_t>::length(v)+1;
-    auto _key = new km_core_cp[n_k],
-         _val = new km_core_cp[n_v];
+    auto _key = new km_core_cu[n_k],
+         _val = new km_core_cu[n_v];
     std::copy_n(k, n_k, _key);
     std::copy_n(v, n_v, _val);
 

@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardDownloa
         context = this;
 
         SentryAndroid.init(context, options -> {
+            options.setEnableAutoSessionTracking(false);
             options.setRelease(com.firstvoices.keyboards.BuildConfig.VERSION_GIT_TAG);
             options.setEnvironment(com.firstvoices.keyboards.BuildConfig.VERSION_ENVIRONMENT);
         });

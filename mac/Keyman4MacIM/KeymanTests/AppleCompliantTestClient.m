@@ -12,7 +12,7 @@
 @implementation AppleCompliantTestClient
 
 - (NSAttributedString*)attributedSubstringFromRange:(NSRange)range {
-    return [[NSAttributedString alloc] initWithString:[super substringFromRangeProtected:range]];
+  return [[NSAttributedString alloc] initWithString:[super substringFromRangeProtected:range]];
 }
 
 @end

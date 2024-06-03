@@ -3,15 +3,12 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 SUBPROJECT_NAME=app/webview
 . "$KEYMAN_ROOT/web/common.inc.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
 
 # ################################ Main script ################################
 
@@ -72,12 +69,18 @@ compile_and_copy() {
   cp -R "$KEYMAN_ROOT/web/src/resources/osk/." "$KEYMAN_ROOT/web/build/app/resources/osk/"
 
   # Clean the sourcemaps of .. and . components
-  for sourcemap in "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME/debug/"*.map; do
-    node "$KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js" null "$sourcemap" --clean
+  for script in "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME/debug/"*.js; do
+    sourcemap="$script.map"
+    node "$KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js" \
+      "$script" "$sourcemap" --clean --inline
   done
 
-  for sourcemap in "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME/release/"*.map; do
-    node "$KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js" null "$sourcemap" --clean
+  # Do NOT inline sourcemaps for release builds - we don't want them to affect
+  # load time.
+  for script in "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME/release/"*.js; do
+    sourcemap="$script.map"
+    node "$KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js" \
+      "$script" "$sourcemap" --clean
   done
 
   node map-polyfill-bundler.js

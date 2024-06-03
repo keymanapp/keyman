@@ -5,8 +5,10 @@ import { CompilerCallbacks, defaultCompilerOptions, LDMLKeyboardTestDataXMLSourc
 import { NodeCompilerCallbacks } from '../../util/NodeCompilerCallbacks.js';
 import { fileURLToPath } from 'url';
 import { CommandLineBaseOptions } from 'src/util/baseOptions.js';
+import { exitProcess } from '../../util/sysexits.js';
+import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
 
-export async function buildTestData(infile: string, _options: any, commander: any) {
+export async function buildTestData(infile: string, _options: any, commander: any): Promise<void> {
   const options: CommandLineBaseOptions = commander.optsWithGlobals();
 
   let compilerOptions: kmcLdml.LdmlCompilerOptions = {
@@ -19,21 +21,22 @@ export async function buildTestData(infile: string, _options: any, commander: an
     }
   };
 
-  let testData = await loadTestData(infile, compilerOptions);
-  if (!testData) {
-    return;
+  const callbacks = new NodeCompilerCallbacks(options);
+
+  let testData = await loadTestData(infile, callbacks, compilerOptions);
+  if (!testData || callbacks.hasFailureMessage()) {
+    await exitProcess(1);
   }
 
   const fileBaseName = options.outFile ?? infile;
   const outFileBase = path.basename(fileBaseName, path.extname(fileBaseName));
   const outFileDir = path.dirname(fileBaseName);
   const outFileJson = path.join(outFileDir, outFileBase + '.json');
-  console.log(`Writing JSON test data to ${outFileJson}`);
   fs.writeFileSync(outFileJson, JSON.stringify(testData, null, '  '));
+  callbacks.reportMessage(InfrastructureMessages.Info_FileBuiltSuccessfully({filename: outFileJson, relativeFilename:  infile}));
 }
 
-async function loadTestData(inputFilename: string, options: kmcLdml.LdmlCompilerOptions): Promise<LDMLKeyboardTestDataXMLSourceFile> {
-  const callbacks: CompilerCallbacks = new NodeCompilerCallbacks(options);
+async function loadTestData(inputFilename: string, callbacks: CompilerCallbacks, options: kmcLdml.LdmlCompilerOptions): Promise<LDMLKeyboardTestDataXMLSourceFile> {
   const k = new kmcLdml.LdmlKeyboardCompiler();
   if(!await k.init(callbacks, options)) {
     return null;

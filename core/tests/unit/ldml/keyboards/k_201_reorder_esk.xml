@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!--
-  Test Keyboard from Spec
-  see https://keyman.com/keyboards/sil_boonkit
--->
-
-<!DOCTYPE keyboard3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
-<keyboard3 locale="en-t-k0-esk" conformsTo="techpreview">
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="en-t-k0-esk" conformsTo="45">
   <info author="srl295" indicator="🙀" layout="qwerty"  name="esk reorder test"/>
 
   <displays>
@@ -19,6 +13,10 @@
     <key id="overbar" output="${overbar}" />
     <key id="underbar" output="${underbar}" />
     <key id="circumflex" output="${circumflex}" />
+    <key id="test0" output="ax${overbar}" />
+    <key id="markertest0" output="a\m{m4}x\m{marker0}${overbar}" />
+    <key id="test1" output="az${overbar}x${underbar}" />
+    <key id="markertest1" output="a\m{m0}z\m{m1}${overbar}\m{m2}x\m{m3}${underbar}\m{m3}" />
   </keys>
 
   <layers formId="us">
@@ -28,6 +26,12 @@
       <row keys="a" />
       <row keys="z x" />
       <row keys="space" />
+    </layer>
+    <layer modifiers="shift">
+      <row keys="gap test0 test1" />
+    </layer>
+    <layer modifiers="altR shift">
+      <row keys="gap markertest0 markertest1" />
     </layer>
   </layers>
 

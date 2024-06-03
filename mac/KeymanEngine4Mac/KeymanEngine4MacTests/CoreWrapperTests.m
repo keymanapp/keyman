@@ -1,11 +1,11 @@
 /**
  * Keyman is copyright (C) SIL International. MIT License.
- * 
+ *
  * CoreWrapperTest.m
  * CoreWrapperTests
- * 
+ *
  * Created by Shawn Schantz on 2023-02-17.
- * 
+ *
  * Description...
  */
 
@@ -15,6 +15,7 @@
 #import "CoreTestStaticHelperMethods.h"
 #import "CoreAction.h"
 #import "MacVKCodes.h"
+#import "KMELogs.h"
 
 @interface CoreWrapperTests : XCTestCase
 
@@ -27,14 +28,14 @@ CoreWrapper *mockWrapper;
 
 + (void)setUp {
   NSString *khmerKeyboardPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"khmer_angkor.kmx"];
-
-  NSLog(@"mockKmxFilePath  = %@\n", mockKmxFilePath);
   
+  os_log_debug([KMELogs testLog], "mockKmxFilePath  = %@\n", mockKmxFilePath);
+
   mockWrapper = [[CoreWrapper alloc] initWithHelper: [CoreTestStaticHelperMethods helper] kmxFilePath:mockKmxFilePath];
 }
 
 - (void)tearDown {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
+  // Put teardown code here. This method is called after the invocation of each test method in the class.
 }
 
 - (void)testCreateWrapper_mockKeyboardPath_noException {
@@ -66,9 +67,11 @@ CoreWrapper *mockWrapper;
 - (void)testgetContextAsString_ContextContainsEmojis_ReturnsSameContext  {
   NSString *kmxPath = [CoreTestStaticHelperMethods getKmxFilePathTestMacEngine];
   CoreWrapper *core = [[CoreWrapper alloc] initWithHelper: [CoreTestStaticHelperMethods helper] kmxFilePath:kmxPath];
-  [core setContext:@"🤔?👍🏻✅"];
-  NSString *finalContext = core.context;
-  XCTAssert([finalContext isEqualToString:@"🤔?👍🏻✅"], @"Expected '🤔?👍🏻✅' in context buffer");
+  [core setContextIfNeeded:@"🤔?👍🏻✅"];
+  NSString *finalContext = core.contextDebug;
+  // Note: relying on km_core_state_context_debug output format is just barely
+  // acceptable for a unit test
+  XCTAssert([finalContext isEqualToString:@"|🤔?👍🏻✅| (len: 5) [ U+1f914 U+003f U+1f44d U+1f3fb U+2705 ]"], @"Expected '🤔?👍🏻✅' in context buffer");
 }
 
 @end

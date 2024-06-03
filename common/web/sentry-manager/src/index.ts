@@ -8,6 +8,7 @@ import { default as SentryType } from '@sentry/browser';
 // a pre-bundled Sentry build artifact.
 let Sentry: {
   init: typeof SentryType.init;
+  // @ts-ignore
 } = window['Sentry'];
 
 /**
@@ -25,14 +26,16 @@ export class KeymanSentryManager {
   _enabled: boolean = true;
 
   static STANDARD_ALIASABLE_FILES = {
-    'keymanweb.js':     'keymanweb.js',
-    'keymanweb-webview.js': 'keymanweb-webview.js',
-    'kmwuibutton.js':   'kmwuibutton.js',
-    'kmwuifloat.js':    'kmwuifloat.js',
-    'kmwuitoggle.js':   'kmwuitoggle.js',
-    'kmwuitoolbar.js':  'kmwuitoolbar.js'
+    'keymanweb.js':             'keymanweb.js',
+    'keymanweb-webview.js':     'keymanweb-webview.js',
+    'keymanweb.es5.js':         'keymanweb.es5.js',
+    'keymanweb-webview.es5.js': 'keymanweb-webview.es5.js',
+    'kmwuibutton.js':           'kmwuibutton.js',
+    'kmwuifloat.js':            'kmwuifloat.js',
+    'kmwuitoggle.js':           'kmwuitoggle.js',
+    'kmwuitoolbar.js':          'kmwuitoolbar.js'
     // Also add entries for the naming system used by Android and iOS - and map them to the EMBEDDED upload, not the std 'native' one.
-  }
+  } as Record<string, string>;
 
   static DEFAULT_OPTIONS: Options = {
     hostPlatform: "native-web"
@@ -102,7 +105,8 @@ export class KeymanSentryManager {
   attachEventMetadata(event: any) {
     // Ensure that the 'extra' object exists.  (May not exist for synthetic/custom Errors.)
     event.extra = event.extra || {};
-    event.extra.keymanState = window['keyman']['getDebugInfo']();
+    //@ts-ignore
+    event.extra.keymanState = window['keyman']?.['getDebugInfo']?.();
     event.extra.keymanHostPlatform = this.keymanPlatform;
   }
 
@@ -213,7 +217,7 @@ export class KeymanSentryManager {
       return oldConsoleWarn.apply(console, args);
     }
 
-    function reduceConsoleArgs(args) {
+    function reduceConsoleArgs(args: any) {
       let errorMsg = args[0];
       // Make sure errorMsg is either an error or string.
       // It's therefore best to pass in new Error('msg') instead of just 'msg' since
@@ -223,7 +227,7 @@ export class KeymanSentryManager {
       if (!(errorMsg instanceof Error)) {
         // stringify all args as a new Error (which creates a stack trace)
         errorMsg = new Error(
-          args.reduce(function(accumulator, currentValue) {
+          args.reduce(function(accumulator: any, currentValue: any) {
             return accumulator.toString() + ' ' + currentValue.toString();
           }, '')
         );
@@ -257,4 +261,5 @@ export class KeymanSentryManager {
 }
 
 // Publish to the window.
+// @ts-ignore
 window['KeymanSentryManager'] = KeymanSentryManager;

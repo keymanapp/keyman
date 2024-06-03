@@ -11,7 +11,7 @@
 @implementation KMAboutWindow
 
 - (BOOL)isMovableByWindowBackground {
-    return YES;
+  return YES;
 }
 
 @end

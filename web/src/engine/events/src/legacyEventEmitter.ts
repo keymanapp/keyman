@@ -27,7 +27,7 @@ export type EventNames<T extends LegacyEventMap> = Exclude<keyof T, number | sym
  * Builds a type-array of the arguments for each named event, indexed by that name.
  */
 type ArgumentMap<T extends LegacyEventMap> = {
-  [K in Exclude<keyof T, number | symbol>]: T[K] extends (arg: any) => boolean
+  [K in Exclude<keyof T, number | symbol>]: T[K] extends (arg: any) => void
     ? Parameters<T[K]>[0]
     : (
       T[K] extends Function
@@ -60,7 +60,7 @@ export type EventListener<
  */
 export class LegacyEventEmitter<EventTypes extends LegacyEventMap> {
   // An object mapping event names to individual event lists.  Maps strings to arrays.
-  private events: { [name: string]: ((Object) => boolean)[];} = {};
+  private events: { [name: string]: ((arg0: Object) => boolean)[];} = {};
   private currentEvents: string[] = [];  // The event messaging call stack.
 
   /**
@@ -76,7 +76,9 @@ export class LegacyEventEmitter<EventTypes extends LegacyEventMap> {
     func: EventListener<EventTypes, T>
   ): boolean {
     this._removeEventListener(event, func);
-    this.events[event].push(func);
+    // TS gets hung up on the type info here because we can potentially store
+    // different types of listeners for different events.
+    this.events[event].push(func as unknown as any);
     return true;
   }
 

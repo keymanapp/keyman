@@ -1,22 +1,161 @@
 import { assert } from 'chai';
 
-import { Mock } from '@keymanapp/keyboard-processor';
+import { Mock, findCommonSubstringEndIndex } from '@keymanapp/keyboard-processor';
 import { extendString } from '@keymanapp/web-utils';
 
 extendString();  // Ensure KMW's string-extension functionality is available.
 
 String.kmwEnableSupplementaryPlane(false);
 
+// A unicode-coding like alias for use in constructing non-BMP strings.
+const u = String.fromCodePoint;
+
+/**
+ * Returns the "Mathematical Sans-Serif Small" non-BMP encoding for
+ * a passed-in lowercase char between 'a' and 'z', inclusive.
+ * @param {*} char
+ * @returns
+ */
+const ss = (char) => {
+  const charCodeOffset = char.charCodeAt(0) - 'a'.charCodeAt(0);
+  return u(0x1d5ba + charCodeOffset);
+}
+
+describe("String divergence calculations", function() {
+  describe("Common prefix", () => {
+    it("BMP text", () => {
+      const result1 = findCommonSubstringEndIndex("apple", "applause", false);
+      assert.equal(result1, 4);
+
+      const result2 = findCommonSubstringEndIndex("applesauce", "applause", false);
+      assert.equal(result2, 4);
+    });
+
+    it("BMP edge cases", () => {
+      const result1 = findCommonSubstringEndIndex("applesauce", "applesauce", false);
+      assert.equal(result1, 10);
+
+      const result2 = findCommonSubstringEndIndex("applesauce", "banana bread", false);
+      assert.equal(result2, 0);
+    });
+
+    it("non-BMP text", () => {
+      const smp_ify = (str) => str.split('').map(ss).join('');
+
+      const result1 = findCommonSubstringEndIndex(
+        smp_ify('apple'),
+        smp_ify('applause'),
+        false
+      );
+
+      // 2 per non-BMP char; is in code-unit... units.
+      // Will avoid splitting code points, though.
+      assert.equal(result1, 8);
+
+      const result2 = findCommonSubstringEndIndex(
+        smp_ify('applesauce'),
+        smp_ify('applause'),
+        false
+      );
+
+      assert.equal(result2, 8);
+    });
+
+    it("non-BMP edge cases", () => {
+      const smp_ify = (str) => str.split('').map(ss).join('');
+
+      const result1 = findCommonSubstringEndIndex(
+        smp_ify('applesauce'),
+        smp_ify('applesauce'),
+        false
+      );
+
+      assert.equal(result1, 20);
+
+      const result2 = findCommonSubstringEndIndex(
+        smp_ify('applesauce'),
+        smp_ify('banana bread'),
+        false
+      );
+
+      assert.equal(result2, 0);
+    })
+  });
+
+  describe("Common suffix", () => {
+    it("BMP text", () => {
+      //    att|endance
+      // transc|endance
+      const result1 = findCommonSubstringEndIndex("attendance", "transcendance", true);
+      assert.equal(result1, 2);
+
+      // transcend|ance
+      //  happenst|ance
+      const result2 = findCommonSubstringEndIndex("transcendance", "happenstance", true);
+      assert.equal(result2, 8);
+
+    });
+
+    it("BMP edge cases", () => {
+      // If the two are equal...
+      const result1 = findCommonSubstringEndIndex("post-caret text", "post-caret text", true);
+      assert.equal(result1, -1);
+
+      // If the two are completely different...
+      const result2 = findCommonSubstringEndIndex("post-caret text", "supercalifragilistic", true);
+      assert.equal(result2, "post-caret text".length-1);
+    })
+
+    it("non-BMP text", () => {
+      const smp_ify = (str) => str.split('').map(ss).join('');
+
+      //   att|endance
+      // trans|endance
+      const result1 = findCommonSubstringEndIndex(
+        smp_ify("attendance"),
+        smp_ify("transcendance"),
+        true
+      );
+
+      // 2 per non-BMP char; is in code-unit... units.
+      // Will avoid splitting code points; is odd b/c we get the index of the LAST char of the pair.
+      assert.equal(result1, 5);
+
+      // transcend|ance
+      //  happenst|ance
+      const result2 = findCommonSubstringEndIndex(
+        smp_ify("transcendance"),
+        smp_ify("happenstance"),
+        true
+      );
+      assert.equal(result2, 17);
+
+    });
+
+    it("non-BMP edge cases", () => {
+      const smp_ify = (str) => str.split('').map(ss).join('');
+
+      // If the two are equal...
+      const result3 = findCommonSubstringEndIndex(
+        smp_ify("post-caret text"),
+        smp_ify("post-caret text"),
+        true
+      );
+      assert.equal(result3, -1);
+
+      // If the two are completely different...
+      const result2 = findCommonSubstringEndIndex(
+        smp_ify("post-caret text"),
+        smp_ify("supercalifragilistic"),
+        true
+      );
+      assert.equal(result2, smp_ify("post-caret text").length-1);
+    })
+  })
+});
+
 describe("Transcriptions and Transforms", function() {
-  var toSupplementaryPairString = function(code){
-    var H = Math.floor((code - 0x10000) / 0x400) + 0xD800;
-    var L = (code - 0x10000) % 0x400 + 0xDC00;
-
-    return String.fromCharCode(H, L);
-  }
-
-  // Built in-line via function.  Looks functionally equivalent to "apple", but with SMP characters.
-  let u = toSupplementaryPairString;
+  // Built in-line via function.  Looks functionally equivalent to "apple", but with non-BMP characters.
   let smpApple = u(0x1d5ba)+u(0x1d5c9)+u(0x1d5c9)+u(0x1d5c5)+u(0x1d5be);
 
   it("does not store an alias for related OutputTargets", function() {
@@ -124,7 +263,7 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
       assert.equal(transcription.transform.deleteRight, 1, "Incorrect count for right-of-caret deletions");
     });
 
-    it("handles deletions around the caret without text insertion (SMP text)", function() {
+    it("handles deletions around the caret without text insertion (non-BMP text)", function() {
       try {
         String.kmwEnableSupplementaryPlane(true);
         var target = new Mock(smpApple, 2);
@@ -216,7 +355,7 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
       assert.equal(transcription.transform.deleteRight, 3, "Incorrect count for right-of-caret deletions");
     });
 
-    it("handles deletions around the caret with text insertion (SMP text)", function() {
+    it("handles deletions around the caret with text insertion (non-BMP text)", function() {
       try {
         String.kmwEnableSupplementaryPlane(true);
 
@@ -296,6 +435,37 @@ but not himself.`;  // Sheev Palpatine, in the Star Wars prequels.
       } finally {
         String.kmwEnableSupplementaryPlane(false);
       }
+    });
+
+    it('from targets with existing selection', () => {
+      //                              |            |
+      const target = new Mock("testing testing one two three");
+      target.setSelection(8, 20)
+      const original = Mock.from(target);
+      target.clearSelection();
+
+      const transform = target.buildTransformFrom(original);
+      assert.deepEqual(transform, {
+        insert: '',
+        deleteLeft: 0,
+        deleteRight: 0,
+        erasedSelection: true
+      });
+    });
+
+    it('to targets with existing selection', () => {
+      //                              |            |
+      const target = new Mock("testing testing one two three");
+      target.setSelection(8, 20)
+      const transform = {
+        insert: '',
+        deleteLeft: 0,
+        deleteRight: 0,
+        erasedSelection: true
+      };
+
+      target.apply(transform);
+      assert.equal(target.getText(), 'testing two three');
     });
   });
 

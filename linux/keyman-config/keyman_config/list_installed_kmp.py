@@ -3,7 +3,7 @@
 import json
 import logging
 import os
-from pkg_resources import parse_version
+import packaging.version
 
 from keyman_config import secure_lookup
 from keyman_config.deprecated_decorator import deprecated
@@ -133,7 +133,7 @@ def _get_kmp_version_internal(packageId, location, previousVersion):
     kmp = get_installed_kmp(location)
     if packageId in kmp:
         version = kmp[packageId]['kmpversion']
-        if not previousVersion or parse_version(previousVersion) < parse_version(version):
+        if not previousVersion or packaging.version.parse(previousVersion) < packaging.version.parse(version):
             previousVersion = version
     return previousVersion
 

@@ -212,6 +212,44 @@ get_engine_for_language(
   return engine_desc;
 }
 
+int _get_version(const gchar **pver) {
+  g_assert(pver);
+  const gchar *ver = *pver;
+  int version      = 0;
+
+  while (*ver && *ver != '.') {
+    if (*ver >= '0' && *ver <= '9') {
+      version = version * 10 + (*ver - '0');
+      ver++;
+    } else {
+      // stop comparison on first non-digit
+      while (*ver)
+        ver++;
+    }
+  }
+  *pver = ver;
+  return version;
+}
+
+int
+keyman_compare_version(const gchar *ver1, const gchar *ver2) {
+  for (; *ver1 || *ver2; ) {
+    int version1 = _get_version(&ver1);
+    int version2 = _get_version(&ver2);
+
+    if (version1 < version2)
+      return -1;
+    if (version1 > version2)
+      return +1;
+
+    if (*ver1)
+      ver1++;
+    if (*ver2)
+      ver2++;
+  }
+  return 0;
+}
+
 gboolean
 keyman_list_contains_keyboard(
   GList *engines_list,
@@ -225,8 +263,7 @@ keyman_list_contains_keyboard(
     // If we already have an engine for this keyboard (in a different area), we
     // don't want to add it again since we wouldn't add anything new
     // if it's the same version
-    // TODO: fix version comparison (#9593)
-    if (g_strcmp0(kmx_file, keyboard->kmx_file) == 0 && g_strcmp0(version, keyboard->version) >= 0) {
+    if (g_strcmp0(kmx_file, keyboard->kmx_file) == 0 && keyman_compare_version(version, keyboard->version) >= 0) {
       g_debug("keyboard %s already exists at version %s which is newer or same as %s", kmx_file, version, keyboard->version);
       return TRUE;
     }
@@ -450,7 +487,7 @@ keyman_get_options_queue_fromdconf(gchar *package_id,
                 g_message("Keyboard Option [%d], %s=%s", index, option_tokens[0], option_tokens[1]);
                 km_core_option_item *opt = g_new0(km_core_option_item, 1);
                 opt[0].scope = KM_CORE_OPT_KEYBOARD;
-                km_core_cp *ocp = g_utf8_to_utf16(option_tokens[0], -1, NULL, NULL, NULL);
+                km_core_cu *ocp = g_utf8_to_utf16(option_tokens[0], -1, NULL, NULL, NULL);
                 opt[0].key = ocp;
                 ocp = g_utf8_to_utf16 (option_tokens[1], -1, NULL, NULL, NULL);
                 opt[0].value = ocp;

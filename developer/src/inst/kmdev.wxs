@@ -58,6 +58,9 @@
               <Directory Id="dir_sentry_0.6.0" Name="sentry-0.6.0" />
               <Directory Id="dirNode" Name="node.js" />
               <Directory Id="dirProjects" Name="Projects" />
+              <Directory Id="dir_import" Name="import">
+                <Directory Id="dir_import_45" Name="45" />
+              </Directory>
             </Directory>
           </Directory>
         </Directory>
@@ -148,7 +151,7 @@
       </Component>
 
       <Component>
-        <File Name="kmbrowserhost.exe" KeyPath="yes" Source="..\..\..\windows\bin\desktop\kmbrowserhost.exe" />
+        <File Name="kmdbrowserhost.exe" KeyPath="yes" />
       </Component>
 
       <Component>
@@ -164,7 +167,7 @@
       </Component>
 
       <Component>
-        <File Name="keymancore-1.dll" KeyPath="yes" />
+        <File Name="keymancore-2.dll" KeyPath="yes" />
       </Component>
 
       <Component>
@@ -191,6 +194,28 @@
 
       <Component>
         <File Name="blocks.txt" Source="..\..\..\resources\standards-data\unicode-character-database\" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <!-- LDML Imports -->
+    <ComponentGroup Id="LdmlImports" Directory="dir_import_45" Source="..\..\..\resources\standards-data\ldml-keyboards\45\import">
+      <Component>
+        <File Id="LdmlImportReadme" Name="README.md" KeyPath="yes" />
+      </Component>
+      <Component>
+        <File Id="LdmlImportLicense" Name="unicode-license.txt" Source="..\..\..\resources\standards-data\ldml-keyboards\unicode-license.txt" />
+      </Component>
+      <Component>
+        <File Name="keys-Latn-implied.xml" KeyPath="yes" />
+      </Component>
+      <Component>
+        <File Name="keys-Zyyy-currency.xml" KeyPath="yes" />
+      </Component>
+      <Component>
+        <File Name="keys-Zyyy-punctuation.xml" KeyPath="yes" />
+      </Component>
+      <Component>
+        <File Name="scanCodes-implied.xml" KeyPath="yes" />
       </Component>
     </ComponentGroup>
 
@@ -275,6 +300,7 @@
       <ComponentGroupRef Id="Node" />
       <ComponentGroupRef Id="KeymanDevSentryComponents" />
       <ComponentGroupRef Id="Server" />
+      <ComponentGroupRef Id="LdmlImports" />
     </Feature>
 
     <Media Id="1" EmbedCab="yes" Cabinet="Data1.cab" VolumeLabel="DISK1" />

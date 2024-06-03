@@ -1,9 +1,9 @@
 /**
  * Keyman is copyright (C) SIL International. MIT License.
- * 
+ *
  * CoreWrapper.h
  * Keyman
- * 
+ *
  * Created by Shawn Schantz on 2022-12-12.
  */
 
@@ -28,8 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
               withModifiers:(NSEventModifierFlags)modifierState
                 withKeyDown:(BOOL)isKeyDown;
 -(void)setContextIfNeeded:(NSString*)context;
--(void)setContext:(NSString*)context;
--(NSString*)context;
+-(NSString*)contextDebug;
 -(void)clearCoreContext;
 -(void)dealloc;
 

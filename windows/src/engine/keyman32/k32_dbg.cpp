@@ -137,7 +137,7 @@ BOOL ShouldDebug_1() {
   return Globals::get_debug_KeymanLog();
 }
 
-int SendDebugMessageFormat_1(HWND hwnd, TSDMState state, int kmn_lineno, char *file, int line, char *fmt, ...)
+int SendDebugMessageFormat_1(HWND hwnd, TSDMState state, int kmn_lineno, wchar_t*file, int line, char *fmt, ...)
 {
 	char fmtbuf[256];
 
@@ -146,6 +146,19 @@ int SendDebugMessageFormat_1(HWND hwnd, TSDMState state, int kmn_lineno, char *f
 	vsnprintf_s(fmtbuf, _countof(fmtbuf), _TRUNCATE, fmt, vars);  // I2248   // I3547
 	fmtbuf[255] = 0;
 	SendDebugMessage_1(hwnd, state, kmn_lineno, file, line, fmtbuf);
+
+  return 0;
+}
+
+int SendDebugMessageFormatW_1(HWND hwnd, TSDMState state, int kmn_lineno, wchar_t* file, int line, wchar_t* fmt, ...)
+{
+  wchar_t fmtbuf[256];
+
+  va_list vars;
+  va_start(vars, fmt);
+  _vsnwprintf_s(fmtbuf, _countof(fmtbuf), _TRUNCATE, fmt, vars);  // I2248   // I3547
+  fmtbuf[255] = 0;
+  SendDebugMessageW_1(hwnd, state, kmn_lineno, file, line, fmtbuf);
 
   return 0;
 }
@@ -169,7 +182,18 @@ int SendDebugMessageFormat_1(HWND hwnd, TSDMState state, int kmn_lineno, char *f
 }*/
 
 
-int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, char *file, int line, char *msg)
+int SendDebugMessageW_1(HWND hwnd, TSDMState state, int kmn_lineno, wchar_t*file, int line, wchar_t* msg)
+{
+  UNREFERENCED_PARAMETER(hwnd);
+  UNREFERENCED_PARAMETER(state);   // I3569
+  UNREFERENCED_PARAMETER(kmn_lineno);
+
+  Keyman_WriteDebugEventW(file, line, msg);
+
+  return 0;
+}
+
+int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, wchar_t*file, int line, char *msg)
 {
   UNREFERENCED_PARAMETER(hwnd);
   UNREFERENCED_PARAMETER(state);   // I3569
@@ -177,8 +201,8 @@ int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, char *file, i
 
   // TODO: convert debugging to Unicode
   PWSTR msgW = strtowstr(msg);
-  Keyman_WriteDebugEvent(file, line, msgW);
-  delete msgW;
+  Keyman_WriteDebugEventW(file, line, msgW);
+  delete [] msgW;
 
   return 0;
 }
@@ -264,7 +288,7 @@ BOOL DebugSignalPause(BOOL fIsUp)
   return FALSE;
 }
 
-void DebugLastError_1(DWORD err, char *context, char *file, int line, char *func)
+void DebugLastError_1(DWORD err, char *context, wchar_t *file, int line, char *func)
 {
   if(ShouldDebug(sdmDebug))
   {
@@ -308,7 +332,7 @@ char *Debug_UnicodeString(PWSTR s, int x) {
   return bufout[x];
 }
 
-BOOL DebugAssert_1(BOOL condition, char *message, char *file, int line)
+BOOL DebugAssert_1(BOOL condition, char *message, wchar_t *file, int line)
 {
   if (!(condition)) {
     SendDebugMessage_1(0, sdmGlobal, 0, file, line, message);

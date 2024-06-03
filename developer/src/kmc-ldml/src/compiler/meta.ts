@@ -1,4 +1,4 @@
-import { constants } from "@keymanapp/ldml-keyboard-constants";
+import { SectionIdent, constants } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlus } from '@keymanapp/common-types';
 
 import { CompilerMessages } from "./messages.js";
@@ -44,6 +44,11 @@ export class MetaCompiler extends SectionCompiler {
       this.callbacks.reportMessage(CompilerMessages.Hint_NormalizationDisabled());
     }
     return true;
+  }
+
+  public get dependencies(): Set<SectionIdent> {
+    const strsOnly = new Set(<SectionIdent[]>[constants.section.strs]);
+    return strsOnly;
   }
 
   public compile(sections: DependencySections): Meta {

@@ -19,7 +19,7 @@ export class GestureRecognizer<HoveredItemType, StateToken = any> extends Touchp
     // overhead.
     gestureModelDefinitions = gestureModelDefinitions || EMPTY_GESTURE_DEFS;
 
-    super(gestureModelDefinitions);
+    super(gestureModelDefinitions, null, preprocessedConfig.historyLength);
     this.config = preprocessedConfig;
 
     this.mouseEngine = new MouseEventEngine<HoveredItemType>(this.config);
@@ -33,6 +33,11 @@ export class GestureRecognizer<HoveredItemType, StateToken = any> extends Touchp
   }
 
   public destroy() {
+    // When shutting down the gesture engine, we should go ahead and clear out all related
+    // gesture-source tracking.
+    this.activeGestures.forEach((sequence) => sequence.cancel());
+    this.activeSources.forEach((source) => source.terminate(true));
+
     this.mouseEngine.unregisterEventHandlers();
     this.touchEngine.unregisterEventHandlers();
 

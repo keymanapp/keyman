@@ -1,6 +1,6 @@
 import { Codes, DeviceSpec, KeyEvent, KeyMapping, Keyboard, KeyboardProcessor } from '@keymanapp/keyboard-processor';
 
-import { HardKeyboard } from 'keyman/engine/main';
+import { HardKeyboard, processForMnemonicsAndLegacy } from 'keyman/engine/main';
 import { DomEventTracker } from 'keyman/engine/events';
 import { DesignIFrame, nestedInstanceOf } from 'keyman/engine/element-wrappers';
 import { eventOutputTarget, outputTargetForElement } from 'keyman/engine/attachment';
@@ -121,6 +121,10 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
 
   // Stage 3 - Set our modifier state tracking variable and perform basic AltGr-related management.
   const LmodifierChange = keyboardState.modStateFlags != curModState;
+
+  // KeyboardState update:  save our known modifier/state analysis bits.
+  // Note:  `keyboardState` is typically the full-fledged KeyboardProcessor instance.  As a result,
+  // changes here persist across calls (as we only ever make the one instance).
   keyboardState.modStateFlags = curModState;
 
   // For European keyboards, not all browsers properly send both key-up events for the AltGr combo.
@@ -186,42 +190,11 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
     isSynthetic: false
   });
 
-  // Mnemonic handling.
-  if(activeKeyboard && activeKeyboard.isMnemonic) {
-    // The following will never set a code corresponding to a modifier key, so it's fine to do this,
-    // which may change the value of Lcode, here.
-
-    s.setMnemonicCode(e.getModifierState("Shift"), e.getModifierState("CapsLock"));
-  }
   // The 0x6F used to be 0x60 - this adjustment now includes the chiral alt and ctrl modifiers in that check.
   let LisVirtualKeyCode = (typeof e.charCode != 'undefined' && e.charCode != null  &&  (e.charCode == 0 || (Lmodifiers & 0x6F) != 0));
   s.LisVirtualKey = LisVirtualKeyCode || e.type != 'keypress';
 
-  // Other minor physical-keyboard adjustments
-  if(activeKeyboard && !activeKeyboard.isMnemonic) {
-    // Positional Layout
-
-    /* 13/03/2007 MCD: Swedish: Start mapping of keystroke to US keyboard */
-    var Lbase = KeyMapping.languageMap[keyboardState.baseLayout];
-    if(Lbase && Lbase['k'+s.Lcode]) {
-      s.Lcode=Lbase['k'+s.Lcode];
-    }
-    /* 13/03/2007 MCD: Swedish: End mapping of keystroke to US keyboard */
-
-    if(!activeKeyboard.definesPositionalOrMnemonic && !(s.Lmodifiers & 0x60)) {
-      // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
-      s = new KeyEvent({
-        Lcode: KeyMapping._USKeyCodeToCharCode(s),
-        Lmodifiers: 0,
-        LisVirtualKey: false,
-        vkCode: s.Lcode, // Helps to merge OSK and physical keystroke control paths.
-        Lstates: s.Lstates,
-        kName: '',
-        device: device,
-        isSynthetic: false
-      });
-    }
-  }
+  s = processForMnemonicsAndLegacy(s, activeKeyboard, keyboardState.baseLayout);
 
   let processedEvent = new KeyEvent(s);
   processedEvent.source = e;
@@ -283,10 +256,6 @@ export default class HardwareEventKeyboard extends HardKeyboard {
     });
   }
 
-  get activeKeyboard(): Keyboard {
-    return this.contextManager.activeKeyboard.keyboard;
-  }
-
   /**
    * Function     _KeyDown
    * Scope        Private
@@ -306,7 +275,7 @@ export default class HardwareEventKeyboard extends HardKeyboard {
 
     // Prevent mapping element is readonly or tagged as kmw-disabled
     const el = target.getElement();
-    if(el?.className?.indexOf('kmw-disabled') >= 0) {
+    if(el?.getAttribute('class')?.indexOf('kmw-disabled') >= 0) {
       return true;
     }
 
@@ -320,7 +289,7 @@ export default class HardwareEventKeyboard extends HardKeyboard {
    */
   _KeyPress: (e: KeyboardEvent) => boolean = (e) => {
     const target = eventOutputTarget(e);
-    if(!target || this.activeKeyboard == null) {
+    if(!target || this.contextManager.activeKeyboard?.keyboard == null) {
       return true;
     }
 
@@ -433,7 +402,7 @@ export default class HardwareEventKeyboard extends HardKeyboard {
     // _Debug('KeyPress code='+Levent.Lcode+'; Ltarg='+Levent.Ltarg.tagName+'; LisVirtualKey='+Levent.LisVirtualKey+'; _KeyPressToSwallow='+keymanweb._KeyPressToSwallow+'; keyCode='+(e?e.keyCode:'nothing'));
 
     /* I732 START - 13/03/2007 MCD: Swedish: Start positional keyboard layout code: prevent keystroke */
-    if(!this.activeKeyboard.isMnemonic) {
+    if(!this.contextManager.activeKeyboard?.keyboard.isMnemonic) {
       if(!this.swallowKeypress) {
         return true;
       }

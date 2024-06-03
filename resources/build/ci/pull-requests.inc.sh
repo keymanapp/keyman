@@ -107,7 +107,7 @@ function ci_open_pull_request {
   git push origin "$branch"
   builder_echo "Push complete"
 
-  hub pull-request -f --no-edit -l auto
+  hub pull-request --force --message "$commit_message" --labels auto
   builder_echo "Pull request created"
 
   git switch "$current_branch"

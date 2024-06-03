@@ -10,6 +10,7 @@ import KeymanEngine
 import UIKit
 import WebKit
 import Sentry
+import os.log
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -49,7 +50,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         vc.present(nvc, animated: true, completion: nil)
       }
     } else {
-      SentryManager.captureAndLog("Cannot find app's root UIViewController")
+      let message = "Cannot find app's root UIViewController"
+      os_log("%{public}s", log: KeymanLogger.ui, type: .info, message)
+      SentryManager.capture(message)
     }
 
     return true
@@ -60,8 +63,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     SentryManager.start()
     // Forces the logs to initialize, as their definitions result in lazy init.
     // These references have been configured to also log app details.
-    _ = log
-    _ = KeymanEngine.log
 
     // In iOS 15, navigation bars become transparent by default when the edge
     // of the scrollable content aligns with the edge of the navigation bar.
@@ -139,7 +140,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             ResourceFileManager.shared.promptPackageInstall(of: package, in: nvc, isCustom: true)
             vc.present(nvc, animated: true, completion: nil)
           } else {
-            SentryManager.captureAndLog("Cannot find app's root UIViewController")
+            let message = "Cannot find app's root UIViewController"
+            os_log("%{public}s", log: KeymanLogger.ui, type: .error, message)
+            SentryManager.capture(message)
           }
         }
         return true

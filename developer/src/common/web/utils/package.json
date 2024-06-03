@@ -8,19 +8,18 @@
   "files": [
     "/build/"
   ],
+  "dependencies": {
+    "@sentry/node": "^7.57.0"
+  },
   "devDependencies": {
     "@types/node": "^20.4.1",
     "ts-node": "^9.1.1",
     "typescript": "^4.9.5",
     "c8": "^7.12.0",
-    "chai": "^4.3.4",
     "mocha": "^8.4.0"
   },
   "scripts": {
     "build": "tsc -b"
-  },
-  "dependencies": {
-    "@keymanapp/common-types": "*"
   },
   "mocha": {
     "spec": "build/test/**/test-*.js",

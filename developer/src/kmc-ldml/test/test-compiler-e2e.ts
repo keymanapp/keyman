@@ -14,6 +14,7 @@ describe('compiler-tests', function() {
   });
 
   it('should-build-fixtures', async function() {
+    this.timeout(4000);
     // Let's build basic.xml
     // It should match basic.kmx (built from basic.txt)
 
@@ -71,7 +72,7 @@ describe('compiler-tests', function() {
     const source = k.load(filename);
     assert.notOk(source, `Trying to loadTestData(${filename})`);
   });
-  it('should fail on illegal chars', async function() {
+  it('should fail on illegal chars - sections/strs/invalid-illegal.xml', async function() {
     const inputFilename = makePathToFixture('sections/strs/invalid-illegal.xml');
     const kmx = await compileKeyboard(inputFilename, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false },
       [
@@ -116,5 +117,17 @@ describe('compiler-tests', function() {
         CompilerMessages.Warn_UnassignedCharacters({ count: 1, lowestCh: 0x0CFFFD }),
       ]);
     assert.isNotNull(kmx);
+  });
+  it('should fail on extra escapes - sections/tran/fail-bad-tran-2.xml', async function() {
+    const inputFilename = makePathToFixture('sections/tran/fail-bad-tran-2.xml');
+    const kmx = await compileKeyboard(inputFilename, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false },
+      [
+        CompilerMessages.Error_InvalidQuadEscape({ cp: 295 }),
+      ],
+      true, // validation should fail
+      [
+        // compiler messages (not reached, we've already failed)
+      ]);
+    assert.isNull(kmx); // should fail post-validate
   });
 });

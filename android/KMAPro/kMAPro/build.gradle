@@ -2,7 +2,7 @@ plugins {
     id 'com.android.application'
     id 'io.sentry.android.gradle'
     // https://github.com/Triple-T/gradle-play-publisher/issues/947#issuecomment-843634852
-    id 'com.github.triplet.play' version '3.8.1' apply false
+    id 'com.github.triplet.play' version '3.9.1' apply false
     id 'name.remal.default-plugins'
 }
 
@@ -10,7 +10,7 @@ ext.rootPath = '../../'
 apply from: "$rootPath/version.gradle"
 
 android {
-    compileSdkVersion 33
+    compileSdk 34
     namespace="com.tavultesoft.kmapro"
 
     // Don't compress kmp files so they can be copied via AssetManager
@@ -21,7 +21,7 @@ android {
     defaultConfig {
         applicationId "com.tavultesoft.kmapro"
         minSdkVersion 21
-        targetSdkVersion 33
+        targetSdkVersion 34
 
         //println "===DUMPING PROPERTIES==="
         //dumpProperties(project) // Use this to dump all external properties for debugging TeamCity integration
@@ -150,12 +150,12 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.6.0-rc01'
-    implementation 'com.google.android.material:material:1.6.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.12.0'
     implementation 'com.stepstone.stepper:material-stepper:4.3.1'
     api(name: 'keyman-engine', ext: 'aar')
-    implementation 'io.sentry:sentry-android:6.9.2'
-    implementation 'androidx.preference:preference:1.2.0'
+    implementation 'io.sentry:sentry-android:7.8.0'
+    implementation 'androidx.preference:preference:1.2.1'
     implementation "com.android.installreferrer:installreferrer:2.2"
 
     // Add dependency for generating QR Codes

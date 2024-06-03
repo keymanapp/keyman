@@ -14,10 +14,10 @@
 #include <test_assert.h>
 #include <test_color.h>
 #include "../emscripten_filesystem.h"
+#include "utfcodec.hpp"
 
 #include <map>
 #include <iostream>
-#include <sstream>
 
 /** This test will test the infrastructure around IMX third party librays
  *  and callback. The functions tested are:
@@ -77,9 +77,9 @@ uint8_t test_imx_callback(km_core_state *state, uint32_t imx_id, void *callback_
   km_core_state_get_intermediate_context(state, &entry_context);
 
   size_t n = 0;
-  try_status(km_core_context_items_to_utf16(entry_context, nullptr, &n))
-  km_core_cp *buf = new km_core_cp[n];
-  try_status(km_core_context_items_to_utf16(entry_context, buf, &n));
+  try_status(context_items_to_utf16(entry_context, nullptr, &n))
+  km_core_cu *buf = new km_core_cu[n];
+  try_status(context_items_to_utf16(entry_context, buf, &n));
 
   std::cout << "imx entry context   : "  << " [" << buf << "]" << std::endl;
   km_core_context_items_dispose(entry_context);
@@ -145,9 +145,9 @@ uint8_t test_imx_callback(km_core_state *state, uint32_t imx_id, void *callback_
   km_core_state_get_intermediate_context(state, &exit_context);
 
   n = 0;
-  try_status(km_core_context_items_to_utf16(exit_context, nullptr, &n))
-  km_core_cp *tmp_buf = new km_core_cp[n];
-  try_status(km_core_context_items_to_utf16(exit_context, tmp_buf, &n));
+  try_status(context_items_to_utf16(exit_context, nullptr, &n))
+  km_core_cu *tmp_buf = new km_core_cu[n];
+  try_status(context_items_to_utf16(exit_context, tmp_buf, &n));
 
   std::cout << "imx exit context   : "  << " [" << tmp_buf << "]" << std::endl;
   km_core_context_items_dispose(exit_context);
@@ -172,13 +172,15 @@ void test_imx_list(const km::core::path &source_file){
 
   // This keyboard has 4 function names from 2 different libraries in the stores
   km_core_keyboard_imx *imx_rule_it = kb_imx_list;
-  std::stringstream extracted_library_function;
   auto x = 0;
   for (; imx_rule_it->library_name; ++imx_rule_it) {
-    extracted_library_function << imx_rule_it->library_name << ":" << imx_rule_it->function_name;
-    assert(extracted_library_function.str() == expected_imx_map[imx_rule_it->imx_id] );
-    g_extract_imx_map[imx_rule_it->imx_id] = extracted_library_function.str();
-    extracted_library_function.str("");
+    std::u16string str;
+    str.append(imx_rule_it->library_name);
+    str.append(u":");
+    str.append(imx_rule_it->function_name);
+    auto extracted_library_function = convert<km_core_cu,char>(str);
+    assert(extracted_library_function == expected_imx_map[imx_rule_it->imx_id] );
+    g_extract_imx_map[imx_rule_it->imx_id] = extracted_library_function;
     ++x;
   }
 

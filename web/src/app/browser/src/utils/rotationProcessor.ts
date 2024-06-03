@@ -58,6 +58,15 @@ export class RotationProcessor {
       window.clearInterval(this.updateTimer);
       this.rotState = null;
     }
+
+    const target = this.keyman.contextManager.activeTarget;
+    if(target) {
+      // This seems to help with scrolling accuracy in iOS Safari;
+      // the scroll tends to consistently go too far without it.
+      window.setTimeout(() => {
+        this.keyman.ensureElementVisibility(target.getElement());
+      }, 0);
+    }
   }
 
   // Used by both Android and iOS.

@@ -8,19 +8,22 @@ export { default as NodeProctor } from "./nodeProctor.js";
 
 import * as utils from "@keymanapp/web-utils";
 
+type EventTypeTag = 'key' | 'osk';
+type TaggedEventObject = { type: EventTypeTag }
+
 //#region Defines the InputEventSpec set, used to reconstruct DOM-based events for browser-based simulation
 export abstract class InputEventSpec {
-  type: "key" | "osk";
-  static fromJSONObject(obj: any): InputEventSpec {
-    if(obj && obj.type) {
+  type: EventTypeTag;
+  static fromJSONObject(obj: TaggedEventObject): InputEventSpec {
+    if(obj) {
       if(obj.type == "key") {
-        return new PhysicalInputEventSpec(obj);
+        return new PhysicalInputEventSpec(obj as PhysicalInputEventSpec);
       } else if(obj.type == "osk") {
-        return new OSKInputEventSpec(obj);
+        return new OSKInputEventSpec(obj as OSKInputEventSpec);
       }
-    } else {
-      throw new SyntaxError("Error in JSON format corresponding to an InputEventSpec!");
     }
+
+    throw new SyntaxError("Error in JSON format corresponding to an InputEventSpec!");
   }
 
   toPrettyJSON(): string {
@@ -49,7 +52,7 @@ export class PhysicalInputEventSpec extends InputEventSpec {
   modifierSet: number;
   location: number;
 
-  constructor(e?: PhysicalInputEventSpec) { // parameter is used to reconstruct from JSON.
+  constructor(e?: PhysicalInputEventSpec | Partial<Pick<PhysicalInputEventSpec, 'key' | 'code' | 'keyCode' | 'modifierSet' | 'location'>>) { // parameter is used to reconstruct from JSON.
     super();
 
     if(e) {
@@ -93,18 +96,20 @@ export class OSKInputEventSpec extends InputEventSpec {
 //#endregion
 
 export abstract class RecordedKeystroke {
-  type: "key" | "osk";
+  type: EventTypeTag;
 
-  static fromJSONObject(obj: any): RecordedKeystroke {
-    if(obj && obj.type) {
+  static fromJSONObject(obj: TaggedEventObject): RecordedKeystroke {
+    if(obj) {
       if(obj.type == "key") {
         return new RecordedPhysicalKeystroke(obj as RecordedPhysicalKeystroke);
-      } else if(obj && obj.type) {
+      } else if(obj.type == "osk") {
         return new RecordedSyntheticKeystroke(obj as RecordedSyntheticKeystroke);
+      } else {
+        return null;
       }
-    } else {
-      throw new SyntaxError("Error in JSON format corresponding to a RecordedKeystroke!");
     }
+
+    throw new SyntaxError("Error in JSON format corresponding to a RecordedKeystroke!");
   }
 
   toPrettyJSON(): string {
@@ -568,8 +573,8 @@ export class EventSpecTestSet implements TestSet<InputEventSpecSequence> {
     let testSet = this.testSet;
 
     for(var i=0; i < testSet.length; i++) {
-      var testSeq = this[i];
-      var simResult = await testSet[i].test(proctor);
+      const testSeq = this.testSet[i];
+      const simResult = await testSeq.test(proctor);
       if(!simResult.success) {
         // Failed test!
         failures.push(new TestFailure(this.constraint, testSeq, simResult.result));
@@ -618,8 +623,8 @@ export class RecordedSequenceTestSet implements TestSet<RecordedKeystrokeSequenc
     let testSet = this.testSet;
 
     for(var i=0; i < testSet.length; i++) {
-      var testSeq = this[i];
-      var simResult = await testSet[i].test(proctor);
+      const testSeq = this.testSet[i];
+      const simResult = await testSeq.test(proctor);
       if(!simResult.success) {
         // Failed test!
         failures.push(new TestFailure(this.constraint, testSeq, simResult.result));

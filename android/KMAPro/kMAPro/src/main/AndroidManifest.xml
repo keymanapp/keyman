@@ -5,8 +5,16 @@
   <!-- Keyman Engine removes INTERNET permission, so add it back -->
   <uses-permission android:name="android.permission.INTERNET" tools:node="replace" />
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
   <uses-permission android:name="android.permission.VIBRATE" />
+
+  <!-- API 33 and above -->
+  <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+  <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+
+  <!-- Devices running up to Android 12L
+       Starting in API level 33, this permission has no effect:
+       https://developer.android.com/reference/android/Manifest.permission#READ_EXTERNAL_STORAGE -->
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
 
   <!-- Ideally we would declare this permission so we can get other installed keyboard names.
   But would involve a long review process with the Play Store:
@@ -17,6 +25,7 @@
     android:hardwareAccelerated="true"
     android:icon="@mipmap/ic_launcher"
     android:label="@string/app_name"
+    android:resizeableActivity="false"
     android:usesCleartextTraffic="true"
     android:theme="@style/AppTheme"
     android:supportsRtl="true">
@@ -59,6 +68,7 @@
       android:name=".SplashScreenActivity"
       android:exported="true"
       android:label="@string/app_name"
+      android:resizeableActivity="false"
       android:theme="@style/AppTheme.BrandedLaunch">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
@@ -71,6 +81,7 @@
       android:exported="true"
       android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
       android:label="@string/app_name"
+      android:resizeableActivity="false"
       android:launchMode="singleTask">
 
       <!-- See http://stackoverflow.com/questions/1733195/android-intent-filter-for-a-particular-file-extension/2062112#2062112 -->
@@ -100,6 +111,9 @@
         <data
           android:mimeType="application/octet-stream"
           android:scheme="content" />
+        <data
+          android:mimeType="application/x-keyman-package"
+          android:scheme="content" />
       </intent-filter>
 
       <!--
@@ -118,19 +132,7 @@
 
         <data android:scheme="file" />
         <data android:host="*" />
-
-        <!--
-                     Work around Android's ugly primitive PatternMatcher
-                     implementation that can't cope with finding a . early in
-                     the path unless it's explicitly matched.
-                -->
-        <data android:pathPattern=".*\\.kmp" />
-        <data android:pathPattern=".*\\..*\\.kmp" />
-        <data android:pathPattern=".*\\..*\\..*\\.kmp" />
-        <data android:pathPattern=".*\\..*\\..*\\..*\\.kmp" />
-        <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.kmp" />
-        <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.kmp" />
-        <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.kmp" />
+        <data android:pathPattern="/.*\\.kmp" />
       </intent-filter>
 
       <!--
@@ -151,19 +153,7 @@
         <data android:scheme="file" />
         <data android:host="*" />
         <data android:mimeType="*/*" />
-
-        <!--
-                     Work around Android's ugly primitive PatternMatcher
-                     implementation that can't cope with finding a . early in
-                     the path unless it's explicitly matched.
-                -->
-        <data android:pathPattern=".*\\.kmp" />
-        <data android:pathPattern=".*\\..*\\.kmp" />
-        <data android:pathPattern=".*\\..*\\..*\\.kmp" />
-        <data android:pathPattern=".*\\..*\\..*\\..*\\.kmp" />
-        <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.kmp" />
-        <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.kmp" />
-        <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.kmp" />
+        <data android:pathPattern="/.*\\.kmp" />
       </intent-filter>
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
@@ -174,11 +164,11 @@
         <!-- http:// and  https:// protocols -->
         <data
           android:host="*"
-          android:pathPattern=".*\\.kmp"
+          android:pathPattern="/.*\\.kmp"
           android:scheme="http" />
         <data
           android:host="*"
-          android:pathPattern=".*\\.kmp"
+          android:pathPattern="/.*\\.kmp"
           android:scheme="https" />
       </intent-filter>
 

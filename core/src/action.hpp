@@ -8,14 +8,36 @@
 
 #pragma once
 
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
 #include <state.hpp>
 
 namespace km {
 namespace core
 {
-  km_core_actions const *action_item_list_to_actions_object(
-    km_core_action_item const *action_items
+  bool action_item_list_to_actions_object(
+    km_core_action_item const *action_items,
+    km_core_actions *actions
   );
+
+  bool actions_normalize(
+    /* in */      context const *cached_context,
+    /* in, out */ context *app_context,
+    /* in, out */ km_core_actions &actions
+  );
+
+  bool actions_update_app_context_nfu(
+    /* in */      context const *cached_context,
+    /* in, out */ context *app_context
+  );
+
+  void actions_dispose(
+    km_core_actions const & actions
+  );
+
+  km_core_usv const *get_deleted_context(
+    context const &app_context,
+    unsigned int code_points_to_delete
+  );
+
 } // namespace core
 } // namespace km

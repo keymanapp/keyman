@@ -22,7 +22,7 @@
 block(kmxheader)  #  struct COMP_KEYBOARD {
   4b 58 54 53      #    KMX_DWORD dwIdentifier;   // 0000 Keyman compiled keyboard id
 
-  00 10 00 00      #    KMX_DWORD dwFileVersion;  // 0004 Version of the file - Keyman 4.0 is 0x0400
+  00 11 00 00      #    KMX_DWORD dwFileVersion;  // 0004 Version of the file - Keyman 4.0 is 0x0400
 
   00 00 00 00      #    KMX_DWORD dwCheckSum;     // 0008 deprecated in 16.0, always 0
   00 00 00 00      #    KMX_DWORD KeyboardID;     // 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
@@ -154,7 +154,7 @@ block(bksp)
   00 00 00 00                       #   KMX_DWORD index = 0
 
   # transforms 0
-  index(strNull,strElemTranFrom1b,2) #   KMX_DWORD str from  ^e
+  index(strNull,strElemTranFrom1b,2) #   KMX_DWORD str from  ^e ## << ??
   index(strNull,strNull,2)          #   KMX_DWORD str to 0
   index(strNull,strNull,2)          #   KMX_DWORD str mapFrom 0
   index(strNull,strNull,2)          #   KMX_DWORD str mapTo 0
@@ -489,16 +489,19 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
 
   diff(strs,strNull)       sizeof(strNull,2)
   diff(strs,strVersion)    sizeof(strVersion,2)
+  diff(strs,strConformsTo) sizeof(strConformsTo,2)
   diff(strs,strName)       sizeof(strName,2)
   diff(strs,strFromSet)     sizeof(strFromSet,2)
   diff(strs,strUSet)       sizeof(strUSet,2)
   diff(strs,strAmarker)     sizeof(strAmarker,2)
+  diff(strs,strSentinel0001r)  sizeof(strSentinel0001r,2)
   diff(strs,strElemTranFrom1) sizeof(strElemTranFrom1,2)
   diff(strs,strElemTranFrom1a) sizeof(strElemTranFrom1a,2)
   diff(strs,strElemTranFrom1b) sizeof(strElemTranFrom1b,2)
   diff(strs,strA)   sizeof(strA,2)
   diff(strs,strSet)   sizeof(strSet,2)
   diff(strs,strSet2)   sizeof(strSet2,2)
+  diff(strs,strTranTo)          sizeof(strTranTo,2)
   diff(strs,strBase)   sizeof(strBase,2)
   diff(strs,strElemBkspFrom2) sizeof(strElemBkspFrom2,2)
   diff(strs,strGapReserved) sizeof(strGapReserved,2)
@@ -506,17 +509,14 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   diff(strs,strLocale)     sizeof(strLocale,2)
   diff(strs,strLayout)     sizeof(strLayout,2)
   diff(strs,strAuthor)     sizeof(strAuthor,2)
-  diff(strs,strConformsTo) sizeof(strConformsTo,2)
   diff(strs,strThat)   sizeof(strThat,2)
   diff(strs,strUs)    sizeof(strUs,2)
   diff(strs,strVse)   sizeof(strVse,2)
   diff(strs,strVst)   sizeof(strVst,2)
   diff(strs,strVus)   sizeof(strVus,2)
-  diff(strs,strTranTo)          sizeof(strTranTo,2)
   diff(strs,strKeys)       sizeof(strKeys,2)
   diff(strs,strIndicator)  sizeof(strIndicator,2)
   diff(strs,strSentinel0001)  sizeof(strSentinel0001,2)
-  diff(strs,strSentinel0001r)  sizeof(strSentinel0001r,2)
 
   # String table -- block(x) is used to store the null u16char at end of each string
   #                 without interfering with sizeof() calculation above
@@ -524,10 +524,12 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
 #str #00
   block(strNull)             block(x) 00 00                                             # the zero-length string
   block(strVersion)          31 00 2e 00 30 00 2e 00 30 00   block(x) 00 00             # '1.0.0'
+  block(strConformsTo)       34 00 35 00 block(x) 00 00                         # '45'
   block(strName)             54 00 65 00 73 00 74 00 4b 00 62 00 64 00   block(x) 00 00 # 'TestKbd'
   block(strFromSet)          5B 00 5C 00 75 00 31 00 41 00 37 00 35 00 2D 00 5C 00 75 00 31 00 41 00 37 00 39 00 5D 00 block(x) 00 00 # [\u1a75-\u1a79]
   block(strUSet)             5b 00 61 00 62 00 63 00 5d 00 block(x) 00 00               # '[abc]'
   block(strAmarker)          5C 00 6D 00 7B 00 61 00 7D 00 block(x) 00 00               # '\m{a}'
+  block(strSentinel0001r)    5c 00 75 00 66 00 66 00 66 00 66 00 5c 00 75 00 30 00 30 00 30 00 38 00 5C 00 75 00 30 00 30 00 30 00 31 00 block(x) 00 00     # UC_SENTINEL CODE_DEADKEY \u0001 (regex form)
   block(strElemTranFrom1)    5E 00 block(x) 00 00                                       # '^'
   block(strElemTranFrom1a)   5E 00 61 00 block(x) 00 00                                       # '^a'
   block(strElemTranFrom1b)   5E 00 65 00 block(x) 00 00                                       # '^e'
@@ -535,6 +537,7 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   block(strSet)              61 00 20 00 62 00 20 00 63 00 block(x) 00 00               # 'a b c'
 #str #0A
   block(strSet2)             61 00 62 00 63 00 block(x) 00 00                           # 'abc'
+  block(strTranTo)           61 00 02 03 block(x) 00 00                          # 'â' (U+0061 U+0302)
   block(strBase)             62 00 61 00 73 00 65 00 block(x) 00 00                     # 'base'
   block(strElemBkspFrom2)    65 00 block(x) 00 00                                       # 'e'
   block(strGapReserved)         67 00 61 00 70 00 20 00 28 00 72 00 65 00 73 00 65 00 72 00 76 00 65 00 64 00 29 00 block(x) 00 00 # 'gap (reserved)'
@@ -543,20 +546,16 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   block(strLocale)           6d 00 74 00   block(x) 00 00                               # 'mt'
   block(strLayout)           71 00 77 00 65 00 72 00 74 00 79 00   block(x) 00 00       # 'qwerty'
   block(strAuthor)           73 00 72 00 6c 00 32 00 39 00 35 00   block(x) 00 00       # 'srl295'
-  block(strConformsTo)       74 00 65 00 63 00 68 00 70 00 72 00 65 00 76 00
-                             69 00 65 00 77 00 block(x) 00 00                         # 'techpreview'
   block(strThat)             74 00 68 00 61 00 74 00 block(x) 00 00                     # 'that'
   block(strUs)               75 00 73 00 block(x) 00 00                           # 'us' (layout)
   block(strVse)              76 00 73 00 65 00 block(x) 00 00                     # 'vse'
   block(strVst)              76 00 73 00 74 00 block(x) 00 00                     # 'vst'
   block(strVus)              76 00 75 00 73 00 block(x) 00 00                     # 'vus'
-  block(strTranTo)           E2 00 block(x) 00 00                                       # 'â'
 #str #1a
   block(strKeys)             90 17 b6 17 block(x) 00 00                               # 'ថា'
   # <reorder before="ᩫ" from="᩠᩵ᩅ" order="10 55 10" />
   block(strIndicator)        3d d8 40 de block(x) 00 00                               # '🙀'
   block(strSentinel0001)    FF FF 08 00 01 00 block(x) 00 00                         # UC_SENTINEL CODE_DEADKEY U+0001
-  block(strSentinel0001r)   FF FF 08 00 5C 00 75 00 30 00 30 00 30 00 31 00 block(x) 00 00     # UC_SENTINEL CODE_DEADKEY \u0001 (regex form)
 
 
 block(endstrs)                      # end of strs block

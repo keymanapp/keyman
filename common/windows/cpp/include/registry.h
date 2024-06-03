@@ -187,9 +187,9 @@ public:
 	BOOL DeleteKey(LPCSTR AKey);
 	BOOL DeleteValue(LPCSTR AName);
 	BOOL OpenKey(LPCSTR AKey, BOOL ACreate);
-	BOOL WriteInteger(LPCSTR AName, int AValue);
-	BOOL WriteString(LPCSTR AName, LPSTR AValue);
-	BOOL WriteString(LPCWSTR AName, LPWSTR AValue);
+	BOOL WriteInteger(LPCSTR AName, const int AValue);
+	BOOL WriteString(LPCSTR AName, LPCSTR AValue);
+	BOOL WriteString(LPCWSTR AName, LPCWSTR AValue);
 };
 
 RegistryReadOnly *Reg_GetKeymanActiveKeyboard(LPSTR kbname);

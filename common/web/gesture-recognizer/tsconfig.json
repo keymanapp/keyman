@@ -5,7 +5,7 @@
     "lib": [ "dom", "es6" ],
     "outDir": "./build/obj/",
     "rootDir": "./src/engine",
-    "tsBuildInfoFile": "./build/obj/tsconfig.tsbuildinfo"
+    "tsBuildInfoFile": "./build/obj/tsconfig.tsbuildinfo",
   },
   "include": ["./src/engine/**/*.ts"],
   "exclude": ["./src/test/**/*.ts", "./src/tools/**/*.ts"],

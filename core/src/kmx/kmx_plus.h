@@ -192,6 +192,11 @@ struct COMP_KMXPLUS_META {
    * @brief True if section is valid.
    */
   bool valid(KMX_DWORD length) const;
+
+  /** @brief True if normalization disabled*/
+  bool normalization_disabled() const {
+    return settings & LDML_META_SETTINGS_NORMALIZATION_DISABLED;
+  }
 };
 
 static_assert(sizeof(struct COMP_KMXPLUS_META) == LDML_LENGTH_META, "mismatched size of section meta");

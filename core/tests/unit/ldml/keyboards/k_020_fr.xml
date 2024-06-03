@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Note: similar to, but slightly ahead of, fr-t-k0-azerty -->
-<!DOCTYPE keyboard3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
-<keyboard3 locale="fr-t-k0-azerty" conformsTo="techpreview">
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="fr-t-k0-azerty" conformsTo="45">
 	<locales>
 		<locale id="br" /> <!-- example of including Breton -->
 	</locales>
@@ -16,7 +15,7 @@
 		<!-- Note: displays is only used for keycap presentation -->
 		<!-- this example is not required for this keyboard as we use the spacing
 			modifiers -->
-		<display output="\u0300" display="\u02CB" /> <!-- display combining grave as modifier letter
+		<display output="\u{0300}" display="\u{02CB}" /> <!-- display combining grave as modifier letter
 		grave ˋ -->
 		<!-- Note: We discussed why the existing displayMap was used for display.
 			rather than adding something closer to the key layout. 1. This way we can
@@ -28,8 +27,8 @@
 	</displays>
 
 	<keys>
-		<import base="cldr" path="techpreview/keys-Zyyy-punctuation.xml" />
-		<import base="cldr" path="techpreview/keys-Zyyy-currency.xml" />
+		<import base="cldr" path="45/keys-Zyyy-punctuation.xml" />
+		<import base="cldr" path="45/keys-Zyyy-currency.xml" />
 
 		<!-- switch keys -->
 		<key id="shift" layerId="shift" />

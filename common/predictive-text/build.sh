@@ -3,22 +3,15 @@
 # Compiles the Language Modeling Layer for common use in predictive text and autocorrective applications.
 # Designed for optimal compatibility with the Keyman Suite.
 #
-
-# Exit on command failure and when using unset variables:
-set -eu
-
 # Include some helper functions from resources
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-
-# This script runs from its own folder
-cd "$(dirname "$THIS_SCRIPT")"
 
 BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
 
@@ -41,6 +34,14 @@ builder_describe_outputs \
   build      /common/predictive-text/build/lib/web/index.mjs # is built by the final step.
 
 builder_parse "$@"
+
+function do_configure() {
+  verify_npm_setup
+
+  # Configure Web browser-engine testing environments.  As is, this should only
+  # make changes when we update the dependency, even on our CI build agents.
+  playwright install
+}
 
 function do_build() {
   # Builds the top-level JavaScript file for use on Node
@@ -65,7 +66,7 @@ function do_test() {
   ./unit_tests/test.sh test:libraries test:headless test:browser $TEST_OPTIONS
 }
 
-builder_run_action configure  verify_npm_setup
+builder_run_action configure  do_configure
 builder_run_action clean      rm -rf build/
 builder_run_action build      do_build
 builder_run_action test       do_test

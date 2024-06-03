@@ -6,12 +6,14 @@
 import { minKeymanVersion } from "./min-keyman-version.js";
 import { ModelInfoFile } from "./model-info-file.js";
 import { CompilerCallbacks, CompilerOptions, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KmpJsonFile } from "@keymanapp/common-types";
-import { ModelInfoCompilerMessages } from "./messages.js";
-import { validateMITLicense } from "@keymanapp/developer-utils";
-
-const HelpRoot = 'https://help.keyman.com/model/';
+import { ModelInfoCompilerMessages } from "./model-info-compiler-messages.js";
+import { KeymanUrls, validateMITLicense } from "@keymanapp/developer-utils";
 
 /* c8 ignore start */
+/**
+ * @public
+ * Description of sources and metadata required to build a .model_info file
+ */
 export class ModelInfoSources {
   /** The identifier for the model */
   model_id: string;
@@ -39,19 +41,46 @@ export class ModelInfoSources {
 };
 /* c8 ignore stop */
 
+/**
+ * @public
+ * Options for the .model_info compiler
+ */
 export interface ModelInfoCompilerOptions extends CompilerOptions {
+  /**
+   * Description of sources and metadata required to build a .model_info file
+   */
   sources: ModelInfoSources;
 };
 
+/**
+ * @public
+ * Internal in-memory build artifacts from a successful compilation
+ */
 export interface ModelInfoCompilerArtifacts extends KeymanCompilerArtifacts {
+  /**
+   * Binary model info filedata and filename - used by keyman.com
+   */
   model_info: KeymanCompilerArtifact;
 };
 
+/**
+ * @public
+ * Build artifacts from the .model_info compiler
+ */
 export interface ModelInfoCompilerResult extends KeymanCompilerResult {
+  /**
+   * Internal in-memory build artifacts from a successful compilation. Caller
+   * can write these to disk with {@link ModelInfoCompiler.write}
+   */
   artifacts: ModelInfoCompilerArtifacts;
 };
 
-
+/**
+ * @public
+ * Compiles source data from a lexical model project to a .model_info. The
+ * compiler does not read or write from filesystem or network directly, but
+ * relies on callbacks for all external IO.
+ */
 export class ModelInfoCompiler implements KeymanCompiler {
   private callbacks: CompilerCallbacks;
   private options: ModelInfoCompilerOptions;
@@ -59,6 +88,14 @@ export class ModelInfoCompiler implements KeymanCompiler {
   constructor() {
   }
 
+  /**
+   * Initialize the compiler.
+   * Copies options.
+   * @param callbacks - Callbacks for external interfaces, including message
+   *                    reporting and file io
+   * @param options   - Compiler options
+   * @returns false if initialization fails
+   */
   public async init(callbacks: CompilerCallbacks, options: ModelInfoCompilerOptions): Promise<boolean> {
     this.callbacks = callbacks;
     this.options = {...options};
@@ -66,12 +103,25 @@ export class ModelInfoCompiler implements KeymanCompiler {
   }
 
   /**
-   * Builds .model_info file with metadata from the model and package source file.
-   * This function is intended for use within the lexical-models repository. While many of the
-   * parameters could be deduced from each other, they are specified here to reduce the
-   * number of places the filenames are constructed.
+   * Builds .model_info file with metadata from the model and package source
+   * file. Returns an object containing binary artifacts on success. The files
+   * are passed in by name, and the compiler will use callbacks as passed to the
+   * {@link ModelInfoCompiler.init} function to read any input files by disk.
    *
-   * @param sources                  Details on files from which to extract additional metadata
+   * This function is intended for use within the lexical-models repository.
+   * While many of the parameters could be deduced from each other, they are
+   * specified here to reduce the number of places the filenames are
+   * constructed.
+   *
+   * @param infile  - Path to source file. Path will be parsed to find relative
+   *                  references in the .kpj file, such as .model.ts or
+   *                  .model.kps file
+   * @param outfile - Path to output file. The file will not be written to, but
+   *                  will be included in the result for use by
+   *                  {@link ModelInfoCompiler.write}.
+   * @returns         Binary artifacts on success, null on failure.
+   *
+   * @param sources - Details on files from which to extract additional metadata
    */
   public async run(inputFilename: string, outputFilename?: string): Promise<ModelInfoCompilerResult> {
     const sources = this.options.sources;
@@ -185,7 +235,7 @@ export class ModelInfoCompiler implements KeymanCompiler {
     model_info.packageIncludes = sources.kmpJsonData.files.filter((e) => !!e.name.match(/.[ot]tf$/i)).length ? ['fonts'] : [];
     model_info.version = sources.kmpJsonData.info.version.description;
     model_info.minKeymanVersion = minKeymanVersion;
-    model_info.helpLink = HelpRoot + model_info.id;
+    model_info.helpLink = KeymanUrls.HELP_MODEL(model_info.id);
 
     if(sources.sourcePath) {
       model_info.sourcePath = sources.sourcePath;
@@ -205,6 +255,15 @@ export class ModelInfoCompiler implements KeymanCompiler {
     return result;
   }
 
+  /**
+   * Write artifacts from a successful compile to disk, via callbacks methods.
+   * The artifacts written may include:
+   *
+   * - .model_info file - metadata file used by keyman.com
+   *
+   * @param artifacts - object containing artifact binary data to write out
+   * @returns true on success
+   */
   public async write(artifacts: ModelInfoCompilerArtifacts): Promise<boolean> {
     this.callbacks.fs.writeFileSync(artifacts.model_info.filename, artifacts.model_info.data);
     return true;
@@ -213,7 +272,7 @@ export class ModelInfoCompiler implements KeymanCompiler {
   private isLicenseMIT(filename: string) {
     const data = this.callbacks.loadFile(filename);
     if(!data) {
-      this.callbacks.reportMessage(ModelInfoCompilerMessages.Error_LicenseFileDoesNotExist({filename}));
+      this.callbacks.reportMessage(ModelInfoCompilerMessages.Error_LicenseFileIsMissing({filename}));
       return false;
     }
 

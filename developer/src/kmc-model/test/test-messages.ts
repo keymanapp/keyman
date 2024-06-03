@@ -1,5 +1,5 @@
 import 'mocha';
-import { ModelCompilerMessages } from '../src/model-compiler-errors.js';
+import { ModelCompilerMessages } from '../src/model-compiler-messages.js';
 import { verifyCompilerMessagesObject } from '@keymanapp/developer-test-helpers';
 import { CompilerErrorNamespace } from '@keymanapp/common-types';
 

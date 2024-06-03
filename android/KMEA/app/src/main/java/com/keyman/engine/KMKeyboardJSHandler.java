@@ -24,6 +24,7 @@ import com.keyman.engine.KMManager.KeyboardType;
 import com.keyman.engine.data.Keyboard;
 import com.keyman.engine.util.CharSequenceUtil;
 import com.keyman.engine.util.KMLog;
+import com.keyman.engine.util.KMString;
 
 public class KMKeyboardJSHandler {
   private Context context;
@@ -70,12 +71,11 @@ public class KMKeyboardJSHandler {
     // loaded and has set a keyboard.  To allow the host-page to have earlier access, we instead get the stored
     // keyboard index directly.
     SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
-    if (index < 0) {
-      index = 0;
+    Keyboard kbd = Keyboard.getDefaultKeyboard(context);
+    int index = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, -1);
+    if (index >= 0) {
+      kbd = KMManager.getKeyboardInfo(this.context, index);
     }
-
-    Keyboard kbd = KMManager.getKeyboardInfo(this.context, index);
     return kbd.toStub(context);
   }
 
@@ -135,13 +135,13 @@ public class KMKeyboardJSHandler {
             end = temp;
           }
           if (end > start) {
+            k.setShouldIgnoreSelectionChange(true);
             if (s.length() == 0) {
               ic.setSelection(start, start);
               ic.deleteSurroundingText(0, end - start);
               ic.endBatchEdit();
               return;
             } else {
-              k.setShouldIgnoreSelectionChange(true);
               ic.setSelection(start, start);
               ic.deleteSurroundingText(0, end - start);
             }
@@ -285,14 +285,25 @@ public class KMKeyboardJSHandler {
 
     // Chop dn+numPairs code points from the end of charsBackup
     // subSequence indices are start(inclusive) to end(exclusive)
-    CharSequence expectedChars = charsBackup.subSequence(0, charsBackup.length() - (dn + numPairs));
+    int start = 0;
+    int end = charsBackup.length() - (dn + numPairs);
+    CharSequence expectedChars;
+    try {
+      expectedChars = charsBackup.subSequence(start, end);
+    } catch (IndexOutOfBoundsException e) {
+      KMLog.LogException(TAG,
+        KMString.format("Bad subSequence of start %d, end is %d, length %d, dn %d, numPairs %d",
+        start, end, charsBackup.length(), dn, numPairs), e);
+      expectedChars = "";
+    }
     ic.deleteSurroundingText(dn + numPairs, 0);
-    CharSequence newContext = getCharacterSequence(ic, originalBufferLength - 2*dn);
+    // Shorten the retrieved context by exactly as many characters as were just deleted.
+    CharSequence newContext = getCharacterSequence(ic, originalBufferLength - dn - numPairs);
 
     CharSequence charsToRestore = CharSequenceUtil.restoreChars(expectedChars, newContext);
     if (charsToRestore.length() > 0) {
       // Restore expectedChars that Chromium deleted.
-      // Use newCusorPosition 1 so cursor will be after the inserted string
+      // Use newCursorPosition 1 so cursor will be after the inserted string
       ic.commitText(charsToRestore, 1);
     }
   }
@@ -328,7 +339,15 @@ public class KMKeyboardJSHandler {
     if (Character.isLowSurrogate(sequence.charAt(0))) {
       // Adjust if the first char is also a split surrogate pair
       // subSequence indices are start(inclusive) to end(exclusive)
-      sequence = sequence.subSequence(1, sequence.length());
+      int start = 1;
+      int end = sequence.length();
+      try {
+        sequence = sequence.subSequence(start, end);
+      } catch (IndexOutOfBoundsException e) {
+        KMLog.LogException(TAG,
+          KMString.format("Bad subSequence of start %d, end is %d",
+          start, end), e);
+      }      
     }
 
     return sequence;

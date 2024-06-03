@@ -69,7 +69,6 @@ type
     FServerUseNgrok: Boolean;
     FServerServerShowConsoleWindow: Boolean;
     FServerNgrokToken: string;
-    FServerNgrokRegion: string;
     FServerKeepAlive: Boolean;
     FToolbarVisible: Boolean;
     FStartupProjectPath: string;
@@ -83,6 +82,7 @@ type
     procedure optWriteBool(const nm: string; value: Boolean);
     procedure optWriteInt(const nm: string; value: Integer);
     procedure WriteServerConfigurationJson;
+    class function Get_Initial_DefaultProjectPath: string; static;
   public
     procedure Read;
     procedure Write;
@@ -117,7 +117,6 @@ type
     property ServerUseLocalAddresses: Boolean read FServerUseLocalAddresses write FServerUseLocalAddresses;
 
     property ServerNgrokToken: string read FServerNgrokToken write FServerNgrokToken;
-    property ServerNgrokRegion: string read FServerNgrokRegion write FServerNgrokRegion;
     property ServerUseNgrok: Boolean read FServerUseNgrok write FServerUseNgrok;
     property ServerServerShowConsoleWindow: Boolean read FServerServerShowConsoleWindow write FServerServerShowConsoleWindow;
 
@@ -201,7 +200,6 @@ const
   SRegValue_IDEOptServerPort = 'web host port';   // I4021
   SRegValue_IDEOptServerKeepAlive = 'server keep alive';
   SRegValue_IDEOptServerNgrokToken = 'server ngrok token';
-  SRegValue_IDEOptServerNgrokRegion = 'server ngrok region';
   SRegValue_IDEOptServerUseLocalAddresses = 'server use local addresses';
   SRegValue_IDEOptServerUseNgrok = 'server use ngrok';
   SRegValue_IDEOptServerShowConsoleWindow = 'server show console window';
@@ -348,7 +346,6 @@ begin
     FServerUseLocalAddresses := optReadBool(SRegValue_IDEOptServerUseLocalAddresses, True);
 
     FServerNgrokToken := optReadString(SRegValue_IDEOptServerNgrokToken, '');
-    FServerNgrokRegion := optReadString(SRegValue_IDEOptServerNgrokRegion, 'us');
     FServerUseNgrok := optReadBool(SRegValue_IDEOptServerUseNgrok, False);
     FServerServerShowConsoleWindow := optReadBool(SRegValue_IDEOptServerShowConsoleWindow, False);
 
@@ -369,7 +366,12 @@ begin
 
     FFix183_LadderLength := optReadInt(SRegValue_IDEOpt_WebLadderLength, CRegValue_IDEOpt_WebLadderLength_Default);
 
-    FDefaultProjectPath := IncludeTrailingPathDelimiter(optReadString(SRegValue_IDEOpt_DefaultProjectPath, GetFolderPath(CSIDL_PERSONAL) + CDefaultProjectPath));
+    FDefaultProjectPath := IncludeTrailingPathDelimiter(optReadString(SRegValue_IDEOpt_DefaultProjectPath, Get_Initial_DefaultProjectPath));
+    if (FDefaultProjectPath = '\') or IsRelativePath(FDefaultProjectPath) then
+    begin
+      // #11554
+      FDefaultProjectPath := Get_Initial_DefaultProjectPath;
+    end;
 
     // for consistency with Keyman.System.KeymanSentryClient, we need to use
     // reg.ReadInteger, as regReadInt, which in the dim dark past started
@@ -434,7 +436,6 @@ begin
     optWriteBool(SRegValue_IDEOptServerUseLocalAddresses, FServerUseLocalAddresses);
 
     optWriteString(SRegValue_IDEOptServerNgrokToken, FServerNgrokToken);
-    optWriteString(SRegValue_IDEOptServerNgrokRegion, FServerNgrokRegion);
     optWriteBool(SRegValue_IDEOptServerUseNgrok, FServerUseNgrok);
     optWriteBool(SRegValue_IDEOptServerShowConsoleWindow, FServerServerShowConsoleWindow);
 
@@ -514,7 +515,6 @@ begin
   try
     o.AddPair('port', TJSONNumber.Create(FServerDefaultPort));
     o.AddPair('ngrokToken', FServerNgrokToken);
-    o.AddPair('ngrokRegion', FServerNgrokRegion);
     o.AddPair('useNgrok', TJSONBool.Create(FServerUseNgrok));
     o.AddPair('ngrokVisible', TJSONBool.Create(FServerServerShowConsoleWindow));
     SaveJSONToFile(TKeymanDeveloperPaths.ServerDataPath + TKeymanDeveloperPaths.S_ServerConfigJson, o);
@@ -617,6 +617,11 @@ end;
 class function TKeymanDeveloperOptions.IsDefaultEditorTheme(s: string): Boolean;
 begin
   Result := DefaultEditorThemeItemIndex(s) >= 0;
+end;
+
+class function TKeymanDeveloperOptions.Get_Initial_DefaultProjectPath: string;
+begin
+  Result := GetFolderPath(CSIDL_PERSONAL) + CDefaultProjectPath;
 end;
 
 function LoadKeymanDeveloperSentryFlags: TKeymanSentryClientFlags;

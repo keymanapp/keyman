@@ -7,6 +7,11 @@ export interface CompilerEvent {
   code: number;
   message: string;
   /**
+   * detailed Markdown-formatted description of the error including
+   * references to documentation, remediation options.
+   */
+  detail?: string;
+  /**
    * an internal error occurred that should be captured with a stack trace
    * e.g. to the Keyman sentry instance by kmc
    */
@@ -20,6 +25,14 @@ export enum CompilerErrorSeverity {
   Error =         0x300000, // Severe error where we can't continue
   Fatal =         0x400000, // OOM or should-not-happen internal problem
 };
+
+export const CompilerErrorSeverityValues = [
+  CompilerErrorSeverity.Info,
+  CompilerErrorSeverity.Hint,
+  CompilerErrorSeverity.Warn,
+  CompilerErrorSeverity.Error,
+  CompilerErrorSeverity.Fatal,
+]
 
 /**
  * Mask values for mapping compiler errors
@@ -50,6 +63,9 @@ export class CompilerError {
   static baseError(code: number): number {
     return code & CompilerErrorMask.BaseError;
   }
+  static namespace(code: number): CompilerErrorNamespace {
+    return code & CompilerErrorMask.Namespace;
+  }
   static formatSeverity(code: number): string {
     return errorSeverityName[CompilerError.severity(code)] ?? 'UNKNOWN';
   }
@@ -78,7 +94,7 @@ export class CompilerError {
    * ```
    */
   static formatCode(code: number): string {
-    return 'KM' + CompilerError.error(code).toString(16).toUpperCase().padStart(5, '0');
+    return Number.isInteger(code) ? 'KM' + CompilerError.error(code).toString(16).toUpperCase().padStart(5, '0') : 'KM?????';
   }
 
   /**
@@ -156,6 +172,22 @@ export class CompilerError {
   static exceptionToString(e?: any) : string {
     return `${(e ?? 'unknown error').toString()}\n\nCall stack:\n${(e instanceof Error ? e.stack : (new Error()).stack)}`;
   }
+
+  /**
+   * Returns the corresponding error severity value from a partial name match,
+   * e.g. 'inf' returns CompilerErrorSeverity.Info, or returns null if not found
+   * @param name
+   * @returns
+   */
+  static severityNameToValue(name: string): CompilerErrorSeverity {
+    name = name.toLowerCase();
+    for(let level of CompilerErrorSeverityValues) {
+      if(errorSeverityName[level].startsWith(name)) {
+        return level;
+      }
+    }
+    return null;
+  }
 };
 
 /** @deprecated use `CompilerError.severity` instead */
@@ -183,6 +215,9 @@ export function compilerEventFormat(e : CompilerEvent | CompilerEvent[]) : strin
  * ranges must not be changed as external modules may depend on specific error
  * codes. Individual errors are defined at a compiler level, for example,
  * kmc-ldml/src/compiler/messages.ts.
+ *
+ * kmc defines a mapping between each namespace and the corresponding compiler's
+ * error reporting class in kmc/src/messages/messageNamespaces.ts
  */
 export enum CompilerErrorNamespace {
   /**
@@ -259,11 +294,22 @@ export interface CompilerFileSystemCallbacks {
   existsSync(name: string): boolean;
 }
 
+type CompilerErrorSeverityOverride = CompilerErrorSeverity | 'disable';
+export interface CompilerMessageOverrideMap {
+  [code:number]: CompilerErrorSeverityOverride;
+};
+
+export interface CompilerMessageOverride {
+  code: number;
+  level: CompilerErrorSeverityOverride;
+};
+
 export interface CompilerCallbackOptions {
   logLevel?: CompilerLogLevel;
   logFormat?: CompilerLogFormat;
   color?: boolean; // null or undefined == use console default
   compilerWarningsAsErrors?: boolean;
+  messageOverrides?: CompilerMessageOverrideMap;
 };
 
 export interface KeymanCompilerArtifact {
@@ -353,6 +399,28 @@ export class CompilerFileCallbacks implements CompilerCallbacks {
   }
 
   /**
+   *
+   * @param event
+   * @param overrides
+   * @returns true if event has been suppressed
+   */
+  static applyMessageOverridesToEvent(event: CompilerEvent, overrides: CompilerMessageOverrideMap) {
+    // Override event severity from user preference -- this will not override
+    // fatal or error events
+    const severity = overrides?.[CompilerError.error(event.code)] ??
+      CompilerError.severity(event.code);
+
+    if(severity == 'disable') {
+      return true;
+    }
+
+    // Override the default event severity with the command line option
+    event.code = severity | (event.code & ~CompilerErrorMask.Severity);
+
+    return false;
+  }
+
+  /**
    * Returns `true` if any message in the `messages` array is a Fatal or Error
    * message, and if `compilerWarningsAsErrors` is `true`, then also returns
    * `true` if any message is a Warning.
@@ -393,8 +461,11 @@ export class CompilerFileCallbacks implements CompilerCallbacks {
   }
 
   reportMessage(event: CompilerEvent): void {
+    const disable = CompilerFileCallbacks.applyMessageOverridesToEvent(event, this.options.messageOverrides);
     this.messages.push(event);
-    this.parent.reportMessage({filename: this.filename, ...event});
+    if(!disable) {
+      this.parent.reportMessage({filename: this.filename, ...event});
+    }
   }
 
   debug(msg: string): void {
@@ -458,24 +529,28 @@ export const defaultCompilerOptions: CompilerOptions = {
 
 /**
  * Convenience function for constructing CompilerEvents
- * @param code
- * @param message
+ * @param code     Unique numeric value of the event
+ * @param message  A short description of the error presented to the user
+ * @param detail   Detailed Markdown-formatted description of the error
+ *                 including references to documentation, remediation options.
  * @returns
  */
-export const CompilerMessageSpec = (code: number, message: string, exceptionVar?: any) : CompilerEvent => ({
+export const CompilerMessageSpec = (code: number, message: string, detail?: string) : CompilerEvent => ({
+  code,
+  message,
+  detail,
+});
+
+export const CompilerMessageDef = (param: any) => String(param ?? `<param>`);
+
+export const CompilerMessageSpecWithException = (code: number, message: string, exceptionVar: any, detail?: string) : CompilerEvent => ({
   code,
   message: exceptionVar
     ? (message ?? `Unexpected exception`) + `: ${exceptionVar.toString()}\n\nCall stack:\n${(exceptionVar instanceof Error ? exceptionVar.stack : (new Error()).stack)}` :
     message,
-  exceptionVar
+  detail,
+  exceptionVar,
 });
-
-/**
- * @deprecated use `CompilerError.exceptionToString` instead
- */
-export function compilerExceptionToString(e?: any) : string {
-  return CompilerError.exceptionToString(e);
-}
 
 /**
  * Compiler logging level and correspondence to severity

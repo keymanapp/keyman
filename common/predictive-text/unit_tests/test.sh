@@ -57,14 +57,6 @@ if builder_start_action test:libraries; then
   "$KEYMAN_ROOT/common/models/templates/build.sh" test $TEST_OPTS
   popd
 
-  pushd "$KEYMAN_ROOT/common/models/types"
-  echo
-  echo "### Running $(builder_term common/models/types) tests"
-  # Is not mocha-based; it's TSC-based instead, as we're just ensuring that the .d.ts
-  # file is a proper TS declaration file.
-  npm run test
-  popd
-
   pushd "$KEYMAN_ROOT/common/web/lm-worker"
   echo
   echo "### Running ${BUILDER_TERM_START}common/web/lm-worker${BUILDER_TERM_END} tests"
@@ -93,7 +85,7 @@ fi
 #
 # We do not run BrowserStack tests on master, beta, or stable-x.y test
 # builds.
-if [[ $VERSION_ENVIRONMENT == test ]] && builder_has_action test :browser; then
+if [[ $VERSION_ENVIRONMENT == test ]] && builder_has_action test:browser; then
   if builder_pull_get_details; then
     if ! ([[ $builder_pull_title =~ \(web\) ]] || builder_pull_has_label test-browserstack); then
 
@@ -114,32 +106,18 @@ get_browser_set_for_OS ( ) {
 }
 
 if builder_start_action test:browser; then
-  KARMA_FLAGS=$FLAGS
-  KARMA_INFO_LEVEL="--log-level=warn"
+  WTR_CONFIG=
+  WTR_DEBUG=
 
   if builder_has_option --ci; then
-    KARMA_FLAGS="$KARMA_FLAGS --reporters teamcity,BrowserStack"
-    KARMA_CONFIG="CI.conf.cjs"
-    KARMA_INFO_LEVEL="--log-level=debug"
-  else
-    KARMA_CONFIG="manual.conf.cjs"
-    if builder_is_debug_build; then
-      KARMA_FLAGS="$KARMA_FLAGS --no-single-run"
-      KARMA_CONFIG="manual.conf.cjs"
-      KARMA_INFO_LEVEL="--log-level=debug"
-
-      echo
-      echo "${COLOR_YELLOW}You must manually terminate this mode (CTRL-C) for the script to exit.${COLOR_RESET}"
-      sleep 2
-    fi
+    WTR_CONFIG=.CI
   fi
 
-  if [[ KARMA_CONFIG == "manual.conf.cjs" ]]; then
-    get_browser_set_for_OS
-  else
-    BROWSERS=
+  if builder_has_option --debug; then
+    WTR_DEBUG=" --manual"
   fi
-  karma start $KARMA_INFO_LEVEL $KARMA_FLAGS $BROWSERS ./in_browser/$KARMA_CONFIG
+
+  web-test-runner --config in_browser/web-test-runner${WTR_CONFIG}.config.mjs ${WTR_DEBUG}
 
   builder_finish_action success test:browser
 fi

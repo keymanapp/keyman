@@ -339,7 +339,6 @@ class KeyboardMenuView: UIView, UITableViewDelegate, UITableViewDataSource, UIGe
       // keyboard loaded does not provide suggestions.  Parking it here as it's not
       // worth pursuing further at this stage.
       inputViewController?.updateViewConstraints()
-      inputViewController?.updateShowBannerSetting()
       return
     }
   }

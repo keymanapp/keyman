@@ -20,8 +20,9 @@ type
   km_core_virtual_key = uint16_t;
 
   km_core_usv = uint32_t;  // UTF-32
-  km_core_cp = WideChar;
-  pkm_core_cp = ^km_core_cp;
+  pkm_core_usv = ^km_core_usv;
+  km_core_cu = WideChar;
+  pkm_core_cu = ^km_core_cu;
 
   km_core_context = record end;
   pkm_core_context = ^km_core_context;
@@ -70,6 +71,7 @@ type
   end;
 
   pkm_core_context_item = ^km_core_context_item;
+  ppkm_core_context_item = ^pkm_core_context_item;
 
 const
   KM_CORE_CONTEXT_ITEM_END: km_core_context_item = (
@@ -79,32 +81,10 @@ const
   );
 
 const
-  keymancore = 'keymancore-1.dll';
-
-function km_core_context_items_from_utf16(
-  const text: pkm_core_cp;
-  var out_ptr: pkm_core_context_item
-): km_core_status; cdecl; external keymancore delayed;
-
-function km_core_context_items_from_utf8(
-  const text: PAnsiChar;
-  var out_ptr: pkm_core_context_item
-): km_core_status; cdecl; external keymancore delayed;
-
-function km_core_context_items_to_utf16(
-  const item: pkm_core_context_item;
-  buf: pkm_core_cp;
-  var buf_size: integer
-): km_core_status; cdecl; external keymancore delayed;
-
-function km_core_context_items_to_utf8(
-  const item: pkm_core_context_item;
-  buf: pansichar;
-  var buf_size: integer
-): km_core_status; cdecl; external keymancore delayed;
+  keymancore = 'keymancore-2.dll';
 
 procedure km_core_context_items_dispose(
-  const context_items: km_core_context_item
+  context_items: pkm_core_context_item
 ); cdecl; external keymancore delayed;
 
 function km_core_context_set(
@@ -114,25 +94,16 @@ function km_core_context_set(
 
 function km_core_context_get(
   context: pkm_core_context;
-  var context_items: pkm_core_context_item
+  context_items: ppkm_core_context_item
 ): km_core_status; cdecl; external keymancore delayed;
 
 procedure km_core_context_clear(
   context: pkm_core_context
 ); cdecl; external keymancore delayed;
 
-function km_core_context_append(
-  context: pkm_core_context;
-  context_items: pkm_core_context_item
-): km_core_status; cdecl; external keymancore delayed;
-
-function km_core_context_shrink(
-  context: pkm_core_context;
-  num: Integer;
-  prefix: pkm_core_context_item
-): km_core_status; cdecl; external keymancore delayed;
-
-
+function km_core_context_length(
+  context: pkm_core_context
+): uint32; cdecl; external keymancore delayed;
 
 type
   km_core_option_scope = (
@@ -143,8 +114,8 @@ type
   );
 
   km_core_option_item = record
-    key: pkm_core_cp;
-    value: pkm_core_cp;
+    key: pkm_core_cu;
+    value: pkm_core_cu;
     scope: km_core_option_scope;
   end;
 
@@ -201,6 +172,42 @@ type
 
   pkm_core_action_item = ^km_core_action_item;
 
+  km_core_bool = uint32;
+
+  km_core_caps_state = (
+    KM_CORE_CAPS_UNCHANGED = -1,
+    KM_CORE_CAPS_OFF = 0,
+    KM_CORE_CAPS_ON = 1
+  );
+
+  km_core_actions = record
+    // number of codepoints (not codeunits!) to delete from app context.
+    code_points_to_delete: uint32;
+
+    // null-term string of characters to insert into document
+    output: pkm_core_usv;
+
+    // list of options to persist, terminated with KM_CORE_OPTIONS_END
+    persist_options: pkm_core_option_item;
+
+    // issue a beep, 0 = no, 1 = yes
+    do_alert: km_core_bool;
+
+    // emit the (unmodified) input keystroke to the application, 0 = no, 1 = yes
+    emit_keystroke: km_core_bool;
+
+    // -1=unchanged, 0=off, 1=on
+    new_caps_lock_state: km_core_caps_state;
+
+    // reference copy of actual UTF32 codepoints deleted from end of context
+    // (closest to caret) exactly code_points_to_delete in length (plus null
+    // terminator). Used to determine encoding conversion differences when
+    // deleting; only set when using km_core_state_actions_get, otherwise
+    // nullptr.
+    deleted_context: pkm_core_usv;
+  end;
+  pkm_core_actions = ^km_core_actions;
+
 // These types are used only for debugging convenience
 type
   km_core_action_item_array = array[0..100] of km_core_action_item;
@@ -213,8 +220,8 @@ function km_core_options_list_size(
 function km_core_state_option_lookup(
   state: pkm_core_state;
   scope: km_core_option_scope;
-  key: pkm_core_cp;
-  var value: pkm_core_cp
+  key: pkm_core_cu;
+  var value: pkm_core_cu
 ): km_core_status; cdecl; external keymancore delayed;
 
 function km_core_state_options_update(
@@ -230,8 +237,8 @@ function km_core_state_options_to_json(
 
 type
   km_core_keyboard_attrs = record
-    version_string: pkm_core_cp;
-    id: pkm_core_cp;
+    version_string: pkm_core_cu;
+    id: pkm_core_cu;
     folder_path: km_core_path_name;
     default_optons: pkm_core_option_item
   end;
@@ -271,15 +278,27 @@ function km_core_state_context(
   state: pkm_core_state
 ): pkm_core_context; cdecl; external keymancore delayed;
 
+function km_core_state_app_context(
+  state: pkm_core_state
+): pkm_core_context; cdecl; external keymancore delayed;
+
 function km_core_state_action_items(
   state: pkm_core_state;
   num_items: pinteger
 ): pkm_core_action_item; cdecl; external keymancore delayed;
 
+function km_core_state_get_actions(
+  state: pkm_core_state
+): pkm_core_actions; cdecl; external keymancore delayed;
+
 function km_core_state_to_json(
   state: pkm_core_state;
   buf: PAnsiChar;
   space: pinteger
+): km_core_status; cdecl; external keymancore delayed;
+
+function km_core_state_context_clear(
+  state: pkm_core_state
 ): km_core_status; cdecl; external keymancore delayed;
 
 type
@@ -644,4 +663,25 @@ begin
     RaiseLastOSError;
 end;
 
+// Verify size of km_core_actions - from x86 core c++ build, test_actions.cpp
+
+procedure VerifyKmCoreActionsSize;
+var
+  act: km_core_actions;
+begin
+{$IFDEF WIN64}
+  {$ERROR Struct size not yet verified for 64-bit}
+{$ENDIF}
+  assert(sizeof(km_core_actions) = 28);
+  // &km_core_actions.code_points_to_delete: 0
+  assert(Uint32(@act.output) - Uint32(@act) = 4);
+  assert(Uint32(@act.persist_options) - Uint32(@act) = 8);
+  assert(Uint32(@act.do_alert) - Uint32(@act) = 12);
+  assert(Uint32(@act.emit_keystroke) - Uint32(@act) = 16);
+  assert(Uint32(@act.new_caps_lock_state) - Uint32(@act) = 20);
+  assert(Uint32(@act.deleted_context) - Uint32(@act) = 24);
+end;
+
+initialization
+  VerifyKmCoreActionsSize;
 end.

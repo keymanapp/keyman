@@ -15,11 +15,6 @@ export class AlertHost {
   private readonly bg: HTMLDivElement;
 
   /**
-   * The "wait box" element - the top-level element comprising the wait/message box itself.
-   */
-  private readonly lb: HTMLDivElement;
-
-  /**
    * The "wait text" / "alert text" element - the element containing any message text associated
    * with the alert or wait being signaled.
    */
@@ -50,7 +45,7 @@ export class AlertHost {
   constructor() {
     // "background" - the clickable shim BEHIND the 'dialog'
     const bg = this.bg = document.createElement('div'),
-          lb = this.lb = document.createElement('div'), // 'wait box' - the main actual message box / 'dialog' element
+          lb = document.createElement('div'), // 'wait box' - the main actual message box / 'dialog' element
           lt = this.lt = document.createElement('div'), // 'wait text' // or alert text - but the host for message text
           gr = this.gr = document.createElement('div'), // 'wait graphic' - the little 'please wait' spinny / faux progress bar
           bx = this.bx = document.createElement('div'); // the little 'close' top-right x button.
@@ -63,7 +58,7 @@ export class AlertHost {
     bx.className='kmw-alert-close';
 
     // Close alert if anywhere in box is touched, since close box is too small on mobiles
-    lb.onmousedown = lb.onclick = (e) => {
+    const lbClick = lb.onmousedown = lb.onclick = (e: MouseEvent | TouchEvent) => {
       // Ignore if waiting, only handle for alert
       if(bx.style.display == 'block') {
         bg.style.display='none';
@@ -73,13 +68,13 @@ export class AlertHost {
       }
     };
 
-    lb.addEventListener('touchstart', lb.onclick, false);
-    bg.onmousedown = bg.onclick = (e) => {
+    lb.addEventListener('touchstart', lbClick, false);
+    const bgClick = bg.onmousedown = bg.onclick = (e: MouseEvent | TouchEvent) => {
       e.preventDefault();
       e.stopPropagation();
 
     }
-    bg.addEventListener('touchstart', bg.onclick, false);
+    bg.addEventListener('touchstart', bgClick, false);
     lb.appendChild(bx); // [0]
     lb.appendChild(lt); // [1]
     lb.appendChild(gr); // [2]

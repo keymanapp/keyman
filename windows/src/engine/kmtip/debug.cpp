@@ -1,18 +1,18 @@
 /*
   Name:             K32_DBG
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      14 Sep 2006
 
   Modified Date:    23 Feb 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          14 Sep 2006 - mcdurdin - Rework internal debugging to use mailslot passing to Keyman
                     05 Dec 2006 - mcdurdin - Disable temporary file-based logging
                     15 Jan 2007 - mcdurdin - Use _FILELOG define
@@ -85,7 +85,7 @@ void InitDebugging() {
   }
 }
 
-int SendDebugMessageFormat_1(char *file, int line, PWCHAR fmt, ...) {
+int SendDebugMessageFormat_1(wchar_t *file, int line, PWCHAR fmt, ...) {
   if (ShouldDebug()) {
     WCHAR fmtbuf[256];
 
@@ -100,14 +100,14 @@ int SendDebugMessageFormat_1(char *file, int line, PWCHAR fmt, ...) {
   return 0;
 }
 
-int SendDebugMessage_1(char *file, int line, PWCHAR msg) {
+int SendDebugMessage_1(wchar_t *file, int line, PWCHAR msg) {
   if (ShouldDebug()) {
     Keyman32Interface::WriteDebugEvent(file, line, msg);
   }
   return 0;
 }
 
-void DebugLastError_1(char *file, int line, char *func, PWCHAR msg, DWORD err) {
+void DebugLastError_1(wchar_t *file, int line, char *func, PWCHAR msg, DWORD err) {
   if(ShouldDebug()) {
     WCHAR buf[256];
     FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ARGUMENT_ARRAY, NULL, err, 0, buf, _countof(buf), NULL);
@@ -121,7 +121,7 @@ void WINAPI Keyman_Diagnostic(int mode) {
   }
 }
 
-BOOL _LogSUCCEEDED(char *file, int line, PWSTR caller, PSTR callee, HRESULT hr) {
+BOOL _LogSUCCEEDED(wchar_t *file, int line, PWSTR caller, PSTR callee, HRESULT hr) {
   BOOL result = SUCCEEDED(hr);
   if (!result) {
     SendDebugMessageFormat_1(file, line, L"CKMTipTextService::Log: call in %s to %hs failed with %x", caller, callee, hr);

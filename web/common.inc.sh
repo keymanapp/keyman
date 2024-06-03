@@ -85,17 +85,34 @@ function prepare() {
 # ```
 function test-headless() {
   TEST_FOLDER=$1
-  TEST_BASE=${2:-${KEYMAN_ROOT}/web/src/test/auto/headless/}
+  TEST_EXTENSIONS=${2:-}
+  TEST_BASE="${KEYMAN_ROOT}/web/src/test/auto/headless/"
 
   TEST_OPTS=
+  TEST_CD_REQD=false
   if builder_has_option --ci; then
     TEST_OPTS="--reporter mocha-teamcity-reporter"
   fi
+  if [[ -n "$TEST_EXTENSIONS" ]]; then
+    TEST_OPTS="$TEST_OPTS --extension $TEST_EXTENSIONS"
+    TEST_CD_REQD=true
+  fi
+
+  if [ $TEST_CD_REQD ]; then
+    # The mocha config needed to live-compile TS-based tests only applies
+    # if the command is started within the appropriate subfolder.
+    pushd "${TEST_BASE}" > /dev/null
+    TEST_BASE=
+  fi
 
   if [[ -e .c8rc.json ]]; then
-    c8 mocha --recursive "${TEST_BASE}/${TEST_FOLDER}" $TEST_OPTS
+    c8 mocha --recursive "${TEST_BASE}${TEST_FOLDER}" $TEST_OPTS
   else
-    mocha --recursive "${TEST_BASE}/${TEST_FOLDER}" $TEST_OPTS
+    mocha --recursive "${TEST_BASE}${TEST_FOLDER}" $TEST_OPTS
+  fi
+
+  if [ $TEST_CD_REQD ]; then
+    popd > /dev/null
   fi
 }
 
@@ -116,5 +133,7 @@ function test-headless() {
 #   test-headless-typescript engine/osk
 # ```
 function test-headless-typescript() {
-  test-headless "$1" "${KEYMAN_ROOT}/web/build/test/headless"
+  # tests.js - ensure any plain-js files that exist as test resources, but not test defs,
+  # aren't treated by Mocha as tests.
+  test-headless "$1" "tests.ts"
 }

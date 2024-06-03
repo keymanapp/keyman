@@ -5,10 +5,9 @@ import * as PromiseStatusModule from 'promise-status-async';
 const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
 import { assertingPromiseStatus as promiseStatus } from '../../../resources/assertingPromiseStatus.js';
 
-import { InputSample, GestureSource, gestures, GestureDebugPath } from '@keymanapp/gesture-recognizer';
+import { InputSample, gestures, GestureDebugPath } from '@keymanapp/gesture-recognizer';
 
 import { TouchpathTurtle } from '#tools';
-import { ManagedPromise, timedPromise } from '@keymanapp/web-utils';
 
 import { simulateMultiSourceMatcherInput } from "../../../resources/simulateMultiSourceInput.js";
 

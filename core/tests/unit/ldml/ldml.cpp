@@ -24,12 +24,17 @@
 #include <test_assert.h>
 #include <test_color.h>
 
+#include "keyman_core.h"
+#include "util_normalize.hpp"
+
 #include <kmx/kmx_xstring.h>  // for surrogate pair macros
 
 #include "ldml_test_source.hpp"
 #include "debuglog.h"
 
-#include "ldml/ldml_transforms.hpp"
+#include "ldml/ldml_markers.hpp"
+
+#include "processor.hpp"
 
 namespace {
 
@@ -109,40 +114,54 @@ apply_action(
         {(uint32_t)act.marker}});
     break;
   case KM_CORE_IT_BACK:
+  {
+    // single char removed in context
+    km_core_usv ch = 0;
+    bool matched_text = false;
+    // assume the backspace came from set_action() and there's no further info.
+    assert(act.backspace.expected_type == KM_CORE_BT_CHAR);
+    assert(act.backspace.expected_value == 0);
     // It is valid for a backspace to be received with an empty text store
     // as the user can press backspace with no text in the store and Keyman
     // will pass that back to the client, as the client may do additional
     // processing at start of a text store, e.g. delete from a previous cell
     // in a table. Or, if Keyman has a cached context, then there may be
     // additional text in the text store that Keyman can't see.
-    if (act.backspace.expected_type == KM_CORE_BT_MARKER) {
-      assert(!context.empty());
-      assert(context.back().type == KM_CORE_CT_MARKER);
-      context.pop_back();
-      // no change to text store.
-    } else if (text_store.length() > 0) {
+    // If there's anything in the text store, pop it off.  Two if a pair.
+    if (text_store.length() > 0) {
       assert(!context.empty() && !text_store.empty());
-      km_core_usv ch = text_store.back();
+      const auto ch1 = text_store.back();
       text_store.pop_back();
-      if (text_store.length() > 0 && Uni_IsSurrogate2(ch)) {
-        auto ch1 = text_store.back();
-        if (Uni_IsSurrogate1(ch1)) {
+      if (text_store.length() > 0 && Uni_IsSurrogate2(ch1)) {
+        const auto ch2 = text_store.back();
+        if (Uni_IsSurrogate1(ch2)) {
           // We'll only pop the next character off it is actually a
           // surrogate pair
-          ch = Uni_SurrogateToUTF32(ch1, ch);
+          ch = Uni_SurrogateToUTF32(ch2, ch1); // reverse order
           text_store.pop_back();
+        } else {
+          ch = 0xFFFF; // unpaired
         }
-      }
-      if (act.backspace.expected_type == KM_CORE_BT_CHAR) {
-        assert(ch == act.backspace.expected_value);
-        assert(context.back().type == KM_CORE_CT_CHAR);
-        assert(context.back().character == ch);
-        context.pop_back();
       } else {
-        // assume it's otherwise KM_CORE_BT_UNKNOWN
-        assert(act.backspace.expected_type == KM_CORE_BT_UNKNOWN);
-        assert(context.empty()); // if KM_CORE_BT_UNKNOWN, context should be empty.
+        ch = ch1; // single char
       }
+    } else {
+      matched_text = true; // no text to match as context is empty.
+    }
+    // now, we need to simulate what ldml_processor::emit_backspace() is going to do.
+      auto end = context.rbegin();
+      while (end != context.rend()) {
+        if (end->type == KM_CORE_CT_CHAR) {
+          assert(!matched_text);
+          assert_equal(end->character, ch); // expect popped char to be same as what's in context
+          matched_text = true;
+          context.pop_back();
+          break;  // exit on first real char
+        }
+        assert(end->type != KM_CORE_CT_END);  // inappropriate here.
+        context.pop_back();
+      }
+      assert(matched_text);
     }
     break;
   case KM_CORE_IT_PERSIST_OPT:
@@ -154,7 +173,7 @@ apply_action(
       // the context from the context string.
       km_core_context_item* new_context_items = nullptr;
       // We replace the cached context with the current application context
-      km_core_status status = km_core_context_items_from_utf16(text_store.c_str(), &new_context_items);
+      km_core_status status = context_items_from_utf16(text_store.c_str(), &new_context_items);
       assert(status == KM_CORE_STATUS_OK);
       copy_context_items_to_vector(new_context_items, context);
       // also update the test context
@@ -180,49 +199,72 @@ apply_action(
 
 /**
  * verify the current context
-*/
+ */
 void
-verify_context(std::u16string& text_store, km_core_state* &test_state, std::vector<km_core_context_item> &test_context) {
-      // Compare context and text store at each step - should be identical
-    size_t n = 0;
-    km_core_context_item* citems = nullptr;
-    try_status(km_core_context_get(km_core_state_context(test_state), &citems));
-    try_status(km_core_context_items_to_utf16(citems, nullptr, &n));
-    km_core_cp *buf = new km_core_cp[n];
-    try_status(km_core_context_items_to_utf16(citems, buf, &n));
-    std::cout << "context   : " << string_to_hex(buf) << " [" << buf << "]" << std::endl;
-    std::cout << "testcontext ";
-    std::cout.fill('0');
-    for (auto i = test_context.begin(); i < test_context.end(); i++) {
-      switch(i->type) {
-        case KM_CORE_CT_CHAR:
-          std::cout << "U+" << std::setw(4) << std::hex << i->character << std::dec << " ";
-          break;
-        case KM_CORE_CT_MARKER:
-          std::cout << "\\m{" << i->character << "} ";
-          break;
-        default:
-          std::cout << "type#" << i->type << " ";
-      }
+verify_context(std::u16string &text_store, km_core_state *&test_state, std::vector<km_core_context_item> &test_context) {
+  // Compare context and text store at each step - should be identical
+  size_t n                     = 0;
+  km_core_context_item *citems = nullptr;
+  try_status(km_core_context_get(km_core_state_context(test_state), &citems));
+  try_status(context_items_to_utf16(citems, nullptr, &n));
+  km_core_cu *buf = new km_core_cu[n];
+  try_status(context_items_to_utf16(citems, buf, &n));
+  std::cout << "context (raw): ";  // output including markers (which aren't in 'buf' here)
+  for (auto ci = citems; ci->type != KM_CORE_CT_END; ci++) {
+    switch (ci->type) {
+    case KM_CORE_CT_CHAR:
+      std::cout << "U+" << std::setw(4) << std::hex << ci->character << std::dec << " ";
+      break;
+    case KM_CORE_CT_MARKER:
+      std::cout << "\\m{" << ci->character << "} ";
+      break;
+    default:
+      std::cout << "type#" << ci->type << " ";
     }
-    std::cout << std::endl;
-
-    // Verify that both our local test_context and the core's test_state.context have
-    // not diverged
-    auto ci = citems;
-    for (auto test_ci = test_context.begin(); ci->type != KM_CORE_CT_END || test_ci != test_context.end(); ci++, test_ci++) {
-      assert(ci->type != KM_CORE_CT_END && test_ci != test_context.end());  // Verify that both lists are same length
-      assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
+  }
+  std::cout << std::endl;
+  std::cout << "context   : " << string_to_hex(buf) << " [" << buf << "]" << std::endl;
+  std::cout << "testcontext ";
+  std::cout.fill('0');
+  for (auto i = test_context.begin(); i < test_context.end(); i++) {
+    switch (i->type) {
+    case KM_CORE_CT_CHAR:
+      std::cout << "U+" << std::setw(4) << std::hex << i->character << std::dec << " ";
+      break;
+    case KM_CORE_CT_MARKER:
+      std::cout << "\\m{" << i->character << "} ";
+      break;
+    default:
+      std::cout << "type#" << i->type << " ";
     }
+  }
+  std::cout << std::endl;
 
-    km_core_context_items_dispose(citems);
-    if (text_store != buf) {
-      std::cerr << "text store has diverged from buf" << std::endl;
-      std::cerr << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
-      assert(false);
+  // Verify that both our local test_context and the core's test_state.context have
+  // not diverged
+  auto ci = citems;
+  for (auto test_ci = test_context.begin();; ci++, test_ci++) {
+    // skip over markers, they won't be in test_context
+    while (ci->type == KM_CORE_CT_MARKER) {
+      ci++;
     }
-    delete [] buf;
+    // exit if BOTH are at end.
+    if (ci->type == KM_CORE_CT_END && test_ci == test_context.end()) {
+      break;  // success
+    }
+    // fail if only ONE is at end
+    assert(ci->type != KM_CORE_CT_END && test_ci != test_context.end());
+    // fail if type and marker don't match.
+    assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
+  }
 
+  km_core_context_items_dispose(citems);
+  if (text_store != buf) {
+    std::cerr << "text store has diverged from buf" << std::endl;
+    std::cerr << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
+    assert(false);
+  }
+  delete[] buf;
 }
 
 int
@@ -238,6 +280,10 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
     return 0;
   }
 
+  // setup normalization status
+  const bool normalization_disabled = !test_kb->supports_normalization();
+  test_source.set_normalization_disabled(normalization_disabled);
+
   // Setup state, environment
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
 
@@ -245,7 +291,7 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
 
   km_core_context_item *citems = nullptr;
   // setup test_context
-  try_status(km_core_context_items_from_utf16(test_source.get_context().c_str(), &citems));
+  try_status(context_items_from_utf16(test_source.get_context().c_str(), &citems));
   try_status(km_core_context_set(km_core_state_context(test_state), citems));
 
   // Make a copy of the setup context for the test
@@ -287,6 +333,11 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
             test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down,
             KM_CORE_EVENT_FLAG_DEFAULT));  // TODO-LDML: for now. Should send touch and hardware events.
 
+        if (state_should_invalidate_context(test_state, p.vk, p.modifier_state | test_source.caps_lock_state(), key_down,
+            KM_CORE_EVENT_FLAG_DEFAULT)) {
+          test_context.clear();
+          text_store.clear();
+        }
         for (auto act = km_core_state_action_items(test_state, nullptr); act->type != KM_CORE_IT_END; act++) {
           apply_action(test_state, *act, text_store, test_context, test_source, test_context);
         }
@@ -299,8 +350,8 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
       text_store.append(action.string);  // TODO-LDML: not going through keyboard
       // Now, update context?
       km_core_context_item *nitems = nullptr;
-      try_status(km_core_context_items_from_utf16(action.string.c_str(), &nitems));
-      try_status(km_core_context_append(km_core_state_context(test_state), nitems));
+      try_status(context_items_from_utf16(action.string.c_str(), &nitems));
+      try_status(context_append(km_core_state_context(test_state), nitems));
       // update the test_context also.
       for (km_core_context_item *ci = nitems; ci->type != KM_CORE_CT_END; ci++) {
         test_context.emplace_back(*ci);
@@ -310,7 +361,9 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
       verify_context(text_store, test_state, test_context);
     } break;
     case km::tests::LDML_ACTION_CHECK_EXPECTED: {
-      assert(km::core::ldml::normalize_nfd(action.string));  // TODO-LDML: should be NFC
+      if (!normalization_disabled) {
+        assert(km::core::util::normalize_nfd(action.string));  // TODO-LDML: should be NFC
+      }
       std::cout << "- check expected" << std::endl;
       std::cout << "expected  : " << string_to_hex(action.string) << " [" << action.string << "]" << std::endl;
       std::cout << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;

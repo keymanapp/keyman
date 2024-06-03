@@ -12,7 +12,7 @@
 #include <algorithm>
 #include <vector>
 
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
 
 #include "context.hpp"
 #include "jsonpp.hpp"
@@ -108,22 +108,14 @@ namespace {
 }
 
 km_core_status
-km_core_context_items_from_utf16(km_core_cp const *text,
+context_items_from_utf16(km_core_cu const *text,
                                 km_core_context_item **out_ptr)
 {
   return _context_items_from<utf16>(reinterpret_cast<utf16::codeunit_t const *>(text), out_ptr);
 }
 
 
-km_core_status
-km_core_context_items_from_utf8(char const *text,
-                                km_core_context_item **out_ptr)
-{
-  return _context_items_from<utf8>(reinterpret_cast<utf8::codeunit_t const *>(text), out_ptr);
-}
-
-
-km_core_status km_core_context_items_to_utf8(km_core_context_item const *ci,
+km_core_status context_items_to_utf8(km_core_context_item const *ci,
                                             char *buf, size_t * sz_ptr)
 {
   return _context_items_to<utf8>(ci,
@@ -132,15 +124,15 @@ km_core_status km_core_context_items_to_utf8(km_core_context_item const *ci,
 }
 
 
-km_core_status km_core_context_items_to_utf16(km_core_context_item const *ci,
-                                            km_core_cp *buf, size_t * sz_ptr)
+km_core_status context_items_to_utf16(km_core_context_item const *ci,
+                                            km_core_cu *buf, size_t * sz_ptr)
 {
   return _context_items_to<utf16>(ci,
             reinterpret_cast<utf16::codeunit_t *>(buf),
             sz_ptr);
 }
 
-km_core_status km_core_context_items_to_utf32(km_core_context_item const *ci,
+km_core_status context_items_to_utf32(km_core_context_item const *ci,
                                             km_core_usv *buf, size_t * sz_ptr)
 {
   return _context_items_to<utf32>(ci,
@@ -157,7 +149,7 @@ void km_core_context_items_dispose(km_core_context_item *ci)
 km_core_status km_core_context_set(km_core_context *ctxt, km_core_context_item const *ci)
 {
     km_core_context_clear(ctxt);
-    return km_core_context_append(ctxt, ci);
+    return context_append(ctxt, ci);
 }
 
 
@@ -199,8 +191,8 @@ size_t km_core_context_length(km_core_context *ctxt)
 }
 
 
-km_core_status km_core_context_append(km_core_context *ctxt,
-                                    km_core_context_item const *ci)
+km_core_status context_append(km_core_context *ctxt,
+                              km_core_context_item const *ci)
 {
   assert(ctxt); assert(ci);
   if (!ctxt || !ci)   return KM_CORE_STATUS_INVALID_ARGUMENT;
@@ -209,7 +201,13 @@ km_core_status km_core_context_append(km_core_context *ctxt,
   {
     for (;ci->type != KM_CORE_CT_END; ++ci)
     {
-      ctxt->emplace_back(*ci);
+      assert(ci->type == KM_CORE_CT_CHAR || ci->type == KM_CORE_CT_MARKER);
+      if(ci->type == KM_CORE_CT_CHAR || ci->type == KM_CORE_CT_MARKER) {
+        assert(ctxt->has_markers || ci->type != KM_CORE_CT_MARKER);
+        if(ctxt->has_markers || ci->type != KM_CORE_CT_MARKER) {
+          ctxt->emplace_back(*ci);
+        }
+      }
     }
   } catch (std::bad_alloc &) {
     return KM_CORE_STATUS_NO_MEM;
@@ -218,30 +216,67 @@ km_core_status km_core_context_append(km_core_context *ctxt,
   return KM_CORE_STATUS_OK;
 }
 
-
-km_core_status km_core_context_shrink(km_core_context *ctxt, size_t num,
-                           km_core_context_item const * ci)
-{
+km_core_status
+context_prepend(
+  km_core_context *ctxt,
+  km_core_context_item const *ci,
+  size_t num
+) {
   assert(ctxt);
-  if (!ctxt)   return KM_CORE_STATUS_INVALID_ARGUMENT;
+  assert(ci);
+  if (!ctxt || !ci)
+    return KM_CORE_STATUS_INVALID_ARGUMENT;
 
-  try
-  {
-    ctxt->resize(ctxt->size() - std::min(num, ctxt->size()));
-
-    if (ci)
-    {
-      auto const ip = ctxt->begin();
-      while(num-- && ci->type != KM_CORE_CT_END)
-      {
-        ctxt->emplace(ip, *ci);
-        ci++;
+  try {
+    std::vector<km_core_context_item> vci;
+    for (; ci->type != KM_CORE_CT_END && num > 0; ++ci) {
+      num--;
+      assert(ci->type == KM_CORE_CT_CHAR || ci->type == KM_CORE_CT_MARKER);
+      if(ci->type == KM_CORE_CT_CHAR || ci->type == KM_CORE_CT_MARKER) {
+        assert(ctxt->has_markers || ci->type != KM_CORE_CT_MARKER);
+        if(ctxt->has_markers || ci->type != KM_CORE_CT_MARKER) {
+          vci.push_back(*ci);
+        }
       }
     }
+
+    ctxt->insert(ctxt->begin(), vci.begin(), vci.end());
   } catch (std::bad_alloc &) {
     return KM_CORE_STATUS_NO_MEM;
   }
 
+  return KM_CORE_STATUS_OK;
+}
+
+km_core_status
+context_shrink(
+  km_core_context *ctxt,
+  size_t num,
+  bool from_end
+) {
+  assert(ctxt);
+  if (!ctxt)
+    return KM_CORE_STATUS_INVALID_ARGUMENT;
+
+  if (from_end) {
+    // remove from the end
+    try {
+      ctxt->resize(ctxt->size() - std::min(num, ctxt->size()));
+    } catch (std::bad_alloc &) {
+      return KM_CORE_STATUS_NO_MEM;
+    }
+
+    return KM_CORE_STATUS_OK;
+  }
+
+  // remove from the beginning
+  auto it = ctxt->begin();
+  while (num > 0 && it != ctxt->end()) {
+    num--;
+    it++;
+  }
+
+  ctxt->erase(ctxt->begin(), it);
   return KM_CORE_STATUS_OK;
 }
 

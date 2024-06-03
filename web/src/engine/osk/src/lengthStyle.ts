@@ -61,12 +61,16 @@ export class ParsedLengthStyle implements LengthStyle {
   }
 
   private static parseLengthStyle(spec: string): LengthStyle {
+    if(spec == '') {
+      return CONSTANT_STYLE;
+    }
+
     const val = parseFloat(spec);
 
     if(isNaN(val)) {
       // Cannot parse.
       console.error("Could not properly parse specified length style info: '" + spec + "'.");
-      return null;
+      return CONSTANT_STYLE;
     }
 
     return spec.indexOf('px') != -1 ? {val: val, absolute: true} :
@@ -83,3 +87,5 @@ export class ParsedLengthStyle implements LengthStyle {
       {val: (4 * val / 3), absolute: true};
   }
 }
+
+const CONSTANT_STYLE = new ParsedLengthStyle('1em');

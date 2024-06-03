@@ -154,38 +154,17 @@ LogContext(km_core_state *lpCoreKeyboardState, uint8_t context_type) {
   if (!lpCoreKeyboardState) {
     return FALSE;
   }
-  km_core_context_item *citems = nullptr;
-  km_core_status error_status;
-  char *log_str_title = nullptr;
-  char* const int_context = "Intermediate Context";
-  char* const core_context = "Core Context";
-  switch(context_type){
-  case CONTEXT_CORE:
-    error_status = (km_core_status_codes)km_core_context_get(km_core_state_context(lpCoreKeyboardState), &citems);
-    log_str_title = int_context;
-    break;
-  case CONTEXT_INT:
-    error_status = (km_core_status_codes)km_core_state_get_intermediate_context(lpCoreKeyboardState, &citems);
-    log_str_title = core_context;
-    break;
-  default:
-    error_status = KM_CORE_STATUS_INVALID_ARGUMENT;
-  }
-  if (error_status != KM_CORE_STATUS_OK){
-    km_core_context_items_dispose(citems);
-    return FALSE;
-  }
 
-  DWORD context_length = (DWORD)km_core_context_item_list_size(citems);
-  WCHAR *buf            = new WCHAR[(context_length * 3) +1 ]; // *3 if every context item was a deadkey
-  if (!ContextItemToAppContext(citems, buf, context_length)) {
-    km_core_context_items_dispose(citems);
-    delete[] buf;
-    return FALSE;
-  }
-  km_core_context_items_dispose(citems);
-  SendDebugMessageFormat(0, sdmKeyboard, 0, "%s: [%s]", log_str_title, Debug_UnicodeString(buf));
-  delete[] buf;
+  km_core_cu* buffer = km_core_state_context_debug(
+    lpCoreKeyboardState,
+    context_type == CONTEXT_CORE ? KM_CORE_DEBUG_CONTEXT_CACHED : KM_CORE_DEBUG_CONTEXT_INTERMEDIATE
+  );
+  char* const log_str_title = context_type == CONTEXT_CORE ? "Core Context" : "Intermediate Context";
+
+  SendDebugMessageFormat(0, sdmKeyboard, 0, "%s: %ls", log_str_title, buffer);
+
+  km_core_cu_dispose(buffer);
+
   return TRUE;
 }
 

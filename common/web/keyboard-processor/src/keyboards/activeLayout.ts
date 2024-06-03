@@ -1,7 +1,6 @@
 import Codes from "../text/codes.js";
 import KeyEvent, { KeyEventSpec } from "../text/keyEvent.js";
 import KeyMapping from "../text/keyMapping.js";
-import type { KeyDistribution } from "../text/keyEvent.js";
 import { ButtonClasses, Layouts } from "./defaultLayouts.js";
 import type { LayoutKey, LayoutSubKey, LayoutRow, LayoutLayer, LayoutFormFactor, ButtonClass } from "./defaultLayouts.js";
 import type Keyboard from "./keyboard.js";
@@ -9,6 +8,7 @@ import type Keyboard from "./keyboard.js";
 import { TouchLayout } from "@keymanapp/common-types";
 import TouchLayoutDefaultHint = TouchLayout.TouchLayoutDefaultHint;
 import TouchLayoutFlick = TouchLayout.TouchLayoutFlick;
+import TouchLayoutKeySp = TouchLayout.TouchLayoutKeySp;
 import { type DeviceSpec } from "@keymanapp/web-utils";
 
 // TS 3.9 changed behavior of getters to make them
@@ -61,6 +61,35 @@ const KeyTypesOfKeyMap = {
 // based on available hints.  (i.e., `layout.defaultHint == 'flick'`)
 const KeyTypesOfFlickList = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] as const;
 
+/**
+ * Copies non-computed properties and enumerable scomputed property definitions
+ * for any properties not yet defined on the target object.
+ * @param rawObj
+ * @param defaults
+ */
+function assignDefaultsWithPropDefs<RawType, Type extends RawType>(rawObj: RawType, defaults: Type) {
+  const proto = Object.getPrototypeOf(defaults);
+
+  for(let prop in defaults) {
+    if(!rawObj.hasOwnProperty(prop)) {
+      let descriptor = Object.getOwnPropertyDescriptor(proto, prop);
+      if(descriptor) {
+        // It's a computed property!  Copy the descriptor onto the key's object.
+        Object.defineProperty(rawObj, prop, descriptor);
+      } else {
+        // Type 'Extract<keyof Type, string>' cannot be used to index type
+        // 'RawType'. (ts2536)
+        // @ts-ignore
+        // the whole point of this function is to polyfill `rawObj` so that it's
+        // duck-typable to `Type`.
+        rawObj[prop] = defaults[prop];
+      }
+    }
+  }
+
+  return rawObj as Type;
+}
+
 export class ActiveKeyBase {
   static readonly DEFAULT_PAD=15;          // Padding to left of key, in virtual units
   static readonly DEFAULT_RIGHT_MARGIN=15; // Padding to right of right-most key, in virtual units
@@ -90,7 +119,7 @@ export class ActiveKeyBase {
   layer: string;
   displayLayer: string;
   nextlayer: string;
-  sp?: ButtonClass;
+  sp?: TouchLayoutKeySp;
 
   private _baseKeyEvent: KeyEvent;
   isMnemonic: boolean = false;
@@ -268,9 +297,9 @@ export class ActiveKeyBase {
       const value = KeyTypesOfKeyMap[key as keyof typeof KeyTypesOfKeyMap];
       switch(value) {
         case 'subkeys':
-          const arr = rawKey[key] as LayoutSubKey[];
+          const arr = rawKey[key as 'sk' | 'multitap'] as LayoutSubKey[];
           if(!Array.isArray(arr)) {
-            delete rawKey[key];
+            delete rawKey[key as 'sk' | 'multitap'];
           } else {
             for(let i=0; i < arr.length; i++) {
               const sk = arr[i];
@@ -283,9 +312,9 @@ export class ActiveKeyBase {
           }
           break;
         case 'flicks':
-          const flickObj = rawKey[key];
+          const flickObj = rawKey[key as 'flick'];
           if(typeof flickObj != 'object') {
-            delete rawKey[key];
+            delete rawKey[key as 'flick'];
           } else {
             for(const flickKey of KeyTypesOfFlickList) {
               const sk = flickObj[flickKey];
@@ -298,9 +327,9 @@ export class ActiveKeyBase {
           }
           break;
         default:
-          const prop = rawKey[key];
+          const prop = rawKey[key as keyof (LayoutKey | LayoutSubKey)];
           if(typeof prop != value) {
-            delete rawKey[key];
+            delete rawKey[key as keyof (LayoutKey | LayoutSubKey)];
           }
       }
     }
@@ -315,20 +344,10 @@ export class ActiveKeyBase {
       hasMultitaps: false
     }
 
-    // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
-    let dummy = new ActiveKeyBase();
-    let proto = Object.getPrototypeOf(dummy);
+    assignDefaultsWithPropDefs(key, new ActiveKeyBase());
 
-    for(let prop in dummy) {
-      if(!key.hasOwnProperty(prop)) {
-        let descriptor = Object.getOwnPropertyDescriptor(proto, prop);
-        if(descriptor) {
-          // It's a computed property!  Copy the descriptor onto the key's object.
-          Object.defineProperty(key, prop, descriptor);
-        } else {
-          key[prop] = dummy[prop];
-        }
-      }
+    if(!key.text && typeof key.id == 'string') {
+      key.text = ActiveKey.unicodeIDToText(key.id);
     }
 
     // Ensure subkeys are also properly extended.
@@ -376,7 +395,7 @@ export class ActiveKeyBase {
     if(defaultHint?.includes('flick-')) {
       if(spec.flick) {
         // 6 = length of 'flick-'
-        const dir = defaultHint.substring(6);
+        const dir = defaultHint.substring(6) as keyof TouchLayoutFlick;
 
         if(spec.flick[dir]?.text) {
           spec.hintSrc = spec.flick[dir];
@@ -535,11 +554,16 @@ export class ActiveRow implements LayoutRow {
   ) {
     // Apply defaults, setting the width and other undefined properties for each key
     let keys=row['key'];
+    const DEFAULT_KEY = ActiveKeyBase.DEFAULT_KEY;
     for(let j=0; j<keys.length; j++) {
       let key=keys[j];
-      for(var tp in ActiveKey.DEFAULT_KEY) {
-        if(typeof key[tp] != 'string' && typeof key[tp] != 'number') {
-          key[tp]=ActiveKey.DEFAULT_KEY[tp];
+      let keySet = Object.keys(DEFAULT_KEY);
+      for(let tp of keySet) {
+        const typedKey = tp as keyof typeof DEFAULT_KEY;
+        if(typeof key[typedKey] != 'string' && typeof key[typedKey] != 'number') {
+          // We detected a value of the wrong type.
+          // @ts-ignore  // Type 'string' is not assignable to type 'never'. (ts2322)
+          key[typedKey]=DEFAULT_KEY[typedKey];
         }
       }
 
@@ -611,13 +635,7 @@ export class ActiveRow implements LayoutRow {
       }
     }
 
-    // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
-    let dummy = new ActiveRow();
-    for(let key in dummy) {
-      if(!row.hasOwnProperty(key)) {
-        row[key] = dummy[key];
-      }
-    }
+    assignDefaultsWithPropDefs(row, new ActiveRow());
 
     let aRow = row as ActiveRow;
     aRow.proportionalY = proportionalY;
@@ -699,13 +717,7 @@ export class ActiveLayer implements LayoutLayer {
       ActiveRow.polyfill(layer.row[i], keyboard, layout, layer.id, totalWidth, rowProportionalY, analysisFlagObj);
     }
 
-    // Add class functions and properties to the existing layout object, allowing it to act as an ActiveLayout.
-    let dummy = new ActiveLayer();
-    for(let key in dummy) {
-      if(!layer.hasOwnProperty(key)) {
-        layer[key] = dummy[key];
-      }
-    }
+    assignDefaultsWithPropDefs(layer, new ActiveLayer());
 
     let aLayer = layer as ActiveLayer;
     aLayer.totalWidth = totalWidth;
@@ -749,6 +761,8 @@ export class ActiveLayout implements LayoutFormFactor{
   keyboard: Keyboard;
   formFactor: DeviceSpec.FormFactor;
   defaultHint: TouchLayoutDefaultHint;
+  displayUnderlying?: boolean;
+  fontsize?: string;
 
   hasFlicks: boolean = false;
   hasLongpresses: boolean = false;
@@ -834,12 +848,7 @@ export class ActiveLayout implements LayoutFormFactor{
     let layers=layout.layer;
 
     // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
-    let dummy = new ActiveLayout();
-    for(let key in dummy) {
-      if(!layout.hasOwnProperty(key)) {
-        layout[key] = dummy[key];
-      }
-    }
+    assignDefaultsWithPropDefs(layout, new ActiveLayout());
 
     let aLayout = layout as ActiveLayout;
     aLayout.keyboard = keyboard;

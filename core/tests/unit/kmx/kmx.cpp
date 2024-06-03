@@ -17,6 +17,8 @@
 #include <string>
 #include <type_traits>
 
+#include "keyman_core.h"
+
 #include <kmx/kmx_processevent.h>
 #include <kmx/kmx_xstring.h>
 
@@ -205,7 +207,7 @@ run_test(const km::core::path &source, const km::core::path &compiled) {
 
   // Setup context
   km_core_context_item *citems = nullptr;
-  try_status(km_core_context_items_from_utf16(context.c_str(), &citems));
+  try_status(context_items_from_utf16(context.c_str(), &citems));
   try_status(km_core_context_set(km_core_state_context(test_state), citems));
 
   // Make a copy of the setup context for the test
@@ -243,9 +245,9 @@ run_test(const km::core::path &source, const km::core::path &compiled) {
     // should be identical unless an action has caused the context to be invalidated
     size_t n = 0;
     try_status(km_core_context_get(km_core_state_context(test_state), &citems));
-    try_status(km_core_context_items_to_utf16(citems, nullptr, &n));
-    km_core_cp *core_context_str = new km_core_cp[n];
-    try_status(km_core_context_items_to_utf16(citems, core_context_str, &n));
+    try_status(context_items_to_utf16(citems, nullptr, &n));
+    km_core_cu *core_context_str = new km_core_cu[n];
+    try_status(context_items_to_utf16(citems, core_context_str, &n));
 
     // Verify that both our local test_context and the core's test_state.context have
     // not diverged
@@ -270,9 +272,9 @@ run_test(const km::core::path &source, const km::core::path &compiled) {
   // Compare final output - retrieve internal context
   size_t n = 0;
   try_status(km_core_context_get(km_core_state_context(test_state), &citems));
-  try_status(km_core_context_items_to_utf16(citems, nullptr, &n));
-  km_core_cp *core_context_str = new km_core_cp[n];
-  try_status(km_core_context_items_to_utf16(citems, core_context_str, &n));
+  try_status(context_items_to_utf16(citems, nullptr, &n));
+  km_core_cu *core_context_str = new km_core_cu[n];
+  try_status(context_items_to_utf16(citems, core_context_str, &n));
 
   // Verify that both our local test_context and the core's test_state.context have
   // not diverged
@@ -299,7 +301,7 @@ run_test(const km::core::path &source, const km::core::path &compiled) {
   for (auto it = options.begin(); it != options.end(); it++) {
     if (it->type == km::tests::KOT_OUTPUT) {
       std::cout << "output option-key: " << it->key << " expected: " << it->value;
-      km_core_cp const *value;
+      km_core_cu const *value;
       try_status(km_core_state_option_lookup(test_state, KM_CORE_OPT_KEYBOARD, it->key.c_str(), &value));
       std::cout << " actual: " << value << std::endl;
       if (it->value.compare(value) != 0) return __LINE__;

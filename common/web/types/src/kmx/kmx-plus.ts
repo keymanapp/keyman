@@ -2,7 +2,7 @@ import { constants } from '@keymanapp/ldml-keyboard-constants';
 import * as r from 'restructure';
 import { ElementString } from './element-string.js';
 import { ListItem } from './string-list.js';
-import { isOneChar, toOneChar, unescapeString } from '../util/util.js';
+import { isOneChar, toOneChar, unescapeString, escapeStringForRegex } from '../util/util.js';
 import { KMXFile } from './kmx.js';
 import { UnicodeSetParser, UnicodeSet } from '@keymanapp/common-types';
 import { VariableParser } from '../ldml-keyboard/pattern-parser.js';
@@ -43,6 +43,7 @@ export class Elem extends Section {
    */
   allocElementString(sections: DependencySections, source: string | string[], order?: string, tertiary?: string, tertiary_base?: string, prebase?: string): ElementString {
     let s = ElementString.fromStrings(sections, source, order, tertiary, tertiary_base, prebase);
+    if (!s) return s;
     let result = this.strings.find(item => item.isEqual(s));
     if(result === undefined) {
       result = s;
@@ -75,6 +76,11 @@ export class Meta extends Section {
   indicator: StrsItem;
   version: StrsItem; // semver version string, defaults to "0"
   settings: KeyboardSettings;
+
+  /** convenience for checking settings */
+  get normalizationDisabled() {
+    return this?.settings & KeyboardSettings.normalizationDisabled;
+  }
 };
 
 // 'strs'
@@ -141,6 +147,8 @@ export interface StrsOptions {
   markers?: boolean;
   /** unescape with unescapeString */
   unescape?: boolean;
+  /** apply (possibly marker safe) nfd. Not for regex use. */
+  nfd?: boolean;
   /** string can be stored as a single CharStrsItem, not in strs table. */
   singleOk?: boolean;
 };
@@ -201,6 +209,16 @@ export class Strs extends Section {
     if (opts?.unescape) {
       s = unescapeString(s);
     }
+    // nfd
+    if (opts?.nfd) {
+      if (!sections?.meta?.normalizationDisabled) {
+        if (opts?.markers) {
+          s = MarkerParser.nfd_markers(s, false);
+        } else {
+          s = s.normalize("NFD");
+        }
+      }
+    }
     return s;
   }
 };
@@ -210,19 +228,19 @@ export class Strs extends Section {
  */
 export class Vars extends Section {
   totalCount() : number {
-    return this.strings.length + this.sets.length + this.unicodeSets.length;
+    return this.strings.length + this.sets.length + this.usets.length;
   }
   markers: ListItem;
   strings: StringVarItem[] = []; // ≠ StrsItem
   sets: SetVarItem[] = [];
-  unicodeSets: UnicodeSetItem[] = [];
+  usets: UnicodeSetItem[] = [];
 
   /**
    *
    * @returns false if any invalid variables
    */
   valid() : boolean {
-    for (const t of [this.sets, this.strings, this.unicodeSets]) {
+    for (const t of [this.sets, this.strings, this.usets]) {
       for (const i of t) {
         if (!i.valid()) {
           return false;
@@ -246,7 +264,7 @@ export class Vars extends Section {
   }
   substituteUnicodeSets(value: string, sections: DependencySections): string {
     return value.replaceAll(VariableParser.SET_REFERENCE, (_entire, id) => {
-      const v = Vars.findVariable(this.unicodeSets, id);
+      const v = Vars.findVariable(this.usets, id);
       if (v === null) {
         // Should have been caught during validation.
         throw Error(`Internal Error: reference to missing UnicodeSet variable ${id}`);
@@ -254,7 +272,7 @@ export class Vars extends Section {
       return v.value.value; // string value
     });
   }
-  substituteStrings(str: string, sections: DependencySections): string {
+  substituteStrings(str: string, sections: DependencySections, forMatch?: boolean): string {
     if (!str) return str;
     return str.replaceAll(VariableParser.STRING_REFERENCE, (_entire, id) => {
       const val = this.findStringVariableValue(id);
@@ -262,6 +280,7 @@ export class Vars extends Section {
         // Should have been caught during validation.
         throw Error(`Internal Error: reference to missing string variable ${id}`);
       }
+      if (forMatch) return escapeStringForRegex(val);
       return val;
     });
   }
@@ -274,12 +293,13 @@ export class Vars extends Section {
       const set = Vars.findVariable(this.sets, id);
       if (set !== null) {
         const { items } = set;
-        const inner = items.map(i => i.value.value).join('|');
-        return `(?:${inner})`; // TODO-LDML: need to escape here
+        const escapedStrings = items.map(v => escapeStringForRegex(v.value.value));
+        const inner = escapedStrings.join('|');
+        return `(?:${inner})`;
       }
 
       // try as unicodeset
-      const uset = Vars.findVariable(this.unicodeSets, id);
+      const uset = Vars.findVariable(this.usets, id);
       if (uset !== null) {
         const { unicodeSet } = uset;
         const inner = unicodeSet.ranges.map(([start, end]) => {
@@ -354,11 +374,15 @@ export class UnicodeSetItem extends VarsItem {
 };
 
 export class SetVarItem extends VarsItem {
-  constructor(id: string, value: string[], sections: DependencySections) {
+  constructor(id: string, value: string[], sections: DependencySections, rawItems: string[]) {
     super(id, value.join(' '), sections);
     this.items = sections.elem.allocElementString(sections, value);
+    this.rawItems = rawItems;
   }
+  // element string array
   items: ElementString;
+  // like items, but with unprocessed marker strings
+  rawItems: string[];
   valid() : boolean {
     return !!this.items;
   }

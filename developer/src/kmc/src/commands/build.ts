@@ -11,28 +11,11 @@ import { expandFileLists } from '../util/fileLists.js';
 import { isProject } from '../util/projectLoader.js';
 import { buildTestData } from './buildTestData/index.js';
 import { buildWindowsPackageInstaller } from './buildWindowsPackageInstaller/index.js';
-import { ExtendedCompilerOptions } from 'src/util/extendedCompilerOptions.js';
-
-function commandOptionsToCompilerOptions(options: any): ExtendedCompilerOptions {
-  // We don't want to rename command line options to match the precise
-  // properties that we have in CompilerOptions, but nor do we want to rename
-  // CompilerOptions properties...
-  return {
-    // CompilerBaseOptions
-    logLevel: options.logLevel,
-    logFormat: options.logFormat,
-    color: options.color,
-    // CompilerOptions
-    shouldAddCompilerVersion: options.compilerVersion,
-    saveDebug: options.debug,
-    compilerWarningsAsErrors: options.compilerWarningsAsErrors,
-    warnDeprecatedCode: options.warnDeprecatedCode,
-    // ExtendedOptions
-    forPublishing: options.forPublishing,
-  }
-}
+import { commandOptionsToCompilerOptions } from '../util/extendedCompilerOptions.js';
+import { exitProcess } from '../util/sysexits.js';
 
 export function declareBuild(program: Command) {
+  // TODO: localization?
   const buildCommand = program
     .command('build')
     .option('--color', 'Force colorization for log messages')
@@ -43,6 +26,8 @@ export function declareBuild(program: Command) {
     .option('-d, --debug', 'Include debug information in output')
     .option('-w, --compiler-warnings-as-errors', 'Causes warnings to fail the build; overrides project-level warnings-as-errors option')
     .option('-W, --no-compiler-warnings-as-errors', 'Warnings do not fail the build; overrides project-level warnings-as-errors option')
+    .option('-m, --message <number>', 'Adjust severity of info, hint or warning message to Disable (default), Info, Hint, Warn or Error (option can be repeated)',
+      (value, previous) => previous.concat([value]), [])
     .option('--no-compiler-version', 'Exclude compiler version metadata from output')
     .option('--no-warn-deprecated-code', 'Turn off warnings for deprecated code styles');
 
@@ -64,33 +49,7 @@ File lists can be referenced with @filelist.txt.
 
 If no input file is supplied, kmc will build the current folder.`)
 
-    .action(async (filenames: string[], _options: any, commander: any) => {
-      const commanderOptions/*:{TODO?} CommandLineCompilerOptions*/ = commander.optsWithGlobals();
-      const options = commandOptionsToCompilerOptions(commanderOptions);
-      const callbacks = new NodeCompilerCallbacks(options);
-
-      if(!filenames.length) {
-        // If there are no filenames provided, then we are building the current
-        // folder ('.') as a project-style build
-        filenames.push('.');
-      }
-
-      if(filenames.length > 1 && commanderOptions.outFile) {
-        // -o can only be specified with a single input file
-        callbacks.reportMessage(InfrastructureMessages.Error_OutFileCanOnlyBeSpecifiedWithSingleInfile());
-      }
-
-      if(!expandFileLists(filenames, callbacks)) {
-        process.exit(1);
-      }
-
-      for(let filename of filenames) {
-        if(!await build(filename, commanderOptions.outFile, callbacks, options)) {
-          // Once a file fails to build, we bail on subsequent builds
-          process.exit(1);
-        }
-      }
-    });
+    .action(buildFile);
 
   buildCommand
     .command('ldml-test-data <infile>')
@@ -108,6 +67,49 @@ If no input file is supplied, kmc will build the current folder.`)
     .option('--start-disabled', 'Installer property: do not enable keyboards after installation completes')
     .option('--start-with-configuration', 'Installer property: start Keyman Configuration after installation completes')
     .action(buildWindowsPackageInstaller);
+}
+
+function initialize(commanderOptions: any) {
+  // We use a default callback instance when validating command line, but throw
+  // it away once we have completed initialization
+  const initializationCallbacks = new NodeCompilerCallbacks({});
+  const options = commandOptionsToCompilerOptions(commanderOptions, initializationCallbacks);
+  return options;
+}
+
+async function buildFile(filenames: string[], _options: any, commander: any): Promise<never|void> {
+  const commanderOptions/*:{TODO?} CommandLineCompilerOptions*/ = commander.optsWithGlobals();
+  const options = initialize(commanderOptions);
+  if(!options) {
+    return await exitProcess(1);
+  }
+
+  const callbacks = new NodeCompilerCallbacks(options);
+
+  if(!filenames.length) {
+    // If there are no filenames provided, then we are building the current
+    // folder ('.') as a project-style build
+    filenames.push('.');
+  }
+
+  /* c8 ignore next 6 */
+  // full test on console log of error message not justified; check with user test recommended
+  if(filenames.length > 1 && commanderOptions.outFile) {
+    // -o can only be specified with a single input file
+    callbacks.reportMessage(InfrastructureMessages.Error_OutFileCanOnlyBeSpecifiedWithSingleInfile());
+    return await exitProcess(1);
+  }
+
+  if(!expandFileLists(filenames, callbacks)) {
+    return await exitProcess(1);
+  }
+
+  for(let filename of filenames) {
+    if(!await build(filename, commanderOptions.outFile, callbacks, options)) {
+      // Once a file fails to build, we bail on subsequent builds
+      return await exitProcess(1);
+    }
+  }
 }
 
 async function build(filename: string, outfile: string, parentCallbacks: NodeCompilerCallbacks, options: CompilerOptions): Promise<boolean> {
@@ -184,5 +186,5 @@ async function build(filename: string, outfile: string, parentCallbacks: NodeCom
  * these are exported only for unit tests, do not use
  */
 export const unitTestEndpoints = {
-  build
+  build,
 };

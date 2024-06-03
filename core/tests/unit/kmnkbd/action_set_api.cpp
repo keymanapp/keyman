@@ -6,7 +6,8 @@
   History:      23 Oct 2023 - MCD - Initial implementation.
 */
 #include <string>
-#include <keyman/keyman_core_api.h>
+
+#include "keyman_core.h"
 
 #include "path.hpp"
 #include "action.hpp"
@@ -52,14 +53,15 @@ void teardown() {
   }
 }
 
-void setup(const char *keyboard, const km_core_cp* context) {
+void setup(const char *keyboard, const km_core_cu* context) {
   teardown();
 
   km::core::path path = km::core::path::join(arg_path, keyboard);
   try_status(km_core_keyboard_load(path.native().c_str(), &test_kb));
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
-  try_status(km_core_context_items_from_utf16(context, &citems));
+  try_status(context_items_from_utf16(context, &citems));
   try_status(km_core_context_set(km_core_state_context(test_state), citems));
+  try_status(km_core_context_set(km_core_state_app_context(test_state), citems));
 }
 
 void run_test(km_core_action_item const * action_items, const km_core_actions &actions) {
@@ -123,7 +125,8 @@ void test_two_backspaces() {
     test_env_opts, // km_core_option_item* persist_options;
     KM_CORE_FALSE, // km_core_bool do_alert;
     KM_CORE_FALSE, // km_core_bool emit_keystroke;
-    KM_CORE_CAPS_UNCHANGED // new_caps_lock_state;
+    KM_CORE_CAPS_UNCHANGED, // new_caps_lock_state;
+    nullptr // km_core_usv* deleted_context;
   };
 
   run_test(action_items, actions);
@@ -142,7 +145,8 @@ void test_character() {
     test_env_opts, // km_core_option_item* persist_options;
     KM_CORE_FALSE, // km_core_bool do_alert;
     KM_CORE_FALSE, // km_core_bool emit_keystroke;
-    KM_CORE_CAPS_UNCHANGED // new_caps_lock_state;
+    KM_CORE_CAPS_UNCHANGED, // new_caps_lock_state;
+    nullptr // km_core_usv* deleted_context;
   };
 
   run_test(action_items, actions);
@@ -163,7 +167,8 @@ void test_alert() {
     test_env_opts, // km_core_option_item* persist_options;
     KM_CORE_TRUE, // km_core_bool do_alert;
     KM_CORE_FALSE, // km_core_bool emit_keystroke;
-    KM_CORE_CAPS_UNCHANGED // new_caps_lock_state;
+    KM_CORE_CAPS_UNCHANGED, // new_caps_lock_state;
+    nullptr // km_core_usv* deleted_context;
   };
 
   run_test(action_items, actions);
@@ -184,7 +189,8 @@ void test_emit_keystroke() {
     test_env_opts, // km_core_option_item* persist_options;
     KM_CORE_FALSE, // km_core_bool do_alert;
     KM_CORE_TRUE, // km_core_bool emit_keystroke;
-    KM_CORE_CAPS_UNCHANGED // new_caps_lock_state;
+    KM_CORE_CAPS_UNCHANGED, // new_caps_lock_state;
+    nullptr // km_core_usv* deleted_context;
   };
 
   run_test(action_items, actions);
@@ -206,7 +212,8 @@ void test_invalidate_context() {
     test_env_opts, // km_core_option_item* persist_options;
     KM_CORE_FALSE, // km_core_bool do_alert;
     KM_CORE_FALSE, // km_core_bool emit_keystroke;
-    KM_CORE_CAPS_UNCHANGED // new_caps_lock_state;
+    KM_CORE_CAPS_UNCHANGED, // new_caps_lock_state;
+    nullptr // km_core_usv* deleted_context;
   };
 
   run_test(action_items, actions);
@@ -241,7 +248,8 @@ void test_persist_opt() {
     options, // km_core_option_item* persist_options;
     KM_CORE_FALSE, // km_core_bool do_alert;
     KM_CORE_FALSE, // km_core_bool emit_keystroke;
-    KM_CORE_CAPS_UNCHANGED // new_caps_lock_state;
+    KM_CORE_CAPS_UNCHANGED, // new_caps_lock_state;
+    nullptr // km_core_usv* deleted_context;
   };
 
   run_test(action_items, actions);
@@ -264,7 +272,8 @@ void test_caps_lock() {
     test_env_opts, // km_core_option_item* persist_options;
     KM_CORE_FALSE, // km_core_bool do_alert;
     KM_CORE_FALSE, // km_core_bool emit_keystroke;
-    KM_CORE_CAPS_ON // new_caps_lock_state;
+    KM_CORE_CAPS_ON, // new_caps_lock_state;
+    nullptr // km_core_usv* deleted_context;
   };
 
   run_test(action_items, actions);

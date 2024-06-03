@@ -1,19 +1,25 @@
-import { ActiveLayer, type DeviceSpec, Keyboard, LayoutLayer, ActiveLayout } from '@keymanapp/keyboard-processor';
-import { ManagedPromise } from '@keymanapp/web-utils';
+import { ActiveLayer, type DeviceSpec, Keyboard, LayoutLayer, ActiveLayout, ButtonClasses } from '@keymanapp/keyboard-processor';
 
 import { InputSample } from '@keymanapp/gesture-recognizer';
 
 import { KeyElement } from '../keyElement.js';
-import OSKLayer from './oskLayer.js';
+import OSKLayer, { LayerLayoutParams } from './oskLayer.js';
 import VisualKeyboard from '../visualKeyboard.js';
-import OSKRow from './oskRow.js';
+import OSKBaseKey from './oskBaseKey.js';
+
+const NEAREST_KEY_TOUCH_MARGIN_PERCENT = 0.06;
 
 export default class OSKLayerGroup {
   public readonly element: HTMLDivElement;
   public readonly layers: {[layerID: string]: OSKLayer} = {};
   public readonly spec: ActiveLayout;
 
+  // Exist as local copies of the VisualKeyboard values, updated via refreshLayout.
+  private computedWidth: number;
+  private computedHeight: number;
+
   private _activeLayerId: string = 'default';
+  private _heightPadding: number;
 
   public constructor(vkbd: VisualKeyboard, keyboard: Keyboard, formFactor: DeviceSpec.FormFactor) {
     let layout = keyboard.layout(formFactor);
@@ -42,13 +48,13 @@ export default class OSKLayerGroup {
     ls.height = '100%';
 
     // Create a separate OSK div for each OSK layer, only one of which will ever be visible
-    var n: number, i: number, j: number;
+    let n: number;
     var layers: LayoutLayer[];
 
     layers=layout['layer'];
 
     // Set key default attributes (must use exportable names!)
-    var tKey=vkbd.getDefaultKeyObject();
+    let tKey=vkbd.getDefaultKeyObject();
     tKey['fontsize']=ls.fontSize;
 
     for(n=0; n<layers.length; n++) {
@@ -62,6 +68,14 @@ export default class OSKLayerGroup {
       // Add layer to group
       lDiv.appendChild(layerObj.element);
     }
+  }
+
+  public get activeLayer(): OSKLayer {
+    if(!this.activeLayerId) {
+      return null;
+    }
+
+    return this.layers[this.activeLayerId];
   }
 
   public get activeLayerId(): string {
@@ -106,8 +120,6 @@ export default class OSKLayerGroup {
     if(!layer) {
       throw new Error(`Layer id ${layerId} could not be found`);
     }
-
-    this.blinkLayer(layer);
 
     return this.nearestKey(coord, layer);
   }
@@ -165,86 +177,132 @@ export default class OSKLayerGroup {
   }
 
   private nearestKey(coord: Omit<InputSample<KeyElement>, 'item'>, layer: OSKLayer): KeyElement {
-    const baseRect = this.element.getBoundingClientRect();
+    // If there are no rows, there are no keys; return instantly.
+    if(layer.rows.length == 0) {
+      return null;
+    }
 
-    let row: OSKRow = null;
-    let bestMatchDistance = Number.MAX_VALUE;
+    // Our pre-processed layout info maps whatever shape the keyboard is in into a unit square.
+    // So, we map our coord to find its location within that square.
+    const proportionalCoords = {
+      x: coord.targetX / this.computedWidth,
+      y: coord.targetY / this.computedHeight
+    };
 
-    // Find the row that the touch-coordinate lies within.
-    for(const r of layer.rows) {
-      const rowRect = r.element.getBoundingClientRect();
-      if(rowRect.top <= coord.clientY && coord.clientY < rowRect.bottom) {
-        row = r;
-        break;
+    // If our computed width and/or height are 0, it's best to abort; key distance
+    // calculations are not viable.
+    if(!isFinite(proportionalCoords.x) || !isFinite(proportionalCoords.y)) {
+      return null;
+    }
+
+    // Step 1:  find the nearest row.
+    // Rows aren't variable-height - this value is "one size fits all."
+
+    /*
+      If 4 rows, y = .2 x 4 = .8 - still within the row with index 0 (spanning from 0 to .25)
+                 y = .6 x 4 = 2.4 - within row with index 2 (third row, spanning .5 to .75)
+
+      Assumes there is no fine-tuning of the row ranges to be done - each takes a perfect
+      fraction of the overall layer height without any padding above or below.
+    */
+    const rowIndex = Math.max(0, Math.min(layer.rows.length-1, Math.floor(proportionalCoords.y * layer.rows.length)));
+    const row = layer.rows[rowIndex];
+
+    // Assertion:  row no longer `null`.
+    // (We already prevented the no-rows available scenario, anyway.)
+
+    // Step 2: Find minimum distance from any key
+    // - If the coord is within a key's square, go ahead and return it.
+    let closestKey: OSKBaseKey = null;
+    // Is percentage-based!
+    let minDistance = Number.MAX_VALUE;
+
+    for (let key of row.keys) {
+      const keySpec = key.spec;
+      if(keySpec.sp == ButtonClasses.blank || keySpec.sp == ButtonClasses.spacer) {
+        continue;
+      }
+
+      // Max distance from the key's center to consider, horizontally.
+      const keyRadius = keySpec.proportionalWidth / 2;
+      const distanceFromCenter = Math.abs(proportionalCoords.x - keySpec.proportionalX);
+
+      // Find the actual key element.
+      if(distanceFromCenter - keyRadius <= 0) {
+        // As noted above:  if we land within a key's square, match instantly!
+        return key.btn;
       } else {
-        const distance = rowRect.top > coord.clientY ? rowRect.top - coord.clientY : coord.clientY - rowRect.bottom;
-
-        if(distance < bestMatchDistance) {
-          bestMatchDistance = distance;
-          row = r;
+        const distance = distanceFromCenter - keyRadius;
+        if(distance < minDistance) {
+          minDistance = distance;
+          closestKey = key;
         }
       }
     }
 
-    // Assertion:  row no longer `null`.
+    /*
+      Step 3:  If the input coordinate wasn't within any valid key's "square",
+      determine if the nearest valid key is acceptable - if it's within 60% of
+      a standard key's width from the touch location.
 
-    // Warning: am not 100% sure that what follows is actually fully correct.
-
-    // Find minimum distance from any key
-    let closestKeyIndex = 0;
-    let dx: number;
-    let dxMax = 24;
-    let dxMin = 100000;
-
-    const x = coord.clientX;
-
-    for (let k = 0; k < row.keys.length; k++) {
-      // Second-biggest, though documentation suggests this is probably right.
-      const keySquare = row.keys[k].square as HTMLElement; // gets the .kmw-key-square containing a key
-      const squareRect = keySquare.getBoundingClientRect();
-
-      // Find the actual key element.
-      let childNode = keySquare.firstChild ? keySquare.firstChild as HTMLElement : keySquare;
-
-      if (childNode.className !== undefined
-        && (childNode.className.indexOf('key-hidden') >= 0
-          || childNode.className.indexOf('key-blank') >= 0)) {
-        continue;
-      }
-      const x1 = squareRect.left;
-      const x2 = squareRect.right;
-      if (x >= x1 && x <= x2) {
-        // Within the key square
-        return <KeyElement>childNode;
-      }
-      dx = x1 - x;
-      if (dx >= 0 && dx < dxMin) {
-        // To right of key
-        closestKeyIndex = k; dxMin = dx;
-      }
-      dx = x - x2;
-      if (dx >= 0 && dx < dxMin) {
-        // To left of key
-        closestKeyIndex = k; dxMin = dx;
-      }
+      If the condition is not met, there are no valid keys within this row.
+    */
+    if (minDistance /* %age-based! */ <= NEAREST_KEY_TOUCH_MARGIN_PERCENT) {
+      return closestKey.btn;
     }
 
-    if (dxMin < 100000) {
-      const t = <HTMLElement>row.keys[closestKeyIndex].square;
-      const squareRect = t.getBoundingClientRect();
-
-      const x1 = squareRect.left;
-      const x2 = squareRect.right;
-
-      // Limit extended touch area to the larger of 0.6 of key width and 24 px
-      if (squareRect.width > 40) {
-        dxMax = 0.6 * squareRect.width;
-      }
-
-      if (((x1 - x) >= 0 && (x1 - x) < dxMax) || ((x - x2) >= 0 && (x - x2) < dxMax)) {
-        return <KeyElement>t.firstChild;
-      }
-    }
+    // Step 4:  no matches => return null.  The caller should be able to handle such cases,
+    // anyway.
     return null;
+  }
+
+  public resetPrecalcFontSizes() {
+    for(const layer of Object.values(this.layers)) {
+      for(const row of layer.rows) {
+        for(const key of row.keys) {
+          key.resetFontPrecalc();
+        }
+      }
+    }
+
+    // This method is called whenever all related stylesheets are fully loaded and applied.
+    // The actual padding data may not have been available until now.
+    this._heightPadding = undefined;
+  }
+
+  public refreshLayout(layoutParams: LayerLayoutParams) {
+    if(isNaN(layoutParams.keyboardWidth) || isNaN(layoutParams.keyboardHeight)) {
+      // We're not in the DOM yet; we'll refresh properly once that changes.
+      // Can be reached if the layerId is changed before the keyboard enters the DOM.
+      return;
+    }
+    // Set layer-group copies of relevant computed-size values; they are used by nearest-key
+    // detection.
+    this.computedWidth = layoutParams.keyboardWidth;
+    this.computedHeight = layoutParams.keyboardHeight;
+
+    // Assumption:  this styling value will not change once the keyboard and
+    // related stylesheets are loaded and applied.
+    if(this._heightPadding === undefined) {
+      // Should not trigger a new layout reflow; VisualKeyboard should have made no further DOM
+      // style changes since the last one.
+
+      // For touch-based OSK layouts, kmwosk.css may include top & bottom
+      // padding on the layer-group element.
+      const computedGroupStyle = getComputedStyle(this.element);
+
+      // parseInt('') => NaN, which is falsy; we want to fallback to zero.
+      let pt = parseInt(computedGroupStyle.paddingTop, 10) || 0;
+      let pb = parseInt(computedGroupStyle.paddingBottom, 10) || 0;
+      this._heightPadding = pt + pb;
+    }
+
+    if(this.activeLayer) {
+      this.activeLayer.refreshLayout(layoutParams);
+    }
+  }
+
+  public get verticalPadding() {
+    return this._heightPadding ?? 0;
   }
 }

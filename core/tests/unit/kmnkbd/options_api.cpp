@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <string>
 
-#include <keyman/keyman_core_api.h>
+#include "keyman_core.h"
 
 #include "option.hpp"
 #include "state.hpp"
@@ -79,7 +79,7 @@ namespace
   bool _assert_lookup_equals(std::u16string const key, std::u16string value, km_core_option_scope scope)
   {
 
-    km_core_cp const * ret = nullptr;
+    km_core_cu const * ret = nullptr;
     auto s = km_core_state_option_lookup(api_mock_options, scope,
                                          key.c_str(),
                                          &ret);
@@ -129,7 +129,7 @@ int main(int, char * [])
     return __LINE__;
 
 #if 0
-  km_core_cp const *value;
+  km_core_cu const *value;
   auto s = km_core_options_lookup(api_empty_options,
                                      KM_CORE_OPT_ENVIRONMENT,
                                      u"isdummy", &value);

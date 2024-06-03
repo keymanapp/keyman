@@ -8,6 +8,7 @@
 
 import Foundation
 import Reachability
+import os.log
 
 enum DownloadNode {
   case simpleBatch(AnyDownloadBatch)
@@ -279,7 +280,9 @@ class ResourceDownloadQueue: HTTPDownloadDelegate {
     do {
       try reachability = Reachability(hostname: KeymanHosts.API_KEYMAN_COM.host!)
     } catch {
-      SentryManager.captureAndLog("Could not start Reachability object: \(error)")
+      let message = "Could not start Reachability object: \(error)"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
+      SentryManager.capture(error, message: message)
     }
 
     self.session = session

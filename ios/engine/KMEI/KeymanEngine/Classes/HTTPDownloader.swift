@@ -7,8 +7,9 @@
 //
 
 import Foundation
+import os.log
 
-protocol HTTPDownloadDelegate: class {
+protocol HTTPDownloadDelegate: AnyObject {
   func downloadRequestStarted(_ request: HTTPDownloadRequest)
   func downloadRequestFinished(_ request: HTTPDownloadRequest)
   func downloadRequestFailed(_ request: HTTPDownloadRequest, with: Error?)
@@ -99,8 +100,8 @@ class HTTPDownloader: NSObject {
     }
 
     // Successful download.
-    log.debug("Downloaded file \(currentRequest.url) as \(location), " +
-      "to be copied to \(currentRequest.destinationFile ?? "nil")")
+    let message = "Downloaded file \(currentRequest.url) as \(location), to be copied to \(currentRequest.destinationFile ?? "nil")"
+    os_log("%{public}s", log: KeymanEngineLogger.resources, type: .debug, message)
 
     // If a destination file for the download has already been specified, let's go ahead and copy it over.
     if let destFile = currentRequest.destinationFile {
@@ -115,7 +116,7 @@ class HTTPDownloader: NSObject {
         try FileManager.default.copyItem(at: location,
                                          to: destFileUrl)
       } catch {
-        log.error("Error saving the download: \(error)")
+        os_log("Error saving the download: %{public}s", log: KeymanEngineLogger.resources, type: .error, error.localizedDescription)
       }
     }
 
