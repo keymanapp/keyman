@@ -339,7 +339,7 @@ TEST_F(CompilerTest, GetXStringImpl_type1_test) {
     u16cpy(str, u"\"abc\"");
     EXPECT_EQ(CERR_ExtendedStringTooLong, GetXStringImpl(tstr, &fk, str, u"", output, 2, 0, &newp, FALSE)); // max reduced to force error    
 
-    // type=1 ('\"'), CERR_ExtendedStringTooLong *** TODO ***
+    // type=1 ('\"'), CERR_StringInVirtualKeySection *** TODO ***
 }
 
 TEST_F(CompilerTest, GetXStringImpl_type2_test) {
@@ -366,7 +366,7 @@ TEST_F(CompilerTest, GetXStringImpl_type2_test) {
     u16cpy(str, u"\'abc\'");
     EXPECT_EQ(CERR_ExtendedStringTooLong, GetXStringImpl(tstr, &fk, str, u"", output, 2, 0, &newp, FALSE)); // max reduced to force error    
 
-    // type=2 ('\''), CERR_ExtendedStringTooLong *** TODO ***
+    // type=2 ('\''), CERR_StringInVirtualKeySection *** TODO ***
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
