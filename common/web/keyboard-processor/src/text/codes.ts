@@ -86,8 +86,10 @@ const Codes = {
     [')!@#$%^&*(',':+<_>?~', '{|}"']
   ],
 
-  isKnownOSKModifierKey(keyID: string): boolean {
+  isFrameKey(keyID: string): boolean {
     switch(keyID) {
+      // TODO:  consider adding K_ALT, K_CTRL.
+      // Not currently here as they typically don't show up on mobile layouts.
       case 'K_SHIFT':
       case 'K_LOPT':
       case 'K_ROPT':
@@ -95,15 +97,10 @@ const Codes = {
       case 'K_CAPS':
         return true;
       default:
+        // 50000:  start of the range defining key-codes for special frame-key symbols
+        // and specialized common layer-switching key IDs.  See .keyCodes above.
         if(Codes.keyCodes[keyID] >= 50000) { // A few are used by `sil_euro_latin`.
           return true; // is a 'K_' key defined for layer shifting or 'control' use.
-        }
-        // Refer to text/codes.ts - these are Keyman-custom "keycodes" used for
-        // layer shifting keys.  To be safe, we currently let K_TABBACK and
-        // K_TABFWD through, though we might be able to drop them too.
-        const code = Codes[keyID];
-        if(code > 50000 && code < 50011) {
-          return true;
         }
     }
 
