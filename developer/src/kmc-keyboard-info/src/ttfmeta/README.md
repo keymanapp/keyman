@@ -1,0 +1,1 @@
+This was originally npmjs package ttfmeta. The source has been deleted from GitHub, so we will now using it locally so we can maintain it.

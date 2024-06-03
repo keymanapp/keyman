@@ -304,10 +304,12 @@ $(function() {
     return val;
   }
 
-  this.inferKeyHintText = function(keyHint, longpress, flick, multitap) {
+  this.inferKeyHintText = function(keyHint, longpress, flickArray, multitap) {
     let hint = keyHint;
+    const flick = flickArray ? flickArray.reduce((o,f) => {o[f.direction] = f; return o}, {}) : null;
     if(!hint) {
-      switch(KVKL[builder.lastPlatform].defaultHint ?? 'dot') {
+      const source = KVKL[builder.lastPlatform].defaultHint ?? 'dot';
+      switch(source) {
         case 'none':
           break;
         case 'dot':
@@ -1109,7 +1111,11 @@ $(function() {
             // The last selected presentation is no longer available; select the first option instead
             $('#selPlatformPresentation').val($('#selPlatformPresentation option:first').val());
           }
+
+          let selection = builder.saveSelection();
           builder.prepareLayer();
+          builder.restoreSelection(selection);
+
           if(data.layer && KVKL[builder.lastPlatform][data.layer]) {
             $('#selLayer').val(data.layer);
             builder.selectLayer();

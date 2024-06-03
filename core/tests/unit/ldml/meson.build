@@ -35,19 +35,45 @@ if node.found()
   subdir('invalid-keyboards')
 endif
 
-
 # Build ldml test executable
 
+keyboard_build_path = meson.current_build_dir() / 'keyboards'
+
 if cpp_compiler.get_id() == 'emscripten'
-  tests_flags = ['--embed-file', join_paths(meson.current_build_dir(),'keyboards','@')]
-  tests_flags += ['--embed-file', join_paths(meson.current_build_dir(),'invalid-keyboards','@')]
+  tests_flags = ['--embed-file',  meson.current_build_dir() / 'keyboards' / '@']
+  tests_flags += ['--embed-file', meson.current_build_dir() / 'invalid-keyboards' / '@']
+  tests_flags += ['--embed-file', meson.current_build_dir() / 'nodeversions.json' + '@nodeversions.json']
+  tests_flags += ['--embed-file', meson.current_build_dir() / 'package.json' + '@package.json']
+  tests_flags += ['--embed-file', meson.current_build_dir() / 'Blocks.txt' + '@Blocks.txt']
   test_path = '/'
+  test_unicode_path = '/'
   invalid_test_path = '/'
+  tests_flags += ['-lnodefs.js',
+                  '-sNO_DISABLE_EXCEPTION_CATCHING', # for test exceptions
+                  wasm_exported_runtime_methods]
 else
   tests_flags = []
-  test_path = join_paths(meson.current_build_dir(),'keyboards')
-  invalid_test_path = join_paths(meson.current_build_dir(),'invalid-keyboards')
+  test_path         = meson.current_build_dir() / 'keyboards'
+  test_unicode_path = meson.current_build_dir()
+  invalid_test_path = meson.current_build_dir() / 'invalid-keyboards'
 endif
+
+# copy package.json into build dir for test use
+configure_file(
+  copy: true,
+  input: '../../../../package.json',
+  output: 'package.json',
+)
+configure_file(
+  copy: true,
+  input: '../../../../resources/standards-data/unicode-character-database/Blocks.txt',
+  output: 'Blocks.txt',
+)
+
+configure_file(
+  command: [node, meson.current_source_dir() / 'write_node_versions.js','@OUTPUT@'],
+  output: 'nodeversions.json',
+)
 
 ldml = executable('ldml',
     ['ldml.cpp',
@@ -91,31 +117,51 @@ test('test_transforms', t, suite: 'ldml')
 normalization_tests_flags = tests_flags
 
 if cpp_compiler.get_id() == 'emscripten'
-  normalization_tests_flags += ['-lnodefs.js', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
+  normalization_tests_flags += ['-lnodefs.js', wasm_exported_runtime_methods]
 endif
 
-t = executable('test_context_normalization',
+test_context_normalization = executable('test_context_normalization',
     ['test_context_normalization.cpp', common_test_files],
     cpp_args: defns + warns,
     include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
     link_args: links + normalization_tests_flags,
     dependencies: [icu_uc, icu_i18n],
     objects: lib.extract_all_objects(recursive: false))
-test('test_context_normalization', t, suite: 'ldml')
+test('test_context_normalization', test_context_normalization, suite: 'ldml')
+
+# Build and run additional test_unicode test
+
+test_unicode = executable('test_unicode', 'test_unicode.cpp',
+    ['test_unicode.cpp', common_test_files],
+    cpp_args: defns + warns,
+    include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
+    link_args: links + tests_flags,
+    dependencies: [icu_uc, icu_i18n],
+    objects: lib.extract_all_objects(recursive: false),
+
+)
+
+test('test_unicode', test_unicode, suite: 'ldml',
+  args: [
+    test_unicode_path / 'nodeversions.json',
+    test_unicode_path / 'package.json',
+    test_unicode_path / 'Blocks.txt',
+  ],
+)
 
 # Run tests on all keyboards (`tests` defined in keyboards/meson.build)
 
 foreach kbd : tests
-  kbd_src = join_paths(test_path, kbd) + '.xml'
-  kbd_obj = join_paths(test_path, kbd) + '.kmx'
+  kbd_src = test_path / kbd + '.xml'
+  kbd_obj = test_path / kbd + '.kmx'
   test(kbd, ldml, args: [kbd_src, kbd_obj], suite: 'ldml-keyboards')
 endforeach
 
 # Run tests on all invalid keyboards (`invalid_tests` defined in invalid-keyboards/meson.build)
 
 foreach kbd : invalid_tests
-  kbd_src = join_paths(invalid_test_path, kbd) + '.xml'
-  kbd_obj = join_paths(invalid_test_path, kbd) + '.kmx'
+  kbd_src = invalid_test_path / kbd  + '.xml'
+  kbd_obj = invalid_test_path / kbd  + '.kmx'
   test(kbd, ldml, args: [kbd_src, kbd_obj], suite: 'ldml-invalid-keyboards')
   # todo: consider if we should use `should_fail: true`?
 endforeach

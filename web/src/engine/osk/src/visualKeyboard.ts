@@ -1253,7 +1253,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     // Step 1:  have the necessary conditions been met?
     const fixedSize = this.width && this.height;
     const computedStyle = getComputedStyle(this.kbdDiv);
-    const groupStyle = getComputedStyle(this.kbdDiv.firstElementChild);
+    const groupStyle = getComputedStyle(this.layerGroup.element);
 
     const isInDOM = computedStyle.height != '' && computedStyle.height != 'auto';
 
@@ -1358,17 +1358,15 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     var activeKeyboard = this.layoutKeyboard;
     var activeStub = this.layoutKeyboardProperties;
 
-    // Do not do anything if a null stub
-    if (activeStub == null) {
-      return;
-    }
-
     // First remove any existing keyboard style sheet
     if (this.styleSheet && this.styleSheet.parentNode) {
       this.styleSheet.parentNode.removeChild(this.styleSheet);
     }
 
-    var kfd = activeStub.textFont, ofd = activeStub.oskFont;
+    // For help.keyman.com, sometimes we aren't given a stub for the keyboard.
+    // We can't get the keyboard's fonts correct in that case, but we can
+    // at least proceed safely.
+    var kfd = activeStub?.textFont, ofd = activeStub?.oskFont;
 
     // Add and define style sheets for embedded fonts if necessary (each font-face style will only be added once)
     this.styleSheetManager.addStyleSheetForFont(kfd, this.fontRootPath, this.device.OS);
@@ -1483,7 +1481,12 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       isStatic: true,
       topContainer: null,
       pathConfig: pathConfig,
-      styleSheetManager: null
+      styleSheetManager: null,
+      specialFont: {
+        family: 'SpecialOSK',
+        files: [`${pathConfig.resources}/osk/keymanweb-osk.ttf`],
+        path: '' // Not actually used.
+      }
     });
 
     kbdObj.layerGroup.element.className = kbdObj.kbdDiv.className; // may contain multiple classes
