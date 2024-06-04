@@ -692,18 +692,15 @@ extension KeymanWebViewController: KeymanWebDelegate {
   }
 }
 
-// MARK: - UIGestureRecognizerDelegate
-extension KeymanWebViewController: UIGestureRecognizerDelegate {
-  @objc func menuKeyHeld(_ keymanWeb: KeymanWebViewController) {
-    self.delegate?.menuKeyHeld(self)
-  }
-}
-
 // MARK: - Manage views
 extension KeymanWebViewController {
   // MARK: - Sizing
   public var keyboardHeight: CGFloat {
     return keyboardSize.height
+  }
+  
+  @objc func menuKeyHeld(_ keymanWeb: KeymanWebViewController) {
+    self.delegate?.menuKeyHeld(self)
   }
 
   func constraintTargetHeight(isPortrait: Bool) -> CGFloat {
