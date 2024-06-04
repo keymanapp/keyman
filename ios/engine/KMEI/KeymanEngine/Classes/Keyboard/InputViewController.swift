@@ -388,10 +388,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
-    if keymanWeb.isSubKeysMenuVisible {
-      return
-    }
-
     if isInputClickSoundEnabled {
       UIDevice.current.playInputClick()
 
