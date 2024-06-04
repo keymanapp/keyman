@@ -1379,7 +1379,7 @@ _builder_parse_expanded_parameters() {
           shift
           builder_dep_parent="$1"
           builder_echo setmark "dependency build, started by $builder_dep_parent"
-          builder_echo grey "build.sh parameters: <${_params[@]}>"
+          builder_echo grey "$(basename "$0") parameters: <${_params[@]}>"
           ;;
         --builder-child)
           _builder_is_child=0
@@ -1437,9 +1437,9 @@ _builder_parse_expanded_parameters() {
   else
     # This is a top-level invocation, so we want to track which dependencies
     # have been built, so they don't get built multiple times.
-    builder_echo setmark "build.sh parameters: <${_params[@]}>"
+    builder_echo setmark "$(basename "$0") parameters: <${_params[@]}>"
     if [[ ${#builder_extra_params[@]} -gt 0 ]]; then
-      builder_echo grey "build.sh extra parameters: <${builder_extra_params[@]}>"
+      builder_echo grey "$(basename "$0") extra parameters: <${builder_extra_params[@]}>"
     fi
     export _builder_deps_built=`mktemp`
   fi
