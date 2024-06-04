@@ -30,6 +30,9 @@ EM_JS(char*, NormalizeNFC, (const char* input), {
   return stringToNewUTF8(nfd);
 });
 
+// pull in the generated table
+#include "../../resources/standards-data/unicode-character-database/nfd_table.h"
+
 #endif
 
 namespace km {
@@ -207,7 +210,13 @@ bool is_nfd(const std::u32string& str) {
 
 bool has_nfd_boundary_before(km_core_usv cp) {
 #ifdef __EMSCRIPTEN__
-#error TODO
+// it's a negative table. entries in the table mean returning false. non-entries return true.
+  for (int i=0;;i++) {
+    auto t = km_noBoundaryBefore[i];
+    if (t == 0) return true;
+    if (t > cp) return true;
+    if (t == cp) return false;
+  }
 #else
   UErrorCode status = U_ZERO_ERROR;
   auto nfd = getNFD(status);

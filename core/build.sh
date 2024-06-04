@@ -68,6 +68,7 @@ Libraries will be built in 'build/<target>/<configuration>/src'.
   "uninstall                       uninstall libraries from current system" \
   "${archtargets[@]}" \
   "--no-tests                      do not configure tests (used by other projects)" \
+  "--update-unicode                rebuild tables if the ICU4C Unicode version changes" \
   "--test,-t=opt_tests             test[s] to run (space separated)"
 
 builder_parse "$@"
@@ -176,6 +177,11 @@ if builder_start_action test:mac; then
   meson test -C "$MESON_PATH" $testparams
   builder_finish_action success test:mac
 fi
+
+if builder_has_option --update-unicode; then
+  meson compile -C ${KEYMAN_ROOT}/core/build/mac-x86_64/$BUILDER_CONFIGURATION tools/norm_data && mv -v  ${KEYMAN_ROOT}/core/build/mac-x86_64/$BUILDER_CONFIGURATION/tools/nfd_table.h ${KEYMAN_ROOT}/resources/standards-data/unicode-character-database/
+fi
+
 
 # -------------------------------------------------------------------------------
 
