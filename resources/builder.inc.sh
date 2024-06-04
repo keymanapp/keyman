@@ -1344,6 +1344,7 @@ _builder_parse_expanded_parameters() {
       _builder_chosen_options+=("$key")
       if [[ ! -z ${_builder_options_var[$key]+x} ]]; then
         shift
+        n=$((n + 1))
         # Set the variable associated with this option to the next parameter value
         # A little bit of hoop jumping here to avoid issues with cygwin paths being
         # corrupted too early in the game
