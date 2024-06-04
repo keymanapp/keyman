@@ -1,19 +1,19 @@
 import { ManagedPromise } from "@keymanapp/web-utils";
 
 export default class TouchEventPromiseMap {
-  private map: Record<number, ManagedPromise<void>> = {};
+  private map: Map<number, ManagedPromise<void>> = new Map();
 
   // Used to
   public promiseForTouchpoint(id: number): ManagedPromise<void> {
-    if(!this.map[id]) {
-      this.map[id] = new ManagedPromise<void>();
+    if(!this.map.get(id)) {
+      this.map.set(id, new ManagedPromise<void>());
     }
 
-    return this.map[id]; // touchpoint identifiers are unique during a page's lifetime.
+    return this.map.get(id); // touchpoint identifiers are unique during a page's lifetime.
   }
 
   public maintainTouches(list: TouchList) {
-    let keys = Object.keys(this.map);
+    let keys = [].concat(this.map.keys());
 
     for(let i=0; i < list.length; i++) {
       let pos = keys.indexOf('' + list.item(i).identifier);
@@ -24,8 +24,8 @@ export default class TouchEventPromiseMap {
 
     // Any remaining entries of `keys` are no longer in the map!
     for(let endedKey of keys) {
-      (this.map[endedKey] as ManagedPromise<void>).resolve();
-      delete this.map[endedKey];
+      this.map.get(endedKey).resolve();
+      this.map.delete(endedKey);
     }
   }
 }

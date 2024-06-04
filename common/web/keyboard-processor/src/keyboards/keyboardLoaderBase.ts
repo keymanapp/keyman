@@ -4,18 +4,9 @@ import KeyboardProperties from "./keyboardProperties.js";
 
 type KeyboardStub = KeyboardProperties & { filename: string };
 
-/**
- * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/cause
- *
- * While TS doesn't yet recognize it as a property of error, recent versions of JS define it.
- * So, we should obviously conform to that spec, even if older versions of JS won't expect it
- * to exist.
- */
-type ErrorWithCause = Error & { cause?: Error };
-
 export interface KeyboardLoadErrorBuilder {
-  scriptError(err?: Error);
-  missingError(err: Error);
+  scriptError(err?: Error): void;
+  missingError(err: Error): void;
 }
 
 export class KeyboardScriptError extends Error {

@@ -37,6 +37,7 @@ jobs:
       id: environment_step
       run: |
         cat artifacts/env >> $GITHUB_OUTPUT
+        cat artifacts/env
 
     - name: Set pending status on PR builds
       id: set_status
@@ -58,22 +59,23 @@ jobs:
         ref: '${{ steps.environment_step.outputs.GIT_SHA }}'
         fetch-depth: 0
         clean: false
+        path: ${{ github.workspace }}/keyman/
 
     - name: Install devscripts
-      uses: ./.github/actions/apt-install
+      uses: ./keyman/.github/actions/apt-install
       with:
         packages: devscripts equivs
 
-    - name: "Verify API for libkeymancore.so (${{ steps.environment_step.outputs.GIT_BRANCH }}, branch ${{ steps.environment_step.outputs.GIT_BASE_BRANCH }}, by ${{ steps.environment_step.outputs.GIT_USER }}) - "
+    - name: "Verify API for libkeymancore.so (${{ steps.environment_step.outputs.GIT_BRANCH }}, branch ${{ steps.environment_step.outputs.GIT_BASE_BRANCH }}, by ${{ steps.environment_step.outputs.GIT_USER }})"
       run: |
-        ls -al ${GITHUB_WORKSPACE}
-        ls -al ${GITHUB_WORKSPACE}/artifacts/
-        ls -al "${GITHUB_WORKSPACE}/artifacts/${PKG_NAME}_${{ steps.environment_step.outputs.VERSION }}-1${{ steps.environment_step.outputs.PRERELEASE_TAG }}+$(lsb_release -c -s)1_amd64.deb"
-
-        cd linux
+        echo "VERSION=${{ steps.environment_step.outputs.VERSION }}"
+        echo "PRERELEASE_TAG=${{ steps.environment_step.outputs.PRERELEASE_TAG }}"
+        echo "GIT_SHA=${{ steps.environment_step.outputs.GIT_SHA }}"
+        echo "GIT_BASE=${{ steps.environment_step.outputs.GIT_BASE  }}"
+        cd ${{ github.workspace }}/keyman/linux
         ./scripts/deb-packaging.sh \
           --gha \
-          --bin-pkg "${GITHUB_WORKSPACE}/artifacts/${PKG_NAME}_${{ steps.environment_step.outputs.VERSION }}-1${{ steps.environment_step.outputs.PRERELEASE_TAG }}+$(lsb_release -c -s)1_amd64.deb" \
+          --bin-pkg "${GITHUB_WORKSPACE}/artifacts/${PKG_NAME}[0-9]*_${{ steps.environment_step.outputs.VERSION }}-1${{ steps.environment_step.outputs.PRERELEASE_TAG }}+$(lsb_release -c -s)1_amd64.deb" \
           --git-sha "${{ steps.environment_step.outputs.GIT_SHA }}" \
           --git-base "${{ steps.environment_step.outputs.GIT_BASE }}" \
           verify 2>> $GITHUB_STEP_SUMMARY
@@ -82,7 +84,7 @@ jobs:
       uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 # v4.3.0
       with:
         name: libkeymancore.symbols
-        path: linux/debian/tmp/DEBIAN/symbols
+        path: ${{ github.workspace }}/keyman/linux/debian/tmp/DEBIAN/symbols
       if: always()
 
   set_status:
