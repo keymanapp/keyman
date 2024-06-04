@@ -211,12 +211,14 @@ bool is_nfd(const std::u32string& str) {
 bool has_nfd_boundary_before(km_core_usv cp) {
 #ifdef __EMSCRIPTEN__
 // it's a negative table. entries in the table mean returning false. non-entries return true.
-  for (int i=0;;i++) {
-    auto t = km_noBoundaryBefore[i];
-    if (t == 0) return true;
-    if (t > cp) return true;
-    if (t == cp) return false;
+  for (auto i=0;i<(km_noBoundaryBefore_entries*2);i+=2) {
+    auto start = km_noBoundaryBefore[i+0];
+    if (start > cp) return true;
+    auto count = km_noBoundaryBefore[i+1];
+    auto limit = start+count;
+    if (cp >= start && cp < limit) return false;
   }
+  return true; // fallthrough
 #else
   UErrorCode status = U_ZERO_ERROR;
   auto nfd = getNFD(status);
