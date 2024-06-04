@@ -24,7 +24,6 @@ export default class OSKSubKey extends OSKKey {
     let spec = this.spec;
 
     let kDiv=document.createElement('div');
-    let tKey = osk.getDefaultKeyObject();
     let ks=kDiv.style;
 
     kDiv.className='kmw-key-square-ex';

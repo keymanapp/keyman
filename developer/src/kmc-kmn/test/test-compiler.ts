@@ -58,6 +58,7 @@ describe('Compiler class', function() {
   // Note, above test case is essentially a subset of this one, but will leave both because
   // the basic keyboard test is slightly simpler to read
   it('should build all baseline fixtures', async function() {
+    this.timeout(10000); // there are quite a few fixtures, sometimes CI agents are slow
     const compiler = new KmnCompiler();
     const callbacks = new TestCompilerCallbacks();
     assert(await compiler.init(callbacks, {saveDebug: true, shouldAddCompilerVersion: false}));

@@ -283,7 +283,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     // Always do the common focus stuff, instantly returning if we're in an editable iframe.
     if(this._CommonFocusHelper(target)) {
-      return true;
+      return;
     };
 
     // Set element directionality (but only if element is empty)
@@ -803,7 +803,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   /**
    * Restore the most recently used keyboard, if still available
    */
-  restoreSavedKeyboard(kbd) {
+  restoreSavedKeyboard(kbd: string) {
     // If no saved keyboard, defaults to US English
     const d=kbd;
 

@@ -12,6 +12,7 @@
  */
 
 #import "KMPackageReader.h"
+#import "KMLogs.h"
 
 static NSString *const kPackageJsonFile = @"kmp.json";
 static NSString *const kPackageInfFile = @"kmp.inf";
@@ -84,20 +85,19 @@ typedef enum {
 - (KMPackageInfo *) loadPackageInfoFromJsonFile:(NSString *)path {
   KMPackageInfo * packageInfo = nil;
   
-  if (self.debugMode)
-    NSLog(@"Loading JSON package info from path: %@", path);
+  os_log([KMLogs dataLog], "Loading JSON package info from path: %{public}@", path);
   NSError *readError = nil;
   NSData *data = [NSData dataWithContentsOfFile:path options:kNilOptions error:&readError];
   NSDictionary *parsedData = nil;
   
   if (data == nil) {
-    NSLog(@"Error reading JSON file at path : %@, error: %@ ", path, readError);
+    os_log_error([KMLogs dataLog], "Error reading JSON file at path : %{public}@, error: %{public}@ ", path, readError);
   } else {
     NSError *parseError = nil;
     parsedData = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&parseError];
     
     if (parsedData == nil) {
-      NSLog(@"Error parsing JSON file at path : %@, error: %@ ", path, parseError);
+      os_log_error([KMLogs dataLog], "Error parsing JSON file at path : %{public}@, error: %{public}@ ", path, parseError);
     } else {
       packageInfo = [self createPackageInfoFromJsonData:parsedData];
     }
@@ -192,9 +192,8 @@ typedef enum {
  * @return      the corresponding PackageInfo value object or nil if the file cannot be found or parsed
  */
 - (KMPackageInfo *) loadPackageInfoFromInfFile:(NSString *)path {
-  if (self.debugMode)
-    NSLog(@"Loading inf package info from path: %@", path);
-  
+  os_log_debug([KMLogs dataLog], "Loading inf package info from path: %{public}@", path);
+
   NSMutableArray *files = [NSMutableArray arrayWithCapacity:0];
   NSMutableArray *keyboardInfoArray = [NSMutableArray arrayWithCapacity:0];
   NSMutableArray *fontArray = [NSMutableArray arrayWithCapacity:0];
@@ -324,7 +323,7 @@ typedef enum {
     }
   }
   @catch (NSException *e) {
-    NSLog(@"Error = %@", e.description);
+    os_log_error([KMLogs dataLog], "Error = %{public}@", e.description);
     return nil;
   }
   

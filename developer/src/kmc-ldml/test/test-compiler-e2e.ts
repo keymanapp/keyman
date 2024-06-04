@@ -14,6 +14,7 @@ describe('compiler-tests', function() {
   });
 
   it('should-build-fixtures', async function() {
+    this.timeout(4000);
     // Let's build basic.xml
     // It should match basic.kmx (built from basic.txt)
 

@@ -1,5 +1,84 @@
 # Keyman Version History
 
+## 18.0.47 alpha 2024-06-03
+
+* fix(developer): save touch layout editor selection when loading state (#11575)
+* chore: Update history from 17.0.326 (#11649)
+* refactor(web): refactor keyboard-layout preprocessing property transplantation (#11601)
+* fix(web): fix keyboard-processing bugs uncovered by stricter TS settings (#11603)
+* fix(web): Don't apply suggestion unless fully configured (#11594)
+* chore(web): clean up remaining low-level Web .tsconfig settings (#11424)
+* chore(web): correct cases of implicit-any in web/ (#11462)
+* chore(web): enforce strict function types in web/ (#11463)
+* chore(web): finalize web/ project parity with base-repo TS config settings (aside from JS version target) (#11464)
+* fix(android): include DOMRect polyfill for older ES6-supporting devices (#11653)
+* fix(linux): move environment to separate job and checkout to separate subdirectory (#11659)
+* fix(linux): paths in `uses:` can't use variables (#11661)
+* fix(linux): restore of artifacts still needs to be in same job (#11662)
+* fix(linux): include api version as part of package filename (#11664)
+* fix(linux): don't escape wildcard for package filename (#11666)
+* fix(linux): match digit in package filename (#11667)
+
+## 18.0.46 alpha 2024-06-01
+
+* chore(linux): More debugging of API verification (#11639)
+
+## 18.0.45 alpha 2024-05-31
+
+* change(mac): adopt unified logging APIs (#11515)
+* chore(common): update labels to include change, style (#11527)
+* chore(linux): run deb-package sourcepackage job on Ubuntu 24.04 (#11565)
+* test(core): verify Unicode and ICU versions cross-platform (#11418)
+* chore(linux): Debugging API verification (#11536)
+* refactor(core): prepare normalization code to call into JS under WASM (#11519)
+* feat(core): change normalize_nfd() to use JS native call instead of ICU on wasm (#11520)
+* fix(linux): Restore artifacts for API verification in the correct job (#11571)
+* fix(linux): Don't clean workdir after checkout in API verification (#11592)
+* fix(developer): test existence of ngrok.exe before atttempting to start (#11543)
+* fix(developer): handle unsupported `return` statement in `match` and `nomatch` in web compiler (#11546)
+* fix(developer): handle invalid project file when scanning for owner project (#11558)
+* fix(developer): ensure folder for MRU list is always created (#11552)
+* fix(web): fixes error on tab, enter when only a single input element is on the page (#11470)
+* fix(web): correctly handle cross-origin stylesheets when calculating keyboard size and key cap font size (#11472)
+* fix(web): pre-init keyboard activation awaits init before proceeding (#11505)
+* fix(android): host-page banner initialization (#11508)
+* fix(web): add null guard for missing debug info when reporting to Sentry (#11579)
+* chore(web): updates TypeScript version to 5.4.5 (#11414)
+* fix(ios): remove incorrect cast in log statement to prevent crash (#11569)
+* fix(web): headless recorder unhandled paths, invalid test-sequence references (#11596)
+* fix(web): remove dead code-branches (#11597)
+* chore(web): fixes implicit-this cases (#11459)
+* fix(web): use intended source for prediction-to-context matching (#11598)
+* fix(web): explicitly terminate banner gesture-handling when banner is swapped (#11599)
+* chore(web): removes unused locals, imports, and private fields (#11460)
+* fix(web): use correct parameter name in button UI OSK `hide` event (#11600)
+*  (#11444)
+* fix(ios): do not write to shared storage from system keyboard (#11613)
+* fix(developer): handle invalid default project path in options (#11555)
+* fix(developer): handle missing data in .kps `<Keyboard>` (#11563)
+* fix(developer): use correct variable when fixing up flick and multitap in Layer Properties dialog (#11577)
+* fix(developer): correct the inference of default hint from flicks (#11582)
+* fix(developer): make top row of Character Map 1 pixel to avoid DIV/0 in gestures (#11590)
+* chore: increase kmc-kmn build test timeout (#11608)
+* chore(windows): support port in THTTPUploader (#11611)
+* change(common): add extra commit message hints (#11585)
+* chore(developer): add context/debug (#11629)
+
+## 18.0.44 alpha 2024-05-24
+
+* fix(linux): Pass artifacts key to API verification GHA (#11517)
+* fix(web): properly pass test-runner verbose-logging flag (#11509)
+* chore(developer): add context/key-test (#11512)
+* fix(android/engine): Ignore updating invalid selections (#11510)
+* docs(common): update min emscripten version in docs to 3.1.46 (#11530)
+* fix(linux): Properly use and pass run_id (#11533)
+
+## 18.0.43 alpha 2024-05-24
+
+* fix(android): Revert Sentry version for FV Android (#11522)
+* chore(windows): remove schedule task clean up introduced in 15.0 Alpha (#11521)
+* fix(windows): add FirstVoices Keyboards build to Windows release build (#11524)
+
 ## 18.0.42 alpha 2024-05-23
 
 * chore(web): conversion of Web's browser-integration auto-tests for @web/test-runner use (#11455)
@@ -210,6 +289,47 @@
 
 * chore(common): move to 18.0 alpha (#10713)
 * chore: move to 18.0 alpha
+
+## 17.0.326 stable 2024-06-02
+
+* cherrypick(android/engine): Handle globe key on lock screen (#11468)
+* fix(android/app): Verify extracted text is not null (#11482)
+* chore(linux): Trigger GHA packaging for stable builds (#11494)
+* chore(android,mac,windows): Update crowdin strings for DE (#11498)
+* fix(developer): handle `KM_CORE_IT_INVALIDATE_CONTEXT` in debugger (#11489)
+* fix(developer): test existence of ngrok.exe before atttempting to start (#11544)
+* fix(developer): handle unsupported `return` statement in `match` and `nomatch` in web compiler (#11547)
+* fix(developer): ensure folder for MRU list is always created (#11553)
+* fix(developer): handle invalid project file when scanning for owner project (#11559)
+* fix(ios): remove incorrect cast in log statement to prevent crash (#11570)
+* fix(ios): do not write to shared storage from system keyboard (#11622)
+* fix(android): Ignore updating invalid selections (#11529)
+* fix(developer): handle invalid default project path in options (#11556)
+* fix(developer): handle missing data in .kps `<Keyboard>` (#11564)
+* fix(developer): save touch layout editor selection when loading state (#11576)
+* fix(developer): use correct variable when fixing up flick and multitap in Layer Properties dialog (#11578)
+* fix(developer): correct the inference of default hint from flicks (#11583)
+* fix(developer): make top row of Character Map 1 pixel to avoid DIV/0 in gestures (#11591)
+* fix(web): fixes error on tab, enter when only a single input element is on the page (#11615)
+* fix(web): correctly handle cross-origin stylesheets when calculating keyboard size and key cap font size (#11616)
+* fix(web): pre-init keyboard activation awaits init before proceeding (#11617)
+* fix(web): add null guard for missing debug info when reporting to Sentry (#11619)
+* fix(android): host-page banner initialization (#11618)
+* fix(developer): support Windows and Unicode names in .ttf (#11634)
+
+## 17.0.325 stable 2024-05-15
+
+* chore: update history for stable (#11448)
+
+## 17.0.324 stable 2024-05-15
+
+* chore(android): 17.0 stable release
+* chore(ios): 17.0 stable release
+* chore(linux): 17.0 stable release
+* chore(mac): 17.0 stable release
+* chore(web): 17.0 stable release
+* chore(windows): 17.0 stable release
+* chore(developer): 17.0 stable release
 
 ## 17.0.323 beta 2024-05-13
 

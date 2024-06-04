@@ -2,7 +2,6 @@ import { CumulativePathStats } from "../../cumulativePathStats.js";
 import { GestureSource, GestureSourceSubview } from "../../gestureSource.js";
 import { ContactModel } from "../specs/contactModel.js";
 import { ManagedPromise, TimeoutPromise } from "@keymanapp/web-utils";
-import { GesturePath } from "../../gesturePath.js";
 
 export type FulfillmentCause = 'path' | 'timer' | 'item' | 'cancelled';
 

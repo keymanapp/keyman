@@ -46,7 +46,7 @@ export default class ModelManager {
       model = this.registeredModels[modelId];
       delete this.registeredModels[modelId];
     } else {
-      return;
+      return null;
     }
 
     // Ensure the model is deregistered for each targeted language code variant.

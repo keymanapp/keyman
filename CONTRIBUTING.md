@@ -379,12 +379,18 @@ group.
 
 | Label name | `keyman` :mag_right: | Description |
 | --- | --- | --- |
+| `auto` | [search][search-auto] | For PRs only: automatically-opened PRs, e.g. opened by CI. |
+| `bug` | [search][search-bug] | For issues only: confirmed bugs or reports that are very likely to be bugs. PRs use `fix` to mark a bug fix. |
+| `change` | [search][search-change] | Minor change in functionality, but not new. |
+| `chore` | [search][search-chore] | Cleanup work, maintenance, without change in functionality. |
+| `docs` | [search][search-docs] | Relating to any type of documentation. |
 | `feat` | [search][search-feat] | Feature requests. |
-| `bug` | [search][search-bug] | Confirmed bugs or reports that are very likely to be bugs. |
-| `chore` | [search][search-chore] | Minor updates to Keyman. |
+| `fix` | [search][search-fix] | For PRs only: a bug fix, corresponds to issue label `bug`. |
 | `question` | [search][search-question] | Questions more than bug reports or feature requests (e.g. how do I do X). [**Usually better on the Keyman Community**](https://community.software.sil.org/c/keyman) |
+| `refactor` | [search][search-refactor] | Code reorganization and refactoring, without change in functionality. |
 | `spec` | [search][search-spec] | Issues which are specifications for a large scale feature. |
-| `docs` | [search][search-docs] | Related to any type of documentation. |
+| `style` | [search][search-style] | Code formatting only. |
+| `test` | [search][search-test] | Relating to automated tests. |
 
 #### Issue State
 
@@ -397,7 +403,6 @@ group.
 | `low-priority` | [search][search-low-priority] | The Keyman core team has decided not to fix these issues for now, but may in the future as time permits. |
 | `wontfix` | [search][search-wontfix] | The Keyman core team has decided not to fix these issues for now, either because they're working as intended or for some other reason. |
 | `invalid` | [search][search-invalid] | Issues which aren't valid (e.g. user errors). |
-| `auto` | [search][search-auto] | Pull requests created automatically, e.g. version increments. |
 | `compatibility` | [search][search-compatibility] | Related to interactions with other applications. |
 | `dependencies` | [search][search-dependencies] | Related to changes in dependencies, often automatically generated. |
 | `external` | [search][search-external] | Related to issues that require changes to third party applications in order to be resolved. |
@@ -408,15 +413,16 @@ These labels also include sublabels, such as `windows/config/`.
 
 | Label name | `keyman` :mag_right: | Description |
 | --- | --- | --- |
-| `windows/` | [search][search-windows] | Related to Keyman running on Windows. |
+| `android/` | [search][search-android] | Related to Keyman running on Android. |
+| `common/` | [search][search-common] | Related to shared code. |
+| `core/` | [search][search-core] | Related to Keyman Core. |
+| `developer/` | [search][search-developer] | Related to Keyman Developer. |
+| `ios/` | [search][search-ios] | Related to Keyman running on iOS. |
 | `linux/` | [search][search-linux] | Related to Keyman running on Linux. |
 | `mac/` | [search][search-mac] | Related to Keyman running on macOS. |
-| `ios/` | [search][search-ios] | Related to Keyman running on iOS. |
-| `android/` | [search][search-android] | Related to Keyman running on Android. |
-| `web/` | [search][search-web] | Related to KeymanWeb. |
-| `developer/` | [search][search-developer] | Related to Keyman Developer. |
-| `common/` | [search][search-common] | Related to Keyman Core and shared code. |
 | `oem/` | [search][search-oem] | Related to third party projects that are built together with Keyman. |
+| `web/` | [search][search-web] | Related to KeymanWeb. |
+| `windows/` | [search][search-windows] | Related to Keyman running on Windows. |
 
 #### Pull Request Labels
 
@@ -428,12 +434,17 @@ These labels also include sublabels, such as `windows/config/`.
 | `user-test-required` | [search][search-user-test-required] | Pull requests where user testing is incomplete. |
 
 
-[search-feat]: https://github.com/keymanapp/keyman/labels/feat
+[search-auto]: https://github.com/keymanapp/keyman/labels/auto
 [search-bug]: https://github.com/keymanapp/keyman/labels/bug
+[search-change]: https://github.com/keymanapp/keyman/labels/change
 [search-chore]: https://github.com/keymanapp/keyman/labels/chore
+[search-docs]: https://github.com/keymanapp/keyman/labels/docs
+[search-feat]: https://github.com/keymanapp/keyman/labels/feat
+[search-fix]: https://github.com/keymanapp/keyman/labels/fix
 [search-question]: https://github.com/keymanapp/keyman/labels/question
 [search-spec]: https://github.com/keymanapp/keyman/labels/spec
-[search-docs]: https://github.com/keymanapp/keyman/labels/docs
+[search-style]: https://github.com/keymanapp/keyman/labels/style
+[search-test]: https://github.com/keymanapp/keyman/labels/test
 
 [search-requires-design-work]: https://github.com/keymanapp/keyman/labels/requires-design-work
 [search-help-wanted]: https://github.com/keymanapp/keyman/labels/help%20wanted
@@ -443,20 +454,20 @@ These labels also include sublabels, such as `windows/config/`.
 [search-wontfix]: https://github.com/keymanapp/keyman/labels/wontfix
 [search-invalid]: https://github.com/keymanapp/keyman/labels/invalid
 
-[search-auto]: https://github.com/keymanapp/keyman/labels/auto
 [search-compatibility]: https://github.com/keymanapp/keyman/labels/compatibility
 [search-dependencies]: https://github.com/keymanapp/keyman/labels/dependencies
 [search-external]: https://github.com/keymanapp/keyman/labels/external
 
-[search-windows]: https://github.com/keymanapp/keyman/labels/windows%2F
+[search-android]: https://github.com/keymanapp/keyman/labels/android%2F
+[search-common]: https://github.com/keymanapp/keyman/labels/common%2F
+[search-core]: https://github.com/keymanapp/keyman/labels/core%2F
+[search-developer]: https://github.com/keymanapp/keyman/labels/developer%2F
+[search-ios]: https://github.com/keymanapp/keyman/labels/ios%2F
 [search-linux]: https://github.com/keymanapp/keyman/labels/linux%2F
 [search-mac]: https://github.com/keymanapp/keyman/labels/mac%2F
-[search-ios]: https://github.com/keymanapp/keyman/labels/ios%2F
-[search-android]: https://github.com/keymanapp/keyman/labels/android%2F
-[search-web]: https://github.com/keymanapp/keyman/labels/web%2F
-[search-developer]: https://github.com/keymanapp/keyman/labels/developer%2F
-[search-common]: https://github.com/keymanapp/keyman/labels/common%2F
 [search-oem]: https://github.com/keymanapp/keyman/labels/oem%2F
+[search-web]: https://github.com/keymanapp/keyman/labels/web%2F
+[search-windows]: https://github.com/keymanapp/keyman/labels/windows%2F
 
 [search-cherry-pick]: https://github.com/keymanapp/keyman/labels/cherry-pick
 [search-refactor]: https://github.com/keymanapp/keyman/labels/refactor

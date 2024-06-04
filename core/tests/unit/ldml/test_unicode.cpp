@@ -56,6 +56,11 @@
 
 std::string arg_path;
 
+/**
+ * Load a .json file into a json object
+ * @param jsonpath path to the .json file
+ * @returns json object
+ */
 nlohmann::json load_json(const km::core::path &jsonpath) {
   std::cout << "== " << __FUNCTION__ << " loading " << jsonpath << std::endl;
   std::ifstream json_file(jsonpath.native());
@@ -81,62 +86,83 @@ std::string get_major(const std::string& ver) {
   return ver.substr(start, end - start);
 }
 
-/** @return the Unicode version from a Blocks.txt file */
+/**
+ *  @return the Unicode version from a Blocks.txt file, such as `15.1.0`
+ */
 std::string get_block_unicode_ver(const char *blocks_path) {
   std::cout << "= " << __FUNCTION__ << " load " << blocks_path << std::endl;
-  // fetch Blocks.txt
+  // open Blocks.txt
   std::ifstream blocks_file(
       km::core::path(blocks_path).native());
   assert(blocks_file.good());
   std::string block_line;
   assert(std::getline(blocks_file, block_line));  // first line
+
+  // The first line is something such as '# Blocks-15.1.0.txt'
+  // We skip the prefix, and then stop before the suffix
+
   const std::string prefix = "# Blocks-";
+  const std::string txt_suffix = ".txt";
+
+  // find and skip the prefix - "15.1.0.txt"
   assert(block_line.length() > prefix.length());
-  return block_line.substr(prefix.length());
+  std::string result = block_line.substr(prefix.length()); // "15.1.0"
+
+  // find and trim before the suffix
+  auto txt_pos = result.find(txt_suffix, 0);
+  assert(txt_pos != std::string::npos);
+  result.resize(txt_pos);
+
+  return result;
 }
 
 void test_unicode_versions(const nlohmann::json &versions, const nlohmann::json &package,
 const std::string &block_unicode_ver) {
   std::cout << "== test: " << __FUNCTION__ << std::endl;
 
-#define SHOW_VAR(x) (std::cout << #x << "\t" << (x) << std::endl)
-
-  const std::string cxx_icu(U_ICU_VERSION);
-  SHOW_VAR(cxx_icu);
-
+  // 'raw' versions
   const std::string cxx_icu_unicode(U_UNICODE_VERSION);
-  SHOW_VAR(cxx_icu_unicode);
-
-  SHOW_VAR(versions);
-
-  const std::string node_icu_unicode(versions["unicode"].template get<std::string>());
-  SHOW_VAR(node_icu_unicode);
-  SHOW_VAR(versions["node"]);
-
-  const std::string node(versions["node"].template get<std::string>());
-  SHOW_VAR(node);
-
-  const std::string node_icu(versions["icu"].template get<std::string>());
-  SHOW_VAR(node_icu);
-
+  const std::string cxx_icu(U_ICU_VERSION);
   const std::string node_engine(package["engines"]["node"].template get<std::string>());
-  SHOW_VAR(node_engine);
+  const std::string node_icu_unicode(versions["unicode"].template get<std::string>());
+  const std::string node_icu(versions["icu"].template get<std::string>());
+  const std::string node(versions["node"].template get<std::string>());
 
-  std::cout << "=== Loaded from JSON" << std::endl;
+  // calculated versions
+  const std::string block_ver_major        = get_major(block_unicode_ver);
+  const std::string cxx_icu_major          = get_major(cxx_icu);
+  const std::string cxx_icu_unicode_major  = get_major(cxx_icu_unicode);
+  const std::string node_engine_major      = get_major(node_engine);
+  const std::string node_icu_major         = get_major(node_icu);
+  const std::string node_icu_unicode_major = get_major(node_icu_unicode);
+  const std::string node_major             = get_major(node);
 
-  SHOW_VAR(block_unicode_ver);
-  std::cout << "=== calculating major versions" << std::endl;
+  // macro to output string value
 
-  // calculations
-  auto block_ver_major        = get_major(block_unicode_ver);
-  auto node_engine_major      = get_major(node_engine);
-  auto node_major             = get_major(node);
-  auto cxx_icu_major          = get_major(cxx_icu);
-  auto node_icu_major         = get_major(node_icu);
-  auto cxx_icu_unicode_major  = get_major(cxx_icu_unicode);
-  auto node_icu_unicode_major = get_major(node_icu_unicode);
+  std::cout << "ICU Versions:" << std::endl;
+  std::cout << "* " << cxx_icu << "\t"
+            << "..linked from C++" << std::endl;
+  std::cout << "* " << node_icu << "\t"
+            << "..in Node.js" << std::endl;
+  std::cout << std::endl;
 
-#undef SHOW_VAR
+  std::cout << "Unicode Versions:" << std::endl;
+  std::cout << "* " << cxx_icu_unicode << "\t"
+            << "..in ICU linked from C++" << std::endl;
+  std::cout << "* " << node_icu_unicode << "\t"
+            << "..in ICU in Node.js" << std::endl;
+  std::cout << "* " << block_unicode_ver << "\t"
+            << "..in Keyman repo Blocks.txt" << std::endl;
+  std::cout << std::endl;
+
+  std::cout << "Node.js" << std::endl;
+  std::cout << "* " << versions["node"] << "\t"
+            << "Actual version of Node.js" << std::endl;
+  std::cout << "* " << node_engine << "\t"
+            << "Version of Node.js requested by package.json" << std::endl;
+  std::cout << std::endl;
+
+  // ---- tests ------
 
   // allow the Node.js version to be >= required
   auto node_engine_num = std::atoi(node_engine_major.c_str());

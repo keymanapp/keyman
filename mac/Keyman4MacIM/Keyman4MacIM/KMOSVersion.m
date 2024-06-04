@@ -7,6 +7,7 @@
 //
 
 #import "KMOSVersion.h"
+#import "KMLogs.h"
 
 static CFStringRef sSystemVersionPath = CFSTR("/System/Library/CoreServices/SystemVersion.plist");
 
@@ -16,19 +17,19 @@ static CFStringRef sSystemVersionPath = CFSTR("/System/Library/CoreServices/Syst
   NSDictionary *systemVersionDict = [NSDictionary dictionaryWithContentsOfFile:(__bridge NSString*)sSystemVersionPath];
   if (NULL ==systemVersionDict)
   {
-    NSLog(@"could not read system version dictionary file: %@", sSystemVersionPath);
+    os_log_info([KMLogs configLog], "Could not read system version dictionary file: %{public}@", sSystemVersionPath);
     return 0;
   }
   NSString *systemVersionString = [systemVersionDict objectForKey:@"ProductVersion"];
   if (NULL ==systemVersionString)
   {
-    NSLog(@"could not retrieve system version from dictionary at %@ with %d keys", sSystemVersionPath, (int)systemVersionDict.count);
+    os_log_info([KMLogs configLog], "Could not retrieve system version from dictionary at %{public}@ with %d keys", sSystemVersionPath, (int)systemVersionDict.count);
     return 0;
   }
   NSArray *systemVersionStringParts = [systemVersionString componentsSeparatedByString:@"."];
   if (systemVersionStringParts.count < 2)
   {
-    NSLog(@"Too few parts to the system version (probably): %@", systemVersionString);
+    os_log_info([KMLogs configLog], "Too few parts to the system version (probably): %{public}@", systemVersionString);
     return [systemVersionString intValue]; // hopefully this will at least be the major OS version, e.g., 10 (all versions so far!)
   }
   
@@ -43,7 +44,7 @@ static CFStringRef sSystemVersionPath = CFSTR("/System/Library/CoreServices/Syst
   }
   if (systemVersionStringParts.count > 3)
   {
-    NSLog(@"Portions of System Version string after third part unused: %@", systemVersionString);
+    os_log_info([KMLogs configLog], "Portions of System Version string after third part unused: %{public}@", systemVersionString);
   }
   return systemVersion;
 }
