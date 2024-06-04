@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 18.0.48 alpha 2024-06-04
+
+* fix(linux): add debug output (#11668)
+* chore(windows): add debug log messages for modifier key press processing (#11665)
+* test(core): clarify output of test_unicode (#11572)
+* fix(linux): add more debug output (#11680)
+* fix(linux): try a different way (#11681)
+
 ## 18.0.47 alpha 2024-06-03
 
 * fix(developer): save touch layout editor selection when loading state (#11575)
