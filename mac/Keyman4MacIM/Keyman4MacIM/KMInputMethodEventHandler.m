@@ -84,14 +84,16 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
 }
 
 - (void)handleCommand:(NSEvent *)event {
-    // There are a bunch of common navigation/selection command-key combinations, but individual
-    // apps may implement specific commands that also change the selection. There is probably no
-    // situation where a user could reasonably hope that any dead-keys typed before using a
-    // command shortcut would be remembered, so other than an insignificant performance penalty,
-    // the only downside to treating all commands as having the potential to change the selection
-    // is that some non-compliant apps can't get their context at all. This can be overridden so that
-    // non-compliant apps can mitigate this problem as appropriate.
-    [self.appDelegate logDebugMessage:@"KMInputMethodEventHandler handleCommand, event type=%@, must refresh context", event.type];
+  /**
+    * There are many common navigation/selection command-key combinations, but individual
+    * apps may implement specific commands that also change the selection. There is probably no
+    * situation where a user could reasonably hope that any dead-keys typed before using a
+    * command shortcut would be remembered, so other than an insignificant performance penalty,
+    * the only downside to treating all commands as having the potential to change the selection
+    * is that some non-compliant apps can't get their context at all. This can be overridden so that
+    * non-compliant apps can mitigate this problem as appropriate.
+    */
+    [self.appDelegate logDebugMessage:@"KMInputMethodEventHandler handleCommand: command key executed, must refresh context"];
     self.contextChanged = YES;
 }
 
