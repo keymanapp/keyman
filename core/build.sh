@@ -179,6 +179,7 @@ if builder_start_action test:mac; then
 fi
 
 if builder_has_option --update-unicode; then
+  # TODO: only works under mac. What's the right way to get the arch here?
   meson compile -C ${KEYMAN_ROOT}/core/build/mac-x86_64/$BUILDER_CONFIGURATION tools/norm_data && mv -v  ${KEYMAN_ROOT}/core/build/mac-x86_64/$BUILDER_CONFIGURATION/tools/nfd_table.h ${KEYMAN_ROOT}/resources/standards-data/unicode-character-database/
 fi
 
