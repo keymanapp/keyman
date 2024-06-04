@@ -12,7 +12,7 @@ env:
 
 jobs:
   api_verification:
-    name: Verify API for libkeymancore.so
+    name: Verify API for libkeymancore*.so
     runs-on: ubuntu-latest
     outputs:
       VERSION: ${{ steps.environment_step.outputs.VERSION }}
@@ -66,19 +66,24 @@ jobs:
       with:
         packages: devscripts equivs
 
-    - name: "Verify API for libkeymancore.so (${{ steps.environment_step.outputs.GIT_BRANCH }}, branch ${{ steps.environment_step.outputs.GIT_BASE_BRANCH }}, by ${{ steps.environment_step.outputs.GIT_USER }})"
+    - name: "Verify API for libkeymancore*.so (${{ steps.environment_step.outputs.GIT_BRANCH }}, branch ${{ steps.environment_step.outputs.GIT_BASE_BRANCH }}, by ${{ steps.environment_step.outputs.GIT_USER }})"
       run: |
         echo "VERSION=${{ steps.environment_step.outputs.VERSION }}"
         echo "PRERELEASE_TAG=${{ steps.environment_step.outputs.PRERELEASE_TAG }}"
         echo "GIT_SHA=${{ steps.environment_step.outputs.GIT_SHA }}"
         echo "GIT_BASE=${{ steps.environment_step.outputs.GIT_BASE  }}"
+        ls -al ${GITHUB_WORKSPACE}
+        ls -al ${GITHUB_WORKSPACE}/artifacts
+        BIN_PACKAGE=$(ls "${GITHUB_WORKSPACE}/artifacts/${PKG_NAME}[0-9]*_${{ steps.environment_step.outputs.VERSION }}-1${{ steps.environment_step.outputs.PRERELEASE_TAG }}+$(lsb_release -c -s)1_amd64.deb")
+        echo "BIN_PACKAGE=${BIN_PACKAGE}"
+        ls -al ${BIN_PACKAGE}
         cd ${{ github.workspace }}/keyman/linux
         ./scripts/deb-packaging.sh \
           --gha \
-          --bin-pkg "${GITHUB_WORKSPACE}/artifacts/${PKG_NAME}[0-9]*_${{ steps.environment_step.outputs.VERSION }}-1${{ steps.environment_step.outputs.PRERELEASE_TAG }}+$(lsb_release -c -s)1_amd64.deb" \
+          --bin-pkg "${BIN_PACKAGE}" \
           --git-sha "${{ steps.environment_step.outputs.GIT_SHA }}" \
           --git-base "${{ steps.environment_step.outputs.GIT_BASE }}" \
-          verify 2>> $GITHUB_STEP_SUMMARY
+          verify # 2>> $GITHUB_STEP_SUMMARY
 
     - name: Archive .symbols file
       uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 # v4.3.0
