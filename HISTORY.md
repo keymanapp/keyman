@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 18.0.49 alpha 2024-06-05
+
+* fix(web): revert #11598 to eliminate use of `finalInput` which caused crash after moving caret (#11685)
+* fix(common): correctly display result of multiple option parameters in builder (#11679)
+* fix(linux): specify path with package name (#11694)
+* fix(linux): remove debug output and re-enable failures (#11695)
+
 ## 18.0.48 alpha 2024-06-04
 
 * fix(linux): add debug output (#11668)
