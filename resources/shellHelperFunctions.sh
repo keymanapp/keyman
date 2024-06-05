@@ -218,8 +218,10 @@ _try_multiple_times ( ) {
     sleep $wait_length
   fi
 
-  if ! "$@"; then
-    builder_echo "Command failed with error $?"
+  local code=0
+  "$@" || code=$?
+  if (( $code != 0 )); then
+    builder_echo "Command failed with error $code"
     _try_multiple_times $retryCount "$@"
   fi
 }
@@ -248,6 +250,6 @@ verify_npm_setup() {
   pushd "$KEYMAN_ROOT" > /dev/null
 
   try_multiple_times npm ci
-  
+
   popd > /dev/null
 }
