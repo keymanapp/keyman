@@ -76,11 +76,11 @@ jobs:
         ls -al ${GITHUB_WORKSPACE}/artifacts
         BIN_PACKAGE=$(ls "${GITHUB_WORKSPACE}/artifacts/" | grep "${PKG_NAME}[0-9]*_${{ steps.environment_step.outputs.VERSION }}-1${{ steps.environment_step.outputs.PRERELEASE_TAG }}+$(lsb_release -c -s)1_amd64.deb")
         echo "BIN_PACKAGE=${BIN_PACKAGE}"
-        ls -al ${BIN_PACKAGE}
+        ls -al ${GITHUB_WORKSPACE}/artifacts/${BIN_PACKAGE}
         cd ${{ github.workspace }}/keyman/linux
         ./scripts/deb-packaging.sh \
           --gha \
-          --bin-pkg "${BIN_PACKAGE}" \
+          --bin-pkg "${GITHUB_WORKSPACE}/artifacts/${BIN_PACKAGE}" \
           --git-sha "${{ steps.environment_step.outputs.GIT_SHA }}" \
           --git-base "${{ steps.environment_step.outputs.GIT_BASE }}" \
           verify # 2>> $GITHUB_STEP_SUMMARY
