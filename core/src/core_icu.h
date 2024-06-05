@@ -33,6 +33,10 @@
 #include "unicode/utypes.h"
 #include "unicode/unistr.h"
 #include "unicode/normalizer2.h"
+#include "unicode/uniset.h"
+#include "unicode/usetiter.h"
+#include "unicode/regex.h"
+#include "unicode/utext.h"
 
 #include "keyman_core.h"
 #include "debuglog.h"

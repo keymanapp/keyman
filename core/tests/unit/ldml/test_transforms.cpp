@@ -1,5 +1,6 @@
 #include "../../../src/ldml/ldml_markers.hpp"
 #include "../../../src/ldml/ldml_transforms.hpp"
+#include "../../../src/util_regex.hpp"
 #include "kmx/kmx_plus.h"
 #include "kmx/kmx_xstring.h"
 #include "test_color.h"
@@ -624,16 +625,16 @@ test_map() {
   std::cout << __FILE__ << ":" << __LINE__ << "  transform_entry::findIndex" << std::endl;
   {
     std::deque<std::u32string> list;
-    assert_equal(transform_entry::findIndex(U"Does Not Exist", list), -1);
+    assert_equal(km::core::util::km_regex::findIndex(U"Does Not Exist", list), -1);
 
     list.emplace_back(U"0th");
     list.emplace_back(U"First");
     list.emplace_back(U"Second");
 
-    assert_equal(transform_entry::findIndex(U"First", list), 1);
-    assert_equal(transform_entry::findIndex(U"0th", list), 0);
-    assert_equal(transform_entry::findIndex(U"Second", list), 2);
-    assert_equal(transform_entry::findIndex(U"Nowhere", list), -1);
+    assert_equal(km::core::util::km_regex::findIndex(U"First", list), 1);
+    assert_equal(km::core::util::km_regex::findIndex(U"0th", list), 0);
+    assert_equal(km::core::util::km_regex::findIndex(U"Second", list), 2);
+    assert_equal(km::core::util::km_regex::findIndex(U"Nowhere", list), -1);
   }
 
   return EXIT_SUCCESS;
