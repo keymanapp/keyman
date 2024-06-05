@@ -31,7 +31,7 @@ EM_JS(char*, NormalizeNFC, (const char* input), {
 });
 
 // pull in the generated table
-#include "../../resources/standards-data/unicode-character-database/nfd_table.h"
+#include "util_normalize_table.h"
 
 #endif
 

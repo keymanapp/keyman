@@ -47,7 +47,7 @@
 
 #ifdef __EMSCRIPTEN__
 // Pull this in to verify versions
-#include "../../../../resources/standards-data/unicode-character-database/nfd_table.h"
+#include "util_normalize_table.h"
 #endif
 
 //-------------------------------------------------------------------------------------
@@ -189,9 +189,15 @@ inline const char *boolstr(bool b) {
 
 void test_has_boundary_before() {
   std::cout << "= " << __FUNCTION__ << std::endl;
-  std::cout << "(this test only runs under emscripten. congratulations.)" << std::endl;
-  // static_assert(U_UNICODE_VERSION == KM_HASBOUNDARYBEFORE_UNICODE_VERSION, "nfd_table.h Unicode version does not match ICU's - see nfd_table.h");
-  std::cout << U_UNICODE_VERSION << "≈≈" << KM_HASBOUNDARYBEFORE_UNICODE_VERSION << std::endl;
+  std::cout << "I see we are on Emscripten / wasm! Now we will do some additional tests." << std::endl;
+  std::string icu4c_unicode(U_UNICODE_VERSION), header_unicode(KM_HASBOUNDARYBEFORE_UNICODE_VERSION),
+              icu4c_icu(U_ICU_VERSION), header_icu(KM_HASBOUNDARYBEFORE_ICU_VERSION);
+  std::cout << "Unicode: " << U_UNICODE_VERSION << ", and from the table file: " << KM_HASBOUNDARYBEFORE_UNICODE_VERSION << std::endl;
+  std::cout << "It would be very strange for these versions to be out of sync. Some sort of build or tool problem." << std::endl;
+  assert_basic_equal(icu4c_unicode, header_unicode);
+  assert_basic_equal(icu4c_icu, header_icu);
+
+  std::cout << std::endl << "Now, let's make sure has_nfd_boundary_before() matches ICU." << std::endl;
 
   UErrorCode status           = U_ZERO_ERROR;
   const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(status);
@@ -203,7 +209,7 @@ void test_has_boundary_before() {
     auto icu_hbb = nfd->hasBoundaryBefore(cp);
 
     if (km_hbb != icu_hbb) {
-      std::cerr << "Error: nfd_table.h said " << boolstr(km_hbb) << " but ICU said " << boolstr(icu_hbb) << " for "
+      std::cerr << "Error: util_normalize_table.h said " << boolstr(km_hbb) << " but ICU said " << boolstr(icu_hbb) << " for "
                 << "has_nfd_boundary_before(0x" << std::hex << cp << std::dec << ")" << std::endl;
     }
     assert(km_hbb == icu_hbb);
