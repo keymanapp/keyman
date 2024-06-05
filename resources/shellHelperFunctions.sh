@@ -219,6 +219,7 @@ _try_multiple_times ( ) {
   fi
 
   if ! "$@"; then
+    builder_echo "Command failed with error $?"
     _try_multiple_times $retryCount "$@"
   fi
 }
