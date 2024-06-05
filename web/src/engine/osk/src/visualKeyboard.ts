@@ -270,7 +270,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   }
 
   get currentLayer(): OSKLayer {
-    return this.layerGroup.activeLayer;
+    return this.layerGroup?.activeLayer;
   }
 
   // Special keys (for the currently-visible layer)
