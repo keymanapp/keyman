@@ -4,7 +4,7 @@
     hasProp = {}.hasOwnProperty;
 
 import sax from 'sax';
-import * as events from 'events';
+import { EventEmitter } from 'events';
 import * as bom from './bom.js';
 import * as processors from './processors.js';
 import { setImmediate } from 'timers';
@@ -24,7 +24,7 @@ import { defaults } from './defaults.js';
   };
 
 /** @type Class */
-export class Parser extends events.EventEmitter {
+export class Parser extends EventEmitter {
 // export const Parser = (function(superClass) {
     // extend(Parser, superClass);
 
@@ -345,7 +345,7 @@ export class Parser extends events.EventEmitter {
       })(this));
     };
 
-  }// )(events);
+  }
 
   export const parseString = function(str, a, b) {
     var cb, options, parser;
