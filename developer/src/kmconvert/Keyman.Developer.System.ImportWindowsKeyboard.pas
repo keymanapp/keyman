@@ -80,7 +80,7 @@ uses
   BCP47Tag,
   Keyman.Developer.System.ImportKeyboardDLL,
   Keyman.Developer.System.GenerateKeyboardIcon,
-  Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter,
+  Keyman.Developer.System.VisualKeyboardToTouchLayoutConverter,
   Keyman.System.KeyboardUtils,
   KeymanVersion,
   KeyboardParser,
@@ -383,11 +383,11 @@ end;
 
 function TImportWindowsKeyboard.ConvertOSKToTouchLayout(const OSKFilename, TouchLayoutFilename: string): Boolean;
 var
-  converter: TTouchLayoutToVisualKeyboardConverter;
+  converter: TVisualKeyboardToTouchLayoutConverter;
   FNewLayout: string;
   ss: TStringStream;
 begin
-  converter := TTouchLayoutToVisualKeyboardConverter.Create(OSKFilename);
+  converter := TVisualKeyboardToTouchLayoutConverter.Create(OSKFilename);
   try
     if converter.Execute(FNewLayout) then
     begin
