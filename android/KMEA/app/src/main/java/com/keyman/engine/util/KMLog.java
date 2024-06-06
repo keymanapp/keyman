@@ -42,35 +42,39 @@ public final class KMLog {
    * @param msg String of the info message
    */
   public static void LogBreadcrumb(String tag, String msg, boolean addStackTrace) {
-    if (msg != null && !msg.isEmpty()) {
-      Log.i(tag, msg);
+    if (msg == null || msg.isEmpty()) {
+      return;
+    }
 
-      if (DependencyUtil.libraryExists(LibraryType.SENTRY) && Sentry.isEnabled()) {
-        Breadcrumb crumb = new Breadcrumb();
-        crumb.setMessage(msg);
-        crumb.setLevel(SentryLevel.INFO);
+    Log.i(tag, msg);
 
-        if(addStackTrace) {
-          StackTraceElement[] rawTrace = Thread.currentThread().getStackTrace();
+    if (!DependencyUtil.libraryExists(LibraryType.SENTRY) || !Sentry.isEnabled()) {
+      return;
+    }
 
-          // The call that gets us the stack-trace above... shows up in the
-          // stack trace, so we'll skip the first few (redundant) entries.
-          int skipCount = 3;
+    Breadcrumb crumb = new Breadcrumb();
+    crumb.setMessage(msg);
+    crumb.setLevel(SentryLevel.INFO);
 
-          // Sentry does limit the size of messages... so let's just
-          // keep 10 entries and call it a day.
-          int limit = Math.min(rawTrace.length, 10 + skipCount);
-          if(rawTrace.length > skipCount) {
-            String[] trace = new String[limit - skipCount];
-            for (int i = skipCount; i < limit; i++) {
-              trace[i-skipCount] = rawTrace[i].toString();
-            }
-            crumb.setData("stacktrace", trace);
-          }
+    if(addStackTrace) {
+      StackTraceElement[] rawTrace = Thread.currentThread().getStackTrace();
+
+      // The call that gets us the stack-trace above... shows up in the
+      // stack trace, so we'll skip the first few (redundant) entries.
+      int skipCount = 3;
+
+      // Sentry does limit the size of messages... so let's just
+      // keep 10 entries and call it a day.
+      int limit = Math.min(rawTrace.length, 10 + skipCount);
+      if(rawTrace.length > skipCount) {
+        String[] trace = new String[limit - skipCount];
+        for (int i = skipCount; i < limit; i++) {
+          trace[i-skipCount] = rawTrace[i].toString();
         }
-        Sentry.addBreadcrumb(crumb);
+        crumb.setData("stacktrace", trace);
       }
     }
+    Sentry.addBreadcrumb(crumb);
   }
 
   /**
