@@ -91,7 +91,7 @@ export class StylesheetManager {
     const fontKey = fd.family;
     let source: string;
 
-    let i, ttf='', woff='', fList=[];
+    let i, ttf='', woff='', fList=[], data='';
 
     // TODO: 22 Aug 2014: check that font path passed from cloud is actually used!
 
