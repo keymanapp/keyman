@@ -33,7 +33,8 @@
     "@keymanapp/keyman-version": "*",
     "restructure": "3.0.1",
     "semver": "^7.5.2",
-    "xml2js": "git+https://github.com/keymanapp/dependency-node-xml2js#535fe732dc408d697e0f847c944cc45f0baf0829"
+    "sax": ">=0.6.0",
+    "xmlbuilder": "~11.0.0"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
@@ -70,6 +71,7 @@
     ],
     "exclude-after-remap": true,
     "exclude": [
+      "src/deps/",
       "src/kmx/kmx-plus-builder/",
       "src/kmx/kmx-plus.ts",
       "src/kmx/kmx-builder.ts",

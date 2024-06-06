@@ -56,3 +56,5 @@ export * as KeymanFileTypes from './util/file-types.js';
 
 export * as Schemas from './schemas.js';
 export * as SchemaValidators from './schema-validators.js';
+
+export * as xml2js from './deps/xml2js/xml2js.js';
