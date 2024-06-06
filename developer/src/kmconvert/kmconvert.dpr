@@ -68,7 +68,7 @@ uses
   Keyman.Developer.System.KMConvertParameters in 'Keyman.Developer.System.KMConvertParameters.pas',
   Keyman.Developer.System.ImportKeyboardDLL in 'Keyman.Developer.System.ImportKeyboardDLL.pas',
   ScanCodeMap in '..\..\..\common\windows\delphi\general\ScanCodeMap.pas',
-  Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter in 'Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter.pas',
+  Keyman.Developer.System.VisualKeyboardToTouchLayoutConverter in 'Keyman.Developer.System.VisualKeyboardToTouchLayoutConverter.pas',
   OnScreenKeyboardData in '..\..\..\common\windows\delphi\visualkeyboard\OnScreenKeyboardData.pas',
   TouchLayout in '..\TIKE\oskbuilder\TouchLayout.pas',
   TouchLayoutDefinitions in '..\TIKE\oskbuilder\TouchLayoutDefinitions.pas',
