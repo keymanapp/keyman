@@ -374,7 +374,7 @@ TEST_F(CompilerTest, GetXStringImpl_type3_test) {
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
     PKMX_WCHAR newp = NULL;
-    FILE_STORE file_store[3];
+    FILE_STORE file_store[100];
     fk.cxStoreArray = 3u;
     fk.dpStoreArray = file_store;
     u16cpy(file_store[0].szName, u"a");
@@ -415,13 +415,14 @@ TEST_F(CompilerTest, GetXStringImpl_type3_test) {
 TEST_F(CompilerTest, GetXStringImpl_type4_test) {
     KMX_WCHAR tstr[128];
     FILE_KEYBOARD fk;
+    fk.version = VERSION_90;
     fk.cxStoreArray = 0;
     fk.dpStoreArray = nullptr;
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
     PKMX_WCHAR newp = NULL;
 
-    // type=3 ('B'), beep, CERR_InvalidToken
+    // type=3 ('B'), CERR_InvalidToken
     u16cpy(str, u"bcd");
     EXPECT_EQ(CERR_InvalidToken, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
 
@@ -466,6 +467,91 @@ TEST_F(CompilerTest, GetXStringImpl_type4_test) {
     const KMX_WCHAR tstr_baselayout_valid[] = { UC_SENTINEL, CODE_IFSYSTEMSTORE, TSS_BASELAYOUT+1, 2, 1, 0 };
     EXPECT_EQ(0, u16cmp(tstr_baselayout_valid, tstr));
     delete fk.dpStoreArray;
+}
+
+TEST_F(CompilerTest, GetXStringImpl_type5_test) {
+    KMX_WCHAR tstr[128];
+    FILE_KEYBOARD fk;
+    fk.version = VERSION_80;
+    KMX_WCHAR str[LINESIZE];
+    KMX_WCHAR output[GLOBAL_BUFSIZE];
+    PKMX_WCHAR newp = NULL;
+    FILE_STORE option[100];
+    fk.cxStoreArray = 3u;
+    fk.dpStoreArray = option;
+    u16cpy(option[0].szName, u"a");
+    u16cpy(option[1].szName, u"b");
+    u16cpy(option[2].szName, u"c");
+
+    // type=5 ('I'), CERR_InvalidToken
+    u16cpy(str, u"ijk");
+    EXPECT_EQ(CERR_InvalidToken, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+
+    // type=5 ('I'), if, CERR_80FeatureOnly
+    fk.version = VERSION_70;
+    fk.dwFlags = 0u;
+    u16cpy(str, u"if");
+    EXPECT_EQ(CERR_80FeatureOnly, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    fk.version = VERSION_80;
+
+    // type=5 ('I'), if, CERR_InvalidInVirtualKeySection *** TODO ***
+
+    // type=5 ('I'), if, no close delimiter => NULL
+    fk.version = VERSION_80;
+    u16cpy(str, u"if(");
+    EXPECT_EQ(CERR_InvalidIf, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+
+    // type=5 ('I'), if, empty delimiters => empty string
+    fk.version = VERSION_80;
+    fk.dwFlags = 0u;
+    u16cpy(str, u"if()");
+    EXPECT_EQ(CERR_InvalidIf, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+
+    // type=5 ('I'), if, invalid
+    fk.version = VERSION_80;
+    u16cpy(str, u"if(abc)");
+    EXPECT_EQ(CERR_InvalidIf, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+
+    // type=5 ('I'), if, CERR_90FeatureOnly_IfSystemStores
+    fk.version = VERSION_80;
+    u16cpy(str, u"if(&BITMAP=)");
+    EXPECT_EQ(CERR_90FeatureOnly_IfSystemStores, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+
+    // type=5 ('I'), if, CERR_IfSystemStore_NotFound
+    fk.version = VERSION_90;
+    u16cpy(str, u"if(&abc=)");
+    EXPECT_EQ(CERR_IfSystemStore_NotFound, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+
+    // type=5 ('I'), if, system store, equal, valid
+    fk.version = VERSION_90;
+    fk.cxStoreArray = 3u;
+    u16cpy(str, u"if(&BITMAP=beep)");
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_if_equal_system_store_valid[] = { UC_SENTINEL, CODE_IFSYSTEMSTORE, 2, 2, 4, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_if_equal_system_store_valid, tstr));
+
+    // type=5 ('I'), if, system store, not equal, valid
+    fk.version = VERSION_90;
+    fk.cxStoreArray = 3u;
+    u16cpy(str, u"if(&BITMAP!=beep)");
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_if_not_equal_system_store_valid[] = { UC_SENTINEL, CODE_IFSYSTEMSTORE, 2, 1, 4, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_if_not_equal_system_store_valid, tstr));
+
+    // type=5 ('I'), if, option, CERR_StoreDoesNotExist
+    fk.version = VERSION_80;
+    u16cpy(str, u"if(d=beep)");
+    EXPECT_EQ(CERR_StoreDoesNotExist, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+
+    // type=5 ('I'), if, option, equal, valid
+    fk.version = VERSION_80;
+    fk.cxStoreArray = 3u;
+    fk.dpStoreArray = option;
+    option[1].fIsOption = TRUE;
+    u16cpy(str, u"if(b=beep)");
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_if_option_valid[] = { UC_SENTINEL, CODE_IFOPT, 2, 2, 4, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_if_option_valid, tstr));
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
