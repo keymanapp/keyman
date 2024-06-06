@@ -1288,8 +1288,12 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return;
     }
 
-    // Step 3: recalculate gesture parameter values
-    // Skip for doc-keyboards, since they don't do gestures.
+    // Phase 3:  Refresh the layout of the layer-group and active layer.
+    this.layerGroup.refreshLayout(this.constructLayoutParams());
+
+    // Step 4: recalculate gesture parameter values
+    // We do this _after_ "Phase 3" so that this.currentLayer.rowHeight is guaranteed
+    // to be set.  Also, skip for doc-keyboards, since they don't do gestures.
     if(!this.isStatic) {
       const paddingZone = this.gestureEngine.config.maxRoamingBounds as PaddedZoneSource;
       paddingZone.updatePadding([-0.333 * this.currentLayer.rowHeight]);
@@ -1313,9 +1317,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       this.gestureParams.flick.triggerDist        = 0.75 * this.currentLayer.rowHeight;
       this.gestureParams.longpress.flickDistFinal = 0.75 * this.currentLayer.rowHeight;
     }
-
-    // Phase 4:  Refresh the layout of the layer-group and active layer.
-    this.layerGroup.refreshLayout(this.constructLayoutParams());
   }
 
   private constructLayoutParams(): LayerLayoutParams {
