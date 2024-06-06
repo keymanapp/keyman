@@ -38,6 +38,8 @@ export const MainLongpressSourceModel: ContactModel = {
       if(path.isComplete) {
         return 'reject';
       }
+
+      return undefined;
     }
   }
 };
@@ -78,6 +80,8 @@ export const ModipressEndModel: ContactModel = {
       if(path.isComplete) {
         return 'resolve';
       }
+
+      return undefined;
     }
   }
 }
@@ -91,6 +95,8 @@ export const SimpleTapModel: ContactModel = {
       if(path.isComplete && !path.wasCancelled) {
         return 'resolve';
       }
+
+      return undefined;
     }
   }
 }
@@ -103,6 +109,8 @@ export const SubkeySelectModel: ContactModel = {
       if(path.isComplete && !path.wasCancelled) {
         return 'resolve';
       }
+
+      return undefined;
     }
   }
 }
@@ -145,6 +153,8 @@ export const FlickEndContactModel: ContactModel = {
         // - or, take a regression & look at the coefficient of determination.
         return 'resolve';
       }
+
+      return undefined;
     }
   },
   pathResolutionAction: 'resolve',

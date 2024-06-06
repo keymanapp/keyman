@@ -46,7 +46,7 @@ cd `dirname ${KEYMAN_MACIM_BASE_PATH}` > /dev/null
 KEYMAN_MACIM_BASE_PATH=`pwd`;
 popd  > /dev/null
 
-. $KEYMAN_MACIM_BASE_PATH/../bashHelperFunctions.sh
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 KM_APP_NAME="Install Keyman.app"
 OUTPUT_DIR="$KEYMAN_MACIM_BASE_PATH/output"

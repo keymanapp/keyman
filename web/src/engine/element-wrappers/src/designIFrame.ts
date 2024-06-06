@@ -4,7 +4,7 @@ class SelectionCaret {
   node: Node;
   offset: number;
 
-  constructor(node, offset) {
+  constructor(node: Node, offset: number) {
     this.node = node;
     this.offset = offset;
   }
@@ -14,7 +14,7 @@ class SelectionRange {
   start: SelectionCaret;
   end: SelectionCaret;
 
-  constructor(start, end) {
+  constructor(start: SelectionCaret, end: SelectionCaret) {
     this.start = start;
     this.end = end;
   }
@@ -266,7 +266,6 @@ export default class DesignIFrame extends OutputTarget<{}> {
 
     let caret = this.getCarets().end;
     let delta = s._kmwLength();
-    let Lsel = this.doc.getSelection();
 
     if(delta == 0) {
       return;

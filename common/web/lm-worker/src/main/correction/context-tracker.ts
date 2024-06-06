@@ -413,7 +413,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
           There's already an implied whitespace to the left, so we conceptually
           merge the new whitespace with that one.
         */
-        return state;
+        return;
       } else if(isBackspace) {
         // Consider backspace entry for this case?
         state.replaceTailForBackspace(finalToken, primaryInput.id);

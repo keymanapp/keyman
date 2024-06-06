@@ -9,11 +9,11 @@ import { GestureSource, gestures } from '@keymanapp/gesture-recognizer';
 const { matchers } = gestures;
 
 // Huh... gotta do BOTH here?  One for constructor use, the other for generic-parameter use?
-const { GestureSequence, GestureStageReport, MatcherSelector } = matchers;
+const { GestureSequence, GestureStageReport } = matchers;
 type GestureSequence<Type> = gestures.matchers.GestureSequence<Type>;
 type GestureStageReport<Type> = gestures.matchers.GestureStageReport<Type>;
 
-import { ManagedPromise, timedPromise } from '@keymanapp/web-utils';
+import { ManagedPromise } from '@keymanapp/web-utils';
 
 export interface StageReportAssertion<Type> {
   matchedId: string,

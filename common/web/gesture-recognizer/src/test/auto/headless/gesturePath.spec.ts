@@ -18,7 +18,7 @@ describe("GesturePath", function() {
   // other automated tests for the module.
   describe("canary tests: serialization & deserialization", function() {
     it('from fixture', () => {
-      let testJSONtext = fs.readFileSync(`${SEGMENT_TEST_JSON_FOLDER}/simple_ne_move.json`);
+      let testJSONtext = fs.readFileSync(`${SEGMENT_TEST_JSON_FOLDER}/simple_ne_move.json`, 'utf-8');
       let fullSerializedJSON = JSON.parse(testJSONtext);
       let rawPathObject = fullSerializedJSON.inputs[0].path;
 
@@ -30,7 +30,7 @@ describe("GesturePath", function() {
       let reconstructedPath = GestureDebugPath.deserialize(rawPathObject);
       assert.isFalse(reconstructedPath.wasCancelled);
 
-      assert.sameDeepOrderedMembers(reconstructedPath.coords, rawPathObject.coords);
+      assert.sameDeepOrderedMembers([].concat(reconstructedPath.coords), rawPathObject.coords);
       const reconstructedPathJSON = reconstructedPath.toJSON();
       delete reconstructedPathJSON.stats;
       assert.notEqual(reconstructedPathJSON, rawPathObject);

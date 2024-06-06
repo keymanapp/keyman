@@ -76,8 +76,9 @@ export class TouchEventEngine<ItemType, StateToken = any> extends InputEventEngi
     super.dropTouchpoint(source);
 
     for(const key of Object.keys(this.safeBoundMaskMap)) {
-      if(this.getTouchpointWithId(Number.parseInt(key, 10)) == source) {
-        delete this.safeBoundMaskMap[key];
+      const keyVal = Number.parseInt(key, 10);
+      if(this.getTouchpointWithId(keyVal) == source) {
+        delete this.safeBoundMaskMap[keyVal];
       }
     }
   }
@@ -226,6 +227,8 @@ export class TouchEventEngine<ItemType, StateToken = any> extends InputEventEngi
         this.inputStartSignalMap.set(touchpoint, eventSignalPromise);
 
         return eventSignalPromise.corePromise;
+      } else {
+        return Promise.resolve();
       }
     });
   }

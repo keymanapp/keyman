@@ -115,8 +115,9 @@ export abstract class InputEngineBase<HoveredItemType, StateToken = any> extends
 
     this._activeTouchpoints = this._activeTouchpoints.filter((pt) => point != pt);
     for(const key of Object.keys(this.identifierMap)) {
-      if(this.identifierMap[key] == id) {
-        delete this.identifierMap[key];
+      const keyVal = Number.parseInt(key, 10);
+      if(this.identifierMap[keyVal] == id) {
+        delete this.identifierMap[keyVal];
       }
     }
   }

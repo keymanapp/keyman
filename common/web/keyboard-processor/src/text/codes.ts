@@ -29,7 +29,7 @@ const Codes = {
     // Note: keys_mod_other = 0x10000, used by KMX+ for the
     // other modifier flag in layers, > 16 bit so not available here.
     // See keys_mod_other in keyman_core_ldml.ts
-  },
+  } as {[name: string]: number},
 
   modifierBitmasks: {
     "ALL":0x007F,
@@ -39,14 +39,14 @@ const Codes = {
     "NON_CHIRAL":0x0070, // The default bitmask, for non-chiral keyboards,
     // Represents all modifier codes not supported by KMW 1.0 legacy keyboards.
     "NON_LEGACY": 0x006F // ALL, but without the SHIFT bit
-  },
+  } as {[name: string]: number},
 
   stateBitmasks: {
     "ALL":0x3F00,
     "CAPS":0x0300,
     "NUM_LOCK":0x0C00,
     "SCROLL_LOCK":0x3000
-  },
+  } as {[name: string]: number},
 
   // Define standard keycode numbers (exposed for use by other modules)
   keyCodes: {
@@ -79,15 +79,17 @@ const Codes = {
     "K_UPPER":50006,"K_LOWER":50007,"K_ALPHA":50008,
     "K_SHIFTED":50009,"K_ALTGR":50010,
     "K_TABBACK":50011,"K_TABFWD":50012
-  },
+  } as {[name: string]: number},
 
   codesUS: [
     ['0123456789',';=,-./`', '[\\]\''],
     [')!@#$%^&*(',':+<_>?~', '{|}"']
   ],
 
-  isKnownOSKModifierKey(keyID: string): boolean {
+  isFrameKey(keyID: string): boolean {
     switch(keyID) {
+      // TODO:  consider adding K_ALT, K_CTRL.
+      // Not currently here as they typically don't show up on mobile layouts.
       case 'K_SHIFT':
       case 'K_LOPT':
       case 'K_ROPT':
@@ -95,15 +97,10 @@ const Codes = {
       case 'K_CAPS':
         return true;
       default:
+        // 50000:  start of the range defining key-codes for special frame-key symbols
+        // and specialized common layer-switching key IDs.  See .keyCodes above.
         if(Codes.keyCodes[keyID] >= 50000) { // A few are used by `sil_euro_latin`.
           return true; // is a 'K_' key defined for layer shifting or 'control' use.
-        }
-        // Refer to text/codes.ts - these are Keyman-custom "keycodes" used for
-        // layer shifting keys.  To be safe, we currently let K_TABBACK and
-        // K_TABFWD through, though we might be able to drop them too.
-        const code = Codes[keyID];
-        if(code > 50000 && code < 50011) {
-          return true;
         }
     }
 
