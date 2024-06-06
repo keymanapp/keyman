@@ -415,6 +415,8 @@ TEST_F(CompilerTest, GetXStringImpl_type3_test) {
 TEST_F(CompilerTest, GetXStringImpl_type4_test) {
     KMX_WCHAR tstr[128];
     FILE_KEYBOARD fk;
+    fk.cxStoreArray = 0;
+    fk.dpStoreArray = nullptr;
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
     PKMX_WCHAR newp = NULL;
@@ -455,7 +457,15 @@ TEST_F(CompilerTest, GetXStringImpl_type4_test) {
     u16cpy(str, u"baselayout(abc)");
     EXPECT_EQ(CERR_InvalidToken, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
 
-    // type=4 ('B'), baselayout, valid *** TODO ***
+    // type=4 ('B'), baselayout, valid
+    fk.version = VERSION_90;
+    fk.cxStoreArray = 0;
+    fk.dpStoreArray = nullptr;
+    u16cpy(str, u"baselayout(beep)");
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_baselayout_valid[] = { UC_SENTINEL, CODE_IFSYSTEMSTORE, TSS_BASELAYOUT+1, 2, 1, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_baselayout_valid, tstr));
+    delete fk.dpStoreArray;
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
