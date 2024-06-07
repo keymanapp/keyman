@@ -417,7 +417,6 @@ TEST_F(CompilerTest, GetXStringImpl_type2_test) {
 // KMX_DWORD ReadLine(KMX_BYTE* infile, int sz, int& offset, PKMX_WCHAR wstr, KMX_BOOL PreProcess)
 
 TEST_F(CompilerTest, GetRHS_test) {
-    // FILE_KEYBOARD fk;
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR tstr[128];
 
