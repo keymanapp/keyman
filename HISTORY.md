@@ -1,5 +1,21 @@
 # Keyman Version History
 
+## 18.0.51 alpha 2024-06-07
+
+* fix(web): fix osk touch-focus tracking (#11705)
+* fix(web): defer keyboard activation requests made during engine initialization (#11713)
+* chore(developer): add context/character-map (#11656)
+* chore(developer): add context/wordlist-editor (#11658)
+* chore(developer): add context/new-model-project-parameters (#11677)
+* fix(common): remove allowJs from web's tsconfig.base.json (#11718)
+* change(web): precompile all TS-based tests (#11723)
+* chore(developer): add extra logging for assertion failure when pressing backspace in debugger (#11707)
+* chore: add cherry-pick information in commit messages (#11708)
+* fix(developer): handle encoding errors when loading wordlists (#11711)
+* chore(ios): remove dead Swift-side keyboard gesture code (#11672)
+* fix(mac): change build configuration to prevent cycle error in Xcode 15 (#11730)
+* refactor(web): Replace deprecated substr with substring (#11637)
+
 ## 18.0.50 alpha 2024-06-06
 
 * chore(common): adds retry mechanism for build script npm ci calls (#11451)
