@@ -55,41 +55,52 @@ const KMX_DWORD KMX_VKMap[] = {
   0
 };
 
-typedef std::vector<std::string> v_str_1D;
-typedef std::vector<KMX_DWORD> v_dw_1D;
-typedef std::vector<std::vector<KMX_DWORD> > v_dw_2D;
-typedef std::vector<std::vector<std::vector<KMX_DWORD> > > v_dw_3D;
-static KMX_DWORD returnIfCharInvalid = 0;
+typedef std::vector<std::string> vector_str_1D;
+typedef std::vector<KMX_DWORD> vector_dword_1D;
+typedef std::vector<std::vector<KMX_DWORD> > vector_dword_2D;
+typedef std::vector<std::vector<std::vector<KMX_DWORD> > > vector_dword_3D;
+static KMX_DWORD INVALID_NAME = 0;
 static KMX_DWORD max_shiftstate = 10;
 static KMX_DWORD keycode_max = 50;
 static int keycode_spacebar = 49;
 
-// map vk_ShiftState to modifier (use 0,2,4,8,10 instead of 0,16,9,25 )
-int mac_map_VKShiftState_to_MacModifier(int vk_ShiftState);
+int mac_map_VKShiftState_to_Shiftstate(int vk_ShiftState);
 
-// map win_ShiftState to modifier (use 0,2,4,8,10 instead of Base, Shft, Opt, Sh+Opt )
-int mac_map_Win_ShiftState_to_MacModifier(int win_ShiftState);
+int mac_map_rgkey_ShiftState_to_Shiftstate(int win_ShiftState);
 
-// make sure a correct shiftstate was passed
-//bool is_correct_mac_shiftstate(int comp_ss);
-//bool is_correct_rgkey_shiftstate(int comp_ss);
 bool is_correct_win_shiftstate(int comp_ss);
 
-// create a Vector with all entries of both keymaps
-int mac_createOneVectorFromBothKeyboards(v_dw_3D &All_Vector, const UCKeyboardLayout * keykeyboard_layout);
+bool is_correct_Input_For_KeyboardTranslation(const UCKeyboardLayout * keyboard_layout,int keycode, int shiftstate, int cap);
 
-// read configuration file, split and write to 3D-Vector (Data for US on Vector[0][ ][ ]  )
-int mac_write_US_ToVector(v_dw_3D &vec);
+int mac_createOneVectorFromBothKeyboards(vector_dword_3D &All_Vector, const UCKeyboardLayout * keykeyboard_layout);
 
-// create an empty 2D vector containing 0 in all fields
-v_dw_2D mac_create_empty_2D_Vector(int dim_rows, int dim_shifts);
+int mac_write_US_ToVector(vector_dword_3D &vec);
 
-// append characters to 3D-Vector using GDK (Data for underlying Language on Vector[1][ ][ ]  )
-int mac_append_underlying_ToVector(v_dw_3D &All_Vector, const UCKeyboardLayout * keykeyboard_layout);
+vector_dword_2D mac_create_empty_2D_Vector(int dim_rows, int dim_shifts);
 
-// initialize UCHR
+int mac_append_underlying_ToVector(vector_dword_3D &All_Vector, const UCKeyboardLayout * keykeyboard_layout);
+
 bool mac_InitializeUCHR(const UCKeyboardLayout **keyboard_layout);
-//------------------------------
+
+KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode(const UCKeyboardLayout * keyboard_layout, int keycode, int shiftstate_mac, int caps);
+
+KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode_dk(const UCKeyboardLayout * keyboard_layout, int keycode, int shiftstate_mac, int caps, UInt32 &deadkeystate);
+
+KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLayout * keyboard_layout, int kc_underlying, int shiftstate_mac);
+
+KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLayout * keyboard_layout, UINT kc_underlying, UINT VKShiftState, PKMX_WCHAR deadKey);
+
+KMX_WCHAR mac_KMX_get_KeyValUnderlying_From_KeyValUS(vector_dword_3D &All_Vector, KMX_DWORD kv_us);
+
+KMX_WCHAR mac_KMX_get_KeyCodeUnderlying_From_KeyValUnderlying(vector_dword_3D & All_Vector, KMX_DWORD kv_underlying);
+
+KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_KeyCodeUS(const UCKeyboardLayout * keyboard_layout, vector_dword_3D &All_Vector, KMX_DWORD kc_us, ShiftState ss, int caps);
+
+UINT mac_KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD vk_us);
+
+KMX_DWORD mac_KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode);
+
+KMX_DWORD  mac_get_CombinedChar_From_DK(int vk_dk, KMX_DWORD ss_dk, const UCKeyboardLayout* keyboard_layout, KMX_DWORD vk_us, KMX_DWORD shiftstate_mac, int caps);
 
 // we use the same type of array as throughout Keyman even though we have lots of unused fields
 const UINT mac_ScanCodeToUSVirtualKey[128] = {
@@ -483,67 +494,11 @@ const UINT mac_USVirtualKeyToScanCode[256] = {
 	0xFFFF, 		    // not used
 };
 
-//bool mac_IsKeymanUsedChar(int KV);
-//------------------------------
-//  _S2 CHECKED OK
-KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLayout * keyboard_layout, int kc_underlying, int shiftstate_mac);
-
-//  _S2 CHECKED OK fill Deadkey with dk and return CATEGORY
-KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLayout * keyboard_layout, UINT kc_underlying, UINT VKShiftState, PKMX_WCHAR deadKey);
-
-//  _S2 CHECKED OK use Vector to return the Keyval of underlying Keyboard
-KMX_WCHAR mac_KMX_get_KeyValUnderlying_From_KeyValUS(v_dw_3D &All_Vector, KMX_DWORD kv_us);
-
-//  _S2 CHECKED OK use Vector to return the Scancode of underlying Keyboard
-KMX_WCHAR mac_KMX_get_KeyCodeUnderlying_From_KeyValUnderlying(v_dw_3D & All_Vector, KMX_DWORD kv_underlying);
-
-//  _S2 CHECKED OK use Vector to return the Keycode of the underlying Keyboard for given VK_US using GDK
-KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_KeyCodeUS(const UCKeyboardLayout * keyboard_layout, v_dw_3D &All_Vector, KMX_DWORD kc_us, ShiftState ss, int caps);
-
-//  _S2 CHECKED OK return the Keycode of the underlying Keyboard for given VK_US
-UINT mac_KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD vk_us);
-
-//  _S2 CHECKED OK return the VirtualKey of the US Keyboard for a given Keyode using GDK
-KMX_DWORD mac_KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode);
-
-//  _S2 CHECKED OK
-KMX_DWORD  mac_get_CombinedChar_From_DK(int vk_dk, KMX_DWORD ss_dk, const UCKeyboardLayout* keyboard_layout, KMX_DWORD vk_us, KMX_DWORD shiftstate_mac, int caps);
-
-// use gdk_keymap_translate_keyboard_state to get keyval - base function to get keyvals
-
-//  _S2 CHECKED OK
-KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode(const UCKeyboardLayout * keyboard_layout, int keycode, int shiftstate_mac, int caps);
-//  _S2 CHECKED OK
-KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode_dk(const UCKeyboardLayout * keyboard_layout, int keycode, int shiftstate_mac, int caps, UInt32 &deadkeystate);
-
 
 //################################################################################################################################################
 //################################################################################################################################################
-//KMX_DWORD  mac_KMX_get_KeyVal_From_KeyCode_new(int charVal,const UCKeyboardLayout* keyboard_layout , KMX_DWORD shiftstate);
 
-//static KMX_DWORD deadkey_min = 0xfe50;	// _S2 needed??
-//static KMX_DWORD deadkey_max = 0xfe93;	// _S2 needed??
-//static KMX_DWORD deadkey_max = 0xfe52;  // _S2 TOP_6 TODO This has to go! my test: to only return 3 dk
-// _S2 need to go
-
-//  _S2 CHECKED OK
-// take deadkey-value (e.g.65106) and return u16string (e.g. '^' )
-//std::u16string mac_convert_DeadkeyValues_To_U16str(int in);
-
-
-// convert codePoint to u16string
-//std::u16string mac_CodePointToU16String(unsigned int codepoint);
-
-// replace Name of Key (e.g. <AD06>)  wih Keycode ( e.g. 15 )
-//int mac_replace_KeyName_with_Keycode(std::string  in);
-
-// take a std::string (=contents of line symbols-file ) and returns the (int) value of the character
-//KMX_DWORD mac_convertNamesTo_DWORD_Value(std::string tok_str);
-
-// 1. step: read complete Row of Configuration file US
-//bool mac_createCompleteRow_US(v_str_1D &complete_List, FILE *fpp, const char *text, std::string language);
-
-void test_printoutKeyboards_S2(v_dw_3D &All_Vector);
+void test_printoutKeyboards_S2(vector_dword_3D &All_Vector);
 KMX_DWORD X_playWithDK_S2(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal) ;
 KMX_DWORD X_playWithDK_S2_one(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal);
 KMX_DWORD X_compare_Shiftstates_S2(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal=0);

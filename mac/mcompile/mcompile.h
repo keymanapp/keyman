@@ -35,15 +35,12 @@ struct KMX_DeadkeyMapping {   // I4353
 
 extern std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;   // I4353
 
-//  _S2 CHECKED OK
 int mac_run(int argc, std::vector<std::u16string>  str_argv, char* argv[]);
 
 PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p);
 
-//  _S2 CHECKED OK
-int mac_KMX_GetDeadkeys( const UCKeyboardLayout * keyboard_layout,  v_dw_3D &All_Vector, KMX_WCHAR deadkey, UINT shift_dk, KMX_WORD *OutputPairs );  // returns array of [usvk, ch_out] pairs
+int mac_KMX_GetDeadkeys( const UCKeyboardLayout * keyboard_layout,  vector_dword_3D &All_Vector, KMX_WCHAR deadkey, UINT shift_dk, KMX_WORD *OutputPairs );  // returns array of [usvk, ch_out] pairs
 
-//  _S2 CHECKED OK
 void mac_KMX_LogError(const wchar_t* fmt, ...);
 
 
