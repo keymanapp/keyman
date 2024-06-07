@@ -469,6 +469,93 @@
     </Control>
   </Form>
 
+  <Form Name="context/new-model-project-parameters">
+    <Control Name="editAuthor" Title="Author Name">
+      <p>The name of the developer of the keyboard. This is either your full name or 
+      the organization you're creating a model for.</p>
+    </Control>
+
+    <Control Name="editModelName" Title="Model Name">
+      <p>We recommend the name of the language, dialect, or community that this model is 
+      intended for. The name must be written in all the Latin letters or Arabic numerals.</p>
+    </Control>
+
+    <Control Name="editCopyright" Title="Copyright">
+      <p>Who owns the rights to this model and its data? Typically, 
+      you can use the automatically generated default value: © 2024 Your Full Name or 
+      Your Organization.</p>
+    </Control>
+
+    <Control Name="editFullCopyright" Title="Full copyright">
+      <p></p>
+    </Control>
+
+    <Control Name="editVersion" Title="Version">
+      <p>If this is the first time you've created a lexical model for you language, you should 
+      leave the version as 1.0. Otherwise, your version number must conform to the following 
+      rules: A version string made of major revision number.minor revision number.</p>
+    </Control>
+
+    <Control Name="gridLanguages" Title="Languages">
+      <p>Specifies the default BCP 47 language tags which will be added to the package 
+      metadata and project metadata.</p>
+    </Control>
+
+    <Control Name="cmdAddLanguage" Title="Add...">
+      <p>To add a language tag, click the Add button to bring up the “Select BCP 47 Tag” 
+      dialog box.</p>
+    </Control>
+
+    <Control Name="cmdEditLanguage" Title="Edit...">
+      <p>Click the Edit button to bring up the “Select BCP 47 Tag” dialog box again and edit the
+      language tag.</p>
+    </Control>
+
+    <Control Name="cmdRemoveLanguage" Title="Remove">
+      <p>Click the Remove button to delete the language tag.</p>
+    </Control>
+
+    <Control Name="editPath" Title="Path">
+      <p>Specifies the base path where the project folder will be created.</p>
+    </Control>
+
+    <Control Name="cmdBrowse" Title="Browse...">
+      <p>Browse for a folder or create a new folder to save the project to.</p>
+    </Control>
+
+    <Control Name="editAuthorID" Title="Author ID">
+      <p>An Author ID is a unique identifier used to distinguish you from others 
+      who have the same or similar names. </p>
+    </Control>
+
+    <Control Name="cbBCP47" Title="Primary Language">
+      <p>Choose your primary language which generated from the “Select BCP 47 Tag” dialog box.</p>
+    </Control>
+
+    <Control Name="editUniq" Title="Unique Name">
+      <p>Enter a unique name of the model. You can use the name of the language, dialect, 
+      or community that this model is intended for.</p>
+    </Control>
+
+    <Control Name="editModelID" Title="Model ID">
+      <p>Keyman automatically generates a model ID for you, given all the 
+      information already filled out. Model ID helps Keyman sorts and organizes 
+      different lexical models.</p>
+    </Control>
+
+    <Control Name="editProjectFilename" Title="Project filename">
+      <p>Specifies the base path where the project filename (.model.kpj) will be created.</p>
+    </Control>
+
+    <Control Name="memoDescription" Title="Description">
+      <p>Enter information about the model.</p>
+    </Control>
+
+    <Control Name="cmdCancel" Title="Cancel">
+      <p>Click Cancel to close the dialog without saving changes.</p>
+    </Control>
+  </Form>
+
   <Form Name="context/wordlist-editor">
     <Control Name="pages" Title="Wordlist tabs">
       <p>Wordlist tabs have two views: Design, and Code. Changes to one view are reflected 
