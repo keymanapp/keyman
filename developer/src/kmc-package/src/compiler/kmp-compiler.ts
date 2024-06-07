@@ -1,4 +1,4 @@
-import * as xml2js from 'xml2js';
+import { xml2js } from '@keymanapp/common-types';
 import JSZip from 'jszip';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 

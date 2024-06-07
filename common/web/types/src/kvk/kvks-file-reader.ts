@@ -1,4 +1,4 @@
-import * as xml2js from 'xml2js';
+import * as xml2js from '../deps/xml2js/xml2js.js';
 import KVKSourceFile from './kvks-file.js';
 import { boxXmlArray } from '../util/util.js';
 import { DEFAULT_KVK_FONT, VisualKeyboard, VisualKeyboardHeaderFlags, VisualKeyboardKey, VisualKeyboardKeyFlags, VisualKeyboardLegalShiftStates, VisualKeyboardShiftState } from './visual-keyboard.js';
