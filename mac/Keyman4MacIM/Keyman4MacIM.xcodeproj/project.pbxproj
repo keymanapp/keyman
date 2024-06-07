@@ -112,13 +112,13 @@
 		};
 		E211CCF420B5FE7A00505C36 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 8;
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
 				E211CCF620B600A500505C36 /* KeymanEngine4Mac.framework.dSYM in CopyFiles */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 		};
 		E27BA9CF202036BA00D273E7 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
