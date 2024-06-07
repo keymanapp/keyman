@@ -444,8 +444,6 @@ TEST_F(CompilerTest, GetXStringImpl_type3_test) {
 TEST_F(CompilerTest, GetXStringImpl_type4_test) {
     KMX_WCHAR tstr[128];
     fileKeyboard.version = VERSION_90;
-    fileKeyboard.cxStoreArray = 0;
-    fileKeyboard.dpStoreArray = nullptr;
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
     PKMX_WCHAR newp = NULL;
