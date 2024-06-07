@@ -37,12 +37,12 @@ class CompilerTest : public testing::Test {
     	CompilerTest() {}
 	    ~CompilerTest() override {}
 	    void SetUp() override {
-            kmcmp::BeginLine[BEGIN_ANSI] = -1;
-            kmcmp::BeginLine[BEGIN_UNICODE] = -1;
-            kmcmp::BeginLine[BEGIN_NEWCONTEXT] = -1;
-            kmcmp::BeginLine[BEGIN_POSTKEYSTROKE] = -1;
+            initGlobals();
         }
 	    void TearDown() override {
+            initGlobals();
+        }
+        void initGlobals() {
             msgproc = NULL;
             szText_stub[0] = '\0';
             kmcmp::nErrors = 0;
