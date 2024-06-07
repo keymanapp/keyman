@@ -23,6 +23,7 @@ export class TextTransform implements Transform {
   readonly deleteLeft: number;
   readonly deleteRight: number;
   readonly erasedSelection: boolean;
+  id: number;
 
   constructor(insert: string, deleteLeft: number, deleteRight: number, erasedSelection: boolean) {
     this.insert = insert;
@@ -37,13 +38,13 @@ export class TextTransform implements Transform {
 export class Transcription {
   readonly token: number;
   readonly keystroke: KeyEvent;
-  readonly transform: Transform;
+  readonly transform: TextTransform;
   alternates: Alternate[]; // constructed after the rest of the transcription.
   readonly preInput: Mock;
 
   private static tokenSeed: number = 0;
 
-  constructor(keystroke: KeyEvent, transform: Transform, preInput: Mock, alternates?: Alternate[]/*, removedDks: Deadkey[], insertedDks: Deadkey[]*/) {
+  constructor(keystroke: KeyEvent, transform: TextTransform, preInput: Mock, alternates?: Alternate[]/*, removedDks: Deadkey[], insertedDks: Deadkey[]*/) {
     let token = this.token = Transcription.tokenSeed++;
 
     this.keystroke = keystroke;
@@ -122,7 +123,7 @@ export default abstract class OutputTarget {
    * As such, it assumes that the caret is immediately after any inserted text.
    * @param from An output target (preferably a Mock) representing the prior state of the input/output system.
    */
-  buildTransformFrom(original: OutputTarget): Transform {
+  buildTransformFrom(original: OutputTarget): TextTransform {
     const toLeft = this.getTextBeforeCaret();
     const fromLeft = original.getTextBeforeCaret();
 

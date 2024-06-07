@@ -12,7 +12,7 @@ declare global {
   interface StringConstructor {
     kmwFromCharCode(cp0: number): string,
     _kmwFromCharCode(cp0: number): string,
-    kmwEnableSupplementaryPlane(bEnable: boolean)
+    kmwEnableSupplementaryPlane(bEnable: boolean): void
   }
 
   interface String {

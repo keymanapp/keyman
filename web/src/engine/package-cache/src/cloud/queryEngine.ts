@@ -19,11 +19,6 @@ export const MISSING_KEYBOARD = function(kbdid: string) {
   return kbdid + ' keyboard not found.';
 }
 
-type CloudAPIFont = {
-  family: string,
-  source: string | string[]
-}
-
 type CloudQueryOptions = {
   context: 'keyboard' | 'language';
   keyboardid?: string,
@@ -62,7 +57,7 @@ interface EventMap {
 }
 
 export default class CloudQueryEngine extends EventEmitter<EventMap> {
-  private cloudResolutionPromises: Record<number, ManagedPromise<KeyboardStub[] | ManagedPromise<LanguageAPIPropertySpec[]>>> = {};
+  private cloudResolutionPromises: Map<number, ManagedPromise<KeyboardStub[] | LanguageAPIPropertySpec[]>> = new Map();
 
   private _languageListPromise: ManagedPromise<LanguageAPIPropertySpec[]>;
   private languageFetchStarted: boolean = false;
@@ -118,11 +113,11 @@ export default class CloudQueryEngine extends EventEmitter<EventMap> {
 
     const query = URL + queryConfig + cmd;
 
-    let { promise, queryId } = this.requestEngine.request(query);
-    this.cloudResolutionPromises[queryId] = promise as any;
+    let { promise, queryId } = this.requestEngine.request<KeyboardStub[] | LanguageAPIPropertySpec[]>(query);
+    this.cloudResolutionPromises.set(queryId, promise);
 
     promise.finally(() => {
-      delete this.cloudResolutionPromises[queryId];
+      this.cloudResolutionPromises.delete(queryId);
     });
 
     return promise.corePromise as any;
@@ -137,7 +132,7 @@ export default class CloudQueryEngine extends EventEmitter<EventMap> {
    * @param {Object}    x   metadata object
    **/
   registerFromCloud = (x: CloudQueryResult) => {
-    const promiseid = x.timerid;
+    const promiseid = Number.parseInt(x.timerid);
 
     let result: KeyboardStub[] | LanguageAPIPropertySpec[] | Error;
     try {
@@ -150,7 +145,7 @@ export default class CloudQueryEngine extends EventEmitter<EventMap> {
       this.emit('unboundregister', result);
       return;
     } else {
-      const promise: ManagedPromise<KeyboardStub[]> | ManagedPromise<LanguageAPIPropertySpec[]> = this.cloudResolutionPromises[promiseid];
+      const promise = this.cloudResolutionPromises.get(promiseid);
 
       if(!promise) {
         this.emit('unboundregister', result);
@@ -163,7 +158,7 @@ export default class CloudQueryEngine extends EventEmitter<EventMap> {
             promise.resolve(result as any);
           }
         } finally {
-          delete this.cloudResolutionPromises[promiseid];
+          this.cloudResolutionPromises.delete(promiseid);
         }
       }
     }

@@ -8,7 +8,6 @@
 
 #import "AppDelegate.h"
 #import <KeymanEngine4Mac/KeymanEngine4Mac.h>
-#import <os/log.h>
 
 static BOOL debugMode = YES;
 
@@ -68,8 +67,6 @@ NSString *const kKMXFileKey = @"KMXFile";
 }
 
 - (void)windowDidResize:(NSNotification *)notification {
-  os_log_t oskLog = os_log_create("org.sil.keyman", "osk");
-  os_log_with_type(oskLog, OS_LOG_TYPE_DEBUG, "AppDelegate windowDidResize");
   [self.oskView resizeOSKLayout];
 }
 

@@ -283,7 +283,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     // Always do the common focus stuff, instantly returning if we're in an editable iframe.
     if(this._CommonFocusHelper(target)) {
-      return true;
+      return;
     };
 
     // Set element directionality (but only if element is empty)
@@ -488,6 +488,12 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   public async activateKeyboard(keyboardId: string, languageCode?: string, saveCookie?: boolean): Promise<boolean> {
     saveCookie ||= false;
     const originalKeyboardTarget = this.currentKeyboardSrcTarget();
+
+    // If someone tries to activate a keyboard before we've had a chance to load it,
+    // we should defer the activation, just as we'd have deferred the load attempt.
+    if(!this.engineConfig.deferForInitialization.isFulfilled) {
+      await this.engineConfig.deferForInitialization.corePromise;
+    }
 
     // Must do here b/c of fallback behavior stuff defined below.
     // If the default keyboard is requested, load that.  May vary based on form-factor, which is
@@ -803,7 +809,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   /**
    * Restore the most recently used keyboard, if still available
    */
-  restoreSavedKeyboard(kbd) {
+  restoreSavedKeyboard(kbd: string) {
     // If no saved keyboard, defaults to US English
     const d=kbd;
 

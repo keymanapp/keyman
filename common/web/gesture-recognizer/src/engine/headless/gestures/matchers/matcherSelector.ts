@@ -5,7 +5,6 @@ import { ManagedPromise, timedPromise } from "@keymanapp/web-utils";
 import { GestureSource, GestureSourceSubview } from "../../gestureSource.js";
 import { GestureMatcher, MatchResult, PredecessorMatch } from "./gestureMatcher.js";
 import { GestureModel } from "../specs/gestureModel.js";
-import { GestureSequence } from "./index.js";
 
 interface GestureSourceTracker<Type, StateToken> {
   /**
@@ -212,7 +211,7 @@ export class MatcherSelector<Type, StateToken = any> extends EventEmitter<EventM
      */
     const sourceNotYetStaged = source instanceof GestureSource;
 
-    const determinePredecessorSources = (source: PredecessorMatch<Type, StateToken>) => {
+    const determinePredecessorSources = (source: PredecessorMatch<Type, StateToken>): GestureSource<Type>[] => {
       const directSources = (source.sources as GestureSourceSubview<Type>[]).map((source => source.baseSource));
 
       if(directSources && directSources.length > 0) {

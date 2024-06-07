@@ -21,11 +21,11 @@ typedef uint32_t  uchar_t;
 
 /* Intentional fallthrough */
 #if defined(__clang__)
-#define fallthrough [[clang::fallthrough]]
+#define KMN_FALLTHROUGH [[clang::fallthrough]]
 #elif defined(__GNUC__) && __GNUC__ >=  7
-#define fallthrough [[gnu::fallthrough]]
+#define KMN_FALLTHROUGH [[gnu::fallthrough]]
 #else
-#define fallthrough ((void)0)
+#define KMN_FALLTHROUGH ((void)0)
 #endif
 
 template <int N>
@@ -151,9 +151,9 @@ public:
         auto rl = 1;
         bool toolong = false;
         switch(seq_sz) {
-            case 4:     u <<= 6; u |= *++cp & 0x3F; if (*cp >> 6 != 2) break; ++rl; toolong  = (u < 0x10); fallthrough;
-            case 3:     u <<= 6; u |= *++cp & 0x3F; if (*cp >> 6 != 2) break; ++rl; toolong |= (u < 0x20); fallthrough;
-            case 2:     u <<= 6; u |= *++cp & 0x3F; if (*cp >> 6 != 2) break; ++rl; toolong |= (u < 0x80); fallthrough;
+            case 4:     u <<= 6; u |= *++cp & 0x3F; if (*cp >> 6 != 2) break; ++rl; toolong  = (u < 0x10); KMN_FALLTHROUGH;
+            case 3:     u <<= 6; u |= *++cp & 0x3F; if (*cp >> 6 != 2) break; ++rl; toolong |= (u < 0x20); KMN_FALLTHROUGH;
+            case 2:     u <<= 6; u |= *++cp & 0x3F; if (*cp >> 6 != 2) break; ++rl; toolong |= (u < 0x80); KMN_FALLTHROUGH;
             case 1:     l = seq_sz; break;
             case 0:     l = -1; return 0xFFFD;
         }

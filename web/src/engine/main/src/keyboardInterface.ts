@@ -1,5 +1,5 @@
 import {
-  KeyboardInterface as KeyboardInterfaceBase,
+  KeyboardInterface as KeyboardInterfaceBase, KeyboardObject,
 } from "@keymanapp/keyboard-processor";
 import { KeyboardStub, RawKeyboardStub, toUnprefixedKeyboardId as unprefixed } from 'keyman/engine/package-cache';
 
@@ -46,7 +46,7 @@ export default class KeyboardInterface<ContextManagerType extends ContextManager
     }
   }
 
-  registerKeyboard(Pk): void {
+  registerKeyboard(Pk: KeyboardObject): void {
     // Among other things, sets Pk as a newly-active Keyboard.
     super.registerKeyboard(Pk);
     const registeredKeyboard = this.loadedKeyboard;
