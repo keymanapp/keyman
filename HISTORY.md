@@ -1,5 +1,18 @@
 # Keyman Version History
 
+## 18.0.50 alpha 2024-06-06
+
+* chore(common): adds retry mechanism for build script npm ci calls (#11451)
+* fix(web): get row-height for flick constraints after performing layout (#11691)
+* chore(ios): enable webview debugging (#11229)
+* fix(android): handle `IllegalArgumentException` when initializing `CloudDownloadMgr`, add logging to check for unhandled side-effects (#11626)
+* chore: replace git dep on restructure with 3.0.1 in npm (#11657)
+* chore: move xml2js into the repo to eliminate npm git dependency (#11660)
+* chore(common): move CLDR import copy into build step for common/web/types (#11690)
+* fix(developer): handle editor initializing after debugger when setting execution point (#11587)
+* fix(developer): treat js files with unrecognized encodings as non-keyboard files (#11698)
+* fix(developer): disable example edit controls if no examples in Package Editor (#11701)
+
 ## 18.0.49 alpha 2024-06-05
 
 * fix(web): revert #11598 to eliminate use of `finalInput` which caused crash after moving caret (#11685)
