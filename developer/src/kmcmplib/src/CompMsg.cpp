@@ -1,7 +1,11 @@
 #include <CompMsg.h>
-#include <map>
 
-std::map<KMX_DWORD, const KMX_CHAR*> CompilerErrorMap = {
+struct CompilerError {
+  KMX_DWORD ErrorCode;
+  const  KMX_CHAR* Text;
+  };
+
+const struct CompilerError CompilerErrors[] = {
     { CERR_InvalidLayoutLine                             , "Invalid 'layout' command"},
     { CERR_NoVersionLine                                 , "No version line found for file"},
     { CERR_InvalidGroupLine                              , "Invalid 'group' command"},
@@ -146,8 +150,14 @@ std::map<KMX_DWORD, const KMX_CHAR*> CompilerErrorMap = {
     { CWARN_VirtualKeyInOutput                           , "Virtual keys are not supported in output"},
 
     { 0, nullptr }
-};
+  };
 
-KMX_CHAR *GetCompilerErrorString(KMX_DWORD code) {
-    return (KMX_CHAR*) CompilerErrorMap[code];
+KMX_CHAR *GetCompilerErrorString(KMX_DWORD code)
+{
+  for(int i = 0; CompilerErrors[i].ErrorCode; i++) {
+    if(CompilerErrors[i].ErrorCode == code) {
+      return ( KMX_CHAR*) CompilerErrors[i].Text;
+    }
+  }
+  return nullptr;
 }
