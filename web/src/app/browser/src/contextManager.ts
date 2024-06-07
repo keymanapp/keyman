@@ -489,6 +489,12 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     saveCookie ||= false;
     const originalKeyboardTarget = this.currentKeyboardSrcTarget();
 
+    // If someone tries to activate a keyboard before we've had a chance to load it,
+    // we should defer the activation, just as we'd have deferred the load attempt.
+    if(!this.engineConfig.deferForInitialization.isFulfilled) {
+      await this.engineConfig.deferForInitialization.corePromise;
+    }
+
     // Must do here b/c of fallback behavior stuff defined below.
     // If the default keyboard is requested, load that.  May vary based on form-factor, which is
     // part of what .getFallbackStubKey() handles.

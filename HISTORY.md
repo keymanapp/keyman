@@ -1,5 +1,33 @@
 # Keyman Version History
 
+## 18.0.50 alpha 2024-06-06
+
+* chore(common): adds retry mechanism for build script npm ci calls (#11451)
+* fix(web): get row-height for flick constraints after performing layout (#11691)
+* chore(ios): enable webview debugging (#11229)
+* fix(android): handle `IllegalArgumentException` when initializing `CloudDownloadMgr`, add logging to check for unhandled side-effects (#11626)
+* chore: replace git dep on restructure with 3.0.1 in npm (#11657)
+* chore: move xml2js into the repo to eliminate npm git dependency (#11660)
+* chore(common): move CLDR import copy into build step for common/web/types (#11690)
+* fix(developer): handle editor initializing after debugger when setting execution point (#11587)
+* fix(developer): treat js files with unrecognized encodings as non-keyboard files (#11698)
+* fix(developer): disable example edit controls if no examples in Package Editor (#11701)
+
+## 18.0.49 alpha 2024-06-05
+
+* fix(web): revert #11598 to eliminate use of `finalInput` which caused crash after moving caret (#11685)
+* fix(common): correctly display result of multiple option parameters in builder (#11679)
+* fix(linux): specify path with package name (#11694)
+* fix(linux): remove debug output and re-enable failures (#11695)
+
+## 18.0.48 alpha 2024-06-04
+
+* fix(linux): add debug output (#11668)
+* chore(windows): add debug log messages for modifier key press processing (#11665)
+* test(core): clarify output of test_unicode (#11572)
+* fix(linux): add more debug output (#11680)
+* fix(linux): try a different way (#11681)
+
 ## 18.0.47 alpha 2024-06-03
 
 * fix(developer): save touch layout editor selection when loading state (#11575)

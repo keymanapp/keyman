@@ -4,10 +4,92 @@
 
   <Form Name="context/character-map">
     <Control Name="editFilter" Title="Character Map Filter">
-      <p>The Filter allows a user to reduce the number of characters displayed in the character map.  The standard filter options used are by font name or block name.</p>
+      <p>The Filter allows a user to reduce the number of characters displayed in the character map. The standard filter options used are by font name or block name.</p>
     </Control>
+
     <Control Name="grid" Title="Character Map">
       <p>The Character Map Grid displays each character in a square, with a visual representation of the character and the Unicode value displayed at the bottom of the square. Each font group is divided into a block headed by the font name.</p>
+    </Control>
+
+    <Control Name="cmdFilter" Title="Character Map Filter">
+      <p>The Filter allows a user to reduce the number of characters displayed in the 
+      character map. The standard filter options used are by font name or block name.</p>
+    </Control>
+
+    <Control Name="rbRange" Title="Character Map Filter">
+      <p>The filter format for a range is: [U+]XXXX-[U+]YYYY, where U+ is optional, 
+      XXXX is the starting Unicode value and YYYY is the finishing Unicode value.</p>
+    </Control>
+
+    <Control Name="editRangeStart" Title="Character Map Filter">
+      <p>The filter format for a range is: [U+]XXXX-[U+]YYYY, where U+ is optional, 
+      XXXX is the starting Unicode value and YYYY is the finishing Unicode value.</p>
+    </Control>
+
+    <Control Name="editRangeStop" Title="Character Map Filter">
+      <p>The filter format for a range is: [U+]XXXX-[U+]YYYY, where U+ is optional, 
+      XXXX is the starting Unicode value and YYYY is the finishing Unicode value.</p>
+    </Control>
+
+    <Control Name="rbName" Title="Character Map Filter">
+      <p>The Filter allows a user to reduce the number of characters displayed in the 
+      character map. The standard filter options used are by font name or block name.</p>
+    </Control>
+
+    <Control Name="cmdCharactersInCurrentFontOnly" Title="Character Map Filter">
+      <p> "&gt;" placed at the start of an entry will only show characters in the currently 
+      selected Character Map font. This is helpful when trying to determine which characters 
+      a given font supports.</p><br></br>
+      <p>Example: &gt;LAO </p><br></br>
+      <p>finds all characters with names starting in "LAO" in the current font</p>
+    </Control>
+
+    <Control Name="cmdBlock" Title="Character Map Filter">
+      <p> "&lt;" placed at the start of an entry will search Unicode block names instead of 
+      character names. This is helpful when searching for characters within related 
+      blocks</p><br></br>
+      <p>Example:  &lt;Thai </p><br></br>
+      <p>finds the Thai Unicode block</p>
+    </Control>
+
+    <Control Name="cmdStar" Title="Character Map Filter">
+      <p>Using "*" in an entry serves as a wildcard for any number of places in that entry. 
+      For example, searching for "greek*alpha" will find characters whose Unicode names begin 
+      with the word "Greek" and contain the word "Alpha" any number of places later. 
+      This is helpful when searching for characters that share a common element in 
+      their names (e.g. capital).</p>
+    </Control>
+
+    <Control Name="cmdQuestionMark" Title="Character Map Filter">
+      <p>Using "?" anywhere in an entry serves as a wildcard for that single place in the entry. 
+      For example, searching for "s???e" will return both the SPACE and the SMILE characters, 
+      among others.</p><br></br>
+    </Control>
+
+    <Control Name="cmdRange" Title="Character Map Filter">
+      <p>Example: 1000-119F </p><br></br>
+      <p>finds all characters between U+1000 and U+119F (inclusive) - 
+      the Myanmar alphabet in this case</p>
+    </Control>
+
+    <Control Name="cmdSet" Title="Character Map Filter">
+      <p>Example: LATIN * LETTER [AEIOU] </p><br></br>
+      <p>finds all all Latin A,E,I,O or U vowel combinations</p>
+    </Control>
+
+    <Control Name="cmdDollar" Title="Character Map Filter">
+      <p>"$" placed at the end of an entry will match from the end of a Unicode character name. 
+      This option works best when used with "*" or "?".</p><br></br>
+      <p>Example: LATIN * LETTER A$ </p><br></br>
+      <p>finds only "a" and "A"</p>
+    </Control>
+
+    <Control Name="cmdOK" Title="Character Map Filter">
+      <p>Click OK to save changes and close the dialog.</p>
+    </Control>
+
+    <Control Name="cmdCancel" Title="Character Map Filter">
+      <p>Click Cancel to close the dialog without saving changes.</p>
     </Control>
   </Form>
 
@@ -471,6 +553,59 @@
 
     <Control Name="cmdCancel" Title="Cancel">
       <p>Click Cancel to close the dialog without saving changes.</p>
+    </Control>
+  </Form>
+
+  <Form Name="context/wordlist-editor">
+    <Control Name="pages" Title="Wordlist tabs">
+      <p>Wordlist tabs have two views: Design, and Code. Changes to one view are reflected 
+      immedaitely in the other view. Wordlist files should be stored in UTF-8 encoding 
+      (preferably without BOM), and tab-separated format.</p>
+    </Control>
+
+    <Control Name="gridWordlist" Title="Wordlist tabs">
+      <p>Every line of the tab-separated format file is shown here, and can be edited directly. 
+      For most wordlists, it will be more effective to use an external dictionary tool, 
+      such as SIL Fieldworks or SIL PrimerPrep to generate the wordlist from a text corpus, 
+      and use this tab just to preview the contents of the file.</p>
+    </Control>
+
+    <Control Name="cmdDeleteRow" Title="Wordlist tabs">
+      <p>The Delete row button will delete the selected row in the wordlist.</p>
+    </Control>
+
+    <Control Name="cmdSortByFrequency" Title="Wordlist tabs">
+      <p>The Sort by frequency button has no effect on the functioning of the wordlist, 
+      but can help you, the editor, by showing more common words earlier in the list.</p>
+    </Control>
+  </Form>
+
+  <Form Name="context/editor">
+    <Control Name="cefwp" Title="Editor Window">
+      <p>Editor windows in Keyman Developer supports standard Windows editing keystrokes. 
+      Many file formats, including .kmn, .kps, .xml, .html, .js and .json, support syntax 
+      highlighting. The text editor in Keyman uses the Monaco component from Visual Studio Code, 
+      so all the functionality available in that editor is also available here.</p>
+    </Control>
+  </Form>
+
+  <Form Name="context/character-identifier">
+    <Control Name="gridFonts" Title="Character Identifier">
+      <p>Attempt to identify the fonts on your system that will support the 
+      characters. You can quickly change fonts by clicking on a font name in the grid of 
+      identified fonts.</p>
+    </Control>
+
+    <Control Name="sgChars" Title="Character Identifier">
+      <p>Display the Unicode value of the selected character. </p>
+    </Control>
+  </Form>
+
+  <Form Name="context/messages">
+    <Control Name="memoMessage" Title="Message Window">
+      <p>The message window appears at the bottom of the screen, or floating in a toolbar 
+      window. It contains a list of error and warning messages returned from a compilation 
+      session. You can undock and dock the window by dragging its title bar.</p>
     </Control>
   </Form>
 

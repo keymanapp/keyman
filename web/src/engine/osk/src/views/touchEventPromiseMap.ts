@@ -13,10 +13,10 @@ export default class TouchEventPromiseMap {
   }
 
   public maintainTouches(list: TouchList) {
-    let keys = [].concat(this.map.keys());
+    let keys = Array.from(this.map.keys());
 
     for(let i=0; i < list.length; i++) {
-      let pos = keys.indexOf('' + list.item(i).identifier);
+      let pos = keys.indexOf(list.item(i).identifier);
       if(pos != -1) {
         keys.splice(pos, 1);
       }
