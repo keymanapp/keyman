@@ -34,13 +34,17 @@ extern char ErrExtraLIB[ERR_EXTRA_LIB_LEN];
 
 class CompilerTest : public testing::Test {
     protected:
+        FILE_KEYBOARD fileKeyboard;
+
     	CompilerTest() {}
 	    ~CompilerTest() override {}
 	    void SetUp() override {
             initGlobals();
+            initFileKeyboard(fileKeyboard);
         }
 	    void TearDown() override {
             initGlobals();
+            initFileKeyboard(fileKeyboard);
         }
         void initGlobals() {
             msgproc = NULL;
@@ -52,6 +56,40 @@ class CompilerTest : public testing::Test {
             kmcmp::BeginLine[BEGIN_UNICODE] = -1;
             kmcmp::BeginLine[BEGIN_NEWCONTEXT] = -1;
             kmcmp::BeginLine[BEGIN_POSTKEYSTROKE] = -1;
+        }
+
+        void initFileKeyboard(FILE_KEYBOARD &fk, bool isSetUp=true) {
+            if (!isSetUp) {
+                if (fk.dpStoreArray)   { delete[] fk.dpStoreArray;   }
+                if (fk.dpGroupArray)   { delete[] fk.dpGroupArray;   }
+                if (fk.lpBitmap)       { delete   fk.lpBitmap;       }
+                if (fk.dpDeadKeyArray) { delete[] fk.dpDeadKeyArray; }
+                if (fk.dpVKDictionary) { delete   fk.dpVKDictionary; }
+                if (fk.extra)          { delete   fk.extra;          }
+            }
+            fk.KeyboardID        = 0;
+            fk.version           = VERSION_90;
+            fk.dpStoreArray      = nullptr;
+            fk.dpGroupArray      = nullptr;
+            fk.cxStoreArray      = 0;
+            fk.cxGroupArray      = 0;
+            fk.StartGroup[0]     = 0;
+            fk.StartGroup[1]     = 0;
+            fk.dwHotKey          = 0;
+            fk.szName[0]         = u'\0';
+            fk.szLanguageName[0] = u'\0';
+            fk.szCopyright[0]    = u'\0';
+            fk.szMessage[0]      = u'\0';
+            fk.lpBitmap          = nullptr;
+            fk.dwBitmapSize      = 0;
+            fk.dwFlags           = 0;
+            fk.currentGroup      = 0;
+            fk.currentStore      = 0;
+            fk.cxDeadKeyArray    = 0;
+            fk.dpDeadKeyArray    = nullptr;
+            fk.cxVKDictionary    = 0;
+            fk.dpVKDictionary    = nullptr;
+            fk.extra             = nullptr;
         }
 
     public:
@@ -146,39 +184,38 @@ TEST_F(CompilerTest, AddCompileError_test) {
 };
 
 TEST_F(CompilerTest, ProcessBeginLine_test) {
-    FILE_KEYBOARD fk;
     KMX_WCHAR str[LINESIZE];
 
     // CERR_NoTokensFound
     str[0] = '\0';
-    EXPECT_EQ(CERR_NoTokensFound, ProcessBeginLine(&fk, str));
+    EXPECT_EQ(CERR_NoTokensFound, ProcessBeginLine(&fileKeyboard, str));
 
     // CERR_InvalidToken
     u16cpy(str, u"abc >");
-    EXPECT_EQ(CERR_InvalidToken, ProcessBeginLine(&fk, str));
+    EXPECT_EQ(CERR_InvalidToken, ProcessBeginLine(&fileKeyboard, str));
 
     // CERR_RepeatedBegin, BEGIN_UNICODE
     kmcmp::BeginLine[BEGIN_UNICODE] = 0; // not -1
     u16cpy(str, u" unicode>");
-    EXPECT_EQ(CERR_RepeatedBegin, ProcessBeginLine(&fk, str));
+    EXPECT_EQ(CERR_RepeatedBegin, ProcessBeginLine(&fileKeyboard, str));
     kmcmp::BeginLine[BEGIN_UNICODE] = -1;
 
     // CERR_RepeatedBegin, BEGIN_ANSI
     kmcmp::BeginLine[BEGIN_ANSI] = 0; // not -1
     u16cpy(str, u" ansi>");
-    EXPECT_EQ(CERR_RepeatedBegin, ProcessBeginLine(&fk, str));
+    EXPECT_EQ(CERR_RepeatedBegin, ProcessBeginLine(&fileKeyboard, str));
     kmcmp::BeginLine[BEGIN_ANSI] = -1;
 
     // CERR_RepeatedBegin, BEGIN_NEWCONTEXT
     kmcmp::BeginLine[BEGIN_NEWCONTEXT] = 0; // not -1
     u16cpy(str, u" newContext>");
-    EXPECT_EQ(CERR_RepeatedBegin, ProcessBeginLine(&fk, str));
+    EXPECT_EQ(CERR_RepeatedBegin, ProcessBeginLine(&fileKeyboard, str));
     kmcmp::BeginLine[BEGIN_NEWCONTEXT] = -1;
 
     // CERR_RepeatedBegin, BEGIN_POSTKEYSTROKE
     kmcmp::BeginLine[BEGIN_POSTKEYSTROKE] = 0; // not -1
     u16cpy(str, u" postKeystroke>");
-    EXPECT_EQ(CERR_RepeatedBegin, ProcessBeginLine(&fk, str));
+    EXPECT_EQ(CERR_RepeatedBegin, ProcessBeginLine(&fileKeyboard, str));
     kmcmp::BeginLine[BEGIN_POSTKEYSTROKE] = -1;
 };
 
@@ -241,129 +278,121 @@ TEST_F(CompilerTest, IsValidKeyboardVersion_test) {
 
 TEST_F(CompilerTest, GetXStringImpl_test) {
     KMX_WCHAR tstr[128];
-    FILE_KEYBOARD fk;
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
     PKMX_WCHAR newp = NULL;
 
     // CERR_BufferOverflow, max=0
-    EXPECT_EQ(CERR_BufferOverflow, GetXStringImpl(tstr, &fk, str, u"", output, 0, 0, &newp, FALSE));
+    EXPECT_EQ(CERR_BufferOverflow, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 0, 0, &newp, FALSE));
 
     // CERR_None, no token
     str[0] = '\0';
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // CERR_NoTokensFound, empty
     u16cpy(str, u"");
-    EXPECT_EQ(CERR_NoTokensFound, GetXStringImpl(tstr, &fk, str, u"c", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(CERR_NoTokensFound, GetXStringImpl(tstr, &fileKeyboard, str, u"c", output, 80, 0, &newp, FALSE));
 
     // CERR_NoTokensFound, whitespace
     u16cpy(str, u" ");
-    EXPECT_EQ(CERR_NoTokensFound, GetXStringImpl(tstr, &fk, str, u"c", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(CERR_NoTokensFound, GetXStringImpl(tstr, &fileKeyboard, str, u"c", output, 80, 0, &newp, FALSE));
 }
 
 TEST_F(CompilerTest, GetXStringImpl_type0_test) {
     KMX_WCHAR tstr[128];
-    FILE_KEYBOARD fk;
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
     PKMX_WCHAR newp = NULL;
 
     // type=0 ('X' or 'D'), hex 32-bit
     u16cpy(str, u"x10330"); // Gothic A
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_GothicA[] = { 0xD800, 0xDF30, 0 }; // see UTF32ToUTF16
     EXPECT_EQ(0, u16cmp(tstr_GothicA, tstr)); 
 
     // type=0 ('X' or 'D'), decimal 8-bit
     u16cpy(str, u"d18");
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(u"\u0012", tstr));
 
     // type=0 ('X' or 'D'), hex capital 8-bit
     u16cpy(str, u"X12");
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(u"\u0012", tstr));
 
     // type=0 ('X' or 'D'), hex 32-bit, CERR_InvalidCharacter
     u16cpy(str, u"x110000");
-    EXPECT_EQ(CERR_InvalidCharacter, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(CERR_InvalidCharacter, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // type=0 ('X' or 'D'), dk, valid
     u16cpy(str, u"dk(A)");
-    EXPECT_EQ(0, (int)fk.cxDeadKeyArray);
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, (int)fileKeyboard.cxDeadKeyArray);
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_dk_valid[] = { UC_SENTINEL, CODE_DEADKEY, 1, 0 };
     EXPECT_EQ(0, u16cmp(tstr_dk_valid, tstr));
-    fk.cxDeadKeyArray = 0;
+    fileKeyboard.cxDeadKeyArray = 0;
 
     // type=0 ('X' or 'D'), deadkey, valid
     u16cpy(str, u"deadkey(A)");
-    EXPECT_EQ(0, (int)fk.cxDeadKeyArray);
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, (int)fileKeyboard.cxDeadKeyArray);
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_deadkey_valid[] = { UC_SENTINEL, CODE_DEADKEY, 1, 0 };
     EXPECT_EQ(0, u16cmp(tstr_deadkey_valid, tstr));
-    fk.cxDeadKeyArray = 0;
+    fileKeyboard.cxDeadKeyArray = 0;
 
     // type=0 ('X' or 'D'), dk, CERR_InvalidDeadkey, bad character
     u16cpy(str, u"dk(%)");
-    EXPECT_EQ(CERR_InvalidDeadkey, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(CERR_InvalidDeadkey, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // type=0 ('X' or 'D'), dk, CERR_InvalidDeadkey, no close delimiter => NULL
     u16cpy(str, u"dk(");
-    EXPECT_EQ(CERR_InvalidDeadkey, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(CERR_InvalidDeadkey, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // type=0 ('X' or 'D'), dk, CERR_InvalidDeadkey, empty delimiters => empty string
     u16cpy(str, u"dk()");
-    EXPECT_EQ(CERR_InvalidDeadkey, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(CERR_InvalidDeadkey, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 }
 
 TEST_F(CompilerTest, GetXStringImpl_type1_test) {
     KMX_WCHAR tstr[128];
-    FILE_KEYBOARD fk;
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
     PKMX_WCHAR newp = NULL;
 
     // type=1 ('\"'), valid
     u16cpy(str, u"\"abc\"");
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(u"abc", tstr));
 
     // type=1 ('\"'), CERR_UnterminatedString
     u16cpy(str, u"\"abc");
-    EXPECT_EQ(CERR_UnterminatedString, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(CERR_UnterminatedString, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     
     // type=1 ('\"'), CERR_ExtendedStringTooLong
     u16cpy(str, u"\"abc\"");
-    EXPECT_EQ(CERR_ExtendedStringTooLong, GetXStringImpl(tstr, &fk, str, u"", output, 2, 0, &newp, FALSE)); // max reduced to force error    
+    EXPECT_EQ(CERR_ExtendedStringTooLong, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 2, 0, &newp, FALSE)); // max reduced to force error    
 
     // type=1 ('\"'), CERR_StringInVirtualKeySection *** TODO ***
 }
 
 TEST_F(CompilerTest, GetXStringImpl_type2_test) {
     KMX_WCHAR tstr[128];
-    FILE_KEYBOARD fk;
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
     PKMX_WCHAR newp = NULL;
 
-    // std::cerr << "debug" << std::endl;
-    // std::cerr << "end debug" << std::endl;
-    // std::cerr << std::hex << GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE) << std::dec << std::endl;
-
     // type=2 ('\''), valid
     u16cpy(str, u"\'abc\'");
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(u"abc", tstr));
 
     // type=2 ('\''), CERR_UnterminatedString
     u16cpy(str, u"\'abc");
-    EXPECT_EQ(CERR_UnterminatedString, GetXStringImpl(tstr, &fk, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(CERR_UnterminatedString, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     
     // type=2 ('\''), CERR_ExtendedStringTooLong
     u16cpy(str, u"\'abc\'");
-    EXPECT_EQ(CERR_ExtendedStringTooLong, GetXStringImpl(tstr, &fk, str, u"", output, 2, 0, &newp, FALSE)); // max reduced to force error    
+    EXPECT_EQ(CERR_ExtendedStringTooLong, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 2, 0, &newp, FALSE)); // max reduced to force error    
 
     // type=2 ('\''), CERR_StringInVirtualKeySection *** TODO ***
 }
@@ -573,21 +602,20 @@ TEST_F(CompilerTest, GetXStringImpl_type5_test) {
 // KMX_DWORD ReadLine(KMX_BYTE* infile, int sz, int& offset, PKMX_WCHAR wstr, KMX_BOOL PreProcess)
 
 TEST_F(CompilerTest, GetRHS_test) {
-    FILE_KEYBOARD fk;
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR tstr[128];
 
     // CERR_NoTokensFound, empty string
     str[0] = '\0';
-    EXPECT_EQ(CERR_NoTokensFound, GetRHS(&fk, str, tstr, 80, 0, FALSE));
+    EXPECT_EQ(CERR_NoTokensFound, GetRHS(&fileKeyboard, str, tstr, 80, 0, FALSE));
 
     // CERR_NoTokensFound, no '>'
     u16cpy(str, u"abc");
-    EXPECT_EQ(CERR_NoTokensFound, GetRHS(&fk, str, tstr, 80, 0, FALSE));
+    EXPECT_EQ(CERR_NoTokensFound, GetRHS(&fileKeyboard, str, tstr, 80, 0, FALSE));
 
     // CERR_None
     u16cpy(str, u"> nul c\n");
-    EXPECT_EQ(CERR_None, GetRHS(&fk, str, tstr, 80, 0, FALSE));
+    EXPECT_EQ(CERR_None, GetRHS(&fileKeyboard, str, tstr, 80, 0, FALSE));
 }
 
 // void safe_wcsncpy(PKMX_WCHAR out, PKMX_WCHAR in, int cbMax)
