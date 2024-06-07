@@ -1,5 +1,4 @@
 import { assert } from 'chai';
-import sinon from 'sinon';
 
 import { ParsedLengthStyle } from 'keyman/engine/osk';
 
