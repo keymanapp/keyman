@@ -24,7 +24,7 @@ jobs:
   sourcepackage:
     name: Build source package
     if: github.repository == 'keymanapp/keyman'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     outputs:
       VERSION: ${{ steps.version_step.outputs.VERSION }}
       PRERELEASE_TAG: ${{ steps.prerelease_tag.outputs.PRERELEASE_TAG }}

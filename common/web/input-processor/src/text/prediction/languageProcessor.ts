@@ -167,6 +167,12 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
     } else if(outputTarget) {
       let transcription = outputTarget.buildTranscriptionFrom(outputTarget, null, false);
       return this.predict_internal(transcription, true, layerId);
+    } else {
+      // if there's no active context source, there's nothing to 
+      // provide suggestions for. In that case, there's no reason 
+      // to even request suggestions, so bypass the prediction 
+      // engine and say that there aren't any.
+      return Promise.resolve([]);
     }
   }
 
@@ -210,10 +216,16 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
       throw "Accepting suggestions requires a destination OutputTarget instance."
     }
 
+    if(!this.isConfigured) {
+      // If we're in this state, the suggestion is now outdated; the user must have swapped keyboard and model.
+      console.warn("Could not apply suggestion; the corresponding model has been unloaded");
+      return null;
+    }
+
     // Find the state of the context at the time the suggestion was generated.
     // This may refer to the context before an input keystroke or before application
     // of a predictive suggestion.
-    let original = this.getPredictionState(suggestion.transformId);
+    const original = this.getPredictionState(suggestion.transformId);
     if(!original) {
       console.warn("Could not apply the Suggestion!");
       return null;
@@ -284,7 +296,7 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
     let original = this.getPredictionState(-reversion.transformId);
     if(!original) {
       console.warn("Could not apply the Suggestion!");
-      return;
+      return Promise.resolve([]);
     }
 
     // Apply the Reversion!

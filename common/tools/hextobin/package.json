@@ -15,8 +15,5 @@
   "main": "build/index.js",
   "bin": {
     "hextobin": "build/hextobin.js"
-  },
-  "devDependencies": {
-    "@types/node": "^18.7.18"
   }
 }

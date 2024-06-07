@@ -1,5 +1,4 @@
-import { ActiveKey, Codes, DeviceSpec } from '@keymanapp/keyboard-processor';
-import { landscapeView } from 'keyman/engine/dom-utils';
+import { ActiveKey, Codes } from '@keymanapp/keyboard-processor';
 
 import OSKKey, { KeyLayoutParams, renameSpecialKey } from './oskKey.js';
 import { KeyData, KeyElement, link } from '../keyElement.js';

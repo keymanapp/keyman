@@ -23,7 +23,7 @@ common_test_keyboards_baseline = source_path / '../../../../common/test/keyboard
 if cpp_compiler.get_id() == 'emscripten'
   # TODO: we will move the tests to ES6 in the future
   # '-sMODULARIZE', '-sEXPORT_ES6',
-  tests_flags += ['-lnodefs.js', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
+  tests_flags += ['-lnodefs.js', wasm_exported_runtime_methods]
 endif
 
 kmx = executable('kmx',

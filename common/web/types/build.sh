@@ -89,8 +89,12 @@ function copy_cldr_imports() {
 
 function do_configure() {
   compile_schemas
-  copy_cldr_imports
   verify_npm_setup
+}
+
+function do_build() {
+  copy_cldr_imports
+  tsc --build
 }
 
 function do_test() {
@@ -103,6 +107,6 @@ function do_test() {
 
 builder_run_action clean      rm -rf ./build/ ./tsconfig.tsbuildinfo
 builder_run_action configure  do_configure
-builder_run_action build      tsc --build
+builder_run_action build      do_build
 builder_run_action test       do_test
 builder_run_action publish    builder_publish_npm

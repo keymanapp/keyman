@@ -1,7 +1,6 @@
 import { EventEmitter } from "eventemitter3";
 import { InputSample } from "./inputSample.js";
 import { CumulativePathStats } from "./cumulativePathStats.js";
-import { Mutable } from "../mutable.js";
 
 interface EventMap<Type, StateToken> {
   'step': (sample: InputSample<Type, StateToken>) => void,

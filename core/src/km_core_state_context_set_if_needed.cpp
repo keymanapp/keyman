@@ -14,7 +14,7 @@
 #include "processor.hpp"
 #include "state.hpp"
 #include "debuglog.h"
-#include "core_icu.h"
+#include "util_normalize.hpp"
 #include "kmx/kmx_xstring.h" // for Unicode routines
 
 using namespace km::core;
@@ -94,7 +94,7 @@ km_core_state_context_set_if_needed(
   km_core_cu const *new_cached_context = nullptr;
 
   if (should_normalize(state)) {
-    if (!do_normalize_nfd(new_app_context, normalized_buffer)) {
+    if (!km::core::util::normalize_nfd(new_app_context, normalized_buffer)) {
       return do_fail(app_context, cached_context, "could not normalize string");
     }
     new_cached_context = normalized_buffer.c_str();
@@ -281,30 +281,6 @@ get_context_items_change(
   change_type.type = CONTEXT_SHORTER;
   change_type.end_difference = n;
   return change_type;
-}
-
-/**
- * Normalize the input string using ICU
- */
-bool do_normalize_nfd(km_core_cu const * src, std::u16string &dst) {
-  UErrorCode icu_status = U_ZERO_ERROR;
-  const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(icu_status);
-  assert(U_SUCCESS(icu_status));
-  if(!U_SUCCESS(icu_status)) {
-    // TODO: log the failure code
-    return false;
-  }
-  icu::UnicodeString udst;
-  icu::UnicodeString usrc = icu::UnicodeString(src);
-  nfd->normalize(usrc, udst, icu_status);
-  assert(U_SUCCESS(icu_status));
-  if(!U_SUCCESS(icu_status)) {
-    // TODO: log the failure code
-    return false;
-  }
-
-  dst.assign(udst.getBuffer(), udst.length());
-  return true;
 }
 
 /**

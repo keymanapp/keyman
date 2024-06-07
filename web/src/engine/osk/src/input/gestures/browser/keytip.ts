@@ -91,7 +91,6 @@ export default class KeyTip implements KeyTipInterface {
       let xLeft = rkey.left - rrow.left,
           xWidth = rkey.width,
           xHeight = rkey.height,
-          kc = key.key.label,
           previewFontScale = 1.8;
 
       let kts = this.element.style;

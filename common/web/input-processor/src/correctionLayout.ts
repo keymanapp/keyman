@@ -1,4 +1,4 @@
-import { ActiveKey, ActiveKeyBase, ActiveLayer, ActiveLayout, ActiveRow, Codes } from "@keymanapp/keyboard-processor";
+import { ActiveKey, ActiveKeyBase, ActiveLayer, ActiveRow, Codes } from "@keymanapp/keyboard-processor";
 
 /**
  * Defines correction-layout mappings for keys to be considered by
@@ -81,7 +81,7 @@ export function correctionKeyFilter(key: ActiveKeyBase): boolean {
     return false;
     // Attempt to filter out known non-output keys.
     // Results in a more optimized distribution.
-  } else if(Codes.isKnownOSKModifierKey(key.baseKeyID)) {
+  } else if(Codes.isFrameKey(key.baseKeyID)) {
     return false;
   } else if(key.isPadding) { // to the user, blank / padding keys do not exist.
     return false;

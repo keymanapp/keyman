@@ -1,7 +1,7 @@
 
 import { EventEmitter } from "eventemitter3";
 
-import type { KeyEvent, KeyboardAPIPropertyMultilangSpec, LanguageAPIPropertySpec } from "@keymanapp/keyboard-processor";
+import type { KeyEvent } from "@keymanapp/keyboard-processor";
 
 import {
   Constraint,

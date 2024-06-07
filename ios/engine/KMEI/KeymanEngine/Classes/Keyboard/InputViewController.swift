@@ -175,6 +175,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     keymanWeb = KeymanWebViewController(storage: Storage.active)
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
 
+    var message = self.hasFullAccess ? "hasFullAccess: true" : "hasFullAccess: false"
+    os_log("%{public}s", log: KeymanEngineLogger.settings, type: .default, message)
+    SentryManager.breadcrumb(message)
+
     addChild(keymanWeb)
   }
 
