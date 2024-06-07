@@ -14,7 +14,6 @@ import {
   Codes,
   DeviceSpec,
   Keyboard,
-  KeyEvent,
   KeyboardProperties,
   ManagedPromise,
   type MinimalCodesInterface,
@@ -22,7 +21,7 @@ import {
   type SystemStoreMutationHandler
 } from '@keymanapp/keyboard-processor';
 import { createUnselectableElement, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
-import { EventListener, EventNames, KeyEventHandler, KeyEventSourceInterface, LegacyEventEmitter } from 'keyman/engine/events';
+import { EventListener, KeyEventHandler, KeyEventSourceInterface, LegacyEventEmitter } from 'keyman/engine/events';
 
 import Configuration from '../config/viewConfiguration.js';
 import Activator, { StaticActivator } from './activator.js';
@@ -46,13 +45,17 @@ export type OSKRect = {
  * https://help.keyman.com/DEVELOPER/ENGINE/WEB/16.0/reference/events/.
  */
 export interface LegacyOSKEventMap {
-  'configclick'(obj: {});
-  'helpclick'(obj: {});
-  'resizemove'(obj: {});
-  'show'(obj: {});
+  'configclick'(obj: {}): void;
+  'helpclick'(obj: {}): void;
+  'resizemove'(obj: {}): void;
+  'show'(obj: {
+    x?: number,
+    y?: number,
+    userLocated?: boolean
+  }): void;
   'hide'(obj: {
-    HiddenByUser: boolean
-  });
+    HiddenByUser?: boolean
+  }): void;
 }
 
 /**
@@ -161,7 +164,6 @@ export default abstract class OSKView
   private config: Configuration;
   private deferLayout: boolean;
 
-  private _boxBaseMouseDown:        (e: MouseEvent) => boolean;
   private _boxBaseTouchStart:       (e: TouchEvent) => boolean;
   private _boxBaseTouchEventCancel: (e: TouchEvent) => boolean;
 
@@ -290,24 +292,8 @@ export default abstract class OSKView
     return this.config.isEmbedded;
   }
 
-  /**
-   * Function     _VKbdMouseEnter
-   * Scope        Private
-   * @param       {Object}      e      event
-   * Description  Activate the KMW UI when mouse enters the OSK element hierarchy
-   */
-  private _VKbdMouseEnter: (e: MouseEvent) => void;
-
-  /**
-   * Function     _VKbdMouseLeave
-   * Scope        Private
-   * @param       {Object}      e      event
-   * Description  Cancel activation of KMW UI when mouse leaves the OSK element hierarchy
-   */
-  private _VKbdMouseLeave: (e: MouseEvent) => void;
-
   private setBaseMouseEventListeners() {
-    this._Box.onmouseenter = this._VKbdMouseEnter = (e) => {
+    this._Box.onmouseenter = (e) => {
       if(this.mouseEnterPromise) {
         // The chain was somehow interrupted, with the mouseleave never occurring!
         this.mouseEnterPromise.resolve();
@@ -317,7 +303,7 @@ export default abstract class OSKView
       this.emit('pointerinteraction', this.mouseEnterPromise.corePromise);
     };
 
-    this._Box.onmouseleave = this._VKbdMouseLeave = (e) => {
+    this._Box.onmouseleave = (e) => {
       this.mouseEnterPromise.resolve();
       this.mouseEnterPromise = null;
       // focusAssistant.setMaintainingFocus(false);
@@ -956,7 +942,7 @@ export default abstract class OSKView
    * Method usable by subclasses of OSKView to control that OSKView type's
    * positioning behavior when needed by the present() method.
    */
-  protected abstract setDisplayPositioning();
+  protected abstract setDisplayPositioning(): void;
 
   /**
    * Method used to start a potentially-asynchronous hide of the OSK.
@@ -1271,7 +1257,11 @@ export default abstract class OSKView
    * @return      {boolean}
    *
    */
-  doShow(p) {
+  doShow(p: {
+    x: number,
+    y: number,
+    userLocated: boolean
+  }) {
     // Newer style 'doShow' emitted from .present by default.
     this.legacyEvents.callEvent('show', p);
   }

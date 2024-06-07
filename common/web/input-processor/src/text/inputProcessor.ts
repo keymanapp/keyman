@@ -20,7 +20,6 @@ import {
   type ProcessorInitOptions,
   RuleBehavior,
   SystemStoreIDs,
-  type TextTransform
 } from "@keymanapp/keyboard-processor";
 import { TranscriptionCache } from "../transcriptionCache.js";
 
@@ -200,7 +199,7 @@ export default class InputProcessor {
 
     // If it's a key that we 'optimize out' of our fat-finger correction algorithm,
     // we MUST NOT trigger it for this keystroke.
-    let isOnlyLayerSwitchKey = Codes.isKnownOSKModifierKey(keyEvent.kName);
+    let isOnlyLayerSwitchKey = Codes.isFrameKey(keyEvent.kName);
 
     // Best-guess stopgap for possible custom modifier keys.
     // If a key (1) does not affect the context and (2) shifts the active layer,

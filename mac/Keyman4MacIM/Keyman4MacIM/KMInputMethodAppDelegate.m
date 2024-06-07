@@ -23,6 +23,7 @@
 #import "KMPackageInfo.h"
 #import "KMKeyboardInfo.h"
 #import "PrivacyConsent.h"
+#import "KMLogs.h"
 @import Sentry;
 
 /** NSUserDefaults keys */
@@ -107,7 +108,7 @@ NSString* _keymanDataPath = nil;
 }
 
 - (void)initCompletion {
-  NSLog(@"initCompletionHandler method invoked");
+  os_log_info([KMLogs startupLog], "initCompletionHandler method invoked");
   [[NSAppleEventManager sharedAppleEventManager] setEventHandler:self
                                                      andSelector:@selector(handleURLEvent:withReplyEvent:)
                                                    forEventClass:kInternetEventClass
@@ -124,10 +125,10 @@ NSString* _keymanDataPath = nil;
                                            nil);
   
   if (!self.lowLevelEventTap) {
-    NSLog(@"Unable to create lowLevelEventTap!");
+    os_log_error([KMLogs startupLog], "Unable to create lowLevelEventTap!");
   }
   else {
-    NSLog(@"Successfully created lowLevelEventTap with CGEventTapCreate.");
+    os_log([KMLogs startupLog], "Successfully created lowLevelEventTap with CGEventTapCreate.");
     CFRelease(self.lowLevelEventTap);
   }
   
@@ -137,15 +138,6 @@ NSString* _keymanDataPath = nil;
   
   if (self.runLoopEventSrc && runLoop) {
     CFRunLoopAddSource(runLoop,  self.runLoopEventSrc, kCFRunLoopDefaultMode);
-  }
-}
-
--(void)logDebugMessage:(NSString *)format, ... {
-  if (self.debugMode) {
-    va_list args;
-    va_start(args, format);
-    NSLogv(format, args);
-    va_end(args);
   }
 }
 
@@ -178,6 +170,8 @@ NSString* _keymanDataPath = nil;
   KeymanVersionInfo keymanVersionInfo = [self versionInfo];
   NSString *releaseName = [NSString stringWithFormat:@"%@", keymanVersionInfo.versionGitTag];
   
+  [KMLogs reportLogStatus];
+  
   [SentrySDK startWithConfigureOptions:^(SentryOptions *options) {
     options.dsn = @"https://960f8b8e574c46e3be385d60ce8e1fea@o1005580.ingest.sentry.io/5983522";
     options.releaseName = releaseName;
@@ -190,9 +184,9 @@ NSString* _keymanDataPath = nil;
 
 #ifdef USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE
 - (BOOL)alertShowHelp:(NSAlert *)alert {
-  NSLog(@"Sentry - KME: Got call to force crash from engine");
+  os_log_error([KMLogs startupLog], "Sentry - KME: Got call to force crash from engine");
   [SentrySDK crash];
-  NSLog(@"Sentry - KME: should not have gotten this far!");
+  os_log_error([KMLogs startupLog], "Sentry - KME: should not have gotten this far!");
   return NO;
 }
 #endif
@@ -206,13 +200,11 @@ NSString* _keymanDataPath = nil;
   NSMutableString *urlStr = [NSMutableString stringWithString:rawUrl];
   [urlStr replaceOccurrencesOfString:@"keyman:" withString:@"keyman/" options:0 range:NSMakeRange(0, 7)];
   NSURL *url = [NSURL URLWithString:urlStr];
-  if (self.debugMode)
-    NSLog(@"url = %@", url);
+  os_log_debug([KMLogs keyboardLog], "processURL, url = %{public}@", url);
   
   if ([url.lastPathComponent isEqualToString:@"download"]) {
     if (_connection != nil) {
-      if (self.debugMode)
-        NSLog(@"Already downloading a keyboard.");
+      os_log_debug([KMLogs keyboardLog], "Already downloading a keyboard.");
       return;
     }
     
@@ -236,23 +228,17 @@ NSString* _keymanDataPath = nil;
 }
 
 -(void) sleepFollowingDeactivationOfServer:(id)lastServer {
-  if ([self debugMode]) {
-    NSLog(@"Keyman no longer active IM.");
-  }
+  os_log_debug([KMLogs lifecycleLog], "Keyman no longer active IM.");
   self.sleeping = YES;
   if ([self.oskWindow.window isVisible]) {
-    if ([self debugMode]) {
-      NSLog(@"Hiding OSK.");
-    }
+    os_log_debug([KMLogs oskLog], "sleepFollowingDeactivationOfServer, Hiding OSK.");
     // Storing this ensures that if the deactivation is temporary, resulting from dropping down a menu,
     // the OSK will re-display when that client application re-activates.
     _lastServerWithOSKShowing = lastServer;
     [self.oskWindow.window setIsVisible:NO];
   }
   if (self.lowLevelEventTap) {
-    if ([self debugMode]) {
-      NSLog(@"Disabling event tap...");
-    }
+    os_log_debug([KMLogs lifecycleLog], "sleepFollowingDeactivationOfServer, disabling event tap...");
     CGEventTapEnable(self.lowLevelEventTap, NO);
   }
 }
@@ -260,9 +246,7 @@ NSString* _keymanDataPath = nil;
 -(void) wakeUpWith:(id)newServer {
   self.sleeping = NO;
   if (self.lowLevelEventTap && !CGEventTapIsEnabled(self.lowLevelEventTap)) {
-    if ([self debugMode]) {
-      NSLog(@"Keyman is now the active IM. Re-enabling event tap...");
-    }
+    os_log_debug([KMLogs lifecycleLog], "wakeUpWith, Keyman is now the active IM. Re-enabling event tap...");
     CGEventTapEnable(self.lowLevelEventTap, YES);
   }
   // See note in sleepFollowingDeactivationOfServer.
@@ -282,7 +266,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
       if (!appDelegate.sleeping) {
         // REVIEW: We might need to consider putting in some kind of counter/flag to ensure that the very next
         // event is not another disable so we don't end up in an endless cycle.
-        NSLog(@"Event tap disabled by %@! Attempting to restart...", (type == kCGEventTapDisabledByTimeout ? @"timeout" : @"user"));
+        os_log([KMLogs eventsLog], "Event tap disabled by %{public}@! Attempting to restart...", (type == kCGEventTapDisabledByTimeout ? @"timeout" : @"user"));
         CGEventTapEnable(appDelegate.lowLevelEventTap, YES);
         if (!CGEventTapIsEnabled(appDelegate.lowLevelEventTap)) {
           if (appDelegate.runLoopEventSrc) { // This should always be true
@@ -301,13 +285,11 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     NSEvent* sysEvent = [NSEvent eventWithCGEvent:event];
     // Too many of these to be useful for most debugging sessions, but we'll keep this around to be
     // un-commented when needed.
-    //if (appDelegate.debugMode)
-    //    NSLog(@"System Event: %@", sysEvent);
+    //    os_log_debug([KMLogs eventsLog], "System Event: %@", sysEvent);
     
     switch (type) {
       case kCGEventFlagsChanged:
-        if (appDelegate.debugMode)
-          NSLog(@"eventTapFunction: system event kCGEventFlagsChanged to: %x", (int) sysEvent.modifierFlags);
+        os_log_debug([KMLogs eventsLog], "eventTapFunction: system event kCGEventFlagsChanged to: %x", (int) sysEvent.modifierFlags);
         appDelegate.currentModifierFlags = sysEvent.modifierFlags;
         if (appDelegate.currentModifierFlags & NSEventModifierFlagCommand) {
           appDelegate.contextChangedByLowLevelEvent = YES;
@@ -318,26 +300,26 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
       case kCGEventLeftMouseDown:
       case kCGEventOtherMouseUp:
       case kCGEventOtherMouseDown:
-        NSLog(@"Event tap context invalidation flagged due to event: %@", event);
+        os_log_debug([KMLogs eventsLog], "Event tap context invalidation flagged due to event of type: %u", type);
         appDelegate.contextChangedByLowLevelEvent = YES;
         break;
         
       case kCGEventKeyDown:
-        NSLog(@"Event tap keydown event, keyCode: %hu, event: %@", sysEvent.keyCode, event);
+        os_log_debug([KMLogs eventsLog], "Event tap keydown event, keyCode: %hu", sysEvent.keyCode);
         // Pass back low-level backspace events to the input method event handler
         // because some non-compliant apps do not allow us to see backspace events
         // that we have generated (and we need to see them, for serialization
         // of events)
         if(sysEvent.keyCode == kVK_Delete && appDelegate.inputController != nil) {
-          NSLog(@"Event tap handling kVK_Delete.");
+          os_log_debug([KMLogs eventsLog], "Event tap handling kVK_Delete.");
           [appDelegate.inputController handleBackspace:sysEvent];
         } else if(sysEvent.keyCode == kVK_Delete) {
-          NSLog(@"Event tap not handling kVK_Delete, appDelegate.inputController = %@", appDelegate.inputController);
+          os_log_debug([KMLogs eventsLog], "Event tap not handling kVK_Delete, appDelegate.inputController = %{public}@", appDelegate.inputController);
         }
         if(sysEvent.keyCode == 255) {
-          NSLog(@"*** kKeymanEventKeyCode = 0xFF");
+          os_log_debug([KMLogs eventsLog], "*** kKeymanEventKeyCode = 0xFF");
         } else {
-          NSLog(@"*** other: %d(%x)", (char) sysEvent.keyCode, sysEvent.keyCode);
+          os_log_debug([KMLogs eventsLog], "*** other: %d(%x)", (char) sysEvent.keyCode, sysEvent.keyCode);
         }
         
         switch(sysEvent.keyCode) {
@@ -439,14 +421,14 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   }
   NSDictionary *persistedOptionsForSelectedKeyboard = [allPersistedOptions objectForKey:_selectedKeyboard];
   if (!persistedOptionsForSelectedKeyboard) {
-    NSLog(@"no persisted options found in UserDefaults for keyboard %@ ", _selectedKeyboard);
+    os_log_info([KMLogs configLog], "no persisted options found in UserDefaults for keyboard %{public}@ ", _selectedKeyboard);
     return;
   }
   
   // TODO: pass array instead of making repeated calls
   for (NSString *key in persistedOptionsForSelectedKeyboard) {
     NSString *value = [persistedOptionsForSelectedKeyboard objectForKey:key];
-    NSLog(@"persisted options found in UserDefaults for keyboard %@, key: %@, value: %@", _selectedKeyboard, key, value);
+    os_log_info([KMLogs configLog], "persisted options found in UserDefaults for keyboard %{public}@, key: %{public}@, value: %{public}@", _selectedKeyboard, key, value);
     [self.kme setCoreOptions:key withValue:value];
   }
 }
@@ -495,7 +477,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (void)setUseVerboseLogging:(BOOL)useVerboseLogging {
-  NSLog(@"Turning verbose logging %@", useVerboseLogging ? @"on." : @"off.");
+  os_log_debug([KMLogs configLog], "Turning verbose logging %{public}@", useVerboseLogging ? @"on." : @"off.");
   _debugMode = useVerboseLogging;
   if (_kme != nil)
     [_kme setUseVerboseLogging:useVerboseLogging];
@@ -674,8 +656,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     if (infoDict != nil) {
       NSString *name = [infoDict objectForKey:kKMKeyboardNameKey];
       if (name != nil && [name length]) {
-        if (self.debugMode)
-          NSLog(@"Adding keyboard name: %@", name);
+        os_log_debug([KMLogs configLog], "Adding keyboard name: %{public}@", name);
         [kbNames addObject:name];
       }
     }
@@ -814,9 +795,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 - (void)removeDynamicKeyboardMenuItems {
   int numberToRemove = (int) self.menu.numberOfItems - DEFAULT_KEYMAN_MENU_ITEM_COUNT;
   
-  if (self.debugMode) {
-    NSLog(@"*** removeDynamicKeyboardMenuItems, self.menu.numberOfItems = %ld, number of items to remove = %d", (long)self.menu.numberOfItems, numberToRemove);
-  }
+  os_log_info([KMLogs keyboardLog], "*** removeDynamicKeyboardMenuItems, self.menu.numberOfItems = %ld, number of items to remove = %d", (long)self.menu.numberOfItems, numberToRemove);
   
   if (numberToRemove > 0) {
     for (int i = 0; i < numberToRemove; i++) {
@@ -832,7 +811,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   int menuItemIndex = KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX;
   
   if (self.debugMode) {
-    NSLog(@"*** populateKeyboardMenuItems, number of active keyboards=%lu", self.activeKeyboards.count);
+    os_log_info([KMLogs configLog], "*** populateKeyboardMenuItems, number of active keyboards=%lu", self.activeKeyboards.count);
   }
   
   // loop through the active keyboards list and add them to the menu
@@ -908,7 +887,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 - (void)selectKeyboardFromMenu:(NSInteger)tag {
   NSMenuItem *menuItem = [self.menu itemWithTag:tag];
   NSString *title = menuItem.title;
-  NSLog(@"Input Menu, selected Keyboards menu, itag: %lu, title: %@", tag, title);
+  os_log_info([KMLogs keyboardLog], "Input Menu, selected Keyboards menu, itag: %lu, title: %{public}@", tag, title);
   for (NSMenuItem *item in self.menu.itemArray) {
     // set the state of the keyboard items in the Keyman menu based on the new selection
     if (item.tag >= KEYMAN_FIRST_KEYBOARD_MENUITEM_TAG) {
@@ -934,8 +913,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   }
   [self setKvk:kvk];
   NSString *keyboardName = [kmxInfo objectForKey:kKMKeyboardNameKey];
-  if ([self debugMode])
-    NSLog(@"Selected keyboard from menu: %@", keyboardName);
+  os_log_info([KMLogs keyboardLog], "Selected keyboard from menu: %{public}@", keyboardName);
   [self setKeyboardName:keyboardName];
   [self setKeyboardIcon:[kmxInfo objectForKey:kKMKeyboardIconKey]];
   [self setContextBuffer:nil];
@@ -996,8 +974,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (void)showConfigurationWindow {
-  if (self.debugMode)
-    NSLog(@"Showing config window...");
+  os_log_debug([KMLogs uiLog], "Showing config window...");
   [self.configWindow.window centerInParent];
   [self.configWindow.window makeKeyAndOrderFront:nil];
   [self.configWindow.window setLevel:NSFloatingWindowLevel];
@@ -1027,8 +1004,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
 - (NSWindowController *)configWindow {
   if (_configWindow.window == nil) {
-    if (self.debugMode)
-      NSLog(@"Creating config window...");
+    os_log_debug([KMLogs uiLog], "Creating config window...");
     _configWindow = [[KMConfigurationWindowController alloc] initWithWindowNibName:@"preferences"];
     [self observeCloseFor:_configWindow.window];
   }
@@ -1289,7 +1265,7 @@ extern const CGKeyCode kProcessPendingBuffer;
   
   CGEventRef ev = CGEventCreateKeyboardEvent (source, virtualKey, true); //down
   if (postEvent) {
-    NSLog(@"postKeyboardEventWithSource, keycode: %d", virtualKey);
+    os_log_info([KMLogs eventsLog], "postKeyboardEventWithSource, keycode: %d", virtualKey);
     postEvent(ev);
   }
   CFRelease(ev);
@@ -1306,7 +1282,7 @@ extern const CGKeyCode kProcessPendingBuffer;
 - (BOOL)verifyPackageVersionInTempFolder: (NSString *)tempDestFolder filePath:(NSString *)filePath {
   KMPackageInfo *packageInfo = [self loadPackageInfo:tempDestFolder];
   if(packageInfo == nil) {
-    NSLog(@"Could not find kmp.json in %@", filePath);
+    os_log_info([KMLogs eventsLog], "Could not find kmp.json in %{public}@", filePath);
   } else {
     NSString* requiredVersion = [packageInfo.fileVersion minimalVersionNumberString];
     KeymanVersionInfo keymanVersionInfo = [self versionInfo];
@@ -1314,7 +1290,7 @@ extern const CGKeyCode kProcessPendingBuffer;
     
     if ([requiredVersion compare:currentVersion options:NSNumericSearch] == NSOrderedDescending) {
       // currentVersion is lower than the requiredVersion
-      NSLog(@"Package %@ requires a newer version of Keyman: %@", filePath, requiredVersion);
+      os_log_error([KMLogs keyboardLog], "Package %{public}@ requires a newer version of Keyman: %{public}@", filePath, requiredVersion);
     } else {
       return YES;
     }
@@ -1340,10 +1316,9 @@ extern const CGKeyCode kProcessPendingBuffer;
   
   ZipArchive *za = [[ZipArchive alloc] init];
   if ([za UnzipOpenFile:filePath]) {
-    if (self.debugMode) {
-      NSLog(@"Unzipping %@ to %@", filePath, tempDestFolder);
-      if ([[NSFileManager defaultManager] fileExistsAtPath:tempDestFolder])
-        NSLog(@"The temp destination folder already exists. Overwriting...");
+    os_log_debug([KMLogs keyboardLog], "Unzipping %{public}@ to %{public}@", filePath, tempDestFolder);
+    if ([[NSFileManager defaultManager] fileExistsAtPath:tempDestFolder]) {
+      os_log_debug([KMLogs keyboardLog], "The temp destination folder already exists. Overwriting...");
     }
     
     didUnzip = [za UnzipFileTo:tempDestFolder overWrite:YES];
@@ -1351,25 +1326,22 @@ extern const CGKeyCode kProcessPendingBuffer;
   }
   
   if (!didUnzip) {
-    NSLog(@"Failed to unzip file: %@", filePath);
+    os_log_error([KMLogs keyboardLog], "Failed to unzip file: %{public}@", filePath);
     return NO;
   }
   
-  if (self.debugMode)
-    NSLog(@"Unzipped file: %@", filePath);
+  os_log_debug([KMLogs keyboardLog], "Unzipped file: %{public}@", filePath);
   
   BOOL didInstall = [self verifyPackageVersionInTempFolder:tempDestFolder filePath:filePath];
   
   NSString *destFolder = [self.keyboardsPath stringByAppendingPathComponent:folderName];
-  
+
   // Remove existing package if it exists
   if (didInstall && [[NSFileManager defaultManager] fileExistsAtPath:destFolder]) {
-    if(self.debugMode) {
-      NSLog(@"The destination folder already exists. Overwriting...");
-    }
+    os_log_debug([KMLogs keyboardLog], "The destination folder already exists. Overwriting...");
     [[NSFileManager defaultManager] removeItemAtPath:destFolder error:&error];
     if (error != nil) {
-      NSLog(@"Unable to remove destination folder %@", destFolder);
+      os_log_error([KMLogs keyboardLog], "Unable to remove destination folder %{public}@", destFolder);
       didInstall = NO;
     }
   }
@@ -1382,7 +1354,7 @@ extern const CGKeyCode kProcessPendingBuffer;
   if(didInstall) {
     [[NSFileManager defaultManager] moveItemAtPath:tempDestFolder toPath:destFolder error:&error];
     if (error != nil) {
-      NSLog(@"Unable to move temp folder %@ to dest folder %@", tempDestFolder, destFolder);
+      os_log_error([KMLogs keyboardLog], "Unable to move temp folder %{public}@ to dest folder %{public}@", tempDestFolder, destFolder);
       didInstall = NO;
     }
   }
@@ -1390,7 +1362,7 @@ extern const CGKeyCode kProcessPendingBuffer;
   if(!didInstall) {
     [[NSFileManager defaultManager] removeItemAtPath:tempDestFolder error:&error];
     if (error != nil) {
-      NSLog(@"Unable to remove temp folder %@", tempDestFolder);
+      os_log_error([KMLogs keyboardLog], "Unable to remove temp folder %{public}@", tempDestFolder);
     }
     
     return NO;
@@ -1401,8 +1373,7 @@ extern const CGKeyCode kProcessPendingBuffer;
   NSString * keyboardFolderPath = [self.keyboardsPath stringByAppendingPathComponent:folderName];
   [self installFontsAtPath:keyboardFolderPath];
   for (NSString *kmxFile in [self KMXFilesAtPath:keyboardFolderPath]) {
-    if (self.debugMode)
-      NSLog(@"Adding keyboard to list of active keyboards: %@", kmxFile);
+    os_log_debug([KMLogs keyboardLog], "Adding keyboard to list of active keyboards: %{public}@", kmxFile);
     if (![self.activeKeyboards containsObject:kmxFile])
       [self.activeKeyboards addObject:kmxFile];
   }
@@ -1442,7 +1413,7 @@ extern const CGKeyCode kProcessPendingBuffer;
       [[NSFileManager defaultManager] copyItemAtPath:srcPath toPath:destPath error:&error];
     
     if (error != nil)
-      NSLog(@"Error = %@", error);
+      os_log_error([KMLogs keyboardLog], "installFontsAtPath error = %{public}@", error);
   }
 }
 

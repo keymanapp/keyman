@@ -1,8 +1,6 @@
-import { InputSample } from "./inputSample.js";
-import { GestureRecognizerConfiguration, preprocessRecognizerConfig } from "../configuration/gestureRecognizerConfiguration.js";
+import { GestureRecognizerConfiguration } from "../configuration/gestureRecognizerConfiguration.js";
 import { Nonoptional } from "../nonoptional.js";
-import { MatcherSelector } from "./gestures/matchers/matcherSelector.js";
-import { SerializedGesturePath, GestureDebugPath } from "./gestureDebugPath.js";
+import { GestureDebugPath } from "./gestureDebugPath.js";
 import { GestureSource, SerializedGestureSource } from "./gestureSource.js";
 /**
  * Represents all metadata needed internally for tracking a single "touch contact point" / "touchpoint"

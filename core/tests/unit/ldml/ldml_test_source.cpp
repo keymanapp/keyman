@@ -28,6 +28,7 @@
 #include "path.hpp"
 #include "state.hpp"
 #include "utfcodec.hpp"
+#include "util_normalize.hpp"
 
 #include "ldml_test_source.hpp"
 #include "ldml_test_utils.hpp"
@@ -532,7 +533,7 @@ LdmlJsonTestSource::next_action(ldml_action &fillin) {
     fillin.type   = LDML_ACTION_CHECK_EXPECTED;
     fillin.string = LdmlTestSource::parse_u8_source_string(result.get<std::string>());
     if (!get_normalization_disabled()) {
-      assert(km::core::ldml::normalize_nfd(fillin.string)); // TODO-LDML: will be NFC when core is normalizing to NFC
+      assert(km::core::util::normalize_nfd(fillin.string)); // TODO-LDML: will be NFC when core is normalizing to NFC
     }
     return;
   } else if (type == "keystroke") {
@@ -547,7 +548,7 @@ LdmlJsonTestSource::next_action(ldml_action &fillin) {
     fillin.type   = LDML_ACTION_EMIT_STRING;
     fillin.string = LdmlTestSource::parse_u8_source_string(to.get<std::string>());
     if (!get_normalization_disabled()) {
-      assert(km::core::ldml::normalize_nfd(fillin.string)); // TODO-LDML: will be NFC when core is normalizing to NFC
+      assert(km::core::util::normalize_nfd(fillin.string)); // TODO-LDML: will be NFC when core is normalizing to NFC
     }
     return;
   } else if (type == "backspace") {
@@ -574,7 +575,7 @@ LdmlJsonTestSource::get_context() {
     auto startContext = data["/startContext/to"_json_pointer];
     context = LdmlTestSource::parse_u8_source_string(startContext);
     if (!get_normalization_disabled()) {
-      assert(km::core::ldml::normalize_nfd(context)); // TODO-LDML: should be NFC
+      assert(km::core::util::normalize_nfd(context)); // TODO-LDML: should be NFC
     }
   }
   loaded_context = true;
@@ -645,7 +646,7 @@ LdmlJsonRepertoireTestSource::next_action(ldml_action &fillin) {
   std::size_t len = km::core::kmx::Utf32CharToUtf16(ch, ch16);
   std::u16string chstr = std::u16string(ch16.ch, len);
   if (!get_normalization_disabled()) {
-    assert(km::core::ldml::normalize_nfd(chstr)); // TODO-LDML: will be NFC when core is normalizing to NFC
+    assert(km::core::util::normalize_nfd(chstr)); // TODO-LDML: will be NFC when core is normalizing to NFC
   }
   // append to expected
   expected.append(chstr);

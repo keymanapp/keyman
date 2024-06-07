@@ -110,3 +110,12 @@ export var LMLayerWorkerSourcemapComment = "${srcMapString}";
 `;
 
 fs.writeFileSync(destFile, wrapper);
+
+// Don't let there be multiples; TS may signal typing conflict if it thinks
+// these are defined multiple times.
+let wrapperDeclarations = `
+export const LMLayerWorkerCode: string;
+export const LMLayerWorkerSourcemapComment: string;
+`;
+
+fs.writeFileSync('build/lib/worker-main.wrapped.d.ts', wrapperDeclarations);

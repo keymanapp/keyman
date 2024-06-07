@@ -54,13 +54,17 @@ export default class OSKLayer {
     // Set font for layer if defined in layout
     gs.fontFamily = 'font' in layout ? layout['font'] : '';
 
-    this.nextlayer = gDiv['layer'] = layer['id'];
+    this.nextlayer = layer.id;
+    //@ts-ignore
+    gDiv['layer'] = layer.id;
+    // @ts-ignore
     if(typeof layer['nextlayer'] == 'string') {
       // The gDiv['nextLayer'] is no longer referenced in KMW 15.0+, but is
       // maintained for partial back-compat in case any site devs actually
       // relied on its value from prior versions.
       //
       // We won't pay attention to any mutations to the gDiv copy, though.
+      // @ts-ignore
       gDiv['nextLayer'] = this.nextlayer = layer['nextlayer'];
     }
 

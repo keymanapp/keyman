@@ -5,11 +5,11 @@
  * See https://stackoverflow.com/questions/43587286/why-does-instanceof-return-false-on-chrome-safari-and-edge-and-true-on-firefox
  * for more details.
  *
- * @param {Element|Event}   Pelem       An element of the web page or one of its IFrame-based subdocuments.
- * @param {string}          className   The plain-text name of the expected Element type.
+ * @param {EventTarget}   Pelem       An element of the web page or one of its IFrame-based subdocuments.
+ * @param {string}        className   The plain-text name of the expected Element type.
  * @return {boolean}
  */
-export function nestedInstanceOf(Pelem: Event|EventTarget, className: string): boolean {
+export function nestedInstanceOf(Pelem: EventTarget, className: string): boolean {
   var scopedClass;
 
   if(!Pelem) {
@@ -17,22 +17,17 @@ export function nestedInstanceOf(Pelem: Event|EventTarget, className: string): b
     // what we're looking for.
     return false;
   }
+  // @ts-ignore
   if (Pelem['Window']) { // Window objects contain the class definitions for types held within them.  So, we can check for those.
     return className == 'Window';
+    // @ts-ignore
   } else if (Pelem['defaultView']) { // Covers Document.
-    scopedClass = Pelem['defaultView'][className];
+    // @ts-ignore
+    scopedClass = (Pelem as Document)['defaultView'][className];
+    // @ts-ignore
   } else if(Pelem['ownerDocument']) {
+    // @ts-ignore
     scopedClass = (Pelem as Node).ownerDocument.defaultView[className];
-  } else if(Pelem['target']) {
-    var event = Pelem as Event;
-
-    if(this.instanceof(event.target, 'Window')) {
-      scopedClass = event.target[className];
-    } else if(this.instanceof(event.target, 'Document')) {
-      scopedClass = (event.target as Document).defaultView[className];
-    } else if(this.instanceof(event.target, 'HTMLElement')) {
-      scopedClass = (event.target as HTMLElement).ownerDocument.defaultView[className];
-    }
   }
 
   if(scopedClass) {

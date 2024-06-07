@@ -138,6 +138,12 @@ class KeymanWebViewController: UIViewController {
     webView!.backgroundColor = UIColor.clear
     webView!.navigationDelegate = self
     webView!.scrollView.isScrollEnabled = false
+    
+    if #available(iOSApplicationExtension 16.4, *) {
+      if(Version.current.tier != .stable) {
+        webView!.isInspectable = true
+      }
+    }
 
     // Disable WKWebView default layout-constraint manipulations. We ensure
     // safe-area boundaries are respected via InputView / InputViewController
@@ -314,7 +320,7 @@ extension KeymanWebViewController {
         event.extra?["package"] = packageID
       }
       SentryManager.capture(event)
-      os_log("%{public}s id: %s file: %{public}s", log: KeymanEngineLogger.resources, type: .error, errorMessage, keyboard.id, fileURL as CVarArg)
+      os_log("%{public}s id: %{public}s file: %{public}s", log: KeymanEngineLogger.resources, type: .error, errorMessage, keyboard.id, fileURL.absoluteString)
       throw KeyboardError.fileMissing
     }
 
@@ -339,7 +345,7 @@ extension KeymanWebViewController {
       event.extra!["package"] = stub["KP"]
 
       SentryManager.capture(event)
-      os_log("%{public}s id: %{public}s file: %{public}s", log: KeymanEngineLogger.resources, type: .error, errorMessage, keyboard.id, fileURL as CVarArg)
+      os_log("%{public}s id: %{public}s file: %{public}s", log: KeymanEngineLogger.resources, type: .error, errorMessage, keyboard.id, fileURL.absoluteString)
       throw KeyboardError.keyboardLoadingError
     }
     guard let stubString = String(data: data, encoding: .utf8) else {

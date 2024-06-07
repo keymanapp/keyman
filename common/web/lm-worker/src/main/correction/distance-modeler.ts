@@ -39,9 +39,9 @@ export class SearchNode {
   // Internal lazy-cache for .inputSamplingCost, as it's a bit expensive to re-compute.
   private _inputCost?: number;
 
-  constructor(rootTraversal: LexiconTraversal, toKey?: (USVString) => USVString);
+  constructor(rootTraversal: LexiconTraversal, toKey?: (arg0: USVString) => USVString);
   constructor(node: SearchNode);
-  constructor(rootTraversal: LexiconTraversal | SearchNode, toKey?: (USVString) => USVString) {
+  constructor(rootTraversal: LexiconTraversal | SearchNode, toKey?: (arg0: USVString) => USVString) {
     toKey = toKey || (x => x);
 
     if(rootTraversal instanceof SearchNode) {
@@ -549,7 +549,7 @@ export class SearchSpace {
 
       let inputIndex = nextTier.index;
 
-      let deletionEdges = [];
+      let deletionEdges: SearchNode[] = [];
       if(!substitutionsOnly) {
         deletionEdges       = currentNode.buildDeletionEdges(this.inputSequence[inputIndex-1]);
       }

@@ -1,4 +1,4 @@
-import * as xml2js from 'xml2js';
+import { xml2js } from '@keymanapp/common-types';
 import JSZip from 'jszip';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
@@ -310,9 +310,9 @@ export class KmpCompiler implements KeymanCompiler {
       kmp.keyboards = this.arrayWrap(kps.Keyboards.Keyboard).map((keyboard: KpsFile.KpsFileKeyboard) => ({
         displayFont: keyboard.DisplayFont ? this.callbacks.path.basename(this.normalizePath(keyboard.DisplayFont)) : undefined,
         oskFont: keyboard.OSKFont ? this.callbacks.path.basename(this.normalizePath(keyboard.OSKFont)) : undefined,
-        name:keyboard.Name.trim(),
-        id:keyboard.ID.trim(),
-        version:keyboard.Version.trim(),
+        name:keyboard.Name?.trim(),
+        id:keyboard.ID?.trim(),
+        version:keyboard.Version?.trim(),
         rtl:keyboard.RTL == 'True' ? true : undefined,
         languages: keyboard.Languages ?
           this.kpsLanguagesToKmpLanguages(this.arrayWrap(keyboard.Languages.Language) as KpsFile.KpsFileLanguage[]) :

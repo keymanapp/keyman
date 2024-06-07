@@ -24,7 +24,9 @@ export function outputTargetForElement(Ltarg: HTMLElement) {
   // ... determine the element expected to hold the KMW attachment object based on
   // its typing, properties, etc.
 
+  // @ts-ignore
   if(Ltarg['body']) {
+    // @ts-ignore
     Ltarg = Ltarg['body']; // Occurs in Firefox for design-mode iframes.
   }
 
