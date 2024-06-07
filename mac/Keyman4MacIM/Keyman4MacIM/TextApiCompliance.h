@@ -16,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSString *clientApplicationId;
 
 -(instancetype)initWithClient:(id) client applicationId:(NSString *)appId;
+-(NSString *)description;
 -(void)checkCompliance:(id) client;
 -(void) checkComplianceAfterInsert:(id) client delete:(NSString *)textToDelete insert:(NSString *)textToInsert;
 -(BOOL)isComplianceUncertain;
