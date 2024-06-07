@@ -10,6 +10,85 @@
 #include "core_icu.h"
 #include "kmx/kmx_xstring.h"
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#include "utfcodec.hpp"
+#include <assert.h>
+// JS implementations
+
+
+/**
+ * RegexMatchLen(pattern, input)
+ * @param pattern the string, sans trailing $, for the pattern
+ * @param input the text to match against
+ * @return the length, in code units, of the matched portion
+ */
+EM_JS(int, RegexMatchLen, (const char* pattern, const char *input), {
+  const DEBUG_JS = false;
+  if (!pattern) return -1;
+  if (!input) return -1;
+  const patternstr = Module.UTF8ToString(pattern) + '$';
+  const inputstr = Module.UTF8ToString(input);
+  const re = new RegExp(patternstr);
+  const result = re.exec(inputstr);
+  if (DEBUG_JS) console.dir({patternstr,inputstr,re,result});
+  if (!result) return 0; // no match
+  const index = result.index;
+  // code unit indices
+  const startIndex = index;
+  const endIndex = inputstr.length;
+  const matchedText = inputstr.substring(startIndex);
+  const matchedCodepoints = [...matchedText];
+  if (DEBUG_JS) console.dir({index, startIndex,endIndex,matchedText,matchedCodepoints});
+  return matchedCodepoints.length;
+});
+
+/**
+ * RegexGroup1(pattern, input)
+ * @param pattern the string, sans trailing $, for the pattern
+ * @param input the text to match against
+ * @return string of group 1 match or null
+ */
+EM_JS(char*, RegexGroup1, (const char* pattern, const char *input), {
+  const DEBUG_JS = false;
+  if (!pattern) return 0;
+  if (!input) return 0;
+  const patternstr = Module.UTF8ToString(pattern) + '$';
+  const inputstr = Module.UTF8ToString(input);
+  const re = new RegExp(patternstr);
+  const result = re.exec(inputstr);
+  if (!result) return 0; // no match
+  const g1 = result[1];
+  if (DEBUG_JS) console.dir({patternstr,inputstr,re,result,g1});
+  if (!g1) return 0;
+  return stringToNewUTF8(g1);
+});
+
+
+/**
+ * RegexSubstitute
+ * @param pattern the string, sans trailing $, for the pattern
+ * @param input the text to match against
+ * @param to the replacement text
+ * @return the entire updated output string
+ */
+EM_JS(char*, RegexSubstitute, (const char* pattern, const char *input, const char *to), {
+  const DEBUG_JS = false;
+  if (!pattern) return -1;
+  if (!input) return -1;
+  const patternstr = Module.UTF8ToString(pattern) + '$';
+  const inputstr = Module.UTF8ToString(input);
+  const tostr = Module.UTF8ToString(to);
+  const re = new RegExp(patternstr);
+  const output = inputstr.replace(re, tostr);
+  return stringToNewUTF8(output);
+});
+
+// pull in the generated table
+#include "util_normalize_table.h"
+
+#endif
+
 
 namespace km {
 namespace core {
@@ -38,6 +117,7 @@ km_regex::km_regex()
 
 km_regex::km_regex(const km_regex& other)
 #if KMN_NO_ICU
+ : fPattern(other.fPattern)
 #else
  : fPattern(nullptr)
 #endif
@@ -54,6 +134,7 @@ km_regex::km_regex(const km_regex& other)
 
 km_regex::km_regex(const std::u32string &pattern)
 #if KMN_NO_ICU
+  : fPattern(pattern)
 #else
   : fPattern(nullptr)
 #endif
@@ -67,7 +148,7 @@ km_regex::~km_regex() {
 
 bool km_regex::valid() const {
 #if KMN_NO_ICU
-#error todo
+  return (!fPattern.empty());
 #else
   // valid if fPattern is present.
   return !!fPattern;
@@ -76,7 +157,10 @@ bool km_regex::valid() const {
 
 bool km_regex::init(const std::u32string &pattern) {
 #if KMN_NO_ICU
-#error todo
+// for now- new regex every time.
+  assert(!pattern.empty());
+  fPattern = pattern;
+  return true; // TODO
 #else
   if (pattern.empty()) {
     return false;
@@ -97,7 +181,44 @@ size_t km_regex::apply(const std::u32string &input, std::u32string &output,
   const std::deque<std::u32string> &fromList,
   const std::deque<std::u32string> &toList ) const {
 #if KMN_NO_ICU
-#error TODO
+  // length in code points of match from end
+  std::string patstr = convert<char32_t,char>(fPattern);
+  std::string instr = convert<char32_t,char>(input);
+
+  /** code units */
+  const auto matchLen = RegexMatchLen(patstr.c_str(), instr.c_str());
+  assert(matchLen != -1); // error
+  if (matchLen == 0) {
+    // TODO: not correct, just trying to quell unused arg.
+    return 0;
+  }
+  std::u32string rustr; // replacement
+  if (fromList.empty()) {
+    rustr = to;
+  } else {
+
+    char *group1 = RegexGroup1(patstr.c_str(), instr.c_str());
+    assert(group1 != nullptr);
+    const std::string group1str(group1);
+    const std::u32string match32 = convert<char, char32_t>(group1str);
+    free(group1);
+    auto matchIndex = findIndex(match32, fromList);
+    assert(matchIndex != 1L);
+    rustr = toList.at(matchIndex);
+  }
+  std::string rstr = convert<char32_t,char>(rustr);
+  // now, perform substitution
+  char *out = RegexSubstitute(patstr.c_str(), instr.c_str(), rstr.c_str());
+  assert(out != nullptr);
+  std::string outstr(out);
+  free(out);
+  output = convert<char, char32_t>(outstr);
+  /** code units */
+  const auto matchStart = input.length() - matchLen;
+  // remove the unmatched prefix.
+  output.erase(0, matchStart);
+
+  return matchLen;
 #else
   assert(fPattern);
   // TODO-LDML: Really? can't go from u32 to UnicodeString?
@@ -131,7 +252,6 @@ size_t km_regex::apply(const std::u32string &input, std::u32string &output,
 
   // should have matched something.
   assert(matchLen > 0);
-
 
   // now, do the replace.
 
@@ -171,7 +291,7 @@ size_t km_regex::apply(const std::u32string &input, std::u32string &output,
 
     // 1., we need to find the index in the source set.
     auto matchIndex = findIndex(match32, fromList);
-    assert(matchIndex != -1L); // TODO-LDML: not matching shouldn't happen, the regex wouldn't have matched.
+    assert(matchIndex != -1L); // This indicates that the regex and the fromList are out of sync.
     // we already asserted on load that the from and to sets have the same cardinality.
 
     // 2. get the target string, convert to utf-16

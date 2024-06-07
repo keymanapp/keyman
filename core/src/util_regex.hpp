@@ -34,7 +34,7 @@ public:
   bool valid() const;
 private:
 #if KMN_NO_ICU
-  void *stuff;
+  std::u32string fPattern; // TODO: by value?
 #else
   std::unique_ptr<icu::RegexPattern> fPattern;
 #endif

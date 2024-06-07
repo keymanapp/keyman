@@ -15,14 +15,14 @@
 // #include "debuglog.h"
 
 #ifndef zassert_string_equal
-#define zassert_string_equal(actual, expected)                                                              \
-  {                                                                                                         \
-    if (actual != expected) {                                                                               \
-      std::wcerr << __FILE__ << ":" << __LINE__ << ": " << console_color::fg(console_color::BRIGHT_RED)     \
-                 << "got: " << km::core::kmx::Debug_UnicodeString(actual, 0) << " expected "                \
-                 << km::core::kmx::Debug_UnicodeString(expected, 1) << console_color::reset() << std::endl; \
-      return EXIT_FAILURE;                                                                                  \
-    }                                                                                                       \
+#define zassert_string_equal(actual, expected)                                                                               \
+  {                                                                                                                          \
+    if (actual != expected) {                                                                                                \
+      std::wcerr << __FILE__ << ":" << __LINE__ << ": " << console_color::fg(console_color::BRIGHT_RED) << "got: " << actual \
+                 << " " << km::core::kmx::Debug_UnicodeString(actual, 0) << " expected " << expected << " "                  \
+                 << km::core::kmx::Debug_UnicodeString(expected, 1) << console_color::reset() << std::endl;                  \
+      return EXIT_FAILURE;                                                                                                   \
+    }                                                                                                                        \
   }
 #endif
 
@@ -1174,7 +1174,7 @@ test_util_regex() {
     std::u32string output;
     const std::u32string input(U":e𐒻");
     auto apply1 = r.apply(input, output, to, fromList, toList);
-    assert_equal(apply1, 2); // matched last 3 codepoints
+    assert_equal(apply1, 2); // matched last 2 codepoints
     std::u32string expect(U"𐓏");
     zassert_string_equal(output, expect)
   }
@@ -1250,6 +1250,9 @@ main(int argc, const char *argv[]) {
 
   console_color::enabled = console_color::isaterminal() || arg_color;
 
+  if (test_util_regex() != EXIT_SUCCESS) {
+    rc = EXIT_FAILURE;
+  }
 
   if (test_transforms() != EXIT_SUCCESS) {
     rc = EXIT_FAILURE;
@@ -1272,10 +1275,6 @@ main(int argc, const char *argv[]) {
   }
 
   if (test_normalize() != EXIT_SUCCESS) {
-    rc = EXIT_FAILURE;
-  }
-
-  if (test_util_regex() != EXIT_SUCCESS) {
     rc = EXIT_FAILURE;
   }
 
