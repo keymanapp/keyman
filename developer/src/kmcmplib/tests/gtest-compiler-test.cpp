@@ -46,7 +46,7 @@ class CompilerTest : public testing::Test {
             initGlobals();
             initFileKeyboard(fileKeyboard, false);
         }
-        
+
         void initGlobals() {
             msgproc = NULL;
             szText_stub[0] = '\0';
@@ -494,7 +494,6 @@ TEST_F(CompilerTest, GetXStringImpl_type4_test) {
     EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_baselayout_valid[] = { UC_SENTINEL, CODE_IFSYSTEMSTORE, TSS_BASELAYOUT+1, 2, 1, 0 };
     EXPECT_EQ(0, u16cmp(tstr_baselayout_valid, tstr));
-    delete[] fileKeyboard.dpStoreArray;
 }
 
 TEST_F(CompilerTest, GetXStringImpl_type5_test) {
