@@ -140,7 +140,7 @@ uses
   xmldoc,
 
   Keyman.Developer.System.HelpTopics,
-  Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter,
+  Keyman.Developer.System.VisualKeyboardToTouchLayoutConverter,
 
   CharacterDragObject,
   CharMapDropTool,
@@ -246,7 +246,7 @@ end;
 
 procedure TframeTouchLayoutBuilder.ImportFromKVK(const KVKFileName: string);   // I3945
 var
-  converter: TTouchLayoutToVisualKeyboardConverter;
+  converter: TVisualKeyboardToTouchLayoutConverter;
   FVK: TVisualKeyboard;
   FJS: string;
 begin
@@ -268,7 +268,7 @@ begin
       end;
     end;
 
-    converter := TTouchLayoutToVisualKeyboardConverter.Create(FVK);
+    converter := TVisualKeyboardToTouchLayoutConverter.Create(FVK);
     try
       if not converter.Execute(FJS) then
       begin
