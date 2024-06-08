@@ -43,8 +43,7 @@ class CompilerTest : public testing::Test {
             initFileKeyboard(fileKeyboard);
         }
 	    void TearDown() override {
-            initGlobals();
-            initFileKeyboard(fileKeyboard, false);
+            deleteFileKeyboard(fileKeyboard);
         }
         
         void initGlobals() {
@@ -59,15 +58,7 @@ class CompilerTest : public testing::Test {
             kmcmp::BeginLine[BEGIN_POSTKEYSTROKE] = -1;
         }
 
-        void initFileKeyboard(FILE_KEYBOARD &fk, bool isSetUp=true) {
-            if (!isSetUp) {
-                if (fk.dpStoreArray)   { delete[] fk.dpStoreArray;   }
-                if (fk.dpGroupArray)   { delete[] fk.dpGroupArray;   }
-                if (fk.lpBitmap)       { delete   fk.lpBitmap;       }
-                if (fk.dpDeadKeyArray) { delete[] fk.dpDeadKeyArray; }
-                if (fk.dpVKDictionary) { delete   fk.dpVKDictionary; }
-                if (fk.extra)          { delete   fk.extra;          }
-            }
+        void initFileKeyboard(FILE_KEYBOARD &fk) {
             fk.KeyboardID        = 0;
             fk.version           = VERSION_90;
             fk.dpStoreArray      = nullptr;
@@ -91,6 +82,15 @@ class CompilerTest : public testing::Test {
             fk.cxVKDictionary    = 0;
             fk.dpVKDictionary    = nullptr;
             fk.extra             = nullptr;
+        }
+
+        void deleteFileKeyboard(FILE_KEYBOARD &fk) {
+            if (fk.dpStoreArray)   { delete[] fk.dpStoreArray;   }
+            if (fk.dpGroupArray)   { delete[] fk.dpGroupArray;   }
+            if (fk.lpBitmap)       { delete   fk.lpBitmap;       }
+            if (fk.dpDeadKeyArray) { delete[] fk.dpDeadKeyArray; }
+            if (fk.dpVKDictionary) { delete   fk.dpVKDictionary; }
+            if (fk.extra)          { delete   fk.extra;          }
         }
 
     public:
