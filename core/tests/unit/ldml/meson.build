@@ -22,12 +22,6 @@ invalid_tests = []
 
 # Setup copying of source files, used in child subdir calls
 
-if build_machine.system() == 'windows'
-  copy_cmd = [find_program('cmd.exe', required: true), '/c', 'copy']
-else
-  copy_cmd = [find_program('cp', required: true)]
-endif
-
 if node.found()
   # Note: if node is not available, we cannot build the keyboards; build.sh
   # emits a warning that the ldml keyboard tests will be skipped

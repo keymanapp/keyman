@@ -101,7 +101,7 @@ if cpp_compiler.get_id() == 'emscripten'
     cpp_args: defns,
     include_directories: inc,
     link_args: links + lib_links,
-    objects: lib.extract_all_objects(),
+    objects: lib.extract_all_objects(recursive: false),
     dependencies: icuuc_dep)
 
   if get_option('buildtype') == 'release'
