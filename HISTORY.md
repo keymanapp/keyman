@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 18.0.52 alpha 2024-06-08
+
+* fix(developer): prevent two touch layout editors opening for the same file (#11717)
+* chore(common): cleanup meson deprecations and warnings (#11523)
+* feat(developer): support language reference in context help (#11737)
+* test(developer): kmcmplib compiler unit tests (#11378)
+
 ## 18.0.51 alpha 2024-06-07
 
 * fix(web): fix osk touch-focus tracking (#11705)
