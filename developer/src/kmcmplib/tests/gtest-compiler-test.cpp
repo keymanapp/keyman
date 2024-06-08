@@ -330,7 +330,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_xd_test) {
     u16cpy(str, u"dk(A)");
     EXPECT_EQ(0, (int)fileKeyboard.cxDeadKeyArray);
     EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_dk_valid[] = { UC_SENTINEL, CODE_DEADKEY, 1, 0 };
+    const KMX_WCHAR tstr_dk_valid[] = { UC_SENTINEL, CODE_DEADKEY, 1, 0 }; // setup deadkeys
     EXPECT_EQ(0, u16cmp(tstr_dk_valid, tstr));
     fileKeyboard.cxDeadKeyArray = 0;
 
@@ -338,7 +338,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_xd_test) {
     u16cpy(str, u"deadkey(A)");
     EXPECT_EQ(0, (int)fileKeyboard.cxDeadKeyArray);
     EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_deadkey_valid[] = { UC_SENTINEL, CODE_DEADKEY, 1, 0 };
+    const KMX_WCHAR tstr_deadkey_valid[] = { UC_SENTINEL, CODE_DEADKEY, 1, 0 }; // setup deadkeys
     EXPECT_EQ(0, u16cmp(tstr_deadkey_valid, tstr));
     fileKeyboard.cxDeadKeyArray = 0;
 
