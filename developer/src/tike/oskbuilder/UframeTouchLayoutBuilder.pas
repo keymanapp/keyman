@@ -90,7 +90,7 @@ type
 
     procedure cefCommand(Sender: TObject; const command: string; params: TStringList);
     procedure cefLoadEnd(Sender: TObject);
-    procedure RegisterSource;
+    procedure RegisterSources(const AState: string);
     procedure CharMapDragDrop(Sender, Source: TObject; X, Y: Integer);
     procedure CharMapDragOver(Sender, Source: TObject; X, Y: Integer;
       State: TDragState; var Accept: Boolean);
@@ -238,10 +238,12 @@ begin
     modWebHttpServer.AppSource.UnregisterSource(FFilename+'#state');
 end;
 
-procedure TframeTouchLayoutBuilder.RegisterSource;
+procedure TframeTouchLayoutBuilder.RegisterSources(const AState: string);
 begin
   if FFilename <> '' then
     modWebHttpServer.AppSource.RegisterSource(FFilename, FSavedLayoutJS);
+  if (FFileName <> '') and (AState <> '') then
+    modWebHttpServer.AppSource.RegisterSource(FFilename + '#state', AState, True);
 end;
 
 procedure TframeTouchLayoutBuilder.ImportFromKVK(const KVKFileName: string);   // I3945
@@ -332,70 +334,84 @@ begin
   end;
 
   UnregisterSources;
-  try
 
-    if ALoadFromString then
+  if ALoadFromString then
+  begin
+    FNewLayoutJS := AFilename;
+    FFilename := GetNextFilename;
+  end
+  else
+  begin
+    if ALoadFromTemplate or (AFileName = '') or not FileExists(AFileName) then
     begin
-      FNewLayoutJS := AFilename;
+      FBaseFileName := FTemplateFileName;
       FFilename := GetNextFilename;
     end
     else
     begin
-      if ALoadFromTemplate or (AFileName = '') or not FileExists(AFileName) then
-      begin
-        FBaseFileName := FTemplateFileName;
-        FFilename := GetNextFilename;
-      end
-      else
-      begin
-        FBaseFileName := AFileName;
-        FFilename := AFileName;
-      end;
-
-      with TStringList.Create do
-      try
-        LoadFromFile(FBaseFileName, TEncoding.UTF8);
-        FNewLayoutJS := Text;
-      finally
-        Free;
-      end;
+      FBaseFileName := AFileName;
+      FFilename := AFileName;
     end;
 
-    FTouchLayout := TTouchLayout.Create;   // I3642
+    with TStringList.Create do
     try
-      if not FTouchLayout.Load(FNewLayoutJS) then
+      LoadFromFile(FBaseFileName, TEncoding.UTF8);
+      FNewLayoutJS := Text;
+    finally
+      Free;
+    end;
+  end;
+
+  FTouchLayout := TTouchLayout.Create;   // I3642
+  try
+    if not FTouchLayout.Load(FNewLayoutJS) then
+    begin
+      FLastError := FTouchLayout.LoadError;   // I4083
+      FLastErrorOffset := FTouchLayout.LoadErrorOffset;   // I4083
+      FFilename := FLastFilename;
+      RegisterSources(FState);
+      Exit(False);
+    end
+    else
+    begin
+      if (FSavedLayoutJS <> '') and ALoadFromTemplate then
       begin
-        FLastError := FTouchLayout.LoadError;   // I4083
-        FLastErrorOffset := FTouchLayout.LoadErrorOffset;   // I4083
-        FFilename := FLastFilename;
-        Exit(False);
+        FOldLayout := TTouchLayout.Create;
+        try
+          FOldLayout.Load(FSavedLayoutJS);
+          if FTouchLayout.Merge(FOldLayout)
+            then FSavedLayoutJS := FTouchLayout.Save(False)
+            else FSavedLayoutJS := FNewLayoutJS;
+        finally
+          FOldLayout.Free;
+        end;
       end
       else
-      begin
-        if (FSavedLayoutJS <> '') and ALoadFromTemplate then
-        begin
-          FOldLayout := TTouchLayout.Create;
-          try
-            FOldLayout.Load(FSavedLayoutJS);
-            if FTouchLayout.Merge(FOldLayout)
-              then FSavedLayoutJS := FTouchLayout.Save(False)
-              else FSavedLayoutJS := FNewLayoutJS;
-          finally
-            FOldLayout.Free;
-          end;
-        end
-        else
-          FSavedLayoutJS := FNewLayoutJS;
-      end;
-    finally
-      FTouchLayout.Free;
+        FSavedLayoutJS := FNewLayoutJS;
     end;
-
   finally
-    RegisterSource;
-    if (FFileName <> '') and (FState <> '') then
-      modWebHttpServer.AppSource.RegisterSource(FFilename + '#state', FState, True);
+    FTouchLayout.Free;
   end;
+
+  if (FFileName <> '') and modWebHttpServer.AppSource.IsSourceRegistered(FFileName) then
+  begin
+    // If two .kmn files are loaded which both reference the same
+    // .keyman-touch-layout file, it's safest to just block it. This is a rare
+    // scenario, as most keyboard projects have a single .kmn, and it usually
+    // indicates a project may be in a bit of chaos anyway.
+    ShowMessage(
+      'The touch layout is already opened for editing in another keyboard '+
+      'editor. Please close the other keyboard editor before opening this one '+
+      'again.');
+
+    // We want to prevent this window unregistering the sources it doesn't own
+    // when it is destroyed immediately after this, which we can do by blanking
+    // the filename.
+    FFileName := '';
+    Exit(False);
+  end;
+
+  RegisterSources(FState);
 
   try
     DoLoad;

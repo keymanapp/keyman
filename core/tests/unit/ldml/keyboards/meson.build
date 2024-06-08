@@ -56,8 +56,8 @@ tests += tests_from_cldr
 
 # Setup kmc
 
-kmc_root = join_paths(meson.source_root(),'..','developer','src','kmc')
-ldml_root = join_paths(meson.source_root(),'..','resources','standards-data','ldml-keyboards','45')
+kmc_root = meson.global_source_root() / '../developer/src/kmc'
+ldml_root = meson.global_source_root() / '../resources/standards-data/ldml-keyboards/45'
 ldml_data = join_paths(ldml_root, '3.0')
 ldml_testdata = join_paths(ldml_root, 'test')
 kmc_cmd = [node, '--enable-source-maps', kmc_root]
