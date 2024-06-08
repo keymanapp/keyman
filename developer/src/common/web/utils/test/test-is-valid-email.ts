@@ -8,7 +8,10 @@ describe('test-is-valid-email', function () {
       'email@example.com',
       'email.example-true@example.com',
       'email@example-example.com',
-      'email...@example.com'
+      'email...@example.com',
+      'email_example1@1example.com',
+      'email+example@mail.example.com',
+      'Email@Example.Com'
     ].forEach(email => assert.isTrue(isValidEmail(email), `expected '${email}' to be valid`));
 
     // This is accepted, but it's really a bit wonky. But that's an upstream
