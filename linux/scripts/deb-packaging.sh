@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2154 # (variables are set in build-utils.sh)
-# Actions for creating a Debian source package. Used by deb-packaging.yml GHA.
+# Actions for creating a Debian source package and verifying the API.
+# Used by deb-packaging.yml and api-verification.yml GHAs.
 
 set -eu
 shopt -s inherit_errexit

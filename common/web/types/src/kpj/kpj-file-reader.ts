@@ -1,4 +1,4 @@
-import * as xml2js from 'xml2js';
+import * as xml2js from '../deps/xml2js/xml2js.js';
 import { KPJFile, KPJFileProject } from './kpj-file.js';
 import { boxXmlArray } from '../util/util.js';
 import { KeymanDeveloperProject, KeymanDeveloperProjectFile10, KeymanDeveloperProjectType } from './keyman-developer-project.js';

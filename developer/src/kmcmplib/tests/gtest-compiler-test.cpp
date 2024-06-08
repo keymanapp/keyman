@@ -399,6 +399,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_single_quote_test) {
     EXPECT_EQ(CERR_ExtendedStringTooLong, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 2, 0, &newp, FALSE)); // max reduced to force error    
 
     // CERR_StringInVirtualKeySection *** TODO ***
+<<<<<<< HEAD
 }
 
 // tests strings starting with 'a'
@@ -582,6 +583,8 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_if_option_valid[] = { UC_SENTINEL, CODE_IFOPT, 2, 2, 4, 0 };
     EXPECT_EQ(0, u16cmp(tstr_if_option_valid, tstr));
+=======
+>>>>>>> master
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
