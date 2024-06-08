@@ -86,30 +86,38 @@ function prepend_scope() {
       EXTRA_WHITESPACE=
     fi
 
+    # Build commit message title
+
     if [ -z "$SCOPE" ]; then
       prefix="$TYPE: $EXTRA_WHITESPACE"
     else
       prefix="$TYPE($SCOPE): $EXTRA_WHITESPACE"
     fi
 
-    # Now that we have the components finalized, we can proceed.
-    if [ -n "${ISSUE// }" ]; then # Refer to https://unix.stackexchange.com/a/146945 for explanation.
-      # This technically does pass the conventional commits test - it doesn't -ensure- that the
-      # "Fixes #____" section doesn't count toward the core message.
-      prefix="${prefix}\n"
-      prefix="${prefix}Fixes: #$ISSUE\n"
+    if [ ! -z "$CHERRYPICK" ]; then
+      prefix ="${prefix}🍒"
     fi
 
-    if [ ! -z "$CHERRYPICK" ]; then
-      postfix_cherrypick="\n# - Add a cherry pick trailer:\n#     Cherry-pick-of: #_ID_"
-    else
-      postfix_cherrypick=
+    # Add commit message trailers
+
+    if [ "${COMMIT_SOURCE}" != "merge" ]; then
+      if [ -n "${ISSUE// }" ] || [ ! -z "$CHERRYPICK" ]; then
+        prefix="${prefix}\n"
+      fi
+
+      if [ -n "${ISSUE// }" ]; then # Refer to https://unix.stackexchange.com/a/146945 for explanation.
+        prefix="${prefix}Fixes: #$ISSUE\n"
+      fi
+
+      if [ ! -z "$CHERRYPICK" ]; then
+        prefix="${prefix}Cherry-pick-of: #_ID_"
+      fi
     fi
 
     postfix=$(
       cat <<EOF
 \n# Keyman Conventional Commit suggestions:
-#$postfix_cherrypick
+#
 # - Link to a Sentry issue with git trailer:
 #     Fixes: _MODULE_-_ID_
 # - Give credit to co-authors:

@@ -2,10 +2,10 @@ node = find_program('node', required: true)
 
 common_test_files = [
   meson.current_source_dir() / 'emscripten_filesystem.cpp',
-  meson.source_root() / '../common/include/test_color.cpp'
+  meson.global_source_root() / '../common/include/test_color.cpp'
 ]
 
-hextobin_root = join_paths(meson.source_root(),'..','common','tools','hextobin','build','hextobin.js')
+hextobin_root = meson.global_source_root() / '../common/tools/hextobin/build/hextobin.js'
 hextobin_cmd = [node, hextobin_root]
 
 subdir('json')
