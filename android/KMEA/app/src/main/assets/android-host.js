@@ -145,7 +145,7 @@ function setOskHeight(h) {
 
 function setOskWidth(w) {
   if(w > 0) {
-    oskWidth = w;
+    oskWidth = w / window.devicePixelRatio;
   }
 }
 
