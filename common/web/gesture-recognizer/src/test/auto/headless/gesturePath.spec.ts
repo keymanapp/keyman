@@ -1,5 +1,5 @@
 import { assert } from 'chai'
-import sinon  from 'sinon';
+import sinon from 'sinon';
 import path from 'path';
 import url from 'url';
 import fs from 'fs';
@@ -8,9 +8,11 @@ import { GestureDebugPath } from '@keymanapp/gesture-recognizer';
 import { timedPromise } from '@keymanapp/web-utils';
 import { TouchpathTurtle } from '#tools';
 
-// Ensures that the resources are resolved relative to this script, not to the cwd when the test
-// runner was launched.
-const scriptFolder = path.dirname(url.fileURLToPath(import.meta.url));
+// Ensures that the resources are resolved relative to this script's source, not
+// to the cwd when the test runner was launched or to its built version.
+const scriptFolder = path.dirname(url.fileURLToPath(import.meta.url))
+  .replace("build/test/auto", "src/test/auto")       // Mac/Linux
+  .replace("build\\test\\auto", "src\\test\\auto");  // Windows
 const SEGMENT_TEST_JSON_FOLDER = path.resolve(`${scriptFolder}/../../resources/json/segmentation`);
 
 describe("GesturePath", function() {
