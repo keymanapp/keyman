@@ -1,4 +1,5 @@
 import { Comparator, isHighSurrogate, SENTINEL_CODE_UNIT, PriorityQueue } from '@keymanapp/models-templates';
+import { SearchBatcher } from './search-batcher.js';
 
 import { ClassicalDistanceCalculation, EditToken } from './classical-calculation.js';
 
@@ -570,10 +571,6 @@ export class SearchSpace {
 
   // Current best guesstimate of how compositor will retrieve ideal corrections.
   async *getBestMatches(waitMillis?: number): AsyncGenerator<SearchResult[]> {
-    // might should also include a 'base cost' parameter of sorts?
-    let searchSpace = this;
-    let currentReturns: {[mapKey: string]: SearchNode} = {};
-
     let maxTime: number;
     if(waitMillis == 0) {
       maxTime = Infinity;
@@ -714,50 +711,7 @@ export class SearchSpace {
       }
     }
 
-    class BatchingAssistant {
-      currentCost = Number.MIN_SAFE_INTEGER;
-      entries: SearchResult[] = [];
-
-      checkAndAdd(entry: SearchNode): SearchResult[] | null {
-        var result: SearchResult[] = null;
-
-        if(entry.currentCost > this.currentCost) {
-          result = this.tryFinalize();
-
-          this.currentCost = entry.currentCost;
-        }
-
-        // Filter out any duplicated match sequences.  The same match sequence may be reached via
-        // different input sequences, after all.
-        let outputMapKey = entry.calculation.matchSequence.map(value => value.key).join('');
-
-        // First, ensure the edge has an existing 'shared' cache entry.
-        if(!searchSpace.returnedValues[outputMapKey]) {
-          searchSpace.returnedValues[outputMapKey] = entry;
-        }
-
-        // Check the generator's local returned-value cache - this determines whether or not we
-        // need to add a new 'return' to the batch.
-        if(!currentReturns[outputMapKey]) {
-          this.entries.push(new SearchResult(entry));
-          currentReturns[outputMapKey] = entry;
-        }
-
-        return result;
-      }
-
-      tryFinalize(): SearchResult[] | null {
-        var result: SearchResult[] = null;
-        if(this.entries.length > 0) {
-          result = this.entries;
-          this.entries = [];
-        }
-
-        return result;
-      }
-    }
-
-    let batcher = new BatchingAssistant();
+    let batcher = new SearchBatcher(this.returnedValues);
 
     const timer = new ExecutionTimer(maxTime*1.5, maxTime);
 
