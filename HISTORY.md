@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.53 alpha 2024-06-10
+
+* fix(android): check current orientation when redisplaying system keyboard (#11604)
+* fix(android): fix keyboard size after rotation and restore via onSizeChanged, after layout (#11722)
+* fix(developer): fix kmcmplib unit-test include paths (#11749)
+
 ## 18.0.52 alpha 2024-06-08
 
 * fix(developer): prevent two touch layout editors opening for the same file (#11717)
