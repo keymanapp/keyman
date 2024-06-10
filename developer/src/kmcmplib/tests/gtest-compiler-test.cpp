@@ -188,7 +188,7 @@ TEST_F(CompilerTest, ProcessBeginLine_test) {
     KMX_WCHAR str[LINESIZE];
 
     // CERR_NoTokensFound
-    str[0] = '\0';
+    u16cpy(str, u"");
     EXPECT_EQ(CERR_NoTokensFound, ProcessBeginLine(&fileKeyboard, str));
 
     // CERR_InvalidToken
@@ -281,22 +281,25 @@ TEST_F(CompilerTest, GetXStringImpl_test) {
     KMX_WCHAR tstr[128];
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
-    PKMX_WCHAR newp = NULL;
+    PKMX_WCHAR newp  = nullptr;
+    KMX_WCHAR token[128];
 
     // CERR_BufferOverflow, max=0
     EXPECT_EQ(CERR_BufferOverflow, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 0, 0, &newp, FALSE));
 
     // CERR_None, no token
-    str[0] = '\0';
+    u16cpy(str, u"");
     EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // CERR_NoTokensFound, empty
     u16cpy(str, u"");
-    EXPECT_EQ(CERR_NoTokensFound, GetXStringImpl(tstr, &fileKeyboard, str, u"c", output, 80, 0, &newp, FALSE));
+    u16cpy(token, u"c");
+    EXPECT_EQ(CERR_NoTokensFound, GetXStringImpl(tstr, &fileKeyboard, str, token, output, 80, 0, &newp, FALSE));
 
     // CERR_NoTokensFound, whitespace
     u16cpy(str, u" ");
-    EXPECT_EQ(CERR_NoTokensFound, GetXStringImpl(tstr, &fileKeyboard, str, u"c", output, 80, 0, &newp, FALSE));
+    u16cpy(token, u"c");
+    EXPECT_EQ(CERR_NoTokensFound, GetXStringImpl(tstr, &fileKeyboard, str, token, output, 80, 0, &newp, FALSE));
 }
 
 // tests strings starting with 'x' or 'd'
@@ -304,7 +307,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_xd_test) {
     KMX_WCHAR tstr[128];
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
-    PKMX_WCHAR newp = NULL;
+    PKMX_WCHAR newp = nullptr;
 
     // hex 32-bit
     u16cpy(str, u"x10330"); // Gothic A
@@ -360,7 +363,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_double_quote_test) {
     KMX_WCHAR tstr[128];
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
-    PKMX_WCHAR newp = NULL;
+    PKMX_WCHAR newp = nullptr;
 
     // valid
     u16cpy(str, u"\"abc\"");
@@ -383,7 +386,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_single_quote_test) {
     KMX_WCHAR tstr[128];
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
-    PKMX_WCHAR newp = NULL;
+    PKMX_WCHAR newp = nullptr;
 
     // valid
     u16cpy(str, u"\'abc\'");
@@ -406,7 +409,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_a_test) {
     KMX_WCHAR tstr[128];
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
-    PKMX_WCHAR newp = NULL;
+    PKMX_WCHAR newp = nullptr;
     PFILE_STORE file_store = new FILE_STORE[100];
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
@@ -451,7 +454,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_b_test) {
     fileKeyboard.version = VERSION_90;
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
-    PKMX_WCHAR newp = NULL;
+    PKMX_WCHAR newp = nullptr;
 
     // CERR_InvalidToken
     u16cpy(str, u"bcd");
@@ -505,7 +508,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     fileKeyboard.version = VERSION_80;
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
-    PKMX_WCHAR newp = NULL;
+    PKMX_WCHAR newp = nullptr;
     PFILE_STORE option = new FILE_STORE[100];
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = option;
@@ -607,7 +610,7 @@ TEST_F(CompilerTest, GetRHS_test) {
     KMX_WCHAR tstr[128];
 
     // CERR_NoTokensFound, empty string
-    str[0] = '\0';
+    u16cpy(str, u"");
     EXPECT_EQ(CERR_NoTokensFound, GetRHS(&fileKeyboard, str, tstr, 80, 0, FALSE));
 
     // CERR_NoTokensFound, no '>'
