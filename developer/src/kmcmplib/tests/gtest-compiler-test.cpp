@@ -45,7 +45,7 @@ class CompilerTest : public testing::Test {
 	    void TearDown() override {
             deleteFileKeyboard(fileKeyboard);
         }
-        
+
         void initGlobals() {
             msgproc = NULL;
             szText_stub[0] = '\0';
@@ -175,7 +175,7 @@ TEST_F(CompilerTest, AddCompileError_test) {
     EXPECT_EQ(0, strcmp(expected, szText_stub));
     ErrExtraLIB[0] = '\0';
     EXPECT_EQ(5, kmcmp::nErrors);
-    
+
     // msgproc returns FALSE
     msgproc = msgproc_false_stub;
     EXPECT_EQ(CERR_ERROR, CERR_InvalidLayoutLine & CERR_ERROR);
@@ -249,7 +249,7 @@ TEST_F(CompilerTest, IsValidKeyboardVersion_test) {
     EXPECT_FALSE(IsValidKeyboardVersion((KMX_WCHAR *)u""));
     EXPECT_FALSE(IsValidKeyboardVersion((KMX_WCHAR *)u" "));
     EXPECT_FALSE(IsValidKeyboardVersion((KMX_WCHAR *)u"\t"));
-    EXPECT_FALSE(IsValidKeyboardVersion((KMX_WCHAR *)u" 1.1"));    
+    EXPECT_FALSE(IsValidKeyboardVersion((KMX_WCHAR *)u" 1.1"));
     EXPECT_TRUE(IsValidKeyboardVersion((KMX_WCHAR *)u"1.1"));
     EXPECT_TRUE(IsValidKeyboardVersion((KMX_WCHAR *)u"1.0"));
     EXPECT_FALSE(IsValidKeyboardVersion((KMX_WCHAR *)u"1."));
@@ -313,7 +313,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_xd_test) {
     u16cpy(str, u"x10330"); // Gothic A
     EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_GothicA[] = { 0xD800, 0xDF30, 0 }; // see UTF32ToUTF16
-    EXPECT_EQ(0, u16cmp(tstr_GothicA, tstr)); 
+    EXPECT_EQ(0, u16cmp(tstr_GothicA, tstr));
 
     // decimal 8-bit
     u16cpy(str, u"d18");
@@ -373,10 +373,10 @@ TEST_F(CompilerTest, GetXStringImpl_type_double_quote_test) {
     // CERR_UnterminatedString
     u16cpy(str, u"\"abc");
     EXPECT_EQ(CERR_UnterminatedString, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    
+
     // CERR_ExtendedStringTooLong
     u16cpy(str, u"\"abc\"");
-    EXPECT_EQ(CERR_ExtendedStringTooLong, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 2, 0, &newp, FALSE)); // max reduced to force error    
+    EXPECT_EQ(CERR_ExtendedStringTooLong, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 2, 0, &newp, FALSE)); // max reduced to force error
 
     // CERR_StringInVirtualKeySection *** TODO ***
 }
@@ -396,10 +396,10 @@ TEST_F(CompilerTest, GetXStringImpl_type_single_quote_test) {
     // CERR_UnterminatedString
     u16cpy(str, u"\'abc");
     EXPECT_EQ(CERR_UnterminatedString, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    
+
     // CERR_ExtendedStringTooLong
     u16cpy(str, u"\'abc\'");
-    EXPECT_EQ(CERR_ExtendedStringTooLong, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 2, 0, &newp, FALSE)); // max reduced to force error    
+    EXPECT_EQ(CERR_ExtendedStringTooLong, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 2, 0, &newp, FALSE)); // max reduced to force error
 
     // CERR_StringInVirtualKeySection *** TODO ***
 }
