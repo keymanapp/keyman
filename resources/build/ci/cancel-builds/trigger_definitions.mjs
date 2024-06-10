@@ -6,7 +6,7 @@ export const testBuildConfigurations = {
   'mac': ['Keyman_KeymanMac_PullRequests', 'Keyman_Common_KPAPI_TestPullRequests_macOS'],
   'windows': ['KeymanDesktop_TestPullRequests', 'KeymanDesktop_TestPrRenderOnScreenKeyboards', 'Keyman_Common_KPAPI_TestPullRequests_Windows'],
   'web': ['Keymanweb_TestPullRequests', 'Keyman_Common_LMLayer_TestPullRequests', 'Keyman_Common_KPAPI_TestPullRequests_WASM'],
-  'developer': ['Keyman_Developer_Test'],
+  'developer': ['Keyman_Developer_Test', 'Keyman_Test_Common_Web', 'Keyman_Test_Common_Windows', 'Keyman_Test_Common_Mac', 'Keyman_Test_Common_Linux'],
 
   'common_web': ['Keyman_Test_Common_Web'],
   'common_windows': ['Keyman_Test_Common_Windows'],

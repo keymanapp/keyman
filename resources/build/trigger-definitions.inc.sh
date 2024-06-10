@@ -22,13 +22,13 @@ watch_developer='common|core|web'
 
 # Note, currently common_web build is a no-op because we rely on running the web
 # tests on all three of our build platforms as seen below
-watch_common_web='common/web'
+watch_common_web='common/web|developer'
 # Currently, we run web tests on all three of our build platforms, to ensure
 # that they work in all our environments. So we need to include common/web in
 # the matches for these
-watch_common_windows='common/windows|common/web'
-watch_common_mac='common/mac|common/web'
-watch_common_linux='common/linux|common/web'
+watch_common_windows='common/windows|common/web|developer'
+watch_common_mac='common/mac|common/web|developer'
+watch_common_linux='common/linux|common/web|developer'
 
 #
 # Available build configurations and VCS identifiers; identifiers are somewhat inconsistent due
@@ -50,7 +50,7 @@ bc_test_linux=(KeymanLinux_TestPullRequests Keyman_Linux_Test_Integration Keyman
 bc_test_mac=(Keyman_KeymanMac_PullRequests Keyman_Common_KPAPI_TestPullRequests_macOS)
 bc_test_windows=(KeymanDesktop_TestPullRequests KeymanDesktop_TestPrRenderOnScreenKeyboards Keyman_Common_KPAPI_TestPullRequests_Windows)
 bc_test_web=(Keymanweb_TestPullRequests Keyman_Common_LMLayer_TestPullRequests Keyman_Common_KPAPI_TestPullRequests_WASM)
-bc_test_developer=(Keyman_Developer_Test)
+bc_test_developer=(Keyman_Developer_Test Keyman_Test_Common_Web Keyman_Test_Common_Windows Keyman_Test_Common_Mac Keyman_Test_Common_Linux)
 
 bc_test_common_web=(Keyman_Test_Common_Web)
 bc_test_common_windows=(Keyman_Test_Common_Windows)
