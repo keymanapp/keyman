@@ -67,7 +67,7 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
     wprintf(
         L"Usage: mcompile [-d] infile.kmx outfile.kmx\n"
         L"       mmcompile -u ...  (not available for Linux)\n "
-        L"      mcompile converts a Keyman mnemonic layout to a\n"
+        L"       mcompile converts a Keyman mnemonic layout to a\n"
         L"       positional one based on the Linux keyboard\n"
         L"       layout on top position\n"
         L"       (-d   convert deadkeys to plain keys) not available yet \n\n"
@@ -154,7 +154,7 @@ void KMX_TranslateKey(LPKMX_KEY key, KMX_WORD vk, UINT shift, KMX_WCHAR ch) {
   if(key->ShiftFlags == 0 && key->Key == ch) {
     // Key is a mnemonic key with no shift state defined.
     // Remap the key according to the character on the key cap.
-    //LogError(L"Converted mnemonic rule on line %d, + '%c' TO + [%x K_%d]", key->Line, key->Key, shift, vk);
+    //KMX_LogError(L"Converted mnemonic rule on line %d, + '%c' TO + [%x K_%d]", key->Line, key->Key, shift, vk);
     key->ShiftFlags = ISVIRTUALKEY | shift;
     key->Key = vk;
   } else if(key->ShiftFlags & VIRTUALCHARKEY && key->Key == ch) {
@@ -163,7 +163,7 @@ void KMX_TranslateKey(LPKMX_KEY key, KMX_WORD vk, UINT shift, KMX_WCHAR ch) {
     // This will not result in 100% wonderful mappings as there could
     // be overlap, depending on how keys are arranged on the target layout.
     // But that is up to the designer.
-    //LogError(L"Converted mnemonic virtual char key rule on line %d, + [%x '%c'] TO + [%x K_%d]", key->Line, key->ShiftFlags, key->Key, key->ShiftFlags & ~VIRTUALCHARKEY, vk);
+    //KMX_LogError(L"Converted mnemonic virtual char key rule on line %d, + [%x '%c'] TO + [%x K_%d]", key->Line, key->ShiftFlags, key->Key, key->ShiftFlags & ~VIRTUALCHARKEY, vk);
     key->ShiftFlags &= ~VIRTUALCHARKEY;
     key->Key = vk;
   }
@@ -185,7 +185,7 @@ void KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHA
 
 void KMX_ReportUnconvertedKeyRule(LPKMX_KEY key) {
   if(key->ShiftFlags == 0) {
-    KMX_LogError(L"Did not find a match for mnemonic rule on line %d, + '%c' > ...", key->Line, key->Key);
+    //KMX_LogError(L"Did not find a match for mnemonic rule on line %d, + '%c' > ...", key->Line, key->Key);
   } else if(key->ShiftFlags & VIRTUALCHARKEY) {
     KMX_LogError(L"Did not find a match for mnemonic virtual character key rule on line %d, + [%x '%c'] > ...", key->Line, key->ShiftFlags, key->Key);
   }
@@ -429,7 +429,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
       UINT scUnderlying =  KMX_get_KeyCodeUnderlying_From_VKUS(KMX_VKMap[i]);
       KMX_WCHAR ch = KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(keymap, VKShiftState[j], scUnderlying, &DeadKey);
 
-      //wprintf(L"--- VK_%d -> SC_ [%c] dk=%d  ( ss %i) \n", VKMap[i], ch == 0 ? 32 : ch, DeadKey, VKShiftState[j]);
+      //wprintf(L"--- VK_%d -> SC_ [%c] dk=%d  ( ss %i) \n", KMX_VKMap[i], ch == 0 ? 32 : ch, DeadKey, VKShiftState[j]);
 
       if(bDeadkeyConversion) {   // I4552
         if(ch == 0xFFFF) {
