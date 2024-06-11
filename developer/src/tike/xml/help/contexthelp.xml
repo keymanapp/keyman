@@ -102,6 +102,18 @@
        ======================================================================== -->
 
   <Form Name="context/keyboard-editor">
+    <Control Name="pages" Title="Packaging your Keyboard">
+      <p>Keyboard Editor page consists of:
+        <ul>
+          <li>Details</li>
+          <li>Layout</li>
+          <li>Icon</li>
+          <li>On-Screen</li>
+          <li>Touch Layout</li>
+          <li>Build</li>
+        </ul>
+      </p>
+    </Control>
 
     <!-- Details tab -->
     <Control Name="editName" Title="Keyboard Name">
@@ -139,6 +151,24 @@
       <p>This corresponds to the following source line:</p>
       <div class="code">store(&amp;message) 'Here is a message about a keyboard'</div>
     </Control>
+
+    <Control Name="editKeyboardVersion" Title="Keyboard Version">
+    <p>The Keyboard Version documents the version of the keyboard.</p>
+    <p>A keyboard version should be updated whenever there are changes to a keyboard. The good principles to follow are: 
+    <ul>
+      <li> Increment the major version number for a
+      keyboard that has significant new functionality.</li>
+      <li> Increment the minor version number for changes that impact functionality but not 
+      in a significant manner.</li>
+      <li> Optionally, use a third number for bug fixes.</li>
+    </ul>
+    </p>
+    <p>This corresponds to the following source line:</p>
+      <div class="code">store(&amp;keyboardversion) '1.1.2'</div>
+    <p><b>Note:</b> there is a difference between &amp;keyboardversion, which documents the keyboard version, and &amp;version,
+     which determines which version of Keyman a keyboard will run with. </p>
+    </Control>
+
     <Control Name="memoComments" Title="Comments">
       <p>In this field, enter information about the keyboard for your own reference.  These comments will only be visible in the
       source file, and not to users of your keyboard.</p>
@@ -183,6 +213,41 @@
       <p>Tests your KeymanWeb keyboard in an Internet Explorer embedded window</p>
     </Control>
 
+    <Control Name="gridFeatures" Title="Features">
+      <p>The Features grid controls which additional file components are included in 
+      the keyboard. Each of the features relates to a system store. Here are the file
+      components:
+      <ul>
+        <li>Embedded JavaScript</li>
+        <li>Embedded CSS</li>
+        <li>Web Help</li>
+        <li>Include Codes</li>
+        <li>Desktop On-Screen Keyboard (auto-included if Targets is any)</li>
+        <li>Touch-Optimised Keyboard (auto-included if Targets is any)</li>
+      </ul>
+      Icon will be automatically included when a new keyboard project is created.
+      </p>
+    </Control>
+    
+    <Control Name="cmdAddFeature" Title="Add feature">
+      <p>This will open a selection dialog allowing you to choose a feature to add to 
+      the keyboard project. Adding a feature will add an extra tab to the editor, 
+      and add the corresponding store to the keyboard source</p>
+    </Control>
+    
+    <Control Name="cmdEditFeature" Title="Edit feature">
+      <p>Depending on what is included in the Feature Grid, you can select a feature from
+      the grid then click on Edit... This will take you to the corresponding tab and 
+      let you make changes.
+      </p>
+    </Control>
+
+    <Control Name="cmdRemoveFeature" Title="Remove feature">
+      <p>Removing a feature will not delete the component file, 
+      but will just remove the store from the keyboard source.
+      </p>
+    </Control>
+
     <!-- Layout tab -->
     <!-- Icon tab -->
     <Control Name="cmdbitmapChange" Title="Change" TopicName="context/keyboard-editor#toc-icon-tab">
@@ -197,8 +262,40 @@
     <Control Name="panEdit" Title="Icon Editor" TopicName="context/keyboard-editor#toc-icon-tab">
       <p>The toolbox allows for the changing of the colours, addition of text and shapes.  It also allows for the moving of the icon around the canvas and also a preview of the icon is displayed.</p>
     </Control>
+    
+    <Control Name="palColours" Title="Colours">
+      <p>Click on a colour from the box to apply the colour onto the Keyboard's 
+      icon. You can see the Foreground Color displays the colour you chose. To deselect 
+      the colour, click on the X mark on the corner left of the colour box, or choose 
+      another colour.
+      </p>
+    </Control>
 
     <!-- On-Screen tab: see context/keyboard-editor#toc-on-screen-tab -->
+    <Control Name="pages" Title="Pages">
+      <p>This tab allows you to edit the visual representation of your keyboard 
+      layout. The content on this tab is stored in the .kvks file associated with 
+      your keyboard. The visual representation is used only in desktop and desktop 
+      web; however if no touch layout is defined, this layout will be synthesized 
+      into a touch layout automatically.
+      </p>
+      <p>An On-Screen keyboard is optional but in most keyboards is recommended. 
+      The On-Screen keyboard may not always match the actual layout identically, 
+      because you may choose to hide some of the details of encoding from the 
+      interface presented to the user.
+      </p>
+      <p>
+      This keyboard layout can also be printed or included in HTML or other documentation. 
+      The editor allows you to export the file to HTML, PNG or BMP formats.
+      </p>
+    </Control>
+      
+    <Control Name="chkFillUnderlyingLayout" Title="Auto-fill underlying layout">
+      <p>If this option is checked, when the Fill from layout button is clicked, 
+      then keys without corresponding rules in the Layout will be filled with the 
+      base layout character.
+      </p>
+    </Control>
     <!-- Touch Layout tab: see context/keyboard-editor#toc-touch-layout-tab -->
     <!-- Source tab -->
     <!-- Compile tab -->
