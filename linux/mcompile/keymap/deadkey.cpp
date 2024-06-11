@@ -1,8 +1,8 @@
 #include "keymap.h"
 #include "deadkey.h"
 
-v_dw_1D createLine(std::string  first, std::string second, KMX_DWORD number, std::string nameresult) {
-	v_dw_1D line;
+vec_dword_1D createLine(std::string  first, std::string second, KMX_DWORD number, std::string nameresult) {
+	vec_dword_1D line;
 	line.push_back(convertNamesTo_DWORD_Value(first));
 	line.push_back(convertNamesTo_DWORD_Value(second));
 	//line.push_back(convertNamesTo_DWORD_Value(nameresult));
@@ -10,9 +10,9 @@ v_dw_1D createLine(std::string  first, std::string second, KMX_DWORD number, std
 	return line;
 }
 
-std::vector<DeadKey*> create_alDead() {
+std::vector<DeadKey*> create_deadkeys_by_basechar() {
 	std::vector<DeadKey*> alDead;
-	v_dw_2D dk_ComposeTable;
+	vec_dword_2D dk_ComposeTable;
 
   create_DKTable(dk_ComposeTable);
 
@@ -54,8 +54,8 @@ bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec) {
 	return false;
 }
 
-bool query_dk_combinations_for_specific_dk(v_dw_2D * p_dk_ComposeTable, v_dw_2D  &dk_SingleTable, KMX_DWORD dk) {
-	v_dw_1D line;
+bool query_dk_combinations_for_specific_dk(vec_dword_2D * p_dk_ComposeTable, vec_dword_2D  &dk_SingleTable, KMX_DWORD dk) {
+	vec_dword_1D line;
 
 	for ( int i =0; i< (int) (*p_dk_ComposeTable).size(); i++) {
 		if (((*p_dk_ComposeTable)[i][0] == dk) && (IsKeymanUsedChar((*p_dk_ComposeTable)[i][1]))) {
@@ -73,25 +73,25 @@ bool query_dk_combinations_for_specific_dk(v_dw_2D * p_dk_ComposeTable, v_dw_2D 
 		return false;
 }
 
-KMX_DWORD KMX_changeKeynameToCapital(KMX_DWORD KVal, KMX_DWORD &shift, GdkKeymap* keymap) {
-  guint Keyval = (guint) KVal;
+KMX_DWORD KMX_change_keyname_to_capital(KMX_DWORD kVal, KMX_DWORD &shift, GdkKeymap* keymap) {
+  guint keyval = (guint) kVal;
   GdkKeymapKey* keys;
   gint n_keys;
 
-	KMX_DWORD Cap = (KMX_DWORD) gdk_keyval_to_upper (KVal);
-	if( Keyval !=0) {
-		gdk_keymap_get_entries_for_keyval(keymap, Keyval, &keys, &n_keys);
+	KMX_DWORD capitalKeyval = (KMX_DWORD) gdk_keyval_to_upper (kVal);
+	if( keyval !=0) {
+		gdk_keymap_get_entries_for_keyval(keymap, keyval, &keys, &n_keys);
 		for (int i = 0; i < n_keys; i++) {
 			if (keys[i].group == 0) {
 				shift = keys[i].level;
-				return Cap;
+				return capitalKeyval;
 			}
 		}
 	}
-	return Cap;
+	return capitalKeyval;
 }	
 
-void create_DKTable(v_dw_2D & dk_ComposeTable) {
+void create_DKTable(vec_dword_2D & dk_ComposeTable) {
   //create a 2D-Vector which contains data for ALL existing deadkey combinations on a Linux Keyboard:
   //dk_ComposeTable[i][0] : First    (e.g. dead_circumflex)
   //dk_ComposeTable[i][1] : Second   (e.g. a)
@@ -100,7 +100,7 @@ void create_DKTable(v_dw_2D & dk_ComposeTable) {
   //values taken from: https://help.ubuntu.com/community/GtkDeadKeyTable#Accents
 	// _S2 Do we want to use GTK instead of this function?
 
-  v_dw_1D line;
+  vec_dword_1D line;
 
 	line = createLine("dead_circumflex",  "a",  0x00E2, "small A with circumflex");
 	  dk_ComposeTable.push_back(line);	line.clear();

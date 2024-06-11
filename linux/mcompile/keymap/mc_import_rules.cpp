@@ -76,17 +76,17 @@ int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int
   if (!(keycode <= keycode_max))
     return 0;
 
-  KMX_DWORD KeyVal= (KMX_DWORD) KMX_get_KeyVal_From_KeyCode(keymap, keycode, ShiftState(shift_state_pos), caps);
-  std::u16string str = convert_DeadkeyValues_To_U16str(KeyVal);
+  KMX_DWORD keyVal= (KMX_DWORD) KMX_get_KeyVal_From_KeyCode(keymap, keycode, ShiftState(shift_state_pos), caps);
+  std::u16string str = convert_DeadkeyValues_To_U16str(keyVal);
   pwszBuff[0]= * (PKMX_WCHAR)  str.c_str();
 
 
   g_free(keyvals);
   g_free(maps);
 
-  if((KeyVal >=  deadkey_min) && (KeyVal <=  deadkey_max))          // deadkeys
+  if((keyVal >=  deadkey_min) && (keyVal <=  deadkey_max))          // deadkeys
     return -1;
-  else if(gdk_keyval_to_unicode(KeyVal)  == 0)                      // NO UNICODE
+  else if(gdk_keyval_to_unicode(keyVal)  == 0)                      // NO UNICODE
     return 0;
   else                                                              // usable char
     return 1;
@@ -241,7 +241,7 @@ public:
     return nkeys;
   }
 
-  bool KMX_LayoutRow(int MaxShiftState, LPKMX_KEY key, std::vector<DeadKey*> *deadkeys, int deadkeyBase, BOOL bDeadkeyConversion,v_dw_3D &All_Vector, GdkKeymap *keymap) {   // I4552
+  bool KMX_LayoutRow(int MaxShiftState, LPKMX_KEY key, std::vector<DeadKey*> *deadkeys, int deadkeyBase, BOOL bDeadkeyConversion,vec_dword_3D &All_Vector, GdkKeymap *keymap) {   // I4552
     // Get the CAPSLOCK value
    int capslock =
         (this->KMX_IsCapsEqualToShift() ? 1 : 0) |
@@ -362,12 +362,12 @@ int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
   return n;
 }
 
-bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap, std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
+bool KMX_ImportRules(LPKMX_KEYBOARD kp,vec_dword_3D  &All_Vector, GdkKeymap **keymap, std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
   KMX_Loader loader;
 
   std::vector<KMX_VirtualKey*> rgKey; //= new VirtualKey[256];
   std::vector<DeadKey*> alDead;
-  std::vector<DeadKey*> alDead_cpl = create_alDead();
+  std::vector<DeadKey*> alDead_cpl = create_deadkeys_by_basechar();
 
   rgKey.resize(256);
 
@@ -413,10 +413,10 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,v_dw_3D  &All_Vector, GdkKeymap **keymap,
             continue;
           }*/
 
-          KMX_DWORD KC_US = (KMX_DWORD) KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
+          KMX_DWORD kc_us = (KMX_DWORD) KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 
           for(int caps = 0; caps <= 1; caps++) {
-            int rc = KMX_ToUnicodeEx(KC_US, sbBuffer, ss, caps, *keymap);
+            int rc = KMX_ToUnicodeEx(kc_us, sbBuffer, ss, caps, *keymap);
 
             if(rc > 0) {
               if(*sbBuffer == 0) {

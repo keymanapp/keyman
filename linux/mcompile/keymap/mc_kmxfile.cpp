@@ -21,7 +21,7 @@ KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename) {
     return FALSE;
   }
 
-  KMX_DWORD err = KMX_WriteCompiledKeyboard(kbd, fp, FALSE);
+  KMX_DWORD err = KMX_WriteCompiledKeyboardToFile(kbd, fp, FALSE);
   fclose(fp);
 
   if(err != CERR_None) {
@@ -37,7 +37,7 @@ KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename) {
   return TRUE;
 }
 
-KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL FSaveDebug) {
+KMX_DWORD KMX_WriteCompiledKeyboardToFile(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL FSaveDebug) {
 
 	LPKMX_GROUP fgp;
 	LPKMX_STORE fsp;
@@ -102,22 +102,6 @@ KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL 
 	ck->dwFlags = fk->dwFlags;
 
 	offset = sizeof(KMX_COMP_KEYBOARD);
-
-	// ck->dpLanguageName = offset;
-	//wcscpy((PWSTR)(buf + offset), fk->szLanguageName);
-	//offset += wcslen(fk->szLanguageName)*2 + 2;
-
-	//ck->dpName = offset;
-	//wcscpy((PWSTR)(buf + offset), fk->szName);
-	//offset += wcslen(fk->szName)*2 + 2;
-
-	//ck->dpCopyright = offset;
-	//wcscpy((PWSTR)(buf + offset), fk->szCopyright);
-	//offset += wcslen(fk->szCopyright)*2 + 2;
-
-	//ck->dpMessage = offset;
-	//wcscpy((PWSTR)(buf + offset), fk->szMessage);
-	//offset += wcslen(fk->szMessage)*2 + 2;
 
 	ck->dpStoreArray = offset;
 	sp = (PKMX_COMP_STORE)(buf+offset);
@@ -196,12 +180,6 @@ KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL 
   } else {
     ck->dwBitmapSize = 0;
 	  ck->dpBitmapOffset = 0;
-  }
-
-	if(offset != size)
-  {
-    delete[] buf;
-    return CERR_SomewhereIGotItWrong;
   }
 
   fwrite(buf, size,1,hOutfile);

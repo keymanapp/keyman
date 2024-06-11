@@ -57,17 +57,16 @@ const KMX_DWORD KMX_VKMap[] = {
   0
 };
 
-typedef std::vector<std::string> v_str_1D;
+typedef std::vector<std::string> vec_string_1D;
 
-typedef std::vector<KMX_DWORD> v_dw_1D;
-typedef std::vector<std::vector<KMX_DWORD> > v_dw_2D;
-typedef std::vector<std::vector<std::vector<KMX_DWORD> > > v_dw_3D;
+typedef std::vector<KMX_DWORD> vec_dword_1D;
+typedef std::vector<std::vector<KMX_DWORD> > vec_dword_2D;
+typedef std::vector<std::vector<std::vector<KMX_DWORD> > > vec_dword_3D;
 
-static KMX_DWORD returnIfCharInvalid = 0;
+static KMX_DWORD INVALID_NAME = 0;
 static KMX_DWORD keycode_max = 94;
-static KMX_DWORD deadkey_min = 0xfe50;
-static KMX_DWORD deadkey_max = 0xfe93;
-//static KMX_DWORD deadkey_max = 0xfe52;  // _S2 TOP_6 TODO This has to go! my test: to only return 3 dk
+static KMX_DWORD deadkey_min = 0xfe50;		// X11's keysymdef.h defines deadkeys between 0xfe50-0xfe93
+static KMX_DWORD deadkey_max = 0xfe93;		// https://fossies.org/linux/tk/xlib/X11/keysymdef.h
 
 // map Shiftstate to modifier (e.g. 0->0; 16-1; 9->2; 25->3)
 int map_VKShiftState_to_LinModifier(int VKShiftState);
@@ -76,25 +75,25 @@ int map_VKShiftState_to_LinModifier(int VKShiftState);
 KMX_DWORD convertNamesTo_DWORD_Value(std::string tok_str);
 
 // create a Vector with all entries of both keymaps
-int createOneVectorFromBothKeyboards(v_dw_3D &All_Vector,GdkKeymap *keymap);
+int createOneVectorFromBothKeyboards(vec_dword_3D &All_Vector,GdkKeymap *keymap);
 
 // read configuration file, split and write to 3D-Vector (Data for US on Vector[0][ ][ ]  )
-int write_US_ToVector(v_dw_3D &vec, std::string language, const char *text);
+int write_US_ToVector(vec_dword_3D &vec, std::string language, const char *text);
 
 // 1. step: read complete Row of Configuration file US
-bool createCompleteRow_US(v_str_1D &complete_List, FILE *fpp, const char *text, std::string language);
+bool createCompleteVector_US(FILE *fpp, const char *text, vec_string_1D &complete_List);
 
 // replace Name of Key (e.g. <AD06>)  wih Keycode ( e.g. 15 )
 int replace_KeyName_with_Keycode(std::string  in);
 
 // 2. step: write contents to 3D vector
-int split_US_To_3D_Vector(v_dw_3D &all_US, v_str_1D completeList);
+int split_US_To_3D_Vector(vec_dword_3D &all_US, vec_string_1D completeList);
 
 // create an empty 2D vector containing 0 in all fields
-v_dw_2D create_empty_2D_Vector(int dim_rows, int dim_shifts);
+vec_dword_2D create_empty_2D_Vector(int dim_rows, int dim_shifts);
 
 // append characters to 3D-Vector using GDK (Data for underlying Language on Vector[1][ ][ ]  )
-int append_underlying_ToVector(v_dw_3D &All_Vector, GdkKeymap *keymap);
+int append_underlying_ToVector(vec_dword_3D &All_Vector, GdkKeymap *keymap);
 
 // initialize GDK
 bool InitializeGDK(GdkKeymap **keymap,int argc, gchar *argv[]);
@@ -512,16 +511,16 @@ int KMX_get_KeyVal_From_KeyCode(GdkKeymap *keymap, guint keycode, ShiftState ss,
 KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, guint keycode, int shift_state_pos);
 
 // fill Deadkey with dk and return CATEGORY
-KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, UINT VKShiftState, UINT KC_underlying, PKMX_WCHAR DeadKey);
+KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, UINT vk_ShiftState, UINT kc_underlying, PKMX_WCHAR deadkey);
 
 // use Vector to return the Keyval of underlying Keyboard
-KMX_WCHAR KMX_get_KeyValUnderlying_From_KeyValUS(v_dw_3D &All_Vector,KMX_DWORD VK_underlying);
+KMX_WCHAR KMX_get_KeyValUnderlying_From_KeyValUS(vec_dword_3D &All_Vector,KMX_DWORD VK_underlying);
 
 // use Vector to return the Keycode of the underlying Keyboard for given VK_US using GDK
-KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeyCodeUS(GdkKeymap *keymap, v_dw_3D &All_Vector,KMX_DWORD KC_US, ShiftState ss, int caps);
+KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeyCodeUS(GdkKeymap *keymap, vec_dword_3D &All_Vector,KMX_DWORD kc_us, ShiftState ss, int caps);
 
 // return the Keycode of the underlying Keyboard for given VK_US
-UINT KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD VirtualKeyUS);
+UINT KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD virtualKeyUS);
 
 // return the VirtualKey of the US Keyboard for a given Keyode using GDK
 KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode);
