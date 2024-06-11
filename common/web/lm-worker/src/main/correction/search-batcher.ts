@@ -1,63 +1,59 @@
 import { SearchNode, SearchResult } from "./distance-modeler.js";
 
-
+/**
+ * A helper class for ensuring that equally-likely corrections are returned
+ * from the correction-search on even footing.
+ *
+ * Pre-conditions:
+ * - entries should be examined in ascending-cost order.
+ */
 export class SearchBatcher {
-  currentCost = Number.MIN_SAFE_INTEGER;
-  entries: SearchResult[] = [];
+  private currentCost = Number.MIN_SAFE_INTEGER;
+  private entries: SearchResult[] = [];
 
-  // might should also include a 'base cost' parameter of sorts?
-  searchCache: {
-    [mapKey: string]: SearchNode;
-  };
-  currentReturns: {[mapKey: string]: SearchNode} = {};
+  private currentReturns: {[mapKey: string]: SearchNode} = {};
 
-  constructor(searchCache: typeof SearchBatcher.prototype.searchCache) {
-    this.searchCache = searchCache;
+  constructor() {
   }
 
-  checkAndAdd(entry: SearchNode): SearchResult[] | null {
-    var result: SearchResult[] = null;
+  /**
+   * Gets the cost of results currently batched together.
+   * All added entries should have matching `batchCost`.
+   */
+  get batchCost(): number {
+    return this.currentCost;
+  }
 
-    if(entry.currentCost > this.currentCost) {
-      result = this.tryFinalize();
-
-      this.currentCost = entry.currentCost;
-    }
-
-    // Filter out any duplicated match sequences.  The same match sequence may be reached via
-    // different input sequences, after all.
-    let outputMapKey = entry.calculation.matchSequence.map(value => value.key).join('');
-
-    const searchCache = this.searchCache;
-    // First, ensure the edge has an existing 'shared' cache entry.
-    if(!searchCache[outputMapKey]) {
-      searchCache[outputMapKey] = entry;
-    }
-
+  /**
+   * Adds a new entry to the 'batch' currently under construction.  Its cost
+   * should match `this.batchCost`.
+   * @param entry
+   */
+  add(entry: SearchNode): void {
+    // While not checked, the usage pattern intended for this class would assert that
+    // `entry.currentCost == this.batchCost`.
     const currentReturns = this.currentReturns;
-
-    // Check the generator's local returned-value cache - this determines
-    // whether or not we need to add a new 'return' to the batch.
-    //
-    // Is not necessarily the same as `searchCache`.  In particular, on
-    // revisiting the context state, `searchCache` is used to rebuild
-    // `currentReturns` in order to efficiently rebuild results that have
-    // already been iterated through once.
-    if(!currentReturns[outputMapKey]) {
+    if(!currentReturns[entry.resultKey]) {
       this.entries.push(new SearchResult(entry));
-      currentReturns[outputMapKey] = entry;
+      currentReturns[entry.resultKey] = entry;
     }
-
-    return result;
   }
 
-  tryFinalize(): SearchResult[] | null {
-    var result: SearchResult[] = null;
-    if(this.entries.length > 0) {
-      result = this.entries;
-      this.entries = [];
+  /**
+   * Finalizes the current batch, returning it if not empty.  Also updates
+   * the `.batchCost` to use for the next attempt at batching.
+   * @param nextCost
+   * @returns
+   */
+  finalizeBatch(nextCost: number): SearchResult[] | null {
+    this.currentCost = nextCost;
+
+    if(this.entries.length == 0) {
+      return null;
     }
 
+    const result: SearchResult[] = this.entries;
+    this.entries = [];
     return result;
   }
 }

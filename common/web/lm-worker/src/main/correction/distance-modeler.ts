@@ -201,12 +201,27 @@ export class SearchNode {
     return edges;
   }
 
-  get mapKey(): string {
+  /**
+   * A key uniquely identifying identical search path nodes.  Replacement of a keystroke's
+   * text in a manner that results in identical path to a different keystroke should result
+   * in both path nodes sharing the same pathKey value.
+   */
+  get pathKey(): string {
     let inputString = this.priorInput.map((value) => '+' + value.sample.insert + '-' + value.sample.deleteLeft).join('');
     let matchString =  this.calculation.matchSequence.map((value) => value.key).join('');
 
     // TODO:  might should also track diagonalWidth.
     return inputString + SENTINEL_CODE_UNIT + matchString;
+  }
+
+  /**
+   * A key uniquely identifying identical match sequences.  Reaching the same net result
+   * by different paths should result in identical `resultKey` values.
+   */
+  get resultKey(): string {
+    // Filter out any duplicated match sequences.  The same match sequence may be reached via
+    // different input sequences, after all.
+    return this.calculation.matchSequence.map(value => value.key).join('');
   }
 
   get isFullReplacement(): boolean {
@@ -491,11 +506,11 @@ export class SearchSpace {
 
     // Have we already processed a matching edge?  If so, skip it.
     // We already know the previous edge is of lower cost.
-    if(this.processedEdgeSet[currentNode.mapKey]) {
+    if(this.processedEdgeSet[currentNode.pathKey]) {
       this.selectionQueue.enqueue(bestTier);
       return unmatchedResult;
     } else {
-      this.processedEdgeSet[currentNode.mapKey] = true;
+      this.processedEdgeSet[currentNode.pathKey] = true;
     }
 
     // Stage 1:  filter out nodes/edges we want to prune
@@ -711,7 +726,7 @@ export class SearchSpace {
       }
     }
 
-    let batcher = new SearchBatcher(this.returnedValues);
+    let batcher = new SearchBatcher();
 
     const timer = new ExecutionTimer(maxTime*1.5, maxTime);
 
@@ -732,21 +747,18 @@ export class SearchSpace {
           continue;
         }
 
-        let batch = batcher.checkAndAdd(entry);
+        let batch: SearchResult[];
+        if(entry.currentCost > batcher.batchCost) {
+          batch = batcher.finalizeBatch(entry.currentCost);
+        }
+        batcher.add(entry);
+
         timer.markIteration();
 
         if(batch) {
           // Do not track yielded time.
           yield batch;
         }
-      }
-
-      // As we only return a batch once all entries of the same cost have been processed, we can safely
-      // finalize the last preprocessed group without issue.
-      let batch = batcher.tryFinalize();
-      if(batch) {
-        // Do not track yielded time.
-        yield batch;
       }
     }
 
@@ -765,30 +777,44 @@ export class SearchSpace {
         if(timer.shouldTimeout()) {
           timedOut = true;
         }
+
+        let batch: SearchResult[];
+        if(newResult.type != 'none' && newResult.cost > batcher.batchCost) {
+          batch = batcher.finalizeBatch(newResult.cost);
+        }
+
+        if(batch) {
+          yield batch;
+        }
       } while(!timedOut && newResult.type == 'intermediate')
 
-      // TODO:  check 'cost' on intermediate, running it through batcher to early-detect cost changes.
-      let batch: SearchResult[];
       if(newResult.type == 'none') {
         break;
       } else if(newResult.type == 'complete') {
+        const node = newResult.finalNode;
+
         // Is the entry a reasonable result?
-        if(newResult.finalNode.isFullReplacement) {
+        if(node.isFullReplacement) {
           // If the entry's 'match' fully replaces the input string, we consider it
           // unreasonable and ignore it.  Also, if we've reached this point...
           // we can(?) assume that everything thereafter is as well.
           break;
         }
-        batch = batcher.checkAndAdd(newResult.finalNode);
-      }
 
-      if(batch) {
-        yield batch;
+        // no need to compare batch-cost here - we already did so within the do-while
+        // before breaking out of it.
+        batcher.add(node);
+
+        const searchCache = this.returnedValues;
+        // Ensure the edge has an existing 'shared' cache entry.
+        if(!searchCache[node.resultKey]) {
+          searchCache[node.resultKey] = node;
+        }
       }
     } while(!timedOut && this.hasNextMatchEntry());
 
     // If we _somehow_ exhaust all search options, make sure to return the final results.
-    let batch = batcher.tryFinalize();
+    let batch = batcher.finalizeBatch(Number.MAX_VALUE);
     if(batch) {
       yield batch;
     }
