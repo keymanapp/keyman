@@ -21,7 +21,7 @@ builder_describe "Build Keyman Developer web utility module" \
 
 builder_describe_outputs \
   configure     /node_modules \
-  build         /developer/src/common/web/utils/build/index.js
+  build         /developer/src/common/web/utils/build/src/index.js
 
 builder_parse "$@"
 
@@ -34,7 +34,10 @@ builder_run_action build       tsc --build
 if builder_start_action test; then
   eslint .
   tsc --build test
-  c8 --reporter=lcov --reporter=text --exclude-after-remap mocha
+  readonly C8_THRESHOLD=60
+  c8 --reporter=lcov --reporter=text --exclude-after-remap --lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD mocha
+  builder_echo warning "Coverage thresholds are currently $C8_THRESHOLD%, which is lower than ideal."
+  builder_echo warning "Please increase threshold in build.sh as test coverage improves."
   builder_finish_action success test
 fi
 

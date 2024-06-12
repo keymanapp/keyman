@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { assert } from 'chai';
 import 'mocha';
 import { makePathToFixture } from './helpers/index.js';
-import { validateMITLicense } from '../src/validate-mit-license.js';
+import { validateMITLicense } from '../src/utils/validate-mit-license.js';
 
 function verifyLicenseFile(filename: string) {
   return validateMITLicense(fs.readFileSync(makePathToFixture('license', filename), 'utf-8'));

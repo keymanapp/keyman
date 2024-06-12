@@ -1,6 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
-import { CompilerCallbacks, CompilerFileCallbacks, KeymanDeveloperProject, KeymanDeveloperProjectFile, KeymanDeveloperProjectType, KeymanFileTypes } from '@keymanapp/common-types';
+import { CompilerCallbacks, CompilerFileCallbacks, KeymanFileTypes } from '@keymanapp/common-types';
+import { KeymanDeveloperProject, KeymanDeveloperProjectFile, KeymanDeveloperProjectType } from '@keymanapp/developer-utils';
 import { BuildActivity } from './BuildActivity.js';
 import { buildActivities, buildKeyboardInfoActivity, buildModelInfoActivity } from './buildActivities.js';
 import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';

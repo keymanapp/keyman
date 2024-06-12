@@ -1,9 +1,8 @@
-import * as xml2js from '../deps/xml2js/xml2js.js';
+import { xml2js } from '@keymanapp/common-types';
 import { KPJFile, KPJFileProject } from './kpj-file.js';
-import { boxXmlArray } from '../util/util.js';
+import { util } from '@keymanapp/common-types';
 import { KeymanDeveloperProject, KeymanDeveloperProjectFile10, KeymanDeveloperProjectType } from './keyman-developer-project.js';
-import { CompilerCallbacks } from '../util/compiler-interfaces.js';
-import SchemaValidators from '../schema-validators.js';
+import { CompilerCallbacks, SchemaValidators } from '@keymanapp/common-types';
 
 export class KPJFileReader {
   constructor(private callbacks: CompilerCallbacks) {
@@ -29,7 +28,7 @@ export class KPJFileReader {
     });
     data = this.boxArrays(data);
     if(data.KeymanDeveloperProject?.Files?.File?.length) {
-      for(let file of data.KeymanDeveloperProject?.Files?.File) {
+      for(const file of data.KeymanDeveloperProject?.Files?.File) {
         // xml2js imports <Details/> as '' so we will just delete the empty string
         if(typeof file.Details == 'string') {
           delete file.Details;
@@ -40,11 +39,11 @@ export class KPJFileReader {
   }
 
   public validate(source: KPJFile): void {
-    if(!SchemaValidators.kpj(source)) {
-      if(!SchemaValidators.kpj90(source)) {
+    if(!SchemaValidators.default.kpj(source)) {
+      if(!SchemaValidators.default.kpj90(source)) {
         // If the legacy schema also does not validate, then we will only report
         // the errors against the modern schema
-        throw new Error(JSON.stringify((<any>SchemaValidators.kpj).errors));
+        throw new Error(JSON.stringify((<any>SchemaValidators.default.kpj).errors));
       }
     }
   }
@@ -60,8 +59,8 @@ export class KPJFileReader {
     // NOTE: at this point, the xml should have been validated
     // and matched the schema result so we can assume the source
     // is a valid shape
-    let project = source.KeymanDeveloperProject;
-    let result: KeymanDeveloperProject = new KeymanDeveloperProject(projectFilename, project.Options?.Version || "1.0", this.callbacks);
+    const project = source.KeymanDeveloperProject;
+    const result: KeymanDeveloperProject = new KeymanDeveloperProject(projectFilename, project.Options?.Version || "1.0", this.callbacks);
     if(result.options.version == '2.0') {
       result.options.buildPath = (project.Options?.BuildPath || result.options.buildPath).replace(/\\/g, '/');
       result.options.sourcePath = (project.Options?.SourcePath || result.options.sourcePath).replace(/\\/g, '/');
@@ -88,9 +87,9 @@ export class KPJFileReader {
   }
 
   private transformFilesVersion10(project: KPJFileProject, result: KeymanDeveloperProject) {
-    let ids: { [id: string]: KeymanDeveloperProjectFile10; } = {};
-    for (let sourceFile of project.Files?.File) {
-      let file: KeymanDeveloperProjectFile10 = new KeymanDeveloperProjectFile10(
+    const ids: { [id: string]: KeymanDeveloperProjectFile10; } = {};
+    for (const sourceFile of project.Files?.File) {
+      const file: KeymanDeveloperProjectFile10 = new KeymanDeveloperProjectFile10(
         sourceFile.ID || '',
         (sourceFile.Filepath || '').replace(/\\/g, '/'),
         sourceFile.FileVersion || '',
@@ -123,7 +122,7 @@ export class KPJFileReader {
     if(!source.KeymanDeveloperProject.Files || typeof source.KeymanDeveloperProject.Files == 'string') {
       source.KeymanDeveloperProject.Files = {File:[]};
     }
-    boxXmlArray(source.KeymanDeveloperProject.Files, 'File');
+    util.boxXmlArray(source.KeymanDeveloperProject.Files, 'File');
     return source;
   }
 }
