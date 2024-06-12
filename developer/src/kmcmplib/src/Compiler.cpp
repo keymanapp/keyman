@@ -1210,7 +1210,7 @@ int GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store) {
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString) {   // I4140
   /**
     version format: /^\d+(\.\d+)*$/
-    e.g. 9.0.3, 1.0, 1.2.3.4, 6.2.1.4.6.4, 11.22.3 are all ok; 
+    e.g. 9.0.3, 1.0, 1.2.3.4, 6.2.1.4.6.4, 11.22.3 are all ok;
     empty string is not permitted; whitespace is not permitted
   */
 
@@ -1471,7 +1471,14 @@ KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnico
 
     str = p + 1;
     if ((msg = GetXString(fk, str, u">", pklKey, GLOBAL_BUFSIZE - 1, (int)(str - pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
+
     if (pklKey[0] == 0) return CERR_ZeroLengthString;
+
+    if(Uni_IsSurrogate1(pklKey[0])) {
+      // #11643: non-BMP characters do not makes sense for key codes
+      return CERR_NonBMPCharactersNotSupportedInKeySection;
+    }
+
     if (xstrlen(pklKey) > 1) AddWarning(CWARN_KeyBadLength);
   } else {
     if ((msg = GetXString(fk, str, u">", pklIn, GLOBAL_BUFSIZE - 1, (int)(str - pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
@@ -1653,9 +1660,10 @@ KMX_DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, KMX_DWORD storeIndex)
       default:
         return CERR_CodeInvalidInKeyStore;
       }
-    }
-    else
-    {
+    } else if(Uni_IsSurrogate1(*pn)) {
+      // #11643: non-BMP characters do not makes sense for key codes
+      return CERR_NonBMPCharactersNotSupportedInKeySection;
+    } else {
       k->Key = *pn;				// set the key to store offset.
       k->ShiftFlags = 0;
     }
