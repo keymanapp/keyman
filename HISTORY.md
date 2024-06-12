@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.54 alpha 2024-06-12
+
+* fix(common): remove subpackage entries for older TS version (#11745)
+* chore(common): end use of ts-node (#11746)
+* feat(web): add bulk_render variant that loads and renders keyboards from local KMP (#10432)
+
 ## 18.0.53 alpha 2024-06-10
 
 * fix(android): check current orientation when redisplaying system keyboard (#11604)
