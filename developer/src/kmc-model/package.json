@@ -33,7 +33,7 @@
     "@keymanapp/common-types": "*",
     "@keymanapp/keyman-version": "*",
     "@keymanapp/models-types": "*",
-    "typescript": "^4.9.5"
+    "typescript": "^5.4.5"
   },
   "devDependencies": {
     "@keymanapp/developer-test-helpers": "*",
