@@ -5,10 +5,9 @@ import Hexy from 'hexy';
 import gitDiff from 'git-diff';
 const { hexy } = Hexy;
 import { makePathToFixture } from '../helpers/index.js';
-import KvksFileReader from "../../src/kvk/kvks-file-reader.js";
-import KvkFileReader from "../../src/kvk/kvk-file-reader.js";
-import KvkFileWriter from "../../src/kvk/kvk-file-writer.js";
-import KvksFileWriter from "../../src/kvk/kvks-file-writer.js";
+import KvksFileReader from "../../src/types/kvks/kvks-file-reader.js";
+import { KvkFileReader, KvkFileWriter } from "@keymanapp/common-types";
+import KvksFileWriter from "../../src/types/kvks/kvks-file-writer.js";
 
 /**
  *

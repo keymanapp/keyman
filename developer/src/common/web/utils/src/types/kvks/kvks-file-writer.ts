@@ -1,7 +1,12 @@
-import * as xml2js from '../deps/xml2js/xml2js.js';
+import { VisualKeyboard as VK, Constants, xml2js } from '@keymanapp/common-types';
 import KVKSourceFile, { KVKSEncoding, KVKSFlags, KVKSKey, KVKSLayer } from './kvks-file.js';
-import { VisualKeyboard, VisualKeyboardHeaderFlags, VisualKeyboardKeyFlags, VisualKeyboardLegalShiftStates, VisualKeyboardShiftState } from './visual-keyboard.js';
-import { USVirtualKeyCodes } from '../consts/virtual-key-constants.js';
+
+import USVirtualKeyCodes = Constants.USVirtualKeyCodes;
+import VisualKeyboard = VK.VisualKeyboard;
+import VisualKeyboardHeaderFlags = VK.VisualKeyboardHeaderFlags;
+import VisualKeyboardKeyFlags = VK.VisualKeyboardKeyFlags;
+import VisualKeyboardLegalShiftStates = VK.VisualKeyboardLegalShiftStates;
+import VisualKeyboardShiftState = VK.VisualKeyboardShiftState;
 
 export default class KVKSFileWriter {
   public write(vk: VisualKeyboard): string {

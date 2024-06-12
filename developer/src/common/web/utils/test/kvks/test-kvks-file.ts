@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import 'mocha';
 import { makePathToFixture } from '../helpers/index.js';
-import KvksFileReader from "../../src/kvk/kvks-file-reader.js";
-import KvksFileWriter from "../../src/kvk/kvks-file-writer.js";
+import KvksFileReader from "../../src/types/kvks/kvks-file-reader.js";
+import KvksFileWriter from "../../src/types/kvks/kvks-file-writer.js";
 import { verify_khmer_angkor, verify_balochi_inpage } from './test-kvk-utils.js';
 import { assert } from 'chai';
 

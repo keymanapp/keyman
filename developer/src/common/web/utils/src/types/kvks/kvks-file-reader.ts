@@ -1,10 +1,18 @@
-import * as xml2js from '../deps/xml2js/xml2js.js';
+import { SchemaValidators as SV, KvkFile, xml2js, util, Constants } from '@keymanapp/common-types';
 import KVKSourceFile from './kvks-file.js';
-import { boxXmlArray } from '../util/util.js';
-import { DEFAULT_KVK_FONT, VisualKeyboard, VisualKeyboardHeaderFlags, VisualKeyboardKey, VisualKeyboardKeyFlags, VisualKeyboardLegalShiftStates, VisualKeyboardShiftState } from './visual-keyboard.js';
-import { USVirtualKeyCodes } from '../consts/virtual-key-constants.js';
-import { BUILDER_KVK_HEADER_VERSION, KVK_HEADER_IDENTIFIER_BYTES } from './kvk-file.js';
-import SchemaValidators from '../schema-validators.js';
+const SchemaValidators = SV.default;
+import boxXmlArray = util.boxXmlArray;
+import USVirtualKeyCodes = Constants.USVirtualKeyCodes;
+import { VisualKeyboard as VK } from '@keymanapp/common-types';
+import DEFAULT_KVK_FONT = VK.DEFAULT_KVK_FONT;
+import VisualKeyboard = VK.VisualKeyboard;
+import VisualKeyboardHeaderFlags = VK.VisualKeyboardHeaderFlags;
+import VisualKeyboardKey = VK.VisualKeyboardKey;
+import VisualKeyboardKeyFlags = VK.VisualKeyboardKeyFlags;
+import VisualKeyboardLegalShiftStates = VK.VisualKeyboardLegalShiftStates;
+import VisualKeyboardShiftState = VK.VisualKeyboardShiftState;
+import BUILDER_KVK_HEADER_VERSION = KvkFile.BUILDER_KVK_HEADER_VERSION;
+import KVK_HEADER_IDENTIFIER_BYTES = KvkFile.KVK_HEADER_IDENTIFIER_BYTES;
 
 
 export default class KVKSFileReader {
