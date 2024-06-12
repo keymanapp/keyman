@@ -51,7 +51,6 @@
     "git-diff": "^2.0.6",
     "hexy": "^0.3.4",
     "mocha": "^8.4.0",
-    "ts-node": "^9.1.1",
     "typescript": "^5.4.5"
   },
   "mocha": {

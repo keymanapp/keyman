@@ -131,7 +131,7 @@ function test_server() {
   # eslint .
   tsc --build test
   # c8 --reporter=lcov --reporter=text
-  mocha
+  mocha --recursive build/test
 }
 
 function publish_server() {
