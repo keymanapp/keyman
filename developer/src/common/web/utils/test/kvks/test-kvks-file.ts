@@ -8,7 +8,7 @@ import { assert } from 'chai';
 
 describe('kvks-file-reader', function() {
   it('should read a valid file', function() {
-    const path = makePathToFixture('kvk', 'khmer_angkor.kvks');
+    const path = makePathToFixture('kvks', 'khmer_angkor.kvks');
     const input = fs.readFileSync(path);
 
     const reader = new KvksFileReader();
@@ -23,7 +23,7 @@ describe('kvks-file-reader', function() {
   });
 
   it('should read a valid file with bitmaps', function() {
-    const path = makePathToFixture('kvk', 'balochi_inpage.kvks');
+    const path = makePathToFixture('kvks', 'balochi_inpage.kvks');
     const input = fs.readFileSync(path);
     const reader = new KvksFileReader();
     const kvks = reader.read(input);
@@ -34,7 +34,7 @@ describe('kvks-file-reader', function() {
   });
 
   it('should give a sensible error on a .kvk file', function() {
-    const path = makePathToFixture('kvk', 'khmer_angkor.kvk');
+    const path = makePathToFixture('kvks', 'khmer_angkor.kvk');
     const input = fs.readFileSync(path);
 
     const reader = new KvksFileReader();
@@ -44,7 +44,7 @@ describe('kvks-file-reader', function() {
 
 describe('kvks-file-writer', function() {
   it('should write a valid file', function() {
-    const path = makePathToFixture('kvk', 'khmer_angkor.kvks');
+    const path = makePathToFixture('kvks', 'khmer_angkor.kvks');
     const input = fs.readFileSync(path);
 
     const reader = new KvksFileReader();
