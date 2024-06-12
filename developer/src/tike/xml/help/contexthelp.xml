@@ -102,7 +102,7 @@
        ======================================================================== -->
 
   <Form Name="context/keyboard-editor">
-    <Control Name="pages" Title="Packaging your Keyboard">
+    <Control Name="pages" Title="Keyboard Editor">
       <p>Keyboard Editor page consists of:
         <ul>
           <li>Details</li>
