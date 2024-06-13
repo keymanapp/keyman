@@ -19,6 +19,7 @@
 #ifdef _MSC_VER
 #else
 #include <unistd.h>
+#include <cstring>
 #endif
 
 using namespace std;
