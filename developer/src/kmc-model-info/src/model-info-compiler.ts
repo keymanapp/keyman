@@ -7,7 +7,7 @@ import { minKeymanVersion } from "./min-keyman-version.js";
 import { ModelInfoFile } from "./model-info-file.js";
 import { CompilerCallbacks, CompilerOptions, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KmpJsonFile } from "@keymanapp/common-types";
 import { ModelInfoCompilerMessages } from "./model-info-compiler-messages.js";
-import { KeymanUrls, validateMITLicense } from "@keymanapp/developer-utils";
+import { KeymanUrls, isValidEmail, validateMITLicense } from "@keymanapp/developer-utils";
 
 /* c8 ignore start */
 /**
@@ -188,6 +188,11 @@ export class ModelInfoCompiler implements KeymanCompiler {
       const match = author.url.match(/^(mailto\:)?(.+)$/);
       /* c8 ignore next 3 */
       if (match === null) {
+        this.callbacks.reportMessage(ModelInfoCompilerMessages.Error_InvalidAuthorEmail({email:author.url}));
+        return null;
+      }
+
+      if(!isValidEmail(match[2])) {
         this.callbacks.reportMessage(ModelInfoCompilerMessages.Error_InvalidAuthorEmail({email:author.url}));
         return null;
       }
