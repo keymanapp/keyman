@@ -8,9 +8,9 @@ import { SourcemappedWorker } from '@keymanapp/lexical-model-layer/web'
   * This can only be done during load when the active script will be the
   * last script loaded.  Otherwise the script must be identified by name.
  */
- var scripts = document.getElementsByTagName('script');
- var ss = scripts[scripts.length-1].src;
- var sPath = ss.substr(0,ss.lastIndexOf('/')+1);
+const scripts = document.getElementsByTagName('script');
+const ss = scripts[scripts.length-1].src;
+const sPath = ss.substring(0,ss.lastIndexOf('/')+1);
 
 // @ts-ignore
 window['keyman'] = new KeymanEngine(SourcemappedWorker.constructInstance(), sPath);
