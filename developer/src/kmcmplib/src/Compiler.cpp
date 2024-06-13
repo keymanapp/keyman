@@ -1191,11 +1191,11 @@ int GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store) {
     if(AnyTarget == token) {
       result |= COMPILETARGETS_KMX | COMPILETARGETS_JS;
     }
-    for(auto p: KMXKeymanTargets) {
-      if(p == token) result |= COMPILETARGETS_KMX;
+    for(auto target: KMXKeymanTargets) {
+      if(target == token) result |= COMPILETARGETS_KMX;
     }
-    for(auto p: KMWKeymanTargets) {
-      if(p == token) result |= COMPILETARGETS_JS;
+    for(auto target: KMWKeymanTargets) {
+      if(target == token) result |= COMPILETARGETS_JS;
     }
 
     token = u16tok(nullptr, u" ", &ctx);
