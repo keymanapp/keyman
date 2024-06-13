@@ -89,10 +89,8 @@ kmc_root = meson.current_source_dir() / '../../../../developer/src/kmc/build/src
 kmc_cmd = [node, '--enable-source-maps', kmc_root]
 
 if build_machine.system() == 'windows'
-  copy_cmd = [find_program('cmd.exe', required: true), '/c', 'copy']
-  cat_cmd = [find_program('cmd.exe', required: true), '/c', 'type']
+  cat_cmd = [find_program(meson.current_source_dir() / 'cat.bat', required: true)]
 else
-  copy_cmd = [find_program('cp', required: true)]
   cat_cmd = [find_program('cat', required: true)]
 endif
 
@@ -127,7 +125,7 @@ foreach kbd : tests
   kbd_src_path = common_test_keyboards_baseline / kbd + '.kmn'
 
   content = run_command(
-    cat_cmd, files(kbd_src_path),
+    cat_cmd, files(kbd_src_path), check: true,
   ).stdout().strip()
 
   cfg = configuration_data()

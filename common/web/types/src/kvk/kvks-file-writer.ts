@@ -1,4 +1,4 @@
-import * as xml2js from 'xml2js';
+import * as xml2js from '../deps/xml2js/xml2js.js';
 import KVKSourceFile, { KVKSEncoding, KVKSFlags, KVKSKey, KVKSLayer } from './kvks-file.js';
 import { VisualKeyboard, VisualKeyboardHeaderFlags, VisualKeyboardKeyFlags, VisualKeyboardLegalShiftStates, VisualKeyboardShiftState } from './visual-keyboard.js';
 import { USVirtualKeyCodes } from '../consts/virtual-key-constants.js';

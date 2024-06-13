@@ -228,8 +228,10 @@ bool has_nfd_boundary_before(km_core_usv cp) {
 }
 
 /**
- * Helper to convert icu::UnicodeString to a UTF-32 km_core_usv buffer,
- * nul-terminated
+ * Helper to convert std::u32string to a UTF-32 km_core_usv buffer,
+ * nul-terminated.
+ * Parallel to unicode_string_to_usv()
+ * @returns new buffer, caller owns storage
  */
 km_core_usv *string_to_usv(const std::u32string& src) {
   return km::core::kmx::u32dup(src.c_str());

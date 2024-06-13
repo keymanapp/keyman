@@ -31,9 +31,10 @@
   "dependencies": {
     "@keymanapp/ldml-keyboard-constants": "*",
     "@keymanapp/keyman-version": "*",
-    "restructure": "git+https://github.com/keymanapp/dependency-restructure.git#7a188a1e26f8f36a175d95b67ffece8702363dfc",
+    "restructure": "3.0.1",
     "semver": "^7.5.2",
-    "xml2js": "git+https://github.com/keymanapp/dependency-node-xml2js#535fe732dc408d697e0f847c944cc45f0baf0829"
+    "sax": ">=0.6.0",
+    "xmlbuilder": "~11.0.0"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
@@ -50,8 +51,7 @@
     "git-diff": "^2.0.6",
     "hexy": "^0.3.4",
     "mocha": "^8.4.0",
-    "ts-node": "^9.1.1",
-    "typescript": "^4.9.5"
+    "typescript": "^5.4.5"
   },
   "mocha": {
     "spec": "build/test/**/test-*.js",
@@ -70,6 +70,7 @@
     ],
     "exclude-after-remap": true,
     "exclude": [
+      "src/deps/",
       "src/kmx/kmx-plus-builder/",
       "src/kmx/kmx-plus.ts",
       "src/kmx/kmx-builder.ts",

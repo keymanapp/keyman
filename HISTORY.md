@@ -1,5 +1,66 @@
 # Keyman Version History
 
+## 18.0.55 alpha 2024-06-13
+
+* fix(developer): handle missing OSK when importing a Windows keyboard into a touch-only project (#11720)
+* fix(developer): verify email addresses in .kps and .keyboard_info (#11735)
+* change(web): prep for better asynchronous prediction handling (#10343)
+
+## 18.0.54 alpha 2024-06-12
+
+* fix(common): remove subpackage entries for older TS version (#11745)
+* chore(common): end use of ts-node (#11746)
+* feat(web): add bulk_render variant that loads and renders keyboards from local KMP (#10432)
+
+## 18.0.53 alpha 2024-06-10
+
+* fix(android): check current orientation when redisplaying system keyboard (#11604)
+* fix(android): fix keyboard size after rotation and restore via onSizeChanged, after layout (#11722)
+* fix(developer): fix kmcmplib unit-test include paths (#11749)
+
+## 18.0.52 alpha 2024-06-08
+
+* fix(developer): prevent two touch layout editors opening for the same file (#11717)
+* chore(common): cleanup meson deprecations and warnings (#11523)
+* feat(developer): support language reference in context help (#11737)
+* test(developer): kmcmplib compiler unit tests (#11378)
+
+## 18.0.51 alpha 2024-06-07
+
+* fix(web): fix osk touch-focus tracking (#11705)
+* fix(web): defer keyboard activation requests made during engine initialization (#11713)
+* chore(developer): add context/character-map (#11656)
+* chore(developer): add context/wordlist-editor (#11658)
+* chore(developer): add context/new-model-project-parameters (#11677)
+* fix(common): remove allowJs from web's tsconfig.base.json (#11718)
+* change(web): precompile all TS-based tests (#11723)
+* chore(developer): add extra logging for assertion failure when pressing backspace in debugger (#11707)
+* chore: add cherry-pick information in commit messages (#11708)
+* fix(developer): handle encoding errors when loading wordlists (#11711)
+* chore(ios): remove dead Swift-side keyboard gesture code (#11672)
+* fix(mac): change build configuration to prevent cycle error in Xcode 15 (#11730)
+* refactor(web): Replace deprecated substr with substring (#11637)
+
+## 18.0.50 alpha 2024-06-06
+
+* chore(common): adds retry mechanism for build script npm ci calls (#11451)
+* fix(web): get row-height for flick constraints after performing layout (#11691)
+* chore(ios): enable webview debugging (#11229)
+* fix(android): handle `IllegalArgumentException` when initializing `CloudDownloadMgr`, add logging to check for unhandled side-effects (#11626)
+* chore: replace git dep on restructure with 3.0.1 in npm (#11657)
+* chore: move xml2js into the repo to eliminate npm git dependency (#11660)
+* chore(common): move CLDR import copy into build step for common/web/types (#11690)
+* fix(developer): handle editor initializing after debugger when setting execution point (#11587)
+* fix(developer): treat js files with unrecognized encodings as non-keyboard files (#11698)
+* fix(developer): disable example edit controls if no examples in Package Editor (#11701)
+
+## 18.0.49 alpha 2024-06-05
+
+* fix(web): revert #11598 to eliminate use of `finalInput` which caused crash after moving caret (#11685)
+* fix(common): correctly display result of multiple option parameters in builder (#11679)
+* fix(linux): specify path with package name (#11694)
+* fix(linux): remove debug output and re-enable failures (#11695)
+
 ## 18.0.48 alpha 2024-06-04
 
 * fix(linux): add debug output (#11668)
