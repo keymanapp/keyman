@@ -55,7 +55,7 @@ write_nfd_table() {
 
   // collect the raw list of chars that do NOT have a boundary before them.
   std::vector<km_core_usv> noBoundary;
-  for (km_core_usv ch = 0; ch < 0x10FFFF; ch++) {
+  for (km_core_usv ch = 0; ch < km::core::kmx::Uni_MAX_CODEPOINT; ch++) {
     bool bb = nfd->hasBoundaryBefore(ch);
     assert(!(ch == 0 && !bb)); // assert that we can use U+0000 as a terminator
     if (bb) continue; //only emit nonboundary
