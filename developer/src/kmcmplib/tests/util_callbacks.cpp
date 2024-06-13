@@ -16,7 +16,7 @@ int msgproc(int line, uint32_t dwMsgCode, const char* szText, void* context) {
     case CERR_ERROR:   t="  error"; break;
     case CERR_FATAL:   t="  fatal"; break;
   }
-  printf("line %d  %s %04.4x:  %s\n", line, t, (unsigned int)dwMsgCode, szText);
+  printf("line %d  %s %4.4x:  %s\n", line, t, (unsigned int)dwMsgCode, szText);
 	return 1;
 }
 
