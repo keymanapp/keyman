@@ -937,6 +937,92 @@
     </Control>
   </Form>
 
+  <!-- New Project Parameters-->
+  <Form Name="context/new-project-parameters">
+    <Control Name="editKeyboardName" Title="Keyboard name">
+    <p>The descriptive name of the keyboard. This will be set in the <u>&amp;Name</u> store in the keyboard, 
+    in the package name, and where appropriate in documentation and metadata.</p>
+    </Control>
+    <Control Name="memoDescription" Title="Description">
+    <p>A brief or long description about the keyboard's functionality, background, script, language, community,
+    or any information related to showcase to users.</p>
+    </Control>
+    <Control Name="editAuthor" Title="Author">
+    <p>The name of the developer of the keyboard. This is either your full name or 
+      the organization you're creating the keyboard for.</p>
+    </Control>
+    <Control Name="editCopyright" Title="Copyright">
+    <p>This field should contain the word "Copyright", the copyright symbol "©", and the full name of the rights 
+	      owner. Do not put the year of copyright in this field (see Full Copyright). Typically, 
+	      you can use the automatically generated default value: "Copyright © Your Full Name or 
+	      Your Organization".</p>
+    <p>A copyright string for the keyboard. This will be set in the <u>&amp;Copyright</u> store in the keyboard, 
+    in the package metadata, and where appropriate in documentation and metadata.</p>
+    </Control>
+    <Control Name="editFullCopyright" Title="Full Copyright">
+    <p>Who owns the rights to this keyboard? This field should
+	      contain the word "Copyright", the copyright symbol "©", the first year of copyright, 
+	      and the full name of the rights owner. Do include the year of copyright in this field.
+	      Typically, you can use the automatically generated default value: 
+	      "Copyright © Current-Year Your-Full Name or Your Organization".</p>
+    </Control>
+    <Control Name="editVersion" Title="Version">
+    <p>If this is the first time you've created a keyboard for the language, you should 
+      leave the version as 1.0. Otherwise, your version number must conform to the following 
+      rules: A version string made of major revision number.minor revision number.</p>
+    </Control>
+    <Control Name="clbTargets" Title="Targets">
+    <p>
+      Specifies the default deployment targets for the keyboard, set in the <u>&amp;Targets</u> store in the keyboard, 
+      and controls the files added to the package initially. This also is reflected in documentation and metadata.
+    </p>
+    </Control>
+    <Control Name="editPath" Title="Edit Path">
+    <p>
+      Specifies the base path where the project folder will be created. The project folder name will be the keyboard ID. 
+      If the folder already exists, then you will be prompted before Keyman Developer overwrites files inside it.
+    </p>
+    </Control>
+    <Control Name="cmdBrowse" Title="Browse">
+      <p>
+        Specifies a different path to store the project folder.
+      </p>
+    </Control>
+    <Control Name="editKeyboardID" Title="Keyboard ID">
+      <p>
+        The base filename of the keyboard, project and package. This must conform to the Keyman 
+        keyboard identifier rules, using the characters a-z, 0-9 and _ (underscore) only.
+      </p>
+    </Control>
+    <Control Name="editProjectFilename" Title="Keyboard ID">
+      <p>
+        A Keyboard Project (.kpj) file is store inside the base path, this cannot be changed to anywhere else.
+      </p>
+    </Control>
+    <Control Name="cmdKeyboardAddLanguage" Title="Add a Language">
+    <p>This button will open up the BCP 47 Tag window to add the keyboard's language tag, script tag,
+       region tag, and language name.</p>
+    </Control>
+    <Control Name="cmdKeyboardEditLanguage" Title="Edit a Language">
+      <p>
+        Click on Edit... to open up the BCP 47 Tag window with the language information.
+      </p>
+    </Control>
+    <Control Name="cmdKeyboardRemoveLanguage" Title="Remove a Language">
+      <p>
+        Delete the selected language.
+      </p>
+    </Control>
+    <Control Name="cmdOK" Title="OK">
+      <p>
+        Once everything is ready, click OK and enjoy developing the keyboard.
+      </p>
+    </Control>
+    <Control Name="cmdCancel" Title="Cancel">
+      <p>Click Cancel to close the dialog and reset the process entirely.</p>
+    </Control>
+  </Form>
+
   <!-- New Project -->
   <Form Name="context/new-project">
     <Control Name="lvItems" Title="New Project">
@@ -959,4 +1045,3 @@
   </Form>
 
 </ContextHelp>
-
