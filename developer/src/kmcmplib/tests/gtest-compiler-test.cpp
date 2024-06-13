@@ -586,6 +586,15 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     const KMX_WCHAR tstr_if_option_valid[] = { UC_SENTINEL, CODE_IFOPT, 2, 2, 4, 0 };
     EXPECT_EQ(0, u16cmp(tstr_if_option_valid, tstr));
 
+    delete[] option;
+    PFILE_STORE file_store = new FILE_STORE[100];
+    fileKeyboard.cxStoreArray = 3u;
+    fileKeyboard.dpStoreArray = file_store;
+    option[1].fIsStore = TRUE;
+    u16cpy(file_store[0].szName, u"a");
+    u16cpy(file_store[1].szName, u"b");
+    u16cpy(file_store[2].szName, u"c");
+
     // index, CERR_InvalidInVirtualKeySection *** TODO ***
 
     // index, no close delimiter => NULL
@@ -605,34 +614,59 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     EXPECT_EQ(CERR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // index, comma, valid
+    fileKeyboard.cxStoreArray = 3u;
+    fileKeyboard.dpStoreArray = file_store;
     u16cpy(str, u"index(b,4)");
     EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_index_comma_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 4, 0 };
     EXPECT_EQ(0, u16cmp(tstr_index_comma_valid, tstr));
 
+    std::cerr << "debug: index, space, valid" << std::endl;
+
     // index, space, valid
     u16cpy(str, u"index(b 4)");
+    fileKeyboard.cxStoreArray = 3u;
+    fileKeyboard.dpStoreArray = file_store;
     EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_index_space_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 4, 0 };
     EXPECT_EQ(0, u16cmp(tstr_index_space_valid, tstr));
 
     // index, two-digit parameter, valid
     u16cpy(str, u"index(b,42)");
+    fileKeyboard.cxStoreArray = 3u;
+    fileKeyboard.dpStoreArray = file_store;
     EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_index_two_digit_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 42, 0 };
     EXPECT_EQ(0, u16cmp(tstr_index_two_digit_valid, tstr));
 
     // index, comma, non-digit parameter, valid (should this be caught?)
     u16cpy(str, u"index(b,g)");
+    fileKeyboard.cxStoreArray = 3u;
+    fileKeyboard.dpStoreArray = file_store;
     EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_index_non_digit_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 0, 0 };
     EXPECT_EQ(0, u16cmp(tstr_index_non_digit_valid, tstr));
 
-    // index, comma, no parameter, valid (should this be caught?)
+    // index, comma, no parameter, valid (should this be caught?) *** can cause SEH error ***
     u16cpy(str, u"index(b,)");
+    fileKeyboard.cxStoreArray = 3u;
+    fileKeyboard.dpStoreArray = file_store;
     EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_index_no_param_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 0, 0 };
     EXPECT_EQ(0, u16cmp(tstr_index_no_param_valid, tstr));
+}
+
+// tests strings starting with 'o'
+TEST_F(CompilerTest, GetXStringImpl_type_o_test) {
+    KMX_WCHAR tstr[128];
+    fileKeyboard.version = VERSION_80;
+    KMX_WCHAR str[LINESIZE];
+    KMX_WCHAR output[GLOBAL_BUFSIZE];
+    PKMX_WCHAR newp = nullptr;
+
+    // CERR_InvalidToken
+    u16cpy(str, u"opq");
+    EXPECT_EQ(CERR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
