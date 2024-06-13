@@ -710,4 +710,27 @@
       <p>To close the dialog, click the Close button or press Shift + Esc.</p>
     </Control>
   </Form>
+
+  <!-- New Project -->
+  <Form Name="context/new-project">
+    <Control Name="lvItems" Title="New Project">
+      <p>
+      Creates a new Keyman Keyboard, LDML Keyboard, or a Wordlist Lexical Model, 
+      or by importing from another source. Details are written on individual icons; clicking on
+      them shows a detailed explanation of each keyboard project.
+      </p>
+    </Control>
+    <Control Name="cmdOK" Title="OK with the Selected Project">
+      <p>
+      Once decided on a project to create, click OK will take you to the next step. 
+      </p>
+    </Control>
+    <Control Name="cmdCancel" Title="Cancel Project Creation">
+      <p>
+      Cancels creating a project.
+      </p>
+    </Control>
+  </Form>
+
 </ContextHelp>
+
