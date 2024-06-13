@@ -49,7 +49,7 @@ bool loadfileProc(const char* filename, const char* baseFilename, void* data, in
     }
   } else {
     // return data
-    if(fread(data, 1, *size, fp) != *size) {
+    if((int)fread(data, 1, *size, fp) != *size) {
       fclose(fp);
       return false;
     }
