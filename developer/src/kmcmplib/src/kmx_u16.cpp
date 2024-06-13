@@ -285,7 +285,7 @@ double u16tof( KMX_WCHAR* str)
 	PKMX_WCHAR q = (PKMX_WCHAR)u16chr(str, '.');
 	size_t pos_dot = q-str  ;
 
-	if (pos_dot < 0)
+	if (q-str < 0)
 		pos_dot = u16len(str);
 
 	for (size_t i = 0; i < u16len(str); i++)
