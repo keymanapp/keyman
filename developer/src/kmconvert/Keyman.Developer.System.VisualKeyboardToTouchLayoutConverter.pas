@@ -1,4 +1,4 @@
-unit Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter;
+unit Keyman.Developer.System.VisualKeyboardToTouchLayoutConverter;
 
 interface
 
@@ -8,7 +8,7 @@ uses
   VisualKeyboard;
 
 type
-  TTouchLayoutToVisualKeyboardConverter = class
+  TVisualKeyboardToTouchLayoutConverter = class
   private
     FOwnsVisualKeyboard: Boolean;
     FVisualKeyboard: TVisualKeyboard;
@@ -34,7 +34,7 @@ uses
   Unicode,
   VKeys;
 
-constructor TTouchLayoutToVisualKeyboardConverter.Create(
+constructor TVisualKeyboardToTouchLayoutConverter.Create(
   const AFileName: string);
 begin
   inherited Create;
@@ -43,7 +43,7 @@ begin
   FVisualKeyboard.LoadFromFile(AFileName);
 end;
 
-constructor TTouchLayoutToVisualKeyboardConverter.Create(
+constructor TVisualKeyboardToTouchLayoutConverter.Create(
   AVisualKeyboard: TVisualKeyboard);
 begin
   inherited Create;
@@ -51,7 +51,7 @@ begin
   FVisualKeyboard := AVisualKeyboard;
 end;
 
-constructor TTouchLayoutToVisualKeyboardConverter.Create(
+constructor TVisualKeyboardToTouchLayoutConverter.Create(
   const AStream: TStream);
 begin
   inherited Create;
@@ -60,21 +60,21 @@ begin
   FVisualKeyboard.LoadFromStream(AStream);
 end;
 
-destructor TTouchLayoutToVisualKeyboardConverter.Destroy;
+destructor TVisualKeyboardToTouchLayoutConverter.Destroy;
 begin
   if FOwnsVisualKeyboard then
     FreeAndNil(FVisualKeyboard);
   inherited Destroy;
 end;
 
-function TTouchLayoutToVisualKeyboardConverter.Execute(
+function TVisualKeyboardToTouchLayoutConverter.Execute(
   var KeymanTouchLayout: string): Boolean;
 begin
   KeymanTouchLayout := ImportFromKVK;
   Result := KeymanTouchLayout <> '';
 end;
 
-function TTouchLayoutToVisualKeyboardConverter.ImportFromKVK: string;
+function TVisualKeyboardToTouchLayoutConverter.ImportFromKVK: string;
 type
   TKeyData = record
     Data: TOnScreenKeyboardKeyData;
@@ -296,7 +296,7 @@ end;
  * each layer on each given platform. Will rewrite the K_LCONTROL key
  * or remove it if there are no extended layers.
  *}
-function TTouchLayoutToVisualKeyboardConverter.SetupModifierKeysForImportedLayout(TouchLayout: string): string;
+function TVisualKeyboardToTouchLayoutConverter.SetupModifierKeysForImportedLayout(TouchLayout: string): string;
   procedure SetupModifierKeysForPlatform(p: TTouchLayoutPlatform);
   var
     l, l2: TTouchLayoutLayer;
