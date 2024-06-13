@@ -89,7 +89,8 @@ int main(int argc, char *argv[])
     if ((long)result.kmxSize != sz2) return __LINE__;                //  exit code: size of kmx-file in build differs from size of kmx-file in source folder
 
     char* buf2 = new char[result.kmxSize];
-    fread(buf2, 1, result.kmxSize, fp2);
+    auto sz3 = fread(buf2, 1, result.kmxSize, fp2);
+    if (result.kmxSize != sz3) return __LINE__;                // exit code:  when not able to read the build into the buffer 
     return memcmp(result.kmx, buf2, result.kmxSize) ? __LINE__ : 0;  // exit code:  when contents of kmx-file in build differs from contents of kmx-file in source folder
                                                     // success:    when contents of kmx-file in build and source folder are the same
   }
