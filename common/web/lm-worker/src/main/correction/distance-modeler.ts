@@ -200,12 +200,27 @@ export class SearchNode {
     return edges;
   }
 
-  get mapKey(): string {
+  /**
+   * A key uniquely identifying identical search path nodes.  Replacement of a keystroke's
+   * text in a manner that results in identical path to a different keystroke should result
+   * in both path nodes sharing the same pathKey value.
+   */
+  get pathKey(): string {
     let inputString = this.priorInput.map((value) => '+' + value.sample.insert + '-' + value.sample.deleteLeft).join('');
     let matchString =  this.calculation.matchSequence.map((value) => value.key).join('');
 
     // TODO:  might should also track diagonalWidth.
     return inputString + SENTINEL_CODE_UNIT + matchString;
+  }
+
+  /**
+   * A key uniquely identifying identical match sequences.  Reaching the same net result
+   * by different paths should result in identical `resultKey` values.
+   */
+  get resultKey(): string {
+    // Filter out any duplicated match sequences.  The same match sequence may be reached via
+    // different input sequences, after all.
+    return this.calculation.matchSequence.map(value => value.key).join('');
   }
 
   get isFullReplacement(): boolean {
@@ -265,7 +280,7 @@ export class SearchResult {
   };
 
   get matchString(): USVString {
-    return this.matchSequence.map(value => value.key).join('');
+    return this.resultNode.resultKey;
   }
 
   get knownCost(): number {
@@ -325,10 +340,10 @@ export class SearchSpace {
   private completedPaths: SearchNode[];
 
   // Marks all results that have already been returned since the last input was received.
-  private returnedValues: {[mapKey: string]: SearchNode} = {};
+  private returnedValues: {[resultKey: string]: SearchNode} = {};
 
   // Signals that the edge has already been processed.
-  private processedEdgeSet: {[mapKey: string]: boolean} = {};
+  private processedEdgeSet: {[pathKey: string]: boolean} = {};
 
   /**
    * Clone constructor.  Deep-copies its internal queues, but not search nodes.
@@ -490,11 +505,11 @@ export class SearchSpace {
 
     // Have we already processed a matching edge?  If so, skip it.
     // We already know the previous edge is of lower cost.
-    if(this.processedEdgeSet[currentNode.mapKey]) {
+    if(this.processedEdgeSet[currentNode.pathKey]) {
       this.selectionQueue.enqueue(bestTier);
       return unmatchedResult;
     } else {
-      this.processedEdgeSet[currentNode.mapKey] = true;
+      this.processedEdgeSet[currentNode.pathKey] = true;
     }
 
     // Stage 1:  filter out nodes/edges we want to prune
@@ -569,10 +584,10 @@ export class SearchSpace {
   }
 
   // Current best guesstimate of how compositor will retrieve ideal corrections.
-  async *getBestMatches(waitMillis?: number): AsyncGenerator<SearchResult[]> {
+  async *getBestMatches(waitMillis?: number): AsyncGenerator<SearchResult> {
     // might should also include a 'base cost' parameter of sorts?
     let searchSpace = this;
-    let currentReturns: {[mapKey: string]: SearchNode} = {};
+    let currentReturns: {[resultKey: string]: SearchNode} = {};
 
     let maxTime: number;
     if(waitMillis == 0) {
@@ -714,51 +729,6 @@ export class SearchSpace {
       }
     }
 
-    class BatchingAssistant {
-      currentCost = Number.MIN_SAFE_INTEGER;
-      entries: SearchResult[] = [];
-
-      checkAndAdd(entry: SearchNode): SearchResult[] | null {
-        var result: SearchResult[] = null;
-
-        if(entry.currentCost > this.currentCost) {
-          result = this.tryFinalize();
-
-          this.currentCost = entry.currentCost;
-        }
-
-        // Filter out any duplicated match sequences.  The same match sequence may be reached via
-        // different input sequences, after all.
-        let outputMapKey = entry.calculation.matchSequence.map(value => value.key).join('');
-
-        // First, ensure the edge has an existing 'shared' cache entry.
-        if(!searchSpace.returnedValues[outputMapKey]) {
-          searchSpace.returnedValues[outputMapKey] = entry;
-        }
-
-        // Check the generator's local returned-value cache - this determines whether or not we
-        // need to add a new 'return' to the batch.
-        if(!currentReturns[outputMapKey]) {
-          this.entries.push(new SearchResult(entry));
-          currentReturns[outputMapKey] = entry;
-        }
-
-        return result;
-      }
-
-      tryFinalize(): SearchResult[] | null {
-        var result: SearchResult[] = null;
-        if(this.entries.length > 0) {
-          result = this.entries;
-          this.entries = [];
-        }
-
-        return result;
-      }
-    }
-
-    let batcher = new BatchingAssistant();
-
     const timer = new ExecutionTimer(maxTime*1.5, maxTime);
 
     // Stage 1 - if we already have extracted results, build a queue just for them and iterate over it first.
@@ -766,7 +736,6 @@ export class SearchSpace {
     if(returnedValues.length > 0) {
       let preprocessedQueue = new PriorityQueue<SearchNode>(QUEUE_NODE_COMPARATOR, returnedValues);
 
-      // Build batches of same-cost entries.
       timer.startLoop();
       while(preprocessedQueue.count > 0) {
         let entry = preprocessedQueue.dequeue();
@@ -778,21 +747,13 @@ export class SearchSpace {
           continue;
         }
 
-        let batch = batcher.checkAndAdd(entry);
         timer.markIteration();
 
-        if(batch) {
+        if(!currentReturns[entry.resultKey]) {
+          currentReturns[entry.resultKey] = entry;
           // Do not track yielded time.
-          yield batch;
+          yield new SearchResult(entry);
         }
-      }
-
-      // As we only return a batch once all entries of the same cost have been processed, we can safely
-      // finalize the last preprocessed group without issue.
-      let batch = batcher.tryFinalize();
-      if(batch) {
-        // Do not track yielded time.
-        yield batch;
       }
     }
 
@@ -813,8 +774,6 @@ export class SearchSpace {
         }
       } while(!timedOut && newResult.type == 'intermediate')
 
-      // TODO:  check 'cost' on intermediate, running it through batcher to early-detect cost changes.
-      let batch: SearchResult[];
       if(newResult.type == 'none') {
         break;
       } else if(newResult.type == 'complete') {
@@ -825,19 +784,23 @@ export class SearchSpace {
           // we can(?) assume that everything thereafter is as well.
           break;
         }
-        batch = batcher.checkAndAdd(newResult.finalNode);
-      }
 
-      if(batch) {
-        yield batch;
+        const entry = newResult.finalNode;
+
+        // As we can't guarantee a monotonically-increasing cost during the search -
+        // due to effects from keystrokes with deleteLeft > 0 - it's technically
+        // possible to find a lower-cost path later in such cases.
+        //
+        // If it occurs, we should re-emit it - it'll show up earlier in the
+        // suggestions that way, as it should.
+        if((currentReturns[entry.resultKey]?.currentCost ?? Number.MAX_VALUE) > entry.currentCost) {
+          currentReturns[entry.resultKey] = entry;
+          searchSpace.returnedValues[entry.resultKey] = entry;
+          // Do not track yielded time.
+          yield new SearchResult(entry);
+        }
       }
     } while(!timedOut && this.hasNextMatchEntry());
-
-    // If we _somehow_ exhaust all search options, make sure to return the final results.
-    let batch = batcher.tryFinalize();
-    if(batch) {
-      yield batch;
-    }
 
     return null;
   }
