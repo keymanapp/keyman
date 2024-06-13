@@ -203,7 +203,7 @@ size_t km_regex::apply(const std::u32string &input, std::u32string &output,
     const std::u32string match32 = convert<char, char32_t>(group1str);
     free(group1);
     auto matchIndex = findIndex(match32, fromList);
-    assert(matchIndex != 1L);
+    assert(matchIndex != -1);
     rustr = toList.at(matchIndex);
   }
   std::string rstr = convert<char32_t,char>(rustr);
