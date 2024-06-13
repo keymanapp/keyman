@@ -1,7 +1,12 @@
-import * as xml2js from '../deps/xml2js/xml2js.js';
+import { VisualKeyboard as VK, Constants, xml2js } from '@keymanapp/common-types';
 import KVKSourceFile, { KVKSEncoding, KVKSFlags, KVKSKey, KVKSLayer } from './kvks-file.js';
-import { VisualKeyboard, VisualKeyboardHeaderFlags, VisualKeyboardKeyFlags, VisualKeyboardLegalShiftStates, VisualKeyboardShiftState } from './visual-keyboard.js';
-import { USVirtualKeyCodes } from '../consts/virtual-key-constants.js';
+
+import USVirtualKeyCodes = Constants.USVirtualKeyCodes;
+import VisualKeyboard = VK.VisualKeyboard;
+import VisualKeyboardHeaderFlags = VK.VisualKeyboardHeaderFlags;
+import VisualKeyboardKeyFlags = VK.VisualKeyboardKeyFlags;
+import VisualKeyboardLegalShiftStates = VK.VisualKeyboardLegalShiftStates;
+import VisualKeyboardShiftState = VK.VisualKeyboardShiftState;
 
 export default class KVKSFileWriter {
   public write(vk: VisualKeyboard): string {
@@ -17,7 +22,7 @@ export default class KVKSFileWriter {
       }
     })
 
-    let flags: KVKSFlags = {};
+    const flags: KVKSFlags = {};
     if(vk.header.flags & VisualKeyboardHeaderFlags.kvkhDisplayUnderlying) {
       flags.displayunderlying = '';
     }
@@ -33,7 +38,7 @@ export default class KVKSFileWriter {
 
 
 
-    let kvks: KVKSourceFile = {
+    const kvks: KVKSourceFile = {
       visualkeyboard: {
         header: {
           version: '10.0',
@@ -46,9 +51,9 @@ export default class KVKSFileWriter {
 
     if(vk.header.underlyingLayout) kvks.visualkeyboard.header.layout = vk.header.underlyingLayout;
 
-    let encodings: {ansi: {o: KVKSEncoding, l: {[name:string]:KVKSLayer}}, unicode: {o: KVKSEncoding, l: {[name:string]:KVKSLayer}}} = {ansi:null,unicode:null};
+    const encodings: {ansi: {o: KVKSEncoding, l: {[name:string]:KVKSLayer}}, unicode: {o: KVKSEncoding, l: {[name:string]:KVKSLayer}}} = {ansi:null,unicode:null};
 
-    for(let key of vk.keys) {
+    for(const key of vk.keys) {
       const encoding = key.flags & VisualKeyboardKeyFlags.kvkkUnicode ? 'unicode' : 'ansi';
       const shift = this.kvkShiftToKvksShift(key.shift);
 
@@ -65,7 +70,7 @@ export default class KVKSFileWriter {
         };
         kvks.visualkeyboard.encoding.push(encodings[encoding].o);
       }
-      let e = encodings[encoding];
+      const e = encodings[encoding];
       if(!e.l[shift]) {
         e.l[shift] = {
           key: [],
@@ -73,11 +78,11 @@ export default class KVKSFileWriter {
         };
         e.o.layer.push(e.l[shift]);
       }
-      let l = e.l[shift];
+      const l = e.l[shift];
 
       // TODO-LDML: map
       let vkeyName = '';
-      for(let vkey of Object.keys(USVirtualKeyCodes)) {
+      for(const vkey of Object.keys(USVirtualKeyCodes)) {
         if((USVirtualKeyCodes as any)[vkey] == key.vkey) {
           vkeyName = vkey;
           break;
@@ -88,7 +93,7 @@ export default class KVKSFileWriter {
         //TODO-LDML: warn
         continue;
       }
-      let k: KVKSKey = {
+      const k: KVKSKey = {
         $: {vkey: vkeyName},
         _: key.text,
       }
@@ -99,7 +104,7 @@ export default class KVKSFileWriter {
       l.key.push(k);
     }
 
-    let result = builder.buildObject(kvks);
+    const result = builder.buildObject(kvks);
     return result; //Uint8Array.from(result);
   }
 
@@ -111,7 +116,7 @@ export default class KVKSFileWriter {
 
   public kvkShiftToKvksShift(shift: VisualKeyboardShiftState): string {
     // TODO-LDML(lowpri): make a map of this?
-    for(let state of VisualKeyboardLegalShiftStates) {
+    for(const state of VisualKeyboardLegalShiftStates) {
       if(state.shift == shift) {
         return state.name;
       }
