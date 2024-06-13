@@ -82,6 +82,17 @@ ldml = executable('ldml',
     objects: lib.extract_all_objects(recursive: false),
     )
 
+core_ldml_min = executable('core_ldml_min',
+    ['core_ldml_min.cpp'],
+    cpp_args: defns + warns,
+    include_directories: [inc, libsrc],
+    link_args: links,
+    dependencies: [],
+    link_with: [lib],
+    # objects: lib.extract_all_objects(recursive: false),
+    )
+test('core_ldml_min', core_ldml_min, suite: 'ldml', should_fail: true)
+
 
 # Build and run additional test_kmx_plus test
 
