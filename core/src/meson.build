@@ -16,11 +16,6 @@ if cpp_compiler.get_id() == 'msvc'
   version_res += import('windows').compile_resources('version.rc', args:['/n','/c65001'])
 endif
 
-if cpp_compiler.get_id() == 'emscripten'
-  # TODO: why do we need this defn here?
-  defns += ['-DKM_CORE_LIBRARY']
-endif
-
 # ICU4C is used for repertoire tests and core implementation
 
 if target_machine.system() == 'linux'
@@ -34,6 +29,15 @@ else
 'werror=false']) # TODO-LDML: options: static, no data (these are in the meson build files)
   icu_uc = icu4c.get_variable('icuuc_dep')
   icu_i18n = icu4c.get_variable('icui18n_dep')
+endif
+
+if cpp_compiler.get_id() == 'emscripten'
+  # TODO: why do we need this defn here?
+  defns += ['-DKM_CORE_LIBRARY']
+  icu_if_not_on_wasm = []
+else
+  # only include this if NOT on wasm.
+  icu_if_not_on_wasm = [icu_uc, icu_i18n]
 endif
 
 if icu_uc.found()
@@ -142,12 +146,12 @@ lib = library('keymancore',
   include_directories: inc,
   pic: true,
   install: true,
-  dependencies: [icu_uc, icu_i18n],
+  dependencies: icu_if_not_on_wasm,
   )
 
 headerdirs = [ '.', 'keyman' ] # subdirectories of ${prefix}/include to add to header path
 
-keymancore = declare_dependency(link_with: lib, include_directories: inc, dependencies: [icu_uc, icu_i18n])
+keymancore = declare_dependency(link_with: lib, include_directories: inc, dependencies: icu_if_not_on_wasm)
 
 pkg = import('pkgconfig')
 pkg.generate(
