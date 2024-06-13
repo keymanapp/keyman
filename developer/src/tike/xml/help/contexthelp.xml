@@ -331,32 +331,184 @@
       <p>The debugger can be used without the debug information by clicking on Test without debugger.</p>
     </Control>
   </Form>
-
+  
+  <!-- New file details -->
   <Form Name="context/new-file-details">
     <Control Name="*" Title="New File">
       <p>Enter the name for your new keyboard. Click on the Browse button to change the location of the new keyboard.</p>
     </Control>
   </Form>
-
+  
+  <!-- Package Editor -->
   <Form Name="context/package-editor">
+    <Control Name="pages" Title="Keyboard Package">
+      <p>A keyboard package is most likely to have 7 tabs:
+        <ul>
+          <li>Files</li>
+          <li>Keyboards</li>
+          <li>Lexical Models</li>
+          <li>Details</li>
+          <li>Shortcuts</li>
+          <li>Source</li>
+          <li>Build</li>
+        </ul>
+      </p>
+    </Control>
+
+    <!-- Keyboard Layouts Tab -->
+    <Control Name="lbKeyboards" Title="Keyboard name">
+      <p>Usually, there is only one keyboard listed in the box, and by clicking on it
+      will show the keyboard information.</p>
+    </Control>
+    <Control Name="cbKeyboardOSKFont" Title="Keyboard font">
+      <p>When font files are added to the package, this dropdown tells the Keyman 
+      apps which font to use when rendering the On Screen Keyboard touch keyboard. 
+      </p>
+    </Control>
+    <Control Name="cbKeyboardDisplayFont" Title="Display font">
+      <p>When font files are added to the package, this dropdown tells the Keyman 
+      apps for iOS and Android which font to use in edit fields. It only applies 
+      within the Keyman app and apps that support this functionality.</p>
+    </Control>
+    <Control Name="gridKeyboardLanguages" Title="Keyboard languages">
+      <p>Each language listed here is a BCP 47 language tag and every keyboard must have a
+      minimum of one language. When Keyman installs the keyboard package, it will associate the 
+      keyboard with the language(s) you select.</p>
+    </Control>
+    <Control Name="cmdKeyboardAddLanguage" Title="Add a language">
+      <p>This button will open up the BCP 47 Tag window to add the keyboard's language tag, script tag,
+       region tag, and language name.</p>
+    </Control>
+    <Control Name="cmdKeyboardRemoveLanguage" Title="Remove a language">
+      <p>Select on a language then click on Remove to delete the language tag.</p>
+    </Control>
+    <Control Name="cmdKeyboardEditLanguage" Title="Edit a language">
+      <p>Click on Edit... then the BCP 47 Tag window will pop up once again with the language information.</p>
+    </Control>
+
+    <!-- Lexical Models Tab -->
+    <Control Name="lbLexicalModels" Title="Lexical Models">
+      <p>This is the location of the Lexical Model (Predictive text) for the keyboard in the keyboard 
+      package.</p>
+    </Control>
+    <Control Name="cmdLexicalModelLanguageAdd" Title="Add a language to the Lexical Model">
+      <p>Add button brings up the “Select BCP 47 Tag” 
+      window, thus allowing the input of a language for the Lexical Model (Predictive text).</p>
+    </Control>
+    <Control Name="chkLexicalModelRTL" Title="Right-to-left Predictive text">
+      <p>By ticking this, it will set the text direction of the Lexical Model (Predictive text) to Right-to-left.</p>
+    </Control>
+    <Control Name="editLexicalModelDescription" Title="Lexical Model Description">
+      <p>A short or long text related to the Lexical Model (Predictive text) is encouraged to be added here but it is optional.</p>
+    </Control>
+
+    <!-- Details Tab -->
+    <Control Name="cbWelcomeFile" Title="Welcome file">
+      <p>Choose from the list to specifies which welcome file is suitable to display when they install the keyboard package.
+      However, this is optional, most keyboard package uses the default option which is (none).</p>
+    </Control>
+    <Control Name="cbLicense" Title="License file">
+      <p>Choose from the list if there is a License file to specified to the keyboard package.
+      However, this is optional, most keyboard package uses the default option which is (none) and we 
+      only accept an open-license keyboard package.</p>
+    </Control>
+    <Control Name="editInfoAuthor" Title="Author's">
+      <p>Enter the name of the author or authors of the keyboard package.</p>
+    </Control>
+    <Control Name="editInfoCopyright" Title="Copyright">
+      <p>Enter the copyright details of the keyboard package This information will be displayed with the version, author and message information when the package is installed.</p>
+    </Control>
+    <Control Name="editInfoEmail" Title="Email address">
+      <p>Enter the contact email address for the keyboard package.</p>
+    </Control>
+    <Control Name="editInfoName" Title="Package Name">
+      <p>Package Name is the name that will be displayed when the package is installed. It should be a descriptive name, in any language, but remember that some applications may use a font that does not include the language you are writing the keyboard name in. Don't include a version number, help information or hotkey in the name.</p>
+    </Control>
+    <Control Name="editInfoVersion" Title="Package Version">
+      <p>The version number allows the user to check whether they have the latest version of the keyboard. The format should be 'major.minor[.subversion]'.  Each number should be an integer, and you should avoid non-integer version strings.  See help for more details.</p>
+    </Control>
+    <Control Name="editInfoWebSite" Title="Website">
+      <p>The website details for the keyboard package if available.</p>
+    </Control>
+    <Control Name="editLexicalModelVersion" Title="Lexical Model version">
+      <p>Specifies an independant version for the Lexical Model.</p>
+    </Control>
+    <Control Name="chkFollowKeyboardVersion" Title="Package and Keyboard version">
+      <p>By ticking this, the Lexical Model (Predictive text) version will receive a version bump alongside 
+      the keyboard, even when the Model does not receive an update.</p>
+    </Control>
+    <Control Name="memoInfoDescription" Title="Description">
+      <p>A keyboard package's description about the language, wonderful community, script, or any related information
+      that would help users once they install the package.</p>
+    </Control>
+    <Control Name="gridRelatedPackages" Title="Related Packages">
+      <p>If a keyboard package is intended to replace an existing keyboard, or if there are related packages, 
+      then the identifiers for these packages should be listed here.</p>
+    </Control>
+    <Control Name="cmdAddRelatedPackage" Title="Add a related package">
+      <p>Add the Package ID and specify Deprecated or Non-deprecated if a keyboard package is intended to 
+      replace an existing keyboard, or if there are related packages.</p>
+    </Control>
+    <Control Name="cmdEditRelatedPackage" Title="Edit a related package">
+      <p>Selects the package and click Edit... to add any changes to the current information.</p>
+    </Control>
+    <Control Name="cmdRemoveRelatedPackage" Title="Remove a related package">
+      <p>A keyboard package's description about the language, community, script, or any related information
+      that would help users when they see once installing the package.</p>
+    </Control>
+
+     <!-- Shortcuts Tab -->
+    <Control Name="editStartMenuPath" Title="Start Menu Path">
+      <p>Enter the path of the start menu to be displayed when the keyboard package is installed.</p>
+    </Control>
+    <Control Name="lbStartMenuEntries" Title="Start menu entries">
+      <p>This is a list of Start menu entries for the keyboard package.</p>
+    </Control>
+    <Control Name="chkStartMenuUninstall" Title="Uninstall">
+      <p>The uninstall shortcut will be added automatically to the shortcut menu list when the package is installed.</p>
+    </Control>
+    <Control Name="chkCreateStartMenu" Title="Start menu">
+      <p>This option will allow you to create a folder on the Start menu when the keyboard package is installed.</p>
+    </Control>
+    <Control Name="cmdNewStartMenuEntry" Title="New">
+      <p>To add a new menu item to the list of shortcuts to be displayed in the Start menu folder created when the keyboard package is installed.</p>
+    </Control>
+    <Control Name="cmdDeleteStartMenuEntry" Title="Delete">
+      <p>To delete the selected shortcut menu item from the Start menu folder.</p>
+    </Control>
+    <Control Name="editStartMenuDescription" Title="Start">
+      <p>The text to be displayed for the selected file as a menu item in the Start up folder that is created when the package is installed.</p>
+    </Control>
+    <Control Name="editStartMenuParameters" Title="Shortcut Parameters" />
+    
+    <Control Name="cbStartMenuProgram" Title="Shortcut Program" />
+
+  <!-- Compile Tab -->
+    <Control Name="cmdStartTestOnline" Title="Test package on web">
+      <p>Starts the Keyman Developer Web Server for the keyboard package. 
+      This will list the various IP addresses and hostnames that Keyman Developer is listening on.</p>
+    </Control>
+    <Control Name="lbDebugHosts" Title="Web addresses">
+      <p>A list of available servers to test the keyboard package.</p>
+    </Control>
+    <Control Name="cmdOpenDebugHost" Title="Open in browser">
+      <p>Starts your default browser with the selected address to allow testing of the keyboard package 
+      directly.</p>
+    </Control>
+    <Control Name="editBootstrapMSI" Title="Keyman MSI">
+      <p>Specifies the location of the Keyman MSI file. As of Keyman Developer 17, bundled executable package 
+      installers for Keyman for Windows can be created using kmc, but cannot be created within the IDE.</p>
+    </Control>
+
     <Control Name="cbImageFile" Title="Image File">
       <p>You can include an image file that will be displayed to the left of the install details when the package is installed. This image should be 140 pixels wide and 250 pixels high.</p>
     </Control>
     <Control Name="cbReadmeFile" Title="Readme file">
       <p>The readme file can be displayed after the installation of the keyboard package, but can also be accessed from the keyboard folder at a later time. The file must be loaded under the Files tab, add option before being able to be selected from the drop down list.</p>
     </Control>
-    <Control Name="cbStartMenuProgram" Title="Shortcut Program" />
-    <Control Name="chkCreateStartMenu" Title="Start menu">
-      <p>This option will allow you to create a folder on the Start menu when the keyboard package is installed.</p>
-    </Control>
-    <Control Name="chkStartMenuUninstall" Title="Uninstall">
-      <p>The uninstall shortcut will be added automatically to the shortcut menu list when the package is installed.</p>
-    </Control>
+    
     <Control Name="cmdAddFile" Title="Add Files">
       <p>This option allows the user to add new files to the package.</p>
-    </Control>
-    <Control Name="cmdDeleteStartMenuEntry" Title="Delete">
-      <p>To delete the selected shortcut menu item from the Start menu folder.</p>
     </Control>
     <Control Name="cmdInsertCopyright" Title="Insert Copyright">
       <p>This allows for the insertion of a copyright symbol if needed.</p>
@@ -374,8 +526,6 @@
       <p>You should try installing your package on your system before distributing it, to ensure that all files are
       installed correctly.  If you can, try installing your package on several different machines.</p>
     </Control>
-
-    <!-- Compile Page -->
 
     <Control Name="editOutPath" Title="Compile">
       <p>Displays the output path and filename of the file when the package is compiled.</p>
@@ -404,9 +554,6 @@
       <p>This option will install the package on the computer. A message will be displayed as to the success of the install.</p>
     </Control>
 
-    <Control Name="cmdNewStartMenuEntry" Title="New">
-      <p>To add a new menu item to the list of shortcuts to be displayed in the Start menu folder created when the keyboard package is installed.</p>
-    </Control>
     <Control Name="cmdOpenContainingFolder" Title="Open Containing Folder">
       <p>Opens the source folder of the selected file.</p>
     </Control>
@@ -432,33 +579,6 @@
       <p>File Type</p>
       <p>Enter the details of the file type being added to the keyboard package.</p>
     </Control>
-    <Control Name="editInfoAuthor" Title="Author's">
-      <p>Enter the name of the author or authors of the keyboard package.</p>
-    </Control>
-    <Control Name="editInfoCopyright" Title="Copyright">
-      <p>Enter the copyright details of the keyboard package This information will be displayed with the version, author and message information when the package is installed.</p>
-    </Control>
-    <Control Name="editInfoEmail" Title="Email address">
-      <p>Enter the contact email address for the keyboard package.</p>
-    </Control>
-    <Control Name="editInfoName" Title="Package Name">
-      <p>Package Name is the name that will be displayed when the package is installed. It should be a descriptive name, in any language, but remember that some applications may use a font that does not include the language you are writing the keyboard name in. Don't include a version number, help information or hotkey in the name.</p>
-    </Control>
-    <Control Name="editInfoVersion" Title="Package Version">
-      <p>The version number allows the user to check whether they have the latest version of the keyboard.  The format should be 'major.minor[.subversion]'.  Each number should be an integer, and you should avoid non-integer version strings.  See help for more details.</p>
-    </Control>
-    <Control Name="editInfoWebSite" Title="Website">
-      <p>The website details for the keyboard package if available.</p>
-    </Control>
-
-    <Control Name="editStartMenuDescription" Title="Start">
-      <p>The text to be displayed for the selected file as a menu item in the Start up folder that is created when the package is installed.</p>
-    </Control>
-    <Control Name="editStartMenuParameters" Title="Shortcut Parameters" />
-    <Control Name="editStartMenuPath" Title="">
-      <p>Start Menu Path</p>
-      <p>Enter the path of the start menu to be displayed when the keyboard package is installed.</p>
-    </Control>
     <Control Name="lbFiles" Title="Package Files">
       <p>This will display all the files that have been added to the keyboard package.  It allows for the addition and removal of files, the entering of file details and the editing of any of the files listed if the appropriate editor is available.</p>
     </Control>
@@ -467,12 +587,14 @@
     </Control>
   </Form>
 
+  <!-- Project -->
   <Form Name="context/project">
     <Control Name="*" Title="Project Manager">
       <p>The Project Manager allows you to manage all the files related to a keyboard layout in a single location.</p>
     </Control>
   </Form>
 
+   <!-- New Lexical Model Project Parameters -->
   <Form Name="context/new-model-project-parameters">
     <Control Name="editAuthor" Title="Author Name">
       <p>The name of the developer of the keyboard. This is either your full name or
@@ -560,6 +682,7 @@
     </Control>
   </Form>
 
+  <!-- Wordlist Editor -->
   <Form Name="context/wordlist-editor">
     <Control Name="pages" Title="Wordlist tabs">
       <p>Wordlist tabs have two views: Design, and Code. Changes to one view are reflected
@@ -584,6 +707,7 @@
     </Control>
   </Form>
 
+   <!-- Editor -->
   <Form Name="context/editor">
     <Control Name="cefwp" Title="Editor Window">
       <p>Editor windows in Keyman Developer supports standard Windows editing keystrokes.
@@ -593,6 +717,7 @@
     </Control>
   </Form>
 
+ <!-- Character Identifier -->
   <Form Name="context/character-identifier">
     <Control Name="gridFonts" Title="Character Identifier">
       <p>Attempt to identify the fonts on your system that will support the
@@ -605,6 +730,7 @@
     </Control>
   </Form>
 
+   <!-- Messages -->
   <Form Name="context/messages">
     <Control Name="memoMessage" Title="Message Window">
       <p>The message window appears at the bottom of the screen, or floating in a toolbar
@@ -613,6 +739,7 @@
     </Control>
   </Form>
 
+   <!-- Debug -->
   <Form Name="context/debug">
     <Control Name="memo" Title="Debugger input window">
       <p>The debugger input window is used for typing input to test the keyboard.
@@ -689,6 +816,7 @@
     </Control>
   </Form>
 
+   <!-- About tike -->
   <Form Name="context/about-tike">
     <Control Name="cmdOK" Title="About Dialog">
       <p>The About dialog displays copyright and registration information for Keyman Developer,
@@ -696,6 +824,7 @@
     </Control>
   </Form>
 
+   <!-- Key test -->
   <Form Name="context/key-test">
     <Control Name="cmdInsert" Title="Virtual Key Identifier">
       <p>This dialog lets you check the virtual key code for any key combination (except Window reserved key combinations such as Alt + Tab). You can then insert the virtual key code into the last active edit window at the current cursor position.</p><br></br>
