@@ -115,6 +115,13 @@ context_items_from_utf16(km_core_cu const *text,
 }
 
 
+km_core_status
+context_items_from_utf32(km_core_usv const *text,
+                                km_core_context_item **out_ptr)
+{
+  return _context_items_from<utf32>(reinterpret_cast<utf32::codeunit_t const *>(text), out_ptr);
+}
+
 km_core_status context_items_to_utf8(km_core_context_item const *ci,
                                             char *buf, size_t * sz_ptr)
 {
