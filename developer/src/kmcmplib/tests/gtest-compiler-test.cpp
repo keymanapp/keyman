@@ -590,7 +590,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     PFILE_STORE file_store = new FILE_STORE[100];
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
-    option[1].fIsStore = TRUE;
+    file_store[1].fIsStore = TRUE;
     u16cpy(file_store[0].szName, u"a");
     u16cpy(file_store[1].szName, u"b");
     u16cpy(file_store[2].szName, u"c");
@@ -620,8 +620,6 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_index_comma_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 4, 0 };
     EXPECT_EQ(0, u16cmp(tstr_index_comma_valid, tstr));
-
-    std::cerr << "debug: index, space, valid" << std::endl;
 
     // index, space, valid
     u16cpy(str, u"index(b 4)");
@@ -663,10 +661,43 @@ TEST_F(CompilerTest, GetXStringImpl_type_o_test) {
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
     PKMX_WCHAR newp = nullptr;
+    PFILE_STORE file_store = new FILE_STORE[100];
+    fileKeyboard.cxStoreArray = 3u;
+    fileKeyboard.dpStoreArray = file_store;
+    file_store[1].fIsStore = TRUE;
+    u16cpy(file_store[0].szName, u"a");
+    u16cpy(file_store[1].szName, u"b");
+    u16cpy(file_store[2].szName, u"c");
 
     // CERR_InvalidToken
     u16cpy(str, u"opq");
     EXPECT_EQ(CERR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // outs, CERR_OutsInVirtualKeySection *** TODO ***
+
+    // outs, no close delimiter => NULL
+    u16cpy(str, u"outs(");
+    EXPECT_EQ(CERR_InvalidOuts, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // outs, empty delimiters => empty string
+    u16cpy(str, u"outs()");
+    EXPECT_EQ(CERR_InvalidOuts, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // outs, CERR_StoreDoesNotExist
+    u16cpy(str, u"outs(d)");
+    EXPECT_EQ(CERR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // outs, CERR_OutsTooLong
+    file_store[1].dpString = (PKMX_WCHAR)u"abc"; // length 4 => max should be > 4
+    u16cpy(str, u"outs(b)");
+    EXPECT_EQ(CERR_OutsTooLong, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 4, 0, &newp, FALSE)); // max reduced to force error
+
+    // outs, valid
+    file_store[1].dpString = (PKMX_WCHAR)u"abc";
+    u16cpy(str, u"outs(b)");
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_outs_valid[] = { 'a', 'b', 'c', 0 };
+    EXPECT_EQ(0, u16cmp(tstr_outs_valid, tstr));
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
