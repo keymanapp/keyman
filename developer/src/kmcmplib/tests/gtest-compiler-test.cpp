@@ -585,6 +585,54 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_if_option_valid[] = { UC_SENTINEL, CODE_IFOPT, 2, 2, 4, 0 };
     EXPECT_EQ(0, u16cmp(tstr_if_option_valid, tstr));
+
+    // index, CERR_InvalidInVirtualKeySection *** TODO ***
+
+    // index, no close delimiter => NULL
+    u16cpy(str, u"index(");
+    EXPECT_EQ(CERR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // index, empty delimiters => empty string
+    u16cpy(str, u"index()");
+    EXPECT_EQ(CERR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // index, no comma or space
+    u16cpy(str, u"index(b)");
+    EXPECT_EQ(CERR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // index, CERR_StoreDoesNotExist
+    u16cpy(str, u"index(d 4)");
+    EXPECT_EQ(CERR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // index, comma, valid
+    u16cpy(str, u"index(b,4)");
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_index_comma_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 4, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_index_comma_valid, tstr));
+
+    // index, space, valid
+    u16cpy(str, u"index(b 4)");
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_index_space_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 4, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_index_space_valid, tstr));
+
+    // index, two-digit parameter, valid
+    u16cpy(str, u"index(b,42)");
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_index_two_digit_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 42, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_index_two_digit_valid, tstr));
+
+    // index, comma, non-digit parameter, valid (should this be caught?)
+    u16cpy(str, u"index(b,g)");
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_index_non_digit_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 0, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_index_non_digit_valid, tstr));
+
+    // index, comma, no parameter, valid (should this be caught?)
+    u16cpy(str, u"index(b,)");
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_index_no_param_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 0, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_index_no_param_valid, tstr));
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
