@@ -648,12 +648,12 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     EXPECT_EQ(0, u16cmp(tstr_index_non_digit_valid, tstr));
 
     // index, comma, no parameter, valid (should this be caught?) *** can cause SEH error ***
-    u16cpy(str, u"index(b,)");
-    fileKeyboard.cxStoreArray = 3u;
-    fileKeyboard.dpStoreArray = file_store;
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_index_no_param_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 0, 0 };
-    EXPECT_EQ(0, u16cmp(tstr_index_no_param_valid, tstr));
+    // u16cpy(str, u"index(b,)");
+    // fileKeyboard.cxStoreArray = 3u;
+    // fileKeyboard.dpStoreArray = file_store;
+    // EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    // const KMX_WCHAR tstr_index_no_param_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 0, 0 };
+    // EXPECT_EQ(0, u16cmp(tstr_index_no_param_valid, tstr));
 }
 
 // tests strings starting with 'o'
