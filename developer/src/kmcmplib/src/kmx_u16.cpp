@@ -10,6 +10,11 @@
 #include <locale>
 #include <stdarg.h>
 
+#ifdef _MSC_VER
+#else
+#include <algorithm>
+#endif
+
 //String <- wstring
 std::string string_from_wstring(std::wstring const str) {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
@@ -96,7 +101,11 @@ std::string toHex(int num1) {
 			s += (87 + temp);
 		num = num / 16;
 	}
+#ifdef _MSC_VER
 	reverse(s.begin(), s.end());
+#else
+	std::reverse(s.begin(), s.end());
+#endif
 	return s;
 }
 
