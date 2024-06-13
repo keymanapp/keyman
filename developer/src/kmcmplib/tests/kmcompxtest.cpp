@@ -157,7 +157,7 @@ bool isDesktopKeyboard(FILE* fp) {
 
   PCOMP_STORE s = pfs;
 
-  for(int i = 0; i < fk.cxStoreArray; i++, s++) {
+  for(KMX_DWORD i = 0; i < fk.cxStoreArray; i++, s++) {
     if(s->dwSystemID != TSS_TARGETS) {
       continue;
     }
