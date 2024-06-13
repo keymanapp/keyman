@@ -174,7 +174,7 @@ namespace kmcmp {
   void CopyExtraData(PFILE_KEYBOARD fk) {
     /* Copy stores */
     PFILE_STORE store = fk->dpStoreArray;
-    for(int i = 0; i < fk->cxStoreArray; i++, store++) {
+    for(KMX_DWORD i = 0; i < fk->cxStoreArray; i++, store++) {
       KMCMP_COMPILER_RESULT_EXTRA_STORE extraStore;
       extraStore.storeType =
         (store->fIsStore ? STORETYPE_STORE : 0) |
@@ -188,7 +188,7 @@ namespace kmcmp {
     }
 
     PFILE_GROUP group = fk->dpGroupArray;
-    for(int i = 0; i < fk->cxGroupArray; i++, group++) {
+    for(KMX_DWORD i = 0; i < fk->cxGroupArray; i++, group++) {
       KMCMP_COMPILER_RESULT_EXTRA_GROUP extraGroup;
       extraGroup.isReadOnly = group->fReadOnly;
       extraGroup.name = string_from_u16string(group->szName);
