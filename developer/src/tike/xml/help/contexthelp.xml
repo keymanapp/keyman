@@ -182,7 +182,20 @@
     <Control Name="cmdTestKeymanWeb" Title="Test KeymanWeb Keyboard">
       <p>Tests your KeymanWeb keyboard in an Internet Explorer embedded window</p>
     </Control>
+    <Control Name="pagesTouchLayout" Title="Touch Layout page">
+      <p>Touch Layout tab defines the functionality of the keyboard for mobile devices:
+      <ul>
+        <li>Top bar Controls</li>
+        <li>Keyboard area</li>
+        <li>Middle bar controls</li>
+        <li>Long press area</li>
+      </ul>
+      </p>
+    </Control>
 
+    <Control Name="cmdPackageForDistribution" Title="Package for Distribution">
+      <p>Creates a package (.kps) file to prepare distribution of the keyboard</p>
+    </Control>
     <!-- Layout tab -->
     <!-- Icon tab -->
     <Control Name="cmdbitmapChange" Title="Change" TopicName="context/keyboard-editor#toc-icon-tab">
@@ -591,6 +604,7 @@
       highlighting. The text editor in Keyman uses the Monaco component from Visual Studio Code,
       so all the functionality available in that editor is also available here.</p>
     </Control>
+
   </Form>
 
   <Form Name="context/character-identifier">
