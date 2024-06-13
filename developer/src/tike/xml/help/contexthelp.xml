@@ -710,4 +710,47 @@
       <p>To close the dialog, click the Close button or press Shift + Esc.</p>
     </Control>
   </Form>
+
+  <!-- Select BCP 47 Language -->
+  <Form Name="context/select-bcp47-language">
+    <Control Name="cbLanguageTag" Title="Language tag">
+      <p>The only required option is the Language tag, which is an ISO 639-1 or ISO 639-3 code.
+      ISO 639-1 tags are a two-letter code. ISO 639-3 tags are a three-letter code. First, try to find your 
+      language on the list of two-letter ISO 639-1 codes.</p>
+      <p>If you can't find a two-letter code, you'll need to find the closest three-letter code. You can use Glottolog 
+      to search for your language, and it will give you an appropriate code.</p>
+      <p>The Language tag is conventionally written in lower case.</p>
+    </Control>
+    <Control Name="cbScriptTag" Title="Script tag">
+      <p>The Script tag allows you to specify the writing system used in your language model or keyboard.
+       If your language only uses one writing system, omit the Script subtag. he Script subtag is conventionally 
+       written in title case - first letter capitalized.</p>
+    </Control>
+    <Control Name="cbRegionTag" Title="Region tag">
+      <p>The Region tag allows you to specify the region your language or 
+      dialect is spoken in. If your language is only spoken in one region, omit the Region subtag.
+      Alphabetic region will show up in upper case once the region tag is selected.</p>
+    </Control>
+    <Control Name="editBCP47Code" Title="BCP 47 Code">
+      <p>This is the BCP 47 Code forms from the language, script, and region tag which were previously
+      selected.</p>
+    </Control>
+    <Control Name="editLanguageName" Title="Language name">
+      <p>If lefts as default, a language name will be assigned automatically. Feel free to change the name
+      if you must.
+      </p>
+    </Control>
+    <Control Name="cmdResetLanguageName" Title="Reset">
+      <p>Reset the Language name to what it was assigned to.</p>
+    </Control>
+    <Control Name="cmdOK" Title="OK">
+      <p>Once everything is set, click OK to confirm.</p>
+    </Control>
+    <Control Name="cmdCancel" Title="Cancel">
+      <p>Exits out of the "Select BCP 47 Tag".</p>
+    </Control>
+    <Control Name="lblLinkToW3C" Title="Learn about BCP 47 Tag">
+      <p>Learn more about the BCP 47 Tag over at w3.org.</p>
+    </Control>
+  </Form>
 </ContextHelp>
