@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import 'mocha';
 import { assert } from 'chai';
 import { makePathToFixture } from '../helpers/index.js';
-import { TouchLayoutFileReader } from "../../src/keyman-touch-layout/keyman-touch-layout-file-reader.js";
+import { TouchLayoutFileReader } from "../../src/types/keyman-touch-layout/keyman-touch-layout-file-reader.js";
 
 describe('TouchLayoutFileReader', function () {
   it('should read a valid file', function() {

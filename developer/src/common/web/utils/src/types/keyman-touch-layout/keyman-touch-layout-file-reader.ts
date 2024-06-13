@@ -1,5 +1,6 @@
-import { TouchLayoutFile } from "./keyman-touch-layout-file.js";
-import SchemaValidators from '../schema-validators.js';
+import { TouchLayout } from "@keymanapp/common-types";
+import TouchLayoutFile = TouchLayout.TouchLayoutFile;
+import { SchemaValidators } from '@keymanapp/common-types';
 
 export class TouchLayoutFileReader {
   public read(source: Uint8Array): TouchLayoutFile {
@@ -22,7 +23,7 @@ export class TouchLayoutFileReader {
         // `row.id` should be number, but may have been stringified; we use
         // presence of `key` property to recognise this as a `TouchLayoutRow`.
         if(this.key && key == 'id' && typeof value == 'string') {
-          let newValue = parseInt(value, 10);
+          const newValue = parseInt(value, 10);
           /* c8 ignore next 3 */
           if(isNaN(newValue)) {
             throw new TypeError(`Invalid row.id: "${value}"`);
@@ -39,7 +40,7 @@ export class TouchLayoutFileReader {
             return undefined;
           }
 
-          let newValue = parseInt(value, 10);
+          const newValue = parseInt(value, 10);
           /* c8 ignore next 3 */
           if(isNaN(newValue)) {
             throw new TypeError(`Invalid [sub]key.${key}: "${value}"`);
@@ -67,10 +68,10 @@ export class TouchLayoutFileReader {
   }
 
   public validate(source: TouchLayoutFile): void {
-    if(!SchemaValidators.touchLayoutClean(source))
+    if(!SchemaValidators.default.touchLayoutClean(source))
     /* c8 ignore next 3 */
     {
-      throw new Error(JSON.stringify((<any>SchemaValidators.touchLayoutClean).errors));
+      throw new Error(JSON.stringify((<any>SchemaValidators.default.touchLayoutClean).errors));
     }
   }
 

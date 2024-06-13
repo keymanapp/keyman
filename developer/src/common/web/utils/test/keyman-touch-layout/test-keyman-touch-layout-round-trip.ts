@@ -2,8 +2,8 @@ import * as fs from 'fs';
 import 'mocha';
 import { assert } from 'chai';
 import { makePathToFixture } from '../helpers/index.js';
-import { TouchLayoutFileReader } from "../../src/keyman-touch-layout/keyman-touch-layout-file-reader.js";
-import { TouchLayoutFileWriter } from "../../src/keyman-touch-layout/keyman-touch-layout-file-writer.js";
+import { TouchLayoutFileReader } from "../../src/types/keyman-touch-layout/keyman-touch-layout-file-reader.js";
+import { TouchLayoutFileWriter } from "../../src/types/keyman-touch-layout/keyman-touch-layout-file-writer.js";
 
 describe('TouchLayoutFile', function () {
   it('should round-trip from TouchLayoutFileReader to TouchLayoutFileWriter', function() {
@@ -26,7 +26,7 @@ describe('TouchLayoutFile', function () {
     assert.deepEqual(layout, newLayout);
 
     // And do the same without any options
-    let output2 = writer.write(layout);
+    const output2 = writer.write(layout);
     assert.deepEqual(output, output2);
 
     newLayout = reader.read(output2);
