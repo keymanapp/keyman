@@ -806,7 +806,7 @@ bool resizeStoreArray(PFILE_KEYBOARD fk) {
  * reallocates the key array in increments of 100
  */
 bool resizeKeyArray(PFILE_GROUP gp, int increment) {
-  if((gp->cxKeyArray + increment - 1) % 100 < increment) {
+  if(((int)gp->cxKeyArray + increment - 1) % 100 < increment) {
     PFILE_KEY kp = new FILE_KEY[((gp->cxKeyArray + increment)/100 + 1) * 100];
     if (!kp) return false;
     if (gp->dpKeyArray)
