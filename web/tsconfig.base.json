@@ -11,7 +11,6 @@
     "target": "es5",
 
     // Other settings - declaration files, sourcemapping, and other miscellaneous bits.
-    "allowJs": false,
     "declaration": true,
     "experimentalDecorators": true,
     "importHelpers": true,

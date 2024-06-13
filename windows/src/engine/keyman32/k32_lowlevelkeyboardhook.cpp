@@ -181,6 +181,8 @@ LRESULT _kmnLowLevelKeyboardProc(
     if (GetKeyState(VK_RMENU) < 0) FHotkeyShiftState |= HK_RALT_INVALID;
     if (GetKeyState(VK_LSHIFT) < 0) FHotkeyShiftState |= HK_SHIFT;
     if (GetKeyState(VK_RSHIFT) < 0) FHotkeyShiftState |= HK_RSHIFT_INVALID;
+    //TODO: #8064. Can remove debug message once issue #8064 is resolved
+     SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: !UseCachedHotkeyModifierState [FHotkeyShiftState:%x Flag:%x]", FHotkeyShiftState, Flag);
   }
   else if (UseRegisterHotkey()) {
     // The old RegisterHotkey pattern does not support chiral modifier keys
@@ -194,7 +196,10 @@ LRESULT _kmnLowLevelKeyboardProc(
       case VK_LSHIFT:
       case VK_RSHIFT:
       case VK_SHIFT:    Flag = HK_SHIFT; break;
+
     }
+    //TODO: #8064. Can remove debug message once issue #8064 is resolved
+    SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: UseRegisterHotkey [FHotkeyShiftState:%x Flag:%x]", FHotkeyShiftState, Flag);
   }
   else {
     // #4619: We differentiate between Left and Right Ctrl/Shift/Alt. The right modifiers are
@@ -225,6 +230,8 @@ LRESULT _kmnLowLevelKeyboardProc(
   // message only updates our internal modifier state, and does not do
   // any additional processing or other serialization of the input queue.
   if (isModifierKey(hs->vkCode) && flag_ShouldSerializeInput) {
+      //TODO: #8064. Can remove debug message once issue #8064 is resolved
+      SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: isModifierKey [hs->vkCode:%x isUp:%d]", hs->vkCode, isUp);
       PostMessage(ISerialKeyEventServer::GetServer()->GetWindow(), WM_KEYMAN_MODIFIER_EVENT, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
   }
 
@@ -234,10 +241,12 @@ LRESULT _kmnLowLevelKeyboardProc(
     if (ProcessLanguageSwitchShiftKey(hs->vkCode, isUp) == 1) return 1;
   }
   else if (KeyLanguageSwitchPress(hs->vkCode, extended, isUp, FHotkeyShiftState)) {
+    SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: KeyLanguageSwitchPress [vkCode:%x extended:%x isUp:%d FHotkeyShiftState:%x", hs->vkCode, extended, isUp, FHotkeyShiftState);
     if (ProcessLanguageSwitchShiftKey(hs->vkCode, isUp) == 1) return 1;
   }
 
   if (ProcessHotkey(hs->vkCode, isUp, FHotkeyShiftState)) {
+    SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: ProcessHotkey [vkCode:%x isUp:%d FHotkeyShiftState:%x", hs->vkCode, isUp, FHotkeyShiftState);
     return 1;
   }
 
@@ -256,13 +265,14 @@ LRESULT _kmnLowLevelKeyboardProc(
     // dwExtraInfo is set to 0x4321DCBA by mstsc which does prefiltering. So we ignore for anything where dwExtraInfo!=0 because it
     // probably is not hardware generated and may cause more issues to filter it.
     // We also ignore if a Keyman keyboard is not currently active.
+    SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: Pass through [dwExtraInfo:%x scancode:%x vkCode:%x, isKeymanKeyboardActive:%d", hs->dwExtraInfo, hs->scanCode, hs->vkCode, isKeymanKeyboardActive);
     return CallNextHookEx(Globals::get_hhookLowLevelKeyboardProc(), nCode, wParam, lParam);
   }
 
   if (IsTouchPanelVisible()) {
     // See #2450. The touch panel will close automatically if we reprocess key events
     // So we don't want to reprocess events when it is visible.
-    //SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: touch panel is visible. Not reprocessing keystrokes");
+    SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: touch panel is visible. Not reprocessing keystrokes");
     return CallNextHookEx(Globals::get_hhookLowLevelKeyboardProc(), nCode, wParam, lParam);
   }
 

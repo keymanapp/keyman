@@ -85,8 +85,14 @@ function prepare() {
 # ```
 function test-headless() {
   TEST_FOLDER=$1
-  TEST_EXTENSIONS=${2:-}
   TEST_BASE="${KEYMAN_ROOT}/web/src/test/auto/headless/"
+  TEST_EXTENSIONS=${2:-}
+  if [ ! -z "${2:-}" ]; then
+    TEST_BASE="${KEYMAN_ROOT}/web/build/test/headless/"
+
+    # Ensure the compiled tests are available.
+    tsc --project "${KEYMAN_ROOT}/web/src/test/auto/tsconfig.json"
+  fi
 
   TEST_OPTS=
   TEST_CD_REQD=false
@@ -135,5 +141,5 @@ function test-headless() {
 function test-headless-typescript() {
   # tests.js - ensure any plain-js files that exist as test resources, but not test defs,
   # aren't treated by Mocha as tests.
-  test-headless "$1" "tests.ts"
+  test-headless "$1" "tests.js"
 }

@@ -27,32 +27,6 @@ builder_parse "$@"
 
 # Browser-based tests: common configs & kill-switches
 
-# DO_BROWSER_TEST_SUITE=true
-
-# if [[ $VERSION_ENVIRONMENT == test ]]; then
-#   # Implied: CONFIG=CI.conf.js because `-CI` parameter is passed.
-#   #
-#   # If we are running a TeamCity test build, for now, only run BrowserStack
-#   # tests when on a PR branch with a title including "(web)" or with the label
-#   # test-browserstack. This is because the BrowserStack tests are currently
-#   # unreliable, and the false positive failures are masking actual failures.
-#   #
-#   # We do not run BrowserStack tests on master, beta, or stable-x.y test
-#   # builds.
-#   DO_BROWSER_TEST_SUITE=false
-#   if builder_pull_get_details; then
-#     if [[ $builder_pull_title =~ \(web\) ]] || builder_pull_has_label test-browserstack; then
-#       DO_BROWSER_TEST_SUITE=true
-#     fi
-#   fi
-# fi
-
-# if [[ $DO_BROWSER_TEST_SUITE == false ]]; then
-#   builder_warn "Skipping action test:engine - this CI build does not appear to be for a Web PR."
-#   builder_finish_action success test:engine
-#   exit 0
-# fi
-
 # Select the right CONFIG file.
 WTR_CONFIG=
 if builder_has_option --ci; then

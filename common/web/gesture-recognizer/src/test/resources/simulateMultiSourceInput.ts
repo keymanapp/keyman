@@ -1,6 +1,5 @@
-import { InputSample, buildGestureMatchInspector, GestureSource, gestures } from '@keymanapp/gesture-recognizer';
+import { InputSample, buildGestureMatchInspector, GestureSource, GestureSourceSubview, gestures } from '@keymanapp/gesture-recognizer';
 import { ManagedPromise, timedPromise } from '@keymanapp/web-utils';
-import { GestureSourceSubview } from '../../../build/obj/headless/gestureSource.js';
 
 type GestureMatcher<Type> = gestures.matchers.GestureMatcher<Type>;
 type MatcherSelection<Type> = gestures.matchers.MatcherSelection<Type>;
@@ -80,7 +79,7 @@ function prepareSourcesFromPriorMatcher<Type>(
 ): ReturnType<typeof prepareSimContact<Type>> {
   const spec = contactSpec;
   const existingSources = spec.matcher.sources.map((src) => {
-    return src instanceof GestureSourceSubview<Type> ? src.baseSource : src;
+    return src instanceof GestureSourceSubview ? src.baseSource : src;
   });
 
   const sequences = spec.continuation;
@@ -330,7 +329,7 @@ export function simulateMultiSourceMatcherInput<Type>(
   const config: SimulationConfig<GestureMatcher<Type>, Type> = {
     construction: (source) => new gestures.matchers.GestureMatcher<Type>(modelSpec, source),
     addSource: (obj, source) => {
-      if(source instanceof GestureSource<Type>) {
+      if(source instanceof GestureSource) {
         obj.addContact(source)
       } else {
         throw new Error("Error in internal sim-engine configuration");

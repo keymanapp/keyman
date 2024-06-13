@@ -12,7 +12,7 @@ env:
 
 jobs:
   api_verification:
-    name: Verify API for libkeymancore.so
+    name: Verify API for libkeymancore*.so
     runs-on: ubuntu-latest
     outputs:
       VERSION: ${{ steps.environment_step.outputs.VERSION }}
@@ -37,8 +37,6 @@ jobs:
       id: environment_step
       run: |
         cat artifacts/env >> $GITHUB_OUTPUT
-        pwd
-        ls -al artifacts/
 
     - name: Set pending status on PR builds
       id: set_status
@@ -60,25 +58,20 @@ jobs:
         ref: '${{ steps.environment_step.outputs.GIT_SHA }}'
         fetch-depth: 0
         clean: false
+        path: ${{ github.workspace }}/keyman/
 
     - name: Install devscripts
-      uses: ./.github/actions/apt-install
+      uses: ./keyman/.github/actions/apt-install
       with:
         packages: devscripts equivs
 
-    - name: "Verify API for libkeymancore.so (${{ steps.environment_step.outputs.GIT_BRANCH }}, branch ${{ steps.environment_step.outputs.GIT_BASE_BRANCH }}, by ${{ steps.environment_step.outputs.GIT_USER }}) - "
+    - name: "Verify API for libkeymancore*.so (${{ steps.environment_step.outputs.GIT_BRANCH }}, branch ${{ steps.environment_step.outputs.GIT_BASE_BRANCH }}, by ${{ steps.environment_step.outputs.GIT_USER }})"
       run: |
-        pwd
-        ls -al artifacts/
-        echo "GITHUB_WORKSPACE=${GITHUB_WORKSPACE}"
-        ls -al ${GITHUB_WORKSPACE}
-        ls -al ${GITHUB_WORKSPACE}/artifacts/
-        ls -al "${GITHUB_WORKSPACE}/artifacts/${PKG_NAME}_${{ steps.environment_step.outputs.VERSION }}-1${{ steps.environment_step.outputs.PRERELEASE_TAG }}+$(lsb_release -c -s)1_amd64.deb"
-
-        cd linux
+        BIN_PACKAGE=$(ls "${GITHUB_WORKSPACE}/artifacts/" | grep "${PKG_NAME}[0-9]*_${{ steps.environment_step.outputs.VERSION }}-1${{ steps.environment_step.outputs.PRERELEASE_TAG }}+$(lsb_release -c -s)1_amd64.deb")
+        cd ${{ github.workspace }}/keyman/linux
         ./scripts/deb-packaging.sh \
           --gha \
-          --bin-pkg "${GITHUB_WORKSPACE}/artifacts/${PKG_NAME}_${{ steps.environment_step.outputs.VERSION }}-1${{ steps.environment_step.outputs.PRERELEASE_TAG }}+$(lsb_release -c -s)1_amd64.deb" \
+          --bin-pkg "${GITHUB_WORKSPACE}/artifacts/${BIN_PACKAGE}" \
           --git-sha "${{ steps.environment_step.outputs.GIT_SHA }}" \
           --git-base "${{ steps.environment_step.outputs.GIT_BASE }}" \
           verify 2>> $GITHUB_STEP_SUMMARY
@@ -87,7 +80,7 @@ jobs:
       uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 # v4.3.0
       with:
         name: libkeymancore.symbols
-        path: linux/debian/tmp/DEBIAN/symbols
+        path: ${{ github.workspace }}/keyman/linux/debian/tmp/DEBIAN/symbols
       if: always()
 
   set_status:
@@ -97,23 +90,22 @@ jobs:
     if: ${{ always() && needs.api_verification.outputs.IS_TEST_BUILD == 'true' }}
     steps:
     - name: Set success
-    # TEMP commented until things are working!
-    #   if: needs.api_verification.result == 'success'
+      if: needs.api_verification.result == 'success'
       run: |
         echo "RESULT=success" >> $GITHUB_ENV
         echo "MSG=Package build succeeded" >> $GITHUB_ENV
 
-    # - name: Set cancelled
-    #   if: needs.api_verification.result == 'cancelled'
-    #   run: |
-    #     echo "RESULT=error" >> $GITHUB_ENV
-    #     echo "MSG=Package build cancelled" >> $GITHUB_ENV
+    - name: Set cancelled
+      if: needs.api_verification.result == 'cancelled'
+      run: |
+        echo "RESULT=error" >> $GITHUB_ENV
+        echo "MSG=Package build cancelled" >> $GITHUB_ENV
 
-    # - name: Set failure
-    #   if: needs.api_verification.result == 'failure'
-    #   run: |
-    #     echo "RESULT=failure" >> $GITHUB_ENV
-    #     echo "MSG=Package build failed" >> $GITHUB_ENV
+    - name: Set failure
+      if: needs.api_verification.result == 'failure'
+      run: |
+        echo "RESULT=failure" >> $GITHUB_ENV
+        echo "MSG=Package build failed" >> $GITHUB_ENV
 
     - name: Set final status
       run: |

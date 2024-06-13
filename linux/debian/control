@@ -19,7 +19,7 @@ Build-Depends:
  libjson-glib-dev (>= 1.4.0),
  liblocale-gettext-perl,
  libsystemd-dev,
- meson (>= 0.53),
+ meson (>= 1.0),
  metacity,
  ninja-build,
  perl,
