@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
     fseek(fp2, 0, SEEK_END);
     auto sz2 = ftell(fp2);
     fseek(fp2, 0, SEEK_SET);
-    if (result.kmxSize != sz2) return __LINE__;                //  exit code: size of kmx-file in build differs from size of kmx-file in source folder
+    if ((long)result.kmxSize != sz2) return __LINE__;                //  exit code: size of kmx-file in build differs from size of kmx-file in source folder
 
     char* buf2 = new char[result.kmxSize];
     fread(buf2, 1, result.kmxSize, fp2);
