@@ -3516,7 +3516,7 @@ bool UTF16TempFromUTF8(KMX_BYTE* infile, int sz, KMX_BYTE** tempfile, int *sz16)
   try {
     std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
     result = converter.from_bytes((char*)infile, (char*)infile+sz);
-  } catch(std::range_error e) {
+  } catch(std::range_error &e) {
     AddCompileError(CHINT_NonUnicodeFile);
     result.resize(sz);
     for(int i = 0; i < sz; i++) {
