@@ -50,6 +50,15 @@ size_t km::core::kmx::u16len(const km_core_cu *p) {
   return i;
 }
 
+size_t km::core::kmx::u32len(const km_core_usv *p) {
+  int i = 0;
+  while (*p) {
+    p++;
+    i++;
+  }
+  return i;
+}
+
 int km::core::kmx::u16cmp(const km_core_cu *p, const km_core_cu *q) {
   while (*p && *q) {
     if (*p != *q) return *p - *q;
@@ -105,6 +114,11 @@ km_core_cu *km::core::kmx::u16tok(km_core_cu *p, km_core_cu ch, km_core_cu **ctx
 km_core_cu *km::core::kmx::u16dup(km_core_cu *src) {
   km_core_cu *dup = new km_core_cu[u16len(src) + 1];
   memcpy(dup, src, (u16len(src) + 1) * sizeof(km_core_cu));
+  return dup;
+}
+km_core_usv *km::core::kmx::u32dup(const km_core_usv *src) {
+  km_core_usv *dup = new km_core_usv[u32len(src) + 1];
+  memcpy(dup, src, (u32len(src) + 1) * sizeof(src[0]));
   return dup;
 }
 
