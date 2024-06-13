@@ -14,6 +14,7 @@ if cpp_compiler.get_id() == 'gcc' or cpp_compiler.get_id() == 'clang'
      '-Wall',
      '-Wextra'
   ]
+  flags += ['-D__cdecl= ']
 endif
 
 if cpp_compiler.get_id() == 'msvc'
