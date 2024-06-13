@@ -54,6 +54,10 @@ if cpp_compiler.get_id() == 'emscripten'
     # emscripten < 3.1.44 does not include `wasmExports`
     links += ['-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
   endif
+
+  # For Google Test
+  add_global_arguments('-pthread', language: [ 'cpp', 'c' ] )
+
 endif
 
 icu = subproject('icu-for-uset', default_options: [ 'default_library=static', 'cpp_std=c++17', 'warning_level=0', 'werror=false'])
@@ -101,7 +105,7 @@ if cpp_compiler.get_id() == 'emscripten'
     cpp_args: defns,
     include_directories: inc,
     link_args: links + lib_links,
-    objects: lib.extract_all_objects(),
+    objects: lib.extract_all_objects(recursive: false),
     dependencies: icuuc_dep)
 
   if get_option('buildtype') == 'release'
@@ -116,3 +120,7 @@ if cpp_compiler.get_id() == 'emscripten'
   endif
 endif
 
+
+gtest = subproject('gtest')
+gtest_dep = gtest.get_variable('gtest_main_dep')
+gmock_dep = gtest.get_variable('gmock_dep')
