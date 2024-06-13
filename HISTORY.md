@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.55 alpha 2024-06-13
+
+* fix(developer): handle missing OSK when importing a Windows keyboard into a touch-only project (#11720)
+* fix(developer): verify email addresses in .kps and .keyboard_info (#11735)
+* change(web): prep for better asynchronous prediction handling (#10343)
+
 ## 18.0.54 alpha 2024-06-12
 
 * fix(common): remove subpackage entries for older TS version (#11745)
