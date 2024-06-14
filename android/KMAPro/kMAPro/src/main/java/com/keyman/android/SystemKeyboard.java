@@ -147,6 +147,16 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     KMManager.onStartInput(attribute, restarting);
     KMManager.resetContext(KeyboardType.KEYBOARD_TYPE_SYSTEM);
 
+    // This method (likely) includes the IME equivalent to `onResume` for `Activity`-based classes,
+    // making it an important time to detect orientation changes.
+    Context appContext = getApplicationContext();
+    int newOrientation = KMManager.getOrientation(appContext);
+    if(newOrientation != lastOrientation) {
+      lastOrientation = newOrientation;
+      Configuration newConfig = this.getResources().getConfiguration();
+      KMManager.onConfigurationChanged(newConfig);
+    }
+
     // Temporarily disable predictions on certain fields (e.g. hidden password field or numeric)
     int inputType = attribute.inputType;
     KMManager.setMayPredictOverride(inputType);
@@ -154,7 +164,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       KMManager.setBannerOptions(false);
     } else if (KMManager.isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)){
       // Check if predictions needs to be re-enabled per Settings preference
-      Context appContext = getApplicationContext();
       Keyboard kbInfo = KMManager.getCurrentKeyboardInfo(appContext);
       if (kbInfo != null) {
         String langId = kbInfo.getLanguageID();
@@ -171,7 +180,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
       /*
         We do sometimes receive null `icText.text`, even though
-        getExtractedText() docs does not list this as a possible 
+        getExtractedText() docs does not list this as a possible
         return value, so we test for that as well (#11479)
       */
       if (icText != null && icText.text != null) {
@@ -197,15 +206,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   @Override
   public void onUpdateExtractingVisibility(EditorInfo ei) {
     super.onUpdateExtractingVisibility(ei);
-  }
-
-  @Override
-  public void onConfigurationChanged(Configuration newConfig) {
-    super.onConfigurationChanged(newConfig);
-    if (newConfig.orientation != lastOrientation) {
-      lastOrientation = newConfig.orientation;
-      KMManager.onConfigurationChanged(newConfig);
-    }
   }
 
   @Override

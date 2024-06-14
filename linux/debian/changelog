@@ -1,3 +1,10 @@
+keyman (17.0.326-1) unstable; urgency=medium
+
+  * New upstream release
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Mon, 03 Jun 2024 21:58:16 +0200
+
 keyman (17.0.295-1) unstable; urgency=medium
 
   * Remove ibus-keyman.post{inst,rm} (closes: #1034040)
