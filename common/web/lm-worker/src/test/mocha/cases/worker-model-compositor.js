@@ -9,7 +9,6 @@ import * as wordBreakers from '@keymanapp/models-wordbreakers';
 import { assert } from 'chai';
 
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
-import { timedPromise } from '@keymanapp/web-utils';
 
 var TrieModel = models.TrieModel;
 
