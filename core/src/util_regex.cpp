@@ -157,20 +157,19 @@ bool km_regex::valid() const {
 
 bool km_regex::init(const std::u32string &pattern) {
 #if KMN_NO_ICU
-// for now- new regex every time.
+// The current implementation makes a new regex every time, so we always return true.
   assert(!pattern.empty());
   fPattern = pattern;
-  return true; // TODO
+  return true;
 #else
   if (pattern.empty()) {
     return false;
   }
-  // TODO-LDML: if we have mapFrom, may need to do other processing.
   std::u16string patstr = km::core::kmx::u32string_to_u16string(pattern);
   UErrorCode status           = U_ZERO_ERROR;
   /* const */ icu::UnicodeString patustr = icu::UnicodeString(patstr.data(), (int32_t)patstr.length());
   // add '$' to match to end
-  patustr.append(u'$'); // TODO-LDML: may need to escape some markers. Marker #91 will look like a `[` to the pattern
+  patustr.append(u'$');
   fPattern.reset(icu::RegexPattern::compile(patustr, 0, status));
   return (UASSERT_SUCCESS(status));
 #endif
@@ -189,30 +188,41 @@ size_t km_regex::apply(const std::u32string &input, std::u32string &output,
   const auto matchLen = RegexMatchLen(patstr.c_str(), instr.c_str());
   assert(matchLen != -1); // error
   if (matchLen == 0) {
-    // TODO: not correct, just trying to quell unused arg.
-    return 0;
+    return 0; // Normal case return: no match
   }
   std::u32string rustr; // replacement
   if (fromList.empty()) {
+    // Normal case: not a map.
+    // This replace will apply $1, $2 etc.
     rustr = to;
   } else {
-
+    // we actually need the group(1) string here.
+    // this is only the content in parenthesis ()
     char *group1 = RegexGroup1(patstr.c_str(), instr.c_str());
     assert(group1 != nullptr);
     const std::string group1str(group1);
     const std::u32string match32 = convert<char, char32_t>(group1str);
     free(group1);
+    // Now we're ready to do the actual mapping.
+
+    // 1., we need to find the index in the source set.
     auto matchIndex = findIndex(match32, fromList);
-    assert(matchIndex != -1);
+    assert(matchIndex != -1L); // This indicates that the regex and the fromList are out of sync.
+    // we already asserted on load that the from and to sets have the same cardinality.
+
+    // 2. get the target string
+    // we use the same matchIndex that was just found
+    // 3. update the UnicodeString for replacement
     rustr = toList.at(matchIndex);
   }
   std::string rstr = convert<char32_t,char>(rustr);
-  // now, perform substitution
+  // here we replace the match output.
   char *out = RegexSubstitute(patstr.c_str(), instr.c_str(), rstr.c_str());
   assert(out != nullptr);
   std::string outstr(out);
   free(out);
   output = convert<char, char32_t>(outstr);
+  // output includes all of 'input', but modified. Need to substring it.
   /** code units */
   const auto matchStart = input.length() - matchLen;
   // remove the unmatched prefix.
@@ -221,23 +231,21 @@ size_t km_regex::apply(const std::u32string &input, std::u32string &output,
   return matchLen;
 #else
   assert(fPattern);
-  // TODO-LDML: Really? can't go from u32 to UnicodeString?
-  // TODO-LDML: Also, we could cache the u16 string at the transformGroup level or higher.
+  // TODO-LDML: This entire section may have too many conversions and copies. Could be optimized.
   UErrorCode status = U_ZERO_ERROR;
   const std::u16string matchstr = km::core::kmx::u32string_to_u16string(input);
   icu::UnicodeString matchustr  = icu::UnicodeString(matchstr.data(), (int32_t)matchstr.length());
   // TODO-LDML: create a new Matcher every time. These could be cached and reset.
   std::unique_ptr<icu::RegexMatcher> matcher(fPattern->matcher(matchustr, status));
   if (!UASSERT_SUCCESS(status)) {
-    return 0; // TODO-LDML: return error
+    return 0;
   }
 
   if (!matcher->find(status)) { // i.e. matches somewhere, in this case at end of str
-    return 0; // no match
+    return 0; // Normal case return: no match
   }
 
-  // TODO-LDML: this is UTF-16 len, not UTF-32 len!!
-  // TODO-LDML: if we had an underlying UText this would be simpler.
+  // Note: this is UTF-16 len, not UTF-32 len.
   int32_t matchStart = matcher->start(status);
   int32_t matchEnd   = matcher->end(status);
   if (!UASSERT_SUCCESS(status)) {
@@ -252,6 +260,7 @@ size_t km_regex::apply(const std::u32string &input, std::u32string &output,
 
   // should have matched something.
   assert(matchLen > 0);
+
 
   // now, do the replace.
 
@@ -302,7 +311,7 @@ size_t km_regex::apply(const std::u32string &input, std::u32string &output,
     rustr  = icu::UnicodeString(rstr.data(), (int32_t)rstr.length());
     // and we return to the regular code flow.
   }
-  // here we replace the match output. No normalization, yet.
+  // here we replace the match output.
   icu::UnicodeString entireOutput = matcher->replaceFirst(rustr, status);
   if (!UASSERT_SUCCESS(status)) {
     // TODO-LDML: could fail here due to bad input (syntax err)
@@ -323,12 +332,12 @@ size_t km_regex::apply(const std::u32string &input, std::u32string &output,
     std::unique_ptr<char32_t[]> s(new char32_t[out32len + 1]);
     assert(s);
     if (!s) {
-      return 0; // TODO-LDML: allocation failed
+      return 0;
     }
     // convert
     outu.toUTF32((UChar32 *)(s.get()), out32len + 1, status);
     if (!UASSERT_SUCCESS(status)) {
-      return 0; // TODO-LDML: memory issue
+      return 0;
     }
     output.assign(s.get(), out32len);
   }
