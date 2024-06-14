@@ -16,8 +16,7 @@ export default class OSKSubKey extends OSKKey {
   }
 
   getId(): string {
-    // Create (temporarily) unique ID by prefixing 'popup-' to actual key ID
-    return 'popup-'+this.layer+'-'+this.spec['id'];
+    return 'popup-'+this.spec.elementID;
   }
 
   construct(osk: VisualKeyboard, baseKey: KeyElement, topMargin: boolean): HTMLDivElement {
