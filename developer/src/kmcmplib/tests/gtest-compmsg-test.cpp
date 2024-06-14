@@ -2,7 +2,7 @@
 #include "..\..\common\include\kmn_compiler_errors.h"
 #include "..\..\..\..\common\include\km_types.h"
 
-KMX_CHAR *GetCompilerErrorString(KMX_DWORD code);
+const KMX_CHAR *GetCompilerErrorString(KMX_DWORD code);
 
 class CompMsgTest : public testing::Test {
     protected:

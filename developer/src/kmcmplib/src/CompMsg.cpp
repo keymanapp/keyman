@@ -148,6 +148,6 @@ std::map<KMX_DWORD, const KMX_CHAR*> CompilerErrorMap = {
     { 0, nullptr }
 };
 
-KMX_CHAR *GetCompilerErrorString(KMX_DWORD code) {
+const KMX_CHAR *GetCompilerErrorString(KMX_DWORD code) {
     return (KMX_CHAR*) CompilerErrorMap[code];
 }
