@@ -806,12 +806,13 @@ bool resizeStoreArray(PFILE_KEYBOARD fk) {
  * reallocates the key array in increments of 100
  */
 bool resizeKeyArray(PFILE_GROUP gp, int increment) {
-  if(((int)gp->cxKeyArray + increment - 1) % 100 < increment) {
-    PFILE_KEY kp = new FILE_KEY[((gp->cxKeyArray + increment)/100 + 1) * 100];
+  const int cxKeyArray = (int)gp->cxKeyArray;
+  if((cxKeyArray + increment - 1) % 100 < increment) {
+    PFILE_KEY kp = new FILE_KEY[((cxKeyArray + increment)/100 + 1) * 100];
     if (!kp) return false;
     if (gp->dpKeyArray)
     {
-      memcpy(kp, gp->dpKeyArray, gp->cxKeyArray * sizeof(FILE_KEY));
+      memcpy(kp, gp->dpKeyArray, cxKeyArray * sizeof(FILE_KEY));
       delete[] gp->dpKeyArray;
     }
 
