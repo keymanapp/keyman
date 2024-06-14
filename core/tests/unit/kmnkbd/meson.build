@@ -34,7 +34,7 @@ test_path = join_paths(meson.current_build_dir(), '..', 'kmx')
 tests_flags = []
 
 if cpp_compiler.get_id() == 'emscripten'
-  tests_flags += ['-lnodefs.js', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
+  tests_flags += ['-lnodefs.js', wasm_exported_runtime_methods]
 endif
 
 foreach t : tests

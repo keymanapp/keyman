@@ -18,6 +18,9 @@
 
 #include <json.hpp>
 
+// Ensure that ICU gets included even on wasm.
+#define KMN_IN_LDML_TESTS
+
 #include <kmx/kmx_processevent.h> // for char to vk mapping tables
 #include <kmx/kmx_xstring.h> // for surrogate pair macros
 #include <kmx/kmx_plus.h>

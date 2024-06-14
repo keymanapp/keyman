@@ -56,7 +56,7 @@ describe('KeyboardInfoCompilerMessages', function () {
     assert.isTrue(nodeCompilerMessage(callbacks, KeyboardInfoCompilerMessages.ERROR_FileDoesNotExist).includes(KeymanFileTypes.Binary.WebKeyboard),
       KeymanFileTypes.Binary.WebKeyboard+' not found in the message');
   });
-  
+
   // ERROR_FileDoesNotExist (.kmp fileSize)
 
   it('should generate ERROR_FileDoesNotExist error if .kmp file does not exist', async function() {
@@ -141,7 +141,7 @@ describe('KeyboardInfoCompilerMessages', function () {
     assert.isTrue(nodeCompilerMessage(callbacks, KeyboardInfoCompilerMessages.ERROR_LicenseFileIsMissing).includes(licenseFilename),
       licenseFilename+' not found in the message');
   });
-  
+
   // ERROR_LicenseFileIsDamaged (error on decode)
 
   it('should generate ERROR_LicenseFileIsDamaged error if license file throws error on decode', async function() {
@@ -197,7 +197,7 @@ describe('KeyboardInfoCompilerMessages', function () {
     assert.isTrue(nodeCompilerMessage(callbacks, KeyboardInfoCompilerMessages.ERROR_LicenseIsNotValid).includes(licenseFilename),
       licenseFilename+' not found in the message');
   });
-  
+
   // ERROR_CannotBuildWithoutKmpFile
 
   it('should generate ERROR_CannotBuildWithoutKmpFile error if .kmp file is not in sources', async function() {
@@ -227,7 +227,7 @@ describe('KeyboardInfoCompilerMessages', function () {
     assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.ERROR_CannotBuildWithoutKmpFile),
       `ERROR_CannotBuildWithoutKmpFile not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
   });
-  
+
   // ERROR_NoLicenseFound
 
   it('should generate ERROR_NoLicenseFound error if licence file is not in .kps options', async function() {
@@ -257,7 +257,7 @@ describe('KeyboardInfoCompilerMessages', function () {
     assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.ERROR_NoLicenseFound),
       `ERROR_NoLicenseFound not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
   });
-  
+
   // ERROR_FontFileMetaDataIsInvalid
 
   it('should generate ERROR_FontFileMetaDataIsInvalid error if font file meta data throws an error', async function() {
@@ -285,7 +285,38 @@ describe('KeyboardInfoCompilerMessages', function () {
       `ERROR_FontFileMetaDataIsInvalid not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
     assert.isTrue(nodeCompilerMessage(callbacks, KeyboardInfoCompilerMessages.ERROR_FontFileMetaDataIsInvalid).includes(kmpJsonData.files[0].name),
       kmpJsonData.files[0].name+' not found in the message');
-  });      
+  });
+
+  // ERROR_InvalidAuthorEmail
+
+  it('should generate ERROR_InvalidAuthorEmail error if multiple email addresses are listed in .kps', async function() {
+    const jsFilename = makePathToFixture('multiple-email-addresses', 'build', 'khmer_angkor.js');
+    const kpsFilename = makePathToFixture('multiple-email-addresses', 'source', 'khmer_angkor.kps');
+    const kmpFilename = makePathToFixture('multiple-email-addresses', 'build', 'khmer_angkor.kmp');
+
+    const sources = {
+      kmpFilename,
+      sourcePath: 'release/k/multiple-email-addresses',
+      kpsFilename,
+      jsFilename: jsFilename,
+      forPublishing: true,
+    };
+
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    let result: KeyboardInfoCompilerResult = null;
+    try {
+      result = await compiler.run(kmpFilename, null);
+    } catch(e) {
+      callbacks.printMessages();
+      throw e;
+    }
+    assert.isNull(result);
+
+    assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.ERROR_InvalidAuthorEmail),
+      `ERROR_InvalidAuthorEmail not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
+  });
+
 });
 
 function nodeCompilerMessage(ncb: TestCompilerCallbacks, code: number): string {
