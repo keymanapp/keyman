@@ -278,7 +278,7 @@ KMX_DWORD convertNamesTo_DWORD_Value(std::string tok_str) {
 
   first["acute accent"]      = 0xB4;
 
-  if ( tok_str.size() == 1) {
+  if (tok_str.size() == 1) {
     return (KMX_DWORD) ( *tok_str.c_str() );
   }
   else {
@@ -291,9 +291,9 @@ KMX_DWORD convertNamesTo_DWORD_Value(std::string tok_str) {
   return INVALID_NAME;
 }
 
-int createOneVectorFromBothKeyboards(vec_dword_3D &All_Vector,GdkKeymap *keymap) {
+int createOneVectorFromBothKeyboards(vec_dword_3D &all_vector,GdkKeymap *keymap) {
   // create a 3D-Vector which contains data of the US keyboard and the underlying Keyboard:
-  //    All_Vector[  US_Keyboard ]
+  //    all_vector[  US_Keyboard ]
   //                     [KeyCode_US        ]
   //                     [Keyval unshifted  ]
   //                     [Keyval shifted    ]
@@ -305,13 +305,13 @@ int createOneVectorFromBothKeyboards(vec_dword_3D &All_Vector,GdkKeymap *keymap)
   std::string us_language    = "us";
   const char* text_us        = "xkb_symbols \"basic\"";
 
-  if(write_US_ToVector(All_Vector,us_language, text_us)) {
+  if (write_US_ToVector(all_vector,us_language, text_us)) {
     wprintf(L"ERROR: can't write US to Vector \n");
     return 1;
   }
 
-  // add contents of other keyboard to All_Vector
-  if( append_underlying_ToVector(All_Vector,keymap)) {
+  // add contents of other keyboard to all_vector
+  if (append_underlying_ToVector(all_vector,keymap)) {
     wprintf(L"ERROR: can't append underlying ToVector \n");
     return 2;
   }
@@ -324,20 +324,20 @@ int write_US_ToVector( vec_dword_3D &vec,std::string language, const char* secti
 
   const char* path = fullPathName.c_str();
   FILE* fp = fopen((path), "r");
-  if ( !fp) {
+  if (!fp) {
     wprintf(L"ERROR: could not open file!\n");
     return 1;
   }
 
   // create 1D-vector of the complete line
   vec_string_1D vector_completeUS;
-  if( createCompleteVector_US(fp, section , vector_completeUS)) {
+  if (createCompleteVector_US(fp, section, vector_completeUS)) {
     wprintf(L"ERROR: can't Create complete row US \n");
     return 1;
   }
 
   // split contents of 1D Vector to 3D vector
-  if( split_US_To_3D_Vector( vec,vector_completeUS)) {
+  if (split_US_To_3D_Vector(vec,vector_completeUS)) {
     return 1;
   }
 
@@ -345,7 +345,7 @@ int write_US_ToVector( vec_dword_3D &vec,std::string language, const char* secti
   return 0;
 }
 
-bool createCompleteVector_US(FILE* fp, const char* section , vec_string_1D &complete_List) {
+bool createCompleteVector_US(FILE* fp, const char* section, vec_string_1D &complete_List) {
   // in the Configuration file we find the appopriate paragraph between "xkb_symbol <text>" and the next xkb_symbol
   // and then copy all rows starting with "key <" to a 1D-Vector
 
@@ -353,7 +353,7 @@ bool createCompleteVector_US(FILE* fp, const char* section , vec_string_1D &comp
   char line[buffer_size];
   bool create_row   = false;
   const char* key = "key <";
-  std::string str_us_kbd_name(section );
+  std::string str_us_kbd_name(section);
   std::string xbk_mark = "xkb_symbol";
 
   if (fp) {
@@ -442,7 +442,7 @@ int replace_KeyName_with_Keycode(std::string  in) {
   return out;
 }
 
-int split_US_To_3D_Vector(vec_dword_3D &all_US,vec_string_1D completeList) {
+int split_US_To_3D_Vector(vec_dword_3D& all_US, vec_string_1D completeList) {
   // 1: take the whole line of the 1D-Vector and remove unwanted characters.
   // 2: seperate the name e.g. key<AD06> from the shiftstates
   // 3: convert to KMX_DWORD
@@ -500,7 +500,7 @@ int split_US_To_3D_Vector(vec_dword_3D &all_US,vec_string_1D completeList) {
   }
   all_US.push_back(shift_states);
 
-  if ( all_US.size() == 0) {
+  if (all_US.size() == 0) {
     wprintf(L"ERROR: Can't split US to 3D-Vector\n");
     return 1;
   }
@@ -522,30 +522,30 @@ vec_dword_2D create_empty_2D_Vector( int dim_rows,int dim_ss) {
   return vector_2D;
 }
 
-int append_underlying_ToVector(vec_dword_3D &All_Vector,GdkKeymap *keymap) {
+int append_underlying_ToVector(vec_dword_3D& all_vector,GdkKeymap *keymap) {
 
   // create a 2D vector all filled with " " and push to 3D-Vector
-  vec_dword_2D underlying_Vector2D = create_empty_2D_Vector(All_Vector[0].size(),All_Vector[0][0].size());
+  vec_dword_2D underlying_Vector2D = create_empty_2D_Vector(all_vector[0].size(),all_vector[0][0].size());
 
   if (underlying_Vector2D.size() == 0) {
     wprintf(L"ERROR: can't create empty 2D-Vector\n");
     return 1;
   }
-  All_Vector.push_back(underlying_Vector2D);
+  all_vector.push_back(underlying_Vector2D);
 
-  if (All_Vector.size() < 2) {
+  if (all_vector.size() < 2) {
     wprintf(L"ERROR: creation of 3D-Vector failed\n");
     return 1;
   }
 
-  for(int i =0; i< (int) All_Vector[1].size();i++) {
+  for(int i =0; i< (int) all_vector[1].size();i++) {
 
     // get key name US stored in [0][i][0] and copy to name in "underlying"-block[1][i][0]
-    All_Vector[1][i][0] = All_Vector[0][i][0];
+    all_vector[1][i][0] = all_vector[0][i][0];
 
     // get Keyvals of this key and copy to unshifted/shifted in "underlying"-block[1][i][1] / block[1][i][2]
-    All_Vector[1][i][0+1] = KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(keymap,All_Vector[0][i][0],0);   //shift state: unshifted:0
-    All_Vector[1][i][1+1] = KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(keymap,All_Vector[0][i][0],1);   //shift state: shifted:1
+    all_vector[1][i][0+1] = KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(keymap,all_vector[0][i][0],0);   //shift state: unshifted:0
+    all_vector[1][i][1+1] = KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(keymap,all_vector[0][i][0],1);   //shift state: shifted:1
   }
 
   return 0;
@@ -583,9 +583,9 @@ std::u16string convert_DeadkeyValues_To_U16str(int in) {
   if (in == 0 )
     return u"\0";
 
-  std::string long_name((const char*) gdk_keyval_name (in));                      // e.g. "dead_circumflex" , "U+017F" , "t"
+  std::string long_name((const char*) gdk_keyval_name (in));                      // e.g. "dead_circumflex",  "U+017F",  "t"
 
-  if ( long_name.substr (0,2) == "U+" )                                           // U+... Unicode value
+  if (long_name.substr (0,2) == "U+" )                                           // U+... Unicode value
     return  CodePointToU16String(in-0x1000000);                                   // GDK's gdk_keymap_translate_keyboard_state() returns (Keyvalue | 0x01000000)
                                                                                   // since we never have a carry-over we can just subtract 0x01000000
   if (in < (int) deadkey_min) {                                                   // no deadkey; no Unicode
@@ -614,7 +614,7 @@ int KMX_get_KeyVal_From_KeyCode(GdkKeymap *keymap, guint keycode, ShiftState ss,
   //BASE (shiftstate: 0)
   if (( ss == Base ) && ( caps == 0 )) {
     GdkModifierType MOD_base = (GdkModifierType) ( ~GDK_MODIFIER_MASK );
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_base , 0, keyvals, NULL, NULL, & consumed);
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_base,  0, keyvals, NULL, NULL, & consumed);
   }
 
   //BASE + CAPS (shiftstate: 0)
@@ -626,61 +626,61 @@ int KMX_get_KeyVal_From_KeyCode(GdkKeymap *keymap, guint keycode, ShiftState ss,
   //SHIFT (shiftstate: 1)
   else if (( ss == Shft ) && ( caps == 0 )) {
     GdkModifierType MOD_Shift = (GdkModifierType) ( GDK_SHIFT_MASK );
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Shift , 0, keyvals, NULL, NULL, & consumed);
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Shift,  0, keyvals, NULL, NULL, & consumed);
   }
 
   //SHIFT + CAPS (shiftstate: 1)
-  else if ( ( ss == Shft ) && ( caps ==1 )) {
+  else if (( ss == Shft ) && ( caps ==1 )) {
     GdkModifierType MOD_ShiftCaps= (GdkModifierType) ((GDK_SHIFT_MASK | GDK_LOCK_MASK));
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_ShiftCaps , 0, keyvals, NULL, NULL, & consumed);
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_ShiftCaps,  0, keyvals, NULL, NULL, & consumed);
   }
 
   // Ctrl (shiftstate: 2)
   else if (( ss == Ctrl ) && ( caps == 0 )){
     GdkModifierType MOD_Ctrl = (GdkModifierType) ( GDK_MOD5_MASK  );
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Ctrl , 0, keyvals, NULL, NULL, & consumed);
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Ctrl,  0, keyvals, NULL, NULL, & consumed);
   }
 
   // Ctrl + CAPS  (shiftstate: 2)
   else if (( ss == Ctrl ) && ( caps == 1 )){
     GdkModifierType MOD_CtrlCaps = (GdkModifierType) (GDK_MOD5_MASK | GDK_LOCK_MASK);
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_CtrlCaps , 0, keyvals, NULL, NULL, & consumed);
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_CtrlCaps,  0, keyvals, NULL, NULL, & consumed);
   }
 
   // SHIFT+Ctrl (shiftstate: 3)
   else if (( ss == ShftCtrl ) && ( caps == 0 )){
     GdkModifierType MOD_Ctrl = (GdkModifierType) (GDK_SHIFT_MASK |  GDK_MOD5_MASK  );
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Ctrl , 0, keyvals, NULL, NULL, & consumed);
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_Ctrl,  0, keyvals, NULL, NULL, & consumed);
   }
 
   // SHIFT+Ctrl + CAPS  (shiftstate: 3)
   else if (( ss == ShftCtrl ) && ( caps == 1 )){
     GdkModifierType MOD_CtrlCaps = (GdkModifierType) ( GDK_SHIFT_MASK | GDK_MOD5_MASK | GDK_LOCK_MASK);
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_CtrlCaps , 0, keyvals, NULL, NULL, & consumed);
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_CtrlCaps,  0, keyvals, NULL, NULL, & consumed);
   }
 
   //ALT-GR (shiftstate: 6)
   else if (( ss == MenuCtrl ) && ( caps == 0 )){
     GdkModifierType MOD_AltGr = (GdkModifierType) (GDK_MOD2_MASK | GDK_MOD5_MASK);
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr,  0, keyvals, NULL, NULL, & consumed);
   }
 
   //ALT-GR + CAPS (shiftstate: 6)
   else if (( ss == MenuCtrl ) && ( caps == 1 )){
     GdkModifierType MOD_AltGr = (GdkModifierType) (GDK_MOD2_MASK | GDK_MOD5_MASK | GDK_LOCK_MASK);
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr,  0, keyvals, NULL, NULL, & consumed);
   }
 
   //ALT-GR (shiftstate: 7)
   else if (( ss == ShftMenuCtrl ) && ( caps == 0 )){
     GdkModifierType MOD_AltGr = (GdkModifierType) ( (GDK_SHIFT_MASK | GDK_MOD2_MASK | GDK_MOD5_MASK) );
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr,  0, keyvals, NULL, NULL, & consumed);
   }
 
   //ALT-GR +CAPS (shiftstate: 7)
   else if (( ss == ShftMenuCtrl ) && ( caps == 1 )){
     GdkModifierType MOD_AltGr = (GdkModifierType) ( (GDK_SHIFT_MASK | GDK_MOD2_MASK | GDK_MOD5_MASK | GDK_LOCK_MASK) );
-    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr , 0, keyvals, NULL, NULL, & consumed);
+    gdk_keymap_translate_keyboard_state (keymap, keycode, MOD_AltGr,  0, keyvals, NULL, NULL, & consumed);
   }
   else
     return 0;
@@ -738,18 +738,18 @@ KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, UIN
     *deadkey = *dky;
     return 0xFFFF;
   }
-  else if((keyV >  deadkey_max) || ((keyV <  deadkey_min)  &&  ( keyV > 0xFF)))             // out of range
+  else if ((keyV >  deadkey_max) || ((keyV <  deadkey_min)  &&  ( keyV > 0xFF)))             // out of range
     return 0xFFFE;
   else                                                                                      // usable char
     return keyV;
 }
 //_S2 vk_us or underlying!!"!!"
-KMX_WCHAR KMX_get_KeyValUnderlying_From_KeyValUS(vec_dword_3D & All_Vector, KMX_DWORD vk_US) {
+KMX_WCHAR KMX_get_KeyValUnderlying_From_KeyValUS(vec_dword_3D & all_vector, KMX_DWORD vk_US) {
   KMX_DWORD vk_underlying;
-  for( int i=0; i< (int)All_Vector[0].size()-1 ;i++) {
-    for( int j=1; j< (int)All_Vector[0][0].size();j++) {
-      if ( ( All_Vector[0][i][j] == vk_US ) ) {
-        vk_underlying = All_Vector[1][i][j];
+  for( int i=0; i< (int)all_vector[0].size()-1 ;i++) {
+    for( int j=1; j< (int)all_vector[0][0].size();j++) {
+      if (( all_vector[0][i][j] == vk_US ) ) {
+        vk_underlying = all_vector[1][i][j];
         return vk_underlying;
       }
     }
@@ -757,14 +757,14 @@ KMX_WCHAR KMX_get_KeyValUnderlying_From_KeyValUS(vec_dword_3D & All_Vector, KMX_
   return vk_US;
 }
 
-KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeyCodeUS(GdkKeymap *keymap, vec_dword_3D &All_Vector, KMX_DWORD kc_us, ShiftState ss, int caps) {
+KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeyCodeUS(GdkKeymap *keymap, vec_dword_3D &all_vector, KMX_DWORD kc_us, ShiftState ss, int caps) {
   KMX_DWORD kc_underlying;
   std::u16string u16str = convert_DeadkeyValues_To_U16str(KMX_get_KeyVal_From_KeyCode(keymap, kc_us, ss, caps));
 
-  for( int i=0; i< (int)All_Vector[1].size()-1 ;i++) {
-    for( int j=1; j< (int)All_Vector[1][0].size();j++) {
-      if ( ( All_Vector[1][i][j] == (KMX_DWORD)  *u16str.c_str() ) ) {
-        kc_underlying = All_Vector[1][i][0];
+  for( int i=0; i< (int)all_vector[1].size()-1 ;i++) {
+    for( int j=1; j< (int)all_vector[1][0].size();j++) {
+      if (( all_vector[1][i][j] == (KMX_DWORD)  *u16str.c_str() ) ) {
+        kc_underlying = all_vector[1][i][0];
         return kc_underlying;
       }
     }
@@ -777,7 +777,7 @@ UINT  KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD virtualKeyUS) {
 }
 
 KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode) {
-  if ( keycode >7)
+  if (keycode >7)
     return  (KMX_DWORD) ScanCodeToUSVirtualKey[keycode-8];
 
   return 0;

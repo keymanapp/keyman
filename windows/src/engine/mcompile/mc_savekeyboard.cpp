@@ -67,8 +67,8 @@ DWORD WriteCompiledKeyboard(LPKEYBOARD fk, HANDLE hOutfile, BOOL FSaveDebug)
 			size += wcslen(fkp->dpContext)*2 + 2;
 		}
 
-		if( fgp->dpMatch ) size += wcslen(fgp->dpMatch)*2 + 2;
-		if( fgp->dpNoMatch ) size += wcslen(fgp->dpNoMatch)*2 + 2;
+		if (fgp->dpMatch ) size += wcslen(fgp->dpMatch)*2 + 2;
+		if (fgp->dpNoMatch ) size += wcslen(fgp->dpNoMatch)*2 + 2;
 	}
 
 	for(i = 0; i < fk->cxStoreArray; i++)

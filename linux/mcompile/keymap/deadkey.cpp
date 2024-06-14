@@ -28,11 +28,11 @@ std::vector<DeadKey*> create_deadkeys_by_basechar() {
 }
 
 void refine_alDead(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec, std::vector<DeadKey*> *p_All_Vec) {
-	if( dk == 0)
+	if (dk == 0)
 		return;
 
 	for (int j=0; j < (int) (*p_All_Vec).size()-1;j++) {
-		if( dk == (*p_All_Vec)[j]->KMX_GetDeadCharacter()) {
+		if (dk == (*p_All_Vec)[j]->KMX_GetDeadCharacter()) {
 			if(! found_dk_inVector(dk, dkVec)) {
 				dkVec.push_back((*p_All_Vec)[j]);
 				return;
@@ -44,9 +44,9 @@ void refine_alDead(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec, std::vector<DeadK
 
 bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey*> &dkVec) {
 	int i=0;
-	if( dkVec.size() > 0) {
+	if (dkVec.size() > 0) {
 		do {
-			if( dk == dkVec[i]->KMX_GetDeadCharacter())
+			if (dk == dkVec[i]->KMX_GetDeadCharacter())
 				return true;
 			i++;
 		} while (i < (int) dkVec.size());
@@ -67,7 +67,7 @@ bool query_dk_combinations_for_specific_dk(vec_dword_2D * p_dk_ComposeTable, vec
 		}
 	}
 
-	if( dk_SingleTable.size()>0)
+	if (dk_SingleTable.size()>0)
 		return true;
 	else
 		return false;
@@ -79,7 +79,7 @@ KMX_DWORD KMX_change_keyname_to_capital(KMX_DWORD kVal, KMX_DWORD &shift, GdkKey
   gint n_keys;
 
 	KMX_DWORD capitalKeyval = (KMX_DWORD) gdk_keyval_to_upper (kVal);
-	if( keyval !=0) {
+	if (keyval !=0) {
 		gdk_keymap_get_entries_for_keyval(keymap, keyval, &keys, &n_keys);
 		for (int i = 0; i < n_keys; i++) {
 			if (keys[i].group == 0) {
@@ -382,7 +382,6 @@ void create_DKTable(vec_dword_2D & dk_ComposeTable) {
 	  dk_ComposeTable.push_back(line);	line.clear();
 	line = createLine("dead_ogonek",  "U",  0x0172, "capital U with ogonek");
 	  dk_ComposeTable.push_back(line);	line.clear();
-
 	line = createLine("dead_circumflex",  "space",  0x005E, "CIRCUMFLEX_ACCENT");
 	  dk_ComposeTable.push_back(line);	line.clear();
 

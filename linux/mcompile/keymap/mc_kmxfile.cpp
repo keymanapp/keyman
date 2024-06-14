@@ -70,8 +70,8 @@ KMX_DWORD KMX_WriteCompiledKeyboardToFile(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX
 			size += u16len(fkp->dpContext)*2 + 2;
 		}
 
-		if( fgp->dpMatch ) size += u16len(fgp->dpMatch)*2 + 2;
-		if( fgp->dpNoMatch ) size += u16len(fgp->dpNoMatch)*2 + 2;
+		if (fgp->dpMatch ) size += u16len(fgp->dpMatch)*2 + 2;
+		if (fgp->dpNoMatch ) size += u16len(fgp->dpNoMatch)*2 + 2;
 	}
 
 	for(i = 0; i < fk->cxStoreArray; i++)

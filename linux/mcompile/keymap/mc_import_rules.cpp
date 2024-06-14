@@ -241,7 +241,7 @@ public:
     return nkeys;
   }
 
-  bool KMX_LayoutRow(int MaxShiftState, LPKMX_KEY key, std::vector<DeadKey*> *deadkeys, int deadkeyBase, BOOL bDeadkeyConversion,vec_dword_3D &All_Vector, GdkKeymap *keymap) {   // I4552
+  bool KMX_LayoutRow(int MaxShiftState, LPKMX_KEY key, std::vector<DeadKey*> *deadkeys, int deadkeyBase, BOOL bDeadkeyConversion,vec_dword_3D& all_vector, GdkKeymap *keymap) {   // I4552
     // Get the CAPSLOCK value
    int capslock =
         (this->KMX_IsCapsEqualToShift() ? 1 : 0) |
@@ -301,7 +301,7 @@ public:
             // key->Key      stores VK-US ( not underlying !!)
             // key->dpOutput stores character Underlying
 
-            KMX_DWORD SC_Underlying = KMX_get_KeyCodeUnderlying_From_KeyCodeUS(keymap, All_Vector, this->SC(), (ShiftState) ss, caps);
+            KMX_DWORD SC_Underlying = KMX_get_KeyCodeUnderlying_From_KeyCodeUS(keymap, all_vector, this->SC(), (ShiftState) ss, caps);
             key->Key = KMX_get_VKUS_From_KeyCodeUnderlying( SC_Underlying);
 
             key->Line = 0;
@@ -362,7 +362,7 @@ int KMX_GetMaxDeadkeyIndex(KMX_WCHAR *p) {
   return n;
 }
 
-bool KMX_ImportRules(LPKMX_KEYBOARD kp,vec_dword_3D  &All_Vector, GdkKeymap **keymap, std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
+bool KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, GdkKeymap **keymap, std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) {   // I4353   // I4552
   KMX_Loader loader;
 
   std::vector<KMX_VirtualKey*> rgKey; //= new VirtualKey[256];
@@ -380,7 +380,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,vec_dword_3D  &All_Vector, GdkKeymap **ke
     // ( mcompile win uses MapVirtualKeyEx() to fill m_vk with the VK of the Underlying keyboard)
     // Linux can get a VK for the US Keyboard using USVirtualKeyToScanCode/ScanCodeToUSVirtualKey
     // Linux cannot get a VK for the underling Keyboard
-    // this "connection" is possible only when using All_Vector
+    // this "connection" is possible only when using all_vector
 
     KMX_VirtualKey *key = new KMX_VirtualKey(sc);
 
@@ -409,9 +409,9 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,vec_dword_3D  &All_Vector, GdkKeymap **ke
           }
 
           //_S2 TOP_6 TODO to compare win-lin kmn-files skip ss6+7; MUST BE removed later!!!!
-         /*if(ss == MenuCtrl|| ss == ShftMenuCtrl) {
+         if(ss == MenuCtrl|| ss == ShftMenuCtrl) {
             continue;
-          }*/
+          }
 
           KMX_DWORD kc_us = (KMX_DWORD) KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 
@@ -423,7 +423,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,vec_dword_3D  &All_Vector, GdkKeymap **ke
                 rgKey[iKey]->KMX_SetShiftState(ss, u"", false, (caps));       // different to windows since behavior on Linux is different
               }
               else {
-                if( (ss == Ctrl || ss == ShftCtrl) ) {
+                if ((ss == Ctrl || ss == ShftCtrl) ) {
                 continue;
               }
               sbBuffer[rc] = 0;
@@ -432,7 +432,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,vec_dword_3D  &All_Vector, GdkKeymap **ke
           }
           else if(rc < 0) {
             sbBuffer[2] = 0;
-            rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, true, (caps ));      // different to windows since behavior on Linux is different
+            rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, true, (caps));      // different to windows since behavior on Linux is different
 
             refine_alDead(sbBuffer[0], alDead, &alDead_cpl);
           }
@@ -498,7 +498,7 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp,vec_dword_3D  &All_Vector, GdkKeymap **ke
   //
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
-      if(rgKey[iKey]->KMX_LayoutRow(loader.KMX_MaxShiftState(), &gp->dpKeyArray[nkeys], &alDead, nDeadkey, bDeadkeyConversion, All_Vector,*keymap)) {   // I4552
+      if(rgKey[iKey]->KMX_LayoutRow(loader.KMX_MaxShiftState(), &gp->dpKeyArray[nkeys], &alDead, nDeadkey, bDeadkeyConversion, all_vector,*keymap)) {   // I4552
         nkeys+=rgKey[iKey]->KMX_GetKeyCount(loader.KMX_MaxShiftState());
       }
     }
