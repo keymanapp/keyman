@@ -144,6 +144,9 @@ let sourceFileSet = [
   // Needed for Android / Chromium browser pre-41.
   loadPolyfill('../../../node_modules/string.prototype.codepointat/codepointat.js', 'src/polyfills/string.codepointat.js'),
   // Needed for Android / Chromium browser pre-45.
+  // Not used in this codebase, but used by some compiled model defaults.
+  loadPolyfill('src/polyfills/array.from.js', 'src/polyfills/array.from.js'),
+  // Needed for Android / Chromium browser pre-45.
   loadPolyfill('src/polyfills/array.fill.js', 'src/polyfills/array.fill.js'),
   // Needed for Android / Chromium browser pre-45.
   loadPolyfill('src/polyfills/array.findIndex.js', 'src/polyfills/array.findIndex.js'),
