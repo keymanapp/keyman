@@ -18,11 +18,11 @@
   },
   "dependencies": {
     "tslib": "^2.5.2",
-    "typescript": "^4.9.5"
+    "typescript": "^5.4.5"
   },
   "devDependencies": {
     "@keymanapp/resources-gosh": "*",
-    "esbuild": "^0.15.16"
+    "esbuild": "^0.18.9"
   },
   "type": "module"
 }

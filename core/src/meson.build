@@ -40,6 +40,29 @@ if icu_uc.found()
   defns += '-DHAVE_ICU4C'
 endif
 
+# On wasm, generate util_normalize_table.h automatically from ICU
+generated_headers = []
+
+if cpp_compiler.get_id() == 'emscripten'
+
+util_normalize_table_generator = executable('util_normalize_table_generator',
+    ['util_normalize_table_generator.cpp'],
+    cpp_args: defns + warns,
+    include_directories: [inc],
+    link_args: links,
+    dependencies: [icu_uc, icu_i18n],
+    )
+
+util_normalize_table_h = custom_target('util_normalize_table.h',
+                    output: 'util_normalize_table.h',
+                    command: [util_normalize_table_generator],
+                    capture:true)
+
+generated_headers += util_normalize_table_h
+
+
+endif
+
 
 kmx_files = files(
   'actions_normalize.cpp',
@@ -60,6 +83,7 @@ kmx_files = files(
   'km_core_processevent_api.cpp',
   'jsonpp.cpp',
   'util_normalize.cpp',
+  'core_icu.cpp',
   'ldml/ldml_processor.cpp',
   'ldml/ldml_transforms.cpp',
   'ldml/ldml_markers.cpp',
@@ -110,6 +134,7 @@ lib = library('keymancore',
   kmx_files,
   mock_files,
   version_res,
+  generated_headers,
   cpp_args: defns + warns + flags,
   link_args: links,
   version: lib_version,

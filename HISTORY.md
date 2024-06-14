@@ -1,5 +1,30 @@
 # Keyman Version History
 
+## 18.0.55 alpha 2024-06-13
+
+* fix(developer): handle missing OSK when importing a Windows keyboard into a touch-only project (#11720)
+* fix(developer): verify email addresses in .kps and .keyboard_info (#11735)
+* change(web): prep for better asynchronous prediction handling (#10343)
+
+## 18.0.54 alpha 2024-06-12
+
+* fix(common): remove subpackage entries for older TS version (#11745)
+* chore(common): end use of ts-node (#11746)
+* feat(web): add bulk_render variant that loads and renders keyboards from local KMP (#10432)
+
+## 18.0.53 alpha 2024-06-10
+
+* fix(android): check current orientation when redisplaying system keyboard (#11604)
+* fix(android): fix keyboard size after rotation and restore via onSizeChanged, after layout (#11722)
+* fix(developer): fix kmcmplib unit-test include paths (#11749)
+
+## 18.0.52 alpha 2024-06-08
+
+* fix(developer): prevent two touch layout editors opening for the same file (#11717)
+* chore(common): cleanup meson deprecations and warnings (#11523)
+* feat(developer): support language reference in context help (#11737)
+* test(developer): kmcmplib compiler unit tests (#11378)
+
 ## 18.0.51 alpha 2024-06-07
 
 * fix(web): fix osk touch-focus tracking (#11705)

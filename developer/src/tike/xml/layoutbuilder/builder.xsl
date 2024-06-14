@@ -271,6 +271,10 @@
     </form>
   </div>
 
+  <div id='addPlatformDialogNoPlatformsToAdd' title='Add platform'>
+    <p>All available platforms have already been added.</p>
+  </div>
+
   <div id='addLayerDialog' title='Add layer'>
     <form>
       <fieldset>

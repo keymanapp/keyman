@@ -65,7 +65,7 @@ export default class ModelCompositor {
     return returnedPredictions;
   }
 
-  predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Suggestion[] {
+  async predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Promise<Suggestion[]> {
     let suggestionDistribution: Distribution<Suggestion> = [];
     let lexicalModel = this.lexicalModel;
     let punctuation = this.punctuation;
@@ -241,7 +241,7 @@ export default class ModelCompositor {
 
       let bestCorrectionCost: number;
       const SEARCH_TIMEOUT = this.testMode ? 0 : correction.SearchSpace.DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL;
-      for(let matches of searchSpace.getBestMatches(SEARCH_TIMEOUT)) {
+      for await(let matches of searchSpace.getBestMatches(SEARCH_TIMEOUT)) {
         // Corrections obtained:  now to predict from them!
         let predictionRoots = matches.map(function(match) {
           let correction = match.matchString;
@@ -648,18 +648,19 @@ export default class ModelCompositor {
     return reversion;
   }
 
-  applyReversion(reversion: Reversion, context: Context): Suggestion[] {
+  async applyReversion(reversion: Reversion, context: Context): Promise<Suggestion[]> {
     // If we are unable to track context (because the model does not support LexiconTraversal),
     // we need a "fallback" strategy.
     let compositor = this;
-    let fallbackSuggestions = function() {
+    let fallbackSuggestions = async function() {
       let revertedContext = models.applyTransform(reversion.transform, context);
-      let suggestions = compositor.predict({insert: '', deleteLeft: 0}, revertedContext);
+      const suggestions = await compositor.predict({insert: '', deleteLeft: 0}, revertedContext);
       suggestions.forEach(function(suggestion) {
         // A reversion's transform ID is the additive inverse of its original suggestion;
         // we revert to the state of said original suggestion.
         suggestion.transformId = -reversion.transformId;
       });
+
       return suggestions;
     }
 

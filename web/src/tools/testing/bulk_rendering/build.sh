@@ -33,6 +33,10 @@ function do_build ( ) {
   $BUNDLE_CMD    "${KEYMAN_ROOT}/web/build/$SUBPROJECT_NAME/obj/renderer_core.js" \
     --out        "${KEYMAN_ROOT}/web/build/$SUBPROJECT_NAME/lib/bulk_render.js" \
     --sourceRoot "@keymanapp/keyman/web/build/$SUBPROJECT_NAME/lib/"
+
+  # To ensure it's available to the testing pages when served via localhost or build agent.
+  cp "${KEYMAN_ROOT}/node_modules/@zip.js/zip.js/dist/zip.min.js" \
+     "${KEYMAN_ROOT}/web/build/$SUBPROJECT_NAME/lib/zip.min.js"
 }
 
 builder_run_action configure  verify_npm_setup
