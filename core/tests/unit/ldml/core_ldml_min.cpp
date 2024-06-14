@@ -21,7 +21,8 @@ int main(int argc, const char *argv[]) {
     km_core_keyboard * test_kb = nullptr;
 
     km_core_status status;
-    status = km_core_keyboard_load("", &test_kb);
+    km_core_path_name nowhere = {0}; // this is a narrow or wide char string
+    status = km_core_keyboard_load(nowhere, &test_kb);
 
     std::cerr << "null km_core_keyboard_load = " << status << std::endl;
     assert(status == KM_CORE_STATUS_INVALID_ARGUMENT);
