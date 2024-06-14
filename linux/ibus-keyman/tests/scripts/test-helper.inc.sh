@@ -116,7 +116,7 @@ function _setup_init() {
   echo > "$CLEANUP_FILE"
   echo > "$PID_FILE"
   TEMP_DATA_DIR=$(mktemp --directory)
-  echo "rm -rf ${TEMP_DATA_DIR} || true # TEMP_DATA_DIR" >> "$CLEANUP_FILE"
+  echo "rm -rf \"${TEMP_DATA_DIR}\" || true # TEMP_DATA_DIR" >> "${CLEANUP_FILE}"
 
   COMMON_ARCH_DIR=
   [ -d "${TOP_SRCDIR}"/../../core/build/arch ] && COMMON_ARCH_DIR=${TOP_SRCDIR}/../../core/build/arch
@@ -250,7 +250,7 @@ function _setup_ibus() {
   #shellcheck disable=SC2086
   ibus-daemon ${ARG_VERBOSE-} --daemonize --panel=disable --address=unix:abstract="${TEMP_DATA_DIR}/test-ibus" ${IBUS_CONFIG-} &> /tmp/ibus-daemon.log
   PID=$(pgrep -f "${TEMP_DATA_DIR}/test-ibus")
-  echo "if kill -9 ${PID}; then ibus restart || ibus start; fi || true # ibus-daemon" >> "$CLEANUP_FILE"
+  echo "if kill -9 ${PID}; then ibus restart || ibus start; fi # ibus-daemon" >> "${CLEANUP_FILE}"
   echo "${PID} ibus-daemon" >> "${PID_FILE}"
   sleep 1s
 
