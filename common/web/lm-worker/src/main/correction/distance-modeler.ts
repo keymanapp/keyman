@@ -569,7 +569,7 @@ export class SearchSpace {
   }
 
   // Current best guesstimate of how compositor will retrieve ideal corrections.
-  *getBestMatches(waitMillis?: number): Generator<SearchResult[]> {
+  async *getBestMatches(waitMillis?: number): AsyncGenerator<SearchResult[]> {
     // might should also include a 'base cost' parameter of sorts?
     let searchSpace = this;
     let currentReturns: {[mapKey: string]: SearchNode} = {};

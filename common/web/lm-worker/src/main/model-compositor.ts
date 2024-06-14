@@ -241,7 +241,7 @@ export default class ModelCompositor {
 
       let bestCorrectionCost: number;
       const SEARCH_TIMEOUT = this.testMode ? 0 : correction.SearchSpace.DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL;
-      for(let matches of searchSpace.getBestMatches(SEARCH_TIMEOUT)) {
+      for await(let matches of searchSpace.getBestMatches(SEARCH_TIMEOUT)) {
         // Corrections obtained:  now to predict from them!
         let predictionRoots = matches.map(function(match) {
           let correction = match.matchString;

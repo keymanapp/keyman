@@ -248,8 +248,8 @@ describe('Correction Distance Modeler', function() {
       testModel = new models.TrieModel(jsonFixture('models/tries/english-1000'));
     });
 
-    let checkResults_teh = function(iter) {
-      let firstSet = iter.next();  // {value: <actual value>, done: <iteration complete?>}
+    let checkResults_teh = async function(iter) {
+      let firstSet = await iter.next();  // {value: <actual value>, done: <iteration complete?>}
       assert.isFalse(firstSet.done);
 
       firstSet = firstSet.value; // Retrieves <actual value>
@@ -264,7 +264,7 @@ describe('Correction Distance Modeler', function() {
         'the'
       ];
 
-      let secondSet = iter.next();  // {value: <actual value>, done: <iteration complete?>}
+      let secondSet = await iter.next();  // {value: <actual value>, done: <iteration complete?>}
       assert.isFalse(secondSet.done);
 
       secondSet = secondSet.value; // Retrieves <actual value>
@@ -282,7 +282,7 @@ describe('Correction Distance Modeler', function() {
         'thu', 'wen'
       ];
 
-      let thirdSet = iter.next();  // {value: <actual value>, done: <iteration complete?>}
+      let thirdSet = await iter.next();  // {value: <actual value>, done: <iteration complete?>}
       assert.isFalse(thirdSet.done);
 
       thirdSet = thirdSet.value; // Retrieves <actual value>
@@ -293,7 +293,7 @@ describe('Correction Distance Modeler', function() {
       assert.deepEqual(entries, thirdBatch);
     }
 
-    it('Simple search without input', function() {
+    it('Simple search without input', async function() {
       // The combinatorial effect here is a bit much to fully test.
       let rootTraversal = testModel.traverseFromRoot();
       assert.isNotEmpty(rootTraversal);
@@ -301,11 +301,11 @@ describe('Correction Distance Modeler', function() {
       let searchSpace = new correction.SearchSpace(testModel);
 
       let iter = searchSpace.getBestMatches();
-      let firstSet = iter.next();
+      let firstSet = await iter.next();
       assert.isFalse(firstSet.done);
     });
 
-    it('Simple search (paralleling "Small integration test")', function() {
+    it('Simple search (paralleling "Small integration test")', async function() {
       // The combinatorial effect here is a bit much to fully test.
       let rootTraversal = testModel.traverseFromRoot();
       assert.isNotEmpty(rootTraversal);
@@ -332,7 +332,7 @@ describe('Correction Distance Modeler', function() {
       searchSpace.addInput(synthDistribution3);
 
       let iter = searchSpace.getBestMatches(0); // disables the correction-search timeout.
-      checkResults_teh(iter);
+      await checkResults_teh(iter);
 
       // // Debugging method:  a simple loop for printing out the generated sets, in succession.
       // //
@@ -359,7 +359,7 @@ describe('Correction Distance Modeler', function() {
       // }
     });
 
-    it('Allows reiteration (sequentially)', function() {
+    it('Allows reiteration (sequentially)', async function() {
       // The combinatorial effect here is a bit much to fully test.
       let rootTraversal = testModel.traverseFromRoot();
       assert.isNotEmpty(rootTraversal);
@@ -386,15 +386,15 @@ describe('Correction Distance Modeler', function() {
       searchSpace.addInput(synthDistribution3);
 
       let iter = searchSpace.getBestMatches(0); // disables the correction-search timeout.
-      checkResults_teh(iter);
+      await checkResults_teh(iter);
 
       // The key: do we get the same results the second time?
       // Reset the iterator first...
       let iter2 = searchSpace.getBestMatches(0); // disables the correction-search timeout.
-      checkResults_teh(iter2);
+      await checkResults_teh(iter2);
     });
 
-    it('Empty search space, loaded model', function() {
+    it('Empty search space, loaded model', async function() {
       // The combinatorial effect here is a bit much to fully test.
       let rootTraversal = testModel.traverseFromRoot();
       assert.isNotEmpty(rootTraversal);
@@ -403,7 +403,7 @@ describe('Correction Distance Modeler', function() {
       let iter = searchSpace.getBestMatches();
 
       // While there's no input, insertion operations can produce suggestions.
-      let resultState = iter.next();
+      let resultState = await iter.next();
       let results = resultState.value;
 
       // Just one suggestion should be returned.
