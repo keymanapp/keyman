@@ -2,6 +2,7 @@ import { timedPromise } from "@keymanapp/web-utils";
 
 const MIN_OUTLIER = 1; // 1ms.
 const MAX_CANDIDATES = 5;
+export const STANDARD_TIME_BETWEEN_DEFERS = 5;
 
 /**
  * Handles statistical tracking + data management for one type of task
@@ -169,10 +170,12 @@ export class ExecutionBucket {
 export class ExecutionSpan {
   private start: number;
   private finish?: number;
-  private bucket: ExecutionBucket;
-  private finalizer: () => void;
+  private bucket?: ExecutionBucket;
+  private finalizer?: () => void;
 
-  constructor(bucket: ExecutionBucket, finalizer: () => void) {
+  constructor();
+  constructor(bucket: ExecutionBucket, finalizer: () => void);
+  constructor(bucket?: ExecutionBucket, finalizer?: () => void) {
     this.bucket = bucket;
     this.finalizer = finalizer;
     this.start = performance.now();
@@ -184,8 +187,12 @@ export class ExecutionSpan {
    */
   end() {
     this.finish = performance.now();
-    this.bucket.add(this.duration);
-    this.finalizer();
+    // This is never called by ExecutionTimer when no instances were
+    // provided for these, but null-guarding is still wise.
+    /* c8 ignore start */
+    this.bucket?.add(this.duration);
+    this.finalizer?.();
+    /* c8 ignore end */
   }
 
   /**
@@ -232,8 +239,12 @@ export class ExecutionTimer {
    */
   private activeSpan: ExecutionSpan = null;
 
-  // TODO:  (next PR) track "time since last yield"?
-  // That'd make a decent condition for yielding control briefly to the message-loop.
+  /**
+   * Used to track time spent since the task last yielded control to the message loop / task queue.
+   * This is not considered a 'task' component and does not block timing of tasks through `time()`,
+   * `start()`, or `defer()`.
+   */
+  private spanSinceLastDefer: ExecutionSpan = null;
 
   /**
    * @param maxExecutionTime The maximum amount of time alloted to task execution
@@ -244,6 +255,8 @@ export class ExecutionTimer {
     this.trueStart = performance.now(); // is in ms.
     this.maxExecutionTime = maxExecutionTime;
     this.maxTrueTime = maxTrueTime;
+
+    this.spanSinceLastDefer = new ExecutionSpan();
   }
 
   /**
@@ -304,6 +317,9 @@ export class ExecutionTimer {
       total += bucket.outlierTime;
     }
 
+    // For investigating the ratio of the two factors.
+    // console.log(`outlier time: ${total}, deferred ${this.deferBucket.timeSpent}`);
+
     total += this.deferBucket.timeSpent;
 
     return total;
@@ -350,12 +366,21 @@ export class ExecutionTimer {
     this.validateStart();
     minWait ??= 0;
 
-    const start = performance.now();
+    // By using the state field, we'll get an error if we somehow call other
+    // class methods during the defer.
+    this.activeSpan = new ExecutionSpan(this.deferBucket, () => this.activeSpan = null);
     // WebWorker messages appear to come in via the macrotask queue.
     await timedPromise(minWait);
-    const time = performance.now() - start;
+    this.activeSpan.end();
 
-    this.deferBucket.add(time);
+    this.spanSinceLastDefer = new ExecutionSpan();
+  }
+
+  /**
+   * Returns the amount of milliseconds since the `defer()` method was last called.
+   */
+  get timeSinceLastDefer(): number {
+    return this.spanSinceLastDefer.duration;
   }
 
   /**
@@ -384,9 +409,13 @@ export class ExecutionTimer {
     return this.activeSpan;
   }
 
-  // TODO:  In follow-up PR:  add `terminate()` to force early termination
-  // Also, rework correction-search to take an ExecutionTimer, not just the raw max length.
-  // From there, can have new predict calls call `.terminate()` on the prior call's timer.
+  /**
+   * Sets the timer to instantly complete.  Currently-tracked data will still be maintained,
+   * but the `elapsed()` method will always return `true` after this is called.
+   */
+  terminate() {
+    this.maxTrueTime = 0;
+  }
 
   /**
    * Returns `true` if the represented high-level task has no more time alloted to it.
@@ -400,4 +429,9 @@ export class ExecutionTimer {
 
     return this.executionTime >= this.maxExecutionTime;
   }
+
+  // // For debugging, etc.
+  // get timeSinceConstruction(): number {
+  //   return performance.now() - this.trueStart;
+  // }
 }

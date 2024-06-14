@@ -136,6 +136,57 @@ describe('ExecutionTimer', () => {
 
     assert.isTrue(timer.elapsed);
   });
+
+  it('terminate() - instantly called', async () => {
+    const timer = new ExecutionTimer(50, 100);
+    assert.isFalse(timer.elapsed);
+
+    timer.terminate();
+    assert.isTrue(timer.elapsed);
+
+    assert.doesNotThrow(() => timer.terminate());
+  });
+
+  it('terminate() - called after some operations', async () => {
+    const timer = new ExecutionTimer(50, 100);
+    assert.isFalse(timer.elapsed);
+
+    timer.time(() => timeControl.tick(10));
+
+    const defer = timer.defer(10);
+    const allAsync = timeControl.runAllAsync();
+    await Promise.all([defer, allAsync]);
+
+    assert.isFalse(timer.elapsed);
+    assert.equal(timer.executionTime, 10);
+    assert.equal(timer.deferredTime, 10);
+
+    timer.terminate();
+    assert.isTrue(timer.elapsed);
+    assert.equal(timer.executionTime, 10);
+    assert.equal(timer.deferredTime, 10);
+
+    assert.doesNotThrow(() => timer.terminate());
+  });
+
+  it('timeSinceLastDefer', async () => {
+    const timer = new ExecutionTimer(50, 100);
+    assert.equal(timer.timeSinceLastDefer, 0);
+
+    timeControl.tick(2);
+    assert.equal(timer.timeSinceLastDefer, 2);
+
+    timer.time(() => timeControl.tick(8));
+    assert.equal(timer.timeSinceLastDefer, 10);
+
+    const defer = timer.defer(5);
+    const allAsync = timeControl.runAllAsync();
+    await Promise.all([defer, allAsync]);
+
+    assert.equal(timer.timeSinceLastDefer, 0);
+    timeControl.tick(3);
+    assert.equal(timer.timeSinceLastDefer, 3);
+  });
 });
 
 describe('ExecutionBucket', () => {
