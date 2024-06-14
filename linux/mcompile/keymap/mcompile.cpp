@@ -31,7 +31,7 @@
 
 KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]);
 
-bool KMX_ImportRules( LPKMX_KEYBOARD kp,v_dw_3D &All_Vector, GdkKeymap **keymap,std::vector<KMX_DeadkeyMapping> *KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion); // I4353   // I4327
+bool KMX_ImportRules( LPKMX_KEYBOARD kp,vec_dword_3D& all_vector, GdkKeymap **keymap,std::vector<KMX_DeadkeyMapping> *KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion); // I4353   // I4327
 
 std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys; // I4353
 
@@ -348,7 +348,7 @@ KMX_WCHAR KMX_GetUniqueDeadkeyID(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey) {
   return s_dkids[s_ndkids++].dst_deadkey = s_next_dkid = ++dkid;
 }
 
-void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk_US, UINT shift, KMX_WCHAR deadkey, v_dw_3D &All_Vector, GdkKeymap* keymap,v_dw_2D dk_Table) {
+void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk_US, UINT shift, KMX_WCHAR deadkey, vec_dword_3D& all_vector, GdkKeymap* keymap,vec_dword_2D dk_Table) {
   KMX_WORD deadkeys[512], *pdk;
 
   // Lookup the deadkey table for the deadkey in the physical keyboard
@@ -365,7 +365,7 @@ void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk_US, UINT shift, KMX_WCHA
 
   while(*pdk) {
     // Look up the ch
-    UINT KeyValUnderlying = KMX_get_KeyValUnderlying_From_KeyValUS(All_Vector, *pdk);
+    UINT KeyValUnderlying = KMX_get_KeyValUnderlying_From_KeyValUS(all_vector, *pdk);
     KMX_TranslateDeadkeyKeyboard(kbd, dkid, KeyValUnderlying, *(pdk+1), *(pdk+2));
     pdk+=3;
   }
@@ -405,19 +405,19 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
   // For now, we get the least shifted version, which is hopefully adequate.
 
   GdkKeymap *keymap;
-  if(InitializeGDK(&keymap , argc, argv)) {
+  if(InitializeGDK(&keymap,  argc, argv)) {
       wprintf(L"ERROR: can't Initialize GDK\n");
       return FALSE;
   }
 
   // create vector that contains Keycode, base, shift for US-KEyboard and underlying keyboard
-  v_dw_3D All_Vector;
-  if(createOneVectorFromBothKeyboards(All_Vector, keymap)){
+  vec_dword_3D all_vector;
+  if(createOneVectorFromBothKeyboards(all_vector, keymap)){
     wprintf(L"ERROR: can't create one vector from both keyboards\n");
     return FALSE;
   }
 
-  v_dw_2D  dk_Table;
+  vec_dword_2D  dk_Table;
   create_DKTable(dk_Table);
 
   for (int j = 0; VKShiftState[j] != 0xFFFF; j++) { // I4651
@@ -439,7 +439,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
 
       switch(ch) {
         case 0x0000: break;
-        case 0xFFFF: KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, All_Vector, keymap , dk_Table); break;
+        case 0xFFFF: KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, all_vector, keymap,  dk_Table); break;
         default: KMX_TranslateKeyboard(kbd, KMX_VKMap[i], VKShiftState[j], ch);
       }
     }
@@ -447,21 +447,21 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
 
   KMX_ReportUnconvertedKeyboardRules(kbd);
 
-  if(!KMX_ImportRules(kbd, All_Vector, &keymap, &KMX_FDeadkeys, bDeadkeyConversion)) {   // I4353   // I4552
+  if(!KMX_ImportRules(kbd, all_vector, &keymap, &KMX_FDeadkeys, bDeadkeyConversion)) {   // I4353   // I4552
     return FALSE;
   }
   return TRUE;
 }
 
-int KMX_GetDeadkeys(v_dw_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, GdkKeymap* keymap) {
+int KMX_GetDeadkeys(vec_dword_2D & dk_Table, KMX_WORD deadkey, KMX_WORD *OutputPairs, GdkKeymap* keymap) {
 
   KMX_WORD *p = OutputPairs;
   KMX_DWORD shift;
 
-  v_dw_2D  dk_SingleTable;
-  query_dk_combinations_for_specific_dk(&dk_Table, dk_SingleTable, DeadKey);
+  vec_dword_2D  dk_SingleTable;
+  query_dk_combinations_for_specific_dk(&dk_Table, dk_SingleTable, deadkey);
   for ( int i=0; i< (int) dk_SingleTable.size();i++) {
-    KMX_WORD vk = KMX_changeKeynameToCapital(dk_SingleTable[i][1], shift, keymap);
+    KMX_WORD vk = KMX_change_keyname_to_capital(dk_SingleTable[i][1], shift, keymap);
     if(vk != 0) {
       *p++ = vk;
       *p++ = shift;
