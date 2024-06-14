@@ -241,16 +241,23 @@ function _setup_schema_and_gsettings() {
 }
 
 function _setup_ibus() {
-  local ENV_FILE CLEANUP_FILE PID_FILE PID
+  local ENV_FILE CLEANUP_FILE PID_FILE PID STANDALONE
   ENV_FILE=$1
   CLEANUP_FILE=$2
   PID_FILE=$3
+  STANDALONE=${4:-}
 
   echo "Starting ibus-daemon..."
   #shellcheck disable=SC2086
   ibus-daemon ${ARG_VERBOSE-} --daemonize --panel=disable --address=unix:abstract="${TEMP_DATA_DIR}/test-ibus" ${IBUS_CONFIG-} &> /tmp/ibus-daemon.log
   PID=$(pgrep -f "${TEMP_DATA_DIR}/test-ibus")
-  echo "if kill -9 ${PID}; then ibus restart || ibus start; fi # ibus-daemon" >> "${CLEANUP_FILE}"
+  if [[ "${STANDALONE}" == "--standalone" ]]; then
+    # manual test run
+    echo "if kill -9 ${PID}; then ibus restart || ibus start; fi # ibus-daemon" >> "${CLEANUP_FILE}"
+  else
+    # test run as part of the build
+    echo "kill -9 ${PID} || true" >> "${CLEANUP_FILE}"
+  fi
   echo "${PID} ibus-daemon" >> "${PID_FILE}"
   sleep 1s
 
@@ -269,11 +276,12 @@ function _setup_ibus() {
 }
 
 function setup() {
-  local DISPLAY_SERVER ENV_FILE CLEANUP_FILE PID_FILE TESTBASEDIR TESTDIR
+  local DISPLAY_SERVER ENV_FILE CLEANUP_FILE PID_FILE TESTBASEDIR TESTDIR STANDALONE
   DISPLAY_SERVER=$1
   ENV_FILE=$2
   CLEANUP_FILE=$3
   PID_FILE=$4
+  STANDALONE=${5:-}
 
   _setup_init "${ENV_FILE}" "${CLEANUP_FILE}" "${PID_FILE}"
 
@@ -287,7 +295,7 @@ function setup() {
   _setup_test_dbus_server "${ENV_FILE}" "${CLEANUP_FILE}"
   _setup_display_server "${ENV_FILE}" "${CLEANUP_FILE}" "${PID_FILE}" "${DISPLAY_SERVER}"
   _setup_schema_and_gsettings "${ENV_FILE}"
-  _setup_ibus "${ENV_FILE}" "${CLEANUP_FILE}" "${PID_FILE}"
+  _setup_ibus "${ENV_FILE}" "${CLEANUP_FILE}" "${PID_FILE}" "${STANDALONE}"
 }
 
 function setup_display_server_only() {
