@@ -227,7 +227,15 @@ begin
   // Look for Keyboard_<id>
   with TStringStream.Create('', TEncoding.UTF8) do
   try
-    LoadFromFile(f.FileName);
+    try
+      LoadFromFile(f.FileName);
+    except
+      on E:EEncodingError do
+      begin
+        // If the file cannot be loaded as UTF-8, we'll ignore it; #11687
+        Exit(False);
+      end;
+    end;
     Result := TRegEx.IsMatch(DataString, '\bKeyboard_'+id+'\b', []);
   finally
     Free;

@@ -2,12 +2,97 @@
 <?xml-stylesheet type="text/xsl" href="help.xsl" ?>
 <ContextHelp>
 
+  <LanguageReference Name="group">
+    <p>(TODO: add  documentation on group)</p>
+  </LanguageReference>
+
   <Form Name="context/character-map">
     <Control Name="editFilter" Title="Character Map Filter">
       <p>The Filter allows a user to reduce the number of characters displayed in the character map.  The standard filter options used are by font name or block name.</p>
     </Control>
     <Control Name="grid" Title="Character Map">
       <p>The Character Map Grid displays each character in a square, with a visual representation of the character and the Unicode value displayed at the bottom of the square. Each font group is divided into a block headed by the font name.</p>
+    </Control>
+
+    <Control Name="cmdFilter" Title="Character Map Filter">
+      <p>The Filter allows a user to reduce the number of characters displayed in the
+      character map. The standard filter options used are by font name or block name.</p>
+    </Control>
+
+    <Control Name="rbRange" Title="Character Map Filter">
+      <p>The filter format for a range is: [U+]XXXX-[U+]YYYY, where U+ is optional,
+      XXXX is the starting Unicode value and YYYY is the finishing Unicode value.</p>
+    </Control>
+
+    <Control Name="editRangeStart" Title="Character Map Filter">
+      <p>The filter format for a range is: [U+]XXXX-[U+]YYYY, where U+ is optional,
+      XXXX is the starting Unicode value and YYYY is the finishing Unicode value.</p>
+    </Control>
+
+    <Control Name="editRangeStop" Title="Character Map Filter">
+      <p>The filter format for a range is: [U+]XXXX-[U+]YYYY, where U+ is optional,
+      XXXX is the starting Unicode value and YYYY is the finishing Unicode value.</p>
+    </Control>
+
+    <Control Name="rbName" Title="Character Map Filter">
+      <p>The Filter allows a user to reduce the number of characters displayed in the
+      character map. The standard filter options used are by font name or block name.</p>
+    </Control>
+
+    <Control Name="cmdCharactersInCurrentFontOnly" Title="Character Map Filter">
+      <p> "&gt;" placed at the start of an entry will only show characters in the currently
+      selected Character Map font. This is helpful when trying to determine which characters
+      a given font supports.</p><br></br>
+      <p>Example: &gt;LAO </p><br></br>
+      <p>finds all characters with names starting in "LAO" in the current font</p>
+    </Control>
+
+    <Control Name="cmdBlock" Title="Character Map Filter">
+      <p> "&lt;" placed at the start of an entry will search Unicode block names instead of
+      character names. This is helpful when searching for characters within related
+      blocks</p><br></br>
+      <p>Example:  &lt;Thai </p><br></br>
+      <p>finds the Thai Unicode block</p>
+    </Control>
+
+    <Control Name="cmdStar" Title="Character Map Filter">
+      <p>Using "*" in an entry serves as a wildcard for any number of places in that entry.
+      For example, searching for "greek*alpha" will find characters whose Unicode names begin
+      with the word "Greek" and contain the word "Alpha" any number of places later.
+      This is helpful when searching for characters that share a common element in
+      their names (e.g. capital).</p>
+    </Control>
+
+    <Control Name="cmdQuestionMark" Title="Character Map Filter">
+      <p>Using "?" anywhere in an entry serves as a wildcard for that single place in the entry.
+      For example, searching for "s???e" will return both the SPACE and the SMILE characters,
+      among others.</p><br></br>
+    </Control>
+
+    <Control Name="cmdRange" Title="Character Map Filter">
+      <p>Example: 1000-119F </p><br></br>
+      <p>finds all characters between U+1000 and U+119F (inclusive) -
+      the Myanmar alphabet in this case</p>
+    </Control>
+
+    <Control Name="cmdSet" Title="Character Map Filter">
+      <p>Example: LATIN * LETTER [AEIOU] </p><br></br>
+      <p>finds all all Latin A,E,I,O or U vowel combinations</p>
+    </Control>
+
+    <Control Name="cmdDollar" Title="Character Map Filter">
+      <p>"$" placed at the end of an entry will match from the end of a Unicode character name.
+      This option works best when used with "*" or "?".</p><br></br>
+      <p>Example: LATIN * LETTER A$ </p><br></br>
+      <p>finds only "a" and "A"</p>
+    </Control>
+
+    <Control Name="cmdOK" Title="Character Map Filter">
+      <p>Click OK to save changes and close the dialog.</p>
+    </Control>
+
+    <Control Name="cmdCancel" Title="Character Map Filter">
+      <p>Click Cancel to close the dialog without saving changes.</p>
     </Control>
   </Form>
 
@@ -384,6 +469,244 @@
   <Form Name="context/project">
     <Control Name="*" Title="Project Manager">
       <p>The Project Manager allows you to manage all the files related to a keyboard layout in a single location.</p>
+    </Control>
+  </Form>
+
+  <Form Name="context/new-model-project-parameters">
+    <Control Name="editAuthor" Title="Author Name">
+      <p>The name of the developer of the keyboard. This is either your full name or
+      the organization you're creating a model for.</p>
+    </Control>
+
+    <Control Name="editModelName" Title="Model Name">
+      <p>We recommend the name of the language, dialect, or community that this model is
+      intended for. The name must be written in all the Latin letters or Arabic numerals.</p>
+    </Control>
+
+    <Control Name="editCopyright" Title="Copyright">
+      <p>Who owns the rights to this model and its data? Typically,
+      you can use the automatically generated default value: © 2024 Your Full Name or
+      Your Organization.</p>
+    </Control>
+
+    <Control Name="editFullCopyright" Title="Full copyright">
+      <p></p>
+    </Control>
+
+    <Control Name="editVersion" Title="Version">
+      <p>If this is the first time you've created a lexical model for you language, you should
+      leave the version as 1.0. Otherwise, your version number must conform to the following
+      rules: A version string made of major revision number.minor revision number.</p>
+    </Control>
+
+    <Control Name="gridLanguages" Title="Languages">
+      <p>Specifies the default BCP 47 language tags which will be added to the package
+      metadata and project metadata.</p>
+    </Control>
+
+    <Control Name="cmdAddLanguage" Title="Add...">
+      <p>To add a language tag, click the Add button to bring up the “Select BCP 47 Tag”
+      dialog box.</p>
+    </Control>
+
+    <Control Name="cmdEditLanguage" Title="Edit...">
+      <p>Click the Edit button to bring up the “Select BCP 47 Tag” dialog box again and edit the
+      language tag.</p>
+    </Control>
+
+    <Control Name="cmdRemoveLanguage" Title="Remove">
+      <p>Click the Remove button to delete the language tag.</p>
+    </Control>
+
+    <Control Name="editPath" Title="Path">
+      <p>Specifies the base path where the project folder will be created.</p>
+    </Control>
+
+    <Control Name="cmdBrowse" Title="Browse...">
+      <p>Browse for a folder or create a new folder to save the project to.</p>
+    </Control>
+
+    <Control Name="editAuthorID" Title="Author ID">
+      <p>An Author ID is a unique identifier used to distinguish you from others
+      who have the same or similar names. </p>
+    </Control>
+
+    <Control Name="cbBCP47" Title="Primary Language">
+      <p>Choose your primary language which generated from the “Select BCP 47 Tag” dialog box.</p>
+    </Control>
+
+    <Control Name="editUniq" Title="Unique Name">
+      <p>Enter a unique name of the model. You can use the name of the language, dialect,
+      or community that this model is intended for.</p>
+    </Control>
+
+    <Control Name="editModelID" Title="Model ID">
+      <p>Keyman automatically generates a model ID for you, given all the
+      information already filled out. Model ID helps Keyman sorts and organizes
+      different lexical models.</p>
+    </Control>
+
+    <Control Name="editProjectFilename" Title="Project filename">
+      <p>Specifies the base path where the project filename (.model.kpj) will be created.</p>
+    </Control>
+
+    <Control Name="memoDescription" Title="Description">
+      <p>Enter information about the model.</p>
+    </Control>
+
+    <Control Name="cmdCancel" Title="Cancel">
+      <p>Click Cancel to close the dialog without saving changes.</p>
+    </Control>
+  </Form>
+
+  <Form Name="context/wordlist-editor">
+    <Control Name="pages" Title="Wordlist tabs">
+      <p>Wordlist tabs have two views: Design, and Code. Changes to one view are reflected
+      immedaitely in the other view. Wordlist files should be stored in UTF-8 encoding
+      (preferably without BOM), and tab-separated format.</p>
+    </Control>
+
+    <Control Name="gridWordlist" Title="Wordlist tabs">
+      <p>Every line of the tab-separated format file is shown here, and can be edited directly.
+      For most wordlists, it will be more effective to use an external dictionary tool,
+      such as SIL Fieldworks or SIL PrimerPrep to generate the wordlist from a text corpus,
+      and use this tab just to preview the contents of the file.</p>
+    </Control>
+
+    <Control Name="cmdDeleteRow" Title="Wordlist tabs">
+      <p>The Delete row button will delete the selected row in the wordlist.</p>
+    </Control>
+
+    <Control Name="cmdSortByFrequency" Title="Wordlist tabs">
+      <p>The Sort by frequency button has no effect on the functioning of the wordlist,
+      but can help you, the editor, by showing more common words earlier in the list.</p>
+    </Control>
+  </Form>
+
+  <Form Name="context/editor">
+    <Control Name="cefwp" Title="Editor Window">
+      <p>Editor windows in Keyman Developer supports standard Windows editing keystrokes.
+      Many file formats, including .kmn, .kps, .xml, .html, .js and .json, support syntax
+      highlighting. The text editor in Keyman uses the Monaco component from Visual Studio Code,
+      so all the functionality available in that editor is also available here.</p>
+    </Control>
+  </Form>
+
+  <Form Name="context/character-identifier">
+    <Control Name="gridFonts" Title="Character Identifier">
+      <p>Attempt to identify the fonts on your system that will support the
+      characters. You can quickly change fonts by clicking on a font name in the grid of
+      identified fonts.</p>
+    </Control>
+
+    <Control Name="sgChars" Title="Character Identifier">
+      <p>Display the Unicode value of the selected character. </p>
+    </Control>
+  </Form>
+
+  <Form Name="context/messages">
+    <Control Name="memoMessage" Title="Message Window">
+      <p>The message window appears at the bottom of the screen, or floating in a toolbar
+      window. It contains a list of error and warning messages returned from a compilation
+      session. You can undock and dock the window by dragging its title bar.</p>
+    </Control>
+  </Form>
+
+  <Form Name="context/debug">
+    <Control Name="memo" Title="Debugger input window">
+      <p>The debugger input window is used for typing input to test the keyboard.
+      In the top half of this window, input you type while testing your keyboard will be
+      displayed, exactly the same as in use, with one exception: deadkeys will be shown
+      visually with an OBJ symbol.</p>
+    </Control>
+
+    <Control Name="sgChars" Title="Debugger input window">
+      <p>The lower half of the window shows a grid of the characters to the virtual left
+      of the insertion point, or the selected characters if you make a selection. Deadkeys
+      will be identified in the grid. The grid will show characters in right-to-left scripts
+      in backing store order, from left to right. If there are more characters in your text
+      than can fit on the screen, then only those that fit will be shown in the grid.</p>
+    </Control>
+  </Form>
+
+  <Form Name="context/debug#toc-regression-testing">
+    <Control Name="lbRegTestLog" Title="Regression Testing">
+      <p>The idea in regression testing is to record a sequence of keystrokes and the
+      output the keyboard produced, in order to test for the same behaviour when you
+      make changes to the keyboard.</p>
+    </Control>
+
+    <Control Name="cmdRegTestStartStopLog" Title="Regression Testing">
+      <p>Use Start Log/Stop Log to record the input and output. You can then use Start Test
+      to run the test again, or go the Options menu to clear the log, or save or load a test,
+      or use the batch mode to run several tests in a row. </p><br></br>
+      <p>If the output produced while running a test is different to that stored when recording it,
+      Keyman will halt the test on the line where the failure occurred, and activate
+      Single Step mode.</p>
+    </Control>
+
+    <Control Name="cmdRegTestOptions" Title="Regression Testing">
+      <p>In the Options menu, you can clear the log, save or load a test,
+      or use the batch mode to run several tests in a row.</p>
+    </Control>
+  </Form>
+
+  <Form Name="context/debug#toc-state">
+    <Control Name="cmdRestartDebugger" Title="State">
+      <p>Pressing the Restart button will clear the keystroke log as well as
+      clearing the text in the debug window. </p>
+    </Control>
+
+    <Control Name="lbKeystrokeLog" Title="State">
+      <p>This window shows the current keystroke state, and the sequence of
+      keystrokes that were typed to arrive at this state. </p>
+    </Control>
+  </Form>
+
+  <Form Name="context/debug#toc-elements">
+    <Control Name="lvElements" Title="Elements">
+      <p>This shows the elements that make up rule currently being processed: the context,
+      the key, and also what the output will be. If the rule uses stores, the contents of
+      the store will be shown in the right-hand column, with the matched letter in red.</p>
+    </Control>
+  </Form>
+
+  <Form Name="context/debug#toc-call-stack">
+    <Control Name="lbCallStack" Title="Call Stack">
+      <p>Here all the lines that have been processed to this point are shown in a list.
+      You can double-click on any entry in the list to display the line in the
+      keyboard source.</p>
+    </Control>
+  </Form>
+
+  <Form Name="context/debug#toc-deadkeys">
+    <Control Name="lbDeadkeys" Title="Deadkeys">
+      <p>This lists all the deadkeys that are currently in the context.
+      You can select one from the list to see it highlighted in the debug input box.
+      This information can also be seen in the character grid in the lower half of
+      the debugger input window.</p>
+    </Control>
+  </Form>
+
+  <Form Name="context/about-tike">
+    <Control Name="cmdOK" Title="About Dialog">
+      <p>The About dialog displays copyright and registration information for Keyman Developer,
+      and has a link to the Keyman website.</p>
+    </Control>
+  </Form>
+
+  <Form Name="context/key-test">
+    <Control Name="cmdInsert" Title="Virtual Key Identifier">
+      <p>This dialog lets you check the virtual key code for any key combination (except Window reserved key combinations such as Alt + Tab). You can then insert the virtual key code into the last active edit window at the current cursor position.</p><br></br>
+      <p>Press Shift + Enter to insert the current virtual key code into your source at the insertion point.</p>
+    </Control>
+
+    <Control Name="chkLRDistinguish" Title="Virtual Key Identifier">
+      <p>You can see the virtual key codes for left and right Ctrl / Alt combinations by checking the "Distinguish between left and right ctrl/alt" checkbox.</p>
+    </Control>
+
+    <Control Name="cmdClose" Title="Virtual Key Identifier">
+      <p>To close the dialog, click the Close button or press Shift + Esc.</p>
     </Control>
   </Form>
 </ContextHelp>
