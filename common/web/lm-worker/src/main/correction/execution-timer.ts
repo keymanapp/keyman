@@ -3,6 +3,11 @@ import { timedPromise } from "@keymanapp/web-utils";
 const MIN_OUTLIER = 1; // 1ms.
 const MAX_CANDIDATES = 5;
 
+/**
+ * Handles statistical tracking + data management for one type of task
+ * component comprising the high-level task managed by its owning
+ * `ExecutionTimer`.
+ */
 export class ExecutionBucket {
   // Could make these readonly outside via getter...
   // but the class isn't exposed outside of the timer.
@@ -158,6 +163,9 @@ export class ExecutionBucket {
   }
 }
 
+/**
+ * Represents the timing of an individual task component.
+ */
 export class ExecutionSpan {
   private start: number;
   private finish?: number;
@@ -170,13 +178,22 @@ export class ExecutionSpan {
     this.start = performance.now();
   }
 
+  /**
+   * Ends the timer for the represented timed task and records the
+   * results.
+   */
   end() {
     this.finish = performance.now();
     this.bucket.add(this.duration);
     this.finalizer();
   }
 
-  // Useful for tracking 'time since yield', etc.
+  /**
+   * Indicates the amount of time taken for the task if `end()` has been called.
+   *
+   * If `end()` has not been called, indicates the amount of time since this
+   * `ExecutionSpan` was created by `start()`.
+   */
   get duration() {
     return (this.finish ?? performance.now()) - this.start;
   }
@@ -200,17 +217,29 @@ export class ExecutionTimer {
    */
   private trueStart: number;
 
+  private maxExecutionTime: number;
+  private maxTrueTime: number;
+
   private buckets: Record<number, ExecutionBucket> = {};
   private deferBucket: ExecutionBucket = new ExecutionBucket(true /* prevent outliers */);
 
+  /**
+   * Holds the active `ExecutionSpan` if one exists, representing a task of some
+   * sort being timed.
+   *
+   * While an instance is tracked here, this class will throw an error if an attempt is made to time
+   * something else.  (Aside from 'time since last defer', which isn't considered a task component.)
+   */
   private activeSpan: ExecutionSpan = null;
-
-  private maxExecutionTime: number;
-  private maxTrueTime: number;
 
   // TODO:  (next PR) track "time since last yield"?
   // That'd make a decent condition for yielding control briefly to the message-loop.
 
+  /**
+   * @param maxExecutionTime The maximum amount of time alloted to task execution
+   * @param maxTrueTime      Time until the task's absolute deadline, even if
+   * prevented from using all execution time.
+   */
   constructor(maxExecutionTime: number, maxTrueTime: number) {
     this.trueStart = performance.now(); // is in ms.
     this.maxExecutionTime = maxExecutionTime;
@@ -307,13 +336,15 @@ export class ExecutionTimer {
 
   /**
    * This may be called to defer control to the base JS message loop /
-   * task queue, resuming after all current entries are processed.
+   * task queue, resuming after all current pending executable tasks
+   * are processed.
    *
    * The call will track the amount of time spent 'paused' due to this
    * deferment and will not count it against 'elapsed' time unless in
    * overly-high quantities.
    *
-   * @param minWait Minimum time to wait before resuming.
+   * @param minWait Minimum time to wait before resuming.  (Designed for
+   * use in unit tests)
    */
   async defer(minWait?: number) {
     this.validateStart();
@@ -358,8 +389,7 @@ export class ExecutionTimer {
   // From there, can have new predict calls call `.terminate()` on the prior call's timer.
 
   /**
-   * Returns `true` if the time interval represented by this timer should be considered
-   * as fully elapsed.
+   * Returns `true` if the represented high-level task has no more time alloted to it.
    * @returns
    */
   get elapsed(): boolean {
