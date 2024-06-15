@@ -54,6 +54,18 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   else
     _easterEggForSentry = nil;
   
+  /*
+  SentryBreadcrumb *crumb = [[SentryBreadcrumb alloc] init];
+  crumb.level = kSentryLevelInfo;
+  crumb.category = @"keyboard";
+  crumb.message = [NSString stringWithFormat:@"init text client app, id: %@", clientAppId];
+  [SentrySDK addBreadcrumb:crumb];
+   */
+  
+  [SentrySDK configureScope:^(SentryScope * _Nonnull scope) {
+      [scope setTagValue:clientAppId forKey:@"clientAppId"];
+  }];
+
   return self;
 }
 
@@ -229,6 +241,14 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
       return YES;
     }
     
+    // TODO: remove temporary Sentry test code
+    if (event.keyCode == kVK_ANSI_Slash) {
+      os_log_debug([KMLogs testLog], "handleEvent, calling Sentry captureMessage");
+      [SentrySDK captureMessage:@"handleEvent, slash typed: test message sent"];
+      //[SentrySDK crash];
+      //[SentrySDK captureError:(nonnull NSError *)];
+    }
+
     // for some apps, handleEvent will not be called for the generated backspace
     // but if it is, we need to let it pass through rather than process again in core
     if((event.keyCode == kVK_Delete) && (self.lowLevelBackspaceCount > 0)) {
