@@ -80,7 +80,7 @@ PATH="$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin:$PATH"
 * node.js 18+, emscripten, openjdk 8
 
 ```shell
-brew install node emscripten openjdk@8
+brew install node emscripten
 ```
 
 Note: if you install emscripten with brew on macOS, only emscripten binaries are
