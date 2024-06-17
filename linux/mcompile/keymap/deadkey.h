@@ -18,7 +18,7 @@ void refine_alDead(KMX_WCHAR dk, std::vector<DeadKey *> &myVec, std::vector<Dead
 // check if entry is already there
 bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey *> &myVec);
 
-//query_dk_combinations_for_a specific_dk from dk_ComposeTable(which holds all dk combinations) e.g. for dk: ^ get â,ê,î,ô,û,...
+// query_dk_combinations_for_a specific_dk from dk_ComposeTable(which holds all dk combinations) e.g. for dk: ^ get â,ê,î,ô,û,...
 bool query_dk_combinations_for_specific_dk(vec_dword_2D &dk_ComposeTable, KMX_DWORD dk, vec_dword_2D &dk_SingleTable);
 
 // get the shifted character of a key and write shiftstate of KVal to shift

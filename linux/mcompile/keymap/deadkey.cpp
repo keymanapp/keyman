@@ -1,8 +1,8 @@
 #include "keymap.h"
 #include "deadkey.h"
 
-
-std::vector<DeadKey *> create_deadkeys_by_basechar() {
+std::vector<DeadKey *>
+create_deadkeys_by_basechar() {
   std::vector<DeadKey *> alDead;
   vec_dword_2D dk_ComposeTable;
 
@@ -19,7 +19,8 @@ std::vector<DeadKey *> create_deadkeys_by_basechar() {
   return alDead;
 }
 
-void refine_alDead(KMX_WCHAR dk, std::vector<DeadKey *> &dkVec, std::vector<DeadKey *> &p_All_Vec) {
+void
+refine_alDead(KMX_WCHAR dk, std::vector<DeadKey *> &dkVec, std::vector<DeadKey *> &p_All_Vec) {
   if (dk == 0)
     return;
 
@@ -28,12 +29,14 @@ void refine_alDead(KMX_WCHAR dk, std::vector<DeadKey *> &dkVec, std::vector<Dead
       if (!found_dk_inVector(dk, dkVec)) {
         dkVec.push_back((p_All_Vec)[j]);
         return;
-      } else return;
+      } else
+        return;
     }
   }
 }
 
-bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey *> &dkVec) {
+bool
+found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey *> &dkVec) {
   for (int i = 0; i < dkVec.size(); i++) {
     if (dk == dkVec[i]->KMX_GetDeadCharacter())
       return true;
@@ -41,7 +44,8 @@ bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey *> &dkVec) {
   return false;
 }
 
-bool query_dk_combinations_for_specific_dk(vec_dword_2D &p_dk_ComposeTable, KMX_DWORD dk, vec_dword_2D &dk_SingleTable) {
+bool
+query_dk_combinations_for_specific_dk(vec_dword_2D &p_dk_ComposeTable, KMX_DWORD dk, vec_dword_2D &dk_SingleTable) {
   vec_dword_1D line;
 
   for (int i = 0; i < (int)(p_dk_ComposeTable).size(); i++) {
@@ -60,7 +64,8 @@ bool query_dk_combinations_for_specific_dk(vec_dword_2D &p_dk_ComposeTable, KMX_
     return false;
 }
 
-KMX_DWORD KMX_change_keyname_to_capital(KMX_DWORD kVal, KMX_DWORD &shift, GdkKeymap *keymap) {
+KMX_DWORD
+KMX_change_keyname_to_capital(KMX_DWORD kVal, KMX_DWORD &shift, GdkKeymap *keymap) {
   guint keyval = (guint)kVal;
   GdkKeymapKey *keys;
   gint n_keys;
@@ -78,7 +83,12 @@ KMX_DWORD KMX_change_keyname_to_capital(KMX_DWORD kVal, KMX_DWORD &shift, GdkKey
   return capitalKeyval;
 }
 
-void add_deadkey_combination(vec_dword_2D &dk_ComposeTable, std::string diacritic_name, std::string base_char, KMX_DWORD unicode_value) {
+void
+add_deadkey_combination(
+    vec_dword_2D &dk_ComposeTable,
+    std::string diacritic_name,
+    std::string base_char,
+    KMX_DWORD unicode_value) {
   vec_dword_1D line;
   line.push_back(convertNamesTo_DWORD_Value(diacritic_name));
   line.push_back(convertNamesTo_DWORD_Value(base_char));
@@ -86,7 +96,8 @@ void add_deadkey_combination(vec_dword_2D &dk_ComposeTable, std::string diacriti
   dk_ComposeTable.push_back(line);
 }
 
-void create_DKTable(vec_dword_2D &dk_ComposeTable) {
+void
+create_DKTable(vec_dword_2D &dk_ComposeTable) {
   // create a 2D-Vector which contains data for ALL existing deadkey combinations on a Linux Keyboard:
   // dk_ComposeTable[i][0] : diacritic_name    		(e.g. dead_circumflex)
   // dk_ComposeTable[i][1] : base_char   					(e.g. a)
@@ -241,44 +252,44 @@ void create_DKTable(vec_dword_2D &dk_ComposeTable) {
   add_deadkey_combination(dk_ComposeTable, "dead_ogonek", "u", 0x0173);  // small U with ogonek
   add_deadkey_combination(dk_ComposeTable, "dead_ogonek", "U", 0x0172);  // capital U with ogonek
 
-  add_deadkey_combination(dk_ComposeTable, "dead_circumflex", 	"space", 0x005E);  // CIRCUMFLEX_ACCENT
-  add_deadkey_combination(dk_ComposeTable, "dead_acute", 				"space", 0x0027);  // APOSTROPHE
-  add_deadkey_combination(dk_ComposeTable, "dead_grave", 				"space", 0x0060);  // GRAVE_ACCENT
-  add_deadkey_combination(dk_ComposeTable, "dead_breve", 				"space", 0x02D8);  // BREVE
-  add_deadkey_combination(dk_ComposeTable, "dead_abovedot", 		"space", 0x02D9);  // DOT_ABOVE
-  add_deadkey_combination(dk_ComposeTable, "dead_abovering", 		"space", 0x02DA);  // RING_ABOVE
-  add_deadkey_combination(dk_ComposeTable, "dead_doubleacute", 	"space", 0x02DD);  // DOUBLE_ACUTE_ACCENT
-  add_deadkey_combination(dk_ComposeTable, "dead_caron", 				"space", 0x02C7);  // CARON
-  add_deadkey_combination(dk_ComposeTable, "dead_cedilla", 			"space", 0x00B8);  // CEDILLA
-  add_deadkey_combination(dk_ComposeTable, "dead_ogonek", 			"space", 0x02DB);  // OGONEK
-  add_deadkey_combination(dk_ComposeTable, "dead_tilde", 				"space", 0x007E);  // TILDE
+  add_deadkey_combination(dk_ComposeTable, "dead_circumflex", "space", 0x005E);   // CIRCUMFLEX_ACCENT
+  add_deadkey_combination(dk_ComposeTable, "dead_acute", "space", 0x0027);        // APOSTROPHE
+  add_deadkey_combination(dk_ComposeTable, "dead_grave", "space", 0x0060);        // GRAVE_ACCENT
+  add_deadkey_combination(dk_ComposeTable, "dead_breve", "space", 0x02D8);        // BREVE
+  add_deadkey_combination(dk_ComposeTable, "dead_abovedot", "space", 0x02D9);     // DOT_ABOVE
+  add_deadkey_combination(dk_ComposeTable, "dead_abovering", "space", 0x02DA);    // RING_ABOVE
+  add_deadkey_combination(dk_ComposeTable, "dead_doubleacute", "space", 0x02DD);  // DOUBLE_ACUTE_ACCENT
+  add_deadkey_combination(dk_ComposeTable, "dead_caron", "space", 0x02C7);        // CARON
+  add_deadkey_combination(dk_ComposeTable, "dead_cedilla", "space", 0x00B8);      // CEDILLA
+  add_deadkey_combination(dk_ComposeTable, "dead_ogonek", "space", 0x02DB);       // OGONEK
+  add_deadkey_combination(dk_ComposeTable, "dead_tilde", "space", 0x007E);        // TILDE
 
-  add_deadkey_combination(dk_ComposeTable, "dead_breve", 				"dead_breve", 0x02D8);        // BREVE
-  add_deadkey_combination(dk_ComposeTable, "dead_abovedot", 		"abovedot", 0x02D9);          // DOT_ABOVE
-  add_deadkey_combination(dk_ComposeTable, "dead_abovedot", 		"dead_abovedot", 0x02D9);     // DOT_ABOVE
-  add_deadkey_combination(dk_ComposeTable, "dead_abovering", 		"dead_abovering", 0x02DA);    // RING_ABOVE
-  add_deadkey_combination(dk_ComposeTable, "dead_acute", 				"apostrophe", 0x00B4);        // ACUTE_ACCENT
-  add_deadkey_combination(dk_ComposeTable, "dead_acute", 				"acute", 0x00B4);             // ACUTE_ACCENT
-  add_deadkey_combination(dk_ComposeTable, "dead_acute", 				"dead_acute", 0x00B4);        // ACUTE_ACCENT
-  add_deadkey_combination(dk_ComposeTable, "dead_doubleacute", 	"dead_doubleacute", 0x02DD);  // DOUBLE_ACUTE_ACCENT
-  add_deadkey_combination(dk_ComposeTable, "dead_caron", 				"caron", 0x02C7);             // CARON
-  add_deadkey_combination(dk_ComposeTable, "dead_caron", 				"dead_caron", 0x02C7);        // CARON
-  add_deadkey_combination(dk_ComposeTable, "dead_cedilla", 			"comma", 0x00B8);             // CEDILLA
-  add_deadkey_combination(dk_ComposeTable, "dead_cedilla", 			"cedilla", 0x00B8);           // CEDILLA
-  add_deadkey_combination(dk_ComposeTable, "dead_cedilla", 			"dead_cedilla", 0x00B8);      // CEDILLA
-  add_deadkey_combination(dk_ComposeTable, "dead_circumflex", 	"minus", 0x00AF);             // MACRON
-  add_deadkey_combination(dk_ComposeTable, "dead_circumflex", 	"asciicircum", 0x005E);       // CIRCUMFLEX_ACCENT
-  add_deadkey_combination(dk_ComposeTable, "dead_circumflex", 	"underscore", 0x00AF);        // MACRON
-  add_deadkey_combination(dk_ComposeTable, "dead_circumflex", 	"dead_circumflex", 0x005E);   // CIRCUMFLEX_ACCENT
-  add_deadkey_combination(dk_ComposeTable, "dead_diaeresis", 		"quotedbl", 0x00A8);          // DIAERESIS
-  add_deadkey_combination(dk_ComposeTable, "dead_diaeresis", 		"diaeresis", 0x00A8);         // DIAERESIS
-  add_deadkey_combination(dk_ComposeTable, "dead_diaeresis", 		"dead_diaeresis", 0x00A8);    // DIAERESIS
-  add_deadkey_combination(dk_ComposeTable, "dead_grave", 				"grave", 0x0060);             // GRAVE_ACCENT
-  add_deadkey_combination(dk_ComposeTable, "dead_grave", 				"dead_grave", 0x0060);        // GRAVE_ACCENT
-  add_deadkey_combination(dk_ComposeTable, "dead_macron", 			"macron", 0x00AF);            // MACRON
-  add_deadkey_combination(dk_ComposeTable, "dead_macron", 			"dead_macron", 0x00AF);       // MACRON
-  add_deadkey_combination(dk_ComposeTable, "dead_ogonek", 			"ogonek", 0x02DB);            // OGONEK
-  add_deadkey_combination(dk_ComposeTable, "dead_ogonek", 			"dead_ogonek", 0x02DB);       // OGONEK
-  add_deadkey_combination(dk_ComposeTable, "dead_tilde", 				"asciitilde", 0x007E);        // TILDE
-  add_deadkey_combination(dk_ComposeTable, "dead_tilde", 				"dead_tilde", 0x007E);        // TILDE
+  add_deadkey_combination(dk_ComposeTable, "dead_breve", "dead_breve", 0x02D8);              // BREVE
+  add_deadkey_combination(dk_ComposeTable, "dead_abovedot", "abovedot", 0x02D9);             // DOT_ABOVE
+  add_deadkey_combination(dk_ComposeTable, "dead_abovedot", "dead_abovedot", 0x02D9);        // DOT_ABOVE
+  add_deadkey_combination(dk_ComposeTable, "dead_abovering", "dead_abovering", 0x02DA);      // RING_ABOVE
+  add_deadkey_combination(dk_ComposeTable, "dead_acute", "apostrophe", 0x00B4);              // ACUTE_ACCENT
+  add_deadkey_combination(dk_ComposeTable, "dead_acute", "acute", 0x00B4);                   // ACUTE_ACCENT
+  add_deadkey_combination(dk_ComposeTable, "dead_acute", "dead_acute", 0x00B4);              // ACUTE_ACCENT
+  add_deadkey_combination(dk_ComposeTable, "dead_doubleacute", "dead_doubleacute", 0x02DD);  // DOUBLE_ACUTE_ACCENT
+  add_deadkey_combination(dk_ComposeTable, "dead_caron", "caron", 0x02C7);                   // CARON
+  add_deadkey_combination(dk_ComposeTable, "dead_caron", "dead_caron", 0x02C7);              // CARON
+  add_deadkey_combination(dk_ComposeTable, "dead_cedilla", "comma", 0x00B8);                 // CEDILLA
+  add_deadkey_combination(dk_ComposeTable, "dead_cedilla", "cedilla", 0x00B8);               // CEDILLA
+  add_deadkey_combination(dk_ComposeTable, "dead_cedilla", "dead_cedilla", 0x00B8);          // CEDILLA
+  add_deadkey_combination(dk_ComposeTable, "dead_circumflex", "minus", 0x00AF);              // MACRON
+  add_deadkey_combination(dk_ComposeTable, "dead_circumflex", "asciicircum", 0x005E);        // CIRCUMFLEX_ACCENT
+  add_deadkey_combination(dk_ComposeTable, "dead_circumflex", "underscore", 0x00AF);         // MACRON
+  add_deadkey_combination(dk_ComposeTable, "dead_circumflex", "dead_circumflex", 0x005E);    // CIRCUMFLEX_ACCENT
+  add_deadkey_combination(dk_ComposeTable, "dead_diaeresis", "quotedbl", 0x00A8);            // DIAERESIS
+  add_deadkey_combination(dk_ComposeTable, "dead_diaeresis", "diaeresis", 0x00A8);           // DIAERESIS
+  add_deadkey_combination(dk_ComposeTable, "dead_diaeresis", "dead_diaeresis", 0x00A8);      // DIAERESIS
+  add_deadkey_combination(dk_ComposeTable, "dead_grave", "grave", 0x0060);                   // GRAVE_ACCENT
+  add_deadkey_combination(dk_ComposeTable, "dead_grave", "dead_grave", 0x0060);              // GRAVE_ACCENT
+  add_deadkey_combination(dk_ComposeTable, "dead_macron", "macron", 0x00AF);                 // MACRON
+  add_deadkey_combination(dk_ComposeTable, "dead_macron", "dead_macron", 0x00AF);            // MACRON
+  add_deadkey_combination(dk_ComposeTable, "dead_ogonek", "ogonek", 0x02DB);                 // OGONEK
+  add_deadkey_combination(dk_ComposeTable, "dead_ogonek", "dead_ogonek", 0x02DB);            // OGONEK
+  add_deadkey_combination(dk_ComposeTable, "dead_tilde", "asciitilde", 0x007E);              // TILDE
+  add_deadkey_combination(dk_ComposeTable, "dead_tilde", "dead_tilde", 0x007E);              // TILDE
 }
