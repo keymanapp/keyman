@@ -6,7 +6,7 @@ export const expectedGitDateFormat = /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d\d\
 /**
  * Returns the date and time of the last commit from git for the passed in path
  * @param path   Path for which to retrieve the last commit message
- * @returns string, in RFC3339, 'YYYY-MM-DDThh:nn:ssZ'
+ * @returns string, in RFC3339, 'YYYY-MM-DDThh:nn:ss.SSSZ'
  */
 export function getLastGitCommitDate(path: string): string {
   // TZ=UTC0 git log -1 --no-merges --date=format:%Y-%m-%dT%H:%M:%SZ --format=%ad
