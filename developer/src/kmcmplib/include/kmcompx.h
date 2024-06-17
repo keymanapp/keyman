@@ -29,6 +29,7 @@ typedef KMX_WCHAR*  PKMX_WCHAR ;
 
 #ifndef _MSC_VER
 #include <type_traits>
+#include <cstddef>
 
 template < typename T, size_t N >
 size_t _countof( T ( & /*arr*/ )[ N ] )

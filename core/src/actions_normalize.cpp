@@ -15,12 +15,12 @@
 #include "state.hpp"
 #include "option.hpp"
 #include "debuglog.h"
-#include "core_icu.h"
+#include "util_normalize.hpp"
+#include "utfcodec.hpp"
+#include "kmx/kmx_xstring.h"
 
-// forward declarations
-
-icu::UnicodeString context_items_to_unicode_string(km::core::context const *context);
-km_core_usv *unicode_string_to_usv(icu::UnicodeString& src);
+// forward declaration
+bool context_items_to_unicode_string(km::core::context const *context, std::u32string &str);
 
 /**
  * Normalize the output from an action to NFC, across the context | output
@@ -65,32 +65,12 @@ bool km::core::actions_normalize(
     cached_context.
   */
 
-  /*
-    Initialization
-  */
-
-  UErrorCode icu_status = U_ZERO_ERROR;
-  const icu::Normalizer2 *nfc = icu::Normalizer2::getNFCInstance(icu_status);
-  assert(U_SUCCESS(icu_status));
-  if(!U_SUCCESS(icu_status)) {
-    DebugLog("getNFCInstance failed with %x", icu_status);
+  std::u32string output(actions.output);
+  std::u32string cached_context_string, app_context_string;
+  if (!context_items_to_unicode_string(cached_context, cached_context_string)) {
     return false;
   }
-
-  const icu::Normalizer2 *nfd = icu::Normalizer2::getNFDInstance(icu_status);
-  assert(U_SUCCESS(icu_status));
-  if(!U_SUCCESS(icu_status)) {
-    DebugLog("getNFDInstance failed with %x", icu_status);
-    return false;
-  }
-
-  icu::UnicodeString output = icu::UnicodeString::fromUTF32(reinterpret_cast<const UChar32*>(actions.output), -1);
-  icu::UnicodeString cached_context_string = context_items_to_unicode_string(cached_context);
-  icu::UnicodeString app_context_string = context_items_to_unicode_string(app_context);
-  assert(!output.isBogus());
-  assert(!cached_context_string.isBogus());
-  assert(!app_context_string.isBogus());
-  if(output.isBogus() || cached_context_string.isBogus() || app_context_string.isBogus()) {
+  if (!context_items_to_unicode_string(app_context, app_context_string)) {
     return false;
   }
   int nfu_to_delete = 0;
@@ -98,20 +78,25 @@ bool km::core::actions_normalize(
   /*
     Further debug assertion of inputs
   */
-
-  assert(nfd->isNormalized(output, icu_status) && U_SUCCESS(icu_status));
-  assert(nfd->isNormalized(cached_context_string, icu_status) && U_SUCCESS(icu_status));
+  assert(km::core::util::is_nfd(output));
+  assert(km::core::util::is_nfd(cached_context_string));
 
   /*
     The keyboard processor will have updated the cached_context already,
-    applying the transform to it, so we need to rewind this. Remove the output
-    from cached_context_string to start
+    applying the transform to it, so we need to rewind this.
+
+    Assert that 'cached_context_string' ends with 'output'
+
+    Remove the output
+    from cached_context_string to start.
   */
 
   assert(cached_context_string.length() >= output.length());
-  int n = cached_context_string.length() - output.length();
+  size_t n = cached_context_string.length() - output.length();
+  // auto end_cached = cached_context_string.substr(n, output.length());
+  // assert(end_cached == output);
   assert(cached_context_string.compare(n, output.length(), output) == 0);
-  cached_context_string.remove(n);
+  cached_context_string.resize(n);
 
   /*
     While cached_context is guaranteed to be normalized, actions->output may not
@@ -119,21 +104,22 @@ bool km::core::actions_normalize(
     normalization in our output, we now need to look for a normalization
     boundary prior to the intersection of the cached_context and the output.
   */
-  if(!output.isEmpty()) {
-    while(n > 0 && !nfd->hasBoundaryBefore(output[0])) {
+  if(!output.empty()) {
+    while(n > 0 && !km::core::util::has_nfd_boundary_before(output[0])) {
       // The output may interact with the context further in normalization. We
       // need to copy characters back further until we reach a normalization
       // boundary.
 
       // Remove last code point from the context ...
 
-      n = cached_context_string.moveIndex32(n, -1);
-      UChar32 chr = cached_context_string.char32At(n);
-      cached_context_string.remove(n);
+      auto len = cached_context_string.length();
+      assert(len>0);
+      auto chr = cached_context_string.at(len-1);
+      cached_context_string.resize(len-1);
 
       // And prepend it to the output ...
 
-      output.insert(0, chr);
+      output.insert(0, 1, chr);
     }
   }
 
@@ -148,25 +134,20 @@ bool km::core::actions_normalize(
     its normalized form matches the cached_context normalized form.
   */
 
-  while(app_context_string.countChar32()) {
-    icu::UnicodeString app_context_nfd;
-    nfd->normalize(app_context_string, app_context_nfd, icu_status);
-    assert(U_SUCCESS(icu_status));
-    if(!U_SUCCESS(icu_status)) {
-      DebugLog("nfd->normalize failed with %x", icu_status);
+  while(!app_context_string.empty()) {
+    auto app_context_nfd = app_context_string;
+    if(!km::core::util::normalize_nfd(app_context_nfd)) {
+      DebugLog("nfd->normalize failed");
       return false;
     }
 
-    if(app_context_nfd.compare(cached_context_string) == 0) {
+    if(app_context_nfd == cached_context_string) {
       break;
     }
 
-    // remove the last UChar32
-    int32_t lastUChar32 = app_context_string.length()-1;
-    // adjust pointer to get the entire char (i.e. so we don't slice a non-BMP char)
-    lastUChar32 = app_context_string.getChar32Start(lastUChar32);
-    // remove the UChar32 (1 or 2 code units)
-    app_context_string.remove(lastUChar32);
+    size_t len = app_context_string.length();
+    // remove the cp at end
+    app_context_string.resize(len-1);
     nfu_to_delete++;
   }
 
@@ -174,17 +155,15 @@ bool km::core::actions_normalize(
     Normalize our output string
   */
 
-  icu::UnicodeString output_nfc;
-  nfc->normalize(output, output_nfc, icu_status);
-  assert(U_SUCCESS(icu_status));
-  if(!U_SUCCESS(icu_status)) {
-    DebugLog("nfc->normalize failed with %x", icu_status);
+  auto output_nfc = output;
+  if(!km::core::util::normalize_nfc(output_nfc)) {
+    DebugLog("nfc->normalize failed");
     return false;
   }
 
-  auto new_output = unicode_string_to_usv(output_nfc);
-  if(!new_output) {
-    // error logging handled in unicode_string_to_usv
+  auto new_output = km::core::util::string_to_usv(output_nfc);
+  assert(new_output != nullptr);
+  if(new_output == nullptr) {
     return false;
   }
 
@@ -197,8 +176,8 @@ bool km::core::actions_normalize(
   app_context_string.append(output_nfc);
   km_core_context_item *app_context_items = nullptr;
   km_core_status status = KM_CORE_STATUS_OK;
-  if((status = context_items_from_utf16(app_context_string.getTerminatedBuffer(), &app_context_items)) != KM_CORE_STATUS_OK) {
-    DebugLog("context_items_from_utf16 failed with %x", status);
+  if((status = context_items_from_utf32(app_context_string.c_str(), &app_context_items)) != KM_CORE_STATUS_OK) {
+    DebugLog("context_items_from_string failed with %x", status);
     delete [] new_output;
     return false;
   }
@@ -224,21 +203,19 @@ bool km::core::actions_normalize(
 /**
  * Helper to convert km_core_context list into a icu::UnicodeString
  */
-icu::UnicodeString context_items_to_unicode_string(km::core::context const *context) {
-  icu::UnicodeString nullString;
-  nullString.setToBogus();
+bool context_items_to_unicode_string(km::core::context const *context, std::u32string &str) {
 
   km_core_context_item *items = nullptr;
   km_core_status status;
   if((status = km_core_context_get(static_cast<km_core_context const *>(context), &items)) != KM_CORE_STATUS_OK) {
     DebugLog("Failed to retrieve context with %s", status);
-    return nullString;
+    return false;
   }
   size_t buf_size = 0;
   if((status = context_items_to_utf32(items, nullptr, &buf_size)) != KM_CORE_STATUS_OK) {
     DebugLog("Failed to retrieve context size with %s", status);
     km_core_context_items_dispose(items);
-    return nullString;
+    return false;
   }
 
   km_core_usv *buf = new km_core_usv[buf_size];
@@ -246,37 +223,14 @@ icu::UnicodeString context_items_to_unicode_string(km::core::context const *cont
     DebugLog("Failed to retrieve context with %s", status);
     km_core_context_items_dispose(items);
     delete [] buf;
-    return nullString;
+    return false;
   }
 
-  auto result = icu::UnicodeString::fromUTF32(reinterpret_cast<const UChar32*>(buf), -1);
+  str = std::u32string(buf, buf_size - 1); // don't include terminating null
   km_core_context_items_dispose(items);
   delete [] buf;
-  return result;
+  return true;
 }
-
-/**
- * Helper to convert icu::UnicodeString to a UTF-32 km_core_usv buffer,
- * nul-terminated
- */
-km_core_usv *unicode_string_to_usv(icu::UnicodeString& src) {
-  UErrorCode icu_status = U_ZERO_ERROR;
-
-  km_core_usv *dst = new km_core_usv[src.length() + 1];
-
-  src.toUTF32(reinterpret_cast<UChar32*>(dst), src.length(), icu_status);
-
-  assert(U_SUCCESS(icu_status));
-  if(!U_SUCCESS(icu_status)) {
-    DebugLog("toUTF32 failed with %x", icu_status);
-    delete[] dst;
-    return nullptr;
-  }
-
-  dst[src.length()] = 0;
-  return dst;
-}
-
 
 
 /**
