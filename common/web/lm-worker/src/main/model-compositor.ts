@@ -456,18 +456,21 @@ export default class ModelCompositor {
       // Valid 'keep' suggestions may have zero length; we still need to evaluate the following code
       // for such cases.
 
-      // Do we need to manipulate the suggestion's transform based on the current state of the context?
-      if(!context.right) {
+      // If we're mid-word, delete its original post-caret text.
+      const tokenization = compositor.tokenize(context);
+      if(tokenization && tokenization.caretSplitsToken) {
+        // While we wait on the ability to provide a more 'ideal' solution, let's at least
+        // go with a more stable, if slightly less ideal, solution for now.
+        //
+        // A predictive text default (on iOS, at least) - immediately wordbreak
+        // on suggestions accepted mid-word.
         suggestion.transform.insert += punctuation.insertAfterWord;
-      } else {
-        // If we're mid-word, delete its original post-caret text.
-        const tokenization = compositor.tokenize(context);
-        if(tokenization && tokenization.caretSplitsToken) {
-          // While we wait on the ability to provide a more 'ideal' solution, let's at least
-          // go with a more stable, if slightly less ideal, solution for now.
-          //
-          // A predictive text default (on iOS, at least) - immediately wordbreak
-          // on suggestions accepted mid-word.
+
+        // Do we need to manipulate the suggestion's transform based on the current state of the context?
+      } else if(!context.right) {
+        suggestion.transform.insert += punctuation.insertAfterWord;
+      } else if(punctuation.insertAfterWord != '') {
+        if(context.right.indexOf(punctuation.insertAfterWord) != 0) {
           suggestion.transform.insert += punctuation.insertAfterWord;
         }
       }
