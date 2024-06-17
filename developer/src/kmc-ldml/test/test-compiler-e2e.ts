@@ -118,6 +118,19 @@ describe('compiler-tests', function() {
       ]);
     assert.isNotNull(kmx);
   });
+  it('should warn on mark keys with no display', async function () {
+    // unassigned not implemented yet
+    const inputFilename = makePathToFixture('sections/keys/warn-no-keycap.xml');
+    const msgs = [
+      CompilerMessages.Hint_NoDisplayForMarker({id: 'mark-dotbelow', output:'\\m{dotbelow}'}),
+    ]
+    const kmx = await compileKeyboard(inputFilename, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false },
+      msgs,
+      false, // validation should pass
+      msgs,
+    );
+    assert.isNotNull(kmx);
+  });
   it('should fail on extra escapes - sections/tran/fail-bad-tran-2.xml', async function() {
     const inputFilename = makePathToFixture('sections/tran/fail-bad-tran-2.xml');
     const kmx = await compileKeyboard(inputFilename, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false },

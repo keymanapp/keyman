@@ -52,7 +52,9 @@ export class CompilerMessages {
   static Error_GestureKeyNotFoundInKeyBag = (o:{keyId: string, parentKeyId: string, attribute: string}) =>
   m(this.ERROR_GestureKeyNotFoundInKeyBag, `Key '${def(o.keyId)}' not found in key bag, referenced from other '${def(o.parentKeyId)}' in ${def(o.attribute)}`);
 
-  // 0x000C - available
+  static HINT_NoDisplayForMarker = SevHint | 0x000C;
+  static Hint_NoDisplayForMarker = (o:{id: string, output: string}) =>
+  m(this.HINT_NoDisplayForMarker, `<key id="${def(o.id)}" output="${def(o.output)}"/> element, but there is no matching display element such as <display output="${def(o.output)}"/>. Keycap may be blank.`);
 
   static ERROR_InvalidVersion = SevError | 0x000D;
   static Error_InvalidVersion = (o:{version: string}) =>
