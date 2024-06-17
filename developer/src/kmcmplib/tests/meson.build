@@ -167,3 +167,14 @@ gtestcompilertest = executable('gtest-compiler-test', 'gtest-compiler-test.cpp',
   )
 
 test('gtest-compiler-test', gtestcompilertest)
+
+gtestcompmsgtest = executable('gtest-compmsg-test', 'gtest-compmsg-test.cpp',
+    cpp_args: defns + flags,
+    include_directories: inc,
+    name_suffix: name_suffix,
+    link_args: links + tests_links,
+    objects: lib.extract_all_objects(),
+    dependencies: [ icuuc_dep, gtest_dep, gmock_dep ],
+  )
+
+test('gtest-compmsg-test', gtestcompmsgtest)
