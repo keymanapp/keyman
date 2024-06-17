@@ -12,8 +12,10 @@ lib_links = []
 if cpp_compiler.get_id() == 'gcc' or cpp_compiler.get_id() == 'clang'
   warns += [
      '-Wall',
-     '-Wextra'
+     '-Wextra',
+     '-Wno-ignored-qualifiers'
   ]
+  flags += ['-D__cdecl= ']
 endif
 
 if cpp_compiler.get_id() == 'msvc'

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include "..\..\common\include\kmn_compiler_errors.h"
-#include "..\..\..\..\common\include\km_types.h"
+#include "../../common/include/kmn_compiler_errors.h"
+#include "../../../../common/include/km_types.h"
 
 const KMX_CHAR *GetCompilerErrorString(KMX_DWORD code);
 
