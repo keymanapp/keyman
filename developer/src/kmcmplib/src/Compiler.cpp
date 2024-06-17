@@ -276,7 +276,7 @@ KMX_BOOL kmcmp::AddCompileWarning(PKMX_CHAR buf)
 KMX_BOOL AddCompileError(KMX_DWORD msg)
 {
   KMX_CHAR szText[COMPILE_ERROR_MAX_LEN];
-  KMX_CHAR* szTextp = NULL;
+  const KMX_CHAR* szTextp = NULL;
 
   if (msg & CERR_FATAL)
   {
