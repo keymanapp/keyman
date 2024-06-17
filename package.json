@@ -63,6 +63,6 @@
     "@keymanapp/ldml-keyboard-constants": "file:core/include/ldml"
   },
   "engines": {
-    "node": ">=18.20.0 <23.0.0"
+    "node": "^18.20.0 || ^20.10.0 || ^22.0.0"
   }
 }
