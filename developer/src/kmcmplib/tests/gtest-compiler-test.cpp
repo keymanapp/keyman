@@ -19,6 +19,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
 );
 KMX_DWORD GetRHS(PFILE_KEYBOARD fk, PKMX_WCHAR p, PKMX_WCHAR buf, int bufsize, int offset, int IsUnicode);
 bool hasPreamble(std::u16string result);
+KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnicode, PKMX_WCHAR pklIn, PKMX_WCHAR pklKey, PKMX_WCHAR pklOut);
 
 extern kmcmp_CompilerMessageProc msgproc;
 
@@ -82,6 +83,20 @@ class CompilerTest : public testing::Test {
             fk.cxVKDictionary    = 0;
             fk.dpVKDictionary    = nullptr;
             fk.extra             = nullptr;
+        }
+
+        void initFileGroupArray(FILE_KEYBOARD &fk, KMX_BOOL fUsingKeys) {
+            fk.dpGroupArray = new FILE_GROUP[1];
+            fk.cxGroupArray = 1;
+
+            fk.dpGroupArray->szName[0] = 0;
+            fk.dpGroupArray->cxKeyArray = 0;
+            fk.dpGroupArray->dpKeyArray = nullptr;
+            fk.dpGroupArray->dpMatch = nullptr;
+            fk.dpGroupArray->dpNoMatch = nullptr;
+            fk.dpGroupArray->fUsingKeys = fUsingKeys;
+            fk.dpGroupArray->fReadOnly = FALSE;
+            fk.dpGroupArray->Line = 0;
         }
 
         void deleteFileKeyboard(FILE_KEYBOARD &fk) {
@@ -266,7 +281,32 @@ TEST_F(CompilerTest, IsValidKeyboardVersion_test) {
 // KMX_DWORD InjectContextToReadonlyOutput(PKMX_WCHAR pklOut)
 // KMX_DWORD CheckOutputIsReadonly(const PFILE_KEYBOARD fk, const PKMX_WCHAR output)
 // KMX_DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnicode)
-// KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnicode, PKMX_WCHAR pklIn, PKMX_WCHAR pklKey, PKMX_WCHAR pklOut)
+
+TEST_F(CompilerTest, ProcessKeyLineImpl_test) {
+    initFileGroupArray(fileKeyboard, TRUE);
+
+    PKMX_WCHAR pklIn, pklKey, pklOut;
+    KMX_WCHAR str[128];
+
+    pklIn  = new KMX_WCHAR[GLOBAL_BUFSIZE];
+    pklKey = new KMX_WCHAR[GLOBAL_BUFSIZE];
+    pklOut = new KMX_WCHAR[GLOBAL_BUFSIZE];
+
+    // #11643: non-BMP characters do not makes sense for key codes
+    u16cpy(str, u"+ 'A' > 'test'\n"); // baseline
+    EXPECT_EQ(CERR_None, ProcessKeyLineImpl(&fileKeyboard, str, TRUE, pklIn, pklKey, pklOut));
+
+    u16cpy(str, u"+ '\U00010000' > 'test'\n"); // surrogate pair
+    EXPECT_EQ(CERR_NonBMPCharactersNotSupportedInKeySection, ProcessKeyLineImpl(&fileKeyboard, str, TRUE, pklIn, pklKey, pklOut));
+
+    delete[] pklIn;
+    delete[] pklKey;
+    delete[] pklOut;
+
+    // TODO: other tests for this function
+
+}
+
 // KMX_DWORD ExpandKp_ReplaceIndex(PFILE_KEYBOARD fk, PFILE_KEY k, KMX_DWORD keyIndex, int nAnyIndex)
 // KMX_DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, KMX_DWORD storeIndex)
 // PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_WORD Flags)
