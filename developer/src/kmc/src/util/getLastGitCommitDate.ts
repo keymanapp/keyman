@@ -1,7 +1,7 @@
 import { execFileSync } from 'child_process';
 
 // RFC3339 pattern, UTC
-export const expectedGitDateFormat = /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ$/;
+export const expectedGitDateFormat = /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d\d\d)?Z$/;
 
 /**
  * Returns the date and time of the last commit from git for the passed in path
@@ -17,13 +17,12 @@ export function getLastGitCommitDate(path: string): string {
       'log',                                // git log
       '-1',                                 // one commit only
       '--no-merges',                        // we're only interested in 'real' commits
-      '--date=format:%Y-%m-%dT%H:%M:%SZ',   // format the date in our expected RFC3339 format
-      '--format=%ad'                        // emit only the commit date
+      '--format=%at',                       // emit only the commit date as a UNIX timestamp
+      '--',
+      path
     ], {
-      env: { ...process.env, TZ: 'TZ0' },   // use UTC timezone, not local
       encoding: 'utf-8',                    // force a string result rather than Buffer
       windowsHide: true,                    // on windows, we may need this to suppress a console window popup
-      cwd: path,                            // path to run git from
       stdio: ['pipe', 'pipe', 'pipe']       // all output via pipe, so we don't get git errors on console
     });
   } catch (e) {
@@ -36,13 +35,8 @@ export function getLastGitCommitDate(path: string): string {
     return null;
   }
 
-  result = result.trim();
+  // We receive a timestamp in seconds but we need milliseconds
+  const msec = Number.parseInt(result.trim()) * 1000;
 
-  // We'll only return the result if it walks like a date, swims like a date,
-  // and quacks like a date.
-  if (!result.match(expectedGitDateFormat)) {
-    return null;
-  }
-
-  return result;
+  return new Date(msec).toISOString();
 }
