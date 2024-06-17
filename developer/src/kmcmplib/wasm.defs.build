@@ -2,7 +2,7 @@
 c = ['emcc.py']
 cpp = ['em++.py']
 ar = ['emar.py']
-exe_wrapper = 'node'
+exe_wrapper = ['node', '--enable-source-maps']
 
 [properties]
 root = '$EMSCRIPTEN_BASE/system'
