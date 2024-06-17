@@ -224,4 +224,16 @@ describe('CompilerMessages', function () {
       CompilerMessages.ERROR_InvalidPackageFile);
   });
 
+  // ERROR_InvalidAuthorEmail
+
+  it('should generate ERROR_InvalidAuthorEmail if author email address has multiple addresses', async function() {
+    await testForMessage(this, ['invalid', 'error_invalid_author_email_multiple.kps'],
+      CompilerMessages.ERROR_InvalidAuthorEmail);
+  });
+
+  it('should generate ERROR_InvalidAuthorEmail if author email address is formatted incorrectly', async function() {
+    await testForMessage(this, ['invalid', 'error_invalid_author_email.kps'],
+      CompilerMessages.ERROR_InvalidAuthorEmail);
+  });
+
 });

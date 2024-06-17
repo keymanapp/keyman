@@ -1,5 +1,43 @@
 # Keyman Version History
 
+## 18.0.57 alpha 2024-06-17
+
+* fix(web): fix id of longpress keys with modifier set in touch layout (#11783)
+* fix(web): prevent desktop OSK crash when addKeyboards is called before engine init (#11786)
+* fix(core): serialize tests for core/wasm on mac agents (#11795)
+* fix(developer): refactor kmcmplib compiler messages to use map (#11738)
+* fix(developer): make native compilation of kmcmplib under Linux possible (#11779)
+* feat(core): devolve regex to javascript (#11777)
+* feat(core): remove ICU from core under wasm (#11778)
+* fix(linux): restart ibus after manual integration test run (#11775)
+
+## 18.0.56 alpha 2024-06-14
+
+* feat(core): devolve normalization to js (#11541)
+* fix(developer): show message if no more platforms to add to touch layout editor (#11759)
+* docs(developer): context help in package-editor and put the existing context help in their own tab comments (#11760)
+* docs(developer): context help in keyboard-editor section (#11754)
+* docs(developer): context help in new-project section (#11767)
+* docs(developer): context help for new-project-parameters in keyman developer (#11769)
+* docs(developer): context help for Select BCP 47 tag in Keyman Developer (#11770)
+* change(common): update esbuild to 0.18.9 (#11693)
+* change(web): more prep for better async prediction handling (#10347)
+* fix(web): set new-context rules' device to match that of the active OSK (#11743)
+* chore(linux): Update debian changelog (#11671)
+* fix(web): add limited Array.from polyfill for lm-worker use (#11732)
+
+## 18.0.55 alpha 2024-06-13
+
+* fix(developer): handle missing OSK when importing a Windows keyboard into a touch-only project (#11720)
+* fix(developer): verify email addresses in .kps and .keyboard_info (#11735)
+* change(web): prep for better asynchronous prediction handling (#10343)
+
+## 18.0.54 alpha 2024-06-12
+
+* fix(common): remove subpackage entries for older TS version (#11745)
+* chore(common): end use of ts-node (#11746)
+* feat(web): add bulk_render variant that loads and renders keyboards from local KMP (#10432)
+
 ## 18.0.53 alpha 2024-06-10
 
 * fix(android): check current orientation when redisplaying system keyboard (#11604)
