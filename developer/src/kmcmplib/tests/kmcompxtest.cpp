@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
       std::istringstream(ErrNr) >> std::hex >> error_val;
 
       // check if error_val is in Array of Errors; if it is found return 0 (it's not an error)
-      for (std::vector<int>::size_type i = 0; i < error_vec.size() ; i++) {
+      for (size_t i = 0; i < error_vec.size() ; i++) {
         if (error_vec[i] == error_val) {
           return 0;  // success: CERR_ in Name + Error (specified in CERR_Name) IS found
         }
