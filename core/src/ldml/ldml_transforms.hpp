@@ -16,11 +16,7 @@
 #include <utility>
 #include "debuglog.h"
 
-#include "core_icu.h"
-#include "unicode/uniset.h"
-#include "unicode/usetiter.h"
-#include "unicode/regex.h"
-#include "unicode/utext.h"
+#include "util_regex.hpp"
 
 namespace km {
 namespace core {
@@ -111,14 +107,12 @@ public:
 private:
   const std::u32string fFrom;
   const std::u32string fTo;
-  std::unique_ptr<icu::RegexPattern> fFromPattern;
+  km::core::util::km_regex fFromPattern;
 
   const KMX_DWORD fMapFromStrId;
   const KMX_DWORD fMapToStrId;
   std::deque<std::u32string> fMapFromList;
   std::deque<std::u32string> fMapToList;
-  /** Internal function to setup pattern string @returns true on success */
-  bool init();
   bool normalization_disabled;
   /** @returns the index of the item in the fMapFromList list, or -1 */
   int32_t findIndexFrom(const std::u32string &match) const;
