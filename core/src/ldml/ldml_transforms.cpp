@@ -1,3 +1,5 @@
+// TEMP
+#define KMN_NO_ICU 0
 /*
   Copyright:    © SIL International.
   Description:  This is an implementation of the LDML keyboard spec 3.0.

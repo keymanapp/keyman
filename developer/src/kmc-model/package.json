@@ -33,7 +33,7 @@
     "@keymanapp/common-types": "*",
     "@keymanapp/keyman-version": "*",
     "@keymanapp/models-types": "*",
-    "typescript": "^4.9.5"
+    "typescript": "^5.4.5"
   },
   "devDependencies": {
     "@keymanapp/developer-test-helpers": "*",
@@ -42,9 +42,8 @@
     "@types/node": "^20.4.1",
     "c8": "^7.12.0",
     "chalk": "^2.4.2",
-    "esbuild": "^0.15.7",
-    "mocha": "^10.0.0",
-    "ts-node": "^10.9.1"
+    "esbuild": "^0.18.9",
+    "mocha": "^10.0.0"
   },
   "mocha": {
     "spec": "build/test/**/test-*.js",

@@ -1,6 +1,7 @@
 import { KmpJsonFile, CompilerCallbacks, CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
 import { CompilerMessages } from './package-compiler-messages.js';
 import { keymanEngineForWindowsFiles, keymanForWindowsInstallerFiles, keymanForWindowsRedistFiles } from './redist-files.js';
+import { isValidEmail } from '@keymanapp/developer-utils';
 
 // The keyboard ID SHOULD adhere to this pattern:
 const KEYBOARD_ID_PATTERN_PACKAGE = /^[a-z_][a-z0-9_]*\.(kps|kmp)$/;
@@ -206,6 +207,21 @@ export class PackageValidation {
     if(!file.info || !file.info.name || !file.info.name.description.trim()) {
       this.callbacks.reportMessage(CompilerMessages.Error_PackageNameCannotBeBlank());
       return false;
+    }
+
+    if(file.info?.author?.url) {
+      // we strip the mailto: from the .kps file for the .model_info
+      const match = file.info.author.url.match(/^(mailto\:)?(.+)$/);
+      /* c8 ignore next 3 */
+      if (match === null) {
+        this.callbacks.reportMessage(CompilerMessages.Error_InvalidAuthorEmail({email:file.info.author.url}));
+        return null;
+      }
+      if(!isValidEmail(match[2])) {
+        this.callbacks.reportMessage(CompilerMessages.Error_InvalidAuthorEmail({email:file.info.author.url}));
+        return null;
+      }
+
     }
 
     return true;

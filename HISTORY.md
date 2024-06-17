@@ -1,5 +1,38 @@
 # Keyman Version History
 
+## 18.0.56 alpha 2024-06-14
+
+* feat(core): devolve normalization to js (#11541)
+* fix(developer): show message if no more platforms to add to touch layout editor (#11759)
+* docs(developer): context help in package-editor and put the existing context help in their own tab comments (#11760)
+* docs(developer): context help in keyboard-editor section (#11754)
+* docs(developer): context help in new-project section (#11767)
+* docs(developer): context help for new-project-parameters in keyman developer (#11769)
+* docs(developer): context help for Select BCP 47 tag in Keyman Developer (#11770)
+* change(common): update esbuild to 0.18.9 (#11693)
+* change(web): more prep for better async prediction handling (#10347)
+* fix(web): set new-context rules' device to match that of the active OSK (#11743)
+* chore(linux): Update debian changelog (#11671)
+* fix(web): add limited Array.from polyfill for lm-worker use (#11732)
+
+## 18.0.55 alpha 2024-06-13
+
+* fix(developer): handle missing OSK when importing a Windows keyboard into a touch-only project (#11720)
+* fix(developer): verify email addresses in .kps and .keyboard_info (#11735)
+* change(web): prep for better asynchronous prediction handling (#10343)
+
+## 18.0.54 alpha 2024-06-12
+
+* fix(common): remove subpackage entries for older TS version (#11745)
+* chore(common): end use of ts-node (#11746)
+* feat(web): add bulk_render variant that loads and renders keyboards from local KMP (#10432)
+
+## 18.0.53 alpha 2024-06-10
+
+* fix(android): check current orientation when redisplaying system keyboard (#11604)
+* fix(android): fix keyboard size after rotation and restore via onSizeChanged, after layout (#11722)
+* fix(developer): fix kmcmplib unit-test include paths (#11749)
+
 ## 18.0.52 alpha 2024-06-08
 
 * fix(developer): prevent two touch layout editors opening for the same file (#11717)
