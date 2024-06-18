@@ -18,6 +18,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
   PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isUnicode
 );
 KMX_DWORD GetRHS(PFILE_KEYBOARD fk, PKMX_WCHAR p, PKMX_WCHAR buf, int bufsize, int offset, int IsUnicode);
+bool isuiw(PKMX_WCHAR p);
 bool hasPreamble(std::u16string result);
 
 extern kmcmp_CompilerMessageProc msgproc;
@@ -514,6 +515,16 @@ TEST_F(CompilerTest, GetRHS_test) {
 // KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD FileSize, PKMX_BYTE *Buf)
 // int atoiW(PKMX_WCHAR p)
 // KMX_DWORD kmcmp::CheckUTF16(int n)
+
+TEST_F(CompilerTest, isuiw_test) {
+    EXPECT_FALSE(isuiw(nullptr));
+    EXPECT_FALSE(isuiw((PKMX_WCHAR)u""));
+    EXPECT_FALSE(isuiw((PKMX_WCHAR)u"a"));
+    EXPECT_FALSE(isuiw((PKMX_WCHAR)u"-1"));
+    EXPECT_TRUE(isuiw((PKMX_WCHAR)u"1"));
+    EXPECT_TRUE(isuiw((PKMX_WCHAR)u"42"));
+}
+
 // KMX_DWORD kmcmp::UTF32ToUTF16(int n, int *n1, int *n2)
 // KMX_DWORD BuildVKDictionary(PFILE_KEYBOARD fk)
 // int GetVKCode(PFILE_KEYBOARD fk, PKMX_WCHAR p)

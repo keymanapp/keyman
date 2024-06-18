@@ -3369,6 +3369,7 @@ bool isuiw(PKMX_WCHAR p) {
   while(*q) {
     if (!isdigit(*q))
       return false;
+    q++;
   }
   return true;
 }
