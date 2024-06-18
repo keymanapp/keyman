@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 18.0.57 alpha 2024-06-17
+
+* fix(web): fix id of longpress keys with modifier set in touch layout (#11783)
+* fix(web): prevent desktop OSK crash when addKeyboards is called before engine init (#11786)
+* fix(core): serialize tests for core/wasm on mac agents (#11795)
+* fix(developer): refactor kmcmplib compiler messages to use map (#11738)
+* fix(developer): make native compilation of kmcmplib under Linux possible (#11779)
+* feat(core): devolve regex to javascript (#11777)
+* feat(core): remove ICU from core under wasm (#11778)
+* fix(linux): restart ibus after manual integration test run (#11775)
+
 ## 18.0.56 alpha 2024-06-14
 
 * feat(core): devolve normalization to js (#11541)
