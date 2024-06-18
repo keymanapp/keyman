@@ -5,14 +5,20 @@ $(function() {
     for (var platform in KVKL) {
       platforms[platform] = 0;
     }
+    let nPlatforms = 0;
     for (platform in platforms) {
       if (platforms[platform]) {
         var opt = document.createElement('option');
         $(opt).text(platform);
         $('#selAddPlatform').append(opt);
+        nPlatforms++;
       }
     }
-    $('#addPlatformDialog').dialog('open')
+    if(nPlatforms == 0) {
+      $('#addPlatformDialogNoPlatformsToAdd').dialog('open')
+    } else {
+      $('#addPlatformDialog').dialog('open')
+    }
   });
 
   $('#btnDelPlatform').click(function () {
@@ -64,6 +70,22 @@ $(function() {
         $(this).dialog('close');
       },
       "Cancel": function () {
+        $(this).dialog('close');
+      }
+    }
+  });
+
+  //
+  // Platform dialog -- no platforms to add
+  //
+
+  $('#addPlatformDialogNoPlatformsToAdd').dialog({
+    autoOpen: false,
+    height: 150,
+    width: 350,
+    modal: true,
+    buttons: {
+      "OK": function () {
         $(this).dialog('close');
       }
     }
