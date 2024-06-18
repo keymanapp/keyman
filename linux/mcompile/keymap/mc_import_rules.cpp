@@ -408,11 +408,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, GdkKeymap **ke
             continue;
           }
 
-        //_S2 TOP_6 TODO to compare win-lin kmn-files skip ss6+7; MUST BE removed later!!!!
-        if(ss == MenuCtrl|| ss == ShftMenuCtrl) {
-            continue;
-          }
-
           KMX_DWORD kc_us = (KMX_DWORD) KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 
           for(int caps = 0; caps <= 1; caps++) {
