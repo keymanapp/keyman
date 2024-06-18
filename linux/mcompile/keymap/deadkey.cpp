@@ -18,14 +18,14 @@ std::vector<DeadKey *> create_deadkeys_by_basechar() {
   return alDead;
 }
 
-void refine_alDead(KMX_WCHAR dk, std::vector<DeadKey *> &dkVec, std::vector<DeadKey *> &p_All_Vec) {
+void refine_alDead(KMX_WCHAR dk, std::vector<DeadKey *> &dkVec, std::vector<DeadKey *> &r_All_Vec) {
   if (dk == 0)
     return;
 
-  for (int j = 0; j < (int)p_All_Vec.size() - 1; j++) {
-    if (dk == (p_All_Vec)[j]->KMX_GetDeadCharacter()) {
+  for (int j = 0; j < (int)r_All_Vec.size() - 1; j++) {
+    if (dk == (r_All_Vec)[j]->KMX_GetDeadCharacter()) {
       if (!found_dk_inVector(dk, dkVec)) {
-        dkVec.push_back((p_All_Vec)[j]);
+        dkVec.push_back((r_All_Vec)[j]);
         return;
       } else
         return;

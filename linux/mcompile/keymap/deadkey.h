@@ -13,7 +13,7 @@ void create_DKTable(vec_dword_2D &dk_ComposeTable);
 std::vector<DeadKey *> create_deadkeys_by_basechar();
 
 // refine dk to those used in the underlying keyboard
-void refine_alDead(KMX_WCHAR dk, std::vector<DeadKey *> &myVec, std::vector<DeadKey *> &p_All_Vec);
+void refine_alDead(KMX_WCHAR dk, std::vector<DeadKey *> &myVec, std::vector<DeadKey *> &r_All_Vec);
 
 // check if entry is already there
 bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey *> &myVec);
