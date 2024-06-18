@@ -1,8 +1,7 @@
 #include "keymap.h"
 #include "deadkey.h"
 
-std::vector<DeadKey *>
-create_deadkeys_by_basechar() {
+std::vector<DeadKey *> create_deadkeys_by_basechar() {
   std::vector<DeadKey *> alDead;
   vec_dword_2D dk_ComposeTable;
 
@@ -19,8 +18,7 @@ create_deadkeys_by_basechar() {
   return alDead;
 }
 
-void
-refine_alDead(KMX_WCHAR dk, std::vector<DeadKey *> &dkVec, std::vector<DeadKey *> &p_All_Vec) {
+void refine_alDead(KMX_WCHAR dk, std::vector<DeadKey *> &dkVec, std::vector<DeadKey *> &p_All_Vec) {
   if (dk == 0)
     return;
 
@@ -35,8 +33,7 @@ refine_alDead(KMX_WCHAR dk, std::vector<DeadKey *> &dkVec, std::vector<DeadKey *
   }
 }
 
-bool
-found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey *> &dkVec) {
+bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey *> &dkVec) {
   for (int i = 0; i < dkVec.size(); i++) {
     if (dk == dkVec[i]->KMX_GetDeadCharacter())
       return true;
@@ -44,8 +41,7 @@ found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey *> &dkVec) {
   return false;
 }
 
-bool
-query_dk_combinations_for_specific_dk(vec_dword_2D &p_dk_ComposeTable, KMX_DWORD dk, vec_dword_2D &dk_SingleTable) {
+bool query_dk_combinations_for_specific_dk(vec_dword_2D &p_dk_ComposeTable, KMX_DWORD dk, vec_dword_2D &dk_SingleTable) {
   vec_dword_1D line;
 
   for (int i = 0; i < (int)(p_dk_ComposeTable).size(); i++) {
@@ -64,8 +60,7 @@ query_dk_combinations_for_specific_dk(vec_dword_2D &p_dk_ComposeTable, KMX_DWORD
     return false;
 }
 
-KMX_DWORD
-KMX_change_keyname_to_capital(KMX_DWORD kVal, KMX_DWORD &shift, GdkKeymap *keymap) {
+KMX_DWORD KMX_change_keyname_to_capital(KMX_DWORD kVal, KMX_DWORD &shift, GdkKeymap *keymap) {
   guint keyval = (guint)kVal;
   GdkKeymapKey *keys;
   gint n_keys;
@@ -83,12 +78,7 @@ KMX_change_keyname_to_capital(KMX_DWORD kVal, KMX_DWORD &shift, GdkKeymap *keyma
   return capitalKeyval;
 }
 
-void
-add_deadkey_combination(
-    vec_dword_2D &dk_ComposeTable,
-    std::string diacritic_name,
-    std::string base_char,
-    KMX_DWORD unicode_value) {
+void add_deadkey_combination(vec_dword_2D &dk_ComposeTable, std::string diacritic_name, std::string base_char, KMX_DWORD unicode_value) {
   vec_dword_1D line;
   line.push_back(convertNamesTo_DWORD_Value(diacritic_name));
   line.push_back(convertNamesTo_DWORD_Value(base_char));
@@ -96,8 +86,7 @@ add_deadkey_combination(
   dk_ComposeTable.push_back(line);
 }
 
-void
-create_DKTable(vec_dword_2D &dk_ComposeTable) {
+void create_DKTable(vec_dword_2D &dk_ComposeTable) {
   // create a 2D-Vector which contains data for ALL existing deadkey combinations on a Linux Keyboard:
   // dk_ComposeTable[i][0] : diacritic_name    		(e.g. dead_circumflex)
   // dk_ComposeTable[i][1] : base_char   					(e.g. a)
