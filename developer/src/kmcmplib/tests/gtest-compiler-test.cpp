@@ -459,13 +459,11 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     const KMX_WCHAR tstr_index_two_digit_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 42, 0 };
     EXPECT_EQ(0, u16cmp(tstr_index_two_digit_valid, tstr));
 
-    // index, comma, non-digit parameter, valid (should this be caught?)
+    // index, comma, non-digit parameter, CERR_InvalidIndex
     u16cpy(str, u"index(b,g)");
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_index_non_digit_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 0, 0 };
-    EXPECT_EQ(0, u16cmp(tstr_index_non_digit_valid, tstr));
+    EXPECT_EQ(CERR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // index, comma, no parameter, CERR_InvalidIndex
     u16cpy(str, u"index(b,)");
