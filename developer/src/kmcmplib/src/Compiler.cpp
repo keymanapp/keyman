@@ -2020,6 +2020,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         tstr[mx++] = CODE_INDEX;
         tstr[mx++] = (KMX_WCHAR)i + 1;	    // avoid EOS for stores
         tstr[mx++] = atoiW(r);	// character offset of original any.
+
         tstr[mx] = 0;
       }
       continue;
