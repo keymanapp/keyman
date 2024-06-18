@@ -2014,13 +2014,12 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
           kmcmp::CheckStoreUsage(fk, i, TRUE, FALSE, FALSE);
 
           r = u16tok(NULL, p_sep_com, &context);  // I3481
-          if (!r) return CERR_InvalidIndex;
+          if (!r || !*r) return CERR_InvalidIndex;
         }
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_INDEX;
         tstr[mx++] = (KMX_WCHAR)i + 1;	    // avoid EOS for stores
         tstr[mx++] = atoiW(r);	// character offset of original any.
-
         tstr[mx] = 0;
       }
       continue;

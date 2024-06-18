@@ -259,7 +259,7 @@ KMX_WCHAR * u16tok(KMX_WCHAR* p, const KMX_WCHAR* delim, KMX_WCHAR** ctx) {
 	if (*q) {
 		*q = 0;
 		q++;
-		while (u16chr(delim, *q)) q++;
+		while (*q && u16chr(delim, *q)) q++;
 		*ctx = q;
 	}
 	else {
