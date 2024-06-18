@@ -3362,6 +3362,17 @@ int atoiW(PKMX_WCHAR p)
   return i;
 }
 
+bool isuiw(PKMX_WCHAR p) {
+  if (!p || !*p)
+    return false;
+  PKMX_STR q = wstrtostr(p);
+  while(*q) {
+    if (!isdigit(*q))
+      return false;
+  }
+  return true;
+}
+
 KMX_DWORD kmcmp::CheckUTF16(int n)
 {
   const int res[] = {
