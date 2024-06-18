@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.58 alpha 2024-06-18
+
+* test(core): Add a minimal test that exercises the core API (#11781)
+* fix(developer): check HISTORY.md to get last modified date for keyboard_info and model_info (#11805)
+* docs(developer): extra context help for keyboard-editor (does not exist in Keyman Developer 17.0) (#11771)
+
 ## 18.0.57 alpha 2024-06-17
 
 * fix(web): fix id of longpress keys with modifier set in touch layout (#11783)
