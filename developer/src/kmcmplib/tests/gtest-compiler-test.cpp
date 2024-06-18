@@ -446,6 +446,8 @@ TEST_F(CompilerTest, GetXStringImpl_type_a_test) {
     EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_any_valid[] = { UC_SENTINEL, CODE_ANY, 2, 0 };
     EXPECT_EQ(0, u16cmp(tstr_any_valid, tstr));
+
+    delete[] file_store;
 }
 
 // tests strings starting with 'b'
@@ -633,6 +635,8 @@ TEST_F(CompilerTest, GetXStringImpl_type_o_test) {
     EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_outs_valid[] = { 'a', 'b', 'c', 0 };
     EXPECT_EQ(0, u16cmp(tstr_outs_valid, tstr));
+
+    delete[] file_store;
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
