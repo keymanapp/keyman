@@ -391,8 +391,8 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, GdkKeymap **ke
     }
   }
 
-  // _S2 TODO I assume we do not need those...
-  /*rgKey[VK_DIVIDE] = new KMX_VirtualKey(hkl, VK_DIVIDE);
+  /* _S2 TODO I assume we do not need those...
+  rgKey[VK_DIVIDE] = new KMX_VirtualKey(hkl, VK_DIVIDE);
   rgKey[VK_CANCEL] = new KMX_VirtualKey(hkl, VK_CANCEL);
   rgKey[VK_DECIMAL] = new KMX_VirtualKey(hkl, VK_DECIMAL);*/
 
