@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <climits>
 #include "../include/kmcompx.h"
 #include "../include/kmcmplibapi.h"
 #include "../src/kmx_u16.h"
@@ -18,7 +19,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
   PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isUnicode
 );
 KMX_DWORD GetRHS(PFILE_KEYBOARD fk, PKMX_WCHAR p, PKMX_WCHAR buf, int bufsize, int offset, int IsUnicode);
-bool isuiw(PKMX_WCHAR p);
+bool isIntegerWstring(PKMX_WCHAR p);
 bool hasPreamble(std::u16string result);
 
 extern kmcmp_CompilerMessageProc msgproc;
@@ -514,13 +515,16 @@ TEST_F(CompilerTest, GetRHS_test) {
 // int atoiW(PKMX_WCHAR p)
 // KMX_DWORD kmcmp::CheckUTF16(int n)
 
-TEST_F(CompilerTest, isuiw_test) {
-    EXPECT_FALSE(isuiw(nullptr));
-    EXPECT_FALSE(isuiw((PKMX_WCHAR)u""));
-    EXPECT_FALSE(isuiw((PKMX_WCHAR)u"a"));
-    EXPECT_FALSE(isuiw((PKMX_WCHAR)u"-1"));
-    EXPECT_TRUE(isuiw((PKMX_WCHAR)u"1"));
-    EXPECT_TRUE(isuiw((PKMX_WCHAR)u"42"));
+TEST_F(CompilerTest, isIntegerWstring_test) {
+    EXPECT_FALSE(isIntegerWstring(nullptr));
+    EXPECT_FALSE(isIntegerWstring((PKMX_WCHAR)u""));
+    EXPECT_FALSE(isIntegerWstring((PKMX_WCHAR)u"a"));
+    EXPECT_FALSE(isIntegerWstring((PKMX_WCHAR)u"-1"));
+    EXPECT_TRUE(isIntegerWstring((PKMX_WCHAR)u"1"));
+    EXPECT_TRUE(isIntegerWstring((PKMX_WCHAR)u"42"));
+    //EXPECT_TRUE(isIntegerWstring((PKMX_WCHAR)u"2147483647")); // INT_MAX
+    //EXPECT_FALSE(isIntegerWstring((PKMX_WCHAR)u"2147483648")); // INT_MAX + 1
+    //EXPECT_FALSE(isIntegerWstring((PKMX_WCHAR)u"9999999999")); // > INT_MAX
 }
 
 // KMX_DWORD kmcmp::UTF32ToUTF16(int n, int *n1, int *n2)
