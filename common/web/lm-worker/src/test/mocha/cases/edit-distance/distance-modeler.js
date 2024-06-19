@@ -249,13 +249,12 @@ describe('Correction Distance Modeler', function() {
     });
 
     let checkResults_teh = async function(iter) {
-      let firstSet = await iter.next();  // {value: <actual value>, done: <iteration complete?>}
-      assert.isFalse(firstSet.done);
+      let firstResult = await iter.next();  // {value: <actual value>, done: <iteration complete?>}
+      assert.isFalse(firstResult.done);
 
-      firstSet = firstSet.value; // Retrieves <actual value>
+      firstResult = firstResult.value; // Retrieves <actual value>
       // No checks on the first set's cost.
-      assert.equal(firstSet.length, 1); // A single sequence ("ten") should be the best match.
-      assert.equal(firstSet[0].matchString, "ten");
+      assert.equal(firstResult.matchString, "ten");
 
       let secondBatch = [
         'beh',  'te',  'tec',
@@ -264,15 +263,30 @@ describe('Correction Distance Modeler', function() {
         'the'
       ];
 
-      let secondSet = await iter.next();  // {value: <actual value>, done: <iteration complete?>}
-      assert.isFalse(secondSet.done);
+      async function checkBatch(batch, prevCost) {
+        let cost;
+        firstResult = firstResult;
+        while(batch.length > 0) {
+          const iter_result = await iter.next();
+          assert.isFalse(iter_result.done);
 
-      secondSet = secondSet.value; // Retrieves <actual value>
-      assert.isAbove(secondSet[0].totalCost, firstSet[0].totalCost); // assert it 'costs more'.
-      assert.equal(secondSet.length, secondBatch.length);
+          const result = iter_result.value;
+          assert.isAbove(result.totalCost, prevCost);
+          if(cost !== undefined) {
+            assert.equal(result.totalCost, cost);
+          } else {
+            cost = result.totalCost;
+          }
 
-      let entries = secondSet.map(result => result.matchString).sort();
-      assert.deepEqual(entries, secondBatch);
+          const matchIndex = batch.findIndex((entry) => entry == result.matchString);
+          assert.notEqual(matchIndex, -1, `'${result.matchString}' received as prediction too early`);
+          batch.splice(matchIndex, 1);
+        }
+
+        return cost;
+      }
+
+      const secondCost = await checkBatch(secondBatch, firstResult.totalCost);
 
       let thirdBatch = [
         'cen', 'en',  'gen',
@@ -282,15 +296,7 @@ describe('Correction Distance Modeler', function() {
         'thu', 'wen'
       ];
 
-      let thirdSet = await iter.next();  // {value: <actual value>, done: <iteration complete?>}
-      assert.isFalse(thirdSet.done);
-
-      thirdSet = thirdSet.value; // Retrieves <actual value>
-      assert.isAbove(thirdSet[0].totalCost, secondSet[0].totalCost); // assert it 'costs more'.
-      assert.equal(thirdSet.length, thirdBatch.length);
-
-      entries = thirdSet.map(result => result.matchString).sort();
-      assert.deepEqual(entries, thirdBatch);
+      await checkBatch(thirdBatch, secondCost);
     }
 
     it('Simple search without input', async function() {
@@ -301,8 +307,8 @@ describe('Correction Distance Modeler', function() {
       let searchSpace = new correction.SearchSpace(testModel);
 
       let iter = searchSpace.getBestMatches();
-      let firstSet = await iter.next();
-      assert.isFalse(firstSet.done);
+      let firstResult = await iter.next();
+      assert.isFalse(firstResult.done);
     });
 
     it('Simple search (paralleling "Small integration test")', async function() {
@@ -404,13 +410,12 @@ describe('Correction Distance Modeler', function() {
 
       // While there's no input, insertion operations can produce suggestions.
       let resultState = await iter.next();
-      let results = resultState.value;
+      let result = resultState.value;
 
       // Just one suggestion should be returned.
-      assert.equal(results.length, 1);
-      assert.equal(results[0].totalCost, 0);             // Gives a perfect match
-      assert.equal(results[0].inputSequence.length, 0);  // for a state with no input and
-      assert.equal(results[0].matchString, '');          // an empty match string.
+      assert.equal(result.totalCost, 0);             // Gives a perfect match
+      assert.equal(result.inputSequence.length, 0);  // for a state with no input and
+      assert.equal(result.matchString, '');          // an empty match string.
       assert.isFalse(resultState.done);
     });
   });
