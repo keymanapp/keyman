@@ -62,7 +62,7 @@ bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
   return false;
 }
 
-int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int caps,GdkKeymap *keymap) {
+int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int caps, GdkKeymap *keymap) {
   GdkKeymapKey *maps;
   guint *keyvals;
   gint count;
@@ -70,10 +70,7 @@ int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
 
-  if (!(shift_state_pos <= count))
-   return 0;
-
-  if (!(keycode <= keycode_max))
+  if (!(ensureValidInputForKeyboardTranslation( shift_state_pos, count, keycode)))
     return 0;
 
   KMX_DWORD keyVal= (KMX_DWORD) KMX_get_KeyVal_From_KeyCode(keymap, keycode, ShiftState(shift_state_pos), caps);
@@ -281,7 +278,8 @@ public:
             p = key->dpOutput = new KMX_WCHAR[4];
             *p++ = UC_SENTINEL;
             *p++ = CODE_DEADKEY;
-            *p++ = KMX_DeadKeyMap(st[0], deadkeys, deadkeyBase, &KMX_FDeadkeys);   // I4353
+            // can convert since KMX_DeadKeyMap returns a small positive number 
+            *p++ = (KMX_WCHAR) KMX_DeadKeyMap(st[0], deadkeys, deadkeyBase, &KMX_FDeadkeys);   // I4353
             *p = 0;
           }
           key++;
@@ -468,7 +466,9 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, GdkKeymap **ke
 
   kp->cxGroupArray++;
   gp = &kp->dpGroupArray[kp->cxGroupArray-1];
-
+ 
+  // calculate the required size of `gp->dpKeyArray`
+  
   UINT nkeys = 0;
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
@@ -476,21 +476,21 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, GdkKeymap **ke
     }
   }
 
-
-  nDeadkey++; // ensure a 1-based index above the max deadkey value already in the keyboard
-
   gp->fUsingKeys = TRUE;
   gp->dpMatch = NULL;
   gp->dpName = NULL;
   gp->dpNoMatch = NULL;
   gp->cxKeyArray = nkeys;
   gp->dpKeyArray = new KMX_KEY[gp->cxKeyArray];
-  nkeys = 0;
+
+  nDeadkey++; // ensure a 1-based index above the max deadkey value already in the keyboard
+
 
 
   //
   // Fill in the new rules
   //
+  nkeys = 0;
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->KMX_IsKeymanUsedKey() && (!rgKey[iKey]->KMX_IsEmpty())) {
       if(rgKey[iKey]->KMX_LayoutRow(loader.KMX_MaxShiftState(), &gp->dpKeyArray[nkeys], &alDead, nDeadkey, bDeadkeyConversion, all_vector,*keymap)) {   // I4552
@@ -597,7 +597,8 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, GdkKeymap **ke
       KMX_WCHAR *p = kkp->dpContext = new KMX_WCHAR[8];
       *p++ = UC_SENTINEL;
       *p++ = CODE_DEADKEY;
-      *p++ = KMX_DeadKeyMap(dk->KMX_DeadCharacter(), &alDead, nDeadkey, FDeadkeys);   // I4353
+       // can convert since KMX_DeadKeyMap returns a small positive number 
+      *p++ = (KMX_WCHAR) KMX_DeadKeyMap(dk->KMX_DeadCharacter(), &alDead, nDeadkey, FDeadkeys);   // I4353
       // *p++ = nDeadkey+i;
       *p++ = UC_SENTINEL;
       *p++ = CODE_ANY;

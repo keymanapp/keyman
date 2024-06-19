@@ -22,6 +22,12 @@
                     06 Feb 2015 - mcdurdin - I4552 - V9.0 - Add mnemonic recompile option to ignore deadkeys
                     08 Apr 2015 - mcdurdin - I4651 - V9.0 - Mnemonic layout recompiler maps AltGr+VK_BKSLASH rather than VK_OEM_102
 */
+//
+// m-to-p.cpp : Defines the entry point for the console application.
+//
+// Note: this program deliberately leaks memory as it has a very short life cycle and managing the memory allocations
+// for the subcomponents of the compiled keyboard is an unnecessary optimisation. Just so you know.
+//
 
 #include "mcompile.h"
 

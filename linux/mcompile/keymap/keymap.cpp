@@ -10,6 +10,16 @@ int map_VKShiftState_to_LinModifier(int vk_ShiftState) {
   else return vk_ShiftState;
 }
 
+bool ensureValidInputForKeyboardTranslation(int shiftstate, gint count, guint keycode) {
+  if (!(shiftstate <= count))
+   return false;
+
+  if (!(keycode <= keycode_max))
+    return false;
+
+  return true;
+}
+
 KMX_DWORD convertNamesTo_DWORD_Value(std::string tok_str) {
   // more on https://manpages.ubuntu.com/manpages/jammy/man3/keysyms.3tk.html
   std::map<std::string, KMX_DWORD > first;
@@ -611,6 +621,9 @@ int KMX_get_KeyVal_From_KeyCode(GdkKeymap *keymap, guint keycode, ShiftState ss,
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
 
+  if (!(ensureValidInputForKeyboardTranslation( map_VKShiftState_to_LinModifier(ss), count, keycode)))
+    return 0;
+
   //BASE (shiftstate: 0)
   if (( ss == Base ) && ( caps == 0 )) {
     GdkModifierType MOD_base = (GdkModifierType) ( ~GDK_MODIFIER_MASK );
@@ -697,10 +710,7 @@ KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, gui
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
 
-  if (!(shift_state_pos <= count))
-    return 0;
-
-   if (!(keycode <= keycode_max))
+  if (!(ensureValidInputForKeyboardTranslation( shift_state_pos, count, keycode)))
     return 0;
 
   kVal = (KMX_DWORD) KMX_get_KeyVal_From_KeyCode(keymap, keycode, (ShiftState) shift_state_pos, 0);
@@ -722,10 +732,7 @@ KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, UIN
   if (!gdk_keymap_get_entries_for_keycode(keymap, kc_underlying, &maps, &keyvals, &count))
     return 0;
 
-  if (!(map_VKShiftState_to_LinModifier(vk_ShiftState) <= count))
-  return 0;
-
-  if (!(kc_underlying <= keycode_max))
+  if (!(ensureValidInputForKeyboardTranslation( map_VKShiftState_to_LinModifier(vk_ShiftState), count, kc_underlying)))
     return 0;
 
   KMX_DWORD keyV = KMX_get_KeyVal_From_KeyCode(keymap, kc_underlying, ShiftState(map_VKShiftState_to_LinModifier(vk_ShiftState)), 0);

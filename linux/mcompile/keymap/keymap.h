@@ -16,7 +16,6 @@
 #include <vector>
 #include "u16.h"
 
-
 enum ShiftState {
     Base = 0,                           // 0
     Shft = 1,                           // 1
@@ -70,6 +69,9 @@ static KMX_DWORD deadkey_max  = 0xfe93;  // https://fossies.org/linux/tk/xlib/X1
 
 // map Shiftstate to modifier (e.g. 0->0; 16-1; 9->2; 25->3)
 int map_VKShiftState_to_LinModifier(int VKShiftState);
+
+// check if input is correct
+bool ensureValidInputForKeyboardTranslation(int shift_state_pos, gint count, guint keycode);
 
 // take a std::string (=contents of line symbols-file ) and returns the (int) value of the character
 KMX_DWORD convertNamesTo_DWORD_Value(std::string tok_str);
