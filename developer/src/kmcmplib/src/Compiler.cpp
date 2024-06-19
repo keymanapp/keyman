@@ -97,6 +97,8 @@
 #include <codecvt>
 #include <locale>
 #include <string>
+#include <iostream>
+#include <sstream>
 
 #include "UnreachableRules.h"
 #include "CheckForDuplicates.h"
@@ -3367,15 +3369,11 @@ bool isIntegerWstring(PKMX_WCHAR p) {
   if (!p || !*p)
     return false;
   PKMX_STR q = wstrtostr(p);
-  bool flag = true;
-  for (int i=0; q[i]; i++) {
-    if (!isdigit(q[i])) {
-      flag = false;
-      break;
-    }
-  }
+  std::ostringstream os;
+  os << atoi(q);
+  int cmp = strcmp(q, os.str().c_str());
   delete[] q;
-  return flag;
+  return cmp == 0 ? true : false;
 }
 
 KMX_DWORD kmcmp::CheckUTF16(int n)

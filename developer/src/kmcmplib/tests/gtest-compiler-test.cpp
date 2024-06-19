@@ -519,12 +519,15 @@ TEST_F(CompilerTest, isIntegerWstring_test) {
     EXPECT_FALSE(isIntegerWstring(nullptr));
     EXPECT_FALSE(isIntegerWstring((PKMX_WCHAR)u""));
     EXPECT_FALSE(isIntegerWstring((PKMX_WCHAR)u"a"));
-    EXPECT_FALSE(isIntegerWstring((PKMX_WCHAR)u"-1"));
+    EXPECT_TRUE(isIntegerWstring((PKMX_WCHAR)u"-1"));
     EXPECT_TRUE(isIntegerWstring((PKMX_WCHAR)u"1"));
     EXPECT_TRUE(isIntegerWstring((PKMX_WCHAR)u"42"));
-    //EXPECT_TRUE(isIntegerWstring((PKMX_WCHAR)u"2147483647")); // INT_MAX
-    //EXPECT_FALSE(isIntegerWstring((PKMX_WCHAR)u"2147483648")); // INT_MAX + 1
-    //EXPECT_FALSE(isIntegerWstring((PKMX_WCHAR)u"9999999999")); // > INT_MAX
+    EXPECT_TRUE(isIntegerWstring((PKMX_WCHAR)u"2147483647")); // INT_MAX
+    EXPECT_FALSE(isIntegerWstring((PKMX_WCHAR)u"2147483648")); // INT_MAX + 1
+    EXPECT_FALSE(isIntegerWstring((PKMX_WCHAR)u"9999999999")); // > INT_MAX
+    EXPECT_TRUE(isIntegerWstring((PKMX_WCHAR)u"-2147483648")); // -INT_MAX - 1
+    EXPECT_FALSE(isIntegerWstring((PKMX_WCHAR)u"-2147483649")); // -INT_MAX - 2
+    EXPECT_FALSE(isIntegerWstring((PKMX_WCHAR)u"-9999999999")); // < -INT_MAX - 1
 }
 
 // KMX_DWORD kmcmp::UTF32ToUTF16(int n, int *n1, int *n2)
