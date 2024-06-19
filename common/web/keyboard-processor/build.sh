@@ -2,18 +2,13 @@
 #
 # Compile KeymanWeb's 'keyboard-processor' module, one of the components of Web's 'core' module.
 #
-set -eu
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
 
 BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
 
@@ -37,6 +32,14 @@ builder_describe_outputs \
   build         /common/web/keyboard-processor/build/lib/index.mjs
 
 builder_parse "$@"
+
+function do_configure() {
+  verify_npm_setup
+
+  # Configure Web browser-engine testing environments.  As is, this should only
+  # make changes when we update the dependency, even on our CI build agents.
+  playwright install
+}
 
 function do_build() {
   tsc --build "$THIS_SCRIPT_PATH/tsconfig.all.json"
@@ -65,18 +68,18 @@ function do_build() {
 
 function do_test() {
   local MOCHA_FLAGS=
-  local KARMA_CONFIG=manual.conf.cjs
+  local WTR_CONFIG=
   if builder_has_option --ci; then
     echo "Replacing user-friendly test reports with CI-friendly versions."
     MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
-    KARMA_CONFIG=CI.conf.cjs
+    WTR_CONFIG=.CI
   fi
 
   c8 mocha --recursive $MOCHA_FLAGS ./tests/node/
-  karma start ./tests/dom/$KARMA_CONFIG
+  web-test-runner --config tests/dom/web-test-runner${WTR_CONFIG}.config.mjs
 }
 
-builder_run_action configure  verify_npm_setup
+builder_run_action configure  do_configure
 builder_run_action clean      rm -rf ./build
 builder_run_action build      do_build
 builder_run_action test       do_test

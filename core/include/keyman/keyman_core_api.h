@@ -205,7 +205,7 @@ interface.
 
 Fundamental types for representing data passed across the API.
 
-### km_core_cp type
+### km_core_cu type
 
 `uint16_t/char16_t`
 
@@ -683,7 +683,7 @@ KMN_API
 km_core_context_status
 km_core_state_context_set_if_needed(
   km_core_state *state,
-  km_core_cp const *application_context
+  km_core_cu const *application_context
 );
 
 /*
@@ -800,8 +800,8 @@ Platform layer.
 ## Specification
 ```c */
 struct km_core_option_item {
-  km_core_cp const *   key;
-  km_core_cp const *   value;
+  km_core_cu const *   key;
+  km_core_cu const *   value;
   uint8_t             scope;
 };
 
@@ -860,8 +860,8 @@ KMN_API
 km_core_status
 km_core_state_option_lookup(km_core_state const *state,
                       uint8_t scope,
-                      km_core_cp const *key,
-                      km_core_cp const **value);
+                      km_core_cu const *key,
+                      km_core_cu const **value);
 
 /*
 ```
@@ -1005,8 +1005,8 @@ Provides read-only information about a keyboard.
 ```c
 */
 typedef struct {
-  km_core_cp const * version_string;
-  km_core_cp const * id;
+  km_core_cu const * version_string;
+  km_core_cu const * id;
   km_core_path_name  folder_path;
   km_core_option_item const * default_options;
 } km_core_keyboard_attrs;
@@ -1070,8 +1070,8 @@ Describes a single Input Method eXtension library and entry point.
 
 ```c */
 typedef struct {
-  km_core_cp const * library_name;
-  km_core_cp const * function_name;
+  km_core_cu const * library_name;
+  km_core_cu const * function_name;
   uint32_t imx_id;
 } km_core_keyboard_imx;
 
@@ -1332,7 +1332,7 @@ void km_core_state_imx_register_callback(km_core_state *state, km_core_keyboard_
 : pointer to a function that implements the IMX callback
 
 `callback_object`
-: An opaque pointer that can be used to pass context information to the callback function, 
+: An opaque pointer that can be used to pass context information to the callback function,
   usually it is a user-defined data structure.
 
 -------------------------------------------------------------------------------
@@ -1523,7 +1523,7 @@ Returns a debug formatted string of the context from the state.
 
 ```c */
 KMN_API
-km_core_cp *
+km_core_cu *
 km_core_state_context_debug(km_core_state *state, km_core_debug_context_type context_type);
 
 /*
@@ -1538,16 +1538,16 @@ km_core_state_context_debug(km_core_state *state, km_core_debug_context_type con
 
 ## Returns
 
-A pointer to a [km_core_cp] UTF-16 string. Must be disposed of by a call
-to [km_core_cp_dispose].
+A pointer to a [km_core_cu] UTF-16 string. Must be disposed of by a call
+to [km_core_cu_dispose].
 
 -------------------------------------------------------------------------------
 
-# km_core_cp_dispose()
+# km_core_cu_dispose()
 
 ## Description
 
-Free the allocated memory belonging to a [km_core_cp] array previously
+Free the allocated memory belonging to a [km_core_cu] array previously
 returned by [km_core_state_context_debug]. May be `nullptr`.
 
 ## Specification
@@ -1555,14 +1555,14 @@ returned by [km_core_state_context_debug]. May be `nullptr`.
 ```c */
 KMN_API
 void
-km_core_cp_dispose(km_core_cp *cp);
+km_core_cu_dispose(km_core_cu *cp);
 
 /*
 ```
 ## Parameters
 
 `cp`
-: A pointer to the start of the [km_core_cp] array to be disposed of.
+: A pointer to the start of the [km_core_cu] array to be disposed of.
 
 -------------------------------------------------------------------------------
 

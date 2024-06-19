@@ -1,5 +1,5 @@
-import { ActiveKey, ActiveKeyBase } from "@keymanapp/keyboard-processor";
-import EventEmitter from "eventemitter3";
+import { ActiveKeyBase } from "@keymanapp/keyboard-processor";
+import { EventEmitter } from "eventemitter3";
 
 import { KeyElement } from "../keyElement.js";
 import { FlickNameCoordMap, OrderedFlickDirections } from "../input/gestures/browser/flick.js";
@@ -69,15 +69,15 @@ export class GesturePreviewHost extends EventEmitter<EventMap> {
     if(keySpec.flick) {
       const flickSpec = keySpec.flick || {};
 
-      Object.keys(flickSpec).forEach((dir: typeof OrderedFlickDirections[number]) => {
+      Object.keys(flickSpec).forEach((dir) => {
         const flickPreview = document.createElement('div');
         flickPreview.className = 'kmw-flick-preview kmw-key-text';
-        flickPreview.textContent = flickSpec[dir].text;
+        flickPreview.textContent = flickSpec[dir as typeof OrderedFlickDirections[number]].text;
 
         const ps /* preview style */ = flickPreview.style;
 
         // is in polar coords, origin toward north, clockwise.
-        const coords = FlickNameCoordMap.get(dir);
+        const coords = FlickNameCoordMap.get(dir as typeof OrderedFlickDirections[number]);
 
         const x = coerceZeroes(-Math.sin(coords[0])); // Put 'e' flick at left
         const y = coerceZeroes(Math.cos(coords[0])); // Put 'n' flick at bottom

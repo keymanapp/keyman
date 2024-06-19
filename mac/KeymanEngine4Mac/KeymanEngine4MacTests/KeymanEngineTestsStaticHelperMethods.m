@@ -12,21 +12,21 @@
 @implementation KeymanEngineTestsStaticHelperMethods
 
 + (KMXFile *)getKmxFileTestMacEngine {
-    NSString *path = [[NSBundle bundleForClass:[KeymanEngineTestsStaticHelperMethods class]] pathForResource:@"TestMacEngine.kmx" ofType:nil];
-    KMXFile *kmxFile = [[KMXFile alloc] initWithFilePath:path];
-    return kmxFile;
+  NSString *path = [[NSBundle bundleForClass:[KeymanEngineTestsStaticHelperMethods class]] pathForResource:@"TestMacEngine.kmx" ofType:nil];
+  KMXFile *kmxFile = [[KMXFile alloc] initWithFilePath:path];
+  return kmxFile;
 }
 
 + (KMXFile *)getKmxFileForPlatformTest {
-    NSString *path = [[NSBundle bundleForClass:[KeymanEngineTestsStaticHelperMethods class]] pathForResource:@"PlatformTest.kmx" ofType:nil];
-    KMXFile *kmxFile = [[KMXFile alloc] initWithFilePath:path];
-    return kmxFile;
+  NSString *path = [[NSBundle bundleForClass:[KeymanEngineTestsStaticHelperMethods class]] pathForResource:@"PlatformTest.kmx" ofType:nil];
+  KMXFile *kmxFile = [[KMXFile alloc] initWithFilePath:path];
+  return kmxFile;
 }
 
 + (KMXFile *)getKmxFileForCipherMusicTests {
-    NSString *path = [[NSBundle bundleForClass:[KeymanEngineTestsStaticHelperMethods class]] pathForResource:@"CipherMusicUnicode.kmx" ofType:nil];
-    KMXFile *kmxFile = [[KMXFile alloc] initWithFilePath:path];
-    return kmxFile;
+  NSString *path = [[NSBundle bundleForClass:[KeymanEngineTestsStaticHelperMethods class]] pathForResource:@"CipherMusicUnicode.kmx" ofType:nil];
+  KMXFile *kmxFile = [[KMXFile alloc] initWithFilePath:path];
+  return kmxFile;
 }
 
 + (KMXFile *)getKmxFileForSilIpaTests {

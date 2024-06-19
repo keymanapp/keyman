@@ -1,5 +1,3 @@
-import { MatchResult } from "../matchers/gestureMatcher.js";
-import { GestureSequence } from "../matchers/gestureSequence.js";
 import { FulfillmentCause } from "../matchers/pathMatcher.js";
 import { ContactModel } from "./contactModel.js";
 
@@ -116,7 +114,7 @@ export interface GestureModel<Type, StateToken = any> {
      * Only takes effect if a model instantly resolves or rejects upon being considered for
      * inclusion in the model.
      */
-    resetOnResolve?: boolean,
+    resetOnInstantFulfill?: boolean,
     /**
      * Indicates that the corresponding GestureSource should be terminated whenever this GestureModel
      * is successfully matched.

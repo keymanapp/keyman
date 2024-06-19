@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig.json",
+
+  "compilerOptions": {
+    "outDir": "../build/tools/",
+    "rootDir": ".",
+    "baseUrl": "../.",
+    "allowSyntheticDefaultImports": true,
+  },
+  "include": [
+    "./*.ts"
+  ]
+}

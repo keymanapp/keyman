@@ -3,11 +3,8 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
-
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
 
 # Include our resource functions; they're pretty useful!
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -30,7 +27,7 @@ if builder_is_debug_build; then
 fi
 
 builder_describe_outputs \
-  build     /ios/build/Build/Products/Release-iphoneos/Keyman.xcarchive
+  build     /ios/build/Build/Products/${CONFIG}-iphoneos/Keyman.xcarchive
 
 # Base definitions (must be before do_clean call)
 DERIVED_DATA="$KEYMAN_ROOT/ios/build"

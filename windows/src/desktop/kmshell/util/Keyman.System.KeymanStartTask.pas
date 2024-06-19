@@ -11,7 +11,6 @@ type
   TKeymanStartTask = class
   private
     class function GetTaskName: string;
-    class procedure CleanupAlphaTasks(pTaskFolder: ITaskFolder); static;
   {$IF FALSE}
     //Disabled to avoid hint during build; re-enable if wanting to
     //re-establish the task model
@@ -112,15 +111,6 @@ begin
           end;
         end;
       end;
-    end;
-  end;
-
-  try
-    CleanupAlphaTasks(pTaskFolder);
-  except
-    on E:Exception do
-    begin
-      TKeymanSentryClient.ReportHandledException(E, 'Failed to cleanup alpha tasks');
     end;
   end;
 
@@ -228,8 +218,6 @@ begin
       end;
     end;
 
-    CleanupAlphaTasks(pTaskFolder);
-
     if pTaskFolder.GetTasks(0).Count = 0 then
     begin
       pTaskFolder := nil;
@@ -259,37 +247,5 @@ begin
 
   CreateTask;
 end;
-
-class procedure TKeymanStartTask.CleanupAlphaTasks(pTaskFolder: ITaskFolder);
-var
-  tasks: IRegisteredTaskCollection;
-  i: Integer;
-begin
-  // Cleanup earlier alpha-version tasks: we renamed the task to include the
-  // user's login name in build 14.0.194 of Keyman, so that multiple users could
-  // create the task on the same machine. It's not obvious, but the Tasks
-  // namespace is shared between all users -- non-admin users will not be able
-  // to see or overwrite tasks created by other users; they'd just get a
-  // (silent) access denied result.
-  try
-    tasks := pTaskFolder.GetTasks(0);
-    for i := 1 to tasks.Count do
-      if SameText(tasks.Item[i].Name, CTaskName) then
-      begin
-        tasks := nil;
-        pTaskFolder.DeleteTask(CTaskName, 0);
-        Exit;
-      end;
-  except
-    on E:EOleException do
-    begin
-      if (E.ErrorCode <> HResultFromWin32(ERROR_FILE_NOT_FOUND)) and
-        (E.ErrorCode <> HResultFromWin32(ERROR_ACCESS_DENIED)) then
-        // We ignore when the task doesn't exist, but report other errors
-        TKeymanSentryClient.ReportHandledException(E, 'Failed to delete task '+CTaskName);
-    end;
-  end;
-end;
-
 
 end.

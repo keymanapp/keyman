@@ -107,8 +107,8 @@
     <!-- 6: swap back -->
     <transformGroup>
         <transform from="($[alpha])\m{map2}($[alpha])\m{map1}" to="$2\m{map1}$1\m{map2}" />
-        <transform from=":(?:$[7notok])+\m{uset7}" to=":FAIL" />
-        <transform from=":(?:$[7ok])+\m{uset7}" to=":OK" />
+        <transform from=":(?:$[7notok]){1,9}\m{uset7}" to=":FAIL" />
+        <transform from=":(?:$[7ok]){1,9}\m{uset7}" to=":OK" />
     </transformGroup>
     <transformGroup>
       <transform from="simple_transform:FAIL" to="simple_transform:OK" />

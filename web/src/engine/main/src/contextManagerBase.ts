@@ -1,5 +1,5 @@
-import EventEmitter from 'eventemitter3';
-import { DeviceSpec, ManagedPromise, type Keyboard, type KeyboardInterface, type OutputTarget } from '@keymanapp/keyboard-processor';
+import { EventEmitter } from 'eventemitter3';
+import { ManagedPromise, type Keyboard, type KeyboardInterface, type OutputTarget } from '@keymanapp/keyboard-processor';
 import { StubAndKeyboardCache, type KeyboardStub } from 'keyman/engine/package-cache';
 import { PredictionContext } from '@keymanapp/input-processor';
 import { EngineConfiguration } from './engineConfiguration.js';
@@ -142,7 +142,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
    * @param kbd
    * @param target
    */
-  protected abstract activateKeyboardForTarget(kbd: {keyboard: Keyboard, metadata: KeyboardStub}, target: OutputTarget);
+  protected abstract activateKeyboardForTarget(kbd: {keyboard: Keyboard, metadata: KeyboardStub}, target: OutputTarget): void;
 
   /**
    * Checks the pending keyboard-activation array for an entry corresponding to the specified
@@ -199,6 +199,8 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     } else if(activationAfterAwait) {
       // Restore the popped element; it doesn't match the current activation attempt.
       this.pendingActivations.push(activationAfterAwait);
+      return null;
+    } else {
       return null;
     }
   }
@@ -300,7 +302,7 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     languageCode ||= '';
 
     // Check that the saved keyboard is currently registered
-    let requestedStub = null;
+    let requestedStub: KeyboardStub = null;
     if(keyboardId) {
       requestedStub = this.keyboardCache.getStub(keyboardId, languageCode);
     } else {

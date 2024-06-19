@@ -1,6 +1,6 @@
 # Keyman Core API verification
 
-During GHA Debian package build we verify that the API didn't change
+After the GHA Debian package build we verify that the API didn't change
 without being documented in `linux/debian/libkeymancore.symbols`.
 
 [Debian policy](https://www.debian.org/doc/debian-policy/ch-sharedlibs#run-time-shared-libraries)
@@ -21,7 +21,7 @@ have to begin with a space character.
 
 Example:
 
-```
+```text
  km_core_state_actions_get@Base 17.0.197
 ```
 
@@ -49,15 +49,15 @@ work particularly well with C++, so it might flag some C++ symbols even though
 they aren't part of the API. This happens particularly with C++ template
 instantiations.
 
-To work around this, we list the C++ symbols as `optional` that get flaged:
+To work around this, we list the C++ symbols as `optional` that get flagged:
 
-```
+```text
  (c++|optional)"typeinfo name for std::codecvt_utf8_utf16<char16_t, 1114111ul, (std::codecvt_mode)0>@Base" 17.0.244
 ```
 
 `dpkg-gensymbols` will report the mangled C++ name in the diff, e.g.
 
-```
+```text
  + _ZTSSt18codecvt_utf8_utf16IDsLm1114111ELSt12codecvt_mode0EE@Base 17.0.244
  ```
 
@@ -70,7 +70,7 @@ echo "_ZTSSt18codecvt_utf8_utf16IDsLm1114111ELSt12codecvt_mode0EE@Base" | c++fil
 
 which will output the demangled name:
 
-```
+```text
 typeinfo name for std::codecvt_utf8_utf16<char16_t, 1114111ul, (std::codecvt_mode)0>@Base
 ```
 
@@ -101,7 +101,7 @@ match the API verification will fail.
 
 ## How this works
 
-`.github/workflows/deb-packaging.yml` contains a `Verify API` step
+`.github/workflows/api-verification.yml` contains a `Verify API` step
 which will call `linux/scripts/deb-packaging.sh` with the `verify`
 parameter. Before calling the script it will download and extract
 the binary package artifacts.

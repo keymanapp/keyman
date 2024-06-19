@@ -126,9 +126,6 @@ struct char_to_vkey {
 
 extern const struct char_to_vkey s_char_to_vkey[];
 
-/** for vkeys 0..FF, 'true' if a context reset should be performed before emit */
-extern const bool vkey_to_contextreset[];
-
 } // namespace kmx
 } // namespace core
 } // namespace km

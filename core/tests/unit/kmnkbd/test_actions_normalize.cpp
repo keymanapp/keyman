@@ -16,7 +16,7 @@
 #include <test_assert.h>
 #include "../emscripten_filesystem.h"
 
-void compare_context(km_core_context *app_context, const km_core_cp* expected_final_app_context);
+void compare_context(km_core_context *app_context, const km_core_cu* expected_final_app_context);
 
 km_core_option_item test_env_opts[] =
 {
@@ -42,7 +42,7 @@ void teardown() {
 
 
 
-void setup(const km_core_cp *app_context, const km_core_cp *cached_context_string, const km_core_context_item *cached_context_items, int actions_code_points_to_delete, const std::u32string actions_output) {
+void setup(const km_core_cu *app_context, const km_core_cu *cached_context_string, const km_core_context_item *cached_context_items, int actions_code_points_to_delete, const std::u32string actions_output) {
   teardown();
 
   km::core::path path = km::core::path::join(arg_path, "..", "ldml", "keyboards", "k_001_tiny.kmx");
@@ -105,15 +105,15 @@ void setup(const km_core_cp *app_context, const km_core_cp *cached_context_strin
  */
 void test_actions_normalize(
   const char *name,
-  const km_core_cp *initial_app_context,
-  const km_core_cp *final_cached_context_string,
+  const km_core_cu *initial_app_context,
+  const km_core_cu *final_cached_context_string,
   const km_core_context_item *final_cached_context_items,
   int actions_code_points_to_delete,
   const std::u32string actions_output,
 
   const unsigned int expected_delete,
   const std::u32string expected_output,
-  const km_core_cp *expected_final_app_context
+  const km_core_cu *expected_final_app_context
 ) {
   std::cout << "test_actions_normalize: " << name << std::endl;
 
@@ -133,7 +133,7 @@ void test_actions_normalize(
 
   auto debug = km_core_state_context_debug(test_state, KM_CORE_DEBUG_CONTEXT_APP);
   std::cout << " final app context: " << debug << std::endl;
-  km_core_cp_dispose(debug);
+  km_core_cu_dispose(debug);
 
   compare_context(km_core_state_app_context(test_state), expected_final_app_context);
   teardown();
@@ -179,15 +179,15 @@ void test_actions_normalize(
  */
 void test_actions_update_app_context_nfu(
   const char *name,
-  const km_core_cp *initial_app_context,
-  const km_core_cp *final_cached_context_string,
+  const km_core_cu *initial_app_context,
+  const km_core_cu *final_cached_context_string,
   const km_core_context_item *final_cached_context_items,
   int actions_code_points_to_delete,
   const std::u32string actions_output,
 
   const unsigned int expected_delete,
   const std::u32string expected_output,
-  const km_core_cp *expected_final_app_context
+  const km_core_cu *expected_final_app_context
 ) {
   std::cout << "test_actions_update_app_context_nfu: " << name << std::endl;
 
@@ -207,7 +207,7 @@ void test_actions_update_app_context_nfu(
 
   auto debug = km_core_state_context_debug(test_state, KM_CORE_DEBUG_CONTEXT_APP);
   std::cout << " final app context: " << debug << std::endl;
-  km_core_cp_dispose(debug);
+  km_core_cu_dispose(debug);
 
   compare_context(km_core_state_app_context(test_state), expected_final_app_context);
   teardown();
@@ -618,7 +618,7 @@ int main(int argc, char *argv []) {
 }
 
 
-void compare_context(km_core_context *app_context, const km_core_cp* expected_final_app_context) {
+void compare_context(km_core_context *app_context, const km_core_cu* expected_final_app_context) {
   // Compare context items -- to ensure no markers have leaked into app context
   km_core_context_item *actual_final_app_context_items = nullptr, *expected_final_app_context_items = nullptr;
   try_status(km_core_context_get(app_context, &actual_final_app_context_items));

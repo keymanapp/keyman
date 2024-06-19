@@ -1,4 +1,3 @@
-import { isEmptyTransform, RuleBehavior } from "@keymanapp/keyboard-processor";
 import { EngineConfiguration, InitOptionSpec, InitOptionDefaults } from "keyman/engine/main";
 
 import { buildMergedTransform } from '@keymanapp/models-templates';

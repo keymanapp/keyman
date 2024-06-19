@@ -38,6 +38,10 @@ export class Deadkey {
     return dk;
   }
 
+  equal(other: Deadkey) {
+    return this.d == other.d && this.p == other.d && this.o == other.o;
+  }
+
   /**
    * Sorts the deadkeys in reverse order.
    */
@@ -149,6 +153,24 @@ export class DeadkeyTracker {
         dk.p += Ldelta;
       }
     }
+  }
+
+  equal(other: DeadkeyTracker) {
+    if(this.dks.length != other.dks.length) {
+      return false;
+    }
+
+    const otherDks = other.dks;
+    const matchedDks: Deadkey[] = [];
+
+    for(let dk of this.dks) {
+      const match = otherDks.find((otherDk) => dk.equal(otherDk));
+      if(!match) {
+        return false;
+      }
+    }
+
+    return matchedDks.length == otherDks.length;
   }
 
   count(): number {

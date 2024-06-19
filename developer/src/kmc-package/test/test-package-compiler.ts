@@ -24,6 +24,7 @@ describe('KmpCompiler', function () {
   let kmpCompiler: KmpCompiler = null;
 
   this.beforeAll(async function() {
+    callbacks.clear();
     kmpCompiler = new KmpCompiler();
     assert.isTrue(await kmpCompiler.init(callbacks, null));
   });
@@ -259,6 +260,26 @@ describe('KmpCompiler', function () {
     // differences
     assert.equal(kmpJson.keyboards[0].oskFont, 'khmer_busra_kbd.ttf');
     assert.equal(kmpJson.keyboards[0].displayFont, 'Mondulkiri-R.ttf');
+  });
+
+  //
+  // Test some invalid package metadata
+  //
+  it(`should load a package with missing keyboard ID metadata`, function () {
+    const kmpJson = kmpCompiler.transformKpsToKmpObject(makePathToFixture('invalid', 'missing_keyboard_id.kps'));
+    assert.isNull(kmpJson); // with a missing keyboard_id, the package shouldn't load, but it shouldn't crash either
+    assert.deepEqual(callbacks.messages[0].code, CompilerMessages.ERROR_KeyboardContentFileNotFound);
+
+  });
+
+  it(`should load a package with missing keyboard name metadata`, function () {
+    const kmpJson = kmpCompiler.transformKpsToKmpObject(makePathToFixture('invalid', 'missing_keyboard_name.kps'));
+    assert.equal(kmpJson.keyboards[0].name, 'version 4'); // picks up example.kmx's name
+  });
+
+  it(`should load a package with missing keyboard version metadata`, function () {
+    const kmpJson = kmpCompiler.transformKpsToKmpObject(makePathToFixture('invalid', 'missing_keyboard_version.kps'));
+    assert.equal(kmpJson.keyboards[0].version, '4.0');  // picks up example.kmx's version
   });
 
 });

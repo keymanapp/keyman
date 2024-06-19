@@ -124,7 +124,7 @@ export const SimpleTapModel: GestureModel = {
       endOnResolve: true
     }, {
       model: specs.InstantResolutionModel,
-      resetOnResolve: true
+      resetOnInstantFulfill: true
     }
   ],
   resolutionAction: {

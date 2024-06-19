@@ -13,18 +13,10 @@
 #import "KMInputMethodEventHandler.h"
 #import "AppleCompliantTestClient.h"
 #import "TextApiCompliance.h"
-#import "AppleCompliantTestClient.h"
 
 KMInputMethodEventHandler *testEventHandler = nil;
 
 @interface InputMethodTests : XCTestCase
-@end
-
-// included following interface that we can see and test private methods of TextApiCompliance
-@interface TextApiCompliance (Testing)
-
-- (BOOL)arrayContainsApplicationId:(NSString *)clientAppId fromArray:(NSArray *)legacyApps;
-
 @end
 
 @interface KMInputMethodEventHandler (Testing)
@@ -43,30 +35,7 @@ KMInputMethodEventHandler *testEventHandler = nil;
 }
 
 - (void)tearDown {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
-}
-
-- (void)testIsClientAppLegacy_unlistedClientAppId_returnsNo {
-  id client = [[AppleCompliantTestClient alloc] init];
-  NSString *clientAppId = @"com.compliant.app";
-  TextApiCompliance *apiCompliance = [[TextApiCompliance alloc]initWithClient:client applicationId:clientAppId];
-
-  NSArray *legacyAppsArray = [NSArray arrayWithObjects:@"com.microsoft.VSCode",@"com.adobe.Photoshop",nil];
-
-  BOOL isLegacy = [apiCompliance arrayContainsApplicationId:clientAppId fromArray:legacyAppsArray];
-  NSLog(@"isLegacy = %@", isLegacy?@"yes":@"no");
-    XCTAssertFalse(isLegacy, @"App not expected to be in legacy list");
-}
-
-- (void)testIsClientAppLegacy_listedClientAppId_returnsYes {
-  id client = [[AppleCompliantTestClient alloc] init];
-  NSString *clientAppId = @"com.microsoft.VSCode";
-  TextApiCompliance *apiCompliance = [[TextApiCompliance alloc]initWithClient:client applicationId:clientAppId];
-
-  NSArray *legacyAppsArray = [NSArray arrayWithObjects:@"com.adobe.Photoshop",@"com.microsoft.VSCode",nil];
-
-  BOOL isLegacy = [apiCompliance arrayContainsApplicationId:clientAppId fromArray:legacyAppsArray];
-  XCTAssertTrue(isLegacy, @"App expected to be in legacy list");
+  // Put teardown code here. This method is called after the invocation of each test method in the class.
 }
 
 - (void)testCalculateInsertRange_noDelete_returnsCurrentLocation {

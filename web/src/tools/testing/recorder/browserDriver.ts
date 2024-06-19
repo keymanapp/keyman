@@ -10,6 +10,10 @@ import { type KeymanEngine } from 'keyman/app/browser';
 
 declare var keyman: KeymanEngine;
 
+export type Mutable<Type> = {
+  -readonly [Property in keyof Type]: Type[Property];
+};
+
 function asTouchList(arr: any[]) {
   return {
     get length() {
@@ -67,14 +71,14 @@ export class BrowserDriver {
 
   simulateHardwareEvent(eventSpec: PhysicalInputEventSpec) {
     // Yep, not KeyboardEvent.  "keyCode" is nasty-bugged in Chrome and unusable if initializing through KeyboardEvent.
-    let event = new Event(BrowserDriver.physicalEventType);
+    let event: Mutable<Partial<KeyboardEvent>> = new Event(BrowserDriver.physicalEventType);
     event['key'] = eventSpec.key;
     event['code'] = eventSpec.code;
     event['keyCode'] = eventSpec.keyCode;
     event['location'] = eventSpec.location;
     event['getModifierState'] = eventSpec.getModifierState.bind(eventSpec);
 
-    this.target.dispatchEvent(event);
+    this.target.dispatchEvent(event as KeyboardEvent);
   }
 
   async simulateOSKEvent(eventSpec: OSKInputEventSpec) {
@@ -110,30 +114,40 @@ export class BrowserDriver {
       }
 
       // To be safe, we replicate the MouseEvent similarly to the keystroke event.
-      var downEvent;
-      var upEvent;
+      let downEvent: Event;
+      var upEvent: Event;
       if(keyman.config.hostDevice.touchable) {
-        downEvent = new Event(BrowserDriver.oskDownTouchType);
-        upEvent = new Event(BrowserDriver.oskUpTouchType);
-        downEvent['touches'] = asTouchList([{"target": oskKeyElement, ...center}]);
+        let touchDownEvent: Mutable<Partial<TouchEvent>>;
+        let touchUpEvent: Mutable<Partial<TouchEvent>>;
+        touchDownEvent = new Event(BrowserDriver.oskDownTouchType);
+        touchUpEvent = new Event(BrowserDriver.oskUpTouchType);
+        touchDownEvent['touches'] = asTouchList([{"target": oskKeyElement, ...center}]);
         // The touch should NOT show up in event.touches when a touch ends.
-        upEvent['touches'] = asTouchList([]);
-        downEvent['changedTouches'] = asTouchList([{"target": oskKeyElement, ...center}]);
+        touchUpEvent['touches'] = asTouchList([]);
+        touchDownEvent['changedTouches'] = asTouchList([{"target": oskKeyElement, ...center}]);
         // It should still show up in .changedTouches, though.
-        upEvent['changedTouches'] = asTouchList([{"target": oskKeyElement, ...center}]);
+        touchUpEvent['changedTouches'] = asTouchList([{"target": oskKeyElement, ...center}]);
+
+        downEvent = touchDownEvent as Event;
+        upEvent = touchUpEvent as Event;
       } else {
-        downEvent = new Event(BrowserDriver.oskDownMouseType);
-        upEvent = new Event(BrowserDriver.oskUpMouseType);
-        downEvent.clientX = center.clientX;
-        downEvent.clientY = center.clientY;
-        downEvent['relatedTarget'] = target;
-        upEvent.clientX = center.clientX;
-        upEvent.clientY = center.clientY;
-        upEvent['relatedTarget'] = target;
+        let mouseDownEvent: Mutable<Partial<MouseEvent>>;
+        let mouseUpEvent: Mutable<Partial<MouseEvent>>;
+        mouseDownEvent = new Event(BrowserDriver.oskDownMouseType);
+        mouseUpEvent = new Event(BrowserDriver.oskUpMouseType);
+        mouseDownEvent.clientX = center.clientX;
+        mouseDownEvent.clientY = center.clientY;
+        mouseDownEvent['relatedTarget'] = target;
+        mouseUpEvent.clientX = center.clientX;
+        mouseUpEvent.clientY = center.clientY;
+        mouseUpEvent['relatedTarget'] = target;
         // Mouse-click driven OSK use involves use of at least one mouse button.
-        downEvent['button'] = upEvent['button'] = 0;
-        downEvent['buttons'] = 1;
-        upEvent['buttons'] = 0;
+        mouseDownEvent['button'] = mouseUpEvent['button'] = 0;
+        mouseDownEvent['buttons'] = 1;
+        mouseUpEvent['buttons'] = 0;
+
+        downEvent = mouseDownEvent as Event;
+        upEvent = mouseUpEvent as Event;
       }
 
       // Note:  our gesture engine's internal structure means that even simple keystrokes like this

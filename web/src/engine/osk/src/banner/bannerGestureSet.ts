@@ -2,8 +2,7 @@ import { deepCopy } from '@keymanapp/web-utils';
 
 import {
   gestures,
-  GestureModelDefs,
-  InputSample
+  GestureModelDefs
 } from '@keymanapp/gesture-recognizer';
 
 import { BannerSuggestion } from './suggestionBanner.js';

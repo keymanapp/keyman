@@ -136,6 +136,7 @@ export default class KeyboardProperties implements KeyboardInternalPropertySpec 
   public constructor(keyboardId: string, languageCode: string);
   public constructor(arg1: MetadataObj | string, arg2?: string) {
     if(!(typeof arg1 == 'string')) {
+      // @ts-ignore
       if(arg1['KI'] || arg1['KL'] || arg1['KLC'] || arg1['KFont'] || arg1['KOskFont']) {
         const other = arg1 as KeyboardInternalPropertySpec;
         this.KI = other.KI;

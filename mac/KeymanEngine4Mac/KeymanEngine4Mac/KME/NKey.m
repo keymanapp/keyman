@@ -11,18 +11,18 @@
 @implementation NKey
 
 - (id)init {
-    self = [super init];
-    if (self) {
-        _text = @"";
-    }
-    
-    return self;
+  self = [super init];
+  if (self) {
+    _text = @"";
+  }
+  
+  return self;
 }
 
 - (NSString *)description {
-    NSString *format = @"<%@:%p F:%d S:%d VK:%d TXT:%@ BMP:%@>";
-    NSString *str = [NSString stringWithFormat:format, self.className, self, self.flags, self.shift, self.vkey, self.text, self.bitmap];
-    return str;
+  NSString *format = @"<%@:%p F:%d S:%d VK:%d TXT:%@ BMP:%@>";
+  NSString *str = [NSString stringWithFormat:format, self.className, self, self.flags, self.shift, self.vkey, self.text, self.bitmap];
+  return str;
 }
 
 @end

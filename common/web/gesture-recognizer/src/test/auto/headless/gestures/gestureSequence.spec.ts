@@ -8,7 +8,7 @@ import { GestureModelDefs, buildGestureMatchInspector, gestures } from '@keymana
 const { matchers } = gestures;
 
 // Huh... gotta do BOTH here?  One for constructor use, the other for generic-parameter use?
-const { GestureSequence, GestureStageReport, MatcherSelector } = matchers;
+const { GestureSequence, MatcherSelector } = matchers;
 type GestureSequence<Type> = gestures.matchers.GestureSequence<Type>;
 type MatcherSelector<Type> = gestures.matchers.MatcherSelector<Type>;
 type MatcherSelection<Type> = gestures.matchers.MatcherSelection<Type>;
