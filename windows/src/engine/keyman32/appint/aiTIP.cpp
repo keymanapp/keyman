@@ -126,7 +126,6 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
   BOOL isUp = keyFlags & KF_UP ? TRUE : FALSE;
   BOOL extended = keyFlags & KF_EXTENDED ? TRUE : FALSE;
   BYTE scan = keyFlags & 0xFF;
-  BOOL isUsingCoreProcessor = Globals::get_CoreIntegration();
 
   SendDebugMessageFormat(0, sdmAIDefault, 0, "TIPProcessKey: Enter VirtualKey=%s lParam=%x   IsUp=%d Extended=%d Updateable=%d Preserved=%d", Debug_VirtualKey((WORD) wParam), lParam, isUp, extended, Updateable, Preserved);
 
@@ -161,74 +160,33 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
   DWORD LocalShiftState = Globals::get_ShiftState();
   // Only the modifer flag 'f_ShiftState' is changed before sending the key stroke to the
   // core processor. The core processor has the keyboard Caps Lock stores and will
-  // queue an action 'KM_KBP_IT_CAPSLOCK'. In processing the action the Windows engine will synthesise keystrokes
+  // queue an action 'KM_CORE_IT_CAPSLOCK'. In processing the action the Windows engine will synthesise keystrokes
   // to ensure caps lock is in the correct state.
-  if (isUsingCoreProcessor) {
-    if (!Preserved) {
-      switch (wParam) {
-      case VK_MENU:
-      case VK_CONTROL:
-        ProcessModifierChange((UINT)wParam, isUp, extended);
-        return FALSE;
-      case VK_NUMLOCK:
+  if (!Preserved) {
+    switch (wParam) {
+    case VK_MENU:
+    case VK_CONTROL:
+      ProcessModifierChange((UINT)wParam, isUp, extended);
+      return FALSE;
+    case VK_NUMLOCK:
+      if (!isUp)
+        ProcessToggleChange((UINT)wParam);  // I4793
+      return FALSE;
+    case VK_CAPITAL:
         if (!isUp)
-          ProcessToggleChange((UINT)wParam);  // I4793
-        return FALSE;
-      case VK_CAPITAL:
-         if (!isUp)
-          ProcessToggleChange((UINT)wParam);  // I4793
-         break;
-      case VK_SHIFT:
-        ProcessModifierChange((UINT)wParam, isUp, extended);
+        ProcessToggleChange((UINT)wParam);  // I4793
         break;
-      }
-    } else {
-      // Mask out Ctrl, Shift and Alt and include new modifiers   // I4548
-      DWORD NewShiftState = TSFShiftToShift(lParam);  // I3588
-      SendDebugMessageFormat(
-          0, sdmGlobal, 0, "TIPProcessKey: TSFShiftToShift start with %x, include %x", LocalShiftState, NewShiftState);
-      *Globals::ShiftState() = (LocalShiftState & K_NOTMODIFIERFLAG) | NewShiftState;  // I3588
+    case VK_SHIFT:
+      ProcessModifierChange((UINT)wParam, isUp, extended);
+      break;
     }
-  } else {  // using windows processor TODO: #5442 Remove this else block
-    if (!Preserved) {
-      switch (wParam) {
-      case VK_CAPITAL:
-        if (!isUp)
-          ProcessToggleChange((UINT)wParam);  // I4793
-        if (!Updateable) {
-          // We only want to process the Caps Lock key event once --
-          // in the first pass (!Updateable).
-          KeyCapsLockPress(isUp);  // I4548
-        }
-        return FALSE;
-      case VK_SHIFT:
-        if (!Updateable) {
-          // We only want to process the Shift key event once --
-          // in the first pass (!Updateable).
-          KeyShiftPress(isUp);  // I4548
-        }
-        // Fall through
-      case VK_MENU:
-      case VK_CONTROL:
-        ProcessModifierChange((UINT)wParam, isUp, extended);
-        return FALSE;
-      case VK_NUMLOCK:
-        if (!isUp)
-          ProcessToggleChange((UINT)wParam);  // I4793
-        return FALSE;
-      }
-      // This would only get here if none of the above cases matched why not use default in the switch?
-      if (isUp) {
-        return FALSE;  // return value ignored in this case; we only needed it for testing anyway
-      }
-    } else {
-      // Mask out Ctrl, Shift and Alt and include new modifiers   // I4548
-      DWORD NewShiftState = TSFShiftToShift(lParam);  // I3588
-      SendDebugMessageFormat(
-          0, sdmGlobal, 0, "TIPProcessKey: TSFShiftToShift start with %x, include %x", LocalShiftState, NewShiftState);
-      *Globals::ShiftState() = (LocalShiftState & K_NOTMODIFIERFLAG) | NewShiftState;  // I3588
-    }
-  } // TODO: #5442 Remove this else block ^^
+  } else {
+    // Mask out Ctrl, Shift and Alt and include new modifiers   // I4548
+    DWORD NewShiftState = TSFShiftToShift(lParam);  // I3588
+    SendDebugMessageFormat(
+        0, sdmGlobal, 0, "TIPProcessKey: TSFShiftToShift start with %x, include %x", LocalShiftState, NewShiftState);
+    *Globals::ShiftState() = (LocalShiftState & K_NOTMODIFIERFLAG) | NewShiftState;  // I3588
+  }
 
 	_td->TIPFUpdateable = Updateable;
   _td->TIPFPreserved = Preserved;   // I4290
@@ -239,16 +197,7 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
 	_td->state.vkey = (WORD) wParam;
   _td->state.isDown = !isUp;
 
-  if (isUsingCoreProcessor) {
-    _td->state.lpCoreKb = _td->lpActiveKeyboard->lpCoreKeyboard;
-
-  } else {
-    _td->state.lpkb       = _td->lpActiveKeyboard->Keyboard;
-    _td->state.startgroup = &_td->state.lpkb->dpGroupArray[_td->state.lpkb->StartGroup[BEGIN_UNICODE]];
-    _td->state.NoMatches  = TRUE;
-    _td->state.LoopTimes  = 0;
-    _td->state.StopOutput = FALSE;
-  }
+  _td->state.lpCoreKb = _td->lpActiveKeyboard->lpCoreKeyboard;
 
   _td->state.windowunicode = TRUE;
 
@@ -257,29 +206,7 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
 	_td->TIPProcessOutput = outfunc;
 	_td->TIPGetContext = ctfunc;
 
-  AppContextWithStores *savedContext = NULL;  // I4370   // I4978
-
-  if (!Updateable) {
-    // The core processor km_kbp_process_event is only called once per key stroke
-    // therefore there is no  need to preserve context and keyboard actions
-    if (!isUsingCoreProcessor) {                                                                                   
-      savedContext = new AppContextWithStores(_td->lpActiveKeyboard->Keyboard->cxStoreArray);  // I4370 // I4978 
-      _td->app->SaveContext(savedContext);
-    }
-  }
-
   BOOL res = ProcessHook();
-
-  if (!Updateable) {
-    if (!isUsingCoreProcessor) {  
-      if (res) {  // I4585  // I4370
-        // Reset the context if match found
-        _td->app->RestoreContext(savedContext);
-        delete savedContext;
-        savedContext = NULL;
-      }
-    }
-  }
 
 	_td->TIPProcessOutput = NULL;
 	_td->TIPGetContext = NULL;
@@ -307,14 +234,7 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
 AITIP::AITIP() {
   ::AIWin2000Unicode();   // I3574
 
-  FIsDebugControlWindow = FALSE;
   useLegacy = FALSE;
-
-	WM_KEYMANDEBUG_CANDEBUG         = RegisterWindowMessage("WM_KEYMANDEBUG_CANDEBUG");
-	WM_KEYMANDEBUG_GETUNICODESTATUS = RegisterWindowMessage("WM_KEYMANDEBUG_GETUNICODESTATUS");
-	WM_KEYMANDEBUG_GETCONTEXT       = RegisterWindowMessage("WM_KEYMANDEBUG_GETCONTEXT");
-	WM_KEYMANDEBUG_ACTION           = RegisterWindowMessage("WM_KEYMANDEBUG_ACTION");
-	WM_KEYMANDEBUG_RULEMATCH        = RegisterWindowMessage("WM_KEYMANDEBUG_RULEMATCH");
 }
 
 AITIP::~AITIP() {
@@ -325,15 +245,6 @@ AITIP::~AITIP() {
 BOOL AITIP::CanHandleWindow(HWND ahwnd) {
   UNREFERENCED_PARAMETER(ahwnd);
   return TRUE;   // I3574
-}
-
-BOOL AITIP::HandleWindow(HWND ahwnd) {
-  FIsDebugControlWindow = IsDebugControlWindow(ahwnd);
-  return AIWin2000Unicode::HandleWindow(ahwnd);   // I3574
-}
-
-BOOL AITIP::IsWindowHandled(HWND ahwnd) {
-  return AIWin2000Unicode::IsWindowHandled(ahwnd);   // I3574
 }
 
 BOOL AITIP::IsUnicode() {
@@ -358,194 +269,31 @@ char *debugstr(PWSTR buf) {
 
 /* Context functions */
 
-void AITIP::MergeContextWithCache(PWSTR buf, AppContext *local_context) {   // I4262
-  WCHAR tmpbuf[MAXCONTEXT], contextExDeadkeys[MAXCONTEXT];
-  local_context->Get(tmpbuf, MAXCONTEXT-1);
-
-  int n = 0;
-  PWSTR p = tmpbuf, q = contextExDeadkeys, r = buf;   // I4266
-  while(*p) {
-    if(*p == UC_SENTINEL) {
-      p += 2; // We know the only UC_SENTINEL CODE in the context is CODE_DEADKEY, which has only 1 parameter: UC_SENTINEL CODE_DEADKEY <deadkey_id>
-      n++;
-    } else {
-      *q++ = *p;
-    }
-    p++;
-  }
-  *q = 0;
-
-  if(n > 0 && wcslen(buf) > wcslen(contextExDeadkeys)) {   // I4266
-    r += wcslen(buf) - wcslen(contextExDeadkeys);
+BOOL AITIP::ReadContext(PWSTR buf) {
+  if (buf == nullptr) {
+    return FALSE;
   }
 
-  // We have to cut off the context comparison from the left by #deadkeys matched to ensure we are comparing like with like,
-  // at least when tmpbuf len=MAXCONTEXT-1 at entry.
-
-#ifdef DEBUG_MERGECONTEXT
-  char *mc1 = debugstr(buf), *mc2 = debugstr(contextExDeadkeys), *mc3 = debugstr(tmpbuf);
-
-  SendDebugMessageFormat(0, sdmAIDefault, 0, "AITIP::MergeContextWithCache TIP:'%s' Context:'%s' DKContext:'%s'",
-      mc1, mc2, mc3);
-
-  delete mc1;
-  delete mc2;
-  delete mc3;
-#endif
-
-  if(wcscmp(r, contextExDeadkeys) != 0) {
-    // context has changed, reset context
-#ifdef DEBUG_MERGECONTEXT
-    SendDebugMessageFormat(0, sdmAIDefault, 0, "AITIP::MergeContextWithCache --> load context from app (losing deadkeys)");
-#endif
-    local_context->Set(buf);
-  } else {
-#ifdef DEBUG_MERGECONTEXT
-    SendDebugMessageFormat(0, sdmAIDefault, 0, "AITIP::MergeContextWithCache --> loading cached context");
-#endif
-    wcscpy_s(buf, MAXCONTEXT, tmpbuf);
-  }
-}
-
-void AITIP::ReadContext() {
-  if(DebugControlled()) {
-    Debug_FillContextBuffer();
-    return;
-  }
-
-	WCHAR buf[MAXCONTEXT];
   PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return;
+  if(!_td) return FALSE;
 
 	if(_td->TIPGetContext && (*_td->TIPGetContext)(MAXCONTEXT-1, buf) == S_OK) {   // I3575   // I4262
     if(ShouldDebug(sdmKeyboard)) {
       SendDebugMessageFormat(0, sdmAIDefault, 0, "AITIP::ReadContext: full context [Updateable=%d] %s", _td->TIPFUpdateable, Debug_UnicodeString(buf));
     }
     useLegacy = FALSE;   // I3575
-
-    // If the text content of the context is identical, inject the deadkeys
-    // Otherwise, reset the cachedContext to match buf, no deadkeys
-
-    MergeContextWithCache(buf, context);
-
-    if(ShouldDebug(sdmKeyboard)) {
-      SendDebugMessageFormat(0, sdmAIDefault, 0, "AITIP::ReadContext: after merge [Updateable=%d] %s", _td->TIPFUpdateable, Debug_UnicodeString(buf));
-    }
-
-    context->Set(buf);
+    return TRUE;
   }	else {
     SendDebugMessageFormat(0, sdmAIDefault, 0, "AITIP::ReadContext: transitory context, so use buffered context [Updateable=%d]", _td->TIPFUpdateable);
     useLegacy = TRUE;   // I3575
+    return FALSE;
   }
 }
 
-AppContextWithStores::AppContextWithStores(int nKeyboardOptions) : AppContext() {   // I4978
-  this->nKeyboardOptions = nKeyboardOptions;
-  KeyboardOptions = new INTKEYBOARDOPTIONS[nKeyboardOptions];
-  memset(KeyboardOptions, 0, sizeof(INTKEYBOARDOPTIONS) * nKeyboardOptions);
-}
-
-AppContextWithStores::~AppContextWithStores() {   // I4978
-  for(DWORD i = 0; i < nKeyboardOptions; i++) {
-    if(KeyboardOptions[i].Value) delete KeyboardOptions[i].Value;
-  }
-  delete KeyboardOptions;
-}
-
-void AITIP::SaveContext(AppContextWithStores *savedContext) {   // I4370   // I4978
-  savedContext->CopyFrom(context);
-
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td || !_td->lpActiveKeyboard || !_td->lpActiveKeyboard->Keyboard) return;
-
-  assert(savedContext->nKeyboardOptions == _td->lpActiveKeyboard->Keyboard->cxStoreArray);
-
-  for(DWORD i = 0; i < savedContext->nKeyboardOptions; i++) {   // I4978
-    if(_td->lpActiveKeyboard->KeyboardOptions[i].Value != NULL) {
-      savedContext->KeyboardOptions[i].Value = new WCHAR[wcslen(_td->lpActiveKeyboard->KeyboardOptions[i].Value)+1];
-      wcscpy_s(savedContext->KeyboardOptions[i].Value, wcslen(_td->lpActiveKeyboard->KeyboardOptions[i].Value)+1, _td->lpActiveKeyboard->KeyboardOptions[i].Value);
-    }
-  }
-}
-
-void AITIP::RestoreContext(AppContextWithStores *savedContext) {   // I4370   // I4978
-  context->CopyFrom(savedContext);
-
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td || !_td->lpActiveKeyboard || !_td->lpActiveKeyboard->Keyboard) return;
-  LPINTKEYBOARDINFO kp = _td->lpActiveKeyboard;
-
-  assert(savedContext->nKeyboardOptions == kp->Keyboard->cxStoreArray);
-
-  for(DWORD i = 0; i < savedContext->nKeyboardOptions; i++) {   // I4978
-    if(kp->KeyboardOptions[i].Value == NULL && savedContext->KeyboardOptions[i].Value != NULL) {
-      // Restore the previously saved value as it was reset
-      kp->KeyboardOptions[i].OriginalStore = kp->Keyboard->dpStoreArray[i].dpString;
-      kp->Keyboard->dpStoreArray[i].dpString = kp->KeyboardOptions[i].Value = savedContext->KeyboardOptions[i].Value;
-      savedContext->KeyboardOptions[i].Value = NULL;
-    } else if(kp->KeyboardOptions[i].Value != NULL && savedContext->KeyboardOptions[i].Value == NULL) {
-      // Clear the newly saved value back to the default
-      delete kp->KeyboardOptions[i].Value;
-      kp->KeyboardOptions[i].Value = NULL;
-      kp->Keyboard->dpStoreArray[i].dpString = kp->KeyboardOptions[i].OriginalStore;
-    } else if(kp->KeyboardOptions[i].Value != NULL && savedContext->KeyboardOptions[i].Value != NULL &&
-        wcscmp(kp->KeyboardOptions[i].Value, savedContext->KeyboardOptions[i].Value) != 0) {
-      // Restore the previously saved value as it was changed
-      delete kp->KeyboardOptions[i].Value;
-      kp->Keyboard->dpStoreArray[i].dpString = kp->KeyboardOptions[i].Value = savedContext->KeyboardOptions[i].Value;
-      savedContext->KeyboardOptions[i].Value = NULL;
-    }
-  }
-}
-
-void AITIP::CopyContext(AppContext *savedContext) {
-  savedContext->CopyFrom(context);
-}
-
-void AITIP::RestoreContextOnly(AppContext *savedContext) {
-  context->CopyFrom(savedContext);
-}
 
 /* Output actions */
 
-BOOL AITIP::QueueAction(int ItemType, DWORD dwData) {
-	if(DebugControlled()) {
-	  switch(ItemType) {
-	  case QIT_VKEYDOWN:
-      if((dwData & QVK_KEYMASK) <= VK__MAX && VKContextReset[(BYTE) dwData]) context->Reset();  // I3438   // I4370
-		  break;
-
-	  case QIT_DEADKEY:
-		  context->Add(UC_SENTINEL);   // I4370
-		  context->Add(CODE_DEADKEY);   // I4370
-		  context->Add((WORD) dwData);   // I4370
-		  break;
-
-	  case QIT_CHAR:
-		  context->Add((WORD) dwData);   // I4370
-		  break;
-
-	  case QIT_BACK:
-		  if(dwData & BK_BACKSPACE)
-			  while(context->CharIsDeadkey()) context->Delete();   // I4370
-		  context->Delete();   // I4370
-		  if(dwData & BK_BACKSPACE)
-			  while(context->CharIsDeadkey()) context->Delete();   // I4370
-		  break;
-	  }
-
-		SendMessage(GetDebugControlWindow(), WM_KEYMANDEBUG_ACTION, ItemType, dwData);
-    return TRUE;
-  }
-
-  return AIWin2000Unicode::QueueAction(ItemType, dwData);   // I3575
-}
-
 BOOL AITIP::SendActions() {  // I4196
-  if(DebugControlled()) {
-    return TRUE;
-  }
-
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
 
@@ -635,136 +383,4 @@ DWORD TSFShiftToShift(LPARAM shift)   // I3588
   else if(shift & TF_MOD_LCONTROL) res |= LCTRLFLAG;
   if(shift & TF_MOD_RCONTROL) res |= RCTRLFLAG;
   return res;
-}
-
-/* Debug Integration */
-
-BOOL AITIP::IsDebugControlWindow(HWND hwnd)
-{
-	static int WM_KEYMANDEBUG_CANDEBUG = RegisterWindowMessage("WM_KEYMANDEBUG_CANDEBUG");
-  DWORD_PTR dwResult;
-	SendMessageTimeout(hwnd, WM_KEYMANDEBUG_CANDEBUG, 0, 0, SMTO_BLOCK, 50, &dwResult);
-  return dwResult != 0;
-}
-
-HWND AITIP::GetDebugControlWindow()
-{
-	if(!FIsDebugControlWindow) return NULL;
-	return hwnd;
-}
-
-BOOL AITIP::DebugControlled()
-{
-	return FIsDebugControlWindow;
-}
-
-void AITIP::Debug_FillContextBuffer()
-{
-	WCHAR buf[MAXCONTEXT];
-	if(DebugControlled() &&
-			SendMessage(GetDebugControlWindow(), WM_KEYMANDEBUG_GETCONTEXT, MAXCONTEXT, (LPARAM) buf))
-	{
-		context->Set(buf);    // I4370
-		SendDebugMessageFormat(0, sdmKeyboard, 0, "AIDebugger::FillContextBuffer(%ls)", buf);
-	}
-	else
-	{
-		context->Reset();   // I4370
-		SendDebugMessageFormat(0, sdmKeyboard, 0, "AIDebugger::FillContextBuffer()-Reset");
-	}
-}
-
-#define MAXSTOREOFFSETS	20
-
-struct AIDEBUGINFO
-{
-	int cbSize;
-	int ItemType;
-	PWSTR Context, Output;
-	LPKEY Rule;
-	LPGROUP Group;
-	DWORD_PTR Flags;
-	WORD StoreOffsets[MAXSTOREOFFSETS*2+1];	// pairs--store, char position, terminated by 0xFFFF
-};
-
-void FillStoreOffsets(AIDEBUGINFO *di)
-{
-	int i, n;
-	PWSTR p;
-
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return;
-
-	for(i = n = 0, p = di->Rule->dpContext; *p; p = incxstr(p), i++)
-	{
-		if(*p == UC_SENTINEL && (*(p+1) == CODE_ANY || *(p+1) == CODE_NOTANY))
-		{
-			di->StoreOffsets[n++] = *(p+2) - 1;
-			di->StoreOffsets[n++] = _td->IndexStack[i];
-		}
-		if(*p == UC_SENTINEL && *(p+1) == CODE_INDEX)
-		{
-			di->StoreOffsets[n++] = *(p+2) - 1;
-			di->StoreOffsets[n++] = _td->IndexStack[*(p+3) - 1];
-		}
-		if(n == MAXSTOREOFFSETS*2) break;
-	}
-
-	if(n < MAXSTOREOFFSETS*2 - 1)
-		for(p = di->Rule->dpOutput; *p; p = incxstr(p))
-		{
-			if(*p == UC_SENTINEL && *(p+1) == CODE_INDEX)
-			{
-				di->StoreOffsets[n++] = *(p+2) - 1;
-				di->StoreOffsets[n++] = _td->IndexStack[*(p+3) - 1];
-			}
-			if(n == MAXSTOREOFFSETS*2) break;
-		}
-	di->StoreOffsets[n] = 0xFFFF;
-}
-
-BOOL AITIP::QueueDebugInformation(int ItemType, LPGROUP Group, LPKEY Rule, PWSTR fcontext, PWSTR foutput, DWORD_PTR dwExtraFlags)
-{
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return TRUE;
-  if(!_td->ForceFileName[0]) return TRUE;
-
-	SendDebugMessageFormat(0, sdmAIDefault, 0, "AIDebugger::QueueDebugInformation ItemType=%d", ItemType);
-	AIDEBUGINFO di;
-	di.cbSize = sizeof(AIDEBUGINFO);
-	di.ItemType = ItemType;		// int
-	di.Context = fcontext;		// PWSTR
-	di.Rule = Rule;				// LPKEY
-	di.Group = Group;			// LPGROUP
-	di.Output = foutput;		// PWSTR
-	di.Flags = dwExtraFlags;	// DWORD
-
-	if(di.Rule) FillStoreOffsets(&di);
-
-	// data required
-	// keystroke
-	// context for rule
-	// if rule, then output of rule
-	// match positions for all stores in rule
-
-	if(DebugControlled())
-		SendMessage(GetDebugControlWindow(), WM_KEYMANDEBUG_RULEMATCH, ItemType, (LPARAM) &di);
-
-	return TRUE;
-}
-
-typedef BOOL(WINAPI *PREFRESHPRESERVEDKEYSFUNC)(BOOL Activating);
-
-void RefreshPreservedKeys(BOOL Activating) {
-#ifdef _WIN64
-  HMODULE hModule = GetModuleHandle("kmtip64");
-#else
-  HMODULE hModule = GetModuleHandle("kmtip");
-#endif
-  if (hModule != NULL) {
-    PREFRESHPRESERVEDKEYSFUNC pRefreshPreservedKeys = (PREFRESHPRESERVEDKEYSFUNC)GetProcAddress(hModule, "RefreshPreservedKeys");
-    if (pRefreshPreservedKeys) {
-      pRefreshPreservedKeys(Activating);
-    }
-  }
 }

@@ -2,8 +2,8 @@
  * Unit tests for the priority queue.
  */
 
-var assert = require('chai').assert;
-var PriorityQueue = require('../build/index.bundled.js').models.PriorityQueue;
+import { assert } from 'chai';
+import { PriorityQueue } from '@keymanapp/models-templates';
 
 describe('Priority queue', function() {
   it('can act as a min-heap', function () {
@@ -24,7 +24,7 @@ describe('Priority queue', function() {
 
   it('initializes well from pre-existing values', function() {
     let input = [1, 10, 2, 9, 3, 8, 4, 7, 5, 6];
-    let originalInput = Array.from(input);
+    let originalInput = input.slice(0);
     let queue = new PriorityQueue((a, b) => a - b, input);
 
     assert.deepEqual(input, originalInput);

@@ -49,7 +49,7 @@ uses
 const
   SLexicalModelExtension = '.model.js';
 
-  // The model ID SHOULD adhere to this pattern (see also developer/src/kmlmc/index.ts):
+  // The model ID SHOULD adhere to this pattern (see also developer/src/kmc-model):
   //                           author           .bcp47            .uniq
   MODEL_ID_PATTERN_JS      = '^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a-z0-9_]*\.model\.js$';
   MODEL_ID_PATTERN_TS      = '^[a-z_][a-z0-9_]*\.[a-z_][a-z0-9_-]*\.[a-z_][a-z0-9_]*\.model\.ts$';
@@ -70,7 +70,7 @@ end;
 
 class function TLexicalModelUtils.DoesPackageFilenameFollowLexicalModelConventions(
   const Name: string): Boolean;
-// The model ID SHOULD adhere to this pattern (see also developer/src/kmlmc/index.ts):
+// The model ID SHOULD adhere to this pattern (see also developer/src/kmc-model):
 //                         author           .bcp47            .uniq
 begin
   Result := TRegEx.IsMatch(ExtractFileName(Name), MODEL_ID_PATTERN_PACKAGE);

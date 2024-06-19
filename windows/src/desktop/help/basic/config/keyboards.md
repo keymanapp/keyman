@@ -40,18 +40,44 @@ Keyman Configuration, see: [Keyboard Task - Enable or Disable a Keyboard](../ena
 
 ## Setting a Hotkey
 
-To set a hotkey for a Keyman keyboard, use the [Hotkeys tab](hotkeys).
+The Hotkey for selecting a keyboard will appear to the right of the keyboard name.
+If the keyboard has more than one language associated with it then the hotkey will
+appear beside the language in the keyboards details list.
+
+1.  Click the hotkey link beside the keyboard or language. The
+    Change Hotkey dialog box will be displayed.
+
+    ![](../../desktop_images/hotkeys-change.png)
+
+2.  Select a default hotkey or click Custom and type the hotkey you wish
+    to use.
+
+    **Note:** If you press a single letter or Shift plus a single letter, the
+    hotkey will default to <kbd>Ctrl</kbd> + <kbd>Alt</kbd> plus the letter you pressed, in
+    order to avoid conflicts with standard keyboard input.
+
+    **Note:** To clear a hotkey that has been set previously, click Clear Hotkey
+    or press Backspace.
+
+    **Note:** Be aware that you can set the hotkey to replace common Windows hotkeys (
+    <kbd>Ctrl</kbd> + <kbd>C</kbd>, <kbd>Ctrl</kbd> + <kbd>V</kbd>, etc). This is not
+    recommended.
+
+3.  Click OK to save your selection.
+
+The new hotkey will now be available.
+
+The hotkeys can also be set for a Keyman keyboard, using the [Hotkeys tab](hotkeys).
 
 ## Showing Introductory Help
 
 To show introductory help for a Keyman keyboard from the Keyboard
 Layouts tab of Keyman Configuration:
 
-1.  Find a keyboard in the keyboard list.
+1.  Select the keyboard name from the keyboard list to expand options associated with it.
 
-2.  Click on the question mark icon
-    (![](../../desktop_images/icon-introductory-help.png)) beside the keyboard
-    name. The keyboard help documentation will be shown.
+2.  Click on the help button and the help documentation will be shown.
+    ![](../../desktop_images/tab-layout-help.png)
 
 ## Viewing Keyboard Details
 
@@ -60,23 +86,32 @@ Keyman Configuration:
 
 1.  Find a keyboard in the keyboard list.
 
-2.  Click on the down arrow
-    (![](../../desktop_images/keyboards-downarrow.png)) beside the keyboard
-    name. The keyboard information window will expand.
+2.  Select the keyboard name from the keyboard list to expand options associated with it.
+    The keyboard information window will expand.
+    ![](../../desktop_images/tab-layout-detail1.png)
+    The initial drop down has the following information if available:
 
-    ![](../../desktop_images/keyboards-hotkey.png)
+      -   Languages associated with the keyboard
+      -   Keyboard package name
+      -   Keyboard package version number
+      -   Copyright details
 
-3.  In the information window you can view keyboard details, including:
 
+
+3. Click on the down arrow
+    ![](../../desktop_images/keyboards-downarrow.png), at the end of the list will reveal
+    further details including:
+
+    -   Keyboard version number
     -   Keyboard filename.
-    -   Keyboard package name.
-    -   Keyboard version number.
-    -   Keyboard encodings.
-    -   Keyboard layout type.
-    -   On Screen Keyboard status.
-    -   Documentation status.
-    -   Copyright details.
-    -   Installation details.
+    -   Keyboard included fonts
+    -   Keyboard encodings
+    -   Keyboard layout type
+    -   On Screen Keyboard status
+    -   Documentation status
+    -   Keyboard Message
+
+  ![](../../desktop_images/tab-layout-detail2.png)
 
 ## Sharing a keyboard with other users and devices
 
@@ -85,7 +120,7 @@ then you can share the keyboard with other devices and users using a QR
 Code.
 
 1.  Expand the keyboard details for the keyboard you wish to share, and
-    click Share keyboard.
+    click the Share keyboard button.
 
 2.  A popup will appear with a QR Code. This QR Code can be scanned with
     a mobile phone camera to automatically open a web page with a

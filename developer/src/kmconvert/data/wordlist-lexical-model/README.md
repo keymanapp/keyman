@@ -1,11 +1,9 @@
 $NAME lexical model
 ===================
 
-Version $VERSION
-
 Description
 -----------
-$NAME generated from template
+$DESCRIPTION
 
 Links
 -----

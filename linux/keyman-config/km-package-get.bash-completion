@@ -1,17 +1,18 @@
-#/usr/bin/env bash
+# shellcheck disable=SC2148
+# No hashbang for bash completion scripts! They are intended to be sourced, not executed.
 
 _km-package-get_completions()
 {
-    local cur prev opts cache
+    local cur opts cache pkg_install_path
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
-    prev="${COMP_WORDS[COMP_CWORD-1]}"
     opts="-h --help -v --verbose -vv --veryverbose --version"
 
     cache=${XDG_CACHE_HOME:-~/.cache}/keyman/kmpdirlist
 
     if [[ ${cur} == -* ]] ; then
-        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+        # shellcheck disable=SC2207
+        COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
         return 0
     fi
 
@@ -21,15 +22,17 @@ _km-package-get_completions()
         # Unfortunately with bash completion scripts it's not possible to factor out
         # common code.
         if [[ -e ./km-package-install ]]; then
-            python3 -c "from importlib.machinery import SourceFileLoader;from importlib.util import module_from_spec, spec_from_loader;loader = SourceFileLoader('km_package_install', './km-package-install');spec = spec_from_loader(loader.name, loader);mod = module_from_spec(spec);loader.exec_module(mod);mod.list_keyboards()"
+            pkg_install_path='./km-package-install'
         else
-            python3 -c "from importlib.machinery import SourceFileLoader;from importlib.util import module_from_spec, spec_from_loader;loader = SourceFileLoader('km_package_install', '/usr/bin/km-package-install');spec = spec_from_loader(loader.name, loader);mod = module_from_spec(spec);loader.exec_module(mod);mod.list_keyboards()"
+            pkg_install_path='/usr/bin/km-package-install'
         fi
+        python3 -c "from importlib.machinery import SourceFileLoader;from importlib.util import module_from_spec, spec_from_loader;loader = SourceFileLoader('km_package_install', $pkg_install_path);spec = spec_from_loader(loader.name, loader);mod = module_from_spec(spec);loader.exec_module(mod);mod.list_keyboards()"
     fi
 
     if [[ -r $cache ]] ; then
-        for file in `cat $cache`; do words="${words} ${file}"; done
-        COMPREPLY=($(compgen -W "${words}" -- ${cur}))
+        while read -r file; do words="${words} ${file}"; done < "$cache"
+        # shellcheck disable=SC2207
+        COMPREPLY=($(compgen -W "${words}" -- "${cur}"))
         return 0
     fi
 }

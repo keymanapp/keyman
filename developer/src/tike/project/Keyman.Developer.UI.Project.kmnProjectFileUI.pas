@@ -130,11 +130,12 @@ begin
   if not FSilent then
     frmMessages.DoShowForm;
 
-  Result := ProjectFile.CompileKeyboard;
+  Result :=
+    ProjectFile.CompileKeyboard;
 
   if Result and
       TServerDebugAPI.Running and
-      TServerDebugAPI.IsKeyboardRegistered(ProjectFile.TargetFileName) and
+      TServerDebugAPI.IsKeyboardRegistered(ProjectFile.JSTargetFileName) and
       (ProjectFile.Targets * KMWKeymanTargets <> []) then
     TestKeymanWeb(True);
 end;
@@ -171,7 +172,7 @@ var
   FCompiledName: string;
 begin
   Result := False;
-  FCompiledName := ProjectFile.TargetFileName;
+  FCompiledName := ProjectFile.KmxTargetFileName;
   if not TestKeyboardState(FCompiledName, FSilent) then Exit;
 //  with TfrmFontHelper.Create(frmKeymanDeveloper) do
 //  try
@@ -284,7 +285,7 @@ var
   FCompiledName: string;
 begin
   Result := False;
-  FCompiledName := ProjectFile.TargetFilename;
+  FCompiledName := ProjectFile.KmxTargetFilename;
   if not TestKeyboardState(FCompiledName, False) then Exit;
   KeymanDeveloperUtils.InstallKeyboard(FCompiledName, True);
   Result := True;

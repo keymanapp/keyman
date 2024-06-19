@@ -1,0 +1,74 @@
+/* Message displayed to confirm delete of the Keyman keyboard selected by the user from the keyboard list  */
+"message-confirm-delete-keyboard" = "Gada bara kǝlba kǝlba ka ɗalba kibod '%@' ya?";
+
+/* Delete keyboard confirmation info indicating that the delete action cannot be undone  */
+"info-cannot-undo-delete-keyboard" = "Gadiyata mǝzi ka pali su namtǝ gǝ kurta ʻyati wɛ.";
+
+/* Button text to cancel delete of the specified installed Keyman keyboard  */
+"button-cancel-delete-keyboard" = "Kansǝl";
+
+/* Button text to confirm delete of the specified installed Keyman keyboard  */
+"button-delete-keyboard" = "Kǝlba ka ɗalba";
+
+/* Message displayed to confirm installation of a keyboard from the specifed .kmp file double-clicked by the user  */
+"message-confirm-install-keyboard" = "Vu Keyman kibod?";
+
+/* Message displayed to confirm installation of a keyboard from the specifed .kmp file double-clicked by the user  */
+"info-install-keyboard-filename" = "Gada bara ka Keyman vu alagɛ kibod nam akwa kuta fail ya '%@'?";
+
+/* Button text to cancel installation of the double-clicked Keyman file  */
+"button-cancel-install-keyboard" = "Kansǝl";
+
+/* Button text to confirm installation of the double-clicked Keyman file  */
+"button-install-keyboard" = "Vu ko hau";
+
+/* Message displayed to inform user that .kmp file could not be read/unzipped  */
+"message-keyboard-file-unreadable" = "Ta mǝzi ka karatɛ fail nǝr Keyman wɛ '%@'.";
+
+/* Message displayed in Configuration window when keyboard cannot be loaded */
+"message-error-loading-keyboard" = "(aibe akwa vu kibod)";
+
+/* Message displayed in Configuration window when keyboard metadata cannot be loaded */
+"message-error-unknown-metadata" = "ndǝta zǝndi suyari wɛ";
+
+/* Button text to acknowledge that .kmp file could not be read  */
+"button-keyboard-file-unreadable" = "Kal kal";
+
+/* label text to identify Keyman version */
+"version-label-text" = "Jiliyari %@";
+
+/* Status text for keyboard downloading  */
+"message-keyboard-downloading" = "Ata kǝra sǝgǝl akǝr...";
+
+/* Status text for keyboard download complete  */
+"message-keyboard-download-complete" = "Hau ko sǝgǝl aka suyari kǝ kuri.";
+
+/* Button text to cancel downloading keyboard  */
+"button-cancel-downloading" = "Kansǝl";
+
+/* Button text keyboard download complete  */
+"button-download-complete" = "Kurai ʻyatidzi";
+
+/* keyboards label in the Package Information window */
+"keyboards-label" = "Kibodyere:";
+
+/* fonts label in the Package Information window */
+"fonts-label" = "Fontyere:";
+
+/* package version label in the Package Information window */
+"package-version-label" = "Jiliyir tsabtǝdzǝr failyere nam ada mǝrti su apa kibod namtǝ ndɛ ada na njǝr kuthlǝr aka kamputa:";
+
+/* author label in the Package Information window */
+"author-label" = "Ndǝ nam tara ʻyati sari:";
+
+/* website label in the Package Information window */
+"website-label" = "Websait:";
+
+/* copyright label in the Package Information window */
+"copyright-label" = "Kopirait:";
+
+/* message displayed to alert user to need grant accessibility permission */
+"privacy-alert-text" = "Akuya ka dzǝ ʻya kǝthlǝr daku, Keyman ada bara ɓui whalǝr lukwa suyerere:\n\nNgyar whalǝr ʻyati su akwa Sǝr Nwɛyere nam Tsar Tsaryere, Su tubwar Lapiyakur & Sǝr Kǝrngɛ.\nƁǝla hyanti ka dzǝ badicini ʻya kǝthlǝr sǝr nuwɛyere nǝngɛ ani system.";
+
+/* Text of menu item in Input Menu when no Keyboards are configured -- include parentheses  */
+"no-keyboard-configured-menu-placeholder" = "(Ndadi vu kibod wɛ)";

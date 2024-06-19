@@ -34,12 +34,10 @@ type
     function TestPackageOnline: Boolean;
     function InstallPackage: Boolean;
     function UninstallPackage: Boolean;
-    function CompilePackage(FSilent: Boolean): Boolean;
-    function CompilePackageInstaller(FSilent: Boolean): Boolean;
+    function CompilePackage: Boolean;
 
-    function GetPack: TKPSFile;
     function GetProjectFile: TkpsProjectFileAction;
-    function TestPackageState(FCompiledName: string; FSilent: Boolean): Boolean;
+    function TestPackageState(FCompiledName: string): Boolean;
   public
     function DoAction(action: TProjectFileAction; FSilent: Boolean): Boolean; override;
     property ProjectFile: TkpsProjectFileAction read GetProjectFile;
@@ -69,13 +67,13 @@ uses
   KeymanDeveloperUtils,
   PackageInfo;
 
-function TkpsProjectFileUI.CompilePackage(FSilent: Boolean): Boolean;
+function TkpsProjectFileUI.CompilePackage: Boolean;
 begin
   Result := False;
   if ProjectFile.Modified then
     if not modActionsMain.actFileSave.Execute then Exit;
 
-  Result := ProjectFile.CompilePackage(GetPack, FSilent);
+  Result := ProjectFile.CompilePackage;
 
   if Result and
       TServerDebugAPI.Running and
@@ -83,34 +81,17 @@ begin
     TestPackageOnline;
 end;
 
-function TkpsProjectFileUI.CompilePackageInstaller(FSilent: Boolean): Boolean;
-begin
-  Result := False;
-  if ProjectFile.Modified then
-    if not modActionsMain.actFileSave.Execute then Exit;
-
-  Result := ProjectFile.CompilePackageInstaller(GetPack, FSilent);
-end;
-
 function TkpsProjectFileUI.DoAction(action: TProjectFileAction; FSilent: Boolean): Boolean;
 begin
   case action of
-    pfaCompile: Result := CompilePackage(FSilent);
+    pfaCompile: Result := CompilePackage;
     pfaInstall: Result := InstallPackage;
     pfaUninstall: Result := UninstallPackage;
-    pfaCompileInstaller: Result := CompilePackageInstaller(FSilent);
     pfaClean: Result := ProjectFile.Clean;
     pfaTestKeymanWeb: Result := TestPackageOnline;
   else
     Result := False;
   end;
-end;
-
-function TkpsProjectFileUI.GetPack: TKPSFile;
-begin
-  if Assigned(MDIChild)
-    then with MDIChild as TfrmPackageEditor do Result := GetPack
-    else Result := nil;
 end;
 
 function TkpsProjectFileUI.GetProjectFile: TkpsProjectFileAction;
@@ -124,7 +105,7 @@ var
 begin
   Result := False;
   FCompiledName := ProjectFile.TargetFilename;
-  if not TestPackageState(FCompiledName, False) then Exit;
+  if not TestPackageState(FCompiledName) then Exit;
   KeymanDeveloperUtils.InstallPackage(FCompiledName, True);
   Result := True;
 end;
@@ -158,39 +139,29 @@ begin
   Result := KeymanDeveloperUtils.UninstallPackage(ChangeFileExt(ExtractFileName(ProjectFile.FileName), ''));
 end;
 
-function TkpsProjectFileUI.TestPackageState(FCompiledName: string; FSilent: Boolean): Boolean;
+function TkpsProjectFileUI.TestPackageState(FCompiledName: string): Boolean;
 var
   ftkps, ftkmp: TDateTime;
 begin
   Result := False;
 
   if not FileExists(FCompiledName) then
-    if FSilent then
-    begin
-      if not CompilePackage(FSilent) then Exit;
-    end
-    else
-      case MessageDlg('You need to compile the keyboard before you can test it.  Compile now?',
-          mtConfirmation, mbOkCancel, 0) of
-        mrOk:     if not CompilePackage(FSilent) then Exit;
-        mrCancel: Exit;
-      end;
+    case MessageDlg('You need to compile the keyboard before you can test it.  Compile now?',
+        mtConfirmation, mbOkCancel, 0) of
+      mrOk:     if not CompilePackage then Exit;
+      mrCancel: Exit;
+    end;
 
   FileAge(ProjectFile.FileName, ftkps);
   FileAge(FCompiledName, ftkmp);
 
   if ProjectFile.Modified or (ftkps > ftkmp) then
-    if FSilent then
-    begin
-      if not CompilePackage(FSilent) then Exit;
-    end
-    else
-      case MessageDlg('The source file has changed.  Recompile before testing?',
-          mtConfirmation, mbYesNoCancel, 0) of
-        mrYes:    if not CompilePackage(FSilent) then Exit;
-        mrNo:     ;
-        mrCancel: Exit;
-      end;
+    case MessageDlg('The source file has changed.  Recompile before testing?',
+        mtConfirmation, mbYesNoCancel, 0) of
+      mrYes:    if not CompilePackage then Exit;
+      mrNo:     ;
+      mrCancel: Exit;
+    end;
 
   Result := True;
 end;

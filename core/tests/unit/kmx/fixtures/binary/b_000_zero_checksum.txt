@@ -1,0 +1,43 @@
+#
+# b_000_zero_checksum.txt is a version 16.0 file with a zero checksum, to verify
+# that Keyman Core loads it successfully.
+#
+
+block(kmxheader)  #  struct COMP_KEYBOARD {
+  4b 58 54 53      #    KMX_DWORD dwIdentifier;   // 0000 Keyman compiled keyboard id
+
+  00 10 00 00      #    KMX_DWORD dwFileVersion;  // 0004 Version of the file - Keyman 4.0 is 0x0400
+
+  00 00 00 00      #    KMX_DWORD dwCheckSum;     // 0008 As stored in keyboard
+  00 00 00 00      #    KMX_DWORD KeyboardID;     // 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
+  01 00 00 00      #    KMX_DWORD IsRegistered;   // 0010
+  00 00 00 00      #    KMX_DWORD version;        // 0014 keyboard version
+
+  00 00 00 00      #    KMX_DWORD cxStoreArray;   // 0018 in array entries
+  01 00 00 00      #    KMX_DWORD cxGroupArray;   // 001C in array entries
+
+  00 00 00 00      #    KMX_DWORD dpStoreArray;   // 0020 [LPSTORE] address of first item in store array
+  40 00 00 00      #    KMX_DWORD dpGroupArray;   // 0024 [LPGROUP] address of first item in group array
+
+  ff ff ff ff      #    KMX_DWORD StartGroup[2];  // 0028 index of starting groups [2 of them]
+  00 00 00 00      #
+
+  00 00 00 00      #    KMX_DWORD dwFlags;        // 0030 Flags for the keyboard file
+
+  00 00 00 00      #    KMX_DWORD dwHotKey;       // 0034 standard windows hotkey (hiword=shift/ctrl/alt stuff, loword=vkey)
+
+  00 00 00 00      #    KMX_DWORD dpBitmapOffset; // 0038 offset of the bitmaps in the file
+  00 00 00 00      #    KMX_DWORD dwBitmapSize;   // 003C size in bytes of the bitmaps
+                   #  };
+
+block(groupmain)
+                   # struct COMP_GROUP {
+  00 00 00 00      #   KMX_DWORD dpName;
+  00 00 00 00      #   KMX_DWORD dpKeyArray;   // [LPKEY] address of first item in key array
+  00 00 00 00      #   KMX_DWORD dpMatch;
+  00 00 00 00      #   KMX_DWORD dpNoMatch;
+  00 00 00 00      #   KMX_DWORD cxKeyArray;   // in array entries
+  01 00 00 00      #   KMX_BOOL  fUsingKeys;   // group(xx) [using keys] <-- specified or not
+                   # };
+
+block(eof)   # end of file

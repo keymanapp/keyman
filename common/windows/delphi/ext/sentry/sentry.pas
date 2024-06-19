@@ -1,6 +1,6 @@
 {$D-} // Don't include debug information
 // Delphi translation of sentry.h
-// Sentry Native API 0.4.9
+// Sentry Native API 0.6.0 - ***excluding performance APIs***
 // https://github.com/getsentry/sentry-native
 unit sentry;
 
@@ -53,7 +53,7 @@ const
 
 const
   SENTRY_SDK_NAME = 'sentry.native';
-  SENTRY_SDK_VERSION = '0.4.9';
+  SENTRY_SDK_VERSION = '0.6.0';
   SENTRY_SDK_USER_AGENT = SENTRY_SDK_NAME + '/' + SENTRY_SDK_VERSION;
 
 {$IF DEFINED(MSWINDOWS)}
@@ -278,9 +278,12 @@ function sentry_value_get_by_key(
   const k: PAnsiChar
 ): sentry_value_t; cdecl; external sentry_dll  delayed;
 
-//
-// Looks up a value in a map by key.  If missing a null value is returned.
-// The returned value is owned.
+
+//
+
+// Looks up a value in a map by key.  If missing a null value is returned.
+
+// The returned value is owned.
 //
 // If the caller no longer needs the value it must be released with
 // `sentry_value_decref`.
@@ -456,6 +459,20 @@ function {SENTRY_EXPERIMENTAL_API} sentry_value_new_stacktrace(
 ): sentry_value_t; cdecl; external sentry_dll  delayed;
 
 //
+// Sets the Stack Trace conforming to the Stack Trace Interface in a value.
+//
+// The value argument must be either an exception or thread object.
+//
+// If `ips` is NULL the current stack trace is captured, otherwise `len` stack
+// trace instruction pointers are attached to the event.
+//
+procedure {SENTRY_EXPERIMENTAL_API} sentry_value_set_stacktrace(
+    value: sentry_value_t;
+    ips: PPVoid;
+    len: NativeUInt
+); cdecl; external sentry_dll  delayed;
+
+//
 // Adds an Exception to an Event value.
 //
 // This takes ownership of the `exception`.
@@ -504,10 +521,12 @@ procedure sentry_event_value_add_stacktrace(
   event: sentry_value_t;
   ips: Pointer;
   len: Integer
-); cdecl; external sentry_dll  delayed;
+
+); cdecl; external sentry_dll  delayed;
 
 
-//
+
+//
 // This represents the OS dependent user context in the case of a crash, and can
 // be used to manually capture a crash.
 //
@@ -553,7 +572,8 @@ function sentry_unwind_stack_from_ucontext(
 
 
 
-//
+
+//
 // A UUID
 //
 type
@@ -640,6 +660,15 @@ function sentry_envelope_get_event(
 ): sentry_value_t; cdecl; external sentry_dll  delayed;
 
 //
+// Given an Envelope, returns the embedded Transaction if there is one.
+//
+// This returns a borrowed value to the Transaction in the Envelope.
+//
+function {SENTRY_EXPERIMENTAL_API} sentry_envelope_get_transaction(
+  const envelope: psentry_envelope_t
+): sentry_value_t; cdecl; external sentry_dll  delayed;
+
+//
 // Serializes the envelope
 //
 // The return value needs to be freed with sentry_string_free().
@@ -712,6 +741,7 @@ type
   _sentry_transport_free_func = procedure(state: Pointer); cdecl;
   _sentry_transport_startup_func = function(const options: psentry_options_t; state: Pointer): Integer; cdecl;
   _sentry_transport_shutdown_func = function(timeout: UInt64; state: Pointer): Integer; cdecl;
+  _sentry_transport_flush_func = function(timeout: UInt64; state: Pointer): Integer; cdecl;
 
 //
 // Creates a new transport with an initial `send_func`.
@@ -752,6 +782,20 @@ procedure sentry_transport_set_startup_func(
 ); cdecl; external sentry_dll  delayed;
 
 //
+// Sets the transport flush hook.
+//
+// This hook will receive a millisecond-resolution timeout.
+// It should return `0` if all the pending envelopes are
+// sent within the timeout, or `1` if the timeout is hit.
+//
+procedure {SENTRY_API} sentry_transport_set_flush_func(
+  transport: psentry_transport_t;
+  flush_func: _sentry_transport_flush_func
+); cdecl; external sentry_dll  delayed;
+
+
+
+//
 // Sets the transport shutdown hook.
 //
 // This hook will receive a millisecond-resolution timeout.
@@ -785,6 +829,22 @@ function sentry_new_function_transport(
     func: _sentry_transport_new_func;
     data: Pointer
 ): psentry_transport_t; cdecl; external sentry_dll  delayed;
+
+//
+// This represents an interface for user-defined backends.
+//
+// Backends are responsible to handle crashes. They are maintained at runtime
+// via various life-cycle hooks from the sentry-core.
+//
+// At this point none of those interfaces are exposed in the API including
+// creation and destruction. The main use-case of the backend in the API at this
+// point is to disable it via `sentry_options_set_backend` at runtime before it
+// is initialized.
+//
+type
+  sentry_backend_s = record end;
+  sentry_backend_t = sentry_backend_s;
+  psentry_backend_t = Pointer;
 
 // -- Options APIs --
 
@@ -847,6 +907,71 @@ type
 procedure sentry_options_set_before_send(
   opts: psentry_options_t;
   func: sentry_event_function_t;
+  data: Pointer
+); cdecl; external sentry_dll  delayed;
+
+//
+// Type of the `on_crash` callback.
+//
+// The `on_crash` callback replaces the `before_send` callback for crash events.
+// The interface is analogous to `before_send` in that the callback takes
+// ownership of the `event`, and should usually return that same event. In case
+// the event should be discarded, the callback needs to call
+// `sentry_value_decref` on the provided event, and return a
+// `sentry_value_new_null()` instead.
+//
+// Only the `inproc` backend currently fills the passed-in event with useful
+// data and processes any modifications to the return value. Since both
+// `breakpad` and `crashpad` use minidumps to capture the crash state, the
+// passed-in event is empty when using these backends, and they ignore any
+// changes to the return value.
+//
+// If you set this callback in the options, it prevents a concurrently enabled
+// `before_send` callback from being invoked in the crash case. This allows for
+// better differentiation between crashes and other events and gradual migration
+// from existing `before_send` implementations:
+//
+//  - if you have a `before_send` implementation and do not define an `on_crash`
+//    callback your application will receive both normal and crash events as
+//    before
+//  - if you have a `before_send` implementation but only want to handle normal
+//    events with it, then you can define an `on_crash` callback that returns
+//    the passed-in event and does nothing else
+//  - if you are not interested in normal events, but only want to act on
+//    crashes (within the limits mentioned below), then only define an
+//    `on_crash` callback with the option to filter (on all backends) or enrich
+//    (only inproc) the crash event
+//
+// This function may be invoked inside of a signal handler and must be safe for
+// that purpose, see https://man7.org/linux/man-pages/man7/signal-safety.7.html.
+// On Windows, it may be called from inside of a `UnhandledExceptionFilter`, see
+// the documentation on SEH (structured exception handling) for more information
+// https://docs.microsoft.com/en-us/windows/win32/debug/structured-exception-handling
+//
+// Platform-specific behavior:
+//
+//  - does not work with crashpad on macOS.
+//  - for breakpad on Linux the `uctx` parameter is always NULL.
+//  - on Windows the crashpad backend can capture fast-fail crashes which
+// by-pass SEH. Since `on_crash` is called by a local exception-handler, it will
+// not be invoked when such a crash happened, even though a minidump will be
+// sent.
+//
+type
+  sentry_crash_function_t = function(
+    const uctx: psentry_ucontext_t;
+    event: sentry_value_t;
+    closure: Pointer
+  ): sentry_value_t; cdecl;
+
+//
+// Sets the `on_crash` callback.
+//
+// See the `sentry_crash_function_t` typedef above for more information.
+//
+procedure {SENTRY_API} sentry_options_set_on_crash(
+  opts: psentry_options_t;
+  func: sentry_crash_function_t;
   data: Pointer
 ); cdecl; external sentry_dll  delayed;
 
@@ -1193,6 +1318,37 @@ procedure sentry_options_set_system_crash_reporter_enabled(
     enabled: Integer
 ); cdecl; external sentry_dll  delayed;
 
+//
+// Sets the maximum time (in milliseconds) to wait for the asynchronous tasks to
+// end on shutdown, before attempting a forced termination.
+//
+procedure {SENTRY_API} sentry_options_set_shutdown_timeout(
+  opts: psentry_options_t;
+  shutdown_timeout: UInt64
+); cdecl; external sentry_dll  delayed;
+
+//
+// Gets the maximum time (in milliseconds) to wait for the asynchronous tasks to
+// end on shutdown, before attempting a forced termination.
+//
+function {SENTRY_API} sentry_options_get_shutdown_timeout(
+  opts: psentry_options_t
+): UInt64; cdecl; external sentry_dll  delayed;
+
+//
+// Sets a user-defined backend.
+//
+// Since creation and destruction of backends is not exposed in the API, this
+// can only be used to set the backend to `NULL`, which disables the backend in
+// the initialization.
+//
+procedure {SENTRY_API} sentry_options_set_backend(
+  opts: psentry_options_t;
+  backend: psentry_backend_t
+); cdecl; external sentry_dll  delayed;
+
+
+
 // -- Global APIs --
 
 //
@@ -1207,6 +1363,18 @@ procedure sentry_options_set_system_crash_reporter_enabled(
 function sentry_init(
   options: psentry_options_t
 ): Integer; cdecl; external sentry_dll  delayed;
+
+//
+// Instructs the transport to flush its send queue.
+//
+// The `timeout` parameter is in milliseconds.
+//
+// Returns 0 on success, or a non-zero return value in case the timeout is hit.
+//
+function {SENTRY_API} sentry_flush(
+  timeout: UInt64
+): Integer; cdecl; external sentry_dll  delayed;
+
 
 //
 // Shuts down the sentry client and forces transports to flush out.
@@ -1389,7 +1557,8 @@ procedure sentry_set_level(
   level: sentry_level_t
 ); cdecl; external sentry_dll  delayed;
 
-//
+
+//
 // Starts a new session.
 //
 procedure sentry_start_session; cdecl; external sentry_dll  delayed;
@@ -1399,13 +1568,19 @@ procedure sentry_start_session; cdecl; external sentry_dll  delayed;
 //
 procedure sentry_end_session; cdecl; external sentry_dll  delayed;
 
-//
-// Sets the path to sentry.dll; this must
-// be called before any other sentry apis
-//
-procedure sentry_set_library_path(const path: string);
 
-implementation
+//
+
+// Sets the path to sentry.dll; this must
+
+// be called before any other sentry apis
+
+//
+
+procedure sentry_set_library_path(const path: string);
+
+
+implementation
 
 uses
   System.SysUtils;

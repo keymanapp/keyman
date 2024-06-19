@@ -1,0 +1,12 @@
+﻿c validate_gesture generated from template at 2024-01-11 15:15:16
+c with name "validate_gesture"
+store(&VERSION) '10.0'
+store(&NAME) 'validate_gesture'
+store(&COPYRIGHT) '©'
+store(&KEYBOARDVERSION) '1.0'
+store(&TARGETS) 'mobile'
+store(&LAYOUTFILE) 'validate_gesture.keyman-touch-layout'
+
+begin Unicode > use(main)
+
+group(main) using keys

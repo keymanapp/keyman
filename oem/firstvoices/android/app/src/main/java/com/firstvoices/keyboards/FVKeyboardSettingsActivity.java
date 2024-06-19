@@ -21,22 +21,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 
-import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.KeyboardPickerActivity;
-import com.tavultesoft.kmea.ModelInfoActivity;
-import com.tavultesoft.kmea.ModelPickerActivity;
-import com.tavultesoft.kmea.cloud.CloudApiTypes;
-import com.tavultesoft.kmea.cloud.CloudDownloadMgr;
-import com.tavultesoft.kmea.cloud.impl.CloudLexicalModelMetaDataDownloadCallback;
-import com.tavultesoft.kmea.data.CloudRepository;
-import com.tavultesoft.kmea.data.Dataset;
-import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.data.KeyboardController;
-import com.tavultesoft.kmea.data.LexicalModel;
-import com.tavultesoft.kmea.util.BCP47;
-import com.tavultesoft.kmea.util.KMLog;
-import com.tavultesoft.kmea.util.MapCompat;
+import com.keyman.engine.KMKeyboardDownloaderActivity;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.KeyboardPickerActivity;
+import com.keyman.engine.ModelInfoActivity;
+import com.keyman.engine.ModelPickerActivity;
+import com.keyman.engine.cloud.CloudApiTypes;
+import com.keyman.engine.cloud.CloudDownloadMgr;
+import com.keyman.engine.cloud.impl.CloudLexicalModelMetaDataDownloadCallback;
+import com.keyman.engine.data.CloudRepository;
+import com.keyman.engine.data.Dataset;
+import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.data.KeyboardController;
+import com.keyman.engine.data.LexicalModel;
+import com.keyman.engine.util.BCP47;
+import com.keyman.engine.util.KMLog;
+import com.keyman.engine.util.MapCompat;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -163,7 +163,7 @@ public final class FVKeyboardSettingsActivity extends AppCompatActivity {
     fvKeyboardTextView = (TextView) layout.findViewById(R.id.text1);
     fvKeyboardTextView.setText(getString(R.string.enable_keyboard));
     fvVersionTextView = (TextView) layout.findViewById(R.id.text2);
-    fvVersionTextView.setText(String.format(getString(R.string.keyboard_version), version));
+    fvVersionTextView.setText(String.format(getString(R.string.fv_keyboard_version), version));
     fvKeyboardToggle = layout.findViewById(R.id.toggle);
     fvKeyboardToggle.setChecked(KeyboardController.getInstance().keyboardExists(FVShared.FVDefault_PackageID, kbId, null));
     fvKeyboardToggle.setOnClickListener(new View.OnClickListener() {
@@ -405,6 +405,7 @@ public final class FVKeyboardSettingsActivity extends AppCompatActivity {
 
   @Override
   public void onBackPressed() {
+    super.onBackPressed();
     finish();
   }
 

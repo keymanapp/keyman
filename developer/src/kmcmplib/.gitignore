@@ -1,0 +1,4 @@
+build/
+wasm.build
+tests/keyboards/
+resources/

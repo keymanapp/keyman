@@ -1,10 +1,10 @@
 package com.keyman.kmsample2;
 
-import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.KMManager.KeyboardType;
-import com.tavultesoft.kmea.KMHardwareKeyboardInterpreter;
-import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
+import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.KMManager.KeyboardType;
+import com.keyman.engine.KMHardwareKeyboardInterpreter;
+import com.keyman.engine.KeyboardEventHandler.OnKeyboardEventListener;
 
 import android.content.Context;
 import android.content.res.Configuration;
@@ -176,9 +176,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     super.onComputeInsets(outInsets);
 
     // We should extend the touchable region so that Keyman sub keys menu can receive touch events outside the keyboard frame
-    WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-    Point size = new Point(0, 0);
-    wm.getDefaultDisplay().getSize(size);
+    Point size = KMManager.getWindowSize(getApplicationContext());
 
     int inputViewHeight = 0;
     if (inputView != null)

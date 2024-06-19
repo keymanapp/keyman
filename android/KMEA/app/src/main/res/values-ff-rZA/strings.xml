@@ -45,7 +45,7 @@
     <!-- Context: Button label -->
     <string name="label_update" comment="Dialog button to update a resource">Hesɗitin</string>
     <!-- Context: No internet for updates -->
-    <string name="no_internet_connection" comment="Internet connection missing">No internet connection</string>
+    <string name="no_internet_connection" comment="Internet connection missing">Alaa ceŋol Enternet</string>
     <!-- Context: Keyboard Updates -->
     <string name="cannot_connect" comment="Error message when network connection fails">Horiima seŋaade e Sarworde Keyman!</string>
     <!-- Context: Keyboard Updates -->
@@ -128,11 +128,11 @@
     <!-- Context: Model Info -->
     <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">Aɗa yiɗnoo momtude ndee saggitorde?</string>
     <!-- Context: Model Deleted -->
-    <string name="model_deleted" comment="Notification when a dictionary is deleted">Dictionary deleted</string>
+    <string name="model_deleted" comment="Notification when a dictionary is deleted">Saggitorde momtaama</string>
     <!-- Context: Language Settings Keyboard install strings -->
     <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">Tappirde %1$s aafaama</string>
     <!-- Context: Language Settings Keyboard uninstall strings -->
-    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">Keyboard deleted</string>
+    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">Tappirde momtaama</string>
     <!-- Context: Language Settings menu strings -->
     <string name="enable_corrections" comment="Enable corrections from the suggestion banner">Hurmin caatagol</string>
     <!-- Context: Language Settings menu strings -->
@@ -168,5 +168,5 @@
     <!-- Context: Other strings -->
     <string name="help_bubble_text">Tappu ɗoo ngam waylude tappirde</string>
     <!-- Context: anywhere -->
-    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
+    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Horiima hurminde wanngorde geese</string>
 </resources>

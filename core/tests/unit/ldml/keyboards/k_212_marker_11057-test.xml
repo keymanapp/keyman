@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE keyboardTest3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/45/dtd/ldmlKeyboardTest3.dtd">
+<keyboardTest3 conformsTo="techpreview">
+  <info keyboard="k_212_marker_11057.xml" author="Team Keyboard" name="marker" />
+  <tests name="regression-11057">
+    <test name="caret-a">
+      <keystroke key="caret" />
+      <keystroke key="a" />
+      <check result="A" />
+    </test>
+    <test name="umlaut-e">
+      <keystroke key="umlaut" />
+      <keystroke key="e" />
+      <check result="E" />
+    </test>
+    <test name="crasher">
+      <keystroke key="caret"/>
+      <keystroke key="caret"/>
+      <keystroke key="umlaut"/>
+      <check result=""/>
+    </test>
+  </tests>
+</keyboardTest3>

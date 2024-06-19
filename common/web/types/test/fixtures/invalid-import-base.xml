@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info author="srl295" indicator="🙀" layout="qwerty"  name="TestKbd"/>
+
+  <keys>
+    <import base="SOME_INVALID_BASE" path="abcd/keys-Zyyy-punctuation.xml"/> <!-- invalid -->
+    <key id="hmaqtugha" output="ħ" />
+    <key id="that" output="ថា" />
+  </keys>
+
+</keyboard3>

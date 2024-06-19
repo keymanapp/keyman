@@ -82,6 +82,8 @@ type
     function GetTextFileFormat: TTextFileFormat;
 
   protected
+    property EditorFrame: TframeTextEditor read FEditorFrame;
+
     function GetHelpTopic: string; override;
     function DoSaveFile: Boolean; override;
     function DoOpenFile: Boolean; override;
@@ -118,7 +120,6 @@ uses
   CharacterDragObject,
   CharMapDropTool,
   ClipBrd,
-  CompileKeymanWeb,
   dmActionsMain,
   dmActionsTextEditor,
   keymanstrings,

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Test Keyboard
+-->
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="en" conformsTo="45">
+  <info author="srl295" indicator="🙀" layout="qwerty"  name="Marker Escape Test"/>
+
+  <displays>
+  </displays>
+
+  <keys>
+    <!-- fourty markers.  so that the next one would have its representation as '(' -->
+    <key id="1" output="\m{m01}\m{m02}\m{m03}\m{m04}\m{m05}\m{m06}\m{m07}\m{m08}\m{m09}\m{m10}\m{m11}\m{m12}\m{m13}\m{m14}\m{m15}\m{m16}\m{m17}\m{m18}\m{m19}\m{m20}\m{m21}\m{m22}\m{m23}\m{m24}\m{m25}\m{m26}\m{m27}\m{m28}\m{m29}\m{m30}\m{m31}\m{m32}\m{m33}\m{m34}\m{m35}\m{m36}\m{m37}\m{m38}\m{m39}\m{m40}"/>
+    <!-- this marker should output as U+FFFF U+0008 U+0029  which will break regex -->
+    <key id="z" output="\m{z}" />
+  </keys>
+
+  <layers formId="us">
+    <layer modifiers="none" id="base">
+      <row keys="B 1 2 3" />
+      <row keys="q w e" /> <!-- etc -->
+      <row keys="a s d" /> <!-- etc -->
+      <row keys="z x c" /> <!-- etc -->
+    </layer>
+  </layers>
+
+  <transforms type="simple">
+    <transformGroup>
+      <transform from="\m{z}e" to="E" /> <!-- will end up as '…(e' an unclosed group -->
+    </transformGroup>
+  </transforms>
+</keyboard3>

@@ -1,85 +1,45 @@
 #!/usr/bin/env bash
-# Build Keyman Engine for Android, Keyman for Android, and FirstVoices Android app
-# Use '-clean' flag to clean build artifacts (won't do other build steps)
-
-# Set sensible script defaults:
-# set -e: Terminate script if a command returns an error
-set -e
-# set -u: Terminate script if an unset variable is used
-#set -u: Not set because of $RELEASE_OEM
-# set -x: Debugging use, print each statement
-# set -x
-
+#
+# Build Keyman Engine for Android, Keyman for Android, OEM FirstVoices Android app,
+# Samples: KMsample1 and KMSample2, Test - KeyboardHarness
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-#
-# Prevents 'clear' on exit of mingw64 bash shell
-#
-SHLVL=0
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-# Clean build artifacts: keyman-engine.aar libaries, output and upload directories
-clean ( ) {
-  cd "$KEYMAN_ROOT/android"
+################################ Main script ################################
 
-  find . -name "keyman-engine.aar" | while read fname; do
-    echo "Cleaning $fname"
-    rm $fname
-  done
-  if [ -f "$KEYMAN_ROOT/oem/firstvoices/android/app/libs/keyman-engine.aar" ]; then
-    echo "Cleaning OEM FirstVoices keyman-engine.aar"
-    rm "$KEYMAN_ROOT/oem/firstvoices/android/app/libs/keyman-engine.aar"
-  fi
+builder_describe \
+  "Build Keyman Engine for Android, Keyman for Android, and FirstVoices Android app." \
+  clean \
+  configure \
+  build \
+  test \
+  "publish                                  Publishes the APKs to the Play Store." \
+  --ci+ \
+  --upload-sentry+ \
+  ":engine=KMEA                             Keyman Engine for Android" \
+  ":app=KMAPro                              Keyman for Android" \
+  ":sample1=Samples/KMSample1               Sample app: KMSample1" \
+  ":sample2=Samples/KMSample2               Sample app: KMSample2" \
+  ":keyboardharness=Tests/KeyboardHarness   Test app: KeyboardHarness" \
+  ":fv=../oem/firstvoices/android           OEM FirstVoices for Android app"
 
-  if [ -d "$KEYMAN_ROOT/android/KMAPro/kMAPro/build/outputs" ]; then
-    echo "Cleaning KMAPro build outputs directory"
-    rm -rf "$KEYMAN_ROOT/android/KMAPro/kMAPro/build/outputs"
-  fi
+builder_parse "$@"
 
-  if [ -d "$KEYMAN_ROOT/android/upload" ]; then
-    echo "Cleaning upload directory"
-    rm -rf "$KEYMAN_ROOT/android/upload"
-  fi
-}
+# Override JAVA_HOME to OpenJDK 11
+set_java_home
 
-echo Build KMEA and KMAPro:
+# This script also responsible for cleaning up /android/upload
+builder_run_child_actions clean
 
-# Check about cleaning artifact paths
-if [[ "$1" == "-clean" ]] ; then
-  clean
-  exit
+if builder_start_action clean; then
+  builder_heading "Cleanup /android/upload"
+  rm -rf "$KEYMAN_ROOT/android/upload"
+  builder_finish_action success clean
 fi
 
-# Building Keyman Engine for Android
-
-cd "$KEYMAN_ROOT/android/KMEA"
-./build.sh "$@"
-
-if [ $? -ne 0 ]; then
-    die "ERROR: KMEA/build.sh failed"
-fi
-
-# Building Keyman for Android
-
-cd "$KEYMAN_ROOT/android/KMAPro"
-./build.sh "$@"
-
-if [ $? -ne 0 ]; then
-    die "ERROR: KMAPro/build.sh failed"
-fi
-
-cd "$KEYMAN_ROOT/android"
-
-# Building OEM apps
-
-if [ ! -z "$RELEASE_OEM" ]; then
-  pushd "$KEYMAN_ROOT/oem/firstvoices/android"
-  ./build.sh -download-keyboards -lib-nobuild "$@"
-
-  if [ $? -ne 0 ]; then
-    die "ERROR: oem/firstvoices/android/build.sh failed"
-  fi
-fi
+builder_run_child_actions configure build test publish

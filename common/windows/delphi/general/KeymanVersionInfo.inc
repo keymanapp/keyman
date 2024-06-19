@@ -10,6 +10,7 @@ type
     Tier: string;           // alpha, beta or stable
     Tag: string;            // Tier + Pull Request + Location of build [-alpha|-beta][-test[-1234]][-local]
     VersionWithTag: string; // 14.0.2-alpha-test-1234 or 14.0.2-beta-local or 14.0.2
+    VersionGitTag: string;  // release@14.0.2-alpha-test-1234
     Environment: string;    // alpha, beta, stable, test or local
 
     // These fields are useful only for Windows apps

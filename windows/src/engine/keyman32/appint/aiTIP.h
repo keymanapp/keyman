@@ -35,30 +35,8 @@
 // This can be customised with HKLM\Software\Keyman\Keyman Engine\zap virtual key code
 #define _VK_PREFIX_DEFAULT    0x0E
 
-struct AIDEBUGKEYINFO
-{
-	UINT VirtualKey;
-	DWORD shiftFlags;
-	WCHAR Character, DeadKeyCharacter;
-	BOOL IsUp;
-};
-
 class AITIP : public AIWin2000Unicode
 {
-private:
-	int WM_KEYMANDEBUG_CANDEBUG,
-		WM_KEYMANDEBUG_GETUNICODESTATUS,
-		WM_KEYMANDEBUG_GETCONTEXT,
-		WM_KEYMANDEBUG_ACTION,
-		WM_KEYMANDEBUG_RULEMATCH;
-
-	BOOL FIsDebugControlWindow;
-	HWND GetDebugControlWindow();
-	void Debug_FillContextBuffer();
-  void MergeContextWithCache(PWSTR buf, AppContext *context);   // I4262
-
-	static BOOL IsDebugControlWindow(HWND hwnd);
-
 private:
   BOOL useLegacy;
 
@@ -69,44 +47,23 @@ public:
 	AITIP();
 	~AITIP();
 
-  BOOL DebugControlled();
-
-  // TODO: 5442 This would be better to called SaveContextWithStores or SaveContextWithKbdOptions
-  //       Will be removed with 5442 when removing window core
-  void SaveContext(AppContextWithStores *savedContext);   // I4370   // I4978
-  void RestoreContext(AppContextWithStores *savedContext);   // I4370   // I4978
-
-  /**
-   * Copy the member context
-   *
-   * @param[out]  savedContext  the copied context
-   */
-  void CopyContext(AppContext *savedContext);
-
-   /**
-   * Restore the passed context to the member context
-   *
-   * @param  savedContext  the context to restore
-   */
-  void RestoreContextOnly(AppContext *savedContext);
-
-	virtual BOOL QueueAction(int ItemType, DWORD dwData);
-
 	/* Information functions */
 
 	virtual BOOL CanHandleWindow(HWND ahwnd);
-	virtual BOOL IsWindowHandled(HWND ahwnd);
-	virtual BOOL HandleWindow(HWND ahwnd);
 	virtual BOOL IsUnicode();
 
 	/* Context functions */
 
-	virtual void ReadContext();
+ /**
+   * Reads the current application context upto MAXCONTEXT length into the supplied buffer.
+   * @param  buf      The data buffer to copy current application context into, must
+   *                  be MAXCONTEXT WCHARs or larger.
+   */
+	virtual BOOL ReadContext(PWSTR buf);
 
 	/* Queue and sending functions */
 
 	virtual BOOL SendActions();   // I4196
-	virtual BOOL QueueDebugInformation(int ItemType, LPGROUP Group, LPKEY Rule, PWSTR fcontext, PWSTR foutput, DWORD_PTR dwExtraFlags);
 
 	/* TIP interactions */
 

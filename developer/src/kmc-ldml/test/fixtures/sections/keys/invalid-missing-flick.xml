@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="hardware-missing-flick" />
+
+  <keys>
+    <key id="Q" output="Q" flickId="an-undefined-flick-id" />
+    <key id="W" output="W" flickId="flick0" />
+  </keys>
+  <flicks>
+    <flick id="flick0">
+      <flickSegment directions="nw se" keyId="c" />
+    </flick>
+  </flicks>
+  <layers formId="iso">
+    <layer id="base">
+      <!-- beware: this is mapping ` and 1! -->
+      <row keys="Q W" />
+    </layer>
+  </layers>
+</keyboard3>

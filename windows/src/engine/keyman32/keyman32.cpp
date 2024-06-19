@@ -157,27 +157,9 @@ void UninitDebuggingEx();
 BOOL UninitialiseProcess(BOOL Lock)
 {
   if(!Globals_ProcessInitialised()) return TRUE;
-
-	ReleaseKeyboards(Lock);
-
-	UninitDebuggingEx();
-
-  PKEYMAN64THREADDATA _td = ThreadGlobals(); // This is safe because of Globals_ProcessInitialised call above
-  if(_td)
-  {
-	  if(_td->msgbuf) delete _td->msgbuf;
-	  _td->msgbuf = NULL;
-
-	  if(_td->IndexStack) delete _td->IndexStack;
-	  _td->IndexStack = NULL;
-
-    if (_td->miniContext) delete _td->miniContext;
-    _td->miniContext = NULL;
-
-    if (_td->msgbuf) delete _td->msgbuf;
-    _td->msgbuf = NULL;
-  }
-	return TRUE;
+  ReleaseKeyboards(Lock);
+  UninitDebuggingEx();
+  return TRUE;
 }
 
 LONG FStartedInitialise = FALSE;
@@ -239,33 +221,7 @@ BOOL InitThread(HWND hwnd)
     // I2448 - Removed "|| _td->FInitialised" -- this should not be included because sometimes it can be re-initialised.
   }
 
-  // TODO: Check if we are initialising again and don't reallocate memory.  This can happen if Keyman is restarted
-
   _td->FInitialising = TRUE;  // Control re-entrancy, this is thread safe because the variable is per-thread
-
-	_td->IndexStack = new WORD[GLOBAL_ContextStackSize]; //Globals::Ini()->ContextStackSize];  // I3158   // I3524
-	if(!_td->IndexStack)
-	{
- 	  SendDebugMessage(hwnd, sdmGlobal, 0, "InitialiseProcess: Failed to allocate memory for IndexStack");
-    SetLastError(ERROR_KEYMAN_MEMORY_ALLOCATION_FAILED);  // I3143   // I3523
-  	return FALSE;
-  }
-
-	_td->miniContext = new WCHAR[GLOBAL_ContextStackSize]; //Globals::Ini()->ContextStackSize];  // I3158   // I3524
-	if(!_td->miniContext)
-	{
- 	  SendDebugMessage(hwnd, sdmGlobal, 0, "InitialiseProcess: Failed to allocate memory for miniContext");
-    SetLastError(ERROR_KEYMAN_MEMORY_ALLOCATION_FAILED);  // I3143   // I3523
- 	  return FALSE;
- 	}
-
-	_td->msgbuf = new MSG[GLOBAL_MsgStackSize]; //Globals::Ini()->MsgStackSize];  // I3158   // I3524
-	if(!_td->msgbuf)
-	{
- 	  SendDebugMessage(hwnd, sdmGlobal, 0, "InitialiseProcess: Failed to allocate memory for msgbuf");
-    SetLastError(ERROR_KEYMAN_MEMORY_ALLOCATION_FAILED);  // I3143   // I3523
-	  return FALSE;
-  }
 
 	RefreshKeyboards(TRUE);
 
@@ -315,10 +271,6 @@ BOOL InitialiseProcess(HWND hwnd)
 	wm_test_keyman_functioning = RegisterWindowMessage("wm_test_keyman_functioning");
 
 	DoChangeWindowMessageFilter();
-
-  //GetINIAdvanced();   /* I163x - Fix crash due to memory corruption - Globals::Ini not initialized before use - only appeared to happen on x64? */  // I3158   // I3524
-
-	SendDebugMessageFormat(hwnd, sdmGlobal, 0, "ContextStackSize: %d", GLOBAL_ContextStackSize); // Globals::Ini()->ContextStackSize); // I3158   // I3524
 
   return InitThread(hwnd);
 }
@@ -461,13 +413,6 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Initialise(HWND Handle, BOOL 
 	return TRUE;
 }
 
-/*void GetINIAdvanced(void) // I3158   // I3524
-{
-	Globals::Ini()->ContextStackSize = 80;
-	Globals::Ini()->MsgStackSize = 80;
-	Globals::Ini()->MaxKeyboards = 32;
-}*/
-
 extern "C" BOOL _declspec(dllexport) WINAPI Keyman_StartExit(void)  // I3092
 {
   *Globals::Keyman_Shutdown() = TRUE;
@@ -492,7 +437,6 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Exit(void)
   *Globals::Keyman_Shutdown() = TRUE;
 
   ReleaseKeyboards(TRUE);
-  Addin_Release();
 
   if(!Globals::get_Keyman_Initialised())
   {
@@ -527,138 +471,6 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_RestartEngine()
   }
 
   return TRUE;
-}
-
-/*******************************************************************************************/
-/*                                                                                         */
-/* Keyman Keyboard Override Functions                                                      */
-/*                                                                                         */
-/*******************************************************************************************/
-
-extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_StopForcingKeyboard();
-
-void RefreshPreservedKeys(BOOL Activating);
-
-extern "C" BOOL  _declspec(dllexport) WINAPI Keyman_ForceKeyboard(PCSTR FileName)
-{
-	SendDebugMessageFormat(0,sdmGlobal,0,"Keyman_ForceKeyboard: ENTER %s", FileName);
-
-  Keyman_StopForcingKeyboard();		// 7.0.219.0
-
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return FALSE;
-
-  strncpy(_td->ForceFileName, FileName, MAX_PATH - 1);
-	_td->ForceFileName[MAX_PATH-1] = 0;
-
-	if(_td->lpActiveKeyboard)
-	{
-		DeactivateDLLs(_td->lpActiveKeyboard);
-	}
-
-	_td->lpActiveKeyboard = new INTKEYBOARDINFO;
-  memset(_td->lpActiveKeyboard, 0, sizeof(INTKEYBOARDINFO));    // I2437 - Crash unloading keyboard due to keyboard options not init
-	/*_td->lpActiveKeyboard->KeymanID = 0;
-	_td->lpActiveKeyboard->nIMDLLs = 0;
-	_td->lpActiveKeyboard->IMDLLs = NULL;
-  _td->lpActiveKeyboard->KeyboardOptions = NULL;*/
-  _splitpath_s(FileName, NULL, 0, NULL, 0, _td->lpActiveKeyboard->Name, sizeof(_td->lpActiveKeyboard->Name), NULL, 0);
-  // TODO: 5442 - remove if/ else as there will no longer be the old LoadKeyboard option
-  if (Globals::get_CoreIntegration()) {
-    PWCHAR keyboardPath   = strtowstr(_td->ForceFileName);
-    km_kbp_status err_status = km_kbp_keyboard_load(keyboardPath, &_td->lpActiveKeyboard->lpCoreKeyboard);
-    if (err_status != KM_KBP_STATUS_OK) {
-      SendDebugMessageFormat(0, sdmGlobal, 0, "Keyman_ForceKeyboard Core: km_kbp_keyboard_load failed for %ls with error status [%d]", keyboardPath, err_status); // TODO: 5442 - remove word Core
-      delete keyboardPath;
-      return FALSE;
-    }
-    delete keyboardPath;
-    SendDebugMessageFormat(0, sdmGlobal, 0, "Keyman_ForceKeyboard Core: %s OK", FileName); // TODO: 5442 - remove word Core
-
-    km_kbp_option_item *core_environment = nullptr;
-
-    if(!SetupCoreEnvironment(&core_environment)) {
-      SendDebugMessageFormat(0, sdmLoad, 0, "Keyman_ForceKeyboard Core: Unable to set environment options for keyboard %s", FileName); // TODO: 5442 - remove word Core
-      return FALSE;
-    }
-
-    err_status =
-        km_kbp_state_create(_td->lpActiveKeyboard->lpCoreKeyboard, core_environment, &_td->lpActiveKeyboard->lpCoreKeyboardState);
-
-    DeleteCoreEnvironment(core_environment);
-
-    if (err_status != KM_KBP_STATUS_OK) {
-      SendDebugMessageFormat(
-          0, sdmGlobal, 0, "Keyman_ForceKeyboard Core: km_kbp_state_create failed with error status [%d]", err_status);
-      // Dispose of the keyboard to leave us in a consitent state
-      ReleaseKeyboardMemoryCore(&_td->lpActiveKeyboard->lpCoreKeyboard);
-      return FALSE;
-    }
-
-    ResetCapsLock();
-    err_status = km_kbp_keyboard_get_imx_list(_td->lpActiveKeyboard->lpCoreKeyboard, &_td->lpActiveKeyboard->lpIMXList);
-    if (err_status != KM_KBP_STATUS_OK) {
-      SendDebugMessageFormat(0, sdmLoad, 0, "Keyman_ForceKeyboard Core: km_kbp_keyboard_get_imx_list failed with error status [%d]", err_status);
-      // Dispose of the keyboard to leave us in a consistent state
-      ReleaseKeyboardMemoryCore(&_td->lpActiveKeyboard->lpCoreKeyboard);
-      return FALSE;
-    }
-
-    LoadDLLsCore(_td->lpActiveKeyboard);
-    ActivateDLLs(_td->lpActiveKeyboard);
-    LoadKeyboardOptionsREGCore(_td->lpActiveKeyboard, _td->lpActiveKeyboard->lpCoreKeyboardState);
-    RefreshPreservedKeys(TRUE);
-    return TRUE;
-  } else {
-    if (LoadKeyboard(_td->ForceFileName, &_td->lpActiveKeyboard->Keyboard)) {
-      SendDebugMessageFormat(0, sdmGlobal, 0, "Keyman_ForceKeyboard: %s OK", FileName);
-      ResetCapsLock();
-      LoadDLLs(_td->lpActiveKeyboard);
-      ActivateDLLs(_td->lpActiveKeyboard);
-      LoadKeyboardOptions(_td->lpActiveKeyboard);  // I2437 - Crash unloading keyboard due to keyboard options not set
-      RefreshPreservedKeys(TRUE);
-      return TRUE;
-    }
-  }
-	SendDebugMessageFormat(0,sdmGlobal,0,"Keyman_ForceKeyboard: %s FAIL", FileName);
-
-	delete _td->lpActiveKeyboard;
-	_td->lpActiveKeyboard = NULL;
-
-	_td->ForceFileName[0] = 0;
-	return FALSE;
-}
-
-extern "C" BOOL _declspec(dllexport) WINAPI Keyman_StopForcingKeyboard()
-{
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td)
-  {
-    SetLastError(ERROR_KEYMAN_THREAD_DATA_NOT_READY); // I3173   // I3525
-    return FALSE;
-  }
-
-  if(!_td->lpActiveKeyboard)
-  {
-    SetLastError(ERROR_KEYMAN_KEYBOARD_NOT_ACTIVE); // I3173   // I3525
-    return FALSE;
-  }
-	SendDebugMessageFormat(0,sdmGlobal,0,"Keyman_StopForcingKeyboard");
-	if(_td->ForceFileName[0])
-	{
-		SendDebugMessageFormat(0,sdmGlobal,0,"Keyman_StopForcingKeyboard: Stopping forcing");
-		if(!DeactivateDLLs(_td->lpActiveKeyboard)) return FALSE;  // I3173   // I3525
-		if(!UnloadDLLs(_td->lpActiveKeyboard)) return FALSE;  // I3173   // I3525
-		_td->ForceFileName[0] = 0;
-    FreeKeyboardOptions(_td->lpActiveKeyboard);
-		ReleaseKeyboardMemory(_td->lpActiveKeyboard->Keyboard);
-    ReleaseStateMemoryCore(&_td->lpActiveKeyboard->lpCoreKeyboardState);
-    ReleaseKeyboardMemoryCore(&_td->lpActiveKeyboard->lpCoreKeyboard);
-    RefreshPreservedKeys(FALSE);
-    delete _td->lpActiveKeyboard;
-		_td->lpActiveKeyboard = NULL;
-	}
-	return TRUE;
 }
 
 //---------------------------------------------------------------------------------------------------------
@@ -698,17 +510,17 @@ BOOL ReleaseKeyboardMemory(LPKEYBOARD kbd)
 	return TRUE;
 }
 
-BOOL ReleaseStateMemoryCore(km_kbp_state **state) {
+BOOL ReleaseStateMemoryCore(km_core_state **state) {
   if (!*state) return TRUE;
-  km_kbp_state_dispose(*state);
+  km_core_state_dispose(*state);
   *state = NULL;
   return TRUE;
 }
 
-BOOL ReleaseKeyboardMemoryCore(km_kbp_keyboard **kbd) {
+BOOL ReleaseKeyboardMemoryCore(km_core_keyboard **kbd) {
   if (!*kbd)
     return TRUE;
-  km_kbp_keyboard_dispose(*kbd);
+  km_core_keyboard_dispose(*kbd);
   *kbd = NULL;
   return TRUE;
 }
@@ -936,8 +748,6 @@ void RefreshKeyboards(BOOL Initialising)
 
   // Can happen when multiple top-level windows for one process
 
-	Addin_Refresh();
-
 	SendDebugMessageFormat(0,sdmGlobal,0,"---ENTER RefreshKeyboards---");
 	//FInRefreshKeyboards = TRUE;
 
@@ -1006,8 +816,6 @@ void RefreshKeyboards(BOOL Initialising)
       RefreshKeyboardProfiles(kp, FALSE); // Read standard profiles
       RefreshKeyboardProfiles(kp, TRUE);  // Read transient profiles
 
-			kp->Keyboard = NULL;
-
 			SendDebugMessageFormat(0,sdmGlobal,0,"RefreshKeyboards: Added keyboard %s, %d",
 				kp->Name, kp->KeymanID);
 			i++;
@@ -1035,13 +843,15 @@ void ReleaseKeyboards(BOOL Lock)
 	if(!_td || !_td->lpKeyboards) return;
 
 
-  if(Lock) if(_td->lpActiveKeyboard && !_td->ForceFileName[0]) DeactivateDLLs(_td->lpActiveKeyboard);
+  if(Lock) {
+    if(_td->lpActiveKeyboard) {
+      DeactivateDLLs(_td->lpActiveKeyboard);
+    }
+  }
 
 	for(int i = 0; i < _td->nKeyboards; i++)
 	{
 		if(Lock) UnloadDLLs(&_td->lpKeyboards[i]);
-    FreeKeyboardOptions(&_td->lpKeyboards[i]);
-		ReleaseKeyboardMemory(_td->lpKeyboards[i].Keyboard);
     ReleaseStateMemoryCore(&_td->lpKeyboards[i].lpCoreKeyboardState);
     ReleaseKeyboardMemoryCore(&_td->lpKeyboards[i].lpCoreKeyboard);
     if(_td->lpKeyboards[i].Profiles) delete _td->lpKeyboards[i].Profiles;   // I3581
@@ -1051,7 +861,6 @@ void ReleaseKeyboards(BOOL Lock)
 	delete _td->lpKeyboards;
 
 	_td->lpKeyboards = NULL;
-	if(!_td->ForceFileName[0]) _td->lpActiveKeyboard = NULL;
 }
 
 /**

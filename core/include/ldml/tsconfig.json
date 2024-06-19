@@ -1,0 +1,15 @@
+{
+    "extends": "../../../tsconfig.base.json",
+    "compilerOptions": {
+        "composite": true,
+        "declaration": true,
+        "rootDir": ".",
+        "outDir": "build/",
+    },
+    "exclude": [
+        "node_modules"
+    ],
+    "files": [
+        "keyman_core_ldml.ts"
+    ]
+}

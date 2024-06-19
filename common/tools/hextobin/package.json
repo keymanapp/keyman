@@ -1,0 +1,19 @@
+{
+  "name": "@keymanapp/hextobin",
+  "description": "hextobin conversion tool",
+  "type": "module",
+  "private": true,
+  "keywords": [
+    "keyman",
+    "hex",
+    "binary"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^5.1.0"
+  },
+  "main": "build/index.js",
+  "bin": {
+    "hextobin": "build/hextobin.js"
+  }
+}

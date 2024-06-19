@@ -134,14 +134,11 @@
         </DCCReference>
         <DCCReference Include="..\..\..\common\windows\delphi\general\RegistryKeys.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\VersionInfo.pas"/>
-        <DCCReference Include="..\common\delphi\compiler\compile.pas"/>
         <DCCReference Include="main\KeymanDeveloperOptions.pas"/>
         <DCCReference Include="debug\UfrmKeyTest.pas">
             <Form>frmKeyTest</Form>
         </DCCReference>
-        <DCCReference Include="..\common\delphi\compiler\CompilePackage.pas"/>
         <DCCReference Include="main\KeymanDeveloperUtils.pas"/>
-        <DCCReference Include="..\..\..\common\windows\delphi\general\CRC32.pas"/>
         <DCCReference Include="child\UfrmEditor.pas">
             <Form>frmEditor</Form>
         </DCCReference>
@@ -165,8 +162,8 @@
         <DCCReference Include="project\Keyman.Developer.System.Project.kpsProjectFile.pas"/>
         <DCCReference Include="project\Keyman.Developer.System.Project.kmxProjectFile.pas"/>
         <DCCReference Include="project\Keyman.Developer.System.Project.modelTsProjectFile.pas"/>
-        <DCCReference Include="project\Keyman.Developer.UI.Project.UfrmProjectSettings.pas">
-            <Form>frmProjectSettings</Form>
+        <DCCReference Include="project\Keyman.Developer.UI.Project.UfrmProjectSettings20.pas">
+            <Form>frmProjectSettings20</Form>
         </DCCReference>
         <DCCReference Include="project\Keyman.Developer.UI.Project.ProjectFileUI.pas"/>
         <DCCReference Include="project\Keyman.Developer.UI.Project.ProjectUI.pas"/>
@@ -237,8 +234,6 @@
             <Form>frmNewFileDetails</Form>
         </DCCReference>
         <DCCReference Include="..\..\..\common\windows\delphi\general\StockFileNames.pas"/>
-        <DCCReference Include="compile\CompileKeymanWeb.pas"/>
-        <DCCReference Include="compile\KeymanWebKeyCodes.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\utildir.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\tlb\ADOX_TLB.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\tlb\ADODB_TLB.pas"/>
@@ -321,7 +316,6 @@
         <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardExportPNG.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\tlb\MSXML2_TLB.pas"/>
         <DCCReference Include="main\CharacterInfo.pas"/>
-        <DCCReference Include="..\common\delphi\compiler\CompilePackageInstaller.pas"/>
         <DCCReference Include="main\UTikeDebugMode.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\keyboards\kmxfileconsts.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\keyboards\kmxfileutils.pas"/>
@@ -351,8 +345,8 @@
         <DCCReference Include="main\UfrmMessages.pas">
             <Form>frmMessages</Form>
         </DCCReference>
-        <DCCReference Include="actions\dmActionsKeyboardEditor.pas">
-            <Form>modActionsKeyboardEditor</Form>
+        <DCCReference Include="actions\dmActionsDebugger.pas">
+            <Form>modActionsDebugger</Form>
             <DesignClass>TDataModule</DesignClass>
         </DCCReference>
         <DCCReference Include="actions\dmActionsMain.pas">
@@ -383,6 +377,9 @@
         </DCCReference>
         <DCCReference Include="child\UfrmDebug.pas">
             <Form>frmDebug</Form>
+        </DCCReference>
+        <DCCReference Include="child\Keyman.Developer.UI.Debug.UfrmLdmlKeyboardDebug.pas">
+            <Form>frmLdmlKeyboardDebug</Form>
         </DCCReference>
         <DCCReference Include="child\UfrmPackageEditor.pas">
             <Form>frmPackageEditor</Form>
@@ -418,7 +415,6 @@
         <DCCReference Include="dialogs\UfrmKeyboardFonts.pas">
             <Form>frmKeyboardFonts</Form>
         </DCCReference>
-        <DCCReference Include="..\common\delphi\compiler\CompileErrorCodes.pas"/>
         <DCCReference Include="..\common\delphi\general\KeyboardFonts.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\JsonUtil.pas"/>
         <DCCReference Include="main\TikeUnicodeData.pas"/>
@@ -472,16 +468,21 @@
         <DCCReference Include="..\..\..\common\windows\delphi\web\Keyman.System.HttpServer.Base.pas"/>
         <DCCReference Include="http\Keyman.Developer.System.HttpServer.AppSource.pas"/>
         <DCCReference Include="main\Keyman.UI.FontUtils.pas"/>
-        <DCCReference Include="..\kmconvert\Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter.pas"/>
+        <DCCReference Include="..\kmconvert\Keyman.Developer.System.VisualKeyboardToTouchLayoutConverter.pas"/>
         <DCCReference Include="project\Keyman.Developer.System.Project.kmnProjectFileAction.pas"/>
         <DCCReference Include="project\Keyman.Developer.System.Project.kpsProjectFileAction.pas"/>
         <DCCReference Include="project\Keyman.Developer.UI.Project.UfrmNewProjectParameters.pas">
             <Form>frmNewProjectParameters</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="project\Keyman.Developer.UI.Project.UfrmNewLDMLKeyboardProjectParameters.pas">
+            <Form>frmNewLDMLKeyboardProjectParameters</Form>
         </DCCReference>
         <DCCReference Include="project\Keyman.Developer.UI.Project.UfrmNewProject.pas">
             <Form>frmNewProject</Form>
         </DCCReference>
         <DCCReference Include="..\kmconvert\Keyman.Developer.System.KeyboardProjectTemplate.pas"/>
+        <DCCReference Include="..\kmconvert\Keyman.Developer.System.LdmlKeyboardProjectTemplate.pas"/>
         <DCCReference Include="main\Keyman.Developer.UI.ImportWindowsKeyboardDialogManager.pas"/>
         <DCCReference Include="..\kmconvert\Keyman.Developer.System.ImportWindowsKeyboard.pas"/>
         <DCCReference Include="..\kmconvert\Keyman.Developer.System.ImportKeyboardDLL.pas"/>
@@ -542,18 +543,47 @@
         </DCCReference>
         <DCCReference Include="debug\UfrmDebugStatus_Options.pas">
             <Form>frmDebugStatus_Options</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="main\Keyman.Developer.System.KeymanDeveloperPaths.pas"/>
-        <DCCReference Include="..\common\delphi\compiler\Keyman.Developer.System.ValidateKpsFile.pas"/>
         <DCCReference Include="dialogs\Keyman.Developer.UI.UfrmServerOptions.pas">
             <Form>frmServerOptions</Form>
-            <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="http\Keyman.Developer.System.ServerAPI.pas"/>
         <DCCReference Include="main\Keyman.System.FontLoadUtil.pas"/>
         <DCCReference Include="http\Keyman.Developer.UI.ServerUI.pas"/>
         <DCCReference Include="..\kmconvert\Keyman.Developer.System.GenerateKeyboardIcon.pas"/>
+        <DCCReference Include="dialogs\examples\Keyman.Developer.UI.UfrmEditLanguageExample.pas">
+            <Form>frmEditLanguageExample</Form>
+        </DCCReference>
+        <DCCReference Include="dialogs\relatedPackages\Keyman.Developer.UI.UfrmEditRelatedPackage.pas">
+            <Form>frmEditRelatedPackage</Form>
+        </DCCReference>
+        <DCCReference Include="dialogs\packageWebFonts\Keyman.Developer.UI.UfrmEditPackageWebFonts.pas">
+            <Form>frmEditPackageWebFonts</Form>
+        </DCCReference>
+        <DCCReference Include="compile\Keyman.Developer.System.KmcWrapper.pas"/>
+        <DCCReference Include="project\Keyman.Developer.UI.Project.UpgradeProject.pas"/>
+        <DCCReference Include="project\Keyman.Developer.System.Project.xmlLdmlProjectFile.pas"/>
+        <DCCReference Include="project\Keyman.Developer.System.Project.xmlLdmlProjectFileAction.pas"/>
+        <DCCReference Include="project\Keyman.Developer.UI.Project.xmlLdmlProjectFileUI.pas"/>
+        <DCCReference Include="child\Keyman.Developer.UI.UfrmLdmlKeyboardEditor.pas">
+            <Form>frmLdmlKeyboardEditor</Form>
+        </DCCReference>
+        <DCCReference Include="actions\dmActionsKeyboardEditor.pas">
+            <Form>modActionsKeyboardEditor</Form>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="project\Keyman.Developer.UI.Project.UfrmProjectSettings.pas">
+            <Form>frmProjectSettings</Form>
+        </DCCReference>
+        <DCCReference Include="main\Keyman.Developer.System.TikeCommandLine.pas"/>
+        <DCCReference Include="main\Keyman.Developer.System.MultiProcess.pas"/>
+        <DCCReference Include="main\Keyman.Developer.System.TikeMultiProcess.pas"/>
+        <DCCReference Include="main\Keyman.System.CopyDataHelper.pas"/>
+        <DCCReference Include="main\Keyman.Developer.System.ProjectOwningFile.pas"/>
+        <DCCReference Include="main\Keyman.Developer.System.Main.pas"/>
+        <DCCReference Include="main\Keyman.Developer.System.LaunchProjects.pas"/>
+        <DCCReference Include="debug\Keyman.System.Debug.DebugUtils.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
@@ -615,27 +645,15 @@
                 <Platform value="Win64">False</Platform>
             </Platforms>
             <Deployment Version="3">
-                <DeployFile LocalName="bin\Win32\Debug\tike.rsm" Configuration="Debug" Class="DebugSymbols">
-                    <Platform Name="Win32">
-                        <RemoteName>tike.rsm</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="bin\Win32\Debug\tike.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>tike.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="tike.rsm" Configuration="Debug" Class="DebugSymbols">
+                <DeployFile LocalName="bin\Win32\Debug\tike.rsm" Configuration="Debug" Class="DebugSymbols">
                     <Platform Name="Win32">
                         <RemoteName>tike.rsm</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="tike.exe" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>tike.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

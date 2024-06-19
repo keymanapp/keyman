@@ -1,0 +1,21 @@
+store(&NAME) '023 - options with save'
+c Description: Tests basic option rules with save
+c keys: [K_A][K_1][K_A][K_0][K_A][K_2]
+c expected: no foo.foo.no foo.
+c context: 
+c expected option: foo=0
+c saved option: foo=0
+
+store(&version) '10.0'
+
+store(foo) '0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
+if(foo = '1') + 'a' > 'foo.'
+if(foo = '0') + 'a' > 'no foo.'
++ '1' > set(foo = '1')
++ '0' > set(foo = '0')
++ '2' > save(foo)

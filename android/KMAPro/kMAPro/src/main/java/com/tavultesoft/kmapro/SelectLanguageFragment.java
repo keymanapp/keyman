@@ -23,11 +23,11 @@ import androidx.fragment.app.Fragment;
 import com.stepstone.stepper.BlockingStep;
 import com.stepstone.stepper.StepperLayout;
 import com.stepstone.stepper.VerificationError;
-import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.data.KeyboardController;
-import com.tavultesoft.kmea.packages.PackageProcessor;
-import com.tavultesoft.kmea.util.BCP47;
-import com.tavultesoft.kmea.util.KMLog;
+import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.data.KeyboardController;
+import com.keyman.engine.packages.PackageProcessor;
+import com.keyman.engine.util.BCP47;
+import com.keyman.engine.util.KMLog;
 
 import org.json.JSONObject;
 
@@ -179,7 +179,7 @@ public final class SelectLanguageFragment extends Fragment implements BlockingSt
     }
 
     String[] from = new String[]{titleKey, subtitleKey, iconKey};
-    int[] to = new int[]{R.id.text1, R.id.text2, com.tavultesoft.kmea.R.id.image1};
+    int[] to = new int[]{R.id.text1, R.id.text2, com.keyman.engine.R.id.image1};
 
     adapter = new KMListAdapter(context, list, R.layout.list_row_layout2, from, to);
     listView.setAdapter(adapter);

@@ -1,2 +1,5 @@
 # version.inc.ts is generated during the build
 version.inc.ts
+
+# keyman-version.mts (esm clone of version.inc.ts) is generated during the build
+keyman-version.mts

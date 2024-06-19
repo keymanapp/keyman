@@ -1,0 +1,6 @@
+{
+  "check-coverage": true,
+  "temp-directory": ".nyc_output",
+  "lines": 90,
+  "reporter": "text"
+}

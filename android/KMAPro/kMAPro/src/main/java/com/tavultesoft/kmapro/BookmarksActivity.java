@@ -37,8 +37,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 
-import com.tavultesoft.kmea.BaseActivity;
-import com.tavultesoft.kmea.util.KMLog;
+import com.keyman.engine.BaseActivity;
+import com.keyman.engine.util.KMLog;
 
 public class BookmarksActivity extends BaseActivity {
   private static final String TAG = "BookmarksActivity";
@@ -173,6 +173,7 @@ public class BookmarksActivity extends BaseActivity {
 
   @Override
   public void onBackPressed() {
+    super.onBackPressed();
     finish();
     overridePendingTransition(0, android.R.anim.fade_out);
   }

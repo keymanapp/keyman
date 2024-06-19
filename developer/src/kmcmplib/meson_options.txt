@@ -1,0 +1,1 @@
+option('full_test', type: 'boolean', value: false)

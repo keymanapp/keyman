@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="nod-Lana" conformsTo="45">
+  <info name="nod-Lana Test"/>
+
+  <keys />
+
+  <transforms type="simple">
+    <transformGroup>
+      <!-- from the spec: nod-Lana for ᩅᩫ᩶  -->
+      <reorder from="\u{1A60}" order="127" />
+      <reorder from="\u{1A6B}" order="42" />
+      <reorder from="[\u{1A75}-\u{1A79}]" order="55" />
+      <reorder before="\u{1A6B}" from="\u{1A60}\u{1A45}" order="10" />
+      <reorder before="\u{1A6B}[\u{1A75}-\u{1A79}]" from="\u{1A60}\u{1A45}" order="10" />
+      <reorder before="\u{1A6B}" from="\u{1A60}[\u{1A75}-\u{1A79}]\u{1A45}" order="10 55 10" />
+    </transformGroup>
+  </transforms>
+</keyboard3>

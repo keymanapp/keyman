@@ -3,7 +3,7 @@
   Description:  Internal keyboard class and adaptor class for the API.
   Create Date:  2 Oct 2018
   Authors:      Tim Eves (TSE)
-  History:      2 Oct 2018 - TSE - Refactored out of km_kbp_keyboard_api.cpp
+  History:      2 Oct 2018 - TSE - Refactored out of km_core_keyboard_api.cpp
 */
 
 #pragma once
@@ -12,29 +12,30 @@
 #include <string>
 #include <type_traits>
 
-#include <keyman/keyboardprocessor.h>
+#include "keyman_core.h"
+
 #include "jsonpp.hpp"
 #include "utfcodec.hpp"
 
 // Forward declarations
 
 namespace km {
-namespace kbp
+namespace core
 {
   class path
   {
   public:
     using char_type = std::remove_const_t<
-                        std::remove_pointer_t<km_kbp_path_name>>;
+                        std::remove_pointer_t<km_core_path_name>>;
     using string_type = std::basic_string<char_type>;
-    static constexpr char_type const parent_separator = _KM_KBP_PATH_SEPARATOR,
-                                     suffix_separator = _KM_KBP_EXT_SEPARATOR;
+    static constexpr char_type const parent_separator = _KM_CORE_PATH_SEPARATOR,
+                                     suffix_separator = _KM_CORE_EXT_SEPARATOR;
   private:
     string_type _path;
 
     void normalise() {
-      #if '/' != _KM_KBP_PATH_SEPARATOR
-      std::replace(_path.begin(), _path.end(), char_type('/'), _KM_KBP_PATH_SEPARATOR);
+      #if '/' != _KM_CORE_PATH_SEPARATOR
+      std::replace(_path.begin(), _path.end(), char_type('/'), _KM_CORE_PATH_SEPARATOR);
       #endif
     }
 
@@ -59,22 +60,33 @@ namespace kbp
     template<typename C>
     path(C const * p): path(std::basic_string<C>(p)) {}
 
-
+    /**
+     * @return the enclosing directory's path
+    */
     path parent() const {
       auto i = _path.find_last_of(parent_separator);
       return _path.substr(0, i == string_type::npos ? 0UL : i);
     }
 
+    /**
+     * @return just the filename, such as "angkor.kmx"
+    */
     path name() const {
       auto i = _path.find_last_of(parent_separator);
       return _path.substr(i == string_type::npos ? 0UL : i+1);
     }
 
+    /**
+     * @return the suffix of the file, such as ".kmx"
+    */
     path suffix() const {
       auto i = _path.find_last_of(suffix_separator);
       return _path.substr(i == string_type::npos ? _path.size() : i);
     }
 
+    /**
+     * @return just the child filename, such as "angkor" for "angkor.kmx"
+    */
     path stem() const {
       auto psep = _path.find_last_of(parent_separator),
            ssep = _path.find_last_of(suffix_separator);
@@ -82,6 +94,10 @@ namespace kbp
                           ssep == string_type::npos ? _path.size() : ssep);
     }
 
+    /**
+     * Mutate the path to change the extension
+     * @param replacement new suffix, such as ".kmp". default is to remove the suffix
+    */
     void replace_extension(path const & replacment = path()) {
       _path.resize(std::min(_path.find_last_of(suffix_separator), _path.size()));
       _path += replacment;
@@ -142,5 +158,5 @@ namespace kbp
     return os;
   }
 
-} // namespace kbp
+} // namespace core
 } // namespace km

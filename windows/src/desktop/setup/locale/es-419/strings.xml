@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="ssLanguageName" comment="User interface language name in the UI language">Español</string>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">Español - Latinoamérica</string>
   <string name="ssApplicationTitle">Instalador de $APPNAME $VERSION</string>
   <string name="ssTitle">Instalar $APPNAME $VERSION</string>
   <string name="ssInstallSuccess">$APPNAME $VERSION se ha instalado correctamente.</string>
@@ -72,9 +72,7 @@
   <string name="ssDownloadingTitle">Descargando %0:s</string>
   <!-- Parameters: %0:s: filename -->
   <string name="ssDownloadingText">Descargando %0:s</string>
-  <string name="ssOffline">El instalador de $APPNAME no pudo conectarse a keyman.com para descargar los recursos adicionales.
-
-Comprueba que estás en línea y da permiso al instalador de $APPNAME para acceder a Internet en la configuración de tu cortafuegos.
-
-Haz clic en Abortar para salir del instalador, en Reintentar para descargar los recursos de nuevo o en Ignorar para continuar sin conexión.</string>
+  <string name="ssOffline">El instalador de $APPNAME no pudo conectarse a keyman.com para descargar los recursos adicionales.</string>
+  <string name="ssOffline2">Comprueba que estás en línea y da permiso al instalador de $APPNAME para acceder a Internet en la configuración de tu cortafuegos.</string>
+  <string name="ssOffline3">Haz clic en Abortar para salir del instalador, en Reintentar para reintentar descargar los recursos o en Ignorar para continuar sin conexión.</string>
 </resources>

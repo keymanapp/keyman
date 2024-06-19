@@ -4,10 +4,12 @@
 
 package com.tavultesoft.kmapro;
 
-import com.tavultesoft.kmea.BaseActivity;
+import com.keyman.engine.BaseActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.WebChromeClient;
@@ -87,9 +89,20 @@ public class InfoActivity extends BaseActivity {
 
       @Override
       public boolean shouldOverrideUrlLoading(WebView view, String url) {
-        if (url != null && !url.toLowerCase().equals("about:blank")) {
+        String lowerURL = url.toLowerCase();
+        if (lowerURL.equals("about:blank")) {
+          return true; // never load a blank page, e.g. when the component initializes
+        }
+
+        Uri uri = Uri.parse(url);
+
+        // All links that aren't internal Keyman help links open in user's browser
+        if (!url.contains(htmlPath)) {
+          Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+          startActivity(intent);
+        } else {
           view.loadUrl(url);
-         }
+        }
 
         return true;
       }

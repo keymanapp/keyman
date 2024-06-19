@@ -46,7 +46,7 @@ A virtual key board event and modifier map recevied from the Platform layer to b
 processed with the state object for this Client application.
 - __Virtual Key:__
 A code based on the US English layout, with values matching the Windows
-virtual key codes. See `keyboardprocessor_vkeys.h` for definitions.
+virtual key codes. See `keyman_core_api_vkeys.h` for definitions.
 - __Modifier Key:__
 The set of Control, Shift, Alt, Caps Lock keys. On some platforms these may
 have other names (e.g. Alt is called Option on macOS); other platform-specific
@@ -58,4 +58,15 @@ Caps Lock.
 
 ### Namespace
 
-All calls, types and enums are prefixed with the namespace identifier `km_kbp_`
+All calls, types and enums are prefixed with the namespace identifier `km_core_`
+
+### Changes from 16.0
+
+* The namespace identifier has changed from `km_kbp_` to `km_core_`.
+* Most context APIs are now private, and `km_core_context_set_if_needed` is the
+  primary context function. Private APIs are available in
+  `keyman_core_api_context.h`.
+* The action queue APIs are now private and deprecated. Instead, use
+  `km_core_state_get_actions`. Private APIs are available in
+  `keyman_core_api_actions.h`.
+* Debug APIs are available in `keyman_core_api_debug.h`.

@@ -3,6 +3,7 @@
 import json
 import logging
 import os
+import packaging.version
 
 from keyman_config import secure_lookup
 from keyman_config.deprecated_decorator import deprecated
@@ -30,8 +31,8 @@ def get_installed_kmp(area):
                 id (str): Keyboard ID
                 name (str): Keyboard name
                 kmpname (str): Keyboard name in local
-                version (str): Keyboard version
-                kmpversion (str):
+                version (str): available Keyboard version
+                kmpversion (str): installed Keyboard version
                 path (str): base path where keyboard is installed
                 description (str): Keyboard description
     """
@@ -122,30 +123,19 @@ def get_kmp_version(packageID):
         None: if not found
     """
     version = None
-    user_kmp = get_installed_kmp(InstallLocation.User)
-    shared_kmp = get_installed_kmp(InstallLocation.Shared)
-    os_kmp = get_installed_kmp(InstallLocation.OS)
-
-    if packageID in os_kmp:
-        version = os_kmp[packageID]['version']
-
-    if packageID in shared_kmp:
-        shared_version = shared_kmp[packageID]['version']
-        if version:
-            if version < shared_version:
-                version = shared_version
-        else:
-            version = shared_version
-
-    if packageID in user_kmp:
-        user_version = user_kmp[packageID]['version']
-        if version:
-            if version < user_version:
-                version = user_version
-        else:
-            version = user_version
-
+    version = _get_kmp_version_internal(packageID, InstallLocation.OS, version)
+    version = _get_kmp_version_internal(packageID, InstallLocation.Shared, version)
+    version = _get_kmp_version_internal(packageID, InstallLocation.User, version)
     return version
+
+
+def _get_kmp_version_internal(packageId, location, previousVersion):
+    kmp = get_installed_kmp(location)
+    if packageId in kmp:
+        version = kmp[packageId]['kmpversion']
+        if not previousVersion or packaging.version.parse(previousVersion) < packaging.version.parse(version):
+            previousVersion = version
+    return previousVersion
 
 
 def get_kmp_version_user(packageID):
@@ -159,11 +149,7 @@ def get_kmp_version_user(packageID):
         str: kmp version if kmp ID is installed
         None: if not found
     """
-    user_kmp = get_installed_kmp(InstallLocation.User)
-    if packageID in user_kmp:
-        return user_kmp[packageID]['version']
-    else:
-        return None
+    return _get_kmp_version_internal(packageID, InstallLocation.User, None)
 
 
 def get_kmp_version_shared(packageID):
@@ -177,8 +163,4 @@ def get_kmp_version_shared(packageID):
         str: kmp version if kmp ID is installed
         None: if not found
     """
-    shared_kmp = get_installed_kmp(InstallLocation.Shared)
-    if packageID in shared_kmp:
-        return shared_kmp[packageID]['version']
-    else:
-        return None
+    return _get_kmp_version_internal(packageID, InstallLocation.Shared, None)

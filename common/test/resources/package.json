@@ -1,0 +1,10 @@
+{
+  "name": "@keymanapp/common-test-resources",
+  "description": "Common test resources for Keyman's JS & TS-based components & products",
+  "type": "module",
+  "license": "MIT",
+  "devDependencies": {
+    "@keymanapp/resources-gosh": "*",
+    "typescript": "^5.4.5"
+  }
+}

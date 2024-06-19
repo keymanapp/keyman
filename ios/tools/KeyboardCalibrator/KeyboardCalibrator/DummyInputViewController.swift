@@ -37,11 +37,7 @@ private class CustomInputView: UIInputView {
   func setConstraints() {
     var guide: UILayoutGuide
 
-    if #available(iOS 11.0, *) {
-      guide = self.safeAreaLayoutGuide
-    } else {
-      guide = self.layoutMarginsGuide
-    }
+    guide = self.safeAreaLayoutGuide
 
     if height != 0 {
       innerView.heightAnchor.constraint(equalToConstant: height).isActive = true
@@ -49,15 +45,9 @@ private class CustomInputView: UIInputView {
       innerView.heightAnchor.constraint(equalTo: guide.heightAnchor).isActive = true
     }
 
-    if #available(iOS 11.0, *) {
-      innerView.widthAnchor.constraint(equalTo: guide.widthAnchor).isActive = true
-      innerView.leftAnchor.constraint(equalTo: guide.leftAnchor).isActive = true
-      insetView.widthAnchor.constraint(equalTo: guide.widthAnchor).isActive = true
-    } else {
-      innerView.widthAnchor.constraint(equalTo: self.widthAnchor).isActive = true
-      innerView.leftAnchor.constraint(equalTo: self.leftAnchor).isActive = true
-      insetView.widthAnchor.constraint(equalTo: self.widthAnchor).isActive = true
-    }
+    innerView.widthAnchor.constraint(equalTo: guide.widthAnchor).isActive = true
+    innerView.leftAnchor.constraint(equalTo: guide.leftAnchor).isActive = true
+    insetView.widthAnchor.constraint(equalTo: guide.widthAnchor).isActive = true
 
     innerView.bottomAnchor.constraint(equalTo: insetView.topAnchor).isActive = true
 
@@ -172,13 +162,8 @@ class DummyInputViewController: UIInputViewController {
     self.view.addSubview(self.nextKeyboardButton)
 
     var guide: UILayoutGuide
-    if #available(iOS 11.0, *) {
-      guide = self.view.safeAreaLayoutGuide
-      self.nextKeyboardButton.isHidden = !self.needsInputModeSwitchKey || !asSystemKeyboard
-    } else {
-      guide = self.view.layoutMarginsGuide
-      self.nextKeyboardButton.isHidden = false // Seems buggy to vary, and it matters greatly on older devices.
-    }
+    guide = self.view.safeAreaLayoutGuide
+    self.nextKeyboardButton.isHidden = !self.needsInputModeSwitchKey || !asSystemKeyboard
 
     self.nextKeyboardButton.leftAnchor.constraint(equalTo: guide.leftAnchor).isActive = true
     self.nextKeyboardButton.bottomAnchor.constraint(equalTo: guide.bottomAnchor).isActive = true

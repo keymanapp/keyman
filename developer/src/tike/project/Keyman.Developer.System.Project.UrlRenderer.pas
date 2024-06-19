@@ -8,14 +8,25 @@ uses
 type
   TProjectUrlRenderer = class
     class procedure AddUrls(root: IXMLDomNode);
+    class procedure AddProcessState(root: IXMLDomNode);
   end;
 
 implementation
 
 uses
+  KeymanDeveloperOptions,
   Upload_Settings;
 
 { TProjectUrlRenderer }
+
+class procedure TProjectUrlRenderer.AddProcessState(root: IXMLDomNode);
+var
+  node: IXMLDomElement;
+begin
+  node := root.ownerDocument.createElement('DeveloperState');
+  node.setAttribute('promptToUpgradeProjects', FKeymanDeveloperOptions.PromptToUpgradeProjects);
+  root.appendChild(node);
+end;
 
 class procedure TProjectUrlRenderer.AddUrls(root: IXMLDomNode);
 var

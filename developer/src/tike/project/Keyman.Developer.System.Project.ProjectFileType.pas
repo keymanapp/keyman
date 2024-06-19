@@ -97,7 +97,8 @@ begin
   ni := -1;
   for i := 0 to FRegisteredFileTypes.Count - 1 do
     if FRegisteredFileTypes[i].Extension = '*' then ni := i
-    else if FRegisteredFileTypes[i].Extension = Ext then
+    else if (FRegisteredFileTypes[i].Extension = Ext) and
+      FRegisteredFileTypes[i].ProjectFileClass.IsFileTypeSupported(AFileName) then
     begin
       Result := FRegisteredFileTypes[i].ProjectFileClass.Create(AProject, AFileName, AParent);
 

@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <com.tavultesoft.kmea.KMTextView
+    <com.keyman.engine.KMTextView
         android:id="@+id/kmTextView"
         android:layout_width="match_parent"
         android:layout_height="100dp"
@@ -15,5 +15,5 @@
         android:scrollbars="vertical" >
 
         <requestFocus />
-    </com.tavultesoft.kmea.KMTextView>
+    </com.keyman.engine.KMTextView>
 </RelativeLayout>

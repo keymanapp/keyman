@@ -1,0 +1,105 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "$ref": "#/definitions/KeyboardInfo",
+
+  "definitions": {
+    "KeyboardInfo": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "authorName": { "type": "string" },
+        "authorEmail": { "type": "string", "format": "email" },
+        "description": { "type": "string" },
+        "license": { "type": "string", "enum": ["freeware", "shareware", "commercial", "mit", "other"] },
+        "languages": { "anyOf": [
+          { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+          { "$ref": "#/definitions/KeyboardLanguageInfo" }
+        ]},
+        "lastModifiedDate": { "type": "string", "format": "date-time" },
+        "packageFilename": { "type": "string", "pattern": "\\.km[xp]$" },
+        "packageFileSize": { "type": "number" },
+        "jsFilename": { "type": "string", "pattern": "\\.js$" },
+        "jsFileSize": { "type": "number" },
+        "isRTL": { "type": "boolean" },
+        "encodings": { "type": "array", "items": { "type": "string", "enum": ["ansi", "unicode"] } },
+        "packageIncludes": { "type": "array", "items": { "type": "string", "enum": ["welcome", "documentation", "fonts", "visualKeyboard"] } },
+        "version": { "type": "string" },
+        "minKeymanVersion": { "type": "string", "pattern": "^\\d+\\.\\d$" },
+        "helpLink": { "type": "string", "pattern": "^https://help\\.keyman\\.com/keyboard/" },
+        "platformSupport": { "$ref": "#/definitions/KeyboardPlatformInfo" },
+        "sourcePath": { "type": "string", "pattern": "^(release|legacy|experimental)/.+/.+$" },
+        "related": { "type": "object", "patternProperties": {
+          ".": { "$ref": "#/definitions/KeyboardRelatedInfo" }
+          },
+          "additionalProperties": false
+        },
+        "deprecated": { "type": "boolean" }
+      },
+      "required": [ "id", "name", "license", "languages", "lastModifiedDate", "platformSupport" ]
+    },
+
+    "KeyboardLanguageInfo": {
+      "type": "object",
+      "patternProperties": {
+        ".": { "$ref": "#/definitions/KeyboardLanguageInfoItem" }
+      },
+      "additionalProperties": false
+    },
+
+    "KeyboardLanguageInfoItem": {
+      "type": "object",
+      "properties": {
+        "font": { "$ref": "#/definitions/KeyboardFontInfo" },
+        "oskFont": { "$ref": "#/definitions/KeyboardFontInfo" },
+        "examples": { "type": "array", "items": { "$ref": "#/definitions/KeyboardExampleInfo" } },
+        "displayName": { "type": "string" },
+        "languageName": { "type": "string" },
+        "scriptName": { "type": "string" },
+        "regionName": { "type": "string" }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+
+    "KeyboardFontInfo": {
+      "type": "object",
+      "properties": {
+        "family": { "type": "string" },
+        "source": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["family", "source"],
+      "additionalProperties": false
+    },
+
+    "KeyboardExampleInfo": {
+      "type": "object",
+      "properties": {
+        "keys": { "type": "string" },
+        "text": { "type": "string" },
+        "note": { "type": "string" }
+      },
+      "required": ["keys", "text"],
+      "additionalProperties": false
+    },
+
+    "KeyboardPlatformInfo": {
+      "type": "object",
+      "patternProperties": {
+        "^(windows|macos|desktopWeb|ios|android|mobileWeb|linux)$": { "type": "string", "enum": ["dictionary", "full", "basic", "none"] }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+
+    "KeyboardRelatedInfo": {
+      "type": "object",
+      "properties": {
+        "deprecates": { "type": "boolean" },
+        "deprecatedBy": { "type": "boolean" }
+      },
+      "required": [],
+      "additionalProperties": false
+    }
+  }
+}

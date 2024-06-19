@@ -1,5 +1,0 @@
-src/engine.c
-src/keyman-service.c
-src/keymanutil.c
-src/kmpdetails.c
-src/main.c

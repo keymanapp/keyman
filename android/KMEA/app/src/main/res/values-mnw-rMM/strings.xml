@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Device type  -->
+    <!-- Application name (Keyman Engine for Android) -->
+    <!-- Context: Title for list -->
+    <plurals name="title_keyboards">
+        <item quantity="other">ကဳဗုဒ်</item>
+    </plurals>
+    <!-- Context: Title for list -->
+    <plurals name="title_other_input_methods">
+        <item quantity="other">နဲကဲစုတ်ကဳဗုဒ်တၞဟ်ဟ်</item>
+    </plurals>
+    <!-- Context: Title for list -->
+    <string name="title_add_keyboard" comment="Add a new keyboard">စုတ်ကဳဗုဒ်တၟိ</string>
+    <!-- Context: Title for list -->
+    <string name="title_languages_settings" comment="List of installed languages">ဘာသာစုတ်လဝ်တုဲတုဲဂမၠိုၚ်</string>
+    <!-- Context: Title for list -->
+    <string name="title_language_settings" comment="Keyman Settings for a language">ဒၞါဲပလေဝ်နာနာ %1$s</string>
+    <!-- Context: Button label -->
+    <string name="label_add" comment="Button to add an item">ထပ်စုတ်</string>
+    <!-- Context: Button label -->
+    <string name="label_back" comment="Button to go back">ကလေၚ်</string>
+    <!-- Context: Button label -->
+    <string name="label_cancel" comment="Button to cancel an action">တးပါဲ</string>
+    <!-- Context: Button label -->
+    <string name="label_close" comment="Close a dialog">ကၟာတ်</string>
+    <!-- Context: Button label. Removed in Keyman 15 -->
+    <string name="label_close_keyman" comment="Close the Keyman application">ကၟာတ်ကဳမာန်</string>
+    <!-- Context: Button label -->
+    <string name="label_forward" comment="Button to go forward">ဆက်အာဂတ</string>
+    <!-- Context: Button label -->
+    <string name="label_next_input_method" comment="Switch to next input method (replaces label_close_keyman)">နဲကဲဲကဳဗုဒ်မွဲပၠန်</string>
+    <!-- Context: Button label -->
+    <string name="label_download" comment="Button to confirm downloading an item">ဂြဲဖျေံ</string>
+    <!-- Context: Button label -->
+    <string name="label_install" comment="Confirmation to install a package">စုတ်</string>
+    <!-- Context: Button label -->
+    <string name="label_later" comment="Do an action at a later time">ဂတဏံမှ</string>
+    <!-- Context: Button label -->
+    <string name="label_next" comment="Go to the next screen">မွဲပၠန်</string>
+    <!-- Context: Button label -->
+    <string name="label_ok" comment="Button to acknowledge a dialog">အဵုခေ</string>
+    <!-- Context: Button label -->
+    <string name="label_update" comment="Dialog button to update a resource">ပ္တိုန်က္ဆံၚ်</string>
+    <!-- Context: No internet for updates -->
+    <string name="no_internet_connection" comment="Internet connection missing">ဆက်စၠောံအေန်တာနက်ဟွံဂွံ</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="cannot_connect" comment="Error message when network connection fails">ချိက်စၠောံကဵုသ္ၚိစာတ် Keyman ဟွံဂွံဏီရ!</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="confirm_delete_keyboard" comment="Confirmation to delete a keyboard">မၞးမိက်ဂွံဇိုတ်ပ္တိတ်ထောံ ကောန်ဍေၚ်ဏံဟာ?</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="confirm_download_keyboard" comment="Confirmation to download a keyboard update">မၞးမိက်ဂွံကလောၚ်စုတ်ကေတ်မူလက္ကရဴအိုတ် သွက်ကောန်ဍေၚ်ဏံဟာ?</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="confirm_update" comment="Confirmation to update several resources">မၞးနွံပၟိက်မိက်သ္ဂောံသၠုၚ်ပ္တိုန်မူကု ကောန်ဍေၚ်ဏံကဵုအဘိဓါန်ဂမၠိုၚ်လၟုဟ်ရဟာ?</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="keyboard_updates_channel">သၠုၚ်ကဆံၚ်တမ်ရိုဟ်ဂမၠိုၚ်</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="keyboard_updates_available" comment="Notification when resource updates are available">ကလိဂွံတမ်ရိုဟ်သၠုၚ်ကဆံၚ်ဂမၠိုၚ်မာန်</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="update_available" comment="Currently installed version of a resource with an available update">%1$s (သမၠုၚ်ပ္တိုန်က္ဆံၚ်ဂွံယျ)</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="keyboard_update_message" comment="language name: keyboard name">      ကလိဂွံပ္တိုန်ကဆံၚ် သွက်ကဳဗုဒ် %1$s: %2$s </string>
+    <!-- Context: Keyboard Updates -->
+    <string name="dictionary_update_message">ကလိဂွံပ္တိုန်ကဆံၚ် သွက်အဘိဓာန် %1$s: %2$s </string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_version" comment="Label for keyboard version">ပါယှေန်ကဳဗုဒ်</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="help_link" comment="Label for help link">လေက်မရီုဗၚ်</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="uninstall_keyboard" comment="Label for uninstalling keyboard">ပ္တိတ်ကဳဗုဒ်</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_picker_new_keyboard" comment="Mark a language name that's newly installed in keyboard list">%1$s [တၟိ]</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_qr_code" comment="QR Code description">      ဂွံစုတ်ကဳဗုဒ်ဏံ\nပ္ဍဲစက်တၞဟ်ဟ်ဂှ် သဂေန်ကုက်ဏံညိ</string>
+    <!-- Context: Keyboard Help welcome.htm title -->
+    <string name="welcome_package" comment="Title to welcome.htm page (name and version)">ဒုၚ်တၠုၚ်ဏာ %1$s</string>
+    <!-- Context: Keyboard app doesn't include FileProvider library needed to view help file -->
+    <string name="fileprovider_undefined" comment="FileProvider library needed to view help file">     တၚ်နၚ်လိက် FileProvider မိက်ဂွံဗဵု ဝှါၚ်အရီုဗၚ်: %1$s</string>
+    <!-- Context: Fatal keyboard error. Will load default keyboard -->
+    <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">    ကဳဗုဒ်ယောၚ်ယာဇၞော်ဇၞော်နကဵု %1$s:%2$s သွက် ဘာသာ %3$s ။ ဂြဲပ္တိုန်မံၚ် ကဳဗုဒ်ပကတိ။</string>
+    <!-- Context: Fatal keyboard error.  -->
+    <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">      တၚ်ယောၚ်ယာ ပ္ဍဲကဳဗုဒ် %1$s:%2$s သွက် ဘာသာ %3$s</string>
+    <!-- Context: Query for associated dictionary -->
+    <string name="query_associated_model" comment="Check if there's an available dictionary to download">စၟဳစၟတ်ဒၟံၚ် အဘိဓာန် မဆက်စပ် သ္ဂောံဂြဲဖျေံ</string>
+    <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">      သ္ဂောံဂြဲဖျေံ အဘိဓာန်မဆက်စပ်တံဂှ် ဆက်စၠောံကု သာပါ ကဳမာန်ဟွံဂွံ</string>
+    <!-- Context: Model Updates -->
+    <string name="confirm_download_model" comment="Confirmation to download a dictionary update">မၞးမိက်ဂွံဂြဲဖျေံမူတၟိသွက်အဘိဓာန်ဏံဟာ?</string>
+    <!-- Context: No associated dictionary found -->
+    <string name="no_associated_model" comment="Confirmation there's no available dictionary to download">တံၚ်ဂြဲလဝ်အဘိဓာန်ဟွံမွဲ</string>
+    <!-- Context: Model Updates -->
+    <string name="catalog_unavailable" comment="Notification that the cloud resource catalog can't be updated">တံရိုဟ်သွက်ဏံဟွံမွဲ</string>
+    <!-- Context: Background download messages-->
+    <string name="catalog_download_start_in_background" comment="Notification that the resource catalog update will begin">ကာတ်တလံက် သၠုၚ်ပ္တိုန်ဒၟံၚ်ကဆံၚ်လက်ကရဴရ</string>
+    <!-- Context: Background download messages-->
+    <string name="catalog_download_is_running_in_background" comment="Notification that the resource catalog update is still downloading">      ဂြဲဖျေံဒၟံၚ်ကာတ်တလံက်ဖိုဟ်၊ မၚ်မွဲလစုတ်တုဲဂ္စါန်မွဲဝါပၠန်ညိ!</string>
+    <!-- Context: Background download messages-->
+    <string name="progress_message_checking_resource_is_running" comment="Progress notification that the check for a resource is still running ">စၟဳစၟတ်သွက်တမ်ရိုဟ်</string>
+    <!-- Context: Background download messages-->
+    <string name="keyboard_download_start_in_background" comment="Notification that a keyboard download has started">ဂြဲ​ဖျေံဒၟံၚ် ကဳဗုဒ် လ္ပါ်လက်ကရဴ</string>
+    <!-- Context: Background download messages-->
+    <string name="keyboard_download_is_running_in_background" comment="Notification that a keyboard download is still running">ကဳဗုဒ်မရုဲလဝ်ဂှ် အဃောဂၠောၚ်ဂြဲ​ဖျေံဒၟံၚ်ရောင်။ မၚ်မွဲချိုန်ခဏတုဲ ဆက်ဂစာန်ပၠန်ညိ!</string>
+    <!-- Context: Background download messages-->
+    <string name="keyboard_download_finished" comment="Notification that a keyboard download has finished">​​​​ဂၠောၚ်ဂြဲဖျေံကဳဗုဒ်အာစိုပ်ဒတုဲ!</string>
+    <!-- Context: Background download messages-->
+    <string name="dictionary_download_start_in_background" comment="Notification that a dictionary download has started">ပွမဂြဲ​ဂၠောၚ်ဖျေံဒၟံၚ် အဘိဓာန်ဂှ် ​ဍေံပ္တံလဝ်ပ္ဍဲလက်ကရဴတေံ</string>
+    <!-- Context: Background download messages-->
+    <string name="dictionary_download_is_running_in_background" comment="Notification that a dictionary download is still running">အဘိဓာန်ရုဲစှ်လဝ်ဂှ် အဃောဂၠောၚ်ဂြဲ​ဖျေံဒၟံၚ်ရောင်။ မၚ်မွဲချိုန်ခဏတုဲ ဆက်ဂစာန်ပၠန်ညိ!</string>
+    <!-- Context: Background download messages. Removed in Keyman 17-->
+    <string name="dictionary_download_finished" comment="Notification that a dictionary download has finished">​​​​ဂၠောၚ်ဂြဲဖျေံအဘိဓာန်အာစိုပ်ဒတုဲ။</string>
+    <!-- Context: Background download messages -->
+    <string name="download_failed" comment="Notification that a download failed">​တံၚ်ဂြဲဖျေံဟွံအံၚ်ဇၞး</string>
+    <!-- Context: Background download messages -->
+    <string name="failed_to_retrieve_file" comment="Failed to retrieve downloaded file">ဝှာၚ်မဂၠောၚ်ဂြဲ​ဖျေံလဝ်ဂှ် ကလေၚ်​ကေတ်ဟွံဂွံ</string>
+    <!-- Context: General Updates -->
+    <string name="update_check_unavailable" comment="Error message when a Keyman server can't be reached">ဆက်စၠောံကုသာပါဟွံအံၚ်ဇၞး!</string>
+    <!-- Context: General Updates -->
+    <string name="update_check_current" comment="Notification that all resources are up to date">"တံရိုဟ်ဖအိုတ်ဂှ် ဒှ်တၟိရ!"</string>
+    <!-- Context: General Updates -->
+    <string name="update_failed" comment="Notification that a resource update failed">သၠုၚ်ပ္တိုန်ကဆံၚ် တံရိုဟ် မွဲဟွံသေၚ်မွဲ ဟွံအံၚ်ဇၞး!</string>
+    <!-- Context: General Updates. Removed in Keyman 17 -->
+    <string name="update_success" comment="Notification that a resource update successfully updated">သမၠုၚ်ပ္တိုန်ကဆံၚ်တံရိုဟ်အံၚ်ဇၞး!</string>
+    <!-- Context: Model Info -->
+    <string name="model_version" comment="Title for a dictionary version">ပါယှေန်အဘိဓာန်</string>
+    <!-- Context: Model Info -->
+    <string name="uninstall_model" comment="Label to uninstall a dictionary">ပလှ်ပတိတ် အဘိဓာန်</string>
+    <!-- Context: Model Info -->
+    <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">မၞးမိက်ဂွံဇိုတ် အဘိဓာန်ဟာ?</string>
+    <!-- Context: Model Deleted -->
+    <string name="model_deleted" comment="Notification when a dictionary is deleted">ဇိုတ် အဘိဓာန်တုဲ</string>
+    <!-- Context: Language Settings Keyboard install strings -->
+    <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">ကဳဗုဒ် %1$s စုတ်လဝ်တုဲ</string>
+    <!-- Context: Language Settings Keyboard uninstall strings -->
+    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">ဇိုတ် ကဳဗုဒ်တုဲ</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="enable_corrections" comment="Enable corrections from the suggestion banner">ပံက် ပလေဝ်ဒါန်</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="enable_predictions" comment="Enable predictions from the suggestion banner">ပံက် တၚ်ချိၚ်ခယျဂမၠိုၚ်</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_label">အဘိဓာန်</string>
+    <plurals name="model_count">
+        <item quantity="other">အဘိဓာန်</item>
+    </plurals>
+    <!-- Context: Language Settings menu substring - Check for available dictionary -->
+    <string name="check_available_model" comment="Check for available dictionary">စၟဳစၟတ်အဘိဓာန်နွံဟွံမွဲ</string>
+    <string name="check_model_online" comment="Check for dictionaries online">စၟဳစၟတ်အဘိဓာန်အောန်လာၚ်</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_info_header" comment="Dictionary name">အဘိဓာန်: %1$s</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_picker_header" comment="Dictionaries for a specified language">အဘိဓာန် %1$s ဂမၠိုၚ်</string>
+    <!-- Context: Language Settings menu strings -->
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_install_toast" comment="Notification when a dictionary is installed">စုတ် အဘိဓာန်တုဲ</string>
+    <!-- Context: Language Settings menu strings -->
+    <plurals name="keyboard_count">
+        <item quantity="other">(ကဳဗုဒ် %1$d)</item>
+    </plurals>
+    <!-- Context: "Change Display Language" menu -->
+    <string name="default_locale" comment="Use the device's current locale">အရေဝ်ဘာသာပကတိ</string>
+    <!-- Context: Content descriptions -->
+    <!-- Context: Content descriptions -->
+    <!-- Context: Popup menu labels -->
+    <string name="label_delete" comment="Confirmation to delete an item">ပလီု</string>
+    <!-- Context: Shared preferences name -->
+    <!-- Context: Other strings -->
+    <string name="help_bubble_text">မိက်ဂွံသၠာဲ ကဳဗုဒ်မ္ဂး ဍဵုအဏံညိ</string>
+    <!-- Context: anywhere -->
+    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">ပံက် ဝေက်ဗရဴသာဟွံဂွံ</string>
+</resources>

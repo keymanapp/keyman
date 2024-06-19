@@ -1,0 +1,911 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  strings.xml: Contains all localizable strings for Keyman for Windows
+  * Create a user interface translation for Keyman for Windows at https://translate.keyman.com/
+-->
+<resources>
+  <!-- Context: System -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.1.266.0 -->
+  <string name="S_LocaleAuthors" comment="Name(s) of people who created this translation - i.e. your name">ಪಾರ್ಥ ಕೆಂಪಣ್ಣ</string>
+  <!-- Context: _Font -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SK_UIFontName" comment="The standard font">Noto Sans Kannada</string>
+  <!-- Context: _Font -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SK_UIFontSize" comment="The standard font size">10</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKButtonYes" comment="Yes button in message boxes">&amp;ಹೌದು</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKButtonNo" comment="No button in message boxes">&amp;ಇಲ್ಲ</string>
+  <!-- Context: General Strings -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Button_OK" comment="Ok button term">ಸರಿ</string>
+  <!-- Context: General Strings -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Button_Cancel" comment="Cancel button term">ರದ್ದುಮಾಡು</string>
+  <!-- Context: General Strings -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Button_Close" comment="Close button term">ಮುಚ್ಚು</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKButtonOK" comment="OK button in message boxes">ಸರಿ</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKButtonCancel" comment="Cancel button in message boxes">ರದ್ದುಮಾಡು</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 16.0.47 -->
+  <string name="SKAddremove" comment="Add or Remove languages button opens a dialog window">ಭಾಷೆಯನ್ನು ಸೇರಿಸು/ತೆಗೆದುಹಾಕು...</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 8.0.330.0 -->
+  <string name="SKBalloonClickToSelectKeyboard" comment="Balloon that shows when Keyman icon is first shown during the tutorial">ಕೀಲಿಮಣೆಯನ್ನು ಆಯ್ಕೆ ಮಾಡಲು ಈ ಚಿತ್ರ(ಐಕಾನ್) ಅನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 8.0.330.0 -->
+  <string name="SKBalloonOSKClosed" comment="Balloon that shows when OSK is closed">Keyman ಇನ್ನೂ ಚಾಲನೆಯಲ್ಲಿದೆ. ನಿಮ್ಮ ಭಾಷೆ ಕೀಲಿಮಣೆಯನ್ನು ಯಾವುದೇ ಸಮಯದಲ್ಲಿ ಬಳಸಲು ಈ ಚಿತ್ರ(ಐಕಾನ್) ಅನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 14.0.234 -->
+  <string name="SKBalloonKeymanIsRunning" comment="Balloon that shows when user tries to start Keyman but it is already running">ಕೀಮ್ಯಾನ್ ಈಗಾಗಲೇ ಚಾಲನೆಯಲ್ಲಿದೆ. ನಿಮ್ಮ ಭಾಷೆ ಕೀಲಿಮಣೆಯನ್ನು ಯಾವುದೇ ಸಮಯದಲ್ಲಿ ಬಳಸಲು ನೋಟಿಫಿಕೇಶನ್ ಏರಿಯಾನಲ್ಲಿ ಕೀಮ್ಯಾನ್ ಐಕಾನ್‌ ಅನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ</string>
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_ConfigurationTitle" comment="Configuration dialog title, which includes the product name">ಕೀಮ್ಯಾನ್ ಸಂರಚನೆ (ಕಾನ್ಫಿಗರೇಷನ್)</string>
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.239.0 -->
+  <string name="S_Caption_Help" comment="Configuration dialog link to Help">ಸಹಾಯ</string>
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47.0 -->
+  <string name="S_Caption_Uninstall" comment="Configuration dialog link to Uninstall Keyboard">ಅಸ್ಥಾಪಿಸು</string>
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47.0 -->
+  <string name="S_Caption_Enable" comment="Configuration dialog link to Enable Keyboard">ಸಕ್ರಿಯಗೊಳಿಸು</string>
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47.0 -->
+  <string name="S_Caption_Disable" comment="Configuration dialog link to Disable Keyboard">ನಿಷ್ಕ್ರಿಯಗೊಳಿಸು</string>
+  <!-- Context: Configuration Dialog - Tab names -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Keyboards" comment="Keyboard Layouts tab name">ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸಗಳು</string>
+  <!-- Context: Configuration Dialog - Tab names -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Keyboards_AccessChar" comment="Direct access to the Keyboard Layouts tab using alt+">ಕ</string>
+  <!-- Context: Configuration Dialog - Tab names -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Options" comment="Options tab name">ಆಯ್ಕೆಗಳು</string>
+  <!-- Context: Configuration Dialog - Tab names -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Options_AccessChar" comment="Direct access to the Options tab using alt+">ಆ</string>
+  <!-- Context: Configuration Dialog - Tab names -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Hotkeys" comment="Hotkeys tab name">ನೇರ ಕೀಲಿಗಳು (ಹಾಟ್‌ಕೀ/ಶಾರ್ಟ್‌ಕಟ್‌ಕೀ)</string>
+  <!-- Context: Configuration Dialog - Tab names -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Hotkeys_AccessChar" comment="Direct access to the Hotkeys tab using alt+">ನ</string>
+  <!-- Context: Configuration Dialog - Tab names -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Support" comment="Support tab name">ಸಹಾಯ</string>
+  <!-- Context: Configuration Dialog - Tab names -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Support_AccessChar" comment="Direct access to the Support tab using alt+">ಸ</string>
+  <!-- Context: Configuration Dialog - Tab names -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 9.0.493.0 -->
+  <string name="S_KeepInTouch" comment="Keep in touch tab name">ನಮ್ಮ ಸಂಪರ್ಕದಲ್ಲಿ ಇರಿ</string>
+  <!-- Context: Configuration Dialog - Tab names -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 9.0.492.0 -->
+  <string name="S_KeepInTouch_AccessChar" comment="Direct access to the Keep in Touch tab using alt+">ಪ</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Caption_Filename" comment="Keyboard download window, etc. - term for filename">ಕಡತದ ಹೆಸರು:</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Caption_Version" comment="Keyboard download window, etc. - term for package version">ಪ್ಯಾಕೇಜ್ ಆವೃತ್ತಿ:</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 9.0.442.0 -->
+  <string name="S_Caption_KeyboardVersion" comment="Keyboard download window, etc. - term for keyboard version">ಕೀಲಿಮಣೆ ಆವೃತ್ತಿ:</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Caption_Author" comment="Keyboard download window, etc. - term for author">ಲೇಖಕರು:</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Caption_Website" comment="Keyboard download window, etc. - term for website">ವೆಬ್‌ಸೈಟ್:</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Caption_Package" comment="Keyboard download window, etc. - term for package">ಪ್ಯಾಕೇಜ್:</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Caption_Fonts" comment="Keyboard download window, etc. - term for fonts">ಅಕ್ಷರಶೈಲಿ/ಫಾಂಟ್‌ಗಳು:</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Caption_Keyboards" comment="Keyboard download window, etc. - term for keyboard layouts">ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸಗಳು:</string>
+  <!-- Context: Keyboard Install Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 14.0 -->
+  <string name="S_Caption_Keyboard" comment="Keyboard install dialog - term for a single keyboard layout">ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸ:</string>
+  <!-- Context: Keyboard Install Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 14.0 -->
+  <string name="S_Caption_KeyboardLanguage" comment="Keyboard install dialog - term for caption for language selector a single keyboard layout">ಕೀಲಿಮಣೆಯ ಭಾಷೆ:</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Caption_Encodings" comment="Keyboard download window, etc. - term for encodings (encodings include Unicode, ANSI, Non-Unicode, etc).">ಎನ್ಕೋಡಿಂಗ್‌ಗಳು:</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Caption_LayoutType" comment="Keyboard download window, etc. - term for keyboard layout type (keyboard layout types include Fixed and Mnemonic)">ವಿನ್ಯಾಸ ಪ್ರಕಾರ:</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_LayoutType_Positional" comment="Keyboard download window, etc. - term for the fixed keyboard layout type">ಸ್ಥಿರ (ಸ್ಥಾನಿಕ-Positional)</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_LayoutType_Mnemonic" comment="Keyboard download window, etc. - term for the mnemonic keyboard layout type">ವಿಂಡೋಸ್ (Mnemonic) ಆವೃತ್ತಿಗೆ ಮ್ಯಾಪ್ ಮಾಡಲಾಗಿದೆ</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 9.0.420.0 -->
+  <string name="S_Caption_Languages" comment="Text preceding linked language profiles">ಭಾಷೆಗಳು:</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 9.0.420.0 -->
+  <string name="S_Languages_Uninstall" comment="Remove language profile">X</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 9.0.420.0 -->
+  <string name="S_Languages_Install" comment="Add language profile">ಬೇರೆ ಭಾಷೆಯನ್ನು ಈ ಕೀಲಿಮಣೆಗೆ ಸೇರಿಸು</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47 -->
+  <string name="S_Languages_Addremove" comment="Title for dialog to add or remove languages for keyboard layout">ಭಾಷೆಯನ್ನು ಸೇರಿಸು/ತೆಗೆದುಹಾಕು</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Caption_OnScreenKeyboard" comment="Term for the On Screen Keyboard">ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ:</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 8.0.306.0 -->
+  <string name="S_OnScreenKeyboard_Custom" comment="(OSK) Custom term">ಕಸ್ಟಮ್</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_OnScreenKeyboard_Installed" comment="(OSK) Installed term">ಸ್ಥಾಪಿಸಲಾಗಿದೆ</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_OnScreenKeyboard_NotInstalled" comment="(OSK) Not installed term">ಸ್ಥಾಪಿಸಲಾಗಿಲ್ಲ</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 8.0.306.0 -->
+  <string name="S_Caption_Documentation" comment="Term for the Documentation">ದಾಖಲೆ:</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 8.0.306.0 -->
+  <string name="S_Documentation_Installed" comment="(Documentation) Installed term">ಸ್ಥಾಪಿಸಲಾಗಿದೆ</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 8.0.306.0 -->
+  <string name="S_Documentation_NotInstalled" comment="(Documentation) Not installed term">ಸ್ಥಾಪಿಸಲಾಗಿಲ್ಲ</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Caption_Message" comment="Keyboard download window, etc. - term for additional messages">ಸಂದೇಶ:</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Caption_Copyright" comment="Keyboard download window, etc. - term for copyright">ಕೃತಿಸ್ವಾಮ್ಯ:</string>
+  <!-- Context: Configuration Dialog - Footer -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 14.0 -->
+  <string name="S_Footer_ChangesImmediate" comment="Short-term (14.0) message explaining why Ok and Cancel buttons are no longer present">ಬದಲಾವಣೆಗಳನ್ನು ತಕ್ಷಣವೇ ಅನ್ವಯಿಸಲಾಗುತ್ತದೆ</string>
+  <!-- Context: Configuration Dialog - Footer -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Button_InstallKeyboard" comment="Keyboard Layouts - install keyboard button">ಕೀಲಿಮಣೆಯನ್ನು ಅನುಸ್ಥಾಪಿಸು...</string>
+  <!-- Context: Configuration Dialog - Footer -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Button_DownloadKeyboard" comment="Keyboard Layouts - download keyboard button">ಕೀಲಿಮಣೆ ಡೌನ್ಲೋಡ್ ಮಾಡಿ</string>
+  <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 8.0.287.0 -->
+  <string name="S_Menu_Options" comment="KL option button submenu - keyboard options">ಕೀಲಿಮಣೆಯ ಆಯ್ಕೆಗಳು...</string>
+  <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Keyboards_NoKeyboardsInstalled" comment="Keyboard Layouts - notice of no keyboard layouts installed">ನೀವು ಯಾವುದೇ ಕೀಲಿಮಣೆಯನ್ನು ಸ್ಥಾಪಿಸಿಲ್ಲ. ಕೀಮ್ಯಾನ್ ವೆಬ್‌ಸೈಟ್‌ನಿಂದ ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸವನ್ನು ಸ್ಥಾಪಿಸಲು ಡೌನ್ಲೋಡ್ ಕೀಲಿಮಣೆ ಗುಂಡಿಯನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ.</string>
+  <!-- Parameters: %1$s = keyboard layout name -->
+  <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
+  <!-- Introduced: 7.1.251.0 -->
+  <!-- String Type: PlainText -->
+  <string name="SKUninstallRequireAdmin" comment="Keyboard Layouts - notice of ineligibility to uninstall a keyboard">ನಿರ್ವಾಹಕರಾಗಿದ್ದರೆ(ಅಡ್ಮಿನಿಸ್ಟ್ರೇಟರ್) ಮಾತ್ರ ಕೀಲಿಮಣೆ \'%1$s\' ಅನ್ನು ಅಸ್ಥಾಪಿಸಬಹುದು</string>
+  <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 13.0.40.0 -->
+  <string name="S_Keyboard_Share" comment="Keyboard Layouts - share selected keyboard button">ಕೀಲಿಮಣೆಯನ್ನು ಹಂಚಿಕೊಳ್ಳಿ</string>
+  <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 13.0.40.0 -->
+  <string name="S_Keyboard_Share_QRCode" comment="Keyboard Layouts - caption explaining QRCode, plus prefix to link to share">ಈ ಕೀಲಿಮಣೆಯನ್ನು ಮತ್ತೊಂದು ಸಾಧನದಲ್ಲಿ ಸ್ಥಾಪಿಸಲು ಈ ಕೋಡ್ಅನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ ಅಥವಾ </string>
+  <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 13.0.40.0 -->
+  <string name="S_Keyboard_Share_Link" comment="Keyboard Layouts - text for link to share">ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಹಂಚಿಕೊಳ್ಳಿ</string>
+  <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 13.0.40.0 -->
+  <string name="S_Keyboard_Share_LinkSuffix" comment="Keyboard Layouts - suffix for link to share"></string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="kogGeneral" comment="Options section - General">ಸಾಮಾನ್ಯ</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="kogStartup" comment="Options section - Startup">ಆರಂಭಿಕ</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.244.0 -->
+  <string name="kogOSK" comment="Options section - OSK">ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="kogAdvanced" comment="Options section - Advanced">ಸುಧಾರಿತ(ಅಡ್ವಾನ್ಸ್ಡ್)</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="koKeyboardHotkeysAreToggle" comment="General options - hotkeys toggle on AND off a keyboard layout">ನೇರಕೀಲಿಗಳು (ಹಾಟ್‌ಕೀ/ಶಾರ್ಟ್‌ಕಟ್‌ಕೀ), ಕೀಲಿಮಣೆ ಕ್ರಿಯಾತ್ಮಕತೆಯನ್ನು ಟಾಗಲ್ ಮಾಡಲಿ</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="koAltGrCtrlAlt" comment="General options - Ctrl+Alt simulates AltGr on computers without AltGr">AltGr ಅನ್ನು Ctrl+Alt ಆಗಿ ಅನುಕರಿಸು</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 9.0.480.0 -->
+  <string name="koDeadkeyConversion" comment="Advanced options - Base keyboard deadkeys are treated as normal keys">ಹಾರ್ಡ್‌ವೇರ್ ಕೀಲಿಗಳನ್ನು ಸರಳ ಕೀಲಿಗಳಾಗಿ ಪರಿಗಣಿಸು</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.244.0 -->
+  <string name="koShowHints" comment="General options - show/hide hint messages (resets hint messages individually disabled)">ಸುಳಿವುಗಳನ್ನು ತೋರಿಸು</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 14.0 -->
+  <string name="koAutomaticallyReportErrors" comment="General options - report errors to Keyman team automatically">ದೋಷಗಳನ್ನು ಸ್ವಯಂಚಾಲಿತವಾಗಿ keyman.com ಗೆ ವರದಿ ಮಾಡು</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 14.0 -->
+  <string name="koAutomaticallyReportUsage" comment="General options - report anonymous usage to Keyman team automatically">keyman.com ಜೊತೆಗೆ ಅನಾಮಧೇಯ ಬಳಕೆಯ ಅಂಕಿಅಂಶಗಳನ್ನು ಹಂಚಿಕೊಳ್ಳಿ</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="koStartWithWindows" comment="Startup options - Start Keyman with Windows start">ಕೀಮ್ಯಾನ್ ಚಲನೆಯನ್ನು ವಿಂಡೋಸ್ ಪ್ರಾರಂಭವಾದಾಗ ಪ್ರಾರಂಭಿಸು</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="koShowStartup" comment="Startup options - show/hide splash screen">ಸ್ಪ್ಲಾಶ್ ಪರದೆಯನ್ನು ತೋರಿಸು</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="koShowWelcome" comment="Startup options - show/hide welcome screen">ಸ್ವಾಗತ ಪರದೆಯನ್ನು ತೋರಿಸು</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="koCheckForUpdates" comment="Startup options - check online weekly for updates">ಸ್ವಯಂಚಾಲಿತವಾಗಿ ನವೀಕರಣಗಳನ್ನು www.keyman.com ನಲ್ಲಿ ಸಾಪ್ತಾಹಿಕವಾಗಿ ಪರಿಶೀಲಿಸು</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.236.0 -->
+  <string name="koTestKeymanFunctioning" comment="Startup options - test for conflicting apps when Product starts">ಕೀಮ್ಯಾನ್ ಪ್ರಾರಂಭವಾದಾಗ ವೈಫಲ್ಯದ ಅನ್ವಯಗಳನ್ನು ಪರೀಕ್ಷಿಸು</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.236.0 -->
+  <string name="koReleaseShiftKeysAfterKeyPress" comment="OSK options - Releases shift/ctrl/alt on OSK after key press">\"ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ\"ಯಲ್ಲಿ ಯಾವುದೆ ಕೀಲಿಯನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿದ ನಂತರ Shift/Ctrl/Alt ಅನ್ನು ಬಿಡುಗಡೆ ಮಾಡು</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.244.0 -->
+  <string name="koAutoOpenOSK" comment="OSK options - auto-open OSK">ಹೊಸ ಕೀಮ್ಯಾನ್ ಕೀಲಿಮಣೆಯನ್ನು ಆಯ್ಕೆ ಮಾಡಿದಾಗ ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆಯನ್ನು ತೋರಿಸು</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.244.0 -->
+  <string name="koAutoSwitchOSKPages" comment="OSK options - when a keyboard is activated, switch to most appropriate page in OSK">ಬೇರೆ ಕೀಲಿಮಣೆಯನ್ನು ಆಯ್ಕೆ ಮಾಡಿದಾಗ ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಸಹಾಯ ಅಥವಾ ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆಯನ್ನು ಬದಲಿಸು</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="koDebugging" comment="Advanced options - turn on debugging (which creates a very large file)">ಡೀಬಗ್ ಮಾಡುವುದು</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 9.0.445.0 -->
+  <string name="S_Button_BaseKeyboard" comment="Options tab - base keyboard button">ಮೂಲ(ಬೇಸ್) ಕೀಲಿಮಣೆ...</string>
+  <!-- Context: Configuration Dialog - Hotkeys tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.241.0 -->
+  <string name="S_Hotkey_Language_Prefix" comment="Hotkey - activation term preceding Windows language name. Note: include a space following."></string>
+  <!-- e.g. "Activate [Korean KORDA] Keyboard" -->
+  <!-- Context: Configuration Dialog - Hotkeys tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.241.0 -->
+  <string name="S_Hotkey_Language_Suffix" comment="Hotkey - language term following Windows language name. Note: include an initial space."></string>
+  <!-- Context: Configuration Dialog - Hotkeys tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Hotkey_None" comment="Hotkey - text used when no hotkey set">(ನೇರಕೀಲಿ ಇಲ್ಲ)</string>
+  <!-- Context: Configuration Dialog - Hotkeys tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Hotkey_TurnKeymanOff" comment="Hotkey - Turn Product Off">ಕೀಮ್ಯಾನ್ ಸ್ಥಗಿತಗೊಳಿಸಲು</string>
+  <!-- Context: Configuration Dialog - Hotkeys tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Hotkey_OpenKeyboardMenu" comment="Hotkey - Open Keyman system tray menu">ಕೀಲಿಮಣೆ ಆಯ್ಕೆ ಪಟ್ಟಿಯನ್ನು ತೆರೆಯಲು</string>
+  <!-- Context: Configuration Dialog - Hotkeys tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Hotkey_ShowOnScreenKeyboard" comment="Hotkey - show keyboard in OSK">ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ ಫಲಕ ತೋರಿಸಲು</string>
+  <!-- Context: Configuration Dialog - Hotkeys tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Hotkey_OpenConfiguration" comment="Hotkey - open Keyman Configuration">ಸಂರಚನೆ(ಕಾನ್ಫಿಗರೇಷನ್) ತೋರಿಸು</string>
+  <!-- Context: Configuration Dialog - Hotkeys tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.1.275.0 -->
+  <string name="S_Hotkey_ShowFontHelper" comment="Hotkey - show font helper in OSK">ಅಕ್ಷರ ಶೈಲಿ(ಫಾಂಟ್) ಸಹಾಯಕ ಫಲಕವನ್ನು ತೋರಿಸು</string>
+  <!-- Context: Configuration Dialog - Hotkeys tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.1.275.0 -->
+  <string name="S_Hotkey_ShowCharacterMap" comment="Hotkey - show character map in OSK">ಅಕ್ಷರ ನಕ್ಷೆ ಫಲಕವನ್ನು ತೋರಿಸು</string>
+  <!-- Context: Configuration Dialog - Hotkeys tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.1.275.0 -->
+  <string name="S_Hotkey_OpenTextEditor" comment="Hotkey - open text editor">ಪಠ್ಯ ಸಂಪಾದಕವನ್ನು ತೋರಿಸು</string>
+  <!-- Context: Configuration Dialog - Hotkeys tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 8.0.294.0 -->
+  <string name="S_Hotkey_SwitchLanguage" comment="Hotkey - switch language window">ಭಾಷಾ ಬದಲಾವಣೆ ಫಲಕವನ್ನು ತೋರಿಸು</string>
+  <!-- Context: Configuration Dialog - Hotkeys tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.1.274.0 -->
+  <string name="S_Hotkey_Control_Title" comment="Hotkey - Control Title">ಸಾಮಾನ್ಯ ನೇರ ಕೀಲಿಗಳು (ಹಾಟ್‌ಕೀ/ಶಾರ್ಟ್‌ಕಟ್‌ಕೀ)</string>
+  <!-- Context: Configuration Dialog - Hotkeys tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.1.274.0 -->
+  <string name="S_Hotkey_Keyboard_Title" comment="Hotkey - Keyboard Title">ಕೀಲಿಮಣೆಗಳು</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 9.0.465.0 -->
+  <string name="S_Support_ContactInstructions_Free" comment="">ಕೀಮ್ಯಾನ್‌ ಅನ್ನು ಬಳಸುವಾಗ ನಿಮಗೆ ಯಾವುದೇ ಸಮಸ್ಯೆಗಳು ಕಂಡು ಬಂದರೆ, ಕೀಮ್ಯಾನ್ ಸಮುದಾಯ ವೇದಿಕೆಯಲ್ಲಿ (Keyman Community Forum) ಪ್ರಶ್ನೆಯನ್ನು ಕೇಳಿ.</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 9.0.465.0 -->
+  <string name="S_Button_CommunitySupport" comment="">ಕೀಮ್ಯಾನ್ ಸಮುದಾಯ ವೇದಿಕೆ ತೆರೆಯಿರಿ</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 11.0.1500.0 -->
+  <string name="S_Support_CreatedBySIL" comment="Support - SIL statement">ಎಸ್‌ಐಎಲ್‌ ಇಂಟರ್‌ನ್ಯಾಷನಲ್‌ರವರ ಸೃಷ್ಟಿ</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Support_Copyright" comment="Support - Product Copyright">ಕೃತಿಸ್ವಾಮ್ಯ © ಎಸ್‌ಐಎಲ್‌ ಇಂಟರ್‌ನ್ಯಾಷನಲ್. ಎಲ್ಲ ಹಕ್ಕುಗಳನ್ನು ಕಾಯ್ದಿರಿಸಲಾಗಿದೆ.</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Support_Version" comment="Support - version">ಆವೃತ್ತಿ</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 8.0.294.0 -->
+  <string name="S_Support_UsefulLinks" comment="Support - Useful Links heading">ಉಪಯುಕ್ತ ಕೊಂಡಿಗಳು</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Button_OnlineSupport" comment="Support button - links to online support">ಆನ್‌ಲೈನ್ ಸಹಾಯ</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Button_CheckForUpdates" comment="Support button - manually checks for product updates">ನವೀಕರಣಗಳಿಗಾಗಿ ಪರಿಶೀಲಿಸಿ</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Button_ProxyConfig" comment="Options button - allows manual adjustment of proxy settings">ಪ್ರಾಕ್ಸಿ ಸೆಟ್ಟಿಂಗ್‌ಗಳು...</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Button_SettingsManager" comment="Options button - access to the Settings Manager">ಕೀಮ್ಯಾನ್ ಸಿಸ್ಟಮ್ ಸೆಟ್ಟಿಂಗ್‌ಗಳು...</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Menu_Diagnostics_Diagnostics" comment="Support button submenu - performs a diagnostic report">ಡಯಗ್ನೊಸ್ಟಿಕ್</string>
+  <!-- Context: Download Keyboard Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_DownloadKeyboard_Title" comment="Download keyboard layout from keyman.com dialog title">keyman.com ಯಿಂದ ಕೀಲಿಮಣೆ ಡೌನ್ಲೋಡ್ ಮಾಡಿ</string>
+  <!-- Context: Download Keyboard Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_DownloadKeyboard_DownloadOnlyCheckbox" comment="Download only option checkbox">ಸ್ಥಾಪಿಸಬೇಡಿ, ಡೌನ್ಲೋಡ್ ಮಾಡಿ</string>
+  <!-- Parameters: %1$s = Error Message, %2$d Error Code -->
+  <!-- Context: Download Keyboard Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 14.0 -->
+  <string name="S_DownloadKeyboard_DownloadError" comment="Message shown when there is an error downloading the keyboard package">ಕೀಲಿಮಣೆ ಡೌನ್‌ಲೋಡ್ ಮಾಡಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ, ದೋಷ %2$d: %1$s</string>
+  <!-- Context: Download Keyboard Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 14.0 -->
+  <string name="S_Button_Back" comment="Back button">&lt; ಹಿಂದೆ</string>
+  <!-- Context: Install Keyboard Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_InstallKeyboard_Title" comment="Install keyboard/package dialog title">ಕೀಲಿಮಣೆ/ಪ್ಯಾಕೇಜ್ ಅನುಸ್ಥಾಪಿಸು</string>
+  <!-- Context: Install Keyboard Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_InstallKeyboard_Tab_Details" comment="Install keyboard/package - details">ವಿವರಗಳು</string>
+  <!-- Context: Install Keyboard Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_InstallKeyboard_Tab_Readme" comment="Install keyboard/package - readme">ಸಂದೇಶವನ್ನು ಓದಿ</string>
+  <!-- Context: Install Keyboard Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_InstallKeyboard_Button_Install" comment="Install keyboard/package - install button">ಅನುಸ್ಥಾಪಿಸು</string>
+  <!-- Context: Proxy Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_ProxyConfiguration_Title" comment="Proxy configuration dialog title">ಪ್ರಾಕ್ಸಿ ಸರ್ವರ್ ಸಂರಚನೆ(ಕಾನ್ಫಿಗರೇಷನ್)</string>
+  <!-- Context: Proxy Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_ProxyConfiguration_Server" comment="Proxy dialog - fillable-field server">ಸರ್ವರ್(server):</string>
+  <!-- Context: Proxy Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_ProxyConfiguration_Port" comment="Proxy dialog - fillable-field port">ಪೊರ್ಟ್(port):</string>
+  <!-- Context: Proxy Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_ProxyConfiguration_Username" comment="Proxy dialog - fillable-field username">ಬಳಕೆದಾರರ ಹೆಸರು(username):</string>
+  <!-- Context: Proxy Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_ProxyConfiguration_Password" comment="Proxy dialog - fillable-field password">ಪ್ರವೇಶಪದ(password):</string>
+  <!-- Context: Base Keyboard Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 9.0.445.0 -->
+  <string name="S_BaseKeyboard_Title" comment="Base keyboard dialog title">ಮೂಲ(ಬೇಸ್) ಕೀಲಿಮಣೆ ಹೊಂದಿಸಿ</string>
+  <!-- Context: Base Keyboard Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 9.0.445.0 -->
+  <string name="S_BaseKeyboard_Text" comment="Base keyboard dialog description">ನೀವು ವಿಂಡೋಸ್‌ನಲ್ಲಿ ಬಳಸುವ ಮೂಲ(ಬೇಸ್) ಲ್ಯಾಟಿನ್(ಇಂಗೀಷ್) ಸ್ಕ್ರಿಪ್ಟ್ ಕೀಲಿಮಣೆ ಆಯ್ಕೆಮಾಡಿ. ಕೀಮ್ಯಾನ್ ಕೀಲಿಮಣೆಯು ನಿಮ್ಮ ಆದ್ಯತೆಯ ವಿನ್ಯಾಸಕ್ಕೆ ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಹೊಂದಿಕೊಳ್ಳುತ್ತದೆ.</string>
+  <!-- Context: Hotkey Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKChangeHotkeyTitle" comment="Change Hotkey dialog title">ನೇರ ಕೀಲಿ ಬದಲಾಯಿಸು</string>
+  <!-- Parameters: %1$s = Name of keyboard -->
+  <!-- Context: Hotkey Dialog -->
+  <!-- Introduced: 7.0.241.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKSetHotkey_Language" comment="Hotkey dialog - message when setting hotkey for a language">ಭಾಷೆ %1$s ಗಾಗಿ ಪ್ರಮಾಣಿತ ನೇರಕೀಲಿಯನ್ನು ಆಯ್ಕೆಮಾಡಿ ಅಥವಾ \'ಕಸ್ಟಮ್\' ಆಯ್ಕೆಮಾಡಿ, Ctrl, Shift ಮತ್ತು/ಅಥವಾ Alt ಅನ್ನು ಒತ್ತಿ, ನಿಮಗೆ ಬೇಕಾದ ನೇರಕೀಲಿಯನ್ನು ಆಯ್ಕೆಮಾಡಬಹುದು:</string>
+  <!-- Context: Hotkey Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKSetHotkey_Interface" comment="Hotkey dialog - message displayed when changing a hotkey for a product feature (e.g. show menu or show on screen keyboard)">ಪ್ರಮಾಣಿತ ನೇರ ಕೀಲಿಯನ್ನು ಆಯ್ಕೆಮಾಡಿ ಅಥವಾ \'ಕಸ್ಟಮ್\' ಆಯ್ಕೆಮಾಡಿ ಮತ್ತು Ctrl, Shift ಮತ್ತು/ಅಥವಾ Alt ಅನ್ನು ಒತ್ತಿ ಮತ್ತು ನೀವು ಬಯಸಿದ ನೇರ ಕೀಲಿಯನ್ನು ಟೈಪ್ ಮಾಡಿ:</string>
+  <!-- Parameters: %1$s = Hotkey -->
+  <!-- Context: Hotkey Dialog -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKUnsafeHotkey" comment="Hotkey dialog - warning of hotkey conflict with standard keyboard use">ನೇರ ಕೀಲಿ %1$s ಸಾಮಾನ್ಯ ಕೀಲಿಮಣೆ ಬಳಕೆಗೆ ತೊಂದರೆ ಮಾಡುತ್ತದೆ. ನೀವು ಕನಿಷ್ಠ Ctrl ಅಥವಾ Alt ಅನ್ನು ಬಳಸಬೇಕು. ಈಗ ನೀವು ಇದನ್ನು ಬದಲಾಯಿಸಲು ಬಯಸುವಿರಾ\?</string>
+  <!-- Parameters: %1$s = Hotkey, %2$s = Conflicting keyboard -->
+  <!-- Context: Hotkey Dialog -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKHotkeyConflicts_Keyboard" comment="Hotkey dialog - warning of hotkey conflict with hotkey for another keyboard">%1$s ನೇರ ಕೀಲಿ, %2$s ಕೀಲಿಮಣೆಗಾಗಿ ಆಯ್ಕೆ ಮಾಡಲಾಗಿದೆ. ನೀವು ಮುಂದುವರಿಸಿದರೆ, %2$s ಕೀಲಿಮಣೆಗಾಗಿ ನೇರ ಕೀಲಿಯನ್ನು ತೆರವುಗೊಳಿಸಲಾಗುತ್ತದೆ. ಮುಂದುವರಿಸಬೇಕೆ\?</string>
+  <!-- Parameters: %1$s = Hotkey -->
+  <!-- Context: Hotkey Dialog -->
+  <!-- Introduced: 14.0.117 -->
+  <!-- String Type: FormatString -->
+  <string name="SKHotkeyConflicts_Interface" comment="Hotkey dialog - warning of hotkey conflict with hotkey for another interface hotkey">%1$s ನೇರ ಕೀಲಿ, ಮತ್ತೊಂದು ನೇರ ಕೀಲಿಯೊಂದಿಗೆ ಬಳಕೆಯಾಗಿದೆ. ನೀವು ಮುಂದುವರಿಸಿದರೆ, ಇತ್ತೊಂದು ನೇರ ಕೀಲಿಯನ್ನು ತೆರವುಗೊಳಿಸಲಾಗುತ್ತದೆ. ಮುಂದುವರಿಸಬೇಕೆ\?</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Update_Title" comment="Update dialog title, where Keyman = product name">ನವೀಕೃತ ಕೀಮ್ಯಾನ್ ಘಟಕಗಳು ಲಭ್ಯವಿದೆ</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Update_NewVersionAvailable" comment="Update dialog - updates available text">ನವೀಕೃತ ಕೀಮ್ಯಾನ್ ಲಭ್ಯವಿದೆ</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.1.255.0 -->
+  <string name="S_Update_NewVersionPrompt" comment="Update dialog - prompt to select updates">ದಯವಿಟ್ಟು ನೀವು ಸ್ಥಾಪಿಸಲು ಬಯಸುವ ನವೀಕರಣಗಳನ್ನು ಆಯ್ಕೆ ಮಾಡಿ:</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Update_DownloadFrom" comment="Update dialog - download information">ನೀವು ಈ ಹೊಸ ಆವೃತ್ತಿಯನ್ನು ಡೌನ್ಲೋಡ್ ಮಾಡಬಹುದು:</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Update_Button_InstallNow" comment="Update dialog - install now button">ಈಗ ಅನುಸ್ಥಾಪಿಸು</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Update_Button_InstallLater" comment="Update dialog - cancel button">ರದ್ದುಮಾಡು</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.1.255.0 -->
+  <string name="S_Update_OldVersionHead" comment="Update dialog - old version">ಹಳೆಯ ಆವೃತ್ತಿ</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.1.255.0 -->
+  <string name="S_Update_ComponentHead" comment="Update dialog - update component">ನವೀಕೃತ ಘಟಕಗಳು</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.1.255.0 -->
+  <string name="S_Update_SizeHead" comment="Update dialog - update size">ಗಾತ್ರ</string>
+  <!-- Parameters: %1$s = Current version number -->
+  <!-- Context: Online Update Dialog -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKUpdate_KeymanText" comment="Update dialog - name and version of updatable product">ಕೀಮ್ಯಾನ್ %1$s</string>
+  <!-- Parameters: %1$s = Package description, %2$s = Current package version number -->
+  <!-- Context: Online Update Dialog -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKUpdate_PackageText" comment="Update dialog - name and version of updatable keyboard layout package">ಕೀಲಿಮಣೆ %1$s %2$s</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKUpdate_UnableToContact" comment="Update dialog - unable to access keyman.com warning">keyman.com ವೆಬ್‌ಸೈಟ್‌ ಅನ್ನು ಸಂಪರ್ಕಿಸಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲಾ - ದಯವಿಟ್ಟು ನೀವು ಸಕ್ರಿಯ ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕವನ್ನು ಹೊಂದಿದ್ದೀರ ಎಂದು ಖಚಿತಪಡಿಸಿಕೊಂಡು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.</string>
+  <!-- Parameters: %1$s = Error message -->
+  <!-- Context: Online Update Dialog -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKUpdate_UnableToContact_Error" comment="Update dialog - unable to access keyman.com error message">keyman.com ವೆಬ್‌ಸೈಟ್‌ ಅನ್ನು ಸಂಪರ್ಕಿಸಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲಾ - ದಯವಿಟ್ಟು ನೀವು ಸಕ್ರಿಯ ಅಂತರ್ಜಾಲದ ಸಂಪರ್ಕವನ್ನು ಹೊಂದಿದ್ದೀರ ಎಂದು ಖಚಿತಪಡಿಸಿಕೊಂಡು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ. ಸ್ವೀಕರಿಸಿದ ದೋಷಗಳು: %1$s</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 8.0.288.0 -->
+  <string name="SKUpdate_IconTitle" comment="Update icon - title">ಕೀಮ್ಯಾನ್ ನವೀಕರಣಗಳು ಲಭ್ಯವಿದೆ</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 8.0.288.0 -->
+  <string name="SKUpdate_IconText" comment="Update icon - text">ನವೀಕರಣಗಳನ್ನು ಡೌನ್ಲೋಡ್ ಮಾಡಿ ಮತ್ತು ಅನುಸ್ಥಾಪಿಸಲು ಈ ಐಕಾನ್ ಕ್ಲಿಕ್ ಮಾಡಿ</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 8.0.288.0 -->
+  <string name="SKUpdate_IconMenuText" comment="Update icon - install menu item">ಕೀಮ್ಯಾನ್ ನವೀಕರಣಗಳನ್ನು &amp;ಪರಿಶೀಲಿಸಿ ಹಾಗು ಅನುಸ್ಥಾಪಿಸು</string>
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 8.0.288.0 -->
+  <string name="SKUpdate_IconMenuExit" comment="Update icon - exit menu item">ಆನ್‌ಲೈನ್ ಅಪ್‌ಡೇಟ್ ಪರಿಶೀಲನೆಗೆ &amp;ನಿರ್ಗಮಿಸು</string>
+  <!-- Context: Splash Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 8.0.288.0 -->
+  <string name="S_Splash_Name" comment="Splash major title">ಕೀಮ್ಯಾನ್</string>
+  <!-- Context: Splash Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 8.0.294.0 -->
+  <string name="S_Splash_Start" comment="Start Keyman button">ಕೀಮ್ಯಾನ್ ಪ್ರಾರಂಭಿಸು</string>
+  <!-- Context: Splash Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 8.0.294.0 -->
+  <string name="S_Splash_Exit" comment="Exit button">ನಿರ್ಗಮಿಸು</string>
+  <!-- Context: Splash Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 8.0.294.0 -->
+  <string name="S_Splash_Configuration" comment="Keyman Configuration link">ಸಂರಚನೆ</string>
+  <!-- Context: Splash Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 9.0.341.0 -->
+  <string name="S_Splash_ShowAtStartup" comment="Show at Startup toggle">ಆರಂಭದಲ್ಲಿ ಈ ಪರದೆಯನ್ನು ತೋರಿಸು</string>
+  <!-- Context: _LanguageInfo -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 8.0.278.0 -->
+  <string name="S_DisplayIn" comment="'Display In' text label for UI language menu">ಪ್ರದರ್ಶನ ಭಾಷೆ</string>
+  <!-- Context: _LanguageInfo -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 8.0.278.0 -->
+  <string name="S_MoreUILanguagesMenu" comment="More UI languages online menu item">ಇತರ ಪ್ರದರ್ಶನ ಭಾಷೆಗಳನ್ನು ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಹುಡುಕಿ...</string>
+  <!-- Context: _LanguageInfo -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 9.0.525.0 -->
+  <string name="S_ContributeUILanguagesMenu" comment="Link to contribute to language UI">ಪ್ರದರ್ಶನ ಭಾಷೆ ಭಾಷಾಂತರಿಸಲು ಸಹಾಯ ಮಾಡಿ</string>
+  <!-- Context: _LanguageInfo -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKUILanguageName" comment="User interface language name in the UI language">ಕನ್ನಡ</string>
+  <!-- Context: _LanguageInfo -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKUILanguageNameWithEnglish" comment="UI language name in the UI language with the English name in parentheses  (this message is used when the user gets stuck in a strange UI language)">ಕನ್ನಡ (Kannada)</string>
+  <!-- Context: _LanguageInfo -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKLanguageCode" comment="The language code for the current translation">kn</string>
+  <!-- Context: _LanguageInfo -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKDefaultLanguageCode" comment="The default language code for this product.  This should be the language that the product is created in. For Keyman this must stay 'en', for all translations.">en</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKShortApplicationTitle" comment="Product name">ಕೀಮ್ಯಾನ್</string>
+  <!-- Context: Hints -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.244.0 -->
+  <string name="S_Button_ResetHints" comment="Hint - options tab button to reset hints">ಸುಳಿವುಗಳನ್ನು ಮರುಹೊಂದಿಸು</string>
+  <!-- Context: Hints -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.244.0 -->
+  <string name="SKHintsReset" comment="Hint - options tab dialog confirming reset of hints">ಎಲ್ಲಾ ಸುಳಿವು ಸಂದೇಶಗಳನ್ನು ಮರುಹೊಂದಿಸಲಾಗಿದೆ ಮತ್ತು ಮತ್ತೆ ಪ್ರದರ್ಶಿಸಲಾಗುತ್ತದೆ.</string>
+  <!-- Context: Hints -->
+  <!-- Introduced: 7.0.244.0 -->
+  <!-- String Type: HintTitle -->
+  <!-- DevNote: this is a constructed identifier so won't appear in a search with i18n-check-unused-strings.sh -->
+  <string name="HintTitle_KH_EXITPRODUCT" comment="Hint - dialog title upon attempting to exit product">ಕೀಮ್ಯಾನ್ ನಿರ್ಗಮಿಸಬೇಕೆ\?</string>
+  <!-- Context: Hints -->
+  <!-- Introduced: 7.0.244.0 -->
+  <!-- String Type: Hint -->
+  <!-- DevNote: this is a constructed identifier so won't appear in a search with i18n-check-unused-strings.sh -->
+  <string name="Hint_KH_EXITPRODUCT" comment="Hint - asks for confirmation, explains the difference between de-activating a keyboard layout and closing Product">ನೀವು ಕೀಮ್ಯಾನ್ ನಿರ್ಗಮಸಲು ಬಯಸುತ್ತೀರಾ? ವಿಂಡೋಸ್ ಕೀಲಿಮಣೆಗಳ ಪಟ್ಟಿಯಲ್ಲಿ ಕೀಮ್ಯಾನ್ ಕೀಲಿಮಣೆ ಲಭ್ಯವಿರುತ್ತದೆ. ಆದರೆ ನೀವು ಕೀಮ್ಯಾನ್ ಅನ್ನು ಮರುಪ್ರಾರಂಭಿಸುವವರೆಗೆ ಕೀಮ್ಯಾನ್ ಕೀಲಿಮಣೆಗಳು ಕ್ರಿಯಾತ್ಮಕವಾಗಿರುವುದಿಲ್ಲ.</string>
+  <!-- Context: Hints -->
+  <!-- Introduced: 7.0.244.0 -->
+  <!-- String Type: HintTitle -->
+  <!-- DevNote: this is a constructed identifier so won't appear in a search with i18n-check-unused-strings.sh -->
+  <string name="HintTitle_KH_CLOSEOSK" comment="Hint - dialog title upon closing the OSK">ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ ಮುಚ್ಚಲಾಗಿದೆ</string>
+  <!-- Context: Hints -->
+  <!-- Introduced: 7.0.244.0 -->
+  <!-- String Type: Hint -->
+  <!-- DevNote: this is a constructed identifier so won't appear in a search with i18n-check-unused-strings.sh -->
+  <string name="Hint_KH_CLOSEOSK" comment="Hint - explains that Product is still running and informs how to reopen OSK">ನೀವು \"ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ\"ಅನ್ನು ಮುಚ್ಚಿದ್ದೀರಿ. Keyman ಇನ್ನೂ ಚಾಲನೆಯಲ್ಲಿದೆ. Keyman ಚಿತ್ರ(ಐಕಾನ್) ಮೇಲೆ ನೀವು ಯಾವುದೇ ಸಮಯದಲ್ಲಿ ಕ್ಲಿಕ್ ಮಾಡಿ ಮತ್ತು \"ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ\" ಆಯ್ಕೆಮಾಡುವ ಮೂಲಕ; \"ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ\"ಅನ್ನು ತೆರೆಯಬಹುದು.</string>
+  <!-- Context: Hints -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 10.0.836.0 -->
+  <string name="S_HintDialog_DontShowHintAgain" comment="Hint dialog - caption of checkbox at bottom of dialog">ಈ ಸುಳಿವನ್ನು ಮತ್ತೆ ತೋರಿಸಬೇಡ</string>
+  <!-- Context: Help Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_HelpTitle" comment="Help - product name help">ಕೀಮ್ಯಾನ್ ಸಹಾಯ</string>
+  <!-- Context: Help Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Help_Product" comment="Help - help contents link title">ಸಹಾಯ ಪರಿವಿಡಿ</string>
+  <!-- Context: Help Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Help_Keyboard_Prefix" comment="Help - text preceding keyboard name">\"</string>
+  <!-- Context: Help Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Help_Keyboard_Suffix" comment="Help - text following keyboard name">\" ಕೀಲಿಮಣೆಗೆ ಸಹಾಯ</string>
+  <!-- Context: Toolbar Context Help -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Toolbar_ViewOnScreenKeyboard" comment="Toolbar help - View OSK pop-up text">\"ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ\" ತೋರಿಸು</string>
+  <!-- Context: Toolbar Context Help -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Toolbar_ViewFontHelper" comment="Toolbar help - View Font Helper pop-up text">ಅಕ್ಷರ ಶೈಲಿ(ಫಾಂಟ್) ಸಹಾಯಕ ಫಲಕವನ್ನು ತೋರಿಸು</string>
+  <!-- Context: Toolbar Context Help -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Toolbar_ViewCharacterMap" comment="Toolbar help - View Character Map pop-up text">ಅಕ್ಷರ ನಕ್ಷೆ ಫಲಕವನ್ನು ತೋರಿಸು</string>
+  <!-- Context: Toolbar Context Help -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Toolbar_OpenConfiguration" comment="Toolbar help - Open Keyman Configuration pop-up text">ಕೀಮ್ಯಾನ್ ಸಂರಚನೆ(ಕಾನ್ಫಿಗರೇಷನ್) ತೋರಿಸು</string>
+  <!-- Context: Toolbar Context Help -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Toolbar_OpenHelp" comment="Toolbar help - Open help pop-up text">ಸಹಾಯವನ್ನು ತೋರಿಸು</string>
+  <!-- Context: Toolbar Context Help -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Toolbar_CloseOnScreenKeyboard" comment="Toolbar help - Close OSK pop-up text">\"ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ\" ಮುಚ್ಚು</string>
+  <!-- Context: System Tray Menu Items -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Menu_SwitchKeymanOff" comment="Systray item - Switch Keyman Off [&amp; precedes alt + access-character]">ಕೀಮ್ಯಾನ್ &amp;ಬಳಕೆಯನ್ನು ನಿಲ್ಲಿಸು</string>
+  <!-- Context: System Tray Menu Items -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Menu_OnScreenKeyboard" comment="Systray item - OSK [&amp; precedes alt + access-character]">&amp;ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ</string>
+  <!-- Context: System Tray Menu Items -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Menu_FontHelper" comment="Systray item - Font Helper [&amp; precedes alt + access-character]">ಅಕ್ಷ&amp;ರ ಶೈಲಿ (ಫಾಂಟ್) ಸಹಾಯಕ</string>
+  <!-- Context: System Tray Menu Items -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Menu_CharacterMap" comment="Systray item - Character Map [&amp; precedes alt + access-character]">&amp;ಅಕ್ಷರ ನಕ್ಷೆ</string>
+  <!-- Context: System Tray Menu Items -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Menu_TextEditor" comment="Systray item - Text Editor [&amp; precedes alt + access-character]">&amp;ಪಠ್ಯ ಸಂಪಾದಕ</string>
+  <!-- Context: System Tray Menu Items -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Menu_Configuration" comment="Systray item - Configuration [&amp; precedes alt + access-character]">ಸಂರಚನೆ (&amp;ಕಾನ್ಫಿಗರೇಷನ್)</string>
+  <!-- Context: System Tray Menu Items -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Menu_Help" comment="Systray item - Help [&amp; precedes alt + access-character]">&amp;ಸಹಾಯ...</string>
+  <!-- Context: System Tray Menu Items -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_Menu_Exit" comment="Systray item - Exit [&amp; precedes alt + access-character]">&amp;ನಿರ್ಗಮನ</string>
+  <!-- Context: On Screen Keyboard Menu Items -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_OSKContext_FadeWhenInactive" comment="OSK right-click menu - fade OSK when mouse is elsewhere">ನಿಷ್ಕ್ರಿಯವಾಗಿದ್ದಾಗ ಫೇಡ್ ಮಾಡಿ</string>
+  <!-- Context: On Screen Keyboard Menu Items -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_OSKContext_ShowToolbar" comment="OSK right-click menu - show/hide OSK toolbar">ಉಪಕರಣ ಪಟ್ಟಿ(ಟೂಲ್‌ಬಾರ್) ತೋರಿಸು</string>
+  <!-- Context: On Screen Keyboard Menu Items -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_OSKContext_SaveAsWebPage" comment="OSK right-click menu - save diagram of active keyboard layout as a web page">ವೆಬ್ ಪುಟದಂತೆ ಉಳಿಸು...</string>
+  <!-- Context: On Screen Keyboard Menu Items -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="S_OSKContext_Print" comment="OSK right-click menu - print diagram of active keyboard layout">ಮುದ್ರಿಸು...</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKApplicationTitle" comment="Product name used for the title of message boxes and message dialogs">ಕೀಮ್ಯಾನ್</string>
+  <!-- Parameters: %1$s = Version number string -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKSplashVersion" comment="Version number">ಆವೃತ್ತಿ %1$s</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.239.0 -->
+  <string name="SKButtonPrint" comment="Print button in Welcome dialog for keyboards">&amp;ಮುದ್ರಿಸು....</string>
+  <!-- Parameters: %1$s = Package to be uninstalled -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKPackageAlreadyInstalled" comment="Notice during package installation that a package with the same name is already installed.">%1$s ಹೆಸರಿನ ಪ್ಯಾಕೇಜ್‌ಅನ್ನು ಈಗಾಗಲೇ ಸ್ಥಾಪಿಸಲಾಗಿದೆ. ನೀವು ಅದನ್ನು ಅಸ್ಥಾಪಿಸಿ ಹೊಸ ಪ್ಯಾಕೇಜ್‌ಅನ್ನು ಅನುಸ್ಥಾಪಿಸಲು ಬಯಸುವಿರಾ\?</string>
+  <!-- Parameters: %1$s = Keyboard name -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKKeyboardAlreadyInstalled" comment="Notice during keyboard layout installation that a keyboard layout with the same name is already installed.">%1$s ಹೆಸರಿನ ಕೀಲಿಮಣೆ ಈಗಾಗಲೇ ಅನುಸ್ಥಾಪಿಸಲಾಗಿದೆ. ಈಗ ಅದನ್ನು ಅಸ್ಥಾಪಿಸಿ, ಹೊಸ ಕೀಲಿಮಣೆಯನ್ನು ಸ್ಥಾಪಿಸಲಾಗುವುದು. ಮುಂದುವರಿಸಬೇಕೆ\?</string>
+  <!-- Parameters: %1$s = Keyboard name, %2$s = Package name -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKKeyboardPartOfPackage" comment="Notice of need to uninstall an entire package">\'%1$s\' ಕೀಲಿಮಣೆ \'%2$s\' ಪ್ಯಾಕೇಜಿನ ಭಾಗವಾಗಿದೆ. ನೀವು ಸಂಪೂರ್ಣ ಪ್ಯಾಕೇಜ್‌ಅನ್ನು ಅಸ್ಥಾಪಿಸಬೇಕಾಗುತ್ತದೆ. ಮುಂದುವರಿಸಬೇಕೇ\?</string>
+  <!-- PArameters: %1$s = BCP 47 code -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 14.0.211 -->
+  <!-- String Type: FormatString -->
+  <string name="SKInstallLanguageTransientLimit" comment="Message shown when Keyman is unable to install a Windows language for a keyboard">ಕೀಲಿಮಣೆಯೊಂದಿಗೆ ಸೂಚಿಸಿರುವ ಭಾಷೆಯನ್ನು ಸ್ಥಾಪಿಸಲು ಆಗುತ್ತಿಲ್ಲ; ವಿಂಡೋಸ್ ೪ ಕಸ್ಟಮ್ \'transient-ಟ್ರಾನ್ಸಿಯೆಂಟ್\' ಭಾಷೆಗಳ ಮಿತಿಯನ್ನು ಹೊಂದಿದೆ, ನೀವು ಈ ಮಿತಿಯನ್ನು ತಲುಪಿರಬಹುದು.</string>
+  <!-- Parameters: %1$s = Package Name -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKPackageDoesNotIncludeWelcome" comment="Notice of lack of introductory help">ಈ \'%1$s\' ಪ್ಯಾಕೇಜ್ ಅಥವಾ ಕೀಲಿಮಣೆ ಯಾವುದೇ ಪರಿಚಯಾತ್ಮಕ ಸಹಾಯವನ್ನು ಒಳಗೊಂಡಿಲ್ಲ.</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKOSNotSupported" comment="Notice of unsupported operating system">ಈ ಆಪರೇಟಿಂಗ್ ಸಿಸ್ಟಮ್‌ನಲ್ಲಿ ನಮ್ಮ ತಂತ್ರಾಂಶ ಕೆಲಸ ಮಾಡುವುದಿಲ್ಲ.</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKOnlineHelpFile" comment="File name of the help file - must be .chm format.  The locale folder will be checked first for the file">KeymanDesktop.chm</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKCouldNotFindHelp" comment="Notice of help file not found">ಸಹಾಯ ಕಡತ ಕಂಡುಬಂದಿಲ್ಲ.</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKANSIEncoding" comment="Keyboard with an ANSI or Codepage encoding">ಕೋಡ್‌ಪುಟ</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKUnicodeEncoding" comment="Keyboard with a Unicode encoding">ಯೂನಿಕೋಡ್</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKDownloadProgress_Title" comment="Notice of file downloading">ಡೌನ್ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ</string>
+  <!-- Parameters: %1$s = Keyboard name -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKUninstallOnScreenKeyboard" comment="Request for confirmation to uninstall OSK for a keyboard layout">%1$s ಕೀಲಿಮಣೆಯ \"ತೆರೆಯ ಮೇಲಿನ ಕೀಲಿಮಣೆ ಫಲಕ\" ಅಸ್ಥಾಪಿಸಲು ನೀವು ಖಚಿತವಾಗಿ ಬಯಸುವಿರಾ\?</string>
+  <!-- Parameters: %1$s = Keyboard name -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 7.0.239.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKUninstallKeyboard" comment="Request for confirmation to uninstall keyboard layout">%1$s ಕೀಲಿಮಣೆಯನ್ನು ಅಸ್ಥಾಪಿಸಲು ನೀವು ಖಚಿತವಾಗಿ ಬಯಸುವಿರಾ\?</string>
+  <!-- Parameters: %1$s = Package name, %2$s: Fonts list -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 7.0.239.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKUninstallPackage" comment="Request for confirmation to uninstall a package">%1$s ಪ್ಯಾಕೇಜ್‌ಅನ್ನು ಹಾಗು ಕೆಳಗಿನ ನಮೂದಿಸಿರುವ ಅಕ್ಷರ ಶೈಲಿ-ಫಾಂಟ್‌ಗಳನ್ನು ಅಸ್ಥಾಪಿಸಲು ನೀವು ಖಚಿತವಾಗಿ ಬಯಸುವಿರಾ\?\n\n%2$s</string>
+  <!-- Parameters: %1$s = Fonts list -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 7.1.270.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKUninstallPackageFonts" comment="Text embedded in SKUninstallPackage when fonts are ready for uninstall.">ಕೆಳಗಿನ ಅಕ್ಷರ ಶೈಲಿ-ಫಾಂಟ್/ಗಳನ್ನು ಸಹ ಅಸ್ಥಾಪಿಸಲ್ಪಡುತ್ತದೆ: %1$s.</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKUnicodeData_Build" comment="Request to build Unicode Character Map database">ಅಕ್ಷರ ಮ್ಯಾಪ್ ಅನ್ನು ಬಳಸಬಹುದಾದ ಮೊದಲು ಅಕ್ಷರ ಡೇಟಾಬೇಸ್ ಅನ್ನು ನಿರ್ಮಿಸಬೇಕಾಗಿದೆ. ಈಗ ಅದನ್ನು ನಿರ್ಮಿಸಲು ಬಯಸುವಿರಾ\?</string>
+  <!-- Parameters: %1$s = Error detail string -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKUnicodeData_DatabaseCouldNotBeDeleted" comment="Error deleting Unicode Character Map database">ಯುನಿಕೋಡ್ ಅಕ್ಷರ ಡೇಟಾಬೇಸ್ ಅನ್ನು ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಿ ಪುನರ್ನಿರ್ಮಾಣ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ದೋಷದ ವಿವರಗಳು: %1$s</string>
+  <!-- Parameters: %1$s = Error details -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKUnicodeData_CouldNotCreateDatabase" comment="Error creating Unicode Character Map database">ಯುನಿಕೋಡ್ ಅಕ್ಷರ ಡೇಟಾಬೇಸ್ ಅನ್ನು ಪುನರ್ನಿರ್ಮಾಣ ಮಾಡಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ ಆದ್ದರಿಂದ ಅದನ್ನು ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಲಾಗಿದೆ. ದೋಷದ ವಿವರಗಳು: %1$s</string>
+  <!-- Parameters: %1$s = Error message -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 7.0.230.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKUnicodeData_DatabaseLoadFailedRebuild" comment="Error loading Unicode Character Map database. Request to rebuild.">ಯುನಿಕೋಡ್ ಅಕ್ಷರ ಡೇಟಾಬೇಸ್ ಯಶಸ್ವಿಯಾಗಿ ಲೋಡ್‌ಯಾಗಿಲ್ಲ (%1$s). ಈಗ ಅದನ್ನು ಪುನರ್ನಿರ್ಮಾಣ ಮಾಡುವುದೇ\?</string>
+  <!-- Parameters: %1$s: error message -->
+  <!-- Context: Formatted Messages -->
+  <!-- Introduced: 7.0.241.0 -->
+  <!-- String Type: FormatString -->
+  <string name="SKCannotStartProduct" comment="Error from Keyman failing to start keyman.exe due to an access denied or file not found">ಕೀಮ್ಯಾನ್ ಪ್ರಾರಂಭಿಸಲು ವಿಫಲವಾಗಿದೆ. ಮುಂದುವರೆಯುವ ಮೊದಲು keyman.exe ಅನ್ನು ಆರಂಭಿಸಲು ಅನುಮತಿಸಲಾಗಿದೆಯೇ ಎಂದು ಖಚಿತಪಡಿಸಿಕೊಳ್ಳಲು, ದಯವಿಟ್ಟು ನಿಮ್ಮ ಭದ್ರತೆ ಸೆಟ್ಟಿಂಗ್ಗಳನ್ನು(security settings) ಪರಿಶೀಲಿಸಿ. ಹಿಂದಿನ ದೋಷವೆಂದರೆ:\n\n\"%1$s\" \n\nಈಗ ನೀವು ಭದ್ರತೆ ಸೆಟ್ಟಿಂಗ್ಗಳನ್ನು(security settings) ಪರಿಶೀಲಿಸಿ, ಮತ್ತೆ ಕೀಮ್ಯಾನ್ ಪ್ರಾರಂಭಿಸಲು ಬಯಸುವಿರಾ\?</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 7.0.230.0 -->
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">ಕೀಮ್ಯಾನ್ ಡೀಬಗ್ ಮಾಹಿತಿಯನ್ನು ನಿಮ್ಮ ಡೆಸ್ಕ್‌ಟಾಪ್‌ನಲ್ಲಿ %LOCALAPPDATA%\Keyman\Diag\system#.etl (ಇಲ್ಲಿ # ಒಂದು ಸಂಖ್ಯೆ) ಕರೆಯಲಾಗುವ ಪಠ್ಯ ಫೈಲ್‌ನಲ್ಲಿ ಸಂಗ್ರಹಿಸಲಾಗುತ್ತದೆ. ಈ ಫೈಲ್ ಅನ್ನು ಓದುವ ಅಥವಾ ಅಳಿಸುವ ಮೊದಲು ನೀವು ಕೀಮ್ಯಾನ್ ನಿರ್ಗಮಿಸಬೇಕು. \n\nಎಚ್ಚರಿಕೆ: ಈ ಫೈಲ್ ಬಹಳ ಬೇಗನೆ ದೊಡ್ಡ ಗಾತ್ರವಾಗಿ ಬೆಳೆಯುತ್ತದೆ. ಡೀಬಗ್ ಮಾಡುವುದನ್ನು ಸಕ್ರಿಯಗೊಳಿಸುವುದರಿಂದ ನಿಮ್ಮ ಸಿಸ್ಟಮ್ ಅನ್ನು ನಿಧಾನಗೊಳಿಸುತ್ತದೆ ಹಾಗಾಗಿ \"ತಾಂತ್ರಿಕ ಬೆಂಬಲ\"ದಿಂದ ಸಲಹೆ ನೀಡಿದರೆ ಮಾತ್ರ ಇದನ್ನು ಸ್ಥಾಪಿಸಬೇಕು. \n\nಗೌಪ್ಯತೆಯ ಎಚ್ಚರಿಕೆ: ನೀವು ಟೈಪ್ ಮಾಡುವ ಎಲ್ಲಾ ಕೀಲಿಗಳನ್ನು ಡೀಬಗ್ ಲಾಗ್‌ಫೈಲ್ ದಾಖಲಿಸುತ್ತದೆ ಎಂಬುದನ್ನು ದಯವಿಟ್ಟು ಗಮನಿಸಿ. ಡೀಬಗ್ ಮಾಡುವಿಕೆ ಅಥವಾ ಡಯಗ್ನೊಸ್ಟಿಕ್ ಆಗುವ ಅವಧಿಯಲ್ಲಿ ಮಾತ್ರ ನೀವು ಡೀಬಗ್ ಸ್ಥಾಪಿಸಬೇಕು.</string>
+  <!-- Context: OSK Font Helper -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 8.0.294.0 -->
+  <string name="S_OSK_FontHelper_PleaseWait" comment="OSK Font helper message">ಈ %1$s ಕೀಲಿಮಣೆಯೊಂದಿಗೆ ಸಂಬಂಧಿತ ಅಕ್ಷರ ಶೈಲಿಗಳನ್ನು ಹುಡುಕುತ್ತಿರುವುದು ದಯವಿಟ್ಟು ನಿರೀಕ್ಷಿಸಿ</string>
+  <!-- Context: OSK Font Helper -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 8.0.294.0 -->
+  <string name="S_OSK_FontHelper_NonUnicode" comment="OSK Font helper non-Unicode keyboard">ಕೀಲಿಮಣೆ %1$s ಯುನಿಕೋಡ್ ಕೀಲಿಮಣೆ ಅಲ್ಲ. ಈ ಕೀಲಿಮಣೆಯೊಂದಿಗೆ ಅಕ್ಷರ ಶೈಲಿಗಳನ್ನು ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಸ್ಥಾಪಿಸಲಾಗುವುದಿಲ್ಲ. ಅಕ್ಷರ ಶೈಲಿಗಳ ಮಾಹಿತಿಗಾಗಿ ದಯವಿಟ್ಟು ಕೀಲಿಮಣೆ ದಸ್ತಾವೇಜನ್ನು ಪರಿಶೀಲಿಸಿ.</string>
+  <!-- Context: OSK Font Helper -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 8.0.294.0 -->
+  <string name="S_OSK_FontHelper_NoKeyboards" comment="OSK Font helper no keyboards">ನೀವು ಯಾವುದೇ ಕೀಲಿಮಣೆಯನ್ನು ಅನುಸ್ಥಾಪಿಸಿಲ್ಲ ಅಥವಾ ಲೋಡ್ ಮಾಡಲಾಗಿಲ್ಲ. ಕೀಲಿಮಣೆ ವಿನ್ಯಾಸವನ್ನು ಅನುಸ್ಥಾಪಿಸಲು Keyman \"ಸಂರಚನೆ\"(ಕಾನ್ಫಿಗರೇಷನ್)ನಲ್ಲಿ \"ಡೌನ್ಲೋಡ್ ಕೀಲಿಮಣೆ\" ಗುಂಡಿಯನ್ನು ಕ್ಲಿಕ್ ಮಾಡಿ.</string>
+  <!-- Context: OSK Font Helper -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 8.0.294.0 -->
+  <string name="S_OSK_FontHelper_ChooseKeyboard" comment="OSK Font helper choose keyboard">ಅಕ್ಷರ ಶೈಲಿ(ಫಾಂಟ್)/ಗಳನ್ನು ಹುಡುಕಲು, ದಯವಿಟ್ಟು ಒಂದು ಕೀಮ್ಯಾನ್ ಕೀಲಿಮಣೆ ಆಯ್ಕೆಮಾಡಿ ಆಯ್ಕೆಮಾಡಿ.</string>
+  <!-- Context: Text Editor -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 10.0.836.0 -->
+  <string name="SKTextEditorCaption" comment="Caption of Text Editor">ಪಠ್ಯ ಸಂಪಾದಕ - ಕೀಮ್ಯಾನ್</string>
+</resources>

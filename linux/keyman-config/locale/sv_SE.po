@@ -1,0 +1,332 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: keyman\n"
+"Report-Msgid-Bugs-To: <support@keyman.com>\n"
+"POT-Creation-Date: 2020-08-19 19:17+0200\n"
+"PO-Revision-Date: 2023-01-24 02:30\n"
+"Last-Translator: \n"
+"Language-Team: Swedish\n"
+"Language: sv_SE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Crowdin-Project: keyman\n"
+"X-Crowdin-Project-ID: 386703\n"
+"X-Crowdin-Language: sv-SE\n"
+"X-Crowdin-File: /master/linux/keyman-config.pot\n"
+"X-Crowdin-File-ID: 504\n"
+
+#: keyman_config/__init__.py:68
+msgid "Neither sentry-sdk nor raven is available. Not enabling Sentry error reporting."
+msgstr "Varken sentry-sdk eller raven är tillgänglig. Aktiverar inte Sentry felrapportering."
+
+#: keyman_config/downloadkeyboard.py:23
+msgid "Download Keyman keyboards"
+msgstr "Ladda ner Keyman-tangentbord"
+
+#: keyman_config/downloadkeyboard.py:37 keyman_config/keyboard_details.py:49
+#: keyman_config/keyboard_details.py:340 keyman_config/view_installed.py:205
+msgid "_Close"
+msgstr "_Stäng"
+
+#: keyman_config/install_kmp.py:99
+msgid "You do not have permissions to install the keyboard files to the shared area /usr/local/share/keyman"
+msgstr "Du har inte behörighet att installera tangentbordsfilerna till det delade området /usr/local/share/keyman"
+
+#: keyman_config/install_kmp.py:103
+msgid "You do not have permissions to install the documentation to the shared documentation area /usr/local/share/doc/keyman"
+msgstr "Du har inte behörighet att installera dokumentationen till det delade dokumentationsområdet /usr/local/share/doc/keyman"
+
+#: keyman_config/install_kmp.py:107
+msgid "You do not have permissions to install the font files to the shared font area /usr/local/share/fonts"
+msgstr "Du har inte behörighet att installera teckensnittsfilerna till det delade teckensnittsområdet /usr/local/share/fonts"
+
+#: keyman_config/install_kmp.py:179
+#, python-brace-format
+msgid "install_kmp.py: error: No kmp.json or kmp.inf found in {package}"
+msgstr "install_kmp.py: fel: Ingen kmp.json eller kmp.inf hittades i {package}"
+
+#: keyman_config/install_kmp.py:246
+#, python-brace-format
+msgid "install_kmp.py: error: No kmp.json or kmp.inf found in {packageFile}"
+msgstr "install_kmp.py: fel: Ingen kmp.json eller kmp.inf hittades i {packageFile}"
+
+#: keyman_config/install_window.py:54
+#, python-brace-format
+msgid "Installing keyboard/package {keyboardid}"
+msgstr "Installerar tangentbord/paket {keyboardid}"
+
+#: keyman_config/install_window.py:72 keyman_config/install_window.py:93
+msgid "Keyboard is installed already"
+msgstr "Tangentbord är redan installerat"
+
+#: keyman_config/install_window.py:74
+#, python-brace-format
+msgid "The {name} keyboard is already installed at version {version}. Do you want to uninstall then reinstall it?"
+msgstr "{name} tangentbordet är redan installerat på version {version}. Vill du avinstallera sedan installera om det?"
+
+#: keyman_config/install_window.py:95
+#, python-brace-format
+msgid "The {name} keyboard is already installed with a newer version {installedversion}. Do you want to uninstall it and install the older version {version}?"
+msgstr "{name} tangentbordet är redan installerat med en nyare version {installedversion}. Vill du avinstallera det och installera den äldre versionen {version}?"
+
+#: keyman_config/install_window.py:128
+msgid "Keyboard layouts:   "
+msgstr "Tangentbordslayouter:   "
+
+#: keyman_config/install_window.py:147
+msgid "Fonts:   "
+msgstr "Teckensnitt:   "
+
+#: keyman_config/install_window.py:167 keyman_config/keyboard_details.py:96
+msgid "Package version:   "
+msgstr "Paketversion:   "
+
+#: keyman_config/install_window.py:179
+msgid "Author:   "
+msgstr "Författare:   "
+
+#: keyman_config/install_window.py:197
+msgid "Website:   "
+msgstr "Webbplats:   "
+
+#: keyman_config/install_window.py:211
+msgid "Copyright:   "
+msgstr "Upphovsrätt:   "
+
+#: keyman_config/install_window.py:245
+msgid "Details"
+msgstr "Detaljer"
+
+#: keyman_config/install_window.py:248
+msgid "README"
+msgstr "LÄS DIG"
+
+#: keyman_config/install_window.py:256 keyman_config/view_installed.py:200
+msgid "_Install"
+msgstr "_Installera"
+
+#: keyman_config/install_window.py:260
+msgid "_Cancel"
+msgstr "_Avbryt"
+
+#: keyman_config/install_window.py:305
+#, python-brace-format
+msgid "Keyboard {name} installed"
+msgstr "Tangentbord {name} installerat"
+
+#: keyman_config/install_window.py:310 keyman_config/install_window.py:315
+#, python-brace-format
+msgid "Keyboard {name} could not be installed."
+msgstr "Tangentbord {name} kunde inte installeras."
+
+#: keyman_config/install_window.py:311
+msgid "Error Message:"
+msgstr "Felmeddelande:"
+
+#: keyman_config/install_window.py:316
+msgid "Warning Message:"
+msgstr "Varningsmeddelande:"
+
+#: keyman_config/keyboard_details.py:37
+#, python-brace-format
+msgid "{name} keyboard"
+msgstr "{name} keyboard"
+
+#: keyman_config/keyboard_details.py:53
+msgid "ERROR: Keyboard metadata is damaged.\n"
+"Please \"Uninstall\" and then \"Install\" the keyboard."
+msgstr "FEL: Tangentbords metadata är skadad.\n"
+"Vänligen \"Avinstallera\" och sedan \"Installera\" tangentbordet."
+
+#: keyman_config/keyboard_details.py:74
+msgid "Package name:   "
+msgstr "Paketets namn:   "
+
+#: keyman_config/keyboard_details.py:85
+msgid "Package id:   "
+msgstr "Paket-id:   "
+
+#: keyman_config/keyboard_details.py:108
+msgid "Package description:   "
+msgstr "Paketbeskrivning:   "
+
+#: keyman_config/keyboard_details.py:121
+msgid "Package author:   "
+msgstr "Paketets författare:   "
+
+#: keyman_config/keyboard_details.py:133
+msgid "Package copyright:   "
+msgstr "Paketets upphovsrätt:   "
+
+#: keyman_config/keyboard_details.py:174
+msgid "Keyboard filename:   "
+msgstr "Tangentbords filnamn:   "
+
+#: keyman_config/keyboard_details.py:187
+msgid "Keyboard name:   "
+msgstr "Tangentbords namn:   "
+
+#: keyman_config/keyboard_details.py:198
+msgid "Keyboard id:   "
+msgstr "Keyboard id:   "
+
+#: keyman_config/keyboard_details.py:209
+msgid "Keyboard version:   "
+msgstr "Tangentbordsversion:   "
+
+#: keyman_config/keyboard_details.py:221
+msgid "Keyboard author:   "
+msgstr "Tangentbord författare:   "
+
+#: keyman_config/keyboard_details.py:232
+msgid "Keyboard license:   "
+msgstr "Tangentbord licens:   "
+
+#: keyman_config/keyboard_details.py:243
+msgid "Keyboard description:   "
+msgstr "Tangentbord beskrivning:   "
+
+#: keyman_config/keyboard_details.py:334
+#, python-brace-format
+msgid "Scan this code to load this keyboard\n"
+"on another device or <a href='{uri}'>share online</a>"
+msgstr "Skanna koden för att ladda det här tangentbordet\n"
+"på en annan enhet eller <a href='{uri}'>dela online</a>"
+
+#: keyman_config/options.py:24
+#, python-brace-format
+msgid "{packageId} Settings"
+msgstr "{packageId} Inställningar"
+
+#: keyman_config/view_installed.py:30
+msgid "Keyman Configuration"
+msgstr "Keyman konfiguration"
+
+#: keyman_config/view_installed.py:60
+msgid "Choose a kmp file..."
+msgstr "Välj en TMP-fil..."
+
+#. i18n: file type in file selection dialog
+#: keyman_config/view_installed.py:65
+msgid "KMP files"
+msgstr "KMP filer"
+
+#. i18n: column header in table displaying installed keyboards
+#: keyman_config/view_installed.py:141
+msgid "Icon"
+msgstr "Ikon"
+
+#. i18n: column header in table displaying installed keyboards
+#: keyman_config/view_installed.py:145
+msgid "Name"
+msgstr "Namn"
+
+#. i18n: column header in table displaying installed keyboards
+#: keyman_config/view_installed.py:148
+msgid "Version"
+msgstr "Version"
+
+#: keyman_config/view_installed.py:161
+msgid "_Uninstall"
+msgstr "_Avinstallera"
+
+#: keyman_config/view_installed.py:162 keyman_config/view_installed.py:304
+msgid "Uninstall keyboard"
+msgstr "Avinstallera tangentbordet"
+
+#: keyman_config/view_installed.py:167
+msgid "_About"
+msgstr "_Om"
+
+#: keyman_config/view_installed.py:168 keyman_config/view_installed.py:306
+msgid "About keyboard"
+msgstr "Om tangentbordet"
+
+#: keyman_config/view_installed.py:173
+msgid "_Help"
+msgstr "_Hjälp"
+
+#: keyman_config/view_installed.py:174 keyman_config/view_installed.py:305
+msgid "Help for keyboard"
+msgstr "Hjälp för tangentbordet"
+
+#: keyman_config/view_installed.py:179
+msgid "_Options"
+msgstr "_Alternativ"
+
+#: keyman_config/view_installed.py:180 keyman_config/view_installed.py:307
+msgid "Settings for keyboard"
+msgstr "Inställningar för tangentbord"
+
+#: keyman_config/view_installed.py:190
+msgid "_Refresh"
+msgstr "_Uppdatera"
+
+#: keyman_config/view_installed.py:191
+msgid "Refresh keyboard list"
+msgstr "Uppdatera tangentbordslista"
+
+#: keyman_config/view_installed.py:195
+msgid "_Download"
+msgstr "_Ladda"
+
+#: keyman_config/view_installed.py:196
+msgid "Download and install a keyboard from the Keyman website"
+msgstr "Ladda ner och installera ett tangentbord från Keymans webbplats"
+
+#: keyman_config/view_installed.py:201
+msgid "Install a keyboard from a file"
+msgstr "Installera ett tangentbord från en fil"
+
+#: keyman_config/view_installed.py:206
+msgid "Close window"
+msgstr "Stäng fönster"
+
+#: keyman_config/view_installed.py:278
+#, python-brace-format
+msgid "Uninstall keyboard {package}"
+msgstr "Avinstallera tangentbordet {package}"
+
+#: keyman_config/view_installed.py:280
+#, python-brace-format
+msgid "Help for keyboard {package}"
+msgstr "Hjälp för tangentbord {package}"
+
+#: keyman_config/view_installed.py:282
+#, python-brace-format
+msgid "About keyboard {package}"
+msgstr "Om tangentbordet {package}"
+
+#: keyman_config/view_installed.py:284
+#, python-brace-format
+msgid "Settings for keyboard {package}"
+msgstr "Inställningar för tangentbord {package}"
+
+#: keyman_config/view_installed.py:349
+msgid "Uninstall keyboard package?"
+msgstr "Avinstallera tangentbordspaket?"
+
+#: keyman_config/view_installed.py:351
+#, python-brace-format
+msgid "Are you sure that you want to uninstall the {keyboard} keyboard and its fonts?"
+msgstr "Är du säker på att du vill avinstallera tangentbordet {keyboard} och dess teckensnitt?"
+
+#: keyman_config/welcome.py:22
+#, python-brace-format
+msgid "{name} installed"
+msgstr "{name} installerade"
+
+#: keyman_config/welcome.py:40
+msgid "Open in _Web browser"
+msgstr "Öppna i _Webbläsare"
+
+#: keyman_config/welcome.py:42
+msgid "Open in the default web browser to do things like printing"
+msgstr "Öppna i standardwebbläsaren för att göra saker som utskrift"
+
+#: keyman_config/welcome.py:45
+msgid "_OK"
+msgstr "_OK"
+

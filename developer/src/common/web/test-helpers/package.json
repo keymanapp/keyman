@@ -1,0 +1,22 @@
+{
+  "name": "@keymanapp/developer-test-helpers",
+  "description": "Keyman Developer test helpers",
+  "type": "module",
+  "exports": {
+    ".": "./build/index.js"
+  },
+  "files": [
+    "/build/"
+  ],
+  "devDependencies": {
+    "@types/node": "^20.4.1",
+    "typescript": "^5.4.5"
+  },
+  "scripts": {
+    "build": "tsc -b"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@keymanapp/common-types": "*"
+  }
+}

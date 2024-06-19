@@ -54,10 +54,6 @@
 
 #include <evntprov.h>
 
-#define GLOBAL_ContextStackSize 80
-#define GLOBAL_MsgStackSize 80
-#define GLOBAL_MaxKeyboards 32
-
 #include "serialkeyeventclient.h"
 #include "SharedBuffers.h"
 
@@ -66,8 +62,6 @@
 class Globals
 {
 public:
-	//static INI *Ini();
-
 	static HHOOK *hhookGetMessage();
 	static HHOOK *hhookCallWndProc();
 
@@ -151,7 +145,6 @@ public:
 
   static BOOL get_debug_KeymanLog();
   static BOOL get_debug_ToConsole();
-  static BOOL get_CoreIntegration();
   static void LoadDebugSettings();
 };
 
@@ -197,15 +190,8 @@ typedef struct tagKEYMAN64THREADDATA
   LPINTKEYBOARDINFO lpKeyboards;			// keyboard definitions
   LPINTKEYBOARDINFO lpActiveKeyboard;
 
-   // I3616
-  LPMSG msgbuf;						// Message buffer (alloc at runtime)
-
   int nKeyboards;						// nLoadedKeyboards
   int nLanguages;           // I1087 //TODO UNUSED
-
-  LPWORD IndexStack;
-  LPWSTR miniContext;
-  int miniContextIfLen;
 
   KMSTATE state;
 
@@ -215,8 +201,6 @@ typedef struct tagKEYMAN64THREADDATA
 	  KeymanUIDisabled,
 	  FInitialised,
     FInitialising;
-
-  char ForceFileName[MAX_PATH];
 
   DWORD ActiveKeymanID;
 
@@ -266,12 +250,10 @@ typedef struct tagKEYMAN64THREADDATA
 
 extern UINT
   wm_keyman,						// user message - ignore msg
-  wm_kmdebug,						//  " "  "  "   - debugging
   wm_keyman_control,				// messages to main Keyman window - replaces WM_USER+*
   wm_keyman_control_internal,       // messages to all windows to notify of changes to Keyman   // I4412
   wm_keymankeydown,
   wm_keymankeyup,
-  wm_keymandebug,
   wm_keyman_grabwindowproc,
   wm_keyman_refresh,
   wm_kmgetactivekeymanid,

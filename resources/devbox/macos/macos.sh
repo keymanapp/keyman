@@ -15,7 +15,7 @@ REQUIRE_MACOS=false
 REQUIRE_WEB=false
 
 # Optional components
-REQUIRE_KMCOMP=false
+REQUIRE_KMC=false
 REQUIRE_PANDOC=false
 REQUIRE_SENTRYCLI=false
 
@@ -38,7 +38,7 @@ function print_help() {
     echo "    android ios macos web"
     echo
     echo "  optional targets:"
-    echo "    kmcomp       Keyman keyboard compiler"
+    echo "    kmc          Keyman keyboard compiler"
     echo "    pandoc       Documentation compiler"
     echo "    sentry-cli   sentry.keyman.com debug symbol uploader"
     echo
@@ -69,8 +69,8 @@ while [[ $# -gt 0 ]] ; do
             REQUIRE_WEB=true
             PARAMFOUND=true
             ;;
-        kmcomp)
-            REQUIRE_KMCOMP=true
+        kmc)
+            REQUIRE_KMC=true
             PARAMFOUND=true
             ;;
         pandoc)
@@ -93,7 +93,7 @@ while [[ $# -gt 0 ]] ; do
             REQUIRE_IOS=true
             REQUIRE_MACOS=true
             REQUIRE_WEB=true
-            REQUIRE_KMCOMP=true
+            REQUIRE_KMC=true
             REQUIRE_PANDOC=true
             REQUIRE_SENTRYCLI=true
             PARAMFOUND=true
@@ -145,7 +145,7 @@ which brew || (
 ## Install devchain components
 
 BREW_ALL="bash jq python3 meson ninja coreutils pyenv"
-BREW_WEB="node emscripten openjdk@8"
+BREW_WEB="node emscripten"
 BREW_IOS="swiftlint carthage"
 BREW_MACOS="carthage cocoapods"
 BREW_ANDROID="openjdk@8 android-sdk android-studio ant gradle maven"
@@ -165,12 +165,6 @@ $REQUIRE_SENTRYCLI && brew install getsentry/tools/sentry-cli
 # Add python 2.7.18 from pyenv
 pyenv install 2.7.18
 pyenv global 2.7.18
-
-# Install WINE
-$REQUIRE_KMCOMP && (
-  brew tap homebrew/cask-versions
-  brew install --cask --no-quarantine wine-stable
-)
 
 source "$THIS_DIR/keyman.macos.env.sh"
 

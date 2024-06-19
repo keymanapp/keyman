@@ -1,0 +1,29 @@
+{
+  "name": "regression-tests",
+  "description": "Automated regression test suite for KeymanWeb",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js -l"
+  },
+  "author": "Marc Durdin",
+  "license": "MIT",
+  "devDependencies": {
+    "adm-zip": "^0.4.13",
+    "commander": "^2.19.0",
+    "express": "^4.16.4",
+    "fs-extra": "^7.0.1",
+    "got": "^11.8.5",
+    "jasmine-core": "^3.3.0",
+    "karma": "^6.3.16",
+    "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^2.2.0",
+    "karma-jasmine": "^2.0.1",
+    "karma-mocha": "^2.0.1",
+    "karma-requirejs": "^1.1.0",
+    "karma-teamcity-reporter": "^1.1.0",
+    "minimist": "^1.2.6",
+    "mocha": "^8.4.0",
+    "requirejs": "^2.3.6",
+    "rimraf": "^2.6.3"
+  }
+}

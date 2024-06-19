@@ -6,13 +6,13 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.KMKeyboardDownloaderActivity;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.KMTextView;
-import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardEventListener;
-import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
-import com.tavultesoft.kmea.KMManager.KeyboardType;
+import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.KMKeyboardDownloaderActivity;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.KMTextView;
+import com.keyman.engine.KeyboardEventHandler.OnKeyboardEventListener;
+import com.keyman.engine.KeyboardEventHandler.OnKeyboardDownloadEventListener;
+import com.keyman.engine.KMManager.KeyboardType;
 
 import java.util.HashMap;
 import java.util.List;
@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
     Keyboard longpressKBbInfo = new Keyboard(
       "keyboardharness",
       "longpress",
-      "Longpress Keyboard",
+      "longpress '\"\\|5% +",
       "en",
       "English",
       "1.0",
@@ -95,6 +95,20 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardEventLi
       KMManager.KMDefault_KeyboardFont);
     KMManager.addKeyboard(this, finalKBInfo);
 
+    // Issue #9469 Verify special characters in keyamnweb-osk.ttf keyboard
+    Keyboard specialKBInfo = new Keyboard(
+      "test9469",
+      "test9469",
+      "test9469 Keyboard",
+      "en",
+      "English",
+      "1.0",
+      "",
+      "",
+      true,
+      KMManager.KMDefault_KeyboardFont,
+      KMManager.KMDefault_KeyboardFont);
+    KMManager.addKeyboard(this, specialKBInfo);
   }
 
   @Override

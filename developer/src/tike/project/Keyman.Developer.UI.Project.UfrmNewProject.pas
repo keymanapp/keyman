@@ -81,6 +81,7 @@ uses
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.UI.Project.ProjectUI,
+  Keyman.Developer.UI.Project.UfrmNewLDMLKeyboardProjectParameters,
   Keyman.Developer.UI.Project.UfrmNewProjectParameters,
   Keyman.Developer.UI.Project.UfrmNewModelProjectParameters,
   Keyman.Developer.UI.ImportWindowsKeyboardDialogManager,
@@ -108,18 +109,10 @@ begin
       Assert(False, 'Should not be able to have a project type of unknown here');
     kptBasic:
       Result := ShowNewProjectParameters(Owner);
+    kptLDMLKeyboard:
+      Result := ShowNewLDMLKeyboardProjectParameters(Owner);
     kptWordlistLexicalModel:
       Result := ShowNewModelProjectParameters(Owner);
-    kptBlankLexicalModel:
-      begin
-        modActionsMain.NewProject(ptLexicalModel);
-        Result := True;
-      end;
-    kptBlank:
-      begin
-        modActionsMain.NewProject(ptKeyboard);
-        Result := True;
-      end;
     kptImportWindowsKeyboard:
       Result := ShowImportWindowsKeyboard(Owner);
   end;
@@ -150,14 +143,12 @@ begin
   // Overly wordy but clarifies that we may have other types later
   if not Assigned(lvItems.Selected) then
     Result := kptUnknown
-  else if lvItems.Selected.Caption = 'Basic' then
+  else if lvItems.Selected.Caption = 'Keyman Keyboard' then
     Result := kptBasic
-  else if lvItems.Selected.Caption = 'Blank' then
-    Result := kptBlank
+  else if lvItems.Selected.Caption = 'LDML Keyboard' then
+    Result := kptLDMLKeyboard
   else if lvItems.Selected.Caption = 'Import Windows Keyboard' then
     Result := kptImportWindowsKeyboard
-  else if lvItems.Selected.Caption = 'Blank Lexical Model' then
-    Result := kptBlankLexicalModel
   else if lvItems.Selected.Caption = 'Wordlist Lexical Model' then
     Result := kptWordlistLexicalModel
   else
@@ -190,13 +181,13 @@ begin
       'Creates a keyboard project that matches the folder structure used in '+
       'the Keyman keyboards repository and includes all basic files '+
       'needed for a keyboard project.';
-    kptBlank: lblDescription.Caption :=
-      'Creates a blank, untitled keyboard project.';
+    kptLDMLKeyboard: lblDescription.Caption :=
+      'Creates a keyboard project that matches the folder structure used in '+
+      'the Keyman keyboards repository and includes all basic files '+
+      'needed for a LDML keyboard project.';
     kptImportWindowsKeyboard: lblDescription.Caption :=
       'Creates a new keyboard project, importing from a Windows system keyboard '+
       'and generating all the basic files needed for a keyboard project.';
-    kptBlankLexicalModel: lblDescription.Caption :=
-      'Creates a blank, untitled lexical model project.';
     kptWordlistLexicalModel: lblDescription.Caption :=
       'Creates a new lexical model project that matches the folder structure used in '+
       'the Keyman lexical-models repository and includes all basic files '+

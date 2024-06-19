@@ -1,18 +1,18 @@
 /*
   Name:             kmtip
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
+  Documentation:
   Description:      CKMTipTextService declaration.
   Create Date:      7 Sep 2009
 
   Modified Date:    27 Jan 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          07 Sep 2009 - mcdurdin - I2095 - TSF addin is not threadsafe
                     01 May 2014 - mcdurdin - I4216 - V9.0 - Keyman TIP should use ITfTextInputProcessorEx
                     16 Jun 2014 - mcdurdin - I4274 - V9.0 - kmtip does not work if already active before KM starts
@@ -88,8 +88,6 @@ public:
 
     BOOL TIPNotifyActivate(GUID *guidProfile);
 
-    BOOL DoRefreshPreservedKeys(BOOL Activating);
-
     static __declspec(thread) CKMTipTextService *ThreadThis;
 
 private:
@@ -107,7 +105,7 @@ private:
     void _UninitKeyman();
 
     void _TryAndStartKeyman();
-  
+
     HRESULT _UnpreserveAltKeys(ITfKeystrokeMgr *pKeystrokeMgr);
 
     // Keyman interfaces
@@ -145,7 +143,7 @@ typedef HRESULT(WINAPI *PKEYMANGETCONTEXTFUNC)(int n, PWSTR buf);   // I3567
 
 class Keyman32Interface {
 public:
-  static void WriteDebugEvent(char *file, int line, PWCHAR msg);
+  static void WriteDebugEvent(PWCHAR file, int line, PWCHAR msg);
 
   static BOOL TIPActivateEx(BOOL fActivate);
   static BOOL TIPActivateKeyboard(GUID *profile);

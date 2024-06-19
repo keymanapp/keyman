@@ -1,0 +1,182 @@
+{
+  "title": "kvks.xsd",
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "visualkeyboard": {
+      "properties": {
+        "header": {
+          "$ref": "#/definitions/kvk-header"
+        },
+        "encoding": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/kvk-encoding"
+          }
+        }
+      },
+      "required": [
+        "header"
+      ],
+      "additionalProperties": false,
+      "type": "object"
+    }
+  },
+  "required": [
+    "visualkeyboard"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "kvk-header": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "$ref": "#/definitions/kvk-version"
+        },
+        "kbdname": {
+          "type": "string"
+        },
+        "flags": {
+          "$ref": "#/definitions/kvk-header-flags"
+        },
+        "layout": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "version"
+      ],
+      "additionalProperties": false
+    },
+    "kvk-header-flags": {
+      "type": "object",
+      "properties": {
+        "key102": {
+          "$ref": "#/definitions/km-empty"
+        },
+        "displayunderlying": {
+          "$ref": "#/definitions/km-empty"
+        },
+        "usealtgr": {
+          "$ref": "#/definitions/km-empty"
+        },
+        "useunderlying": {
+          "$ref": "#/definitions/km-empty"
+        }
+      },
+      "additionalProperties": false
+    },
+    "kvk-encoding": {
+      "type": "object",
+      "properties": {
+        "layer": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/kvk-layer"
+          }
+        },
+        "$": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "$ref": "#/definitions/kvk-encoding-name"
+            },
+            "fontname": {
+              "type": "string"
+            },
+            "fontsize": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "name"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "$"
+      ],
+      "additionalProperties": false
+    },
+    "kvk-layer": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/kvk-key"
+          }
+        },
+        "$": {
+          "type": "object",
+          "properties": {
+            "shift": {
+              "$ref": "#/definitions/kvk-layer-shift"
+            }
+          },
+          "required": [
+            "shift"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "$"
+      ],
+      "additionalProperties": false
+    },
+    "kvk-key": {
+      "type": "object",
+      "properties": {
+        "bitmap": {
+          "type": "string"
+        },
+        "$": {
+          "type": "object",
+          "properties": {
+            "vkey": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "vkey"
+          ],
+          "additionalProperties": false
+        },
+        "_": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "$"
+      ],
+      "additionalProperties": false
+    },
+    "km-empty": {
+      "type": "string"
+    },
+    "kvk-encoding-name": {
+      "type": "string",
+      "enum": [
+        "ansi",
+        "unicode"
+      ]
+    },
+    "kvk-layer-shift": {
+      "type": "string",
+      "pattern": "S?(C|LC|RC)?(A|LA|RA)?"
+    },
+    "kvk-version": {
+      "type": "string",
+      "pattern": "(\\d+\\.)+(\\d+)",
+      "enum": [
+        "10.0"
+      ]
+    },
+    "km-version": {
+      "type": "string",
+      "pattern": "(\\d+\\.)+(\\d+)"
+    }
+  }
+}

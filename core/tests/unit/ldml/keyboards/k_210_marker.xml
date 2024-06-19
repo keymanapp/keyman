@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Test Keyboard
+-->
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="en" conformsTo="45">
+  <info author="srl295" indicator="🙀" layout="qwerty"  name="Marker Test"/>
+
+  <displays>
+    <display output="\m{grave}" display="`" />
+    <display output="\m{acute}" display="´" />
+  </displays>
+
+  <keys>
+    <key id="grave" output="\m{grave}" />
+    <key id="acute" output="\m{acute}" />
+    <key id="caret" output="C" /> <!-- see transform -->
+    <key id="hacek" output="H" /> <!-- see transform -->
+    <key id="squiggle" output="\m{squiggle}" />
+  </keys>
+
+  <layers formId="us">
+    <layer modifiers="none" id="base">
+      <row keys="grave acute caret hacek squiggle" />
+      <row keys="q w e" /> <!-- etc -->
+      <row keys="a s d" /> <!-- etc -->
+      <row keys="z x c v b" /> <!-- etc -->
+    </layer>
+  </layers>
+
+  <variables>
+    <!-- for regression  #11045 -->
+    <set id="mark_accent" value="\m{acute} \m{grave}"/>
+    <set id="spacing_accent" value="´ `"/>
+  </variables>
+
+  <transforms type="simple">
+    <transformGroup>
+      <!-- for regression  #11045 -->
+      <transform from="v($[mark_accent])" to="$[1:spacing_accent]" />
+      <transform from="\m{.}z" to="Z" />
+    </transformGroup>
+    <transformGroup>
+      <transform from="C" to="\m{caret}" />
+      <transform from="H" to="\m{hacek}" />
+    </transformGroup>
+    <transformGroup>
+      <transform from="\m{acute}\m{acute}" to="+" />
+      <transform from="e\m{acute}" to="é" />
+      <transform from="e\m{grave}" to="è" />
+      <transform from="e\m{caret}" to="ê" />
+      <transform from="e\m{hacek}" to="e\u{030C}" />
+      <transform from="c\m{hacek}" to="č" />
+    </transformGroup>
+    <transformGroup>
+      <transform from="\m{grave}" to="_" /> <!-- trailing grave becomes _ -->
+      <!-- no cleanup for trailing acute -->
+    </transformGroup>
+    <!-- for the do uble-marker-10955delete tests -->
+    <transformGroup>
+      <transform from="\m{squiggle}\m{squiggle}\m{squiggle}b" to="3-squiggles"/>
+      <transform from="\m{squiggle}\m{squiggle}b" to="2-squiggles"/>
+      <transform from="\m{squiggle}b" to="1-squiggles"/>
+      <transform from="b" to="no-squiggles"/>
+    </transformGroup>
+  </transforms>
+</keyboard3>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="tran-minimal"/>
+
+  <keys />
+
+  <transforms type="simple">
+    <transformGroup>
+      <transform from="xx" to="x"/>
+    </transformGroup>
+  </transforms>
+  <transforms type="simple"> <!-- dup -->
+    <transformGroup>
+      <transform from="yy" to="y"/>
+    </transformGroup>
+  </transforms>
+</keyboard3>

@@ -1,0 +1,81 @@
+/* Title for the bookmarks menu within the embedded browser */
+"browser-bookmarks-add-title" = "Přidat záložku";
+
+/* Title for the bookmarks menu within the embedded browser */
+"browser-bookmarks-none" = "Žádné záložky";
+
+/* Title for the bookmarks menu within the embedded browser */
+"browser-bookmarks-title" = "Záložky";
+
+/* Used to confirm a user's desire to install a package */
+"confirm-install" = "Instalovat";
+
+/* The label for the toggle to stop automatically showing the "Get Started" tutorial popup. */
+"disable-get-started" = "Znovu nezobrazovat";
+
+/* Indicates an error opening a web page requested by a user */
+"error-opening-page" = "Stránku nelze otevřít";
+
+/* Long-form used when installing a font in order to display a language properly. */
+"font-install-description" = "Dotkněte se instalace, aby se %@ správně zobrazilo ve všech aplikacích";
+
+/* The name of the iOS Settings menu option for keyboards */
+"ios-settings-keyboards" = "Klávesnice";
+
+/* The name of the iOS Settings menu option for giving the keyboard full access.  (The menu entry
+underneath the app's name within the app-specific keyboard menu.) */
+"ios-settings-allow-full-access" = "Povolit plný přístup";
+
+/* Short-form used when installing a font in order to display a language properly. */
+"language-for-font" = "%@ Font";
+
+/* Used for 'add' options within menus */
+"menu-add" = "Přidat";
+
+/* Used to indicate a sequence of menu options that a user needs to copy.  May be chained.  Example:  "Keyboards (1) > Enable Keyman (2)" */
+"menu-breadcrumbing" = "%1$@ > %2$@";
+
+/* Used to exit a menu without choosing an option */
+"menu-cancel" = "Zrušit";
+
+/* Menu option that erases all previously-typed text. */
+"menu-clear-text" = "Vymazat text";
+
+/* Menu option that displays a list designed to help users start using the app */
+"menu-get-started" = "Začněte";
+
+/* Menu option that displays help for the app */
+"menu-help" = "Info";
+
+/* Menu option that displays the main screen's drop-down menu */
+"menu-more" = "Více";
+
+/* Menu option used to edit keyboard and dictionary settings */
+"menu-settings" = "Nastavení";
+
+/* Menu option that displays the iOS Share menu */
+"menu-share" = "Sdílet";
+
+/* Menu option that displays an embedded web browser. */
+"menu-show-browser" = "Prohlížeč";
+
+/* Menu option used to control in-app font size. */
+"menu-text-size" = "Velikost textu";
+
+/* Used to describe the current font size */
+"text-size-label" = "Velikost textu: %i";
+
+/* Text to indicate that a user should set a toggle within iOS Settings to 'active'. */
+"toggle-to-enable" = "Povolit %@";
+
+/* First option on the Get Started tutorial - Add a keyboard for your language */
+"tutorial-add-keyboard" = "Přidat klávesnici do vašeho jazyka";
+
+/* Third option on the Get Started tutorial - Displays app help. */
+"tutorial-show-help" = "Více informací";
+
+/* Second option on the Get Started tutorial - Set up Keyman as system-wide keyboard */
+"tutorial-system-keyboard" = "Nastavit klíč jako celosystémovou klávesnici";
+
+/* Used to display app version (as in \"Version: 1.0.2\" */
+"version-label" = "Verze: %@";

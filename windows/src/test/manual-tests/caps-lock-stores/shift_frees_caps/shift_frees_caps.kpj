@@ -52,13 +52,6 @@
       <FileType>.md</FileType>
     </File>
     <File>
-      <ID>id_5e7df09f2deea5c5789153c0e7bca89f</ID>
-      <Filename>shift_frees_caps.keyboard_info</Filename>
-      <Filepath>shift_frees_caps.keyboard_info</Filepath>
-      <FileVersion></FileVersion>
-      <FileType>.keyboard_info</FileType>
-    </File>
-    <File>
       <ID>id_f5c18d42ae1a4a0cad4fa87bc4e65767</ID>
       <Filename>shift_frees_caps.kmx</Filename>
       <Filepath>source\..\build\shift_frees_caps.kmx</Filepath>

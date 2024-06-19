@@ -12,6 +12,7 @@
   #   VERSION_WITH_TAG: e.g. "14.0.1-alpha-test-1234" or "14.0.5-beta-local" or "14.0.1-alpha-test"
   #   [KEYMAN_ROOT:      fully resolved root path of Keyman repository]
   #   VERSION_ENVIRONMENT: One of: local, test, alpha, beta, stable
+  #   VERSION_GIT_TAG:  Git tag for the release, "release@$VERSION_WITH_TAG", e.g. "release@14.0.1-alpha-test-1234"
 */
 
 export interface Environment {
@@ -24,6 +25,7 @@ export interface Environment {
   versionTag: string;
   versionWithTag: string;
   versionEnvironment: string;
+  versionGitTag: string;
   // Pull Request Data
   pr: string;
 }
@@ -42,6 +44,7 @@ export function extractVersionData(version: string): Environment {
     versionTag: versionData[4],
     versionWithTag: version,
     versionEnvironment: versionData[6] || versionData[5] || 'stable',
+    versionGitTag: 'release@'+version,
 
     pr: versionData[7] || ''
   };

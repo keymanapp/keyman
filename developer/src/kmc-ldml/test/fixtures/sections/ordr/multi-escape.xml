@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="nod-Lana" conformsTo="45">
+  <info name="nod-Lana Test2"/>
+
+  <keys />
+
+  <transforms type="simple">
+    <transformGroup>
+      <reorder from="\u{1A60 1A45}" order="10" />
+    </transformGroup>
+  </transforms>
+</keyboard3>

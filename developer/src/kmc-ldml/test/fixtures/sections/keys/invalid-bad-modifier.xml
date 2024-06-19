@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="keys-minimal"/>
+
+  <keys />
+
+  <layers formId="us">
+    <layer id="base" modifiers="altR-shift"> <!-- invalid, should be "altR shift" -->
+      <row keys="a b c" />
+    </layer>
+  </layers>
+
+</keyboard3>

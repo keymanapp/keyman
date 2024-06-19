@@ -7,15 +7,19 @@ ext.rootPath = '../../'
 apply from: "$rootPath/version.gradle"
 
 android {
-    compileSdkVersion 33
+    compileSdk 34
+    namespace "com.keyman.engine"
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 33
+        targetSdkVersion 34
 
         // VERSION_CODE and VERSION_NAME from version.gradle but Gradle removes them for libraries
         buildConfigField "String", "KEYMAN_ENGINE_VERSION_NAME", "\""+VERSION_NAME+"\""
         buildConfigField "String", "VERSION_ENVIRONMENT", "\""+VERSION_ENVIRONMENT+"\""
+
+        // Sepcify library filename keyman-engine-$CONFIG.aar
+        setProperty("archivesBaseName", "keyman-engine")
     }
 
     buildTypes {
@@ -45,37 +49,26 @@ android {
             }
             systemProperty 'kmeaTestMode', 'true'
             workingDir = "../" // Defaults to the `app` subdirectory, which is different from Android Studio's default.
-
-            //Avoid Warning: an illegal reflective access operation has occurred
-            //Change argument jdk.module.illegalAccess=warn for detailed information which module needs to be opened
-            //Problem is caused by robolectric: see https://github.com/robolectric/robolectric/issues/4776
-            if(JavaVersion.current().isJava9Compatible()){
-                jvmArgs ('-Djdk.module.illegalAccess=permit')
-                jvmArgs('--add-opens', 'java.base/java.lang=ALL-UNNAMED')
-                jvmArgs('--add-opens', 'java.base/java.lang.reflect=ALL-UNNAMED')
-            }
-
         }
     }
 }
 
 dependencies {
     // 1.6.0-rc01 needed to resolve https://issuetracker.google.com/issues/238425626
-    implementation 'androidx.appcompat:appcompat:1.6.0-rc01' // 1.5.1
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     // material:1.7.0 will need Gradle plugin 7.1.0+
-    implementation 'com.google.android.material:material:1.6.0'
-    implementation 'commons-io:commons-io:2.6'
-    implementation 'io.sentry:sentry-android:6.9.2'
-    implementation 'androidx.preference:preference:1.2.0'
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'commons-io:commons-io:2.13.0'
+    implementation 'io.sentry:sentry-android:7.8.0'
+    implementation 'androidx.preference:preference:1.2.1'
 
     // Robolectric
     testImplementation 'androidx.test:core:1.5.0'
-    testImplementation 'androidx.test.ext:junit:1.1.4'
-    testImplementation 'org.robolectric:robolectric:4.8.1'
+    testImplementation 'androidx.test.ext:junit:1.1.5'
+    testImplementation 'org.robolectric:robolectric:4.10.3'
 
     // Generate QR Codes
-    // 3.0.1 requires Java 11
-    implementation ('com.github.kenglxn.QRGen:android:2.7.0') {
+    implementation ('com.github.kenglxn.QRGen:android:3.0.1') {
         transitive = true
     }
 }

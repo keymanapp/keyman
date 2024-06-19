@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="hardware-missing-attrs"/>
+
+  <keys>
+    <key id="Q" /> <!-- missing to, gap, and switch -->
+  </keys>
+
+  <layers formId="us">
+    <layer id="base">
+      <!-- beware: this is mapping `! -->
+      <row keys="Q" />
+    </layer>
+  </layers>
+</keyboard3>

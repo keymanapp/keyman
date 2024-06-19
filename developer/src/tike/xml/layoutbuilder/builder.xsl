@@ -108,7 +108,7 @@
         </div>
 
         <div class='toolbar-item' id='key-cap-unicode-toolbar-item'>
-          <label for='inpKeyCapUnicode'>Unicode:</label>
+          <label for='inpKeyCapUnicode'>Text Unicode:</label>
           <input id='inpKeyCapUnicode' type='text' size='16' />
         </div>
 
@@ -118,7 +118,7 @@
         </div>
 
         <div class='toolbar-item' id='key-hint-unicode-toolbar-item'>
-          <label for='inpKeyHintUnicode'>Unicode:</label>
+          <label for='inpKeyHintUnicode'>Hint Unicode:</label>
           <input id='inpKeyHintUnicode' type='text' size='16' />
         </div>
 
@@ -221,7 +221,7 @@
           <input id='inpSubKeyCap' type='text' size='8' />
         </div>
         <div class='toolbar-item' id='sub-key-cap-unicode-toolbar-item'>
-          <label>Unicode:</label>
+          <label>Text Unicode:</label>
           <input id='inpSubKeyCapUnicode' type='text' size='16' />
         </div>
         <div class='toolbar-item'>
@@ -247,6 +247,10 @@
           <label for='selSubKeyNextLayer'>Next Layer:</label>
           <select id='selSubKeyNextLayer'></select>
         </div>
+        <div class='toolbar-item'>
+          <label for='chkSubKeyIsDefault'>Default selection:</label>
+          <input id='chkSubKeyIsDefault' type='checkbox' />
+        </div>
       </div>
 
       <!-- Subkey Controls -->
@@ -265,6 +269,10 @@
         Platform: <select id='selAddPlatform'></select>
       </fieldset>
     </form>
+  </div>
+
+  <div id='addPlatformDialogNoPlatformsToAdd' title='Add platform'>
+    <p>All available platforms have already been added.</p>
   </div>
 
   <div id='addLayerDialog' title='Add layer'>

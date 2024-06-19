@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE keyboardTest3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/45/dtd/ldmlKeyboardTest3.dtd">
+<keyboardTest3 conformsTo="techpreview">
+  <info keyboard="k_211_marker_escape.xml" author="Team Keyboard" name="marker" />
+  <tests name="marker-escape">
+    <test name="marker-escape0">
+      <keystroke key="z" />
+      <keystroke key="e" />
+      <check result="E" />
+    </test>
+  </tests>
+</keyboardTest3>

@@ -1,0 +1,19 @@
+name: apt-install
+description: |
+  Install debian packages with apt
+inputs:
+  packages:
+    description: Packages to install
+    default: devscripts equivs
+    required: false
+runs:
+  using: "composite"
+  steps:
+    - name: Install packages
+      shell: bash
+      run: |
+        export DEBIAN_FRONTEND=noninteractive
+        export DEBIAN_PRIORITY=critical
+        export DEBCONF_NOWARNINGS=yes
+        sudo apt-get update
+        sudo apt-get install -q -y ${{ inputs.packages }}

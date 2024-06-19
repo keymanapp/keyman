@@ -69,6 +69,7 @@
     <xsl:param name="visible" />
     <xsl:param name="background" />
     <xsl:param name="color" />
+    <xsl:param name="fontweight" />
 
     <xsl:choose>
       <xsl:when test="$shield = 1 and /Keyman/canelevate">
@@ -87,6 +88,7 @@
           <xsl:attribute name="tabindex"><xsl:value-of select="$tabid"/></xsl:attribute>
           <xsl:attribute name="style">
             font-size: 11px;
+            <xsl:choose><xsl:when test="$fontweight != ''">font-weight: <xsl:value-of select="$fontweight"/>;</xsl:when></xsl:choose>
             height: 25px;
             display: inline-block;
             text-align: center;
@@ -120,6 +122,7 @@
           <xsl:attribute name="style">
             <xsl:choose><xsl:when test="$width != ''">width: <xsl:value-of select="$width"/>;</xsl:when></xsl:choose>
             font-size: 11px;
+            <xsl:choose><xsl:when test="$fontweight != ''">font-weight: <xsl:value-of select="$fontweight"/>;</xsl:when></xsl:choose>
             height: 25px;
             display: inline-block;
             margin-right: 8px;

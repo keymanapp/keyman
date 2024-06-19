@@ -1,0 +1,131 @@
+{
+  "title": "kpj.xsd",
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "KeymanDeveloperProject": {
+      "properties": {
+        "Options": {
+          "$ref": "#/definitions/Options"
+        },
+        "Files": {
+          "$ref": "#/definitions/Files"
+        }
+      },
+      "required": [
+        "Options"
+      ],
+      "additionalProperties": false,
+      "type": "object"
+    }
+  },
+  "required": [
+    "KeymanDeveloperProject"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "Options": {
+      "type": "object",
+      "properties": {
+        "BuildPath": {
+          "type": "string"
+        },
+        "SourcePath": {
+          "type": "string"
+        },
+        "CompilerWarningsAsErrors": {
+          "type": "string",
+          "pattern": "^(True|False)$"
+        },
+        "WarnDeprecatedCode": {
+          "type": "string",
+          "pattern": "^(True|False)$"
+        },
+        "CheckFilenameConventions": {
+          "type": "string",
+          "pattern": "^(True|False)$"
+        },
+        "SkipMetadataFiles": {
+          "type": "string",
+          "pattern": "^(True|False)$"
+        },
+        "ProjectType": {
+          "type": "string",
+          "pattern": "^(keyboard|lexicalmodel)$"
+        },
+        "Version": {
+          "type": "string",
+          "pattern": "^(1\\.0|2\\.0)$"
+        }
+      },
+      "required": [
+      ],
+      "additionalProperties": false
+    },
+    "Files": {
+      "type": "object",
+      "properties": {
+        "File": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/File"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "File"
+      ]
+    },
+    "File": {
+      "type": "object",
+      "properties": {
+        "ID": {
+          "type": "string"
+        },
+        "Filename": {
+          "type": "string"
+        },
+        "Filepath": {
+          "type": "string"
+        },
+        "FileVersion": {
+          "type": "string"
+        },
+        "FileType": {
+          "type": "string"
+        },
+        "Details": {
+          "$ref": "#/definitions/FileDetails"
+        },
+        "ParentFileID": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "Filename"
+      ],
+      "additionalProperties": false
+    },
+    "FileDetails": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string"
+        },
+        "Copyright": {
+          "type": "string"
+        },
+        "Message": {
+          "type": "string"
+        },
+        "Version": {
+          "type": "string"
+        }
+      },
+      "required": [
+      ],
+      "additionalProperties": false
+    }
+  }
+}

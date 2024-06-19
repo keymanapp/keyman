@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">မန် (Mon)</string>
+  <string name="ssApplicationTitle">ပလေဝ်ပလေတ် $APPNAME $VERSION</string>
+  <string name="ssTitle">စုတ် $APPNAME $VERSION</string>
+  <string name="ssInstallSuccess">$APPNAME $VERSION ဂှ်ပ္တိုန်စုတ်တုဲအာ ဗွဲမအံၚ်ဇၞးရ။</string>
+  <string name="ssCancelQuery">မၞးတးပါဲ ပ္တိုန်စုတ် $APPNAME ဏောၚ်ဂှ် ချိုတ်ပၠိုတ်ဟာ?</string>
+  <string name="ssBootstrapExtractingBundle">သှ်ဒၟံၚ် ကဠာဗါန်ဒဴ...</string>
+  <string name="ssBootstrapCheckingPackages">အဃောစၟဳစၟတ်ဒၟံၚ် ပက်ကေဂမၠိုၚ်...</string>
+  <string name="ssBootstrapCheckingForUpdates">သွက်သ္ဂောံသၠုၚ်က္ဆံၚ်တံဂှ် အဃောစၟဳစၟတ်ဒၟံၚ်လ္တူအွန်လာၚ်...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">အဃောစၟဳစၟတ်ဒၟံၚ် ပါယှေန်စုတ်လဝ်တုဲတုဲ...</string>
+  <string name="ssBootstrapReady">ဒတုဲမံၚ်...</string>
+  <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
+  <string name="ssActionInstallKeyman">• $APPNAME %0:s %1:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
+  <string name="ssActionInstallPackage">• %0:s %1:s %2:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: ssActionDownload -->
+  <string name="ssActionInstallPackageLanguage">• %0:s %1:s for %2:s %3:s</string>
+  <string name="ssActionNothingToInstall">မုသက်ပ္တိုန်စုတ်ဟွံမွဲ။</string>
+  <!-- Parameters: %0:s download size -->
+  <string name="ssActionDownload">(%0:s ဂြဲဖျေံလဝ်တုဲ)</string>
+  <string name="ssActionInstall">တၚ်ပ္တိုန်ဏံ ပ္တိုန်ဏာ:</string>
+  <string name="ssFreeCaption">$APPNAME $VERSION ဂှ် မးး ကေုာံ ဒှ် တံရိုဟ်ပံက်လဝ်မးမးရ</string>
+  <string name="ssLicenseLink">&amp;ဗှ်လာၚ်ဇြေန်</string>
+  <string name="ssInstallOptionsLink">စုတ် &amp;တၚ်ရုဲစှ်ဂမၠိုၚ်</string>
+  <string name="ssMessageBoxTitle">ပ္တိုန် $APPNAME</string>
+  <string name="ssOkButton">အဵုခေ</string>
+  <string name="ssInstallButton">&amp;ပ္တိုန်စုတ်</string>
+  <string name="ssCancelButton">တးပါဲ</string>
+  <string name="ssExitButton">ပ&amp;တိတ်</string>
+  <string name="ssStatusInstalling">စုတ်ဒၟံၚ် $APPNAME</string>
+  <string name="ssStatusRemovingOlderVersions">ပ္တိတ်ဒၟံၚ် ပါယှေန်တြေံဂမၠိုၚ်</string>
+  <string name="ssStatusComplete">စုတ်တုဲအာယျ</string>
+  <string name="ssQueryRestart">ပရေၚ်ပ္တိုန်စုတ် ဂွံအံၚ်ဇၞးမာန်ဂှ် မၞးဒးကလေၚ် ကၟာတ်ပံက် ဝေန်ဒဵုကၠာရောၚ်။ ကလေၚ် ကၟာတ်ပံက်စက်တုဲမ္ဂး ဍေံဆက်စုတ်အာကဵုရောၚ်။ 
+
+
+ကၟာတ်ပံက်စက်လၟုဟ်ဟာ?</string>
+  <string name="ssErrorUnableToAutomaticallyRestart">ဝေန်ဒဵုကလေၚ်ပံက်ကၟာတ်ကေတ်တ်ဟွံဂွံ။ ကၠာဟွံဂွံပံက် $APPNAME ဂှ် မၞးကလေၚ်ပံက်ကၟာတ်ကုစက်ထေက်ရ။</string>
+  <string name="ssMustRestart">သ္ဂောံပတုဲကမၠောန်ဂှ်မၞးဒးပံက်ကၟာတ်ကဵု ဝေန်ဒဵုဟေၚ်။ ပံက်ကၟာတ်တုဲမ္ဂး ကမၠောန်ပ္တိုန်တုဲရ။</string>
+  <string name="ssOldOsVersionInstallKeyboards">ဂွံစုတ် $APPNAME $VERSION ဂှ် ဒးကေတ် ဝေန်ဒဵု ၇ (ဟွံ) လပါ်လ္တူရ။ ဆ္ဂး ကဳမာန်ဒက်တပ် ၇၊ ၈၊ ၉ ဂှ် ဂွံဆဵုညာတ်ကေတ်ရ။ မၞးမိက်ဂွံပ္တိုန်စုတ် ကဳဗုဒ်ပါလုပ်ပ္ဍဲ စက်ပ္တိုန်ဏံ လ္တူ ပါယှေတ် ကဳမာန်ဒက်တပ်ဟာ?</string>
+  <string name="ssOldOsVersionDownload">$APPNAME ပါယှေန်ဏံ ဂှ် ဒးကေတ် ဝေန်ဒဵု ၇ ဟွံသေၚ်တှ်ေ လ္ပါ်လ္တူရ။ ဂြဲကေတ် ကဳမာန်ဒက်တပ် ၈ ဟာ?</string>
+  <string name="ssOptionsTitle">နဲကဲပ္တိုန်ဂွံဂမၠိုၚ်</string>
+  <string name="ssOptionsTitleInstallOptions">ဗီုပြၚ်ပ္တိုန်စုတ်ဂမၠိုၚ်</string>
+  <string name="ssOptionsTitleDefaultKeymanSettings">ပလေဝ်နာနာ $APPNAME ပကတိ</string>
+  <string name="ssOptionsTitleSelectModulesToInstall">မဝ်ဒျူ သွက်ဂွံ စုတ် ဟွံသေၚ် သမၠုၚ်က္ဆံၚ်</string>
+  <string name="ssOptionsTitleAssociatedKeyboardLanguage">ဘာသာ ကဳဗုဒ် မဆက်စပ်</string>
+  <string name="ssOptionsTitleLocation">ပါယှေန်သွက်ဂွံစုတ်</string>
+  <string name="ssOptionsStartWithWindows">စ $APPNAME ပ္ဍဲဝေန်ဒဵုတိုန်</string>
+  <string name="ssOptionsStartAfterInstall">စ $APPNAME အခါရ ပ္တိုန်တုဲဒှ်</string>
+  <string name="ssOptionsCheckForUpdates">စၟဳစၟတ်က္ဆံၚ် လ္တူအောန်လာၚ် နကဵုအခိၚ်အပိုၚ်အခြာ</string>
+  <string name="ssOptionsUpgradeKeyboards">သမၠုၚ်ပ္တိုန်ကဳဗုဒ် ပါယှေန် စုတ်လဝ်တုဲတုဲ နကဵု ပါယှေန် $VERSION</string>
+  <string name="ssOptionsAutomaticallyReportUsage">ပါ်ပရအ် စရၚ်သုၚ်စောဲ သ္ၚိတ်တ်ကု keyman.com</string>
+  <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
+  <string name="ssInstallerVersion">စုတ် ပါယှေန်: %0:s</string>
+  <string name="ssOptionsInstallKeyman">စုတ် $APPNAME</string>
+  <string name="ssOptionsUpgradeKeyman">သၠုၚ်ကဆံၚ် $APPNAME</string>
+  <!-- Parameters: %0:s: installed version -->
+  <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s ဂှ် စုတ်လဝ်တုဲ။</string>
+  <!-- Parameters: %0:s: version, %1:s: size -->
+  <string name="ssOptionsDownloadKeymanVersion">တံၚ်ဂြဲ ပါယှေန် %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: version -->
+  <string name="ssOptionsInstallKeymanVersion">ပါယှေန် %0:s</string>
+  <!-- Parameters: %0:s: package name %1:s -->
+  <string name="ssOptionsInstallPackage">စုတ် %0:s</string>
+  <!-- Parameters: %0:s: package version %1:s package size -->
+  <string name="ssOptionsDownloadPackageVersion">တံၚ်ဂြဲ ပါယှေန် %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: package version -->
+  <string name="ssOptionsInstallPackageVersion">ပါယှေန် %0:s</string>
+  <!-- Parameters: %0:s package name -->
+  <string name="ssOptionsPackageLanguageAssociation">ရုဲကဵု အရေဝ်ဘာသာ သ္ဂောံစၠောံကု ကဳဗုဒ် %0:s ညိ</string>
+  <string name="ssOptionsDefaultLanguage">ဘာသာပကတိ</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingTitle">အဃောတံၚ်ဂြဲ %0:s</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingText">အဃောတံၚ်ဂြဲ %0:s</string>
+  <string name="ssOffline">စက်ပ္တိုန် $APPNAME ဂွံဂြဲဖျေံတမ်ရိုဟ်ဂှ် ဆက်စၠောံကု keyman.com ဟွံဂွံ။</string>
+  <string name="ssOffline2">ကလေၚ်ရံၚ် မၞးနွံလ္တူအောန်လာၚ်ရဟာ တုဲ ကဵုအခေါၚ်သုၚ်စောဲအေန်တာနက် ကု စက်ပ္တိုန် $APPNAME ပ္ဍဲကဵု တၚ်ချိၚ် ဗ္ဒၚ်ပၟတ်ညိ။</string>
+  <string name="ssOffline3">ဍဵု ဗဒေါံ သွက်ဂွံတိတ်နူ စက်ပ္တိုန်၊ က္လေၚ်ဂ္စါန် သွက်ဂွံ ဂ္စါန်တုဲ ဂြဲဖျေံတမ်ရိုဟ်မွဲတုဲပၠန်၊ ဟွံသေၚ်မ္ဂး ဟွံပဂရု သွက်ဂွံ ဆက်အာ အိုပ်လာၚ်။</string>
+</resources>

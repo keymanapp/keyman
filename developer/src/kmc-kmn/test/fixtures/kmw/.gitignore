@@ -1,0 +1,4 @@
+# Files generated during unit tests that do not need to be committed but are
+# kept around for comparison if needed
+*.test.js
+*.strip.js

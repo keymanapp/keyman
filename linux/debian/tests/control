@@ -1,2 +1,5 @@
 Tests: test-build
-Depends: @, build-essential
+Depends: @,
+ build-essential,
+ pkg-config,
+Architecture: amd64 arm64 armel armhf i386 loong64 mips64el mipsel ppc64el riscv64

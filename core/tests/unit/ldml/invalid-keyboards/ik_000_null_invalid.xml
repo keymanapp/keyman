@@ -1,0 +1,10 @@
+<!--
+
+  Note that the corresponding .kmx is currently
+  hand-crafted and expected to be invalid
+
+@@keys: [K_Q][K_W][K_A]
+@@expect-error: This keyboard is invalid, so it will fail to load
+
+-->
+<keyboard3 />

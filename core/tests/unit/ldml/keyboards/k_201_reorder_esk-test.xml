@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE keyboardTest3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/45/dtd/ldmlKeyboardTest3.dtd">
+<keyboardTest3 conformsTo="techpreview">
+  <info keyboard="k_201_reorder_esk.xml" author="Team Keyboard" name="esk-reorder-test" />
+  <tests name="basic">
+    <!-- these are also in C++ form, search for test_reorder_esk -->
+    <test name="1short">
+      <startContext to="" />
+      <keystroke key="a" />
+      <keystroke key="x" />
+      <keystroke key="overbar" />
+      <check result="a\u0305x" />
+    </test>
+    <test name="2longer">
+      <startContext to="" />
+      <keystroke key="a" />
+      <keystroke key="z" />
+      <keystroke key="overbar" />
+      <keystroke key="x" />
+      <keystroke key="underbar" />
+      <check result="a\u0332\u0305xz" />
+    </test>
+  </tests>
+  <tests name="onekey" >
+    <!-- same as above, but a single key-->
+    <test name="1short">
+      <startContext to="" />
+      <keystroke key="test0" />
+      <check result="a\u0305x" />
+      <keystroke key="o"/>
+      <backspace />
+      <!-- no change -->
+      <check result="a\u0305x" />
+    </test>
+    <test name="2longer">
+      <startContext to="" />
+      <keystroke key="test1" />
+      <check result="a\u0332\u0305xz" />
+      <keystroke key="o"/>
+      <backspace />
+      <!-- no change -->
+      <check result="a\u0332\u0305xz" />
+    </test>
+  </tests>
+  <tests name="marker" >
+    <!-- same as above, but a single key with markers -->
+    <test name="1short">
+      <startContext to="" />
+      <keystroke key="markertest0" />
+      <check result="a\u0305x" />
+      <keystroke key="o"/>
+      <backspace />
+      <!-- no change -->
+      <check result="a\u0305x" />
+    </test>
+    <test name="2longer">
+      <startContext to="" />
+      <keystroke key="markertest1" />
+      <check result="a\u0332\u0305xz" />
+      <keystroke key="o"/>
+      <backspace />
+      <!-- no change -->
+      <check result="a\u0332\u0305xz" />
+    </test>
+  </tests>
+</keyboardTest3>

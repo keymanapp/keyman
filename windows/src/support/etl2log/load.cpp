@@ -2,6 +2,9 @@
 #include "stdafx.h"
 #include <stdio.h>
 #include <initguid.h>
+#include <codecvt>
+#include <locale>
+#include <string>
 
 #define SESSION_NAME  TEXT("Keyman-Debug-ETWProvider")
 
@@ -250,10 +253,19 @@ void PrintHKL(HKL hkl) {
   fwprintf(fp, L"\t%08.8x", (int) hkl);
 }
 
+std::string string_from_u16string(std::u16string const str) {
+	std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
+	return converter.to_bytes(str);
+}
+
 void PrintDefault(PWSTR propertyName, int type) {
   switch (type) {
   case TDH_INTYPE_UNICODESTRING:
-    fwprintf(fp, L"\t%s", (PWCHAR)propertyBuf);
+    {
+      std::u16string utf16buf((char16_t*)propertyBuf);
+      auto utf8buf = string_from_u16string(utf16buf);
+      fprintf(fp, "\t%s", utf8buf.c_str());
+    }
     break;
   case TDH_INTYPE_ANSISTRING:
     fwprintf(fp, L"\t%hs", (PCHAR)propertyBuf);

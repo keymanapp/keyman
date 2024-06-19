@@ -8,7 +8,7 @@ _hu_base_dir=$(dirname "$BASH_SOURCE")/../../..
 . $_hu_base_dir/resources/shellHelperFunctions.sh
 
 _hu_debug() {
-  if [[ $DEBUG == 1 ]]; then echo "$1"; fi
+  if [[ ! -z ${DEBUG+x} ]] && [[ $DEBUG == 1 ]]; then echo "$1"; fi
 }
 
 get_history_file_path() {
@@ -192,7 +192,7 @@ get_version_notes() {
   process_history_loop "${history_file}" get_version_helper "$vn_version" "$vn_tier" "$vn_product"
 
   if [ $version_found = false ]; then
-    fail "Could not find changelog information for $vn_product version $vn_version $vn_tier."
+    builder_die "Could not find changelog information for $vn_product version $vn_version $vn_tier."
   fi
 }
 

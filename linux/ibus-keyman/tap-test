@@ -1,7 +1,0 @@
-#! /bin/sh
-
-# from https://gitlab.gnome.org/GNOME/glib/-/blob/glib-2-58/tap-test
-
-# run a GTest in tap mode. The test binary is passed as $1
-
-$1 -k --tap

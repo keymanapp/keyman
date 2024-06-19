@@ -51,16 +51,19 @@ type
   private
     FFileType: TKMFileType;
     FDefaultExt: string;
+    FCanChangePath: Boolean;
     procedure SetFileType(const Value: TKMFileType);
     procedure EnableControls;
     function GetFileName: string;
     procedure SetBaseFileName(Value: string);
+    procedure SetCanChangePath(const Value: Boolean);
   protected
     function GetHelpTopic: string; override;
   public
     property FileName: string read GetFileName;
     property FileType: TKMFileType read FFileType write SetFileType;
     property BaseFileName: string write SetBaseFileName;
+    property CanChangePath: Boolean write SetCanChangePath;
   end;
 
 implementation
@@ -111,6 +114,12 @@ begin
   editFileName.Text := '';   // I4798
 end;
 
+procedure TfrmNewFileDetails.SetCanChangePath(const Value: Boolean);
+begin
+  FCanChangePath := Value;
+  EnableControls;
+end;
+
 procedure TfrmNewFileDetails.SetFileType(const Value: TKMFileType);
 begin
   FFileType := Value;
@@ -126,6 +135,10 @@ end;
 
 procedure TfrmNewFileDetails.EnableControls;
 begin
+  editFilePath.ReadOnly := not FCanChangePath;
+  editFilePath.ParentColor := editFilePath.ReadOnly;
+  if not editFilePath.ParentColor then editFilePath.Color := clWindow;
+
   cmdOK.Enabled := Trim(ChangeFileExt(ExtractFileName(editFileName.Text), '')) <> '';
 end;
 

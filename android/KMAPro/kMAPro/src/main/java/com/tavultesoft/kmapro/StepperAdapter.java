@@ -13,9 +13,9 @@ import androidx.fragment.app.FragmentManager;
 import com.stepstone.stepper.Step;
 import com.stepstone.stepper.adapter.AbstractFragmentStepAdapter;
 import com.stepstone.stepper.viewmodel.StepViewModel;
-import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.packages.PackageProcessor;
-import com.tavultesoft.kmea.util.FileUtils;
+import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.packages.PackageProcessor;
+import com.keyman.engine.util.FileUtils;
 
 import java.io.File;
 

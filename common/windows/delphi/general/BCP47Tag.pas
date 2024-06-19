@@ -124,7 +124,20 @@ var
 begin
   if not FIsValid and FIsValidated then
   begin
-    msg := '''' + OriginalTag + ''' is not a valid BCP 47 tag';
+    if OriginalTag = '' then
+    begin
+      msg := 'A valid BCP 47 tag must contain at least a language subtag';
+    end
+    else
+    begin
+      msg := '''' + OriginalTag + ''' is not a valid BCP 47 tag';
+    end;
+    Exit(False);
+  end;
+
+  if Tag = '' then
+  begin
+    msg := 'A valid BCP 47 tag must contain at least a language subtag';
     Exit(False);
   end;
 

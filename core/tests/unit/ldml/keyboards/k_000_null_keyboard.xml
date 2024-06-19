@@ -1,0 +1,10 @@
+<!-- TODO: this is not yet a valid keyboard file
+
+  Note that the corresponding .kmx is currently
+  hand-crafted and semi-valid.
+
+@@keys: [K_A][K_B][K_C]
+@@expect:
+
+-->
+<keyboard3 />

@@ -17,7 +17,7 @@ After you download Keyman, to install the program:
 
 2.  Double-click the file to begin installation.
 
-3. You may be warned to use a "Microsoft-verfied" App from the Microsoft Store. This is because Keyman is not available in the Microsoft Store. If "**Install Anyway**" is an option, select that. Otherwise follow the instructions found here [How To - Allow Windows 10 to Install Apps From Anywhere](../troubleshooting/install-app-from-anywhere)
+3. You may be warned to use a "Microsoft-verfied" App from the Microsoft Store. This is because Keyman is not available in the Microsoft Store. If "**Install Anyway**" is an option, select that. Otherwise follow the instructions found here [How To - Allow Windows to Install Apps From Anywhere](../troubleshooting/install-app-from-anywhere)
 ![](../desktop_images/km_non_app_store_2.png)
 
 4.  You will be asked to allow the installer to access your system.

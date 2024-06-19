@@ -1,6 +1,6 @@
-const assert = require('chai').assert;
-const breakWords = require('../build').wordBreakers['placeholder'];
 
+import { assert } from 'chai';
+import { placeholder as breakWords } from '@keymanapp/models-wordbreakers';
 
 describe('The placeholder word breaker', function () {
   it('should break simple English sentences', function () {

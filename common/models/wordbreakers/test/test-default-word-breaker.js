@@ -2,8 +2,8 @@
  * Smoke-test the default
  */
 
-const assert = require('chai').assert;
-const breakWords = require('../build').wordBreakers['default'];
+import { assert } from 'chai';
+import { default as breakWords } from '@keymanapp/models-wordbreakers';
 
 const SHY = '\u00AD'; // Other, Format.  The "Soft HYphen" - usually invisible unless needed for word-wrapping.
 

@@ -1,0 +1,372 @@
+{
+  "inputs": [
+    {
+      "isFromTouch": false,
+      "path": {
+        "coords": [
+          {
+            "targetX": 41,
+            "targetY": 124,
+            "t": 5146
+          },
+          {
+            "targetX": 41,
+            "targetY": 123,
+            "t": 5975
+          },
+          {
+            "targetX": 42,
+            "targetY": 123,
+            "t": 5988
+          },
+          {
+            "targetX": 43,
+            "targetY": 121,
+            "t": 6004
+          },
+          {
+            "targetX": 47,
+            "targetY": 114,
+            "t": 6021
+          },
+          {
+            "targetX": 50,
+            "targetY": 110,
+            "t": 6037
+          },
+          {
+            "targetX": 53,
+            "targetY": 105,
+            "t": 6055
+          },
+          {
+            "targetX": 57,
+            "targetY": 101,
+            "t": 6071
+          },
+          {
+            "targetX": 60,
+            "targetY": 96,
+            "t": 6088
+          },
+          {
+            "targetX": 62,
+            "targetY": 94,
+            "t": 6105
+          },
+          {
+            "targetX": 63,
+            "targetY": 91,
+            "t": 6121
+          },
+          {
+            "targetX": 66,
+            "targetY": 87,
+            "t": 6138
+          },
+          {
+            "targetX": 68,
+            "targetY": 85,
+            "t": 6154
+          },
+          {
+            "targetX": 70,
+            "targetY": 81,
+            "t": 6171
+          },
+          {
+            "targetX": 72,
+            "targetY": 79,
+            "t": 6188
+          },
+          {
+            "targetX": 73,
+            "targetY": 77,
+            "t": 6205
+          },
+          {
+            "targetX": 76,
+            "targetY": 75,
+            "t": 6221
+          },
+          {
+            "targetX": 77,
+            "targetY": 73,
+            "t": 6238
+          },
+          {
+            "targetX": 80,
+            "targetY": 70,
+            "t": 6254
+          },
+          {
+            "targetX": 81,
+            "targetY": 68,
+            "t": 6271
+          },
+          {
+            "targetX": 83,
+            "targetY": 67,
+            "t": 6287
+          },
+          {
+            "targetX": 83,
+            "targetY": 65,
+            "t": 6304
+          },
+          {
+            "targetX": 84,
+            "targetY": 64,
+            "t": 6321
+          },
+          {
+            "targetX": 85,
+            "targetY": 63,
+            "t": 6337
+          },
+          {
+            "targetX": 85,
+            "targetY": 62,
+            "t": 6354
+          },
+          {
+            "targetX": 86,
+            "targetY": 62,
+            "t": 6386
+          },
+          {
+            "targetX": 86,
+            "targetY": 61,
+            "t": 6392
+          },
+          {
+            "targetX": 87,
+            "targetY": 62,
+            "t": 6984
+          },
+          {
+            "targetX": 88,
+            "targetY": 64,
+            "t": 6988
+          },
+          {
+            "targetX": 90,
+            "targetY": 66,
+            "t": 7004
+          },
+          {
+            "targetX": 103,
+            "targetY": 80,
+            "t": 7021
+          },
+          {
+            "targetX": 111,
+            "targetY": 90,
+            "t": 7037
+          },
+          {
+            "targetX": 118,
+            "targetY": 97,
+            "t": 7054
+          },
+          {
+            "targetX": 123,
+            "targetY": 103,
+            "t": 7071
+          },
+          {
+            "targetX": 126,
+            "targetY": 106,
+            "t": 7088
+          },
+          {
+            "targetX": 129,
+            "targetY": 110,
+            "t": 7105
+          },
+          {
+            "targetX": 130,
+            "targetY": 112,
+            "t": 7121
+          },
+          {
+            "targetX": 134,
+            "targetY": 119,
+            "t": 7138
+          },
+          {
+            "targetX": 137,
+            "targetY": 123,
+            "t": 7155
+          },
+          {
+            "targetX": 139,
+            "targetY": 126,
+            "t": 7170
+          },
+          {
+            "targetX": 139,
+            "targetY": 127,
+            "t": 7188
+          },
+          {
+            "targetX": 140,
+            "targetY": 127,
+            "t": 7204
+          },
+          {
+            "targetX": 140,
+            "targetY": 128,
+            "t": 7247
+          },
+          {
+            "targetX": 141,
+            "targetY": 128,
+            "t": 7272
+          },
+          {
+            "targetX": 141,
+            "targetY": 128,
+            "t": 7470
+          }
+        ],
+        "segments": [
+          {
+            "type": "start",
+            "duration": 0,
+            "speed": 0,
+            "distance": 0,
+            "peakSpeed": 0,
+            "initialCoord": {
+              "targetX": 41,
+              "targetY": 124,
+              "t": 5146
+            },
+            "lastCoord": {
+              "targetX": 41,
+              "targetY": 124,
+              "t": 5146
+            }
+          },
+          {
+            "type": "hold",
+            "duration": 826,
+            "speed": 0,
+            "distance": 0,
+            "peakSpeed": 0,
+            "initialCoord": {
+              "targetX": 41,
+              "targetY": 124,
+              "t": 5146
+            },
+            "lastCoord": {
+              "targetX": 41,
+              "targetY": 124,
+              "t": 5972
+            }
+          },
+          {
+            "type": "move",
+            "duration": 414,
+            "cardinalDirection": "ne",
+            "speed": 0.18504685724922518,
+            "distance": 76.60939890117922,
+            "angle": 0.6278365938117894,
+            "peakSpeed": 0.412989085859492,
+            "initialCoord": {
+              "targetX": 41,
+              "targetY": 124,
+              "t": 5972
+            },
+            "lastCoord": {
+              "targetX": 86,
+              "targetY": 62,
+              "t": 6386
+            }
+          },
+          {
+            "type": "hold",
+            "duration": 579,
+            "cardinalDirection": "n",
+            "speed": 0.0017271157167530224,
+            "distance": 1,
+            "angle": 0,
+            "peakSpeed": 0.052083333333333266,
+            "initialCoord": {
+              "targetX": 86,
+              "targetY": 62,
+              "t": 6386
+            },
+            "lastCoord": {
+              "targetX": 86,
+              "targetY": 61,
+              "t": 6965
+            }
+          },
+          {
+            "type": "move",
+            "duration": 205,
+            "cardinalDirection": "se",
+            "speed": 0.40911680675632695,
+            "distance": 83.86894538504703,
+            "angle": 2.4575409934580126,
+            "peakSpeed": 0.8538638627297463,
+            "initialCoord": {
+              "targetX": 86,
+              "targetY": 61,
+              "t": 6965
+            },
+            "lastCoord": {
+              "targetX": 139,
+              "targetY": 126,
+              "t": 7170
+            }
+          },
+          {
+            "type": "hold",
+            "duration": 300,
+            "cardinalDirection": "se",
+            "speed": 0.009428090415820635,
+            "distance": 2.8284271247461903,
+            "angle": 2.356194490192345,
+            "peakSpeed": 0.06155426914277638,
+            "initialCoord": {
+              "targetX": 139,
+              "targetY": 126,
+              "t": 7170
+            },
+            "lastCoord": {
+              "targetX": 141,
+              "targetY": 128,
+              "t": 7470
+            }
+          },
+          {
+            "type": "end",
+            "duration": 0,
+            "speed": 0,
+            "distance": 0,
+            "peakSpeed": 0,
+            "initialCoord": {
+              "targetX": 141,
+              "targetY": 128,
+              "t": 7470
+            },
+            "lastCoord": {
+              "targetX": 141,
+              "targetY": 128,
+              "t": 7470
+            }
+          }
+        ],
+        "wasCancelled": false
+      }
+    }
+  ],
+  "config": {
+    "deviceStyle": "screen2",
+    "roamingStyle": "bounds1",
+    "receiverStyle": "full",
+    "safeZoneStyle": "safe-loose"
+  }
+}

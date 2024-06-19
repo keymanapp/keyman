@@ -1,0 +1,24 @@
+{
+  "extends": "../../../tsconfig.base.json",
+
+  "compilerOptions": {
+    "allowJs": false,
+    "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "sourceMap": false,
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "sourceRoot": "/common/tools/sourcemap-path-remapper/src",
+    "lib": ["dom", "es6"],
+    "target": "es5",
+    "types": ["node"],
+    "downlevelIteration": true,
+    "baseUrl": "./",
+    "outDir": "build/",
+    "tsBuildInfoFile": "build/tsconfig.tsbuildinfo",
+    "rootDir": "./src/"
+  },
+  "include": [
+    "src/**/*.ts"
+  ]
+}

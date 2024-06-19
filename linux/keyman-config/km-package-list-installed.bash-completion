@@ -1,15 +1,16 @@
-#/usr/bin/env bash
+# shellcheck disable=SC2148
+# No hashbang for bash completion scripts! They are intended to be sourced, not executed.
 
 _km-package-list-installed_completions()
 {
-    local cur prev opts
+    local cur opts
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
-    prev="${COMP_WORDS[COMP_CWORD-1]}"
     opts="-h --help -l --long -v --verbose -vv --veryverbose --version -u --user -o --os -s --shared"
 
     if [[ ${cur} == -* ]] ; then
-        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+        # shellcheck disable=SC2207
+        COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
         return 0
     fi
 }

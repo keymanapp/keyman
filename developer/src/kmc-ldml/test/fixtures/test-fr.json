@@ -1,0 +1,76 @@
+{
+  "keyboardTest3": {
+    "conformsTo": "techpreview",
+    "info": {
+      "keyboard": "fr-t-k0-azerty.xml",
+      "author": "Team Keyboard",
+      "name": "fr-test"
+    },
+    "repertoire": [
+      {
+        "name": "simple-repertoire",
+        "chars": "[a b c d e \\u{22}]",
+        "type": "simple"
+      },
+      {
+        "name": "chars-repertoire",
+        "chars": "[á é ó]",
+        "type": "gesture"
+      }
+    ],
+    "tests": [
+      {
+        "name": "key-tests",
+        "test": [
+          {
+            "name": "key-test",
+            "startContext": {
+              "to": "abc\\u0022..."
+            },
+            "actions": [
+              {
+                "type": "keystroke",
+                "key": "s"
+              },
+              {
+                "type": "check",
+                "result": "abc\\u0022...s"
+              },
+              {
+                "type": "keystroke",
+                "key": "t"
+              },
+              {
+                "type": "check",
+                "result": "abc\\u0022...st"
+              },
+              {
+                "type": "keystroke",
+                "key": "u"
+              },
+              {
+                "type": "check",
+                "result": "abc\\u0022...stu"
+              },
+              {
+                "type": "emit",
+                "to": "v"
+              },
+              {
+                "type": "check",
+                "result": "abc\\u0022...stuv"
+              },
+              {
+                "type": "backspace"
+              },
+              {
+                "type": "check",
+                "result": "abc\\u0022...stu"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

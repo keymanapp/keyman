@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+
+    <!-- Set the viewport width to match phone and tablet device widths -->
+    <meta name="viewport" content="width=device-width,user-scalable=no" />
+
+    <title>KeymanWeb CKEditor Integration</title>
+
+    <!-- Your page CSS -->
+    <style type='text/css'>
+      body {font-family: Tahoma,helvetica;}
+      h3 {font-size: 1em;font-weight:normal;color: darkred; margin-bottom: 4px}
+      .test {font-size: 1.5em; width:80%; min-height:30px; border: 1px solid gray;}
+      #KeymanWebControl {width:50%;min-width:600px;}
+    </style>
+
+    <!-- Insert uncompiled KeymanWeb source scripts -->
+    <script src="../../../../../build/publish/debug/keymanweb.js" type="application/javascript"></script>
+
+    <!--
+      For desktop browsers, a script for the user interface must be inserted here.
+
+      Standard UIs are toggle, button, float and toolbar.
+      The toolbar UI is best for any page designed to support keyboards for
+      a large number of languages.
+    -->
+    <script src="../../../../../build/publish/debug/kmwuitoggle.js"></script>
+
+    <!-- Initialization: set paths to keyboards, resources and fonts as required -->
+    <script>
+  var kmw=window.keyman;
+  kmw.init({
+    attachType: 'auto'
+  });
+    </script>
+
+    <!-- Add keyboard management script for local selection of keyboards to use -->
+    <script src="./utilities.js"></script>
+
+    <script src="https://cdn.ckeditor.com/ckeditor5/27.1.0/classic/ckeditor.js"></script>
+
+  </head>
+
+<!-- Sample page HTML -->
+  <body onload='loadKeyboards();'>
+    <h2>KeymanWeb Sample Page - Test CKEditor Integration</h2>
+
+    <p>Test CKEditor Integration</p>
+
+    <p>Be sure to reference the developer console for additional feedback.  </p>
+
+    <hr/>
+
+    <!--
+      The following DIV is used to position the Button or Toolbar User Interfaces on the page.
+      If omitted, those User Interfaces will appear at the top of the document body.
+      (It is ignored by other User Interfaces.)
+    -->
+    <div id='KeymanWebControl'></div>
+    <h3>Type in your language in this classic CKEditor:</h3>
+    <div id="classic-editor"></div>
+    <script>
+      ClassicEditor
+          .create( document.querySelector( '#classic-editor' ) )
+          .catch( error => {
+              console.error( error );
+          } );
+    </script>
+
+    <p><a href="inline.html">Test with inline editor</a></p>
+
+    <hr/>
+    <h3><a href="../index.html">Return to testing home page</a></h3>
+  </body>
+
+  <!--
+    *** DEVELOPER NOTE -- FIREFOX CONFIGURATION FOR TESTING ***
+    *
+    * If the URL bar starts with <b>file://</b>, Firefox may not load the font used
+    * to display the special characters used in the On-Screen Keyboard.
+    *
+    * To work around this Firefox bug, navigate to <b>about:config</b>
+    * and set <b>security.fileuri.strict_origin_policy</b> to <b>false</b>
+    * while testing.
+    *
+    * Firefox resolves website-based CSS URI references correctly without needing
+    * any configuration change, so this change should only be made for file-based testing.
+    *
+    ***
+  -->
+</html>

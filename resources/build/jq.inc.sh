@@ -8,8 +8,8 @@
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-JQ_THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-# . "$(dirname "$THIS_SCRIPT")/build-utils.sh"
+JQ_THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+# . "${THIS_SCRIPT%/*}/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 case "${OSTYPE}" in

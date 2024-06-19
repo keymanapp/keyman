@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE keyboardTest3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/45/dtd/ldmlKeyboardTest3.dtd">
+<keyboardTest3 conformsTo="techpreview">
+  <info keyboard="k_007_transform_rgx.xml" author="Team Keyboard" name="marker" />
+  <tests name="regex-tests">
+    <test name="regex-test-basic">
+      <keystroke key="a" />
+      <keystroke key="grave" />
+      <keystroke key="e" />
+      <check result="e`a" />
+    </test>
+    <test name="regex-test-map">
+      <keystroke key="A" />
+      <keystroke key="grave" />
+      <check result="a" />
+      <keystroke key="Y" />
+      <keystroke key="Y" />
+      <keystroke key="grave" />
+      <check result="ayy" />
+    </test>
+  </tests>
+  <tests name="regex-coverage-set">
+    <test name="regex-coverage-set-0">
+      <keystroke key="e"/>
+      <keystroke key="x"/>
+      <check result="ex"/> <!-- no change-->
+    </test>
+    <test name="regex-coverage-set-1">
+      <keystroke key="A"/>
+      <keystroke key="x"/>
+      <check result="Z"/>
+    </test>
+    <test name="regex-coverage-set-2">
+      <keystroke key="Y"/>
+      <keystroke key="Y"/>
+      <keystroke key="x"/>
+      <check result="Z"/>
+    </test>
+  </tests>
+  <tests name="regex-coverage-quantifiers">
+    <test name="regex-coverage-quantifiers-0">
+      <keystroke key="e"/>
+      <keystroke key="z"/>
+      <check result="ez"/>
+    </test>
+    <test name="regex-coverage-quantifiers-1">
+      <keystroke key="e"/>
+      <keystroke key="z"/>
+      <keystroke key="z"/>
+      <check result="E"/>
+    </test>
+    <test name="regex-coverage-quantifiers-2">
+      <keystroke key="e"/>
+      <keystroke key="z"/>
+      <keystroke key="z"/>
+      <keystroke key="z"/>
+      <check result="Ez"/> <!-- ezz matches first -->
+    </test>
+    <test name="regex-coverage-quantifiers-3">
+      <keystroke key="e"/>
+      <keystroke key="z"/>
+      <keystroke key="z"/>
+      <keystroke key="z"/>
+      <keystroke key="z"/>
+      <check result="Ezz"/>
+    </test>
+    <test name="regex-coverage-quantifiers-1b">
+      <keystroke key="e"/>
+      <keystroke key="zz"/>
+      <check result="E"/> <!-- zz captured in one go-->
+    </test>
+    <test name="regex-coverage-quantifiers-2b">
+      <keystroke key="e"/>
+      <keystroke key="zzz"/>
+      <check result="E"/> <!-- zzz captured in one go-->
+    </test>
+    <test name="regex-coverage-quantifiers-3b">
+      <keystroke key="e"/>
+      <keystroke key="zzzz"/>
+      <check result="ezzzz"/> <!-- zzzz did not match (too many -->
+      <backspace />
+      <check result="ezzz"/>
+      <keystroke key="z" />
+      <check result="ezzzz"/> <!-- back to where we just were-->
+      <backspace />
+      <backspace />
+      <keystroke key="z" /> <!-- ezz + z => E-->
+      <check result="E"/>
+    </test>
+  </tests>
+  <tests name="regression-11037">
+    <test name="caret">
+      <keystroke key="caret" />
+      <keystroke key="a" />
+      <check result="â"/>
+    </test>
+    <test name="pipe">
+      <keystroke key="pipe" />
+      <keystroke key="a" />
+      <check result="ą"/>
+    </test>
+  </tests>
+  <tests name="regression-11045-d">
+    <test name="caret">
+      <keystroke key="d" />
+      <keystroke key="name" />
+      <keystroke key="caret" />
+      <check result="caret" />
+    </test>
+    <test name="pipe">
+      <keystroke key="d" />
+      <keystroke key="name" />
+      <keystroke key="pipe" />
+      <check result="pipe" />
+    </test>
+    <test name="grave">
+      <keystroke key="d" />
+      <keystroke key="name" />
+      <keystroke key="grave" />
+      <check result="grave" />
+    </test>
+  </tests>
+  <tests name="regression-11045-i">
+    <test name="caret">
+      <keystroke key="i" />
+      <keystroke key="name" />
+      <keystroke key="caret" />
+      <check result="caret" />
+    </test>
+    <test name="pipe">
+      <keystroke key="i" />
+      <keystroke key="name" />
+      <keystroke key="pipe" />
+      <check result="pipe" />
+    </test>
+    <test name="grave">
+      <keystroke key="i" />
+      <keystroke key="name" />
+      <keystroke key="grave" />
+      <check result="grave" />
+    </test>
+  </tests>
+</keyboardTest3>

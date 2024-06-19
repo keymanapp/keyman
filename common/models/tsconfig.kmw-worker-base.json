@@ -1,0 +1,12 @@
+{
+  "extends": "../../web/tsconfig.base.json",
+
+  "compilerOptions": {
+    // To help better support legacy Android devices
+    "downlevelIteration": true,
+    // Facilitates & simplifies stitching together the worker sourcemaps during the polyfill-concatenation step.
+    "inlineSourceMap": true,
+    // May not be set at the same time as the prior setting.
+    "sourceMap": false
+  }
+}

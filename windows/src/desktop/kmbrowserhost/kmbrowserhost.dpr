@@ -32,11 +32,11 @@ const
   LOGGER_DESKTOP_KMBROWSERHOST = TKeymanSentryClient.LOGGER_DESKTOP + '.kmbrowserhost';
 begin
   TKeymanSentryClient.Start(TSentryClient, kscpDesktop,
-    LOGGER_DESKTOP_KMBROWSERHOST, [kscfCaptureExceptions, kscfTerminate]); // no ui wanted
+    LOGGER_DESKTOP_KMBROWSERHOST, LoadKeymanDesktopSentryFlags([kscfCaptureExceptions, kscfTerminate])); // no ui wanted
   try
     try
       TKeymanSentryClient.Validate;
-      FInitializeCEF := TCEFManager.Create;
+      FInitializeCEF := TCEFManager.Create(False);
       try
         FInitializeCEF.StartSubProcess;
       finally

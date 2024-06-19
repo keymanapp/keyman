@@ -114,7 +114,7 @@ type
   TKeyboardFileHeader = packed record
     dwIdentifier: Dword;    // Keyman compiled keyboard id
     dwFileVersion: Dword;   // 0x0400 or 0x0500
-    dwCheckSum: Dword;
+    dwCheckSum: Dword;       // As stored in keyboard. DEPRECATED as of 16.0
     KeyboardID: DWord;       // as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
     IsRegistered: DWord;        // was layout id;
     version: DWord;         // keyboard file version with VERSION keyword
@@ -182,7 +182,6 @@ function HotkeyAsString(hotkey: DWord): string;
 implementation
 
 uses
-  crc32,
   KeyNames,
   utildir,
   utilfiletypes;
@@ -195,8 +194,10 @@ const
     KF_CAPSONONLY =     $0002;
     KF_CAPSALWAYSOFF =  $0004;
     KF_LOGICALLAYOUT =  $0008;
+    KF_AUTOMATICVERSION = $0010;
 
-
+    // 16.0: Support for LDML Keyboards in KMXPlus file format
+    KF_KMXPLUS =        $0020;
 
 function GetSystemStore(Memory: PByte; SystemID: DWord; var Buffer: WideString): Boolean;  // I3310
 var
@@ -228,7 +229,6 @@ end;
 procedure GetKeyboardInfo(const FileName: string; FReturnDump: Boolean; var ki: TKeyboardInfo; FReturnBitmap: Boolean = False);
 var
   kfh: TKeyboardFileHeader;
-  cs: DWord;
   mem: TMemoryStream;
   ver: WideString;
   shver: string;
@@ -250,15 +250,6 @@ begin
 
     Position := 0;
     Read(kfh, SizeOf(TKeyboardFileHeader));
-
-    cs := kfh.dwCheckSum;
-    kfh.dwCheckSum := 0;
-
-    Position := 0;
-    Write(kfh, SizeOf(TKeyboardFileHeader));
-
-    if CalculateBufferCRC(Size, Memory) <> cs then
-      raise EKMXError.CreateFmt(EKMX_InvalidKeyboardFile, 'The keyboard file %0:s is invalid', [ExtractFileName(FileName)]);
 
     if kfh.dwIdentifier <> FILEID_COMPILED then
       raise EKMXError.CreateFmt(EKMX_InvalidKeyboardFile, 'The keyboard file %0:s is invalid', [ExtractFileName(FileName)]);

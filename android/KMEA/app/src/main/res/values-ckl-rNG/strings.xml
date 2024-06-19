@@ -9,8 +9,8 @@
     </plurals>
     <!-- Context: Title for list -->
     <plurals name="title_other_input_methods">
-        <item quantity="one">Other Input Method</item>
-        <item quantity="other">Other Input Methods</item>
+        <item quantity="one">Whalǝr ʻYa ko pu Suyere Damwa</item>
+        <item quantity="other">Whalǝr ʻYa ko Pu Suyere</item>
     </plurals>
     <!-- Context: Title for list -->
     <string name="title_add_keyboard" comment="Add a new keyboard">Dzakǝr Kibod Ɓǝlin</string>
@@ -45,7 +45,7 @@
     <!-- Context: Button label -->
     <string name="label_update" comment="Dialog button to update a resource">Update</string>
     <!-- Context: No internet for updates -->
-    <string name="no_internet_connection" comment="Internet connection missing">No internet connection</string>
+    <string name="no_internet_connection" comment="Internet connection missing">Layǝr intanet adiwɛ </string>
     <!-- Context: Keyboard Updates -->
     <string name="cannot_connect" comment="Error message when network connection fails">Adi ata mǝzi ɓui ka lukwa Keyman server wɛ!</string>
     <!-- Context: Keyboard Updates -->
@@ -84,7 +84,7 @@
     <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">      Su kura kal kalakwa kibod %1$s:%2$s nǝr %3$s nya.</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Ata kǝra chakǝnta akuyaka ɓui suyere tara tsukwar bwar dictionary kadǝbar ka ndǝ download ko sǝgǝl akǝr</string>
-    <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">      Cannot connect to Keyman server to check for associated dictionary to download</string>
+    <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">     Gadiyata mǝzi bui sava nǝr Keyman wɛ akuya ka gǝ bui ka sǝgǝl aka jiliyir dikshinari namtǝ gada bara. </string>
     <!-- Context: Model Updates -->
     <string name="confirm_download_model" comment="Confirmation to download a dictionary update">Gada bara download vershon nam ɓǝlin nǝr kibod ǝni ya?</string>
     <!-- Context: No associated dictionary found -->
@@ -128,11 +128,11 @@
     <!-- Context: Model Info -->
     <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">Gada bara kǝlba ka ɗalba dictionary ǝni ya?</string>
     <!-- Context: Model Deleted -->
-    <string name="model_deleted" comment="Notification when a dictionary is deleted">Dictionary deleted</string>
+    <string name="model_deleted" comment="Notification when a dictionary is deleted">Ndɛ kǝlba ka ɗalba dikshinari.</string>
     <!-- Context: Language Settings Keyboard install strings -->
     <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">%1$s ndǝ kurta vu kibod</string>
     <!-- Context: Language Settings Keyboard uninstall strings -->
-    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">Keyboard deleted</string>
+    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">Ndǝ kǝlba ka ɗalba Kibod </string>
     <!-- Context: Language Settings menu strings -->
     <string name="enable_corrections" comment="Enable corrections from the suggestion banner">Mǝrti ka dza mǝzi ʻyati ka dzǝ dzukti suwar su wato correctionyere</string>
     <!-- Context: Language Settings menu strings -->
@@ -140,12 +140,12 @@
     <!-- Context: Language Settings menu strings -->
     <string name="model_label">Dictionary</string>
     <plurals name="model_count">
-        <item quantity="one">Dictionary</item>
-        <item quantity="other">Dictionaries</item>
+        <item quantity="one">Dikshinari</item>
+        <item quantity="other">Dikshinariyere </item>
     </plurals>
     <!-- Context: Language Settings menu substring - Check for available dictionary -->
     <string name="check_available_model" comment="Check for available dictionary">Baraba ka zǝndi dictionary nam adai</string>
-    <string name="check_model_online" comment="Check for dictionaries online">Check for dictionaries online</string>
+    <string name="check_model_online" comment="Check for dictionaries online">Wulba ka gǝ bui dikshinariyere akwa layir shambar</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_info_header" comment="Dictionary name">Dictionary: %1$s</string>
     <!-- Context: Language Settings menu strings -->
@@ -168,5 +168,5 @@
     <!-- Context: Other strings -->
     <string name="help_bubble_text">Tsukwar vi ǝni akuya ka gǝ pali kibod</string>
     <!-- Context: anywhere -->
-    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
+    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Yar ta mǝzi ka mburnta brauza wɛ</string>
 </resources>

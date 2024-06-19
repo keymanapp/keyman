@@ -437,6 +437,11 @@ begin
     URL.StartsWith('http://127.0.0.1/');
 end;
 
+function IsPDFURL(URL: string): Boolean;
+begin
+  Result := LowerCase(URL).EndsWith('.pdf');
+end;
+
 procedure TframeCEFHost.Handle_CEF_BEFOREBROWSE(var message: TMessage);
 var
   params: TStringList;
@@ -464,7 +469,7 @@ begin
       FOnBeforeBrowse(Self, url, isPopup, wasHandled);
     end;
 
-    if FShouldOpenRemoteUrlsInBrowser and not IsLocalURL(URL) then
+    if FShouldOpenRemoteUrlsInBrowser and (not IsLocalURL(URL) or IsPDFURL(URL)) then
     begin
       {$MESSAGE HINT 'Refactor how remote URLs are handled'}
       // TODO: refactor links
@@ -534,7 +539,7 @@ begin
   else
   begin
     // Use OnBeforeBrowse for other URLs
-    if not Handled and FShouldOpenRemoteUrlsInBrowser and not IsLocalURL(URL) then
+    if not Handled and FShouldOpenRemoteUrlsInBrowser and (not IsLocalURL(URL) or IsPDFURL(URL)) then
       Handled := True;
 
     params := TStringList.Create;

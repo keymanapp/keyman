@@ -1,0 +1,16 @@
+{
+    "extends": "../../../tsconfig.base.json",
+    "compilerOptions": {
+        "composite": true,
+        "declaration": true,
+        "rootDir": ".",
+        "outDir": "ldml-const-builder/",
+    },
+    "exclude": [
+        "node_modules"
+    ],
+    "files": [
+        "keyman_core_ldml.ts",
+        "ldml-const-builder.ts"
+    ]
+}

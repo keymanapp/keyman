@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<visualkeyboard>
+  <header>
+    <version>10.0</version>
+    <kbdname>caps_lock_layer_3620</kbdname>
+    <!-- error_invalid_kvks_file: missing closing tag below -->
+    <flags>
+  </header>
+</visualkeyboard>

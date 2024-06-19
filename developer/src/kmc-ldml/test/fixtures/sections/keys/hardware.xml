@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="hardware-minimal"/>
+
+  <keys>
+    <key id="qqq" output="qqq" />
+    <key id="www" output="www" />
+    <key id="QQQ" output="QQQ" />
+    <key id="WWW" output="WWW" />
+  </keys>
+
+  <layers formId="us">
+    <layer id="base" modifiers="none">
+      <!-- beware: this is mapping ` and 1! -->
+      <row keys="qqq www" />
+    </layer>
+    <layer id="shift" modifiers="shift">
+      <!-- beware: this is mapping ` and 1! -->
+      <row keys="QQQ WWW" />
+    </layer>
+  </layers>
+</keyboard3>

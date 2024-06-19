@@ -1,0 +1,10 @@
+﻿c WARN_TouchLayoutUnidentifiedKey - issue #8000
+store(&VERSION) '10.0'
+store(&NAME) 'WARN_TouchLayoutUnidentifiedKey'
+store(&TARGETS) 'tablet'
+store(&LAYOUTFILE) 'warn_touch_layout_unidentified_key.keyman-touch-layout'
+c 'emoji' "😇" key on bottom row on base layer has no id (ll.205)
+
+begin Unicode > use(main)
+
+group(main) using keys

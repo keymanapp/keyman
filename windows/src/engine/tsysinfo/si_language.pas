@@ -145,6 +145,8 @@ begin
 
   regnode := xmlAddChild(subnode,'CurrentUser');
   AddRegistry(regnode, HKEY_CURRENT_USER, SRegKey_KeyboardLayout_CU);
+  AddRegistry(regnode, HKEY_CURRENT_USER, 'Software\Microsoft\CTF');
+  AddRegistry(regnode, HKEY_CURRENT_USER, SRegKey_ControlPanelInternationalUserProfile);
   subnode := xmlAddChild(node,'Uniscribe');
   AddFileVersion(subnode, GetFolderPath(CSIDL_SYSTEM) + 'usp10.dll');
   str := TStringList.Create;

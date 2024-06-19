@@ -1,0 +1,436 @@
+{
+  "inputs": [
+    {
+      "isFromTouch": false,
+      "path": {
+        "coords": [
+          {
+            "targetX": 104,
+            "targetY": 107,
+            "t": 217279
+          },
+          {
+            "targetX": 104,
+            "targetY": 106,
+            "t": 218768
+          },
+          {
+            "targetX": 105,
+            "targetY": 105,
+            "t": 218815
+          },
+          {
+            "targetX": 105,
+            "targetY": 104,
+            "t": 218825
+          },
+          {
+            "targetX": 105,
+            "targetY": 101,
+            "t": 218842
+          },
+          {
+            "targetX": 105,
+            "targetY": 99,
+            "t": 218859
+          },
+          {
+            "targetX": 105,
+            "targetY": 96,
+            "t": 218875
+          },
+          {
+            "targetX": 105,
+            "targetY": 94,
+            "t": 218891
+          },
+          {
+            "targetX": 105,
+            "targetY": 92,
+            "t": 218908
+          },
+          {
+            "targetX": 105,
+            "targetY": 91,
+            "t": 218925
+          },
+          {
+            "targetX": 105,
+            "targetY": 90,
+            "t": 218942
+          },
+          {
+            "targetX": 105,
+            "targetY": 89,
+            "t": 218959
+          },
+          {
+            "targetX": 105,
+            "targetY": 88,
+            "t": 218975
+          },
+          {
+            "targetX": 105,
+            "targetY": 87,
+            "t": 218992
+          },
+          {
+            "targetX": 105,
+            "targetY": 86,
+            "t": 219009
+          },
+          {
+            "targetX": 105,
+            "targetY": 84,
+            "t": 219024
+          },
+          {
+            "targetX": 105,
+            "targetY": 82,
+            "t": 219041
+          },
+          {
+            "targetX": 105,
+            "targetY": 81,
+            "t": 219058
+          },
+          {
+            "targetX": 105,
+            "targetY": 80,
+            "t": 219075
+          },
+          {
+            "targetX": 105,
+            "targetY": 78,
+            "t": 219091
+          },
+          {
+            "targetX": 105,
+            "targetY": 77,
+            "t": 219108
+          },
+          {
+            "targetX": 105,
+            "targetY": 76,
+            "t": 219125
+          },
+          {
+            "targetX": 106,
+            "targetY": 75,
+            "t": 219142
+          },
+          {
+            "targetX": 106,
+            "targetY": 73,
+            "t": 219158
+          },
+          {
+            "targetX": 106,
+            "targetY": 72,
+            "t": 219192
+          },
+          {
+            "targetX": 106,
+            "targetY": 71,
+            "t": 219217
+          },
+          {
+            "targetX": 107,
+            "targetY": 71,
+            "t": 219225
+          },
+          {
+            "targetX": 107,
+            "targetY": 70,
+            "t": 219241
+          },
+          {
+            "targetX": 107,
+            "targetY": 69,
+            "t": 219266
+          },
+          {
+            "targetX": 108,
+            "targetY": 68,
+            "t": 219275
+          },
+          {
+            "targetX": 108,
+            "targetY": 67,
+            "t": 219297
+          },
+          {
+            "targetX": 109,
+            "targetY": 67,
+            "t": 219312
+          },
+          {
+            "targetX": 109,
+            "targetY": 66,
+            "t": 219324
+          },
+          {
+            "targetX": 110,
+            "targetY": 66,
+            "t": 219341
+          },
+          {
+            "targetX": 111,
+            "targetY": 65,
+            "t": 219363
+          },
+          {
+            "targetX": 111,
+            "targetY": 64,
+            "t": 219386
+          },
+          {
+            "targetX": 112,
+            "targetY": 64,
+            "t": 219392
+          },
+          {
+            "targetX": 113,
+            "targetY": 64,
+            "t": 219409
+          },
+          {
+            "targetX": 114,
+            "targetY": 63,
+            "t": 219424
+          },
+          {
+            "targetX": 115,
+            "targetY": 63,
+            "t": 219444
+          },
+          {
+            "targetX": 115,
+            "targetY": 62,
+            "t": 219462
+          },
+          {
+            "targetX": 116,
+            "targetY": 62,
+            "t": 219475
+          },
+          {
+            "targetX": 117,
+            "targetY": 62,
+            "t": 219492
+          },
+          {
+            "targetX": 119,
+            "targetY": 62,
+            "t": 219508
+          },
+          {
+            "targetX": 121,
+            "targetY": 62,
+            "t": 219525
+          },
+          {
+            "targetX": 125,
+            "targetY": 62,
+            "t": 219541
+          },
+          {
+            "targetX": 128,
+            "targetY": 62,
+            "t": 219558
+          },
+          {
+            "targetX": 133,
+            "targetY": 62,
+            "t": 219574
+          },
+          {
+            "targetX": 137,
+            "targetY": 62,
+            "t": 219592
+          },
+          {
+            "targetX": 142,
+            "targetY": 62,
+            "t": 219609
+          },
+          {
+            "targetX": 146,
+            "targetY": 62,
+            "t": 219625
+          },
+          {
+            "targetX": 151,
+            "targetY": 63,
+            "t": 219641
+          },
+          {
+            "targetX": 155,
+            "targetY": 64,
+            "t": 219658
+          },
+          {
+            "targetX": 156,
+            "targetY": 64,
+            "t": 219676
+          }
+        ],
+        "segments": [
+          {
+            "type": "start",
+            "duration": 0,
+            "speed": 0,
+            "distance": 0,
+            "peakSpeed": 0,
+            "initialCoord": {
+              "targetX": 104,
+              "targetY": 107,
+              "t": 217279
+            },
+            "lastCoord": {
+              "targetX": 104,
+              "targetY": 107,
+              "t": 217279
+            }
+          },
+          {
+            "type": "hold",
+            "duration": 1461,
+            "speed": 0,
+            "distance": 0,
+            "peakSpeed": 0,
+            "initialCoord": {
+              "targetX": 104,
+              "targetY": 107,
+              "t": 217279
+            },
+            "lastCoord": {
+              "targetX": 104,
+              "targetY": 107,
+              "t": 218740
+            }
+          },
+          {
+            "type": "move",
+            "duration": 368,
+            "cardinalDirection": "n",
+            "speed": 0.08156701641197628,
+            "distance": 30.01666203960727,
+            "angle": 0.03332099587824743,
+            "peakSpeed": 0.13897510723899545,
+            "initialCoord": {
+              "targetX": 104,
+              "targetY": 107,
+              "t": 218740
+            },
+            "lastCoord": {
+              "targetX": 105,
+              "targetY": 77,
+              "t": 219108
+            }
+          },
+          {
+            "type": "move",
+            "duration": 216,
+            "cardinalDirection": "n",
+            "speed": 0.05418842551259086,
+            "distance": 11.704699910719626,
+            "angle": 0.3487710035839072,
+            "peakSpeed": 0.11440730327588175,
+            "initialCoord": {
+              "targetX": 105,
+              "targetY": 77,
+              "t": 219108
+            },
+            "lastCoord": {
+              "targetX": 109,
+              "targetY": 66,
+              "t": 219324
+            }
+          },
+          {
+            "type": "move",
+            "duration": 120,
+            "cardinalDirection": "ne",
+            "speed": 0.05590169943749475,
+            "distance": 6.708203932499369,
+            "angle": 1.1071487177940904,
+            "peakSpeed": 0.11507720669263413,
+            "initialCoord": {
+              "targetX": 109,
+              "targetY": 66,
+              "t": 219324
+            },
+            "lastCoord": {
+              "targetX": 115,
+              "targetY": 63,
+              "t": 219444
+            }
+          },
+          {
+            "type": "move",
+            "duration": 214,
+            "cardinalDirection": "e",
+            "speed": 0.1869742899415192,
+            "distance": 40.01249804748511,
+            "angle": 1.5957911204138169,
+            "peakSpeed": 0.35350060247027293,
+            "initialCoord": {
+              "targetX": 115,
+              "targetY": 63,
+              "t": 219444
+            },
+            "lastCoord": {
+              "targetX": 155,
+              "targetY": 64,
+              "t": 219658
+            }
+          },
+          {
+            "type": "hold",
+            "duration": 112,
+            "cardinalDirection": "e",
+            "speed": 0.008928571428571428,
+            "distance": 1,
+            "angle": 1.5707963267948966,
+            "peakSpeed": 0.041666666666666824,
+            "initialCoord": {
+              "targetX": 155,
+              "targetY": 64,
+              "t": 219658
+            },
+            "lastCoord": {
+              "targetX": 156,
+              "targetY": 64,
+              "t": 219770
+            }
+          },
+          {
+            "type": "end",
+            "duration": 0,
+            "speed": 0,
+            "distance": 0,
+            "peakSpeed": 0,
+            "initialCoord": {
+              "targetX": 156,
+              "targetY": 64,
+              "t": 219770
+            },
+            "lastCoord": {
+              "targetX": 156,
+              "targetY": 64,
+              "t": 219770
+            }
+          }
+        ],
+        "wasCancelled": false
+      }
+    }
+  ],
+  "config": {
+    "deviceStyle": "screen2",
+    "roamingStyle": "bounds1",
+    "receiverStyle": "full",
+    "safeZoneStyle": "safe-loose"
+  }
+}

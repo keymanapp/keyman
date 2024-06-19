@@ -1,0 +1,332 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: keyman\n"
+"Report-Msgid-Bugs-To: <support@keyman.com>\n"
+"POT-Creation-Date: 2020-08-19 19:17+0200\n"
+"PO-Revision-Date: 2023-01-24 03:25\n"
+"Last-Translator: \n"
+"Language-Team: Ukrainian\n"
+"Language: uk_UA\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=((n%10==1 && n%100!=11) ? 0 : ((n%10 >= 2 && n%10 <=4 && (n%100 < 12 || n%100 > 14)) ? 1 : ((n%10 == 0 || (n%10 >= 5 && n%10 <=9)) || (n%100 >= 11 && n%100 <= 14)) ? 2 : 3));\n"
+"X-Crowdin-Project: keyman\n"
+"X-Crowdin-Project-ID: 386703\n"
+"X-Crowdin-Language: uk\n"
+"X-Crowdin-File: /master/linux/keyman-config.pot\n"
+"X-Crowdin-File-ID: 504\n"
+
+#: keyman_config/__init__.py:68
+msgid "Neither sentry-sdk nor raven is available. Not enabling Sentry error reporting."
+msgstr "Ні реал sdk ні крук не доступні. Не допускається надсилання повідомлень про помилки входу на екран."
+
+#: keyman_config/downloadkeyboard.py:23
+msgid "Download Keyman keyboards"
+msgstr "Завантажити клавіатури Keyman"
+
+#: keyman_config/downloadkeyboard.py:37 keyman_config/keyboard_details.py:49
+#: keyman_config/keyboard_details.py:340 keyman_config/view_installed.py:205
+msgid "_Close"
+msgstr "_Закрити"
+
+#: keyman_config/install_kmp.py:99
+msgid "You do not have permissions to install the keyboard files to the shared area /usr/local/share/keyman"
+msgstr "У вас немає дозволу на встановлення файлів клавіатури у спільній області /usr/local/share/keyman"
+
+#: keyman_config/install_kmp.py:103
+msgid "You do not have permissions to install the documentation to the shared documentation area /usr/local/share/doc/keyman"
+msgstr "У вас немає прав на встановлення документації до спільної області документації /usr/local/share/doc/keyman"
+
+#: keyman_config/install_kmp.py:107
+msgid "You do not have permissions to install the font files to the shared font area /usr/local/share/fonts"
+msgstr "У вас немає прав на встановлення файлів шрифтів у спільну область шрифту /usr/local/share/fonts"
+
+#: keyman_config/install_kmp.py:179
+#, python-brace-format
+msgid "install_kmp.py: error: No kmp.json or kmp.inf found in {package}"
+msgstr "install_kmp.py: помилка: у {package} не знайдено kmp.json або kmp.inf"
+
+#: keyman_config/install_kmp.py:246
+#, python-brace-format
+msgid "install_kmp.py: error: No kmp.json or kmp.inf found in {packageFile}"
+msgstr "install_kmp.py: помилка: у {packageFile} не знайдено kmp.json або kmp.inf"
+
+#: keyman_config/install_window.py:54
+#, python-brace-format
+msgid "Installing keyboard/package {keyboardid}"
+msgstr "Встановлення клавіатури/пакету {keyboardid}"
+
+#: keyman_config/install_window.py:72 keyman_config/install_window.py:93
+msgid "Keyboard is installed already"
+msgstr "Клавіатура вже встановлена"
+
+#: keyman_config/install_window.py:74
+#, python-brace-format
+msgid "The {name} keyboard is already installed at version {version}. Do you want to uninstall then reinstall it?"
+msgstr "Клавіатура {name} вже встановлена на версії {version}. Ви хочете видалити, а потім перевстановити його?"
+
+#: keyman_config/install_window.py:95
+#, python-brace-format
+msgid "The {name} keyboard is already installed with a newer version {installedversion}. Do you want to uninstall it and install the older version {version}?"
+msgstr "Клавіатура {name} вже встановлена з новішою версією {installedversion}. Ви хочете видалити її і встановити стару версію {version}?"
+
+#: keyman_config/install_window.py:128
+msgid "Keyboard layouts:   "
+msgstr "Розкладки клавіатури:   "
+
+#: keyman_config/install_window.py:147
+msgid "Fonts:   "
+msgstr "Шрифт:   "
+
+#: keyman_config/install_window.py:167 keyman_config/keyboard_details.py:96
+msgid "Package version:   "
+msgstr "Версія пакету:   "
+
+#: keyman_config/install_window.py:179
+msgid "Author:   "
+msgstr "Автор:   "
+
+#: keyman_config/install_window.py:197
+msgid "Website:   "
+msgstr "Веб-сайт:   "
+
+#: keyman_config/install_window.py:211
+msgid "Copyright:   "
+msgstr "Авторські права:   "
+
+#: keyman_config/install_window.py:245
+msgid "Details"
+msgstr "Подробиці"
+
+#: keyman_config/install_window.py:248
+msgid "README"
+msgstr "README"
+
+#: keyman_config/install_window.py:256 keyman_config/view_installed.py:200
+msgid "_Install"
+msgstr "_Встановити"
+
+#: keyman_config/install_window.py:260
+msgid "_Cancel"
+msgstr "_Скасувати"
+
+#: keyman_config/install_window.py:305
+#, python-brace-format
+msgid "Keyboard {name} installed"
+msgstr "Клавіатура {name} встановлена"
+
+#: keyman_config/install_window.py:310 keyman_config/install_window.py:315
+#, python-brace-format
+msgid "Keyboard {name} could not be installed."
+msgstr "Клавіатура {name} не може бути встановлена."
+
+#: keyman_config/install_window.py:311
+msgid "Error Message:"
+msgstr "Повідомлення про помилку:"
+
+#: keyman_config/install_window.py:316
+msgid "Warning Message:"
+msgstr "Попереджувальне повідомлення:"
+
+#: keyman_config/keyboard_details.py:37
+#, python-brace-format
+msgid "{name} keyboard"
+msgstr "{name} keyboard"
+
+#: keyman_config/keyboard_details.py:53
+msgid "ERROR: Keyboard metadata is damaged.\n"
+"Please \"Uninstall\" and then \"Install\" the keyboard."
+msgstr "Помилка: метадані клавіатури пошкоджено.\n"
+"будь ласка, \"Видалити\" і потім \"Встановити\" клавіатуру."
+
+#: keyman_config/keyboard_details.py:74
+msgid "Package name:   "
+msgstr "Назва пакету:   "
+
+#: keyman_config/keyboard_details.py:85
+msgid "Package id:   "
+msgstr "ID пакета:   "
+
+#: keyman_config/keyboard_details.py:108
+msgid "Package description:   "
+msgstr "Опис пакету:   "
+
+#: keyman_config/keyboard_details.py:121
+msgid "Package author:   "
+msgstr "Пакет автора:   "
+
+#: keyman_config/keyboard_details.py:133
+msgid "Package copyright:   "
+msgstr "Тільки авторські права пакета:   "
+
+#: keyman_config/keyboard_details.py:174
+msgid "Keyboard filename:   "
+msgstr "Ім'я файлу клавіатури:   "
+
+#: keyman_config/keyboard_details.py:187
+msgid "Keyboard name:   "
+msgstr "Ім'я клавіатури:   "
+
+#: keyman_config/keyboard_details.py:198
+msgid "Keyboard id:   "
+msgstr "Keyboard id:   "
+
+#: keyman_config/keyboard_details.py:209
+msgid "Keyboard version:   "
+msgstr "Версія клавіатури:   "
+
+#: keyman_config/keyboard_details.py:221
+msgid "Keyboard author:   "
+msgstr "Автор клавіатури:   "
+
+#: keyman_config/keyboard_details.py:232
+msgid "Keyboard license:   "
+msgstr "Ліцензія клавіатури:   "
+
+#: keyman_config/keyboard_details.py:243
+msgid "Keyboard description:   "
+msgstr "Опис клавіатури:   "
+
+#: keyman_config/keyboard_details.py:334
+#, python-brace-format
+msgid "Scan this code to load this keyboard\n"
+"on another device or <a href='{uri}'>share online</a>"
+msgstr "Проскануйте цей код, щоб завантажити цю клавіатуру\n"
+"на іншому пристрої або <a href='{uri}'>поділитися онлайн</a>"
+
+#: keyman_config/options.py:24
+#, python-brace-format
+msgid "{packageId} Settings"
+msgstr "{packageId} Налаштування"
+
+#: keyman_config/view_installed.py:30
+msgid "Keyman Configuration"
+msgstr "Налаштування Keyman"
+
+#: keyman_config/view_installed.py:60
+msgid "Choose a kmp file..."
+msgstr "Виберіть файл kmp..."
+
+#. i18n: file type in file selection dialog
+#: keyman_config/view_installed.py:65
+msgid "KMP files"
+msgstr "KMP файли"
+
+#. i18n: column header in table displaying installed keyboards
+#: keyman_config/view_installed.py:141
+msgid "Icon"
+msgstr "Іконка"
+
+#. i18n: column header in table displaying installed keyboards
+#: keyman_config/view_installed.py:145
+msgid "Name"
+msgstr "Ім'я"
+
+#. i18n: column header in table displaying installed keyboards
+#: keyman_config/view_installed.py:148
+msgid "Version"
+msgstr "Версія"
+
+#: keyman_config/view_installed.py:161
+msgid "_Uninstall"
+msgstr "_Видалити"
+
+#: keyman_config/view_installed.py:162 keyman_config/view_installed.py:304
+msgid "Uninstall keyboard"
+msgstr "Видалити клавіатуру"
+
+#: keyman_config/view_installed.py:167
+msgid "_About"
+msgstr "_Про"
+
+#: keyman_config/view_installed.py:168 keyman_config/view_installed.py:306
+msgid "About keyboard"
+msgstr "Про клавіатуру"
+
+#: keyman_config/view_installed.py:173
+msgid "_Help"
+msgstr "_Допомога"
+
+#: keyman_config/view_installed.py:174 keyman_config/view_installed.py:305
+msgid "Help for keyboard"
+msgstr "Допомога для клавіатури"
+
+#: keyman_config/view_installed.py:179
+msgid "_Options"
+msgstr "_Параметри"
+
+#: keyman_config/view_installed.py:180 keyman_config/view_installed.py:307
+msgid "Settings for keyboard"
+msgstr "Налаштування клавіатури"
+
+#: keyman_config/view_installed.py:190
+msgid "_Refresh"
+msgstr "_Оновити"
+
+#: keyman_config/view_installed.py:191
+msgid "Refresh keyboard list"
+msgstr "Оновити список клавіатури"
+
+#: keyman_config/view_installed.py:195
+msgid "_Download"
+msgstr "_Завантажити"
+
+#: keyman_config/view_installed.py:196
+msgid "Download and install a keyboard from the Keyman website"
+msgstr "Завантажте та встановіть клавіатуру з веб-сайту Keyman"
+
+#: keyman_config/view_installed.py:201
+msgid "Install a keyboard from a file"
+msgstr "Встановлення клавіатури з файлу"
+
+#: keyman_config/view_installed.py:206
+msgid "Close window"
+msgstr "Закрити вікно"
+
+#: keyman_config/view_installed.py:278
+#, python-brace-format
+msgid "Uninstall keyboard {package}"
+msgstr "Видалити клавіатуру {package}"
+
+#: keyman_config/view_installed.py:280
+#, python-brace-format
+msgid "Help for keyboard {package}"
+msgstr "Довідка по клавіатурі {package}"
+
+#: keyman_config/view_installed.py:282
+#, python-brace-format
+msgid "About keyboard {package}"
+msgstr "Про клавіатуру {package}"
+
+#: keyman_config/view_installed.py:284
+#, python-brace-format
+msgid "Settings for keyboard {package}"
+msgstr "Налаштування клавіатури для {package}"
+
+#: keyman_config/view_installed.py:349
+msgid "Uninstall keyboard package?"
+msgstr "Видалити пакунок з клавіатурою?"
+
+#: keyman_config/view_installed.py:351
+#, python-brace-format
+msgid "Are you sure that you want to uninstall the {keyboard} keyboard and its fonts?"
+msgstr "Ви впевнені, що хочете видалити клавіатуру {keyboard} і її шрифти?"
+
+#: keyman_config/welcome.py:22
+#, python-brace-format
+msgid "{name} installed"
+msgstr "{name} встановлено"
+
+#: keyman_config/welcome.py:40
+msgid "Open in _Web browser"
+msgstr "Відкрити у браузері"
+
+#: keyman_config/welcome.py:42
+msgid "Open in the default web browser to do things like printing"
+msgstr "Відкрити в веб-браузері за замовчуванням для друку"
+
+#: keyman_config/welcome.py:45
+msgid "_OK"
+msgstr "_OK"
+

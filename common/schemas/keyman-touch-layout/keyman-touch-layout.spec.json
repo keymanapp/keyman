@@ -44,7 +44,7 @@
 
     "layer-id": {
       "type": "string",
-      "pattern": "^[a-zA-Z0-9_-]+$"
+      "pattern": "^[\\S]+$"
     },
 
     "rows": {
@@ -88,7 +88,7 @@
         "text": { "type": "string" },
         "layer": { "$ref": "#/definitions/layer-id" },
         "nextlayer": { "$ref": "#/definitions/layer-id" },
-        "fontsize": { "type": "string" },
+        "fontsize": { "$ref": "#/definitions/fontsize-spec" },
         "font": { "$ref": "#/definitions/font-spec" },
         "dk": { "type": "string" },
         "sp": { "$ref" : "#/definitions/numeric" },
@@ -129,9 +129,10 @@
         "sp": { "$ref" : "#/definitions/numeric" },
         "pad": { "$ref" : "#/definitions/numeric" },
         "width": { "$ref" : "#/definitions/numeric" },
-        "fontsize": { "type": "string" },
+        "fontsize": { "$ref": "#/definitions/fontsize-spec" },
         "font": { "$ref": "#/definitions/font-spec" },
-        "dk": { "type": "string" }
+        "dk": { "type": "string" },
+        "default": { "type": "boolean" }
       },
       "required": ["id"],
       "additionalProperties": false

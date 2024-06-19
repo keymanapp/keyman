@@ -125,7 +125,7 @@
 "kmp-error-missing-resource" = "Package ǝni adiyaka kibod ko dictionary namtǝ gǝ yuwɛ wɛ.";
 
 /* Error installing a Keyman package with a version of Keyman that does not support it */
-"kmp-error-unsupported-keyman-version" = "This package requires a newer version of Keyman.";
+"kmp-error-unsupported-keyman-version" = "Pakeji ǝni ada kǝthlǝr aka jiliyir Keyman nam bǝlin.";
 
 /* Error opening a Keyman package - cannot parse contents */
 "kmp-error-no-metadata" = "Package ǝni ndadi tsati tǝni kal kal wɛ - suyere nam akwa ndadi zǝndi wɛ.";

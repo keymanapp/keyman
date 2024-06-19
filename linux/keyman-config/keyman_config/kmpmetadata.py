@@ -51,7 +51,6 @@ def print_info(info):
         print(type(e))    # the exception instance
         print(e.args)     # arguments stored in .args
         print(e)          # __str__ allows args to be printed directly,		pass
-        pass
 
 
 def print_system(system):
@@ -67,7 +66,6 @@ def print_system(system):
         print(type(e))    # the exception instance
         print(e.args)     # arguments stored in .args
         print(e)          # __str__ allows args to be printed directly,		pass
-        pass
 
 
 def print_options(options):
@@ -83,7 +81,6 @@ def print_options(options):
         print(type(e))    # the exception instance
         print(e.args)     # arguments stored in .args
         print(e)          # __str__ allows args to be printed directly,		pass
-        pass
 
 
 def print_keyboards(keyboards):
@@ -107,7 +104,6 @@ def print_keyboards(keyboards):
         print(type(e))    # the exception instance
         print(e.args)     # arguments stored in .args
         print(e)          # __str__ allows args to be printed directly,		pass
-        pass
 
 
 def determine_filetype(kblist, filename):
@@ -148,7 +144,7 @@ def determine_filetype(kblist, filename):
         return KMFileTypes.KM_KMX
     elif ext.lower() == ".kvk":
         return KMFileTypes.KM_OSK
-    elif ext.lower() == ".ttf" or ext.lower() == ".otf":
+    elif ext.lower() in [".ttf", ".otf"]:
         return KMFileTypes.KM_FONT
     elif ext.lower() == ".js":
         if kblist is None:
@@ -156,24 +152,31 @@ def determine_filetype(kblist, filename):
         if name in kblist:
             return KMFileTypes.KM_TOUCH
         else:
-            if name == "keyrenderer":  # currently 2018-09-21 this is the own known non touch js file
-                return KMFileTypes.KM_DOC
-            else:
-                return KMFileTypes.KM_UNKNOWN
-    elif ext.lower() == ".txt" or ext.lower() == ".pdf" or ext.lower() == ".htm" \
-            or ext.lower() == ".html" or ext.lower() == ".doc" or ext.lower() == ".docx" \
-            or ext.lower() == ".css" or ext.lower() == ".chm" or ext.lower() == "" \
-            or ext.lower() == ".md" or ext.lower() == ".odt" or ext.lower() == ".rtf" \
-            or ext.lower() == ".dot" or ext.lower() == ".mht" or ext.lower() == ".woff" \
-            or ext.lower() == ".php":
+            return KMFileTypes.KM_DOC if name == "keyrenderer" else KMFileTypes.KM_UNKNOWN
+    elif ext.lower() in [
+      ".txt",
+      ".pdf",
+      ".htm",
+      ".html",
+      ".doc",
+      ".docx",
+      ".css",
+      ".chm",
+      "",
+      ".md",
+      ".odt",
+      ".rtf",
+      ".dot",
+      ".mht",
+      ".woff",
+      ".php",
+    ]:
         return KMFileTypes.KM_DOC
-    elif ext.lower() == ".inf" or ext.lower() == ".json":
+    elif ext.lower() in [".inf", ".json"]:
         return KMFileTypes.KM_META
-    elif ext.lower() == ".png" or ext.lower() == ".jpeg" \
-            or ext.lower() == ".jpg" or ext.lower() == ".gif" \
-            or ext.lower() == ".bmp":
+    elif ext.lower() in [".png", ".jpeg", ".jpg", ".gif", ".bmp"]:
         return KMFileTypes.KM_IMAGE
-    elif ext.lower() == ".tec" or ext.lower() == ".map":
+    elif ext.lower() in [".tec", ".map"]:
         return KMFileTypes.KM_TECKIT
     elif ext.lower() == ".cct":
         return KMFileTypes.KM_CC
@@ -206,7 +209,6 @@ def print_files(files, extracted_dir):
         print(type(e))    # the exception instance
         print(e.args)     # arguments stored in .args
         print(e)          # __str__ allows args to be printed directly,		pass
-        pass
 
 
 def get_fonts(files):
@@ -275,9 +277,9 @@ def parseinfdata(inffile, verbose=False):
                 if not info:
                     info = {}
                 for item in config.items('Info'):
-                    if item[0] == 'Name' or item[0] == 'name':
+                    if item[0] in ['Name', 'name']:
                         info['name'] = {'description': item[1].split("\"")[1]}
-                    elif item[0] == 'Copyright' or item[0] == 'copyright':
+                    elif item[0] in ['Copyright', 'copyright']:
                         info['copyright'] = {'description': item[1].split("\"")[1]}
                     elif item[0] == 'Version':
                         info['version'] = {'description': item[1].split("\"")[1]}
@@ -292,12 +294,12 @@ def parseinfdata(inffile, verbose=False):
                     info = {}
                 info['version'] = {'description': "1.0"}
                 for item in config.items('PackageInfo'):
-                    if item[0] == 'Name' or item[0] == 'name':
+                    if item[0] in ['Name', 'name']:
                         if item[1].split("\"")[1]:
                             info['name'] = {'description': item[1].split("\"")[1]}
                         else:
                             info['name'] = {'description': item[1].split("\"")[2]}
-                    elif item[0] == 'Copyright' or item[0] == 'copyright':
+                    elif item[0] in ['Copyright', 'copyright']:
                         if item[1].split("\"")[1]:
                             info['copyright'] = {'description': item[1].split("\"")[1]}
                         else:
@@ -329,9 +331,7 @@ def parseinfdata(inffile, verbose=False):
                         options['disableKeepFonts'] = item[1]
                     elif item[0] == 'BothVersionsIncluded':
                         options['bothVersionsIncluded'] = item[1]
-                    elif item[0] == 'ExecuteProgram':
-                        pass
-                    else:
+                    elif item[0] != 'ExecuteProgram':
                         print("Unknown item in Package:", item[0])
                 system['keymanDeveloperVersion'] = ""
             elif "Keyboard" in section:
@@ -391,9 +391,9 @@ def parseinfdata(inffile, verbose=False):
                 if kbfile['type'] == KMFileTypes.KM_KMX:
                     id = os.path.basename(os.path.splitext(kbfile['name'])[0])
                     keyboards = [{
-                        'name': id,
-                        'id': id,
-                        'version': secure_lookup(info, 'version', 'description')
+                      'name': id,
+                      'id': id,
+                      'version': secure_lookup(info, 'version', 'description')
                     }]
 
         kblist = []
@@ -469,22 +469,21 @@ def parsemetadata(jsonfile, verbose=False):
                 data = {"nonexistent": "none"}
 
             for x in data:
-                if x == 'info':
+                if x == 'files':
+                    files = data[x]
+                elif x == 'info':
                     info = data[x]
-                elif x == 'system':
-                    system = data[x]
                 elif x == 'keyboards':
                     keyboards = data[x]
-                elif x == 'files':
-                    files = data[x]
-                elif x == 'options':
-                    options = data[x]
                 elif x == 'nonexistent':
                     nonexistent = data[x]
+                elif x == 'options':
+                    options = data[x]
+                elif x == 'system':
+                    system = data[x]
             kblist = []
             if keyboards:
-                for k in keyboards:
-                    kblist.append(k['id'])
+                kblist.extend(k['id'] for k in keyboards)
             if files:
                 for kbfile in files:
                     kbfile['type'] = determine_filetype(kblist, kbfile['name'])
@@ -506,7 +505,6 @@ def get_metadata(tmpdirname):
     If it does not exist then will return get_and_convert_infdata
 
     Args:
-        inputfile (str): path to kmp file
         tmpdirname(str): temp directory to extract kmp
 
     Returns:

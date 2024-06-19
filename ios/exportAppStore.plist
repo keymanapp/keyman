@@ -7,9 +7,9 @@
     <key>teamID</key>
     <string>3YE4W86L3G</string>
     <key>signingCertificate</key>
-    <string>3F2AB892E24387929F51C36E7A03EF33502D341A</string>
+    <string>BB842A0081298BBA6D034C85451750B08FC9EE8A</string>
     <key>installerSigningCertificate</key>
-    <string>3F2AB892E24387929F51C36E7A03EF33502D341A</string>
+    <string>BB842A0081298BBA6D034C85451750B08FC9EE8A</string>
     <key>provisioningProfiles</key>
     <dict>
         <key>Tavultesoft.Keyman</key>

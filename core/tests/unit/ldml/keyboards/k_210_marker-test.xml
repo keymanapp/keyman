@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE keyboardTest3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/45/dtd/ldmlKeyboardTest3.dtd">
+<keyboardTest3 conformsTo="techpreview">
+  <info keyboard="k_210_marker.xml" author="Team Keyboard" name="marker" />
+  <tests name="marker-tests">
+    <test name="marker-test-basic-grave">
+      <keystroke key="e" />
+      <keystroke key="grave" />
+      <check result="è" />
+    </test>
+    <test name="marker-test-basic-acute">
+      <keystroke key="e" />
+      <keystroke key="acute" />
+      <check result="é" />
+    </test>
+    <test name="marker-test-double-acute">
+      <keystroke key="acute" />
+      <keystroke key="acute" />
+      <check result="+" />
+    </test>
+    <test name="marker-test-trailing-grave">
+      <keystroke key="grave" />
+      <check result="_" />
+    </test>
+    <test name="marker-test-append-grave">
+      <startContext to="e" />
+      <keystroke key="grave" />
+      <check result="è" />
+    </test>
+    <test name="marker-test-append-acute">
+      <startContext to="e" />
+      <keystroke key="acute" />
+      <check result="é" />
+    </test>
+    <test name="marker-test-any-marker">
+      <keystroke key="acute" />
+      <keystroke key="z" />
+      <check result="Z" />
+    </test>
+    <test name="marker-test-trailing-acute">
+      <keystroke key="acute" />
+      <check result="" />
+      <keystroke key="x" />
+      <check result="x" />
+    </test>
+    <test name="marker-test-trailing-acute2">
+      <keystroke key="x" />
+      <check result="x" />
+      <keystroke key="acute" />
+      <check result="x" />
+    </test>
+  </tests>
+  <tests name="regression-11045">
+    <test name="regression-11045-grave">
+      <keystroke key="v" />
+      <keystroke key="grave"/>
+      <check result="`"/>
+    </test>
+    <test name="regression-11045-acute">
+      <keystroke key="v" />
+      <keystroke key="acute"/>
+      <check result="´"/>
+    </test>
+  </tests>
+  <tests name="double-marker-10955">
+    <!-- unmatched delete should delete ALL markers, not just one -->
+    <test name="double-marker-10955-null">
+      <keystroke key="v" />
+      <keystroke key="squiggle" />
+      <keystroke key="squiggle" />
+      <keystroke key="b" />
+      <check result="v2-squiggles" />
+    </test>
+    <test name="double-marker-10955-del-1">
+      <keystroke key="v" />
+      <keystroke key="squiggle" />
+      <backspace />
+      <keystroke key="b" />
+      <check result="no-squiggles" />
+    </test>
+    <test name="double-marker-10955-del-2">
+      <keystroke key="v" />
+      <keystroke key="squiggle" />
+      <keystroke key="squiggle" />
+      <backspace />
+      <keystroke key="b" />
+      <check result="no-squiggles" />
+    </test>
+    <test name="double-marker-10955-del-3">
+      <keystroke key="v" />
+      <keystroke key="squiggle" />
+      <keystroke key="squiggle" />
+      <keystroke key="squiggle" />
+      <backspace />
+      <keystroke key="b" />
+      <check result="no-squiggles" />
+    </test>
+    <test name="double-marker-10955-del-2-1">
+      <keystroke key="v" />
+      <keystroke key="v" />
+      <keystroke key="squiggle" />
+      <backspace />
+      <keystroke key="b" />
+      <check result="vno-squiggles" />
+    </test>
+    <test name="double-marker-10955-del-2-2">
+      <keystroke key="v" />
+      <keystroke key="v" />
+      <keystroke key="squiggle" />
+      <keystroke key="squiggle" />
+      <backspace />
+      <keystroke key="b" />
+      <check result="vno-squiggles" />
+    </test>
+    <test name="double-marker-10955-del-2-3">
+      <keystroke key="v" />
+      <keystroke key="v" />
+      <keystroke key="squiggle" />
+      <keystroke key="squiggle" />
+      <keystroke key="squiggle" />
+      <backspace />
+      <keystroke key="b" />
+      <check result="vno-squiggles" />
+    </test>
+  </tests>
+</keyboardTest3>

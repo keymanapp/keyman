@@ -106,11 +106,9 @@ procedure TVisualKeyboardImportKMX.ImportKey(vk: TVKKey);
 var
   data: string;
   i: Integer;
-  context: pkm_kbp_context;
 begin
-  context := km_kbp_state_context(FCore.State);
-  km_kbp_context_clear(context);
-  if km_kbp_process_event(FCore.State, vk.vkey, vk.kmshift, 1) = KM_KBP_STATUS_OK then
+  km_core_state_context_clear(FCore.State);
+  if km_core_process_event(FCore.State, vk.vkey, vk.kmshift, 1, KM_CORE_EVENT_FLAG_DEFAULT) = KM_CORE_STATUS_OK then
   begin
     FEvents.Clear;
     FEvents.AddStateItems(FCore.State, vk.vkey, vk.kmshift);
@@ -124,9 +122,9 @@ begin
       end;
 
       case FEvents[i].Action.ActionType of
-        KM_KBP_IT_CHAR:
+        KM_CORE_IT_CHAR:
           data := data + FEvents[i].Action.Text;
-        KM_KBP_IT_BACK:
+        KM_CORE_IT_BACK:
           if data.Length > 0 then
           begin
             if (data.Length > 1) and
@@ -201,7 +199,7 @@ begin
   FShow102Key := False;
 
   for i := 0 to keys.Count - 1 do
-    if TVKKey(keys[i]).vkey = KM_KBP_VKEY_oE2 then
+    if TVKKey(keys[i]).vkey = KM_CORE_VKEY_oE2 then
     begin
       FShow102Key := True;
       Exit;

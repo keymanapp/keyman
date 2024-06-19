@@ -1,0 +1,810 @@
+/***
+   KeymanWeb 16.0
+   Copyright 2022 SIL International
+***/
+
+/*
+  kmwosk.css: main CSS for keymanweb on-screen keyboard and other objects.
+*/
+
+/* kmw-key-square applies only to OSK key elements, kmw-key-square-ex applies only to popup key elements */
+
+/* Common key-layout properties (all form factor + OS combinations) */
+
+.kmw-osk-frame,
+.kmw-osk-frame * {
+  /* border-box may make more sense here in the future, but for compat reasons we need to
+     ensure we are always consistent, regardless of context of placement of the osk */
+  box-sizing: content-box;
+}
+
+.kmw-key-row {position: relative; width: 100%; height: 20%; margin: 0px; padding: 0px; border: 0px; overflow: hidden}
+.kmw-key-square {
+  display: inline-block;
+  position: relative;
+  z-index: 10000;
+  margin: 0px;
+  border: 0px;
+  padding: 0px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  vertical-align: top;
+}
+.kmw-key {display: block; position: relative; margin: 0px; text-align: center; box-sizing: border-box;
+  -moz-box-sizing: border-box;}
+
+/* Now for divergent properties & target-device styling */
+
+.phone.kmw-osk-frame{left:0;bottom:0;width:100%;height:144px;overflow-y:visible;
+        -webkit-user-select:none;}
+.phone .kmw-osk-inner-frame{margin:0;background:transparent;}
+.phone .kmw-key-layer-group{left:0;bottom:0;width:100%;margin:0;padding:1px 0;border:none;background-color:#999999;}
+.phone .kmw-key-layer{left:0;bottom:0;width:100%;height:100%;margin:0;padding:0;background-color:transparent;overflow:hidden;}
+.phone .kmw-key-square {height:100%;max-height:100%;overflow:visible;background-color:transparent;cursor:default;-webkit-tap-highlight-color:rgba(0,0,0,0)}
+.phone .kmw-key-square-ex {display:inline-block;box-sizing:border-box;margin:0 0 0 5px;z-index:10001;padding:0; background-color:transparent;cursor:default;}
+.phone .kmw-key {border-radius:6px;overflow:hidden;box-shadow: 0px -1px 1px 0px rgba(0,0,0,1) inset;}
+
+.phone .kmw-suggestion-text,
+.tablet .kmw-suggestion-text {
+  color: #000;
+  text-align: center;
+  display: block;
+  line-height: normal;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.tablet .kmw-suggestion-text {
+  font-size: 0.75em;
+}
+
+.kmw-suggest-banner-scroller {
+  overflow-x: hidden;
+  width: 100%;
+  height: 100%;
+  scrollbar-width: none; /* Firefox scrollbar prevention */
+}
+
+.kmw-suggest-banner-scroller::-webkit-scrollbar {
+  display: none; /* Safari + Chrome scrollbar prevention */
+}
+
+.kmw-suggest-option {
+  overflow: hidden;
+}
+
+.kmw-suggestion-container {
+  height: 100%;
+}
+
+.phone.windows .kmw-key-row{max-width:80%;}
+
+.phone .kmw-5rows {padding-top: 0;}
+.phone .kmw-key-label{position:absolute;left:5%;top:1%;font:0.5em Arial;color:#aaa; background-color:transparent;z-index:10000;}
+
+.phone .kmw-key-row {-webkit-touch-callout:none;-webkit-user-select:none;-ms-user-select:none;user-select:none;-webkit-tap-highlight-color:rgba(0,0,0,0);}
+
+.phone.ios .kmw-key-layer-group {background-color: #cfd3d9}
+.phone.ios .kmw-key {border: none; border-bottom: solid 1px #8a8d90; box-shadow:none; border-radius: 5px;}
+.phone.ios .kmw-key.kmw-key-default {color:#000;background-color:#fdfdfe;}
+.phone.ios .kmw-key.kmw-key-shift,
+.phone.ios .kmw-key.kmw-key-special {color:#fff;background-color:#b2b9c5;}
+.phone.ios .kmw-key.kmw-key-shift-on,
+.phone.ios .kmw-key.kmw-key-special-on {color:#fff;background-color:#88f;}
+.phone.ios .kmw-key.kmw-key-touched {background-color:#447;}
+.phone.ios .kmw-key-deadkey{color:#048204;background-color:#fdfdfe;}
+
+/* Probably best to make this its own CSS that can be optionally included? */
+@media (prefers-color-scheme: dark) {
+  .phone.ios .kmw-key-layer-group {background-color: #0f1319}
+  .phone.ios .kmw-key.kmw-key-default {color:#fff;background-color:#3d3d3e}
+  .phone.ios .kmw-key.kmw-key-shift,
+  .phone.ios .kmw-key.kmw-key-special {color:#fff;background-color:#595c62;}
+  .phone.ios .kmw-key.kmw-key-shift-on,
+  .phone.ios .kmw-key.kmw-key-special-on {color:#fff;background-color:#88f;}
+  .phone.ios .kmw-key.kmw-key-touched {background-color:#447;}
+  .phone.ios .kmw-key-deadkey{color:#0d0;background-color:#3d3d3e;}
+}
+
+.ios .kmw-banner-bar {
+  background-color: #cfd3d9;
+  position: relative;
+  margin-top: 6px;
+  height: 100%;
+  width: 100%;
+}
+
+.ios .kmw-suggest-option::before {
+  background: linear-gradient(90deg, #cfd3d9 0%, transparent 100%);
+}
+
+.ios .kmw-suggest-option::after {
+  background: linear-gradient(90deg, transparent 0%, #cfd3d9 100%);
+}
+
+.ios .kmw-banner-bar .kmw-suggest-option {
+  display:inline-block;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.ios .kmw-banner-bar .kmw-banner-separator {
+  border-left: solid 1px #b2b9c5;
+}
+
+.ios .kmw-suggestion-text {
+  color: #000;
+}
+
+.phone.ios .kmw-suggest-option.kmw-suggest-touched,
+.tablet.ios .kmw-suggest-option.kmw-suggest-touched {background-color:#88f;}
+
+.phone.ios .kmw-suggest-option.kmw-suggest-touched::before,
+.tablet.ios .kmw-suggest-option.kmw-suggest-touched::before {
+  background: linear-gradient(90deg, #88f 0%, transparent 100%);
+}
+
+.phone.ios .kmw-suggest-option.kmw-suggest-touched::after,
+.tablet.ios .kmw-suggest-option.kmw-suggest-touched::after {
+  background: linear-gradient(90deg, transparent 0%, #88f 100%);
+}
+
+.phone.ios.kmw-osk-frame,
+.tablet.ios.kmw-osk-frame {
+  background-color: #cfd3d9;
+}
+
+/*Only apply in embedded mode for the actual predictive banner, and no others.*/
+.kmw-embedded .ios .kmw-banner-bar.kmw-suggest-banner {
+  margin-top: 10px;
+}
+
+/* Probably best to make this its own CSS that can be optionally included? */
+@media (prefers-color-scheme: dark) {
+  .ios .kmw-banner-bar {
+    background-color: #0f1319;
+  }
+
+  .ios .kmw-suggest-option::before {
+    background: linear-gradient(90deg, #0f1319 0%, transparent 100%);
+  }
+
+  .ios .kmw-suggest-option::after {
+    background: linear-gradient(90deg, transparent 0%, #0f1319 100%);
+  }
+
+  .ios .kmw-banner-bar .kmw-banner-separator {
+    border-left: solid 1px #8a8d90
+  }
+
+  .ios .kmw-suggestion-text {
+    color: #fff;
+  }
+
+  .phone.ios.kmw-osk-frame,
+  .tablet.ios.kmw-osk-frame {
+    background-color: #0f1319;
+  }
+}
+
+.phone.android .kmw-key-layer-group {background-color: #333;}
+.phone.android .kmw-key {border: none; border-bottom: solid 1px #8a8d90; box-shadow:none; border-radius: 3px;}
+.phone.android .kmw-key.kmw-key-default {color:#fff;background-color:#777;}
+.phone.android .kmw-key.kmw-key-shift,
+.phone.android .kmw-key.kmw-key-special {color:#fff;background-color:#555;}
+.phone.android .kmw-key.kmw-key-shift-on,
+.phone.android .kmw-key.kmw-key-special-on {color:#fff;background-color:#77f;}
+.phone.android .kmw-key.kmw-key-touched {background-color:#447;}
+.phone.android .kmw-key.kmw-spacebar {background-color: #777;}
+.phone.android .kmw-key.kmw-spacebar.kmw-key-touched {background-color: #447;}
+.phone.android .kmw-spacebar-caption {color: #aaa;}
+.phone.android .kmw-key-deadkey{color:#0d0;background-color:#777;}
+
+
+.phone.android.kmw-osk-frame { background-color: #222;}
+
+.phone.android .kmw-banner-bar,
+.tablet.android .kmw-banner-bar {
+  background-color: #222;
+  position: relative;
+  margin-top: 4px;
+  height: 100%;
+  width: 100%;
+}
+
+.phone.android .kmw-suggest-option::before {
+  background: linear-gradient(90deg, #222 0%, transparent 100%);
+}
+
+.phone.android .kmw-suggest-option::after {
+  background: linear-gradient(90deg, transparent 0%, #222 100%);
+}
+
+.phone.android .kmw-banner-bar .kmw-suggest-option {
+  display:inline-block;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.phone.android .kmw-suggestion-text {
+  color:#fff;
+}
+
+.phone.android .kmw-suggest-option.kmw-suggest-touched {background-color:#bbb;}
+
+.phone.android .kmw-suggest-option.kmw-suggest-touched::before {
+  background: linear-gradient(90deg, #bbb 0%, transparent 100%);
+}
+
+.phone.android .kmw-suggest-option.kmw-suggest-touched::after {
+  background: linear-gradient(90deg, transparent 0%, #bbb 100%);
+}
+
+.tablet.kmw-osk-frame{left:0;bottom:0;width:100%;height:144px;overflow-y:visible;
+        background-color:rgba(0,0,0,0.8);-webkit-user-select:none;}
+.tablet .kmw-osk-inner-frame{margin:0;background:transparent;}
+.tablet .kmw-key-layer-group{left:0;bottom:0;width:100%;margin:0;padding:1px 0;border:none;background-color:#999999;}
+.tablet .kmw-key-layer{left:0;bottom:0;width:100%;height:100%;margin:0;padding:0;background-color:transparent;overflow:hidden;}
+.tablet .kmw-key-square {height:100%; max-height:100%; overflow:hidden;background-color:transparent;cursor:default;-webkit-tap-highlight-color:rgba(0,0,0,0)}
+.tablet .kmw-key-square-ex {display:inline-block;box-sizing:border-box;margin:0 0 0 5px;z-index:10001; padding:0; background-color:transparent; cursor:default;}
+.tablet .kmw-key {border-radius:8px;overflow:visible;border:solid 2px #999999;box-shadow: 0px -1px 1px 0px rgba(0,0,0,1) inset;}
+
+.tablet .kmw-key-label{position:absolute;left:7%;top:2%;font:0.5em Arial;color:#aaa;background-color:transparent;z-index:10000;}
+.tablet .kmw-key-text {
+  -webkit-user-select:none;
+}
+
+.tablet.ios .kmw-key-layer-group {background-color: #cfd3d9}
+.tablet.ios .kmw-key.kmw-keypreview.kmw-preview-overlay { box-shadow: 0 0 5px 3px #cfd3d9 }
+.tablet.ios .kmw-key {border: none; border-bottom: solid 1px #8a8d90; box-shadow:none; border-radius: 5px;}
+.tablet.ios .kmw-key.kmw-key-default {color:#000;background-color:#fdfdfe;}
+.tablet.ios .kmw-key.kmw-key-shift,
+.tablet.ios .kmw-key.kmw-key-special {color:#fff;background-color:#b2b9c5;}
+.tablet.ios .kmw-key.kmw-key-shift-on,
+.tablet.ios .kmw-key.kmw-key-special-on {color:#fff;background-color:#88f;}
+.tablet.ios .kmw-key.kmw-key-touched {background-color:#447;}
+.tablet.ios .kmw-key-deadkey{color:#048204;background-color:#fdfdfe;}
+
+/* Probably best to make this its own CSS that can be optionally included? */
+@media (prefers-color-scheme: dark) {
+  .tablet.ios .kmw-key-layer-group {background-color: #0f1319}
+  .tablet.ios .kmw-key.kmw-keypreview.kmw-preview-overlay { box-shadow: 0 0 5px 3px #0f1319 }
+  .tablet.ios .kmw-key.kmw-key-default {color:#fff;background-color:#3d3d3e}
+  .tablet.ios .kmw-key.kmw-key-shift,
+  .tablet.ios .kmw-key.kmw-key-special {color:#fff;background-color:#595c62;}
+  .tablet.ios .kmw-key.kmw-key-shift-on,
+  .tablet.ios .kmw-key.kmw-key-special-on {color:#fff;background-color:#88f;}
+  .tablet.ios .kmw-key.kmw-key-touched {background-color:#447}
+  .tablet.ios .kmw-key-deadkey {color:#0d0;background-color:#3d3d3e;}
+}
+
+.tablet .kmw-key-row {-webkit-touch-callout:none;-webkit-user-select:none;-ms-user-select:none;user-select:none;-webkit-tap-highlight-color:rgba(0,0,0,0);}
+
+.tablet.android .kmw-key-layer-group {background-color: #333;}
+.tablet.android .kmw-key.kmw-keypreview.kmw-preview-overlay { box-shadow: 0 0 5px 3px #333 }
+.tablet.android .kmw-key {border: none; border-bottom: solid 1px #8a8d90; box-shadow:none; border-radius: 5px;}
+.tablet.android .kmw-key.kmw-key-default {color:#fff;background-color:#777;}
+.tablet.android .kmw-key.kmw-key-shift,
+.tablet.android .kmw-key.kmw-key-special {color:#fff;background-color:#555;}
+.tablet.android .kmw-key.kmw-key-shift-on,
+.tablet.android .kmw-key.kmw-key-special-on {color:#fff;background-color:#77f;}
+.tablet.android .kmw-key.kmw-key-touched {background-color:#447;}
+.tablet.android .kmw-key.kmw-spacebar {background-color: #777;}
+.tablet.android .kmw-key.kmw-spacebar.kmw-key-touched {background-color: #447;}
+.tablet.android .kmw-spacebar-caption {color: #aaa;}
+.tablet.android .kmw-key-deadkey{color:#0d0;background-color:#777;}
+
+.tablet.android .kmw-suggest-option::before {
+  background: linear-gradient(90deg, #222 0px, transparent 100%);
+}
+
+.tablet.android .kmw-suggest-option::after {
+  background: linear-gradient(90deg, transparent 0%, #222 100%);
+}
+
+.tablet.android .kmw-banner-bar .kmw-suggest-option {
+  display:inline-block;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.tablet.android .kmw-suggestion-text {
+  color:#fff;
+}
+
+.tablet.android .kmw-suggest-option.kmw-suggest-touched {background-color:#bbb;}
+
+.tablet.android .kmw-suggest-option.kmw-suggest-touched::before {
+  background: linear-gradient(90deg, #bbb 0px, transparent 100%);
+}
+
+.tablet.android .kmw-suggest-option.kmw-suggest-touched::after {
+  background: linear-gradient(90deg, transparent 0%, #bbb 100%);
+}
+
+/* Vertical centering of text labels on keys */
+.kmw-key {text-align:center; white-space:nowrap;}
+.kmw-key::before {content:'.'; display:inline-block; height:100%; vertical-align:middle; max-width:0px; visibility:hidden;}
+.kmw-key span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.desktop .kmw-osk-frame{position:absolute;width:auto;height:auto;left:0;top:0;display:none;margin:0;padding:0;
+          border:2px solid #ad4a28;border-radius:2px;background-color:#666;box-sizing:border-box;-moz-box-sizing:border-box;}
+.desktop .kmw-osk-inner-frame{margin:0;background-color:#666;border:2px solid #ad4a28;box-sizing:border-box;-moz-box-sizing:border-box;}
+.desktop .kmw-key-layer-group{width:100%;height:100%;margin:0;padding:0;border:none;background:transparent;}
+.desktop .kmw-key-layer{width:100%;height:100%;margin:0;padding:0;background-color:transparent;overflow:hidden;}
+.desktop .kmw-key-square{height:100%;font-size:0.8em;overflow:hidden;background-color:transparent;cursor:default;}
+.desktop .kmw-key {border-radius:6px;overflow:hidden;width:100%;height:100%;}
+.desktop .kmw-key-label{position:absolute;left:2px;top:2px;font:0.5em Arial;color:#888;background-color:transparent;}
+
+/* Popup icon style (and content)*/
+.kmw-key-popup-icon{
+  position: absolute;
+  display: block;
+  visibility: visible;
+  right: 4%;
+  top: 1%;
+  font-size: 0.5em;
+  color: #aaa;
+  line-height: initial;
+}
+
+.android .kmw-key-popup-icon{
+  font-size: 0.5em;
+  color: #eee;
+}
+
+/* For certain form-factors, #aaa blends in with the special-key background-color _way_ too well. */
+/* e.g: .phone.ios .kmw-key.kmw-key-special {background-color:#b2b9c5;} */
+.kmw-key-special .kmw-key-popup-icon {
+  color: #ddd;
+}
+
+@media (prefers-color-scheme: dark) {
+  /* But not in dark mode. */
+  .kmw-key-special .kmw-key-popup-icon {
+    color: #aaa;
+  }
+}
+
+/*.phone .kmw-key-popup-icon{right:6%;top:-2px;width:8px;height:8px;text-align:right;}
+.desktop .kmw-key-popup-icon{right:4%;top:0;width:8px;height:8px;} */
+
+.phone.android .kmw-key-popup-icon {top:1px;right:8%;}
+.phone.android .kmw-key-label {left:10%;top:4%;}
+
+.tablet.android .kmw-key-popup-icon {top:0px;right:5%;}
+.tablet.android .kmw-key-label {left:6%;top:3%;}
+
+/*  Additional desktop element styles */
+.kmw-footer{height:16px;width:auto;margin:0;padding:0;padding-top:2px;background-color:#ad4a28;border-radius:0 0 6px 6px;}
+.kmw-title-bar{height:20px; width:auto; margin:0; background-color:#ad4a28; padding:0;border-radius:6px 6px 0 0;}
+.kmw-title-bar-caption{color:white;margin:0 20px 0 4px;font:bold 0.8em Arial;}
+.kmw-title-bar-actions{position: absolute; cursor: default; right:2px; top:0; width: 33px; height: 13px;}
+.kmw-footer-caption{color:#fff;font:0.7em Arial;margin:0 0 0 4px;}
+
+.kmw-banner-bar{height:100%; width:100%; margin:0; background-color:darkorange; display: inline-block; white-space: nowrap;}
+
+/* Creates a gradient to fade text at the borders, providing visual indication of overflow */
+/* Make sure the non-transparent color of the gradient matches .kmw-banner-bar's background-color. */
+.kmw-suggest-option::before,
+.kmw-suggest-option::after {
+  position:absolute;
+
+  /* Set scrollable-suggestion fade width here.  Make sure to also set .kmw-suggestion-text
+   * padding-left and padding-right accordingly!
+   */
+  width: 32px;
+  height: 100%;
+  content: '';
+  top: 0;
+  z-index:10000;  /* z-indexes this _behind_ the 'option' element that hosts the scrollable zone. */
+  user-select: none;
+  pointer-events: none; /* Ensures click-through! But apparently not touch-through. */
+  touch-action: none; /* Doesn't seem to allow touch-through, though - even with touch-action: none */
+                      /* https://stackoverflow.com/q/21474722 - poster never could find a solution, and settled*/
+                      /* on the same workaround:  a 'before' and 'after' piece instead of a single overlay.*/
+  transition: opacity 0.25s linear;
+}
+
+.kmw-suggest-option.swallow-fade-transition::before,
+.kmw-suggest-option.swallow-fade-transition::after {
+  transition-duration: 0s;
+}
+
+.kmw-suggest-option::before {
+  background: linear-gradient(90deg, darkorange 0%, transparent 100%);
+  left: 0;
+}
+
+.kmw-suggest-option.kmw-hide-fade-left::before,
+.kmw-suggest-option.kmw-hide-fade-right::after {
+  opacity: 0;
+  /* visibility: hidden; */
+}
+
+.kmw-suggest-option::after {
+  background: linear-gradient(90deg, transparent 0%, darkorange 100%);
+  right: 0;
+}
+
+/* Fallback suggestion-selection highlighting */
+.kmw-suggest-option.kmw-suggest-touched {
+  background: #bbb;
+}
+
+.kmw-suggest-option.kmw-suggest-touched::before,
+.kmw-suggest-option.kmw-suggest-touched::after {
+  /* Immediately start hiding the fade styling for touched suggestions. */
+  opacity: 0;
+}
+
+/* Creates a gradient to fade text at the borders, providing visual indication of overflow */
+/* Make sure the non-transparent color of the gradient matches .kmw-banner-bar's background-color. */
+.kmw-suggest-option.kmw-suggest-touched::before {
+  background: linear-gradient(90deg, #bbb 0%, transparent 100%);
+}
+
+.kmw-suggest-option.kmw-suggest-touched::after {
+  background: linear-gradient(90deg, transparent 0%, #bbb 100%);
+}
+
+.kmw-banner-bar .kmw-banner-separator {border-left: solid 1px #8a8d90; width: 0px; vertical-align: middle; height: 45%; display: inline-block;}
+.kmw-banner-bar .kmw-suggest-option {display:inline-block; text-align: center; height: 85%; position: relative; z-index: 10001}
+.kmw-suggestion-text {
+  color:#fff;
+  line-height: normal;
+  position: relative;
+  vertical-align: middle;
+  /* Contrast with .kmw-suggest-option::before .width styling.  */
+  padding-left: 8px;   /* Keeps a bit of whitespace on the suggestion's side. */
+  padding-right: 8px;  /* Keeps a bit of whitespace on the suggestion's side. */
+  width: max-content;  /* Ensure the text span acts like it contains its text */
+  min-width: calc(100% - 16px); /* To ensure the span stays centered. */
+  white-space: nowrap;
+  /* We need click-through and touch-through - we replace spans when updating suggestions, and that can break gestures. */
+  pointer-events: none;
+  touch-action: none;
+}
+
+.kmw-footer-resize{cursor:se-resize;position:absolute;right:2px;bottom:2px;width:16px;height:16px;overflow:hidden;
+          font-family:SpecialOSK;color:white;}
+.kmw-footer-resize:hover{font-weight:bold;}
+.kmw-footer-resize::before {content:'\e023';}
+
+.kmw-title-bar-image {cursor: default; float:right; padding: 2px 2px 0 0; width:16px; height:16px;
+          font-family:SpecialOSK; color:white;}
+.kmw-title-bar-image:hover{font-weight:bold;}
+#kmw-pin-image::before{content:'\e024';}
+#kmw-config-image::before{content:'\e030';}
+#kmw-help-image::before{content:'\e042';}
+#kmw-close-button::before {content:'\e025';}
+
+/* Common key appearance styles (can override with form-factor styles if necessary) */
+.kmw-key-default{color:#000;background-color:#eee;}
+.kmw-key-shift{color:#aaa;background-color:#ddd;}     /*color was #88f (blue) */
+.kmw-key-shift-on,
+.kmw-key-special-on{color:#88f;background-color:#ccf;}
+.kmw-key-deadkey{color:#0d0;background-color:#eee;}
+.kmw-key-blank{color:#000;background-color:rgba(100,100,100,0.5);}
+.kmw-key-hidden{visibility:hidden;}
+.kmw-key-touched{background-color:#447;}
+
+/* Adjust font (image) size on special keys */
+.tablet .kmw-key-shift, .tablet .kmw-key-shift-on{font-size:0.8em !important;}
+.phone .kmw-key-shift, .phone .kmw-key-shift-on{font-size:0.7em !important;}
+
+/* Set special font and style for modifier and special key images */
+body div.kmw-key-shift span.kmw-key-text {font-family:SpecialOSK !important;font-size:1em;}
+body div.kmw-key-shift-on span.kmw-key-text {font-family:SpecialOSK !important;font-size:1em;}
+#kmw-popup-keys div.kmw-key-shift span.kmw-key-text {font-family:SpecialOSK !important;}
+
+#kmw-keytip {
+  z-index: 10002;
+}
+
+#kmw-keytip.kmw-preview-fade {
+  opacity: 0;
+  transition: 0.15s cubic-bezier(.42,0,.58,1) all 0.35s;
+}
+
+.kmw-keypreview {
+  z-index: 10002;
+  position: absolute;
+}
+
+.kmw-keypreview.kmw-preview-fade {
+  opacity: 0;
+  transition: 0.15s cubic-bezier(.42,0,.58,1) all 0.35s;
+}
+
+#kmw-gesture-preview {
+  position: absolute;
+  display: block;
+  z-index: 1;
+  border-radius: inherit;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  /* Clip anything that 'scrolls' past the preview's boundaries.*/
+  overflow: hidden;
+  /* Hides the base key entirely; this prevents artifacting should positioning vary a bit. */
+  background-color: inherit;
+}
+
+#kmw-gesture-base-label {
+  top: 50%;
+  transform: translateY(-50%);
+  position: absolute;
+  display: block;
+  width: 100%;
+}
+
+.kmw-flick-preview {
+  position: absolute;
+}
+
+#kmw-preview-img-container {
+  position: absolute;
+
+  /* Facilitates scrolling animation to match a flick */
+  height: 100%;
+  width: 100%;
+
+  transition: 0.5s linear border;
+}
+
+#kmw-preview-img-container.kmw-flick-clear {
+  transition: margin 0.25s linear ease-in-out;
+  margin-left: 0px !important;
+  margin-top: 0px !important;
+}
+
+.kmw-key-popup-icon.kmw-hint-clear {
+  color: transparent;
+  transition: 0.5s linear all;
+}
+
+/* Key preview styles */
+
+div.kmw-keytip-tip.kmw-top {
+  top: 0;
+}
+
+div.kmw-keytip-tip.kmw-bottom {
+  bottom: 0;
+}
+
+div.ios div.kmw-keytip, div.android div.kmw-keytip {
+  position: absolute;
+  left: 0;
+  width: 3em;
+  height: 3em;
+  overflow: visible;
+}
+
+div.ios div.kmw-keytip {
+  background-color: rgb(0, 0, 0, 0);
+}
+
+div.ios div.kmw-keytip-tip {
+  border-radius: 6px 6px 4px 4px;
+  border: solid 1px #cccccc;
+  border-bottom: solid 1px #8a8d90;
+  box-sizing: border-box;
+  /* Needed in order to properly 'anchor' the gesture-preview */
+  position: absolute;
+  width: 100%;
+}
+
+div.ios div.kmw-keytip-cap, div.android div.kmw-keytip-cap {
+  position: absolute;
+  border-radius: 0 0 5px 5px;
+}
+
+div.ios div.kmw-keytip-cap {
+  border-top: solid 1px white;
+  border-bottom: solid 1px #8a8d90;
+}
+
+span.kmw-keytip-label {
+  display: block;
+  transform: translateY(-50%);
+  top: 50%;
+  position: relative;
+  z-index: 1; /* allows characters like 'g' and 'y' to overflow onto callouts */
+}
+
+div.ios div.kmw-keytip-cap,
+div.ios div.kmw-keytip-tip {
+  background:white;
+  /* background-clip: required to prevent antialiasing on top edge on hi-res devices e.g. iPhone 13 pro + iOS 15.4 */
+  background-clip: content-box;
+}
+
+div.android div.kmw-keytip {
+  color: white;
+}
+
+div.android div.kmw-keytip-tip {
+  border-radius: 6px;
+  background: #999;
+  /* Needed in order to properly 'anchor' the gesture-preview */
+  position: absolute;
+  width: 100%;
+}
+
+div.android div.kmw-keytip-cap {
+  background: #999;
+  border-bottom: solid 1px #8a8d90
+}
+
+/* Dark mode - ensure text is colored appropriately for key tips. */
+@media (prefers-color-scheme: dark) {
+  div.ios div.kmw-keytip {
+    color:#fff;
+  }
+
+  div.ios div.kmw-keytip-cap,
+  div.ios div.kmw-keytip-tip {
+    background: #0f1319;
+  }
+
+  div.ios div.kmw-keytip-cap {
+    border-top: solid 1px #0f1319;
+  }
+}
+
+/* Box styles for keyboard-specific OSK (e.g. EuroLatin) and if no keyboard active (desktop only) */
+.kmw-osk-static, .kmw-osk-none{text-align:left;font:12px sans-serif;border:solid 1px #ad4a28;color:blue;background-color:white;}
+.kmw-osk-none{padding:4px 6px 6px}
+.kmw-osk-none::before{content:'Installing keyboard...';}
+
+/* OSK language menu styles */
+#kmw-language-menu{position:fixed;left:0;width:232px;max-width:232px;z-index:10004;background-color:rgba(128,128,128,1);
+        border:3px solid #888;padding:0;border-radius:4px;-webkit-border-radius:4px;
+        box-shadow:3px 3px 2px #ccc;-webkit-box-shadow:3px 3px 2px #ccc;
+        overflow:hidden;
+        -ms-touch-action:none;-webkit-user-select:none;
+        }
+
+#kmw-language-menu *{-ms-touch-action:none;-webkit-user-select:none;}
+
+#kmw-language-menu p{font-family:Arial,Helvetica,sans-serif; font-size:16px;
+        border-top:1px dotted #989898; border-bottom:1px dotted #989898;
+        margin:0; padding:10px 0px 10px 10px; overflow:hidden;
+        color:#0000ff; background-color:transparent; white-space:nowrap;
+        }
+
+#kmw-language-menu div.kbd-list-open p.kbd-list-entry {display: block;}
+#kmw-language-menu div.kbd-list-closed p.kbd-list-entry {display: none;}
+#kmw-language-menu-background{position:fixed;left:0;top:0;width:100%;height:100%;background-color:transparent;z-index:10003;}
+
+#kmw-menu-scroll-container{position:absolute;left:0;top:0px;width:200px;max-width:200px;overflow:auto;z-index:10005;}
+#kmw-menu-scroller{position:absolute;left:0;top:0;width:200px;max-width:200px;background-color:#e0e0e0;overflow-x:hidden;}
+
+#kmw-menu-index {position:absolute;right:0;width:32px;font-size:14px;}
+#kmw-menu-index p {text-align:center;border:none;padding:0px 2px;margin:0;color:white;}
+
+#kmw-menu-footer{height:2px;background-color:#808080;}
+
+#kmw-language-menu .kbd-list{position:relative;padding-left:10px;background:transparent;}
+#kmw-language-menu .kbd-single-entry{position:relative;padding-left:10px;background:transparent;}
+#kmw-language-menu .kbd-list-entry{position:relative;padding-left:30px;background:transparent;}
+#kmw-language-menu .selected {color:white; background-color:#c82;}/*#ad4a28;}*/
+#kmw-language-menu .current {font-weight:bold;}
+
+/* Popup key styles */
+#kmw-popup-keys {
+  position: absolute;
+  display: block;
+  width: auto;
+  height: auto;
+  overflow-y: visible;
+  padding: 4px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fdfdfe;
+  border: none;
+  z-index: 10002;
+  box-sizing: content-box;
+}
+
+.tablet.ios #kmw-popup-keys {padding: 4px 7px 0px 0px;}
+.phone.ios #kmw-popup-keys {padding: 4px 5px 0px 0px;}
+
+.tablet.ios #kmw-popup-keys .kmw-key{border:none;}
+.phone.ios  #kmw-popup-keys .kmw-key{border:none;}
+
+.phone.android #kmw-popup-keys {border:none; border-radius: 2px; background-color:#333333; padding:5px 5px 0 0;}
+.tablet.android #kmw-popup-keys {border:1px solid #eee; border-radius: 3px; background-color:#888; padding:8px 12px 4px 4px;}
+
+/* Style for callout used on phones */
+#kmw-popup-callout {
+  position: absolute;
+  display: block;
+  border-color: transparent;
+  border-top-color: #fdfdfe;
+  border-style: solid;
+  z-index: 10003;
+  pointer-events:none;
+  box-sizing: border-box;
+}
+
+.phone.android #kmw-popup-callout {
+  border-top-color: #333333;
+}
+
+.tablet.android #kmw-popup-callout {
+  border-top-color: #888;
+}
+
+@media (prefers-color-scheme: dark) {
+  /* Should we do different dark-mode styling for Android than for iOS? */
+  /* These were selected for iOS, just to be clear. */
+  #kmw-popup-keys {
+    background-color: #0f1319;
+  }
+
+  #kmw-popup-callout {
+    border-top-color: #0f1319;
+  }
+}
+
+/* Filter (shim) to darken screen and highlight popup keys */
+#kmw-popup-shim {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  bottom: 0;
+  left: 0;
+  display: block;
+  opacity: 0.15;
+  background-color: #000;
+  pointer-events: none;
+  z-index: 10001;
+}
+
+/* Styles for other KMW elements (keyboard loading wait notification, etc.) */
+.kmw-wait-background{display:none;position:absolute;left:0;top:0;width:100%;height:100%;
+        background-color:rgba(0,0,0,0.0);z-index:11000;}
+.kmw-wait-box{width:240px; min-height:80px;margin-top:20%;margin-left:auto;margin-right:auto;
+        border:3px solid #ad4a28;border-radius:8px;text-align:center;padding:0px;background:white;}
+.kmw-alert-close{float:right; height:24px; width:24px; font:1em bold Arial,sans-serif;color:#ad4a28;}
+/*.kmw-alert-close{float:right; height:24px; width:24px; font:2em bold Arial,sans-serif;color:#ad4a28;} */
+.kmw-alert-close::before{content:'\00d7'}
+/*.kmw-alert-close{float:right;background:url('icons.gif') no-repeat -30px 0; height:13px; width:15px;}*/
+.kmw-wait-text{clear:both; margin:4px;white-space:nowrap;}
+.kmw-wait-graphic{width:100%;min-height:19px;background:url('ajax-loader.gif') no-repeat;background-position:center top;}
+.kmw-alert-text{margin:10px;white-space:default;font-family:Arial,sans-serif;}
+
+/* Note: font size gets overwritten in source code! */
+.kmw-spacebar-caption{font-family: Arial !important;color:rgba(0,0,0,0.25);}
+
+/* Probably best to make this its own CSS that can be optionally included? */
+@media (prefers-color-scheme: dark) {
+  .kmw-spacebar-caption{color:rgba(255, 255, 255, 0.35);}
+}
+
+/* Static styles */
+
+.desktop-static.kmw-osk-inner-frame{margin:0;background-color:#666;border:2px solid #ad4a28;box-sizing:border-box;-moz-box-sizing:border-box;}
+.desktop-static .kmw-key-layer{position: relative}
+
+.phone-static.kmw-osk-inner-frame{margin:0;background-color:#666;border:2px solid #ad4a28;box-sizing:border-box;-moz-box-sizing:border-box;}
+.phone-static .kmw-key-layer{position: relative}
+
+.tablet-static.kmw-osk-inner-frame{margin:0;background-color:#666;border:2px solid #ad4a28;box-sizing:border-box;-moz-box-sizing:border-box;}
+.tablet-static .kmw-key-layer{position: relative}
+

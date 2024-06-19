@@ -13,6 +13,7 @@ sentry.properties
 # User-specific stuff:
 **/.idea/libraries/
 **/.idea/dictionaries
+**/.idea/shelf/
 **/.idea/**/*.xml
 **/*.iml
 
@@ -34,6 +35,12 @@ gradle_models.ser
 KMEA/**/assets/ajax-loader.gif
 KMEA/**/assets/keymanandroid.js
 KMEA/**/assets/keyman.js.map
+KMEA/**/assets/keymanweb-webview.js
+KMEA/**/assets/keymanweb-webview.js.map
+KMEA/**/assets/keymanweb-webview.es5.js
+KMEA/**/assets/keymanweb-webview.es5.js.map
+KMEA/**/assets/map-polyfill.js
+KMEA/**/assets/sentry.min.js
 KMEA/**/assets/keyman-sentry.js
 KMEA/**/assets/es6-shim.min.js
 KMEA/**/assets/kmwosk.css

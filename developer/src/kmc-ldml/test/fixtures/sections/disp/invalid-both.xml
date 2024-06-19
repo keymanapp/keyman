@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="disp-invalid"/>
+
+  <displays>
+    <display output="e" keyId="e" display="(e)"/> <!-- both to and id -->
+    <displayOptions baseCharacter="x" />
+  </displays>
+</keyboard3>

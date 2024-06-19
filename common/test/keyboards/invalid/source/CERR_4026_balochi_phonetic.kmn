@@ -1,0 +1,17 @@
+﻿store(&VERSION) '10.0'
+store(&NAME) 'Balochi Phonetic'
+store(&TARGETS) 'any'
+store(&KMW_RTL) '1'
+store(&LAYOUTFILE) 'balochi_phonetic.keyman-touch-layout'
+store(&KEYBOARDVERSION) '1.4.2'
+store(&COPYRIGHT) '© 2017-2021 SIL International'
+store(&MESSAGE) 'The Balochi Phonetic keyboard is distributed under The MIT License (MIT).'
+store(&KMW_HELPTEXT) 'This is a phonetically organized Balochi keyboard.'
+store(&VISUALKEYBOARD) 'balochi_phonetic.kvks'
+store(&BITMAP) 'CERR__balochi_phonetic.ico'
+
+begin Unicode > use(main)
+
+c ***** CERR_GroupDoesNotExist 0x00004026 **************************
+
+c ******************************************************************

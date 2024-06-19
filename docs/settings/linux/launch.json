@@ -20,32 +20,67 @@
       "name": "Launch kmx unit tests",
       "target": "build/arch/debug/tests/unit/kmx/kmx",
       "cwd": "${workspaceRoot}/core/",
-      "arguments": "tests/unit/kmx/033\\ -\\ caps\\ always\\ off.km{n,x}",
+      "arguments": "tests/unit/kmx/k_033___caps_always_off.km{n,x}",
       "valuesFormatting": "parseText"
     },
     {
+      // Mount the Keyman root directory as a Shared Folder in the VM.
       // kill ibus-engine-keyman, if running
-      // start: gdbserver 10.3.0.53:2345 /media/sf_Develop/keyman/keyman/linux/ibus-keyman/src/ibus-engine-keyman
+      // start: gdbserver 10.3.0.53:2345 /media/sf_Develop/keyman/keyman/linux/build/x86_64/debug/src/ibus-engine-keyman
       // then attach debugger in vscode
+      // Replace the IP address after `gdbserver` with the IP address of the host machine.
+      // Replace the IP address below with the address of the VM running gdbserver.
       "type": "gdb",
       "request": "attach",
-      "name": "Attach to gdbserver",
-      "executable": "./linux/ibus-keyman/src/ibus-engine-keyman",
-      "target": "10.3.0.53:2345",
+      "name": "Attach to gdbserver (ibus-keyman)",
+      "executable": "${workspaceFolder}/linux/build/x86_64/debug/src/ibus-engine-keyman",
+      "target": "10.3.0.52:2345",
       "remote": true,
       "cwd": "${workspaceFolder}/linux/ibus-keyman",
       "valuesFormatting": "parseText"
     },
     {
+      // start: gdbserver 10.3.0.58:2345 /media/sf_Develop/keyman/keyman/linux/build/x86_64/debug/tests/ibus-keyman-tests
+      // then attach debugger in vscode
+      "type": "gdb",
+      "request": "attach",
+      "name": "Attach to gdbserver (ibus-keyman integration tests)",
+      "executable": "${workspaceFolder}/linux/build/x86_64/debug/tests/ibus-keyman-tests",
+      "target": "10.3.0.58:2345",
+      "remote": true,
+      "cwd": "${workspaceFolder}/linux/ibus-keyman",
+      "valuesFormatting": "parseText",
+      "internalConsoleOptions": "openOnSessionStart",
+      "env": {
+        "KEYMAN_DEBUG": "1",
+        "G_ENABLE_DIAGNOSTIC": "1",
+        "GSETTINGS_BACKEND": "keyfile"
+      }
+    },
+    {
+      "type": "gdb",
+      "request": "launch",
+      "name": "Launch ibus-keyman unit tests",
+      "target": "./keymanutil_tests",
+      "cwd": "${workspaceFolder}/linux/build/x86_64/debug/src/test",
+      "valuesFormatting": "parseText",
+      "internalConsoleOptions": "openOnSessionStart",
+      "env": {
+        "KEYMAN_DEBUG": "1",
+        "G_ENABLE_DIAGNOSTIC": "1",
+        "GSETTINGS_BACKEND": "keyfile"
+      }
+    },
+    {
       "name": "Python: Current File",
-      "type": "python",
+      "type": "debugpy",
       "request": "launch",
       "program": "${file}",
       "console": "integratedTerminal"
     },
     {
       "name": "km-config",
-      "type": "python",
+      "type": "debugpy",
       "request": "launch",
       "program": "linux/keyman-config/km-config",
       "cwd": "${workspaceFolder}",
@@ -56,7 +91,7 @@
     },
     {
       "name": "km-package-install",
-      "type": "python",
+      "type": "debugpy",
       "request": "launch",
       "program": "linux/keyman-config/km-package-install",
       "cwd": "${workspaceFolder}",
@@ -64,17 +99,6 @@
       "env": {
         "KEYMAN_NOSENTRY": "1"
       }
-    },
-    {
-      "name": "Python: ibus-keyman unit tests",
-      "type": "python",
-      "request": "launch",
-      "program": "${workspaceFolder}/linux/ibus-keyman/test/test_ibus_keyman.py",
-      "args": [
-        "001 - basic input UnicodeI"
-      ],
-      "cwd": "${workspaceFolder}/linux/ibus-keyman/test/",
-      "console": "integratedTerminal"
     },
     {
       "type": "perl",

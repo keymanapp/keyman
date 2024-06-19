@@ -3,7 +3,6 @@
 /windows/debug/
 /windows/lib/
 /windows/release/
-/windows/src/PathDefines.mak
 /windows/src/**/*.err
 /windows/src/**/*.Build.CppClean.log
 /windows/src/**/*.dproj.local
@@ -36,6 +35,7 @@
 /common/windows/delphi/**/*.bpl
 /common/windows/delphi/**/*.map
 /common/windows/delphi/**/*.tds
+/common/windows/delphi/**/*.identcache
 
 # Temp files generated during release build
 /windows/src/buildtools/inst/copydebug.mak
@@ -72,7 +72,6 @@
 
 # /developer/TIKE/
 /windows/src/developer/TIKE/stock.kct
-/windows/src/developer/TIKE/kmcmpdll.dll
 
 # /developer/TIKE/redist/
 /windows/src/developer/TIKE/redist/Addins
@@ -83,12 +82,6 @@
 /windows/src/developer/inst/*.wixpdb
 /windows/src/developer/inst/download.mak
 /windows/src/developer/inst/copydev.mak
-
-# /developer/kmcmpdll/
-/windows/src/developer/kmcmpdll/*.lastbuildstate
-
-# /developer/kmcmpdll/Debug/
-/windows/src/developer/kmcmpdll/Debug/*.idb
 
 /windows/src/developer/stock/stock.kct
 /windows/src/developer/uitemplates/keyman.kct
@@ -166,6 +159,7 @@ resources/environment.sh
 /core/VERSION.md
 
 **/node_modules/
+tsconfig.tsbuildinfo
 
 # Windows system files
 Thumbs.db
@@ -173,6 +167,13 @@ Thumbs.db
 # Temporary file for logging scripts in xcode runs, see build-utils.sh for
 # details
 /xcodebuild-scripts.log
+
+#
+# Code coverage tools for JS/TS - nyc and c8
+#
+.nyc_output/
+lcov-report/
+lcov.info
 
 # Linux packaging related
 /debian/
@@ -182,3 +183,4 @@ Thumbs.db
 /keyman*.buildinfo
 /keyman*.changes
 /keyman*.tar.?z
+

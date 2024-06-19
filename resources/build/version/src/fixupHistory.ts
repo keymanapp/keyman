@@ -5,7 +5,7 @@ import {
 import { GitHub } from '@actions/github';
 import { readFileSync, writeFileSync } from 'fs';
 import { gt } from 'semver';
-import { reportHistory } from './reportHistory';
+import { reportHistory } from './reportHistory.js';
 
 interface PRInformation {
   title: string;
@@ -42,7 +42,8 @@ const splicePullsIntoHistory = async (pulls: PRInformation[]): Promise<{count: n
   const versionMatch = new RegExp(`^## ${version} ${tier}`, 'i');
 
   let historyChunks: { heading: string[]; newer: string[]; current: string[]; older: string[] } = {heading:[], newer:[], current:[], older:[]};
-  let state = "heading";
+  type ChunkType = keyof typeof historyChunks;
+  let state: ChunkType = "heading";
   for(const line of history) {
     if(line.match(versionMatch)) {
       // We are in the correct section of history
@@ -90,7 +91,7 @@ const splicePullsIntoHistory = async (pulls: PRInformation[]): Promise<{count: n
 
     let found = false;
     // Look for the PR in any other chunk -- can be found with merges of master into PR or chained PRs
-    for(const chunk of ['newer','current','older']) {
+    for(const chunk of ['newer','current','older'] as ChunkType[]) {
       for(const line of historyChunks[chunk]) {
         if(line.match(pullNumberRe)) {
           found = true;
@@ -183,7 +184,7 @@ export const sendCommentToPullRequestAndRelatedIssues = async (
  */
 
 export const fixupHistory = async (
-  octokit: GitHub, base: string, force: boolean, writeGithubComment: boolean
+  octokit: GitHub, base: string, force: boolean, writeGithubComment: boolean, from?: string, to?: string
 ): Promise<number> => {
 
   //
@@ -193,7 +194,7 @@ export const fixupHistory = async (
   let pulls: PRInformation[] = [];
 
   try {
-    pulls = await reportHistory(octokit, base, force, false);
+    pulls = await reportHistory(octokit, base, force, false, from, to);
   } catch(e) {
     logWarning(String(e));
     return -1;

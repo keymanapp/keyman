@@ -1,0 +1,278 @@
+{
+  "inputs": [
+    {
+      "isFromTouch": true,
+      "path": {
+        "coords": [
+          {
+            "targetX": 115,
+            "targetY": 79,
+            "t": 14808
+          },
+          {
+            "targetX": 124,
+            "targetY": 76,
+            "t": 14945
+          },
+          {
+            "targetX": 128,
+            "targetY": 76,
+            "t": 14977
+          },
+          {
+            "targetX": 132,
+            "targetY": 75,
+            "t": 14995
+          },
+          {
+            "targetX": 136,
+            "targetY": 75,
+            "t": 15012
+          },
+          {
+            "targetX": 140,
+            "targetY": 75,
+            "t": 15028
+          },
+          {
+            "targetX": 146,
+            "targetY": 75,
+            "t": 15045
+          },
+          {
+            "targetX": 150,
+            "targetY": 75,
+            "t": 15061
+          },
+          {
+            "targetX": 154,
+            "targetY": 75,
+            "t": 15078
+          },
+          {
+            "targetX": 158,
+            "targetY": 75,
+            "t": 15095
+          },
+          {
+            "targetX": 160,
+            "targetY": 75,
+            "t": 15111
+          },
+          {
+            "targetX": 162,
+            "targetY": 75,
+            "t": 15128
+          },
+          {
+            "targetX": 164,
+            "targetY": 75,
+            "t": 15144
+          },
+          {
+            "targetX": 166,
+            "targetY": 75,
+            "t": 15162
+          },
+          {
+            "targetX": 167,
+            "targetY": 75,
+            "t": 15177
+          },
+          {
+            "targetX": 170,
+            "targetY": 75,
+            "t": 15195
+          },
+          {
+            "targetX": 172,
+            "targetY": 75,
+            "t": 15211
+          },
+          {
+            "targetX": 175,
+            "targetY": 75,
+            "t": 15227
+          },
+          {
+            "targetX": 178,
+            "targetY": 75,
+            "t": 15244
+          },
+          {
+            "targetX": 180,
+            "targetY": 75,
+            "t": 15261
+          },
+          {
+            "targetX": 183,
+            "targetY": 75,
+            "t": 15278
+          },
+          {
+            "targetX": 187,
+            "targetY": 75,
+            "t": 15294
+          },
+          {
+            "targetX": 190,
+            "targetY": 75,
+            "t": 15311
+          },
+          {
+            "targetX": 192,
+            "targetY": 75,
+            "t": 15328
+          },
+          {
+            "targetX": 195,
+            "targetY": 75,
+            "t": 15344
+          },
+          {
+            "targetX": 198,
+            "targetY": 75,
+            "t": 15361
+          },
+          {
+            "targetX": 198,
+            "targetY": 75,
+            "t": 15378
+          },
+          {
+            "targetX": 199,
+            "targetY": 75,
+            "t": 15394
+          },
+          {
+            "targetX": 203,
+            "targetY": 75,
+            "t": 15411
+          },
+          {
+            "targetX": 207,
+            "targetY": 75,
+            "t": 15427
+          },
+          {
+            "targetX": 210,
+            "targetY": 75,
+            "t": 15444
+          },
+          {
+            "targetX": 212,
+            "targetY": 75,
+            "t": 15461
+          },
+          {
+            "targetX": 214,
+            "targetY": 75,
+            "t": 15477
+          },
+          {
+            "targetX": 215,
+            "targetY": 75,
+            "t": 15494
+          },
+          {
+            "targetX": 216,
+            "targetY": 75,
+            "t": 15511
+          },
+          {
+            "targetX": 218,
+            "targetY": 75,
+            "t": 15544
+          },
+          {
+            "targetX": 219,
+            "targetY": 75,
+            "t": 15561
+          },
+          {
+            "targetX": 220,
+            "targetY": 75,
+            "t": 15578
+          },
+          {
+            "targetX": 222,
+            "targetY": 75,
+            "t": 15594
+          },
+          {
+            "targetX": 222,
+            "targetY": 75,
+            "t": 15611
+          },
+          {
+            "targetX": 223,
+            "targetY": 75,
+            "t": 15628
+          },
+          {
+            "targetX": 223,
+            "targetY": 74,
+            "t": 15744
+          },
+          {
+            "targetX": 223,
+            "targetY": 73,
+            "t": 15845
+          },
+          {
+            "targetX": 224,
+            "targetY": 73,
+            "t": 15861
+          },
+          {
+            "targetX": 226,
+            "targetY": 73,
+            "t": 15894
+          },
+          {
+            "targetX": 226,
+            "targetY": 72,
+            "t": 15911
+          },
+          {
+            "targetX": 228,
+            "targetY": 71,
+            "t": 15927
+          },
+          {
+            "targetX": 230,
+            "targetY": 71,
+            "t": 15961
+          },
+          {
+            "targetX": 230,
+            "targetY": 71,
+            "t": 15978
+          },
+          {
+            "targetX": 231,
+            "targetY": 71,
+            "t": 15995
+          },
+          {
+            "targetX": 232,
+            "targetY": 71,
+            "t": 16044
+          },
+          {
+            "targetX": 232,
+            "targetY": 70,
+            "t": 16078
+          }
+        ],
+        "wasCancelled": false
+      }
+    }
+  ],
+  "config": {
+    "deviceStyle": "screen2",
+    "roamingStyle": "bounds1",
+    "receiverStyle": "full",
+    "safeZoneStyle": "safe-loose"
+  }
+}

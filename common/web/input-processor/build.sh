@@ -2,88 +2,56 @@
 #
 # Compile KeymanWeb's 'keyboard-processor' module, one of the components of Web's 'core' module.
 #
-set -eu
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-# This script runs from its own folder
-cd "$(dirname "$THIS_SCRIPT")"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+
+BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
 
 ################################ Main script ################################
 
-builder_check_color "$@"
-
-# TODO: for predictive-text, we only need :headless, perhaps we should be splitting modules?
-# TODO: remove :tools once kmlmc is a dependency for test:module
-
 builder_describe "Builds the standalone, headless form of Keyman Engine for Web's input-processor module" \
-  "@../keyman-version" \
-  "@../keyboard-processor" \
-  "@../../predictive-text" \
+  "@/common/web/keyman-version" \
+  "@/common/web/keyboard-processor" \
+  "@/common/predictive-text" \
+  "@/developer/src/kmc-model test" \
   "clean" \
   "configure" \
   "build" \
   "test" \
-  ":module     A headless, Node-oriented version of the module useful for unit tests" \
-  ":tools      Related tools useful for development and testing of this module" \
-  "--ci        Sets ${BUILDER_TERM_START}test${BUILDER_TERM_END} action to use CI-based test configurations & reporting"
+  "--ci        Sets $(builder_term test) action to use CI-based test configurations & reporting"
 
 builder_describe_outputs \
-  configure:module   /node_modules \
-  configure:tools    /node_modules \
-  build:module       build/index.js \
-  build:tools        /developer/src/kmlmc/dist/kmlmc.js    # TODO: remove this once kmlmc is a dependency
+  configure          /node_modules \
+  build              /common/web/input-processor/build/lib/index.mjs \
 
 builder_parse "$@"
 
-### CONFIGURE ACTIONS
+function do_build() {
+  tsc -b ./tsconfig.json
 
-if builder_start_action configure; then
-  verify_npm_setup
-  builder_finish_action success configure
-fi
+  $BUNDLE_CMD    "${KEYMAN_ROOT}/common/web/input-processor/build/obj/index.js" \
+    --out        "${KEYMAN_ROOT}/common/web/input-processor/build/lib/index.mjs" \
+    --format esm
 
-### CLEAN ACTIONS
+  # Declaration bundling.
+  tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+}
 
-if builder_start_action clean; then
-  rm -rf build/
-  builder_finish_action success clean
-fi
-
-### BUILD ACTIONS
-
-if builder_start_action build:tools; then
-  # Used by test:module
-  # TODO: convert to a dependency once we have updated kmlmc to use builder script
-  pushd "$KEYMAN_ROOT/developer/src/kmlmc"
-  ./build.sh -S
-  popd
-
-  builder_finish_action success build:tools
-fi
-
-if builder_start_action build:module; then
-  npm run tsc -- -b src/tsconfig.json
-  builder_finish_action success build:module
-fi
-
-# TEST ACTIONS
-
-if builder_start_action test:module; then
-  FLAGS=
+function do_test() {
+  local FLAGS=
   if builder_has_option --ci; then
     FLAGS="--reporter mocha-teamcity-reporter"
   fi
 
-  # Build the leaf-style, bundled version of input-processor for use in testing.
-  npm run tsc -- -b src/tsconfig.bundled.json
+  mocha --recursive $FLAGS ./tests/cases/
+}
 
-  npm run mocha -- --recursive $FLAGS ./tests/cases/
-
-  builder_finish_action success test:module
-fi
+builder_run_action configure  verify_npm_setup
+builder_run_action clean      rm -rf build/
+builder_run_action build      do_build
+builder_run_action test       do_test

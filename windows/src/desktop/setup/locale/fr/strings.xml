@@ -72,9 +72,7 @@ Redémarrer maintenant ?</string>
   <string name="ssDownloadingTitle">Téléchargement de %0:s</string>
   <!-- Parameters: %0:s: filename -->
   <string name="ssDownloadingText">Téléchargement de %0:s</string>
-  <string name="ssOffline">$APPNAME L\'installation n\'a pas pu se connecter à keyman.com pour télécharger des ressources supplémentaires.
-
-Veuillez vérifier que vous êtes en ligne et donner à l\'installateur $APPNAME la permission pour accéder à Internet dans les paramètres de votre pare-feu.
-
-Cliquez sur Annuler pour quitter l\'installation, Réessayer pour télécharger à nouveau les ressources ou Ignorer pour continuer hors ligne.</string>
+  <string name="ssOffline">$APPNAME L\'installation n\'a pas pu se connecter à keyman.com pour télécharger des ressources supplémentaires.</string>
+  <string name="ssOffline2">Veuillez vérifier que vous êtes en ligne et donner à l\'installateur $APPNAME la permission pour accéder à Internet dans les paramètres de votre pare-feu.</string>
+  <string name="ssOffline3">Cliquez sur Annuler pour quitter l\'installation, Réessayer pour télécharger à nouveau les ressources ou Ignorer pour continuer hors ligne.</string>
 </resources>

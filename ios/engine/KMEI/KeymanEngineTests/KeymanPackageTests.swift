@@ -29,14 +29,13 @@ class KeymanPackageTests: XCTestCase {
     }
   }
 
-  func testKeyboardPackageExtraction() throws {
+  func testKeyboardPackage_extractWithoutKmpExtension_succeeds() throws {
     let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-    let khmerPackageZip = cacheDirectory.appendingPathComponent("khmer_angkor.kmp.zip")
+    let khmerPackageZip = cacheDirectory.appendingPathComponent("khmer_angkor.kmp")
     try ResourceFileManager.shared.copyWithOverwrite(from: TestUtils.Keyboards.khmerAngkorKMP, to: khmerPackageZip)
 
     let destinationFolderURL = cacheDirectory.appendingPathComponent("khmer_angkor")
 
-    // Requires that the source file is already .zip, not .kmp.  It's a ZipUtils limitation.
     do {
       if let kmp = try KeymanPackage.extract(fileUrl: khmerPackageZip, destination: destinationFolderURL) {
         // Run assertions on the package's kmp.info.
@@ -58,14 +57,102 @@ class KeymanPackageTests: XCTestCase {
     }
   }
 
+  func testKeyboardPackage_clearNonexistentDirectory_doesNothing() throws {
+    let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+    let destinationDirectory = cacheDirectory.appendingPathComponent("doesnotexist")
+
+    do {
+      // clear directory
+      try KeymanPackage.clearDirectory(destination: destinationDirectory)
+    } catch {
+      XCTFail("error clearing the nonexistent directory \(error)")
+    }
+  }
+
+  func testKeyboardPackage_clearEmptyDirectory_throwsNoError() throws {
+    let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+    let destinationDirectory = cacheDirectory.appendingPathComponent("destination")
+
+    do {
+      // create directory
+      try FileManager.default.createDirectory(
+        atPath: destinationDirectory.path,
+        withIntermediateDirectories: false,
+        attributes: nil
+      )
+
+      // clear directory
+      try KeymanPackage.clearDirectory(destination: destinationDirectory)
+    } catch {
+      XCTFail("error clearing the empty directory \(error)")
+    }
+    
+    let fileArray = try FileManager.default.contentsOfDirectory(atPath: destinationDirectory.path)
+    XCTAssert(fileArray.count == 0, "directory still contains \(fileArray.count) items")
+  }
+
+  func testKeyboardPackage_clearNonEmptyDirectory_directoryIsEmpty() throws {
+    let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+    let destinationDirectory = cacheDirectory.appendingPathComponent("destination")
+
+    do {
+      // create directory
+      try FileManager.default.createDirectory(
+        atPath: destinationDirectory.path,
+        withIntermediateDirectories: false,
+        attributes: nil
+      )
+
+      // add some files
+      FileManager.default.createFile(atPath: destinationDirectory.appendingPathComponent("fileone").path, contents: nil)
+      FileManager.default.createFile(atPath: destinationDirectory.appendingPathComponent("filetwo").path, contents: nil)
+      FileManager.default.createFile(atPath: destinationDirectory.appendingPathComponent("filethree").path, contents: nil)
+
+      // clear directory
+      try KeymanPackage.clearDirectory(destination: destinationDirectory)
+    } catch {
+      XCTFail("error clearing the empty directory \(error)")
+    }
+    
+    let fileArray = try FileManager.default.contentsOfDirectory(atPath: destinationDirectory.path)
+    XCTAssert(fileArray.count == 0, "directory still contains \(fileArray.count) items")
+  }
+
+  func testKeyboardPackage_extractTwice_noDuplicateFileError() throws {
+    let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+    let khmerPackageZip = cacheDirectory.appendingPathComponent("khmer_angkor.kmp")
+    try ResourceFileManager.shared.copyWithOverwrite(from: TestUtils.Keyboards.khmerAngkorKMP, to: khmerPackageZip)
+
+    let destinationFolderURL = cacheDirectory.appendingPathComponent("khmer_angkor")
+
+    do {
+      if let kmp = try KeymanPackage.extract(fileUrl: khmerPackageZip, destination: destinationFolderURL) {
+        do {
+          // clear directory before second extract
+          try KeymanPackage.clearDirectory(destination: destinationFolderURL)
+          
+          if let secondKmp = try KeymanPackage.extract(fileUrl: khmerPackageZip, destination: destinationFolderURL) {
+          } else {
+            XCTAssert(false, "*** second unzip failed")
+          }
+        } catch {
+          XCTFail("unzip 2 failure with error \(error)")
+        }
+      } else {
+        XCTAssert(false, "*** first unzip failed")
+      }
+    } catch {
+      XCTFail("unzip 1 failure with error \(error)")
+    }
+  }
+
   func testLexicalModelPackageExtraction() throws {
     let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
-    let mtntZip = cacheDirectory.appendingPathComponent("nrc.en.mtnt.kmp.zip")
+    let mtntZip = cacheDirectory.appendingPathComponent("nrc.en.mtnt.kmp")
     try ResourceFileManager.shared.copyWithOverwrite(from: TestUtils.LexicalModels.mtntKMP, to: mtntZip)
 
     let destinationFolderURL = cacheDirectory.appendingPathComponent("nrc.en.mtnt.model")
 
-    // Requires that the source file is already .zip, not .kmp.  It's a ZipUtils limitation.
     do {
       if let kmp = try KeymanPackage.extract(fileUrl: mtntZip, destination: destinationFolderURL) {
         // Run assertions on the package's kmp.info.

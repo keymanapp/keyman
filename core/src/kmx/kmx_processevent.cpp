@@ -4,16 +4,16 @@
 */
 #include "kmx_processevent.h"
 #include "state.hpp"
-#include <keyman/keyboardprocessor_consts.h>
+#include <keyman/keyman_core_api_consts.h>
 
-using namespace km::kbp;
+using namespace km::core;
 using namespace kmx;
 
 /* Globals */
 
-KMX_BOOL km::kbp::kmx::g_debug_ToConsole = FALSE;
-KMX_BOOL km::kbp::kmx::g_debug_KeymanLog = TRUE;
-KMX_BOOL km::kbp::kmx::g_silent = FALSE;
+KMX_BOOL km::core::kmx::g_debug_ToConsole = FALSE;
+KMX_BOOL km::core::kmx::g_debug_KeymanLog = TRUE;
+KMX_BOOL km::core::kmx::g_silent = FALSE;
 
 /*
 * KMX_ProcessEvent
@@ -44,7 +44,7 @@ char VKeyToChar(KMX_UINT modifiers, KMX_UINT vk) {
     shifted = (modifiers & K_SHIFTFLAG) == K_SHIFTFLAG,
     caps = (modifiers & CAPITALFLAG) == CAPITALFLAG;
 
-  if (vk == KM_KBP_VKEY_SPACE) {
+  if (vk == KM_CORE_VKEY_SPACE) {
     // Override for space because it is the same for
     // shifted and unshifted.
     return 32;
@@ -71,20 +71,20 @@ char VKeyToChar(KMX_UINT modifiers, KMX_UINT vk) {
  * @param state      A pointer to the state object.
  * @param vkey       A virtual key to be processed.
  * @param modifiers  The combinations of modifier keys set at the time vkey was pressed,
- *                   bitmask from the km_kbp_modifier_state enum.
+ *                   bitmask from the km_core_modifier_state enum.
  * @param isKeyDown  TRUE if this is called on KeyDown event, FALSE if called on KeyUp event
 *
  * @return           TRUE if keystroke should be eaten
 */
 KMX_BOOL KMX_ProcessEvent::ProcessEvent(
-  km_kbp_state *state,
+  km_core_state *state,
   KMX_UINT vkey,
   KMX_DWORD modifiers,
   KMX_BOOL isKeyDown
 ) {
   LPKEYBOARD kbd = m_keyboard.Keyboard;
 
-  m_kbp_state = state;
+  m_core_state = state;
 
   // If debugging is enabled, then ...
   DeleteInternalDebugItems();
@@ -106,25 +106,25 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(
 
   if (kbd->StartGroup[BEGIN_UNICODE] == (KMX_DWORD) -1) {
     DebugLog("Non-Unicode keyboards are not supported.");
-    m_kbp_state = nullptr;
+    m_core_state = nullptr;
     return FALSE;
   }
 
   switch (vkey) {
-  case KM_KBP_VKEY_CAPS:
+  case KM_CORE_VKEY_CAPS:
     if (KeyCapsLockPress(modifiers, isKeyDown))
       return TRUE;
     break;
-  case KM_KBP_VKEY_SHIFT:
+  case KM_CORE_VKEY_SHIFT:
     KeyShiftPress(modifiers, isKeyDown);
     return TRUE;
-  case KM_KBP_VKEY_CONTROL:
-  case KM_KBP_VKEY_ALT:
+  case KM_CORE_VKEY_CONTROL:
+  case KM_CORE_VKEY_ALT:
     return TRUE;
   }
 
   if (!isKeyDown) {
-    m_kbp_state = nullptr;
+    m_core_state = nullptr;
     return FALSE;
   }
 
@@ -133,23 +133,23 @@ KMX_BOOL KMX_ProcessEvent::ProcessEvent(
   KMX_BOOL fOutputKeystroke = FALSE;
 
   if(m_debug_items) {
-    km_kbp_state_debug_key_info key_info;
+    km_core_state_debug_key_info key_info;
     key_info.character = m_state.charCode;
     key_info.modifier_state = modifiers;
     key_info.vk = m_state.vkey;
-    m_debug_items->push_begin(&key_info, KM_KBP_DEBUG_FLAG_UNICODE);
+    m_debug_items->push_begin(&key_info, KM_CORE_DEBUG_FLAG_UNICODE);
   }
 
   ProcessGroup(gp, &fOutputKeystroke);
 
   if(m_debug_items) {
-    m_debug_items->push_end(m_actions.Length(), fOutputKeystroke ? KM_KBP_DEBUG_FLAG_OUTPUTKEYSTROKE : 0);
+    m_debug_items->push_end(m_actions.Length(), fOutputKeystroke ? KM_CORE_DEBUG_FLAG_OUTPUTKEYSTROKE : 0);
     // m_debug_items is just a helper class that pushes to state->debug_items(),
     // so we can throw it away after we are done with it
     DeleteInternalDebugItems();
   }
 
-  m_kbp_state = nullptr;
+  m_core_state = nullptr;
 
   return !fOutputKeystroke;
 }
@@ -199,7 +199,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
     DebugLog("Aborting output: m_state.LoopTimes exceeded.");
     m_state.StopOutput = TRUE;
     if(m_debug_items) {
-      m_debug_items->push_group_exit(m_actions.Length(), KM_KBP_DEBUG_FLAG_RECURSIVE_OVERFLOW, gp);
+      m_debug_items->push_group_exit(m_actions.Length(), KM_CORE_DEBUG_FLAG_RECURSIVE_OVERFLOW, gp);
     }
     return FALSE;
   }
@@ -262,7 +262,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
     if(!gp || (m_state.charCode == 0 && gp->fUsingKeys))   // I4585
         // 7.0.241.0: I1133 - Fix mismatched parentheses on m_state.charCode - ie. we don't want to output this letter if !gp->fUsingKeys
     {
-      KMX_BOOL fIsBackspace = m_state.vkey == KM_KBP_VKEY_BKSP && (m_modifiers & (LCTRLFLAG|RCTRLFLAG|LALTFLAG|RALTFLAG)) == 0;   // I4128
+      KMX_BOOL fIsBackspace = m_state.vkey == KM_CORE_VKEY_BKSP && (m_modifiers & (LCTRLFLAG|RCTRLFLAG|LALTFLAG|RALTFLAG)) == 0;   // I4128
 
       if(fIsBackspace) {   // I4838   // I4933
 
@@ -276,9 +276,8 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
         // If there is now no character in the context, we want to
         // emit the backspace for application to use
         if(!pdeletecontext || *pdeletecontext == 0) {   // I4933
-          m_actions.QueueAction(QIT_INVALIDATECONTEXT, 0);
           if(m_debug_items) {
-            m_debug_items->push_group_exit(m_actions.Length(), KM_KBP_DEBUG_FLAG_NOMATCH, gp);
+            m_debug_items->push_group_exit(m_actions.Length(), KM_CORE_DEBUG_FLAG_NOMATCH, gp);
           }
           *pOutputKeystroke = TRUE;   // I4933
           return FALSE;   // I4933
@@ -293,17 +292,16 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
           m_actions.QueueAction(QIT_BACK, BK_DEADKEY);  // side effect: also removes last char from context
           pdeletecontext = m_context.Buf(1);
         }
-      } else if (m_state.vkey == KM_KBP_VKEY_CAPS) {
+      } else if (m_state.vkey == KM_CORE_VKEY_CAPS) {
         if (m_debug_items) {
-          m_debug_items->push_group_exit(m_actions.Length(), KM_KBP_DEBUG_FLAG_NOMATCH, gp);
+          m_debug_items->push_group_exit(m_actions.Length(), KM_CORE_DEBUG_FLAG_NOMATCH, gp);
         }
         *pOutputKeystroke = TRUE;
         return FALSE;
       } else {   // I4024   // I4128   // I4287   // I4290
         DebugLog(" ... IsLegacy = FALSE; IsTIP = TRUE");   // I4128
-        m_actions.QueueAction(QIT_INVALIDATECONTEXT, 0);
         if(m_debug_items) {
-          m_debug_items->push_group_exit(m_actions.Length(), KM_KBP_DEBUG_FLAG_NOMATCH, gp);
+          m_debug_items->push_group_exit(m_actions.Length(), KM_CORE_DEBUG_FLAG_NOMATCH, gp);
         }
         *pOutputKeystroke = TRUE;
         return FALSE;
@@ -327,7 +325,7 @@ KMX_BOOL KMX_ProcessEvent::ProcessGroup(LPGROUP gp, KMX_BOOL *pOutputKeystroke)
     }
 
     if(m_debug_items) {
-      m_debug_items->push_group_exit(m_actions.Length(), KM_KBP_DEBUG_FLAG_NOMATCH, gp);
+      m_debug_items->push_group_exit(m_actions.Length(), KM_CORE_DEBUG_FLAG_NOMATCH, gp);
     }
     return TRUE;
   }
@@ -434,7 +432,7 @@ int KMX_ProcessEvent::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR end
   PKMX_WCHAR p, q, temp;
   LPSTORE s;
   int n1, n2;
-  int i, n, shift;
+  int i, n;
   KMX_BOOL FoundUse = FALSE;
   // TODO: Refactor to use incxstr
   for(p = str; *p && (p < endstr || !endstr); p++)
@@ -443,21 +441,10 @@ int KMX_ProcessEvent::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR end
      switch(*(++p))
      {
       case CODE_EXTENDED:       // Start of a virtual key section w/shift codes
-        p++;
-
-        shift = *p; //(*p<<8) | *(p+1);
-        m_actions.QueueAction(QIT_VSHIFTDOWN, shift);
-
-        p++;
-
-        m_actions.QueueAction(QIT_VKEYDOWN, *p);
-        m_actions.QueueAction(QIT_VKEYUP, *p);
-
-        m_actions.QueueAction(QIT_VSHIFTUP, shift);
-
+        // virtual keys in output are not supported
+        p++; // modifier
+        p++; // vkey
         p++; // CODE_EXTENDEDEND
-        ////// CODE_EXTENDEDEND will be incremented by loop
-
         break;
 
       case CODE_DEADKEY:        // A deadkey to be output
@@ -488,7 +475,7 @@ int KMX_ProcessEvent::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR end
 
       case CODE_CALL:
         p++;
-        m_kbp_state->imx_callback(*p-1);
+        m_core_state->imx_callback(*p-1);
         FoundUse = TRUE;
         break;
       case CODE_USE:          // use another group
@@ -519,7 +506,7 @@ int KMX_ProcessEvent::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR end
       case CODE_RESETOPT:
         p++;
         n1 = *p - 1;
-        GetOptions()->Reset(m_kbp_state->processor(), n1);
+        GetOptions()->Reset(m_core_state->processor(), n1);
         break;
       case CODE_SAVEOPT:
         p++;
@@ -548,8 +535,8 @@ int KMX_ProcessEvent::PostString(PKMX_WCHAR str, LPKEYBOARD lpkb, PKMX_WCHAR end
 
 KMX_BOOL KMX_ProcessEvent::IsMatchingBaseLayout(PKMX_WCHAR layoutName)  // I3432
 {
-  KMX_BOOL bEqual = u16icmp(layoutName, static_cast<const km_kbp_cp *>(m_environment.baseLayout().c_str())) == 0 ||   // I4583
-                u16icmp(layoutName, static_cast<const km_kbp_cp*>(m_environment.baseLayoutAlt().c_str())) == 0;   // I4583
+  KMX_BOOL bEqual = u16icmp(layoutName, static_cast<const km_core_cu *>(m_environment.baseLayout().c_str())) == 0 ||   // I4583
+                u16icmp(layoutName, static_cast<const km_core_cu*>(m_environment.baseLayoutAlt().c_str())) == 0;   // I4583
 
   return bEqual;
 }
@@ -792,8 +779,8 @@ PKMX_WCHAR KMX_ProcessEvent::GetSystemStore(LPKEYBOARD kb, KMX_DWORD SystemID)
 
 void KMX_ProcessEvent::CreateInternalDebugItems() {
   assert(m_debug_items == nullptr);
-  assert(m_kbp_state != nullptr);
-  m_debug_items = new KMX_DebugItems(&m_kbp_state->debug_items());
+  assert(m_core_state != nullptr);
+  m_debug_items = new KMX_DebugItems(&m_core_state->debug_items());
   m_options.SetInternalDebugItems(m_debug_items);
 }
 

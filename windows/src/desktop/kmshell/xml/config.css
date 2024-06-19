@@ -169,8 +169,8 @@ input.kbd_button:hover, input[type='button']:hover, button[type='button']:hover,
 
 input[type='submit']:disabled, input[type='button']:disabled, button:disabled
 {
-  color: #c0c0cf;
-  background: #80808f;
+  color: #929396;
+  background: #C9CACA;
 }
 
 a.hotkey:link, a.hotkey:visited
@@ -306,11 +306,6 @@ html
   display: none;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
-}
-
-.list_detail.list_disabled
-{
-  opacity: 0.5;
 }
 
 .checkbox_hidden
@@ -502,6 +497,11 @@ table tr
   position: relative;
   grid-template-columns: max-content minmax(240px, 439px);
   padding: 1px 0 1px 10px;
+}
+
+.grid_container.grid_disabled
+{
+  opacity: 0.5;
 }
 
 .grid_item
@@ -1136,7 +1136,7 @@ th
   position: fixed;
   display: none;
   width: 256px;
-  height: 324px;
+  height: auto;
   margin: -180px 0 0 -128px;
   left: 50%;
   top: 50%;
@@ -1149,6 +1149,8 @@ th
 
 .qrcode .qrcode_caption {
   display: block;
+  max-height: 130px;
+  overflow-y: auto;
   white-space: normal;
   font-size: 12pt;
   padding: 8px;
@@ -1199,8 +1201,8 @@ th
 .list_languages_add {
   padding-top: 10px;
   position: fixed;
-  top: 45%;
-  left: 49%;
+  top: 223px; /* Have to use fixed position can't use flex or grid inside a fixed child */
+  right: 281px;
 }
 
 .modify .keyboard_language {

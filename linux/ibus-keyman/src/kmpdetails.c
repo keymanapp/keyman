@@ -158,7 +158,8 @@ void kmp_keyboards_foreach (JsonArray *array,
     JsonObject *keyboard_object;
     JsonNode *languages_node;
     GList *l;
-    gchar *l_kmx_file, *l_kvk_file;
+    g_autofree gchar *l_kmx_file = NULL;
+    g_autofree gchar *l_kvk_file = NULL;
     kmp_fileinfo *fileinfo;
     kmp_details *details;
     kmp_keyboard *keyboard;
@@ -201,8 +202,6 @@ void kmp_keyboards_foreach (JsonArray *array,
                     }
                 }
             }
-            g_free(l_kmx_file);
-            g_free(l_kvk_file);
         }
         details->keyboards = g_list_append(details->keyboards, keyboard);
     }
@@ -230,20 +229,19 @@ void kmp_files_foreach (JsonArray *array,
     }
 }
 
+// Get kmp_details from `<kbd>.json`
 kmp_json_status get_keyboard_details(const char *kmp_dir, const char *id, keyboard_details *keyboard)
 {
-    JsonParser *parser;
+    g_autoptr(JsonParser) parser;
     JsonObject *object;
     JsonNode *root;
-    const gchar *value = NULL;
-    gchar *json_file;
-    GError *error = NULL;
+    g_autofree gchar *json_file;
+    g_autoptr(GError) error = NULL;
 
     parser = json_parser_new ();
     json_file = g_strjoin("/", kmp_dir, id, NULL);
 
     if (!g_file_test(json_file, G_FILE_TEST_EXISTS)) {
-        g_free(json_file);
         return JSON_FILE_NOT_EXISTS;
     }
 
@@ -253,12 +251,8 @@ kmp_json_status get_keyboard_details(const char *kmp_dir, const char *id, keyboa
     if (error)
     {
       g_warning ("Unable to parse `%s': %s\n", json_file, error->message);
-      g_free(json_file);
-      g_error_free (error);
-      g_object_unref (parser);
       return JSON_PARSE_ERROR;
     }
-    g_free(json_file);
 
     root = json_parser_get_root (parser);
 
@@ -271,32 +265,26 @@ kmp_json_status get_keyboard_details(const char *kmp_dir, const char *id, keyboa
         get_detail_from_object(object, "license",
             &(keyboard->license));
     }
-    g_object_unref(parser);
     return JSON_OK;
-
-
-
 }
 
+// Get kmp_details from `kmp.json` file
 kmp_json_status get_kmp_details(const char *kmp_dir, kmp_details *details)
 {
-    JsonParser *parser;
-    JsonNode *root, *member_node;
+    g_autoptr(JsonParser) parser;
+    JsonNode *root;
     JsonObject *root_object, *object;
     JsonArray *array;
     JsonNode *kmp_system, *kmp_info, *kmp_options, *kmp_files, *kmp_keyboards;
-    const gchar *value = NULL;
-    gchar *kmp_json;
-    GError *error = NULL;
+    g_autofree gchar *kmp_json;
+    g_autoptr(GError) error = NULL;
 
     parser = json_parser_new ();
     kmp_json = g_strdup_printf("%s/kmp.json", kmp_dir);
 
     if (!g_file_test(kmp_json, G_FILE_TEST_EXISTS)) {
-        g_free(kmp_json);
         return JSON_FILE_NOT_EXISTS;
     }
-
 
     json_parser_load_from_file (parser,
         kmp_json,
@@ -304,12 +292,8 @@ kmp_json_status get_kmp_details(const char *kmp_dir, kmp_details *details)
     if (error)
     {
       g_warning ("Unable to parse `%s': %s\n", kmp_json, error->message);
-      g_free(kmp_json);
-      g_error_free (error);
-      g_object_unref (parser);
       return JSON_PARSE_ERROR;
     }
-    g_free(kmp_json);
 
     root = json_parser_get_root (parser);
 
@@ -375,7 +359,6 @@ kmp_json_status get_kmp_details(const char *kmp_dir, kmp_details *details)
             }
         }
     }
-    g_object_unref(parser);
     return JSON_OK;
 }
 
@@ -431,6 +414,7 @@ void free_language(gpointer data)
     kmp_language *language = (kmp_language *) data;
     g_free(language->name);
     g_free(language->id);
+    g_free(language);
 }
 
 void free_keyboard(gpointer data)
@@ -444,6 +428,7 @@ void free_keyboard(gpointer data)
     if (keyboard->languages != NULL) {
         g_list_free_full(keyboard->languages, (GDestroyNotify)free_language);
     }
+    g_free(keyboard);
 }
 
 void free_fileinfo(gpointer data)
@@ -451,6 +436,7 @@ void free_fileinfo(gpointer data)
     kmp_fileinfo *fileinfo = (kmp_fileinfo *) data;
     g_free(fileinfo->name);
     g_free(fileinfo->description);
+    g_free(fileinfo);
 }
 
 kmp_json_status free_keyboard_details(keyboard_details *kbd_details)
@@ -458,28 +444,44 @@ kmp_json_status free_keyboard_details(keyboard_details *kbd_details)
     g_free(kbd_details->id);
     g_free(kbd_details->description);
     g_free(kbd_details->license);
+    g_free(kbd_details);
     return JSON_OK;
+}
+
+void free_info(gpointer data) {
+  kmp_info *info = (kmp_info *)data;
+  if (info->name)
+    g_free(info->name);
+  if (info->version)
+    g_free(info->version);
+  if (info->copyright)
+    g_free(info->copyright);
+  if (info->author_desc)
+    g_free(info->author_desc);
+  if (info->author_url)
+    g_free(info->author_url);
+  if (info->website_desc)
+    g_free(info->website_desc);
+  if (info->website_url)
+    g_free(info->website_url);
 }
 
 kmp_json_status free_kmp_details(kmp_details * details)
 {
-    g_assert(details != NULL);
+    if (details == NULL)
+      return JSON_OK;
+
     g_free(details->system.fileVersion);
     g_free(details->system.keymanDeveloperVersion);
     g_free(details->options.readmeFile);
     g_free(details->options.graphicFile);
-    g_free(details->info.name);
-    g_free(details->info.version);
-    g_free(details->info.copyright);
-    g_free(details->info.author_desc);
-    g_free(details->info.author_url);
-    g_free(details->info.website_desc);
-    g_free(details->info.website_url);
+    free_info(&details->info);
     if (details->keyboards != NULL) {
-        g_list_free_full(details->keyboards, (GDestroyNotify)free_keyboard);
+      g_list_free_full(details->keyboards, (GDestroyNotify)free_keyboard);
     }
     if (details->files != NULL) {
         g_list_free_full(details->files, (GDestroyNotify)free_fileinfo);
     }
+    g_free(details);
     return JSON_OK;
 }

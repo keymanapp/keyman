@@ -2,69 +2,84 @@
 #
 # Compile KeymanWeb's 'keyboard-processor' module, one of the components of Web's 'core' module.
 #
-set -eu
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
+BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
 
 ################################ Main script ################################
 
-# Ensures color var use in `builder_describe`'s argument respects the specified
-# --color/--no-color option.
-builder_check_color "$@"
-
 builder_describe \
   "Compiles the web-oriented utility function module." \
-  "@../recorder  test" \
-  "@../keyman-version" \
-  "@../utils" \
+  "@/common/web/recorder  test" \
+  "@/common/web/keyman-version" \
+  "@/common/web/es-bundling" \
+  "@/common/web/types" \
+  "@/common/web/utils" \
   configure \
   clean \
   build \
   test \
-  "--ci    For use with action ${BUILDER_TERM_START}test${BUILDER_TERM_END} - emits CI-friendly test reports"
+  "--ci    For use with action $(builder_term test) - emits CI-friendly test reports"
 
 builder_describe_outputs \
   configure     /node_modules \
-  build         build/index.js
+  build         /common/web/keyboard-processor/build/lib/index.mjs
 
 builder_parse "$@"
 
-if builder_start_action configure; then
+function do_configure() {
   verify_npm_setup
-  builder_finish_action success configure
-fi
 
-if builder_start_action clean; then
-  npm run clean
-  builder_finish_action success clean
-fi
+  # Configure Web browser-engine testing environments.  As is, this should only
+  # make changes when we update the dependency, even on our CI build agents.
+  playwright install
+}
 
-if builder_start_action build; then
-  npm run tsc -- --build "$THIS_SCRIPT_PATH/src/tsconfig.json"
-  builder_finish_action success build
-fi
+function do_build() {
+  tsc --build "$THIS_SCRIPT_PATH/tsconfig.all.json"
 
-if builder_start_action test; then
-  npm run tsc -- --build "$THIS_SCRIPT_PATH/src/tsconfig.bundled.json"
+  # Base product - the main keyboard processor
+  $BUNDLE_CMD    "${KEYMAN_ROOT}/common/web/keyboard-processor/build/obj/index.js" \
+    --out        "${KEYMAN_ROOT}/common/web/keyboard-processor/build/lib/index.mjs" \
+    --format esm
 
-  echo_heading "Running Keyboard Processor test suite"
+  # The DOM-oriented keyboard loader
+  $BUNDLE_CMD    "${KEYMAN_ROOT}/common/web/keyboard-processor/build/obj/keyboards/loaders/dom-keyboard-loader.js" \
+    --out        "${KEYMAN_ROOT}/common/web/keyboard-processor/build/lib/dom-keyboard-loader.mjs" \
+    --format esm
 
-  FLAGS=
+  # The Node-oriented keyboard loader
+  $BUNDLE_CMD    "${KEYMAN_ROOT}/common/web/keyboard-processor/build/obj/keyboards/loaders/node-keyboard-loader.js" \
+    --out        "${KEYMAN_ROOT}/common/web/keyboard-processor/build/lib/node-keyboard-loader.mjs" \
+    --format   esm \
+    --platform node
+
+  # Declaration bundling.
+  tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+  tsc --emitDeclarationOnly --outFile ./build/lib/dom-keyboard-loader.d.ts -p src/keyboards/loaders/tsconfig.dom.json
+  tsc --emitDeclarationOnly --outFile ./build/lib/node-keyboard-loader.d.ts -p src/keyboards/loaders/tsconfig.node.json
+}
+
+function do_test() {
+  local MOCHA_FLAGS=
+  local WTR_CONFIG=
   if builder_has_option --ci; then
     echo "Replacing user-friendly test reports with CI-friendly versions."
-    FLAGS="$FLAGS --reporter mocha-teamcity-reporter"
+    MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
+    WTR_CONFIG=.CI
   fi
 
-  npm run mocha -- --recursive $FLAGS ./tests/cases/
+  c8 mocha --recursive $MOCHA_FLAGS ./tests/node/
+  web-test-runner --config tests/dom/web-test-runner${WTR_CONFIG}.config.mjs
+}
 
-  builder_finish_action success test
-fi
+builder_run_action configure  do_configure
+builder_run_action clean      rm -rf ./build
+builder_run_action build      do_build
+builder_run_action test       do_test

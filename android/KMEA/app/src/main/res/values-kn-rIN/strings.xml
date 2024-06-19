@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Device type  -->
+    <!-- Application name (Keyman Engine for Android) -->
+    <!-- Context: Title for list -->
+    <plurals name="title_keyboards">
+        <item quantity="one">ಕೀಲಿಮಣೆ</item>
+        <item quantity="other">ಕೀಲಿಮಣೆಗಳು</item>
+    </plurals>
+    <!-- Context: Title for list -->
+    <plurals name="title_other_input_methods">
+        <item quantity="one">ಇತರೆ ಇನ್‌ಪುಟ್ ವಿಧಾನ</item>
+        <item quantity="other">ಇತರೆ ಇನ್‌ಪುಟ್ ವಿಧಾನಗಳು</item>
+    </plurals>
+    <!-- Context: Title for list -->
+    <string name="title_add_keyboard" comment="Add a new keyboard">ಹೊಸ ಕೀಲಿಮಣೆ ಸೇರಿಸಿ</string>
+    <!-- Context: Title for list -->
+    <string name="title_languages_settings" comment="List of installed languages">ಪ್ರತಿಷ್ಟಾಪಿಸಿದ ಭಾಷೆಗಳು</string>
+    <!-- Context: Title for list -->
+    <string name="title_language_settings" comment="Keyman Settings for a language">%1$s ಸೆಟ್ಟಿಂಗ್‌ಗಳು</string>
+    <!-- Context: Button label -->
+    <string name="label_add" comment="Button to add an item">ಸೇರಿಸು</string>
+    <!-- Context: Button label -->
+    <string name="label_back" comment="Button to go back">ಹಿಂದೆ</string>
+    <!-- Context: Button label -->
+    <string name="label_cancel" comment="Button to cancel an action">ರದ್ದುಮಾಡಿ</string>
+    <!-- Context: Button label -->
+    <string name="label_close" comment="Close a dialog">ಮುಚ್ಚು</string>
+    <!-- Context: Button label. Removed in Keyman 15 -->
+    <string name="label_close_keyman" comment="Close the Keyman application">ಕೀಮ್ಯಾನ್ ಮುಚ್ಚು</string>
+    <!-- Context: Button label -->
+    <string name="label_forward" comment="Button to go forward">ಮುಂದಕ್ಕೆ</string>
+    <!-- Context: Button label -->
+    <string name="label_next_input_method" comment="Switch to next input method (replaces label_close_keyman)">ಇತರೆ ಇನ್‌ಪುಟ್ ವಿಧಾನ</string>
+    <!-- Context: Button label -->
+    <string name="label_download" comment="Button to confirm downloading an item">ಡೌನ್ಲೋಡ್ ಮಾಡು</string>
+    <!-- Context: Button label -->
+    <string name="label_install" comment="Confirmation to install a package">ಅನುಸ್ಥಾಪಿಸು</string>
+    <!-- Context: Button label -->
+    <string name="label_later" comment="Do an action at a later time">ನಂತರ</string>
+    <!-- Context: Button label -->
+    <string name="label_next" comment="Go to the next screen">ಮುಂದಿನ</string>
+    <!-- Context: Button label -->
+    <string name="label_ok" comment="Button to acknowledge a dialog">ಸರಿ</string>
+    <!-- Context: Button label -->
+    <string name="label_update" comment="Dialog button to update a resource">ನವೀಕರಣ</string>
+    <!-- Context: No internet for updates -->
+    <string name="no_internet_connection" comment="Internet connection missing">ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕವಿಲ್ಲ</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="cannot_connect" comment="Error message when network connection fails">ಕೀಮ್ಯಾನ್ ಸರ್ವರ್‌ಗೆ ಸಂಪರ್ಕಿಸಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ!</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="confirm_delete_keyboard" comment="Confirmation to delete a keyboard">ಈ ಕೀಲಿಮಣೆಯನ್ನು ಅಸ್ಥಾಪಿಸಲು ನೀವು ಖಚಿತವಾಗಿ ಬಯಸುವಿರಾ?</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="confirm_download_keyboard" comment="Confirmation to download a keyboard update">ಈ ಕೀಲಿಮಣೆಯ ಇತ್ತೀಚಿನ ಆವೃತ್ತಿಯನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಲು ನೀವು ಬಯಸುವಿರಾ?</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="confirm_update" comment="Confirmation to update several resources">ಕೀಲಿಮಣೆ ಮತ್ತು ಶಬ್ದಕೋಶಗಳನ್ನು ನವೀಕರಿಸಲು ನೀವು ಬಯಸುವಿರಾ?</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="keyboard_updates_channel">ಸಂಪನ್ಮೂಲ ನವೀಕರಣಗಳು</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="keyboard_updates_available" comment="Notification when resource updates are available">ಸಂಪನ್ಮೂಲ ನವೀಕರಣಗಳು ಲಭ್ಯವಿದೆ</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="update_available" comment="Currently installed version of a resource with an available update">%1$s (ನವೀಕರಣ ಲಭ್ಯವಿದೆ)</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="keyboard_update_message" comment="language name: keyboard name">ನವೀಕರಣ ಲಭ್ಯವಿದೆ, ಕೀಲಿಮಣೆ %1$s: %2$s </string>
+    <!-- Context: Keyboard Updates -->
+    <string name="dictionary_update_message">ನವೀಕರಣ ಲಭ್ಯವಿದೆ, ಶಬ್ದಕೋಶ %1$s: %2$s </string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_version" comment="Label for keyboard version">ಕೀಲಿಮಣೆ ಆವೃತ್ತಿ</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="help_link" comment="Label for help link">ಸಹಾಯ ಕೊಂಡಿ</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="uninstall_keyboard" comment="Label for uninstalling keyboard">ಕೀಲಿಮಣೆಯನ್ನು ಅಸ್ಥಾಪಿಸು</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_picker_new_keyboard" comment="Mark a language name that's newly installed in keyboard list">[ಹೊಸ] %1$s</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_qr_code" comment="QR Code description">ಈ ಕೀಲಿಮಣೆಯನ್ನು ಮತ್ತೊಂದು ಸಾಧನದಲ್ಲಿ ಸ್ಥಾಪಿಸಲು \nಈ ಕೋಡ್ಅನ್ನು ಸ್ಕ್ಯಾನ್ ಮಾಡಿ</string>
+    <!-- Context: Keyboard Help welcome.htm title -->
+    <string name="welcome_package" comment="Title to welcome.htm page (name and version)">%1$s ಗೆ ಸ್ವಾಗತ</string>
+    <!-- Context: Keyboard app doesn't include FileProvider library needed to view help file -->
+    <string name="fileprovider_undefined" comment="FileProvider library needed to view help file">ಸಹಾಯ ಫೈಲ್ ವೀಕ್ಷಿಸಲು FileProvider ಲೈಬ್ರರಿ ಅಗತ್ಯವಿದೆ: %1$s</string>
+    <!-- Context: Fatal keyboard error. Will load default keyboard -->
+    <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">%1$s:%2$s ಕೀಲಿಮಣೆಯಲ್ಲಿ %3$s ಭಾಷೆಯೊಂದಿಗೆ ದೋಷವಿದೆ. ಅದರ ಬದಲಿಗೆ ಪೂರ್ವನಿರ್ಧರಿತ ಕೀಲಿಮಣೆ ಲೋಡ್ ಆಗುತ್ತಿದೆ.</string>
+    <!-- Context: Fatal keyboard error.  -->
+    <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">%1$s:%2$s ಕೀಲಿಮಣೆಯಲ್ಲಿ %3$s ಭಾಷೆಯೊಂದಿಗೆ ದೋಷವಿದೆ.</string>
+    <!-- Context: Query for associated dictionary -->
+    <string name="query_associated_model" comment="Check if there's an available dictionary to download">ಸಂಬಂಧಿಸಿದ ಶಬ್ದಕೋಶವನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಲು ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ</string>
+    <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">ಸಂಬಂಧಿಸಿದ ಶಬ್ದಕೋಶವನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಲು ಕೀಮ್ಯಾನ್ ಸರ್ವರ್ ಅನ್ನು ಸಂಪರ್ಕಿಸಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲಾ</string>
+    <!-- Context: Model Updates -->
+    <string name="confirm_download_model" comment="Confirmation to download a dictionary update">ಈ ಶಬ್ದಕೋಶದ ಇತ್ತೀಚಿನ ಆವೃತ್ತಿಯನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಲು ನೀವು ಬಯಸುವಿರಾ?</string>
+    <!-- Context: No associated dictionary found -->
+    <string name="no_associated_model" comment="Confirmation there's no available dictionary to download">ಡೌನ್‌ಲೋಡ್ ಮಾಡಲು ಯಾವುದೇ ಶಬ್ದಕೋಶ ಲಭ್ಯವಿಲ್ಲ</string>
+    <!-- Context: Model Updates -->
+    <string name="catalog_unavailable" comment="Notification that the cloud resource catalog can't be updated">ಸಂಪನ್ಮೂಲ ಕ್ಯಾಟಲಾಗ್ ಲಭ್ಯವಿಲ್ಲ</string>
+    <!-- Context: Background download messages-->
+    <string name="catalog_download_start_in_background" comment="Notification that the resource catalog update will begin">ಹಿನ್ನೆಲೆಯಲ್ಲಿ ಕ್ಯಾಟಲಾಗ್ ನವೀಕರಣ ಪ್ರಾರಂಭವಾಗಿದೆ</string>
+    <!-- Context: Background download messages-->
+    <string name="catalog_download_is_running_in_background" comment="Notification that the resource catalog update is still downloading">ಕ್ಯಾಟಲಾಗ್ ಇನ್ನೂ ಡೌನ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ; ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ!</string>
+    <!-- Context: Background download messages-->
+    <string name="progress_message_checking_resource_is_running" comment="Progress notification that the check for a resource is still running ">ಸಂಪನ್ಮೂಲಕ್ಕಾಗಿ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ</string>
+    <!-- Context: Background download messages-->
+    <string name="keyboard_download_start_in_background" comment="Notification that a keyboard download has started">ತೆರೆಯ ಹಿಂದೆಯಲ್ಲಿ ಕೀಲಿಮಣೆಯನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ</string>
+    <!-- Context: Background download messages-->
+    <string name="keyboard_download_is_running_in_background" comment="Notification that a keyboard download is still running">ಆಯ್ಕೆಮಾಡಿದ ಕೀಲಿಮಣೆ ಈಗಾಗಲೇ ಡೌನ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ; ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ!</string>
+    <!-- Context: Background download messages-->
+    <string name="keyboard_download_finished" comment="Notification that a keyboard download has finished">ಕೀಲಿಮಣೆ ಡೌನ್‌ಲೋಡ್ ಪೂರ್ಣಗೊಂಡಿದೆ!</string>
+    <!-- Context: Background download messages-->
+    <string name="dictionary_download_start_in_background" comment="Notification that a dictionary download has started">ತೆರೆಯ ಹಿಂದೆಯಲ್ಲಿ ಶಬ್ದಕೋಶವನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ</string>
+    <!-- Context: Background download messages-->
+    <string name="dictionary_download_is_running_in_background" comment="Notification that a dictionary download is still running">ಆಯ್ಕೆಮಾಡಿದ ಶಬ್ದಕೋಶ ಈಗಾಗಲೇ ಡೌನ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ; ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ!</string>
+    <!-- Context: Background download messages-->
+    <string name="dictionary_download_finished" comment="Notification that a dictionary download has finished">ಶಬ್ದಕೋಶ ಡೌನ್‌ಲೋಡ್ ಪೂರ್ಣಗೊಂಡಿದೆ.</string>
+    <!-- Context: Background download messages -->
+    <string name="download_failed" comment="Notification that a download failed">ಡೌನ್‌ಲೋಡ್ ವಿಫಲವಾಗಿದೆ</string>
+    <!-- Context: Background download messages -->
+    <string name="failed_to_retrieve_file" comment="Failed to retrieve downloaded file">ಡೌನ್‌ಲೋಡ್ ಮಾಡಿದ ಕಡತವನ್ನು ಪಡೆಯಲು ವಿಫಲವಾಗಿದೆ</string>
+    <!-- Context: General Updates -->
+    <string name="update_check_unavailable" comment="Error message when a Keyman server can't be reached">ಸರ್ವರ್ ಅನ್ನು ಪ್ರವೇಶಿಸಲು ವಿಫಲವಾಗಿದೆ!</string>
+    <!-- Context: General Updates -->
+    <string name="update_check_current" comment="Notification that all resources are up to date">"ಎಲ್ಲಾ ಸಂಪನ್ಮೂಲಗಳು ನವೀಕರಿಸಲಾಗಿದೆ!"</string>
+    <!-- Context: General Updates -->
+    <string name="update_failed" comment="Notification that a resource update failed">ಒಂದು ಅಥವಾ ಹೆಚ್ಚಿನ ಸಂಪನ್ಮೂಲಗಳನ್ನು ನವೀಕರಿಸಲು ವಿಫಲವಾಗಿದೆ!</string>
+    <!-- Context: General Updates -->
+    <string name="update_success" comment="Notification that a resource update successfully updated">ಸಂಪನ್ಮೂಲಗಳನ್ನು ಯಶಸ್ವಿಯಾಗಿ ನವೀಕರಿಸಲಾಗಿದೆ!</string>
+    <!-- Context: Model Info -->
+    <string name="model_version" comment="Title for a dictionary version">ಶಬ್ದಕೋಶದ ಆವೃತ್ತಿ</string>
+    <!-- Context: Model Info -->
+    <string name="uninstall_model" comment="Label to uninstall a dictionary">ಶಬ್ದಕೋಶವನ್ನು ಅಸ್ಥಾಪಿಸು</string>
+    <!-- Context: Model Info -->
+    <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">ಈ ಶಬ್ದಕೋಶವನ್ನು ಅಸ್ಥಾಪಿಸಲು ನೀವು ಖಚಿತವಾಗಿ ಬಯಸುವಿರಾ?</string>
+    <!-- Context: Model Deleted -->
+    <string name="model_deleted" comment="Notification when a dictionary is deleted">ಶಬ್ದಕೋಶ ಅಳಿಸಲಾಗಿದೆ</string>
+    <!-- Context: Language Settings Keyboard install strings -->
+    <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">%1$s ಕೀಲಿಮಣೆ ಸ್ಥಾಪಿಸಲಾಗಿದೆ</string>
+    <!-- Context: Language Settings Keyboard uninstall strings -->
+    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">ಕೀಲಿಮಣೆ ಅಳಿಸಲಾಗಿದೆ</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="enable_corrections" comment="Enable corrections from the suggestion banner">ತಿದ್ದುಪಡಿಗಳನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="enable_predictions" comment="Enable predictions from the suggestion banner">ಮುಂದಿನ ಪದವನ್ನು ಊಹಿಸಲು ಸಕ್ರಿಯಗೊಳಿಸಿ</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_label">ಶಬ್ದಕೋಶ</string>
+    <plurals name="model_count">
+        <item quantity="one">ಶಬ್ದಕೋಶ</item>
+        <item quantity="other">ಶಬ್ದಕೋಶಗಳು</item>
+    </plurals>
+    <!-- Context: Language Settings menu substring - Check for available dictionary -->
+    <string name="check_available_model" comment="Check for available dictionary">ಲಭ್ಯವಿರುವ ಶಬ್ದಕೋಶಗಾಗಿ ಪರಿಶೀಲಿಸಿ</string>
+    <string name="check_model_online" comment="Check for dictionaries online">ಆನ್ಲೈನ್‌ನಲ್ಲಿ ಲಭ್ಯವಿರುವ ಶಬ್ದಕೋಶಗಾಗಿ ಪರಿಶೀಲಿಸಿ</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_info_header" comment="Dictionary name">ಶಬ್ದಕೋಶ: %1$s</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_picker_header" comment="Dictionaries for a specified language">%1$s ಶಬ್ದಕೋಶಗಳು</string>
+    <!-- Context: Language Settings menu strings -->
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_install_toast" comment="Notification when a dictionary is installed">ಶಬ್ದಕೋಶ ಸ್ಥಾಪಿಸಲಾಗಿದೆ</string>
+    <!-- Context: Language Settings menu strings -->
+    <plurals name="keyboard_count">
+        <item quantity="one">(%1$d ಕೀಲಿಮಣೆ)</item>
+        <item quantity="other">(%1$d ಕೀಲಿಮಣೆಗಳು)</item>
+    </plurals>
+    <!-- Context: "Change Display Language" menu -->
+    <string name="default_locale" comment="Use the device's current locale">ಪೂರ್ವನಿರ್ಧರಿತ ಸ್ಥಳೀಯ ಭಾಷೆ</string>
+    <!-- Context: Content descriptions -->
+    <!-- Context: Content descriptions -->
+    <!-- Context: Popup menu labels -->
+    <string name="label_delete" comment="Confirmation to delete an item">ಅಳಿಸು</string>
+    <!-- Context: Shared preferences name -->
+    <!-- Context: Other strings -->
+    <string name="help_bubble_text">ಕೀಲಿಮಣೆಯನ್ನು ಬದಲಾಯಿಸಲು ಇಲ್ಲಿ ಟ್ಯಾಪ್ ಮಾಡಿ</string>
+    <!-- Context: anywhere -->
+    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">ವೆಬ್ ಬ್ರೌಸರ್ ಅನ್ನು ಪ್ರಾರಂಭಿಸಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ</string>
+</resources>

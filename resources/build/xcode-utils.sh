@@ -7,6 +7,8 @@
 #  - echo "warning: foo" will generate an actual compile warning within Xcode:  "foo"
 #  - echo "error: bar" will likewise generate a compile error within Xcode: "bar"
 
+set -e
+
 function buildWarning() {
   echo "warning: $1"
 }
@@ -42,7 +44,11 @@ function phaseSetBundleVersions() {
 
   # For command-line builds, VERSION and VERSION_WITH_TAG) are forwarded through xcodebuild.
   if [ -z "${VERSION:-}" ]; then
-    # We're not a command-line build... so we'll need to retrieve these values ourselves with ./build-utils.sh.
+    # This is likely not a command-line build at the top level; it's been triggered through Xcode.
+    # The $VERSION-loading code is in build-utils.sh, but we need $THIS_SCRIPT to be set
+    # (in similar manner to the "standard build header") in order to avoid script errors therein.
+    THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+
     # Note that this script's process will not have access to TC environment variables, but that's fine for
     # local builds triggered through Xcode's UI, which aren't part of our CI processes.
     . "$KEYMAN_ROOT/resources/build/build-utils.sh"

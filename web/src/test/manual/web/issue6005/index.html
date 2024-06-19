@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+    <!-- Set the viewport width to match phone and tablet device widths -->
+    <meta name="viewport" content="width=device-width,user-scalable=no" />
+
+    <!-- Allow KeymanWeb to be saved to the iPhone home screen -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <!-- Enable IE9 Standards mode -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>KeymanWeb Testing Page - Matchless Final Rule testing</title>
+
+    <!-- Your page CSS -->
+    <style type='text/css'>
+      body {font-family: Tahoma,helvetica;}
+      h3 {font-size: 1em;font-weight:normal;color: darkred; margin-bottom: 4px}
+      .test {font-size: 1.5em; width:80%; min-height:30px; border: 1px solid gray;}
+      #KeymanWebControl {width:50%;min-width:600px;}
+    </style>
+
+    <!-- Insert uncompiled KeymanWeb source scripts -->
+    <script src="../../../../../build/publish/debug/keymanweb.js" type="application/javascript"></script>
+
+    <!--
+      For desktop browsers, a script for the user interface must be inserted here.
+
+      Standard UIs are toggle, button, float and toolbar.
+      The toolbar UI is best for any page designed to support keyboards for
+      a large number of languages.
+    -->
+    <script src="../../../../../build/publish/debug/kmwuitoggle.js"></script>
+
+    <!-- Initialization: set paths to keyboards, resources and fonts as required -->
+    <script>
+      // Thank you to https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams
+      const alertType = (new URLSearchParams(window.location.search)).get("useAlerts") != "false";
+      var alertText = alertType ? 'enabled(default)' : 'disabled';
+
+      var kmw=window.keyman;
+
+      kmw.init({
+        'attachType': 'auto'
+      }).then(function() {
+        // if mobile device, activate pred text.
+        if(kmw.util.isTouchDevice()) {
+          var pageRef = (window.location.protocol == 'file:')
+            ? window.location.href.substr(0, window.location.href.lastIndexOf('/')+1)
+            : window.location.href;
+
+          // Determine the path to the prediction-mtnt manual-test folder so we
+          // can utilize its model, rather than duplicating it here.
+          pageRef = pageRef.substr(0, pageRef.lastIndexOf('test/manual/web/') + 'test/manual/web/'.length);
+
+          // also register appropriate models.
+          var modelStub1 = {'id': 'nrc.en.mtnt',
+            languages: ['en'],
+            path: (pageRef + "prediction-mtnt/nrc.en.mtnt.model.js")
+          };
+          kmw.addModel(modelStub1);
+          var modelStub2 = {'id': 'nrc.en.mtnt',
+            languages: ['pny-latn'],  // yep.  Total cheat for the sake of testing.
+            path: (pageRef + "prediction-mtnt/nrc.en.mtnt.model.js")
+          };
+          kmw.addModel(modelStub2);
+        }
+      });
+      kmw.addKeyboards('sil_euro_latin@en',
+                       'galaxie_hebrew_positional@he',
+                       'sil_cameroon_qwerty@pny-latn');
+
+      kmw.addKeyboards({
+          id:'unmatched_final_group_model_interactions_6005',
+          name:'"Unmatched Vowel Rule"',
+          languages:{id:'en',name:'English'},
+          filename:('unmatched_final_group_model_interactions_6005.js')
+        });
+    </script>
+
+  </head>
+
+<!-- Sample page HTML -->
+  <body>
+    <h2>KeymanWeb Sample Page - Issue 6005</h2>
+    <p>This page is for testing interactions between predictive text and
+       keyboard rules + rule groupings where it is possible for context to be
+       altered without the <i>final</i> group having a matching rule.
+      See <a href="https://github.com/keymanapp/keyman/pulls/6473">PR #6473</a>
+      for additional details.
+    </p>
+    <p>
+      If not already obvious, this is designed for use on mobile devices or
+      with touch-device emulation via your browser's Developer mode.
+    </p>
+    <p>
+      About the "Unmatched Vowel Rule" test keyboard:  this keyboard will only allow up to two
+      vowels in a row.  It will not emit any further vowels until the cluster is
+      broken up, be it by consonant or whitespace.  Note that ALL vowels that it
+      emits are output as a result of "default" behavior, not a keyboard rule!
+    </p>
+    <p>
+      Also, while it tends to block vowels, it instead duplicates the English semi-vowel.  It'll
+      automatically output `yy` when `y` is typed and `YY` when `Y` is typed.
+    </p>
+    <div>
+    <!--
+      The following DIV is used to position the Button or Toolbar User Interfaces on the page.
+      If omitted, those User Interfaces will appear at the top of the document body.
+      (It is ignored by other User Interfaces.)
+    -->
+    <div id='KeymanWebControl'></div>
+
+    <h3>Type in your language in this text area:</h3>
+    <textarea id='ta1' class='test' placeholder='Type here'></textarea>
+
+    <h3>or in this input field:</h3>
+    <input class='test' value='' placeholder='or here'/>
+
+    <h3><a href="../index.html">Return to testing home page</a></h3>
+  </div>
+
+  </body>
+
+  <!--
+    *** DEVELOPER NOTE -- FIREFOX CONFIGURATION FOR TESTING ***
+    *
+    * If the URL bar starts with <b>file://</b>, Firefox may not load the font used
+    * to display the special characters used in the On-Screen Keyboard.
+    *
+    * To work around this Firefox bug, navigate to <b>about:config</b>
+    * and set <b>security.fileuri.strict_origin_policy</b> to <b>false</b>
+    * while testing.
+    *
+    * Firefox resolves website-based CSS URI references correctly without needing
+    * any configuration change, so this change should only be made for file-based testing.
+    *
+    ***
+  -->
+</html>

@@ -30,7 +30,7 @@ Correctly associating your Keyman keyboard has three main benefits.
         right-to-left languages like Arabic, Hebrew, and Farsi.
 
     -   Applications will know how characters and symbols should be
-        rendered. This is partucularly necessary for many Indian
+        rendered. This is particularly necessary for many Indian
         languages.
 
     -   Applications will know which language tools to use when spell
@@ -49,21 +49,24 @@ Correctly associating your Keyman keyboard has three main benefits.
 
     ![](../desktop_images/tab-keyboards.png)
 
-4.  Click on the down arrow
-    (![](../desktop_images/keyboards-downarrow.png)) beside the keyboard
-    name.
+4.  Select the keyboard name to expand the options
 
-5.  Click the Add language button on the left side under 'Languages:'
+5.  Click the Add/remove language... button
 
-    ![](../desktop_images/tab-layout.png)
+    ![](../desktop_images/tab-add-lang.png)
 
-6.  From the pop up window, search for the Windows langauge you would
+6.  Click the Add button on the first pop-up
+
+    ![](../desktop_images/tab-add-popup.png)
+
+  
+7. From the pop up window, search for the Windows language you would
     like to use and click OK
 
     ![](../desktop_images/language-association.png)
 
-7.  To remove an association, hover over the language name, and click
-    the ![](../desktop_images/icon-uninstall.png) button that appears.
+8.  To remove an association, click
+    the ![](../desktop_images/icon-uninstall.png) button to the left of the language.
 
 ## Related Topics
 

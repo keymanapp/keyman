@@ -28,8 +28,19 @@
 // simplyfying the code a bit by replacing async calls with direct synchronous
 // method calls.
 
-#ifdef HAVE_CONFIG_H
 #include <config.h>
+
+#ifndef IBUS_HAS_PREFILTER
+#ifdef KEYMAN_PKG_BUILD
+// When building packages on Ubuntu and Debian servers we probably don't have
+// a patched ibus available and additionally treat warnings as errors, but
+// still want to build packages.
+#pragma message "Compiling against ibus version that does not include prefilter mask patch\n(https://github.com/ibus/ibus/pull/2440). Output ordering guarantees will be disabled."
+#else
+#warning Compiling against ibus version that does not include prefilter mask patch (https://github.com/ibus/ibus/pull/2440). Output ordering guarantees will be disabled.
+#endif
+
+#define IBUS_PREFILTER_MASK (1 << 23)
 #endif
 
 #include "ibusimcontext.h"
@@ -92,7 +103,6 @@ typedef struct _timeout_data {
 static GtkIMContext *_focus_im_context = NULL;
 static IBusInputContext *_fake_context = NULL;
 static GdkWindow *_input_window        = NULL;
-static GtkWidget *_input_widget        = NULL;
 
 /* functions prototype */
 static void ibus_im_context_class_init(IBusIMContextClass *class);
@@ -178,22 +188,6 @@ ibus_im_context_new(void) {
 
   GObject *obj = g_object_new(IBUS_TYPE_IM_CONTEXT, NULL);
   return IBUS_IM_CONTEXT(obj);
-}
-
-static gboolean
-_focus_in_cb(GtkWidget *widget, GdkEventFocus *event, gpointer user_data) {
-  if (_focus_im_context == NULL && _fake_context != NULL) {
-    ibus_input_context_focus_in(_fake_context);
-  }
-  return FALSE;
-}
-
-static gboolean
-_focus_out_cb(GtkWidget *widget, GdkEventFocus *event, gpointer user_data) {
-  if (_focus_im_context == NULL && _fake_context != NULL) {
-    ibus_input_context_focus_out(_fake_context);
-  }
-  return FALSE;
 }
 
 static gboolean
@@ -325,20 +319,6 @@ _set_content_type(IBusIMContext *context) {
 
     ibus_input_context_set_content_type(context->ibuscontext, purpose, hints);
   }
-  return TRUE;
-}
-
-static gboolean
-_get_boolean_env(const gchar *name, gboolean defval) {
-  const gchar *value = g_getenv(name);
-
-  if (value == NULL)
-    return defval;
-
-  if (g_strcmp0(value, "") == 0 || g_strcmp0(value, "0") == 0 || g_strcmp0(value, "false") == 0 ||
-      g_strcmp0(value, "False") == 0 || g_strcmp0(value, "FALSE") == 0)
-    return FALSE;
-
   return TRUE;
 }
 

@@ -1,0 +1,113 @@
+{
+  "system": {
+    "keymanDeveloperVersion": "17.0.91.0",
+    "fileVersion": "7.0"
+  },
+  "options": {
+    "readmeFile": "readme.htm"
+  },
+  "startMenu": {
+    "folder": "ahom_star",
+    "addUninstallEntry": true,
+    "items": [
+      {
+        "name": "(new)",
+        "filename": "(Product Configuration)",
+        "arguments": "shom_star"
+      },
+      {
+        "name": "(new)",
+        "filename": "Ahom_star.kvk",
+        "arguments": "Ahom fonts"
+      }
+    ]
+  },
+  "info": {
+    "version": {
+      "description": "1.0.1"
+    },
+    "name": {
+      "description": "Ahom Star"
+    },
+    "copyright": {
+      "description": "\u00A9 2021-2022 HemantaGogoi Ngi Mon"
+    },
+    "author": {
+      "description": "Dr Hemanta Kumar Gogoi",
+      "url": "mailto:drhemanta97@gmail.com"
+    }
+  },
+  "files": [
+    {
+      "name": "ahom_star.kvk",
+      "description": "File ahom_star.kvk"
+    },
+    {
+      "name": "ahom_star.kmx",
+      "description": "Keyboard ahom_star"
+    },
+    {
+      "name": "ahom_star.js",
+      "description": "File ahom_star.js"
+    },
+    {
+      "name": "welcome.htm",
+      "description": "File welcome.htm"
+    },
+    {
+      "name": "desktop_layout_default.png",
+      "description": "File desktop_layout_default.png"
+    },
+    {
+      "name": "desktop_layout_shift.png",
+      "description": "File desktop_layout_shift.png"
+    },
+    {
+      "name": "phone_default.png",
+      "description": "File phone_default.png"
+    },
+    {
+      "name": "phone_longpress.png",
+      "description": "File phone_longpress.png"
+    },
+    {
+      "name": "phone_numeric.png",
+      "description": "File phone_numeric.png"
+    },
+    {
+      "name": "phone_shift.png",
+      "description": "File phone_shift.png"
+    },
+    {
+      "name": "readme.htm",
+      "description": "File readme.htm"
+    },
+    {
+      "name": "NotoSerifAhom-Regular.ttf",
+      "description": "Font Noto Serif Ahom Regular"
+    },
+    {
+      "name": "kmp.inf",
+      "description": "Package information"
+    },
+    {
+      "name": "kmp.json",
+      "description": "Package information (JSON)"
+    }
+  ],
+  "keyboards": [
+    {
+      "name": "Ahom Star",
+      "id": "ahom_star",
+      "version": "1.0.1",
+      "oskFont": "NotoSerifAhom-Regular.ttf",
+      "displayFont": "NotoSerifAhom-Regular.ttf",
+      "languages": [
+        {
+          "name": "Ahom (Ahom)",
+          "id": "aho-Ahom"
+        }
+      ]
+    }
+  ]
+}

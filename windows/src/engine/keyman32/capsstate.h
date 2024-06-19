@@ -20,8 +20,5 @@
 #define __CAPSSTATE_H
 
 BOOL IsCapsLockOn(void);
-void ResetCapsLock(void);
-void KeyCapsLockPress(BOOL FIsUp);
-void KeyShiftPress(BOOL FIsUp);
 
 #endif

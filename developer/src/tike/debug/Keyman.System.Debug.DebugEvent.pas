@@ -31,8 +31,9 @@ type
   { DebugEvent structure -- an event has occurred }
 
   TDebugEventActionData = class
-    ActionType: km_kbp_action_type;
+    ActionType: km_core_action_type;
     dwData: Integer;
+    nExpectedValue: NativeUInt;
     Text: WideString;
   end;
 
@@ -47,7 +48,7 @@ type
     Context: WideString;
     StoreOffsets: array[0..20] of Word; //TKeymanStoreEx;
     nStores: Integer;
-    procedure FillStoreList(event: pkm_kbp_state_debug_item; KeyboardMemory: PChar);
+    procedure FillStoreList(event: pkm_core_state_debug_item; KeyboardMemory: PChar);
   end;
 
   TDebugEventType = (etAction, etRuleMatch);
@@ -68,28 +69,28 @@ type
 
   TDebugEventList = class(TObjectList<TDebugEvent>)
   private
-    procedure Action_Char(const character: km_kbp_usv);
+    procedure Action_Char(const character: km_core_usv);
     procedure Action_DeleteBack(expected_type: uint8_t;
       expected_value: uintptr_t);
     procedure Action_EmitKeystroke(const key: Word);
     procedure Action_Marker(marker: uintptr_t);
-    function AddActionItem(key: Word; action: pkm_kbp_action_item): Boolean;
+    function AddActionItem(key: Word; action: pkm_core_action_item): Boolean;
     procedure AddDebugItem(
-      debug: pkm_kbp_state_debug_item;
+      debug: pkm_core_state_debug_item;
       debugkeyboard: TDebugKeyboard;
       vk: uint16_t;
       modifier_state: uint16_t
     );
   public
     function AddStateItems(
-      state: pkm_kbp_state;
+      state: pkm_core_state;
       vk: uint16_t;
       modifier_state: uint16_t;
       debugkeyboard: TDebugKeyboard
     ): Boolean; overload;
 
     function AddStateItems(
-      state: pkm_kbp_state;
+      state: pkm_core_state;
       vk: uint16_t;
       modifier_state: uint16_t
     ): Boolean; overload;
@@ -133,18 +134,18 @@ begin
   end;
 end;
 
-function TDebugEventList.AddActionItem(key: Word; action: pkm_kbp_action_item): Boolean;
+function TDebugEventList.AddActionItem(key: Word; action: pkm_core_action_item): Boolean;
 begin
   Result := True;
   case action._type of
-    KM_KBP_IT_CHAR:           Action_Char(action.character);
-    KM_KBP_IT_MARKER:         Action_Marker(action.marker); // Correlates to kmn's "deadkey" markers.
-    KM_KBP_IT_ALERT:          ; // TODO: The keyboard has triggered a alert/beep/bell.
-    KM_KBP_IT_BACK:           Action_DeleteBack(action.backspace.expected_type, action.backspace.expected_value);
-    KM_KBP_IT_PERSIST_OPT:    ; // TODO: The indicated option needs to be stored.
-    KM_KBP_IT_EMIT_KEYSTROKE: Action_EmitKeystroke(key);
-    KM_KBP_IT_CAPSLOCK:       ; // TODO: Caps lock state needs to be updated
-    KM_KBP_IT_INVALIDATE_CONTEXT: ;
+    KM_CORE_IT_CHAR:           Action_Char(action.character);
+    KM_CORE_IT_MARKER:         Action_Marker(action.marker); // Correlates to kmn's "deadkey" markers.
+    KM_CORE_IT_ALERT:          ; // TODO: The keyboard has triggered a alert/beep/bell.
+    KM_CORE_IT_BACK:           Action_DeleteBack(action.backspace.expected_type, action.backspace.expected_value);
+    KM_CORE_IT_PERSIST_OPT:    ; // TODO: The indicated option needs to be stored.
+    KM_CORE_IT_EMIT_KEYSTROKE: Action_EmitKeystroke(key);
+    KM_CORE_IT_CAPSLOCK:       ; // TODO: Caps lock state needs to be updated
+    KM_CORE_IT_INVALIDATE_CONTEXT: ;
     else Assert(False, 'Action type '+IntToStr(Ord(action._type))+' is unexpected.');
   end;
 end;
@@ -156,12 +157,12 @@ begin
   case key of
     VK_TAB:    Action_Char(9);  // Emit a tab character
     VK_RETURN: Action_Char(13); // New line character
-    VK_BACK:   Action_DeleteBack(Ord(KM_KBP_BT_UNKNOWN), 0);
+    VK_BACK:   Action_DeleteBack(Ord(KM_CORE_BT_UNKNOWN), 0);
     else
     begin
       event := TDebugEvent.Create;
       event.EventType := etAction;
-      event.Action.ActionType := KM_KBP_IT_EMIT_KEYSTROKE;
+      event.Action.ActionType := KM_CORE_IT_EMIT_KEYSTROKE;
       event.Action.dwData := key;
       Add(event);
     end;
@@ -172,13 +173,13 @@ end;
 /// Insert a UTF-32 character at the insertion point.
 /// TODO: define behaviour around selection
 ///
-procedure TDebugEventList.Action_Char(const character: km_kbp_usv);
+procedure TDebugEventList.Action_Char(const character: km_core_usv);
 var
   event: TDebugEvent;
 begin
   event := TDebugEvent.Create;
   event.EventType := etAction;
-  event.Action.ActionType := KM_KBP_IT_CHAR;
+  event.Action.ActionType := KM_CORE_IT_CHAR;
   event.Action.Text := Uni_UTF32CharToUTF16(character);
   Add(event);
 end;
@@ -188,7 +189,7 @@ end;
 /// TODO: define behaviour around selection
 ///
 procedure TDebugEventList.Action_DeleteBack(
-  expected_type: uint8_t;    /// one of KM_KBP_BT_CHAR, KM_KBP_BT_MARKER, KM_KBP_BT_UNKNOWN
+  expected_type: uint8_t;    /// one of KM_CORE_BT_CHAR, KM_CORE_BT_MARKER, KM_CORE_BT_UNKNOWN
   expected_value: uintptr_t  /// used mainly in unit tests
 );
 var
@@ -196,8 +197,9 @@ var
 begin
   event := TDebugEvent.Create;
   event.EventType := etAction;
-  event.Action.ActionType := KM_KBP_IT_BACK;
+  event.Action.ActionType := KM_CORE_IT_BACK;
   event.Action.dwData := expected_type;
+  event.Action.nExpectedValue := expected_value;
   Add(event);
 end;
 
@@ -214,13 +216,13 @@ begin
 
   event := TDebugEvent.Create;
   event.EventType := etAction;
-  event.Action.ActionType := KM_KBP_IT_MARKER;
+  event.Action.ActionType := KM_CORE_IT_MARKER;
   event.Action.dwData := marker;
   Add(event);
 end;
 
 procedure TDebugEventList.AddDebugItem(
-  debug: pkm_kbp_state_debug_item;
+  debug: pkm_core_state_debug_item;
   debugkeyboard: TDebugKeyboard;
   vk: uint16_t;
   modifier_state: uint16_t);
@@ -245,14 +247,14 @@ procedure TDebugEventList.AddDebugItem(
     end;
 
     case debug._type of
-      KM_KBP_DEBUG_END:           Result := debugkeyboard.BeginUnicodeLine;
-      KM_KBP_DEBUG_BEGIN:         Result := debugkeyboard.BeginUnicodeLine;
-      KM_KBP_DEBUG_GROUP_ENTER,
-      KM_KBP_DEBUG_GROUP_EXIT:    if grp > -1 then Result := debugkeyboard.Groups[grp].Line;
-      KM_KBP_DEBUG_MATCH_ENTER,
-      KM_KBP_DEBUG_MATCH_EXIT:    if grp > -1 then Result := debugkeyboard.Groups[grp].MatchLine;
-      KM_KBP_DEBUG_NOMATCH_ENTER,
-      KM_KBP_DEBUG_NOMATCH_EXIT:  if grp > -1 then Result := debugkeyboard.Groups[grp].NomatchLine;
+      KM_CORE_DEBUG_END:           Result := debugkeyboard.BeginUnicodeLine;
+      KM_CORE_DEBUG_BEGIN:         Result := debugkeyboard.BeginUnicodeLine;
+      KM_CORE_DEBUG_GROUP_ENTER,
+      KM_CORE_DEBUG_GROUP_EXIT:    if grp > -1 then Result := debugkeyboard.Groups[grp].Line;
+      KM_CORE_DEBUG_MATCH_ENTER,
+      KM_CORE_DEBUG_MATCH_EXIT:    if grp > -1 then Result := debugkeyboard.Groups[grp].MatchLine;
+      KM_CORE_DEBUG_NOMATCH_ENTER,
+      KM_CORE_DEBUG_NOMATCH_EXIT:  if grp > -1 then Result := debugkeyboard.Groups[grp].NomatchLine;
     end;
   end;
 
@@ -297,13 +299,13 @@ begin
 
   { Update user interface }
 
-  if ev.Rule.ItemType = KM_KBP_DEBUG_BEGIN then
+  if ev.Rule.ItemType = KM_CORE_DEBUG_BEGIN then
   begin
     ev.Rule.Key.VirtualKey := vk;
     ev.Rule.Key.Modifiers := modifier_state;
   end;
 
-  if ev.Rule.ItemType = KM_KBP_DEBUG_SET_OPTION then
+  if ev.Rule.ItemType = KM_CORE_DEBUG_SET_OPTION then
   begin
     store := PKeymanStore(debug.kmx_info.option.store);
     ev.Rule.OptionStoreName := store.dpName;
@@ -312,16 +314,16 @@ begin
 end;
 
 function TDebugEventList.AddStateItems(
-  state: pkm_kbp_state;
+  state: pkm_core_state;
   vk: uint16_t;
   modifier_state: uint16_t
 ): Boolean;
 var
-  action: pkm_kbp_action_item;
+  action: pkm_core_action_item;
 begin
   Result := True;
-  action := km_kbp_state_action_items(state, nil);
-  while (action._type <> KM_KBP_IT_END) do
+  action := km_core_state_action_items(state, nil);
+  while (action._type <> KM_CORE_IT_END) do
   begin
     Result := Result and AddActionItem(vk, action);
     Inc(action);
@@ -329,25 +331,25 @@ begin
 end;
 
 function TDebugEventList.AddStateItems(
-  state: pkm_kbp_state;
+  state: pkm_core_state;
   vk: uint16_t;
   modifier_state: uint16_t;
   debugkeyboard: TDebugKeyboard
 ): Boolean;
 var
-  action: pkm_kbp_action_item;
-  debug: pkm_kbp_state_debug_item;
+  action: pkm_core_action_item;
+  debug: pkm_core_state_debug_item;
   action_index: Integer;
 begin
   Result := True;
-  debug := km_kbp_state_debug_items(state, nil);
-  action := km_kbp_state_action_items(state, nil);
+  debug := km_core_state_debug_items(state, nil);
+  action := km_core_state_action_items(state, nil);
   action_index := 0;
-  while debug._type <> KM_KBP_DEBUG_END do
+  while debug._type <> KM_CORE_DEBUG_END do
   begin
     if debug.kmx_info.first_action > action_index then
     begin
-      while (action._type <> KM_KBP_IT_END) and (action_index < debug.kmx_info.first_action) do
+      while (action._type <> KM_CORE_IT_END) and (action_index < debug.kmx_info.first_action) do
       begin
         Result := Result and AddActionItem(vk, action);
         Inc(action);
@@ -360,7 +362,14 @@ begin
 
   AddDebugItem(debug, debugkeyboard, vk, modifier_state);
 
-  if action._type = KM_KBP_IT_EMIT_KEYSTROKE then
+  if action._type = KM_CORE_IT_INVALIDATE_CONTEXT then
+  begin
+    // We always ignore invalidate context which can come when a frame key is
+    // pressed (#11172, #11486)
+    Inc(action);
+  end;
+
+  if action._type = KM_CORE_IT_EMIT_KEYSTROKE then
   begin
     // The EMIT_KEYSTROKE action comes after all rules have completed processing
     Result := Result and AddActionItem(vk, action);
@@ -369,12 +378,12 @@ begin
 
   // By the time we get to the end of rule processing, all actions should have
   // already been undertaken
-  Assert(action._type = KM_KBP_IT_END);
+  Assert(action._type = KM_CORE_IT_END);
 end;
 
 { TDebugEventRuleData }
 
-procedure TDebugEventRuleData.FillStoreList(event: pkm_kbp_state_debug_item; KeyboardMemory: PChar);
+procedure TDebugEventRuleData.FillStoreList(event: pkm_core_state_debug_item; KeyboardMemory: PChar);
   function StoreOffset(kfh: PKeyboardFileHeader; i: Word): PChar;
   begin
     Result := KeyboardMemory;

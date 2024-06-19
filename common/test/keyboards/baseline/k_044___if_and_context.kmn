@@ -1,0 +1,20 @@
+store(&NAME) '044 - if and context'
+c Description: Tests that context(x) takes if() statements into account. See #4275.
+c keys: [K_A][K_B]
+c expected: ex
+c context:
+
+store(&version) '10.0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
+store(nfc) '0'
+store(diaeresisBase) 'ae'
+
++ 'a' > 'exay'
+
+c Test #1 for if() with context(n)
+
+if(nfc = "0") any(diaeresisBase) 'x' any(diaeresisBase) 'y' + 'b' > context(2) context(3)

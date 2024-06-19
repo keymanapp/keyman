@@ -13,12 +13,9 @@ uses
   UfrmAboutTike in 'dialogs\UfrmAboutTike.pas' {frmAboutTike},
   RegistryKeys in '..\..\..\common\windows\delphi\general\RegistryKeys.pas',
   VersionInfo in '..\..\..\common\windows\delphi\general\VersionInfo.pas',
-  compile in '..\common\delphi\compiler\compile.pas',
   KeymanDeveloperOptions in 'main\KeymanDeveloperOptions.pas',
   UfrmKeyTest in 'debug\UfrmKeyTest.pas' {frmKeyTest},
-  CompilePackage in '..\common\delphi\compiler\CompilePackage.pas',
   KeymanDeveloperUtils in 'main\KeymanDeveloperUtils.pas',
-  CRC32 in '..\..\..\common\windows\delphi\general\CRC32.pas',
   UfrmEditor in 'child\UfrmEditor.pas' {frmEditor},
   MenuImgList in '..\common\delphi\components\MenuImgList.pas',
   UfrmSelectKey in 'dialogs\UfrmSelectKey.pas' {frmSelectKey},
@@ -34,7 +31,7 @@ uses
   Keyman.Developer.System.Project.kpsProjectFile in 'project\Keyman.Developer.System.Project.kpsProjectFile.pas',
   Keyman.Developer.System.Project.kmxProjectFile in 'project\Keyman.Developer.System.Project.kmxProjectFile.pas',
   Keyman.Developer.System.Project.modelTsProjectFile in 'project\Keyman.Developer.System.Project.modelTsProjectFile.pas',
-  Keyman.Developer.UI.Project.UfrmProjectSettings in 'project\Keyman.Developer.UI.Project.UfrmProjectSettings.pas' {frmProjectSettings},
+  Keyman.Developer.UI.Project.UfrmProjectSettings20 in 'project\Keyman.Developer.UI.Project.UfrmProjectSettings20.pas' {frmProjectSettings20},
   Keyman.Developer.UI.Project.ProjectFileUI in 'project\Keyman.Developer.UI.Project.ProjectFileUI.pas',
   Keyman.Developer.UI.Project.ProjectUI in 'project\Keyman.Developer.UI.Project.ProjectUI.pas',
   Keyman.Developer.UI.Project.ProjectUIFileType in 'project\Keyman.Developer.UI.Project.ProjectUIFileType.pas',
@@ -90,8 +87,6 @@ uses
   utilfiletypes in '..\..\..\common\windows\delphi\general\utilfiletypes.pas',
   UfrmNewFileDetails in 'dialogs\UfrmNewFileDetails.pas' {frmNewFileDetails},
   StockFileNames in '..\..\..\common\windows\delphi\general\StockFileNames.pas',
-  CompileKeymanWeb in 'compile\CompileKeymanWeb.pas',
-  KeymanWebKeyCodes in 'compile\KeymanWebKeyCodes.pas',
   utildir in '..\..\..\common\windows\delphi\general\utildir.pas',
   ADOX_TLB in '..\..\..\common\windows\delphi\tlb\ADOX_TLB.pas',
   ADODB_TLB in '..\..\..\common\windows\delphi\tlb\ADODB_TLB.pas',
@@ -140,7 +135,6 @@ uses
   VisualKeyboardExportPNG in '..\..\..\common\windows\delphi\visualkeyboard\VisualKeyboardExportPNG.pas',
   MSXML2_TLB in '..\..\..\common\windows\delphi\tlb\MSXML2_TLB.pas',
   CharacterInfo in 'main\CharacterInfo.pas',
-  CompilePackageInstaller in '..\common\delphi\compiler\CompilePackageInstaller.pas',
   UTikeDebugMode in 'main\UTikeDebugMode.pas',
   kmxfileconsts in '..\..\..\common\windows\delphi\keyboards\kmxfileconsts.pas',
   kmxfileutils in '..\..\..\common\windows\delphi\keyboards\kmxfileutils.pas',
@@ -157,7 +151,7 @@ uses
   ErrorControlledRegistry in '..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   UframeBitmapEditor in 'main\UframeBitmapEditor.pas' {frameBitmapEditor: TFrame},
   UfrmMessages in 'main\UfrmMessages.pas' {frmMessages},
-  dmActionsKeyboardEditor in 'actions\dmActionsKeyboardEditor.pas' {modActionsKeyboardEditor: TDataModule},
+  dmActionsDebugger in 'actions\dmActionsDebugger.pas' {modActionsDebugger: TDataModule},
   dmActionsMain in 'actions\dmActionsMain.pas' {modActionsMain: TDataModule},
   dmActionsTextEditor in 'actions\dmActionsTextEditor.pas' {modActionsTextEditor: TDataModule},
   UfrmCharacterMapNew in '..\..\..\common\windows\delphi\charmap\UfrmCharacterMapNew.pas' {frmCharacterMapNew},
@@ -167,6 +161,7 @@ uses
   UfrmVisualKeyboardKeyBitmap in '..\..\..\common\windows\delphi\visualkeyboard\UfrmVisualKeyboardKeyBitmap.pas' {frmVisualKeyboardKeyBitmap},
   UfrmOptions in 'dialogs\UfrmOptions.pas' {frmOptions},
   UfrmDebug in 'child\UfrmDebug.pas' {frmDebug},
+  Keyman.Developer.UI.Debug.UfrmLdmlKeyboardDebug in 'child\Keyman.Developer.UI.Debug.UfrmLdmlKeyboardDebug.pas' {frmLdmlKeyboardDebug},
   UfrmPackageEditor in 'child\UfrmPackageEditor.pas' {frmPackageEditor},
   utilexecute in '..\..\..\common\windows\delphi\general\utilexecute.pas',
   KeymanVersion in '..\..\..\common\windows\delphi\general\KeymanVersion.pas',
@@ -187,7 +182,6 @@ uses
   TempFileManager in '..\..\..\common\windows\delphi\general\TempFileManager.pas',
   UfrmKeymanWizard in 'child\UfrmKeymanWizard.pas' {frmKeymanWizard},
   UfrmKeyboardFonts in 'dialogs\UfrmKeyboardFonts.pas' {frmKeyboardFonts},
-  CompileErrorCodes in '..\common\delphi\compiler\CompileErrorCodes.pas',
   KeyboardFonts in '..\common\delphi\general\KeyboardFonts.pas',
   JsonUtil in '..\..\..\common\windows\delphi\general\JsonUtil.pas',
   TikeUnicodeData in 'main\TikeUnicodeData.pas',
@@ -231,12 +225,14 @@ uses
   Keyman.System.HttpServer.Base in '..\..\..\common\windows\delphi\web\Keyman.System.HttpServer.Base.pas',
   Keyman.Developer.System.HttpServer.AppSource in 'http\Keyman.Developer.System.HttpServer.AppSource.pas',
   Keyman.UI.FontUtils in 'main\Keyman.UI.FontUtils.pas',
-  Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter in '..\kmconvert\Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter.pas',
+  Keyman.Developer.System.VisualKeyboardToTouchLayoutConverter in '..\kmconvert\Keyman.Developer.System.VisualKeyboardToTouchLayoutConverter.pas',
   Keyman.Developer.System.Project.kmnProjectFileAction in 'project\Keyman.Developer.System.Project.kmnProjectFileAction.pas',
   Keyman.Developer.System.Project.kpsProjectFileAction in 'project\Keyman.Developer.System.Project.kpsProjectFileAction.pas',
   Keyman.Developer.UI.Project.UfrmNewProjectParameters in 'project\Keyman.Developer.UI.Project.UfrmNewProjectParameters.pas' {frmNewProjectParameters},
+  Keyman.Developer.UI.Project.UfrmNewLDMLKeyboardProjectParameters in 'project\Keyman.Developer.UI.Project.UfrmNewLDMLKeyboardProjectParameters.pas' {frmNewLDMLKeyboardProjectParameters},
   Keyman.Developer.UI.Project.UfrmNewProject in 'project\Keyman.Developer.UI.Project.UfrmNewProject.pas' {frmNewProject},
   Keyman.Developer.System.KeyboardProjectTemplate in '..\kmconvert\Keyman.Developer.System.KeyboardProjectTemplate.pas',
+  Keyman.Developer.System.LdmlKeyboardProjectTemplate in '..\kmconvert\Keyman.Developer.System.LdmlKeyboardProjectTemplate.pas',
   Keyman.Developer.UI.ImportWindowsKeyboardDialogManager in 'main\Keyman.Developer.UI.ImportWindowsKeyboardDialogManager.pas',
   Keyman.Developer.System.ImportWindowsKeyboard in '..\kmconvert\Keyman.Developer.System.ImportWindowsKeyboard.pas',
   Keyman.Developer.System.ImportKeyboardDLL in '..\kmconvert\Keyman.Developer.System.ImportKeyboardDLL.pas',
@@ -280,12 +276,30 @@ uses
   UfrmDebugStatus_Platform in 'debug\UfrmDebugStatus_Platform.pas' {frmDebugStatus_Platform},
   UfrmDebugStatus_Options in 'debug\UfrmDebugStatus_Options.pas' {frmDebugStatus_Options},
   Keyman.Developer.System.KeymanDeveloperPaths in 'main\Keyman.Developer.System.KeymanDeveloperPaths.pas',
-  Keyman.Developer.System.ValidateKpsFile in '..\common\delphi\compiler\Keyman.Developer.System.ValidateKpsFile.pas',
   Keyman.Developer.UI.UfrmServerOptions in 'dialogs\Keyman.Developer.UI.UfrmServerOptions.pas' {frmServerOptions},
   Keyman.Developer.System.ServerAPI in 'http\Keyman.Developer.System.ServerAPI.pas',
   Keyman.System.FontLoadUtil in 'main\Keyman.System.FontLoadUtil.pas',
   Keyman.Developer.UI.ServerUI in 'http\Keyman.Developer.UI.ServerUI.pas',
-  Keyman.Developer.System.GenerateKeyboardIcon in '..\kmconvert\Keyman.Developer.System.GenerateKeyboardIcon.pas';
+  Keyman.Developer.System.GenerateKeyboardIcon in '..\kmconvert\Keyman.Developer.System.GenerateKeyboardIcon.pas',
+  Keyman.Developer.UI.UfrmEditLanguageExample in 'dialogs\examples\Keyman.Developer.UI.UfrmEditLanguageExample.pas' {frmEditLanguageExample},
+  Keyman.Developer.UI.UfrmEditRelatedPackage in 'dialogs\relatedPackages\Keyman.Developer.UI.UfrmEditRelatedPackage.pas' {frmEditRelatedPackage},
+  Keyman.Developer.UI.UfrmEditPackageWebFonts in 'dialogs\packageWebFonts\Keyman.Developer.UI.UfrmEditPackageWebFonts.pas' {frmEditPackageWebFonts},
+  Keyman.Developer.System.KmcWrapper in 'compile\Keyman.Developer.System.KmcWrapper.pas',
+  Keyman.Developer.UI.Project.UpgradeProject in 'project\Keyman.Developer.UI.Project.UpgradeProject.pas',
+  Keyman.Developer.System.Project.xmlLdmlProjectFile in 'project\Keyman.Developer.System.Project.xmlLdmlProjectFile.pas',
+  Keyman.Developer.System.Project.xmlLdmlProjectFileAction in 'project\Keyman.Developer.System.Project.xmlLdmlProjectFileAction.pas',
+  Keyman.Developer.UI.Project.xmlLdmlProjectFileUI in 'project\Keyman.Developer.UI.Project.xmlLdmlProjectFileUI.pas',
+  Keyman.Developer.UI.UfrmLdmlKeyboardEditor in 'child\Keyman.Developer.UI.UfrmLdmlKeyboardEditor.pas' {frmLdmlKeyboardEditor},
+  dmActionsKeyboardEditor in 'actions\dmActionsKeyboardEditor.pas' {modActionsKeyboardEditor: TDataModule},
+  Keyman.Developer.UI.Project.UfrmProjectSettings in 'project\Keyman.Developer.UI.Project.UfrmProjectSettings.pas' {frmProjectSettings},
+  Keyman.Developer.System.TikeCommandLine in 'main\Keyman.Developer.System.TikeCommandLine.pas',
+  Keyman.Developer.System.MultiProcess in 'main\Keyman.Developer.System.MultiProcess.pas',
+  Keyman.Developer.System.TikeMultiProcess in 'main\Keyman.Developer.System.TikeMultiProcess.pas',
+  Keyman.System.CopyDataHelper in 'main\Keyman.System.CopyDataHelper.pas',
+  Keyman.Developer.System.ProjectOwningFile in 'main\Keyman.Developer.System.ProjectOwningFile.pas',
+  Keyman.Developer.System.Main in 'main\Keyman.Developer.System.Main.pas',
+  Keyman.Developer.System.LaunchProjects in 'main\Keyman.Developer.System.LaunchProjects.pas',
+  Keyman.System.Debug.DebugUtils in 'debug\Keyman.System.Debug.DebugUtils.pas';
 
 {$R *.RES}
 {$R ICONS.RES}
@@ -296,41 +310,6 @@ uses
 // If you don't add this flag the rederer process will crash when you try to load large images.
 {$SetPEFlags IMAGE_FILE_LARGE_ADDRESS_AWARE}
 
-const
-  LOGGER_DEVELOPER_IDE_TIKE = TKeymanSentryClient.LOGGER_DEVELOPER_IDE + '.tike';
 begin
-  TKeymanSentryClient.Start(TSentryClientVcl, kscpDeveloper, LOGGER_DEVELOPER_IDE_TIKE);
-  try
-    try
-      CoInitFlags := COINIT_APARTMENTTHREADED;
-
-      FInitializeCEF := TCEFManager.Create;
-      try
-        if FInitializeCEF.Start then
-        begin
-          InitThemeLibrary;
-          SetThemeAppProperties(STAP_ALLOW_NONCLIENT or STAP_ALLOW_CONTROLS or STAP_ALLOW_WEBCONTENT);
-          Application.MainFormOnTaskBar := True;
-          Application.Initialize;
-          Application.Title := 'Keyman Developer';
-          if TikeActive then Exit;
-          Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-          try
-            Application.CreateForm(TfrmKeymanDeveloper, frmKeymanDeveloper);
-            Application.Run;
-          finally
-            FreeAndNil(frmKeymanDeveloper);
-            FreeAndNil(modWebHttpServer);
-          end;
-        end;
-      finally
-        FInitializeCEF.Free;
-      end;
-    except
-      on E:Exception do
-        SentryHandleException(E);
-    end;
-  finally
-    TKeymanSentryClient.Stop;
-  end;
+  RunKeymanDeveloper;
 end.

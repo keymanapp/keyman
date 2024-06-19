@@ -86,6 +86,8 @@ type
     procedure cefPreKeySyncEvent(Sender: TObject; e: TCEFHostKeyEventData; out isShortcut, Handled: Boolean);
     procedure cefKeyEvent(Sender: TObject; e: TCEFHostKeyEventData; wasShortcut, wasHandled: Boolean);
     procedure cefLoadEnd(Sender: TObject);
+    procedure cefBeforeBrowseSync(Sender: TObject; const Url: string; isPopup: Boolean; out Handled: Boolean);
+    procedure cefBeforePopup(Sender: TObject; const browser: ICefBrowser; const frame: ICefFrame; const targetUrl, targetFrameName: ustring; targetDisposition: TCefWindowOpenDisposition; userGesture: Boolean; const popupFeatures: TCefPopupFeatures; var windowInfo: TCefWindowInfo; var client: ICefClient; var settings: TCefBrowserSettings; var extra_info: ICefDictionaryValue; var noJavascriptAccess: Boolean; var Result: Boolean);
 
     procedure WMUser_TextEditor_Command(var Message: TMessage); message WM_USER_TextEditor_Command;
     procedure WMUser_SyntaxColourChange(var Message: TMessage); message WM_USER_SYNTAXCOLOURCHANGE;
@@ -102,6 +104,8 @@ type
     procedure CharMapDragOver(Sender, Source: TObject; X, Y: Integer;
       State: TDragState; var Accept: Boolean);
     procedure DelayedFindError;
+    procedure DoOpenLinkIfExternal(const url: string; var handled: Boolean);
+    procedure cefHelpTopic(Sender: TObject);
 
   protected
     function GetHelpTopic: string; override;
@@ -202,6 +206,7 @@ uses
   UfrmMain,
   UmodWebHTTPServer,
   Unicode,
+  utilexecute,
   utilhttp,
   utilstr;
 
@@ -259,6 +264,36 @@ begin
   model.SetEnabled(TEXTEDITOR_CONTEXTMENU_CONVERTTOCHARACTERS, modActionsTextEditor.actTextEditor_ConvertToCharacters.Enabled);
 end;
 
+procedure TframeTextEditor.DoOpenLinkIfExternal(const url: string; var handled: Boolean);
+begin
+  if url.StartsWith('keyman:') then
+  begin
+    handled := False;
+    Exit;
+  end;
+
+  handled := not url.StartsWith(modWebHttpServer.GetLocalhostURL + '/app/editor/');
+  if handled then
+    TUtilExecute.URL(url);
+end;
+
+procedure TframeTextEditor.cefBeforeBrowseSync(Sender: TObject;
+  const Url: string; isPopup: Boolean; out Handled: Boolean);
+begin
+  DoOpenLinkIfExternal(Url, Handled);
+end;
+
+procedure TframeTextEditor.cefBeforePopup(Sender: TObject;
+  const browser: ICefBrowser; const frame: ICefFrame; const targetUrl,
+  targetFrameName: ustring; targetDisposition: TCefWindowOpenDisposition;
+  userGesture: Boolean; const popupFeatures: TCefPopupFeatures;
+  var windowInfo: TCefWindowInfo; var client: ICefClient;
+  var settings: TCefBrowserSettings; var extra_info: ICefDictionaryValue;
+  var noJavascriptAccess, Result: Boolean);
+begin
+  DoOpenLinkIfExternal(targetUrl, Result);
+end;
+
 procedure TframeTextEditor.cefContextMenuCommand(Sender: TObject;
   const browser: ICefBrowser; const frame: ICefFrame;
   const params: ICefContextMenuParams; commandId: Integer; eventFlags: Cardinal;
@@ -314,9 +349,12 @@ begin
   cef.Visible := True;
   cef.OnCommand := cefCommand;
   cef.OnLoadEnd := cefLoadEnd;
+  cef.OnBeforeBrowseSync := cefBeforeBrowseSync;
+  cef.OnHelpTopic := cefHelpTopic;
 
   cef.cef.OnBeforeContextMenu := cefBeforeContextMenu;
   cef.cef.OnContextMenuCommand := cefContextMenuCommand;
+  cef.cef.OnBeforePopup := cefBeforePopup;
 
   cef.OnPreKeySyncEvent := cefPreKeySyncEvent;
   cef.OnKeyEvent := cefKeyEvent;
@@ -328,9 +366,15 @@ begin
   GetCharMapDropTool.Handle(cef, cmimDefault, CharMapDragOver, CharMapDragDrop);
 end;
 
+procedure TframeTextEditor.cefHelpTopic(Sender: TObject);
+begin
+  frmKeymanDeveloper.HelpTopic(Self);
+end;
+
 procedure TframeTextEditor.cefLoadEnd(Sender: TObject);
 begin
   FHasBeenLoaded := True;
+  UpdateEditorFonts;
   SetupCharMapDrop;
   DelayedFindError;
 end;
@@ -1089,7 +1133,11 @@ end;
 function TframeTextEditor.GetHelpTopic: string;
 begin
   if FEditorFormat <> efKMN then
+  begin
+    if Parent is TTIKEForm then
+      Exit((Parent as TTIKEForm).HelpTopic);
     Exit(SHelpTopic_Context_TextEditor);
+  end;
 
   Result := HelpKeyword;
 end;

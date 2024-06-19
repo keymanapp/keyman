@@ -1,18 +1,18 @@
 (*
   Name:             Keyman.Developer.System.Project.ProjectLoader
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    24 Aug 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Initial version
                     19 Mar 2007 - mcdurdin - I708 - Files disappearing from project
                     19 Nov 2007 - mcdurdin - I1157 - const string parameters
@@ -22,7 +22,7 @@
                     05 May 2015 - mcdurdin - I4698 - V9.0 - Split project and user preferences files
                     24 Aug 2015 - mcdurdin - I4865 - Add treat hints and warnings as errors into project
                     24 Aug 2015 - mcdurdin - I4866 - Add warn on deprecated features to project and compile
-                    
+
 *)
 unit Keyman.Developer.System.Project.ProjectLoader;
 
@@ -38,6 +38,8 @@ uses
   Keyman.Developer.System.Project.ProjectFile,
   utilsystem;
 
+// Corresponds to kmc/projectLoader.ts; TypeScript implementation is master version
+
 type
   EProjectLoader = class(Exception);
 
@@ -45,7 +47,8 @@ type
   private
     FFileName: string;
     FProject: TProject;
-    procedure LoadUser;   // I4698
+    procedure LoadUser;
+    procedure LoadProjectFromFile;   // I4698
   public
     constructor Create(AProject: TProject; AFileName: string);
     procedure Execute;
@@ -62,6 +65,7 @@ uses
   Keyman.Developer.System.Project.ProjectFiles,
   Keyman.Developer.System.Project.ProjectFileType,
 
+  utildir,
   utilfiletypes;
 
 { TProjectLoader }
@@ -73,13 +77,18 @@ begin
   FFileName := AFileName;
 end;
 
-
 procedure TProjectLoader.Execute;   // I4698
+begin
+  LoadProjectFromFile;
+end;
+
+procedure TProjectLoader.LoadProjectFromFile;
 var
   n, i: Integer;
   doc: IXMLDocument;
   node, root: IXMLNode;
   pf: TProjectFile;
+  hasUserState: Boolean;
 begin
   try
     doc := LoadXMLDocument(FFileName);
@@ -87,6 +96,8 @@ begin
     on E:Exception do
       raise EProjectLoader.Create('Error loading project file: '+E.Message);
   end;
+
+  hasUserState := FileExists(ChangeFileExt(FFileName, Ext_ProjectSourceUser));
 
   root := doc.DocumentElement;
   if root.NodeName <> 'KeymanDeveloperProject' then
@@ -97,70 +108,96 @@ begin
   node := root.ChildNodes.FindNode('Options');   // I4688
   if node <> nil then
   begin
-    FProject.Options.BuildPath := VarToStr(node.ChildValues['BuildPath']);
+    if not VarIsNull(node.ChildValues['Version']) then
+    begin
+      FProject.Options.Version := ProjectVersionFromString(VarToStr(node.ChildValues['Version']));
+      if FProject.Options.Version = pvUnknown then
+        raise EProjectLoader.Create('This project format is version '+VarToStr(node.ChildValues['Version'])+', which is not supported by this version of Keyman Developer.');
+    end;
 
-    if VarIsNull(node.ChildValues['CompilerWarningsAsErrors'])   // I4865
-      then FProject.Options.CompilerWarningsAsErrors := False
-      else FProject.Options.CompilerWarningsAsErrors := node.ChildValues['CompilerWarningsAsErrors'];
+    // Set default project options based on what we learned above
+    FProject.Options.Assign(DefaultProjectOptions[FProject.Options.Version]);
 
-    if VarIsNull(node.ChildValues['WarnDeprecatedCode'])   // I4866
-      then FProject.Options.WarnDeprecatedCode := True
-      else FProject.Options.WarnDeprecatedCode := node.ChildValues['WarnDeprecatedCode'];
+    if not VarIsNull(node.ChildValues['BuildPath']) then
+      FProject.Options.BuildPath := DosSlashes(VarToStr(node.ChildValues['BuildPath']));
 
-    if VarIsNull(node.ChildValues['CheckFilenameConventions'])
-      then FProject.Options.CheckFilenameConventions := False // existing projects default to FALSE (new projects default to TRUE)
-      else FProject.Options.CheckFilenameConventions := node.ChildValues['CheckFilenameConventions'];
+    if not VarIsNull(node.ChildValues['SourcePath']) then
+      FProject.Options.SourcePath := DosSlashes(VarToStr(node.ChildValues['SourcePath']));
 
-    FProject.Options.ProjectType := ProjectTypeFromString(VarToStr(node.ChildValues['ProjectType']));
-    if FProject.Options.ProjectType = ptUnknown then
-      // Support projects without a defined projecttype
-      FProject.Options.ProjectType := ptKeyboard;
+    if not VarIsNull(node.ChildValues['CompilerWarningsAsErrors']) then
+      FProject.Options.CompilerWarningsAsErrors := node.ChildValues['CompilerWarningsAsErrors'];
+
+    if not VarIsNull(node.ChildValues['WarnDeprecatedCode']) then
+      FProject.Options.WarnDeprecatedCode := node.ChildValues['WarnDeprecatedCode'];
+
+    if not VarIsNull(node.ChildValues['CheckFilenameConventions']) then
+      FProject.Options.CheckFilenameConventions := node.ChildValues['CheckFilenameConventions'];
+
+    if not VarIsNull(node.ChildValues['SkipMetadataFiles']) then
+      FProject.Options.SkipMetadataFiles := node.ChildValues['SkipMetadataFiles'];
+
+    if not VarIsNull(node.ChildValues['ProjectType']) then
+    begin
+      FProject.Options.ProjectType := ProjectTypeFromString(VarToStr(node.ChildValues['ProjectType']));
+      if FProject.Options.ProjectType = ptUnknown then
+        // Support projects without a defined projecttype
+        FProject.Options.ProjectType := ptKeyboard;
+    end;
   end;
 
   { Load root nodes first - I708 }
 
-  for i := 0 to root.ChildNodes['Files'].ChildNodes.Count - 1 do
+  if FProject.Options.Version = pv10 then
   begin
-    node := root.ChildNodes['Files'].ChildNodes[i];
-    if node.NodeName <> 'File' then Continue;
-    if node.ChildNodes.FindNode('ParentFileID') = nil then //  ChildValues['ParentFileID'] then
+    for i := 0 to root.ChildNodes['Files'].ChildNodes.Count - 1 do
     begin
-      if not VarIsNull(node.ChildValues['Filepath']) then
+      node := root.ChildNodes['Files'].ChildNodes[i];
+      if node.NodeName <> 'File' then Continue;
+      if node.ChildNodes.FindNode('ParentFileID') = nil then //  ChildValues['ParentFileID'] then
       begin
-        // I1152 - Avoid crashes when .kpj file is invalid
-        pf := CreateProjectFile(FProject, ExpandFileNameClean(FFileName, node.ChildValues['Filepath']), nil);
-        pf.Load(node, True);
+        if not VarIsNull(node.ChildValues['Filepath']) then
+        begin
+          // I1152 - Avoid crashes when .kpj file is invalid
+          pf := CreateProjectFile(FProject, ExpandFileNameClean(FFileName, node.ChildValues['Filepath']), nil);
+          pf.Load(node);
+          if not hasUserState then
+            pf.LoadState(node);
+        end;
       end;
     end;
-  end;
 
-  { Load child nodes }
+    { Load child nodes }
 
-  for i := 0 to root.ChildNodes['Files'].ChildNodes.Count - 1 do
-  begin
-    node := root.ChildNodes['Files'].ChildNodes[i];
-    if node.NodeName <> 'File' then Continue;
-
-    if node.ChildNodes.FindNode('ParentFileID') <> nil then //  ChildValues['ParentFileID'] then
+    for i := 0 to root.ChildNodes['Files'].ChildNodes.Count - 1 do
     begin
-      n := FProject.Files.IndexOfID(node.ChildValues['ParentFileID']);
-      if n < 0 then Continue;
-      pf := CreateProjectFile(FProject, ExpandFileNameClean(FFileName, node.ChildValues['Filepath']), FProject.Files[n]);
-      pf.Load(node, True);
+      node := root.ChildNodes['Files'].ChildNodes[i];
+      if node.NodeName <> 'File' then Continue;
+
+      if node.ChildNodes.FindNode('ParentFileID') <> nil then //  ChildValues['ParentFileID'] then
+      begin
+        n := FProject.Files.IndexOfID(node.ChildValues['ParentFileID']);
+        if n < 0 then Continue;
+        pf := CreateProjectFile(FProject, ExpandFileNameClean(FFileName, node.ChildValues['Filepath']), FProject.Files[n]);
+        pf.Load(node);
+        if not hasUserState then
+          pf.LoadState(node);
+      end;
     end;
-  end;
 
-  { Load MRU from old project files }
+    { Load MRU from old project files }
 
-  node := root.ChildNodes['MRU'];
-  if Assigned(node) then
-  begin
-    for i := 0 to node.ChildNodes.Count - 1 do
+    node := root.ChildNodes['MRU'];
+    if Assigned(node) then
     begin
-      if node.ChildNodes[i].NodeName <> 'File' then Continue;
-      FProject.MRU.Append(node.ChildNodes[i].ChildNodes['FullPath'].NodeValue);
+      for i := 0 to node.ChildNodes.Count - 1 do
+      begin
+        if node.ChildNodes[i].NodeName <> 'File' then Continue;
+        FProject.MRU.Append(node.ChildNodes[i].ChildNodes['FullPath'].NodeValue);
+      end;
     end;
-  end;
+  end
+  else
+    FProject.PopulateFiles;
 
   LoadUser;
 end;

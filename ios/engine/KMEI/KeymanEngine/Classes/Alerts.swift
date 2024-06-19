@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import Reachability
+import os.log
 
 open class Alerts {
   public typealias AcceptanceHandler = ((UIAlertAction)) -> Void
@@ -48,8 +49,8 @@ open class Alerts {
     do {
       try networkReachable = Reachability(hostname: KeymanHosts.KEYMAN_COM.host!)
     } catch {
-      log.debug("reachability could not start")
-    }
+      os_log("Reachability could not start", log:KeymanEngineLogger.ui, type: .debug)
+   }
 
     if networkReachable?.connection == Reachability.Connection.unavailable || networkReachable == nil {
       showConnectionErrorAlert(in: vc, handler: handler)

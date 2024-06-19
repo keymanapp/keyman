@@ -129,9 +129,6 @@
 
 #define REGSZ_Flag_UseCachedHotkeyModifierState "Flag_UseCachedHotkeyModifierState"
 
-/* REGSZ_Flag_UseKeymanCore DWORD: Turns on the common core - instead of windows core */
-#define REGSZ_Flag_UseKeymanCore "Flag_UseKeymanCore"
-
 /* DWORD: Enable/disable deep TSF integration, default enabled; 0 = disabled, 1 = enabled, 2 = default */
 
 #define REGSZ_DeepTSFIntegration  "deep tsf integration"
@@ -190,9 +187,9 @@ public:
 	BOOL DeleteKey(LPCSTR AKey);
 	BOOL DeleteValue(LPCSTR AName);
 	BOOL OpenKey(LPCSTR AKey, BOOL ACreate);
-	BOOL WriteInteger(LPCSTR AName, int AValue);
-	BOOL WriteString(LPCSTR AName, LPSTR AValue);
-	BOOL WriteString(LPCWSTR AName, LPWSTR AValue);
+	BOOL WriteInteger(LPCSTR AName, const int AValue);
+	BOOL WriteString(LPCSTR AName, LPCSTR AValue);
+	BOOL WriteString(LPCWSTR AName, LPCWSTR AValue);
 };
 
 RegistryReadOnly *Reg_GetKeymanActiveKeyboard(LPSTR kbname);

@@ -6,9 +6,9 @@ WARNING: these are old configuration notes. See [index.md](../index.md) for curr
 - Python 3
 - Meson build system 0.45+ (0.56+ for WASM)
 - ninja 1.8+
-- C++14 or later compiler (VC++ 2019 or later for Windows).
+- C++17 or later compiler (VC++ 2019 or later for Windows).
 - lib std::fs
-- kmcomp (for tests) -- must be added to path
+- kmc (for tests) -- must be added to path
 
 For WASM builds:
 - Meson build system 0.56+
@@ -56,19 +56,6 @@ Windows SDK version, if it cannot be automatically detected.
 export SDKVER=10.0.19041.0
 ```
 
-#### kmcomp
-
-Note on paths for kmcomp:
-
-The search path can be edited through System settings / Advanced system settings
-/ Environment Variables / User environment variables.
-
-If you have Keyman Developer installed, kmcomp should be on the path already;
-otherwise add `%KeymanDeveloperPath%` to your path.
-
-If you do not have Keyman Developer installed, add the path where you extracted
-the kmcomp archive.
-
 ### Linux
 
 #### Ubuntu and Debian
@@ -88,7 +75,7 @@ the kmcomp archive.
 * Install Enscripten (including adding to path with `emsdk_env.sh`)  (WASM builds):
   <https://emscripten.org/docs/getting_started/downloads.html#sdk-download-and-install>
 
-You may also need the `kmcomp` wrapper - see below.
+You may also need `kmc` - see below.
 
 #### Other Linux distributions
 
@@ -109,21 +96,15 @@ You may also need the `kmcomp` wrapper - see below.
 
 * Add emcc to PATH (probably upstream/enscripten)
 
-You may also need the `kmcomp` wrapper - see below.
+You may also need `kmc` - see below.
 
-#### kmcomp - All Linux platforms
+#### kmc - All Linux platforms
 
-If you want to rebuild keyboards for tests, you need a wrapper `kmcomp` shell
-script:
+If you want to rebuild keyboards for tests, you need to install `kmc`:
 
 ```bash
-#!/usr/bin/env bash
-wine `dirname "$0"`/kmcomp.exe "$@"
+npm i -g @keymanapp/kmc
 ```
-
-Place this in the same folder as you extracted kmcomp.exe, and
-`chmod +x kmcomp`. Add the folder to the path (e.g.
-`export PATH=/path/to/kmcomp:$PATH`, which you can add to `.bashrc`).
 
 ### macOS
 
@@ -141,25 +122,19 @@ Place this in the same folder as you extracted kmcomp.exe, and
 * Install Enscripten (including environment update):
   <https://emscripten.org/docs/getting_started/downloads.html#sdk-download-and-install>
 
-#### kmcomp
+#### kmc
 
-If you want to rebuild keyboards for tests, you'll also need WINE:
-
-```bash
-brew tap homebrew/cask-versions
-brew install --cask --no-quarantine wine-stable
-```
-
-And you will also need a wrapper `kmcomp` shell script:
+If you want to rebuild keyboards for tests, you'll also need node:
 
 ```bash
-#!/usr/bin/env bash
-wine64 `dirname "$0"`/kmcomp.exe "$@"
+brew install node
 ```
 
-Place this in the same folder as you extracted kmcomp.exe, and
-`chmod +x kmcomp`. Add the folder to the path (e.g.
-`export PATH=/path/to/kmcomp:$PATH`, which you can add to `.bashrc`).
+And you will also need to install `kmc`:
+
+```bash
+npm install -g @keymanapp/kmc
+```
 
 ## Building -- all platforms
 

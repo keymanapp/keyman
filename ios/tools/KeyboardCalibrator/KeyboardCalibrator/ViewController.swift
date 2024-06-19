@@ -149,11 +149,7 @@ class ViewController: UIViewController {
 
   @IBAction func performCapture() {
     let rect = kbdFrame?.cgRectValue
-    if #available(iOS 11.0, *) {
-      capture.insetBottom = self.view.safeAreaInsets.bottom
-    } else {
-      capture.insetBottom = self.view.layoutMargins.bottom
-    }
+    capture.insetBottom = self.view.safeAreaInsets.bottom
 
     // Determine correct capture mode
     switch captureMode {

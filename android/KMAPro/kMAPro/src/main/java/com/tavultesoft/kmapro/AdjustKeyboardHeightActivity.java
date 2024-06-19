@@ -19,8 +19,8 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
-import com.tavultesoft.kmea.BaseActivity;
-import com.tavultesoft.kmea.KMManager;
+import com.keyman.engine.BaseActivity;
+import com.keyman.engine.KMManager;
 
 /**
  * Settings menu for adjusting the keyboard height. The value for the current device orientation
@@ -107,7 +107,7 @@ public class AdjustKeyboardHeightActivity extends BaseActivity {
             break;
           case MotionEvent.ACTION_UP:
             // Save the currentHeight when the user releases
-            int orientation = context.getResources().getConfiguration().orientation;
+            int orientation = KMManager.getOrientation(context);
             String keyboardHeightKey = (orientation == Configuration.ORIENTATION_LANDSCAPE) ?
               KMManager.KMKey_KeyboardHeightLandscape : KMManager.KMKey_KeyboardHeightPortrait;
             editor.putInt(keyboardHeightKey, currentHeight);

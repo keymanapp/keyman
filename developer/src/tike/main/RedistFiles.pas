@@ -63,7 +63,6 @@ function GetRedistSetupPath: string;
 function GetRedistProjectTemplatePath: string;
 function GetWixPath: string;
 function GetStockKCTPath: string;
-function GetDebugKMCmpDllPath: string;
 function GetUnicodeDataSourcePath(DefaultPath: string = ''): string;  // I3463
 function GetXMLTemplatePath: string;
 function GetDeveloperRootPath: string;
@@ -133,19 +132,6 @@ begin
     then Result := root + DevProjectTemplatePath
     else Result := ExtractFilePath(ParamStr(0))+'projects\templates\';
   Result := GetDebugPath('Debug_RedistTemplatePath', Result);
-end;
-
-function GetDebugKMCmpDllPath: string;
-var
-  root: string;
-const
-  DevCompilerPath = 'developer\bin';
-begin
-  if TKeymanPaths.RunningFromSource(root) and
-    FileExists(root + DevCompilerPath + '\kmcmpdll.dll')
-    then Result := root + DevCompilerPath
-    else Result := ExtractFilePath(ParamStr(0));
-  Result := GetDebugPath('Debug_KMCMPDLLPath', Result);
 end;
 
 function GetXMLTemplatePath: string;

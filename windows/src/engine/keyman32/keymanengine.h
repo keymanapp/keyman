@@ -18,11 +18,11 @@
 #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES_COUNT 1
 #endif
 
-// For keyboardprocessor_bits.h
-#ifndef KMN_KBP_STATIC
-#define KMN_KBP_STATIC
+// For keyman_core_api_bits.h
+#ifndef KM_CORE_LIBRARY_STATIC
+#define KM_CORE_LIBRARY_STATIC
 #endif
-// For keyboardprocessor_bits.h
+// For keyman_core_api_bits.h
 #ifndef _WIN32
 #define _WIN32 1
 #endif
@@ -39,8 +39,10 @@
 #include <assert.h>
 #include <msctf.h>
 #include "../../../../common/windows/cpp/include/legacy_kmx_file.h"
-#include <keyman/keyboardprocessor.h>
-#include <keyman/keyboardprocessor_consts.h>
+#include <keyman/keyman_core_api.h>
+#include <keyman/keyman_core_api_actions.h> // for imx integration
+#include <keyman/keyman_core_api_context.h> // for intermediate context
+#include <keyman/keyman_core_api_consts.h>
 
 /***************************************************************************/
 
@@ -81,41 +83,26 @@ typedef struct tagINTKEYBOARDINFO
   DWORD      __filler_Hotkey;
   DWORD      __filler; // makes same as KEYBOARDINFO   // I4462
   char       Name[256];
-  LPKEYBOARD Keyboard;
   DWORD      nIMDLLs;
   LPIMDLL    IMDLLs;
   int        __filler2; // makes same as KEYBOARDINFO
-  LPINTKEYBOARDOPTIONS KeyboardOptions;
   int        nProfiles;
   LPINTKEYBOARDPROFILE Profiles;
-  km_kbp_keyboard* lpCoreKeyboard;
-  km_kbp_option_item* lpCoreKeyboardOptions;
-  km_kbp_state* lpCoreKeyboardState;
-  km_kbp_keyboard_imx* lpIMXList;
+  km_core_keyboard* lpCoreKeyboard;
+  km_core_option_item* lpCoreKeyboardOptions;
+  km_core_state* lpCoreKeyboardState;
+  km_core_keyboard_imx* lpIMXList;
 } INTKEYBOARDINFO, * LPINTKEYBOARDINFO;
-
-typedef struct tagINI
-{
-  int MsgStackSize;
-  int MaxKeyboards;
-  int ContextStackSize;
-} INI;
 
 typedef struct tagKMSTATE
 {
   BOOL NoMatches;
   MSG msg;
-  // TODO: 5442 will remove these once windows core is deprecated
-  BOOL StopOutput;
-  int LoopTimes;
-  // TODO: 5442
   WORD vkey;           // I934
   WCHAR charCode;      // I4582
   BOOL windowunicode;  // I4287
   BOOL isDown;
-  LPKEYBOARD lpkb;
-  km_kbp_keyboard* lpCoreKb;  //  future use with IMDLL
-  LPGROUP startgroup;         // TODO: 5442 will remove this once windows core is deprecated
+  km_core_keyboard* lpCoreKb;  //  future use with IMDLL
 } KMSTATE;
 
 // I3616
@@ -129,18 +116,10 @@ LRESULT CALLBACK kmnLowLevelKeyboardProc(   // I4124
   _In_  LPARAM lParam
 );
 
-BOOL ReleaseKeyboardMemory(LPKEYBOARD kbd);
-BOOL ReleaseStateMemoryCore(km_kbp_state** state);
-BOOL ReleaseKeyboardMemoryCore(km_kbp_keyboard** kbd);
+BOOL ReleaseStateMemoryCore(km_core_state** state);
+BOOL ReleaseKeyboardMemoryCore(km_core_keyboard** kbd);
 
-void PostGETNEXT(HWND hwnd);
-BOOL CompareMsg(LPMSG MsgA, LPMSG MsgB);
 BOOL ProcessHook();	// returns FALSE on error or key not matched [only for AITip]
-BOOL ProcessMessage( LPMSG mp );
-BOOL ProcessGroup(LPGROUP gp);
-BOOL ContextMatch(LPKEY kkp);
-int PostString(PWSTR str, LPMSG mp, LPKEYBOARD lpkb, PWSTR endstr);
-BOOL LoadAllKeymanKeyboards(DWORD layout);
 
 BOOL IsSysTrayWindow(HWND hwnd);
 
@@ -149,7 +128,6 @@ BOOL IsSysTrayWindow(HWND hwnd);
 
 BOOL InitialiseProcess(HWND hwnd);
 BOOL UninitialiseProcess(BOOL Lock);
-BOOL IsKeyboardUnicode();
 
 BOOL IsFocusedThread();
 
@@ -158,7 +136,6 @@ BOOL SelectKeyboard(DWORD KeymanID);
 extern "C" DWORD  _declspec(dllexport) WINAPI GetActiveKeymanID();
 
 BOOL GetKeyboardFileName(LPSTR kbname, LPSTR buf, int nbuf);
-BOOL LoadKeyboard(LPSTR fileName, LPKEYBOARD *lpKeyboard);
 BOOL LoadlpKeyboard(int i);
 
 PSTR wstrtostr(PCWSTR in);
@@ -182,24 +159,35 @@ void InitDebugging();
 void UninitDebugging();
 
 extern "C" void _declspec(dllexport) WINAPI Keyman_WriteDebugEvent(char* file, int line, PWCHAR msg);
+extern "C" void _declspec(dllexport) WINAPI Keyman_WriteDebugEventW(PWCHAR file, int line, PWCHAR msg);
 
-#define SendDebugMessage(hwnd,state,kmn_lineno,msg) (ShouldDebug((state)) ? SendDebugMessage_1((hwnd),(state),(kmn_lineno), __FILE__, __LINE__, (msg)) : 0)
-#define SendDebugMessageFormat(hwnd,state,kmn_lineno,msg,...) (ShouldDebug((state)) ? SendDebugMessageFormat_1((hwnd),(state),(kmn_lineno), __FILE__, __LINE__, (msg),__VA_ARGS__) : 0)
+// Following macros widen a constant string, ugly it is true
+#define __WFILE2__(m) L ## m
+#define __WFILE1__(m) __WFILE2__(m)
+#define __WFILE__ __WFILE1__(__FILE__)
+
+#define SendDebugMessageW(hwnd,state,kmn_lineno,msg) (ShouldDebug((state)) ? SendDebugMessageW_1((hwnd),(state),(kmn_lineno), __WFILE__, __LINE__, (msg)) : 0)
+#define SendDebugMessageFormatW(hwnd,state,kmn_lineno,msg,...) (ShouldDebug((state)) ? SendDebugMessageFormatW_1((hwnd),(state),(kmn_lineno), __WFILE__, __LINE__, (msg),__VA_ARGS__) : 0)
+
+#define SendDebugMessage(hwnd,state,kmn_lineno,msg) (ShouldDebug((state)) ? SendDebugMessage_1((hwnd),(state),(kmn_lineno), __WFILE__, __LINE__, (msg)) : 0)
+#define SendDebugMessageFormat(hwnd,state,kmn_lineno,msg,...) (ShouldDebug((state)) ? SendDebugMessageFormat_1((hwnd),(state),(kmn_lineno), __WFILE__, __LINE__, (msg),__VA_ARGS__) : 0)
 #define ShouldDebug(state) ShouldDebug_1()
-#define DebugLastError(context) (DebugLastError_1(GetLastError(), (context), __FILE__,__LINE__,__FUNCTION__))
-#define DebugLastError0(error, context) (DebugLastError_1((error), (context), __FILE__,__LINE__,__FUNCTION__))
+#define DebugLastError(context) (DebugLastError_1(GetLastError(), (context), __WFILE__, __LINE__,__FUNCTION__))
+#define DebugLastError0(error, context) (DebugLastError_1((error), (context), __WFILE__, __LINE__,__FUNCTION__))
 // On failed condition log "message", return FALSE
 // and assert if a debugger is attached for a debug build.
-#define DebugAssert(condition, message) (DebugAssert_1((condition),(message), __FILE__, __LINE__))
-int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, char* file, int line, char* msg);
-int SendDebugMessageFormat_1(HWND hwnd, TSDMState state, int kmn_lineno, char* file, int line, char* fmt, ...);
-void DebugLastError_1(DWORD err, char* context, char* file, int line, char* func);
+#define DebugAssert(condition, message) (DebugAssert_1((condition),(message), __WFILE__, __LINE__))
+int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, wchar_t* file, int line, char* msg);
+int SendDebugMessageFormat_1(HWND hwnd, TSDMState state, int kmn_lineno, wchar_t* file, int line, char* fmt, ...);
+int SendDebugMessageW_1(HWND hwnd, TSDMState state, int kmn_lineno, wchar_t* file, int line, wchar_t* msg);
+int SendDebugMessageFormatW_1(HWND hwnd, TSDMState state, int kmn_lineno, wchar_t* file, int line, wchar_t* fmt, ...);
+void DebugLastError_1(DWORD err, char* context, wchar_t* file, int line, char* func);
 void DebugMessage(LPMSG msg, WPARAM wParam);
 void DebugShift(char* function, char* point);
 BOOL DebugSignalPause(BOOL fIsUp);
 char* Debug_VirtualKey(WORD vk);
 char* Debug_UnicodeString(PWSTR s, int x = 0);
-BOOL DebugAssert_1(BOOL condition, char* msg, char* file, int line);
+BOOL DebugAssert_1(BOOL condition, char* msg, wchar_t* file, int line);
 BOOL ShouldDebug_1(); // TSDMState state);
 
 #endif
@@ -230,8 +218,6 @@ DWORD HKLToKeyboardID(HKL hkl);
 WORD HKLToLanguageID(HKL hkl);
 WORD HKLToLayoutNumber(HKL hkl);
 WORD HKLToLayoutID(HKL hkl);
-DWORD EthnologueCodeToKeymanID(DWORD EthCode);
-DWORD EthnologueStringCodeToDWord(PWSTR EthCode);
 
 PWSTR  GetSystemStore(LPKEYBOARD kb, DWORD SystemID);
 
@@ -254,10 +240,10 @@ void keybd_shift(LPINPUT pInputs, int* n, BOOL isReset, LPBYTE const kbd);
 #include "keystate.h"
 
 #include "calldll.h"
-#include "addins.h"
 #include "keymancontrol.h"
 #include "keyboardoptions.h"
 #include "kmprocessactions.h"
+#include "appcontext.h"
 
 #include "syskbd.h"
 #include "vkscancodes.h"
@@ -276,7 +262,7 @@ BOOL SelectKeyboardTSF(DWORD KeymanID, BOOL foreground);   // I3933   // I3949  
 BOOL ReportKeyboardChanged(WORD wCommand, DWORD dwProfileType, UINT langid, HKL hkl, GUID clsid, GUID guidProfile);
 void ProcessModifierChange(UINT key, BOOL isUp, BOOL isExtended);   // I4793
 
-BOOL SetupCoreEnvironment(km_kbp_option_item **test_env_opts);
-void DeleteCoreEnvironment(km_kbp_option_item *test_env_opts);
+BOOL SetupCoreEnvironment(km_core_option_item **test_env_opts);
+void DeleteCoreEnvironment(km_core_option_item *test_env_opts);
 
 #endif  // _KEYMANENGINE_H

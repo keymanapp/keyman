@@ -18,14 +18,14 @@ import android.widget.Toast;
 
 import com.stepstone.stepper.StepperLayout;
 import com.stepstone.stepper.VerificationError;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.KeyboardEventHandler;
-import com.tavultesoft.kmea.KmpInstallMode;
-import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.packages.PackageProcessor;
-import com.tavultesoft.kmea.packages.LexicalModelPackageProcessor;
-import com.tavultesoft.kmea.util.FileUtils;
-import com.tavultesoft.kmea.util.KMLog;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.KeyboardEventHandler;
+import com.keyman.engine.KmpInstallMode;
+import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.packages.PackageProcessor;
+import com.keyman.engine.packages.LexicalModelPackageProcessor;
+import com.keyman.engine.util.FileUtils;
+import com.keyman.engine.util.KMLog;
 
 import org.json.JSONObject;
 
@@ -117,7 +117,8 @@ public class PackageActivity extends AppCompatActivity implements
     // Sanity check for keyboard packages
     if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
       if (keyboardCount == 0) {
-        showErrorToast(getString(R.string.no_new_touch_keyboards_to_install));
+        showErrorDialog(context, pkgId, getString(R.string.no_new_touch_keyboards_to_install));
+        return;
       } else if (languageCount == 0) {
         showErrorToast(getString(R.string.no_associated_languages));
       }
@@ -179,6 +180,7 @@ public class PackageActivity extends AppCompatActivity implements
 
   @Override
   public void onBackPressed() {
+    super.onBackPressed();
     finish();
     overridePendingTransition(0, android.R.anim.fade_out);
   }
@@ -340,7 +342,11 @@ public class PackageActivity extends AppCompatActivity implements
           if (dialog != null) {
             dialog.dismiss();
           }
+          // Setting result to 1 so calling activity will finish too
+          setResult(1);
           cleanup();
+          finish();
+          MainActivity.cleanupPackageInstall();
         }
       });
 

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import os.log
 
 public class KeyboardKeymanPackage : TypedKeymanPackage<InstallableKeyboard> {
   internal var keyboards: [KMPKeyboard]!
@@ -22,7 +23,9 @@ public class KeyboardKeymanPackage : TypedKeymanPackage<InstallableKeyboard> {
         if(keyboard.isValid && FileManager.default.fileExists(atPath: self.sourceFolder.appendingPathComponent("\(keyboard.keyboardId).js").path)) {
           keyboards.append(keyboard)
         } else {
-          SentryManager.breadcrumbAndLog("\(keyboard.name) not valid / corresponding file not found")
+          let message = "\(keyboard.name) not valid / corresponding file not found"
+          os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
+          SentryManager.breadcrumb(message)
         }
       }
     }

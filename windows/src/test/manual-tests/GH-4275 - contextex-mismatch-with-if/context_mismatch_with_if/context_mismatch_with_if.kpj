@@ -52,13 +52,6 @@
       <FileType>.md</FileType>
     </File>
     <File>
-      <ID>id_1213256b2009e2b32ee7d551a63402c6</ID>
-      <Filename>context_mismatch_with_if.keyboard_info</Filename>
-      <Filepath>context_mismatch_with_if.keyboard_info</Filepath>
-      <FileVersion></FileVersion>
-      <FileType>.keyboard_info</FileType>
-    </File>
-    <File>
       <ID>id_ea1380e11b2491a95b183d9ea2bcd813</ID>
       <Filename>context_mismatch_with_if.kmx</Filename>
       <Filepath>source\..\build\context_mismatch_with_if.kmx</Filepath>

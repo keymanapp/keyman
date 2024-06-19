@@ -30,13 +30,13 @@ function debug_echo() {
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$(dirname "$THIS_SCRIPT")/trigger-definitions.inc.sh"
-. "$(dirname "$THIS_SCRIPT")/trigger-builds.inc.sh"
-. "$(dirname "$THIS_SCRIPT")/jq.inc.sh"
+. "${THIS_SCRIPT%/*}/trigger-definitions.inc.sh"
+. "${THIS_SCRIPT%/*}/trigger-builds.inc.sh"
+. "${THIS_SCRIPT%/*}/jq.inc.sh"
 
 #
 # Iterate through the platforms 'array' passed in and
@@ -49,15 +49,18 @@ function triggerTestBuilds() {
   local branch="$2"
   local force="${3:-false}"
 
+  # Cancel any already running builds for this branch
+  node "$THIS_SCRIPT_PATH/ci/cancel-builds/cancel-test-builds.mjs" "$branch" "$TEAMCITY_TOKEN"
+
   for platform in "${platforms[@]}"; do
     echo "# $platform: checking for changes"
     eval test_builds='(${'bc_test_$platform'[@]})'
     for test_build in "${test_builds[@]}"; do
       if [[ $test_build == "" ]]; then continue; fi
-      if [ "${test_build:(-8)}" == "_Jenkins" ]; then
-        local job=${test_build%_Jenkins}
-        echo "  -- Triggering build configuration $job/$branch on Jenkins"
-        triggerJenkinsBuild "$job" "$branch" "$force"
+      if [ "${test_build:(-7)}" == "_GitHub" ]; then
+        local job=${test_build%_GitHub}
+        echo "  -- Triggering GitHub action build $job/$branch"
+        triggerGitHubActionsBuild true "$job" "$branch"
       else
         echo "  -- Triggering build configuration $test_build on teamcity"
         triggerTeamCityBuild true "$test_build" "$vcs_test" "$branch"
@@ -86,7 +89,7 @@ fi
 #
 
 echo ". Get information about pull request #$PRNUM from GitHub"
-prinfo=`curl -s -H "User-Agent: @keymanapp" https://api.github.com/repos/keymanapp/keyman/pulls/$PRNUM`
+prinfo=`curl -s -H "User-Agent: @keymanapp" -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/repos/keymanapp/keyman/pulls/$PRNUM`
 prbase=`echo ${prinfo} | "$JQ" -r '.base.ref'`
 prhead=`echo ${prinfo} | "$JQ" -r '.head.ref'`
 prbaserepo=`echo ${prinfo} | "$JQ" -r '.base.repo.html_url'`
@@ -172,11 +175,21 @@ while IFS= read -r line; do
 done <<< "$prfiles"
 
 debug_echo "Build platforms: ${build_platforms[*]}"
-#
-# Start the test builds
-#
 
-echo ". Start test builds"
-triggerTestBuilds "`echo ${build_platforms[@]}`" "$PRNUM"
+if (( ${#build_platforms[@]} > 0)); then
+  #
+  # Start the test builds
+  #
+  echo ". Start test builds"
+  triggerTestBuilds "`echo ${build_platforms[@]}`" "$PRNUM"
+else
+  echo ". No builds to start"
+  curl --silent --write-out '\n' \
+    --request POST \
+    --header "Accept: application/vnd.github+json" \
+    --header "Authorization: token $GITHUB_TOKEN" \
+    --data '{"state":"success","description":"Skipping since no platform builds necessary","context":"Test Build (Keyman)"}' \
+    "https://api.github.com/repos/keymanapp/keyman/statuses/${BUILD_VCS_NUMBER}"
+fi
 
 exit 0

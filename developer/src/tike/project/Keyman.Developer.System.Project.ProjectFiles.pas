@@ -1,18 +1,18 @@
 (*
   Name:             Keyman.Developer.System.Project.ProjectFiles
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    4 May 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Initial version
                     04 Dec 2006 - mcdurdin - Test if file is open - WindowOpen
                     16 Jan 2009 - mcdurdin - I1769 - Add support for HTM, HTLM, XML to open for edit in Keyman Developer
@@ -29,8 +29,6 @@ uses
   Keyman.Developer.System.Project.ProjectFile;
 
 type
-  TProjectFileActionCompileSuccessEvent = procedure(Sender: TObject; const SourceFilename, DestFilename: string) of object;
-
   TShellProjectFile = class(TProjectFile)
   protected
     function GetRelativeOrder: Integer; override;
@@ -38,12 +36,8 @@ type
   end;
 
   TOpenableProjectFile = class(TShellProjectFile)
-  private
-    class var FOnCompileSuccess: TProjectFileActionCompileSuccessEvent;
   protected
     function GetRelativeOrder: Integer; override;
-  public
-    class property OnCompileSuccess: TProjectFileActionCompileSuccessEvent read FOnCompileSuccess write FOnCompileSuccess;
   end;
 
 implementation
@@ -71,11 +65,14 @@ initialization
   RegisterProjectFileType('.ico', TOpenableProjectFile);
   RegisterProjectFileType('.txt', TOpenableProjectFile);
   RegisterProjectFileType('.md', TOpenableProjectFile);
-  RegisterProjectFileType('.keyboard_info', TOpenableProjectFile);
   RegisterProjectFileType('.model_info', TOpenableProjectFile);
   RegisterProjectFileType('.htm', TOpenableProjectFile);   // I1769
   RegisterProjectFileType('.html', TOpenableProjectFile);  // I1769
   RegisterProjectFileType('.xml', TOpenableProjectFile);   // I1769
   RegisterProjectFileType('.js', TOpenableProjectFile);
+  RegisterProjectFileType('.kpj', TOpenableProjectFile);
+  RegisterProjectFileType('.user', TOpenableProjectFile);
+  RegisterProjectFileType('.keyman-touch-layout', TOpenableProjectFile);
+  RegisterProjectFileType('.keyboard_info', TOpenableProjectFile);
 end.
 

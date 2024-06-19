@@ -90,7 +90,6 @@ type
     cbEditorTheme: TComboBox;
     lblEditorCustomTheme: TLabel;
     lblEditorTheme: TLabel;
-    chkAllowMultipleInstances: TCheckBox;
     gbDefaultProjectPath: TGroupBox;
     editDefaultProjectPath: TEdit;
     cmdBrowseDefaultProjectPath: TButton;
@@ -105,6 +104,7 @@ type
     gbServer: TGroupBox;
     chkListLocalURLs: TCheckBox;
     cmdConfigureServer: TButton;
+    chkPromptToUpgradeProjects: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure cmdOKClick(Sender: TObject);
     procedure cmdDefaultFontClick(Sender: TObject);
@@ -193,11 +193,10 @@ begin
     chkDebuggerAutoResetBeforeCompiling.Checked := DebuggerAutoResetBeforeCompiling;
     chkAutoSaveBeforeCompiling.Checked :=          AutoSaveBeforeCompiling;
     chkOSKAutoSaveBeforeImporting.Checked :=       OSKAutoSaveBeforeImporting;
+    chkPromptToUpgradeProjects.Checked :=          PromptToUpgradeProjects;
 
     chkCharMapAutoLookup.Checked := CharMapAutoLookup;
     chkCharMapDisableDatabaseLookups.Checked := CharMapDisableDatabaseLookups;
-
-    chkAllowMultipleInstances.Checked := AllowMultipleInstances;
 
     chkOpenKeyboardFilesInSourceView.Checked := OpenKeyboardFilesInSourceView;   // I4751
 
@@ -294,13 +293,12 @@ begin
     DebuggerAutoResetBeforeCompiling := chkDebuggerAutoResetBeforeCompiling.Checked;
     AutoSaveBeforeCompiling          := chkAutoSaveBeforeCompiling.Checked;
     OSKAutoSaveBeforeImporting       := chkOSKAutoSaveBeforeImporting.Checked;
+    PromptToUpgradeProjects          := chkPromptToUpgradeProjects.Checked;
 
     ServerUseLocalAddresses := chkListLocalURLs.Checked;
 
     CharMapAutoLookup := chkCharMapAutoLookup.Checked;
     CharMapDisableDatabaseLookups := chkCharMapDisableDatabaseLookups.Checked;
-
-    AllowMultipleInstances := chkAllowMultipleInstances.Checked;
 
     OpenKeyboardFilesInSourceView := chkOpenKeyboardFilesInSourceView.Checked;   // I4751
 

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Note that the corresponding .kmx is currently
+  hand-crafted
+
+@@keys: [K_BKQUOTE][K_1][K_BKQUOTE]
+@@expected: \u0127\u1790\u17B6\u0127
+
+-->
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info author="srl295" indicator="🙀" layout="qwerty"  name="TestKbd"/>
+
+  <keys>
+    <key id="hmaqtugha" output="ħ" />
+    <key id="that" output="ថា" />
+  </keys>
+
+  <layers formId="us">
+    <layer id="base">
+      <row keys="hmaqtugha that" /> <!-- number row -->
+    </layer>
+  </layers>
+</keyboard3>

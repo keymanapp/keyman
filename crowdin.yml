@@ -59,6 +59,7 @@ files:
       locale:
         de: de
         fr: fr
+        kn: kn
 
   - source: /windows/src/desktop/setup/locale/en/strings.xml
     dest: /windows/setup/strings.xml
@@ -68,6 +69,7 @@ files:
       locale:
         de: de
         fr: fr
+        kn: kn
 
   # iOS files
 

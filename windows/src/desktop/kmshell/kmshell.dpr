@@ -107,7 +107,6 @@ uses
   utilolepicture in '..\..\engine\kmcomapi\util\utilolepicture.pas',
   kmxfile in '..\..\..\..\common\windows\delphi\keyboards\kmxfile.pas',
   utilfiletypes in '..\..\..\..\common\windows\delphi\general\utilfiletypes.pas',
-  CRC32 in '..\..\..\..\common\windows\delphi\general\CRC32.pas',
   input_installlayoutortip in '..\..\global\delphi\winapi\input_installlayoutortip.pas',
   KPInstallPackageStartMenu in '..\..\global\delphi\general\KPInstallPackageStartMenu.pas',
   kmpinffile in '..\..\..\..\common\windows\delphi\packages\kmpinffile.pas',
@@ -177,7 +176,8 @@ uses
   TaskScheduler_TLB in '..\..\global\delphi\winapi\TaskScheduler_TLB.pas',
   Keyman.Configuration.System.HttpServer.App.TextEditorFonts in 'startup\help\Keyman.Configuration.System.HttpServer.App.TextEditorFonts.pas',
   Keyman.Configuration.System.HttpServer.App.Locale in 'web\Keyman.Configuration.System.HttpServer.App.Locale.pas',
-  Keyman.System.AndroidStringToKeymanLocaleString in '..\..\..\..\common\windows\delphi\general\Keyman.System.AndroidStringToKeymanLocaleString.pas';
+  Keyman.System.AndroidStringToKeymanLocaleString in '..\..\..\..\common\windows\delphi\general\Keyman.System.AndroidStringToKeymanLocaleString.pas',
+  Keyman.Configuration.System.Main in 'main\Keyman.Configuration.System.Main.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}
@@ -186,33 +186,7 @@ uses
 // If you don't add this flag the rederer process will crash when you try to load large images.
 {$SetPEFlags IMAGE_FILE_LARGE_ADDRESS_AWARE}
 
-const
-  LOGGER_DESKTOP_KMSHELL = TKeymanSentryClient.LOGGER_DESKTOP + '.kmshell';
 begin
-  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop, LOGGER_DESKTOP_KMSHELL);
-  try
-    CoInitFlags := COINIT_APARTMENTTHREADED;
-    FInitializeCEF := TCEFManager.Create;
-    try
-      if FInitializeCEF.Start then
-      try
-        Application.Initialize;
-        Application.Title := 'Keyman Configuration';
-        Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-        try
-          Run;
-        finally
-          FreeAndNil(modWebHttpServer);
-        end;
-      except
-        on E:Exception do
-          SentryHandleException(E);
-      end;
-    finally
-      FInitializeCEF.Free;
-    end;
-  finally
-    TKeymanSentryClient.Stop;
-  end;
+  RunKeymanConfiguration;
 end.
 

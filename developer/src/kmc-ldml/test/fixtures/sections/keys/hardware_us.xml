@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="hardware-minimal"/>
+
+  <keys>
+    <import base="cldr" path="45/keys-Zyyy-punctuation.xml"/>
+  </keys>
+
+  <layers formId="us">
+    <layer id="base" modifiers="none">
+      <row keys="grave 1 2 3 4 5 6 7 8 9 0 hyphen equal" />
+      <row keys="q w e r t y u i o p open-square close-square backslash" />
+      <row keys="a s d f g h j k l semi-colon apos" />
+      <row keys="z x c v b n m comma period slash" />
+      <row keys="space" />
+    </layer>
+  </layers>
+</keyboard3>
