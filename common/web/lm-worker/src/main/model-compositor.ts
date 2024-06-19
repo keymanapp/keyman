@@ -245,14 +245,13 @@ export default class ModelCompositor {
       const SEARCH_TIMEOUT = this.testMode ? 0 : correction.SearchSpace.DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL;
       for await(let match of searchSpace.getBestMatches(SEARCH_TIMEOUT)) {
         // Corrections obtained:  now to predict from them!
-        let correction = match.matchString;
-        correctionPredictionMap[match.matchString]
+        const correction = match.matchString;
 
         // Worth considering:  extend Traversal to allow direct prediction lookups?
         // let traversal = match.finalTraversal;
 
         // Replace the existing context with the correction.
-        let correctionTransform: Transform = {
+        const correctionTransform: Transform = {
           insert: correction,  // insert correction string
           deleteLeft: deleteLeft,
           id: inputTransform.id // The correction should always be based on the most recent external transform/transcription ID.
