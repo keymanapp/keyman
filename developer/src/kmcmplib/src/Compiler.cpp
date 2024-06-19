@@ -134,7 +134,7 @@ namespace kmcmp{
 
 int xatoi(PKMX_WCHAR *p);
 int atoiW(PKMX_WCHAR p);
-bool isuiw(PKMX_WCHAR p);
+bool isIntegerWstring(PKMX_WCHAR p);
 void safe_wcsncpy(PKMX_WCHAR out, PKMX_WCHAR in, int cbMax);
 int GetDeadKey(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 
@@ -2015,7 +2015,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
           kmcmp::CheckStoreUsage(fk, i, TRUE, FALSE, FALSE);
 
           r = u16tok(NULL, p_sep_com, &context);  // I3481
-          if (!r || !*r || !isuiw(r)) return CERR_InvalidIndex;
+          if (!r || !*r || !isIntegerWstring(r)) return CERR_InvalidIndex;
         }
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_INDEX;
@@ -3363,7 +3363,7 @@ int atoiW(PKMX_WCHAR p)
   return i;
 }
 
-bool isuiw(PKMX_WCHAR p) {
+bool isIntegerWstring(PKMX_WCHAR p) {
   if (!p || !*p)
     return false;
   PKMX_STR q = wstrtostr(p);
