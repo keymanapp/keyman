@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-#include <climits>
 #include "../include/kmcompx.h"
 #include "../include/kmcmplibapi.h"
 #include "../src/kmx_u16.h"
