@@ -3367,12 +3367,15 @@ bool isuiw(PKMX_WCHAR p) {
   if (!p || !*p)
     return false;
   PKMX_STR q = wstrtostr(p);
-  while(*q) {
-    if (!isdigit(*q))
-      return false;
-    q++;
+  bool flag = true;
+  for (int i=0; q[i]; i++) {
+    if (!isdigit(q[i])) {
+      flag = false;
+      break;
+    }
   }
-  return true;
+  delete[] q;
+  return flag;
 }
 
 KMX_DWORD kmcmp::CheckUTF16(int n)
