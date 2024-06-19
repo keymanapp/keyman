@@ -425,11 +425,12 @@ final class KMKeyboard extends WebView {
 
   public void onResume() {
     DisplayMetrics dms = context.getResources().getDisplayMetrics();
-    int kbWidth = (int) (dms.widthPixels / dms.density);
-    // Ensure window is loaded for javascript functions
-    loadJavascript(KMString.format(
-      "window.onload = function(){ setOskWidth(\"%d\");"+
-      "setOskHeight(\"0\"); };", kbWidth));
+    // Keyboard width = device width.
+    int kbWidth = (int) dms.widthPixels;
+    int bannerHeight = KMManager.getBannerHeight(context);
+    int oskHeight = KMManager.getKeyboardHeight(context);
+
+    this.setDimensions(kbWidth, bannerHeight, oskHeight);
     if (this.getShouldShowHelpBubble()) {
       this.showHelpBubbleAfterDelay(2000);
     }
@@ -463,6 +464,7 @@ final class KMKeyboard extends WebView {
   @Override
   public void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
     super.onSizeChanged(width, height, oldWidth, oldHeight);
+
     int bannerHeight = KMManager.getBannerHeight(context);
     int oskHeight = KMManager.getKeyboardHeight(context);
 
@@ -471,14 +473,21 @@ final class KMKeyboard extends WebView {
       KMLog.LogInfo(TAG, "Height mismatch: onSizeChanged = " + height + ", our version = " + (bannerHeight + oskHeight));
     }
 
-    if (this.htmlBannerString != null && !this.htmlBannerString.isEmpty()) {
-      setHTMLBanner(this.htmlBannerString);
-    }
+    this.setDimensions(width, bannerHeight, oskHeight);
+  }
 
-    loadJavascript(KMString.format("setBannerHeight(%d)", bannerHeight));
-    loadJavascript(KMString.format("setOskWidth(%d)", width));
-    // Must be last - it's the one that triggers a Web-engine layout refresh.
-    loadJavascript(KMString.format("setOskHeight(%d)", oskHeight));
+  /**
+   * Sets the dimensions of the WebView-hosted keyboard.
+   * @param width   The keyboard's width
+   * @param height  The keyboard's height.
+   */
+  public void setDimensions(int width, int bannerHeight, int oskHeight) {
+    loadJavascript(KMString.format(
+      "setDimensions({bannerHeight: %d, keyboardWidth: %d, keyboardHeight: %d})",
+      bannerHeight,
+      width,
+      oskHeight
+    ));
   }
 
   public void dismissSuggestionMenuWindow() {

@@ -1638,7 +1638,7 @@ public final class KMManager {
 
   public static boolean isDefaultKey(String key) {
     return (
-      key != null && 
+      key != null &&
       key.equals(KMString.format("%s_%s", KMDefault_LanguageID, KMDefault_KeyboardID)));
   }
 
@@ -2058,12 +2058,10 @@ public final class KMManager {
 
   public static void applyKeyboardHeight(Context context, int height) {
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
-      InAppKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height));
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       InAppKeyboard.setLayoutParams(params);
     }
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
-      SystemKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height));
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
     }
@@ -2084,11 +2082,11 @@ public final class KMManager {
       wm.getDefaultDisplay().getSize(size);
       return size;
     }
-    
+
     WindowMetrics windowMetrics = wm.getCurrentWindowMetrics();
     return new Point(
       windowMetrics.getBounds().width(),
-      windowMetrics.getBounds().height());    
+      windowMetrics.getBounds().height());
   }
 
   public static float getWindowDensity(Context context) {
