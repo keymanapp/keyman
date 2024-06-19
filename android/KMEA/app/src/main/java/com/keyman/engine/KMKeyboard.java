@@ -313,6 +313,7 @@ final class KMKeyboard extends WebView {
       public void onLongPress(MotionEvent event) {
          if (KMManager.getGlobeKeyState() == KMManager.GlobeKeyState.GLOBE_KEY_STATE_DOWN) {
           KMManager.setGlobeKeyState(KMManager.GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS);
+          loadJavascript("clearGlobeHighlight()");
           KMManager.handleGlobeKeyAction(context, true, keyboardType);
           return;
         /* For future implementation
