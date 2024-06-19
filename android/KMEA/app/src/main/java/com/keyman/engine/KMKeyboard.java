@@ -313,7 +313,12 @@ final class KMKeyboard extends WebView {
       public void onLongPress(MotionEvent event) {
          if (KMManager.getGlobeKeyState() == KMManager.GlobeKeyState.GLOBE_KEY_STATE_DOWN) {
           KMManager.setGlobeKeyState(KMManager.GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS);
+
+          // When we activate the keyboard picker, this will disrupt the JS-side's control
+          // flow for gesture-handling; we should pre-emptively clear the globe key,
+          // as Web will not receive a "globe key up" event.
           loadJavascript("clearGlobeHighlight()");
+
           KMManager.handleGlobeKeyAction(context, true, keyboardType);
           return;
         /* For future implementation
