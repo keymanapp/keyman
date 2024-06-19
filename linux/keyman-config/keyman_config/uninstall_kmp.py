@@ -13,7 +13,7 @@ from keyman_config.get_kmp import (InstallLocation, get_keyboard_dir,
                                    get_keyman_doc_dir, get_keyman_font_dir)
 from keyman_config.gnome_keyboards_util import (GnomeKeyboardsUtil,
                                                 get_ibus_keyboard_id,
-                                                is_gnome_shell)
+                                                is_gnome_desktop)
 from keyman_config.gsettings import GSettings
 from keyman_config.ibus_util import IbusUtil, get_ibus_bus, restart_ibus
 from keyman_config.kmpmetadata import get_metadata
@@ -56,7 +56,7 @@ def _uninstall_kmp_common(location, packageID, removeLanguages):
         if keyboards:
             if is_fcitx_running():
                 _uninstall_keyboards_from_fcitx5()
-            elif is_gnome_shell():
+            elif is_gnome_desktop():
                 _uninstall_keyboards_from_gnome(keyboards, kbdir)
             else:
                 _uninstall_keyboards_from_ibus(keyboards, kbdir)

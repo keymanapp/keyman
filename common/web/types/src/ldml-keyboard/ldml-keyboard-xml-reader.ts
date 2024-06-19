@@ -1,4 +1,4 @@
-import * as xml2js from 'xml2js';
+import * as xml2js from '../deps/xml2js/xml2js.js';
 import { LDMLKeyboardXMLSourceFile, LKImport, ImportStatus } from './ldml-keyboard-xml.js';
 import { boxXmlArray } from '../util/util.js';
 import { CompilerCallbacks } from '../util/compiler-interfaces.js';

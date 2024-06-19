@@ -273,6 +273,7 @@ public final class ModelPickerActivity extends BaseActivity {
 
   @Override
   public void onBackPressed() {
+    super.onBackPressed();
     finish();
   }
 

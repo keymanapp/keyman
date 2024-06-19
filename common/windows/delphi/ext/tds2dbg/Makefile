@@ -1,19 +1,6 @@
-
-!include ..\..\Defines.mak
-
-build:
-    -mkdir $(WIN32_TARGET_PATH)
-    $(COPY) tds2dbg.bin $(WIN32_TARGET_PATH)\tds2dbg.exe
-    $(MAKE) install
-
-install:
-    -mkdir $(KEYMAN_ROOT)\common\windows\bin\tools
-    $(COPY) $(WIN32_TARGET_PATH)\tds2dbg.exe $(KEYMAN_ROOT)\common\windows\bin\tools
-
-#
-# The following builds require Borland C++ compiler to be installed and in the path; see Readme.txt for details.
-# So, the tds2dbg.bin is kept in the repo in order to make builds simpler
-#
+info:
+  echo The following builds require Borland C++ compiler to be installed and in the path; see Readme.txt for details.
+  echo So, the tds2dbg.bin is kept in the repo in order to make builds simpler
 
 BCC55DIR=c:\borland\bcc55
 
@@ -33,5 +20,3 @@ clean:
 
 doc:
   doxygen tds2dbg.dcf
-
-!include ..\..\Target.mak

@@ -19,8 +19,6 @@ export class Device {
   version: string;  // As in, device version; only really persisted for Android.
                     // No real sign of actual use, though.
 
-  private detected: boolean = false;
-
   // Generates a default Device value.
   constructor() {
     this.touchable = !!('ontouchstart' in window);
@@ -194,7 +192,6 @@ export class Device {
     }
 
     this.colorScheme = StyleConstants.prefersDarkMode() ? 'dark' : 'light';
-    this.detected = true;
 
     return this.coreSpec;
   }

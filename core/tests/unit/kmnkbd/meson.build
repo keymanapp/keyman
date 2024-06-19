@@ -34,11 +34,11 @@ test_path = join_paths(meson.current_build_dir(), '..', 'kmx')
 tests_flags = []
 
 if cpp_compiler.get_id() == 'emscripten'
-  tests_flags += ['-lnodefs.js', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
+  tests_flags += ['-lnodefs.js', wasm_exported_runtime_methods]
 endif
 
 foreach t : tests
-  bin = executable(t[0], [t[1], '../emscripten_filesystem.cpp'],
+  bin = executable(t[0], [t[1], common_test_files],
     cpp_args: local_defns + defns + warns,
     include_directories: [inc, libsrc],
     link_args: links + tests_flags,

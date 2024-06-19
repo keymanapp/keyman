@@ -3,8 +3,7 @@
    Copyright 2019-2023 SIL International
 ***/
 
-import type { KeymanEngine, KeyboardCookie, UIModule } from 'keyman/app/browser';
-import type { FloatingOSKViewCookie } from 'keyman/engine/osk';
+import type { KeymanEngine, UIModule } from 'keyman/app/browser';
 
 declare var keyman: KeymanEngine
 
@@ -32,8 +31,6 @@ if(!keyman?.ui?.name) {
     // Declare KeymanWeb, OnScreen keyboard and Util objects
     const keymanweb = keyman;
     const util=keymanweb.util;
-
-    var dbg=keymanweb['debug'];
 
     // Disable UI for touch devices
     if(util.isTouchDevice()) {
@@ -445,7 +442,7 @@ if(!keyman?.ui?.name) {
        * @param       {Object}    e       event
        * Description  Change active keyboard in response to user selection event
        */
-      readonly SelectKeyboardChange = (e) => {
+      readonly SelectKeyboardChange = (e: Event) => {
         keymanweb.activatingUI(true);
 
         if(this.KeyboardSelector.value != '-') {
@@ -468,7 +465,7 @@ if(!keyman?.ui?.name) {
        * @param       {Object}    e       event
        * Description  Ensure OSK is hidden when moving focus after reselecting a keyboard
        */
-      readonly SelectBlur = (e) => {
+      readonly SelectBlur = (e: Event) => {
         if(!this.selecting) {
           keymanweb.focusLastActiveElement();
         }
@@ -545,7 +542,7 @@ if(!keyman?.ui?.name) {
        * @return      {boolean}
        * Description  Display KMW OSK at specified position (returns nothing)
        */
-      readonly _Resize = (e) => {
+      readonly _Resize = (e: Event) => {
         if(this.outerDiv.style.display =='block') {
           var elem = keymanweb.getLastActiveElement();
           if(this.floatRight) {  // I1296

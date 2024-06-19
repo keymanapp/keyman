@@ -51,6 +51,7 @@ export default class OSKLayerGroup {
     ls.width = '100%';
     ls.height = '100%';
 
+    // Trigger construction of the default layer.
     this.activeLayerId = 'default';
   }
 
@@ -298,6 +299,11 @@ export default class OSKLayerGroup {
   }
 
   public refreshLayout(layoutParams: LayerLayoutParams) {
+    if(isNaN(layoutParams.keyboardWidth) || isNaN(layoutParams.keyboardHeight)) {
+      // We're not in the DOM yet; we'll refresh properly once that changes.
+      // Can be reached if the layerId is changed before the keyboard enters the DOM.
+      return;
+    }
     // Set layer-group copies of relevant computed-size values; they are used by nearest-key
     // detection.
     this.computedWidth = layoutParams.keyboardWidth;

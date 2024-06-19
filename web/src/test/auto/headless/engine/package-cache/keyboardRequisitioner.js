@@ -30,7 +30,8 @@ const resolvedResourcePackage = path.dirname(resolvedResourcePackageAnchor);
 const pathConfig = new PathConfiguration({
   root: '',
   resources: '',
-  keyboards: `file:///${resolvedResourcePackage}/../`, // the one part NEEDED for unit tests below.
+  // Keyboard paths in fixtures are relative to the repository root.
+  keyboards: `file:///${resolvedResourcePackage}/../../..`, // the one part NEEDED for unit tests below.
   fonts: '',
 }, `file:///${path.dirname(require.resolve('keyman/engine/package-cache'))}`);
 
@@ -66,7 +67,7 @@ function mockedSetup(queryResultsFile) {
        *  <repo root>/common/test/resources/../resources/keyboards/khmer_angkor.js
        * - the latter part is from values within khmer_angkor.hand-edited.js.fixture.
        */
-      x.options.keyboardBaseUri = `file:///${resolvedResourcePackage}/../${x.options.keyboardBaseUri}`;
+      x.options.keyboardBaseUri = `file:///${resolvedResourcePackage}/../../../${x.options.keyboardBaseUri}`;
 
       keyboardRequisitioner.cloudQueryEngine.registerFromCloud(x);
     }
@@ -326,6 +327,9 @@ describe("KeyboardRequisitioner", () => {
     const cache = keyboardRequisitioner.cache;
 
     const stubJSON = JSON.parse(fs.readFileSync(require.resolve(`${rootCommonStubPath}/khmer_angkor.json`)));
+    // Tests in other engines do a bit of aliasing here for easier reading.
+    // We have to introduce it manually for this test, though.
+    stubJSON.filename = "common/test/" + stubJSON.filename;
     // The `pathConfig` setup + internal logic should ensure that the filepath points to the correct location
     // with no additional effort required here.
     const [stub] = await keyboardRequisitioner.addKeyboardArray([stubJSON]);

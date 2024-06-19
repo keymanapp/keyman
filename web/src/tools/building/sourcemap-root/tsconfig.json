@@ -4,6 +4,9 @@
     "outDir": "../../../../build/tools/building/sourcemap-root",
     "tsBuildInfoFile": "../../../../build/tools/building/sourcemap-root/tsconfig.tsbuildinfo",
     "baseUrl": "./",
-    "rootDir": "./"
+    "rootDir": "./",
+
+    // override for now, see #11716
+    "allowJs": false
   }
 }

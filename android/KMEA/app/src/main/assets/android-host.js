@@ -12,6 +12,7 @@ var bannerHeight = 0;
 var bannerImagePath = '';
 var bannerHTMLContents = '';
 var fragmentToggle = 0;
+var deferredBannerCall;
 
 var sentryManager = new KeymanSentryManager({
   hostPlatform: "android"
@@ -36,7 +37,11 @@ function init() {
   keyman.beepKeyboard = beepKeyboard;
 
   // Readies the keyboard stub for instant loading during the init process.
-  KeymanWeb.registerStub(JSON.parse(jsInterface.initialKeyboard()));
+  try {
+    KeymanWeb.registerStub(JSON.parse(jsInterface.initialKeyboard()));
+  } catch(error) {
+    console.error(error);
+  }
 
   keyman.init({
     'embeddingApp':device,
@@ -49,6 +54,12 @@ function init() {
 
       // The OSK is not available until initialization is complete.
       keyman.osk.bannerView.activeBannerHeight = bannerHeight;
+
+      if(deferredBannerCall) {
+        deferredBannerCall();
+        deferredBannerCall = null;
+      }
+
       keyman.refreshOskLayout();
     }
   });
@@ -63,10 +74,19 @@ function init() {
 }
 
 function showBanner(flag) {
+  if(!keyman.osk) {
+    deferredBannerCall = function() {
+      showBanner(flag);
+    }
+
+    return;
+  }
+
+  var bc = keyman.osk.bannerController;
+
   console_debug("Setting banner display for dictionaryless keyboards to " + flag);
   console_debug("bannerHTMLContents: " + bannerHTMLContents);
-  var bc = keyman.osk.bannerController;
-  if (bc) {
+  if(bc) {
     if (bannerHTMLContents != '') {
       bc.inactiveBanner = flag ? new bc.HTMLBanner(bannerHTMLContents) : null;
     } else {
@@ -125,7 +145,7 @@ function setOskHeight(h) {
 
 function setOskWidth(w) {
   if(w > 0) {
-    oskWidth = w;
+    oskWidth = w / window.devicePixelRatio;
   }
 }
 
@@ -172,7 +192,8 @@ function setKeymanLanguage(k) {
 }
 
 function setSpacebarText(mode) {
-  keyman.config.spacebarText = mode;
+  var text = (mode == undefined) || !mode.text ? '' : mode.text;
+  keyman.config.spacebarText = text;
 }
 
 // #6665: we need to know when the user has pressed a hardware key so we don't
@@ -230,10 +251,8 @@ function setNumericLayer() {
   }
 }
 
-function updateKMText(text) {
-  if(text == undefined) {
-      text = '';
-  }
+function updateKMText(k) {
+  var text = (k == undefined) || !k.text ? '' : k.text;
 
   console_debug('updateKMText(text=' + text + ') with: \n' + build_context_string(keyman.context));
 

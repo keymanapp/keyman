@@ -104,7 +104,9 @@ export default class KeyEvent implements KeyEventSpec {
 
   public constructor(keyEventSpec: KeyEventSpec) {
     for(let key in keyEventSpec) {
+      // @ts-ignore
       if(keyEventSpec[key] !== undefined) {
+        // @ts-ignore
         this[key] = keyEventSpec[key];
       }
     }
@@ -146,7 +148,8 @@ export default class KeyEvent implements KeyEventSpec {
       // We need to determine the mnemonic base character - for example, SHIFT + K_PERIOD needs to map to '>'.
       let mappingEvent: KeyEvent = new KeyEvent(this);
       for(let key in (this as KeyEvent)) {
-        mappingEvent[key] = this[key];
+        // @ts-ignore
+        mappingEvent[key as keyof KeyEvent] = this[key];
       }
 
       // To facilitate storing relevant commands, we should probably reverse-lookup

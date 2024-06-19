@@ -1,7 +1,7 @@
 project('ibus-keyman', 'c', 'cpp',
         version: run_command('cat', '../../VERSION.md', check: true).stdout().strip(),
         license: 'GPL-2+',
-        meson_version: '>=0.53.0')
+        meson_version: '>=1.0')
 cc = meson.get_compiler('c')
 conf = configuration_data()
 

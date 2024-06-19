@@ -15,9 +15,8 @@
 #import "WindowsVKCodes.h"
 #import "MacVKCodes.h"
 #import "CoreWrapper.h"
+#import "KMELogs.h"
 @import Carbon;
-
-//DWORD VKMap[0x80];
 
 @interface KMEngine ()
 @property (readonly) CoreHelper *coreHelper;
@@ -31,28 +30,27 @@ const NSString* kEasterEggText = @"Sentrycrash#KME";
 const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 
 - (id)initWithKMX:(KMXFile *)kmx context:(NSString *)contextString verboseLogging:(BOOL)enableDebugLogging {
-    self = [super init];
-    if (self) {
-        self.debugMode = enableDebugLogging;
-        _kmx = kmx;
-        _coreHelper = [[CoreHelper alloc] initWithDebugMode:enableDebugLogging];
-
-      if (kmx) {
-        [self loadCoreWrapperFromKmxFile:self.kmx.filePath];
-        [self.coreWrapper setContextIfNeeded:contextString];
-      }
+  self = [super init];
+  if (self) {
+    self.debugMode = enableDebugLogging;
+    _kmx = kmx;
+    _coreHelper = [[CoreHelper alloc] initWithDebugMode:enableDebugLogging];
+    
+    if (kmx) {
+      [self loadCoreWrapperFromKmxFile:self.kmx.filePath];
+      [self.coreWrapper setContextIfNeeded:contextString];
     }
-
-    return self;
+  }
+  
+  return self;
 }
 
 -(void)loadCoreWrapperFromKmxFile:(NSString *)kmxFilePath {
   @try {
     _coreWrapper = [[CoreWrapper alloc] initWithHelper:_coreHelper kmxFilePath:kmxFilePath];
-    [self.coreHelper logDebugMessage:@"loadCoreWrapperFromKmxFile, keyboardId = %@", [self.coreWrapper keyboardId]];
   }
   @catch (NSException *exception) {
-    NSLog(@"loadCoreWrapperFromKmxFile, failed to create keyboard for path '%@' with exception: %@", kmxFilePath, exception.description);
+    os_log_error([KMELogs coreLog], "loadCoreWrapperFromKmxFile, failed to create keyboard for path '%{public}@' with exception: %{public}@", kmxFilePath, exception.description);
   }
 }
 
@@ -66,27 +64,28 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 }
 
 - (void)setUseVerboseLogging:(BOOL)useVerboseLogging {
-    self.debugMode = useVerboseLogging;
-
-    if (self.coreHelper) {
-        self.coreHelper.debugMode = useVerboseLogging;
-    }
-
-    if (useVerboseLogging) {
-        NSLog(@"KMEngine - Turning verbose logging on");
-        // In Keyman Engine if "debugMode" is turned on (explicitly) with "English plus Spanish" as the current keyboard and you type "Sentrycrash#KME",
-        // it will force a simulated crash to test reporting to sentry.keyman.com.
-        NSString * kmxName = [[_kmx filePath] lastPathComponent];
-        NSLog(@"Sentry - KME: _kmx name = %@", kmxName);
-        if ([kEasterEggKmxName isEqualToString:kmxName]) {
-            NSLog(@"Sentry - KME: Preparing to detect Easter egg.");
-            _easterEggForSentry = [[NSMutableString alloc] init];
-        }
-        else
-            _easterEggForSentry = nil;
+  self.debugMode = useVerboseLogging;
+  
+  if (self.coreHelper) {
+    self.coreHelper.debugMode = useVerboseLogging;
+  }
+  
+  if (useVerboseLogging) {
+    os_log_debug([KMELogs testLog], "KMEngine - Turning verbose logging on");
+    // In Keyman Engine if "debugMode" is turned on (explicitly) with "English plus Spanish" as the current keyboard and you type "Sentrycrash#KME",
+    // it will force a simulated crash to test reporting to sentry.keyman.com.
+    NSString * kmxName = [[_kmx filePath] lastPathComponent];
+    os_log_debug([KMELogs testLog], "Sentry - KME: _kmx name = %{public}@", kmxName);
+    if ([kEasterEggKmxName isEqualToString:kmxName]) {
+      os_log_debug([KMELogs testLog], "Sentry - KME: Preparing to detect Easter egg.");
+      _easterEggForSentry = [[NSMutableString alloc] init];
     }
     else
-        NSLog(@"KMEngine - Turning verbose logging off");
+      _easterEggForSentry = nil;
+  }
+  else {
+    os_log_debug([KMELogs testLog], "KMEngine - Turning verbose logging off");
+  }
 }
 
 - (NSString *)getCoreContextDebug {
@@ -103,7 +102,7 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
 
 - (void)setCoreOptions:(NSString *)key withValue:(NSString *)value {
   BOOL success = [self.coreWrapper setOptionsForCore:key value:value];
-  [self.coreHelper logDebugMessage:@"setCoreOptions for key: %@, value: %@ succeeded = %@", key, value, success ? @"YES" : @"NO"];
+  os_log_debug([KMELogs coreLog], "setCoreOptions for key: %{public}@, value: %{public}@ succeeded = %{public}@", key, value, success ? @"YES" : @"NO");
 }
 
 /*
@@ -111,82 +110,80 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
  */
 - (CoreKeyOutput *)processEvent:(NSEvent *)event {
   if (!self.kmx)
-      return nil;
-
+    return nil;
+  
   return [self.coreWrapper processEvent:event];
 }
 
 - (void) processPossibleEasterEggCharacterFrom:(NSString *)characters {
-    NSUInteger len = [_easterEggForSentry length];
-    NSLog(@"Sentry - KME: Processing character(s): %@", characters);
-    if ([characters length] == 1 && [characters characterAtIndex:0] == [kEasterEggText characterAtIndex:len]) {
-        NSString *characterToAdd = [kEasterEggText substringWithRange:NSMakeRange(len, 1)];
-        NSLog(@"Sentry - KME: Adding character to Easter Egg code string: %@", characterToAdd);
-        [_easterEggForSentry appendString:characterToAdd];
-        if ([kEasterEggText isEqualToString:_easterEggForSentry]) {
-            NSLog(@"Sentry - KME: Forcing crash now!");
-            // Both of the following approaches do throw an exception that causes control to exit this method,
-            // but at least in my debug builds locally, neither one seems to get picked up by Sentry in a
-            // way that results in a new report on sentry.keyman.com
-
+  NSUInteger len = [_easterEggForSentry length];
+  os_log_debug([KMELogs keyLog], "Sentry - KME: Processing character(s): %{public}@", characters);
+  if ([characters length] == 1 && [characters characterAtIndex:0] == [kEasterEggText characterAtIndex:len]) {
+    NSString *characterToAdd = [kEasterEggText substringWithRange:NSMakeRange(len, 1)];
+    os_log_debug([KMELogs keyLog], "Sentry - KME: Adding character to Easter Egg code string: %{public}@", characterToAdd);
+    [_easterEggForSentry appendString:characterToAdd];
+    if ([kEasterEggText isEqualToString:_easterEggForSentry]) {
+      os_log_debug([KMELogs keyLog], "Sentry - KME: Forcing crash now!");
+      // Both of the following approaches do throw an exception that causes control to exit this method,
+      // but at least in my debug builds locally, neither one seems to get picked up by Sentry in a
+      // way that results in a new report on sentry.keyman.com
+      
 #ifndef USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE
-            //#1
-            @throw ([NSException exceptionWithName:@"SentryForce" reason:@"Easter egg hit" userInfo:nil]);
-
-            //#2
-            //    NSDecimalNumber *i = [NSDecimalNumber decimalNumberWithDecimal:[@(1) decimalValue]];
-            //    NSDecimalNumber *o = [NSDecimalNumber decimalNumberWithDecimal:[@(0) decimalValue]];
-            //    // Divide by 0 to throw an exception
-            //    NSDecimalNumber *x = [i decimalNumberByDividingBy:o];
-
+      //#1
+      @throw ([NSException exceptionWithName:@"SentryForce" reason:@"Easter egg hit" userInfo:nil]);
+      
+      //#2
+      //    NSDecimalNumber *i = [NSDecimalNumber decimalNumberWithDecimal:[@(1) decimalValue]];
+      //    NSDecimalNumber *o = [NSDecimalNumber decimalNumberWithDecimal:[@(0) decimalValue]];
+      //    // Divide by 0 to throw an exception
+      //    NSDecimalNumber *x = [i decimalNumberByDividingBy:o];
+      
 #else
-            //#3 The following DOES work, but it's really lame because the crash actually gets forced in the IM
-            // via this bogus call to a protocol method implemented in the IM's App Delegate just for the
-            // purpose of enabling the engine to force a crash.
-            [(NSObject <NSAlertDelegate> *)[NSApp delegate] alertShowHelp:[NSAlert alertWithMessageText:@"Forcing an error" defaultButton:nil alternateButton:nil otherButton:nil informativeTextWithFormat:@"Forcing an Easter egg error from KME!"]];
+      //#3 The following DOES work, but it's really lame because the crash actually gets forced in the IM
+      // via this bogus call to a protocol method implemented in the IM's App Delegate just for the
+      // purpose of enabling the engine to force a crash.
+      [(NSObject <NSAlertDelegate> *)[NSApp delegate] alertShowHelp:[NSAlert alertWithMessageText:@"Forcing an error" defaultButton:nil alternateButton:nil otherButton:nil informativeTextWithFormat:@"Forcing an Easter egg error from KME!"]];
 #endif
-
-            NSLog(@"Sentry - KME: You should not be seeing this line!");
-        }
     }
-    else if (len > 0) {
-        NSLog(@"Sentry - KME: Clearing Easter Egg code string.");
-        [_easterEggForSentry setString:@""];
-    }
+  }
+  else if (len > 0) {
+    os_log_debug([KMELogs keyLog], "Sentry - KME: Clearing Easter Egg code string.");
+    [_easterEggForSentry setString:@""];
+  }
 }
 
 - (NSString *)getCharsFromKeyCode:(UInt16)keyCode {
-    TISInputSourceRef currentKeyboard = TISCopyCurrentKeyboardLayoutInputSource();
-    CFDataRef uchr = (CFDataRef)TISGetInputSourceProperty(currentKeyboard, kTISPropertyUnicodeKeyLayoutData);
-    const UCKeyboardLayout *keyboardLayout = (const UCKeyboardLayout*)CFDataGetBytePtr(uchr);
-
-    if (keyboardLayout) {
-        UInt32 deadKeyState = 0;
-        UniCharCount maxStringLength = 255;
-        UniCharCount actualStringLength = 0;
-        UniChar unicodeString[maxStringLength];
-
-        OSStatus status = UCKeyTranslate(keyboardLayout,
-                                         keyCode, kUCKeyActionDown, 0,
-                                         LMGetKbdType(), 0,
-                                         &deadKeyState,
-                                         maxStringLength,
-                                         &actualStringLength, unicodeString);
-
-        if (actualStringLength == 0 && deadKeyState) {
-            status = UCKeyTranslate(keyboardLayout,
-                                    kVK_Space, kUCKeyActionDown, 0,
-                                    LMGetKbdType(), 0,
-                                    &deadKeyState,
-                                    maxStringLength,
-                                    &actualStringLength, unicodeString);
-        }
-
-        if (actualStringLength > 0 && status == noErr)
-            return [NSString stringWithCharacters:unicodeString length:(NSUInteger)actualStringLength];
+  TISInputSourceRef currentKeyboard = TISCopyCurrentKeyboardLayoutInputSource();
+  CFDataRef uchr = (CFDataRef)TISGetInputSourceProperty(currentKeyboard, kTISPropertyUnicodeKeyLayoutData);
+  const UCKeyboardLayout *keyboardLayout = (const UCKeyboardLayout*)CFDataGetBytePtr(uchr);
+  
+  if (keyboardLayout) {
+    UInt32 deadKeyState = 0;
+    UniCharCount maxStringLength = 255;
+    UniCharCount actualStringLength = 0;
+    UniChar unicodeString[maxStringLength];
+    
+    OSStatus status = UCKeyTranslate(keyboardLayout,
+                                     keyCode, kUCKeyActionDown, 0,
+                                     LMGetKbdType(), 0,
+                                     &deadKeyState,
+                                     maxStringLength,
+                                     &actualStringLength, unicodeString);
+    
+    if (actualStringLength == 0 && deadKeyState) {
+      status = UCKeyTranslate(keyboardLayout,
+                              kVK_Space, kUCKeyActionDown, 0,
+                              LMGetKbdType(), 0,
+                              &deadKeyState,
+                              maxStringLength,
+                              &actualStringLength, unicodeString);
     }
-
-    return nil;
+    
+    if (actualStringLength > 0 && status == noErr)
+      return [NSString stringWithCharacters:unicodeString length:(NSUInteger)actualStringLength];
+  }
+  
+  return nil;
 }
 
 @end

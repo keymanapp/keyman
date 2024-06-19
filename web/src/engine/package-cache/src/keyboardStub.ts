@@ -159,7 +159,7 @@ export default class KeyboardStub extends KeyboardProperties {
     let stubs: KeyboardStub[] = [];
     languages.forEach(language => {
       // The deprecated `language` is assigned to satisfy TS type-checking.
-      const intermediate = {...arg, languages: language, language: undefined};
+      const intermediate = {...arg, languages: language, language: undefined as LanguageAPIPropertySpec};
       const stub: KeyboardStub = new KeyboardStub(intermediate, keyboardBaseUri, fontBaseUri);
 
       stubs.push(stub);

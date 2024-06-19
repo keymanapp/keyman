@@ -1,4 +1,4 @@
-import EventEmitter from "eventemitter3";
+import { EventEmitter } from "eventemitter3";
 import { InputEngineBase } from "./inputEngineBase.js";
 import { GestureSource } from "./gestureSource.js";
 import { MatcherSelection, MatcherSelector } from "./gestures/matchers/matcherSelector.js";
@@ -39,8 +39,13 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
 
   private _stateToken: StateToken;
 
-  public constructor(gestureModelDefinitions: GestureModelDefs<HoveredItemType, StateToken>, inputEngines?: InputEngineBase<HoveredItemType, StateToken>[]) {
+  private _history: (GestureSource<HoveredItemType> | GestureSequence<HoveredItemType, StateToken>)[] = [];
+  private historyMax: number;
+
+  public constructor(gestureModelDefinitions: GestureModelDefs<HoveredItemType, StateToken>, inputEngines?: InputEngineBase<HoveredItemType, StateToken>[], historyLength?: number) {
     super();
+
+    this.historyMax = historyLength > 0 ? historyLength : 0;
 
     this.gestureModelDefinitions = gestureModelDefinitions;
     this.inputEngines = [];
@@ -165,6 +170,16 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
     this.inputEngines.push(engine);
   }
 
+  private recordHistory(gesture: typeof this._history[0]) {
+    const histMax = this.historyMax;
+    if(histMax > 0) {
+      if(this._history.length == histMax) {
+        this._history.shift();
+      }
+      this._history.push(gesture);
+    }
+  }
+
   private readonly onNewTrackedPath = async (touchpoint: GestureSource<HoveredItemType>) => {
     this.addSimpleSourceHooks(touchpoint);
     const modelDefs = this.gestureModelDefinitions;
@@ -224,12 +239,17 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
 
     touchpoint.setGestureMatchInspector(this.buildGestureMatchInspector(selector));
 
+    const preGestureScribe = () => {
+      this.recordHistory(touchpoint);
+    }
+
     /*
       If there's an error in code receiving this event, we must not let that break the flow of
       event input processing - we may still have a locking Promise corresponding to our active
       GestureSource.  (See: next comment)
     */
     try {
+      touchpoint.path.on('invalidated', preGestureScribe);
       this.emit('inputstart', touchpoint);
     } catch (err) {
       reportError("Error from 'inputstart' event listener", err);
@@ -283,6 +303,10 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
     // Could track sequences easily enough; the question is how to tell when to 'let go'.
 
     // No try-catch because only there's no critical code after it.
+    if(!touchpoint.path.wasCancelled) {
+      touchpoint.path.off('invalidated', preGestureScribe);
+      gestureSequence.on('complete', () => this.recordHistory(gestureSequence));
+    }
     this.emit('recognizedgesture', gestureSequence);
   }
 
@@ -292,6 +316,24 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
 
   public get activeSources(): GestureSource<HoveredItemType, StateToken>[] {
     return [].concat(this.inputEngines.map((engine) => engine.activeSources).reduce((merged, arr) => merged.concat(arr), []));
+  }
+
+  public get history() {
+    return this._history;
+  }
+
+  public get historyJSON() {
+    const sanitizingReplacer = function (key: string, value: any) {
+      if(key == 'item') {
+        // KMW 'key' elements involve circular refs.
+        // Just return the key ID.  (Assumes use in KMW)
+        return value?.id;
+      } else {
+        return value;
+      }
+    }
+
+    return JSON.stringify(this.history, sanitizingReplacer, 2);
   }
 
   /**
