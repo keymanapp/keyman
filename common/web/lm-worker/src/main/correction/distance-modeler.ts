@@ -14,6 +14,12 @@ export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2
   return arg1.currentCost - arg2.currentCost;
 }
 
+enum TimedTaskTypes {
+  CACHED_RESULT = 0,
+  PREDICTING = 1,
+  CORRECTING = 2
+}
+
 // Represents a processed node for the correction-search's search-space's tree-like graph.  May represent
 // internal and 'leaf' nodes on said graph, as well as the overall root of the search.  Also used to represent
 // edges on the graph TO said nodes - there's a bit of overloading here.  Either way, it stores the cost of the
@@ -606,69 +612,78 @@ export class SearchSpace {
     if(returnedValues.length > 0) {
       let preprocessedQueue = new PriorityQueue<SearchNode>(QUEUE_NODE_COMPARATOR, returnedValues);
 
-      timer.startLoop();
       while(preprocessedQueue.count > 0) {
-        let entry = preprocessedQueue.dequeue();
+        const entryFromCache = timer.time(() => {
+          let entry = preprocessedQueue.dequeue();
 
-        // Is the entry a reasonable result?
-        if(entry.isFullReplacement) {
-          // If the entry's 'match' fully replaces the input string, we consider it
-          // unreasonable and ignore it.
-          continue;
-        }
+          // Is the entry a reasonable result?
+          if(entry.isFullReplacement) {
+            // If the entry's 'match' fully replaces the input string, we consider it
+            // unreasonable and ignore it.
+            return null;
+          }
 
-        timer.markIteration();
-
-        if(!currentReturns[entry.resultKey]) {
           currentReturns[entry.resultKey] = entry;
           // Do not track yielded time.
-          yield new SearchResult(entry);
+          return new SearchResult(entry);
+        }, TimedTaskTypes.CACHED_RESULT);
+
+        if(entryFromCache) {
+          // Time yielded here is generally spent on turning corrections into predictions.
+          // It's timing a different sort of task, so... different task set ID.
+          const timeSpan = timer.start(TimedTaskTypes.PREDICTING);
+          yield entryFromCache;
+          timeSpan.end();
         }
       }
     }
 
     // Stage 2:  the fun part; actually searching!
-    timer.resetOutlierCheck();
-    timer.startLoop();
     let timedOut = false;
     do {
-      let newResult: PathResult;
+      const entry = timer.time(() => {
+        let newResult: PathResult = this.handleNextNode();
 
-      // Search for a 'complete' path, skipping all partial paths as long as time remains.
-      do {
-        newResult = this.handleNextNode();
-        timer.markIteration();
-
-        if(timer.shouldTimeout()) {
+        if(timer.elapsed) {
           timedOut = true;
         }
-      } while(!timedOut && newResult.type == 'intermediate')
 
-      if(newResult.type == 'none') {
-        break;
-      } else if(newResult.type == 'complete') {
-        // Is the entry a reasonable result?
-        if(newResult.finalNode.isFullReplacement) {
-          // If the entry's 'match' fully replaces the input string, we consider it
-          // unreasonable and ignore it.  Also, if we've reached this point...
-          // we can(?) assume that everything thereafter is as well.
-          break;
+        if(newResult.type == 'none') {
+          return null;
+        } else if(newResult.type == 'complete') {
+          const node = newResult.finalNode;
+
+          // Is the entry a reasonable result?
+          if(node.isFullReplacement) {
+            // If the entry's 'match' fully replaces the input string, we consider it
+            // unreasonable and ignore it.  Also, if we've reached this point...
+            // we can(?) assume that everything thereafter is as well.
+            return null;
+          }
+
+          const entry = newResult.finalNode;
+
+          // As we can't guarantee a monotonically-increasing cost during the search -
+          // due to effects from keystrokes with deleteLeft > 0 - it's technically
+          // possible to find a lower-cost path later in such cases.
+          //
+          // If it occurs, we should re-emit it - it'll show up earlier in the
+          // suggestions that way, as it should.
+          if((currentReturns[entry.resultKey]?.currentCost ?? Number.MAX_VALUE) > entry.currentCost) {
+            currentReturns[entry.resultKey] = entry;
+            searchSpace.returnedValues[entry.resultKey] = entry;
+            // Do not track yielded time.
+            return new SearchResult(entry);
+          }
         }
 
-        const entry = newResult.finalNode;
+        return null;
+      }, TimedTaskTypes.CORRECTING);
 
-        // As we can't guarantee a monotonically-increasing cost during the search -
-        // due to effects from keystrokes with deleteLeft > 0 - it's technically
-        // possible to find a lower-cost path later in such cases.
-        //
-        // If it occurs, we should re-emit it - it'll show up earlier in the
-        // suggestions that way, as it should.
-        if((currentReturns[entry.resultKey]?.currentCost ?? Number.MAX_VALUE) > entry.currentCost) {
-          currentReturns[entry.resultKey] = entry;
-          searchSpace.returnedValues[entry.resultKey] = entry;
-          // Do not track yielded time.
-          yield new SearchResult(entry);
-        }
+      if(entry) {
+        const timeSpan = timer.start(TimedTaskTypes.PREDICTING);
+        yield entry;
+        timeSpan.end();
       }
     } while(!timedOut && this.hasNextMatchEntry());
 
