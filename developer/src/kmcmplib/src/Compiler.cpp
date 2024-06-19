@@ -3365,6 +3365,15 @@ int atoiW(PKMX_WCHAR p)
   return i;
 }
 
+/**
+ * Checks if a wide-character C-string represents an integer.
+ * It does not strip whitespace, and depends on the action of atoi()
+ * to determine if the C-string is an integer.
+ *
+ * @param p a pointer to a wide-character C-string
+ *
+ * @return true if p represents an integer, false otherwise
+*/
 bool isIntegerWstring(PKMX_WCHAR p) {
   if (!p || !*p)
     return false;

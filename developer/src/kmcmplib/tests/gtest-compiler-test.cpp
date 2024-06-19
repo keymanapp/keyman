@@ -572,6 +572,8 @@ TEST_F(CompilerTest, isIntegerWstring_test) {
     EXPECT_FALSE(isIntegerWstring((PKMX_WCHAR)u"a"));
     EXPECT_TRUE(isIntegerWstring((PKMX_WCHAR)u"-1"));
     EXPECT_TRUE(isIntegerWstring((PKMX_WCHAR)u"1"));
+    EXPECT_FALSE(isIntegerWstring((PKMX_WCHAR)u" 1"));
+    EXPECT_FALSE(isIntegerWstring((PKMX_WCHAR)u"1 "));
     EXPECT_TRUE(isIntegerWstring((PKMX_WCHAR)u"42"));
     EXPECT_TRUE(isIntegerWstring((PKMX_WCHAR)u"2147483647")); // INT_MAX
     EXPECT_FALSE(isIntegerWstring((PKMX_WCHAR)u"2147483648")); // INT_MAX + 1
