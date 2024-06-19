@@ -4,6 +4,10 @@ import * as correction from '#./correction/index.js';
 
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
+function buildTestTimer() {
+  return new correction.ExecutionTimer(Number.MAX_VALUE, Number.MAX_VALUE);
+}
+
 function assertEdgeChars(edge, input, match) {
   assert.isTrue(edgeHasChars(edge, input, match));
 }
@@ -306,7 +310,7 @@ describe('Correction Distance Modeler', function() {
 
       let searchSpace = new correction.SearchSpace(testModel);
 
-      let iter = searchSpace.getBestMatches();
+      let iter = searchSpace.getBestMatches(buildTestTimer());
       let firstResult = await iter.next();
       assert.isFalse(firstResult.done);
     });
@@ -337,32 +341,8 @@ describe('Correction Distance Modeler', function() {
       searchSpace.addInput(synthDistribution2);
       searchSpace.addInput(synthDistribution3);
 
-      let iter = searchSpace.getBestMatches(0); // disables the correction-search timeout.
+      let iter = searchSpace.getBestMatches(buildTestTimer()); // disables the correction-search timeout.
       await checkResults_teh(iter);
-
-      // // Debugging method:  a simple loop for printing out the generated sets, in succession.
-      // //
-      // for(let i = 1; i <= 8; i++) {  // After 8 tiers, we run out of entries for this particular case.
-      //   console.log();
-      //   console.log("Batch " + i);
-
-      //   let set = iter.next();
-      //   assert.isFalse(set.done);
-
-      //   set = set.value;
-
-      //   let entries = set.map(function(result) {
-      //     return result.matchString;
-      //   });
-
-      //   console.log("Entry count: " + set.length);
-      //   entries.sort();
-      //   console.log(entries);
-      //   console.log("Probablility:  " + set[0].totalCost);
-      //   console.log("Analysis (first entry):");
-      //   console.log(" - Edit cost:  " + set[0].knownCost);
-      //   console.log(" - Input cost: " + set[0].inputSamplingCost);
-      // }
     });
 
     it('Allows reiteration (sequentially)', async function() {
@@ -391,12 +371,12 @@ describe('Correction Distance Modeler', function() {
       searchSpace.addInput(synthDistribution2);
       searchSpace.addInput(synthDistribution3);
 
-      let iter = searchSpace.getBestMatches(0); // disables the correction-search timeout.
+      let iter = searchSpace.getBestMatches(buildTestTimer()); // disables the correction-search timeout.
       await checkResults_teh(iter);
 
       // The key: do we get the same results the second time?
       // Reset the iterator first...
-      let iter2 = searchSpace.getBestMatches(0); // disables the correction-search timeout.
+      let iter2 = searchSpace.getBestMatches(buildTestTimer()); // disables the correction-search timeout.
       await checkResults_teh(iter2);
     });
 
@@ -406,7 +386,8 @@ describe('Correction Distance Modeler', function() {
       assert.isNotEmpty(rootTraversal);
 
       let searchSpace = new correction.SearchSpace(testModel);
-      let iter = searchSpace.getBestMatches();
+      const timer = buildTestTimer();
+      let iter = searchSpace.getBestMatches(timer);
 
       // While there's no input, insertion operations can produce suggestions.
       let resultState = await iter.next();

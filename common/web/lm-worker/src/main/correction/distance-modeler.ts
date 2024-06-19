@@ -1,7 +1,7 @@
 import { Comparator, isHighSurrogate, SENTINEL_CODE_UNIT, PriorityQueue } from '@keymanapp/models-templates';
 
 import { ClassicalDistanceCalculation, EditToken } from './classical-calculation.js';
-import { ExecutionTimer } from './execution-timer.js';
+import { ExecutionTimer, STANDARD_TIME_BETWEEN_DEFERS } from './execution-timer.js';
 
 type RealizedInput = ProbabilityMass<Transform>[];  // NOT Distribution - they're masses from separate distributions.
 
@@ -591,21 +591,8 @@ export class SearchSpace {
   }
 
   // Current best guesstimate of how compositor will retrieve ideal corrections.
-  async *getBestMatches(waitMillis?: number): AsyncGenerator<SearchResult> {
-    // might should also include a 'base cost' parameter of sorts?
-    let searchSpace = this;
+  async *getBestMatches(timer: ExecutionTimer): AsyncGenerator<SearchResult> {
     let currentReturns: {[resultKey: string]: SearchNode} = {};
-
-    let maxTime: number;
-    if(waitMillis == 0) {
-      maxTime = Infinity;
-    } else if(waitMillis == undefined || Number.isNaN(waitMillis)) { // also covers null.
-      maxTime = SearchSpace.DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL;
-    } else  {
-      maxTime = waitMillis;
-    }
-
-    const timer = new ExecutionTimer(maxTime*1.5, maxTime);
 
     // Stage 1 - if we already have extracted results, build a queue just for them and iterate over it first.
     let returnedValues = Object.values(this.returnedValues);
@@ -634,19 +621,18 @@ export class SearchSpace {
           const timeSpan = timer.start(TimedTaskTypes.PREDICTING);
           yield entryFromCache;
           timeSpan.end();
+
+          if(timer.timeSinceLastDefer > STANDARD_TIME_BETWEEN_DEFERS) {
+            await timer.defer();
+          }
         }
       }
     }
 
     // Stage 2:  the fun part; actually searching!
-    let timedOut = false;
     do {
       const entry = timer.time(() => {
         let newResult: PathResult = this.handleNextNode();
-
-        if(timer.elapsed) {
-          timedOut = true;
-        }
 
         if(newResult.type == 'none') {
           return null;
@@ -671,7 +657,7 @@ export class SearchSpace {
           // suggestions that way, as it should.
           if((currentReturns[entry.resultKey]?.currentCost ?? Number.MAX_VALUE) > entry.currentCost) {
             currentReturns[entry.resultKey] = entry;
-            searchSpace.returnedValues[entry.resultKey] = entry;
+            this.returnedValues[entry.resultKey] = entry;
             // Do not track yielded time.
             return new SearchResult(entry);
           }
@@ -685,7 +671,11 @@ export class SearchSpace {
         yield entry;
         timeSpan.end();
       }
-    } while(!timedOut && this.hasNextMatchEntry());
+
+      if(timer.timeSinceLastDefer > STANDARD_TIME_BETWEEN_DEFERS) {
+        await timer.defer();
+      }
+    } while(!timer.elapsed && this.hasNextMatchEntry());
 
     return null;
   }

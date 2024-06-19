@@ -7,8 +7,18 @@ import TransformUtils from './transformUtils.js';
 export default class ModelCompositor {
   private lexicalModel: LexicalModel;
   private contextTracker?: correction.ContextTracker;
+
   private static readonly MAX_SUGGESTIONS = 12;
   readonly punctuation: LexicalModelPunctuation;
+
+  // Left exposed to facilitate unit tests.
+  // See worker-model-compositor, "stops predicting early[...]".
+  /**
+   * If there is a prediction request currently beign processed, this will
+   * hold a reference to its time-management ExecutionTimer, which can
+   * be used to have it exit early (once it yields to the task queue).
+   */
+  activeTimer?: correction.ExecutionTimer;
 
   /**
    * Controls the strength of anti-corrective measures for single-character scenarios.
@@ -69,6 +79,10 @@ export default class ModelCompositor {
     let suggestionDistribution: Distribution<Suggestion> = [];
     let lexicalModel = this.lexicalModel;
     let punctuation = this.punctuation;
+
+    // If a prior prediction is still processing, signal to terminate it; we have a new
+    // prediction request to prioritize.
+    this.activeTimer?.terminate();
 
     if(!(transformDistribution instanceof Array)) {
       transformDistribution = [ {sample: transformDistribution, p: 1.0} ];
@@ -239,11 +253,13 @@ export default class ModelCompositor {
       // TODO:  whitespace, backspace filtering.  Do it here.
       //        Whitespace is probably fine, actually.  Less sure about backspace.
 
+      const SEARCH_TIMEOUT = correction.SearchSpace.DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL;
+      const timer = this.activeTimer = new correction.ExecutionTimer(this.testMode ? Number.MAX_VALUE : SEARCH_TIMEOUT, this.testMode ? Number.MAX_VALUE : SEARCH_TIMEOUT * 1.5);
+
       let bestCorrectionCost: number;
       let correctionPredictionMap: Record<string, Distribution<Suggestion>> = {};
 
-      const SEARCH_TIMEOUT = this.testMode ? 0 : correction.SearchSpace.DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL;
-      for await(let match of searchSpace.getBestMatches(SEARCH_TIMEOUT)) {
+      for await(let match of searchSpace.getBestMatches(timer)) {
         // Corrections obtained:  now to predict from them!
         const correction = match.matchString;
 
@@ -332,6 +348,13 @@ export default class ModelCompositor {
             }
           }
         }
+      }
+
+      // // For debugging / investigation.
+      // console.log(`execute: ${timer.executionTime}, deferred: ${timer.deferredTime}`); //, total since start: ${timer.timeSinceConstruction}`);
+
+      if(this.activeTimer == timer) {
+        this.activeTimer = null;
       }
     }
 
@@ -743,6 +766,9 @@ export default class ModelCompositor {
   }
 
   public resetContext(context: Context) {
+    // If we're resetting the context, any active prediction requests are no
+    // longer valid.
+    this.activeTimer?.terminate();
     // Force-resets the context, throwing out any previous fat-finger data, etc.
     // Designed for use when the caret has been directly moved and/or the context sourced from a different control
     // than before.

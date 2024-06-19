@@ -157,6 +157,43 @@ describe('ModelCompositor', function() {
           assert.equal(suggestion.transform.deleteLeft, 0);
         });
       });
+
+      it('stops predicting early if new prediction request comes in', async function() {
+        const compositor = new ModelCompositor(plainModel, true);
+
+        const firstPredict = compositor.predict({
+          insert: "a",
+          deleteLeft: 0
+        }, {
+          left: "the ", startOfBuffer: true, endOfBuffer: true
+        });
+
+        const firstTimer = compositor.activeTimer;
+        assert.isOk(firstTimer);
+        assert.isFalse(firstTimer.elapsed);
+
+        const secondPredict = compositor.predict({
+          insert: "l",
+          deleteLeft: 0
+        }, {
+          left: "the apl", startOfBuffer: true, endOfBuffer: true
+        });
+
+        assert.notEqual(compositor.activeTimer, firstTimer);
+        assert.isTrue(firstTimer.elapsed);
+
+        await Promise.race([
+          firstPredict,
+          secondPredict.then(() => Promise.reject(new Error("second prediction should not beat the first"))),
+        ]);
+
+        await Promise.all([firstPredict, secondPredict]);
+
+        const terminatedSuggestions = await firstPredict;
+        const finalSuggestions = await secondPredict;
+        assert.isOk(terminatedSuggestions.find((entry) => entry.displayAs == 'a'));
+        assert.isOk(finalSuggestions.find((entry) => entry.displayAs == 'applied'));
+      });
     });
 
     describe('applySuggestionCasing', function() {
