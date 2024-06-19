@@ -455,7 +455,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     const KMX_WCHAR tstr_index_comma_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 4, 0 };
     EXPECT_EQ(0, u16cmp(tstr_index_comma_valid, tstr));
 
-    // index, space, valid
+    // index, space, valid ... should not be valid (see #11833)
     u16cpy(str, u"index(b 4)");
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
