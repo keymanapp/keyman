@@ -1070,6 +1070,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = C06D37301F81F4E100F61AE0 /* Build configuration list for PBXNativeTarget "KeymanEngine" */;
 			buildPhases = (
+				A4DBE0462C232E7B00DBF7A1 /* ShellScript */,
 				C06D37261F81F4E100F61AE0 /* Sources */,
 				C06D37271F81F4E100F61AE0 /* Frameworks */,
 				C06D37281F81F4E100F61AE0 /* Headers */,
@@ -1292,6 +1293,23 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		A4DBE0462C232E7B00DBF7A1 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd \"$KEYMAN_ROOT/ios\"\n./build.sh build:engine --carthage-build --debug\n";
+		};
 		C06D37C61F82364E00F61AE0 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;

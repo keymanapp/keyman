@@ -19,7 +19,8 @@ builder_describe "Builds Keyman Engine for use on iOS devices - iPhone and iPad.
   "clean" \
   "configure" \
   "build" \
-  "--sim-artifact  Also outputs a simulator-friendly test artifact corresponding to the build"
+  "--sim-artifact  Also outputs a simulator-friendly test artifact corresponding to the build" \
+  "--carthage-build"
 
 builder_parse "$@"
 
@@ -93,7 +94,10 @@ function do_packages() {
 
 function do_configure ( ) {
   do_packages
-  do_carthage
+  # Carthage build does not run carthage internally
+  if ! builder_has_option --carthage-build ; then
+    do_carthage
+  fi
 }
 
 # Manages KeymanEngine.bundle, which is included inside the :engine target.
@@ -115,7 +119,10 @@ function update_bundle ( ) {
 # First things first - update our dependencies.
 function build_engine() {
   update_bundle
-
+  # Carthage build does actual build of framework in carthage
+  if builder_has_option --carthage-build; then 
+    return 0
+  fi
   echo
   echo "Build products will be set with the following version metadata:"
   echo "  * VERSION=$VERSION"
