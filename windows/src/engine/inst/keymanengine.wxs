@@ -91,7 +91,7 @@
       <Custom Action="EnginePostInstall" Before="InstallFinalize"><![CDATA[NOT Installed OR UPGRADINGPRODUCTCODE Or REINSTALL]]></Custom>
     </InstallExecuteSequence>
 
-    <Binary Id="insthelper.dll" SourceFile="..\..\..\bin\inst\insthelper.dll" />
+    <Binary Id="insthelper.dll" SourceFile="..\..\..\bin\engine\insthelper.dll" />
 
   </Module>
 </Wix>

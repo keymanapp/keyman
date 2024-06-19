@@ -32,7 +32,7 @@ export default abstract class Proctor {
   abstract beforeAll(): Promise<void>;
 
   // Performs per-test setup
-  abstract before();
+  abstract before(): void;
 
   /**
    * Allows the proctor to indicate if is capable of executing a suite of tests or not.
@@ -43,7 +43,7 @@ export default abstract class Proctor {
   /**
    * Indicates whether or not this Proctor is capable of running the specified set of tests.
    */
-  abstract matchesTestSet(testSet: TestSet<any>);
+  abstract matchesTestSet(testSet: TestSet<any>): boolean;
 
   /**
    * Simulates the specified test sequence for use in testing.

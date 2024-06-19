@@ -175,6 +175,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     keymanWeb = KeymanWebViewController(storage: Storage.active)
     super.init(nibName: nibNameOrNil, bundle: nibBundleOrNil)
 
+    var message = self.hasFullAccess ? "hasFullAccess: true" : "hasFullAccess: false"
+    os_log("%{public}s", log: KeymanEngineLogger.settings, type: .default, message)
+    SentryManager.breadcrumb(message)
+
     addChild(keymanWeb)
   }
 
@@ -333,12 +337,57 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       }
     }
   }
+  
+  func deleteSelection() -> Bool {
+    if let selected = textDocumentProxy.selectedText, selected.count > 0 {
+      /*
+        Since we're doing some funky text manipulation, it's best to add
+        a "canary" check in case something does go awry with it in
+        the future.
+      */
+      let beforeManipulation = textDocumentProxy.documentContextBeforeInput ?? ""
+
+      /*
+        We have a problem to resolve here: we cannot simply delete the selection
+        with either .deleteBackward() or .insertText(""):
+       
+        - If there is selected text immediately following a space (U+0020),
+          .deleteBackward() will delete that space IN ADDITION to the selected text.
+        - Unlike .insertText("-any-string-here"), .insertText("") does nothing;
+          it does not replace the selection with the new string.
+       
+        Our policy (#9073) on handling the backspace key when there is a
+        text selection is to just delete the selection. We have to override
+        the special case of space being deleted by .deleteBackward() ourselves.
+        Additionally, the internal Web engine cannot anticipate the special
+        case and requires precise and consistent backspace handling in line
+        with our policy in order to keep the context on both sides synchronized.
+       
+        As .insertText() does not delete the selection if the string to
+        be inserted is empty, we insert something that won't combine,
+        like a ZWNJ, and then delete it.
+       
+        iOS does not allow users to select text in a way that splits
+        character clusters.  This implies that it's impossible for an
+        inserted ZWNJ to combine with existing context, making this
+        operation safe.
+      */
+      textDocumentProxy.insertText("\u{200c}")
+      textDocumentProxy.deleteBackward()
+      
+      let afterManipulation = textDocumentProxy.documentContextBeforeInput ?? ""
+      
+      // And now to finish our 'canary' check.
+      if beforeManipulation != afterManipulation {
+        os_log(.error, log: KeymanEngineLogger.engine, "Could not cleanly execute backspace for selected text")
+      }
+      
+      return true
+    }
+    return false
+  }
 
   func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {
-    if keymanWeb.isSubKeysMenuVisible {
-      return
-    }
-
     if isInputClickSoundEnabled {
       UIDevice.current.playInputClick()
 
@@ -347,18 +396,13 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
       perform(#selector(self.enableInputClickSound), with: nil, afterDelay: 0.1)
     }
 
-    var hasDeletedSelection = false
+    // `true` if there was selected text to be deleted
+    let deletedSelection = self.deleteSelection()
 
-    if let selected = textDocumentProxy.selectedText {
-      if selected.count > 0 {
-        textDocumentProxy.deleteBackward()
-        hasDeletedSelection = true
-      }
-    }
-
-    if numCharsToDelete <= 0 || hasDeletedSelection {
+    // If text was selected, we generally act as if the context is nil - no back
+    // deletions allowed, so we skip that section.
+    if numCharsToDelete <= 0 || deletedSelection {
       textDocumentProxy.insertText(newText)
-
       sendContextUpdate()
       return
     }

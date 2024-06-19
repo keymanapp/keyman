@@ -1,4 +1,4 @@
-import * as xml2js from 'xml2js';
+import { xml2js } from '@keymanapp/common-types';
 import JSZip from 'jszip';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
@@ -269,11 +269,21 @@ export class KmpCompiler implements KeymanCompiler {
       kmp.files = this.arrayWrap(kps.Files.File).map((file: KpsFile.KpsFileContentFile) => {
         return {
           name: this.normalizePath(file.Name),
-          description: file.Description.trim(),
+          description: (file.Description ?? '').trim(),
           copyLocation: parseInt(file.CopyLocation, 10) || undefined
           // note: we don't emit fileType as that is not permitted in kmp.json
         };
       });
+      if(!kmp.files.reduce((result: boolean, file) => {
+        if(!file.name) {
+          // as the filename field is missing or blank, we'll try with the description instead
+          this.callbacks.reportMessage(CompilerMessages.Error_FileRecordIsMissingName({description: file.description ?? '(no description)'}));
+          return false;
+        }
+        return result;
+      }, true)) {
+        return null;
+      }
     }
     kmp.files = kmp.files ?? [];
 
@@ -300,9 +310,9 @@ export class KmpCompiler implements KeymanCompiler {
       kmp.keyboards = this.arrayWrap(kps.Keyboards.Keyboard).map((keyboard: KpsFile.KpsFileKeyboard) => ({
         displayFont: keyboard.DisplayFont ? this.callbacks.path.basename(this.normalizePath(keyboard.DisplayFont)) : undefined,
         oskFont: keyboard.OSKFont ? this.callbacks.path.basename(this.normalizePath(keyboard.OSKFont)) : undefined,
-        name:keyboard.Name.trim(),
-        id:keyboard.ID.trim(),
-        version:keyboard.Version.trim(),
+        name:keyboard.Name?.trim(),
+        id:keyboard.ID?.trim(),
+        version:keyboard.Version?.trim(),
         rtl:keyboard.RTL == 'True' ? true : undefined,
         languages: keyboard.Languages ?
           this.kpsLanguagesToKmpLanguages(this.arrayWrap(keyboard.Languages.Language) as KpsFile.KpsFileLanguage[]) :

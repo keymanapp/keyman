@@ -5,7 +5,6 @@ import { GestureModel, GestureResolution, GestureResolutionSpec, RejectionDefaul
 import { ManagedPromise, TimeoutPromise } from "@keymanapp/web-utils";
 import { FulfillmentCause, PathMatcher } from "./pathMatcher.js";
 import { CumulativePathStats } from "../../cumulativePathStats.js";
-import { SampleCoordReplacement } from "../specs/contactModel.js";
 import { processSampleClientCoords } from "../../../inputEventEngine.js";
 
 /**
@@ -49,7 +48,7 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
 
   public get sources(): GestureSource<Type>[] {
     return this.pathMatchers.map((pathMatch, index) => {
-      if(this.model.contacts[index].resetOnResolve) {
+      if(this.model.contacts[index].resetOnInstantFulfill) {
         return undefined;
       } else {
         return pathMatch.source;
@@ -81,7 +80,7 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
 
     // We condition on ComplexGestureSource since some unit tests mock the other type without
     // instantiating the actual type.
-    const predecessor = sourceObj instanceof GestureSource<Type> ? null : sourceObj;
+    const predecessor = sourceObj instanceof GestureSource ? null : sourceObj;
     const source = predecessor ? null : (sourceObj as GestureSource<Type>);
 
     this.predecessor = predecessor;
@@ -106,7 +105,7 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
       if(source && entry == source) {
         // Due to internal delays that can occur when an incoming tap triggers
         // completion of a previously-existing gesture but is not included in it
-        // (`resetOnResolve` mechanics), it is technically possible for a very
+        // (`resetOnInstantFulfill` mechanics), it is technically possible for a very
         // quick tap to be 'complete' by the time we start trying to match
         // against it on some devices.  We should still try in such cases.
         return source;
@@ -131,11 +130,9 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
 
     for(let touchpointIndex = 0; touchpointIndex < sourceTouchpoints.length; touchpointIndex++) {
       const srcContact = sourceTouchpoints[touchpointIndex];
-      let baseContact = srcContact;
 
       if(srcContact instanceof GestureSourceSubview) {
         srcContact.disconnect();  // prevent further updates from mangling tracked path info.
-        baseContact = srcContact.baseSource;
       }
 
       // No need to filter out already-matched contact points, and doing so is more trouble
@@ -181,7 +178,7 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
     return this._isCancelled;
   }
 
-  private finalize(matched: boolean, cause: FulfillmentCause) {
+  private finalize(matched: boolean, cause: FulfillmentCause): MatchResult<Type> {
     if(this.publishedPromise.isFulfilled) {
       return this._result;
     }
@@ -245,6 +242,13 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
       /* c8 ignore next 3 */
     } catch(err) {
       this.publishedPromise.reject(err);
+      return {
+        matched: false,
+        action: {
+          type: 'none',
+          item: null
+        }
+      }
     }
   }
 
@@ -477,6 +481,13 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
           here, as the decision is made due to a validation check against the initial item.
         */
         this.finalize(false, 'cancelled');
+
+        /*
+         * There's no need to process the gesture-model any further... and the
+         * invalid state may correspond to assumptions in the path-model that
+         * will be invalidated if we continue.
+         */
+        return;
       }
     }
 
@@ -507,6 +518,7 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
         instantly fail and thus cancel.
       */
       this.finalize(false, whileInitializing ? 'cancelled' : 'path');
+      return;
     }
 
     // Standard path:  trigger either resolution or rejection when the contact model signals either.
@@ -516,6 +528,13 @@ export class GestureMatcher<Type, StateToken = any> implements PredecessorMatch<
   }
 
   update() {
-    this.pathMatchers.forEach((matcher) => matcher.update());
+    this.pathMatchers.forEach((matcher) => {
+      try {
+        matcher.update();
+      } catch(err) {
+        console.error(err);
+        this.finalize(false, 'cancelled');
+      }
+    });
   }
 }

@@ -14,7 +14,7 @@ gi.require_version('IBus', '1.0')
 from gi.repository import IBus
 from pkg_resources import parse_version
 
-from keyman_config.gnome_keyboards_util import is_gnome_shell
+from keyman_config.gnome_keyboards_util import is_gnome_desktop
 from keyman_config.gsettings import GSettings
 
 
@@ -164,7 +164,7 @@ def _start_ibus_daemon(realuser):
             # If IBus is too old we have to start ibus-daemon directly and pass
             # what we think are the correct parameters
             args = ['ibus-daemon', '-d', '-r', '--xim']
-            if is_gnome_shell():
+            if is_gnome_desktop():
                 # on Ubuntu 21.10 with Gnome the keyboards don't show in dropdown
                 # list if we don't disable the panel
                 args.extend(['--panel', 'disable'])

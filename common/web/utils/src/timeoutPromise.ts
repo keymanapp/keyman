@@ -51,7 +51,7 @@ export default class TimeoutPromise extends ManagedPromise<Boolean> {
  * A simplified, but non-cancelable, version of `TimeoutPromise`.  Returns a simple,
  * Promise that resolves after the specified timeout duration.
  */
-export const timedPromise = (time) => {
+export const timedPromise = (time: number) => {
   const promise = new TimeoutPromise(time);
   return promise.corePromise;
 }

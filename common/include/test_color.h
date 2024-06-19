@@ -23,7 +23,7 @@ enum ansi_code {
     BRIGHT_RED = 196
 };
 
-bool enabled = false;   // TODO: move to test_color.c because test_color.h cannot be #included in more than 1 file in a project otherwise.
+extern bool enabled;
 
 class fg {
     ansi_code code;

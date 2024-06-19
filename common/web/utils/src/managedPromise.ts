@@ -1,7 +1,7 @@
 type ResolveSignature<Type> = (value: Type | PromiseLike<Type>) => void;
 type RejectSignature = (reason?: any) => void;
 
-export default class ManagedPromise<Type> {
+export default class ManagedPromise<Type = void> {
   /**
    * Calling this function will fulfill the Promise represented by this class.
    */

@@ -1,4 +1,4 @@
-import EventEmitter from "eventemitter3";
+import { EventEmitter } from "eventemitter3";
 
 import { DeviceSpec, KeyboardProperties, ManagedPromise, OutputTarget, physicalKeyDeviceAlias, RuleBehavior, SpacebarText } from "@keymanapp/keyboard-processor";
 import { PathConfiguration, PathOptionDefaults, PathOptionSpec } from "keyman/engine/paths";
@@ -21,7 +21,7 @@ export class EngineConfiguration extends EventEmitter<EventMap> {
   private _paths: PathConfiguration;
   public activateFirstKeyboard: boolean;
   private _spacebarText: SpacebarText;
-  private _stubNamespacer?: (KeyboardStub) => void;
+  private _stubNamespacer?: (stub: KeyboardStub) => void;
 
   public applyCacheBusting: boolean = false;
 

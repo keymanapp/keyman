@@ -7,6 +7,8 @@
 #  - echo "warning: foo" will generate an actual compile warning within Xcode:  "foo"
 #  - echo "error: bar" will likewise generate a compile error within Xcode: "bar"
 
+set -e
+
 function buildWarning() {
   echo "warning: $1"
 }

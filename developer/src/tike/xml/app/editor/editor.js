@@ -199,6 +199,13 @@ async function loadSettings() {
   };
 
   context.updateExecutionPoint = function (row) {
+    if(!editor) {
+      // At debugger startup time, it initializes asynchronously at the same
+      // time as the editor, which means that in some circumstances the
+      // debugger will call to SetExecutionPointLine before the editor has
+      // loaded. The safest thing to do here is just exit. #11586
+      return;
+    }
     if(row >= 0) {
       executionPoint = editor.deltaDecorations(
         executionPoint,

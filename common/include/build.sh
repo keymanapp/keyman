@@ -2,17 +2,11 @@
 #
 # Creates keymanversion_build.h
 #
-
-# Exit on command failure and when using unset variables:
-set -eu
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
-
-cd "$THIS_SCRIPT_PATH"
 
 builder_describe "Build keymanversion_build.h" configure build clean
 

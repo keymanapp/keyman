@@ -2,6 +2,12 @@
 
 Data is versioned, so each directory has its version such as `45`.
 
+## How to Update
+
+- Checkout CLDR, preferably a release version, somewhere such as /src/cldr
+- run `fetch-latest-cldr.sh 45 /src/cldr`   (where '45' is the CLDR version)
+- check results, run tests, check in and open a PR
+
 ## Data Format
 
 Each directory contains:

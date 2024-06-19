@@ -1,7 +1,6 @@
 import {
   gestures,
   GestureModelDefs,
-  InputSample,
   CumulativePathStats
 } from '@keymanapp/gesture-recognizer';
 
@@ -32,9 +31,15 @@ export interface GestureParams<Item = any> {
     permitsFlick: (item?: Item) => boolean,
 
     /**
+     * The minimum _net_ distance traveled before a longpress flick-shortcut will cancel any
+     * conflicting flick models.
+     */
+    flickDistStart: number,
+
+    /**
      * The minimum _net_ distance traveled before a longpress flick-shortcut will trigger.
      */
-    flickDist: number,
+    flickDistFinal: number,
 
     /**
      * The maximum amount of raw-distance movement allowed for a longpress before it is
@@ -104,13 +109,14 @@ export const DEFAULT_GESTURE_PARAMS: GestureParams = {
     permitsFlick: () => true,
     // Note:  actual runtime value is determined at runtime based upon row height.
     // See `VisualKeyboard.refreshLayout`, CTRL-F "Step 3".
-    flickDist: 5,
+    flickDistStart: 8,
+    flickDistFinal: 40,
     waitLength: 500,
     noiseTolerance: 10
   },
   multitap: {
-    waitLength: 500,
-    holdLength: 500
+    waitLength: 300,
+    holdLength: 150
   },
   // Note:  all actual runtime values are determined at runtime based upon row height.
   // See `VisualKeyboard.refreshLayout`, CTRL-F "Step 3".
@@ -192,6 +198,7 @@ interface LayoutGestureSupportFlags {
 
 // Simple compile-time validation that OSKLayerGroup's spec object provides the fields expected above.
 let dummy: ActiveLayout;
+// @ts-ignore // so that we don't trigger "unused local" warnings.
 let dummy2: LayoutGestureSupportFlags = dummy;
 
 /**
@@ -349,11 +356,34 @@ export function instantContactResolutionModel(): ContactModel {
   };
 }
 
-export function flickStartContactModel(params: GestureParams): ContactModel {
+export function flickStartContactModel(params: GestureParams): gestures.specs.ContactModel<KeyElement, any> {
+  const flickParams = params.flick;
+
   return {
     itemPriority: 1,
     pathModel: {
-      evaluate: (path) => path.stats.netDistance > params.flick.startDist ? 'resolve' : null
+      evaluate: (path, _, item) => {
+        const stats = path.stats;
+        const keySpec = item?.key.spec;
+
+        if(keySpec && keySpec.sk) {
+          const flickSpec = keySpec.flick;
+          const hasUpFlick = flickSpec.nw || flickSpec.n || flickSpec.ne;
+
+          if(!hasUpFlick) {
+            // Check for possible conflict with the longpress up-flick shortcut;
+            // it's supported on this key, as there is no true northish flick.
+            const baseDistance = stats.netDistance;
+            const angle = stats.angle; // from <0, -1> (straight up) going clockwise.
+            const verticalDistance = baseDistance * Math.cos(angle);
+            if(verticalDistance > params.longpress.flickDistStart) {
+              return 'reject';
+            }
+          }
+        }
+
+        return stats.netDistance > flickParams.startDist ? 'resolve' : null;
+      }
     },
     pathResolutionAction: 'resolve',
     pathInheritance: 'partial'
@@ -410,6 +440,8 @@ export function flickMidContactModel(params: GestureParams): gestures.specs.Cont
         } else if(path.isComplete) {
           return 'reject';
         }
+
+        return undefined;
       }
     },
     pathResolutionAction: 'resolve',
@@ -434,6 +466,7 @@ export function flickEndContactModel(params: GestureParams): ContactModel {
             return 'reject';
           }
         }
+        return undefined;
       }
     },
     pathResolutionAction: 'resolve',
@@ -464,7 +497,10 @@ export function longpressContactModel(params: GestureParams, enabledFlicks: bool
          * each side of due N in total.
          */
         if((enabledFlicks && spec.permitsFlick(stats.lastSample.item)) && (stats.cardinalDirection?.indexOf('n') != -1 ?? false)) {
-          if(stats.netDistance > spec.flickDist) {
+          const baseDistance = stats.netDistance;
+          const angle = stats.angle; // from <0, -1> (straight up) going clockwise.
+          const verticalDistance = baseDistance * Math.cos(angle);
+          if(verticalDistance > spec.flickDistFinal) {
             return 'resolve';
           }
         } else if(resetForRoaming) {
@@ -511,6 +547,7 @@ export function modipressContactHoldModel(): ContactModel {
         if(path.isComplete) {
           return 'reject';
         }
+        return undefined;
       }
     }
   }
@@ -526,6 +563,7 @@ export function modipressContactEndModel(): ContactModel {
         if(path.isComplete) {
           return 'resolve';
         }
+        return undefined;
       }
     }
   };
@@ -547,6 +585,8 @@ export function simpleTapContactModel(params: GestureParams, isNotInitial?: bool
         if(path.isComplete && !path.wasCancelled) {
           return 'resolve';
         }
+
+        return undefined;
       }
     }
   };
@@ -561,6 +601,7 @@ export function subkeySelectContactModel(): ContactModel {
         if(path.isComplete && !path.wasCancelled) {
           return 'resolve';
         }
+        return undefined;
       }
     }
   }
@@ -632,7 +673,8 @@ export function specialKeyEndModel(params: GestureParams): GestureModel<any> {
 export function longpressModel(params: GestureParams, allowShortcut: boolean, allowRoaming: boolean): GestureModel<any> {
   const base: GestureModel<any> = {
     id: 'longpress',
-    resolutionPriority: 0,
+    // Needs to beat flick-start priority.
+    resolutionPriority: 4,
     contacts: [
       {
         model: {
@@ -642,7 +684,8 @@ export function longpressModel(params: GestureParams, allowShortcut: boolean, al
         },
         endOnResolve: false
       }, {
-        model: instantContactRejectionModel()
+        model: instantContactRejectionModel(),
+        resetOnInstantFulfill: true
       }
     ],
     resolutionAction: {
@@ -814,7 +857,7 @@ export function flickMidModel(params: GestureParams): GestureModel<any> {
         endOnReject: true,
       }, {
         model: instantContactRejectionModel(),
-        resetOnResolve: true,
+        resetOnInstantFulfill: true,
       }
     ],
     rejectionActions: {
@@ -873,6 +916,8 @@ export function flickResetCenteringModel(params: GestureParams): GestureModel<Ke
               if(oldDist < newDist) {
                 return 'resolve';
               }
+
+              return undefined;
             },
           },
           itemPriority: 0,
@@ -916,7 +961,7 @@ export function flickEndModel(params: GestureParams): GestureModel<any> {
       },
       {
         model: instantContactResolutionModel(),
-        resetOnResolve: true
+        resetOnInstantFulfill: true
       }
     ],
     rejectionActions: {
@@ -979,7 +1024,7 @@ export function multitapEndModel(params: GestureParams): GestureModel<any> {
         endOnResolve: true
       }, {
         model: instantContactResolutionModel(),
-        resetOnResolve: true
+        resetOnInstantFulfill: true
       }
     ],
     rejectionActions: {
@@ -1014,7 +1059,7 @@ export function initialTapModel(params: GestureParams): GestureModel<any> {
         endOnResolve: true
       }, {
         model: instantContactResolutionModel(),
-        resetOnResolve: true
+        resetOnInstantFulfill: true
       }
     ],
     sustainWhenNested: true,
@@ -1045,7 +1090,7 @@ export function simpleTapModel(params: GestureParams): GestureModel<any> {
         endOnResolve: true
       }, {
         model: instantContactResolutionModel(),
-        resetOnResolve: true
+        resetOnInstantFulfill: true
       }
     ],
     sustainWhenNested: true,
@@ -1159,7 +1204,7 @@ export function modipressHoldModel(params: GestureParams): GestureModel<any> {
         },
         // The incoming tap belongs to a different gesture; we just care to know that it
         // happened.
-        resetOnResolve: true
+        resetOnInstantFulfill: true
       }
     ],
     // To be clear:  any time modipress-hold is triggered and the timer duration elapses,
@@ -1283,7 +1328,7 @@ export function modipressMultitapEndModel(params: GestureParams): GestureModel<a
         },
         // The incoming tap belongs to a different gesture; we just care to know that it
         // happened.
-        resetOnResolve: true
+        resetOnInstantFulfill: true
       }
     ],
     resolutionAction: {

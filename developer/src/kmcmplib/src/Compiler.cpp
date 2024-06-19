@@ -276,7 +276,7 @@ KMX_BOOL kmcmp::AddCompileWarning(PKMX_CHAR buf)
 KMX_BOOL AddCompileError(KMX_DWORD msg)
 {
   KMX_CHAR szText[COMPILE_ERROR_MAX_LEN];
-  KMX_CHAR* szTextp = NULL;
+  const KMX_CHAR* szTextp = NULL;
 
   if (msg & CERR_FATAL)
   {
@@ -806,12 +806,13 @@ bool resizeStoreArray(PFILE_KEYBOARD fk) {
  * reallocates the key array in increments of 100
  */
 bool resizeKeyArray(PFILE_GROUP gp, int increment) {
-  if((gp->cxKeyArray + increment - 1) % 100 < increment) {
-    PFILE_KEY kp = new FILE_KEY[((gp->cxKeyArray + increment)/100 + 1) * 100];
+  const int cxKeyArray = (int)gp->cxKeyArray;
+  if((cxKeyArray + increment - 1) % 100 < increment) {
+    PFILE_KEY kp = new FILE_KEY[((cxKeyArray + increment)/100 + 1) * 100];
     if (!kp) return false;
     if (gp->dpKeyArray)
     {
-      memcpy(kp, gp->dpKeyArray, gp->cxKeyArray * sizeof(FILE_KEY));
+      memcpy(kp, gp->dpKeyArray, cxKeyArray * sizeof(FILE_KEY));
       delete[] gp->dpKeyArray;
     }
 
@@ -1060,7 +1061,7 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
       u16ncpy(q, pp2, u16len(pp2) + 1);
 
       // Change compiled reference file extension to .kvk
-      pp2 = ( km_core_cp *) u16chr(q, 0) - 5;
+      pp2 = ( km_core_cu *) u16chr(q, 0) - 5;
       if (pp2 > q && u16icmp(pp2, u".kvks") == 0) {
         pp2[4] = 0;
       }
@@ -1191,11 +1192,11 @@ int GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store) {
     if(AnyTarget == token) {
       result |= COMPILETARGETS_KMX | COMPILETARGETS_JS;
     }
-    for(auto p: KMXKeymanTargets) {
-      if(p == token) result |= COMPILETARGETS_KMX;
+    for(auto target: KMXKeymanTargets) {
+      if(target == token) result |= COMPILETARGETS_KMX;
     }
-    for(auto p: KMWKeymanTargets) {
-      if(p == token) result |= COMPILETARGETS_JS;
+    for(auto target: KMWKeymanTargets) {
+      if(target == token) result |= COMPILETARGETS_JS;
     }
 
     token = u16tok(nullptr, u" ", &ctx);
@@ -1208,7 +1209,11 @@ int GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store) {
 }
 
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString) {   // I4140
-  /* version format \d+(\.\d+)*  e.g. 9.0.3, 1.0, 1.2.3.4, 6.2.1.4.6.4, blank is not allowed */
+  /**
+    version format: /^\d+(\.\d+)*$/
+    e.g. 9.0.3, 1.0, 1.2.3.4, 6.2.1.4.6.4, 11.22.3 are all ok; 
+    empty string is not permitted; whitespace is not permitted
+  */
 
   do {
     if (!iswdigit(*dpString)) {
@@ -3512,7 +3517,7 @@ bool UTF16TempFromUTF8(KMX_BYTE* infile, int sz, KMX_BYTE** tempfile, int *sz16)
   try {
     std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
     result = converter.from_bytes((char*)infile, (char*)infile+sz);
-  } catch(std::range_error e) {
+  } catch(std::range_error& e) {
     AddCompileError(CHINT_NonUnicodeFile);
     result.resize(sz);
     for(int i = 0; i < sz; i++) {

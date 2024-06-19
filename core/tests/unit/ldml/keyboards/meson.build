@@ -10,8 +10,7 @@
 tests_from_cldr = [
   'ja-Latn',
   'pt-t-k0-abnt2',
-  # 'fr-t-k0-optimise', (not yet)
-  'fr-t-k0-azerty',
+  'fr-t-k0-test',
   'pcm',
   'bn',
 ]
@@ -27,6 +26,7 @@ tests_without_testdata = [
   'k_010_mt',
   'k_011_mt_iso',
   'k_012_other',
+  'k_030_transform_plus',
   'k_100_keytest',
   'k_101_keytest',
   'k_102_keytest',
@@ -56,8 +56,8 @@ tests += tests_from_cldr
 
 # Setup kmc
 
-kmc_root = join_paths(meson.source_root(),'..','developer','src','kmc')
-ldml_root = join_paths(meson.source_root(),'..','resources','standards-data','ldml-keyboards','45')
+kmc_root = meson.global_source_root() / '../developer/src/kmc'
+ldml_root = meson.global_source_root() / '../resources/standards-data/ldml-keyboards/45'
 ldml_data = join_paths(ldml_root, '3.0')
 ldml_testdata = join_paths(ldml_root, 'test')
 kmc_cmd = [node, '--enable-source-maps', kmc_root]
