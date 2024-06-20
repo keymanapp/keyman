@@ -93,9 +93,17 @@ export class CompilerMessages {
   static Error_InvalidHardware = (o:{formId: string}) => m(this.ERROR_InvalidHardware,
     `layers has invalid value formId=${def(o.formId)}`);
 
+  private static layerIdOrEmpty(layer : string) {
+    if (layer) {
+      return ` on layer id=${def(layer)}`;
+    } else {
+      return '';
+    }
+  }
+
   static ERROR_InvalidModifier = SevError | 0x0014;
   static Error_InvalidModifier = (o:{layer: string, modifiers: string}) => m(this.ERROR_InvalidModifier,
-    `layer has invalid modifiers='${def(o.modifiers)}' on layer id=${def(o.layer)}`);
+    `layer has invalid modifiers='${def(o.modifiers)}'` + CompilerMessages.layerIdOrEmpty(o.layer));
 
   static ERROR_MissingFlicks = SevError | 0x0015;
   static Error_MissingFlicks = (o:{flickId: string, id: string}) => m(this.ERROR_MissingFlicks,
