@@ -3,7 +3,7 @@
 #define MC_KMXFILE_H
 
 #include "km_types.h"
-#include <../../../../common/include/kmx_file.h>
+#include <kmx_file.h>
 #include "filesystem.h"
 #include "mcompile.h"
 

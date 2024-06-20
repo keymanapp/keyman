@@ -23,7 +23,7 @@
                     08 Apr 2015 - mcdurdin - I4651 - V9.0 - Mnemonic layout recompiler maps AltGr+VK_BKSLASH rather than VK_OEM_102
 */
 //
-// m-to-p.cpp : Defines the entry point for the console application.
+// Defines the entry point for the console application.
 //
 // Note: this program deliberately leaks memory as it has a very short life cycle and managing the memory allocations
 // for the subcomponents of the compiled keyboard is an unnecessary optimisation. Just so you know.
@@ -499,4 +499,3 @@ void KMX_LogError(const wchar_t* fmt, ...) {
   while(fmtbuf[j] != *end);
   putwchar(*nl);
 }
-
