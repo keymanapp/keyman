@@ -105,6 +105,8 @@ final class KMKeyboard extends WebView {
 
   public String specialOskFont = "";
 
+  private boolean performingLateLayout = false;
+
   public KMKeyboard(Context context) {
     super(context);
     this.context = context;
@@ -468,11 +470,25 @@ final class KMKeyboard extends WebView {
     int bannerHeight = KMManager.getBannerHeight(context);
     int oskHeight = KMManager.getKeyboardHeight(context);
 
+    // If this condition is met, the current layout params are likely mismatched
+    // with the device's actual orientation.  Re-enforce & try again.
     if(bannerHeight + oskHeight != height) {
-      // We'll proceed, but cautiously and with logging.
-      KMLog.LogInfo(TAG, "Height mismatch: onSizeChanged = " + height + ", our version = " + (bannerHeight + oskHeight));
+      // Is there potential for an infinite loop of relaying out?  Doesn't seem possible,
+      // but should it happen, we'd like some hard (log) evidence.
+      if(performingLateLayout) {
+        KMLog.LogInfo(TAG, "Height mismatch: onSizeChanged = " + height + ", our version = " + (bannerHeight + oskHeight));
+      }
+
+      this.performingLateLayout = true;
+      RelativeLayout.LayoutParams params = KMManager.getKeyboardLayoutParams();
+      // I suspect this is the part we should actually be calling directly...
+      this.setLayoutParams(params);
+      this.invalidate();
+      this.requestLayout();
+      return;
     }
 
+    this.performingLateLayout = false;
     this.setDimensions(width, bannerHeight, oskHeight);
   }
 
