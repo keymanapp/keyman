@@ -9,7 +9,7 @@ std::vector<DeadKey *> create_deadkeys_by_basechar() {
 
   for (int i = 0; i < (int)dk_ComposeTable.size() - 1; i++) {
     DeadKey *dk2 = new DeadKey(dk_ComposeTable[i][0]);
-    for (int j = 0; j < (int)dk_ComposeTable.size(); j++) {
+    for (int j = i; j < (int)dk_ComposeTable.size(); j++) {
       if ((dk_ComposeTable[i][0] == dk_ComposeTable[j][0]) && (IsKeymanUsedChar(dk_ComposeTable[j][1])))
         dk2->KMX_AddDeadKeyRow(dk_ComposeTable[j][1], dk_ComposeTable[j][2]);
     }
@@ -18,22 +18,21 @@ std::vector<DeadKey *> create_deadkeys_by_basechar() {
   return alDead;
 }
 
-void refine_alDead(KMX_WCHAR dk, std::vector<DeadKey *> &dkVec, std::vector<DeadKey *> &r_All_Vec) {
+void refine_alDead(KMX_WCHAR dk, std::vector<DeadKey *>& dkVec, std::vector<DeadKey *>& r_All_Vec) {
   if (dk == 0)
     return;
 
-  for (int j = 0; j < (int)r_All_Vec.size() - 1; j++) {
-    if (dk == (r_All_Vec)[j]->KMX_GetDeadCharacter()) {
+  for (int j = 0; j < (int) r_All_Vec.size(); j++) {
+    if (dk == r_All_Vec[j]->KMX_GetDeadCharacter()) {
       if (!found_dk_inVector(dk, dkVec)) {
-        dkVec.push_back((r_All_Vec)[j]);
-        return;
-      } else
-        return;
+        dkVec.push_back(r_All_Vec[j]);
+      }
+      return;
     }
   }
 }
 
-bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey *> &dkVec) {
+bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey *>& dkVec) {
   for (int i = 0; i < dkVec.size(); i++) {
     if (dk == dkVec[i]->KMX_GetDeadCharacter())
       return true;
@@ -41,16 +40,16 @@ bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey *> &dkVec) {
   return false;
 }
 
-bool query_dk_combinations_for_specific_dk(vec_dword_2D &p_dk_ComposeTable, KMX_DWORD dk, vec_dword_2D &dk_SingleTable) {
-  vec_dword_1D line;
+bool query_dk_combinations_for_specific_dk(vec_dword_2D& r_dk_ComposeTable, KMX_DWORD dk, vec_dword_2D& dk_SingleTable) {
+  vec_dword_1D row;
 
-  for (int i = 0; i < (int)(p_dk_ComposeTable).size(); i++) {
-    if (((p_dk_ComposeTable)[i][0] == dk) && (IsKeymanUsedChar((p_dk_ComposeTable)[i][1]))) {
-      line.push_back((p_dk_ComposeTable)[i][0]);
-      line.push_back((p_dk_ComposeTable)[i][1]);
-      line.push_back((p_dk_ComposeTable)[i][2]);
-      dk_SingleTable.push_back(line);
-      line.clear();
+  for (int i = 0; i < (int)r_dk_ComposeTable.size(); i++) {
+    if (r_dk_ComposeTable[i][0] == dk && IsKeymanUsedChar(r_dk_ComposeTable[i][1])) {
+      row.push_back(r_dk_ComposeTable[i][0]);
+      row.push_back(r_dk_ComposeTable[i][1]);
+      row.push_back(r_dk_ComposeTable[i][2]);
+      dk_SingleTable.push_back(row);
+      row.clear();
     }
   }
 
@@ -60,7 +59,7 @@ bool query_dk_combinations_for_specific_dk(vec_dword_2D &p_dk_ComposeTable, KMX_
     return false;
 }
 
-KMX_DWORD KMX_change_keyname_to_capital(KMX_DWORD kVal, KMX_DWORD &shift, GdkKeymap *keymap) {
+KMX_DWORD KMX_change_keyname_to_capital(KMX_DWORD kVal, KMX_DWORD& shift, GdkKeymap* keymap) {
   guint keyval = (guint)kVal;
   GdkKeymapKey *keys;
   gint n_keys;
@@ -78,7 +77,7 @@ KMX_DWORD KMX_change_keyname_to_capital(KMX_DWORD kVal, KMX_DWORD &shift, GdkKey
   return capitalKeyval;
 }
 
-void add_deadkey_combination(vec_dword_2D &dk_ComposeTable, std::string diacritic_name, std::string base_char, KMX_DWORD unicode_value) {
+void add_deadkey_combination(vec_dword_2D& dk_ComposeTable, std::string diacritic_name, std::string base_char, KMX_DWORD unicode_value) {
   vec_dword_1D line;
   line.push_back(convertNamesTo_DWORD_Value(diacritic_name));
   line.push_back(convertNamesTo_DWORD_Value(base_char));
@@ -86,7 +85,7 @@ void add_deadkey_combination(vec_dword_2D &dk_ComposeTable, std::string diacriti
   dk_ComposeTable.push_back(line);
 }
 
-void create_DKTable(vec_dword_2D &dk_ComposeTable) {
+void create_DKTable(vec_dword_2D& dk_ComposeTable) {
   // create a 2D-Vector which contains data for ALL existing deadkey combinations on a Linux Keyboard:
   // dk_ComposeTable[i][0] : diacritic_name    		(e.g. dead_circumflex)
   // dk_ComposeTable[i][1] : base_char   					(e.g. a)
