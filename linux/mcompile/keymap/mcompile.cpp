@@ -457,9 +457,9 @@ int KMX_GetDeadkeys(vec_dword_2D & dk_Table, KMX_WORD deadkey, KMX_WORD *OutputP
 
   KMX_WORD *p = OutputPairs;
   KMX_DWORD shift;
+  vec_dword_2D dk_SingleTable;
 
-  vec_dword_2D  dk_SingleTable;
-  query_dk_combinations_for_specific_dk(&dk_Table, dk_SingleTable, deadkey);
+  query_dk_combinations_for_specific_dk(dk_Table, deadkey, dk_SingleTable);
   for ( int i=0; i< (int) dk_SingleTable.size();i++) {
     KMX_WORD vk = KMX_change_keyname_to_capital(dk_SingleTable[i][1], shift, keymap);
     if(vk != 0) {
