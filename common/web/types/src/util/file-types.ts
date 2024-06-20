@@ -65,6 +65,16 @@ export type All = Source | Binary;
 export type Any = string;
 
 /**
+ * Standard project file name - history of project in Markdown format
+ */
+export const HISTORY_MD = 'HISTORY.md';
+
+/**
+ * Standard project file name - README in Markdown format
+ */
+export const README_MD = 'README.md';
+
+/**
  * Gets the file type based on extension, dealing with multi-part file
  * extensions. Does not sniff contents of file or assume file existence. Does
  * transform upper-cased file extensions to lower-case.
