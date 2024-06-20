@@ -4,12 +4,25 @@
   <info name="warn-no-disp"/>
 
   <keys>
-    <key id="mark-dotbelow" output="\m{dotbelow}" />
+    <key id="mark-dotbelow" output="\m{dotbelow}" /> <!-- HINT -->
+    <key id="mark-dotabove" output="\m{dotabove}" /> <!-- OK: has display by id -->
+    <key id="mark-dotbelowabove" output="\m{dotabove}\m{dotbelow}" /> <!-- HINT -->
+    <key id="mark-dotabovebelow" output="\m{dotbelow}\m{dotabove}" /> <!-- OK: has display by output -->
+    <key id="mark-dotless-dot" output="\m{dotlessdot}" /> <!-- ignored, not in layout-->
+    <key id="base" layerId="base"/> <!-- has display-->
+    <key id="rebase" layerId="base"/> <!-- HINT -->
   </keys>
+
+  <displays>
+    <display keyId="mark-dotabove" display="." />
+    <display output="\m{dotbelow}\m{dotabove}" display=".." />
+    <display keyId="base" display="(BASE)" />
+  </displays>
 
   <layers formId="iso">
     <layer id="base" modifiers="none">
-      <row keys="mark-dotbelow" />
+      <row keys="mark-dotbelow mark-dotabove mark-dotabovebelow mark-dotbelowabove" />
+      <row keys="base rebase"/>
       <row keys="space" />
     </layer>
   </layers>

@@ -15,8 +15,10 @@ describe('linter-tests', function() {
       // unassigned not implemented yet
       const inputFilename = makePathToFixture('sections/keys/warn-no-keycap.xml');
       const msgs = [
-        CompilerMessages.Hint_NoDisplayForMarker({id: 'mark-dotbelow', output:'\\m{dotbelow}'}),
-      ]
+        CompilerMessages.Hint_NoDisplayForMarker({ id: 'mark-dotbelow' }),
+        CompilerMessages.Hint_NoDisplayForMarker({ id: 'mark-dotbelowabove' }),
+        CompilerMessages.Hint_NoDisplayForSwitch({ id: 'rebase' }),
+      ];
       const kmx = await compileKeyboard(inputFilename, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false },
         msgs,
         false, // validation should pass
