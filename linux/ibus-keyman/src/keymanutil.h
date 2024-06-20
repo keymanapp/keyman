@@ -78,43 +78,39 @@ void             ibus_keyman_init           (void);
 GList           *ibus_keyman_list_engines   (void);
 IBusComponent   *ibus_keyman_get_component  (void);
 
-// Obtain Keyboard Options list from DConf
-// DConf options are in a list of strings like ['option_key1=value1', 'option_key2=value2']
-//
-// Parameters:
-// package_id  (gchar *): Package ID
-// keyboard_id (gchar *): Keyboard ID
-//
-// Returns a newly allocated gchar**; free with g_strfreev()
-gchar**  keyman_get_options_fromdconf
-                                            (gchar *package_id,
-                                             gchar *keyboard_id);
+/**
+ * Obtain Keyboard Options list from DConf
+ *
+ * DConf options are in a list of strings like ['option_key1=value1', 'option_key2=value2']
+ *
+ * @param   package_id   Package ID
+ * @param   keyboard_id  Keyboard ID
+ * @return               A newly allocated gchar**; free with g_strfreev()
+ */
+gchar **keyman_get_keyboard_options_fromdconf(const gchar *package_id, const gchar *keyboard_id);
 
-// Obtain Keyboard Options from DConf and parse into a GQueue of struct km_core_option_item
-//
-// Parameters:
-// package_id  (gchar *): Package ID
-// keyboard_id (gchar *): Keyboard ID
-//
-// Return a newly allocated GQueue; free with g_queue_free_full()
-GQueue*  keyman_get_options_queue_fromdconf
-                                            (gchar *package_id,
-                                             gchar *keyboard_id);
+/**
+ * Obtain Keyboard Options from DConf and parse into a GQueue of struct km_core_option_item
+ *
+ * @param   package_id   Package ID
+ * @param   keyboard_id  Keyboard ID
+ * @return               A newly allocated GQueue; free with g_queue_free_full()
+ */
+GQueue *keyman_get_keyboard_options_queue_fromdconf(const gchar *package_id, const gchar *keyboard_id);
 
-// Write new keyboard option to DConf.
-// DConf options are in a list of strings like ['option_key1=value1', 'option_key2=value2']
-// If the option key already exists, the value is updated. Otherwise a new string 'option_key=option_value' is appended.
-//
-// Parameters:
-// package_id   (gchar *): Package ID
-// keyboard_id  (gchar *): Keyboard ID
-// option_key   (gchar *): Key for the new option
-// option_value (gchar *): Value of the new option
-void keyman_put_options_todconf
-                                            (gchar *package_id,
-                                             gchar *keyboard_id,
-                                             gchar *option_key,
-                                             gchar *option_value);
+/**
+ * Write new keyboard option to DConf
+ *
+ * DConf options are in a list of strings like ['option_key1=value1', 'option_key2=value2']
+ * If the option key already exists, the value is updated. Otherwise a new string
+ * 'option_key=option_value' is appended.
+ *
+ * @param package_id     Package ID
+ * @param keyboard_id    Keyboard ID
+ * @param option_key     Key for the new option
+ * @param option_value   Value of the new option
+ */
+void keyman_put_keyboard_options_todconf(const gchar *package_id, const gchar *keyboard_id, const gchar *option_key, const gchar *option_value);
 
 G_END_DECLS
 
