@@ -7,8 +7,10 @@ import {
   InputSequenceSimulator
 } from '#tools';
 
+import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
+
 describe("'Canary' checks", function() {
-  this.timeout(5000);
+  this.timeout(DEFAULT_BROWSER_TIMEOUT);
 
   let domain: string;
 

@@ -8,6 +8,7 @@ import { type Keyboard } from '@keymanapp/keyboard-processor';
 import sinon from 'sinon';
 
 import { assert } from 'chai';
+import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
 
 const device = new Device();
 device.detect();
@@ -29,7 +30,7 @@ const host = document.createElement('div');
 document.body.appendChild(host);
 
 describe('OSK events', function () {
-  this.timeout(5000);
+  this.timeout(DEFAULT_BROWSER_TIMEOUT);
 
   before(async () => {
     const fixture = await fetch('resources/stubs/khmer_angkor.json');
