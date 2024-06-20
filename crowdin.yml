@@ -34,6 +34,7 @@ files:
     languages_mapping:
       # Prevent invalid region pap-rPAP. Leaving "in" for Indonesian
       android_code:
+        el-polyton: b+el # TODO: figure out polyton variant
         es-419: b+es+419
         pap: pap
         shu-latn-n: b+shu+latn
@@ -44,6 +45,7 @@ files:
     languages_mapping:
       # Prevent invalid region pap-rPAP
       android_code:
+        el-polyton: b+el # TODO: figure out polyton variant
         es-419: b+es+419
         pap: pap
         shu-latn-n: b+shu+latn
@@ -136,7 +138,7 @@ files:
       osx_code:
         pt-PT: pt-PT.lproj
 
-  - source: /mac/Keyman4MacIM/Keyman4MacIM/KMKeyboardHelpWindow/en.lproj/KMKeyboardHelpWindowController.strings  
+  - source: /mac/Keyman4MacIM/Keyman4MacIM/KMKeyboardHelpWindow/en.lproj/KMKeyboardHelpWindowController.strings
     dest: /mac/app/KMKeyboardHelpWindowController.strings
     translation: /mac/Keyman4MacIM/Keyman4MacIM/KMKeyboardHelpWindow/%osx_code%/%original_file_name%
     languages_mapping:
