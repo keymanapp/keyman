@@ -65,9 +65,6 @@ int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int
   guint* keyvals;
   gint count;
 
-  if (u16len(pwszBuff) < 1)
-    return 0;
-
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
 
@@ -81,6 +78,8 @@ int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int
   g_free(keyvals);
   g_free(maps);
 
+  if (u16len(pwszBuff) < 1)
+    return 0;
 
   if ((keyVal >= deadkey_min) && (keyVal <= deadkey_max))   // deadkeys
     return -1;
