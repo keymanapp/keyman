@@ -53,10 +53,6 @@ export default class OSKLayerGroup {
 
     layers=layout['layer'];
 
-    // Set key default attributes (must use exportable names!)
-    let tKey=vkbd.getDefaultKeyObject();
-    tKey['fontsize']=ls.fontSize;
-
     for(n=0; n<layers.length; n++) {
       let layer=layers[n] as ActiveLayer;
       const layerObj = new OSKLayer(vkbd, layout, layer);

@@ -121,7 +121,7 @@ export class ActiveKeyBase {
   nextlayer: string;
   sp?: TouchLayoutKeySp;
 
-  private _baseKeyEvent: KeyEvent;
+  private _baseKeyEvent: KeyEvent | (() => KeyEvent);
   isMnemonic: boolean = false;
 
   /**
@@ -135,7 +135,7 @@ export class ActiveKeyBase {
   proportionalWidth: number;
 
   // While they're only valid on ActiveKey, spec'ing them here makes references more concise within the OSK.
-  sk?: ActiveKey[];
+  sk?: ActiveSubKey[];
   multitap?: ActiveSubKey[];
   flick?: TouchLayout.TouchLayoutFlick;
 
@@ -234,7 +234,29 @@ export class ActiveKeyBase {
 
   @Enumerable
   public get baseKeyEvent(): KeyEvent {
-    return new KeyEvent(this._baseKeyEvent);
+    let val = this._baseKeyEvent;
+    if(typeof val == 'function') {
+      val = val();
+    }
+    return new KeyEvent(val);
+  }
+
+  constructor();
+  constructor(spec: LayoutKey | LayoutSubKey, layout: ActiveLayout, displayLayer: string);
+  constructor(spec?: LayoutKey | LayoutSubKey, layout?: ActiveLayout, displayLayer?: string) {
+    // First things first:  this class's fields are designed to match that of the spec.
+    Object.assign(this, spec);
+
+    if(!this.text && typeof this.id == 'string') {
+      this.text = ActiveKey.unicodeIDToText(this.id);
+    }
+
+    this.displayLayer = displayLayer;
+    this.layer = this.layer || displayLayer;
+
+    // Compute the key's base KeyEvent properties for use in future event generation
+    // It's actually somewhat expensive to do this at the start, so we do a lazy-init.
+    this._baseKeyEvent = () => this.constructBaseKeyEvent(layout, displayLayer);
   }
 
   /**
@@ -298,7 +320,10 @@ export class ActiveKeyBase {
       switch(value) {
         case 'subkeys':
           const arr = rawKey[key as 'sk' | 'multitap'] as LayoutSubKey[];
-          if(!Array.isArray(arr)) {
+          if(arr === undefined) {
+            // `delete` has a small yet significant performance cost; bypass it.
+            break;
+          } else if(!Array.isArray(arr)) {
             delete rawKey[key as 'sk' | 'multitap'];
           } else {
             for(let i=0; i < arr.length; i++) {
@@ -313,12 +338,17 @@ export class ActiveKeyBase {
           break;
         case 'flicks':
           const flickObj = rawKey[key as 'flick'];
-          if(typeof flickObj != 'object') {
+          if(flickObj === undefined) {
+            // `delete` has a small yet significant performance cost; bypass it.
+            break;
+          } else if(typeof flickObj != 'object') {
             delete rawKey[key as 'flick'];
           } else {
             for(const flickKey of KeyTypesOfFlickList) {
               const sk = flickObj[flickKey];
-              if(typeof sk != 'object') {
+              if(sk === undefined) {
+                break;
+              } else if(typeof sk != 'object') {
                 delete flickObj[flickKey];
               } else {
                 ActiveKey.sanitize(sk);
@@ -328,7 +358,7 @@ export class ActiveKeyBase {
           break;
         default:
           const prop = rawKey[key as keyof (LayoutKey | LayoutSubKey)];
-          if(typeof prop != value) {
+          if(prop !== undefined && typeof prop != value) {
             delete rawKey[key as keyof (LayoutKey | LayoutSubKey)];
           }
       }
@@ -337,51 +367,101 @@ export class ActiveKeyBase {
     rawKey.text ||= ActiveKey.DEFAULT_KEY.text;
   }
 
-  static polyfill(key: LayoutKey, keyboard: Keyboard, layout: ActiveLayout, displayLayer: string, analysisFlagObj?: AnalysisMetadata) {
-    analysisFlagObj ||= {
-      hasFlicks: false,
-      hasLongpresses: false,
-      hasMultitaps: false
+  @Enumerable
+  private constructBaseKeyEvent(layout: ActiveLayout, displayLayer: string) {
+    // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling)
+    // Note - virtual keys should be treated case-insensitive, so we force uppercasing here.
+    let layer = this.layer || displayLayer || '';
+    let keyName= this.id ? this.id.toUpperCase() : null;
+
+    // Start:  mirrors _GetKeyEventProperties
+
+    // First check the virtual key, and process shift, control, alt or function keys
+    let props: KeyEventSpec = {
+      // Override key shift state if specified for key in layout (corrected for popup keys KMEW-93)
+      Lmodifiers: Codes.getModifierState(layer),
+      Lstates: Codes.getStateFromLayer(layer),
+      Lcode: keyName ? Codes.keyCodes[keyName] : 0,
+      LisVirtualKey: true,
+      vkCode: 0,
+      kName: keyName,
+      kLayer: layer,
+      kbdLayer: displayLayer,
+      kNextLayer: this.nextlayer,
+      device: null,
+      isSynthetic: true
+    };
+
+    let Lkc: KeyEvent = new KeyEvent(props);
+
+    if(layout.keyboard) {
+      let keyboard = layout.keyboard;
+
+      // Include *limited* support for mnemonic keyboards (Sept 2012)
+      // If a touch layout has been defined for a mnemonic keyout, do not perform mnemonic mapping for rules on touch devices.
+      if(keyboard.isMnemonic && !(layout.isDefault && layout.formFactor != 'desktop')) {
+        if(Lkc.Lcode != Codes.keyCodes['K_SPACE']) { // exception required, March 2013
+          // Jan 2019 - interesting that 'K_SPACE' also affects the caps-state check...
+          Lkc.vkCode = Lkc.Lcode;
+          this.isMnemonic = true;
+        }
+      } else {
+        Lkc.vkCode=Lkc.Lcode;
+      }
+
+      // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
+      if(!keyboard.definesPositionalOrMnemonic) {
+        Lkc.Lcode = KeyMapping._USKeyCodeToCharCode(Lkc);
+        Lkc.LisVirtualKey=false;
+      }
     }
 
-    assignDefaultsWithPropDefs(key, new ActiveKeyBase());
+    return Lkc;
+  }
+}
 
-    if(!key.text && typeof key.id == 'string') {
-      key.text = ActiveKey.unicodeIDToText(key.id);
+export class ActiveKey extends ActiveKeyBase implements LayoutKey {
+  public getSubkey(coreID: string): ActiveSubKey {
+    if(this.sk) {
+      for(let key of this.sk) {
+        if(key.coreID == coreID) {
+          return key;
+        }
+      }
     }
+
+    return null;
+  }
+
+  constructor();
+  constructor(spec: LayoutKey, layout: ActiveLayout, displayLayer: string);
+  constructor(spec?: LayoutKey, layout?: ActiveLayout, displayLayer?: string) {
+    super(spec, layout, displayLayer);
 
     // Ensure subkeys are also properly extended.
-    if(key.sk) {
-      analysisFlagObj.hasLongpresses = true;
-      for(let subkey of key.sk) {
-        ActiveSubKey.polyfill(subkey, keyboard, layout, displayLayer, analysisFlagObj);
+    const sk = this.sk;
+    if(sk) {
+      for(let i=0; i < sk.length; i++) {
+        sk[i] = new ActiveSubKey(sk[i], layout, displayLayer);
       }
     }
 
     // Also multitap keys.
-    if(key.multitap) {
-      analysisFlagObj.hasMultitaps = true;
-      for(let mtKey of key.multitap) {
-        ActiveSubKey.polyfill(mtKey, keyboard, layout, displayLayer, analysisFlagObj);
+    const multitap = this.multitap;
+    if(multitap) {
+      for(let i=0; i < multitap.length; i++) {
+        multitap[i] = new ActiveSubKey(multitap[i], layout, displayLayer);
       }
     }
 
-
-    if(key.flick) {
-      analysisFlagObj.hasFlicks = true;
-      for(let flickKey in key.flick) {
-        ActiveSubKey.polyfill(key.flick[flickKey as keyof TouchLayoutFlick], keyboard, layout, displayLayer, analysisFlagObj);
+    const flick = this.flick;
+    if(flick) {
+      for(let flickKey in flick) {
+        flick[flickKey as keyof TouchLayoutFlick] = new ActiveSubKey(flick[flickKey as keyof TouchLayoutFlick], layout, displayLayer);
       }
     }
 
-    let aKey = key as ActiveKey;
-    aKey.displayLayer = displayLayer;
-    aKey.layer = aKey.layer || displayLayer;
-
-    ActiveKeyBase.determineHint(aKey, layout.defaultHint);
-
-    // Compute the key's base KeyEvent properties for use in future event generation
-    aKey.constructBaseKeyEvent(keyboard, layout, displayLayer);
+    ActiveKey.determineHint(this, layout.defaultHint);
   }
 
   private static determineHint(spec: ActiveKey, defaultHint: TouchLayout.TouchLayoutDefaultHint): void {
@@ -436,73 +516,6 @@ export class ActiveKeyBase {
         }
         return;
     }
-  }
-
-  @Enumerable
-  private constructBaseKeyEvent(keyboard: Keyboard, layout: ActiveLayout, displayLayer: string) {
-    // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling)
-    // Note - virtual keys should be treated case-insensitive, so we force uppercasing here.
-    let layer = this.layer || displayLayer || '';
-    let keyName= this.id ? this.id.toUpperCase() : null;
-
-    // Start:  mirrors _GetKeyEventProperties
-
-    // First check the virtual key, and process shift, control, alt or function keys
-    let props: KeyEventSpec = {
-      // Override key shift state if specified for key in layout (corrected for popup keys KMEW-93)
-      Lmodifiers: Codes.getModifierState(layer),
-      Lstates: Codes.getStateFromLayer(layer),
-      Lcode: keyName ? Codes.keyCodes[keyName] : 0,
-      LisVirtualKey: true,
-      vkCode: 0,
-      kName: keyName,
-      kLayer: layer,
-      kbdLayer: displayLayer,
-      kNextLayer: this.nextlayer,
-      device: null,
-      isSynthetic: true
-    };
-
-    let Lkc: KeyEvent = new KeyEvent(props);
-
-    if(layout.keyboard) {
-      let keyboard = layout.keyboard;
-
-      // Include *limited* support for mnemonic keyboards (Sept 2012)
-      // If a touch layout has been defined for a mnemonic keyout, do not perform mnemonic mapping for rules on touch devices.
-      if(keyboard.isMnemonic && !(layout.isDefault && layout.formFactor != 'desktop')) {
-        if(Lkc.Lcode != Codes.keyCodes['K_SPACE']) { // exception required, March 2013
-          // Jan 2019 - interesting that 'K_SPACE' also affects the caps-state check...
-          Lkc.vkCode = Lkc.Lcode;
-          this.isMnemonic = true;
-        }
-      } else {
-        Lkc.vkCode=Lkc.Lcode;
-      }
-
-      // Support version 1.0 KeymanWeb keyboards that do not define positional vs mnemonic
-      if(!keyboard.definesPositionalOrMnemonic) {
-        Lkc.Lcode = KeyMapping._USKeyCodeToCharCode(Lkc);
-        Lkc.LisVirtualKey=false;
-      }
-    }
-
-    this._baseKeyEvent = Lkc;
-  }
-}
-
-
-export class ActiveKey extends ActiveKeyBase implements LayoutKey {
-  public getSubkey(coreID: string): ActiveKey {
-    if(this.sk) {
-      for(let key of this.sk) {
-        if(key.coreID == coreID) {
-          return key;
-        }
-      }
-    }
-
-    return null;
   }
 }
 
@@ -583,7 +596,18 @@ export class ActiveRow implements LayoutRow {
           break;
       }
 
-      ActiveKey.polyfill(key, keyboard, layout, displayLayer, analysisFlagObj);
+      const processedKey = new ActiveKey(key, layout, displayLayer);
+      keys[j] = processedKey;
+
+      if(processedKey.sk) {
+        analysisFlagObj.hasLongpresses = true;
+      }
+      if(processedKey.multitap) {
+        analysisFlagObj.hasMultitaps = true;
+      }
+      if(processedKey.flick) {
+        analysisFlagObj.hasFlicks = true;
+      }
     }
 
     /* The calculations here are effectively 'virtualized'.  When used with the OSK, the VisualKeyboard
@@ -771,7 +795,7 @@ export class ActiveLayout implements LayoutFormFactor{
   /**
    * Facilitates mapping layer id strings to their specification objects.
    */
-  layerMap: {[layerId: string]: ActiveLayer};
+  private layerMap: {[layerId: string]: ActiveLayer};
 
   private constructor() {
 
@@ -883,8 +907,8 @@ export class ActiveLayout implements LayoutFormFactor{
         defaultShift.multitap = [{...Layouts.dfltShiftToCaps}, {...Layouts.dfltShiftToDefault}] as ActiveSubKey[];
         shiftShift.multitap   = [{...Layouts.dfltShiftToCaps}, {...Layouts.dfltShiftToShift}] as ActiveSubKey[];
 
-        defaultShift.multitap.forEach((sk) => ActiveSubKey.polyfill(sk, keyboard, aLayout, 'default'));
-        shiftShift  .multitap.forEach((sk) => ActiveSubKey.polyfill(sk, keyboard, aLayout, 'shift'));
+        defaultShift.multitap.forEach((sk, index) => defaultShift.multitap[index] = new ActiveSubKey(sk, aLayout, 'default'));
+        shiftShift  .multitap.forEach((sk, index) => shiftShift.multitap[index]   = new ActiveSubKey(sk, aLayout, 'shift'));
       } // else no default shift -> caps multitaps.
     }
 
