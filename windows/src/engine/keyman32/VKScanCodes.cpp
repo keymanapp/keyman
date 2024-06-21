@@ -23,7 +23,7 @@ UINT USVirtualKeyToScanCode[256] =
 	0x00, // L"K_?00",				// &H0
 	0x00, // L"K_LBUTTON",			// &H1
 	0x00, // L"K_RBUTTON",			// &H2
-	0x46, // L"K_CANCE0x00, // L",		   	// &H3
+	0x46, // L"K_CANCEL",		   	// &H3
 	0x00, // L"K_MBUTTON",			// &H4
 	0x00, // L"K_?05",				// &H5
 	0x00, // L"K_?06",				// &H6
@@ -37,7 +37,7 @@ UINT USVirtualKeyToScanCode[256] =
 	0x00, // L"K_?0E",				// &HE
 	0x00, // L"K_?0F",				// &HF
 	0x2A, // L"K_SHIFT",				// &H10
-	0x1D, // L"K_CONTRO0x00, // L",			// &H11
+	0x1D, // L"K_CONTROL",			// &H11
 	0x38, // L"K_ALT",				// &H12
 	0x00, // L"K_PAUSE",				// &H13
 	0x3A, // L"K_CAPS",				// &H14
@@ -168,7 +168,7 @@ UINT USVirtualKeyToScanCode[256] =
 	0x00, // L"K_?8F",				// &H8F 
 
 	0x45, // L"K_NUMLOCK",			// &H90
-	0x46, // L"K_SCROL0x00, // L",			// &H91 
+	0x46, // L"K_SCROL",			// &H91
 
 	0x00, // L"K_?92",				// &H92
 	0x00, // L"K_?93",				// &H93
@@ -212,7 +212,7 @@ UINT USVirtualKeyToScanCode[256] =
 	0x00, // L"K_?B9",				// &HB9 
 
 	0x27, // L"K_COLON",				// &HBA
-	0x0D, // L"K_EQUA0x00, // L",				// &HBB
+	0x0D, // L"K_EQUAL",				// &HBB
 	0x33, // L"K_COMMA",				// &HBC
 	0x0C, // L"K_HYPHEN",			// &HBD
 	0x34, // L"K_PERIOD",			// &HBE
