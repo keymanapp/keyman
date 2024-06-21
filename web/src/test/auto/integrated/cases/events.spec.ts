@@ -12,19 +12,21 @@ import OSKInputEventSpec = KMWRecorder.OSKInputEventSpec;
 import { timedPromise } from '@keymanapp/web-utils';
 import { type KeymanEngine } from 'keyman/app/browser';
 
+import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
+
 const host = document.createElement('div');
 document.body.appendChild(host);
 
 const attachmentTimeout = 500;
 
 describe('Event Management', function() {
-  this.timeout(5000);
+  this.timeout(DEFAULT_BROWSER_TIMEOUT);
 
   before(function() {
-    return setupKMW(null, 5000).then(() => {
+    return setupKMW(null, DEFAULT_BROWSER_TIMEOUT).then(() => {
       // We use this keyboard since we only need minimal input functionality for these tests.
       // Smaller is better when dealing with net latency.
-      return loadKeyboardFromJSON("resources/json/keyboards/test_simple_deadkeys.json", 5000);
+      return loadKeyboardFromJSON("resources/json/keyboards/test_simple_deadkeys.json", DEFAULT_BROWSER_TIMEOUT);
     });
   });
 

@@ -1,10 +1,12 @@
 import { assert } from 'chai';
 
 import { LMLayer, Worker as WorkerBuilder }  from "@keymanapp/lexical-model-layer/web";
+
+import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
 import { defaultCapabilities } from '../helpers.mjs';
 
 describe('LMLayer', function () {
-  this.timeout(5000);
+  this.timeout(DEFAULT_BROWSER_TIMEOUT);
 
   describe('[[constructor]]', function () {
     it('should construct with a single argument', function () {

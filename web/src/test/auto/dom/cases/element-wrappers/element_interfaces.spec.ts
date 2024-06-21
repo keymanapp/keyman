@@ -4,6 +4,7 @@ import { extendString, Mock } from '@keymanapp/keyboard-processor';
 import * as wrappers from 'keyman/engine/element-wrappers';
 
 import { DynamicElements } from '../../test_utils.js';
+import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
 
 extendString();
 
@@ -958,7 +959,7 @@ if(typeof InterfaceTests == 'undefined') {
 }
 
 describe('Element Input/Output Interfacing', function() {
-  this.timeout(5000);
+  this.timeout(DEFAULT_BROWSER_TIMEOUT);
 
   before(function() {
     // Make sure the basic SMP extension hooks exist to prevent errors later.
@@ -1256,7 +1257,7 @@ describe('Element Input/Output Interfacing', function() {
   describe('Wrapper: Design-Mode IFrames', function() {
     // We're asynchronously loading IFrames, and sequentially at that.
     // We'll need a larger timeout.
-    this.timeout(5000);
+    this.timeout(DEFAULT_BROWSER_TIMEOUT);
 
     beforeEach(function(done) {
       // Per-test creation of reg. pair and dummy elements, since IFrames are async.

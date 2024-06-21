@@ -1,6 +1,8 @@
 import { assert } from 'chai';
 
 import { LMLayer, Worker }   from "@keymanapp/lexical-model-layer/web";
+
+import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
 import { defaultCapabilities } from '../helpers.mjs';
 
 // Import assertions, even using 'with', aren't yet supported in Firefox's engine.
@@ -20,7 +22,7 @@ let hazelModel;
  * of suggestions when loaded and return them sequentially.
  */
 describe('LMLayer using dummy model', function () {
-  this.timeout(5000);
+  this.timeout(DEFAULT_BROWSER_TIMEOUT);
 
   before(async () => {
     let loc = document.location;
