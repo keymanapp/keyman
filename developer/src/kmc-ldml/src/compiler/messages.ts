@@ -26,19 +26,19 @@ export class CompilerMessages {
 
   static ERROR_KeyNotFoundInKeyBag = SevError | 0x0005;
   static Error_KeyNotFoundInKeyBag = (o:{keyId: string, col: number, row: number, layer: string, form: string}) =>
-     m(this.ERROR_KeyNotFoundInKeyBag, `Key '${def(o.keyId)}' in position #${def(o.col)} on row #${def(o.row)} of layer ${def(o.layer)}, form '${def(o.form)}' not found in key bag`);
+    m(this.ERROR_KeyNotFoundInKeyBag, `Key '${def(o.keyId)}' in position #${def(o.col)} on row #${def(o.row)} of layer ${def(o.layer)}, form '${def(o.form)}' not found in key bag`);
 
   static HINT_OneOrMoreRepeatedLocales = SevHint | 0x0006;
   static Hint_OneOrMoreRepeatedLocales = () =>
-    m(this.HINT_OneOrMoreRepeatedLocales, `After minimization, one or more locales is repeated and has been removed`);
+  m(this.HINT_OneOrMoreRepeatedLocales, `After minimization, one or more locales is repeated and has been removed`);
 
   static ERROR_InvalidFile = SevError | 0x0007;
   static Error_InvalidFile = (o:{errorText: string}) =>
-    m(this.ERROR_InvalidFile, `The source file has an invalid structure: ${def(o.errorText)}`);
+  m(this.ERROR_InvalidFile, `The source file has an invalid structure: ${def(o.errorText)}`);
 
   static HINT_LocaleIsNotMinimalAndClean = SevHint | 0x0008;
   static Hint_LocaleIsNotMinimalAndClean = (o:{sourceLocale: string, locale: string}) =>
-    m(this.HINT_LocaleIsNotMinimalAndClean, `Locale '${def(o.sourceLocale)}' is not minimal or correctly formatted and should be '${def(o.locale)}'`);
+  m(this.HINT_LocaleIsNotMinimalAndClean, `Locale '${def(o.sourceLocale)}' is not minimal or correctly formatted and should be '${def(o.locale)}'`);
 
   static ERROR_InvalidScanCode = SevError | 0x0009;
   static Error_InvalidScanCode = (o:{form?: string, codes?: string[]}) =>
@@ -52,17 +52,21 @@ export class CompilerMessages {
   static Error_GestureKeyNotFoundInKeyBag = (o:{keyId: string, parentKeyId: string, attribute: string}) =>
   m(this.ERROR_GestureKeyNotFoundInKeyBag, `Key '${def(o.keyId)}' not found in key bag, referenced from other '${def(o.parentKeyId)}' in ${def(o.attribute)}`);
 
-  // 0x000C - available
+  static HINT_NoDisplayForMarker = SevHint | 0x000C;
+  static Hint_NoDisplayForMarker = (o: { id: string }) =>
+  m(this.HINT_NoDisplayForMarker, `Key element with id "${def(o.id)}" has only marker output, but there is no matching display element by output or keyId. Keycap may be blank.`);
 
   static ERROR_InvalidVersion = SevError | 0x000D;
   static Error_InvalidVersion = (o:{version: string}) =>
-    m(this.ERROR_InvalidVersion, `Version number '${def(o.version)}' must be a semantic version format string.`);
+  m(this.ERROR_InvalidVersion, `Version number '${def(o.version)}' must be a semantic version format string.`);
 
   static ERROR_MustBeAtLeastOneLayerElement = SevError | 0x000E;
   static Error_MustBeAtLeastOneLayerElement = () =>
-    m(this.ERROR_MustBeAtLeastOneLayerElement, `The source file must contain at least one layer element.`);
+  m(this.ERROR_MustBeAtLeastOneLayerElement, `The source file must contain at least one layer element.`);
 
-  // 0x000F - available
+  static HINT_NoDisplayForSwitch = SevHint | 0x000F;
+  static Hint_NoDisplayForSwitch = (o: { id: string }) =>
+  m(this.HINT_NoDisplayForSwitch, `Key element with id "${def(o.id)}" is a layer switch key, but there is no matching display element by keyId. Keycap may be blank.`);
 
   /** annotate the to= or id= entry */
   private static outputOrKeyId(o:{output?: string, keyId?: string}) {
