@@ -250,7 +250,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
   set layerId(value: string) {
     const changedLayer = value != this.layerId;
-    if(!this.layerGroup.layers[value]) {
+    if(!this.layerGroup.getLayer(value)) {
       throw new Error(`Keyboard ${this.layoutKeyboard.id} does not have a layer with id ${value}`);
     } else {
       this.layerGroup.activeLayerId = value;
@@ -1073,7 +1073,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       layerId = this.layerId;
     }
 
-    const layer = this.layerGroup.layers[layerId];
+    const layer = this.layerGroup.getLayer(layerId);
     if (!layer) {
       return;
     }
@@ -1316,13 +1316,13 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return allottedHeight;
     }
 
-    const layers = this.layerGroup.layers;
+    const layers = this.layerGroup.spec.layer;
     let oskHeight = 0;
 
     // In case the keyboard's layers have differing row counts, we check them all for the maximum needed oskHeight.
     for (const layerID in layers) {
       const layer = layers[layerID];
-      let nRows = layer.rows.length;
+      let nRows = layer.row.length;
       let rowHeight = Math.floor(allottedHeight / (nRows == 0 ? 1 : nRows));
       let layerHeight = nRows * rowHeight;
 
