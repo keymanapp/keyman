@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 18.0.60 alpha 2024-06-21
+
+* chore(web): define common timeout variable for automated testing (#11839)
+* feat(developer): warn on empty keycaps (#11810)
+* change(web): optimization for keyboard-layout preprocessing (#11263)
+* feat(web): optimization via lazy construction of OSK layers (#11264)
+* fix(developer): layr: fix modifier err message on layer w/o id (#11843)
+
 ## 18.0.59 alpha 2024-06-19
 
 * chore(deps-dev): bump braces from 3.0.2 to 3.0.3 (#11756)
