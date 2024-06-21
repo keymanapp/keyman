@@ -877,7 +877,7 @@ export class ActiveLayout implements LayoutFormFactor{
     for(let layer of layout.layer) {
       for(let row of layer.row) {
         for(let key of row.key) {
-          analysisMetadata.hasLongpresses ||= !!key.sp;
+          analysisMetadata.hasLongpresses ||= !!key.sk;
           analysisMetadata.hasFlicks      ||= !!key.flick;
           analysisMetadata.hasMultitaps   ||= !!key.multitap;
         }
