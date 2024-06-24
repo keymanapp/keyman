@@ -81,7 +81,7 @@ int createOneVectorFromBothKeyboards(vec_dword_3D& All_Vector, GdkKeymap* keymap
 int write_US_ToVector(vec_dword_3D& vec, std::string language, const char* text);
 
 // 1. step: read complete Row of Configuration file US
-bool createCompleteVector_US(FILE* fpp, const char* text, vec_string_1D& complete_List);
+bool createCompleteVector_US(std::string fullPathName, const char* section, vec_string_1D& complete_List) ;
 
 // replace Name of Key (e.g. <AD06>)  wih Keycode ( e.g. 15 )
 int replace_KeyName_with_Keycode(std::string in);

@@ -331,9 +331,9 @@ int createOneVectorFromBothKeyboards(vec_dword_3D& all_vector, GdkKeymap* keymap
 
 int write_US_ToVector(vec_dword_3D& vec, std::string language, const char* section) {
   std::string fullPathName = "/usr/share/X11/xkb/symbols/" + language;
-
   const char* path = fullPathName.c_str();
   FILE* fp         = fopen((path), "r");
+
   if (!fp) {
     printf("ERROR: could not open file!\n");
     return 1;
@@ -341,7 +341,7 @@ int write_US_ToVector(vec_dword_3D& vec, std::string language, const char* secti
 
   // create 1D-vector of the complete line
   vec_string_1D vector_completeUS;
-  if (createCompleteVector_US(fp, section, vector_completeUS)) {
+  if (createCompleteVector_US(fullPathName, section, vector_completeUS)) {
     printf("ERROR: can't Create complete row US \n");
     return 1;
   }
@@ -355,19 +355,19 @@ int write_US_ToVector(vec_dword_3D& vec, std::string language, const char* secti
   return 0;
 }
 
-bool createCompleteVector_US(FILE* fp, const char* section, vec_string_1D& complete_List) {
+bool createCompleteVector_US(std::string fullPathName, const char* section, vec_string_1D& complete_List) {
   // in the Configuration file we find the appopriate paragraph between "xkb_symbol <text>" and the next xkb_symbol
-  // and then copy all rows starting with "key <" to a 1D-Vector
+  // then copy all rows starting with "key <" to a 1D-Vector
 
-  int buffer_size = 512;
-  char line[buffer_size];
   bool create_row = false;
   const char* key = "key <";
+  std::string line;
   std::string str_us_kbd_name(section);
   std::string xbk_mark = "xkb_symbol";
+  std::ifstream inputFile(fullPathName);
 
-  if (fp) {
-    while (fgets(line, buffer_size, fp) != NULL) {
+  if (inputFile.is_open()) {
+    while (getline(inputFile, line)) {
       std::string str_buf(line);
 
       // stop when finding the mark xkb_symbol
@@ -379,7 +379,7 @@ bool createCompleteVector_US(FILE* fp, const char* section, vec_string_1D& compl
         create_row = true;
 
       // as long as we are in the same xkb_symbol layout block and find "key <" we push the whole line into a 1D-vector
-      if (create_row && (std::string(str_buf).find(key) != std::string::npos)) {
+      else if (create_row && (std::string(str_buf).find(key) != std::string::npos)) {
         complete_List.push_back(line);
       }
     }
@@ -566,12 +566,12 @@ vec_dword_2D create_empty_2D_Vector(int dim_rows, int dim_ss) {
   vec_dword_1D shifts;
   vec_dword_2D vector_2D;
 
-  for (int i = 0; i < dim_rows; i++) {
     for (int j = 0; j < dim_ss; j++) {
       shifts.push_back(INVALID_NAME);
     }
+
+  for (int i = 0; i < dim_rows; i++) {
     vector_2D.push_back(shifts);
-    shifts.clear();
   }
   return vector_2D;
 }
@@ -641,14 +641,15 @@ std::u16string convert_DeadkeyValues_To_U16str(int in) {
   if (in == 0)
     return u"\0";
 
+  if (in < (int)deadkey_min) {                    // no deadkey; no Unicode
+    return std::u16string(1, in);
+  }
+
   std::string long_name((const char*)gdk_keyval_name(in));  // e.g. "dead_circumflex",  "U+017F",  "t"
 
   if (long_name.substr(0, 2) == "U+")             // U+... Unicode value
     return CodePointToU16String(in - 0x1000000);  // GDK's gdk_keymap_translate_keyboard_state() returns (Keyvalue | 0x01000000)
                                                   // since we never have a carry-over we can just subtract 0x01000000
-  if (in < (int)deadkey_min) {                    // no deadkey; no Unicode
-    return std::u16string(1, in);
-  }
 
   KMX_DWORD lname = convertNamesTo_DWORD_Value(long_name);  // 65106 => "dead_circumflex" => 94 => "^"
 
