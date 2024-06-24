@@ -1,5 +1,27 @@
 # Keyman Version History
 
+## 18.0.60 alpha 2024-06-21
+
+* chore(web): define common timeout variable for automated testing (#11839)
+* feat(developer): warn on empty keycaps (#11810)
+* change(web): optimization for keyboard-layout preprocessing (#11263)
+* feat(web): optimization via lazy construction of OSK layers (#11264)
+* fix(developer): layr: fix modifier err message on layer w/o id (#11843)
+
+## 18.0.59 alpha 2024-06-19
+
+* chore(deps-dev): bump braces from 3.0.2 to 3.0.3 (#11756)
+* chore(developer): clarify project upgrade messages about file locations (#11819)
+* chore(deps): bump ws from 8.16.0 to 8.17.1 (#11822)
+* chore(common): update base-package node-engine setting (#11798)
+* change(web): change after-word whitespace check to be more selective (#11800)
+* chore: Revert "chore(common): update base-package node-engine setting" (#11829)
+* change(web): drop correction batching (#11768)
+* chore(web): move correction-search execution timer to its own file (#11757)
+* refactor(web): overhaul predictive-text engine's timer to better detect paused time (#11758)
+* feat(web): improve predictive-text responsiveness when typing rapidly (#11784)
+* feat(linux): re-create missing files at run-time (#11789)
+
 ## 18.0.58 alpha 2024-06-18
 
 * test(core): Add a minimal test that exercises the core API (#11781)

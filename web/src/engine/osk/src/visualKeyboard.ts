@@ -11,7 +11,6 @@ import {
   KeyEvent,
   Layouts,
   StateKeyMap,
-  LayoutKey,
   ActiveSubKey,
   timedPromise,
   ActiveKeyBase,
@@ -251,7 +250,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
   set layerId(value: string) {
     const changedLayer = value != this.layerId;
-    if(!this.layerGroup.layers[value]) {
+    if(!this.layerGroup.getLayer(value)) {
       throw new Error(`Keyboard ${this.layoutKeyboard.id} does not have a layer with id ${value}`);
     } else {
       this.layerGroup.activeLayerId = value;
@@ -908,18 +907,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       }
     }
   }
-
-  /**
-   * Returns the default properties for a key object, used to construct
-   * both a base keyboard key and popup keys
-   *
-   * @return    {Object}    An object that contains default key properties
-   */
-  getDefaultKeyObject(): ActiveKey {
-    const baseKeyObject: LayoutKey = {...ActiveKey.DEFAULT_KEY};
-    ActiveKey.polyfill(baseKeyObject, this.layoutKeyboard, this.kbdLayout, this.layerId);
-    return baseKeyObject as ActiveKey;
-  };
   //#endregion
 
   //#region VisualKeyboard - OSK touch handlers
@@ -1086,7 +1073,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       layerId = this.layerId;
     }
 
-    const layer = this.layerGroup.layers[layerId];
+    const layer = this.layerGroup.getLayer(layerId);
     if (!layer) {
       return;
     }
@@ -1329,13 +1316,19 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return allottedHeight;
     }
 
-    const layers = this.layerGroup.layers;
+    /*
+      Note:  these may not be fully preprocessed yet!
+
+      However, any "empty row bug" preprocessing has been applied, and that's
+      what we care about here.
+    */
+    const layers = this.layerGroup.spec.layer;
     let oskHeight = 0;
 
     // In case the keyboard's layers have differing row counts, we check them all for the maximum needed oskHeight.
     for (const layerID in layers) {
       const layer = layers[layerID];
-      let nRows = layer.rows.length;
+      let nRows = layer.row.length;
       let rowHeight = Math.floor(allottedHeight / (nRows == 0 ? 1 : nRows));
       let layerHeight = nRows * rowHeight;
 

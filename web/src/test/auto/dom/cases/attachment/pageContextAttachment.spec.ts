@@ -1,5 +1,6 @@
 import { PageContextAttachment } from 'keyman/engine/attachment';
 import { DeviceSpec, timedPromise } from '@keymanapp/web-utils';
+import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
 
 import { assert } from 'chai';
 
@@ -35,7 +36,7 @@ async function promiseForIframeLoad(iframe) {
 }
 
 describe('KMW element-attachment logic', function () {
-  this.timeout(5000);
+  this.timeout(DEFAULT_BROWSER_TIMEOUT);
 
   describe('attachMode: auto', () => {
     beforeEach(function() {

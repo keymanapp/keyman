@@ -1,9 +1,10 @@
 import { assert } from 'chai';
 import { LMLayerWorkerCode } from "@keymanapp/lm-worker/worker-main.wrapped.js";
+import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
 
 describe('LMLayerWorker', function () {
   // This one makes multiple subsequent calls across the WebWorker boundary, so we should be generous here.
-  this.timeout(5000);
+  this.timeout(DEFAULT_BROWSER_TIMEOUT);
 
   describe('LMLayerWorkerCode', function() {
     it('should exist!', function() {
