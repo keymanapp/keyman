@@ -74,7 +74,18 @@ describe('LMLayerWorker', function () {
       sinon.assert.calledWithMatch(fakePostMessage.lastCall, {
         message: 'suggestions',
         token: token,
-        suggestions: hazel[0]
+        suggestions: hazel[0].map((entry) => {
+          return {
+            ...entry,
+            // Dummy-model predictions all claim probability 1; there's no actual probability stuff
+            // used here.
+            'lexical-p': 1,
+            // We're predicting from a single transform, not a distribution, so probability 1.
+            'correction-p': 1,
+            // Multiply 'em together.
+            p: 1,
+          }
+        })
       });
     });
 

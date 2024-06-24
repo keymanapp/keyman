@@ -4,6 +4,12 @@ import * as correction from './correction/index.js'
 
 import TransformUtils from './transformUtils.js';
 
+type CorrectionPredictionTuple = {
+  prediction: ProbabilityMass<Suggestion>,
+  correction: ProbabilityMass<string>,
+  totalProb: number;
+};
+
 export default class ModelCompositor {
   private lexicalModel: LexicalModel;
   private contextTracker?: correction.ContextTracker;
@@ -39,9 +45,13 @@ export default class ModelCompositor {
 
   private SUGGESTION_ID_SEED = 0;
 
-  private testMode: boolean = false
+  private testMode: boolean = false;
+  private verbose: boolean = true;
 
-  constructor(lexicalModel: LexicalModel, testMode?: boolean) {
+  constructor(
+    lexicalModel: LexicalModel,
+    testMode?: boolean
+  ) {
     this.lexicalModel = lexicalModel;
     if(lexicalModel.traverseFromRoot) {
       this.contextTracker = new correction.ContextTracker();
@@ -50,23 +60,32 @@ export default class ModelCompositor {
     this.testMode = !!testMode;
   }
 
-  private predictFromCorrections(corrections: ProbabilityMass<Transform>[], context: Context): Distribution<Suggestion> {
-    let returnedPredictions: Distribution<Suggestion> = [];
+  private predictFromCorrections(corrections: ProbabilityMass<Transform>[], context: Context): CorrectionPredictionTuple[] {
+    let returnedPredictions: CorrectionPredictionTuple[] = [];
 
     for(let correction of corrections) {
       let predictions = this.lexicalModel.predict(correction.sample, context);
 
+      const { sample: correctionTransform, p: correctionProb } = correction;
+      const correctionRoot = this.wordbreak(models.applyTransform(correction.sample, context));
+
       let predictionSet = predictions.map(function(pair: ProbabilityMass<Suggestion>) {
-        let transform = correction.sample;
-        let inputProb = correction.p;
+
         // Let's not rely on the model to copy transform IDs.
         // Only bother is there IS an ID to copy.
-        if(transform.id !== undefined) {
-          pair.sample.transformId = transform.id;
+        if(correctionTransform.id !== undefined) {
+          pair.sample.transformId = correctionTransform.id;
         }
 
-        let prediction = {sample: pair.sample, p: pair.p * inputProb};
-        return prediction;
+        let tuple: CorrectionPredictionTuple = {
+          prediction: pair,
+          correction: {
+            sample: correctionRoot,
+            p: correctionProb
+          },
+          totalProb: pair.p * correctionProb
+        };
+        return tuple;
       }, this);
 
       returnedPredictions = returnedPredictions.concat(predictionSet);
@@ -76,7 +95,7 @@ export default class ModelCompositor {
   }
 
   async predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Promise<Suggestion[]> {
-    let suggestionDistribution: Distribution<Suggestion> = [];
+    let suggestionDistribution: CorrectionPredictionTuple[] = [];
     let lexicalModel = this.lexicalModel;
     let punctuation = this.punctuation;
 
@@ -119,7 +138,7 @@ export default class ModelCompositor {
     let keepOptionText = this.wordbreak(postContext);
     let keepOption: Outcome<Keep> = null;
 
-    let rawPredictions: Distribution<Suggestion> = [];
+    let rawPredictions: CorrectionPredictionTuple[] = [];
 
     // Used to restore whitespaces if operations would remove them.
     let prefixTransform: Transform;
@@ -318,10 +337,10 @@ export default class ModelCompositor {
         // If we're getting the same prediction again, it's lower-cost.  Update!
         let oldPredictionSet = correctionPredictionMap[match.matchString];
         if(oldPredictionSet) {
-          rawPredictions = rawPredictions.filter((entry) => !oldPredictionSet.find((match) => entry == match))
+          rawPredictions = rawPredictions.filter((entry) => !oldPredictionSet.find((match) => entry.prediction.sample == match.sample));
         }
 
-        correctionPredictionMap[match.matchString] = predictions;
+        correctionPredictionMap[match.matchString] = predictions.map((entry) => entry.prediction);
 
         rawPredictions = rawPredictions.concat(predictions);
 
@@ -337,13 +356,13 @@ export default class ModelCompositor {
           } else {
             // Sort the prediction list; we need them in descending order for the next check.
             rawPredictions.sort(function(a, b) {
-              return b.p - a.p;
+              return b.totalProb - a.totalProb;
             });
 
             // If the best suggestion from the search's current tier fails to beat the worst
             // pending suggestion from previous tiers, assume all further corrections will
             // similarly fail to win; terminate the search-loop.
-            if(rawPredictions[ModelCompositor.MAX_SUGGESTIONS-1].p > Math.exp(-correctionCost)) {
+            if(rawPredictions[ModelCompositor.MAX_SUGGESTIONS-1].totalProb > Math.exp(-correctionCost)) {
               break;
             }
           }
@@ -361,7 +380,7 @@ export default class ModelCompositor {
     // Section 2 - post-analysis for our generated predictions, managing 'keep'.
     // Assumption:  Duplicated 'displayAs' properties indicate duplicated Suggestions.
     // When true, we can use an 'associative array' to de-duplicate everything.
-    let suggestionDistribMap: {[key: string]: ProbabilityMass<Suggestion>} = {};
+    let suggestionDistribMap: {[key: string]: CorrectionPredictionTuple} = {};
     let currentCasing: CasingForm = null;
     if(lexicalModel.languageUsesCasing) {
       currentCasing = this.detectCurrentCasing(postContext);
@@ -370,9 +389,12 @@ export default class ModelCompositor {
     let baseWord = this.wordbreak(context);
 
     // Deduplicator + annotator of 'keep' suggestions.
-    for(let prediction of rawPredictions) {
+    for(let tuple of rawPredictions) {
+      const prediction = tuple.prediction.sample;
+      const prob = tuple.totalProb;
+
       // Combine duplicate samples.
-      let displayText = prediction.sample.displayAs;
+      let displayText = prediction.displayAs;
       let preserveAsKeep = displayText == keepOptionText;
 
       // De-duplication should be case-insensitive, but NOT
@@ -384,7 +406,7 @@ export default class ModelCompositor {
       if(preserveAsKeep) {
         // Preserve the original, pre-keyed version of the text.
         if(!keepOption) {
-          let baseTransform = prediction.sample.transform;
+          let baseTransform = prediction.transform;
 
           let keepTransform = {
             insert: keepOptionText,
@@ -393,15 +415,15 @@ export default class ModelCompositor {
             id: baseTransform.id
           }
 
-          let intermediateKeep = models.transformToSuggestion(keepTransform, prediction.p);
+          let intermediateKeep = models.transformToSuggestion(keepTransform, prob);
           keepOption = this.toAnnotatedSuggestion(intermediateKeep, 'keep',  models.QuoteBehavior.noQuotes);
           keepOption.matchesModel = true;
 
           // Since we replaced the original Suggestion with a keep-annotated one,
           // we must manually preserve the transform ID.
-          keepOption.transformId = prediction.sample.transformId;
-        } else if(keepOption.p && prediction.p) {
-          keepOption.p += prediction.p;
+          keepOption.transformId = prediction.transformId;
+        } else if(keepOption.p && prob) {
+          keepOption.p += prob;
         }
       } else {
         // Apply capitalization rules now; facilitates de-duplication of suggestions
@@ -409,16 +431,16 @@ export default class ModelCompositor {
         //
         // Example:  "apple" and "Apple" are separate when 'lower', but identical for 'initial' and 'upper'.
         if(currentCasing && currentCasing != 'lower') {
-          this.applySuggestionCasing(prediction.sample, baseWord, currentCasing);
+          this.applySuggestionCasing(prediction, baseWord, currentCasing);
           // update the mapping string, too.
-          displayText = prediction.sample.displayAs;
+          displayText = prediction.displayAs;
         }
 
         let existingSuggestion = suggestionDistribMap[displayText];
         if(existingSuggestion) {
-          existingSuggestion.p += prediction.p;
+          existingSuggestion.totalProb += prob;
         } else {
-          suggestionDistribMap[displayText] = prediction;
+          suggestionDistribMap[displayText] = tuple;
         }
       }
     }
@@ -448,28 +470,31 @@ export default class ModelCompositor {
     }
 
     suggestionDistribution = suggestionDistribution.sort(function(a, b) {
-      return b.p - a.p; // Use descending order - we want the largest probabilty suggestions first!
+      return b.totalProb - a.totalProb; // Use descending order - we want the largest probabilty suggestions first!
     });
 
-    let suggestions = suggestionDistribution.splice(0, ModelCompositor.MAX_SUGGESTIONS).map(function(value) {
-      let sample: Suggestion & {
-        p?: number,
-        "lexical-p"?: number,
-        "correction-p"?: number
-      } = value.sample;
+    let suggestions = suggestionDistribution.splice(0, ModelCompositor.MAX_SUGGESTIONS).map((tuple) => {
+      const prediction = tuple.prediction;
 
-      if(sample['p']) {
-        // For analysis / debugging
-        sample['lexical-p'] =  sample['p'];
-        sample['correction-p'] = value.p / sample['p'];
-        // Use of the Trie model always exposed the lexical model's probability for a word to KMW.
-        // It's useful for debugging right now, so may as well repurpose it as the posterior.
-        //
-        // We still condition on 'p' existing so that test cases aren't broken.
-        sample['p'] = value.p;
+      if(!this.verbose) {
+        return {
+          ...prediction.sample,
+          p: tuple.totalProb
+        };
+      } else {
+        const sample: Suggestion & {
+          p?: number,
+          "lexical-p"?: number,
+          "correction-p"?: number
+        } = {
+          ...prediction.sample,
+          p: tuple.totalProb,
+          "lexical-p": tuple.prediction.p,
+          "correction-p": tuple.correction.p
+        }
+
+        return sample;
       }
-      //
-      return sample;
     });
 
     if(keepOption) {
