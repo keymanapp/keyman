@@ -81,6 +81,7 @@ files:
     languages_mapping:
       osx_code:
         pt-PT: pt-PT.lproj
+        el-polyton: el.lproj
 
   - source: /ios/engine/KMEI/KeymanEngine/en.lproj/Localizable.strings
     dest: /ios/engine/Localizable.strings
@@ -88,6 +89,7 @@ files:
     languages_mapping:
       osx_code:
         pt-PT: pt-PT.lproj
+        el-polyton: el.lproj
 
   - source: /ios/engine/KMEI/KeymanEngine/en.lproj/Localizable.stringsdict
     dest: /ios/engine/Localizable.stringsdict
@@ -95,6 +97,7 @@ files:
     languages_mapping:
       osx_code:
         pt-PT: pt-PT.lproj
+        el-polyton: el.lproj
 
   - source: /ios/keyman/Keyman/Keyman/en.lproj/Localizable.strings
     dest: /ios/app/Localizable.strings
@@ -102,6 +105,7 @@ files:
     languages_mapping:
       osx_code:
         pt-PT: pt-PT.lproj
+        el-polyton: el.lproj
 
   # Linux files
 
