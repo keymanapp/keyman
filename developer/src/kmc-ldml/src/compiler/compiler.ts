@@ -291,10 +291,14 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
   }
 
   /**
-   * Runs any linter steps
+   * Runs any linter steps, adding hints to the callbacks as needed
    * @internal
+   * @returns true unless there was a linter failure.
    */
   private async lint(source: LDMLKeyboardXMLSourceFile, kmx: KMXPlus.KMXPlusFile) : Promise<boolean> {
+    if (!kmx || !source) {
+      return false;
+    }
     // run each of the linters
     for (const linter of this.buildLinters(source, kmx)) {
       if (!await linter.lint()) {
@@ -319,12 +323,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
     }
 
     // Run the linters
-    if (!await this.lint(source, kmx)) {
-      return false;
-    }
-
-    // We are valid if we have a keyboard file at this point.
-    return !!kmx;
+    return (await this.lint(source, kmx));
   }
 
   /**
