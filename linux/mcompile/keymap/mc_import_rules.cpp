@@ -68,8 +68,11 @@ int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
 
-  if (!(ensureValidInputForKeyboardTranslation(shift_state_pos, count, keycode)))
+  if (!(ensureValidInputForKeyboardTranslation(shift_state_pos, count, keycode))) {
+    g_free(keyvals);
+    g_free(maps);
     return 0;
+  }
 
   KMX_DWORD keyVal = (KMX_DWORD)KMX_get_KeyVal_From_KeyCode(keymap, keycode, ShiftState(shift_state_pos), caps);
   std::u16string str = convert_DeadkeyValues_To_U16str(keyVal);
@@ -89,7 +92,7 @@ int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int
     return 1;
 }
 
-KMX_WCHAR KMX_DeadKeyMap( int index, std::vector<DeadKey*>* deadkeys, int deadkeyBase, std::vector<KMX_DeadkeyMapping>* deadkeyMappings) {  // I4327   // I4353
+KMX_WCHAR KMX_DeadKeyMap(int index, std::vector<DeadKey*>* deadkeys, int deadkeyBase, std::vector<KMX_DeadkeyMapping>* deadkeyMappings) {  // I4327   // I4353
   for (size_t i = 0; i < deadkeyMappings->size(); i++) {
     if ((*deadkeyMappings)[i].deadkey == index) {
       return (*deadkeyMappings)[i].dkid;
@@ -98,7 +101,7 @@ KMX_WCHAR KMX_DeadKeyMap( int index, std::vector<DeadKey*>* deadkeys, int deadke
 
   for (size_t i = 0; i < deadkeys->size(); i++) {
     if ((*deadkeys)[i]->KMX_DeadCharacter() == index) {
-      return (KMX_WCHAR) (deadkeyBase + i);
+      return (KMX_WCHAR)(deadkeyBase + i);
     }
   }
   return 0xFFFF;
@@ -422,13 +425,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, GdkKeymap** ke
 
   kp->dpGroupArray = gp;
   for (UINT i = 0; i < kp->cxGroupArray; i++, gp++) {
-    // if(gp->fUsingKeys && gp->dpNoMatch == NULL) {   // I4550
-    //  WCHAR *p = gp->dpNoMatch = new WCHAR[4];
-    //  *p++ = UC_SENTINEL;
-    //  *p++ = CODE_USE;
-    //  *p++ = (WCHAR)(kp->cxGroupArray + 1);
-    //  *p = 0;
-    //}
     LPKMX_KEY kkp = gp->dpKeyArray;
 
     for (UINT j = 0; j < gp->cxKeyArray; j++, kkp++) {

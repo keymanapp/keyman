@@ -20,7 +20,7 @@ cpp_files = files(
     'u16.cpp',)
 
 comon_include_dir = [
-  include_directories('../../../../common/include'),
+  include_directories('../../../common/include'),
 ]
 
 

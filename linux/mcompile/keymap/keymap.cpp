@@ -621,7 +621,7 @@ int KMX_get_KeyVal_From_KeyCode(GdkKeymap *keymap, guint keycode, ShiftState ss,
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
 
-  if (!(ensureValidInputForKeyboardTranslation( map_VKShiftState_to_LinModifier(ss), count, keycode))){
+  if (!(ensureValidInputForKeyboardTranslation( map_VKShiftState_to_LinModifier(ss), count, keycode))) {
     g_free(keyvals);
     g_free(maps);
     return 0;
@@ -713,7 +713,7 @@ KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, gui
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
 
-  if (!(ensureValidInputForKeyboardTranslation( shift_state_pos, count, keycode))){
+  if (!(ensureValidInputForKeyboardTranslation( shift_state_pos, count, keycode))) {
     g_free(keyvals);
     g_free(maps);
     return 0;
@@ -738,7 +738,7 @@ KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, UIN
   if (!gdk_keymap_get_entries_for_keycode(keymap, kc_underlying, &maps, &keyvals, &count))
     return 0;
 
-  if (!(ensureValidInputForKeyboardTranslation( map_VKShiftState_to_LinModifier(vk_ShiftState), count, kc_underlying))){
+  if (!(ensureValidInputForKeyboardTranslation( map_VKShiftState_to_LinModifier(vk_ShiftState), count, kc_underlying))) {
     g_free(keyvals);
     g_free(maps);
     return 0;
@@ -754,12 +754,12 @@ KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap *keymap, UIN
     *deadkey = *dky;
     return 0xFFFF;
   }
-  else if ((keyV >  deadkey_max) || ((keyV <  deadkey_min)  &&  ( keyV > 0xFF)))             // out of range
+  else if ((keyV >  deadkey_max) || ((keyV <  deadkey_min)  &&  ( keyV > 0xFF)))            // out of range
     return 0xFFFE;
   else                                                                                      // usable char
     return keyV;
 }
-//_S2 vk_us or underlying!!"!!"
+
 KMX_WCHAR KMX_get_KeyValUnderlying_From_KeyValUS(vec_dword_3D & all_vector, KMX_DWORD vk_US) {
   KMX_DWORD vk_underlying;
   for( int i=0; i< (int)all_vector[0].size()-1 ;i++) {
