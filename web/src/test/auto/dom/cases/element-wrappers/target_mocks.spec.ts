@@ -3,6 +3,7 @@ import { assert } from 'chai';
 import { extendString, Mock } from '@keymanapp/keyboard-processor';
 import { Input } from 'keyman/engine/element-wrappers';
 
+import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
 extendString();
 
 var MockTests;
@@ -70,7 +71,7 @@ if(typeof MockTests == 'undefined') {
 }
 
 describe('OutputTarget Mocking', function() {
-  this.timeout(5000);
+  this.timeout(DEFAULT_BROWSER_TIMEOUT);
 
   before(function() {
     // Make sure the basic SMP extension hooks exist to prevent errors later.

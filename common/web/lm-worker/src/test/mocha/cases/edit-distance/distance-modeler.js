@@ -4,6 +4,10 @@ import * as correction from '#./correction/index.js';
 
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
+function buildTestTimer() {
+  return new correction.ExecutionTimer(Number.MAX_VALUE, Number.MAX_VALUE);
+}
+
 function assertEdgeChars(edge, input, match) {
   assert.isTrue(edgeHasChars(edge, input, match));
 }
@@ -249,13 +253,12 @@ describe('Correction Distance Modeler', function() {
     });
 
     let checkResults_teh = async function(iter) {
-      let firstSet = await iter.next();  // {value: <actual value>, done: <iteration complete?>}
-      assert.isFalse(firstSet.done);
+      let firstResult = await iter.next();  // {value: <actual value>, done: <iteration complete?>}
+      assert.isFalse(firstResult.done);
 
-      firstSet = firstSet.value; // Retrieves <actual value>
+      firstResult = firstResult.value; // Retrieves <actual value>
       // No checks on the first set's cost.
-      assert.equal(firstSet.length, 1); // A single sequence ("ten") should be the best match.
-      assert.equal(firstSet[0].matchString, "ten");
+      assert.equal(firstResult.matchString, "ten");
 
       let secondBatch = [
         'beh',  'te',  'tec',
@@ -264,15 +267,30 @@ describe('Correction Distance Modeler', function() {
         'the'
       ];
 
-      let secondSet = await iter.next();  // {value: <actual value>, done: <iteration complete?>}
-      assert.isFalse(secondSet.done);
+      async function checkBatch(batch, prevCost) {
+        let cost;
+        firstResult = firstResult;
+        while(batch.length > 0) {
+          const iter_result = await iter.next();
+          assert.isFalse(iter_result.done);
 
-      secondSet = secondSet.value; // Retrieves <actual value>
-      assert.isAbove(secondSet[0].totalCost, firstSet[0].totalCost); // assert it 'costs more'.
-      assert.equal(secondSet.length, secondBatch.length);
+          const result = iter_result.value;
+          assert.isAbove(result.totalCost, prevCost);
+          if(cost !== undefined) {
+            assert.equal(result.totalCost, cost);
+          } else {
+            cost = result.totalCost;
+          }
 
-      let entries = secondSet.map(result => result.matchString).sort();
-      assert.deepEqual(entries, secondBatch);
+          const matchIndex = batch.findIndex((entry) => entry == result.matchString);
+          assert.notEqual(matchIndex, -1, `'${result.matchString}' received as prediction too early`);
+          batch.splice(matchIndex, 1);
+        }
+
+        return cost;
+      }
+
+      const secondCost = await checkBatch(secondBatch, firstResult.totalCost);
 
       let thirdBatch = [
         'cen', 'en',  'gen',
@@ -282,15 +300,7 @@ describe('Correction Distance Modeler', function() {
         'thu', 'wen'
       ];
 
-      let thirdSet = await iter.next();  // {value: <actual value>, done: <iteration complete?>}
-      assert.isFalse(thirdSet.done);
-
-      thirdSet = thirdSet.value; // Retrieves <actual value>
-      assert.isAbove(thirdSet[0].totalCost, secondSet[0].totalCost); // assert it 'costs more'.
-      assert.equal(thirdSet.length, thirdBatch.length);
-
-      entries = thirdSet.map(result => result.matchString).sort();
-      assert.deepEqual(entries, thirdBatch);
+      await checkBatch(thirdBatch, secondCost);
     }
 
     it('Simple search without input', async function() {
@@ -300,9 +310,9 @@ describe('Correction Distance Modeler', function() {
 
       let searchSpace = new correction.SearchSpace(testModel);
 
-      let iter = searchSpace.getBestMatches();
-      let firstSet = await iter.next();
-      assert.isFalse(firstSet.done);
+      let iter = searchSpace.getBestMatches(buildTestTimer());
+      let firstResult = await iter.next();
+      assert.isFalse(firstResult.done);
     });
 
     it('Simple search (paralleling "Small integration test")', async function() {
@@ -331,32 +341,8 @@ describe('Correction Distance Modeler', function() {
       searchSpace.addInput(synthDistribution2);
       searchSpace.addInput(synthDistribution3);
 
-      let iter = searchSpace.getBestMatches(0); // disables the correction-search timeout.
+      let iter = searchSpace.getBestMatches(buildTestTimer()); // disables the correction-search timeout.
       await checkResults_teh(iter);
-
-      // // Debugging method:  a simple loop for printing out the generated sets, in succession.
-      // //
-      // for(let i = 1; i <= 8; i++) {  // After 8 tiers, we run out of entries for this particular case.
-      //   console.log();
-      //   console.log("Batch " + i);
-
-      //   let set = iter.next();
-      //   assert.isFalse(set.done);
-
-      //   set = set.value;
-
-      //   let entries = set.map(function(result) {
-      //     return result.matchString;
-      //   });
-
-      //   console.log("Entry count: " + set.length);
-      //   entries.sort();
-      //   console.log(entries);
-      //   console.log("Probablility:  " + set[0].totalCost);
-      //   console.log("Analysis (first entry):");
-      //   console.log(" - Edit cost:  " + set[0].knownCost);
-      //   console.log(" - Input cost: " + set[0].inputSamplingCost);
-      // }
     });
 
     it('Allows reiteration (sequentially)', async function() {
@@ -385,12 +371,12 @@ describe('Correction Distance Modeler', function() {
       searchSpace.addInput(synthDistribution2);
       searchSpace.addInput(synthDistribution3);
 
-      let iter = searchSpace.getBestMatches(0); // disables the correction-search timeout.
+      let iter = searchSpace.getBestMatches(buildTestTimer()); // disables the correction-search timeout.
       await checkResults_teh(iter);
 
       // The key: do we get the same results the second time?
       // Reset the iterator first...
-      let iter2 = searchSpace.getBestMatches(0); // disables the correction-search timeout.
+      let iter2 = searchSpace.getBestMatches(buildTestTimer()); // disables the correction-search timeout.
       await checkResults_teh(iter2);
     });
 
@@ -400,17 +386,17 @@ describe('Correction Distance Modeler', function() {
       assert.isNotEmpty(rootTraversal);
 
       let searchSpace = new correction.SearchSpace(testModel);
-      let iter = searchSpace.getBestMatches();
+      const timer = buildTestTimer();
+      let iter = searchSpace.getBestMatches(timer);
 
       // While there's no input, insertion operations can produce suggestions.
       let resultState = await iter.next();
-      let results = resultState.value;
+      let result = resultState.value;
 
       // Just one suggestion should be returned.
-      assert.equal(results.length, 1);
-      assert.equal(results[0].totalCost, 0);             // Gives a perfect match
-      assert.equal(results[0].inputSequence.length, 0);  // for a state with no input and
-      assert.equal(results[0].matchString, '');          // an empty match string.
+      assert.equal(result.totalCost, 0);             // Gives a perfect match
+      assert.equal(result.inputSequence.length, 0);  // for a state with no input and
+      assert.equal(result.matchString, '');          // an empty match string.
       assert.isFalse(resultState.done);
     });
   });

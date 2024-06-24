@@ -11,8 +11,8 @@ from PIL import Image, ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
-def changeblacktowhite(im):
-    data = np.array(im)   # "data" is a height x width x 4 numpy array
+def _changeblacktowhite(image):
+    data = np.array(image)   # "data" is a height x width x 4 numpy array
     red, green, blue, alpha = data.T  # Temporarily unpack the bands for readability
 
     # Replace black with white... (leaves alpha values alone...)
@@ -50,15 +50,15 @@ def checkandsaveico(icofile):
 
 
 def _convert_ico_to_bmp(icofile, bmpfile):
-    with Image.open(icofile) as im:
-        with im.convert('RGBA') as im2:
-            num, colour = max(im.getcolors(im2.size[0] * im2.size[1]))
+    with Image.open(icofile) as image:
+        with image.convert('RGBA') as image2:
+            num, colour = max(image.getcolors(image2.size[0] * image2.size[1]))
             logging.debug(f"checkandsaveico maxcolour: num {num}: colour {colour}")
             if num > 160 and colour == (0, 0, 0, 0):
                 logging.info(f"checkandsaveico:{icofile} mostly black so changing black to white")
-                im2.close()
-                im2 = changeblacktowhite(im)
-            im2.save(bmpfile)
+                image2.close()
+                image2 = _changeblacktowhite(image)
+            image2.save(bmpfile)
 
 
 def extractico(kmxfile):
@@ -109,7 +109,7 @@ def extractico(kmxfile):
     return True
 
 
-def main(argv):
+def main():
     if len(sys.argv) != 2:
         logging.error("convertico.py <ico file | kmx file>")
         sys.exit(2)
@@ -122,4 +122,4 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()

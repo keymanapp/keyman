@@ -10,6 +10,7 @@ import { DOMKeyboardLoader } from '@keymanapp/keyboard-processor/dom-keyboard-lo
 import { loadKeyboardsFromStubs } from '../../kbdLoader.js';
 
 import { DeviceSpec, ManagedPromise, timedPromise } from '@keymanapp/web-utils';
+import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
 import sinon from 'sinon';
 
 import { assert } from 'chai';
@@ -127,7 +128,7 @@ async function withDelayedFetching(keyboardLoader, time, closure) {
 }
 
 describe('app/browser:  ContextManager', function () {
-  this.timeout(5000);
+  this.timeout(DEFAULT_BROWSER_TIMEOUT);
 
   /**
    * Holds a test-specific instance of ContextManager.

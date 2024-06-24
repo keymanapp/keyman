@@ -1,0 +1,1 @@
+export const DEFAULT_BROWSER_TIMEOUT = 5000; //ms

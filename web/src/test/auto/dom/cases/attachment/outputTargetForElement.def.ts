@@ -11,6 +11,7 @@ import {
 } from 'keyman/engine/attachment';
 
 import { timedPromise } from '@keymanapp/web-utils';
+import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
 import sinon from 'sinon';
 
 import { assert } from 'chai';
@@ -41,7 +42,7 @@ function promiseForIframeLoad(iframe) {
 }
 
 describe('outputTargetForElement()', function () {
-  this.timeout(5000);
+  this.timeout(DEFAULT_BROWSER_TIMEOUT);
 
   before(async function() {
     const attacher = this.attacher = new PageContextAttachment(window.document, STANDARD_OPTIONS);
@@ -139,7 +140,7 @@ describe('outputTargetForElement()', function () {
 });
 
 describe('eventOutputTarget()', function () {
-  this.timeout(5000);
+  this.timeout(DEFAULT_BROWSER_TIMEOUT);
 
   before(async function() {
     const attacher = this.attacher = new PageContextAttachment(window.document, STANDARD_OPTIONS);
