@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 18.0.61 alpha 2024-06-24
+
+* feat(web): optimization via lazy preprocessing of keyboard touch-layout info (#11265)
+* fix(android): clear globe highlight when displaying keyboard picker (#11826)
+* refactor(linux): add KeymanOption class for options :checkered_flag: (#11850)
+* refactor(linux): rename methods that deal with keyboard options :checkered_flag: (#11851)
+
 ## 18.0.60 alpha 2024-06-21
 
 * chore(web): define common timeout variable for automated testing (#11839)
