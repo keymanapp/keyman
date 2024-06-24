@@ -846,16 +846,16 @@ KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode) {
 std::u16string CodePointToU16String(unsigned int codepoint) {
   std::u16string str;
 
-  if constexpr (sizeof(wchar_t) > 2) {
-    str = static_cast<char16_t>(codepoint);
-  } else if (codepoint <= 0xFFFF) {
+  if (codepoint <= 0xFFFF) {
     str = static_cast<char16_t>(codepoint);
   } else {
+    assert(codepoint < 0x10FFFF);
+    assert(isLittleEndianSystem());
+
     codepoint -= 0x10000;
     str.resize(2);
-    str[0] = static_cast<wchar_t>(0xD800 + ((codepoint >> 10) & 0x3FF));
-    str[1] = static_cast<wchar_t>(0xDC00 + (codepoint & 0x3FF));
+    str[0] = static_cast<char16_t>(0xDC00 + (codepoint & 0x3FF));
+    str[1] = static_cast<char16_t>(0xD800 + ((codepoint >> 10) & 0x3FF));
   }
-
   return str;
 }

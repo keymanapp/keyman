@@ -15,6 +15,7 @@
 #include <string>
 #include <vector>
 #include "u16.h"
+#include<cassert>
 
 enum ShiftState {
   Base         = 0,                   // 0
@@ -64,6 +65,11 @@ static KMX_DWORD INVALID_NAME = 0;
 static KMX_DWORD keycode_max  = 94;
 static KMX_DWORD deadkey_min  = 0xfe50;  // X11's keysymdef.h defines deadkeys between 0xfe50-0xfe93
 static KMX_DWORD deadkey_max  = 0xfe93;  // https://fossies.org/linux/tk/xlib/X11/keysymdef.h
+
+inline bool isLittleEndianSystem() {
+  char16_t test = 0x0102;
+  return (reinterpret_cast<char *>(&test))[0] == 0x02;
+}
 
 // map Shiftstate to modifier (e.g. 0->0; 16-1; 9->2; 25->3)
 int convert_WinShiftstate_to_LinuxShiftstate(int VKShiftState);
