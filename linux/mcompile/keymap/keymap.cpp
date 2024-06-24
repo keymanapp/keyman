@@ -772,8 +772,7 @@ KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap* keymap, gui
   return kVal;
 }
 
-KMX_DWORD
-KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap* keymap, UINT vk_ShiftState, UINT kc_underlying, PKMX_WCHAR deadkey) {
+KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap* keymap, UINT vk_ShiftState, UINT kc_underlying, PKMX_WCHAR deadkey) {
   GdkKeymapKey* maps;
   guint* keyvals;
   gint count;
@@ -783,28 +782,27 @@ KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap* keymap, UINT vk_Shift
     return 0;
 
   if (!(ensureValidInputForKeyboardTranslation(
-          convert_WinShiftstate_to_LinuxShiftstate(vk_ShiftState), (int)count, (int)kc_underlying))) {
+    convert_WinShiftstate_to_LinuxShiftstate(vk_ShiftState), (int)count, (int)kc_underlying))) {
     g_free(keyvals);
     g_free(maps);
     return 0;
   }
 
-  KMX_DWORD keyV =
-      KMX_get_KeyVal_From_KeyCode(keymap, kc_underlying, ShiftState(convert_WinShiftstate_to_LinuxShiftstate(vk_ShiftState)), 0);
+  KMX_DWORD keyV = KMX_get_KeyVal_From_KeyCode(keymap, kc_underlying, ShiftState(convert_WinShiftstate_to_LinuxShiftstate(vk_ShiftState)), 0);
 
   g_free(keyvals);
   g_free(maps);
 
-  if ((keyV >= deadkey_min) && (keyV <= deadkey_max)) {  // deadkey
-    dky      = (PKMX_WCHAR)(convert_DeadkeyValues_To_U16str((int)keyV)).c_str();
+  if ((keyV >= deadkey_min) && (keyV <= deadkey_max)) {                          // deadkey
+    dky = (PKMX_WCHAR)(convert_DeadkeyValues_To_U16str((int)keyV)).c_str();
     *deadkey = *dky;
     return 0xFFFF;
-  } else if ((keyV > deadkey_max) || ((keyV < deadkey_min) && (keyV > 0xFF)))  // out of range
+  } else if ((keyV > deadkey_max) || ((keyV < deadkey_min) && (keyV > 0xFF)))   // out of range
     return 0xFFFE;
-  else  // usable char
+  else                                                                          // usable char
     return keyV;
 }
-//_S2 vk_us or underlying!!"!!"
+
 KMX_WCHAR KMX_get_KeyValUnderlying_From_KeyValUS(vec_dword_3D& all_vector, KMX_DWORD vk_US) {
   KMX_DWORD vk_underlying;
   for (int i = 0; i < (int)all_vector[0].size() - 1; i++) {
@@ -818,8 +816,7 @@ KMX_WCHAR KMX_get_KeyValUnderlying_From_KeyValUS(vec_dword_3D& all_vector, KMX_D
   return vk_US;
 }
 
-KMX_DWORD
-KMX_get_KeyCodeUnderlying_From_KeyCodeUS(GdkKeymap* keymap, vec_dword_3D& all_vector, KMX_DWORD kc_us, ShiftState ss, int caps) {
+KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeyCodeUS(GdkKeymap* keymap, vec_dword_3D& all_vector, KMX_DWORD kc_us, ShiftState ss, int caps) {
   KMX_DWORD kc_underlying;
   std::u16string u16str = convert_DeadkeyValues_To_U16str(KMX_get_KeyVal_From_KeyCode(keymap, kc_us, ss, caps));
 

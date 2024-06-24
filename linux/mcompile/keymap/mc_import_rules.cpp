@@ -92,7 +92,7 @@ int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int
     return 1;
 }
 
-KMX_WCHAR KMX_DeadKeyMap( int index, std::vector<DeadKey*>* deadkeys, int deadkeyBase, std::vector<KMX_DeadkeyMapping>* deadkeyMappings) {  // I4327   // I4353
+KMX_WCHAR KMX_DeadKeyMap(int index, std::vector<DeadKey*>* deadkeys, int deadkeyBase, std::vector<KMX_DeadkeyMapping>* deadkeyMappings) {  // I4327   // I4353
   for (size_t i = 0; i < deadkeyMappings->size(); i++) {
     if ((*deadkeyMappings)[i].deadkey == index) {
       return (*deadkeyMappings)[i].dkid;
@@ -101,7 +101,7 @@ KMX_WCHAR KMX_DeadKeyMap( int index, std::vector<DeadKey*>* deadkeys, int deadke
 
   for (size_t i = 0; i < deadkeys->size(); i++) {
     if ((*deadkeys)[i]->KMX_DeadCharacter() == index) {
-      return (KMX_WCHAR) (deadkeyBase + i);
+      return (KMX_WCHAR)(deadkeyBase + i);
     }
   }
   return 0xFFFF;
@@ -425,13 +425,6 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, GdkKeymap** ke
 
   kp->dpGroupArray = gp;
   for (UINT i = 0; i < kp->cxGroupArray; i++, gp++) {
-    // if(gp->fUsingKeys && gp->dpNoMatch == NULL) {   // I4550
-    //  WCHAR *p = gp->dpNoMatch = new WCHAR[4];
-    //  *p++ = UC_SENTINEL;
-    //  *p++ = CODE_USE;
-    //  *p++ = (WCHAR)(kp->cxGroupArray + 1);
-    //  *p = 0;
-    //}
     LPKMX_KEY kkp = gp->dpKeyArray;
 
     for (UINT j = 0; j < gp->cxKeyArray; j++, kkp++) {
