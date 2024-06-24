@@ -407,7 +407,7 @@ load_keyboard_options(IBusKeymanEngine *keyman) {
   // Retrieve keyboard options from DConf
   // TODO: May need unique packageID and keyboard ID
   g_message("%s: Loading options for kb_name: %s", __FUNCTION__, keyman->kb_name);
-  GQueue *queue_options = keyman_get_options_queue_fromdconf(keyman->kb_name, keyman->kb_name);
+  GQueue *queue_options = keyman_get_keyboard_options_queue_fromdconf(keyman->kb_name, keyman->kb_name);
   int num_options       = g_queue_get_length(queue_options);
   if (num_options < 1) {
     g_queue_free_full(queue_options, free_km_core_option_item);
@@ -655,7 +655,7 @@ process_persist_action(IBusEngine *engine, km_core_option_item *persist_options)
     g_assert(option->key != NULL && option->value != NULL);
     g_message("%s: Saving keyboard option to DConf", __FUNCTION__);
     // Load the current keyboard options from DConf
-    keyman_put_options_todconf(keyman->kb_name, keyman->kb_name, (gchar *)option->key, (gchar *)option->value);
+    keyman_put_keyboard_options_todconf(keyman->kb_name, keyman->kb_name, (gchar *)option->key, (gchar *)option->value);
   }
 }
 

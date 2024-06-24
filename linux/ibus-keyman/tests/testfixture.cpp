@@ -320,7 +320,7 @@ static void test_source(IBusKeymanTestsFixture *fixture, gconstpointer user_data
     if (option.type == km::tests::KOT_INPUT) {
       auto key = g_utf16_to_utf8((gunichar2 *)option.key.c_str(), option.key.length(), NULL, NULL, NULL);
       auto value = g_utf16_to_utf8((gunichar2 *)option.value.c_str(), option.value.length(), NULL, NULL, NULL);
-      keyman_put_options_todconf(data->test_name, data->test_name, key, value);
+      keyman_put_keyboard_options_todconf(data->test_name, data->test_name, key, value);
     }
   }
   g_settings_sync();

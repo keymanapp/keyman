@@ -10,21 +10,21 @@
 #define TEST_FIXTURE "keymanutil-test"
 
 void
-_delete_tst_options_key(gchar* testname) {
+_delete_tst_keyboard_options_key(const gchar* testname) {
   g_autofree gchar *path = g_strdup_printf("%s%s/%s/", KEYMAN_DCONF_OPTIONS_PATH, TEST_FIXTURE, testname);
   g_autoptr(GSettings) settings = g_settings_new_with_path(KEYMAN_DCONF_OPTIONS_CHILD_NAME, path);
   g_settings_reset(settings, KEYMAN_DCONF_OPTIONS_KEY);
 }
 
 void
-_set_tst_options_key(gchar* testname, gchar** options) {
+_set_tst_keyboard_options_key(const gchar* testname, const gchar* const* options) {
   g_autofree gchar* path = g_strdup_printf("%s%s/%s/", KEYMAN_DCONF_OPTIONS_PATH, TEST_FIXTURE, testname);
   g_autoptr(GSettings) settings = g_settings_new_with_path(KEYMAN_DCONF_OPTIONS_CHILD_NAME, path);
-  g_settings_set_strv(settings, KEYMAN_DCONF_OPTIONS_KEY, (const gchar* const*)options);
+  g_settings_set_strv(settings, KEYMAN_DCONF_OPTIONS_KEY, options);
 }
 
 gchar**
-_get_tst_options_key(gchar* testname) {
+_get_tst_keyboard_options_key(const gchar* testname) {
   g_autofree gchar* path = g_strdup_printf("%s%s/%s/", KEYMAN_DCONF_OPTIONS_PATH, TEST_FIXTURE, testname);
   g_autoptr(GSettings) settings = g_settings_new_with_path(KEYMAN_DCONF_OPTIONS_CHILD_NAME, path);
   gchar** result = g_settings_get_strv(settings, KEYMAN_DCONF_OPTIONS_KEY);
@@ -126,58 +126,58 @@ _kmn_assert_cmpstrv(gchar** result, gchar** expected) {
 
 //----------------------------------------------------------------------------------------------
 void
-test_keyman_put_options_todconf__invalid() {
+test_keyman_put_keyboard_options_todconf__invalid() {
   // Initialize
-  gchar* testname = "test_keyman_put_options_todconf__test_keyman_put_options_todconf__invalid";
-  _delete_tst_options_key(testname);
+  const gchar* testname = __FUNCTION__;
+  _delete_tst_keyboard_options_key(testname);
 
   // Execute
-  keyman_put_options_todconf(TEST_FIXTURE, testname, "new_key", NULL);
+  keyman_put_keyboard_options_todconf(TEST_FIXTURE, testname, "new_key", NULL);
 
   // Verify
-  g_auto(GStrv) options = _get_tst_options_key(testname);
+  g_auto(GStrv) options = _get_tst_keyboard_options_key(testname);
   g_assert_nonnull(options);
   g_assert_null(options[0]);
 
   // Cleanup
-  _delete_tst_options_key(testname);
+  _delete_tst_keyboard_options_key(testname);
 }
 
 void
-test_keyman_put_options_todconf__new_key() {
+test_keyman_put_keyboard_options_todconf__new_key() {
   // Initialize
-  gchar* testname = "test_keyman_put_options_todconf__new_key";
-  _delete_tst_options_key(testname);
+  const gchar* testname = __FUNCTION__;
+  _delete_tst_keyboard_options_key(testname);
   g_autofree gchar* value = g_strdup_printf("%d", g_test_rand_int());
 
   // Execute
-  keyman_put_options_todconf(TEST_FIXTURE, testname, "new_key", value);
+  keyman_put_keyboard_options_todconf(TEST_FIXTURE, testname, "new_key", value);
 
   // Verify
-  g_auto(GStrv) options = _get_tst_options_key(testname);
+  g_auto(GStrv) options = _get_tst_keyboard_options_key(testname);
   g_autofree gchar* expected = g_strdup_printf("new_key=%s", value);
   g_assert_nonnull(options);
   g_assert_cmpstr(options[0], ==, expected);
   g_assert_null(options[1]);
 
   // Cleanup
-  _delete_tst_options_key(testname);
+  _delete_tst_keyboard_options_key(testname);
 }
 
 void
-test_keyman_put_options_todconf__other_keys() {
+test_keyman_put_keyboard_options_todconf__other_keys() {
   // Initialize
-  gchar* testname = "test_keyman_put_options_todconf__other_keys";
-  _delete_tst_options_key(testname);
-  gchar* existingKeys[] = {"key1=val1", "key2=val2", NULL};
-  _set_tst_options_key(testname, existingKeys);
+  const gchar* testname = __FUNCTION__;
+  _delete_tst_keyboard_options_key(testname);
+  const gchar* const existingKeys[] = {"key1=val1", "key2=val2", NULL};
+  _set_tst_keyboard_options_key(testname, existingKeys);
   g_autofree gchar* value = g_strdup_printf("%d", g_test_rand_int());
 
   // Execute
-  keyman_put_options_todconf(TEST_FIXTURE, testname, "new_key", value);
+  keyman_put_keyboard_options_todconf(TEST_FIXTURE, testname, "new_key", value);
 
   // Verify
-  g_auto(GStrv) options = _get_tst_options_key(testname);
+  g_auto(GStrv) options = _get_tst_keyboard_options_key(testname);
   g_autofree gchar* expected = g_strdup_printf("new_key=%s", value);
   g_assert_nonnull(options);
   g_assert_cmpstr(options[0], ==, "key1=val1");
@@ -186,23 +186,23 @@ test_keyman_put_options_todconf__other_keys() {
   g_assert_null(options[3]);
 
   // Cleanup
-  _delete_tst_options_key(testname);
+  _delete_tst_keyboard_options_key(testname);
 }
 
 void
-test_keyman_put_options_todconf__existing_key() {
+test_keyman_put_keyboard_options_todconf__existing_key() {
   // Initialize
-  gchar* testname = "test_keyman_put_options_todconf__existing_key";
-  _delete_tst_options_key(testname);
-  gchar* existingKeys[] = {"key1=val1", "new_key=val2", NULL};
-  _set_tst_options_key(testname, existingKeys);
+  const gchar* testname = __FUNCTION__;
+  _delete_tst_keyboard_options_key(testname);
+  const gchar* const existingKeys[] = {"key1=val1", "new_key=val2", NULL};
+  _set_tst_keyboard_options_key(testname, existingKeys);
   g_autofree gchar* value = g_strdup_printf("%d", g_test_rand_int());
 
   // Execute
-  keyman_put_options_todconf(TEST_FIXTURE, testname, "new_key", value);
+  keyman_put_keyboard_options_todconf(TEST_FIXTURE, testname, "new_key", value);
 
   // Verify
-  g_auto(GStrv) options = _get_tst_options_key(testname);
+  g_auto(GStrv) options = _get_tst_keyboard_options_key(testname);
   g_autofree gchar* expected = g_strdup_printf("new_key=%s", value);
   g_assert_nonnull(options);
   g_assert_cmpstr(options[0], ==, "key1=val1");
@@ -210,7 +210,7 @@ test_keyman_put_options_todconf__existing_key() {
   g_assert_null(options[2]);
 
   // Cleanup
-  _delete_tst_options_key(testname);
+  _delete_tst_keyboard_options_key(testname);
 }
 
 //----------------------------------------------------------------------------------------------
@@ -1107,10 +1107,10 @@ int main(int argc, char* argv[]) {
   }
 
   // Add tests
-  g_test_add_func("/keymanutil/keyman_put_options_todconf/invalid", test_keyman_put_options_todconf__invalid);
-  g_test_add_func("/keymanutil/keyman_put_options_todconf/new_key", test_keyman_put_options_todconf__new_key);
-  g_test_add_func("/keymanutil/keyman_put_options_todconf/other_keys", test_keyman_put_options_todconf__other_keys);
-  g_test_add_func("/keymanutil/keyman_put_options_todconf/existing_key", test_keyman_put_options_todconf__existing_key);
+  g_test_add_func("/keymanutil/keyman_put_keyboard_options_todconf/invalid", test_keyman_put_keyboard_options_todconf__invalid);
+  g_test_add_func("/keymanutil/keyman_put_keyboard_options_todconf/new_key", test_keyman_put_keyboard_options_todconf__new_key);
+  g_test_add_func("/keymanutil/keyman_put_keyboard_options_todconf/other_keys", test_keyman_put_keyboard_options_todconf__other_keys);
+  g_test_add_func("/keymanutil/keyman_put_keyboard_options_todconf/existing_key", test_keyman_put_keyboard_options_todconf__existing_key);
 
   g_test_add_func("/keymanutil/keyman_get_custom_keyboard_dictionary/values", test_keyman_get_custom_keyboard_dictionary__values);
   g_test_add_func("/keymanutil/keyman_get_custom_keyboard_dictionary/invalid", test_keyman_get_custom_keyboard_dictionary__invalid);
