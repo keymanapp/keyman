@@ -175,6 +175,7 @@ export class BannerSuggestion {
     }
 
     this.currentWidth = this.collapsedWidth;
+    this.highlight(suggestion?.autoAccept);
     this.updateLayout();
   }
 
@@ -551,6 +552,16 @@ export class SuggestionBanner extends Banner {
       if(sourceTracker.source) {
         source.terminate(true);
         return;
+      }
+
+      const autoselection = this._predictionContext.selected;
+      this._predictionContext.selected = null;
+      if(autoselection) {
+        this.options.forEach((entry) => {
+          if(entry.suggestion == autoselection) {
+            entry.highlight(false)
+          };
+        });
       }
 
       this.scrollState = new BannerScrollState(source.currentSample, this.container.scrollLeft);

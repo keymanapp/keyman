@@ -15,7 +15,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
   // SuggestionBanner class.  This class serves as the main implementation of the banner's core logic.
 
   // Designed for use with auto-correct behavior
-  private selected: Suggestion;
+  selected: Suggestion;
 
   private initNewContext: boolean = true;
 
@@ -224,19 +224,23 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
    * Should return 'false' if the current state allows accepting a suggestion and act accordingly.
    * Otherwise, return true.
    */
-  private doTryAccept = (source: string /*, returnObj: {shouldSwallow: boolean}*/): void => {
+  private doTryAccept = (source: string, returnObj: {shouldSwallow: boolean}): void => {
     //let keyman = com.keyman.singleton;
 
     if(!this.recentAccept && this.selected) {
       this.accept(this.selected);
-      // returnObj.shouldSwallow = true;
+      returnObj.shouldSwallow = true;
+      // No need to swallow the next keystroke's whitespace; we triggered FROM a space,
+      // which this matches.
+      // Standard applications from the banner, those we DO want to swallow the first time.
+      this.recentAccept = false;
     } else if(this.recentAccept && source == 'space') {
       this.recentAccept = false;
-      // // If the model doesn't insert wordbreaks, don't swallow the space.  If it does,
-      // // we consider that insertion to be the results of the first post-accept space.
-      // returnObj.shouldSwallow = !!keyman.core.languageProcessor.wordbreaksAfterSuggestions; // can be handed outside
+      // If the model doesn't insert wordbreaks, don't swallow the space.  If it does,
+      // we consider that insertion to be the results of the first post-accept space.
+      returnObj.shouldSwallow = !!this.langProcessor.wordbreaksAfterSuggestions; // can be handed outside
     } else {
-      // returnObj.shouldSwallow = false;
+      returnObj.shouldSwallow = false;
     }
   }
 
@@ -270,6 +274,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
   private invalidateSuggestions = (source: InvalidateSourceEnum): void => {
     // By default, we assume that the context is the same until we notice otherwise.
     this.initNewContext = false;
+    this.selected = null;
 
     if(!this.swallowPrediction || source == 'context') {
       this.recentAccept = false;
@@ -312,6 +317,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     let suggestions = prediction.suggestions;
 
     this._currentSuggestions = suggestions;
+    this.selected = null;
 
     // Do we have a keep suggestion?  If so, remove it from the list so that we can control its display position
     // and prevent it from being hidden after reversion operations.
@@ -319,6 +325,10 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     for(let s of suggestions) {
       if(s.tag == 'keep') {
         this.keepSuggestion = s as Keep;
+      }
+
+      if(s.autoAccept) {
+        this.selected = s;
       }
     }
 
