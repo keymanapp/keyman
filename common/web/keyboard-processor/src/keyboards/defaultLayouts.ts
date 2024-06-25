@@ -4,7 +4,7 @@
 ***/
 
 import { Version, deepCopy } from "@keymanapp/web-utils";
-import { TouchLayout } from "@keymanapp/common-types";
+import { Codes, TouchLayout } from "@keymanapp/common-types";
 
 import LayoutFormFactorSpec = TouchLayout.TouchLayoutPlatform;
 import LayoutLayerBase = TouchLayout.TouchLayoutLayer;
@@ -16,7 +16,6 @@ import ButtonClasses = TouchLayout.TouchLayoutKeySp;
 
 export { ButtonClasses };
 
-import Codes from "../text/codes.js";
 import type Keyboard from "./keyboard.js";
 
 export interface EncodedVisualKeyboard {

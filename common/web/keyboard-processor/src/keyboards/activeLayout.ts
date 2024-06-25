@@ -1,4 +1,4 @@
-import Codes from "../text/codes.js";
+import { Codes } from '@keymanapp/common-types';
 import KeyEvent, { KeyEventSpec } from "../text/keyEvent.js";
 import KeyMapping from "../text/keyMapping.js";
 import { ButtonClasses, Layouts } from "./defaultLayouts.js";

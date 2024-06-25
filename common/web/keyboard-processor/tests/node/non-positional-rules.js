@@ -4,7 +4,8 @@ import fs from 'fs';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { Codes, KeyboardInterface, KeyEvent, MinimalKeymanGlobal, Mock } from '@keymanapp/keyboard-processor';
+import { Codes } from "@keymanapp/common-types";
+import { KeyboardInterface, KeyEvent, MinimalKeymanGlobal, Mock } from '@keymanapp/keyboard-processor';
 import { NodeKeyboardLoader } from '@keymanapp/keyboard-processor/node-keyboard-loader';
 
 // Compare and contrast the unit tests here with those for app/browser key-event unit testing

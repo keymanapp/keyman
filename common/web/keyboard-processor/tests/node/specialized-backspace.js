@@ -4,7 +4,8 @@ import fs from 'fs';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { Codes, KeyboardInterface, KeyboardProcessor, KeyEvent, MinimalKeymanGlobal, Mock } from '@keymanapp/keyboard-processor';
+import { Codes } from "@keymanapp/common-types";
+import { KeyboardInterface, KeyboardProcessor, KeyEvent, MinimalKeymanGlobal, Mock } from '@keymanapp/keyboard-processor';
 import { NodeKeyboardLoader } from '@keymanapp/keyboard-processor/node-keyboard-loader';
 
 
