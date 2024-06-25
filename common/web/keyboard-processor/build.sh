@@ -8,9 +8,9 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
 
-BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
+BUNDLE_CMD="node ${KEYMAN_ROOT}/common/web/es-bundling/build/common-bundle.mjs"
 
 ################################ Main script ################################
 
@@ -42,20 +42,23 @@ function do_configure() {
 }
 
 function do_build() {
-  tsc --build "$THIS_SCRIPT_PATH/tsconfig.all.json"
+  tsc --build "${THIS_SCRIPT_PATH}/tsconfig.all.json"
 
   # Base product - the main keyboard processor
-  ${BUNDLE_CMD}    "${KEYMAN_ROOT}/common/web/keyboard-processor/build/obj/src/index.js" \
+  builder_echo "Bundle base product - the main keyboard processor"
+  ${BUNDLE_CMD}  "${KEYMAN_ROOT}/common/web/keyboard-processor/build/obj/src/index.js" \
     --out        "${KEYMAN_ROOT}/common/web/keyboard-processor/build/lib/index.mjs" \
     --format esm
 
   # The DOM-oriented keyboard loader
-  ${BUNDLE_CMD}    "${KEYMAN_ROOT}/common/web/keyboard-processor/build/obj/src/keyboards/loaders/dom-keyboard-loader.js" \
+  builder_echo "Bundle the DOM-oriented keyboard loader"
+  ${BUNDLE_CMD}  "${KEYMAN_ROOT}/common/web/keyboard-processor/build/obj/src/keyboards/loaders/dom-keyboard-loader.js" \
     --out        "${KEYMAN_ROOT}/common/web/keyboard-processor/build/lib/dom-keyboard-loader.mjs" \
     --format esm
 
   # The Node-oriented keyboard loader
-  ${BUNDLE_CMD}    "${KEYMAN_ROOT}/common/web/keyboard-processor/build/obj/src/keyboards/loaders/node-keyboard-loader.js" \
+  builder_echo "Bundle the Node-oriented keyboard loader"
+  ${BUNDLE_CMD}  "${KEYMAN_ROOT}/common/web/keyboard-processor/build/obj/src/keyboards/loaders/node-keyboard-loader.js" \
     --out        "${KEYMAN_ROOT}/common/web/keyboard-processor/build/lib/node-keyboard-loader.mjs" \
     --format   esm \
     --platform node
@@ -66,6 +69,7 @@ function do_build() {
     --format   esm
 
   # Declaration bundling.
+  builder_echo "Declaration bundling"
   tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
   tsc --emitDeclarationOnly --outFile ./build/lib/dom-keyboard-loader.d.ts -p src/keyboards/loaders/tsconfig.dom.json
   tsc --emitDeclarationOnly --outFile ./build/lib/node-keyboard-loader.d.ts -p src/keyboards/loaders/tsconfig.node.json
