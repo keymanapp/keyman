@@ -123,9 +123,18 @@ export default function teamcityReporter({ name="Web Test Runner JavaScript test
 
       for(const sessionName of sessionFailureMap.keys()) {
         const sessionTestData = testDefMap.get(sessionName);
+        const session = args.sessions.find((entry) => buildSessionName(entry) == sessionName);
 
         logger.log('');
         logger.log(`Failure data for '${sessionName}'`);
+
+        if(session.errors) {
+          for(let error of session.errors) {
+            // "Browser tests did not start after xxxx ms..."" errors appear here.
+            logger.error(`  ${error.message}`);
+          }
+        }
+
         for(const sessionFile of sessionFailureMap.get(sessionName)) {
           const testFile = sessionFile.testFile;
           const fileTestData = sessionTestData.get(testFile);
