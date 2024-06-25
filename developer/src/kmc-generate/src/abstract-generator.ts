@@ -55,6 +55,10 @@ export interface GeneratorOptions /* not inheriting from CompilerBaseOptions */ 
    * description of the keyboard, Markdown permissible
    */
   description?: string;
+  /**
+   * version of Keyman to reference in source files, defaults to KEYMAN_VERSION.VERSION
+   */
+  keymanVersion?: string;
 };
 
 /**

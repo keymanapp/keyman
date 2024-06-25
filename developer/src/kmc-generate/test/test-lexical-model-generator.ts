@@ -1,4 +1,5 @@
 import 'mocha';
+import sinon from 'sinon';
 import * as fs from 'fs';
 import * as path from 'path';
 import { assert } from 'chai';
@@ -27,6 +28,17 @@ function getFilenames(p: string, base?: string): string[] {
 }
 
 describe('LexicalModelGenerator', function () {
+  let clock: sinon.SinonFakeTimers;
+
+  before(function() {
+    // We will always be 12 April 2024 to match test fixtures
+    clock = sinon.useFakeTimers(new Date(2024, 3, 12));
+  });
+
+  after(function() {
+    clock.restore();
+  });
+
   it('should generate a lexical model from provided options', async function() {
     const generator = new LexicalModelGenerator();
     const callbacks = new TestCompilerCallbacks();
@@ -52,7 +64,7 @@ describe('LexicalModelGenerator', function () {
       if(!fs.statSync(path.join(samplePath, file)).isDirectory()) {
         assert.isDefined(result.artifacts[file]);
         assert.equal(result.artifacts[file].filename, file);
-        const fixtureUTF8 = fs.readFileSync(path.join(samplePath, file), 'utf-8');
+        const fixtureUTF8 = fs.readFileSync(path.join(samplePath, file), 'utf-8').replace(/\r\n/g, '\n');;
         const actualUTF8 = new TextDecoder().decode(result.artifacts[file].data);
         assert.equal(actualUTF8, fixtureUTF8, `File ${file} does not have expected content`);
       }
