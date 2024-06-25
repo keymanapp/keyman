@@ -22,7 +22,7 @@ export class BasicGenerator extends AbstractGenerator {
 
     this.tokenMap['$NAME'] = this.options.name;
     this.tokenMap['$ID'] = this.options.id;
-    this.tokenMap['$KEYMANVERSION'] = KEYMAN_VERSION.VERSION+'.0';
+    this.tokenMap['$KEYMANVERSION'] = (this.options.keymanVersion ?? KEYMAN_VERSION.VERSION) + '.0';
     this.tokenMap['$VERSION'] = this.options.version;
     this.tokenMap['$COPYRIGHT'] = '© ' + this.options.copyright;
     this.tokenMap['$FULLCOPYRIGHT'] = '© ' + dt.getFullYear().toString() + ' ' + this.options.copyright;

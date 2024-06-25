@@ -11,4 +11,5 @@ export const options: GeneratorOptions = {
   author: 'Sample Author',
   copyright: 'TheAuthor',
   description: '# A mighty description',
+  keymanVersion: '17.0.292'
 };
