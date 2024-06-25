@@ -6,10 +6,10 @@ import ContextWindow from "./contextWindow.js";
 import LanguageProcessor from "./prediction/languageProcessor.js";
 import type ModelSpec from "./prediction/modelSpec.js";
 import { globalObject, DeviceSpec } from "@keymanapp/web-utils";
+import { Codes } from "@keymanapp/common-types";
 
 import {
   type Alternate,
-  Codes,
   isEmptyTransform,
   type Keyboard,
   KeyboardInterface,

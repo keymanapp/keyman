@@ -19,6 +19,7 @@ export { UnicodeSetParser, UnicodeSet } from './ldml-keyboard/unicodeset-parser-
 export { VariableParser, MarkerParser } from './ldml-keyboard/pattern-parser.js';
 export { LDMLKeyboardXMLSourceFileReader, LDMLKeyboardXMLSourceFileReaderOptions } from './ldml-keyboard/ldml-keyboard-xml-reader.js';
 
+export { Codes } from './consts/codes.js';
 export * as Constants from './consts/virtual-key-constants.js';
 
 export { defaultCompilerOptions, CompilerBaseOptions, CompilerCallbacks, CompilerOptions, CompilerEvent, CompilerErrorNamespace,

@@ -1,4 +1,5 @@
 import { EventEmitter } from 'eventemitter3';
+import { Codes } from "@keymanapp/common-types";
 
 import { BannerView } from '../banner/bannerView.js';
 import { BannerController } from '../banner/bannerController.js';
@@ -11,7 +12,6 @@ import { LengthStyle, ParsedLengthStyle } from '../lengthStyle.js';
 import { type KeyElement } from '../keyElement.js';
 
 import {
-  Codes,
   DeviceSpec,
   Keyboard,
   KeyboardProperties,

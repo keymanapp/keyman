@@ -1,4 +1,5 @@
-import { ActiveKey, Codes } from '@keymanapp/keyboard-processor';
+import { ActiveKey } from '@keymanapp/keyboard-processor';
+import { Codes } from "@keymanapp/common-types";
 
 import OSKKey, { KeyLayoutParams, renameSpecialKey } from './oskKey.js';
 import { KeyData, KeyElement, link } from '../keyElement.js';

@@ -6,8 +6,8 @@
 //#region Imports
 
 import { type DeviceSpec } from "@keymanapp/web-utils";
+import { Codes } from '@keymanapp/common-types';
 
-import Codes from "./codes.js";
 import type KeyEvent from "./keyEvent.js";
 import type { Deadkey } from "./deadkeys.js";
 import KeyMapping from "./keyMapping.js";

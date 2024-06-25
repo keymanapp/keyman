@@ -24,8 +24,6 @@ export {
 export { default as SpacebarText } from "./keyboards/spacebarText.js";
 export { default as StateKeyMap } from "./keyboards/stateKeyMap.js";
 
-export { default as Codes } from "./text/codes.js";
-export * from "./text/codes.js";
 export * from "./text/deadkeys.js";
 export { default as DefaultRules } from "./text/defaultRules.js";
 export * from "./text/defaultRules.js";

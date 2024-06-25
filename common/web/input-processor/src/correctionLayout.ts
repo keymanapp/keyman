@@ -1,4 +1,5 @@
-import { ActiveKey, ActiveKeyBase, ActiveLayer, ActiveRow, Codes } from "@keymanapp/keyboard-processor";
+import { ActiveKey, ActiveKeyBase, ActiveLayer, ActiveRow } from "@keymanapp/keyboard-processor";
+import { Codes } from "@keymanapp/common-types";
 
 /**
  * Defines correction-layout mappings for keys to be considered by
