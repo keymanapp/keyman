@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.62 alpha 2024-06-25
+
+* chore(common): update C/C++ formatting options (#11836)
+* chore(linux): use shared meson config (#11863)
+* fix(linux): ignore exceptions trying to install cache (#11861)
+
 ## 18.0.61 alpha 2024-06-24
 
 * feat(web): optimization via lazy preprocessing of keyboard touch-layout info (#11265)
