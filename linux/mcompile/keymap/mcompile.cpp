@@ -22,6 +22,12 @@
                     06 Feb 2015 - mcdurdin - I4552 - V9.0 - Add mnemonic recompile option to ignore deadkeys
                     08 Apr 2015 - mcdurdin - I4651 - V9.0 - Mnemonic layout recompiler maps AltGr+VK_BKSLASH rather than VK_OEM_102
 */
+//
+// Defines the entry point for the console application.
+//
+// Note: this program deliberately leaks memory as it has a very short life cycle and managing the memory allocations
+// for the subcomponents of the compiled keyboard is an unnecessary optimisation. Just so you know.
+//
 
 #include "mcompile.h"
 
@@ -83,7 +89,7 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
 
   char16_t* infile = (char16_t*) argv[n], *outfile = (char16_t*) argv[n+1];
 
-  wprintf(L"mcompile%ls \"%ls\" \"%ls\"\n", bDeadkeyConversion ? L" -d" : L"", u16fmt((const char16_t*) infile).c_str(), u16fmt((const char16_t*) outfile).c_str() ); // I4174
+  printf("mcompile%ls \"%ls\" \"%ls\"\n", bDeadkeyConversion ? L" -d" : L"", u16fmt((const char16_t*) infile).c_str(), u16fmt((const char16_t*) outfile).c_str() ); // I4174
 
   // 1. Load the keyman keyboard file
 
@@ -406,14 +412,14 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
 
   GdkKeymap *keymap;
   if(InitializeGDK(&keymap,  argc, argv)) {
-      wprintf(L"ERROR: can't Initialize GDK\n");
+      printf("ERROR: can't Initialize GDK\n");
       return FALSE;
   }
 
   // create vector that contains Keycode, base, shift for US-KEyboard and underlying keyboard
   vec_dword_3D all_vector;
   if(createOneVectorFromBothKeyboards(all_vector, keymap)){
-    wprintf(L"ERROR: can't create one vector from both keyboards\n");
+    printf("ERROR: can't create one vector from both keyboards\n");
     return FALSE;
   }
 
@@ -429,7 +435,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
       UINT scUnderlying =  KMX_get_KeyCodeUnderlying_From_VKUS(KMX_VKMap[i]);
       KMX_WCHAR ch = KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(keymap, VKShiftState[j], scUnderlying, &DeadKey);
 
-      //wprintf(L"--- VK_%d -> SC_ [%c] dk=%d  ( ss %i) \n", KMX_VKMap[i], ch == 0 ? 32 : ch, DeadKey, VKShiftState[j]);
+      //printf("--- VK_%d -> SC_ [%c] dk=%d  ( ss %i) \n", KMX_VKMap[i], ch == 0 ? 32 : ch, DeadKey, VKShiftState[j]);
 
       if(bDeadkeyConversion) {   // I4552
         if(ch == 0xFFFF) {
@@ -493,4 +499,3 @@ void KMX_LogError(const wchar_t* fmt, ...) {
   while(fmtbuf[j] != *end);
   putwchar(*nl);
 }
-
