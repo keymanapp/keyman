@@ -3,7 +3,7 @@
 #define MC_KMXFILE_H
 
 #include "km_types.h"
-#include <kmx_file.h>
+#include "kmx_file.h"
 #include "filesystem.h"
 #include "mcompile.h"
 
@@ -75,8 +75,6 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD *lpKeyboard);
 KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename);
 
 KMX_DWORD KMX_WriteCompiledKeyboardToFile(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL FSaveDebug);
-
-PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p);
 
 #endif // _KMXFILE_H
 

@@ -19,14 +19,9 @@ cpp_files = files(
     'mc_import_rules.cpp',
     'u16.cpp',)
 
-comon_include_dir = [
-  include_directories('../../../common/include'),
-]
-
-
 mcompile = executable(
     'mcompile',
     sources: [cpp_files],
-    dependencies: deps,
-    include_directories : comon_include_dir
+    dependencies: deps
     )
+
