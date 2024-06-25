@@ -87,9 +87,15 @@ int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL){
   int bDeadkeyConversion = u16cmp(argv[1], u"-d") == 0; // I4552
   int n = (bDeadkeyConversion ? 2 : 1);
 
-  char16_t* infile = (char16_t*) argv[n], *outfile = (char16_t*) argv[n+1];
+// _S2 needs more work  once mcompile is changed after review ( use char* only instead of char16_t*)
+  char16_t* infile  = (char16_t*) argv[n];
+  char16_t* outfile_16 = (char16_t*) argv[n+1];
+  std::u16string u16stri(outfile_16);
+  std::string str= string_from_u16string(u16stri);
+  char* outfile = (char*) str.c_str();
 
-  printf("mcompile%ls \"%ls\" \"%ls\"\n", bDeadkeyConversion ? L" -d" : L"", u16fmt((const char16_t*) infile).c_str(), u16fmt((const char16_t*) outfile).c_str() ); // I4174
+
+  printf("mcompile%ls \"%ls\" \"%ls\"\n", bDeadkeyConversion ? L" -d" : L"", u16fmt((const char16_t*) infile).c_str(), u16fmt((const char16_t*) outfile_16).c_str() ); // I4174
 
   // 1. Load the keyman keyboard file
 
