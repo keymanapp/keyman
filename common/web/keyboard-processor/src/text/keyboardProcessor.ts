@@ -1,8 +1,8 @@
 // #region Big ol' list of imports
 
 import { EventEmitter } from 'eventemitter3';
+import { Codes } from '@keymanapp/common-types';
 
-import Codes from "./codes.js";
 import type Keyboard from "../keyboards/keyboard.js";
 import { MinimalKeymanGlobal } from '../keyboards/keyboardHarness.js';
 import KeyEvent from "./keyEvent.js";

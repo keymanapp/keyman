@@ -1,4 +1,4 @@
-export { Codes, DeviceSpec, Keyboard, KeyboardProperties, SpacebarText } from '@keymanapp/keyboard-processor';
+export { DeviceSpec, Keyboard, KeyboardProperties, SpacebarText } from '@keymanapp/keyboard-processor';
 
 export { default as OSKView } from './views/oskView.js';
 export { default as FloatingOSKView, FloatingOSKViewConfiguration } from './views/floatingOskView.js';

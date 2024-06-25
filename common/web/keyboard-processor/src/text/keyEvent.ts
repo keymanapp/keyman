@@ -8,8 +8,8 @@
 
 import type Keyboard from "../keyboards/keyboard.js";
 import { type DeviceSpec } from "@keymanapp/web-utils";
+import { Codes } from '@keymanapp/common-types';
 
-import Codes from './codes.js';
 import DefaultRules from './defaultRules.js';
 import { ActiveKeyBase } from "../index.js";
 

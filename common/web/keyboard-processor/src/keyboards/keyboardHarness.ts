@@ -1,5 +1,5 @@
+import { Codes } from '@keymanapp/common-types';
 import Keyboard from "./keyboard.js";
-import Codes from "../text/codes.js";
 
 /**
  * Defines members of the top-level `keyman` global object necessary to guarantee

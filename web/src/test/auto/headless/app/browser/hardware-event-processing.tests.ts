@@ -4,7 +4,8 @@ import { preprocessKeyboardEvent } from 'keyman/app/browser';
 import { processForMnemonicsAndLegacy } from 'keyman/engine/main';
 import { PhysicalInputEventSpec } from '@keymanapp/recorder-core';
 import { DeviceSpec } from '@keymanapp/web-utils';
-import { Codes, Keyboard, KeyEvent } from '@keymanapp/keyboard-processor';
+import { Codes } from "@keymanapp/common-types";
+import { Keyboard, KeyEvent } from '@keymanapp/keyboard-processor';
 
 const ModifierCodes = Codes.modifierCodes;
 const KeyCodes = Codes.keyCodes;

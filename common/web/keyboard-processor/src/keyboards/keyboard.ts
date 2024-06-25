@@ -1,4 +1,4 @@
-import Codes from "../text/codes.js";
+import { Codes } from '@keymanapp/common-types';
 import { EncodedVisualKeyboard, LayoutSpec, Layouts } from "./defaultLayouts.js";
 import { ActiveKey, ActiveLayout, ActiveSubKey } from "./activeLayout.js";
 import KeyEvent from "../text/keyEvent.js";
