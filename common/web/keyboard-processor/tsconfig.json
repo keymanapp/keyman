@@ -4,8 +4,8 @@
   "compilerOptions": {
     "baseUrl": "./",
     "outDir": "build/obj/",
-    "tsBuildInfoFile": "build/obj/tsconfig.tsbuildinfo",
-    "rootDir": "./src"
+    "tsBuildInfoFile": "build/obj/src/tsconfig.tsbuildinfo",
+    "rootDir": "."
   },
   "references": [
     { "path": "../types" },
@@ -13,6 +13,9 @@
     { "path": "../keyman-version/" },
     { "path": "../utils/" }
   ],
-  "include": ["./src/**/*.ts"],
+  "include": [
+    "./src/**/*.ts",
+    "./tests/dom/**/*.ts",
+  ],
   "exclude": ["./src/keyboards/loaders/**/*.ts"]
 }

@@ -249,14 +249,14 @@ const Uni_PUA_16_END   = 0x10FFFD;
  * @brief True if a lead surrogate
  * \def Uni_IsSurrogate1
  */
-function Uni_IsSurrogate1(ch : number) {
+export function Uni_IsSurrogate1(ch : number) {
   return ((ch) >= Uni_LEAD_SURROGATE_START && (ch) <= Uni_LEAD_SURROGATE_END);
 }
 /**
  * @brief True if a trail surrogate
  * \def Uni_IsSurrogate2
  */
-function Uni_IsSurrogate2(ch : number) {
+export function Uni_IsSurrogate2(ch : number) {
   return ((ch) >= Uni_TRAIL_SURROGATE_START && (ch) <= Uni_TRAIL_SURROGATE_END);
 }
 
@@ -264,7 +264,7 @@ function Uni_IsSurrogate2(ch : number) {
  * @brief True if any surrogate
  * \def UniIsSurrogate
 */
-function Uni_IsSurrogate(ch : number) {
+export function Uni_IsSurrogate(ch : number) {
   return (Uni_IsSurrogate1(ch) || Uni_IsSurrogate2(ch));
 }
 

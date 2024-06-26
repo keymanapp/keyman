@@ -45,20 +45,25 @@ function do_build() {
   tsc --build "$THIS_SCRIPT_PATH/tsconfig.all.json"
 
   # Base product - the main keyboard processor
-  $BUNDLE_CMD    "${KEYMAN_ROOT}/common/web/keyboard-processor/build/obj/index.js" \
+  ${BUNDLE_CMD}    "${KEYMAN_ROOT}/common/web/keyboard-processor/build/obj/src/index.js" \
     --out        "${KEYMAN_ROOT}/common/web/keyboard-processor/build/lib/index.mjs" \
     --format esm
 
   # The DOM-oriented keyboard loader
-  $BUNDLE_CMD    "${KEYMAN_ROOT}/common/web/keyboard-processor/build/obj/keyboards/loaders/dom-keyboard-loader.js" \
+  ${BUNDLE_CMD}    "${KEYMAN_ROOT}/common/web/keyboard-processor/build/obj/src/keyboards/loaders/dom-keyboard-loader.js" \
     --out        "${KEYMAN_ROOT}/common/web/keyboard-processor/build/lib/dom-keyboard-loader.mjs" \
     --format esm
 
   # The Node-oriented keyboard loader
-  $BUNDLE_CMD    "${KEYMAN_ROOT}/common/web/keyboard-processor/build/obj/keyboards/loaders/node-keyboard-loader.js" \
+  ${BUNDLE_CMD}    "${KEYMAN_ROOT}/common/web/keyboard-processor/build/obj/src/keyboards/loaders/node-keyboard-loader.js" \
     --out        "${KEYMAN_ROOT}/common/web/keyboard-processor/build/lib/node-keyboard-loader.mjs" \
     --format   esm \
     --platform node
+
+  # Tests
+  ${BUNDLE_CMD}    "${KEYMAN_ROOT}/common/web/keyboard-processor/build/obj/tests/dom/cases/domKeyboardLoader.spec.js" \
+    --out        "${KEYMAN_ROOT}/common/web/keyboard-processor/build/lib/ndomKeyboardLoader.spec.mjs" \
+    --format   esm
 
   # Declaration bundling.
   tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts

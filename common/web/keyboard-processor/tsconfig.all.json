@@ -4,7 +4,7 @@
     "baseUrl": "./",
     "outDir": "build/obj/",
     "tsBuildInfoFile": "build/obj/tsconfig.all.tsbuildinfo",
-    "rootDir": "./src"
+    "rootDir": "."
   },
   "references": [
     { "path": "./src/keyboards/loaders/tsconfig.dom.json" },

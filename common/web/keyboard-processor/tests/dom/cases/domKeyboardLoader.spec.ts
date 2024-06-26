@@ -15,8 +15,8 @@ const device: DeviceSpec = {
 
 describe('Keyboard loading in DOM', function() {
   afterEach(() => {
-    if(window['KeymanWeb']) {
-      window['KeymanWeb'].uninstall();
+    if(window['KeymanWeb' as any]) {
+      (window['KeymanWeb' as any] as any).uninstall();
     }
   })
 
@@ -29,8 +29,8 @@ describe('Keyboard loading in DOM', function() {
     assert.equal(keyboard.id, 'Keyboard_khmer_angkor');
     assert.isTrue(keyboard.isChiral);
     assert.isFalse(keyboard.isCJK);
-    assert.isOk(window['KeymanWeb']);
-    assert.isOk(window['keyman']);
+    assert.isOk(window['KeymanWeb' as any]);
+    assert.isOk(window['keyman' as any]);
 
     // Should be cleared post-keyboard-load.
     assert.isNotOk(harness.loadedKeyboard);
@@ -46,8 +46,8 @@ describe('Keyboard loading in DOM', function() {
     assert.equal(keyboard.id, 'Keyboard_khmer_angkor');
     assert.isTrue(keyboard.isChiral);
     assert.isFalse(keyboard.isCJK);
-    assert.isOk(window['KeymanWeb']);
-    assert.isOk(window['keyman']);
+    assert.isOk(window['KeymanWeb' as any]);
+    assert.isOk(window['keyman' as any]);
 
     // TODO:  verify actual rule processing.
     const nullKeyEvent = keyboard.constructNullKeyEvent(device);
@@ -55,8 +55,8 @@ describe('Keyboard loading in DOM', function() {
     const result = harness.processKeystroke(mock, nullKeyEvent);
 
     assert.isOk(result);
-    assert.isOk(window['KeymanWeb']);
-    assert.isOk(window['keyman']);
+    assert.isOk(window['KeymanWeb' as any]);
+    assert.isOk(window['keyman' as any]);
 
     // Should be cleared post-keyboard-load.
     assert.isNotOk(harness.loadedKeyboard);

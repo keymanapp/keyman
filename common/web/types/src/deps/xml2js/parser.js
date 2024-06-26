@@ -4,7 +4,7 @@
     hasProp = {}.hasOwnProperty;
 
 import sax from 'sax';
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'eventemitter3';
 import * as bom from './bom.js';
 import * as processors from './processors.js';
 import { setImmediate } from 'timers';

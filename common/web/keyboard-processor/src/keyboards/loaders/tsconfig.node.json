@@ -3,8 +3,8 @@
   "compilerOptions": {
     "types": [ "node" ],
     "baseUrl": "../../../",
-    "outDir": "../../../build/obj/keyboards/loaders/",
-    "tsBuildInfoFile": "../../../build/obj/keyboards/loaders/tsconfig.node.tsbuildinfo",
+    "outDir": "../../../build/obj/src/keyboards/loaders/",
+    "tsBuildInfoFile": "../../../build/obj/src/keyboards/loaders/tsconfig.node.tsbuildinfo",
     "rootDir": "."
   },
   "references": [
