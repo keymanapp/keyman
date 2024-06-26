@@ -69,8 +69,7 @@ export default class ModelCompositor {
       const { sample: correctionTransform, p: correctionProb } = correction;
       const correctionRoot = this.wordbreak(models.applyTransform(correction.sample, context));
 
-      let predictionSet = predictions.map(function(pair: ProbabilityMass<Suggestion>) {
-
+      let predictionSet = predictions.map((pair: ProbabilityMass<Suggestion>) => {
         // Let's not rely on the model to copy transform IDs.
         // Only bother is there IS an ID to copy.
         if(correctionTransform.id !== undefined) {
@@ -473,6 +472,16 @@ export default class ModelCompositor {
       return b.totalProb - a.totalProb; // Use descending order - we want the largest probabilty suggestions first!
     });
 
+    // Section 4:  Auto-correction + finalization.
+    if(keepOption && keepOption.matchesModel) {
+      // Auto-select it for auto-acceptance; we don't correct away from perfectly-valid
+      // lexical entries, even if they are comparatively low-frequency.
+      keepOption.autoAccept = true;
+    } else {
+      this.predictionAutoSelect(suggestionDistribution);
+    }
+
+    // Now that we've marked the suggestion to auto-select, we can finalize the suggestions.
     let suggestions = suggestionDistribution.splice(0, ModelCompositor.MAX_SUGGESTIONS).map((tuple) => {
       const prediction = tuple.prediction;
 
@@ -489,7 +498,7 @@ export default class ModelCompositor {
         } = {
           ...prediction.sample,
           p: tuple.totalProb,
-          "lexical-p": tuple.prediction.p,
+          "lexical-p": prediction.p,
           "correction-p": tuple.correction.p
         }
 
@@ -557,6 +566,53 @@ export default class ModelCompositor {
     }
 
     return suggestions;
+  }
+
+  private predictionAutoSelect(suggestionDistribution: CorrectionPredictionTuple[]) {
+    if(suggestionDistribution.length == 0) {
+      return;
+    }
+
+    if(suggestionDistribution.length == 1) {
+      // Mark for auto-acceptance; there are no alternatives.
+      suggestionDistribution[0].prediction.sample.autoAccept = true;
+      return;
+    }
+
+    // Is it reasonable to auto-accept any of our suggestions?
+    const bestSuggestion = suggestionDistribution[0];
+
+    const baseCorrection = bestSuggestion.correction.sample;
+    if(baseCorrection.length == 0) {
+      // If the correction is rooted on an empty root, there's no basis for
+      // auto-correcting to this suggestion.
+      return;
+    }
+
+    // Find the highest probability for any correction that led to a valid prediction.
+    // No need to full-on re-sort everything, though.
+    const bestCorrection = suggestionDistribution.reduce((prev, current) => prev?.correction.p > current.correction.p ? prev : current, null).correction;
+    if(bestCorrection.p > bestSuggestion.correction.p) {
+      // Here, the best suggestion didn't come from the best correction.
+      // Is it actually reasonable to auto-correct?  We're probably just very
+      // biased toward its frequency.  (Maybe a threshold should be considered?)
+      return;
+    }
+
+    // compare best vs other probabilities.
+    const probSum = suggestionDistribution.reduce((accum, current) => accum + current.totalProb, 0);
+    const proportionOfBest = bestSuggestion.totalProb / probSum;
+    if(proportionOfBest < .66) {
+      return;
+    }
+
+    // compare correction-cost aspects?  We disable if the base correction is lower than best,
+    // but should we do other comparisons too?
+
+    // const nextSuggestion = suggestionDistribution[1];
+    // baseCorrection
+
+    bestSuggestion.prediction.sample.autoAccept = true;
   }
 
   // Responsible for applying casing rules to suggestions.
