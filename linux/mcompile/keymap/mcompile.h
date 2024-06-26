@@ -17,35 +17,25 @@
                     
 */
 
-
-
+#ifndef MCOMPILE_H
+#define MCOMPILE_H
 #include <vector>
-#include "km_types.h"
+#include "keymap.h"
+#include "deadkey.h"
+#include "mc_kmxfile.h"
 
-void LogError(PKMX_WCHART message, ...);
-
-
-struct DeadkeyMapping {   // I4353
-  KMX_WCHART deadkey, dkid;
-  KMX_UINT shift;
+struct KMX_DeadkeyMapping {   // I4353
+  KMX_WCHAR deadkey, dkid;
+  UINT shift;
   KMX_WORD vk;
 };
 
-extern std::vector<DeadkeyMapping> FDeadkeys;   // I4353
+extern std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;   // I4353
 
+int run(int argc, std::vector<std::u16string>  str_argv, char* argv[]);
 
-//--------------------old 
-/*
-#include <vector>
+int KMX_GetDeadkeys(vec_dword_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, GdkKeymap* keymap);
 
-void LogError(PWSTR message, ...);
+void KMX_LogError(const wchar_t* fmt, ...);
 
-
-struct DeadkeyMapping {   // I4353
-  WCHAR deadkey, dkid;
-  UINT shift;
-  WORD vk;
-};
-
-extern std::vector<DeadkeyMapping> FDeadkeys;   // I4353
-*/
+#endif /*MCOMPILE_H*/
