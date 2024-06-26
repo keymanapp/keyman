@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.63 alpha 2024-06-26
+
+* feat(linux): implement Linux side of SimulateAltGr option :checkered_flag: (#11852)
+
 ## 18.0.62 alpha 2024-06-25
 
 * chore(common): update C/C++ formatting options (#11836)
