@@ -1,5 +1,4 @@
-// Future TODO:  import from @keymanapp/common-types... once we no longer need to support ES5.
-import { Uni_IsSurrogate1, Uni_IsSurrogate2 } from '@keymanapp/web-utils';
+import { util } from '@keymanapp/common-types';
 
 /**
  * Returns the index for the code point divergence point between two strings, as measured in code
@@ -73,8 +72,8 @@ export function findCommonSubstringEndIndex(str1: string, str2: string, commonSu
     const divergentChar1 = str1.charCodeAt(index);
     const divergentChar2 = str2.charCodeAt(index + offset);
 
-    const commonSurrogateChecker = commonSuffix ? Uni_IsSurrogate2 : Uni_IsSurrogate1;
-    const divergentSurrogateChecker = commonSuffix ? Uni_IsSurrogate1 : Uni_IsSurrogate2;
+    const commonSurrogateChecker = commonSuffix ? util.Uni_IsSurrogate2 : util.Uni_IsSurrogate1;
+    const divergentSurrogateChecker = commonSuffix ? util.Uni_IsSurrogate1 : util.Uni_IsSurrogate2;
 
     // If the last common character if of the direction-appropriate surrogate type (for
     // comprising a potential split surrogate pair representing a non-BMP char)...

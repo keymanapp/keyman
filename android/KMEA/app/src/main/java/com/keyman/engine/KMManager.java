@@ -295,9 +295,7 @@ public final class KMManager {
 
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
-  protected static final String KMFilename_KeyboardHtml_Legacy = "keyboard.es5.html";
   protected static final String KMFilename_JSEngine = "keymanweb-webview.js";
-  protected static final String KMFilename_JSLegacyEngine = "keymanweb-webview.es5.js";
   protected static final String KMFilename_JSSentry = "sentry.min.js";
   protected static final String KMFilename_JSSentryInit = "keyman-sentry.js";
   protected static final String KMFilename_AndroidHost = "android-host.js";
@@ -858,25 +856,11 @@ public final class KMManager {
   private static void copyAssets(Context context) {
     AssetManager assetManager = context.getAssets();
 
-    // Will build a temp WebView in order to check Chrome version internally.
-    boolean legacyMode = WebViewUtils.getEngineWebViewVersionStatus(context, null, null) != WebViewUtils.EngineWebViewVersionStatus.FULL;
-
     try {
       // Copy KMW files
-      if(legacyMode) {
-        // Replaces the standard ES6-friendly version of the host page with a legacy one that
-        // includes polyfill requests and that links the legacy, ES5-compatible version of KMW.
-        copyAssetWithRename(context, KMFilename_KeyboardHtml_Legacy, KMFilename_KeyboardHtml, "", true);
+      copyAsset(context, KMFilename_KeyboardHtml, "", true);
 
-        copyAsset(context, KMFilename_JSLegacyEngine, "", true);
-      } else {
-        copyAsset(context, KMFilename_KeyboardHtml, "", true);
-
-        // For versions of Chrome with full ES6 support, we use the ES6 artifact.
-        copyAsset(context, KMFilename_JSEngine, "", true);
-      }
-
-      // Is still built targeting ES5.
+      copyAsset(context, KMFilename_JSEngine, "", true);
       copyAsset(context, KMFilename_JSSentry, "", true);
       copyAsset(context, KMFilename_JSSentryInit, "", true);
       copyAsset(context, KMFilename_AndroidHost, "", true);
@@ -886,12 +870,6 @@ public final class KMManager {
 
       // Copy default keyboard font
       copyAsset(context, KMDefault_KeyboardFont, "", true);
-
-      if(legacyMode) {
-        copyAsset(context, KMFilename_JSPolyfill, "", true);
-        copyAsset(context, KMFilename_JSPolyfill2, "", true);
-        copyAsset(context, KMFilename_JSPolyfill3, "", true);
-      }
 
       // Keyboard packages directory
       File packagesDir = new File(getPackagesDir());
@@ -1638,7 +1616,7 @@ public final class KMManager {
 
   public static boolean isDefaultKey(String key) {
     return (
-      key != null && 
+      key != null &&
       key.equals(KMString.format("%s_%s", KMDefault_LanguageID, KMDefault_KeyboardID)));
   }
 
@@ -2084,11 +2062,11 @@ public final class KMManager {
       wm.getDefaultDisplay().getSize(size);
       return size;
     }
-    
+
     WindowMetrics windowMetrics = wm.getCurrentWindowMetrics();
     return new Point(
       windowMetrics.getBounds().width(),
-      windowMetrics.getBounds().height());    
+      windowMetrics.getBounds().height());
   }
 
   public static float getWindowDensity(Context context) {
