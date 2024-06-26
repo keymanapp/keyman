@@ -67,6 +67,7 @@
 // (https://docs.gtk.org/gio/class.Settings.html) (#9579)
 #define KEYMAN_DCONF_OPTIONS_PATH "/desktop/ibus/keyman/options/"
 #define KEYMAN_DCONF_OPTIONS_KEY "options"
+#define KEYMAN_DCONF_OPTIONS_SIMULATEALTGR "simulate-altgr"
 
 #define KEYMAN_DCONF_ENGINE_NAME "com.keyman.engine"
 #define KEYMAN_DCONF_ENGINE_PATH "/com/keyman/engine/"
@@ -111,6 +112,43 @@ GQueue *keyman_get_keyboard_options_queue_fromdconf(const gchar *package_id, con
  * @param option_value   Value of the new option
  */
 void keyman_put_keyboard_options_todconf(const gchar *package_id, const gchar *keyboard_id, const gchar *option_key, const gchar *option_value);
+
+/**
+ * Obtain (general) option value from DConf
+ *
+ * @param   option_key   Key of the option
+ * @return               The current value of the option
+ */
+gboolean keyman_get_option_fromdconf(const gchar* option_key);
+
+/**
+ * Write new (general) option to DConf
+ *
+ * @param option_key     Key for the new option
+ * @param option_value   Value of the new option
+ * @return               TRUE if setting the key succeeded, FALSE if the key was not writable
+ */
+gboolean keyman_put_option_todconf(const gchar* option_key, gboolean option_value);
+
+/**
+ * Subscribe to changes in the (general) Keyman options
+ *
+ * @param callback   Callback method. Note that this should be different methods if
+ *                   this method gets called for different keys.
+ * @param user_data  Custom data that will passed to callback
+ * @return           A transparent settings object
+ */
+void* keyman_subscribe_option_changes(void* callback, gpointer user_data);
+
+/**
+ * Unsubscribe from changes in the (general) option settings
+ *
+ * @param settings   The settings object
+ * @param callback   The callback method used when subscribing
+ * @param user_data  Custom data for callback
+ * @return           > 0 if successfully unsubscribed, otherwise 0
+ */
+guint keyman_unsubscribe_option_changes(void *settings, void *callback, gpointer user_data);
 
 G_END_DECLS
 

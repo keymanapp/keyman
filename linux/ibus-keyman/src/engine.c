@@ -94,6 +94,7 @@ struct _IBusKeymanEngine {
   IBusLookupTable *table;
   IBusProperty    *status_prop;
   IBusPropList    *prop_list;
+  void            *settings;
 
   commit_queue_item commit_queue[MAX_QUEUE_SIZE];
   commit_queue_item *commit_item;
@@ -366,8 +367,8 @@ setup_environment(IBusKeymanEngine *keyman)
   g_assert(keyman);
   g_message("%s: setting up environment", __FUNCTION__);
 
-  // Allocate enough options for: 3 environments plus 1 pad struct of 0's
-  km_core_option_item environment_opts[4] = {0};
+  // Allocate enough options for: 4 environments plus 1 pad struct of 0's
+  km_core_option_item environment_opts[5] = {0};
 
   environment_opts[0].scope = KM_CORE_OPT_ENVIRONMENT;
   environment_opts[0].key   = KM_CORE_KMX_ENV_PLATFORM;
@@ -381,12 +382,26 @@ setup_environment(IBusKeymanEngine *keyman)
   environment_opts[2].key   = KM_CORE_KMX_ENV_BASELAYOUTALT;
   environment_opts[2].value = get_base_layout();  // TODO: free when mnemonic layouts are to be supported
 
+  environment_opts[3].scope = KM_CORE_OPT_ENVIRONMENT;
+  environment_opts[3].key   = KM_CORE_KMX_ENV_SIMULATEALTGR;
+  environment_opts[3].value = keyman_get_option_fromdconf(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR) ? u"1" : u"0";
 
   km_core_status status = km_core_state_create(keyman->keyboard, environment_opts, &(keyman->state));
   if (status != KM_CORE_STATUS_OK) {
     g_warning("%s: problem creating km_core_state. Status is %u.", __FUNCTION__, status);
   }
   return status;
+}
+
+static void
+on_dconf_settings_change(GSettings *settings, gchar *key, gpointer user_data) {
+  if (!user_data || g_strcmp0(key, KEYMAN_DCONF_OPTIONS_SIMULATEALTGR) != 0) {
+    // not the SimulateAltGr option...
+    return;
+  }
+  IBusKeymanEngine *keyman = (IBusKeymanEngine *)user_data;
+  km_core_state_dispose(keyman->state);
+  setup_environment(keyman);
 }
 
 void
@@ -515,6 +530,8 @@ ibus_keyman_engine_constructor(
       return NULL;
     }
 
+    keyman->settings = keyman_subscribe_option_changes(on_dconf_settings_change, keyman);
+
     status = load_keyboard_options(keyman);
     if (status != KM_CORE_STATUS_OK) {
       ibus_keyman_engine_destroy(keyman);
@@ -536,6 +553,11 @@ ibus_keyman_engine_destroy (IBusKeymanEngine *keyman)
     engine_name = ibus_engine_get_name ((IBusEngine *) keyman);
     g_assert (engine_name);
     g_message("DAR: %s %s", __FUNCTION__, engine_name);
+
+    if (keyman->settings) {
+      keyman_unsubscribe_option_changes(keyman->settings, on_dconf_settings_change, keyman);
+      keyman->settings = NULL;
+    }
 
     if (keyman->prop_list) {
         g_debug("DAR: %s: unref keyman->prop_list", __FUNCTION__);

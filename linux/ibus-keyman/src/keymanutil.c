@@ -566,6 +566,65 @@ keyman_put_keyboard_options_todconf(
   // kvp got assigned to options[x] and so gets freed when options are freed
 }
 
+/**
+ * Obtain (general) option value from DConf
+ *
+ * @param   option_key   Key of the option
+ * @return               The current value of the option
+ */
+gboolean keyman_get_option_fromdconf(const gchar* option_key) {
+  g_autoptr(GSettings) settings = g_settings_new(KEYMAN_DCONF_OPTIONS_NAME);
+  return g_settings_get_boolean(settings, option_key);
+}
+
+/**
+ * Write new (general) option to DConf
+ *
+ * @param option_key     Key for the new option
+ * @param option_value   Value of the new option
+ * @return               TRUE if setting the key succeeded, FALSE if the key was not writable
+ */
+gboolean keyman_put_option_todconf(const gchar* option_key, gboolean option_value) {
+  g_autoptr(GSettings) settings = g_settings_new(KEYMAN_DCONF_OPTIONS_NAME);
+  return g_settings_set_boolean(settings, option_key, option_value);
+}
+
+/**
+ * Subscribe to changes in the (general) Keyman options
+ *
+ * @param callback   Callback method. Note that this should be different methods if
+ *                   this method gets called for different keys.
+ * @param user_data  Custom data that will passed to callback
+ * @return           A transparent settings object
+ */
+void* keyman_subscribe_option_changes(void* callback, gpointer user_data) {
+  GSettings *settings;
+  settings = g_settings_new(KEYMAN_DCONF_OPTIONS_NAME);
+
+  g_signal_connect(settings, "changed", G_CALLBACK(callback), user_data);
+  return settings;
+}
+
+/**
+ * Unsubscribe from changes in the (general) option settings
+ *
+ * @param settings   The settings object
+ * @param callback   The callback method used when subscribing
+ * @param user_data  Custom data for callback
+ * @return           > 0 if successfully unsubscribed, otherwise 0
+ */
+guint keyman_unsubscribe_option_changes(void* settings, void* callback, gpointer user_data) {
+  if (!settings) {
+    return 0;
+  }
+
+  guint retval = g_signal_handlers_disconnect_by_func(settings, callback, user_data);
+  if (retval > 0) {
+    g_object_unref(settings);
+  }
+  return retval;
+}
+
 static GPtrArray *
 _ptr_array_new_from_array(
     gpointer *data,
