@@ -167,8 +167,8 @@ UINT USVirtualKeyToScanCode[256] =
 	0x00, // L"K_?8E",				// &H8E
 	0x00, // L"K_?8F",				// &H8F 
 
-	0x45, // L"K_NUMLOCK",			// &H90
-	0x46, // L"K_SCROL",			// &H91
+	0x45, // L"K_NUMLOCK",		// &H90
+	0x46, // L"K_SCROLL",			// &H91
 
 	0x00, // L"K_?92",				// &H92
 	0x00, // L"K_?93",				// &H93
