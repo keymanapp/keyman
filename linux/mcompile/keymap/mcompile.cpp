@@ -34,7 +34,6 @@
 //------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------
 
-
 KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]);
 
 bool KMX_ImportRules( LPKMX_KEYBOARD kp,vec_dword_3D& all_vector, GdkKeymap **keymap,std::vector<KMX_DeadkeyMapping> *KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion); // I4353   // I4327

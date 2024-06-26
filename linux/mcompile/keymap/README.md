@@ -3,4 +3,5 @@ This is a proposal to rewrite  mcompile for Linux.  For this we need to  query t
 Ideally, we'd rewrite mcompile to be cross-platform (Windows, Linux, macOS), so that the keyboard interrogation would be separated from the .kmx rewriting, at least to some degree. Nevertheless it would probably be easiest to start from a standalone implementation. 
 Sample program that reads US basic keyboard and compares to key value group
 
+
 # Keymap
