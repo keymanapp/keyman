@@ -317,7 +317,8 @@ int createOneVectorFromBothKeyboards(vec_dword_3D& all_vector, GdkKeymap* keymap
   //                     [Keyval unshifted  ]
   //                     [Keyval shifted    ]
 
-  if (write_US_ToVector(all_vector, "us", "xkb_symbols \"basic\"")) {
+  // use entries of English (US) for all_vector
+  if (write_US_ToVector(all_vector)) {
     printf("ERROR: can't write US to Vector \n");
     return 1;
   }
@@ -330,20 +331,19 @@ int createOneVectorFromBothKeyboards(vec_dword_3D& all_vector, GdkKeymap* keymap
   return 0;
 }
 
-int write_US_ToVector(vec_dword_3D& vec, std::string language, const char* section) {
-  std::string fullPathName = "/usr/share/X11/xkb/symbols/" + language;
+int write_US_ToVector(vec_dword_3D& vec) {
+  std::string fullPathName = "/usr/share/X11/xkb/symbols/usrdujuls";
   const char* path = fullPathName.c_str();
-  FILE* fp         = fopen((path), "r");
-
-  if (!fp) {
-    printf("ERROR: could not open file!\n");
-    return 1;
-  }
 
   // create 1D-vector of the complete line
   vec_string_1D vector_completeUS;
-  if (createCompleteVector_US(fullPathName, section, vector_completeUS)) {
-    printf("ERROR: can't Create complete row US \n");
+  if (createCompleteVector_US(fullPathName, vector_completeUS)) {
+    printf("ERROR: can't create complete row US \n");
+    return 1;
+  }
+
+  if (vector_completeUS.size() < 2) {
+    printf("ERROR: several keys of US are not processed \n");
     return 1;
   }
 
@@ -352,35 +352,33 @@ int write_US_ToVector(vec_dword_3D& vec, std::string language, const char* secti
     return 1;
   }
 
-  fclose(fp);
   return 0;
 }
 
-bool createCompleteVector_US(std::string fullPathName, const char* section, vec_string_1D& complete_List) {
+bool createCompleteVector_US(std::string fullPathName, vec_string_1D& complete_List) {
   // in the Configuration file we find the appopriate paragraph between "xkb_symbol <text>" and the next xkb_symbol
   // then copy all rows starting with "key <" to a 1D-Vector
 
   bool create_row = false;
   const char* key = "key <";
   std::string line;
-  std::string str_us_kbd_name(section);
+  std::string str_us_kbd_name("xkb_symbols \"basic\"");
   std::string xbk_mark = "xkb_symbol";
   std::ifstream inputFile(fullPathName);
 
   if (inputFile.is_open()) {
     while (getline(inputFile, line)) {
-      std::string str_buf(line);
 
       // stop when finding the mark xkb_symbol
-      if (std::string(str_buf).find(xbk_mark) != std::string::npos)
+      if (std::string(line).find(xbk_mark) != std::string::npos)
         create_row = false;
 
       // start when finding the mark xkb_symbol + correct layout
-      if (std::string(str_buf).find(str_us_kbd_name) != std::string::npos)
+      if (std::string(line).find(str_us_kbd_name) != std::string::npos)
         create_row = true;
 
       // as long as we are in the same xkb_symbol layout block and find "key <" we push the whole line into a 1D-vector
-      else if (create_row && (std::string(str_buf).find(key) != std::string::npos)) {
+      else if (create_row && (std::string(line).find(key) != std::string::npos)) {
         complete_List.push_back(line);
       }
     }
@@ -567,9 +565,9 @@ vec_dword_2D create_empty_2D_Vector(int dim_rows, int dim_ss) {
   vec_dword_1D shifts;
   vec_dword_2D vector_2D;
 
-    for (int j = 0; j < dim_ss; j++) {
-      shifts.push_back(INVALID_NAME);
-    }
+  for (int j = 0; j < dim_ss; j++) {
+    shifts.push_back(INVALID_NAME);
+  }
 
   for (int i = 0; i < dim_rows; i++) {
     vector_2D.push_back(shifts);
@@ -627,6 +625,7 @@ bool InitializeGDK(GdkKeymap** keymap, int argc, gchar* argv[]) {
     gdk_display_close(display);
     return 2;
   }
+  // intentionally leaking `display` in order to still be able to access `keymap`
   return 0;
 }
 
