@@ -61,6 +61,12 @@ bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
 }
 
 int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int caps, GdkKeymap* keymap) {
+/*
+  * Contrary to what the function name might suggest, the function KMX_ToUnicodeEx does not process surrogate pairs. 
+  * This is because it is used in mcompile only which only deals with latin scripts.
+  * In case this function is used for surrogate pairs, they will be ignored and a message will be printed out
+*/
+
   GdkKeymapKey* maps;
   guint* keyvals;
   gint count;
@@ -76,7 +82,14 @@ int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int
 
   KMX_DWORD keyVal = (KMX_DWORD)KMX_get_KeyVal_From_KeyCode(keymap, keycode, ShiftState(shift_state_pos), caps);
   std::u16string str = convert_DeadkeyValues_To_U16str(keyVal);
-  pwszBuff[0] = *(PKMX_WCHAR)str.c_str();
+  KMX_WCHAR firstchar = *(PKMX_WCHAR)str.c_str();
+
+  if ((firstchar >= 0xD800) &&(firstchar <= 0xDFFF)) {
+    wprintf(L"Surrogate pair found that is not processed in KMX_ToUnicodeEx\n");
+    return 0;
+  }
+
+  pwszBuff[0] = firstchar;
 
   g_free(keyvals);
   g_free(maps);
