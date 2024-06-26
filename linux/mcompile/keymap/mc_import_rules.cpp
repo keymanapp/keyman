@@ -74,7 +74,7 @@ int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
 
-  if (!(ensureValidInputForKeyboardTranslation(shift_state_pos, count, keycode))) {
+  if (!(ensureValidInputForKeyboardTranslation(shift_state_pos, (int)count, (int)keycode))){
     g_free(keyvals);
     g_free(maps);
     return 0;
@@ -224,7 +224,7 @@ public:
             if (st[ich] < 0x20 || st[ich] == 0x7F) {
               isvalid = false;
 
-              wprintf(L"invalid for: %i\n", st[ich]);
+              printf("invalid for: %i\n", st[ich]);
               break;
             }
           }
@@ -281,7 +281,7 @@ public:
           for (size_t ich = 0; ich < st.size(); ich++) {
             if (st[ich] < 0x20 || st[ich] == 0x7F) {
               isvalid = false;
-              wprintf(L"invalid 16 for: %i\n", st[ich]);
+              printf("invalid 16 for: %i\n", st[ich]);
               break;
             }
           }
