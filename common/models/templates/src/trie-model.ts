@@ -494,7 +494,11 @@ function getSortedResults(traversal: LexiconTraversal, limit = MAX_SUGGESTIONS):
     } else {
       const traversal = entry as LexiconTraversal;
       queue.enqueueAll(traversal.entries);
-      queue.enqueueAll(Array.from(traversal.children()).map((entry) => entry.traversal()));
+      let children: LexiconTraversal[] = []
+      for(let child of traversal.children()) {
+        children.push(child.traversal());
+      }
+      queue.enqueueAll(children);
     }
   }
 
