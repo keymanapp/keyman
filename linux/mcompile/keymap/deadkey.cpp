@@ -1,6 +1,7 @@
 #include "keymap.h"
 #include "deadkey.h"
 
+
 std::vector<DeadKey *> create_deadkeys_by_basechar() {
   std::vector<DeadKey *> alDead;
   vec_dword_2D dk_ComposeTable;

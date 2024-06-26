@@ -1,7 +1,6 @@
 #pragma once
 #ifndef KM_TYPES
 #define KM_TYPES
-
 #include <stdint.h>
 
 /*
