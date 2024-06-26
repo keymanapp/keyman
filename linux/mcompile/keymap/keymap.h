@@ -17,7 +17,6 @@
 #include "u16.h"
 #include<cassert>
 
-
 enum ShiftState {
   Base         = 0,                   // 0
   Shft         = 1,                   // 1

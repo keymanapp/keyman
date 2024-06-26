@@ -3,7 +3,6 @@
 #include "/usr/include/xcb/xproto.h"
 #include <xkbcommon/xkbcommon.h>
 
-
 int convert_WinShiftstate_to_LinuxShiftstate(int win_ShiftState) {
   if (win_ShiftState == 0)
     return 0;

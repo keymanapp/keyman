@@ -19,7 +19,6 @@
                     06 Feb 2015 - mcdurdin - I4552 - V9.0 - Add mnemonic recompile option to ignore deadkeys
 */
 
-
 #include <vector>
 #include <string>
 #include <stdio.h>

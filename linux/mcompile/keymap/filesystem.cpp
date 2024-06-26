@@ -9,7 +9,6 @@
 #include <iostream>
 #include "filesystem.h"
 
-
 #ifdef _MSC_VER
 #include <io.h>
 #else

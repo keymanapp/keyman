@@ -10,6 +10,7 @@
 #ifndef _KMXFILE_H
 #define _KMXFILE_H
 
+
 typedef struct KMX_tagSTORE {
 	KMX_DWORD dwSystemID;
 	PKMX_WCHAR dpName;

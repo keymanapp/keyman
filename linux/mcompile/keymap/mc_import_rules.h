@@ -3,7 +3,6 @@
 #ifndef MC_IMPORT_RULES_H
 #define MC_IMPORT_RULES_H
 
-
 class DeadKey {
 private:
   KMX_WCHAR m_deadchar;
