@@ -23,7 +23,8 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
   private keepSuggestion: Keep;
   private revertSuggestion: Reversion;
 
-  private recentAccept: boolean = false;
+  // Set to null/undefined if there was no recent acceptance.
+  private recentAcceptCause: 'key' | 'banner';
   private revertAcceptancePromise: Promise<Reversion>;
 
   private swallowPrediction: boolean = false;
@@ -191,7 +192,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
       // We get here either if suggestion acceptance fails or if it was a reversion.
       if(suggestion && suggestion.tag == 'revert') {
         // Reversion state management
-        this.recentAccept = false;
+        this.recentAcceptCause = null;
         this.recentRevert = true;
       }
 
@@ -205,7 +206,9 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
       }
     });
 
-    this.recentAccept = true;
+    // By default, we assume we were triggered by the banner.
+    // Acceptance by keystroke will overwrite this later (in `tryAccept`)
+    this.recentAcceptCause = 'banner';
     this.recentRevert = false;
 
     this.swallowPrediction = true;
@@ -225,19 +228,30 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
    * Otherwise, return true.
    */
   private doTryAccept = (source: string, returnObj: {shouldSwallow: boolean}): void => {
-    //let keyman = com.keyman.singleton;
+    const recentAcceptCause = this.recentAcceptCause;
 
-    if(!this.recentAccept && this.selected) {
+    if(!recentAcceptCause && this.selected) {
       this.accept(this.selected);
       returnObj.shouldSwallow = true;
-      // No need to swallow the next keystroke's whitespace; we triggered FROM a space,
-      // which this matches.
-      // Standard applications from the banner, those we DO want to swallow the first time.
-      this.recentAccept = false;
-    } else if(this.recentAccept && source == 'space') {
-      this.recentAccept = false;
-      // If the model doesn't insert wordbreaks, don't swallow the space.  If it does,
-      // we consider that insertion to be the results of the first post-accept space.
+
+      // doTryAccept is the path for keystroke-based auto-acceptance.
+      // Overwrite the cause to reflect this.
+      this.recentAcceptCause = 'key';
+    } else if(recentAcceptCause && source == 'space') {
+      this.recentAcceptCause = null;
+      if(recentAcceptCause == 'key') {
+        // No need to swallow the keystroke's whitespace; we triggered the prior acceptance
+        // FROM a space, so we've already aliased the suggestion's built-in space.
+        returnObj.shouldSwallow = false;
+        return;
+      }
+
+      // Standard whitespace applications from the banner, those we DO want to
+      // swallow the first time.
+      //
+      // If the model doesn't insert wordbreaks, there's no space to alias, so
+      // don't swallow the space.  If it does, we consider that insertion to be
+      // the results of the first post-accept space.
       returnObj.shouldSwallow = !!this.langProcessor.wordbreaksAfterSuggestions; // can be handed outside
     } else {
       returnObj.shouldSwallow = false;
@@ -254,9 +268,9 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     if(this.doRevert) {
       // If so, clear the 'revert' option and start doing normal predictions again.
       this.doRevert = false;
-      this.recentAccept = false;
+      this.recentAcceptCause = null;
       // Otherwise, did we just accept something before the revert signal was received?
-    } else if(this.recentAccept) {
+    } else if(this.recentAcceptCause) {
       this.showRevert();
       this.swallowPrediction = true;
     }
@@ -277,7 +291,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     this.selected = null;
 
     if(!this.swallowPrediction || source == 'context') {
-      this.recentAccept = false;
+      this.recentAcceptCause = null;
       this.doRevert = false;
       this.recentRevert = false;
 
@@ -304,7 +318,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
   }
 
   private activateKeep(): boolean {
-    return !this.recentAccept && !this.recentRevert && !this.initNewContext;
+    return !this.recentAcceptCause && !this.recentRevert && !this.initNewContext;
   }
 
   /**
@@ -338,7 +352,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
 
     // If we've gotten an update request like this, it's almost always user-triggered and means the context has shifted.
     if(!this.swallowPrediction) {
-      this.recentAccept = false;
+      this.recentAcceptCause = null;
       this.doRevert = false;
       this.recentRevert = false;
     } else { // This prediction was triggered by a recent 'accept.'  Now that it's fulfilled, we clear the flag.
