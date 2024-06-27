@@ -73,10 +73,10 @@ inline bool isLittleEndianSystem() {
 }
 
 // map Shiftstate to modifier (e.g. 0->0; 16-1; 9->2; 25->3)
-int convert_WinShiftstate_to_LinuxShiftstate(int VKShiftState);
+int convert_Shiftstate_to_LinuxShiftstate(int VKShiftState);
 
 // check if input is correct
-bool ensureValidInputForKeyboardTranslation(int shiftstate, int count, int keycode);
+bool ensureValidInputForKeyboardTranslation(int shiftstate, gint count, gint keycode);
 
 // take a std::string (=contents of line symbols-file ) and returns the (int) value of the character
 KMX_DWORD convertNamesTo_DWORD_Value(std::string tok_str);
@@ -88,7 +88,7 @@ int createOneVectorFromBothKeyboards(vec_dword_3D& All_Vector, GdkKeymap* keymap
 int write_US_ToVector(vec_dword_3D& vec);
 
 // 1. step: read complete Row of Configuration file US
-bool createCompleteVector_US(std::string fullPathName, vec_string_1D& complete_List) ;
+bool createCompleteVector_US(vec_string_1D& complete_List) ;
 
 // replace Name of Key (e.g. <AD06>)  wih Keycode ( e.g. 15 )
 int replace_KeyName_with_Keycode(std::string in);

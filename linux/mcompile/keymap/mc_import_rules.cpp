@@ -69,7 +69,7 @@ int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
 
-  if (!(ensureValidInputForKeyboardTranslation(shift_state_pos, (int)count, (int)keycode))){
+  if (!(ensureValidInputForKeyboardTranslation(shift_state_pos, count, keycode))){
     g_free(keyvals);
     g_free(maps);
     return 0;
