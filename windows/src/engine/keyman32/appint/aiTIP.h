@@ -39,6 +39,7 @@ class AITIP : public AIWin2000Unicode
 {
 private:
   BOOL useLegacy;
+  BOOL isTextSelected;
 
 	BOOL PostKeys();
 //TOUCH  	void PostTouchContext();
@@ -68,6 +69,10 @@ public:
 	/* TIP interactions */
 
   BOOL IsLegacy() { return useLegacy; }
+  BOOL
+  IsTextSelected() {
+    return isTextSelected;
+  }
 };
 
 /**
