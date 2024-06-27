@@ -74,11 +74,7 @@ describe('LMLayerWorker', function () {
       sinon.assert.calledWithMatch(fakePostMessage.lastCall, {
         message: 'suggestions',
         token: token,
-        suggestions: hazel[0].map((entry) => {
-          return {
-            ...entry
-          }
-        })
+        suggestions: hazel[0]
       });
     });
 
