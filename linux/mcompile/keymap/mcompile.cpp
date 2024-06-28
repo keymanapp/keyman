@@ -294,11 +294,9 @@ void KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT
 KMX_WCHAR KMX_ScanXStringForMaxDeadkeyID(PKMX_WCHAR str) {
   KMX_WCHAR dkid = 0;
   while(str && *str) {
-    if(*str == UC_SENTINEL) {
-      switch(*(str+1)) {
-      case CODE_DEADKEY:
-        dkid = max(dkid, *(str+2));
-      }
+    if(*str == UC_SENTINEL && *(str+1) == CODE_DEADKEY) {
+      dkid = max(dkid, *(str+2));
+    }
     }
     str = KMX_incxstr(str);
   }
