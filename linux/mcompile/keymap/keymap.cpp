@@ -17,10 +17,10 @@ int convert_Shiftstate_to_LinuxShiftstate(int shiftState) {
 
 
 bool ensureValidInputForKeyboardTranslation(int gdk_level, gint count, gint keycode) {
-  if (gdk_level >=  (int) count)
+  if (gdk_level >  (int) count)
     return false;
 
-  if ((int) keycode > (int)keycode_max)
+  if (keycode > keycode_max)
     return false;
 
   return true;
@@ -344,15 +344,16 @@ int write_US_ToVector(vec_dword_3D& vec) {
     return 1;
   }
 
+  if (vector_completeUS.size() < 2) {
+    printf("ERROR: several keys of the US keyboard are not processed \n");
+    return 1;
+  }
+
   if (vector_completeUS.size() != 48) {
     printf("WARNING: the wrong keyboard input might have been chosen.\n");
     return 0;
   }
 
-  if (vector_completeUS.size() < 2) {
-    printf("ERROR: several keys of the US keyboard are not processed \n");
-    return 1;
-  }
   return 0;
 }
 
