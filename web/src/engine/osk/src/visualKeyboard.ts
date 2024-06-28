@@ -637,7 +637,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           try {
             shouldLockLayer && this.lockLayer(true);
             // Once the best coord to use for fat-finger calculations has been determined:
-            keyResult = this.modelKeyClick(gestureStage.item, coord);
+            keyResult = this.modelKeyClick(gestureStage.item, coord, correctionKeyDistribution);
           } finally {
             shouldLockLayer && this.lockLayer(false);
           }
