@@ -36,7 +36,7 @@ const appleDummySuggestionSets = [[
 ], [
   // Set 2:
   {
-    transform: { insert: '', deleteLeft: 0},
+    transform: { insert: 'e', deleteLeft: 0},
     displayAs: 'apple',
     tag: 'keep'
   }, {

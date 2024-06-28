@@ -48,7 +48,7 @@
   [
     {
       "transform": {
-        "insert": "distracted ",
+        "insert": "distracted by ",
         "deleteLeft": 0
       },
       "displayAs": "distracted by"
