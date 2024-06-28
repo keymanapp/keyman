@@ -68,8 +68,7 @@ typedef struct KMX_tagKEYBOARD {
 	//HBITMAP	hBitmap;				// handle to the bitmap in the file;
 } KMX_KEYBOARD, *LPKMX_KEYBOARD;
 
-KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD *lpKeyboard);
-
+KMX_BOOL KMX_LoadKeyboard(KMX_CHAR* fileName, LPKMX_KEYBOARD* lpKeyboard) ;
 KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, KMX_CHAR* filename);
 
 PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p);

@@ -358,7 +358,7 @@ LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFil
 
 #endif
 
-KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
+KMX_BOOL KMX_LoadKeyboard(KMX_CHAR* fileName, LPKMX_KEYBOARD* lpKeyboard) {
 
   *lpKeyboard = NULL;
   PKMX_BYTE buf;
@@ -371,7 +371,7 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
     return FALSE;
   }
 
-  fp = Open_File((const KMX_WCHAR*)fileName, u"rb");
+  fp = Open_File((const KMX_CHAR*)fileName, "rb");
 
   if(fp == NULL) {
     KMX_LogError(L"Could not open file\n" );

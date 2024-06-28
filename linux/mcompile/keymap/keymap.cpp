@@ -17,7 +17,7 @@ int convert_Shiftstate_to_LinuxShiftstate(int shiftState) {
 
 
 bool ensureValidInputForKeyboardTranslation(int gdk_level, gint count, gint keycode) {
-  if (gdk_level >=  (int) count)
+  if (gdk_level >  (int) count)
     return false;
 
   if ((int) keycode > (int)keycode_max)
