@@ -6,6 +6,7 @@
 #include "mc_import_rules.h"
 #include <map>
 
+
 // create a 2D-vector of all dk combinations ( ` + a -> à ;  ^ + a -> â ; `+ e -> è; ...)
 void create_DKTable(vec_dword_2D &dk_ComposeTable);
 

@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "u16.h"
 
+
 // Open files on windows and non-windows platforms. Datatypes for Filename and mode must be the same.
 // return FILE* if file could be opened; FILE must to be closed in calling function
 FILE* Open_File(const KMX_CHAR* Filename, const KMX_CHAR* mode);
