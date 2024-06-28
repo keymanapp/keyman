@@ -38,6 +38,10 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
 
 bool KMX_ImportRules( LPKMX_KEYBOARD kp,vec_dword_3D& all_vector, GdkKeymap **keymap,std::vector<KMX_DeadkeyMapping> *KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion); // I4353   // I4327
 
+int run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[]);
+
+int KMX_GetDeadkeys(vec_dword_2D & dk_Table, KMX_WORD DeadKey, KMX_WORD *OutputPairs, GdkKeymap* keymap);
+
 std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys; // I4353
 
 // Note: max is not a standard c api function or macro
@@ -296,7 +300,6 @@ KMX_WCHAR KMX_ScanXStringForMaxDeadkeyID(PKMX_WCHAR str) {
   while(str && *str) {
     if(*str == UC_SENTINEL && *(str+1) == CODE_DEADKEY) {
       dkid = max(dkid, *(str+2));
-    }
     }
     str = KMX_incxstr(str);
   }
