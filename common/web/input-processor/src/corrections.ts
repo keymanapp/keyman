@@ -80,7 +80,12 @@ export function distributionFromDistanceMaps(squaredDistMaps: Map<ActiveKeyBase,
     for(let key of squaredDistMap.keys()) {
       // We've found that in practice, dist^-4 seems to work pretty well.  (Our input has dist^2.)
       // (Note:  our rule of thumb here has only been tested for layout-based distances.)
-      const entry = 1 / (Math.pow(squaredDistMap.get(key), 2) + 1e-6); // Prevent div-by-0 errors.
+      //
+      // The 3e-5 fudge-factor may seem a bit high, but it has two purposes:
+      // 1. Prevent div-by-0 errors
+      // 2. Ensures that the main key's probability doesn't get SO high that we don't
+      //    consider correcting to immediate neighbors, even if perfectly accurate.
+      const entry = 1 / (Math.pow(squaredDistMap.get(key), 2) + 3e-5);
       totalMass += entry;
 
       // In case of duplicate key IDs; this can occur if multiple sets are specified.
