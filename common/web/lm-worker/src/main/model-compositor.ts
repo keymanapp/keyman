@@ -421,11 +421,12 @@ export default class ModelCompositor {
         tuple.prediction.sample.transformId = inputTransform.id;
       }
 
+      const predictedWord = this.wordbreak(models.applyTransform(tuple.prediction.sample.transform, context));
+
       // Is the suggestion an exact match (or, "similar enough") to the
       // actually-typed context?  If so, we wish to note this fact and to
       // prioritize such a suggestion over suggestions that are not.
       if(keyed(tuple.correction.sample) == keyedPrefix) {
-        const predictedWord = tuple.prediction.sample.transform.insert;
         if(predictedWord == truePrefix) {
           tuple.matchLevel = SuggestionSimilarity.exact;
           keepOption = this.toAnnotatedSuggestion(tuple.prediction.sample, 'keep',  models.QuoteBehavior.noQuotes);
@@ -439,12 +440,17 @@ export default class ModelCompositor {
         }
       }
 
-      let displayText = tuple.prediction.sample.displayAs;
-      let existingSuggestion = suggestionDistribMap[displayText];
+      // Assumption:  suggestions that have the same net result should have the
+      // same displayAs string.  (We could try to pick the one with highest net
+      // probability, but that seems like too much of an edge-case to matter.)
+      //
+      // Either way, no point in showing multiple suggestions that do the same thing.
+      // Merge 'em!
+      const existingSuggestion = suggestionDistribMap[predictedWord];
       if(existingSuggestion) {
         existingSuggestion.totalProb += tuple.totalProb;
       } else {
-        suggestionDistribMap[displayText] = tuple;
+        suggestionDistribMap[predictedWord] = tuple;
       }
     }
 
