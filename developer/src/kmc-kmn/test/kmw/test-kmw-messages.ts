@@ -39,10 +39,10 @@ describe('KmwCompilerMessages', function () {
     }
   }
 
-  // WARN_TouchLayoutUsesUnsupportedGesturesDownlevel
+  // HINT_TouchLayoutUsesUnsupportedGesturesDownlevel
 
-  it('should generate WARN_TouchLayoutUsesUnsupportedGesturesDownlevel if the touch layout has gestures but the keyboard is an old version', async function() {
-    await testForMessage(this, ['kmw', 'validate_gesture.kmn'], KmwCompilerMessages.WARN_TouchLayoutUsesUnsupportedGesturesDownlevel);
+  it('should generate HINT_TouchLayoutUsesUnsupportedGesturesDownlevel if the touch layout has gestures but the keyboard is an old version', async function() {
+    await testForMessage(this, ['kmw', 'validate_gesture.kmn'], KmwCompilerMessages.HINT_TouchLayoutUsesUnsupportedGesturesDownlevel);
   });
 
   // TODO: other messages
@@ -70,5 +70,12 @@ describe('KmwCompilerMessages', function () {
   // it('should generate ERROR_TouchLayoutFileDoesNotExist if ...', async function() {
   //   await testForMessage(this, ['kmw', '....kmn'], KmwCompilerMessages.ERROR_TouchLayoutFileDoesNotExist);
   // });
+
+  // ERROR_NotSupportedInKeymanWebOutput
+
+  it('should generate ERROR_NotSupportedInKeymanWebOutput if the command is not supported in output for KeymanWeb', async function() {
+    await testForMessage(this, ['kmw', 'error_not_supported_in_keyman_web_output.kmn'], KmwCompilerMessages.ERROR_NotSupportedInKeymanWebOutput);
+  });
+
 
 });

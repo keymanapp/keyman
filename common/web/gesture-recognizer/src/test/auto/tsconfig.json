@@ -9,5 +9,7 @@
     // Not needed when testing via Node, and when `true` it seems to desync preset breakpoints
     // worse than when `false`.
     "importHelpers": false,
+    // Makes the tests... somewhat tricky to handle properly.
+    "noImplicitAny": false
   }
 }

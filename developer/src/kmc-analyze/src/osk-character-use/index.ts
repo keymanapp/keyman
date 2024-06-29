@@ -1,14 +1,30 @@
-import { CompilerCallbacks, KeymanFileTypes, KvksFile, KvksFileReader, Osk, TouchLayout, TouchLayoutFileReader } from "@keymanapp/common-types";
-import { CompilerMessages } from '@keymanapp/kmc-kmn';
+import { CompilerCallbacks, KeymanFileTypes, KvksFile, KvksFileReader, TouchLayout, TouchLayoutFileReader } from "@keymanapp/common-types";
+import { CompilerMessages, Osk } from '@keymanapp/kmc-kmn';
+import { escapeMarkdownChar } from '@keymanapp/developer-utils';
 import { getOskFromKmnFile } from "../util/get-osk-from-kmn-file.js";
 import { AnalyzerMessages } from "../messages.js";
 
 
 type StringRefUsageMap = {[index:string]: Osk.StringRefUsage[]};
 
+/**
+ * @public
+ * Options for character analysis
+ */
 export interface AnalyzeOskCharacterUseOptions {
+  /**
+   * First character to use in PUA for remapping with &displayMap, defaults to
+   * U+F100
+   */
   puaBase?: number;
+  /**
+   * If true, strips U+25CC from the key cap before further analysis
+   */
   stripDottedCircle?: boolean;
+  /**
+   * If true, reports number of references to each character found in each
+   * source file
+   */
   includeCounts?: boolean;
 }
 
@@ -18,6 +34,11 @@ const defaultOptions: AnalyzeOskCharacterUseOptions = {
   includeCounts: false,
 }
 
+/**
+ * @public
+ * Analyze the characters used in On Screen Keyboard files (.kvks,
+ * .keyman-touch-layout) for use with `&displayMap`.
+ */
 export class AnalyzeOskCharacterUse {
   private _strings: StringRefUsageMap = {};
   private options: AnalyzeOskCharacterUseOptions;
@@ -26,6 +47,10 @@ export class AnalyzeOskCharacterUse {
     this.options = {...defaultOptions, ...options};
   }
 
+  /**
+   * Clears analysis data collected from previous calls to
+   * {@link AnalyzeOskCharacterUse.analyze}
+   */
   public clear() {
     this._strings = {};
   }
@@ -34,6 +59,19 @@ export class AnalyzeOskCharacterUse {
   // Analyze a single file
   //
 
+  /**
+   * Analyzes a single source file for Unicode character usage. Can parse .kmn,
+   * .kvks, .keyman-touch-layout file formats. Can be called multiple times to
+   * collect results from more than one file. Use
+   * {@link AnalyzeOskCharacterUse.getStrings} to retrieve results.
+   *
+   * Note: `analyze()` collects key cap data, so calling this for a .kmn file
+   * will retrieve the key caps from the .kvks and .keyman-touch-layout files
+   * that it references, rather than key cap data from the .kmn file itself.
+   *
+   * @param   file - relative or absolute path to a Keyman source file
+   * @returns        true if the file is successfully loaded and parsed
+   */
   public async analyze(file: string): Promise<boolean> {
     switch(KeymanFileTypes.sourceTypeFromFilename(file)) {
       case KeymanFileTypes.Source.VisualKeyboard: {
@@ -210,6 +248,30 @@ export class AnalyzeOskCharacterUse {
     return result;
   }
 
+  /**
+   * Returns the collected results from earlier calls to
+   * {@link AnalyzeOskCharacterUse.analyze}. This generates a mapping from a key
+   * cap (one or more characters) to a PUA code, for use with `&displayMap`.
+   *
+   * Three output formats are supported:
+   *
+   * - .txt: tab-separated string format, with three columns: PUA, Key Cap, and
+   *   plain string. The PUA and Key Cap columns are formatted as Unicode Scalar
+   *   Values, e.g. U+0061, and the plain string is the original key cap string.
+   *
+   * - .md: formatted for documentation purposes. Generates a Markdown table
+   *   (GFM) with PUA, Key Cap, and plain string. The PUA and Key Cap columns
+   *   are formatted as Unicode Scalar Values, e.g. U+0061, and the plain string
+   *   is the original key cap string.
+   *
+   * - .json: returns the final aggregated data as an array of strings, which
+   *   can be joined to form a JSON blob of an object with a single member,
+   *   `map`, which is an array of {@link Osk.StringResult} objects.
+   *
+   * @param    format - file format to return - can be '.txt', '.md', or '.json'
+   * @returns  an array of strings, formatted according to the `format`
+   *           parameter.
+   */
   public getStrings(format?: '.txt'|'.md'|'.json'): string[] {
     const final = this.prepareResults(this._strings);
     switch(format) {
@@ -241,7 +303,7 @@ export class AnalyzeOskCharacterUse {
     lines.push('-------|-------------|---------');
     for(let s of strings) {
       const ux = this.stringToUnicodeSequence(s.str);
-      lines.push('U+'+s.pua + ' | ' + ux + ' | ' + this.escapeMarkdownChar(s.str));
+      lines.push('U+'+s.pua + ' | ' + ux + ' | ' + escapeMarkdownChar(s.str, true));
     }
     return lines;
   }
@@ -250,20 +312,6 @@ export class AnalyzeOskCharacterUse {
     // For future expansion, we wrap the array in a 'map' property
     let map = { "map": strings };
     return JSON.stringify(map, null, 2).split('\n');
-  }
-
-  private static escapeMarkdownChar(s: string) {
-    // note: could replace with a common lib but too much baggage to be worth it for now
-    // commonmark 2.4: all punct can be escaped
-    // const punct = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~';
-    s = s.replace(/[!"#$%&'()*+,-./:;<=>?@\[\\\]^_`{|}~]/g, '\\$0');
-    // replace whitepsace
-    s = s.replace(/[\n]/g, '\\n');
-    s = s.replace(/[\r]/g, '\\r');
-    s = s.replace(/[\t]/g, '\\t');
-    s = s.replace(/ /g, '&#x20;');
-    s = s.replace(/\u00a0/g, '&#xa0;');
-    return s;
   }
 
   private static stringToUnicodeSequence(s: string, addUPlusPrefix: boolean = true): string {

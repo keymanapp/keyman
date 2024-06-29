@@ -13,7 +13,7 @@ import { Deadkey, DeadkeyTracker } from "./deadkeys.js";
 
 export function isEmptyTransform(transform: Transform) {
   if(!transform) {
-    return false;
+    return true;
   }
   return transform.insert === '' && transform.deleteLeft === 0 && (transform.deleteRight ?? 0) === 0;
 }
@@ -21,27 +21,30 @@ export function isEmptyTransform(transform: Transform) {
 export class TextTransform implements Transform {
   readonly insert: string;
   readonly deleteLeft: number;
-  readonly deleteRight?: number;
+  readonly deleteRight: number;
+  readonly erasedSelection: boolean;
+  id: number;
 
-  constructor(insert: string, deleteLeft: number, deleteRight?: number) {
+  constructor(insert: string, deleteLeft: number, deleteRight: number, erasedSelection: boolean) {
     this.insert = insert;
     this.deleteLeft = deleteLeft;
-    this.deleteRight = deleteRight || 0;
+    this.deleteRight = deleteRight;
+    this.erasedSelection = erasedSelection;
   }
 
-  public static readonly nil = new TextTransform('', 0, 0);
+  public static readonly nil = new TextTransform('', 0, 0, false);
 }
 
 export class Transcription {
   readonly token: number;
   readonly keystroke: KeyEvent;
-  readonly transform: Transform;
+  readonly transform: TextTransform;
   alternates: Alternate[]; // constructed after the rest of the transcription.
   readonly preInput: Mock;
 
   private static tokenSeed: number = 0;
 
-  constructor(keystroke: KeyEvent, transform: Transform, preInput: Mock, alternates?: Alternate[]/*, removedDks: Deadkey[], insertedDks: Deadkey[]*/) {
+  constructor(keystroke: KeyEvent, transform: TextTransform, preInput: Mock, alternates?: Alternate[]/*, removedDks: Deadkey[], insertedDks: Deadkey[]*/) {
     let token = this.token = Transcription.tokenSeed++;
 
     this.keystroke = keystroke;
@@ -120,7 +123,7 @@ export default abstract class OutputTarget {
    * As such, it assumes that the caret is immediately after any inserted text.
    * @param from An output target (preferably a Mock) representing the prior state of the input/output system.
    */
-  buildTransformFrom(original: OutputTarget): Transform {
+  buildTransformFrom(original: OutputTarget): TextTransform {
     const toLeft = this.getTextBeforeCaret();
     const fromLeft = original.getTextBeforeCaret();
 
@@ -138,7 +141,7 @@ export default abstract class OutputTarget {
     // caret mid-word..
     const deletedRight = fromRight.substring(0, rightDivergenceIndex + 1)._kmwLength();
 
-    return new TextTransform(insertedText, deletedLeft, deletedRight);
+    return new TextTransform(insertedText, deletedLeft, deletedRight, original.getSelectedText() && !this.getSelectedText());
   }
 
   buildTranscriptionFrom(original: OutputTarget, keyEvent: KeyEvent, readonly: boolean, alternates?: Alternate[]): Transcription {
@@ -442,6 +445,18 @@ export class Mock extends OutputTarget {
 
   protected setTextAfterCaret(s: string): void {
     this.text = this.getTextBeforeCaret() + s;
+  }
+
+  /**
+   * Indicates if this Mock represents an identical context to that of another Mock.
+   * @param other
+   * @returns
+   */
+  isEqual(other: Mock) {
+    return this.text == other.text
+      && this.selStart == other.selStart
+      && this.selEnd == other.selEnd
+      && this.deadkeys().equal(other.deadkeys());
   }
 
   doInputEvent() {

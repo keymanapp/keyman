@@ -1,5 +1,5 @@
 //
-// Conforms to techpreview
+// Conforms to 45
 //
 // The interfaces in this file are designed with reference to the mapped
 // structures produced by xml2js when passed a LDML keyboard .xml file.
@@ -40,7 +40,7 @@ export interface LKImport {
    */
   base: string;
   /**
-   * path to imported resource, of the form `techpreview/*.xml`
+   * path to imported resource, of the form `45/*.xml`
    */
   path: string;
 };
@@ -124,7 +124,7 @@ export interface LKRow {
 export interface LKVariables {
   string?: LKString[];
   set?: LKSet[];
-  unicodeSet?: LKUnicodeSet[];
+  uset?: LKUSet[];
 };
 
 /**
@@ -137,7 +137,7 @@ export interface Variable {
 
 export interface LKString extends Variable {};
 export interface LKSet extends Variable {};
-export interface LKUnicodeSet extends Variable {};
+export interface LKUSet extends Variable {};
 
 export interface LKTransforms {
   type?: "simple" | "backspace";

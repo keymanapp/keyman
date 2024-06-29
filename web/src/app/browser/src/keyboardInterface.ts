@@ -1,5 +1,5 @@
 import { type OutputTarget } from 'keyman/engine/element-wrappers';
-import { FloatingOSKView, OSKView } from 'keyman/engine/osk';
+import { FloatingOSKView } from 'keyman/engine/osk';
 import { KeyboardInterface as KeyboardInterfaceBase } from 'keyman/engine/main';
 
 import ContextManager from './contextManager.js';

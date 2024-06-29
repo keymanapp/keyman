@@ -59,7 +59,7 @@
               <Directory Id="dirNode" Name="node.js" />
               <Directory Id="dirProjects" Name="Projects" />
               <Directory Id="dir_import" Name="import">
-                <Directory Id="dir_import_techpreview" Name="techpreview" />
+                <Directory Id="dir_import_45" Name="45" />
               </Directory>
             </Directory>
           </Directory>
@@ -151,7 +151,7 @@
       </Component>
 
       <Component>
-        <File Name="kmbrowserhost.exe" KeyPath="yes" Source="..\..\..\windows\bin\desktop\kmbrowserhost.exe" />
+        <File Name="kmdbrowserhost.exe" KeyPath="yes" />
       </Component>
 
       <Component>
@@ -167,7 +167,7 @@
       </Component>
 
       <Component>
-        <File Name="keymancore-1.dll" KeyPath="yes" />
+        <File Name="keymancore-2.dll" KeyPath="yes" />
       </Component>
 
       <Component>
@@ -198,7 +198,7 @@
     </ComponentGroup>
 
     <!-- LDML Imports -->
-    <ComponentGroup Id="LdmlImports" Directory="dir_import_techpreview" Source="..\..\..\resources\standards-data\ldml-keyboards\techpreview\import">
+    <ComponentGroup Id="LdmlImports" Directory="dir_import_45" Source="..\..\..\resources\standards-data\ldml-keyboards\45\import">
       <Component>
         <File Id="LdmlImportReadme" Name="README.md" KeyPath="yes" />
       </Component>

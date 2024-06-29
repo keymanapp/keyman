@@ -12,6 +12,7 @@
 #import <InputMethodKit/InputMethodKit.h>
 #import "KeySender.h"
 #import "KMInputMethodAppDelegate.h"
+#import "KMLogs.h"
 
 const CGKeyCode kKeymanEventKeyCode = 0xFF;
 
@@ -29,50 +30,23 @@ const CGKeyCode kKeymanEventKeyCode = 0xFF;
   return self;
 }
 
-- (void)sendKeyDown:(NSUInteger)keyCode forSourceEvent:(NSEvent *)event includeKeyUp:(BOOL)includeKeyUpEvent {
-  // Returns the frontmost app, which is the app that receives key events.
-  NSRunningApplication *app = NSWorkspace.sharedWorkspace.frontmostApplication;
-  pid_t processId = app.processIdentifier;
-  NSString *bundleId = app.bundleIdentifier;
-
-  [self.appDelegate logDebugMessage:@"sendKeyDown keyCode %lu to app %@ with pid %d", (unsigned long)keyCode, bundleId, processId];
-
-  if (keyCode < 0x100) {
-    CGEventRef cgevent = [event CGEvent];
-
-    // use source from event to generate new event
-    CGEventSourceRef source = CGEventCreateSourceFromEvent(cgevent);
-    CGEventRef keyDownEvent = CGEventCreateKeyboardEvent(source, (CGKeyCode)keyCode, true);
-
-    // TODO: add version check
-    CGEventPostToPid(processId, keyDownEvent);
-    CFRelease(keyDownEvent);
-
-    if (includeKeyUpEvent) {
-      CGEventRef keyUpEvent = CGEventCreateKeyboardEvent(source, (CGKeyCode)keyCode, false);
-      CGEventPostToPid(processId, keyUpEvent);
-      CFRelease(keyUpEvent);
-    }
-  }
-}
-
 - (void)sendBackspaceforEventSource:(CGEventSourceRef)eventSource {
-  [self.appDelegate logDebugMessage:@"KeySender sendBackspaceforEventSource"];
+  os_log_debug([KMLogs keyLog], "KeySender sendBackspaceforEventSource");
 
   [self postKeyboardEventWithSource:eventSource code:kVK_Delete postCallback:^(CGEventRef eventToPost) {
-      CGEventPost(kCGHIDEventTap, eventToPost);
+    CGEventPost(kCGHIDEventTap, eventToPost);
   }];
 }
 
 - (void)postKeyboardEventWithSource: (CGEventSourceRef)source code:(CGKeyCode) virtualKey postCallback:(PostEventCallback)postEvent{
-    
+  
   if (!postEvent) {
-    [self.appDelegate logDebugMessage:@"KeySender postKeyboardEventWithSource callback not specified", virtualKey];
+    os_log_debug([KMLogs keyLog], "KeySender postKeyboardEventWithSource callback not specified for virtualKey: %u", virtualKey);
     return;
   }
   
-  [self.appDelegate logDebugMessage:@"KeySender postKeyboardEventWithSource for virtualKey: @%", virtualKey];
-
+  os_log_debug([KMLogs keyLog], "KeySender postKeyboardEventWithSource for virtualKey: %u", virtualKey);
+  
   CGEventRef ev = CGEventCreateKeyboardEvent (source, virtualKey, true); //down
   postEvent(ev);
   CFRelease(ev);
@@ -88,24 +62,20 @@ const CGKeyCode kKeymanEventKeyCode = 0xFF;
  */
 
 - (void)sendKeymanKeyCodeForEvent:(NSEvent *)event {
-  [self.appDelegate logDebugMessage:@"KeySender sendKeymanKeyCodeForEvent"];
-  
-  [self sendKeyDown:kKeymanEventKeyCode forSourceEvent:event includeKeyUp:NO];
+  os_log_debug([KMLogs keyLog], "KeySender sendKeymanKeyCodeForEvent");
+
+  ProcessSerialNumber psn;
   
   // Returns the frontmost app, which is the app that receives key events.
   NSRunningApplication *app = NSWorkspace.sharedWorkspace.frontmostApplication;
   pid_t processId = app.processIdentifier;
   NSString *bundleId = app.bundleIdentifier;
   
-  [self.appDelegate logDebugMessage:@"sendKeymanKeyCodeForEvent keyCode %lu to app %@ with pid %d", (unsigned long)kKeymanEventKeyCode, bundleId, processId];
+  os_log_debug([KMLogs keyLog], "sendKeymanKeyCodeForEvent keyCode %lu to app %{public}@ with pid %d", (unsigned long)kKeymanEventKeyCode, bundleId, processId);
   
-  CGEventRef cgevent = [event CGEvent];
+  // use nil as source, as this generated event is not directly tied to the originating event
+  CGEventRef keyDownEvent = CGEventCreateKeyboardEvent(nil, kKeymanEventKeyCode, true);
   
-  // use source from event to generate new event
-  CGEventSourceRef source = CGEventCreateSourceFromEvent(cgevent);
-  CGEventRef keyDownEvent = CGEventCreateKeyboardEvent(source, kKeymanEventKeyCode, true);
-  
-  // TODO: add version check
   CGEventPostToPid(processId, keyDownEvent);
   CFRelease(keyDownEvent);
   

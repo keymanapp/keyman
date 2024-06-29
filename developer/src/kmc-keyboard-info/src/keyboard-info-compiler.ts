@@ -8,7 +8,7 @@ import { KeyboardInfoFile, KeyboardInfoFileIncludes, KeyboardInfoFileLanguageFon
 import { KeymanFileTypes, CompilerCallbacks, KmpJsonFile, KmxFileReader, KMX, KeymanTargets, KeymanCompiler, CompilerOptions, KeymanCompilerResult, KeymanCompilerArtifacts, KeymanCompilerArtifact } from "@keymanapp/common-types";
 import { KeyboardInfoCompilerMessages } from "./keyboard-info-compiler-messages.js";
 import langtags from "./imports/langtags.js";
-import { validateMITLicense } from "@keymanapp/developer-utils";
+import { KeymanUrls, validateMITLicense } from "@keymanapp/developer-utils";
 import { KmpCompiler } from "@keymanapp/kmc-package";
 
 import { SchemaValidators } from "@keymanapp/common-types";
@@ -17,8 +17,6 @@ import { getFontFamily } from "./font-family.js";
 const regionNames = new Intl.DisplayNames(['en'], { type: "region" });
 const scriptNames = new Intl.DisplayNames(['en'], { type: "script" });
 const langtagsByTag = {};
-
-const HelpRoot = 'https://help.keyman.com/keyboard/';
 
 /**
  * Build a dictionary of language tags from langtags.json
@@ -42,6 +40,10 @@ function preinit(): void {
   }
 }
 
+/**
+ * @public
+ * Description of sources and metadata required to build a .keyboard_info file
+ */
 export interface KeyboardInfoSources {
   /** The path in the keymanapp/keyboards repo where this keyboard may be found */
   sourcePath: string;
@@ -62,18 +64,46 @@ export interface KeyboardInfoSources {
   forPublishing: boolean;
 };
 
+/**
+ * @public
+ * Options for the .keyboard_info compiler
+ */
 export interface KeyboardInfoCompilerOptions extends CompilerOptions {
+  /**
+   * Description of sources and metadata required to build a .keyboard_info file
+   */
   sources: KeyboardInfoSources;
 };
 
+/**
+ * @public
+ * Internal in-memory build artifacts from a successful compilation
+ */
 export interface KeyboardInfoCompilerArtifacts extends KeymanCompilerArtifacts {
+  /**
+   * Binary keyboard info filedata and filename - used by keyman.com
+   */
   keyboard_info: KeymanCompilerArtifact;
 };
 
+/**
+ * @public
+ * Build artifacts from the .keyboard_info compiler
+ */
 export interface KeyboardInfoCompilerResult extends KeymanCompilerResult {
+  /**
+   * Internal in-memory build artifacts from a successful compilation. Caller
+   * can write these to disk with {@link KeyboardInfoCompiler.write}
+   */
   artifacts: KeyboardInfoCompilerArtifacts;
 };
 
+/**
+ * @public
+ * Compiles source data from a keyboard project to a .keyboard_info. The
+ * compiler does not read or write from filesystem or network directly, but
+ * relies on callbacks for all external IO.
+ */
 export class KeyboardInfoCompiler implements KeymanCompiler {
   private callbacks: CompilerCallbacks;
   private options: KeyboardInfoCompilerOptions;
@@ -82,6 +112,14 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
     preinit();
   }
 
+  /**
+   * Initialize the compiler.
+   * Copies options.
+   * @param callbacks - Callbacks for external interfaces, including message
+   *                    reporting and file io
+   * @param options   - Compiler options
+   * @returns false if initialization fails
+   */
   public async init(callbacks: CompilerCallbacks, options: KeyboardInfoCompilerOptions): Promise<boolean> {
     this.callbacks = callbacks;
     this.options = {...options};
@@ -89,14 +127,25 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
   }
 
   /**
-   * Builds a .keyboard_info file with metadata from the keyboard and package source file.
-   * This function is intended for use within the keyboards repository. While many of the
-   * parameters could be deduced from each other, they are specified here to reduce the
-   * number of places the filenames are constructed.
-   * For full documentation, see:
-   * https://help.keyman.com/developer/cloud/keyboard_info/
+   * @public
+   * Builds a .keyboard_info file with metadata from the keyboard and package
+   * source file. Returns an object containing binary artifacts on success. The
+   * files are passed in by name, and the compiler will use callbacks as passed
+   * to the {@link KeyboardInfoCompiler.init} function to read any input files
+   * by disk.
    *
-   * @param sources                     Details on files from which to extract metadata
+   * This function is intended for use within the keyboards repository. While
+   * many of the parameters could be deduced from each other, they are specified
+   * here to reduce the number of places the filenames are constructed. For full
+   * documentation, see: https://help.keyman.com/developer/cloud/keyboard_info/
+   *
+   * @param infile  - Path to source file. Path will be parsed to find relative
+   *                  references in the .kpj file, such as .model.ts or
+   *                  .model.kps file
+   * @param outfile - Path to output file. The file will not be written to, but
+   *                  will be included in the result for use by
+   *                  {@link KeyboardInfoCompiler.write}.
+   * @returns         Binary artifacts on success, null on failure.
    */
   public async run(inputFilename: string, outputFilename?: string): Promise<KeyboardInfoCompilerResult> {
     const sources = this.options.sources;
@@ -183,7 +232,7 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
       if (author.url) {
         // we strip the mailto: from the .kps file for the .keyboard_info
         const match = author.url.match(/^(mailto\:)?(.+)$/);
-        /* c8 ignore next 3 */
+        /* c8 ignore next 4 */
         if (match === null) {
           this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_InvalidAuthorEmail({email:author.url}));
           return null;
@@ -213,15 +262,16 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
     keyboard_info.packageFilename = this.callbacks.path.basename(sources.kmpFilename);
 
     // Always overwrite with actual file size
-    keyboard_info.packageFileSize = this.callbacks.fileSize(sources.kmpFilename);
-    if(keyboard_info.packageFileSize === undefined) {
+    if(!this.callbacks.fs.existsSync(sources.kmpFilename)) {
       this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FileDoesNotExist({filename:sources.kmpFilename}));
       return null;
     }
+    keyboard_info.packageFileSize = this.callbacks.fileSize(sources.kmpFilename);
 
     if(sources.jsFilename) {
       keyboard_info.jsFilename = this.callbacks.path.basename(sources.jsFilename);
       // Always overwrite with actual file size
+      /* c8 ignore next 5 */
       keyboard_info.jsFileSize = this.callbacks.fileSize(sources.jsFilename);
       if(keyboard_info.jsFileSize === undefined) {
         this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FileDoesNotExist({filename:sources.jsFilename}));
@@ -308,7 +358,7 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
 
     keyboard_info.minKeymanVersion = minVersion;
     keyboard_info.sourcePath = sources.sourcePath;
-    keyboard_info.helpLink = HelpRoot + keyboard_info.id;
+    keyboard_info.helpLink = KeymanUrls.HELP_KEYBOARD(keyboard_info.id);
 
     // Related packages
     if(kmpJsonData.relatedPackages?.length) {
@@ -322,6 +372,7 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
 
     const jsonOutput = JSON.stringify(keyboard_info, null, 2);
 
+    /* c8 ignore next 8 */
     if(!SchemaValidators.default.keyboard_info(keyboard_info)) {
       // This is an internal fatal error; we should not be capable of producing
       // invalid output, so it is best to throw and die
@@ -344,6 +395,15 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
     return result;
   }
 
+  /**
+   * Write artifacts from a successful compile to disk, via callbacks methods.
+   * The artifacts written may include:
+   *
+   * - .keyboard_info file - metadata file used by keyman.com
+   *
+   * @param artifacts - object containing artifact binary data to write out
+   * @returns true on success
+   */
   public async write(artifacts: KeyboardInfoCompilerArtifacts): Promise<boolean> {
     this.callbacks.fs.writeFileSync(artifacts.keyboard_info.filename, artifacts.keyboard_info.data);
     return true;
@@ -374,7 +434,7 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
   private isLicenseMIT(filename: string) {
     const data = this.callbacks.loadFile(filename);
     if(!data) {
-      this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_LicenseFileDoesNotExist({filename}));
+      this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_LicenseFileIsMissing({filename}));
       return false;
     }
 
@@ -508,6 +568,9 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
     return true;
   }
 
+  /**
+   * @internal
+   */
   async fontSourceToKeyboardInfoFont(kpsFilename: string, kmpJsonData: KmpJsonFile.KmpJsonFile, source: string[]): Promise<KeyboardInfoFileLanguageFont> {
     // locate a .ttf, .otf, or .woff font file
     const ttf = source.find(file => file.endsWith('.ttf') || file.endsWith('.otf') || file.endsWith('.woff'));
@@ -533,11 +596,20 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
       return null;
     }
 
+    let fontFamily = null;
+    try {
+      fontFamily = await getFontFamily(fontData)
+    } catch(e) {
+      this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FontFileMetaDataIsInvalid({filename: sourcePath,message: e}));
+      return null;
+    }
+
     const result = {
-      family: await getFontFamily(fontData),
+      family: fontFamily,
       source
     };
 
+    /* c8 ignore next 4 */
     if(!result.family) {
       this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_FontFileCannotBeRead({filename: sourcePath}));
       return null;
@@ -547,3 +619,9 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
 
 }
 
+/**
+ * these are exported only for unit tests, do not use
+ */
+export const unitTestEndpoints = {
+  langtagsByTag,
+};

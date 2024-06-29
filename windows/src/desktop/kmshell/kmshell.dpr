@@ -177,6 +177,7 @@ uses
   Keyman.Configuration.System.HttpServer.App.TextEditorFonts in 'startup\help\Keyman.Configuration.System.HttpServer.App.TextEditorFonts.pas',
   Keyman.Configuration.System.HttpServer.App.Locale in 'web\Keyman.Configuration.System.HttpServer.App.Locale.pas',
   Keyman.System.AndroidStringToKeymanLocaleString in '..\..\..\..\common\windows\delphi\general\Keyman.System.AndroidStringToKeymanLocaleString.pas',
+  Keyman.Configuration.System.Main in 'main\Keyman.Configuration.System.Main.pas',
   UpdateXMLRenderer in 'render\UpdateXMLRenderer.pas',
   Keyman.System.UpdateCheckStorage in 'main\Keyman.System.UpdateCheckStorage.pas',
   Keyman.System.RemoteUpdateCheck in 'main\Keyman.System.RemoteUpdateCheck.pas',
@@ -192,35 +193,7 @@ uses
 // If you don't add this flag the rederer process will crash when you try to load large images.
 {$SetPEFlags IMAGE_FILE_LARGE_ADDRESS_AWARE}
 
-const
-  LOGGER_DESKTOP_KMSHELL = TKeymanSentryClient.LOGGER_DESKTOP + '.kmshell';
 begin
-  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop, LOGGER_DESKTOP_KMSHELL, LoadKeymanDesktopSentryFlags);
-  try
-    CoInitFlags := COINIT_APARTMENTTHREADED;
-    FInitializeCEF := TCEFManager.Create;
-    try
-      if FInitializeCEF.Start then
-      try
-        Application.Initialize;
-        Application.Title := 'Keyman Configuration';
-        Application.CreateForm(TmodWebHttpServer, modWebHttpServer);
-  Application.CreateForm(TForm1, Form1);
-  Application.CreateForm(TForm1, Form1);
-  try
-          Run;
-        finally
-          FreeAndNil(modWebHttpServer);
-        end;
-      except
-        on E:Exception do
-          SentryHandleException(E);
-      end;
-    finally
-      FInitializeCEF.Free;
-    end;
-  finally
-    TKeymanSentryClient.Stop;
-  end;
+  RunKeymanConfiguration;
 end.
 

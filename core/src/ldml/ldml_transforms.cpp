@@ -12,7 +12,6 @@
 #include <string>
 #include "kmx/kmx_xstring.h"
 #include <assert.h>
-#include "ldml_utils.hpp"
 
 namespace km {
 namespace core {
@@ -155,7 +154,7 @@ reorder_sort_key::dump() const {
 
 size_t
 element_list::match_end(const std::u32string &str) const {
-  if (str.size() < size()) {
+  if (str.length() < size()) {
     // input string too short, can't possibly match.
     // This assumes each element is a single char, no string elements.
     return 0;
@@ -292,7 +291,7 @@ reorder_entry::match_end(std::u32string &str, size_t offset, size_t len) const {
   // is also a precondition.
   if (!before.empty()) {
     // does not match before offset
-    std::u32string prefix = substr.substr(0, substr.size() - match_len);
+    std::u32string prefix = substr.substr(0, substr.length() - match_len);
     // make sure the 'before' is present
     if (before.match_end(prefix) == 0) {
       return 0;  // break out.
@@ -342,7 +341,7 @@ reorder_group::apply(std::u32string &str) const {
   for (const auto &r : list) {
     // work backward from end of string forward
     // That is, see if "abc" matches "abc" or "ab" or "a"
-    for (size_t s = out.size(); s > 0; s--) {
+    for (size_t s = out.length(); s > 0; s--) {
       size_t submatch = r.match_end(out, 0, s);
       if (submatch != 0) {
 #if KMXPLUS_DEBUG_TRANSFORM
@@ -669,6 +668,60 @@ any_group::any_group(const transform_group &g) : type(any_group_type::transform)
 any_group::any_group(const reorder_group &g) : type(any_group_type::reorder), transform(), reorder(g) {
 }
 
+size_t
+any_group::apply(std::u32string &input, std::u32string &output, size_t matched) const  {
+  if (type == any_group_type::transform) {
+    return apply_transform(input, output, matched);
+  } else if(type == any_group_type::reorder) {
+    return apply_reorder(input, output, matched);
+  } else {
+    assert(type != any_group_type::transform && type != any_group_type::reorder);
+    return matched;
+  }
+}
+
+size_t
+any_group::apply_transform(std::u32string &input, std::u32string &output, size_t matched) const {
+  std::u32string subOutput;
+  size_t subMatched = transform.apply(input, subOutput);
+
+  if (subMatched == 0) {
+    return matched; // no match, break out
+  }
+
+  // remove the matched part of the input
+  assert(subMatched <= input.length());
+  input.resize(input.length() - subMatched);  // chop off the subMatched part at end
+  input.append(subOutput);                    // subOutput could be empty such as in backspace transform
+
+  if (subMatched <= output.length()) {
+    // remove matched part of output
+    output.resize(output.length() - subMatched);
+  } else {
+    // matched past beginning of 'output', expand match
+    matched += (subMatched - output.length());
+    output.resize(0);
+  }
+  output.append(subOutput);
+
+  return matched;
+}
+
+size_t
+any_group::apply_reorder(std::u32string &input, std::u32string &output, size_t matched) const {
+  std::u32string str2 = input;
+  if (reorder.apply(str2)) {
+    output.resize(0);
+    output.append(str2);
+    input.resize(0);
+    input.append(str2);
+    // Consider the entire string as 'matched'.
+    // The calling chain will determine which characters actually changed.
+    matched = output.length();
+  }
+  return matched;
+}
+
 transforms::transforms(bool norm_disabled) : transform_groups(), normalization_disabled(norm_disabled) {
 }
 
@@ -706,7 +759,7 @@ transform_group::apply(const std::u32string &input, std::u32string &output) cons
  * Apply this entire transform set to the input.
  * Example: input "abc" -> output="xyz", return=2:  replace last two chars "bc" with "xyz", so final output = "abxyz";
  * @param input input string, will match at end: unmodified
- * @param output on output: if return>0, contains text to replace
+ * @param output cleared. on output: if return>0, contains text to replace
  * @return match length: number of chars at end of input string to modify.  0 if no match.
  */
 size_t
@@ -744,55 +797,17 @@ transforms::apply(const std::u32string &input, std::u32string &output) {
    * Matched can increment.
    */
   size_t matched = 0;
-  /** modified copy of input */
+  output.clear();
+  /** modified copy of input, to pass to each next step */
   std::u32string updatedInput = input;
+
+  // loop over each group of transforms
   for (auto group = transform_groups.begin(); group < transform_groups.end(); group++) {
-    // for each transform group
-    // break out once there's a match
-    /** Length of match within this group*/
-
-    // find the first match in this group (if present)
-    if (group->type == any_group_type::transform) {
-      std::u32string subOutput;
-      size_t subMatched = group->transform.apply(updatedInput, subOutput);
-
-      if (subMatched != 0) {
-        // remove the matched part of the updatedInput
-        updatedInput.resize(updatedInput.length() - subMatched);  // chop of the subMatched part at end
-        updatedInput.append(subOutput);                           // subOutput could be empty such as in backspace transform
-
-        if (subMatched > output.size()) {
-          // including first time through
-          // expand match by amount subMatched prior to output
-          matched += (subMatched - output.size());
-        }  // else: didn't match prior to the existing output, so don't expand 'match'
-
-        // now update 'output'
-        if (subOutput.length() >= output.length() || subMatched > output.length()) {
-          output = subOutput;  // replace all output
-        } else {
-          // replace output with new output
-          output.resize(output.length() - subMatched);
-          output.append(subOutput);
-        }
-      }
-    } else if (group->type == any_group_type::reorder) {
-      // TODO-LDML: cheesy solution. We should be finding a smaller
-      // common match here.
-      std::u32string str2 = updatedInput;
-      if (group->reorder.apply(str2)) {
-        // pretend the whole thing matched
-        output.resize(0);
-        output.append(str2);
-        updatedInput.resize(0);
-        updatedInput.append(str2);
-        matched = output.length();
-      }
-    }
-    // else: continue to next group
+    matched = group->apply(updatedInput, output, matched);
   }
+
   /**
-   * TODO-LDML: optimization to contract 'matched' if possible.
+   * Could optimize to contract 'matched' if possible.
    * We could decrement 'matched' for every char of output
    * which is already in input. Example (regex example):
    * - str = "xxyyzz";
@@ -803,6 +818,9 @@ transforms::apply(const std::u32string &input, std::u32string &output) {
    *      (but could contract to match=1, output='w')
    *
    * could also handle from="x" to="x" as match=0
+   *
+   * However, the calling code already checks for common prefixes,
+   * so this does not need to be optimized.
    */
   return matched;
 }

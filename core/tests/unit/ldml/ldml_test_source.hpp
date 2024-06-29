@@ -149,8 +149,9 @@ private:
   key_event next_key(std::string &keys);
   key_event next_key();
 
-  std::string keys = "";
-  std::u16string expected = u"", context = u"";
+  std::deque<std::string> keys;
+  std::deque<std::u16string> expected;
+  std::u16string context = u"";
   bool expected_beep = false;
   bool expected_error = false;
   bool is_done = false;

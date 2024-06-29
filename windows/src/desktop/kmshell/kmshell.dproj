@@ -353,6 +353,7 @@
         <DCCReference Include="startup\help\Keyman.Configuration.System.HttpServer.App.TextEditorFonts.pas"/>
         <DCCReference Include="web\Keyman.Configuration.System.HttpServer.App.Locale.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\Keyman.System.AndroidStringToKeymanLocaleString.pas"/>
+        <DCCReference Include="main\Keyman.Configuration.System.Main.pas"/>
         <DCCReference Include="render\UpdateXMLRenderer.pas"/>
         <DCCReference Include="main\Keyman.System.UpdateCheckStorage.pas"/>
         <DCCReference Include="main\Keyman.System.RemoteUpdateCheck.pas"/>
@@ -430,9 +431,9 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Profiling\AQtimeModule1.aqt" Configuration="Debug" Class="ProjectFile">
+                <DeployFile LocalName="kmshell.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
-                        <RemoteDir>.\</RemoteDir>
+                        <RemoteName>kmshell.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

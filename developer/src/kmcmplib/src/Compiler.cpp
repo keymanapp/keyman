@@ -1060,7 +1060,7 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
       u16ncpy(q, pp2, u16len(pp2) + 1);
 
       // Change compiled reference file extension to .kvk
-      pp2 = ( km_core_cp *) u16chr(q, 0) - 5;
+      pp2 = ( km_core_cu *) u16chr(q, 0) - 5;
       if (pp2 > q && u16icmp(pp2, u".kvks") == 0) {
         pp2[4] = 0;
       }
@@ -1827,6 +1827,12 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
   p = str;
   do
   {
+    if (mx >= max) {
+      // This is an error condition, we want the compiler
+      // to crash if we reach this
+      return CERR_BufferOverflow;
+    }
+
     tokenFound = FALSE;
     while (iswspace(*p) && !u16chr(token, *p)) p++;
     if (!*p) break;
@@ -1905,7 +1911,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     case 1:
       q = (PKMX_WCHAR) u16chr(p + 1, '\"');
       if (!q) return CERR_UnterminatedString;
-      if ((int)(q - p) - 1 + mx > max) return CERR_UnterminatedString;
+      if ((int)(q - p) - 1 + mx > max) return CERR_ExtendedStringTooLong;
       if (sFlag) return CERR_StringInVirtualKeySection;
       u16ncat(tstr,  p + 1, (int)(q - p) - 1);  // I3481
       mx += (int)(q - p) - 1;
@@ -1915,7 +1921,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     case 2:
       q = (PKMX_WCHAR) u16chr(p + 1, '\'');
       if (!q) return CERR_UnterminatedString;
-      if ((int)(q - p) - 1 + mx > max) return CERR_UnterminatedString;
+      if ((int)(q - p) - 1 + mx > max) return CERR_ExtendedStringTooLong;
       if (sFlag) return CERR_StringInVirtualKeySection;
       u16ncat(tstr,  p + 1, (int)(q - p) - 1);  // I3481
       mx += (int)(q - p) - 1;
@@ -2031,7 +2037,9 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       for (q = fk->dpStoreArray[i].dpString; *q; q++)
       {
         tstr[mx++] = *q;
-        if (mx >= max - 1) return CERR_BufferOverflow;
+        if (mx >= max - 1) {
+          return CERR_OutsTooLong;
+        }
       }
       tstr[mx] = 0;
       continue;
@@ -2421,7 +2429,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       ErrChr = 0;
       return CERR_None;
     }
-    if (mx >= max) return CERR_BufferOverflow;
   } while (*p);
 
   if (!*token)
@@ -2630,7 +2637,9 @@ KMX_DWORD process_expansion(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, in
       return CERR_ExpansionMustBePositive;
     }
     // Verify space in buffer
-    if (*mx + (HighKey - BaseKey) * 5 + 1 >= max) return CERR_BufferOverflow;
+    if (*mx + (HighKey - BaseKey) * 5 + 1 >= max) {
+      return CERR_VirtualKeyExpansionTooLong;
+    }
     // Inject an expansion.
     for (BaseKey++; BaseKey < HighKey; BaseKey++) {
       // < HighKey because caller will add HighKey to output
@@ -2657,12 +2666,16 @@ KMX_DWORD process_expansion(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, in
       // < HighChar because caller will add HighChar to output
       if (Uni_IsSMP(BaseChar)) {
         // We'll test on each char to avoid complex calculations crossing SMP boundary
-        if (*mx + 3 >= max) return CERR_BufferOverflow;
+        if (*mx + 3 >= max) {
+          return CERR_CharacterRangeTooLong;
+        }
         tstr[(*mx)++] = (KMX_WCHAR) Uni_UTF32ToSurrogate1(BaseChar);
         tstr[(*mx)++] = (KMX_WCHAR) Uni_UTF32ToSurrogate2(BaseChar);
       }
       else {
-        if (*mx + 2 >= max) return CERR_BufferOverflow;
+        if (*mx + 2 >= max) {
+          return CERR_CharacterRangeTooLong;
+        }
         tstr[(*mx)++] = (KMX_WCHAR) BaseChar;
       }
     }

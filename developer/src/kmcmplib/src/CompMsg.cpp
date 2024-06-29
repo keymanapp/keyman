@@ -24,7 +24,7 @@ const struct CompilerError CompilerErrors[] = {
     { CERR_IndexInVirtualKeySection                      , "'index' command is illegal in virtual key section"},
     { CERR_BadCallParams                                 , "CompileKeyboardFile was called with bad parameters"},
     { CERR_InfileNotExist                                , "Cannot find the input file"},
-    { CERR_CannotCreateOutfile                           , "Cannot open output file for writing"},
+    // { CERR_CannotCreateOutfile                           , "Cannot open output file for writing"}, unused
     { CERR_UnableToWriteFully                            , "Unable to write the file completely"},
     { CERR_CannotReadInfile                              , "Cannot read the input file"},
     { CERR_SomewhereIGotItWrong                          , "Internal error: contact Keyman"},
@@ -111,6 +111,10 @@ const struct CompilerError CompilerErrors[] = {
     { CERR_DuplicateStore                                , "A store with this name has already been defined."},
     { CERR_RepeatedBegin                                 , "Begin has already been set"},
     { CERR_VirtualKeyInContext                           , "Virtual keys are not permitted in context"},
+    { CERR_OutsTooLong                                   , "Store cannot be inserted with outs() as it makes the extended string too long" },
+    { CERR_ExtendedStringTooLong                         , "Extended string is too long" },
+    { CERR_VirtualKeyExpansionTooLong                    , "Virtual key expansion is too large" },
+    { CERR_CharacterRangeTooLong                         , "Character range is too large and cannot be expanded" },
 
     { CHINT_UnreachableRule                              , "This rule will never be matched as another rule takes precedence"},
     { CHINT_NonUnicodeFile                               , "Keyman Developer has detected that the file has ANSI encoding. Consider converting this file to UTF-8"},

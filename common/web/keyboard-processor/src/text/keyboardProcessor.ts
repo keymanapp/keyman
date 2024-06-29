@@ -1,6 +1,6 @@
 // #region Big ol' list of imports
 
-import EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter3';
 
 import Codes from "./codes.js";
 import type Keyboard from "../keyboards/keyboard.js";
@@ -27,7 +27,7 @@ export type LogMessageHandler = (str: string) => void;
 
 export interface VariableStoreSerializer {
   loadStore(keyboardID: string, storeName: string): VariableStore;
-  saveStore(keyboardID: string, storeName: string, storeMap: VariableStore);
+  saveStore(keyboardID: string, storeName: string, storeMap: VariableStore): void;
 }
 
 export interface ProcessorInitOptions {
@@ -235,6 +235,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
       matchBehavior = this.defaultRuleBehavior(keyEvent, outputTarget, false);
       matchBehavior.triggerKeyDefault = true;
       // Force a single `deleteLeft`.
+      // @ts-ignore // force value override, because deleteLeft is marked readonly.
       matchBehavior.transcription.transform.deleteLeft = 1;
     } else if(!matchBehavior || matchBehavior.triggerKeyDefault) {
       // Restore the virtual key code if a mnemonic keyboard is being used
@@ -273,8 +274,8 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
   _UpdateVKShift(e: KeyEvent): boolean {
     let keyShiftState=0;
 
-    const lockNames  = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'];
-    const lockKeys   = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'];
+    const lockNames  = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'] as const;
+    const lockKeys   = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'] as const;
 
     if(!this.activeKeyboard) {
       return true;
@@ -322,8 +323,8 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
   }
 
   private updateStates(): void {
-    var lockNames  = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'];
-    var lockKeys   = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'];
+    var lockNames  = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'] as const;
+    var lockKeys   = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'] as const;
 
     for(let i=0; i < lockKeys.length; i++) {
       const key = lockKeys[i];
@@ -443,7 +444,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
 
     // Do not change layer unless needed (27/08/2015)
     if(id == activeLayer && keyEvent.device.formFactor != DeviceSpec.FormFactor.Desktop) {
-      return false;
+      return;
     }
 
     var idx=id;

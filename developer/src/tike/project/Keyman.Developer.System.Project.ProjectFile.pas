@@ -835,6 +835,7 @@ var
   buf: TBytes;  // I3310
   encoding: TEncoding;
 begin
+  encoding := nil;
   FState := psLoading;
   try
     SetLength(buf, 32);

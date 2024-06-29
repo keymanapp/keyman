@@ -20,11 +20,10 @@ export default class OSKSubKey extends OSKKey {
     return 'popup-'+this.layer+'-'+this.spec['id'];
   }
 
-  construct(osk: VisualKeyboard, baseKey: KeyElement, topMargin: boolean): HTMLDivElement {
+  construct(osk: VisualKeyboard, baseKey: KeyElement, width: number, topMargin: boolean): HTMLDivElement {
     let spec = this.spec;
 
     let kDiv=document.createElement('div');
-    let tKey = osk.getDefaultKeyObject();
     let ks=kDiv.style;
 
     kDiv.className='kmw-key-square-ex';
@@ -32,11 +31,7 @@ export default class OSKSubKey extends OSKKey {
       ks.marginTop='5px';
     }
 
-    if(typeof spec['width'] != 'undefined') {
-      ks.width=(spec['width']*baseKey.offsetWidth/100)+'px';
-    } else {
-      ks.width=baseKey.offsetWidth+'px';
-    }
+    ks.width=width+'px';
     ks.height=baseKey.offsetHeight+'px';
 
     let btnEle=document.createElement('div');

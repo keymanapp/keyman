@@ -28,14 +28,14 @@ typedef uint8_t    KMX_BYTE;
 typedef uint16_t   KMX_WORD;
 
 #if defined(__cplusplus)
-typedef char16_t   km_core_cp;
+typedef char16_t   km_core_cu;
 typedef char32_t   km_core_usv;
 #else
-typedef uint16_t   km_core_cp;          // code point
+typedef uint16_t   km_core_cu;          // code unit
 typedef uint32_t   km_core_usv;         // Unicode Scalar Value
 #endif
 
-typedef km_core_cp  KMX_WCHAR;    // wc,   16-bit UNICODE character
+typedef km_core_cu  KMX_WCHAR;    // wc,   16-bit UNICODE character
 typedef KMX_WCHAR* PKMX_WCHAR;
 
 typedef char       KMX_CHAR;
@@ -60,7 +60,7 @@ typedef KMX_DWORD* PKMX_DWORD;
 
 #ifdef USE_CHAR16_T
 #define lpuch(x) u ## x
-typedef  km_core_cp KMX_UCHAR;
+typedef  km_core_cu KMX_UCHAR;
 #else
 #define lpuch(x) L ## x
 typedef  wchar_t KMX_UCHAR;

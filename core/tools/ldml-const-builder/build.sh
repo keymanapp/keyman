@@ -2,20 +2,13 @@
 #
 # Builds /core/include/ldml/keyman_core_ldml.h from /core/include/ldml/keyman_core_ldml.ts
 #
-
-# Exit on command failure and when using unset variables:
-set -eu
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-
-# This script runs from its own folder
-cd "$(dirname "$THIS_SCRIPT")"
 
 CORE_LDML_H_FILE="../../include/ldml/keyman_core_ldml.h"
 

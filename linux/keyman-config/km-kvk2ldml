@@ -5,7 +5,7 @@ import logging
 import os
 import sys
 
-from keyman_config import add_standard_arguments, initialize_logging, initialize_sentry
+from keyman_config import add_standard_arguments, initialize_logging, initialize_sentry, verify_dbus_running
 from keyman_config.kvk2ldml import parse_kvk_file, print_kvk, convert_ldml, output_ldml
 
 
@@ -23,6 +23,7 @@ def main():
 
     initialize_logging(args)
     initialize_sentry()
+    verify_dbus_running()
 
     name, ext = os.path.splitext(args.kvkfile)
     # Check if input file extension is kvk

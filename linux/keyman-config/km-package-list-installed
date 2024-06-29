@@ -3,7 +3,7 @@
 import argparse
 import os
 
-from keyman_config import add_standard_arguments, initialize_logging, initialize_sentry
+from keyman_config import add_standard_arguments, initialize_logging, initialize_sentry, verify_dbus_running
 from keyman_config.get_kmp import get_keyman_dir, InstallLocation
 from keyman_config.list_installed_kmp import get_installed_kmp
 
@@ -20,6 +20,7 @@ def main():
 
     initialize_logging(args)
     initialize_sentry()
+    verify_dbus_running()
 
     _all = not args.user and not args.shared and not args.os
     if args.user or _all:

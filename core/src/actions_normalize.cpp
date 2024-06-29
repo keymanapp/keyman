@@ -119,39 +119,36 @@ bool km::core::actions_normalize(
     normalization in our output, we now need to look for a normalization
     boundary prior to the intersection of the cached_context and the output.
   */
+  if(!output.isEmpty()) {
+    while(n > 0 && !nfd->hasBoundaryBefore(output[0])) {
+      // The output may interact with the context further in normalization. We
+      // need to copy characters back further until we reach a normalization
+      // boundary.
 
-  while(n > 0 && output[0] && !nfd->hasBoundaryBefore(output[0])) {
-    // The output may interact with the context further in normalization. We
-    // need to copy characters back further until we reach a normalization
-    // boundary.
+      // Remove last code point from the context ...
 
-    // Remove last code point from the context ...
+      n = cached_context_string.moveIndex32(n, -1);
+      UChar32 chr = cached_context_string.char32At(n);
+      cached_context_string.remove(n);
 
-    n = cached_context_string.moveIndex32(n, -1);
-    UChar32 chr = cached_context_string.char32At(n);
-    cached_context_string.remove(n);
+      // And prepend it to the output ...
 
-    // And prepend it to the output ...
-
-    output.insert(0, chr);
-
-    // And finally remember that we now need to delete an additional NFD codepoint
-
-    actions.code_points_to_delete++;
+      output.insert(0, chr);
+    }
   }
 
   /*
     At this point, our output and cached_context are coherent and normalization
     will be complete at the edit boundary.
 
-    Now, we need to adjust the delete_back to match the number of characters
+    Now, we need to adjust the delete_back to match the number of codepoints
     that must actually be deleted from the applications's NFU context
 
-    To adjust, we remove one character at a time from the app_context until
+    To adjust, we remove one codepoint at a time from the app_context until
     its normalized form matches the cached_context normalized form.
   */
 
-  while(app_context_string.length()) {
+  while(app_context_string.countChar32()) {
     icu::UnicodeString app_context_nfd;
     nfd->normalize(app_context_string, app_context_nfd, icu_status);
     assert(U_SUCCESS(icu_status));
@@ -163,7 +160,13 @@ bool km::core::actions_normalize(
     if(app_context_nfd.compare(cached_context_string) == 0) {
       break;
     }
-    app_context_string.remove(app_context_string.length()-1);
+
+    // remove the last UChar32
+    int32_t lastUChar32 = app_context_string.length()-1;
+    // adjust pointer to get the entire char (i.e. so we don't slice a non-BMP char)
+    lastUChar32 = app_context_string.getChar32Start(lastUChar32);
+    // remove the UChar32 (1 or 2 code units)
+    app_context_string.remove(lastUChar32);
     nfu_to_delete++;
   }
 

@@ -6,11 +6,11 @@ import { makePathToFixture } from './helpers/index.js';
 import { KmnCompiler } from '../src/main.js';
 import { CompilerErrorNamespace } from '@keymanapp/common-types';
 
-describe('CompilerMessages', function () {
+describe('KmnCompilerMessages', function () {
   const callbacks = new TestCompilerCallbacks();
 
-  it('should have a valid CompilerMessages object', function() {
-    return verifyCompilerMessagesObject(CompilerMessages, CompilerErrorNamespace.KmnCompiler);
+  it('should have a valid KmnCompilerMessages object', function() {
+    return verifyCompilerMessagesObject(KmnCompilerMessages, CompilerErrorNamespace.KmnCompiler);
   });
 
   //
@@ -53,23 +53,20 @@ describe('CompilerMessages', function () {
 
   // ERROR_DuplicateGroup
 
-  it('should generate CERR_DuplicateGroup if the kmn contains two groups with the same name', async function() {
+  it('should generate ERROR_DuplicateGroup if the kmn contains two groups with the same name', async function() {
     await testForMessage(this, ['invalid-keyboards', 'error_duplicate_group.kmn'], KmnCompilerMessages.ERROR_DuplicateGroup);
-    assert.equal(callbacks.messages[0].message, "A group with this name has already been defined. Group 'ខ្មែរ' declared on line 9");
   });
 
   // ERROR_DuplicateStore
 
-  it('should generate CERR_DuplicateStore if the kmn contains two stores with the same name', async function() {
+  it('should generate ERROR_DuplicateStore if the kmn contains two stores with the same name', async function() {
     await testForMessage(this, ['invalid-keyboards', 'error_duplicate_store.kmn'], KmnCompilerMessages.ERROR_DuplicateStore);
-    assert.equal(callbacks.messages[0].message, "A store with this name has already been defined. Store 'ខ្មែរ' declared on line 11");
   });
 
   // ERROR_VirtualKeyInContext
 
   it('should generate ERROR_VirtualKeyInContext if a virtual key is found in the context part of a rule', async function() {
     await testForMessage(this, ['invalid-keyboards', 'error_virtual_key_in_context.kmn'], KmnCompilerMessages.ERROR_VirtualKeyInContext);
-    assert.equal(callbacks.messages[0].message, "Virtual keys are not permitted in context");
   });
 
   // WARN_TouchLayoutUnidentifiedKey
@@ -77,21 +74,42 @@ describe('CompilerMessages', function () {
   it('should generate WARN_TouchLayoutUnidentifiedKey if a key has no identifier in the touch layout', async function() {
     await testForMessage(this, ['invalid-keyboards', 'warn_touch_layout_unidentified_key.kmn'], KmnCompilerMessages.WARN_TouchLayoutUnidentifiedKey);
     // TODO(lowpri): that message could be slightly more helpful!
-    assert.equal(callbacks.messages[0].message, "A key on layer \"default\" has no identifier.");
   });
 
   // ERROR_NotSupportedInKeymanWebOutput
 
   it('should generate ERROR_NotSupportedInKeymanWebOutput if a rule has `return` in the output', async function() {
     await testForMessage(this, ['invalid-keyboards', 'error_not_supported_in_keyman_web_output.kmn'], KmnCompilerMessages.ERROR_NotSupportedInKeymanWebOutput);
-    assert.equal(callbacks.messages[0].message, "Statement 'return' is not currently supported in output for web and touch targets");
   });
 
   // WARN_VirtualKeyInOutput
 
   it('should generate WARN_VirtualKeyInOutput if a virtual key is found in the output part of a rule', async function() {
     await testForMessage(this, ['invalid-keyboards', 'warn_virtual_key_in_output.kmn'], KmnCompilerMessages.WARN_VirtualKeyInOutput);
-    assert.equal(callbacks.messages[0].message, "Virtual keys are not supported in output");
+  });
+
+  // ERROR_OutsTooLong
+
+  it('should generate ERROR_OutsTooLong if a store referenced in outs() is too long and would overflow the buffer', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'error_outs_too_long.kmn'], KmnCompilerMessages.ERROR_OutsTooLong);
+  });
+
+  // ERROR_ExtendedStringTooLong
+
+  it('should generate ERROR_ExtendedStringTooLong if an extended string is too long and would overflow the buffer', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'error_extended_string_too_long.kmn'], KmnCompilerMessages.ERROR_ExtendedStringTooLong);
+  });
+
+  // ERROR_VirtualKeyExpansionTooLong
+
+  it('should generate ERROR_VirtualKeyExpansionTooLong if a virtual key expansion is too long and would overflow the buffer', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'error_virtual_key_expansion_too_long.kmn'], KmnCompilerMessages.ERROR_VirtualKeyExpansionTooLong);
+  });
+
+  // ERROR_CharacterRangeTooLong
+
+  it('should generate ERROR_CharacterRangeTooLong if a character range would expand to be too long and would overflow the buffer', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'error_character_range_too_long.kmn'], KmnCompilerMessages.ERROR_CharacterRangeTooLong);
   });
 
 });

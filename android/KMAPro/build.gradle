@@ -6,9 +6,9 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.4.0'
+        classpath 'com.android.tools.build:gradle:7.4.2'
         // sentry-android-gradle-plugin 2.1.5+ requires AGP 7.0
-        classpath 'io.sentry:sentry-android-gradle-plugin:2.1.2'
+        classpath 'io.sentry:sentry-android-gradle-plugin:4.6.0'
         classpath 'name.remal:gradle-plugins:1.5.0'
 
         // From jcenter() which could be sunset in future

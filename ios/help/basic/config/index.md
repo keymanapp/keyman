@@ -26,17 +26,6 @@ screen where you may view the languages you have installed and, by clicking any 
 
 Click on this to [search for a keyboard or language](../../start/searching-for-keyboards).
 
-## Show Banner
-This adds a banner to the top of the keyboard to allow space for pop-up keys to render above the top row of keys.
-
-![](../../ios_images/banner.png)
-
-When this is off,
-
-![](../../ios_images/no-banner.png)
-
-pop-up keys in the top row render horizontally.
-
 ## Show "Get Started" on startup
 When enabled, the Keyman app will display the 'Get Started' screen on app startup.
 

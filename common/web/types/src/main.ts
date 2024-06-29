@@ -23,8 +23,8 @@ export * as Constants from './consts/virtual-key-constants.js';
 
 export { defaultCompilerOptions, CompilerBaseOptions, CompilerCallbacks, CompilerOptions, CompilerEvent, CompilerErrorNamespace,
          CompilerErrorSeverity, CompilerPathCallbacks, CompilerFileSystemCallbacks, CompilerCallbackOptions,
-         CompilerError, CompilerMessageSpec, compilerErrorSeverity, CompilerErrorMask, CompilerFileCallbacks, compilerErrorSeverityName,
-         compilerExceptionToString, compilerErrorFormatCode,
+         CompilerError, CompilerMessageSpec, CompilerMessageSpecWithException, compilerErrorSeverity, CompilerErrorMask, CompilerFileCallbacks, compilerErrorSeverityName,
+         compilerErrorFormatCode, CompilerMessageDef,
          compilerLogLevelToSeverity, CompilerLogLevel, compilerEventFormat, ALL_COMPILER_LOG_LEVELS,
          ALL_COMPILER_LOG_FORMATS, CompilerLogFormat,
          CompilerMessageOverride,
@@ -54,7 +54,7 @@ export * as util from './util/util.js';
 
 export * as KeymanFileTypes from './util/file-types.js';
 
-export * as Osk from './osk/osk.js';
-
 export * as Schemas from './schemas.js';
 export * as SchemaValidators from './schema-validators.js';
+
+export * as xml2js from './deps/xml2js/xml2js.js';

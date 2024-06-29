@@ -2,10 +2,8 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
-
-cd "$THIS_SCRIPT_PATH"
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
@@ -15,9 +13,10 @@ builder_describe "Build Keyman Developer web utility module" \
   "clean" \
   "configure" \
   "build" \
+  "api                       analyze API and prepare API documentation (no-op for now)" \
   "test" \
   publish \
-  pack \
+  "--npm-publish+            For publish, do a npm publish, not npm pack (only for CI)" \
   "--dry-run,-n              don't actually publish, just dry run"
 
 builder_describe_outputs \
@@ -39,5 +38,4 @@ if builder_start_action test; then
   builder_finish_action success test
 fi
 
-builder_run_action publish    builder_publish_to_npm
-builder_run_action pack       builder_publish_to_pack
+builder_run_action publish    builder_publish_npm
