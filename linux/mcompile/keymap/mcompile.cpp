@@ -65,12 +65,12 @@ int run(int argc, char* argv[], char* argv_gdk[]) {
 
   int bDeadkeyConversion = 0;
 
-  if( argc > 1)
+  if (argc > 1)
     bDeadkeyConversion = (strcmp(argv[1], "-d") == 0);  // I4552
 
   int n = (bDeadkeyConversion ? 2 : 1);
 
-  if (argc < 3 || argc > 4 || argc-n !=2) {  // I4273// I4273
+  if (argc < 3 || argc > 4 || argc - n != 2) {  // I4273// I4273
     wprintf(
         L"Usage:  \tmcompile [-d] infile.kmx outfile.kmx\n"
         L"        \tmcompile -u ...  (not available for Linux)\n "
@@ -261,7 +261,7 @@ void KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT
   // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
   // We store that as just RALT, and use the option "Simulate RAlt with Ctrl+Alt"
   // to provide an alternate..
-  if ((shift & (LCTRLFLAG | RALTFLAG)) == (LCTRLFLAG | RALTFLAG)) // I4549
+  if ((shift & (LCTRLFLAG | RALTFLAG)) == (LCTRLFLAG | RALTFLAG))  // I4549
     shift &= ~LCTRLFLAG;
   // If the first group is not a matching-keys group, then we need to add into
   // each subgroup, otherwise just the match group
