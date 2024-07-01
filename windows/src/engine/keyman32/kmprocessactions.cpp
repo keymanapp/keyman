@@ -30,13 +30,28 @@ static void processAlert(AITIP* app) {
 }
 
 static void
-processBack(AITIP* app, const unsigned int code_points_to_delete, const km_core_usv* delete_context) {
+processBack(
+    AITIP* app,
+    const unsigned int code_points_to_delete,
+    const km_core_usv* delete_context,
+    BOOL* emitKeystroke,
+    WORD vkey) {
   if (app->IsLegacy()) {
     for (unsigned int i = 0; i < code_points_to_delete; i++) {
       app->QueueAction(QIT_BACK, BK_DEFAULT);
     }
   }
   else {
+    // If there is a selection the TSF documentation suggests an empty string
+    // to the select range. However this would require a change to QueueAction
+    // and the ProcessOutput callback. Instead we will pass through the emit the character
+    // and let the application clear the the selected text.
+    if (app->IsTextSelected() && (vkey == VK_BACK)) {
+      //SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessBack: Emit Keystroke [%d].", app->IsTextSelected());
+      *emitKeystroke = TRUE;
+      return;
+    }
+
     km_core_usv const* delete_context_ptr = delete_context;
     while (*delete_context_ptr) {
       delete_context_ptr++;
@@ -109,7 +124,7 @@ BOOL ProcessActions(BOOL* emitKeystroke)
 
   _td->CoreProcessEventRun = FALSE;
 
-  processBack(_td->app, core_actions->code_points_to_delete, core_actions->deleted_context);
+  processBack(_td->app, core_actions->code_points_to_delete, core_actions->deleted_context, emitKeystroke, _td->state.vkey);
   processUnicodeChar(_td->app, core_actions->output);
   if (core_actions->persist_options != NULL) {
     processPersistOpt(core_actions, _td->lpActiveKeyboard);
