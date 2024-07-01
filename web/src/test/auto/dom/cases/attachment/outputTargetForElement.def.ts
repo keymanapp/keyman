@@ -7,7 +7,8 @@ import {
 
   eventOutputTarget,
   outputTargetForElement,
-  PageContextAttachment
+  PageContextAttachment,
+  PageAttachmentOptions,
 } from 'keyman/engine/attachment';
 
 import { timedPromise } from '@keymanapp/web-utils';
@@ -16,17 +17,17 @@ import sinon from 'sinon';
 
 import { assert } from 'chai';
 
-let STANDARD_OPTIONS = {
-  owner: null,
+const STANDARD_OPTIONS: PageAttachmentOptions = {
+  owner: null as any,
   hostDevice: {
-    formFactor: 'desktop',
-    OS: 'windows',
-    browser: 'native',
+    formFactor: 'desktop' as any,
+    OS: 'windows' as any,
+    browser: 'native' as any,
     touchable: false
   }
 };
 
-function promiseForIframeLoad(iframe) {
+function promiseForIframeLoad(iframe: HTMLIFrameElement) {
   // Chrome makes this first case tricky - it initializes all iframes with a 'complete' about:blank
   // before loading the actual href.  (https://stackoverflow.com/a/36155560)
   if(iframe.contentDocument
@@ -47,8 +48,8 @@ describe('outputTargetForElement()', function () {
   before(async function() {
     const attacher = this.attacher = new PageContextAttachment(window.document, STANDARD_OPTIONS);
 
-    const iframe = document.getElementById('iframe');
-    const iframe2 = document.getElementById('design-iframe');
+    const iframe = document.getElementById('iframe') as HTMLIFrameElement;
+    const iframe2 = document.getElementById('design-iframe') as HTMLIFrameElement;
     await Promise.all([promiseForIframeLoad(iframe), promiseForIframeLoad(iframe2)]);
     await timedPromise(20);  // for the design-iframe.
 
@@ -72,7 +73,7 @@ describe('outputTargetForElement()', function () {
     });
 
     it('<iframe>.<input> => Input', async () => {
-      const iframe = document.getElementById('iframe');
+      const iframe = document.getElementById('iframe') as HTMLIFrameElement;
       const iframeInput = iframe.contentDocument.getElementById('iframe-input');
       const inputTarget = outputTargetForElement(iframeInput);
 
@@ -106,7 +107,7 @@ describe('outputTargetForElement()', function () {
     // ensure it meets our expectations.
 
     it('DesignIFrame: from .contentDocument.body', () => {
-      const designElement = document.getElementById('design-iframe');
+      const designElement = document.getElementById('design-iframe') as HTMLIFrameElement;
       const designTarget = outputTargetForElement(designElement.contentDocument.body);
 
       assert.isTrue(designTarget instanceof DesignIFrame);
@@ -115,8 +116,8 @@ describe('outputTargetForElement()', function () {
     });
 
     it('DesignIFrame: from .contentDocument', () => {
-      const designElement = document.getElementById('design-iframe');
-      const designTarget = outputTargetForElement(designElement.contentDocument);
+      const designElement = document.getElementById('design-iframe') as HTMLIFrameElement;
+      const designTarget = outputTargetForElement(designElement.contentDocument as any as HTMLElement);
 
       assert.isTrue(designTarget instanceof DesignIFrame);
       assert.strictEqual(designTarget.getElement(), designElement);
@@ -125,7 +126,7 @@ describe('outputTargetForElement()', function () {
 
     it('ContentEditable: from direct #text child', () => {
       const divElement = document.getElementById('editable');
-      const textNode = divElement.firstChild;
+      const textNode = divElement.firstChild as HTMLTextAreaElement;
 
       // Text node!  Corresponds to a `// defeat Safari bug` comment in the codebase.
       assert.equal(textNode.nodeType, 3);
@@ -145,8 +146,8 @@ describe('eventOutputTarget()', function () {
   before(async function() {
     const attacher = this.attacher = new PageContextAttachment(window.document, STANDARD_OPTIONS);
 
-    const iframe = document.getElementById('iframe');
-    const iframe2 = document.getElementById('design-iframe');
+    const iframe = document.getElementById('iframe') as HTMLIFrameElement;
+    const iframe2 = document.getElementById('design-iframe') as HTMLIFrameElement;
     await Promise.all([promiseForIframeLoad(iframe), promiseForIframeLoad(iframe2)]);
 
     attacher.install(false);
@@ -165,7 +166,7 @@ describe('eventOutputTarget()', function () {
       inputElement.addEventListener('keydown', fake);
 
       // Yep, not KeyboardEvent.  "keyCode" is nasty-bugged in Chrome and unusable if initializing through KeyboardEvent.
-      let event = new Event('keydown');
+      const event = new Event('keydown') as any;
       event['key'] = "s";
       event['code'] = "KeyS";
       event['keyCode'] = 83;
@@ -191,7 +192,7 @@ describe('eventOutputTarget()', function () {
 
       // textElement.focus() seems to fail on re-tests during Karma watch mode.
       // Couldn't work out why, but at least this approach bypasses the issue.
-      let focusEvent = new FocusEvent('focus', {relatedTarget: textElement});
+      const focusEvent = new FocusEvent('focus', {relatedTarget: textElement});
       textElement.dispatchEvent(focusEvent);
     } finally {
       textElement.removeEventListener('focus', fake, true);
@@ -205,7 +206,7 @@ describe('eventOutputTarget()', function () {
   });
 
   it('FocusEvent on design iframe .contentDocument => DesignIFrame', () => {
-    const designElement = document.getElementById('design-iframe');
+    const designElement = document.getElementById('design-iframe') as HTMLIFrameElement;
     const fake = sinon.fake();
 
     try {
@@ -213,7 +214,7 @@ describe('eventOutputTarget()', function () {
 
       // textElement.focus() seems to fail on re-tests during Karma watch mode.
       // Couldn't work out why, but at least this approach bypasses the issue.
-      let focusEvent = new FocusEvent('focus', {relatedTarget: designElement});
+      const focusEvent = new FocusEvent('focus', {relatedTarget: designElement});
       designElement.contentDocument.dispatchEvent(focusEvent);
     } finally {
       designElement.contentDocument.removeEventListener('focus', fake, true);
@@ -232,7 +233,7 @@ describe('eventOutputTarget()', function () {
       divElement.addEventListener('keydown', fake);
 
       // Yep, not KeyboardEvent.  "keyCode" is nasty-bugged in Chrome and unusable if initializing through KeyboardEvent.
-      let event = new Event('keydown');
+      const event = new Event('keydown') as any;
       event['key'] = "s";
       event['code'] = "KeyS";
       event['keyCode'] = 83;
