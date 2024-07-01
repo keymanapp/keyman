@@ -1,9 +1,7 @@
 #include <gtest/gtest.h>
+#include "../src/kmx_u16.h"
+#include "../src/compfile.h"
 #include "../../../../common/include/km_types.h"
-
-const KMX_WCHAR *  u16chr(const KMX_WCHAR *p, KMX_WCHAR ch);
-KMX_WCHAR * u16tok(KMX_WCHAR *p, const KMX_WCHAR ch,  KMX_WCHAR **ctx);
-KMX_WCHAR * u16tok(KMX_WCHAR* p, const KMX_WCHAR* delim, KMX_WCHAR** ctx);
 
 class KmxU16Test : public testing::Test {
     protected:
@@ -14,5 +12,12 @@ class KmxU16Test : public testing::Test {
 };
 
 TEST_F(KmxU16Test, u16chr_test) {
-    EXPECT_TRUE(true);
+	KMX_WCHAR str[LINESIZE];
+
+	u16cpy(str, u"abc");
+    EXPECT_EQ(1, u16chr(str, 'b') - str); // in string
+	u16cpy(str, u"abc");
+    EXPECT_EQ(NULL, u16chr(str, 'd')); // not in string
+	u16cpy(str, u"abc");
+    EXPECT_EQ(3, u16chr(str, '\0') - str); // locate null terminator
 }
