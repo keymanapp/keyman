@@ -1,5 +1,26 @@
 # Keyman Version History
 
+## 18.0.64 alpha 2024-06-28
+
+* fix(web): use fat-finger data with simple keypresses (#11854)
+
+## 18.0.63 alpha 2024-06-26
+
+* feat(linux): implement Linux side of SimulateAltGr option :checkered_flag: (#11852)
+
+## 18.0.62 alpha 2024-06-25
+
+* chore(common): update C/C++ formatting options (#11836)
+* chore(linux): use shared meson config (#11863)
+* fix(linux): ignore exceptions trying to install cache (#11861)
+
+## 18.0.61 alpha 2024-06-24
+
+* feat(web): optimization via lazy preprocessing of keyboard touch-layout info (#11265)
+* fix(android): clear globe highlight when displaying keyboard picker (#11826)
+* refactor(linux): add KeymanOption class for options :checkered_flag: (#11850)
+* refactor(linux): rename methods that deal with keyboard options :checkered_flag: (#11851)
+
 ## 18.0.60 alpha 2024-06-21
 
 * chore(web): define common timeout variable for automated testing (#11839)
