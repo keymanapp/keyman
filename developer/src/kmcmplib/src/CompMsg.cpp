@@ -111,6 +111,7 @@ std::map<KMX_DWORD, const KMX_CHAR*> CompilerErrorMap = {
     { CERR_ExtendedStringTooLong                         , "Extended string is too long" },
     { CERR_VirtualKeyExpansionTooLong                    , "Virtual key expansion is too large" },
     { CERR_CharacterRangeTooLong                         , "Character range is too large and cannot be expanded" },
+    { CERR_NonBMPCharactersNotSupportedInKeySection      , "Characters with codepoints over U+FFFF are not supported in the key part of the rule" },
 
     { CHINT_UnreachableRule                              , "This rule will never be matched as another rule takes precedence"},
     { CHINT_NonUnicodeFile                               , "Keyman Developer has detected that the file has ANSI encoding. Consider converting this file to UTF-8"},
