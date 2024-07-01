@@ -111,23 +111,6 @@ long int u16tol(const KMX_WCHAR* str, KMX_WCHAR** endptr, int base)
   if (endptr != nullptr) *endptr = (KMX_WCHAR*)str + (t - s.c_str());
   return result;
 }
-/*
-std::string toHex(int num1) {
-	if (num1 == 0)
-		return "0";
-	int  num = num1;
-	std::string s = "";
-	while (num) {
-		int temp = num % 16;
-		if (temp <= 9)
-			s += (48 + temp);
-		else
-			s += (87 + temp);
-		num = num / 16;
-	}
-	reverse(s.begin(), s.end());
-	return s;
-}*/
 
 const KMX_WCHAR *  u16ncat(KMX_WCHAR *dst, const KMX_WCHAR *src, size_t max) {
   KMX_WCHAR* o = dst;
