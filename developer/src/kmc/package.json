@@ -38,6 +38,7 @@
     "@keymanapp/developer-utils": "*",
     "@keymanapp/keyman-version": "*",
     "@keymanapp/kmc-analyze": "*",
+    "@keymanapp/kmc-generate": "*",
     "@keymanapp/kmc-keyboard-info": "*",
     "@keymanapp/kmc-kmn": "*",
     "@keymanapp/kmc-ldml": "*",
