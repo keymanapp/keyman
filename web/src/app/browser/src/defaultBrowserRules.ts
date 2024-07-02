@@ -1,5 +1,5 @@
+import { Codes } from "@keymanapp/common-types";
 import {
-  Codes,
   DefaultRules,
   type KeyEvent,
   type OutputTarget

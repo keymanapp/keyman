@@ -2,7 +2,7 @@
 // We should start splitting off code needed by keyboards even without a KeyboardProcessor active.
 // There's an upcoming `/common/web/types` package that 'codes' and 'keyboards' may fit well within.
 
-import Codes from "./codes.js";
+import { Codes } from '@keymanapp/common-types';
 import type KeyEvent from "./keyEvent.js";
 import type OutputTarget from "./outputTarget.js";
 

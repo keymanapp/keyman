@@ -1,9 +1,8 @@
-// TODO:  Move to separate folder:  'codes'
 // We should start splitting off code needed by keyboards even without a KeyboardProcessor active.
 
 // see also: common/web/types/src/kmx/kmx.ts
 
-const Codes = {
+export const Codes = {
   // Define Keyman Developer modifier bit-flags (exposed for use by other modules)
   // Compare against /common/include/kmx_file.h.  CTRL+F "#define LCTRLFLAG" to find the secton.
   modifierCodes: {
@@ -115,13 +114,13 @@ const Codes = {
    * @return      {number}                    modifier key state (desktop keyboards)
    */
    getModifierState(layerId: string): number {
-    var modifier=0;
+    let modifier=0;
     if(layerId.indexOf('shift') >= 0) {
       modifier |= Codes.modifierCodes['SHIFT'];
     }
 
     // The chiral checks must not be directly exclusive due each other to visual OSK feedback.
-    var ctrlMatched=false;
+    let ctrlMatched=false;
     if(layerId.indexOf('leftctrl') >= 0) {
       modifier |= Codes.modifierCodes['LCTRL'];
       ctrlMatched=true;
@@ -134,7 +133,7 @@ const Codes = {
       modifier |= Codes.modifierCodes['CTRL'];
     }
 
-    var altMatched=false;
+    let altMatched=false;
     if(layerId.indexOf('leftalt') >= 0) {
       modifier |= Codes.modifierCodes['LALT'];
       altMatched=true;
@@ -157,7 +156,7 @@ const Codes = {
    * @return      {number}                    modifier key state (desktop keyboards)
    */
   getStateFromLayer(layerId: string): number {
-    var modifier=0;
+    let modifier=0;
 
     if(layerId.indexOf('caps') >= 0) {
       modifier |= Codes.modifierCodes['CAPS'];
@@ -168,5 +167,3 @@ const Codes = {
     return modifier;
   }
 }
-
-export default Codes;
