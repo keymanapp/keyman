@@ -243,7 +243,7 @@ KMX_WCHAR * u16tok(KMX_WCHAR *p, const KMX_WCHAR ch,  KMX_WCHAR **ctx) {
   else {
     *ctx = NULL;
   }
-  return p;
+  return *p ? p : NULL;
 }
 
 KMX_WCHAR * u16tok(KMX_WCHAR* p, const KMX_WCHAR* delim, KMX_WCHAR** ctx) {
@@ -259,13 +259,13 @@ KMX_WCHAR * u16tok(KMX_WCHAR* p, const KMX_WCHAR* delim, KMX_WCHAR** ctx) {
 	if (*q) {
 		*q = 0;
 		q++;
-		while (u16chr(delim, *q)) q++;
+		while (*q && u16chr(delim, *q)) q++;
 		*ctx = q;
 	}
 	else {
 		*ctx = NULL;
 	}
-	return p;
+  return *p ? p : NULL;
 }
 
 double u16tof( KMX_WCHAR* str)
