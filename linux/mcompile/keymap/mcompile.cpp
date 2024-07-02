@@ -44,11 +44,6 @@ int KMX_GetDeadkeys(vec_dword_2D& dk_Table, KMX_WORD DeadKey, KMX_WORD* OutputPa
 
 std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys; // I4353
 
-// Note: max is not a standard c api function or macro
-#ifndef max
-#define max(a, b)            (((a) > (b)) ? (a) : (b))
-#endif
-
 #define _countof(a) (sizeof(a) / sizeof(*(a)))
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -71,13 +66,13 @@ int run(int argc, char* argv[], char* argv_gdk[]) {
   int n = (bDeadkeyConversion ? 2 : 1);
 
   if (argc < 3 || argc > 4 || argc - n != 2) {  // I4273// I4273
-    wprintf(
-        L"Usage:  \tmcompile [-d] infile.kmx outfile.kmx\n"
-        L"        \tmcompile -u ...  (not available for Linux)\n "
-        L"        \tmcompile converts a Keyman mnemonic layout to a\n"
-        L"        \tpositional one based on the Linux keyboard\n"
-        L"        \tlayout on top position\n"
-        L"        \t(-d convert deadkeys to plain keys) \n \n");  // I4552
+    printf(
+        "Usage:  \tmcompile [-d] infile.kmx outfile.kmx\n"
+        "        \tmcompile -u ...  (not available for Linux)\n "
+        "        \tmcompile converts a Keyman mnemonic layout to\n"
+        "        \ta positional one based on the currently used \n"
+        "        \tLinux keyboard layout\n"
+        "        \t(-d convert deadkeys to plain keys) \n \n");  // I4552
 
     return 1;
   }
@@ -292,7 +287,7 @@ KMX_WCHAR KMX_ScanXStringForMaxDeadkeyID(PKMX_WCHAR str) {
   KMX_WCHAR dkid = 0;
   while (str && *str) {
     if (*str == UC_SENTINEL && *(str + 1) == CODE_DEADKEY) {
-      dkid = max(dkid, *(str + 2));
+      dkid = std::max(dkid, *(str + 2));
     }
     str = KMX_incxstr(str);
   }
@@ -337,15 +332,15 @@ KMX_WCHAR KMX_GetUniqueDeadkeyID(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey) {
 
   for (i = 0, gp = kbd->dpGroupArray; i < kbd->cxGroupArray; i++, gp++) {
     for (j = 0, kp = gp->dpKeyArray; j < gp->cxKeyArray; j++, kp++) {
-      dkid = max(dkid, KMX_ScanXStringForMaxDeadkeyID(kp->dpContext));
-      dkid = max(dkid, KMX_ScanXStringForMaxDeadkeyID(kp->dpOutput));
+      dkid = std::max(dkid, KMX_ScanXStringForMaxDeadkeyID(kp->dpContext));
+      dkid = std::max(dkid, KMX_ScanXStringForMaxDeadkeyID(kp->dpOutput));
     }
-    dkid = max(dkid, KMX_ScanXStringForMaxDeadkeyID(gp->dpMatch));
-    dkid = max(dkid, KMX_ScanXStringForMaxDeadkeyID(gp->dpNoMatch));
+    dkid = std::max(dkid, KMX_ScanXStringForMaxDeadkeyID(gp->dpMatch));
+    dkid = std::max(dkid, KMX_ScanXStringForMaxDeadkeyID(gp->dpNoMatch));
   }
 
   for (i = 0, sp = kbd->dpStoreArray; i < kbd->cxStoreArray; i++, sp++) {
-    dkid = max(dkid, KMX_ScanXStringForMaxDeadkeyID(sp->dpString));
+    dkid = std::max(dkid, KMX_ScanXStringForMaxDeadkeyID(sp->dpString));
   }
 
   s_dkids = (KMX_dkidmap*)realloc(s_dkids, sizeof(KMX_dkidmap) * (s_ndkids + 1));
