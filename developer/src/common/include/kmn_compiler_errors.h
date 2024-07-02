@@ -180,6 +180,9 @@
 #define CERR_VirtualKeyExpansionTooLong                    0x00004077
 #define CERR_CharacterRangeTooLong                         0x00004078
 
+#define CERR_InvalidTarget                                 0x00004079
+#define CERR_NoTargetsSpecified                            0x0000407A
+
 #define CWARN_TooManyWarnings                              0x00002080
 #define CWARN_OldVersion                                   0x00002081
 #define CWARN_BitmapNotUsed                                0x00002082
