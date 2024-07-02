@@ -12,7 +12,7 @@
   <xsl:include href="keyman_options.xsl"/>
   <xsl:include href="keyman_hotkeys.xsl"/>
   <xsl:include href="keyman_support.xsl"/>
-  <xsl:include href="keyman_keepintouch.xsl"/>
+  <xsl:include href="keyman_update.xsl"/>
 
   <xsl:include href="keyman_footer.xsl"/>
 
@@ -50,7 +50,7 @@
             <div class="contentpage" id="content_options"><xsl:call-template name="content_options" /></div>
             <div class="contentpage" id="content_hotkeys"><xsl:call-template name="content_hotkeys" /></div>
             <div class="contentpage" id="content_support"><xsl:call-template name="content_support" /></div>
-            <div class="contentpage" id="content_keepintouch"><xsl:call-template name="content_keepintouch" /></div>
+            <div class="contentpage" id="content_update"><xsl:call-template name="content_update" /></div>
           </div>
           <div id="footerframe">
             <xsl:call-template name="footerframe" />

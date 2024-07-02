@@ -17,6 +17,8 @@ type
     const S_CEF_SubProcess = 'kmbrowserhost.exe';
     const S_CEF_SubProcess_Developer = 'kmdbrowserhost.exe';
     const S_CustomisationFilename = 'desktop_pro.pxx';
+
+    const S_KeymanAppData_UpdateCache = 'Keyman\UpdateCache\';
   public
     const S_KMShell = 'kmshell.exe';
     const S_TSysInfoExe = 'tsysinfo.exe';
@@ -27,8 +29,10 @@ type
     const S_FallbackKeyboardPath = 'Keyboards\';
     const S__Package = '_Package\';
     const S_MCompileExe = 'mcompile.exe';
+    const S_UpdateCache_Metadata = 'cache.json';
     class function ErrorLogPath(const app: string = ''): string; static;
     class function KeymanHelpPath(const HelpFile: string): string; static;
+    class function KeymanUpdateCachePath(const filename: string = ''): string; static;
     class function KeymanDesktopInstallPath(const filename: string = ''): string; static;
     class function KeymanEngineInstallPath(const filename: string = ''): string; static;
     class function KeymanDesktopInstallDir: string; static;
@@ -421,6 +425,11 @@ begin
   if FileExists(Result) then Exit;
 
   Result := '';
+end;
+
+class function TKeymanPaths.KeymanUpdateCachePath(const filename: string): string;
+begin
+  Result := GetFolderPath(CSIDL_LOCAL_APPDATA) + S_KeymanAppData_UpdateCache + filename;
 end;
 
 class function TKeymanPaths.RunningFromSource(var keyman_root: string): Boolean;
