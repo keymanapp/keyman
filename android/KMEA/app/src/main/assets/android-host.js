@@ -116,6 +116,28 @@ function notifyHost(event, params) {
   }, 10);
 }
 
+/**
+ * @typedef {Object} DimensionConfig
+ * @property {number} bannerHeight
+ * @property {number} keyboardWidth
+ * @property {number} keyboardHeight
+ */
+
+/**
+ * @param {DimensionConfig} config
+ */
+function setDimensions(config) {
+  setBannerHeight(config.bannerHeight);
+  setOskWidth(config.keyboardWidth);
+  setOskHeight(config.keyboardHeight);
+
+  // Refresh KMW's OSK
+  if(keyman && keyman.core && keyman.core.activeKeyboard) {
+    keyman.core.activeKeyboard.refreshLayouts();
+  }
+  keyman.refreshOskLayout();
+}
+
 // Update the KMW banner height
 // h is in dpi (different from iOS)
 function setBannerHeight(h) {
@@ -128,19 +150,12 @@ function setBannerHeight(h) {
       keyman.osk.bannerView.activeBannerHeight = bannerHeight;
     }
   }
-
-  // Refresh KMW's OSK
-  keyman.refreshOskLayout();
 }
 
 function setOskHeight(h) {
   if(h > 0) {
     oskHeight = Math.ceil(h / window.devicePixelRatio);
   }
-  if(keyman && keyman.core && keyman.core.activeKeyboard) {
-    keyman.core.activeKeyboard.refreshLayouts();
-  }
-  keyman.refreshOskLayout();
 }
 
 function setOskWidth(w) {
