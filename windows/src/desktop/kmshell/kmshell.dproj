@@ -357,7 +357,7 @@
         <DCCReference Include="render\UpdateXMLRenderer.pas"/>
         <DCCReference Include="main\Keyman.System.UpdateCheckStorage.pas"/>
         <DCCReference Include="main\Keyman.System.RemoteUpdateCheck.pas"/>
-        <DCCReference Include="main\BackgroundUpdate.pas"/>
+        <DCCReference Include="main\Keyman.System.Update.pas"/>
         <DCCReference Include="main\Keyman.System.DownloadUpdate.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\Keyman.System.ExecuteHistory.pas"/>
         <DCCReference Include="main\UfrmStartInstall.pas">
@@ -425,12 +425,6 @@
                 <Platform value="Win64">False</Platform>
             </Platforms>
             <Deployment Version="3">
-                <DeployFile LocalName="bin\Win32\Debug\kmshell.exe" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="Win32">
-                        <RemoteName>kmshell.exe</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
                 <DeployFile LocalName="kmshell.exe" Configuration="Debug" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>kmshell.exe</RemoteName>
@@ -440,6 +434,12 @@
                 <DeployFile LocalName="bin\Win32\Debug\kmshell.rsm" Configuration="Debug" Class="DebugSymbols">
                     <Platform Name="Win32">
                         <RemoteName>kmshell.rsm</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="bin\Win32\Debug\kmshell.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>kmshell.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

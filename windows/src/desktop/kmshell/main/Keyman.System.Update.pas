@@ -15,7 +15,7 @@
   Notes: For the state diagram in mermaid ../BackgroundUpdateStateDiagram.md
   History:
 *)
-unit BackgroundUpdate;
+unit Keyman.System.Update;
 
 interface
 

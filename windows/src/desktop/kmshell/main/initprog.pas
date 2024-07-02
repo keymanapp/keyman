@@ -144,7 +144,7 @@ uses
   UpgradeMnemonicLayout,
   utilfocusappwnd,
   utilkmshell,
-  BackgroundUpdate,
+  Keyman.System.Update,
 
   KeyboardTIPCheck,
 
