@@ -118,9 +118,9 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     return false;
   }
 
-  resetContext() {
+  public async resetContext(): Promise<void> {
     this._resetContext(this.activeTarget);
-    this.predictionContext.resetContext();
+    await this.predictionContext.resetContext();
   }
 
   abstract get activeKeyboard(): {keyboard: Keyboard, metadata: KeyboardStub};
