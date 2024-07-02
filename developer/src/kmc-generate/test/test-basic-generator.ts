@@ -1,3 +1,7 @@
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ */
+
 import 'mocha';
 import { assert } from 'chai';
 import { BasicGenerator } from '../src/basic-generator.js';
@@ -14,6 +18,6 @@ describe('BasicGenerator', function () {
     assert.equal(bg.test_tokenMap['$NAME'], 'Sample Project');
   });
 
-  // TODO: test transform
+  // TODO-GENERATE: test transform
 });
 

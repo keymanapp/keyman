@@ -1,3 +1,7 @@
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ */
+
 import 'mocha';
 import sinon from 'sinon';
 import * as fs from 'fs';

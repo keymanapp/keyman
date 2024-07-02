@@ -1,3 +1,9 @@
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Messages for kmc-generate
+ */
+
 import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, CompilerMessageSpecWithException } from "@keymanapp/common-types";
 
 const Namespace = CompilerErrorNamespace.Generator;

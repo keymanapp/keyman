@@ -1,3 +1,9 @@
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * tslint options for kmc-generate
+ */
+
 module.exports = {
   parserOptions: {
     project: ["./tsconfig.json", "./test/tsconfig.json"],

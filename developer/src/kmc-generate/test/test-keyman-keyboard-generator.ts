@@ -1,3 +1,7 @@
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ */
+
 import 'mocha';
 import sinon from 'sinon';
 import * as fs from 'fs';
@@ -54,9 +58,9 @@ describe('KeymanKeyboardGenerator', function () {
       assert.include(files, artifact);
     }
 
-    // compare each file content as a UTF-8 string. TODO: this only works until
-    // we have binary files (icons)
-    for(const file of files) {
+    // Compare each file content as a UTF-8 string
+   for(const file of files) {
+      // TODO-GENERATE: this only works until we have binary files (icons)
       if(!fs.statSync(path.join(samplePath, file)).isDirectory()) {
         assert.isDefined(result.artifacts[file]);
         assert.equal(result.artifacts[file].filename, file);

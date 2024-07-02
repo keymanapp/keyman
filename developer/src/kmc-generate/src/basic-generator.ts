@@ -1,9 +1,17 @@
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Basic generator -- common file generation functionality
+ */
+
 import { KeymanTargets } from "@keymanapp/common-types";
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { AbstractGenerator, GeneratorArtifacts } from "./abstract-generator.js";
 
 /**
  * @internal
+ * Common functionality for generating projects. Do not instantiate
+ * this class, rather instantiate a subclass
  */
 export class BasicGenerator extends AbstractGenerator {
 
@@ -27,7 +35,7 @@ export class BasicGenerator extends AbstractGenerator {
     this.tokenMap['$COPYRIGHT'] = '© ' + this.options.copyright;
     this.tokenMap['$FULLCOPYRIGHT'] = '© ' + dt.getFullYear().toString() + ' ' + this.options.copyright;
     this.tokenMap['$AUTHOR'] = this.options.author ?? '';
-    this.tokenMap['$TARGETS'] = this.options.targets.join(' ') ?? 'any'; //TODO: validate targets
+    this.tokenMap['$TARGETS'] = this.options.targets.join(' ') ?? 'any'; //TODO-GENERATE: validate targets
     this.tokenMap['$DESCRIPTION'] = this.options.description;
     this.tokenMap['$DATE'] =
       dt.getFullYear().toString() + '-' +
@@ -42,7 +50,7 @@ export class BasicGenerator extends AbstractGenerator {
   }
 
   private getLanguageName(tag: string) {
-    // TODO: probably need to use langtags.json
+    // TODO-GENERATE: probably need to use langtags.json
     return new Intl.Locale(tag).language;
   }
 

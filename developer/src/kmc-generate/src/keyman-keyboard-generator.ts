@@ -1,3 +1,9 @@
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Generate a Keyman keyboard project (.kmn source)
+ */
+
 import { KeymanCompiler, KeymanFileTypes, KeymanTargets } from '@keymanapp/common-types';
 import { GeneratorArtifacts, GeneratorResult } from './abstract-generator.js';
 import { BasicGenerator } from './basic-generator.js';
@@ -92,12 +98,12 @@ export class KeymanKeyboardGenerator extends BasicGenerator implements KeymanCom
   private readonly hasKMX         = () => this.targetIncludes(KeymanTargets.KMXKeymanTargets);
   private readonly hasTouchLayout = () => this.targetIncludes(KeymanTargets.TouchKeymanTargets);
 
-  // TODO, once writeIcon is implemented:
+  // TODO-GENERATE, once writeIcon is implemented:
   // hasIcon = () => this.options.icon && this.targetIncludes(KeymanTargets.KMXKeymanTargets);
   private readonly hasIcon = () => false;
 
   private writeIcon(artifacts: GeneratorArtifacts) {
-    // TODO: this will require some effort
+    // TODO-GENERATE: this will require some effort
     // proposal: generate 16x16 icon with 2-3 letters. Following TKeyboardIconGenerator.GenerateIcon
     // research for .ico writer in node
   }

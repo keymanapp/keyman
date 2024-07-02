@@ -1,3 +1,7 @@
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ */
+
 import { GeneratorOptions } from "../src/abstract-generator.js";
 
 export const options: GeneratorOptions = {
