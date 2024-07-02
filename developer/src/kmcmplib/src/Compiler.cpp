@@ -97,6 +97,8 @@
 #include <codecvt>
 #include <locale>
 #include <string>
+#include <iostream>
+#include <sstream>
 
 #include "UnreachableRules.h"
 #include "CheckForDuplicates.h"
@@ -134,6 +136,7 @@ namespace kmcmp{
 
 int xatoi(PKMX_WCHAR *p);
 int atoiW(PKMX_WCHAR p);
+bool isIntegerWstring(PKMX_WCHAR p);
 void safe_wcsncpy(PKMX_WCHAR out, PKMX_WCHAR in, int cbMax);
 int GetDeadKey(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 
@@ -2022,7 +2025,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
           kmcmp::CheckStoreUsage(fk, i, TRUE, FALSE, FALSE);
 
           r = u16tok(NULL, p_sep_com, &context);  // I3481
-          if (!r) return CERR_InvalidIndex;
+          if (!r || !*r || !isIntegerWstring(r) || atoiW(r) < 1) return CERR_InvalidIndex;
         }
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_INDEX;
@@ -3368,6 +3371,26 @@ int atoiW(PKMX_WCHAR p)
   int i = atoi(q);
   delete[] q;
   return i;
+}
+
+/**
+ * Checks if a wide-character C-string represents an integer.
+ * It does not strip whitespace, and depends on the action of atoi()
+ * to determine if the C-string is an integer.
+ *
+ * @param p a pointer to a wide-character C-string
+ *
+ * @return true if p represents an integer, false otherwise
+*/
+bool isIntegerWstring(PKMX_WCHAR p) {
+  if (!p || !*p)
+    return false;
+  PKMX_STR q = wstrtostr(p);
+  std::ostringstream os;
+  os << atoi(q);
+  int cmp = strcmp(q, os.str().c_str());
+  delete[] q;
+  return cmp == 0 ? true : false;
 }
 
 KMX_DWORD kmcmp::CheckUTF16(int n)
