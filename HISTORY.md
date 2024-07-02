@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.65 alpha 2024-07-01
+
+* fix(developer): prevent non-BMP characters in key part of rule (#11806)
+* chore(linux): remove unused building with pbuilder (#11862)
+
 ## 18.0.64 alpha 2024-06-28
 
 * fix(web): use fat-finger data with simple keypresses (#11854)

@@ -55,7 +55,7 @@ source_action() {
   echo "${END_STEP}"
 
   echo "${START_STEP}Make deb source${COLOR_RESET}"
-  ./scripts/deb.sh sourcepackage
+  ./scripts/deb.sh
   echo "${END_STEP}"
 
   mv builddebs/* "${OUTPUT_PATH:-..}"
