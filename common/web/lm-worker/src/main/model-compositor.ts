@@ -440,6 +440,17 @@ export default class ModelCompositor {
     return suggestions;
   }
 
+  /**
+   * Given an array of suggestions output from the correction and model-lookup processes,
+   * this function checks for any duplicate suggestions and merges them.
+   *
+   * Note that duplicates can arise for a few reasons:
+   * - Two or more corrections may have the same net result (due to keyboard rules, etc)
+   * - Application of casing may cause previously-distinct suggestions to no longer be distinct.
+   * @param rawPredictions
+   * @param context The context to which suggestions will be applied.
+   * @returns
+   */
   private dedupeSuggestions(rawPredictions: CorrectionPredictionTuple[], context: Context) {
     let suggestionDistribMap: {[key: string]: CorrectionPredictionTuple} = {};
     let suggestionDistribution: CorrectionPredictionTuple[] = [];
@@ -461,8 +472,9 @@ export default class ModelCompositor {
         suggestionDistribMap[predictedWord] = tuple;
       }
     }
-        // Now that we've calculated a unique set of probability masses, time to make them into a proper
-    // distribution and prep for return.
+
+    // Now that we've calculated a unique set of probability masses, time to
+    // make them into a proper distribution and prep for return.
     for(let key in suggestionDistribMap) {
       let pair = suggestionDistribMap[key];
       suggestionDistribution.push(pair);
@@ -471,6 +483,25 @@ export default class ModelCompositor {
     return suggestionDistribution;
   }
 
+  /**
+   * This function checks for any suggestions that directly match the actual
+   * context in some manner and ranks suggestions accordingly.  Additionally, if
+   * there is no such suggestion, a stand-in is generated and added to the list,
+   * though marked as "not matching the model".
+   *
+   * The suggestion "ranks", from highest to lowest:
+   * - the suggestion produces an exact match for the user's current text
+   * - the suggestion produces a case-insensitive match for the user's current
+   *   text
+   * - the suggestion produces a case + diacritic insensitive match for the
+   *   user's current text
+   * - any other suggestion
+   *
+   * @param suggestionDistribution
+   * @param context
+   * @param trueInput inputTransform + its assigned probability
+   * @returns
+   */
   private processSimilarity(suggestionDistribution: CorrectionPredictionTuple[], context: Context, trueInput: ProbabilityMass<Transform>) {
     const { sample: inputTransform, p: inputTransformProb } = trueInput;
 
@@ -534,7 +565,7 @@ export default class ModelCompositor {
       },
       correction: {
         sample: truePrefix,
-        p: inputTransformProb // we already sorted + this aligns with inputTransform.
+        p: inputTransformProb
       },
       matchLevel: SuggestionSimilarity.exact,
     });
