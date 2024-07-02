@@ -7,7 +7,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe "Keystroke processing engine (32 bit)" \
   @/common/include \
-  @/core:x86 \
+  @/core:x86 @/core:x64 \
   clean configure build test publish install \
   :x86 :x64
 
@@ -46,7 +46,7 @@ function do_build_x86() {
 
 function do_build_x64() {
   create-windows-output-folders
-  build_version.res
+  run_in_vs_env rc version64.rc
   vs_msbuild keyman32.vcxproj //t:Build "//p:Platform=x64"
   cp "$X64_TARGET" "$WINDOWS_PROGRAM_ENGINE"
   cp "$X64_TARGET_PATH/keyman64.pdb" "$WINDOWS_DEBUGPATH_ENGINE"
