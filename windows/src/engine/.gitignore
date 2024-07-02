@@ -3,11 +3,6 @@ keyman32/keyman-debug-etw.h
 keyman32/keyman-debug-etw.rc
 keyman32/keyman-debug-etw.res
 keyman32/keyman-debug-etwTEMP.BIN
-keyman64/MSG00001.bin
-keyman64/keyman-debug-etw.h
-keyman64/keyman-debug-etw.rc
-keyman64/keyman-debug-etw.res
-keyman64/keyman-debug-etwTEMP.BIN
 mcompile/Debug
 
 # Visual Studio packages for test

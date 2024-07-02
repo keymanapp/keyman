@@ -17,8 +17,7 @@ builder_describe \
   \
   ":insthelper             Installation helper module" \
   ":keyman                 Main host process (32 bit)" \
-  ":keyman32               Keystroke processing engine (32 bit)" \
-  ":keyman64               Keystroke processing engine (64 bit)" \
+  ":keyman32               Keystroke processing engine (all archs)" \
   ":keymanmc               Message library" \
   ":keymanx64              Host process (64 bit)" \
   ":kmcomapi               COM API library" \

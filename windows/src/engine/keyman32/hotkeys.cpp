@@ -26,9 +26,7 @@
    // I5136
 #include "pch.h"
 
-#ifdef _WIN64
-#error hotkeys.cpp is not required for win64.
-#endif
+#ifndef _WIN64
 
 Hotkeys *g_Hotkeys = NULL;   // I4326
 
@@ -141,3 +139,5 @@ Hotkey *Hotkeys::GetHotkey(DWORD hotkey)
 			return &m_hotkeys[i];
 	return NULL;
 }
+
+#endif

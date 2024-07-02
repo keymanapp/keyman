@@ -11,13 +11,9 @@ The installation merge module database for the Keyman Engine.
 
 Host application for the Keyman Engine. Shows the Keyman icon, Keyman menu, OSK, and handles language switching etc, as well as running the windows hooks to capture and translate keystrokes.
 
-## keyman32 - keyman32.dll
+## keyman32 - keyman32.dll, keyman64.dll
 
-Main keyboard processing library and hook library (32 bit).
-
-## keyman64 - keyman64.dll
-
-Main keyboard processing library and hook library (64 bit).
+Main keyboard processing library and hook library (x86, x64).
 
 ## keymanmc - keymanmc.dll
 

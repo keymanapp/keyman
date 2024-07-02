@@ -1,0 +1,45 @@
+LIBRARY   KEYMAN64
+
+EXPORTS
+      Keyman_GetInitialised
+			Keyman_Initialise
+			Keyman_Exit
+			Keyman_GetLastActiveWindow
+			Keyman_GetLastFocusWindow
+			KMSetOutput
+			KMGetContext
+			KMQueueAction
+			KMDisplayIM
+			KMHideIM
+			KMGetActiveKeyboard
+			KMGetKeyboardPath
+
+      TIPActivateEx
+      TIPActivateKeyboard
+			TIPProcessKey
+      TIPIsKeymanRunning
+      GetKeyboardPreservedKeys
+
+			GetActiveKeymanID
+			Keyman_RegisterControllerWindow
+			Keyman_UnregisterControllerWindow
+			Keyman_RestartEngine
+
+      Keyman_SendMasterController
+			Keyman_PostControllers
+      Keyman_PostMasterController
+
+      Keyman_StartExit
+      Keyman_ResetInitialisation
+
+  	  Keyman_WriteDebugEvent
+  	  Keyman_WriteDebugEventW
+
+      Keyman_Diagnostic
+
+      Keyman_RegisterMasterController
+      Keyman_UnregisterMasterController
+			Keyman_RegisterControllerThread
+			Keyman_UnregisterControllerThread
+
+      SetCustomPostKeyCallback

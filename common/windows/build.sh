@@ -18,7 +18,7 @@ builder_describe "Keyman common Windows modules" \
 
 builder_parse "$@"
 
-if [[ $BUILDER_OS != windows ]]; then
+if [[ $BUILDER_OS != win ]]; then
   builder_echo grey "Platform is not Windows; skipping common/windows"
   exit 0
 fi
