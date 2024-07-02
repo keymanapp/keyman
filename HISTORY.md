@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.66 alpha 2024-07-02
+
+* fix(developer): handle second parameter of index correctly in kmcmplib compiler (#11815)
+
 ## 18.0.65 alpha 2024-07-01
 
 * fix(developer): prevent non-BMP characters in key part of rule (#11806)
