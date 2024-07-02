@@ -62,6 +62,7 @@ public class DisplayLanguages {
       new DisplayLanguageType("nl-NL", "Nederlands (Dutch)"),
       new DisplayLanguageType("ann", "Obolo"),
       new DisplayLanguageType("pl-PL", "Polski (Polish)"),
+      new DisplayLanguageType("el", "Polytonic Greek"),
       new DisplayLanguageType("pt-PT", "Português do Portugal"),
       new DisplayLanguageType("ff-ZA", "Pulaar-Fulfulde"), // or Fulah
       new DisplayLanguageType("ru-RU", "Pyccĸий (Russian)"),
