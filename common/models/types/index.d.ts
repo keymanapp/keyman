@@ -333,6 +333,11 @@ declare interface Suggestion {
    * to the input text.  Ex:  'keep', 'emoji', 'correction', etc.
    */
   tag?: SuggestionTag;
+
+  /**
+   * Set to true if this suggestion is a valid auto-accept target.
+   */
+  autoAccept?: boolean
 }
 
 interface Reversion extends Suggestion {
