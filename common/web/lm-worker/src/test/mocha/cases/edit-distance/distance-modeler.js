@@ -2,6 +2,7 @@ import { assert } from 'chai';
 import * as models from '#./models/index.js';
 import * as correction from '#./correction/index.js';
 
+import { PriorityQueue } from '@keymanapp/web-utils';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
 function buildTestTimer() {
@@ -142,7 +143,7 @@ describe('Correction Distance Modeler', function() {
       assert.equal(edges.length, expectedChildCount);
 
       // One final bit, which is a bit of integration - we know the top two nodes that should result.
-      let queue = new models.PriorityQueue(correction.QUEUE_NODE_COMPARATOR, edges);
+      let queue = new PriorityQueue(correction.QUEUE_NODE_COMPARATOR, edges);
 
       let firstEdge = queue.dequeue();
       assert.equal(firstEdge.priorInput[0].sample.insert, 't');
@@ -185,13 +186,13 @@ describe('Correction Distance Modeler', function() {
       ];
 
       let layer1Edges = rootNode.buildSubstitutionEdges(synthDistribution1);
-      let layer1Queue = new models.PriorityQueue(correction.QUEUE_NODE_COMPARATOR, layer1Edges);
+      let layer1Queue = new PriorityQueue(correction.QUEUE_NODE_COMPARATOR, layer1Edges);
 
       let tEdge = layer1Queue.dequeue();
       assertEdgeChars(tEdge, 't', 't');
 
       let layer2Edges = tEdge.buildSubstitutionEdges(synthDistribution2);
-      let layer2Queue = new models.PriorityQueue(correction.QUEUE_NODE_COMPARATOR, layer2Edges);
+      let layer2Queue = new PriorityQueue(correction.QUEUE_NODE_COMPARATOR, layer2Edges);
 
       let eEdge = layer2Queue.dequeue();
       assertEdgeChars(eEdge, 'e', 'e');
@@ -208,7 +209,7 @@ describe('Correction Distance Modeler', function() {
       let layer3eEdges  = eEdge.buildSubstitutionEdges(synthDistribution3);
       let layer3hEdges  = hEdge.buildSubstitutionEdges(synthDistribution3);
       let layer3ehEdges = ehEdge.buildSubstitutionEdges(synthDistribution3);
-      let layer3Queue = new models.PriorityQueue(correction.QUEUE_NODE_COMPARATOR, layer3eEdges.concat(layer3hEdges).concat(layer3ehEdges));
+      let layer3Queue = new PriorityQueue(correction.QUEUE_NODE_COMPARATOR, layer3eEdges.concat(layer3hEdges).concat(layer3ehEdges));
 
       // Find the first result with an actual word directly represented.
       let bestEdge;
