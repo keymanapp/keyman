@@ -5,6 +5,9 @@ import * as KMWRecorder from '#recorder';
 import { type BrowserInitOptionSpec, type KeymanEngine } from 'keyman/app/browser';
 import { ErrorStub, type KeyboardAPISpec, type KeyboardStub } from 'keyman/engine/package-cache';
 
+type WindowKey = keyof typeof window;
+const keyman_window = 'keyman' as WindowKey;
+
 export let DEVICE_DETECT_FAILURE = false;
 
 const loc = document.location;
@@ -14,7 +17,7 @@ const domain = `${loc.protocol}/${loc.host}`
 
 // If we've set things up to support Device dection without loading KMW...
 try {
-  let device = new Device();
+  const device = new Device();
   device.detect();
 } catch (err) {
   // Sets a warning flag that unit-test files can use to disable themselves.
@@ -67,8 +70,8 @@ export function setupKMW(kmwOptions: BrowserInitOptionSpec | string, timeout: nu
   }
 
   return compositePromise.then(() => {
-    if(window['keyman']) {
-      return window['keyman'].init(kmwOptions);
+    if(window[keyman_window]) {
+      return window[keyman_window].init(kmwOptions);
     } else {
       return Promise.reject();
     }
@@ -94,7 +97,7 @@ function setupScriptInternal(src: string, timeout: number, attemptCount?: number
     console.log("Re-attempting load of script '" + src + "': retry #" + attemptCount);
   }
 
-  let promise = new Promise<void>((resolve, reject) => {
+  const promise = new Promise<void>((resolve, reject) => {
     const Lscript = document.createElement('script');
     let hasResolved = false;
     Lscript.charset="UTF-8";        // KMEW-89
@@ -140,7 +143,7 @@ function setupScriptInternal(src: string, timeout: number, attemptCount?: number
       // we don't exceed the timeout as a result!
       if(attemptCount <= 3) {
         window.setTimeout(() => {
-          let retryPromise = setupScriptInternal(src, timeout, attemptCount + 1, existingTimer);
+          const retryPromise = setupScriptInternal(src, timeout, attemptCount + 1, existingTimer);
           retryPromise.then(resolve).catch(reject);
         }, 20);
       } else {
@@ -157,8 +160,8 @@ function setupScriptInternal(src: string, timeout: number, attemptCount?: number
 }
 
 export function teardownKMW() {
-  var error = null;
-  const keyman: KeymanEngine = window['keyman'];
+  let error = null;
+  const keyman: KeymanEngine = window[keyman_window];
 
   // If our setupKMW fails somehow, this guard prevents a second error report on teardown.
   if(keyman) {
@@ -171,9 +174,9 @@ export function teardownKMW() {
     }
 
     try {
-      var success = delete window["keyman"];
+      const success = delete window[keyman_window];
       if(!success) {
-        window["keyman"] = undefined;
+        (window[keyman_window] as Window) = undefined;
       }
     } finally {
       if(error) {
@@ -185,13 +188,13 @@ export function teardownKMW() {
 }
 
 export async function loadKeyboardStub(stub: KeyboardAPISpec | KeyboardStub, timeout: number, params?: { passive: boolean }) {
-  var kbdName = "Keyboard_" + stub.id;
-  const keyman: KeymanEngine = window['keyman'];
+  const kbdName = "Keyboard_" + stub.id;
+  const keyman: KeymanEngine = window[keyman_window];
 
   // Returning an "error stub" does not actually throw an error.  Makes
   // picking up on related errors in unit-test dev a bit trickier, but
   // we can manually throw the error from here.
-  let result = await keyman.addKeyboards(stub);
+  const result = await keyman.addKeyboards(stub);
   for(let i=0; i < result.length; i++) {
     if('error' in result[i]) {
       const errStub = result[i] as ErrorStub;
@@ -217,20 +220,20 @@ export async function loadKeyboardFromJSON(jsonPath: string, timeout: number, pa
   return loadKeyboardStub(stub, timeout, params);
 }
 
-async function runLoadedKeyboardTest(testDef, device, usingOSK, assertCallback) {
-  var inputElem = document.getElementById('singleton');
+async function runLoadedKeyboardTest(testDef:any , device:any, usingOSK:any, assertCallback:any) {
+  const inputElem = document.getElementById('singleton');
 
-  let proctor = new KMWRecorder.BrowserProctor(inputElem, device, usingOSK, assertCallback);
+  const proctor = new KMWRecorder.BrowserProctor(inputElem, device, usingOSK, assertCallback);
   await testDef.test(proctor);
 }
 
-export async function runKeyboardTestFromJSON(jsonPath, params, assertCallback, timeout) {
-  const keyman: KeymanEngine = window['keyman'];
+export async function runKeyboardTestFromJSON(jsonPath: any, params: any, assertCallback: any, timeout: any) {
+  const keyman: KeymanEngine = window[keyman_window];
   const jsonResponse = await fetch(new URL(`${domain}/${jsonPath}`));
   const testJSON = await jsonResponse.json();
 
-  var testSpec = new KMWRecorder.KeyboardTest(testJSON);
-  let device = new Device();
+  const testSpec = new KMWRecorder.KeyboardTest(testJSON);
+  const device = new Device();
   device.detect();
 
   // @ts-ignore // Types are a bit messy here.
@@ -242,7 +245,7 @@ export async function runKeyboardTestFromJSON(jsonPath, params, assertCallback, 
 }
 
 export async function oskResourceLoadPromise() {
-  const keyman: KeymanEngine = window['keyman'];
+  const keyman: KeymanEngine = window[keyman_window];
   // If the CSS isn't fully loaded, the element positions will not match their expected
   // locations in the keyboard layout and OSK keys won't be triggered properly by the
   // gesture engine.
@@ -251,16 +254,16 @@ export async function oskResourceLoadPromise() {
 }
 
 // Useful for tests related to strings with supplementary pairs.
-export function toSupplementaryPairString(code) {
-  var H = Math.floor((code - 0x10000) / 0x400) + 0xD800;
-  var L = (code - 0x10000) % 0x400 + 0xDC00;
+export function toSupplementaryPairString(code: number) {
+  const H = Math.floor((code - 0x10000) / 0x400) + 0xD800;
+  const L = (code - 0x10000) % 0x400 + 0xDC00;
 
   return String.fromCharCode(H, L);
 }
 
-export function toEscapedSupplementaryPairString(code) {
-  var H = (Math.floor((code - 0x10000) / 0x400) + 0xD800).toString(16);
-  var L = ((code - 0x10000) % 0x400 + 0xDC00).toString(16);
+export function toEscapedSupplementaryPairString(code: number) {
+  const H = (Math.floor((code - 0x10000) / 0x400) + 0xD800).toString(16);
+  const L = ((code - 0x10000) % 0x400 + 0xDC00).toString(16);
 
   return "\\u"+H+"\\u"+L;
 }

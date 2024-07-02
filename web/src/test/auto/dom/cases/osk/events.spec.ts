@@ -3,7 +3,6 @@ import Device from 'keyman/engine/device-detect';
 
 import { loadKeyboardsFromStubs } from '../../kbdLoader.js';
 import { timedPromise } from '@keymanapp/web-utils';
-import { type Keyboard } from '@keymanapp/keyboard-processor';
 
 import sinon from 'sinon';
 
@@ -49,7 +48,7 @@ describe('OSK events', function () {
   it('InlinedOSK - onHide / onShow', async () => {
     const container = document.getElementById('osk-container');
 
-    let osk = new KeymanOSK.InlinedOSKView(TestResources.OskConfig);
+    const osk = new KeymanOSK.InlinedOSKView(TestResources.OskConfig);
 
     osk.setSize(600, 400);
     container.appendChild(osk.element);
@@ -66,7 +65,7 @@ describe('OSK events', function () {
     // Setup complete.
 
     // Hide the OSK + check for related event
-    let legacyHideStub = sinon.fake();
+    const legacyHideStub = sinon.fake();
     osk.legacyEvents.addEventListener('hide', legacyHideStub);
 
     osk.activationModel.enabled = false;
@@ -77,7 +76,7 @@ describe('OSK events', function () {
     await Promise.resolve();
 
     // Show the OSK + check for related event
-    let legacyShowStub = sinon.fake();
+    const legacyShowStub = sinon.fake();
     osk.legacyEvents.addEventListener('show', legacyShowStub);
 
     osk.activationModel.enabled = true;

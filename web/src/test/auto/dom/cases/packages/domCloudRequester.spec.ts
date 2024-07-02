@@ -4,7 +4,7 @@ import sinon from 'sinon';
 import DOMCloudRequester from 'keyman/engine/package-cache/dom-requester';
 
 describe("Mocked cloud query results ('canary' testing)", () => {
-  function performMockedRequest(mockedResultsPath) {
+  function performMockedRequest(mockedResultsPath: string) {
     const requester = new DOMCloudRequester(true);
 
     /*
@@ -13,12 +13,12 @@ describe("Mocked cloud query results ('canary' testing)", () => {
      * 1. A proper endpoint for the query results' `keyman.register` call.
      * 2. Resolution of the request's `Promise` (to prevent unwanted errors)
      */
-    const mockedRegisterOwner = {
+    const mockedRegisterOwner: any = {
       // Query promises are stored for resolution by the registration function.
       register: sinon.spy(() => mockedRegisterOwner.promise.resolve())
     };
     // Must be available via keyman.register().
-    window['keyman'] = mockedRegisterOwner;
+    (window as any)['keyman'] = mockedRegisterOwner;
 
     const queryString = mockedResultsPath;
     const queryHandle = requester.request(queryString).promise;
@@ -49,7 +49,7 @@ describe("Mocked cloud query results ('canary' testing)", () => {
     assert.equal(queryResult.keyboard[1].languages.length, 1);
 
     const langCodes = ['no', 'sv'];
-    assert.sameOrderedMembers(queryResult.keyboard.map((kbd) => kbd.languages[0].id), langCodes);
+    assert.sameOrderedMembers(queryResult.keyboard.map((kbd: any) => kbd.languages[0].id), langCodes);
   });
 
   it('sil_cameroon_azerty', async () => {
@@ -66,7 +66,7 @@ describe("Mocked cloud query results ('canary' testing)", () => {
     // single-language specs on each of the returned `keyboard` entries.
     assert.equal(queryResult.keyboard[0].languages.length, 278); //... that's a LOT.
 
-    assert.isOk(queryResult.keyboard[0].languages.find((value) => value.id == 'pny'));
+    assert.isOk(queryResult.keyboard[0].languages.find((value: any) => value.id == 'pny'));
   });
 
   it('@dz', async () => {
@@ -90,10 +90,10 @@ describe("Mocked cloud query results ('canary' testing)", () => {
       'tibetan_unicode_direct_input',
       'tibetan_unicode_ewts'
     ];
-    assert.sameOrderedMembers(keyboards.map((kbd) => kbd.id), keyboardIds);
+    assert.sameOrderedMembers(keyboards.map((kbd: any) => kbd.id), keyboardIds);
 
     for(const keyboard of keyboards) {
-      assert.isOk(keyboard.languages.find((language) => language.id == 'dz'));
+      assert.isOk(keyboard.languages.find((language: any) => language.id == 'dz'));
     }
   });
 });
