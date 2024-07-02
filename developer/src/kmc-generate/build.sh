@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+#
+# Keyman is copyright (C) SIL International. MIT License.
+#
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
@@ -38,7 +41,7 @@ do_build() {
 do_test() {
   eslint .
   cd test
-  tsc -b
+  tsc --build
   cd ..
   c8 --reporter=lcov --reporter=text mocha "${builder_extra_params[@]}"
 }

@@ -1,3 +1,9 @@
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Base interfaces and classes for generating Keyman Developer source files
+ */
+
 import { CompilerCallbacks, CompilerLogLevel, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult } from "@keymanapp/common-types";
 import { GeneratorMessages } from './generator-messages.js';
 
@@ -178,7 +184,7 @@ export class AbstractGenerator {
    * @returns true on success
    */
   public async write(artifacts: GeneratorArtifacts): Promise<boolean> {
-    // TODO: this is a little poor because it is carrying state over from the
+    // TODO-GENERATE: this is a little poor because it is carrying state over from the
     // previous 'run' call, rather than figuring out the target path from the
     // artifacts. Probably should be looking at highest common folder, and then
     // failing if that path exists

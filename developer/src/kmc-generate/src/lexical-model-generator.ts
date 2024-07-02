@@ -1,3 +1,9 @@
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Generate a Keyman lexical model project
+ */
+
 import { KeymanCompiler, KeymanFileTypes } from '@keymanapp/common-types';
 import { SourceFilenamePatterns } from '@keymanapp/developer-utils';
 import { GeneratorArtifacts, GeneratorResult } from './abstract-generator.js';
