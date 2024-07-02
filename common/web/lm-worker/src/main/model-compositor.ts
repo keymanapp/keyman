@@ -114,7 +114,6 @@ export default class ModelCompositor {
   }
 
   async predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Promise<Suggestion[]> {
-    let suggestionDistribution: CorrectionPredictionTuple[] = [];
     let lexicalModel = this.lexicalModel;
 
     // If a prior prediction is still processing, signal to terminate it; we have a new
@@ -406,6 +405,8 @@ export default class ModelCompositor {
     const keyedPrefix = keyed(truePrefix);
     const lowercasedPrefix = keyCased(truePrefix);
 
+    let deduplicatedSuggestionTuples: CorrectionPredictionTuple[] = [];
+
     // Deduplicator + annotator of 'keep' suggestions.
     for(let tuple of rawPredictions) {
       if(currentCasing && currentCasing != 'lower') {
@@ -465,7 +466,7 @@ export default class ModelCompositor {
       keepOption.transformId = inputTransform.id;
       keepOption.matchesModel = false;
 
-      suggestionDistribution.unshift({
+      deduplicatedSuggestionTuples.unshift({
         totalProb: keepOption.p,
         prediction: {
           sample: keepOption,
@@ -485,15 +486,17 @@ export default class ModelCompositor {
     // distribution and prep for return.
     for(let key in suggestionDistribMap) {
       let pair = suggestionDistribMap[key];
-      suggestionDistribution.push(pair);
+      deduplicatedSuggestionTuples.push(pair);
     }
 
-    // Section 4:  Auto-correction + finalization.
-    suggestionDistribution = suggestionDistribution.sort(tupleDisplayOrderSort);
-    this.predictionAutoSelect(suggestionDistribution);
+    deduplicatedSuggestionTuples = deduplicatedSuggestionTuples.sort(tupleDisplayOrderSort);
+    this.predictionAutoSelect(deduplicatedSuggestionTuples);
+
+    // Section 4: Trim down the suggestion list to the N (MAX_SUGGESTIONS) most optimal,
+    // then cache and return the set of suggestions
 
     // Now that we've marked the suggestion to auto-select, we can finalize the suggestions.
-    const suggestions = this.finalizeSuggestions(suggestionDistribution, context, inputTransform);
+    const suggestions = this.finalizeSuggestions(deduplicatedSuggestionTuples, context, inputTransform);
 
     // Store the suggestions on the final token of the current context state (if it exists).
     // Or, once phrase-level suggestions are possible, on whichever token serves as each prediction's root.
