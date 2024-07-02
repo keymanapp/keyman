@@ -105,7 +105,6 @@
     "@keymanapp/lexical-model-layer": "*",
     "@keymanapp/models-types": "*",
     "@keymanapp/recorder-core": "*",
-    "@keymanapp/tslib": "*",
     "@keymanapp/web-utils": "*",
     "core-js": "^3.34.0",
     "eventemitter3": "^5.0.0",

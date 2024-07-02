@@ -44,6 +44,8 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
+BUNDLE_CMD="node ${KEYMAN_ROOT}/common/web/es-bundling/build/common-bundle.mjs"
+
 #### Build action definitions ####
 
 ##################### TODO:  call child action, verify things work as expected!
@@ -62,8 +64,33 @@ builder_run_child_actions configure
 
 ## Build actions
 
+precompile() {
+  local DIR
+  DIR="$1"
+
+  # pre-compile bundle for use in DOM testing. When running in the browser several
+  # types built-in to Node aren't available, and @web/test-runner doesn't do
+  # treeshaking when loading the imports. We work around by pre-compiling.
+  for f in "${DIR}"/*.js; do
+    ${BUNDLE_CMD}   "${f}" \
+      --out         "${f%.js}".mjs \
+      --format esm
+  done
+}
+
 build_action() {
   tsc --project "${KEYMAN_ROOT}/web/src/test/auto/tsconfig.json"
+
+  for dir in \
+    "${KEYMAN_ROOT}/web/build/test/dom/cases"/*/ \
+    "${KEYMAN_ROOT}/web/build/test/integrated/" \
+    "${KEYMAN_ROOT}/web/build/test/integrated/cases/";
+  do
+    precompile "${dir}"
+  done
+
+  cp "${KEYMAN_ROOT}/web/src/test/auto/dom/cases/attachment/outputTargetForElement.spec.html" \
+    "${KEYMAN_ROOT}/web/build/test/dom/cases/attachment/"
 }
 
 test_action() {

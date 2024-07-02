@@ -28,8 +28,6 @@ export class KeymanSentryManager {
   static STANDARD_ALIASABLE_FILES = {
     'keymanweb.js':             'keymanweb.js',
     'keymanweb-webview.js':     'keymanweb-webview.js',
-    'keymanweb.es5.js':         'keymanweb.es5.js',
-    'keymanweb-webview.es5.js': 'keymanweb-webview.es5.js',
     'kmwuibutton.js':           'kmwuibutton.js',
     'kmwuifloat.js':            'kmwuifloat.js',
     'kmwuitoggle.js':           'kmwuitoggle.js',
@@ -186,8 +184,7 @@ export class KeymanSentryManager {
    * Capture errors and warnings logged to Console in order to get
    * stack traces. We can't use CaptureConsole integration until we
    * upgrade to a newer version of Sentry, which has a bit of a cascade
-   * of changes required, in particular a change of module type and
-   * transpiling down to ES5.
+   * of changes required, in particular a change of module type.
    *
    * https://stackoverflow.com/a/53214615/1836776
    */

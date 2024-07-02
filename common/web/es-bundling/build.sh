@@ -11,7 +11,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ################################ Main script ################################
 
 builder_describe "Builds KMW's esbuild-oriented common configuration & tooling" \
-  "@/common/web/tslib" \
   "clean" \
   "configure" \
   "build"
