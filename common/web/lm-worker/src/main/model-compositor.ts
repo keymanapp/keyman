@@ -114,7 +114,7 @@ export default class ModelCompositor {
   }
 
   async predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Promise<Suggestion[]> {
-    let lexicalModel = this.lexicalModel;
+    const lexicalModel = this.lexicalModel;
 
     // If a prior prediction is still processing, signal to terminate it; we have a new
     // prediction request to prioritize.
@@ -143,18 +143,17 @@ export default class ModelCompositor {
       })
     }
 
-    const { sample: inputTransform, p: inputTransformProb } = transformDistribution.sort(function(a, b) {
+    const inputTransform = transformDistribution.sort(function(a, b) {
       return b.p - a.p;
-    })[0];
+    })[0].sample;
 
     // Only allow new-word suggestions if space was the most likely keypress.
-    let allowSpace = TransformUtils.isWhitespace(inputTransform);
-    let allowBksp = TransformUtils.isBackspace(inputTransform);
+    const allowSpace = TransformUtils.isWhitespace(inputTransform);
+    const allowBksp = TransformUtils.isBackspace(inputTransform);
 
-    let postContext = models.applyTransform(inputTransform, context);
+    const postContext = models.applyTransform(inputTransform, context);
     const truePrefix = this.wordbreak(postContext);
     const basePrefix = allowBksp ? truePrefix : this.wordbreak(context);
-    let keepOption: Outcome<Keep> = null;
 
     let rawPredictions: CorrectionPredictionTuple[] = [];
 
@@ -395,100 +394,29 @@ export default class ModelCompositor {
       }
     }
 
-    // Section 2 - post-analysis for our generated predictions, managing 'keep'.
-    // Assumption:  Duplicated 'displayAs' properties indicate duplicated Suggestions.
-    // When true, we can use an 'associative array' to de-duplicate everything.
-    let suggestionDistribMap: {[key: string]: CorrectionPredictionTuple} = {};
+    // Section 2 - prediction filtering + post-processing pass 1
 
-    const keyed = (text: string) => this.lexicalModel.toKey ? this.lexicalModel.toKey(text) : text;
-    const keyCased = (text: string) => this.lexicalModel.applyCasing ? this.lexicalModel.applyCasing('lower', text) : text;
-    const keyedPrefix = keyed(truePrefix);
-    const lowercasedPrefix = keyCased(truePrefix);
-
-    let deduplicatedSuggestionTuples: CorrectionPredictionTuple[] = [];
-
-    // Deduplicator + annotator of 'keep' suggestions.
+    // Properly capitalizes the suggestions based on the existing context casing state.
+    // This may result in duplicates if multiple casing options exist within the
+    // lexicon for a word.  (Example:  "Apple" the company vs "apple" the fruit.)
     for(let tuple of rawPredictions) {
       if(currentCasing && currentCasing != 'lower') {
         this.applySuggestionCasing(tuple.prediction.sample, basePrefix, currentCasing);
       }
-
-      // Don't set it unnecessarily; this can have side-effects in some automated tests.
-      if(inputTransform.id !== undefined) {
-        tuple.prediction.sample.transformId = inputTransform.id;
-      }
-
-      const predictedWord = this.wordbreak(models.applyTransform(tuple.prediction.sample.transform, context));
-
-      // Is the suggestion an exact match (or, "similar enough") to the
-      // actually-typed context?  If so, we wish to note this fact and to
-      // prioritize such a suggestion over suggestions that are not.
-      if(keyed(tuple.correction.sample) == keyedPrefix) {
-        if(predictedWord == truePrefix) {
-          tuple.matchLevel = SuggestionSimilarity.exact;
-          keepOption = this.toAnnotatedSuggestion(tuple.prediction.sample, 'keep',  models.QuoteBehavior.noQuotes);
-          keepOption.matchesModel = true;
-          Object.assign(tuple.prediction.sample, keepOption);
-          keepOption = tuple.prediction.sample as Outcome<Keep>;
-        } else if(keyCased(predictedWord) == lowercasedPrefix) {
-          tuple.matchLevel = SuggestionSimilarity.sameText;
-        } else if(keyed(predictedWord) == keyedPrefix) {
-          tuple.matchLevel = SuggestionSimilarity.sameKey;
-        }
-      }
-
-      // Assumption:  suggestions that have the same net result should have the
-      // same displayAs string.  (We could try to pick the one with highest net
-      // probability, but that seems like too much of an edge-case to matter.)
-      //
-      // Either way, no point in showing multiple suggestions that do the same thing.
-      // Merge 'em!
-      const existingSuggestion = suggestionDistribMap[predictedWord];
-      if(existingSuggestion) {
-        existingSuggestion.totalProb += tuple.totalProb;
-      } else {
-        suggestionDistribMap[predictedWord] = tuple;
-      }
     }
 
-    // Generate a default 'keep' option if one was not otherwise produced.
-    if(!keepOption && truePrefix != '') {
-      // IMPORTANT:  duplicate the original transform.  Causes nasty side-effects
-      // for context-tracking otherwise!
-      let keepTransform: Transform = { ...inputTransform };
+    // We want to dedupe before trimming the list so that we can present a full set
+    // of viable distinct suggestions if available.
+    let deduplicatedSuggestionTuples = this.dedupeSuggestions(rawPredictions, context);
 
-      // 1 is a filler value; goes unused b/c is for a 'keep'.
-      let keepSuggestion = models.transformToSuggestion(keepTransform, 1);
-      // This is the one case where the transform doesn't insert the full word; we need to override the displayAs param.
-      keepSuggestion.displayAs = truePrefix;
+    // Needs "casing" to be applied first.
+    //
+    // Will also add a 'keep' suggestion (with `.matchesModel = false`) matching
+    // the current state of context if there is no such matching prediction.
+    this.processSimilarity(deduplicatedSuggestionTuples, context, transformDistribution[0]);
 
-      keepOption = this.toAnnotatedSuggestion(keepSuggestion, 'keep');
-      keepOption.transformId = inputTransform.id;
-      keepOption.matchesModel = false;
-
-      deduplicatedSuggestionTuples.unshift({
-        totalProb: keepOption.p,
-        prediction: {
-          sample: keepOption,
-          p: keepOption.p,
-        },
-        correction: {
-          sample: truePrefix,
-          p: inputTransformProb // we already sorted + this aligns with inputTransform.
-        },
-        matchLevel: SuggestionSimilarity.exact,
-      });
-    }
-
-    // Section 3:  Finalize suggestions, truncate list to the N (MAX_SUGGESTIONS) most optimal, return.
-
-    // Now that we've calculated a unique set of probability masses, time to make them into a proper
-    // distribution and prep for return.
-    for(let key in suggestionDistribMap) {
-      let pair = suggestionDistribMap[key];
-      deduplicatedSuggestionTuples.push(pair);
-    }
-
+    // Section 3:  Sort the suggestions in display priority order to determine
+    // which are most optimal, then auto-select based on the results.
     deduplicatedSuggestionTuples = deduplicatedSuggestionTuples.sort(tupleDisplayOrderSort);
     this.predictionAutoSelect(deduplicatedSuggestionTuples);
 
@@ -510,6 +438,106 @@ export default class ModelCompositor {
     }
 
     return suggestions;
+  }
+
+  private dedupeSuggestions(rawPredictions: CorrectionPredictionTuple[], context: Context) {
+    let suggestionDistribMap: {[key: string]: CorrectionPredictionTuple} = {};
+    let suggestionDistribution: CorrectionPredictionTuple[] = [];
+
+    // Deduplicator + annotator of 'keep' suggestions.
+    for(let tuple of rawPredictions) {
+      const predictedWord = this.wordbreak(models.applyTransform(tuple.prediction.sample.transform, context));
+
+      // Assumption:  suggestions that have the same net result should have the
+      // same displayAs string.  (We could try to pick the one with highest net
+      // probability, but that seems like too much of an edge-case to matter.)
+      //
+      // Either way, no point in showing multiple suggestions that do the same thing.
+      // Merge 'em!
+      const existingSuggestion = suggestionDistribMap[predictedWord];
+      if(existingSuggestion) {
+        existingSuggestion.totalProb += tuple.totalProb;
+      } else {
+        suggestionDistribMap[predictedWord] = tuple;
+      }
+    }
+        // Now that we've calculated a unique set of probability masses, time to make them into a proper
+    // distribution and prep for return.
+    for(let key in suggestionDistribMap) {
+      let pair = suggestionDistribMap[key];
+      suggestionDistribution.push(pair);
+    }
+
+    return suggestionDistribution;
+  }
+
+  private processSimilarity(suggestionDistribution: CorrectionPredictionTuple[], context: Context, trueInput: ProbabilityMass<Transform>) {
+    const { sample: inputTransform, p: inputTransformProb } = trueInput;
+
+    let postContext = models.applyTransform(inputTransform, context);
+    const truePrefix = this.wordbreak(postContext);
+
+    const keyed = (text: string) => this.lexicalModel.toKey ? this.lexicalModel.toKey(text) : text;
+    const keyCased = (text: string) => this.lexicalModel.applyCasing ? this.lexicalModel.applyCasing('lower', text) : text;
+    const keyedPrefix = keyed(truePrefix);
+    const lowercasedPrefix = keyCased(truePrefix);
+
+    let keepOption: Outcome<Keep>;
+
+    for(let tuple of suggestionDistribution) {
+      const predictedWord = this.wordbreak(models.applyTransform(tuple.prediction.sample.transform, context));
+
+      // Is the suggestion an exact match (or, "similar enough") to the
+      // actually-typed context?  If so, we wish to note this fact and to
+      // prioritize such a suggestion over suggestions that are not.
+      if(keyed(tuple.correction.sample) == keyedPrefix) {
+        if(predictedWord == truePrefix) {
+          tuple.matchLevel = SuggestionSimilarity.exact;
+          keepOption = this.toAnnotatedSuggestion(tuple.prediction.sample, 'keep',  models.QuoteBehavior.noQuotes);
+          keepOption.matchesModel = true;
+          Object.assign(tuple.prediction.sample, keepOption);
+          keepOption = tuple.prediction.sample as Outcome<Keep>;
+        } else if(keyCased(predictedWord) == lowercasedPrefix) {
+          tuple.matchLevel = SuggestionSimilarity.sameText;
+        } else if(keyed(predictedWord) == keyedPrefix) {
+          tuple.matchLevel = SuggestionSimilarity.sameKey;
+        }
+      }
+    }
+
+    // If we already have a keep option, we're done!  Return and move on.
+    if(keepOption || truePrefix == '') {
+      return;
+    }
+
+    // Generate a default 'keep' option if one was not otherwise produced.
+
+    // IMPORTANT:  duplicate the original transform.  Causes nasty side-effects
+    // for context-tracking otherwise!
+    let keepTransform: Transform = { ...inputTransform };
+
+    // 1 is a filler value; goes unused b/c is for a 'keep'.
+    let keepSuggestion = models.transformToSuggestion(keepTransform, 1);
+    // This is the one case where the transform doesn't insert the full word; we need to override the displayAs param.
+    keepSuggestion.displayAs = truePrefix;
+
+    keepOption = this.toAnnotatedSuggestion(keepSuggestion, 'keep');
+    keepOption.transformId = inputTransform.id;
+    keepOption.matchesModel = false;
+
+    // Insert our
+    suggestionDistribution.unshift({
+      totalProb: keepOption.p,
+      prediction: {
+        sample: keepOption,
+        p: keepOption.p,
+      },
+      correction: {
+        sample: truePrefix,
+        p: inputTransformProb // we already sorted + this aligns with inputTransform.
+      },
+      matchLevel: SuggestionSimilarity.exact,
+    });
   }
 
   private predictionAutoSelect(suggestionDistribution: CorrectionPredictionTuple[]) {
@@ -609,7 +637,7 @@ export default class ModelCompositor {
       }
     });
 
-    // Apply 'after word' punctuation and casing (when applicable).  Also, set suggestion IDs.
+    // Apply 'after word' punctuation and other post-processing, setting suggestion IDs.
     // We delay until now so that utility functions relying on the unmodified Transform may execute properly.
     suggestions.forEach((suggestion) => {
       // Valid 'keep' suggestions may have zero length; we still need to evaluate the following code
