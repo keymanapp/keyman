@@ -7,7 +7,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe "Keystroke processing engine (32 bit)" \
   @/common/include \
-  @/core:x86 @/core:x64 \
+  @/core \
   clean configure build test publish install \
   :x86 :x64
 
