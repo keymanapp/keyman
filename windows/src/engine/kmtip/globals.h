@@ -53,30 +53,33 @@ void GetDeadkeyFlags(TfEditCookie ec, ITfContext *pContext, PWSTR buf, int n);
 //
 
 // Following macros widen a constant string, ugly it is true
-#define __WFILE2__(m) L ## m
-#define __WFILE1__(m) __WFILE2__(m)
-#define __WFILE__ __WFILE1__(__FILE__)
+#define __WIDEN2__(m)  L ## m
+#define __WIDEN1__(m)  __WIDEN2__(m)
 
-void Log(WCHAR *fmt, ...);
+#define __WIDEN__(m)  __WIDEN1__(m)
+#define __WFILE__ __WIDEN1__(__FILE__)
+#define __WFUNCTION__ __WIDEN1__(__FUNCTION__)
 
 BOOL ShouldDebug();
-int SendDebugMessage_1(wchar_t *file, int line, PWCHAR msg);   // I4379
-int SendDebugMessageFormat_1(wchar_t *file, int line, PWCHAR fmt, ...);   // I4379
-void DebugLastError_1(wchar_t *file, int line, char *func, PWCHAR msg, DWORD err);
+int SendDebugMessage_1(wchar_t *file, int line, wchar_t *function, PWCHAR msg);   // I4379
+int SendDebugMessageFormat_1(wchar_t *file, int line, wchar_t *function, PWCHAR fmt, ...);   // I4379
+void DebugLastError_1(wchar_t *file, int line, wchar_t *function, PWCHAR msg, DWORD err);
 
-#define SendDebugMessage(msg) (SendDebugMessage_1(__WFILE__, __LINE__, (msg)))
-#define SendDebugMessageFormat(msg,...) (SendDebugMessageFormat_1(__WFILE__, __LINE__, (msg),__VA_ARGS__))
+#define SendDebugMessage(msg) (SendDebugMessage_1(__WFILE__, __LINE__, __WFUNCTION__, (msg)))
+#define SendDebugMessageFormat(msg,...) (SendDebugMessageFormat_1(__WFILE__, __LINE__, __WFUNCTION__, (msg),__VA_ARGS__))
 
-#define DebugLastError(msg) (DebugLastError_1(__WFILE__,__LINE__,__FUNCTION__,(msg),GetLastError()))
-#define DebugLastError0(msg,err) (DebugLastError_1(__WFILE__,__LINE__,__FUNCTION__,(msg),(err)))
+#define DebugLastError(msg) (DebugLastError_1(__WFILE__,__LINE__,__WFUNCTION__,(msg),GetLastError()))
+#define DebugLastError0(msg,err) (DebugLastError_1(__WFILE__,__LINE__,__WFUNCTION__,(msg),(err)))
 
-#define LogSUCCEEDED(hr) _LogSUCCEEDED(__WFILE__, __LINE__, __FUNCTIONW__, (#hr), (hr))
+#define LogSUCCEEDED(hr) _LogSUCCEEDED(__WFILE__, __LINE__, __WFUNCTION__, (#hr), (hr))
 BOOL _LogSUCCEEDED(wchar_t *file, int line, PWSTR caller, PSTR callee, HRESULT hr);
 
-//#define LogEnter() (SendDebugMessageFormat_1(__WFILE__, __LINE__, L"%hs ENTER", __FUNCTION__))
-//#define LogExit() (SendDebugMessageFormat_1(__WFILE__, __LINE__, L"%hs EXIT", __FUNCTION__))
-#define LogEnter()
-#define LogExit()
+#define SendDebugEntry() (ShouldDebug() ? SendDebugEntry_1(__WFILE__, __LINE__, __WFUNCTION__) : 0)
+#define SendDebugExit() (ShouldDebug() ? SendDebugExit_1(__WFILE__, __LINE__, __WFUNCTION__) : 0)
+#define return_SendDebugExit(v) { SendDebugExit(); return v; }
+
+int SendDebugEntry_1(wchar_t* file, int line, wchar_t* function);
+int SendDebugExit_1(wchar_t* file, int line, wchar_t* function);
 
 //
 // Defines

@@ -138,11 +138,10 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
   if(!_td->FInitialised)			// Keyman keyboard is being selected for first time in active process
   {
     if(!Globals::CheckControllers()) return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);  // I2435 - Prevent Keyman from re-initialising when it is shutting down  // I3253   // I3532
-    if(!InitialiseProcess(mp->hwnd)) return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
+    if(!InitialiseProcess()) return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
   }
 
-  if (((mp->message >= WM_KEYFIRST && mp->message <= WM_KEYLAST) ||
-    mp->message == WM_KEYMAN_KEY_EVENT) && ShouldDebug(sdmMessage)) {
+  if (mp->message >= WM_KEYFIRST && mp->message <= WM_KEYLAST && ShouldDebug()) {
     DebugMessage(mp, wParam);
   }
 
@@ -207,27 +206,27 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
    // I3594
   if(mp->message == wm_keyman_refresh)
   {
-    SendDebugMessageFormat(0, sdmInternat, 0, "GetMessage: wm_keyman_refresh %d tag=%d", mp->wParam, mp->lParam);
+    SendDebugMessageFormat("wm_keyman_refresh %d tag=%d", mp->wParam, mp->lParam);
     HandleRefresh((int) mp->wParam, (LONG) mp->lParam);
     return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
   }
 
   if(mp->message == wm_keyman_control_internal)   // I3933
   {
-    SendDebugMessageFormat(0, sdmInternat, 0, "GetMessage: wm_keyman_control_internal hwnd=%x %x %x", mp->hwnd, mp->wParam, mp->lParam);   // I4674
+    SendDebugMessageFormat("wm_keyman_control_internal hwnd=%x %x %x", mp->hwnd, mp->wParam, mp->lParam);   // I4674
     ProcessWMKeymanControlInternal(mp->hwnd, mp->wParam, mp->lParam);
     return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
   }
 
   if (mp->message == wm_keyman_control) {
-    SendDebugMessageFormat(0, sdmInternat, 0, "GetMessage: wm_keyman_control hwnd=%x %x %x", mp->hwnd, mp->wParam, mp->lParam);
+    SendDebugMessageFormat("wm_keyman_control hwnd=%x %x %x", mp->hwnd, mp->wParam, mp->lParam);
     ProcessWMKeymanControl(mp->wParam, mp->lParam);
     return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
   }
 
   if(mp->message == wm_keyman)   // I3933
   {
-    SendDebugMessageFormat(0, sdmInternat, 0, "GetMessage: wm_keyman hwnd=%x %x %x", mp->hwnd, mp->wParam, mp->lParam);   // I4674
+    SendDebugMessageFormat("wm_keyman hwnd=%x %x %x", mp->hwnd, mp->wParam, mp->lParam);   // I4674
     ProcessWMKeyman(mp->hwnd, mp->wParam, mp->lParam);
     return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
   }
@@ -247,7 +246,7 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
    // I4412
   if(mp->message == wm_keymanshift)
   {
-    SendDebugMessageFormat(0, sdmInternat, 0, "GetMessage: wm_keymanshift %x %x", mp->wParam, mp->lParam);
+    SendDebugMessageFormat("wm_keymanshift %x %x", mp->wParam, mp->lParam);
     SelectApplicationIntegration();
     if(!_td->app->IsWindowHandled(mp->hwnd)) _td->app->HandleWindow(mp->hwnd);
     return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
@@ -267,7 +266,7 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
             return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
           }
           if (KM_CORE_STATUS_OK != km_core_process_queued_actions(_td->lpActiveKeyboard->lpCoreKeyboardState)) {
-            SendDebugMessageFormat(0, sdmGlobal, 0, "_kmnGetMessageProc wm_keymanim_close process event fail");
+            SendDebugMessageFormat("_kmnGetMessageProc wm_keymanim_close process event fail");
             return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
           }
           BOOL emitKeyStroke;
@@ -321,7 +320,7 @@ void ProcessWMKeyman(HWND hwnd, WPARAM wParam, LPARAM lParam)
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return;
 
-  SendDebugMessageFormat(hwnd, sdmGlobal, 0, "ProcessWMKeyman wm_keyman: %d %d", wParam, lParam);
+  SendDebugMessageFormat("wm_keyman: %d %d", wParam, lParam);
   switch(wParam)
   {
   case KM_DISABLEUI:
@@ -431,7 +430,7 @@ void GetCapsAndNumlockState() {   // I4793
   if(GetKeyState(VK_RMENU) < 0) *Globals::ShiftState() |= RALTFLAG;
   else *Globals::ShiftState() &= ~RALTFLAG;
 
-  SendDebugMessageFormat(0, sdmInternat, 0, "GetCapsAndNumlockState (Enter:%x Exit:%x)", n, Globals::get_ShiftState());
+  SendDebugMessageFormat("Enter: %x Exit: %x", n, Globals::get_ShiftState());
 }
 
 /*
@@ -461,7 +460,7 @@ void ProcessModifierChange(UINT key, BOOL isUp, BOOL isExtended) {   // I4793
     *Globals::ShiftState() |= flag;
   }
 
-  SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessModifierChange(%x, %d, %d) -> shift state from %x to %x",
+  SendDebugMessageFormat("key=%x, isUp=%d, isExtended=%d -> shift state from %x to %x",
     key, isUp, isExtended, oldShiftState, Globals::get_ShiftState());
 }
 

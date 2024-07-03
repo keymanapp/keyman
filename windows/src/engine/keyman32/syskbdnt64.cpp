@@ -1,18 +1,18 @@
 /*
   Name:             syskbdnt64
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      10 Sep 2008
 
   Modified Date:    6 Feb 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          10 Sep 2008 - mcdurdin - I1635 - Initial version
                     11 Mar 2009 - mcdurdin - I1894 - Fix threading bugs introduced in I1888
                     30 Nov 2009 - mcdurdin - I934 - Prep for x64 - change UINT to WORD for vkeys
@@ -31,7 +31,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch.h"
-#include "kbd.h"	/* DDK kbdlayout */ 
+#include "kbd.h"	/* DDK kbdlayout */
 
 //#pragma warning ( disable : 4200 )
 
@@ -151,19 +151,19 @@ BOOL LoadNewLibrary_x64()
 			if(r->ReadString("Layout File", buf, 32))
 			{
 				hKbdLibrary_x64 = LoadLibrary(buf);
-				if(!hKbdLibrary_x64) 
-				{ 	
-					SendDebugMessageFormat(GetFocus(), sdmKeyboard, 0, "LoadNewLibrary_x64: Exit -- could not load library");
-					return FALSE; 
+				if(!hKbdLibrary_x64)
+				{
+					SendDebugMessageFormat("Exit -- could not load library");
+					return FALSE;
 				}
 				PKBDLAYERDESCRIPTORFUNC KbdLayerDescriptorFunc = (PKBDLAYERDESCRIPTORFUNC) GetProcAddress(hKbdLibrary_x64, "KbdLayerDescriptor");
 				if(KbdLayerDescriptorFunc)
 				{
 					KbdTables_x64 = (*KbdLayerDescriptorFunc)();
-					if(KbdTables_x64) 
+					if(KbdTables_x64)
 						return TRUE;
 				}
-				
+
 				FreeLibrary(hKbdLibrary_x64);
 			}
 		}
@@ -175,7 +175,7 @@ BOOL LoadNewLibrary_x64()
 	{
 		delete r;
 	}
-	SendDebugMessageFormat(GetFocus(), sdmKeyboard, 0, "LoadNewLibrary_x64: Exit -- failed to find function");
+	SendDebugMessageFormat("Exit -- failed to find function");
 	return FALSE;
 }
 
@@ -183,15 +183,15 @@ BOOL KeyboardGivesCtrlRAltForRAlt_NT_x64()
 {
 	HKL hkl = GetKeyboardLayout(0);
 
-	/* Find the appropriate keyboard tables */ 
+	/* Find the appropriate keyboard tables */
 
 	if(hkl != ActiveHKL_NT_x64)
 	{
-		ActiveHKL_NT_x64 = hkl; 
+		ActiveHKL_NT_x64 = hkl;
 		LoadNewLibrary_x64();
 	}
 
-	if(!KbdTables_x64)				/* Could not load keyboard DLL */ 
+	if(!KbdTables_x64)				/* Could not load keyboard DLL */
 		return FALSE;
 
 	return (KbdTables_x64->fLocaleFlags & 0x1) ? TRUE : FALSE;
@@ -200,7 +200,7 @@ BOOL KeyboardGivesCtrlRAltForRAlt_NT_x64()
 
 typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
 
-LPFN_ISWOW64PROCESS 
+LPFN_ISWOW64PROCESS
 fnIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(
 GetModuleHandle("kernel32"),"IsWow64Process");
 BOOL fStored = FALSE;

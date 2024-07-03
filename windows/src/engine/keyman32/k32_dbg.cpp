@@ -79,6 +79,7 @@ void InitDebugging() {
 
 	InitDebuggingEx(_td);
 	_td->debug_DebugInit = TRUE;
+  _td->debug_Depth = 0;
 
 	if(Globals::get_debug_KeymanLog())
 	{
@@ -88,7 +89,7 @@ void InitDebugging() {
 		char *buf = new char[1024], fname[260];
 
 		GetWindowsVersion(buf);
-		SendDebugMessage(0, sdmKeyboard, 0, buf);
+		SendDebugMessage(buf);
 		delete buf;
 
 		GetModuleFileName(GetModuleHandle(LIBRARY_NAME), fname, 260);
@@ -99,13 +100,13 @@ void InitDebugging() {
 			GetFileVersionInfo(fname, 0, sz, buf);
 			VerQueryValue(buf, "\\", (void **) &ffi, &ffilen);
 
-			SendDebugMessageFormat(0, sdmKeyboard, 0, "Keyman version: %d.%d.%d.%d",
+			SendDebugMessageFormat("Keyman version: %d.%d.%d.%d",
 				HIWORD(ffi->dwProductVersionMS), LOWORD(ffi->dwProductVersionMS),
 				HIWORD(ffi->dwProductVersionLS), LOWORD(ffi->dwProductVersionLS));
   		delete buf; // I2157
 		}
 		else
-			SendDebugMessage(0, sdmKeyboard, 0, "Keyman version: damaged");
+			SendDebugMessage("Keyman version: damaged");
 	}
 }
 
@@ -123,10 +124,8 @@ void UninitDebuggingEx()
 }
 
 void UninitDebugging() {
-  SendDebugMessage(0, sdmGlobal, 0, "--- UninitDebugging() - shutting down ---");
+  SendDebugMessage("--- shutting down ---");
 }
-
-const TSDMState DebugState[] = {sdmInternat, sdmAIDefault, sdmMessage, sdmKeyboard, sdmGlobal, sdmMenu, sdmDebug, sdmLoad, sdmOther};
 
 BOOL ShouldDebug_1() {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
@@ -137,73 +136,59 @@ BOOL ShouldDebug_1() {
   return Globals::get_debug_KeymanLog();
 }
 
-int SendDebugMessageFormat_1(HWND hwnd, TSDMState state, int kmn_lineno, wchar_t*file, int line, char *fmt, ...)
-{
+int SendDebugEntry_1(wchar_t* file, int line, wchar_t* function) {
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+  if(!_td) return FALSE;
+  SendDebugMessageW_1(file, line, function, L"ENTER ========");
+  _td->debug_Depth++;
+  return 0;
+}
+
+int SendDebugExit_1(wchar_t* file, int line, wchar_t* function) {
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+  if(!_td) return FALSE;
+  if(--_td->debug_Depth < 0) {
+    // guard against unmatched debug entry/exits
+    _td->debug_Depth = 0;
+  }
+  SendDebugMessageW_1(file, line, function, L"EXIT  ========");
+  return 0;
+}
+
+int SendDebugMessageFormat_1(wchar_t* file, int line, wchar_t* function, char *fmt, ...) {
 	char fmtbuf[256];
 
 	va_list vars;
 	va_start(vars, fmt);
 	vsnprintf_s(fmtbuf, _countof(fmtbuf), _TRUNCATE, fmt, vars);  // I2248   // I3547
 	fmtbuf[255] = 0;
-	SendDebugMessage_1(hwnd, state, kmn_lineno, file, line, fmtbuf);
+	SendDebugMessage_1(file, line, function, fmtbuf);
 
   return 0;
 }
 
-int SendDebugMessageFormatW_1(HWND hwnd, TSDMState state, int kmn_lineno, wchar_t* file, int line, wchar_t* fmt, ...)
-{
+int SendDebugMessageFormatW_1(wchar_t* file, int line, wchar_t* function, wchar_t* fmt, ...) {
   wchar_t fmtbuf[256];
 
   va_list vars;
   va_start(vars, fmt);
   _vsnwprintf_s(fmtbuf, _countof(fmtbuf), _TRUNCATE, fmt, vars);  // I2248   // I3547
   fmtbuf[255] = 0;
-  SendDebugMessageW_1(hwnd, state, kmn_lineno, file, line, fmtbuf);
+  SendDebugMessageW_1(file, line, function, fmtbuf);
 
   return 0;
 }
 
-/*void FillWindowInfo(HWND hwnd, char *sClassName, char *sWindowText)
-{
-	if(hwnd == 0 || !GetClassName(hwnd, sClassName, 32))
-		sClassName[0] = 0;
-  else
-	  sClassName[31] = 0;
-
-  WCHAR wsWindowText[32];
-
-  if(hwnd == 0 || !InternalGetWindowText(hwnd, wsWindowText, 32))
-    sWindowText[0] = 0;
-  else
-  {
-    WideCharToMultiByte(CP_ACP, 0, wsWindowText, -1, sWindowText, 32, NULL, NULL);
-    sWindowText[31] = 0;
-  }
-}*/
-
-
-int SendDebugMessageW_1(HWND hwnd, TSDMState state, int kmn_lineno, wchar_t*file, int line, wchar_t* msg)
-{
-  UNREFERENCED_PARAMETER(hwnd);
-  UNREFERENCED_PARAMETER(state);   // I3569
-  UNREFERENCED_PARAMETER(kmn_lineno);
-
-  Keyman_WriteDebugEventW(file, line, msg);
-
+int SendDebugMessageW_1(wchar_t* file, int line, wchar_t* function, wchar_t* msg) {
+  Keyman_WriteDebugEvent2W(file, line, function, msg);
   return 0;
 }
 
-int SendDebugMessage_1(HWND hwnd, TSDMState state, int kmn_lineno, wchar_t*file, int line, char *msg)
-{
-  UNREFERENCED_PARAMETER(hwnd);
-  UNREFERENCED_PARAMETER(state);   // I3569
-  UNREFERENCED_PARAMETER(kmn_lineno);
-
+int SendDebugMessage_1(wchar_t* file, int line, wchar_t* function, char *msg) {
   // TODO: convert debugging to Unicode
   PWSTR msgW = strtowstr(msg);
-  Keyman_WriteDebugEventW(file, line, msgW);
+  Keyman_WriteDebugEvent2W(file, line, function, msgW);
   delete [] msgW;
-
   return 0;
 }
 
@@ -250,54 +235,25 @@ void DebugMessage(LPMSG msg, WPARAM wParam)  // I2908
 	else
     wsprintf(ds, "%x: %d: wParam: %d, lParam: %X [message flags: %x time: %d]", PtrToInt(msg->hwnd), msg->message, msg->wParam, (unsigned int) msg->lParam, wParam, (int) msg->time);
 
-	SendDebugMessage(msg->hwnd, sdmMessage, 0, ds);
+	SendDebugMessage(ds);
 }
 
-void DebugShift(char *function, char *point)
+void DebugLastError_1(DWORD err, char *context, wchar_t *file, int line, wchar_t *function)
 {
-	BYTE kbd[256];
-	GetKeyboardState(kbd);
-
-	SendDebugMessageFormat(0, sdmKeyboard, 0, "%s - %s Alt: [%x] %x %x Ctrl: [%x] %x %x Shift: %x",
-		function, point,
-		kbd[VK_MENU],
-		kbd[VK_LMENU],
-		kbd[VK_RMENU],
-		kbd[VK_CONTROL],
-		kbd[VK_LCONTROL],
-		kbd[VK_RCONTROL],
-		kbd[VK_SHIFT]);
-}
-
-BOOL DebugSignalPause(BOOL fIsUp)
-{
-  if(ShouldDebug(sdmDebug))
-  {
-    if(fIsUp)
-    {
-      SendDebugMessage_1(NULL, sdmDebug, -1, NULL, 0, NULL); // Signals an event to the controller
-    }
-    return TRUE;
-  }
-  return FALSE;
-}
-
-void DebugLastError_1(DWORD err, char *context, wchar_t *file, int line, char *func)
-{
-  if(ShouldDebug(sdmDebug))
+  if(ShouldDebug())
   {
     char msg[256];
     if (FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ARGUMENT_ARRAY, NULL, err, 0, msg, sizeof(msg), NULL) == 0) msg[0] = 0;
     for (char *p = msg; *p; p++) {
       if (*p == '\r' || *p == '\n') *p = ' ';
     }
-    SendDebugMessageFormat_1(NULL, sdmDebug, 0, file, line, "ERROR %d in %s calling %s: %s", err, func, context, msg);
+    SendDebugMessageFormat_1(file, line, function, "ERROR %d calling %s: %s", err, context, msg);
   }
 }
 
 char *Debug_VirtualKey(WORD vk) {
   __declspec(thread) static char buf[256];
-  if (!ShouldDebug(sdmDebug)) {
+  if (!ShouldDebug()) {
     return "";
   }
 
@@ -311,7 +267,7 @@ char *Debug_VirtualKey(WORD vk) {
 }
 
 char *Debug_UnicodeString(PWSTR s, int x) {
-  if (!ShouldDebug(sdmDebug)) {
+  if (!ShouldDebug()) {
     return "";
   }
   __declspec(thread) static char bufout[2][128 * 7];
@@ -326,18 +282,6 @@ char *Debug_UnicodeString(PWSTR s, int x) {
   return bufout[x];
 }
 
-BOOL DebugAssert_1(BOOL condition, char *message, wchar_t *file, int line)
-{
-  if (!(condition)) {
-    SendDebugMessage_1(0, sdmGlobal, 0, file, line, message);
-    if (IsDebugAssertEnabled()) {
-      assert(condition);
-    }
-    return FALSE;
-  }
-  return TRUE;
-}
-
 #ifdef _DEBUG
 void _OutputThreadDebugString(char *s) {
   char buf[256];
@@ -346,17 +290,16 @@ void _OutputThreadDebugString(char *s) {
 }
 #endif
 
-BOOL IsDebugAssertEnabled()
-{
-#ifdef _DEBUG
-  return IsDebuggerPresent();
-#else
-  return FALSE;
-#endif
-}
-
 void WINAPI Keyman_Diagnostic(int mode) {
   if (mode == 0) {
     RaiseException(0xDEADBEEF, EXCEPTION_NONCONTINUABLE, 0, NULL);
   }
+}
+
+extern "C" void _declspec(dllexport) WINAPI Keyman_SendDebugEntry(PWCHAR file, int line, PWCHAR function) {
+  SendDebugEntry_1(file, line, function);
+}
+
+extern "C" void _declspec(dllexport) WINAPI Keyman_SendDebugExit(PWCHAR file, int line, PWCHAR function) {
+  SendDebugExit_1(file, line, function);
 }
