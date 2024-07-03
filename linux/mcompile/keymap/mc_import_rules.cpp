@@ -26,6 +26,7 @@
 #include "mc_kmxfile.h"
 #include "keymap.h"
 
+/** ToDo _S2 COMMENT NEEDED */
 const int KMX_ShiftStateMap[] = {
     ISVIRTUALKEY,
     ISVIRTUALKEY | K_SHIFTFLAG,
@@ -38,19 +39,27 @@ const int KMX_ShiftStateMap[] = {
     0,
     0};
 
+
+/** ToDo _S2 COMMENT NEEDED */
 DeadKey::DeadKey(KMX_WCHAR deadCharacter) {
   this->m_deadchar = deadCharacter;
 }
 
+
+/** ToDo _S2 COMMENT NEEDED */
 KMX_WCHAR DeadKey::KMX_DeadCharacter() {
   return this->m_deadchar;
 }
 
+
+/** ToDo _S2 COMMENT NEEDED */
 void DeadKey::KMX_AddDeadKeyRow(KMX_WCHAR baseCharacter, KMX_WCHAR combinedCharacter) {
   this->m_rgbasechar.push_back(baseCharacter);
   this->m_rgcombchar.push_back(combinedCharacter);
 }
 
+
+/** ToDo _S2 COMMENT NEEDED */
 bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
   std::vector<KMX_WCHAR>::iterator it;
   for (it = this->m_rgbasechar.begin(); it < m_rgbasechar.end(); it++) {
@@ -61,6 +70,16 @@ bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
   return false;
 }
 
+
+/** ToDo
+   * @brief  a function similar to Window`s ToUnicodeEx() function. Find a keyvalue for given keycode, shiftstate and caps
+   * @param  keycode a key of the currently used keyboard Layout
+   * @param  pwszBuff Buffer to store resulting character
+   * @param  ss_win a windows-style shiftstate of the currently used keyboard Layout
+   * @param  caps state of the caps key of the currently used keyboard Layout
+   * @param  keyboard_layout the currently used (underlying)keyboard Layout
+   * @return -1 if a deadkey was found; 0 if no translation is available; +1 if character was found and written to pwszBuff
+   */
 int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int caps, GdkKeymap* keymap) {
   GdkKeymapKey* maps;
   guint* keyvals;
@@ -93,6 +112,7 @@ int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int
     return 1;
 }
 
+/** ToDo _S2 COMMENT NEEDED */
 KMX_WCHAR KMX_DeadKeyMap(int index, std::vector<DeadKey*>* deadkeys, int deadkeyBase, std::vector<KMX_DeadkeyMapping>* deadkeyMappings) {  // I4327   // I4353
   for (size_t i = 0; i < deadkeyMappings->size(); i++) {
     if ((*deadkeyMappings)[i].deadkey == index) {
@@ -108,6 +128,8 @@ KMX_WCHAR KMX_DeadKeyMap(int index, std::vector<DeadKey*>* deadkeys, int deadkey
   return 0xFFFF;
 }
 
+
+/** ToDo _S2 COMMENT NEEDED */
 class KMX_VirtualKey {
 private:
   UINT m_vk;
@@ -302,6 +324,16 @@ public:
   }
 };
 
+
+/** ToDo
+   * @brief  Collect the key data, translate it to kmx and append to the existing keyboard
+   * @param  kp keyboard
+   * @param  All_Vector Vector that holds the data of the US keyboard and the currently used (underlying) keyboard
+   * @param  keyboard_layout the currently used (underlying)keyboard Layout
+   * @param  FDeadkeys vector of all deadkeys for the currently used (underlying)keyboard Layout
+   * @param  bDeadkeyConversion 1 to convert a deadkey to a character; 0 no conversion
+   * @return true in case of success
+   */
 class KMX_Loader {
 private:
   KMX_BYTE lpKeyStateNull[256];
@@ -330,6 +362,8 @@ public:
   }
 };
 
+
+/** ToDo _S2 COMMENT NEEDED */
 int KMX_GetMaxDeadkeyIndex(KMX_WCHAR* p) {
   int n = 0;
   while (p && *p) {
@@ -340,6 +374,16 @@ int KMX_GetMaxDeadkeyIndex(KMX_WCHAR* p) {
   return n;
 }
 
+
+  /** ToDo
+   * @brief  Collect the key data, translate it to kmx and append to the existing keyboard
+   * @param  kp keyboard
+   * @param  All_Vector Vector that holds the data of the US keyboard and the currently used (underlying) keyboard
+   * @param  keyboard_layout the currently used (underlying)keyboard Layout
+   * @param  FDeadkeys vector of all deadkeys for the currently used (underlying)keyboard Layout
+   * @param  bDeadkeyConversion 1 to convert a deadkey to a character; 0 no conversion
+   * @return true in case of success
+   */
 bool KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, GdkKeymap** keymap, std::vector<KMX_DeadkeyMapping>* FDeadkeys, KMX_BOOL bDeadkeyConversion) {  // I4353   // I4552
   KMX_Loader loader;
 

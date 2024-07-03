@@ -518,7 +518,7 @@ int KMX_get_KeyVal_From_KeyCode(GdkKeymap* keymap, guint keycode, ShiftState ss,
 KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap* keymap, guint keycode, int shift_state_pos);
 
 // fill Deadkey with dk and return CATEGORY
-KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap* keymap, UINT vk_ShiftState, UINT kc_underlying, PKMX_WCHAR deadkey);
+KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap* keymap, guint keycode, int shiftState, PKMX_WCHAR deadkey);
 
 // use Vector to return the Keyval of underlying Keyboard
 KMX_WCHAR KMX_get_KeyValUnderlying_From_KeyValUS(vec_dword_3D& All_Vector, KMX_DWORD VK_underlying);

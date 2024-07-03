@@ -3,11 +3,16 @@
 #include "/usr/include/xcb/xproto.h"
 #include <xkbcommon/xkbcommon.h>
 
-
+/**
+   * @brief  map shiftstate used on windows to a shiftstate suitable for gdk_keymap_translate_keyboard_state() on Linux
+   *            Windows: (Base: 00000000 (0); Shift 00010000 (16); AltGr 00001001 (9); Shift+AltGr 00011001 (25))
+   *            Linux:   (Base: 0;            Shift 2;             ALTGr 2;            Shift+ALTGr 3            )
+   * @param  shiftState    shiftstate used on windows
+   * @return a shiftstate usable for gdk_keymap_translate_keyboard_state() on linux if available
+   *         if shiftState is a windows ShiftState: convert the windows ShiftState (0,16,9,25) to a Linux ShiftState (0,1,2,3) that is then used as "Level" in gdk
+   *         if shiftState is NOT a windows ShiftState (then in_ShiftState is already a Linux shiftstate): return the entered shiftstate
+   */
 int convert_Shiftstate_to_LinuxShiftstate(int shiftState) {
-  // if shiftState is a windows ShiftState: convert the windows ShiftState (0,16,9,25) to a Linux ShiftState (0,1,2,3) that is then used as "Level" in gdk
-  // if shiftState is NOT a windows ShiftState (then in_ShiftState is already a Linux shiftstate): return the entered shiftstate
-
   if (shiftState == 0)                                           return 0;                                           // Win ss 0  -> Lin ss 0
   else if (shiftState == K_SHIFTFLAG)                            return XCB_MOD_MASK_SHIFT;                          // Win ss 16 -> Lin ss 1
   else if (shiftState == (LCTRLFLAG | RALTFLAG))                 return XCB_MOD_MASK_LOCK;                           // Win ss 9  -> Lin ss 2
@@ -15,7 +20,13 @@ int convert_Shiftstate_to_LinuxShiftstate(int shiftState) {
   else                                                           return shiftState;                                  // Lin ss x  -> Lin ss x
 }
 
-
+/**
+   * @brief  check for correct input parameter that will later be used in gdk_keymap_translate_keyboard_state()
+   * @param  gdk_level the currently used shiftstate
+   * @param  count the number of valid group/levels
+   * @param  keycode the code of the key in question
+   * @return true if all parameters are OK; false if not
+   */
 bool ensureValidInputForKeyboardTranslation(int gdk_level, gint count, gint keycode) {
   if (gdk_level >  (int) count)
     return false;
@@ -26,6 +37,8 @@ bool ensureValidInputForKeyboardTranslation(int gdk_level, gint count, gint keyc
   return true;
 }
 
+
+/** ToDo _S2 COMMENT NEEDED */
 KMX_DWORD convertNamesTo_DWORD_Value(std::string tok_str) {
   // more on https://manpages.ubuntu.com/manpages/jammy/man3/keysyms.3tk.html
   std::map<std::string, KMX_DWORD> key_values;
@@ -305,16 +318,22 @@ KMX_DWORD convertNamesTo_DWORD_Value(std::string tok_str) {
   return INVALID_NAME;
 }
 
+
+/**
+   * @brief   create a 3D-Vector containing data of the US keyboard and the currently used (underlying) keyboard :
+   *          all_vector [ US_Keyboard  ]
+   *                            [KeyCode_US        ]
+   *                            [Keyval unshifted  ]
+   *                            [Keyval shifted    ]
+   *                     [Underlying Kbd]
+   *                            [KeyCode_underlying]
+   *                            [Keyval unshifted  ]
+   *                            [Keyval shifted    ]
+   * @param[out]  all_vector Vector that holds the data of the US keyboard as well as the currently used (underlying) keyboard
+   * @param       keymap ptr to currently used (underlying) keymap
+   * @return      0 on success; 1 if data of US keyboard was not written; 2 if data of underlying keyboard was not written
+   */
 int createOneVectorFromBothKeyboards(vec_dword_3D& all_vector, GdkKeymap* keymap) {
-  // create a 3D-Vector which contains data of the English (US) keyboard and the underlying Keyboard:
-  //    all_vector[  US_Keyboard ]
-  //                     [KeyCode_US        ]
-  //                     [Keyval unshifted  ]
-  //                     [Keyval shifted    ]
-  //               [Underlying Kbd]
-  //                     [KeyCode_underlying]
-  //                     [Keyval unshifted  ]
-  //                     [Keyval shifted    ]
 
   // store contents of the English (US) keyboard in all_vector
   if (write_US_ToVector(all_vector)) {
@@ -330,6 +349,13 @@ int createOneVectorFromBothKeyboards(vec_dword_3D& all_vector, GdkKeymap* keymap
   return 0;
 }
 
+
+/**
+   * @brief       write data of the US keyboard into a 3D-Vector which later will contain
+   *              data of the US keyboard and the currently used (underlying) keyboard
+   * @param[out]  vec Vector that holds the data
+   * @return      0 on success; 1 if data of US keyboard was not written;
+   */
 int write_US_ToVector(vec_dword_3D& vec) {
 
   // create 1D-vector of the complete line
@@ -356,6 +382,7 @@ int write_US_ToVector(vec_dword_3D& vec) {
   return 0;
 }
 
+/** ToDo _S2 COMMENT NEEDED */
 bool createCompleteVector_US(vec_string_1D& complete_List) {
   // in the Configuration file we find the appopriate paragraph between "xkb_symbol <text>" and the next xkb_symbol
   // then copy all rows starting with "key <" to a 1D-Vector
@@ -395,6 +422,7 @@ bool createCompleteVector_US(vec_string_1D& complete_List) {
   return 0;
 }
 
+/** ToDo _S2 COMMENT NEEDED */
 int get_keycode_from_keyname(std::string key_name) {
   int out = INVALID_NAME;
 
@@ -503,6 +531,7 @@ int get_keycode_from_keyname(std::string key_name) {
   return out;
 }
 
+/** ToDo _S2 COMMENT NEEDED */
 int split_US_To_3D_Vector(vec_dword_3D& all_US, vec_string_1D completeList) {
   // 1: take the whole line of the 1D-Vector and remove unwanted characters.
   // 2: seperate the name e.g. key<AD06> from the shiftstates
@@ -564,6 +593,13 @@ int split_US_To_3D_Vector(vec_dword_3D& all_US, vec_string_1D completeList) {
   return 0;
 }
 
+
+/**
+   * @brief   create an 2D-Vector with all fields containing INVALID_NAME
+   * @param   dim_rows number of rows in vector
+   * @param   dim_ss   number of columns in vector
+   * @return  the 2D-Vector
+   */
 vec_dword_2D create_empty_2D_Vector(int dim_rows, int dim_ss) {
   vec_dword_1D shifts;
   vec_dword_2D vector_2D;
@@ -578,6 +614,13 @@ vec_dword_2D create_empty_2D_Vector(int dim_rows, int dim_ss) {
   return vector_2D;
 }
 
+
+ /**
+   * @brief       append a 2D-vector containing data of the currently used (underlying) keyboard to the 3D-vector
+   * @param[out]  all_vector 3D-vector that holds the data of the US keyboard and the currently used (underlying) keyboard
+   * @param       keymap ptr to currently used (underlying) keymap
+   * @return      0 on success; 1 if the initialization of the underlying vector failes; 2 if data of less than 2 keyboards is contained in all_vector
+   */
 int append_underlying_ToVector(vec_dword_3D& all_vector, GdkKeymap* keymap) {
   if (all_vector.size() != 1) {
     printf("ERROR: data for US keyboard not correct\n");
@@ -595,7 +638,7 @@ int append_underlying_ToVector(vec_dword_3D& all_vector, GdkKeymap* keymap) {
   all_vector.push_back(underlying_Vector2D);
   if (all_vector.size() < 2) {
     printf("ERROR: creation of 3D-Vector failed\n");
-    return 1;
+    return 2;
   }
 
   for (int i = 0; i < (int)all_vector[1].size(); i++) {
@@ -610,6 +653,14 @@ int append_underlying_ToVector(vec_dword_3D& all_vector, GdkKeymap* keymap) {
   return 0;
 }
 
+
+/**
+   * @brief       create a pointer to the current keymap for later use
+   * @param[out]  keymap*  ptr* to currently used (underlying) keymap
+   * @param       argc count of arguments
+   * @param       argv array of arguments
+   * @return      0 on success; 1 if the display is not found; 2 if the keybmap is not found
+   */
 bool InitializeGDK(GdkKeymap** keymap, int argc, gchar* argv[]) {
   // get keymap of underlying keyboard
 
@@ -630,6 +681,7 @@ bool InitializeGDK(GdkKeymap** keymap, int argc, gchar* argv[]) {
   return 0;
 }
 
+/** ToDo _S2 COMMENT NEEDED */
 bool IsKeymanUsedChar(int KV) {
   //         32            A-Z                      a-z
   if ((KV == 0x20) || (KV >= 65 && KV <= 90) || (KV >= 97 && KV <= 122))
@@ -638,6 +690,7 @@ bool IsKeymanUsedChar(int KV) {
     return false;
 }
 
+/** ToDo _S2 COMMENT NEEDED */
 std::u16string convert_DeadkeyValues_To_U16str(int in) {
   if (in == 0)
     return u"\0";
@@ -660,6 +713,17 @@ std::u16string convert_DeadkeyValues_To_U16str(int in) {
     return u"\0";
 }
 
+
+/**
+   * @brief  return the keyvalue for a given Keycode, shiftstate and caps of the
+   *         currently used (underlying) keyboard layout
+   *         What character will be produced for a keypress of a key and modifiers?
+   * @param  keymap the currently used (underlying) keyboard layout
+   * @param  keycode a key of the currently used keyboard layout
+   * @param  ss a (windows-)shiftstate of the currently used keyboard layout
+   * @param  caps state of the caps key of the currently used keyboard layout
+   * @return the keyval obtained from keycode, shiftstate and caps
+   */
 int KMX_get_KeyVal_From_KeyCode(GdkKeymap* keymap, guint keycode, ShiftState ss, int caps) {
   GdkModifierType consumed;
   GdkKeymapKey* maps;
@@ -751,7 +815,15 @@ int KMX_get_KeyVal_From_KeyCode(GdkKeymap* keymap, guint keycode, ShiftState ss,
   return (int)*keyvals;
 }
 
-KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap* keymap, guint keycode, int shift_state_pos) {
+/**
+   * @brief   return the keyvalue for a given Keycode and shiftstate of the currently used (underlying) keyboard layout.
+   *          What character will be produced for a keypress of a key and modifiers on the underlying keyboard?
+   * @param   keymap the currently used (underlying) keyboard layout
+   * @param   keycode a key of the currently used keyboard
+   * @param   shiftState a shiftstate of the currently used keyboard layout
+   * @return  the keyval obtained from Keycode and shiftstate and caps OR 0xFFFF in case a deadkey was found
+   */
+KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap* keymap, guint keycode, int shiftState) {
   GdkKeymapKey* maps;
   guint* keyvals;
   gint count;
@@ -760,13 +832,13 @@ KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap* keymap, gui
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
 
-  if (!(ensureValidInputForKeyboardTranslation(shift_state_pos, count, keycode))) {
+  if (!(ensureValidInputForKeyboardTranslation(shiftState, count, keycode))) {
     g_free(keyvals);
     g_free(maps);
     return 0;
   }
 
-  kVal = (KMX_DWORD)KMX_get_KeyVal_From_KeyCode(keymap, keycode, (ShiftState)shift_state_pos, 0);
+  kVal = (KMX_DWORD)KMX_get_KeyVal_From_KeyCode(keymap, keycode, (ShiftState)shiftState, 0);
 
   g_free(keyvals);
   g_free(maps);
@@ -774,22 +846,32 @@ KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap* keymap, gui
   return kVal;
 }
 
-KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap* keymap, UINT vk_ShiftState, UINT kc_underlying, PKMX_WCHAR deadkey) {
+
+/**
+   * @brief   return the keyvalue for a given Keycode and shiftstate of the currently used (underlying) keyboard layout. If a deadkey was found return 0xFFFF and copy deadkey into deadKey
+   *          What character will be produced for a keypress of a key and modifiers on the underlying keyboard? 0XFFFF in case of a deadkey?
+   * @param   keymap the currently used (underlying) keyboard layout
+   * @param   shiftState a shiftstate of the currently used keyboard layout
+   * @param   keycode a key of the currently used keyboard
+   * @param   deadKey*  ptr to keyvalue if a deadkey was found; if not NULL
+   * @return  the keyval obtained from Keycode and shiftstate and caps OR 0xFFFF in case a deadkey was found
+   */
+KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap* keymap, guint keycode, int shiftState, PKMX_WCHAR deadkey) {
   GdkKeymapKey* maps;
   guint* keyvals;
   gint count;
   PKMX_WCHAR dky = NULL;
 
-  if (!gdk_keymap_get_entries_for_keycode(keymap, kc_underlying, &maps, &keyvals, &count))
+  if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
 
-  if (!(ensureValidInputForKeyboardTranslation(convert_Shiftstate_to_LinuxShiftstate(vk_ShiftState), count, kc_underlying))) {
+  if (!(ensureValidInputForKeyboardTranslation(convert_Shiftstate_to_LinuxShiftstate(shiftState), count, keycode))) {
     g_free(keyvals);
     g_free(maps);
     return 0;
   }
 
-  KMX_DWORD keyV = KMX_get_KeyVal_From_KeyCode(keymap, kc_underlying, ShiftState(convert_Shiftstate_to_LinuxShiftstate(vk_ShiftState)), 0);
+  KMX_DWORD keyV = KMX_get_KeyVal_From_KeyCode(keymap, keycode, ShiftState(convert_Shiftstate_to_LinuxShiftstate(shiftState)), 0);
 
   g_free(keyvals);
   g_free(maps);
@@ -804,19 +886,38 @@ KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap* keymap, UIN
     return keyV;
 }
 
-KMX_WCHAR KMX_get_KeyValUnderlying_From_KeyValUS(vec_dword_3D& all_vector, KMX_DWORD vk_US) {
+
+/**
+   * @brief   return the keyvalue of a key of the the currently used (underlying) keyboard for a given keyvalue of the US keyboard
+   *          What character is on the same position/shiftstats/caps on the currently used (underlying) keyboard?
+   * @param   all_vector 3D-vector that holds the data of the US keyboard and the currently used (underlying) keyboard
+   * @param   kv_us a keyvalue on the US keyboard
+   * @return  keyval of the underlying keyboard if available; else the keyval of the US keyboard
+   */
+KMX_WCHAR KMX_get_KeyValUnderlying_From_KeyValUS(vec_dword_3D& all_vector, KMX_DWORD kv_us) {
   KMX_DWORD vk_underlying;
   for (int i = 0; i < (int)all_vector[0].size() - 1; i++) {
     for (int j = 1; j < (int)all_vector[0][0].size(); j++) {
-      if ((all_vector[0][i][j] == vk_US)) {
+      if ((all_vector[0][i][j] == kv_us)) {
         vk_underlying = all_vector[1][i][j];
         return vk_underlying;
       }
     }
   }
-  return vk_US;
+  return kv_us;
 }
 
+
+/**
+   * @brief   return the keycode of the currently used (underlying) keyboard for a given keycode of the US keyboard
+   *          Where on a underlying keyboard do we find a character that is on a certain key on a US keyboard?
+   * @param   keymap the currently used (underlying)keyboard layout
+   * @param   all_vector 3D-vector that holds the data of the US keyboard and the currently used (underlying) keyboard
+   * @param   kc_us a key of the US keyboard
+   * @param   ss a windows-type shiftstate
+   * @param   caps state of the caps key
+   * @return  the keycode of the underlying keyboard if found; else the keycode of the US keyboard
+   */
 KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeyCodeUS(GdkKeymap* keymap, vec_dword_3D& all_vector, KMX_DWORD kc_us, ShiftState ss, int caps) {
   KMX_DWORD kc_underlying;
   std::u16string u16str = convert_DeadkeyValues_To_U16str(KMX_get_KeyVal_From_KeyCode(keymap, kc_us, ss, caps));
@@ -832,10 +933,26 @@ KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeyCodeUS(GdkKeymap* keymap, vec_dword_
   return kc_us;
 }
 
+
+/**
+   *
+   * @brief   return the keycode of the currently used (underlying) keyboard for a given virtual key of the US keyboard
+   *          Which keycode of a underlying keyboard will be mapped to a virtuaĺ key of a US keyboard
+   * @param   virtualKeyUS a virtual key of the US keyboard
+   * @return  the keycode of the currently used (underlying) keyboard
+   */
 UINT KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD virtualKeyUS) {
   return (8 + USVirtualKeyToScanCode[virtualKeyUS]);
 }
 
+
+ /**
+   *
+   * @brief   return a virtual key of the US keyboard for a given keycode of the currently used (underlying) keyboard
+   *          Which key of a underlying keyboard will be mapped to a virtual key of a US keyboard
+   * @param   keycode a keycode of the currently used (underlying) keyboard
+   * @return  the virtual key of the US keyboard
+   */
 KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode) {
   if (keycode > 7)
     return (KMX_DWORD)ScanCodeToUSVirtualKey[keycode - 8];
@@ -843,6 +960,7 @@ KMX_DWORD KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode) {
   return 0;
 }
 
+/** ToDo _S2 COMMENT NEEDED */
 std::u16string CodePointToU16String(unsigned int codepoint) {
   std::u16string str;
 
