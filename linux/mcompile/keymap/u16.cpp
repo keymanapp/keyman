@@ -228,12 +228,11 @@ int   u16ncmp(const KMX_WCHAR *p, const KMX_WCHAR *q, size_t count) {
   return 0;
 }
 
-KMX_WCHAR * u16tok(KMX_WCHAR *p,  KMX_WCHAR ch,  KMX_WCHAR **ctx) {
+KMX_WCHAR * u16tok(KMX_WCHAR *p, const KMX_WCHAR ch,  KMX_WCHAR **ctx) {
   if (!p) {
     p = *ctx;
     if (!p) return NULL;
   }
-
   KMX_WCHAR *q = p;
   while (*q && *q != ch) {
     q++;
@@ -247,7 +246,7 @@ KMX_WCHAR * u16tok(KMX_WCHAR *p,  KMX_WCHAR ch,  KMX_WCHAR **ctx) {
   else {
     *ctx = NULL;
   }
-  return p;
+  return *p ? p : NULL;
 }
 
 // _S2 delimiters is array of char ( of size 2)
@@ -264,13 +263,13 @@ KMX_WCHAR * u16tok(KMX_WCHAR* p,  KMX_WCHAR* delimiters, KMX_WCHAR** ctx) {
 	if (*q) {
 		*q = 0;
 		q++;
-		while (u16chr(delimiters, *q)) q++;
+		while (*q && u16chr(delimiters, *q)) q++;
 		*ctx = q;
 	}
 	else {
 		*ctx = NULL;
 	}
-	return p;
+	return *p ? p : NULL;
 }
 
 double u16tof( KMX_WCHAR* str)
