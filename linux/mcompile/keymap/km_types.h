@@ -11,7 +11,6 @@
 #endif
 */
 
-
 #if defined(__LP64__) || defined(_LP64)
 /* 64-bit, g++ */
 #define KMX_64BIT
