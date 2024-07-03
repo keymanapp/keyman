@@ -5,7 +5,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-builder_describe "Keystroke processing engine (32 bit)" \
+builder_describe "Keystroke processing engine" \
   @/common/include \
   @/core \
   clean configure build test publish install \
