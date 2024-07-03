@@ -25,6 +25,8 @@ std::vector<std::u16string> convert_argvW_to_Vector_u16str(int argc, wchar_t* ar
   return vector_u16;
 }
 
+// ToDo codecvt needs to be replaced !!
+
 //String <- wstring
 std::string string_from_wstring(std::wstring const str) {
 	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
@@ -96,7 +98,6 @@ long int u16tol(const KMX_WCHAR* str, KMX_WCHAR** endptr, int base)
   auto s = string_from_u16string(str);
   char* t;
   size_t idx;
- // long int result = strtol(s.c_str(), &t, base);
   long int result = stol(s, &idx, base);
   if (endptr != nullptr) *endptr = (KMX_WCHAR*)str + (t - s.c_str());
   return result;
@@ -135,10 +136,7 @@ KMX_CHAR* strrchr_slash(KMX_CHAR* Name)
 */
 // u16rchr returns last occurence of ch in p; It returns '\0'  if ch == '\0' and NULL if ch is not found
 const KMX_WCHAR* u16rchr(const KMX_WCHAR* p, KMX_WCHAR ch) {
-  /*const KMX_WCHAR* p_end = p + u16len(p) - 1;
-
-	if (ch == '\0')	return p_end + 1; */
-  const KMX_WCHAR* p_end = p + u16len(p);
+   const KMX_WCHAR* p_end = p + u16len(p);
 
 	while (p_end >= p) {
 		if (*p_end == ch) return p_end;
