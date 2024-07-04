@@ -12,15 +12,31 @@ int convert_Shiftstate_to_LinuxShiftstate(int shiftState) {
   else if (shiftState == K_SHIFTFLAG)                            return XCB_MOD_MASK_SHIFT;                          // Win ss 16 -> Lin ss 1
   else if (shiftState == (LCTRLFLAG | RALTFLAG))                 return XCB_MOD_MASK_LOCK;                           // Win ss 9  -> Lin ss 2
   else if (shiftState == (K_SHIFTFLAG | LCTRLFLAG | RALTFLAG))   return (XCB_MOD_MASK_SHIFT | XCB_MOD_MASK_LOCK);    // Win ss 25 -> Lin ss 3
-  else                                                           return shiftState;                                  // Lin ss x  -> Lin ss x
+  else return shiftState;                                                                                            // Lin ss x  -> Lin ss x
 }
 
+int convert_rgkey_Shiftstate_to_LinuxShiftstate(ShiftState shiftState) {
+  // if shiftState is a rgkey ShiftState: convert the rgkey ShiftState (0,1,6,7) to a Linux ShiftState (0,1,2,3) that is then used as "Level" in gdk
+  // if shiftState is NOT a rgkey ShiftState (then in_ShiftState is already a Linux shiftstate): return the entered shiftstate
 
-bool ensureValidInputForKeyboardTranslation(int gdk_level, gint count, gint keycode) {
-  if (gdk_level >  (int) count)
+  if (shiftState == Base)                return 0;                                           // rgkey ss 0  -> Lin ss 0
+  else if (shiftState == Shft)           return XCB_MOD_MASK_SHIFT;                          // rgkey ss 1  -> Lin ss 1
+  else if (shiftState == MenuCtrl)       return XCB_MOD_MASK_LOCK;                           // rgkey ss 6  -> Lin ss 2
+  else if (shiftState == ShftMenuCtrl)   return (XCB_MOD_MASK_SHIFT | XCB_MOD_MASK_LOCK);    // rgkey ss 7  -> Lin ss 3
+  else return shiftState;                                                                    // Lin   ss x  -> Lin ss x
+}
+
+bool ensureValidInputForKeyboardTranslation(int shiftstate, gint keycode) {
+
+  // We're dealing with shiftstates 0,1,2,3
+  if (shiftstate < 0 || shiftstate > 3)
     return false;
 
-  if ((int) keycode > (int)keycode_max)
+  // For K_Space (keycode = 65) only Base and Shift are allowed
+  if (keycode == 65 && shiftstate > 1)
+    return false;
+
+  if (keycode > keycode_max)
     return false;
 
   return true;
@@ -344,15 +360,16 @@ int write_US_ToVector(vec_dword_3D& vec) {
     return 1;
   }
 
+  if (vector_completeUS.size() < 2) {
+    printf("ERROR: several keys of the US keyboard are not processed \n");
+    return 1;
+  }
+
   if (vector_completeUS.size() != 48) {
     printf("WARNING: the wrong keyboard input might have been chosen.\n");
     return 0;
   }
 
-  if (vector_completeUS.size() < 2) {
-    printf("ERROR: several keys of the US keyboard are not processed \n");
-    return 1;
-  }
   return 0;
 }
 
@@ -603,8 +620,8 @@ int append_underlying_ToVector(vec_dword_3D& all_vector, GdkKeymap* keymap) {
     all_vector[1][i][0] = all_vector[0][i][0];
 
     // get Keyvals of this key and copy to unshifted/shifted in "underlying"-block[1][i][1] / block[1][i][2]
-    all_vector[1][i][0 + 1] = KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(keymap, all_vector[0][i][0], 0);  // shift state: unshifted:0
-    all_vector[1][i][1 + 1] = KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(keymap, all_vector[0][i][0], 1);  // shift state: shifted:1
+    all_vector[1][i][0 + 1] = KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(keymap, all_vector[0][i][0], convert_rgkey_Shiftstate_to_LinuxShiftstate(ShiftState::Base));  // shift state: unshifted:0
+    all_vector[1][i][1 + 1] = KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(keymap, all_vector[0][i][0], convert_rgkey_Shiftstate_to_LinuxShiftstate(ShiftState::Shft));  // shift state: shifted:1
   }
 
   return 0;
@@ -665,11 +682,10 @@ int KMX_get_KeyVal_From_KeyCode(GdkKeymap* keymap, guint keycode, ShiftState ss,
   GdkKeymapKey* maps;
   guint* keyvals;
   gint count;
-
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
 
-  if (!(ensureValidInputForKeyboardTranslation(convert_Shiftstate_to_LinuxShiftstate(ss), count, keycode))) {
+  if (!(ensureValidInputForKeyboardTranslation(convert_rgkey_Shiftstate_to_LinuxShiftstate(ss), keycode))) {
     g_free(keyvals);
     g_free(maps);
     return 0;
@@ -760,7 +776,7 @@ KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap* keymap, gui
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
 
-  if (!(ensureValidInputForKeyboardTranslation(shift_state_pos, count, keycode))) {
+  if (!(ensureValidInputForKeyboardTranslation(shift_state_pos, keycode))) {
     g_free(keyvals);
     g_free(maps);
     return 0;
@@ -783,7 +799,7 @@ KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap* keymap, UIN
   if (!gdk_keymap_get_entries_for_keycode(keymap, kc_underlying, &maps, &keyvals, &count))
     return 0;
 
-  if (!(ensureValidInputForKeyboardTranslation(convert_Shiftstate_to_LinuxShiftstate(vk_ShiftState), count, kc_underlying))) {
+  if (!(ensureValidInputForKeyboardTranslation(convert_Shiftstate_to_LinuxShiftstate(vk_ShiftState), kc_underlying))) {
     g_free(keyvals);
     g_free(maps);
     return 0;

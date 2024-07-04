@@ -61,7 +61,7 @@ bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
   return false;
 }
 
-int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int caps, GdkKeymap* keymap) {
+int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, ShiftState rgkey_ss, int caps, GdkKeymap* keymap) {
   GdkKeymapKey* maps;
   guint* keyvals;
   gint count;
@@ -69,13 +69,13 @@ int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
 
-  if (!(ensureValidInputForKeyboardTranslation(shift_state_pos, count, keycode))){
+  if (!(ensureValidInputForKeyboardTranslation(convert_rgkey_Shiftstate_to_LinuxShiftstate(rgkey_ss), keycode))){
     g_free(keyvals);
     g_free(maps);
     return 0;
   }
 
-  KMX_DWORD keyVal = (KMX_DWORD)KMX_get_KeyVal_From_KeyCode(keymap, keycode, ShiftState(shift_state_pos), caps);
+  KMX_DWORD keyVal = (KMX_DWORD)KMX_get_KeyVal_From_KeyCode(keymap, keycode, ShiftState(rgkey_ss), caps);
   std::u16string str = convert_DeadkeyValues_To_U16str(keyVal);
   pwszBuff[0] = *(PKMX_WCHAR)str.c_str();
 
