@@ -13,7 +13,6 @@ cpp_files = files(
     'keymap.cpp',
     'deadkey.cpp',
     'mcompile.cpp',
-    'filesystem.cpp',
     'mc_kmxfile.cpp',
     'mc_import_rules.cpp',
     'u16.cpp',)
