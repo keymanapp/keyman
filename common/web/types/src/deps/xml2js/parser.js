@@ -323,7 +323,11 @@ export class Parser extends EventEmitter {
       } catch (error1) {
         err = error1;
         if (!(this.saxParser.errThrown || this.saxParser.ended)) {
-          this.emit('error', err);
+          if(this.listenerCount('error') > 0) {
+            this.emit('error', err);
+          } else {
+            throw err;
+          }
           return this.saxParser.errThrown = true;
         } else if (this.saxParser.ended) {
           throw err;
