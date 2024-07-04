@@ -63,7 +63,7 @@ typedef std::vector<std::vector<KMX_DWORD> > vec_dword_2D;
 typedef std::vector<std::vector<std::vector<KMX_DWORD> > > vec_dword_3D;
 
 static KMX_DWORD INVALID_NAME = 0;
-static KMX_DWORD keycode_max  = 94;
+static gint keycode_max  = 94;
 static KMX_DWORD deadkey_min  = 0xfe50;  // X11's keysymdef.h defines deadkeys between 0xfe50-0xfe93
 static KMX_DWORD deadkey_max  = 0xfe93;  // https://fossies.org/linux/tk/xlib/X11/keysymdef.h
 
@@ -73,10 +73,11 @@ inline bool isLittleEndianSystem() {
 }
 
 // map Shiftstate to modifier (e.g. 0->0; 16-1; 9->2; 25->3)
-int convert_WinShiftstate_to_LinuxShiftstate(int VKShiftState);
+int convert_Shiftstate_to_LinuxShiftstate(int VKShiftState);
+int convert_rgkey_Shiftstate_to_LinuxShiftstate(ShiftState shiftState);
 
 // check if input is correct
-bool ensureValidInputForKeyboardTranslation(int shiftstate, int count, int keycode);
+bool ensureValidInputForKeyboardTranslation(int shiftstate, gint keycode);
 
 // take a std::string (=contents of line symbols-file ) and returns the (int) value of the character
 KMX_DWORD convertNamesTo_DWORD_Value(std::string tok_str);
@@ -85,10 +86,10 @@ KMX_DWORD convertNamesTo_DWORD_Value(std::string tok_str);
 int createOneVectorFromBothKeyboards(vec_dword_3D& All_Vector, GdkKeymap* keymap);
 
 // read configuration file, split and write to 3D-Vector (Data for US on Vector[0][ ][ ]  )
-int write_US_ToVector(vec_dword_3D& vec, std::string language, const char* text);
+int write_US_ToVector(vec_dword_3D& vec);
 
 // 1. step: read complete Row of Configuration file US
-bool createCompleteVector_US(std::string fullPathName, const char* section, vec_string_1D& complete_List) ;
+bool createCompleteVector_US(vec_string_1D& complete_List) ;
 
 // replace Name of Key (e.g. <AD06>)  wih Keycode ( e.g. 15 )
 int replace_KeyName_with_Keycode(std::string in);

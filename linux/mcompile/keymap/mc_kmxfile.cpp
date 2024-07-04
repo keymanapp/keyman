@@ -358,7 +358,7 @@ LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFil
 
 #endif
 
-KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
+KMX_BOOL KMX_LoadKeyboard(KMX_CHAR* fileName, LPKMX_KEYBOARD* lpKeyboard) {
 
   *lpKeyboard = NULL;
   PKMX_BYTE buf;
@@ -371,7 +371,7 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
     return FALSE;
   }
 
-  fp = Open_File((const KMX_WCHAR*)fileName, u"rb");
+  fp = Open_File((const KMX_CHAR*)fileName, "rb");
 
   if(fp == NULL) {
     KMX_LogError(L"Could not open file\n" );
@@ -523,3 +523,32 @@ PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p) {
   }
   return p;
 }
+
+
+FILE* Open_File(const KMX_CHAR* Filename, const KMX_CHAR* mode) {
+#ifdef _MSC_VER
+  std::string cpath = Filename; //, cmode = mode;
+  std::replace(cpath.begin(), cpath.end(), '/', '\\');
+  return fopen(cpath.c_str(), (const KMX_CHAR*) mode);
+#else
+  return fopen(Filename, mode);
+  std::string cpath, cmode;
+  cpath = (const KMX_CHAR*) Filename;
+  cmode = (const KMX_CHAR*) mode;
+  return fopen(cpath.c_str(), cmode.c_str());
+#endif
+};
+
+FILE* Open_File(const KMX_WCHAR* Filename, const KMX_WCHAR* mode) {
+#ifdef _MSC_VER
+  std::wstring cpath = convert_pchar16T_To_wstr((KMX_WCHAR*) Filename);
+  std::wstring cmode = convert_pchar16T_To_wstr((KMX_WCHAR*) mode);
+  std::replace(cpath.begin(), cpath.end(), '/', '\\');
+  return _wfsopen(cpath.c_str(), cmode.c_str(), _SH_DENYWR);
+#else
+  std::string cpath, cmode;
+  cpath = string_from_u16string(Filename);
+  cmode = string_from_u16string(mode);
+  return fopen(cpath.c_str(), cmode.c_str());
+#endif
+};

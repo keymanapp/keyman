@@ -4,24 +4,39 @@
 #include <xkbcommon/xkbcommon.h>
 
 
-int convert_WinShiftstate_to_LinuxShiftstate(int win_ShiftState) {
-  if (win_ShiftState == 0)
-    return 0;
-  else if (win_ShiftState == K_SHIFTFLAG)
-    return XCB_MOD_MASK_SHIFT;
-  else if (win_ShiftState == (LCTRLFLAG | RALTFLAG))
-    return XCB_MOD_MASK_LOCK;
-  else if (win_ShiftState == (K_SHIFTFLAG | LCTRLFLAG | RALTFLAG))
-    return (XCB_MOD_MASK_SHIFT | XCB_MOD_MASK_LOCK);
-  else
-    return win_ShiftState;
+int convert_Shiftstate_to_LinuxShiftstate(int shiftState) {
+  // if shiftState is a windows ShiftState: convert the windows ShiftState (0,16,9,25) to a Linux ShiftState (0,1,2,3) that is then used as "Level" in gdk
+  // if shiftState is NOT a windows ShiftState (then in_ShiftState is already a Linux shiftstate): return the entered shiftstate
+
+  if (shiftState == 0)                                           return 0;                                           // Win ss 0  -> Lin ss 0
+  else if (shiftState == K_SHIFTFLAG)                            return XCB_MOD_MASK_SHIFT;                          // Win ss 16 -> Lin ss 1
+  else if (shiftState == (LCTRLFLAG | RALTFLAG))                 return XCB_MOD_MASK_LOCK;                           // Win ss 9  -> Lin ss 2
+  else if (shiftState == (K_SHIFTFLAG | LCTRLFLAG | RALTFLAG))   return (XCB_MOD_MASK_SHIFT | XCB_MOD_MASK_LOCK);    // Win ss 25 -> Lin ss 3
+  else return shiftState;                                                                                            // Lin ss x  -> Lin ss x
 }
 
-bool ensureValidInputForKeyboardTranslation(int shiftstate, int count, int keycode) {
-  if (shiftstate > count)
+int convert_rgkey_Shiftstate_to_LinuxShiftstate(ShiftState shiftState) {
+  // if shiftState is a rgkey ShiftState: convert the rgkey ShiftState (0,1,6,7) to a Linux ShiftState (0,1,2,3) that is then used as "Level" in gdk
+  // if shiftState is NOT a rgkey ShiftState (then in_ShiftState is already a Linux shiftstate): return the entered shiftstate
+
+  if (shiftState == Base)                return 0;                                           // rgkey ss 0  -> Lin ss 0
+  else if (shiftState == Shft)           return XCB_MOD_MASK_SHIFT;                          // rgkey ss 1  -> Lin ss 1
+  else if (shiftState == MenuCtrl)       return XCB_MOD_MASK_LOCK;                           // rgkey ss 6  -> Lin ss 2
+  else if (shiftState == ShftMenuCtrl)   return (XCB_MOD_MASK_SHIFT | XCB_MOD_MASK_LOCK);    // rgkey ss 7  -> Lin ss 3
+  else return shiftState;                                                                    // Lin   ss x  -> Lin ss x
+}
+
+bool ensureValidInputForKeyboardTranslation(int shiftstate, gint keycode) {
+
+  // We're dealing with shiftstates 0,1,2,3
+  if (shiftstate < 0 || shiftstate > 3)
     return false;
 
-  if (keycode > (int)keycode_max)
+  // For K_Space (keycode = 65) only Base and Shift are allowed
+  if (keycode == 65 && shiftstate > 1)
+    return false;
+
+  if (keycode > keycode_max)
     return false;
 
   return true;
@@ -307,7 +322,7 @@ KMX_DWORD convertNamesTo_DWORD_Value(std::string tok_str) {
 }
 
 int createOneVectorFromBothKeyboards(vec_dword_3D& all_vector, GdkKeymap* keymap) {
-  // create a 3D-Vector which contains data of the US keyboard and the underlying Keyboard:
+  // create a 3D-Vector which contains data of the English (US) keyboard and the underlying Keyboard:
   //    all_vector[  US_Keyboard ]
   //                     [KeyCode_US        ]
   //                     [Keyval unshifted  ]
@@ -317,12 +332,13 @@ int createOneVectorFromBothKeyboards(vec_dword_3D& all_vector, GdkKeymap* keymap
   //                     [Keyval unshifted  ]
   //                     [Keyval shifted    ]
 
-  if (write_US_ToVector(all_vector, "us", "xkb_symbols \"basic\"")) {
+  // store contents of the English (US) keyboard in all_vector
+  if (write_US_ToVector(all_vector)) {
     printf("ERROR: can't write US to Vector \n");
     return 1;
   }
 
-  // add contents of other keyboard to all_vector
+  // add contents of underlying keyboard to all_vector
   if (append_underlying_ToVector(all_vector, keymap)) {
     printf("ERROR: can't append underlying ToVector \n");
     return 2;
@@ -330,20 +346,12 @@ int createOneVectorFromBothKeyboards(vec_dword_3D& all_vector, GdkKeymap* keymap
   return 0;
 }
 
-int write_US_ToVector(vec_dword_3D& vec, std::string language, const char* section) {
-  std::string fullPathName = "/usr/share/X11/xkb/symbols/" + language;
-  const char* path = fullPathName.c_str();
-  FILE* fp         = fopen((path), "r");
-
-  if (!fp) {
-    printf("ERROR: could not open file!\n");
-    return 1;
-  }
+int write_US_ToVector(vec_dword_3D& vec) {
 
   // create 1D-vector of the complete line
   vec_string_1D vector_completeUS;
-  if (createCompleteVector_US(fullPathName, section, vector_completeUS)) {
-    printf("ERROR: can't Create complete row US \n");
+  if (createCompleteVector_US(vector_completeUS)) {
+    printf("ERROR: can't create complete row US \n");
     return 1;
   }
 
@@ -352,45 +360,55 @@ int write_US_ToVector(vec_dword_3D& vec, std::string language, const char* secti
     return 1;
   }
 
-  fclose(fp);
+  if (vector_completeUS.size() < 2) {
+    printf("ERROR: several keys of the US keyboard are not processed \n");
+    return 1;
+  }
+
+  if (vector_completeUS.size() != 48) {
+    printf("WARNING: the wrong keyboard input might have been chosen.\n");
+    return 0;
+  }
+
   return 0;
 }
 
-bool createCompleteVector_US(std::string fullPathName, const char* section, vec_string_1D& complete_List) {
+bool createCompleteVector_US(vec_string_1D& complete_List) {
   // in the Configuration file we find the appopriate paragraph between "xkb_symbol <text>" and the next xkb_symbol
   // then copy all rows starting with "key <" to a 1D-Vector
 
   bool create_row = false;
   const char* key = "key <";
   std::string line;
-  std::string str_us_kbd_name(section);
+  std::string str_us_kbd_name("xkb_symbols \"basic\"");
   std::string xbk_mark = "xkb_symbol";
-  std::ifstream inputFile(fullPathName);
+  std::ifstream inputFile("/usr/share/X11/xkb/symbols/us");
 
-  if (inputFile.is_open()) {
+  if (!inputFile.is_open()) {
+    printf("ERROR: could not open file!\n");
+    return 1;
+  }
+
+  else {
     while (getline(inputFile, line)) {
-      std::string str_buf(line);
 
       // stop when finding the mark xkb_symbol
-      if (std::string(str_buf).find(xbk_mark) != std::string::npos)
+      if (line.find(xbk_mark) != std::string::npos)
         create_row = false;
 
       // start when finding the mark xkb_symbol + correct layout
-      if (std::string(str_buf).find(str_us_kbd_name) != std::string::npos)
+      if (line.find(str_us_kbd_name) != std::string::npos)
         create_row = true;
 
       // as long as we are in the same xkb_symbol layout block and find "key <" we push the whole line into a 1D-vector
-      else if (create_row && (std::string(str_buf).find(key) != std::string::npos)) {
+      else if (create_row && (line.find(key) != std::string::npos)) {
         complete_List.push_back(line);
       }
     }
   }
   complete_List.push_back("    key <SPCE>  { [ space,        space] };");
 
-  if (complete_List.size() < 1) {
-    printf("ERROR: can't create row from US \n");
-    return 1;
-  }
+  inputFile.close();
   return 0;
 }
 
@@ -567,9 +585,9 @@ vec_dword_2D create_empty_2D_Vector(int dim_rows, int dim_ss) {
   vec_dword_1D shifts;
   vec_dword_2D vector_2D;
 
-    for (int j = 0; j < dim_ss; j++) {
-      shifts.push_back(INVALID_NAME);
-    }
+  for (int j = 0; j < dim_ss; j++) {
+    shifts.push_back(INVALID_NAME);
+  }
 
   for (int i = 0; i < dim_rows; i++) {
     vector_2D.push_back(shifts);
@@ -590,8 +608,8 @@ int append_underlying_ToVector(vec_dword_3D& all_vector, GdkKeymap* keymap) {
     printf("ERROR: can't create empty 2D-Vector\n");
     return 1;
   }
-  all_vector.push_back(underlying_Vector2D);
 
+  all_vector.push_back(underlying_Vector2D);
   if (all_vector.size() < 2) {
     printf("ERROR: creation of 3D-Vector failed\n");
     return 1;
@@ -602,10 +620,8 @@ int append_underlying_ToVector(vec_dword_3D& all_vector, GdkKeymap* keymap) {
     all_vector[1][i][0] = all_vector[0][i][0];
 
     // get Keyvals of this key and copy to unshifted/shifted in "underlying"-block[1][i][1] / block[1][i][2]
-    all_vector[1][i][0 + 1] =
-        KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(keymap, all_vector[0][i][0], 0);  // shift state: unshifted:0
-    all_vector[1][i][1 + 1] =
-        KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(keymap, all_vector[0][i][0], 1);  // shift state: shifted:1
+    all_vector[1][i][0 + 1] = KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(keymap, all_vector[0][i][0], convert_rgkey_Shiftstate_to_LinuxShiftstate(ShiftState::Base));  // shift state: unshifted:0
+    all_vector[1][i][1 + 1] = KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(keymap, all_vector[0][i][0], convert_rgkey_Shiftstate_to_LinuxShiftstate(ShiftState::Shft));  // shift state: shifted:1
   }
 
   return 0;
@@ -627,6 +643,7 @@ bool InitializeGDK(GdkKeymap** keymap, int argc, gchar* argv[]) {
     gdk_display_close(display);
     return 2;
   }
+  // intentionally leaking `display` in order to still be able to access `keymap`
   return 0;
 }
 
@@ -665,11 +682,10 @@ int KMX_get_KeyVal_From_KeyCode(GdkKeymap* keymap, guint keycode, ShiftState ss,
   GdkKeymapKey* maps;
   guint* keyvals;
   gint count;
-
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
 
-  if (!(ensureValidInputForKeyboardTranslation(convert_WinShiftstate_to_LinuxShiftstate(ss), (int)count, (int)keycode))) {
+  if (!(ensureValidInputForKeyboardTranslation(convert_rgkey_Shiftstate_to_LinuxShiftstate(ss), keycode))) {
     g_free(keyvals);
     g_free(maps);
     return 0;
@@ -760,7 +776,7 @@ KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap* keymap, gui
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
 
-  if (!(ensureValidInputForKeyboardTranslation(shift_state_pos, (int)count, (int)keycode))) {
+  if (!(ensureValidInputForKeyboardTranslation(shift_state_pos, keycode))) {
     g_free(keyvals);
     g_free(maps);
     return 0;
@@ -783,14 +799,13 @@ KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap* keymap, UIN
   if (!gdk_keymap_get_entries_for_keycode(keymap, kc_underlying, &maps, &keyvals, &count))
     return 0;
 
-  if (!(ensureValidInputForKeyboardTranslation(
-    convert_WinShiftstate_to_LinuxShiftstate(vk_ShiftState), (int)count, (int)kc_underlying))) {
+  if (!(ensureValidInputForKeyboardTranslation(convert_Shiftstate_to_LinuxShiftstate(vk_ShiftState), kc_underlying))) {
     g_free(keyvals);
     g_free(maps);
     return 0;
   }
 
-  KMX_DWORD keyV = KMX_get_KeyVal_From_KeyCode(keymap, kc_underlying, ShiftState(convert_WinShiftstate_to_LinuxShiftstate(vk_ShiftState)), 0);
+  KMX_DWORD keyV = KMX_get_KeyVal_From_KeyCode(keymap, kc_underlying, ShiftState(convert_Shiftstate_to_LinuxShiftstate(vk_ShiftState)), 0);
 
   g_free(keyvals);
   g_free(maps);
