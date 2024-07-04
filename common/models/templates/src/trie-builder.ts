@@ -20,7 +20,7 @@ function createRootNode(): Node {
  * @param index the index in the key and also the trie depth. Should be set to
  *              zero when adding onto the root node of the trie.
  */
-export function addUnsorted(node: Node, entry: Entry, index: number = 0) {
+function addUnsorted(node: Node, entry: Entry, index: number = 0) {
   // Each node stores the MAXIMUM weight out of all of its decesdents, to
   // enable a greedy search through the trie.
   node.weight = Math.max(node.weight, entry.weight);
@@ -145,11 +145,29 @@ export class TrieBuilder extends Trie {
     this.totalWeight = 0;
   }
 
+  addEntry(word: string, weight?: number) {
+    weight = (isNaN(weight ?? NaN) || !weight) ? 1 : weight;
+    this.totalWeight += weight;
+
+    addUnsorted(
+      this.root, {
+        key: this.toKey(word),
+        content: word,
+        weight: weight
+      },
+      0
+    );
+  }
+
   sort() {
     sortTrie(this.root);
   }
 
   getRoot(): Node {
     return this.root;
+  }
+
+  getTotalWeight(): number {
+    return this.totalWeight;
   }
 }
