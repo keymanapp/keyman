@@ -74,7 +74,7 @@ inline bool isLittleEndianSystem() {
 
 // map Shiftstate to modifier (e.g. 0->0; 16-1; 9->2; 25->3)
 int convert_Shiftstate_to_LinuxShiftstate(int VKShiftState);
-int convert_rgkey_Shiftstate_to_LinuxShiftstate(int shiftState);
+int convert_rgkey_Shiftstate_to_LinuxShiftstate(ShiftState shiftState);
 
 // check if input is correct
 bool ensureValidInputForKeyboardTranslation(int shiftstate, gint keycode);
