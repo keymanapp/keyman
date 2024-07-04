@@ -19,7 +19,7 @@
        "foo": "gosh ./foo.sh ..."
      }
 
- For example, in common/web/utils/package.json, npm run build is defined as:
+ For example, in web/src/engine/common/utils/package.json, npm run build is defined as:
 
      "build": "gosh ./build.sh -skip-package-install"
 

@@ -18,7 +18,6 @@
     { "path": "./common/web/recorder/tsconfig.json" },
     { "path": "./common/web/sentry-manager/src/tsconfig.json" },
     { "path": "./common/web/types/" },
-    { "path": "./common/web/utils/tsconfig.json" },
 
     { "path": "./developer/src/common/web/test-helpers/tsconfig.json" },
     { "path": "./developer/src/common/web/utils/tsconfig.json" },
@@ -45,6 +44,7 @@
     { "path": "./resources/build/version/" },
 
     { "path": "./web/src/tsconfig.all.json" },
+    { "path": "./web/src/engine/common/utils/tsconfig.json" },
     // { "path": "./web/tools/recorder/tsconfig.json" },
     // { "path": "./web/tools/sourcemap-root/tsconfig.json" },
   ]

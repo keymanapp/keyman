@@ -12,6 +12,11 @@
       "types": "./build/engine/attachment/obj/index.d.ts",
       "import": "./build/engine/attachment/obj/index.js"
     },
+    "./engine/common/utils": {
+      "es6-bundling": "./src/engine/common/utils/src/index.ts",
+      "types": "./build/engine/common/utils/obj/index.d.ts",
+      "import": "./build/engine/common/utils/obj/index.js"
+    },
     "./engine/paths": {
       "es6-bundling": "./src/engine/paths/src/index.ts",
       "types": "./build/engine/paths/obj/index.d.ts",
@@ -105,7 +110,6 @@
     "@keymanapp/lexical-model-layer": "*",
     "@keymanapp/models-types": "*",
     "@keymanapp/recorder-core": "*",
-    "@keymanapp/web-utils": "*",
     "core-js": "^3.34.0",
     "eventemitter3": "^5.0.0",
     "tslib": "^2.5.2"

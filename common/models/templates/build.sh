@@ -16,7 +16,7 @@ builder_describe "Builds the predictive-text model template implementation modul
   "@/common/web/keyman-version" \
   "@/common/web/es-bundling" \
   "@/common/models/wordbreakers" \
-  "@/common/web/utils" \
+  "@/web/src/engine/common/utils" \
   "clean" \
   "configure" \
   "build" \

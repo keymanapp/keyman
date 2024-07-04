@@ -1,5 +1,5 @@
 {
-  "extends": "../tsconfig.kmw-main-base.json",
+  "extends": "../../../../tsconfig.base.json",
   "compilerOptions": {
     "tsBuildInfoFile": "./build/obj/tsconfig.tsbuildinfo",
     "baseUrl": "./",
