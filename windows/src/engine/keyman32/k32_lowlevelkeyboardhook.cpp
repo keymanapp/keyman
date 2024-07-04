@@ -26,9 +26,7 @@
 #include "serialkeyeventserver.h"
 #include "kbd.h"	/* DDK kbdlayout */
 
-#ifdef _WIN64
-#error k32_lowlevelkeyboardhook.cpp is not required for win64.
-#endif
+#ifndef _WIN64
 
 BOOL ProcessHotkey(UINT vkCode, BOOL isUp, DWORD ShiftState);
 
@@ -334,3 +332,5 @@ BOOL ProcessHotkey(UINT vkCode, BOOL isUp, DWORD ShiftState) {
 
   return TRUE;
 }
+
+#endif

@@ -31,7 +31,10 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch.h"
-#include "kbd.h"	/* DDK kbdlayout */
+
+#ifndef _WIN64
+
+#include "kbd.h"	/* DDK kbdlayout */ 
 
 //#pragma warning ( disable : 4200 )
 
@@ -221,3 +224,5 @@ BOOL IsWow64()
   fStored = TRUE;
   return bIsWow64;
 }
+
+#endif

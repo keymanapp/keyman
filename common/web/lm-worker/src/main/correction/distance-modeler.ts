@@ -1,4 +1,5 @@
-import { Comparator, isHighSurrogate, SENTINEL_CODE_UNIT, PriorityQueue } from '@keymanapp/models-templates';
+import { isHighSurrogate, SENTINEL_CODE_UNIT } from '@keymanapp/models-templates';
+import { QueueComparator as Comparator, PriorityQueue } from '@keymanapp/web-utils';
 
 import { ClassicalDistanceCalculation, EditToken } from './classical-calculation.js';
 import { ExecutionTimer, STANDARD_TIME_BETWEEN_DEFERS } from './execution-timer.js';

@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.67 alpha 2024-07-03
+
+* refactor(common/models): move TS priority-queue implementation to web-utils (#11867)
+
 ## 18.0.66 alpha 2024-07-02
 
 * fix(developer): handle second parameter of index correctly in kmcmplib compiler (#11815)

@@ -16,7 +16,7 @@
 
 # These files are generated during build
 engine/keyman32/KEYMAN32.res
-engine/keyman64/Keyman64.res
+engine/keyman32/Keyman64.res
 engine/keymanx64/keymanx64.res
 engine/mcompile/Release/
 tds_file.txt
