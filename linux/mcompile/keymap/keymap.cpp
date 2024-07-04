@@ -12,12 +12,18 @@ int convert_Shiftstate_to_LinuxShiftstate(int shiftState) {
   else if (shiftState == K_SHIFTFLAG)                            return XCB_MOD_MASK_SHIFT;                          // Win ss 16 -> Lin ss 1
   else if (shiftState == (LCTRLFLAG | RALTFLAG))                 return XCB_MOD_MASK_LOCK;                           // Win ss 9  -> Lin ss 2
   else if (shiftState == (K_SHIFTFLAG | LCTRLFLAG | RALTFLAG))   return (XCB_MOD_MASK_SHIFT | XCB_MOD_MASK_LOCK);    // Win ss 25 -> Lin ss 3
-  else                                                           return shiftState;                                  // Lin ss x  -> Lin ss x
+  else return shiftState;                                                                                            // Lin ss x  -> Lin ss x
 }
 
 
-bool ensureValidInputForKeyboardTranslation(int gdk_level, gint count, gint keycode) {
-  if (gdk_level >  (int) count)
+bool ensureValidInputForKeyboardTranslation(int shiftstate, gint count, gint keycode) {
+
+  // We're dealing with shiftstates 0,1,2,3 or shiftstates 0,1,6,7
+  if (shiftstate < 0 || shiftstate > 7)
+    return false;
+
+  // For K_Space (keycode = 65) only Base and Shift are allowed
+  if (keycode == 65 && shiftstate > 3)
     return false;
 
   if (keycode > keycode_max)
