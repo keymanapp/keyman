@@ -38,7 +38,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
 
 bool KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, GdkKeymap** keymap, std::vector<KMX_DeadkeyMapping>* KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion); // I4353   // I4327
 
-int run(int argc, char* argv[], char* argv_gdk[] = NULL);
+int run(int argc, char* argv[]);
 
 int KMX_GetDeadkeys(vec_dword_2D& dk_Table, KMX_WORD DeadKey, KMX_WORD* OutputPairs, GdkKeymap* keymap);
 
@@ -48,15 +48,14 @@ std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys; // I4353
 
 #if defined(_WIN32) || defined(_WIN64)
   int wmain(int argc, wchar_t* argv[]) {
-    run(argc, argv);
-
 #else  // LINUX
   int main(int argc, char* argv[]) {
-    run(argc, argv, argv);
 #endif
+
+  run(argc, argv);
 }
 
-int run(int argc, char* argv[], char* argv_gdk[]) {
+int run(int argc, char* argv[]) {
 
   int bDeadkeyConversion = 0;
 
@@ -122,12 +121,7 @@ int run(int argc, char* argv[], char* argv_gdk[]) {
   }*/
 
 #else  // LINUX
-  if (argv_gdk == NULL) {
-    KMX_LogError(L"Missing parameter for initializing GdkKeymap \n");
-    return 3;
-  }
-
-  if (KMX_DoConvert(kmxfile, bDeadkeyConversion, argc, (gchar**)argv_gdk)) {  // I4552F
+  if (KMX_DoConvert(kmxfile, bDeadkeyConversion, argc, (gchar**)argv)) {  // I4552F
     KMX_SaveKeyboard(kmxfile, outfile);
 }
 
