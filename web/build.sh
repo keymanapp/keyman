@@ -23,6 +23,7 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   ":app/webview              A puppetable version of KMW designed for use in a host app's WebView" \
   ":app/ui                   Builds KMW's desktop form-factor keyboard-selection UI modules" \
   ":engine/attachment        Subset used for detecting valid page contexts for use in text editing " \
+  ":engine/common/utils      Web-oriented utility function module. " \
   ":engine/device-detect     Subset used for device-detection " \
   ":engine/dom-utils         A common subset of function used for DOM calculations, layout, etc" \
   ":engine/events            Specialized classes utilized to support KMW API events" \
@@ -53,6 +54,7 @@ builder_describe_outputs \
   build:app/webview             "/web/build/app/webview/${config}/keymanweb-webview.js" \
   build:app/ui                  "/web/build/app/ui/${config}/kmwuitoggle.js" \
   build:engine/attachment       "/web/build/engine/attachment/lib/index.mjs" \
+  build:engine/common/utils     "/web/build/engine/common/utils/lib/index.mjs" \
   build:engine/device-detect    "/web/build/engine/device-detect/lib/index.mjs" \
   build:engine/dom-utils        "/web/build/engine/dom-utils/obj/index.js" \
   build:engine/events           "/web/build/engine/events/lib/index.mjs" \

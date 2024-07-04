@@ -32,7 +32,7 @@
       "@keymanapp/models-types": ["./common/models/types"],
       "@keymanapp/models-templates": ["./common/models/templates"],
       "@keymanapp/models-wordbreakers": ["./common/models/wordbreakers"],
-      "@keymanapp/web-utils": ["./common/web/utils"],
+      "@keymanapp/web-utils": ["./web/src/engine/common/utils"],
       "@keymanapp/lm-message-types": ["./common/web/lm-message-types"],
       "@keymanapp/keyman-version": ["./common/web/keyman-version"],
       "@keymanapp/ldml-keyboard-constants": [ "./core/include/ldml" ],

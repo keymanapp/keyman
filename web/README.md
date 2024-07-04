@@ -74,11 +74,11 @@ graph TD;
     IP["common/web/input-processor"];
     OSK-->KP;
     IP-->KP;
-    Utils["common/web/utils"];
-    KP---->Utils;
+    WebUtils["web/src/engine/common/utils"];
+    KP---->WebUtils;
     Wordbreakers["common/models/wordbreakers"];
     Models["common/models/templates"];
-    Models-->Utils;
+    Models-->WebUtils;
     LMWorker["common/web/lm-worker"];
     LMWorker-->Models;
     LMWorker-->Wordbreakers;
@@ -97,19 +97,19 @@ graph TD;
         direction LR
         KP;
         IP;
-        Utils;
+        WebUtils;
         PredText;
     end
 
     subgraph ClassicWeb["Previously unmodularized components"]
         Device[web/src/engine/device-detect];
-        Device----->Utils;
+        Device----->WebUtils;
         Elements[web/src/engine/element-wrappers];
         Elements-->KP;
         KeyboardCache[web/src/engine/package-cache];
         KeyboardCache-->IP;
         DomUtils[web/src/engine/dom-utils];
-        DomUtils-->Utils;
+        DomUtils-->WebUtils;
         OSK-->DomUtils;
         OSK---->IP;
         Configuration[web/src/engine/paths];

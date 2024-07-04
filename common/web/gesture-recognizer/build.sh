@@ -14,7 +14,7 @@ BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
 
 builder_describe "Builds the gesture-recognition model for Web-based on-screen keyboards" \
   "@/common/web/es-bundling build" \
-  "@/common/web/utils build" \
+  "@/web/src/engine/common/utils build" \
   "clean" \
   "configure" \
   "build" \
