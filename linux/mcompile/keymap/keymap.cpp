@@ -26,7 +26,7 @@ int convert_rgkey_Shiftstate_to_LinuxShiftstate(int shiftState) {
   else return shiftState;                                                        // Lin   ss x  -> Lin ss x
 }
 
-bool ensureValidInputForKeyboardTranslation(int shiftstate, gint count, gint keycode) {
+bool ensureValidInputForKeyboardTranslation(int shiftstate, gint keycode) {
 
   // We're dealing with shiftstates 0,1,2,3 (Lin) or shiftstates 0,1,6,7 (rgkey)
   if (shiftstate < 0 || shiftstate > 3)
@@ -685,7 +685,7 @@ int KMX_get_KeyVal_From_KeyCode(GdkKeymap* keymap, guint keycode, ShiftState ss,
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
 
-  if (!(ensureValidInputForKeyboardTranslation(convert_rgkey_Shiftstate_to_LinuxShiftstate((int) ss), count, keycode))) {
+  if (!(ensureValidInputForKeyboardTranslation(convert_rgkey_Shiftstate_to_LinuxShiftstate((int) ss), keycode))) {
     g_free(keyvals);
     g_free(maps);
     return 0;
@@ -776,7 +776,7 @@ KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap* keymap, gui
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
 
-  if (!(ensureValidInputForKeyboardTranslation(shift_state_pos, count, keycode))) {
+  if (!(ensureValidInputForKeyboardTranslation(shift_state_pos, keycode))) {
     g_free(keyvals);
     g_free(maps);
     return 0;
@@ -799,7 +799,7 @@ KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap* keymap, UIN
   if (!gdk_keymap_get_entries_for_keycode(keymap, kc_underlying, &maps, &keyvals, &count))
     return 0;
 
-  if (!(ensureValidInputForKeyboardTranslation(convert_Shiftstate_to_LinuxShiftstate(vk_ShiftState), count, kc_underlying))) {
+  if (!(ensureValidInputForKeyboardTranslation(convert_Shiftstate_to_LinuxShiftstate(vk_ShiftState), kc_underlying))) {
     g_free(keyvals);
     g_free(maps);
     return 0;

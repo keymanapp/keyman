@@ -77,7 +77,7 @@ int convert_Shiftstate_to_LinuxShiftstate(int VKShiftState);
 int convert_rgkey_Shiftstate_to_LinuxShiftstate(int shiftState);
 
 // check if input is correct
-bool ensureValidInputForKeyboardTranslation(int shiftstate, gint count, gint keycode);
+bool ensureValidInputForKeyboardTranslation(int shiftstate, gint keycode);
 
 // take a std::string (=contents of line symbols-file ) and returns the (int) value of the character
 KMX_DWORD convertNamesTo_DWORD_Value(std::string tok_str);
