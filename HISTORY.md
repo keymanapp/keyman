@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.68 alpha 2024-07-04
+
+* refactor(windows): merge keyman64 build into keyman32 (#11906)
+* refactor(windows): remove wm_keyman_keydown and wm_keyman_keyup (#11920)
+
 ## 18.0.67 alpha 2024-07-03
 
 * refactor(common/models): move TS priority-queue implementation to web-utils (#11867)
