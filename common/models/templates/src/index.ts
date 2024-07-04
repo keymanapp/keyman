@@ -7,5 +7,5 @@ export { Tokenization, tokenize, getLastPreCaretToken, wordbreak } from "./token
 export {
   Entry, InternalNode, Leaf, Node
 } from './trie.js';
-export { addUnsorted, TrieBuilder } from './trie-builder.js';
+export { TrieBuilder } from './trie-builder.js';
 export { default as TrieModel, TrieModelOptions } from "./trie-model.js";

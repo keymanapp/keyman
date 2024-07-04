@@ -1,7 +1,7 @@
 import { ModelCompilerError, ModelCompilerMessageContext, ModelCompilerMessages } from "./model-compiler-messages.js";
 import { callbacks } from "./compiler-callbacks.js";
 
-import { addUnsorted, Node, TrieBuilder } from '@keymanapp/models-templates';
+import { TrieBuilder } from '@keymanapp/models-templates';
 
 // Supports LF or CRLF line terminators.
 const NEWLINE_SEPARATOR = /\u000d?\u000a/;
@@ -217,7 +217,7 @@ export function buildTrie(wordlist: WordList, keyFunction: SearchTermToKey): obj
 
   buildFromWordList(collater, wordlist);
   return {
-    totalWeight: sumWeights(collater.getRoot()),
+    totalWeight: collater.getTotalWeight(),
     root: collater.getRoot()
   }
 }
@@ -228,36 +228,10 @@ export function buildTrie(wordlist: WordList, keyFunction: SearchTermToKey): obj
  */
 function buildFromWordList(trieCollator: TrieBuilder, words: WordList): TrieBuilder {
   for (let [wordform, weight] of Object.entries(words)) {
-    let key = trieCollator.toKey(wordform);
-    addUnsorted(trieCollator.getRoot(), { content: wordform, key, weight });
+    trieCollator.addEntry(wordform, weight);
   }
   trieCollator.sort();
   return trieCollator;
-}
-
-/**
- * O(n) recursive traversal to sum the total weight of all leaves in the
- * trie, starting at the provided node.
- *
- * @param node The node to start summing weights.
- */
-function sumWeights(node: Node): number {
-  let val: number;
-  if (node.type === 'leaf') {
-    val = node.entries
-      .map(entry => entry.weight)
-      //.map(entry => isNaN(entry.weight) ? 1 : entry.weight)
-      .reduce((acc, count) => acc + count, 0);
-  } else {
-    val = Object.keys(node.children)
-      .map((key) => sumWeights(node.children[key]))
-      .reduce((acc, count) => acc + count, 0);
-  }
-
-  if(isNaN(val)) {
-    throw new Error("Unexpected NaN has appeared!");
-  }
-  return val;
 }
 
 /**
