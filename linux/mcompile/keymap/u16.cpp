@@ -25,7 +25,7 @@ std::vector<std::u16string> convert_argvW_to_Vector_u16str(int argc, wchar_t* ar
   return vector_u16;
 }
 
-// ToDo codecvt needs to be replaced !!
+// TODO codecvt needs to be replaced !!
 
 //String <- wstring
 std::string string_from_wstring(std::wstring const str) {

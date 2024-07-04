@@ -21,7 +21,6 @@ std::string string_from_u16string(std::u16string const str);
 
 void u16sprintf(KMX_WCHAR * dst, const size_t sz, const wchar_t* fmt, ...);
 
-std::wstring  convert_pchar16T_To_wstr(KMX_WCHAR *Name);
 std::wstring  convert_pchar16T_To_wstr(const KMX_WCHAR *Name);
 
 size_t  u16len(const KMX_WCHAR *p);
