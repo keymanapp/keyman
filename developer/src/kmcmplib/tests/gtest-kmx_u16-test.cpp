@@ -3,15 +3,15 @@
 #include "../src/compfile.h"
 #include "../../../../common/include/km_types.h"
 
-class KmxU16Test : public testing::Test {
+class kmx_u16_Test : public testing::Test {
     protected:
-    	KmxU16Test() {}
-	    ~KmxU16Test() override {}
+    	kmx_u16_Test() {}
+	    ~kmx_u16_Test() override {}
 	    void SetUp() override {}
 	    void TearDown() override {}
 };
 
-TEST_F(KmxU16Test, u16chr_test) {
+TEST_F(kmx_u16_Test, u16chr_test) {
 	KMX_WCHAR str[LINESIZE];
 
 	u16cpy(str, u"abc");
@@ -22,12 +22,12 @@ TEST_F(KmxU16Test, u16chr_test) {
     EXPECT_EQ(3, u16chr(str, '\0') - str); // locate null terminator
 }
 
-TEST_F(KmxU16Test, u16tok_ch_test) {
+TEST_F(kmx_u16_Test, u16tok_ch_test) {
 	EXPECT_TRUE(true);
 }
 
 // KMX_WCHAR * u16tok(KMX_WCHAR* p, const KMX_WCHAR* delim, KMX_WCHAR** ctx)
-TEST_F(KmxU16Test, u16tok_delim_test) {
+TEST_F(kmx_u16_Test, u16tok_delim_test) {
 	KMX_WCHAR str[LINESIZE];
 	PKMX_WCHAR ctx = NULL;
 
