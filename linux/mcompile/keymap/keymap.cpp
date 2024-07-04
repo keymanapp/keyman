@@ -18,7 +18,7 @@ int convert_Shiftstate_to_LinuxShiftstate(int shiftState) {
 
 bool ensureValidInputForKeyboardTranslation(int shiftstate, gint count, gint keycode) {
 
-  // We're dealing with shiftstates 0,1,2,3 or shiftstates 0,1,6,7
+  // We're dealing with shiftstates 0,1,2,3 (Lin) or shiftstates 0,1,6,7 (rgkey)
   if (shiftstate < 0 || shiftstate > 7)
     return false;
 
