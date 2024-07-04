@@ -39,10 +39,31 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
 # Possible TODO?
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
 
-builder_describe_outputs \
-  configure                      /node_modules
-
 builder_parse "$@"
+
+config=release
+if builder_is_debug_build; then
+  config=debug
+fi
+
+builder_describe_outputs \
+  configure                     "/node_modules" \
+  build                         "/web/build/test/dom/cases/attachment/outputTargetForElement.spec.html" \
+  build:app/browser             "/web/build/app/browser/lib/index.mjs" \
+  build:app/WebViews            "/web/build/app/webview/${config}/keymanweb-webview.js" \
+  build:app/ui                  "/web/build/app/ui/${config}/kmwuitoggle.js" \
+  build:engine/attachment       "/web/build/engine/attachment/lib/index.mjs" \
+  build:engine/device-detect    "/web/build/engine/device-detect/lib/index.mjs" \
+  build:engine/dom-utils        "/web/build/engine/dom-utils/obj/index.js" \
+  build:engine/events           "/web/build/engine/events/lib/index.mjs" \
+  build:engine/element-wrappers "/web/build/engine/element-wrappers/lib/index.mjs" \
+  build:engine/main             "/web/build/engine/main/lib/index.mjs" \
+  build:engine/osk              "/web/build/engine/osk/lib/index.mjs" \
+  build:engine/package-cache    "/web/build/engine/package-cache/lib/index.mjs" \
+  build:engine/paths            "/web/build/engine/paths/lib/index.mjs" \
+  build:samples                 "/web/src/samples/simplest/keymanweb.js" \
+  build:tools                   "/web/build/tools/building/sourcemap-root/index.js" \
+  build:test-pages              "/web/build/test-resources/sentry-manager.js"
 
 BUNDLE_CMD="node ${KEYMAN_ROOT}/common/web/es-bundling/build/common-bundle.mjs"
 
@@ -68,6 +89,8 @@ precompile() {
   local DIR
   DIR="$1"
 
+  builder_echo "Pre-compiling ${DIR}..."
+
   # pre-compile bundle for use in DOM testing. When running in the browser several
   # types built-in to Node aren't available, and @web/test-runner doesn't do
   # treeshaking when loading the imports. We work around by pre-compiling.
@@ -79,6 +102,7 @@ precompile() {
 }
 
 build_action() {
+  builder_echo "Building auto tests..."
   tsc --project "${KEYMAN_ROOT}/web/src/test/auto/tsconfig.json"
 
   for dir in \
