@@ -571,6 +571,8 @@ export class KmnCompilerMessages {
   static ERROR_CharacterRangeTooLong                          = SevError | 0x078;
   static Error_CharacterRangeTooLong                          = () => m(this.ERROR_CharacterRangeTooLong, `Character range is too large and cannot be expanded`);
 
+  static ERROR_NonBMPCharactersNotSupportedInKeySection       = SevError | 0x079;
+  static Error_NonBMPCharactersNotSupportedInKeySection       = () => m(this.ERROR_NonBMPCharactersNotSupportedInKeySection, `Characters with codepoints over U+FFFF are not supported in the key part of the rule`);
 
   static WARN_TooManyWarnings                                 = SevWarn | 0x080;
   static Warn_TooManyWarnings                                 = () => m(this.WARN_TooManyWarnings, `Too many warnings or errors`);

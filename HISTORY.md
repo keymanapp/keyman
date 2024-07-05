@@ -1,5 +1,31 @@
 # Keyman Version History
 
+## 18.0.68 alpha 2024-07-04
+
+* refactor(windows): merge keyman64 build into keyman32 (#11906)
+* refactor(windows): remove wm_keyman_keydown and wm_keyman_keyup (#11920)
+
+## 18.0.67 alpha 2024-07-03
+
+* refactor(common/models): move TS priority-queue implementation to web-utils (#11867)
+
+## 18.0.66 alpha 2024-07-02
+
+* fix(developer): handle second parameter of index correctly in kmcmplib compiler (#11815)
+
+## 18.0.65 alpha 2024-07-01
+
+* fix(developer): prevent non-BMP characters in key part of rule (#11806)
+* chore(linux): remove unused building with pbuilder (#11862)
+
+## 18.0.64 alpha 2024-06-28
+
+* fix(web): use fat-finger data with simple keypresses (#11854)
+
+## 18.0.63 alpha 2024-06-26
+
+* feat(linux): implement Linux side of SimulateAltGr option :checkered_flag: (#11852)
+
 ## 18.0.62 alpha 2024-06-25
 
 * chore(common): update C/C++ formatting options (#11836)
