@@ -54,8 +54,15 @@ TEST_F(kmx_u16_Test, u16tok_str_delim) {
   EXPECT_TRUE(!u16cmp(u"and", u16tok(nullptr, u" ", &ctx)));
   EXPECT_TRUE(!u16cmp(u"two", u16tok(nullptr, u" ", &ctx)));
 
+  // only a delimiter
   KMX_WCHAR buffer_space[128] = u" ";
   EXPECT_EQ(nullptr, u16tok(buffer_space, u" ", &ctx));
+  EXPECT_EQ(nullptr, u16tok(nullptr, u" ", &ctx));
+
+  // delimiters at end
+  KMX_WCHAR buffer_space_at_end[128] = u"a b   ";
+  EXPECT_TRUE(!u16cmp(u"a", u16tok(buffer_space_at_end, u" ", &ctx)));
+  EXPECT_TRUE(!u16cmp(u"b", u16tok(nullptr, u" ", &ctx)));
   EXPECT_EQ(nullptr, u16tok(nullptr, u" ", &ctx));
 
   // no string, no context
@@ -77,7 +84,14 @@ TEST_F(kmx_u16_Test, u16tok_str_compare_to_strtok) {
   EXPECT_TRUE(!strcmp("and", strtok(nullptr, " ")));
   EXPECT_TRUE(!strcmp("two", strtok(nullptr, " ")));
 
+  // only a delimiter
   char sbuffer_space[128] = " ";
   EXPECT_EQ(nullptr, strtok(sbuffer_space, " "));
+  EXPECT_EQ(nullptr, strtok(nullptr, " "));
+
+  // delimiters at end
+  char buffer_space_at_end[128] = "a b   ";
+  EXPECT_TRUE(!strcmp("a", strtok(buffer_space_at_end, " ")));
+  EXPECT_TRUE(!strcmp("b", strtok(nullptr, " ")));
   EXPECT_EQ(nullptr, strtok(nullptr, " "));
 }
