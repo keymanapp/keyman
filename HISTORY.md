@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.69 alpha 2024-07-05
+
+* fix(core): allow to successfully build on Ubuntu 24.04 (#11926)
+* chore(windows): correct output file for 64-bit build of keyman32 in build.sh (#11930)
+* chore(android,ios): Add Crowdin localization for Polytonic Greek (#11877)
+
 ## 18.0.68 alpha 2024-07-04
 
 * refactor(windows): merge keyman64 build into keyman32 (#11906)
