@@ -13,16 +13,16 @@
 #include "u16.h"
 
 enum ShiftState {
-    Base = 0,                           // 0
-    Shft = 1,                           // 1
-    Ctrl = 2,                           // 2
-    ShftCtrl = Shft | Ctrl,             // 3
-    Menu = 4,                           // 4 -- NOT USED
-    ShftMenu = Shft | Menu,             // 5 -- NOT USED
-    MenuCtrl = Menu | Ctrl,             // 6
-    ShftMenuCtrl = Shft | Menu | Ctrl,  // 7
-    Xxxx = 8,                           // 8
-    ShftXxxx = Shft | Xxxx,             // 9
+  Base         = 0,                   // 0
+  Shft         = 1,                   // 1
+  Ctrl         = 2,                   // 2
+  ShftCtrl     = Shft | Ctrl,         // 3
+  Menu         = 4,                   // 4 -- NOT USED
+  ShftMenu     = Shft | Menu,         // 5 -- NOT USED
+  MenuCtrl     = Menu | Ctrl,         // 6
+  ShftMenuCtrl = Shft | Menu | Ctrl,  // 7
+  Xxxx         = 8,                   // 8
+  ShftXxxx     = Shft | Xxxx,         // 9
 };
 
 // the shiftstates we can use for mac: Base;Shift, OPTION, Shift+OPTION
@@ -60,25 +60,25 @@ typedef std::vector<KMX_DWORD> vec_dword_1D;
 typedef std::vector<std::vector<KMX_DWORD> > vec_dword_2D;
 typedef std::vector<std::vector<std::vector<KMX_DWORD> > > vector_dword_3D;
 static KMX_DWORD INVALID_NAME = 0;
-static KMX_DWORD max_shiftstate = 10;
 static KMX_DWORD keycode_max = 50;
 static int keycode_spacebar = 49;
+static KMX_DWORD max_shiftstate = 10;
 
-int mac_map_VKShiftState_to_Shiftstate(int vk_ShiftState);
+int mac_convert_Shiftstate_to_MacShiftstate(int vk_ShiftState);
 
 int mac_map_rgkey_ShiftState_to_Shiftstate(int win_ShiftState);
 
 bool is_correct_win_shiftstate(int comp_ss);
 
-bool is_correct_Input_For_KeyboardTranslation(const UCKeyboardLayout * keyboard_layout,int keycode, int shiftstate, int cap);
+bool ensureValidInputForKeyboardTranslation(const UCKeyboardLayout * keyboard_layout,int keycode, int shiftstate, int cap);
 
-int mac_createOneVectorFromBothKeyboards(vector_dword_3D &All_Vector, const UCKeyboardLayout * keykeyboard_layout);
+int mac_createOneVectorFromBothKeyboards(vector_dword_3D &all_vector, const UCKeyboardLayout * keykeyboard_layout);
 
 int mac_write_US_ToVector(vector_dword_3D &vec);
 
 vec_dword_2D mac_create_empty_2D_Vector(int dim_rows, int dim_shifts);
 
-int mac_append_underlying_ToVector(vector_dword_3D &All_Vector, const UCKeyboardLayout * keykeyboard_layout);
+int mac_append_underlying_ToVector(vector_dword_3D &all_vector, const UCKeyboardLayout * keykeyboard_layout);
 
 bool mac_InitializeUCHR(const UCKeyboardLayout **keyboard_layout);
 
@@ -90,11 +90,11 @@ KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLa
 
 KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLayout * keyboard_layout, UINT kc_underlying, UINT VKShiftState, PKMX_WCHAR deadKey);
 
-KMX_WCHAR mac_KMX_get_KeyValUnderlying_From_KeyValUS(vector_dword_3D &All_Vector, KMX_DWORD kv_us);
+KMX_WCHAR mac_KMX_get_KeyValUnderlying_From_KeyValUS(vector_dword_3D &all_vector, KMX_DWORD kv_us);
 
-KMX_WCHAR mac_KMX_get_KeyCodeUnderlying_From_KeyValUnderlying(vector_dword_3D & All_Vector, KMX_DWORD kv_underlying);
+KMX_WCHAR mac_KMX_get_KeyCodeUnderlying_From_KeyValUnderlying(vector_dword_3D & all_vector, KMX_DWORD kv_underlying);
 
-KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_KeyCodeUS(const UCKeyboardLayout * keyboard_layout, vector_dword_3D &All_Vector, KMX_DWORD kc_us, ShiftState ss, int caps);
+KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_KeyCodeUS(const UCKeyboardLayout * keyboard_layout, vector_dword_3D &all_vector, KMX_DWORD kc_us, ShiftState ss, int caps);
 
 UINT mac_KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD vk_us);
 
@@ -498,7 +498,7 @@ const UINT mac_USVirtualKeyToScanCode[256] = {
 //################################################################################################################################################
 //################################################################################################################################################
 
-void test_printoutKeyboards_S2(vector_dword_3D &All_Vector);
+void test_printoutKeyboards_S2(vector_dword_3D &all_vector);
 KMX_DWORD X_playWithDK_S2(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal) ;
 KMX_DWORD X_playWithDK_S2_one(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal);
 KMX_DWORD X_compare_Shiftstates_S2(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal=0);

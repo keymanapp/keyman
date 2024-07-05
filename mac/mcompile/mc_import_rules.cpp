@@ -89,7 +89,7 @@ int mac_KMX_ToUnicodeEx(int keycode, PKMX_WCHAR pwszBuff, int ss_win, int caps, 
   if (!(caps <= 1))
     return 0;*/
 
-  if(! is_correct_Input_For_KeyboardTranslation(keyboard_layout, keycode, ss_win, caps))
+  if(! ensureValidInputForKeyboardTranslation(keyboard_layout, keycode, ss_win, caps))
     return 0;
 
   keyval= mac_KMX_get_KeyVal_From_KeyCode_dk(keyboard_layout, keycode, mac_map_rgkey_ShiftState_to_Shiftstate(ShiftState(ss_win)), caps, isdk);
@@ -252,7 +252,7 @@ public:
     return nkeys;
   }
 
-  bool mac_KMX_LayoutRow(int MaxShiftState, LPKMX_KEY key, std::vector<DeadKey*> *deadkeys, int deadkeyBase, BOOL bDeadkeyConversion, vector_dword_3D &All_Vector, const UCKeyboardLayout *keyboard_layout ) {   // I4552
+  bool mac_KMX_LayoutRow(int MaxShiftState, LPKMX_KEY key, std::vector<DeadKey*> *deadkeys, int deadkeyBase, BOOL bDeadkeyConversion, vector_dword_3D &all_vector, const UCKeyboardLayout *keyboard_layout ) {   // I4552
     // Get the CAPSLOCK value
     /*int capslock =
           (this->mac_KMX_IsCapsEqualToShift() ? 1 : 0) |
@@ -313,7 +313,7 @@ public:
             // this->m_vk    stores VK-US ( not underlying !!)
             // key->Key      stores VK-US ( not underlying !!)
             // key->dpOutput stores character Underlying
-            KMX_DWORD SC_Underlying = mac_KMX_get_KeyCodeUnderlying_From_KeyCodeUS(keyboard_layout, All_Vector, this->SC(), (ShiftState) ss, caps);
+            KMX_DWORD SC_Underlying = mac_KMX_get_KeyCodeUnderlying_From_KeyCodeUS(keyboard_layout, all_vector, this->SC(), (ShiftState) ss, caps);
 
             key->Key = mac_KMX_get_VKUS_From_KeyCodeUnderlying( SC_Underlying);
 
@@ -434,13 +434,13 @@ void test_print_certain_Keys_S2(const UCKeyboardLayout * keyboard_layout, int ke
   /**
    * @brief  Collect the key data, translate it to kmx and append to the existing keyboard
    * @param  kp keyboard
-   * @param  All_Vector Vector that holds the data of the US keyboard and the currently used (underlying) keyboard
+   * @param  all_vector Vector that holds the data of the US keyboard and the currently used (underlying) keyboard
    * @param  keyboard_layout the currently used (underlying)keyboard Layout
    * @param  FDeadkeys vector of all deadkeys for the currently used (underlying)keyboard Layout
    * @param  bDeadkeyConversion 1 to convert a deadkey to a character; 0 no conversion
    * @return true in case of success
    */
-bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp, vector_dword_3D &All_Vector, const UCKeyboardLayout **keyboard_layout, std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) { // I4353   // I4327
+bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp, vector_dword_3D &all_vector, const UCKeyboardLayout **keyboard_layout, std::vector<KMX_DeadkeyMapping> *FDeadkeys, KMX_BOOL bDeadkeyConversion) { // I4353   // I4327
  mac_KMX_Loader loader;
 
   std::vector<mac_KMX_VirtualKey*> rgKey; //= new VirtualKey[256];
@@ -462,7 +462,7 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp, vector_dword_3D &All_Vector, const 
 
     // macOS cannot get a VK for the underling Keyboard since this does not exist
     // macOS can only get a VK for the US Keyboard (by using USVirtualKeyToScanCode/ScanCodeToUSVirtualKey)
-    // therefore in rgkey[ ] we use VK_US which we get from All_Vector
+    // therefore in rgkey[ ] we use VK_US which we get from all_vector
 
     mac_KMX_VirtualKey *key = new mac_KMX_VirtualKey(sc);
 
@@ -603,7 +603,7 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp, vector_dword_3D &All_Vector, const 
   //
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->mac_KMX_IsKeymanUsedKey() && (!rgKey[iKey]->mac_KMX_IsEmpty())) {
-      if(rgKey[iKey]->mac_KMX_LayoutRow(loader.KMX_MaxShiftState(), &gp->dpKeyArray[nkeys], &alDead, nDeadkey, bDeadkeyConversion, All_Vector,*keyboard_layout)) {   // I4552
+      if(rgKey[iKey]->mac_KMX_LayoutRow(loader.KMX_MaxShiftState(), &gp->dpKeyArray[nkeys], &alDead, nDeadkey, bDeadkeyConversion, all_vector,*keyboard_layout)) {   // I4552
         nkeys+=rgKey[iKey]->mac_KMX_GetKeyCount(loader.KMX_MaxShiftState());
       }
     }

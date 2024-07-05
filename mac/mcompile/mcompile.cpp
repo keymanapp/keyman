@@ -31,7 +31,7 @@
 
 KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, int argc);
 
-bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp, vector_dword_3D &All_Vector, const UCKeyboardLayout **keyboard_layout, std::vector<KMX_DeadkeyMapping> *KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion); // I4353   // I4327
+bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp, vector_dword_3D &all_vector, const UCKeyboardLayout **keyboard_layout, std::vector<KMX_DeadkeyMapping> *KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion); // I4353   // I4327
 
 std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys; // I4353
 
@@ -465,12 +465,12 @@ KMX_WCHAR mac_KMX_GetUniqueDeadkeyID(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey) {
    * @param  vk_US virtual key of the us keyboard
    * @param  shift shiftstate
    * @param  deadkey character produced by a deadkey
-   * @param  All_Vector Vector that holds the data of the US keyboard and the currently used (underlying) keyboard
+   * @param  all_vector Vector that holds the data of the US keyboard and the currently used (underlying) keyboard
    * @param  keyboard_layout the currently used (underlying) keyboard Layout
    *
    * @return void
    */
-void mac_KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk_US, UINT shift, KMX_WCHAR deadkey, vector_dword_3D &All_Vector, const UCKeyboardLayout * keyboard_layout) {
+void mac_KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk_US, UINT shift, KMX_WCHAR deadkey, vector_dword_3D &all_vector, const UCKeyboardLayout * keyboard_layout) {
   KMX_WORD deadkeys[512]={0};
   KMX_WORD *pdk;
 
@@ -483,11 +483,11 @@ void mac_KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk_US, UINT shift, KMX_
   KMX_FDeadkeys.push_back(KMX_deadkeyMapping); //dkid, vk, shift);   // I4353
   mac_KMX_AddDeadkeyRule(kbd, dkid, vk_US, shift);
 
-  mac_KMX_GetDeadkeys(keyboard_layout, All_Vector, deadkey, shift, pdk = deadkeys );  // returns array of [usvk, ch_out] pairs
+  mac_KMX_GetDeadkeys(keyboard_layout, all_vector, deadkey, shift, pdk = deadkeys );  // returns array of [usvk, ch_out] pairs
 
   while(*pdk) {
     // Look up the ch
-    UINT KeyValUnderlying = mac_KMX_get_KeyValUnderlying_From_KeyValUS(All_Vector, *pdk);
+    UINT KeyValUnderlying = mac_KMX_get_KeyValUnderlying_From_KeyValUS(all_vector, *pdk);
     mac_KMX_TranslateDeadkeyKeyboard(kbd, dkid, KeyValUnderlying, *(pdk+1), *(pdk+2));
     pdk+=3;
   }
@@ -553,13 +553,13 @@ KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, int 
       return FALSE;
   }
   // create vector that contains Keycode, Base, Shift for US-Keyboard and underlying keyboard
-  vector_dword_3D All_Vector;
-  if(mac_createOneVectorFromBothKeyboards(All_Vector, keyboard_layout)){
+  vector_dword_3D all_vector;
+  if(mac_createOneVectorFromBothKeyboards(all_vector, keyboard_layout)){
     wprintf(L"ERROR: can't create one vector from both keyboards\n");
     return FALSE;
   }
 
- //printoutKeyboards(All_Vector);
+ //printoutKeyboards(all_vector);
 find_character_S2(keyboard_layout, 180);
 printf("-------\n");
 //print_dublicates_S2(keyboard_layout);
@@ -584,7 +584,7 @@ printf("-------\n");
 
       switch(ch) {
         case 0x0000: break;
-        case 0xFFFF: mac_KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, All_Vector, keyboard_layout); break;
+        case 0xFFFF: mac_KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, all_vector, keyboard_layout); break;
         default: mac_KMX_TranslateKeyboard(kbd, KMX_VKMap[i], VKShiftState[j], ch);
       }
     }
@@ -592,7 +592,7 @@ printf("-------\n");
 
   mac_KMX_ReportUnconvertedKeyboardRules(kbd);
 
-  if(!mac_KMX_ImportRules(kbd, All_Vector, &keyboard_layout, &KMX_FDeadkeys, bDeadkeyConversion)) {   // I4353   // I4552
+  if(!mac_KMX_ImportRules(kbd, all_vector, &keyboard_layout, &KMX_FDeadkeys, bDeadkeyConversion)) {   // I4353   // I4552
     return FALSE;
   }
 
@@ -603,13 +603,13 @@ printf("-------\n");
   /**
    * @brief  return an array of [usvk, ch_out] pairs: all existing combinations of a deadkey + character for the underlying keyboard
    * @param  keyboard_layout the currently used (underlying) keyboard Layout
-   * @param  All_Vector Vector that holds the data of the US keyboard and the currently used (underlying) keyboard
+   * @param  all_vector Vector that holds the data of the US keyboard and the currently used (underlying) keyboard
    * @param  deadkey deadkey character
    * @param  shift_dk shiftstate of the deadkey
    * @param  OutputPairs ptr to array of deadkeys
    * @return size of array of deadkeys
    */
-int mac_KMX_GetDeadkeys( const UCKeyboardLayout * keyboard_layout,  vector_dword_3D &All_Vector, KMX_WCHAR deadkey, UINT shift_dk, KMX_WORD *OutputPairs ) {
+int mac_KMX_GetDeadkeys( const UCKeyboardLayout * keyboard_layout,  vector_dword_3D &all_vector, KMX_WCHAR deadkey, UINT shift_dk, KMX_WORD *OutputPairs ) {
 
   UInt32 deadkeystate;
   UniCharCount maxStringlength    = 5;
@@ -620,14 +620,14 @@ int mac_KMX_GetDeadkeys( const UCKeyboardLayout * keyboard_layout,  vector_dword
   unicodeString[0] = 0;
 
   KMX_WORD *p = OutputPairs;
-  KMX_DWORD sc_dk = mac_KMX_get_KeyCodeUnderlying_From_KeyValUnderlying( All_Vector, deadkey);
+  KMX_DWORD sc_dk = mac_KMX_get_KeyCodeUnderlying_From_KeyValUnderlying( all_vector, deadkey);
 
   for ( int j=0; j < sizeof(ss_mac)/sizeof(ss_mac[0]); j++) {
     // we start with SPACE (keycode_spacebar=49) since all deadkeys occur in combinations with space.
     // Since mcompile finds only the first occurance of a dk combination, this makes sure that we always find the dk+SPACE combinations for a deadkey.
     // If there are more combinations to create a specific character they will not be found. (See comment at the beginning of mac_KMX_DoConvert())
     for ( int i=keycode_spacebar; i >=0; i--) {
-      status = UCKeyTranslate(keyboard_layout, sc_dk,  kUCKeyActionDown, mac_map_VKShiftState_to_Shiftstate(shift_dk), LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
+      status = UCKeyTranslate(keyboard_layout, sc_dk,  kUCKeyActionDown, mac_convert_Shiftstate_to_MacShiftstate(shift_dk), LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
 
       if(deadkeystate !=0) {
         status = UCKeyTranslate(keyboard_layout, i,  kUCKeyActionDown, ss_mac[j], LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
