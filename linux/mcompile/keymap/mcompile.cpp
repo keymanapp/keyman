@@ -404,7 +404,7 @@ struct KMX_dkidmap {
 };
 
 
-/** ToDo
+/**
    * @brief  find a deadkey id for a given deadkey
    * @param  kbd the keyboard
    * @param  deadkey
