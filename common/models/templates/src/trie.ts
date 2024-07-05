@@ -1,4 +1,5 @@
 import { isHighSurrogate, isSentinel, SearchKey, SENTINEL_CODE_UNIT, Wordform2Key } from "./common.js";
+import { sortNode } from "./trie-builder.js";
 
 // The following trie implementation has been (heavily) derived from trie-ing
 // by Conrad Irwin.
@@ -62,7 +63,7 @@ export class TrieTraversal implements LexiconTraversal {
    * The current traversal node.  Serves as the 'root' of its own sub-Trie,
    * and we cannot navigate back to its parent.
    */
-  root: Node;
+  readonly root: Node;
 
   /**
    * The max weight for the Trie being 'traversed'.  Needed for probability
@@ -98,25 +99,15 @@ export class TrieTraversal implements LexiconTraversal {
     return traversal;
   }
 
-  private sortNodeIfNeeded(node: Node) {
-    if(node.unsorted) {
-      if(node.type == 'leaf') {
-        node.entries.sort((a, b) => b.weight - a.weight)
-      } else {
-        node.values.sort((a, b) => node.children[b].weight - node.children[a].weight);
-      }
-
-      node.unsorted = false;
-    }
-  }
-
   // Handles one code unit at a time.
   private _child(char: USVString): TrieTraversal | undefined {
     const root = this.root;
     const totalWeight = this.totalWeight;
     const nextPrefix = this.prefix + char;
 
-    this.sortNodeIfNeeded(root);
+    // Sorts _just_ the current level, and only if needed.
+    // We only care about sorting parts that we're actually accessing.
+    sortNode(root, true);
 
     if(root.type == 'internal') {
       let childNode = root.children[char];
@@ -143,7 +134,9 @@ export class TrieTraversal implements LexiconTraversal {
     let root = this.root;
     const totalWeight = this.totalWeight;
 
-    this.sortNodeIfNeeded(root);
+    // Sorts _just_ the current level, and only if needed.
+    // We only care about sorting parts that we're actually accessing.
+    sortNode(root, true);
 
     if(root.type == 'internal') {
       for(let entry of root.values) {

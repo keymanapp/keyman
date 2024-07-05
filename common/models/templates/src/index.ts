@@ -8,4 +8,5 @@ export {
   Entry, InternalNode, Leaf, Node
 } from './trie.js';
 export { TrieBuilder } from './trie-builder.js';
+export * as trieConstruction from './trie-builder.js';
 export { default as TrieModel, TrieModelOptions } from "./trie-model.js";
