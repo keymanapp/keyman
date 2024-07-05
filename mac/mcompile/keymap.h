@@ -55,9 +55,9 @@ const KMX_DWORD KMX_VKMap[] = {
   0
 };
 
-typedef std::vector<std::string> vector_str_1D;
-typedef std::vector<KMX_DWORD> vector_dword_1D;
-typedef std::vector<std::vector<KMX_DWORD> > vector_dword_2D;
+typedef std::vector<std::string> vec_string_1D;
+typedef std::vector<KMX_DWORD> vec_dword_1D;
+typedef std::vector<std::vector<KMX_DWORD> > vec_dword_2D;
 typedef std::vector<std::vector<std::vector<KMX_DWORD> > > vector_dword_3D;
 static KMX_DWORD INVALID_NAME = 0;
 static KMX_DWORD max_shiftstate = 10;
@@ -76,7 +76,7 @@ int mac_createOneVectorFromBothKeyboards(vector_dword_3D &All_Vector, const UCKe
 
 int mac_write_US_ToVector(vector_dword_3D &vec);
 
-vector_dword_2D mac_create_empty_2D_Vector(int dim_rows, int dim_shifts);
+vec_dword_2D mac_create_empty_2D_Vector(int dim_rows, int dim_shifts);
 
 int mac_append_underlying_ToVector(vector_dword_3D &All_Vector, const UCKeyboardLayout * keykeyboard_layout);
 

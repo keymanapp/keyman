@@ -7,37 +7,6 @@
 #define CERR_UnableToWriteFully                            0x00008007
 #define CERR_SomewhereIGotItWrong                          0x00008009
 
-KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD sz);
-
-LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize);
-
-KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename) {
-
-  FILE *fp;
-  fp = Open_File(filename, u"wb");
-
-  if(fp == NULL)
-  {
-    mac_KMX_LogError(L"Failed to create output file (%d)", errno);
-    return FALSE;
-  }
-
-  KMX_DWORD err = KMX_WriteCompiledKeyboard(kbd, fp, FALSE);
-  fclose(fp);
-
-  if(err != CERR_None) {
-    mac_KMX_LogError(L"Failed to write compiled keyboard with error %d", err);
-
-    std::u16string u16_filname(filename);
-    std::string s = string_from_u16string(u16_filname);
-
-    remove(s.c_str());
-    return FALSE;
-  }
-
-  return TRUE;
-}
-
 KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL FSaveDebug) {
 
 	LPKMX_GROUP fgp;
@@ -217,6 +186,37 @@ KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL 
 	return CERR_None;
 }
 
+
+KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD sz);
+
+LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize);
+
+KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename) {
+
+  FILE *fp;
+  fp = Open_File(filename, u"wb");
+
+  if(fp == NULL)
+  {
+    mac_KMX_LogError(L"Failed to create output file (%d)", errno);
+    return FALSE;
+  }
+
+  KMX_DWORD err = KMX_WriteCompiledKeyboard(kbd, fp, FALSE);
+  fclose(fp);
+
+  if(err != CERR_None) {
+    mac_KMX_LogError(L"Failed to write compiled keyboard with error %d", err);
+
+    std::u16string u16_filname(filename);
+    std::string s = string_from_u16string(u16_filname);
+
+    remove(s.c_str());
+    return FALSE;
+  }
+
+  return TRUE;
+}
 PKMX_WCHAR KMX_StringOffset(PKMX_BYTE base, KMX_DWORD offset) {
   if(offset == 0) return NULL;
   return (PKMX_WCHAR)(base + offset);
@@ -516,3 +516,32 @@ PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p) {
 //################################# Code beyond these lines needs to be included in mcompile #####################################################
 //################################################################################################################################################
 
+
+FILE* Open_File(const KMX_CHAR* Filename, const KMX_CHAR* mode) {
+#ifdef _MSC_VER
+  std::string cpath = Filename; //, cmode = mode;
+  std::replace(cpath.begin(), cpath.end(), '/', '\\');
+  return fopen(cpath.c_str(), (const KMX_CHAR*) mode);
+#else
+  return fopen(Filename, mode);
+  std::string cpath, cmode;
+  cpath = (const KMX_CHAR*) Filename;
+  cmode = (const KMX_CHAR*) mode;
+  return fopen(cpath.c_str(), cmode.c_str());
+#endif
+};
+
+
+FILE* Open_File(const KMX_WCHAR* Filename, const KMX_WCHAR* mode) {
+#ifdef _MSC_VER
+  std::wstring cpath = convert_pchar16T_To_wstr((KMX_WCHAR*) Filename);
+  std::wstring cmode = convert_pchar16T_To_wstr((KMX_WCHAR*) mode);
+  std::replace(cpath.begin(), cpath.end(), '/', '\\');
+  return _wfsopen(cpath.c_str(), cmode.c_str(), _SH_DENYWR);
+#else
+  std::string cpath, cmode;
+  cpath = string_from_u16string(Filename);
+  cmode = string_from_u16string(mode);
+  return fopen(cpath.c_str(), cmode.c_str());
+#endif
+};

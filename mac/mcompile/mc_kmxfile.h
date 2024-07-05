@@ -6,7 +6,7 @@
 
 #include "km_types.h"
 #include "kmx_file.h"
-#include "util_filesystem.h"			//_S2 TODO include from keyman; not from this folder
+//#include "util_filesystem.h"			//_S2 TODO include from keyman; not from this folder
 #include "mcompile.h"
 
 
@@ -76,7 +76,11 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD *lpKeyboard);
 
 KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename);
 
-KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL FSaveDebug);
+// _S2 Open files on windows and non-windows platforms. Datatypes for Filename and mode must be the same.
+// return FILE* if file could be opened; FILE must to be closed in calling function
+FILE* Open_File(const KMX_CHAR* Filename, const KMX_CHAR* mode);
+FILE* Open_File(const KMX_WCHAR* Filename, const KMX_WCHAR* mode);
+
 
 #endif // _KMXFILE_H
 

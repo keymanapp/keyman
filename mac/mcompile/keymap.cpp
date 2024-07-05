@@ -119,8 +119,8 @@ int mac_write_US_ToVector( vector_dword_3D &vec_us) {
   std::vector<int> us_Base  = {97,115,100,102,104,103,122,120,99,118,167,98,113,119,101,114,121,116,49,50,51,52,54,53,61,57,55,45,56,48, 93,111,117, 91,105,112,13,108,106,39,107,59, 92,44,47,110,109,46};
   std::vector<int> us_Shift = {65, 83, 68, 70, 72, 71, 90, 88,67, 86,177,66, 81, 87, 69, 82, 89, 84,33,64,35,36,94,37,43,40,38,95,42,41,125, 79, 85,123, 73, 80,13, 76, 74,34, 75,58,124,60,63, 78, 77,62};
 
-  vector_dword_1D values;
-  vector_dword_2D key;
+  vec_dword_1D values;
+  vec_dword_2D key;
 
   for ( int i=0; i< us_Base.size(); i++) {
     values.push_back(i);
@@ -147,10 +147,10 @@ int mac_write_US_ToVector( vector_dword_3D &vec_us) {
    * @return  the 2D-Vector
    */
 
-vector_dword_2D mac_create_empty_2D_Vector( int dim_rows, int dim_cols) {
+vec_dword_2D mac_create_empty_2D_Vector( int dim_rows, int dim_cols) {
 
-  vector_dword_1D shift;
-  vector_dword_2D vector_2D;
+  vec_dword_1D shift;
+  vec_dword_2D vector_2D;
 
   for ( int j=0; j< dim_cols;j++) {
     shift.push_back(INVALID_NAME);
@@ -174,7 +174,7 @@ vector_dword_2D mac_create_empty_2D_Vector( int dim_rows, int dim_cols) {
 int mac_append_underlying_ToVector(vector_dword_3D &All_Vector, const UCKeyboardLayout * keyboard_layout) {
   int caps=0;
   // create a 2D vector all filled with " " and push to 3D-Vector
-  vector_dword_2D underlying_Vector2D = mac_create_empty_2D_Vector(All_Vector[0].size(), All_Vector[0][0].size());
+  vec_dword_2D underlying_Vector2D = mac_create_empty_2D_Vector(All_Vector[0].size(), All_Vector[0][0].size());
 
   if (underlying_Vector2D.size() == 0) {
     wprintf(L"ERROR: can't create empty 2D-Vector\n");

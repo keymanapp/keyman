@@ -15,10 +15,3 @@ setup/textinputsource/textinputsource
 setup/textinputsource/textinputsource.arm64
 setup/textinputsource/textinputsource.x86_64
 setup/Install Keyman.app
-
-//Sabine
-**/mcompile/executable/*.*
-**/mcompile/*.kmx
-**/mcompile/X*.cpp
-**/mcompile/X_bak
-**/mcompile/X*.*
