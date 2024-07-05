@@ -4,6 +4,7 @@
 #define MC_IMPORT_RULES_H
 
 
+/**  @brief  Base class for Deadkey*/
 class DeadKey {
 private:
   KMX_WCHAR m_deadchar;
