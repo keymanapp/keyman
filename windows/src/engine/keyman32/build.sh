@@ -22,7 +22,7 @@ X64_TARGET="$X64_TARGET_PATH/keyman64.dll"
 builder_describe_outputs \
   configure    /resources/build/win/delphi_environment_generated.inc.sh \
   build:x86    /windows/src/engine/keyman32/$WIN32_TARGET \
-  build:x64    /windows/src/engine/keyman64/$X64_TARGET \
+  build:x64    /windows/src/engine/keyman32/$X64_TARGET \
 
 #-------------------------------------------------------------------------------------------------------------------
 
