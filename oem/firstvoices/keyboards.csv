@@ -56,6 +56,8 @@ fv,fv_severn_ojibwa,ᐊᓂᔑᓂᓂᒧᐎᐣ (Severn Ojibwa),Eastern Subarctic,f
 fv,fv_severn_ojibwa_rdot,ᐊᓂᔑᓂᓂᒧᐏᐣ (Severn Ojibwa right w-dot),Eastern Subarctic,fv_severn_ojibwa_kmw-9.0.js,1.0.1,ojs,Oji-Cree
 fv,fv_ojibwa,ᐊᓂᔑᓇᐯᒧᐎᓐ (a-finals),Eastern Subarctic,fv_ojibwa_kmw-9.0.js,10.0.1,ojb-Cans,Northwestern Ojibwa (Unified Canadian Aboriginal Syllabics)
 fv,fv_ojibwa_rdot,ᐁᓂᔑᓇᐯᒧᐏᓐ (a-finals right w-dot),Eastern Subarctic,fv_ojibwa_rdot_kmw-9.0.js,1.0.1,oj,Ojibwa
+fv,fv_ojibwa_ifinal,ᐊᓂᔑᓇᐯᒧᐎᣙ (i-finals),Eastern Subarctic,fv_ojibwa_ifinal_kmw-9.0.js,1.0,oj,Ojibwa
+fv,fv_ojibwa_ifinal_rdot,ᐊᓂᔑᓇᐯᒧᐏᣙ (i-finals right w-dot),Eastern Subarctic,fv_ojibwa_ifinal_rdot_kmw-9.0.js,1.0,oj,Ojibwa
 fv,fv_naskapi,ᓇᔅᑲᐱ (Naskapi),Eastern Subarctic,fv_naskapi_kmw-9.0.js,9.3.1,nsk-Cans,Naskapi (Unified Canadian Aboriginal Syllabics)
 sil,sil_euro_latin,English,European,european2-1.6.js,3.0.2,en,English
 basic,basic_kbdcan,Français,European,canadian_french-1.0.js,1.1.1,fr-CA,French (Canada)
