@@ -191,9 +191,6 @@ extern "C" __declspec(dllexport) BOOL WINAPI TIPProcessKey(WPARAM wParam, LPARAM
 	_td->TIPFUpdateable = Updateable;
   _td->TIPFPreserved = Preserved;   // I4290
 
-	_td->state.msg.hwnd = GetFocus();
-	_td->state.msg.lParam = 0;
-	_td->state.msg.message = wm_keymankeydown;
 	_td->state.vkey = (WORD) wParam;
   _td->state.isDown = !isUp;
 
