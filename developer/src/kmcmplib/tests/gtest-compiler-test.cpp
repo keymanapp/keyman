@@ -554,6 +554,11 @@ TEST_F(CompilerTest, GetXStringImpl_type_b_test) {
     u16cpy(str, u"baselayout()");
     EXPECT_EQ(CERR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
+    // baselayout, space in delimiters ... investigate u16tok() ... issue #11814
+    //fileKeyboard.version = VERSION_90;
+    //u16cpy(str, u"baselayout( )");
+    //EXPECT_EQ(CERR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
     // baselayout, CERR_InvalidToken from process_baselayout
     fileKeyboard.version = VERSION_90;
     u16cpy(str, u"baselayout(abc)");
@@ -567,6 +572,24 @@ TEST_F(CompilerTest, GetXStringImpl_type_b_test) {
     EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_baselayout_valid[] = { UC_SENTINEL, CODE_IFSYSTEMSTORE, TSS_BASELAYOUT+1, 2, 1, 0 };
     EXPECT_EQ(0, u16cmp(tstr_baselayout_valid, tstr));
+
+    // baselayout, space before argument, valid
+    fileKeyboard.version = VERSION_90;
+    fileKeyboard.cxStoreArray = 0;
+    fileKeyboard.dpStoreArray = nullptr;
+    u16cpy(str, u"baselayout( beep)");
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_baselayout_space_before_valid[] = { UC_SENTINEL, CODE_IFSYSTEMSTORE, TSS_BASELAYOUT+1, 2, 1, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_baselayout_space_before_valid, tstr));
+
+    // baselayout, space after argument, valid ... investigate GetDelimitedString() ... issue #11937
+    //fileKeyboard.version = VERSION_90;
+    //fileKeyboard.cxStoreArray = 0;
+    //fileKeyboard.dpStoreArray = nullptr;
+    //u16cpy(str, u"baselayout(beep )");
+    //EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    //const KMX_WCHAR tstr_baselayout_space_after_valid[] = { UC_SENTINEL, CODE_IFSYSTEMSTORE, TSS_BASELAYOUT+1, 2, 1, 0 };
+    //EXPECT_EQ(0, u16cmp(tstr_baselayout_space_after_valid, tstr));
 }
 
 // tests strings starting with 'i'
