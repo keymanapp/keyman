@@ -1,5 +1,29 @@
 # Keyman Version History
 
+## 18.0.69 alpha 2024-07-05
+
+* fix(core): allow to successfully build on Ubuntu 24.04 (#11926)
+* chore(windows): correct output file for 64-bit build of keyman32 in build.sh (#11930)
+* chore(android,ios): Add Crowdin localization for Polytonic Greek (#11877)
+
+## 18.0.68 alpha 2024-07-04
+
+* refactor(windows): merge keyman64 build into keyman32 (#11906)
+* refactor(windows): remove wm_keyman_keydown and wm_keyman_keyup (#11920)
+
+## 18.0.67 alpha 2024-07-03
+
+* refactor(common/models): move TS priority-queue implementation to web-utils (#11867)
+
+## 18.0.66 alpha 2024-07-02
+
+* fix(developer): handle second parameter of index correctly in kmcmplib compiler (#11815)
+
+## 18.0.65 alpha 2024-07-01
+
+* fix(developer): prevent non-BMP characters in key part of rule (#11806)
+* chore(linux): remove unused building with pbuilder (#11862)
+
 ## 18.0.64 alpha 2024-06-28
 
 * fix(web): use fat-finger data with simple keypresses (#11854)

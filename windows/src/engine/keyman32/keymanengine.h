@@ -97,7 +97,6 @@ typedef struct tagINTKEYBOARDINFO
 typedef struct tagKMSTATE
 {
   BOOL NoMatches;
-  MSG msg;
   WORD vkey;           // I934
   WCHAR charCode;      // I4582
   BOOL windowunicode;  // I4287

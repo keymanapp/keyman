@@ -13,7 +13,7 @@ import {
 
 import { BANNER_GESTURE_SET } from './bannerGestureSet.js';
 
-import { DeviceSpec, Keyboard, KeyboardProperties } from '@keymanapp/keyboard-processor';
+import { DeviceSpec, Keyboard, KeyboardProperties, timedPromise } from '@keymanapp/keyboard-processor';
 import { Banner } from './banner.js';
 import { ParsedLengthStyle } from '../lengthStyle.js';
 import { getFontSizeStyle } from '../fontSizeUtils.js';
@@ -175,6 +175,7 @@ export class BannerSuggestion {
     }
 
     this.currentWidth = this.collapsedWidth;
+    this.highlight(suggestion?.autoAccept);
     this.updateLayout();
   }
 
@@ -553,6 +554,16 @@ export class SuggestionBanner extends Banner {
         return;
       }
 
+      const autoselection = this._predictionContext.selected;
+      this._predictionContext.selected = null;
+      if(autoselection) {
+        this.options.forEach((entry) => {
+          if(entry.suggestion == autoselection) {
+            entry.highlight(false);
+          };
+        });
+      }
+
       this.scrollState = new BannerScrollState(source.currentSample, this.container.scrollLeft);
       const suggestion = source.baseItem;
 
@@ -585,6 +596,31 @@ export class SuggestionBanner extends Banner {
       }
 
       const terminationHandler = () => {
+        const currentSuggestions = this.currentSuggestions;
+        // First, schedule reselection of the autoselected suggestion.
+        // We shouldn't do it synchronously, as suggestion acceptance triggers
+        // _after_ this handler is called.
+        // Delaying via the task queue is enough to get the desired order of events.
+        timedPromise(0).then(async () => {
+          // If the suggestion list instance has changed, our state has changed; do
+          // not reselect.
+          if(currentSuggestions != this.currentSuggestions) {
+            return;
+          }
+
+          // The suggestions are still current?  Then restore the original
+          // auto-correct suggestion and its highlighting.
+          this._predictionContext.selected = autoselection;
+          if(autoselection) {
+            for(let entry of this.options) {
+              if(entry.suggestion == autoselection) {
+                entry.highlight(true);
+                break;
+              };
+            }
+          }
+        });
+
         if(sourceTracker.suggestion) {
           clearSelection(sourceTracker.suggestion);
           sourceTracker.suggestion = null;
@@ -603,7 +639,15 @@ export class SuggestionBanner extends Banner {
       // The actual result comes in via the sequence's `stage` event.
       sequence.once('stage', (result) => {
         const suggestion = result.item; // Should also == sourceTracker.suggestion.
-        if(suggestion && !this.scrollState.hasScrolled) {
+        // 1. A valid suggestion has been selected
+        // 2. The user wasn't scrolling the banner.  (If they were, they likely
+        //    need to lift their finger to select a newly-visible suggestion!)
+        // 3. The suggestions themselves are still valid; avoid suggestion
+        //    double-application or similar.
+        if(suggestion && !this.scrollState.hasScrolled && this.currentSuggestions.length > 0) {
+          // Invalidate the suggestions internally, but don't visually update;
+          // this will avoid banner-flicker.
+          this.currentSuggestions = [];
           this.predictionContext.accept(suggestion.suggestion).then(() => {
             // Reset the scroll state
             this.container.scrollLeft = this.isRTL ? this.container.scrollWidth : 0;
