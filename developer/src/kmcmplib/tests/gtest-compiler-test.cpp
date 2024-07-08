@@ -472,8 +472,20 @@ TEST_F(CompilerTest, GetXStringImpl_type_a_test) {
     u16cpy(str, u"any()");
     EXPECT_EQ(CERR_InvalidAny, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
+    // CERR_InvalidAny, space in delimiters ... investigate u16tok() ... issue #11814
+    // u16cpy(str, u"any( )");
+    // EXPECT_EQ(CERR_InvalidAny, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
     // CERR_StoreDoesNotExist
     u16cpy(str, u"any(d)");
+    EXPECT_EQ(CERR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // CERR_StoreDoesNotExist, space before store
+    u16cpy(str, u"any( d)");
+    EXPECT_EQ(CERR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // CERR_StoreDoesNotExist, space after store
+    u16cpy(str, u"any(d )");
     EXPECT_EQ(CERR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // CERR_ZeroLengthString
@@ -487,6 +499,20 @@ TEST_F(CompilerTest, GetXStringImpl_type_a_test) {
     EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_any_valid[] = { UC_SENTINEL, CODE_ANY, 2, 0 };
     EXPECT_EQ(0, u16cmp(tstr_any_valid, tstr));
+
+    // space before store, valid
+    u16cpy(str, u"any( b)");
+    file_store[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_any_space_before_valid[] = { UC_SENTINEL, CODE_ANY, 2, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_any_space_before_valid, tstr));
+
+    // space after store, valid ... investigate GetDelimitedString() issue #11937
+    // u16cpy(str, u"any(b )");
+    // file_store[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
+    // EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    // const KMX_WCHAR tstr_any_space_after_valid[] = { UC_SENTINEL, CODE_ANY, 2, 0 };
+    // EXPECT_EQ(0, u16cmp(tstr_any_space_after_valid, tstr));
 }
 
 // tests strings starting with 'b'
