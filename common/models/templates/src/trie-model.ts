@@ -109,7 +109,7 @@ class Traversal implements LexiconTraversal {
 
     // Split into individual code units.
     let steps = char.split('');
-    let traversal: ReturnType<Traversal["_child"]> = this;
+    let traversal: Traversal | undefined = this;
 
     while(steps.length > 0 && traversal) {
       const step: string = steps.shift()!;
@@ -148,6 +148,10 @@ class Traversal implements LexiconTraversal {
 
   *children(): Generator<{char: USVString, traversal: () => LexiconTraversal}> {
     let root = this.root;
+
+    // We refer to the field multiple times in this method, and it doesn't change.
+    // This also assists minification a bit, since we can't minify when re-accessing
+    // through `this.`.
     const totalWeight = this.totalWeight;
 
     if(root.type == 'internal') {
@@ -220,11 +224,10 @@ class Traversal implements LexiconTraversal {
   }
 
   get entries() {
-    const totalWeight = this.totalWeight;
-    const entryMapper = function(value: Entry) {
+    const entryMapper = (value: Entry) => {
       return {
         text: value.content,
-        p: value.weight / totalWeight
+        p: value.weight / this.totalWeight
       }
     }
 
@@ -425,7 +428,7 @@ interface Entry {
  * Wrapper class for the trie and its nodes.
  */
 class Trie {
-  private root: Node;
+  public readonly root: Node;
   /** The total weight of the entire trie. */
   readonly totalWeight: number;
   /**
