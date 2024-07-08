@@ -13,6 +13,12 @@ var smpForUnicode = function(code){
   return String.fromCharCode(H, L);
 }
 
+// Prob:  entry weight / total weight
+// "the" is the highest-weighted word in the fixture.
+const PROB_OF_THE     = 1000 / 500500;
+const PROB_OF_TRUE    =  607 / 500500;
+const PROB_OF_TROUBLE =  267 / 500500;
+
 describe('Trie traversal abstractions', function() {
   it('root-level iteration over child nodes', function() {
     var model = new TrieModel(jsonFixture('tries/english-1000'));
@@ -34,10 +40,6 @@ describe('Trie traversal abstractions', function() {
 
   it('traversal with simple internal nodes', function() {
     var model = new TrieModel(jsonFixture('tries/english-1000'));
-
-    // Prob:  entry weight / total weight
-    // "the" is the highest-weighted word in the fixture.
-    const PROB_OF_THE = 1000 / 500500;
 
     let rootTraversal = model.traverseFromRoot();
     assert.isDefined(rootTraversal);
@@ -103,7 +105,6 @@ describe('Trie traversal abstractions', function() {
 
   it('traversal over compact leaf node', function() {
     var model = new TrieModel(jsonFixture('tries/english-1000'));
-    const PROB_OF_TROUBLE = 267 / 500500;
 
     let rootTraversal = model.traverseFromRoot();
     assert.isDefined(rootTraversal);
@@ -117,7 +118,7 @@ describe('Trie traversal abstractions', function() {
         assert.isDefined(traversalInner1);
         assert.isArray(child.traversal().entries);
         assert.isEmpty(child.traversal().entries);
-        assert.equal(traversalInner1.p, 1000 / 500500 /* prob of 'the' */);
+        assert.equal(traversalInner1.p, PROB_OF_THE);
 
         for(let tChild of traversalInner1.children()) {
           if(tChild.char == 'r') {
@@ -125,7 +126,7 @@ describe('Trie traversal abstractions', function() {
             assert.isDefined(traversalInner2);
             assert.isArray(tChild.traversal().entries);
             assert.isEmpty(tChild.traversal().entries);
-            assert.equal(traversalInner2.p, 607 / 500500 /* prob of 'true', the best 'tr-' entry */);
+            assert.equal(traversalInner2.p, PROB_OF_TRUE);
 
             for(let rChild of traversalInner2.children()) {
               if(rChild.char == 'o') {

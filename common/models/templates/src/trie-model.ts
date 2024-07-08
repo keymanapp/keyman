@@ -108,6 +108,10 @@ class Traversal implements LexiconTraversal {
 
   *children(): Generator<{char: string, traversal: () => LexiconTraversal}> {
     let root = this.root;
+
+    // We refer to the field multiple times in this method, and it doesn't change.
+    // This also assists minification a bit, since we can't minify when re-accessing
+    // through `this.`.
     const totalWeight = this.totalWeight;
 
     if(root.type == 'internal') {
@@ -180,11 +184,10 @@ class Traversal implements LexiconTraversal {
   }
 
   get entries() {
-    const totalWeight = this.totalWeight;
-    const entryMapper = function(value: Entry) {
+    const entryMapper = (value: Entry) => {
       return {
         text: value.content,
-        p: value.weight / totalWeight
+        p: value.weight / this.totalWeight
       }
     }
 
@@ -305,7 +308,7 @@ export default class TrieModel implements LexicalModel {
   }
 
   public traverseFromRoot(): LexiconTraversal {
-    return new Traversal(this._trie['root'], '', this._trie.totalWeight);
+    return new Traversal(this._trie.root, '', this._trie.totalWeight);
   }
 };
 
@@ -386,7 +389,7 @@ interface Entry {
  * Wrapper class for the trie and its nodes.
  */
 class Trie {
-  private root: Node;
+  public readonly root: Node;
   /** The total weight of the entire trie. */
   readonly totalWeight: number;
   /**
