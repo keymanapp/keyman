@@ -7,22 +7,25 @@ import android.content.res.AssetManager;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
+import com.keyman.engine.JSONParser;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.data.Keyboard;
 import com.keyman.engine.packages.PackageProcessor;
 import com.keyman.engine.util.KMLog;
 
-import java.io.BufferedReader;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -30,6 +33,8 @@ final class FVShared {
     private static FVShared instance = null;
     private boolean isInitialized = false;
 
+    // File containing keyboard+region info for each keyboard
+    private static final String FVKeyboards_JSON = "keyboards.json";
     private static final String FVLoadedKeyboardList = "loaded_keyboards.dat";
 
     // Keys from earlier versions of app, used only in the upgrade process
@@ -124,53 +129,83 @@ final class FVShared {
   }
 
   private FVRegionList loadRegionList() {
-        FVRegionList list = new FVRegionList();
-        try {
-            // At this point in initialization, fv_all.kmp hasn't been extracted, so
-            // we get all the keyboard info from keyboards.csv
-            InputStream inputStream = context.getAssets().open("keyboards.csv");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+      FVRegionList list = new FVRegionList();
+      File resourceRoot = new File(getResourceRoot());
+      PackageProcessor kmpProcessor = new PackageProcessor(resourceRoot);
+      JSONParser parser = new JSONParser();
+      File jsonFile = new File(getPackagesDir() + FVDefault_PackageID + File.separator + FVKeyboards_JSON);
+      if (!jsonFile.exists()) {
+          return list;
+      }
+      try {
+          // At this point in initialization, fv_all.kmp is now extracted, so
+          // populate keyboard info from keyboards.json
+          JSONArray keyboardsArray = parser.getJSONObjectFromFile(jsonFile, JSONArray.class);
 
-            reader.readLine(); // skip header row
-            String line = reader.readLine();
+          if (keyboardsArray == null) {
+              Log.d("loadRegionList", "unable to load keyboards.json");
+              return list;
+          }
 
-            while (line != null) {
-                while (line.contains(",,"))
-                    line = line.replace(",,", ", ,");
+          for (int i=0; i<keyboardsArray.length(); i++) {
+              JSONObject keyboardObj = keyboardsArray.getJSONObject(i);
+              if (keyboardObj == null) {
+                  Log.d("loadRegionList", "keyboard Obj is null");
+                  continue;
+              }
+              JSONArray languageArray = keyboardObj.getJSONArray("languages");
+              if (languageArray == null) {
+                  Log.d("loadRegionList", "language Array is null");
+                  continue;
+              }
+              String regionName = keyboardObj.getString("region");
+              FVRegion region = list.findRegion(regionName);
+              if(region == null) {
+                  region = new FVRegion(regionName);
+                  list.add(region);
+              }
 
-                String[] values = line.split(",");
-                if (values != null && values.length > 0) {
-                    // Read in column info
-                    String kbId = values[1];
-                    String kbName = values[2];
-                    String regionName = values[3];
-                    String legacyId = values[4];
-                    String version = values[5];
-                    String lgId = values[6].toLowerCase(); // Normalize language ID
-                    String lgName = values[7];
+              String kbID = keyboardObj.getString("id");
+              String kbName = keyboardObj.getString("name");
+              JSONObject languageObj = languageArray.getJSONObject(0);
+              String lgID = languageObj.getString("id").toLowerCase(); // Normalize language Id
+              String lgName = languageObj.getString("name");
 
-                    FVRegion region = list.findRegion(regionName);
-                    if(region == null) {
-                        region = new FVRegion(regionName);
-                        list.add(region);
-                    }
+              // Override European keyboard info
+              if (kbID.equalsIgnoreCase("sil_euro_latin")) {
+                kbName = "English";
+                lgID = "en";
+                lgName = "English";
+              } else if (kbID.equalsIgnoreCase("basic_kbdcan")) {
+                kbName = "Français";
+                lgID = "fr-ca";
+                lgName = "French";
+              }
 
-                    FVKeyboard keyboard = new FVKeyboard(kbId, kbName, legacyId, version, lgId, lgName);
+              FVKeyboard kbd = new FVKeyboard(
+                  kbID,
+                  kbName,
+                  kbID, // unused legacy ID
+                  keyboardObj.getString("version"),
+                  lgID,
+                  lgName);
 
-                    region.keyboards.add(keyboard);
-                }
+              region.keyboards.add(kbd);
+          }
+      } catch (Exception e) {
+          Log.e("createKeyboardList", "Error: " + e);
+          // We'll return a malformed list for now in this situation
+      }
 
-                line = reader.readLine();
-            }
+      // Sort by region name
+      Collections.sort(list, (r1, r2) -> r1.name.compareTo(r2.name));
 
-            inputStream.close();
-        } catch (Exception e) {
-            Log.e("createKeyboardList", "Error: " + e);
-            // We'll return a malformed list for now in this situation
-        }
-
-        return list;
-    }
+      for (int i=0; i<list.size(); i++) {
+        // Sort by keyboard name in each region
+        Collections.sort(list.get(i).keyboards, (k1, k2) -> k1.name.compareTo(k2.name));
+      }
+      return list;
+  }
 
     private FVLoadedKeyboardList loadLoadedKeyboardList() {
         FVLoadedKeyboardList data = new FVLoadedKeyboardList();
