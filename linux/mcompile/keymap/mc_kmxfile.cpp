@@ -1,3 +1,9 @@
+/*
+ * Keyman is copyright (C) 2004 SIL International. MIT License.
+ *
+ * Mnemonic layout support for Linux
+ */
+
 #include "mc_kmxfile.h"
 #include <typeinfo>
 

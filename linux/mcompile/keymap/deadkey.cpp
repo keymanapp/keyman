@@ -4,20 +4,18 @@
  * Mnemonic layout support for Linux
  */
 
-
 #include "keymap.h"
 #include "deadkey.h"
 
-
 /** @brief create a Vector of DeadKey containing all combinations of deadkey + character for ALL possible Linux keyboards */ 
-std::vector<DeadKey *> create_deadkeys_by_basechar() {
-  std::vector<DeadKey *> alDead;
+std::vector<DeadKey*> create_deadkeys_by_basechar() {
+  std::vector<DeadKey*> alDead;
   vec_dword_2D dk_ComposeTable;
 
   create_DKTable(dk_ComposeTable);
 
   for (int i = 0; i < (int)dk_ComposeTable.size() - 1; i++) {
-    DeadKey *dk2 = new DeadKey(dk_ComposeTable[i][0]);
+    DeadKey* dk2 = new DeadKey(dk_ComposeTable[i][0]);
     for (int j = i; j < (int)dk_ComposeTable.size(); j++) {
       if ((dk_ComposeTable[i][0] == dk_ComposeTable[j][0]) && (IsKeymanUsedChar(dk_ComposeTable[j][1])))
         dk2->KMX_AddDeadKeyRow(dk_ComposeTable[j][1], dk_ComposeTable[j][2]);
@@ -27,13 +25,12 @@ std::vector<DeadKey *> create_deadkeys_by_basechar() {
   return alDead;
 }
 
-
 /** @brief filter entries for the currently used Linux Keyboard out of a vector of all existing deadKey combinations */
-void refine_alDead(KMX_WCHAR dk, std::vector<DeadKey *>& dkVec, std::vector<DeadKey *>& r_All_Vec) {
+void refine_alDead(KMX_WCHAR dk, std::vector<DeadKey*>& dkVec, std::vector<DeadKey*>& r_All_Vec) {
   if (dk == 0)
     return;
 
-  for (int j = 0; j < (int) r_All_Vec.size(); j++) {
+  for (int j = 0; j < (int)r_All_Vec.size(); j++) {
     if (dk == r_All_Vec[j]->KMX_GetDeadCharacter()) {
       if (!found_dk_inVector(dk, dkVec)) {
         dkVec.push_back(r_All_Vec[j]);
@@ -43,16 +40,14 @@ void refine_alDead(KMX_WCHAR dk, std::vector<DeadKey *>& dkVec, std::vector<Dead
   }
 }
 
-
 /** @brief check whether a deadkey already exists in the deadkey vector */
-bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey *>& dkVec) {
+bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey*>& dkVec) {
   for (int i = 0; i < dkVec.size(); i++) {
     if (dk == dkVec[i]->KMX_GetDeadCharacter())
       return true;
   }
   return false;
 }
-
 
 /** @brief find deadkey combinations for a certain deadkey in a vector of all deadkey combinations */
 bool query_dk_combinations_for_specific_dk(vec_dword_2D& r_dk_ComposeTable, KMX_DWORD dk, vec_dword_2D& dk_SingleTable) {
@@ -74,11 +69,10 @@ bool query_dk_combinations_for_specific_dk(vec_dword_2D& r_dk_ComposeTable, KMX_
     return false;
 }
 
-
 /** @brief convert a character to the upper-case equivalent and find the corresponding shiftstate */
 KMX_DWORD KMX_change_keyname_to_capital(KMX_DWORD kVal, KMX_DWORD& shift, GdkKeymap* keymap) {
   guint keyval = (guint)kVal;
-  GdkKeymapKey *keys;
+  GdkKeymapKey* keys;
   gint n_keys;
 
   KMX_DWORD capitalKeyval = (KMX_DWORD)gdk_keyval_to_upper(kVal);
@@ -94,7 +88,6 @@ KMX_DWORD KMX_change_keyname_to_capital(KMX_DWORD kVal, KMX_DWORD& shift, GdkKey
   return capitalKeyval;
 }
 
-
 /** @brief append a 1D-vector containing name, base character and unicode_value to a 2D-Vector */
 void add_deadkey_combination(vec_dword_2D& dk_ComposeTable, std::string diacritic_name, std::string base_char, KMX_DWORD unicode_value) {
   vec_dword_1D line;
@@ -103,7 +96,6 @@ void add_deadkey_combination(vec_dword_2D& dk_ComposeTable, std::string diacriti
   line.push_back(unicode_value);
   dk_ComposeTable.push_back(line);
 }
-
 
 /** @brief create a 2D-Vector containing all possible combinations of deadkey + character for all Linux keyboards */
 void create_DKTable(vec_dword_2D& dk_ComposeTable) {
