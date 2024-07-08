@@ -384,6 +384,30 @@ TEST_F(CompilerTest, GetDelimitedString_test) {
     EXPECT_EQ(0, u16cmp(u"b", q));
     EXPECT_FALSE(*p);
     EXPECT_EQ(4, p-str); // deleted close delimiter
+
+    // single-character argument, space after argument, cut open and close delimiter, valid
+    u16cpy(str, u"(b )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(3, p-str); // deleted close delimiter
+
+    // single-character argument, double space after argument, cut open and close delimiter, valid
+    u16cpy(str, u"(b  )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(4, p-str); // deleted close delimiter
+
+    // single-character argument, space after close delimiter, cut open and close delimiter, valid ... fails *** TODO ***
+    // u16cpy(str, u"(b) ");
+    // p = str;
+    // q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    // EXPECT_EQ(0, u16cmp(u"b", q));
+    // EXPECT_FALSE(*p);
+    // EXPECT_EQ(3, p-str); // deleted space
 }
 
 // LinePrefixType GetLinePrefixType(PKMX_WCHAR *p)

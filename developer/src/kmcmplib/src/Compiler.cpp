@@ -1704,13 +1704,18 @@ PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_W
     while (iswspace(*q)) q++;	        // cut off leading spaces
 
   if (Flags & GDS_CUTFOLL)
-    if (!iswspace(*(r - 1))) *r = 0;
+    if (!iswspace(*(r - 1))) *r = 0; // delete close delimiter
     else
     {
       r--;							// Cut off following spaces
       while (iswspace(*r) && r > q) r--;
       r++;
-      *r = 0; r = (PKMX_WCHAR) u16chr((r + 1), dClose);
+
+      *r = 0; // delete first following space
+
+      r = (PKMX_WCHAR) u16chr((r + 1), dClose);
+
+       *r = 0; // delete close delimiter
     }
   else *r = 0;
 
