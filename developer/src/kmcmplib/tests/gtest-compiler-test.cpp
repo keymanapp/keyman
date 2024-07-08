@@ -317,29 +317,57 @@ TEST_F(CompilerTest, GetDelimitedString_test) {
     PKMX_WCHAR p = str;
     PKMX_WCHAR q = nullptr;
 
-    // no open delimiter
+    // no open delimiter, cut open and close delimiter
     u16cpy(str, u"");
+    p = str;
     q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
     EXPECT_FALSE(q);
 
-    // no close delimiter
+    // no close delimiter, cut open and close delimiterg
     u16cpy(str, u"(");
+    p = str;
     q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
     EXPECT_FALSE(q);
 
-    // no argument ... buffer overrun
-    // u16cpy(str, u"()");
-    // q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-    // EXPECT_EQ(0, u16cmp(u"", q));
-    // EXPECT_FALSE(*p);
-    // EXPECT_EQ(1, p-str); // deleted close delimiter
+    // no argument, cut open and close delimiter
+    u16cpy(str, u"()");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(1, p-str); // deleted close delimiter
 
-    // single-character argument, valid
+    // single-character argument, cut open and close delimiter, valid
     u16cpy(str, u"(b)");
+    p = str;
     q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
     EXPECT_EQ(0, u16cmp(u"b", q));
     EXPECT_FALSE(*p);
     EXPECT_EQ(2, p-str); // deleted close delimiter
+
+    // multi-character argument, cut open and close delimiter, valid
+    u16cpy(str, u"(abc)");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"abc", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(4, p-str); // deleted close delimiter
+
+    // single-character argument, leading single space, cut open and close delimiter, valid
+    u16cpy(str, u" (b)");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(3, p-str); // deleted close delimiter
+
+    // single-character argument, leading double space, cut open and close delimiter, valid
+    u16cpy(str, u"  (b)");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(4, p-str); // deleted close delimiter
 }
 
 // LinePrefixType GetLinePrefixType(PKMX_WCHAR *p)
