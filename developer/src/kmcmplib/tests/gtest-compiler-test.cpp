@@ -317,11 +317,29 @@ TEST_F(CompilerTest, GetDelimitedString_test) {
     PKMX_WCHAR p = str;
     PKMX_WCHAR q = nullptr;
 
-    // single-character agument, valid
+    // no open delimiter
+    u16cpy(str, u"");
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_FALSE(q);
+
+    // no close delimiter
+    u16cpy(str, u"(");
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_FALSE(q);
+
+    // no argument ... buffer overrun
+    // u16cpy(str, u"()");
+    // q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    // EXPECT_EQ(0, u16cmp(u"", q));
+    // EXPECT_FALSE(*p);
+    // EXPECT_EQ(1, p-str); // deleted close delimiter
+
+    // single-character argument, valid
     u16cpy(str, u"(b)");
     q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
     EXPECT_EQ(0, u16cmp(u"b", q));
     EXPECT_FALSE(*p);
+    EXPECT_EQ(2, p-str); // deleted close delimiter
 }
 
 // LinePrefixType GetLinePrefixType(PKMX_WCHAR *p)
