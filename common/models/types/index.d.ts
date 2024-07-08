@@ -32,8 +32,10 @@ type TextWithProbability = {
 
   /**
    * The probability of the lexical entry, directly based upon its frequency.
+   *
+   * A real-number weight, from 0 to 1.
    */
-  p: number; // real-number weight, from 0 to 1
+  p: number;
 }
 
 /**
