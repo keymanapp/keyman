@@ -118,7 +118,7 @@ class Traversal implements LexiconTraversal {
 
     // Split into individual code units.
     let steps = char.split('');
-    let traversal: ReturnType<Traversal["_child"]> = this;
+    let traversal: Traversal | undefined = this;
 
     while(steps.length > 0 && traversal) {
       const step: string = steps.shift()!;

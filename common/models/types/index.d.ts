@@ -51,10 +51,9 @@ declare interface LexiconTraversal {
   children(): Generator<{char: USVString, traversal: () => LexiconTraversal}>;
 
   /**
-   * Allows direct access to the traversal state that results when appending a
-   * `char` representing a single UTF-16 codepoint to the current traversal
-   * state's prefix.  This bypasses the need to iterate among all legal child
-   * Traversals.
+   * Allows direct access to the traversal state that results when appending one
+   * or more codepoints encoded in UTF-16 to the current traversal state's prefix.
+   * This allows bypassing iteration among all legal child Traversals.
    *
    * If such a traversal state is not supported, returns `undefined`.
    * Implementations may choose to return `undefined` if more than one UTF-16
