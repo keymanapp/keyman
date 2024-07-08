@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 18.0.70 alpha 2024-07-08
+
+* feat(web): provide lexicon probabilities directly on the search path (#11868)
+* feat(common/models): support direct-child access for Trie node iteration (#11869)
+* change(common/models/templates): rework Trie predict method to utilize traversals (#11870)
+* change(web): track the base correction for generated predictions (#11875)
+* feat(web): add and enable auto-correction (#11866)
+
 ## 18.0.69 alpha 2024-07-05
 
 * fix(core): allow to successfully build on Ubuntu 24.04 (#11926)
