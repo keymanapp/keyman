@@ -100,13 +100,62 @@ class Traversal implements LexiconTraversal {
    */
   totalWeight: number;
 
-  constructor(root: Node, prefix: string, maxWeight: number) {
+  constructor(root: Node, prefix: string, totalWeight: number) {
     this.root = root;
     this.prefix = prefix;
-    this.totalWeight = maxWeight;
+    this.totalWeight = totalWeight;
   }
 
-  *children(): Generator<{char: string, traversal: () => LexiconTraversal}> {
+  child(char: USVString): LexiconTraversal | undefined {
+    /*
+      Note: would otherwise return the current instance if `char == ''`.  If
+      such a call is happening, it's probably indicative of an implementation
+      issue elsewhere - let's signal now in order to catch such stuff early.
+    */
+    if(char == '') {
+      return undefined;
+    }
+
+    // Split into individual code units.
+    let steps = char.split('');
+    let traversal: Traversal | undefined = this;
+
+    while(steps.length > 0 && traversal) {
+      const step: string = steps.shift()!;
+      traversal = traversal._child(step);
+    }
+
+    return traversal;
+  }
+
+  // Handles one code unit at a time.
+  private _child(char: USVString): Traversal | undefined {
+    const root = this.root;
+    const totalWeight = this.totalWeight;
+    const nextPrefix = this.prefix + char;
+
+    if(root.type == 'internal') {
+      let childNode = root.children[char];
+      if(!childNode) {
+        return undefined;
+      }
+
+      return new Traversal(childNode, nextPrefix, totalWeight);
+    } else {
+      // root.type == 'leaf';
+      const legalChildren = root.entries.filter(function(entry) {
+        return entry.key.indexOf(nextPrefix) == 0;
+      });
+
+      if(!legalChildren.length) {
+        return undefined;
+      }
+
+      return new Traversal(root, nextPrefix, totalWeight);
+    }
+  }
+
+  *children(): Generator<{char: USVString, traversal: () => LexiconTraversal}> {
     let root = this.root;
 
     // We refer to the field multiple times in this method, and it doesn't change.
@@ -308,7 +357,7 @@ export default class TrieModel implements LexicalModel {
   }
 
   public traverseFromRoot(): LexiconTraversal {
-    return new Traversal(this._trie.root, '', this._trie.totalWeight);
+    return this._trie.traverseFromRoot();
   }
 };
 
@@ -402,6 +451,10 @@ class Trie {
     this.root = root;
     this.toKey = wordform2key;
     this.totalWeight = totalWeight;
+  }
+
+  public traverseFromRoot(): LexiconTraversal {
+    return new Traversal(this.root, '', this.totalWeight);
   }
 
   /**

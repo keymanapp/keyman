@@ -29,6 +29,10 @@ describe('Trie traversal abstractions', function() {
     let rootKeys = ['t', 'o', 'a', 'i', 'w', 'h', 'f', 'b', 'n', 'y', 's', 'm',
                     'u', 'c', 'd', 'l', 'e', 'j', 'p', 'g', 'v', 'k', 'r', 'q'];
 
+    rootKeys.forEach((entry) => assert.isOk(rootTraversal.child(entry)));
+    assert.isNotOk(rootTraversal.child('x'));
+    assert.isNotOk(rootTraversal.child('z'));
+
     for(let child of rootTraversal.children()) {
       let keyIndex = rootKeys.indexOf(child.char);
       assert.notEqual(keyIndex, -1);
@@ -101,6 +105,38 @@ describe('Trie traversal abstractions', function() {
     assert.isTrue(eSuccess);
 
     assert.isEmpty(eKeys);
+  });
+
+  it('direct traversal with simple internal nodes', function() {
+    var model = new TrieModel(jsonFixture('tries/english-1000'));
+
+    let rootTraversal = model.traverseFromRoot();
+    assert.isDefined(rootTraversal);
+
+    let eKeys = ['y', 'r', 'i', 'm', 's', 'n', 'o'];
+
+    const tNode = rootTraversal.child('t');
+    assert.isOk(tNode);
+    assert.isDefined(tNode);
+    assert.isArray(tNode.entries);
+    assert.isEmpty(tNode.entries);
+
+    const hNode = tNode.child('h');
+    assert.isOk(hNode);
+    assert.isDefined(hNode);
+    assert.isArray(hNode.entries);
+    assert.isEmpty(hNode.entries);
+
+    const eNode = hNode.child('e');
+    assert.isOk(eNode);
+    assert.isDefined(eNode);
+    assert.isArray(eNode.entries);
+    assert.isNotEmpty(eNode.entries);
+    assert.equal(eNode.entries[0].text, "the");
+
+    for(let key of eKeys) {
+      assert.isOk(eNode.child(key));
+    }
   });
 
   it('traversal over compact leaf node', function() {
@@ -178,7 +214,6 @@ describe('Trie traversal abstractions', function() {
 
     assert.isTrue(eSuccess);
   });
-
 
   it('traversal with SMP entries', function() {
     // Two entries, both of which read "apple" to native English speakers.
@@ -284,5 +319,53 @@ describe('Trie traversal abstractions', function() {
     assert.isTrue(eSuccess);
 
     assert.isEmpty(pKeys);
+  });
+
+  it('direct traversal with SMP entries', function() {
+    // Two entries, both of which read "apple" to native English speakers.
+    // One solely uses SMP characters, the other of which uses a mix of SMP and standard.
+    var model = new TrieModel(jsonFixture('tries/smp-apple'));
+
+    let rootTraversal = model.traverseFromRoot();
+    assert.isDefined(rootTraversal);
+
+    let smpA = smpForUnicode(0x1d5ba);
+    let smpP = smpForUnicode(0x1d5c9);
+    let smpL = smpForUnicode(0x1d5c5);
+    let smpE = smpForUnicode(0x1d5be);
+
+    // Just to be sure our utility function is working right.
+    assert.equal(smpA + smpP + 'pl' + smpE, "𝖺𝗉pl𝖾");
+
+    let pKeys = ['p', smpP];
+    let leafChildSequence = ['l', smpE];
+
+    const aNode = rootTraversal.child(smpA);
+    assert.isOk(aNode);
+    assert.isNotOk(rootTraversal.child('a'));
+
+    const pNode1 = aNode.child(smpP);
+    assert.isOk(pNode1);
+    assert.isNotOk(aNode.child('p'));
+
+    const pNode2 = pNode1.child('p');
+    assert.isOk(pNode2);
+    assert.isOk(pNode1.child(smpP)); // Both exist for this step.
+
+    const lNode = pNode2.child('l');
+    assert.isOk(lNode);
+    assert.isNotOk(pNode2.child(smpL));
+
+    const eNode = lNode.child(smpE);
+    assert.isOk(eNode);
+    assert.isNotOk(lNode.child('e'));
+
+    assert.deepEqual(eNode.entries, [
+      {
+        text: smpA + smpP + 'pl' + smpE,
+        p: 1/2
+      }
+    ]);
+    assert.equal(eNode.p, 0.5);
   });
 });
