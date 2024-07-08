@@ -35,6 +35,14 @@ const int CODE__SIZE[] = {
     2    // CODE_SETSYSTEMSTORE      0x18
 };
 
+
+/**
+   * @brief Saves a Keyboard to a file
+   * @param kbd ptr to the keyboard
+   * @param hOutfile ptr to the output file
+   * @param FSaveDebug
+   * @return an Error in case of failure
+   */
 KMX_DWORD KMX_WriteCompiledKeyboardToFile(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL FSaveDebug) {
 
   LPKMX_GROUP fgp;
@@ -201,6 +209,13 @@ KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD file_size);
 
 LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize);
 
+
+/**
+   * @brief save keyboard to file
+   * @param kbd ptr to the keyboard
+   * @param filename ptr to filename of kmx-file
+   * @return TRUE on success; else FALSE
+   */
 KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, KMX_CHAR* filename) {
 
   FILE *fp;
@@ -225,6 +240,12 @@ KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, KMX_CHAR* filename) {
   return TRUE;
 }
 
+/**
+   * @brief adds an offset
+   * @param base ptr to starting point
+   * @param offset a given offset
+   * @return pointer to base + ofset
+   */
 PKMX_WCHAR KMX_StringOffset(PKMX_BYTE base, KMX_DWORD offset) {
   if(offset == 0) return NULL;
   return (PKMX_WCHAR)(base + offset);
@@ -232,12 +253,14 @@ PKMX_WCHAR KMX_StringOffset(PKMX_BYTE base, KMX_DWORD offset) {
 
 #ifdef KMX_64BIT
 
-/**  CopyKeyboard will copy the data read into bufp from x86-sized structures into
-  x64-sized structures starting at `base`
-  * After this function finishes, we still need to keep the original data because
-    we don't copy the strings
-  This method is used on 64-bit architectures.
-*/
+/**
+   * @brief CopyKeyboard will copy the data into bufp from x86-sized structures into
+   * x64-sized structures starting at `base`. After this function finishes, we still need to keep the original data because
+   * we don't copy the strings. The method is used on 64-bit architectures.
+   * @param bufp ptr to buffer where data is copied into
+   * @param base ptr to starting point
+   * @return ptr to the keyboard
+   */
 LPKMX_KEYBOARD CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base) {
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) base;
 
@@ -315,10 +338,15 @@ LPKMX_KEYBOARD CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base) {
 }
 
 // else KMX_FixupKeyboard
-#else  /**  Fixup the keyboard by expanding pointers. On disk the pointers are stored relative to the
- beginning of the file, but we need real pointers. This method is used on 32-bit architectures.
-*/
-
+#else
+/**
+   * @brief Fixup the keyboard by expanding pointers. On disk the pointers are stored relative to the
+   *        beginning of the file, but we need real pointers. This method is used on 32-bit architectures.
+   * @param bufp ptr to buffer where data will be copied into
+   * @param base ptr to starting point
+   * @param dwFileSize size of the file
+   * @return ptr to the keyboard
+   */
 LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize) {
 
   UNREFERENCED_PARAMETER(dwFileSize);
@@ -357,7 +385,12 @@ LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFil
 }
 
 #endif
-
+/**
+   * @brief load a keyboard kmx-file
+   * @param fileName ptr to filename of kmx-file
+   * @param [in,out] lpKeyboard ptr to ptr to keyboard
+   * @return TRUE on success; else FALSE
+   */
 KMX_BOOL KMX_LoadKeyboard(KMX_CHAR* fileName, LPKMX_KEYBOARD* lpKeyboard) {
 
   *lpKeyboard = NULL;
@@ -465,6 +498,12 @@ KMX_BOOL KMX_LoadKeyboard(KMX_CHAR* fileName, LPKMX_KEYBOARD* lpKeyboard) {
   return TRUE;
 }
 
+/**
+   * @brief check if the fiel has correct version
+   * @param filebase containing data of the inputfile
+   * @param file_size a size
+   * @return true if successful; false if not
+   */
 KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD file_size){
   KMX_DWORD i;
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD)filebase;
@@ -490,6 +529,12 @@ KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD file_size){
   return TRUE;
 }
 
+
+/**
+   * @brief increments in a string
+   * @param p ptr to a character
+   * @return ptr to the next character
+   */
 PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p) {
 
   if (p == NULL || *p == 0)
@@ -524,7 +569,12 @@ PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p) {
   return p;
 }
 
-
+/**
+   * @brief open a file
+   * @param Filename name of the file
+   * @param mode same as mode in fopen
+   * @return ptr to file
+   */
 FILE* Open_File(const KMX_CHAR* Filename, const KMX_CHAR* mode) {
 #ifdef _MSC_VER
   std::string cpath = Filename; //, cmode = mode;

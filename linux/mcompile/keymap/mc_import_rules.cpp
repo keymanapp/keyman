@@ -47,8 +47,8 @@ DeadKey::DeadKey(KMX_WCHAR deadCharacter) {
 }
 
 /** 
-   * @brief  return a deadkey
-   * @return deadkey
+   * @brief  return a dead character
+   * @return deadkey character
    */
 KMX_WCHAR DeadKey::KMX_DeadCharacter() {
   return this->m_deadchar;
@@ -56,8 +56,8 @@ KMX_WCHAR DeadKey::KMX_DeadCharacter() {
 
 /** 
    * @brief set Deadkey with values
-   * @param baseCharacter
-   * @param combinedCharacter
+   * @param baseCharacter the base character
+   * @param combinedCharacter the combined character
    * @return void
    */
 void DeadKey::KMX_AddDeadKeyRow(KMX_WCHAR baseCharacter, KMX_WCHAR combinedCharacter) {
@@ -67,7 +67,7 @@ void DeadKey::KMX_AddDeadKeyRow(KMX_WCHAR baseCharacter, KMX_WCHAR combinedChara
 
 
 /** 
-   * @brief check if character exists in deadkey
+   * @brief check if character exists in DeadKey
    * @param baseCharacter 
    * @return true if found; false if not found
    */
