@@ -857,8 +857,20 @@ TEST_F(CompilerTest, GetXStringImpl_type_o_test) {
     u16cpy(str, u"outs()");
     EXPECT_EQ(CERR_InvalidOuts, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
+    // outs, space in delimiters ... investigate u16tok() ... issue #11814
+    // u16cpy(str, u"outs( )");
+    // EXPECT_EQ(CERR_InvalidOuts, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
     // outs, CERR_StoreDoesNotExist
     u16cpy(str, u"outs(d)");
+    EXPECT_EQ(CERR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // outs, CERR_StoreDoesNotExist, space before store
+    u16cpy(str, u"outs( d)");
+    EXPECT_EQ(CERR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // outs, CERR_StoreDoesNotExist, space after store
+    u16cpy(str, u"outs(d )");
     EXPECT_EQ(CERR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // outs, CERR_OutsTooLong
@@ -872,6 +884,20 @@ TEST_F(CompilerTest, GetXStringImpl_type_o_test) {
     EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_outs_valid[] = { 'a', 'b', 'c', 0 };
     EXPECT_EQ(0, u16cmp(tstr_outs_valid, tstr));
+
+    // outs, space before store, valid
+    file_store[1].dpString = (PKMX_WCHAR)u"abc";
+    u16cpy(str, u"outs( b)");
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_outs_space_before_valid[] = { 'a', 'b', 'c', 0 };
+    EXPECT_EQ(0, u16cmp(tstr_outs_space_before_valid, tstr));
+
+    // outs, space after store, valid ... investigate GetDelimitedString() ... issue #11937
+    // file_store[1].dpString = (PKMX_WCHAR)u"abc";
+    // u16cpy(str, u"outs(b )");
+    // EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    // const KMX_WCHAR tstr_outs_space_after_valid[] = { 'a', 'b', 'c', 0 };
+    // EXPECT_EQ(0, u16cmp(tstr_outs_space_after_valid, tstr));
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
