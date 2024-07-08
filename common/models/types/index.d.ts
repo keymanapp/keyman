@@ -25,7 +25,7 @@ declare type CasingForm = 'lower' | 'initial' | 'upper';
  */
 declare interface LexiconTraversal {
   /**
-   * Provides an iterable pattern used to search for words with a prefix matching
+   * Provides an iterable pattern used to search for words with a 'keyed' prefix matching
    * the current traversal state's prefix when a new character is appended.  Iterating
    * across `children` provides 'breadth' to a lexical search.
    *
@@ -70,7 +70,25 @@ declare interface LexiconTraversal {
    * - prefix of 'crepe': ['crêpe', 'crêpé']
    * - other examples:  https://www.thoughtco.com/french-accent-homographs-1371072
    */
-  entries: USVString[];
+  entries: {
+    /**
+     * A lexical entry (word) offered by the model.
+     *
+     * Note:  not the search-term keyed part.  This will match the actual, unkeyed form.
+     */
+    text: USVString,
+    /**
+     * The probability of the lexical entry, directly based upon its frequency.
+     */
+    p: number
+  }[];
+
+  // Note:  `p`, not `maxP` - we want to see the same name for `this.entries.p` and `this.p`
+  /**
+   * Gives the probability of the highest-frequency lexical entry that is either a member or
+   * descendent of the represented trie `Node`.
+   */
+  p: number;
 }
 
 /**
