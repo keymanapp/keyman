@@ -164,10 +164,9 @@ export default class ModelCompositor {
     let prefixTransform: Transform;
     let postContextState: correction.TrackedContextState = null;
 
-    let currentCasing: CasingForm = null;
-    if(lexicalModel.languageUsesCasing) {
-      currentCasing = this.detectCurrentCasing(postContext);
-    }
+    const currentCasing: CasingForm = lexicalModel.languageUsesCasing
+      ? this.detectCurrentCasing(postContext)
+      : null;
 
     // Section 1:  determining 'prediction roots'.
     if(!this.contextTracker) {
@@ -428,14 +427,22 @@ export default class ModelCompositor {
       // prioritize such a suggestion over suggestions that are not.
       if(keyed(tuple.correction.sample) == keyedPrefix) {
         if(predictedWord == truePrefix) {
+          // Exact match:  it's a perfect 'keep' suggestion.
           tuple.matchLevel = SuggestionSimilarity.exact;
           keepOption = this.toAnnotatedSuggestion(tuple.prediction.sample, 'keep',  models.QuoteBehavior.noQuotes);
+
+          // Indicates that this suggestion exists directly within the lexical
+          // model as a valid suggestion.  (We actively display it if it's an
+          // exact match, but hide it if not, only preserving it for reversions
+          // if/when needed.)
           keepOption.matchesModel = true;
           Object.assign(tuple.prediction.sample, keepOption);
           keepOption = tuple.prediction.sample as Outcome<Keep>;
         } else if(keyCased(predictedWord) == lowercasedPrefix) {
+          // Case-insensitive match.  No diacritic differences; the ONLY difference is casing.
           tuple.matchLevel = SuggestionSimilarity.sameText;
         } else if(keyed(predictedWord) == keyedPrefix) {
+          // Diacritic-insensitive / exact-key match.
           tuple.matchLevel = SuggestionSimilarity.sameKey;
         }
       }
@@ -581,7 +588,7 @@ export default class ModelCompositor {
   }
 
   private predictionAutoSelect(suggestionDistribution: CorrectionPredictionTuple[]) {
-    if(suggestionDistribution.length < 1) {
+    if(suggestionDistribution.length == 0) {
       return;
     }
 
