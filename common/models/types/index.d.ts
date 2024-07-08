@@ -20,6 +20,25 @@ declare type USVString = string;
 declare type CasingForm = 'lower' | 'initial' | 'upper';
 
 /**
+ * Represents one lexical entry and its probability..
+ */
+type TextWithProbability = {
+  /**
+   * A lexical entry (word) offered by the model.
+   *
+   * Note:  not the search-term keyed part.  This will match the actual, unkeyed form.
+   */
+  text: string;
+
+  /**
+   * The probability of the lexical entry, directly based upon its frequency.
+   *
+   * A real-number weight, from 0 to 1.
+   */
+  p: number;
+}
+
+/**
  * Used to facilitate edit-distance calculations by allowing the LMLayer to
  * efficiently search the model's lexicon in a Trie-like manner.
  */
@@ -56,8 +75,6 @@ declare interface LexiconTraversal {
    * This allows bypassing iteration among all legal child Traversals.
    *
    * If such a traversal state is not supported, returns `undefined`.
-   * Implementations may choose to return `undefined` if more than one UTF-16
-   * codepoint is appended, even if such a descendant exists.
    *
    * Note: traversals navigate and represent the lexicon in its "keyed" state,
    * as produced by use of the search-term keying function defined for the model.
@@ -86,18 +103,7 @@ declare interface LexiconTraversal {
    * - prefix of 'crepe': ['crêpe', 'crêpé']
    * - other examples:  https://www.thoughtco.com/french-accent-homographs-1371072
    */
-  entries: {
-    /**
-     * A lexical entry (word) offered by the model.
-     *
-     * Note:  not the search-term keyed part.  This will match the actual, unkeyed form.
-     */
-    text: USVString,
-    /**
-     * The probability of the lexical entry, directly based upon its frequency.
-     */
-    p: number
-  }[];
+  entries: TextWithProbability[];
 
   // Note:  `p`, not `maxP` - we want to see the same name for `this.entries.p` and `this.p`
   /**
