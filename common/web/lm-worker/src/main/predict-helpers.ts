@@ -11,6 +11,8 @@ import ModelCompositor from './model-compositor.js';
  * correction/prediction process at the core of our predictive-text engine.
  */
 
+export const AUTOSELECT_PROPORTION_THRESHOLD = .66;
+
 export type CorrectionPredictionTuple = {
   prediction: ProbabilityMass<Suggestion>,
   correction: ProbabilityMass<string>,
@@ -561,7 +563,7 @@ export function predictionAutoSelect(suggestionDistribution: CorrectionPredictio
   // compare best vs other probabilities.
   const probSum = suggestionDistribution.reduce((accum, current) => accum + current.totalProb, 0);
   const proportionOfBest = bestSuggestion.totalProb / probSum;
-  if(proportionOfBest < .66) {
+  if(proportionOfBest < AUTOSELECT_PROPORTION_THRESHOLD) {
     return;
   }
 
