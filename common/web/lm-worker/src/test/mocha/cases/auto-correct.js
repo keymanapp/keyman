@@ -1,4 +1,4 @@
-import { AUTOSELECT_PROPORTION_THRESHOLD, predictionAutoSelect, tupleDisplayOrderSort } from "#./predict-helpers.js";
+import { AUTOSELECT_PROPORTION_THRESHOLD, SuggestionSimilarity, predictionAutoSelect, tupleDisplayOrderSort } from "#./predict-helpers.js";
 import { assert } from 'chai';
 import sinon from 'sinon';
 
@@ -431,12 +431,81 @@ describe.only('predictionAutoSelect', () => {
     assert.equal(autoselected, highestNonKeepSuggestion);
   });
 
-  it.skip('ignores non key-matched suggestions when key-matched suggestions exist', () => {
-    // great example:  can't
-    // cant isn't a word, but can't - the keyed form - totally is.
-    //
-    // should leverage tuple.matchLevel... which isn't actually defined on the prior inline
-    // fixtures.
+  it('ignores non key-matched suggestions when key-matched suggestions exist', () => {
+    /**
+     * @type {import('#./predict-helpers.js').CorrectionPredictionTuple}
+     */
+    const keepSuggestion = {
+      correction: {
+        sample: 'cant', // can be null / "mocked out"
+        p: 1
+      },
+      prediction: {
+        sample: {
+          tag: 'keep',
+          transform: {  // can be null / "mocked out"
+            insert: 't',
+            deleteLeft: 0
+          },
+          matchesModel: false
+        },
+        p: 1
+      },
+      totalProb: 1,
+      matchLevel: SuggestionSimilarity.exact
+    }
+
+    const expectedSuggestion = {
+      correction: {
+        sample: 'cant', // can be null / "mocked out"
+        p: 1
+      },
+      prediction: {
+        sample: {
+          transform: {  // can be null / "mocked out"
+            insert: '\'t',
+            deleteLeft: 0
+          },
+        },
+        p: .2
+      },
+      totalProb: .2,
+      matchLevel: SuggestionSimilarity.sameKey
+    };
+
+    /**
+     * @type {import('#./predict-helpers.js').CorrectionPredictionTuple[]}
+     */
+    const predictions = [
+      keepSuggestion,
+      expectedSuggestion,
+      {
+        correction: {
+          sample: 'cant', // can be null / "mocked out"
+          p: 1
+        },
+        prediction: {
+          sample: {
+            transform: {  // can be null / "mocked out"
+              insert: 'teen',
+              deleteLeft: 0
+            },
+          },
+          p: .8
+        },
+        totalProb: .8,
+        matchLevel: SuggestionSimilarity.none
+      }
+    ];
+
+    predictions.sort(tupleDisplayOrderSort);
+
+    const originalPredictions = [].concat(predictions);
+    assert.doesNotThrow(() => predictionAutoSelect(predictions));
+    assert.sameDeepOrderedMembers(predictions, originalPredictions);
+
+    const autoselected = predictions.find((entry) => entry.prediction.sample.autoAccept);
+    assert.equal(autoselected, expectedSuggestion);
   });
 
   // The idea:  avoid "over-correcting" when a potential correction has a
@@ -519,4 +588,12 @@ describe.only('predictionAutoSelect', () => {
     const autoselected = predictions.find((entry) => entry.prediction.sample.autoAccept);
     assert.isNotOk(autoselected);
   });
+
+  // // If we add a setting allowing 'exact', 'sameText', and 'sameKey' tiers to
+  // // all compete equally, rather than having each instantly win over those
+  // // after it, we'd want to add a test such as this.
+  //
+  // it.skip("properly groups sufficiently-similar suggestions for auto-correction based on engine settings", () => {
+  //   //
+  // });
 });
