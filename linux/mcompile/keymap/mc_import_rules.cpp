@@ -1,24 +1,8 @@
 /*
-  Name:             mc_import_rules
-  Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
-  Create Date:      3 Aug 2014
-
-  Modified Date:    6 Feb 2015
-  Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
-
-  Bugs:             
-  Todo:             
-  Notes:            
-  History:          03 Aug 2014 - mcdurdin - I4327 - V9.0 - Mnemonic layout compiler follow-up
-                    03 Aug 2014 - mcdurdin - I4353 - V9.0 - mnemonic layout recompiler mixes up deadkey rules
-                    31 Dec 2014 - mcdurdin - I4550 - V9.0 - logical flaw in mnemonic layout recompiler means that AltGr base keys are never processed
-                    06 Feb 2015 - mcdurdin - I4552 - V9.0 - Add mnemonic recompile option to ignore deadkeys
-*/
-
+ * Keyman is copyright (C) 2004 SIL International. MIT License.
+ *
+ * Mnemonic layout support for Linux
+ */
 
 #include <vector>
 #include <string>
@@ -39,38 +23,24 @@ const int KMX_ShiftStateMap[] = {
     0};
 
 
-/**  @brief Constructor
-   * @param deadCharacter a deadkey
-   */
+/** @brief Constructor */
 DeadKey::DeadKey(KMX_WCHAR deadCharacter) {
   this->m_deadchar = deadCharacter;
 }
 
-/** 
-   * @brief  return a dead character
-   * @return deadkey character
-   */
+/** @brief  return character */
 KMX_WCHAR DeadKey::KMX_DeadCharacter() {
   return this->m_deadchar;
 }
 
-/** 
-   * @brief set Deadkey with values
-   * @param baseCharacter the base character
-   * @param combinedCharacter the combined character
-   * @return void
-   */
+/** @brief set Deadkey with values */
 void DeadKey::KMX_AddDeadKeyRow(KMX_WCHAR baseCharacter, KMX_WCHAR combinedCharacter) {
   this->m_rgbasechar.push_back(baseCharacter);
   this->m_rgcombchar.push_back(combinedCharacter);
 }
 
 
-/** 
-   * @brief check if character exists in DeadKey
-   * @param baseCharacter 
-   * @return true if found; false if not found
-   */
+/** @brief check if character exists in DeadKey */
 bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
   std::vector<KMX_WCHAR>::iterator it;
   for (it = this->m_rgbasechar.begin(); it < m_rgbasechar.end(); it++) {
@@ -83,14 +53,14 @@ bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
 
 
 /**   // _S2 at merge: better description in other branch:
-   * @brief  Find a keyvalue for given keycode, shiftstate and caps. A function similar to Window`s ToUnicodeEx() function.
-   * @param  keycode a key of the currently used keyboard Layout
-   * @param  pwszBuff Buffer to store resulting character
-   * @param  ss_win a windows-style shiftstate of the currently used keyboard Layout
-   * @param  caps state of the caps key of the currently used keyboard Layout
-   * @param  keyboard_layout the currently used (underlying)keyboard Layout
-   * @return -1 if a deadkey was found; 0 if no translation is available; +1 if character was found and written to pwszBuff
-   */
+ * @brief  Find a keyvalue for given keycode, shiftstate and caps. A function similar to Window`s ToUnicodeEx() function.
+ * @param  keycode a key of the currently used keyboard Layout
+ * @param  pwszBuff Buffer to store resulting character
+ * @param  ss_win a windows-style shiftstate of the currently used keyboard Layout
+ * @param  caps state of the caps key of the currently used keyboard Layout
+ * @param  keyboard_layout the currently used (underlying)keyboard Layout
+ * @return -1 if a deadkey was found; 0 if no translation is available; +1 if character was found and written to pwszBuff
+ */
 int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int caps, GdkKeymap* keymap) {
   GdkKeymapKey* maps;
   guint* keyvals;
@@ -139,7 +109,7 @@ KMX_WCHAR KMX_DeadKeyMap(int index, std::vector<DeadKey*>* deadkeys, int deadkey
   return 0xFFFF;
 }
 
-/**  @brief  Base class for dealing with rgkey*/
+/** @brief  Base class for dealing with rgkey*/
 class KMX_VirtualKey {
 private:
   UINT m_vk;
@@ -334,7 +304,7 @@ public:
   }
 };
 
-/**  @brief  Base class for KMX_loader*/
+/** @brief  Base class for KMX_loader*/
 class KMX_Loader {
 private:
   KMX_BYTE lpKeyStateNull[256];
@@ -365,10 +335,10 @@ public:
 
 
 /** 
-   * @brief find the maximum index of a deadkey
-   * @param p pointer to deadkey
-   * @return index of deadkey
-   */
+ * @brief find the maximum index of a deadkey
+ * @param p pointer to deadkey
+ * @return index of deadkey
+ */
 int KMX_GetMaxDeadkeyIndex(KMX_WCHAR* p) {
   int n = 0;
   while (p && *p) {
@@ -380,15 +350,15 @@ int KMX_GetMaxDeadkeyIndex(KMX_WCHAR* p) {
 }
 
 
-  /**
-   * @brief  Collect the key data, translate it to kmx and append to the existing keyboard
-   * @param  kp pointer to keyboard
-   * @param  all_vector vector that holds the data of the US keyboard and the currently used (underlying) keyboard
-   * @param  keymap the currently used (underlying)keyboard Layout
-   * @param  FDeadkeys vector of all deadkeys for the currently used (underlying)keyboard Layout
-   * @param  bDeadkeyConversion 1 to convert a deadkey to a character; 0 no conversion
-   * @return true in case of success
-   */
+/**
+ * @brief  Collect the key data, translate it to kmx and append to the existing keyboard
+ * @param  kp pointer to keyboard
+ * @param  all_vector vector that holds the data of the US keyboard and the currently used (underlying) keyboard
+ * @param  keymap the currently used (underlying)keyboard Layout
+ * @param  FDeadkeys vector of all deadkeys for the currently used (underlying)keyboard Layout
+ * @param  bDeadkeyConversion 1 to convert a deadkey to a character; 0 no conversion
+ * @return true in case of success
+ */
 bool KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, GdkKeymap** keymap, std::vector<KMX_DeadkeyMapping>* FDeadkeys, KMX_BOOL bDeadkeyConversion) {  // I4353   // I4552
   KMX_Loader loader;
 

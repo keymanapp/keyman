@@ -1,27 +1,9 @@
 /*
-  Name:             mcompile
-  Copyright:        Copyright (C) SIL International.
-  Documentation:
-  Description:
-  Create Date:      24 Apr 2014
+ * Keyman is copyright (C) 2004 SIL International. MIT License.
+ *
+ * Mnemonic layout support for Linux
+ */
 
-  Modified Date:    8 Apr 2015
-  Authors:          mcdurdin
-  Related Files:
-  Dependencies:
-
-  Bugs:
-  Todo:
-  Notes:
-  History:          24 Apr 2014 - mcdurdin - I4174 - V9 - mcompile logs should be stored in diag folder
-                    16 Jun 2014 - mcdurdin - I4273 - V9.0 - Convert keyboards to Unicode before installing
-                    23 Jun 2014 - mcdurdin - I4279 - V9.0 - mcompile fails to start when converting keyboard to Unicode
-                    03 Aug 2014 - mcdurdin - I4353 - V9.0 - mnemonic layout recompiler mixes up deadkey rules
-                    03 Aug 2014 - mcdurdin - I4327 - V9.0 - Mnemonic layout compiler follow-up
-                    31 Dec 2014 - mcdurdin - I4549 - V9.0 - Mnemonic layout recompiler does not translate Lctrl Ralt for deadkeys correctly
-                    06 Feb 2015 - mcdurdin - I4552 - V9.0 - Add mnemonic recompile option to ignore deadkeys
-                    08 Apr 2015 - mcdurdin - I4651 - V9.0 - Mnemonic layout recompiler maps AltGr+VK_BKSLASH rather than VK_OEM_102
-*/
 //
 // Defines the entry point for the console application.
 //
@@ -31,27 +13,48 @@
 
 #include "mcompile.h"
 
-//------------------------------------------------------------------------------------------------
-//------------------------------------------------------------------------------------------------
-
+/**
+ * @brief  convert mnemonic keyboard layout to positional keyboard layout and translate keyboard
+ * @param  kbd pointer to US keyboard
+ * @param  bDeadkeyConversion option for converting a deadkey to a character: 1=conversion; 0= no conversion
+ * @param  argc number of commandline arguments
+ * @param  argv pointer to commandline arguments
+ * @return TRUE if conversion was successful;  FALSE if not
+ */
 KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint argc, gchar *argv[]);
 
+/** @brief  Collect the key data, translate it to kmx and append to the existing keyboard */
 bool KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, GdkKeymap** keymap, std::vector<KMX_DeadkeyMapping>* KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion); // I4353   // I4327
 
+/**
+ * @brief  start of mcompile; load, convert and save keyboard
+ * @param  argc number of commandline arguments
+ * @param  argv pointer to commandline arguments: executable, inputfile, outputfile
+ * @param  argv_gdk  pointer to (commandline arguments)
+ * @return 0 on success, 1 for wrong usage of calling parameters, 3 if unable to load keyboard
+ */
 int run(int argc, char* argv[], char* argv_gdk[] = NULL);
 
-int KMX_GetDeadkeys(vec_dword_2D& dk_Table, KMX_WORD DeadKey, KMX_WORD* OutputPairs, GdkKeymap* keymap);
+/**
+ * @brief  return an array of [usvk, ch_out] pairs: all existing combinations of a deadkey + character for the underlying keyboard
+ * @param       dk_Table shiftstate of the deadkey
+ * @param       deadkey deadkey character
+ * @param [out] outputPairs pointer to array of [usvk, ch_out] pairs
+ * @param       keymap pointer to  the currently used (underlying) keyboard Layout
+ * @return      size of array of [usvk, ch_out] pairs
+ */
+int KMX_GetDeadkeys(vec_dword_2D& dk_Table, KMX_WORD deadkey, KMX_WORD* outputPairs, GdkKeymap* keymap);
 
-std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys; // I4353
+std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;  // I4353
 
 #define _countof(a) (sizeof(a) / sizeof(*(a)))
 
   /**
-   * @brief  main function for mcompile for Windows, Linux, Mac
-   * @param  argc number of commandline arguments
-   * @param  argv commandline arguments
-   * @return 0 on success
-   */
+ * @brief  main function for mcompile for Windows, Linux, Mac
+ * @param  argc number of commandline arguments
+ * @param  argv commandline arguments
+ * @return 0 on success
+ */
 #if defined(_WIN32) || defined(_WIN64)
   int wmain(int argc, wchar_t* argv[]) {
     run(argc, argv);
@@ -62,16 +65,8 @@ std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys; // I4353
 #endif
 }
 
-
-/**
-   * @brief  start of mcompile; load, convert and save keyboard
-   * @param  argc number of commandline arguments
-   * @param  argv pointer to commandline arguments: executable, inputfile, outputfile
-   * @param  argv_gdk  pointer to (commandline arguments)
-   * @return 0 on success, 1 for wrong usage of calling parameters, 3 if unable ro load keyboard
-   */
+/** @brief  start of mcompile; load, convert and save keyboard */
 int run(int argc, char* argv[], char* argv_gdk[]) {
-
   int bDeadkeyConversion = 0;
 
   if (argc > 1)
@@ -151,7 +146,6 @@ int run(int argc, char* argv[], char* argv_gdk[]) {
   return 0;
 }
 
-
 // Map of all shift states that we will work with
 const UINT VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG | RALTFLAG, K_SHIFTFLAG | LCTRLFLAG | RALTFLAG, 0xFFFF};
 
@@ -161,14 +155,15 @@ const UINT VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG | RALTFLAG, K_SHIFTFLAG |
 // For each key rule on the keyboard, remap its key to the
 // correct shift state and key.  Adjust the LCTRL+RALT -> RALT if necessary
 //
+
 /**
-   * @brief  translate each key of a group: remap the content of a key (key->Key) of the US keyboard to a character (ch)
-   * @param  key pointer to a key
-   * @param  vk a keyvalue of the US keyboard
-   * @param  shift shiftstate
-   * @param  ch character of the underlying keyboard to be remapped
-   * @return void
-   */
+ * @brief  translate each key of a group: remap the content of a key (key->Key) of the US keyboard to a character (ch)
+ * @param  key pointer to a key
+ * @param  vk a keyvalue of the US keyboard
+ * @param  shift shiftstate
+ * @param  ch character of the underlying keyboard to be remapped
+ * @return void
+ */
 void KMX_TranslateKey(LPKMX_KEY key, KMX_WORD vk, UINT shift, KMX_WCHAR ch) {
   // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
   // We store that as just RALT, and use the option "Simulate RAlt with Ctrl+Alt"
@@ -194,30 +189,28 @@ void KMX_TranslateKey(LPKMX_KEY key, KMX_WORD vk, UINT shift, KMX_WCHAR ch) {
   }
 }
 
-
 /**
-   * @brief  translate a group of a keyboard
-   * @param  group pointer to a keyboard group
-   * @param  vk a keyvalue of the US keyboard
-   * @param  shift shiftstate
-   * @param  ch character of the underlying keyboard to be remapped
-   * @return void
-   */
+ * @brief  translate a group of a keyboard
+ * @param  group pointer to a keyboard group
+ * @param  vk a keyvalue of the US keyboard
+ * @param  shift shiftstate
+ * @param  ch character of the underlying keyboard to be remapped
+ * @return void
+ */
 void KMX_TranslateGroup(LPKMX_GROUP group, KMX_WORD vk, UINT shift, KMX_WCHAR ch) {
   for (unsigned int i = 0; i < group->cxKeyArray; i++) {
     KMX_TranslateKey(&group->dpKeyArray[i], vk, shift, ch);
   }
 }
 
-
 /**
-   * @brief  translate  a keyboard
-   * @param  kbd pointer to the US keyboard
-   * @param  vk a keyvalue of the US keyboard
-   * @param  shift shiftstate
-   * @param  ch character of the underlying keyboard to be remapped
-   * @return void
-   */
+ * @brief  translate  a keyboard
+ * @param  kbd pointer to the US keyboard
+ * @param  vk a keyvalue of the US keyboard
+ * @param  shift shiftstate
+ * @param  ch character of the underlying keyboard to be remapped
+ * @return void
+ */
 void KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR ch) {
   for (unsigned int i = 0; i < kbd->cxGroupArray; i++) {
     if (kbd->dpGroupArray[i].fUsingKeys) {
@@ -226,12 +219,11 @@ void KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHA
   }
 }
 
-
 /**
-   * @brief  check key for unconverted key rules
-   * @param  key pointer to a key
-   * @return void
-   */
+ * @brief  check key for unconverted key rules
+ * @param  key pointer to a key
+ * @return void
+ */
 void KMX_ReportUnconvertedKeyRule(LPKMX_KEY key) {
   if (key->ShiftFlags == 0) {
     // KMX_LogError(L"Did not find a match for mnemonic rule on line %d, + '%c' > ...", key->Line, key->Key);
@@ -240,24 +232,22 @@ void KMX_ReportUnconvertedKeyRule(LPKMX_KEY key) {
   }
 }
 
-
 /**
-   * @brief  check a group for unconverted rules
-   * @param  group pointer to a keyboard group
-   * @return void
-   */
+ * @brief  check a group for unconverted rules
+ * @param  group pointer to a keyboard group
+ * @return void
+ */
 void KMX_ReportUnconvertedGroupRules(LPKMX_GROUP group) {
   for (unsigned int i = 0; i < group->cxKeyArray; i++) {
     KMX_ReportUnconvertedKeyRule(&group->dpKeyArray[i]);
   }
 }
 
-
 /**
-   * @brief  check a keyboard for unconverted rules
-   * @param  kbd pointer to the US keyboard
-   * @return void
-   */
+ * @brief  check a keyboard for unconverted rules
+ * @param  kbd pointer to the US keyboard
+ * @return void
+ */
 void KMX_ReportUnconvertedKeyboardRules(LPKMX_KEYBOARD kbd) {
   for (unsigned int i = 0; i < kbd->cxGroupArray; i++) {
     if (kbd->dpGroupArray[i].fUsingKeys) {
@@ -266,16 +256,15 @@ void KMX_ReportUnconvertedKeyboardRules(LPKMX_KEYBOARD kbd) {
   }
 }
 
-
 /**
-   * @brief  remap the content of a key (key->dpContext) of the US keyboard to a deadkey sequence
-   * @param  key pointer to a key
-   * @param  deadkey a deadkey to be remapped
-   * @param  vk a keyvalue of the US keyboard
-   * @param  shift shiftstate
-   * @param  ch character of the underlying keyboard
-   * @return void
-   */
+ * @brief  remap the content of a key (key->dpContext) of the US keyboard to a deadkey sequence
+ * @param  key pointer to a key
+ * @param  deadkey a deadkey to be remapped
+ * @param  vk a keyvalue of the US keyboard
+ * @param  shift shiftstate
+ * @param  ch character of the underlying keyboard
+ * @return void
+ */
 void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch) {
 // _S2 TOP_2 INFO this produces  a different output due to different layouts for Lin<-> win ( for the same language!!)
 
@@ -307,32 +296,30 @@ void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT
   }
 }
 
-
 /**
-   * @brief  translate a group
-   * @param  group pointer to a keyboard group
-   * @param  a deadkey to be remapped
-   * @param  vk a keyvalue of the US keyboard
-   * @param  shift shiftstate
-   * @param  character of the underlying keyboard
-   * @return void
-   */
+ * @brief  translate a group
+ * @param  group pointer to a keyboard group
+ * @param  a deadkey to be remapped
+ * @param  vk a keyvalue of the US keyboard
+ * @param  shift shiftstate
+ * @param  character of the underlying keyboard
+ * @return void
+ */
 void KMX_TranslateDeadkeyGroup(LPKMX_GROUP group, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch) {
   for (unsigned int i = 0; i < group->cxKeyArray; i++) {
     KMX_TranslateDeadkeyKey(&group->dpKeyArray[i], deadkey, vk, shift, ch);
   }
 }
 
-
 /**
-   * @brief  translate a keyboard
-   * @param  kbd pointer to the US keyboard
-   * @param  a deadkey to be remapped
-   * @param  vk a keyvalue of the US keyboard
-   * @param  shift shiftstate
-   * @param  character of the underlying keyboard
-   * @return void
-   */
+ * @brief  translate a keyboard
+ * @param  kbd pointer to the US keyboard
+ * @param  a deadkey to be remapped
+ * @param  vk a keyvalue of the US keyboard
+ * @param  shift shiftstate
+ * @param  character of the underlying keyboard
+ * @return void
+ */
 void KMX_TranslateDeadkeyKeyboard(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch) {
   for (unsigned int i = 0; i < kbd->cxGroupArray; i++) {
     if (kbd->dpGroupArray[i].fUsingKeys) {
@@ -341,15 +328,14 @@ void KMX_TranslateDeadkeyKeyboard(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WOR
   }
 }
 
-
 /**
-   * @brief  add a deadkey rule
-   * @param  kbd pointer to the US keyboard
-   * @param  deadkey a deadkey to be added
-   * @param  vk a keyvalue of the US keyboard
-   * @param  shift shiftstate
-   * @return void
-   */
+ * @brief  add a deadkey rule
+ * @param  kbd pointer to the US keyboard
+ * @param  deadkey a deadkey to be added
+ * @param  vk a keyvalue of the US keyboard
+ * @param  shift shiftstate
+ * @return void
+ */
 void KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift) {
   // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
   // We store that as just RALT, and use the option "Simulate RAlt with Ctrl+Alt"
@@ -381,12 +367,11 @@ void KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT
   }
 }
 
-
 /**
-   * @brief  find the maximal deadkey id
-   * @param  str the deadkey
-   * @return the maximum deadkey id
-   */
+ * @brief  find the maximal deadkey id
+ * @param  str the deadkey
+ * @return the maximum deadkey id
+ */
 KMX_WCHAR KMX_ScanXStringForMaxDeadkeyID(PKMX_WCHAR str) {
   KMX_WCHAR dkid = 0;
   while (str && *str) {
@@ -402,13 +387,12 @@ struct KMX_dkidmap {
   KMX_WCHAR src_deadkey, dst_deadkey;
 };
 
-
 /**
-   * @brief  find the deadkey id for a given deadkey
-   * @param  kbd pointer to the keyboard
-   * @param  deadkey for which an id is to be found
-   * @return 0 if failed; otherwise a deadkey-id
-   */
+ * @brief  find the deadkey id for a given deadkey
+ * @param  kbd pointer to the keyboard
+ * @param  deadkey for which an id is to be found
+ * @return 0 if failed; otherwise a deadkey-id
+ */
 KMX_WCHAR KMX_GetUniqueDeadkeyID(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey) {
   LPKMX_GROUP gp;
   LPKMX_KEY kp;
@@ -460,16 +444,16 @@ KMX_WCHAR KMX_GetUniqueDeadkeyID(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey) {
 }
 
 /**
-   * @brief  Lookup the deadkey table for the deadkey in the physical keyboard. Then for each character, go through and map it through
-   * @param  kbd pointer to the keyboard
-   * @param  vk_US virtual key of the us keyboard
-   * @param  shift shiftstate
-   * @param  deadkey character produced by a deadkey
-   * @param  all_vector vector that holds the data of the US keyboard and the currently used (underlying) keyboard
-   * @param  keymap pointer to the currently used (underlying) keyboard Layout
-   * @param  dk_Table a vector of all posible deadkey combinations for all Linux keyboards
-   * @return void
-   */
+ * @brief  Lookup the deadkey table for the deadkey in the physical keyboard. Then for each character, go through and map it through
+ * @param  kbd pointer to the keyboard
+ * @param  vk_US virtual key of the us keyboard
+ * @param  shift shiftstate
+ * @param  deadkey character produced by a deadkey
+ * @param  all_vector vector that holds the data of the US keyboard and the currently used (underlying) keyboard
+ * @param  keymap pointer to the currently used (underlying) keyboard Layout
+ * @param  dk_Table a vector of all possible deadkey combinations for all Linux keyboards
+ * @return void
+ */
 void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk_US, UINT shift, KMX_WCHAR deadkey, vec_dword_3D& all_vector, GdkKeymap* keymap, vec_dword_2D dk_Table) {
   KMX_WORD deadkeys[512], *pdk;
 
@@ -493,13 +477,12 @@ void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk_US, UINT shift, KMX_WCHA
   }
 }
 
-
  /**
-   * @brief  convert a mnemonic keyboard to a positional keyboard 
-   *         (i.e. setting *sp->dpString = '0' / TSS_MNEMONIC=0)
-   * @param  kbd pointer to keyboard
-   * @return TRUE if conversion was successful; FALSE otherwise
-   */
+ * @brief  convert a mnemonic keyboard to a positional keyboard
+ *         (i.e. setting *sp->dpString = '0' / TSS_MNEMONIC=0)
+ * @param  kbd pointer to keyboard
+ * @return TRUE if conversion was successful; FALSE otherwise
+ */
 KMX_BOOL KMX_SetKeyboardToPositional(LPKMX_KEYBOARD kbd) {
   LPKMX_STORE sp;
   UINT i;
@@ -520,16 +503,8 @@ KMX_BOOL KMX_SetKeyboardToPositional(LPKMX_KEYBOARD kbd) {
   KMX_LogError(L"Keyboard is not a mnemonic layout keyboard");
   return FALSE;
 }
- 
- 
- /**
-   * @brief  convert mnemonic keyboard layout to positional keyboard layout and translate keyboard
-   * @param  kbd pointer to US keyboard
-   * @param  bDeadkeyConversion option for converting a deadkey to a character: 1=conversion; 0= no conversion
-   * @param  argc number of commandline arguments
-   * @param  argv pointer to commandline arguments
-   * @return TRUE if conversion was succsessful;  FALSE if not
-   */
+
+/** @brief  convert mnemonic keyboard layout to positional keyboard layout and translate keyboard */
 KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint argc, gchar* argv[]) {
   KMX_WCHAR DeadKey = 0;
 
@@ -591,17 +566,16 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
   return TRUE;
 }
 
-
  /**
-   * @brief  return an array of [usvk, ch_out] pairs: all existing combinations of a deadkey + character for the underlying keyboard
-   * @param       deadkey deadkey character
-   * @param [out] OutputPairs pointer to array of [usvk, ch_out] pairs
-   * @param       keymap pointer to  the currently used (underlying) keyboard Layout
-   * @param       dk_Table shiftstate of the deadkey
-   * @return      size of array of [usvk, ch_out] pairs
-   */
-int KMX_GetDeadkeys(vec_dword_2D& dk_Table, KMX_WORD deadkey, KMX_WORD* OutputPairs, GdkKeymap* keymap) {
-  KMX_WORD* p = OutputPairs;
+ * @brief  return an array of [usvk, ch_out] pairs: all existing combinations of a deadkey + character for the underlying keyboard
+ * @param       deadkey deadkey character
+ * @param [out] OutputPairs pointer to array of [usvk, ch_out] pairs
+ * @param       keymap pointer to  the currently used (underlying) keyboard Layout
+ * @param       dk_Table shiftstate of the deadkey
+ * @return      size of array of [usvk, ch_out] pairs
+ */
+int KMX_GetDeadkeys(vec_dword_2D& dk_Table, KMX_WORD deadkey, KMX_WORD* outputPairs, GdkKeymap* keymap) {
+  KMX_WORD* p = outputPairs;
   KMX_DWORD shift;
   vec_dword_2D dk_SingleTable;
 
@@ -617,15 +591,10 @@ int KMX_GetDeadkeys(vec_dword_2D& dk_Table, KMX_WORD deadkey, KMX_WORD* OutputPa
     }
   }
   *p = 0;
-  return (p - OutputPairs);
+  return (p - outputPairs);
 }
 
-
- /**
-   * @brief  print (error) messages
-   * @param  fmt text to print
-   * @return void
-   */
+ /** @brief  print (error) messages */
 void KMX_LogError(const wchar_t* fmt, ...) {
 	WCHAR fmtbuf[256];
   const wchar_t* end = L"\0";
