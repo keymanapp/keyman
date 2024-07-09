@@ -1,18 +1,18 @@
 /*
   Name:             inserttext
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      19 Jun 2007
 
   Modified Date:    28 Mar 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          19 Jun 2007 - mcdurdin - I890 - Fix deadkeys in TSF
                     19 Jun 2007 - mcdurdin - I890 - Fix crash with deadkeys - logging
                     11 Dec 2009 - mcdurdin - Header files
@@ -67,7 +67,7 @@ void DePseudofy(WCHAR *pchText)   // I3564
     {
       if(*pchText == PseudoMap[k])
       {
-        *pchText = k; 
+        *pchText = k;
         break;
       }
     }
@@ -78,7 +78,7 @@ void DePseudofy(WCHAR *pchText)   // I3564
 void InsertTextAtSelection(TfEditCookie ec, ITfContext *pContext, const WCHAR *pchText, ULONG cchText)
 {
   LogEnter();
-  
+
   ITfInsertAtSelection *pInsertAtSelection;
     ITfRange *pRange;
     TF_SELECTION tfSelection;
@@ -89,7 +89,7 @@ void InsertTextAtSelection(TfEditCookie ec, ITfContext *pContext, const WCHAR *p
 
 #ifdef DEBUG_PSEUDO   // I3607
     WCHAR *PseudoBuf = new WCHAR[cchText+1];   // I3564
-    
+
     wcsncpy_s(PseudoBuf, cchText+1, pchText, cchText);
     PseudoBuf[cchText] = 0;
     Pseudofy(PseudoBuf);
@@ -133,7 +133,7 @@ void DeleteLeftOfSelection(TfEditCookie ec, ITfContext *pContext, LONG n)
 
   if(pContext->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &tfSelection, &cFetched) != S_OK || cFetched == 0)
 		return;
-	
+
   //TODO: log failures
 	if(tfSelection.range->ShiftStart(ec, -n, &outn, NULL) != S_OK) {
     tfSelection.range->Release();
@@ -163,20 +163,27 @@ char *debugstr(PWSTR buf) {
 	return bufout;
 }
 
-BOOL GetLeftOfSelection(TfEditCookie ec, ITfContext *pContext, WCHAR *buf, LONG n)   // I4933
+BOOL
+GetLeftOfSelection(
+    TfEditCookie ec,
+    ITfContext *pContext,
+    WCHAR *buf,
+    LONG n,
+    HRESULT *hrGetSelection,
+    ULONG *cFetched,
+    TF_SELECTION *tfSelection)  // I4933
 {
   LogEnter();
 
-  TF_SELECTION tfSelection = {0};
-  TF_STATUS tfStatus = {0};
-	ULONG cFetched;
+  TF_SELECTION tfSelectionLocal = {0};
+  ULONG cFetchedLocal;
 	LONG outn;
 	ITfRange *pRange, *pRangeEnd;
   HRESULT hr;
 
   /*   // I4933
     First we will try to see if there is any text in the control, and if not, then treat
-    it as transitory (that is, no ability to read context. This seems to happen in Firefox 
+    it as transitory (that is, no ability to read context. This seems to happen in Firefox
     with RICHEDIT controls - for example, SourceForge comment fields e.g. reported on page
     https://sourceforge.net/p/greekpolytonicsp/discussion/general/thread/9b6fa46d/
     This also happens in Internet Explorer in the same fields. It is unclear at this point
@@ -201,11 +208,11 @@ BOOL GetLeftOfSelection(TfEditCookie ec, ITfContext *pContext, WCHAR *buf, LONG 
     return FALSE;
   }
 
-  BOOL bTreatAsTransitory = FALSE; 
-  if(!SUCCEEDED(hr = pRange->GetText(ec, 0, buf, n, &cFetched))) {
+  BOOL bTreatAsTransitory = FALSE;
+  if(!SUCCEEDED(hr = pRange->GetText(ec, 0, buf, n, &cFetchedLocal))) {
     Log(L"GetLeftOfSelection: Exit -- Failed GetRange (all text to 63 chars) = %x", hr);
     bTreatAsTransitory = TRUE;
-  } else if(cFetched == 0) {
+  } else if(cFetchedLocal == 0) {
     Log(L"GetLeftOfSelection: Exit -- no text in edit control, treating as transitory");
     bTreatAsTransitory = TRUE;
   }
@@ -218,55 +225,62 @@ BOOL GetLeftOfSelection(TfEditCookie ec, ITfContext *pContext, WCHAR *buf, LONG 
     return FALSE;
   }
 
-  /* 
+  /*
     At this point, we know we can read content from the edit control, so we just need
     to read the range to the left of the selection - up to (n) characters.
   */
 
-  if(!SUCCEEDED(hr = pContext->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &tfSelection, &cFetched)))   // I3565
+  if (!SUCCEEDED(hr = *hrGetSelection = pContext->GetSelection(ec, TF_DEFAULT_SELECTION, 1, tfSelection, cFetched)))  // I3565
 	{
 		Log(L"GetLeftOfSelection: Exit -- Failed GetSelection = %x", hr);   // I3565
 		return FALSE;
 	}
 
-  if(cFetched == 0)   // I3565
+  // copy the values for local processing, preserving the function call variables
+  cFetchedLocal    = *cFetched;
+  tfSelectionLocal = *tfSelection;
+  if (tfSelectionLocal.range) {
+    tfSelectionLocal.range->AddRef();
+  }
+  
+  if(cFetchedLocal == 0)   // I3565
   {
-    Log(L"GetLeftOfSelection: Exit -- cFetched == 0");   // I3565
-    if(tfSelection.range != NULL)
-      tfSelection.range->Release();
+    Log(L"GetLeftOfSelection: Exit -- cFetchedLocal == 0");   // I3565
+    if(tfSelectionLocal.range != NULL)
+      tfSelectionLocal.range->Release();
     return FALSE;
   }
-	
-	if(!SUCCEEDED(hr = tfSelection.range->Clone(&pRange)))   // I3565
+
+	if(!SUCCEEDED(hr = tfSelectionLocal.range->Clone(&pRange)))   // I3565
   {
     Log(L"GetLeftOfSelection: Failed range->Clone = %x", hr);   // I3565
-    tfSelection.range->Release();
+    tfSelectionLocal.range->Release();
     return FALSE;
   }
 
 	if(!SUCCEEDED(hr = pRange->Collapse(ec, TF_ANCHOR_START)))   // I3565
   {
     Log(L"GetLeftOfSelection: Failed range->Collapse = %x", hr);   // I3565
-    tfSelection.range->Release();
+    tfSelectionLocal.range->Release();
     pRange->Release();
     return FALSE;
   }
 	if(!SUCCEEDED(hr = pRange->ShiftStart(ec, -n, &outn, NULL)))   // I3565
   {
     Log(L"GetLeftOfSelection: Failed range->ShiftStart = %x", hr);   // I3565
-    tfSelection.range->Release();
+    tfSelectionLocal.range->Release();
     pRange->Release();
     return FALSE;
   }
 
   BOOL result = TRUE;
 
-	if(SUCCEEDED(hr = pRange->GetText(ec, 0, buf, n, &cFetched)))   // I3565
+	if(SUCCEEDED(hr = pRange->GetText(ec, 0, buf, n, &cFetchedLocal)))   // I3565
   {
-		buf[cFetched] = 0;
+		buf[cFetchedLocal] = 0;
     if(ShouldDebug()) {
       char *p = debugstr(buf);
-      Log(L"GetLeftOfSelection(%d) = %hs [%d fetched]", n, p, cFetched);
+      Log(L"GetLeftOfSelection(%d) = %hs [%d fetched]", n, p, cFetchedLocal);
       delete[] p;
     }
 #ifdef DEBUG_PSEUDO   // I3607
@@ -281,7 +295,7 @@ BOOL GetLeftOfSelection(TfEditCookie ec, ITfContext *pContext, WCHAR *buf, LONG 
   }
 
 	pRange->Release();
-  tfSelection.range->Release();
+  tfSelectionLocal.range->Release();
 
   return result;   // I4933
 }

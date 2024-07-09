@@ -45,7 +45,7 @@ void DllRelease();
 
 void InsertTextAtSelection(TfEditCookie ec, ITfContext *pContext, const WCHAR *pchText, ULONG cchText);
 void DeleteLeftOfSelection(TfEditCookie ec, ITfContext *pContext, LONG n);
-BOOL GetLeftOfSelection(TfEditCookie ec, ITfContext *pContext, WCHAR *buf, LONG n);   // I4933
+BOOL GetLeftOfSelection(TfEditCookie ec, ITfContext *pContext, WCHAR *buf, LONG n, HRESULT *hrGetSelection, ULONG *cFetched, TF_SELECTION *tfSelection);  // I4933
 void GetDeadkeyFlags(TfEditCookie ec, ITfContext *pContext, PWSTR buf, int n);
 
 //
