@@ -1717,7 +1717,7 @@ PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_W
 
        *r = 0; // delete close delimiter
     }
-  else *r = 0;
+  else *r = 0; // delete close delimiter
 
   r++; while (iswspace(*r)) r++;	        // Ignore spaces after the close
   if (*r == 0) r--;					    // Safety for terminating strings.
