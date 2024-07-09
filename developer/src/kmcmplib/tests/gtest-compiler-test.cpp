@@ -353,6 +353,14 @@ TEST_F(CompilerTest, GetDelimitedString_test) {
     EXPECT_FALSE(*p);
     EXPECT_EQ(4, p-str); // deleted close delimiter
 
+    // multi-word argument, cut open and close delimiter, valid
+    u16cpy(str, u"(abc def)");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"abc def", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(8, p-str); // deleted close delimiter
+
     // single-character argument, leading single space, cut open and close delimiter, valid
     u16cpy(str, u" (b)");
     p = str;
