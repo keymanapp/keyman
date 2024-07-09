@@ -8,7 +8,7 @@ import sinon from 'sinon';
   *   `.matchesModel` - that can vary.
   * - Predictions should be in sorted order (see tupleDisplaySortOrder).
   */
-describe.only('predictionAutoSelect', () => {
+describe('predictionAutoSelect', () => {
   it(`does not throw when no suggestions are available`, () => {
     /**
      * @type {import('#./predict-helpers.js').CorrectionPredictionTuple[]}
