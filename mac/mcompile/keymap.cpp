@@ -54,13 +54,13 @@ return true;
 int mac_createOneVectorFromBothKeyboards(vec_dword_3D& all_vector, const UCKeyboardLayout* keyboard_layout) {
   // store contents of the English (US) keyboard in all_vector
   if (mac_write_US_ToVector(all_vector)) {
-    wprintf(L"ERROR: can't write US to Vector \n");
+    printf("ERROR: can't write US to Vector \n");
     return 1;
   }
 
   // add contents of underlying keyboard to all_vector
   if (mac_append_underlying_ToVector(all_vector, keyboard_layout)) {
-    wprintf(L"ERROR: can't append underlying ToVector \n");
+    printf("ERROR: can't append underlying ToVector \n");
     return 2;
   }
   return 0;
@@ -86,7 +86,7 @@ int mac_write_US_ToVector(vec_dword_3D& vec_us) {
   vec_us.push_back(key);
 
   if (key.size() == 0) {
-    wprintf(L"ERROR: can't Create Vector for US keyboard\n");
+    printf("ERROR: can't Create Vector for US keyboard\n");
     return 1;
   } else
     return 0;
@@ -119,13 +119,13 @@ int mac_append_underlying_ToVector(vec_dword_3D& all_vector, const UCKeyboardLay
   vec_dword_2D underlying_Vector2D = mac_create_empty_2D_Vector(all_vector[0].size(), all_vector[0][0].size());
 
   if (underlying_Vector2D.size() == 0) {
-    wprintf(L"ERROR: can't create empty 2D-Vector\n");
+    printf("ERROR: can't create empty 2D-Vector\n");
     return 1;
   }
 
   all_vector.push_back(underlying_Vector2D);
   if (all_vector.size() < 2) {
-    wprintf(L"ERROR: creation of 3D-Vector failed\n");
+    printf("ERROR: creation of 3D-Vector failed\n");
     return 2;
   }
 
@@ -145,17 +145,17 @@ int mac_append_underlying_ToVector(vec_dword_3D& all_vector, const UCKeyboardLay
 bool mac_InitializeUCHR(const UCKeyboardLayout** keyboard_layout) {
   TISInputSourceRef source = TISCopyCurrentKeyboardInputSource();
   if (!source) {
-    wprintf(L"ERROR: can't get source\n");
+    printf("ERROR: can't get source\n");
     return 1;
   }
 
   CFDataRef layout_data = static_cast<CFDataRef>((TISGetInputSourceProperty(source, kTISPropertyUnicodeKeyLayoutData)));
   *keyboard_layout = reinterpret_cast<const UCKeyboardLayout*>(CFDataGetBytePtr(layout_data));
   if (!keyboard_layout) {
-    wprintf(L"ERROR: Can't get keyboard_layout\n");
+    printf("ERROR: Can't get keyboard_layout\n");
     return 2;
   }
-  // intentionally leaking `display` in order to still be able to access `keymap`
+  // intentionally leaking `source` in order to still be able to access `keymap`
   return 0;
 }
 

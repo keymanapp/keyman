@@ -64,12 +64,12 @@ std::wstring wstring_from_u16string(std::u16string const str16) {
   return wstr;
 }
 
-void u16sprintf(KMX_WCHAR* dst, const size_t sz, const wchar_t* fmt, ...) {
+void u16sprintf(KMX_WCHAR* dst, const size_t max_len, const wchar_t* fmt, ...) {
  // UTF16 (=const wchar_t*) -> -> std::string  -> std::u16string -> UTF16 ( = char16_t*)
-	wchar_t* wbuf = new wchar_t[sz];
+	wchar_t* wbuf = new wchar_t[max_len];
 	va_list args;
 	va_start(args, fmt);
-	vswprintf(wbuf, sz, fmt, args);
+	vswprintf(wbuf, max_len, fmt, args);
 	va_end(args);
 
 	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> convert_wstring;
@@ -78,7 +78,7 @@ void u16sprintf(KMX_WCHAR* dst, const size_t sz, const wchar_t* fmt, ...) {
    // UTF16 (=const wchar_t*) -> -> std::string  -> std::u16string -> UTF16 ( = char16_t*)
 	std::string utf8str = convert_wstring.to_bytes(wbuf);    // UTF16 ( = const wchar_t*)  -> std::string
 	std::u16string u16str = convert.from_bytes(utf8str);     // std::string -> std::u16string
-  u16ncpy(dst, u16str.c_str(), sz);                        // std::u16string.c_str() -> char16_t*
+  u16ncpy(dst, u16str.c_str(), max_len);                        // std::u16string.c_str() -> char16_t*
 	delete[] wbuf;
 }
 
@@ -96,7 +96,8 @@ std::wstring convert_pchar16T_To_wstr(KMX_WCHAR* Name) {
 long int u16tol(const KMX_WCHAR* str, KMX_WCHAR** endptr, int base) {
   auto s = string_from_u16string(str);
   char* t;
-  long int result = strtol(s.c_str(), &t, base);
+  size_t idx;
+  long int result = stol(s, &idx, base);
   if (endptr != nullptr) 
     *endptr = (KMX_WCHAR*)str + (t - s.c_str());
   return result;
@@ -134,13 +135,10 @@ KMX_CHAR* strrchr_slash(KMX_CHAR* Name)
 */
 // u16rchr returns last occurence of ch in p; It returns '\0'  if ch == '\0' and NULL if ch is not found
 const KMX_WCHAR* u16rchr(const KMX_WCHAR* p, KMX_WCHAR ch) {
-  const KMX_WCHAR* p_end = p + u16len(p) - 1;
-
-	if (ch == '\0')
-  	return p_end + 1;
+  const KMX_WCHAR* p_end = p + u16len(p);
 	while (p_end >= p) {
 		if (*p_end == ch)
-    return p_end;
+      return p_end;
 		p_end--;
 	}
 	return NULL;

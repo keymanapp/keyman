@@ -4,17 +4,23 @@
  * Mnemonic layout support for Linux
  */
 
-//
-// Defines the entry point for the console application.
-//
-// Note: this program deliberately leaks memory as it has a very short life cycle and managing the memory allocations
-// for the subcomponents of the compiled keyboard is an unnecessary optimisation. Just so you know.
-//
+/*
+  Defines the entry point for the console application.
+
+  Note: this program deliberately leaks memory as it has a very short life cycle and managing the memory allocations
+  for the subcomponents of the compiled keyboard is an unnecessary optimisation. Just so you know.
+*/
 
 #include <stdio.h>
 #include <wchar.h>
 #include "mcompile.h"
 #include "u16.h"
+
+
+int mac_KMX_GetDeadkeys(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& all_vector, KMX_WCHAR deadkey, UINT shift_dk, KMX_WORD* OutputPairs);  // returns array of [usvk, ch_out] pairs
+
+int mac_run(int argc, std::vector<std::u16string> str_argv, char* argv[]);
+
 /**
  * @brief  convert mnemonic keyboard layout to positional keyboard layout and translate keyboard
  * @param  kbd pointer to US keyboard
@@ -74,13 +80,13 @@ int mac_run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NU
   }
 
   if (argc < 3 || (argc > 4)) {  // I4273// I4273
-    wprintf(
-        L"Usage: mcompile [-d] infile.kmx outfile.kmx\n"
-        L"       mmcompile -u ...  (not available for mac)\n "
-        L"      mcompile converts a Keyman mnemonic layout to a\n"
-        L"       positional one based on the mac keyboard\n"
-        L"       layout on top position\n"
-        L"       (-d   convert deadkeys to plain keys) not available yet \n\n");  // I4552
+    printf(
+        "Usage: mcompile [-d] infile.kmx outfile.kmx\n"
+        "       mmcompile -u ...  (not available for mac)\n "
+        "      mcompile converts a Keyman mnemonic layout to a\n"
+        "       positional one based on the mac keyboard\n"
+        "       layout on top position\n"
+        "       (-d   convert deadkeys to plain keys) not available yet \n\n");  // I4552
 
     return 1;
   }
@@ -374,11 +380,8 @@ void mac_KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, 
 KMX_WCHAR mac_KMX_ScanXStringForMaxDeadkeyID(PKMX_WCHAR str) {
   KMX_WCHAR dkid = 0;
   while(str && *str) {
-    if (*str == UC_SENTINEL) {
-      switch(*(str+1)) {
-      case CODE_DEADKEY:
-        dkid = max(dkid, *(str+2));
-      }
+    if(*str == UC_SENTINEL && *(str+1) == CODE_DEADKEY) {
+      dkid = max(dkid, *(str+2));
     }
     str = KMX_incxstr(str);
   }
@@ -526,13 +529,13 @@ KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, int 
 
   const UCKeyboardLayout* keyboard_layout;
   if (mac_InitializeUCHR(&keyboard_layout)) {
-      wprintf(L"ERROR: can't Initialize GDK\n");
+      printf("ERROR: can't Initialize GDK\n");
       return FALSE;
   }
   // create vector that contains Keycode, Base, Shift for US-Keyboard and underlying keyboard
   vec_dword_3D all_vector;
   if (mac_createOneVectorFromBothKeyboards(all_vector, keyboard_layout)) {
-    wprintf(L"ERROR: can't create one vector from both keyboards\n");
+    printf("ERROR: can't create one vector from both keyboards\n");
     return FALSE;
   }
 

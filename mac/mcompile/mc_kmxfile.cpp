@@ -7,7 +7,7 @@
 #define CERR_UnableToWriteFully                            0x00008007
 #define CERR_SomewhereIGotItWrong                          0x00008009
 
-KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL FSaveDebug) {
+KMX_DWORD KMX_WriteCompiledKeyboardToFile(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL FSaveDebug) {
 
 	LPKMX_GROUP fgp;
 	LPKMX_STORE fsp;
@@ -33,22 +33,22 @@ KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL 
 
 	for(i = 0, fgp = fk->dpGroupArray; i < fk->cxGroupArray; i++, fgp++) {
     if(fgp->dpName)
-	    size += u16len(fgp->dpName)*2 + 2;
+	    size += (u16len(fgp->dpName) + 1) * sizeof(KMX_WCHAR);
 		size += fgp->cxKeyArray * sizeof(KMX_COMP_KEY);
 		for(j = 0, fkp = fgp->dpKeyArray; j < fgp->cxKeyArray; j++, fkp++) {
-			size += u16len(fkp->dpOutput)*2 + 2;
-			size += u16len(fkp->dpContext)*2 + 2;
+			size += (u16len(fkp->dpOutput) + 1) * sizeof(KMX_WCHAR);
+			size += (u16len(fkp->dpContext) + 1) * sizeof(KMX_WCHAR);
 		}
 
-		if( fgp->dpMatch ) size += u16len(fgp->dpMatch)*2 + 2;
-		if( fgp->dpNoMatch ) size += u16len(fgp->dpNoMatch)*2 + 2;
+		if( fgp->dpMatch ) size += (u16len(fgp->dpMatch)  + 1) * sizeof(KMX_WCHAR);
+		if( fgp->dpNoMatch ) size += (u16len(fgp->dpNoMatch)  + 1) * sizeof(KMX_WCHAR);
 	}
 
 	for(i = 0; i < fk->cxStoreArray; i++)
 	{
-		size += u16len(fk->dpStoreArray[i].dpString)*2 + 2;
+		size += (u16len(fk->dpStoreArray[i].dpString) + 1) * sizeof(KMX_WCHAR);
     if(fk->dpStoreArray[i].dpName)
-      size += u16len(fk->dpStoreArray[i].dpName)*2 + 2;
+      size += (u16len(fk->dpStoreArray[i].dpName) + 1) * sizeof(KMX_WCHAR);
 	}
 
 	buf = new KMX_BYTE[size];
@@ -73,22 +73,6 @@ KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL 
 
 	offset = sizeof(KMX_COMP_KEYBOARD);
 
-	// ck->dpLanguageName = offset;
-	//wcscpy((PWSTR)(buf + offset), fk->szLanguageName);
-	//offset += wcslen(fk->szLanguageName)*2 + 2;
-
-	//ck->dpName = offset;
-	//wcscpy((PWSTR)(buf + offset), fk->szName);
-	//offset += wcslen(fk->szName)*2 + 2;
-
-	//ck->dpCopyright = offset;
-	//wcscpy((PWSTR)(buf + offset), fk->szCopyright);
-	//offset += wcslen(fk->szCopyright)*2 + 2;
-
-	//ck->dpMessage = offset;
-	//wcscpy((PWSTR)(buf + offset), fk->szMessage);
-	//offset += wcslen(fk->szMessage)*2 + 2;
-
 	ck->dpStoreArray = offset;
 	sp = (PKMX_COMP_STORE)(buf+offset);
 	fsp = fk->dpStoreArray;
@@ -97,14 +81,14 @@ KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL 
 		sp->dwSystemID = fsp->dwSystemID;
 		sp->dpString = offset;
 		u16ncpy((PKMX_WCHAR)(buf+offset), fsp->dpString, (size-offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
-		offset += u16len(fsp->dpString)*2 + 2;
+		offset += (u16len(fsp->dpString) + 1) * sizeof(KMX_WCHAR);
 
     if(!fsp->dpName) {
       sp->dpName = 0;
     } else {
       sp->dpName = offset;
       u16ncpy((PKMX_WCHAR)(buf+offset), fsp->dpName, (size-offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
-		  offset += u16len(fsp->dpName)*2 + 2;
+		  offset += (u16len(fsp->dpName) + 1) * sizeof(KMX_WCHAR);
     }
 	}
 
@@ -123,38 +107,37 @@ KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL 
 		if(fgp->dpMatch) {
 			gp->dpMatch = offset;
 			u16ncpy((PKMX_WCHAR)(buf+offset), fgp->dpMatch, (size-offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
-			offset += u16len(fgp->dpMatch)*2 + 2;
+			offset += (u16len(fgp->dpMatch) + 1) * sizeof(KMX_WCHAR);
 		}
 		if(fgp->dpNoMatch) {
 			gp->dpNoMatch = offset;
 			u16ncpy((PKMX_WCHAR)(buf+offset), fgp->dpNoMatch, (size-offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
-			offset += u16len(fgp->dpNoMatch)*2 + 2;
+			offset += (u16len(fgp->dpNoMatch) + 1) * sizeof(KMX_WCHAR);
 		}
 
     if(fgp->dpName) {
 			gp->dpName = offset;
 			u16ncpy((PKMX_WCHAR)(buf+offset), fgp->dpName, (size-offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
-			offset += u16len(fgp->dpName)*2 + 2;
+			offset += (u16len(fgp->dpName) + 1) * sizeof(KMX_WCHAR);
 		}	else {
       gp->dpName = 0;
     }
 
     gp->dpKeyArray = offset;
 		kp = (PKMX_COMP_KEY) (buf + offset);
-		fkp = fgp->dpKeyArray;
 		offset += gp->cxKeyArray * sizeof(KMX_COMP_KEY);
-		for(j = 0; j < gp->cxKeyArray; j++, kp++, fkp++) {
+		for(j = 0, fkp = fgp->dpKeyArray; j < gp->cxKeyArray; j++, kp++, fkp++) {
 			kp->Key = fkp->Key;
 			kp->Line = fkp->Line;
 			kp->ShiftFlags = fkp->ShiftFlags;
 			kp->dpOutput = offset;
 
 			u16ncpy((PKMX_WCHAR)(buf+offset), fkp->dpOutput, (size-offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
-			offset += u16len(fkp->dpOutput)*2 + 2;
+			offset += (u16len(fkp->dpOutput) + 1) * sizeof(KMX_WCHAR);
 
       kp->dpContext = offset;
       u16ncpy((PKMX_WCHAR)(buf+offset), fkp->dpContext, (size-offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
-		  offset += u16len(fkp->dpContext)*2 + 2;
+		  offset += (u16len(fkp->dpContext) + 1) * sizeof(KMX_WCHAR);
 		}
 	}
 
@@ -166,12 +149,6 @@ KMX_DWORD KMX_WriteCompiledKeyboard(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL 
   } else {
     ck->dwBitmapSize = 0;
 	  ck->dpBitmapOffset = 0;
-  }
-
-	if(offset != size)
-  {
-    delete[] buf;
-    return CERR_SomewhereIGotItWrong;
   }
 
   fwrite(buf, size,1, hOutfile);
@@ -202,7 +179,7 @@ KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename) {
     return FALSE;
   }
 
-  KMX_DWORD err = KMX_WriteCompiledKeyboard(kbd, fp, FALSE);
+  KMX_DWORD err = KMX_WriteCompiledKeyboardToFile(kbd, fp, FALSE);
   fclose(fp);
 
   if(err != CERR_None) {
@@ -351,7 +328,7 @@ LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFil
 #endif
 
 KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
-
+  *lpKeyboard = NULL;
   PKMX_BYTE buf;
   FILE* fp;
   LPKMX_KEYBOARD kbp;
@@ -376,7 +353,7 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
   }
 
   auto sz = ftell(fp);
-  if (sz < 0) {
+  if (sz <= 0) {
     fclose(fp);
     return FALSE;
   }
@@ -400,6 +377,7 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
   #endif
 
   if (!buf) {
+    delete[] buf;
     fclose(fp);
     mac_KMX_LogError(L"Not allocmem\n" );
     return FALSE;
@@ -413,13 +391,14 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
 
   if (fread(filebase, 1, sz, fp) < (size_t)sz) {
     mac_KMX_LogError(L"Could not read file\n" );
+    delete[] buf;
     fclose(fp);
     return FALSE;
   }
-
+// delete???
   fclose(fp);
 
-  if(*PKMX_DWORD(filebase) != KMX_DWORD(FILEID_COMPILED))
+  if (*((PKMX_DWORD)filebase) != (KMX_DWORD)FILEID_COMPILED)
   {
     delete [] buf;
     mac_KMX_LogError(L"Invalid file - signature is invalid\n");
@@ -428,6 +407,7 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
 
   if (!KMX_VerifyKeyboard(filebase, sz)) {
     mac_KMX_LogError(L"errVerifyKeyboard\n" );
+    delete[] buf;
     return FALSE;
   }
 
@@ -440,6 +420,7 @@ KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
 
   if (!kbp) {
     mac_KMX_LogError(L"errFixupKeyboard\n" );
+    delete[] buf;
     return FALSE;
   }
 
@@ -480,7 +461,7 @@ KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD sz){
 
 PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p) {
 
-  if (*p == 0)
+  if (p == NULL || *p == 0)
     return p;
   if (*p != UC_SENTINEL) {
     if (*p >= 0xD800 && *p <= 0xDBFF && *(p + 1) >= 0xDC00 && *(p + 1) <= 0xDFFF)

@@ -79,7 +79,7 @@ int mac_KMX_ToUnicodeEx(int keycode, PKMX_WCHAR pwszBuff, int ss_win, int caps, 
   if (!ensureValidInputForKeyboardTranslation(keyboard_layout, keycode, ss_win, caps))
     return 0;
 
-  keyval= mac_KMX_get_KeyVal_From_KeyCode_dk(keyboard_layout, keycode, mac_map_rgkey_ShiftState_to_Shiftstate(ShiftState(ss_win)), caps, isdk);
+  keyval = mac_KMX_get_KeyVal_From_KeyCode_dk(keyboard_layout, keycode, mac_map_rgkey_ShiftState_to_Shiftstate(ShiftState(ss_win)), caps, isdk);
   std::u16string str =std::u16string(1, keyval );
   pwszBuff[0] = *(PKMX_WCHAR)str.c_str();
 
@@ -226,7 +226,7 @@ public:
           for (size_t ich = 0; ich < st.size(); ich++) {
             if (st[ich] < 0x20 || st[ich] == 0x7F) {
               isvalid = false;
-               wprintf(L"invalid for: %i\n", st[ich]);
+              wprintf(L"invalid for: %i\n", st[ich]);
               break;
             }
           }
@@ -467,11 +467,6 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, const UCK
     }
   }
 
-//  // _S2 I assume we do not need those...
-//  rgKey[VK_DIVIDE] = new mac_KMX_VirtualKey(hkl, VK_DIVIDE);
-//  rgKey[VK_CANCEL] = new mac_KMX_VirtualKey(hkl, VK_CANCEL);
-//  rgKey[VK_DECIMAL] = new mac_KMX_VirtualKey(hkl, VK_DECIMAL);
-
     // in this part we skip shiftstates 4, 5, 8, 9
     for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
       if (rgKey[iKey] != NULL) {
@@ -483,11 +478,11 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, const UCK
           }
 
           //_S2 TOP_6 TODO to compare win-lin kmn-files skip ss6+7; MUST BE removed later!!!!
-         if (ss == MenuCtrl || ss == ShftMenuCtrl) {
+         /*if (ss == MenuCtrl || ss == ShftMenuCtrl) {
            continue;
-          }
+          }*/
 
-          KMX_DWORD KC_US = mac_KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
+          KMX_DWORD KC_US = (KMX_DWORD)mac_KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 
           for (int caps = 0; caps <= 1; caps++) {
             int rc = mac_KMX_ToUnicodeEx(KC_US, sbBuffer, ss, caps, *keyboard_layout);
