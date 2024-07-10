@@ -42,12 +42,9 @@ processBack(
     }
   }
   else {
-    // If there is a selection the TSF documentation suggests an empty string
-    // to the select range. However this would require a change to QueueAction
-    // and the ProcessOutput callback. Instead we will pass through the emit the character
-    // and let the application clear the the selected text.
+    // If there is a selection emit the key (backspace)
+    // allowing the application handle clearing selected text in the correct manner.
     if (app->IsTextSelected() && (vkey == VK_BACK)) {
-      //SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessBack: Emit Keystroke [%d].", app->IsTextSelected());
       *emitKeystroke = TRUE;
       return;
     }

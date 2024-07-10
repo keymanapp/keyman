@@ -165,13 +165,13 @@ char *debugstr(PWSTR buf) {
 
 BOOL
 GetLeftOfSelection(
-    TfEditCookie ec,
-    ITfContext *pContext,
-    WCHAR *buf,
-    LONG n,
-    HRESULT *hrGetSelection,
-    ULONG *cFetched,
-    TF_SELECTION *tfSelection)  // I4933
+  TfEditCookie ec,
+  ITfContext *pContext,
+  WCHAR *buf,
+  LONG n,
+  HRESULT *hrGetSelection,
+  ULONG *cFetched,
+  TF_SELECTION *tfSelection)  // I4933
 {
   LogEnter();
 
@@ -242,7 +242,7 @@ GetLeftOfSelection(
   if (tfSelectionLocal.range) {
     tfSelectionLocal.range->AddRef();
   }
-  
+
   if(cFetchedLocal == 0)   // I3565
   {
     Log(L"GetLeftOfSelection: Exit -- cFetchedLocal == 0");   // I3565

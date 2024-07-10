@@ -68,7 +68,10 @@ public:
 
 	/* TIP interactions */
 
-  BOOL IsLegacy() { return useLegacy; }
+  BOOL IsLegacy() {
+    return useLegacy;
+  }
+
   BOOL
   IsTextSelected() {
     return isTextSelected;

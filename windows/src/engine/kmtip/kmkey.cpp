@@ -64,6 +64,13 @@ public:
   STDMETHODIMP DoEditSession(TfEditCookie ec);
 
   HRESULT WINAPI KeymanProcessOutput(int n, PWSTR buf, int nbuf);   // I3567
+  /**
+   * Retrieves the current context and checks if text is selected.
+   * @param[in]   n               The size of the buffer.
+   * @param[out]  buf             The buffer to store the context.
+   * @param[out]  isTextSelected  A flag indicating whether text is selected.
+   * @return                      S_OK if successful, otherwise an HRESULT error code.
+   */
   HRESULT WINAPI KeymanGetContext(int n, PWSTR buf, BOOL* isTextSelected);   // I3567
   HRESULT GetResult() { return _hr; }
 
@@ -75,8 +82,16 @@ private:
   LPARAM _lParam;   // I3589
   DWORD _dwDeepIntegration;   // I4375
   TfEditCookie _ec;
+  /**
+   * Checks if any text is selected in the given context.
+   *
+   * @param[in]   hrGetSelection  The result of a call to GetSelection selection.
+   * @param[in]   cFetched        The number of selections fetched.
+   * @param[in]   tfSelection     The selection details.
+   * @param[out]  isTextSelected  A flag indicating whether text is selected.
+   * @return                      S_OK if successful, otherwise an HRESULT error code.
+   */
   HRESULT KeymanIsTextSelected(HRESULT hrGetSelection, ULONG cFetched, TF_SELECTION tfSelection, BOOL *isTextSelected);
-  ;
 };
 
 #define KEYEVENT_EXTRAINFO_KEYMAN 0xF00F0000   // I4370
@@ -256,8 +271,9 @@ HRESULT WINAPI CKeymanEditSession::KeymanGetContext(int n, PWSTR buf, BOOL* isTe
   // now check for selected text
   if (!SUCCEEDED(hr = KeymanIsTextSelected(hrGetSelection, cFetched, tfSelection, isTextSelected))) {
     Log(L"KeymanGetContext: Warning: KeymanIsTextSelected failed");
-    // Continue to return S_OK, as IsTextSelected defaults to not selected.
-    // If we have gotten this far, the context in buf is valid.
+    // Continue to return S_OK, even though checking if a text selection exists has failed.
+    // Reaching this point means the context in 'buf' is valid and will be passed to the caller.
+    // isTextSelected will be false, which is better than returning E_FAIL at this point.
   }
   return S_OK;
 }
