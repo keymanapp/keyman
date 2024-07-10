@@ -23,7 +23,7 @@ enum ShiftState {
 };
 
 // shiftstates we can use for mac: Base;Shift, OPTION, Shift+OPTION
-static int ss_mac[]={0,2,8,10};
+static int ss_mac[] = {0, 2, 8, 10};
 
 // Map of all US English virtual key codes that we can translate
 const KMX_DWORD KMX_VKMap[] = {
@@ -84,14 +84,9 @@ bool is_correct_win_shiftstate(int comp_ss);
  * @param  cap the code of the key in question
  * @return true if all parameters are OK; false if not
  */
-bool ensureValidInputForKeyboardTranslation(const UCKeyboardLayout * keyboard_layout,int keycode, int shiftstate, int cap);
-
-
-
+bool ensureValidInputForKeyboardTranslation(const UCKeyboardLayout* keyboard_layout, int keycode, int shiftstate, int cap);
 
 // _S2 TODO
-
-
 
 /**
  * @brief   create a 3D-Vector containing data of the US keyboard and the currently used (underlying) keyboard :
@@ -127,15 +122,17 @@ vec_dword_2D mac_create_empty_2D_Vector(int dim_rows, int dim_ss);
  * @brief         append a 2D-vector containing data of the currently used (underlying) keyboard to the 3D-vector
  * @param[in,out] all_vector 3D-vector that holds the data of the US keyboard and the currently used (underlying) keyboard
  * @param         keyboard_layout ptr to currently used (underlying) keybord layout
- * @return        0 on success; 1 if the initialization of the underlying vector failes; 2 if data of less than 2 keyboards is contained in all_vector
+ * @return        0 on success;
+ * 								1 if the initialization of the underlying vector failes;
+ * 								2 if data of less than 2 keyboards is contained in all_vector;
  */
-int mac_append_underlying_ToVector(vec_dword_3D &all_vector, const UCKeyboardLayout * keyboard_layout);
+int mac_append_underlying_ToVector(vec_dword_3D& all_vector, const UCKeyboardLayout* keyboard_layout);
 /**
  * @brief  create a pointer to pointer of the current keyboard_layout for later use
  * @param  keyboard_layout  ptr to ptr to currently used (underlying) keyborad layout
  * @return 0 on success; 1 if the display is not found; 2 if the keymap is not found
  */
-bool mac_InitializeUCHR(const UCKeyboardLayout **keyboard_layout);
+bool mac_InitializeUCHR(const UCKeyboardLayout** keyboard_layout);
 
 // we use the same type of array as throughout Keyman even though we have lots of unused fields
 const UINT mac_USVirtualKeyToScanCode[256] = {
@@ -543,10 +540,10 @@ const UINT mac_ScanCodeToUSVirtualKey[128] = {
  * @return the keyval obtained from keycode, shiftstate and caps
  */
 // _S2 ShiftState  ss vs int shiftstate_mac
-KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode(const UCKeyboardLayout * keyboard_layout, int keycode, int shiftstate_mac, int caps);
+KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode(const UCKeyboardLayout* keyboard_layout, int keycode, int shiftstate_mac, int caps);
 
 //_S2 TODO
-KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode_dk(const UCKeyboardLayout * keyboard_layout, int keycode, int shiftstate_mac, int caps, UInt32 &deadkeystate);
+KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode_dk(const UCKeyboardLayout* keyboard_layout, int keycode, int shiftstate_mac, int caps, UInt32& deadkeystate);
 
 /** // _S2 shift_state_pos vs int shiftstate_mac
  * @brief  return the keyvalue for a given Keycode and shiftstate of the currently used (underlying) keyboard layout.
@@ -556,7 +553,7 @@ KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode_dk(const UCKeyboardLayout * keyboard_l
  * @param  shift_state_pos a shiftstate of the currently used keyboard layout
  * @return the keyval obtained from Keycode and shiftstate;
  */
-KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLayout * keyboard_layout, int keycode, int shiftstate_mac);
+KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLayout* keyboard_layout, int keycode, int shiftstate_mac);
 
 /**
  * @brief  return the keyvalue for a given Keycode and shiftstate of the currently used (underlying) keyboard layout.
@@ -571,7 +568,7 @@ KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLa
  * @return 0xFFFF in case a deadkey was found, then the deadkey is stored in deadKey
  *         the keyval obtained from Keycode and shiftstate and caps;
  */
-KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLayout * keyboard_layout, UINT keycode, UINT shiftState, PKMX_WCHAR deadKey);
+KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLayout* keyboard_layout, UINT keycode, UINT shiftState, PKMX_WCHAR deadKey);
 
 /**
  * @brief  return the keyvalue of a key of the the currently used (underlying) keyboard for a given keyvalue of the US keyboard
@@ -580,7 +577,7 @@ KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLa
  * @param  kv_us a keyvalue on the US keyboard
  * @return keyval of the underlying keyboard if available; else the keyval of the US keyboard
  */
-KMX_WCHAR mac_KMX_get_KeyValUnderlying_From_KeyValUS(vec_dword_3D &all_vector, KMX_DWORD kv_us);
+KMX_WCHAR mac_KMX_get_KeyValUnderlying_From_KeyValUS(vec_dword_3D& all_vector, KMX_DWORD kv_us);
 
 /**
  * @brief  return the keycode of the currently used (underlying) keyboard for a given keycode of the US keyboard
@@ -592,7 +589,7 @@ KMX_WCHAR mac_KMX_get_KeyValUnderlying_From_KeyValUS(vec_dword_3D &all_vector, K
  * @param  caps state of the caps key
  * @return the keycode of the underlying keyboard if found; else the keycode of the US keyboard
  */
-KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_KeyCodeUS(const UCKeyboardLayout * keyboard_layout, vec_dword_3D &all_vector, KMX_DWORD kc_us, ShiftState ss, int caps);
+KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_KeyCodeUS(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& all_vector, KMX_DWORD kc_us, ShiftState ss, int caps);
 
 /**
  * @brief  return the keycode of the currently used (underlying) keyboard for a given virtual key of the US keyboard
@@ -611,7 +608,7 @@ UINT mac_KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD virtualKeyUS);
 KMX_DWORD mac_KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode);
 
 //_S2 TODO
-KMX_WCHAR mac_KMX_get_KeyCodeUnderlying_From_KeyValUnderlying(vec_dword_3D & all_vector, KMX_DWORD kv_underlying);
+KMX_WCHAR mac_KMX_get_KeyCodeUnderlying_From_KeyValUnderlying(vec_dword_3D& all_vector, KMX_DWORD kv_underlying);
 //_S2 TODO
 KMX_DWORD  mac_get_CombinedChar_From_DK(int vk_dk, KMX_DWORD ss_dk, const UCKeyboardLayout* keyboard_layout, KMX_DWORD vk_us, KMX_DWORD shiftstate_mac, int caps);
 //_S2 TODO  CodePointToU16String??

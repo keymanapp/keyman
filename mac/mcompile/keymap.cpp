@@ -29,38 +29,37 @@ int mac_convert_Shiftstate_to_MacShiftstate(int shiftState) {
 
 // _S2 Todo
 bool is_correct_win_shiftstate(int win_ss) {
-  return ( (win_ss ==0) || (win_ss ==16) || (win_ss ==9) || (win_ss ==25) || (win_ss ==0xFFFF)  );
+  return ((win_ss == 0) || (win_ss == 16) || (win_ss == 9) || (win_ss == 25) || (win_ss == 0xFFFF));
 }
 
 // _S2 todo missing code
 /** @brief check for correct input parameter that will later be used in UCKeyTranslate() */
-bool ensureValidInputForKeyboardTranslation(const UCKeyboardLayout * keyboard_layout,int keycode, int shiftstate, int caps=0){
-
+bool ensureValidInputForKeyboardTranslation(const UCKeyboardLayout* keyboard_layout, int keycode, int shiftstate, int caps = 0) {
   if (!keyboard_layout)
     return false;
 
-  if ((int) keycode > (int)keycode_max)
+  if ((int)keycode > (int)keycode_max)
     return false;
 
   if ((shiftstate > max_shiftstate))
     return false;
 
-  if ((caps> 1))
+  if ((caps > 1))
     return false;
 
 return true;
 }
 
   /** @brief create a 3D-Vector containing data of the US keyboard and the currently used (underlying) keyboard */
-int mac_createOneVectorFromBothKeyboards(vec_dword_3D& all_vector, const UCKeyboardLayout * keyboard_layout) {
+int mac_createOneVectorFromBothKeyboards(vec_dword_3D& all_vector, const UCKeyboardLayout* keyboard_layout) {
   // store contents of the English (US) keyboard in all_vector
-  if(mac_write_US_ToVector(all_vector)) {
+  if (mac_write_US_ToVector(all_vector)) {
     wprintf(L"ERROR: can't write US to Vector \n");
     return 1;
   }
 
   // add contents of underlying keyboard to all_vector
-  if ( mac_append_underlying_ToVector(all_vector, keyboard_layout)) {
+  if (mac_append_underlying_ToVector(all_vector, keyboard_layout)) {
     wprintf(L"ERROR: can't append underlying ToVector \n");
     return 2;
   }
@@ -68,7 +67,7 @@ int mac_createOneVectorFromBothKeyboards(vec_dword_3D& all_vector, const UCKeybo
 }
 
  /** @brief write data of the US keyboard into a 3D-Vector */
-int mac_write_US_ToVector( vec_dword_3D& vec_us) {
+int mac_write_US_ToVector(vec_dword_3D& vec_us) {
 //_S2 TODO
   // Values for US        :     A,  S,  D,  F,  H,  G,  Z,  X, C,  V,  §, B,  Q,  W,  E,  R,  Y,  T, 1, 2, 3, 4, 6, 5, =, 9, 7, -, 8, 0,  ],  O,  U,  [,  I,  P,CR,  L,  J, ',  K, ;,  \, ,, /,  N,  M, .
   std::vector<int> us_Base  = {97,115,100,102,104,103,122,120,99,118,167,98,113,119,101,114,121,116,49,50,51,52,54,53,61,57,55,45,56,48, 93,111,117, 91,105,112,13,108,106,39,107,59, 92,44,47,110,109,46};
@@ -77,7 +76,7 @@ int mac_write_US_ToVector( vec_dword_3D& vec_us) {
   vec_dword_1D values;
   vec_dword_2D key;
 
-  for ( int i=0; i< us_Base.size(); i++) {
+  for (int i = 0; i < us_Base.size(); i++) {
     values.push_back(i);
     values.push_back(us_Base[i]);
     values.push_back(us_Shift[i]);
@@ -86,16 +85,14 @@ int mac_write_US_ToVector( vec_dword_3D& vec_us) {
   }
   vec_us.push_back(key);
 
-  if ( key.size() == 0) {
+  if (key.size() == 0) {
     wprintf(L"ERROR: can't Create Vector for US keyboard\n");
     return 1;
-  }
-  else
+  } else
     return 0;
 }
 
-
-  /** @brief create an 2D-Vector with all fields containing INVALID_NAME */
+/** @brief create an 2D-Vector with all fields containing INVALID_NAME */
 vec_dword_2D mac_create_empty_2D_Vector(int dim_rows, int dim_ss) {
   vec_dword_1D shifts;
   vec_dword_2D vector_2D;
@@ -110,10 +107,9 @@ vec_dword_2D mac_create_empty_2D_Vector(int dim_rows, int dim_ss) {
   return vector_2D;
 }
 
-
   /** @brief append a 2D-vector containing data of the currently used (underlying) keyboard to the 3D-vector */
 int mac_append_underlying_ToVector(vec_dword_3D& all_vector, const UCKeyboardLayout* keyboard_layout) {
-  int caps=0;
+  int caps = 0;
   if (all_vector.size() != 1) {
     printf("ERROR: data for US keyboard not correct\n");
     return 1;
@@ -137,18 +133,16 @@ int mac_append_underlying_ToVector(vec_dword_3D& all_vector, const UCKeyboardLay
     // get key name US stored in [0][i][0] and copy to name in "underlying"-block[1][i][0]
     all_vector[1][i][0] = all_vector[0][i][0];
 
-    for ( int k=0; k < 2; k++) {
-      all_vector[1][i][k+1] = mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout, all_vector[0][i][0], mac_map_rgkey_ShiftState_to_Shiftstate(k),0);
+    for (int k = 0; k < 2; k++) {
+      all_vector[1][i][k + 1] = mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout, all_vector[0][i][0], mac_map_rgkey_ShiftState_to_Shiftstate(k), 0);
     }
   }
 
   return 0;
 }
 
-
 /** @brief create a pointer to pointer of the current keymap for later use */
-bool mac_InitializeUCHR(const UCKeyboardLayout **keyboard_layout) {
-
+bool mac_InitializeUCHR(const UCKeyboardLayout** keyboard_layout) {
   TISInputSourceRef source = TISCopyCurrentKeyboardInputSource();
   if (!source) {
     wprintf(L"ERROR: can't get source\n");
@@ -156,7 +150,7 @@ bool mac_InitializeUCHR(const UCKeyboardLayout **keyboard_layout) {
   }
 
   CFDataRef layout_data = static_cast<CFDataRef>((TISGetInputSourceProperty(source, kTISPropertyUnicodeKeyLayoutData)));
-  * keyboard_layout = reinterpret_cast<const UCKeyboardLayout*>(CFDataGetBytePtr(layout_data));
+  *keyboard_layout = reinterpret_cast<const UCKeyboardLayout*>(CFDataGetBytePtr(layout_data));
   if (!keyboard_layout) {
     wprintf(L"ERROR: Can't get keyboard_layout\n");
     return 2;
@@ -164,7 +158,6 @@ bool mac_InitializeUCHR(const UCKeyboardLayout **keyboard_layout) {
   // intentionally leaking `display` in order to still be able to access `keymap`
   return 0;
 }
-
 
   /** old
    * @brief  return the keyvalue for a given Keycode, shiftstate and caps of the currently used (underlying) keyboard Layout
@@ -176,13 +169,13 @@ bool mac_InitializeUCHR(const UCKeyboardLayout **keyboard_layout) {
    * @return the keyval obtained from Keycode, shiftstate and caps
    */
   /** @brief return the keyvalue for a given Keycode, shiftstate and caps */
-KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode(const UCKeyboardLayout * keyboard_layout, int keycode, int shiftstate_mac, int caps) {
+KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode(const UCKeyboardLayout* keyboard_layout, int keycode, int shiftstate_mac, int caps) {
   UInt32 deadkeystate;
   UniCharCount maxStringlength    = 5;
   UniCharCount actualStringlength = 0;
   OptionBits keyTranslateOptions  = 0;
   UniChar unicodeString[maxStringlength];
-  OSStatus status ;
+  OSStatus status;
   unicodeString[0] = 0;
 
   /*if (!keyboard_layout)
@@ -197,29 +190,27 @@ KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode(const UCKeyboardLayout * keyboard_layo
   if (!(caps <= 1))
     return 0;*/
 
-  if(! ensureValidInputForKeyboardTranslation(keyboard_layout, keycode, shiftstate_mac, caps))
+  if (!ensureValidInputForKeyboardTranslation(keyboard_layout, keycode, shiftstate_mac, caps))
     return 0;
 
 
-  status = UCKeyTranslate(keyboard_layout, keycode, kUCKeyActionDown, (shiftstate_mac+ 4*caps), LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
+  status = UCKeyTranslate(keyboard_layout, keycode, kUCKeyActionDown, (shiftstate_mac + 4 * caps), LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString);
   // If this was a deadkey,append a space
-  if(deadkeystate !=0)
-    status = UCKeyTranslate(keyboard_layout, keycode_spacebar, kUCKeyActionDown, (shiftstate_mac+ 4*caps), LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
+  if (deadkeystate != 0)
+    status = UCKeyTranslate(keyboard_layout, keycode_spacebar, kUCKeyActionDown, (shiftstate_mac + 4 * caps), LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString);
 
   // if there is no character assigned to the Key+Shift+CAPS UCKeyTranslate writes 0x01 into unicodeString[0]
-  if( unicodeString[0] == 1 )   // impossible character
+  if (unicodeString[0] == 1)  // impossible character
     return 0;
   else {
-    return unicodeString[0];    // combined char e.g.  â
+    return unicodeString[0];  // combined char e.g.  â
   }
 
   return 0;
 }
 
-
  //_S2 ToDO
-KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode_dk(const UCKeyboardLayout * keyboard_layout, int keycode, int shiftstate_mac, int caps, UInt32 &deadkeystate) {
-
+KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode_dk(const UCKeyboardLayout* keyboard_layout, int keycode, int shiftstate_mac, int caps, UInt32& deadkeystate) {
   UniCharCount maxStringlength    = 5;
   UniCharCount actualStringlength = 0;
   OptionBits keyTranslateOptions  = 0;
@@ -239,26 +230,24 @@ KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode_dk(const UCKeyboardLayout * keyboard_l
   if (!(caps <= 1))
     return 0;*/
 
-  if(! ensureValidInputForKeyboardTranslation(keyboard_layout, keycode, shiftstate_mac, caps))
+  if (!ensureValidInputForKeyboardTranslation(keyboard_layout, keycode, shiftstate_mac, caps))
       return 0;
   // if CAPS is used: always add 4 e.g. SHIFT = 2; SHIFT+CAPS = 6
-  status = UCKeyTranslate(keyboard_layout, keycode,  kUCKeyActionDown,(shiftstate_mac+ 4*caps), LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
+  status = UCKeyTranslate(keyboard_layout, keycode, kUCKeyActionDown, (shiftstate_mac + 4 * caps), LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString);
 
   // If this was a deadkey,append a space
-  if(deadkeystate !=0)
-    status = UCKeyTranslate(keyboard_layout, keycode_spacebar,  kUCKeyActionDown,(shiftstate_mac+ 4*caps), LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
+  if (deadkeystate != 0)
+    status = UCKeyTranslate(keyboard_layout, keycode_spacebar, kUCKeyActionDown,(shiftstate_mac + 4 * caps), LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString);
 
   // if there is no character assigned to the Key+Shift+CAPS UCKeyTranslate writes 0x01 into unicodeString[0]
-  if(unicodeString[0] == 1 )    // impossible character
+  if (unicodeString[0] == 1)  // impossible character
     return 0;
   else
-    return unicodeString[0];    // combined char e.g.  â
+    return unicodeString[0];  // combined char e.g.  â
 }
 
-
-
 /** @brief return the keyvalue for a given Keycode and shiftstate of the currently used (underlying) keyboard layout and copy deadkey into deadKey */
-KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLayout * keyboard_layout, UINT kc_underlying, UINT vk_ShiftState, PKMX_WCHAR deadKey) {
+KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLayout* keyboard_layout, UINT kc_underlying, UINT vk_ShiftState, PKMX_WCHAR deadKey) {
   PKMX_WCHAR dky = NULL;
   UInt32 isdk = 0;
   KMX_DWORD keyV;
@@ -267,21 +256,21 @@ KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLa
   /*if (!keyboard_layout)
     return 0;
 
-  if(!(is_correct_win_shiftstate(vk_ShiftState)))
+  if (!(is_correct_win_shiftstate(vk_ShiftState)))
     return 0;
 
   if (!(kc_underlying <= keycode_max))
     return 0;*/
 
-  if(! ensureValidInputForKeyboardTranslation(keyboard_layout, kc_underlying, is_correct_win_shiftstate(vk_ShiftState)))
+  if (!ensureValidInputForKeyboardTranslation(keyboard_layout, kc_underlying, is_correct_win_shiftstate(vk_ShiftState)))
       return 0;
 
 
-  keyV = mac_KMX_get_KeyVal_From_KeyCode_dk(keyboard_layout, kc_underlying,(mac_convert_Shiftstate_to_MacShiftstate(vk_ShiftState)), caps, isdk);
+  keyV = mac_KMX_get_KeyVal_From_KeyCode_dk(keyboard_layout, kc_underlying, (mac_convert_Shiftstate_to_MacShiftstate(vk_ShiftState)), caps, isdk);
 
   // if there was a deadkey return 0xFFFF and copy deadkey into dky
-  if( isdk !=0) {
-    dky = (PKMX_WCHAR) (std::u16string(1, keyV)).c_str();
+  if (isdk != 0) {
+    dky = (PKMX_WCHAR)(std::u16string(1, keyV)).c_str();
     *deadKey = *dky;
     return 0xFFFF;
   }
@@ -289,12 +278,11 @@ KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLa
   return keyV;
 }
 
-
 /** @brief return the keyvalue of a key of the the currently used (underlying) keyboard for a given keyvalue of the US keyboard */
-KMX_WCHAR mac_KMX_get_KeyValUnderlying_From_KeyValUS(vec_dword_3D&  all_vector, KMX_DWORD kv_us) {
+KMX_WCHAR mac_KMX_get_KeyValUnderlying_From_KeyValUS(vec_dword_3D& all_vector, KMX_DWORD kv_us) {
   // look for kv_us for any shiftstate of US keyboard
   for (int i = 0; i < (int)all_vector[0].size() - 1; i++) {
-    for (int j = 1; j <  (int)all_vector[0][0].size(); j++) {
+    for (int j = 1; j < (int)all_vector[0][0].size(); j++) {
       if (all_vector[0][i][j] == kv_us)
         return all_vector[1][i][j];
     }
@@ -311,12 +299,11 @@ KMX_WCHAR mac_KMX_get_KeyValUnderlying_From_KeyValUS(vec_dword_3D&  all_vector, 
    * @param   kv_underlying a keyvalue on the currently used (underlying) keyboard
    * @return  keycode of the underlying keyboardif foundf; else the keyval of the underlying keyboard
    */
-KMX_WCHAR mac_KMX_get_KeyCodeUnderlying_From_KeyValUnderlying(vec_dword_3D&  all_vector, KMX_DWORD kv_underlying) {
-
+KMX_WCHAR mac_KMX_get_KeyCodeUnderlying_From_KeyValUnderlying(vec_dword_3D& all_vector, KMX_DWORD kv_underlying) {
   // look for kv_us for any shiftstate of US keyboard
-  for ( int i=0; i< all_vector[1].size()-1 ;i++) {
-    for ( int j=1; j< all_vector[1][0].size();j++) {
-      if ( all_vector[1][i][j] == kv_underlying ) {
+  for (int i = 0; i < all_vector[1].size() - 1; i++) {
+    for (int j = 1; j < all_vector[1][0].size(); j++) {
+      if (all_vector[1][i][j] == kv_underlying) {
         return all_vector[1][i][0];
       }
     }
@@ -324,25 +311,22 @@ KMX_WCHAR mac_KMX_get_KeyCodeUnderlying_From_KeyValUnderlying(vec_dword_3D&  all
   return kv_underlying;
 }
   /** @brief return the keycode of the currently used (underlying) keyboard for a given keycode of the US keyboard */
-KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_KeyCodeUS(const UCKeyboardLayout * keyboard_layout, vec_dword_3D& all_vector, KMX_DWORD kc_us, ShiftState ss_win, int caps) {
-
+KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_KeyCodeUS(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& all_vector, KMX_DWORD kc_us, ShiftState ss_win, int caps) {
   // first get the keyvalue of the key on the US keyboard (kc_us)
-  std::u16string u16str = std::u16string(1, mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout, kc_us, mac_map_rgkey_ShiftState_to_Shiftstate(ss_win), caps) );
+  std::u16string u16str = std::u16string(1, mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout, kc_us, mac_map_rgkey_ShiftState_to_Shiftstate(ss_win), caps));
 
   // then find the same keyvalue on the underlying keyboard and return the keycode of that key on the underlying keyboard
   for (int i = 0; i < all_vector[1].size() - 1; i++) {
     for (int j = 1; j < all_vector[1][0].size(); j++) {
-      if (((KMX_DWORD) all_vector[1][i][j] == (KMX_DWORD)*u16str.c_str() ) )
+      if (((KMX_DWORD)all_vector[1][i][j] == (KMX_DWORD)*u16str.c_str()))
         return all_vector[1][i][0];
     }
   }
   return kc_us;
 }
-
-
  
 /** @brief return the keycode of the currently used (underlying) keyboard for a given virtual key of the US keyboard */
-UINT  mac_KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD vk_us) {
+UINT mac_KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD vk_us) {
   // On mac virtual keys do not exist. Nevertheless we can use this mapping to obtain an 'artificial' us virtual key
   return (mac_USVirtualKeyToScanCode[vk_us]);
 }
@@ -366,8 +350,7 @@ KMX_DWORD mac_KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode) {
    * @param   caps state of the caps key of a character key on the currently used (underlying) keyboard
    * @return  the combination of deadkey + character if it is available; if not return 0
    */
-KMX_DWORD  mac_get_CombinedChar_From_DK(int vk_dk, KMX_DWORD ss_dk, const UCKeyboardLayout* keyboard_layout, KMX_DWORD vk_us, KMX_DWORD shiftstate_mac, int caps) {
-
+KMX_DWORD mac_get_CombinedChar_From_DK(int vk_dk, KMX_DWORD ss_dk, const UCKeyboardLayout* keyboard_layout, KMX_DWORD vk_us, KMX_DWORD shiftstate_mac, int caps) {
   UInt32 deadkeystate;
   UniCharCount maxStringlength    = 5;
   UniCharCount actualStringlength = 0;
@@ -376,18 +359,17 @@ KMX_DWORD  mac_get_CombinedChar_From_DK(int vk_dk, KMX_DWORD ss_dk, const UCKeyb
   unicodeString[0] = 0;
   OSStatus status;
 
-  status = UCKeyTranslate(keyboard_layout, vk_dk,  kUCKeyActionDown, ss_dk, LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
+  status = UCKeyTranslate(keyboard_layout, vk_dk, kUCKeyActionDown, ss_dk, LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString);
 
   // If this was a deadkey,append a character
-  if(deadkeystate !=0) {
-    status = UCKeyTranslate(keyboard_layout,(UInt16) vk_us,  kUCKeyActionDown, shiftstate_mac+4*caps, LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
+  if (deadkeystate != 0) {
+    status = UCKeyTranslate(keyboard_layout,(UInt16) vk_us,  kUCKeyActionDown, shiftstate_mac+4*caps, LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString);
 
-  if(unicodeString[0] == 1 )    // impossible character
+  if (unicodeString[0] == 1)  // impossible character
       return 0;
   else
-    return unicodeString[0];    // combined char e.g.  â
-  }
-  else
+    return unicodeString[0];  // combined char e.g.  â
+  } else
     return 0;
 }
 
