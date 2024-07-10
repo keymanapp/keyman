@@ -36,6 +36,18 @@ describe('LMLayer using dummy model', function () {
     // Since Firefox can't do JSON imports quite yet.
     const hazelFixture = await fetch(new URL(`${domain}/resources/json/models/future_suggestions/i_got_distracted_by_hazel.json`));
     hazelModel = await hazelFixture.json();
+    hazelModel = hazelModel.map((set) => set.map((entry) => {
+      return {
+        ...entry,
+        // Dummy-model predictions all claim probability 1; there's no actual probability stuff
+        // used here.
+        'lexical-p': 1,
+        // We're predicting from a single transform, not a distribution, so probability 1.
+        'correction-p': 1,
+        // Multiply 'em together.
+        p: 1,
+      }
+    }));
   });
 
   describe('Prediction', function () {
