@@ -1,12 +1,3 @@
-#ifndef MCOMPILE_H
-#define MCOMPILE_H
-
-#include "keymap.h"
-#include <vector>
-#include <map>
-#include "mc_import_rules.h"
-#include "mc_kmxfile.h"
-
 /*
   Name:             mcompile
   Copyright:        Copyright (C) 2003-2017 SIL International.
@@ -26,23 +17,34 @@
                     
 */
 
+#ifndef MCOMPILE_H
+#define MCOMPILE_H
+#include <vector>
+#include "keymap.h"
+#include "mc_kmxfile.h"
+#include <map>
+#include "mc_import_rules.h"
 
-struct KMX_DeadkeyMapping {   // I4353
+struct KMX_DeadkeyMapping {  // I4353
   KMX_WCHAR deadkey, dkid;
   UINT shift;
   KMX_WORD vk;
 };
 
-extern std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;   // I4353
+extern std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;  // I4353
 
-int mac_run(int argc, std::vector<std::u16string>  str_argv, char* argv[]);
+int mac_run(int argc, std::vector<std::u16string> str_argv, char* argv[]);
 
 PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p);
 
-int mac_KMX_GetDeadkeys( const UCKeyboardLayout * keyboard_layout,  vector_dword_3D &all_vector, KMX_WCHAR deadkey, UINT shift_dk, KMX_WORD *OutputPairs );  // returns array of [usvk, ch_out] pairs
+int mac_KMX_GetDeadkeys(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& all_vector, KMX_WCHAR deadkey, UINT shift_dk, KMX_WORD* OutputPairs);  // returns array of [usvk, ch_out] pairs
 
+/**
+ * @brief  print (error) messages
+ * @param  fmt text to print
+ * @return void
+ */
 void mac_KMX_LogError(const wchar_t* fmt, ...);
-
 
 //################################################################################################################################################
 //################################################################################################################################################
@@ -58,4 +60,4 @@ bool test_dk_write_entries_S2(KMX_WORD deadkeys[512]);
 void fun2();
 void testmyFunctions_S2();
 
-#endif // MCOMPILE_H
+#endif /*MCOMPILE_H*/
