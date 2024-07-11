@@ -48,6 +48,7 @@ TEST_F(kmx_u16_Test, u16tok_char_delim) {
   EXPECT_TRUE(!u16cmp(u"space", u16tok(nullptr, ' ', &ctx)));
   EXPECT_TRUE(!u16cmp(u"and", u16tok(nullptr, ' ', &ctx)));
   EXPECT_TRUE(!u16cmp(u"two", u16tok(nullptr, ' ', &ctx)));
+  EXPECT_EQ(nullptr, ctx);
 
   // only a delimiter
   u16cpy(str, u" ");
@@ -74,6 +75,7 @@ TEST_F(kmx_u16_Test, u16tok_str_delim) {
   EXPECT_TRUE(!u16cmp(u"space", u16tok(nullptr, u" ", &ctx)));
   EXPECT_TRUE(!u16cmp(u"and", u16tok(nullptr, u" ", &ctx)));
   EXPECT_TRUE(!u16cmp(u"two", u16tok(nullptr, u" ", &ctx)));
+  EXPECT_EQ(nullptr, ctx);
 
   // only a delimiter
   u16cpy(str, u" ");
@@ -111,6 +113,7 @@ TEST_F(kmx_u16_Test, u16tok_str_compare_to_strtok) {
   EXPECT_TRUE(!strcmp("space", strtok(nullptr, " ")));
   EXPECT_TRUE(!strcmp("and", strtok(nullptr, " ")));
   EXPECT_TRUE(!strcmp("two", strtok(nullptr, " ")));
+  EXPECT_EQ(nullptr, strtok(nullptr, " "));
 
   // only a delimiter
   strcpy(str, " ");
