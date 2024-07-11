@@ -118,7 +118,7 @@ export function transformToSuggestion(transform: Transform, p?: number): Outcome
     displayAs: transform.insert
   };
 
-  if(transform.id) {
+  if(transform.id !== undefined) {
     suggestion.transformId = transform.id;
   }
 
