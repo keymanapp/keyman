@@ -472,6 +472,22 @@ TEST_F(CompilerTest, GetDelimitedString_test) {
     EXPECT_EQ(0, u16cmp(u"b  ", q));
     EXPECT_EQ(' ', *p);
     EXPECT_EQ(6, p-str); // last space after the close delimiter
+
+    // single-character argument, two spaces and text after close delimiter, cut open and close delimiter, valid
+    u16cpy(str, u"(b)  def");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_EQ('d', *p);
+    EXPECT_EQ(5, p-str); // first text character after the close delimiter
+
+    // single-character argument, two spaces and text after close delimiter, no flags, valid
+    u16cpy(str, u"(b)  def");
+    p = str;
+    q = GetDelimitedString(&p, u"()", 0x00);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_EQ('d', *p);
+    EXPECT_EQ(5, p-str); // first text character after the close delimiter
 }
 
 // LinePrefixType GetLinePrefixType(PKMX_WCHAR *p)
