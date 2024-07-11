@@ -17,12 +17,12 @@ import { DummyModel } from "#./models/dummy-model.js";
 /** @type { import("#./models/dummy-model.js").DummyOptions } */
 const DUMMY_MODEL_CONFIG = {
   punctuation: {
-  quotesForKeepSuggestion: {
-    open: '<',
-    close: '>'
+    quotesForKeepSuggestion: {
+      open: '<',
+      close: '>'
+    },
+    insertAfterWord: '\u00a0' // non-breaking space
   },
-  insertAfterWord: '\u00a0' // non-breaking space
-},
   wordbreaker: wordBreakers.default
 };
 
