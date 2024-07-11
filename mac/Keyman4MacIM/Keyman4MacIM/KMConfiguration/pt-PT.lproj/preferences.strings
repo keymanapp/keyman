@@ -1,14 +1,14 @@
 /* Checkbox text to always show on-screen keyboard */
-"4UX-80-0Vo.title" = "Sempre mostrar o teclado na tela";
+"4UX-80-0Vo.title" = "Mostrar sempre o teclado no ecrã";
 
 /* Checkbox text to enable verbose Console logging */
-"7J6-zy-R20.title" = "Usar registro do Console detalhado";
+"7J6-zy-R20.title" = "Utilizar o registo detalhado da consola";
 
 /* Support button text  */
 "93O-x6-RLF.label" = "Suporte";
 
 /* Download Keyboard button text */
-"CTw-kf-WNS.title" = "Baixar teclado...";
+"CTw-kf-WNS.title" = "Descarregar teclado...";
 
 /* Keyman Configuration window title */
 "F0z-JX-Cv5.title" = "Configuração do Keyman ";
@@ -17,16 +17,16 @@
 "JOK-JV-n8w.title" = "Voltar";
 
 /* Keyboards button text */
-"MPN-9N-wWc.label" = "Keyboards";
+"MPN-9N-wWc.label" = "Teclados";
 
 /* text to explain verbose Console logging option */
-"MrI-GM-7d6.title" = "Quando a opção de registro detalhada estiver ativada, o Keyman irá registrar ações que podem ajudar o suporte ao Keyman a diagnosticar um problema. O programa Console pode ser usado para ver um registro de mensagens do Keyman. Em Console, filtro para mostrar todas as mensagens do processo \"Keyman\". Este log pode ser exportado e enviado para o suporte a Keyman, se necessário.";
+"MrI-GM-7d6.title" = "Quando a opção de registro detalhada estiver ativada, o Keyman irá registrar ações que podem ajudar o suporte ao Keyman a diagnosticar um problema. O programa Consola pode ser usado para ver um registro de mensagens do Keyman. Em Consola, filtre para mostrar todas as mensagens do processo \"Keyman\". Este registo pode ser exportado e enviado para o suporte do Keyman, se necessário.";
 
 /* button text to move forward to the next page */
 "eXr-8V-h1g.title" = "Avançar";
 
 /* button text to return to the home help page */
-"fXS-aC-CMH.title" = "Residencial";
+"fXS-aC-CMH.title" = "Início";
 
 /* Options button text */
 "frd-No-seV.label" = "Opções";
@@ -35,4 +35,4 @@
 "jex-Nd-Qzg.headerCell.title" = "Teclado instalado";
 
 /* Verbose logging tooltip text */
-"uWx-3J-U0D.ibShadowedToolTip" = "Ative isso se você estiver tendo problemas com um teclado específico ou com o Keyman em geral.";
+"uWx-3J-U0D.ibShadowedToolTip" = "Ative esta opção se tiver problemas com um teclado específico ou com o Keyman em geral.";

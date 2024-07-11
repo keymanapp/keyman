@@ -17,7 +17,7 @@
 "error-opening-page" = "Impossível Abrir Página";
 
 /* Long-form used when installing a font in order to display a language properly. */
-"font-install-description" = "Toque em Instalar para exibir o %@ corretamente em todos os seus aplicativos";
+"font-install-description" = "Toque em Instalar para exibir o %@ corretamente em todos as suas aplicações";
 
 /* The name of the iOS Settings menu option for keyboards */
 "ios-settings-keyboards" = "Teclados";
@@ -54,7 +54,7 @@ underneath the app's name within the app-specific keyboard menu.) */
 "menu-settings" = "Configurações";
 
 /* Menu option that displays the iOS Share menu */
-"menu-share" = "Compartilhar";
+"menu-share" = "Partilhar";
 
 /* Menu option that displays an embedded web browser. */
 "menu-show-browser" = "Navegador";
@@ -66,7 +66,7 @@ underneath the app's name within the app-specific keyboard menu.) */
 "text-size-label" = "Tamanho do texto: %i";
 
 /* Text to indicate that a user should set a toggle within iOS Settings to 'active'. */
-"toggle-to-enable" = "Habilitar %@";
+"toggle-to-enable" = "Ativar %@";
 
 /* First option on the Get Started tutorial - Add a keyboard for your language */
 "tutorial-add-keyboard" = "Adicione um teclado para o seu idioma";
@@ -75,7 +75,7 @@ underneath the app's name within the app-specific keyboard menu.) */
 "tutorial-show-help" = "Mais informações";
 
 /* Second option on the Get Started tutorial - Set up Keyman as system-wide keyboard */
-"tutorial-system-keyboard" = "Configurar o Keyman como teclado de todo o sistema";
+"tutorial-system-keyboard" = "Configurar Keyman como o teclado de sistema";
 
 /* Used to display app version (as in \"Version: 1.0.2\" */
 "version-label" = "Versão: %@";

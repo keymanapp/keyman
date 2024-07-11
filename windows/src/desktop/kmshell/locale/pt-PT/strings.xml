@@ -31,7 +31,7 @@
   <!-- Context: General Strings -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Button_Cancel" comment="Cancel button term">Instalar Mais Tarde</string>
+  <string name="S_Button_Cancel" comment="Cancel button term">Cancelar</string>
   <!-- Context: General Strings -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -43,7 +43,7 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKButtonCancel" comment="Cancel button in message boxes">Instalar Mais Tarde</string>
+  <string name="SKButtonCancel" comment="Cancel button in message boxes">Cancelar</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.330.0 -->
@@ -539,7 +539,7 @@
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Update_Button_InstallLater" comment="Update dialog - cancel button">Instalar Mais Tarde</string>
+  <string name="S_Update_Button_InstallLater" comment="Update dialog - cancel button">Cancelar</string>
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.1.255.0 -->
@@ -868,7 +868,7 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">As informações de depuração do keyman serão armazenadas em um ficheiro de log chamado %LOCALAPPDATA%\Keyman\Diag\system#.etl (onde # é um número). Deverá sair do Keyman antes de tentar excluir este ficheiro.\n\n\AVISO: Este ficheiro pode crescer grande rapidamente. Permitir a depuração pode tornar o sistema mais lento e só deve ser feito se recomendado pelo suporte técnico.\n\nATENÇÃO: Por favor, note que o ficheiro de log de depuração registra todos os traços de tecla que digita. Só deve ativar o log de depuração durante uma sessão de diagnóstico ou depuração.</string>
+  <string name="SKDebuggingWarning" comment="Warning upon starting debugging in the Options tab">As informações de depuração do keyman serão armazenadas em um ficheiro de registo chamado %LOCALAPPDATA%\Keyman\Diag\system#.etl (onde # é um número). Deverá sair do Keyman antes de tentar excluir este ficheiro.\n\n\AVISO: Este ficheiro pode crescer grande rapidamente. Permitir a depuração pode tornar o sistema mais lento e só deve ser feito se recomendado pelo suporte técnico.\n\nATENÇÃO: Por favor, note que o ficheiro de registo de depuração grava todos os traços de tecla que digita. Só deve ativar o registo de depuração durante uma sessão de diagnóstico ou depuração.</string>
   <!-- Context: OSK Font Helper -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->

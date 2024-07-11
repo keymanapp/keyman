@@ -1,17 +1,17 @@
 /* A descriptive message used for errors when the app is already busy downloading */
-"alert-download-error-busy" = "Baixando já ocupado.";
+"alert-download-error-busy" = "Já ocupado a descarregar.";
 
 /* A descriptive message used when a download fails */
-"alert-download-error-detail" = "Ocorreu um erro durante o download ou instalação.";
+"alert-download-error-detail" = "Ocorreu um erro durante a descarga ou instalação.";
 
 /* Title for a "download failed" alert */
-"alert-download-error-title" = "Erro no download";
+"alert-download-error-title" = "Erro de descarga";
 
 /* Title for a general alert about errors */
 "alert-error-title" = "Erro";
 
 /* A descriptive message used when no internet connection is detected */
-"alert-no-connection-detail" = "Não foi possível acessar o servidor Keyman. Por favor, tente novamente mais tarde.";
+"alert-no-connection-detail" = "Não foi possível aceder ao servidor Keyman. Por favor, tente novamente mais tarde.";
 
 /* Title for a "no connection" alert */
 "alert-no-connection-title" = "Erro de conexão";
@@ -20,7 +20,7 @@
 "command-back" = "Voltar";
 
 /* Short text for a 'cancel' command.  Used to back out of a menu or install process without making changes */
-"command-cancel" = "Instalar Mais Tarde";
+"command-cancel" = "Cancelar";
 
 /* Short text for a 'done' command.  Used to back out of settings menus after changes have been made */
 "command-done" = "Concluído";
@@ -56,13 +56,13 @@
 "error-loading-lexical-model" = "Não foi possível carregar o dicionário solicitado";
 
 /* Text for error when an installed file is unexpectedly missing */
-"error-missing-file" = "Não foi possível encontrar um arquivo obrigatório.";
+"error-missing-file" = "Não foi possível encontrar um ficheiro obrigatório.";
 
 /* Text for error when an installed file is unexpectedly missing */
-"error-missing-file-critical" = "Não foi possível encontrar um arquivo crítico. Por favor, tente reinstalar o aplicativo.";
+"error-missing-file-critical" = "Não foi possível encontrar um ficheiro crítico. Por favor, tente reinstalar o aplicativo.";
 
 /* Text for errors in data received from search queries */
-"error-query-decoding" = "O servidor está atualmente passando por dificuldades técnicas";
+"error-query-decoding" = "O servidor está a passar por dificuldades técnicas";
 
 /* A descriptive message used when a download fails */
 "error-query-general" = "Erro de comunicação com o servidor";
@@ -110,13 +110,13 @@
 "keyboard-menu-exit" = "Fechar %@";
 
 /* Error installing a Keyman package - could not allocate a location to install it */
-"kmp-error-file-system" = "Erro ao instalar pacote - erro de arquivo-sistema";
+"kmp-error-file-system" = "Erro ao instalar pacote - erro no sistema de ficheiros";
 
 /* Error installing a Keyman package - could not copy package files */
-"kmp-error-file-copying" = "Erro ao instalar o pacote - não foi possível copiar os arquivos necessários";
+"kmp-error-file-copying" = "Erro ao instalar o pacote - não foi possível copiar os ficheiros necessários";
 
 /* Error opening a Keyman package - package is not valid */
-"kmp-error-invalid" = "O arquivo do pacote está corrompido.";
+"kmp-error-invalid" = "O ficheiro do pacote está corrompido.";
 
 /* Error opening a Keyman package - it does not exist / the specified location is wrong */
 "kmp-error-missing" = "O pacote especificado não existe.";
@@ -179,10 +179,10 @@
 "menu-settings-error-report-description" = "Pode exigir \"acesso total\"";
 
 /* Primary text for the Settings menu local-file package installation option */
-"menu-settings-install-from-file" = "Instalar do arquivo";
+"menu-settings-install-from-file" = "Instalar do ficheiro";
 
 /* Secondary text for the Settings menu local-file package installation option */
-"menu-settings-install-from-file-description" = "Procurar por arquivos .kmp";
+"menu-settings-install-from-file-description" = "Procurar por ficheiros .kmp";
 
 /* Primary text for the Settings menu option that displays the iOS system menu options for the app's keyboard */
 "menu-settings-system-keyboard-menu" = "Configurações do teclado";
@@ -227,22 +227,22 @@
 "menu-settings-spacebar-item-languageKeyboard" = "Idioma e teclado";
 
 /* Short text for notification:  download failure for keyboard */
-"notification-download-failure-keyboard" = "Download do teclado falhou";
+"notification-download-failure-keyboard" = "Descarga do teclado falhou";
 
 /* Short text for notification:  download failure for lexical model */
-"notification-download-failure-lexical-model" = "Download do dicionário falhou";
+"notification-download-failure-lexical-model" = "Descarga do dicionário falhou";
 
 /* Short text for notification:  download success for keyboard */
 "notification-download-success-keyboard" = "Teclado baixado com sucesso";
 
 /* Short text for notification:  download success for lexical model */
-"notification-download-success-lexical-model" = "Modelo Léxico baixado com sucesso";
+"notification-download-success-lexical-model" = "Modelo léxico baixado com sucesso";
 
 /* Short text for notification:  downloading a keyboard */
-"notification-downloading-keyboard" = "Baixando teclado\U2026";
+"notification-downloading-keyboard" = "A descarregar teclado\U2026";
 
 /* Short text for notification:  downloading a lexical model */
-"notification-downloading-lexical-model" = "Baixando o dicionário\U2026";
+"notification-downloading-lexical-model" = "A descarregar o dicionário\U2026";
 
 /* Short text for notification:  an update is available */
 "notification-update-available" = "Atualização disponível";

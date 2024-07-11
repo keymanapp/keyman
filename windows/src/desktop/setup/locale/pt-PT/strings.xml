@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="ssLanguageName" comment="User interface language name in the UI language">Português do Portugal</string>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">Português de Portugal</string>
   <string name="ssApplicationTitle">Configuração de $APPNAME $VERSION</string>
   <string name="ssTitle">Instalar $APPNAME $VERSION</string>
   <string name="ssInstallSuccess">$APPNAME $VERSION foi instalado com sucesso.</string>
-  <string name="ssCancelQuery">Tem certeza de que deseja cancelar a instalação de $APPNAME?</string>
-  <string name="ssBootstrapExtractingBundle">Extraindo o pacote...</string>
-  <string name="ssBootstrapCheckingPackages">Verificando pacotes...</string>
-  <string name="ssBootstrapCheckingForUpdates">Verificando atualizações online...</string>
-  <string name="ssBootstrapCheckingInstalledVersions">Verificando versões instaladas...</string>
-  <string name="ssBootstrapReady">Concluindo ...</string>
+  <string name="ssCancelQuery">Tem a certeza que pretende cancelar a instalação de $APPNAME?</string>
+  <string name="ssBootstrapExtractingBundle">A extrair o pacote...</string>
+  <string name="ssBootstrapCheckingPackages">A verificar pacotes...</string>
+  <string name="ssBootstrapCheckingForUpdates">A verificar atualizações online...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">A verificar versões instaladas...</string>
+  <string name="ssBootstrapReady">A Concluir...</string>
   <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
   <string name="ssActionInstallKeyman">• $APPNAME %0:s %1:s</string>
   <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
@@ -19,7 +19,7 @@
   <string name="ssActionNothingToInstall">Não há nada para instalar.</string>
   <!-- Parameters: %0:s download size -->
   <string name="ssActionDownload">(%0:s baixado)</string>
-  <string name="ssActionInstall">A instalação será instalada:</string>
+  <string name="ssActionInstall">A Configuração será instalada:</string>
   <string name="ssFreeCaption">$APPNAME $VERSION é gratuito e de código aberto</string>
   <string name="ssLicenseLink">&amp;Leia a licença</string>
   <string name="ssInstallOptionsLink">Instalar &amp;opções</string>
@@ -28,15 +28,15 @@
   <string name="ssInstallButton">&amp;Instalar</string>
   <string name="ssCancelButton">Instalar Mais Tarde</string>
   <string name="ssExitButton">E&amp;xit</string>
-  <string name="ssStatusInstalling">Instalando $APPNAME</string>
-  <string name="ssStatusRemovingOlderVersions">Removendo versões anteriores</string>
+  <string name="ssStatusInstalling">A Instalar $APPNAME</string>
+  <string name="ssStatusRemovingOlderVersions">A remover versões anteriores</string>
   <string name="ssStatusComplete">Instalação concluída</string>
-  <string name="ssQueryRestart">Você deve reiniciar o Windows antes que a configuração seja concluída. Ao reiniciar o Windows, a configuração continuará.
+  <string name="ssQueryRestart">Deve reiniciar o Windows antes que a configuração seja concluída. Ao reiniciar o Windows, a configuração irá continuar.
 
 Reiniciar agora?</string>
-  <string name="ssErrorUnableToAutomaticallyRestart">O Windows não pôde ser reiniciado automaticamente. Você deve reiniciar o Windows antes de tentar iniciar o $APPNAME.</string>
-  <string name="ssMustRestart">Você deve reiniciar o Windows para concluir a instalação. Ao reiniciar o Windows, a instalação terminará.</string>
-  <string name="ssOldOsVersionInstallKeyboards">$APPNAME $VERSION requer que o Windows 7 ou posterior seja instalado. No entanto, Keyman Desktop 7, 8 ou 9 foi detectado. Você deseja instalar os teclados incluídos neste instalador na versão instalada do Keyman Desktop?</string>
+  <string name="ssErrorUnableToAutomaticallyRestart">O Windows não pôde ser reiniciado automaticamente. Deve reiniciar o Windows antes de tentar iniciar o $APPNAME.</string>
+  <string name="ssMustRestart">Deve reiniciar o Windows para concluir a instalação. Ao reiniciar o Windows, a instalação irá terminar.</string>
+  <string name="ssOldOsVersionInstallKeyboards">$APPNAME $VERSION requer que o Windows 7 ou posterior seja instalado. No entanto, Keyman Desktop 7, 8 ou 9 foi detectado. Pretende instalar os teclados incluídos neste instalador na versão instalada do Keyman Desktop?</string>
   <string name="ssOldOsVersionDownload">Esta versão do $APPNAME requer que o Windows 7 ou posterior seja instalado. Você deseja baixar o Keyman Desktop 8?</string>
   <string name="ssOptionsTitle">Opções de Instalação</string>
   <string name="ssOptionsTitleInstallOptions">Opções de instalação</string>
@@ -48,31 +48,31 @@ Reiniciar agora?</string>
   <string name="ssOptionsStartAfterInstall">Iniciar $APPNAME quando a instalação for concluída</string>
   <string name="ssOptionsCheckForUpdates">Verificar se há atualizações online periodicamente</string>
   <string name="ssOptionsUpgradeKeyboards">Atualizar teclados instalados com versões anteriores para a versão $VERSION</string>
-  <string name="ssOptionsAutomaticallyReportUsage">Compartilhar estatísticas de uso anônimas com keyman.com</string>
+  <string name="ssOptionsAutomaticallyReportUsage">Partilhar estatísticas de utilização anónimas com keyman.com</string>
   <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
   <string name="ssInstallerVersion">Configurar versão: %0:s</string>
   <string name="ssOptionsInstallKeyman">Instalar $APPNAME</string>
-  <string name="ssOptionsUpgradeKeyman">Melhorar $APPNAME</string>
+  <string name="ssOptionsUpgradeKeyman">Atualizar $APPNAME</string>
   <!-- Parameters: %0:s: installed version -->
   <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s já está instalado.</string>
   <!-- Parameters: %0:s: version, %1:s: size -->
-  <string name="ssOptionsDownloadKeymanVersion">Baixar a versão %0:s (%1:s)</string>
+  <string name="ssOptionsDownloadKeymanVersion">Descarregar a versão %0:s (%1:s)</string>
   <!-- Parameters: %0:s: version -->
   <string name="ssOptionsInstallKeymanVersion">Versão %0:s</string>
   <!-- Parameters: %0:s: package name %1:s -->
   <string name="ssOptionsInstallPackage">Instalar %0:s</string>
   <!-- Parameters: %0:s: package version %1:s package size -->
-  <string name="ssOptionsDownloadPackageVersion">Baixar a versão %0:s (%1:s)</string>
+  <string name="ssOptionsDownloadPackageVersion">Descarregar a versão %0:s (%1:s)</string>
   <!-- Parameters: %0:s: package version -->
   <string name="ssOptionsInstallPackageVersion">Versão %0:s</string>
   <!-- Parameters: %0:s package name -->
-  <string name="ssOptionsPackageLanguageAssociation">Selecione o idioma que você deseja associar com o teclado %0:s</string>
+  <string name="ssOptionsPackageLanguageAssociation">Selecione o idioma que pretende associar com o teclado %0:s</string>
   <string name="ssOptionsDefaultLanguage">Idioma padrão</string>
   <!-- Parameters: %0:s: filename -->
-  <string name="ssDownloadingTitle">Baixando %0:s</string>
+  <string name="ssDownloadingTitle">A descarregar %0:s</string>
   <!-- Parameters: %0:s: filename -->
-  <string name="ssDownloadingText">Baixando %0:s</string>
-  <string name="ssOffline">A configuração do $APPNAME não pôde se conectar a keyman.com para baixar recursos adicionais.</string>
-  <string name="ssOffline2">Por favor, verifique se você está online e dê ao $APPNAME permissão de configuração para acessar a Internet nas suas configurações de firewall.</string>
-  <string name="ssOffline3">Clique em Abortar para sair da instalação, tente tentar baixar os recursos novamente ou Ignorar para continuar offline.</string>
+  <string name="ssDownloadingText">A descarregar %0:s</string>
+  <string name="ssOffline">A configuração do $APPNAME não pode ligar-se a keyman.com para descarregar recursos adicionais.</string>
+  <string name="ssOffline2">Por favor, verifique se está online e deu ao $APPNAME permissão de configuração para aceder à Internet nas definições de firewall.</string>
+  <string name="ssOffline3">Clique em Abortar para sair da instalação, em  tentar descarregar os recursos novamente ou Ignorar para continuar offline.</string>
 </resources>
