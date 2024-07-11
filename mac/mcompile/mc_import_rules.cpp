@@ -4,6 +4,7 @@
  * Mnemonic layout support for Linux
  */
 
+
 #include <vector>
 #include <string>
 #include <stdio.h>
@@ -51,38 +52,38 @@ bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
 //_S2 remove!
 bool test_alDead_S2(std::vector<DeadKey*> ald);
 
-/**   // _S2 at merge: better description in other branch:
- * @brief  Find a keyvalue for given keycode, shiftstate and caps. A function similar to Window`s ToUnicodeEx() function.
- * @param  keycode a key of the currently used keyboard Layout
- * @param  pwszBuff Buffer to store resulting character
- * @param  ss_win a windows-style shiftstate of the currently used keyboard Layout
- * @param  caps state of the caps key of the currently used keyboard Layout
- * @param  keyboard_layout the currently used (underlying)keyboard Layout
+
+ /** @brief Find a keyvalue for given keycode, shiftstate and caps. A function similar to Window`s ToUnicodeEx() function.
+ *          Contrary to what the function name might suggest, the function the mac_KMX_ToUnicodeEx does NOT process surrogate pairs.
+ *          This is because it is used in mcompile only which only deals with latin scripts.
+ *          In case this function is used for surrogate pairs, they will be ignored and a message will be printed out
+ * @param keycode a key of the currently used keyboard Layout
+ * @param pwszBuff Buffer to store resulting character
+ * @param ss_win a windows-style shiftstate of the currently used keyboard Layout
+ * @param caps state of the caps key of the currently used keyboard Layout
+ * @param keyboard_layout the currently used (underlying)keyboard Layout
  * @return -1 if a deadkey was found; 0 if no translation is available; +1 if character was found and written to pwszBuff
  */
-int mac_KMX_ToUnicodeEx(int keycode, PKMX_WCHAR pwszBuff, int ss_win, int caps, const UCKeyboardLayout* keyboard_layout) {
+int mac_KMX_ToUnicodeEx(int keycode, PKMX_WCHAR pwszBuff, ShiftState ss_rgkey, int caps, const UCKeyboardLayout* keyboard_layout) {
   KMX_DWORD keyval;
   UInt32 isdk = 0;
 
-  /*if (!keyboard_layout)
+  if (!ensureValidInputForKeyboardTranslation(keyboard_layout, keycode, mac_convert_rgkey_Shiftstate_to_MacShiftstate(ss_rgkey), caps))
     return 0;
 
-  if (!(keycode <= keycode_max))
-    return 0;
-
-  if (!(ss_win <= max_shiftstate))
-    return 0;
-
-  if (!(caps <= 1))
-    return 0;*/
-
-  if (!ensureValidInputForKeyboardTranslation(keyboard_layout, keycode, ss_win, caps))
-    return 0;
-
-  keyval = mac_KMX_get_KeyVal_From_KeyCode_dk(keyboard_layout, keycode, mac_map_rgkey_ShiftState_to_Shiftstate(ShiftState(ss_win)), caps, isdk);
+  keyval = mac_KMX_get_KeyVal_From_KeyCode_dk(keyboard_layout, keycode, mac_convert_rgkey_Shiftstate_to_MacShiftstate(ss_rgkey), caps, isdk);
   std::u16string str =std::u16string(1, keyval );
-  pwszBuff[0] = *(PKMX_WCHAR)str.c_str();
+  KMX_WCHAR firstchar = *(PKMX_WCHAR)str.c_str();
 
+  if ((firstchar >= 0xD800) && (firstchar <= 0xDFFF)) {
+    wprintf(L"Surrogate pair found that is not processed in KMX_ToUnicodeEx\n");
+    return 0;
+  }
+
+  pwszBuff[0] = firstchar;
+
+  if (u16len(pwszBuff) < 1)
+    return 0;
   if ((isdk) && (keycode != 0xFFFF))    // deadkeys
     return -1;
   if (keyval == 0)                      // no character
@@ -91,7 +92,7 @@ int mac_KMX_ToUnicodeEx(int keycode, PKMX_WCHAR pwszBuff, int ss_win, int caps, 
     return 1;
 }
 
-int mac_KMX_DeadKeyMap(int index, std::vector<DeadKey*>*deadkeys, int deadkeyBase, std::vector<KMX_DeadkeyMapping>*deadkeyMappings) {   // I4327   // I4353
+KMX_WCHAR mac_KMX_DeadKeyMap(int index, std::vector<DeadKey*>*deadkeys, int deadkeyBase, std::vector<KMX_DeadkeyMapping>*deadkeyMappings) {   // I4327   // I4353
   for (size_t i = 0; i < deadkeyMappings->size(); i++) {
     if ((*deadkeyMappings)[i].deadkey == index) {
       return (*deadkeyMappings)[i].dkid;
@@ -100,7 +101,7 @@ int mac_KMX_DeadKeyMap(int index, std::vector<DeadKey*>*deadkeys, int deadkeyBas
 
   for (size_t i = 0; i < deadkeys->size(); i++) {
     if ((*deadkeys)[i]->KMX_DeadCharacter() == index) {
-      return deadkeyBase + i;
+      return (KMX_WCHAR)deadkeyBase + i;
     }
   }
   return 0xFFFF;
@@ -247,7 +248,7 @@ public:
           (this->mac_KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
           (this->mac_KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);*/
 
-    int capslock = 1;  // we do not use the equation to obtain capslock. On Mac we set capslock=1
+    int capslock = 1;  // we do not use the equation to obtain capslock. on the mac we set capslock=1
 
     for (int ss = 0; ss <= MaxShiftState; ss++) {
       if (ss == Menu || ss == ShftMenu) {
@@ -356,10 +357,10 @@ public:
     bool fCapsLock,                             // Was the caps lock key pressed?
     const UCKeyboardLayout* keyboard_layout) {  // The keyboard layout
 
-    int maxshiftstate = 2;
+    int maxshiftstate = 2;  //_S2 MAC_SHIFT??
     DeadKey* deadKey = new DeadKey(rgKey[iKeyDead]->mac_KMX_GetShiftState(shiftStateDead, fCapsLock)[0]);
 
-    int ss_dead = mac_map_rgkey_ShiftState_to_Shiftstate(shiftStateDead);
+    int ss_dead = mac_convert_rgkey_Shiftstate_to_MacShiftstate(shiftStateDead);
     KMX_DWORD keyval_underlying_dk  = mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout, mac_USVirtualKeyToScanCode[iKeyDead], ss_dead, 0);
 
     for (int i = 0; i < keycode_spacebar + 1; i++) {
@@ -478,9 +479,9 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, const UCK
           }
 
           //_S2 TOP_6 TODO to compare win-lin kmn-files skip ss6+7; MUST BE removed later!!!!
-         /*if (ss == MenuCtrl || ss == ShftMenuCtrl) {
+         if (ss == MenuCtrl || ss == ShftMenuCtrl) {
            continue;
-          }*/
+          }
 
           KMX_DWORD KC_US = (KMX_DWORD)mac_KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 
@@ -489,17 +490,17 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, const UCK
 
             if (rc > 0) {
               if (*sbBuffer == 0) {
-                rgKey[iKey]->mac_KMX_SetShiftState(ss, u"", false, (caps));      // different to windows since behavior on mac is different
+                rgKey[iKey]->mac_KMX_SetShiftState(ss, u"", false, (caps));      // different to windows since behavior on the mac is different
               } else {
               if ((ss == Ctrl || ss == ShftCtrl)) {
                   continue;
                 }
                   sbBuffer[rc] = 0;
-                  rgKey[iKey]->mac_KMX_SetShiftState(ss, sbBuffer, false, (caps));    // different to windows since behavior on mac is different
+                  rgKey[iKey]->mac_KMX_SetShiftState(ss, sbBuffer, false, (caps));    // different to windows since behavior on the mac is different
              }
           } else if (rc < 0) {
             sbBuffer[2] = 0;
-            rgKey[iKey]->mac_KMX_SetShiftState(ss, sbBuffer, true, (caps ));      // different to windows since behavior on mac is different
+            rgKey[iKey]->mac_KMX_SetShiftState(ss, sbBuffer, true, (caps ));      // different to windows since behavior on the mac is different
 
             sbBuffer[2] = 0;
             rgKey[iKey]->mac_KMX_SetShiftState(ss, sbBuffer, true, (caps == 0));
@@ -548,13 +549,6 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, const UCK
 
   kp->dpGroupArray = gp;
   for (UINT i = 0; i < kp->cxGroupArray; i++, gp++) {
-    //if (gp->fUsingKeys && gp->dpNoMatch == NULL) {   // I4550
-     // WCHAR *p = gp->dpNoMatch = new WCHAR[4];
-     // *p++ = UC_SENTINEL;
-     // *p++ = CODE_USE;
-     // *p++ = (WCHAR)(kp->cxGroupArray + 1);
-     // *p = 0;
-    //}
     LPKMX_KEY kkp = gp->dpKeyArray;
 
     for (UINT j = 0; j < gp->cxKeyArray; j++, kkp++) {
@@ -713,35 +707,6 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, const UCK
   }
 return true;
 }
-
-const int CODE__SIZE[] = {
-   -1,   // undefined                0x00
-    1,   // CODE_ANY                 0x01
-    2,   // CODE_INDEX               0x02
-    0,   // CODE_CONTEXT             0x03
-    0,   // CODE_NUL                 0x04
-    1,   // CODE_USE                 0x05
-    0,   // CODE_RETURN              0x06
-    0,   // CODE_BEEP                0x07
-    1,   // CODE_DEADKEY             0x08
-   -1,  // unused                   0x09
-    2,   // CODE_EXTENDED            0x0A
-   -1,  // CODE_EXTENDEDEND         0x0B (unused)
-    1,   // CODE_SWITCH              0x0C
-   -1,  // CODE_KEY                 0x0D (never used)
-    0,   // CODE_CLEARCONTEXT        0x0E
-    1,   // CODE_CALL                0x0F
-   -1,  // UC_SENTINEL_EXTENDEDEND  0x10 (not valid with UC_SENTINEL)
-    1,   // CODE_CONTEXTEX           0x11
-    1,   // CODE_NOTANY              0x12
-    2,   // CODE_SETOPT              0x13
-    3,   // CODE_IFOPT               0x14
-    1,   // CODE_SAVEOPT             0x15
-    1,   // CODE_RESETOPT            0x16
-    3,   // CODE_IFSYSTEMSTORE       0x17
-    2    // CODE_SETSYSTEMSTORE      0x18
-};
-
 // _S2 need to go
 void print_entries_S2(int i, std::vector<mac_KMX_VirtualKey*> rgKey , std::string comp1,std::string comp2,std::string erg) {
   std::string b0 =string_from_u16string(rgKey[i]->mac_KMX_GetShiftState(Base,  0 ));

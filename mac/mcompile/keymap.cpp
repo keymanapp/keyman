@@ -7,22 +7,22 @@
 #include "keymap.h"
 #include "kmx_file.h"
 
-  /** @brief map shiftstate used on windows to a shiftstate suitable for UCKeyTranslate() on mac */
+  /** @brief map a shiftstate used on windows to a shiftstate suitable for UCKeyTranslate() on the mac */
 int mac_convert_Shiftstate_to_MacShiftstate(int shiftState) {
-  if      (shiftState == 0)                                       return 0;   // Win ss  0  -> mac ss 0
-  else if (shiftState == K_SHIFTFLAG)                             return 2;   // Win ss 16  -> mac ss 2
-  else if (shiftState == (LCTRLFLAG | RALTFLAG))                  return 8;   // Win ss  9  -> mac ss 8
-  else if (shiftState == (K_SHIFTFLAG | LCTRLFLAG | RALTFLAG))    return 10;  // Win ss 25  -> mac ss 10
-  else return shiftState;                                                     // Win ss x   -> mac ss x
+  if (shiftState == 0)                                            return MAC_BASE;        // Win ss  0  -> mac ss 0
+  else if (shiftState == K_SHIFTFLAG)                             return MAC_SHIFT;       // Win ss 16  -> mac ss 2
+  else if (shiftState == (LCTRLFLAG | RALTFLAG))                  return MAC_OPT;         // Win ss  9  -> mac ss 8
+  else if (shiftState == (K_SHIFTFLAG | LCTRLFLAG | RALTFLAG))    return MAC_SHIFT_OPT;   // Win ss 25  -> mac ss 10
+  else return shiftState;                                                                 // Win ss x   -> mac ss x
 }
 
 
-// _S2 Todo
-  int mac_map_rgkey_ShiftState_to_Shiftstate(int rgkey_ShiftState) {
-    if      (rgkey_ShiftState == 0 )        return 0;
-    else if (rgkey_ShiftState == 1)         return 2;
-    else if (rgkey_ShiftState == 6 )        return 8;
-    else if (rgkey_ShiftState == 7)         return 10;
+/** @brief map a shiftstate used in rgkey (a vector of VirtualKey*) to a shiftstate suitable for UCKeyTranslate() on the mac */  
+int mac_convert_rgkey_Shiftstate_to_MacShiftstate(int rgkey_ShiftState) {
+    if      (rgkey_ShiftState == 0)         return MAC_BASE;
+    else if (rgkey_ShiftState == 1)         return MAC_SHIFT;
+    else if (rgkey_ShiftState == 6)         return MAC_OPT;
+    else if (rgkey_ShiftState == 7)         return MAC_SHIFT_OPT;
     else return rgkey_ShiftState;
   }
 
@@ -38,13 +38,24 @@ bool ensureValidInputForKeyboardTranslation(const UCKeyboardLayout* keyboard_lay
   if (!keyboard_layout)
     return false;
 
-  if ((int)keycode > (int)keycode_max)
+  if (keycode > keycode_max)
     return false;
 
   if ((shiftstate > max_shiftstate))
     return false;
 
   if ((caps > 1))
+    return false;
+
+return true;
+}
+// _S2 todo missing code
+/** @brief check for correct input parameter that will later be used in UCKeyTranslate() */
+bool ensureValidInputForKeyboardTranslation(int shiftstate, int keycode) {
+  if ((shiftstate > max_shiftstate))
+    return false;
+
+  if (keycode > keycode_max)
     return false;
 
 return true;
@@ -133,8 +144,8 @@ int mac_append_underlying_ToVector(vec_dword_3D& all_vector, const UCKeyboardLay
     // get key name US stored in [0][i][0] and copy to name in "underlying"-block[1][i][0]
     all_vector[1][i][0] = all_vector[0][i][0];
 
-    for (int k = 0; k < 2; k++) {
-      all_vector[1][i][k + 1] = mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout, all_vector[0][i][0], mac_map_rgkey_ShiftState_to_Shiftstate(k), 0);
+    for (int k = 0; k < 2; k++) {  // use BASE and SHIFT only
+      all_vector[1][i][k + 1] = mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout, all_vector[0][i][0], mac_convert_rgkey_Shiftstate_to_MacShiftstate(k), 0);
     }
   }
 
@@ -178,19 +189,8 @@ KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode(const UCKeyboardLayout* keyboard_layou
   OSStatus status;
   unicodeString[0] = 0;
 
-  /*if (!keyboard_layout)
-    return 0;
-
-  if (!(keycode <= keycode_max))
-    return 0;
-
-  if (!(shiftstate_mac <= max_shiftstate))
-    return 0;
-
-  if (!(caps <= 1))
-    return 0;*/
-
-  if (!ensureValidInputForKeyboardTranslation(keyboard_layout, keycode, shiftstate_mac, caps))
+  //if (!ensureValidInputForKeyboardTranslation(keyboard_layout, keycode, shiftstate_mac, caps))
+  if (!ensureValidInputForKeyboardTranslation(shiftstate_mac, keycode))
     return 0;
 
 
@@ -230,7 +230,8 @@ KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode_dk(const UCKeyboardLayout* keyboard_la
   if (!(caps <= 1))
     return 0;*/
 
-  if (!ensureValidInputForKeyboardTranslation(keyboard_layout, keycode, shiftstate_mac, caps))
+  //if (!ensureValidInputForKeyboardTranslation(keyboard_layout, keycode, shiftstate_mac, caps))
+  if (!ensureValidInputForKeyboardTranslation(shiftstate_mac, keycode))
       return 0;
   // if CAPS is used: always add 4 e.g. SHIFT = 2; SHIFT+CAPS = 6
   status = UCKeyTranslate(keyboard_layout, keycode, kUCKeyActionDown, (shiftstate_mac + 4 * caps), LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString);
@@ -253,18 +254,10 @@ KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLa
   KMX_DWORD keyV;
   int caps = 0;
 
-  /*if (!keyboard_layout)
-    return 0;
-
-  if (!(is_correct_win_shiftstate(vk_ShiftState)))
-    return 0;
-
-  if (!(kc_underlying <= keycode_max))
-    return 0;*/
-
-  if (!ensureValidInputForKeyboardTranslation(keyboard_layout, kc_underlying, is_correct_win_shiftstate(vk_ShiftState)))
+// _S2 WOW NO!  convert??
+  //if (!ensureValidInputForKeyboardTranslation(keyboard_layout, kc_underlying, is_correct_win_shiftstate(vk_ShiftState)))
+  if (!ensureValidInputForKeyboardTranslation(mac_convert_Shiftstate_to_MacShiftstate(vk_ShiftState), kc_underlying))
       return 0;
-
 
   keyV = mac_KMX_get_KeyVal_From_KeyCode_dk(keyboard_layout, kc_underlying, (mac_convert_Shiftstate_to_MacShiftstate(vk_ShiftState)), caps, isdk);
 
@@ -313,12 +306,12 @@ KMX_WCHAR mac_KMX_get_KeyCodeUnderlying_From_KeyValUnderlying(vec_dword_3D& all_
   /** @brief return the keycode of the currently used (underlying) keyboard for a given keycode of the US keyboard */
 KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_KeyCodeUS(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& all_vector, KMX_DWORD kc_us, ShiftState ss_win, int caps) {
   // first get the keyvalue of the key on the US keyboard (kc_us)
-  std::u16string u16str = std::u16string(1, mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout, kc_us, mac_map_rgkey_ShiftState_to_Shiftstate(ss_win), caps));
+  std::u16string u16str = std::u16string(1, mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout, kc_us, mac_convert_rgkey_Shiftstate_to_MacShiftstate(ss_win), caps));
 
   // then find the same keyvalue on the underlying keyboard and return the keycode of that key on the underlying keyboard
-  for (int i = 0; i < all_vector[1].size() - 1; i++) {
-    for (int j = 1; j < all_vector[1][0].size(); j++) {
-      if (((KMX_DWORD)all_vector[1][i][j] == (KMX_DWORD)*u16str.c_str()))
+  for (int i = 0; i < (int)all_vector[1].size() - 1; i++) {
+    for (int j = 1; j < (int)all_vector[1][0].size(); j++) {
+      if (all_vector[1][i][j] == (KMX_DWORD)*u16str.c_str())
         return all_vector[1][i][0];
     }
   }
@@ -327,13 +320,13 @@ KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_KeyCodeUS(const UCKeyboardLayout* k
  
 /** @brief return the keycode of the currently used (underlying) keyboard for a given virtual key of the US keyboard */
 UINT mac_KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD vk_us) {
-  // On mac virtual keys do not exist. Nevertheless we can use this mapping to obtain an 'artificial' us virtual key
+  // on the mac virtual keys do not exist. Nevertheless we can use this mapping to obtain an 'artificial' us virtual key
   return (mac_USVirtualKeyToScanCode[vk_us]);
 }
 
   /** @brief return a virtual key of the US keyboard for a given keycode of the currently used (underlying) keyboard */
 KMX_DWORD mac_KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode) {
-  // On mac virtual keys do not exist. Nevertheless we can use this mapping to obtain an keycode from an 'artificial' us virtual key
+  // on the mac virtual keys do not exist. Nevertheless we can use this mapping to obtain an keycode from an 'artificial' us virtual key
   return mac_ScanCodeToUSVirtualKey[keycode];
 }
 

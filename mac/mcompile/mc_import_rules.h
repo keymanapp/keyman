@@ -3,6 +3,7 @@
 #ifndef MC_IMPORT_RULES_H
 #define MC_IMPORT_RULES_H
 
+
 int mac_KMX_ToUnicodeEx(int keycode, PKMX_WCHAR pwszBuff, int shift_state_pos, int caps, const UCKeyboardLayout* keyboard_layout);
 
 /** @brief  Base class for Deadkey*/

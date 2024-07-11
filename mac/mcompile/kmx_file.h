@@ -8,7 +8,6 @@
   Authors:          mcdurdin
 */
 
-
 #define UNREFERENCED_PARAMETER(P)   (P)
 #define TRUNCATE ((size_t)-1)
 #ifdef KMN_KBP

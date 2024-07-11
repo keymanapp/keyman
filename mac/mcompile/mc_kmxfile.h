@@ -4,7 +4,6 @@
 
 #include "km_types.h"
 #include "kmx_file.h"
-
 #include "mcompile.h"
 
 #ifndef _KMXFILE_H
@@ -71,20 +70,21 @@ typedef struct KMX_tagKEYBOARD {
 
 /**
  * @brief load a keyboard kmx-file
- * @param fileName ptr to filename of kmx-file
+ * @param fileName ptr to fileName of kmx-file
  * @param [in,out] lpKeyboard ptr to ptr to keyboard
  * @return TRUE on success; else FALSE
  */
 KMX_BOOL KMX_LoadKeyboard(KMX_WCHAR* fileName, LPKMX_KEYBOARD* lpKeyboard) ;
+KMX_BOOL KMX_LoadKeyboard(KMX_CHAR* fileName, LPKMX_KEYBOARD* lpKeyboard) ;
 
 /**
  * @brief save keyboard to file
  * @param kbd ptr to the keyboard
- * @param filename ptr to filename of a kmx-file
+ * @param fileName ptr to fileName of a kmx-file
  * @return TRUE on success; else FALSE
  */
-KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, KMX_WCHAR* filename);
-
+KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, KMX_WCHAR* fileName);
+KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, KMX_CHAR* fileName);
 /**
  * @brief increment in a string
  * @param p ptr to a character

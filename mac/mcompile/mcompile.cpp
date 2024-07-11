@@ -19,7 +19,7 @@
 
 int mac_KMX_GetDeadkeys(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& all_vector, KMX_WCHAR deadkey, UINT shift_dk, KMX_WORD* OutputPairs);  // returns array of [usvk, ch_out] pairs
 
-int mac_run(int argc, std::vector<std::u16string> str_argv, char* argv[]);
+int mac_run(int argc, char* argv[]);
 
 /**
  * @brief  convert mnemonic keyboard layout to positional keyboard layout and translate keyboard
@@ -35,11 +35,6 @@ bool mac_KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D &all_vector, const UCKe
 
 std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys; // I4353
 
-// Note: max is not a standard c api function or macro
-#ifndef max
-#define max(a,b)            (((a) > (b)) ? (a) : (b))
-#endif
-
 // _S2 run and getdeadkeys to here
 #define _countof(a) (sizeof(a) / sizeof(*(a)))
 
@@ -51,52 +46,45 @@ std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys; // I4353
  */
 #if defined(_WIN32) || defined(_WIN64)
   int wmain(int argc, wchar_t* argv[]) {
-    std::vector<std::u16string> str_argv_16 = convert_argvW_to_Vector_u16str(argc, argv);
-    run(argc, str_argv_16);
 
 #elif ((__linux__) || (__unix__))  // LINUX, UNIX
   int main(int argc, char* argv[]) {
-    std::vector<std::u16string> str_argv_16 = convert_argv_to_Vector_u16str(argc, argv);
-    run(argc, str_argv_16, argv);
 
 #elif (__APPLE__ && TARGET_OS_MAC)
   #include <TargetConditionals.h>
-
   int main(int argc, char* argv[]) {
-  std::vector<std::u16string> str_argv_16 = convert_argv_to_Vector_u16str(argc, argv);
+#endif
 
-  mac_run(argc, str_argv_16, argv);
+  mac_run(argc, argv);
   printf("\n................................ END .............................. _S2 \n");
 
-#endif
 }
  
 /** @brief  start of mcompile; load, convert and save keyboard */
-int mac_run(int argc, std::vector<std::u16string> str_argv, char* argv_ch[] = NULL) {
-  std::vector<const char16_t*> argv;
-  for (int i = 0; i < argc; i++) {
-    const char16_t* cmdl_par = str_argv[i].c_str();
-    argv.push_back(cmdl_par);
-  }
+int mac_run(int argc, char* argv[] ) {
 
-  if (argc < 3 || (argc > 4)) {  // I4273// I4273
-    printf(
-        "Usage: mcompile [-d] infile.kmx outfile.kmx\n"
-        "       mmcompile -u ...  (not available for mac)\n "
-        "      mcompile converts a Keyman mnemonic layout to a\n"
-        "       positional one based on the mac keyboard\n"
-        "       layout on top position\n"
-        "       (-d   convert deadkeys to plain keys) not available yet \n\n");  // I4552
+  int bDeadkeyConversion = 0;
 
-    return 1;
-  }
-  // -u option is not available for Linux and macOS
+  if (argc > 1)
+    bDeadkeyConversion = (strcmp(argv[1], "-d") == 0);  // I4552
 
-  int bDeadkeyConversion = u16cmp(argv[1], u"-d") == 0;  // I4552
   int n = (bDeadkeyConversion ? 2 : 1);
 
-  char16_t *infile = (char16_t*)argv[n], *outfile = (char16_t*)argv[n + 1];
+  if (argc < 3 || argc > 4 || (argc - n) != 2) { // I4273// I4273
+      printf(
+          "Usage:  \tmcompile [-d] infile.kmx outfile.kmx\n"
+          "        \tmcompile -u ...  (not available for mac)\n "
+          "        \tmcompile converts a Keyman mnemonic layout to\n"
+          "        \ta positional one based on the currently used \n"
+          "        \tmac keyboard layout\n"
+          "        \t(-d convert deadkeys to plain keys) \n \n");  // I4552
+    }
+    // -u option is not available for Linux and macOS
 
+  KMX_CHAR* infile = argv[n];
+  KMX_CHAR* outfile = argv[n + 1];
+
+  printf("mcompile%s \"%s\" \"%s\"\n", bDeadkeyConversion ? " -d" : "", infile, outfile);  // I4174
   // _S2 TODO open again!!
   //wprintf(L"mcompile%ls \"%ls\" \"%ls\"\n", bDeadkeyConversion ? L" -d" : L"", u16fmt((const char16_t*) infile).c_str(), u16fmt((const char16_t*) outfile).c_str() ); // I4174
 
@@ -381,7 +369,7 @@ KMX_WCHAR mac_KMX_ScanXStringForMaxDeadkeyID(PKMX_WCHAR str) {
   KMX_WCHAR dkid = 0;
   while(str && *str) {
     if(*str == UC_SENTINEL && *(str+1) == CODE_DEADKEY) {
-      dkid = max(dkid, *(str+2));
+      dkid = std::max(dkid, *(str+2));
     }
     str = KMX_incxstr(str);
   }
@@ -432,15 +420,15 @@ KMX_WCHAR mac_KMX_GetUniqueDeadkeyID(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey) {
 
   for (i = 0, gp = kbd->dpGroupArray; i < kbd->cxGroupArray; i++, gp++) {
     for (j = 0, kp = gp->dpKeyArray; j < gp->cxKeyArray; j++, kp++) {
-      dkid = max(dkid, mac_KMX_ScanXStringForMaxDeadkeyID(kp->dpContext));
-      dkid = max(dkid, mac_KMX_ScanXStringForMaxDeadkeyID(kp->dpOutput));
+      dkid = std::max(dkid, mac_KMX_ScanXStringForMaxDeadkeyID(kp->dpContext));
+      dkid = std::max(dkid, mac_KMX_ScanXStringForMaxDeadkeyID(kp->dpOutput));
     }
-    dkid = max(dkid, mac_KMX_ScanXStringForMaxDeadkeyID(gp->dpMatch));
-    dkid = max(dkid, mac_KMX_ScanXStringForMaxDeadkeyID(gp->dpNoMatch));
+    dkid = std::max(dkid, mac_KMX_ScanXStringForMaxDeadkeyID(gp->dpMatch));
+    dkid = std::max(dkid, mac_KMX_ScanXStringForMaxDeadkeyID(gp->dpNoMatch));
   }
 
   for (i = 0, sp = kbd->dpStoreArray; i < kbd->cxStoreArray; i++, sp++) {
-    dkid = max(dkid, mac_KMX_ScanXStringForMaxDeadkeyID(sp->dpString));
+    dkid = std::max(dkid, mac_KMX_ScanXStringForMaxDeadkeyID(sp->dpString));
   }
 
   s_dkids = (KMX_dkidmap*)realloc(s_dkids, sizeof(KMX_dkidmap) * (s_ndkids + 1));
@@ -769,7 +757,7 @@ continue;
 
     for ( int caps=0; caps< 2;caps++) {
       for ( int key=0; key< 50;key++) {
-          int keyvalsearch= mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout,  key,  mac_map_rgkey_ShiftState_to_Shiftstate(ss),  caps);
+          int keyvalsearch= mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout,  key,  mac_convert_rgkey_Shiftstate_to_MacShiftstate(ss),  caps);
           if ((ss_rgkey!= 999 )&& ( keyval== keyvalsearch))
           printf( " found keyval: key: %i, ss_mac:%i ( ss_rgkey:%i),  caps:%i  -> character: %i (%c)  \n", key, ss, ss_rgkey, caps, keyvalsearch,keyvalsearch);
       }

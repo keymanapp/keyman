@@ -61,8 +61,12 @@ static KMX_DWORD keycode_max  = 50;
 static int keycode_spacebar   = 49;
 static KMX_DWORD max_shiftstate = 10;
 
+static int MAC_BASE = 0;
+static int MAC_SHIFT = 2;
+static int MAC_OPT = 8;
+static int MAC_SHIFT_OPT = 10;
 /**
- * @brief  map shiftstate used on windows to a shiftstate suitable for UCKeyTranslate() on mac
+ * @brief  map a shiftstate used on windows to a shiftstate suitable for UCKeyTranslate() on the mac
  *            Windows: (Base: 00000000 (0); Shift 00010000 (16); AltGr 00001001 (9); Shift+AltGr 00011001 (25))
  *            mac:   (Base: 0;            Shift 2;             OPT 8;            Shift+OPT 10            )
  * @param  shiftState    shiftstate used on windows
@@ -71,21 +75,27 @@ static KMX_DWORD max_shiftstate = 10;
  *         if shiftState is NOT a windows ShiftState (then in_ShiftState is already a mac shiftstate): return the entered shiftstate
  */
 int mac_convert_Shiftstate_to_MacShiftstate(int shiftState);
-// _S2 TODO
-int mac_map_rgkey_ShiftState_to_Shiftstate(int win_ShiftState);
+/**
+ * @brief  map a shiftstate used in rgkey ( a vector of VirtualKey*) to a shiftstate suitable for UCKeyTranslate() on the mac
+ *            rgkey: (Base: 0; Shift 1; OPT 6; Shift+OPT 7 )
+ *            mac:   (Base: 0; Shift 2; OPT 8; Shift+OPT 10)
+ * @param  shiftState    shiftstate used in rgkey
+ * @return a shiftstate usable for UCKeyTranslate() on mac if available
+ *         if shiftState is a windows ShiftState: convert the windows ShiftState (0,16,9,25) to a mac ShiftState (0,2,8,10)
+ *         if shiftState is NOT a windows ShiftState (then in_ShiftState is already a mac shiftstate): return the entered shiftstate
+ */
+int mac_convert_rgkey_Shiftstate_to_MacShiftstate(int win_ShiftState);
 // _S2 TODO
 bool is_correct_win_shiftstate(int comp_ss);
 
 /**
- * @brief  check for correct input parameter that will later be used in gdk_keymap_translate_keyboard_state()
- * @param  keyboard_layout ptr to the the currently used keyboard layout
- * @param  keycode the code of the key in question
+ * @brief  check for correct input parameter that will later be used in UCKeyTranslate()
  * @param  shiftstate the currently used shiftstate
- * @param  cap the code of the key in question
+ * @param  keycode the code of the key in question
  * @return true if all parameters are OK; false if not
  */
 bool ensureValidInputForKeyboardTranslation(const UCKeyboardLayout* keyboard_layout, int keycode, int shiftstate, int cap);
-
+bool ensureValidInputForKeyboardTranslation(int shiftstate,int keycode);
 // _S2 TODO
 
 /**

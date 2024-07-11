@@ -3,6 +3,7 @@
 #include <locale>
 #include <stdarg.h>
 
+
 std::vector<std::u16string> convert_argv_to_Vector_u16str(int argc, char* argv[]) {
   std::vector<std::u16string> vector_u16;
 
