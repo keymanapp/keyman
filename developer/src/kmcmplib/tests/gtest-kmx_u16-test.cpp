@@ -22,6 +22,17 @@ TEST_F(kmx_u16_Test, u16chr_test) {
   EXPECT_EQ(3, u16chr(str, '\0') - str); // locate null terminator
 }
 
+TEST_F(kmx_u16_Test, u16chr_compare_to_strchr) {
+  char str[LINESIZE];
+
+  strcpy(str, "abc");
+	EXPECT_EQ(1, strchr(str, 'b') - str); // in string
+	strcpy(str, "abc");
+  EXPECT_EQ(NULL, strchr(str, 'd')); // not in string
+	strcpy(str, "abc");
+  EXPECT_EQ(3, strchr(str, '\0') - str); // locate null terminator
+}
+
 TEST_F(kmx_u16_Test, u16tok_char_delim) {
   // For char delimiter: KMX_WCHAR * u16tok(KMX_WCHAR *p, const KMX_WCHAR ch,  KMX_WCHAR **ctx) ;
 
