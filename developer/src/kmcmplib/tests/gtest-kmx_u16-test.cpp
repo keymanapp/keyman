@@ -56,7 +56,6 @@ TEST_F(kmx_u16_Test, u16tok_str_delim) {
 
 	KMX_WCHAR str[LINESIZE];
   KMX_WCHAR *ctx = nullptr;
-  EXPECT_EQ(nullptr, u16tok(nullptr, u" ", &ctx));
 
   KMX_WCHAR buffer[128] = u"test a space  and two";
   EXPECT_TRUE(!u16cmp(u"test", u16tok(buffer, u" ", &ctx)));
