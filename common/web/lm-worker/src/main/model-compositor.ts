@@ -3,9 +3,9 @@ import * as correction from './correction/index.js'
 
 import TransformUtils from './transformUtils.js';
 import { correctAndEnumerate, dedupeSuggestions, finalizeSuggestions, predictionAutoSelect, processSimilarity, toAnnotatedSuggestion, tupleDisplayOrderSort } from './predict-helpers.js';
-import { determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
+import { detectCurrentCasing, determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
 
-export default class ModelCompositor {
+export class ModelCompositor {
   private lexicalModel: LexicalModel;
   private contextTracker?: correction.ContextTracker;
 
@@ -102,7 +102,7 @@ export default class ModelCompositor {
 
     let currentCasing: CasingForm = null;
     if(lexicalModel.languageUsesCasing) {
-      currentCasing = this.detectCurrentCasing(postContext);
+      currentCasing = detectCurrentCasing(this.lexicalModel, postContext);
     }
 
     // Section 1:  determine 'prediction roots' - enumerate corrections from most to least likely,
@@ -340,39 +340,6 @@ export default class ModelCompositor {
       this.contextTracker.analyzeState(this.lexicalModel, context, null);
     }
   }
-
-  private detectCurrentCasing(context: Context): CasingForm {
-    let model = this.lexicalModel;
-
-    let text = this.wordbreak(context);
-
-    if(!model.languageUsesCasing) {
-      throw "Invalid attempt to detect casing: languageUsesCasing is set to false";
-    }
-
-    if(!model.applyCasing) {
-      // The worker should automatically 'sub in' default behavior during the model's load if that
-      // function isn't defined explicitly as part of the model.
-      throw "Invalid LMLayer state:  languageUsesCasing is set to true, but no applyCasing function exists";
-    }
-
-    // If the user has selected Shift or Caps layer, that overrides our
-    // text analysis
-    if(context.casingForm == 'upper' || context.casingForm == 'initial') {
-      return context.casingForm;
-    }
-    if(model.applyCasing('lower', text) == text) {
-      return 'lower';
-    } else if(model.applyCasing('upper', text) == text) {
-      // If only a single character has been input, assume we're in 'initial' mode.
-      return text.kmwLength() > 1 ? 'upper' : 'initial';
-    } else if(model.applyCasing('initial', text) == text) {
-      // We check 'initial' last, as upper-case input is indistinguishable.
-      return 'initial';
-    } else {
-      // If we do not have a casing form given to us by the keyboard, then
-      // 'null' is returned when no casing pattern matches the input.
-      return context.casingForm ?? null;
-    }
-  }
 }
+
+export default ModelCompositor;
