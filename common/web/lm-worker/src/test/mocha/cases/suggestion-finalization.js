@@ -12,7 +12,7 @@ import { DummyModel } from "#./models/dummy-model.js";
  */
 
 const testModelWithSpacing = new DummyModel({
-  wordBreaker: wordBreakers.default,
+  wordbreaker: wordBreakers.default,
   punctuation: {
     quotesForKeepSuggestion: {
       open: '<',
@@ -23,7 +23,7 @@ const testModelWithSpacing = new DummyModel({
 });
 
 const testModelWithoutSpacing = new DummyModel({
-  wordBreaker: wordBreakers.default,
+  wordbreaker: wordBreakers.default,
   punctuation: {
     quotesForKeepSuggestion: {
       open: '<',
