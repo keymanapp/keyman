@@ -96,8 +96,8 @@ TEST_F(kmx_u16_Test, u16tok_str_delim) {
 	u16cpy(str, u"abc|def");
   ctx = nullptr;
 	EXPECT_EQ(str, u16tok(str, u"|", &ctx));
-	EXPECT_EQ(0, u16cmp(u"abc", str));
-	EXPECT_EQ(0, u16cmp(u"def", ctx));
+	EXPECT_TRUE(!u16cmp(u"abc", str));
+	EXPECT_TRUE(!u16cmp(u"def", ctx));
 }
 
 TEST_F(kmx_u16_Test, u16tok_str_compare_to_strtok) {
