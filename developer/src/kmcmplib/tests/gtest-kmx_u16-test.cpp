@@ -56,9 +56,23 @@ TEST_F(kmx_u16_Test, u16tok_char_delim) {
   EXPECT_EQ(nullptr, u16tok(str, ' ', &ctx));
   EXPECT_EQ(nullptr, u16tok(nullptr, ' ', &ctx));
 
+  // delimiters at end
+  u16cpy(str, u"a b   ");
+  ctx = nullptr;
+  EXPECT_TRUE(!u16cmp(u"a", u16tok(str, ' ', &ctx)));
+  EXPECT_TRUE(!u16cmp(u"b", u16tok(nullptr, ' ', &ctx)));
+  EXPECT_EQ(nullptr, u16tok(nullptr, ' ', &ctx));
+
   // no string, no context
   ctx = nullptr;
   EXPECT_EQ(nullptr, u16tok(nullptr, ' ', &ctx));
+
+	// delimited string
+	u16cpy(str, u"abc|def");
+  ctx = nullptr;
+	EXPECT_EQ(str, u16tok(str, '|', &ctx));
+	EXPECT_TRUE(!u16cmp(u"abc", str));
+	EXPECT_TRUE(!u16cmp(u"def", ctx));
 }
 
 TEST_F(kmx_u16_Test, u16tok_str_delim) {
