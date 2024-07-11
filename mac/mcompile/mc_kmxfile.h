@@ -70,25 +70,24 @@ typedef struct KMX_tagKEYBOARD {
 
 /**
  * @brief load a keyboard kmx-file
- * @param fileName ptr to fileName of kmx-file
- * @param [in,out] lpKeyboard ptr to ptr to keyboard
+ * @param fileName pointer to fileName of kmx-file
+ * @param [in,out] lpKeyboard pointer to pointer to keyboard
  * @return TRUE on success; else FALSE
  */
-KMX_BOOL KMX_LoadKeyboard(KMX_WCHAR* fileName, LPKMX_KEYBOARD* lpKeyboard) ;
 KMX_BOOL KMX_LoadKeyboard(KMX_CHAR* fileName, LPKMX_KEYBOARD* lpKeyboard) ;
 
 /**
  * @brief save keyboard to file
- * @param kbd ptr to the keyboard
- * @param fileName ptr to fileName of a kmx-file
+ * @param kbd pointer to the keyboard
+ * @param fileName pointer to fileName of a kmx-file
  * @return TRUE on success; else FALSE
  */
-KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, KMX_WCHAR* fileName);
 KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, KMX_CHAR* fileName);
+
 /**
  * @brief increment in a string
- * @param p ptr to a character
- * @return ptr to the incremented character
+ * @param p pointer to a character
+ * @return pointer to the incremented character
  */
 PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p);
 
@@ -96,10 +95,9 @@ PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p);
  * @brief open a file
  * @param Filename name of the file
  * @param mode same as mode in fopen
- * @return ptr to file. On error, returns a null pointer
+ * @return pointer to file. On error, returns a null pointer
  */
 FILE* Open_File(const KMX_CHAR* Filename, const KMX_CHAR* mode);
-FILE* Open_File(const KMX_WCHAR* Filename, const KMX_WCHAR* mode);
 
 #endif // _KMXFILE_H
 

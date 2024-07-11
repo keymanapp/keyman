@@ -21,7 +21,7 @@ std::string string_from_u16string(std::u16string const str);
 
 void u16sprintf(KMX_WCHAR* dst, const size_t sz, const wchar_t* fmt, ...);
 
-std::wstring convert_pchar16T_To_wstr(KMX_WCHAR* Name);
+std::wstring convert_pchar16T_To_wstr(KMX_WCHAR* name);
 
 size_t u16len(const KMX_WCHAR* p);
 int u16cmp(const KMX_WCHAR* p, const KMX_WCHAR* q);
@@ -38,7 +38,7 @@ KMX_WCHAR* u16tok(KMX_WCHAR* p, KMX_WCHAR* ch, KMX_WCHAR** ctx);
 long int u16tol(const KMX_WCHAR* str, KMX_WCHAR** endptr, int base);
 double u16tof(KMX_WCHAR* str);
 
-KMX_CHAR* strrchr_slash(KMX_CHAR* Name);
-const KMX_WCHAR* u16rchr_slash(KMX_WCHAR const* Name);
+KMX_CHAR* strrchr_slash(KMX_CHAR* name);
+const KMX_WCHAR* u16rchr_slash(KMX_WCHAR const* name);
 
 #endif /* U16_H */

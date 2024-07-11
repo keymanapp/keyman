@@ -1,3 +1,8 @@
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Mnemonic layout support for mac
+ */
 
 #include "mc_kmxfile.h"
 #include <typeinfo>
@@ -36,8 +41,32 @@ const int CODE__SIZE[] = {
     2    // CODE_SETSYSTEMSTORE      0x18
 };
 
-KMX_DWORD KMX_WriteCompiledKeyboardToFile(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL FSaveDebug) {
+/**
+ * @brief check if the file has correct version
+ * @param filebase containing data of the input file
+ * @param file_size a size
+ * @return true if successful; false if not
+ */
+KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD file_size);
 
+/**
+ * @brief Fixup the keyboard by expanding pointers. On disk the pointers are stored relative to the
+ *        beginning of the file, but we need real pointers. This method is used on 32-bit architectures.
+ * @param bufp pointer to buffer where data will be copied into
+ * @param base pointer to starting point
+ * @param dwFileSize size of the file
+ * @return pointer to the keyboard
+ */
+LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize);
+
+/**
+ * @brief Save a Keyboard to a file
+ * @param fk pointer to the keyboard
+ * @param hOutfile pointer to the output file
+ * @param FSaveDebug
+ * @return an Error in case of failure
+ */
+KMX_DWORD KMX_WriteCompiledKeyboardToFile(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL FSaveDebug) {
 	LPKMX_GROUP fgp;
 	LPKMX_STORE fsp;
 	LPKMX_KEY fkp;
@@ -60,28 +89,27 @@ KMX_DWORD KMX_WriteCompiledKeyboardToFile(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX
 			//wcslen(fk->szMessage)*2 + 2 +
       fk->dwBitmapSize;
 
-	for(i = 0, fgp = fk->dpGroupArray; i < fk->cxGroupArray; i++, fgp++) {
-    if(fgp->dpName)
+	for (i = 0, fgp = fk->dpGroupArray; i < fk->cxGroupArray; i++, fgp++) {
+    if (fgp->dpName)
 	    size += (u16len(fgp->dpName) + 1) * sizeof(KMX_WCHAR);
 		size += fgp->cxKeyArray * sizeof(KMX_COMP_KEY);
-		for(j = 0, fkp = fgp->dpKeyArray; j < fgp->cxKeyArray; j++, fkp++) {
+		for (j = 0, fkp = fgp->dpKeyArray; j < fgp->cxKeyArray; j++, fkp++) {
 			size += (u16len(fkp->dpOutput) + 1) * sizeof(KMX_WCHAR);
 			size += (u16len(fkp->dpContext) + 1) * sizeof(KMX_WCHAR);
 		}
 
-		if( fgp->dpMatch ) size += (u16len(fgp->dpMatch)  + 1) * sizeof(KMX_WCHAR);
-		if( fgp->dpNoMatch ) size += (u16len(fgp->dpNoMatch)  + 1) * sizeof(KMX_WCHAR);
+		if (fgp->dpMatch) size += (u16len(fgp->dpMatch) + 1) * sizeof(KMX_WCHAR);
+		if (fgp->dpNoMatch) size += (u16len(fgp->dpNoMatch) + 1) * sizeof(KMX_WCHAR);
 	}
 
-	for(i = 0; i < fk->cxStoreArray; i++)
-	{
+	for (i = 0; i < fk->cxStoreArray; i++) {
 		size += (u16len(fk->dpStoreArray[i].dpString) + 1) * sizeof(KMX_WCHAR);
-    if(fk->dpStoreArray[i].dpName)
+    if (fk->dpStoreArray[i].dpName)
       size += (u16len(fk->dpStoreArray[i].dpName) + 1) * sizeof(KMX_WCHAR);
 	}
 
 	buf = new KMX_BYTE[size];
-	if(!buf) return CERR_CannotAllocateMemory;
+	if (!buf) return CERR_CannotAllocateMemory;
 	memset(buf, 0, size);
 
 	ck = (PKMX_COMP_KEYBOARD) buf;
@@ -103,74 +131,74 @@ KMX_DWORD KMX_WriteCompiledKeyboardToFile(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX
 	offset = sizeof(KMX_COMP_KEYBOARD);
 
 	ck->dpStoreArray = offset;
-	sp = (PKMX_COMP_STORE)(buf+offset);
+	sp = (PKMX_COMP_STORE)(buf + offset);
 	fsp = fk->dpStoreArray;
 	offset += sizeof(KMX_COMP_STORE) * ck->cxStoreArray;
-	for(i = 0; i < ck->cxStoreArray; i++, sp++, fsp++) {
+	for (i = 0; i < ck->cxStoreArray; i++, sp++, fsp++) {
 		sp->dwSystemID = fsp->dwSystemID;
 		sp->dpString = offset;
-		u16ncpy((PKMX_WCHAR)(buf+offset), fsp->dpString, (size-offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
-		offset += (u16len(fsp->dpString) + 1) * sizeof(KMX_WCHAR);
+		u16ncpy((PKMX_WCHAR)(buf + offset), fsp->dpString, (size - offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
 
-    if(!fsp->dpName) {
+		offset += (u16len(fsp->dpString) + 1) * sizeof(KMX_WCHAR);
+    if (!fsp->dpName) {
       sp->dpName = 0;
     } else {
       sp->dpName = offset;
-      u16ncpy((PKMX_WCHAR)(buf+offset), fsp->dpName, (size-offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
+      u16ncpy((PKMX_WCHAR)(buf + offset), fsp->dpName, (size - offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
 		  offset += (u16len(fsp->dpName) + 1) * sizeof(KMX_WCHAR);
     }
 	}
 
 	ck->dpGroupArray = offset;
-	gp = (PKMX_COMP_GROUP)(buf+offset);
-	fgp = fk->dpGroupArray;
+	gp = (PKMX_COMP_GROUP)(buf + offset);
 
 	offset += sizeof(KMX_COMP_GROUP) * ck->cxGroupArray;
 
-	for(i = 0; i < ck->cxGroupArray; i++, gp++, fgp++) {
+	for (i = 0, fgp = fk->dpGroupArray; i < ck->cxGroupArray; i++, gp++, fgp++) {
 		gp->cxKeyArray = fgp->cxKeyArray;
 		gp->fUsingKeys = fgp->fUsingKeys;
 
 		gp->dpMatch = gp->dpNoMatch = 0;
 
-		if(fgp->dpMatch) {
+		if (fgp->dpMatch) {
 			gp->dpMatch = offset;
-			u16ncpy((PKMX_WCHAR)(buf+offset), fgp->dpMatch, (size-offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
+			u16ncpy((PKMX_WCHAR)(buf + offset), fgp->dpMatch, (size - offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
 			offset += (u16len(fgp->dpMatch) + 1) * sizeof(KMX_WCHAR);
 		}
-		if(fgp->dpNoMatch) {
+		if (fgp->dpNoMatch) {
 			gp->dpNoMatch = offset;
-			u16ncpy((PKMX_WCHAR)(buf+offset), fgp->dpNoMatch, (size-offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
+			u16ncpy((PKMX_WCHAR)(buf + offset), fgp->dpNoMatch, (size - offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
 			offset += (u16len(fgp->dpNoMatch) + 1) * sizeof(KMX_WCHAR);
 		}
 
-    if(fgp->dpName) {
+    if (fgp->dpName) {
 			gp->dpName = offset;
-			u16ncpy((PKMX_WCHAR)(buf+offset), fgp->dpName, (size-offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
+			u16ncpy((PKMX_WCHAR)(buf + offset), fgp->dpName, (size - offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
 			offset += (u16len(fgp->dpName) + 1) * sizeof(KMX_WCHAR);
-		}	else {
+		} else {
       gp->dpName = 0;
     }
 
     gp->dpKeyArray = offset;
-		kp = (PKMX_COMP_KEY) (buf + offset);
+		kp = (PKMX_COMP_KEY)(buf + offset);
 		offset += gp->cxKeyArray * sizeof(KMX_COMP_KEY);
-		for(j = 0, fkp = fgp->dpKeyArray; j < gp->cxKeyArray; j++, kp++, fkp++) {
+
+		for (j = 0, fkp = fgp->dpKeyArray; j < gp->cxKeyArray; j++, kp++, fkp++) {
 			kp->Key = fkp->Key;
 			kp->Line = fkp->Line;
 			kp->ShiftFlags = fkp->ShiftFlags;
 			kp->dpOutput = offset;
 
-			u16ncpy((PKMX_WCHAR)(buf+offset), fkp->dpOutput, (size-offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
+			u16ncpy((PKMX_WCHAR)(buf + offset), fkp->dpOutput, (size - offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
 			offset += (u16len(fkp->dpOutput) + 1) * sizeof(KMX_WCHAR);
 
       kp->dpContext = offset;
-      u16ncpy((PKMX_WCHAR)(buf+offset), fkp->dpContext, (size-offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
+      u16ncpy((PKMX_WCHAR)(buf + offset), fkp->dpContext, (size - offset) / sizeof(KMX_WCHAR));  // I3481   // I3641
 		  offset += (u16len(fkp->dpContext) + 1) * sizeof(KMX_WCHAR);
 		}
 	}
 
-  if(fk->dwBitmapSize > 0) {
+  if (fk->dwBitmapSize > 0) {
     ck->dwBitmapSize = fk->dwBitmapSize;
 	  ck->dpBitmapOffset = offset;
     memcpy(buf + offset, ((PKMX_BYTE)fk) + fk->dpBitmapOffset, fk->dwBitmapSize);
@@ -178,11 +206,16 @@ KMX_DWORD KMX_WriteCompiledKeyboardToFile(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX
   } else {
     ck->dwBitmapSize = 0;
 	  ck->dpBitmapOffset = 0;
+   }
+
+  size_t nr_elements = fwrite(buf, size, 1, hOutfile);
+
+  if (nr_elements < 1) {
+    delete[] buf;
+    return CERR_SomewhereIGotItWrong;
   }
 
-  fwrite(buf, size,1, hOutfile);
-	if(offset != size)
-  {
+  if (offset != size) {
     delete[] buf;
     return CERR_UnableToWriteFully;
   }
@@ -192,43 +225,13 @@ KMX_DWORD KMX_WriteCompiledKeyboardToFile(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX
 	return CERR_None;
 }
 
-KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD file_size);
-
-LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize);
-
-KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR fileName) {
-
-  FILE *fp;
-  fp = Open_File(fileName, u"wb");
-
-  if(fp == NULL)
-  {
-    mac_KMX_LogError(L"Failed to create output file (%d)", errno);
-    return FALSE;
-  }
-
-  KMX_DWORD err = KMX_WriteCompiledKeyboardToFile(kbd, fp, FALSE);
-  fclose(fp);
-
-  if(err != CERR_None) {
-    mac_KMX_LogError(L"Failed to write compiled keyboard with error %d", err);
-
-    std::u16string u16_filname(fileName);
-    std::string s = string_from_u16string(u16_filname);
-
-    remove(s.c_str());
-    return FALSE;
-  }
-
-  return TRUE;
-}
+/** @brief save keyboard to file */
 KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, KMX_CHAR* fileName) {
 
-  FILE *fp;
+  FILE* fp;
   fp = Open_File(fileName, "wb");
 
-  if(fp == NULL)
-  {
+  if (fp == NULL) {
     mac_KMX_LogError(L"Failed to create output file (%d)", errno);
     return FALSE;
   }
@@ -236,7 +239,7 @@ KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, KMX_CHAR* fileName) {
   KMX_DWORD err = KMX_WriteCompiledKeyboardToFile(kbd, fp, FALSE);
   fclose(fp);
 
-  if(err != CERR_None) {
+  if (err != CERR_None) {
     mac_KMX_LogError(L"Failed to write compiled keyboard with error %d", err);
     std::string s(fileName);
     remove(s.c_str());
@@ -246,25 +249,35 @@ KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, KMX_CHAR* fileName) {
   return TRUE;
 }
 
+/**
+ * @brief add an offset
+ * @param base pointer to starting point
+ * @param offset a given offset
+ * @return pointer to base + offset
+ */
 PKMX_WCHAR KMX_StringOffset(PKMX_BYTE base, KMX_DWORD offset) {
-  if(offset == 0) return NULL;
+  if (offset == 0)
+    return NULL;
   return (PKMX_WCHAR)(base + offset);
 }
 
 #ifdef KMX_64BIT
 
-/**  CopyKeyboard will copy the data read into bufp from x86-sized structures into
-  x64-sized structures starting at `base`
-  * After this function finishes, we still need to keep the original data because
-    we don't copy the strings
-  This method is used on 64-bit architectures.
-*/
+/**
+ * @brief CopyKeyboard will copy the data into bufp from x86-sized structures into
+ * x64-sized structures starting at `base`. After this function finishes, we still
+ * need to keep the original data because we don't copy the strings. The method is
+ * used on 64-bit architectures.
+ * @param bufp pointer to buffer where data is copied into
+ * @param base pointer to starting point
+ * @return pointer to the keyboard
+ */
 LPKMX_KEYBOARD KMX_CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base) {
-  PKMX_COMP_KEYBOARD ckbp = (PKMX_COMP_KEYBOARD) base;
+  PKMX_COMP_KEYBOARD ckbp = (PKMX_COMP_KEYBOARD)base;
 
   // Copy keyboard structure //
 
-  LPKMX_KEYBOARD kbp = (LPKMX_KEYBOARD) bufp;
+  LPKMX_KEYBOARD kbp = (LPKMX_KEYBOARD)bufp;
   bufp += sizeof(KMX_KEYBOARD);
 
   kbp->dwIdentifier = ckbp->dwIdentifier;
@@ -280,21 +293,17 @@ LPKMX_KEYBOARD KMX_CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base) {
   kbp->dwFlags = ckbp->dwFlags;
   kbp->dwHotKey = ckbp->dwHotKey;
 
-  kbp->dpStoreArray = (LPKMX_STORE) bufp;
+  kbp->dpStoreArray = (LPKMX_STORE)bufp;
   bufp += sizeof(KMX_STORE) * kbp->cxStoreArray;
 
-  kbp->dpGroupArray = (LPKMX_GROUP) bufp;
+  kbp->dpGroupArray = (LPKMX_GROUP)bufp;
   bufp += sizeof(KMX_GROUP) * kbp->cxGroupArray;
 
   PKMX_COMP_STORE csp;
   LPKMX_STORE sp;
   KMX_DWORD i;
 
-  for(
-    csp = (PKMX_COMP_STORE)(base + ckbp->dpStoreArray), sp = kbp->dpStoreArray, i = 0;
-    i < kbp->cxStoreArray;
-    i++, sp++, csp++)
-  {
+  for (csp = (PKMX_COMP_STORE)(base + ckbp->dpStoreArray), sp = kbp->dpStoreArray, i = 0; i < kbp->cxStoreArray; i++, sp++, csp++) {
     sp->dwSystemID = csp->dwSystemID;
     sp->dpName = KMX_StringOffset(base, csp->dpName);
     sp->dpString = KMX_StringOffset(base, csp->dpString);
@@ -303,13 +312,9 @@ LPKMX_KEYBOARD KMX_CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base) {
   PKMX_COMP_GROUP cgp;
   LPKMX_GROUP gp;
 
-  for(
-    cgp = (PKMX_COMP_GROUP)(base + ckbp->dpGroupArray), gp = kbp->dpGroupArray, i = 0;
-    i < kbp->cxGroupArray;
-    i++, gp++, cgp++)
-  {
+  for (cgp = (PKMX_COMP_GROUP)(base + ckbp->dpGroupArray), gp = kbp->dpGroupArray, i = 0; i < kbp->cxGroupArray; i++, gp++, cgp++) {
     gp->dpName = KMX_StringOffset(base, cgp->dpName);
-    gp->dpKeyArray = cgp->cxKeyArray > 0 ? (LPKMX_KEY) bufp : NULL;
+    gp->dpKeyArray = cgp->cxKeyArray > 0 ? (LPKMX_KEY)bufp : NULL;
     gp->cxKeyArray = cgp->cxKeyArray;
     bufp += sizeof(KMX_KEY) * gp->cxKeyArray;
     gp->dpMatch = KMX_StringOffset(base, cgp->dpMatch);
@@ -320,11 +325,7 @@ LPKMX_KEYBOARD KMX_CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base) {
     LPKMX_KEY kp;
     KMX_DWORD j;
 
-    for(
-      ckp = (PKMX_COMP_KEY)(base + cgp->dpKeyArray), kp = gp->dpKeyArray, j = 0;
-      j < gp->cxKeyArray;
-      j++, kp++, ckp++)
-    {
+    for (ckp = (PKMX_COMP_KEY)(base + cgp->dpKeyArray), kp = gp->dpKeyArray, j = 0; j < gp->cxKeyArray; j++, kp++, ckp++) {
       kp->Key = ckp->Key;
       kp->Line = ckp->Line;
       kp->ShiftFlags = ckp->ShiftFlags;
@@ -336,41 +337,38 @@ LPKMX_KEYBOARD KMX_CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base) {
 }
 
 // else KMX_FixupKeyboard
-#else  /*  Fixup the keyboard by expanding pointers. On disk the pointers are stored relative to the
- beginning of the file, but we need real pointers. This method is used on 32-bit architectures.
-*/
-
+#else  
+/** @brief Fixup the keyboard by expanding pointers. */
 LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize) {
-
   UNREFERENCED_PARAMETER(dwFileSize);
 
   KMX_DWORD i, j;
-  PKMX_COMP_KEYBOARD ckbp = (PKMX_COMP_KEYBOARD) base;
+  PKMX_COMP_KEYBOARD ckbp = (PKMX_COMP_KEYBOARD)base;
   PKMX_COMP_GROUP cgp;
   PKMX_COMP_STORE csp;
   PKMX_COMP_KEY ckp;
-  LPKMX_KEYBOARD kbp = (LPKMX_KEYBOARD) bufp;
+  LPKMX_KEYBOARD kbp = (LPKMX_KEYBOARD)bufp;
   LPKMX_STORE sp;
   LPKMX_GROUP gp;
   LPKMX_KEY kp;
 
-	kbp->dpStoreArray = (LPKMX_STORE) (base + ckbp->dpStoreArray);
-	kbp->dpGroupArray = (LPKMX_GROUP) (base + ckbp->dpGroupArray);
+	kbp->dpStoreArray = (LPKMX_STORE)(base + ckbp->dpStoreArray);
+	kbp->dpGroupArray = (LPKMX_GROUP)(base + ckbp->dpGroupArray);
 
-	for(sp = kbp->dpStoreArray, csp = (PKMX_COMP_STORE) sp, i = 0; i < kbp->cxStoreArray; i++, sp++, csp++)	{
+	for (sp = kbp->dpStoreArray, csp = (PKMX_COMP_STORE)sp, i = 0; i < kbp->cxStoreArray; i++, sp++, csp++) {
     sp->dpName = KMX_StringOffset(base, csp->dpName);
 		sp->dpString = KMX_StringOffset(base, csp->dpString);
 	}
 
-	for(gp = kbp->dpGroupArray, cgp = (PKMX_COMP_GROUP) gp, i = 0; i < kbp->cxGroupArray; i++, gp++, cgp++)	{
+	for (gp = kbp->dpGroupArray, cgp = (PKMX_COMP_GROUP)gp, i = 0; i < kbp->cxGroupArray; i++, gp++, cgp++) {
     gp->dpName = KMX_StringOffset(base, cgp->dpName);
-		gp->dpKeyArray = (LPKMX_KEY) (base + cgp->dpKeyArray);
-		if(cgp->dpMatch != NULL) gp->dpMatch = (PKMX_WCHAR) (base + cgp->dpMatch);
-		if(cgp->dpNoMatch != NULL) gp->dpNoMatch = (PKMX_WCHAR) (base + cgp->dpNoMatch);
+		gp->dpKeyArray = (LPKMX_KEY)(base + cgp->dpKeyArray);
+		if (cgp->dpMatch != NULL)gp->dpMatch = (PKMX_WCHAR)(base + cgp->dpMatch);
+		if (cgp->dpNoMatch != NULL)gp->dpNoMatch = (PKMX_WCHAR)(base + cgp->dpNoMatch);
 
-    for(kp = gp->dpKeyArray, ckp = (PKMX_COMP_KEY) kp, j = 0; j < gp->cxKeyArray; j++, kp++, ckp++) {
-			kp->dpOutput = (PKMX_WCHAR) (base + ckp->dpOutput);
-			kp->dpContext = (PKMX_WCHAR) (base + ckp->dpContext);
+    for (kp = gp->dpKeyArray, ckp = (PKMX_COMP_KEY)kp, j = 0; j < gp->cxKeyArray; j++, kp++, ckp++) {
+			kp->dpOutput = (PKMX_WCHAR)(base + ckp->dpOutput);
+			kp->dpContext = (PKMX_WCHAR)(base + ckp->dpContext);
 		}
 	}
 
@@ -379,133 +377,29 @@ LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFil
 
 #endif
 
-KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD* lpKeyboard) {
+/** @brief load a keyboard kmx-file */
+KMX_BOOL KMX_LoadKeyboard(KMX_CHAR* fileName, LPKMX_KEYBOARD* lpKeyboard) {
   *lpKeyboard = NULL;
   PKMX_BYTE buf;
   FILE* fp;
   LPKMX_KEYBOARD kbp;
   PKMX_BYTE filebase;
 
-  if(!fileName || !lpKeyboard) {
-    mac_KMX_LogError(L"Bad Filename\n" );
-    return FALSE;
-  }
-
-  fp = Open_File((const KMX_WCHAR*)fileName, u"rb");
-
-  if(fp == NULL) {
-    mac_KMX_LogError(L"Could not open file\n" );
-    return FALSE;
-  }
-
-  if (fseek(fp, 0, SEEK_END) != 0) {
-    fclose(fp);
-    mac_KMX_LogError(L"Could not fseek file\n" );
-    return FALSE;
-  }
-
-  auto file_size = ftell(fp);
-  if (file_size <= 0) {
-    fclose(fp);
-    return FALSE;
-  }
-
-  if (fseek(fp, 0, SEEK_SET) != 0) {
-    fclose(fp);
-    mac_KMX_LogError(L"Could not fseek(set) file\n" );
-    return FALSE;
-  }
-
-  #ifdef KMX_64BIT
-  //  allocate enough memory for expanded data structure + original data.
-  //  Expanded data structure is double the size of data on disk (8-byte
-  //  pointers) - on disk the "pointers" are relative to the beginning of
-  //  the file.
-  //  We save the original data at the end of buf; we don't copy strings, so
-  //  those will remain in the location at the end of the buffer.
-    buf = new KMX_BYTE[file_size * 3];
-  #else
-    buf = new KMX_BYTE[file_size];
-  #endif
-
-  if (!buf) {
-    delete[] buf;
-    fclose(fp);
-    mac_KMX_LogError(L"Not allocmem\n" );
-    return FALSE;
-  }
-
-  #ifdef KMX_64BIT
-    filebase = buf + file_size*2;
-  #else
-    filebase = buf;
-  #endif
-
-  if (fread(filebase, 1, file_size, fp) < (size_t)file_size) {
-    mac_KMX_LogError(L"Could not read file\n" );
-    delete[] buf;
-    fclose(fp);
-    return FALSE;
-  }
-// delete???
-  fclose(fp);
-
-  if (*((PKMX_DWORD)filebase) != (KMX_DWORD)FILEID_COMPILED)
-  {
-    delete [] buf;
-    mac_KMX_LogError(L"Invalid file - signature is invalid\n");
-    return FALSE;
-  }
-
-  if (!KMX_VerifyKeyboard(filebase, file_size)) {
-    mac_KMX_LogError(L"errVerifyKeyboard\n" );
-    delete[] buf;
-    return FALSE;
-  }
-
-#ifdef KMX_64BIT
-  kbp = KMX_CopyKeyboard(buf, filebase);
-#else
-  kbp = KMX_FixupKeyboard(buf, filebase, file_size);
-#endif
-
-
-  if (!kbp) {
-    mac_KMX_LogError(L"errFixupKeyboard\n" );
-    delete[] buf;
-    return FALSE;
-  }
-
-  if (kbp->dwIdentifier != FILEID_COMPILED) {
-    delete[] buf;
-    mac_KMX_LogError(L"errNotFileID\n" );
-    return FALSE;
-  }
-  *lpKeyboard = kbp;
-  return TRUE;
-}
-KMX_BOOL KMX_LoadKeyboard(char* fileName, LPKMX_KEYBOARD* lpKeyboard) {
-  *lpKeyboard = NULL;
-  PKMX_BYTE buf;
-  FILE* fp;
-  LPKMX_KEYBOARD kbp;
-  PKMX_BYTE filebase;
-
-  if(!fileName || !lpKeyboard) {
-    mac_KMX_LogError(L"Bad Filename\n" );
+  if (!fileName || !lpKeyboard) {
+    mac_KMX_LogError(L"Bad Filename\n");
     return FALSE;
   }
 
   fp = Open_File((const KMX_CHAR*)fileName, "rb");
 
-  if(fp == NULL) {
-    mac_KMX_LogError(L"Could not open file\n" );
+  if (fp == NULL) {
+    mac_KMX_LogError(L"Could not open file\n");
     return FALSE;
   }
 
   if (fseek(fp, 0, SEEK_END) != 0) {
     fclose(fp);
-    mac_KMX_LogError(L"Could not fseek file\n" );
+    mac_KMX_LogError(L"Could not fseek file\n");
     return FALSE;
   }
 
@@ -517,17 +411,19 @@ KMX_BOOL KMX_LoadKeyboard(char* fileName, LPKMX_KEYBOARD* lpKeyboard) {
 
   if (fseek(fp, 0, SEEK_SET) != 0) {
     fclose(fp);
-    mac_KMX_LogError(L"Could not fseek(set) file\n" );
+    mac_KMX_LogError(L"Could not fseek(set) file\n");
     return FALSE;
   }
 
   #ifdef KMX_64BIT
-  //  allocate enough memory for expanded data structure + original data.
-  //  Expanded data structure is double the size of data on disk (8-byte
-  //  pointers) - on disk the "pointers" are relative to the beginning of
-  //  the file.
-  //  We save the original data at the end of buf; we don't copy strings, so
-  //  those will remain in the location at the end of the buffer.
+/**
+  *   allocate enough memory for expanded data structure + original data.
+  *   Expanded data structure is double the size of data on disk (8-byte
+  *   pointers) - on disk the "pointers" are relative to the beginning of
+  *   the file.
+  *   We save the original data at the end of buf; we don't copy strings, so
+  *   those will remain in the location at the end of the buffer.
+  */
     buf = new KMX_BYTE[file_size * 3];
   #else
     buf = new KMX_BYTE[file_size];
@@ -536,35 +432,34 @@ KMX_BOOL KMX_LoadKeyboard(char* fileName, LPKMX_KEYBOARD* lpKeyboard) {
   if (!buf) {
     delete[] buf;
     fclose(fp);
-    mac_KMX_LogError(L"Not allocmem\n" );
+    mac_KMX_LogError(L"Not allocmem\n");
     return FALSE;
   }
 
   #ifdef KMX_64BIT
-    filebase = buf + file_size*2;
+    filebase = buf + file_size * 2;
   #else
     filebase = buf;
   #endif
 
   if (fread(filebase, 1, file_size, fp) < (size_t)file_size) {
-    mac_KMX_LogError(L"Could not read file\n" );
+    mac_KMX_LogError(L"Could not read file\n");
     delete[] buf;
     fclose(fp);
     return FALSE;
   }
-// delete???
+// delete??? _S2
   fclose(fp);
 
-  if (*((PKMX_DWORD)filebase) != (KMX_DWORD)FILEID_COMPILED)
-  {
-    delete [] buf;
+  if (*((PKMX_DWORD)filebase) != (KMX_DWORD)FILEID_COMPILED) {
+    delete[] buf;
     mac_KMX_LogError(L"Invalid file - signature is invalid\n");
     return FALSE;
   }
 
   if (!KMX_VerifyKeyboard(filebase, file_size)) {
-    mac_KMX_LogError(L"errVerifyKeyboard\n" );
     delete[] buf;
+    mac_KMX_LogError(L"errVerifyKeyboard\n");
     return FALSE;
   }
 
@@ -574,10 +469,9 @@ KMX_BOOL KMX_LoadKeyboard(char* fileName, LPKMX_KEYBOARD* lpKeyboard) {
   kbp = KMX_FixupKeyboard(buf, filebase, file_size);
 #endif
 
-
   if (!kbp) {
-    mac_KMX_LogError(L"errFixupKeyboard\n" );
     delete[] buf;
+    mac_KMX_LogError(L"errFixupKeyboard\n");
     return FALSE;
   }
 
@@ -590,8 +484,8 @@ KMX_BOOL KMX_LoadKeyboard(char* fileName, LPKMX_KEYBOARD* lpKeyboard) {
   return TRUE;
 }
 
-KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD file_size){
-
+/** @brief check if the file has correct version */
+KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD file_size) {
  KMX_DWORD i;
   PKMX_COMP_KEYBOARD ckbp = (PKMX_COMP_KEYBOARD)filebase;
   PKMX_COMP_STORE csp;
@@ -605,7 +499,7 @@ KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD file_size){
         if (csp->dpString == 0) {
           mac_KMX_LogError(L"errWrongFileVersion:NULL");
         } else {
-          mac_KMX_LogError(L"errWrongFileVersion:%10.10ls",(const PKMX_WCHAR) KMX_StringOffset((PKMX_BYTE)filebase, csp->dpString));
+          mac_KMX_LogError(L"errWrongFileVersion:%10.10ls", (const PKMX_WCHAR)KMX_StringOffset((PKMX_BYTE)filebase, csp->dpString));
         }
         return FALSE;
       }
@@ -616,8 +510,8 @@ KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD file_size){
   return TRUE;
 }
 
+/** @brief increment in a string */
 PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p) {
-
   if (p == NULL || *p == 0)
     return p;
   if (*p != UC_SENTINEL) {
@@ -625,13 +519,14 @@ PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p) {
       return p + 2;
     return p + 1;
   }
-  // UC_SENTINEL(FFFF) with UC_SENTINEL_EXTENDEDEND(0x10) == variable length
+  // UC_SENTINEL(FFFF) with UC_SENTINEL_EXTENDEDEND(0x10) ==> variable length
   if (*(p + 1) == CODE_EXTENDED) {
     p += 2;
     while (*p && *p != UC_SENTINEL_EXTENDEDEND)
       p++;
 
-    if (*p == 0)        return p;
+    if (*p == 0)
+      return p;
     return p + 1;
   }
 
@@ -650,36 +545,17 @@ PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p) {
   return p;
 }
 
-//################################################################################################################################################
-//################################# Code beyond these lines needs to be included in mcompile #####################################################
-//################################################################################################################################################
-
-
+/** @brief open a file */
 FILE* Open_File(const KMX_CHAR* Filename, const KMX_CHAR* mode) {
 #ifdef _MSC_VER
-  std::string cpath = Filename; //, cmode = mode;
+  std::string cpath = Filename;  //, cmode = mode;
   std::replace(cpath.begin(), cpath.end(), '/', '\\');
-  return fopen(cpath.c_str(), (const KMX_CHAR*) mode);
+  return fopen(cpath.c_str(), (const KMX_CHAR*)mode);
 #else
   return fopen(Filename, mode);
   std::string cpath, cmode;
-  cpath = (const KMX_CHAR*) Filename;
-  cmode = (const KMX_CHAR*) mode;
-  return fopen(cpath.c_str(), cmode.c_str());
-#endif
-};
-
-
-FILE* Open_File(const KMX_WCHAR* Filename, const KMX_WCHAR* mode) {
-#ifdef _MSC_VER
-  std::wstring cpath = convert_pchar16T_To_wstr((KMX_WCHAR*) Filename);
-  std::wstring cmode = convert_pchar16T_To_wstr((KMX_WCHAR*) mode);
-  std::replace(cpath.begin(), cpath.end(), '/', '\\');
-  return _wfsopen(cpath.c_str(), cmode.c_str(), _SH_DENYWR);
-#else
-  std::string cpath, cmode;
-  cpath = string_from_u16string(Filename);
-  cmode = string_from_u16string(mode);
+  cpath = (const KMX_CHAR*)Filename;
+  cmode = (const KMX_CHAR*)mode;
   return fopen(cpath.c_str(), cmode.c_str());
 #endif
 };

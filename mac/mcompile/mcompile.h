@@ -33,8 +33,6 @@ struct KMX_DeadkeyMapping {  // I4353
 
 extern std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;  // I4353
 
-PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p);
-
 /**
  * @brief  print (error) messages
  * @param  fmt text to print

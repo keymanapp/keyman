@@ -1,3 +1,9 @@
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Keyboard reading and mapping for mac
+ */
+
 #include "u16.h"
 #include <codecvt>
 #include <locale>
@@ -8,9 +14,9 @@ std::vector<std::u16string> convert_argv_to_Vector_u16str(int argc, char* argv[]
   std::vector<std::u16string> vector_u16;
 
   // for each arg convert to u16string and push to vector
-  for (char **arg = argv, i = 0; *arg; ++arg, i++) {
-    std::string S(*arg);
-    vector_u16.push_back(u16string_from_string(S));
+  for (char** arg = argv, i = 0; *arg; ++arg, i++) {
+    std::string s(*arg);
+    vector_u16.push_back(u16string_from_string(s));
   }
   return vector_u16;
 }
@@ -19,7 +25,7 @@ std::vector<std::u16string> convert_argvW_to_Vector_u16str(int argc, wchar_t* ar
   std::vector<std::u16string> vector_u16;
 
   // for each arg convert to u16string and push to vector
-  for (wchar_t **arg = argv, i = 0; *arg; ++arg, i++) {
+  for (wchar_t** arg = argv, i = 0; *arg; ++arg, i++) {
     std::wstring S(*arg);
     vector_u16.push_back(u16string_from_wstring(S));
   }
@@ -83,10 +89,10 @@ void u16sprintf(KMX_WCHAR* dst, const size_t max_len, const wchar_t* fmt, ...) {
 	delete[] wbuf;
 }
 
-std::wstring convert_pchar16T_To_wstr(KMX_WCHAR* Name) {
+std::wstring convert_pchar16T_To_wstr(KMX_WCHAR* name) {
   //  convert char16_t*  -> std::u16string -> std::string -> std::wstring
   //  char16_t* -> std::u16string
-  std::u16string u16str(Name);
+  std::u16string u16str(name);
   //  std::u16string -> std::string
   std::string stri = string_from_u16string(u16str);
   //  std::string -> std::wstring
@@ -117,20 +123,20 @@ const KMX_WCHAR* u16ncat(KMX_WCHAR* dst, const KMX_WCHAR* src, size_t max) {
   return o;
 }
 
-const KMX_WCHAR* u16rchr_slash(KMX_WCHAR const* Name) {
+const KMX_WCHAR* u16rchr_slash(KMX_WCHAR const* name) {
   const KMX_WCHAR* cp = NULL;
-  cp = u16rchr(Name, '\\');
+  cp = u16rchr(name, '\\');
   if (cp == NULL)
-    cp = u16rchr(Name, '/');
+    cp = u16rchr(name, '/');
   return cp;
 }
 /*
-KMX_CHAR* strrchr_slash(KMX_CHAR* Name)
+KMX_CHAR* strrchr_slash(KMX_CHAR* name)
 {
   KMX_CHAR* cp = NULL;
-  cp = strrchr(Name, '\\');
+  cp = strrchr(name, '\\');
   if (cp == NULL)
-    cp = strrchr(Name, '/');
+    cp = strrchr(name, '/');
   return cp;
 }
 */
