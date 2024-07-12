@@ -582,9 +582,16 @@ TEST_F(CompilerTest, ProcessEthnologueStore_test) {
     EXPECT_EQ(CWARN_PunctuationInEthnologueCode, ProcessEthnologueStore((PKMX_WCHAR)u";abc"));
     EXPECT_EQ(CWARN_PunctuationInEthnologueCode, ProcessEthnologueStore((PKMX_WCHAR)u",abc"));
     EXPECT_EQ(CERR_None, ProcessEthnologueStore((PKMX_WCHAR)u" abc"));
+    EXPECT_EQ(CERR_InvalidEthnologueCode, ProcessEthnologueStore((PKMX_WCHAR)u"abc "));
+    EXPECT_EQ(CERR_InvalidEthnologueCode, ProcessEthnologueStore((PKMX_WCHAR)u"abcd"));
     EXPECT_EQ(CERR_InvalidEthnologueCode, ProcessEthnologueStore((PKMX_WCHAR)u"ab"));
     EXPECT_EQ(CERR_InvalidEthnologueCode, ProcessEthnologueStore((PKMX_WCHAR)u"a"));
+    EXPECT_EQ(CERR_InvalidEthnologueCode, ProcessEthnologueStore((PKMX_WCHAR)u"a2b"));
     EXPECT_EQ(CERR_None, ProcessEthnologueStore((PKMX_WCHAR)u"")); // is this right?
+    EXPECT_EQ(CERR_None, ProcessEthnologueStore((PKMX_WCHAR)u"abc def"));
+    EXPECT_EQ(CERR_None, ProcessEthnologueStore((PKMX_WCHAR)u"abc  def"));
+    EXPECT_EQ(CWARN_PunctuationInEthnologueCode, ProcessEthnologueStore((PKMX_WCHAR)u"abc,def"));
+    EXPECT_EQ(CWARN_PunctuationInEthnologueCode, ProcessEthnologueStore((PKMX_WCHAR)u"abc;def"));
 }
 
 // KMX_DWORD ProcessHotKey(PKMX_WCHAR p, KMX_DWORD *hk)
