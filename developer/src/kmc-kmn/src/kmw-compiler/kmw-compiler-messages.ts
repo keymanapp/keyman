@@ -3,7 +3,7 @@ import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerM
 import { kmnfile } from "./compiler-globals.js";
 
 const Namespace = CompilerErrorNamespace.KmwCompiler;
-// const SevInfo = CompilerErrorSeverity.Info | Namespace;
+const SevInfo = CompilerErrorSeverity.Info | Namespace;
 const SevHint = CompilerErrorSeverity.Hint | Namespace;
 // const SevWarn = CompilerErrorSeverity.Warn | Namespace;
 const SevError = CompilerErrorSeverity.Error | Namespace;
@@ -49,4 +49,8 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
   static HINT_TouchLayoutUsesUnsupportedGesturesDownlevel = SevHint | 0x0005;
   static Hint_TouchLayoutUsesUnsupportedGesturesDownlevel = (o:{keyId:string}) => m(this.HINT_TouchLayoutUsesUnsupportedGesturesDownlevel,
     `The touch layout uses a flick or multi-tap gesture on key ${def(o.keyId)}, which is only available on version 17.0+ of Keyman`);
+
+  static INFO_MinimumEngineVersion = SevInfo | 0x0006;
+  static Info_MinimumEngineVersion = (o:{version:string}) => m(this.INFO_MinimumEngineVersion,
+    `The compiler has assigned a minimum web engine version of ${o.version} based on features used in this keyboard`);
 };

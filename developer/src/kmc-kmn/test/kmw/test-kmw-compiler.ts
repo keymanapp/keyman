@@ -6,8 +6,10 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { KmnCompilerResult, KmnCompiler } from '../../src/compiler/compiler.js';
-import { ETLResult, extractTouchLayout as parseWebTestResult } from './util.js';
+import { ETLResult, extractTouchLayout } from './util.js';
 import { KeymanFileTypes } from '@keymanapp/common-types';
+import { KmnCompilerMessages } from '../../src/compiler/kmn-compiler-messages.js';
+import { KmwCompilerMessages } from '../../src/kmw-compiler/kmw-compiler-messages.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url)).replace(/\\/g, '/');
 const fixturesDir = __dirname + '/../../../test/fixtures/kmw/';
@@ -38,49 +40,73 @@ describe('KeymanWeb Compiler', function() {
     callbacks.clear();
   });
 
-  it('should compile a complex keyboard', function() {
-    run_test_keyboard(kmnCompiler, 'khmer_angkor');
+  it('should compile a complex keyboard', async function() {
+    await run_test_keyboard(kmnCompiler, 'khmer_angkor');
   });
 
-  it('should handle option stores', function() {
+  it('should handle option stores', async function() {
     //
     // This is enough to verify that the option store is set appropriately with
     // KLOAD because the fixture has that code present:
     //
     //    this.s_foo_6=KeymanWeb.KLOAD(this.KI,"foo","0");
     //
-    run_test_keyboard(kmnCompiler, 'test_options');
+    await run_test_keyboard(kmnCompiler, 'test_options');
   });
 
-  it('should translate every "character style" key correctly', function() {
+  it('should translate every "character style" key correctly', async function() {
     //
     // This is enough to verify that every character style key is encoded in the
     // same way as the fixture.
     //
-    run_test_keyboard(kmnCompiler, 'test_keychars');
+    await run_test_keyboard(kmnCompiler, 'test_keychars');
   });
 
-  it('should handle readonly groups', function() {
-    run_test_keyboard(kmnCompiler, 'test_readonly_groups');
+  it('should handle readonly groups', async function() {
+    await run_test_keyboard(kmnCompiler, 'test_readonly_groups');
   });
 
-  it('should handle context(n) in output of rule, v10.0 generation', function() {
-    run_test_keyboard(kmnCompiler, 'test_contextn_in_output');
+  it('should handle context(n) in output of rule, v10.0 generation', async function() {
+    await run_test_keyboard(kmnCompiler, 'test_contextn_in_output');
   });
 
-  it('should handle context(n) in output of rule, v9.0 generation', function() {
-    run_test_keyboard(kmnCompiler, 'test_contextn_in_output_9');
+  it('should handle context(n) in output of rule, v9.0 generation', async function() {
+    await run_test_keyboard(kmnCompiler, 'test_contextn_in_output_9');
   });
 
-  it('should handle context(n) in context part of rule, v9.0 generation', function() {
-    run_test_keyboard(kmnCompiler, 'test_context_in_context_9');
+  it('should handle context(n) in context part of rule, v9.0 generation', async function() {
+    await run_test_keyboard(kmnCompiler, 'test_context_in_context_9');
   });
 
-  it('should handle context(n) in context part of rule, v10.0 generation', function() {
-    run_test_keyboard(kmnCompiler, 'test_context_in_context');
+  it('should handle context(n) in context part of rule, v10.0 generation', async function() {
+    await run_test_keyboard(kmnCompiler, 'test_context_in_context');
+  });
+
+  it('should determine the minimum version correctly with U_xxxx_yyyy touch ids', async function() {
+    const filenames = generateTestFilenames('version_u_xxxx_yyyy');
+
+    let result = await kmnCompiler.run(filenames.source, null);
+    assert.isNotNull(result);
+    assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumEngineVersion));
+    // The min version message from the .kmn compiler is generic 208A INFO_Info;
+    // we expect only 1 of the info messages -- for the .kmx target (not 2)
+    assert.equal(callbacks.messages.filter(item => item.code == KmnCompilerMessages.INFO_Info).length, 1);
+
+    const data = new TextDecoder('utf-8').decode(result.artifacts.js.data);
+    assert.match(data, /KMINVER="15.0"/, `Could not find expected 'KMINVER="15.0"'`);
+  });
+
+  it('should give an error if the minimum version specified in the keyboard does not support U_xxxx_yyyy touch ids', async function() {
+    const filenames = generateTestFilenames('version_u_xxxx_yyyy_14');
+
+    let result = await kmnCompiler.run(filenames.source, null);
+    assert.isNull(result);
+    // The min version message from the .kmn compiler is generic 208A INFO_Info
+    assert.isFalse(callbacks.hasMessage(KmnCompilerMessages.INFO_Info));
+    assert.isFalse(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumEngineVersion));
+    assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.ERROR_TouchLayoutIdentifierRequires15));
   });
 });
-
 
 async function run_test_keyboard(kmnCompiler: KmnCompiler, id: string):
   Promise<{ result: KmnCompilerResult, actualCode: string, actual: ETLResult, expectedCode: string, expected: ETLResult }> {
@@ -96,11 +122,11 @@ async function run_test_keyboard(kmnCompiler: KmnCompiler, id: string):
     expected: <ETLResult>null,
     actual: <ETLResult>null,
   };
-  value.actual = parseWebTestResult(value.actualCode);
-  value.expected = parseWebTestResult(value.expectedCode);
+  value.actual = extractTouchLayout(value.actualCode);
+  value.expected = extractTouchLayout(value.expectedCode);
 
   if(debug) {
-    // This is mostly to allow us to verify that parseWebTestResult is doing what we want
+    // This is mostly to allow us to verify that extractTouchLayout is doing what we want
     // fs.writeFileSync(filenames.binary + '.strip.js', value.actual.js);
     // fs.writeFileSync(filenames.fixture + '.strip.js', value.expected.js);
     fs.writeFileSync(filenames.binary, value.actualCode);
