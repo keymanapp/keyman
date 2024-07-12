@@ -587,7 +587,7 @@ TEST_F(CompilerTest, ProcessEthnologueStore_test) {
     EXPECT_EQ(CERR_InvalidEthnologueCode, ProcessEthnologueStore((PKMX_WCHAR)u"ab"));
     EXPECT_EQ(CERR_InvalidEthnologueCode, ProcessEthnologueStore((PKMX_WCHAR)u"a"));
     EXPECT_EQ(CERR_InvalidEthnologueCode, ProcessEthnologueStore((PKMX_WCHAR)u"a2b"));
-    EXPECT_EQ(CERR_None, ProcessEthnologueStore((PKMX_WCHAR)u"")); // is this right?
+    EXPECT_EQ(CERR_None, ProcessEthnologueStore((PKMX_WCHAR)u"")); // needs correcting ... see #11955
     EXPECT_EQ(CERR_None, ProcessEthnologueStore((PKMX_WCHAR)u"abc def"));
     EXPECT_EQ(CERR_None, ProcessEthnologueStore((PKMX_WCHAR)u"abc  def"));
     EXPECT_EQ(CWARN_PunctuationInEthnologueCode, ProcessEthnologueStore((PKMX_WCHAR)u"abc,def"));
