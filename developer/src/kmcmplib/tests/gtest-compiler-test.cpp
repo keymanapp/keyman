@@ -17,6 +17,7 @@ KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString);
 KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
   PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isUnicode
 );
+KMX_DWORD ProcessEthnologueStore(PKMX_WCHAR p);
 KMX_DWORD GetRHS(PFILE_KEYBOARD fk, PKMX_WCHAR p, PKMX_WCHAR buf, int bufsize, int offset, int IsUnicode);
 bool isIntegerWstring(PKMX_WCHAR p);
 bool hasPreamble(std::u16string result);
@@ -575,7 +576,17 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
 // KMX_DWORD process_save(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
 // int xatoi(PKMX_WCHAR *p)
 // int GetGroupNum(PFILE_KEYBOARD fk, PKMX_WCHAR p)
-// KMX_DWORD ProcessEthnologueStore(PKMX_WCHAR p)
+
+TEST_F(CompilerTest, ProcessEthnologueStore_test) {
+    EXPECT_EQ(CERR_None, ProcessEthnologueStore((PKMX_WCHAR)u"abc"));
+    EXPECT_EQ(CWARN_PunctuationInEthnologueCode, ProcessEthnologueStore((PKMX_WCHAR)u";abc"));
+    EXPECT_EQ(CWARN_PunctuationInEthnologueCode, ProcessEthnologueStore((PKMX_WCHAR)u",abc"));
+    EXPECT_EQ(CERR_None, ProcessEthnologueStore((PKMX_WCHAR)u" abc"));
+    EXPECT_EQ(CERR_InvalidEthnologueCode, ProcessEthnologueStore((PKMX_WCHAR)u"ab"));
+    EXPECT_EQ(CERR_InvalidEthnologueCode, ProcessEthnologueStore((PKMX_WCHAR)u"a"));
+    EXPECT_EQ(CERR_None, ProcessEthnologueStore((PKMX_WCHAR)u"")); // is this right?
+}
+
 // KMX_DWORD ProcessHotKey(PKMX_WCHAR p, KMX_DWORD *hk)
 // void SetChecksum(PKMX_BYTE buf, PKMX_DWORD CheckSum, KMX_DWORD sz)
 // KMX_BOOL kmcmp::CheckStoreUsage(PFILE_KEYBOARD fk, int storeIndex, KMX_BOOL fIsStore, KMX_BOOL fIsOption, KMX_BOOL fIsCall)
