@@ -135,6 +135,34 @@ describe('KeymanWeb Compiler', function() {
       assert.match(data, /KMINVER="10.0"/, `Could not find expected 'KMINVER="10.0"'`);
     });
   });
+
+  it('should determine the minimum version correctly with `notany`', async function() {
+    // Note that the logic being tested here is in kmx compiler.cpp, not kmw compiler
+    const filenames = generateTestFilenames('version_notany');
+
+    let result = await kmnCompiler.run(filenames.source, null);
+    assert.isNotNull(result);
+    assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumEngineVersion));
+    // The min version message from the .kmn compiler is generic 208A INFO_Info;
+    // we expect only 1 of the info messages -- for the .kmx target (not 2)
+    assert.equal(callbacks.messages.filter(item => item.code == KmnCompilerMessages.INFO_Info).length, 1);
+
+    const data = new TextDecoder('utf-8').decode(result.artifacts.js.data);
+    assert.match(data, /KMINVER="14.0"/, `Could not find expected 'KMINVER="14.0"'`);
+  });
+
+  it('should give an error if the minimum version specified in the keyboard does not support `notany`', async function() {
+    // Note that the logic being tested here is in kmx compiler.cpp, not kmw compiler
+    const filenames = generateTestFilenames('version_notany_10');
+
+    let result = await kmnCompiler.run(filenames.source, null);
+    assert.isNull(result);
+    // The min version message from the .kmn compiler is generic 208A INFO_Info
+    assert.isFalse(callbacks.hasMessage(KmnCompilerMessages.INFO_Info));
+    assert.isFalse(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumEngineVersion));
+    assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.ERROR_140FeatureOnlyContextAndNotAnyWeb));
+  });
+
 });
 
 async function run_test_keyboard(kmnCompiler: KmnCompiler, id: string):

@@ -30,10 +30,6 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
 
   // Following messages are kmw-compiler only, so use KmwCompiler error namespace
 
-  static ERROR_NotAnyRequiresVersion14 = SevError | 0x0001;
-  static Error_NotAnyRequiresVersion14 = (o:{line: number}) => m(this.ERROR_NotAnyRequiresVersion14,
-    `Statement notany in context() match requires version 14.0+ of KeymanWeb`, o);
-
   static ERROR_TouchLayoutIdentifierRequires15 = SevError | 0x0002;
   static Error_TouchLayoutIdentifierRequires15 = (o:{keyId:string, platformName:string, layerId:string}) => m(this.ERROR_TouchLayoutIdentifierRequires15,
     `Key "${def(o.keyId)}" on "${def(o.platformName)}", layer "${def(o.layerId)}" has a multi-part identifier which requires version 15.0 or newer.`);

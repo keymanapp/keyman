@@ -677,10 +677,9 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
         break;
       case KMX.KMXFile.CODE_NOTANY:
         // #917: Minimum version required is 14.0: the KCXO function was only added for 14.0
-        // Note that this is checked in compiler.cpp as well, so this error can probably never occur
-        // TODO: automatic version upgrade
         if(!isKeyboardVersion14OrLater()) {
-          callbacks.reportMessage(KmwCompilerMessages.Error_NotAnyRequiresVersion14({line:fkp.Line}));
+          // Note that this is checked in compiler.cpp as well, so this error can probably never occur
+          throw new Error('Unexpected: notany() encountered with invalid version');
         }
         Result += nlt + `k.KCXO(${len},t,${AdjustIndex(fkp.dpContext, xstrlen(fkp.dpContext))},${AdjustIndex(fkp.dpContext, ContextIndex)+1});`;
         break;
