@@ -47,6 +47,9 @@ describe('KmwCompilerMessages', function () {
 
   // TODO: other messages
 
+  // WARN_ExtendedShiftFlagsNotSupportedInKeymanWeb:
+  // * Implemented in test-kmw-compiler.ts: 'should give warning WARN_ExtendedShiftFlagsNotSupportedInKeymanWeb for v9 keyboards if ${mode} found'
+
   // ERROR_NotAnyRequiresVersion14
 
   // it('should generate ERROR_NotAnyRequiresVersion14 if ...', async function() {
