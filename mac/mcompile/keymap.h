@@ -2,7 +2,6 @@
 #ifndef KEYMAP_H
 #define KEYMAP_H
 
-
 #include <iostream>
 #include <Carbon/Carbon.h>
 #include <string>
@@ -49,7 +48,6 @@ const KMX_DWORD KMX_VKMap[] = {
 
 	VK_xDF,     /* ß (?) 223*/
 	VK_OEM_102, /* < > | 226 */
-
   0};
 
 typedef std::vector<std::string> vec_string_1D;
@@ -90,7 +88,7 @@ int mac_convert_Shiftstate_to_MacShiftstate(int shiftState);
 int mac_convert_rgkey_Shiftstate_to_MacShiftstate(int rgkey_ShiftState);
 
 /**
- * @brief  check for correct input parameters that will later be used in UCKeyTranslate()
+ * @brief  check for correct input parameter that will later be used in UCKeyTranslate()
  * @param  shiftstate the currently used shiftstate
  * @param  keycode the code of the key in question
  * @return true if all parameters are OK; false if not
@@ -98,7 +96,7 @@ int mac_convert_rgkey_Shiftstate_to_MacShiftstate(int rgkey_ShiftState);
 bool ensureValidInputForKeyboardTranslation(int shiftstate, int keycode);
 
 /**
- * @brief   create a 3D-Vector containing data of the US keyboard and the currently used (underlying) keyboard
+ * @brief  create a 3D-Vector containing data of the US keyboard and the currently used (underlying) keyboard
  *          all_vector [ US_Keyboard  ]
  *                            [KeyCode_US        ]
  *                            [Keyval unshifted  ]
@@ -612,14 +610,13 @@ KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_KeyValUnderlying(vec_dword_3D& all_
  */
 KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_KeyCodeUS(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& all_vector, KMX_DWORD kc_us, ShiftState ss_win, int caps);
 
-
 /**
  * @brief  return the keycode of the currently used (underlying) keyboard for a given virtual key of the US keyboard
  *         "Where on an underlying keyboard do we find a character of a US keyboard?"
- * @param  vk_us a virtual key of the US keyboard
+ * @param  virtualKeyUS a virtual key of the US keyboard
  * @return the keycode of the currently used (underlying) keyboard
  */
-KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD vk_us);
+KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD virtualKeyUS);
 
 /**
  * @brief  return a virtual key of the US keyboard for a given keycode of the currently used (underlying) keyboard

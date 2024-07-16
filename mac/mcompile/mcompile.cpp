@@ -14,7 +14,6 @@
 #include "mcompile.h"
 #include "u16.h"
 
-
 /**
  * @brief  convert mnemonic keyboard layout to positional keyboard layout and translate keyboard
  * @param  kbd pointer to US keyboard
@@ -48,7 +47,7 @@ int mac_run(int argc, char* argv[]);
  */
 int mac_KMX_GetDeadkeys(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& all_vector, KMX_WCHAR deadkey, UINT shift_dk, KMX_WORD* outputPairs);  // returns array of [usvk, ch_out] pairs
 
-std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys; // I4353
+std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;  // I4353
 
 #define _countof(a) (sizeof(a) / sizeof(*(a)))
 
@@ -82,7 +81,7 @@ int mac_run(int argc, char* argv[]) {
 
   int n = (bDeadkeyConversion ? 2 : 1);
 
-  if (argc < 3 || argc > 4 || (argc - n) != 2) { // I4273// I4273
+  if (argc < 3 || argc > 4 || (argc - n) != 2) {  // I4273// I4273
       printf(
           "Usage:  \tmcompile [-d] infile.kmx outfile.kmx\n"
           "        \tmcompile -u ...  (not available for mac)\n "
@@ -132,7 +131,7 @@ int mac_run(int argc, char* argv[]) {
   }
 
   #if defined(_WIN32) || defined(_WIN64)  // Windows
-    if (DoConvert(kmxfile, kbid, bDeadkeyConversion)) {   // I4552F
+    if (DoConvert(kmxfile, kbid, bDeadkeyConversion)) {  // I4552F
       KMX_SaveKeyboard(kmxfile, outfile);
     }
 
@@ -510,8 +509,7 @@ KMX_BOOL mac_KMX_SetKeyboardToPositional(LPKMX_KEYBOARD kbd) {
 
 /** @brief  convert mnemonic keyboard layout to positional keyboard layout and translate keyboard */
 KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, int argc) {
-
-  KMX_WCHAR DeadKey=0;
+  KMX_WCHAR DeadKey = 0;
   if (!mac_KMX_SetKeyboardToPositional(kbd))
     return FALSE;
 
@@ -580,7 +578,7 @@ KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, int 
  * @param [out] outputPairs pointer to array of [usvk, ch_out] pairs
  * @return size of array of [usvk, ch_out] pairs
  */
-int mac_KMX_GetDeadkeys( const UCKeyboardLayout* keyboard_layout, vec_dword_3D& all_vector, KMX_WCHAR deadkey, UINT shift_dk, KMX_WORD* outputPairs) {
+int mac_KMX_GetDeadkeys(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& all_vector, KMX_WCHAR deadkey, UINT shift_dk, KMX_WORD* outputPairs) {
   UInt32 deadkeystate;
   UniCharCount maxStringlength    = 5;
   UniCharCount actualStringlength = 0;

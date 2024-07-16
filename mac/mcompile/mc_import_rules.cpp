@@ -4,7 +4,6 @@
  * Mnemonic layout support for mac
  */
 
-
 #include <vector>
 #include <string>
 #include <stdio.h>
@@ -52,17 +51,16 @@ bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
 //_S2 remove!
 bool test_alDead_S2(std::vector<DeadKey*> ald);
 
-
 /** @brief Find a keyvalue for given keycode, shiftstate and caps. A function similar to Window`s ToUnicodeEx() function. */
 int mac_KMX_ToUnicodeEx(int keycode, PKMX_WCHAR pwszBuff, ShiftState ss_rgkey, int caps, const UCKeyboardLayout* keyboard_layout) {
   KMX_DWORD keyval;
   UInt32 isdk = 0;
 
-  if (!ensureValidInputForKeyboardTranslation(mac_convert_rgkey_Shiftstate_to_MacShiftstate(ss_rgkey),keycode))
+  if (!ensureValidInputForKeyboardTranslation(mac_convert_rgkey_Shiftstate_to_MacShiftstate(ss_rgkey), keycode))
     return 0;
 
   keyval = mac_KMX_get_KeyVal_From_KeyCode_dk(keyboard_layout, keycode, mac_convert_rgkey_Shiftstate_to_MacShiftstate(ss_rgkey), caps, isdk);
-  std::u16string str =std::u16string(1, keyval );
+  std::u16string str = std::u16string(1, keyval);
   KMX_WCHAR firstchar = *(PKMX_WCHAR)str.c_str();
 
   if ((firstchar >= 0xD800) && (firstchar <= 0xDFFF)) {
@@ -236,7 +234,7 @@ public:
   }
 
 /** @brief edit the row of kmx-file */
-  bool mac_KMX_LayoutRow(int MaxShiftState, LPKMX_KEY key, std::vector<DeadKey*>*deadkeys, int deadkeyBase, BOOL bDeadkeyConversion, vec_dword_3D& all_vector, const UCKeyboardLayout* keyboard_layout) {  // I4552
+  bool mac_KMX_LayoutRow(int MaxShiftState, LPKMX_KEY key, std::vector<DeadKey*>* deadkeys, int deadkeyBase, BOOL bDeadkeyConversion, vec_dword_3D& all_vector, const UCKeyboardLayout* keyboard_layout) {  // I4552
     // Get the CAPSLOCK value
     /*int capslock =
           (this->mac_KMX_IsCapsEqualToShift() ? 1 : 0) |
@@ -318,7 +316,6 @@ public:
     }
     return true;
   }
-
 };
 
 /** @brief  Base class for KMX_loader*/
@@ -376,9 +373,8 @@ public:
             continue;
 
           // push only for if combchar is not dk or combchar is dk with space
-          if ((!(combchar== keyval_underlying_dk)) || (basechar == mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout, keycode_spacebar, ss_mac[j], caps))) {
+          if ((!(combchar == keyval_underlying_dk)) || (basechar == mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout, keycode_spacebar, ss_mac[j], caps))) {
             deadKey->KMX_AddDeadKeyRow(basechar, combchar);
-            //printf( " processed basechar %i(%c) with  dk %i(%c) ===> combchar%i(%c)  \t\t ss[%i](%i)  caps%i  \n", basechar,basechar ,keyval_underlying_dk,keyval_underlying_dk, combchar,combchar, j, ss[j], caps );
           }
         }
       }
@@ -427,10 +423,10 @@ void test_print_All_Entries_S2(std::vector<mac_KMX_VirtualKey*> rgKey);
  * @param  bDeadkeyConversion 1 to convert a deadkey to a character; 0 no conversion
  * @return true in case of success
  */
-bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, const UCKeyboardLayout** keyboard_layout, std::vector<KMX_DeadkeyMapping>* FDeadkeys, KMX_BOOL bDeadkeyConversion) { // I4353   // I4327
+bool mac_KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, const UCKeyboardLayout** keyboard_layout, std::vector<KMX_DeadkeyMapping>* FDeadkeys, KMX_BOOL bDeadkeyConversion) {  // I4353   // I4327
  mac_KMX_Loader loader;
 
-  std::vector<mac_KMX_VirtualKey*> rgKey; //= new VirtualKey[256];
+  std::vector<mac_KMX_VirtualKey*> rgKey;  //= new VirtualKey[256];
   std::vector<DeadKey*> alDead;
 
   rgKey.resize(256);
@@ -439,7 +435,7 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, const UCK
   // values in it. Then, store the SC in each valid VK so it can act as both a
   // flag that the VK is valid, and it can store the SC value.
 
-  //Windows and Linux Keycodes start with 1; Mac keycodes start with 0
+  // Windows and Linux Keycodes start with 1; Mac keycodes start with 0
   for (UINT sc = 0x00; sc <= 0x7f; sc++) {
     /* HERE IS A BIG DIFFERENCE COMPARED TO MCOMPILE FOR WINDOWS:
     * mcompile on Windows fills rgkey.m_vk with the VK of the Underlying keyboard
@@ -448,7 +444,7 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, const UCK
 
     * macOS cannot get a VK for the underling Keyboard since this does not exist
     * macOS can only get a VK for the US Keyboard (by using USVirtualKeyToScanCode/ScanCodeToUSVirtualKey)
-    * therefore in rgkey[ ] we use VK_US which we get from all_vector
+    * therefore we use VK_US in rgkey[ ] which we get from all_vector
     */
     mac_KMX_VirtualKey* key = new mac_KMX_VirtualKey(sc);
 
@@ -491,7 +487,7 @@ bool mac_KMX_ImportRules( LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, const UCK
              }
           } else if (rc < 0) {
             sbBuffer[2] = 0;
-            rgKey[iKey]->mac_KMX_SetShiftState(ss, sbBuffer, true, (caps ));      // different to windows since behavior on the mac is different
+            rgKey[iKey]->mac_KMX_SetShiftState(ss, sbBuffer, true, (caps));       // different to windows since behavior on the mac is different
 
             sbBuffer[2] = 0;
             rgKey[iKey]->mac_KMX_SetShiftState(ss, sbBuffer, true, (caps == 0));

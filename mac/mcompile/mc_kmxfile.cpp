@@ -98,8 +98,8 @@ KMX_DWORD KMX_WriteCompiledKeyboardToFile(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX
 			size += (u16len(fkp->dpContext) + 1) * sizeof(KMX_WCHAR);
 		}
 
-		if (fgp->dpMatch) size += (u16len(fgp->dpMatch) + 1) * sizeof(KMX_WCHAR);
-		if (fgp->dpNoMatch) size += (u16len(fgp->dpNoMatch) + 1) * sizeof(KMX_WCHAR);
+		if (fgp->dpMatch)size += (u16len(fgp->dpMatch) + 1) * sizeof(KMX_WCHAR);
+		if (fgp->dpNoMatch)size += (u16len(fgp->dpNoMatch) + 1) * sizeof(KMX_WCHAR);
 	}
 
 	for (i = 0; i < fk->cxStoreArray; i++) {
@@ -109,10 +109,11 @@ KMX_DWORD KMX_WriteCompiledKeyboardToFile(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX
 	}
 
 	buf = new KMX_BYTE[size];
-	if (!buf) return CERR_CannotAllocateMemory;
+	if (!buf)
+    return CERR_CannotAllocateMemory;
 	memset(buf, 0, size);
 
-	ck = (PKMX_COMP_KEYBOARD) buf;
+	ck = (PKMX_COMP_KEYBOARD)buf;
 
 	ck->dwIdentifier = FILEID_COMPILED;
 
@@ -227,7 +228,6 @@ KMX_DWORD KMX_WriteCompiledKeyboardToFile(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX
 
 /** @brief save keyboard to file */
 KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, KMX_CHAR* fileName) {
-
   FILE* fp;
   fp = Open_File(fileName, "wb");
 
@@ -448,7 +448,6 @@ KMX_BOOL KMX_LoadKeyboard(KMX_CHAR* fileName, LPKMX_KEYBOARD* lpKeyboard) {
     fclose(fp);
     return FALSE;
   }
-// delete??? _S2
   fclose(fp);
 
   if (*((PKMX_DWORD)filebase) != (KMX_DWORD)FILEID_COMPILED) {
@@ -477,7 +476,7 @@ KMX_BOOL KMX_LoadKeyboard(KMX_CHAR* fileName, LPKMX_KEYBOARD* lpKeyboard) {
 
   if (kbp->dwIdentifier != FILEID_COMPILED) {
     delete[] buf;
-    mac_KMX_LogError(L"errNotFileID\n" );
+    mac_KMX_LogError(L"errNotFileID\n");
     return FALSE;
   }
   *lpKeyboard = kbp;

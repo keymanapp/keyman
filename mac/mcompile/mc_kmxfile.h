@@ -74,7 +74,7 @@ typedef struct KMX_tagKEYBOARD {
  * @param [in,out] lpKeyboard pointer to pointer to keyboard
  * @return TRUE on success; else FALSE
  */
-KMX_BOOL KMX_LoadKeyboard(KMX_CHAR* fileName, LPKMX_KEYBOARD* lpKeyboard) ;
+KMX_BOOL KMX_LoadKeyboard(KMX_CHAR* fileName, LPKMX_KEYBOARD* lpKeyboard);
 
 /**
  * @brief save keyboard to file

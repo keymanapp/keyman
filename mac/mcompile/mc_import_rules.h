@@ -46,7 +46,6 @@ public:
   */
   void KMX_AddDeadKeyRow(KMX_WCHAR baseCharacter, KMX_WCHAR combinedCharacter);
 
-
   /** @brief return size of array of basecharacters */
   int KMX_Count() {
     return this->m_rgbasechar.size();
