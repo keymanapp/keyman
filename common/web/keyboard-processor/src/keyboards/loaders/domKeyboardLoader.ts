@@ -16,6 +16,13 @@ import { ManagedPromise } from '@keymanapp/web-utils';
  */
 export function keyboardScriptErrorFilterer(err: ErrorEvent) {
   if(/script error/i.test(err.message) && !err.filename) {
+    // Tends to be reached on Android devices; some sort of 'security' is
+    // enacted that obscures the actual error details.
+    err.preventDefault();
+    err.stopPropagation();
+  } else if(/modifierCodes/.test(err.message) && /undefined/.test(err.message)) {
+    // Tends to be reached for Keyman Engine for Web in the browser for
+    // locally-hosted files.
     err.preventDefault();
     err.stopPropagation();
   }

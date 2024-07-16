@@ -229,12 +229,12 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
       If we tracked cloud requests and awaited a Promise.all on pending queries,
       we could handle that too.
     */
+    window.addEventListener('error', keyboardScriptErrorFilterer);
     const loadingKbd: Promise<any> = this.contextManager.restoreSavedKeyboard(savedKeyboardStr);
 
     // Wait for the initial keyboard to load before setting the OSK; this will avoid building an
     // empty OSK that we'll instantly discard after.
     try {
-      window.addEventListener('error', keyboardScriptErrorFilterer)
       await loadingKbd;
     } catch (err) {
       // If there's a keyboard-script error, there's a non-zero chance that it's

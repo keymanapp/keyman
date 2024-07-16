@@ -809,7 +809,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
   /**
    * Restore the most recently used keyboard, if still available
    */
-  restoreSavedKeyboard(kbd: string) {
+  async restoreSavedKeyboard(kbd: string) {
     // If no saved keyboard, defaults to US English
     const d=kbd;
 
@@ -826,7 +826,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     if(stub) {
       return this.activateKeyboard(stub.id, stub.langId, true);
     } else {
-      return null;
+      return Promise.resolve(false);
     }
   }
 
