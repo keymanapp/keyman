@@ -438,25 +438,61 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMDisplayIM(HWND hwnd, BOOL FShowAlw
 	*Globals::hwndIM() = hwnd;
 	*Globals::hwndIMAlways() = FShowAlways;
 
-	POINT pt;
-	RECT r;
+	POINT IMTop, Caret;
+  RECT RectIM, RectApp;
+  HWND hFocus;
+  int n = 0;
 
-	GetCaretPos(&pt);
+  HMONITOR hMonitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+	if (hMonitor == NULL) {
+		return FALSE;
+	}
 
-	int n;
-	//if(pt.x == 0 && pt.y == 0)
-		n = SWP_NOMOVE;
-	//else n = 0;
+	MONITORINFO monitor_info;
+	monitor_info.cbSize = sizeof(monitor_info);
+	if (!GetMonitorInfo(hMonitor, &monitor_info)) {
+		return FALSE;
+	}
 
-	ClientToScreen(hwndFocus, &pt);
-	GetWindowRect(hwnd, &r);
-	if(pt.x + r.right - r.left >= GetSystemMetrics(SM_CXSCREEN))
-		pt.x = GetSystemMetrics(SM_CXSCREEN) - (r.right - r.left);
+  if (!GetWindowRect(hwnd, &RectIM)) {
+    return FALSE;
+  }
 
-	if(pt.y - (r.bottom-r.top) > 0) pt.y -= (r.bottom-r.top);
-	else pt.y += 32; // guessing...
+  // Only adjust the IM window coordinates if it is not going to be visible on the
+  // monitor it is currently showing on. Otherwise leave it to the 3rd paryt app
+  // to control the location of the IM Window.
+  // If changing the coordinates place the IM window use the caret postion of the
+  // application that has focus.
+  if ((RectIM.left < monitor_info.rcMonitor.left) || (RectIM.right > monitor_info.rcMonitor.right) ||
+      (RectIM.top < monitor_info.rcMonitor.top) || (RectIM.bottom > monitor_info.rcMonitor.bottom)) {
 
-	SetWindowPos(hwnd, HWND_TOPMOST, pt.x,pt.y,0,0, n|SWP_NOSIZE|SWP_SHOWWINDOW|SWP_NOACTIVATE);
+    if (!GetCaretPos(&Caret)) {
+      return FALSE;
+    }
+
+    hFocus = GetFocus();
+    if (!GetWindowRect(hFocus, &RectApp)) {
+      return FALSE;
+    }
+
+    IMTop.x = Caret.x + RectApp.left;
+    IMTop.y = Caret.y + RectApp.top + 24;
+
+    if (IMTop.x + RectIM.right - RectIM.left > RectApp.right) {
+      IMTop.x = RectApp.right - (RectIM.right - RectIM.left);
+    }
+
+    if (IMTop.y + RectIM.bottom - RectIM.top > RectApp.bottom) {
+      IMTop.y = RectApp.top + Caret.y - (RectIM.bottom - RectIM.top);
+    }
+    n = 0; // Move to tracked postion
+  } else {
+    IMTop.x = 0; // will be ignored by SWP_NOMOVE;
+    IMTop.y = 0;
+    n = SWP_NOMOVE;
+  }
+
+	SetWindowPos(hwnd, HWND_TOPMOST, IMTop.x, IMTop.y, 0, 0, n|SWP_NOSIZE|SWP_SHOWWINDOW|SWP_NOACTIVATE);
   //SendDebugMessageFormat(0, sdmKeyboard, 0, "KMDisplayIM: Exit");
 	return TRUE;
 }
