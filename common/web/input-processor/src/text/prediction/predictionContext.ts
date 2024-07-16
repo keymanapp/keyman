@@ -86,9 +86,14 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
       }
     }
 
-    this.suggestionReverter = (reversion) => {
+    this.suggestionReverter = async (reversion) => {
       if(validSuggestionState()) {
-        langProcessor.applyReversion(reversion, this.currentTarget);
+        let suggestions = await langProcessor.applyReversion(reversion, this.currentTarget);
+
+        // We bypass the 'standard' "new suggestions" pipeline, as these aren't NEW suggestions.
+        // We also want to avoid altering flags that would indicate our post-reversion state.
+        this._currentSuggestions = suggestions;
+        this.sendUpdateEvent();
       }
     }
 
