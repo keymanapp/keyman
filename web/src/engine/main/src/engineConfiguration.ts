@@ -17,6 +17,7 @@ export class EngineConfiguration extends EventEmitter<EventMap> {
   public hostDevice: DeviceSpec;
   readonly sourcePath: string;
   readonly deferForInitialization: ManagedPromise<void>;
+  deferForOsk: ManagedPromise<void>;
 
   private _paths: PathConfiguration;
   public activateFirstKeyboard: boolean;
@@ -39,6 +40,7 @@ export class EngineConfiguration extends EventEmitter<EventMap> {
     this.sourcePath = sourcePath;
     this.hostDevice = device;
     this.deferForInitialization = new ManagedPromise<void>();
+    this.deferForOsk = new ManagedPromise<void>();
   }
 
   initialize(options: Required<InitOptionSpec>) {

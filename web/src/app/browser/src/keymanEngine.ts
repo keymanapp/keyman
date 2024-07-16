@@ -7,7 +7,7 @@ import {
   VisualKeyboard
 } from 'keyman/engine/osk';
 import { ErrorStub, KeyboardStub, CloudQueryResult, toPrefixedKeyboardId as prefixed } from 'keyman/engine/package-cache';
-import { DeviceSpec, Keyboard, KeyboardObject } from "@keymanapp/keyboard-processor";
+import { DeviceSpec, Keyboard, KeyboardObject, KeyboardScriptError } from "@keymanapp/keyboard-processor";
 
 import * as views from './viewsAnchorpoint.js';
 import { BrowserConfiguration, BrowserInitOptionDefaults, BrowserInitOptionSpec } from './configuration.js';
@@ -26,6 +26,7 @@ import { UIModule } from './uiModuleInterface.js';
 import { HotkeyManager } from './hotkeyManager.js';
 import { BeepHandler } from './beepHandler.js';
 import KeyboardInterface from './keyboardInterface.js';
+import { keyboardScriptErrorFilterer } from '@keymanapp/keyboard-processor/dom-keyboard-loader';
 
 export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration, ContextManager, HardwareEventKeyboard> {
   touchLanguageMenu?: LanguageMenu;
@@ -233,8 +234,21 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     // Wait for the initial keyboard to load before setting the OSK; this will avoid building an
     // empty OSK that we'll instantly discard after.
     try {
+      window.addEventListener('error', keyboardScriptErrorFilterer)
       await loadingKbd;
-    } catch { /* in case of failed fetch due to network error or bad URI; we must still let the OSK init. */ };
+    } catch (err) {
+      // If there's a keyboard-script error, there's a non-zero chance that it's
+      // a debug-mode keyboard, which needs the OSK to be in place.
+      if(err instanceof KeyboardScriptError) {
+        // No error-filtering will be applied to the deferred keyboard load attempt,
+        // so error messages due to truly malformed keyboards will still be
+        // surfaced.
+        this.config.deferForOsk.then(() => this.contextManager.restoreSavedKeyboard(savedKeyboardStr));
+      }
+      /* in case of failed fetch due to network error or bad URI; we must still let the OSK init. */
+    } finally {
+      window.removeEventListener('error', keyboardScriptErrorFilterer);
+    };
 
     const firstKbdConfig = {
       keyboardToActivate: this.contextManager.activeKeyboard

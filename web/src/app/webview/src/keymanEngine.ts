@@ -1,4 +1,4 @@
-import { DefaultRules, DeviceSpec, RuleBehavior, Keyboard } from '@keymanapp/keyboard-processor'
+import { DefaultRules, DeviceSpec, RuleBehavior, Keyboard, KeyboardScriptError } from '@keymanapp/keyboard-processor'
 import { KeymanEngine as KeymanEngineBase, KeyboardInterface } from 'keyman/engine/main';
 import { AnchoredOSKView, ViewConfiguration, StaticActivator } from 'keyman/engine/osk';
 import { getAbsoluteX, getAbsoluteY } from 'keyman/engine/dom-utils';
@@ -8,6 +8,7 @@ import { WebviewConfiguration, WebviewInitOptionDefaults, WebviewInitOptionSpec 
 import ContextManager, { ContextHost } from './contextManager.js';
 import PassthroughKeyboard from './passthroughKeyboard.js';
 import { buildEmbeddedGestureConfig, setupEmbeddedListeners } from './oskConfiguration.js';
+import { keyboardScriptErrorFilterer } from '@keymanapp/keyboard-processor/dom-keyboard-loader';
 
 export default class KeymanEngine extends KeymanEngineBase<WebviewConfiguration, ContextManager, PassthroughKeyboard> {
   // Ideally, we would be able to auto-detect `sourceUri`: https://stackoverflow.com/a/60244278.
@@ -81,14 +82,30 @@ export default class KeymanEngine extends KeymanEngineBase<WebviewConfiguration,
     const kbdCache = this.keyboardRequisitioner.cache;
     const firstStub = kbdCache.defaultStub;
     let firstKeyboard: Keyboard;
+
     if(firstStub) {
       // If so, the common engine will have automatically started fetching it.
       // Wait for the keyboard to load in order to avoid the high cost of building
       // a stand-in we'll automatically replace.
       try {
         // Re-uses pre-existing fetch requests and fetched keyboards.
+        //
+        // As we haven't yet initialized the OSK, the osk-based API for debug
+        // values isn't yet available.  Debug-mode keyboards will generate errors
+        // on load as a result, but we can silence those errors here...
+        window.addEventListener('error', keyboardScriptErrorFilterer);
         firstKeyboard = await kbdCache.fetchKeyboardForStub(firstStub);
-      } catch { /* in case of failed fetch due to network error or bad URI; we must still let the OSK init. */ };
+      } catch (e) {
+        if(e instanceof KeyboardScriptError) {
+          // ... and retry the keyboard-load once the OSK is available to provide
+          // the debug-keyboard code API points.
+          this.config.deferForOsk.then(() => this.setActiveKeyboard(firstStub.id, firstStub.langId));
+        } else {
+          throw e;
+        }
+      } finally {
+        window.removeEventListener('error', keyboardScriptErrorFilterer);
+      }
     }
 
     const keyboardConfig: ViewConfiguration['keyboardToActivate'] = firstKeyboard ? {

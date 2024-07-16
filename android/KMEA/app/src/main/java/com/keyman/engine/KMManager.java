@@ -886,10 +886,12 @@ public final class KMManager {
 
       // Copy default keyboard font
       copyAsset(context, KMDefault_KeyboardFont, "", true);
+      // Includes something needed up to Chrome 61, which has full ES5 support.
+      // Thus, this one isn't legacy-only.
+      copyAsset(context, KMFilename_JSPolyfill2, "", true);
 
       if(legacyMode) {
         copyAsset(context, KMFilename_JSPolyfill, "", true);
-        copyAsset(context, KMFilename_JSPolyfill2, "", true);
         copyAsset(context, KMFilename_JSPolyfill3, "", true);
       }
 
@@ -1638,7 +1640,7 @@ public final class KMManager {
 
   public static boolean isDefaultKey(String key) {
     return (
-      key != null && 
+      key != null &&
       key.equals(KMString.format("%s_%s", KMDefault_LanguageID, KMDefault_KeyboardID)));
   }
 
@@ -2084,11 +2086,11 @@ public final class KMManager {
       wm.getDefaultDisplay().getSize(size);
       return size;
     }
-    
+
     WindowMetrics windowMetrics = wm.getCurrentWindowMetrics();
     return new Point(
       windowMetrics.getBounds().width(),
-      windowMetrics.getBounds().height());    
+      windowMetrics.getBounds().height());
   }
 
   public static float getWindowDensity(Context context) {

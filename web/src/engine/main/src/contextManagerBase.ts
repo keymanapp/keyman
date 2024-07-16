@@ -236,11 +236,11 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
     // still async-loading, we should go with the later setting - the preloaded one.
     this.findAndPopActivation(this.currentKeyboardSrcTarget());
 
-    const activatingKeyboard = this.prepareKeyboardForActivation(keyboardId, languageCode);
+    let activatingKeyboard = this.prepareKeyboardForActivation(keyboardId, languageCode);
 
     const originalKeyboardTarget = this.currentKeyboardSrcTarget();
 
-    const keyboard = await activatingKeyboard.keyboard;
+    let keyboard = await activatingKeyboard.keyboard;
     if(keyboard == null && activatingKeyboard.metadata) {
       // The activation was async and was cancelled - either by `beforeKeyboardChange` first-pass
       // cancellation or because a different keyboard was requested before completion of the async load.
@@ -357,17 +357,19 @@ export abstract class ContextManagerBase<MainConfig extends EngineConfiguration>
 
         let combinedPromise = Promise.race([keyboardPromise, timeoutPromise]);
 
-        // Ensure the async-load Promise completes properly.
+        // Ensure the async-load Promise completes properly, allowing us to
+        // consistently clear keyboard-loading alerts.
         combinedPromise.then(() => {
           completionPromise.resolve(null);
-          // Prevent any 'unhandled Promise rejection' events that may otherwise occur from the timeout promise.
+          // Prevent any 'unhandled Promise rejection' events that may otherwise
+          // occur from the timeout promise.
           timeoutPromise.catch(() => {});
-        });
-        combinedPromise.catch((err) => {
+        }).catch((err) => {
           completionPromise.resolve(err);
-          throw err;
         });
 
+        // Any errors from the keyboard-loading process will continue to be
+        // forwarded through the main returned Promise.
         return combinedPromise;
       });
 

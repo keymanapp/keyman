@@ -1,5 +1,5 @@
-import { type Keyboard, KeyboardKeymanGlobal, ProcessorInitOptions } from "@keymanapp/keyboard-processor";
-import { DOMKeyboardLoader as KeyboardLoader } from "@keymanapp/keyboard-processor/dom-keyboard-loader";
+import { type Keyboard, KeyboardKeymanGlobal, ProcessorInitOptions, ManagedPromise, KeyboardScriptError } from "@keymanapp/keyboard-processor";
+import { DOMKeyboardLoader as KeyboardLoader, keyboardScriptErrorFilterer } from "@keymanapp/keyboard-processor/dom-keyboard-loader";
 import { InputProcessor, PredictionContext } from "@keymanapp/input-processor";
 import { OSKView } from "keyman/engine/osk";
 import { KeyboardRequisitioner, ModelCache, ModelSpec, toUnprefixedKeyboardId as unprefixed } from "keyman/engine/package-cache";
@@ -263,7 +263,7 @@ export default class KeymanEngine<
     });
 
     kbdCache.on('stubadded', (stub) => {
-      let eventRaiser = () => {
+      let eventRaiser = async () => {
         // The corresponding event is needed in order to update UI modules as new keyboard stubs "come online".
         this.legacyAPIEvents.callEvent('keyboardregistered', {
           internalName: stub.KI,
@@ -275,8 +275,23 @@ export default class KeymanEngine<
 
         // If this is the first stub loaded, set it as active.
         if(this.config.activateFirstKeyboard && this.keyboardRequisitioner.cache.defaultStub == stub) {
-          // Note:  leaving this out is super-useful for debugging issues that occur when no keyboard is active.
-          this.contextManager.activateKeyboard(stub.id, stub.langId, true);
+          // Note:  this can trigger before the OSK is first built; such a
+          // situation can present a problem for debug-mode keyboards (as
+          // certain values are accessed through `keyman.osk`).
+          window.addEventListener('error', keyboardScriptErrorFilterer);
+
+          try {
+            // Note:  leaving this out is super-useful for debugging issues that occur when no keyboard is active.
+            await this.contextManager.activateKeyboard(stub.id, stub.langId, true);
+          } catch (err) {
+            if(err instanceof KeyboardScriptError) {
+              this.config.deferForOsk.then(() => this.setActiveKeyboard(stub.id, stub.langId));
+            } else {
+              throw err;
+            }
+          } finally {
+            window.removeEventListener('error', keyboardScriptErrorFilterer);
+          }
         }
       }
 
@@ -360,6 +375,13 @@ export default class KeymanEngine<
       }
       value.on('keyevent', this.keyEventListener);
       this.core.keyboardProcessor.layerStore.handler = value.layerChangeHandler;
+
+      // Trigger any deferred operations that require a present OSK.
+      // For example, debug-mode keyboards use APIs available through the OSK.
+      this.config.deferForOsk.resolve();
+    } else {
+      // If the OSK was cleared, we may need to restore deferment for debug-mode keyboards.
+      this.config.deferForOsk = new ManagedPromise<void>();
     }
   }
 
