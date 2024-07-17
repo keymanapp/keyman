@@ -1,6 +1,6 @@
 import { EventEmitter } from "eventemitter3";
 import type LanguageProcessor from "./languageProcessor.js";
-import { type ReadySuggestions, type InvalidateSourceEnum, StateChangeHandler } from './languageProcessor.js';
+import { ReadySuggestions, type InvalidateSourceEnum, StateChangeHandler } from './languageProcessor.js';
 import { type KeyboardProcessor, type OutputTarget } from "@keymanapp/keyboard-processor";
 
 interface PredictionContextEventMap {
@@ -89,11 +89,9 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     this.suggestionReverter = async (reversion) => {
       if(validSuggestionState()) {
         let suggestions = await langProcessor.applyReversion(reversion, this.currentTarget);
-
-        // We bypass the 'standard' "new suggestions" pipeline, as these aren't NEW suggestions.
-        // We also want to avoid altering flags that would indicate our post-reversion state.
-        this._currentSuggestions = suggestions;
-        this.sendUpdateEvent();
+        // We want to avoid altering flags that would indicate our post-reversion state.
+        this.swallowPrediction = true;
+        this.updateSuggestions(new ReadySuggestions(suggestions, reversion.id ? -reversion.id : undefined));
       }
     }
 
