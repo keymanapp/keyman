@@ -220,6 +220,13 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     // Let any deferred, pre-init stubs complete registration
     await this.config.deferForInitialization;
 
+    // We know the upcoming keyboard-load attempt may fail for debug-mode keyboards,
+    // so we aim to silence the script's emitted error if the type matches.
+    //
+    // Other areas also use the same filter function, so we create a distinct function
+    // unique to this location for our listener.
+    const errorFilterer = (event: ErrorEvent) => keyboardScriptErrorFilterer(event);
+    window.addEventListener('error', errorFilterer);
     /*
       Attempt to restore the user's last-used keyboard from their previous session.
       The method auto-loads the default stub if one is available and the last-used keyboard
@@ -229,7 +236,6 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
       If we tracked cloud requests and awaited a Promise.all on pending queries,
       we could handle that too.
     */
-    window.addEventListener('error', keyboardScriptErrorFilterer);
     const loadingKbd: Promise<any> = this.contextManager.restoreSavedKeyboard(savedKeyboardStr);
 
     // Wait for the initial keyboard to load before setting the OSK; this will avoid building an
@@ -247,7 +253,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
       }
       /* in case of failed fetch due to network error or bad URI; we must still let the OSK init. */
     } finally {
-      window.removeEventListener('error', keyboardScriptErrorFilterer);
+      window.removeEventListener('error', errorFilterer);
     };
 
     const firstKbdConfig = {

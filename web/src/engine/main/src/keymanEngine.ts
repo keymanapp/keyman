@@ -278,7 +278,11 @@ export default class KeymanEngine<
           // Note:  this can trigger before the OSK is first built; such a
           // situation can present a problem for debug-mode keyboards (as
           // certain values are accessed through `keyman.osk`).
-          window.addEventListener('error', keyboardScriptErrorFilterer);
+          //
+          // Other areas also use the same filter function, so we create a distinct function
+          // unique to this location for our listener.
+          const errorFilterer = (event: ErrorEvent) => keyboardScriptErrorFilterer(event);
+          window.addEventListener('error', errorFilterer);
 
           try {
             // Note:  leaving this out is super-useful for debugging issues that occur when no keyboard is active.
@@ -290,7 +294,7 @@ export default class KeymanEngine<
               throw err;
             }
           } finally {
-            window.removeEventListener('error', keyboardScriptErrorFilterer);
+            window.removeEventListener('error', errorFilterer);
           }
         }
       }

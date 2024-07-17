@@ -485,8 +485,9 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     }
   }
 
-  public async activateKeyboard(keyboardId: string, languageCode?: string, saveCookie?: boolean): Promise<boolean> {
+  public async activateKeyboard(keyboardId: string, languageCode?: string, saveCookie?: boolean, silenceErrorLogging?: boolean): Promise<boolean> {
     saveCookie ||= false;
+    silenceErrorLogging ||= false;
     const originalKeyboardTarget = this.currentKeyboardSrcTarget();
 
     // If someone tries to activate a keyboard before we've had a chance to load it,
@@ -538,14 +539,16 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
       const message = (err as Error)?.message ||
                       'Sorry, the ' + keyboardId + ' keyboard for ' + languageCode + ' is not currently available.';
 
-      if(err instanceof KeyboardScriptError) {
-        // We get signaled about error log messages if the site is connected to our Sentry error reporting
-        // system; we want to know if we have a broken keyboard that's been published.
-        console.error(err || message);
-      } else {
-        // If it's just internet connectivity or "file not found" issues, that's not worth reporting
-        // to Sentry.
-        console.warn(err || message);
+      if(!silenceErrorLogging) {
+        if(err instanceof KeyboardScriptError) {
+          // We get signaled about error log messages if the site is connected to our Sentry error reporting
+          // system; we want to know if we have a broken keyboard that's been published.
+          console.error(err || message);
+        } else {
+          // If it's just internet connectivity or "file not found" issues, that's not worth reporting
+          // to Sentry.
+          console.warn(err || message);
+        }
       }
 
       if(this.engineConfig.alertHost) {
@@ -824,7 +827,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     // Sets the default stub (as specified with the `getSavedKeyboard` call) as active.
     if(stub) {
-      return this.activateKeyboard(stub.id, stub.langId, true);
+      return this.activateKeyboard(stub.id, stub.langId, true, true);
     } else {
       return Promise.resolve(false);
     }
