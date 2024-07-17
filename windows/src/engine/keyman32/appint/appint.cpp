@@ -28,8 +28,10 @@
 
 PWSTR decxstr(PWSTR p, PWSTR pStart);
 
+// QIT_VSHIFTDOWN and QIT_VSHIFTUP deprecated see #11925
+// Change to Deprecated to avoid array and index reshuffle
 const LPSTR ItemTypes[8] = {
-	"QIT_VKEYDOWN", "QIT_VKEYUP", "QIT_VSHIFTDOWN", "QIT_VSHIFTUP",
+	"QIT_VKEYDOWN", "QIT_VKEYUP", "QIT_DEPRECATED", "QIT_DEPRECATED",
     "QIT_CHAR", "QIT_DEADKEY", "QIT_BELL", "QIT_BACK" };
 
 /* AppActionQueue */

@@ -82,8 +82,8 @@ BOOL AIWin2000Unicode::IsUnicode()
 
 BOOL AIWin2000Unicode::ReadContext(PWSTR buf) {
   UNREFERENCED_PARAMETER(buf);
-  // We cannot read any context from legacy apps, so we return a 
-  // failure here -- telling Core to maintain its own cached 
+  // We cannot read any context from legacy apps, so we return a
+  // failure here -- telling Core to maintain its own cached
   // context.
   return FALSE;
 }
@@ -178,10 +178,6 @@ BOOL AIWin2000Unicode::PostKeys()
         pInputs[i++].ki.dwExtraInfo = 0; //KEYEVENT_EXTRAINFO_KEYMAN;   // I4370   // I4378
       }
 
-		  break;
-	  case QIT_VSHIFTDOWN:
-		  break;
-	  case QIT_VSHIFTUP:
 		  break;
 	  case QIT_CHAR:
       pInputs[i].type = INPUT_KEYBOARD;
