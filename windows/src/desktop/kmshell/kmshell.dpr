@@ -181,7 +181,7 @@ uses
   UpdateXMLRenderer in 'render\UpdateXMLRenderer.pas',
   Keyman.System.UpdateCheckStorage in 'main\Keyman.System.UpdateCheckStorage.pas',
   Keyman.System.RemoteUpdateCheck in 'main\Keyman.System.RemoteUpdateCheck.pas',
-  Keyman.System.Update in 'main\Keyman.System.Update.pas',
+  Keyman.System.UpdateStateMachine in 'main\Keyman.System.UpdateStateMachine.pas',
   Keyman.System.DownloadUpdate in 'main\Keyman.System.DownloadUpdate.pas',
   Keyman.System.ExecuteHistory in '..\..\..\..\common\windows\delphi\general\Keyman.System.ExecuteHistory.pas',
   UfrmStartInstall in 'main\UfrmStartInstall.pas' {Form1};

@@ -144,7 +144,7 @@ uses
   UpgradeMnemonicLayout,
   utilfocusappwnd,
   utilkmshell,
-  Keyman.System.Update,
+  Keyman.System.UpdateStateMachine,
 
   KeyboardTIPCheck,
 
@@ -387,7 +387,7 @@ var
   kdl: IKeymanDefaultLanguage;
   FIcon: string;
   FMutex: TKeymanMutex;  // I2720
-  BUpdateSM : TBackgroundUpdate;
+  BUpdateSM : TUpdateStateMachine;
     function FirstKeyboardFileName: WideString;
     begin
       if KeyboardFileNames.Count = 0
@@ -436,7 +436,7 @@ begin
   end;
   // TODO: #10038  Will add this as part of the background update state machine
   // for now just verifing the download happens via -buc switch.
-  BUpdateSM := TBackgroundUpdate.Create(False);
+  BUpdateSM := TUpdateStateMachine.Create(False);
     try
       if (FMode = fmBackgroundUpdateCheck) then
       begin
