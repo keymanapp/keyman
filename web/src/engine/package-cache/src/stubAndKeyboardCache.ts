@@ -134,7 +134,7 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
     return cachedEntry instanceof Promise;
   }
 
-  async fetchKeyboard(keyboardID: string): Promise<Keyboard> {
+  fetchKeyboard(keyboardID: string): Promise<Keyboard> {
     if(!keyboardID) {
       throw new Error("Keyboard ID must be specified");
     }
@@ -164,16 +164,22 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
     const promise = this.keyboardLoader.loadKeyboardFromStub(stub);
     this.keyboardTable[keyboardID] = promise;
 
-    try {
-      const kbd = await promise;
+    promise.then((kbd) => {
       // Overrides the built-in ID in case of keyboard namespacing.
       kbd.scriptObject["KI"] = keyboardID;
       this.addKeyboard(kbd);
       return kbd;
-    } catch (err) {
+    }).catch(() => {
       delete this.keyboardTable[keyboardID];
-      throw err;
-    };
+      // Do NOT throw; the returned `promise` will throw the error as well;
+      // it will be handled via that pathway.
+      //
+      // Otherwise, we get duplicate errors... and become unable to silence
+      // the error here even if we're silencing it elsewhere (say, when
+      // trying to load a debug-mode keyboard too early).
+    });
+
+    return promise;
   }
 
   addStub(stub: KeyboardStub) {
