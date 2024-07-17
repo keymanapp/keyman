@@ -89,7 +89,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     this.suggestionReverter = async (reversion) => {
       if(validSuggestionState()) {
         let suggestions = await langProcessor.applyReversion(reversion, this.currentTarget);
-        // We want to avoid altering flags that would indicate our post-reversion state.
+        // We want to avoid altering flags that indicate our post-reversion state.
         this.swallowPrediction = true;
         this.updateSuggestions(new ReadySuggestions(suggestions, reversion.id ? -reversion.id : undefined));
       }
