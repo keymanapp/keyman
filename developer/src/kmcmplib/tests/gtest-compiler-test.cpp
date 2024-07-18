@@ -337,6 +337,28 @@ TEST_F(CompilerTest, LineTokenType_test) {
     p = str;
     kmcmp::CompileTarget = CKF_KEYMANWEB;
     EXPECT_EQ(T_BLANK, LineTokenType(&p));
+
+    // T_BLANK, no rhs
+    u16cpy(str, u"$keyman:");
+    p = str;
+    kmcmp::CompileTarget = CKF_KEYMAN;
+    EXPECT_EQ(T_BLANK, LineTokenType(&p));
+
+    // T_STORE (=T_W_START)
+    u16cpy(str, u"$keyman:store(b)");
+    p = str;
+    kmcmp::CompileTarget = CKF_KEYMAN;
+    EXPECT_EQ(T_STORE, LineTokenType(&p));
+    EXPECT_EQ(13, p - str);
+    EXPECT_TRUE(!u16cmp(p, u"(b)"));
+
+    // T_BITMAPS (=T_W_END)
+    u16cpy(str, u"$keyman:bitmaps \"b\"");
+    p = str;
+    kmcmp::CompileTarget = CKF_KEYMAN;
+    EXPECT_EQ(T_BITMAPS, LineTokenType(&p));
+    EXPECT_EQ(16, p - str);
+    EXPECT_TRUE(!u16cmp(p, u"\"b\""));
 }
 
 // KMX_BOOL StrValidChrs(PKMX_WCHAR q, KMX_WCHAR const * chrs)
