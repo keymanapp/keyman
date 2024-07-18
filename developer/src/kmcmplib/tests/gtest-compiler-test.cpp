@@ -326,39 +326,61 @@ TEST_F(CompilerTest, LineTokenType_test) {
     p = str;
     EXPECT_EQ(T_BLANK, LineTokenType(&p));
 
-    // T_BLANK, CKF_KEYMAN, lptKeymanWebOnly
+    // T_BLANK, mismatched prefix, CKF_KEYMAN, lptKeymanWebOnly
     u16cpy(str, u"$keymanweb:");
     p = str;
     kmcmp::CompileTarget = CKF_KEYMAN;
     EXPECT_EQ(T_BLANK, LineTokenType(&p));
 
-    // T_BLANK, CKF_KEYMANWEB, lptKeymanOnly
+    // T_BLANK, mismatched prefix, CKF_KEYMANWEB, lptKeymanOnly
     u16cpy(str, u"$keymanonly:");
     p = str;
     kmcmp::CompileTarget = CKF_KEYMANWEB;
     EXPECT_EQ(T_BLANK, LineTokenType(&p));
 
-    // T_BLANK, no rhs
+    // T_BLANK, nothing after prefix
     u16cpy(str, u"$keyman:");
     p = str;
     kmcmp::CompileTarget = CKF_KEYMAN;
     EXPECT_EQ(T_BLANK, LineTokenType(&p));
 
     // T_STORE (=T_W_START)
-    u16cpy(str, u"$keyman:store(b)");
+    u16cpy(str, u"store(b)");
     p = str;
-    kmcmp::CompileTarget = CKF_KEYMAN;
     EXPECT_EQ(T_STORE, LineTokenType(&p));
-    EXPECT_EQ(13, p - str);
+    EXPECT_EQ(u16len(u"store"), p - str);
     EXPECT_TRUE(!u16cmp(p, u"(b)"));
 
     // T_BITMAPS (=T_W_END)
-    u16cpy(str, u"$keyman:bitmaps \"b\"");
+    u16cpy(str, u"bitmaps \"b\"");
     p = str;
-    kmcmp::CompileTarget = CKF_KEYMAN;
     EXPECT_EQ(T_BITMAPS, LineTokenType(&p));
-    EXPECT_EQ(16, p - str);
+    EXPECT_EQ(u16len(u"bitmaps "), p - str);
     EXPECT_TRUE(!u16cmp(p, u"\"b\""));
+
+    // T_COMMENT
+    u16cpy(str, u"c ");
+    p = str;
+    EXPECT_EQ(T_COMMENT, LineTokenType(&p));
+    EXPECT_EQ(0, p - str);
+
+    // comment without following space
+    u16cpy(str, u"c");
+    p = str;
+    EXPECT_EQ(T_UNKNOWN, LineTokenType(&p));
+    EXPECT_EQ(0, p - str);
+
+    // T_KEYTOKEY
+    u16cpy(str, u"abc");
+    p = str;
+    EXPECT_EQ(T_KEYTOKEY, LineTokenType(&p));
+    EXPECT_EQ(0, p - str);
+
+     // T_UNKNOWN
+    u16cpy(str, u"z");
+    p = str;
+    EXPECT_EQ(T_UNKNOWN, LineTokenType(&p));
+    EXPECT_EQ(0, p - str);
 }
 
 // KMX_BOOL StrValidChrs(PKMX_WCHAR q, KMX_WCHAR const * chrs)
