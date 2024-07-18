@@ -62,7 +62,13 @@ export function determineModelWordbreaker(model: LexicalModel): (context: Contex
 export function determineModelTokenizer(model: LexicalModel) {
   return (context: Context) => {
     if(model.wordbreaker) {
-      return models.tokenize(model.wordbreaker, context);
+      const fullTokenization = models.tokenize(model.wordbreaker, context);
+
+      return {
+        left:  fullTokenization.left .filter((entry) => !entry.isWhitespace).map((entry) => entry.text),
+        right: fullTokenization.right.filter((entry) => !entry.isWhitespace).map((entry) => entry.text),
+        caretSplitsToken: fullTokenization.caretSplitsToken
+      }
     } else {
       return null;
     }

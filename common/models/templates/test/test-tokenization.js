@@ -6,6 +6,28 @@ import { assert } from 'chai';
 import * as models from "@keymanapp/models-templates";
 import * as wordBreakers from "@keymanapp/models-wordbreakers";
 
+function asProcessedToken(text) {
+  // default wordbreaker emits these at the end of each context half if ending with whitespace.
+  // Indicates a new spot for non-whitespace text.
+  if(text == '') {
+    return {
+      text: text
+    };
+  } else if(text.trim() == '') {
+    // Simple cases using standard Latin-script patterns - can be handled via trim()
+    return {
+      text: text,
+      isWhitespace: true
+    };
+  }
+
+  // could add simple check for other, non-default cases here.
+
+  return {
+    text: text
+  };
+}
+
 describe('Tokenization functions', function() {
   describe('tokenize', function() {
     it('tokenizes English using defaults, pre-whitespace caret', function() {
@@ -19,8 +41,8 @@ describe('Tokenization functions', function() {
       let tokenization = models.tokenize(wordBreakers.default, context);
 
       let expectedResult = {
-        left: ['The', 'quick', 'brown', 'fox'],
-        right: ['jumped', 'over', 'the', 'lazy', 'dog'],
+        left: ['The', ' ', 'quick', ' ', 'brown', ' ', 'fox'].map(asProcessedToken),
+        right: [' ', 'jumped', ' ', 'over', ' ', 'the', ' ', 'lazy', ' ', 'dog'].map(asProcessedToken),
         caretSplitsToken: false
       };
 
@@ -30,7 +52,7 @@ describe('Tokenization functions', function() {
     it('tokenizes English using defaults, pre-whitespace caret, partial context', function() {
       let context = {
         left: "quick brown fox",        // No "The"
-        right: " jumped over the lazy", // No "dog"
+        right: " jumped over the lazy ", // No "dog"
         startOfBuffer: false,
         endOfBuffer: false
       };
@@ -38,8 +60,8 @@ describe('Tokenization functions', function() {
       let tokenization = models.tokenize(wordBreakers.default, context);
 
       let expectedResult = {
-        left: ['quick', 'brown', 'fox'],
-        right: ['jumped', 'over', 'the', 'lazy'],
+        left: ['quick', ' ', 'brown', ' ', 'fox'].map(asProcessedToken),
+        right: [' ', 'jumped', ' ', 'over', ' ', 'the', ' ', 'lazy', ' ', ''].map(asProcessedToken),
         caretSplitsToken: false
       };
 
@@ -59,9 +81,30 @@ describe('Tokenization functions', function() {
       // Technically, we're editing the start of the first token on the right
       // when in this context.
       let expectedResult = {
-        left: ['The', 'quick', 'brown', 'fox', ''],
-        right: ['jumped', 'over', 'the', 'lazy', 'dog'],
+        left: ['The', ' ', 'quick', ' ', 'brown', ' ', 'fox', ' ', ''].map(asProcessedToken),
+        right: ['jumped', ' ', 'over', ' ', 'the', ' ', 'lazy', ' ', 'dog'].map(asProcessedToken),
         caretSplitsToken: true
+      };
+
+      assert.deepEqual(tokenization, expectedResult);
+    });
+
+    it('tokenizes English using ascii-breaker, post-whitespace caret', function() {
+      let context = {
+        left: "The quick brown fox ",
+        right: "jumped over the lazy dog ",
+        startOfBuffer: true,
+        endOfBuffer: true
+      };
+
+      let tokenization = models.tokenize(wordBreakers.ascii, context);
+
+      // Technically, we're editing the start of the first token on the right
+      // when in this context.
+      let expectedResult = {
+        left: ['The', ' ', 'quick', ' ', 'brown', ' ', 'fox', ' '].map(asProcessedToken),
+        right: ['jumped', ' ', 'over', ' ', 'the', ' ', 'lazy', ' ', 'dog', ' '].map(asProcessedToken),
+        caretSplitsToken: false
       };
 
       assert.deepEqual(tokenization, expectedResult);
@@ -80,8 +123,8 @@ describe('Tokenization functions', function() {
       // Technically, we're editing the start of the first token on the right
       // when in this context.
       let expectedResult = {
-        left: ['quick', 'brown', 'fox', ''],
-        right: ['jumped', 'over', 'the', 'lazy'],
+        left: ['quick', ' ', 'brown', ' ', 'fox', ' ', ''].map(asProcessedToken),
+        right: ['jumped', ' ', 'over', ' ', 'the', ' ', 'lazy'].map(asProcessedToken),
         caretSplitsToken: true
       };
 
@@ -99,8 +142,8 @@ describe('Tokenization functions', function() {
       let tokenization = models.tokenize(wordBreakers.default, context);
 
       let expectedResult = {
-        left: ['The', 'quick', 'brown', 'fox', 'jum'],
-        right: ['ped', 'over', 'the', 'lazy', 'dog'],
+        left: ['The', ' ', 'quick', ' ', 'brown', ' ', 'fox', ' ', 'jum'].map(asProcessedToken),
+        right: ['ped', ' ', 'over', ' ', 'the', ' ', 'lazy', ' ', 'dog'].map(asProcessedToken),
         caretSplitsToken: true
       };
 
@@ -118,8 +161,8 @@ describe('Tokenization functions', function() {
       let tokenization = models.tokenize(wordBreakers.default, context);
 
       let expectedResult = {
-        left: ['The', 'quick', 'brown', 'fox', 'jum'],
-        right: ['ped', 'over', 'the', 'lazy', 'dog'],
+        left: ['The', ' ', 'quick', ' ', 'brown', ' ', 'fox', ' ', 'jum'].map(asProcessedToken),
+        right: ['ped', ' ', 'over', ' ', 'the', ' ', 'lazy', ' ', 'dog'].map(asProcessedToken),
         caretSplitsToken: true
       };
 
@@ -167,12 +210,91 @@ describe('Tokenization functions', function() {
       let tokenization = models.tokenize(wordBreakers.default, context);
 
       let expectedResult = {
-        left: [''],
+        left: [' ', ''].map(asProcessedToken),
         right: [],
         caretSplitsToken: false
       };
 
       assert.deepEqual(tokenization, expectedResult);
+    });
+
+    it('properly tokenizes partial English contractions - default setting', function() {
+      let context = {
+        left: "I can'",
+        right: "",
+        startOfBuffer: true,
+        endOfBuffer: true
+      };
+
+      let tokenization = models.tokenize(wordBreakers.default, context);
+
+      // Technically, we're editing the start of the first token on the right
+      // when in this context.
+      let expectedResult = {
+        left: ['I', ' ', 'can\''].map(asProcessedToken),
+        right: [].map(asProcessedToken),
+        caretSplitsToken: false
+      };
+
+      assert.deepEqual(tokenization, expectedResult);
+    });
+
+    it('overly tokenizes partial English contractions when (default) apostrophe rejoin is disabled', function() {
+      let context = {
+        left: "I can'",
+        right: "",
+        startOfBuffer: true,
+        endOfBuffer: true
+      };
+
+      let tokenization = models.tokenize(wordBreakers.default, context, { rejoins: [] });
+
+      // Technically, we're editing the start of the first token on the right
+      // when in this context.
+      let expectedResult = {
+        left: ['I', ' ', 'can' , '\''].map(asProcessedToken),
+        right: [].map(asProcessedToken),
+        caretSplitsToken: false
+      };
+
+      assert.deepEqual(tokenization, expectedResult);
+    });
+
+    it('properly tokenizes English contractions', function() {
+      // Note: a 'context0' with the caret before the `'` actually
+      // is not supported well yet; a leading `'` is broken from
+      // following text when in isolation.
+
+      let context1 = {
+        left: "I can'",
+        right: "t",
+        startOfBuffer: true,
+        endOfBuffer: true
+      };
+
+      let context2 = {
+        left: "I can't",
+        right: "",
+        startOfBuffer: true,
+        endOfBuffer: true
+      }
+
+      let tokenization1 = models.tokenize(wordBreakers.default, context1);
+      let tokenization2 = models.tokenize(wordBreakers.default, context2);
+
+      let expectedResult1 = {
+        left: ['I', ' ', 'can\''].map(asProcessedToken),
+        right: ['t'].map(asProcessedToken),
+        caretSplitsToken: true
+      };
+      let expectedResult2 = {
+        left: ['I', ' ', 'can\'t'].map(asProcessedToken),
+        right: [].map(asProcessedToken),
+        caretSplitsToken: false
+      };
+
+      assert.deepEqual(tokenization1, expectedResult1);
+      assert.deepEqual(tokenization2, expectedResult2);
     });
 
     // For the next few tests:  a mocked wordbreaker for Khmer, a language
@@ -258,8 +380,8 @@ describe('Tokenization functions', function() {
       let tokenization = models.tokenize(mockedKhmerBreaker, context);
 
       let expectedResult = {
-        left: ['ស្រុក'],
-        right: ['ខ្មែរ'],
+        left: ['ស្រុក'].map(asProcessedToken),
+        right: ['ខ្មែរ'].map(asProcessedToken),
         caretSplitsToken: false
       };
 
@@ -282,8 +404,8 @@ describe('Tokenization functions', function() {
       let tokenization = models.tokenize(mockedKhmerBreaker, context);
 
       let expectedResult = {
-        left: ['ស្រុ'],
-        right: ['ក', 'ខ្មែរ'],
+        left: ['ស្រុ'].map(asProcessedToken),
+        right: ['ក', 'ខ្មែរ'].map(asProcessedToken),
         caretSplitsToken: true
       };
 
@@ -326,21 +448,21 @@ describe('Tokenization functions', function() {
       let tokenization = models.tokenize(wordBreakers.default, context);
 
       assert.deepEqual(tokenization, {
-        left: ["don", "-"],
-        right: ["worry"],
+        left: ["don", "-"].map(asProcessedToken),
+        right: [" ", "worry"].map(asProcessedToken),
         caretSplitsToken: false
       });
 
       tokenization = models.tokenize(midLetterNonbreaker, context);
 
       assert.deepEqual(tokenization, {
-        left: ["don-"],
-        right: ["worry"],
+        left: ["don-"].map(asProcessedToken),
+        right: [" ", "worry"].map(asProcessedToken),
         caretSplitsToken: false
       });
     });
 
-    it('handles mid-contraction tokenization', function() {
+    it('handles mid-contraction tokenization (via wordbreaker customization)', function() {
       let context = {
         left: "don:",
         right: "t worry",
@@ -351,17 +473,20 @@ describe('Tokenization functions', function() {
       let tokenization = models.tokenize(wordBreakers.default, context);
 
       assert.deepEqual(tokenization, {
-        left: ["don", ":"],    // This particular case feels like a possible issue.
-        right: ["t", "worry"], // It'd be a three-way split token, as "don:t" would
-                               // be a single token were it not for the caret in the middle.
+        // This particular case feels like a possible issue.
+        // It'd be a three-way split token, as "don:t" would
+        // be a single token were it not for the caret in the middle.
+        left: ["don", ":"].map(asProcessedToken),
+        right: ["t", " ", "worry"].map(asProcessedToken),
+
         caretSplitsToken: false
       })
 
       tokenization = models.tokenize(midLetterNonbreaker, context);
 
       assert.deepEqual(tokenization, {
-        left: ["don:"],
-        right: ["t", "worry"],
+        left: ["don:"].map(asProcessedToken),
+        right: ["t", " ", "worry"].map(asProcessedToken),
         caretSplitsToken: true
       });
     });
@@ -394,6 +519,20 @@ describe('Tokenization functions', function() {
       assert.equal(tokenization, '');
     });
 
+
+    it('with post-whitespace caret, ascii breaker', function() {
+      let context = {
+        left: "The quick brown fox ",
+        right: "jumped over the lazy dog",
+        startOfBuffer: true,
+        endOfBuffer: true
+      };
+
+      let tokenization = models.getLastPreCaretToken(wordBreakers.ascii, context);
+
+      assert.equal(tokenization, '');
+    });
+
     it('within a token', function() {
       let context = {
         left: "The quick brown fox jum",
@@ -405,6 +544,11 @@ describe('Tokenization functions', function() {
       let tokenization = models.getLastPreCaretToken(wordBreakers.default, context);
 
       assert.equal(tokenization, 'jum');
+    });
+
+    it('with no context', function() {
+      let tokenization = models.getLastPreCaretToken(wordBreakers.default, null);
+      assert.equal(tokenization, '');
     });
   });
 

@@ -323,7 +323,7 @@ export class ModelCompositor {
     return breaker(context);
   }
 
-  private tokenize(context: Context): models.Tokenization {
+  private tokenize(context: Context) {
     const tokenizer = determineModelTokenizer(this.lexicalModel);
     return tokenizer(context);
   }
