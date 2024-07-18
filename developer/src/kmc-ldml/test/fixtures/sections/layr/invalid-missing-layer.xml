@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="en" conformsTo="45">
+  <info name="layr-invalid-form"/>
+
+  <keys>
+    <key id="grave" output="`" />
+    <key id="one" output="1" />
+  </keys>
+
+  <layers formId="touch">
+    <!-- INVALID: need at least one layer. -->
+  </layers>
+</keyboard3>

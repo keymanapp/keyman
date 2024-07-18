@@ -1,61 +1,80 @@
 #!/usr/bin/env bash
-# Build KMSample1
-
-set -e
-set -u
-
-display_usage ( ) {
-    echo "build.sh [-no-daemon] [-debug]"
-    echo
-    echo "Build KM Sample 1"
-    echo "  -no-daemon              Don't start the Gradle daemon. Use for CI"
-    echo "  -debug                  Compile only Debug variant"
-    exit 1
-}
-
-echo Build KMSample1
-
 #
-# Prevents 'clear' on exit of mingw64 bash shell
-#
-SHLVL=0
+# Samples: KMsample1
+## START STANDARD BUILD SCRIPT INCLUDE
+# adjust relative paths as necessary
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+## END STANDARD BUILD SCRIPT INCLUDE
 
-NO_DAEMON=false
-ONLY_DEBUG=false
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+
+################################ Main script ################################
+
+# Definition of global compile constants
+
+CONFIG="release"
+SAMPLE_FLAGS="build"
+
+builder_describe "Build KMSample1 app for Android." \
+  "@/android/KMEA" \
+  "clean" \
+  "configure" \
+  "build" \
+  "test" \
+  ":app                   KMSample1" \
+  "--ci                   Don't start the Gradle daemon. Use for CI"
+
+# parse before describe_outputs to check debug flags
+builder_parse "$@"
+
+ARTIFACT="app-release-unsigned.apk"
+
+if builder_is_debug_build; then
+  builder_heading "### Debug config ####"
+  CONFIG="debug"
+  SAMPLE_FLAGS="assembleDebug"
+  ARTIFACT="app-$CONFIG.apk"
+fi
+
+
+builder_describe_outputs \
+  configure             /android/Samples/KMSample1/app/libs/keyman-engine.aar \
+  build:app             /android/Samples/KMSample1/app/build/outputs/apk/$CONFIG/$ARTIFACT
+
+
 
 # Parse args
-while [[ $# -gt 0 ]] ; do
-    key="$1"
-    case $key in
-        -no-daemon)
-            NO_DAEMON=true
-            ;;
-        -debug)
-            ONLY_DEBUG=true
-            ;;
-        -h|-\?)
-            display_usage
-            ;;
-    esac
-    shift # past argument
-done
 
-echo
-echo "NO_DAEMON: $NO_DAEMON"
-echo "ONLY_DEBUG: $ONLY_DEBUG"
-echo
-
-if [ "$NO_DAEMON" = true ]; then
-  DAEMON_FLAG=--no-daemon
-else
-  DAEMON_FLAG=
+if builder_has_option --ci; then
+  SAMPLE_FLAGS="$SAMPLE_FLAGS -no-daemon"
 fi
 
-if [ "$ONLY_DEBUG" = true ]; then
-  BUILD_FLAG=assembleDebug
-else
-  BUILD_FLAG=build
+#### Build action definitions ####
+
+# Check about cleaning artifact paths
+if builder_start_action clean:app; then
+  rm -rf "$KEYMAN_ROOT/android/Samples/KMSample1/app/build/outputs"
+  builder_finish_action success clean:app
 fi
 
-./gradlew $DAEMON_FLAG clean $BUILD_FLAG
+if builder_start_action configure:app; then
 
+  builder_finish_action success configure:app
+fi
+
+# Building KMSample1
+if builder_start_action build:app; then
+
+  # Copy Keyman Engine for Android
+  cp "$KEYMAN_ROOT/android/KMEA/app/build/outputs/aar/keyman-engine-${CONFIG}.aar" "$KEYMAN_ROOT/android/Samples/KMSample1/app/libs/keyman-engine.aar"
+
+  ./gradlew clean $SAMPLE_FLAGS
+
+  builder_finish_action success build:app
+fi
+
+if builder_start_action test:app; then
+  # TODO: define tests
+  builder_finish_action success test:app
+fi

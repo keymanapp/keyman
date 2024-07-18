@@ -14,7 +14,7 @@ DEBIAN_SUITES=($UNSTABLE_CODENAME $TESTING_CODENAME $STABLE_CODENAME $STABLE_BAC
     "experimental" "unstable" "testing" "stable")
 
 # List of Ubuntu suites. Update these when needed.
-UBUNTU_SUITES=("kinetic" "jammy" "focal" "bionic")
+UBUNTU_SUITES=("noble" "mantic" "jammy" "focal")
 
 # Mirrors to use. Update these to your preferred mirror.
 DEBIAN_MIRROR="deb.debian.org"

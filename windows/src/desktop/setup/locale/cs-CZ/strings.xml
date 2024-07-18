@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">čeština</string>
+  <string name="ssApplicationTitle">$APPNAME $VERSION nastavení</string>
+  <string name="ssTitle">Nainstalovat $APPNAME $VERSION</string>
+  <string name="ssInstallSuccess">$APPNAME $VERSION byl úspěšně nainstalován.</string>
+  <string name="ssCancelQuery">Jste si jisti, že chcete zrušit instalaci $APPNAME?</string>
+  <string name="ssBootstrapExtractingBundle">Rozbalování balíku...</string>
+  <string name="ssBootstrapCheckingPackages">Kontroluji balíčky...</string>
+  <string name="ssBootstrapCheckingForUpdates">Probíhá kontrola aktualizací...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">Kontrola nainstalovaných verzí...</string>
+  <string name="ssBootstrapReady">Dokončování...</string>
+  <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
+  <string name="ssActionInstallKeyman">• $APPNAME %0:s %1:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
+  <string name="ssActionInstallPackage">• %0:s %1:s %2:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: ssActionDownload -->
+  <string name="ssActionInstallPackageLanguage">• %0:s %1:s pro %2:s %3:s</string>
+  <string name="ssActionNothingToInstall">Není co instalovat.</string>
+  <!-- Parameters: %0:s download size -->
+  <string name="ssActionDownload">(%0:s stažení)</string>
+  <string name="ssActionInstall">Nastavení nainstaluje:</string>
+  <string name="ssFreeCaption">$APPNAME $VERSION je zdarma a open source</string>
+  <string name="ssLicenseLink">&amp;Přečtěte si licenci</string>
+  <string name="ssInstallOptionsLink">Instalovat &amp;možnosti</string>
+  <string name="ssMessageBoxTitle">Nastavení $APPNAME</string>
+  <string name="ssOkButton">OK</string>
+  <string name="ssInstallButton">&amp;Instalovat</string>
+  <string name="ssCancelButton">Zrušit</string>
+  <string name="ssExitButton">E&amp;xit</string>
+  <string name="ssStatusInstalling">Instalace $APPNAME</string>
+  <string name="ssStatusRemovingOlderVersions">Odstranění starších verzí</string>
+  <string name="ssStatusComplete">Instalace dokončena</string>
+  <string name="ssQueryRestart">Před dokončením nastavení je třeba Windows restartovat. Po restartu systému bude instalace pokračovat.
+
+Restartovat nyní?</string>
+  <string name="ssErrorUnableToAutomaticallyRestart">Windows se nepodařilo automaticky restartovat. Před spuštěním $APPNAME byste měli Windows restartovat .</string>
+  <string name="ssMustRestart">Pro dokončení nastavení musíte restartovat Windows. Po restartu Windows, instalace skončí.</string>
+  <string name="ssOldOsVersionInstallKeyboards">$APPNAME $VERSION vyžaduje instalaci Windows 7 nebo novější. Nicméně Keyman Desktop 7, 8 nebo 9 byl detekován. Chcete nainstalovat klávesnice obsažené v tomto instalačním programu do nainstalované verze klávesnice?</string>
+  <string name="ssOldOsVersionDownload">Tato verze $APPNAME vyžaduje instalaci Windows 7 nebo novější. Chcete stáhnout klávesovou plochu 8?</string>
+  <string name="ssOptionsTitle">Možnosti instalace</string>
+  <string name="ssOptionsTitleInstallOptions">Možnosti instalace</string>
+  <string name="ssOptionsTitleDefaultKeymanSettings">Výchozí nastavení $APPNAME</string>
+  <string name="ssOptionsTitleSelectModulesToInstall">Moduly k instalaci nebo aktualizaci</string>
+  <string name="ssOptionsTitleAssociatedKeyboardLanguage">Související jazyk klávesnice</string>
+  <string name="ssOptionsTitleLocation">Verze k instalaci</string>
+  <string name="ssOptionsStartWithWindows">Spustit $APPNAME po spuštění Windows</string>
+  <string name="ssOptionsStartAfterInstall">Po dokončení instalace spustit $APPNAME</string>
+  <string name="ssOptionsCheckForUpdates">Pravidelně kontrolovat online aktualizace</string>
+  <string name="ssOptionsUpgradeKeyboards">Aktualizujte klávesnici nainstalované se staršími verzemi na verzi $VERSION</string>
+  <string name="ssOptionsAutomaticallyReportUsage">Sdílet anonymní statistiky používání na keyman.com</string>
+  <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
+  <string name="ssInstallerVersion">Nastavit verzi: %0:s</string>
+  <string name="ssOptionsInstallKeyman">Nainstalovat $APPNAME</string>
+  <string name="ssOptionsUpgradeKeyman">Vylepšit $APPNAME</string>
+  <!-- Parameters: %0:s: installed version -->
+  <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s je již nainstalován.</string>
+  <!-- Parameters: %0:s: version, %1:s: size -->
+  <string name="ssOptionsDownloadKeymanVersion">Stáhnout verzi %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: version -->
+  <string name="ssOptionsInstallKeymanVersion">Verze %0:s</string>
+  <!-- Parameters: %0:s: package name %1:s -->
+  <string name="ssOptionsInstallPackage">Instalovat %0:s</string>
+  <!-- Parameters: %0:s: package version %1:s package size -->
+  <string name="ssOptionsDownloadPackageVersion">Stáhnout verzi %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: package version -->
+  <string name="ssOptionsInstallPackageVersion">Verze %0:s</string>
+  <!-- Parameters: %0:s package name -->
+  <string name="ssOptionsPackageLanguageAssociation">Vyberte jazyk, který chcete spojit s klávesnicí %0:s</string>
+  <string name="ssOptionsDefaultLanguage">Výchozí jazyk</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingTitle">Stahování %0:s</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingText">Stahování %0:s</string>
+  <string name="ssOffline">$APPNAME Instalace se nemohla připojit k keyman.com a stáhnout další zdroje.
+
+Zkontrolujte, zda jste online, a povolte $APPNAME nastavení přístupu k Internetu v nastavení firewall.
+
+Kliknutím na tlačítko Zrušit instalaci, zkuste znovu stáhnout zdroje znovu, nebo ignorujte pro pokračování v režimu offline.</string>
+</resources>

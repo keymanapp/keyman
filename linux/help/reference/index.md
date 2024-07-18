@@ -1,8 +1,8 @@
 ---
-title: Keyman 16.0 for Linux Reference
+title: Keyman 17.0 for Linux Reference
 ---
 
-## Keyman 16.0 for Linux Overview
+## Keyman 17.0 for Linux Overview
 
 Keyman for Linux makes it possible for you to type in over 2,000 languages on Linux.
 

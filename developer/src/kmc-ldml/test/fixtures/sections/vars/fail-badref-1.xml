@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="vars-fail"/>
+
+  <keys />
+
+  <!-- from spec -->
+  <variables>
+    <set id="upper" value="A B C D E FF $[lower]" /> <!-- BAD: bad back reference -->
+  </variables>
+
+
+</keyboard3>

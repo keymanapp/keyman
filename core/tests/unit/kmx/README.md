@@ -65,12 +65,12 @@ Alternatively it's possible to run a single test with:
 
 ```bash
 cd core
-build/arch/debug/tests/unit/kmx/kmx 'tests/unit/kmx/038 - punctkeys.kmn' 'tests/unit/kmx/038 - punctkeys.kmx'
+build/arch/debug/tests/unit/kmx/kmx '../common/test/keyboards/baseline/k_038___punctkeys.kmn' '../common/test/keyboards/baseline/k_038___punctkeys.kmx'
 ```
 
 or shorter:
 
 ```bash
 cd core
-build/arch/debug/tests/unit/kmx/kmx 'tests/unit/kmx/038 - punctkeys'.km{n,x}
+build/arch/debug/tests/unit/kmx/kmx '../common/test/keyboards/baseline/k_038___punctkeys'.km{n,x}
 ```

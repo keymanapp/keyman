@@ -1,0 +1,81 @@
+/* Title for the bookmarks menu within the embedded browser */
+"browser-bookmarks-add-title" = "Lägg till bokmärke";
+
+/* Title for the bookmarks menu within the embedded browser */
+"browser-bookmarks-none" = "Inga bokmärken";
+
+/* Title for the bookmarks menu within the embedded browser */
+"browser-bookmarks-title" = "Bokmärken";
+
+/* Used to confirm a user's desire to install a package */
+"confirm-install" = "Installera";
+
+/* The label for the toggle to stop automatically showing the "Get Started" tutorial popup. */
+"disable-get-started" = "Visa inte igen";
+
+/* Indicates an error opening a web page requested by a user */
+"error-opening-page" = "Kan inte öppna sidan";
+
+/* Long-form used when installing a font in order to display a language properly. */
+"font-install-description" = "Tryck på Installera för att få %@ att visas korrekt i alla appar";
+
+/* The name of the iOS Settings menu option for keyboards */
+"ios-settings-keyboards" = "Tangentbord";
+
+/* The name of the iOS Settings menu option for giving the keyboard full access.  (The menu entry
+underneath the app's name within the app-specific keyboard menu.) */
+"ios-settings-allow-full-access" = "Tillåt full åtkomst";
+
+/* Short-form used when installing a font in order to display a language properly. */
+"language-for-font" = "%@ Font";
+
+/* Used for 'add' options within menus */
+"menu-add" = "Lägg till";
+
+/* Used to indicate a sequence of menu options that a user needs to copy.  May be chained.  Example:  "Keyboards (1) > Enable Keyman (2)" */
+"menu-breadcrumbing" = "%1$@ > %2$@";
+
+/* Used to exit a menu without choosing an option */
+"menu-cancel" = "Avbryt";
+
+/* Menu option that erases all previously-typed text. */
+"menu-clear-text" = "Rensa text";
+
+/* Menu option that displays a list designed to help users start using the app */
+"menu-get-started" = "Kom igång";
+
+/* Menu option that displays help for the app */
+"menu-help" = "Information";
+
+/* Menu option that displays the main screen's drop-down menu */
+"menu-more" = "Mer";
+
+/* Menu option used to edit keyboard and dictionary settings */
+"menu-settings" = "Inställningar";
+
+/* Menu option that displays the iOS Share menu */
+"menu-share" = "Dela";
+
+/* Menu option that displays an embedded web browser. */
+"menu-show-browser" = "Webbläsare";
+
+/* Menu option used to control in-app font size. */
+"menu-text-size" = "Textstorlek";
+
+/* Used to describe the current font size */
+"text-size-label" = "Textstorlek: %i";
+
+/* Text to indicate that a user should set a toggle within iOS Settings to 'active'. */
+"toggle-to-enable" = "Aktivera %@";
+
+/* First option on the Get Started tutorial - Add a keyboard for your language */
+"tutorial-add-keyboard" = "Lägg till ett tangentbord för ditt språk";
+
+/* Third option on the Get Started tutorial - Displays app help. */
+"tutorial-show-help" = "Mer information";
+
+/* Second option on the Get Started tutorial - Set up Keyman as system-wide keyboard */
+"tutorial-system-keyboard" = "Ställ in Keyman som tangentbord i hela systemet";
+
+/* Used to display app version (as in \"Version: 1.0.2\" */
+"version-label" = "Version: %@";

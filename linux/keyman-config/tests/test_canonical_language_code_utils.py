@@ -21,15 +21,16 @@ class CanonicalLanguageCodeUtilsTests(unittest.TestCase):
             { 'expected': 'sqt-Arab-YE', 'tags': ['sqt', 'sqt-YE', 'sqt-Arab'] },
             { 'expected': 'sqt-Latn-YE', 'tags': ['sqt-Latn', 'sqt-Latn-YE'] },
 
-            { 'expected': 'sa-Latn', 'tags': ['sa-Latn'] },
-            { 'expected': 'hi-Latn', 'tags': ['hi-Latn'] },
+            {'expected': 'sa-Latn', 'tags': ['sa-Latn']},
+            {'expected': 'he-Latn', 'tags': ['he-Latn']},
+            {'expected': 'hi-Latn-IN', 'tags': ['hi-Latn']},
 
             # #1282
             { 'expected': 'raw-Latn-MM', 'tags': ['raw', 'raw-MM', 'raw-Latn'] },
 
             # Various extended tags and tests
             { 'expected': 'km-KH', 'tags': ['km', 'km-kh', 'km-khmr', 'km-khmr-kh'] },
-            { 'expected': 'th-TH', 'tags': ['th', 'th-th', 'th-thai-th'] },
+            {'expected': 'th-TH', 'tags': ['th', 'th-th', 'th-thai-th', 'th-Thai']},
 
             # A BCP 47 tag that is not in our canonicalization tables
             { 'expected': 'th-Latn-DE', 'tags': ['th-latn-de'] },

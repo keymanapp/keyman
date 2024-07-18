@@ -112,18 +112,6 @@ LPKEYBOARD FixupKeyboard(PBYTE bufp, PBYTE base, DWORD dwFileSize) {
   return kbp;
 }
 
-BOOL VerifyChecksum(LPBYTE buf, DWORD sz) {
-	DWORD tempcs;
-  PCOMP_KEYBOARD ckbp;
-
-  ckbp = (PCOMP_KEYBOARD) buf;
-
-	tempcs = ckbp->dwCheckSum;
-  ckbp->dwCheckSum = 0;
-
-	return tempcs == CalculateBufferCRC(sz, buf);
-}
-
 BOOL VerifyKeyboard(LPBYTE filebase, DWORD sz) {
   DWORD i;
   PCOMP_KEYBOARD ckbp = (PCOMP_KEYBOARD) filebase;
@@ -134,7 +122,6 @@ BOOL VerifyKeyboard(LPBYTE filebase, DWORD sz) {
 	if(ckbp->dwFileVersion < VERSION_MIN ||
 	   ckbp->dwFileVersion > VERSION_MAX) {
 		/* Old or new version -- identify the desired program version */
-		if(VerifyChecksum(filebase, sz)) {
 			for(csp = (PCOMP_STORE)(filebase + ckbp->dpStoreArray), i = 0; i < ckbp->cxStoreArray; i++, csp++) {
 				if(csp->dwSystemID == TSS_COMPILEDVERSION) {
 					wchar_t buf2[256];
@@ -146,16 +133,11 @@ BOOL VerifyKeyboard(LPBYTE filebase, DWORD sz) {
 					Err(buf2);
 					return FALSE;
 				}
-      }
 		}
 		Err(L"errWrongFileVersion");
 		return FALSE;
 	}
 
-	if(!VerifyChecksum(filebase, sz)) {
-    Err(L"errBadChecksum");
-    return FALSE;
-  }
 
   return TRUE;
 }

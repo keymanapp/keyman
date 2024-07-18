@@ -1,11 +1,29 @@
-var assert = require('chai').assert;
-var sinon = require('sinon');
+import { assert } from 'chai';
+import sinon from 'sinon';
 
-let LMLayer = require('../../build/headless');
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
+import { LMLayer } from '#./node/index.js';
+import { capabilities } from '@keymanapp/common-test-resources/model-helpers.mjs';
 
 // Test the top-level LMLayer interface.
 // Note: these tests can only be run after BOTH stages of compilation are completed.
 describe('LMLayer', function() {
+  /**
+   * Returns an object implementing *enough* of the Worker
+   * interface to fool the LMLayer into thinking it's
+   * communicating with a bona fide Web Worker.
+   *
+   * @returns {Worker} an object with sinon.fake() instances.
+   */
+  function createFakeWorker(postMessage) {
+    return {
+      postMessage: postMessage ? sinon.fake(postMessage) : sinon.fake(),
+      onmessage: null
+    };
+  }
+
   describe('[[constructor]]', function () {
     it('should accept a Worker to instantiate', function () {
       new LMLayer(capabilities(), createFakeWorker());
@@ -29,7 +47,7 @@ describe('LMLayer', function() {
       let fakeWorker = createFakeWorker();
 
       let lmLayer = new LMLayer(capabilities(), fakeWorker);
-      lmLayer.loadModel("./unit_tests/in_browser/resources/models/simple-dummy.js");
+      lmLayer.loadModel(require.resolve("@keymanapp/common-test-resources/models/simple-dummy.js"));
 
       assert.isFunction(fakeWorker.onmessage, 'LMLayer failed to set a callback!');
     });
@@ -37,7 +55,7 @@ describe('LMLayer', function() {
     it('should send the `load` message to the LMLayer', async function () {
       let fakeWorker = createFakeWorker(fakePostMessage);
       let lmLayer = new LMLayer(capabilities(), fakeWorker);
-      let configuration = await lmLayer.loadModel("./unit_tests/in_browser/resources/models/simple-dummy.js");
+      let configuration = await lmLayer.loadModel(require.resolve("@keymanapp/common-test-resources/models/simple-dummy.js"));
 
       assert.propertyVal(fakeWorker.postMessage, 'callCount', 2);
       // In the "Worker", assert the message looks right and
@@ -94,34 +112,6 @@ describe('LMLayer', function() {
       assert.deepEqual(actualConfiguration, expectedConfiguration);
     })
   });
-
-  // Since the Blob API is limited to browsers, look for those
-  // tests for .asBlobURI() in the in_browser tests.
-  describe('.unwrap', function () {
-    it('should return the inner code of a function', function () {
-      // Create a multi-line function body we can match in a RegExp.
-      let text = LMLayer.unwrap(function hello() {
-        var hello;
-        var world;
-      });
-      // Unwrap should give us back ONLY the body. Whitespace isn't really important.
-      assert.match(text, /^\s*var\s+hello;\s*var\s+world;\s*$/);
-    });
-  });
-
-  /**
-   * Returns an object implementing *enough* of the Worker
-   * interface to fool the LMLayer into thinking it's
-   * communicating with a bona fide Web Worker.
-   *
-   * @returns {Worker} an object with sinon.fake() instances.
-   */
-  function createFakeWorker(postMessage) {
-    return {
-        postMessage: postMessage ? sinon.fake(postMessage) : sinon.fake(),
-        onmessage: null
-      };
-  }
 
   /**
    * Call a function in the future, i.e., later in the event loop.

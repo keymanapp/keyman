@@ -30,31 +30,36 @@ uses
 
 type
   TMRUList = class
-    FMRU: TStrings;
   private
-    FMRUName: WideString;
+    FMRU: TStrings;
+    FMRUName: string;
     FOnChange: TNotifyEvent;
-    function GetFile(Index: Integer): WideString;
+    function GetFile(Index: Integer): string;
     function GetFileCount: Integer;
     procedure Change;
+    procedure Save;
   public
-    constructor Create(AMRUName: WideString);
+    constructor Create(AMRUName: string);
     destructor Destroy; override;
-    procedure Delete(FileName: WideString);
-    procedure Add(FileName: WideString);
-    procedure Append(FileName: WideString);
-    procedure Open(FileName: WideString);
+    procedure Load;
+    procedure Delete(FileName: string);
+    procedure Add(FileName: string);
+    procedure Append(FileName: string);
+    procedure Open(FileName: string);
     procedure SaveListToXML(FileName: string);
     property FileCount: Integer read GetFileCount;
-    property Files[Index: Integer]: WideString read GetFile;
-    function EllipsisFile(Index: Integer): WideString;
+    property Files[Index: Integer]: string read GetFile;
+    function EllipsisFile(Index: Integer): string;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
   end;
+
+function EllipsisFile(filename: string): string;
 
 implementation
 
 uses
   System.SysUtils,
+  System.Win.ComObj,
   Winapi.ShlWapi,
   Winapi.Windows,
   Xml.XMLDoc,
@@ -63,9 +68,87 @@ uses
   ErrorControlledRegistry,
   RegistryKeys;
 
+const HRESULT_FROM_WIN32 = HRESULT($80070000);
+const E_SHARING_VIOLATION: HRESULT = HRESULT(HRESULT_FROM_WIN32 or ERROR_SHARING_VIOLATION);
+
 { TMRUList }
 
-procedure TMRUList.Add(FileName: WideString);
+procedure TMRUList.Change;
+begin
+  Save;
+  if Assigned(FOnChange) then
+    FOnChange(Self);
+end;
+
+constructor TMRUList.Create(AMRUName: string);
+begin
+  inherited Create;
+  FMRUName := AMRUName;
+  FMRU := TStringList.Create;
+end;
+
+procedure TMRUList.Load;
+var
+  s: TStringList;
+  i: Integer;
+  name: string;
+  reg: TRegistryErrorControlled;
+  FNewMRU: TStringList;
+begin
+  if FMRUName = '' then
+    Exit;
+
+  FNewMRU := TStringList.Create;
+  try
+    reg := TRegistryErrorControlled.Create;
+    try
+      if reg.OpenKey(SRegKey_IDEFiles_CU, True) and
+        reg.OpenKey(FMRUName, True) then
+      begin
+        s := TStringList.Create;
+        try
+          reg.GetValueNames(s);
+          s.Sort;
+          for i := 0 to s.Count - 1 do
+          begin
+            name := reg.ReadString(s[i]);
+            if FileExists(name) and (FNewMRU.IndexOf(name) < 0) then
+              FNewMRU.Add(name);
+          end;
+        finally
+          s.Free;
+        end;
+      end;
+    finally
+      reg.Free;
+    end;
+
+    if FNewMRU.Text = FMRU.Text then
+    begin
+      // No changes to MRU
+      Exit;
+    end;
+
+    FMRU.Text := FNewMRU.Text;
+  finally
+    FNewMRU.Free;
+  end;
+
+  if FMRU.Count > 9 then
+  begin
+    while FMRU.Count > 9 do
+      FMRU.Delete(9);
+    Change;
+  end
+  else if Assigned(FOnChange) then
+  begin
+    // Don't use 'Change' here because we just loaded, and don't need to 'Save'
+    // as well as notify
+    FOnChange(Self);
+  end;
+end;
+
+procedure TMRUList.Add(FileName: string);
 var
   n: Integer;
 begin
@@ -83,7 +166,7 @@ begin
   Change;
 end;
 
-procedure TMRUList.Append(FileName: WideString);
+procedure TMRUList.Append(FileName: string);
 var
   n: Integer;
 begin
@@ -103,48 +186,7 @@ begin
   end;
 end;
 
-procedure TMRUList.Change;
-begin
-  if Assigned(FOnChange) then
-    FOnChange(Self);
-end;
-
-constructor TMRUList.Create(AMRUName: WideString);
-var
-  s: TStringList;
-  i: Integer;
-begin
-  inherited Create;
-  FMRUName := AMRUName;
-  FMRU := TStringList.Create;
-  if FMRUName <> '' then
-  begin
-    with TRegistryErrorControlled.Create do  // I2890
-    try
-      if OpenKeyReadOnly(SRegKey_IDEFiles_CU) then
-        if OpenKeyReadOnly(FMRUName) then
-        begin
-          s := TStringList.Create;
-          try
-            GetValueNames(s);
-            s.Sort;
-            for i := 0 to s.Count - 1 do
-            begin
-              if FileExists(s[i]) then
-                FMRU.Add(ReadString(s[i]))
-            end;
-          finally
-            s.Free;
-          end;
-        end;
-    finally
-      Free;
-    end;
-    while FMRU.Count > 9 do FMRU.Delete(9);
-  end;
-end;
-
-procedure TMRUList.Delete(FileName: WideString);
+procedure TMRUList.Delete(FileName: string);
 var
   n: Integer;
 begin
@@ -156,48 +198,7 @@ begin
   end;
 end;
 
-destructor TMRUList.Destroy;
-var
-  i: Integer;
-begin
-  if FMRUName <> '' then
-    with TRegistryErrorControlled.Create do  // I2890
-    try
-      if OpenKey(SRegKey_IDEFiles_CU, True) then
-      begin
-        if KeyExists(FMRUName) then DeleteKey(FMRUName);
-        if OpenKey(FMRUName, True) then
-          for i := 0 to FMRU.Count - 1 do
-            WriteString('File'+IntToStr(i), FMRU[i]);
-      end;
-    finally
-      Free;
-    end;
-  FMRU.Free;
-  inherited Destroy;
-end;
-
-function TMRUList.EllipsisFile(Index: Integer): WideString;
-begin
-  Result := Files[Index];
-
-  if PathCompactPath(0, PWideChar(Result), GetSystemMetrics(SM_CXSCREEN) div 3) then   // I4697
-    Result := string(PChar(Result))  // This removes the terminating nul
-  else
-    Result := ExtractFileName(Files[Index]);
-end;
-
-function TMRUList.GetFile(Index: Integer): WideString;
-begin
-  Result := FMRU[Index];
-end;
-
-function TMRUList.GetFileCount: Integer;
-begin
-  Result := FMRU.Count;
-end;
-
-procedure TMRUList.Open(FileName: WideString);
+procedure TMRUList.Open(FileName: string);
 var
   n: Integer;
 begin
@@ -207,6 +208,59 @@ begin
     FMRU.Move(n, 0);
     Change;
   end;
+end;
+
+procedure TMRUList.Save;
+var
+  i: Integer;
+begin
+  if FMRUName = '' then Exit;
+
+  with TRegistryErrorControlled.Create do  // I2890
+  try
+    if OpenKey(SRegKey_IDEFiles_CU, True) then
+    begin
+      if KeyExists(FMRUName) then DeleteKey(FMRUName);
+      if OpenKey(FMRUName, True) then
+        for i := 0 to FMRU.Count - 1 do
+          WriteString('File'+IntToStr(i), FMRU[i]);
+    end;
+  finally
+    Free;
+  end;
+end;
+
+destructor TMRUList.Destroy;
+begin
+  FMRU.Free;
+  inherited Destroy;
+end;
+
+function TMRUList.EllipsisFile(Index: Integer): string;
+begin
+  Result := mrulist.EllipsisFile(Files[Index]);
+end;
+
+function EllipsisFile(filename: string): string;
+var
+  buffer: array[0..MAX_PATH] of char;
+begin
+  StrPCopy(buffer, filename);
+
+  if PathCompactPath(0, buffer, GetSystemMetrics(SM_CXSCREEN) div 3) then   // I4697
+    Result := buffer  // This removes the terminating nul
+  else
+    Result := ExtractFileName(filename);
+end;
+
+function TMRUList.GetFile(Index: Integer): string;
+begin
+  Result := FMRU[Index];
+end;
+
+function TMRUList.GetFileCount: Integer;
+begin
+  Result := FMRU.Count;
 end;
 
 procedure TMRUList.SaveListToXML(FileName: string);
@@ -238,7 +292,22 @@ begin
     end;
   end;
 
-  doc.SaveToFile(FileName);
+  try
+    doc.SaveToFile(FileName);
+  except
+    on E:EOleException do
+    begin
+      if E.ErrorCode = E_SHARING_VIOLATION then
+      begin
+        // Another process is also writing the mru list; we'll let it
+        // slide as we'll usually get another chance later
+        Exit;
+      end
+      else
+        // Another error, let's capture it
+        raise;
+    end;
+  end;
 end;
 
 end.

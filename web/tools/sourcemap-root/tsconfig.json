@@ -1,7 +1,0 @@
-{
-  "compilerOptions": {
-	"allowJs": true,
-  "types": ["node"],
-  "lib": ["es6", "dom"]
-  }
-}

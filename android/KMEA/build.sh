@@ -1,203 +1,112 @@
 #!/usr/bin/env bash
-# Build Keyman Engine Android using Keyman Web artifacts
+# Build Keyman Engine for Android using Keyman Web artifacts
 #
-# Abbreviations:
-# KMA  - Keyman Android
-# KMEA - Keyman Engine Android
-# KMW  - Keyman Web
-
-# Set sensible script defaults:
-# set -e: Terminate script if a command returns an error
-set -e
-# set -u: Terminate script if an unset variable is used
-set -u
-# set -x: Debugging use, print each statement
-# set -x
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-display_usage ( ) {
-    echo "build.sh [-no-kmw-build] | [-no-kmw] [-no-daemon] | [-no-test] | [-upload-sentry] | [-debug]"
-    echo
-    echo "Build Keyman Engine Android (KMEA) using Keyman Web (KMW) artifacts"
-    echo "  -no-kmw-build           Don't build KMW. Just copy existing artifacts"
-    echo "  -no-kmw                 Don't build KMW. Don't copy artifacts"
-    echo "  -no-daemon              Don't start the Gradle daemon. Use for CI"
-    echo "  -no-test                Don't run the unit-test suite.  Use for development builds"
-    echo "                          to facilitate manual debugging and testing"
-    echo "  -upload-sentry          Uploads debug symbols, etc, to Sentry"
-    echo "  -debug                  Local debug build; use for development builds"
-    exit 1
-}
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-echo Build KMEA
+# ################################ Main script ################################
 
-#
-# Prevents 'clear' on exit of mingw64 bash shell
-#
-SHLVL=0
+# Definition of global compile constants
 
-# Path definitions
+KEYMAN_ANDROID_ROOT="$KEYMAN_ROOT/android"
+KEYMAN_WEB_ROOT="$KEYMAN_ROOT/web"
+ENGINE_ASSETS="$KEYMAN_ANDROID_ROOT/KMEA/app/src/main/assets"
+CONFIG="release"
+BUILD_FLAGS="aR -x lint -x test"           # Gradle build w/o test
+TEST_FLAGS="-x aR lintRelease testRelease" # Gradle test w/o build
+JUNIT_RESULTS="##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testReleaseUnitTest\']"
 
-KMA_ROOT="$KEYMAN_ROOT/android"
-KMW_ROOT="$KEYMAN_ROOT/web"
-KMW_SOURCE="$KMW_ROOT/source"
-KMEA_ASSETS="$KMA_ROOT/KMEA/app/src/main/assets"
+builder_describe "Builds Keyman Engine for Android." \
+  "@/web/src/app/webview" \
+  "@/common/web/sentry-manager" \
+  "clean" \
+  "configure" \
+  "build" \
+  "test             Runs lint and unit tests." \
+  ":engine          Builds Engine" \
+  "--ci             Don't start the Gradle daemon. For CI"
 
-warn ( ) {
-    echo "$*"
-}
+# parse before describe_outputs to check debug flags
+builder_parse "$@"
 
-die ( ) {
-    echo
-    echo "$*"
-    echo
-    exit 1
-}
-
-# Default is building KMW and copying artifacts
-DO_BUILD=true
-DO_COPY=true
-DO_TEST=true
-NO_DAEMON=false
-DEBUG_BUILD=false
-KMWFLAGS=-embed
-KMW_PATH=
-
-# Parse args
-while [[ $# -gt 0 ]] ; do
-    key="$1"
-    case $key in
-        -no-kmw-build)
-            DO_BUILD=false
-            DO_COPY=true
-            ;;
-        -no-kmw)
-            DO_BUILD=false
-            DO_COPY=false
-            ;;
-        -no-daemon)
-            NO_DAEMON=true
-            ;;
-        -upload-sentry)
-            # Overrides default set by build-utils.sh
-            UPLOAD_SENTRY=true
-            ;;
-        -debug)
-            DEBUG_BUILD=true
-            KMWFLAGS=-debug_embedded
-            KMW_PATH=unminified
-            ;;
-        -h|-\?)
-            display_usage
-            ;;
-        -no-test)
-            DO_TEST=false
-            ;;
-    esac
-    shift # past argument
-done
-
-# Local development optimization - cross-target Sentry uploading when requested
-# by developer. As it's not CI, the Web artifacts won't exist otherwise...
-# unless the developer manually runs the correct build configuration accordingly.
-if [[ $VERSION_ENVIRONMENT == "local" ]] && [[ $UPLOAD_SENTRY == true ]]; then
-    KMWFLAGS="$KMWFLAGS -upload-sentry"
+if builder_is_debug_build; then
+  builder_heading "### Debug config ####"
+  CONFIG="debug"
+  BUILD_FLAGS="assembleDebug -x lint -x test"
+  TEST_FLAGS="-x assembleDebug lintDebug testDebug"
+  JUNIT_RESULTS="##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testDebugUnitTest\']"
 fi
 
-echo
-echo "DO_BUILD: $DO_BUILD"
-echo "DO_COPY: $DO_COPY"
-echo "DO_TEST: $DO_TEST"
-echo "NO_DAEMON: $NO_DAEMON"
-echo "DEBUG_BUILD: $DEBUG_BUILD"
-echo "KMWFLAGS: $KMWFLAGS"
-echo "KMW_PATH: $KMW_PATH"
-echo
+builder_describe_outputs \
+  build:engine     /android/KMEA/app/build/outputs/aar/keyman-engine-${CONFIG}.aar
 
-if [ "$NO_DAEMON" = true ]; then
+#### Build
+
+
+# Parse args
+
+DAEMON_FLAG=
+if builder_has_option --ci; then
   DAEMON_FLAG=--no-daemon
-else
-  DAEMON_FLAG=
+fi
+
+#### Build action definitions ####
+
+# Check about cleaning artifact paths
+if builder_start_action clean:engine; then
+  rm -rf "$KEYMAN_ROOT/android/KMEA/app/build/outputs"
+  builder_finish_action success clean:engine
+fi
+
+if builder_start_action configure:engine; then
+
+  builder_finish_action success configure:engine
 fi
 
 # Destinations that will need the keymanweb artifacts
 
-PLATFORM=`uname -s`
 
-if [ "$DO_BUILD" = true ]; then
-    echo "Building keyman web engine"
-    cd $KMW_SOURCE
+if builder_start_action build:engine; then
 
-    ./build.sh $KMWFLAGS
+  # Copy KeymanWeb artifacts
+  echo "Copying Keyman Web artifacts"
+  cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/keymanweb-webview.js" "$ENGINE_ASSETS/keymanweb-webview.js"
+  cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/keymanweb-webview.js.map" "$ENGINE_ASSETS/keymanweb-webview.js.map"
+  cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/keymanweb-webview.es5.js" "$ENGINE_ASSETS/keymanweb-webview.es5.js"
+  cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/keymanweb-webview.es5.js.map" "$ENGINE_ASSETS/keymanweb-webview.es5.js.map"
+  cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/map-polyfill.js" "$ENGINE_ASSETS/map-polyfill.js"
+  cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/ajax-loader.gif" "$ENGINE_ASSETS/ajax-loader.gif"
+  cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/kmwosk.css" "$ENGINE_ASSETS/kmwosk.css"
+  cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/globe-hint.css" "$ENGINE_ASSETS/globe-hint.css"
+  cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/keymanweb-osk.ttf" "$ENGINE_ASSETS/keymanweb-osk.ttf"
 
-    if [ $? -ne 0 ]; then
-        die "ERROR: keymanweb build failed. Exiting"
-    fi
-fi
-if [ "$DO_COPY" = true ]; then
-    echo "Copying KMW artifacts"
-    cp $KMW_ROOT/release/$KMW_PATH/embedded/resources/osk/ajax-loader.gif $KMEA_ASSETS/ajax-loader.gif
-    cp $KMW_ROOT/release/$KMW_PATH/embedded/keyman.js $KMEA_ASSETS/keymanandroid.js
-    cp $KMW_ROOT/release/$KMW_PATH/embedded/keyman.js.map $KMEA_ASSETS/keyman.js.map
-    cp $KMW_ROOT/release/$KMW_PATH/embedded/resources/osk/kmwosk.css $KMEA_ASSETS/kmwosk.css
-    cp $KMW_ROOT/release/$KMW_PATH/embedded/resources/osk/globe-hint.css $KMEA_ASSETS/globe-hint.css
-    cp $KMW_ROOT/release/$KMW_PATH/embedded/resources/osk/keymanweb-osk.ttf $KMEA_ASSETS/keymanweb-osk.ttf
+  cp "$KEYMAN_ROOT/node_modules/@sentry/browser/build/bundle.min.js" "$ENGINE_ASSETS/sentry.min.js"
+  cp "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js" "$ENGINE_ASSETS/keyman-sentry.js"
 
-    cp $KEYMAN_ROOT/common/web/sentry-manager/build/index.js $KMEA_ASSETS/keyman-sentry.js
+  echo "Copying es6-shim polyfill"
+  cp "$KEYMAN_ROOT/node_modules/es6-shim/es6-shim.min.js" "$ENGINE_ASSETS/es6-shim.min.js"
 
-    echo "Copying es6-shim polyfill"
-    cp $KEYMAN_ROOT/node_modules/es6-shim/es6-shim.min.js $KMEA_ASSETS/es6-shim.min.js
+  echo "BUILD_FLAGS $BUILD_FLAGS"
+  # Build without test
+  ./gradlew $DAEMON_FLAG clean $BUILD_FLAGS
 
-    if [ $? -ne 0 ]; then
-        die "ERROR: copying artifacts failed"
-    fi
+  builder_finish_action success build:engine
 fi
 
-echo "Gradle Build of KMEA"
-cd $KMA_ROOT/KMEA
+if builder_start_action test:engine; then
 
-if [ "$DEBUG_BUILD" = true ]; then
-  BUILD_FLAGS="assembleDebug lintDebug"
-  TEST_FLAGS="testDebug"
-  ARTIFACT="app-debug.aar"
-  if [ "$DO_TEST" = true ]; then
+  if builder_has_option --ci; then
     # Report JUnit test results to CI
-    echo "##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testDebugUnitTest\']"
+    echo "$JUNIT_RESULTS"
   fi
-else
-  BUILD_FLAGS="aR lint"
-  TEST_FLAGS="testRelease"
-  ARTIFACT="app-release.aar"
-  if [ "$DO_TEST" = true ]; then
-    # Report JUnit test results to CI
-    echo "##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testReleaseUnitTest\']"
-  fi
-fi
 
-echo "BUILD_FLAGS $BUILD_FLAGS"
-./gradlew $DAEMON_FLAG clean $BUILD_FLAGS
-if [ $? -ne 0 ]; then
-    die "ERROR: Build of KMEA failed"
-fi
-if [ "$DO_TEST" = true ]; then
-    echo "TEST_FLAGS $TEST_FLAGS"
-    ./gradlew $DAEMON_FLAG $TEST_FLAGS
-    if [ $? -ne 0 ]; then
-        die "ERROR: KMEA test cases failed"
-    fi
-fi
+  echo "TEST_FLAGS: $TEST_FLAGS"
+  ./gradlew $DAEMON_FLAG $TEST_FLAGS
 
-echo "Copying Keyman Engine for Android to KMAPro, Sample apps, and Tests"
-mv $KMA_ROOT/KMEA/app/build/outputs/aar/$ARTIFACT $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar
-cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/Samples/KMSample1/app/libs/keyman-engine.aar
-cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/Samples/KMSample2/app/libs/keyman-engine.aar
-cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/Tests/KeyboardHarness/app/libs/keyman-engine.aar
-if [ ! -z ${RELEASE_OEM+x} ]; then
-  cp $KMA_ROOT/KMAPro/kMAPro/libs/keyman-engine.aar $KMA_ROOT/../oem/firstvoices/android/app/libs/keyman-engine.aar
+  builder_finish_action success test:engine
 fi
-cd ..\

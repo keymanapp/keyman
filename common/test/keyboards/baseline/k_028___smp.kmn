@@ -1,0 +1,26 @@
+store(&NAME) '028 - smp'
+c Description: Tests SMP characters; see #4361 [1-4], #5561 [5]
+c keys: [K_1][K_2][K_3][K_4][K_5]
+c expected: \U0001F601yx
+c context:
+
+store(&version) '10.0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
+c Tests #4361:
+
++ [K_1] > U+1F642
+U+1F642 + [K_2] > context 'hi' U+1F600
+U+1F600 + [K_3] > 'x'
+U+1F642 'hix' + [K_4] > U+1F601 'y'
+
+c Tests #5561 (#5465):
+
++ [K_5] > U+10333 use(second)
+
+group(second)
+
+U+10333 > 'x'

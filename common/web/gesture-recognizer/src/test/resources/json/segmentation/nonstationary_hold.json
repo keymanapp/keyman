@@ -1,0 +1,93 @@
+{
+  "inputs": [
+    {
+      "isFromTouch": false,
+      "path": {
+        "coords": [
+          {
+            "targetX": 81,
+            "targetY": 87,
+            "t": 21785383
+          },
+          {
+            "targetX": 80,
+            "targetY": 87,
+            "t": 21786301
+          },
+          {
+            "targetX": 80,
+            "targetY": 88,
+            "t": 21786349
+          },
+          {
+            "targetX": 80,
+            "targetY": 88,
+            "t": 21786555
+          }
+        ],
+        "segments": [
+          {
+            "type": "start",
+            "duration": 0,
+            "speed": 0,
+            "distance": 0,
+            "peakSpeed": 0,
+            "initialCoord": {
+              "targetX": 81,
+              "targetY": 87,
+              "t": 21785383
+            },
+            "lastCoord": {
+              "targetX": 81,
+              "targetY": 87,
+              "t": 21785383
+            }
+          },
+          {
+            "type": "hold",
+            "duration": 1172,
+            "cardinalDirection": "sw",
+            "speed": 0.0012066668620930845,
+            "distance": 1.4142135623730951,
+            "angle": 3.9269908169872414,
+            "peakSpeed": 0.07237082517385776,
+            "initialCoord": {
+              "targetX": 81,
+              "targetY": 87,
+              "t": 21785383
+            },
+            "lastCoord": {
+              "targetX": 80,
+              "targetY": 88,
+              "t": 21786555
+            }
+          },
+          {
+            "type": "end",
+            "duration": 0,
+            "speed": 0,
+            "distance": 0,
+            "peakSpeed": 0,
+            "initialCoord": {
+              "targetX": 80,
+              "targetY": 88,
+              "t": 21786555
+            },
+            "lastCoord": {
+              "targetX": 80,
+              "targetY": 88,
+              "t": 21786555
+            }
+          }
+        ],
+        "wasCancelled": false
+      }
+    }
+  ],
+  "config": {
+    "deviceStyle": "screen2",
+    "roamingStyle": "bounds1",
+    "receiverStyle": "full",
+    "safeZoneStyle": "safe-loose"
+  }
+}

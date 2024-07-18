@@ -156,6 +156,9 @@ a.button {
 #config .btn {
   width: 180px;
   text-overflow: ellipsis;
+  overflow: hidden;
+  display: inline-block;
+  white-space: nowrap;
 }
 
 #config {
@@ -167,6 +170,10 @@ a.button {
 
 #exit .btn-small {
   width: 90px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  display: inline-block;
+  white-space: nowrap;
 }
 
 #tasks div#showAtStartupBox { margin-top: 6px; margin-left: 0; }

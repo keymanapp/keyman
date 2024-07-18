@@ -2,8 +2,8 @@
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
@@ -15,7 +15,7 @@ cd "$THIS_SCRIPT_PATH"
 ################################ Main script ################################
 
 # Defaults
-FLAGS="--require ./unit_tests/helpers"
+FLAGS=""
 
 builder_describe "Runs all tests for the language-modeling / predictive-text layer module" \
   "configure" \
@@ -23,12 +23,18 @@ builder_describe "Runs all tests for the language-modeling / predictive-text lay
   ":libraries  Runs unit tests for in-repo libraries used by this module"\
   ":headless   Runs this module's headless user tests" \
   ":browser    Runs this module's browser-based user tests" \
-  "--ci        Uses CI-based test configurations & emits CI-friendly test reports" \
-  "--debug,-d  Activates developer-friendly debug mode for unit tests where applicable"
+  "--ci        Uses CI-based test configurations & emits CI-friendly test reports"
 
 # TODO: consider dependencies? ideally this will be test.inc.sh?
 
 builder_parse "$@"
+
+TEST_OPTS=
+if builder_has_option --ci && builder_is_debug_build; then
+  builder_die "Options --ci and --debug are incompatible."
+elif builder_has_option --ci; then
+  TEST_OPTS=--ci
+fi
 
 if builder_start_action configure; then
   verify_npm_setup
@@ -41,34 +47,20 @@ if builder_start_action test:libraries; then
   # They do not have builder-based scripts, being run directly via npm package script.
   # So, for now, we add a text header to clarify what is running at each stage, in
   # addition to fair bit of `pushd` and `popd`.
-  pushd "$KEYMAN_ROOT/common/models/wordbreakers"
   echo
-  echo "### Running ${BUILDER_TERM_START}common/models/wordbreaker${BUILDER_TERM_END} tests"
-  # NPM doesn't seem to parse the post `--` part if specified via script variable.
-  # So... a simple if-else will do the job for now.
-  if builder_has_option --ci; then
-    npm run test -- -reporter mocha-teamcity-reporter
-  else
-    npm run test
-  fi
-  popd
+  echo "### Running $(builder_term common/models/wordbreakers) tests"
+  "$KEYMAN_ROOT/common/models/wordbreakers/build.sh" test $TEST_OPTS
 
   pushd "$KEYMAN_ROOT/common/models/templates"
   echo
-  echo "### Running ${BUILDER_TERM_START}common/models/templates${BUILDER_TERM_END} tests"
-  if builder_has_option --ci; then
-    npm run test -- -reporter mocha-teamcity-reporter
-  else
-    npm run test
-  fi
+  echo "### Running $(builder_term common/models/templates) tests"
+  "$KEYMAN_ROOT/common/models/templates/build.sh" test $TEST_OPTS
   popd
 
-  pushd "$KEYMAN_ROOT/common/models/types"
+  pushd "$KEYMAN_ROOT/common/web/lm-worker"
   echo
-  echo "### Running ${BUILDER_TERM_START}common/models/types${BUILDER_TERM_END} tests"
-  # Is not mocha-based; it's TSC-based instead, as we're just ensuring that the .d.ts
-  # file is a proper TS declaration file.
-  npm run test
+  echo "### Running ${BUILDER_TERM_START}common/web/lm-worker${BUILDER_TERM_END} tests"
+  ./build.sh test $TEST_OPTS
   popd
 
   builder_finish_action success test:libraries
@@ -81,7 +73,7 @@ if builder_start_action test:headless; then
     MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
   fi
 
-  npm run mocha -- --recursive $MOCHA_FLAGS ./unit_tests/headless/*.js ./unit_tests/headless/**/*.js
+  mocha --recursive $MOCHA_FLAGS ./headless/*.js ./headless/**/*.js
 
   builder_finish_action success test:headless
 fi
@@ -93,20 +85,20 @@ fi
 #
 # We do not run BrowserStack tests on master, beta, or stable-x.y test
 # builds.
-if [[ $VERSION_ENVIRONMENT == test ]] && builder_has_action test :browser; then
+if [[ $VERSION_ENVIRONMENT == test ]] && builder_has_action test:browser; then
   if builder_pull_get_details; then
     if ! ([[ $builder_pull_title =~ \(web\) ]] || builder_pull_has_label test-browserstack); then
 
-      echo "Auto-skipping ${BUILDER_TERM_START}test:browser${BUILDER_TERM_END} for unrelated CI test build"
+      echo "Auto-skipping $(builder_term test:browser) for unrelated CI test build"
       exit 0
     fi
   fi
 fi
 
 get_browser_set_for_OS ( ) {
-  if [ $os_id = "mac" ]; then
+  if [[ $BUILDER_OS == mac ]]; then
     BROWSERS="--browsers Firefox,Chrome,Safari"
-  elif [ $os_id = "win" ]; then
+  elif [[ $BUILDER_OS == win ]]; then
     BROWSERS="--browsers Chrome"
   else
     BROWSERS="--browsers Firefox,Chrome"
@@ -114,37 +106,18 @@ get_browser_set_for_OS ( ) {
 }
 
 if builder_start_action test:browser; then
-  KARMA_FLAGS=$FLAGS
-  KARMA_INFO_LEVEL="--log-level=warn"
+  WTR_CONFIG=
+  WTR_DEBUG=
 
   if builder_has_option --ci; then
-    KARMA_FLAGS="$KARMA_FLAGS --reporters teamcity,BrowserStack"
-    KARMA_CONFIG="CI.conf.js"
-    KARMA_INFO_LEVEL="--log-level=debug"
-
-    if builder_has_option --debug; then
-      echo "${BUILDER_TERM_START}--ci${BUILDER_TERM_END} option set; ignoring ${BUILDER_TERM_START}--debug${BUILDER_TERM_END} option"
-    fi
-  else
-    KARMA_CONFIG="manual.conf.js"
-    if builder_has_option --debug; then
-      KARMA_FLAGS="$KARMA_FLAGS --no-single-run"
-      KARMA_CONFIG="manual.conf.js"
-      KARMA_INFO_LEVEL="--log-level=debug"
-
-      echo
-      echo "${COLOR_YELLOW}You must manually terminate this mode (CTRL-C) for the script to exit.${COLOR_RESET}"
-      sleep 2
-    fi
+    WTR_CONFIG=.CI
   fi
 
-  if [[ KARMA_CONFIG == "manual.conf.js" ]]; then
-    get_builder_OS  # return:  os_id="linux"|"mac"|"win"
-    get_browser_set_for_OS
-  else
-    BROWSERS=
+  if builder_has_option --debug; then
+    WTR_DEBUG=" --manual"
   fi
-  npm run karma -- start $KARMA_INFO_LEVEL $KARMA_FLAGS $BROWSERS unit_tests/in_browser/$KARMA_CONFIG
+
+  web-test-runner --config in_browser/web-test-runner${WTR_CONFIG}.config.mjs ${WTR_DEBUG}
 
   builder_finish_action success test:browser
 fi

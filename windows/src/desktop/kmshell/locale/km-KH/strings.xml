@@ -46,6 +46,10 @@
   <string name="SKButtonCancel" comment="Cancel button in message boxes">បោះ​បង់</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
+  <!-- Introduced: 16.0.47 -->
+  <string name="SKAddremove" comment="Add or Remove languages button opens a dialog window">បន្ថែម/លុប ភាសា...</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.330.0 -->
   <string name="SKBalloonClickToSelectKeyboard" comment="Balloon that shows when Keyman icon is first shown during the tutorial">ចុច​អាយខុន​នេះ​ដើម្បី​ជ្រើសរើស​ក្ដារចុច</string>
   <!-- Context: Formatted Messages -->
@@ -64,6 +68,18 @@
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.239.0 -->
   <string name="S_Caption_Help" comment="Configuration dialog link to Help">ជំនួយ</string>
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47.0 -->
+  <string name="S_Caption_Uninstall" comment="Configuration dialog link to Uninstall Keyboard">លុប​ចេញ</string>
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47.0 -->
+  <string name="S_Caption_Enable" comment="Configuration dialog link to Enable Keyboard">បើក</string>
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47.0 -->
+  <string name="S_Caption_Disable" comment="Configuration dialog link to Disable Keyboard">បិទ​ដំណើរការ</string>
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -174,6 +190,10 @@
   <string name="S_Languages_Install" comment="Add language profile">បន្ថែមភាសា</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47 -->
+  <string name="S_Languages_Addremove" comment="Title for dialog to add or remove languages for keyboard layout">បន្ថែម/លុប ភាសា</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Caption_OnScreenKeyboard" comment="Term for the On Screen Keyboard">ក្ដារចុច​លើ​អេក្រង់៖</string>
   <!-- Context: Configuration Dialog - Captions -->
@@ -223,7 +243,7 @@
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.287.0 -->
-  <string name="S_Menu_Options" comment="KL option button submenu - keyboard options">ជម្រើស​ក្ដារចុច</string>
+  <string name="S_Menu_Options" comment="KL option button submenu - keyboard options">ជម្រើស​ក្ដារចុច...</string>
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -341,7 +361,7 @@
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Hotkey_None" comment="Hotkey - text used when no hotkey set for an option">(គ្មាន)</string>
+  <string name="S_Hotkey_None" comment="Hotkey - text used when no hotkey set">(មិនមានគ្រាប់​ចុច​ផ្លូវកាត់)</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -884,6 +904,10 @@
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
   <string name="S_OSK_FontHelper_ChooseKeyboard" comment="OSK Font helper choose keyboard">សូម​ជ្រើសរើស​ក្ដារចុច Keyman មួយ​ដើម្បី​រក​ពុម្ព​អក្សរ​ដែល​ពាក់ព័ន្ធ</string>
+  <!-- Context: OSK Font Helper -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 17.0.312.0 -->
+  <string name="S_OSK_FontHelper_NoFonts" comment="OSK Font helper no fonts found for keyboard">មិនឃើញមានពុម្ពអក្សរណាជាសំណូមពរសម្រាប់ក្តារចុច %1$s.</string>
   <!-- Context: Text Editor -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 10.0.836.0 -->

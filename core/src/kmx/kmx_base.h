@@ -1,7 +1,6 @@
 #pragma once
 
-#include <keyman/keyboardprocessor_bits.h>
-#include <keyman/keyboardprocessor.h>
+#include "keyman_core.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 #define snprintf _snprintf
@@ -11,7 +10,7 @@
 #endif
 
 namespace km {
-namespace kbp {
+namespace core {
 namespace kmx {
 
 typedef struct tagSTORE
@@ -49,7 +48,7 @@ typedef struct tagKEYBOARD
 
   KMX_DWORD dwFileVersion;  // Version of the file - Keyman 4.0 is 0x0400
 
-  KMX_DWORD dwCheckSum;   // As stored in keyboard
+  KMX_DWORD dwCheckSum;   // As stored in keyboard. DEPRECATED as of 16.0
   KMX_DWORD xxkbdlayout;      // as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
   KMX_DWORD IsRegistered;   // layout id, from same key
   KMX_DWORD version;      // keyboard version
@@ -95,5 +94,5 @@ typedef struct tagKMSTATE
 enum ProcessStringReturn { psrPostMessages, psrCheckMatches };
 
 } // namespace kmx
-} // namespace kbp
+} // namespace core
 } // namespace km

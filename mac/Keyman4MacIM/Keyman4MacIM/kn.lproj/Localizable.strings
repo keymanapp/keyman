@@ -1,0 +1,71 @@
+/* Message displayed to confirm delete of the Keyman keyboard selected by the user from the keyboard list  */
+"message-confirm-delete-keyboard" = "'%@' ಕೀಲಿಮಣೆಯನ್ನು ಅಸ್ಥಾಪಿಸಲು ನೀವು ಖಚಿತವಾಗಿ ಬಯಸುವಿರಾ?";
+
+/* Delete keyboard confirmation info indicating that the delete action cannot be undone  */
+"info-cannot-undo-delete-keyboard" = "ನೀವು ಈ ಕ್ರಿಯೆಯನ್ನು ರದ್ದುಗೊಳಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ.";
+
+/* Button text to cancel delete of the specified installed Keyman keyboard  */
+"button-cancel-delete-keyboard" = "ರದ್ದುಮಾಡು";
+
+/* Button text to confirm delete of the specified installed Keyman keyboard  */
+"button-delete-keyboard" = "ಅಳಿಸು";
+
+/* Message displayed to confirm installation of a keyboard from the specifed .kmp file double-clicked by the user  */
+"message-confirm-install-keyboard" = "ಕೀಮ್ಯಾನ್ ಕೀಲಿಮಣೆ ಅನುಸ್ಥಾಪಿಸಬೇಕೆ?";
+
+/* Message displayed to confirm installation of a keyboard from the specifed .kmp file double-clicked by the user  */
+"info-install-keyboard-filename" = "ಕೀಮ್ಯಾನ್ ಕೀಲಿಮಣೆಯನ್ನು '%@' ಕಡತದಿಂದ ಅನುಸ್ಥಾಪಿಸಬೇಕೆ?";
+
+/* Button text to cancel installation of the double-clicked Keyman file  */
+"button-cancel-install-keyboard" = "ರದ್ದುಮಾಡು";
+
+/* Button text to confirm installation of the double-clicked Keyman file  */
+"button-install-keyboard" = "ಅನುಸ್ಥಾಪಿಸು";
+
+/* Message displayed to inform user that .kmp file could not be read/unzipped  */
+"message-keyboard-file-unreadable" = "ಕೀಮ್ಯಾನ್ ಕಡತವನ್ನು ಓದಲಾಗಲಿಲ್ಲ '%@'.";
+
+/* Message displayed in Configuration window when keyboard cannot be loaded */
+"message-error-loading-keyboard" = "(ಕೀಲಿಮಣೆಯನ್ನು ಲೋಡ್ ಮಾಡುವಲ್ಲಿ ದೋಷ ಕಂಡುಬಂದಿದೆ)";
+
+/* Message displayed in Configuration window when keyboard metadata cannot be loaded */
+"message-error-unknown-metadata" = "ಅಪರಿಚಿತ";
+
+/* Button text to acknowledge that .kmp file could not be read  */
+"button-keyboard-file-unreadable" = "ಸರಿ";
+
+/* label text to identify Keyman version */
+"version-label-text" = "ಆವೃತ್ತಿ %@";
+
+/* Status text for keyboard downloading  */
+"message-keyboard-downloading" = "ಡೌನ್‌ಲೋಡ್ ಆಗುತ್ತಿದೆ...";
+
+/* Status text for keyboard download complete  */
+"message-keyboard-download-complete" = "ಡೌನ್‌ಲೋಡ್ ಪೂರ್ಣಗೊಂಡಿದೆ.";
+
+/* Button text to cancel downloading keyboard  */
+"button-cancel-downloading" = "ರದ್ದುಮಾಡು";
+
+/* Button text keyboard download complete  */
+"button-download-complete" = "ಆಗಿದೆ";
+
+/* keyboards label in the Package Information window */
+"keyboards-label" = "ಕೀಲಿಮಣೆಗಳು:";
+
+/* fonts label in the Package Information window */
+"fonts-label" = "ಅಕ್ಷರಶೈಲಿ/ಫಾಂಟ್‌ಗಳು:";
+
+/* package version label in the Package Information window */
+"package-version-label" = "ಪ್ಯಾಕೇಜ್ ಆವೃತ್ತಿ:";
+
+/* author label in the Package Information window */
+"author-label" = "ಲೇಖಕರು:";
+
+/* website label in the Package Information window */
+"website-label" = "ವೆಬ್‌ಸೈಟ್:";
+
+/* copyright label in the Package Information window */
+"copyright-label" = "ಕೃತಿಸ್ವಾಮ್ಯ:";
+
+/* message displayed to alert user to need grant accessibility permission */
+"privacy-alert-text" = "ಕೀಮ್ಯಾನ್‌ ಸರಿಯಾಗಿ ಕಾರ್ಯನಿರ್ವಹಿಸಲು, ಕೀಮ್ಯಾನ್‌ಗೆ (accessibility features) ಪ್ರವೇಶಿಸುವಿಕೆ ವೈಶಿಷ್ಟ್ಯಗಳ ಅಗತ್ಯವಿದೆ:\n\nಸಿಸ್ಟಂ ಆದ್ಯತೆಗಳು, ಭದ್ರತೆ ಮತ್ತು ಗೌಪ್ಯತೆಗೆ ಪ್ರವೇಶವನ್ನು ನೀಡಿ.\nನಿಮ್ಮ ಸಿಸ್ಟಂ ಅನ್ನು ಮರುಪ್ರಾರಂಭಿಸಿ.";

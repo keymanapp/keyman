@@ -1,12 +1,17 @@
 {
   "name": "@keymanapp/web-utils",
   "description": "Common utility functions used throughout other Keyman packages",
-  "main": "./build/index.js",
-  "types": "./build/index.d.ts",
+  "main": "./build/obj/index.js",
+  "exports": {
+    ".": {
+      "es6-bundling": "./src/index.ts",
+      "types": "./build/obj/index.d.ts",
+      "import": "./build/obj/index.js"
+    }
+  },
   "scripts": {
     "build": "gosh ./build.sh",
-    "clean": "tsc -b --clean",
-    "tsc": "tsc"
+    "clean": "gosh ./build.sh clean"
   },
   "repository": {
     "type": "git",
@@ -19,9 +24,18 @@
   },
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "devDependencies": {
-    "@keymanapp/resources-gosh": "*",
     "@keymanapp/keyman-version": "*",
-    "@types/node": "^14.0.5",
-    "typescript": "^4.5.4"
-  }
+    "@keymanapp/resources-gosh": "*",
+    "c8": "^7.12.0",
+    "mocha": "^10.0.0",
+    "mocha-teamcity-reporter": "^4.0.0",
+    "typescript": "^5.4.5"
+  },
+  "type": "module",
+  "paths": {
+    "@keymanapp/keyman-version": "*"
+  },
+  "sideEffects": [
+    "./src/kmwstring.ts", "./build/obj/kmwstring.js"
+  ]
 }

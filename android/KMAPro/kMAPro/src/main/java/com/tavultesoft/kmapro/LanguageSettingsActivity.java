@@ -25,13 +25,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.appcompat.widget.Toolbar;
 
-import com.tavultesoft.kmea.KeyboardPickerActivity;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.ModelPickerActivity;
-import com.tavultesoft.kmea.data.Dataset;
-import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.data.adapters.NestedAdapter;
-import com.tavultesoft.kmea.util.KMLog;
+import com.keyman.engine.KeyboardPickerActivity;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.ModelPickerActivity;
+import com.keyman.engine.data.Dataset;
+import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.data.adapters.NestedAdapter;
+import com.keyman.engine.util.KMLog;
 
 import java.util.HashMap;
 
@@ -292,6 +292,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
 
   @Override
   public void onBackPressed() {
+    super.onBackPressed();
     finish();
   }
 
@@ -315,7 +316,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
   }
 
   // Fully details the building of this Activity's list view items.
-  static private class FilteredKeyboardsAdapter extends NestedAdapter<com.tavultesoft.kmea.data.Keyboard, Dataset.Keyboards, String> {
+  static private class FilteredKeyboardsAdapter extends NestedAdapter<com.keyman.engine.data.Keyboard, Dataset.Keyboards, String> {
     static final int RESOURCE = R.layout.list_row_layout1;
 
     private static class ViewHolder {

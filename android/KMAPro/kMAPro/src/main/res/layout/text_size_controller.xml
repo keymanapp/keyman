@@ -21,6 +21,7 @@
         android:id="@+id/seekBar"
         android:layout_width="180dp"
         android:layout_height="wrap_content"
+        android:contentDescription="@string/ic_text_size_slider"
         android:layout_gravity="center" />
 
     <ImageButton

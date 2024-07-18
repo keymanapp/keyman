@@ -3,9 +3,9 @@
 /*
  * Keyman Input Method for IBUS (The Input Bus)
  *
- * Copyright (C) 2018, 2020 SIL International
+ * Copyright (C) 2018-2023 SIL International
  *
- * kmflutil is dual licensed under the MIT or GPL licenses as described below.
+ * keymanutil is dual licensed under the MIT or GPL licenses as described below.
  *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *
@@ -55,16 +55,22 @@
 #include <ibus.h>
 #include <gmodule.h>
 
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api.h>
 
 // Number of default Keyboard processor environment options for: "platform", "baseLayout", and "baseLayoutAlt"
 #define KEYMAN_ENVIRONMENT_OPTIONS 3
 
 // Path information for Keyman keyboard options in DConf
-#define KEYMAN_DCONF_NAME "com.keyman.options"
-#define KEYMAN_CHILD_DCONF_NAME "com.keyman.options.child"
-#define KEYMAN_DCONF_PATH "/desktop/ibus/keyman/options/"
+#define KEYMAN_DCONF_OPTIONS_NAME "com.keyman.options"
+#define KEYMAN_DCONF_OPTIONS_CHILD_NAME "com.keyman.options.child"
+// TODO: migrate to /com/keyman/options to better follow Gnome recommmendations
+// (https://docs.gtk.org/gio/class.Settings.html) (#9579)
+#define KEYMAN_DCONF_OPTIONS_PATH "/desktop/ibus/keyman/options/"
 #define KEYMAN_DCONF_OPTIONS_KEY "options"
+
+#define KEYMAN_DCONF_ENGINE_NAME "com.keyman.engine"
+#define KEYMAN_DCONF_ENGINE_PATH "/com/keyman/engine/"
+#define KEYMAN_DCONF_KEYBOARDS_KEY "additional-keyboards"
 
 G_BEGIN_DECLS
 
@@ -84,7 +90,7 @@ gchar**  keyman_get_options_fromdconf
                                             (gchar *package_id,
                                              gchar *keyboard_id);
 
-// Obtain Keyboard Options from DConf and parse into a GQueue of struct km_kbp_option_item
+// Obtain Keyboard Options from DConf and parse into a GQueue of struct km_core_option_item
 //
 // Parameters:
 // package_id  (gchar *): Package ID

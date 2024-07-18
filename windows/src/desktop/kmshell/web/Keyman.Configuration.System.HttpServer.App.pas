@@ -60,6 +60,7 @@ implementation
 
 uses
   System.Contnrs,
+  System.RegularExpressions,
   System.StrUtils,
   System.SysUtils,
 
@@ -282,9 +283,21 @@ var
   tag: Integer;
   u: IInterface;
   PageTag: string;
+  regex: TRegEx;
+  matches: TMatch;
 begin
   Result := False;
   PageTag := RequestInfo.Params.Values['tag'];
+  if PageTag = '' then
+  begin
+    // TIdUri does not have a parameter parser, and while there are other
+    // classes we could use, a regex is adequate for this task
+    regex := TRegEx.Create('tag=(\d+)');
+    matches := regex.Match(RequestInfo.Referer);
+    if matches.Success then
+      PageTag := matches.Groups[1].Value;
+  end;
+
   tag := StrToIntDef(PageTag, -1);
   if tag >= 0 then
   begin

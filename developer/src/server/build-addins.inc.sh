@@ -11,7 +11,7 @@ isNodeX64() {
   # [[ $(file -b "$(which node)" | grep x86-64) ]] && echo 1 || echo 0
 }
 
-build_addins() {
+do_build_addins() {
   local NODEX64=$(isNodeX64)
   local ARCH=x64
   local TRAYICON_TARGET=addon.x64.node
@@ -29,8 +29,13 @@ build_addins() {
   echo "TRAYICON_TARGET=$TRAYICON_TARGET"
   echo "HIDECONSOLE_TARGET=$HIDECONSOLE_TARGET"
 
-  HIDECONSOLE_TARGET="$KEYMAN_ROOT/developer/src/server/src/win32/console/$HIDECONSOLE_TARGET"
-  TRAYICON_TARGET="$KEYMAN_ROOT/developer/src/server/src/win32/trayicon/$TRAYICON_TARGET"
+  local HIDECONSOLE_SRC_TARGET="$KEYMAN_ROOT/developer/src/server/src/win32/console/$HIDECONSOLE_TARGET"
+  local HIDECONSOLE_BIN_TARGET="$KEYMAN_ROOT/developer/src/server/build/src/win32/console/$HIDECONSOLE_TARGET"
+  local TRAYICON_SRC_TARGET="$KEYMAN_ROOT/developer/src/server/src/win32/trayicon/$TRAYICON_TARGET"
+  local TRAYICON_BIN_TARGET="$KEYMAN_ROOT/developer/src/server/build/src/win32/trayicon/$TRAYICON_TARGET"
+
+  mkdir -p "$(dirname "$HIDECONSOLE_BIN_TARGET")"
+  mkdir -p "$(dirname "$TRAYICON_BIN_TARGET")"
 
   #
   # Build node-windows-trayicon
@@ -39,7 +44,8 @@ build_addins() {
   pushd "$KEYMAN_ROOT/node_modules/node-windows-trayicon"
   rm -rf build
   npx node-gyp clean configure build --arch=$ARCH --silent
-  cp build/Release/addon.node "$TRAYICON_TARGET"
+  cp build/Release/addon.node "$TRAYICON_SRC_TARGET"
+  cp build/Release/addon.node "$TRAYICON_BIN_TARGET"
   popd
 
   #
@@ -49,7 +55,8 @@ build_addins() {
   pushd "$KEYMAN_ROOT/node_modules/hetrodo-node-hide-console-window-napi"
   rm -rf build
   npx node-gyp clean configure build --arch=$ARCH --silent
-  cp build/Release/node-hide-console-window.node "$HIDECONSOLE_TARGET"
+  cp build/Release/node-hide-console-window.node "$HIDECONSOLE_SRC_TARGET"
+  cp build/Release/node-hide-console-window.node "$HIDECONSOLE_BIN_TARGET"
   popd
 
   #
@@ -57,10 +64,10 @@ build_addins() {
   #
 
   if (( NODEX64 )); then
-    [[ $(isFileX64 "$TRAYICON_TARGET") == 1 ]] || die "$TRAYICON_TARGET should be 64-bit"
-    [[ $(isFileX64 "$HIDECONSOLE_TARGET") == 1 ]] || die "$HIDECONSOLE_TARGET should be 64-bit"
+    [[ $(isFileX64 "$TRAYICON_BIN_TARGET") == 1 ]] || builder_die "$TRAYICON_TARGET should be 64-bit"
+    [[ $(isFileX64 "$HIDECONSOLE_BIN_TARGET") == 1 ]] || builder_die "$HIDECONSOLE_TARGET should be 64-bit"
   else
-    [[ $(isFileX64 "$TRAYICON_TARGET") == 0 ]] || die "$TRAYICON_TARGET should not be 64-bit"
-    [[ $(isFileX64 "$HIDECONSOLE_TARGET") == 0 ]] || die "$HIDECONSOLE_TARGET should not be 64-bit"
+    [[ $(isFileX64 "$TRAYICON_BIN_TARGET") == 0 ]] || builder_die "$TRAYICON_TARGET should not be 64-bit"
+    [[ $(isFileX64 "$HIDECONSOLE_BIN_TARGET") == 0 ]] || builder_die "$HIDECONSOLE_TARGET should not be 64-bit"
   fi
 }

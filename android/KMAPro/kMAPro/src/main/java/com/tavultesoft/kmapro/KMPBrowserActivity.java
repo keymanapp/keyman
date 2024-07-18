@@ -21,11 +21,11 @@ import android.webkit.WebViewClient;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.tavultesoft.kmea.BaseActivity;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.util.KMPLink;
-import com.tavultesoft.kmea.util.KMString;
-import com.tavultesoft.kmea.util.WebViewUtils;
+import com.keyman.engine.BaseActivity;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.util.KMPLink;
+import com.keyman.engine.util.KMString;
+import com.keyman.engine.util.WebViewUtils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

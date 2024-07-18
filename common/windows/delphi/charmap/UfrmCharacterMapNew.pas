@@ -342,7 +342,8 @@ begin
 
     grid.RowCount := n+1; //FCharCount div grid.ColCount + 1;
     if n = 0
-      then grid.RowHeights[n] := 0 {Don't show the first block title}
+      // Top row must be 1 pixel in order to avoid DIV/0 in Grids.pas #11589
+      then grid.RowHeights[n] := 1 {Don't show the first block title}
       else grid.RowHeights[n] := 28;
     Blocks[i].Tag := n;
 
@@ -589,6 +590,18 @@ var
   uc: Integer;
   RectBmp: TRect;
 begin
+  if ARow = 0 then
+  begin
+    // #11589 -- we have a single pixel top row to avoid DIV/0, so format it as
+    // 'invisible' by making it look the same as gridlines. It is not selectable
+    // so there is no real behaviour change.
+    grid.Canvas.Brush.Color := $909090;
+    grid.Canvas.Font.Color := $909090;
+    grid.Canvas.TextRect(Rect, Rect.Left, Rect.Top, ' ');
+    grid.Canvas.FillRect(Rect);
+    Exit;
+  end;
+
   ub := GetHeaderCellProperties(ACol, ARow);
   if Assigned(ub) then
   begin
@@ -904,7 +917,7 @@ end;
 
 procedure TfrmCharacterMapNew.gridSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
 begin
-  CanSelect := ARow > 0;
+  CanSelect := (ARow > 0) or (grid.RowCount = 1);
 end;
 
 function TfrmCharacterMapNew.GetDragObject: TCharacterDragObject;

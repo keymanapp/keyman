@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">Pyccĸий</string>
+  <string name="ssApplicationTitle">Настройки $APPNAME $VERSION</string>
+  <string name="ssTitle">Установить $APPNAME $VERSION</string>
+  <string name="ssInstallSuccess">$APPNAME $VERSION успешно установлен.</string>
+  <string name="ssCancelQuery">Вы уверены, что хотите отменить установку $APPNAME?</string>
+  <string name="ssBootstrapExtractingBundle">Извлечение набора...</string>
+  <string name="ssBootstrapCheckingPackages">Проверка пакетов...</string>
+  <string name="ssBootstrapCheckingForUpdates">Проверка онлайн обновлений...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">Проверка установленных версий...</string>
+  <string name="ssBootstrapReady">Завершение...</string>
+  <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
+  <string name="ssActionInstallKeyman">• $APPNAME %0:s %1:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
+  <string name="ssActionInstallPackage">• %0:s %1:s %2:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: ssActionDownload -->
+  <string name="ssActionInstallPackageLanguage">• %0:s %1:s для %2:s %3:s</string>
+  <string name="ssActionNothingToInstall">Нет ничего для установки.</string>
+  <!-- Parameters: %0:s download size -->
+  <string name="ssActionDownload">(%0:s загрузки)</string>
+  <string name="ssActionInstall">Установка установки:</string>
+  <string name="ssFreeCaption">$APPNAME $VERSION является бесплатным и с открытым исходным кодом</string>
+  <string name="ssLicenseLink">&amp;Прочитать лицензию</string>
+  <string name="ssInstallOptionsLink">Установить &amp;параметры</string>
+  <string name="ssMessageBoxTitle">Настройки $APPNAME</string>
+  <string name="ssOkButton">ОК</string>
+  <string name="ssInstallButton">&amp;Установить</string>
+  <string name="ssCancelButton">Отменить</string>
+  <string name="ssExitButton">E&amp;xit</string>
+  <string name="ssStatusInstalling">Установка $APPNAME</string>
+  <string name="ssStatusRemovingOlderVersions">Удаление старых версий</string>
+  <string name="ssStatusComplete">Установка завершена</string>
+  <string name="ssQueryRestart">Перед завершением установки необходимо перезапустить Windows. После перезапуска Windows установка продолжится.
+
+Перезапустить сейчас?</string>
+  <string name="ssErrorUnableToAutomaticallyRestart">Windows не удалось автоматически перезагрузить. Вам следует перезагрузить Windows, прежде чем вы попытаетесь запустить $APPNAME.</string>
+  <string name="ssMustRestart">Для завершения установки необходимо перезапустить Windows. После перезапуска Windows установка закончится.</string>
+  <string name="ssOldOsVersionInstallKeyboards">$APPNAME $VERSION требует установки Windows 7 или более поздней версии. Однако, был обнаружен Keyman Desktop 7, 8 или 9. Вы хотите установить клавиатуры, включенные в эту программу установки, в установленную версию Keyman Desktop?</string>
+  <string name="ssOldOsVersionDownload">Для установки этой версии $APPNAME требуется Windows 7 или более поздняя версия. Загрузить Keyman Desktop 8?</string>
+  <string name="ssOptionsTitle">Параметры установки</string>
+  <string name="ssOptionsTitleInstallOptions">Параметры установки</string>
+  <string name="ssOptionsTitleDefaultKeymanSettings">Настройки по умолчанию $APPNAME</string>
+  <string name="ssOptionsTitleSelectModulesToInstall">Модули для установки или обновления</string>
+  <string name="ssOptionsTitleAssociatedKeyboardLanguage">Связанный язык клавиатуры</string>
+  <string name="ssOptionsTitleLocation">Версия для установки</string>
+  <string name="ssOptionsStartWithWindows">Запускать $APPNAME при запуске Windows</string>
+  <string name="ssOptionsStartAfterInstall">Запускать $APPNAME после завершения установки</string>
+  <string name="ssOptionsCheckForUpdates">Проверять наличие обновлений в режиме онлайн</string>
+  <string name="ssOptionsUpgradeKeyboards">Обновление клавиатуры с более ранними версиями $VERSION</string>
+  <string name="ssOptionsAutomaticallyReportUsage">Поделиться анонимной статистикой использования с keyman.com</string>
+  <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
+  <string name="ssInstallerVersion">Версия установки: %0:s</string>
+  <string name="ssOptionsInstallKeyman">Установить $APPNAME</string>
+  <string name="ssOptionsUpgradeKeyman">Улучшить $APPNAME</string>
+  <!-- Parameters: %0:s: installed version -->
+  <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s уже установлен.</string>
+  <!-- Parameters: %0:s: version, %1:s: size -->
+  <string name="ssOptionsDownloadKeymanVersion">Скачать версию %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: version -->
+  <string name="ssOptionsInstallKeymanVersion">Версия %0:s</string>
+  <!-- Parameters: %0:s: package name %1:s -->
+  <string name="ssOptionsInstallPackage">Установить %0:s</string>
+  <!-- Parameters: %0:s: package version %1:s package size -->
+  <string name="ssOptionsDownloadPackageVersion">Скачать версию %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: package version -->
+  <string name="ssOptionsInstallPackageVersion">Версия %0:s</string>
+  <!-- Parameters: %0:s package name -->
+  <string name="ssOptionsPackageLanguageAssociation">Выберите язык, который вы хотите связать с клавиатурой %0:s</string>
+  <string name="ssOptionsDefaultLanguage">Язык по умолчанию</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingTitle">Загрузка %0:s</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingText">Загрузка %0:s</string>
+  <string name="ssOffline">$APPNAME Не удалось подключиться к keyman.com для загрузки дополнительных ресурсов.</string>
+  <string name="ssOffline2">Пожалуйста, проверьте, что вы онлайн, и предоставьте $APPNAME установить разрешение на доступ к Интернету в настройках брандмауэра.</string>
+  <string name="ssOffline3">Нажмите кнопку \"Прервать\" для выхода из настройки. Повторите попытку и загрузите ресурсы снова, или \"Игнорируйте\", чтобы продолжить в автономном режиме.</string>
+</resources>

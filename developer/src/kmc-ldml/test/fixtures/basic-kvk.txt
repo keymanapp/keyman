@@ -1,0 +1,53 @@
+#
+# basic-kvk.txt describes the expected output of running kmc against basic.xml to generate
+# a .kvk file. It is used in the end-to-end test test-visual-keyboard-compiler-e2e.ts.
+#
+# Any changes to the compiler or basic.xml will likely result in changes to the compiled file.
+#
+
+block(kvkheader)
+  4b 56 4b 46      # identifier 'KVKF'
+  00 06 00 00      # version 0x0600
+  00               # flags
+block(associated_keyboard)
+  01 00            # string len in UTF-16 code units incl zterm
+  00 00            # '\0'
+
+block(ansi_font)
+  06 00            # string len in UTF-16 code units incl zterm
+  41 00 72 00 69 00 61 00 6c 00 00 00           # 'Arial\0'
+
+block(ansi_font_extra)
+  f4 ff ff ff      # size -12pt per Winapi LOGFONT
+  08 00 00 ff      # color (TColor.clWindowText)
+
+block(unicode_font)
+  06 00            # string len in UTF-16 code units incl zterm
+  41 00 72 00 69 00 61 00 6c 00 00 00           # 'Arial\0'
+
+block(unicode_font_extra)
+  f4 ff ff ff      # size -12pt per Winapi LOGFONT
+  08 00 00 ff      # color (TColor.clWindowText)
+
+block(keys_header)
+  02 00 00 00      # number of keys
+
+block(keys)
+
+block(key0)
+  02            # flags = unicode
+  00 00         # shift
+  c0 00         # vkey
+  02 00         # string len in UTF-16 code units incl zterm
+  27 01 00 00   # "ħ"
+  00 00 00 00   # bitmap
+
+block(key1)
+  02                  # flags = unicode
+  00 00               # shift
+  31 00               # vkey
+  03 00               # string len in UTF-16 code units incl zterm
+  90 17 b6 17 00 00   # "ថា"
+  00 00 00 00         # bitmap
+
+block(eof)   # end of file

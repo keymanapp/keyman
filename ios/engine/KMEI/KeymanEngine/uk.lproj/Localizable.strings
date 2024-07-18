@@ -1,0 +1,257 @@
+/* A descriptive message used for errors when the app is already busy downloading */
+"alert-download-error-busy" = "Вже зайнято завантаженням.";
+
+/* A descriptive message used when a download fails */
+"alert-download-error-detail" = "Сталася помилка під час завантаження або інсталяції.";
+
+/* Title for a "download failed" alert */
+"alert-download-error-title" = "Помилка завантаження";
+
+/* Title for a general alert about errors */
+"alert-error-title" = "Помилка";
+
+/* A descriptive message used when no internet connection is detected */
+"alert-no-connection-detail" = "Не вдалося зв’язатися з сервером Keyman. Будь ласка, спробуйте ще раз пізніше.";
+
+/* Title for a "no connection" alert */
+"alert-no-connection-title" = "Помилка підключення";
+
+/* Short text for a 'back' navigational command.  Used to return to the previous screen */
+"command-back" = "Відмінити";
+
+/* Short text for a 'cancel' command.  Used to back out of a menu or install process without making changes */
+"command-cancel" = "Скасувати";
+
+/* Short text for a 'done' command.  Used to back out of settings menus after changes have been made */
+"command-done" = "Виконано";
+
+/* Short text for an 'install' command.  Used to confirm installation of a package. */
+"command-install" = "Інсталювати";
+
+/* Short text for a 'next' navigational command.  Used to advance to the next screen */
+"command-next" = "Уперед";
+
+/* Short text for an 'OK' command.  Used for some error alerts */
+"command-ok" = "Гаразд";
+
+/* Short text for confirmining 'uninstall' commands. */
+"command-uninstall" = "Видалити";
+
+/* Text for the command to uninstall a keyboard */
+"command-uninstall-keyboard" = "Видалити клавіатуру";
+
+/* Confirmation text to display before uninstalling a keyboard */
+"command-uninstall-keyboard-confirm" = "Видалити цю клавіатуру?";
+
+/* Text for the command to uninstall a lexical model */
+"command-uninstall-lexical-model" = "Видалити словник";
+
+/* Confirmation text to display before uninstalling a lexical model */
+"command-uninstall-lexical-model-confirm" = "Ви хотіли б видалити цей словник?";
+
+/* Text for error when a keyboard cannot load properly */
+"error-loading-keyboard" = "Не вдається завантажити запитану клавіатуру";
+
+/* Text for error when a lexical model cannot load properly */
+"error-loading-lexical-model" = "Не вдалося завантажити запитаний словник";
+
+/* Text for error when an installed file is unexpectedly missing */
+"error-missing-file" = "Необхідний файл не знайдено.";
+
+/* Text for error when an installed file is unexpectedly missing */
+"error-missing-file-critical" = "Критичний файл не знайдено. Будь ласка, спробуйте перевстановити додаток.";
+
+/* Text for errors in data received from search queries */
+"error-query-decoding" = "В даний час сервер має технічні труднощі";
+
+/* A descriptive message used when a download fails */
+"error-query-general" = "Помилка зв'язку з сервером";
+
+/* Text for error when a search query is unexpectedly empty */
+"error-query-no-data" = "Сервер не зміг відповісти";
+
+/* Text for general errors where not much information is known */
+"error-unknown" = "Сталась непередбачена помилка";
+
+/* Text for error when updating a resource:  cannot download because no source is available */
+"error-update-no-link" = "Джерело оновлень для цього пакету не доступне";
+
+/* Text for error when updating a resource:  Keyman does not know how to update the resource */
+"error-update-not-managed" = "Неможливо оновити ресурс яким керує рушій Keyman";
+
+/* Text for the command to open the help page of a keyboard, as shown on resource information views */
+"info-command-help-keyboard" = "Допомога з клавіатурою";
+
+/* Text for the command to open the help page of a lexical model, as shown on resource information views */
+"info-command-help-lexical-model" = "Допомога по словнику";
+
+/* Text label for displaying a keyboard's version, as shown on resource information views */
+"info-label-version-keyboard" = "Версія клавіатури";
+
+/* Text label for displaying a lexical model's version, as shown on resource information views */
+"info-label-version-lexical-model" = "Версія словника";
+
+/* Label used for the "package info" / readme tab with the package installation prompt on phones. */
+"installer-label-package-info" = "Відомості про пакунок";
+
+/* Label used for the language-selection tab with the package installation prompt on phones. */
+"installer-label-select-languages" = "Вибрати мову";
+
+/* Label used with a package's version, as seen within the package installation prompt.  Example:  "Version: 14.0.0" */
+"installer-label-version" = "Версія: %@";
+
+/* Section header for languages supported by a package, as seen within the package installation prompt */
+"installer-section-available-languages" = "Доступні мови";
+
+/* Text for the help popup for changing keyboards with the globe key */
+"keyboard-help-change" = "Натисніть тут для зміни клавіатури";
+
+/* Text for the command to exit the Keyman keyboard in favor of other keyboards installed on the system */
+"keyboard-menu-exit" = "Закрити %@";
+
+/* Error installing a Keyman package - could not allocate a location to install it */
+"kmp-error-file-system" = "Помилка встановлення пакунку - помилка файлової системи";
+
+/* Error installing a Keyman package - could not copy package files */
+"kmp-error-file-copying" = "Помилка встановлення пакунку - не вдалося скопіювати необхідні файли";
+
+/* Error opening a Keyman package - package is not valid */
+"kmp-error-invalid" = "Файл пакунку пошкоджено.";
+
+/* Error opening a Keyman package - it does not exist / the specified location is wrong */
+"kmp-error-missing" = "Вказаний пакунок не існує.";
+
+/* Error installing a Keyman package - expected resource (keyboard or dictionary) is missing */
+"kmp-error-missing-resource" = "Цей пакет не містить запитаної клавіатури чи словника.";
+
+/* Error installing a Keyman package with a version of Keyman that does not support it */
+"kmp-error-unsupported-keyman-version" = "This package requires a newer version of Keyman.";
+
+/* Error opening a Keyman package - cannot parse contents */
+"kmp-error-no-metadata" = "Цей пакет був не коректно побудований - вміст невідомо.";
+
+/* Error opening a Keyman package - package's contents are for desktop platforms only */
+"kmp-error-unsupported" = "Цей пакунок не має підтримки для вашого пристрою.";
+
+/* Error opening a Keyman package - package contains unexpected resource (keyboard or dictionary) type */
+"kmp-error-wrong-type" = "Цей пакунок не містить очікуваний тип ресурсів.";
+
+/* Title for the Installed Languages menu */
+"menu-installed-languages-title" = "Встановлені мови";
+
+/* Section header for lexical models within a language-specific settings menu */
+"menu-langsettings-label-lexical-models" = "Словники";
+
+/* Section header for keyboards within a language-specific settings menu */
+"menu-langsettings-section-keyboards" = "Клавіатури";
+
+/* Section header for the settings toggles within a language-specific settings menu */
+"menu-langsettings-section-settings" = "Мовні параметри";
+
+/* Title for the language-specific settings menus */
+"menu-langsettings-title" = "%@ Параметри";
+
+/* Label for the toggle that enables corrections that is displayed within a language-specific settings menu */
+"menu-langsettings-toggle-correct" = "Увімкнути виправлення";
+
+/* Label for the toggle that enables predictions that is displayed within a language-specific settings menu */
+"menu-langsettings-toggle-predict" = "Увімкнути передбачення";
+
+/* Help message for a prompt that appears for confirming a lexical model download:  language (1): lexical model (dictionary) name (2) */
+"menu-lexical-model-install-message" = "Ви б хотіли встановити цей словник?";
+
+/* Title for a prompt that appears for confirming a lexical model download:  language (1): lexical model (dictionary) name (2) */
+"menu-lexical-model-install-title" = "%1$@: %2$@";
+
+/* Text for an info alert indicating that no lexical models are available */
+"menu-lexical-model-none-message" = "Немає словників";
+
+/* Title for the lexical model menu, a submenu of the language-specific settings menus */
+"menu-lexical-model-title" = "%@ словники";
+
+/* Title for the keyboard picker */
+"menu-picker-title" = "Клавіатури";
+
+/* Primary text for the Settings menu option to report keyboard crashes */
+"menu-settings-error-report" = "Дозволити звіт про помилки";
+
+/* Secondary text for the Settings menu option to report keyboard crashes */
+"menu-settings-error-report-description" = "Може зажадати \"повний доступ\"";
+
+/* Primary text for the Settings menu local-file package installation option */
+"menu-settings-install-from-file" = "Встановити з файлу";
+
+/* Secondary text for the Settings menu local-file package installation option */
+"menu-settings-install-from-file-description" = "Шукати файли .kmp";
+
+/* Primary text for the Settings menu option that displays the iOS system menu options for the app's keyboard */
+"menu-settings-system-keyboard-menu" = "Системні налаштування клавіатури";
+
+/* Label for the "Show Banner" toggle on the main settings screen */
+"menu-settings-show-banner" = "Показувати банер";
+
+/* Label for the "Get Started" automatic display toggle seen in the Settings menu */
+"menu-settings-startup-get-started" = "Показувати \"Розпочати\" під час запуску";
+
+/* Title for the main Settings menu */
+"menu-settings-title" = "Налаштування Keyman";
+
+/* Secondary text showing current setting for spacebar caption - blank */
+"menu-settings-spacebar-hint-blank" = "Не показувати підпис на пробілі";
+
+/* Secondary text showing current setting for spacebar caption - keyboard */
+"menu-settings-spacebar-hint-keyboard" = "Показувати назву клавіатури на пробілі";
+
+/* Secondary text showing current setting for spacebar caption - language */
+"menu-settings-spacebar-hint-language" = "Показувати назву мови на пробілі";
+
+/* Secondary text showing current setting for spacebar caption - language + keyboard */
+"menu-settings-spacebar-hint-languageKeyboard" = "Показати мову і назву клавіатури на пробілі";
+
+/* Label for the "Spacebar Caption" item on the main settings screen */
+"menu-settings-spacebar-text" = "Заголовок до пробілу";
+
+/* Title for the "Spacebar Caption" settings screen */
+"menu-settings-spacebar-title" = "Заголовок до пробілу";
+
+/* Text showing name of spacebar caption - blank */
+"menu-settings-spacebar-item-blank" = "Пустий";
+
+/* Text showing name of spacebar caption - keyboard */
+"menu-settings-spacebar-item-keyboard" = "Keyboard";
+
+/* Text showing name of spacebar caption - language */
+"menu-settings-spacebar-item-language" = "Мова:";
+
+/* Text showing name of spacebar caption - language + keyboard */
+"menu-settings-spacebar-item-languageKeyboard" = "Мови та клавіатура";
+
+/* Short text for notification:  download failure for keyboard */
+"notification-download-failure-keyboard" = "Помилка завантаження клавіатури";
+
+/* Short text for notification:  download failure for lexical model */
+"notification-download-failure-lexical-model" = "Помилка завантаження словника";
+
+/* Short text for notification:  download success for keyboard */
+"notification-download-success-keyboard" = "Клавіатура успішно завантажена";
+
+/* Short text for notification:  download success for lexical model */
+"notification-download-success-lexical-model" = "Лексична модель успішно завантажена";
+
+/* Short text for notification:  downloading a keyboard */
+"notification-downloading-keyboard" = "Завантаження клавіатури\U2026";
+
+/* Short text for notification:  downloading a lexical model */
+"notification-downloading-lexical-model" = "Завантаження словника\U2026";
+
+/* Short text for notification:  an update is available */
+"notification-update-available" = "Доступне оновлення";
+
+/* Short text for notification:  currently updating */
+"notification-update-processing" = "Оновлення\U2026";
+
+/* Text indicating success at installing new keyboards or dictionaries */
+"success-install" = "Успішно встановлено.";
+
+/* A title to use in alerts indicating 'success' at whatever task the user requested */
+"success-title" = "Успіх";

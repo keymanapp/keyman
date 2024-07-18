@@ -19,7 +19,6 @@ uses
   kmxfile in '..\..\..\..\common\windows\delphi\keyboards\kmxfile.pas',
   utilkeyboard in '..\..\..\..\common\windows\delphi\keyboards\utilkeyboard.pas',
   utilfiletypes in '..\..\..\..\common\windows\delphi\general\utilfiletypes.pas',
-  CRC32 in '..\..\..\..\common\windows\delphi\general\CRC32.pas',
   KeyNames in '..\..\..\..\common\windows\delphi\general\KeyNames.pas',
   ttinfo in '..\..\..\..\common\windows\delphi\general\ttinfo.pas',
   Upload_Settings in '..\..\..\..\common\windows\delphi\general\Upload_Settings.pas',
@@ -72,12 +71,12 @@ const
   LOGGER_DESKTOP_ENGINE_TSYSINFO = TKeymanSentryClient.LOGGER_DESKTOP_ENGINE + '.tsysinfo';
 begin
   TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop, LOGGER_DESKTOP_ENGINE_TSYSINFO,
-    [kscfCaptureExceptions]); // no ui for exceptions, no termination
+    LoadKeymanDesktopSentryFlags([kscfCaptureExceptions])); // no ui for exceptions, no termination
   try
     if RunCrashReportHandler then
       Exit;
 
-    FInitializeCEF := TCEFManager.Create;
+    FInitializeCEF := TCEFManager.Create(False);
     try
       try
         if FInitializeCEF.Start then

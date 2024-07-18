@@ -1,0 +1,36 @@
+{
+  "tablet": {
+    "layer": [
+      {
+        "id": "default",
+        "row": [
+          {
+            "id": "1",
+            "key": [
+              {
+                "id": "K_BKSP",
+                "text": "*BkSp*",
+                "pad": "25",
+                "width": "100",
+                "sp": "1",
+                "sk": [
+                  {
+                    "id": "K_BAM",
+                    "text": "Bam",
+                    "pad": "10",
+                    "width": "25",
+                    "sp": "8"
+                  }
+                ]
+              },
+              {
+                "id": "K_FOO",
+                "sk": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

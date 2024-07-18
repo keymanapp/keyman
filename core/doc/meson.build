@@ -12,18 +12,20 @@ if hotdoc.found()
   cfg = configuration_data()
   cfg.set('project_name', meson.project_name())
   cfg.set('project_version', meson.project_version())
+  cfg.set('doc_dir', meson.current_source_dir())
+  cfg.set('include_dir', meson.current_source_dir() / '../include')
   configure_file(input: 'hotdoc.json',
                  output: 'hotdoc.json',
                  configuration: cfg)
   deps = files(
-    '../include/keyman/keyboardprocessor.h.in',
+    '../include/keyman/keyman_core_api.h',
     '../src/jsonpp.hpp',
     '../src/utfcodec.hpp'
   )
 
   docs = custom_target('docs',
     output: ['html'],
-    input: ['sitemap.txt', 'markdown_files/index.md'],
+    input: ['sitemap.txt', 'markdown_files/index.md', deps],
     command: [hotdoc, '--verbose', '--conf-file=doc/hotdoc.json', '--output=doc', 'run'],
     depend_files: deps,
     install: true,

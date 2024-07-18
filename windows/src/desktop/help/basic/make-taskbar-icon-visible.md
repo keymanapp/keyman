@@ -38,29 +38,15 @@ Here's how to make the change with Windows Settings:
         Taskbar near the clock, if Keyman is on.
     6.  Continue on to [Step 5](../start/tutorial#step-5-) of this guide.
 
--   On Windows 8:
+-   On Windows 11
 
     1.  Right-click on the Windows Taskbar.
-        ![](../desktop_images/win8-taskbar1.png)
-    2.  Select 'Properties'.
-    3.  Next to 'Notification area', click Customize….
-        ![](../desktop_images/win8-taskbar2.png)
-    4.  From the dropdown menu beside 'Keyman
-        Engine x86', select 'Show icon and notifications'.
-        ![](../desktop_images/win8-taskbar3.png)
-    5.  Click OK to apply changes. The Keyman icon will now always
-        appear in the Windows Taskbar near the clock, if Keyman is
-        on.
-    6.  Continue on to [Step 5](../start/tutorial#step-5-) of this guide.
-
--   On Windows 7:
-
-    1.  Open the Windows Start menu.
-    2.  In the search field, type and enter: Notification Area Icons
-    3.  From the dropdown menu beside Keyman
-        Engine x86, select 'Show icon and notifications'.
-        ![](../desktop_images/7-taskbar.png)
-    4.  Click OK to apply changes. The Keyman icon will now always
-        appear in the Windows Taskbar near the clock, if Keyman is
-        on.
+    
+        ![](../desktop_images/win11-taskbar1.png)
+    2.  Select 'Taskbar settings'.
+    3.  Under 'Other system tray icons', expand the list, 
+        click the toggle button beside 'Keyman Engine x86'to turn it on.
+        ![](../desktop_images/win11-taskbar2.png)
+    4.  The Keyman icon will now always appear in the Windows
+        Taskbar near the clock, if Keyman is on.
     5.  Continue on to [Step 5](../start/tutorial#step-5-) of this guide.

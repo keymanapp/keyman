@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+@@keys: [K_BKQUOTE]
+@@expected: \u0061
+-->
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="en" conformsTo="45">
+  <info author="srl295" indicator="🙀" layout="qwerty"  name="TestKbd"/>
+
+  <keys>
+    <!-- tests that gap="true" (with no to=) is OK -->
+    <key id="gap" gap="true" />
+  </keys>
+
+  <layers formId="us">
+    <layer id="base">
+      <row keys="a gap"/>
+    </layer>
+  </layers>
+</keyboard3>

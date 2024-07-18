@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <version number="1.0" /> <!-- invalid because it's not "1.0.0" as required by semver -->
+
+  <info name="meta-minimal"/>
+
+  <keys />
+</keyboard3>

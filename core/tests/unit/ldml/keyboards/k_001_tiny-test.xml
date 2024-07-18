@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE keyboardTest3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/45/dtd/ldmlKeyboardTest3.dtd">
+<keyboardTest3 conformsTo="techpreview">
+  <info keyboard="k_001_tiny.xml" author="srl295" name="k_001_tiny" />
+  <!-- <repertoire chars="[ħ ថា]" type="simple" name="our-little-language" /> TODO-LDML: not working yet -->
+  <repertoire chars="[ħ]" type="simple" name="minus-khmer" />
+  <tests name="tiny-tests">
+    <test name="tiny-test">
+      <keystroke key="hmaqtugha"/>
+      <keystroke key="that"/>
+      <keystroke key="hmaqtugha"/>
+      <check result="ħថាħ"/>
+    </test>
+  </tests>
+</keyboardTest3>

@@ -15,10 +15,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(_ application: UIApplication,
                    didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]? = nil) -> Bool {
-    // Set desired level before release
-    KeymanEngine.log.outputLevel = .debug
-    KeymanEngine.log.logAppDetails()
-
     // Replace with your application group id
     // Ensure this happens before installing any keyboards or models within the engine
     // whenever using App Group Identifiers.

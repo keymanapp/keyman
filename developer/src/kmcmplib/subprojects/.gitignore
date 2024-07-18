@@ -1,0 +1,5 @@
+/icu
+/*.zip
+/*.tgz
+/packagecache
+/googletest-*

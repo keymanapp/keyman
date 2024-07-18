@@ -38,9 +38,6 @@
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\xstring.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\crc32.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\keymansentry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -6,7 +6,7 @@
 #include "kmx_processevent.h"
 #include <option.hpp>
 
-using namespace km::kbp;
+using namespace km::core;
 using namespace kmx;
 
 int KMX_Options::_GetIndex(std::u16string const &key) const {
@@ -101,7 +101,7 @@ void KMX_Options::Init(std::vector<option> &opts) {
   LPSTORE sp;
   for (n = 0, i = 0, ko = _kp->KeyboardOptions, sp = _kp->Keyboard->dpStoreArray; i < _kp->Keyboard->cxStoreArray; i++, sp++, ko++) {
     if (ko->OriginalStore == NULL) continue;
-    opts.emplace_back(KM_KBP_OPT_KEYBOARD, sp->dpName, sp->dpString);
+    opts.emplace_back(KM_CORE_OPT_KEYBOARD, sp->dpName, sp->dpString);
     n++;
   }
 

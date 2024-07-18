@@ -8,8 +8,9 @@ if(_debug) {
         document.documentElement.appendChild(iframe);
         iframe.parentNode.removeChild(iframe);
         iframe = null;
-        if (typeof(window.webkit) != 'undefined')
+        if (typeof(window.webkit) != 'undefined') {
             window.webkit.messageHandlers.keyman.postMessage("ios-log:#iOS#" + log);
+        }
     };
     console.debug = console.log;
     console.info = console.log;
@@ -22,10 +23,13 @@ if(_debug) {
 
 var oskHeight = 0;
 var oskWidth = 0;
+var bannerHeight = 0;
+var bannerImgPath = '';
 
-var sentryManager = new com.keyman.KeymanSentryManager({
+var sentryManager = new KeymanSentryManager({
     hostPlatform: "ios"
 });
+
 sentryManager.init();
 
 window.addEventListener('load', init, false);
@@ -40,57 +44,65 @@ function init() {
     document.body.style.height = window.outerHeight;
 
     var kmw=window['keyman'];
-    // We could convert to relying on the promise, but the underlying input element
-    // tends to show a bit due to the delay when we do so.
-    kmw.init({'app':device,'fonts':'fonts/'});//.then(function() {
-        kmw['util']['setOption']('attachType','manual');
-        kmw['oninserttext'] = insertText;
-        kmw['showKeyboardList'] = menuKeyDown;
-        kmw['hideKeyboard'] = hideKeyboard;
-        kmw['getOskHeight'] = getOskHeight;
-        kmw['getOskWidth'] = getOskWidth;
-        kmw['beepKeyboard'] = beepKeyboard;
-        kmw['setActiveElement']('ta');
+    kmw['showKeyboardList'] = menuKeyDown;
+    kmw['menuKeyUp'] = menuKeyUp;
+    kmw['hideKeyboard'] = hideKeyboard;
+    kmw['getOskHeight'] = getOskHeight;
+    kmw['getOskWidth'] = getOskWidth;
+    kmw['beepKeyboard'] = beepKeyboard;
+    kmw.init({
+        'embeddingApp':device,
+        'fonts':'fonts/',
+        oninserttext: insertText
+    }).then(function() {
+      if(bannerHeight > 0) {
+        // The OSK is not available until initialization is complete.
+        kmw.osk.bannerView.activeBannerHeight = bannerHeight;
+        keyman.refreshOskLayout();
+      }
 
-    //});
+      var bc = keyman.osk.bannerController;
+      if(bannerImgPath) {
+        bc.inactiveBanner = new bc.ImageBanner(bannerImgPath);
+      }
+    });
 }
 
 function verifyLoaded() {
     // During proper loads of KMW, a keyboard will be set very early on.
     // There's a chance that the keyboard is still loading, so we double-check
     // against the stub count.
-    if(!keyman.core.activeKeyboard && keyman.keyboardManager.keyboardStubs.length == 0) {
+    if(!keyman.core.activeKeyboard && !keyman.keyboardRequisitioner.cache.defaultStub) {
     location.reload();
     }
 }
 
-function showBanner(flag) {
-    console.log("Setting banner display for dictionaryless keyboards to " + flag);
-    keyman.osk.banner.setOptions({'alwaysShow': flag});
-}
-
 function setBannerImage(path) {
-    var kmw=window['keyman'];
-    kmw.osk.banner.setOptions({"imagePath": path});
+    bannerImgPath = path;
+
+    var bc = keyman && keyman.osk && keyman.osk.bannerController;
+    if(!bc) {
+      return;
+    }
+
+    // If an inactive banner is set, update its image.
+    bc.inactiveBanner = new bc.ImageBanner(bannerImgPath);
 }
 
 function setBannerHeight(h) {
-    var kmw = com.keyman.singleton;
-    var osk = kmw.osk;
-
-    if(h >= 0) {
+  if(h >= 0) {
     // The banner itself may not be loaded yet.  This will preemptively help set
     // its eventual display height.
-    com.keyman.osk.Banner.DEFAULT_HEIGHT = h;
+    bannerHeight = h;
 
-    if(osk.banner.activeType != 'blank') {
-        osk.banner.height = h;
+    if(keyman.osk) {
+        keyman.osk.bannerView.activeBannerHeight = h;
     }
-    }
+  }
 
-    // Refresh KMW's OSK
-    kmw.correctOSKTextSize();
-    doResetContext();
+  // Refresh KMW's OSK
+  keyman.refreshOskLayout();
+  doResetContext();
 }
 
 function setOskHeight(height) {
@@ -99,8 +111,7 @@ function setOskHeight(height) {
     if(kmw && kmw.core && kmw.core.activeKeyboard) {
         kmw.core.activeKeyboard.refreshLayouts();
     }
-    kmw.osk.show(true);
-    kmw.correctOSKTextSize();
+    kmw.refreshOskLayout();
     doResetContext();
 }
 
@@ -120,8 +131,10 @@ function getOskWidth() {
 
 function getOskHeight() {
     var height = oskHeight;
-    if(keyman.osk.banner._activeType != 'blank') {
+    if(keyman.osk && keyman.osk.banner._activeType != 'blank') {
         height = height - keyman.osk.banner.height;
+    } else {
+        height = height - (bannerHeight ? bannerHeight : 0);
     }
     return height;
 }
@@ -129,11 +142,11 @@ function getOskHeight() {
 var keyboardOffset = 0;
 function setKeymanLanguage(stub) {
     var kmw = window.keyman;
-    
+
     KeymanWeb.registerStub(stub);
-    
-    kmw.setActiveKeyboard(stub.KP + '::' + stub.KI, stub.KLC).then(function() {
-        kmw.osk.show(true);
+
+    kmw.setActiveKeyboard(stub.KI, stub.KLC).then(function() {
+        keyman.refreshOskLayout();
         doResetContext();
     });
 }
@@ -263,31 +276,28 @@ function doResetContext() {
     keyman.resetContext();
 }
 
-function setCursorRange(pos, length) {
-    //console.log('setCursorRange('+pos+', '+length+')');
-    var ta = document.getElementById('ta');
-    var resetContext = (ta.selectionStart != pos || ta.selectionEnd != pos + length);
-    ta.selectionStart = ta._KeymanWebSelectionStart = pos;
-    ta.selectionEnd = ta._KeymanWebSelectionEnd = pos + length;
-    if(resetContext) {
-        //console.log('  setCursorRange: resetting context');
-        doResetContext();
+function setKeymanContext(text, doSync, selStart, selLength) {
+    // console.log(`setKeymanContext(${JSON.stringify(text)}, ${doSync}, ${pos}, ${length})`);
+    if(text == undefined) {
+        text = '';
     }
-    return ta.selectionEnd;
-}
 
-function setKeymanVal(text) {
-    //console.log('setKeymanVal('+JSON.stringify(text)+')');
-    if(undefined == text) text = '';
-    var ta = document.getElementById('ta');
+    // Both pos + length are optional parameters.
+    // undefined + <number> => NaN; undefined + undefined => NaN.
+    let selEnd = selStart + selLength;
+    selEnd = isNaN(selEnd) ? undefined : selEnd;
 
-    var resetContext = ta.value != text;
-    ta.value = text;
-    if(resetContext) {
-        //console.log('  setKeymanVal: resetting context');
-        doResetContext();
+    if(doSync) {
+      const shouldReset = keyman.context.updateContext(text, selStart, selEnd);
+      if(shouldReset) {
+        keyman.resetContext();
+      }
+    } else {
+      // if not in "sync" mode, we have a hard context reset; just full-reset it.
+      keyman.context.setText(text);
+      keyman.context.setSelection(selStart, selStart+selLength);
+      keyman.resetContext();
     }
-    return ta.value;
 }
 
 function executePopupKey(keyID, keyText) {
@@ -316,16 +326,13 @@ function toHex(theString) {
 function enableSuggestions(model, mayPredict, mayCorrect) {
     // Set the options first so that KMW's ModelManager can properly handle model enablement states
     // the moment we actually register the new model.
-    keyman.osk.banner.setOptions({
-    'mayPredict': mayPredict,
-    'mayCorrect': mayCorrect
-    });
+    keyman.core.languageProcessor.mayPredict = mayPredict;
+    keyman.core.languageProcessor.mayCorrect = mayCorrect;
 
-    keyman.modelManager.register(model);
+    keyman.addModel(model);
 }
 
 function setSpacebarText(mode) {
-    keyman.options['spacebarText'] = mode;
-    keyman.osk.show(true);
+    keyman.config.spacebarText = mode;
 }
 

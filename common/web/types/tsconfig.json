@@ -1,0 +1,20 @@
+{
+  "extends": "../../../tsconfig.base.json",
+
+  "compilerOptions": {
+    "outDir": "build/src/",
+    "rootDir": "src/",
+    "baseUrl": ".",
+    "allowSyntheticDefaultImports": true,
+    "preserveConstEnums": true,
+  },
+  "include": [
+    "src/deps/xml2js/*.js",
+    "src/**/*.ts",
+    "src/schemas/*.mjs", // Import the validators
+  ],
+  "references": [
+    { "path": "../keyman-version" },
+    { "path": "../../../core/include/ldml/tsconfig.json"},
+  ]
+}

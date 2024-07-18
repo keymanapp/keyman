@@ -12,7 +12,7 @@
 #include "processor.hpp"
 
 
-using namespace km::kbp;
+using namespace km::core;
 
 namespace
 {
@@ -25,15 +25,15 @@ namespace
 // Forward declarations
 
 
-option::option(km_kbp_option_scope s, char16_t const *k, char16_t const *v)
+option::option(km_core_option_scope s, char16_t const *k, char16_t const *v)
 : option()
 {
   if (k && v)
   {
     auto n_k = std::char_traits<char16_t>::length(k)+1,
          n_v = std::char_traits<char16_t>::length(v)+1;
-    auto _key = new km_kbp_cp[n_k],
-         _val = new km_kbp_cp[n_v];
+    auto _key = new km_core_cu[n_k],
+         _val = new km_core_cu[n_v];
     std::copy_n(k, n_k, _key);
     std::copy_n(v, n_v, _val);
 
@@ -43,8 +43,16 @@ option::option(km_kbp_option_scope s, char16_t const *k, char16_t const *v)
   }
 }
 
+km_core_option_item
+option::release() {
+  km_core_option_item opt = *this;
+  key = nullptr;
+  value = nullptr;
+  return opt;
+}
+
 // TODO: Relocate this and fix it
-json & km::kbp::operator << (json &j, abstract_processor const &)
+json & km::core::operator << (json &j, abstract_processor const &)
 {
   j << json::object;
   // auto n = 0;
@@ -59,7 +67,7 @@ json & km::kbp::operator << (json &j, abstract_processor const &)
   // }
 
   j << "saved" << json::object;
-  for (auto scope: {KM_KBP_OPT_KEYBOARD, KM_KBP_OPT_ENVIRONMENT})
+  for (auto scope: {KM_CORE_OPT_KEYBOARD, KM_CORE_OPT_ENVIRONMENT})
   {
     j << scope_names_lut[scope-1] << json::object;
     // for (auto & opt: opts._saved)

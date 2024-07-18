@@ -1,0 +1,12 @@
+﻿c should fail to compile, readonly group uses() non-readonly group
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+group(foo) readonly
+
+'a' > use(bar)
+
+group(bar)
+

@@ -35,6 +35,18 @@ def getVersionCode = { ->
     return 100
 }
 
+def getVersionMD = { ->
+    String env_version = System.getenv("VERSION")
+    if (env_version != null) {
+        // If building from script, we have build number in VERSION
+        println "Using build $env_version from VERSION"
+        return "$env_version"
+    } else {
+        String version_md = file("$rootPath/../VERSION.md").text.trim()
+        return "$version_md"
+    }
+}
+
 def getVersionName = { ->
     String env_version = System.getenv("VERSION_WITH_TAG")
     if (env_version != null) {
@@ -65,11 +77,24 @@ def getVersionEnvironment = { ->
     }
 }
 
+def getVersionGitTag = { ->
+    String env_git_tag = System.getenv("VERSION_GIT_TAG")
+    if (env_git_tag != null) {
+        println "Using $env_git_tag from VERSION_GIT_TAG"
+        return "$env_git_tag"
+    } else {
+        // Building probably from IDE
+        println "Using release@$VERSION_NAME"
+        return "release@$VERSION_NAME"
+    }
+}
 ext {
     VERSION_CODE=getVersionCode()
+    VERSION_MD=getVersionMD()
     VERSION_NAME=getVersionName()
     VERSION_ENVIRONMENT=getVersionEnvironment()
     VERSION_TAG=System.getenv("VERSION_TAG")
+    VERSION_GIT_TAG=getVersionGitTag()
 }
 
 //println "version.gradle: VERSION_TAG: " + VERSION_TAG

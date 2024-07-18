@@ -1,6 +1,5 @@
-namespace wordBreakers {
-export namespace data {
 // Automatically generated file. DO NOT MODIFY.
+
 /**
  * Valid values for a word break property.
  */
@@ -1801,5 +1800,3 @@ export const WORD_BREAK_PROPERTY: [number, WordBreakProperty][] = [
   [/*start*/ 0xE0100, WordBreakProperty.Extend],
   [/*start*/ 0xE01F0, WordBreakProperty.Other],
 ];
-}
-}

@@ -4,8 +4,6 @@ EXPORTS
       Keyman_GetInitialised
 			Keyman_Initialise
 			Keyman_Exit
-			Keyman_ForceKeyboard
-			Keyman_StopForcingKeyboard
 			Keyman_GetLastActiveWindow
 			Keyman_GetLastFocusWindow
 			KMSetOutput
@@ -35,6 +33,7 @@ EXPORTS
       Keyman_ResetInitialisation
 
   	  Keyman_WriteDebugEvent
+  	  Keyman_WriteDebugEventW
 
       Keyman_UpdateTouchPanelVisibility
 

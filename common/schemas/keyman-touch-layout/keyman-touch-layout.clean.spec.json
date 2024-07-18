@@ -86,7 +86,7 @@
         "layer": { "$ref": "#/definitions/layer-id" },
         "nextlayer": { "$ref": "#/definitions/layer-id" },
         "font": { "$ref": "#/definitions/font-spec" },
-        "fontsize": { "type": "string" },
+        "fontsize": { "$ref": "#/definitions/fontsize-spec" },
         "sp": { "$ref": "#/definitions/key-sp" },
         "pad": { "$ref" : "#/definitions/key-pad" },
         "width": { "$ref" : "#/definitions/key-width" },
@@ -141,7 +141,7 @@
         "layer": { "$ref": "#/definitions/layer-id" },
         "nextlayer": { "$ref": "#/definitions/layer-id" },
         "font": { "$ref": "#/definitions/font-spec" },
-        "fontsize": { "type": "string" },
+        "fontsize": { "$ref": "#/definitions/fontsize-spec" },
         "sp": { "$ref": "#/definitions/key-sp" },
         "pad": { "$ref" : "#/definitions/key-pad" },
         "width": { "$ref" : "#/definitions/key-width" }

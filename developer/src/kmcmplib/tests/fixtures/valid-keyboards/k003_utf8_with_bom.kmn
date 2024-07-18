@@ -1,0 +1,11 @@
+﻿c Description: Verifies that kmcmplib can compile a UTF-8 file (with BOM)
+
+store(&NAME) 'k003_utf8_with_bom'
+store(&VERSION) '9.0'
+
+begin unicode > use(main)
+
+group(main) using keys
+
++ [K_A] > 'a'
+'a' + [K_B] > 'ខ្មែរ'

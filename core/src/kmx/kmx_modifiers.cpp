@@ -4,7 +4,7 @@
 */
 #include "kmx_processevent.h"
 
-using namespace km::kbp;
+using namespace km::core;
 using namespace kmx;
 
 #define MAX_RSHIFT 24
@@ -22,7 +22,7 @@ static KMX_DWORD legalRuleStates[MAX_RSHIFT] = {
 };
 
 // Simulate RALT -> LCtrl+RAlt -> columns marked with *
-// 
+//
 // Truth table: matching key states
 // 1 = yes match always
 // 2 = RAlt mapped as LCtrl+RAlt by keyboard driver
@@ -109,14 +109,14 @@ KMX_BOOL KMX_ProcessEvent::IsEquivalentShift(KMX_UINT rshift, KMX_UINT kshift) {
 
   for(i = 0; i < MAX_RSHIFT; i++) {
     if(rshift == legalRuleStates[i]) {
-      rshift = i; 
+      rshift = i;
       break;
     }
   }
   if(i == MAX_RSHIFT) return FALSE;
 
   for(i = 0; i < MAX_KSHIFT; i++) {
-    if(kshift == legalKeyStates[i]) { 
+    if(kshift == legalKeyStates[i]) {
       kshift = i;
       break;
     }

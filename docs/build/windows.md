@@ -101,18 +101,25 @@ Building:
 * Ant
 * Gradle
 * Maven
+* Optional: OpenJDK 11 (https://learn.microsoft.com/en-us/java/openjdk/download)
 
 ```ps1
 # Elevated PowerShell
 choco install android-sdk android-studio ant gradle maven
 # optionally install sdk images
-sdkmanager "system-images;android-30;google_apis;armeabi-v7a"
+sdkmanager "system-images;android-33;google_apis;armeabi-v7a"
 sdkmanager --update
 sdkmanager --licenses
 ```
 
 * Run Android Studio once after installation to install additional components
   such as emulator images and SDK updates.
+
+**Required environment variables**:
+* [`JAVA_HOME`](#java_home)
+
+**Optional environment variables**:
+* [`JAVA_HOME_11`](#java_home)
 
 Building:
 * [Building Keyman for Android](../../android/README.md)
@@ -134,7 +141,7 @@ PowerShell.
 * git for Windows
 * jq
 * Python 3
-* Meson 0.56+
+* Meson 1.0+
 * Ninja
 * Pandoc
 
@@ -142,10 +149,9 @@ PowerShell.
 # Elevated PowerShell
 # for *much* faster download, hide progress bar (PowerShell/PowerShell#2138)
 $ProgressPreference = 'SilentlyContinue'
-choco install git jq python ninja pandoc
+choco install git jq python ninja pandoc meson
 refreshenv
-# choco meson (0.55) is too old, 0.56 required:
-python -m pip install meson
+```
 
 **Environment variables**:
 * [`KEYMAN_ROOT`](#keyman_root)
@@ -175,9 +181,9 @@ You can use Windows Settings to add these environment variables permanently:
 * KeymanWeb
 
 **Requirements**:
-* emscripten 2.0.23+
-* node.js 14+
-* openjdk 8+
+* emscripten 3.1.46 or later
+* node.js 18+
+* [openjdk 11](https://learn.microsoft.com/en-us/java/openjdk/download#openjdk-11)+
 
 ```ps1
 # Elevated PowerShell
@@ -185,7 +191,7 @@ You can use Windows Settings to add these environment variables permanently:
 # for *much* faster download, hide progress bar (PowerShell/PowerShell#2138)
 $ProgressPreference = 'SilentlyContinue'
 
-choco install emscripten
+choco install emscripten --version 3.1.46
 ```
 
 Note: emscripten very unhelpfully overwrites JAVA_HOME, and adds its own
@@ -245,6 +251,10 @@ choco install openjdk
   ```ps1
   choco install visualstudio2019community visualstudio2019-workload-nativedesktop visualstudio2019buildtools
   ```
+  * Verify required build tools are installed
+    * Run `Visual Studio Installer`
+    * Check the `Individual components` tab
+    * Verify `MSVC v142 - VS 2019 c++ x64/x86 build tools (Latest)` is installed. If not, install it.
 
   Recommended: configure Visual Studio to use two-space tab stops:
   1. Open the options dialog: Tools > Options.
@@ -340,6 +350,17 @@ be used to sign executables when you build a release.
 To include UserDefines.mak in the build, use the command line parameter
 `-DUSERDEFINES`. You can also set an environment variable `USERDEFINES=1` to get
 the same result.
+
+### JAVA_HOME
+
+This environment variable tells Gradle what version of Java to use for building Keyman for Android.
+
+**Multiple versions of Java:** If you need to build Keyman for Android 16.0 or older versions, you can set `JAVA_HOME_11` to the OpenJDK 11 path and `JAVA_HOME` to the OpenJDK 8 path. This will build both versions correctly from command line. But note that you do need to update your `JAVA_HOME` env var to the associated version before opening Android Studio and loading any Android projects. `JAVA_HOME_11` is mostly used by CI.
+
+```bat
+SET JAVA_HOME="path to OpenJDK 8"
+SET JAVA_HOME_11="path to OpenJDK 11"
+```
 
 ## Optional Tools
 

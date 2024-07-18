@@ -362,36 +362,3 @@ STDMETHODIMP CKMTipTextService::OnPreservedKey(ITfContext *pContext, REFGUID rgu
 	*pfEaten = FALSE;
 	return S_OK;
 }
-
-BOOL CKMTipTextService::DoRefreshPreservedKeys(BOOL Activating) {
-  LogEnter();
-  ITfKeystrokeMgr *pKeystrokeMgr;
-  HRESULT hr = S_OK;
-
-  Log(L"CKMTipTextService::DoRefreshPreservedKeys");
-
-  if (!_pThreadMgr) {
-    return FALSE;
-  }
-
-  if (_pThreadMgr->QueryInterface(IID_ITfKeystrokeMgr, (void **)&pKeystrokeMgr) != S_OK) {
-    return FALSE;
-  }
-
-  _UnpreserveAltKeys(pKeystrokeMgr);
-  if (Activating) {
-    hr = _PreserveAltKeys(pKeystrokeMgr);   // I3588
-  }
-
-  pKeystrokeMgr->Release();
-
-  return (hr == S_OK);
-}
-
-__declspec(dllexport) BOOL WINAPI RefreshPreservedKeys(BOOL Activating) {
-  LogEnter();
-  if (CKMTipTextService::ThreadThis) {
-    return CKMTipTextService::ThreadThis->DoRefreshPreservedKeys(Activating);
-  }
-  return FALSE;
-}

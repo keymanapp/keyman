@@ -9,10 +9,4 @@ WARNING: these are old configuration notes. See [index.md](../index.md) for curr
 * A local installation of [Node.js](https://nodejs.org/) v8.9+.
 	* Builds will call `npm install` to automatically install further necessary build dependencies.
 
-	* Linux users can run the following to update to LTS version of nodejs
-
-```
-sudo apt-get install python-software-properties
-curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-sudo apt-get install nodejs
-```
+	* Linux users can update to LTS version of nodejs by following instructions on the [NodeSource Distributions](https://github.com/nodesource/distributions#table-of-contents) page.

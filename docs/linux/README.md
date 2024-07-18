@@ -2,31 +2,18 @@
 
 ## Projects
 
-- [keyman-config](../../linux/keyman-config) - km-config and some other tools to install, uninstall
-  and view information about Keyman keyboard packages.
+- [keyman-config](../../linux/keyman-config) - `km-config` and some other tools
+  to install, uninstall and view information about Keyman keyboard packages.
 - [ibus-keyman](../../linux/ibus-keyman) - IBUS integration to use .kmp Keyman keyboards
+- [keyman-system-service](../../linux/keyman-system-service) - A DBus system service
+  that allows to perform keyboard related actions when running under Wayland.
 - [core](../../core) - common keyboardprocessor library
-- [legacy/kmflcomp](../../linux/legacy/kmflcomp) - KMFL keyboard compiler
-- [legacy/libkmfl](../../linux/legacy/libkmfl) - older KMFL core library
-- [legacy/ibus-kmfl](../../linux/legacy/ibus-kmfl) - IBUS integration to use KMFL
 
 See [license information](../../linux/LICENSE.md) about licensing.
 
 ## Linux Requirements/Setup
 
-- It is helpful to be using the [packages.sil.org](http://packages.sil.org) repo
-
-- Install packages required for building and developing Keyman for Linux
-
-  ```bash
-  sudo apt install cdbs debhelper libx11-dev autotools-dev build-essential \
-    dh-autoreconf flex bison libibus-1.0-dev python3-setuptools meson \
-    libjson-glib-dev libgtk-3-dev libxml2-utils help2man python3-lxml \
-    python3-magic python3-numpy python3-pil python3-pip python3-qrcode \
-    python3-requests python3-requests-cache python3 python3-gi dconf-cli \
-    dconf-editor cargo python3-dbus gir1.2-webkit2-4.0 ibus libglib2.0-bin \
-    liblocale-gettext-perl xvfb xserver-xephyr metacity mutter
-  ```
+See [document in ../build](../build/linux-ubuntu.md).
 
 ## Compiling from Command Line
 
@@ -36,54 +23,25 @@ See [license information](../../linux/LICENSE.md) about licensing.
 
 - The process to build and install everything is:
 
-  - `make reconf` to create the build system and set the version
-  - `make fullbuild` to configure and build
-  - `sudo make install` to install to `/usr/local`
+  - `linux/build.sh configure` to set the version and setup the build system
+  - `linux/build.sh build` to build
+  - `sudo linux/build.sh install` to install to `/usr/local`
 
-- Some of the files must be installed to `/usr/share/` so `make install` must be run as `sudo`.
+- Some of the files must be installed to `/usr/share/` or `/usr/local/share`
+  so `linux/build.sh install` must be run as `sudo`.
 
-  To do this run `sudo make install`
+  To do this run `sudo linux/build.sh install`
 
-  - This will install to `/usr/local`
-    - and `/usr/share/ibus/component/keyman.xml` and `/usr/share/keyman/icons`
+  - This will install to `/usr/local` and
+    `/usr/local/share/ibus/component/keyman.xml` and `/usr/local/share/keyman/icons`
 
-  - If you already have the ibus-keyman package installed then it will move the file `/usr/share/ibus/component/keyman.xml` to `/usr/share/doc/ibus-keyman/`
-
-- run `sudo make uninstall` to uninstall everything and put it back again
-
-#### Tmp install
-
-Used by TC for validating PRs
-
-Run `make tmpinstall` to build and install **keyboardprocessor** and **ibus-keyman** to `/tmp/keyman`
-
-This is only for testing the build, not for running **ibus-keyman** in ibus
-
-### Manually
-
-- **ibus-keyman** requires headers and lib from **keyboardprocessor**
-
-So
-
-- **keyboardprocessor** must be built before **ibus-keyman**
-
-For each project run `./configure && make && make install`.
-
-You may prefer to create a different directory to build in and run configure from there e.g.
-
-```bash
-mkdir ../build-ibus-keyman
-cd ../build-ibus-keyman
-../ibus-keyman/configure
-make
-make install
-```
+- run `sudo linux/build.sh uninstall` to uninstall everything and put it back again
 
 ## Continuous integration
 
-Teamcity PR builds will run `make tmpinstall`
+Teamcity PR builds will run `linux/build.sh install`
 
-Master builds run `make tmpinstall` and create source packages
+Master builds run `linux/build.sh install` and create source packages
 
 Nightly and release builds upload the most recent new master build to <https://downloads.keyman.com>
 
@@ -94,14 +52,17 @@ for details on building Linux packages for Keyman.
 
 ## Testing
 
-### keyman-config
-
-The unit tests can be run with the following command:
+The tests can be run with the following command:
 
 ```bash
-cd linux/keyman-config
-./run-tests.sh
+linux/build.sh test
 ```
+
+To just run the unit tests without integration tests, add the
+`--no-integration` parameter.
+
+It's also possible to only run the tests for one of the subprojects. You
+can use `build.sh` in the subdirectory for that.
 
 ### ibus-keyman
 
@@ -112,37 +73,80 @@ to run the tests with X11.
 The tests can be run with the following command:
 
 ```bash
+cd linux/ibus-keyman
+./build.sh test
+```
+
+or with a script that accepts additional parameters:
+
+```bash
 cd linux/ibus-keyman/tests
-./run-tests
+scripts/run-tests
 ```
 
 The `run-tests` script accepts different arguments which can be seen with
-`./run-tests --help`.
+`scripts/run-tests --help`.
+
+### Code Coverage Report
+
+#### Prerequisites
+
+Code coverage reports require some additional tools: lcov, gcovr,
+libdatetime-perl, and coverage.
+
+You can install these with:
+
+```bash
+sudo apt update
+sudo apt install -y lcov libdatetime-perl gcovr
+pip3 install coverage
+```
+
+**Note:** You want lcov > 1.16, so you might have to download and install
+a newer version e.g. from <https://packages.ubuntu.com/mantic/lcov>.
+
+#### Creating and displaying code coverage reports
+
+All three projects (ibus-keyman, keyman-config, and keyman-system-service)
+can produce code coverage reports.
+
+Run `./build.sh --debug --coverage --report test` to create the report.
+
+**Note:** You might have to run `./build.sh clean` first.
+
+There's also an index page (`linux/CodecoverageReports.html`) that links to all
+three reports. You can run
+`linux/build.sh --debug --coverage --report --open --no-integration test`
+to create the coverage reports for all three Linux projects and open the
+index page in the browser.
 
 ## Running Keyman for Linux
 
 ### Setting up Ibus
 
-Ibus should be running on a default install of Ubuntu
+Ibus should be running on a default install of Ubuntu.
 
-You may want to install extra packages to get other ibus input methods e.g **ibus-unikey** for VN
+You may want to install extra packages to get other ibus input methods e.g
+**ibus-unikey** for VN.
 
-Run `ibus restart` after installing any of them
+Run `ibus restart` after installing any of them.
 
 ### Getting a Keyman keyboard
 
-- After installing a Keyman keyboard usually ibus will be restarted automatically so that ibus will
-  look for the new keyboard. If for whatever reason the keyboard doesn't show up in the system
+- After installing a Keyman keyboard usually ibus will be restarted
+  automatically so that ibus will look for the new keyboard. If for
+  whatever reason the keyboard doesn't show up in the system
   keyboard list, you can manually run `ibus restart`.
 
 ### Activating a Keyman keyboard
 
-Keyman tries to activate the keyboard automatically. If you want to activate it for a different
-language, you can do so by following the steps below.
+Keyman tries to activate the keyboard automatically. If you want to activate
+it for a different language, you can do so by following the steps below.
 
 #### GNOME3 (focal and bionic default, also newer Ubuntu versions)
 
-- Click the connection/sound/shutdown section in the top right. Then the tools icon for Settings.
+- Click the connection/sound/shutdown section in the top right. Then the tools
+  icon for Settings.
 
 - In `Language and Region` click `+` to add a keyboard.
 - Click the 3 dots expander then search for "Other" and click it

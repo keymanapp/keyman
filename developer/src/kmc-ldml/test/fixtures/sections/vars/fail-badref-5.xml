@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="vars-fail"/>
+
+  <keys />
+
+  <!-- from spec -->
+  <variables>
+    <set id="nonUnicodeSet" value="A B C"/>
+    <uset id="consonants" value="[$[nonUnicodeSet]]" /> <!-- fail: bad back reference to a set instead of a uset-->
+  </variables>
+
+</keyboard3>

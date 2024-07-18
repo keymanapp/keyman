@@ -132,6 +132,7 @@ uses
   UframeTextEditor, UfrmDebug, ExtShiftState,
   ImgList, MenuImgList,
   KeyboardParser, TextFileFormat, dmActionsKeyboardEditor,
+  dmActionsDebugger,
   VisualKeyboard, UframeOnScreenKeyboardEditor,
   KeymanDeveloperUtils,
   OnScreenKeyboard, KMDActionInterfaces,
@@ -452,13 +453,13 @@ type
     procedure ConfirmSaveOfOldEditorWindows;
     procedure ConfirmSaveOfOldEditorWindow(FeatureID: TKeyboardParser_FeatureID;
       FModified: Boolean; const FOldFilename: string; DoSave: TProc; DoLoad: TProc<String>);
-    procedure LoadFeature(ID: TKeyboardParser_FeatureID);
+    function LoadFeature(ID: TKeyboardParser_FeatureID): Boolean;
     function FeatureTab(kf: TKeyboardParser_FeatureID): TTabSheet;
     procedure InitFeatureTab(ID: TKeyboardParser_FeatureID);
     procedure FeatureModified(Sender: TObject);
     function SaveFeature(ID: TKeyboardParser_FeatureID): Boolean;
     procedure SelectTouchLayoutTemplate(APromptChange: Boolean);
-    procedure LoadTouchLayout;   // I4034
+    function LoadTouchLayout: Boolean;   // I4034
     function GetFontInfo(Index: TKeyboardFont): TKeyboardFontInfo;   // I4057
     procedure SetFontInfo(Index: TKeyboardFont; const Value: TKeyboardFontInfo);   // I4057
 
@@ -571,8 +572,6 @@ uses
   CharacterInfo,
   CharMapDropTool,
   Clipbrd,
-  compile,
-  CompileKeymanWeb,
   dmActionsMain,
   KeymanDeveloperOptions,
   KeymanVersion,
@@ -582,6 +581,7 @@ uses
   Keyman.Developer.System.Project.ProjectLog,
   Keyman.Developer.System.Project.kmnProjectFileAction,
   Keyman.Developer.System.ServerAPI,
+  Keyman.Developer.System.KmcWrapper,
   Keyman.Developer.UI.Project.ProjectFileUI,
   Keyman.Developer.UI.UfrmMessageDlgWithSave,
   ErrorControlledRegistry,
@@ -1012,11 +1012,11 @@ procedure TfrmKeymanWizard.StartDebugging(FStartTest: Boolean);
     ki: TKeyboardInfo;
     buf: WideString;
   begin
-    if not FileExists((ProjectFile as TkmnProjectFile).TargetFilename) then
+    if not FileExists((ProjectFile as TkmnProjectFile).KmxTargetFilename) then
       Exit(False);
 
     try
-      GetKeyboardInfo((ProjectFile as TkmnProjectFile).TargetFilename, True, ki);   // I4695
+      GetKeyboardInfo((ProjectFile as TkmnProjectFile).KmxTargetFilename, True, ki);   // I4695
       try
         Result := GetSystemStore(ki.MemoryDump.Memory, TSS_DEBUG_LINE, buf);
       finally
@@ -1069,7 +1069,7 @@ begin
       Exit;
     end;
 
-    if not FileExists((ProjectFile as TkmnProjectFile).TargetFilename) then
+    if not FileExists((ProjectFile as TkmnProjectFile).KmxTargetFilename) then
     begin
       ShowMessage(SKKeyboardKMXDoesNotExist);
       Exit;
@@ -1085,7 +1085,7 @@ begin
       FDebugForm.UpdateFont(nil);
 //    FDebugForm.Visible := True;
     FDebugForm.DebugFileName := FileName;
-    FDebugForm.CompiledFileName := (ProjectFile as TkmnProjectFile).TargetFilename;   // I4695
+    FDebugForm.CompiledFileName := (ProjectFile as TkmnProjectFile).KmxTargetFilename;   // I4695
     FDebugForm.ShowDebugForm;
   end;
 end;
@@ -1628,7 +1628,7 @@ begin
     FLayoutSetup := FOldLayoutSetup;
 end;
 
-procedure TfrmKeymanWizard.LoadFeature(ID: TKeyboardParser_FeatureID);
+function TfrmKeymanWizard.LoadFeature(ID: TKeyboardParser_FeatureID): Boolean;
 begin
   if FKeyboardParser.Features.ContainsKey(ID) then
   begin
@@ -1651,7 +1651,8 @@ begin
       end;
     kfTouchLayout:
       begin
-        LoadTouchLayout;   // I4034
+        if not LoadTouchLayout then
+          Exit(False);
       end;
     else
     begin
@@ -1667,6 +1668,7 @@ begin
     end;
   end;
   FFeature[ID].Modified := False;
+  Result := True;
 end;
 
 function TfrmKeymanWizard.SaveFeature(ID: TKeyboardParser_FeatureID): Boolean;
@@ -2007,7 +2009,12 @@ begin
   LoadSettings;
 
   for kf in FKeyboardParser.Features.Keys do
-    LoadFeature(kf);
+  begin
+    if not LoadFeature(kf) then
+    begin
+      Exit(False);
+    end;
+  end;
 
   if FKeyboardParser.IsComplex then   // I4557
     pagesLayout.ActivePage := pageLayoutCode;
@@ -2390,7 +2397,7 @@ begin
 
   if FKeyboardParser.Features.ContainsKey(kfOSK) then
   begin
-    frameOSK.KMXFileName := (ProjectFile as TkmnProjectFile).TargetFilename;   // I4695
+    frameOSK.KMXFileName := (ProjectFile as TkmnProjectFile).KmxTargetFilename;   // I4695
     frameOSK.UpdateControls;
   end;
 
@@ -2944,15 +2951,15 @@ end;
 
 procedure TfrmKeymanWizard.OSKImportKMX(Sender: TObject; var KMXFileName: TTempFile);   // I4181
 var
-  KMNFileName: TTempFile;
-  KMXFileName2: string;
+  KMNFileName: string;
   sw: WideString;
   kbdparser: TKeyboardParser;
   FEncoding: TEncoding;
   FIncludeCodes: string;
+  w: TKmcWrapper;
 begin
   KMXFileName := TTempFileManager.Get('.kmx');   // I4181
-  KMNFileName := TTempFileManager.Get('.kmn');   // I4181
+  KMNFileName := ExtractFilePath(Filename) + '__temp_osk_import_' + ExtractFileName(Filename);
 
   kbdparser := TKeyboardParser.Create;
   try
@@ -2963,6 +2970,7 @@ begin
     kbdparser.AddRequiredLines;
     kbdparser.SetSystemStoreValue(ssTargets, 'windows native');
     kbdparser.SetSystemStoreValue(ssVersion, SKeymanVersion90);
+    kbdparser.DeleteSystemStore(ssVisualKeyboard);
     kbdparser.DeleteSystemStore(ssBitmap);
 
     FIncludeCodes := kbdparser.GetSystemStoreValue(ssIncludeCodes);   // I4979
@@ -2988,23 +2996,24 @@ begin
   with TStringList.Create do  // I3337
   try
     Text := sw;
-    SaveToFile(KMNFileName.Name, FEncoding);   // I4181
+    SaveToFile(KMNFileName, FEncoding);   // I4181
   finally
     Free;
   end;
 
-  KMXFileName2 := KMXFileName.Name;   // I4181
-
-  TProject.CompilerMessageFile := ProjectFile;
   frmMessages.Clear;
-  if CompileKeyboardFile(PChar(KMNFileName.Name), PChar(KMXFileName2), False, False, False, ProjectCompilerMessage) <= 0 then   // I4181   // I4865   // I4866
-  begin
-    frmMessages.DoShowForm;
-    ShowMessage('There were errors compiling the keyboard to convert to the On Screen Keyboard.');
-    FreeAndNil(KMXFileName);   // I4181
+  w := TKmcWrapper.Create;
+  try
+    if not w.Compile(ProjectFile, KMNFileName, KMXFileName.Name, False) then
+    begin
+      frmMessages.DoShowForm;
+      ShowMessage('There were errors compiling the keyboard to convert to the On Screen Keyboard.');
+      FreeAndNil(KMXFileName);   // I4181
+    end;
+  finally
+    w.Free;
+    DeleteFile(KMNFileName);
   end;
-  FreeAndNil(KMNFileName);   // I4181
-  TProject.CompilerMessageFile := nil;
 end;
 
 procedure TfrmKeymanWizard.OSKImportKMXFinished(Sender: TObject; KMXFileName: TTempFile);   // I4181
@@ -3126,7 +3135,7 @@ end;
 
 procedure TfrmKeymanWizard.SaveOSK;
 begin
-  frameOSK.KMXFileName := (ProjectFile as TkmnProjectFile).TargetFilename;   // I4695
+  frameOSK.KMXFileName := (ProjectFile as TkmnProjectFile).KmxTargetFilename;   // I4695
   if FFeature[kfOSK].FileName = '' then
     FFeature[kfOSK].FileName := ChangeFileExt(FileName, '.kvks');
   frameOSK.FileName := FFeature[kfOSK].Filename;
@@ -3161,18 +3170,17 @@ begin
   FFeature[kfTouchLayout].Modified := True;
 end;
 
-procedure TfrmKeymanWizard.LoadTouchLayout;   // I4034
+function TfrmKeymanWizard.LoadTouchLayout: Boolean;   // I4034
 begin
   if pagesTouchLayout.ActivePage = pageTouchLayoutDesign then
   begin
-    if not frameTouchLayout.Load(FFeature[kfTouchLayout].Filename, False, False) then
-    begin
-      pagesTouchLayout.ActivePage := pageTouchLayoutCode;
-      frameTouchLayoutSource.LoadFromFile(FFeature[kfTouchLayout].Filename, tffUTF8);
-    end;
+    Result := frameTouchLayout.Load(FFeature[kfTouchLayout].Filename, False, False);
   end
   else
+  begin
     frameTouchLayoutSource.LoadFromFile(FFeature[kfTouchLayout].Filename, tffUTF8);
+    Result := True;
+  end;
 end;
 
 procedure TfrmKeymanWizard.SaveTouchLayout;   // I3885

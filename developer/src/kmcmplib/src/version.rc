@@ -1,0 +1,32 @@
+#include "../../../../common/windows/cpp/include/keymanversion.h"
+
+1 VERSIONINFO
+  FILEVERSION		KV_FILEVERSION
+  PRODUCTVERSION	KV_PRODUCTVERSION
+  FILEFLAGSMASK		0x3fL
+  FILEFLAGS		0x0L
+  FILEOS		0x4L
+  FILETYPE		0x2L
+  FILESUBTYPE		0x0L
+  BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+      BLOCK "0C0904E4"
+      BEGIN
+        VALUE "CompanyName", KV_COMPANY_NAME
+        VALUE "FileDescription", "Keyman compiler library\0"
+        VALUE "FileVersion", KV_VERSION_STRING
+        VALUE "InternalName", "KMCMPLIB\0"
+        VALUE "LegalCopyright", KV_LEGAL_COPYRIGHT
+        VALUE "LegalTrademarks", KV_LEGAL_TRADEMARKS
+        VALUE "OriginalFilename", "KMCMPLIB.DLL\0"
+        VALUE "ProductName", "Keyman Developer\0"
+        VALUE "ProductVersion", KV_VERSION_STRING
+        VALUE "Comments", "\0"
+      END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+      VALUE "Translation", 0xc09, 1252
+    END
+  END

@@ -1,6 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:tools="http://schemas.android.com/tools"
-  package="com.tavultesoft.kmea" >
+  xmlns:tools="http://schemas.android.com/tools">
     <!-- Query other IME's for keyboard picker menu -->
     <queries>
       <intent>
@@ -16,13 +15,14 @@
     <uses-permission android:name="android.permission.INTERNET" tools:node="remove" />
 
     <application
+        android:resizeableActivity="false"
         android:theme="@style/AppTheme" >
 
         <!-- Have application handle initializing Sentry -->
         <meta-data android:name="io.sentry.auto-init" android:value="false" />
 
         <activity
-            android:name="com.tavultesoft.kmea.KeyboardPickerActivity"
+            android:name="com.keyman.engine.KeyboardPickerActivity"
             android:exported="true"
             android:launchMode="singleTask"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
@@ -30,28 +30,28 @@
             android:theme="@style/AppTheme.Light.Dialog" >
         </activity>
         <activity
-            android:name="com.tavultesoft.kmea.KeyboardInfoActivity"
+            android:name="com.keyman.engine.KeyboardInfoActivity"
             android:exported="true"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.Light.Dialog" >
         </activity>
         <activity
-            android:name="com.tavultesoft.kmea.KMKeyboardDownloaderActivity"
+            android:name="com.keyman.engine.KMKeyboardDownloaderActivity"
             android:exported="true"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
             android:label=""
             android:theme="@style/AppTheme.Light.Dialog">
         </activity>
         <activity
-            android:name="com.tavultesoft.kmea.ModelPickerActivity"
+            android:name="com.keyman.engine.ModelPickerActivity"
             android:exported="true"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.Light.Dialog">
         </activity>
         <activity
-            android:name="com.tavultesoft.kmea.ModelInfoActivity"
+            android:name="com.keyman.engine.ModelInfoActivity"
             android:exported="true"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
             android:label="@string/app_name"
@@ -61,7 +61,7 @@
         <!-- Put other WebViewActivities in a separate process so the Keyboard WebView doesn't lag.
         Ref https://stackoverflow.com/questions/40650643/timed-out-waiting-on-iinputcontextcallback-with-custom-keyboard-on-android -->
         <activity
-            android:name="com.tavultesoft.kmea.KMHelpFileActivity"
+            android:name="com.keyman.engine.KMHelpFileActivity"
             android:exported="true"
             android:process=":KMHelpFileActivity"
             android:launchMode="singleTask"

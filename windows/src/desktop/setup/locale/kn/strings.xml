@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">ಕನ್ನಡ</string>
+  <string name="ssApplicationTitle">$APPNAME $VERSION ಸೆಟ್ಅಪ್</string>
+  <string name="ssTitle">$APPNAME $VERSION ಸ್ಥಾಪಿಸಿ</string>
+  <string name="ssInstallSuccess">$APPNAME $VERSION ಯಶಸ್ವಿಯಾಗಿ ಸ್ಥಾಪಿಸಲಾಗಿದೆ.</string>
+  <string name="ssCancelQuery">$APPNAME ಸ್ಥಾಪನೆಯನ್ನು ರದ್ದುಗೊಳಿಸಲು ನೀವು ಖಚಿತವಾಗಿ ಬಯಸುವಿರಾ?</string>
+  <string name="ssBootstrapExtractingBundle">ಕಡತಗಳನ್ನು ಹೊರತೆಗೆಯಲಾಗುತ್ತಿದೆ...</string>
+  <string name="ssBootstrapCheckingPackages">ಪ್ಯಾಕೇಜ್‌ಗಳನ್ನು ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...</string>
+  <string name="ssBootstrapCheckingForUpdates">ನವೀಕರಣಗಳಿಗಾಗಿ ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">ಸ್ಥಾಪಿಸಲಾದ ಆವೃತ್ತಿಗಳನ್ನು ಪರಿಶೀಲಿಸಲಾಗುತ್ತಿದೆ...</string>
+  <string name="ssBootstrapReady">ಪೂರ್ಣಗೊಳಿಸುತ್ತಿದೆ...</string>
+  <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
+  <string name="ssActionInstallKeyman">$APPNAME %0:s %1:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
+  <string name="ssActionInstallPackage">• %0:s %1:s %2:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: ssActionDownload -->
+  <string name="ssActionInstallPackageLanguage">• %2:s ಗೆ %0:s %1:s %3:s</string>
+  <string name="ssActionNothingToInstall">ಸ್ಥಾಪಿಸಲು ಏನೂ ಇಲ್ಲ.</string>
+  <!-- Parameters: %0:s download size -->
+  <string name="ssActionDownload">(ಡೌನ್ಲೋಡ್ %0:s)</string>
+  <string name="ssActionInstall">ಸೆಟ್ಅಪ್ ಸ್ಥಾಪಿಸುತ್ತದೆ:</string>
+  <string name="ssFreeCaption">$APPNAME $VERSION ಉಚಿತ ಮತ್ತು ಮುಕ್ತ ಸಂಪನ್ಮೂಲವಾಗಿದೆ</string>
+  <string name="ssLicenseLink">&amp;ಪರವಾನಗಿಯನ್ನು ಓದಿ</string>
+  <string name="ssInstallOptionsLink">ಅನುಸ್ಥಾಪಿಸುವ &amp; ಆಯ್ಕೆಗಳು</string>
+  <string name="ssMessageBoxTitle">$APPNAME ಅನುಸ್ಥಾಪಿಸು</string>
+  <string name="ssOkButton">ಸರಿ</string>
+  <string name="ssInstallButton">&amp;ಅನುಸ್ಥಾಪಿಸು</string>
+  <string name="ssCancelButton">ರದ್ದುಮಾಡು</string>
+  <string name="ssExitButton">ನಿರ್ಗಮನ&amp;</string>
+  <string name="ssStatusInstalling">$APPNAME ಸ್ಥಾಪಿಸಲಾಗುತ್ತಿದೆ</string>
+  <string name="ssStatusRemovingOlderVersions">ಹಳೆಯ ಆವೃತ್ತಿಗಳನ್ನು ತೆಗೆದುಹಾಕಲಾಗುತ್ತಿದೆ</string>
+  <string name="ssStatusComplete">ಅನುಸ್ಥಾಪನೆಯು ಪೂರ್ಣಗೊಂಡಿದೆ</string>
+  <string name="ssQueryRestart">ಸೆಟ್‌ಅಪ್ ಅನ್ನು ಪೂರ್ಣಗೊಳಿಸಲು ನೀವು ವಿಂಡೋಸ್ ಅನ್ನು ಮರುಪ್ರಾರಂಭಿಸಬೇಕು. ನೀವು ವಿಂಡೋಸ್ ಅನ್ನು ಮರುಪ್ರಾರಂಭಿಸಿದಾಗ, ಸೆಟ್‌ಅಪ್ ಮುಂದುವರಿಯುತ್ತದೆ.
+
+ಈಗ ವಿಂಡೋಸ್ ಅನ್ನು ಮರುಪ್ರಾರಂಭಿಸಬಹುದೇ?</string>
+  <string name="ssErrorUnableToAutomaticallyRestart">ವಿಂಡೋಸ್ ಅನ್ನು ಮರುಪ್ರಾರಂಭಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ. ನೀವು $APPNAME ಅನ್ನು ಪ್ರಾರಂಭಿಸುವ ಮೊದಲು, ವಿಂಡೋಸ್ ಅನ್ನು ಮರುಪ್ರಾರಂಭಿಸಬೇಕು.</string>
+  <string name="ssMustRestart">ಸೆಟ್‌ಅಪ್ ಅನ್ನು ಪೂರ್ಣಗೊಳಿಸಲು ನೀವು ವಿಂಡೋಸ್ ಅನ್ನು ಮರುಪ್ರಾರಂಭಿಸಬೇಕು. ನೀವು ವಿಂಡೋಸ್ ಅನ್ನು ಮರುಪ್ರಾರಂಭಿಸಿದಾಗ, ಸೆಟ್‌ಅಪ್ ಮುಕ್ತಾಯಗೊಳ್ಳುತ್ತದೆ.</string>
+  <string name="ssOldOsVersionInstallKeyboards">$APPNAME $VERSION ಸ್ಥಾಪಿಸಲು (Windows 7) ವಿಂಡೋಸ್ ೭ ಅಥವಾ ನಂತರದ ಅಗತ್ಯವಿದೆ. ಆದಾಗ್ಯೂ, ಕೀಮನ್ ಡೆಸ್ಕ್‌ಟಾಪ್ 7, 8 ಅಥವಾ 9 ಅನ್ನು ಪತ್ತೆಹಚ್ಚಲಾಗಿದೆ. ಈ ಸ್ಥಾಪಕದಲ್ಲಿ ಸೇರಿಸಲಾದ ಕೀಲಿಮಣೆಗಳನ್ನು ಸ್ಥಾಪಿಸಲಾದ ಕೀಮ್ಯಾನ್ ಡೆಸ್ಕ್‌ಟಾಪ್ ಆವೃತ್ತಿಗೆ ಸ್ಥಾಪಿಸಲು ನೀವು ಬಯಸುವಿರಾ?</string>
+  <string name="ssOldOsVersionDownload">$APPNAME ನ ಈ ಆವೃತ್ತಿಯನ್ನು ಸ್ಥಾಪಿಸಲು (Windows 7) ವಿಂಡೋಸ್ ೭ ಅಥವಾ ನಂತರದ ಅಗತ್ಯವಿದೆ. ನೀವು ಕೀಮ್ಯಾನ್ ಡೆಸ್ಕ್‌ಟಾಪ್ ೮ ಅನ್ನು ಡೌನ್‌ಲೋಡ್ ಮಾಡಲು ಬಯಸುವಿರಾ?</string>
+  <string name="ssOptionsTitle">ಸ್ಥಾಪಿಸುವ ಆಯ್ಕೆಗಳು</string>
+  <string name="ssOptionsTitleInstallOptions">ಅನುಸ್ಥಾಪನೆಯ ಆಯ್ಕೆಗಳು</string>
+  <string name="ssOptionsTitleDefaultKeymanSettings">ಪೂರ್ವನಿರ್ಧರಿತ $APPNAME ಸೆಟ್ಟಿಂಗ್‌ಗಳು</string>
+  <string name="ssOptionsTitleSelectModulesToInstall">ಸ್ಥಾಪಿಸಲು ಅಥವ ನವೀಕರಿಸಲು ಇರುವ ಮಾಡ್ಯೂಲ್‌ಗಳು</string>
+  <string name="ssOptionsTitleAssociatedKeyboardLanguage">ಕೀಲಿಮಣೆ ಸಂಬಂಧಿತ ಭಾಷೆಗಳು</string>
+  <string name="ssOptionsTitleLocation">ಸ್ಥಾಪಿಸಲು ಆವೃತ್ತಿ</string>
+  <string name="ssOptionsStartWithWindows">$APPNAME ಚಲನೆಯನ್ನು ವಿಂಡೋಸ್ ಪ್ರಾರಂಭವಾದಾಗ ಪ್ರಾರಂಭಿಸು</string>
+  <string name="ssOptionsStartAfterInstall">ಸ್ಥಾಪನೆ ಪೂರ್ಣಗೊಂಡಾಗ $APPNAME ಅನ್ನು ಪ್ರಾರಂಭಿಸಿ</string>
+  <string name="ssOptionsCheckForUpdates">ನವೀಕರಣಗಳಿಗೆ ನಿಯತಕಾಲಿಕವಾಗಿ ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಪರಿಶೀಲಿಸಿ</string>
+  <string name="ssOptionsUpgradeKeyboards">ಹಳೆಯ ಆವೃತ್ತಿಗಳೊಂದಿಗೆ ಸ್ಥಾಪಿಸಲಾದ ಕೀಲಿಮಣೆ‌ಗಳನ್ನು $VERSION ಆವೃತ್ತಿಗೆ ನವೀಕರಿಸು</string>
+  <string name="ssOptionsAutomaticallyReportUsage">keyman.com ಜೊತೆಗೆ ಅನಾಮಧೇಯ ಬಳಕೆಯ ಅಂಕಿಅಂಶಗಳನ್ನು ಹಂಚಿಕೊಳ್ಳಿ</string>
+  <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
+  <string name="ssInstallerVersion">ಸೆಟ್ಅಪ್ ಆವೃತ್ತಿ: %0:s</string>
+  <string name="ssOptionsInstallKeyman">$APPNAME ಸ್ಥಾಪಿಸು</string>
+  <string name="ssOptionsUpgradeKeyman">$APPNAME ನವೀಕರಿಸು</string>
+  <!-- Parameters: %0:s: installed version -->
+  <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s ಈಗಾಗಲೇ ಸ್ಥಾಪಿಸಲಾಗಿದೆ.</string>
+  <!-- Parameters: %0:s: version, %1:s: size -->
+  <string name="ssOptionsDownloadKeymanVersion">ಡೌನ್ಲೋಡ್ ಆವೃತ್ತಿ %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: version -->
+  <string name="ssOptionsInstallKeymanVersion">ಆವೃತ್ತಿ %0:s</string>
+  <!-- Parameters: %0:s: package name %1:s -->
+  <string name="ssOptionsInstallPackage">%0:s ಸ್ಥಾಪಿಸು</string>
+  <!-- Parameters: %0:s: package version %1:s package size -->
+  <string name="ssOptionsDownloadPackageVersion">ಡೌನ್ಲೋಡ್ ಆವೃತ್ತಿ %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: package version -->
+  <string name="ssOptionsInstallPackageVersion">ಆವೃತ್ತಿ %0:s</string>
+  <!-- Parameters: %0:s package name -->
+  <string name="ssOptionsPackageLanguageAssociation">%0:s ಕೀಲಿಮಣೆಗೆ ಸಂಬಂಧಿತ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆಮಾಡಿ</string>
+  <string name="ssOptionsDefaultLanguage">ಪೂರ್ವನಿರ್ಧರಿತ ಭಾಷೆ</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingTitle">%0:s ಡೌನ್ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingText">%0:s ಡೌನ್ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ</string>
+  <string name="ssOffline">$APPNAME ಸೆಟ್‌ಅಪ್ ಗೆ ಹೆಚ್ಚುವರಿ ಸಂಪನ್ಮೂಲಗಳನ್ನು ಡೌನ್ಲೋಡ್ ಮಾಡಲು keyman.com ಅನ್ನು ಸಂಪರ್ಕಿಸಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ.</string>
+  <string name="ssOffline2">ದಯವಿಟ್ಟು ನೀವು ಆನ್‌ಲೈನ್‌ನಲ್ಲಿರುವಿರಿ ಎಂಬುದನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತು ನಿಮ್ಮ ಫೈರ್‌ವಾಲ್ ಸೆಟ್ಟಿಂಗ್‌ಗಳಲ್ಲಿ ಇಂಟರ್ನೆಟ್ ಅನ್ನು ಪ್ರವೇಶಿಸಲು $APPNAME ಸೆಟ್‌ಅಪ್ ಗೆ ಅನುಮತಿಯನ್ನು ನೀಡಿ.</string>
+  <string name="ssOffline3">ಸೆಟ್‌ಅಪ್‌ನಿಂದ ನಿರ್ಗಮಿಸಲು \"ಸ್ಥಗಿತಗೊಳಿಸು\" ಕ್ಲಿಕ್ ಮಾಡಿ, ಸಂಪನ್ಮೂಲಗಳನ್ನು ಪುನಃ ಪ್ರಯತ್ನಿಸಲು ಮತ್ತು ಡೌನ್ಲೋಡ್ ಮಾಡಲು ಮರುಪ್ರಯತ್ನಿಸಿ ಅಥವಾ ಇದನ್ನು ನಿರ್ಲಕ್ಷಿಸಿ ಆಫ್‌ಲೈನ್‌ನಲ್ಲಿ ಮುಂದುವರಿಸಿ.</string>
+</resources>

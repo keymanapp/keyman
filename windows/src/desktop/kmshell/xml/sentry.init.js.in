@@ -10,7 +10,7 @@
 Sentry.init({
   dsn: 'https://92eb58e6005d47daa33c9c9e39458eb7@o1005580.ingest.sentry.io/5983518',  // Keyman for Windows
   environment: '$Environment',
-  release: 'release-$VersionWithTag'
+  release: '$VersionGitTag'
 });
 
 function keymanEnableDiagnostics() {

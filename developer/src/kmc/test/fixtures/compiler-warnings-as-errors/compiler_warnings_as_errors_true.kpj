@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<KeymanDeveloperProject>
+  <Options>
+    <BuildPath>$PROJECTPATH</BuildPath>
+    <CompilerWarningsAsErrors>True</CompilerWarningsAsErrors>
+    <WarnDeprecatedCode>False</WarnDeprecatedCode>
+    <CheckFilenameConventions>False</CheckFilenameConventions>
+    <ProjectType>keyboard</ProjectType>
+  </Options>
+  <Files>
+    <File>
+      <ID>keyboard_1</ID>
+      <Filename>keyboard.kmn</Filename>
+      <Filepath>keyboard.kmn</Filepath>
+      <FileVersion>1.0</FileVersion>
+      <FileType>.kmn</FileType>
+      <Details>
+        <Name>keyboard</Name>
+        <Copyright>Copyright (C) Keyman Team</Copyright>
+      </Details>
+    </File>
+  </Files>
+</KeymanDeveloperProject>

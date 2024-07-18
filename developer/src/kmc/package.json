@@ -1,0 +1,86 @@
+{
+  "name": "@keymanapp/kmc",
+  "description": "Keyman Developer compiler command line tools",
+  "keywords": [
+    "keyboard",
+    "keyman",
+    "ldml",
+    "unicode",
+    "lexical-model",
+    "predictive-text"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "bundle": "npm run bundle-kmc && npm run bundle-kmlmc && npm run bundle-kmlmp",
+    "bundle-kmc": "esbuild build/src/kmc.js --bundle --platform=node --target=es2022 > build/cjs-src/kmc.cjs",
+    "bundle-kmlmc": "esbuild build/src/kmlmc.js --bundle --platform=node --target=es2022 > build/cjs-src/kmlmc.cjs",
+    "bundle-kmlmp": "esbuild build/src/kmlmp.js --bundle --platform=node --target=es2022 > build/cjs-src/kmlmp.cjs",
+    "test": "eslint . && cd test && tsc -b && cd .. && mocha"
+  },
+  "type": "module",
+  "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
+  "contributors": [
+    "Eddie Antonio Santos <Eddie.Santos@nrc-cnrc.gc.ca>",
+    "Joshua Horton"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/keymanapp/keyman/issues"
+  },
+  "main": "build/src/kmc.js",
+  "bin": {
+    "kmc": "build/src/kmc.js",
+    "kmlmc": "build/src/kmlmc.js",
+    "kmlmp": "build/src/kmlmp.js"
+  },
+  "dependencies": {
+    "@keymanapp/common-types": "*",
+    "@keymanapp/developer-utils": "*",
+    "@keymanapp/keyman-version": "*",
+    "@keymanapp/kmc-analyze": "*",
+    "@keymanapp/kmc-keyboard-info": "*",
+    "@keymanapp/kmc-kmn": "*",
+    "@keymanapp/kmc-ldml": "*",
+    "@keymanapp/kmc-model": "*",
+    "@keymanapp/kmc-model-info": "*",
+    "@keymanapp/kmc-package": "*",
+    "@keymanapp/models-types": "*",
+    "@sentry/node": "^7.57.0",
+    "chalk": "^2.4.2",
+    "commander": "^10.0.0",
+    "supports-color": "^9.4.0"
+  },
+  "files": [
+    "build/src/",
+    "build/unicode-license.txt"
+  ],
+  "devDependencies": {
+    "@sentry/cli": "^2.31.0",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^20.4.1",
+    "c8": "^7.12.0",
+    "esbuild": "^0.18.9",
+    "mocha": "^8.4.0",
+    "typescript": "^5.4.5"
+  },
+  "mocha": {
+    "spec": "build/test/**/test-*.js",
+    "require": [
+      "source-map-support/register"
+    ]
+  },
+  "c8": {
+    "all": true,
+    "src": [
+      "src/"
+    ],
+    "exclude-after-remap": true,
+    "exclude": [
+      "test/"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git"
+  }
+}

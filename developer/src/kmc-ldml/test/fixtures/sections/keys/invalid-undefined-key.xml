@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="keys-minimal"/>
+
+  <keys>
+    <key id="grave" output="🪦" />
+  </keys>
+
+  <layers formId="us">
+    <layer id="base">
+      <row keys="foo" />
+    </layer>
+  </layers>
+</keyboard3>

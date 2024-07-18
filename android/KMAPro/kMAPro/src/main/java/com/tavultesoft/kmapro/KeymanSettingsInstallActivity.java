@@ -24,9 +24,9 @@ import android.os.Bundle;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.data.KeyboardController;
-import com.tavultesoft.kmea.util.MapCompat;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.data.KeyboardController;
+import com.keyman.engine.util.MapCompat;
 
 public class KeymanSettingsInstallActivity extends AppCompatActivity {
   private static final String TAG = "SettingsInstallActivity";
@@ -51,7 +51,7 @@ public class KeymanSettingsInstallActivity extends AppCompatActivity {
     getSupportActionBar().setDisplayShowHomeEnabled(true);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-    final ListView listView = findViewById(com.tavultesoft.kmea.R.id.listView);
+    final ListView listView = findViewById(com.keyman.engine.R.id.listView);
 
     Bundle bundle = getIntent().getExtras();
 
@@ -96,9 +96,9 @@ public class KeymanSettingsInstallActivity extends AppCompatActivity {
     installOptionList.add(hashMap);
 
     String[] from = new String[]{titleKey, subtitleKey, iconKey};
-    int[] to = new int[]{com.tavultesoft.kmea.R.id.text1, com.tavultesoft.kmea.R.id.text2, com.tavultesoft.kmea.R.id.image1};
+    int[] to = new int[]{com.keyman.engine.R.id.text1, com.keyman.engine.R.id.text2, com.keyman.engine.R.id.image1};
 
-    ListAdapter adapter = new SimpleAdapter(context, installOptionList, com.tavultesoft.kmea.R.layout.list_row_layout2, from, to) {
+    ListAdapter adapter = new SimpleAdapter(context, installOptionList, com.keyman.engine.R.layout.list_row_layout2, from, to) {
       @Override
       public boolean isEnabled(int position) {
         HashMap<String, String> hashMap = installOptionList.get(position);

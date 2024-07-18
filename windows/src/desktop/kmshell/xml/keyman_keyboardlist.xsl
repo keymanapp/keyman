@@ -136,47 +136,56 @@
       </div>
         <div class="list_detail">
           <xsl:attribute name="id">list_detail_keyboard_<xsl:value-of select="id"/></xsl:attribute>
-          <xsl:attribute name='class'>
-           list_detail <xsl:choose><xsl:when test='loaded'></xsl:when><xsl:otherwise>list_disabled</xsl:otherwise></xsl:choose>
-          </xsl:attribute>
           <div class="flex_container">
             <div class="flex_container_buttons">
               <xsl:if test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id] and ../../options">
                 <xsl:call-template name="button">
+                  <xsl:with-param name="id">menu_options_<xsl:value-of select="id"/></xsl:with-param>
                   <xsl:with-param name="className">kbd_button</xsl:with-param>
                   <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Menu_Options']"/></xsl:with-param>
                   <xsl:with-param name="command">keyman:keyboard_options?id=<xsl:value-of select="id"/></xsl:with-param>
                 </xsl:call-template>
               </xsl:if>
               <xsl:call-template name="button">
+                <xsl:with-param name="id">add_remove_<xsl:value-of select="id"/></xsl:with-param>
                 <xsl:with-param name="className">kbd_button</xsl:with-param>
                 <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='SKAddremove']"/></xsl:with-param>
-                <xsl:with-param name="command">javascript:showModifyLink('<xsl:value-of select="../../id" />')</xsl:with-param>
+                <xsl:with-param name="command">javascript:showModifyLink('<xsl:value-of select="id" />')</xsl:with-param>
+                <xsl:with-param name="disabled">
+                  <xsl:choose>
+                    <xsl:when test='loaded'>0</xsl:when>
+                    <xsl:otherwise>1</xsl:otherwise>
+                  </xsl:choose>
+                </xsl:with-param>
               </xsl:call-template>
               <xsl:if test="$singlekeyboardpackage = '1' or //KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id]">
                 <xsl:call-template name="button">
+                  <xsl:with-param name="id">share_<xsl:value-of select="id"/></xsl:with-param>
                   <xsl:with-param name="className">kbd_button</xsl:with-param>
                   <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Keyboard_Share']"/></xsl:with-param>
-                  <xsl:with-param name="command">javascript:showKeyboardLink('<xsl:value-of select="../../id" />')</xsl:with-param>
+                  <xsl:with-param name="command">javascript:showKeyboardLink('<xsl:value-of select="id" />')</xsl:with-param>
                 </xsl:call-template>
                 <div class='qrcode'>
-                  <xsl:attribute name='id'>qrcode-<xsl:value-of select="../../id" /></xsl:attribute>
+                  <!-- Use the keyboard id to ensure unique id -->
+                  <xsl:attribute name='id'>qrcode-<xsl:value-of select="id" /></xsl:attribute>
                   <div class='qrcode_back'>
-                    <xsl:attribute name="onclick">return hideKeyboardLink('<xsl:value-of select="../../id" />')</xsl:attribute>
+                    <xsl:attribute name="onclick">return hideKeyboardLink('<xsl:value-of select="id" />')</xsl:attribute>
                   </div>
                   <div class='qrcode_popup'>
                     <div>
-                      <xsl:attribute name='id'>qrcode-img-<xsl:value-of select="../../id" /></xsl:attribute>
+                      <!-- Use the keyboard id to ensure unique xml id -->
+                      <xsl:attribute name='id'>qrcode-img-<xsl:value-of select="id" /></xsl:attribute>
                     </div>
                     <div class='qrcode_caption'>
                       <xsl:value-of select="$locale/string[@name='S_Keyboard_Share_QRCode']"/>&#160;
                       <a>
+                        <!-- Use the package id for the actual URL link -->
                         <xsl:attribute name="href">keyman:link?url=<xsl:value-of select="/Keyman/keyman-com" />/go/keyboard/<xsl:value-of select="../../id" />/share</xsl:attribute>
                         <xsl:value-of select="$locale/string[@name='S_Keyboard_Share_Link']"/>
                       </a>
                       <xsl:value-of select="$locale/string[@name='S_Keyboard_Share_LinkSuffix']"/>
                     </div>
-                    <script>new QRCode(document.getElementById("qrcode-img-<xsl:value-of select="../../id"/>"), {
+                    <script>new QRCode(document.getElementById("qrcode-img-<xsl:value-of select="id"/>"), {
                         text: '<xsl:value-of select="/Keyman/keyman-com" />/go/keyboard/<xsl:value-of select="../../id"/>/share',
                         width: 256,
                         height: 256
@@ -187,6 +196,7 @@
               </xsl:if>
               <xsl:if test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id]">
                 <xsl:call-template name="button">
+                  <xsl:with-param name="id">help_<xsl:value-of select="id"/></xsl:with-param>
                   <xsl:with-param name="className">kbd_button</xsl:with-param>
                   <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Caption_Help']"/></xsl:with-param>
                   <xsl:with-param name="command">keyman:package_welcome?id=<xsl:value-of select="$package_id" /></xsl:with-param>
@@ -214,6 +224,7 @@
                   <xsl:with-param name="id">enable_<xsl:value-of select="id"/></xsl:with-param>
                   <xsl:with-param name="onclick">return keyboard_toggle('<xsl:value-of select="id"/>')</xsl:with-param>
                   <xsl:with-param name="className">kbd_button</xsl:with-param>
+                  <xsl:with-param name="fontweight">bold</xsl:with-param>
                   <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Caption_Enable']"/></xsl:with-param>
                   <xsl:with-param name="visible">
                     <xsl:choose>
@@ -225,6 +236,7 @@
               <xsl:choose>
                 <xsl:when test="//KeymanPackageContentKeyboardsInstalled/KeymanKeyboardInstalled[id=current()/id]">
                   <xsl:call-template name="button">
+                  <xsl:with-param name="id">uninstall_package_<xsl:value-of select="id"/></xsl:with-param>
                     <xsl:with-param name="className">kbd_button</xsl:with-param>
                     <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Caption_Uninstall']"/></xsl:with-param>
                     <xsl:with-param name="command">keyman:package_uninstall?id=<xsl:value-of select="$package_id"/></xsl:with-param>
@@ -232,6 +244,7 @@
                 </xsl:when>
                 <xsl:otherwise>
                   <xsl:call-template name="button">
+                    <xsl:with-param name="id">uninstall_kbd_<xsl:value-of select="id"/></xsl:with-param>
                     <xsl:with-param name="className">kbd_button</xsl:with-param>
                     <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Caption_Uninstall']"/></xsl:with-param>
                     <xsl:with-param name="command">keyman:keyboard_uninstall?id=<xsl:value-of select="$id"/></xsl:with-param>
@@ -243,10 +256,13 @@
 
             <div class="flex_vertical_line"> </div><!--- Vertical seperator  -->
 
-            <div class="grid_container grid_rows_hide">
+            <div>
+              <xsl:attribute name='class'>
+                grid_container grid_rows_hide <xsl:choose><xsl:when test='loaded'></xsl:when><xsl:otherwise>grid_disabled</xsl:otherwise></xsl:choose>
+              </xsl:attribute>
               <xsl:attribute name="id">keyboard_grid_<xsl:value-of select="id"/></xsl:attribute>
               <div class="grid_item grid_item_title">
-                <xsl:if test="count(//KeymanLanguage[keymankeyboardid=$id]) = 0">
+                <xsl:if test="count(KeymanKeyboardLanguagesInstalled/KeymanKeyboardLanguageInstalled[isinstalled]) = 0">
                   <xsl:attribute name="style">color:red;</xsl:attribute>
                 </xsl:if>
                 <xsl:value-of select="$locale/string[@name='S_Caption_Languages']"/>
@@ -369,10 +385,10 @@
 
 
           <div class='modify'>
-            <xsl:attribute name='id'>modify-<xsl:value-of select="../../id" /></xsl:attribute>
+            <xsl:attribute name='id'>modify-<xsl:value-of select="id" /></xsl:attribute>
             <xsl:attribute name="data-name"><xsl:value-of select="name"/></xsl:attribute>
             <div class='modify_back'>
-              <xsl:attribute name="onclick">return hideModifyLink('<xsl:value-of select="../../id" />')</xsl:attribute>
+              <xsl:attribute name="onclick">return hideModifyLink('<xsl:value-of select="id" />')</xsl:attribute>
             </div>
             <div class='modify_popup'>
 
@@ -392,7 +408,7 @@
                   <xsl:call-template name="button">
                     <xsl:with-param name="className">kbd_button</xsl:with-param>
                     <xsl:with-param name="caption"><xsl:value-of select="$locale/string[@name='S_Button_Close']"/></xsl:with-param>
-                    <xsl:with-param name="onclick">return hideModifyLink('<xsl:value-of select="../../id" />')</xsl:with-param>
+                    <xsl:with-param name="onclick">return hideModifyLink('<xsl:value-of select="id" />')</xsl:with-param>
                   </xsl:call-template>
                 </div>
               </div>

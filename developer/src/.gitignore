@@ -31,11 +31,11 @@ inst/setup.inf
 inst/setup.zip
 inst/templates.wxs
 inst/xml.wxs
-inst/kmlmc.wxs
+inst/kmc.wxs
+tike/xml/osk
 
 # /developer/TIKE/
 tike/stock.kct
-tike/kmcmpdll.dll
 
 # /developer/TIKE/redist/
 tike/redist/Addins
@@ -46,9 +46,6 @@ tike/redist/UI
 inst/*.wixpdb
 inst/download.mak
 inst/copydev.mak
-
-# /developer/kmcmpdll/
-kmcmpdll/*.lastbuildstate
 
 stock/stock.kct
 uitemplates/keyman.kct
@@ -76,8 +73,6 @@ tike/xml/kmw/resource
 
 # These files are generated during build
 tike/icons.res
-kmcmpdll/Compiler.res
-kmcomp/icons.res
 tds_file.txt
 
 # These are built from corresponding manifest.in and version.in
@@ -86,7 +81,8 @@ tds_file.txt
 # Breakpad files generated for Sentry
 **/*.sym
 
-
-
+# All kmc projects have build/ folders
+kmc/build/
+kmc-*/build/
 
 

@@ -12,14 +12,15 @@
 #include "state.hpp"
 #include <map>
 
-#include "../test_assert.h"
-#include "../test_color.h"
+#include <test_assert.h>
+#include <test_color.h>
+#include "../emscripten_filesystem.h"
 
-using namespace km::kbp::kmx;
+using namespace km::core::kmx;
 
-km_kbp_option_item test_env_opts[] =
+km_core_option_item test_env_opts[] =
 {
-  KM_KBP_OPTIONS_END
+  KM_CORE_OPTIONS_END
 };
 
 int error_args() {
@@ -32,38 +33,38 @@ int error_args() {
 #define CHAR_CODE_LOWER_B 98
 
 
-std::map<std::pair<km_kbp_virtual_key,uint32_t>, uint32_t> kb_key_expected_key_list {{{KM_KBP_VKEY_1, 0},0},
-                                              {{KM_KBP_VKEY_2, 0},0},
-                                              {{KM_KBP_VKEY_A, 0},0},
-                                              {{KM_KBP_VKEY_B, 0},0},
-                                              {{KM_KBP_VKEY_B, KM_KBP_MODIFIER_CTRL},KM_KBP_MODIFIER_CTRL},
-                                              {{KM_KBP_VKEY_C, 0},0},
-                                              {{KM_KBP_VKEY_C, KM_KBP_MODIFIER_ALT},KM_KBP_MODIFIER_ALT},
+std::map<std::pair<km_core_virtual_key,uint32_t>, uint32_t> kb_key_expected_key_list {{{KM_CORE_VKEY_1, 0},0},
+                                              {{KM_CORE_VKEY_2, 0},0},
+                                              {{KM_CORE_VKEY_A, 0},0},
+                                              {{KM_CORE_VKEY_B, 0},0},
+                                              {{KM_CORE_VKEY_B, KM_CORE_MODIFIER_CTRL},KM_CORE_MODIFIER_CTRL},
+                                              {{KM_CORE_VKEY_C, 0},0},
+                                              {{KM_CORE_VKEY_C, KM_CORE_MODIFIER_ALT},KM_CORE_MODIFIER_ALT},
                                               };
 
 /**
- * The purpose of this test is to verify that `km_kbp_keyboard_get_key_list`
+ * The purpose of this test is to verify that `km_core_keyboard_get_key_list`
  * returns list of all the keys used for a keyboard that core as loaded.
  *
  * @param source_file  Path to kmx keyboard file
  */
-void test_key_list(const km::kbp::path &source_file){
+void test_key_list(const km::core::path &source_file){
 
-  km_kbp_keyboard * test_kb = nullptr;
-  km_kbp_state * test_state = nullptr;
-  km_kbp_keyboard_key * kb_key_list;
+  km_core_keyboard * test_kb = nullptr;
+  km_core_state * test_state = nullptr;
+  km_core_keyboard_key * kb_key_list;
 
-  km::kbp::path full_path = source_file;
+  km::core::path full_path = source_file;
 
-  try_status(km_kbp_keyboard_load(full_path.native().c_str(), &test_kb));
+  try_status(km_core_keyboard_load(full_path.native().c_str(), &test_kb));
 
   // Setup state, environment
-  try_status(km_kbp_state_create(test_kb, test_env_opts, &test_state));
+  try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
 
-  try_status(km_kbp_keyboard_get_key_list(test_kb,&kb_key_list));
+  try_status(km_core_keyboard_get_key_list(test_kb,&kb_key_list));
 
-  km_kbp_keyboard_key *key_rule_it = kb_key_list;
-  std::map<std::pair<km_kbp_virtual_key,uint32_t>, uint32_t> map_key_list;
+  km_core_keyboard_key *key_rule_it = kb_key_list;
+  std::map<std::pair<km_core_virtual_key,uint32_t>, uint32_t> map_key_list;
 
   auto n = 0;
   // Internally the list is created using a map so we should not rely on order elemnts
@@ -76,8 +77,8 @@ void test_key_list(const km::kbp::path &source_file){
   }
   assert(n==7);
 
-  std::map<std::pair<km_kbp_virtual_key,uint32_t>, uint32_t>::iterator it_expected;
-  std::map<std::pair<km_kbp_virtual_key,uint32_t>, uint32_t>::iterator it_key_list = map_key_list.begin();
+  std::map<std::pair<km_core_virtual_key,uint32_t>, uint32_t>::iterator it_expected;
+  std::map<std::pair<km_core_virtual_key,uint32_t>, uint32_t>::iterator it_key_list = map_key_list.begin();
   while (it_key_list != map_key_list.end()){
 
     it_expected = kb_key_expected_key_list.find(it_key_list->first);
@@ -85,9 +86,9 @@ void test_key_list(const km::kbp::path &source_file){
     it_key_list++;
   }
 
-  km_kbp_keyboard_key_list_dispose(kb_key_list);
-  km_kbp_state_dispose(test_state);
-  km_kbp_keyboard_dispose(test_kb);
+  km_core_keyboard_key_list_dispose(kb_key_list);
+  km_core_state_dispose(test_state);
+  km_core_keyboard_dispose(test_kb);
 
 }
 
@@ -107,7 +108,11 @@ int main(int argc, char *argv []) {
   }
   console_color::enabled = console_color::isaterminal() || arg_color;
 
+#ifdef __EMSCRIPTEN__
+  test_key_list(get_wasm_file_path(argv[first_arg]));
+#else
   test_key_list(argv[first_arg]);
+#endif
 
   return 0;
 }

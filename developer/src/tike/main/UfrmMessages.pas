@@ -1,18 +1,18 @@
 (*
   Name:             UfrmMessages
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Aug 2006
 
   Modified Date:    24 Jul 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Aug 2006 - mcdurdin - Rework messages as TTntMemo
                     23 Aug 2006 - mcdurdin - Rework menu as TSp-TbxPopupMenu
                     14 Sep 2006 - mcdurdin - Double click selects whole line for error
@@ -107,6 +107,8 @@ var
 implementation
 
 uses
+  Winapi.RichEdit,
+
   UfrmMain,
   UfrmMDIEditor,
   dmActionsMain,
@@ -123,33 +125,145 @@ uses
  - Message functions                                                           -
  -------------------------------------------------------------------------------}
 
+const // ABGR - text on white bg, Colors similar to Light+ VSCode color theme
+  Color_Filename = $96791A;
+  Color_Line     = $197975;
+  Color_Text     = $333333;
+  Color_Code     = $666666;
+
+  Color_Info     = $333333;
+  Color_Hint     = $A25015;
+  Color_Warn     = $156193;
+  Color_Error    = $3434C9;
+  Color_Fatal    = $3434C9;
+
+  Color_SuccessText  = $1C8816;
+  Color_InfoText     = $6B6B6B;
+  Color_FailureText  = $3434C9;
+
+  // Hard coded message numbers from infrastructureMessages.ts
+
+  NAMESPACE_Infrastructure = $5000;
+  INFO_FileBuiltSuccessfully = NAMESPACE_Infrastructure or $0006;
+  INFO_FileNotBuiltSuccessfully = NAMESPACE_Infrastructure or $0007;
+  INFO_ProjectBuiltSuccessfully = NAMESPACE_Infrastructure or $000B;
+  INFO_ProjectNotBuiltSuccessfully = NAMESPACE_Infrastructure or $000C;
+
+
 procedure TfrmMessages.Add(state: TProjectLogState; filename, msg: WideString; MsgCode, line: Integer);
+type
+  TSegment = record
+    text: string;
+    color: TColor;
+  end;
 var
   mi: TMessageItem;
   FColor: TColor;
-begin
-  mi := TMessageItem.Create;
-  mi.FileName := filename;
-  mi.Msg := msg;
-  mi.MsgCode := MsgCode;
-  mi.Line := line;
+  FTextColor: TColor;
+  Segments: array of TSegment;
 
-  case state of
-    plsInfo: FColor := clBlack;
-    plsWarning: FColor := clOlive;
-    plsError: FColor := clRed;
-    plsFatal: FColor := clRed;
-    plsSuccess: FColor := clGreen;
-    plsFailure: FColor := clRed;
-  else
-    FColor := clBlack;
+  procedure AddText(const text: string; color: TColor);
+  var
+    s: TSegment;
+  begin
+    s.text := text;
+    s.color := color;
+    SetLength(Segments, Length(Segments)+1);
+    Segments[High(Segments)] := s;
   end;
 
-  memoMessage.SelStart := Length(memoMessage.Text);
-  memoMessage.SelLength := 0;
-  memoMessage.SelAttributes.Color := FColor;
-  memoMessage.Lines.Add(TProjectLog.FormatMessage(state, filename, msg, msgcode, line));
-  memoMessage.SelAttributes.Color := clBlack;
+  procedure AddLine;
+  var
+    t: string;
+    s: TSegment;
+    cr: TCharRange;
+    cf: TCharFormat;
+    gtle: TGetTextLengthEx;
+  begin
+    // TRichEdit's wrapper of the RichEdit control is very slow, so we instead
+    // use direct messages to the RichEdit control to emit formatted text
+    FillChar(cf, sizeof(TCharFormat), 0);
+    cf.cbSize := sizeof(TCharFormat);
+    cf.dwMask := CFM_COLOR;
+
+    gtle.flags := GTL_PRECISE or GTL_NUMCHARS;
+    gtle.codepage := 1200;
+    cr.cpMin := SendMessage(memoMessage.Handle, EM_GETTEXTLENGTHEX, NativeUint(@gtle), 0);
+    cr.cpMax := cr.cpMin;
+    SendMessage(memoMessage.Handle, EM_EXSETSEL, 0, NativeUint(@cr));
+
+    for s in Segments do
+      t := t + s.text;
+    memoMessage.SelText := t;
+
+    for s in Segments do
+    begin
+      cr.cpMin := cr.cpMax;
+      cr.cpMax := cr.cpMax + s.text.Length;
+      SendMessage(memoMessage.Handle, EM_EXSETSEL, 0, NativeUint(@cr));
+      cf.crTextColor := ColorToRGB(s.color);
+      SendMessage(memoMessage.Handle, EM_SETCHARFORMAT, SCF_SELECTION, NativeUint(@cf));
+    end;
+    cr.cpMin := cr.cpMax;
+    SendMessage(memoMessage.Handle, EM_EXSETSEL, 0, NativeUint(@cr));
+  end;
+
+var
+  eventMask: DWord;
+begin
+
+  eventMask := SendMessage(memoMessage.Handle, EM_SETEVENTMASK, 0, 0);
+  SendMessage(memoMessage.Handle, WM_SETREDRAW, 0, 0);
+  try
+    mi := TMessageItem.Create;
+    mi.FileName := filename;
+    mi.Msg := msg;
+    mi.MsgCode := MsgCode;
+    mi.Line := line;
+
+    FColor := clBlack;
+    FTextColor := Color_Text;
+
+    // Override formatting for 4 known messages
+    if (MsgCode = INFO_FileBuiltSuccessfully) or
+       (MsgCode = INFO_ProjectBuiltSuccessfully) then
+      state := plsSuccess
+    else if (MsgCode = INFO_FileNotBuiltSuccessfully) or
+       (MsgCode = INFO_ProjectNotBuiltSuccessfully) then
+      state := plsFailure;
+
+    case state of
+      plsInfo: begin FColor := Color_Info; FTextColor := Color_InfoText; end;
+      plsHint: FColor := Color_Hint;
+      plsWarning: FColor := Color_Warn;
+      plsError: FColor := Color_Error;
+      plsFatal: FColor := Color_Error;
+      plsSuccess: begin FColor := Color_Info; FTextColor := Color_SuccessText; end;
+      plsFailure: begin FColor := Color_Info; FTextColor := Color_FailureText; end;
+    end;
+
+    // Add a log entry, following the color scheme that we use in kmc, matching
+    // colors from VSCode's Light+ theme, which work reasonably well on white
+    // background.
+
+    AddText(ExtractFileName(Filename), Color_Filename);
+    if line > 0 then
+    begin
+      AddText(':', Color_Text);
+      AddText(IntToStr(Line), Color_Line);
+    end;
+    AddText(' - ', Color_Text);
+    AddText(ProjectLogStateTitle[state], FColor);
+    AddText(' KM'+IntToHex(MsgCode, 5), Color_Code);
+    AddText(': ', Color_Text);
+    AddText(StringReplace(msg, #13#10, '   ', [rfReplaceAll]), FTextColor);
+
+    AddText(#13#10, clBlack);
+    AddLine;
+  finally
+    SendMessage(memoMessage.Handle, WM_SETREDRAW, 1, 0);
+    SendMessage(memoMessage.Handle, EM_SETEVENTMASK, 0, eventMask);
+  end;
 
   FMessageItems.Add(mi);
   if not memoMessage.Focused then SelLine := memoMessage.Lines.Count - 1;
@@ -162,7 +276,6 @@ procedure TfrmMessages.Clear;
 begin
   FMessageItems.Clear;
   memoMessage.Clear;
-  ProjectCompilerMessageClear;
 end;
 
 procedure TfrmMessages.memoMessageDblClick(Sender: TObject);
@@ -183,12 +296,18 @@ begin
   mi := FMessageItems[line] as TMessageItem;
   FFilename := mi.FileName;
 
+  if FFileName = FGlobalProject.FileName then
+  begin
+    frmKeymanDeveloper.ShowProject;
+    Exit;
+  end;
+
   frm := frmKeymanDeveloper.FindEditorByFileName(FFileName);
   if not Assigned(frm) then
   begin
     pf := FGlobalProject.FindFile(FFileName);
     if Assigned(pf) then (pf.UI as TProjectFileUI).DefaultEvent(Self)   // I4687
-    else frmKeymanDeveloper.OpenFile(FFileName, False);
+    else if FileExists(FFileName) then frmKeymanDeveloper.OpenFile(FFileName, False);
     frm := frmKeymanDeveloper.FindEditorByFileName(FFileName);
     if not Assigned(frm) then
     begin

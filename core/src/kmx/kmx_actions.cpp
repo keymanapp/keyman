@@ -4,7 +4,7 @@
 */
 #include <kmx/kmx_processevent.h>
 
-using namespace km::kbp;
+using namespace km::core;
 using namespace kmx;
 
 void KMX_Actions::ResetQueue()
@@ -35,9 +35,6 @@ KMX_BOOL KMX_Actions::QueueAction(int ItemType, KMX_DWORD dwData)
 
   switch(ItemType)
   {
-  case QIT_VKEYDOWN:
-    break;
-
   case QIT_DEADKEY:
     m_context->Add(UC_SENTINEL);
     m_context->Add(CODE_DEADKEY);
@@ -45,11 +42,12 @@ KMX_BOOL KMX_Actions::QueueAction(int ItemType, KMX_DWORD dwData)
     break;
 
   case QIT_CHAR:
-    if(Uni_IsSMP(dwData)) {
-      m_context->Add(Uni_UTF32ToSurrogate1(dwData));
-      m_context->Add(Uni_UTF32ToSurrogate2(dwData));
-    } else {
-      m_context->Add((KMX_WORD) dwData);
+    {
+      char16_single buf;
+      int len = Utf32CharToUtf16(dwData, buf);
+      for(int i=0; i<len; i++) {
+        m_context->Add(buf.ch[i]);
+      }
     }
     break;
 

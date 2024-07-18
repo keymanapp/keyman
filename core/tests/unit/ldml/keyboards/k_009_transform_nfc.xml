@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+like k_008 but in NFC (and other normalizations)
+-->
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="en" conformsTo="45">
+  <info author="srl295" indicator="🙀" layout="qwerty" name="k_009_transform_nfc" />
+
+  <settings normalization="disabled" />
+
+  <keys>
+    <key id="u-0320" output="\u{0320}" /> <!-- ◌̠ -->
+    <key id="u-0300" output="\u{0300}" /> <!-- ◌̀ -->
+    <key id="u-00e8" output="\u{00e8}" /> <!-- è -->
+    <key id="u-0344" output="\u{0344}" /> <!-- discouraged greek dialytika tonos -->
+    <key id="nfd" output="e\u{0320}\u{0300}" />
+    <key id="nfc" output="\u{00E8}\u{0320}" />
+    <key id="not-nfd" output="e\u{0300}\u{0320}" />
+    <key id="lgtm" output="\m{lgtm}" />     <!-- \m{1} -->
+    <key id="stampy" output="\m{stampy}" /> <!-- \m{2}-->
+  </keys>
+
+  <layers formId="us">
+    <layer modifiers="none" id="base">
+      <row keys="u-0320 1 2 3 4 5 6 7 8 9 0" />
+      <row keys="q w e r t y u i o p" />
+      <row keys="a s d f g h j k l" />
+      <row keys="z x c v b n m" />
+      <row keys="space" />
+    </layer>
+    <layer modifiers="shift" id="shift">
+      <row keys="u-0300 u-00e8 nfd nfc not-nfd stampy lgtm u-0344" />
+    </layer>
+  </layers>
+
+  <variables>
+    <string id="under" value="\u{0320}" />
+    <string id="grave" value="\u{0300}" />
+  </variables>
+
+  <transforms type="simple">
+    <transformGroup>
+      <!-- 0 = any marker -> YES0 -->
+      <transform from="0\m{.}" to="YES0" />
+
+      <!-- these should NOT match-->
+      <transform from="e[\u{0300}][\u{0320}]" to="NO0" /> <!-- out of order -->
+      <!-- these SHOULD match -->
+      <transform from="1e\u{0300}\u{0320}" to="YES1" /> <!-- out of order but should get normalized -->
+      <transform from="2e\u{0320}\u{0300}" to="YES2" /> <!-- in order  NFD -->
+      <transform from="3\u{00E8}\u{0320}" to="YES3" /> <!-- in order   NFC -->
+
+      <!-- matches with various markers-->
+      <transform from="\m{stampy}4e\u{0300}\u{0320}" to="YES4x" /> <!-- out of order-->
+      <transform from="4\m{stampy}e\u{0300}\u{0320}" to="YES4a" />
+      <transform from="4e\m{stampy}\u{0300}\u{0320}" to="YES4b" />
+      <transform from="4e\u{0300}\m{stampy}\u{0320}" to="YES4c" />
+      <transform from="4e\u{0300}\u{0320}\m{stampy}" to="YES4d" />
+
+      <transform from="\m{stampy}5e\u{0320}\u{0300}" to="YES5x" />
+      <transform from="5\m{stampy}e\u{0320}\u{0300}" to="YES5a" />
+      <transform from="5e\m{stampy}\u{0320}\u{0300}" to="YES5b" />
+      <transform from="5e\u{0320}\m{stampy}\u{0300}" to="YES5c" />
+      <transform from="5e\u{0320}\u{0300}\m{stampy}" to="YES5d" />
+
+      <transform from="\m{stampy}6e\u{0320}" to="YES6x" />
+      <transform from="6\m{stampy}e\u{0320}" to="YES6a" />
+      <transform from="6e\m{stampy}\u{0320}" to="YES6b" />
+      <transform from="6e\u{0320}\m{stampy}" to="YES6c" />
+
+      <transform from="\m{stampy}7e\u{0300}" to="YES7x" />
+      <transform from="7\m{stampy}e\u{0300}" to="YES7a" />
+      <transform from="7e\m{stampy}\u{0300}" to="YES7b" />
+      <transform from="7e\u{0300}\m{stampy}" to="YES7c" />
+
+      <transform from="8e\m{stampy}\u{0300}\m{lgtm}\u{0320}" to="YES8a" />
+      <transform from="8e\u{0300}\m{stampy}\m{lgtm}\u{0320}" to="YES8b" />
+      <transform from="8e\u{0300}\u{0320}\m{stampy}\m{lgtm}" to="YES8c" /> <!-- denormalized, but matches -->
+      <transform from="8f\u{0320}\u{0300}\m{stampy}\m{lgtm}" to="YES8d" /> <!-- NFD -->
+
+      <!-- normalization in output -->
+      <transform from="9a" to="9e\u{0300}\u{0320}" /> <!-- no marker, denormalized -->
+      <transform from="9b" to="9e\u{0320}\u{0300}" /> <!-- no marker, NFD -->
+      <transform from="9c" to="9ce\u{0300}\m{stampy}\u{0320}\m{lgtm}" /> <!-- marker, denormalized -->
+      <transform from="9d" to="9de\u{0320}\m{stampy}\u{0300}\m{lgtm}" /> <!--  marker, NFD -->
+
+      <transform from="9e\u{00E8}\m{stampy}\u{00E8}\u{0320}\m{lgtm}" to="YES9e" /> <!-- NFC in rules-->
+
+      <transform from="9fe\m{stampy}\u{0344}" to="YES9f" />
+      <transform from="9g" to="9\u{00e8}\u{0320}" /> <!-- no marker, NFD -->
+    </transformGroup>
+    <transformGroup>
+      <transform from="9ce\m{stampy}[\u{0320}][\u{0300}]\m{lgtm}" to="YES9c" />
+      <transform from="9de\u{0320}\m{stampy}\u{0300}\m{lgtm}" to="YES9d" />
+      <transform from="e9\u{00e8}\u{0320}" to="YES9g" />
+    </transformGroup>
+  </transforms>
+</keyboard3>

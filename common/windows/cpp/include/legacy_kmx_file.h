@@ -1,3 +1,5 @@
+// TODO: merge and replace with kmx_file.h from core
+
 /*
   Name:             legacy_kmx_file
   Copyright:        Copyright (C) SIL International.
@@ -71,9 +73,10 @@
 #define VERSION_100 0x00000A00
 #define VERSION_140 0x00000E00
 #define VERSION_150 0x00000F00
-
+#define VERSION_160 0x00001000
+#define VERSION_170 0x00001100
 #define VERSION_MIN	VERSION_50
-#define VERSION_MAX	VERSION_150
+#define VERSION_MAX	VERSION_170
 
 /*
  Special flag for WM_CHAR/WM_KEY???/WM_SYSKEY???: says that key has been
@@ -283,6 +286,9 @@
 #define KF_LOGICALLAYOUT	0x0008
 #define KF_AUTOMATICVERSION 0x0010
 
+// 16.0: Support for LDML Keyboards in KMXPlus file format
+#define KF_KMXPLUS  0x0020
+
 #define HK_ALT			0x00010000
 #define HK_CTRL			0x00020000
 #define HK_SHIFT		0x00040000
@@ -314,6 +320,10 @@
 #define K_MODIFIERFLAG  0x007F
 #define K_NOTMODIFIERFLAG 0xFF00   // I4548
 
+// Note: OTHER_MODIFIER = 0x10000, used by KMX+ for the
+// other modifier flag in layers, > 16 bit so not available here.
+// See keys_mod_other in keyman_core_ldml.ts
+
 /*
   These sanity checks help ensure we don't
   break on-disk struct sizes when we cross
@@ -341,6 +351,7 @@ static_assert(sizeof(COMP_STORE) == KEYBOARDFILESTORE_SIZE, "COMP_STORE must be 
 
 struct COMP_KEY {
 	WORD Key;
+	WORD _reserved;
 	DWORD Line;
 	DWORD ShiftFlags;
 	DWORD dpOutput;
@@ -365,7 +376,7 @@ struct COMP_KEYBOARD {
 
 	DWORD dwFileVersion;	// 0004 Version of the file - Keyman 4.0 is 0x0400
 
-	DWORD dwCheckSum;		  // 0008 As stored in keyboard
+	DWORD dwCheckSum;		  // 0008 As stored in keyboard. DEPRECATED as of 16.0
 	DWORD KeyboardID;    	// 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
 	DWORD IsRegistered;		// 0010
 	DWORD version;			  // 0014 keyboard version
@@ -399,9 +410,15 @@ typedef COMP_STORE *PCOMP_STORE;
 typedef COMP_KEY *PCOMP_KEY;
 typedef COMP_GROUP *PCOMP_GROUP;
 
-typedef int (CALLBACK *CompilerMessageProc)(int line, DWORD dwMsgCode, LPSTR szText);
 
-extern "C" BOOL __declspec(dllexport) CompileKeyboardFile(PSTR pszInfile, PSTR pszOutfile, BOOL FSaveDebug, BOOL ACompilerWarningsAsErrors, BOOL AWarnDeprecatedCode, CompilerMessageProc pMsgProc);   // I4865   // I4866
+typedef struct _COMPILER_OPTIONS {
+  DWORD dwSize;
+  BOOL ShouldAddCompilerVersion;
+} COMPILER_OPTIONS;
+
+typedef COMPILER_OPTIONS *PCOMPILER_OPTIONS;
+
+typedef int (CALLBACK *CompilerMessageProc)(int line, DWORD dwMsgCode, LPSTR szText);
 
 #endif		// _COMPILER_H
 

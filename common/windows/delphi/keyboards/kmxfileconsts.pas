@@ -98,9 +98,11 @@ const
   VERSION_100 = $00000A00;
   VERSION_140 = $00000E00;
   VERSION_150 = $00000F00;
+  VERSION_160 = $00001000;
+  VERSION_170 = $00001100;
 
   VERSION_MIN	= VERSION_50;
-  VERSION_MAX	= VERSION_150;
+  VERSION_MAX	= VERSION_170;
 
   VERSION_MASK_MINOR = $00FF;
   VERSION_MASK_MAJOR = $FF00;
@@ -126,6 +128,10 @@ const
   KMX_NOTSCROLLFLAG  = $2000;	// Scroll lock NOT on
   KMX_ISVIRTUALKEY   = $4000;	// It is a Virtual Key Sequence
   KMX_VIRTUALCHARKEY = $8000; // It is a virtual character key sequence - mnemonic layouts
+
+  // Note: KMX_OTHER_MODIFIER = $10000, used by KMX+ for the
+  // other modifier flag in layers, > 16 bit so not available here.
+  // See keys_mod_other in keyman_core_ldml.ts
 
   // Combinations of key masks
   KMX_MASK_MODIFIER_CHIRAL = KMX_LCTRLFLAG or KMX_RCTRLFLAG or KMX_LALTFLAG or KMX_RALTFLAG;

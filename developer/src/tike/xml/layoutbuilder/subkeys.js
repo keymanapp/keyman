@@ -41,7 +41,8 @@ $(function() {
           fontsize: $(key).data('fontsize'),
           nextlayer: $(key).data('nextlayer'),
           layer: $(key).data('layer'),
-          direction: $(key).data('direction')
+          direction: $(key).data('direction'),
+          default: $(key).data('default')
         });
       }
       return items;
@@ -72,6 +73,7 @@ $(function() {
     $('#selSubKeyType').val($(key).data('sp') ? $(key).data('sp') : 0);
     $('#selSubKeyNextLayer').val($(key).data('nextlayer'));
     $('#selSubKeyLayerOverride').val($(key).data('layer'));
+    $('#chkSubKeyIsDefault').prop('checked', !!$(key).data('default'));
   }
 
   const subKeyNameChange = builder.wrapChange(function () {
@@ -165,6 +167,20 @@ $(function() {
   });
 
   $('#selSubKeyNextLayer').change(selSubKeyNextLayerChange);
+
+  const chkSubKeyIsDefaultChange = builder.wrapChange(function () {
+    // Remove default property from all subkeys
+    $('#sub-key-groups .key-is-default').removeData('default');
+    $('#sub-key-groups .key-is-default').removeClass('key-is-default');
+    if($(this).prop('checked')) {
+      // Then add it to selected key
+      builder.selectedSubKey().data('default', true);
+      builder.selectedSubKey().addClass('key-is-default');
+    }
+    builder.generateSubKeys();
+  });
+
+  $('#chkSubKeyIsDefault').change(chkSubKeyIsDefaultChange);
 
   const selSubKeyLayerOverrideChange = builder.wrapChange(function () {
     $(this).val() === '' ?
@@ -276,6 +292,7 @@ $(function() {
       $('#subKeyToolbar *').removeAttr('disabled');
       $('#subKeyToolbar #inpSubKeyGestureType').attr('disabled', 'disabled');
       $('#sub-key-cap-unicode-toolbar-item, #sub-key-cap-toolbar-item').css('display', builder.specialCharacters[val] ? 'none' : '');
+      $('#chkSubKeyIsDefault').prop('disabled', $(key).data('type') != 'longpress');
     }
   }
 

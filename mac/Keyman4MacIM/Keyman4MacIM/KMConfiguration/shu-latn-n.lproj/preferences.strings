@@ -1,0 +1,38 @@
+/* Checkbox text to always show on-screen keyboard */
+"4UX-80-0Vo.title" = "Matakula war keyboard albinshaf";
+
+/* Checkbox text to enable verbose Console logging */
+"7J6-zy-R20.title" = "Annaf bey verbose console logging";
+
+/* Support button text  */
+"93O-x6-RLF.label" = "Mi'awana";
+
+/* Download Keyboard button text */
+"CTw-kf-WNS.title" = "Dyssal keyboard...";
+
+/* Keyman Configuration window title */
+"F0z-JX-Cv5.title" = "Ta'adil hana Keyman";
+
+/* button text to go back to previous page */
+"JOK-JV-n8w.title" = "Wara";
+
+/* Keyboards button text */
+"MPN-9N-wWc.label" = "Keyboards";
+
+/* text to explain verbose Console logging option */
+"MrI-GM-7d6.title" = "Kan verbose logging mafkuk da, alshu'ul bi'awwun Keyman ley eirfiyan shunu min mashakil kan gamma. Alshu'ul hanal console binnafu beya ley shafian risalat min Keyman. Fyl console da, dyssa ley eiwari risalat chatta min darb albisawwi hana \"Keyman\". Alshu'ul da bikun bisullu wa biluzzu ley Keyman kan murada gamma.";
+
+/* button text to move forward to the next page */
+"eXr-8V-h1g.title" = "Giddam";
+
+/* button text to return to the home help page */
+"fXS-aC-CMH.title" = "Bidaya";
+
+/* Options button text */
+"frd-No-seV.label" = "Durub";
+
+/* Installed Keyboard column heading */
+"jex-Nd-Qzg.headerCell.title" = "Dyssal keyboard";
+
+/* Verbose logging tooltip text */
+"uWx-3J-U0D.ibShadowedToolTip" = "Fukkal shu'ul da kan ligyt mashakil bey keyboard khassa walla bey Keyman zaata.";

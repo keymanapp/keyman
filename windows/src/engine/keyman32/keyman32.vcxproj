@@ -55,11 +55,11 @@
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LibraryPath>$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\src;$(ProjectDir)..\..\..\..\core\build\rust\x86\$(Configuration);$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\src;$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\subprojects\icu\source\common;$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\subprojects\icu\source\i18n;$(ProjectDir)..\..\..\..\core\build\rust\x86\$(Configuration);$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)..\..\..\..\common\include;$(ProjectDir)..\..\..\..\core\include;$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LibraryPath>$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\src;$(ProjectDir)..\..\..\..\core\build\rust\x86\$(Configuration);$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\src;$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\subprojects\icu\source\common;$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\subprojects\icu\source\i18n;$(ProjectDir)..\..\..\..\core\build\rust\x86\$(Configuration);$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir)..\..\..\..\common\include;$(ProjectDir)..\..\..\..\core\include;$(ProjectDir)..\..\..\..\core\build\x86\$(Configuration)\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -96,7 +96,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/verbose:lib /section:.SHARDATA,rws %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>libkmnkbp0.a;psapi.lib;rpcrt4.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libicuuc.a;libicuin.a;libkeymancore.a;psapi.lib;rpcrt4.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>keyman32.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -152,7 +152,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/verbose:lib /section:.SHARDATA,rws %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>libkmnkbp0.a;psapi.lib;rpcrt4.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libicuuc.a;libicuin.a;libkeymancore.a;psapi.lib;rpcrt4.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>keyman32.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -176,12 +176,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\global\cpp\kmtip_guids.cpp" />
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\xstring.cpp" />
-    <ClCompile Include="addins.cpp">
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
+    <ClCompile Include="appcontext.cpp" />
     <ClCompile Include="appint\aiTIP.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -360,9 +355,9 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="appcontext.h" />
     <ClInclude Include="keymanengine.h" />
     <ClInclude Include="..\..\..\include\kmtip_guids.h" />
-    <ClInclude Include="addins.h" />
     <ClInclude Include="appint\aiTIP.h" />
     <ClInclude Include="appint\aiWin2000Unicode.h" />
     <ClInclude Include="appint\appint.h" />

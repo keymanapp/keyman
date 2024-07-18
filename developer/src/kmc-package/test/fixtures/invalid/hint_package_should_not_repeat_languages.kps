@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>15.0.266.0</KeymanDeveloperVersion>
+    <FileVersion>7.0</FileVersion>
+  </System>
+  <Info>
+    <Name URL="">SENĆOŦEN (Saanich Dialect) Lexical Model</Name>
+    <Copyright URL="">© 2019 National Research Council Canada</Copyright>
+    <Author URL="mailto:Eddie.Santos@nrc-cnrc.gc.ca">Eddie Antonio Santos</Author>
+    <Version>1.0</Version>
+  </Info>
+  <Files>
+    <File>
+      <Name>basic.kmx</Name>
+      <Description>Keyboard Basic</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kmx</FileType>
+    </File>
+  </Files>
+  <Keyboards>
+    <Keyboard>
+      <Name>Basic</Name>
+      <ID>basic</ID>
+      <Version>1.0</Version>
+      <Languages>
+        <!-- HINT_PackageShouldNotRepeatLanguages -->
+        <Language ID="km">Central Khmer (Khmer, Cambodia)</Language>
+        <Language ID="KM">Khmer</Language>
+      </Languages>
+    </Keyboard>
+  </Keyboards>
+</Package>

@@ -1,24 +1,14 @@
 {
-  "extends": "../../../../tsconfig-base.json",
+  "extends": "../../tsconfig.kmw-main-base.json",
   "compilerOptions": {
-    "allowJs": true,
-    "module": "none",
-    "outDir": "../build/",
-    "inlineSources": true,
-    "sourceMap": true,
-    "target": "es5",
+    "baseUrl": "./",
     "lib": ["es6", "dom"],
-    "outFile": "../build/index.js"
+    "outDir": "../build/obj",
+    "rootDir": "./",
+    "tsBuildInfoFile": "../build/obj/tsconfig.tsbuildinfo",
   },
-  "references": [
-    { "path": "../../keyman-version" }
-  ],
 
   "include": [
-    "../../../../node_modules/@sentry/browser/build/bundle.min.js",
-  ],
-
-  "files": [
-		"index.ts",
+    "*.ts"
   ]
 }

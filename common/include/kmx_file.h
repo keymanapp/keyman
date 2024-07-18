@@ -7,13 +7,14 @@
 
 #include <km_types.h>
 
-#ifdef KMN_KBP
+#ifdef KM_CORE_LIBRARY
 // TODO: move this to a common namespace keyman::common::kmx_file or similar in the future
 namespace km {
-namespace kbp {
+namespace core {
 namespace kmx {
 #endif
 
+#define KMX_MAX_ALLOWED_FILE_SIZE (128 * 1024 * 1024)  /* 128MB */
 /* */
 
 #define KEYMAN_LAYOUT_DEFAULT 0x000005FE
@@ -48,8 +49,11 @@ namespace kmx {
 #define VERSION_140 0x00000E00
 #define VERSION_150 0x00000F00
 
+#define VERSION_160 0x00001000
+#define VERSION_170 0x00001100
+
 #define VERSION_MIN VERSION_50
-#define VERSION_MAX VERSION_150
+#define VERSION_MAX VERSION_170
 
 //
 // Backspace types
@@ -61,6 +65,8 @@ namespace kmx {
 // Different begin types
 #define BEGIN_ANSI    0
 #define BEGIN_UNICODE 1
+#define BEGIN_NEWCONTEXT 2
+#define BEGIN_POSTKEYSTROKE 3
 
 #define TSS_NONE        0
 #define TSS_BITMAP        1
@@ -148,7 +154,13 @@ namespace kmx {
 
 #define TSS__KEYMAN_150_MAX  43
 
-#define TSS__MAX        43
+/* Keyman 17.0 system stores */
+
+#define TSS_DISPLAYMAP       44
+
+#define TSS__KEYMAN_170_MAX  44
+
+#define TSS__MAX        44
 
 /* wm_keyman_control_internal message control codes */
 
@@ -261,6 +273,9 @@ namespace kmx {
 #define KF_LOGICALLAYOUT  0x0008
 #define KF_AUTOMATICVERSION 0x0010
 
+// 16.0: Support for LDML Keyboards in KMXPlus file format
+#define KF_KMXPLUS  0x0020
+
 #define HK_ALT      0x00010000
 #define HK_CTRL     0x00020000
 #define HK_SHIFT    0x00040000
@@ -287,28 +302,32 @@ namespace kmx {
 
 #define K_MODIFIERFLAG  0x007F
 #define K_NOTMODIFIERFLAG 0xFF00   // I4548
+// Note: OTHER_MODIFIER = 0x10000, used by KMX+ for the
+// other modifier flag in layers, > 16 bit so not available here.
+// See keys_mod_other in keyman_core_ldml.ts
 
 struct COMP_STORE {
-  KMX_DWORD dwSystemID;
-  KMX_DWORD dpName;
-  KMX_DWORD dpString;
+  KMX_DWORD_unaligned dwSystemID;
+  KMX_DWORD_unaligned dpName;
+  KMX_DWORD_unaligned dpString;
   };
 
 struct COMP_KEY {
-  KMX_WORD Key;
-  KMX_DWORD Line;
-  KMX_DWORD ShiftFlags;
-  KMX_DWORD dpOutput;
-  KMX_DWORD dpContext;
+  KMX_WORD_unaligned Key;
+  KMX_WORD_unaligned _reserved;
+  KMX_DWORD_unaligned Line;
+  KMX_DWORD_unaligned ShiftFlags;
+  KMX_DWORD_unaligned dpOutput;
+  KMX_DWORD_unaligned dpContext;
   };
 
 struct COMP_GROUP {
-  KMX_DWORD dpName;
-  KMX_DWORD dpKeyArray;   // [LPKEY] address of first item in key array
-  KMX_DWORD dpMatch;
-  KMX_DWORD dpNoMatch;
-  KMX_DWORD cxKeyArray;   // in array entries
-  KMX_BOOL  fUsingKeys;   // group(xx) [using keys] <-- specified or not
+  KMX_DWORD_unaligned dpName;
+  KMX_DWORD_unaligned dpKeyArray;   // [LPKEY] address of first item in key array
+  KMX_DWORD_unaligned dpMatch;
+  KMX_DWORD_unaligned dpNoMatch;
+  KMX_DWORD_unaligned cxKeyArray;   // in array entries
+  KMX_BOOL_unaligned  fUsingKeys;   // group(xx) [using keys] <-- specified or not
   };
 
 struct COMP_KEYBOARD {
@@ -316,7 +335,7 @@ struct COMP_KEYBOARD {
 
   KMX_DWORD dwFileVersion;  // 0004 Version of the file - Keyman 4.0 is 0x0400
 
-  KMX_DWORD dwCheckSum;     // 0008 As stored in keyboard
+  KMX_DWORD dwCheckSum;     // 0008 As stored in keyboard. DEPRECATED as of 16.0
   KMX_DWORD KeyboardID;     // 000C as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
   KMX_DWORD IsRegistered;   // 0010
   KMX_DWORD version;        // 0014 keyboard version
@@ -335,7 +354,20 @@ struct COMP_KEYBOARD {
 
   KMX_DWORD dpBitmapOffset; // 0038 offset of the bitmaps in the file
   KMX_DWORD dwBitmapSize;   // 003C size in bytes of the bitmaps
-  };
+};
+
+struct COMP_KEYBOARD_KMXPLUSINFO {
+  KMX_DWORD dpKMXPlus;      // 0040 offset of KMXPlus data, <sect> header is first
+  KMX_DWORD dwKMXPlusSize;  // 0044 size in bytes of entire KMXPlus data
+};
+
+/**
+ * Only valid if comp_keyboard.dwFlags&KF_KMXPLUS
+ */
+struct COMP_KEYBOARD_EX {
+  COMP_KEYBOARD             header;    // 0000 see COMP_KEYBOARD
+  COMP_KEYBOARD_KMXPLUSINFO kmxplus;   // 0040 see COMP_KEYBOARD_EXTRA
+};
 
 typedef COMP_KEYBOARD *PCOMP_KEYBOARD;
 typedef COMP_STORE *PCOMP_STORE;
@@ -355,8 +387,8 @@ static_assert(sizeof(COMP_KEY) == KEYBOARDFILEKEY_SIZE, "COMP_KEY must be KEYBOA
 static_assert(sizeof(COMP_GROUP) == KEYBOARDFILEGROUP_SIZE, "COMP_GROUP must be KEYBOARDFILEGROUP_SIZE bytes");
 static_assert(sizeof(COMP_KEYBOARD) == KEYBOARDFILEHEADER_SIZE, "COMP_KEYBOARD must be KEYBOARDFILEHEADER_SIZE bytes");
 
-#ifdef KMN_KBP
+#ifdef KM_CORE_LIBRARY
 } // namespace kmx
-} // namespace kbp
+} // namespace core
 } // namespace km
 #endif

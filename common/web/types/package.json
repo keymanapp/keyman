@@ -1,0 +1,88 @@
+{
+  "name": "@keymanapp/common-types",
+  "description": "Keyman Developer keyboard file types",
+  "keywords": [
+    "keyboard",
+    "keyman",
+    "ldml",
+    "unicode"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "es6-bundling": "./src/main.ts",
+      "default": "./build/src/main.js"
+    }
+  },
+  "files": [
+    "/build/src/"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "build:schema": "ajv compile",
+    "lint": "eslint .",
+    "test": "npm run lint && cd test && tsc -b && cd .. && c8 --skip-full --reporter=lcov --reporter=text mocha"
+  },
+  "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/keymanapp/keyman/issues"
+  },
+  "dependencies": {
+    "@keymanapp/ldml-keyboard-constants": "*",
+    "@keymanapp/keyman-version": "*",
+    "restructure": "3.0.1",
+    "semver": "^7.5.2",
+    "sax": ">=0.6.0",
+    "xmlbuilder": "~11.0.0"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/git-diff": "^2.0.3",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^20.4.1",
+    "@types/semver": "^7.3.12",
+    "@types/xml2js": "^0.4.5",
+    "ajv": "^8.12.0",
+    "ajv-cli": "^5.0.0",
+    "ajv-formats": "^2.1.1",
+    "c8": "^7.12.0",
+    "chalk": "^2.4.2",
+    "git-diff": "^2.0.6",
+    "hexy": "^0.3.4",
+    "mocha": "^8.4.0",
+    "typescript": "^5.4.5"
+  },
+  "mocha": {
+    "spec": "build/test/**/test-*.js",
+    "require": [
+      "source-map-support/register"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git"
+  },
+  "c8": {
+    "all": true,
+    "src": [
+      "src/"
+    ],
+    "exclude-after-remap": true,
+    "exclude": [
+      "src/deps/",
+      "src/kmx/kmx-plus-builder/",
+      "src/kmx/kmx-plus.ts",
+      "src/kmx/kmx-builder.ts",
+      "src/kmx/element-string.ts",
+      "src/kmx/string-list.ts",
+      "src/ldml-keyboard/ldml-keyboard-testdata-xml.ts",
+      "src/ldml-keyboard/unicodeset-parser-api.ts",
+      "src/keyman-touch-layout/keyman-touch-layout-file-writer.ts",
+      "src/osk/osk.ts",
+      "src/schemas/*",
+      "test/"
+    ]
+  },
+  "sideEffects": false
+}

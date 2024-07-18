@@ -1,0 +1,13 @@
+store(&NAME) '029 - beep'
+c Description: Tests beep
+c keys: [K_1]
+c expected: \b
+c context: 
+
+store(&version) '10.0'
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+
++ [K_1] > beep

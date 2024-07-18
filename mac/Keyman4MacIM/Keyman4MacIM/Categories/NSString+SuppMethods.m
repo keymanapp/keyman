@@ -11,7 +11,7 @@
 @implementation NSString (SuppMethods)
 
 - (BOOL)startsWith:(NSString *)str {
-    return [[self lowercaseString] hasPrefix:[str lowercaseString]];
+  return [[self lowercaseString] hasPrefix:[str lowercaseString]];
 }
 
 @end

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="keys-markers"/>
+
+  <keys>
+    <key id="aa" output="\m{aa}" />
+    <key id="bb" output="\m{bb}" />
+    <key id="cc" output="\m{cc}" />
+    <key id="dd" output="\m{dd}" />
+    <key id="ww" output="\m{w}" flickId="flickw" longPressKeyIds="aa bb" longPressDefaultKeyId="bb" multiTapKeyIds="cc" />
+  </keys>
+  <flicks>
+    <flick id="flickw">
+      <flickSegment directions="nw" keyId="dd" />
+    </flick>
+  </flicks>
+
+  <layers formId="iso">
+    <layer id="base">
+      <row keys="ww" />
+    </layer>
+  </layers>
+
+  <transforms type="simple">
+    <transformGroup>
+      <transform from="\m{w}" to="W" /> <!-- to quell marker err -->
+    </transformGroup>
+  </transforms>
+</keyboard3>
+
+<!-- you can have any output you want, as long as it's an W ! -->

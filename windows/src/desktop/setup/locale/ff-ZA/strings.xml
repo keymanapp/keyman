@@ -72,9 +72,7 @@ Hurmitin jooni?</string>
   <string name="ssDownloadingTitle">Nana awtoo %0:s</string>
   <!-- Parameters: %0:s: filename -->
   <string name="ssDownloadingText">Nana awtoo %0:s</string>
-  <string name="ssOffline">$APPNAME horiima seŋaade e keyman.com ngam aawtaade geɗe.
-
-Tiiɗno ƴeewto so aɗa seŋii, kadi ndokkaa aafirde $APPNAME yamiroore naatde e Enternet e teelte falo-jaynge maa.
-
-Dobo Gallin ngam yaltude Aafirde, Eto kadi aawtaade goɗngol, walla faalkiso ngam jokkude e ceŋtol.</string>
+  <string name="ssOffline">$APPNAME horiima seŋaade e keyman.com ngam aawtaade geɗe.</string>
+  <string name="ssOffline2">Tiiɗno ƴeewto so aɗa seŋii, kadi ndokkaa aafirde $APPNAME yamiroore naatde e Enternet e teelte falo-jaynge maa.</string>
+  <string name="ssOffline3">Dobo Gallin ngam yaltude Aafirde, Eto kadi aawtaade goɗngol, walla faalkiso ngam jokkude e ceŋtol.</string>
 </resources>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+  This keyboard won't make a lot of sense, it's mostly
+  a test of validating markers.
+
+  When we get further on in implementation, we'll shape this up
+  into something testable for implementation.
+
+-->
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="vars-markers-maximal"/>
+
+  <displays>
+    <display output="\m{m}" display="Ⓜ️" />
+  </displays>
+
+  <keys>
+    <key id="m" output="\m{m}" />
+  </keys>
+
+  <!-- from spec -->
+  <variables>
+    <string id="x" value="\m{x}" />
+  </variables>
+
+  <transforms type="simple">
+    <transformGroup>
+      <transform from="m" to="\m{m}"/>
+      <transform from="x" to="\m{x}"/>
+    </transformGroup>
+    <transformGroup>
+      <transform from="e\m{x}" to="é" />
+    </transformGroup>
+  </transforms>
+  <transforms type="backspace">
+    <transformGroup>
+      <transform from="A\m{.}B" />
+    </transformGroup>
+  </transforms>
+</keyboard3>

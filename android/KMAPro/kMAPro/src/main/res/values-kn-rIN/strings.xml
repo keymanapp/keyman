@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!-- app_name removed in 16.0 beta. Set in build.gradle -->
+  <!-- Context: Menu Action -->
+  <string name="action_share" comment="Menu action to send text content to another app">ಹಂಚಿಕೊಳ್ಳಿ</string>
+  <!-- Context: Menu Action -->
+  <string name="action_web" comment="Menu action to open Keyman browser">ವೆಬ್ ಬ್ರೌಸರ್</string>
+  <!-- Context: Menu Action -->
+  <string name="action_text_size" comment="Menu action to adjust text size">ಅಕ್ಷರದ ಗಾತ್ರ</string>
+  <!-- Context: Menu Action -->
+  <string name="action_overflow" comment="Show additional menu items">ಇನ್ನಷ್ಟು</string>
+  <!-- Context: Menu Action -->
+  <string name="action_clear_text" comment="Menu action to erase text">ಪಠ್ಯವನ್ನು ತೆರವುಗೊಳಿಸಿ</string>
+  <!-- Context: Menu Action -->
+  <string name="action_info" comment="Menu action to display Keyman help page">ಮಾಹಿತಿ</string>
+  <!-- Context: Menu Action -->
+  <string name="action_settings" comment="Menu action to open Settings menu">ಸೆಟ್ಟಿಂಗ್‌ಗಳು</string>
+  <!-- Context: Menu Action -->
+  <string name="action_install_updates" comment="Menu notification that keyboard or dictionary updates available">ನವೀಕರಣೆಯನ್ನು ಅಳವಡಿಸಿ</string>
+  <!-- Context: Title -->
+  <string name="title_version" comment="Title of Keyman for Android version">ಆವೃತ್ತಿ %1$s</string>
+  <!-- Context: Text label when old Chrome version installed -->
+  <string name="text_require_chrome_57" comment="Banner text when old version of Chrome is installed">ಕೀಮ್ಯಾನ್‌ಗೆ ಕ್ರೋಮ್ ಆವೃತ್ತಿ 57 ಅಥವಾ ಹೊಸತಿನ ಅಗತ್ಯವಿದೆ.</string>
+  <!-- Context: Button label -->
+  <string name="button_update_chrome" comment="Prompt to upgrade Chrome in the Play Store">ಕ್ರೋಮ್ ನವೀಕರಿಸು</string>
+  <!-- Context: Textfield prompt (&#8230; is the ellipsis character "...") -->
+  <string name="textview_hint" comment="Prompt to start typing">ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಲು ಪ್ರಾರಂಭಿಸಿ&#8230;</string>
+  <!-- Context: Splash screen (version/copyright info currently disabled -->
+  <string name="splash_blank" translatable="false" comment="Blank text while version info on splash page is disabled"></string>
+  <!-- Context: Splash screen (version/copyright info currently disabled -->
+  <!-- Context: Text Size dialog -->
+  <string name="text_size" comment="Current text size (number)">ಅಕ್ಷರದ ಗಾತ್ರ: %1$d</string>
+  <!-- Context: Text Size dialog -->
+  <string name="ic_text_size_up" comment="Make text bigger">ಅಕ್ಷರದ ಗಾತ್ರ ಹೆಚ್ಚಿಸಿ</string>
+  <!-- Context: Text Size dialog -->
+  <string name="ic_text_size_down" comment="Make text smaller">ಅಕ್ಷರದ ಗಾತ್ರ ತಗ್ಗಿಸಿ</string>
+  <!-- Context: Text Size dialog -->
+  <string name="ic_text_size_slider" comment="Adjust text size">ಅಕ್ಷರ ಗಾತ್ರದ ಸ್ಲೈಡರ್</string>
+  <!-- Context: Clear Text dialog -->
+  <string name="all_text_will_be_cleared" comment="Erase all the text">\nಎಲ್ಲಾ ಪಠ್ಯವನ್ನು ತೆರವುಗೊಳಿಸಲಾಗುತ್ತದೆ\n</string>
+  <!-- Context: Get Started menu -->
+  <string name="get_started" comment="Menu for getting started">ಪ್ರಾರಂಭಿಕ ಪರದೆ</string>
+  <!-- Context: Get Started menu -->
+  <string name="add_a_keyboard" comment="Menu item to add a keyboard">ನಿಮ್ಮ ಭಾಷೆಗೆ ಕೀಲಿಮಣೆಯನ್ನು ಸೇರಿಸಿ</string>
+  <!-- Context: Get Started menu -->
+  <string name="enable_system_keyboard" comment="Menu item to enable Keyman as system keyboard">ಕೀಮ್ಯಾನ್‌ವನ್ನು ಸಿಸ್ಟಮ್-ಆದ್ಯಂತ ಕೀಲಿಮಣೆಯಾಗಿ ಸ್ಥಾಪಿಸು</string>
+  <!-- Context: Get Started menu -->
+  <string name="set_keyman_as_default" comment="Menu item to set Keyman as default system keyboard">ಕೀಮ್ಯಾನ್‌ಅನ್ನು ಪೂರ್ವನಿರ್ಧರಿತ (ಡೀಫಾಲ್ಟ್) ಕೀಲಿಮಣೆಯನ್ನಾಗಿ ಹೊಂದಿಸಿ</string>
+  <!-- Context: Get Started menu -->
+  <string name="more_info" comment="Open the Keyman for Android help page">ಹೆಚ್ಚಿನ ಮಾಹಿತಿ</string>
+  <!-- Context: Get Started menu -->
+  <string name="show_get_started" comment="Show the &quot;Get Started&quot; menu on startup">ಆರಂಭದಲ್ಲಿ \"%1$s\" ತೋರಿಸು</string>
+  <!-- Context: Android Storage Permission -->
+  <string name="request_storage_permission" comment="Request storage permission to access keyboard packages">ಕೀಲಿಮಣೆ ಪ್ಯಾಕೇಜ್‌ಗಳನ್ನು ಸ್ಥಾಪಿಸಲು, ಕೀಮ್ಯಾನ್‌ಗೆ (external storage) ಬಾಹ್ಯ ಸಂಗ್ರಹಣೆಯನ್ನು ಓದಲು ಅನುಮತಿ ನೀಡಿ.</string>
+  <!-- Context: Android Storage Permission -->
+  <string name="storage_permission_denied" comment="Keyboard package installation may fail since Android storage permission not granted">ಬಾಹ್ಯ ಸಂಗ್ರಹಣೆಯನ್ನು (external storage) ಓದಲು ಅನುಮತಿಯನ್ನು ನಿರಾಕರಿಸಲಾಗಿದೆ. ಕೀಲಿಮಣೆ ಪ್ಯಾಕೇಜ್‌ಅನ್ನು ಸ್ಥಾಪಿಸಲು ವಿಫಲವಾಗಬಹುದು</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="keyman_settings" comment="Settings menu title">ಸೆಟ್ಟಿಂಗ್‌ಗಳು</string>
+  <!-- Context: Keyman Settings menu -->
+  <plurals name="installed_languages">
+    <item quantity="one">ಸ್ಥಾಪಿಸಲಾದ ಭಾಷೆ (%1$d)</item>
+    <item quantity="other">ಸ್ಥಾಪಿಸಲಾದ ಭಾಷೆಗಳು (%1$d)</item>
+  </plurals>
+  <!-- Context: Keyman Settings menu -->
+  <string name="install_keyboard_or_dictionary" comment="Menu item to install keyboard or dictionary">ಕೀಲಿಮಣೆ ಅಥವ ಶಬ್ದಕೋಶವನ್ನು ಅನುಸ್ಥಾಪಿಸು</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="change_display_language" comment="Menu action to change interface language">ಪ್ರದರ್ಶನ ಭಾಷೆ</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="adjust_keyboard_height" comment="Menu action to adjust keyboard height">ಕೀಲಿಮಣೆಯ ಎತ್ತರವನ್ನು ಹೊಂದಿಸಿ</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="spacebar_caption" comment="Menu action to set the spacebar caption">ಸ್ಪೇಸ್‌ಬಾರ್ ಶೀರ್ಷಿಕೆ</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_keyboard" comment="Spacebar caption option - keyboard">ಕೀಲಿಮಣೆ</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_language" comment="Spacebar caption option - language">ಭಾಷೆ</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_language_keyboard" comment="Spacebar caption option - language + keyboard">ಭಾಷೆ + ಕೀಲಿಮಣೆ</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_blank" comment="Spacebar caption option - blank">ಖಾಲಿ</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_keyboard" comment="Spacebar caption hint - keyboard">ಕೀಲಿಮಣೆ ಹೆಸರನ್ನು ಸ್ಪೇಸ್‌ಬಾರ್ ಶೀರ್ಷಿಕೆಯನ್ನಾಗಿ ತೋರಿಸು</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_language" comment="Spacebar caption hint - language">ಭಾಷೆಯನ್ನು ಸ್ಪೇಸ್‌ಬಾರ್ ಶೀರ್ಷಿಕೆಯನ್ನಾಗಿ ತೋರಿಸು</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_language_keyboard" comment="Spacebar caption hint - language + keyboard">ಭಾಷೆ ಮತ್ತು ಕೀಲಿಮಣೆ ಸ್ಪೇಸ್‌ಬಾರ್ ಶೀರ್ಷಿಕೆಯನ್ನಾಗಿ ತೋರಿಸು</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">ಸ್ಪೇಸ್‌ಬಾರ್ ಶೀರ್ಷಿಕೆ ತೋರಿಸಬೇಡ</string>
+  <!-- Context: Keyman Settings menu / Haptic feedback -->
+  <string name="haptic_feedback" comment="haptic feedback on key press">ಟೈಪಿಂಗ್ ಮಾಡುವಾಗ ವೈಬ್ರೇಟ್ ಮಾಡು</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="show_banner" comment="text suggestions banner">ಯಾವಾಗಲೂ ಬ್ಯಾನರ್ ತೋರಿಸು</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="show_banner_on" comment="Description when toggle is on">ಅನುಷ್ಠಾನಗೊಳಿಸಲಾಗುವುದು</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="show_banner_off" comment="Description when toggle is off">ಇದು ಆಫ್ ಆಗಿರುವಾಗ, \"ಮುಂದಿನ ಪದವನ್ನು ಊಹಿಸಿ\" ಸಕ್ರಿಯಗೊಳಿಸಿದಾಗ ಮಾತ್ರ ತೋರಿಸಲಾಗುತ್ತದೆ</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="show_send_crash_report" comment="permission for sending crash reports">ಅಂತರ್ಜಾಲ ಮೂಲಕ ದೋಷದ ವರದಿಗಳನ್ನು ಕಳುಹಿಸಲು ಅನುಮತಿಸಿ</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="show_send_crash_report_on" comment="Description when toggle is on">ಇದು ಆನ್ ಆಗಿರುವಾಗ, ದೋಷದ ವರದಿಗಳನ್ನು ಕಳುಹಿಸಲಾಗುವುದು</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="show_send_crash_report_off" comment="Description when toggle is off">ಇದು ಆಫ್ ಆಗಿರುವಾಗ, ದೋಷದ ವರದಿಗಳನ್ನು ಕಳುಹಿಸಲಾಗುವುದಿಲ್ಲ</string>
+  <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
+  <string name="install_from_keyman_dot_com" comment="Install package from Keyman server">Keyman.com ನಿಂದ ಅನುಸ್ಥಾಪಿಸು</string>
+  <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
+  <string name="install_from_local_file" comment="Install package file from local device">ಸ್ಥಳೀಯ ಕಡತನಿಂದ ಅನುಸ್ಥಾಪಿಸು</string>
+  <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
+  <string name="install_from_other_device" comment="Scan QR Code">ಬೇರೊಂದು ಡಿವೈಸ್‌ನಿಂದ ಅನುಸ್ಥಾಪಿಸು</string>
+  <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
+  <string name="add_languages_to_installed_keyboard" comment="Install additional languages from a keyboard package">ಸ್ಥಾಪಿಸಲಾದ ಕೀಲಿಮಣೆಗೆ ಭಾಷೆಯನ್ನು ಸೇರಿಸು</string>
+  <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
+  <string name="add_language_subtext" comment="Additional information for adding another language">(ಕೀಲಿಮಣೆ ಪ್ಯಾಕೇಜ್‌ನಿಂದ)</string>
+  <!-- Context: Select Package and Select Languages menu -->
+  <string name="title_select_keyboard_package_list" comment="Select a keyboard package to add languages">ಕೀಲಿಮಣೆ ಪ್ಯಾಕೇಜ್‌ವನ್ನು ಆಯ್ಕೆ ಮಾಡಿ</string>
+  <!-- Context: Select Package and Select Languages menu -->
+  <string name="title_select_languages_for_package" comment="Select language names from the keyboard package">%1$s ಕೀಲಿಮಣೆಗೆ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆ ಮಾಡಿ</string>
+  <!-- Context: Select Package and Select Languages menu -->
+  <string name="added_language_to_keyboard" comment="Notification that a language name is added to a keyboard">%1$s ಭಾಷೆಯನ್ನು %2$s ಕೀಲಿಮಣೆಗೆ ಸೇರಿಸಲಾಗಿದೆ</string>
+  <!-- Context: Select Package and Select Languages menu -->
+  <string name="all_languages_installed" comment="Text when all languages from a keyboard package have been installed">ಎಲ್ಲಾ ಭಾಷೆಗಳನ್ನು ಈಗಾಗಲೇ ಸ್ಥಾಪಿಸಲಾಗಿದೆ</string>
+  <!-- Context: Adjust Keyboard Height menu -->
+  <string name="drag_the_keyboard" comment="First line of adjusting keyboard height">ಎತ್ತರವನ್ನು ಬದಲಾಯಿಸಲು ಕೀಲಿಮಣೆಯನ್ನು ಎಳೆಯಿರಿ</string>
+  <!-- Context: Adjust Keyboard Height menu -->
+  <string name="rotate_the_device" comment="Second line of adjusting keyboard height">ಪೋರ್ಟ್ರೇಟ್ ಮತ್ತು ಲ್ಯಾಂಡ್ಸ್ಕೇಪ್ ಹೊಂದಿಸಲು ಸಾಧನವನ್ನು ತಿರುಗಿಸಿ</string>
+  <!-- Context: Adjust Keyboard Height menu -->
+  <string name="reset_to_defaults" comment="Button to reset to default heights">ಡೀಫಾಲ್ಟ್ ಮರುಹೊಂದಿಸಿ</string>
+  <!-- Context: Keyman Web Browser -->
+  <string name="hint_text" comment="Prompt to type in the browser search bar">ಹುಡುಕು ಅಥವಾ URL ಟೈಪ್ ಮಾಡಿ</string>
+  <!-- Context: Keyman Web Browser -->
+  <string name="title_bookmarks" comment="Title for bookmarks">ಬುಕ್‍ಮಾರ್ಕ್‌ಗಳು</string>
+  <!-- Context: Keyman Web Browser -->
+  <string name="no_bookmarks" comment="Text when bookmark list is empty">ಯಾವುದೇ ಬುಕ್‍ಮಾರ್ಕ್‌ಗಳಿಲ್ಲ</string>
+  <!-- Context: Keyman Web Browser -->
+  <string name="add_bookmark" comment="Confirmation to add bookmark">ಬುಕ್‌ಮಾರ್ಕ್ ಸೇರಿಸಿ</string>
+  <!-- Context: Keyman Web Browser -->
+  <string name="hint_title" comment="Page title for saved bookmark">ಶೀರ್ಷಿಕೆ</string>
+  <!-- Context: Keyman Web Browser -->
+  <string name="hint_url" comment="Page URL for saved bookmark">ಯುಆರ್‌ಎಲ್‌</string>
+  <!-- Context: KMP Package strings -->
+  <string name="title_package_failed_to_install" comment="Error dialog title when package failed to install">ಪ್ಯಾಕೇಜ್ %1$s ಅನ್ನು ಅನುಸ್ಥಾಪಿಸಲು ವಿಫಲವಾಗಿದೆ</string>
+  <!-- Context: KMP Package strings -->
+  <string name="downloading_keyboard_package" comment="Confirmation to download keyboard package filename">ಕೆಳಗೆ ಉಲ್ಲೇಖಿಸಿರುವ ಕೀಲಿಮಣೆ ಪ್ಯಾಕೇಜ್ ಡೌನ್ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ\n%1$s&#8230;</string>
+  <!-- Context: KMP Package strings -->
+  <string name="failed_to_extract" comment="Notification that keyboard package failed to unzip">ಹೊರತೆಗೆಯಲು ವಿಫಲವಾಗಿದೆ</string>
+  <!-- Context: KMP Package strings -->
+  <string name="install_keyboard_package" comment="Title to install keyboard package">ಕೀಲಿಮಣೆಯನ್ನು ಅನುಸ್ಥಾಪಿಸು</string>
+  <!-- Context: KMP Package strings -->
+  <string name="install_predictive_text_package" comment="Title to install dictionary package">ಶಬ್ದಕೋಶವನ್ನು ಅನುಸ್ಥಾಪಿಸು</string>
+  <!-- Context: KMP Package strings -->
+  <string name="not_valid_package_file" comment="Notification when invalid package file cannot be installed">%1$s ಕೀಮ್ಯಾನ್ ಪ್ಯಾಕೇಜ್ ಕಡತ ಮಾನ್ಯವಾಗಿಲ್ಲ\n%2$s\"</string>
+  <!-- Context: KMP Package strings -->
+  <string name="no_new_touch_keyboards_to_install" comment="Notification when no touch-optimized keyboards can be installed">ಕೀಲಿಮಣೆ ಪ್ಯಾಕೇಜ್‌ನಲ್ಲಿ ಯಾವುದೆ ಕೀಲಿಮಣೆಯು (touch-optimized) ಟಚ್ ಹೊಂದುವಂತೆ ಮಾಡಲಾಗಿಲ್ಲ</string>
+  <!-- Context: KMP Package strings -->
+  <string name="no_new_predictive_text_to_install" comment="Notification when no dictionaries can be installed">ಮುಂದಿನ ಪದವನ್ನು ಊಹಿಸುವ ಪಟ್ಟಿಯನ್ನು ಸ್ಥಾಪಿಸಲು ಯಾವ ಹೊಸದು ಇಲ್ಲ</string>
+  <!-- Context: KMP Package strings -->
+  <string name="no_targets_to_install" comment="Notification when a package doesn't contain keyboards or dictionaries">ಕೀಲಿಮಣೆಗಳು ಅಥವ ಮುಂದಿನ ಪದವನ್ನು ಊಹಿಸುವ ಪಟ್ಟಿಯನ್ನು ಸ್ಥಾಪಿಸಲು ಸಾಧ್ಯವಿಲ್ಲ</string>
+  <!-- Context: KMP Package strings -->
+  <string name="no_associated_languages" comment="Notification when a keyboard package doesn't contain languages">ಕೀಲಿಮಣೆ ಪ್ಯಾಕೇಜ್‌ನಲ್ಲಿ ಯಾವುದೆ ಸಂಬಂಧಿತ ಭಾಷೆಗಳನ್ನು ಹೊಂದಿಲ್ಲ</string>
+  <!-- Context: KMP Package strings -->
+  <string name="invalid_metadata" comment="kmp.json metadata file is invalid or missing in package">ಪ್ಯಾಕೇಜ್‌ನಲ್ಲಿ ಅಮಾನ್ಯ/ಕಾಣೆಯಾದ (metadata)ಮೆಟಾಡೇಟಾ</string>
+  <!-- Context: KMP Package strings -->
+  <string name="minimum_keyboard_version_not_supported" comment="Notification when keyboard has functionality not supported by current Keyman">ಈ ಕೀಲಿಮಣೆಗೆ ಹೊಸ ಆವೃತ್ತಿಯ ಕೀಮ್ಯಾನ್ ಅಗತ್ಯವಿದೆ</string>
+  <!-- Context: anywhere -->
+  <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">ವೆಬ್ ಬ್ರೌಸರ್ ಅನ್ನು ಪ್ರಾರಂಭಿಸಲು ಸಾಧ್ಯವಾಗುತ್ತಿಲ್ಲ</string>
+</resources>

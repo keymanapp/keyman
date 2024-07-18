@@ -1,0 +1,38 @@
+/* Checkbox text to always show on-screen keyboard */
+"4UX-80-0Vo.title" = "Vždy zobrazovat klávesnici na obrazovce";
+
+/* Checkbox text to enable verbose Console logging */
+"7J6-zy-R20.title" = "Použít detailní logování konzole";
+
+/* Support button text  */
+"93O-x6-RLF.label" = "Podpora";
+
+/* Download Keyboard button text */
+"CTw-kf-WNS.title" = "Stáhnout klávesnici...";
+
+/* Keyman Configuration window title */
+"F0z-JX-Cv5.title" = "Konfigurace klíče";
+
+/* button text to go back to previous page */
+"JOK-JV-n8w.title" = "Zpět";
+
+/* Keyboards button text */
+"MPN-9N-wWc.label" = "Keyboards";
+
+/* text to explain verbose Console logging option */
+"MrI-GM-7d6.title" = "Když je zapnuta možnost detailního logování, Keyman zaznamená akce, které mohou pomoci Keymanovi diagnostikovat problém. Program konzole může být použit k zobrazení protokolu zpráv od Keymana. V konzoli filtr zobrazuje všechny zprávy z procesu \"Klíčové\". Tento log může být exportován a v případě potřeby odeslán na podporu klíče.";
+
+/* button text to move forward to the next page */
+"eXr-8V-h1g.title" = "Přeposlat";
+
+/* button text to return to the home help page */
+"fXS-aC-CMH.title" = "Domů";
+
+/* Options button text */
+"frd-No-seV.label" = "Možnosti";
+
+/* Installed Keyboard column heading */
+"jex-Nd-Qzg.headerCell.title" = "Instalovaná klávesnice";
+
+/* Verbose logging tooltip text */
+"uWx-3J-U0D.ibShadowedToolTip" = "Zapněte, pokud máte problémy s konkrétní klávesnicí nebo s klíčem obecně.";

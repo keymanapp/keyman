@@ -31,4 +31,6 @@
 
 GType   ibus_keyman_engine_get_type    (void);
 
+extern void ibus_keyman_set_text(IBusEngine* engine, const gchar* text);
+
 #endif

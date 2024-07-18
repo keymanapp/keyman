@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="disp-invalid"/>
+
+  <displays>
+    <display output="f" display="(f)"/> <!-- Note: in opposite lexical order, as the compiler will sort -->
+    <display output="e" display="(e)"/>
+    <display output="e" display="(e)"/> <!-- duplicate -->
+    <displayOptions baseCharacter="x" />
+  </displays>
+</keyboard3>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+
+@@keys: [SHIFT K_BKQUOTE][K_1][K_BKQUOTE]
+@@expected: \u0037\u1790\u17B6\u0127
+
+-->
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info author="srl295" indicator="🙀" layout="qwerty"  name="TestKbd"/>
+
+  <keys>
+    <key id="hmaqtugha" output="ħ" />
+    <key id="that" output="ថា" />
+    <key id="seven" output="7" />
+    <key id="eee" output="e" />
+  </keys>
+
+  <layers formId="us">
+    <layer id="base" modifiers="none">
+      <row keys="hmaqtugha that" /> <!-- number row -->
+    </layer>
+    <layer id="shift" modifiers="shift">
+      <row keys="seven eee" /> <!-- number row -->
+    </layer>
+  </layers>
+</keyboard3>

@@ -1,0 +1,43 @@
+{
+  "name": "@keymanapp/kmc-analyze",
+  "description": "Keyman Developer Compiler Module - keyboard analysis tools",
+  "keywords": [
+    "keyboard",
+    "keyman",
+    "unicode"
+  ],
+  "scripts": {
+    "build": "gosh ./build.sh build",
+    "test": "gosh ./build.sh test"
+  },
+  "type": "module",
+  "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/keymanapp/keyman/issues"
+  },
+  "exports": {
+    ".": "./build/src/index.js"
+  },
+  "files": [
+    "build/src/"
+  ],
+  "dependencies": {
+    "@keymanapp/common-types": "*",
+    "@keymanapp/developer-utils": "*",
+    "@keymanapp/kmc-kmn": "*"
+  },
+  "devDependencies": {
+    "@keymanapp/resources-gosh": "*",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^20.4.1",
+    "c8": "^7.12.0",
+    "chalk": "^2.4.2",
+    "mocha": "^8.4.0",
+    "typescript": "^5.4.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git"
+  }
+}

@@ -1,0 +1,32 @@
+store(&NAME) '020 - deadkeys and backspace'
+c Description: Tests deadkey backspacing
+c 1. One deadkey in context                   dk(1) + BKSP = nul
+c 2. One char and one deadkey in context      'a' dk(2) + BKSP = nul
+c 3. One deadkey and one char in context      dk(3) 'a' + BKSP = nul
+c 4. Two deadkeys in a row in context         dk(4a) dk(4b) + BKSP = nul
+c 5. One char and two deadkeys in context     'a' dk(5a) dk(5b) 'b' + BKSP = 'a'
+c 6. One char and two deadkeys and one char and two deadkeys in context:
+c    'a' dk(6a) dk(6b) 'b' dk(6c) dk(6d) + BKSP = 'a'
+c 7. Tests behaviour when deleting two characters with deadkey prior to first character,
+c    verifying that deadkeys are preserved with the first backspace event:
+c    'c' (dk7) 'de' + BKSP + BKSP = 'ok'
+
+c keys: [K_1][K_BKSP][K_2][K_BKSP][K_3][K_BKSP][K_4][K_BKSP][K_5][K_BKSP][K_6][K_BKSP][K_7][K_BKSP][K_BKSP]
+c expected: wxaa ok
+c context: wxyz
+
+store(&VERSION) '9.0'
+
+begin unicode > use(main)
+
+group(main) using keys
+
++ '1' > dk(1)
++ '2' > 'a' dk(2)
++ '3' > dk(3) 'a'
++ '4' > dk(4a) dk(4b)
++ '5' > 'a' dk(5a) dk(5b) 'b'
++ '6' > 'a' dk(6a) dk(6b) 'b' dk(6c) dk(6d)
++ '7' > 'c' dk(7) 'd' 'e'
+'c' 'd' + [K_BKSP]       > ' fail'
+'c' dk(7) 'd' + [K_BKSP] > ' ok'

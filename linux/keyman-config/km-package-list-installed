@@ -1,9 +1,11 @@
 #!/usr/bin/python3
 
 import argparse
-import logging
 import os
-from keyman_config import __version__
+
+from keyman_config import add_standard_arguments, initialize_logging, initialize_sentry, verify_dbus_running
+from keyman_config.get_kmp import get_keyman_dir, InstallLocation
+from keyman_config.list_installed_kmp import get_installed_kmp
 
 
 def main():
@@ -12,29 +14,23 @@ def main():
     parser.add_argument('-s', "--shared", help='show keyboard packages installed in shared area', action="store_true")
     parser.add_argument('-o', "--os", help='show keyboard packages installed by the OS', action="store_true")
     parser.add_argument('-u', "--user", help='show keyboard packages installed in user area', action="store_true")
-    parser.add_argument('--version', action='version', version='%(prog)s version ' + __version__)
-    parser.add_argument('-v', '--verbose', action='store_true', help='verbose logging')
-    parser.add_argument('-vv', '--veryverbose', action='store_true', help='very verbose logging')
+    add_standard_arguments(parser)
 
     args = parser.parse_args()
-    if args.verbose:
-        logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(message)s')
-    elif args.veryverbose:
-        logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(message)s')
-    else:
-        logging.basicConfig(format='%(levelname)s:%(message)s')
 
-    all = not args.user and not args.shared and not args.os
-    from keyman_config.list_installed_kmp import get_installed_kmp
-    from keyman_config.get_kmp import get_keyman_dir, InstallLocation
-    if args.user or all:
+    initialize_logging(args)
+    initialize_sentry()
+    verify_dbus_running()
+
+    _all = not args.user and not args.shared and not args.os
+    if args.user or _all:
         installed_kmp = get_installed_kmp(InstallLocation.User)
         if args.verbose or args.veryverbose:
             print("--- Installed user Keyman keyboard packages (%s) ---" % (get_keyman_dir(InstallLocation.User)))
         else:
             print("--- Installed user Keyman keyboard packages ---")
         print_keyboards(installed_kmp, args.long)
-    if args.shared or all:
+    if args.shared or _all:
         installed_kmp = get_installed_kmp(InstallLocation.Shared)
         if args.verbose or args.veryverbose:
             print("--- Installed shared Keyman keyboard packages (%s) ---" %
@@ -42,7 +38,7 @@ def main():
         else:
             print("--- Installed shared Keyman keyboard packages ---")
         print_keyboards(installed_kmp, args.long)
-    if args.os or all:
+    if args.os or _all:
         installed_kmp = get_installed_kmp(InstallLocation.OS)
         if args.verbose or args.veryverbose:
             print("--- Installed OS Keyman keyboard packages (%s) ---" % (get_keyman_dir(InstallLocation.OS)))
@@ -51,12 +47,12 @@ def main():
         print_keyboards(installed_kmp, args.long)
 
 
-def print_keyboards(installed_kmp, verbose):
+def print_keyboards(installed_kmp, detailed):
     for packageID in sorted(installed_kmp):
-        print(installed_kmp[packageID]['name'] + ", version:", installed_kmp[packageID]['version'] + ", id:", packageID)
-        if verbose:
+        print(f"{installed_kmp[packageID]['name']}, version: {installed_kmp[packageID]['kmpversion']}, id: {packageID}")
+        if detailed:
             if installed_kmp[packageID]['version'] != installed_kmp[packageID]['kmpversion']:
-                print("Version mismatch. Installed keyboard package is %s. Website says it is %s."
+                print("New version of keyboard available. Installed keyboard package is %s. Website has %s."
                       % (installed_kmp[packageID]['kmpversion'], installed_kmp[packageID]['version']))
             if installed_kmp[packageID]['name'] != installed_kmp[packageID]['kmpname']:
                 print("Name mismatch. Installed keyboard package is %s. Website says it is %s."

@@ -367,6 +367,9 @@ KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLa
   *deadKey = 0;
   return keyV;
 }
+//--------------------------------------------------- 
+// _S2 checked OK
+KMX_WCHAR mac_KMX_get_KeyValUnderlying_From_KeyValUS(v_dw_3D & All_Vector, KMX_DWORD kv_us) {
 
 
   /**
@@ -388,6 +391,8 @@ KMX_WCHAR mac_KMX_get_KeyValUnderlying_From_KeyValUS(vector_dword_3D & All_Vecto
   }
   return kv_us;
 }
+// _S2 checked OK
+KMX_WCHAR mac_KMX_get_KeyCodeUnderlying_From_KeyValUnderlying(v_dw_3D & All_Vector, KMX_DWORD kv_underlying) {
 
 
 /**
@@ -410,6 +415,8 @@ KMX_WCHAR mac_KMX_get_KeyCodeUnderlying_From_KeyValUnderlying(vector_dword_3D & 
   }
   return kv_underlying;
 }
+// _S2 checked OK
+KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_KeyCodeUS(const UCKeyboardLayout * keyboard_layout, v_dw_3D &All_Vector, KMX_DWORD kc_us, ShiftState ss, int caps) {
 
 
   /**

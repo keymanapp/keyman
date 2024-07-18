@@ -46,6 +46,75 @@
                BlueprintName = "KeymanEngine4MacTests"
                ReferencedContainer = "container:KeymanEngine4Mac.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "KMEngineTests/testCheckPlatform_Browsers_ReturnsNo">
+               </Test>
+               <Test
+                  Identifier = "KMEngineTests/testCheckPlatform_Desktop_ReturnsYes">
+               </Test>
+               <Test
+                  Identifier = "KMEngineTests/testCheckPlatform_HARDWARE_ReturnsYes">
+               </Test>
+               <Test
+                  Identifier = "KMEngineTests/testCheckPlatform_MAC_ReturnsYes">
+               </Test>
+               <Test
+                  Identifier = "KMEngineTests/testCheckPlatform_MacOS_ReturnsYes">
+               </Test>
+               <Test
+                  Identifier = "KMEngineTests/testCheckPlatform_NATIVE_ReturnsYes">
+               </Test>
+               <Test
+                  Identifier = "KMEngineTests/testCheckPlatform_desktop_ReturnsYes">
+               </Test>
+               <Test
+                  Identifier = "KMEngineTests/testCheckPlatform_hardware_ReturnsYes">
+               </Test>
+               <Test
+                  Identifier = "KMEngineTests/testCheckPlatform_macosx_ReturnsYes">
+               </Test>
+               <Test
+                  Identifier = "KMEngineTests/testCheckPlatform_multipleTokens_MatchesCorrectOneForMac">
+               </Test>
+               <Test
+                  Identifier = "KMEngineTests/testCheckPlatform_native_ReturnsYes">
+               </Test>
+               <Test
+                  Identifier = "KMEngineTests/testContextMatch_InvertedPlatformLogic_NotTouch">
+               </Test>
+               <Test
+                  Identifier = "KMEngineTests/testprocessEvent_eventForCtrl8WithCipherMusicKmx_ReturnsNoAction">
+               </Test>
+               <Test
+                  Identifier = "KMEngineTests/testprocessEvent_eventForCtrlShiftNumeralWithCipherMusicKmx_ReturnsQstrActionForCorrectUnicodeSurrogatePair">
+               </Test>
+               <Test
+                  Identifier = "KMEngineTests/testprocessEvent_eventForPeriodWithCipherMusicKmx_ReturnsNoAction">
+               </Test>
+               <Test
+                  Identifier = "KMEngineTests/testprocessEvent_eventForShiftNumeralsWithoutRulesInCipherMusicKmx_ReturnsNoAction">
+               </Test>
+               <Test
+                  Identifier = "KMEngineTests/testprocessEvent_eventForUnmappedKey_ReturnsNoActions">
+               </Test>
+               <Test
+                  Identifier = "KMEngineTests/testprocessEvent_eventForUnshiftedNumeralWithCipherMusicKmx_ReturnsQstrActionToInsertNumeral">
+               </Test>
+               <Test
+                  Identifier = "KMEngineTests/testsetContextBuffer_EmptyContext_InitializedWithContext">
+               </Test>
+            </SkippedTests>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "E29F22F0201A59B1005EA234"
+               BuildableName = "KeymanTests.xctest"
+               BlueprintName = "KeymanTests"
+               ReferencedContainer = "container:../Keyman4MacIM/Keyman4MacIM.xcodeproj">
+            </BuildableReference>
          </TestableReference>
       </Testables>
    </TestAction>

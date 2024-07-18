@@ -3,9 +3,9 @@
 #
 
 !ifdef NODELPHI
-TARGETS=etl2log
+TARGETS=etl2log texteditor
 !else
-TARGETS=oskbulkrenderer etl2log
+TARGETS=oskbulkrenderer etl2log texteditor
 !endif
 CLEANS=clean-support
 
@@ -19,6 +19,10 @@ oskbulkrenderer: .virtual
 
 etl2log: .virtual
     cd $(ROOT)\src\support\etl2log
+    $(MAKE) $(TARGET)
+
+texteditor: .virtual
+    cd $(ROOT)\src\support\texteditor
     $(MAKE) $(TARGET)
 
 # ----------------------------------------------------------------------

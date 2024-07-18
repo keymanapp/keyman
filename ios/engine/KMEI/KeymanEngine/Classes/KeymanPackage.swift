@@ -7,7 +7,8 @@
 //
 
 import Foundation
-import Zip
+import ZIPFoundation
+import os.log
 
 // KMPErrors may be passed to UIAlertControllers, so they need localization.
 public enum KMPError : String, Error {
@@ -245,7 +246,7 @@ public class KeymanPackage {
           try FileManager.default.removeItem(at: self.sourceFolder)
         }
       } catch {
-        log.debug("Could not remove temporary extraction site on package deinit")
+        os_log("Could not remove temporary extraction site on package deinit", log:KeymanEngineLogger.resources, type: .error)
       }
     }
   }
@@ -436,20 +437,38 @@ public class KeymanPackage {
     let minVersion = Version(minSupportedVersion)
     
     if (currentVersion.major < minVersion!.major) {
-      log.error("package '\(packageName)' could not be installed because it requires version \(minSupportedVersion) of Keyman")
+      let message = "package '\(packageName)' could not be installed because it requires version \(minSupportedVersion) of Keyman"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
       throw KMPError.unsupportedKeymanVersion
     }
   }
   
   @available(*, deprecated, message: "Use of the completion block is unnecessary; this method now returns synchronously.")
   static public func extract(fileUrl: URL, destination: URL, complete: @escaping (KeymanPackage?) -> Void) throws {
-    try unzipFile(fileUrl: fileUrl, destination: destination) {
-      do {
-        let package = try KeymanPackage.parse(destination)
-        complete(package)
-      } catch {
-        SentryManager.captureAndLog(error, sentryLevel: .info)
-        complete(nil)
+    let fileManager = FileManager()
+    do {
+      try fileManager.unzipItem(at: fileUrl, to: destination)
+      let package = try KeymanPackage.parse(destination)
+      complete(package)
+    } catch {
+      let message = "Keyboard installation error: \(String(describing: error))"
+      os_log("%{public}s", log:KeymanEngineLogger.migration, type: .error, message)
+      SentryManager.capture(error, message: message, sentryLevel: .info)
+      complete(nil)
+    }
+  }
+  
+  static public func clearDirectory(destination: URL) throws {
+    // First check to see if directory exists. If not, then do nothing.
+    var isDirectory: ObjCBool = false
+    if(FileManager.default.fileExists(atPath: destination.path, isDirectory: &isDirectory)){
+      if (isDirectory.boolValue) {
+        // it exists and is actually a directory, so remove every file it contains
+        let fileArray = try FileManager.default.contentsOfDirectory(atPath: destination.path)
+        try fileArray.forEach { file in
+          let fileUrl = destination.appendingPathComponent(file)
+          try FileManager.default.removeItem(atPath: fileUrl.path)
+        }
       }
     }
   }
@@ -460,7 +479,8 @@ public class KeymanPackage {
   }
 
   static public func unzipFile(fileUrl: URL, destination: URL, complete: @escaping () -> Void = {}) throws {
-    try Zip.unzipFile(fileUrl, destination: destination, overwrite: true, password: nil)
+    let fileManager = FileManager()
+    try fileManager.unzipItem(at: fileUrl, to: destination)
     complete()
   }
 

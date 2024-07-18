@@ -1,0 +1,1609 @@
+keyman.register({
+    "options": {
+        "context": "keyboard",
+        "dateFormat": "standard",
+        "device": "any",
+        "keyboardBaseUri": "https://s.keyman.com/keyboard/",
+        "fontBaseUri": "https://s.keyman.com/font/deploy/",
+        "keyboardid": "@dz",
+        "keyboardVersion": "current"
+    },
+    "keyboard": [[{
+        "id": "basic_kbddzo",
+        "name": "Dzongkha Basic",
+        "filename": "basic_kbddzo/1.0/basic_kbddzo-1.0.js",
+        "version": "1.0",
+        "source": "https://github.com/keymanapp/keyboards/tree/master/release/basic/basic_kbddzo",
+        "devices": {
+            "phone": 2,
+            "tablet": 2,
+            "desktop": 2
+        },
+        "languages": [{
+            "id": "dz",
+            "name": "Dzongkha",
+            "region": 3
+        }]
+    }, {
+        "id": "tibetan_direct_input",
+        "name": "Tibetan Direct Input",
+        "filename": "tibetan_direct_input/1.4/tibetan_direct_input-1.4.js",
+        "version": "1.4",
+        "source": "https://github.com/keymanapp/keyboards/tree/master/release/t/tibetan_direct_input",
+        "devices": {
+            "phone": 2,
+            "tablet": 2,
+            "desktop": 2
+        },
+        "languages": [{
+            "id": "adi-tibt",
+            "name": "Adi",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "bft-tibt",
+            "name": "Balti",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "kjz-tibt",
+            "name": "Bumthangkha",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "cna-tibt",
+            "name": "Changthang",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "dre-tibt",
+            "name": "Dolpo",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "dz",
+            "name": "Dzongkha",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "bfu-tibt",
+            "name": "Gahri",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "clk-tibt",
+            "name": "Idu-Mishmi",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "jya-tibt",
+            "name": "Jiarong",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "kbg-tibt",
+            "name": "Khamba",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "xkf-tibt",
+            "name": "Khengkha",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "ght-tibt",
+            "name": "Kuke",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "lbj-tibt",
+            "name": "Ladakhi",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "lep-tibt",
+            "name": "Lepcha",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "loy-tibt",
+            "name": "Lhowa",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "khk-tibt",
+            "name": "Mongolian, Halh",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "muk-tibt",
+            "name": "Mugom",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "lae-tibt",
+            "name": "Pattani",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "prx-tibt",
+            "name": "Purik",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "xsr-tibt",
+            "name": "Sherpa",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "sip-tibt",
+            "name": "Sikkimese",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "sbu-tibt",
+            "name": "Stod Bhoti",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "taj-tibt",
+            "name": "Tamang, Eastern",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "tdg-tibt",
+            "name": "Tamang, Western",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "adx-tibt",
+            "name": "Tibetan, Amdo",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "bo-tibt",
+            "name": "Tibetan, Central",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "khg-tibt",
+            "name": "Tibetan, Khams",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "lbf-tibt",
+            "name": "Tinani",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "tsj",
+            "name": "Tshangla",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "ola",
+            "name": "Walungge",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "zau-tibt",
+            "name": "Zangskari",
+            "region": 3
+        }]
+    }, {
+        "id": "tibetan_ewts",
+        "name": "Tibetan EWTS",
+        "filename": "tibetan_ewts/2.4/tibetan_ewts-2.4.js",
+        "version": "2.4",
+        "source": "https://github.com/keymanapp/keyboards/tree/master/release/t/tibetan_ewts",
+        "devices": {
+            "phone": 2,
+            "tablet": 2,
+            "desktop": 2
+        },
+        "languages": [{
+            "id": "adi-tibt",
+            "name": "Adi",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "bft-tibt",
+            "name": "Balti",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "kjz-tibt",
+            "name": "Bumthangkha",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "cna-tibt",
+            "name": "Changthang",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "xct-tibt",
+            "name": "Classical Tibetan",
+            "region": 1,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "dre-tibt",
+            "name": "Dolpo",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "dz",
+            "name": "Dzongkha",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "bfu-tibt",
+            "name": "Gahri",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "clk-tibt",
+            "name": "Idu-Mishmi",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "jya-tibt",
+            "name": "Jiarong",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "kbg-tibt",
+            "name": "Khamba",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "xkf-tibt",
+            "name": "Khengkha",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "ght-tibt",
+            "name": "Kuke",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "lbj-tibt",
+            "name": "Ladakhi",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "lep-tibt",
+            "name": "Lepcha",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "loy-tibt",
+            "name": "Lhowa",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "khk-tibt",
+            "name": "Mongolian, Halh",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "muk-tibt",
+            "name": "Mugom",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "otb-tibt",
+            "name": "Old Tibetan",
+            "region": 1,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "lae-tibt",
+            "name": "Pattani",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "prx-tibt",
+            "name": "Purik",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "xsr-tibt",
+            "name": "Sherpa",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "sip-tibt",
+            "name": "Sikkimese",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "sbu-tibt",
+            "name": "Stod Bhoti",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "taj-tibt",
+            "name": "Tamang, Eastern",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "tdg-tibt",
+            "name": "Tamang, Western",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "adx-tibt",
+            "name": "Tibetan, Amdo",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "bo-tibt",
+            "name": "Tibetan, Central",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "khg-tibt",
+            "name": "Tibetan, Khams",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "lbf-tibt",
+            "name": "Tinani",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "tsj-tibt",
+            "name": "Tshangla",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "ola-tibt",
+            "name": "Walungge",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "zau-tibt",
+            "name": "Zangskari",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }]
+    }, {
+        "id": "dzongkha",
+        "name": "Dzongkha",
+        "filename": "dzongkha/1.0/dzongkha-1.0.js",
+        "version": "1.0",
+        "desktopKeyboardID": 652,
+        "source": "https://github.com/keymanapp/keyboards/tree/master/legacy/d/dzongkha",
+        "devices": {
+            "phone": 0,
+            "tablet": 0,
+            "desktop": 2
+        },
+        "languages": [{
+            "id": "dz",
+            "name": "Dzongkha",
+            "region": 3
+        }]
+    }, {
+        "id": "tibetan_direct_unicode",
+        "name": "Tibetan Direct-to-Unicode v2",
+        "filename": "tibetan_direct_unicode/1.1/tibetan_direct_unicode-1.1.js",
+        "version": "1.1",
+        "source": "https://github.com/keymanapp/keyboards/tree/master/legacy/t/tibetan_direct_unicode",
+        "devices": {
+            "phone": 1,
+            "tablet": 1,
+            "desktop": 2
+        },
+        "languages": [{
+            "id": "dz",
+            "name": "Dzongkha",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "bo",
+            "name": "Tibetan, Central",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }]
+    }, {
+        "id": "tibetan_unicode_direct_input",
+        "name": "Tibetan Unicode Direct Input",
+        "filename": "tibetan_unicode_direct_input/1.1/tibetan_unicode_direct_input-1.1.js",
+        "version": "1.1",
+        "source": "https://github.com/keymanapp/keyboards/tree/master/legacy/t/tibetan_unicode_direct_input",
+        "devices": {
+            "phone": 1,
+            "tablet": 1,
+            "desktop": 2
+        },
+        "languages": [{
+            "id": "adi",
+            "name": "Adi",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "bft",
+            "name": "Balti",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "kjz",
+            "name": "Bumthangkha",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "cna",
+            "name": "Changthang",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "dre",
+            "name": "Dolpo",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "dz",
+            "name": "Dzongkha",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "bfu",
+            "name": "Gahri",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "clk",
+            "name": "Idu-Mishmi",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "jya",
+            "name": "Jiarong",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "kbg",
+            "name": "Khamba",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "xkf",
+            "name": "Khengkha",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "ght",
+            "name": "Kuke",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "lbj",
+            "name": "Ladakhi",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "lep",
+            "name": "Lepcha",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "loy",
+            "name": "Lhowa",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "khk",
+            "name": "Mongolian, Halh",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "muk",
+            "name": "Mugom",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "lae",
+            "name": "Pattani",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "prx",
+            "name": "Purik",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "xsr",
+            "name": "Sherpa",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "sip",
+            "name": "Sikkimese",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "sbu",
+            "name": "Stod Bhoti",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "taj",
+            "name": "Tamang, Eastern",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "tdg",
+            "name": "Tamang, Western",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "adx",
+            "name": "Tibetan, Amdo",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "bo",
+            "name": "Tibetan, Central",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "khg",
+            "name": "Tibetan, Khams",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "lbf",
+            "name": "Tinani",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "tsj",
+            "name": "Tshangla",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "ola",
+            "name": "Walungge",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }]
+    }, {
+        "id": "tibetan_unicode_ewts",
+        "name": "Tibetan Unicode EWTS",
+        "filename": "tibetan_unicode_ewts/1.1/tibetan_unicode_ewts-1.1.js",
+        "version": "1.1",
+        "source": "https://github.com/keymanapp/keyboards/tree/master/legacy/t/tibetan_unicode_ewts",
+        "devices": {
+            "phone": 1,
+            "tablet": 1,
+            "desktop": 2
+        },
+        "languages": [{
+            "id": "adi",
+            "name": "Adi",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "bft",
+            "name": "Balti",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "kjz",
+            "name": "Bumthangkha",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "cna",
+            "name": "Changthang",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "dre",
+            "name": "Dolpo",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "dz",
+            "name": "Dzongkha",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "bfu",
+            "name": "Gahri",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "clk",
+            "name": "Idu-Mishmi",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "jya",
+            "name": "Jiarong",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "kbg",
+            "name": "Khamba",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "xkf",
+            "name": "Khengkha",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "ght",
+            "name": "Kuke",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "lbj",
+            "name": "Ladakhi",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "lep",
+            "name": "Lepcha",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "loy",
+            "name": "Lhowa",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "khk",
+            "name": "Mongolian, Halh",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "muk",
+            "name": "Mugom",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "lae",
+            "name": "Pattani",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "prx",
+            "name": "Purik",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "xsr",
+            "name": "Sherpa",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "sip",
+            "name": "Sikkimese",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "sbu",
+            "name": "Stod Bhoti",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "taj",
+            "name": "Tamang, Eastern",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "tdg",
+            "name": "Tamang, Western",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "adx",
+            "name": "Tibetan, Amdo",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "bo",
+            "name": "Tibetan, Central",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "khg",
+            "name": "Tibetan, Khams",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "lbf",
+            "name": "Tinani",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "tsj",
+            "name": "Tshangla",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }, {
+            "id": "ola",
+            "name": "Walungge",
+            "region": 3,
+            "font": {
+                "family": "TibetanWeb",
+                "source": ["DDC_Uchen.ttf"]
+            },
+            "oskFont": {
+                "family": "TibetanWebOsk",
+                "source": ["DDC_Uchen.ttf", "ddc_uchen-webfont.svg#ddc_uchenregular"]
+            }
+        }]
+    }]]
+});

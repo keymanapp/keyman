@@ -26,10 +26,10 @@
 "message-keyboard-file-unreadable" = "Impossible de lire le fichier Keyman '%@'.";
 
 /* Message displayed in Configuration window when keyboard cannot be loaded */
-"message-error-loading-keyboard" = "(error loading keyboard)";
+"message-error-loading-keyboard" = "(erreur lors du chargement du clavier)";
 
 /* Message displayed in Configuration window when keyboard metadata cannot be loaded */
-"message-error-unknown-metadata" = "unknown";
+"message-error-unknown-metadata" = "inconnu";
 
 /* Button text to acknowledge that .kmp file could not be read  */
 "button-keyboard-file-unreadable" = "OK";
@@ -68,4 +68,7 @@
 "copyright-label" = "Droit d'auteur :";
 
 /* message displayed to alert user to need grant accessibility permission */
-"privacy-alert-text" = "To function properly, Keyman requires accessibility features:\n\nGrant access in System Preferences, Security & Privacy.\nRestart your system.";
+"privacy-alert-text" = "Pour fonctionner correctement, Keyman nécessite des fonctionnalités d'accessibilité :\n\nAccorder l'accès dans les Préférences Système, Sécurité et Confidentialité.\nRedémarrez votre système.";
+
+/* Text of menu item in Input Menu when no Keyboards are configured -- include parentheses  */
+"no-keyboard-configured-menu-placeholder" = "(Aucun clavier configuré)";

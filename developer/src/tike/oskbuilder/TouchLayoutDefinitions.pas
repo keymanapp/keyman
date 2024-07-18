@@ -36,7 +36,7 @@ type
   TJSONDefArray = array of TJSONDef;
 
 const
-  SkDef: array[0..9] of TJSONDef = (
+  SkDef: array[0..10] of TJSONDef = (
     (Name: 'id'; ClassType: TJSONString; Required: True),
     (Name: 'text'; ClassType: TJSONString),
     (Name: 'sp'; ClassType: TJSONValue),
@@ -46,7 +46,8 @@ const
     (Name: 'layer'; ClassType: TJSONString),
     (Name: 'nextlayer'; ClassType: TJSONString),
     (Name: 'font'; ClassType: TJSONString),
-    (Name: 'fontsize'; ClassType: TJSONString)
+    (Name: 'fontsize'; ClassType: TJSONString),
+    (Name: 'default'; ClassType: TJSONBool)
   );
 
   FlickDef: array[0..7] of TJSONDef = (

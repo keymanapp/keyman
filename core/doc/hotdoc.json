@@ -1,10 +1,14 @@
 {
     "project_name": "@project_name@",
     "project_version": "@project_version@",
-    "sitemap": "../../doc/sitemap.txt",
-    "index": "../../doc/markdown_files/index.md",
+    "sitemap": "@doc_dir@/sitemap.txt",
+    "index": "@doc_dir@/markdown_files/index.md",
     "c_sources": [
-      "../include/keyboardprocessor.h"
+      "@include_dir@/keyman/keyman_core_api.h"
+    ],
+    "c_include_directories": [
+      "@include_dir@",
+      "@doc_dir@/../../common/include"
     ],
     "c_smart_index" : true,
     "output": ".",

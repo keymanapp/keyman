@@ -67,10 +67,10 @@ inherited frmDebug: TfrmDebug
     Left = 228
     Top = 73
     object mnuPopupFont: TMenuItem
-      Action = modActionsKeyboardEditor.actDebugViewFont
+      Action = modActionsDebugger.actDebugViewFont
     end
     object mnuPopupResetToQuotedFont: TMenuItem
-      Action = modActionsKeyboardEditor.actDebugViewDefaultFont
+      Action = modActionsDebugger.actDebugViewDefaultFont
     end
     object N1: TMenuItem
       Caption = '-'

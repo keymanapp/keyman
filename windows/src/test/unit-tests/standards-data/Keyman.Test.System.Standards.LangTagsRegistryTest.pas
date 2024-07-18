@@ -13,7 +13,15 @@ type
     procedure Setup;
 
     [Test]
-    procedure TestSomeTags;
+    procedure TestTokPisinTag;
+    [Test]
+    procedure TestKhmerTag;
+    [Test]
+    procedure TestAkqTag;
+    [Test]
+    procedure TestAllTags;
+    [Test]
+    procedure TestUndTag;
   end;
 
 implementation
@@ -28,7 +36,7 @@ begin
   Assert.IgnoreCaseDefault := False;
 end;
 
-procedure TLangTagsTest.TestSomeTags;
+procedure TLangTagsTest.TestTokPisinTag;
 begin
   // Tok Pisin
   Assert.AreEqual('tpi', TLangTagsMap.LangTags['tpi'].tag);
@@ -39,7 +47,10 @@ begin
   Assert.AreEqual('Latn', TLangTagsMap.LangTags['tpi'].script);
   Assert.AreEqual(True, TLangTagsMap.LangTags['tpi'].suppress);
   Assert.AreEqual('tpi', TLangTagsMap.LangTags['tpi'].windows);
+end;
 
+procedure TLangTagsTest.TestKhmerTag;
+begin
   // Khmer
   Assert.AreEqual('km', TLangTagsMap.LangTags['km'].tag);
   Assert.AreEqual('km-Khmr-KH', TLangTagsMap.LangTags['km'].full);
@@ -49,7 +60,10 @@ begin
   Assert.AreEqual('Khmr', TLangTagsMap.LangTags['km'].script);
   Assert.AreEqual(True, TLangTagsMap.LangTags['km'].suppress);
   Assert.AreEqual('km', TLangTagsMap.LangTags['km'].windows);
+end;
 
+procedure TLangTagsTest.TestAkqTag;
+begin
   // Ak
   Assert.AreEqual('akq', TLangTagsMap.LangTags['akq'].tag);
   Assert.AreEqual('akq-Latn-PG', TLangTagsMap.LangTags['akq'].full);
@@ -57,13 +71,18 @@ begin
   Assert.AreEqual('PG', TLangTagsMap.LangTags['akq'].region);
   Assert.AreEqual(False, TLangTagsMap.LangTags['akq'].suppress);
   Assert.AreEqual('akq-Latn', TLangTagsMap.LangTags['akq'].windows);
+end;
 
+procedure TLangTagsTest.TestAllTags;
+begin
   // All Tags
-
   Assert.AreEqual('arx', TLangTagsMap.AllTags['arx-BR']);
-  Assert.AreEqual('bfi-x-stokoe', TLangTagsMap.AllTags['sgn-bfi-GB-x-stokoe']);
+  Assert.AreEqual('bfi-Zzzz-x-stokoe', TLangTagsMap.AllTags['sgn-bfi-GB-x-stokoe']);
   Assert.AreEqual('bfy', TLangTagsMap.AllTags['ppa-Deva-IN']);
+end;
 
+procedure TLangTagsTest.TestUndTag;
+begin
   // und
   Assert.AreEqual('und', TLangTagsMap.LangTags['und'].tag);
   Assert.AreEqual('und-Zyyy-001', TLangTagsMap.LangTags['und'].full);

@@ -62,7 +62,6 @@ const
   MAX_REG_FONT_ENTRIES = 16;
 
 function GetFolderPath(csidl: Integer): string;
-function TikeActive: Boolean;
 function CreateLink(const ObjPath, LinkPath, Desc: string): Boolean;
 procedure SetFontFromString(f: TFont; s: string);
 function FontAsString(f: TFont): string;
@@ -91,12 +90,9 @@ uses
   Classes, SysUtils,
   ErrorControlledRegistry, ActiveX, shlobj, RegistryKeys, //Dialogs,
      utilsystem, Forms, kmxfile, Dialogs, utilexecute,
-     KeymanVersion, CRC32, VisualKeyboard, Controls;
+     KeymanVersion, VisualKeyboard, Controls;
 
 function GetKMShellPath(var ps: string): Boolean; forward;  // I3655
-
-var
-  hMutex: THandle;
 
 type
 { IPersist interface }
@@ -190,54 +186,6 @@ begin
             mm.Free(idl);
         end;
     end;
-end;
-
-function TikeActive: Boolean;
-var
-  handle: THandle;
-  i: Integer;
-  FMultiInstance: Boolean;
-begin
-  with TRegistryErrorControlled.Create do  // I2890
-  try
-    if OpenKeyReadOnly(SRegKey_IDEOptions_CU) and ValueExists(SRegValue_IDEOptMultipleInstances)
-      then FMultiInstance := ReadString(SRegValue_IDEOptMultipleInstances) = '1'
-      else FMultiInstance := False;
-  finally
-    Free;
-  end;
-
-  if FMultiInstance then
-  begin
-    Result := False;
-    Exit;
-  end;
-
-  hMutex := CreateMutex(nil, True, 'Tavultesoft Integrated Keyboard Editor Mutex');
-  if GetLastError = ERROR_ALREADY_EXISTS then
-  begin
-    handle := FindWindow('TfrmKeymanDeveloper', nil);   // I4264
-    if (handle <> 0) then
-    begin
-      with TRegistryErrorControlled.Create do  // I2890
-      try
-        RootKey := HKEY_CURRENT_USER;
-        if not OpenKey(SRegKey_IDEFiles_CU, True) then  // I2890
-          RaiseLastRegistryError;
-        for i := 1 to ParamCount do
-        begin
-          WriteString(IntToStr(i), ExpandFileNameClean(IncludeTrailingPathDelimiter(GetCurrentDir), ParamStr(i)));   // I4749   // I4749
-        end;
-      finally
-        Free;
-      end;
-      PostMessage(handle, WM_USER_LOADREGFILES, 0, 0);
-      SetForegroundWindow(handle);
-    end;
-    Result := True;
-  end
-  else
-    Result := False;
 end;
 
 function FontAsString(f: TFont): string;

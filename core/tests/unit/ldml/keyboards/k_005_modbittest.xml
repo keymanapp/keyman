@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+
+@@keys: [K_BKQUOTE][SHIFT K_BKQUOTE][LALT K_BKQUOTE][RALT K_BKQUOTE][SHIFT LALT K_BKQUOTE][SHIFT RALT K_BKQUOTE][LCTRL K_BKQUOTE][RCTRL K_BKQUOTE][SHIFT LCTRL K_BKQUOTE][SHIFT RCTRL K_BKQUOTE]
+@@expected: \u0061\u0041\u0062\u0063\u0064\u0064\u0065\u0066\u0067\u0067
+
+-->
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info author="srl295" indicator="🙀" layout="qwerty"  name="TestKbd"/>
+
+  <keys/> <!-- implied only -->
+
+  <layers formId="us">
+    <layer id="base" modifiers="none">
+      <row keys="a" /> <!-- K_BKQUOTE -->
+    </layer>
+    <layer modifiers="shift">
+      <row keys="A" /> <!-- K_BKQUOTE -->
+    </layer>
+    <layer modifiers="altL">
+      <row keys="b" /> <!-- K_BKQUOTE -->
+    </layer>
+    <layer modifiers="altR">
+      <row keys="c" /> <!-- K_BKQUOTE -->
+    </layer>
+    <layer modifiers="shift alt"> <!-- LALT+shift or RALT+shift -->
+      <row keys="d" /> <!-- K_BKQUOTE -->
+    </layer>
+    <layer modifiers="ctrlL">
+      <row keys="e" /> <!-- K_BKQUOTE -->
+    </layer>
+    <layer modifiers="ctrlR">
+      <row keys="f" /> <!-- K_BKQUOTE -->
+    </layer>
+    <layer modifiers="shift ctrl"> <!-- LALT+shift or RALT+shift -->
+      <row keys="g" /> <!-- K_BKQUOTE -->
+    </layer>
+  </layers>
+</keyboard3>

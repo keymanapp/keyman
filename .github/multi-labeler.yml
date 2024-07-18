@@ -15,24 +15,33 @@ labels:
   # conventional commit / semantic PR styles
   #
 
-  - label: 'feat'
+  - label: 'auto'
     matcher:
-      title: '^feat(\(|:)'
-  - label: 'fix'
+      title: '^auto(\(|:)'
+  - label: 'change'
     matcher:
-      title: '^fix(\(|:)'
+      title: '^change(\(|:)'
   - label: 'chore'
     matcher:
       title: '^chore(\(|:)'
   - label: 'docs'
     matcher:
       title: '^docs(\(|:)'
+  - label: 'feat'
+    matcher:
+      title: '^feat(\(|:)'
+  - label: 'fix'
+    matcher:
+      title: '^fix(\(|:)'
   - label: 'refactor'
     matcher:
       title: '^refactor(\(|:)'
-  - label: 'auto'
+  - label: 'style'
     matcher:
-      title: '^auto(\(|:)'
+      title: '^style(\(|:)'
+  - label: 'test'
+    matcher:
+      title: '^test(\(|:)'
 
   #
   # additional meta flags
@@ -87,11 +96,3 @@ labels:
   - label: 'windows/'
     matcher:
       title: '\(.*windows.*\):'
-
-  #
-  # epics -- we will add/remove these as we work on new epics each release
-  #
-
-  - label: 'epic-ldml'
-    matcher:
-      branch: '.*epic-ldml.*' # anywhere in the branch name, e.g. feat/epic-ldml/developer/... or feat/developer/foo-epic-ldml

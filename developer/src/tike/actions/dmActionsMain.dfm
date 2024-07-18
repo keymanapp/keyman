@@ -248,21 +248,8 @@ object modActionsMain: TmodActionsMain
       Dialog.Options = [ofHideReadOnly, ofPathMustExist, ofFileMustExist, ofEnableSizing]
       Hint = 'Open Project|Opens an existing project'
       ImageIndex = 28
-      ShortCut = 16463
+      ShortCut = 24655
       OnAccept = actProjectOpenAccept
-    end
-    object actProjectSaveAs: TFileSaveAs
-      Category = 'Project'
-      Caption = 'Save Project &As...'
-      Dialog.DefaultExt = 'kpj'
-      Dialog.Filter = 'Keyman Developer Project Files (*.kpj)|*.kpj|All Files (*.*)|*.*'
-      Dialog.Options = [ofOverwritePrompt, ofHideReadOnly, ofPathMustExist, ofEnableSizing]
-      Dialog.Title = 'Save Project As'
-      Dialog.OnCanClose = actProjectSaveAsSaveDialogCanClose
-      Hint = 'Save Project As|Saves the current project with a new name'
-      BeforeExecute = actProjectSaveAsBeforeExecute
-      OnAccept = actProjectSaveAsAccept
-      OnUpdate = actProjectSaveAsUpdate
     end
     object actProjectAddCurrentEditorFile: TAction
       Category = 'Project'
@@ -290,13 +277,6 @@ object modActionsMain: TmodActionsMain
       ImageIndex = 31
       OnExecute = actProjectSettingsExecute
       OnUpdate = actProjectSettingsUpdate
-    end
-    object actToolsCustomise: TAction
-      Category = 'Tools'
-      Caption = 'C&ustomise...'
-      Hint = 
-        'Customise|Change the layout and appearance of the toolbars and m' +
-        'enus'
     end
     object actToolsOptions: TAction
       Category = 'Tools'
@@ -505,6 +485,11 @@ object modActionsMain: TmodActionsMain
       Caption = '&Stop server'
       OnExecute = actToolsWebStopServerExecute
       OnUpdate = actToolsWebStopServerUpdate
+    end
+    object actWindowNew: TAction
+      Category = 'Window'
+      Caption = '&New window'
+      OnExecute = actWindowNewExecute
     end
   end
   object ActionManager1: TActionManager

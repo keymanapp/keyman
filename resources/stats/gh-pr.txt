@@ -1,0 +1,9 @@
+{{range .}}{{
+	printf "%s\t%s\t%s\t%s\t%s\t%s\n"
+		(.number | printf "#%v" | autocolor "green")
+		.state
+		(.author.login | printf "%s" | autocolor "red")
+		.title
+		(.labels | pluck "name" | join "," | printf "%s" | autocolor "blue")
+		.createdAt
+}}{{end}}

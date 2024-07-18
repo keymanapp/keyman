@@ -58,6 +58,8 @@ type
     editProjectFilename: TEdit;
     Label1: TLabel;
     editFullCopyright: TEdit;
+    Label2: TLabel;
+    memoDescription: TMemo;
     procedure cmdOKClick(Sender: TObject);
     procedure editModelIDComponentChange(Sender: TObject);
     procedure FormCreate(Sender: TObject);
@@ -75,6 +77,7 @@ type
     procedure cmdBrowseClick(Sender: TObject);
     procedure editModelNameChange(Sender: TObject);
     procedure editFullCopyrightChange(Sender: TObject);
+    procedure memoDescriptionChange(Sender: TObject);
   private
     pack: TKPSFile;
     FSetup: Integer;
@@ -100,6 +103,7 @@ type
     procedure UpdateModelIDFromComponents;
     procedure UpdateProjectFilename;
     function GetFullCopyright: string;
+    function GetDescription: string;
   protected
     function GetHelpTopic: string; override;
     property AuthorID: string read GetAuthorID;
@@ -110,6 +114,7 @@ type
     property FullCopyright: string read GetFullCopyright;
     property Version: string read GetVersion;
     property Author: string read GetAuthor;
+    property Description: string read GetDescription;
     property ModelName: string read GetModelName;
     property BCP47Tags: string read GetBCP47Tags;
     property BasePath: string read GetBasePath;
@@ -126,14 +131,14 @@ uses
   Keyman.System.LexicalModelUtils,
   BCP47Tag,
   utilstr,
-  dmActionsMain,
   KeymanDeveloperOptions,
   Keyman.Developer.System.HelpTopics,
   Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFile,
   Keyman.Developer.System.ModelProjectTemplate,
   Keyman.Developer.System.ProjectTemplate,
-  Keyman.Developer.UI.UfrmSelectBCP47Language;
+  Keyman.Developer.UI.UfrmSelectBCP47Language,
+  UfrmMain;
 
 {$R *.dfm}
 
@@ -153,6 +158,7 @@ begin
       pt.Name := f.ModelName;
       pt.Copyright := f.Copyright;
       pt.FullCopyright := f.FullCopyright;
+      pt.Description := f.Description;
       pt.Author := f.Author;
       pt.Version := f.Version;
       pt.BCP47Tags := f.BCP47Tags;
@@ -167,7 +173,7 @@ begin
         end;
       end;
 
-      modActionsMain.OpenProject(pt.ProjectFilename);
+      frmKeymanDeveloper.OpenProject(pt.ProjectFilename);
       Result := True;
 
     finally
@@ -352,6 +358,7 @@ var
 begin
   e :=
     not Author.IsEmpty and
+    not Description.IsEmpty and
     not ModelName.IsEmpty and
     not AuthorID.IsEmpty and
     not PrimaryBCP47.IsEmpty and
@@ -388,6 +395,11 @@ end;
 function TfrmNewModelProjectParameters.GetCopyright: string;
 begin
   Result := Trim(editCopyright.Text);
+end;
+
+function TfrmNewModelProjectParameters.GetDescription: string;
+begin
+  Result := memoDescription.Text;
 end;
 
 function TfrmNewModelProjectParameters.GetFullCopyright: string;
@@ -474,8 +486,8 @@ end;
 procedure TfrmNewModelProjectParameters.UpdateAuthorIDFromAuthor;
 begin
   editAuthorID.Text := TLexicalModelUtils.CleanLexicalModelIDComponent(Author);
-  editCopyright.Text := Char($00A9 {copyright})+' '+Author;
-  editFullCopyright.Text := Char($00A9 {copyright})+' '+FormatDateTime('yyyy', Now)+' '+Author;
+  editCopyright.Text := 'Copyright ' + Char($00A9 {copyright})+' '+Author;
+  editFullCopyright.Text := 'Copyright ' + Char($00A9 {copyright})+' '+FormatDateTime('yyyy', Now)+' '+Author;
 end;
 
 procedure TfrmNewModelProjectParameters.UpdateUniqFromModelName;
@@ -554,6 +566,11 @@ begin
   finally
     Dec(FSetup);
   end;
+end;
+
+procedure TfrmNewModelProjectParameters.memoDescriptionChange(Sender: TObject);
+begin
+  EnableControls;
 end;
 
 procedure TfrmNewModelProjectParameters.BCP47_Fill;

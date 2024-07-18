@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import os.log
 
 /// Mainly differs from the API `Keyboard` by having an associated language.
 public struct InstallableKeyboard: Codable, KMPInitializableLanguageResource {
@@ -106,7 +107,12 @@ public struct InstallableKeyboard: Codable, KMPInitializableLanguageResource {
     self.lgCode = lgCode
 
     let languageMatches = metadata.languages.compactMap { return $0.languageId == lgCode ? $0.name : nil }
-    guard languageMatches.count == 1 else {
+    if (languageMatches.isEmpty) {
+      let message = "Could not find languageId '\(lgCode)' for package '\(packageID)'"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .default, message)
+      SentryManager.capture(message, sentryLevel: .warning)
+    }
+    guard languageMatches.count >= 1 else {
       return nil
     }
 

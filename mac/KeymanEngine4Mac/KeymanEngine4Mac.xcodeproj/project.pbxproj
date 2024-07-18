@@ -7,6 +7,24 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2993C32C29B1D92E00FB5E95 /* CoreAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 2993C32229B1D92E00FB5E95 /* CoreAction.m */; };
+		2993C32E29B1D92E00FB5E95 /* CoreWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 2993C32429B1D92E00FB5E95 /* CoreWrapper.m */; };
+		2993C32F29B1D92E00FB5E95 /* CoreHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 2993C32529B1D92E00FB5E95 /* CoreHelper.m */; };
+		2993C33229B1D92E00FB5E95 /* CoreWrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = 2993C32829B1D92E00FB5E95 /* CoreWrapper.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2993C33429B1D92E00FB5E95 /* CoreAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 2993C32A29B1D92E00FB5E95 /* CoreAction.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2993C33529B1D92E00FB5E95 /* CoreHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 2993C32B29B1D92E00FB5E95 /* CoreHelper.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2993C33829B1DD6900FB5E95 /* libkeymancore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2993C33729B1DD6900FB5E95 /* libkeymancore.a */; };
+		299D0B1B29CAB2F500767276 /* el_nuer.kmx in Resources */ = {isa = PBXBuildFile; fileRef = 299D0B1A29CAB2F500767276 /* el_nuer.kmx */; };
+		299F9E2A29C46AFC0053E903 /* CoreHelperTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 299F9E2729C46AFB0053E903 /* CoreHelperTests.m */; };
+		299F9E2B29C46AFC0053E903 /* CoreWrapperTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 299F9E2829C46AFB0053E903 /* CoreWrapperTests.m */; };
+		299F9E2C29C46AFC0053E903 /* CoreTestStaticHelperMethods.m in Sources */ = {isa = PBXBuildFile; fileRef = 299F9E2929C46AFC0053E903 /* CoreTestStaticHelperMethods.m */; };
+		29A12C292AC51D3F00327D46 /* libsicuuc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 29A205D82AC2E446000750C0 /* libsicuuc.a */; };
+		29A12C2A2AC51D6100327D46 /* libsicui18n.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 29A205DA2AC2E46A000750C0 /* libsicui18n.a */; };
+		29A1971E2AF091E600512A37 /* CoreKeyOutput.h in Headers */ = {isa = PBXBuildFile; fileRef = 29A1971C2AF091E600512A37 /* CoreKeyOutput.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		29A1971F2AF091E600512A37 /* CoreKeyOutput.m in Sources */ = {isa = PBXBuildFile; fileRef = 29A1971D2AF091E600512A37 /* CoreKeyOutput.m */; };
+		29A658C82AF394560038DCFE /* armenian_mnemonic.kmx in Resources */ = {isa = PBXBuildFile; fileRef = 29A658C72AF394560038DCFE /* armenian_mnemonic.kmx */; };
+		29B4A0D82BFAE8A400682049 /* KMELogs.h in Headers */ = {isa = PBXBuildFile; fileRef = 29B4A0D62BFAE8A400682049 /* KMELogs.h */; };
+		29B4A0D92BFAE8A400682049 /* KMELogs.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B4A0D72BFAE8A400682049 /* KMELogs.m */; };
 		378568D122FCCF0A00B481B5 /* sil_ipa.kmx in Resources */ = {isa = PBXBuildFile; fileRef = 378568D022FCCF0A00B481B5 /* sil_ipa.kmx */; };
 		378568D322FCD93300B481B5 /* indexoffset1892.kmx in Resources */ = {isa = PBXBuildFile; fileRef = 378568D222FCD93300B481B5 /* indexoffset1892.kmx */; };
 		980053351B37C9B50088DDDD /* NFont.h in Headers */ = {isa = PBXBuildFile; fileRef = 980053311B37C9B50088DDDD /* NFont.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -29,8 +47,6 @@
 		984C2AD81A79C98D0023F89D /* KeymanEngine4Mac.h in Headers */ = {isa = PBXBuildFile; fileRef = 984C2AD71A79C98D0023F89D /* KeymanEngine4Mac.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		984C2ADE1A79C98D0023F89D /* KeymanEngine4Mac.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 984C2AD21A79C98D0023F89D /* KeymanEngine4Mac.framework */; };
 		984C2AE51A79C98D0023F89D /* KMXFileTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 984C2AE41A79C98D0023F89D /* KMXFileTests.m */; };
-		984C2B041A79CA4F0023F89D /* NSArray+Action.h in Headers */ = {isa = PBXBuildFile; fileRef = 984C2AF01A79CA4F0023F89D /* NSArray+Action.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		984C2B051A79CA4F0023F89D /* NSArray+Action.m in Sources */ = {isa = PBXBuildFile; fileRef = 984C2AF11A79CA4F0023F89D /* NSArray+Action.m */; };
 		984C2B061A79CA4F0023F89D /* NSString+XString.h in Headers */ = {isa = PBXBuildFile; fileRef = 984C2AF21A79CA4F0023F89D /* NSString+XString.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		984C2B071A79CA4F0023F89D /* NSString+XString.m in Sources */ = {isa = PBXBuildFile; fileRef = 984C2AF31A79CA4F0023F89D /* NSString+XString.m */; };
 		984C2B091A79CA4F0023F89D /* KMBinaryFileFormat.h in Headers */ = {isa = PBXBuildFile; fileRef = 984C2AF51A79CA4F0023F89D /* KMBinaryFileFormat.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -66,6 +82,25 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2993C32229B1D92E00FB5E95 /* CoreAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreAction.m; sourceTree = "<group>"; };
+		2993C32429B1D92E00FB5E95 /* CoreWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreWrapper.m; sourceTree = "<group>"; };
+		2993C32529B1D92E00FB5E95 /* CoreHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreHelper.m; sourceTree = "<group>"; };
+		2993C32829B1D92E00FB5E95 /* CoreWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreWrapper.h; sourceTree = "<group>"; };
+		2993C32A29B1D92E00FB5E95 /* CoreAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreAction.h; sourceTree = "<group>"; };
+		2993C32B29B1D92E00FB5E95 /* CoreHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreHelper.h; sourceTree = "<group>"; };
+		2993C33729B1DD6900FB5E95 /* libkeymancore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libkeymancore.a; path = ../../core/build/mac/debug/libkeymancore.a; sourceTree = "<group>"; };
+		299D0B1A29CAB2F500767276 /* el_nuer.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = el_nuer.kmx; sourceTree = "<group>"; };
+		299F9E2629C46AFB0053E903 /* CoreTestStaticHelperMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreTestStaticHelperMethods.h; sourceTree = "<group>"; };
+		299F9E2729C46AFB0053E903 /* CoreHelperTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreHelperTests.m; sourceTree = "<group>"; };
+		299F9E2829C46AFB0053E903 /* CoreWrapperTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreWrapperTests.m; sourceTree = "<group>"; };
+		299F9E2929C46AFC0053E903 /* CoreTestStaticHelperMethods.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreTestStaticHelperMethods.m; sourceTree = "<group>"; };
+		29A1971C2AF091E600512A37 /* CoreKeyOutput.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CoreKeyOutput.h; sourceTree = "<group>"; };
+		29A1971D2AF091E600512A37 /* CoreKeyOutput.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CoreKeyOutput.m; sourceTree = "<group>"; };
+		29A205D82AC2E446000750C0 /* libsicuuc.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsicuuc.a; path = "../../core/build/mac-arm64/release/subprojects/icu/source/common/libsicuuc.a"; sourceTree = "<group>"; };
+		29A205DA2AC2E46A000750C0 /* libsicui18n.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libsicui18n.a; path = "../../core/build/mac-arm64/release/subprojects/icu/source/i18n/libsicui18n.a"; sourceTree = "<group>"; };
+		29A658C72AF394560038DCFE /* armenian_mnemonic.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = armenian_mnemonic.kmx; sourceTree = "<group>"; };
+		29B4A0D62BFAE8A400682049 /* KMELogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMELogs.h; sourceTree = "<group>"; };
+		29B4A0D72BFAE8A400682049 /* KMELogs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMELogs.m; sourceTree = "<group>"; };
 		378568D022FCCF0A00B481B5 /* sil_ipa.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = sil_ipa.kmx; sourceTree = "<group>"; };
 		378568D222FCD93300B481B5 /* indexoffset1892.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = indexoffset1892.kmx; sourceTree = "<group>"; };
 		980053311B37C9B50088DDDD /* NFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NFont.h; sourceTree = "<group>"; };
@@ -91,8 +126,6 @@
 		984C2ADD1A79C98D0023F89D /* KeymanEngine4MacTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = KeymanEngine4MacTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		984C2AE31A79C98D0023F89D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		984C2AE41A79C98D0023F89D /* KMXFileTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMXFileTests.m; sourceTree = "<group>"; };
-		984C2AF01A79CA4F0023F89D /* NSArray+Action.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+Action.h"; sourceTree = "<group>"; };
-		984C2AF11A79CA4F0023F89D /* NSArray+Action.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+Action.m"; sourceTree = "<group>"; };
 		984C2AF21A79CA4F0023F89D /* NSString+XString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+XString.h"; sourceTree = "<group>"; };
 		984C2AF31A79CA4F0023F89D /* NSString+XString.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+XString.m"; sourceTree = "<group>"; };
 		984C2AF51A79CA4F0023F89D /* KMBinaryFileFormat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMBinaryFileFormat.h; sourceTree = "<group>"; };
@@ -123,6 +156,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				29A12C292AC51D3F00327D46 /* libsicuuc.a in Frameworks */,
+				29A12C2A2AC51D6100327D46 /* libsicui18n.a in Frameworks */,
+				2993C33829B1DD6900FB5E95 /* libkeymancore.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -137,6 +173,31 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2993C32129B1D92E00FB5E95 /* CoreWrapper */ = {
+			isa = PBXGroup;
+			children = (
+				2993C32B29B1D92E00FB5E95 /* CoreHelper.h */,
+				2993C32529B1D92E00FB5E95 /* CoreHelper.m */,
+				2993C32829B1D92E00FB5E95 /* CoreWrapper.h */,
+				2993C32429B1D92E00FB5E95 /* CoreWrapper.m */,
+				2993C32A29B1D92E00FB5E95 /* CoreAction.h */,
+				2993C32229B1D92E00FB5E95 /* CoreAction.m */,
+				29A1971C2AF091E600512A37 /* CoreKeyOutput.h */,
+				29A1971D2AF091E600512A37 /* CoreKeyOutput.m */,
+			);
+			path = CoreWrapper;
+			sourceTree = "<group>";
+		};
+		2993C33629B1DD6800FB5E95 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				29A205DA2AC2E46A000750C0 /* libsicui18n.a */,
+				29A205D82AC2E446000750C0 /* libsicuuc.a */,
+				2993C33729B1DD6900FB5E95 /* libkeymancore.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		981880641BC1EA5800A1FBA5 /* OnScreenKeyboard */ = {
 			isa = PBXGroup;
 			children = (
@@ -161,6 +222,7 @@
 				984C2AD41A79C98D0023F89D /* KeymanEngine4Mac */,
 				984C2AE11A79C98D0023F89D /* KeymanEngine4MacTests */,
 				984C2AD31A79C98D0023F89D /* Products */,
+				2993C33629B1DD6800FB5E95 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -176,6 +238,7 @@
 		984C2AD41A79C98D0023F89D /* KeymanEngine4Mac */ = {
 			isa = PBXGroup;
 			children = (
+				2993C32129B1D92E00FB5E95 /* CoreWrapper */,
 				984C2AEE1A79CA4F0023F89D /* KME */,
 				984C2AD71A79C98D0023F89D /* KeymanEngine4Mac.h */,
 				984C2AD51A79C98D0023F89D /* Supporting Files */,
@@ -196,6 +259,10 @@
 		984C2AE11A79C98D0023F89D /* KeymanEngine4MacTests */ = {
 			isa = PBXGroup;
 			children = (
+				299F9E2629C46AFB0053E903 /* CoreTestStaticHelperMethods.h */,
+				299F9E2929C46AFC0053E903 /* CoreTestStaticHelperMethods.m */,
+				299F9E2729C46AFB0053E903 /* CoreHelperTests.m */,
+				299F9E2829C46AFB0053E903 /* CoreWrapperTests.m */,
 				E22A5A1220113F8100233965 /* KeymanEngineTestsStaticHelperMethods.h */,
 				E22A5A132011402E00233965 /* KeymanEngineTestsStaticHelperMethods.m */,
 				984C2AE41A79C98D0023F89D /* KMXFileTests.m */,
@@ -208,6 +275,8 @@
 		984C2AE21A79C98D0023F89D /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				29A658C72AF394560038DCFE /* armenian_mnemonic.kmx */,
+				299D0B1A29CAB2F500767276 /* el_nuer.kmx */,
 				378568D222FCD93300B481B5 /* indexoffset1892.kmx */,
 				378568D022FCCF0A00B481B5 /* sil_ipa.kmx */,
 				E23380F02112C01500B90591 /* CipherMusicUnicode.kmx */,
@@ -221,6 +290,8 @@
 		984C2AEE1A79CA4F0023F89D /* KME */ = {
 			isa = PBXGroup;
 			children = (
+				29B4A0D62BFAE8A400682049 /* KMELogs.h */,
+				29B4A0D72BFAE8A400682049 /* KMELogs.m */,
 				981880641BC1EA5800A1FBA5 /* OnScreenKeyboard */,
 				984C2AEF1A79CA4F0023F89D /* Categories */,
 				984C2AF51A79CA4F0023F89D /* KMBinaryFileFormat.h */,
@@ -249,8 +320,6 @@
 		984C2AEF1A79CA4F0023F89D /* Categories */ = {
 			isa = PBXGroup;
 			children = (
-				984C2AF01A79CA4F0023F89D /* NSArray+Action.h */,
-				984C2AF11A79CA4F0023F89D /* NSArray+Action.m */,
 				984C2AF21A79CA4F0023F89D /* NSString+XString.h */,
 				984C2AF31A79CA4F0023F89D /* NSString+XString.m */,
 			);
@@ -264,6 +333,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				29A1971E2AF091E600512A37 /* CoreKeyOutput.h in Headers */,
 				984C2B091A79CA4F0023F89D /* KMBinaryFileFormat.h in Headers */,
 				984C2B121A79CA4F0023F89D /* KMEngine.h in Headers */,
 				984C2B141A79CA4F0023F89D /* KMXFile.h in Headers */,
@@ -271,7 +341,7 @@
 				984C2B161A79CA4F0023F89D /* KVKFile.h in Headers */,
 				984C2B061A79CA4F0023F89D /* NSString+XString.h in Headers */,
 				984C2AD81A79C98D0023F89D /* KeymanEngine4Mac.h in Headers */,
-				984C2B041A79CA4F0023F89D /* NSArray+Action.h in Headers */,
+				2993C33429B1D92E00FB5E95 /* CoreAction.h in Headers */,
 				980053351B37C9B50088DDDD /* NFont.h in Headers */,
 				9818807B1BC1EE9700A1FBA5 /* TimerTarget.h in Headers */,
 				E28C71E520EBBA2D002D959D /* KMkeyViewProtocol.h in Headers */,
@@ -283,8 +353,11 @@
 				9840F5ED1B43B02500410ABA /* MacVKCodes.h in Headers */,
 				981880711BC1EA5800A1FBA5 /* KeyLabelCell.h in Headers */,
 				981880731BC1EA5800A1FBA5 /* KeyView.h in Headers */,
+				2993C33529B1D92E00FB5E95 /* CoreHelper.h in Headers */,
+				2993C33229B1D92E00FB5E95 /* CoreWrapper.h in Headers */,
 				9818806F1BC1EA5800A1FBA5 /* KeyLabel.h in Headers */,
 				981880751BC1EA5800A1FBA5 /* OSKKey.h in Headers */,
+				29B4A0D82BFAE8A400682049 /* KMELogs.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -379,7 +452,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				378568D322FCD93300B481B5 /* indexoffset1892.kmx in Resources */,
+				299D0B1B29CAB2F500767276 /* el_nuer.kmx in Resources */,
 				E2537D9A201641DA0069FEA6 /* TestMacEngine.kmx in Resources */,
+				29A658C82AF394560038DCFE /* armenian_mnemonic.kmx in Resources */,
 				E23380F12112C01500B90591 /* CipherMusicUnicode.kmx in Resources */,
 				378568D122FCCF0A00B481B5 /* sil_ipa.kmx in Resources */,
 				E224323F20D37E97006940A1 /* PlatformTest.kmx in Resources */,
@@ -433,17 +508,21 @@
 				980053381B37C9B50088DDDD /* NKey.m in Sources */,
 				981880701BC1EA5800A1FBA5 /* KeyLabel.m in Sources */,
 				981880721BC1EA5800A1FBA5 /* KeyLabelCell.m in Sources */,
+				29B4A0D92BFAE8A400682049 /* KMELogs.m in Sources */,
 				981880781BC1EA5800A1FBA5 /* OSKView.m in Sources */,
+				2993C32E29B1D92E00FB5E95 /* CoreWrapper.m in Sources */,
 				984C2B0F1A79CA4F0023F89D /* KMCompKey.m in Sources */,
 				984C2B131A79CA4F0023F89D /* KMEngine.m in Sources */,
 				984C2B171A79CA4F0023F89D /* KVKFile.m in Sources */,
+				29A1971F2AF091E600512A37 /* CoreKeyOutput.m in Sources */,
 				981880741BC1EA5800A1FBA5 /* KeyView.m in Sources */,
 				981880761BC1EA5800A1FBA5 /* OSKKey.m in Sources */,
+				2993C32F29B1D92E00FB5E95 /* CoreHelper.m in Sources */,
 				984C2B0D1A79CA4F0023F89D /* KMCompGroup.m in Sources */,
 				984C2B111A79CA4F0023F89D /* KMCompStore.m in Sources */,
+				2993C32C29B1D92E00FB5E95 /* CoreAction.m in Sources */,
 				984C2B151A79CA4F0023F89D /* KMXFile.m in Sources */,
 				980053361B37C9B50088DDDD /* NFont.m in Sources */,
-				984C2B051A79CA4F0023F89D /* NSArray+Action.m in Sources */,
 				984C2B071A79CA4F0023F89D /* NSString+XString.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -452,7 +531,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				299F9E2A29C46AFC0053E903 /* CoreHelperTests.m in Sources */,
 				984C2AE51A79C98D0023F89D /* KMXFileTests.m in Sources */,
+				299F9E2B29C46AFC0053E903 /* CoreWrapperTests.m in Sources */,
+				299F9E2C29C46AFC0053E903 /* CoreTestStaticHelperMethods.m in Sources */,
 				E22A5A142011402E00233965 /* KeymanEngineTestsStaticHelperMethods.m in Sources */,
 				E22A5A1120113DC100233965 /* KMEngineTests.m in Sources */,
 			);
@@ -499,7 +581,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -514,8 +596,13 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				"HEADER_SEARCH_PATHS[arch=*]" = (
+					"$(PROJECT_DIR)/../../core/**",
+					"$(PROJECT_DIR)/../../common/include",
+				);
 				INSTALL_PATH = "";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				"LIBRARY_SEARCH_PATHS[arch=*]" = "$(PROJECT_DIR)/../../core/build/mac/debug";
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -554,7 +641,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -562,8 +649,13 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				"HEADER_SEARCH_PATHS[arch=*]" = (
+					"$(PROJECT_DIR)/../../core/**",
+					"$(PROJECT_DIR)/../../common/include",
+				);
 				INSTALL_PATH = "";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				"LIBRARY_SEARCH_PATHS[arch=*]" = "$(PROJECT_DIR)/../../core/build/mac/release";
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -590,8 +682,20 @@
 				INFOPLIST_FILE = KeymanEngine4Mac/Info.plist;
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				"LIBRARY_SEARCH_PATHS[arch=*]" = "";
+				"LIBRARY_SEARCH_PATHS[arch=arm64]" = (
+					"$(PROJECT_DIR)/../../core/build/mac-arm64/debug/subprojects/icu/source/common",
+					"$(PROJECT_DIR)/../../core/build/mac-arm64/debug/subprojects/icu/source/i18n",
+					"$(PROJECT_DIR)/../../core/build/mac/debug",
+				);
+				"LIBRARY_SEARCH_PATHS[arch=x86_64]" = (
+					"$(PROJECT_DIR)/../../core/build/mac-x86_64/debug/subprojects/icu/source/common",
+					"$(PROJECT_DIR)/../../core/build/mac-x86_64/debug/subprojects/icu/source/i18n",
+					"$(PROJECT_DIR)/../../core/build/mac/debug",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				ONLY_ACTIVE_ARCH = NO;
+				"OTHER_LDFLAGS[arch=*]" = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sil.KeymanEngine4Mac;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PRODUCT_VERSION = 0.0.1;
@@ -621,7 +725,19 @@
 				INFOPLIST_FILE = KeymanEngine4Mac/Info.plist;
 				INSTALL_PATH = "@executable_path/../Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				"LIBRARY_SEARCH_PATHS[arch=*]" = "";
+				"LIBRARY_SEARCH_PATHS[arch=arm64]" = (
+					"$(PROJECT_DIR)/../../core/build/mac-arm64/release/subprojects/icu/source/common",
+					"$(PROJECT_DIR)/../../core/build/mac-arm64/release/subprojects/icu/source/i18n",
+					"$(PROJECT_DIR)/../../core/build/mac/release",
+				);
+				"LIBRARY_SEARCH_PATHS[arch=x86_64]" = (
+					"$(PROJECT_DIR)/../../core/build/mac-x86_64/release/subprojects/icu/source/common",
+					"$(PROJECT_DIR)/../../core/build/mac-x86_64/release/subprojects/icu/source/i18n",
+					"$(PROJECT_DIR)/../../core/build/mac/release",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				"OTHER_LDFLAGS[arch=*]" = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sil.KeymanEngine4Mac;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PRODUCT_VERSION = 0.0.1;
@@ -645,6 +761,7 @@
 				);
 				INFOPLIST_FILE = KeymanEngine4MacTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_BUNDLE_IDENTIFIER = "Tavultesoft.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -660,6 +777,7 @@
 				);
 				INFOPLIST_FILE = KeymanEngine4MacTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				PRODUCT_BUNDLE_IDENTIFIER = "Tavultesoft.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

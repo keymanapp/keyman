@@ -43,7 +43,9 @@ uses
 
   JsonUtil,
   KeymanDeveloperOptions,
+  Keyman.Developer.System.Project.Project,
   Keyman.Developer.System.Project.ProjectFile,
+  Keyman.Developer.System.Project.ProjectLoader,
   Keyman.Developer.System.Project.WelcomeRenderer,
   RedistFiles;
 
@@ -94,6 +96,7 @@ procedure TAppHttpResponder.RespondProject(doc: string; AContext: TIdContext;
   procedure RespondProjectFile;
   var
     path: string;
+    p: TProject;
   begin
     if ARequestInfo.Params.IndexOfName('path') < 0 then
     begin
@@ -104,7 +107,7 @@ procedure TAppHttpResponder.RespondProject(doc: string; AContext: TIdContext;
 
     path := CrackUTF8ZeroExtendedString(ARequestInfo.CommandType, ARequestInfo.Params.Values['path']);
 
-    if (Path <> '') and (not FileExists(path) or not SameText(ExtractFileExt(path), Ext_ProjectSource)) then
+    if (Path <> '') and (not DirectoryExists(ExtractFileDir(path)) or not SameText(ExtractFileExt(path), Ext_ProjectSource)) then
     begin
       AResponseInfo.ResponseNo := 404;
       AResponseInfo.ResponseText := 'Project file '+path+' does not exist.';
@@ -112,12 +115,21 @@ procedure TAppHttpResponder.RespondProject(doc: string; AContext: TIdContext;
     end;
 
     // Transform the .kpj
-    with TProject.Create(ptUnknown, path) do
+    try
+      p := TProject.Create(ptUnknown, path, True);
+    except
+      on E:EProjectLoader do
+      begin
+        AResponseInfo.ResponseNo := 400;
+        AResponseInfo.ResponseText := 'Invalid project file: '+E.Message;
+        Exit;
+      end;
+    end;
     try
       AResponseInfo.ContentType := 'text/html; charset=UTF-8';
-      AResponseInfo.ContentText := Render;
+      AResponseInfo.ContentText := p.Render;
     finally
-      Free;
+      p.Free;
     end;
   end;
 
@@ -191,7 +203,7 @@ procedure TAppHttpResponder.RespondProject(doc: string; AContext: TIdContext;
 
     // Saving state
 
-    if (Path <> '') and (not FileExists(path) or not SameText(ExtractFileExt(path), Ext_ProjectSource)) then
+    if (Path <> '') and (not DirectoryExists(ExtractFileDir(path)) or not SameText(ExtractFileExt(path), Ext_ProjectSource)) then
     begin
       AResponseInfo.ResponseNo := 404;
       AResponseInfo.ResponseText := 'Project file '+path+' does not exist.';

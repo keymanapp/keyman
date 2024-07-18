@@ -1,14 +1,16 @@
-import path = require("path");
+import * as path from "path";
+import * as url from 'url';
+import { shutdown } from './shutdown.js';
 
 // TODO: this is a Windows-only tray icon. There are a number of
 // cross-platform solutions but none of them are wonderful. We
 // should replace this when we find a decent one.
 
-const WindowsTrayicon = require("./win32/trayicon");
-const WindowsConsole = require("./win32/console");
-const open = require("open");
+import WindowsTrayicon from "./win32/trayicon/index.js";
+import WindowsConsole from "./win32/console/index.js";
+import open from 'open';
 
-module.exports = class Win32Tray {
+export class Win32Tray {
   private myTrayApp: any;
 
   public restart(localPort: number, ngrokAddress: string) {
@@ -55,7 +57,7 @@ module.exports = class Win32Tray {
 
     this.myTrayApp = new WindowsTrayicon({
       title: "Keyman Developer Server",
-      icon: path.resolve(__dirname, "site", "favicon.ico"),
+      icon: path.resolve(url.fileURLToPath(new URL('.', import.meta.url)), "site", "favicon.ico"),
       menu: menu
     });
 
@@ -75,7 +77,7 @@ module.exports = class Win32Tray {
           WindowsConsole.hideConsole();
           break;
         case 'item-id-exit':
-          process.exit(0);
+          shutdown();
       }
     });
 

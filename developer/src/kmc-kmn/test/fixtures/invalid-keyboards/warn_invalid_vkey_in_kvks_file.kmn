@@ -1,0 +1,12 @@
+c Description: Verifies that kmc reports a warning with an invalid vkey in the kvks
+
+store(&NAME) 'warn_invalid_vkey_in_kvks_file'
+store(&VERSION) '9.0'
+store(&VISUALKEYBOARD) 'warn_invalid_vkey_in_kvks_file.kvks'
+
+begin unicode > use(main)
+
+group(main) using keys
+
++ [K_A] > 'a'
+'a' + [K_B] > 'ខ្មែរ'

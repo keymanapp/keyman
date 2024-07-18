@@ -1,4 +1,5 @@
-#/usr/bin/env bash
+# shellcheck disable=SC2148
+# No hashbang for bash completion scripts! They are intended to be sourced, not executed.
 
 _km-kvk2ldml_completions()
 {
@@ -9,7 +10,8 @@ _km-kvk2ldml_completions()
     opts="-h --help -p --print -k --keys -o --output -v --verbose -vv --veryverbose --version"
 
     if [[ ${cur} == -* ]] ; then
-        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+        # shellcheck disable=SC2207
+        COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
         return 0
     fi
 
@@ -17,7 +19,8 @@ _km-kvk2ldml_completions()
         "-o"|"--output")
             local IFS=$'\n'
             compopt -o filenames
-            COMPREPLY=( $(compgen -f -- $cur) )
+            # shellcheck disable=SC2207
+            COMPREPLY=( $(compgen -f -- "$cur") )
             return 0
             ;;
         *)
@@ -26,7 +29,8 @@ _km-kvk2ldml_completions()
 
     local IFS=$'\n'
     compopt -o filenames
-    COMPREPLY=( $(compgen -f -X "!"*.kvk -- $cur) $(compgen -d -- $cur) )
+    # shellcheck disable=SC2207
+    COMPREPLY=( $(compgen -f -X "!"*.kvk -- "$cur") $(compgen -d -- "$cur") )
 }
 
 complete -F _km-kvk2ldml_completions km-kvk2ldml

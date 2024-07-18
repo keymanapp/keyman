@@ -19,8 +19,8 @@ set -u
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 cd "$KEYMAN_ROOT/windows/src"
@@ -31,7 +31,7 @@ cd "$KEYMAN_ROOT/windows/src"
 
 echo "Uploading symbols for desktop/"
 sentry-cli upload-dif -p keyman-windows -t breakpad -t pdb desktop --include-sources
-sentry-cli releases -p keyman-windows files "release-$VERSION_WITH_TAG" upload-sourcemaps desktop/kmshell/xml
+sentry-cli releases -p keyman-windows files "$VERSION_GIT_TAG" upload-sourcemaps desktop/kmshell/xml
 
 echo "Uploading symbols for engine/"
 sentry-cli upload-dif -p keyman-windows -t breakpad -t pdb engine --include-sources

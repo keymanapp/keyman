@@ -1,0 +1,7 @@
+// All projects herein require a reference to the DOM libraries... even the mostly-headless ones.
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": [ "DOM", "ES6"]
+  }
+}

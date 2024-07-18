@@ -18,18 +18,20 @@ set -u
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$(dirname "$THIS_SCRIPT")/trigger-definitions.inc.sh"
-. "$(dirname "$THIS_SCRIPT")/trigger-builds.inc.sh"
-. "$(dirname "$THIS_SCRIPT")/sentry-control.inc.sh"
+. "${THIS_SCRIPT%/*}/trigger-definitions.inc.sh"
+. "${THIS_SCRIPT%/*}/trigger-builds.inc.sh"
+. "${THIS_SCRIPT%/*}/sentry-control.inc.sh"
 
 gitbranch=`git branch --show-current`
 
 FORCE=0
 HISTORY_FORCE=
+fromversion=
+toversion=
 
 if [[ $# -gt 0 ]]; then
   if [[ "$1" == "-f" ]]; then
@@ -42,13 +44,14 @@ fi
 if [[ $# -gt 0 ]]; then
   # We want the action to specify the branch as a consistency check
   # for now at least.
-
   action=$1
   if [[ $# -gt 1 ]]; then
     base=$2
+    shift
   else
     action=help
   fi
+  shift
 
   if [[ $action == commit ]]; then
     if [ "$base" != "master" ] && [ "$base" != "beta" ] && [[ ! "$base" =~ ^stable-[0-9]+\.[0-9]+$ ]]; then
@@ -59,6 +62,13 @@ if [[ $# -gt 0 ]]; then
     if [ "$base" != "$gitbranch" ]; then
       echo "Branch doesn't match currently checked out branch."
       exit 2
+    fi
+
+    # commit action parameters
+    if [[ $# -gt 0 ]]; then
+      # next two parameters are --from and --to
+      fromversion="$1"
+      toversion="$2"
     fi
   fi
 else
@@ -88,16 +98,18 @@ echo "increment-version.sh: building resources/build/version"
 pushd "$KEYMAN_ROOT"
 npm ci
 
-pushd "$KEYMAN_ROOT/resources/build/version"
-npm run build:ts
-popd
+"$KEYMAN_ROOT/resources/build/version/build.sh"
 
 echo "increment-version.sh: running resources/build/version"
 pushd "$KEYMAN_ROOT"
 ABORT=0
-node resources/build/version/lib/index.js history version -t "$GITHUB_TOKEN" -b "$base" $HISTORY_FORCE || ABORT=$?
+if [[ -z "$fromversion" ]]; then
+  node resources/build/version/build/src/index.js history version -t "$GITHUB_TOKEN" -b "$base" $HISTORY_FORCE || ABORT=$?
+else
+  node resources/build/version/build/src/index.js history version -t "$GITHUB_TOKEN" -b "$base" $HISTORY_FORCE --from "$fromversion" --to "$toversion" || ABORT=$?
+fi
 
-if [[ $ABORT = 1 ]]; then
+if [[ $ABORT = 50 ]]; then
   if [[ $FORCE = 0 ]]; then
     echo "Skipping version increment from $VERSION: no recently merged pull requests were found"
     if [ ! -z "${TEAMCITY_VERSION-}" ]; then
@@ -109,7 +121,7 @@ if [[ $ABORT = 1 ]]; then
     echo "Force specified; building even though no changes were detected"
   fi
 elif [[ $ABORT != 0 ]]; then
-  echo "Failed to complete version history check"
+  echo "Failed to complete version history check (node version/lib/index.js failed with error $ABORT)"
   exit $ABORT
 fi
 popd > /dev/null
@@ -126,7 +138,7 @@ if [ "$action" == "commit" ]; then
   pushd "$KEYMAN_ROOT" > /dev/null
   message="auto: increment $base version to $NEWVERSION"
   branch="auto/version-$base-$NEWVERSION"
-  git tag -a "release-$VERSION_WITH_TAG" -m "Keyman release $VERSION_WITH_TAG"
+  git tag -a "$VERSION_GIT_TAG" -m "Keyman release $VERSION_WITH_TAG"
   git checkout -b "$branch"
   git add VERSION.md HISTORY.md
 
@@ -143,7 +155,7 @@ if [ "$action" == "commit" ]; then
   popd > /dev/null
 
   #
-  # Trigger builds for the previous version on TeamCity and Jenkins
+  # Trigger builds for the previous version on TeamCity and GitHub
   #
 
   triggerBuilds

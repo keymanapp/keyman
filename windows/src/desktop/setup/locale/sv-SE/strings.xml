@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">svenska</string>
+  <string name="ssApplicationTitle">$APPNAME $VERSION Konfiguration</string>
+  <string name="ssTitle">Installera $APPNAME $VERSION</string>
+  <string name="ssInstallSuccess">$APPNAME $VERSION har installerats.</string>
+  <string name="ssCancelQuery">Är du säker på att du vill avbryta installationen av $APPNAME?</string>
+  <string name="ssBootstrapExtractingBundle">Extraherar buntet...</string>
+  <string name="ssBootstrapCheckingPackages">Kontrollerar paket...</string>
+  <string name="ssBootstrapCheckingForUpdates">Letar efter uppdateringar...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">Kontrollerar installerade versioner...</string>
+  <string name="ssBootstrapReady">Slutför upp...</string>
+  <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
+  <string name="ssActionInstallKeyman">• $APPNAME %0:s %1:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
+  <string name="ssActionInstallPackage">• %0s %1s %2s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: ssActionDownload -->
+  <string name="ssActionInstallPackageLanguage">• %0:s %1:s för %2s %3:s</string>
+  <string name="ssActionNothingToInstall">Det finns inget att installera.</string>
+  <!-- Parameters: %0:s download size -->
+  <string name="ssActionDownload">(%0s nedladdning)</string>
+  <string name="ssActionInstall">Installationen kommer att installera:</string>
+  <string name="ssFreeCaption">$APPNAME $VERSION är gratis och öppen källkod</string>
+  <string name="ssLicenseLink">&amp;Läs licensen</string>
+  <string name="ssInstallOptionsLink">Installera &amp;alternativ</string>
+  <string name="ssMessageBoxTitle">$APPNAME Konfiguration</string>
+  <string name="ssOkButton">Ok</string>
+  <string name="ssInstallButton">&amp;Installera</string>
+  <string name="ssCancelButton">Avbryt</string>
+  <string name="ssExitButton">E&amp;xit</string>
+  <string name="ssStatusInstalling">Installerar $APPNAME</string>
+  <string name="ssStatusRemovingOlderVersions">Tar bort äldre versioner</string>
+  <string name="ssStatusComplete">Installationen slutförd</string>
+  <string name="ssQueryRestart">Du måste starta om Windows innan installationen kan slutföras. När du startar om Windows kommer installationen att fortsätta.
+
+Starta om nu?</string>
+  <string name="ssErrorUnableToAutomaticallyRestart">Windows kunde inte startas om automatiskt. Du bör starta om Windows innan du försöker starta om $APPNAME.</string>
+  <string name="ssMustRestart">Du måste starta om Windows för att slutföra installationen. När du startar om Windows kommer installationen att slutföras.</string>
+  <string name="ssOldOsVersionInstallKeyboards">$APPNAME $VERSION kräver Windows 7 eller senare för att installera. Keyman Desktop 7, 8 eller 9 har upptäckts. Vill du installera tangentbord som ingår i detta installationsprogram i den installerade Keyman Desktop versionen?</string>
+  <string name="ssOldOsVersionDownload">Denna version av $APPNAME kräver Windows 7 eller senare för att installera. Vill du ladda ner Keyman Desktop 8?</string>
+  <string name="ssOptionsTitle">Installera alternativ</string>
+  <string name="ssOptionsTitleInstallOptions">Installationsalternativ</string>
+  <string name="ssOptionsTitleDefaultKeymanSettings">Standard $APPNAME inställningar</string>
+  <string name="ssOptionsTitleSelectModulesToInstall">Moduler att installera eller uppgradera</string>
+  <string name="ssOptionsTitleAssociatedKeyboardLanguage">Kopplat tangentbordsspråk</string>
+  <string name="ssOptionsTitleLocation">Version att installera</string>
+  <string name="ssOptionsStartWithWindows">Starta $APPNAME när Windows startar</string>
+  <string name="ssOptionsStartAfterInstall">Starta $APPNAME när installationen är klar</string>
+  <string name="ssOptionsCheckForUpdates">Sök efter uppdateringar online regelbundet</string>
+  <string name="ssOptionsUpgradeKeyboards">Uppgradera tangentbord installerade med äldre versioner till version $VERSION</string>
+  <string name="ssOptionsAutomaticallyReportUsage">Dela anonym användningsstatistik med keyman.com</string>
+  <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
+  <string name="ssInstallerVersion">Setup version: %0:s</string>
+  <string name="ssOptionsInstallKeyman">Installera $APPNAME</string>
+  <string name="ssOptionsUpgradeKeyman">Uppgradera $APPNAME</string>
+  <!-- Parameters: %0:s: installed version -->
+  <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s är redan installerad.</string>
+  <!-- Parameters: %0:s: version, %1:s: size -->
+  <string name="ssOptionsDownloadKeymanVersion">Ladda ner version %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: version -->
+  <string name="ssOptionsInstallKeymanVersion">Version %0:s</string>
+  <!-- Parameters: %0:s: package name %1:s -->
+  <string name="ssOptionsInstallPackage">Installera %0:s</string>
+  <!-- Parameters: %0:s: package version %1:s package size -->
+  <string name="ssOptionsDownloadPackageVersion">Ladda ner version %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: package version -->
+  <string name="ssOptionsInstallPackageVersion">Version %0:s</string>
+  <!-- Parameters: %0:s package name -->
+  <string name="ssOptionsPackageLanguageAssociation">Välj det språk som du vill associera med %0:s tangentbord</string>
+  <string name="ssOptionsDefaultLanguage">Standard språk</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingTitle">Laddar ner %0:s</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingText">Laddar ner %0:s</string>
+  <string name="ssOffline">$APPNAME Konfigurationen kunde inte ansluta till keyman.com för att ladda ner ytterligare resurser.
+
+Kontrollera att du är online och ge $APPNAME Setup tillstånd att komma åt Internet i dina brandväggsinställningar.
+
+Klicka på Avbryt för att avsluta konfigurationen, Försök igen för att ladda ner resurser igen, eller Ignorera för att fortsätta offline.</string>
+</resources>

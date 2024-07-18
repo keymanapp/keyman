@@ -119,7 +119,7 @@
 "kmp-error-invalid" = "Alshu'ul maknus.";
 
 /* Error opening a Keyman package - it does not exist / the specified location is wrong */
-"kmp-error-missing" = "The specified package does not exist.";
+"kmp-error-missing" = "Al package alkhassa da mafi.";
 
 /* Error installing a Keyman package - expected resource (keyboard or dictionary) is missing */
 "kmp-error-missing-resource" = "Alshu'ul da ma leya gudura layl keyboard walla kakkad hanal kalimat da.";
@@ -131,7 +131,7 @@
 "kmp-error-no-metadata" = "Ma sawwol shu'ul da zayn - shu'ul alfiya ma mil'araf.";
 
 /* Error opening a Keyman package - package's contents are for desktop platforms only */
-"kmp-error-unsupported" = "This package does not include support for your device.";
+"kmp-error-unsupported" = "Al package da ma bikun bidukhul ley shu'ulak.";
 
 /* Error opening a Keyman package - package contains unexpected resource (keyboard or dictionary) type */
 "kmp-error-wrong-type" = "Alshu'ul da ma leya shu'ul albinadawar minna.";

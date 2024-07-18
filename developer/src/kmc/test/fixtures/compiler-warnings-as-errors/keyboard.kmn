@@ -1,0 +1,10 @@
+store(&NAME) '000 - null keyboard'
+store(&version) '6.0'
+
+c The following line generates warn KM0209D: Header statements are deprecated; use instead the equivalent system store
+LANGUAGE x1, x1
+
+begin Unicode > use(Main)
+
+group(Main) using keys
+

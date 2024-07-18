@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ## Note - this script is designed solely for use within our Continuous
-## Integration processes with `pwd` as this script's parent folder.
+## Integration processes (thus, by ../ci.sh) with `pwd` as this script's parent folder.
 
 # Exit if program call fails
 set -e
@@ -11,8 +11,8 @@ set -e
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # This script runs from its parent's folder
@@ -50,9 +50,8 @@ get_version_notes "ios" "${BUILD_NUMBER}" "$TIER" > $CHANGELOG_PATH
 echo "* Minor fixes and performance improvements" >> $CHANGELOG_PATH
 assertFileExists "${CHANGELOG_PATH}"
 
-# Strip emoji to make Apple happy
-emoji="\U1f300-\U1f5ff\U1f900-\U1f9ff\U1f600-\U1f64f\U1f680-\U1f6ff\U2600-\U26ff\U2700-\U27bf\U1f1e6-\U1f1ff\U1f191-\U1f251\U1f004\U1f0cf\U1f170-\U1f171\U1f17e-\U1f17f\U1f18e\U3030\U2b50\U2b55\U2934-\U2935\U2b05-\U2b07\U2b1b-\U2b1c\U3297\U3299\U303d\U00a9\U00ae\U2122\U23f3\U24c2\U23e9-\U23ef\U25b6\U23f8-\U23fa"
-LC_ALL=UTF-8 sed -e "s/[$(printf $emoji)]//g" < "$CHANGELOG_PATH" > "$CHANGELOG_PATH.1"
+# Strip emoji as App Store does not allow emoji in changelogs
+node "$KEYMAN_ROOT/resources/tools/strip-emoji" < "$CHANGELOG_PATH" > "$CHANGELOG_PATH.1"
 mv -f "$CHANGELOG_PATH.1" "$CHANGELOG_PATH"
 assertFileExists "${CHANGELOG_PATH}"
 
@@ -70,17 +69,17 @@ KEYMAN_SAMPLES="samples"
 
 echo "engine dest: $KMEI_DST"
 
-echo "Zipping ${UNI_FRAMEWORK} => ${UPLOAD_DIR}/${KMEI_DST}..."
+echo "Zipping ${FRAMEWORK} => ${UPLOAD_DIR}/${KMEI_DST}..."
 cd "${KMEI_FRAMEWORK_BASE}"
-zip -qrX ${KMEI_DST} ${FRAMEWORK}
-cd $WORK_DIR
+zip -qrX "${KMEI_DST}" ${FRAMEWORK}
+cd "$WORK_DIR"
 
 echo "Copying Keyman Engine samples into ${UPLOAD_DIR}/${KMEI_DST_NAME}..."
 cp -rf "${KEYMAN_SAMPLES}" "${UPLOAD_DIR}/samples"
 cd "${UPLOAD_DIR}"
 zip -qr "${KMEI_DST_NAME}" "samples"
 rm -rf "samples"
-cd $WORK_DIR
+cd "$WORK_DIR"
 
 #
 # Keyman app

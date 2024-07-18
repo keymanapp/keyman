@@ -1,0 +1,66 @@
+{
+  "name": "@keymanapp/kmc-package",
+  "description": "Keyman Developer package compiler",
+  "keywords": [
+    "keyboard",
+    "keyman",
+    "unicode"
+  ],
+  "type": "module",
+  "exports": {
+    ".": "./build/src/main.js"
+  },
+  "files": [
+    "/build/src/"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "lint": "eslint .",
+    "test": "npm run lint && cd test && tsc -b && cd .. && c8 --reporter=lcov --reporter=text mocha",
+    "coverage": "npm test"
+  },
+  "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
+  "contributors": [
+    "Eddie Antonio Santos <Eddie.Santos@nrc-cnrc.gc.ca>",
+    "Joshua Horton"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/keymanapp/keyman/issues"
+  },
+  "dependencies": {
+    "@keymanapp/common-types": "*",
+    "jszip": "^3.7.0",
+    "marked": "^7.0.0"
+  },
+  "devDependencies": {
+    "@keymanapp/developer-test-helpers": "*",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^20.4.1",
+    "c8": "^7.12.0",
+    "chalk": "^2.4.2",
+    "mocha": "^8.4.0",
+    "typescript": "^5.4.5"
+  },
+  "mocha": {
+    "spec": "build/test/**/test-*.js",
+    "require": [
+      "source-map-support/register"
+    ]
+  },
+  "c8": {
+    "all": true,
+    "src": [
+      "src/"
+    ],
+    "exclude-after-remap": true,
+    "exclude": [
+      "test/",
+      "src/main.ts"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git"
+  }
+}

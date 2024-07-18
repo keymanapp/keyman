@@ -41,6 +41,7 @@ uses
   System.Generics.Collections,
   System.IniFiles,
   System.JSON,
+  System.StrUtils,
   System.Sysutils,
   Winapi.Windows,
   Xml.XMLDoc,
@@ -55,7 +56,15 @@ function GetJsonValueString(o: TJSONObject; const n: string): string;
 function GetJsonValueBool(o: TJSONObject; const n: string): Boolean;
 
 type
-  TPackageInfoEntryType = (pietName, pietVersion, pietCopyright, pietAuthor, pietWebsite, pietOther);
+  TPackageInfoEntryType = (
+    pietName,
+    pietVersion,
+    pietCopyright,
+    pietAuthor,
+    pietWebsite,
+    pietDescription,
+    pietOther
+  );
 
 const
   PackageInfo_Name      = 'Name';
@@ -63,9 +72,17 @@ const
   PackageInfo_Copyright = 'Copyright';
   PackageInfo_Author    = 'Author';
   PackageInfo_Website   = 'Website';
+  PackageInfo_Description = 'Description';
 
-  PackageInfoEntryTypeNames: array[TPackageInfoEntryType] of WideString =
-    (PackageInfo_Name, PackageInfo_Version, PackageInfo_Copyright, PackageInfo_Author, PackageInfo_Website, '');
+  PackageInfoEntryTypeNames: array[TPackageInfoEntryType] of string = (
+    PackageInfo_Name,
+    PackageInfo_Version,
+    PackageInfo_Copyright,
+    PackageInfo_Author,
+    PackageInfo_Website,
+    PackageInfo_Description,
+    ''
+  );
 
 type
   EPackageInfo = class(Exception);
@@ -122,6 +139,7 @@ type
 
   TPackageContentFile = class;
   TPackageContentFileList = class;
+  TPackageContentFileReferenceList = class;
 
   { Package Options }
 
@@ -131,6 +149,8 @@ type
     FExecuteProgram: WideString;
     FReadmeFile: TPackageContentFile;
     FGraphicFile: TPackageContentFile;
+    FLicenseFile: TPackageContentFile;
+    FWelcomeFile: TPackageContentFile;
     FLoadLegacy: Boolean;
     procedure SetReadmeFile(const Value: TPackageContentFile);
     procedure SetExecuteProgram(Value: WideString);
@@ -139,6 +159,12 @@ type
     procedure GraphicRemoved(Sender: TObject;
       EventType: TPackageNotifyEventType; var FAllow: Boolean);
     procedure ReadmeRemoved(Sender: TObject;
+      EventType: TPackageNotifyEventType; var FAllow: Boolean);
+    procedure SetLicenseFile(const Value: TPackageContentFile);
+    procedure LicenseRemoved(Sender: TObject;
+      EventType: TPackageNotifyEventType; var FAllow: Boolean);
+    procedure SetWelcomeFile(const Value: TPackageContentFile);
+    procedure WelcomeRemoved(Sender: TObject;
       EventType: TPackageNotifyEventType; var FAllow: Boolean);
   public
     constructor Create(APackage: TPackage); override;
@@ -155,6 +181,8 @@ type
     property ExecuteProgram: WideString read FExecuteProgram write SetExecuteProgram;
     property ReadmeFile: TPackageContentFile read FReadmeFile write SetReadmeFile;
     property GraphicFile: TPackageContentFile read FGraphicFile write SetGraphicFile;
+    property LicenseFile: TPackageContentFile read FLicenseFile write SetLicenseFile;
+    property WelcomeFile: TPackageContentFile read FWelcomeFile write SetWelcomeFile;
   end;
 
   { Package Information }
@@ -282,6 +310,8 @@ type
   TPackageKeyboardList = class;
   TPackageKeyboardLanguage = class;
   TPackageKeyboardLanguageList = class;
+  TPackageKeyboardExample = class;
+  TPackageKeyboardExampleList = class;
 
   TPackageKeyboard = class(TPackageBaseObject)
   private
@@ -291,14 +321,17 @@ type
     FRTL: Boolean;
     FDisplayFont: TPackageContentFile;
     FLanguages: TPackageKeyboardLanguageList;
+    FExamples: TPackageKeyboardExampleList;
     FVersion: string;
     FMinKeymanVersion: string;
+    FWebOSKFonts: TPackageContentFileReferenceList;
+    FWebDisplayFonts: TPackageContentFileReferenceList;
     procedure SetDisplayFont(const Value: TPackageContentFile);
     procedure SetOSKFont(const Value: TPackageContentFile);
-    procedure DisplayFontRemoved(Sender: TObject;
+    procedure FontRemoved(Sender: TObject;
       EventType: TPackageNotifyEventType; var FAllow: Boolean);
-    procedure OSKFontRemoved(Sender: TObject;
-      EventType: TPackageNotifyEventType; var FAllow: Boolean);
+    procedure FontListNotify(Sender: TObject; const Item: TPackageContentFile;
+      Action: TCollectionNotification);
   public
     constructor Create(APackage: TPackage); override;
     destructor Destroy; override;
@@ -308,10 +341,24 @@ type
     property RTL: Boolean read FRTL write FRTL;
     property Version: string read FVersion write FVersion;
     property Languages: TPackageKeyboardLanguageList read FLanguages;
+    property Examples: TPackageKeyboardExampleList read FExamples;
     property OSKFont: TPackageContentFile read FOSKFont write SetOSKFont;
     property DisplayFont: TPackageContentFile read FDisplayFont write SetDisplayFont;
+    property WebOSKFonts: TPackageContentFileReferenceList read FWebOSKFonts;
+    property WebDisplayFonts: TPackageContentFileReferenceList read FWebDisplayFonts;
     // The following properties are used only in memory and never streamed in or out
     property MinKeymanVersion: string read FMinKeymanVersion write FMinKeymanVersion;
+  end;
+
+  TPackageContentFileReferenceList = class(TPackageObjectList<TPackageContentFile>)
+  public
+    constructor Create(APackage: TPackage);
+    procedure Assign(Source: TPackageContentFileReferenceList); virtual;
+    procedure LoadXML(ARoot: IXMLNode); virtual;
+    procedure SaveXML(ARoot: IXMLNode); virtual;
+    procedure LoadJSON(ARoot: TJSONArray); virtual;
+    procedure SaveJSON(ARoot: TJSONArray); virtual;
+    function GetAsString: string;
   end;
 
   TPackageKeyboardList = class(TPackageObjectList<TPackageKeyboard>)
@@ -337,6 +384,25 @@ type
     procedure SaveJSON(ARoot: TJSONObject); virtual;
     procedure LoadXML(ARoot: IXMLNode); virtual;
     procedure SaveXML(ARoot: IXMLNode); virtual;
+    function ContainsID(const id: string): Boolean;
+    function IndexOfID(const id: string): Integer;
+  end;
+
+  TPackageKeyboardExample = class(TPackageBaseObject)
+    ID: string;
+    Keys: string;
+    Text: string;
+    Note: string;
+  end;
+
+  TPackageKeyboardExampleList = class(TPackageObjectList<TPackageKeyboardExample>)
+  public
+    procedure LoadJSON(ARoot: TJSONObject); virtual;
+    procedure SaveJSON(ARoot: TJSONObject); virtual;
+    procedure LoadXML(ARoot: IXMLNode); virtual;
+    procedure SaveXML(ARoot: IXMLNode); virtual;
+    function ContainsID(const id: string): Boolean;
+    function IndexOfID(const id: string; from: Integer = 0): Integer;
   end;
 
   TPackageLexicalModel = class(TPackageBaseObject)
@@ -364,6 +430,24 @@ type
     function ItemByID(id: string): TPackageLexicalModel;
   end;
 
+  TPackageRelatedPackage = class(TPackageBaseObject)
+  private
+    FID: string;
+    FRelationship: string;
+  public
+    procedure Assign(Source: TPackageRelatedPackage); virtual;
+    property ID: string read FID write FID;
+    property Relationship: string read FRelationship write FRelationship;
+  end;
+
+  TPackageRelatedPackageList = class(TPackageObjectList<TPackageRelatedPackage>)
+    procedure Assign(Source: TPackageRelatedPackageList); virtual;
+    procedure LoadXML(ARoot: IXMLNode); virtual;
+    procedure SaveXML(ARoot: IXMLNode); virtual;
+    procedure LoadJSON(ARoot: TJSONObject); virtual;
+    procedure SaveJSON(ARoot: TJSONObject); virtual;
+  end;
+
   { TPackage }
 
   TPackage = class
@@ -388,6 +472,7 @@ type
     Info: TPackageInfoEntryList;
     Keyboards: TPackageKeyboardList;
     LexicalModels: TPackageLexicalModelList;
+    RelatedPackages: TPackageRelatedPackageList;
 
     property FileName: WideString read FFileName write FFileName;
     procedure Assign(Source: TPackage); virtual;
@@ -415,6 +500,9 @@ type
 const
   PackageStartMenuEntryLocationName: array[TPackageStartMenuEntryLocation] of WideString = ('Start Menu', 'Desktop'); //, 'Quick Launch Toolbar');
 
+const
+  S_RelatedPackage_Deprecates = 'deprecates';
+
 implementation
 
 uses
@@ -431,12 +519,11 @@ const
   SPackageInfoTooNew = 'The package file is version %s.  This version can only read version '+SKeymanVersion+' and older files.';
   SReadmeNotOwnedCorrectly = 'The readme file ''%s'' referred to is not part of the package.';
   SGraphicNotOwnedCorrectly = 'The graphic file ''%s'' referred to is not part of the package.';
+  SLicenseNotOwnedCorrectly = 'The license file ''%s'' referred to is not part of the package.';
+  SWelcomeNotOwnedCorrectly = 'The welcome file ''%s'' referred to is not part of the package.';
   SFileNotOwnedCorrectly = 'The file ''%s'' referred to is not part of the package.';
   SDisplayFontNotOwnedCorrectly = 'The display font file ''%s'' referred to is not part of the package.';
   SOSKFontNotOwnedCorrectly = 'The OSK font file ''%s'' referred to is not part of the package.';
-
-
-
 
 const
   SXML_PackageKeyboards = 'Keyboards';
@@ -448,18 +535,34 @@ const
   SXML_PackageKeyboard_OSKFont = 'OSKFont';
   SXML_PackageKeyboard_DisplayFont = 'DisplayFont';
   SXML_PackageKeyboard_Languages = 'Languages';
+  SXML_PackageKeyboard_Examples = 'Examples';
 
   SXML_PackageKeyboard_Language = 'Language';
   SXML_PackageKeyboard_Language_ID = 'ID';
   SXML_PackageKeyboard_Language_Name = 'Name';
 
+  SXML_PackageKeyboard_Example = 'Example';
+  SXML_PackageKeyboard_Example_ID = 'ID';
+  SXML_PackageKeyboard_Example_Keys = 'Keys';
+  SXML_PackageKeyboard_Example_Text = 'Text';
+  SXML_PackageKeyboard_Example_Note = 'Note';
+
+  SXML_PackageKeyboard_WebOskFonts = 'WebOSKFonts';
+  SXML_PackageKeyboard_WebDisplayFonts = 'WebDisplayFonts';
+  SXML_PackageKeyboardFont = 'Font';
+  SXML_PackageKeyboardFont_Filename = 'Filename';
+
   SXML_PackageLexicalModels = 'LexicalModels';
   SXML_PackageLexicalModel = 'LexicalModel';
   SXML_PackageLexicalModel_Name = 'Name';
   SXML_PackageLexicalModel_ID = 'ID';
-  SXML_PackageLexicalModel_Version = 'Version';
   SXML_PackageLexicalModel_RTL = 'RTL';
   SXML_PackageLexicalModel_Languages = 'Languages';
+
+  SXML_PackageRelatedPackages = 'RelatedPackages';
+  SXML_PackageRelatedPackage = 'RelatedPackage';
+  SXML_PackageRelatedPackage_ID = 'ID';
+  SXML_PackageRelatedPackage_Relationship = 'Relationship';
 
 const
   SJSON_System = 'system';
@@ -470,6 +573,8 @@ const
   SJSON_Options_ExecuteProgram = 'executeProgram';
   SJSON_Options_ReadMeFile = 'readmeFile';
   SJSON_Options_GraphicFile = 'graphicFile';
+  SJSON_Options_LicenseFile = 'licenseFile';
+  SJSON_Options_WelcomeFile = 'welcomeFile';
 
   SJSON_Registry = 'registry';
   SJSON_Registry_Root = 'root';
@@ -492,14 +597,22 @@ const
   SJSON_Info__Description = 'description';
   SJSON_Info__URL = 'url';
 
-  SJSON_Info_Website = 'website';
-  SJSON_Info_Version = 'version';
   SJSON_Info_Name = 'name';
+  SJSON_Info_Version = 'version';
   SJSON_Info_Copyright = 'copyright';
   SJSON_Info_Author = 'author';
+  SJSON_Info_Website = 'website';
+  SJSON_Info_Description = 'description';
 
-  SJSON_PackageInfoEntryTypeNames: array[TPackageInfoEntryType] of string =
-    (SJSON_Info_Name, SJSON_Info_Version, SJSON_Info_Copyright, SJSON_Info_Author, SJSON_Info_Website, '');
+  SJSON_PackageInfoEntryTypeNames: array[TPackageInfoEntryType] of string = (
+    SJSON_Info_Name,
+    SJSON_Info_Version,
+    SJSON_Info_Copyright,
+    SJSON_Info_Author,
+    SJSON_Info_Website,
+    SJSON_Info_Description,
+    ''
+  );
 
   SJSON_Files = 'files';
   SJSON_Files_Name = 'name';
@@ -518,15 +631,28 @@ const
   SJSON_Keyboard_Language_ID = 'id';
   SJSON_Keyboard_Language_Name = 'name';
 
+  SJSON_Keyboard_Examples = 'examples';
+  SJSON_Keyboard_Example_ID = 'id';
+  SJSON_Keyboard_Example_Keys = 'keys';
+  SJSON_Keyboard_Example_Text = 'text';
+  SJSON_Keyboard_Example_Note = 'note';
+
+  SJSON_Keyboard_WebOSKFonts = 'webOskFonts';
+  SJSON_Keyboard_WebDisplayFonts = 'webDisplayFonts';
+
   SJSON_LexicalModels = 'lexicalModels';
   SJSON_LexicalModel_Name = 'name';
   SJSON_LexicalModel_ID = 'id';
   SJSON_LexicalModel_RTL = 'rtl';
   SJSON_LexicalModel_Languages = 'languages';
 
+  SJSON_RelatedPackages = 'relatedPackages';
+  SJSON_RelatedPackage_ID = 'id';
+  SJSON_RelatedPackage_Relationship = 'relationship';
+
 function XmlVarToStr(v: OleVariant): string;
 begin
-  Result := Trim(VarToStr(v));
+  Result := ReplaceStr(ReplaceStr(Trim(VarToStr(v)), #$D#$A, #$A), #$A, #$D#$A);
 end;
 
 {-------------------------------------------------------------------------------
@@ -543,6 +669,12 @@ begin
   if Assigned(Source.GraphicFile)
     then GraphicFile := Package.Files.FromFileName(Source.GraphicFile.FileName)
     else GraphicFile := nil;
+  if Assigned(Source.LicenseFile)
+    then LicenseFile := Package.Files.FromFileName(Source.LicenseFile.FileName)
+    else LicenseFile := nil;
+  if Assigned(Source.WelcomeFile)
+    then WelcomeFile := Package.Files.FromFileName(Source.WelcomeFile.FileName)
+    else WelcomeFile := nil;
 end;
 
 constructor TPackageOptions.Create(APackage: TPackage);
@@ -556,6 +688,8 @@ destructor TPackageOptions.Destroy;
 begin
   ReadmeFile := nil;
   GraphicFile := nil;
+  LicenseFile := nil;
+  WelcomeFile := nil;
   inherited Destroy;
 end;
 
@@ -569,14 +703,28 @@ begin
   FGraphicFile := nil;
 end;
 
+procedure TPackageOptions.LicenseRemoved(Sender: TObject; EventType: TPackageNotifyEventType; var FAllow: Boolean);
+begin
+  FLicenseFile := nil;
+end;
+
+procedure TPackageOptions.WelcomeRemoved(Sender: TObject; EventType: TPackageNotifyEventType; var FAllow: Boolean);
+begin
+  FWelcomeFile := nil;
+end;
+
 procedure TPackageOptions.LoadXML(ARoot: IXMLNode);
 begin
   FileVersion :=                XmlVarToStr(ARoot.ChildNodes['System'].ChildNodes['FileVersion'].NodeValue);
   ExecuteProgram :=             XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['ExecuteProgram'].NodeValue);
   ReadmeFile :=                 Package.Files.FromFileName(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['ReadMeFile'].NodeValue));
   GraphicFile :=                Package.Files.FromFileName(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['GraphicFile'].NodeValue));
+  LicenseFile :=                Package.Files.FromFileName(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['LicenseFile'].NodeValue));
+  WelcomeFile :=                Package.Files.FromFileName(XmlVarToStr(ARoot.ChildNodes['Options'].ChildNodes['WelcomeFile'].NodeValue));
   if Assigned(ReadmeFile) then ReadmeFile.AddNotifyObject(ReadmeRemoved);
   if Assigned(GraphicFile) then GraphicFile.AddNotifyObject(GraphicRemoved);
+  if Assigned(LicenseFile) then LicenseFile.AddNotifyObject(LicenseRemoved);
+  if Assigned(WelcomeFile) then WelcomeFile.AddNotifyObject(WelcomeRemoved);
 end;
 
 procedure TPackageOptions.SaveXML(ARoot: IXMLNode);
@@ -587,6 +735,10 @@ begin
     ARoot.ChildNodes['Options'].ChildNodes['ReadMeFile'].NodeValue := ReadmeFile.RelativeFileName;
   if Assigned(GraphicFile) then
     ARoot.ChildNodes['Options'].ChildNodes['GraphicFile'].NodeValue := GraphicFile.RelativeFileName;
+  if Assigned(LicenseFile) then
+    ARoot.ChildNodes['Options'].ChildNodes['LicenseFile'].NodeValue := LicenseFile.RelativeFileName;
+  if Assigned(WelcomeFile) then
+    ARoot.ChildNodes['Options'].ChildNodes['WelcomeFile'].NodeValue := WelcomeFile.RelativeFileName;
 end;
 
 procedure TPackageOptions.LoadIni(AIni: TIniFile);
@@ -597,6 +749,8 @@ begin
   GraphicFile :=                Package.Files.FromFileName(AIni.ReadString('Package', 'GraphicFile', ''));
   if Assigned(ReadmeFile) then ReadmeFile.AddNotifyObject(ReadmeRemoved);
   if Assigned(GraphicFile) then GraphicFile.AddNotifyObject(GraphicRemoved);
+  // LicenseFile not supported in ini
+  // WelcomeFile not supported in ini
 end;
 
 procedure TPackageOptions.LoadJSON(ARoot: TJSONObject);
@@ -610,8 +764,12 @@ begin
   ExecuteProgram :=             GetJsonValueString(FOptions, SJSON_Options_ExecuteProgram);
   ReadmeFile :=                 Package.Files.FromFileName(GetJsonValueString(FOptions, SJSON_Options_ReadMeFile));
   GraphicFile :=                Package.Files.FromFileName(GetJsonValueString(FOptions, SJSON_Options_GraphicFile));
+  LicenseFile :=                Package.Files.FromFileName(GetJsonValueString(FOptions, SJSON_Options_LicenseFile));
+  WelcomeFile :=                Package.Files.FromFileName(GetJsonValueString(FOptions, SJSON_Options_WelcomeFile));
   if Assigned(ReadmeFile) then ReadmeFile.AddNotifyObject(ReadmeRemoved);
   if Assigned(GraphicFile) then GraphicFile.AddNotifyObject(GraphicRemoved);
+  if Assigned(LicenseFile) then LicenseFile.AddNotifyObject(LicenseRemoved);
+  if Assigned(WelcomeFile) then WelcomeFile.AddNotifyObject(WelcomeRemoved);
 end;
 
 procedure TPackageOptions.SaveIni(AIni: TIniFile);
@@ -622,6 +780,8 @@ begin
     AIni.WriteString('Package', 'ReadMeFile', ReadmeFile.RelativeFileName);
   if Assigned(GraphicFile) then
     AIni.WriteString('Package', 'GraphicFile', GraphicFile.RelativeFileName);
+  // licenseFile not supported in ini
+  // welcomeFile not supported in ini
 end;
 
 procedure TPackageOptions.SaveJSON(ARoot: TJSONObject);
@@ -641,6 +801,10 @@ begin
     FOptions.AddPair(SJSON_Options_ReadMeFile, ReadmeFile.RelativeFileName);
   if Assigned(GraphicFile) then
     FOptions.AddPair(SJSON_Options_GraphicFile, GraphicFile.RelativeFileName);
+  if Assigned(LicenseFile) then
+    FOptions.AddPair(SJSON_Options_LicenseFile, LicenseFile.RelativeFileName);
+  if Assigned(WelcomeFile) then
+    FOptions.AddPair(SJSON_Options_WelcomeFile, WelcomeFile.RelativeFileName);
 end;
 
 procedure TPackageOptions.SetExecuteProgram(Value: WideString);
@@ -665,6 +829,32 @@ begin
     if Value.Package <> Package then raise EPackageInfo.CreateFmt(SGraphicNotOwnedCorrectly, [Value]);
     FGraphicFile := Value;
     FGraphicFile.AddNotifyObject(GraphicRemoved);
+  end;
+end;
+
+procedure TPackageOptions.SetLicenseFile(const Value: TPackageContentFile);
+begin
+  if Assigned(FLicenseFile) then FLicenseFile.RemoveNotifyObject(LicenseRemoved);
+  if not Assigned(Value) then
+    FLicenseFile := nil
+  else
+  begin
+    if Value.Package <> Package then raise EPackageInfo.CreateFmt(SLicenseNotOwnedCorrectly, [Value]);
+    FLicenseFile := Value;
+    FLicenseFile.AddNotifyObject(LicenseRemoved);
+  end;
+end;
+
+procedure TPackageOptions.SetWelcomeFile(const Value: TPackageContentFile);
+begin
+  if Assigned(FWelcomeFile) then FWelcomeFile.RemoveNotifyObject(WelcomeRemoved);
+  if not Assigned(Value) then
+    FWelcomeFile := nil
+  else
+  begin
+    if Value.Package <> Package then raise EPackageInfo.CreateFmt(SWelcomeNotOwnedCorrectly, [Value]);
+    FWelcomeFile := Value;
+    FWelcomeFile.AddNotifyObject(WelcomeRemoved);
   end;
 end;
 
@@ -1419,6 +1609,7 @@ begin
   Info.Assign(Source.Info);
   Keyboards.Assign(Source.Keyboards);
   LexicalModels.Assign(Source.LexicalModels);
+  RelatedPackages.Assign(Source.RelatedPackages);
 end;
 
 constructor TPackage.Create;
@@ -1431,6 +1622,7 @@ begin
   if not Assigned(Info)      then Info      := TPackageInfoEntryList.Create(Self);
   if not Assigned(Keyboards) then Keyboards := TPackageKeyboardList.Create(Self);
   if not Assigned(LexicalModels) then LexicalModels := TPackageLexicalModelList.Create(Self);
+  if not Assigned(RelatedPackages) then RelatedPackages := TPackageRelatedPackageList.Create(Self);
 end;
 
 destructor TPackage.Destroy;
@@ -1441,6 +1633,7 @@ begin
   Info.Free;
   Keyboards.Free;
   LexicalModels.Free;
+  RelatedPackages.Free;
   inherited Destroy;
 end;
 
@@ -1474,6 +1667,7 @@ begin
   Options.LoadIni(ini);
   Keyboards.LoadIni(ini);
   //LexicalModels not supported in ini
+  //RelatedPackages not supported in ini
 end;
 
 procedure TPackage.LoadJSON;
@@ -1592,8 +1786,9 @@ begin
   Files.LoadJSON(ARoot);
   Options.LoadJSON(ARoot);
   Keyboards.LoadJSON(ARoot);
-  if Options.FileVersion = SKeymanVersion120 then
+  if CompareVersions(Options.FileVersion, SKeymanVersion120) >= 0 then
     LexicalModels.LoadJSON(ARoot);
+  RelatedPackages.LoadJSON(ARoot);
 end;
 
 procedure TPackage.DoLoadXML(ARoot: IXMLNode);
@@ -1612,8 +1807,9 @@ begin
   Files.LoadXML(ARoot);
   Options.LoadXML(ARoot);
   Keyboards.LoadXML(ARoot);
-  if FVersion = SKeymanVersion120 then
+  if CompareVersions(FVersion, SKeymanVersion120) >= 0 then
     LexicalModels.LoadXML(ARoot);
+  RelatedPackages.LoadXML(ARoot);
 end;
 
 procedure TPackage.DoSaveIni(ini: TIniFile);
@@ -1625,6 +1821,7 @@ begin
   Files.SaveIni(ini);
   Keyboards.SaveIni(ini);
   // Lexical models not supported in ini
+  // RelatedPackages not supported in ini
 end;
 
 procedure TPackage.FixupFileVersion;
@@ -1646,6 +1843,7 @@ begin
   Keyboards.SaveJSON(ARoot);
   if LexicalModels.Count > 0 then
     LexicalModels.SaveJSON(ARoot);
+  RelatedPackages.SaveJSON(ARoot);
 end;
 
 procedure TPackage.DoSaveXML(ARoot: IXMLNode);
@@ -1659,6 +1857,8 @@ begin
   Keyboards.SaveXML(ARoot);
   if LexicalModels.Count > 0 then
     LexicalModels.SaveXML(ARoot);
+  if RelatedPackages.Count > 0 then
+    RelatedPackages.SaveXML(ARoot);
 end;
 
 procedure TPackage.SaveIni;
@@ -1821,6 +2021,7 @@ procedure TPackageKeyboard.Assign(Source: TPackageKeyboard);
 var
   i: Integer;
   FLanguage: TPackageKeyboardLanguage;
+  FExample: TPackageKeyboardExample;
 begin
   FName := Source.Name;
   FID := Source.ID;
@@ -1841,18 +2042,35 @@ begin
     FLanguage.Name := Source.Languages[i].Name;
     FLanguages.Add(FLanguage);
   end;
+  FExamples.Clear;
+  for i := 0 to Source.Examples.Count - 1 do
+  begin
+    FExample := TPackageKeyboardExample.Create(Package);
+    FExample.ID := Source.Examples[i].ID;
+    FExample.Keys := Source.Examples[i].Keys;
+    FExample.Text := Source.Examples[i].Text;
+    FExample.Note := Source.Examples[i].Note;
+    FExamples.Add(FExample);
+  end;
+
+  FWebOSKFonts.Clear;
+  FWebOSKFonts.Assign(Source.WebOSKFonts);
+
+  FWebDisplayFonts.Clear;
+  FWebDisplayFonts.Assign(Source.WebDisplayFonts);
 end;
 
 procedure TPackageKeyboard.SetDisplayFont(const Value: TPackageContentFile);
 begin
-  if Assigned(FDisplayFont) then FDisplayFont.RemoveNotifyObject(DisplayFontRemoved);
+  if Assigned(FDisplayFont) then
+    FDisplayFont.RemoveNotifyObject(FontRemoved);
   if not Assigned(Value) then
     FDisplayFont := nil
   else
   begin
     if Value.Package <> Package then raise EPackageInfo.CreateFmt(SDisplayFontNotOwnedCorrectly, [Value]);
     FDisplayFont := Value;
-    FDisplayFont.AddNotifyObject(DisplayFontRemoved);
+    FDisplayFont.AddNotifyObject(FontRemoved);
   end;
 end;
 
@@ -1860,37 +2078,66 @@ constructor TPackageKeyboard.Create(APackage: TPackage);
 begin
   inherited Create(APackage);
   FLanguages := TPackageKeyboardLanguageList.Create(APackage);
+  FExamples := TPackageKeyboardExampleList.Create(APackage);
+  FWebOSKFonts := TPackageContentFileReferenceList.Create(APackage);
+  FWebOSKFonts.OnNotify := FontListNotify;
+  FWebDisplayFonts := TPackageContentFileReferenceList.Create(APackage);
+  FWebDisplayFonts.OnNotify := FontListNotify;
 end;
 
 destructor TPackageKeyboard.Destroy;
 begin
+  if Assigned(FDisplayFont) then
+    FDisplayFont.RemoveNotifyObject(FontRemoved);
+  FDisplayFont := nil;
+
+  if Assigned(FOSKFont) then
+    FOSKFont.RemoveNotifyObject(FontRemoved);
+  FOSKFont := nil;
+
   FreeAndNil(FLanguages);
+  FreeAndNil(FExamples);
+  FreeAndNil(FWebOSKFonts);
+  FreeAndNil(FWebDisplayFonts);
   inherited Destroy;
 end;
 
-procedure TPackageKeyboard.DisplayFontRemoved(Sender: TObject;
+procedure TPackageKeyboard.FontListNotify(Sender: TObject;
+  const Item: TPackageContentFile; Action: TCollectionNotification);
+begin
+  if Action = cnRemoved then
+    Item.RemoveNotifyObject(FontRemoved)
+  else if Action = cnAdded then
+  begin
+    Assert(Item.Package = Self.Package);
+    Item.AddNotifyObject(FontRemoved);
+  end;
+end;
+
+procedure TPackageKeyboard.FontRemoved(Sender: TObject;
   EventType: TPackageNotifyEventType; var FAllow: Boolean);
 begin
-  FDisplayFont := nil;
+  // For all EventTypes
+  if Sender = FDisplayFont then
+    FDisplayFont := nil;
+  if Sender = FOSKFont then
+    FOSKFont := nil;
+  FWebDisplayFonts.Remove(Sender as TPackageContentFile);
+  FWebOSKFonts.Remove(Sender as TPackageContentFile);
 end;
 
 procedure TPackageKeyboard.SetOSKFont(const Value: TPackageContentFile);
 begin
-  if Assigned(FOSKFont) then FOSKFont.RemoveNotifyObject(OSKFontRemoved);
+  if Assigned(FOSKFont) then
+    FOSKFont.RemoveNotifyObject(FontRemoved);
   if not Assigned(Value) then
     FOSKFont := nil
   else
   begin
     if Value.Package <> Package then raise EPackageInfo.CreateFmt(SOSKFontNotOwnedCorrectly, [Value]);
     FOSKFont := Value;
-    FOSKFont.AddNotifyObject(OSKFontRemoved);
+    FOSKFont.AddNotifyObject(FontRemoved);
   end;
-end;
-
-procedure TPackageKeyboard.OSKFontRemoved(Sender: TObject;
-  EventType: TPackageNotifyEventType; var FAllow: Boolean);
-begin
-  FOSKFont := nil;
 end;
 
 { TPackageKeyboardList }
@@ -1957,6 +2204,8 @@ begin
         keyboard.Languages.Add(FLanguage);
       end;
 
+      // web fonts not supported in ini
+
       Add(keyboard);
     end;
   finally
@@ -1968,7 +2217,7 @@ procedure TPackageKeyboardList.LoadJSON(ARoot: TJSONObject);
 var
   keyboard: TPackageKeyboard;
   i: Integer;
-  ANode: TJSONArray;
+  ASubNode, ANode: TJSONArray;
   AKeyboard: TJSONObject;
 begin
   Clear;
@@ -1989,6 +2238,16 @@ begin
     keyboard.OSKFont := Package.Files.FromFileNameEx(GetJsonValueString(AKeyboard, SJSON_Keyboard_OSKFont));
     keyboard.DisplayFont := Package.Files.FromFileNameEx(GetJsonValueString(AKeyboard, SJSON_Keyboard_DisplayFont));
     keyboard.Languages.LoadJSON(AKeyboard);
+    keyboard.Examples.LoadJSON(AKeyboard);
+
+    ASubNode := AKeyboard.GetValue(SJSON_Keyboard_WebOSKFonts) as TJSONArray;
+    if Assigned(ASubNode) then
+      keyboard.WebOSKFonts.LoadJSON(ASubNode);
+
+    ASubNode := AKeyboard.GetValue(SJSON_Keyboard_WebDisplayFonts) as TJSONArray;
+    if Assigned(ASubNode) then
+      keyboard.WebDisplayFonts.LoadJSON(ASubNode);
+
     Add(keyboard);
   end;
 end;
@@ -1997,7 +2256,7 @@ procedure TPackageKeyboardList.LoadXML(ARoot: IXMLNode);
 var
   keyboard: TPackageKeyboard;
   i: Integer;
-  AKeyboard, ANode: IXMLNode;
+  AKeyboard, ANode, ASubNode: IXMLNode;
 begin
   Clear;
 
@@ -2015,6 +2274,20 @@ begin
     keyboard.DisplayFont := Package.Files.FromFileNameEx(XmlVarToStr(AKeyboard.ChildValues[SXML_PackageKeyboard_DisplayFont]));
 
     keyboard.Languages.LoadXML(AKeyboard);
+    keyboard.Examples.LoadXML(AKeyboard);
+
+    ASubNode := AKeyboard.ChildNodes[SXML_PackageKeyboard_WebOSKFonts];
+    if Assigned(ASubNode) then
+    begin
+      keyboard.WebOSKFonts.LoadXML(ASubNode);
+    end;
+
+    ASubNode := AKeyboard.ChildNodes[SXML_PackageKeyboard_WebDisplayFonts];
+    if Assigned(ASubNode) then
+    begin
+      keyboard.WebDisplayFonts.LoadXML(ASubNode);
+    end;
+
     Add(keyboard);
   end;
 end;
@@ -2040,6 +2313,8 @@ begin
     begin
       AIni.WriteString(FSectionName, SXML_PackageKeyboard_Language+IntToStr(j), Items[i].Languages[j].ID+','+Items[i].Languages[j].Name);
     end;
+
+    // web fonts not supported in ini
   end;
 end;
 
@@ -2047,7 +2322,7 @@ procedure TPackageKeyboardList.SaveJSON(ARoot: TJSONObject);
 var
   i: Integer;
   AKeyboard: TJSONObject;
-  AKeyboards: TJSONArray;
+  AFonts, AKeyboards: TJSONArray;
 begin
   if Count = 0 then
     Exit;
@@ -2070,13 +2345,27 @@ begin
       AKeyboard.AddPair(SJSON_Keyboard_DisplayFont, Items[i].DisplayFont.RelativeFileName);
 
     Items[i].Languages.SaveJSON(AKeyboard);
+    Items[i].Examples.SaveJSON(AKeyboard);
+    if Items[i].WebOSKFonts.Count > 0 then
+    begin
+      AFonts := TJSONArray.Create;
+      Items[i].WebOSKFonts.SaveJSON(AFonts);
+      AKeyboard.AddPair(SJSON_Keyboard_WebOSKFonts, AFonts);
+    end;
+
+    if Items[i].WebDisplayFonts.Count > 0 then
+    begin
+      AFonts := TJSONArray.Create;
+      Items[i].WebDisplayFonts.SaveJSON(AFonts);
+      AKeyboard.AddPair(SJSON_Keyboard_WebDisplayFonts, AFonts);
+    end;
   end;
 end;
 
 procedure TPackageKeyboardList.SaveXML(ARoot: IXMLNode);
 var
   i: Integer;
-  AKeyboard, ANode: IXMLNode;
+  AFonts, AKeyboard, ANode: IXMLNode;
 begin
   ANode := ARoot.AddChild(SXML_PackageKeyboards);
   for i := 0 to Count - 1 do
@@ -2094,6 +2383,18 @@ begin
       AKeyboard.ChildNodes[SXML_PackageKeyboard_DisplayFont].NodeValue := Items[i].DisplayFont.RelativeFileName;
 
     Items[i].Languages.SaveXML(AKeyboard);
+    Items[i].Examples.SaveXML(AKeyboard);
+    if Items[i].WebOSKFonts.Count > 0 then
+    begin
+      AFonts := AKeyboard.AddChild(SXML_PackageKeyboard_WebOskFonts);
+      Items[i].WebOSKFonts.SaveXML(AFonts);
+    end;
+
+    if Items[i].WebDisplayFonts.Count > 0 then
+    begin
+      AFonts := AKeyboard.AddChild(SXML_PackageKeyboard_WebDisplayFonts);
+      Items[i].WebDisplayFonts.SaveXML(AFonts);
+    end;
   end;
 end;
 
@@ -2211,7 +2512,7 @@ begin
     lexicalModel := TPackageLexicalModel.Create(Package);
     lexicalModel.Name := XmlVarToStr(ALexicalModel.ChildValues[SXML_PackageLexicalModel_Name]);
     lexicalModel.ID := XmlVarToStr(ALexicalModel.ChildValues[SXML_PackageLexicalModel_ID]);
-    lexicalModel.RTL := ANode.ChildNodes.IndexOf(SXML_PackageLexicalModel_RTL) >= 0;
+    lexicalModel.RTL := ALexicalModel.ChildNodes.IndexOf(SXML_PackageLexicalModel_RTL) >= 0;
     lexicalModel.Languages.LoadXML(ALexicalModel);
     Add(lexicalModel);
   end;
@@ -2261,6 +2562,21 @@ begin
 end;
 
 { TPackageKeyboardLanguageList }
+
+function TPackageKeyboardLanguageList.ContainsID(const id: string): Boolean;
+begin
+  Result := IndexOfID(id) >= 0;
+end;
+
+function TPackageKeyboardLanguageList.IndexOfID(const id: string): Integer;
+var
+  i: Integer;
+begin
+  for i := 0 to Count - 1 do
+    if SameText(Items[i].ID, id) then
+      Exit(i);
+  Result := -1;
+end;
 
 procedure TPackageKeyboardLanguageList.LoadJSON(ARoot: TJSONObject);
 var
@@ -2334,6 +2650,311 @@ begin
     ALanguage := ALanguages.AddChild(SXML_PackageKeyboard_Language);
     ALanguage.NodeValue := Items[j].Name;
     ALanguage.Attributes[SXML_PackageKeyboard_Language_ID] := Items[j].ID;
+  end;
+end;
+
+{ TPackageKeyboardExampleList }
+
+function TPackageKeyboardExampleList.ContainsID(const id: string): Boolean;
+begin
+  Result := IndexOfID(id) >= 0;
+end;
+
+function TPackageKeyboardExampleList.IndexOfID(const id: string;
+  from: Integer): Integer;
+var
+  i: Integer;
+begin
+  for i := from to Count - 1 do
+    if SameText(Items[i].ID, id) then
+      Exit(i);
+  Result := -1;
+end;
+
+procedure TPackageKeyboardExampleList.LoadJSON(ARoot: TJSONObject);
+var
+  j: Integer;
+  AExample: TJSONObject;
+  FExample: TPackageKeyboardExample;
+  AExamples: TJSONArray;
+begin
+  AExamples := ARoot.Values[SJSON_Keyboard_Examples] as TJSONArray;
+  if not Assigned(AExamples) then
+    Exit;
+
+  for j := 0 to AExamples.Count - 1 do
+  begin
+    AExample := AExamples.Items[j] as TJSONObject;
+
+    FExample := TPackageKeyboardExample.Create(Package);
+    FExample.ID := GetJsonValueString(AExample, SJSON_Keyboard_Example_ID);
+    FExample.Keys := GetJsonValueString(AExample, SJSON_Keyboard_Example_Keys);
+    FExample.Text := GetJsonValueString(AExample, SJSON_Keyboard_Example_Text);
+    FExample.Note := GetJsonValueString(AExample, SJSON_Keyboard_Example_Note);
+    Self.Add(FExample);
+  end;
+end;
+
+procedure TPackageKeyboardExampleList.LoadXML(ARoot: IXMLNode);
+var
+  j: Integer;
+  AExamples, AExample: IXMLNode;
+  FExample: TPackageKeyboardExample;
+begin
+  AExamples := ARoot.ChildNodes[SXML_PackageKeyboard_Examples];
+  if not Assigned(AExamples) then
+    Exit;
+
+  for j := 0 to AExamples.ChildNodes.Count - 1 do
+  begin
+    AExample := AExamples.ChildNodes[j];
+
+    FExample := TPackageKeyboardExample.Create(Package);
+    FExample.ID := VarToStr(AExample.Attributes[SXML_PackageKeyboard_Example_ID]);
+    FExample.Keys := VarToStr(AExample.Attributes[SXML_PackageKeyboard_Example_Keys]);
+    FExample.Text := VarToStr(AExample.Attributes[SXML_PackageKeyboard_Example_Text]);
+    FExample.Note := VarToStr(AExample.Attributes[SXML_PackageKeyboard_Example_Note]);
+    Self.Add(FExample);
+  end;
+end;
+
+procedure TPackageKeyboardExampleList.SaveJSON(ARoot: TJSONObject);
+var
+  AExamples: TJSONArray;
+  j: Integer;
+  AExample: TJSONObject;
+begin
+  AExamples := TJSONArray.Create;
+  ARoot.AddPair(SJSON_Keyboard_Examples, AExamples);
+  for j := 0 to Count - 1 do
+  begin
+    AExample := TJSONObject.Create;
+    AExamples.Add(AExample);
+    AExample.AddPair(SJSON_Keyboard_Example_ID, Items[j].ID);
+    AExample.AddPair(SJSON_Keyboard_Example_Keys, Items[j].Keys);
+    AExample.AddPair(SJSON_Keyboard_Example_Text, Items[j].Text);
+    AExample.AddPair(SJSON_Keyboard_Example_Note, Items[j].Note);
+  end;
+end;
+
+procedure TPackageKeyboardExampleList.SaveXML(ARoot: IXMLNode);
+var
+  AExamples: IXMLNode;
+  j: Integer;
+  AExample: IXMLNode;
+begin
+  if Count = 0 then
+    Exit;
+
+  AExamples := ARoot.AddChild(SXML_PackageKeyboard_Examples);
+  for j := 0 to Count - 1 do
+  begin
+    AExample := AExamples.AddChild(SXML_PackageKeyboard_Example);
+    AExample.Attributes[SXML_PackageKeyboard_Example_ID] := Items[j].ID;
+    AExample.Attributes[SXML_PackageKeyboard_Example_Keys] := Items[j].Keys;
+    AExample.Attributes[SXML_PackageKeyboard_Example_Text] := Items[j].Text;
+    AExample.Attributes[SXML_PackageKeyboard_Example_Note] := Items[j].Note;
+  end;
+end;
+
+{ TPackageRelatedPackage }
+
+procedure TPackageRelatedPackage.Assign(Source: TPackageRelatedPackage);
+begin
+  FID := Source.ID;
+  FRelationship := Source.Relationship;
+end;
+
+{ TPackageRelatedPackageList }
+
+procedure TPackageRelatedPackageList.Assign(Source: TPackageRelatedPackageList);
+var
+  i: Integer;
+  rp: TPackageRelatedPackage;
+begin
+  Clear;
+  for i := 0 to Source.Count - 1 do
+  begin
+    rp := TPackageRelatedPackage.Create(Package);
+    rp.Assign(Source[i]);
+    Add(rp);
+  end;
+end;
+
+procedure TPackageRelatedPackageList.LoadJSON(ARoot: TJSONObject);
+var
+  rp: TPackageRelatedPackage;
+  i: Integer;
+  ANode: TJSONArray;
+  ARelatedPackage: TJSONObject;
+begin
+  Clear;
+
+  ANode := ARoot.Values[SJSON_RelatedPackages] as TJSONArray;
+  if not Assigned(ANode) then
+    Exit;
+
+  for i := 0 to ANode.Count - 1 do
+  begin
+    ARelatedPackage := ANode.Items[i] as TJSONObject;
+
+    rp := TPackageRelatedPackage.Create(Package);
+    rp.ID := GetJsonValueString(ARelatedPackage,SJSON_RelatedPackage_ID);
+    rp.Relationship := GetJsonValueString(ARelatedPackage, SJSON_RelatedPackage_Relationship);
+    if rp.Relationship <> 'deprecates' then
+      rp.Relationship := '';
+
+    Add(rp);
+  end;
+end;
+
+procedure TPackageRelatedPackageList.LoadXML(ARoot: IXMLNode);
+var
+  rp: TPackageRelatedPackage;
+  i: Integer;
+  ARelatedPackage, ANode: IXMLNode;
+begin
+  Clear;
+
+  ANode := ARoot.ChildNodes[SXML_PackageRelatedPackages];
+  for i := 0 to ANode.ChildNodes.Count - 1 do
+  begin
+    ARelatedPackage := ANode.ChildNodes[i];
+
+    rp := TPackageRelatedPackage.Create(Package);
+    rp.ID := XmlVarToStr(ARelatedPackage.Attributes[SXML_PackageRelatedPackage_ID]);
+    rp.Relationship := XmlVarToStr(ARelatedPackage.Attributes[SXML_PackageRelatedPackage_Relationship]);
+    if rp.Relationship <> 'deprecates' then
+      rp.Relationship := '';
+
+    Add(rp);
+  end;
+end;
+
+procedure TPackageRelatedPackageList.SaveJSON(ARoot: TJSONObject);
+var
+  i: Integer;
+  ARelatedPackage: TJSONObject;
+  ARelatedPackages: TJSONArray;
+begin
+  if Count = 0 then
+    Exit;
+
+  ARelatedPackages := TJSONArray.Create;
+  ARoot.AddPair(SJSON_RelatedPackages, ARelatedPackages);
+
+  for i := 0 to Count - 1 do
+  begin
+    ARelatedPackage := TJSONObject.Create;
+    ARelatedPackages.Add(ARelatedPackage);
+
+    ARelatedPackage.AddPair(SJSON_RelatedPackage_ID, Items[i].ID);
+    // Relationship field required for kmp.json
+    if Items[i].Relationship = ''
+      then ARelatedPackage.AddPair(SJSON_RelatedPackage_Relationship, 'related')
+      else ARelatedPackage.AddPair(SJSON_RelatedPackage_Relationship, Items[i].Relationship);
+  end;
+end;
+
+procedure TPackageRelatedPackageList.SaveXML(ARoot: IXMLNode);
+var
+  i: Integer;
+  ARelatedPackage, ANode: IXMLNode;
+begin
+  ANode := ARoot.AddChild(SXML_PackageRelatedPackages);
+  for i := 0 to Count - 1 do
+  begin
+    ARelatedPackage := ANode.AddChild(SXML_PackageRelatedPackage);
+
+    ARelatedPackage.Attributes[SXML_PackageRelatedPackage_ID] := Items[i].ID;
+    // Relationship field optional for .kps
+    if Items[i].Relationship <> '' then
+      ARelatedPackage.Attributes[SXML_PackageRelatedPackage_Relationship] := Items[i].Relationship;
+  end;
+end;
+
+{ TPackageContentFileReferenceList }
+
+procedure TPackageContentFileReferenceList.Assign(Source: TPackageContentFileReferenceList);
+var
+  i: Integer;
+  f: TPackageContentFile;
+begin
+  Clear;
+  for i := 0 to Source.Count - 1 do
+  begin
+    f := Package.Files.FromFileNameEx(Source[i].FileName);
+    if Assigned(f) then
+      Add(f);
+  end;
+end;
+
+constructor TPackageContentFileReferenceList.Create(APackage: TPackage);
+begin
+  inherited Create(APackage);
+  OwnsObjects := False;
+end;
+
+function TPackageContentFileReferenceList.GetAsString: string;
+var
+  f: TPackageContentFile;
+begin
+  Result := '';
+  for f in Self do
+  begin
+    Result := Result + ', ' + ExtractFileName(f.FileName);
+  end;
+  System.Delete(Result, 1, 2);
+end;
+
+procedure TPackageContentFileReferenceList.LoadJSON(ARoot: TJSONArray);
+var
+  i: Integer;
+  f: TPackageContentFile;
+begin
+  for i := 0 to ARoot.Count - 1 do
+  begin
+    f := Package.Files.FromFileNameEx(ARoot.Items[i].Value);
+    if Assigned(f) then
+      Add(f);
+  end;
+end;
+
+procedure TPackageContentFileReferenceList.LoadXML(ARoot: IXMLNode);
+var
+  i: Integer;
+  ANode: IXMLNode;
+  f: TPackageContentFile;
+begin
+  Clear;
+  for i := 0 to ARoot.ChildNodes.Count - 1 do
+  begin
+    ANode := ARoot.ChildNodes[i];
+    f := Package.Files.FromFileNameEx(ANode.Attributes[SXML_PackageKeyboardFont_Filename]);
+    if Assigned(f) then
+      Add(f);
+  end;
+end;
+
+procedure TPackageContentFileReferenceList.SaveJSON(ARoot: TJSONArray);
+var
+  i: Integer;
+begin
+  for i := 0 to Count - 1 do
+  begin
+    ARoot.Add(Items[i].FileName);
+  end;
+end;
+
+procedure TPackageContentFileReferenceList.SaveXML(ARoot: IXMLNode);
+var
+  i: Integer;
+  ANode: IXMLNode;
+begin
+  for i := 0 to Count - 1 do
+  begin
+    ANode := ARoot.AddChild(SXML_PackageKeyboardFont);
+    ANode.Attributes[SXML_PackageKeyboardFont_Filename] := Items[i].FileName;
   end;
 end;
 

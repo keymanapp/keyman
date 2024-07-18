@@ -72,9 +72,7 @@
   <string name="ssDownloadingTitle">%0:s በማውረድ ላይ</string>
   <!-- Parameters: %0:s: filename -->
   <string name="ssDownloadingText">%0:s በማውረድ ላይ</string>
-  <string name="ssOffline">$APPNAME ማዋቀር ተጨማሪ አጋዥ ሪሶርሶችን ለማውረድ ከkeyman.com ጋር መገናኘት አልቻለም።
-
-እባክዎን የኢንተርኔት ኮኔክሽን መኖሩን ያረጋግጡ እና በፋየርዎልዎ ቅንብሮች ውስጥ በይነመረብን ለመድረስ ለ $APPNAME ማዋቀር ፈቃድ ይስጡ።
-
-ከቅንብር ለመውጣት (Abort)ን ይምረጡ፣ እንደገና ሪሶርሶቹን ለማውረድ እንደገና ይሞክሩ፣ ወይም ከኢንተርኔት ውጭ ለመቀጠል ችላ ይበሉት።</string>
+  <string name="ssOffline">$APPNAME ማቀነባበሪያው ተጨማሪ አጋዥ ሪሶርሶችን ለማውረድ ከkeyman.com ጋር መገናኘት አልቻለም።</string>
+  <string name="ssOffline2">እባክዎን የኢንተርኔት ኮኔክሽን መኖሩን ያረጋግጡ እና በፋየርዎልዎ ቅንብሮች ውስጥ በይነመረብን ለመድረስ ለ $APPNAME ማቀነባበሪያውን ፈቃድ ይስጡ።</string>
+  <string name="ssOffline3">ከማቀነባበሪያው ለመውጣት (Abort) ን ይምረጡ፣ እንደገና ሪሶርሶቹን ለማውረድ ይሞክሩ፣ ወይም ከኢንተርኔት ውጭ ለመቀጠል ይሞክሩ።</string>
 </resources>

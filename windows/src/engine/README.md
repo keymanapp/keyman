@@ -1,6 +1,7 @@
 # Keyman Engine for Windows
 
 There are a number of build artifacts that make up the Keyman Engine. This is a brief description of each artifact's purpose.
+For FAQs on the architecture see the [Keyman Wiki](https://github.com/keymanapp/keyman/wiki/Keyman-Windows-FAQs).
 
 ## inst - keymanengine.msm
 
@@ -9,6 +10,18 @@ The installation merge module database for the Keyman Engine.
 ## keyman - keyman.exe
 
 Host application for the Keyman Engine. Shows the Keyman icon, Keyman menu, OSK, and handles language switching etc, as well as running the windows hooks to capture and translate keystrokes.
+
+## keyman32 - keyman32.dll
+
+Main keyboard processing library and hook library (32 bit).
+
+## keyman64 - keyman64.dll
+
+Main keyboard processing library and hook library (64 bit).
+
+## keymanmc - keymanmc.dll
+
+Message library for Windows events.
 
 ## keymanx64 - keymanx64.exe
 
@@ -30,6 +43,10 @@ Architecturally it sits between the TSF Manager and Keyman.exe
 ## mcompile - mcompile.exe
 
 A tool to recompile keyboard layouts after install to map to various European Latin script keyboard layouts
+
+## testhost - testhost.exe
+
+Test application to allow simple debugging of keystroke processing (not distributed)
 
 ## tsysinfo - tsysinfo.exe & tsysinfox64.exe
 

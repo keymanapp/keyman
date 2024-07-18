@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">Українська</string>
+  <string name="ssApplicationTitle">$APPNAME $VERSION налаштування</string>
+  <string name="ssTitle">Встановити $APPNAME $VERSION</string>
+  <string name="ssInstallSuccess">$APPNAME $VERSION було успішно встановлено.</string>
+  <string name="ssCancelQuery">Ви дійсно бажаєте скасувати встановлення $APPNAME?</string>
+  <string name="ssBootstrapExtractingBundle">Вилучення пакету...</string>
+  <string name="ssBootstrapCheckingPackages">Перевірка пакетів...</string>
+  <string name="ssBootstrapCheckingForUpdates">Перевірка онлайн-оновлень...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">Перевірка встановлених версій...</string>
+  <string name="ssBootstrapReady">Завершення...</string>
+  <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
+  <string name="ssActionInstallKeyman">• $APPNAME %0:s %1:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
+  <string name="ssActionInstallPackage">• %0:s %1:s %2:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: ssActionDownload -->
+  <string name="ssActionInstallPackageLanguage">• %0:s %1:s за %2:s %3:s :s</string>
+  <string name="ssActionNothingToInstall">Немає нічого для встановлення.</string>
+  <!-- Parameters: %0:s download size -->
+  <string name="ssActionDownload">(%0:s завантаження)</string>
+  <string name="ssActionInstall">Установка встановлюється:</string>
+  <string name="ssFreeCaption">$APPNAME $VERSION є вільним та відкритим програмним кодом</string>
+  <string name="ssLicenseLink">&amp;Прочитати ліцензію</string>
+  <string name="ssInstallOptionsLink">Встановити &amp;параметри</string>
+  <string name="ssMessageBoxTitle">$APPNAME налаштування</string>
+  <string name="ssOkButton">Гаразд</string>
+  <string name="ssInstallButton">&amp;Встановити</string>
+  <string name="ssCancelButton">Скасувати</string>
+  <string name="ssExitButton">E&amp;xit</string>
+  <string name="ssStatusInstalling">Встановлення $APPNAME</string>
+  <string name="ssStatusRemovingOlderVersions">Видалення старих версій</string>
+  <string name="ssStatusComplete">Встановлення завершено</string>
+  <string name="ssQueryRestart">Перед початком встановлення необхідно перезавантажити Windows, перезапустити програму. Після перезавантаження Windows налаштування продовжиться.
+
+Перезавантажити зараз?</string>
+  <string name="ssErrorUnableToAutomaticallyRestart">Windows не зміг автоматично перезавантажитись. Варто перезапустити Windows, перш ніж запустити $APPNAME, а потім запустити програму.</string>
+  <string name="ssMustRestart">Для завершення встановлення необхідно перезапустити Windows, для завершення встановлення необхідно перезавантажити Windows. Після перезавантаження Windows буде завершено.</string>
+  <string name="ssOldOsVersionInstallKeyboards">$APPNAME $VERSION потребує Windows 7 або пізнішої версії. Однак, Keyman Desktop 7, 8 або 9 було виявлено. Чи хочете ви встановити клавіатури, вбудовані в даний інсталятор до встановленої версії Keyman Робочий стіл?</string>
+  <string name="ssOldOsVersionDownload">Для установки для цієї версії $APPNAME потрібна Windows 7 або новіше. Хочете завантажити Keyman робочий стіл 8?</string>
+  <string name="ssOptionsTitle">Параметри встановлення</string>
+  <string name="ssOptionsTitleInstallOptions">Параметри встановлення</string>
+  <string name="ssOptionsTitleDefaultKeymanSettings">Параметри $APPNAME за замовчуванням</string>
+  <string name="ssOptionsTitleSelectModulesToInstall">Модулі до встановлення чи оновлення</string>
+  <string name="ssOptionsTitleAssociatedKeyboardLanguage">Пов\'язані мови клавіатури</string>
+  <string name="ssOptionsTitleLocation">Версія для встановлення</string>
+  <string name="ssOptionsStartWithWindows">Запускати $APPNAME при запуску Windows</string>
+  <string name="ssOptionsStartAfterInstall">Запуск $APPNAME після закінчення встановлення</string>
+  <string name="ssOptionsCheckForUpdates">Періодична перевірка оновлень</string>
+  <string name="ssOptionsUpgradeKeyboards">Оновити клавіатурні налаштування встановлених в старішій версії $VERSION</string>
+  <string name="ssOptionsAutomaticallyReportUsage">Поділитися анонімною статистикою використання з keyman.com</string>
+  <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
+  <string name="ssInstallerVersion">Версія встановлення: %0:s</string>
+  <string name="ssOptionsInstallKeyman">Встановити $APPNAME</string>
+  <string name="ssOptionsUpgradeKeyman">Оновити $APPNAME</string>
+  <!-- Parameters: %0:s: installed version -->
+  <string name="ssOptionsKeymanAlreadyInstalled">$APPNAME %0:s вже встановлено.</string>
+  <!-- Parameters: %0:s: version, %1:s: size -->
+  <string name="ssOptionsDownloadKeymanVersion">Завантажити версію %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: version -->
+  <string name="ssOptionsInstallKeymanVersion">Версія %0:s</string>
+  <!-- Parameters: %0:s: package name %1:s -->
+  <string name="ssOptionsInstallPackage">Встановити %0:s</string>
+  <!-- Parameters: %0:s: package version %1:s package size -->
+  <string name="ssOptionsDownloadPackageVersion">Завантажити версію %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: package version -->
+  <string name="ssOptionsInstallPackageVersion">Версія %0:s</string>
+  <!-- Parameters: %0:s package name -->
+  <string name="ssOptionsPackageLanguageAssociation">Виберіть мову, яку ви бажаєте зв\'язати з %0:s клавіатурою</string>
+  <string name="ssOptionsDefaultLanguage">Мова за замовчуванням</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingTitle">Завантаження %0:s</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingText">Завантаження %0:s</string>
+  <string name="ssOffline">$APPNAME Setup could not connect to keyman.com to download additional resources.
+
+Please check that you are online, and give $APPNAME Setup permission to access the Internet in your firewall settings.
+
+Click Abort to exit Setup, Retry to try and download resources again, or Ignore to continue offline.</string>
+</resources>

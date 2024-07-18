@@ -1,0 +1,12 @@
+c Description: Verifies that kmc throws an error with an invalid .kvks file
+
+store(&NAME) 'error_invalid_kvks_file'
+store(&VERSION) '9.0'
+store(&VISUALKEYBOARD) 'error_invalid_kvks_file.kvks'
+
+begin unicode > use(main)
+
+group(main) using keys
+
++ [K_A] > 'a'
+'a' + [K_B] > 'ខ្មែរ'

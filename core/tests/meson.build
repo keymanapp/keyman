@@ -8,17 +8,27 @@
 
 # Note: this version of cmpfiles ignores line endings, which is better for platform independence
 cmpfiles = ['-c', 'import sys; a = open(sys.argv[1], \'r\').read(); b = open(sys.argv[2], \'r\').read(); exit(not (a==b))']
-stnds = join_paths(meson.source_root(), 'tests', 'standards')
+stnds = join_paths(meson.current_source_dir(), 'standards')
 
 libsrc = include_directories(join_paths('../', 'src'))
 
-if get_option('default_library') != 'static'
-  ctypes_void_p_size = ['-c', 'import ctypes; print(ctypes.sizeof(ctypes.c_void_p))']
-  r = run_command(python, ctypes_void_p_size)
-  python_ctypes_compatible = r.stdout().to_int() == compiler.sizeof('void *')
-  if not python_ctypes_compatible
-    message('Python ctypes is incompatible with built shared object. Disabling some tests.')
-  endif
-endif
+# kmx_test_source is required for linux builds, so always enable it even when we
+# disable all other tests
+subdir('kmx_test_source')
 
-subdir('unit')
+if get_option('keyman_core_tests')
+  message('option "keyman_core_tests" is true, enabling tests')
+
+  if get_option('default_library') != 'static'
+    ctypes_void_p_size = ['-c', 'import ctypes; print(ctypes.sizeof(ctypes.c_void_p))']
+    r = run_command(python, ctypes_void_p_size, check: true)
+    python_ctypes_compatible = r.stdout().to_int() == cpp_compiler.sizeof('void *')
+    if not python_ctypes_compatible
+      message('Python ctypes is incompatible with built shared object. Disabling some tests.')
+    endif
+  endif
+
+  subdir('unit')
+else
+  message('option "keyman_core_tests" is false, disabling tests')
+endif

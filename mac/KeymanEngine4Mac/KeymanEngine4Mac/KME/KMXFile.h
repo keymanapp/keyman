@@ -23,7 +23,6 @@ extern NSString *const kKMVisualKeyboardKey;
 
 @property (assign, nonatomic, readonly) DWORD identifier;
 @property (assign, nonatomic, readonly) DWORD fileVersion;
-@property (assign, nonatomic, readonly) DWORD checkSum;
 @property (assign, nonatomic, readonly) DWORD keyboardID;
 @property (assign, nonatomic, readonly) BOOL isRegistered;
 @property (assign, nonatomic, readonly) BOOL isMnemonic;

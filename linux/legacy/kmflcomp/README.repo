@@ -1,5 +1,0 @@
-You need autoconf, automake and libtool to generate the build system
-
-flex and bison are useful to rebuild lex.l and yacc.y but not essential
-
-Run ./autogen.sh to run them

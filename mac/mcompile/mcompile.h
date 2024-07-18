@@ -35,6 +35,7 @@ struct KMX_DeadkeyMapping {   // I4353
 
 extern std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;   // I4353
 
+//  _S2 CHECKED OK
 int mac_run(int argc, std::vector<std::u16string>  str_argv, char* argv[]);
 
 PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p);

@@ -31,6 +31,8 @@
             <xs:element minOccurs="0" maxOccurs="1" name="ExecuteProgram" type="xs:string" />
             <xs:element minOccurs="0" maxOccurs="1" name="ReadMeFile" type="xs:string" />
             <xs:element minOccurs="0" maxOccurs="1" name="GraphicFile" type="xs:string" />
+            <xs:element minOccurs="0" maxOccurs="1" name="LicenseFile" type="xs:string" />
+            <xs:element minOccurs="0" maxOccurs="1" name="WelcomeFile" type="xs:string" />
             <xs:element minOccurs="0" maxOccurs="1" name="MSIFileName" type="xs:string" />
             <xs:element minOccurs="0" maxOccurs="1" name="MSIOptions" type="xs:string" />
             <xs:element minOccurs="0" maxOccurs="1" name="FollowKeyboardVersion" type="km-empty" />
@@ -74,6 +76,7 @@
             <xs:element minOccurs="0" maxOccurs="1" name="Copyright" type="km-info" />
             <xs:element minOccurs="0" maxOccurs="1" name="Author" type="km-info" />
             <xs:element minOccurs="0" maxOccurs="1" name="WebSite" type="km-info" />
+            <xs:element minOccurs="0" maxOccurs="1" name="Description" type="km-info" />
           </xs:all>
         </xs:complexType>
       </xs:element>
@@ -96,6 +99,19 @@
         </xs:complexType>
       </xs:element>
 
+      <xs:element minOccurs="0" maxOccurs="1" name="RelatedPackages">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" name="RelatedPackage">
+              <xs:complexType>
+                <xs:attribute name="ID" type="xs:string" />
+                <!-- "deprecates" is only valid value, if not present then means "related" -->
+                <xs:attribute name="Relationship" type="km-package-relationship" />
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
 
       <xs:element minOccurs="0" maxOccurs="1" name="Keyboards">
         <xs:complexType>
@@ -110,6 +126,9 @@
                   <xs:element minOccurs="0" maxOccurs="1" name="OSKFont" type="xs:string" />
                   <xs:element minOccurs="0" maxOccurs="1" name="DisplayFont" type="xs:string" />
                   <xs:element minOccurs="0" maxOccurs="1" name="Languages" type="km-keyboard-languages" />
+                  <xs:element minOccurs="0" maxOccurs="1" name="Examples" type="km-keyboard-examples" />
+                  <xs:element minOccurs="0" maxOccurs="1" name="WebOSKFonts" type="km-keyboard-fonts" />
+                  <xs:element minOccurs="0" maxOccurs="1" name="WebDisplayFonts" type="km-keyboard-fonts" />
                 </xs:all>
               </xs:complexType>
               </xs:element>
@@ -126,7 +145,6 @@
                 <xs:all>
                   <xs:element minOccurs="0" maxOccurs="1" name="Name" type="xs:string" />
                   <xs:element minOccurs="0" maxOccurs="1" name="ID" type="xs:string" />
-                  <xs:element minOccurs="0" maxOccurs="1" name="Version" type="xs:string" />
                   <xs:element minOccurs="0" maxOccurs="1" name="RTL" type="xs:string" />
                   <xs:element minOccurs="0" maxOccurs="1" name="Languages" type="km-keyboard-languages" />
                 </xs:all>
@@ -136,6 +154,7 @@
         </xs:complexType>
       </xs:element>
 
+      <!-- Deprecated elements: we won't validate as processors ignore them -->
 
       <xs:element minOccurs="0" maxOccurs="1" name="Strings">
         <xs:complexType>
@@ -149,8 +168,6 @@
           </xs:sequence>
         </xs:complexType>
       </xs:element>
-
-      <!-- Deprecated elements: we won't validate as processors ignore them -->
 
       <xs:element minOccurs="0" maxOccurs="1" name="Buttons" type="km-any" />
       <xs:element minOccurs="0" maxOccurs="1" name="Registry" type="km-any" />
@@ -190,6 +207,12 @@
   </xs:restriction>
 </xs:simpleType>
 
+<xs:simpleType name="km-package-relationship">
+  <xs:restriction base="xs:string">
+    <xs:pattern value="deprecates" />
+  </xs:restriction>
+</xs:simpleType>
+
 <xs:simpleType name="km-start-menu-location">
   <xs:restriction base="xs:string">
     <xs:pattern value="psmelStartMenu|psmelDesktop"></xs:pattern>
@@ -205,6 +228,29 @@
             <xs:attribute name="ID" type="xs:string" />
           </xs:extension>
         </xs:simpleContent>
+      </xs:complexType>
+    </xs:element>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="km-keyboard-examples">
+  <xs:sequence>
+    <xs:element minOccurs="0" maxOccurs="unbounded" name="Example">
+      <xs:complexType>
+        <xs:attribute name="ID" type="xs:string" />
+        <xs:attribute name="Keys" type="xs:string" />
+        <xs:attribute name="Text" type="xs:string" />
+        <xs:attribute name="Note" type="xs:string" />
+      </xs:complexType>
+    </xs:element>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="km-keyboard-fonts">
+  <xs:sequence>
+    <xs:element minOccurs="0" maxOccurs="unbounded" name="Font">
+      <xs:complexType>
+        <xs:attribute name="Filename" type="xs:string" />
       </xs:complexType>
     </xs:element>
   </xs:sequence>

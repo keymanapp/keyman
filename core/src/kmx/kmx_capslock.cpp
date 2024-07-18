@@ -2,10 +2,10 @@
   Copyright:        Copyright (C) 2003-2018 SIL International.
   Authors:          mcdurdin
 */
-#include <keyman/keyboardprocessor_consts.h>
+#include <keyman/keyman_core_api_consts.h>
 #include <kmx/kmx_processevent.h>
 
-using namespace km::kbp;
+using namespace km::core;
 using namespace kmx;
 
 /**

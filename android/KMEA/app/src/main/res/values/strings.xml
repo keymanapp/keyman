@@ -172,7 +172,7 @@
     <!-- Context: Background download messages-->
     <string name="dictionary_download_is_running_in_background" comment="Notification that a dictionary download is still running">The selected dictionary is already downloading; please try again in a moment!</string>
 
-    <!-- Context: Background download messages-->
+    <!-- Context: Background download messages. Removed in Keyman 17-->
     <string name="dictionary_download_finished" comment="Notification that a dictionary download has finished">Dictionary download is finished.</string>
 
     <!-- Context: Background download messages -->
@@ -190,7 +190,7 @@
     <!-- Context: General Updates -->
     <string name="update_failed" comment="Notification that a resource update failed">One or more resources failed to update!</string>
 
-    <!-- Context: General Updates -->
+    <!-- Context: General Updates. Removed in Keyman 17 -->
     <string name="update_success" comment="Notification that a resource update successfully updated">Resources successfully updated!</string>
 
     <!-- Context: Model Info -->
@@ -251,7 +251,7 @@
     <string name="default_locale" comment="Use the device's current locale">Default Locale</string>
 
     <!-- Context: Content descriptions -->
-    <string name="image_button" translatable="false">Image Button</string>
+    <string name="image_button" translatable="false">Image</string>
 
     <!-- Context: Content descriptions -->
     <string name="image_view" translatable="false">Image View</string>

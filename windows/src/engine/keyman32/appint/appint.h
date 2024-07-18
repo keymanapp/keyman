@@ -43,22 +43,6 @@ typedef struct
 #define QIT_CAPSLOCK 8
 #define QIT_INVALIDATECONTEXT 9
 
-// QueueDebugInformation ItemTypes
-#define QID_BEGIN_UNICODE		0
-#define QID_BEGIN_ANSI			1
-#define QID_GROUP_ENTER			2
-#define QID_GROUP_EXIT			3
-#define QID_RULE_ENTER			4
-#define QID_RULE_EXIT			5
-#define QID_MATCH_ENTER			6
-#define QID_MATCH_EXIT			7
-#define QID_NOMATCH_ENTER		8
-#define QID_NOMATCH_EXIT		9
-#define QID_END					10
-
-#define QID_FLAG_RECURSIVE_OVERFLOW	0x0001
-#define QID_FLAG_NOMATCH			0x0002
-
 #define QVK_EXTENDED 0x00010000 // Flag for QIT_VKEYDOWN to indicate an extended key
 #define QVK_KEYMASK  0x0000FFFF
 #define QVK_FLAGMASK 0xFFFF0000
@@ -81,112 +65,6 @@ public:
   int GetQueueSize() { return QueueSize; }
 };
 
-class AppContext
-{
-private:
-	WCHAR CurContext[MAXCONTEXT]; //!< CurContext[0] is furthest from the caret and buffer is null terminated.
-	int pos;
-
-public:
-	AppContext();
-  /**
-   * Copy "source" AppContext to this AppContext
-   *
-   * @param source AppContext to copy
-   */
-  void CopyFrom(AppContext *source);
-
-  /**
-   * Add a single code unit to the Current Context. Not necessarily a complete code point
-   *
-   * @param Code unit to add
-   */
-  void Add(WCHAR ch);
-
-  /**
-   * Removes a single code point from the end of the CurContext closest to the caret;
-   * i.e. it will be both code units if a surrogate pair. If it is a deadkey it will
-   * remove three code points: UC_SENTINEL, CODE_DEADKEY and deadkey value.
-   */
-	void Delete();
-
-  /**
-   * Clears the CurContext and resets the position - pos - index
-   */
-  void Reset();
-
-  /**
-   * Copies the characters in CurContext to supplied buffer.
-   * If bufsize is reached before the entire context was copied, the buf
-   * will be truncated to number of valid characters possible with null character
-   * termination. e.g. it will be one code unit less than bufsize if that would
-   * have meant splitting a surrogate pair
-   * @param  buf      The data buffer to copy current context
-   * @param  bufsize  The number of code units ie size of the WCHAR buffer - not the code points
-   */
-	void Get(WCHAR *buf, int bufsize);
-
-  /**
-   * Sets the CurContext to the supplied buf character array and updates the pos index.
-   *
-   * @param buf
-   */
-	void Set(const WCHAR *buf);
-
-  /**
-   * Returns a pointer to the character in the current context buffer which
-   * will have at most n valid xstring units remaining until the null terminating
-   * character. It will be one code unit less than bufsize if that would
-   * have meant splitting a surrogate pair or deadkey.
-   *
-   * @param n        The maximum number of valid xstring units (not code points or code units)
-   * @return WCHAR*  Pointer to the start postion for a buffer of maximum n xstring units
-   */
-	WCHAR *BufMax(int n);
-
-  /**
-   * Returns a pointer to the character in the current context buffer which
-   * will have n valid xstring units remaining until the the null terminating character.
-   * OR
-   * Returns NULL if there are less than n valid xstring units in the current context.
-   * Background this was historically for performance during rule evaluation, if there
-   * are not enough characters to compare, don't event attempt the comparison.
-   *
-   * @param n  The number of valid xstring units (not code points or code units)
-   * @return KMX_WCHAR* Pointer to the start postion for a buffer of maximum n characters
-   */
-	WCHAR *Buf(int n);
-
-  /**
-   * Returns TRUE if the last xstring unit in the context is a deadkey
-   *
-   * @return BOOL
-   */
-	BOOL CharIsDeadkey();
-
-  /**
-   * Returns TRUE if the last xstring unit in the CurContext is a surrogate pair.
-   * @return BOOL
-   */
-  BOOL CharIsSurrogatePair();
-
-  /**
-   * Returns TRUE if the context is empty
-   * @return  BOOL
-   */
-  BOOL AppContext::IsEmpty();
-
-};
-
-class AppContextWithStores : public AppContext   // I4978
-{
-public:
-  AppContextWithStores(int nKeyboardOptions);
-  ~AppContextWithStores();
-  DWORD nKeyboardOptions;
-  LPINTKEYBOARDOPTIONS KeyboardOptions;
-};
-
 class AppIntegration:public AppActionQueue
 {
 protected:
@@ -205,43 +83,18 @@ public:
 	virtual BOOL IsUnicode() = 0;
 
 	/* Context functions */
-
-	virtual void ReadContext() = 0;
+  /**
+    * Reads the current application context upto MAXCONTEXT length into the supplied buffer.
+    * @param  buf      The data buffer to copy current application context
+    */
+	virtual BOOL ReadContext(PWSTR buf) = 0;
 	virtual void ResetContext() = 0;
-  virtual void AddContext(WCHAR ch) = 0;  //I2436
-	virtual WCHAR *ContextBuf(int n) = 0;
-	virtual WCHAR *ContextBufMax(int n) = 0;
 
 	/* Queue and sending functions */
 
-	virtual BOOL QueueDebugInformation(int ItemType, LPGROUP Group, LPKEY Rule, PWSTR fcontext, PWSTR foutput, DWORD_PTR dwExtraFlags) = 0;
 	void SetCurrentShiftState(int ShiftFlags) { FShiftFlags = ShiftFlags; }
 	virtual BOOL SendActions() = 0;   // I4196
 };
-
-/**
- * Convert AppContext array into an array of core context items.
- * Caller is responsible for freeing the memory.
- *
- * @param   buf     appcontext character array
- * @param   outPtr  The ouput array of context items. caller to free memory
- * @return  BOOL    True if array created successfully
- */
-BOOL ContextItemsFromAppContext(WCHAR const* buf, km_kbp_context_item** outPtr);
-
-/**
- * Convert km_kbp_context_item array into an kmx char buffer.
- * Caller is responsible for freeing the memory.
- * The length is restricted to a maximum of MAXCONTEXT length. If the number
- * of input km_kbp_context_items exceeds this length the characters furthest
- * from the caret will be truncated.
- *
- * @param  contextItems  the input core context array. (km_kbp_context_item)
- * @param  [out] outBuf  the kmx character array output. caller to free memory.
- *
- * @return  BOOL    True if array created successfully
- */
-BOOL ContextItemToAppContext(km_kbp_context_item *contextItems, PWSTR outBuf, DWORD len);
 
 extern const LPSTR ItemTypes[];
 

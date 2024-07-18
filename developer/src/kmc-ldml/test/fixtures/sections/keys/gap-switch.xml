@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="hardware-gap-switch"/>
+
+  <keys>
+    <key id="Q" gap="true" />
+    <key id="W" layerId="shift" />
+    <key id="q" output="q" />
+    <key id="w" output="w" />
+  </keys>
+
+  <layers formId="us">
+    <layer id="base">
+      <!-- beware: this is mapping ` and 1! -->
+      <row keys="Q W" />
+    </layer>
+    <layer id="shift">
+      <!-- beware: this is mapping ` and 1! -->
+      <row keys="q w" />
+    </layer>
+  </layers>
+</keyboard3>

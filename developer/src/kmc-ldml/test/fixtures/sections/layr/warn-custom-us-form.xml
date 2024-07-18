@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="und" conformsTo="45">
+  <info name="layr-hint-custom-form"/>
+
+  <keys>
+    <key id="one" output="1" />
+    <key id="two" output="2" />
+    <key id="three" output="3" />
+  </keys>
+  <forms>
+    <!-- this will emit a warning about custom scancodes -->
+    <form id="us">
+      <!-- warning, redefining US! -->
+      <scanCodes codes="25 12 15" />
+    </form>
+  </forms>
+  <layers formId="us">
+    <layer id="base">
+      <row keys="one two three" />
+    </layer>
+  </layers>
+</keyboard3>

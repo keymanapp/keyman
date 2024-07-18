@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="und" conformsTo="45">
+  <info author="srl295" indicator="🙀" layout="qwerty"  name="Test Minimal Keyboard"/>
+  <keys>
+    <key id="a" output="å"/> <!-- override -->
+  </keys>
+</keyboard3>

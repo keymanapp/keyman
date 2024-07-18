@@ -70,25 +70,6 @@
 
 BOOL fOutputKeystroke;
 
-/*char *getcontext()
-{
-	WCHAR buf[128];
-	static char bufout[128];
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return "";
-	_td->app->GetWindowContext(buf, 128);
-	WideCharToMultiByte(CP_ACP, 0, buf, -1, bufout, 128, NULL, NULL);
-	return bufout;
-}*/
-
-
-char *getcontext_debug() {
-  //return "";
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return "";
-	return Debug_UnicodeString(_td->app->ContextBufMax(128));
-}
-
 /**
  *  Process the key stroke using the core processor
  *
@@ -98,27 +79,27 @@ char *getcontext_debug() {
 
 static BOOL
 Process_Event_Core(PKEYMAN64THREADDATA _td) {
-  PWSTR contextBuf = _td->app->ContextBufMax(MAXCONTEXT);
-  km_kbp_context_item *citems = nullptr;
-  ContextItemsFromAppContext(contextBuf, &citems);
-  if (KM_KBP_STATUS_OK != km_kbp_context_set(km_kbp_state_context(_td->lpActiveKeyboard->lpCoreKeyboardState), citems)) {
-    km_kbp_context_items_dispose(citems);
-    return FALSE;
+  WCHAR application_context[MAXCONTEXT];
+  if (_td->app->ReadContext(application_context)) {
+    km_core_context_status result;
+    result = km_core_state_context_set_if_needed(_td->lpActiveKeyboard->lpCoreKeyboardState, reinterpret_cast<const km_core_cu *>(application_context));
+    if (result == KM_CORE_CONTEXT_STATUS_ERROR || result == KM_CORE_CONTEXT_STATUS_INVALID_ARGUMENT) {
+      SendDebugMessageFormat(0, sdmGlobal, 0, "Process_Event_Core: km_core_state_context_set_if_needed returned [%d]", result);
+    }
   }
-  km_kbp_context_items_dispose(citems);
+
   SendDebugMessageFormat(
       0, sdmGlobal, 0, "ProcessEvent: vkey[%d] ShiftState[%d] isDown[%d]", _td->state.vkey,
-      static_cast<uint16_t>(Globals::get_ShiftState() & (KM_KBP_MODIFIER_MASK_ALL | KM_KBP_MODIFIER_MASK_CAPS)), (uint8_t)_td->state.isDown);
-  //  Mask the bits supported according to `km_kbp_modifier_state` enum, update the mask if this enum is expanded.
-  if (KM_KBP_STATUS_OK != km_kbp_process_event(
+      static_cast<uint16_t>(Globals::get_ShiftState() & (KM_CORE_MODIFIER_MASK_ALL | KM_CORE_MODIFIER_MASK_CAPS)), (uint8_t)_td->state.isDown);
+  //  Mask the bits supported according to `km_core_modifier_state` enum, update the mask if this enum is expanded.
+  if (KM_CORE_STATUS_OK != km_core_process_event(
     _td->lpActiveKeyboard->lpCoreKeyboardState, _td->state.vkey,
-    static_cast<uint16_t>(Globals::get_ShiftState() & (KM_KBP_MODIFIER_MASK_ALL | KM_KBP_MODIFIER_MASK_CAPS)), (uint8_t)_td->state.isDown)) {
+    static_cast<uint16_t>(Globals::get_ShiftState() & (KM_CORE_MODIFIER_MASK_ALL | KM_CORE_MODIFIER_MASK_CAPS)), (uint8_t)_td->state.isDown, KM_CORE_EVENT_FLAG_DEFAULT)) {
     SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessEvent CoreProcessEvent Result:False %d ", FALSE);
     return FALSE;
   }
   return TRUE;
 }
-
 
 /*
 *	BOOL ProcessHook();
@@ -138,66 +119,46 @@ BOOL ProcessHook()
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return FALSE;
 
-	LPGROUP gp = _td->state.startgroup;
-
   fOutputKeystroke = FALSE;  // TODO: 5442 no longer needs to be global once we use core processor
-  BOOL isUsingCoreProcessor = Globals::get_CoreIntegration();
-  //
-  // If we are running in the debugger, don't do a second run through
-  //
-
-  if(_td->app->DebugControlled() && !_td->TIPFUpdateable) {   // I4287
-    if(_td->state.vkey == VK_ESCAPE || (_td->state.vkey >= VK_PRIOR && _td->state.vkey <= VK_DOWN) || (_td->state.vkey == VK_DELETE)) return FALSE;   // I4033   // I4826   // I4845
-    else return TRUE;
-  }
-
-	//app->NoSetShift = FALSE;
-  _td->app->ReadContext();
 
 	if(_td->state.msg.message == wm_keymankeydown) {   // I4827
     if (ShouldDebug(sdmKeyboard)) {
-      SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "Key pressed: %s Context '%s'",
-        Debug_VirtualKey(_td->state.vkey), getcontext_debug());
-    }
-
-		AIDEBUGKEYINFO keyinfo;
-		keyinfo.shiftFlags = Globals::get_ShiftState();
-		keyinfo.VirtualKey = _td->state.vkey;
-		keyinfo.Character = _td->state.charCode;
-		keyinfo.DeadKeyCharacter = 0;   // I4582
-		keyinfo.IsUp = !_td->state.isDown;
-		if(_td->app->IsUnicode())
-			_td->app->QueueDebugInformation(QID_BEGIN_UNICODE, NULL, NULL, NULL, NULL, (DWORD_PTR) &keyinfo);
-		else
-			_td->app->QueueDebugInformation(QID_BEGIN_ANSI, NULL, NULL, NULL, NULL, (DWORD_PTR) &keyinfo);
-	}
-
-  if (isUsingCoreProcessor) {  // TODO: 5442 Note: Nested if will be reduced once using core only
-    // For applications not using the TSF kmtip calls this function twice for each keystroke,
-    // first to determine if we are doing processing work (TIPFUpdateable == FALSE),
-    // if we say yes it will call a second time to actually do the work.
-    // We call the core process event only once and use the core's queued actions
-    // on the second pass.
-    // For the TSF in most cases kmtip (except OnPreservedKey) will not call the non-updateable test parse.
-    // Therfore the core process event will need to be called before processing the actions.
-
-    // CoreProcessEventRun would be a sufficient test however testing TIPFUpdateable defines
-    // the status of the keystroke processing more precisely.
-    if (!_td->TIPFUpdateable || !_td->CoreProcessEventRun) {
-      if (!Process_Event_Core(_td)) {
-        return FALSE;
+      if(!_td->lpActiveKeyboard || !_td->lpActiveKeyboard->lpCoreKeyboardState) {
+        SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "Key pressed: %s Context <unavailable>",
+          Debug_VirtualKey(_td->state.vkey));
+      } else {
+        km_core_cu* debug_context = km_core_state_context_debug(
+          _td->lpActiveKeyboard->lpCoreKeyboardState,
+          KM_CORE_DEBUG_CONTEXT_CACHED
+        );
+        SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "Key pressed: %s Context '%ls'",
+          Debug_VirtualKey(_td->state.vkey), debug_context);
+        km_core_cu_dispose(debug_context);
       }
     }
 
-    if (!_td->TIPFUpdateable) {
-      ProcessActionsNonUpdatableParse(&fOutputKeystroke);
-    } else {
-      ProcessActions(&fOutputKeystroke);
-    }
+	}
 
+  // For applications not using the TSF kmtip calls this function twice for each keystroke,
+  // first to determine if we are doing processing work (TIPFUpdateable == FALSE),
+  // if we say yes it will call a second time to actually do the work.
+  // We call the core process event only once and use the core's queued actions
+  // on the second pass.
+  // For the TSF in most cases kmtip (except OnPreservedKey) will not call the non-updateable test parse.
+  // Therfore the core process event will need to be called before processing the actions.
+
+  // CoreProcessEventRun would be a sufficient test however testing TIPFUpdateable defines
+  // the status of the keystroke processing more precisely.
+  if (!_td->TIPFUpdateable || !_td->CoreProcessEventRun) {
+    if (!Process_Event_Core(_td)) {
+      return FALSE;
+    }
   }
-  else {
-    ProcessGroup(gp); // TODO: 5442 remove
+
+  if (!_td->TIPFUpdateable) {
+    ProcessActionsNonUpdatableParse(&fOutputKeystroke);
+  } else {
+    ProcessActions(&fOutputKeystroke);
   }
 
   if (fOutputKeystroke && !_td->app->IsQueueEmpty()) {
@@ -236,690 +197,14 @@ BOOL ProcessHook()
     }
   }
 
-  if (fOutputKeystroke && _td->app->DebugControlled()) {
-		// The debug memo does not receive default key events because
-		// we capture them all here. So we synthesize the key event for
-		// the debugger.
-    _td->app->QueueAction(QIT_VSHIFTDOWN, Globals::get_ShiftState());
-    _td->app->QueueAction(QIT_VKEYDOWN, _td->state.vkey);
-    _td->app->QueueAction(QIT_VKEYUP, _td->state.vkey);
-    _td->app->QueueAction(QIT_VSHIFTUP, Globals::get_ShiftState());
-    fOutputKeystroke = FALSE;
-  }
-
 	if(*Globals::hwndIM() == 0 || *Globals::hwndIMAlways())
 	{
 		_td->app->SetCurrentShiftState(Globals::get_ShiftState());
 		_td->app->SendActions();   // I4196
 	}
-  // output context for debugging
-  // PWSTR contextBuf = _td->app->ContextBufMax(MAXCONTEXT);
-  // SendDebugMessageFormat(0, sdmAIDefault, 0, "Kmprocess::ProcessHook After cxt=%s", Debug_UnicodeString(contextBuf, 1));
 
-	_td->app->QueueDebugInformation(QID_END, NULL, NULL, NULL, NULL, 0);
 	return !fOutputKeystroke;
 }
-
-/*
-*	PRIVATE BOOL ProcessGroup(LPGROUP gp);
-*
-*	Parameters:	gp		Pointer to group to process inside
-*
-*	Returns:	TRUE if messages are to be sent,
-*				and FALSE if no messages are to be sent.
-*
-*   Called by:  ProcessHook, recursive inside groups
-*
-*	ProcessKey is where the keystroke conversion and output takes place.  This routine
-*	has a lot of crucial code in it!
-*/
-
-BOOL ProcessGroup(LPGROUP gp)
-{
-  if (!DebugAssert(!Globals::get_CoreIntegration(), "KMPROCESS:ProcessGroup: Error called in core integration mode")) {
-    return FALSE;
-  }
-  DWORD i;
-	LPKEY kkp = NULL;
-	PWSTR p;
-	int sdmfI;
-
-    /*
-	 If the number of nested groups goes higher than 50, then break out - this is
-	 a limitation of stack size.  This is basically a catch-all for freaky apps that
-	 cause message loopbacks and nasty things like that.  Okay, it's really a catch all
-	 for bugs!  This means the user's system shouldn't hang.
-	*/
-
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return FALSE;
-
-	_td->app->QueueDebugInformation(QID_GROUP_ENTER, gp, NULL, NULL, NULL, 0);
-
-	sdmfI = -1;
-
-	for(i = 0; i < _td->state.lpkb->cxGroupArray; i++)
-		if(gp == &_td->state.lpkb->dpGroupArray[i])
-		{
-			if(_td->state.msg.message == wm_keymankeydown && ShouldDebug(sdmKeyboard))
-				SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "Entering group %d of %d, context '%s'", i+1, _td->state.lpkb->cxGroupArray, getcontext_debug());
-			sdmfI = i;
-			break;
-		}
-
-	if(++_td->state.LoopTimes > 50)
-	{
-		if(_td->state.msg.message == wm_keymankeydown) SendDebugMessage(_td->state.msg.hwnd, sdmKeyboard, 0, "Aborting output: state.LoopTimes exceeded.");
-		_td->state.StopOutput = TRUE;
-		_td->app->QueueDebugInformation(QID_GROUP_EXIT, gp, NULL, NULL, NULL, QID_FLAG_RECURSIVE_OVERFLOW);
-		return FALSE;
-	}
-
-	_td->state.NoMatches = TRUE;
-
-	/*
-	 The rule matching loop.
-
-	 This loop iterates through all the rules in the group that is currently being
-	 processed.  Each rule in a group can be of three different types:
-		1. A virtual key rule, where the key to be matched is a virtual key
-		2. A normal key rule (WM_CHAR), where the key to be matched is an Ascii char.
-		3. A rule in a keyless group, where only the context is matched.
-
-	 The loop goes through and checks the rules like that.  This loop could be optimized
-	 with standard searching techniques - the ContextMatch may be difficult.
-	*/
-
-  if(ShouldDebug(sdmKeyboard))
-	  SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "state.vkey: %s shiftFlags: %x; charCode: %X",
-      Debug_VirtualKey(_td->state.vkey), Globals::get_ShiftState(), _td->state.charCode);   // I4582
-
-	if(gp)
-	{
-		for(kkp = gp->dpKeyArray, i=0; i < gp->cxKeyArray; i++, kkp++)
-		{
-			if(!ContextMatch(kkp)) continue;
-			if(!gp->fUsingKeys)
-			{
-				if(kkp->dpContext[0] != 0) break; else continue;
-			}
-
-			//if(kkp->Key == state.vkey)
-			//SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, 0, "kkp->Key: %d kkp->ShiftFlags: %x",
-			//	kkp->Key, kkp->ShiftFlags);
-
-			/* Keyman 6.0: support Virtual Characters */
-			if(IsEquivalentShift(kkp->ShiftFlags, Globals::get_ShiftState()))
-			{
-        if(kkp->Key > VK__MAX && kkp->Key == _td->state.vkey) break;	// I3438   // I4582
-				else if(kkp->Key == _td->state.vkey) break;   // I4169
-			}
-			else if(kkp->ShiftFlags == 0 && kkp->Key == _td->state.charCode && _td->state.charCode != 0) break;
-		}
-	}
-
-	if(!gp || i == gp->cxKeyArray)
-	{
-		/*
-		 No rule was found that corresponded to the current state of the context and
-		 keyboard.  NoMatch should be checked for everything except virtual keys; and
-		 context should also be kept.
-
-		 If the message was a virtual key, then just return without checking NoMatch.
-		 NoMatch shouldn't be used for virtual keys because it will mean that no key
-		 can ever get through that isn't matched - including arrows, func. keys, etc !!
-		 Context is not kept for virtual keys being output.
-		*/
-
-		if(_td->state.msg.message == wm_keymankeydown && ShouldDebug(sdmKeyboard)) SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0,
-			"No match was found in group %d of %d", sdmfI, _td->state.lpkb->cxGroupArray);
-
-		if(!gp || (_td->state.charCode == 0 && gp->fUsingKeys))   // I4585
-        // 7.0.241.0: I1133 - Fix mismatched parentheses on state.charCode - ie. we don't want to output this letter if !gp->fUsingKeys
-		{
-      BOOL fIsBackspace = _td->state.vkey == VK_BACK && (Globals::get_ShiftState() & (LCTRLFLAG|RCTRLFLAG|LALTFLAG|RALTFLAG)) == 0;   // I4128
-
-      if(/*_td->app->DebugControlled() &&*/ fIsBackspace) {   // I4838   // I4933
-				if(_td->state.msg.message == wm_keymankeydown) {   // I4933
-          if(!_td->app->IsLegacy()) {   // I4933
-            PWCHAR pdeletecontext = _td->app->ContextBuf(1);   // I4933
-            if(!pdeletecontext || *pdeletecontext == 0) {   // I4933
-              _td->app->ResetContext();   // I4933
-              fOutputKeystroke = TRUE;   // I4933
-              return FALSE;   // I4933
-            }
-            if (Uni_IsSurrogate1(*pdeletecontext) && Uni_IsSurrogate2(*(pdeletecontext+1))) {
-              // 2 backspaces to delete both parts of surrogate pair
-              // This only needs to be done for TSF-aware apps as legacy apps
-              // will receive a BKSP WM_KEYDOWN event which results in deleting
-              // both parts in one action
-              _td->app->QueueAction(QIT_BACK, BK_BACKSPACE | BK_SURROGATE);
-            }
-            else {
-              _td->app->QueueAction(QIT_BACK, BK_BACKSPACE);
-            }
-          }
-          else {
-            _td->app->QueueAction(QIT_BACK, BK_BACKSPACE);   // I4933
-          }
-        }
-      } else if( (!_td->app->IsLegacy() || !fIsBackspace) && !_td->TIPFPreserved) {   // I4024   // I4128   // I4287   // I4290
-        SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, " ... IsLegacy = FALSE; IsTIP = TRUE");   // I4128
-  			if(_td->state.charCode == 0) _td->app->ResetContext();    // I3573   // I3577   // I4585
-        fOutputKeystroke = TRUE;
-        return FALSE;
-      }
-			  //fOutputKeystroke = TRUE; return FALSE; // Don't swallow keystroke   // I3577
-        ///SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, " ... IsLegacy = TRUE; IsTIP = TRUE");
-
-			/*
-             If the key is not a character key (white keys), or not processing, then we must init the stack -
-             unknown keys do things like moving position in the context, so must clear.
-            */
-			if(fIsBackspace)   // I4128
-			{
-				/*
-				 Must have special handling for VK_BACK: delete a character from the context stack
-				 This only fires if the keyboard has no rule for backspace.
-				*/
-			}
-			else
-			{
-				//app->NoSetShift = FALSE;
-
-				DWORD dw = _td->state.vkey;
-				if(dw == 0x05) dw = VK_RETURN;    // I649 - VK_ENTER and K_NPENTER
-
-				if(_td->state.msg.lParam & (1<<24)) dw |= QVK_EXTENDED;	// Extended key flag  // I3438
-
-        if(_td->state.charCode == 0) {
-          _td->app->ResetContext();
-        }
-
-        if(_td->TIPFPreserved) {   // I4290
-          if(_td->state.charCode != 0) {
-            _td->app->QueueAction(QIT_CHAR, _td->state.charCode);
-          }
-        } else {
-				  if(_td->state.msg.message == wm_keymankeydown)
-          {
-					  _td->app->QueueAction(QIT_VSHIFTDOWN, Globals::get_ShiftState());  // 15/05/2001 - fixing I201 -- enabled line
-            _td->app->QueueAction(QIT_VKEYDOWN, dw);
-          }
-
-				  if(_td->state.msg.message == wm_keymankeyup) {
-            _td->app->QueueAction(QIT_VKEYUP, dw);
-					  _td->app->QueueAction(QIT_VSHIFTUP, Globals::get_ShiftState());
-          }
-        }
-			}
-		}
-		else if (gp->dpNoMatch != NULL && *gp->dpNoMatch != 0 && _td->state.msg.message != wm_keymankeyup)
-		{
-			/* NoMatch rule found, and is a character key */
-			_td->app->QueueDebugInformation(QID_NOMATCH_ENTER, gp, NULL, NULL, gp->dpNoMatch, 0);
-			PostString(gp->dpNoMatch, &_td->state.msg, _td->state.lpkb, NULL);
-			_td->app->QueueDebugInformation(QID_NOMATCH_EXIT, gp, NULL, NULL, gp->dpNoMatch, 0);
-		}
-		else if (_td->state.charCode != 0 && _td->state.charCode != 0xFFFF && _td->state.msg.message != wm_keymankeyup && gp->fUsingKeys)
-		{
-			/* No rule found, is a character key */
-			// 7.0.239.0: I994 - Workaround output order issues - we will use the TSF to output all characters...
-			// if(app->Type1() == AIType_TIP) { fOutputKeystroke = TRUE; return FALSE; } // Don't swallow keystroke
-
-			_td->app->QueueAction(QIT_CHAR, _td->state.charCode);
-		}
-
-		_td->app->QueueDebugInformation(QID_GROUP_EXIT, gp, NULL, NULL, NULL, QID_FLAG_NOMATCH);
-		return TRUE;
-	}
-
-	if(_td->state.msg.message == wm_keymankeyup)
-		return TRUE;
-
-	SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "match found in rule %d", i);
-
-	_td->state.NoMatches = FALSE;
-
-	/*
-	 Save the context that will be used for output when the 'context' keyword is used.
-	 For each deadkey, we need to add 2 characters; look in related stores as well...
-	*/
-
-  assert(kkp != NULL);
-
-  _td->miniContextIfLen = xstrlen(kkp->dpContext) - xstrlen_ignoreifopt(kkp->dpContext);
-
-	// 11 Aug 2003 - I25(v6) - mcdurdin - CODE_NUL context support
-	if(*kkp->dpContext == UC_SENTINEL && *(kkp->dpContext+1) == CODE_NUL)
-    wcsncpy_s(_td->miniContext, GLOBAL_ContextStackSize, _td->app->ContextBuf(xstrlen_ignoreifopt(kkp->dpContext)-1), GLOBAL_ContextStackSize);  // I3162   // I3536
-	else
-	  wcsncpy_s(_td->miniContext, GLOBAL_ContextStackSize, _td->app->ContextBuf(xstrlen_ignoreifopt(kkp->dpContext)), GLOBAL_ContextStackSize);  // I3162   // I3536
-
-  _td->miniContext[GLOBAL_ContextStackSize-1] = 0;
-
-	_td->app->QueueDebugInformation(QID_RULE_ENTER, gp, kkp, _td->miniContext, NULL, 0);
-
-	/*
-	 The next section includes several optimizations that make the code a little harder
-	 to read, but are probably worth it in the time that they save.
-
-	 If the output string doesn't have a "context" byte at the start, post backspaces
-	 to erase the appropriate number of characters in the application.  If it does have
-	 a "context" byte at the start, then the string won't change, and no backspaces are
-	 necessary.  You could go one step further with this optimization, in PostAllKeys,
-	 by comparing the starts of the strings to see what is same, and not backspacing
-	 that, but it is probably not necessary.
-	*/
-
-	p = kkp->dpOutput;
-	if(*p != UC_SENTINEL || *(p+1) != CODE_CONTEXT) {
-		for(PWSTR mcp = decxstr(wcschr(_td->miniContext, 0), _td->miniContext); mcp != NULL; mcp = decxstr(mcp, _td->miniContext)) {
-      if (*mcp == UC_SENTINEL) {
-        switch (*(mcp + 1)) {
-          case CODE_DEADKEY: _td->app->QueueAction(QIT_BACK, BK_DEADKEY); break;
-          case CODE_NUL: break;	// 11 Aug 2003 - I25(v6) - mcdurdin - CODE_NUL context support
-        }
-      }
-      else if (Uni_IsSurrogate1(*mcp) && Uni_IsSurrogate2(*(mcp + 1))) {
-				// 2 backspaces to delete both parts of surrogate pair
-				// This only needs to be done for TSF-aware apps as legacy apps
-				// will receive a BKSP WM_KEYDOWN event which results in deleting
-				// both parts in one action
-				_td->app->QueueAction(QIT_BACK, BK_SURROGATE);
-      }
-      else {
-				_td->app->QueueAction(QIT_BACK, 0);
-			}
-		}
-	}
-  else {
-    // otherwise, the "context" entry has to be jumped over
-    p += 2;
-  }
-
-	/* Use PostString to post the rest of the output string. */
-
-	if(PostString(p, &_td->state.msg, _td->state.lpkb, NULL) == psrCheckMatches)
-	{
-		_td->app->QueueDebugInformation(QID_RULE_EXIT, gp, kkp, _td->miniContext, NULL, 0);
-
-		if(gp->dpMatch && *gp->dpMatch)
-		{
-			_td->app->QueueDebugInformation(QID_MATCH_ENTER, gp, NULL, NULL, gp->dpMatch, 0);
-			PostString(gp->dpMatch, &_td->state.msg, _td->state.lpkb, NULL);
-			_td->app->QueueDebugInformation(QID_MATCH_EXIT, gp, NULL, NULL, gp->dpMatch, 0);
-		}
-	}
-	else
-		_td->app->QueueDebugInformation(QID_RULE_EXIT, gp, kkp, _td->miniContext, NULL, 0);
-	_td->app->QueueDebugInformation(QID_GROUP_EXIT, gp, NULL, NULL, NULL, 0);
-
-	return TRUE;
-}
-
-/*
-*	int PostString( LPSTR str, BOOL *useMode, LPMSG mp,
-*	LPKEYBOARD lpkb );
-*
-*	Parameters:	str		Pointer to string to send
-*				useMode	Pointer to BOOL about whether a "use" command was found
-*				mp		Pointer to MSG structure to copy in outputting messages
-*				lpkb	Pointer to global keyboard structure
-*
-*	Returns:	0 to continue, 1 and 2 to return.
-*
-*   Called by:  ProcessKey
-*
-*	PostString posts a string of "context", "index", "beep", characters and virtual keys
-*	to the active application, via the Keyman PostKey buffer.
-*/
-
-int PostString(PWSTR str, LPMSG mp, LPKEYBOARD lpkb, PWSTR endstr)
-{
-  if (!DebugAssert(!Globals::get_CoreIntegration(), "KKMPROCESS:PostString: Error called in core integration mode")) {
-    return FALSE;
-  }
-  PWSTR p, q, temp;
-  LPSTORE s;
-  int n1, n2;
-	int i, n, shift;
-	BOOL FoundUse = FALSE;
-
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return FALSE;
-
-  // TODO: Refactor to use incxstr
-	for(p = str; *p && (p < endstr || !endstr); p++)
-    {
-        if(*p == UC_SENTINEL)
-		    switch(*(++p))
-            {
-		    case CODE_EXTENDED:				// Start of a virtual key section w/shift codes
-			    p++;
-
-				shift = *p; //(*p<<8) | *(p+1);
-				_td->app->QueueAction(QIT_VSHIFTDOWN, shift);
-
-				p++;
-
-				_td->app->QueueAction(QIT_VKEYDOWN, *p);
-				_td->app->QueueAction(QIT_VKEYUP, *p);
-
-				_td->app->QueueAction(QIT_VSHIFTUP, shift);
-
-				p++; // CODE_EXTENDEDEND
-				////// CODE_EXTENDEDEND will be incremented by loop
-
-				//app->QueueAction(QIT_VSHIFTUP, shift);
-				break;
-
-			case CODE_DEADKEY:				// A deadkey to be output
-			  p++;
-				_td->app->QueueAction(QIT_DEADKEY, *p);
-			  break;
-		  case CODE_BEEP:					// Sound an 'iconasterisk' beep
-			  _td->app->QueueAction(QIT_BELL, 0);
-			  break;
-		  case CODE_CONTEXT:				// copy the context to the output
-        PostString(_td->miniContext, mp, lpkb, wcschr(_td->miniContext, 0));
-        break;
-			case CODE_CONTEXTEX:
-				p++;
-				for(q = _td->miniContext, i = _td->miniContextIfLen; *q && i < *p-1; i++, q=incxstr(q));
-				if(*q) {
-          temp = incxstr(q);
-          PostString(q, mp, lpkb, temp);
-        }
-				break;
-		  case CODE_RETURN:				// stop processing and start PostAllKeys
-			  _td->state.StopOutput = TRUE;
-			  return psrPostMessages;
-
-			case CODE_CALL:
-				p++;
-				CallDLL(_td->lpActiveKeyboard, *p-1);
-			    if(_td->state.StopOutput) return psrPostMessages;
-				FoundUse = TRUE;
-				break;
-			case CODE_USE:					// use another group
-			  p++;
-			  ProcessGroup(&lpkb->dpGroupArray[*p-1]);
-			  if(_td->state.StopOutput) return psrPostMessages;
-				FoundUse = TRUE;
-			  break;
-		  case CODE_CLEARCONTEXT:
-			  _td->app->ResetContext();
-				_td->app->ReadContext();
-			  break;
-      case CODE_INDEX:
-       	p++;
-        s = &_td->lpActiveKeyboard->Keyboard->dpStoreArray[*p - 1];
-		    p++;
-
-				n = _td->IndexStack[*p - 1];
-				for(temp = s->dpString; *temp && n > 0; temp = incxstr(temp), n--);
-				PostString(temp, mp, lpkb, incxstr(temp));
-				break;
-      case CODE_SETOPT:
-        p++;
-        n1 = *p - 1;
-		    p++;
-        n2 = *p - 1;
-        SetKeyboardOption(_td->lpActiveKeyboard, n1, n2);
-        break;
-      case CODE_RESETOPT:
-        p++;
-        n1 = *p - 1;
-        ResetKeyboardOption(_td->lpActiveKeyboard, n1);
-        break;
-      case CODE_SAVEOPT:
-        p++;
-        n1 = *p - 1;
-        SaveKeyboardOption(_td->lpActiveKeyboard, n1);
-        break;
-      case CODE_IFSYSTEMSTORE:
-        p+=3;
-        break;
-      case CODE_SETSYSTEMSTORE:
-        p+=2;
-        break;
-      }
-    else
-			_td->app->QueueAction(QIT_CHAR, *p);
-  }
-	return FoundUse ? psrPostMessages : psrCheckMatches;
-}
-
-
-BOOL IsMatchingBaseLayout(PWCHAR layoutName)  // I3432
-{
-  BOOL bEqual = _wcsicmp(layoutName, Globals::get_BaseKeyboardName()) == 0 ||   // I4583
-                _wcsicmp(layoutName, Globals::get_BaseKeyboardNameAlt()) == 0;   // I4583
-
-  return bEqual;
-}
-
-BOOL IsMatchingPlatformString(PWCHAR platform)  // I3432
-{
-  return
-    _wcsicmp(platform, L"windows") == 0 ||
-    _wcsicmp(platform, L"desktop") == 0 ||
-    _wcsicmp(platform, L"hardware") == 0 ||
-    _wcsicmp(platform, L"native") == 0;
-}
-
-BOOL IsMatchingPlatform(LPSTORE s)  // I3432
-{
-  PWCHAR t = new WCHAR[wcslen(s->dpString)+1];
-  wcscpy_s(t, wcslen(s->dpString)+1, s->dpString);
-  PWCHAR context = NULL;
-  PWCHAR platform = wcstok_s(t, L" ", &context);
-  while(platform != NULL)
-  {
-    if(!IsMatchingPlatformString(platform))
-    {
-      s->dwSystemID = TSS_PLATFORM_NOMATCH;
-      delete[] t;
-      return FALSE;
-    }
-    platform = wcstok_s(NULL, L" ", &context);
-  }
-
-  s->dwSystemID = TSS_PLATFORM_MATCH;
-  delete[] t;
-  return TRUE;
-}
-
-/*
-*	BOOL ContextMatch( LPKEY kkp );
-*
-*	Parameters:	kkp		Rule to compare
-*
-*	Returns:    0 on OK, 1 on not equal
-*
-*   Called by:	ProcessKey
-*
-*	ContextMatch compares the context of a rule with the current context.
-*/
-
-BOOL ContextMatch(LPKEY kkp)
-{
-  if (!DebugAssert(!Globals::get_CoreIntegration(), "KMPROCESS:ContextMatch: Error called in core integration mode")) {
-    return FALSE;
-  }
-	WORD /*i,*/ n;
-	PWSTR p, q, qbuf, temp;
-	LPWORD indexp;
-	LPSTORE s, t;
-  BOOL bEqual;
-
-	//SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: ENTER [%d]", kkp->Line);
-  PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return FALSE;
-
-	memset(_td->IndexStack, 0, GLOBAL_ContextStackSize*sizeof(WORD));  // I3158   // I3524
-
-	p = kkp->dpContext;
-
-	if(*p == 0)
-	{
-		//SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: EXIT TRUE -> no rule context");
-		return TRUE;
-	}
-
-	/* 11 Aug 2003 - I25(v6) - mcdurdin - test for CODE_NUL */
-
-	if(*p == UC_SENTINEL && *(p+1) == CODE_NUL)
-	{
-		// If context buf is longer than the context, then obviously not start of doc.
-		if(_td->app->ContextBuf(xstrlen_ignoreifopt(p))) return FALSE;  // I2484 - Fix bug with if() following nul in same statement
-		p = incxstr(p);
-		if(*p == 0) return TRUE;
-	}
-
-  for(PWCHAR pp = p; pp && *pp; pp = incxstr(pp))
-  {
-    if(*pp == UC_SENTINEL && *(pp+1) == CODE_IFOPT)
-    {
-    	s = &_td->lpActiveKeyboard->Keyboard->dpStoreArray[(*(pp+2))-1];  // I2590
-      t = &_td->lpActiveKeyboard->Keyboard->dpStoreArray[(*(pp+4))-1];  // I2590
-
-      bEqual = wcscmp(s->dpString, t->dpString) == 0;
-      if(*(pp+3) == 1 && bEqual) return FALSE;  // I2590
-      if(*(pp+3) == 2 && !bEqual) return FALSE;  // I2590
-    }
-    else if(*pp == UC_SENTINEL && *(pp+1) == CODE_IFSYSTEMSTORE)  // I3432
-    {
-      DWORD dwSystemID = *(pp+2)-1;
-      t = &_td->lpActiveKeyboard->Keyboard->dpStoreArray[(*(pp+4))-1];  // I2590
-      switch(dwSystemID)
-      {
-      case TSS_PLATFORM_MATCH:  // Cached platform result - a matching platform
-        bEqual = TRUE;
-        break;
-      case TSS_PLATFORM_NOMATCH:  // Cached platform result - not a matching platform
-        bEqual = FALSE;
-        break;
-      case TSS_PLATFORM:
-        bEqual = IsMatchingPlatform(t);
-        break;
-      case TSS_BASELAYOUT:
-        bEqual = IsMatchingBaseLayout(t->dpString);
-        break;
-      default:
-        {
-          PWCHAR ss = GetSystemStore(_td->lpActiveKeyboard->Keyboard, dwSystemID);
-          if(ss == NULL) return FALSE;
-          bEqual = wcscmp(ss, t->dpString) == 0;
-        }
-      }
-
-      if(*(pp+3) == 1 && bEqual) return FALSE;  // I2590
-      if(*(pp+3) == 2 && !bEqual) return FALSE;  // I2590
-    }
-  }
-
-	q = qbuf = _td->app->ContextBuf(xstrlen_ignoreifopt(p));
-	if(!q)
-	{
-		//SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: EXIT FALSE -> context too short");
-		return FALSE;	// context buf is too short!
-	}
-	indexp = _td->IndexStack;
-
-	//SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: [%d] Rule: %s", kkp->Line, format_unicode_debug(kkp->dpContext));
-	//SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: [%d] Test: %s", kkp->Line, format_unicode_debug(q));
-
-	for(; *p && *q; p = incxstr(p))
-	{
-		//SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: p:%x q:%x", *p, *q);
-		*indexp = 0;
-
-		if(*p == UC_SENTINEL)
-		{
-			switch(*(p+1))
-			{
-			case CODE_DEADKEY:
-				if(*q != UC_SENTINEL || *(q+1) != CODE_DEADKEY || *(q+2) != *(p+2))
-				{
-	//	SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: EXIT FALSE -> deadkeys don't match %x %x %x != %x %x %x",
-	//				*p, *(p+1), *(p+2), *q, *(q+1), *(q+2));
-					return FALSE;
-				}
-				break;
-			case CODE_ANY:
-	      s = &_td->lpActiveKeyboard->Keyboard->dpStoreArray[(*(p+2))-1];
-
-        temp = xstrchr(s->dpString, q);
-
-        /*SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard ,kkp->Line, "ContextMatch: CODE_ANY [%x %x %x %x %x %x %x %x %x %x] [%x %x %x] %d",
-          s->dpString[0], s->dpString[1], s->dpString[2],
-          s->dpString[3], s->dpString[4], s->dpString[5],
-          s->dpString[6], s->dpString[7], s->dpString[8],
-          s->dpString[9],
-          q[0], q[1], q[2],
-          (temp ? (INT_PTR)(temp-s->dpString) : 0));*/
-
-        if(temp != NULL)  // I1622
-          *indexp = (WORD) xstrpos(temp, s->dpString);
-
-				//if((temp = xstrchr(s->dpString, GetSuppChar(q))) != NULL)
-		    //	    *indexp = xstrpos(temp, s->dpString);
-				else
-					return FALSE;
-				break;
-			case CODE_NOTANY:
-	      s = &_td->lpActiveKeyboard->Keyboard->dpStoreArray[(*(p+2))-1];
-
-        if((temp = xstrchr(s->dpString, q)) != NULL)   // I1622
-          return FALSE;
-
-				//if((temp = xstrchr(s->dpString, GetSuppChar(q))) != NULL)
-				//  return FALSE;
-				break;
-			case CODE_INDEX:
-	    	s = &_td->lpActiveKeyboard->Keyboard->dpStoreArray[(*(p+2))-1];
-				*indexp = n = _td->IndexStack[(*(p+3))-1];
-
-				for(temp = s->dpString; *temp && n > 0; temp = incxstr(temp), n--);
-				if(n != 0) return FALSE;
-				if(xchrcmp(temp, q) != 0) return FALSE;
-        ////if(GetSuppChar(temp) != GetSuppChar(q)) return FALSE; // I1622
-				break;
-			case CODE_CONTEXTEX:
-				// only the nth character
-				for(n = *(p+2) - 1, temp = qbuf; temp < q && n > 0; n--, temp = incxstr(temp));
-				if(n == 0)
-          if(xchrcmp(temp, q) != 0) return FALSE;
-					//if(GetSuppChar(temp) != GetSuppChar(q)) return FALSE;
-				break;
-      case CODE_IFOPT:
-      case CODE_IFSYSTEMSTORE:  // I3432
-        indexp++;
-        continue; // don't increment q
-			default:
-				return FALSE;
-			}
-		}
-		else if(xchrcmp(p, q) != 0) //GetSuppChar(p) != GetSuppChar(q))
-		{
-    	//SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: [%d] FAIL: %s", kkp->Line, format_unicode_debug(p));
-	    //SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: [%d] FAIL: %s", kkp->Line, format_unicode_debug(q));
-			//SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: EXIT FALSE -> chrs don't match");
-			return FALSE;
-		}
-		indexp++;
-    q = incxstr(q);
-	}
-
-  while(*p == UC_SENTINEL && (*(p+1) == CODE_IFOPT || *(p+1) == CODE_IFSYSTEMSTORE)) p = incxstr(p); // already tested  // I3432
-
-	//SendDebugMessageFormat(state.msg.hwnd, sdmKeyboard, kkp->Line, "ContextMatch: EXIT %s -> END OF FUNCTION",
-	//	*p == *q ? "TRUE" : "FALSE");
-  return *p == *q; /*at least one must ==0 at this point*/
-}
-
 
 PWSTR strtowstr(PSTR in)
 {
@@ -933,15 +218,14 @@ PWSTR strtowstr(PSTR in)
     return result;
 }
 
-
 PSTR wstrtostr(PCWSTR in)
 {
     PSTR result;
-    size_t len;
+    int len;
 
-    wcstombs_s(&len, NULL, 0, in, wcslen(in));
+    len = WideCharToMultiByte(CP_ACP, 0, in, -1, NULL, 0, NULL, NULL);
     result = new CHAR[len+1];
-    wcstombs_s(&len, result, len, in, wcslen(in));
+    WideCharToMultiByte(CP_ACP, 0, in, -1, result, len, NULL, NULL);
     result[len] = 0;
     return result;
 }

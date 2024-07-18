@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="addins.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="appint\aiTIP.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -141,6 +138,9 @@
     <ClCompile Include="CoreEnvironment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="appcontext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="KEYMAN32.DEF">
@@ -162,9 +162,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="addins.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="appint\aiTIP.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -250,6 +247,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\kmtip_guids.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="appcontext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

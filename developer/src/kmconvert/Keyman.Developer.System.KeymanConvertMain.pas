@@ -13,6 +13,7 @@ uses
   Keyman.Developer.System.KMConvertParameters,
   Keyman.Developer.System.ImportWindowsKeyboard,
   Keyman.Developer.System.KeyboardProjectTemplate,
+  Keyman.Developer.System.LDMLKeyboardProjectTemplate,
   Keyman.Developer.System.ModelProjectTemplate,
   KeymanVersion,
   VersionInfo;
@@ -50,6 +51,7 @@ begin
     iwk.DestinationPath := FParameters.Destination;
     iwk.KeyboardIDTemplate := FParameters.KeyboardID;
     iwk.NameTemplate := FParameters.Name;
+    iwk.Description := FParameters.Description;
     iwk.Copyright := FParameters.Copyright;
     iwk.FullCopyright := FParameters.FullCopyright;
     iwk.Version := FParameters.Version;
@@ -97,6 +99,44 @@ begin
       kpt.Generate;
     except
       on E:EKeyboardProjectTemplate do
+      begin
+        writeln(E.Message);
+        Exit(False);
+      end;
+    end;
+    Result := True;
+  finally
+    kpt.Free;
+  end;
+end;
+
+function DoCreateLDMLKeyboardTemplate(FParameters: TKMConvertParameters): Boolean;
+var
+  kpt: TLDMLKeyboardProjectTemplate;
+  FTargetFolder: string;
+begin
+  kpt := TLDMLKeyboardProjectTemplate.Create(FParameters.Destination, FParameters.KeyboardID);
+  try
+    if FParameters.Name = ''
+      then kpt.Name := FParameters.KeyboardID
+      else kpt.Name := FParameters.Name;
+    kpt.Copyright := FParameters.Copyright;
+    kpt.FullCopyright := FParameters.FullCopyright;
+    kpt.Version := FParameters.Version;
+    kpt.BCP47Tags := FParameters.BCP47Tags;
+    kpt.Author := FParameters.Author;
+
+    FTargetFolder := ExtractFileDir(kpt.ProjectFilename);
+    if DirectoryExists(FTargetFolder) then
+    begin
+      writeln('ERROR: The directory "'+FTargetFolder+'" already exists.');
+      Exit(False);
+    end;
+
+    try
+      kpt.Generate;
+    except
+      on E:ELDMLKeyboardProjectTemplate do
       begin
         writeln(E.Message);
         Exit(False);
@@ -189,6 +229,8 @@ begin
       Result := DoImportWindowsKeyboard(FParameters);
     cmTemplate:
       Result := DoCreateKeyboardTemplate(FParameters);
+    cmLdmlKeyboard:
+      Result := DoCreateLDMLKeyboardTemplate(FParameters);
     cmLexicalModel:
       Result := DoCreateModelTemplate(FParameters);
   end;

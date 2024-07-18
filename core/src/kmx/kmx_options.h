@@ -4,14 +4,14 @@
 #include <string>
 #include <vector>
 
-#include <keyman/keyboardprocessor.h>
+#include "keyman_core.h"
 #include "option.hpp"
 
 #include "kmx_base.h"
 #include "kmx_debugger.h"
 
 namespace km {
-namespace kbp {
+namespace core {
 
 class abstract_processor;
 
@@ -68,5 +68,5 @@ STORE const * KMX_Options::end() const {
 }
 
 } // namespace kmx
-} // namespace kbp
+} // namespace core
 } // namespace km

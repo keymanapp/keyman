@@ -3,5 +3,5 @@
     "languages": [
         $LANGUAGES_KEYBOARD_INFO
     ],
-	  "description": "$NAME generated from template"
+	  "description": "$DESCRIPTION"
 }

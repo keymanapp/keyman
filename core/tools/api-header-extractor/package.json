@@ -1,0 +1,6 @@
+{
+  "name": "@keymanapp/api-header-extractor",
+  "private": true,
+  "type": "module",
+  "main": "build/src/index.js"
+}

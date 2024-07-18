@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import os.log
 
 private let toolbarButtonTag = 100
 private let toolbarLabelTag = 101
@@ -57,7 +58,7 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
       observer: self,
       function: LexicalModelPickerViewController.lexicalModelDownloadFailed)
     
-    log.info("didLoad: LexicalModelPickerViewController (registered lexicalModelDownloadCompleted et al)")
+    os_log("viewDidLoad: LexicalModelPickerViewController (registered lexicalModelDownloadCompleted et al)", log:KeymanEngineLogger.ui, type: .info)
   }
   
   override func viewWillAppear(_ animated: Bool) {
@@ -69,8 +70,8 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
-    log.info("didAppear: LexicalModelPickerViewController")
-    
+    os_log("viewDidAppear: LexicalModelPickerViewController", log:KeymanEngineLogger.ui, type: .info)
+
     scroll(toSelectedLexicalModel: false)
 }
   
@@ -176,8 +177,8 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   }
   
   private func lexicalModelDownloadCompleted() {
-    log.info("lexicalModelDownloadCompleted LexicalModelPicker")
-    
+    os_log("lexicalModelDownloadCompleted LexicalModelPicker", log:KeymanEngineLogger.ui, type: .info)
+
     // Actually used now.
     view.isUserInteractionEnabled = true
     navigationItem.leftBarButtonItem?.isEnabled = true
@@ -286,7 +287,8 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
     //get list of lexical models for this languageID and show it
     Queries.LexicalModel.fetch(forLanguageCode: language.id) { result, error in
       if let error = error {
-        log.info("Failed to fetch lexical model list for "+self.language.id+". error: "+error.localizedDescription)
+        let errorMessage = "Failed to fetch lexical model list for \(self.language.id). Error: \(error.localizedDescription)"
+        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, errorMessage)
         DispatchQueue.main.async {
           self.lexicalModelDownloadFailed(PackageDownloadFailedNotification(packageKey: nil, error: error))
         }
@@ -301,7 +303,8 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
       if result.count == 0 {
         self.noModelsAvailable(cause: "empty")
       } else {
-        log.info("Fetched lexical model list for "+self.language.id+".")
+        let message = "Fetched lexical model list for \(self.language.id)."
+        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
         let packages: [(InstallableLexicalModel, URL)] = result.map { ($0.modelFor(languageID: self.language.id)!, URL.init(string: $0.packageFilename)!) }
         // show the list of lexical models (on the main thread)
         DispatchQueue.main.async {
@@ -317,11 +320,11 @@ class LexicalModelPickerViewController: UITableViewController, UIAlertViewDelega
   }
 
   func noModelsAvailable(cause: String = "nil") {
-    let msg = NSLocalizedString("menu-lexical-model-none-message", bundle: engineBundle, comment: "")
-    let logMsg = "No lexical models available for language \(language.id): (\(cause))"
-    log.info(logMsg)
+    let message = NSLocalizedString("menu-lexical-model-none-message", bundle: engineBundle, comment: "")
+    let logMessage = "No lexical models available for language \(language.id): (\(cause))"
+    os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, logMessage)
 
-    let alertController = UIAlertController(title: title, message: msg,
+    let alertController = UIAlertController(title: title, message: message,
                                             preferredStyle: UIAlertController.Style.alert)
     alertController.addAction(UIAlertAction(title: NSLocalizedString("command-ok", bundle: engineBundle, comment: ""),
                                             style: UIAlertAction.Style.default,

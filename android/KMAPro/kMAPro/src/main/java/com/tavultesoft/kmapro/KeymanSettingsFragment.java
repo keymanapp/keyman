@@ -17,9 +17,9 @@ import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceScreen;
 import androidx.preference.SwitchPreference;
 
-import com.tavultesoft.kmea.DisplayLanguages;
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.data.Dataset;
+import com.keyman.engine.DisplayLanguages;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.data.Dataset;
 
 import java.util.HashMap;
 

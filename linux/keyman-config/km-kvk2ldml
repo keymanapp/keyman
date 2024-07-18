@@ -5,7 +5,8 @@ import logging
 import os
 import sys
 
-from keyman_config import __version__
+from keyman_config import add_standard_arguments, initialize_logging, initialize_sentry, verify_dbus_running
+from keyman_config.kvk2ldml import parse_kvk_file, print_kvk, convert_ldml, output_ldml
 
 
 def main():
@@ -16,19 +17,13 @@ def main():
     parser.add_argument('-k', "--keys", help='if printing also print all keys', action="store_true")
     parser.add_argument('kvkfile', help='kvk file')
     parser.add_argument('-o', '--output', metavar='LDMLFILE', help='output LDML file location')
-    parser.add_argument('--version', action='version', version='%(prog)s version ' + __version__)
-    parser.add_argument('-v', '--verbose', action='store_true', help='verbose logging')
-    parser.add_argument('-vv', '--veryverbose', action='store_true', help='very verbose logging')
+    add_standard_arguments(parser)
 
     args = parser.parse_args()
-    if args.verbose:
-        logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(message)s')
-    elif args.veryverbose:
-        logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(message)s')
-    else:
-        logging.basicConfig(format='%(levelname)s:%(message)s')
 
-    from keyman_config.kvk2ldml import parse_kvk_file, print_kvk, convert_ldml, output_ldml
+    initialize_logging(args)
+    initialize_sentry()
+    verify_dbus_running()
 
     name, ext = os.path.splitext(args.kvkfile)
     # Check if input file extension is kvk
@@ -48,14 +43,25 @@ def main():
     if args.print:
         print_kvk(kvkData, args.keys)
 
-    if args.output:
-        outputfile = args.output
-    else:
-        outputfile = name + ".ldml"
+    outputfile = args.output if args.output else f'{name}.ldml'
 
-    with open(outputfile, 'wb') as ldmlfile:
-        ldml = convert_ldml(kvkData)
-        output_ldml(ldmlfile, ldml)
+    dirname = os.path.dirname(outputfile)
+    if not os.path.isdir(dirname):
+        if os.path.exists(dirname):
+            logging.error(f'km-kvk2ldml: error, `{dirname}` exists but is not a directory')
+            sys.exit(3)
+        os.makedirs(dirname)
+
+    try:
+        with open(outputfile, 'wb') as ldmlfile:
+            ldml = convert_ldml(kvkData)
+            output_ldml(ldmlfile, ldml)
+    except PermissionError:
+        logging.error(f'km-kvk2ldml: error, permission denied writing file `{outputfile}`')
+        sys.exit(4)
+    except IsADirectoryError:
+        logging.error(f'km-kvk2ldml: error, cannot create file `{outputfile}` - it is a directory')
+        sys.exit(5)
 
 
 if __name__ == "__main__":

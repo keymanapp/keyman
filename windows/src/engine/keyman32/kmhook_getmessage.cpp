@@ -249,19 +249,6 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 	}
 
 	/*
-	 Handle WM_UNICHAR messages for RichEdit control -- should we test RichEdit version?
-	*/
-
-	if(mp->message == WM_UNICHAR && Addin_ShouldProcessUnichar(mp->hwnd))
-	{
-		if(Addin_ProcessUnichar(mp->hwnd, (DWORD) mp->wParam))
-		{
-			mp->message = 0;
-			return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
-		}
-	}
-
-	/*
 	 Handle wm_keyman_control_internal messages
 	*/
 
@@ -271,7 +258,6 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 
 	if(_td->lpActiveKeyboard)
 	{
-		_td->state.lpkb = _td->lpActiveKeyboard->Keyboard;
     _td->state.lpCoreKb = _td->lpActiveKeyboard->lpCoreKeyboard;
 	}
    // I4412
@@ -280,11 +266,6 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 		SendDebugMessageFormat(0, sdmInternat, 0, "GetMessage: wm_keymanshift %x %x", mp->wParam, mp->lParam);
     SelectApplicationIntegration();
 		if(!_td->app->IsWindowHandled(mp->hwnd)) _td->app->HandleWindow(mp->hwnd);
-		if(_td->app->DebugControlled())
-		{
-			if(mp->wParam == 1) *Globals::ShiftState() = (DWORD) mp->lParam;
-			else *Globals::ShiftState() = 0;
-		}
 		return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
 	}
 
@@ -297,20 +278,17 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 			{
 				if(_td->app)
 				{
-          BOOL isUsingCoreProcessor = Globals::get_CoreIntegration();
-
-          if (isUsingCoreProcessor) {
-            // Call the core keyboard processor to process the queued actions
-            if (!_td->lpActiveKeyboard) {
-              return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
-            }
-            if (KM_KBP_STATUS_OK != km_kbp_process_queued_actions(_td->lpActiveKeyboard->lpCoreKeyboardState)) {
-              SendDebugMessageFormat(0, sdmGlobal, 0, "_kmnGetMessageProc wm_keymanim_close process event fail");
-              return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
-            }
-            BOOL emitKeyStroke;
-            ProcessActions(&emitKeyStroke);
+          // Call the core keyboard processor to process the queued actions
+          if (!_td->lpActiveKeyboard) {
+            return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
           }
+          if (KM_CORE_STATUS_OK != km_core_process_queued_actions(_td->lpActiveKeyboard->lpCoreKeyboardState)) {
+            SendDebugMessageFormat(0, sdmGlobal, 0, "_kmnGetMessageProc wm_keymanim_close process event fail");
+            return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
+          }
+          BOOL emitKeyStroke;
+          ProcessActions(&emitKeyStroke);
+
           _td->app->SetCurrentShiftState(Globals::get_ShiftState());
           _td->app->SendActions();
 				}
@@ -372,7 +350,6 @@ void ProcessWMKeyman(HWND hwnd, WPARAM wParam, LPARAM lParam)
       hwnd = GetFocus();
 
 		  if(_td->lpActiveKeyboard) {
-			  _td->state.lpkb = _td->lpActiveKeyboard->Keyboard;
         _td->state.lpCoreKb = _td->lpActiveKeyboard->lpCoreKeyboard;
 		  }
 
@@ -384,7 +361,6 @@ void ProcessWMKeyman(HWND hwnd, WPARAM wParam, LPARAM lParam)
 		  {
         if(_td->app) _td->app->ResetQueue();
 	  	  GetCapsAndNumlockState();
-  		  Addin_FocusChanged(hwnd);
 	  	  UpdateActiveWindows();
       }
     }

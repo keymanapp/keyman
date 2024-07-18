@@ -34,7 +34,7 @@ typedef struct tagKEYBOARD
 
     DWORD dwFileVersion;	// Version of the file - Keyman 4.0 is 0x0400
 
-    DWORD dwCheckSum;		// As stored in keyboard
+    DWORD dwCheckSum;		// As stored in keyboard. DEPRECATED as of 16.0
     DWORD xxkbdlayout;    	// as stored in HKEY_LOCAL_MACHINE//system//currentcontrolset//control//keyboard layouts
     DWORD IsRegistered;		// layout id, from same registry key
     DWORD version;			// keyboard version

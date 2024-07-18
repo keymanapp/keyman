@@ -1,12 +1,8 @@
 {
-  "extends": "../../../tsconfig-base.json",
+  "extends": "../tsconfig.kmw-worker-base.json",
   "compilerOptions": {
     "declaration": true,
-    "module": "none",
     "outDir": "build/",
-    "sourceMap": true,
-    "lib": ["es6"],
-    "target": "es5"
   },
   "include": ["./*.ts"],
   "exclude": ["test.ts"]

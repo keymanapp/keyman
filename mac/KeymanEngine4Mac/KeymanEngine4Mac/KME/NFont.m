@@ -11,18 +11,18 @@
 @implementation NFont
 
 - (id)init {
-    self = [super init];
-    if (self) {
-        _name = @"";
-    }
-    
-    return self;
+  self = [super init];
+  if (self) {
+    _name = @"";
+  }
+  
+  return self;
 }
 
 - (NSString *)description {
-    NSString *format = @"<%@:%p N:%@ S:%d C:%d>";
-    NSString *str = [NSString stringWithFormat:format, self.className, self, self.name, self.size, self.color];
-    return str;
+  NSString *format = @"<%@:%p N:%@ S:%d C:%d>";
+  NSString *str = [NSString stringWithFormat:format, self.className, self, self.name, self.size, self.color];
+  return str;
 }
 
 @end

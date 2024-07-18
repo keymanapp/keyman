@@ -32,10 +32,10 @@ import com.android.installreferrer.api.InstallReferrerStateListener;
 import com.android.installreferrer.api.ReferrerDetails;
 import com.tavultesoft.kmapro.MainActivity;
 import com.tavultesoft.kmapro.R;
-import com.tavultesoft.kmea.KmpInstallMode;
-import com.tavultesoft.kmea.util.KMLog;
-import com.tavultesoft.kmea.util.KMString;
-import com.tavultesoft.kmea.util.VersionUtils;
+import com.keyman.engine.KmpInstallMode;
+import com.keyman.engine.util.KMLog;
+import com.keyman.engine.util.KMString;
+import com.keyman.engine.util.VersionUtils;
 
 public class CheckInstallReferrer {
   private static final String TAG = "CheckInstallReferrer";
@@ -91,7 +91,7 @@ public class CheckInstallReferrer {
     }
     
     if (!installerInfo.equalsIgnoreCase(GOOGLE_PLAY)) {
-      KMLog.LogInfo(TAG, "Skipping install referrer. Installed from " + installerInfo);
+      // Don't log install referrer #10762
       return;
     }
 

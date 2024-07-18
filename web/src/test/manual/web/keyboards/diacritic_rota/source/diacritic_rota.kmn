@@ -1,0 +1,62 @@
+﻿c diacritic_rota generated from template at 2023-10-25 10:16:56
+c with name "Diacritic Rota"
+store(&VERSION) '14.0'
+store(&NAME) 'Diacritic 10-key Rota'
+store(&COPYRIGHT) '© SIL International'
+store(&KEYBOARDVERSION) '1.0'
+store(&BITMAP) 'diacritic_rota.ico'
+store(&VISUALKEYBOARD) 'diacritic_rota.kvks'
+store(&LAYOUTFILE) 'diacritic_rota.keyman-touch-layout'
+store(&TARGETS) 'web iphone ipad androidphone androidtablet mobile desktop'
+
+store(basekeys)    [K_A] .. [K_Z]
+store(bigkeys)     [SHIFT K_A] .. [SHIFT K_Z]
+
+store(basealpha)   'abcdefghijklmnopqrstuvwxyz'
+store(bigalpha)    'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+store(alphagrave)  'àbcdèfghìjklmǹòpqrstùvẁxỳz'
+store(biggrave)    'ÀBCDÈFGHÌJKLMǸÒPQRSTÙVẀXỲZ'
+
+store(alphaacute)  'ábćdéfǵhíjḱĺḿńóṕqŕśtúvẃxýź'
+store(bigacute)    'ÁBĆDÉFǴHÍJḰĹḾŃÓṔQŔŚTÚVẂXÝŹ'
+
+store(alphacircum) 'âbĉdêfĝĥîĵklmnôpqrŝtûvŵxŷẑ'
+store(bigcircum)   'ÂBĈDÊFĜĤÎĴKLMNÔPQRŜTÛVŴXŶẐ'
+
+store(dias)        U+0300 U+0301 U+0302
+store(all_dks)     dk(1) dk(2) dk(3)
+
+begin Unicode > use(main)
+
+group(main) using keys
+
++ [ T_DK_DIA_GRAVE  ]  > U+0300 dk(1)
++ [ T_DK_DIA_ACUTE  ]  > U+0301 dk(2)
++ [ T_DK_DIA_CIRCUM ]  > U+0302 dk(3)
+
++ [ SHIFT T_DK_DIA_GRAVE  ]  > U+0300 dk(1)
++ [ SHIFT T_DK_DIA_ACUTE  ]  > U+0301 dk(2)
++ [ SHIFT T_DK_DIA_CIRCUM ]  > U+0302 dk(3)
+
++ [T_NEW_71] > 'Monster'
+
++ any(basekeys) > index(basealpha, 1)
++ any(bigkeys)  > index(bigalpha, 1)
+
+any(dias) any(all_dks) + [K_SPACE] > ' '
+any(dias) any(all_dks) + [SHIFT K_SPACE] > ' '
+
+match > use(combine)
+
+c ========
+
+group(combine)
+
+U+0300 dk(1) any(basealpha) > index(alphagrave,  3)
+U+0301 dk(2) any(basealpha) > index(alphaacute,  3)
+U+0302 dk(3) any(basealpha) > index(alphacircum, 3)
+
+U+0300 dk(1) any(bigalpha) > index(biggrave,  3)
+U+0301 dk(2) any(bigalpha) > index(bigacute,  3)
+U+0302 dk(3) any(bigalpha) > index(bigcircum, 3)

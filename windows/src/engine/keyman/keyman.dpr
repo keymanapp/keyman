@@ -9,7 +9,6 @@ uses
   custinterfaces in '..\..\global\delphi\cust\custinterfaces.pas',
   Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
   GetOsVersion in '..\..\..\..\common\windows\delphi\general\GetOsVersion.pas',
-  CRC32 in '..\..\..\..\common\windows\delphi\general\CRC32.pas',
   KeyNames in '..\..\..\..\common\windows\delphi\general\KeyNames.pas',
   MessageIdentifiers in '..\..\global\delphi\cust\MessageIdentifiers.pas',
   kmint in 'kmint.pas',
@@ -126,7 +125,7 @@ uses
 const
   LOGGER_DESKTOP_ENGINE_KEYMAN = TKeymanSentryClient.LOGGER_DESKTOP_ENGINE + '.keyman';
 begin
-  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop, LOGGER_DESKTOP_ENGINE_KEYMAN);
+  TKeymanSentryClient.Start(TSentryClientVcl, kscpDesktop, LOGGER_DESKTOP_ENGINE_KEYMAN, LoadKeymanDesktopSentryFlags);
   try
     Run;
   finally

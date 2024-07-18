@@ -1,6 +1,76 @@
 {
   "name": "keyman",
   "description": "Facilitates text input in any language.",
+  "exports": {
+    "./app/browser": {
+      "es6-bundling": "./src/app/browser/src/test-index.ts",
+      "types": "./build/app/browser/obj/test-index.d.js",
+      "import": "./build/app/browser/obj/test-index.js"
+    },
+    "./engine/attachment": {
+      "es6-bundling": "./src/engine/attachment/src/index.ts",
+      "types": "./build/engine/attachment/obj/index.d.ts",
+      "import": "./build/engine/attachment/obj/index.js"
+    },
+    "./engine/paths": {
+      "es6-bundling": "./src/engine/paths/src/index.ts",
+      "types": "./build/engine/paths/obj/index.d.ts",
+      "import": "./build/engine/paths/obj/index.js"
+    },
+    "./engine/device-detect": {
+      "es6-bundling": "./src/engine/device-detect/src/index.ts",
+      "types": "./build/engine/device-detect/obj/index.d.ts",
+      "import": "./build/engine/device-detect/obj/index.js"
+    },
+    "./engine/dom-utils": {
+      "es6-bundling": "./src/engine/dom-utils/src/index.ts",
+      "types": "./build/engine/dom-utils/obj/index.d.ts",
+      "import": "./build/engine/dom-utils/obj/index.js"
+    },
+    "./engine/element-wrappers": {
+      "es6-bundling": "./src/engine/element-wrappers/src/index.ts",
+      "types": "./build/engine/element-wrappers/obj/index.d.ts",
+      "import": "./build/engine/element-wrappers/obj/index.js"
+    },
+    "./engine/events": {
+      "es6-bundling": "./src/engine/events/src/index.ts",
+      "types": "./build/engine/events/obj/index.d.ts",
+      "import": "./build/engine/events/obj/index.js"
+    },
+    "./engine/package-cache": {
+      "es6-bundling": "./src/engine/package-cache/src/index.ts",
+      "types": "./build/engine/package-cache/obj/index.d.ts",
+      "import": "./build/engine/package-cache/obj/index.js",
+      "require": "./build/engine/package-cache/obj/index.js"
+    },
+    "./engine/package-cache/dom-requester": {
+      "es6-bundling": "./src/engine/package-cache/src/domCloudRequester.ts",
+      "types": "./build/engine/package-cache/obj/domCloudRequester.d.ts",
+      "import": "./build/engine/package-cache/obj/domCloudRequester.js"
+    },
+    "./engine/package-cache/node-requester": {
+      "es6-bundling": "./src/engine/package-cache/src/nodeCloudRequester.ts",
+      "types": "./build/engine/package-cache/obj/nodeCloudRequester.d.ts",
+      "import": "./build/engine/package-cache/obj/nodeCloudRequester.js"
+    },
+    "./engine/main": {
+      "es6-bundling": "./src/engine/main/src/index.ts",
+      "types": "./build/engine/main/obj/index.d.ts",
+      "import": "./build/engine/main/obj/index.js"
+    },
+    "./engine/osk": {
+      "es6-bundling": "./src/engine/osk/src/index.ts",
+      "types": "./build/engine/osk/obj/index.d.ts",
+      "import": "./build/engine/osk/obj/index.js"
+    },
+    "./engine/osk/internals": {
+      "types": "./build/engine/osk/obj/test-index.d.ts",
+      "import": "./build/engine/osk/obj/test-index.js"
+    }
+  },
+  "imports": {
+    "#recorder": "./build/tools/testing/recorder/obj/index.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/keymanapp/keyman.git"
@@ -19,35 +89,14 @@
   "devDependencies": {
     "@keymanapp/resources-gosh": "*",
     "@keymanapp/web-sentry-manager": "*",
-    "@sentry/cli": "2.2.0",
-    "chai": "^4.3.4",
-    "google-closure-compiler-java": "^20200224.0.0",
-    "karma": "^6.4.1",
-    "karma-browserstack-launcher": "^1.6.0",
-    "karma-chai": "^0.1.0",
-    "karma-chrome-launcher": "^2.2.0",
-    "karma-edge-launcher": "^0.4.2",
-    "karma-firefox-launcher": "^1.1.0",
-    "karma-fixture": "^0.2.6",
-    "karma-html2js-preprocessor": "^1.1.0",
-    "karma-ie-launcher": "^1.0.0",
-    "karma-json-fixtures-preprocessor": "0.0.6",
-    "karma-mocha": "^2.0.1",
-    "karma-mocha-reporter": "^2.2.5",
-    "karma-safari-launcher": "^1.0.0",
-    "karma-teamcity-reporter": "^1.1.0",
-    "mocha": "^10.0.0",
-    "modernizr": "^3.11.7",
-    "ts-node": "^9.1.1",
-    "typescript": "^4.5.4"
+    "@sentry/cli": "^2.31.0",
+    "@zip.js/zip.js": "^2.7.32",
+    "c8": "^7.12.0",
+    "jsdom": "^23.0.1",
+    "mocha": "^10.0.0"
   },
   "scripts": {
-    "tsc": "tsc",
-    "test": "gosh ./unit_tests/test.sh",
-    "karma": "karma",
-    "mocha": "mocha",
-    "modernizr": "modernizr",
-    "sentry-cli": "sentry-cli"
+    "test": "gosh ./test.sh"
   },
   "dependencies": {
     "@keymanapp/input-processor": "*",
@@ -56,8 +105,11 @@
     "@keymanapp/lexical-model-layer": "*",
     "@keymanapp/models-types": "*",
     "@keymanapp/recorder-core": "*",
+    "@keymanapp/tslib": "*",
     "@keymanapp/web-utils": "*",
-    "@types/node": "^11.9.4",
-    "eventemitter3": "^4.0.0"
-  }
+    "core-js": "^3.34.0",
+    "eventemitter3": "^5.0.0",
+    "tslib": "^2.5.2"
+  },
+  "type": "module"
 }

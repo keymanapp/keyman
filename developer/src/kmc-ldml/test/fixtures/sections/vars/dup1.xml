@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="vars-minimal"/>
+
+  <keys />
+
+  <!-- from spec -->
+  <variables>
+    <string id="y" value="yes" /> <!-- ERROR: duplicate -->
+    <string id="upper" value="UPPERCASE" /> <!-- ERROR: duplicate -->
+    <set id="upper" value="A B C D E FF" /> <!-- ERROR: duplicate -->
+    <set id="y" value="Y E S" /> <!-- ERROR: duplicate -->
+    <uset id="consonants" value="[कसतनमह]" /> <!-- a UnicodeSet -->
+    <uset id="y" value="[y e s]" />  <!-- ERROR: duplicate -->
+  </variables>
+
+</keyboard3>

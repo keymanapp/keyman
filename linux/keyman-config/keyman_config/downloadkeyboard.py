@@ -7,7 +7,11 @@ import urllib.parse
 import gi
 
 gi.require_version('Gtk', '3.0')
-gi.require_version('WebKit2', '4.0')
+try:
+    gi.require_version('WebKit2', '4.1')
+except ValueError:
+    # TODO: Remove once we drop support for Ubuntu 20.04 Focal
+    gi.require_version('WebKit2', '4.0')
 
 from gi.repository import Gtk, WebKit2
 
@@ -30,19 +34,41 @@ class DownloadKmpWindow(Gtk.Dialog):
         s = Gtk.ScrolledWindow()
         self.webview = WebKit2.WebView()
         self.webview.connect("decide-policy", self._keyman_policy)
+        self.webview.connect("load-changed", self._update_back_button)
         url = KeymanComUrl + "/go/linux/" + __releaseversion__ + "/download-keyboards"
         self.webview.load_uri(url)
         s.add(self.webview)
 
         self.get_content_area().pack_start(s, True, True, 0)
 
-        self.add_button(_("_Close"), Gtk.ResponseType.CLOSE)
+        hbox = Gtk.Box(spacing=6)
+        self.get_content_area().pack_start(hbox, False, False, 0)
+
+        self.back_button = Gtk.Button.new_with_mnemonic(_("_Back"))
+        self.back_button.set_tooltip_text(_("Back to search"))
+        self.back_button.connect("clicked", self._on_back_clicked)
+        self.back_button.set_sensitive(False)
+        hbox.pack_start(self.back_button, False, False, 0)
+
+        close_button = Gtk.Button.new_with_mnemonic(_("_Close"))
+        close_button.set_tooltip_text(_("Close dialog"))
+        close_button.connect("clicked", self._on_close_clicked)
+        hbox.pack_end(close_button, False, False, 0)
 
         if self.parentWindow is not None:
             self.getinfo = GetInfo(self.parentWindow.incomplete_kmp)
 
         self.resize(800, 450)
         self.show_all()
+
+    def _update_back_button(self, webview, load_event):
+        self.back_button.set_sensitive(webview.can_go_back())
+
+    def _on_back_clicked(self, button):
+        self.webview.go_back()
+
+    def _on_close_clicked(self, button):
+        self.response(Gtk.ResponseType.CLOSE)
 
     def _process_kmp(self, url, downloadfile: str):
         logging.info("Downloading kmp file to %s", downloadfile)
@@ -52,6 +78,12 @@ class DownloadKmpWindow(Gtk.Dialog):
             self.response(Gtk.ResponseType.OK)
             self.close()
             return True
+        logging.error(_("Downloading kmp file failed"))
+        dialog = Gtk.MessageDialog(
+                  self, 0, Gtk.MessageType.ERROR,
+                  Gtk.ButtonsType.OK, _("Downloading keyboard file failed"))
+        dialog.run()
+        dialog.destroy()
         return False
 
     def _keyman_policy(self, web_view, decision, decision_type):

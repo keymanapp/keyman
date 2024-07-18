@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="keys-minimal"/>
+
+  <keys>
+    <key id="grave" output="`" />
+    <key id="one" output="1" />
+    <key id="two" output="2" />
+    <key id="three" output="3" />
+    <key id="four" output="4" />
+    <key id="five" output="5" />
+    <key id="six" output="6" />
+    <key id="seven" output="7" />
+    <key id="eight" output="8" />
+    <key id="nine" output="9" />
+    <key id="zero" output="0" />
+    <key id="ten" output="10" />
+    <key id="eleven" output="11" />
+    <key id="minus" output="-" />
+    <key id="equal" output="=" />
+  </keys>
+
+  <layers formId="us">
+    <layer id="base">
+      <!-- beware: this is mapping ` and 1! -->
+      <row keys="grave one two three four five six seven eight nine ten eleven minus equal" />
+    </layer>
+  </layers>
+</keyboard3>

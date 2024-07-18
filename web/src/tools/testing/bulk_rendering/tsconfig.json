@@ -1,0 +1,19 @@
+{
+  "extends": "../../../tsconfig.dom.json",
+
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "../../../../build/tools/testing/bulk_rendering/obj/",
+    "tsBuildInfoFile": "../../../../build/tools/testing/bulk_rendering/obj/tsconfig.tsbuildinfo",
+    "rootDir": "."
+  },
+
+  "files": [
+    "renderer_core.ts"
+  ],
+
+	"references": [
+    { "path": "../../../app/browser" },
+    { "path": "../../../engine/device-detect" }
+	]
+}

@@ -22,11 +22,11 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.tavultesoft.kmea.data.Dataset;
-import com.tavultesoft.kmea.data.adapters.AdapterFilter;
-import com.tavultesoft.kmea.data.adapters.NestedAdapter;
-import com.tavultesoft.kmea.KeyboardPickerActivity;
-import com.tavultesoft.kmea.KMManager;
+import com.keyman.engine.data.Dataset;
+import com.keyman.engine.data.adapters.AdapterFilter;
+import com.keyman.engine.data.adapters.NestedAdapter;
+import com.keyman.engine.KeyboardPickerActivity;
+import com.keyman.engine.KMManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -152,6 +152,7 @@ public final class LanguagesSettingsActivity extends AppCompatActivity {
 
   @Override
   public void onBackPressed() {
+    super.onBackPressed();
     finish();
   }
 

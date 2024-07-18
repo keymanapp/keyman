@@ -598,6 +598,7 @@ printf("-------\n");
 
   return TRUE;
 }
+int mac_KMX_GetDeadkeys( const UCKeyboardLayout * keyboard_layout,  v_dw_3D &All_Vector, KMX_WCHAR deadkey, UINT shift_dk, KMX_WORD *OutputPairs ) {
 
 
   /**
@@ -735,7 +736,6 @@ bool moreval=false;
         else  ss_rgkey= 999;
 if( (ss==1) || (ss==3) || (ss==5) || (ss==7) || (ss==9) )
 continue;
-
           int keyvalsearch= mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout,  key,  ss,  caps);
 
           count++;
@@ -767,7 +767,6 @@ bool print_character_of_key_S2(const UCKeyboardLayout * keyboard_layout, int key
 int ss_rgkey;
   for ( int ss=0; ss< 6;ss++) {
     for ( int caps=0; caps< 2;caps++) {
-
           int keyvalsearch= mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout,  key,  2*ss,  caps);
           printf( " key %i has values : %i (%c) ( ss:%i, caps:%i) \n", key,  keyvalsearch,keyvalsearch, 2*ss, caps);
     }

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>12.0.1500.0</KeymanDeveloperVersion>
+    <FileVersion>12.0</FileVersion>
+  </System>
+  <Info>
+    <Name URL="">SENĆOŦEN (Saanich Dialect) Lexical Model</Name>
+    <Copyright URL="">© 2019 National Research Council Canada</Copyright>
+    <Author URL="mailto:Eddie.Santos@nrc-cnrc.gc.ca">Eddie Antonio Santos</Author>
+    <Version>1.0.3</Version>
+  </Info>
+  <Files>
+    <File>
+      <Name>..\build\withfolders.qaa.sencoten.model.js</Name>
+      <Description>Lexical model withfolders.qaa.sencoten.model.js</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.model.js</FileType>
+    </File>
+    <File>
+      <Name>welcome.htm</Name>
+      <Description>Welcome file</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.htm</FileType>
+    </File>
+  </Files>
+  <LexicalModels>
+    <LexicalModel>
+      <Name>SENĆOŦEN dictionary</Name>
+      <ID>withfolders.qaa.sencoten</ID>
+      <Languages>
+        <Language ID="qaa">North Straits Salish</Language>
+        <Language ID="qaa-Latn">SENĆOŦEN</Language>
+      </Languages>
+    </LexicalModel>
+  </LexicalModels>
+</Package>

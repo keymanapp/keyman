@@ -7,6 +7,10 @@ type
     class procedure Build(const LangTagsFile, DestinationFile: string);
   end;
 
+const
+  { Index of the _version record in the langtags.json file }
+  IndexOfVersionRecord = 3;
+
 implementation
 
 uses
@@ -85,7 +89,7 @@ begin
   end;
 
   try
-    for i := 0 to 2 do
+    for i := 0 to IndexOfVersionRecord do
     begin
       if (FLangTags.Items[i] as TJSONObject).Values['tag'].Value = '_version' then
       begin
@@ -153,11 +157,11 @@ begin
       FResult.Add('');
       FResult.Add('{ TLangTagsMap }');
       FResult.Add('');
-      FResult.Add(Format('const CLangTags: array[0..%d] of TLangTag = (', [FLangTags.Count - 4]));
+      FResult.Add(Format('const CLangTags: array[0..%d] of TLangTag = (', [FLangTags.Count - IndexOfVersionRecord - 2]));
 
       comma := ',';
       FTagMapCount := 0;
-      for i := 3 to FLangTags.Count - 1 do
+      for i := IndexOfVersionRecord + 1 to FLangTags.Count - 1 do
       begin
         if i = FLangTags.Count - 1 then comma := '';
         FLangTag := FLangTags.Items[i] as TJSONObject;
@@ -194,7 +198,7 @@ begin
       FResult.Add(Format('const CAllTags: array[0..%d] of TStringMap = (', [FTagMapCount-1]));
 
       comma := '';
-      for i := 3 to FLangTags.Count - 1 do
+      for i := IndexOfVersionRecord + 1 to FLangTags.Count - 1 do
       begin
         FLangTag := FLangTags.Items[i] as TJSONObject;
 

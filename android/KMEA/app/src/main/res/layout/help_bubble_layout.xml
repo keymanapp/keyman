@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
     
-    <com.tavultesoft.kmea.KMPopoverView
+    <com.keyman.engine.KMPopoverView
         android:id="@+id/kmPopoverView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

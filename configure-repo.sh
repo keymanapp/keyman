@@ -10,7 +10,7 @@ if [[ -n "$WINDIR" ]]; then
   # https://stackoverflow.com/a/39160850/1836776
   SCRIPT_DIR=$(cmd //C cd)
 else
-  SCRIPT_DIR="$(dirname "$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")")"
+  SCRIPT_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 fi
 
 case $1 in

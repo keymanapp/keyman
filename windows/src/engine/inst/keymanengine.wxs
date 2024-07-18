@@ -13,7 +13,7 @@
         <Directory Id="KEYMANROOT" Name="Keyman">
           <Directory Id="KEYMAN_ENGINE" Name="Keyman Engine">
             <Directory Id="INSTALLDIR">
-              <Directory Id="dir_sentry_0.4.9" Name="sentry-0.4.9" />
+              <Directory Id="dir_sentry_0.6.0" Name="sentry-0.6.0" />
               <Directory Id="xml" Name="xml">
                 <Directory Id="osk" Name="osk" FileSource="..\..\engine\xml\osk\">
                   <Component Id="xml" Guid="{58D31506-F964-47AF-B4A0-51107A74C2FE}">
@@ -91,7 +91,7 @@
       <Custom Action="EnginePostInstall" Before="InstallFinalize"><![CDATA[NOT Installed OR UPGRADINGPRODUCTCODE Or REINSTALL]]></Custom>
     </InstallExecuteSequence>
 
-    <Binary Id="insthelper.dll" SourceFile="..\..\..\bin\inst\insthelper.dll" />
+    <Binary Id="insthelper.dll" SourceFile="..\..\..\bin\engine\insthelper.dll" />
 
   </Module>
 </Wix>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  .kvks file schema, version 10.0
+
+  Copyright (C) SIL International
+
+  Supports KVKS files for Keyman Developer 10+
+
+  Expects version 10.0
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+<xs:element name="visualkeyboard">
+  <xs:complexType>
+    <xs:all>
+      <xs:element name="header" type="kvk-header" />
+      <xs:element minOccurs="0" name="encoding" type="kvk-encoding" />
+    </xs:all>
+  </xs:complexType>
+</xs:element>
+
+<xs:complexType name="kvk-header">
+  <xs:all>
+    <xs:element name="version" type="kvk-version" />
+    <xs:element minOccurs="0" name="kbdname" type="xs:string" />
+    <xs:element minOccurs="0" name="flags" type="kvk-header-flags" />
+    <xs:element minOccurs="0" name="layout" type="xs:string" />
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="kvk-header-flags">
+  <xs:all>
+    <xs:element minOccurs="0" name="key102" type="km-empty" />
+    <xs:element minOccurs="0" name="displayunderlying" type="km-empty" />
+    <xs:element minOccurs="0" name="usealtgr" type="km-empty" />
+    <xs:element minOccurs="0" name="useunderlying" type="km-empty" />
+  </xs:all>
+</xs:complexType>
+
+<xs:complexType name="kvk-encoding">
+  <xs:sequence>
+    <xs:element minOccurs="0" maxOccurs="unbounded" name="layer" type="kvk-layer" />
+  </xs:sequence>
+  <xs:attribute name="name" type="kvk-encoding-name" use="required" />
+  <xs:attribute name="fontname" type="xs:string" />
+  <xs:attribute name="fontsize" type="xs:double" />
+</xs:complexType>
+
+<xs:simpleType name="kvk-encoding-name">
+  <xs:restriction base="xs:string">
+    <xs:enumeration value="ansi" />
+    <xs:enumeration value="unicode" />
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:complexType name="kvk-layer">
+  <xs:sequence><xs:element minOccurs="0" maxOccurs="unbounded" name="key" type="kvk-key" /></xs:sequence>
+  <xs:attribute name="shift" use="required" type="kvk-layer-shift" />
+</xs:complexType>
+
+<xs:simpleType name="kvk-layer-shift">
+  <xs:restriction base="xs:string">
+    <xs:pattern value="S?(C|LC|RC)?(A|LA|RA)?" />
+  </xs:restriction>
+</xs:simpleType>
+
+<xs:complexType name="kvk-key" mixed="true">
+  <xs:sequence>
+    <xs:element minOccurs="0" name="bitmap" type="xs:string" />
+  </xs:sequence>
+  <xs:attribute name="vkey" type="xs:string" use="required" />
+</xs:complexType>
+
+<xs:simpleType name="kvk-version">
+  <xs:restriction base="km-version">
+    <xs:enumeration value="10.0" />
+  </xs:restriction>
+</xs:simpleType>
+
+<!-- Some base types -->
+
+<xs:complexType name="km-empty">
+  <xs:sequence/>
+</xs:complexType>
+
+<xs:simpleType name="km-version">
+  <xs:restriction base="xs:string">
+    <xs:pattern value="(\d+\.)+(\d+)"/>
+  </xs:restriction>
+</xs:simpleType>
+
+</xs:schema>

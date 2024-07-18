@@ -1,0 +1,25 @@
+{
+  "extends": "../../kmc/tsconfig.kmc-base.json",
+
+  "compilerOptions": {
+      "rootDir": ".",
+      "rootDirs": ["./", "../src/"],
+      "outDir": "../build/test",
+      "esModuleInterop": true,
+      "allowSyntheticDefaultImports": true,
+      "baseUrl": ".",
+      "paths": {
+        "@keymanapp/developer-test-helpers": ["../../common/web/test-helpers/index"],
+      },
+  },
+  "include": [
+      "**/test-*.ts",
+      "*.ts",
+      "helpers/*.ts",
+      "wordbreakers/*.ts"
+  ],
+  "references": [
+      { "path": "../" },
+      { "path": "../../common/web/test-helpers/" },
+    ]
+}

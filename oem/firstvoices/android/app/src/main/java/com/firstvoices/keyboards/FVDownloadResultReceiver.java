@@ -8,8 +8,8 @@ import android.os.ResultReceiver;
 import android.widget.Toast;
 
 import com.firstvoices.android.FVKmpInstallMode;
-import com.tavultesoft.kmea.BaseActivity;
-import com.tavultesoft.kmea.util.FileUtils;
+import com.keyman.engine.BaseActivity;
+import com.keyman.engine.util.FileUtils;
 
 import java.io.File;
 

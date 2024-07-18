@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -25,6 +25,8 @@
 		1645D5952036C6FF0076C51B /* KeymanPackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1645D5942036C6FF0076C51B /* KeymanPackage.swift */; };
 		1645D5972036C9F80076C51B /* KMPKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1645D5962036C9F80076C51B /* KMPKeyboard.swift */; };
 		165EB3A12098993900040A69 /* KeyboardError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165EB3A02098993900040A69 /* KeyboardError.swift */; };
+		296EF2C72AFA26C700E3E384 /* ZIPFoundation.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 296EF2C62AFA26C700E3E384 /* ZIPFoundation.xcframework */; };
+		29B30C232B564F9900C342A4 /* KeymanEngineLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29B30C222B564F9900C342A4 /* KeymanEngineLogger.swift */; };
 		377D10DE26846B8900467431 /* SpacebarTextViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 377D10DD26846B8900467431 /* SpacebarTextViewController.swift */; };
 		6CD5DFAA150F6DC8007A5DDE /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 6CD5DFA8150F6DC8007A5DDE /* icon.png */; };
 		6CD5DFAB150F6DC8007A5DDE /* icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6CD5DFA9150F6DC8007A5DDE /* icon@2x.png */; };
@@ -58,7 +60,6 @@
 		C0324B8F1F8750B700AF3785 /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B8E1F8750B700AF3785 /* TextView.swift */; };
 		C0324B911F8763E100AF3785 /* TextViewDelegateProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B901F8763E100AF3785 /* TextViewDelegateProxy.swift */; };
 		C0324B931F87689B00AF3785 /* KeymanURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B921F87689B00AF3785 /* KeymanURLProtocol.swift */; };
-		C040E50E1F85FF8A00901EE4 /* KeyPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C040E50D1F85FF8A00901EE4 /* KeyPreviewView.swift */; };
 		C040E5101F8606E300901EE4 /* TextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C040E50F1F8606E300901EE4 /* TextField.swift */; };
 		C040E5121F86107E00901EE4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C040E5111F86107E00901EE4 /* AppDelegate.swift */; };
 		C040E5141F86108900901EE4 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C040E5131F86108900901EE4 /* MainViewController.swift */; };
@@ -69,13 +70,11 @@
 		C0452BAD1F9F21270064431A /* Keyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0452BAC1F9F21270064431A /* Keyboard.swift */; };
 		C0452BAF1F9F22A80064431A /* Font.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0452BAE1F9F22A80064431A /* Font.swift */; };
 		C055E6EB1F99ED090035C2DD /* RegisteredFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055E6EA1F99ED090035C2DD /* RegisteredFont.swift */; };
-		C05B14331FD914870082A316 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05B14321FD914870082A316 /* Log.swift */; };
 		C05F43311FBD62550058CBD4 /* JSONDecoder.DateDecodingStrategy+ISO8601Fallback.swift in Sources */ = {isa = PBXBuildFile; fileRef = C05F43301FBD62550058CBD4 /* JSONDecoder.DateDecodingStrategy+ISO8601Fallback.swift */; };
 		C06085B41F9485E40057E5B9 /* UIButton+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = C06085B31F9485E40057E5B9 /* UIButton+Helpers.swift */; };
 		C06D37341F81F5C300F61AE0 /* HTTPDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ED71B41F6BBFAF002A2FD6 /* HTTPDownloader.swift */; };
 		C06D37351F81F5C300F61AE0 /* HTTPDownloadRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ED71B21F6BB0B1002A2FD6 /* HTTPDownloadRequest.swift */; };
 		C06D37361F81F5C300F61AE0 /* KeyboardMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C034BBBD1F7CCE7D00021FF5 /* KeyboardMenuView.swift */; };
-		C06D37381F81F5C400F61AE0 /* SubKeysView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C07B42AE1F7CEE2700ECA97F /* SubKeysView.swift */; };
 		C06D37421F81F5C400F61AE0 /* KeyboardPickerButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08C620F1F67BD4500268D03 /* KeyboardPickerButton.swift */; };
 		C06D37431F81F5C400F61AE0 /* KeyboardPickerBarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08C620B1F6792A200268D03 /* KeyboardPickerBarButtonItem.swift */; };
 		C06D37441F81F5C400F61AE0 /* KeyboardNameTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08C62121F67C31100268D03 /* KeyboardNameTableViewCell.swift */; };
@@ -120,11 +119,8 @@
 		CE46D65D247B93C9005FD506 /* (null) in Resources */ = {isa = PBXBuildFile; };
 		CE5C8BE324B5B3BA00FAFB7F /* Queries+LexicalModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5C8BE224B5B3BA00FAFB7F /* Queries+LexicalModel.swift */; };
 		CE5C8BE524B5BD1C00FAFB7F /* QueryModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5C8BE424B5BD1C00FAFB7F /* QueryModelTests.swift */; };
-		CE5EDDC526522EAA001733AC /* XCGLogger.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE5EDDC026522EA9001733AC /* XCGLogger.xcframework */; };
-		CE5EDDC626522EAA001733AC /* Zip.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE5EDDC126522EA9001733AC /* Zip.xcframework */; };
 		CE5EDDC726522EAA001733AC /* Sentry.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE5EDDC226522EAA001733AC /* Sentry.xcframework */; };
 		CE5EDDC826522EAA001733AC /* Reachability.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE5EDDC326522EAA001733AC /* Reachability.xcframework */; };
-		CE5EDDC926522EAA001733AC /* ObjcExceptionBridging.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE5EDDC426522EAA001733AC /* ObjcExceptionBridging.xcframework */; };
 		CE5EDDD52652372A001733AC /* DeviceKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE5EDDBB26522EA3001733AC /* DeviceKit.xcframework */; };
 		CE67D961228A6F190029F2B5 /* KeyboardCommandStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE67D960228A6F190029F2B5 /* KeyboardCommandStructs.swift */; };
 		CE71705823A9C14D00A924A1 /* ResourceFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE71705723A9C14D00A924A1 /* ResourceFileManager.swift */; };
@@ -308,9 +304,26 @@
 		2949146F2738DA6700400732 /* ff-NG */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ff-NG"; path = "ff-NG.lproj/ResourceInfoView.strings"; sourceTree = "<group>"; };
 		294914702738DD7400400732 /* ff-NG */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ff-NG"; path = "ff-NG.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		294914712738DD9700400732 /* ff-NG */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = "ff-NG"; path = "ff-NG.lproj/Localizable.stringsdict"; sourceTree = "<group>"; };
+		296EF2C62AFA26C700E3E384 /* ZIPFoundation.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ZIPFoundation.xcframework; path = ../../Carthage/Build/ZIPFoundation.xcframework; sourceTree = "<group>"; };
+		297810FE297FAEDF007C886D /* kn */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = kn; path = kn.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
+		297810FF297FAEF8007C886D /* kn */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = kn; path = kn.lproj/Localizable.strings; sourceTree = "<group>"; };
+		29781100297FAF06007C886D /* kn */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = kn; path = kn.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
+		298566B929802892004ACA95 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
+		298566BA298028A8004ACA95 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/Localizable.strings; sourceTree = "<group>"; };
+		298566BB298028AC004ACA95 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = cs; path = cs.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
+		298566C52980C5BB004ACA95 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
+		298566C62980C5C7004ACA95 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Localizable.strings; sourceTree = "<group>"; };
+		298566C72980C5CC004ACA95 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = sv; path = sv.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
+		298566D12980D390004ACA95 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
+		298566D22980D39A004ACA95 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Localizable.strings; sourceTree = "<group>"; };
+		298566D32980D39F004ACA95 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = uk; path = uk.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
+		298566DD2980E477004ACA95 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
+		298566DE2980E486004ACA95 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
+		298566DF2980E48C004ACA95 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = ru; path = ru.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		29B27FEF29062CF50036917E /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
 		29B27FF029062D100036917E /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		29B27FF129062D190036917E /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = nl; path = nl.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
+		29B30C222B564F9900C342A4 /* KeymanEngineLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeymanEngineLogger.swift; sourceTree = "<group>"; };
 		29BFA75E28293287009FCCC3 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
 		29BFA75F282934B4009FCCC3 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
 		29BFA760282934BB009FCCC3 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = it; path = it.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
@@ -363,7 +376,6 @@
 		C0324B901F8763E100AF3785 /* TextViewDelegateProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextViewDelegateProxy.swift; sourceTree = "<group>"; };
 		C0324B921F87689B00AF3785 /* KeymanURLProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeymanURLProtocol.swift; sourceTree = "<group>"; };
 		C034BBBD1F7CCE7D00021FF5 /* KeyboardMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardMenuView.swift; sourceTree = "<group>"; };
-		C040E50D1F85FF8A00901EE4 /* KeyPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyPreviewView.swift; sourceTree = "<group>"; };
 		C040E50F1F8606E300901EE4 /* TextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextField.swift; sourceTree = "<group>"; };
 		C040E5111F86107E00901EE4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C040E5131F86108900901EE4 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
@@ -375,13 +387,11 @@
 		C0452BAC1F9F21270064431A /* Keyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Keyboard.swift; sourceTree = "<group>"; };
 		C0452BAE1F9F22A80064431A /* Font.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Font.swift; sourceTree = "<group>"; };
 		C055E6EA1F99ED090035C2DD /* RegisteredFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisteredFont.swift; sourceTree = "<group>"; };
-		C05B14321FD914870082A316 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		C05F43301FBD62550058CBD4 /* JSONDecoder.DateDecodingStrategy+ISO8601Fallback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "JSONDecoder.DateDecodingStrategy+ISO8601Fallback.swift"; sourceTree = "<group>"; };
 		C06085B31F9485E40057E5B9 /* UIButton+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Helpers.swift"; sourceTree = "<group>"; };
 		C06D372B1F81F4E100F61AE0 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C06D372E1F81F4E100F61AE0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C075EB051F8EFF870041F4BD /* String+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Helpers.swift"; sourceTree = "<group>"; };
-		C07B42AE1F7CEE2700ECA97F /* SubKeysView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubKeysView.swift; sourceTree = "<group>"; };
 		C082CE141F90AFD400860F02 /* Collection+SafeAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+SafeAccess.swift"; sourceTree = "<group>"; };
 		C08C620B1F6792A200268D03 /* KeyboardPickerBarButtonItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyboardPickerBarButtonItem.swift; sourceTree = "<group>"; };
 		C08C620F1F67BD4500268D03 /* KeyboardPickerButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyboardPickerButton.swift; sourceTree = "<group>"; };
@@ -420,11 +430,8 @@
 		CE5C8BE224B5B3BA00FAFB7F /* Queries+LexicalModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Queries+LexicalModel.swift"; sourceTree = "<group>"; };
 		CE5C8BE424B5BD1C00FAFB7F /* QueryModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryModelTests.swift; sourceTree = "<group>"; };
 		CE5EDDBB26522EA3001733AC /* DeviceKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = DeviceKit.xcframework; path = ../../Carthage/Build/DeviceKit.xcframework; sourceTree = "<group>"; };
-		CE5EDDC026522EA9001733AC /* XCGLogger.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = XCGLogger.xcframework; path = ../../Carthage/Build/XCGLogger.xcframework; sourceTree = "<group>"; };
-		CE5EDDC126522EA9001733AC /* Zip.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Zip.xcframework; path = ../../Carthage/Build/Zip.xcframework; sourceTree = "<group>"; };
 		CE5EDDC226522EAA001733AC /* Sentry.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Sentry.xcframework; path = ../../Carthage/Build/Sentry.xcframework; sourceTree = "<group>"; };
 		CE5EDDC326522EAA001733AC /* Reachability.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Reachability.xcframework; path = ../../Carthage/Build/Reachability.xcframework; sourceTree = "<group>"; };
-		CE5EDDC426522EAA001733AC /* ObjcExceptionBridging.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ObjcExceptionBridging.xcframework; path = ../../Carthage/Build/ObjcExceptionBridging.xcframework; sourceTree = "<group>"; };
 		CE67D960228A6F190029F2B5 /* KeyboardCommandStructs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardCommandStructs.swift; sourceTree = "<group>"; };
 		CE71705723A9C14D00A924A1 /* ResourceFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceFileManager.swift; sourceTree = "<group>"; };
 		CE71705E23A9C97F00A924A1 /* PackageInstallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageInstallViewController.swift; sourceTree = "<group>"; };
@@ -513,6 +520,9 @@
 		CEF888D123FE6ADF00667693 /* Simple 10.0 Migration.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "Simple 10.0 Migration.bundle"; sourceTree = "<group>"; };
 		CEF888D423FE786C00667693 /* KeyboardScaleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardScaleTests.swift; sourceTree = "<group>"; };
 		CEF9367724D3B0B20031C70D /* PackageInstallView_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = PackageInstallView_iPhone.xib; sourceTree = "<group>"; };
+		CEFFECD52A417F1300D58C36 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
+		CEFFECD62A417F2900D58C36 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CEFFECD72A417F2E00D58C36 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = es; path = es.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		F243887E14BBD43000A3E055 /* KeymanEngineDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KeymanEngineDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F27FCAEE157FD59100FBBA20 /* Keyman-iphoneos.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Keyman-iphoneos.xcconfig"; sourceTree = "<group>"; };
 		F27FCAEF157FD59100FBBA20 /* Keyman-iphonesimulator.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = "Keyman-iphonesimulator.xcconfig"; sourceTree = "<group>"; };
@@ -542,12 +552,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CE5EDDC526522EAA001733AC /* XCGLogger.xcframework in Frameworks */,
-				CE5EDDC626522EAA001733AC /* Zip.xcframework in Frameworks */,
+				296EF2C72AFA26C700E3E384 /* ZIPFoundation.xcframework in Frameworks */,
 				CE5EDDD52652372A001733AC /* DeviceKit.xcframework in Frameworks */,
 				CE5EDDC726522EAA001733AC /* Sentry.xcframework in Frameworks */,
 				CE5EDDC826522EAA001733AC /* Reachability.xcframework in Frameworks */,
-				CE5EDDC926522EAA001733AC /* ObjcExceptionBridging.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -784,9 +792,7 @@
 				CE79B24823C711FF007E72AE /* KeyboardScaleMap.swift */,
 				C0EF3E7A1F95B65300CE9BD4 /* KeymanWebDelegate.swift */,
 				C0C16A881FA8146300F090BA /* KeymanWebViewController.swift */,
-				C040E50D1F85FF8A00901EE4 /* KeyPreviewView.swift */,
 				C0A5FF361F6682EB00BE740C /* PopoverView.swift */,
-				C07B42AE1F7CEE2700ECA97F /* SubKeysView.swift */,
 			);
 			path = Keyboard;
 			sourceTree = "<group>";
@@ -931,11 +937,9 @@
 		F243888114BBD43000A3E055 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				CE5EDDC426522EAA001733AC /* ObjcExceptionBridging.xcframework */,
+				296EF2C62AFA26C700E3E384 /* ZIPFoundation.xcframework */,
 				CE5EDDC326522EAA001733AC /* Reachability.xcframework */,
 				CE5EDDC226522EAA001733AC /* Sentry.xcframework */,
-				CE5EDDC026522EA9001733AC /* XCGLogger.xcframework */,
-				CE5EDDC126522EA9001733AC /* Zip.xcframework */,
 				CE5EDDBB26522EA3001733AC /* DeviceKit.xcframework */,
 				9A079DE52231A69D00581263 /* Foundation.framework */,
 			);
@@ -982,10 +986,10 @@
 				CE7A26DA23CEEF640005955C /* Colors.swift */,
 				CE7A26D723CEEC630005955C /* Colors+Extension.swift */,
 				C0959CD31F99C44E00B616BC /* Constants.swift */,
+				29B30C222B564F9900C342A4 /* KeymanEngineLogger.swift */,
 				CEE0321224C58C90005BFC73 /* KeymanHosts.swift */,
 				C0324B921F87689B00AF3785 /* KeymanURLProtocol.swift */,
 				C0A93A531F8B21240079948B /* Manager.swift */,
-				C05B14321FD914870082A316 /* Log.swift */,
 				CEA70CCE24CAC3AE001C12E6 /* Obsoletions.swift */,
 				CE9E95CC24CE786900F6DD78 /* UniversalLinks.swift */,
 			);
@@ -1195,6 +1199,12 @@
 				it,
 				pl,
 				nl,
+				cs,
+				kn,
+				sv,
+				uk,
+				ru,
+				es,
 			);
 			mainGroup = F243887314BBD43000A3E055;
 			productRefGroup = F243887F14BBD43000A3E055 /* Products */;
@@ -1338,7 +1348,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/usr/bin/env bash";
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n. \"$KEYMAN_ROOT/resources/build/xcode-utils.sh\"\n\nphaseSetBundleVersions true\n";
+			shellScript = "\"$KEYMAN_ROOT/resources/build/xcode-wrap.sh\" \"$KEYMAN_ROOT/resources/build/set-bundle-versions-tagged.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		CEC0C66F2410B005003E1BCD /* Run Script - upload dsyms to Sentry */ = {
@@ -1415,7 +1425,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C05B14331FD914870082A316 /* Log.swift in Sources */,
 				9A079E43223B61AE00581263 /* FullLexicalModelID.swift in Sources */,
 				C06D37341F81F5C300F61AE0 /* HTTPDownloader.swift in Sources */,
 				C0452BAF1F9F22A80064431A /* Font.swift in Sources */,
@@ -1439,7 +1448,6 @@
 				CE7A26DB23CEEF640005955C /* Colors.swift in Sources */,
 				9A9CB08022416E5400231FB9 /* LexicalModelPickerViewController.swift in Sources */,
 				9A079E3D223B5FAF00581263 /* InstallableLexicalModel.swift in Sources */,
-				C06D37381F81F5C400F61AE0 /* SubKeysView.swift in Sources */,
 				C0A93A541F8B21240079948B /* Manager.swift in Sources */,
 				CE99350E24D7CCFC00202DA3 /* LanguagePickAssociator.swift in Sources */,
 				C024C9981FA6F2340060583B /* NotificationObserver.swift in Sources */,
@@ -1453,7 +1461,6 @@
 				9A3E832522EAC14A00D22D2A /* KeyboardSwitcherViewController.swift in Sources */,
 				C0324B911F8763E100AF3785 /* TextViewDelegateProxy.swift in Sources */,
 				C0B09EAE1FCFD10F002F39AF /* FontManager.swift in Sources */,
-				C040E50E1F85FF8A00901EE4 /* KeyPreviewView.swift in Sources */,
 				CEC0C6772410E049003E1BCD /* SentryManager.swift in Sources */,
 				9A079E3A223AFF3C00581263 /* KeyboardKeymanPackage.swift in Sources */,
 				C0CB633C1FA6F61500617CDB /* Notifications.swift in Sources */,
@@ -1501,6 +1508,7 @@
 				C06085B41F9485E40057E5B9 /* UIButton+Helpers.swift in Sources */,
 				C0959CD41F99C44E00B616BC /* Constants.swift in Sources */,
 				C0452BAD1F9F21270064431A /* Keyboard.swift in Sources */,
+				29B30C232B564F9900C342A4 /* KeymanEngineLogger.swift in Sources */,
 				CE79B24923C711FF007E72AE /* KeyboardScaleMap.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1588,6 +1596,12 @@
 				29BFA760282934BB009FCCC3 /* it */,
 				29BFA76C28294833009FCCC3 /* pl */,
 				29B27FF129062D190036917E /* nl */,
+				298566BB298028AC004ACA95 /* cs */,
+				29781100297FAF06007C886D /* kn */,
+				298566C72980C5CC004ACA95 /* sv */,
+				298566D32980D39F004ACA95 /* uk */,
+				298566DF2980E48C004ACA95 /* ru */,
+				CEFFECD72A417F2E00D58C36 /* es */,
 			);
 			name = Localizable.stringsdict;
 			sourceTree = "<group>";
@@ -1610,6 +1624,12 @@
 				29BFA75F282934B4009FCCC3 /* it */,
 				29BFA76B28294813009FCCC3 /* pl */,
 				29B27FF029062D100036917E /* nl */,
+				298566BA298028A8004ACA95 /* cs */,
+				297810FF297FAEF8007C886D /* kn */,
+				298566C62980C5C7004ACA95 /* sv */,
+				298566D22980D39A004ACA95 /* uk */,
+				298566DE2980E486004ACA95 /* ru */,
+				CEFFECD62A417F2900D58C36 /* es */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1633,6 +1653,12 @@
 				29BFA75E28293287009FCCC3 /* it */,
 				29BFA76A28294746009FCCC3 /* pl */,
 				29B27FEF29062CF50036917E /* nl */,
+				298566B929802892004ACA95 /* cs */,
+				297810FE297FAEDF007C886D /* kn */,
+				298566C52980C5BB004ACA95 /* sv */,
+				298566D12980D390004ACA95 /* uk */,
+				298566DD2980E477004ACA95 /* ru */,
+				CEFFECD52A417F1300D58C36 /* es */,
 			);
 			name = ResourceInfoView.xib;
 			sourceTree = "<group>";
@@ -1670,7 +1696,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = SystemKeyboard/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1716,7 +1742,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = SystemKeyboard/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1851,7 +1877,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_BITCODE = YES;
+				ENABLE_BITCODE = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -1859,7 +1885,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = KeymanEngine/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1907,14 +1933,14 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_BITCODE = YES;
+				ENABLE_BITCODE = NO;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = KeymanEngine/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1938,7 +1964,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = F27FCAF6157FD95E00FBBA20 /* Keyman-lib.xcconfig */;
 			buildSettings = {
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = all;
@@ -1951,7 +1977,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = F27FCAF6157FD95E00FBBA20 /* Keyman-lib.xcconfig */;
 			buildSettings = {
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
 			};
@@ -1980,7 +2006,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "KeymanEngine/resources/Keyman.bundle/Contents/Resources/KeymanEngine-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2017,7 +2043,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "KeymanEngine/resources/Keyman.bundle/Contents/Resources/KeymanEngine-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2069,7 +2095,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				KEYMAN_ROOT = "$(SRCROOT)/../../..";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -2102,7 +2128,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				ENABLE_BITCODE = YES;
+				ENABLE_BITCODE = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -2110,7 +2136,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = KeymanEngine/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2134,7 +2160,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = F27FCAF6157FD95E00FBBA20 /* Keyman-lib.xcconfig */;
 			buildSettings = {
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
 			};
@@ -2153,7 +2179,7 @@
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 3YE4W86L3G;
 				ENABLE_BITCODE = NO;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2203,7 +2229,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = SystemKeyboard/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2292,7 +2318,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "KeymanEngine/resources/Keyman.bundle/Contents/Resources/KeymanEngine-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2344,7 +2370,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				KEYMAN_ROOT = "$(SRCROOT)/../../..";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG NO_SENTRY";
@@ -2387,7 +2413,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				KEYMAN_ROOT = "$(SRCROOT)/../../..";
 				SKIP_INSTALL = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -2408,7 +2434,7 @@
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 3YE4W86L3G;
 				ENABLE_BITCODE = NO;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2441,7 +2467,7 @@
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 3YE4W86L3G;
 				ENABLE_BITCODE = NO;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

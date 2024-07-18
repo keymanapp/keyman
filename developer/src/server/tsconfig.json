@@ -1,13 +1,13 @@
 {
-  "extends": "../../../tsconfig-base.json",
+  "extends": "../../../tsconfig.base.json",
 
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es2017",
-    "moduleResolution": "node",
+    "target": "es2022",
     "sourceMap": true,
-    "outDir": "dist/",
+    "outDir": "build/src/",
     "rootDir": "src/",
+    "baseUrl": ".",
+
     "declaration": true,
     "alwaysStrict": true,
     "noImplicitThis": true,
@@ -15,12 +15,19 @@
     "noImplicitAny": true,
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    "allowJs": true,
+    "lib": ["es2022"],
+
+    "paths": {
+      "@keymanapp/developer-utils": ["../common/web/utils/index"],
+    }
   },
   "include": [
     "src/**/*.ts"
   ],
   "references": [
-    { "path": "../../../common/web/keyman-version" }
+    { "path": "../../../common/web/keyman-version" },
+    { "path": "../common/web/utils" },
   ]
 }

@@ -2,8 +2,8 @@
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
@@ -34,7 +34,7 @@ cd `dirname ${KEYMAN_MACIM_BASE_PATH}` > /dev/null
 KEYMAN_MACIM_BASE_PATH=`pwd`;
 popd  > /dev/null
 
-. $KEYMAN_MACIM_BASE_PATH/../bashHelperFunctions.sh
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 DEST_DIR="$KEYMAN_MACIM_BASE_PATH/output/upload"
 ADD_VERSION_TO_DEST_DIR=true
@@ -49,7 +49,7 @@ while [[ $# -gt 0 ]] ; do
     case $key in
         -destDir)
             if [[ "$2" == "" || "$2" =~ ^\- ]]; then
-                fail "Missing destination directory on command line."
+                builder_die "Missing destination directory on command line."
             else
                 DEST_DIR="$2"
                 ADD_VERSION_TO_DEST_DIR=false
@@ -60,7 +60,7 @@ while [[ $# -gt 0 ]] ; do
             display_usage
             ;;
         -*)
-          fail "Unknown option $1. Run with --help for help."
+          builder_die "Unknown option $1. Run with --help for help."
           ;;
     esac
     shift # past argument
@@ -72,20 +72,20 @@ fi
 if [[ ! -e $DEST_DIR ]]; then
 	mkdir -p $DEST_DIR
 elif [[ ! -d $DEST_DIR ]]; then
-	fail "Destination dir exists but is not a directory: $2"
+	builder_die "Destination dir exists but is not a directory: $2"
 fi
 
 DMG_FILENAME="keyman-$VERSION.dmg"
 DMG_FILEPATH="$DEST_DIR/$DMG_FILENAME"
 DOWNLOAD_INFO_FILEPATH="${DMG_FILEPATH}.download_info"
 if [[ ! -f "$DMG_FILEPATH" ]]; then
-  fail "Cannot compute file size or MD5 for non-existent DMG file: $DMG_FILEPATH"
+  builder_die "Cannot compute file size or MD5 for non-existent DMG file: $DMG_FILEPATH"
 fi
-DMG_FILE_SIZE=$(stat -f"%z" "$DMG_FILEPATH")
+DMG_FILE_SIZE=$(/usr/bin/stat -f"%z" "$DMG_FILEPATH")
 DMG_MD5=$(md5 -q "$DMG_FILEPATH")
 
 if [[ -f "$DOWNLOAD_INFO_FILEPATH" ]]; then
-  warn "Overwriting $DOWNLOAD_INFO_FILEPATH"
+  builder_warn "Overwriting $DOWNLOAD_INFO_FILEPATH"
 fi
 
 echo { > "$DOWNLOAD_INFO_FILEPATH"

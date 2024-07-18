@@ -72,9 +72,7 @@ Jetzt neu starten?</string>
   <string name="ssDownloadingTitle">Herunterladen von %0:s</string>
   <!-- Parameters: %0:s: filename -->
   <string name="ssDownloadingText">Herunterladen von %0:s</string>
-  <string name="ssOffline">$APPNAME Setup konnte keine Verbindung zu keyman.com herstellen, um zusätzliche Ressourcen herunterzuladen.
-
-Bitte überprüfen Sie, ob Sie online sind, und geben Sie $APPNAME Setup in Ihren Firewall-Einstellungen die Erlaubnis, auf das Internet zuzugreifen.
-
-Klicken Sie auf Abbrechen, um die Einrichtung zu beenden, erneut zu versuchen und Ressourcen erneut herunterzuladen, oder ignorieren Sie, um offline fortzufahren.</string>
+  <string name="ssOffline">$APPNAME Setup konnte keine Verbindung zu keyman.com herstellen, um zusätzliche Ressourcen herunterzuladen.</string>
+  <string name="ssOffline2">Bitte überprüfen Sie, ob Sie online sind, und geben Sie $APPNAME Setup in Ihren Firewall-Einstellungen die Erlaubnis, auf das Internet zuzugreifen.</string>
+  <string name="ssOffline3">Klicken Sie auf Abbrechen, um die Einrichtung zu beenden, erneut zu versuchen und Ressourcen erneut herunterzuladen, oder ignorieren Sie, um offline fortzufahren.</string>
 </resources>

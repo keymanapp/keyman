@@ -25,20 +25,20 @@ inherited frmOptions: TfrmOptions
       Caption = 'General'
       ImageIndex = 2
       object cmdProxySettings: TButton
-        Left = 8
-        Top = 209
+        Left = 7
+        Top = 185
         Width = 125
         Height = 25
-        Caption = '&Proxy Settings...'
+        Caption = 'Prox&y Settings...'
         TabOrder = 4
         OnClick = cmdProxySettingsClick
       end
       object gbExternalEditor: TGroupBox
-        Left = 8
-        Top = 71
+        Left = 7
+        Top = 47
         Width = 401
         Height = 45
-        Caption = '&External Editor Path'
+        Caption = 'E&xternal Editor Path'
         TabOrder = 1
         object editExternalEditorPath: TEdit
           Left = 8
@@ -57,46 +57,38 @@ inherited frmOptions: TfrmOptions
         end
       end
       object cmdSMTPSettings: TButton
-        Left = 8
-        Top = 240
+        Left = 7
+        Top = 216
         Width = 125
         Height = 25
-        Caption = 'S&MTP Settings...'
-        TabOrder = 3
+        Caption = '&SMTP Settings...'
+        TabOrder = 5
         OnClick = cmdSMTPSettingsClick
       end
       object chkOpenKeyboardFilesInSourceView: TCheckBox
-        Left = 8
-        Top = 36
+        Left = 7
+        Top = 12
         Width = 221
         Height = 17
         Caption = 'Open &keyboard files in source view'
         TabOrder = 0
       end
       object cmdResetToolWindows: TButton
-        Left = 8
-        Top = 178
+        Left = 7
+        Top = 154
         Width = 125
         Height = 25
         Caption = '&Reset tool windows'
-        TabOrder = 2
+        TabOrder = 3
         OnClick = cmdResetToolWindowsClick
       end
-      object chkAllowMultipleInstances: TCheckBox
-        Left = 8
-        Top = 12
-        Width = 289
-        Height = 17
-        Caption = '&Allow multiple instances of Keyman Developer'
-        TabOrder = 5
-      end
       object gbDefaultProjectPath: TGroupBox
-        Left = 8
-        Top = 122
+        Left = 7
+        Top = 98
         Width = 401
         Height = 45
         Caption = '&Default Project Folder'
-        TabOrder = 6
+        TabOrder = 2
         object editDefaultProjectPath: TEdit
           Left = 8
           Top = 16
@@ -109,30 +101,30 @@ inherited frmOptions: TfrmOptions
           Top = 16
           Width = 69
           Height = 21
-          Caption = '&Browse...'
+          Caption = 'Bro&wse...'
           TabOrder = 1
           OnClick = cmdBrowseDefaultProjectPathClick
         end
       end
       object chkAutoSaveBeforeCompiling: TCheckBox
-        Left = 152
-        Top = 182
+        Left = 151
+        Top = 158
         Width = 218
         Height = 17
         Caption = '&Automatically save before compiling'
-        TabOrder = 7
+        TabOrder = 6
       end
       object chkOSKAutoSaveBeforeImporting: TCheckBox
-        Left = 152
-        Top = 205
+        Left = 151
+        Top = 181
         Width = 218
         Height = 17
-        Caption = '&Automatically save before importing OSK'
-        TabOrder = 8
+        Caption = 'Au&tomatically save before importing OSK'
+        TabOrder = 7
       end
       object gbPrivacy: TGroupBox
-        Left = 8
-        Top = 280
+        Left = 7
+        Top = 256
         Width = 401
         Height = 73
         Caption = 'Privacy'
@@ -142,8 +134,8 @@ inherited frmOptions: TfrmOptions
           Top = 44
           Width = 311
           Height = 17
-          Caption = '&Share anonymous usage statistics with keyman.com'
-          TabOrder = 0
+          Caption = 'Share anonymous &usage statistics with keyman.com'
+          TabOrder = 1
         end
         object chkReportErrors: TCheckBox
           Left = 8
@@ -151,8 +143,16 @@ inherited frmOptions: TfrmOptions
           Width = 311
           Height = 17
           Caption = 'Automatically report &errors to keyman.com'
-          TabOrder = 1
+          TabOrder = 0
         end
+      end
+      object chkPromptToUpgradeProjects: TCheckBox
+        Left = 151
+        Top = 204
+        Width = 218
+        Height = 17
+        Caption = '&Prompt to upgrade projects to 17.0 format'
+        TabOrder = 8
       end
     end
     object tabEditor: TTabSheet

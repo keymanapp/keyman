@@ -16,8 +16,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.tavultesoft.kmea.KMManager;
-import com.tavultesoft.kmea.data.KeyboardController;
+import com.keyman.engine.KMManager;
+import com.keyman.engine.data.KeyboardController;
 
 class FVKeyboardListAdapter extends ArrayAdapter<FVShared.FVKeyboard> {
 

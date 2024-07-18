@@ -243,7 +243,7 @@
 
     </ComponentGroup>
 
-    <ComponentGroup Id="KeymanEngineSentryComponents" Directory="dir_sentry_0.4.9" Source="..\..\..\..\common\windows\delphi\ext\sentry">
+    <ComponentGroup Id="KeymanEngineSentryComponents" Directory="dir_sentry_0.6.0" Source="..\..\..\bin\engine">
       <Component Guid="{95AB1B5C-2556-4282-B327-E2E417B26926}">
         <File Id="sentry.dll" KeyPath="yes" />
       </Component>

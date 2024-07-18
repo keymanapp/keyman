@@ -1,0 +1,353 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "$ref": "#/definitions/package",
+  "definitions": {
+    "package": {
+      "type": "object",
+      "properties": {
+        "system": {
+          "$ref": "#/definitions/system"
+        },
+        "options": {
+          "$ref": "#/definitions/options"
+        },
+        "startMenu": {
+          "$ref": "#/definitions/startMenu"
+        },
+        "strings": {
+          "$ref": "#/definitions/strings"
+        },
+        "files": {
+          "$ref": "#/definitions/files"
+        },
+        "keyboards": {
+          "$ref": "#/definitions/keyboards"
+        },
+        "lexicalModels": {
+          "$ref": "#/definitions/lexicalModels"
+        },
+        "info": {
+          "$ref": "#/definitions/info"
+        },
+        "relatedPackages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/relatedPackage"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "options",
+        "system"
+      ]
+    },
+    "system": {
+      "type": "object",
+      "properties": {
+        "keymanDeveloperVersion": {
+          "type": "string"
+        },
+        "fileVersion": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "fileVersion"
+      ]
+    },
+    "options": {
+      "type": "object",
+      "properties": {
+        "readmeFile": {
+          "type": "string"
+        },
+        "graphicFile": {
+          "type": "string"
+        },
+        "licenseFile": {
+          "type": "string"
+        },
+        "welcomeFile": {
+          "type": "string"
+        },
+        "executeProgram": {
+          "type": "string"
+        },
+        "msiFilename": {
+          "type": "string"
+        },
+        "msiOptions": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "startMenu": {
+      "type": "object",
+      "properties": {
+        "folder": {
+          "type": "string"
+        },
+        "addUninstallEntry": {
+          "type": "boolean"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/startMenuItem"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "startMenuItem": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "arguments": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        },
+        "location": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "filename"
+      ]
+    },
+    "strings": {
+      "type": "object",
+      "patternProperties": {
+        ".": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/file"
+      }
+    },
+    "file": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "copyLocation": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "description"
+      ]
+    },
+    "keyboards": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/keyboard"
+      }
+    },
+    "keyboard": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "oskFont": {
+          "type": "string"
+        },
+        "displayFont": {
+          "type": "string"
+        },
+        "rtl": {
+          "type": "boolean"
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/keyboardLanguage"
+          }
+        },
+        "examples": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/keyboardExample"
+          }
+        },
+        "webOskFonts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "webDisplayFonts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "id",
+        "version"
+      ]
+    },
+    "keyboardLanguage": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name"
+      ]
+    },
+    "info": {
+      "type": "object",
+      "properties": {
+        "website": {
+          "$ref": "#/definitions/infoItem"
+        },
+        "version": {
+          "$ref": "#/definitions/infoItem"
+        },
+        "name": {
+          "$ref": "#/definitions/infoItem"
+        },
+        "copyright": {
+          "$ref": "#/definitions/infoItem"
+        },
+        "author": {
+          "$ref": "#/definitions/infoItem"
+        },
+        "description": {
+          "$ref": "#/definitions/infoItem"
+        }
+      },
+      "additionalProperties": false
+    },
+    "infoItem": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "description"
+      ]
+    },
+    "lexicalModels": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/lexicalModel"
+      }
+    },
+    "lexicalModel": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "rtl": {
+          "type": "boolean"
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/keyboardLanguage"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "id",
+        "languages"
+      ]
+    },
+    "keyboardExample": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "keys": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "keys"
+      ]
+    },
+    "relatedPackage": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "relationship": {
+          "type": "string",
+          "enum": ["deprecates", "related"]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "relationship"
+      ]
+    }
+  }
+}

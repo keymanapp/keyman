@@ -14,6 +14,10 @@
 		162E2C9F2092D36800F40769 /* UIDevice+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 162E2C9E2092D36800F40769 /* UIDevice+Extensions.swift */; };
 		165EB39A2097165B00040A69 /* UIColor+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165EB3992097165B00040A69 /* UIColor+Extensions.swift */; };
 		165EB39C2097181D00040A69 /* KMView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165EB39B2097181D00040A69 /* KMView.swift */; };
+		296EF2C42AFA267500E3E384 /* ZIPFoundation.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 296EF2C32AFA267500E3E384 /* ZIPFoundation.xcframework */; };
+		296EF2C52AFA267500E3E384 /* ZIPFoundation.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 296EF2C32AFA267500E3E384 /* ZIPFoundation.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		29B30C212B56325D00C342A4 /* KeymanLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29CA9A612B4F9B0B00EAB099 /* KeymanLogger.swift */; };
+		29CA9A622B4F9B0B00EAB099 /* KeymanLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29CA9A612B4F9B0B00EAB099 /* KeymanLogger.swift */; };
 		981AFA8F19EF44DE006706BF /* 724-info@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9815725518E4F0930014DF0C /* 724-info@2x.png */; };
 		981AFA9619EF44DE006706BF /* MainViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 98ABADCE176935E500B62590 /* MainViewController_iPhone.xib */; };
 		981AFA9819EF44DE006706BF /* 724-info.png in Resources */ = {isa = PBXBuildFile; fileRef = 9815725418E4F0930014DF0C /* 724-info.png */; };
@@ -114,7 +118,6 @@
 		C055F0B11F60E8D400140735 /* GetStartedViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055F0B01F60E8D400140735 /* GetStartedViewController.swift */; };
 		C055F0B31F60F7A400140735 /* DropDownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055F0B21F60F7A400140735 /* DropDownView.swift */; };
 		C055F0B51F610FB200140735 /* DropDownListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C055F0B41F610FB200140735 /* DropDownListView.swift */; };
-		C059FCC01FD927EF00BD1A64 /* Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = C059FCBF1FD927EF00BD1A64 /* Log.swift */; };
 		C0A1A6311F5E4F4300EAF822 /* InfoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1A6301F5E4F4300EAF822 /* InfoViewController.swift */; };
 		C0A1A6331F5E749000EAF822 /* SetUpViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1A6321F5E749000EAF822 /* SetUpViewController.swift */; };
 		C0A1A6351F5E786A00EAF822 /* BookmarksViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0A1A6341F5E786A00EAF822 /* BookmarksViewController.swift */; };
@@ -147,16 +150,10 @@
 		CEBD34322654FE3500EB2EA8 /* KeymanEngine.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE80AD32257F2B4A008D2150 /* KeymanEngine.framework */; };
 		CEBD343B2654FEB400EB2EA8 /* DeviceKit.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34352654FEB400EB2EA8 /* DeviceKit.xcframework */; };
 		CEBD343C2654FEB400EB2EA8 /* DeviceKit.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34352654FEB400EB2EA8 /* DeviceKit.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CEBD343D2654FEB400EB2EA8 /* ObjcExceptionBridging.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34362654FEB400EB2EA8 /* ObjcExceptionBridging.xcframework */; };
-		CEBD343E2654FEB400EB2EA8 /* ObjcExceptionBridging.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34362654FEB400EB2EA8 /* ObjcExceptionBridging.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CEBD343F2654FEB400EB2EA8 /* Reachability.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34372654FEB400EB2EA8 /* Reachability.xcframework */; };
 		CEBD34402654FEB400EB2EA8 /* Reachability.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34372654FEB400EB2EA8 /* Reachability.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CEBD34412654FEB400EB2EA8 /* Sentry.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34382654FEB400EB2EA8 /* Sentry.xcframework */; };
 		CEBD34422654FEB400EB2EA8 /* Sentry.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34382654FEB400EB2EA8 /* Sentry.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CEBD34432654FEB400EB2EA8 /* XCGLogger.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34392654FEB400EB2EA8 /* XCGLogger.xcframework */; };
-		CEBD34442654FEB400EB2EA8 /* XCGLogger.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD34392654FEB400EB2EA8 /* XCGLogger.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CEBD34452654FEB400EB2EA8 /* Zip.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD343A2654FEB400EB2EA8 /* Zip.xcframework */; };
-		CEBD34462654FEB400EB2EA8 /* Zip.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CEBD343A2654FEB400EB2EA8 /* Zip.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CEF4E55623E95B7B0065B9C7 /* ImageBanner.xib in Resources */ = {isa = PBXBuildFile; fileRef = CEF4E55523E95B7B0065B9C7 /* ImageBanner.xib */; };
 		CEF4E55723E95B7B0065B9C7 /* ImageBanner.xib in Resources */ = {isa = PBXBuildFile; fileRef = CEF4E55523E95B7B0065B9C7 /* ImageBanner.xib */; };
 		CEF4E55923E967140065B9C7 /* ImageBannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEF4E55823E967140065B9C7 /* ImageBannerViewController.swift */; };
@@ -182,12 +179,10 @@
 			dstSubfolderSpec = 10;
 			files = (
 				CEBD34402654FEB400EB2EA8 /* Reachability.xcframework in Embed Frameworks */,
-				CEBD343E2654FEB400EB2EA8 /* ObjcExceptionBridging.xcframework in Embed Frameworks */,
+				296EF2C52AFA267500E3E384 /* ZIPFoundation.xcframework in Embed Frameworks */,
 				CEBD343C2654FEB400EB2EA8 /* DeviceKit.xcframework in Embed Frameworks */,
 				CEBD34422654FEB400EB2EA8 /* Sentry.xcframework in Embed Frameworks */,
-				CEBD34442654FEB400EB2EA8 /* XCGLogger.xcframework in Embed Frameworks */,
 				CE80AD34257F2B4B008D2150 /* KeymanEngine.framework in Embed Frameworks */,
-				CEBD34462654FEB400EB2EA8 /* Zip.xcframework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -205,10 +200,17 @@
 		16A9229D20325253003CC98E /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Keyman/Info.plist; sourceTree = SOURCE_ROOT; };
 		293EA3E027059C6900545EED /* ha */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ha; path = ha.lproj/Localizable.strings; sourceTree = "<group>"; };
 		294914742738DF7700400732 /* ff-NG */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ff-NG"; path = "ff-NG.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		296EF2C32AFA267500E3E384 /* ZIPFoundation.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ZIPFoundation.xcframework; path = ../../Carthage/Build/ZIPFoundation.xcframework; sourceTree = "<group>"; };
+		297810FD297FA818007C886D /* kn */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = kn; path = kn.lproj/Localizable.strings; sourceTree = "<group>"; };
+		298566B829802828004ACA95 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/Localizable.strings; sourceTree = "<group>"; };
+		298566C42980C493004ACA95 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Localizable.strings; sourceTree = "<group>"; };
+		298566D02980D354004ACA95 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Localizable.strings; sourceTree = "<group>"; };
+		298566DC2980E416004ACA95 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		29B27FEE29062BBC0036917E /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		29BFA75D282931F8009FCCC3 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Localizable.strings; sourceTree = "<group>"; };
 		29BFA769282946EC009FCCC3 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		29C1E17028001EC200759EDE /* pt-PT */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-PT"; path = "pt-PT.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		29CA9A612B4F9B0B00EAB099 /* KeymanLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeymanLogger.swift; sourceTree = "<group>"; };
 		37378F4222C9AA610043F22B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainViewController_iPad.xib; sourceTree = "<group>"; };
 		37378F4322C9AA630043F22B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainViewController_iPhone.xib; sourceTree = "<group>"; };
 		9815725018E4F0930014DF0C /* 702-share.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "702-share.png"; path = "Keyman Icons/702-share.png"; sourceTree = "<group>"; };
@@ -313,7 +315,6 @@
 		C055F0B01F60E8D400140735 /* GetStartedViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = GetStartedViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C055F0B21F60F7A400140735 /* DropDownView.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = DropDownView.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C055F0B41F610FB200140735 /* DropDownListView.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = DropDownListView.swift; sourceTree = "<group>"; tabWidth = 2; };
-		C059FCBF1FD927EF00BD1A64 /* Log.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Log.swift; sourceTree = "<group>"; };
 		C0A1A6301F5E4F4300EAF822 /* InfoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = InfoViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0A1A6321F5E749000EAF822 /* SetUpViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = SetUpViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
 		C0A1A6341F5E786A00EAF822 /* BookmarksViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = BookmarksViewController.swift; sourceTree = "<group>"; tabWidth = 2; };
@@ -335,11 +336,8 @@
 		CEACC90F25F07D5A006EAB45 /* km */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = km; path = km.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEACC91225F07D77006EAB45 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEBD34352654FEB400EB2EA8 /* DeviceKit.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = DeviceKit.xcframework; path = ../../Carthage/Build/DeviceKit.xcframework; sourceTree = "<absolute>"; };
-		CEBD34362654FEB400EB2EA8 /* ObjcExceptionBridging.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = ObjcExceptionBridging.xcframework; path = ../../Carthage/Build/ObjcExceptionBridging.xcframework; sourceTree = "<absolute>"; };
 		CEBD34372654FEB400EB2EA8 /* Reachability.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Reachability.xcframework; path = ../../Carthage/Build/Reachability.xcframework; sourceTree = "<absolute>"; };
 		CEBD34382654FEB400EB2EA8 /* Sentry.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Sentry.xcframework; path = ../../Carthage/Build/Sentry.xcframework; sourceTree = "<absolute>"; };
-		CEBD34392654FEB400EB2EA8 /* XCGLogger.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = XCGLogger.xcframework; path = ../../Carthage/Build/XCGLogger.xcframework; sourceTree = "<absolute>"; };
-		CEBD343A2654FEB400EB2EA8 /* Zip.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Zip.xcframework; path = ../../Carthage/Build/Zip.xcframework; sourceTree = "<absolute>"; };
 		CEBD3458265511B700EB2EA8 /* am */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = am; path = am.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEEC468226F2F7BA009A5B7D /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		CEEF81B92673019600EE6A07 /* es-419 */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-419"; path = "es-419.lproj/Localizable.strings"; sourceTree = "<group>"; };
@@ -353,12 +351,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				CEBD343F2654FEB400EB2EA8 /* Reachability.xcframework in Frameworks */,
-				CEBD343D2654FEB400EB2EA8 /* ObjcExceptionBridging.xcframework in Frameworks */,
+				296EF2C42AFA267500E3E384 /* ZIPFoundation.xcframework in Frameworks */,
 				CEBD343B2654FEB400EB2EA8 /* DeviceKit.xcframework in Frameworks */,
 				CEBD34412654FEB400EB2EA8 /* Sentry.xcframework in Frameworks */,
-				CEBD34432654FEB400EB2EA8 /* XCGLogger.xcframework in Frameworks */,
 				CE80AD33257F2B4A008D2150 /* KeymanEngine.framework in Frameworks */,
-				CEBD34452654FEB400EB2EA8 /* Zip.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -539,12 +535,10 @@
 		98ABADB2176935E400B62590 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				296EF2C32AFA267500E3E384 /* ZIPFoundation.xcframework */,
 				CEBD34352654FEB400EB2EA8 /* DeviceKit.xcframework */,
-				CEBD34362654FEB400EB2EA8 /* ObjcExceptionBridging.xcframework */,
 				CEBD34372654FEB400EB2EA8 /* Reachability.xcframework */,
 				CEBD34382654FEB400EB2EA8 /* Sentry.xcframework */,
-				CEBD34392654FEB400EB2EA8 /* XCGLogger.xcframework */,
-				CEBD343A2654FEB400EB2EA8 /* Zip.xcframework */,
 				CE80AD32257F2B4A008D2150 /* KeymanEngine.framework */,
 			);
 			name = Frameworks;
@@ -563,8 +557,8 @@
 				16A9229D20325253003CC98E /* Info.plist */,
 				162E2C9420926C8600F40769 /* Classes */,
 				C0E943F91F6124E100E7D98C /* AppDelegate.swift */,
-				C059FCBF1FD927EF00BD1A64 /* Log.swift */,
 				CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */,
+				29CA9A612B4F9B0B00EAB099 /* KeymanLogger.swift */,
 			);
 			path = Keyman;
 			sourceTree = "<group>";
@@ -794,6 +788,11 @@
 				it,
 				pl,
 				nl,
+				cs,
+				kn,
+				sv,
+				uk,
+				ru,
 			);
 			mainGroup = 98ABADA7176935E400B62590;
 			productRefGroup = 98ABADB1176935E400B62590 /* Products */;
@@ -951,7 +950,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/usr/bin/env bash";
-			shellScript = "verstr1=$(/usr/libexec/PlistBuddy -c \"Print CFBundleShortVersionString\" \"$SRCROOT/Keyman-Info.plist\")\nverstr2=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$SRCROOT/Keyman-Info.plist\")\n/usr/libexec/PlistBuddy \"$SRCROOT/Settings.bundle/Root.plist\" -c \"set PreferenceSpecifiers:0:DefaultValue $verstr1 (build $verstr2)\"\n\nif which swiftlint >/dev/null; then\n    swiftlint --config ../../.swiftlint.yml\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			shellScript = "#verstr1=$(/usr/libexec/PlistBuddy -c \"Print CFBundleShortVersionString\" \"$SRCROOT/Keyman-Info.plist\")\n#verstr2=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$SRCROOT/Keyman-Info.plist\")\n#/usr/libexec/PlistBuddy \"$SRCROOT/Settings.bundle/Root.plist\" -c \"set PreferenceSpecifiers:0:DefaultValue $verstr1 (build $verstr2)\"\n\nif which swiftlint >/dev/null; then\n    swiftlint --config ../../.swiftlint.yml\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 		CE002CB32408B372002026CE /* Run Script - upload dsyms to sentry */ = {
@@ -971,7 +970,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/usr/bin/env bash";
-			shellScript = ". \"$KEYMAN_ROOT/resources/build/xcode-utils.sh\"\n\nif [ ${UPLOAD_SENTRY:-false} = true ]; then\n  # Calls resource script to perform the dSYM upload\n  phaseSentryDsymUpload \"keyman-ios\"\nfi\n";
+			shellScript = ". \"$KEYMAN_ROOT/resources/build/xcode-utils.sh\"\n\nif [ ${UPLOAD_SENTRY:-false} = true ]; then\n  # Calls resource script to perform the dSYM upload\n  \"$KEYMAN_ROOT/resources/build/xcode-wrap.sh\" \"$KEYMAN_ROOT/resources/build/sentry-dsym-upload.sh\"\nfi\n";
 		};
 		CE06AA671F161422006D91C3 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -984,7 +983,7 @@
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
+			shellPath = "/usr/bin/env bash";
 			shellScript = "if which swiftlint >/dev/null; then\n    swiftlint --config ../../.swiftlint.yml\nelse\n    echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 		CE7E13D8240E285800252C00 /* Run Script - set versions */ = {
@@ -1003,7 +1002,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = "/usr/bin/env bash";
-			shellScript = ". \"$KEYMAN_ROOT/resources/build/xcode-utils.sh\"\n\n# Calls resource script to update build products' versioning.\n# true:  applies VERSION_WITH_TAG to custom KeymanVersionWithTag plist member used for in-app display\nphaseSetBundleVersions true\n\n# Also updates the version string for Settings\nsetSettingsBundleVersion\n";
+			shellScript = "\"$KEYMAN_ROOT/resources/build/xcode-wrap.sh\" \"$KEYMAN_ROOT/resources/build/set-bundle-versions-and-settings-tagged.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		CED3CFDA240E49DF001540A1 /* ShellScript */ = {
@@ -1020,8 +1019,8 @@
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = ". \"$KEYMAN_ROOT/resources/build/xcode-utils.sh\"\n\n# Calls resource script to update build products' versioning.\nphaseSetBundleVersions\n";
+			shellPath = "/usr/bin/env bash";
+			shellScript = "\"$KEYMAN_ROOT/resources/build/xcode-wrap.sh\" \"$KEYMAN_ROOT/resources/build/set-bundle-versions-untagged.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -1032,9 +1031,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				165EB39C2097181D00040A69 /* KMView.swift in Sources */,
+				29CA9A622B4F9B0B00EAB099 /* KeymanLogger.swift in Sources */,
 				C055F0B11F60E8D400140735 /* GetStartedViewController.swift in Sources */,
 				C055F0B51F610FB200140735 /* DropDownListView.swift in Sources */,
-				C059FCC01FD927EF00BD1A64 /* Log.swift in Sources */,
 				CE7FF1F0239A0293007859D9 /* PackageBrowserViewController.swift in Sources */,
 				C0E943F81F61234C00E7D98C /* UIImage+Helpers.swift in Sources */,
 				C0E943FE1F61377900E7D98C /* MainViewController.swift in Sources */,
@@ -1060,6 +1059,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CEF4E55A23E967140065B9C7 /* ImageBannerViewController.swift in Sources */,
+				29B30C212B56325D00C342A4 /* KeymanLogger.swift in Sources */,
 				C0FF769B1F5D368C00BD23C3 /* KeyboardViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1101,6 +1101,11 @@
 				29BFA75D282931F8009FCCC3 /* it */,
 				29BFA769282946EC009FCCC3 /* pl */,
 				29B27FEE29062BBC0036917E /* nl */,
+				298566B829802828004ACA95 /* cs */,
+				297810FD297FA818007C886D /* kn */,
+				298566C42980C493004ACA95 /* sv */,
+				298566D02980D354004ACA95 /* uk */,
+				298566DC2980E416004ACA95 /* ru */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1123,7 +1128,7 @@
 				GCC_PREFIX_HEADER = "Keyman/Keyman-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				INFOPLIST_FILE = Keyman/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1158,7 +1163,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Keyman/Keyman-Prefix.pch";
 				INFOPLIST_FILE = Keyman/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1169,7 +1174,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "Tavultesoft.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = Keyman;
 				PROVISIONING_PROFILE = "";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				PROVISIONING_PROFILE_SPECIFIER = "Keyman Distribution";
 				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
@@ -1225,7 +1229,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				KEYMAN_ROOT = "$(SRCROOT)/../../..";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
@@ -1277,7 +1281,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				KEYMAN_ROOT = "$(SRCROOT)/../../..";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
@@ -1312,7 +1316,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				INFOPLIST_FILE = SWKeyboard/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1355,7 +1359,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				INFOPLIST_FILE = SWKeyboard/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1424,7 +1428,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				KEYMAN_ROOT = "$(SRCROOT)/../../..";
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "";
@@ -1449,7 +1453,7 @@
 				GCC_PREFIX_HEADER = "Keyman/Keyman-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				INFOPLIST_FILE = Keyman/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1493,7 +1497,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				INFOPLIST_FILE = SWKeyboard/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

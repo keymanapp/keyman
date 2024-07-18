@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+@@keys: [K_Q][K_W][K_Q]
+@@expected: \u0127\u1790\u17B6\u0127
+-->
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <version number="1.0.0" />
+
+  <info author="srl295" indicator="🙀" layout="qwerty"  name="TestKbd"/>
+
+  <displays>
+    <!-- values chosen to reuse strings -->
+    <display output="a" display="^" />
+    <display keyId="e" display="^e" />
+    <displayOptions baseCharacter="e" />
+  </displays>
+
+  <keys>
+    <!-- Note: implied keys here: 'a' and 'e' -->
+    <key id="hmaqtugha" output="ħ" longPressKeyIds="a e" />
+    <key id="that" output="ថា" />
+  </keys>
+
+  <layers formId="us" minDeviceWidth="123">
+    <layer id="base">
+      <row keys="hmaqtugha that" />
+    </layer>
+  </layers>
+
+  <variables>
+    <string id="a" value="\m{a}"/>
+    <string id="vst" value="abc"/>
+    <set id="vse" value="a b c"/>
+    <uset id="vus" value="[abc]"/>
+  </variables>
+
+  <transforms type="simple">
+    <transformGroup>
+      <transform from="^a" to="â" />
+      <transform from="a" to="\m{a}" />
+    </transformGroup>
+    <transformGroup>
+      <!-- delete that marker -->
+      <transform from="\m{a}" />
+    </transformGroup>
+
+    <transformGroup>
+      <!-- Northern Thai example from spec -->
+      <reorder before="\u{1A6B}" from="\u{1A60}[\u{1A75}-\u{1A79}]\u{1A45}" order="10 55 10" />
+    </transformGroup>
+  </transforms>
+
+  <transforms type="backspace">
+    <transformGroup>
+      <transform from="^e" />
+    </transformGroup>
+  </transforms>
+</keyboard3>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+    <!-- Set the viewport width to match phone and tablet device widths -->
+    <meta name="viewport" content="width=device-width,user-scalable=no" />
+
+    <!-- Enable IE9 Standards mode -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>KeymanWeb Testing Page - Basic Mnemonic Support</title>
+
+    <!-- Your page CSS -->
+    <style type='text/css'>
+      body {font-family: Tahoma,helvetica;}
+      h3 {font-size: 1em;font-weight:normal;color: darkred; margin-bottom: 4px}
+      .test {font-size: 1.5em; width:80%; min-height:30px; border: 1px solid gray;}
+      #KeymanWebControl {width:50%;min-width:600px;}
+    </style>
+
+    <!-- Insert uncompiled KeymanWeb source scripts -->
+    <script src="../../../../../build/publish/debug/keymanweb.js" type="application/javascript"></script>
+
+    <!--
+      For desktop browsers, a script for the user interface must be inserted here.
+
+      Standard UIs are toggle, button, float and toolbar.
+      The toolbar UI is best for any page designed to support keyboards for
+      a large number of languages.
+    -->
+    <script src="../../../../../build/publish/debug/kmwuitoggle.js"></script>
+
+    <!-- Initialization: set paths to keyboards, resources and fonts as required -->
+    <script>
+      var kmw=window.keyman;
+      kmw.init();
+    </script>
+
+    <!-- Add keyboard management script for local selection of keyboards to use -->
+    <!--<script src="../commonHeader.js"></script>-->
+
+    <script>
+      kmw.addKeyboards({
+        id:'options_with_save',
+        name:'Options Test',
+        languages: {
+          id:'en',
+          name:'English'
+        },
+        filename:'./options_with_save.js'
+      });
+    </script>
+  </head>
+
+  <body>
+    <h2>KeymanWeb:  Test basic variable-store functionality</h2>
+    <p><ul>
+      <li><code>a</code>: Outputs "foo." if store is 'true', "no foo." if store is 'false'.</li>
+      <li><code>0</code>: Sets store to 'false'.</li>
+      <li><code>1</code>: Sets store to 'true'.</li>
+      <li><code>2</code>: "Saves" store; value should persist after a page reload.</li>
+    </ul></p>
+
+    <textarea rows='10' cols='80'></textarea>
+    <div id='KeymanWebControl'></div>
+
+    <h3><a href="../">Return to testing home page</a></h3>
+
+  </body>
+
+  <!--
+    *** DEVELOPER NOTE -- FIREFOX CONFIGURATION FOR TESTING ***
+    *
+    * If the URL bar starts with <b>file://</b>, Firefox may not load the font used
+    * to display the special characters used in the On-Screen Keyboard.
+    *
+    * To work around this Firefox bug, navigate to <b>about:config</b>
+    * and set <b>security.fileuri.strict_origin_policy</b> to <b>false</b>
+    * while testing.
+    *
+    * Firefox resolves website-based CSS URI references correctly without needing
+    * any configuration change, so this change should only be made for file-based testing.
+    *
+    ***
+  -->
+</html>

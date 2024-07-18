@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!-- app_name removed in 16.0 beta. Set in build.gradle -->
+  <!-- Context: Menu Action -->
+  <string name="action_share" comment="Menu action to send text content to another app">ပါ်ပရအ်</string>
+  <!-- Context: Menu Action -->
+  <string name="action_web" comment="Menu action to open Keyman browser">ဝေက်ဗရဴသာ</string>
+  <!-- Context: Menu Action -->
+  <string name="action_text_size" comment="Menu action to adjust text size">အဝဲမလိက်</string>
+  <!-- Context: Menu Action -->
+  <string name="action_overflow" comment="Show additional menu items">ဂၠိုၚ်နူဏံ</string>
+  <!-- Context: Menu Action -->
+  <string name="action_clear_text" comment="Menu action to erase text">ပလီုလိက်</string>
+  <!-- Context: Menu Action -->
+  <string name="action_info" comment="Menu action to display Keyman help page">တၚ်နၚ်</string>
+  <!-- Context: Menu Action -->
+  <string name="action_settings" comment="Menu action to open Settings menu">ဒၞါဲပလေဝ်နာနာ</string>
+  <!-- Context: Menu Action -->
+  <string name="action_install_updates" comment="Menu notification that keyboard or dictionary updates available">ပ္တိုန်စုတ်က္ဆံၚ်ဂမၠိုၚ်</string>
+  <!-- Context: Title -->
+  <string name="title_version" comment="Title of Keyman for Android version">ပါယှေန်: %1$s</string>
+  <!-- Context: Text label when old Chrome version installed -->
+  <string name="text_require_chrome_57" comment="Banner text when old version of Chrome is installed">    ကဳမာန် ဒးသုၚ်စောဲ Chrome ပါယှေန် ၅၇ အေန်အိုတ်ဟွံသေၚ်မ္ဂး သၠုၚ်နူဂှ်။</string>
+  <!-- Context: Button label -->
+  <string name="button_update_chrome" comment="Prompt to upgrade Chrome in the Play Store">သၠုၚ်ပ္တိုန်က္ဆံၚ် Chrome</string>
+  <!-- Context: Textfield prompt (&#8230; is the ellipsis character "...") -->
+  <string name="textview_hint" comment="Prompt to start typing">စတက်လိက်ဒၞာဲဏံ&#8230;</string>
+  <!-- Context: Splash screen (version/copyright info currently disabled -->
+  <!-- Context: Splash screen (version/copyright info currently disabled -->
+  <!-- Context: Text Size dialog -->
+  <string name="text_size" comment="Current text size (number)">အဝဲမလိက်: %1$d</string>
+  <!-- Context: Text Size dialog -->
+  <string name="ic_text_size_up" comment="Make text bigger">အဝဲမလိက်လ္တူ</string>
+  <!-- Context: Text Size dialog -->
+  <string name="ic_text_size_down" comment="Make text smaller">ဗၞတ်ဗ္ၜတ်မလိက်သၟဝ်</string>
+  <!-- Context: Text Size dialog -->
+  <string name="ic_text_size_slider" comment="Adjust text size">တသောဝ်ဖျေံ အဝဲမလိက်</string>
+  <!-- Context: Clear Text dialog -->
+  <string name="all_text_will_be_cleared" comment="Erase all the text">\nလိက်သီုဖအိုတ်ဂှ် သ္အးထောံရောၚ်\n</string>
+  <!-- Context: Get Started menu -->
+  <string name="get_started" comment="Menu for getting started">စတရဴစိုအ်</string>
+  <!-- Context: Get Started menu -->
+  <string name="add_a_keyboard" comment="Menu item to add a keyboard">စုတ်ကဳဗုဒ်သွက်ဘာသာမၞးညိ</string>
+  <!-- Context: Get Started menu -->
+  <string name="enable_system_keyboard" comment="Menu item to enable Keyman as system keyboard">သ္ပဒတန်ကဳမာန် နကဵု ကဳဗုဒ်အလုံစက်</string>
+  <!-- Context: Get Started menu -->
+  <string name="set_keyman_as_default" comment="Menu item to set Keyman as default system keyboard">ကဳမာန်ဂှ် စွံနဒဒှ်ကဳဗုဒ်ပကတိညိ</string>
+  <!-- Context: Get Started menu -->
+  <string name="more_info" comment="Open the Keyman for Android help page">တၚ်နၚ်ဂမၠိုၚ်</string>
+  <!-- Context: Get Started menu -->
+  <string name="show_get_started" comment="Show the &quot;Get Started&quot; menu on startup">ကာလစပ္တံမ္ဂး ထ္ၜး “%1$s”ညိ</string>
+  <!-- Context: Android Storage Permission -->
+  <string name="request_storage_permission" comment="Request storage permission to access keyboard packages">သွက်ဂွံစုတ်ပက်ကေကဳဗုဒ်ဂမၠိုၚ်ကီု, သွက်ဂွံဗှ်အရာမစွံပ္တန်လဝ်မ္ၚးတအ်မာန်ကီုဂှ် ပံက်ကဵုအခေါၚ် ကဳမာန်ညိ</string>
+  <!-- Context: Android Storage Permission -->
+  <string name="storage_permission_denied" comment="Keyboard package installation may fail since Android storage permission not granted">အခေါၚ်သွက်ဂွံစွံပ္တန်ဂှ် တးပါဲလဝ်ရ။ သွက်ဂွံစုတ်ပက်ကုက်ကဳဗုဒ်လေဝ် လီုအာမာန်ရ။</string>
+  <string name="storage_permission_denied2" comment="Keyboard package installation failed. Recommend install from local file">ကေတ်အခေါၚ် ဒၞါဲဂိုၚ်စွံဟွံအံၚ်ဇၞး။ စမ်ရံၚ်ဒၞါဲပလေဝ်ပလေတ်ကဳမာန် - ပ္တိုန်စုတ်နူဝှါၚ် လဵုဂေဝ်</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="keyman_settings" comment="Settings menu title">ဒၞါဲပလေဝ်နာနာ</string>
+  <!-- Context: Keyman Settings menu -->
+  <plurals name="installed_languages">
+    <item quantity="other">အရေဝ်ဘာသာ (%1$d) စုတ်လဝ် တုဲတုဲဂမၠိုၚ်</item>
+  </plurals>
+  <!-- Context: Keyman Settings menu -->
+  <string name="install_keyboard_or_dictionary" comment="Menu item to install keyboard or dictionary">စုတ် ကဳဗုဒ် ဟွံသေၚ်မ္ဂး အဘိဓာန်</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="change_display_language" comment="Menu action to change interface language">ဘာသာဓမံက်ထ္ၜး</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="adjust_keyboard_height" comment="Menu action to adjust keyboard height">ချိၚ်ဆသမၠုၚ်ကဳဗုဒ်ညိ</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="spacebar_caption" comment="Menu action to set the spacebar caption">က္တိုပ်လိက် Spacebar</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_keyboard" comment="Spacebar caption option - keyboard">ကဳဗုဒ်</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_language" comment="Spacebar caption option - language">အရေဝ်ဘာသာ</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_language_keyboard" comment="Spacebar caption option - language + keyboard">ဘာသာ + ကဳဗုဒ်</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption -->
+  <string name="spacebar_caption_blank" comment="Spacebar caption option - blank">သၠး</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_keyboard" comment="Spacebar caption hint - keyboard">ပ္ဍဲ spacebar ဂှ် ထ္ၜးယၟုကဳဗုဒ်ညိ</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_language" comment="Spacebar caption hint - language">ပ္ဍဲ spacebar ဂှ် ထ္ၜးယၟုအရေဝ်ဘာသာညိ</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_language_keyboard" comment="Spacebar caption hint - language + keyboard">ကဳဗုဒ် ကေုာံ အရေဝ်ဘာသာ
+ပ္ဍဲspacebar</string>
+  <!-- Context: Keyman Settings menu / Spacebar caption hint -->
+  <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">လ္ပဓမံက်ထ္ၜးမလိက်ပ္ဍဲspacebarညိ</string>
+  <!-- Context: Keyman Settings menu / Haptic feedback -->
+  <string name="haptic_feedback" comment="haptic feedback on key press">ပ္ဍဲကာလမတက်လိက် ချဳဒတဝ်ညိ</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="show_banner" comment="text suggestions banner">ဓမံက်ထ္ၜးbannerလၟိုန်ညိ</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="show_banner_on" comment="Description when toggle is on">သွက်ဂွံဓမံက်ရုပ်ရဴ</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="show_banner_off" comment="Description when toggle is off">ကၟာတ်လဝ်မ္ဂး မလိက်ချိၚ်ဆလဝ်တံဂှ် ထ္ၜးအဃောပံက်လဝ်ဟေၚ်</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="show_send_crash_report" comment="permission for sending crash reports">ကဵုအခေါၚ် ပၠံၚ်လိက်စဳရေၚ်လ္တူ အေန်တာနက်ညိ</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="show_send_crash_report_on" comment="Description when toggle is on">ယဝ်ပံက်လဝ်မ္ဂး လိက်ဒုၚ်စဳရေၚ်ဂှ်ပၠံၚ်ဏာရောၚ်</string>
+  <!-- Context: Keyman Settings menu -->
+  <string name="show_send_crash_report_off" comment="Description when toggle is off">ယဝ်ကၟာတ်လဝ်မ္ဂး လိက်ဒုၚ်စဳရေၚ်ဂှ် ဟွံပၠံၚ်ရ။.</string>
+  <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
+  <string name="install_from_keyman_dot_com" comment="Install package from Keyman server">စုတ်နူ keyman.com</string>
+  <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
+  <string name="install_from_local_file" comment="Install package file from local device">စုတ်နူ ဝှါၚ် ပ္ဍဲစက်</string>
+  <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
+  <string name="install_from_other_device" comment="Scan QR Code">စုတ်နူစက်တၞဟ်ဟ်</string>
+  <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
+  <string name="add_languages_to_installed_keyboard" comment="Install additional languages from a keyboard package">ဂွံစုတ်ကဳဗုဒ်ဂှ် ထပ်စုတ် အရေဝ်ဘာသာဂမၠိုၚ်</string>
+  <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
+  <string name="add_language_subtext" comment="Additional information for adding another language">(နူကဵုပက်ကေ ကဳဗုဒ်)</string>
+  <!-- Context: Select Package and Select Languages menu -->
+  <string name="title_select_keyboard_package_list" comment="Select a keyboard package to add languages">ရုဲစှ်ကဳဗုဒ်ပက်ကေ</string>
+  <!-- Context: Select Package and Select Languages menu -->
+  <string name="title_select_languages_for_package" comment="Select language names from the keyboard package">ရုဲစှ်အရေဝ်ဘာသာ%1$s</string>
+  <!-- Context: Select Package and Select Languages menu -->
+  <string name="added_language_to_keyboard" comment="Notification that a language name is added to a keyboard">စုတ်လဝ်ဘာသာနူ %1$s စိုပ် %2$s တုဲရ</string>
+  <!-- Context: Select Package and Select Languages menu -->
+  <string name="all_languages_installed" comment="Text when all languages from a keyboard package have been installed">စုတ်ဘာသာသီုဖအိုတ်တုဲ</string>
+  <!-- Context: Adjust Keyboard Height menu -->
+  <string name="drag_the_keyboard" comment="First line of adjusting keyboard height">သ္ဂောံချိၚ်သမၠုၚ် ကဳဗုဒ်ဂှ် ဂြဲညိ</string>
+  <!-- Context: Adjust Keyboard Height menu -->
+  <string name="rotate_the_device" comment="Second line of adjusting keyboard height">ဂွံချိၚ် လံက်သတိက် လံက်ဇမၠိၚ်ဂှ် ဗဂေတ်ကဵုစက်ပိုဲညိ။</string>
+  <!-- Context: Adjust Keyboard Height menu -->
+  <string name="reset_to_defaults" comment="Button to reset to default heights">ကလေၚ်သ္ပနူပကတိ</string>
+  <!-- Context: Keyman Web Browser -->
+  <string name="hint_text" comment="Prompt to type in the browser search bar">ဂၠာဲ ဟွံသေၚ် တက် URL</string>
+  <!-- Context: Keyman Web Browser -->
+  <string name="title_bookmarks" comment="Title for bookmarks">သမ္တီမုက်လိက်ဂမၠိုၚ်</string>
+  <!-- Context: Keyman Web Browser -->
+  <string name="no_bookmarks" comment="Text when bookmark list is empty">မုက်လိက်သမ္တီလဝ်ဂမၠိုၚ်ဟွံမွဲ</string>
+  <!-- Context: Keyman Web Browser -->
+  <string name="add_bookmark" comment="Confirmation to add bookmark">စွံ သမ္တီမုက်လိက်</string>
+  <!-- Context: Keyman Web Browser -->
+  <string name="hint_title" comment="Page title for saved bookmark">မာတိကာ</string>
+  <!-- Context: Keyman Web Browser -->
+  <string name="hint_url" comment="Page URL for saved bookmark">Url</string>
+  <!-- Context: KMP Package strings -->
+  <string name="title_package_failed_to_install" comment="Error dialog title when package failed to install">ပက်ကေ %1$s ဂှ် ပ္တိုန်စုတ်ဟွံအံၚ်ဇၞး</string>
+  <!-- Context: KMP Package strings -->
+  <string name="downloading_keyboard_package" comment="Confirmation to download keyboard package filename">အဃောဂြဲဖျေံဒၟံၚ် ပက်ကေကဳဗုဒ်\n&amp;%1$s&#8230;</string>
+  <!-- Context: KMP Package strings -->
+  <string name="failed_to_extract" comment="Notification that keyboard package failed to unzip">သှ် ဟွံအံၚ်ဇၞး</string>
+  <!-- Context: KMP Package strings -->
+  <string name="install_keyboard_package" comment="Title to install keyboard package">စုတ်ကဳဗုဒ်</string>
+  <!-- Context: KMP Package strings -->
+  <string name="install_predictive_text_package" comment="Title to install dictionary package">စုတ်အဘိဓာန်</string>
+  <!-- Context: KMP Package strings -->
+  <string name="not_valid_package_file" comment="Notification when invalid package file cannot be installed">%1$s ဂှ် ဝှါၚ်ပက်ကေ ကဳမာန် ဟွံသေၚ်ရ။\n%2$s\"</string>
+  <!-- Context: KMP Package strings -->
+  <string name="no_new_touch_keyboards_to_install" comment="Notification when no touch-optimized keyboards can be installed">ပက်ကေ ကဳဗုဒ် ဂှ် ကဳဗုဒ် လုက်စုက် သမၠုၚ်လဝ်ကဆံၚ် ဂမၠိုၚ်ဟွံဂွံစုတ်လဝ်ရ။</string>
+  <!-- Context: KMP Package strings -->
+  <string name="no_new_predictive_text_to_install" comment="Notification when no dictionaries can be installed">မလိက်ခယျတၟိ ဟွံစုတ်လဝ်ရ။</string>
+  <!-- Context: KMP Package strings -->
+  <string name="no_targets_to_install" comment="Notification when a package doesn't contain keyboards or dictionaries">မလိက်ခယျတၟိ ဟွံစုတ်လဝ်ရ။</string>
+  <!-- Context: KMP Package strings -->
+  <string name="no_associated_languages" comment="Notification when a keyboard package doesn't contain languages">ပ္ဍဲပက်ကေ ကဳဗုဒ်ဏံ ဘာသာ မဆက်စပ်ဂမၠိုၚ် ဟွံပ္တိုန်စုတ်လဝ်ရ</string>
+  <!-- Context: KMP Package strings -->
+  <string name="invalid_metadata" comment="kmp.json metadata file is invalid or missing in package">မဳတာဒေတာ ပ္ဍဲပက်ကေဏံ သုၚ်စောဲ ဟွံဂွံ/ကၠေံမံၚ်ရ။</string>
+  <!-- Context: KMP Package strings -->
+  <string name="minimum_keyboard_version_not_supported" comment="Notification when keyboard has functionality not supported by current Keyman">    ကဳဗုဒ်ဏံ နွံပၟိက်ကု ပါယှေန် ကဳမာန်တၟိ</string>
+  <!-- Context: anywhere -->
+  <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">ပံက် ဝေက်ဗရဴသာဟွံဂွံ</string>
+</resources>

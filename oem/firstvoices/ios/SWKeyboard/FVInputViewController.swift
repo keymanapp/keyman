@@ -11,16 +11,11 @@
 
 import KeymanEngine
 import UIKit
+import os.log
 
 @objc(FVInputViewController)
 class FVInputViewController: InputViewController {
   override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-    #if DEBUG
-      KeymanEngine.log.outputLevel = .debug
-      KeymanEngine.log.logAppDetails()
-    #else
-      KeymanEngine.log.outputLevel = .warning
-    #endif
 
     Manager.applicationGroupIdentifier = FVConstants.groupID
 
@@ -77,7 +72,7 @@ class FVInputViewController: InputViewController {
   func setupTopBarImage(isPortrait: Bool) {
     let imgPath = getTopBarImage(isPortrait: isPortrait)
     guard let path = imgPath else {
-      log.error("No image specified for the image banner!")
+      os_log("No image specified for the image banner!", log: FVLogger.ui, type: .error)
       return
     }
 

@@ -1,12 +1,17 @@
 #!/usr/bin/python3
 
 import logging
+import os
 import webbrowser
 
 import gi
 
 gi.require_version('Gtk', '3.0')
-gi.require_version('WebKit2', '4.0')
+try:
+    gi.require_version('WebKit2', '4.1')
+except ValueError:
+    # TODO: Remove once we drop support for Ubuntu 20.04 Focal
+    gi.require_version('WebKit2', '4.0')
 from gi.repository import Gtk, WebKit2
 
 from keyman_config import _
@@ -55,15 +60,23 @@ class WelcomeView(Gtk.Dialog):
     def doc_policy(self, web_view, decision, decision_type):
         logging.info("Checking policy")
         logging.debug("received policy decision request of type: {0}".format(decision_type.value_name))
-        if decision_type == WebKit2.PolicyDecisionType.NAVIGATION_ACTION or \
-                decision_type == WebKit2.PolicyDecisionType.NEW_WINDOW_ACTION:
+        if decision_type in [
+            WebKit2.PolicyDecisionType.NAVIGATION_ACTION,
+            WebKit2.PolicyDecisionType.NEW_WINDOW_ACTION,
+        ]:
             nav_action = decision.get_navigation_action()
             request = nav_action.get_request()
             uri = request.get_uri()
             logging.debug("nav request is for uri %s", uri)
-            if "welcome.htm" not in uri:
-                logging.debug("opening uri %s in webbrowser")
+            if not uri.startswith("file://"):
+                logging.debug("opening external uri %s in webbrowser", uri)
                 webbrowser.open(uri)
+                decision.ignore()
+                return True
+            elif ".htm" not in uri:
+                cmd = f'xdg-open {uri}'
+                logging.debug('opening uri in default app: %s', cmd)
+                os.system(cmd)
                 decision.ignore()
                 return True
         return False

@@ -33,6 +33,7 @@ function ParseJSONValue(const Data: string; var Offset: Integer): TJSONObject;  
 function JSONDateToDateTime(const Value: string; var DateTime: TDateTime): Boolean;
 function DateTimeToJSONDate(ADateTime: TDateTime): string;
 function LoadJSONFromFile(const Filename: string; var Offset: Integer): TJSONObject;
+procedure SaveJSONToFile(const Filename: string; const JSON: TJSONObject);
 
 implementation
 
@@ -45,10 +46,24 @@ function JSONToString(obj: TJSONAncestor; ReplaceSlashes: Boolean = False): stri
 var
   bytes: TBytes;
   len: Integer;
+  builder: TStringBuilder;
 begin
-  SetLength(bytes, obj.EstimatedByteSize);
-  len := obj.ToBytes(bytes, 0);
-  Result := TEncoding.UTF8.GetString(bytes, 0, len);
+  if obj is TJSONString then
+  begin
+    builder := TStringBuilder.Create;
+    try
+      obj.ToChars(builder);
+      Result := builder.ToString;
+    finally
+      builder.Free;
+    end;
+  end
+  else
+  begin
+    SetLength(bytes, obj.EstimatedByteSize);
+    len := obj.ToBytes(bytes, 0);
+    Result := TEncoding.UTF8.GetString(bytes, 0, len);
+  end;
   if ReplaceSlashes then
     Result := ReplaceStr(Result, '\/', '/');
 end;
@@ -150,6 +165,25 @@ begin
     Result := ParseJSONValue(ss.DataString, offset);
   finally
     ss.Free;
+  end;
+end;
+
+procedure SaveJSONToFile(const Filename: string; const JSON: TJSONObject);
+var
+  s: TStringList;
+  ss: TStringStream;
+begin
+  s := TStringList.Create;
+  try
+    PrettyPrintJSON(JSON, s, 2);
+    ss := TStringStream.Create(s.Text, TEncoding.UTF8);
+    try
+      ss.SaveToFile(Filename);
+    finally
+      ss.Free;
+    end;
+  finally
+    s.Free;
   end;
 end;
 

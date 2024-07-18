@@ -1,141 +1,111 @@
 #!/usr/bin/env bash
-# Build KMAPro
-
-# Set sensible script defaults:
-# set -e: Terminate script if a command returns an error
-set -e
-# set -u: Terminate script if an unset variable is used
-set -u
-# set -x: Debugging use, print each statement
-# set -x
-
+# Build Keyman for Android app (KMAPro)
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
-THIS_SCRIPT="$(greadlink -f "${BASH_SOURCE[0]}" 2>/dev/null || readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../resources/build/build-utils.sh"
+THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-help.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
 
-echo Build KMAPro
+# ################################ Main script ################################
 
-#
-# Prevents 'clear' on exit of mingw64 bash shell
-#
-SHLVL=0
+# Definition of global compile constants
 
-display_usage ( ) {
-    echo "build.sh [-no-daemon] [-debug] [-download-resources]"
-    echo
-    echo "Build Keyman for Android"
-    echo "  -no-daemon              Don't start the Gradle daemon. Use for CI"
-    echo "  -upload-sentry          Uploads debug symbols, etc, to Sentry"
-    echo "  -debug                  Compile only Debug variant"
-    echo "  -download-resources     Download sil_euro_latin.kmp and nrc.en.mtnt.model.kmp from downloads.keyman.com"
-    exit 1
-}
+CONFIG="release"
+BUILD_FLAGS="build -x lint -x test"                     # Gradle build w/o test
+TEST_FLAGS="-x assembleRelease lintRelease testRelease" # Gradle test w/o build
+DAEMON_FLAG=
 
-function makeLocalSentryRelease() {
-  local SENTRY_RELEASE_VERSION="release-$VERSION_WITH_TAG"
-  echo "Making a Sentry release for tag $SENTRY_RELEASE_VERSION"
-  sentry-cli upload-dif -p keyman-android --include-sources
-  sentry-cli releases -p keyman-android files $SENTRY_RELEASE_VERSION upload-sourcemaps ./
+builder_describe "Builds Keyman for Android app." \
+  "@/android/KMEA" \
+  "clean" \
+  "configure" \
+  "build" \
+  "test             Runs lint and unit tests." \
+  "--ci             Don't start the Gradle daemon. For CI" \
+  "--upload-sentry  Upload to sentry"
 
-  echo "Finalizing release tag $SENTRY_RELEASE_VERSION"
-  sentry-cli releases finalize "$SENTRY_RELEASE_VERSION"
-}
+# parse before describe_outputs to check debug flags
+builder_parse "$@"
 
-NO_DAEMON=false
-ONLY_DEBUG=false
-DO_KEYBOARDS_DOWNLOAD=false
-DO_MODELS_DOWNLOAD=false
-DO_SENTRY_LOCAL_UPLOAD=false
+if builder_is_debug_build; then
+  builder_heading "### Debug config ####"
+  CONFIG="debug"
+  BUILD_FLAGS="assembleDebug -x lint -x test"
+  TEST_FLAGS="-x assembleDebug lintDebug testDebug"
+fi
+
+builder_describe_outputs \
+  configure     /android/KMAPro/kMAPro/libs/keyman-engine.aar \
+  build         /android/KMAPro/kMAPro/build/outputs/apk/$CONFIG/keyman-${VERSION}.apk
+
+#### Build
+
 
 # Parse args
-while [[ $# -gt 0 ]] ; do
-    key="$1"
-    case $key in
-        -no-daemon)
-            NO_DAEMON=true
-            ;;
-        -upload-sentry)
-            # Overrides default set by build-utils.sh
-            UPLOAD_SENTRY=true
-            ;;
-        -debug)
-            ONLY_DEBUG=true
-            ;;
-        -download-resources)
-            DO_KEYBOARDS_DOWNLOAD=true
-            DO_MODELS_DOWNLOAD=true
-            ;;
-        -h|-\?)
-            display_usage
-            ;;
-    esac
-    shift # past argument
-done
 
-KEYBOARD_PACKAGE_ID="sil_euro_latin"
-KEYBOARDS_TARGET="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/assets/${KEYBOARD_PACKAGE_ID}.kmp"
-MODEL_PACKAGE_ID="nrc.en.mtnt"
-MODELS_TARGET="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/assets/${MODEL_PACKAGE_ID}.model.kmp"
-
-# Verify default keyboard and dictionary exist
-if [[ ! -f "$KEYBOARDS_TARGET" ]]; then
-  echo "$KEYBOARDS_TARGET doesn't exist. Will download the latest version"
-  DO_KEYBOARDS_DOWNLOAD=true
-fi
-
-if [[ ! -f "$MODELS_TARGET" ]]; then
-  echo "$MODELS_TARGET doesn't exist. Will download the latest version"
-  DO_MODELS_DOWNLOAD=true
-fi
-
-# Local development optimization to upload local symbols to Sentry
-if [[ $VERSION_ENVIRONMENT == "local" && $ONLY_DEBUG == true && $UPLOAD_SENTRY == true ]]; then
-  DO_SENTRY_LOCAL_UPLOAD=true
-fi
-
-echo
-echo "NO_DAEMON: $NO_DAEMON"
-echo "ONLY_DEBUG: $ONLY_DEBUG"
-echo "DO_KEYBOARDS_DOWNLOAD: $DO_KEYBOARDS_DOWNLOAD"
-echo "DO_MODELS_DOWNLOAD: $DO_MODELS_DOWNLOAD"
-echo "DO_SENTRY_LOCAL_UPLOAD: $DO_SENTRY_LOCAL_UPLOAD"
-echo
-
-if [ "$NO_DAEMON" = true ]; then
+if builder_has_option --ci; then
   DAEMON_FLAG=--no-daemon
-else
-  DAEMON_FLAG=
 fi
 
-# Convert markdown to html for offline help
-echo "Converting markdown to html for offline help"
-cd "$KEYMAN_ROOT/android"
-./build-help.sh htm
-cd "$KEYMAN_ROOT/android/KMAPro"
+#### Build action definitions ####
 
-# Download default keyboard and dictionary
-if [ "$DO_KEYBOARDS_DOWNLOAD" = true ]; then
+function makeLocalSentryRelease() {
+  echo "Making a Sentry release for tag $VERSION_GIT_TAG"
+  sentry-cli upload-dif -p keyman-android --include-sources
+  sentry-cli releases -p keyman-android files $VERSION_GIT_TAG upload-sourcemaps ./
+
+  echo "Finalizing release tag $VERSION_GIT_TAG"
+  sentry-cli releases finalize "$VERSION_GIT_TAG"
+}
+
+
+#### Build action definitions ####
+
+# Check about cleaning artifact paths
+if builder_start_action clean; then
+  rm -rf "$KEYMAN_ROOT/android/KMAPro/kMAPro/build/outputs"
+  builder_finish_action success clean
+fi
+
+if builder_start_action configure; then
+
+  KEYBOARD_PACKAGE_ID="sil_euro_latin"
+  KEYBOARDS_TARGET="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/assets/${KEYBOARD_PACKAGE_ID}.kmp"
+  MODEL_PACKAGE_ID="nrc.en.mtnt"
+  MODELS_TARGET="$KEYMAN_ROOT/android/KMAPro/kMAPro/src/main/assets/${MODEL_PACKAGE_ID}.model.kmp"
+
   downloadKeyboardPackage "$KEYBOARD_PACKAGE_ID" "$KEYBOARDS_TARGET"
-fi
-
-if [ "$DO_MODELS_DOWNLOAD" = true ]; then
   downloadModelPackage "$MODEL_PACKAGE_ID" "$MODELS_TARGET"
+
+  builder_finish_action success configure
 fi
 
-if [ "$ONLY_DEBUG" = true ]; then
-  BUILD_FLAGS="assembleDebug lintDebug"
-else
-  # build = assemble + check; check = test + lint
-  BUILD_FLAGS=build
+if builder_start_action build; then
+
+  # Copy Keyman Engine for Android
+  cp "$KEYMAN_ROOT/android/KMEA/app/build/outputs/aar/keyman-engine-${CONFIG}.aar" "$KEYMAN_ROOT/android/KMAPro/kMAPro/libs/keyman-engine.aar"
+
+  # Convert markdown to html for offline help
+  build_help_html android KMAPro/kMAPro/src/main/assets/info
+
+  echo "BUILD_FLAGS $BUILD_FLAGS"
+  ./gradlew $DAEMON_FLAG clean $BUILD_FLAGS
+
+  if builder_has_option --upload-sentry; then
+    makeLocalSentryRelease
+  fi
+
+  builder_finish_action success build
 fi
 
-echo "BUILD_FLAGS $BUILD_FLAGS"
-./gradlew $DAEMON_FLAG clean $BUILD_FLAGS
+if builder_start_action test; then
 
-if [ "$DO_SENTRY_LOCAL_UPLOAD" = true ]; then
-  makeLocalSentryRelease
+  echo "TEST_FLAGS $TEST_FLAGS"
+  ./gradlew $DAEMON_FLAG $TEST_FLAGS
+
+  builder_finish_action success test
 fi

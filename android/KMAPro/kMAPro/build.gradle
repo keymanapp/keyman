@@ -2,7 +2,7 @@ plugins {
     id 'com.android.application'
     id 'io.sentry.android.gradle'
     // https://github.com/Triple-T/gradle-play-publisher/issues/947#issuecomment-843634852
-    id 'com.github.triplet.play' version '3.7.0-agp4.2' apply false
+    id 'com.github.triplet.play' version '3.9.1' apply false
     id 'name.remal.default-plugins'
 }
 
@@ -10,21 +10,18 @@ ext.rootPath = '../../'
 apply from: "$rootPath/version.gradle"
 
 android {
-    compileSdkVersion 33
+    compileSdk 34
+    namespace="com.tavultesoft.kmapro"
 
     // Don't compress kmp files so they can be copied via AssetManager
     aaptOptions {
         noCompress "kmp"
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
 
     defaultConfig {
         applicationId "com.tavultesoft.kmapro"
         minSdkVersion 21
-        targetSdkVersion 33
+        targetSdkVersion 34
 
         //println "===DUMPING PROPERTIES==="
         //dumpProperties(project) // Use this to dump all external properties for debugging TeamCity integration
@@ -34,6 +31,7 @@ android {
         versionCode VERSION_CODE as Integer
         versionName VERSION_NAME
         buildConfigField 'String', 'VERSION_ENVIRONMENT', '"'+VERSION_ENVIRONMENT+'"'
+        buildConfigField 'String', 'VERSION_GIT_TAG', '"'+VERSION_GIT_TAG+'"'
     }
 
     String env_release_store_file = System.getenv("release_store_file")
@@ -94,6 +92,11 @@ android {
             }
         }
         variant.resValue "string", "app_name", 'Keyman' + appSuffix;
+
+        // Adjust output name to "keyman-${VERSION_MD}.apk"
+        variant.outputs.all {
+            outputFileName = "keyman-" + VERSION_MD + ".apk"
+        }
     }
     lintOptions {
         disable 'MissingQuantity', 'MissingTranslation'
@@ -147,18 +150,18 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.6.0-rc01'
-    implementation 'com.google.android.material:material:1.6.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.12.0'
     implementation 'com.stepstone.stepper:material-stepper:4.3.1'
     api(name: 'keyman-engine', ext: 'aar')
-    implementation 'io.sentry:sentry-android:6.9.2'
-    implementation 'androidx.preference:preference:1.2.0'
+    implementation 'io.sentry:sentry-android:7.8.0'
+    implementation 'androidx.preference:preference:1.2.1'
     implementation "com.android.installreferrer:installreferrer:2.2"
 
     // Add dependency for generating QR Codes
     // (Even though it's embedded in KMEA, because we're manually copying keyman-engine.aar,
     // we "lose" it in the dependency management)
-    implementation ('com.github.kenglxn.QRGen:android:2.7.0') {
+    implementation ('com.github.kenglxn.QRGen:android:3.0.1') {
         transitive = true
     }
 }

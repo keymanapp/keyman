@@ -17,11 +17,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import io.sentry.android.core.SentryAndroid;
 
-import com.tavultesoft.kmea.*;
-import com.tavultesoft.kmea.data.Keyboard;
-import com.tavultesoft.kmea.util.BCP47;
-import com.tavultesoft.kmea.util.DownloadFileUtils;
-import com.tavultesoft.kmea.KeyboardEventHandler.OnKeyboardDownloadEventListener;
+import com.keyman.engine.*;
+import com.keyman.engine.data.Keyboard;
+import com.keyman.engine.util.BCP47;
+import com.keyman.engine.util.DownloadFileUtils;
+import com.keyman.engine.KeyboardEventHandler.OnKeyboardDownloadEventListener;
 
 import java.io.File;
 import java.util.HashMap;
@@ -40,7 +40,8 @@ public class MainActivity extends AppCompatActivity implements OnKeyboardDownloa
         context = this;
 
         SentryAndroid.init(context, options -> {
-            options.setRelease("release-"+com.firstvoices.keyboards.BuildConfig.VERSION_NAME);
+            options.setEnableAutoSessionTracking(false);
+            options.setRelease(com.firstvoices.keyboards.BuildConfig.VERSION_GIT_TAG);
             options.setEnvironment(com.firstvoices.keyboards.BuildConfig.VERSION_ENVIRONMENT);
         });
 

@@ -54,12 +54,12 @@
     <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>$(ProjectDir)..\..\..\..\core\build\x64\$(Configuration)\src;$(ProjectDir)..\..\..\..\core\build\rust\x64\$(Configuration);$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
-    <IncludePath>$(ProjectDir)..\..\..\..\common\include;$(ProjectDir)..\..\..\..\core\build\x64\$(Configuration)\include;$(ProjectDir)..\..\..\..\core\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\..\..\..\core\build\x64\$(Configuration)\src;$(ProjectDir)..\..\..\..\core\build\x64\$(Configuration)\subprojects\icu\source\common;$(ProjectDir)..\..\..\..\core\build\x64\$(Configuration)\subprojects\icu\source\i18n;$(ProjectDir)..\..\..\..\core\build\rust\x64\$(Configuration);$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\..\..\..\common\include;$(ProjectDir)..\..\..\..\core\include;$(ProjectDir)..\..\..\..\core\build\x64\$(Configuration)\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LibraryPath>$(ProjectDir)..\..\..\..\core\build\x64\$(Configuration)\src;$(ProjectDir)..\..\..\..\core\build\rust\x64\$(Configuration);$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
-    <IncludePath>$(ProjectDir)..\..\..\..\common\include;$(ProjectDir)..\..\..\..\core\build\x64\$(Configuration)\include;$(ProjectDir)..\..\..\..\core\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\..\..\..\core\build\x64\$(Configuration)\src;$(ProjectDir)..\..\..\..\core\build\x64\$(Configuration)\subprojects\icu\source\common;$(ProjectDir)..\..\..\..\core\build\x64\$(Configuration)\subprojects\icu\source\i18n;$(ProjectDir)..\..\..\..\core\build\rust\x64\$(Configuration);$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\..\..\..\common\include;$(ProjectDir)..\..\..\..\core\include;$(ProjectDir)..\..\..\..\core\build\x64\$(Configuration)\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Midl>
@@ -96,7 +96,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/verbose:lib /section:.SHARDATA,rws %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>libkmnkbp0.a;psapi.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libicuuc.a;libicuin.a;libkeymancore.a;psapi.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>C:\Program Files\Microsoft SDKs\Windows\v7.0\Lib\x64;$(VCInstallDir)lib\amd64;$(VCInstallDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -152,7 +152,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/verbose:lib /section:.SHARDATA,rws %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>libkmnkbp0.a;psapi.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;libcmt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libicuuc.a;libicuin.a;libkeymancore.a;psapi.lib;version.lib;setupapi.lib;iphlpapi.lib;imm32.lib;crypt32.lib;wintrust.lib;imagehlp.lib;ws2_32.lib;libcmtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>C:\Program Files\Microsoft SDKs\Windows\v7.0\Lib\x64;$(VCInstallDir)lib\amd64;$(VCInstallDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -177,7 +177,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\global\cpp\kmtip_guids.cpp" />
     <ClCompile Include="$(KEYMAN_ROOT)\common\windows\cpp\src\xstring.cpp" />
-    <ClCompile Include="..\keyman32\addins.cpp" />
+    <ClCompile Include="..\keyman32\appcontext.cpp" />
     <ClCompile Include="..\keyman32\appint\aiTIP.cpp" />
     <ClCompile Include="..\keyman32\appint\aiWin2000Unicode.cpp" />
     <ClCompile Include="..\keyman32\appint\appint.cpp" />
@@ -277,9 +277,9 @@
     <ResourceCompile Include="Keyman64.RC" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\keyman32\appcontext.h" />
     <ClInclude Include="..\keyman32\keymanengine.h" />
     <ClInclude Include="..\..\..\include\kmtip_guids.h" />
-    <ClInclude Include="..\keyman32\addins.h" />
     <ClInclude Include="..\keyman32\appint\aiTIP.h" />
     <ClInclude Include="..\keyman32\appint\aiWin2000Unicode.h" />
     <ClInclude Include="..\keyman32\appint\appint.h" />

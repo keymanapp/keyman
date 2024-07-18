@@ -1,7 +1,4 @@
 [binaries]
-c = ['$EMSCRIPTEN_BASE/emcc.py', '-s', 'WASM=1', '-O2']
-cpp = ['$EMSCRIPTEN_BASE/em++.py', '-s', 'WASM=1','-O2']
+c = ['$EMSCRIPTEN_BASE/emcc.py']
+cpp = ['$EMSCRIPTEN_BASE/em++.py']
 ar = ['$EMSCRIPTEN_BASE/emar.py']
-
-[properties]
-root = '$EMSCRIPTEN_BASE/system'

@@ -17,10 +17,10 @@ function triggerBuilds() {
     eval builds='(${'bc_${bcbase}_${platform}'[@]})'
     for build in "${builds[@]}"; do
       if [[ $build == "" ]]; then continue; fi
-      if [ "${build:(-8)}" == "_Jenkins" ]; then
-        local job=${build%_Jenkins}
-        echo Triggering Jenkins build "$job" "$base" "true"
-        triggerJenkinsBuild "$job" "$base" "true"
+      if [ "${build:(-7)}" == "_GitHub" ]; then
+        local job=${build%_GitHub}
+        echo Triggering GitHub action build "$job" "$base"
+        triggerGitHubActionsBuild false "$job" "$base"
       else
         echo Triggering TeamCity build false $build $TEAMCITY_VCS_ID $base
         triggerTeamCityBuild false $build $TEAMCITY_VCS_ID $base
@@ -65,58 +65,54 @@ function triggerTeamCityBuild() {
     -d "$command"
 }
 
-function triggerJenkinsBuild() {
-  local JENKINS_JOB="$1"
-  local JENKINS_BRANCH="${2:-master}"
+function triggerGitHubActionsBuild() {
+  local IS_TEST_BUILD="$1"
+  local GITHUB_ACTION="$2"
+  local GIT_BRANCH="${3:-master}"
+  local GIT_BASE_BRANCH="${GIT_BRANCH}"
+  local GIT_USER="keyman-server"
+  local GIT_BUILD_SHA GIT_BASE_REF JSON
 
-  local JENKINS_SERVER=https://jenkins.lsdev.sil.org
-  local GIT_TAG="release-$VERSION_WITH_TAG"
+  local GITHUB_SERVER=https://api.github.com/repos/keymanapp/keyman
 
-  local FORCE=""
-  if [ "${3:-false}" == "true" ]; then
-    FORCE=", \"force\": true"
-  fi
-
-  local TAG=""
-  # This will only be true if we created and pushed a tag
   if [ "${action:-""}" == "commit" ]; then
-    TAG=", \"tag\": \"$GIT_TAG\", \"tag2\": \"$GIT_TAG\""
-  fi
-
-  if [[ $JENKINS_BRANCH != stable-* ]] && [[ $JENKINS_BRANCH =~ [0-9]+ ]]; then
-    JENKINS_BRANCH="PR-${JENKINS_BRANCH}"
-  fi
-
-  local OUTPUT=$(curl --silent --write-out '\n' \
-    -X POST \
-    --header "token: $JENKINS_TOKEN" \
-    --header "Content-Type: application/json" \
-    $JENKINS_SERVER/generic-webhook-trigger/invoke \
-    --data "{ \"project\": \"$JENKINS_JOB/$JENKINS_BRANCH\", \"branch\": \"$JENKINS_BRANCH\" $TAG $FORCE }")
-
-  if echo "$OUTPUT" | grep -q "\"triggered\":true"; then
-    echo -n "     job triggered: "
+    # This will only be true if we created and pushed a tag
+    GIT_BUILD_SHA="$(git rev-parse "refs/tags/release@$VERSION_WITH_TAG")"
+    GIT_BASE_REF="$(git rev-parse "${GIT_BUILD_SHA}^")"
+    GIT_EVENT_TYPE="${GITHUB_ACTION}: release@${VERSION_WITH_TAG}"
+  elif [[ $GIT_BRANCH != stable-* ]] && [[ $GIT_BRANCH =~ [0-9]+ ]]; then
+    JSON=$(curl -s "${GITHUB_SERVER}/pulls/${GIT_BRANCH}")
+    GIT_BUILD_SHA="$(echo "$JSON" | $JQ -r '.head.sha')"
+    GIT_EVENT_TYPE="${GITHUB_ACTION}: PR #${GIT_BRANCH}"
+    GIT_USER="$(echo "$JSON" | $JQ -r '.user.login')"
+    GIT_BASE_BRANCH="$(echo "$JSON" | $JQ -r '.base.ref')"
+    GIT_BASE_REF="$(echo "$JSON" | $JQ -r '.base.sha')"
+    GIT_BRANCH="PR-${GIT_BRANCH}"
   else
-    echo -n "     triggering failed: "
+    GIT_BUILD_SHA="$(git rev-parse "refs/heads/${GIT_BRANCH}")"
+    GIT_BASE_REF="$(git rev-parse "${GIT_BUILD_SHA}^")"
+    GIT_EVENT_TYPE="${GITHUB_ACTION}: ${GIT_BRANCH}"
   fi
 
-  # Strip {"jobs":{ from the beginning of OUTPUT
-  OUTPUT=${OUTPUT#\{\"jobs\":\{}
-  # Split json string to lines with one job each
-  local jobs count
-  count=0
-  IFS='|' jobs=(${OUTPUT//\},\"pipeline/\},|\"pipeline})
-  # Find job that actually got triggered (or that we should have triggered)
-  for line in "${jobs[@]}"; do
-    if [[ $line == \"$JENKINS_JOB/$JENKINS_BRANCH* ]]; then
-      echo "$line"
-      count=$((++count))
-    fi
-  done
-  if [[ $count < 1 ]]; then
-    # DEBUG
-    echo -n $OUTPUT
+  local DATA="{
+    \"event_type\": \"$GIT_EVENT_TYPE\", \
+    \"client_payload\": { \
+      \"buildSha\": \"$GIT_BUILD_SHA\", \
+      \"branch\": \"$GIT_BRANCH\", \
+      \"baseBranch\": \"$GIT_BASE_BRANCH\", \
+      \"baseRef\": \"$GIT_BASE_REF\", \
+      \"user\": \"$GIT_USER\", \
+      \"isTestBuild\": \"$IS_TEST_BUILD\" \
+    }}"
 
-    echo
-  fi
+  echo "GitHub Action Data: $DATA"
+
+  # adjust indentation for output of curl
+  echo -n "     "
+  curl --silent --write-out '\n' \
+    --request POST \
+    --header "Accept: application/vnd.github+json" \
+    --header "Authorization: token $GITHUB_TOKEN" \
+    --data "$DATA" \
+    ${GITHUB_SERVER}/dispatches
 }

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="keys-minimal"/>
+
+  <keys>
+    <key id="Q" output="qqq" />
+    <key id="W" output="www" />
+  </keys>
+
+  <layers formId="us">
+    <layer id="base">
+      <!-- beware: this is mapping ` and 1! -->
+      <row keys="Q W" />
+      <row keys="Q W" />
+      <row keys="Q W" />
+      <row keys="Q W" />
+      <row keys="Q" />  <!-- space row -->
+      <row keys="Q W" />
+    </layer>
+  </layers>
+</keyboard3>
