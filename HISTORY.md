@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.71 alpha 2024-07-18
+
+* chore(windows): add comments for _WIN64 tests (#11929)
+* chore(common): Update Crowdin strings for Portuguese (#11974)
+
 ## 18.0.70 alpha 2024-07-08
 
 * feat(web): provide lexicon probabilities directly on the search path (#11868)
