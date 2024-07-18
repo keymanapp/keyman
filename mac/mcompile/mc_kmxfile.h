@@ -1,14 +1,10 @@
-
 #pragma once
 #ifndef MC_KMXFILE_H
 #define MC_KMXFILE_H
 
-
 #include "km_types.h"
 #include "kmx_file.h"
-//#include "util_filesystem.h"			//_S2 TODO include from keyman; not from this folder
 #include "mcompile.h"
-
 
 #ifndef _KMXFILE_H
 #define _KMXFILE_H
@@ -72,17 +68,37 @@ typedef struct KMX_tagKEYBOARD {
 	//HBITMAP	hBitmap;				// handle to the bitmap in the file;
 } KMX_KEYBOARD, *LPKMX_KEYBOARD;
 
-KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD *lpKeyboard);
+/**
+ * @brief load a keyboard kmx-file
+ * @param fileName pointer to fileName of kmx-file
+ * @param [in,out] lpKeyboard pointer to pointer to keyboard
+ * @return TRUE on success; else FALSE
+ */
+KMX_BOOL KMX_LoadKeyboard(KMX_CHAR* fileName, LPKMX_KEYBOARD* lpKeyboard);
 
-KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename);
+/**
+ * @brief save keyboard to file
+ * @param kbd pointer to the keyboard
+ * @param fileName pointer to fileName of a kmx-file
+ * @return TRUE on success; else FALSE
+ */
+KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, KMX_CHAR* fileName);
 
-// _S2 Open files on windows and non-windows platforms. Datatypes for Filename and mode must be the same.
-// return FILE* if file could be opened; FILE must to be closed in calling function
+/**
+ * @brief increment in a string
+ * @param p pointer to a character
+ * @return pointer to the incremented character
+ */
+PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p);
+
+/**
+ * @brief open a file
+ * @param Filename name of the file
+ * @param mode same as mode in fopen
+ * @return pointer to file. On error, returns a null pointer
+ */
 FILE* Open_File(const KMX_CHAR* Filename, const KMX_CHAR* mode);
-FILE* Open_File(const KMX_WCHAR* Filename, const KMX_WCHAR* mode);
-
 
 #endif // _KMXFILE_H
 
-#endif //MC_KMXFILE_H
-
+#endif /*MC_KMXFILE_H*/
