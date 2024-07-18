@@ -233,9 +233,6 @@ KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLa
   *deadKey = 0;
   return keyV;
 }
-//--------------------------------------------------- 
-// _S2 checked OK
-KMX_WCHAR mac_KMX_get_KeyValUnderlying_From_KeyValUS(v_dw_3D & All_Vector, KMX_DWORD kv_us) {
 
 /** @brief return the keyvalue of a key of the the currently used (underlying) keyboard for a given keyvalue of the US keyboard */
 KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyValUS(vec_dword_3D& all_vector, KMX_DWORD kv_us) {
@@ -248,8 +245,6 @@ KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyValUS(vec_dword_3D& all_vector, K
   }
   return kv_us;
 }
-// _S2 checked OK
-KMX_WCHAR mac_KMX_get_KeyCodeUnderlying_From_KeyValUnderlying(v_dw_3D & All_Vector, KMX_DWORD kv_underlying) {
 
 /** @brief return the keycode of the currently used (underlying) keyboard for a given keyvalue of the underlying keyboard */
 KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_KeyValUnderlying(vec_dword_3D& all_vector, KMX_DWORD kv_underlying) {
@@ -263,8 +258,6 @@ KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_KeyValUnderlying(vec_dword_3D& all_
   }
   return kv_underlying;
 }
-// _S2 checked OK
-KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_KeyCodeUS(const UCKeyboardLayout * keyboard_layout, v_dw_3D &All_Vector, KMX_DWORD kc_us, ShiftState ss, int caps) {
 
 /** @brief return the keycode of the currently used (underlying) keyboard for a given keycode of the US keyboard */
 KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_KeyCodeUS(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& all_vector, KMX_DWORD kc_us, ShiftState ss_win, int caps) {
