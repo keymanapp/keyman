@@ -14,6 +14,7 @@ KMX_BOOL AddCompileError(KMX_DWORD msg);
 KMX_DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 KMX_DWORD ValidateMatchNomatchOutput(PKMX_WCHAR p);
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString);
+int LineTokenType(PKMX_WCHAR *str);
 KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
   PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isUnicode
 );
@@ -29,6 +30,7 @@ namespace kmcmp {
     extern int nErrors;
     extern int ErrChr;
     extern int BeginLine[4];
+    extern int CompileTarget;
     KMX_BOOL AddCompileWarning(char* buf);
 }
 
@@ -59,6 +61,7 @@ class CompilerTest : public testing::Test {
             kmcmp::BeginLine[BEGIN_UNICODE] = -1;
             kmcmp::BeginLine[BEGIN_NEWCONTEXT] = -1;
             kmcmp::BeginLine[BEGIN_POSTKEYSTROKE] = -1;
+            kmcmp::CompileTarget = CKF_KEYMAN;
         }
 
         void initFileKeyboard(FILE_KEYBOARD &fk) {
@@ -313,7 +316,29 @@ TEST_F(CompilerTest, ProcessKeyLineImpl_test) {
 // KMX_DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, KMX_DWORD storeIndex)
 // PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_WORD Flags)
 // LinePrefixType GetLinePrefixType(PKMX_WCHAR *p)
-// int LineTokenType(PKMX_WCHAR *str)
+
+TEST_F(CompilerTest, LineTokenType_test) {
+    KMX_WCHAR str[LINESIZE];
+    PKMX_WCHAR p = nullptr;
+
+    // T_BLANK, lptOther, empty string
+    u16cpy(str, u"");
+    p = str;
+    EXPECT_EQ(T_BLANK, LineTokenType(&p));
+
+    // T_BLANK, CKF_KEYMAN, lptKeymanWebOnly
+    u16cpy(str, u"$keymanweb:");
+    p = str;
+    kmcmp::CompileTarget = CKF_KEYMAN;
+    EXPECT_EQ(T_BLANK, LineTokenType(&p));
+
+    // T_BLANK, CKF_KEYMANWEB, lptKeymanOnly
+    u16cpy(str, u"$keymanonly:");
+    p = str;
+    kmcmp::CompileTarget = CKF_KEYMANWEB;
+    EXPECT_EQ(T_BLANK, LineTokenType(&p));
+}
+
 // KMX_BOOL StrValidChrs(PKMX_WCHAR q, KMX_WCHAR const * chrs)
 // KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
 //  PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int /*isVKey*/, int isUnicode
