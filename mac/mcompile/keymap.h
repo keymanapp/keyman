@@ -3,7 +3,7 @@
 #ifndef KEYMAP_H
 #define KEYMAP_H
 
-// compile with.    gcc -framework Carbon -o xxx.exe yy.cpp
+// compile with  gcc -framework Carbon -o xxx.exe yy.cpp
 // #import <Carbon/Carbon.h>
 
 #include <iostream>
