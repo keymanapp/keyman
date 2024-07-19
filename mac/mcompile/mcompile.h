@@ -40,18 +40,4 @@ extern std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;  // I4353
  */
 void mac_KMX_LogError(const wchar_t* fmt, ...);
 
-//################################################################################################################################################
-//################################################################################################################################################
-
-bool find_print_character_S2(const UCKeyboardLayout * keyboard_layout, int keyval, int k, int c, int s);
-bool print_dublicates_S2(const UCKeyboardLayout * keyboard_layout);
-bool print_character_of_key_S2(const UCKeyboardLayout * keyboard_layout, int key) ;
-bool find_character_S2(const UCKeyboardLayout * keyboard_layout, int keyval) ;
-
-bool test_dk_S2(KMX_WORD deadkeys[512], KMX_WORD deadkeys1[512]);
-bool test_dk_find_entries_S2(KMX_WORD deadkeys[512], int search);
-bool test_dk_write_entries_S2(KMX_WORD deadkeys[512]);
-void fun2();
-void testmyFunctions_S2();
-
 #endif /*MCOMPILE_H*/

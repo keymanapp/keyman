@@ -9,7 +9,6 @@
 #include <locale>
 #include <stdarg.h>
 
-
 std::vector<std::u16string> convert_argv_to_Vector_u16str(int argc, char* argv[]) {
   std::vector<std::u16string> vector_u16;
 
@@ -85,7 +84,7 @@ void u16sprintf(KMX_WCHAR* dst, const size_t max_len, const wchar_t* fmt, ...) {
    // UTF16 (=const wchar_t*) -> -> std::string  -> std::u16string -> UTF16 ( = char16_t*)
 	std::string utf8str = convert_wstring.to_bytes(wbuf);    // UTF16 ( = const wchar_t*)  -> std::string
 	std::u16string u16str = convert.from_bytes(utf8str);     // std::string -> std::u16string
-  u16ncpy(dst, u16str.c_str(), max_len);                        // std::u16string.c_str() -> char16_t*
+  u16ncpy(dst, u16str.c_str(), max_len);                   // std::u16string.c_str() -> char16_t*
 	delete[] wbuf;
 }
 
@@ -259,7 +258,6 @@ KMX_WCHAR* u16tok(KMX_WCHAR* p, KMX_WCHAR ch, KMX_WCHAR** ctx) {
 	return *p ? p : NULL;
 }
 
-// _S2 delimiters is array of char ( of size 2)
 KMX_WCHAR* u16tok(KMX_WCHAR* p, KMX_WCHAR* delimiters, KMX_WCHAR** ctx) {
 	if (!p) {
 		p = *ctx;

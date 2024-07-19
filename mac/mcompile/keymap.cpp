@@ -4,8 +4,8 @@
  * Mnemonic layout support for mac
  *
  * Throughout mcompile we use the following naming conventions:
- *  KEYCODE:     The physical position of a key on a keyboard e.g. Keycode for 'Z' on US: 6 on Mac |  52 on Linux/x11 |  44 on Windows
- *  SCANCODE     (naming on windows): The physical position of a key on a keyboard e.g. Keycode for 'Z' on US: 44 on Windows
+ *  KEYCODE:     (name on Linux, Mac):The physical position of a key on a keyboard e.g. Keycode for 'Z' on US: 6 on Mac |  52 on Linux/x11 |  44 on Windows
+ *  SCANCODE     (name on Windows):  The physical position of a key on a keyboard e.g. Keycode for 'Z' on US: 44 on Windows
  *  VIRTUAL KEY: The value of a character on a key e.g. 'A' = 65; 'a' = 97 - not neccessarily the same as ACSII- exists on a Windows keyboard only
  *  KEYVAL(UE):  The value of a character on a key e.g. 'A' = 65; 'a' = 97 - not neccessarily the same as ACSII
  */
@@ -13,7 +13,7 @@
 #include "keymap.h"
 #include "kmx_file.h"
 
-/** @brief map a shiftstate used on windows to a shiftstate suitable for UCKeyTranslate() on the mac */
+/** @brief map a shiftstate used on Windows to a shiftstate suitable for UCKeyTranslate() on the mac */
 int mac_convert_Shiftstate_to_MacShiftstate(int shiftState) {
   if (shiftState == 0)                                           return MAC_BASE;        // Win ss  0  -> mac ss 0
   else if (shiftState == K_SHIFTFLAG)                            return MAC_SHIFT;       // Win ss 16  -> mac ss 2
@@ -31,7 +31,6 @@ int mac_convert_rgkey_Shiftstate_to_MacShiftstate(int rgkey_ShiftState) {
     else return rgkey_ShiftState;
   }
 
-// _S2 todo missing code
 /** @brief check for correct input parameter that will later be used in UCKeyTranslate() */
 bool ensureValidInputForKeyboardTranslation(int shiftstate, int keycode) {
   if ((shiftstate > max_shiftstate))
@@ -313,19 +312,3 @@ KMX_DWORD mac_get_CombinedChar_From_DK(const UCKeyboardLayout* keyboard_layout, 
   } else
     return 0;
 }
-
-
-//################################################################################################################################################
-//################################################################################################################################################
-
-
-void test_printoutKeyboards_S2(vec_dword_3D& all_vector) { 
-  printf(" values of US - Values of underlying");
-  for ( int i=0; i< all_vector[0].size(); i++)  {
-    printf("-----------------------------\n");
-    for ( int j=0; j< all_vector[0][0].size(); j++) {
-        printf("i:%i\tUS: %i(%c)\t  Underlying: %i(%c)\t   \t\t\t%c  \n",  i,all_vector[0][i][j] , all_vector[0][i][j] , all_vector[1][i][j],all_vector[1][i][j],(all_vector[0][i][j] ==  all_vector[1][i][j]) ? '.' : '*');
-    }
-  }
-}
-

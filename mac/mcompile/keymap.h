@@ -66,13 +66,13 @@ static int MAC_OPT = 8;
 static int MAC_SHIFT_OPT = 10;
 
 /**
- * @brief  map a shiftstate used on windows to a shiftstate suitable for UCKeyTranslate() on the mac
+ * @brief  map a shiftstate used on Windows to a shiftstate suitable for UCKeyTranslate() on the mac
  *            Windows: (Base: 00000000 (0); Shift 00010000 (16); AltGr 00001001 (9); Shift+AltGr 00011001 (25))
  *            mac:     (Base: 0;            Shift 2;             OPT 8;            Shift+OPT 10               )
- * @param  shiftState    shiftstate used on windows
+ * @param  shiftState    shiftstate used on Windows
  * @return a shiftstate usable for UCKeyTranslate() on mac if available
- *         if shiftState is a windows ShiftState: convert the windows ShiftState (0,16,9,25) to a mac ShiftState (0,2,8,10)
- *         if shiftState is NOT a windows ShiftState (then in_ShiftState is already a mac shiftstate): return the entered shiftstate
+ *         if shiftState is a Windows ShiftState: convert the Windows ShiftState (0,16,9,25) to a mac ShiftState (0,2,8,10)
+ *         if shiftState is NOT a Windows ShiftState (then in_ShiftState is already a mac shiftstate): return the entered shiftstate
  */
 int mac_convert_Shiftstate_to_MacShiftstate(int shiftState);
 
@@ -82,8 +82,8 @@ int mac_convert_Shiftstate_to_MacShiftstate(int shiftState);
  *            mac:   (Base: 0; Shift 2; OPT 8; Shift+OPT 10)
  * @param  rgkey_ShiftState  shiftstate used in rgkey
  * @return a shiftstate usable for UCKeyTranslate() on mac if available
- *         if shiftState is a windows ShiftState: convert the windows ShiftState (0,16,9,25) to a mac ShiftState (0,2,8,10)
- *         if shiftState is NOT a windows ShiftState (then in_ShiftState is already a mac shiftstate): return the entered shiftstate
+ *         if shiftState is a Windows ShiftState: convert the Windows ShiftState (0,16,9,25) to a mac ShiftState (0,2,8,10)
+ *         if shiftState is NOT a Windows ShiftState (then in_ShiftState is already a mac shiftstate): return the entered shiftstate
  */
 int mac_convert_rgkey_Shiftstate_to_MacShiftstate(int rgkey_ShiftState);
 
@@ -604,7 +604,7 @@ KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_KeyValUnderlying(vec_dword_3D& all_
  * @param  keyboard_layout the currently used (underlying) keyboard layout
  * @param  all_vector 3D-vector that holds the data of the US keyboard and the currently used (underlying) keyboard
  * @param  kc_us a key of the US keyboard
- * @param  ss_win a windows-type shiftstate
+ * @param  ss_win a Windows-type shiftstate
  * @param  caps state of the caps key
  * @return the keycode of the underlying keyboard if found; else the keycode of the US keyboard
  */
@@ -638,16 +638,5 @@ KMX_DWORD mac_KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode);
    * @return the combination of deadkey + character if it is available; if not return 0
    */
 KMX_DWORD mac_get_CombinedChar_From_DK(const UCKeyboardLayout* keyboard_layout, int vk_dk, KMX_DWORD ss_dk, KMX_DWORD vk_us, KMX_DWORD shiftstate_mac, int caps);
-
-//_S2 TODO  CodePointToU16String??
-//################################################################################################################################################
-//################################################################################################################################################
-
-void test_printoutKeyboards_S2(vec_dword_3D &all_vector);
-KMX_DWORD X_playWithDK_S2(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal) ;
-KMX_DWORD X_playWithDK_S2_one(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal);
-KMX_DWORD X_compare_Shiftstates_S2(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal=0);
-KMX_DWORD X_find_Shiftstates_S2(int shiftstate,const UCKeyboardLayout* keyboard_layout , KMX_DWORD charVal=0);
-KMX_DWORD  printout_dk(const UCKeyboardLayout* keyboard_layout);
 
 #endif  /*KEYMAP_H*/

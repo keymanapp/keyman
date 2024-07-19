@@ -8,8 +8,8 @@
   Authors:          mcdurdin
 */
 
-#define UNREFERENCED_PARAMETER(P)   (P)
-#define TRUNCATE ((size_t)-1)
+#define UNREFERENCED_PARAMETER(P) (P)
+#define TRUNCATE ((size_t) - 1)
 #ifdef KMN_KBP
 // TODO: move this to a common namespace keyman::common::kmx_file or similar in the future
 namespace km {
@@ -311,7 +311,6 @@ struct KMX_COMP_KEY {
   KMX_DWORD dpOutput;
   KMX_DWORD dpContext;
   };
-
 
 struct KMX_COMP_GROUP {
   KMX_DWORD dpName;

@@ -48,8 +48,6 @@ bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
   }
   return false;
 }
-//_S2 remove!
-bool test_alDead_S2(std::vector<DeadKey*> ald);
 
 /** @brief Find a keyvalue for given keycode, shiftstate and caps. A function similar to Window`s ToUnicodeEx() function. */
 int mac_KMX_ToUnicodeEx(int keycode, PKMX_WCHAR pwszBuff, ShiftState ss_rgkey, int caps, const UCKeyboardLayout* keyboard_layout) {
@@ -81,7 +79,7 @@ int mac_KMX_ToUnicodeEx(int keycode, PKMX_WCHAR pwszBuff, ShiftState ss_rgkey, i
     return 1;
 }
 
-KMX_WCHAR mac_KMX_DeadKeyMap(int index, std::vector<DeadKey*>*deadkeys, int deadkeyBase, std::vector<KMX_DeadkeyMapping>*deadkeyMappings) {   // I4327   // I4353
+KMX_WCHAR mac_KMX_DeadKeyMap(int index, std::vector<DeadKey*>*deadkeys, int deadkeyBase, std::vector<KMX_DeadkeyMapping>*deadkeyMappings) {  // I4327   // I4353
   for (size_t i = 0; i < deadkeyMappings->size(); i++) {
     if ((*deadkeyMappings)[i].deadkey == index) {
       return (*deadkeyMappings)[i].dkid;
@@ -262,7 +260,7 @@ public:
           *key->dpContext = 0;
 
           key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState)ss);
-          // we already use VK_US so no need to convert it as we do on windows
+          // we already use VK_US so no need to convert it as we do on Windows
           key->Key = this->VK();
           key->Line = 0;
 
@@ -289,7 +287,7 @@ public:
           }
           if (isvalid) {
             /*
-             * this is different to mcompile windows !!!!
+             * this is different to mcompile Windows !!!!
              * this->m_sc    stores SC-US = SCUnderlying
              * this->m_vk    stores VK-US ( not underlying !!)
              * key->Key      stores VK-US ( not underlying !!)
@@ -357,7 +355,7 @@ public:
     DeadKey* deadKey = new DeadKey(rgKey[iKeyDead]->mac_KMX_GetShiftState(shiftStateDead, fCapsLock)[0]);
 
     int ss_dead = mac_convert_rgkey_Shiftstate_to_MacShiftstate(shiftStateDead);
-    KMX_DWORD keyval_underlying_dk  = mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout, mac_USVirtualKeyToScanCode[iKeyDead], ss_dead, 0);
+    KMX_DWORD keyval_underlying_dk = mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout, mac_USVirtualKeyToScanCode[iKeyDead], ss_dead, 0);
 
     for (int i = 0; i < keycode_spacebar + 1; i++) {
       for (int j = 0; j <= max_shiftstate_pos; j++) {
@@ -398,21 +396,10 @@ int mac_KMX_GetMaxDeadkeyIndex(KMX_WCHAR* p) {
   return n;
 }
 
-//################################################################################################################################################
-//################################# Code beyond these lines needs to be included in mcompile #####################################################
-//################################################################################################################################################
-
-
-bool test_run_verify_S2(std::vector<mac_KMX_VirtualKey*> rgKey);
-// _S2 need to go
-void test_print_All_Entries_S2(std::vector<mac_KMX_VirtualKey*> rgKey);
-//void test_print_All_Keys_S2(const UCKeyboardLayout * keyboard_layout);
-//void test_print_certain_Keys_S2(const UCKeyboardLayout * keyboard_layout, int keycode);
-
 /**
  * @brief  Collect the key data, translate it to kmx and append to the existing keyboard
  *         It is important to understand that this function has different sorting order in rgkey compared to mcompile-windows!
- *         On windows the values of rgkey are sorted according to the VK of the underlying keyboard
+ *         On Windows the values of rgkey are sorted according to the VK of the underlying keyboard
  *         On Linux   the values of rgkey are sorted according to the VK of the the US keyboard
  *         Since Linux Keyboards do not use a VK mcompile uses the VK of the the US keyboard because
  *         these are available in mcompile through USVirtualKeyToScanCode/ScanCodeToUSVirtualKey and an offset of 8
@@ -465,11 +452,6 @@ bool mac_KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, const UCKe
             continue;
           }
 
-         //_S2 TOP_6 TODO to compare win-lin kmn-files skip ss6+7; MUST BE removed later!!!!
-         /*if (ss == MenuCtrl || ss == ShftMenuCtrl) {
-           continue;
-          }*/
-
           KMX_DWORD kc_underlying = mac_KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 
           for (int caps = 0; caps <= 1; caps++) {
@@ -477,17 +459,17 @@ bool mac_KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, const UCKe
 
             if (rc > 0) {
               if (*sbBuffer == 0) {
-                rgKey[iKey]->mac_KMX_SetShiftState(ss, u"", false, (caps));      // different to windows since behavior on the mac is different
+                rgKey[iKey]->mac_KMX_SetShiftState(ss, u"", false, (caps));      // different to Windows since behavior on the mac is different
               } else {
               if ((ss == Ctrl || ss == ShftCtrl)) {
                   continue;
                 }
                   sbBuffer[rc] = 0;
-                  rgKey[iKey]->mac_KMX_SetShiftState(ss, sbBuffer, false, (caps));    // different to windows since behavior on the mac is different
+                  rgKey[iKey]->mac_KMX_SetShiftState(ss, sbBuffer, false, (caps));    // different to Windows since behavior on the mac is different
              }
           } else if (rc < 0) {
             sbBuffer[2] = 0;
-            rgKey[iKey]->mac_KMX_SetShiftState(ss, sbBuffer, true, (caps));       // different to windows since behavior on the mac is different
+            rgKey[iKey]->mac_KMX_SetShiftState(ss, sbBuffer, true, (caps));       // different to Windows since behavior on the mac is different
 
             sbBuffer[2] = 0;
             rgKey[iKey]->mac_KMX_SetShiftState(ss, sbBuffer, true, (caps == 0));
@@ -513,21 +495,8 @@ bool mac_KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, const UCKe
   // translate it to kmx and append to the existing keyboard
   //-------------------------------------------------------------
 
-  // _S2 all of my tests need to go ............
-  //test_print_All_Entries_S2(rgKey);
-  //test_print_All_Keys_S2( * keyboard_layout);
-  //test_print_certain_Keys_S2( * keyboard_layout, 14);
- //bool allOK =test_alDead_S2(alDead);
- bool allOK=true;
-  if ( ! allOK )
-    printf(" \n::::::::::::::::::::::::::::::::::::::::::::::::::: THERE ARE SOME WRONG DEADKEYS :::::::::::::::::::::::::::::::::::::::::::::::::: \n");
- if ( ! test_run_verify_S2(rgKey))
-    printf(" \n::::::::::::::::::::::::::::::::::::::::::::::::::: THERE ARE SOME WRONG ENTRIES ::::::::::::::::::::::::::::::::::::::::::::::::::: \n");
-  if (  test_run_verify_S2(rgKey) && allOK)
-    printf("\n ::::::::::::::::::::::::::::::::::::::::::::::::::::::::: :) :) :) ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: \n");
-
   int nDeadkey = 0;
-  LPKMX_GROUP gp = new KMX_GROUP[kp->cxGroupArray+4];  // leave space for old
+  LPKMX_GROUP gp = new KMX_GROUP[kp->cxGroupArray + 4];  // leave space for old
   memcpy(gp, kp->dpGroupArray, sizeof(KMX_GROUP) * kp->cxGroupArray);
 
   //
@@ -692,244 +661,4 @@ bool mac_KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, const UCKe
     }
   }
 return true;
-}
-// _S2 need to go
-
-void print_entries_S2(int i, std::vector<mac_KMX_VirtualKey*> rgKey , std::string comp1,std::string comp2,std::string erg) {
-  std::string b0 =string_from_u16string(rgKey[i]->mac_KMX_GetShiftState(Base,  0 ));
-  std::string b1 =string_from_u16string(rgKey[i]->mac_KMX_GetShiftState(Base,  1 ));
-  std::string s0 =string_from_u16string(rgKey[i]->mac_KMX_GetShiftState(Shft,  0 ));
-  std::string s1 =string_from_u16string(rgKey[i]->mac_KMX_GetShiftState(Shft,  1 ));
-  printf("\n entry nr %i has characters %-30s:(%s|%s|%s|%s)",i, erg.c_str(), (const char * ) b0.c_str(),(const char * ) b1.c_str(),(const char * ) s0.c_str(),(const char * ) s1.c_str());
-}
-bool verify_entries_S2(int i, std::vector<mac_KMX_VirtualKey*> rgKey, int res1,int res2,int res3,int res4 ,int res5=0, int res6=0, int res7=0, int res8=0 ) {
-    std::vector <std::u16string> st_vec;
-    std::vector <int> r_vec;
-    bool all_OK=true;;
-
-    r_vec.push_back(res1);         r_vec.push_back(res2);
-    r_vec.push_back(res3);         r_vec.push_back(res4);
-    r_vec.push_back(res5);         r_vec.push_back(res6);
-    r_vec.push_back(res7);         r_vec.push_back(res8);
-
-    st_vec.push_back(rgKey[i]->mac_KMX_GetShiftState(Base,0));
-    st_vec.push_back(rgKey[i]->mac_KMX_GetShiftState(Base,1));
-    st_vec.push_back(rgKey[i]->mac_KMX_GetShiftState(Shft,0));
-    st_vec.push_back(rgKey[i]->mac_KMX_GetShiftState(Shft,1));
-    st_vec.push_back(rgKey[i]->mac_KMX_GetShiftState(MenuCtrl,0));
-    st_vec.push_back(rgKey[i]->mac_KMX_GetShiftState(MenuCtrl,1));
-    st_vec.push_back(rgKey[i]->mac_KMX_GetShiftState(ShftMenuCtrl,0));
-    st_vec.push_back(rgKey[i]->mac_KMX_GetShiftState(ShftMenuCtrl,1));
-
-    for ( int k=0; k< st_vec.size();k++)
-      if (r_vec[k] !=0 )   all_OK = (  *st_vec[k].c_str()  == r_vec[k]  ) && all_OK;
-
-    if ( !all_OK)
-      printf(" ERROR FOR i= Nr:%i, %i(%c) - %i (%c) - %i (%c) - %i (%c) \n",i, *st_vec[0].c_str(),*st_vec[1].c_str(),*st_vec[2].c_str(),*st_vec[3].c_str(),*st_vec[4].c_str(),*st_vec[5].c_str(),*st_vec[6].c_str(),*st_vec[7].c_str());
-    return all_OK;
-}
-void test_print_All_Entries_S2( std::vector<mac_KMX_VirtualKey*> rgKey) {
-  for ( int i=48; i<58; i++)
-    print_entries_S2(i, rgKey," ","","");
-
-  for ( int i=65; i<91; i++)
-    print_entries_S2(i, rgKey, " ","", "" );
-
-    print_entries_S2(186, rgKey, "ö", "Ö", "xc3 xb6");
-    print_entries_S2(187, rgKey, "´", ";", "´ ´ ` `");
-    print_entries_S2(188, rgKey, ".", ":", ", , ; ;");
-    print_entries_S2(189, rgKey, "ß", "?", "ß ß ? ?");
-    print_entries_S2(190, rgKey, ".", ":", ". . : :");
-    print_entries_S2(191, rgKey, "-", "_", "- - _ _");
-    print_entries_S2(192, rgKey, "^", "°", "^ ^ ° °");
-
-    print_entries_S2(219, rgKey, "ü", "Ü", "ü,Ü;Ü;Ü");
-    print_entries_S2(220, rgKey, "#", "'", "# # ' '");
-    print_entries_S2(221, rgKey, "+", "*", "+ + * *");
-    print_entries_S2(222, rgKey, "ä", "Ä", "ä Ä Ä Ä");
-    print_entries_S2(226, rgKey, "<", ">", "< < > >");
-}
-/*void test_print_certain_Keys_S2(const UCKeyboardLayout * keyboard_layout, int keycode) {
-  UniCharCount maxStringlength    = 5;
-  UniCharCount actualStringlength = 0;
-  UniChar unicodeString[maxStringlength];
-  UInt32 deadkeystate = 0;
-  OSStatus status;
- unicodeString[0]=0;
-  //int shiftarray[] ={0,2,8,10};
-  int shiftarray[] ={0,1,2,3,4,5,6,7,8,9,10};
-  for (int k=0; k<2;k++) {
-    for (int j=0; j<(sizeof(shiftarray)/ sizeof(int));j++) {
-      status = UCKeyTranslate(keyboard_layout, keycode , kUCKeyActionDown, (shiftarray[j]+ 4*k), LMGetKbdType(), 0, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
-       if (deadkeystate ==0)
-        printf("    key nr %i , ss %i has values %i(%c)\n", keycode, shiftarray[j]+ 4*k, unicodeString[0], unicodeString[0] );
-      // If this was a deadkey, append a space
-      if (deadkeystate !=0) {
-        status = UCKeyTranslate(keyboard_layout, keycode_spacebar , kUCKeyActionDown, (shiftarray[j]+ 4*k), LMGetKbdType(), 0, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
-        printf(" dk with caps key nr %i , ss %i has values %i(%c)\n", keycode,shiftarray[j]+ 4*k, unicodeString[0], unicodeString[0] );
-      }
-    }
-  }
-}
-*/
-/*void test_print_All_Keys_S2(const UCKeyboardLayout * keyboard_layout){
-  UniCharCount maxStringlength    = 5;
-  UniCharCount actualStringlength = 0;
-  UniChar unicodeString[maxStringlength];
-  UInt32 deadkeystate = 0;
-  OSStatus status;
- unicodeString[0]=0;
-  int shiftarray[] ={0,2,8,10};
-
-  for (int k=0; k<2;k++) {
-    for (int j=0; j<4;j++) {
-      for (int i=0; i< keycode_spacebar+1 ;i++) {
-        status = UCKeyTranslate(keyboard_layout, i , kUCKeyActionDown, (shiftarray[j]+ 4*k), LMGetKbdType(), 0, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
-        if (deadkeystate ==0)
-          printf("    key nr %i , ss %i has values %i(%c)\n", i, shiftarray[j]+ 4*k, unicodeString[0], unicodeString[0] );
-        // If this was a deadkey, append a space
-        if (deadkeystate !=0) {
-          status = UCKeyTranslate(keyboard_layout, keycode_spacebar , kUCKeyActionDown, (shiftarray[j]+ 4*k), LMGetKbdType(), 0, &deadkeystate, maxStringlength, &actualStringlength, unicodeString );
-          printf(" dk key nr %i , ss %i has values %i(%c)\n", i,shiftarray[j]+ 4*k, unicodeString[0], unicodeString[0] );
-        }
-      }
-    }
-  }
-}
-*/
-bool test_checkBasechar_S2 (DeadKey* DK, int index, KMX_WCHAR ch) {
-   return ( DK->KMX_GetBaseCharacter(index) == ch) ;
-}
-bool test_checkCombchar_S2 (DeadKey* DK, int index, KMX_WCHAR ch) {
-   return ( DK->KMX_GetCombinedCharacter(index) == ch) ;
-}
-bool test_alDead_S2(std::vector <DeadKey*> ald) {
-  bool OK =true;
-
-    OK = OK && test_checkBasechar_S2(ald[2],0,  0x61);
-    OK = OK && test_checkBasechar_S2(ald[2],1,  0x41);
-    OK = OK && test_checkBasechar_S2(ald[2],14, 0x65);
-    OK = OK && test_checkBasechar_S2(ald[2],15, 0x45);
-    OK = OK && test_checkBasechar_S2(ald[2],23 ,0x69 );
-    OK = OK && test_checkBasechar_S2(ald[2],24 ,0x49 );
-    OK = OK && test_checkBasechar_S2(ald[2],19 ,0x6f );
-    OK = OK && test_checkBasechar_S2(ald[2],20 ,0x4f );
-    OK = OK && test_checkBasechar_S2(ald[2],21 ,0x75 );
-    OK = OK && test_checkBasechar_S2(ald[2],22 ,0x55 );
-    OK = OK && test_checkBasechar_S2(ald[2],27 ,0x20 );
-    OK = OK && test_checkBasechar_S2(ald[2],28 ,0x20 );
-
-      OK = OK && test_checkCombchar_S2(ald[2],0,  0xe2);
-      OK = OK && test_checkCombchar_S2(ald[2],1,  0xc2);
-      OK = OK && test_checkCombchar_S2(ald[2],14 ,0xea);
-      OK = OK && test_checkCombchar_S2(ald[2],15, 0xca);
-      OK = OK && test_checkCombchar_S2(ald[2],23 ,0xee );
-      OK = OK && test_checkCombchar_S2(ald[2],24 ,0xce );
-      OK = OK && test_checkCombchar_S2(ald[2],19 ,0xf4 );
-      OK = OK && test_checkCombchar_S2(ald[2],20 ,0xd4 );
-      OK = OK && test_checkCombchar_S2(ald[2],21 ,0xfb );
-      OK = OK && test_checkCombchar_S2(ald[2],22 ,0xdb );
-      OK = OK && test_checkCombchar_S2(ald[2],27 ,0x5e );
-      OK = OK && test_checkCombchar_S2(ald[2],28 ,0x5e );
-
-    OK = OK && test_checkBasechar_S2(ald[0],0,  0x61);
-    OK = OK && test_checkBasechar_S2(ald[0],1,  0x41);
-    OK = OK && test_checkBasechar_S2(ald[0],12, 0x65);
-    OK = OK && test_checkBasechar_S2(ald[0],13, 0x45);
-    OK = OK && test_checkBasechar_S2(ald[0],24 ,0x69 );
-    OK = OK && test_checkBasechar_S2(ald[0],25 ,0x49 );
-    OK = OK && test_checkBasechar_S2(ald[0],18 ,0x6f );
-    OK = OK && test_checkBasechar_S2(ald[0],19 ,0x4f );
-    OK = OK && test_checkBasechar_S2(ald[0],20 ,0x75 );
-    OK = OK && test_checkBasechar_S2(ald[0],21 ,0x55 );
-    OK = OK && test_checkBasechar_S2(ald[0],36 ,0x20 );
-    OK = OK && test_checkBasechar_S2(ald[0],37 ,0x20 );
-
-      OK = OK && test_checkCombchar_S2(ald[0],0,  0xe2-1);
-      OK = OK && test_checkCombchar_S2(ald[0],1,  0xc2-1);
-      OK = OK && test_checkCombchar_S2(ald[0],12 ,0xea-1);
-      OK = OK && test_checkCombchar_S2(ald[0],13, 0xca-1);
-      OK = OK && test_checkCombchar_S2(ald[0],24 ,0xee -1);
-      OK = OK && test_checkCombchar_S2(ald[0],25 ,0xce -1);
-      OK = OK && test_checkCombchar_S2(ald[0],18 ,0xf4 -1);
-      OK = OK && test_checkCombchar_S2(ald[0],19 ,0xd4 -1);
-      OK = OK && test_checkCombchar_S2(ald[0],20 ,0xfb -1);
-      OK = OK && test_checkCombchar_S2(ald[0],21 ,0xdb -1);
-      OK = OK && test_checkCombchar_S2(ald[0],36 ,0xb4 );
-      OK = OK && test_checkCombchar_S2(ald[0],37 ,0xb4 );
-
-    OK = OK && test_checkBasechar_S2(ald[1],0,  0x61);
-    OK = OK && test_checkBasechar_S2(ald[1],1,  0x41);
-    OK = OK && test_checkBasechar_S2(ald[1],6, 0x65);
-    OK = OK && test_checkBasechar_S2(ald[1],7, 0x45);
-    OK = OK && test_checkBasechar_S2(ald[1],12 ,0x69 );
-    OK = OK && test_checkBasechar_S2(ald[1],13 ,0x49 );
-    OK = OK && test_checkBasechar_S2(ald[1],8 ,0x6f );
-    OK = OK && test_checkBasechar_S2(ald[1],9 ,0x4f );
-    OK = OK && test_checkBasechar_S2(ald[1],10 ,0x75 );
-    OK = OK && test_checkBasechar_S2(ald[1],11 ,0x55 );
-    OK = OK && test_checkBasechar_S2(ald[1],16 ,0x20 );
-    OK = OK && test_checkBasechar_S2(ald[1],17 ,0x20 );
-
-      OK = OK && test_checkCombchar_S2(ald[1],0,  0xe2-2);
-      OK = OK && test_checkCombchar_S2(ald[1],1,  0xc2-2);
-      OK = OK && test_checkCombchar_S2(ald[1],6 ,0xea-2);
-      OK = OK && test_checkCombchar_S2(ald[1],7, 0xca-2);
-      OK = OK && test_checkCombchar_S2(ald[1],12 ,0xee -2);
-      OK = OK && test_checkCombchar_S2(ald[1],13 ,0xce -2);
-      OK = OK && test_checkCombchar_S2(ald[1],8 ,0xf4 -2);
-      OK = OK && test_checkCombchar_S2(ald[1],9 ,0xd4 -2);
-      OK = OK && test_checkCombchar_S2(ald[1],10 ,0xfb -2);
-      OK = OK && test_checkCombchar_S2(ald[1],11 ,0xdb -2);
-      OK = OK && test_checkCombchar_S2(ald[1],16 ,0x60 );
-      OK = OK && test_checkCombchar_S2(ald[1],17 ,0x60 );
-return OK;
-}
-bool test_run_verify_S2(std::vector<mac_KMX_VirtualKey*> rgKey) {
-
-  bool allOK= true;
-  allOK =  verify_entries_S2(48, rgKey, 48,48,61,61)                           && allOK;
-  allOK =  verify_entries_S2(48, rgKey, 48,48,61,61)                           && allOK;
-  allOK =  verify_entries_S2(49, rgKey, 49,49,33,33)                           && allOK;
-  allOK =  verify_entries_S2(50, rgKey, 50,50,34,34)                           && allOK;
-  allOK =  verify_entries_S2(51, rgKey, 51,51,167,167)                         && allOK;
-  allOK =  verify_entries_S2(52, rgKey, 52,52,36,36)                           && allOK;
-  allOK =  verify_entries_S2(53, rgKey, 53,53,37,37)                           && allOK;
-  allOK =  verify_entries_S2(54, rgKey, 54,54,38,38)                           && allOK;
-  allOK =  verify_entries_S2(55, rgKey, 55,55,47,47)                           && allOK;
-  allOK =  verify_entries_S2(56, rgKey, 56,56,40,40)                           && allOK;
-  allOK =  verify_entries_S2(57, rgKey, 57,57,41,41)                           && allOK;
-
-  for ( int i=65; i<89;i++)
-    allOK =  verify_entries_S2(i, rgKey,i+32,i,i,i)                            && allOK;
-
-  allOK =  verify_entries_S2(89, rgKey, 90+32,90,90,90)                        && allOK;
-  allOK =  verify_entries_S2(90, rgKey, 89+32,89,89,89)                        && allOK;
-
-  allOK =  verify_entries_S2(186, rgKey, 246,214,214,214)                      && allOK;
-  allOK =  verify_entries_S2(187, rgKey, 180,180,96,96)                      && allOK;      // dk ´ `
-  allOK =  verify_entries_S2(188, rgKey, 44,44,59,59)                          && allOK;
-  allOK =  verify_entries_S2(189, rgKey, 223,223,63,63)                        && allOK;
-  allOK =  verify_entries_S2(190, rgKey, 46,46,58,58)                          && allOK;
-  allOK =  verify_entries_S2(191, rgKey, 45,45,95,95)                          && allOK;
-
-  allOK =  verify_entries_S2(192, rgKey, 94,94,176,176)                      && allOK;      // dk ^ °
-  allOK =  verify_entries_S2(219, rgKey, 252,220,220,220)                      && allOK;
-  allOK =  verify_entries_S2(220, rgKey, 35,35,39,39)                          && allOK;
-  allOK =  verify_entries_S2(221, rgKey, 43,43,42,42)                          && allOK;
-  allOK =  verify_entries_S2(222, rgKey, 228,196,196,196)                      && allOK;
-  allOK =  verify_entries_S2(226, rgKey, 60,60,62,62)                          && allOK;      // < >
-// -------------------------------------------
-  /*allOK =  verify_entries_S2(48, rgKey, 48,48,61,61,L'}',0,0,0)                && allOK;
-  allOK =  verify_entries_S2(49, rgKey, 49,49,33,33,L'’',0,0,0)                && allOK;
-  allOK =  verify_entries_S2(50, rgKey, 50,50,34,34,L'²',0,0,0)                && allOK;
-  allOK =  verify_entries_S2(51, rgKey, 51,51,167,167,L'³',0,0,0)              && allOK;
-  allOK =  verify_entries_S2(52, rgKey, 52,52,36,36,L'—',0,0,0)                && allOK;
-  allOK =  verify_entries_S2(53, rgKey, 53,53,37,37,L'¡',0,0,0)                && allOK;
-  allOK =  verify_entries_S2(54, rgKey, 54,54,38,38,L'¿',0,0,0)                && allOK;
-  allOK =  verify_entries_S2(55, rgKey, 55,55,47,47,L'{',0,0,0)                && allOK;
-  allOK =  verify_entries_S2(56, rgKey, 56,56,40,40,L'[',0,0,0)                && allOK;
-  allOK =  verify_entries_S2(57, rgKey, 57,57,41,41,L']',0,0,0)                && allOK;*/
-
-  return allOK;
 }
