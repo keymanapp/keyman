@@ -240,7 +240,7 @@ public:
           (this->mac_KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
           (this->mac_KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);*/
 
-    int capslock = 1;  // we do not use the equation to obtain capslock. on the mac we set capslock=1
+    int capslock = 1;  // on mcompile-mac we do not use the equation to obtain capslock. Here we set capslock = 1
 
     for (int ss = 0; ss <= MaxShiftState; ss++) {
       if (ss == Menu || ss == ShftMenu) {
@@ -289,8 +289,8 @@ public:
             /*
              * this is different to mcompile Windows !!!!
              * this->m_sc    stores SC-US = SCUnderlying
-             * this->m_vk    stores VK-US ( not underlying !!)
-             * key->Key      stores VK-US ( not underlying !!)
+             * this->m_vk    stores VK-US ( not VK underlying !!)
+             * key->Key      stores VK-US ( not VK underlying !!)
              * key->dpOutput stores character Underlying
              */
             KMX_DWORD sc_underlying = mac_KMX_get_KeyCodeUnderlying_From_KeyCodeUS(keyboard_layout, all_vector, this->SC(), (ShiftState)ss, caps);

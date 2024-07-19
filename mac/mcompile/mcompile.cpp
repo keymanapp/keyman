@@ -19,7 +19,8 @@
  * @param  kbd pointer to US keyboard
  * @param  bDeadkeyConversion option for converting a deadkey to a character: 1 = dk conversion; 0 = no dk conversion
  * @param  argc number of command line arguments
- * @return TRUE if conversion was successful;  FALSE if not
+ * @return TRUE if conversion was successful;
+ *         FALSE if not
  */
 KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, int argc);
 
@@ -398,7 +399,8 @@ struct KMX_dkidmap {
  * @brief  find the deadkey id for a given deadkey
  * @param  kbd pointer to the keyboard
  * @param  deadkey for which an id is to be found
- * @return 0 if failed; otherwise a deadkey-id
+ * @return 0 if failed;
+ *         otherwise a deadkey-id
  */
 KMX_WCHAR mac_KMX_GetUniqueDeadkeyID(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey) {
   LPKMX_GROUP gp;
@@ -600,15 +602,15 @@ int mac_KMX_GetDeadkeys(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& a
       we start with SPACE (keycode_spacebar=49) because all deadkeys occur in combinations with space.
       Since mcompile finds only the first occurance of a dk combination, this makes sure that we always
       find the dk+SPACE combinations for a deadkey.
-      If there are more combinations to create a specific character they will not be found.
+      If there are additional combinations to create a specific character they will not be found.
       (See comment at the top of mac_KMX_DoConvert())
     */
     for (int i = keycode_spacebar; i >= 0; i--) {
       status = UCKeyTranslate(keyboard_layout, sc_dk, kUCKeyActionDown, mac_convert_Shiftstate_to_MacShiftstate(shift_dk), LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString);
 
       /*
-        UCKeyTranslate != 0 if a dk was found; then run UCKeyTranslate again with a SPACE (keycode_spacebar) to get the plain dk e.g.'^'
-        if CAPS is used: always add 4 e.g. SHIFT = 2; SHIFT+CAPS = 6
+        UCKeyTranslate != 0 if a dk was found; then run UCKeyTranslate again with a SPACE (keycode_spacebar) to get the plain dk e.g.'^'.
+        If CAPS is used: always add 4 e.g. SHIFT = 2; SHIFT+CAPS = 6
       */
       if (deadkeystate != 0) {
         status = UCKeyTranslate(keyboard_layout, i, kUCKeyActionDown, ss_mac[j], LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString);
@@ -617,7 +619,7 @@ int mac_KMX_GetDeadkeys(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& a
         if (deadkeystate != 0) {
           KMX_WORD vk = mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout, i, ss_mac[1], 0);
 
-          // ensure to NOT get key combinations like ^a but only combined characters like â (exception for ^+space)
+          // ensure to NOT get key combinations like '^a' but only combined characters like 'â' (exception for '^' + space)
           if ((unicodeString[0] != deadkey) || (vk == 32)) {
             *p++ = vk;
             *p++ = ss_mac[j];

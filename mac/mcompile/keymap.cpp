@@ -18,7 +18,7 @@ int mac_convert_Shiftstate_to_MacShiftstate(int shiftState) {
   if (shiftState == 0)                                           return MAC_BASE;        // Win ss  0  -> mac ss 0
   else if (shiftState == K_SHIFTFLAG)                            return MAC_SHIFT;       // Win ss 16  -> mac ss 2
   else if (shiftState == (LCTRLFLAG | RALTFLAG))                 return MAC_OPT;         // Win ss  9  -> mac ss 8
-  else if (shiftState == (K_SHIFTFLAG | LCTRLFLAG | RALTFLAG))    return MAC_SHIFT_OPT;   // Win ss 25  -> mac ss 10
+  else if (shiftState == (K_SHIFTFLAG | LCTRLFLAG | RALTFLAG))   return MAC_SHIFT_OPT;   // Win ss 25  -> mac ss 10
   else return shiftState;                                                                 // Win ss x   -> mac ss x
 }
 
@@ -33,7 +33,7 @@ int mac_convert_rgkey_Shiftstate_to_MacShiftstate(int rgkey_ShiftState) {
 
 /** @brief check for correct input parameter that will later be used in UCKeyTranslate() */
 bool ensureValidInputForKeyboardTranslation(int shiftstate, int keycode) {
-  if ((shiftstate > max_shiftstate))
+  if (!(std::find(std::begin(ss_mac), std::end(ss_mac), shiftstate) != std::end(ss_mac)))
     return false;
 
   if (keycode > keycode_max)
@@ -148,7 +148,7 @@ bool mac_InitializeUCHR(const UCKeyboardLayout** keyboard_layout) {
     printf("ERROR: Can't get keyboard_layout\n");
     return 2;
   }
-  // intentionally leaking `source` in order to still be able to access `keymap`
+  // intentionally leaking `source` in order to still be able to access `keyboard_layout`
   return 0;
 }
 
@@ -166,8 +166,8 @@ KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode(const UCKeyboardLayout* keyboard_layou
     return 0;
 
   /*
-    UCKeyTranslate != 0 if a dk was found; then run UCKeyTranslate again with a SPACE (keycode_spacebar) to get the plain dk e.g.'^'
-    if CAPS is used: always add 4 e.g. SHIFT = 2; SHIFT+CAPS = 6
+    UCKeyTranslate != 0 if a dk was found; then run UCKeyTranslate again with a SPACE (keycode_spacebar) to get the plain dk e.g.'^'.
+    If CAPS is used: always add 4 e.g. SHIFT = 2; SHIFT+CAPS = 6
   */
   status = UCKeyTranslate(keyboard_layout, keycode, kUCKeyActionDown, (shiftstate_mac + 4 * caps), LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString);
   // If this was a deadkey (deadkeystate != 0), append a space
@@ -178,7 +178,7 @@ KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode(const UCKeyboardLayout* keyboard_layou
   if (unicodeString[0] == 1)  // impossible character
     return 0;
   else {
-    return unicodeString[0];  // combined char e.g.  â
+    return unicodeString[0];  // combined char e.g.  'â'
   }
 }
 
@@ -195,12 +195,12 @@ KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode_dk(const UCKeyboardLayout* keyboard_la
     return 0;
 
   /*
-    UCKeyTranslate != 0 if a dk was found; then run UCKeyTranslate again with a SPACE (keycode_spacebar) to get the plain dk e.g.'^'
-    if CAPS is used: always add 4 e.g. SHIFT = 2; SHIFT+CAPS = 6
+    UCKeyTranslate != 0 if a dk was found; then run UCKeyTranslate again with a SPACE (keycode_spacebar) to get the plain dk e.g.'^'.
+    If CAPS is used: always add 4 e.g. SHIFT = 2; SHIFT+CAPS = 6
   */
   status = UCKeyTranslate(keyboard_layout, keycode, kUCKeyActionDown, (shiftstate_mac + 4 * caps), LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString);
 
-  // If this was a deadkey,append a space
+  // If this was a deadkey, append a space
   if (deadkeystate != 0)
     status = UCKeyTranslate(keyboard_layout, keycode_spacebar, kUCKeyActionDown,(shiftstate_mac + 4 * caps), LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString);
 
@@ -208,7 +208,7 @@ KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode_dk(const UCKeyboardLayout* keyboard_la
   if (unicodeString[0] == 1)  // impossible character
     return 0;
   else
-    return unicodeString[0];  // combined char e.g.  â
+    return unicodeString[0];  // combined char e.g.  'â'
 }
 
 /** @brief return the keyvalue for a given Keycode and shiftstate of the currently used (underlying) keyboard layout. */
@@ -258,7 +258,7 @@ KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_KeyValUnderlying(vec_dword_3D& all_
   return kv_underlying;
 }
 
-/** @brief return the keycode of the currently used (underlying) keyboard for a given keycode of the US keyboard */
+/** @brief return the keycode of the currently used (underlying) keyboard for a given keycode of a character on the US keyboard */
 KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_KeyCodeUS(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& all_vector, KMX_DWORD kc_us, ShiftState ss_win, int caps) {
   // first get the keyvalue kv of the key on the US keyboard (kc_us)
   KMX_DWORD kv = mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout, kc_us, mac_convert_rgkey_Shiftstate_to_MacShiftstate(ss_win), caps);
@@ -275,13 +275,13 @@ KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_KeyCodeUS(const UCKeyboardLayout* k
 
 /** @brief return the keycode of the currently used (underlying) keyboard for a given virtual key of the US keyboard */
 KMX_DWORD mac_KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD virtualKeyUS) {
-  // on the mac virtual keys do not exist. Nevertheless we can use this mapping to obtain an 'artificial' us virtual key
+  // on the mac virtual keys do not exist. Nevertheless we can use this mapping to obtain an 'artificial' us virtual key from a keycode
   return (mac_USVirtualKeyToScanCode[virtualKeyUS]);
 }
 
 /** @brief return a virtual key of the US keyboard for a given keycode of the currently used (underlying) keyboard */
 KMX_DWORD mac_KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode) {
-  // on the mac virtual keys do not exist. Nevertheless we can use this mapping to obtain an keycode from an 'artificial' us virtual key
+  // on the mac virtual keys do not exist. Nevertheless we can use this mapping to obtain a keycode from an 'artificial' us virtual key
   return mac_ScanCodeToUSVirtualKey[keycode];
 }
 
@@ -296,8 +296,8 @@ KMX_DWORD mac_get_CombinedChar_From_DK(const UCKeyboardLayout* keyboard_layout, 
   OSStatus status;
 
   /*
-    UCKeyTranslate != 0 if a dk was found; then run UCKeyTranslate again with a base character (vk_us) to get the combined dk e.g.'Â'
-    if CAPS is used: always add 4 e.g. SHIFT = 2; SHIFT+CAPS = 6
+    UCKeyTranslate != 0 if a dk was found; then run UCKeyTranslate again with a base character (vk_us) to get the combined dk e.g. '^' + 'A' -> 'Â'
+    If CAPS is used: always add 4 e.g. SHIFT = 2; SHIFT+CAPS = 6
   */
   status = UCKeyTranslate(keyboard_layout, vk_dk, kUCKeyActionDown, ss_dk, LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString);
 
@@ -308,7 +308,7 @@ KMX_DWORD mac_get_CombinedChar_From_DK(const UCKeyboardLayout* keyboard_layout, 
   if (unicodeString[0] == 1)  // impossible character
       return 0;
   else
-    return unicodeString[0];  // combined char e.g.  â
+    return unicodeString[0];  // combined char e.g.  'â'
   } else
     return 0;
 }

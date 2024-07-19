@@ -45,7 +45,8 @@ const int CODE__SIZE[] = {
  * @brief check if the file has correct version
  * @param filebase containing data of the input file
  * @param file_size a size
- * @return true if successful; false if not
+ * @return true if successful;
+ *         false if not
  */
 KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD file_size);
 
