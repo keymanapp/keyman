@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+  <!-- app_name removed in 16.0 beta. Set in build.gradle -->
   <!-- Context: Menu Action -->
   <string name="action_share" comment="Menu action to send text content to another app">Compartilhar</string>
   <!-- Context: Menu Action -->
@@ -32,6 +33,8 @@
   <string name="ic_text_size_up" comment="Make text bigger">Tamanho do texto para cima</string>
   <!-- Context: Text Size dialog -->
   <string name="ic_text_size_down" comment="Make text smaller">Tamanho do texto para baixo</string>
+  <!-- Context: Text Size dialog -->
+  <string name="ic_text_size_slider" comment="Adjust text size">Tamanho do texto deslizante</string>
   <!-- Context: Clear Text dialog -->
   <string name="all_text_will_be_cleared" comment="Erase all the text">\nTodo o texto será limpo\n</string>
   <!-- Context: Get Started menu -->
@@ -50,6 +53,7 @@
   <string name="request_storage_permission" comment="Request storage permission to access keyboard packages">    Para instalar pacotes de teclado, permita que o Keyman leia o armazenamento externo.</string>
   <!-- Context: Android Storage Permission -->
   <string name="storage_permission_denied" comment="Keyboard package installation may fail since Android storage permission not granted">    A solicitação de permissão de armazenamento foi negada. Pode falhar na instalação do pacote de teclado</string>
+  <string name="storage_permission_denied2" comment="Keyboard package installation failed. Recommend install from local file">    Falha no pedido de permissão de armazenamento. Experimente instalar de um ficheiro local, nas configurações do Keyman</string>
   <!-- Context: Keyman Settings menu -->
   <string name="keyman_settings" comment="Settings menu title">Configurações</string>
   <!-- Context: Keyman Settings menu -->
@@ -82,7 +86,7 @@
   <!-- Context: Keyman Settings menu / Spacebar caption hint -->
   <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">Não mostrar legenda na barra de espaço</string>
   <!-- Context: Keyman Settings menu / Haptic feedback -->
-  <string name="haptic_feedback" comment="haptic feedback on key press">Vibrate when typing</string>
+  <string name="haptic_feedback" comment="haptic feedback on key press">Vibrar ao tocar</string>
   <!-- Context: Keyman Settings menu -->
   <string name="show_banner" comment="text suggestions banner">Sempre mostrar banner</string>
   <!-- Context: Keyman Settings menu -->
@@ -154,7 +158,7 @@
   <!-- Context: KMP Package strings -->
   <string name="invalid_metadata" comment="kmp.json metadata file is invalid or missing in package">Metadados inválidos/ausentes no pacote</string>
   <!-- Context: KMP Package strings -->
-  <string name="minimum_keyboard_version_not_supported" comment="Notification when keyboard has functionality not supported by current Keyman">    Keyboard requires a newer version of Keyman</string>
+  <string name="minimum_keyboard_version_not_supported" comment="Notification when keyboard has functionality not supported by current Keyman">O teclado requer uma nova versão do Keyman</string>
   <!-- Context: anywhere -->
-  <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
+  <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Não foi possível carregar o navegador</string>
 </resources>
