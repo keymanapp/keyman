@@ -30,6 +30,9 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
 
   // Following messages are kmw-compiler only, so use KmwCompiler error namespace
 
+  // 0x0001 - Reserved for removed identifier ERROR_NotAnyRequiresVersion14 =
+  //          SevError | 0x0001, added in 17.0, removed in 18.0
+
   static ERROR_TouchLayoutIdentifierRequires15 = SevError | 0x0002;
   static Error_TouchLayoutIdentifierRequires15 = (o:{keyId:string, platformName:string, layerId:string}) => m(this.ERROR_TouchLayoutIdentifierRequires15,
     `Key "${def(o.keyId)}" on "${def(o.platformName)}", layer "${def(o.layerId)}" has a multi-part identifier which requires version 15.0 or newer.`);
