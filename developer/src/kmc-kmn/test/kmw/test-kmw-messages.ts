@@ -57,6 +57,11 @@ describe('KmwCompilerMessages', function () {
   //   WARN_TouchLayoutSpecialLabelOnNormalKey if the minimum version specified
   //   in the keyboard does not support special key caps on normal keys'
 
+  // HINT_TouchLayoutUsesUnsupportedGesturesDownlevel
+  // * Implemented in test-kmw-compiler.ts: 'should give warning
+  //   HINT_TouchLayoutUsesUnsupportedGesturesDownlevel if the minimum version
+  //   specified in the keyboard does not support gestures'
+
   // ERROR_NotAnyRequiresVersion14
 
   // it('should generate ERROR_NotAnyRequiresVersion14 if ...', async function() {

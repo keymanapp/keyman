@@ -178,7 +178,6 @@ describe('KeymanWeb Compiler', function() {
   });
 
   it('should give warning WARN_TouchLayoutSpecialLabelOnNormalKey if the minimum version specified in the keyboard does not support special key caps on normal keys', async function() {
-    // Note that the logic being tested here is in kmx compiler.cpp, not kmw compiler
     const filenames = generateTestFilenames('version_special_key_caps_14');
 
     let result = await kmnCompiler.run(filenames.source, null);
@@ -187,6 +186,31 @@ describe('KeymanWeb Compiler', function() {
     assert.isFalse(callbacks.hasMessage(KmnCompilerMessages.INFO_Info));
     assert.isFalse(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumEngineVersion));
     assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.WARN_TouchLayoutSpecialLabelOnNormalKey));
+  });
+
+  it('should determine the minimum version correctly with v17 gestures', async function() {
+    const filenames = generateTestFilenames('version_gestures');
+
+    let result = await kmnCompiler.run(filenames.source, null);
+    assert.isNotNull(result);
+    assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumEngineVersion));
+    // The min version message from the .kmn compiler is generic 208A INFO_Info;
+    // we expect only 1 of the info messages -- for the .kmx target (not 2)
+    assert.equal(callbacks.messages.filter(item => item.code == KmnCompilerMessages.INFO_Info).length, 1);
+
+    const data = new TextDecoder('utf-8').decode(result.artifacts.js.data);
+    assert.match(data, /KMINVER="17.0"/, `Could not find expected 'KMINVER="17.0"'`);
+  });
+
+  it('should give warning HINT_TouchLayoutUsesUnsupportedGesturesDownlevel if the minimum version specified in the keyboard does not support special key caps on normal keys', async function() {
+    const filenames = generateTestFilenames('version_gestures_16');
+
+    let result = await kmnCompiler.run(filenames.source, null);
+    assert.isNotNull(result);
+    // The min version message from the .kmn compiler is generic 208A INFO_Info
+    assert.isFalse(callbacks.hasMessage(KmnCompilerMessages.INFO_Info));
+    assert.isFalse(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumEngineVersion));
+    assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.HINT_TouchLayoutUsesUnsupportedGesturesDownlevel));
   });
 
 });
