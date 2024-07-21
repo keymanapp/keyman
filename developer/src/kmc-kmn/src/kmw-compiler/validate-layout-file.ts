@@ -1,8 +1,8 @@
 import { KMX, TouchLayout, TouchLayoutFileReader, TouchLayoutFileWriter } from "@keymanapp/common-types";
-import { callbacks, minimumKeymanVersion, verifyMinimumRequiredKeymanVersion15,
+import { callbacks, minimumKeymanVersion, verifyAndSetMinimumRequiredKeymanVersion15,
          isKeyboardVersion14OrLater, isKeyboardVersion17OrLater,
-         verifyMinimumRequiredKeymanVersion14,
-         verifyMinimumRequiredKeymanVersion17} from "./compiler-globals.js";
+         verifyAndSetMinimumRequiredKeymanVersion14,
+         verifyAndSetMinimumRequiredKeymanVersion17} from "./compiler-globals.js";
 import { JavaScript_Key } from "./javascript-strings.js";
 import { TRequiredKey, CRequiredKeys, CSpecialText, CSpecialText14Map, CSpecialText17Map,
          CSpecialTextMinVer, CSpecialTextMaxVer } from "./constants.js";
@@ -125,7 +125,7 @@ function CheckKey(
     callbacks.reportMessage(KmwCompilerMessages.Error_TouchLayoutInvalidIdentifier({keyId: FId, platformName: platformId, layerId: layer.id}));
     return false;
   }
-  else if (FValid == TKeyIdType.Key_Unicode_Multi && !verifyMinimumRequiredKeymanVersion15()) {
+  else if (FValid == TKeyIdType.Key_Unicode_Multi && !verifyAndSetMinimumRequiredKeymanVersion15()) {
     callbacks.reportMessage(KmwCompilerMessages.Error_TouchLayoutIdentifierRequires15({keyId: FId, platformName: platformId, layerId: layer.id}));
     return false;
   }
@@ -151,7 +151,7 @@ function CheckKey(
     const mapVersion = Math.max(Math.min(minimumKeymanVersion(), CSpecialTextMaxVer), CSpecialTextMinVer);
     const specialText = CSpecialText.get(mapVersion);
     if(specialText.includes(FText) &&
-        !verifyMinimumRequiredKeymanVersion14() &&
+        !verifyAndSetMinimumRequiredKeymanVersion14() &&
         !([TouchLayout.TouchLayoutKeySp.special, TouchLayout.TouchLayoutKeySp.specialActive].includes(FKeyType))) {
       callbacks.reportMessage(KmwCompilerMessages.Warn_TouchLayoutSpecialLabelOnNormalKey({
         keyId: FId,
@@ -243,7 +243,7 @@ export function ValidateLayoutFile(fk: KMX.KEYBOARD, FDebug: boolean, sLayoutFil
 
   let hasWarnedOfGestureUseDownlevel = false;
   const warnGesturesIfNeeded = function(keyId: string) {
-    if(!hasWarnedOfGestureUseDownlevel && !verifyMinimumRequiredKeymanVersion17()) {
+    if(!hasWarnedOfGestureUseDownlevel && !verifyAndSetMinimumRequiredKeymanVersion17()) {
       hasWarnedOfGestureUseDownlevel = true;
       callbacks.reportMessage(KmwCompilerMessages.Hint_TouchLayoutUsesUnsupportedGesturesDownlevel({keyId}));
     }

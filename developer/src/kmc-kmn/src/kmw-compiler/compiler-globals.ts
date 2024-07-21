@@ -52,7 +52,10 @@ function isKeyboardVersionAutomaticallyDetermined() {
   return (fk.flags & KMX.KMXFile.KF_AUTOMATICVERSION) == KMX.KMXFile.KF_AUTOMATICVERSION;
 }
 
-function verifyMinimumRequiredKeymanVersion(version: KMX.KMX_Version) {
+/**
+ * @see `verifyAndSetMinimumRequiredKeymanVersion10` for usage
+ */
+function verifyAndSetMinimumRequiredKeymanVersion(version: KMX.KMX_Version) {
   if(isKeyboardVersionAutomaticallyDetermined()) {
     _minimumKeymanVersion = Math.max(version, _minimumKeymanVersion);
     return true;
@@ -72,8 +75,8 @@ function verifyMinimumRequiredKeymanVersion(version: KMX.KMX_Version) {
  * @returns `true` if the version is now 10.0 or higher, `false` if a lower
  * version has been specified in the source file `store(&version)` line.
  */
-export function verifyMinimumRequiredKeymanVersion10(): boolean {
-  return verifyMinimumRequiredKeymanVersion(KMX.KMX_Version.VERSION_100);
+export function verifyAndSetMinimumRequiredKeymanVersion10(): boolean {
+  return verifyAndSetMinimumRequiredKeymanVersion(KMX.KMX_Version.VERSION_100);
 }
 
 /**
@@ -87,8 +90,8 @@ export function verifyMinimumRequiredKeymanVersion10(): boolean {
  * @returns `true` if the version is now 14.0 or higher, `false` if a lower
  * version has been specified in the source file `store(&version)` line.
  */
-export function verifyMinimumRequiredKeymanVersion14(): boolean {
-  return verifyMinimumRequiredKeymanVersion(KMX.KMX_Version.VERSION_140);
+export function verifyAndSetMinimumRequiredKeymanVersion14(): boolean {
+  return verifyAndSetMinimumRequiredKeymanVersion(KMX.KMX_Version.VERSION_140);
 }
 
 /**
@@ -102,8 +105,8 @@ export function verifyMinimumRequiredKeymanVersion14(): boolean {
  * @returns `true` if the version is now 15.0 or higher, `false` if a lower
  * version has been specified in the source file `store(&version)` line.
  */
-export function verifyMinimumRequiredKeymanVersion15(): boolean {
-  return verifyMinimumRequiredKeymanVersion(KMX.KMX_Version.VERSION_150);
+export function verifyAndSetMinimumRequiredKeymanVersion15(): boolean {
+  return verifyAndSetMinimumRequiredKeymanVersion(KMX.KMX_Version.VERSION_150);
 }
 
 /**
@@ -117,8 +120,8 @@ export function verifyMinimumRequiredKeymanVersion15(): boolean {
  * @returns `true` if the version is now 17.0 or higher, `false` if a lower
  * version has been specified in the source file `store(&version)` line.
  */
-export function verifyMinimumRequiredKeymanVersion17(): boolean {
-  return verifyMinimumRequiredKeymanVersion(KMX.KMX_Version.VERSION_170);
+export function verifyAndSetMinimumRequiredKeymanVersion17(): boolean {
+  return verifyAndSetMinimumRequiredKeymanVersion(KMX.KMX_Version.VERSION_170);
 }
 
 export function isKeyboardVersion10OrLater(): boolean {
