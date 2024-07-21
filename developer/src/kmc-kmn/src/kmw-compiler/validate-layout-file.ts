@@ -1,6 +1,7 @@
 import { KMX, TouchLayout, TouchLayoutFileReader, TouchLayoutFileWriter } from "@keymanapp/common-types";
 import { callbacks, minimumKeymanVersion, verifyMinimumRequiredKeymanVersion15,
-         isKeyboardVersion14OrLater, isKeyboardVersion17OrLater } from "./compiler-globals.js";
+         isKeyboardVersion14OrLater, isKeyboardVersion17OrLater,
+         verifyMinimumRequiredKeymanVersion14 } from "./compiler-globals.js";
 import { JavaScript_Key } from "./javascript-strings.js";
 import { TRequiredKey, CRequiredKeys, CSpecialText, CSpecialText14Map, CSpecialText17Map,
          CSpecialTextMinVer, CSpecialTextMaxVer } from "./constants.js";
@@ -149,8 +150,7 @@ function CheckKey(
     const mapVersion = Math.max(Math.min(minimumKeymanVersion(), CSpecialTextMaxVer), CSpecialTextMinVer);
     const specialText = CSpecialText.get(mapVersion);
     if(specialText.includes(FText) &&
-        // TODO: automatic version upgrade
-        !isKeyboardVersion14OrLater() &&
+        !verifyMinimumRequiredKeymanVersion14() &&
         !([TouchLayout.TouchLayoutKeySp.special, TouchLayout.TouchLayoutKeySp.specialActive].includes(FKeyType))) {
       callbacks.reportMessage(KmwCompilerMessages.Warn_TouchLayoutSpecialLabelOnNormalKey({
         keyId: FId,
