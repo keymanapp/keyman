@@ -50,7 +50,7 @@ builder_describe_outputs \
   configure                     "/node_modules" \
   build                         "/web/build/test/dom/cases/attachment/outputTargetForElement.spec.html" \
   build:app/browser             "/web/build/app/browser/lib/index.mjs" \
-  build:app/WebViews            "/web/build/app/webview/${config}/keymanweb-webview.js" \
+  build:app/webview             "/web/build/app/webview/${config}/keymanweb-webview.js" \
   build:app/ui                  "/web/build/app/ui/${config}/kmwuitoggle.js" \
   build:engine/attachment       "/web/build/engine/attachment/lib/index.mjs" \
   build:engine/device-detect    "/web/build/engine/device-detect/lib/index.mjs" \
