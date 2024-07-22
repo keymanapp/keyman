@@ -3,6 +3,10 @@ import { assert } from 'chai';
 import { DOMKeyboardLoader } from '@keymanapp/keyboard-processor/dom-keyboard-loader';
 import { extendString, KeyboardHarness, Keyboard, KeyboardInterface, MinimalKeymanGlobal, Mock, DeviceSpec } from '@keymanapp/keyboard-processor';
 
+type WindowKey = keyof typeof window;
+const keyman_window = 'keyman' as WindowKey;
+const KeymanWeb = 'KeymanWeb' as WindowKey;
+
 // Note:  rule processing tests will fail if string extensions are not established beforehand.
 extendString();
 
@@ -15,8 +19,8 @@ const device: DeviceSpec = {
 
 describe('Keyboard loading in DOM', function() {
   afterEach(() => {
-    if(window['KeymanWeb' as any]) {
-      (window['KeymanWeb' as any] as any).uninstall();
+    if (window[KeymanWeb]) {
+      (window[KeymanWeb] as KeyboardInterface).uninstall();
     }
   })
 
@@ -29,8 +33,8 @@ describe('Keyboard loading in DOM', function() {
     assert.equal(keyboard.id, 'Keyboard_khmer_angkor');
     assert.isTrue(keyboard.isChiral);
     assert.isFalse(keyboard.isCJK);
-    assert.isOk(window['KeymanWeb' as any]);
-    assert.isOk(window['keyman' as any]);
+    assert.isOk(window[KeymanWeb]);
+    assert.isOk(window[keyman_window]);
 
     // Should be cleared post-keyboard-load.
     assert.isNotOk(harness.loadedKeyboard);
@@ -46,8 +50,8 @@ describe('Keyboard loading in DOM', function() {
     assert.equal(keyboard.id, 'Keyboard_khmer_angkor');
     assert.isTrue(keyboard.isChiral);
     assert.isFalse(keyboard.isCJK);
-    assert.isOk(window['KeymanWeb' as any]);
-    assert.isOk(window['keyman' as any]);
+    assert.isOk(window[KeymanWeb]);
+    assert.isOk(window[keyman_window]);
 
     // TODO:  verify actual rule processing.
     const nullKeyEvent = keyboard.constructNullKeyEvent(device);
@@ -55,8 +59,8 @@ describe('Keyboard loading in DOM', function() {
     const result = harness.processKeystroke(mock, nullKeyEvent);
 
     assert.isOk(result);
-    assert.isOk(window['KeymanWeb' as any]);
-    assert.isOk(window['keyman' as any]);
+    assert.isOk(window[KeymanWeb]);
+    assert.isOk(window[keyman_window]);
 
     // Should be cleared post-keyboard-load.
     assert.isNotOk(harness.loadedKeyboard);
