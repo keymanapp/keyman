@@ -2,8 +2,8 @@
   "extends": "../../../../tsconfig.kmw-main-base.json",
   "compilerOptions": {
     "baseUrl": "../../../",
-    "outDir": "../../../build/obj/src/keyboards/loaders/",
-    "tsBuildInfoFile": "../../../build/obj/src/keyboards/loaders/tsconfig.dom.tsbuildinfo",
+    "outDir": "../../../build/obj/keyboards/loaders/",
+    "tsBuildInfoFile": "../../../build/obj/keyboards/loaders/tsconfig.dom.tsbuildinfo",
     "rootDir": "."
   },
   "references": [

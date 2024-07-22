@@ -46,26 +46,27 @@ function do_build() {
 
   # Base product - the main keyboard processor
   builder_echo "Bundle base product - the main keyboard processor"
-  ${BUNDLE_CMD}  "${KEYMAN_ROOT}/common/web/keyboard-processor/build/obj/src/index.js" \
+  ${BUNDLE_CMD}  "${KEYMAN_ROOT}/common/web/keyboard-processor/build/obj/index.js" \
     --out        "${KEYMAN_ROOT}/common/web/keyboard-processor/build/lib/index.mjs" \
     --format esm
 
   # The DOM-oriented keyboard loader
   builder_echo "Bundle the DOM-oriented keyboard loader"
-  ${BUNDLE_CMD}  "${KEYMAN_ROOT}/common/web/keyboard-processor/build/obj/src/keyboards/loaders/dom-keyboard-loader.js" \
+  ${BUNDLE_CMD}  "${KEYMAN_ROOT}/common/web/keyboard-processor/build/obj/keyboards/loaders/dom-keyboard-loader.js" \
     --out        "${KEYMAN_ROOT}/common/web/keyboard-processor/build/lib/dom-keyboard-loader.mjs" \
     --format esm
 
   # The Node-oriented keyboard loader
   builder_echo "Bundle the Node-oriented keyboard loader"
-  ${BUNDLE_CMD}  "${KEYMAN_ROOT}/common/web/keyboard-processor/build/obj/src/keyboards/loaders/node-keyboard-loader.js" \
+  ${BUNDLE_CMD}  "${KEYMAN_ROOT}/common/web/keyboard-processor/build/obj/keyboards/loaders/node-keyboard-loader.js" \
     --out        "${KEYMAN_ROOT}/common/web/keyboard-processor/build/lib/node-keyboard-loader.mjs" \
     --format   esm \
     --platform node
 
   # Tests
-  ${BUNDLE_CMD}    "${KEYMAN_ROOT}/common/web/keyboard-processor/build/obj/tests/dom/cases/domKeyboardLoader.spec.js" \
-    --out        "${KEYMAN_ROOT}/common/web/keyboard-processor/build/lib/ndomKeyboardLoader.spec.mjs" \
+  builder_echo "Bundle tests"
+  ${BUNDLE_CMD} "${KEYMAN_ROOT}/common/web/keyboard-processor/build/tests/dom/cases/domKeyboardLoader.spec.js" \
+    --out       "${KEYMAN_ROOT}/common/web/keyboard-processor/build/tests/dom/domKeyboardLoader.spec.mjs" \
     --format   esm
 
   # Declaration bundling.
