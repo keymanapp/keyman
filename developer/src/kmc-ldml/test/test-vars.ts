@@ -2,7 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { VarsCompiler } from '../src/compiler/vars.js';
 import { CompilerMessages } from '../src/compiler/messages.js';
-import { CompilerMessages as KmnCompilerMessages } from '@keymanapp/kmc-kmn';
+import { KmnCompilerMessages } from '@keymanapp/kmc-kmn';
 import { testCompilationCases } from './helpers/index.js';
 import { KMXPlus, KMX } from '@keymanapp/common-types';
 import { BASIC_DEPENDENCIES } from '../src/compiler/empty-compiler.js';
