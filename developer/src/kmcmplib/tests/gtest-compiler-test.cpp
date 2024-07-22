@@ -970,6 +970,20 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
     fileKeyboard.version = VERSION_50;
     u16cpy(str, u"context(1)");
     EXPECT_EQ(CERR_60FeatureOnly_Contextn, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // context, space before offset, valid
+    fileKeyboard.version = VERSION_60;
+    u16cpy(str, u"context( 1)");
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_context_space_before_offset_valid[] = { UC_SENTINEL, CODE_CONTEXTEX, 1, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_context_space_before_offset_valid, tstr));
+
+    // context, space after offset, valid ... investigate GetDelimitedString() ... issue #11937
+    // fileKeyboard.version = VERSION_60;
+    // u16cpy(str, u"context(1 )");
+    // EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    // const KMX_WCHAR tstr_context_space_after_offset_valid[] = { UC_SENTINEL, CODE_CONTEXTEX, 1, 0 };
+    // EXPECT_EQ(0, u16cmp(tstr_context_space_after_offset_valid, tstr));
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
