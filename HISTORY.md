@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.72 alpha 2024-07-22
+
+* fix(web): remedy unit-test stability issues (#11933)
+* refactor(web): fix TypeScript errors and warnings (#11911)
+
 ## 18.0.71 alpha 2024-07-18
 
 * chore(windows): add comments for _WIN64 tests (#11929)
