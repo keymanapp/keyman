@@ -326,6 +326,11 @@ TEST_F(CompilerTest, LineTokenType_test) {
     p = str;
     EXPECT_EQ(T_BLANK, LineTokenType(&p));
 
+    // T_BLANK, lptOther, one space
+    u16cpy(str, u" ");
+    p = str;
+    EXPECT_EQ(T_BLANK, LineTokenType(&p));
+
     // T_BLANK, mismatched prefix, CKF_KEYMAN, lptKeymanWebOnly
     u16cpy(str, u"$keymanweb:");
     p = str;
@@ -357,6 +362,34 @@ TEST_F(CompilerTest, LineTokenType_test) {
     EXPECT_EQ(T_BITMAPS, LineTokenType(&p));
     EXPECT_EQ(u16len(u"bitmaps "), p - str);
     EXPECT_TRUE(!u16cmp(p, u"\"b\""));
+
+    // T_STORE, preceeded by one space
+    u16cpy(str, u" store(b)");
+    p = str;
+    EXPECT_EQ(T_STORE, LineTokenType(&p));
+    EXPECT_EQ(u16len(u" store"), p - str);
+    EXPECT_TRUE(!u16cmp(p, u"(b)"));
+
+    // T_STORE, preceeded by two spaces
+    u16cpy(str, u"  store(b)");
+    p = str;
+    EXPECT_EQ(T_STORE, LineTokenType(&p));
+    EXPECT_EQ(u16len(u"  store"), p - str);
+    EXPECT_TRUE(!u16cmp(p, u"(b)"));
+
+    // T_STORE, followed by one space
+    u16cpy(str, u"store (b)");
+    p = str;
+    EXPECT_EQ(T_STORE, LineTokenType(&p));
+    EXPECT_EQ(u16len(u"store "), p - str);
+    EXPECT_TRUE(!u16cmp(p, u"(b)"));
+
+    // T_STORE, followed by two spaces
+    u16cpy(str, u"store  (b)");
+    p = str;
+    EXPECT_EQ(T_STORE, LineTokenType(&p));
+    EXPECT_EQ(u16len(u"store  "), p - str);
+    EXPECT_TRUE(!u16cmp(p, u"(b)"));
 
     // T_COMMENT
     u16cpy(str, u"c ");
