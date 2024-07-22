@@ -14,6 +14,9 @@ import { type KeymanEngine } from 'keyman/app/browser';
 
 import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
 
+type WindowKey = keyof typeof window;
+const keyman_window = 'keyman' as WindowKey;
+
 const host = document.createElement('div');
 document.body.appendChild(host);
 
@@ -52,7 +55,7 @@ describe('Event Management', function() {
   });
 
   it('Keystroke-based onChange event generation', async function() {
-    const keyman: KeymanEngine = window['keyman'];
+    const keyman: KeymanEngine = window[keyman_window];
 
     var simple_A = {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0};
     var event = new KMWRecorder.PhysicalInputEventSpec(simple_A);
@@ -77,7 +80,7 @@ describe('Event Management', function() {
   });
 
   it('OSK-based onChange event generation', async function() {
-    const keyman: KeymanEngine = window['keyman'];
+    const keyman: KeymanEngine = window[keyman_window];
     var simple_A = {"type":"osk","keyID":"default-K_A"};
     var event = new KMWRecorder.OSKInputEventSpec(simple_A as OSKInputEventSpec);
 
@@ -106,7 +109,7 @@ describe('Event Management', function() {
   });
 
   it('Keystroke-based onInput event generation', async function() {
-    const keyman: KeymanEngine = window['keyman'];
+    const keyman: KeymanEngine = window[keyman_window];
     var simple_A = {"type":"key","key":"a","code":"KeyA","keyCode":65,"modifierSet":0,"location":0};
     var event = new KMWRecorder.PhysicalInputEventSpec(simple_A);
 
@@ -129,7 +132,7 @@ describe('Event Management', function() {
   });
 
   it('OSK-based onInput event generation', async function() {
-    const keyman: KeymanEngine = window['keyman'];
+    const keyman: KeymanEngine = window[keyman_window];
     var simple_A = {"type":"osk","keyID":"default-K_A"};
     var event = new KMWRecorder.OSKInputEventSpec(simple_A as OSKInputEventSpec);
 
