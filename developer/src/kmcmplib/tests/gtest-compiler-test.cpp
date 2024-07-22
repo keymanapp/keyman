@@ -900,6 +900,40 @@ TEST_F(CompilerTest, GetXStringImpl_type_o_test) {
     // EXPECT_EQ(0, u16cmp(tstr_outs_space_after_valid, tstr));
 }
 
+// tests strings starting with 'c'
+TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
+    KMX_WCHAR tstr[128];
+    fileKeyboard.version = VERSION_80;
+    KMX_WCHAR str[LINESIZE];
+    KMX_WCHAR output[GLOBAL_BUFSIZE];
+    PKMX_WCHAR newp = nullptr;
+
+    // are comments stripped before this point?
+    // if so, why the test on whitespace after 'c'?
+
+    // CERR_InvalidToken
+    u16cpy(str, u"cde");
+    EXPECT_EQ(CERR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // context, CERR_ContextInVirtualKeySection *** TODO ***
+
+    // context, no offset, valid
+    u16cpy(str, u"context");
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_context_no_offset_valid[] = { UC_SENTINEL, CODE_CONTEXT, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_context_no_offset_valid, tstr));
+
+    //std::cerr << "start debug" << std::endl;
+
+    // context, no close delimiter => NULL
+    u16cpy(str, u"context(");
+    //KMX_DWORD res = GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE);
+    //std::cerr << std::hex << "res: " << res << std::dec << std::endl;
+    EXPECT_EQ(CERR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    //std::cerr << "end debug" << std::endl;
+}
+
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
 // KMX_DWORD process_platform(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
 // KMX_DWORD process_if_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
