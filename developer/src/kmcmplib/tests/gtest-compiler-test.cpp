@@ -317,19 +317,19 @@ TEST_F(CompilerTest, GetDelimitedString_test) {
     PKMX_WCHAR p = str;
     PKMX_WCHAR q = nullptr;
 
-    // no open delimiter, cut open and close delimiter
+    // no open delimiter, cut spaces after open and before close delimiter
     u16cpy(str, u"");
     p = str;
     q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
     EXPECT_FALSE(q);
 
-    // no close delimiter, cut open and close delimiterg
+    // no close delimiter, cut spaces after open and before close delimiter
     u16cpy(str, u"(");
     p = str;
     q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
     EXPECT_FALSE(q);
 
-    // no argument, cut open and close delimiter
+    // no argument, cut spaces after open and before close delimiter
     u16cpy(str, u"()");
     p = str;
     q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -337,7 +337,7 @@ TEST_F(CompilerTest, GetDelimitedString_test) {
     EXPECT_FALSE(*p);
     EXPECT_EQ(1, p-str); // deleted close delimiter
 
-    // single-character argument, cut open and close delimiter, valid
+    // single-character argument, cut spaces after open and before close delimiter, valid
     u16cpy(str, u"(b)");
     p = str;
     q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -345,7 +345,7 @@ TEST_F(CompilerTest, GetDelimitedString_test) {
     EXPECT_FALSE(*p);
     EXPECT_EQ(2, p-str); // deleted close delimiter
 
-    // multi-character argument, cut open and close delimiter, valid
+    // multi-character argument, cut spaces after open and before close delimiter, valid
     u16cpy(str, u"(abc)");
     p = str;
     q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -353,7 +353,7 @@ TEST_F(CompilerTest, GetDelimitedString_test) {
     EXPECT_FALSE(*p);
     EXPECT_EQ(4, p-str); // deleted close delimiter
 
-    // multi-word argument, cut open and close delimiter, valid
+    // multi-word argument, cut spaces after open and before close delimiter, valid
     u16cpy(str, u"(abc def)");
     p = str;
     q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -361,7 +361,7 @@ TEST_F(CompilerTest, GetDelimitedString_test) {
     EXPECT_FALSE(*p);
     EXPECT_EQ(8, p-str); // deleted close delimiter
 
-    // single-character argument, leading single space, cut open and close delimiter, valid
+    // single-character argument, leading single space, cut spaces after open and before close delimiter, valid
     u16cpy(str, u" (b)");
     p = str;
     q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -377,7 +377,7 @@ TEST_F(CompilerTest, GetDelimitedString_test) {
     EXPECT_FALSE(*p);
     EXPECT_EQ(4, p-str); // deleted close delimiter
 
-    // single-character argument, space before argument, cut open and close delimiter, valid
+    // single-character argument, space before argument, cut spaces after open and before close delimiter, valid
     u16cpy(str, u"( b)");
     p = str;
     q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -393,7 +393,7 @@ TEST_F(CompilerTest, GetDelimitedString_test) {
     EXPECT_FALSE(*p);
     EXPECT_EQ(3, p-str); // deleted close delimiter
 
-    // single-character argument, double space before argument, cut open and close delimiter, valid
+    // single-character argument, double space before argument, cut spaces after open and before close delimiter, valid
     u16cpy(str, u"(  b)");
     p = str;
     q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -409,7 +409,7 @@ TEST_F(CompilerTest, GetDelimitedString_test) {
     EXPECT_FALSE(*p);
     EXPECT_EQ(4, p-str); // deleted close delimiter
 
-    // single-character argument, space after argument, cut open and close delimiter, valid
+    // single-character argument, space after argument, cut spaces after open and before close delimiter, valid
     u16cpy(str, u"(b )");
     p = str;
     q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -425,7 +425,7 @@ TEST_F(CompilerTest, GetDelimitedString_test) {
     EXPECT_FALSE(*p);
     EXPECT_EQ(3, p-str); // deleted close delimiter
 
-    // single-character argument, two spaces after argument, cut open and close delimiter, valid
+    // single-character argument, two spaces after argument, cut spaces after open and before close delimiter, valid
     u16cpy(str, u"(b  )");
     p = str;
     q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -441,7 +441,7 @@ TEST_F(CompilerTest, GetDelimitedString_test) {
     EXPECT_FALSE(*p);
     EXPECT_EQ(4, p-str); // deleted close delimiter
 
-    // single-character argument, space after close delimiter, cut open and close delimiter, valid
+    // single-character argument, space after close delimiter, cut spaces after open and before close delimiter, valid
     u16cpy(str, u"(b) ");
     p = str;
     q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -449,7 +449,7 @@ TEST_F(CompilerTest, GetDelimitedString_test) {
     EXPECT_EQ(' ', *p);
     EXPECT_EQ(3, p-str); // space after the close delimiter
 
-    // single-character argument, two spaces after close delimiter, cut open and close delimiter, valid
+    // single-character argument, two spaces after close delimiter, cut spaces after open and before close delimiter, valid
     u16cpy(str, u"(b)  ");
     p = str;
     q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -457,7 +457,8 @@ TEST_F(CompilerTest, GetDelimitedString_test) {
     EXPECT_EQ(' ', *p);
     EXPECT_EQ(4, p-str); // last space after the close delimiter
 
-    // single-character argument, two spaces after argument and two spaces after close delimiter, cut open and close delimiter, valid
+    // single-character argument, two spaces after argument and two spaces after close delimiter,
+    // cut spaces after open and before close delimiter, valid
     u16cpy(str, u"(b  )  ");
     p = str;
     q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -473,7 +474,7 @@ TEST_F(CompilerTest, GetDelimitedString_test) {
     EXPECT_EQ(' ', *p);
     EXPECT_EQ(6, p-str); // last space after the close delimiter
 
-    // single-character argument, two spaces and text after close delimiter, cut open and close delimiter, valid
+    // single-character argument, two spaces and text after close delimiter, cut spaces after open and before close delimiter, valid
     u16cpy(str, u"(b)  def");
     p = str;
     q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
