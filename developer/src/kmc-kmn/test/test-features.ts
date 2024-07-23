@@ -24,21 +24,21 @@ describe('Keyboard compiler features', function() {
 
   const versions = [
     // TODO(lowpri): we should add a test for each version + also test automatic feature detection
-    ['16.0', '160', KMX.KMXFile.VERSION_160],
-    ['17.0', '170', KMX.KMXFile.VERSION_170],
+    {major: '16.0', vstr: '160', vernum: KMX.KMXFile.VERSION_160},
+    {major: '17.0', vstr: '170', vernum: KMX.KMXFile.VERSION_170},
   ];
 
   for(const v of versions) {
-    it(`should build a version ${v[0]} keyboard`, async function() {
-      const fixtureName = makePathToFixture('features', `version_${v[1]}.kmn`);
+    it(`should build a version ${v.major} keyboard`, async function() {
+      const fixtureName = makePathToFixture('features', `version_${v.vstr}.kmn`);
 
-      const result = await compiler.run(fixtureName, `version_${v[1]}.kmx`);
+      const result = await compiler.run(fixtureName, `version_${v.vstr}.kmx`);
       if(result === null) callbacks.printMessages();
       assert.isNotNull(result);
 
       const reader = new KmxFileReader();
       const keyboard = reader.read(result.artifacts.kmx.data);
-      assert.equal(keyboard.fileVersion, v[2]);
+      assert.equal(keyboard.fileVersion, v.vernum);
     });
   }
 });

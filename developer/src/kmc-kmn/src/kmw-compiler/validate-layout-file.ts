@@ -1,7 +1,9 @@
 import { KMX, TouchLayout, TouchLayoutFileReader, TouchLayoutFileWriter } from "@keymanapp/common-types";
-import { callbacks, fk, IsKeyboardVersion14OrLater, IsKeyboardVersion15OrLater, IsKeyboardVersion17OrLater } from "./compiler-globals.js";
+import { callbacks, minimumKeymanVersion, verifyMinimumRequiredKeymanVersion15,
+         isKeyboardVersion14OrLater, isKeyboardVersion17OrLater } from "./compiler-globals.js";
 import { JavaScript_Key } from "./javascript-strings.js";
-import { TRequiredKey, CRequiredKeys, CSpecialText, CSpecialText14Map, CSpecialText17Map, CSpecialTextMinVer, CSpecialTextMaxVer } from "./constants.js";
+import { TRequiredKey, CRequiredKeys, CSpecialText, CSpecialText14Map, CSpecialText17Map,
+         CSpecialTextMinVer, CSpecialTextMaxVer } from "./constants.js";
 import { KeymanWebTouchStandardKeyNames, KMWAdditionalKeyNames, VKeyNames } from "./keymanweb-key-codes.js";
 import { KmwCompilerMessages } from "./kmw-compiler-messages.js";
 import * as Osk from '../compiler/osk.js';
@@ -121,7 +123,7 @@ function CheckKey(
     callbacks.reportMessage(KmwCompilerMessages.Error_TouchLayoutInvalidIdentifier({keyId: FId, platformName: platformId, layerId: layer.id}));
     return false;
   }
-  else if (FValid == TKeyIdType.Key_Unicode_Multi && !IsKeyboardVersion15OrLater()) {
+  else if (FValid == TKeyIdType.Key_Unicode_Multi && !verifyMinimumRequiredKeymanVersion15()) {
     callbacks.reportMessage(KmwCompilerMessages.Error_TouchLayoutIdentifierRequires15({keyId: FId, platformName: platformId, layerId: layer.id}));
     return false;
   }
@@ -144,10 +146,11 @@ function CheckKey(
     // Keyman versions before 14 do not support '*special*' labels on non-special keys.
     // ZWNJ use, however, is safe because it will be transformed in function
     // TransformSpecialKeys14 to '<|>',  which does not require the custom OSK font.
-    const mapVersion = Math.max(Math.min(fk.fileVersion, CSpecialTextMaxVer), CSpecialTextMinVer);
+    const mapVersion = Math.max(Math.min(minimumKeymanVersion(), CSpecialTextMaxVer), CSpecialTextMinVer);
     const specialText = CSpecialText.get(mapVersion);
     if(specialText.includes(FText) &&
-        !IsKeyboardVersion14OrLater() &&
+        // TODO: automatic version upgrade
+        !isKeyboardVersion14OrLater() &&
         !([TouchLayout.TouchLayoutKeySp.special, TouchLayout.TouchLayoutKeySp.specialActive].includes(FKeyType))) {
       callbacks.reportMessage(KmwCompilerMessages.Warn_TouchLayoutSpecialLabelOnNormalKey({
         keyId: FId,
@@ -187,7 +190,7 @@ function CheckDictionaryKeyValidity(fk: KMX.KEYBOARD, FDictionary: string[]) {  
 function TransformSpecialKeys14(FDebug: boolean, sLayoutFile: string): string {
   // Rewrite Special key labels that are only supported in Keyman 14+
   // This code is a little ugly but effective.
-  if(!IsKeyboardVersion14OrLater()) {
+  if(!isKeyboardVersion14OrLater()) {
     for(let i = 0; i < CSpecialText14Map.length; i++) {
       // Assumes the JSON output format will not change
       if(FDebug) {
@@ -203,7 +206,7 @@ function TransformSpecialKeys14(FDebug: boolean, sLayoutFile: string): string {
 function TransformSpecialKeys17(FDebug: boolean, sLayoutFile: string): string {
   // Rewrite Special key labels that are only supported in Keyman 17+
   // This code is a little ugly but effective.
-  if(!IsKeyboardVersion17OrLater()) {
+  if(!isKeyboardVersion17OrLater()) {
     for(let i = 0; i < CSpecialText17Map.length; i++) {
       // Assumes the JSON output format will not change
       if(FDebug) {
@@ -239,7 +242,8 @@ export function ValidateLayoutFile(fk: KMX.KEYBOARD, FDebug: boolean, sLayoutFil
 
   let hasWarnedOfGestureUseDownlevel = false;
   const warnGesturesIfNeeded = function(keyId: string) {
-    if(!hasWarnedOfGestureUseDownlevel && !IsKeyboardVersion17OrLater()) {
+    // TODO: automatic version upgrade
+    if(!hasWarnedOfGestureUseDownlevel && !isKeyboardVersion17OrLater()) {
       hasWarnedOfGestureUseDownlevel = true;
       callbacks.reportMessage(KmwCompilerMessages.Hint_TouchLayoutUsesUnsupportedGesturesDownlevel({keyId}));
     }
