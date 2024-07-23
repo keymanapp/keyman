@@ -1,0 +1,8 @@
+﻿store(&NAME) 'version_u_xxxx_yyyy'
+store(&TARGETS) 'mobile'
+store(&LAYOUTFILE) 'version_u_xxxx_yyyy.keyman-touch-layout'
+store(&VERSION) '14.0'
+
+begin Unicode > use(main)
+
+group(main) using keys

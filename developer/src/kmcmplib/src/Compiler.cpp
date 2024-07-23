@@ -144,7 +144,7 @@ KMX_BOOL IsSameToken(PKMX_WCHAR *p, KMX_WCHAR const * token);
 KMX_DWORD GetRHS(PFILE_KEYBOARD fk, PKMX_WCHAR p, PKMX_WCHAR buf, int bufsize, int offset, int IsUnicode);
 PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_WORD Flags);
 KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token, PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isVKey, int isUnicode);
-int GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store);
+KMX_DWORD GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &targets);
 
 int GetGroupNum(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 
@@ -1089,7 +1089,9 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
 
   case TSS_TARGETS:   // I4504
     VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnlyTargets);
-    fk->extra->targets = GetCompileTargetsFromTargetsStore(sp->dpString);
+    if((msg = GetCompileTargetsFromTargetsStore(sp->dpString, fk->extra->targets)) != CERR_None) {
+      return msg;
+    }
     break;
 
   case TSS_WINDOWSLANGUAGES:
@@ -1172,7 +1174,7 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
   return CERR_None;
 }
 
-int GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store) {
+KMX_DWORD GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &targets) {
   // Compile to .kmx
   const std::vector<std::u16string> KMXKeymanTargets{
     u"windows", u"macosx", u"linux", u"desktop"
@@ -1186,29 +1188,47 @@ int GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store) {
 
   const std::u16string AnyTarget = u"any";
 
-  int result = 0;
+  targets = 0;
   auto p = new KMX_WCHAR[u16len(store)+1];
   u16cpy(p, store);
   KMX_WCHAR* ctx;
   auto token = u16tok(p, u" ", &ctx);
   while(token) {
-    if(AnyTarget == token) {
-      result |= COMPILETARGETS_KMX | COMPILETARGETS_JS;
-    }
-    for(auto target: KMXKeymanTargets) {
-      if(target == token) result |= COMPILETARGETS_KMX;
-    }
-    for(auto target: KMWKeymanTargets) {
-      if(target == token) result |= COMPILETARGETS_JS;
-    }
+    bool found = false;
+    if(*token) {
+      if(AnyTarget == token) {
+        targets |= COMPILETARGETS_KMX | COMPILETARGETS_JS;
+        found = true;
+      }
+      for(auto target: KMXKeymanTargets) {
+        if(target == token) {
+          targets |= COMPILETARGETS_KMX;
+          found = true;
+        }
+      }
+      for(auto target: KMWKeymanTargets) {
+        if(target == token) {
+          targets |= COMPILETARGETS_JS;
+          found = true;
+        }
+      }
 
+      if(!found) {
+        snprintf(ErrExtraLIB, ERR_EXTRA_LIB_LEN, " target: %s", string_from_u16string(token).c_str());
+        delete[] p;
+        targets = 0;
+        return CERR_InvalidTarget;
+      }
+    }
     token = u16tok(nullptr, u" ", &ctx);
-
-    // Future: consider warnings on invalid compile targets?
   }
   delete[] p;
 
-  return result;
+  if(targets == 0) {
+    return CERR_NoTargetsSpecified;
+  }
+
+  return CERR_None;
 }
 
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString) {   // I4140
