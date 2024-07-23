@@ -1,5 +1,21 @@
 # Keyman Version History
 
+## 18.0.73 alpha 2024-07-23
+
+* fix(windows): add text selected bool emit backspace key when text selected in TSF (#11884)
+* fix(developer): prevent buffer overrun in `u16tok` (#11910)
+* fix(developer): prevent invalid values in targets store (#11918)
+* feat(developer): automatically detect version for `U_xxxx_yyyy` ids (#11957)
+* feat(developer): handle automatic versioning of chiral modifiers (#11965)
+* test(developer): Add tests for automatic versioning of notany() with context() (#11980)
+* feat(developer): handle automatic versioning of special key caps on normal keys (#11981)
+* feat(developer): automatically upgrade version when gestures are found in the touch layout (#11982)
+* refactor(developer): rename `verifyMinimumKeymanVersion` (#11983)
+* feat(developer): add searching for message identifiers to `kmc message` (#11984)
+* fix(developer): kmc-keyboard-info: use default version 1.0 if version information missing (#11985)
+* fix(web): present a "keep" option when a context-altering suggestion is auto-selected (#11969)
+* fix(web): prevents auto-accept immediately after reversion (#11970)
+
 ## 18.0.72 alpha 2024-07-22
 
 * fix(web): remedy unit-test stability issues (#11933)
