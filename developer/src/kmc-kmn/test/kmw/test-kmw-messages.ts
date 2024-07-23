@@ -48,7 +48,14 @@ describe('KmwCompilerMessages', function () {
   // TODO: other messages
 
   // WARN_ExtendedShiftFlagsNotSupportedInKeymanWeb:
-  // * Implemented in test-kmw-compiler.ts: 'should give warning WARN_ExtendedShiftFlagsNotSupportedInKeymanWeb for v9 keyboards if ${mode} found'
+  // * Implemented in test-kmw-compiler.ts: 'should give warning
+  //   WARN_ExtendedShiftFlagsNotSupportedInKeymanWeb for v9 keyboards if
+  //   ${mode} found'
+
+  // WARN_TouchLayoutSpecialLabelOnNormalKey
+  // * Implemented in test-kmw-compiler.ts: 'should give warning
+  //   WARN_TouchLayoutSpecialLabelOnNormalKey if the minimum version specified
+  //   in the keyboard does not support special key caps on normal keys'
 
   // ERROR_NotAnyRequiresVersion14
 
