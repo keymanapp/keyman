@@ -1702,7 +1702,27 @@ KMX_DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, KMX_DWORD storeIndex)
   return CERR_None;
 }
 
-
+/**
+ * When called with a pointer to a wide-character C-string string, the open and close delimiters, and
+ * optional flags, returns a pointer to the section of the KMX_WCHAR string identified by the delimiters.
+ * The supplied string will be terminated by a null where the close delimiter was.  The pointer to the supplied
+ * string is adjusted to point either to the null where the close delimiter was, or if there are trailing
+ * whitespaces after the close delimiter, to the last of these.  Whitespaces before the open delimiter
+ * are always skipped.  If the flag contains GDS_CUTLEAD, whitespaces after the open delimiter are skipped;
+ * if the flag contains GDS_CUTFOLL, whitespace immediately before the close delimiter is skipped by setting
+ * the first such character to null.
+ *
+ * @param p a pointer to a wide-character C-string
+ *
+ * @param Delimiters a pointer to a two-character wide-character C-string containing the open and close
+ * delimiters
+ *
+ * @param Flags include GDS_CUTLEAD and/or GDS_CUTFOLL to cut leading and/or following whitespace from
+ * the delimited string
+ *
+ * @return a pointer to the section of the wide-character C-string identified by the delimiters, or NULL if
+ * the delimiters cannot be found
+*/
 PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_WORD Flags)
 {
   PKMX_WCHAR q, r;
@@ -1724,15 +1744,20 @@ PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_W
     while (iswspace(*q)) q++;	        // cut off leading spaces
 
   if (Flags & GDS_CUTFOLL)
-    if (!iswspace(*(r - 1))) *r = 0;
+    if (!iswspace(*(r - 1))) *r = 0; // delete close delimiter
     else
     {
       r--;							// Cut off following spaces
       while (iswspace(*r) && r > q) r--;
-      r++;
-      *r = 0; r = (PKMX_WCHAR) u16chr((r + 1), dClose);
+      if (!iswspace(*r)) r++;
+
+      *r = 0; // delete first following space
+
+      r = (PKMX_WCHAR) u16chr((r + 1), dClose);
+
+      *r = 0; // delete close delimiter
     }
-  else *r = 0;
+  else *r = 0; // delete close delimiter
 
   r++; while (iswspace(*r)) r++;	        // Ignore spaces after the close
   if (*r == 0) r--;					    // Safety for terminating strings.

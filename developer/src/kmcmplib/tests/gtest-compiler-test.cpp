@@ -14,6 +14,7 @@ KMX_BOOL AddCompileError(KMX_DWORD msg);
 KMX_DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 KMX_DWORD ValidateMatchNomatchOutput(PKMX_WCHAR p);
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString);
+PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_WORD Flags);
 int LineTokenType(PKMX_WCHAR *str);
 KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
   PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isUnicode
@@ -314,7 +315,250 @@ TEST_F(CompilerTest, ProcessKeyLineImpl_test) {
 
 // KMX_DWORD ExpandKp_ReplaceIndex(PFILE_KEYBOARD fk, PFILE_KEY k, KMX_DWORD keyIndex, int nAnyIndex)
 // KMX_DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, KMX_DWORD storeIndex)
-// PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_WORD Flags)
+
+TEST_F(CompilerTest, GetDelimitedString_test) {
+    KMX_WCHAR str[LINESIZE];
+    PKMX_WCHAR p = str;
+    PKMX_WCHAR q = nullptr;
+
+    // no open delimiter, cut spaces after open and before close delimiter
+    u16cpy(str, u"");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_FALSE(q);
+
+    // no close delimiter, cut spaces after open and before close delimiter
+    u16cpy(str, u"(");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_FALSE(q);
+
+    // no argument, cut spaces after open and before close delimiter
+    u16cpy(str, u"()");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(1, p-str); // deleted close delimiter
+
+    // no argument, single space, no flags
+    u16cpy(str, u"( )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", 0x00);
+    EXPECT_EQ(0, u16cmp(u" ", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(2, p-str); // deleted close delimiter
+
+    // no argument, single space, cut spaces after open delimiter
+    u16cpy(str, u"( )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD);
+    EXPECT_EQ(0, u16cmp(u"", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(2, p-str); // deleted close delimiter
+
+    // no argument, single space, cut spaces before close delimiter
+    u16cpy(str, u"( )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(2, p-str); // deleted close delimiter
+
+    // no argument, single space, cut spaces after open and before close delimiter
+    u16cpy(str, u"( )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(2, p-str); // deleted close delimiter
+
+    // no argument, two spaces, no flags
+    u16cpy(str, u"(  )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", 0x00);
+    EXPECT_EQ(0, u16cmp(u"  ", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(3, p-str); // deleted close delimiter
+
+    // no argument, two spaces, cut spaces after open delimiter
+    u16cpy(str, u"(  )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD);
+    EXPECT_EQ(0, u16cmp(u"", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(3, p-str); // deleted close delimiter
+
+    // no argument, two spaces, cut spaces before close delimiter
+    u16cpy(str, u"(  )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(3, p-str); // deleted close delimiter
+
+    // no argument, two spaces, cut spaces after open and before close delimiter
+    u16cpy(str, u"(  )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(3, p-str); // deleted close delimiter
+
+    // single-character argument, cut spaces after open and before close delimiter, valid
+    u16cpy(str, u"(b)");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(2, p-str); // deleted close delimiter
+
+    // multi-character argument, cut spaces after open and before close delimiter, valid
+    u16cpy(str, u"(abc)");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"abc", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(4, p-str); // deleted close delimiter
+
+    // multi-word argument, cut spaces after open and before close delimiter, valid
+    u16cpy(str, u"(abc def)");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"abc def", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(8, p-str); // deleted close delimiter
+
+    // single-character argument, leading single space, cut spaces after open and before close delimiter, valid
+    u16cpy(str, u" (b)");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(3, p-str); // deleted close delimiter
+
+    // single-character argument, leading double space, cut open and close delimiter, valid
+    u16cpy(str, u"  (b)");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(4, p-str); // deleted close delimiter
+
+    // single-character argument, space before argument, cut spaces after open and before close delimiter, valid
+    u16cpy(str, u"( b)");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(3, p-str); // deleted close delimiter
+
+    // single-character argument, space before argument, no flags, valid
+    u16cpy(str, u"( b)");
+    p = str;
+    q = GetDelimitedString(&p, u"()", 0x00);
+    EXPECT_EQ(0, u16cmp(u" b", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(3, p-str); // deleted close delimiter
+
+    // single-character argument, double space before argument, cut spaces after open and before close delimiter, valid
+    u16cpy(str, u"(  b)");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(4, p-str); // deleted close delimiter
+
+    // single-character argument, double space before argument, no flags, valid
+    u16cpy(str, u"(  b)");
+    p = str;
+    q = GetDelimitedString(&p, u"()", 0x00);
+    EXPECT_EQ(0, u16cmp(u"  b", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(4, p-str); // deleted close delimiter
+
+    // single-character argument, space after argument, cut spaces after open and before close delimiter, valid
+    u16cpy(str, u"(b )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(3, p-str); // deleted close delimiter
+
+    // single-character argument, space after argument, no flags, valid
+    u16cpy(str, u"(b )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", 0x00);
+    EXPECT_EQ(0, u16cmp(u"b ", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(3, p-str); // deleted close delimiter
+
+    // single-character argument, two spaces after argument, cut spaces after open and before close delimiter, valid
+    u16cpy(str, u"(b  )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(4, p-str); // deleted close delimiter
+
+    // single-character argument, two spaces after argument, no flags, valid
+    u16cpy(str, u"(b  )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", 0x00);
+    EXPECT_EQ(0, u16cmp(u"b  ", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(4, p-str); // deleted close delimiter
+
+    // single-character argument, space after close delimiter, cut spaces after open and before close delimiter, valid
+    u16cpy(str, u"(b) ");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_EQ(' ', *p);
+    EXPECT_EQ(3, p-str); // space after the close delimiter
+
+    // single-character argument, two spaces after close delimiter, cut spaces after open and before close delimiter, valid
+    u16cpy(str, u"(b)  ");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_EQ(' ', *p);
+    EXPECT_EQ(4, p-str); // last space after the close delimiter
+
+    // single-character argument, two spaces after argument and two spaces after close delimiter,
+    // cut spaces after open and before close delimiter, valid
+    u16cpy(str, u"(b  )  ");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_EQ(' ', *p);
+    EXPECT_EQ(6, p-str); // last space after the close delimiter
+
+    // single-character argument, two spaces after argument and two spaces after close delimiter, no flags, valid
+    u16cpy(str, u"(b  )  ");
+    p = str;
+    q = GetDelimitedString(&p, u"()", 0x00);
+    EXPECT_EQ(0, u16cmp(u"b  ", q));
+    EXPECT_EQ(' ', *p);
+    EXPECT_EQ(6, p-str); // last space after the close delimiter
+
+    // single-character argument, two spaces and text after close delimiter, cut spaces after open and before close delimiter, valid
+    u16cpy(str, u"(b)  def");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_EQ('d', *p);
+    EXPECT_EQ(5, p-str); // first text character after the close delimiter
+
+    // single-character argument, two spaces and text after close delimiter, no flags, valid
+    u16cpy(str, u"(b)  def");
+    p = str;
+    q = GetDelimitedString(&p, u"()", 0x00);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_EQ('d', *p);
+    EXPECT_EQ(5, p-str); // first text character after the close delimiter
+}
+
 // LinePrefixType GetLinePrefixType(PKMX_WCHAR *p)
 
 TEST_F(CompilerTest, LineTokenType_test) {
