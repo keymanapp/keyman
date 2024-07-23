@@ -571,14 +571,14 @@ export class KmnCompilerMessages {
   static ERROR_CharacterRangeTooLong                          = SevError | 0x078;
   static Error_CharacterRangeTooLong                          = () => m(this.ERROR_CharacterRangeTooLong, `Character range is too large and cannot be expanded`);
 
-  static ERROR_InvalidTarget                                  = SevError | 0x079;
+  static ERROR_NonBMPCharactersNotSupportedInKeySection       = SevError | 0x079;
+  static Error_NonBMPCharactersNotSupportedInKeySection       = () => m(this.ERROR_NonBMPCharactersNotSupportedInKeySection, `Characters with codepoints over U+FFFF are not supported in the key part of the rule`);
+
+  static ERROR_InvalidTarget                                  = SevError | 0x07A;
   static Error_InvalidTarget                                  = () => m(this.ERROR_InvalidTarget, `Unrecognized compile target`);
 
-  static ERROR_NoTargetsSpecified                             = SevError | 0x07A;
+  static ERROR_NoTargetsSpecified                             = SevError | 0x07B;
   static Error_NoTargetsSpecified                             = () => m(this.ERROR_NoTargetsSpecified, `At least one compile target must be specified`);
-
-  static ERROR_NonBMPCharactersNotSupportedInKeySection       = SevError | 0x07B;
-  static Error_NonBMPCharactersNotSupportedInKeySection       = () => m(this.ERROR_NonBMPCharactersNotSupportedInKeySection, `Characters with codepoints over U+FFFF are not supported in the key part of the rule`);
 
   static WARN_TooManyWarnings                                 = SevWarn | 0x080;
   static Warn_TooManyWarnings                                 = () => m(this.WARN_TooManyWarnings, `Too many warnings or errors`);
