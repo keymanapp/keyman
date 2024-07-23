@@ -1118,9 +1118,11 @@ TEST_F(CompilerTest, GetXStringImpl_type_o_test) {
     EXPECT_EQ(CERR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // outs, CERR_OutsTooLong
-    file_store[1].dpString = (PKMX_WCHAR)u"abc"; // length 4 => max should be > 4
+    PKMX_WCHAR dpString = (PKMX_WCHAR)u"abc";
+    file_store[1].dpString = dpString; // length 4 => max should be > 4, otherwise a CERR_OutsTooLong is emitted
+    int max = u16len(dpString) + 1; // 4, including terminating '\0'
     u16cpy(str, u"outs(b)");
-    EXPECT_EQ(CERR_OutsTooLong, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 4, 0, &newp, FALSE)); // max reduced to force error
+    EXPECT_EQ(CERR_OutsTooLong, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, max, 0, &newp, FALSE)); // max reduced to force error
 
     // outs, valid
     file_store[1].dpString = (PKMX_WCHAR)u"abc";
