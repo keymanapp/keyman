@@ -884,7 +884,7 @@ export default abstract class OSKView
       //
       // Also, only change the layer ID itself if there is an actual corresponding layer
       // in the OSK.
-      if(this.vkbd?.layerGroup.layers[newValue] && !this.vkbd?.layerLocked) {
+      if(this.vkbd?.layerGroup.getLayer(newValue) && !this.vkbd?.layerLocked) {
         // triggers state-update + layer refresh automatically.
         this.vkbd.layerId = newValue;
       }

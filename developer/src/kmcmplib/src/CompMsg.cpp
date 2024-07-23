@@ -1,11 +1,7 @@
 #include <CompMsg.h>
+#include <map>
 
-struct CompilerError {
-  KMX_DWORD ErrorCode;
-  const  KMX_CHAR* Text;
-  };
-
-const struct CompilerError CompilerErrors[] = {
+std::map<KMX_DWORD, const KMX_CHAR*> CompilerErrorMap = {
     { CERR_InvalidLayoutLine                             , "Invalid 'layout' command"},
     { CERR_NoVersionLine                                 , "No version line found for file"},
     { CERR_InvalidGroupLine                              , "Invalid 'group' command"},
@@ -115,6 +111,7 @@ const struct CompilerError CompilerErrors[] = {
     { CERR_ExtendedStringTooLong                         , "Extended string is too long" },
     { CERR_VirtualKeyExpansionTooLong                    , "Virtual key expansion is too large" },
     { CERR_CharacterRangeTooLong                         , "Character range is too large and cannot be expanded" },
+    { CERR_NonBMPCharactersNotSupportedInKeySection      , "Characters with codepoints over U+FFFF are not supported in the key part of the rule" },
 
     { CHINT_UnreachableRule                              , "This rule will never be matched as another rule takes precedence"},
     { CHINT_NonUnicodeFile                               , "Keyman Developer has detected that the file has ANSI encoding. Consider converting this file to UTF-8"},
@@ -150,14 +147,8 @@ const struct CompilerError CompilerErrors[] = {
     { CWARN_VirtualKeyInOutput                           , "Virtual keys are not supported in output"},
 
     { 0, nullptr }
-  };
+};
 
-KMX_CHAR *GetCompilerErrorString(KMX_DWORD code)
-{
-  for(int i = 0; CompilerErrors[i].ErrorCode; i++) {
-    if(CompilerErrors[i].ErrorCode == code) {
-      return ( KMX_CHAR*) CompilerErrors[i].Text;
-    }
-  }
-  return nullptr;
+const KMX_CHAR *GetCompilerErrorString(KMX_DWORD code) {
+    return CompilerErrorMap[code];
 }

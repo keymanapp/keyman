@@ -145,7 +145,7 @@ function setOskHeight(h) {
 
 function setOskWidth(w) {
   if(w > 0) {
-    oskWidth = w;
+    oskWidth = w / window.devicePixelRatio;
   }
 }
 
@@ -335,6 +335,14 @@ function menuKeyUp() {
   fragmentToggle = (fragmentToggle + 1) % 100;
   var hash = 'globeKeyAction&fragmentToggle=' + fragmentToggle + '&keydown=false';
   window.location.hash = hash;
+}
+
+// The keyboard-picker displayed via Android longpress disrupts Web-side
+// gesture-handling; this function helps force-clear the globe key's highlighting.
+function clearGlobeHighlight() {
+  if(keyman.osk && keyman.osk.vkbd && keyman.osk.vkbd.currentLayer.globeKey) {
+    keyman.osk.vkbd.currentLayer.globeKey.highlight(false)
+  }
 }
 
 function hideKeyboard() {

@@ -129,5 +129,11 @@ describe('layr', function () {
         ]);
       },
     },
+    {
+      subpath: 'sections/layr/error-bogus-modifiers.xml',
+      errors: [
+        CompilerMessages.Error_InvalidModifier({ layer: '', modifiers: 'caps bogus'}),
+      ]
+    },
   ]);
 });

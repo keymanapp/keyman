@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -60,7 +60,6 @@
 		C0324B8F1F8750B700AF3785 /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B8E1F8750B700AF3785 /* TextView.swift */; };
 		C0324B911F8763E100AF3785 /* TextViewDelegateProxy.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B901F8763E100AF3785 /* TextViewDelegateProxy.swift */; };
 		C0324B931F87689B00AF3785 /* KeymanURLProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0324B921F87689B00AF3785 /* KeymanURLProtocol.swift */; };
-		C040E50E1F85FF8A00901EE4 /* KeyPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C040E50D1F85FF8A00901EE4 /* KeyPreviewView.swift */; };
 		C040E5101F8606E300901EE4 /* TextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C040E50F1F8606E300901EE4 /* TextField.swift */; };
 		C040E5121F86107E00901EE4 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C040E5111F86107E00901EE4 /* AppDelegate.swift */; };
 		C040E5141F86108900901EE4 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C040E5131F86108900901EE4 /* MainViewController.swift */; };
@@ -76,7 +75,6 @@
 		C06D37341F81F5C300F61AE0 /* HTTPDownloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ED71B41F6BBFAF002A2FD6 /* HTTPDownloader.swift */; };
 		C06D37351F81F5C300F61AE0 /* HTTPDownloadRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0ED71B21F6BB0B1002A2FD6 /* HTTPDownloadRequest.swift */; };
 		C06D37361F81F5C300F61AE0 /* KeyboardMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C034BBBD1F7CCE7D00021FF5 /* KeyboardMenuView.swift */; };
-		C06D37381F81F5C400F61AE0 /* SubKeysView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C07B42AE1F7CEE2700ECA97F /* SubKeysView.swift */; };
 		C06D37421F81F5C400F61AE0 /* KeyboardPickerButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08C620F1F67BD4500268D03 /* KeyboardPickerButton.swift */; };
 		C06D37431F81F5C400F61AE0 /* KeyboardPickerBarButtonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08C620B1F6792A200268D03 /* KeyboardPickerBarButtonItem.swift */; };
 		C06D37441F81F5C400F61AE0 /* KeyboardNameTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C08C62121F67C31100268D03 /* KeyboardNameTableViewCell.swift */; };
@@ -378,7 +376,6 @@
 		C0324B901F8763E100AF3785 /* TextViewDelegateProxy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextViewDelegateProxy.swift; sourceTree = "<group>"; };
 		C0324B921F87689B00AF3785 /* KeymanURLProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeymanURLProtocol.swift; sourceTree = "<group>"; };
 		C034BBBD1F7CCE7D00021FF5 /* KeyboardMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardMenuView.swift; sourceTree = "<group>"; };
-		C040E50D1F85FF8A00901EE4 /* KeyPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyPreviewView.swift; sourceTree = "<group>"; };
 		C040E50F1F8606E300901EE4 /* TextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextField.swift; sourceTree = "<group>"; };
 		C040E5111F86107E00901EE4 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C040E5131F86108900901EE4 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
@@ -395,7 +392,6 @@
 		C06D372B1F81F4E100F61AE0 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C06D372E1F81F4E100F61AE0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C075EB051F8EFF870041F4BD /* String+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Helpers.swift"; sourceTree = "<group>"; };
-		C07B42AE1F7CEE2700ECA97F /* SubKeysView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubKeysView.swift; sourceTree = "<group>"; };
 		C082CE141F90AFD400860F02 /* Collection+SafeAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Collection+SafeAccess.swift"; sourceTree = "<group>"; };
 		C08C620B1F6792A200268D03 /* KeyboardPickerBarButtonItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyboardPickerBarButtonItem.swift; sourceTree = "<group>"; };
 		C08C620F1F67BD4500268D03 /* KeyboardPickerButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyboardPickerButton.swift; sourceTree = "<group>"; };
@@ -497,6 +493,9 @@
 		CEA9670A24BEC8030035AACF /* EngineStateBundler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineStateBundler.swift; sourceTree = "<group>"; };
 		CEA9670C24BEEFF80035AACF /* khmer_angkor update-base.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = "khmer_angkor update-base.bundle"; sourceTree = "<group>"; };
 		CEA9670E24BEF05A0035AACF /* Updates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Updates.swift; sourceTree = "<group>"; };
+		CEAC2A222C2A503600C99ABD /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
+		CEAC2A232C2A505700C99ABD /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = el; path = el.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
+		CEAC2A242C2A508000C99ABD /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEACC90125F07C81006EAB45 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
 		CEACC90325F07CAF006EAB45 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEACC90425F07CB6006EAB45 /* km */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = km; path = km.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -796,9 +795,7 @@
 				CE79B24823C711FF007E72AE /* KeyboardScaleMap.swift */,
 				C0EF3E7A1F95B65300CE9BD4 /* KeymanWebDelegate.swift */,
 				C0C16A881FA8146300F090BA /* KeymanWebViewController.swift */,
-				C040E50D1F85FF8A00901EE4 /* KeyPreviewView.swift */,
 				C0A5FF361F6682EB00BE740C /* PopoverView.swift */,
-				C07B42AE1F7CEE2700ECA97F /* SubKeysView.swift */,
 			);
 			path = Keyboard;
 			sourceTree = "<group>";
@@ -1211,6 +1208,7 @@
 				uk,
 				ru,
 				es,
+				el,
 			);
 			mainGroup = F243887314BBD43000A3E055;
 			productRefGroup = F243887F14BBD43000A3E055 /* Products */;
@@ -1454,7 +1452,6 @@
 				CE7A26DB23CEEF640005955C /* Colors.swift in Sources */,
 				9A9CB08022416E5400231FB9 /* LexicalModelPickerViewController.swift in Sources */,
 				9A079E3D223B5FAF00581263 /* InstallableLexicalModel.swift in Sources */,
-				C06D37381F81F5C400F61AE0 /* SubKeysView.swift in Sources */,
 				C0A93A541F8B21240079948B /* Manager.swift in Sources */,
 				CE99350E24D7CCFC00202DA3 /* LanguagePickAssociator.swift in Sources */,
 				C024C9981FA6F2340060583B /* NotificationObserver.swift in Sources */,
@@ -1468,7 +1465,6 @@
 				9A3E832522EAC14A00D22D2A /* KeyboardSwitcherViewController.swift in Sources */,
 				C0324B911F8763E100AF3785 /* TextViewDelegateProxy.swift in Sources */,
 				C0B09EAE1FCFD10F002F39AF /* FontManager.swift in Sources */,
-				C040E50E1F85FF8A00901EE4 /* KeyPreviewView.swift in Sources */,
 				CEC0C6772410E049003E1BCD /* SentryManager.swift in Sources */,
 				9A079E3A223AFF3C00581263 /* KeyboardKeymanPackage.swift in Sources */,
 				C0CB633C1FA6F61500617CDB /* Notifications.swift in Sources */,
@@ -1610,6 +1606,7 @@
 				298566D32980D39F004ACA95 /* uk */,
 				298566DF2980E48C004ACA95 /* ru */,
 				CEFFECD72A417F2E00D58C36 /* es */,
+				CEAC2A232C2A505700C99ABD /* el */,
 			);
 			name = Localizable.stringsdict;
 			sourceTree = "<group>";
@@ -1638,6 +1635,7 @@
 				298566D22980D39A004ACA95 /* uk */,
 				298566DE2980E486004ACA95 /* ru */,
 				CEFFECD62A417F2900D58C36 /* es */,
+				CEAC2A242C2A508000C99ABD /* el */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1667,6 +1665,7 @@
 				298566D12980D390004ACA95 /* uk */,
 				298566DD2980E477004ACA95 /* ru */,
 				CEFFECD52A417F1300D58C36 /* es */,
+				CEAC2A222C2A503600C99ABD /* el */,
 			);
 			name = ResourceInfoView.xib;
 			sourceTree = "<group>";

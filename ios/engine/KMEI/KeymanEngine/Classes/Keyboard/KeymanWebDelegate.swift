@@ -21,23 +21,6 @@ protocol KeymanWebDelegate: class {
   /// - Parameters:
   func beep(_ keymanWeb: KeymanWebViewController)
 
-  /// - Parameters:
-  ///   - keyFrame: The frame of the anchor key.
-  ///   - preview: The text to preview.
-  func showKeyPreview(_ keymanWeb: KeymanWebViewController, keyFrame: CGRect, preview: String)
-
-  func dismissKeyPreview(_ keymanWeb: KeymanWebViewController)
-
-  /// - Parameters:
-  ///   - keyFrame: The frame of the anchor key.
-  ///   - subkeyIDs: The IDs of the subkeys.
-  ///   - subkeyTexts: The user-displayable texts of the subkeys.
-  ///   - useSpecialFont: Use the Keyman Web OSK font.
-  func showSubkeys(_ keymanWeb: KeymanWebViewController,
-                   keyFrame: CGRect,
-                   subkeyIDs: [String],
-                   subkeyTexts: [String],
-                   useSpecialFont: Bool)
   func menuKeyDown(_ keymanWeb: KeymanWebViewController)
   func menuKeyUp(_ keymanWeb: KeymanWebViewController)
   func menuKeyHeld(_ keymanWeb: KeymanWebViewController)
@@ -47,13 +30,6 @@ extension KeymanWebDelegate {
   func keyboardLoaded(_ keymanWeb: KeymanWebViewController) {}
   func insertText(_ keymanWeb: KeymanWebViewController, numCharsToDelete: Int, newText: String) {}
   func beep(_ keymanWeb: KeymanWebViewController) {}
-  func showKeyPreview(_ keymanWeb: KeymanWebViewController, keyFrame: CGRect, preview: String) {}
-  func dismissKeyPreview(_ keymanWeb: KeymanWebViewController) {}
-  func showSubkeys(_ keymanWeb: KeymanWebViewController,
-                   keyFrame: CGRect,
-                   subkeyIDs: [String],
-                   subkeyTexts: [String],
-                   useSpecialFont: Bool) {}
   func menuKeyDown(_ keymanWeb: KeymanWebViewController) {}
   func menuKeyUp(_ keymanWeb: KeymanWebViewController) {}
   func menuKeyHeld(_ keymanWeb: KeymanWebViewController) {}

@@ -190,8 +190,6 @@ void DoChangeWindowMessageFilter()
   }
 
 	DoCWMF(wm_keyman);   // I3594
-  DoCWMF(wm_keymankeydown);
-  DoCWMF(wm_keymankeyup);
   DoCWMF(wm_keyman_grabwindowproc);
   DoCWMF(wm_keyman_refresh);
   DoCWMF(wm_kmgetactivekeymanid);
@@ -255,8 +253,6 @@ BOOL InitialiseProcess(HWND hwnd)
   Initialise_Flag_ShouldSerializeInput();
 
 	wm_keyman = RegisterWindowMessage(RWM_KEYMAN);
-	wm_keymankeydown = RegisterWindowMessage("WM_KEYMANKEYDOWN");
-	wm_keymankeyup = RegisterWindowMessage("WM_KEYMANKEYUP");
 	wm_keyman_grabwindowproc = RegisterWindowMessage("WM_KEYMAN_GRABWINDOWPROC");
 	wm_keyman_refresh = RegisterWindowMessage("WM_KEYMANREFRESH");
 	wm_kmgetactivekeymanid = RegisterWindowMessage("WM_KEYMAN_GETACTIVEKEYMANID");

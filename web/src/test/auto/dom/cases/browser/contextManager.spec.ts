@@ -10,6 +10,7 @@ import { DOMKeyboardLoader } from '@keymanapp/keyboard-processor/dom-keyboard-lo
 import { loadKeyboardsFromStubs } from '../../kbdLoader.js';
 
 import { DeviceSpec, ManagedPromise, timedPromise } from '@keymanapp/web-utils';
+import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
 import sinon from 'sinon';
 
 import { assert } from 'chai';
@@ -55,11 +56,11 @@ function assertPromiseResolved(promise: Promise<any>, timeout?: number) {
   });
 }
 
-function promiseForIframeLoad(iframe) {
+function promiseForIframeLoad(iframe: HTMLIFrameElement) {
   // Chrome makes this first case tricky - it initializes all iframes with a 'complete' about:blank
   // before loading the actual href.  (https://stackoverflow.com/a/36155560)
   if(iframe.contentDocument
-    && iframe.contentDocument.readyState === 'complete'
+    && iframe.contentDocument.readyState as string === 'complete'
     && iframe.contentDocument.body.innerHTML) {
     return Promise.resolve();
   } else {
@@ -70,14 +71,14 @@ function promiseForIframeLoad(iframe) {
   }
 }
 
-function dispatchFocus(eventName, elem) {
-  let event = new FocusEvent(eventName, {relatedTarget: elem});
+function dispatchFocus(eventName: string, elem: HTMLElement) {
+  const event = new FocusEvent(eventName, {relatedTarget: elem});
   elem.dispatchEvent(event);
 }
 
 // The replaced methods sometimes fail in unit-testing setups, possibly due to the very short time intervals involved.
 // The replacements suffice to trigger the same effects.
-function upgradeFocus(elem) {
+function upgradeFocus(elem: HTMLElement) {
   elem.blur = () => {
     dispatchFocus('blur', elem);
   }
@@ -89,7 +90,7 @@ function upgradeFocus(elem) {
   }
 }
 
-async function blockConsoleAndAwait(asyncClosure) {
+async function blockConsoleAndAwait(asyncClosure: any) {
   const originalConsole = window.console;
   /* @ts-ignore */
   window.console = {
@@ -105,7 +106,7 @@ async function blockConsoleAndAwait(asyncClosure) {
   }
 }
 
-async function withDelayedFetching(keyboardLoader, time, closure) {
+async function withDelayedFetching(keyboardLoader: any, time: number, closure: any) {
   time || 0;
   if(time < 0) {
     time = 0;
@@ -113,7 +114,7 @@ async function withDelayedFetching(keyboardLoader, time, closure) {
 
   const originalLoad = keyboardLoader.loadKeyboardInternal;
 
-  const fetchIntercept = async (...args) => {
+  const fetchIntercept = async (...args: any) => {
     const retVal = originalLoad.call(keyboardLoader, ...args);
     keyboardLoader.loadKeyboardInternal = originalLoad;
 
@@ -127,24 +128,24 @@ async function withDelayedFetching(keyboardLoader, time, closure) {
 }
 
 describe('app/browser:  ContextManager', function () {
-  this.timeout(5000);
+  this.timeout(DEFAULT_BROWSER_TIMEOUT);
 
   /**
    * Holds a test-specific instance of ContextManager.
    */
-  let contextManager;
+  let contextManager: ContextManager;
 
   /**
    * Holds the test-specific instance of the stub & keyboard cache used by the
    * current test's `contextManager`.
    */
-  let keyboardCache;
+  let keyboardCache: StubAndKeyboardCache;
 
   /**
    * Holds the test-specific instance of the keyboard loader used by the current
    * test's `keyboardCache`.
    */
-  let keyboardLoader;
+  let keyboardLoader: any;
 
   beforeEach(async () => {
     // Loads a common fixture and ensures all relevant elements are attached.
@@ -152,8 +153,8 @@ describe('app/browser:  ContextManager', function () {
     host.innerHTML = await fixture.text();
 
     // Note:  iframes require additional time to resolve.
-    await promiseForIframeLoad(document.getElementById('iframe'));
-    await promiseForIframeLoad(document.getElementById('design-iframe'));
+    await promiseForIframeLoad(document.getElementById('iframe') as HTMLIFrameElement);
+    await promiseForIframeLoad(document.getElementById('design-iframe') as HTMLIFrameElement);
 
     // Give the design-mode iframe a bit of time to set itself up properly.
     // Note: it is thus important that whatever sends the `install` command has also
@@ -187,9 +188,9 @@ describe('app/browser:  ContextManager', function () {
       keyboardCache: keyboardCache,
       predictionContext: {
         // we're dummying these out.
-        resetContext: () => {},
-        setCurrentTarget: () => {}
-      },
+        resetContext: (() => {}) as any,
+        setCurrentTarget: (() => {}) as any,
+      } as any,
       resetContext: () => {}
     });
 
@@ -206,7 +207,7 @@ describe('app/browser:  ContextManager', function () {
 
   afterEach(() => {
     // Since certain user tests change this.
-    contextManager.engineConfig.hostDevice.touchable = false;
+    (contextManager as any).engineConfig.hostDevice.touchable = false;
 
     // The main reason we set `ContextManager` in `beforeEach` - to make cleanup after
     // each test round much simpler to maintain.  If not reset, the unit test stuff can
@@ -486,13 +487,13 @@ describe('app/browser:  ContextManager', function () {
 
   // ------------------------- Second suite: keyboard-related tests --------------------------
   describe('keyboard management', () => {
-    let apiStubs;
+    let apiStubs: any;
 
     /**
      * Preloaded versions of the keyboards useful for bypassing loading times / allowing synchronicity
      * within individual test definitions.
      */
-    let KEYBOARDS;
+    let KEYBOARDS: any;
 
     // const fixture = await fetch('/resources/fixtures/a-bit-of-everything.html');
     // host.innerHTML = await fixture.text();
@@ -507,7 +508,7 @@ describe('app/browser:  ContextManager', function () {
         '/keyboards/test_deadkeys'
       ];
 
-      const kbdStubPromises = apiStubs.map((file) => {
+      const kbdStubPromises = apiStubs.map((file: string) => {
         return fetch(`common/test/resources/json/${file}.json`).then((response) => {
           return response.json();
         });
@@ -521,7 +522,7 @@ describe('app/browser:  ContextManager', function () {
     beforeEach(() => {
       // Since `contextManager` and `keyboardCache` are replaced `beforeEach` test, we need to prep
       // the stubs here.  They'll all be available, as stubs, within the cache.
-      for(let key in KEYBOARDS) {
+      for(const key in KEYBOARDS) {
         keyboardCache.addStub(KEYBOARDS[key].metadata);
       }
     });
@@ -531,7 +532,7 @@ describe('app/browser:  ContextManager', function () {
     // test keyboard objects themselves are greatly facilitated by having known, preloaded instances.
 
     it('initializes in global-keyboard mode', () => {
-      assert.isNotOk(contextManager.keyboardTarget);
+      assert.isNotOk((contextManager as any).keyboardTarget);
     });
 
     describe('global-keyboard mode only' , () => {
@@ -563,7 +564,7 @@ describe('app/browser:  ContextManager', function () {
         contextManager.on('keyboardasyncload', keyboardasyncload);
 
         // Hacky override - activate touch mode.
-        contextManager.engineConfig.hostDevice.touchable = true;
+        (contextManager as any).engineConfig.hostDevice.touchable = true;
 
         await contextManager.activateKeyboard('', '');
         // When no keyboard is set, the keyboard-metadata pair object itself should be null.
@@ -662,7 +663,7 @@ describe('app/browser:  ContextManager', function () {
         contextManager.on('keyboardchange', keyboardchange);
 
         // Hacky override - activate touch mode.
-        contextManager.engineConfig.hostDevice.touchable = true;
+        (contextManager as any).engineConfig.hostDevice.touchable = true;
 
         // Setup
         keyboardCache.addKeyboard(KEYBOARDS.lao_2008_basic.keyboard);
@@ -829,7 +830,7 @@ describe('app/browser:  ContextManager', function () {
         // attempts are deferred until after engine init.
         assert.isTrue(keyboardasyncload.calledOnce);
 
-        // And now we let all the async stuff resolve.
+        // And now we const all the async stuff resolve.
         await fetchPromise;
 
         // The instance itself may differ, but the .keyboard and .metadata entries will
@@ -865,7 +866,7 @@ describe('app/browser:  ContextManager', function () {
         contextManager.setKeyboardForTarget(target, 'lao_2008_basic', 'lo');
 
         // As we haven't yet focused the affected target, no keyboard-change events should have triggered yet.
-        assert.equal(contextManager.currentKeyboardSrcTarget(), null);
+        assert.equal((contextManager as any).currentKeyboardSrcTarget(), null);
         assert.isTrue(beforekeyboardchange.notCalled);
         assert.isTrue(keyboardchange.notCalled);
         assert.isTrue(keyboardasyncload.notCalled);
@@ -877,7 +878,7 @@ describe('app/browser:  ContextManager', function () {
         await timedPromise(10);
 
         // No need to 'keyboardchange' when the same keyboard is kept active.
-        assert.equal(contextManager.currentKeyboardSrcTarget(), target);
+        assert.equal((contextManager as any).currentKeyboardSrcTarget(), target);
         assert.isTrue(beforekeyboardchange.calledOnce);
         assert.isTrue(keyboardchange.calledOnce);
         assert.isTrue(keyboardasyncload.notCalled);
@@ -892,7 +893,7 @@ describe('app/browser:  ContextManager', function () {
         // Allows any _FocusKeyboardSettings stuff trigger to resolve.
         await timedPromise(10);
 
-        assert.equal(contextManager.keyboardTarget, null);
+        assert.equal((contextManager as any).keyboardTarget, null);
         assert.isTrue(beforekeyboardchange.calledTwice);
         assert.isTrue(keyboardchange.calledTwice);
         assert.isTrue(keyboardasyncload.notCalled);
@@ -931,7 +932,7 @@ describe('app/browser:  ContextManager', function () {
         // Allows any _FocusKeyboardSettings stuff trigger to resolve.
         await timedPromise(10);
 
-        assert.equal(contextManager.keyboardTarget, null);
+        assert.equal((contextManager as any).keyboardTarget, null);
         assert.isTrue(beforekeyboardchange.calledOnce);
         assert.isTrue(keyboardchange.calledOnce);
         assert.isTrue(keyboardasyncload.notCalled);
@@ -980,7 +981,7 @@ describe('app/browser:  ContextManager', function () {
         // Allows any _FocusKeyboardSettings stuff trigger to resolve.
         await timedPromise(10);
 
-        assert.equal(contextManager.keyboardTarget, null);
+        assert.equal((contextManager as any).keyboardTarget, null);
         assert.isTrue(beforekeyboardchange.notCalled);
         assert.isTrue(keyboardchange.notCalled);
         assert.isTrue(keyboardasyncload.notCalled);
@@ -1018,7 +1019,7 @@ describe('app/browser:  ContextManager', function () {
         // Allow the indirect keyboard-change operation to resolve.
         await timedPromise(10);
 
-        assert.equal(contextManager.keyboardTarget, null);
+        assert.equal((contextManager as any).keyboardTarget, null);
         assert.isTrue(beforekeyboardchange.calledOnce);
         assert.isTrue(keyboardchange.calledOnce);
         assert.isTrue(keyboardasyncload.notCalled);
@@ -1054,7 +1055,7 @@ describe('app/browser:  ContextManager', function () {
         await contextManager.activateKeyboard('test_chirality', 'en');
 
         // Aspect 1:  the current keyboard has changed
-        assert.equal(contextManager.currentKeyboardSrcTarget(), target);
+        assert.equal((contextManager as any).currentKeyboardSrcTarget(), target);
         assert.isTrue(beforekeyboardchange.calledOnce);
         assert.isTrue(keyboardchange.calledOnce);
         assert.isTrue(keyboardasyncload.notCalled);
@@ -1068,7 +1069,7 @@ describe('app/browser:  ContextManager', function () {
         await timedPromise(10);
 
         // Aspect 2: ... without affecting the global keyboard's setting.
-        assert.equal(contextManager.currentKeyboardSrcTarget(), null);
+        assert.equal((contextManager as any).currentKeyboardSrcTarget(), null);
         assert.isTrue(beforekeyboardchange.calledTwice);
         assert.isTrue(keyboardchange.calledTwice);
         assert.isTrue(keyboardasyncload.notCalled);
@@ -1109,7 +1110,7 @@ describe('app/browser:  ContextManager', function () {
         await Promise.resolve();
 
         // Aspect 1:  the current keyboard has not yet changed
-        assert.equal(contextManager.currentKeyboardSrcTarget(), target);
+        assert.equal((contextManager as any).currentKeyboardSrcTarget(), target);
         assert.isTrue(beforekeyboardchange.calledOnce);  // +1
         assert.isTrue(keyboardchange.notCalled);         // is delayed 50 ms, so not yet.
         assert.isTrue(keyboardasyncload.calledOnce);     // The async load has already started.
@@ -1124,7 +1125,7 @@ describe('app/browser:  ContextManager', function () {
         // Allows any _FocusKeyboardSettings stuff trigger to resolve.
         await timedPromise(10);
 
-        assert.equal(contextManager.currentKeyboardSrcTarget(), null);
+        assert.equal((contextManager as any).currentKeyboardSrcTarget(), null);
         assert.isTrue(beforekeyboardchange.calledTwice);  // +1: re-activating the global keyboard
         assert.isTrue(keyboardchange.calledOnce);         // +1: same
         assert.isTrue(keyboardasyncload.calledOnce);
@@ -1135,7 +1136,7 @@ describe('app/browser:  ContextManager', function () {
 
         // ...and verify that the active keyboard has not changed, since the target for
         // activation is not itself active.
-        assert.equal(contextManager.currentKeyboardSrcTarget(), null);
+        assert.equal((contextManager as any).currentKeyboardSrcTarget(), null);
         assert.isTrue(beforekeyboardchange.calledTwice);  // +1: re-activating the global keyboard
         assert.isTrue(keyboardchange.calledOnce);         // +1: same
         assert.isTrue(keyboardasyncload.calledOnce);
@@ -1153,7 +1154,7 @@ describe('app/browser:  ContextManager', function () {
         await timedPromise(10);
 
         // And, final expectations:
-        assert.equal(contextManager.currentKeyboardSrcTarget(), target);
+        assert.equal((contextManager as any).currentKeyboardSrcTarget(), target);
         assert.isTrue(beforekeyboardchange.calledThrice);  // +1: activating the independent-mode kbd
         assert.isTrue(keyboardchange.calledTwice);         // +1: same
         assert.isTrue(keyboardasyncload.calledOnce);
@@ -1205,7 +1206,7 @@ describe('app/browser:  ContextManager', function () {
         await Promise.resolve();
 
         // Aspect 1:  the current keyboard has not yet changed
-        assert.equal(contextManager.currentKeyboardSrcTarget(), target);
+        assert.equal((contextManager as any).currentKeyboardSrcTarget(), target);
         assert.isTrue(beforekeyboardchange.calledOnce);  // +1
         assert.isTrue(keyboardchange.notCalled);         // is delayed 50 ms, so not yet.
         assert.isTrue(keyboardasyncload.calledOnce);     // The async load has already started.
@@ -1228,7 +1229,7 @@ describe('app/browser:  ContextManager', function () {
         await Promise.resolve();
 
         // Aspect 2:  the current keyboard STILL has not yet changed - still delayed.
-        assert.equal(contextManager.currentKeyboardSrcTarget(), target);
+        assert.equal((contextManager as any).currentKeyboardSrcTarget(), target);
         assert.isTrue(beforekeyboardchange.calledTwice);  // +1
         assert.isTrue(keyboardchange.notCalled);          // both should still be delayed.
         assert.isTrue(keyboardasyncload.calledTwice);      // The async load has already started.
@@ -1240,7 +1241,7 @@ describe('app/browser:  ContextManager', function () {
 
         // Critical bit: the `lao` activation should appear to have auto-canceled; this is because
         // when its keyboard loaded, we'd already requested the `test_chirality` keyboard.
-        assert.equal(contextManager.currentKeyboardSrcTarget(), target);
+        assert.equal((contextManager as any).currentKeyboardSrcTarget(), target);
         assert.isTrue(beforekeyboardchange.calledThrice);  // +1
         assert.isTrue(keyboardchange.calledOnce);          // There should be no attempt to swap to the lao kbd.
         assert.isTrue(keyboardasyncload.calledTwice);

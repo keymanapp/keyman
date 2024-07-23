@@ -1,5 +1,163 @@
 # Keyman Version History
 
+## 18.0.72 alpha 2024-07-22
+
+* fix(web): remedy unit-test stability issues (#11933)
+* refactor(web): fix TypeScript errors and warnings (#11911)
+
+## 18.0.71 alpha 2024-07-18
+
+* chore(windows): add comments for _WIN64 tests (#11929)
+* chore(common): Update Crowdin strings for Portuguese (#11974)
+
+## 18.0.70 alpha 2024-07-08
+
+* feat(web): provide lexicon probabilities directly on the search path (#11868)
+* feat(common/models): support direct-child access for Trie node iteration (#11869)
+* change(common/models/templates): rework Trie predict method to utilize traversals (#11870)
+* change(web): track the base correction for generated predictions (#11875)
+* feat(web): add and enable auto-correction (#11866)
+
+## 18.0.69 alpha 2024-07-05
+
+* fix(core): allow to successfully build on Ubuntu 24.04 (#11926)
+* chore(windows): correct output file for 64-bit build of keyman32 in build.sh (#11930)
+* chore(android,ios): Add Crowdin localization for Polytonic Greek (#11877)
+
+## 18.0.68 alpha 2024-07-04
+
+* refactor(windows): merge keyman64 build into keyman32 (#11906)
+* refactor(windows): remove wm_keyman_keydown and wm_keyman_keyup (#11920)
+
+## 18.0.67 alpha 2024-07-03
+
+* refactor(common/models): move TS priority-queue implementation to web-utils (#11867)
+
+## 18.0.66 alpha 2024-07-02
+
+* fix(developer): handle second parameter of index correctly in kmcmplib compiler (#11815)
+
+## 18.0.65 alpha 2024-07-01
+
+* fix(developer): prevent non-BMP characters in key part of rule (#11806)
+* chore(linux): remove unused building with pbuilder (#11862)
+
+## 18.0.64 alpha 2024-06-28
+
+* fix(web): use fat-finger data with simple keypresses (#11854)
+
+## 18.0.63 alpha 2024-06-26
+
+* feat(linux): implement Linux side of SimulateAltGr option :checkered_flag: (#11852)
+
+## 18.0.62 alpha 2024-06-25
+
+* chore(common): update C/C++ formatting options (#11836)
+* chore(linux): use shared meson config (#11863)
+* fix(linux): ignore exceptions trying to install cache (#11861)
+
+## 18.0.61 alpha 2024-06-24
+
+* feat(web): optimization via lazy preprocessing of keyboard touch-layout info (#11265)
+* fix(android): clear globe highlight when displaying keyboard picker (#11826)
+* refactor(linux): add KeymanOption class for options :checkered_flag: (#11850)
+* refactor(linux): rename methods that deal with keyboard options :checkered_flag: (#11851)
+
+## 18.0.60 alpha 2024-06-21
+
+* chore(web): define common timeout variable for automated testing (#11839)
+* feat(developer): warn on empty keycaps (#11810)
+* change(web): optimization for keyboard-layout preprocessing (#11263)
+* feat(web): optimization via lazy construction of OSK layers (#11264)
+* fix(developer): layr: fix modifier err message on layer w/o id (#11843)
+
+## 18.0.59 alpha 2024-06-19
+
+* chore(deps-dev): bump braces from 3.0.2 to 3.0.3 (#11756)
+* chore(developer): clarify project upgrade messages about file locations (#11819)
+* chore(deps): bump ws from 8.16.0 to 8.17.1 (#11822)
+* chore(common): update base-package node-engine setting (#11798)
+* change(web): change after-word whitespace check to be more selective (#11800)
+* chore: Revert "chore(common): update base-package node-engine setting" (#11829)
+* change(web): drop correction batching (#11768)
+* chore(web): move correction-search execution timer to its own file (#11757)
+* refactor(web): overhaul predictive-text engine's timer to better detect paused time (#11758)
+* feat(web): improve predictive-text responsiveness when typing rapidly (#11784)
+* feat(linux): re-create missing files at run-time (#11789)
+
+## 18.0.58 alpha 2024-06-18
+
+* test(core): Add a minimal test that exercises the core API (#11781)
+* fix(developer): check HISTORY.md to get last modified date for keyboard_info and model_info (#11805)
+* docs(developer): extra context help for keyboard-editor (does not exist in Keyman Developer 17.0) (#11771)
+
+## 18.0.57 alpha 2024-06-17
+
+* fix(web): fix id of longpress keys with modifier set in touch layout (#11783)
+* fix(web): prevent desktop OSK crash when addKeyboards is called before engine init (#11786)
+* fix(core): serialize tests for core/wasm on mac agents (#11795)
+* fix(developer): refactor kmcmplib compiler messages to use map (#11738)
+* fix(developer): make native compilation of kmcmplib under Linux possible (#11779)
+* feat(core): devolve regex to javascript (#11777)
+* feat(core): remove ICU from core under wasm (#11778)
+* fix(linux): restart ibus after manual integration test run (#11775)
+
+## 18.0.56 alpha 2024-06-14
+
+* feat(core): devolve normalization to js (#11541)
+* fix(developer): show message if no more platforms to add to touch layout editor (#11759)
+* docs(developer): context help in package-editor and put the existing context help in their own tab comments (#11760)
+* docs(developer): context help in keyboard-editor section (#11754)
+* docs(developer): context help in new-project section (#11767)
+* docs(developer): context help for new-project-parameters in keyman developer (#11769)
+* docs(developer): context help for Select BCP 47 tag in Keyman Developer (#11770)
+* change(common): update esbuild to 0.18.9 (#11693)
+* change(web): more prep for better async prediction handling (#10347)
+* fix(web): set new-context rules' device to match that of the active OSK (#11743)
+* chore(linux): Update debian changelog (#11671)
+* fix(web): add limited Array.from polyfill for lm-worker use (#11732)
+
+## 18.0.55 alpha 2024-06-13
+
+* fix(developer): handle missing OSK when importing a Windows keyboard into a touch-only project (#11720)
+* fix(developer): verify email addresses in .kps and .keyboard_info (#11735)
+* change(web): prep for better asynchronous prediction handling (#10343)
+
+## 18.0.54 alpha 2024-06-12
+
+* fix(common): remove subpackage entries for older TS version (#11745)
+* chore(common): end use of ts-node (#11746)
+* feat(web): add bulk_render variant that loads and renders keyboards from local KMP (#10432)
+
+## 18.0.53 alpha 2024-06-10
+
+* fix(android): check current orientation when redisplaying system keyboard (#11604)
+* fix(android): fix keyboard size after rotation and restore via onSizeChanged, after layout (#11722)
+* fix(developer): fix kmcmplib unit-test include paths (#11749)
+
+## 18.0.52 alpha 2024-06-08
+
+* fix(developer): prevent two touch layout editors opening for the same file (#11717)
+* chore(common): cleanup meson deprecations and warnings (#11523)
+* feat(developer): support language reference in context help (#11737)
+* test(developer): kmcmplib compiler unit tests (#11378)
+
+## 18.0.51 alpha 2024-06-07
+
+* fix(web): fix osk touch-focus tracking (#11705)
+* fix(web): defer keyboard activation requests made during engine initialization (#11713)
+* chore(developer): add context/character-map (#11656)
+* chore(developer): add context/wordlist-editor (#11658)
+* chore(developer): add context/new-model-project-parameters (#11677)
+* fix(common): remove allowJs from web's tsconfig.base.json (#11718)
+* change(web): precompile all TS-based tests (#11723)
+* chore(developer): add extra logging for assertion failure when pressing backspace in debugger (#11707)
+* chore: add cherry-pick information in commit messages (#11708)
+* fix(developer): handle encoding errors when loading wordlists (#11711)
+* chore(ios): remove dead Swift-side keyboard gesture code (#11672)
+* fix(mac): change build configuration to prevent cycle error in Xcode 15 (#11730)
+* refactor(web): Replace deprecated substr with substring (#11637)
+
 ## 18.0.50 alpha 2024-06-06
 
 * chore(common): adds retry mechanism for build script npm ci calls (#11451)

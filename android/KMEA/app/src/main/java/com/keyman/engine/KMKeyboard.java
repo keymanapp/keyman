@@ -195,13 +195,13 @@ final class KMKeyboard extends WebView {
     int selMin = icText.selectionStart, selMax = icText.selectionEnd;
 
     int textLength = rawText.length();
-    
+
     if (selMin < 0 || selMax < 0) {
       // There is no selection or cursor
       // Reference https://developer.android.com/reference/android/text/Selection#getSelectionEnd(java.lang.CharSequence)
       return false;
     } else if (selMin > textLength || selMax > textLength) {
-      // Selection is past end of existing text -- should not be possible but we 
+      // Selection is past end of existing text -- should not be possible but we
       // are seeing it happen; #11506
       return false;
     }
@@ -231,7 +231,7 @@ final class KMKeyboard extends WebView {
     selMin -= pairsAtStart;
     selMax -= (pairsAtStart + pairsSelected);
     this.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selMin, selMax));
-  
+
     return true;
   }
 
@@ -262,7 +262,7 @@ final class KMKeyboard extends WebView {
     // When `.isTestMode() == true`, the setWebContentsDebuggingEnabled method is not available
     // and thus will trigger unit-test failures.
     if (!KMManager.isTestMode() && (
-      (context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0 || 
+      (context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0 ||
       KMManager.getTier(null) != KMManager.Tier.STABLE
     )) {
       // Enable debugging of WebView via adb. Not used during unit tests
@@ -313,6 +313,12 @@ final class KMKeyboard extends WebView {
       public void onLongPress(MotionEvent event) {
          if (KMManager.getGlobeKeyState() == KMManager.GlobeKeyState.GLOBE_KEY_STATE_DOWN) {
           KMManager.setGlobeKeyState(KMManager.GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS);
+
+          // When we activate the keyboard picker, this will disrupt the JS-side's control
+          // flow for gesture-handling; we should pre-emptively clear the globe key,
+          // as Web will not receive a "globe key up" event.
+          loadJavascript("clearGlobeHighlight()");
+
           KMManager.handleGlobeKeyAction(context, true, keyboardType);
           return;
         /* For future implementation
@@ -443,26 +449,42 @@ final class KMKeyboard extends WebView {
     dismissHelpBubble();
   }
 
+  @Override
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
 
     RelativeLayout.LayoutParams params = KMManager.getKeyboardLayoutParams();
+    // I suspect this is the part we should actually be calling directly...
     this.setLayoutParams(params);
-
-    int bannerHeight = KMManager.getBannerHeight(context);
-    int oskHeight = KMManager.getKeyboardHeight(context);
-    if (this.htmlBannerString != null && !this.htmlBannerString.isEmpty()) {
-      setHTMLBanner(this.htmlBannerString);
-    }
-    loadJavascript(KMString.format("setBannerHeight(%d)", bannerHeight));
-    loadJavascript(KMString.format("setOskWidth(%d)", newConfig.screenWidthDp));
-    loadJavascript(KMString.format("setOskHeight(%d)", oskHeight));
+    this.invalidate();
+    this.requestLayout();
 
     this.dismissHelpBubble();
 
     if(this.getShouldShowHelpBubble()) {
       this.showHelpBubbleAfterDelay(2000);
     }
+  }
+
+  @Override
+  public void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
+    super.onSizeChanged(width, height, oldWidth, oldHeight);
+    int bannerHeight = KMManager.getBannerHeight(context);
+    int oskHeight = KMManager.getKeyboardHeight(context);
+
+    if(bannerHeight + oskHeight != height) {
+      // We'll proceed, but cautiously and with logging.
+      KMLog.LogInfo(TAG, "Height mismatch: onSizeChanged = " + height + ", our version = " + (bannerHeight + oskHeight));
+    }
+
+    if (this.htmlBannerString != null && !this.htmlBannerString.isEmpty()) {
+      setHTMLBanner(this.htmlBannerString);
+    }
+
+    loadJavascript(KMString.format("setBannerHeight(%d)", bannerHeight));
+    loadJavascript(KMString.format("setOskWidth(%d)", width));
+    // Must be last - it's the one that triggers a Web-engine layout refresh.
+    loadJavascript(KMString.format("setOskHeight(%d)", oskHeight));
   }
 
   public void dismissSuggestionMenuWindow() {

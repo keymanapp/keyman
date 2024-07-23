@@ -18,6 +18,7 @@ import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
 import { KmnCompiler } from '@keymanapp/kmc-kmn';
 import { KMXPlusMetadataCompiler } from './metadata-compiler.js';
 import { LdmlKeyboardVisualKeyboardCompiler } from './visual-keyboard-compiler.js';
+import { LinterKeycaps } from './linter-keycaps.js';
 //KMW17.0: import { LdmlKeyboardKeymanWebCompiler } from './keymanweb-compiler.js';
 
 export const SECTION_COMPILERS = [
@@ -39,6 +40,11 @@ export const SECTION_COMPILERS = [
   LayrCompiler,
   LocaCompiler,
   TranCompiler,
+];
+
+/** list of linters, in order. */
+const LINTERS = [
+  LinterKeycaps,
 ];
 
 /**
@@ -279,16 +285,46 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
     return source;
   }
 
+  /** Materialize the linters against the built datafile */
+  private buildLinters(source: LDMLKeyboardXMLSourceFile, kmx: KMXPlus.KMXPlusFile) {
+    return LINTERS.map(c => new c(source, kmx, this.callbacks));
+  }
+
+  /**
+   * Runs any linter steps
+   * @internal
+   */
+  private async lint(source: LDMLKeyboardXMLSourceFile, kmx: KMXPlus.KMXPlusFile) : Promise<boolean> {
+    // run each of the linters
+    for (const linter of this.buildLinters(source, kmx)) {
+      if (!await linter.lint()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
 
   /**
    * @internal
-   * Validates that the LDML keyboard source file and lints. Actually just
-   * compiles the keyboard and returns `true` if everything is good...
+   * Validates that the LDML keyboard source file and lints.
    * @param   source - in-memory representation of LDML keyboard xml file
    * @returns          true if the file validates
    */
   public async validate(source: LDMLKeyboardXMLSourceFile): Promise<boolean> {
-    return !!(await this.compile(source, true));
+    // We need to compile in order to validate.
+    const kmx = await this.compile(source, true);
+    if (!kmx) {
+      return false;
+    }
+
+    // Run the linters
+    if (!await this.lint(source, kmx)) {
+      return false;
+    }
+
+    // We are valid if we have a keyboard file at this point.
+    return !!kmx;
   }
 
   /**
