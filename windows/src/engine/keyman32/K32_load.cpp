@@ -87,7 +87,7 @@ BOOL LoadlpKeyboard(int i)
   km_core_status err_status = km_core_keyboard_load(keyboardPath, &_td->lpKeyboards[i].lpCoreKeyboard);
   if (err_status != KM_CORE_STATUS_OK) {
     SendDebugMessageFormat("km_core_keyboard_load failed for %ls with error status [%d]", keyboardPath, err_status);
-    delete keyboardPath;
+    delete[] keyboardPath;
     return_SendDebugExit(FALSE);
   }
   delete[] keyboardPath;
