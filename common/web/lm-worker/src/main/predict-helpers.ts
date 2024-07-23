@@ -51,6 +51,7 @@ export type CorrectionPredictionTuple = {
   correction: ProbabilityMass<string>,
   totalProb: number;
   matchLevel: SuggestionSimilarity;
+  preservationTransform?: Transform;
 };
 
 export enum SuggestionSimilarity {
@@ -105,8 +106,6 @@ export async function correctAndEnumerate(
   const inputTransform = transformDistribution[0].sample;
 
   const postContext = models.applyTransform(inputTransform, context);
-  let postContextState: TrackedContextState = null;
-
   let rawPredictions: CorrectionPredictionTuple[] = [];
 
   // If `this.contextTracker` does not exist, we don't have the
@@ -150,6 +149,9 @@ export async function correctAndEnumerate(
 
     // Running in bulk over all suggestions, duplicate entries may be possible.
     rawPredictions = predictFromCorrections(lexicalModel, predictionRoots, context);
+    if(allowSpace) {
+      rawPredictions.forEach((entry) => entry.preservationTransform = inputTransform);
+    }
 
     return {
       postContextState: null,
@@ -162,19 +164,21 @@ export async function correctAndEnumerate(
   // facilitates a more thorough correction-search pattern.
 
   // Token replacement benefits greatly from knowledge of the prior context state.
-  let contextState = contextTracker.analyzeState(
+  let { state: contextState } = contextTracker.analyzeState(
     lexicalModel,
     context,
     null
   );
+
   // Corrections and predictions are based upon the post-context state, though.
-  postContextState = contextTracker.analyzeState(
+  const contextChangeAnalysis = contextTracker.analyzeState(
     lexicalModel,
     context,
     !TransformUtils.isEmpty(inputTransform)
       ? transformDistribution
       : null
   );
+  const postContextState = contextChangeAnalysis.state;
 
   // TODO:  Should we filter backspaces & whitespaces out of the transform distribution?
   //        Ideally, the answer (in the future) will be no, but leaving it in right now may pose an issue.
@@ -192,46 +196,19 @@ export async function correctAndEnumerate(
   // The amount of text to 'replace' depends upon whatever sort of context change occurs
   // from the received input.
   const postContextTokens = postContextState.tokens;
-  let postContextLength = postContextTokens.length;
   // Only use of `contextState`.
   let contextLengthDelta = postContextTokens.length - contextState.tokens.length;
   // If the context now has more tokens, the token we'll be 'predicting' didn't originally exist.
-  if(postContextLength == 0 || contextLengthDelta > 0) {
+  if(contextChangeAnalysis.preservationTransform) {
     // As the word/token being corrected/predicted didn't originally exist, there's no
-    // part of it to 'replace'.
+    // part of it to 'replace'.  (Suggestions are applied to the pre-transform state.)
     deleteLeft = 0;
 
     // If the new token is due to whitespace or due to a different input type that would
-    // likely imply a tokenization boundary...
-    if(TransformUtils.isWhitespace(inputTransform)) {
-      /* TODO:  consider/implement:  the second half of the comment above.
-        * For example:  on input of a `'`, predict new words instead of replacing the `'`.
-        * (since after a letter, the `'` will be ignored, anyway)
-        *
-        * Idea:  if the model's most likely prediction (with no root) would make a new
-        * token if appended to the current token, that's probably a good case.
-        * Keeps the check simple & quick.
-        *
-        * Might need a mixed mode, though:  ';' is close enough that `l` is a reasonable
-        * fat-finger guess.   So yeah, we're not addressing this idea right now.
-        * - so... consider multiple context behavior angles when building prediction roots?
-        *
-        * May need something similar to help handle contractions during their construction,
-        * but that'd be within `ContextTracker`.
-        * can' => [`can`, `'`]
-        * can't => [`can't`]  (WB6, 7 of https://unicode.org/reports/tr29/#Word_Boundary_Rules)
-        *
-        * (Would also helps WB7b+c for Hebrew text)
-        */
-
-      // Infer 'new word' mode, even if we received new text when reaching
-      // this position.  That new text didn't exist before, so still - nothing
-      // to 'replace'.
-      context = postContext; // As far as predictions are concerned, the post-context state
-                              // should not be replaced.  Predictions are to be rooted on
-                              // text "up for correction" - so we want a null root for this
-                              // branch.
-    }
+    // likely imply a tokenization boundary, infer 'new word' mode.
+    // Apply any part of the context change that is not considered
+    // to be up for correction.
+    context = models.applyTransform(contextChangeAnalysis.preservationTransform, context);
     // If the tokenized context length is shorter... sounds like a backspace (or similar).
   } else if (contextLengthDelta < 0) {
     /* Ooh, we've dropped context here.  Almost certainly from a backspace.
@@ -313,6 +290,7 @@ export async function correctAndEnumerate(
     };
 
     let predictions = predictFromCorrections(lexicalModel, [predictionRoot], context);
+    predictions.forEach((entry) => entry.preservationTransform = contextChangeAnalysis.preservationTransform);
 
     // Only set 'best correction' cost when a correction ACTUALLY YIELDS predictions.
     if(predictions.length > 0 && bestCorrectionCost === undefined) {
@@ -667,6 +645,22 @@ export function finalizeSuggestions(
   const suggestions = deduplicatedSuggestionTuples.map((tuple) => {
     const prediction = tuple.prediction;
 
+    // If this is a suggestion after any form of wordbreak input, make sure we preserve any components
+    // from prior tokens!
+    //
+    // Note:  may need adjustment if/when supporting phrase-level correction.
+    if(tuple.preservationTransform) {
+      let mergedTransform = models.buildMergedTransform(tuple.preservationTransform, prediction.sample.transform);
+      mergedTransform.id = prediction.sample.transformId;
+
+      // Temporarily and locally drops 'readonly' semantics so that we can reassign the transform.
+      // See https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#improved-control-over-mapped-type-modifiers
+      let mutableSuggestion = prediction.sample as {-readonly [transform in keyof Suggestion]: Suggestion[transform]};
+
+      // Assignment via by-reference behavior, as suggestion is an object
+      mutableSuggestion.transform = mergedTransform;
+    }
+
     if(!verbose) {
       return {
         ...prediction.sample,
@@ -713,18 +707,6 @@ export function finalizeSuggestions(
       }
     }
 
-    // If this is a suggestion after wordbreak input, make sure we preserve the wordbreak transform!
-    if(TransformUtils.isWhitespace(inputTransform)) {
-      let mergedTransform = models.buildMergedTransform(inputTransform, suggestion.transform);
-      mergedTransform.id = suggestion.transformId;
-
-      // Temporarily and locally drops 'readonly' semantics so that we can reassign the transform.
-      // See https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#improved-control-over-mapped-type-modifiers
-      let mutableSuggestion = suggestion as {-readonly [transform in keyof Suggestion]: Suggestion[transform]};
-
-      // Assignment via by-reference behavior, as suggestion is an object
-      mutableSuggestion.transform = mergedTransform;
-    }
   });
 
   return suggestions;

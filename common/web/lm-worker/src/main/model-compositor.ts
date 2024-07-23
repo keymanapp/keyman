@@ -247,7 +247,7 @@ export class ModelCompositor {
     if(this.contextTracker) {
       let contextState = this.contextTracker.newest;
       if(!contextState) {
-        contextState = this.contextTracker.analyzeState(this.lexicalModel, context);
+        contextState = this.contextTracker.analyzeState(this.lexicalModel, context).state;
       }
 
       contextState.tail.activeReplacementId = suggestion.id;

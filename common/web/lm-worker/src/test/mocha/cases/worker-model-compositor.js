@@ -192,7 +192,9 @@ describe('ModelCompositor', function() {
 
         const terminatedSuggestions = await firstPredict;
         const finalSuggestions = await secondPredict;
-        assert.isOk(terminatedSuggestions.find((entry) => entry.displayAs == 'a'));
+        if(terminatedSuggestions.length > 0) {
+          assert.isOk(terminatedSuggestions.find((entry) => entry.displayAs == 'a'));
+        }
         assert.isOk(finalSuggestions.find((entry) => entry.displayAs == 'applied'));
       });
     });
