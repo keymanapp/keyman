@@ -1749,13 +1749,14 @@ PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_W
     {
       r--;							// Cut off following spaces
       while (iswspace(*r) && r > q) r--;
-      r++;
+      if (!iswspace(*r))
+        r++;
 
       *r = 0; // delete first following space
 
       r = (PKMX_WCHAR) u16chr((r + 1), dClose);
 
-       *r = 0; // delete close delimiter
+      *r = 0; // delete close delimiter
     }
   else *r = 0; // delete close delimiter
 

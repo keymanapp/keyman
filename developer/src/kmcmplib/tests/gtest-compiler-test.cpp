@@ -337,6 +337,74 @@ TEST_F(CompilerTest, GetDelimitedString_test) {
     EXPECT_FALSE(*p);
     EXPECT_EQ(1, p-str); // deleted close delimiter
 
+    // no argument, single space, no flags
+    u16cpy(str, u"( )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", 0x00);
+    EXPECT_EQ(0, u16cmp(u" ", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(2, p-str); // deleted close delimiter
+
+    // no argument, single space, cut spaces after open delimiter
+    u16cpy(str, u"( )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD);
+    EXPECT_EQ(0, u16cmp(u"", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(2, p-str); // deleted close delimiter
+
+    // no argument, single space, cut spaces before close delimiter
+    u16cpy(str, u"( )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(2, p-str); // deleted close delimiter
+
+    // no argument, single space, cut spaces after open and before close delimiter
+    u16cpy(str, u"( )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(2, p-str); // deleted close delimiter
+
+    // no argument, two spaces, no flags
+    u16cpy(str, u"(  )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", 0x00);
+    EXPECT_EQ(0, u16cmp(u"  ", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(3, p-str); // deleted close delimiter
+
+    // no argument, two spaces, cut spaces after open delimiter
+    u16cpy(str, u"(  )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD);
+    EXPECT_EQ(0, u16cmp(u"", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(3, p-str); // deleted close delimiter
+
+    // no argument, two spaces, cut spaces before close delimiter
+    u16cpy(str, u"(  )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(3, p-str); // deleted close delimiter
+
+    std::cerr << "start debug" << std::endl;
+
+    // no argument, two spaces, cut spaces after open and before close delimiter
+    u16cpy(str, u"(  )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(3, p-str); // deleted close delimiter
+
+    std::cerr << "end debug" << std::endl;
+
     // single-character argument, cut spaces after open and before close delimiter, valid
     u16cpy(str, u"(b)");
     p = str;
