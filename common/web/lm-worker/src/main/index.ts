@@ -328,12 +328,12 @@ export default class LMLayerWorker {
         switch(payload.message) {
           case 'predict':
             var {transform, context} = payload;
-            var suggestions = compositor.predict(transform, context);
-
-            // Now that the suggestions are ready, send them out!
-            this.cast('suggestions', {
-              token: payload.token,
-              suggestions: suggestions
+            compositor.predict(transform, context).then((suggestions) => {
+              // Now that the suggestions are ready, send them out!
+              this.cast('suggestions', {
+                token: payload.token,
+                suggestions: suggestions
+              });
             });
             break;
           case 'wordbreak':
@@ -358,11 +358,12 @@ export default class LMLayerWorker {
             break;
           case 'revert':
             var {reversion, context} = payload;
-            var suggestions: Suggestion[] = compositor.applyReversion(reversion, context);
 
-            this.cast('postrevert', {
-              token: payload.token,
-              suggestions: suggestions
+            compositor.applyReversion(reversion, context).then((suggestions) => {
+              this.cast('postrevert', {
+                token: payload.token,
+                suggestions: suggestions
+              });
             });
             break;
           case 'reset-context':

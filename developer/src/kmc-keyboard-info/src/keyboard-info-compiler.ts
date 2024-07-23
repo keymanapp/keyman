@@ -8,7 +8,7 @@ import { KeyboardInfoFile, KeyboardInfoFileIncludes, KeyboardInfoFileLanguageFon
 import { KeymanFileTypes, CompilerCallbacks, KmpJsonFile, KmxFileReader, KMX, KeymanTargets, KeymanCompiler, CompilerOptions, KeymanCompilerResult, KeymanCompilerArtifacts, KeymanCompilerArtifact } from "@keymanapp/common-types";
 import { KeyboardInfoCompilerMessages } from "./keyboard-info-compiler-messages.js";
 import langtags from "./imports/langtags.js";
-import { KeymanUrls, validateMITLicense } from "@keymanapp/developer-utils";
+import { KeymanUrls, isValidEmail, validateMITLicense } from "@keymanapp/developer-utils";
 import { KmpCompiler } from "@keymanapp/kmc-package";
 
 import { SchemaValidators } from "@keymanapp/common-types";
@@ -234,6 +234,11 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
         const match = author.url.match(/^(mailto\:)?(.+)$/);
         /* c8 ignore next 4 */
         if (match === null) {
+          this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_InvalidAuthorEmail({email:author.url}));
+          return null;
+        }
+
+        if(!isValidEmail(match[2])) {
           this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_InvalidAuthorEmail({email:author.url}));
           return null;
         }

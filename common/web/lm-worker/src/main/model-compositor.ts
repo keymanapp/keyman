@@ -4,11 +4,27 @@ import * as correction from './correction/index.js'
 
 import TransformUtils from './transformUtils.js';
 
+type CorrectionPredictionTuple = {
+  prediction: ProbabilityMass<Suggestion>,
+  correction: ProbabilityMass<string>,
+  totalProb: number;
+};
+
 export default class ModelCompositor {
   private lexicalModel: LexicalModel;
   private contextTracker?: correction.ContextTracker;
+
   private static readonly MAX_SUGGESTIONS = 12;
   readonly punctuation: LexicalModelPunctuation;
+
+  // Left exposed to facilitate unit tests.
+  // See worker-model-compositor, "stops predicting early[...]".
+  /**
+   * If there is a prediction request currently beign processed, this will
+   * hold a reference to its time-management ExecutionTimer, which can
+   * be used to have it exit early (once it yields to the task queue).
+   */
+  activeTimer?: correction.ExecutionTimer;
 
   /**
    * Controls the strength of anti-corrective measures for single-character scenarios.
@@ -29,9 +45,13 @@ export default class ModelCompositor {
 
   private SUGGESTION_ID_SEED = 0;
 
-  private testMode: boolean = false
+  private testMode: boolean = false;
+  private verbose: boolean = true;
 
-  constructor(lexicalModel: LexicalModel, testMode?: boolean) {
+  constructor(
+    lexicalModel: LexicalModel,
+    testMode?: boolean
+  ) {
     this.lexicalModel = lexicalModel;
     if(lexicalModel.traverseFromRoot) {
       this.contextTracker = new correction.ContextTracker();
@@ -40,23 +60,31 @@ export default class ModelCompositor {
     this.testMode = !!testMode;
   }
 
-  private predictFromCorrections(corrections: ProbabilityMass<Transform>[], context: Context): Distribution<Suggestion> {
-    let returnedPredictions: Distribution<Suggestion> = [];
+  private predictFromCorrections(corrections: ProbabilityMass<Transform>[], context: Context): CorrectionPredictionTuple[] {
+    let returnedPredictions: CorrectionPredictionTuple[] = [];
 
     for(let correction of corrections) {
       let predictions = this.lexicalModel.predict(correction.sample, context);
 
-      let predictionSet = predictions.map(function(pair: ProbabilityMass<Suggestion>) {
-        let transform = correction.sample;
-        let inputProb = correction.p;
+      const { sample: correctionTransform, p: correctionProb } = correction;
+      const correctionRoot = this.wordbreak(models.applyTransform(correction.sample, context));
+
+      let predictionSet = predictions.map((pair: ProbabilityMass<Suggestion>) => {
         // Let's not rely on the model to copy transform IDs.
         // Only bother is there IS an ID to copy.
-        if(transform.id !== undefined) {
-          pair.sample.transformId = transform.id;
+        if(correctionTransform.id !== undefined) {
+          pair.sample.transformId = correctionTransform.id;
         }
 
-        let prediction = {sample: pair.sample, p: pair.p * inputProb};
-        return prediction;
+        let tuple: CorrectionPredictionTuple = {
+          prediction: pair,
+          correction: {
+            sample: correctionRoot,
+            p: correctionProb
+          },
+          totalProb: pair.p * correctionProb
+        };
+        return tuple;
       }, this);
 
       returnedPredictions = returnedPredictions.concat(predictionSet);
@@ -65,10 +93,14 @@ export default class ModelCompositor {
     return returnedPredictions;
   }
 
-  predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Suggestion[] {
-    let suggestionDistribution: Distribution<Suggestion> = [];
+  async predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Promise<Suggestion[]> {
+    let suggestionDistribution: CorrectionPredictionTuple[] = [];
     let lexicalModel = this.lexicalModel;
     let punctuation = this.punctuation;
+
+    // If a prior prediction is still processing, signal to terminate it; we have a new
+    // prediction request to prioritize.
+    this.activeTimer?.terminate();
 
     if(!(transformDistribution instanceof Array)) {
       transformDistribution = [ {sample: transformDistribution, p: 1.0} ];
@@ -105,7 +137,7 @@ export default class ModelCompositor {
     let keepOptionText = this.wordbreak(postContext);
     let keepOption: Outcome<Keep> = null;
 
-    let rawPredictions: Distribution<Suggestion> = [];
+    let rawPredictions: CorrectionPredictionTuple[] = [];
 
     // Used to restore whitespaces if operations would remove them.
     let prefixTransform: Transform;
@@ -239,72 +271,79 @@ export default class ModelCompositor {
       // TODO:  whitespace, backspace filtering.  Do it here.
       //        Whitespace is probably fine, actually.  Less sure about backspace.
 
+      const SEARCH_TIMEOUT = correction.SearchSpace.DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL;
+      const timer = this.activeTimer = new correction.ExecutionTimer(this.testMode ? Number.MAX_VALUE : SEARCH_TIMEOUT, this.testMode ? Number.MAX_VALUE : SEARCH_TIMEOUT * 1.5);
+
       let bestCorrectionCost: number;
-      const SEARCH_TIMEOUT = this.testMode ? 0 : correction.SearchSpace.DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL;
-      for(let matches of searchSpace.getBestMatches(SEARCH_TIMEOUT)) {
+      let correctionPredictionMap: Record<string, Distribution<Suggestion>> = {};
+
+      for await(let match of searchSpace.getBestMatches(timer)) {
         // Corrections obtained:  now to predict from them!
-        let predictionRoots = matches.map(function(match) {
-          let correction = match.matchString;
+        const correction = match.matchString;
 
-          // Worth considering:  extend Traversal to allow direct prediction lookups?
-          // let traversal = match.finalTraversal;
+        // Worth considering:  extend Traversal to allow direct prediction lookups?
+        // let traversal = match.finalTraversal;
 
-          // Replace the existing context with the correction.
-          let correctionTransform: Transform = {
-            insert: correction,  // insert correction string
-            deleteLeft: deleteLeft,
-            id: inputTransform.id // The correction should always be based on the most recent external transform/transcription ID.
-          }
+        // Replace the existing context with the correction.
+        const correctionTransform: Transform = {
+          insert: correction,  // insert correction string
+          deleteLeft: deleteLeft,
+          id: inputTransform.id // The correction should always be based on the most recent external transform/transcription ID.
+        }
 
-          let rootCost = match.totalCost;
+        let rootCost = match.totalCost;
 
-          /* If we're dealing with the FIRST keystroke of a new sequence, we'll **dramatically** boost
-           * the exponent to ensure only VERY nearby corrections have a chance of winning, and only if
-           * there are significantly more likely words.  We only need this to allow very minor fat-finger
-           * adjustments for 100% keystroke-sequence corrections in order to prevent finickiness on
-           * key borders.
-           *
-           * Technically, the probabilities this produces won't be normalized as-is... but there's no
-           * true NEED to do so for it, even if it'd be 'nice to have'.  Consistently tracking when
-           * to apply it could become tricky, so it's simpler to leave out.
-           *
-           * Worst-case, it's possible to temporarily add normalization if a code deep-dive
-           * is needed in the future.
-           */
-          if(isTokenStart) {
-            /* Suppose a key distribution:  most likely with p=0.5, second-most with 0.4 - a pretty
-             * ambiguous case that would only arise very near the center of the boundary between two keys.
-             * Raising (0.5/0.4)^16 ~= 35.53.  (At time of writing, SINGLE_CHAR_KEY_PROB_EXPONENT = 16.)
-             * That seems 'within reason' for correction very near boundaries.
-             *
-             * So, with the second-most-likely key being that close in probability, its best suggestion
-             * must be ~ 35.5x more likely than that of the truly-most-likely key to "win".  So, it's not
-             * a HARD cutoff, but more of a 'soft' one.  Keeping the principles in mind documented above,
-             * it's possible to tweak this to a more harsh or lenient setting if desired, rather than
-             * being totally "all or nothing" on which key is taken for highly-ambiguous keypresses.
-             */
-            rootCost *= ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT;  // note the `Math.exp` below.
-          }
+        /* If we're dealing with the FIRST keystroke of a new sequence, we'll **dramatically** boost
+          * the exponent to ensure only VERY nearby corrections have a chance of winning, and only if
+          * there are significantly more likely words.  We only need this to allow very minor fat-finger
+          * adjustments for 100% keystroke-sequence corrections in order to prevent finickiness on
+          * key borders.
+          *
+          * Technically, the probabilities this produces won't be normalized as-is... but there's no
+          * true NEED to do so for it, even if it'd be 'nice to have'.  Consistently tracking when
+          * to apply it could become tricky, so it's simpler to leave out.
+          *
+          * Worst-case, it's possible to temporarily add normalization if a code deep-dive
+          * is needed in the future.
+          */
+        if(isTokenStart) {
+          /* Suppose a key distribution:  most likely with p=0.5, second-most with 0.4 - a pretty
+            * ambiguous case that would only arise very near the center of the boundary between two keys.
+            * Raising (0.5/0.4)^16 ~= 35.53.  (At time of writing, SINGLE_CHAR_KEY_PROB_EXPONENT = 16.)
+            * That seems 'within reason' for correction very near boundaries.
+            *
+            * So, with the second-most-likely key being that close in probability, its best suggestion
+            * must be ~ 35.5x more likely than that of the truly-most-likely key to "win".  So, it's not
+            * a HARD cutoff, but more of a 'soft' one.  Keeping the principles in mind documented above,
+            * it's possible to tweak this to a more harsh or lenient setting if desired, rather than
+            * being totally "all or nothing" on which key is taken for highly-ambiguous keypresses.
+            */
+          rootCost *= ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT;  // note the `Math.exp` below.
+        }
 
-          return {
-            sample: correctionTransform,
-            p: Math.exp(-rootCost)
-          };
-        }, this);
+        const predictionRoot = {
+          sample: correctionTransform,
+          p: Math.exp(-rootCost)
+        };
 
-        // Running in bulk over all suggestions, duplicate entries may be possible.
-        let predictions = this.predictFromCorrections(predictionRoots, context);
+        let predictions = this.predictFromCorrections([predictionRoot], context);
 
         // Only set 'best correction' cost when a correction ACTUALLY YIELDS predictions.
         if(predictions.length > 0 && bestCorrectionCost === undefined) {
-          bestCorrectionCost = -Math.log(predictionRoots[0].p);
+          bestCorrectionCost = -Math.log(predictionRoot.p);
         }
 
-        rawPredictions = rawPredictions.concat(predictions);
-        // TODO:  We don't currently de-duplicate predictions at this point quite yet, so
-        // it's technically possible that we return too few.
+        // If we're getting the same prediction again, it's lower-cost.  Update!
+        let oldPredictionSet = correctionPredictionMap[match.matchString];
+        if(oldPredictionSet) {
+          rawPredictions = rawPredictions.filter((entry) => !oldPredictionSet.find((match) => entry.prediction.sample == match.sample));
+        }
 
-        let correctionCost = matches[0].totalCost;
+        correctionPredictionMap[match.matchString] = predictions.map((entry) => entry.prediction);
+
+        rawPredictions = rawPredictions.concat(predictions);
+
+        let correctionCost = match.totalCost;
         // Searching a bit longer is permitted when no predictions have been found.
         if(correctionCost >= bestCorrectionCost + 8) {
           break;
@@ -316,24 +355,31 @@ export default class ModelCompositor {
           } else {
             // Sort the prediction list; we need them in descending order for the next check.
             rawPredictions.sort(function(a, b) {
-              return b.p - a.p;
+              return b.totalProb - a.totalProb;
             });
 
             // If the best suggestion from the search's current tier fails to beat the worst
             // pending suggestion from previous tiers, assume all further corrections will
             // similarly fail to win; terminate the search-loop.
-            if(rawPredictions[ModelCompositor.MAX_SUGGESTIONS-1].p > Math.exp(-correctionCost)) {
+            if(rawPredictions[ModelCompositor.MAX_SUGGESTIONS-1].totalProb > Math.exp(-correctionCost)) {
               break;
             }
           }
         }
+      }
+
+      // // For debugging / investigation.
+      // console.log(`execute: ${timer.executionTime}, deferred: ${timer.deferredTime}`); //, total since start: ${timer.timeSinceConstruction}`);
+
+      if(this.activeTimer == timer) {
+        this.activeTimer = null;
       }
     }
 
     // Section 2 - post-analysis for our generated predictions, managing 'keep'.
     // Assumption:  Duplicated 'displayAs' properties indicate duplicated Suggestions.
     // When true, we can use an 'associative array' to de-duplicate everything.
-    let suggestionDistribMap: {[key: string]: ProbabilityMass<Suggestion>} = {};
+    let suggestionDistribMap: {[key: string]: CorrectionPredictionTuple} = {};
     let currentCasing: CasingForm = null;
     if(lexicalModel.languageUsesCasing) {
       currentCasing = this.detectCurrentCasing(postContext);
@@ -342,9 +388,12 @@ export default class ModelCompositor {
     let baseWord = this.wordbreak(context);
 
     // Deduplicator + annotator of 'keep' suggestions.
-    for(let prediction of rawPredictions) {
+    for(let tuple of rawPredictions) {
+      const prediction = tuple.prediction.sample;
+      const prob = tuple.totalProb;
+
       // Combine duplicate samples.
-      let displayText = prediction.sample.displayAs;
+      let displayText = prediction.displayAs;
       let preserveAsKeep = displayText == keepOptionText;
 
       // De-duplication should be case-insensitive, but NOT
@@ -356,7 +405,7 @@ export default class ModelCompositor {
       if(preserveAsKeep) {
         // Preserve the original, pre-keyed version of the text.
         if(!keepOption) {
-          let baseTransform = prediction.sample.transform;
+          let baseTransform = prediction.transform;
 
           let keepTransform = {
             insert: keepOptionText,
@@ -365,15 +414,15 @@ export default class ModelCompositor {
             id: baseTransform.id
           }
 
-          let intermediateKeep = models.transformToSuggestion(keepTransform, prediction.p);
+          let intermediateKeep = models.transformToSuggestion(keepTransform, prob);
           keepOption = this.toAnnotatedSuggestion(intermediateKeep, 'keep',  models.QuoteBehavior.noQuotes);
           keepOption.matchesModel = true;
 
           // Since we replaced the original Suggestion with a keep-annotated one,
           // we must manually preserve the transform ID.
-          keepOption.transformId = prediction.sample.transformId;
-        } else if(keepOption.p && prediction.p) {
-          keepOption.p += prediction.p;
+          keepOption.transformId = prediction.transformId;
+        } else if(keepOption.p && prob) {
+          keepOption.p += prob;
         }
       } else {
         // Apply capitalization rules now; facilitates de-duplication of suggestions
@@ -381,16 +430,16 @@ export default class ModelCompositor {
         //
         // Example:  "apple" and "Apple" are separate when 'lower', but identical for 'initial' and 'upper'.
         if(currentCasing && currentCasing != 'lower') {
-          this.applySuggestionCasing(prediction.sample, baseWord, currentCasing);
+          this.applySuggestionCasing(prediction, baseWord, currentCasing);
           // update the mapping string, too.
-          displayText = prediction.sample.displayAs;
+          displayText = prediction.displayAs;
         }
 
         let existingSuggestion = suggestionDistribMap[displayText];
         if(existingSuggestion) {
-          existingSuggestion.p += prediction.p;
+          existingSuggestion.totalProb += prob;
         } else {
-          suggestionDistribMap[displayText] = prediction;
+          suggestionDistribMap[displayText] = tuple;
         }
       }
     }
@@ -420,28 +469,41 @@ export default class ModelCompositor {
     }
 
     suggestionDistribution = suggestionDistribution.sort(function(a, b) {
-      return b.p - a.p; // Use descending order - we want the largest probabilty suggestions first!
+      return b.totalProb - a.totalProb; // Use descending order - we want the largest probabilty suggestions first!
     });
 
-    let suggestions = suggestionDistribution.splice(0, ModelCompositor.MAX_SUGGESTIONS).map(function(value) {
-      let sample: Suggestion & {
-        p?: number,
-        "lexical-p"?: number,
-        "correction-p"?: number
-      } = value.sample;
+    // Section 4:  Auto-correction + finalization.
+    if(keepOption && keepOption.matchesModel) {
+      // Auto-select it for auto-acceptance; we don't correct away from perfectly-valid
+      // lexical entries, even if they are comparatively low-frequency.
+      keepOption.autoAccept = true;
+    } else {
+      this.predictionAutoSelect(suggestionDistribution);
+    }
 
-      if(sample['p']) {
-        // For analysis / debugging
-        sample['lexical-p'] =  sample['p'];
-        sample['correction-p'] = value.p / sample['p'];
-        // Use of the Trie model always exposed the lexical model's probability for a word to KMW.
-        // It's useful for debugging right now, so may as well repurpose it as the posterior.
-        //
-        // We still condition on 'p' existing so that test cases aren't broken.
-        sample['p'] = value.p;
+    // Now that we've marked the suggestion to auto-select, we can finalize the suggestions.
+    let suggestions = suggestionDistribution.splice(0, ModelCompositor.MAX_SUGGESTIONS).map((tuple) => {
+      const prediction = tuple.prediction;
+
+      if(!this.verbose) {
+        return {
+          ...prediction.sample,
+          p: tuple.totalProb
+        };
+      } else {
+        const sample: Suggestion & {
+          p?: number,
+          "lexical-p"?: number,
+          "correction-p"?: number
+        } = {
+          ...prediction.sample,
+          p: tuple.totalProb,
+          "lexical-p": prediction.p,
+          "correction-p": tuple.correction.p
+        }
+
+        return sample;
       }
-      //
-      return sample;
     });
 
     if(keepOption) {
@@ -456,18 +518,21 @@ export default class ModelCompositor {
       // Valid 'keep' suggestions may have zero length; we still need to evaluate the following code
       // for such cases.
 
-      // Do we need to manipulate the suggestion's transform based on the current state of the context?
-      if(!context.right) {
+      // If we're mid-word, delete its original post-caret text.
+      const tokenization = compositor.tokenize(context);
+      if(tokenization && tokenization.caretSplitsToken) {
+        // While we wait on the ability to provide a more 'ideal' solution, let's at least
+        // go with a more stable, if slightly less ideal, solution for now.
+        //
+        // A predictive text default (on iOS, at least) - immediately wordbreak
+        // on suggestions accepted mid-word.
         suggestion.transform.insert += punctuation.insertAfterWord;
-      } else {
-        // If we're mid-word, delete its original post-caret text.
-        const tokenization = compositor.tokenize(context);
-        if(tokenization && tokenization.caretSplitsToken) {
-          // While we wait on the ability to provide a more 'ideal' solution, let's at least
-          // go with a more stable, if slightly less ideal, solution for now.
-          //
-          // A predictive text default (on iOS, at least) - immediately wordbreak
-          // on suggestions accepted mid-word.
+
+        // Do we need to manipulate the suggestion's transform based on the current state of the context?
+      } else if(!context.right) {
+        suggestion.transform.insert += punctuation.insertAfterWord;
+      } else if(punctuation.insertAfterWord != '') {
+        if(context.right.indexOf(punctuation.insertAfterWord) != 0) {
           suggestion.transform.insert += punctuation.insertAfterWord;
         }
       }
@@ -501,6 +566,53 @@ export default class ModelCompositor {
     }
 
     return suggestions;
+  }
+
+  private predictionAutoSelect(suggestionDistribution: CorrectionPredictionTuple[]) {
+    if(suggestionDistribution.length == 0) {
+      return;
+    }
+
+    if(suggestionDistribution.length == 1) {
+      // Mark for auto-acceptance; there are no alternatives.
+      suggestionDistribution[0].prediction.sample.autoAccept = true;
+      return;
+    }
+
+    // Is it reasonable to auto-accept any of our suggestions?
+    const bestSuggestion = suggestionDistribution[0];
+
+    const baseCorrection = bestSuggestion.correction.sample;
+    if(baseCorrection.length == 0) {
+      // If the correction is rooted on an empty root, there's no basis for
+      // auto-correcting to this suggestion.
+      return;
+    }
+
+    // Find the highest probability for any correction that led to a valid prediction.
+    // No need to full-on re-sort everything, though.
+    const bestCorrection = suggestionDistribution.reduce((prev, current) => prev?.correction.p > current.correction.p ? prev : current, null).correction;
+    if(bestCorrection.p > bestSuggestion.correction.p) {
+      // Here, the best suggestion didn't come from the best correction.
+      // Is it actually reasonable to auto-correct?  We're probably just very
+      // biased toward its frequency.  (Maybe a threshold should be considered?)
+      return;
+    }
+
+    // compare best vs other probabilities.
+    const probSum = suggestionDistribution.reduce((accum, current) => accum + current.totalProb, 0);
+    const proportionOfBest = bestSuggestion.totalProb / probSum;
+    if(proportionOfBest < .66) {
+      return;
+    }
+
+    // compare correction-cost aspects?  We disable if the base correction is lower than best,
+    // but should we do other comparisons too?
+
+    // const nextSuggestion = suggestionDistribution[1];
+    // baseCorrection
+
+    bestSuggestion.prediction.sample.autoAccept = true;
   }
 
   // Responsible for applying casing rules to suggestions.
@@ -648,18 +760,19 @@ export default class ModelCompositor {
     return reversion;
   }
 
-  applyReversion(reversion: Reversion, context: Context): Suggestion[] {
+  async applyReversion(reversion: Reversion, context: Context): Promise<Suggestion[]> {
     // If we are unable to track context (because the model does not support LexiconTraversal),
     // we need a "fallback" strategy.
     let compositor = this;
-    let fallbackSuggestions = function() {
+    let fallbackSuggestions = async function() {
       let revertedContext = models.applyTransform(reversion.transform, context);
-      let suggestions = compositor.predict({insert: '', deleteLeft: 0}, revertedContext);
+      const suggestions = await compositor.predict({insert: '', deleteLeft: 0}, revertedContext);
       suggestions.forEach(function(suggestion) {
         // A reversion's transform ID is the additive inverse of its original suggestion;
         // we revert to the state of said original suggestion.
         suggestion.transformId = -reversion.transformId;
       });
+
       return suggestions;
     }
 
@@ -734,6 +847,9 @@ export default class ModelCompositor {
   }
 
   public resetContext(context: Context) {
+    // If we're resetting the context, any active prediction requests are no
+    // longer valid.
+    this.activeTimer?.terminate();
     // Force-resets the context, throwing out any previous fat-finger data, etc.
     // Designed for use when the caret has been directly moved and/or the context sourced from a different control
     // than before.

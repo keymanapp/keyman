@@ -97,6 +97,8 @@
 #include <codecvt>
 #include <locale>
 #include <string>
+#include <iostream>
+#include <sstream>
 
 #include "UnreachableRules.h"
 #include "CheckForDuplicates.h"
@@ -134,6 +136,7 @@ namespace kmcmp{
 
 int xatoi(PKMX_WCHAR *p);
 int atoiW(PKMX_WCHAR p);
+bool isIntegerWstring(PKMX_WCHAR p);
 void safe_wcsncpy(PKMX_WCHAR out, PKMX_WCHAR in, int cbMax);
 int GetDeadKey(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 
@@ -276,7 +279,7 @@ KMX_BOOL kmcmp::AddCompileWarning(PKMX_CHAR buf)
 KMX_BOOL AddCompileError(KMX_DWORD msg)
 {
   KMX_CHAR szText[COMPILE_ERROR_MAX_LEN];
-  KMX_CHAR* szTextp = NULL;
+  const KMX_CHAR* szTextp = NULL;
 
   if (msg & CERR_FATAL)
   {
@@ -806,12 +809,13 @@ bool resizeStoreArray(PFILE_KEYBOARD fk) {
  * reallocates the key array in increments of 100
  */
 bool resizeKeyArray(PFILE_GROUP gp, int increment) {
-  if((gp->cxKeyArray + increment - 1) % 100 < increment) {
-    PFILE_KEY kp = new FILE_KEY[((gp->cxKeyArray + increment)/100 + 1) * 100];
+  const int cxKeyArray = (int)gp->cxKeyArray;
+  if((cxKeyArray + increment - 1) % 100 < increment) {
+    PFILE_KEY kp = new FILE_KEY[((cxKeyArray + increment)/100 + 1) * 100];
     if (!kp) return false;
     if (gp->dpKeyArray)
     {
-      memcpy(kp, gp->dpKeyArray, gp->cxKeyArray * sizeof(FILE_KEY));
+      memcpy(kp, gp->dpKeyArray, cxKeyArray * sizeof(FILE_KEY));
       delete[] gp->dpKeyArray;
     }
 
@@ -1191,11 +1195,11 @@ int GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store) {
     if(AnyTarget == token) {
       result |= COMPILETARGETS_KMX | COMPILETARGETS_JS;
     }
-    for(auto p: KMXKeymanTargets) {
-      if(p == token) result |= COMPILETARGETS_KMX;
+    for(auto target: KMXKeymanTargets) {
+      if(target == token) result |= COMPILETARGETS_KMX;
     }
-    for(auto p: KMWKeymanTargets) {
-      if(p == token) result |= COMPILETARGETS_JS;
+    for(auto target: KMWKeymanTargets) {
+      if(target == token) result |= COMPILETARGETS_JS;
     }
 
     token = u16tok(nullptr, u" ", &ctx);
@@ -1208,7 +1212,11 @@ int GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store) {
 }
 
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString) {   // I4140
-  /* version format \d+(\.\d+)*  e.g. 9.0.3, 1.0, 1.2.3.4, 6.2.1.4.6.4, blank is not allowed */
+  /**
+    version format: /^\d+(\.\d+)*$/
+    e.g. 9.0.3, 1.0, 1.2.3.4, 6.2.1.4.6.4, 11.22.3 are all ok;
+    empty string is not permitted; whitespace is not permitted
+  */
 
   do {
     if (!iswdigit(*dpString)) {
@@ -1467,7 +1475,14 @@ KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnico
 
     str = p + 1;
     if ((msg = GetXString(fk, str, u">", pklKey, GLOBAL_BUFSIZE - 1, (int)(str - pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
+
     if (pklKey[0] == 0) return CERR_ZeroLengthString;
+
+    if(Uni_IsSurrogate1(pklKey[0])) {
+      // #11643: non-BMP characters do not makes sense for key codes
+      return CERR_NonBMPCharactersNotSupportedInKeySection;
+    }
+
     if (xstrlen(pklKey) > 1) AddWarning(CWARN_KeyBadLength);
   } else {
     if ((msg = GetXString(fk, str, u">", pklIn, GLOBAL_BUFSIZE - 1, (int)(str - pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
@@ -1649,9 +1664,10 @@ KMX_DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, KMX_DWORD storeIndex)
       default:
         return CERR_CodeInvalidInKeyStore;
       }
-    }
-    else
-    {
+    } else if(Uni_IsSurrogate1(*pn)) {
+      // #11643: non-BMP characters do not makes sense for key codes
+      return CERR_NonBMPCharactersNotSupportedInKeySection;
+    } else {
       k->Key = *pn;				// set the key to store offset.
       k->ShiftFlags = 0;
     }
@@ -2009,7 +2025,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
           kmcmp::CheckStoreUsage(fk, i, TRUE, FALSE, FALSE);
 
           r = u16tok(NULL, p_sep_com, &context);  // I3481
-          if (!r) return CERR_InvalidIndex;
+          if (!r || !*r || !isIntegerWstring(r) || atoiW(r) < 1) return CERR_InvalidIndex;
         }
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_INDEX;
@@ -3357,6 +3373,26 @@ int atoiW(PKMX_WCHAR p)
   return i;
 }
 
+/**
+ * Checks if a wide-character C-string represents an integer.
+ * It does not strip whitespace, and depends on the action of atoi()
+ * to determine if the C-string is an integer.
+ *
+ * @param p a pointer to a wide-character C-string
+ *
+ * @return true if p represents an integer, false otherwise
+*/
+bool isIntegerWstring(PKMX_WCHAR p) {
+  if (!p || !*p)
+    return false;
+  PKMX_STR q = wstrtostr(p);
+  std::ostringstream os;
+  os << atoi(q);
+  int cmp = strcmp(q, os.str().c_str());
+  delete[] q;
+  return cmp == 0 ? true : false;
+}
+
 KMX_DWORD kmcmp::CheckUTF16(int n)
 {
   const int res[] = {
@@ -3512,7 +3548,7 @@ bool UTF16TempFromUTF8(KMX_BYTE* infile, int sz, KMX_BYTE** tempfile, int *sz16)
   try {
     std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
     result = converter.from_bytes((char*)infile, (char*)infile+sz);
-  } catch(std::range_error e) {
+  } catch(std::range_error& e) {
     AddCompileError(CHINT_NonUnicodeFile);
     result.resize(sz);
     for(int i = 0; i < sz; i++) {

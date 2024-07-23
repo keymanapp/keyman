@@ -19,7 +19,7 @@ describe('ModelCompositor', function() {
         {wordBreaker: wordBreakers.default}
       );
 
-      it('generates suggestions with expected properties', function() {
+      it('generates suggestions with expected properties', async function() {
         let compositor = new ModelCompositor(plainModel, true);
         let context = {
           left: 'th', startOfBuffer: true, endOfBuffer: true,
@@ -30,7 +30,7 @@ describe('ModelCompositor', function() {
           deleteLeft: 0
         };
 
-        let suggestions = compositor.predict(inputTransform, context);
+        let suggestions = await compositor.predict(inputTransform, context);
         suggestions.forEach(function(suggestion) {
           // Suggstions are built based on the context state BEFORE the triggering
           // input, replacing the prediction's root with the complete word.
@@ -55,7 +55,7 @@ describe('ModelCompositor', function() {
         });
       });
 
-      it('strongly avoids corrections for single-character roots', function() {
+      it('strongly avoids corrections for single-character roots', async function() {
         let compositor = new ModelCompositor(plainModel, true);
         let context = {
           left: '', startOfBuffer: true, endOfBuffer: true,
@@ -68,8 +68,8 @@ describe('ModelCompositor', function() {
           {sample: {insert: 'a', deleteLeft: 0}, p: 0.4}   // but at lower weight than 'and' (998).
         ];
 
-        compositor.predict({insert: '', deleteLeft: 0}, context); // Initialize context tracking first!
-        let suggestions = compositor.predict(inputDistribution, context);
+        await compositor.predict({insert: '', deleteLeft: 0}, context); // Initialize context tracking first!
+        let suggestions = await compositor.predict(inputDistribution, context);
 
         // remove the keep suggestion; we're not testing that here.
         suggestions = suggestions.filter((suggestion) => suggestion.tag != 'keep');
@@ -94,7 +94,7 @@ describe('ModelCompositor', function() {
         assert.isUndefined(aRange.find((suggestion) => suggestion.transform.insert.charAt(0) == 'q'));
       });
 
-      it('properly handles suggestions after a backspace', function() {
+      it('properly handles suggestions after a backspace', async function() {
         let compositor = new ModelCompositor(plainModel, true);
         let context = {
           left: 'the ', startOfBuffer: true, endOfBuffer: true,
@@ -105,7 +105,7 @@ describe('ModelCompositor', function() {
           deleteLeft: 1
         };
 
-        let suggestions = compositor.predict(inputTransform, context);
+        let suggestions = await compositor.predict(inputTransform, context);
         suggestions.forEach(function(suggestion) {
           // Suggestions always delete the full root of the suggestion.
           //
@@ -117,7 +117,7 @@ describe('ModelCompositor', function() {
         });
       });
 
-      it('properly handles suggestions for the first letter after a ` `', function() {
+      it('properly handles suggestions for the first letter after a ` `', async function() {
         let compositor = new ModelCompositor(plainModel, true);
         let context = {
           left: 'the', startOfBuffer: true, endOfBuffer: true,
@@ -128,7 +128,7 @@ describe('ModelCompositor', function() {
           deleteLeft: 0
         };
 
-        let suggestions = compositor.predict(inputTransform, context);
+        let suggestions = await compositor.predict(inputTransform, context);
         suggestions.forEach(function(suggestion) {
           // After a space, predictions are based on a new, zero-length root.
           // With nothing to replace, .deleteLeft should be zero.
@@ -136,7 +136,7 @@ describe('ModelCompositor', function() {
         });
       });
 
-      it('properly handles suggestions for the first letter after a `\'`', function() {
+      it('properly handles suggestions for the first letter after a `\'`', async function() {
         let compositor = new ModelCompositor(plainModel, true);
         let context = {
           left: "the '", startOfBuffer: true, endOfBuffer: true,
@@ -149,13 +149,60 @@ describe('ModelCompositor', function() {
           deleteLeft: 0
         };
 
-        let suggestions = compositor.predict(inputTransform, context);
+        let suggestions = await compositor.predict(inputTransform, context);
         suggestions.forEach(function(suggestion) {
           // Suggestions always delete the full root of the suggestion.
           // Which, here, didn't exist before the input.  Nothing to
           // replace => nothing for the suggestion to delete.
           assert.equal(suggestion.transform.deleteLeft, 0);
         });
+      });
+
+      it('stops predicting early if new prediction request comes in', async function() {
+        const compositor = new ModelCompositor(plainModel, true);
+
+        const firstPredict = compositor.predict({
+          insert: "a",
+          deleteLeft: 0
+        }, {
+          left: "the ", startOfBuffer: true, endOfBuffer: true
+        });
+
+        const firstTimer = compositor.activeTimer;
+        assert.isOk(firstTimer);
+        assert.isFalse(firstTimer.elapsed);
+
+        const secondPredict = compositor.predict({
+          insert: "l",
+          deleteLeft: 0
+        }, {
+          left: "the apl", startOfBuffer: true, endOfBuffer: true
+        });
+
+        assert.notEqual(compositor.activeTimer, firstTimer);
+        assert.isTrue(firstTimer.elapsed);
+
+        await Promise.race([
+          firstPredict,
+          secondPredict.then(() => Promise.reject(new Error("second prediction should not beat the first"))),
+        ]);
+
+        await Promise.all([firstPredict, secondPredict]);
+
+        // We can't make many solid guarantees about the state at which the first predict()
+        // call was interrupted.
+        //
+        // Possible cases:
+        // - an early OS-level context switch can land between processing the root search node
+        //   and the first possible search result (even for a single char)
+        // - It's possible to interrupt after the first result (exact match) and before any
+        //   secondary corrections may be found
+        // - It's possible to interrupt "too late" if the correction search proceeds quickly,
+        //   returning a standard full set.
+        await firstPredict;
+        const finalSuggestions = await secondPredict;
+
+        assert.isOk(finalSuggestions.find((entry) => entry.displayAs == 'applied'));
       });
     });
 
@@ -320,20 +367,20 @@ describe('ModelCompositor', function() {
         }
       );
 
-      it('should produce suggestions from uncased input', function() {
+      it('should produce suggestions from uncased input', async function() {
         let model = uncasedModel;
-        var composite = new ModelCompositor(model, true);
+        var compositor = new ModelCompositor(model, true);
 
         // Initialize context
         let context = {
           left: 'th', startOfBuffer: false, endOfBuffer: true,
         };
-        composite.predict({insert: '', deleteLeft: 0}, context);
+        await compositor.predict({insert: '', deleteLeft: 0}, context);
 
         // Pretend to fat finger "the" as "thr"
         var the = { sample: { insert: 'r', deleteLeft: 0}, p: 0.45 };
         var thr = { sample: { insert: 'e', deleteLeft: 0}, p: 0.55 };
-        var suggestions = composite.predict([thr, the], context);
+        var suggestions = await compositor.predict([thr, the], context);
 
         // Get the top suggest for 'the' and 'thr*'.
         var theSuggestion = suggestions.filter(function (s) { return s.displayAs === 'the' || s.displayAs === '“the”'; })[0];
@@ -348,20 +395,20 @@ describe('ModelCompositor', function() {
         assert.isAbove(theSuggestion.p, thrSuggestion.p);
       });
 
-      it('should not produce suggestions from cased input', function() {
+      it('should not produce suggestions from cased input', async function() {
         let model = uncasedModel;
-        var composite = new ModelCompositor(model, true);
+        var compositor = new ModelCompositor(model, true);
 
         // Initialize context
         let context = {
           left: 'TH', startOfBuffer: false, endOfBuffer: true,
         };
-        composite.predict({insert: '', deleteLeft: 0}, context);
+        await compositor.predict({insert: '', deleteLeft: 0}, context);
 
         // Pretend to fat finger "the" as "thr"
         var the = { sample: { insert: 'R', deleteLeft: 0}, p: 0.45 };
         var thr = { sample: { insert: 'E', deleteLeft: 0}, p: 0.55 };
-        var suggestions = composite.predict([thr, the], context);
+        var suggestions = await compositor.predict([thr, the], context);
 
         // We should only receive a 'keep' suggestion.
         assert.equal(suggestions.length, 1);
@@ -395,20 +442,20 @@ describe('ModelCompositor', function() {
         }
       );
 
-      it('should produce suggestions from uncased input', function() {
+      it('should produce suggestions from uncased input', async function() {
         let model = casedModel;
-        var composite = new ModelCompositor(model, true);
+        let compositor = new ModelCompositor(model, true);
 
         // Initialize context
         let context = {
           left: 'th', startOfBuffer: false, endOfBuffer: true,
         };
-        composite.predict({insert: '', deleteLeft: 0}, context);
+        await compositor.predict({insert: '', deleteLeft: 0}, context);
 
         // Pretend to fat finger "the" as "thr"
         var the = { sample: { insert: 'r', deleteLeft: 0}, p: 0.45 };
         var thr = { sample: { insert: 'e', deleteLeft: 0}, p: 0.55 };
-        var suggestions = composite.predict([thr, the], context);
+        var suggestions = await compositor.predict([thr, the], context);
 
         // Get the top suggest for 'the' and 'thr*'.
         var theSuggestion = suggestions.filter(function (s) { return s.displayAs === 'the' || s.displayAs === '“the”'; })[0];
@@ -423,20 +470,20 @@ describe('ModelCompositor', function() {
         assert.isAbove(theSuggestion.p, thrSuggestion.p);
       });
 
-      it('should produce capitalized suggestions from fully-uppercased input', function() {
+      it('should produce capitalized suggestions from fully-uppercased input', async function() {
         let model = casedModel;
-        var composite = new ModelCompositor(model, true);
+        let compositor = new ModelCompositor(model, true);
 
         // Initialize context
         let context = {
           left: 'TH', startOfBuffer: false, endOfBuffer: true,
         };
-        composite.predict({insert: '', deleteLeft: 0}, context);
+        await compositor.predict({insert: '', deleteLeft: 0}, context);
 
         // Pretend to fat finger "the" as "thr"
         var the = { sample: { insert: 'R', deleteLeft: 0}, p: 0.45 };
         var thr = { sample: { insert: 'E', deleteLeft: 0}, p: 0.55 };
-        var suggestions = composite.predict([thr, the], context);
+        var suggestions = await compositor.predict([thr, the], context);
 
         // Get the top suggest for 'the' and 'thr*'.
         var theSuggestion = suggestions.filter(function (s) { return s.displayAs === 'THE' || s.displayAs === '“THE”'; })[0];
@@ -451,20 +498,20 @@ describe('ModelCompositor', function() {
         assert.isAbove(theSuggestion.p, thrSuggestion.p);
       });
 
-      it('should produce "initial-case" suggestions from input with an initial capital', function() {
+      it('should produce "initial-case" suggestions from input with an initial capital', async function() {
         let model = casedModel;
-        var composite = new ModelCompositor(model, true);
+        let compositor = new ModelCompositor(model, true);
 
         // Initialize context
         let context = {
           left: 'Th', startOfBuffer: false, endOfBuffer: true,
         };
-        composite.predict({insert: '', deleteLeft: 0}, context);
+        await compositor.predict({insert: '', deleteLeft: 0}, context);
 
         // Pretend to fat finger "the" as "thr"
         var the = { sample: { insert: 'r', deleteLeft: 0}, p: 0.45 };
         var thr = { sample: { insert: 'e', deleteLeft: 0}, p: 0.55 };
-        var suggestions = composite.predict([thr, the], context);
+        var suggestions = await compositor.predict([thr, the], context);
 
         // Get the top suggest for 'the' and 'thr*'.
         var theSuggestion = suggestions.filter(function (s) { return s.displayAs === 'The' || s.displayAs === '“The”'; })[0];
@@ -479,20 +526,20 @@ describe('ModelCompositor', function() {
         assert.isAbove(theSuggestion.p, thrSuggestion.p);
       });
 
-      it('also from input with partial capitalization when including an initial capital', function() {
+      it('also from input with partial capitalization when including an initial capital', async function() {
         let model = casedModel;
-        var composite = new ModelCompositor(model, true);
+        let compositor = new ModelCompositor(model, true);
 
         // Initialize context
         let context = {
           left: 'TH', startOfBuffer: false, endOfBuffer: true,
         };
-        composite.predict({insert: '', deleteLeft: 0}, context);
+        await compositor.predict({insert: '', deleteLeft: 0}, context);
 
         // Pretend to fat finger "the" as "thr"
         var the = { sample: { insert: 'r', deleteLeft: 0}, p: 0.45 };
         var thr = { sample: { insert: 'e', deleteLeft: 0}, p: 0.55 };
-        var suggestions = composite.predict([thr, the], context);
+        var suggestions = await compositor.predict([thr, the], context);
 
         // Get the top suggest for 'the' and 'thr*'.
         var theSuggestion = suggestions.filter(function (s) { return s.displayAs.startsWith('The'); })[0];
@@ -508,22 +555,22 @@ describe('ModelCompositor', function() {
   });
 
   describe('Prediction with legacy Models (12.0 / 13.0)', function() {
-    it('should compose suggestions from a fat-fingered keypress (no keying needed)', function () {
+    it('should compose suggestions from a fat-fingered keypress (no keying needed)', async function () {
       var model = new TrieModel(
         jsonFixture('models/tries/english-1000')
       );
-      var composite = new ModelCompositor(model, true);
+      let compositor = new ModelCompositor(model, true);
 
       // Initialize context
       let context = {
         left: 'th', startOfBuffer: false, endOfBuffer: true,
       };
-      composite.predict({insert: '', deleteLeft: 0}, context);
+      await compositor.predict({insert: '', deleteLeft: 0}, context);
 
       // Pretend to fat finger "the" as "thr"
       var the = { sample: { insert: 'r', deleteLeft: 0}, p: 0.45 };
       var thr = { sample: { insert: 'e', deleteLeft: 0}, p: 0.55 };
-      var suggestions = composite.predict([thr, the], context);
+      var suggestions = await compositor.predict([thr, the], context);
 
       // Get the top suggest for 'the' and 'thr*'.
       var theSuggestion = suggestions.filter(function (s) { return s.displayAs === 'the' || s.displayAs === '“the”'; })[0];
@@ -538,22 +585,22 @@ describe('ModelCompositor', function() {
       assert.isAbove(theSuggestion.p, thrSuggestion.p);
     });
 
-    it('should compose suggestions from a fat-fingered keypress (keying needed)', function () {
+    it('should compose suggestions from a fat-fingered keypress (keying needed)', async function () {
       var model = new TrieModel(
         jsonFixture('models/tries/english-1000')
       );
-      var composite = new ModelCompositor(model, true);
+      let compositor = new ModelCompositor(model, true);
 
       // Initialize context
       let context = {
         left: 'Th', startOfBuffer: false, endOfBuffer: true,
       };
-      composite.predict({insert: '', deleteLeft: 0}, context);
+      await compositor.predict({insert: '', deleteLeft: 0}, context);
 
       // Pretend to fat finger "the" as "thr"
       var the = { sample: { insert: 'r', deleteLeft: 0}, p: 0.45 };
       var thr = { sample: { insert: 'e', deleteLeft: 0}, p: 0.55 };
-      var suggestions = composite.predict([thr, the], context);
+      var suggestions = await compositor.predict([thr, the], context);
 
       // Get the top suggest for 'the' and 'thr*'.
       // As of 15.0+, because of #5429, the keep suggestion `"The"` will not be merged
@@ -841,7 +888,7 @@ describe('ModelCompositor', function() {
 
     // While this isn't a state the LMLayer should ever operate within, this provides
     // a useful base state for developing further tests against the method.
-    it('model without traversals: returns appropriate suggestions upon reversion', function() {
+    it('model without traversals: returns appropriate suggestions upon reversion', async function() {
       // This setup matches 'acceptSuggestion' the test case
       // it('first word of context + postTransform provided, .deleteLeft > 0')
       // seen earlier in the file.
@@ -878,7 +925,7 @@ describe('ModelCompositor', function() {
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
       assert.equal(appliedContext.left, "hello ");
 
-      let suggestions = compositor.applyReversion(reversion, appliedContext);
+      let suggestions = await compositor.applyReversion(reversion, appliedContext);
 
       // As this test is a bit... 'hard-wired', we only get the 'keep' suggestion.
       // It should still be accurate, though.
@@ -891,7 +938,7 @@ describe('ModelCompositor', function() {
       assert.deepEqual(suggestions[0].transform, expectedTransform);
     });
 
-    it('model with traversals: returns appropriate suggestions upon reversion', function() {
+    it('model with traversals: returns appropriate suggestions upon reversion', async function() {
       // This setup matches 'acceptSuggestion' the test case
       // it('first word of context + postTransform provided, .deleteLeft > 0')
       // seen earlier in the file.
@@ -911,7 +958,7 @@ describe('ModelCompositor', function() {
       let model = new models.TrieModel(jsonFixture('models/tries/english-1000'), {punctuation: englishPunctuation});
       let compositor = new ModelCompositor(model, true);
 
-      let initialSuggestions = compositor.predict(postTransform, baseContext);
+      let initialSuggestions = await compositor.predict(postTransform, baseContext);
       let keepSuggestion = initialSuggestions[0];
       assert.equal(keepSuggestion.tag, 'keep'); // corresponds to `postTransform`, but the transform isn't equal.
 
@@ -921,13 +968,13 @@ describe('ModelCompositor', function() {
       assert.equal(reversion.id, -baseSuggestion.id);
 
       let appliedContext = models.applyTransform(baseSuggestion.transform, baseContext);
-      let reversionSuggestions = compositor.applyReversion(reversion, appliedContext);
+      let reversionSuggestions = await compositor.applyReversion(reversion, appliedContext);
 
       // The returned suggestion list should match the original suggestion list.
       assert.deepEqual(reversionSuggestions, initialSuggestions);
     });
 
-    it('model with traversals: properly tracks context state', function() {
+    it('model with traversals: properly tracks context state', async function() {
       // Could be merged with the previous test case, but I think it's good to have the error
       // sets flagged separately.
 
@@ -946,7 +993,7 @@ describe('ModelCompositor', function() {
       let model = new models.TrieModel(jsonFixture('models/tries/english-1000'), {punctuation: englishPunctuation});
       let compositor = new ModelCompositor(model, true);
 
-      let initialSuggestions = compositor.predict(postTransform, baseContext);
+      let initialSuggestions = await compositor.predict(postTransform, baseContext);
       const suggestionContextState = compositor.contextTracker.newest;
 
       let keepSuggestion = initialSuggestions[0];

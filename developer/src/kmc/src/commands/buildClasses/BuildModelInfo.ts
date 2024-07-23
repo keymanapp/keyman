@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import * as path from 'path';
 import { BuildActivity } from './BuildActivity.js';
 import { CompilerCallbacks, KeymanFileTypes } from '@keymanapp/common-types';
@@ -62,7 +63,8 @@ export class BuildModelInfo extends BuildActivity {
       return false;
     }
 
-    const lastCommitDate = getLastGitCommitDate(project.projectPath);
+    const historyPath = path.join(project.projectPath, KeymanFileTypes.HISTORY_MD);
+    const lastCommitDate = getLastGitCommitDate(fs.existsSync(historyPath) ? historyPath : project.projectPath);
     const sources = {
       model_id: path.basename(project.projectPath, KeymanFileTypes.Source.Project),
       kmpJsonData,

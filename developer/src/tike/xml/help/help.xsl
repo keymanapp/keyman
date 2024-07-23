@@ -53,6 +53,7 @@
           </script>
       </head>
       <body>
+        <xsl:apply-templates select="//LanguageReference" />
         <xsl:apply-templates select="//Control" />
         <div class="control" id="nohelp">
           Context help is not available for <b><span id="nohelp_name"></span></b>.
@@ -64,6 +65,18 @@
 
   <xsl:template match="/ContextHelp/Form">
     <xsl:apply-templates select="Control" />
+  </xsl:template>
+
+  <xsl:template match="//LanguageReference">
+    <div class="control">
+      <xsl:attribute name="id">language/reference/<xsl:value-of select="@Name"/></xsl:attribute>
+      <div class="title"><xsl:value-of select="@Title"/></div>
+      <xsl:copy-of select="." />
+      <div class="morehelp"><a>
+        <xsl:attribute name='href'>help:language/reference/<xsl:value-of select="@Name"/></xsl:attribute>
+        More help...
+      </a></div>
+    </div>
   </xsl:template>
 
   <xsl:template match="//Control">

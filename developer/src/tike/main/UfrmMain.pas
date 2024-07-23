@@ -1477,8 +1477,12 @@ begin
   if n >= 0 then
     Result.ProjectFile := FGlobalProject.Files[n];
 
-  (Result as frmClass).OpenFile(FFileName);
   LockWindowUpdate(0);
+
+  if not (Result as frmClass).OpenFile(FFileName) then
+  begin
+    Result.Release;
+  end;
 end;
 
 procedure TfrmKeymanDeveloper.HelpTopic(s: string);
