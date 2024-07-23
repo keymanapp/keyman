@@ -393,8 +393,6 @@ TEST_F(CompilerTest, GetDelimitedString_test) {
     EXPECT_FALSE(*p);
     EXPECT_EQ(3, p-str); // deleted close delimiter
 
-    std::cerr << "start debug" << std::endl;
-
     // no argument, two spaces, cut spaces after open and before close delimiter
     u16cpy(str, u"(  )");
     p = str;
@@ -402,8 +400,6 @@ TEST_F(CompilerTest, GetDelimitedString_test) {
     EXPECT_EQ(0, u16cmp(u"", q));
     EXPECT_FALSE(*p);
     EXPECT_EQ(3, p-str); // deleted close delimiter
-
-    std::cerr << "end debug" << std::endl;
 
     // single-character argument, cut spaces after open and before close delimiter, valid
     u16cpy(str, u"(b)");
