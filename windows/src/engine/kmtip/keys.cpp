@@ -35,7 +35,7 @@
 #include "kmtip.h"
 #include "../../../../common/windows/cpp/include/vkeys.h"
 
-#define _DEBUG_LOGKEY
+//#define _DEBUG_LOGKEY
 
 //+---------------------------------------------------------------------------
 //
