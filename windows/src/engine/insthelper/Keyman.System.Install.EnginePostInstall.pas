@@ -35,7 +35,7 @@ var
 begin
 
   Result := False;
-  UpdateStr := 'usWaitingPostInstall';
+  UpdateStr := 'usPostInstall';
     //KL.Log('SetBackgroundState State Entry');
   if RegOpenKeyEx(HKEY_LOCAL_MACHINE, PChar(SRegKey_KeymanEngine_LM), 0, KEY_ALL_ACCESS, hk) = ERROR_SUCCESS then
   begin

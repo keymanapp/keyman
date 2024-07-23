@@ -297,7 +297,8 @@ type
     constructor Create(AParams: TUpdateStateMachineParams);
     function Params: TUpdateStateMachineParams;
   end;
-
+  // Private Utility functions
+  function ConfigCheckContinue: Boolean;
 implementation
 
 uses
@@ -335,7 +336,7 @@ const
 { TUpdateStateMachine }
 
 constructor TUpdateStateMachine.Create(AForce : Boolean);
-var TSerailsedState : TUpdateState;
+// var TSerailsedState : TUpdateState;  // TODO: Remove
 begin
   inherited Create;
 
@@ -448,7 +449,6 @@ var
 begin
   // We will use a registry flag to maintain the state of the background update
 
-  UpdateState := usIdle; // do we need a unknown state ?
   // check the registry value
   with TRegistryErrorControlled.Create do  // I2890
   try
@@ -702,15 +702,15 @@ var
   Result : TRemoteUpdateCheckResult;
 begin
 
+
   { Make a HTTP request out and see if updates are available for now do
     this all in the Idle HandleCheck message. But could be broken into an
     seperate state of WaitngCheck RESP }
   { if Response not OK stay in the idle state and return }
 
 
-  // should be false but forcing check for testing
-  //CheckForUpdates := TRemoteUpdateCheck.Create(True);
-  CheckForUpdates := TRemoteUpdateCheck.Create(False);
+  // If handle check event force check
+  CheckForUpdates := TRemoteUpdateCheck.Create(True);
   try
      Result:= CheckForUpdates.Run;
   finally
@@ -731,8 +731,26 @@ begin
 end;
 
 function IdleState.HandleKmShell;
+var
+ CheckForUpdates: TRemoteUpdateCheck;
+ UpdateCheckResult : TRemoteUpdateCheckResult;
+const CheckPeriod: Integer = 7; // Days between checking for updates
 begin
-
+  // Check if auto updates enable and if scheduled time has expired
+  if ConfigCheckContinue then
+  begin
+    CheckForUpdates := TRemoteUpdateCheck.Create(True);
+    try
+       UpdateCheckResult:= CheckForUpdates.Run;
+    finally
+      CheckForUpdates.Free;
+    end;
+    { Response OK and Update is available }
+    if UpdateCheckResult = wucSuccess then
+    begin
+      ChangeState(UpdateAvailableState);
+    end;
+  end;
   Result := kmShellContinue;
 end;
 
@@ -755,6 +773,7 @@ procedure IdleState.HandleInstallNow;
 begin
   bucStateContext.SetRegistryInstallMode(True);
   bucStateContext.CurrentState.HandleCheck;
+  //  TODO: How do we notify the command line no update available
 end;
 
 function IdleState.StateName;
@@ -771,7 +790,7 @@ begin
   bucStateContext.SetRegistryState(usUpdateAvailable);
   if bucStateContext.FAuto then
   begin
-    bucStateContext.CurrentState.HandleDownload;
+    ChangeState(DownloadingState);
   end;
 end;
 
@@ -787,14 +806,14 @@ end;
 
 procedure UpdateAvailableState.HandleDownload;
 begin
-  ChangeState(DownloadingState);
+
 end;
 
 function UpdateAvailableState.HandleKmShell;
 begin
   if bucStateContext.FAuto then
   begin
-    bucStateContext.CurrentState.HandleDownload ;
+    ChangeState(DownloadingState);;
   end;
   Result := kmShellContinue;
 end;
@@ -822,29 +841,22 @@ end;
 
 function UpdateAvailableState.StateName;
 begin
-
   Result := 'UpdateAvailableState';
 end;
 
 { DownloadingState }
 
 procedure DownloadingState.Enter;
-var DownloadResult : Boolean;
+var DownloadResult, FResult : Boolean;
+RootPath: string;
 begin
   // Enter DownloadingState
   bucStateContext.SetRegistryState(usDownloading);
-  DownloadResult := DownloadUpdatesBackground;
-  if DownloadResult then
-  begin
-    if HasKeymanRun then
-      ChangeState(WaitingRestartState)
-    else
-      ChangeState(InstallingState);
-  end
-  else
-  begin
-    ChangeState(RetryState);
-  end
+  // call seperate process
+  RootPath := ExtractFilePath(ParamStr(0));
+  FResult := TUtilExecute.ShellCurrentUser(0, ParamStr(0), IncludeTrailingPathDelimiter(RootPath), '');
+  if not FResult then
+    KL.Log('TrmfMain: Executing KMshell for download updated Failed');
 end;
 
 procedure DownloadingState.Exit;
@@ -917,7 +929,6 @@ end;
 
 function DownloadingState.DownloadUpdatesBackground: Boolean;
 var
-  i: Integer;
   DownloadBackGroundSavePath : String;
   DownloadResult : Boolean;
   DownloadUpdate: TDownloadUpdate;
@@ -988,7 +999,7 @@ begin
         KL.Log('WaitingRestartState.HandleKmShell No Files in Download Cache');
         // Return to Idle state and check for Updates state
         ChangeState(IdleState);
-        bucStateContext.CurrentState.HandleCheck;
+        bucStateContext.CurrentState.HandleCheck;  // TODO no event here
         Result := kmShellExit;
         // Exit; // again exit was not working
     end
@@ -1075,6 +1086,8 @@ begin
   else if s = '.exe' then
   begin
     KL.Log('TUpdateStateMachine.InstallingState.DoInstallKeyman SavePath:"'+ SavePath+'"');
+    // switch -au for auto update in silent mode.
+    // We will need to add the pop up that says install update now yes/no
     FResult := TUtilExecute.Shell(0, SavePath, '', '-au')  // I3349
   end
   else
@@ -1297,6 +1310,46 @@ begin
   Result := 'PostInstallState';
 end;
 
+// Private Functions:
+function ConfigCheckContinue: Boolean;
+var
+  registry: TRegistryErrorControlled;
+begin
+{ Verify that it has been at least CheckPeriod days since last update check }
+  Result := False;
+  try
+    registry := TRegistryErrorControlled.Create;   // I2890
+    try
+      if registry.OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
+      begin
+        if registry.ValueExists(SRegValue_CheckForUpdates) and not registry.ReadBool(SRegValue_CheckForUpdates) then
+        begin
+          Result := False;
+          Exit;
+        end;
+        if registry.ValueExists(SRegValue_LastUpdateCheckTime) and (Now - registry.ReadDateTime(SRegValue_LastUpdateCheckTime) > CheckPeriod) then
+        begin
+          Result := True;
+        end
+        else
+        begin
+          Result := False;
+        end;
+        Exit;
+      end;
+    finally
+      registry.Free;
+    end;
+  except
+    { we will not run the check if an error occurs reading the settings }
+    on E:Exception do
+    begin
+      Result := False;
+      LogMessage(E.Message);
+      Exit;
+    end;
+  end;
+end;
 
 
 end.
