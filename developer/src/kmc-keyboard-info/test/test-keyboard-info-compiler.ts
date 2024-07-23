@@ -836,7 +836,6 @@ describe('keyboard-info-compiler', function () {
   });
 
   it('handles missing info.version in a package file', async function() {
-    debugger;
     const sources = {
       ...KHMER_ANGKOR_SOURCES,
       kpsFilename: makePathToFixture('missing-info-version-in-kps-11856', 'khmer_angkor.kps')
