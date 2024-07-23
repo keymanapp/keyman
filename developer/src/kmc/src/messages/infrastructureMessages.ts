@@ -115,7 +115,7 @@ export class InfrastructureMessages {
   static ERROR_UnrecognizedMessageCode = SevError | 0x001a;
   static Error_UnrecognizedMessageCode = (o:{message:string}) => m(
     this.ERROR_UnrecognizedMessageCode,
-    `Invalid parameter: message identifier '${def(o.message)}' must match format '[KM]#####'`);
+    `Invalid parameter: message identifier '${def(o.message)}' must match format '[KM]#####' or be a search for a ...`);
 
   static ERROR_MustSpecifyMessageCode = SevError | 0x001b;
   static Error_MustSpecifyMessageCode = () => m(
@@ -136,5 +136,10 @@ export class InfrastructureMessages {
   static Error_OutputPathMustExistAndBeADirectory = (o:{outPath:string}) => m(
     this.ERROR_OutputPathMustExistAndBeADirectory,
     `Output path ${def(o.outPath)} must exist and must be a folder`);
-}
+
+  static ERROR_MessageNamespaceNameNotFound = SevError | 0x001f;
+  static Error_MessageNamespaceNameNotFound = (o:{message: string}) => m(
+    this.ERROR_MessageNamespaceNameNotFound,
+    `Invalid parameter: --message ${def(o.message)} does not have a recognized namespace`);
+ }
 

@@ -1,0 +1,10 @@
+﻿store(&NAME) 'version_auto_caps_lock'
+store(&TARGETS) 'web'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+c Use of CAPS should make compiler select version 10
+
++ [CAPS K_A] > 'a'

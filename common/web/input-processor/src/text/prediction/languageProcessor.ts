@@ -296,7 +296,7 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
     let original = this.getPredictionState(-reversion.transformId);
     if(!original) {
       console.warn("Could not apply the Suggestion!");
-      return Promise.resolve([]);
+      return Promise.resolve([] as Suggestion[]);
     }
 
     // Apply the Reversion!
@@ -312,15 +312,12 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
     outputTarget.apply(transform);
 
     // The reason we need to preserve the additive-inverse 'transformId' property on Reversions.
-    let promise = this.lmEngine.revertSuggestion(reversion, new ContextWindow(original.preInput, this.configuration, null))
+    let promise = this.currentPromise = this.lmEngine.revertSuggestion(reversion, new ContextWindow(original.preInput, this.configuration, null))
+    // If the "current Promise" is as set above, clear it.
+    // If another one has been triggered since... don't.
+    promise.then(() => this.currentPromise = (this.currentPromise == promise) ? null : this.currentPromise);
 
-    return promise.then((suggestions: Suggestion[]) => {
-      let result = new ReadySuggestions(suggestions, transform.id);
-      this.emit("suggestionsready", result);
-      this.currentPromise = null;
-
-      return suggestions;
-    });
+    return promise;
   }
 
   public predictFromTarget(outputTarget: OutputTarget, layerId: string): Promise<Suggestion[]> {
