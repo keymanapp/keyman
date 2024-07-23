@@ -771,6 +771,9 @@ export default class ModelCompositor {
         // A reversion's transform ID is the additive inverse of its original suggestion;
         // we revert to the state of said original suggestion.
         suggestion.transformId = -reversion.transformId;
+        // Prevent auto-selection of any suggestion immediately after a reversion.
+        // It's fine after at least one keystroke, but not before.
+        suggestion.autoAccept = false;
       });
 
       return suggestions;
@@ -813,6 +816,7 @@ export default class ModelCompositor {
       // A reversion's transform ID is the additive inverse of its original suggestion;
       // we revert to the state of said original suggestion.
       suggestion.transformId = -reversion.transformId;
+      suggestion.autoAccept = false;
     });
     return suggestions;
   }

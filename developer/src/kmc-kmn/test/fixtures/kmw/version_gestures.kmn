@@ -1,0 +1,9 @@
+﻿store(&NAME) 'version_gestures'
+store(&TARGETS) 'mobile'
+store(&LAYOUTFILE) 'version_gestures.keyman-touch-layout'
+
+c Use of gestures should make compiler select version 17
+
+begin Unicode > use(main)
+
+group(main) using keys

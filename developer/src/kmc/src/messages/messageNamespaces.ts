@@ -24,7 +24,7 @@ const messageNamespaces: Record<CompilerErrorNamespace, any> = {
 
 // This works around pain points in enumerating enum members in Typescript
 // ref https://www.totaltypescript.com/iterate-over-object-keys-in-typescript
-export const messageNamespaceKeys = Object.keys(messageNamespaces).map(v => Number.parseInt(v));
+export const messageNamespaceKeys = Object.keys(messageNamespaces).map(v => Number.parseInt(v) as CompilerErrorNamespace);
 
 export type CompilerMessageSource = {
   module: string;
