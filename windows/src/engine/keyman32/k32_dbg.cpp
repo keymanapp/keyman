@@ -162,6 +162,7 @@ int SendDebugMessageFormat_1(wchar_t* file, int line, wchar_t* function, char *f
 	va_start(vars, fmt);
 	vsnprintf_s(fmtbuf, _countof(fmtbuf), _TRUNCATE, fmt, vars);  // I2248   // I3547
 	fmtbuf[255] = 0;
+	va_end(vars);
 	SendDebugMessage_1(file, line, function, fmtbuf);
 
   return 0;
