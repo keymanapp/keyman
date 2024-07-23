@@ -1749,8 +1749,7 @@ PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_W
     {
       r--;							// Cut off following spaces
       while (iswspace(*r) && r > q) r--;
-      if (!iswspace(*r))
-        r++;
+      if (!iswspace(*r)) r++;
 
       *r = 0; // delete first following space
 
