@@ -3,7 +3,7 @@ import { KMX } from "@keymanapp/common-types";
 
 import { callbacks, FCallFunctions, FFix183_LadderLength, FMnemonic, FTabStop, FUnreachableKeys,
          kmxResult, nl, options, isKeyboardVersion10OrLater, isKeyboardVersion14OrLater,
-         verifyMinimumRequiredKeymanVersion10 } from "./compiler-globals.js";
+         verifyAndSetMinimumRequiredKeymanVersion10 } from "./compiler-globals.js";
 import { KmwCompilerMessages } from "./kmw-compiler-messages.js";
 import { FormatModifierAsBitflags, RuleIsExcludedByPlatform } from "./kmw-compiler.js";
 import { KMXCodeNames, SValidIdentifierCharSet, UnreachableKeyCodes, USEnglishShift,
@@ -258,7 +258,7 @@ export function JavaScript_Shift(fkp: KMX.KEY, FMnemonic: boolean): number {
 
     // Non-chiral support only and no support for state keys
     if (fkp.ShiftFlags & (KMX.KMXFile.LCTRLFLAG | KMX.KMXFile.RCTRLFLAG | KMX.KMXFile.LALTFLAG | KMX.KMXFile.RALTFLAG)) {   // I4118
-      if(verifyMinimumRequiredKeymanVersion10()) {
+      if(verifyAndSetMinimumRequiredKeymanVersion10()) {
         // upgrade to v10 if possible
         return fkp.ShiftFlags;
       }
@@ -268,7 +268,7 @@ export function JavaScript_Shift(fkp: KMX.KEY, FMnemonic: boolean): number {
     if (fkp.ShiftFlags & (
       KMX.KMXFile.CAPITALFLAG | KMX.KMXFile.NOTCAPITALFLAG | KMX.KMXFile.NUMLOCKFLAG | KMX.KMXFile.NOTNUMLOCKFLAG |
       KMX.KMXFile.SCROLLFLAG | KMX.KMXFile.NOTSCROLLFLAG)) {   // I4118
-        if(verifyMinimumRequiredKeymanVersion10()) {
+        if(verifyAndSetMinimumRequiredKeymanVersion10()) {
           // upgrade to v10 if possible
           return fkp.ShiftFlags;
         }
