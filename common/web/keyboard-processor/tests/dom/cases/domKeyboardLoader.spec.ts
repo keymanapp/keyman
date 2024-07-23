@@ -22,7 +22,7 @@ const device: DeviceSpec = {
 describe('Keyboard loading in DOM', function() {
   afterEach(() => {
     if (KeymanWeb) {
-      (KeymanWeb as KeyboardInterface).uninstall();
+      KeymanWeb.uninstall();
     }
   })
 
