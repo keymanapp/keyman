@@ -270,7 +270,7 @@ extern "C" uint8_t IM_CallBackCore(km_core_state *km_state, uint32_t UniqueStore
   SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: td TIPFUpdatable about to call function [%s]", imdh->name);
   LogContext(_td->lpActiveKeyboard->lpCoreKeyboardState, CONTEXT_CORE);
   LogContext(_td->lpActiveKeyboard->lpCoreKeyboardState, CONTEXT_INT);
-  (*imdh->function)(_td->state.msg.hwnd, _td->state.vkey, _td->state.charCode, Globals::get_ShiftState());
+  (*imdh->function)(GetFocus(), _td->state.vkey, _td->state.charCode, Globals::get_ShiftState());
 
   //SendDebugMessageFormat(0, sdmKeyboard, 0, "IM_CallBackCore: Exit");
   return TRUE;

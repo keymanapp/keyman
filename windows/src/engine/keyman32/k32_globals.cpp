@@ -73,8 +73,6 @@ UINT
   //TODO: consolidate these messages -- they are probably not all required now
   wm_keyman = 0,						// user message - ignore msg   // I3594
 
-	wm_keymankeydown = 0,
-	wm_keymankeyup = 0,
   wm_keyman_grabwindowproc = 0,
 	wm_keyman_refresh = 0,
 	wm_kmgetactivekeymanid = 0,

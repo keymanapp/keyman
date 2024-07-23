@@ -179,6 +179,7 @@
 #define CERR_ExtendedStringTooLong                         0x00004076
 #define CERR_VirtualKeyExpansionTooLong                    0x00004077
 #define CERR_CharacterRangeTooLong                         0x00004078
+#define CERR_NonBMPCharactersNotSupportedInKeySection      0x00004079
 
 #define CERR_InvalidTarget                                 0x00004079
 #define CERR_NoTargetsSpecified                            0x0000407A

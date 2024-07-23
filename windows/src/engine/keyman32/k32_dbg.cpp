@@ -225,13 +225,7 @@ void DebugMessage(LPMSG msg, WPARAM wParam)  // I2908
 {
 	char ds[256];
 
-	if(msg->message == wm_keymankeydown)
-    wsprintf(ds, "DebugMessage(%x, wm_keymankeydown: %s lParam: %X) [message flags: %x time: %d]", PtrToInt(msg->hwnd),
-      Debug_VirtualKey((WORD) msg->wParam), (unsigned int) msg->lParam, wParam, (int) msg->time);
-	else if(msg->message == wm_keymankeyup)
-    wsprintf(ds, "DebugMessage(%x, wm_keymankeyup: %s lParam: %X) [message flags: %x time: %d]", PtrToInt(msg->hwnd),
-      Debug_VirtualKey((WORD) msg->wParam), (unsigned int) msg->lParam, wParam, (int) msg->time);
-  else if (msg->message == WM_KEYMAN_KEY_EVENT)
+  if (msg->message == WM_KEYMAN_KEY_EVENT)
     wsprintf(ds, "DebugMessage(%x, WM_KEYMAN_KEY_EVENT: %s lParam: %X) [message flags: %x time: %d]", PtrToInt(msg->hwnd),
       Debug_VirtualKey((WORD)msg->wParam), (unsigned int) msg->lParam, wParam, (int) msg->time);
   else if(msg->message == WM_KEYDOWN || msg->message == WM_KEYUP || msg->message == WM_SYSKEYDOWN || msg->message == WM_SYSKEYUP)

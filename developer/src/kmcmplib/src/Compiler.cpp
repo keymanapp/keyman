@@ -97,6 +97,8 @@
 #include <codecvt>
 #include <locale>
 #include <string>
+#include <iostream>
+#include <sstream>
 
 #include "UnreachableRules.h"
 #include "CheckForDuplicates.h"
@@ -134,6 +136,7 @@ namespace kmcmp{
 
 int xatoi(PKMX_WCHAR *p);
 int atoiW(PKMX_WCHAR p);
+bool isIntegerWstring(PKMX_WCHAR p);
 void safe_wcsncpy(PKMX_WCHAR out, PKMX_WCHAR in, int cbMax);
 int GetDeadKey(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 
@@ -1492,7 +1495,14 @@ KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnico
 
     str = p + 1;
     if ((msg = GetXString(fk, str, u">", pklKey, GLOBAL_BUFSIZE - 1, (int)(str - pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
+
     if (pklKey[0] == 0) return CERR_ZeroLengthString;
+
+    if(Uni_IsSurrogate1(pklKey[0])) {
+      // #11643: non-BMP characters do not makes sense for key codes
+      return CERR_NonBMPCharactersNotSupportedInKeySection;
+    }
+
     if (xstrlen(pklKey) > 1) AddWarning(CWARN_KeyBadLength);
   } else {
     if ((msg = GetXString(fk, str, u">", pklIn, GLOBAL_BUFSIZE - 1, (int)(str - pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
@@ -1674,9 +1684,10 @@ KMX_DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, KMX_DWORD storeIndex)
       default:
         return CERR_CodeInvalidInKeyStore;
       }
-    }
-    else
-    {
+    } else if(Uni_IsSurrogate1(*pn)) {
+      // #11643: non-BMP characters do not makes sense for key codes
+      return CERR_NonBMPCharactersNotSupportedInKeySection;
+    } else {
       k->Key = *pn;				// set the key to store offset.
       k->ShiftFlags = 0;
     }
@@ -2034,7 +2045,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
           kmcmp::CheckStoreUsage(fk, i, TRUE, FALSE, FALSE);
 
           r = u16tok(NULL, p_sep_com, &context);  // I3481
-          if (!r) return CERR_InvalidIndex;
+          if (!r || !*r || !isIntegerWstring(r) || atoiW(r) < 1) return CERR_InvalidIndex;
         }
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_INDEX;
@@ -3380,6 +3391,26 @@ int atoiW(PKMX_WCHAR p)
   int i = atoi(q);
   delete[] q;
   return i;
+}
+
+/**
+ * Checks if a wide-character C-string represents an integer.
+ * It does not strip whitespace, and depends on the action of atoi()
+ * to determine if the C-string is an integer.
+ *
+ * @param p a pointer to a wide-character C-string
+ *
+ * @return true if p represents an integer, false otherwise
+*/
+bool isIntegerWstring(PKMX_WCHAR p) {
+  if (!p || !*p)
+    return false;
+  PKMX_STR q = wstrtostr(p);
+  std::ostringstream os;
+  os << atoi(q);
+  int cmp = strcmp(q, os.str().c_str());
+  delete[] q;
+  return cmp == 0 ? true : false;
 }
 
 KMX_DWORD kmcmp::CheckUTF16(int n)
