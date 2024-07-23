@@ -106,6 +106,21 @@ export function verifyMinimumRequiredKeymanVersion15(): boolean {
   return verifyMinimumRequiredKeymanVersion(KMX.KMX_Version.VERSION_150);
 }
 
+/**
+ * Verify that minimum supported Keyman version in the keyboard is version 17.0,
+ * and upgrade to that version if possible and necessary.
+ *
+ * Will upgrade the minimum version to 17.0 if `KF_AUTOMATICVERSION` flag is set
+ * for the keyboard, which correlates to having no `store(&version)` line in the
+ * .kmn source file.
+ *
+ * @returns `true` if the version is now 17.0 or higher, `false` if a lower
+ * version has been specified in the source file `store(&version)` line.
+ */
+export function verifyMinimumRequiredKeymanVersion17(): boolean {
+  return verifyMinimumRequiredKeymanVersion(KMX.KMX_Version.VERSION_170);
+}
+
 export function isKeyboardVersion10OrLater(): boolean {
   return fk.fileVersion >= KMX.KMXFile.VERSION_100;
 }
