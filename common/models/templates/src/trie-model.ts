@@ -73,15 +73,6 @@ export interface TrieModelOptions {
   punctuation?: LexicalModelPunctuation;
 }
 
-/**
- * Used to determine the probability of an entry from the trie.
- */
-type TextWithProbability = {
-  text: string;
-  // TODO: use negative-log scaling instead?
-  p: number; // real-number weight, from 0 to 1
-}
-
 class Traversal implements LexiconTraversal {
   /**
    * The lexical prefix corresponding to the current traversal state.
@@ -94,13 +85,74 @@ class Traversal implements LexiconTraversal {
    */
   root: Node;
 
-  constructor(root: Node, prefix: string) {
+  /**
+   * The max weight for the Trie being 'traversed'.  Needed for probability
+   * calculations.
+   */
+  totalWeight: number;
+
+  constructor(root: Node, prefix: string, totalWeight: number) {
     this.root = root;
     this.prefix = prefix;
+    this.totalWeight = totalWeight;
   }
 
-  *children(): Generator<{char: string, traversal: () => LexiconTraversal}> {
+  child(char: USVString): LexiconTraversal | undefined {
+    /*
+      Note: would otherwise return the current instance if `char == ''`.  If
+      such a call is happening, it's probably indicative of an implementation
+      issue elsewhere - let's signal now in order to catch such stuff early.
+    */
+    if(char == '') {
+      return undefined;
+    }
+
+    // Split into individual code units.
+    let steps = char.split('');
+    let traversal: Traversal | undefined = this;
+
+    while(steps.length > 0 && traversal) {
+      const step: string = steps.shift()!;
+      traversal = traversal._child(step);
+    }
+
+    return traversal;
+  }
+
+  // Handles one code unit at a time.
+  private _child(char: USVString): Traversal | undefined {
+    const root = this.root;
+    const totalWeight = this.totalWeight;
+    const nextPrefix = this.prefix + char;
+
+    if(root.type == 'internal') {
+      let childNode = root.children[char];
+      if(!childNode) {
+        return undefined;
+      }
+
+      return new Traversal(childNode, nextPrefix, totalWeight);
+    } else {
+      // root.type == 'leaf';
+      const legalChildren = root.entries.filter(function(entry) {
+        return entry.key.indexOf(nextPrefix) == 0;
+      });
+
+      if(!legalChildren.length) {
+        return undefined;
+      }
+
+      return new Traversal(root, nextPrefix, totalWeight);
+    }
+  }
+
+  *children(): Generator<{char: USVString, traversal: () => LexiconTraversal}> {
     let root = this.root;
+
+    // We refer to the field multiple times in this method, and it doesn't change.
+    // This also assists minification a bit, since we can't minify when re-accessing
+    // through `this.`.
+    const totalWeight = this.totalWeight;
 
     if(root.type == 'internal') {
       for(let entry of root.values) {
@@ -119,7 +171,7 @@ class Traversal implements LexiconTraversal {
               let prefix = this.prefix + entry + lowSurrogate;
               yield {
                 char: entry + lowSurrogate,
-                traversal: function() { return new Traversal(internalNode.children[lowSurrogate], prefix) }
+                traversal: function() { return new Traversal(internalNode.children[lowSurrogate], prefix, totalWeight) }
               }
             }
           } else {
@@ -130,7 +182,7 @@ class Traversal implements LexiconTraversal {
 
             yield {
               char: entry,
-              traversal: function () {return new Traversal(entryNode, prefix)}
+              traversal: function () {return new Traversal(entryNode, prefix, totalWeight)}
             }
           }
         } else if(isSentinel(entry)) {
@@ -142,7 +194,7 @@ class Traversal implements LexiconTraversal {
           let prefix = this.prefix + entry;
           yield {
             char: entry,
-            traversal: function() { return new Traversal(entryNode, prefix)}
+            traversal: function() { return new Traversal(entryNode, prefix, totalWeight)}
           }
         }
       }
@@ -164,29 +216,40 @@ class Traversal implements LexiconTraversal {
         }
         yield {
           char: nodeKey,
-          traversal: function() { return new Traversal(root, prefix + nodeKey)}
+          traversal: function() { return new Traversal(root, prefix + nodeKey, totalWeight)}
         }
       };
       return;
     }
   }
 
-  get entries(): string[] {
+  get entries() {
+    const entryMapper = (value: Entry) => {
+      return {
+        text: value.content,
+        p: value.weight / this.totalWeight
+      }
+    }
+
     if(this.root.type == 'leaf') {
       let prefix = this.prefix;
       let matches = this.root.entries.filter(function(entry) {
         return entry.key == prefix;
       });
 
-      return matches.map(function(value) { return value.content });
+      return matches.map(entryMapper);
     } else {
       let matchingLeaf = this.root.children[SENTINEL_CODE_UNIT];
       if(matchingLeaf && matchingLeaf.type == 'leaf') {
-        return matchingLeaf.entries.map(function(value) { return value.content });
+        return matchingLeaf.entries.map(entryMapper);
       } else {
         return [];
       }
     }
+  }
+
+  get p(): number {
+    return this.root.weight / this.totalWeight;
   }
 }
 
@@ -285,7 +348,7 @@ export default class TrieModel implements LexicalModel {
   }
 
   public traverseFromRoot(): LexiconTraversal {
-    return new Traversal(this._trie['root'], '');
+    return this._trie.traverseFromRoot();
   }
 };
 
@@ -306,11 +369,10 @@ export default class TrieModel implements LexicalModel {
 type SearchKey = string & { _: 'SearchKey'};
 
 /**
- * The priority queue will always pop the most weighted item. There can only
- * be two kinds of items right now: nodes, and entries; both having a weight
- * attribute.
+ * The priority queue will always pop the most probable item - be it a Traversal
+ * state or a lexical entry reached via Traversal.
  */
-type Weighted = Node | Entry;
+type TraversableWithProb = TextWithProbability | LexiconTraversal;
 
 /**
  * A function that converts a string (word form or query) into a search key
@@ -366,9 +428,9 @@ interface Entry {
  * Wrapper class for the trie and its nodes.
  */
 class Trie {
-  private root: Node;
+  public readonly root: Node;
   /** The total weight of the entire trie. */
-  private totalWeight: number;
+  readonly totalWeight: number;
   /**
    * Converts arbitrary strings to a search key. The trie is built up of
    * search keys; not each entry's word form!
@@ -381,6 +443,10 @@ class Trie {
     this.totalWeight = totalWeight;
   }
 
+  public traverseFromRoot(): LexiconTraversal {
+    return new Traversal(this.root, '', this.totalWeight);
+  }
+
   /**
    * Lookups an arbitrary prefix (a query) in the trie. Returns the top 3
    * results in sorted order.
@@ -389,12 +455,8 @@ class Trie {
    */
   lookup(prefix: string): TextWithProbability[] {
     let searchKey = this.toKey(prefix);
-    let lowestCommonNode = findPrefix(this.root, searchKey);
-    if (lowestCommonNode === null) {
-      return [];
-    }
-
-    return getSortedResults(lowestCommonNode, searchKey, this.totalWeight);
+    let rootTraversal = this.traverseFromRoot().child(searchKey);
+    return rootTraversal ? getSortedResults(rootTraversal) : [];
   }
 
   /**
@@ -402,34 +464,8 @@ class Trie {
    * @param n How many suggestions, maximum, to return.
    */
   firstN(n: number): TextWithProbability[] {
-    return getSortedResults(this.root, '' as SearchKey, this.totalWeight, n);
+    return getSortedResults(this.traverseFromRoot(), n);
   }
-}
-
-/**
- * Finds the deepest descendent in the trie with the given prefix key.
- *
- * This means that a search in the trie for a given prefix has a best-case
- * complexity of O(m) where m is the length of the prefix.
- *
- * @param key The prefix to search for.
- * @param index The index in the prefix. Initially 0.
- */
-function findPrefix(node: Node, key: SearchKey, index: number = 0): Node | null {
-  // An important note - the Trie itself is built on a per-JS-character basis,
-  // not on a UTF-8 character-code basis.
-  if (node.type === 'leaf' || index === key.length) {
-    return node;
-  }
-
-  // So, for SMP models, we need to match each char of the supplementary pair
-  // in sequence.  Each has its own node in the Trie.
-  let char = key[index];
-  if (node.children[char]) {
-    return findPrefix(node.children[char], key, index + 1);
-  }
-
-  return null;
 }
 
 /**
@@ -440,72 +476,36 @@ function findPrefix(node: Node, key: SearchKey, index: number = 0): Node | null 
  * @param results the current results
  * @param queue
  */
-function getSortedResults(node: Node, prefix: SearchKey, N: number, limit = MAX_SUGGESTIONS): TextWithProbability[] {
-  let queue = new PriorityQueue(function(a: Weighted, b: Weighted) {
+function getSortedResults(traversal: LexiconTraversal, limit = MAX_SUGGESTIONS): TextWithProbability[] {
+  let queue = new PriorityQueue(function(a: TraversableWithProb, b: TraversableWithProb) {
     // In case of Trie compilation issues that emit `null` or `undefined`
-    return (b ? b.weight : 0) - (a ? a.weight : 0);
+    return (b ? b.p : 0) - (a ? a.p : 0);
   });
   let results: TextWithProbability[] = [];
 
-  if (node.type === 'leaf') {
-    // Assuming the values are sorted, we can just add all of the values in the
-    // leaf, until we reach the limit.
-    for (let item of node.entries) {
-      // String.startsWith is not supported on certain Android (5.0) devices we wish to support.
-      // Requires a minimum of Chrome 36, as opposed to 5.0's default of 35.
-      if (item.key.indexOf(prefix) == 0) {
-        let { content, weight } = item;
-        results.push({
-          text: content,
-          p: weight / N
-        });
+  queue.enqueue(traversal);
 
-        if (results.length >= limit) {
-          return results;
-        }
-      }
-    }
-  } else {
-    queue.enqueue(node);
-    let next: Weighted | undefined;
+  while(queue.count > 0) {
+    const entry = queue.dequeue();
 
-    while (next = queue.dequeue()) {
-      if (isNode(next)) {
-        // When a node is next up in the queue, that means that next least
-        // likely suggestion is among its decsendants.
-        // So we search all of its descendants!
-        if (next.type === 'leaf') {
-          queue.enqueueAll(next.entries);
-        } else {
-          // XXX: alias `next` so that TypeScript can be SURE that internal is
-          // in fact an internal node. Because of the callback binding to the
-          // original definition of node (i.e., a Node | Entry), this will not
-          // type-check otherwise.
-          let internal = next;
-          queue.enqueueAll(next.values.map(char => {
-            return internal.children[char];
-          }));
-        }
-      } else {
-        // When an entry is up next in the queue, we just add its contents to
-        // the results!
-        results.push({
-          text: next.content,
-          p: next.weight / N
-        });
-        if (results.length >= limit) {
-          return results;
-        }
+    if((entry as TextWithProbability)!.text !== undefined) {
+      const lexicalEntry = entry as TextWithProbability;
+      results.push(lexicalEntry);
+      if(results.length >= limit) {
+        return results;
       }
+    } else {
+      const traversal = entry as LexiconTraversal;
+      queue.enqueueAll(traversal.entries);
+      let children: LexiconTraversal[] = []
+      for(let child of traversal.children()) {
+        children.push(child.traversal());
+      }
+      queue.enqueueAll(children);
     }
   }
+
   return results;
-
-}
-
-/** TypeScript type guard that returns whether the thing is a Node. */
-function isNode(x: Entry | Node): x is Node {
-  return 'type' in x;
 }
 
 /**

@@ -26,6 +26,8 @@
    // I5136
 #include "pch.h"
 
+// This file is used only in keyman32.dll; it tracks hotkeys for Keyman keyboard
+// switching and events
 #ifndef _WIN64
 
 Hotkeys *g_Hotkeys = NULL;   // I4326

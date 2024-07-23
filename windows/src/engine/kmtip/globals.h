@@ -45,7 +45,20 @@ void DllRelease();
 
 void InsertTextAtSelection(TfEditCookie ec, ITfContext *pContext, const WCHAR *pchText, ULONG cchText);
 void DeleteLeftOfSelection(TfEditCookie ec, ITfContext *pContext, LONG n);
-BOOL GetLeftOfSelection(TfEditCookie ec, ITfContext *pContext, WCHAR *buf, LONG n);   // I4933
+/**
+ * Retrieves the text to the left of the current selection in the context.
+ * In addition it also returns the output values of the TSF call 'GetSelection'.
+ * 
+ * @param[in]   ec               The edit cookie.
+ * @param[in]   pContext         The text input context.
+ * @param[out]  buf              The buffer to store the text.
+ * @param[in]   n                The maximum number of characters to retrieve.
+ * @param[out]  hrGetSelection   The result of the 'GetSelection' call.
+ * @param[out]  cFetched         The number of selections fetched.
+ * @param[out]  tfSelection      The selection details.
+ * @return                       TRUE if successful, otherwise FALSE.
+ */
+BOOL GetLeftOfSelection(TfEditCookie ec, ITfContext *pContext, WCHAR *buf, LONG n, HRESULT *hrGetSelection, ULONG *cFetched, TF_SELECTION *tfSelection);  // I4933
 void GetDeadkeyFlags(TfEditCookie ec, ITfContext *pContext, PWSTR buf, int n);
 
 //

@@ -37,6 +37,7 @@
 #include "pch.h"
 #include "kbd.h"	/* DDK kbdlayout */
 
+// This file is used only in keyman32.dll; it maps syskbd for x86 builds of Windows
 #ifndef _WIN64
 
 extern BOOL KeyboardGivesCtrlRAltForRAlt_NT_x64();

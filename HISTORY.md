@@ -1,5 +1,34 @@
 # Keyman Version History
 
+## 18.0.72 alpha 2024-07-22
+
+* fix(web): remedy unit-test stability issues (#11933)
+* refactor(web): fix TypeScript errors and warnings (#11911)
+
+## 18.0.71 alpha 2024-07-18
+
+* chore(windows): add comments for _WIN64 tests (#11929)
+* chore(common): Update Crowdin strings for Portuguese (#11974)
+
+## 18.0.70 alpha 2024-07-08
+
+* feat(web): provide lexicon probabilities directly on the search path (#11868)
+* feat(common/models): support direct-child access for Trie node iteration (#11869)
+* change(common/models/templates): rework Trie predict method to utilize traversals (#11870)
+* change(web): track the base correction for generated predictions (#11875)
+* feat(web): add and enable auto-correction (#11866)
+
+## 18.0.69 alpha 2024-07-05
+
+* fix(core): allow to successfully build on Ubuntu 24.04 (#11926)
+* chore(windows): correct output file for 64-bit build of keyman32 in build.sh (#11930)
+* chore(android,ios): Add Crowdin localization for Polytonic Greek (#11877)
+
+## 18.0.68 alpha 2024-07-04
+
+* refactor(windows): merge keyman64 build into keyman32 (#11906)
+* refactor(windows): remove wm_keyman_keydown and wm_keyman_keyup (#11920)
+
 ## 18.0.67 alpha 2024-07-03
 
 * refactor(common/models): move TS priority-queue implementation to web-utils (#11867)

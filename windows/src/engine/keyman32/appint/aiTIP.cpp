@@ -274,9 +274,12 @@ BOOL AITIP::ReadContext(PWSTR buf) {
   }
 
   PKEYMAN64THREADDATA _td = ThreadGlobals();
-  if(!_td) return FALSE;
 
-	if(_td->TIPGetContext && (*_td->TIPGetContext)(MAXCONTEXT-1, buf) == S_OK) {   // I3575   // I4262
+  if(!_td) {
+    return FALSE;
+  }
+
+  if (_td->TIPGetContext && (*_td->TIPGetContext)(MAXCONTEXT - 1, buf, &isTextSelected) == S_OK) {  // I3575   // I4262
     if(ShouldDebug()) {
       SendDebugMessageFormat("full context [Updateable=%d] %s", _td->TIPFUpdateable, Debug_UnicodeString(buf));
     }

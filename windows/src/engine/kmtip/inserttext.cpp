@@ -171,13 +171,20 @@ char *debugstr(PWSTR buf) {
 	return bufout;
 }
 
-BOOL GetLeftOfSelection(TfEditCookie ec, ITfContext *pContext, WCHAR *buf, LONG n)   // I4933
+BOOL
+GetLeftOfSelection(
+  TfEditCookie ec,
+  ITfContext *pContext,
+  WCHAR *buf,
+  LONG n,
+  HRESULT *hrGetSelection,
+  ULONG *cFetched,
+  TF_SELECTION *tfSelection)  // I4933
 {
   SendDebugEntry();
 
-  TF_SELECTION tfSelection = {0};
-  TF_STATUS tfStatus = {0};
-	ULONG cFetched;
+  TF_SELECTION tfSelectionLocal = {0};
+  ULONG cFetchedLocal;
 	LONG outn;
 	ITfRange *pRange, *pRangeEnd;
   HRESULT hr;
@@ -210,10 +217,10 @@ BOOL GetLeftOfSelection(TfEditCookie ec, ITfContext *pContext, WCHAR *buf, LONG 
   }
 
   BOOL bTreatAsTransitory = FALSE;
-  if(!SUCCEEDED(hr = pRange->GetText(ec, 0, buf, n, &cFetched))) {
+  if(!SUCCEEDED(hr = pRange->GetText(ec, 0, buf, n, &cFetchedLocal))) {
     SendDebugMessageFormat(L"Exit -- Failed GetRange (all text to 63 chars) = %x", hr);
     bTreatAsTransitory = TRUE;
-  } else if(cFetched == 0) {
+  } else if(cFetchedLocal == 0) {
     SendDebugMessageFormat(L"Exit -- no text in edit control, treating as transitory");
     bTreatAsTransitory = TRUE;
   }
@@ -231,50 +238,57 @@ BOOL GetLeftOfSelection(TfEditCookie ec, ITfContext *pContext, WCHAR *buf, LONG 
     to read the range to the left of the selection - up to (n) characters.
   */
 
-  if(!SUCCEEDED(hr = pContext->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &tfSelection, &cFetched)))   // I3565
+  if (!SUCCEEDED(hr = *hrGetSelection = pContext->GetSelection(ec, TF_DEFAULT_SELECTION, 1, tfSelection, cFetched)))  // I3565
 	{
 		SendDebugMessageFormat(L"Exit -- Failed GetSelection = %x", hr);   // I3565
     return_SendDebugExit(FALSE);
 	}
 
-  if(cFetched == 0)   // I3565
+  // copy the values for local processing, preserving the function call variables
+  cFetchedLocal    = *cFetched;
+  tfSelectionLocal = *tfSelection;
+  if (tfSelectionLocal.range) {
+    tfSelectionLocal.range->AddRef();
+  }
+
+  if(cFetchedLocal == 0)   // I3565
   {
-    SendDebugMessageFormat(L"Exit -- cFetched == 0");   // I3565
-    if(tfSelection.range != NULL)
-      tfSelection.range->Release();
+    SendDebugMessageFormat(L"Exit -- cFetchedLocal == 0");   // I3565
+    if(tfSelectionLocal.range != NULL)
+      tfSelectionLocal.range->Release();
     return_SendDebugExit(FALSE);
   }
 
-	if(!SUCCEEDED(hr = tfSelection.range->Clone(&pRange)))   // I3565
+	if(!SUCCEEDED(hr = tfSelectionLocal.range->Clone(&pRange)))   // I3565
   {
     SendDebugMessageFormat(L"Failed range->Clone = %x", hr);   // I3565
-    tfSelection.range->Release();
+    tfSelectionLocal.range->Release();
     return_SendDebugExit(FALSE);
   }
 
 	if(!SUCCEEDED(hr = pRange->Collapse(ec, TF_ANCHOR_START)))   // I3565
   {
     SendDebugMessageFormat(L"Failed range->Collapse = %x", hr);   // I3565
-    tfSelection.range->Release();
+    tfSelectionLocal.range->Release();
     pRange->Release();
     return_SendDebugExit(FALSE);
   }
 	if(!SUCCEEDED(hr = pRange->ShiftStart(ec, -n, &outn, NULL)))   // I3565
   {
     SendDebugMessageFormat(L"Failed range->ShiftStart = %x", hr);   // I3565
-    tfSelection.range->Release();
+    tfSelectionLocal.range->Release();
     pRange->Release();
     return_SendDebugExit(FALSE);
   }
 
   BOOL result = TRUE;
 
-	if(SUCCEEDED(hr = pRange->GetText(ec, 0, buf, n, &cFetched)))   // I3565
+	if(SUCCEEDED(hr = pRange->GetText(ec, 0, buf, n, &cFetchedLocal)))   // I3565
   {
-		buf[cFetched] = 0;
+		buf[cFetchedLocal] = 0;
     if(ShouldDebug()) {
       char *p = debugstr(buf);
-      SendDebugMessageFormat(L"(%d) = %hs [%d fetched]", n, p, cFetched);
+      SendDebugMessageFormat(L"(%d) = %hs [%d fetched]", n, p, cFetchedLocal);
       delete[] p;
     }
 #ifdef DEBUG_PSEUDO   // I3607
@@ -289,7 +303,7 @@ BOOL GetLeftOfSelection(TfEditCookie ec, ITfContext *pContext, WCHAR *buf, LONG 
   }
 
 	pRange->Release();
-  tfSelection.range->Release();
+  tfSelectionLocal.range->Release();
 
   return_SendDebugExit(result);
 }

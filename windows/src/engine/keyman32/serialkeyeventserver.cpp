@@ -3,6 +3,7 @@
 #include "security.h"
 #include "kbd.h"
 
+// This file is used only in keyman32.dll; implements the serial key event server
 #ifndef _WIN64
 
 /*

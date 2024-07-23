@@ -62,6 +62,10 @@
 #include "pch.h"
 #include <Psapi.h>
 
+// This file is used only in keyman32.dll; it has support functions for hotkeys
+// which used to be in a keyboard hook but are now in the low-level keyboard
+// hook
+// TODO: rename this file
 #ifndef _WIN64
 
    // I3617

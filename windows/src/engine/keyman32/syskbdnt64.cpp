@@ -32,9 +32,10 @@
 
 #include "pch.h"
 
+// This file is used only in keyman32.dll; it maps syskbd for x64 builds of Windows
 #ifndef _WIN64
 
-#include "kbd.h"	/* DDK kbdlayout */ 
+#include "kbd.h"	/* DDK kbdlayout */
 
 //#pragma warning ( disable : 4200 )
 
