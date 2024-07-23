@@ -946,7 +946,6 @@ export function zeroPadHex(n: number, len: number): string {
  * @return string of JavaScript code, e.g. 'keyCodes.K_A /* 0x41 * /'
  */
 function FormatKeyAsString(key: number): string {
-  // TODO: automatic version upgrade
   if(isKeyboardVersion10OrLater()) {
     // Depends on flags defined in KeymanWeb 10.0
     if (key <= 255 && KMWVKeyNames[key] != '') {
