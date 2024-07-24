@@ -1,0 +1,11 @@
+﻿store(&NAME) 'version_9_caps_lock'
+store(&TARGETS) 'web'
+store(&VERSION) '9.0'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+c Use of CAPS should make compiler generate warning Warn_ExtendedShiftFlagsNotSupportedInKeymanWeb
+
++ [CAPS K_A] > 'a'

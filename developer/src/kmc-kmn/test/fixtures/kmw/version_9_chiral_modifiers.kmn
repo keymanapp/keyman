@@ -1,0 +1,11 @@
+﻿store(&NAME) 'version_9_chiral_modifiers'
+store(&TARGETS) 'web'
+store(&VERSION) '9.0'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+c Use of LCTRL should make compiler generate warning Warn_ExtendedShiftFlagsNotSupportedInKeymanWeb
+
++ [LCTRL K_A] > 'a'
