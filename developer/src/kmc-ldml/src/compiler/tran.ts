@@ -1,5 +1,6 @@
 import { constants, SectionIdent } from "@keymanapp/ldml-keyboard-constants";
-import { KMXPlus, LDMLKeyboard, CompilerCallbacks, VariableParser, MarkerParser, util } from '@keymanapp/common-types';
+import { KMXPlus, LDMLKeyboard, CompilerCallbacks, VariableParser, MarkerParser } from '@keymanapp/common-types';
+import * as util from '@keymanapp/common-types/utils';
 import { SectionCompiler } from "./section-compiler.js";
 
 import Bksp = KMXPlus.Bksp;
