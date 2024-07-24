@@ -282,12 +282,6 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 
     if(!*Globals::hwndIMAlways())
     {
-/* TODO: IM windows no longer receive these messages, what is going on? #11919?
-      if(mp->message == wxm_keymankeydown)
-        PostMessage(*Globals::hwndIM(), WM_KEYDOWN, mp->wParam, mp->lParam);
-      else if(mp->message == wxm_keymankeyup)
-        PostMessage(*Globals::hwndIM(), WM_KEYUP, mp->wParam, mp->lParam);
-*/
       return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
     }
   }
