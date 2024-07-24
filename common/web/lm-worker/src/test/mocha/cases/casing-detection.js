@@ -84,12 +84,14 @@ const emptyContext = {
 }
 
 describe('detectCasing', () => {
-  it('with empty context, no pre-set casing', () => {
+  // precondition - `context` is defined.  Will fail if `null` or `undefined`.
+
+  it('returns "lower" by default for empty contexts', () => {
     assert.equal(detectCurrentCasing(defaultCasingModel, emptyContext), 'lower');
   });
 
-  describe('standard latin-alphabet casing patterns', () => {
-    it('without pre-set casing on context', () => {
+  describe('for standard latin-alphabet casing patterns', () => {
+    it('returns expected case for context without preferred case specified', () => {
       assert.equal(detectCurrentCasing(defaultCasingModel, {
         ...emptyContext,
         left: 'apple'
@@ -111,92 +113,90 @@ describe('detectCasing', () => {
       }), null);
     });
 
-    describe('with pre-set casing on context', () => {
-      // When set to 'lower', it's just treated as a default, rather than an override.
-      it('set to lower', () => {
-        assert.equal(detectCurrentCasing(defaultCasingModel, {
-          ...emptyContext,
-          left: 'apple',
-          casingForm: 'lower'
-        }), 'lower');
+    // When set to 'lower', it's just treated as a default, rather than an override.
+    it('returns expected case for context with preferred case set to lower', () => {
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: 'apple',
+        casingForm: 'lower'
+      }), 'lower');
 
-        assert.equal(detectCurrentCasing(defaultCasingModel, {
-          ...emptyContext,
-          left: 'Apple',
-          casingForm: 'lower'
-        }), 'initial');
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: 'Apple',
+        casingForm: 'lower'
+      }), 'initial');
 
-        assert.equal(detectCurrentCasing(defaultCasingModel, {
-          ...emptyContext,
-          left: 'APPLE',
-          casingForm: 'lower'
-        }), 'upper');
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: 'APPLE',
+        casingForm: 'lower'
+      }), 'upper');
 
-        assert.equal(detectCurrentCasing(defaultCasingModel, {
-          ...emptyContext,
-          left: 'aPpLe',
-          casingForm: 'lower'
-        }), 'lower');
-      });
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: 'aPpLe',
+        casingForm: 'lower'
+      }), 'lower');
+    });
 
-      // When set to 'initial', it's treated as an override.
-      it('set to initial', () => {
-        assert.equal(detectCurrentCasing(defaultCasingModel, {
-          ...emptyContext,
-          left: 'apple',
-          casingForm: 'initial'
-        }), 'initial');
+    // When set to 'initial', it's treated as an override.
+    it('returns expected case for context with preferred case set to initial', () => {
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: 'apple',
+        casingForm: 'initial'
+      }), 'initial');
 
-        assert.equal(detectCurrentCasing(defaultCasingModel, {
-          ...emptyContext,
-          left: 'Apple',
-          casingForm: 'initial'
-        }), 'initial');
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: 'Apple',
+        casingForm: 'initial'
+      }), 'initial');
 
-        assert.equal(detectCurrentCasing(defaultCasingModel, {
-          ...emptyContext,
-          left: 'APPLE',
-          casingForm: 'initial'
-        }), 'initial');
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: 'APPLE',
+        casingForm: 'initial'
+      }), 'initial');
 
-        assert.equal(detectCurrentCasing(defaultCasingModel, {
-          ...emptyContext,
-          left: 'aPpLe',
-          casingForm: 'initial'
-        }), 'initial');
-      });
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: 'aPpLe',
+        casingForm: 'initial'
+      }), 'initial');
+    });
 
-      // When set to 'upper', it's treated as an override.
-      it('set to upper', () => {
-        assert.equal(detectCurrentCasing(defaultCasingModel, {
-          ...emptyContext,
-          left: 'apple',
-          casingForm: 'upper'
-        }), 'upper');
+    // When set to 'upper', it's treated as an override.
+    it('returns expected case for context with preferred case set to upper', () => {
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: 'apple',
+        casingForm: 'upper'
+      }), 'upper');
 
-        assert.equal(detectCurrentCasing(defaultCasingModel, {
-          ...emptyContext,
-          left: 'Apple',
-          casingForm: 'upper'
-        }), 'upper');
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: 'Apple',
+        casingForm: 'upper'
+      }), 'upper');
 
-        assert.equal(detectCurrentCasing(defaultCasingModel, {
-          ...emptyContext,
-          left: 'APPLE',
-          casingForm: 'upper'
-        }), 'upper');
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: 'APPLE',
+        casingForm: 'upper'
+      }), 'upper');
 
-        assert.equal(detectCurrentCasing(defaultCasingModel, {
-          ...emptyContext,
-          left: 'aPpLe',
-          casingForm: 'upper'
-        }), 'upper');
-      });
+      assert.equal(detectCurrentCasing(defaultCasingModel, {
+        ...emptyContext,
+        left: 'aPpLe',
+        casingForm: 'upper'
+      }), 'upper');
     });
   });
 
-  describe('custom leet-based casing patterns', () => {
-    it('without pre-set casing on context', () => {
+  describe('for custom leet-based casing patterns', () => {
+    it('returns expected case for context without preferred case specified', () => {
       assert.equal(detectCurrentCasing(leetCasingModel, {
         ...emptyContext,
         left: 'EAST'
@@ -218,175 +218,169 @@ describe('detectCasing', () => {
       }), null);
     });
 
-    describe('with pre-set casing on context', () => {
-      // When set to 'lower', it's just treated as a default, rather than an override.
-      it('set to lower', () => {
-        assert.equal(detectCurrentCasing(leetCasingModel, {
-          ...emptyContext,
-          left: 'EAST',
-          casingForm: 'lower'
-        }), 'lower');
+    // When set to 'lower', it's just treated as a default, rather than an override.
+    it('returns expected case for context with preferred case set to lower', () => {
+      assert.equal(detectCurrentCasing(leetCasingModel, {
+        ...emptyContext,
+        left: 'EAST',
+        casingForm: 'lower'
+      }), 'lower');
 
-        assert.equal(detectCurrentCasing(leetCasingModel, {
-          ...emptyContext,
-          left: '3AST',
-          casingForm: 'lower'
-        }), 'initial');
+      assert.equal(detectCurrentCasing(leetCasingModel, {
+        ...emptyContext,
+        left: '3AST',
+        casingForm: 'lower'
+      }), 'initial');
 
-        assert.equal(detectCurrentCasing(leetCasingModel, {
-          ...emptyContext,
-          left: '3457',
-          casingForm: 'lower'
-        }), 'upper');
+      assert.equal(detectCurrentCasing(leetCasingModel, {
+        ...emptyContext,
+        left: '3457',
+        casingForm: 'lower'
+      }), 'upper');
 
-        assert.equal(detectCurrentCasing(leetCasingModel, {
-          ...emptyContext,
-          left: 'E45T',
-          casingForm: 'lower'
-        }), 'lower');
-      });
+      assert.equal(detectCurrentCasing(leetCasingModel, {
+        ...emptyContext,
+        left: 'E45T',
+        casingForm: 'lower'
+      }), 'lower');
+    });
 
-      // When set to 'initial', it's treated as an override.
-      it('set to initial', () => {
-        assert.equal(detectCurrentCasing(leetCasingModel, {
-          ...emptyContext,
-          left: 'EAST',
-          casingForm: 'initial'
-        }), 'initial');
+    // When set to 'initial', it's treated as an override.
+    it('returns expected case for context with preferred case set to initial', () => {
+      assert.equal(detectCurrentCasing(leetCasingModel, {
+        ...emptyContext,
+        left: 'EAST',
+        casingForm: 'initial'
+      }), 'initial');
 
-        assert.equal(detectCurrentCasing(leetCasingModel, {
-          ...emptyContext,
-          left: '3AST',
-          casingForm: 'initial'
-        }), 'initial');
+      assert.equal(detectCurrentCasing(leetCasingModel, {
+        ...emptyContext,
+        left: '3AST',
+        casingForm: 'initial'
+      }), 'initial');
 
-        assert.equal(detectCurrentCasing(leetCasingModel, {
-          ...emptyContext,
-          left: '3457',
-          casingForm: 'initial'
-        }), 'initial');
+      assert.equal(detectCurrentCasing(leetCasingModel, {
+        ...emptyContext,
+        left: '3457',
+        casingForm: 'initial'
+      }), 'initial');
 
-        assert.equal(detectCurrentCasing(leetCasingModel, {
-          ...emptyContext,
-          left: 'E45T',
-          casingForm: 'initial'
-        }), 'initial');
-      });
+      assert.equal(detectCurrentCasing(leetCasingModel, {
+        ...emptyContext,
+        left: 'E45T',
+        casingForm: 'initial'
+      }), 'initial');
+    });
 
-      // When set to 'upper', it's treated as an override.
-      it('set to upper', () => {
-        assert.equal(detectCurrentCasing(leetCasingModel, {
-          ...emptyContext,
-          left: 'EAST',
-          casingForm: 'upper'
-        }), 'upper');
+    // When set to 'upper', it's treated as an override.
+    it('returns expected case for context with preferred case set to upper', () => {
+      assert.equal(detectCurrentCasing(leetCasingModel, {
+        ...emptyContext,
+        left: 'EAST',
+        casingForm: 'upper'
+      }), 'upper');
 
-        assert.equal(detectCurrentCasing(leetCasingModel, {
-          ...emptyContext,
-          left: '3AST',
-          casingForm: 'upper'
-        }), 'upper');
+      assert.equal(detectCurrentCasing(leetCasingModel, {
+        ...emptyContext,
+        left: '3AST',
+        casingForm: 'upper'
+      }), 'upper');
 
-        assert.equal(detectCurrentCasing(leetCasingModel, {
-          ...emptyContext,
-          left: '3457',
-          casingForm: 'upper'
-        }), 'upper');
+      assert.equal(detectCurrentCasing(leetCasingModel, {
+        ...emptyContext,
+        left: '3457',
+        casingForm: 'upper'
+      }), 'upper');
 
-        assert.equal(detectCurrentCasing(leetCasingModel, {
-          ...emptyContext,
-          left: 'E45T',
-          casingForm: 'upper'
-        }), 'upper');
-      });
+      assert.equal(detectCurrentCasing(leetCasingModel, {
+        ...emptyContext,
+        left: 'E45T',
+        casingForm: 'upper'
+      }), 'upper');
     });
   });
 
-  describe('throws errors for models without full casing support', () => {
-    it('languageUsesCasing = false, applyCasing not defined', () => {
-      const dummyModel = new DummyModel({
-        languageUsesCasing: true
-      });
-
-      // We don't care which message.
-      assert.throws(() => detectCurrentCasing(dummyModel, emptyContext));
+  it('throws when model has languageUsesCasing = false, applyCasing not defined', () => {
+    const dummyModel = new DummyModel({
+      languageUsesCasing: true
     });
 
-    it('languageUsesCasing = false, applyCasing defined', () => {
-      const dummyModel = new DummyModel({
-        applyCasing: defaultCasingModel.applyCasing
-      });
-
-      assert.throws(() => detectCurrentCasing(dummyModel, emptyContext), /languageUsesCasing is set to false/);
-    });
-
-    it('languageUsesCasing = true, applyCasing not defined', () => {
-      const dummyModel = new DummyModel({
-        languageUsesCasing: true
-      });
-
-      assert.throws(() => detectCurrentCasing(dummyModel, emptyContext), /no applyCasing function/);
-    });
+    // We don't care which message.
+    assert.throws(() => detectCurrentCasing(dummyModel, emptyContext));
   });
 
-  describe('predict() does not throw errors when the model has incomplete casing support', () => {
-    it('languageUsesCasing = false, applyCasing defined', () => {
-      const model = new DummyModel({
-        languageUsesCasing: false,
-        applyCasing: defaultCasingModel.applyCasing,
-        futureSuggestions: [
-          [
-            {
-              transform: {
-                insert: 'apple',
-                deleteLeft: 2
-              },
-              displayAs: 'apple'
-            }
-          ]
-        ]
-      });
-
-      const compositor = new ModelCompositor(model, true);
-
-      const context = {
-        ...emptyContext,
-        left: 'Ap'
-      };
-
-      assert.doesNotThrow(() => compositor.predict({
-        insert: 'p',
-        deleteLeft: 0
-      }, context));
+  it('throws when model has languageUsesCasing = false, applyCasing defined', () => {
+    const dummyModel = new DummyModel({
+      applyCasing: defaultCasingModel.applyCasing
     });
 
-    it('languageUsesCasing = true, applyCasing not defined', () => {
-      const model = new DummyModel({
-        languageUsesCasing: true,
-        futureSuggestions: [
-          [
-            {
-              transform: {
-                insert: 'apple',
-                deleteLeft: 2
-              },
-              displayAs: 'apple'
-            }
-          ]
-        ]
-      });
+    assert.throws(() => detectCurrentCasing(dummyModel, emptyContext), /languageUsesCasing is set to false/);
+  });
 
-      const compositor = new ModelCompositor(model, true);
-
-      const context = {
-        ...emptyContext,
-        left: 'Ap'
-      };
-
-      assert.doesNotThrow(() => compositor.predict({
-        insert: 'p',
-        deleteLeft: 0
-      }, context));
+  it('throws when model has languageUsesCasing = true, applyCasing not defined', () => {
+    const dummyModel = new DummyModel({
+      languageUsesCasing: true
     });
+
+    assert.throws(() => detectCurrentCasing(dummyModel, emptyContext), /no applyCasing function/);
+  });
+
+  it('is bypassed by predict() when languageUsesCasing = false, applyCasing defined', () => {
+    const model = new DummyModel({
+      languageUsesCasing: false,
+      applyCasing: defaultCasingModel.applyCasing,
+      futureSuggestions: [
+        [
+          {
+            transform: {
+              insert: 'apple',
+              deleteLeft: 2
+            },
+            displayAs: 'apple'
+          }
+        ]
+      ]
+    });
+
+    const compositor = new ModelCompositor(model, true);
+
+    const context = {
+      ...emptyContext,
+      left: 'Ap'
+    };
+
+    assert.doesNotThrow(() => compositor.predict({
+      insert: 'p',
+      deleteLeft: 0
+    }, context));
+  });
+
+  it('is bypassed by predict() when languageUsesCasing = true, applyCasing not defined', () => {
+    const model = new DummyModel({
+      languageUsesCasing: true,
+      futureSuggestions: [
+        [
+          {
+            transform: {
+              insert: 'apple',
+              deleteLeft: 2
+            },
+            displayAs: 'apple'
+          }
+        ]
+      ]
+    });
+
+    const compositor = new ModelCompositor(model, true);
+
+    const context = {
+      ...emptyContext,
+      left: 'Ap'
+    };
+
+    assert.doesNotThrow(() => compositor.predict({
+      insert: 'p',
+      deleteLeft: 0
+    }, context));
   });
 });
