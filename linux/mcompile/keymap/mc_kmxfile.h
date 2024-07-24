@@ -4,12 +4,10 @@
 
 #include "km_types.h"
 #include <kmx_file.h>
-#include "filesystem.h"
 #include "mcompile.h"
 
 #ifndef _KMXFILE_H
 #define _KMXFILE_H
-
 
 typedef struct KMX_tagSTORE {
 	KMX_DWORD dwSystemID;
@@ -70,13 +68,15 @@ typedef struct KMX_tagKEYBOARD {
 	//HBITMAP	hBitmap;				// handle to the bitmap in the file;
 } KMX_KEYBOARD, *LPKMX_KEYBOARD;
 
-KMX_BOOL KMX_LoadKeyboard(char16_t* fileName, LPKMX_KEYBOARD *lpKeyboard);
-
-KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, PKMX_WCHAR filename);
-
-KMX_DWORD KMX_WriteCompiledKeyboardToFile(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL FSaveDebug);
+KMX_BOOL KMX_LoadKeyboard(KMX_CHAR* fileName, LPKMX_KEYBOARD* lpKeyboard) ;
+KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, KMX_CHAR* filename);
 
 PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p);
+
+// _S2 Open files on windows and non-windows platforms. Datatypes for Filename and mode must be the same.
+// return FILE* if file could be opened; FILE must to be closed in calling function
+FILE* Open_File(const KMX_CHAR* Filename, const KMX_CHAR* mode);
+FILE* Open_File(const KMX_WCHAR* Filename, const KMX_WCHAR* mode);
 
 #endif // _KMXFILE_H
 

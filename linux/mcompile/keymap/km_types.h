@@ -1,9 +1,7 @@
 #pragma once
 #ifndef KM_TYPES
 #define KM_TYPES
-
 #include <stdint.h>
-
 /*
 #if defined(_WIN32) || defined(_WIN64)
 #define snprintf _snprintf
@@ -12,6 +10,7 @@
 #define strncasecmp _strnicmp
 #endif
 */
+
 
 #if defined(__LP64__) || defined(_LP64)
 /* 64-bit, g++ */

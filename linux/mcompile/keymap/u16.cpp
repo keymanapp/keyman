@@ -1,11 +1,7 @@
 #include "u16.h"
-
-//#include <xstring.h>
-//#include <kmx_file.h>
 #include <codecvt>
 #include <locale>
 #include <stdarg.h>
-
 
 std::vector<std::u16string> convert_argv_to_Vector_u16str(int argc, char* argv[]) {
   std::vector<std::u16string> vector_u16;
@@ -28,6 +24,8 @@ std::vector<std::u16string> convert_argvW_to_Vector_u16str(int argc, wchar_t* ar
   }
   return vector_u16;
 }
+
+// TODO codecvt needs to be replaced !!
 
 //String <- wstring
 std::string string_from_wstring(std::wstring const str) {
@@ -66,24 +64,12 @@ std::wstring wstring_from_u16string(std::u16string const str16) {
   return wstr;
 }
 
-// often used with c_str() e.g. u16fmt( DEBUGSTORE_MATCH).c_str()
-// UTF16 (= const char16_t*) -> UTF8 (= std::string)  -> UTF16 ( = std::wstring 16 bit)
-std::wstring u16fmt(const KMX_WCHAR * str) {
-	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> convert_wstring;
-	std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
-
-  // UTF16 (= const char16_t*) -> UTF8 (= std::string)  -> UTF16 ( =  std::wstring 16 bit)
-	std::string utf8str = convert.to_bytes(str);              // UTF16 (= const char16_t*) -> UTF8 (= std::string)
-  std::wstring wstr = convert_wstring.from_bytes(utf8str);  // UTF8 (= std::string)  -> UTF16 ( =  std::wstring 16 bit)
-	return wstr;
-}
-
-void u16sprintf(KMX_WCHAR * dst, const size_t sz, const wchar_t* fmt, ...) {
+void u16sprintf(KMX_WCHAR * dst, const size_t max_len, const wchar_t* fmt, ...) {
  // UTF16 (=const wchar_t*) -> -> std::string  -> std::u16string -> UTF16 ( = char16_t*)
-	wchar_t* wbuf = new wchar_t[sz];
+	wchar_t* wbuf = new wchar_t[max_len];
 	va_list args;
 	va_start(args, fmt);
-	vswprintf(wbuf, sz, fmt, args);
+	vswprintf(wbuf, max_len, fmt, args);
 	va_end(args);
 
 	std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> convert_wstring;
@@ -92,11 +78,11 @@ void u16sprintf(KMX_WCHAR * dst, const size_t sz, const wchar_t* fmt, ...) {
    // UTF16 (=const wchar_t*) -> -> std::string  -> std::u16string -> UTF16 ( = char16_t*)
 	std::string utf8str = convert_wstring.to_bytes(wbuf);     // UTF16 ( = const wchar_t*)  -> std::string
 	std::u16string u16str = convert.from_bytes(utf8str);      // std::string -> std::u16string
-  u16ncpy(dst, u16str.c_str(), sz);                         // std::u16string.c_str() -> char16_t*
+  u16ncpy(dst, u16str.c_str(), max_len);                         // std::u16string.c_str() -> char16_t*
 	delete[] wbuf;
 }
 
-  std::wstring  convert_pchar16T_To_wstr(KMX_WCHAR *Name){
+  std::wstring  convert_pchar16T_To_wstr(const KMX_WCHAR *Name){
   //  convert char16_t*  -> std::u16string -> std::string -> std::wstring
   //  char16_t* -> std::u16string
   std::u16string u16str(Name);
@@ -111,27 +97,11 @@ long int u16tol(const KMX_WCHAR* str, KMX_WCHAR** endptr, int base)
 {
   auto s = string_from_u16string(str);
   char* t;
-  long int result = strtol(s.c_str(), &t, base);
+  size_t idx;
+  long int result = stol(s, &idx, base);
   if (endptr != nullptr) *endptr = (KMX_WCHAR*)str + (t - s.c_str());
   return result;
 }
-/*
-std::string toHex(int num1) {
-	if (num1 == 0)
-		return "0";
-	int  num = num1;
-	std::string s = "";
-	while (num) {
-		int temp = num % 16;
-		if (temp <= 9)
-			s += (48 + temp);
-		else
-			s += (87 + temp);
-		num = num / 16;
-	}
-	reverse(s.begin(), s.end());
-	return s;
-}*/
 
 const KMX_WCHAR *  u16ncat(KMX_WCHAR *dst, const KMX_WCHAR *src, size_t max) {
   KMX_WCHAR* o = dst;
@@ -164,11 +134,10 @@ KMX_CHAR* strrchr_slash(KMX_CHAR* Name)
   return cp;
 }
 */
-// u16rchr returns last occurence of ch in p; It returns NULL  if ch = '\0' and NULL if ch is not found
+// u16rchr returns last occurence of ch in p; It returns '\0'  if ch == '\0' and NULL if ch is not found
 const KMX_WCHAR* u16rchr(const KMX_WCHAR* p, KMX_WCHAR ch) {
-  const KMX_WCHAR* p_end = p + u16len(p) - 1;
+   const KMX_WCHAR* p_end = p + u16len(p);
 
-	if (ch == '\0')	return p_end + 1;
 	while (p_end >= p) {
 		if (*p_end == ch) return p_end;
 		p_end--;
@@ -257,12 +226,11 @@ int   u16ncmp(const KMX_WCHAR *p, const KMX_WCHAR *q, size_t count) {
   return 0;
 }
 
-KMX_WCHAR * u16tok(KMX_WCHAR *p,  KMX_WCHAR ch,  KMX_WCHAR **ctx) {
+KMX_WCHAR * u16tok(KMX_WCHAR *p, const KMX_WCHAR ch,  KMX_WCHAR **ctx) {
   if (!p) {
     p = *ctx;
     if (!p) return NULL;
   }
-
   KMX_WCHAR *q = p;
   while (*q && *q != ch) {
     q++;
@@ -276,29 +244,30 @@ KMX_WCHAR * u16tok(KMX_WCHAR *p,  KMX_WCHAR ch,  KMX_WCHAR **ctx) {
   else {
     *ctx = NULL;
   }
-  return p;
+  return *p ? p : NULL;
 }
 
-KMX_WCHAR * u16tok(KMX_WCHAR* p,  KMX_WCHAR* delim, KMX_WCHAR** ctx) {
+// _S2 delimiters is array of char ( of size 2)
+KMX_WCHAR * u16tok(KMX_WCHAR* p,  KMX_WCHAR* delimiters, KMX_WCHAR** ctx) {
 	if (!p) {
 		p = *ctx;
 		if (!p) return NULL;
 	}
 
 	KMX_WCHAR * q = p;
-	while (*q && !u16chr(delim, *q)) {
+	while (*q && !u16chr(delimiters, *q)) {
 		q++;
 	}
 	if (*q) {
 		*q = 0;
 		q++;
-		while (u16chr(delim, *q)) q++;
+		while (*q && u16chr(delimiters, *q)) q++;
 		*ctx = q;
 	}
 	else {
 		*ctx = NULL;
 	}
-	return p;
+	return *p ? p : NULL;
 }
 
 double u16tof( KMX_WCHAR* str)

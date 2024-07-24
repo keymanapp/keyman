@@ -8,6 +8,7 @@
 #include <string>
 #include "km_types.h"
 
+
 std::vector<std::u16string> convert_argvW_to_Vector_u16str(int argc, wchar_t* argv[]);
 std::vector<std::u16string> convert_argv_to_Vector_u16str(int argc, char* argv[]);
 
@@ -18,10 +19,9 @@ std::u16string u16string_from_string(std::string const str);
 std::u16string u16string_from_wstring(std::wstring const wstr);
 std::string string_from_u16string(std::u16string const str);
 
-std::wstring u16fmt(const KMX_WCHAR * str);
 void u16sprintf(KMX_WCHAR * dst, const size_t sz, const wchar_t* fmt, ...);
 
-std::wstring  convert_pchar16T_To_wstr(KMX_WCHAR *Name);
+std::wstring  convert_pchar16T_To_wstr(const KMX_WCHAR *Name);
 
 size_t  u16len(const KMX_WCHAR *p);
 int  u16cmp(const KMX_WCHAR *p, const KMX_WCHAR *q);
@@ -40,8 +40,6 @@ double u16tof( KMX_WCHAR* str);
 
 KMX_CHAR* strrchr_slash(KMX_CHAR* Name);
 const KMX_WCHAR* u16rchr_slash(KMX_WCHAR const* Name);
-
-std::string toHex(int num1);
 
 
 #endif /* U16_H */
