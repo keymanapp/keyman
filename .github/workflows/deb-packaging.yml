@@ -115,7 +115,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dist: [focal, jammy, mantic]
+        dist: [focal, jammy]
 
     runs-on: ubuntu-latest
     steps:
