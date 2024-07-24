@@ -407,7 +407,7 @@ export default class ModelCompositor {
 
     // We want to dedupe before trimming the list so that we can present a full set
     // of viable distinct suggestions if available.
-    let deduplicatedSuggestionTuples = this.dedupeSuggestions(rawPredictions, context);
+    const deduplicatedSuggestionTuples = this.dedupeSuggestions(rawPredictions, context);
 
     // Needs "casing" to be applied first.
     //
@@ -417,7 +417,7 @@ export default class ModelCompositor {
 
     // Section 3:  Sort the suggestions in display priority order to determine
     // which are most optimal, then auto-select based on the results.
-    deduplicatedSuggestionTuples = deduplicatedSuggestionTuples.sort(tupleDisplayOrderSort);
+    deduplicatedSuggestionTuples.sort(tupleDisplayOrderSort);
     this.predictionAutoSelect(deduplicatedSuggestionTuples);
 
     // Section 4: Trim down the suggestion list to the N (MAX_SUGGESTIONS) most optimal,
