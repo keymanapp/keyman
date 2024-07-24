@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.74 alpha 2024-07-24
+
+* fix(developer): correct handling of trailing spaces by GetDelimitedString() in kmcmplib compiler (#11938)
+* chore(linux): remove Ubuntu Mantic, add Oracular (#12003)
+
 ## 18.0.73 alpha 2024-07-23
 
 * fix(windows): add text selected bool emit backspace key when text selected in TSF (#11884)
