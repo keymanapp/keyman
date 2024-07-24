@@ -50,14 +50,14 @@ bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
 }
 
 /** @brief Find a keyvalue for given keycode, shiftstate and caps. A function similar to Window`s ToUnicodeEx() function. */
-int mac_KMX_ToUnicodeEx(int keycode, PKMX_WCHAR pwszBuff, ShiftState ss_rgkey, int caps, const UCKeyboardLayout* keyboard_layout) {
+int mac_KMX_ToUnicodeEx(int keycode, PKMX_WCHAR pwszBuff, ShiftState ss, int caps, const UCKeyboardLayout* keyboard_layout) {
   KMX_DWORD keyval;
   UInt32 isdk = 0;
 
-  if (!ensureValidInputForKeyboardTranslation(mac_convert_rgkey_Shiftstate_to_MacShiftstate(ss_rgkey), keycode))
+  if (!ensureValidInputForKeyboardTranslation(mac_convert_rgkey_Shiftstate_to_MacShiftstate(ss), keycode))
     return 0;
 
-  keyval = mac_KMX_get_KeyVal_From_KeyCode_dk(keyboard_layout, keycode, mac_convert_rgkey_Shiftstate_to_MacShiftstate(ss_rgkey), caps, isdk);
+  keyval = mac_KMX_get_KeyVal_From_KeyCode_dk(keyboard_layout, keycode, mac_convert_rgkey_Shiftstate_to_MacShiftstate(ss), caps, isdk);
   std::u16string str = std::u16string(1, keyval);
   KMX_WCHAR firstchar = *(PKMX_WCHAR)str.c_str();
 
@@ -451,6 +451,10 @@ bool mac_KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, const UCKe
             // Alt and Shift+Alt don't work, so skip them (ss 4+5)
             continue;
           }
+//_S2 TOP_6 TODO to compare win-lin kmn-files skip ss6+7; MUST BE removed later!!!!
+         /*if (ss == MenuCtrl || ss == ShftMenuCtrl) {
+           continue;
+          }*/
 
           KMX_DWORD kc_underlying = mac_KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 

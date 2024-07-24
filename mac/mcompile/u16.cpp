@@ -103,7 +103,7 @@ long int u16tol(const KMX_WCHAR* str, KMX_WCHAR** endptr, int base) {
   auto s = string_from_u16string(str);
   char* t;
   size_t idx;
-  long int result = stol(s, &idx, base);
+  long int result = strtol(s, &idx, base);
   if (endptr != nullptr) 
     *endptr = (KMX_WCHAR*)str + (t - s.c_str());
   return result;
