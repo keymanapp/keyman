@@ -98,6 +98,11 @@
         <DCCReference Include="Keyman.System.InstHelp.KeymanStartTaskUninstall.pas"/>
         <DCCReference Include="..\..\global\delphi\winapi\TaskScheduler_TLB.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\UserMessages.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\KeymanPaths.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\DebugPaths.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\VersionInfo.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\Unicode.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

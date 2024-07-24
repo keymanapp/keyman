@@ -8,7 +8,12 @@ uses
   KeymanVersion in '..\..\..\..\common\windows\delphi\general\KeymanVersion.pas',
   Keyman.System.InstHelp.KeymanStartTaskUninstall in 'Keyman.System.InstHelp.KeymanStartTaskUninstall.pas',
   TaskScheduler_TLB in '..\..\global\delphi\winapi\TaskScheduler_TLB.pas',
-  UserMessages in '..\..\..\..\common\windows\delphi\general\UserMessages.pas';
+  ErrorControlledRegistry in '..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
+  UserMessages in '..\..\..\..\common\windows\delphi\general\UserMessages.pas',
+  DebugPaths in '..\..\..\..\common\windows\delphi\general\DebugPaths.pas',
+  VersionInfo in '..\..\..\..\common\windows\delphi\general\VersionInfo.pas',
+  Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
+  KeymanPaths in '..\..\..\..\common\windows\delphi\general\KeymanPaths.pas';
 
 {$R version.res}
 {-R manifest.res}

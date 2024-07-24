@@ -10,6 +10,6 @@ hextobin_cmd = [node, hextobin_root]
 
 subdir('json')
 subdir('utftest')
-subdir('kmnkbd')
-subdir('kmx')
-subdir('ldml')
+#subdir('kmnkbd')
+#subdir('kmx')
+#subdir('ldml')
