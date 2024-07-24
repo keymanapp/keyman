@@ -1,0 +1,11 @@
+store(&NAME) 'warn_index_store_short'
+store(&VERSION) '10.0'
+
+begin unicode > use(main)
+
+group(main) using keys
+
+store(abc) 'abc'
+store(defg) 'defg'
+
+any(abc) + 'x' > index(defg, 1)

@@ -735,11 +735,17 @@ export class KmnCompilerMessages {
   static WARN_VirtualKeyInOutput                              = SevWarn | 0x0AF;
   static Warn_VirtualKeyInOutput                              = () => m(this.WARN_VirtualKeyInOutput, `Virtual keys are not supported in output`);
 
+  static HINT_IndexStoreLong                                  = SevHint | 0x0B0;
+  static Hint_IndexStoreLong                                  = () => m(
+    this.HINT_IndexStoreLong,
+    `The store referenced in index() is longer than the store referenced in any()`
+  );
+
   static FATAL_BufferOverflow                                 = SevFatal | 0x0C0;
-  static Fatal_BufferOverflow                                = () => m(this.FATAL_BufferOverflow, `The compiler memory buffer overflowed`);
+  static Fatal_BufferOverflow                                 = () => m(this.FATAL_BufferOverflow, `The compiler memory buffer overflowed`);
 
   static FATAL_Break                                          = SevFatal | 0x0C1;
-  static Fatal_Break                                         = () => m(this.FATAL_Break, `Compiler interrupted by user`);
+  static Fatal_Break                                          = () => m(this.FATAL_Break, `Compiler interrupted by user`);
 };
 
 /**

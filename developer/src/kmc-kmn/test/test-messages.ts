@@ -33,7 +33,7 @@ describe('KmnCompilerMessages', function () {
 
     if(messageId) {
       assert.isTrue(callbacks.hasMessage(messageId), `messageId ${messageId.toString(16)} not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
-      assert.lengthOf(callbacks.messages, 1);
+      assert.lengthOf(callbacks.messages, 1, `messages should have 1 entry, instead has: `+JSON.stringify(callbacks.messages,null,2));
     } else {
       assert.lengthOf(callbacks.messages, 0, `messages should be empty, but instead got: `+JSON.stringify(callbacks.messages,null,2));
     }
@@ -110,6 +110,22 @@ describe('KmnCompilerMessages', function () {
 
   it('should generate ERROR_CharacterRangeTooLong if a character range would expand to be too long and would overflow the buffer', async function() {
     await testForMessage(this, ['invalid-keyboards', 'error_character_range_too_long.kmn'], KmnCompilerMessages.ERROR_CharacterRangeTooLong);
+  });
+
+  // WARN_IndexStoreShort
+
+  it('should generate WARN_IndexStoreShort if a store referenced in index() is shorter than the corresponding any() store', async function() {
+    await testForMessage(this, ['keyboards', 'warn_index_store_short.kmn'], KmnCompilerMessages.WARN_IndexStoreShort);
+    callbacks.clear();
+    await testForMessage(this, ['keyboards', 'warn_index_store_short_key.kmn'], KmnCompilerMessages.WARN_IndexStoreShort);
+  });
+
+  // HINT_IndexStoreLong
+
+  it('should generate HINT_IndexStoreLong if a store referenced in index() is longer than the corresponding any() store', async function() {
+    await testForMessage(this, ['keyboards', 'hint_index_store_long.kmn'], KmnCompilerMessages.HINT_IndexStoreLong);
+    callbacks.clear();
+    await testForMessage(this, ['keyboards', 'hint_index_store_long_key.kmn'], KmnCompilerMessages.HINT_IndexStoreLong);
   });
 
 });
