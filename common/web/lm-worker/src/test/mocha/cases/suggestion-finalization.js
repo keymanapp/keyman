@@ -3,7 +3,6 @@ import { assert } from 'chai';
 
 import { finalizeSuggestions } from "#./predict-helpers.js";
 import { DummyModel } from "#./models/dummy-model.js";
-
 import { deepCopy } from '@keymanapp/web-utils';
 
 /*
@@ -147,8 +146,8 @@ const build_its_is_set = (verbose) => {
 };
 
 describe('finalizeSuggestions', () => {
-  describe('with custom post-token insert', () => {
-    it('with caret at end of current token and context', () => {
+  describe('for models with custom post-token insert', () => {
+    it('adds whitespace when caret is at token + context end', () => {
       /** @type {Context} */
       const context = {
         left: 'It',
@@ -170,7 +169,7 @@ describe('finalizeSuggestions', () => {
       assert.sameDeepOrderedMembers(finalized, expected);
     });
 
-    it('with caret at end of current token, but mid-context', () => {
+    it('does not add whitespace when caret is followed by whitespace', () => {
       /** @type {Context} */
       const context = {
         left: 'It',
@@ -193,7 +192,9 @@ describe('finalizeSuggestions', () => {
       assert.sameDeepOrderedMembers(finalized, expected);
     });
 
-    it('with caret at end of current token, punctuation word-break before next', () => {
+    // Not saying this is ideal... just that this is what it's currently set to do.
+    // May be possible to improve once better tokenization is ready.
+    it('adds whitespace when caret is followed by word-breaking punctuation', () => {
       /** @type {Context} */
       const context = {
         left: 'It',
@@ -217,7 +218,7 @@ describe('finalizeSuggestions', () => {
       assert.sameDeepOrderedMembers(finalized, expected);
     });
 
-    it('with caret mid-token', () => {
+    it('adds whitespace when caret is mid-token', () => {
       // Current behavior - conceptually splits the current token at the current
       // location, then acts as if it's end-token.  The whitespace added at "end
       // of token" actually enforces the split.
@@ -238,12 +239,13 @@ describe('finalizeSuggestions', () => {
       const { unfinalized, expected } = build_its_is_set();
       const finalized = finalizeSuggestions(testModelWithSpacing, unfinalized, context, transform, false);
 
+      expected.forEach((entry) => entry.transform.insert += testModelWithSpacing.punctuation.insertAfterWord);
       assert.sameDeepOrderedMembers(finalized, expected);
     });
   });
 
-  describe('without post-token insert text', () => {
-    it('with caret at end of current token and context', () => {
+  describe('for models without post-token insert text', () => {
+    it('does not add whitespace when caret is at token + context end', () => {
       /** @type {Context} */
       const context = {
         left: 'It',
@@ -264,7 +266,7 @@ describe('finalizeSuggestions', () => {
       assert.sameDeepOrderedMembers(finalized, expected);
     });
 
-    it('with caret at end of current token, but mid-context', () => {
+    it('does not add whitespace when caret is followed by whitespace', () => {
       /** @type {Context} */
       const context = {
         left: 'It',
@@ -290,7 +292,7 @@ describe('finalizeSuggestions', () => {
       assert.sameDeepOrderedMembers(finalized, expected);
     });
 
-    it('with caret mid-token', () => {
+    it('does not add whitespace when caret is mid-token', () => {
       // Current behavior - conceptually splits the current token at the current
       // location, then acts as if it's end-token.  The whitespace added at "end
       // of token" actually enforces the split.
@@ -316,8 +318,8 @@ describe('finalizeSuggestions', () => {
     });
   });
 
-  describe('with output mode', () => {
-    it('verbose', () => {
+  describe('suggestion output-mode configuration', () => {
+    it('adds extra data to suggestions when set to "verbose"', () => {
       /** @type {Context} */
       const context = {
         left: 'It',
@@ -340,7 +342,7 @@ describe('finalizeSuggestions', () => {
       assert.sameDeepOrderedMembers(finalized, expected);
     });
 
-    it('standard', () => {
+    it('does not add extra data to suggestions when not "verbose"', () => {
       /** @type {Context} */
       const context = {
         left: 'It',
