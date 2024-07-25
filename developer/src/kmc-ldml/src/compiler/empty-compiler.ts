@@ -2,7 +2,7 @@ import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
 import { SectionCompiler } from "./section-compiler.js";
 import { LDMLKeyboard, KMXPlus, CompilerCallbacks, util, MarkerParser } from "@keymanapp/common-types";
 import { VarsCompiler } from './vars.js';
-import { CompilerMessages } from './messages.js';
+import { LdmlCompilerMessages } from './ldml-compiler-messages.js';
 
 /**
  * Compiler for typrs that don't actually consume input XML
@@ -58,16 +58,16 @@ export class StrsCompiler extends EmptyCompiler {
         const illegals = m.get(util.BadStringType.illegal);
         if (puas) {
           const [count, lowestCh] = [puas.size, Array.from(puas.values()).sort((a, b) => a - b)[0]];
-          this.callbacks.reportMessage(CompilerMessages.Hint_PUACharacters({ count, lowestCh }))
+          this.callbacks.reportMessage(LdmlCompilerMessages.Hint_PUACharacters({ count, lowestCh }))
         }
         if (unassigneds) {
           const [count, lowestCh] = [unassigneds.size, Array.from(unassigneds.values()).sort((a, b) => a - b)[0]];
-          this.callbacks.reportMessage(CompilerMessages.Warn_UnassignedCharacters({ count, lowestCh }))
+          this.callbacks.reportMessage(LdmlCompilerMessages.Warn_UnassignedCharacters({ count, lowestCh }))
         }
         if (illegals) {
           // do this last, because we will return false.
           const [count, lowestCh] = [illegals.size, Array.from(illegals.values()).sort((a, b) => a - b)[0]];
-          this.callbacks.reportMessage(CompilerMessages.Error_IllegalCharacters({ count, lowestCh }))
+          this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalCharacters({ count, lowestCh }))
           return false;
         }
       }
