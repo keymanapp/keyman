@@ -1,4 +1,4 @@
-store(&NAME) 'warn_index_store_short'
+store(&NAME) 'hint_index_store_long'
 store(&VERSION) '10.0'
 
 begin unicode > use(main)
