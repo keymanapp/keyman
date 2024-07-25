@@ -114,9 +114,7 @@ export default class ModelCompositor {
   }
 
   async predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Promise<Suggestion[]> {
-    let suggestionDistribution: CorrectionPredictionTuple[] = [];
     let lexicalModel = this.lexicalModel;
-    let punctuation = this.punctuation;
 
     // If a prior prediction is still processing, signal to terminate it; we have a new
     // prediction request to prioritize.
@@ -161,7 +159,6 @@ export default class ModelCompositor {
     let rawPredictions: CorrectionPredictionTuple[] = [];
 
     // Used to restore whitespaces if operations would remove them.
-    let prefixTransform: Transform;
     let postContextState: correction.TrackedContextState = null;
 
     const currentCasing: CasingForm = lexicalModel.languageUsesCasing
@@ -179,7 +176,6 @@ export default class ModelCompositor {
       if(allowSpace) {
         // Detect start of new word; prevent whitespace loss here.
         predictionRoots = [{sample: inputTransform, p: 1.0}];
-        prefixTransform = inputTransform;
       } else {
         predictionRoots = transformDistribution.map((alt) => {
           let transform = alt.sample;
@@ -261,7 +257,6 @@ export default class ModelCompositor {
           // Infer 'new word' mode, even if we received new text when reaching
           // this position.  That new text didn't exist before, so still - nothing
           // to 'replace'.
-          prefixTransform = inputTransform;
           context = postContext; // As far as predictions are concerned, the post-context state
                                  // should not be replaced.  Predictions are to be rooted on
                                  // text "up for correction" - so we want a null root for this
@@ -409,6 +404,8 @@ export default class ModelCompositor {
     const keyedPrefix = keyed(truePrefix);
     const lowercasedPrefix = keyCased(truePrefix);
 
+    let deduplicatedSuggestionTuples: CorrectionPredictionTuple[] = [];
+
     // Deduplicator + annotator of 'keep' suggestions.
     for(let tuple of rawPredictions) {
       if(currentCasing && currentCasing != 'lower') {
@@ -476,7 +473,7 @@ export default class ModelCompositor {
       keepOption.transformId = inputTransform.id;
       keepOption.matchesModel = false;
 
-      suggestionDistribution.unshift({
+      deduplicatedSuggestionTuples.unshift({
         totalProb: keepOption.p,
         prediction: {
           sample: keepOption,
@@ -496,82 +493,17 @@ export default class ModelCompositor {
     // distribution and prep for return.
     for(let key in suggestionDistribMap) {
       let pair = suggestionDistribMap[key];
-      suggestionDistribution.push(pair);
+      deduplicatedSuggestionTuples.push(pair);
     }
 
-    // Section 4:  Auto-correction + finalization.
-    suggestionDistribution = suggestionDistribution.sort(tupleDisplayOrderSort);
+    deduplicatedSuggestionTuples = deduplicatedSuggestionTuples.sort(tupleDisplayOrderSort);
+    this.predictionAutoSelect(deduplicatedSuggestionTuples);
+
+    // Section 4: Trim down the suggestion list to the N (MAX_SUGGESTIONS) most optimal,
+    // then cache and return the set of suggestions
 
     // Now that we've marked the suggestion to auto-select, we can finalize the suggestions.
-    let suggestions = suggestionDistribution.splice(0, ModelCompositor.MAX_SUGGESTIONS).map((tuple) => {
-      const prediction = tuple.prediction;
-
-      if(!this.verbose) {
-        return {
-          ...prediction.sample,
-          p: tuple.totalProb
-        };
-      } else {
-        const sample: Suggestion & {
-          p?: number,
-          "lexical-p"?: number,
-          "correction-p"?: number
-        } = {
-          ...prediction.sample,
-          p: tuple.totalProb,
-          "lexical-p": prediction.p,
-          "correction-p": tuple.correction.p
-        }
-
-        return sample;
-      }
-    });
-
-    this.predictionAutoSelect(suggestionDistribution);
-
-    // Apply 'after word' punctuation and casing (when applicable).  Also, set suggestion IDs.
-    // We delay until now so that utility functions relying on the unmodified Transform may execute properly.
-
-    let compositor = this;
-    suggestions.forEach(function(suggestion) {
-      // Valid 'keep' suggestions may have zero length; we still need to evaluate the following code
-      // for such cases.
-
-      // If we're mid-word, delete its original post-caret text.
-      const tokenization = compositor.tokenize(context);
-      if(tokenization && tokenization.caretSplitsToken) {
-        // While we wait on the ability to provide a more 'ideal' solution, let's at least
-        // go with a more stable, if slightly less ideal, solution for now.
-        //
-        // A predictive text default (on iOS, at least) - immediately wordbreak
-        // on suggestions accepted mid-word.
-        suggestion.transform.insert += punctuation.insertAfterWord;
-
-        // Do we need to manipulate the suggestion's transform based on the current state of the context?
-      } else if(!context.right) {
-        suggestion.transform.insert += punctuation.insertAfterWord;
-      } else if(punctuation.insertAfterWord != '') {
-        if(context.right.indexOf(punctuation.insertAfterWord) != 0) {
-          suggestion.transform.insert += punctuation.insertAfterWord;
-        }
-      }
-
-      // If this is a suggestion after wordbreak input, make sure we preserve the wordbreak transform!
-      if(prefixTransform) {
-        let mergedTransform = models.buildMergedTransform(prefixTransform, suggestion.transform);
-        mergedTransform.id = suggestion.transformId;
-
-        // Temporarily and locally drops 'readonly' semantics so that we can reassign the transform.
-        // See https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#improved-control-over-mapped-type-modifiers
-        let mutableSuggestion = suggestion as {-readonly [transform in keyof Suggestion]: Suggestion[transform]};
-
-        // Assignment via by-reference behavior, as suggestion is an object
-        mutableSuggestion.transform = mergedTransform;
-      }
-
-      suggestion.id = compositor.SUGGESTION_ID_SEED;
-      compositor.SUGGESTION_ID_SEED++;
-    });
+    const suggestions = this.finalizeSuggestions(deduplicatedSuggestionTuples, context, inputTransform);
 
     // Store the suggestions on the final token of the current context state (if it exists).
     // Or, once phrase-level suggestions are possible, on whichever token serves as each prediction's root.
@@ -641,6 +573,92 @@ export default class ModelCompositor {
     // but should we do other comparisons too?
 
     bestSuggestion.prediction.sample.autoAccept = true;
+  }
+
+  /**
+   * Given a set of generated + pre-processed suggestions + their associated
+   * corrections, this method generates the final, published form for each
+   * suggestion.
+   *
+   * Model-specific punctuation settings are applied during this process, as is
+   * verbose logging about the influence of "correction" vs "lexicon-frequency"
+   * per suggestion if enabled.
+   * @param deduplicatedSuggestionTuples The set of suggestions to finalize.
+   * @param context The context to which suggestions will be applied.
+   * @param inputTransform The actual text change to `context` that triggered
+   * the prediction request (which may be replaced by a Suggestion in the
+   * future)
+   * @returns
+   */
+  private finalizeSuggestions(deduplicatedSuggestionTuples: CorrectionPredictionTuple[], context: Context, inputTransform: Transform) {
+    const punctuation = this.punctuation;
+    const suggestions = deduplicatedSuggestionTuples.splice(0, ModelCompositor.MAX_SUGGESTIONS).map((tuple) => {
+      const prediction = tuple.prediction;
+
+      if(!this.verbose) {
+        return {
+          ...prediction.sample,
+          p: tuple.totalProb
+        };
+      } else {
+        const sample: Suggestion & {
+          p?: number,
+          "lexical-p"?: number,
+          "correction-p"?: number
+        } = {
+          ...prediction.sample,
+          p: tuple.totalProb,
+          "lexical-p": prediction.p,
+          "correction-p": tuple.correction.p
+        }
+
+        return sample;
+      }
+    });
+
+    // Apply 'after word' punctuation and casing (when applicable).  Also, set suggestion IDs.
+    // We delay until now so that utility functions relying on the unmodified Transform may execute properly.
+    suggestions.forEach((suggestion) => {
+      // Valid 'keep' suggestions may have zero length; we still need to evaluate the following code
+      // for such cases.
+
+      // If we're mid-word, delete its original post-caret text.
+      const tokenization = this.tokenize(context);
+      if(tokenization && tokenization.caretSplitsToken) {
+        // While we wait on the ability to provide a more 'ideal' solution, let's at least
+        // go with a more stable, if slightly less ideal, solution for now.
+        //
+        // A predictive text default (on iOS, at least) - immediately wordbreak
+        // on suggestions accepted mid-word.
+        suggestion.transform.insert += punctuation.insertAfterWord;
+
+        // Do we need to manipulate the suggestion's transform based on the current state of the context?
+      } else if(!context.right) {
+        suggestion.transform.insert += punctuation.insertAfterWord;
+      } else if(punctuation.insertAfterWord != '') {
+        if(context.right.indexOf(punctuation.insertAfterWord) != 0) {
+          suggestion.transform.insert += punctuation.insertAfterWord;
+        }
+      }
+
+      // If this is a suggestion after wordbreak input, make sure we preserve the wordbreak transform!
+      if(TransformUtils.isWhitespace(inputTransform)) {
+        let mergedTransform = models.buildMergedTransform(inputTransform, suggestion.transform);
+        mergedTransform.id = suggestion.transformId;
+
+        // Temporarily and locally drops 'readonly' semantics so that we can reassign the transform.
+        // See https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-8.html#improved-control-over-mapped-type-modifiers
+        let mutableSuggestion = suggestion as {-readonly [transform in keyof Suggestion]: Suggestion[transform]};
+
+        // Assignment via by-reference behavior, as suggestion is an object
+        mutableSuggestion.transform = mergedTransform;
+      }
+
+      suggestion.id = this.SUGGESTION_ID_SEED;
+      this.SUGGESTION_ID_SEED++;
+    });
+
+    return suggestions;
   }
 
   // Responsible for applying casing rules to suggestions.
