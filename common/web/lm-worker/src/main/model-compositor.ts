@@ -105,7 +105,7 @@ export default class ModelCompositor {
           matchLevel: SuggestionSimilarity.none
         };
         return tuple;
-      }, this);
+      });
 
       returnedPredictions = returnedPredictions.concat(predictionSet);
     }
@@ -143,255 +143,30 @@ export default class ModelCompositor {
       })
     }
 
-    const inputTransform = transformDistribution.sort(function(a, b) {
+    // Fulfill pre-condition:  the transform distribution should be sorted in
+    // descending order.
+    transformDistribution.sort(function(a, b) {
       return b.p - a.p;
-    })[0].sample;
+    });
 
     // Only allow new-word suggestions if space was the most likely keypress.
-    const allowSpace = TransformUtils.isWhitespace(inputTransform);
+    // const allowSpace = TransformUtils.isWhitespace(inputTransform);
+    const inputTransform = transformDistribution[0].sample;
     const allowBksp = TransformUtils.isBackspace(inputTransform);
 
     const postContext = models.applyTransform(inputTransform, context);
     const truePrefix = this.wordbreak(postContext);
     const basePrefix = allowBksp ? truePrefix : this.wordbreak(context);
 
-    let rawPredictions: CorrectionPredictionTuple[] = [];
-
     // Used to restore whitespaces if operations would remove them.
-    let postContextState: correction.TrackedContextState = null;
-
     const currentCasing: CasingForm = lexicalModel.languageUsesCasing
       ? this.detectCurrentCasing(postContext)
       : null;
 
-    // Section 1:  determining 'prediction roots'.
-    if(!this.contextTracker) {
-      let predictionRoots: ProbabilityMass<Transform>[];
+    // Section 1:  determine 'prediction roots' - enumerate corrections from most to least likely,
+    // searching for results that yield viable predictions from the model.
 
-      // Generates raw prediction distributions for each valid input.  Can only 'correct'
-      // against the final input.
-      //
-      // This is the old, 12.0-13.0 'correction' style.
-      if(allowSpace) {
-        // Detect start of new word; prevent whitespace loss here.
-        predictionRoots = [{sample: inputTransform, p: 1.0}];
-      } else {
-        predictionRoots = transformDistribution.map((alt) => {
-          let transform = alt.sample;
-
-          // Filter out special keys unless they're expected.
-          if(TransformUtils.isWhitespace(transform) && !allowSpace) {
-            return null;
-          } else if(TransformUtils.isBackspace(transform) && !allowBksp) {
-            return null;
-          }
-
-          return alt;
-        });
-      }
-
-      // Remove `null` entries.
-      predictionRoots = predictionRoots.filter(tuple => !!tuple);
-
-      // Running in bulk over all suggestions, duplicate entries may be possible.
-      rawPredictions = this.predictFromCorrections(predictionRoots, context);
-    } else {
-      // Token replacement benefits greatly from knowledge of the prior context state.
-      let contextState = this.contextTracker.analyzeState(this.lexicalModel, context, null);
-      // Corrections and predictions are based upon the post-context state, though.
-      postContextState = this.contextTracker.analyzeState(this.lexicalModel,
-                                                          postContext,
-                                                          !TransformUtils.isEmpty(inputTransform) ?
-                                                                          transformDistribution:
-                                                                          null
-                                                          );
-
-      // TODO:  Should we filter backspaces & whitespaces out of the transform distribution?
-      //        Ideally, the answer (in the future) will be no, but leaving it in right now may pose an issue.
-
-      // Rather than go "full hog" and make a priority queue out of the eventual, future competing search spaces...
-      // let's just note that right now, there will only ever be one.
-      //
-      // The 'eventual' logic will be significantly more complex, though still manageable.
-      let searchSpace = postContextState.searchSpace[0];
-
-      // No matter the prediction, once we know the root of the prediction, we'll always 'replace' the
-      // same amount of text.  We can handle this before the big 'prediction root' loop.
-      let deleteLeft = 0;
-
-      // The amount of text to 'replace' depends upon whatever sort of context change occurs
-      // from the received input.
-      const postContextTokens = postContextState.tokens;
-      let postContextLength = postContextTokens.length;
-      let contextLengthDelta = postContextTokens.length - contextState.tokens.length;
-      // If the context now has more tokens, the token we'll be 'predicting' didn't originally exist.
-      if(postContextLength == 0 || contextLengthDelta > 0) {
-        // As the word/token being corrected/predicted didn't originally exist, there's no
-        // part of it to 'replace'.
-        deleteLeft = 0;
-
-        // If the new token is due to whitespace or due to a different input type that would
-        // likely imply a tokenization boundary...
-        if(TransformUtils.isWhitespace(inputTransform)) {
-          /* TODO:  consider/implement:  the second half of the comment above.
-           * For example:  on input of a `'`, predict new words instead of replacing the `'`.
-           * (since after a letter, the `'` will be ignored, anyway)
-           *
-           * Idea:  if the model's most likely prediction (with no root) would make a new
-           * token if appended to the current token, that's probably a good case.
-           * Keeps the check simple & quick.
-           *
-           * Might need a mixed mode, though:  ';' is close enough that `l` is a reasonable
-           * fat-finger guess.   So yeah, we're not addressing this idea right now.
-           * - so... consider multiple context behavior angles when building prediction roots?
-           *
-           * May need something similar to help handle contractions during their construction,
-           * but that'd be within `ContextTracker`.
-           * can' => [`can`, `'`]
-           * can't => [`can't`]  (WB6, 7 of https://unicode.org/reports/tr29/#Word_Boundary_Rules)
-           *
-           * (Would also helps WB7b+c for Hebrew text)
-           */
-
-          // Infer 'new word' mode, even if we received new text when reaching
-          // this position.  That new text didn't exist before, so still - nothing
-          // to 'replace'.
-          context = postContext; // As far as predictions are concerned, the post-context state
-                                 // should not be replaced.  Predictions are to be rooted on
-                                 // text "up for correction" - so we want a null root for this
-                                 // branch.
-          contextState = postContextState;
-        }
-        // If the tokenized context length is shorter... sounds like a backspace (or similar).
-      } else if (contextLengthDelta < 0) {
-        /* Ooh, we've dropped context here.  Almost certainly from a backspace.
-         * Even if we drop multiple tokens... well, we know exactly how many chars
-         * were actually deleted - `inputTransform.deleteLeft`.
-         * Since we replace a word being corrected/predicted, we take length of the remaining
-         * context's tail token in addition to however far was deleted to reach that state.
-         */
-        deleteLeft = this.wordbreak(postContext).kmwLength() + inputTransform.deleteLeft;
-      } else {
-        // Suggestions are applied to the pre-input context, so get the token's original length.
-        // We're on the same token, so just delete its text for the replacement op.
-        deleteLeft = this.wordbreak(context).kmwLength();
-      }
-
-      // Is the token under construction newly-constructed / is there no pre-existing root?
-      // If so, we want to strongly avoid overcorrection, even for 'nearby' keys.
-      // (Strong lexical frequency differences can easily cause overcorrection when only
-      // one key's available.)
-      //
-      // NOTE:  we only want this applied word-initially, when any corrections 'correct'
-      // 100% of the word.  Things are generally fine once it's not "all or nothing."
-      let tailToken = postContextTokens[postContextTokens.length - 1];
-      const isTokenStart = tailToken.transformDistributions.length <= 1;
-
-      // TODO:  whitespace, backspace filtering.  Do it here.
-      //        Whitespace is probably fine, actually.  Less sure about backspace.
-
-      const SEARCH_TIMEOUT = correction.SearchSpace.DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL;
-      const timer = this.activeTimer = new correction.ExecutionTimer(this.testMode ? Number.MAX_VALUE : SEARCH_TIMEOUT, this.testMode ? Number.MAX_VALUE : SEARCH_TIMEOUT * 1.5);
-
-      let bestCorrectionCost: number;
-      let correctionPredictionMap: Record<string, Distribution<Suggestion>> = {};
-
-      for await(let match of searchSpace.getBestMatches(timer)) {
-        // Corrections obtained:  now to predict from them!
-        const correction = match.matchString;
-
-        // Worth considering:  extend Traversal to allow direct prediction lookups?
-        // let traversal = match.finalTraversal;
-
-        // Replace the existing context with the correction.
-        const correctionTransform: Transform = {
-          insert: correction,  // insert correction string
-          deleteLeft: deleteLeft,
-          id: inputTransform.id // The correction should always be based on the most recent external transform/transcription ID.
-        }
-
-        let rootCost = match.totalCost;
-
-        /* If we're dealing with the FIRST keystroke of a new sequence, we'll **dramatically** boost
-          * the exponent to ensure only VERY nearby corrections have a chance of winning, and only if
-          * there are significantly more likely words.  We only need this to allow very minor fat-finger
-          * adjustments for 100% keystroke-sequence corrections in order to prevent finickiness on
-          * key borders.
-          *
-          * Technically, the probabilities this produces won't be normalized as-is... but there's no
-          * true NEED to do so for it, even if it'd be 'nice to have'.  Consistently tracking when
-          * to apply it could become tricky, so it's simpler to leave out.
-          *
-          * Worst-case, it's possible to temporarily add normalization if a code deep-dive
-          * is needed in the future.
-          */
-        if(isTokenStart) {
-          /* Suppose a key distribution:  most likely with p=0.5, second-most with 0.4 - a pretty
-            * ambiguous case that would only arise very near the center of the boundary between two keys.
-            * Raising (0.5/0.4)^16 ~= 35.53.  (At time of writing, SINGLE_CHAR_KEY_PROB_EXPONENT = 16.)
-            * That seems 'within reason' for correction very near boundaries.
-            *
-            * So, with the second-most-likely key being that close in probability, its best suggestion
-            * must be ~ 35.5x more likely than that of the truly-most-likely key to "win".  So, it's not
-            * a HARD cutoff, but more of a 'soft' one.  Keeping the principles in mind documented above,
-            * it's possible to tweak this to a more harsh or lenient setting if desired, rather than
-            * being totally "all or nothing" on which key is taken for highly-ambiguous keypresses.
-            */
-          rootCost *= ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT;  // note the `Math.exp` below.
-        }
-
-        const predictionRoot = {
-          sample: correctionTransform,
-          p: Math.exp(-rootCost)
-        };
-
-        let predictions = this.predictFromCorrections([predictionRoot], context);
-
-        // Only set 'best correction' cost when a correction ACTUALLY YIELDS predictions.
-        if(predictions.length > 0 && bestCorrectionCost === undefined) {
-          bestCorrectionCost = -Math.log(predictionRoot.p);
-        }
-
-        // If we're getting the same prediction again, it's lower-cost.  Update!
-        let oldPredictionSet = correctionPredictionMap[match.matchString];
-        if(oldPredictionSet) {
-          rawPredictions = rawPredictions.filter((entry) => !oldPredictionSet.find((match) => entry.prediction.sample == match.sample));
-        }
-
-        correctionPredictionMap[match.matchString] = predictions.map((entry) => entry.prediction);
-
-        rawPredictions = rawPredictions.concat(predictions);
-
-        let correctionCost = match.totalCost;
-        // Searching a bit longer is permitted when no predictions have been found.
-        if(correctionCost >= bestCorrectionCost + 8) {
-          break;
-          // If enough have been found, we're safe to terminate earlier.
-        } else if(rawPredictions.length >= ModelCompositor.MAX_SUGGESTIONS) {
-            if(correctionCost >= bestCorrectionCost + 4) { // e^-4 = 0.0183156388.  Allows "80%" of an extra edit.
-            // Very useful for stopping 'sooner' when words reach a sufficient length.
-            break;
-          } else {
-            // Sort the prediction list; we need them in descending order for the next check.
-            rawPredictions.sort(tupleDisplayOrderSort);
-
-            // If the best suggestion from the search's current tier fails to beat the worst
-            // pending suggestion from previous tiers, assume all further corrections will
-            // similarly fail to win; terminate the search-loop.
-            if(rawPredictions[ModelCompositor.MAX_SUGGESTIONS-1].totalProb > Math.exp(-correctionCost)) {
-              break;
-            }
-          }
-        }
-      }
-
-      // // For debugging / investigation.
-      // console.log(`execute: ${timer.executionTime}, deferred: ${timer.deferredTime}`); //, total since start: ${timer.timeSinceConstruction}`);
-
-      if(this.activeTimer == timer) {
-        this.activeTimer = null;
-      }
-    }
+    const { postContextState, rawPredictions } = await this.correctAndEnumerate(transformDistribution, context);
 
     // Section 2 - prediction filtering + post-processing pass 1
 
@@ -437,6 +212,290 @@ export default class ModelCompositor {
     }
 
     return suggestions;
+  }
+
+  /**
+   * This method performs the correction-search and model-lookup operations for
+   * prediction generation by using the user's context state and potential
+   * inputs (according to fat-finger distributions).
+   * @param transformDistribution
+   * @param context
+   * @returns
+   */
+  private async correctAndEnumerate(transformDistribution: Distribution<Transform>, context: Context): Promise<{
+    /**
+     * For models that support correction-search caching, this provides the
+     * cached object corresponding to this method's operation.
+     *
+     * Otherwise, is `null`.
+     */
+    postContextState?: correction.TrackedContextState;
+
+    /**
+     * The suggestions generated based on the user's input state.
+     */
+    rawPredictions: CorrectionPredictionTuple[];
+  }> {
+    // Assertion / pre-condition:  `transformDistribution` should be sorted!
+    const inputTransform = transformDistribution[0].sample;
+
+    // Only allow new-word suggestions if space was the most likely keypress.
+    const allowSpace = TransformUtils.isWhitespace(inputTransform);
+    const allowBksp = TransformUtils.isBackspace(inputTransform);
+
+    const postContext = models.applyTransform(inputTransform, context);
+    let postContextState: correction.TrackedContextState = null;
+
+    let rawPredictions: CorrectionPredictionTuple[] = [];
+
+    // If `this.contextTracker` does not exist, we don't have the
+    // `LexiconTraversal` pattern available to us.  We're unable to efficiently
+    // iterate through the lexicon as a result, so we use a far lazier pattern -
+    // only checking corrections for the final keystroke.
+    //
+    // It's mostly here to support models compiled before Keyman 14.0, which was
+    // when the `LexiconTraversal` pattern was established.
+    if(!this.contextTracker) {
+      let predictionRoots: ProbabilityMass<Transform>[];
+
+      // Generates raw prediction distributions for each valid input.  Can only 'correct'
+      // against the final input.
+      //
+      // This is the old, 12.0-13.0 'correction' style.
+      if(allowSpace) {
+        // Detect start of new word; prevent whitespace loss here.
+        predictionRoots = [{sample: inputTransform, p: 1.0}];
+      } else {
+        predictionRoots = transformDistribution.map((alt) => {
+          let transform = alt.sample;
+
+          // Filter out special keys unless they're expected.
+          if(TransformUtils.isWhitespace(transform) && !allowSpace) {
+            return null;
+          } else if(TransformUtils.isBackspace(transform) && !allowBksp) {
+            return null;
+          }
+
+          return alt;
+        });
+      }
+
+      // Remove `null` entries.
+      predictionRoots = predictionRoots.filter(tuple => !!tuple);
+
+      // Running in bulk over all suggestions, duplicate entries may be possible.
+      rawPredictions = this.predictFromCorrections(predictionRoots, context);
+
+      return {
+        postContextState: null,
+        rawPredictions: rawPredictions
+      };
+    }
+
+    // 'else':  the current, 14.0+ pattern, which is able to leverage
+    // `LexiconTraversal`s for greater search efficiency.  This pattern
+    // facilitates a more thorough correction-search pattern.
+
+    // Token replacement benefits greatly from knowledge of the prior context state.
+    let contextState = this.contextTracker.analyzeState(this.lexicalModel, context, null);
+    // Corrections and predictions are based upon the post-context state, though.
+    postContextState = this.contextTracker.analyzeState(this.lexicalModel,
+                                                        postContext,
+                                                        !TransformUtils.isEmpty(inputTransform) ?
+                                                                        transformDistribution:
+                                                                        null
+                                                        );
+
+    // TODO:  Should we filter backspaces & whitespaces out of the transform distribution?
+    //        Ideally, the answer (in the future) will be no, but leaving it in right now may pose an issue.
+
+    // Rather than go "full hog" and make a priority queue out of the eventual, future competing search spaces...
+    // let's just note that right now, there will only ever be one.
+    //
+    // The 'eventual' logic will be significantly more complex, though still manageable.
+    let searchSpace = postContextState.searchSpace[0];
+
+    // No matter the prediction, once we know the root of the prediction, we'll always 'replace' the
+    // same amount of text.  We can handle this before the big 'prediction root' loop.
+    let deleteLeft = 0;
+
+    // The amount of text to 'replace' depends upon whatever sort of context change occurs
+    // from the received input.
+    const postContextTokens = postContextState.tokens;
+    let postContextLength = postContextTokens.length;
+    let contextLengthDelta = postContextTokens.length - contextState.tokens.length;
+    // If the context now has more tokens, the token we'll be 'predicting' didn't originally exist.
+    if(postContextLength == 0 || contextLengthDelta > 0) {
+      // As the word/token being corrected/predicted didn't originally exist, there's no
+      // part of it to 'replace'.
+      deleteLeft = 0;
+
+      // If the new token is due to whitespace or due to a different input type that would
+      // likely imply a tokenization boundary...
+      if(TransformUtils.isWhitespace(inputTransform)) {
+        /* TODO:  consider/implement:  the second half of the comment above.
+          * For example:  on input of a `'`, predict new words instead of replacing the `'`.
+          * (since after a letter, the `'` will be ignored, anyway)
+          *
+          * Idea:  if the model's most likely prediction (with no root) would make a new
+          * token if appended to the current token, that's probably a good case.
+          * Keeps the check simple & quick.
+          *
+          * Might need a mixed mode, though:  ';' is close enough that `l` is a reasonable
+          * fat-finger guess.   So yeah, we're not addressing this idea right now.
+          * - so... consider multiple context behavior angles when building prediction roots?
+          *
+          * May need something similar to help handle contractions during their construction,
+          * but that'd be within `ContextTracker`.
+          * can' => [`can`, `'`]
+          * can't => [`can't`]  (WB6, 7 of https://unicode.org/reports/tr29/#Word_Boundary_Rules)
+          *
+          * (Would also helps WB7b+c for Hebrew text)
+          */
+
+        // Infer 'new word' mode, even if we received new text when reaching
+        // this position.  That new text didn't exist before, so still - nothing
+        // to 'replace'.
+        context = postContext; // As far as predictions are concerned, the post-context state
+                                // should not be replaced.  Predictions are to be rooted on
+                                // text "up for correction" - so we want a null root for this
+                                // branch.
+        contextState = postContextState;
+      }
+      // If the tokenized context length is shorter... sounds like a backspace (or similar).
+    } else if (contextLengthDelta < 0) {
+      /* Ooh, we've dropped context here.  Almost certainly from a backspace.
+        * Even if we drop multiple tokens... well, we know exactly how many chars
+        * were actually deleted - `inputTransform.deleteLeft`.
+        * Since we replace a word being corrected/predicted, we take length of the remaining
+        * context's tail token in addition to however far was deleted to reach that state.
+        */
+      deleteLeft = this.wordbreak(postContext).kmwLength() + inputTransform.deleteLeft;
+    } else {
+      // Suggestions are applied to the pre-input context, so get the token's original length.
+      // We're on the same token, so just delete its text for the replacement op.
+      deleteLeft = this.wordbreak(context).kmwLength();
+    }
+
+    // Is the token under construction newly-constructed / is there no pre-existing root?
+    // If so, we want to strongly avoid overcorrection, even for 'nearby' keys.
+    // (Strong lexical frequency differences can easily cause overcorrection when only
+    // one key's available.)
+    //
+    // NOTE:  we only want this applied word-initially, when any corrections 'correct'
+    // 100% of the word.  Things are generally fine once it's not "all or nothing."
+    let tailToken = postContextTokens[postContextTokens.length - 1];
+    const isTokenStart = tailToken.transformDistributions.length <= 1;
+
+    // TODO:  whitespace, backspace filtering.  Do it here.
+    //        Whitespace is probably fine, actually.  Less sure about backspace.
+
+    const SEARCH_TIMEOUT = correction.SearchSpace.DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL;
+    const timer = this.activeTimer = new correction.ExecutionTimer(this.testMode ? Number.MAX_VALUE : SEARCH_TIMEOUT, this.testMode ? Number.MAX_VALUE : SEARCH_TIMEOUT * 1.5);
+
+    let bestCorrectionCost: number;
+    let correctionPredictionMap: Record<string, Distribution<Suggestion>> = {};
+
+    for await(let match of searchSpace.getBestMatches(timer)) {
+      // Corrections obtained:  now to predict from them!
+      const correction = match.matchString;
+
+      // Worth considering:  extend Traversal to allow direct prediction lookups?
+      // let traversal = match.finalTraversal;
+
+      // Replace the existing context with the correction.
+      const correctionTransform: Transform = {
+        insert: correction,  // insert correction string
+        deleteLeft: deleteLeft,
+        id: inputTransform.id // The correction should always be based on the most recent external transform/transcription ID.
+      }
+
+      let rootCost = match.totalCost;
+
+      /* If we're dealing with the FIRST keystroke of a new sequence, we'll **dramatically** boost
+        * the exponent to ensure only VERY nearby corrections have a chance of winning, and only if
+        * there are significantly more likely words.  We only need this to allow very minor fat-finger
+        * adjustments for 100% keystroke-sequence corrections in order to prevent finickiness on
+        * key borders.
+        *
+        * Technically, the probabilities this produces won't be normalized as-is... but there's no
+        * true NEED to do so for it, even if it'd be 'nice to have'.  Consistently tracking when
+        * to apply it could become tricky, so it's simpler to leave out.
+        *
+        * Worst-case, it's possible to temporarily add normalization if a code deep-dive
+        * is needed in the future.
+        */
+      if(isTokenStart) {
+        /* Suppose a key distribution:  most likely with p=0.5, second-most with 0.4 - a pretty
+          * ambiguous case that would only arise very near the center of the boundary between two keys.
+          * Raising (0.5/0.4)^16 ~= 35.53.  (At time of writing, SINGLE_CHAR_KEY_PROB_EXPONENT = 16.)
+          * That seems 'within reason' for correction very near boundaries.
+          *
+          * So, with the second-most-likely key being that close in probability, its best suggestion
+          * must be ~ 35.5x more likely than that of the truly-most-likely key to "win".  So, it's not
+          * a HARD cutoff, but more of a 'soft' one.  Keeping the principles in mind documented above,
+          * it's possible to tweak this to a more harsh or lenient setting if desired, rather than
+          * being totally "all or nothing" on which key is taken for highly-ambiguous keypresses.
+          */
+        rootCost *= ModelCompositor.SINGLE_CHAR_KEY_PROB_EXPONENT;  // note the `Math.exp` below.
+      }
+
+      const predictionRoot = {
+        sample: correctionTransform,
+        p: Math.exp(-rootCost)
+      };
+
+      let predictions = this.predictFromCorrections([predictionRoot], context);
+
+      // Only set 'best correction' cost when a correction ACTUALLY YIELDS predictions.
+      if(predictions.length > 0 && bestCorrectionCost === undefined) {
+        bestCorrectionCost = -Math.log(predictionRoot.p);
+      }
+
+      // If we're getting the same prediction again, it's lower-cost.  Update!
+      let oldPredictionSet = correctionPredictionMap[match.matchString];
+      if(oldPredictionSet) {
+        rawPredictions = rawPredictions.filter((entry) => !oldPredictionSet.find((match) => entry.prediction.sample == match.sample));
+      }
+
+      correctionPredictionMap[match.matchString] = predictions.map((entry) => entry.prediction);
+
+      rawPredictions = rawPredictions.concat(predictions);
+
+      let correctionCost = match.totalCost;
+      // Searching a bit longer is permitted when no predictions have been found.
+      if(correctionCost >= bestCorrectionCost + 8) {
+        break;
+        // If enough have been found, we're safe to terminate earlier.
+      } else if(rawPredictions.length >= ModelCompositor.MAX_SUGGESTIONS) {
+          if(correctionCost >= bestCorrectionCost + 4) { // e^-4 = 0.0183156388.  Allows "80%" of an extra edit.
+          // Very useful for stopping 'sooner' when words reach a sufficient length.
+          break;
+        } else {
+          // Sort the prediction list; we need them in descending order for the next check.
+          rawPredictions.sort(tupleDisplayOrderSort);
+
+          // If the best suggestion from the search's current tier fails to beat the worst
+          // pending suggestion from previous tiers, assume all further corrections will
+          // similarly fail to win; terminate the search-loop.
+          if(rawPredictions[ModelCompositor.MAX_SUGGESTIONS-1].totalProb > Math.exp(-correctionCost)) {
+            break;
+          }
+        }
+      }
+    }
+
+    // // For debugging / investigation.
+    // console.log(`execute: ${timer.executionTime}, deferred: ${timer.deferredTime}`); //, total since start: ${timer.timeSinceConstruction}`);
+
+    if(this.activeTimer == timer) {
+      this.activeTimer = null;
+    }
+
+    return {
+      postContextState: postContextState,
+      rawPredictions: rawPredictions
+    };
   }
 
   /**
