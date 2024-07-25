@@ -9,9 +9,7 @@
 
     Model.punctuation = {
       quotesForKeepSuggestion: { open: '“', close: '”'},
-      // Important! Set this, or else the model compositor will
-      // insert something for us!
-      insertAfterWord: "",
+      insertAfterWord: " ",
     };
 
     // A direct import/copy from i_got_distracted_by_hazel.json.
@@ -19,21 +17,21 @@
       [
         {
           "transform": {
-            "insert": "I ",
+            "insert": "I",
             "deleteLeft": 0
           },
           "displayAs": "I"
         },
         {
           "transform": {
-            "insert": "I'm ",
+            "insert": "I'm",
             "deleteLeft": 0
           },
           "displayAs": "I'm"
         },
         {
           "transform": {
-            "insert": "Oh ",
+            "insert": "Oh",
             "deleteLeft": 0
           },
           "displayAs": "Oh"
@@ -42,21 +40,21 @@
       [
         {
           "transform": {
-            "insert": "love ",
+            "insert": "love",
             "deleteLeft": 0
           },
           "displayAs": "love"
         },
         {
           "transform": {
-            "insert": "am ",
+            "insert": "am",
             "deleteLeft": 0
           },
           "displayAs": "am"
         },
         {
           "transform": {
-            "insert": "got ",
+            "insert": "got",
             "deleteLeft": 0
           },
           "displayAs": "got"
@@ -65,21 +63,21 @@
       [
         {
           "transform": {
-            "insert": "distracted ",
+            "insert": "distracted by",
             "deleteLeft": 0
           },
           "displayAs": "distracted by"
         },
         {
           "transform": {
-            "insert": "distracted ",
+            "insert": "distracted",
             "deleteLeft": 0
           },
           "displayAs": "distracted"
         },
         {
           "transform": {
-            "insert": "a ",
+            "insert": "a",
             "deleteLeft": 0
           },
           "displayAs": "a"
@@ -88,27 +86,27 @@
       [
         {
           "transform": {
-            "insert": "Hazel ",
+            "insert": "Hazel",
             "deleteLeft": 0
           },
           "displayAs": "Hazel"
         },
         {
           "transform": {
-            "insert": "the ",
+            "insert": "the",
             "deleteLeft": 0
           },
           "displayAs": "the"
         },
         {
           "transform": {
-            "insert": "a ",
+            "insert": "a",
             "deleteLeft": 0
           },
           "displayAs": "a"
         }
       ]
-    ];    
+    ];
 
     return Model;
   }());

@@ -57,15 +57,15 @@ describe('Custom Punctuation', function () {
     it('appears after "word" suggestion', async function () {
       let dummySuggestions = [
         {
-          transform: { insert: 'ᚈᚑᚋ', deleteLeft: 0, },
+          transform: { insert: 'ᚈᚑᚋ', deleteLeft: 2, },
           displayAs: 'ᚈᚑᚋ',
         },
         {
-          transform: { insert: 'ᚄ', deleteLeft: 0, },
+          transform: { insert: 'ᚄ', deleteLeft: 2, },
           displayAs: 'ᚄ',
         },
         {
-          transform: { insert: 'ᚉᚑᚈᚈ', deleteLeft: 0, },
+          transform: { insert: 'ᚉᚑᚈᚈ', deleteLeft: 2, },
           displayAs: 'ᚉᚑᚈᚈ',
         }
       ];
