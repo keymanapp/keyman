@@ -51,6 +51,7 @@ export * as KpsFile from './package/kps-file.js';
 export * as KmpJsonFile from './package/kmp-json-file.js';
 
 export { Uni_IsSurrogate1, Uni_IsSurrogate2 } from './util/util.js';
+export * as util from './util/util.js';
 
 export * as KeymanFileTypes from './util/file-types.js';
 
