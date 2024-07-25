@@ -612,11 +612,12 @@ export class SuggestionBanner extends Banner {
           // auto-correct suggestion and its highlighting.
           this._predictionContext.selected = autoselection;
           if(autoselection) {
-            this.options.forEach((entry) => {
+            for(let entry of this.options) {
               if(entry.suggestion == autoselection) {
                 entry.highlight(true);
+                break;
               };
-            });
+            }
           }
         });
 

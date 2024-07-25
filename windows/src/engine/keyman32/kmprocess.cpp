@@ -121,23 +121,22 @@ BOOL ProcessHook()
 
   fOutputKeystroke = FALSE;  // TODO: 5442 no longer needs to be global once we use core processor
 
-	if(_td->state.msg.message == wm_keymankeydown) {   // I4827
-    if (ShouldDebug(sdmKeyboard)) {
-      if(!_td->lpActiveKeyboard || !_td->lpActiveKeyboard->lpCoreKeyboardState) {
-        SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "Key pressed: %s Context <unavailable>",
-          Debug_VirtualKey(_td->state.vkey));
-      } else {
-        km_core_cu* debug_context = km_core_state_context_debug(
-          _td->lpActiveKeyboard->lpCoreKeyboardState,
-          KM_CORE_DEBUG_CONTEXT_CACHED
-        );
-        SendDebugMessageFormat(_td->state.msg.hwnd, sdmKeyboard, 0, "Key pressed: %s Context '%ls'",
-          Debug_VirtualKey(_td->state.vkey), debug_context);
-        km_core_cu_dispose(debug_context);
-      }
+  if (ShouldDebug(sdmKeyboard)) {
+    if(!_td->lpActiveKeyboard || !_td->lpActiveKeyboard->lpCoreKeyboardState) {
+      SendDebugMessageFormat(0, sdmKeyboard, 0, "Key %s: %s Context <unavailable>",
+        _td->state.isDown ? "pressed" : "released",
+        Debug_VirtualKey(_td->state.vkey));
+    } else {
+      km_core_cu* debug_context = km_core_state_context_debug(
+        _td->lpActiveKeyboard->lpCoreKeyboardState,
+        KM_CORE_DEBUG_CONTEXT_CACHED
+      );
+      SendDebugMessageFormat(0, sdmKeyboard, 0, "Key %s: %s Context '%ls'",
+        _td->state.isDown ? "pressed" : "released",
+        Debug_VirtualKey(_td->state.vkey), debug_context);
+      km_core_cu_dispose(debug_context);
     }
-
-	}
+  }
 
   // For applications not using the TSF kmtip calls this function twice for each keystroke,
   // first to determine if we are doing processing work (TIPFUpdateable == FALSE),

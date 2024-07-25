@@ -64,7 +64,7 @@ dpkg-source --tar-ignore=*~ --tar-ignore=.git --tar-ignore=.gitattributes \
     --tar-ignore=results \
     --tar-ignore=tmp \
     --tar-ignore=web --tar-ignore=windows --tar-ignore=keyman_1* \
-    --tar-ignore=dist --tar-ignore=.pbuilderrc --tar-ignore=VERSION -Zgzip -b .
+    --tar-ignore=dist --tar-ignore=VERSION -Zgzip -b .
 mv ../keyman_"${VERSION}".tar.gz linux/dist/keyman-"${VERSION}".tar.gz
 echo "3.0 (quilt)" > debian/source/format
 cd "$BASEDIR"

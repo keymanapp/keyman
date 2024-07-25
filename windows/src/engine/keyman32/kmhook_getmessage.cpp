@@ -73,21 +73,21 @@ void GetCapsAndNumlockState();
 /*
 BOOL SysTabCtrl(HWND hwnd)
 {
-	char buf[64];
-	GetClassName(hwnd, buf, 64);
-	return !strcmpi(buf, "SysTabControl32");
+  char buf[64];
+  GetClassName(hwnd, buf, 64);
+  return !strcmpi(buf, "SysTabControl32");
 }
 */
 
 BOOL IsMessageEquivalent(LPMSG m1, LPMSG m2)
 {
-	return m1->hwnd == m2->hwnd &&
-		m1->lParam == m2->lParam &&
-		m1->message == m2->message &&
-		m1->time == m2->time &&
-		m1->pt.x == m2->pt.x &&
-		m1->pt.y == m2->pt.y &&
-		m1->wParam == m2->wParam;
+  return m1->hwnd == m2->hwnd &&
+    m1->lParam == m2->lParam &&
+    m1->message == m2->message &&
+    m1->time == m2->time &&
+    m1->pt.x == m2->pt.x &&
+    m1->pt.y == m2->pt.y &&
+    m1->wParam == m2->wParam;
 }
 
 LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam);
@@ -108,16 +108,16 @@ LRESULT CALLBACK kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
   }
 #endif
 
-	return res;
+  return res;
 }
 
 LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
-	LPMSG mp;
+  LPMSG mp;
 
-	mp = (LPMSG)lParam;
+  mp = (LPMSG)lParam;
 
-	// If the message sent should be ignored, just return
+  // If the message sent should be ignored, just return
   if(nCode < 0)
     return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
 
@@ -131,19 +131,18 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
       return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
 
     _td = ThreadGlobals();
-	  if(!_td)
+    if(!_td)
       return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
   }
 
   if(!_td->FInitialised)			// Keyman keyboard is being selected for first time in active process
   {
     if(!Globals::CheckControllers()) return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);  // I2435 - Prevent Keyman from re-initialising when it is shutting down  // I3253   // I3532
-		if(!InitialiseProcess(mp->hwnd)) return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
+    if(!InitialiseProcess(mp->hwnd)) return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
   }
 
-  if (((mp->message >= WM_KEYFIRST && mp->message <= WM_KEYLAST) || mp->message == wm_keymankeydown || mp->message == wm_keymankeyup ||
-    mp->message == WM_KEYMAN_KEY_EVENT)
-    && ShouldDebug(sdmMessage)) {
+  if (((mp->message >= WM_KEYFIRST && mp->message <= WM_KEYLAST) ||
+    mp->message == WM_KEYMAN_KEY_EVENT) && ShouldDebug(sdmMessage)) {
     DebugMessage(mp, wParam);
   }
 
@@ -173,67 +172,52 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 
   // I1337 - move mousewheel message checking before the PM_REMOVE handling - otherwise we can't pre-modify the message
   // TODO: Move to WH_MOUSE_LL proc in main process
-	if(mp->message == WM_MOUSEWHEEL)
-	{
-		HWND hwndMouseWheel = FindWindow("TfrmVisualKeyboard", NULL);
-		if(hwndMouseWheel && GetWindowThreadProcessId(mp->hwnd, NULL) != GetWindowThreadProcessId(hwndMouseWheel, NULL))
-		{
-			RECT rcMouseWheel;
-			POINT pt;
-			GetWindowRect(hwndMouseWheel, &rcMouseWheel);
-			pt.x = LOWORD(mp->lParam);
-			pt.y = HIWORD(mp->lParam);
-			if(PtInRect(&rcMouseWheel, pt))
-			{
+  if(mp->message == WM_MOUSEWHEEL)
+  {
+    HWND hwndMouseWheel = FindWindow("TfrmVisualKeyboard", NULL);
+    if(hwndMouseWheel && GetWindowThreadProcessId(mp->hwnd, NULL) != GetWindowThreadProcessId(hwndMouseWheel, NULL))
+    {
+      RECT rcMouseWheel;
+      POINT pt;
+      GetWindowRect(hwndMouseWheel, &rcMouseWheel);
+      pt.x = LOWORD(mp->lParam);
+      pt.y = HIWORD(mp->lParam);
+      if(PtInRect(&rcMouseWheel, pt))
+      {
         // if(!_td->state.PreviousNoRemove)  // I2908
-				  PostMessage(WindowFromPoint(pt), WM_MOUSEWHEEL, mp->wParam, mp->lParam);
-				mp->message = WM_NULL;
-				return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
-			}
-		}
-	}
+          PostMessage(WindowFromPoint(pt), WM_MOUSEWHEEL, mp->wParam, mp->lParam);
+        mp->message = WM_NULL;
+        return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
+      }
+    }
+  }
 
   if((wParam & PM_REMOVE) == 0)  // I2908
   {
     return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
   }
 
-#if 0  // I2908
-  if(_td->state.PreviousNoRemove && IsMessageEquivalent(&_td->state.msg, mp))
-	{
-		/*
-		  Was the previous message the same as this one.  If so, don't process it again.
-		 */
-		_td->state.PreviousNoRemove = (wParam & PM_REMOVE) == 0;
-		_td->state.msg = *mp;
-		return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
-	}
-#endif
-
-	_td->state.msg = *mp;
-	/*_td->state.PreviousNoRemove = (wParam & PM_REMOVE) == 0; I2908 */
-
   // 16 April 2005, 7 May 2007 - mcdurdin - Check if Keyman is receiving messages (reimplement from v6.2) */
-	if(mp->message == wm_test_keyman_functioning && mp->wParam == TKF_PING)
-	{
-		PostMessage(mp->hwnd, wm_test_keyman_functioning, TKF_RESPONSE, mp->lParam);
-		return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
-	}
+  if(mp->message == wm_test_keyman_functioning && mp->wParam == TKF_PING)
+  {
+    PostMessage(mp->hwnd, wm_test_keyman_functioning, TKF_RESPONSE, mp->lParam);
+    return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
+  }
 
    // I3594
-	if(mp->message == wm_keyman_refresh)
-	{
-		SendDebugMessageFormat(0, sdmInternat, 0, "GetMessage: wm_keyman_refresh %d tag=%d", mp->wParam, mp->lParam);
-		HandleRefresh((int) mp->wParam, (LONG) mp->lParam);
-		return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
-	}
+  if(mp->message == wm_keyman_refresh)
+  {
+    SendDebugMessageFormat(0, sdmInternat, 0, "GetMessage: wm_keyman_refresh %d tag=%d", mp->wParam, mp->lParam);
+    HandleRefresh((int) mp->wParam, (LONG) mp->lParam);
+    return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
+  }
 
-	if(mp->message == wm_keyman_control_internal)   // I3933
-	{
+  if(mp->message == wm_keyman_control_internal)   // I3933
+  {
     SendDebugMessageFormat(0, sdmInternat, 0, "GetMessage: wm_keyman_control_internal hwnd=%x %x %x", mp->hwnd, mp->wParam, mp->lParam);   // I4674
-		ProcessWMKeymanControlInternal(mp->hwnd, mp->wParam, mp->lParam);
-		return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
-	}
+    ProcessWMKeymanControlInternal(mp->hwnd, mp->wParam, mp->lParam);
+    return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
+  }
 
   if (mp->message == wm_keyman_control) {
     SendDebugMessageFormat(0, sdmInternat, 0, "GetMessage: wm_keyman_control hwnd=%x %x %x", mp->hwnd, mp->wParam, mp->lParam);
@@ -241,43 +225,43 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
     return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
   }
 
-	if(mp->message == wm_keyman)   // I3933
-	{
+  if(mp->message == wm_keyman)   // I3933
+  {
     SendDebugMessageFormat(0, sdmInternat, 0, "GetMessage: wm_keyman hwnd=%x %x %x", mp->hwnd, mp->wParam, mp->lParam);   // I4674
-		ProcessWMKeyman(mp->hwnd, mp->wParam, mp->lParam);
-		return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
-	}
+    ProcessWMKeyman(mp->hwnd, mp->wParam, mp->lParam);
+    return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
+  }
 
-	/*
-	 Handle wm_keyman_control_internal messages
-	*/
+  /*
+   Handle wm_keyman_control_internal messages
+  */
 
-	/*
-	 If the keyboard needs to be activated, select it: messaging from the main application
-	*/
+  /*
+   If the keyboard needs to be activated, select it: messaging from the main application
+  */
 
-	if(_td->lpActiveKeyboard)
-	{
+  if(_td->lpActiveKeyboard)
+  {
     _td->state.lpCoreKb = _td->lpActiveKeyboard->lpCoreKeyboard;
-	}
+  }
    // I4412
-	if(mp->message == wm_keymanshift)
-	{
-		SendDebugMessageFormat(0, sdmInternat, 0, "GetMessage: wm_keymanshift %x %x", mp->wParam, mp->lParam);
+  if(mp->message == wm_keymanshift)
+  {
+    SendDebugMessageFormat(0, sdmInternat, 0, "GetMessage: wm_keymanshift %x %x", mp->wParam, mp->lParam);
     SelectApplicationIntegration();
-		if(!_td->app->IsWindowHandled(mp->hwnd)) _td->app->HandleWindow(mp->hwnd);
-		return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
-	}
+    if(!_td->app->IsWindowHandled(mp->hwnd)) _td->app->HandleWindow(mp->hwnd);
+    return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
+  }
 
-	if(*Globals::hwndIM() != 0)
-	{
-		if(mp->message == wm_keymanim_close)
-		{
-			if(mp->lParam) KMHideIM();
-			if(mp->wParam)
-			{
-				if(_td->app)
-				{
+  if(*Globals::hwndIM() != 0)
+  {
+    if(mp->message == wm_keymanim_close)
+    {
+      if(mp->lParam) KMHideIM();
+      if(mp->wParam)
+      {
+        if(_td->app)
+        {
           // Call the core keyboard processor to process the queued actions
           if (!_td->lpActiveKeyboard) {
             return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
@@ -291,43 +275,39 @@ LRESULT _kmnGetMessageProc(int nCode, WPARAM wParam, LPARAM lParam)
 
           _td->app->SetCurrentShiftState(Globals::get_ShiftState());
           _td->app->SendActions();
-				}
-			}
-			return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
-		}
+        }
+      }
+      return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
+    }
 
-		if(!*Globals::hwndIMAlways())
-		{
-			if(mp->message == wm_keymankeydown)
-				PostMessage(*Globals::hwndIM(), WM_KEYDOWN, mp->wParam, mp->lParam);
-			else if(mp->message == wm_keymankeyup)
-				PostMessage(*Globals::hwndIM(), WM_KEYUP, mp->wParam, mp->lParam);
-			return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
-		}
-	}
+    if(!*Globals::hwndIMAlways())
+    {
+      return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
+    }
+  }
 
-	/*
-	 If no keyboard is active, return
-	*/
+  /*
+   If no keyboard is active, return
+  */
 
-	if(!_td->lpActiveKeyboard || _td->FInRefreshKeyboards)
-	{
-		if(_td->app) _td->app->ResetContext();
-		return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
-	}
+  if(!_td->lpActiveKeyboard || _td->FInRefreshKeyboards)
+  {
+    if(_td->app) _td->app->ResetContext();
+    return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
+  }
 
-	if(mp->message > WM_MOUSEFIRST && mp->message <= WM_MOUSELAST && !IsIMWindow(mp->hwnd))
-	{
-		// > MOUSEFIRST ignores mouse movement
-		if(_td->app) _td->app->ResetContext();
-		return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
-	}
+  if(mp->message > WM_MOUSEFIRST && mp->message <= WM_MOUSELAST && !IsIMWindow(mp->hwnd))
+  {
+    // > MOUSEFIRST ignores mouse movement
+    if(_td->app) _td->app->ResetContext();
+    return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
+  }
 
-	/*   // I3617
-	 Text Services Framework tells us we don't need to continue here
-	*/
+  /*   // I3617
+   Text Services Framework tells us we don't need to continue here
+  */
 
-	return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
+  return CallNextHookEx(Globals::get_hhookGetMessage(), nCode, wParam, lParam);
 }
 
 void ProcessWMKeyman(HWND hwnd, WPARAM wParam, LPARAM lParam)
@@ -335,38 +315,38 @@ void ProcessWMKeyman(HWND hwnd, WPARAM wParam, LPARAM lParam)
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td) return;
 
-	SendDebugMessageFormat(hwnd, sdmGlobal, 0, "ProcessWMKeyman wm_keyman: %d %d", wParam, lParam);
-	switch(wParam)
-	{
-	case KM_DISABLEUI:
-		_td->KeymanUIDisabled = TRUE;
-		break;
-	case KM_ENABLEUI:
-		_td->KeymanUIDisabled = FALSE;
-		break;
-	case KM_FOCUSCHANGED:
+  SendDebugMessageFormat(hwnd, sdmGlobal, 0, "ProcessWMKeyman wm_keyman: %d %d", wParam, lParam);
+  switch(wParam)
+  {
+  case KM_DISABLEUI:
+    _td->KeymanUIDisabled = TRUE;
+    break;
+  case KM_ENABLEUI:
+    _td->KeymanUIDisabled = FALSE;
+    break;
+  case KM_FOCUSCHANGED:
     if(lParam & KMF_WINDOWCHANGED)
     {
       hwnd = GetFocus();
 
-		  if(_td->lpActiveKeyboard) {
+      if(_td->lpActiveKeyboard) {
         _td->state.lpCoreKb = _td->lpActiveKeyboard->lpCoreKeyboard;
-		  }
+      }
 
       SelectApplicationIntegration();
       if(_td->app && !_td->app->IsWindowHandled(hwnd)) _td->app->HandleWindow(hwnd);
       _td->state.windowunicode = !_td->app || _td->app->IsUnicode();
 
       if(IsFocusedThread())
-		  {
+      {
         if(_td->app) _td->app->ResetQueue();
-	  	  GetCapsAndNumlockState();
-	  	  UpdateActiveWindows();
+        GetCapsAndNumlockState();
+        UpdateActiveWindows();
       }
     }
 
-		break;
-	}
+    break;
+  }
 }
 
 
@@ -374,8 +354,8 @@ void ProcessWMKeymanControlInternal(HWND hwnd, WPARAM wParam, LPARAM lParam)
 {
   UNREFERENCED_PARAMETER(hwnd);
 
-	switch(wParam)
-	{
+  switch(wParam)
+  {
   case KMCI_GETACTIVEKEYBOARD:   // I3933
     ReportActiveKeyboard(LOWORD(lParam));   // I3949
     break;
@@ -393,7 +373,7 @@ void ProcessWMKeymanControlInternal(HWND hwnd, WPARAM wParam, LPARAM lParam)
   case KMCI_SETFOREGROUND:   // I3933
     SetForegroundWindow(hwnd);
     break;
-	}
+  }
 }
 
 void
@@ -422,30 +402,30 @@ ProcessWMKeymanControl(WPARAM wParam, LPARAM lParam) {
   may have been reset while Keyman was not aware of it
 */
 void GetCapsAndNumlockState() {   // I4793
-	DWORD n = Globals::get_ShiftState();
+  DWORD n = Globals::get_ShiftState();
 
-	if(GetKeyState(VK_NUMLOCK) & 1) *Globals::ShiftState() |= NUMLOCKFLAG;
-	else *Globals::ShiftState() &= ~NUMLOCKFLAG;
+  if(GetKeyState(VK_NUMLOCK) & 1) *Globals::ShiftState() |= NUMLOCKFLAG;
+  else *Globals::ShiftState() &= ~NUMLOCKFLAG;
 
-	if(GetKeyState(VK_CAPITAL) & 1) *Globals::ShiftState() |= CAPITALFLAG;
-	else *Globals::ShiftState() &= ~CAPITALFLAG;
+  if(GetKeyState(VK_CAPITAL) & 1) *Globals::ShiftState() |= CAPITALFLAG;
+  else *Globals::ShiftState() &= ~CAPITALFLAG;
 
-	if(GetKeyState(VK_SHIFT) < 0) *Globals::ShiftState() |= K_SHIFTFLAG;
-	else *Globals::ShiftState() &= ~K_SHIFTFLAG;
+  if(GetKeyState(VK_SHIFT) < 0) *Globals::ShiftState() |= K_SHIFTFLAG;
+  else *Globals::ShiftState() &= ~K_SHIFTFLAG;
 
-	if(GetKeyState(VK_RCONTROL) < 0) *Globals::ShiftState() |= RCTRLFLAG;
-	else *Globals::ShiftState() &= ~RCTRLFLAG;
+  if(GetKeyState(VK_RCONTROL) < 0) *Globals::ShiftState() |= RCTRLFLAG;
+  else *Globals::ShiftState() &= ~RCTRLFLAG;
 
-	if(GetKeyState(VK_LCONTROL) < 0) *Globals::ShiftState() |= LCTRLFLAG;
-	else *Globals::ShiftState() &= ~LCTRLFLAG;
+  if(GetKeyState(VK_LCONTROL) < 0) *Globals::ShiftState() |= LCTRLFLAG;
+  else *Globals::ShiftState() &= ~LCTRLFLAG;
 
-	if(GetKeyState(VK_LMENU) < 0) *Globals::ShiftState() |= LALTFLAG;
-	else *Globals::ShiftState() &= ~LALTFLAG;
+  if(GetKeyState(VK_LMENU) < 0) *Globals::ShiftState() |= LALTFLAG;
+  else *Globals::ShiftState() &= ~LALTFLAG;
 
-	if(GetKeyState(VK_RMENU) < 0) *Globals::ShiftState() |= RALTFLAG;
-	else *Globals::ShiftState() &= ~RALTFLAG;
+  if(GetKeyState(VK_RMENU) < 0) *Globals::ShiftState() |= RALTFLAG;
+  else *Globals::ShiftState() &= ~RALTFLAG;
 
-	SendDebugMessageFormat(0, sdmInternat, 0, "GetCapsAndNumlockState (Enter:%x Exit:%x)", n, Globals::get_ShiftState());
+  SendDebugMessageFormat(0, sdmInternat, 0, "GetCapsAndNumlockState (Enter:%x Exit:%x)", n, Globals::get_ShiftState());
 }
 
 /*
@@ -489,5 +469,5 @@ BOOL IsFocusedThread()
     return FALSE;
   }
   return gti.hwndFocus == GetFocus();
-	//return GetCurrentThreadId() == GetWindowThreadProcessId(GetForegroundWindow(), NULL);
+  //return GetCurrentThreadId() == GetWindowThreadProcessId(GetForegroundWindow(), NULL);
 }

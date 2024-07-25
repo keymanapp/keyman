@@ -25,9 +25,6 @@ install: # run as sudo
 uninstall: # run as sudo
 	SUDOINSTALL="uninstall" ./scripts/install.sh
 
-debnocow:
-	./scripts/deb.sh
-
 sources:
 	./scripts/dist.sh
 
@@ -38,16 +35,7 @@ origdist:
 	./scripts/dist.sh origdist
 
 sourcepackage: reconf origdist
-	./scripts/deb.sh sourcepackage
-
-cow: # it will prompt for sudo if required for cowbuilder
-	./scripts/cow.sh
-
-deb: reconf origdist cow debnocow # it will prompt for sudo if required for cowbuilder
-	echo "Built dev Debian packages in builddebs/"
-
-releasedeb: reconf origdist cow debnocow # it will prompt for sudo if required for cowbuilder
-	echo "Built release Debian packages in builddebs/"
+	./scripts/deb.sh
 
 nightlydist: reconf sources
 	echo "Built nightly source release in dist/"
