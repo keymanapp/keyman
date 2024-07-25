@@ -287,16 +287,32 @@ class CircularArray<Item> {
   }
 }
 
+interface ContextMatchResult {
+  /**
+   * Represents the current state of the context after applying incoming keystroke data.
+   */
+  state: TrackedContextState;
+
+  /**
+   * Represents the previously-cached context state that best matches `state` if available.
+   * May be `null` if no such state could be found within the context-state cache.
+   */
+  baseState: TrackedContextState;
+
+  /**
+   * Indicates the portion of the incoming keystroke data, if any, that applies to
+   * tokens before the last pre-caret token and thus should not be replaced by predictions
+   * based upon `state`.
+   */
+  preservationTransform?: Transform;
+}
+
 export class ContextTracker extends CircularArray<TrackedContextState> {
   static attemptMatchContext(
     tokenizedContext: { text: USVString, isWhitespace?: boolean } [],
     matchState: TrackedContextState,
     transformSequenceDistribution?: Distribution<Transform[]>
-  ): {
-    state: TrackedContextState,
-    baseState: TrackedContextState,
-    preservationTransform?: Transform
-  } {
+  ): ContextMatchResult {
     // Map the previous tokenized state to an edit-distance friendly version.
     let matchContext: USVString[] = matchState.toRawTokenization();
 
@@ -376,21 +392,20 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     // Reset priorEdit for the end-of-context updating loop.
     priorEdit = undefined;
 
-    // TODO:  I'm beginning to believe that searchSpace be tracked (eventually)
-    // on the tokens, rather than on the overall 'state'
-    // - Reason:  phrase-level corrections / predictions would likely need a search-state
-    //   across per potentially-affected token.
-    // - Shifting the paradigm should be a separate work unit than the
-    //   context-tracker rework currently being done, though.
+    // Used to construct and represent the part of the incoming transform that
+    // does not land as part of the final token in the resulting context.  This
+    // component should be preserved by any suggestions that get applied.
+    let preservationTransform: Transform;
 
     // Now to update the end of the context window.
-
-    let preservationTransform: Transform;
     for(let i = lastMatch+1; i < editPath.length; i++) {
       const isLastToken = i == editPath.length - 1;
 
+      // If we didn't get any input, we really should perfectly match
+      // a previous context state.  If such a state is out of our cache,
+      // it should simply be rebuilt.
       if(!hasDistribution) {
-        throw new Error("Unexpected context-tracking state.");
+        return null;
       }
       const transformDistIndex = i - (lastMatch + 1);
       const tokenDistribution = transformSequenceDistribution.map((entry) => {
@@ -400,6 +415,10 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
         };
       });
 
+      // If the tokenized part of the input is a completely empty transform,
+      // replace it with null.  This can happen with our default wordbreaker
+      // immediately after a whitespace.  We don't want to include this
+      // transform as part of the input when doing correction-search.
       let primaryInput = hasDistribution ? tokenDistribution[0]?.sample : null;
       if(primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft == 0 && !primaryInput.deleteRight) {
         primaryInput = null;
@@ -426,6 +445,12 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
           const token = state.tokens[i - poppedTokenCount];
           const matchToken = matchState.tokens[i];
 
+          // TODO:  I'm beginning to believe that searchSpace should (eventually) be tracked
+          // on the tokens, rather than on the overall 'state'.
+          // - Reason:  phrase-level corrections / predictions would likely need a search-state
+          //   across per potentially-affected token.
+          // - Shifting the paradigm should be a separate work unit than the
+          //   context-tracker rework currently being done, though.
           if(isBackspace) {
             token.updateWithBackspace(incomingToken.text, primaryInput.id);
             if(isLastToken) {
@@ -497,6 +522,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
           }
           pushedToken.isWhitespace = incomingToken.isWhitespace;
 
+          // Auto-replaces the search space to correspond with the new token.
           state.pushTail(pushedToken);
           break;
         default:
@@ -571,7 +597,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     model: LexicalModel,
     context: Context,
     transformDistribution?: Distribution<Transform>
-  ): { state: TrackedContextState, baseState: TrackedContextState, preservationTransform?: Transform } {
+  ): ContextMatchResult {
     if(!model.traverseFromRoot) {
       // Assumption:  LexicalModel provides a valid traverseFromRoot function.  (Is technically optional)
       // Without it, no 'corrections' may be made; the model can only be used to predict, not correct.
