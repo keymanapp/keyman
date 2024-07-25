@@ -15,6 +15,7 @@ builder_describe "Keyman Developer Compiler Module for .kmn to .kmx" \
   "@/common/web/keyman-version" \
   "@/common/web/types" \
   "@/developer/src/common/web/test-helpers" \
+  "@/developer/src/common/web/utils" \
   "@/developer/src/kmcmplib:wasm" \
   "configure" \
   "build" \
