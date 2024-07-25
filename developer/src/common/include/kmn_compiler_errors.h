@@ -49,13 +49,13 @@
 #define CERR_None                                          0x00000000
 #define CERR_EndOfFile                                     0x00000001
 
-#define CERR_BadCallParams                                 0x00008002
-#define CERR_CannotAllocateMemory                          0x00008004
+#define CERR_BadCallParams                                 0x00008002      // TODO: rename to CFATAL_
+#define CERR_CannotAllocateMemory                          0x00008004      // TODO: rename to CFATAL_
 #define CERR_InfileNotExist                                0x00004005   // #10678: reduced from fatal to error in 17.0
 // #define CERR_CannotCreateOutfile                           0x00004006   // #10678: reduced from fatal to error in 17.0, but unused
-#define CERR_UnableToWriteFully                            0x00008007
+#define CERR_UnableToWriteFully                            0x00008007      // TODO: rename to CFATAL_
 #define CERR_CannotReadInfile                              0x00004008   // #10678: reduced from fatal to error in 17.0
-#define CERR_SomewhereIGotItWrong                          0x00008009
+#define CERR_SomewhereIGotItWrong                          0x00008009      // TODO: rename to CFATAL_
 
 #define CERR_InvalidToken                                  0x0000400A
 #define CERR_InvalidBegin                                  0x0000400B
@@ -129,7 +129,7 @@
 
 #define CERR_InvalidEthnologueCode                         0x0000404D
 
-#define CERR_CannotCreateTempfile                          0x0000804E
+#define CERR_CannotCreateTempfile                          0x0000804E         // TODO: rename to CFATAL_
 
 #define CERR_90FeatureOnly_IfSystemStores                  0x0000404F
 #define CERR_IfSystemStore_NotFound                        0x00004050
@@ -252,7 +252,9 @@
 
 #define CWARN_VirtualKeyInOutput                           0x000020AF
 
-#define CERR_BufferOverflow                                0x000080C0
-#define CERR_Break                                         0x000080C1
+#define CHINT_IndexStoreLong                               0x000010B0
+
+#define CERR_BufferOverflow                                0x000080C0      // TODO: Rename to CFATAL_...
+#define CERR_Break                                         0x000080C1      // TODO: Rename to CFATAL_...
 
 #endif  // _kmn_compiler_errors_h
