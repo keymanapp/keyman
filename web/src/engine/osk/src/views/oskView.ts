@@ -238,7 +238,7 @@ export default abstract class OSKView
 
     this._bannerController = new BannerController(this.bannerView, this.hostDevice, this.config.predictionContextManager);
 
-    this.keyboardView = new EmptyView();
+    this.keyboardView = this._GenerateKeyboardView(null, null);
     this._Box.appendChild(this.keyboardView.element);
 
     // Install the default OSK stylesheets - but don't have it managed by the keyboard-specific stylesheet manager.
@@ -250,8 +250,6 @@ export default abstract class OSKView
       const sheetHref = `${resourcePath}${sheetFile}`;
       this.uiStyleSheetManager.linkExternalSheet(sheetHref);
     }
-
-    this.activeKeyboard = this.config.keyboardToActivate;
 
     this.setBaseMouseEventListeners();
     if(this.hostDevice.touchable) {
@@ -542,13 +540,6 @@ export default abstract class OSKView
     keyboard: Keyboard,
     metadata: KeyboardProperties
   }) {
-    // Is the keyboard already loaded?  If so, ignore the change command.
-    //
-    // Note:  ensures that the _instances_ are the same; it's possible to make new instances
-    // to force a refresh.  Does not perform a deep-equals.
-    if(this.keyboardData?.keyboard == keyboardData?.keyboard && this.keyboardData?.metadata == keyboardData?.metadata) {
-      return;
-    }
     this.keyboardData = keyboardData;
     this.loadActiveKeyboard();
 
