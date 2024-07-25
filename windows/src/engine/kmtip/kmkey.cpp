@@ -276,7 +276,7 @@ HRESULT WINAPI CKeymanEditSession::KeymanGetContext(int n, PWSTR buf, BOOL* isTe
 
   // now check for selected text
   if (!SUCCEEDED(hr = KeymanIsTextSelected(hrGetSelection, cFetched, tfSelection, isTextSelected))) {
-    Log(L"KeymanGetContext: Warning: KeymanIsTextSelected failed");
+    SendDebugMessage(L"Warning: KeymanIsTextSelected failed");
     // Continue to return S_OK, even though checking if a text selection exists has failed.
     // Reaching this point means the context in 'buf' is valid and will be passed to the caller.
     // isTextSelected will be false, which is better than returning E_FAIL at this point.
@@ -306,7 +306,7 @@ CKeymanEditSession::KeymanIsTextSelected(HRESULT hrGetSelection, ULONG cFetched,
 
     // Compare the start and end of the range
     if (!SUCCEEDED(hr = tfSelection.range->IsEmpty(_ec, &isEmpty))) {
-      Log(L"KeymanIsTextSelected: Exit: Testing range->isEmpty");
+      SendDebugMessage(L"Exit: Testing range->isEmpty");
       return_SendDebugExit(hr);
     }
 
