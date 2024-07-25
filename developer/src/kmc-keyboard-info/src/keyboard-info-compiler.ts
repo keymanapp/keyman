@@ -299,7 +299,7 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
     }
     keyboard_info.packageIncludes = [...includes];
 
-    keyboard_info.version = kmpJsonData.info.version.description;
+    keyboard_info.version = kmpJsonData.info?.version?.description ?? '1.0';
 
     let minVersion = minKeymanVersion;
     const m = jsFile?.match(/this.KMINVER\s*=\s*(['"])(.*?)\1/);

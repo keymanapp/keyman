@@ -32,8 +32,10 @@ type TextWithProbability = {
 
   /**
    * The probability of the lexical entry, directly based upon its frequency.
+   *
+   * A real-number weight, from 0 to 1.
    */
-  p: number; // real-number weight, from 0 to 1
+  p: number;
 }
 
 /**
@@ -68,10 +70,9 @@ declare interface LexiconTraversal {
   children(): Generator<{char: USVString, traversal: () => LexiconTraversal}>;
 
   /**
-   * Allows direct access to the traversal state that results when appending a
-   * `char` representing one or more individual UTF-16 codepoints to the
-   * current traversal state's prefix.  This bypasses the need to iterate
-   * among all legal child Traversals.
+   * Allows direct access to the traversal state that results when appending one
+   * or more codepoints encoded in UTF-16 to the current traversal state's prefix.
+   * This allows bypassing iteration among all legal child Traversals.
    *
    * If such a traversal state is not supported, returns `undefined`.
    *

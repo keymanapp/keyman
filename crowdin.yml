@@ -34,6 +34,7 @@ files:
     languages_mapping:
       # Prevent invalid region pap-rPAP. Leaving "in" for Indonesian
       android_code:
+        el-polyton: b+el # TODO: figure out polyton variant
         es-419: b+es+419
         pap: pap
         shu-latn-n: b+shu+latn
@@ -44,6 +45,7 @@ files:
     languages_mapping:
       # Prevent invalid region pap-rPAP
       android_code:
+        el-polyton: b+el # TODO: figure out polyton variant
         es-419: b+es+419
         pap: pap
         shu-latn-n: b+shu+latn
@@ -79,6 +81,7 @@ files:
     languages_mapping:
       osx_code:
         pt-PT: pt-PT.lproj
+        el-polyton: el.lproj
 
   - source: /ios/engine/KMEI/KeymanEngine/en.lproj/Localizable.strings
     dest: /ios/engine/Localizable.strings
@@ -86,6 +89,7 @@ files:
     languages_mapping:
       osx_code:
         pt-PT: pt-PT.lproj
+        el-polyton: el.lproj
 
   - source: /ios/engine/KMEI/KeymanEngine/en.lproj/Localizable.stringsdict
     dest: /ios/engine/Localizable.stringsdict
@@ -93,6 +97,7 @@ files:
     languages_mapping:
       osx_code:
         pt-PT: pt-PT.lproj
+        el-polyton: el.lproj
 
   - source: /ios/keyman/Keyman/Keyman/en.lproj/Localizable.strings
     dest: /ios/app/Localizable.strings
@@ -100,6 +105,7 @@ files:
     languages_mapping:
       osx_code:
         pt-PT: pt-PT.lproj
+        el-polyton: el.lproj
 
   # Linux files
 
@@ -136,7 +142,7 @@ files:
       osx_code:
         pt-PT: pt-PT.lproj
 
-  - source: /mac/Keyman4MacIM/Keyman4MacIM/KMKeyboardHelpWindow/en.lproj/KMKeyboardHelpWindowController.strings  
+  - source: /mac/Keyman4MacIM/Keyman4MacIM/KMKeyboardHelpWindow/en.lproj/KMKeyboardHelpWindowController.strings
     dest: /mac/app/KMKeyboardHelpWindowController.strings
     translation: /mac/Keyman4MacIM/Keyman4MacIM/KMKeyboardHelpWindow/%osx_code%/%original_file_name%
     languages_mapping:

@@ -1,6 +1,6 @@
 import { EventEmitter } from "eventemitter3";
 import type LanguageProcessor from "./languageProcessor.js";
-import { type ReadySuggestions, type InvalidateSourceEnum, StateChangeHandler } from './languageProcessor.js';
+import { ReadySuggestions, type InvalidateSourceEnum, StateChangeHandler } from './languageProcessor.js';
 import { type KeyboardProcessor, type OutputTarget } from "@keymanapp/keyboard-processor";
 
 interface PredictionContextEventMap {
@@ -86,9 +86,12 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
       }
     }
 
-    this.suggestionReverter = (reversion) => {
+    this.suggestionReverter = async (reversion) => {
       if(validSuggestionState()) {
-        langProcessor.applyReversion(reversion, this.currentTarget);
+        let suggestions = await langProcessor.applyReversion(reversion, this.currentTarget);
+        // We want to avoid altering flags that indicate our post-reversion state.
+        this.swallowPrediction = true;
+        this.updateSuggestions(new ReadySuggestions(suggestions, reversion.id ? -reversion.id : undefined));
       }
     }
 
@@ -138,8 +141,13 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     // Insert 'current text' if/when valid as the leading option.
     // Since we don't yet do auto-corrections, we only show 'keep' whenever it's
     // a valid word (according to the model).
+    const mayShowKeep = this.activateKeep() && this.keepSuggestion;
 
-    if(this.activateKeep() && this.keepSuggestion && this.keepSuggestion.matchesModel) {
+    // If there is an auto-select option that doesn't match the current context,
+    // we need to present the user a way to preserve the current context instead.
+    const keepNeeded = this.selected && (this.keepSuggestion != this.selected);
+
+    if(mayShowKeep && (keepNeeded || this.keepSuggestion.matchesModel)) {
       suggestions.push(this.keepSuggestion);
     } else if(this.doRevert) {
       suggestions.push(this.revertSuggestion);
@@ -341,7 +349,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
         this.keepSuggestion = s as Keep;
       }
 
-      if(s.autoAccept) {
+      if(s.autoAccept && !this.selected) {
         this.selected = s;
       }
     }
