@@ -114,7 +114,7 @@ export default class ModelCompositor {
   }
 
   async predict(transformDistribution: Transform | Distribution<Transform>, context: Context): Promise<Suggestion[]> {
-    let lexicalModel = this.lexicalModel;
+    const lexicalModel = this.lexicalModel;
 
     // If a prior prediction is still processing, signal to terminate it; we have a new
     // prediction request to prioritize.
@@ -143,18 +143,17 @@ export default class ModelCompositor {
       })
     }
 
-    const { sample: inputTransform, p: inputTransformProb } = transformDistribution.sort(function(a, b) {
+    const inputTransform = transformDistribution.sort(function(a, b) {
       return b.p - a.p;
-    })[0];
+    })[0].sample;
 
     // Only allow new-word suggestions if space was the most likely keypress.
-    let allowSpace = TransformUtils.isWhitespace(inputTransform);
-    let allowBksp = TransformUtils.isBackspace(inputTransform);
+    const allowSpace = TransformUtils.isWhitespace(inputTransform);
+    const allowBksp = TransformUtils.isBackspace(inputTransform);
 
-    let postContext = models.applyTransform(inputTransform, context);
+    const postContext = models.applyTransform(inputTransform, context);
     const truePrefix = this.wordbreak(postContext);
     const basePrefix = allowBksp ? truePrefix : this.wordbreak(context);
-    let keepOption: Outcome<Keep> = null;
 
     let rawPredictions: CorrectionPredictionTuple[] = [];
 
@@ -394,24 +393,128 @@ export default class ModelCompositor {
       }
     }
 
-    // Section 2 - post-analysis for our generated predictions, managing 'keep'.
-    // Assumption:  Duplicated 'displayAs' properties indicate duplicated Suggestions.
-    // When true, we can use an 'associative array' to de-duplicate everything.
+    // Section 2 - prediction filtering + post-processing pass 1
+
+    // Properly capitalizes the suggestions based on the existing context casing state.
+    // This may result in duplicates if multiple casing options exist within the
+    // lexicon for a word.  (Example:  "Apple" the company vs "apple" the fruit.)
+    for(let tuple of rawPredictions) {
+      if(currentCasing && currentCasing != 'lower') {
+        this.applySuggestionCasing(tuple.prediction.sample, basePrefix, currentCasing);
+      }
+    }
+
+    // We want to dedupe before trimming the list so that we can present a full set
+    // of viable distinct suggestions if available.
+    const deduplicatedSuggestionTuples = this.dedupeSuggestions(rawPredictions, context);
+
+    // Needs "casing" to be applied first.
+    //
+    // Will also add a 'keep' suggestion (with `.matchesModel = false`) matching
+    // the current state of context if there is no such matching prediction.
+    this.processSimilarity(deduplicatedSuggestionTuples, context, transformDistribution[0]);
+
+    // Section 3:  Sort the suggestions in display priority order to determine
+    // which are most optimal, then auto-select based on the results.
+    deduplicatedSuggestionTuples.sort(tupleDisplayOrderSort);
+    this.predictionAutoSelect(deduplicatedSuggestionTuples);
+
+    // Section 4: Trim down the suggestion list to the N (MAX_SUGGESTIONS) most optimal,
+    // then cache and return the set of suggestions
+
+    // Now that we've marked the suggestion to auto-select, we can finalize the suggestions.
+    const suggestions = this.finalizeSuggestions(deduplicatedSuggestionTuples, context, inputTransform);
+
+    // Store the suggestions on the final token of the current context state (if it exists).
+    // Or, once phrase-level suggestions are possible, on whichever token serves as each prediction's root.
+    if(postContextState) {
+      postContextState.tail.replacements = suggestions.map(function(suggestion) {
+        return {
+          suggestion: suggestion,
+          tokenWidth: 1
+        }
+      });
+    }
+
+    return suggestions;
+  }
+
+  /**
+   * Given an array of suggestions output from the correction and model-lookup processes,
+   * this function checks for any duplicate suggestions and merges them.
+   *
+   * Note that duplicates can arise for a few reasons:
+   * - Two or more corrections may have the same net result (due to keyboard rules, etc)
+   * - Application of casing may cause previously-distinct suggestions to no longer be distinct.
+   * @param rawPredictions
+   * @param context The context to which suggestions will be applied.
+   * @returns
+   */
+  private dedupeSuggestions(rawPredictions: CorrectionPredictionTuple[], context: Context) {
     let suggestionDistribMap: {[key: string]: CorrectionPredictionTuple} = {};
+    let suggestionDistribution: CorrectionPredictionTuple[] = [];
+
+    // Deduplicator + annotator of 'keep' suggestions.
+    for(let tuple of rawPredictions) {
+      const predictedWord = this.wordbreak(models.applyTransform(tuple.prediction.sample.transform, context));
+
+      // Assumption:  suggestions that have the same net result should have the
+      // same displayAs string.  (We could try to pick the one with highest net
+      // probability, but that seems like too much of an edge-case to matter.)
+      //
+      // Either way, no point in showing multiple suggestions that do the same thing.
+      // Merge 'em!
+      const existingSuggestion = suggestionDistribMap[predictedWord];
+      if(existingSuggestion) {
+        existingSuggestion.totalProb += tuple.totalProb;
+      } else {
+        suggestionDistribMap[predictedWord] = tuple;
+      }
+    }
+
+    // Now that we've calculated a unique set of probability masses, time to
+    // make them into a proper distribution and prep for return.
+    for(let key in suggestionDistribMap) {
+      let pair = suggestionDistribMap[key];
+      suggestionDistribution.push(pair);
+    }
+
+    return suggestionDistribution;
+  }
+
+  /**
+   * This function checks for any suggestions that directly match the actual
+   * context in some manner and ranks suggestions accordingly.  Additionally, if
+   * there is no such suggestion, a stand-in is generated and added to the list,
+   * though marked as "not matching the model".
+   *
+   * The suggestion "ranks", from highest to lowest:
+   * - the suggestion produces an exact match for the user's current text
+   * - the suggestion produces a case-insensitive match for the user's current
+   *   text
+   * - the suggestion produces a case + diacritic insensitive match for the
+   *   user's current text
+   * - any other suggestion
+   *
+   * @param suggestionDistribution
+   * @param context
+   * @param trueInput inputTransform + its assigned probability
+   * @returns
+   */
+  private processSimilarity(suggestionDistribution: CorrectionPredictionTuple[], context: Context, trueInput: ProbabilityMass<Transform>) {
+    const { sample: inputTransform, p: inputTransformProb } = trueInput;
+
+    let postContext = models.applyTransform(inputTransform, context);
+    const truePrefix = this.wordbreak(postContext);
 
     const keyed = (text: string) => this.lexicalModel.toKey ? this.lexicalModel.toKey(text) : text;
     const keyCased = (text: string) => this.lexicalModel.applyCasing ? this.lexicalModel.applyCasing('lower', text) : text;
     const keyedPrefix = keyed(truePrefix);
     const lowercasedPrefix = keyCased(truePrefix);
 
-    let deduplicatedSuggestionTuples: CorrectionPredictionTuple[] = [];
+    let keepOption: Outcome<Keep>;
 
-    // Deduplicator + annotator of 'keep' suggestions.
-    for(let tuple of rawPredictions) {
-      if(currentCasing && currentCasing != 'lower') {
-        this.applySuggestionCasing(tuple.prediction.sample, basePrefix, currentCasing);
-      }
-
+    for(let tuple of suggestionDistribution) {
       // Don't set it unnecessarily; this can have side-effects in some automated tests.
       if(inputTransform.id !== undefined) {
         tuple.prediction.sample.transformId = inputTransform.id;
@@ -443,80 +546,41 @@ export default class ModelCompositor {
           tuple.matchLevel = SuggestionSimilarity.sameKey;
         }
       }
+    }
 
-      // Assumption:  suggestions that have the same net result should have the
-      // same displayAs string.  (We could try to pick the one with highest net
-      // probability, but that seems like too much of an edge-case to matter.)
-      //
-      // Either way, no point in showing multiple suggestions that do the same thing.
-      // Merge 'em!
-      const existingSuggestion = suggestionDistribMap[predictedWord];
-      if(existingSuggestion) {
-        existingSuggestion.totalProb += tuple.totalProb;
-      } else {
-        suggestionDistribMap[predictedWord] = tuple;
-      }
+    // If we already have a keep option, we're done!  Return and move on.
+    if(keepOption || truePrefix == '') {
+      return;
     }
 
     // Generate a default 'keep' option if one was not otherwise produced.
-    if(!keepOption && truePrefix != '') {
-      // IMPORTANT:  duplicate the original transform.  Causes nasty side-effects
-      // for context-tracking otherwise!
-      let keepTransform: Transform = { ...inputTransform };
 
-      // 1 is a filler value; goes unused b/c is for a 'keep'.
-      let keepSuggestion = models.transformToSuggestion(keepTransform, 1);
-      // This is the one case where the transform doesn't insert the full word; we need to override the displayAs param.
-      keepSuggestion.displayAs = truePrefix;
+    // IMPORTANT:  duplicate the original transform.  Causes nasty side-effects
+    // for context-tracking otherwise!
+    let keepTransform: Transform = { ...inputTransform };
 
-      keepOption = this.toAnnotatedSuggestion(keepSuggestion, 'keep');
-      keepOption.transformId = inputTransform.id;
-      keepOption.matchesModel = false;
+    // 1 is a filler value; goes unused b/c is for a 'keep'.
+    let keepSuggestion = models.transformToSuggestion(keepTransform, 1);
+    // This is the one case where the transform doesn't insert the full word; we need to override the displayAs param.
+    keepSuggestion.displayAs = truePrefix;
 
-      deduplicatedSuggestionTuples.unshift({
-        totalProb: keepOption.p,
-        prediction: {
-          sample: keepOption,
-          p: keepOption.p,
-        },
-        correction: {
-          sample: truePrefix,
-          p: inputTransformProb // we already sorted + this aligns with inputTransform.
-        },
-        matchLevel: SuggestionSimilarity.exact,
-      });
-    }
+    keepOption = this.toAnnotatedSuggestion(keepSuggestion, 'keep');
+    keepOption.transformId = inputTransform.id;
+    keepOption.matchesModel = false;
 
-    // Section 3:  Finalize suggestions, truncate list to the N (MAX_SUGGESTIONS) most optimal, return.
-
-    // Now that we've calculated a unique set of probability masses, time to make them into a proper
-    // distribution and prep for return.
-    for(let key in suggestionDistribMap) {
-      let pair = suggestionDistribMap[key];
-      deduplicatedSuggestionTuples.push(pair);
-    }
-
-    deduplicatedSuggestionTuples = deduplicatedSuggestionTuples.sort(tupleDisplayOrderSort);
-    this.predictionAutoSelect(deduplicatedSuggestionTuples);
-
-    // Section 4: Trim down the suggestion list to the N (MAX_SUGGESTIONS) most optimal,
-    // then cache and return the set of suggestions
-
-    // Now that we've marked the suggestion to auto-select, we can finalize the suggestions.
-    const suggestions = this.finalizeSuggestions(deduplicatedSuggestionTuples, context, inputTransform);
-
-    // Store the suggestions on the final token of the current context state (if it exists).
-    // Or, once phrase-level suggestions are possible, on whichever token serves as each prediction's root.
-    if(postContextState) {
-      postContextState.tail.replacements = suggestions.map(function(suggestion) {
-        return {
-          suggestion: suggestion,
-          tokenWidth: 1
-        }
-      });
-    }
-
-    return suggestions;
+    // Insert our
+    suggestionDistribution.unshift({
+      totalProb: keepOption.p,
+      prediction: {
+        sample: keepOption,
+        p: keepOption.p,
+      },
+      correction: {
+        sample: truePrefix,
+        p: inputTransformProb
+      },
+      matchLevel: SuggestionSimilarity.exact,
+    });
   }
 
   private predictionAutoSelect(suggestionDistribution: CorrectionPredictionTuple[]) {
@@ -616,7 +680,7 @@ export default class ModelCompositor {
       }
     });
 
-    // Apply 'after word' punctuation and casing (when applicable).  Also, set suggestion IDs.
+    // Apply 'after word' punctuation and other post-processing, setting suggestion IDs.
     // We delay until now so that utility functions relying on the unmodified Transform may execute properly.
     suggestions.forEach((suggestion) => {
       // Valid 'keep' suggestions may have zero length; we still need to evaluate the following code
