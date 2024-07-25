@@ -254,13 +254,6 @@ export default abstract class OSKView
 
     this.activeKeyboard = this.config.keyboardToActivate;
 
-    // Ensure the appropriate banner mode is activated; it's possible for a model to have either
-    // partially or fully loaded, especially if the prior line has a full Keyboard instance.
-    const modelState = this.config.predictionContextManager?.modelState;
-    if(modelState) {
-      this.bannerController.selectBanner(modelState);
-    }
-
     this.setBaseMouseEventListeners();
     if(this.hostDevice.touchable) {
       this.setBaseTouchEventListeners();
