@@ -67,7 +67,7 @@ declare interface LexiconTraversal {
    * - If `char` = 'e', the child represents a prefix of 'the'.
    * - Then `traversal` allows traversing the part of the lexicon prefixed by 'the'.
    */
-  children(): Generator<{char: USVString, traversal: () => LexiconTraversal}>;
+  children(): {char: USVString, p: number, traversal: () => LexiconTraversal}[];
 
   /**
    * Allows direct access to the traversal state that results when appending one
