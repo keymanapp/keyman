@@ -303,6 +303,8 @@ interface ContextMatchResult {
    * Indicates the portion of the incoming keystroke data, if any, that applies to
    * tokens before the last pre-caret token and thus should not be replaced by predictions
    * based upon `state`.
+   *
+   * Should always be non-null if the token before the caret did not previously exist.
    */
   preservationTransform?: Transform;
 }
