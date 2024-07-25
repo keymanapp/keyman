@@ -259,7 +259,7 @@
 * fix(web): explicitly terminate banner gesture-handling when banner is swapped (#11599)
 * chore(web): removes unused locals, imports, and private fields (#11460)
 * fix(web): use correct parameter name in button UI OSK `hide` event (#11600)
-*  (#11444)
+* chore(mac): rework of main build script (#11444)
 * fix(ios): do not write to shared storage from system keyboard (#11613)
 * fix(developer): handle invalid default project path in options (#11555)
 * fix(developer): handle missing data in .kps `<Keyboard>` (#11563)
@@ -344,7 +344,7 @@
 
 ## 18.0.35 alpha 2024-05-14
 
-*  (#11340)
+* chore(core): update core to C++17 (#11340)
 
 ## 18.0.34 alpha 2024-05-13
 
@@ -608,8 +608,8 @@
 
 ## 17.0.317 beta 2024-05-01
 
-*  (#11322)
-*  (#11321)
+* chore(web): remove old reference-doc from alpha that has completed its purpose (#11322)
+* fix(web): gesture-model initial-state, callback failure handling (#11321)
 * fix(linux): Fix icon for .kmp files (#11295)
 
 ## 17.0.316 beta 2024-04-30
