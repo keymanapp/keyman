@@ -451,10 +451,6 @@ bool mac_KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, const UCKe
             // Alt and Shift+Alt don't work, so skip them (ss 4+5)
             continue;
           }
-//_S2 TOP_6 TODO to compare win-lin kmn-files skip ss6+7; MUST BE removed later!!!!
-         /*if (ss == MenuCtrl || ss == ShftMenuCtrl) {
-           continue;
-          }*/
 
           KMX_DWORD kc_underlying = mac_KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 
