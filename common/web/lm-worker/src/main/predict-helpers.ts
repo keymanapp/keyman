@@ -491,7 +491,11 @@ export function processSimilarity(
       } else if(keyed(predictedWord) == keyedPrefix) {
         // Diacritic-insensitive / exact-key match.
         tuple.matchLevel = SuggestionSimilarity.sameKey;
+      } else {
+        tuple.matchLevel = SuggestionSimilarity.none;
       }
+    } else {
+      tuple.matchLevel = SuggestionSimilarity.none;
     }
   }
 
@@ -512,7 +516,9 @@ export function processSimilarity(
   keepSuggestion.displayAs = truePrefix;
 
   keepOption = toAnnotatedSuggestion(lexicalModel, keepSuggestion, 'keep');
-  keepOption.transformId = inputTransform.id;
+  if(inputTransform.id !== undefined) {
+    keepOption.transformId = inputTransform.id;
+  }
   keepOption.matchesModel = false;
 
   // Insert our synthetic keepOption as a prediction.
@@ -722,11 +728,16 @@ export function toAnnotatedSuggestion(
     defaultQuoteBehavior = QuoteBehavior.useQuotes;
   }
 
-  return {
+  const result: Outcome<Suggestion> = {
     transform: suggestion.transform,
-    transformId: suggestion.transformId,
     displayAs: QuoteBehavior.apply(quoteBehavior, suggestion.displayAs, punctuation, defaultQuoteBehavior),
     tag: annotationType,
     p: suggestion.p
   };
+
+  if(suggestion.transformId !== undefined) {
+    result.transformId = suggestion.transformId;
+  }
+
+  return result;
 }

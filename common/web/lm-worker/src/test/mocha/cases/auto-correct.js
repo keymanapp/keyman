@@ -1,6 +1,5 @@
 import { AUTOSELECT_PROPORTION_THRESHOLD, SuggestionSimilarity, predictionAutoSelect, tupleDisplayOrderSort } from "#./predict-helpers.js";
 import { assert } from 'chai';
-import sinon from 'sinon';
 
 /*
   * Preconditions:
