@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { TranCompiler, BkspCompiler } from '../src/compiler/tran.js';
 import { BASIC_DEPENDENCIES, UsetCompiler } from '../src/compiler/empty-compiler.js';
 import { CompilerMessages } from '../src/compiler/messages.js';
-import { CompilerMessages as KmnOtherCompilerMessages } from '@keymanapp/kmc-kmn';
+import { KmnCompilerMessages } from '@keymanapp/kmc-kmn';
 import { assertCodePoints, compilerTestCallbacks, testCompilationCases } from './helpers/index.js';
 import { KMXPlus, MarkerParser } from '@keymanapp/common-types';
 
@@ -267,7 +267,7 @@ describe('tran', function () {
     {
       subpath: 'sections/tran/fail-bad-reorder-1.xml',
       errors: [
-        KmnOtherCompilerMessages.Error_UnicodeSetSyntaxError()
+        KmnCompilerMessages.Error_UnicodeSetSyntaxError()
       ],
     },
     {

@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import { CompilerMessages, KmnCompilerMessages } from '../src/compiler/kmn-compiler-messages.js';
+import { KmnCompilerMessages } from '../src/compiler/kmn-compiler-messages.js';
 import { TestCompilerCallbacks, verifyCompilerMessagesObject } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
 import { KmnCompiler } from '../src/main.js';
@@ -42,13 +42,13 @@ describe('KmnCompilerMessages', function () {
   // ERROR_InvalidKvksFile
 
   it('should generate ERROR_InvalidKvksFile if the kvks is not valid XML', async function() {
-    await testForMessage(this, ['invalid-keyboards', 'error_invalid_kvks_file.kmn'], CompilerMessages.ERROR_InvalidKvksFile);
+    await testForMessage(this, ['invalid-keyboards', 'error_invalid_kvks_file.kmn'], KmnCompilerMessages.ERROR_InvalidKvksFile);
   });
 
   // WARN_InvalidVkeyInKvksFile
 
   it('should generate WARN_InvalidVkeyInKvksFile if the kvks contains an invalid virtual key', async function() {
-    await testForMessage(this, ['invalid-keyboards', 'warn_invalid_vkey_in_kvks_file.kmn'], CompilerMessages.WARN_InvalidVkeyInKvksFile);
+    await testForMessage(this, ['invalid-keyboards', 'warn_invalid_vkey_in_kvks_file.kmn'], KmnCompilerMessages.WARN_InvalidVkeyInKvksFile);
   });
 
   // ERROR_DuplicateGroup

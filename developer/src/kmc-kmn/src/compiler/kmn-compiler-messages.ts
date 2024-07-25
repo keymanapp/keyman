@@ -742,14 +742,6 @@ export class KmnCompilerMessages {
   static Fatal_Break                                         = () => m(this.FATAL_Break, `Compiler interrupted by user`);
 };
 
-/**
- * @internal
- * TODO: This class is here as a stopgap as we merged it with
- * KmnCompilerMessages. It should be removed in v18.0.
- */
-export class CompilerMessages extends KmnCompilerMessages {
-}
-
 export function mapErrorFromKmcmplib(line: number, code: number, msg: string): CompilerEvent {
   const severity = LogLevelToSeverity[code & LogLevel.LEVEL_MASK];
   const baseCode = code & LogLevel.CODE_MASK;
