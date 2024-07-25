@@ -169,45 +169,6 @@ export class TrackedContextState {
     }
   }
 
-  // pushWhitespaceToTail(transformDistribution: Distribution<Transform> = null) {
-  //   let whitespaceToken = new TrackedContextToken();
-
-  //   // Track the Transform that resulted in the whitespace 'token'.
-  //   // Will be needed for phrase-level correction/prediction.
-  //   whitespaceToken.transformDistributions = transformDistribution ? [transformDistribution] : [];
-
-  //   whitespaceToken.raw = null;
-  //   this.tokens.push(whitespaceToken);
-  // }
-
-  // /**
-  //  * Used for 14.0's backspace workaround, which flattens all previous Distribution<Transform>
-  //  * entries because of limitations with direct use of backspace transforms.
-  //  * @param tokenText
-  //  * @param transformId
-  //  */
-  // replaceTailForBackspace(tokenText: USVString, transformId: number) {
-  //   this.tokens.pop();
-
-  //   // It's a backspace transform; time for special handling!
-  //   //
-  //   // For now, with 14.0, we simply compress all remaining Transforms for the token into
-  //   // multiple single-char transforms.  Probabalistically modeling BKSP is quite complex,
-  //   // so we simplify by assuming everything remaining after a BKSP is 'true' and 'intended' text.
-  //   //
-  //   // Note that we cannot just use a single, monolithic transform at this point b/c
-  //   // of our current edit-distance optimization strategy; diagonalization is currently...
-  //   // not very compatible with that.
-  //   let backspacedTokenContext: Distribution<Transform>[] = textToCharTransforms(tokenText, transformId).map(function(transform) {
-  //     return [{sample: transform, p: 1.0}];
-  //   });
-
-  //   let compactedToken = new TrackedContextToken();
-  //   compactedToken.raw = tokenText;
-  //   compactedToken.transformDistributions = backspacedTokenContext;
-  //   this.pushTail(compactedToken);
-  // }
-
   updateToken(token: TrackedContextToken, transformDistribution: Distribution<Transform>, tokenText?: USVString) {
     // Preserve existing text if new text isn't specified.
     tokenText = tokenText || (tokenText === '' ? '' : token.raw);
@@ -424,25 +385,34 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
 
     // Now to update the end of the context window.
     for(let i = lastMatch+1; i < editPath.length; i++) {
+      const isLastToken = i == editPath.length - 1;
+
       const incomingToken = tokenizedContext[i - poppedTokenCount]
       switch(editPath[i]) {
         case 'substitute':
-          if(i == editPath.length - 1) {
+          if(isLastToken) {
             state = new TrackedContextState(state);
           }
 
+          const token = state.tokens[i - poppedTokenCount];
+          const matchToken = matchState.tokens[i];
+
           if(isBackspace) {
-            state.tokens[i - poppedTokenCount].updateWithBackspace(incomingToken.text, primaryInput.id);
+            token.updateWithBackspace(incomingToken.text, primaryInput.id);
           } else {
-            state.updateToken(state.tokens[i - poppedTokenCount], transformDistribution, incomingToken.text);
+            state.updateToken(token, transformDistribution, incomingToken.text);
           }
 
-          if(state != matchState) {
-            if(isBackspace) {
-              matchState.tokens[i].updateWithBackspace(incomingToken.text, primaryInput.id);
-            } else {
-              matchState.updateToken(state.tokens[i], transformDistribution, incomingToken.text);
-            }
+          // For this case, we were _likely_ called by
+          // ModelCompositor.acceptSuggestion(), which would have marked the
+          // accepted suggestion.
+          //
+          // Upon inspection, this doesn't seem entirely ideal.  It works for
+          // the common case, but not for specially crafted keystroke
+          // transforms.  That said, it's also very low impact.  Best as I can
+          // see, this is only really used for debugging info?
+          if(state != matchState && !isLastToken) {
+            matchToken.replacementText = incomingToken.text;
           }
           break;
         case 'insert':
