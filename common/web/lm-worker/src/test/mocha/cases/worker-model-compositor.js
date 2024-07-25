@@ -3,6 +3,7 @@
  */
 
 import ModelCompositor from '#./model-compositor.js';
+import { toAnnotatedSuggestion } from '#./predict-helpers.js';
 import * as models from '#./models/index.js';
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
 
@@ -649,13 +650,12 @@ describe('ModelCompositor', function() {
         };
 
         let model = new models.DummyModel(options);
-        let compositor = new ModelCompositor(model, true);
 
         var keep;
         if(quoteStyle) {
-          keep = compositor.toAnnotatedSuggestion(baseSuggestion, 'keep', quoteStyle);
+          keep = toAnnotatedSuggestion(model, baseSuggestion, 'keep', quoteStyle);
         } else {
-          keep = compositor.toAnnotatedSuggestion(baseSuggestion, 'keep');
+          keep = toAnnotatedSuggestion(model, baseSuggestion, 'keep');
         }
 
         // Make sure we didn't accidentally leak any mutations to the parameter.
