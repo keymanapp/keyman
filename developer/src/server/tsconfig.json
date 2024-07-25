@@ -18,10 +18,6 @@
     "noUnusedLocals": true,
     "allowJs": true,
     "lib": ["es2022"],
-
-    "paths": {
-      "@keymanapp/developer-utils": ["../common/web/utils/index"],
-    }
   },
   "include": [
     "src/**/*.ts"
