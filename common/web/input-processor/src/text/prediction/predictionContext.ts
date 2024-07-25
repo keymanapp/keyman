@@ -111,10 +111,6 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     this.connect();
   }
 
-  public get modelState() {
-    return this.langProcessor.state;
-  }
-
   private connect() {
     this.langProcessor.addListener('invalidatesuggestions', this.invalidateSuggestions);
     this.langProcessor.addListener('suggestionsready', this.updateSuggestions);
