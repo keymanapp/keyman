@@ -1,5 +1,26 @@
 # Keyman Version History
 
+## 18.0.75 alpha 2024-07-25
+
+* chore(windows): remove the posting WM_KEYUP/DOWN events to IM (#12002)
+* feat(web): check for low-probability exact + exact-key correction matches (#11876)
+* refactor(web): extract suggestion-finalization block into its own function (#11899)
+* chore(developer): remove `CompilerMessages` stub and use `KmnCompilerMessages` (#11986)
+* chore(developer): rename kmc-ldml `CompilerMessages`, `LdmlKeyboardCompilerMessages` to `LdmlCompilerMessages` (#11988)
+* chore(developer): rename kmc-package `CompilerMessages` to `PackageCompilerMessages` (#11989)
+* fix(developer): handle errors parsing .kps file when loading project (#12008)
+* chore(common): updated stats script to support end date/sprint (#12009)
+* fix(windows): align engine.sln platforms and configurations (#12011)
+* refactor(web): spin off deduplication, suggestion-similarity sections (#11900)
+* refactor(web): extract the correct-and-raw-predict blocks into their own method (#11888)
+* refactor(web): convert internal prediction methods to stateless format (#11940)
+* feat(web): add unit tests for predict auto-selection method (#11941)
+* feat(web): extend unit-test oriented dummy model (#11948)
+* feat(web): add unit tests for suggestion-similarity detection (#11944)
+* feat(web): add unit testing for suggestion deduplication (#11945)
+* feat(developer): add hint when index() store is longer than any() store (#12000)
+* chore(android,ios): Add ojibwa ifinal/rdot keyboards to FirstVoices (#11889)
+
 ## 18.0.74 alpha 2024-07-24
 
 * fix(developer): correct handling of trailing spaces by GetDelimitedString() in kmcmplib compiler (#11938)
