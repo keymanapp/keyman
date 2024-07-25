@@ -1,5 +1,40 @@
 # Keyman Version History
 
+## 17.0.327 stable 2024-07-25
+
+* fix(android): include DOMRect polyfill for older ES6-supporting devices (#11654)
+* fix(web): Don't apply suggestion unless fully configured (#11636)
+* fix(mac): handle command keys without crashing (#11675)
+* fix(web): get row-height for flick constraints after performing layout (#11692)
+* fix(android): handle IllegalArgumentException when initializing CloudDownloadMgr, add logging to check for unhandled side-effects (#11628)
+* fix(developer): handle editor initializing after debugger when setting execution point (#11588)
+* fix(developer): treat js files with unrecognized encodings as non-keyboard files (#11699)
+* fix(developer): disable example edit controls if no examples in Package Editor (#11703)
+* chore(developer): add extra logging for assertion failure when pressing backspace in debugger (#11709)
+* fix(developer): handle encoding errors when loading wordlists (#11712)
+* fix(mac): change build configuration to prevent cycle error in Xcode 15 (#11731)
+* fix(developer): handle missing OSK when importing a Windows keyboard into a touch-only project (#11721)
+* fix(developer): prevent two touch layout editors opening for the same file (#11727)
+* fix(android): check current orientation, fix keyboard size after system keyboard rotations and resumes (#11747)
+* chore(linux): Update debian changelog (#11670)
+* feat(developer): support language reference in context help (#11741)
+* fix(developer): show message if no more platforms to add to touch layout editor (#11766)
+* fix(web): add limited Array.from polyfill for lm-worker use (#11733)
+* fix(web): set new-context rules' device to match that of the active OSK (#11744)
+* fix(web): prevent desktop OSK crash when addKeyboards is called before engine init (#11787)
+* fix(windows): add -k parameter for keyboards build.sh (#11811)
+* fix(core): serialize tests for core/wasm on mac agents (#11809)
+* chore(developer): clarify project upgrade messages about file locations (#11820)
+* fix(developer): check HISTORY.md to get last modified date for keyboard_info and model_info (#11808)
+* fix(web): fix id of longpress keys with modifier set in touch layout (#11797)
+* change(web): change after-word whitespace check to be more selective (#11824)
+* fix(android): clear globe highlight when displaying keyboard picker (#11827)
+* fix(web): use fat-finger data with simple keypresses (#11871)
+* fix(developer): prevent non-BMP characters in key part of rule (#11807)
+* fix(linux): ignore exceptions trying to install cache (#11885)
+* chore(common): Update Crowdin strings for Portuguese (#11976)
+* chore(linux): remove Ubuntu 23.10 Mantic (#12004)
+
 ## 17.0.326 stable 2024-06-02
 
 * cherrypick(android/engine): Handle globe key on lock screen (#11468)
