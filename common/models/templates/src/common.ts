@@ -115,9 +115,12 @@ export function transformToSuggestion(transform: Transform, p: number): WithOutc
 export function transformToSuggestion(transform: Transform, p?: number): Outcome<Suggestion> {
   let suggestion: Outcome<Suggestion> = {
     transform: transform,
-    transformId: transform.id,
     displayAs: transform.insert
   };
+
+  if(transform.id !== undefined) {
+    suggestion.transformId = transform.id;
+  }
 
   if(p === 0 || p) {
     suggestion.p = p;
