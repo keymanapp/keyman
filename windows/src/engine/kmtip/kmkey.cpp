@@ -64,7 +64,14 @@ public:
   STDMETHODIMP DoEditSession(TfEditCookie ec);
 
   HRESULT WINAPI KeymanProcessOutput(int n, PWSTR buf, int nbuf);   // I3567
-  HRESULT WINAPI KeymanGetContext(int n, PWSTR buf);   // I3567
+  /**
+   * Retrieves the current context and checks if text is selected.
+   * @param[in]   n               The size of the buffer.
+   * @param[out]  buf             The buffer to store the context.
+   * @param[out]  isTextSelected  A flag indicating whether text is selected.
+   * @return                      S_OK if successful, otherwise an HRESULT error code.
+   */
+  HRESULT WINAPI KeymanGetContext(int n, PWSTR buf, BOOL* isTextSelected);   // I3567
   HRESULT GetResult() { return _hr; }
 
 private:
@@ -75,6 +82,16 @@ private:
   LPARAM _lParam;   // I3589
   DWORD _dwDeepIntegration;   // I4375
   TfEditCookie _ec;
+  /**
+   * Checks if any text is selected in the given context.
+   *
+   * @param[in]   hrGetSelection  The result of a call to GetSelection selection.
+   * @param[in]   cFetched        The number of selections fetched.
+   * @param[in]   tfSelection     The selection details.
+   * @param[out]  isTextSelected  A flag indicating whether text is selected.
+   * @return                      S_OK if successful, otherwise an HRESULT error code.
+   */
+  HRESULT KeymanIsTextSelected(HRESULT hrGetSelection, ULONG cFetched, TF_SELECTION tfSelection, BOOL *isTextSelected);
 };
 
 #define KEYEVENT_EXTRAINFO_KEYMAN 0xF00F0000   // I4370
@@ -153,11 +170,11 @@ extern "C" __declspec(dllexport) HRESULT WINAPI ExtKeymanProcessOutput(int n, WC
   return res;
 }
 
-extern "C" __declspec(dllexport) HRESULT WINAPI ExtKeymanGetContext(int n, PWSTR buf)   // I3567
+extern "C" __declspec(dllexport) HRESULT WINAPI ExtKeymanGetContext(int n, PWSTR buf, BOOL* isTextSelected)   // I3567
 {
   LogEnter();
   HRESULT res;
-  if (ExtEditSession) res = ExtEditSession->KeymanGetContext(n, buf);
+  if (ExtEditSession) res = ExtEditSession->KeymanGetContext(n, buf, isTextSelected);
   else res = E_FAIL;   // I3567
   return res;
 }
@@ -179,7 +196,7 @@ STDAPI CKeymanEditSession::DoEditSession(TfEditCookie ec)
 
   ExtEditSession = NULL;
 
-  // Call keyman32.processtipkey; this may call "KeymanGetContext(n, buf)";
+  // Call keyman32.processtipkey; this may call "KeymanGetContext(n, buf, isTextSelected)";
   // keyman32.processtipkey this will call "KeymanProcessOutput"
   // which will delete n chrs from left of cursor and output a text string
   // beeps, deadkeys, etc. will be managed from within keyman32.dll itself
@@ -219,12 +236,16 @@ HRESULT WINAPI CKeymanEditSession::KeymanProcessOutput(int n, WCHAR *buf, int nb
 }
 
 
-HRESULT WINAPI CKeymanEditSession::KeymanGetContext(int n, PWSTR buf)   // I3567
+HRESULT WINAPI CKeymanEditSession::KeymanGetContext(int n, PWSTR buf, BOOL* isTextSelected)   // I3567
 {
   LogEnter();
 
-  HRESULT hr;
+  HRESULT hr, hrGetSelection;
+  ULONG cFetched;
+  TF_SELECTION tfSelection = {0};
   TF_STATUS tfStatus;
+
+  *isTextSelected = FALSE; // set to false before any early returns
 
   if (_dwDeepIntegration == DEEPINTEGRATION_DISABLE) {   // I4375
     Log(L"KeymanGetContext: Exit: deep integration disabled by registry (or default)");
@@ -243,10 +264,51 @@ HRESULT WINAPI CKeymanEditSession::KeymanGetContext(int n, PWSTR buf)   // I3567
     return S_FALSE;
   }
 
-  if (!GetLeftOfSelection(_ec, _pContext, buf, n)) {   // I4933
+  if (!GetLeftOfSelection(_ec, _pContext, buf, n, &hrGetSelection, &cFetched, &tfSelection)) {  // I4933
     return S_FALSE;   // I4933
   }
 
+  // now check for selected text
+  if (!SUCCEEDED(hr = KeymanIsTextSelected(hrGetSelection, cFetched, tfSelection, isTextSelected))) {
+    Log(L"KeymanGetContext: Warning: KeymanIsTextSelected failed");
+    // Continue to return S_OK, even though checking if a text selection exists has failed.
+    // Reaching this point means the context in 'buf' is valid and will be passed to the caller.
+    // isTextSelected will be false, which is better than returning E_FAIL at this point.
+  }
+  return S_OK;
+}
+
+HRESULT
+CKeymanEditSession::KeymanIsTextSelected(HRESULT hrGetSelection, ULONG cFetched, TF_SELECTION tfSelection, BOOL *isTextSelected) {
+  LogEnter();
+
+  HRESULT hr;
+
+  *isTextSelected = FALSE;
+
+  if (!SUCCEEDED(hrGetSelection)) {
+    return E_FAIL;
+  }
+  if (hrGetSelection == TF_E_NOSELECTION) {
+    // No selection is present
+    return S_OK;
+  }
+
+  if (cFetched > 0) {
+    // check if the range is empty
+    BOOL isEmpty = FALSE;
+
+    // Compare the start and end of the range
+    if (!SUCCEEDED(hr = tfSelection.range->IsEmpty(_ec, &isEmpty))) {
+      Log(L"KeymanIsTextSelected: Exit: Testing range->isEmpty");
+      return hr;
+    }
+
+    if (!isEmpty) {
+      *isTextSelected = TRUE;
+    }
+    tfSelection.range->Release();
+  }
   return S_OK;
 }
 

@@ -109,7 +109,7 @@ class Traversal implements LexiconTraversal {
 
     // Split into individual code units.
     let steps = char.split('');
-    let traversal: ReturnType<Traversal["_child"]> = this;
+    let traversal: Traversal | undefined = this;
 
     while(steps.length > 0 && traversal) {
       const step: string = steps.shift()!;
@@ -148,6 +148,10 @@ class Traversal implements LexiconTraversal {
 
   *children(): Generator<{char: USVString, traversal: () => LexiconTraversal}> {
     let root = this.root;
+
+    // We refer to the field multiple times in this method, and it doesn't change.
+    // This also assists minification a bit, since we can't minify when re-accessing
+    // through `this.`.
     const totalWeight = this.totalWeight;
 
     if(root.type == 'internal') {
@@ -220,11 +224,10 @@ class Traversal implements LexiconTraversal {
   }
 
   get entries() {
-    const totalWeight = this.totalWeight;
-    const entryMapper = function(value: Entry) {
+    const entryMapper = (value: Entry) => {
       return {
         text: value.content,
-        p: value.weight / totalWeight
+        p: value.weight / this.totalWeight
       }
     }
 
@@ -425,7 +428,7 @@ interface Entry {
  * Wrapper class for the trie and its nodes.
  */
 class Trie {
-  private root: Node;
+  public readonly root: Node;
   /** The total weight of the entire trie. */
   readonly totalWeight: number;
   /**
@@ -451,8 +454,8 @@ class Trie {
    * @param prefix
    */
   lookup(prefix: string): TextWithProbability[] {
-    let searchKey = this.toKey(prefix);
-    let rootTraversal = this.traverseFromRoot().child(searchKey);
+    const searchKey = this.toKey(prefix);
+    const rootTraversal = this.traverseFromRoot().child(searchKey);
 
     if(!rootTraversal) {
       return [];
@@ -461,14 +464,14 @@ class Trie {
     const directEntries = rootTraversal.entries;
     // `Set` requires Chrome 38+, which is more recent than Chrome 35.
     const directSet: Record<string, string> = {};
-    for(let entry of directEntries) {
+    for(const entry of directEntries) {
       directSet[entry.text] = entry.text;
     }
 
     const bestEntries = getSortedResults(rootTraversal);
-    const deduplicated = bestEntries.filter((entry) => !directSet[entry.text])
+    const deduplicated = bestEntries.filter((entry) => !directSet[entry.text]);
 
-    // Any entries directly hosted on the current note should get full display
+    // Any entries directly hosted on the current node should get full display
     // priority over anything from its descendants.
     return directEntries.concat(deduplicated);
   }

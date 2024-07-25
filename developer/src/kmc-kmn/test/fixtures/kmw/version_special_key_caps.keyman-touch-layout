@@ -1,0 +1,45 @@
+{
+  "tablet": {
+    "font": "Tahoma",
+    "layer": [
+      {
+        "id": "default",
+        "row": [
+          {
+            "id": 1,
+            "key": [
+              {
+                "id": "K_Q",
+                "text": "q"
+              },
+              {
+                "id": "K_BKSP",
+                "text": "*BkSp*",
+                "width": 90,
+                "sp": 1
+              },
+              {
+                "id": "K_LOPT",
+                "text": "*Menu*",
+                "width": 120,
+                "sp": 1
+              },
+              {
+                "id": "K_SPACE",
+                "text": "",
+                "width": 630,
+                "sp": 0
+              },
+              {
+                "id": "K_ENTER",
+                "text": "*Enter*",
+                "width": 140,
+                "sp": 0
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

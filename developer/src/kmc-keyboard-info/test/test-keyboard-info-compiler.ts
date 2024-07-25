@@ -125,7 +125,7 @@ describe('keyboard-info-compiler', function () {
     assert.isTrue(await compiler.init(callbacks, {sources}));
     assert.deepEqual(compiler['callbacks'], callbacks);
     assert.deepEqual(compiler['options'], {sources});
-  });  
+  });
 
   it('check run returns null if KmpCompiler.init fails', async function() {
     const kpjFilename = KHMER_ANGKOR_KPJ;
@@ -144,7 +144,7 @@ describe('keyboard-info-compiler', function () {
     }
     assert.isNull(result);
   });
-  
+
   it('check run returns null if KmpCompiler.transformKpsToKmpObject fails', async function() {
     const sources = KHMER_ANGKOR_SOURCES;
     const compiler = new KeyboardInfoCompiler();
@@ -161,7 +161,7 @@ describe('keyboard-info-compiler', function () {
     }
     assert.isNull(result);
   });
-  
+
   it('check run returns null if loadJsFile fails', async function() {
     const sources = KHMER_ANGKOR_SOURCES
     const compiler = new KeyboardInfoCompiler();
@@ -169,7 +169,7 @@ describe('keyboard-info-compiler', function () {
     compiler['loadJsFile'] = (_filename: string): string => null;
     const result = await compiler.run(KHMER_ANGKOR_KPJ, null);
     assert.isNull(result);
-  }); 
+  });
 
   it('check run returns null if license is not MIT', async function() {
     const sources = KHMER_ANGKOR_SOURCES;
@@ -251,7 +251,7 @@ describe('keyboard-info-compiler', function () {
     compiler['fillLanguages'] = async (_kpsFilename: string, _keyboard_info: KeyboardInfoFile, _kmpJsonData:  KmpJsonFile.KmpJsonFile): Promise<boolean> => false;
     const result = await compiler.run(KHMER_ANGKOR_KPJ, null);
     assert.isNull(result);
-  }); 
+  });
 
   const packageIncludesTestCases = [
     {
@@ -441,23 +441,23 @@ describe('keyboard-info-compiler', function () {
   it('check mapKeymanTargetToPlatform returns correct platforms', async function() {
     const compiler = new KeyboardInfoCompiler();
     const map: {[index in KeymanTargets.KeymanTarget]: KeyboardInfoFilePlatform[]} = {
-      any: [], 
+      any: [],
       androidphone: ['android'],
       androidtablet: ['android'],
-      desktop: [], 
+      desktop: [],
       ipad: ['ios'],
       iphone: ['ios'],
       linux: ['linux'],
       macosx: ['macos'],
-      mobile: [], 
-      tablet: [], 
-      web: ['desktopWeb'],  
+      mobile: [],
+      tablet: [],
+      web: ['desktopWeb'],
       windows: ['windows']
     }
     for (const [target, platform] of Object.entries(map)) {
       assert.deepEqual(compiler['mapKeymanTargetToPlatform'](<KeymanTargets.KeymanTarget>target), platform);
     }
-  }); 
+  });
 
   it('check kmxFileVersionToString returns correct strings', async function() {
     const compiler = new KeyboardInfoCompiler();
@@ -472,7 +472,7 @@ describe('keyboard-info-compiler', function () {
       assert.equal(compiler['kmxFileVersionToString'](testCase.num), testCase.str);
     });
   });
-  
+
   it('check loadKmxFiles returns empty array if .kmx file is missing from .kmp', async function() {
     const compiler = new KeyboardInfoCompiler();
     const kmpCompiler = new KmpCompiler();
@@ -498,7 +498,7 @@ describe('keyboard-info-compiler', function () {
     const kmpIndex = kmpJsonData.files.findIndex(file => KeymanFileTypes.filenameIs(file.name, KeymanFileTypes.Binary.Keyboard));
     kmpJsonData.files[kmpIndex].name = '../build/throw_error.kmx';
     assert.throws(() => compiler['loadKmxFiles'](KHMER_ANGKOR_KPS, kmpJsonData));
-  });  
+  });
 
   it('check loadKmxFiles can handle two .kmx files', async function() {
     const jsFilename = makePathToFixture('two-kmx', 'build', 'two_kmx.js');
@@ -515,7 +515,7 @@ describe('keyboard-info-compiler', function () {
 
     const kmx_filename_001 = 'k_001___basic_input_unicodei.kmx';
     const kmx_filename_002 = 'k_002___basic_input_unicode.kmx';
-    
+
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
     const kmpJsonData: KmpJsonFile.KmpJsonFile = {
@@ -535,7 +535,7 @@ describe('keyboard-info-compiler', function () {
     assert.deepEqual(kmxFiles[1].filename, kmx_filename_002);
     assert.isNotNull(kmxFiles[0].data);
     assert.isNotNull(kmxFiles[1].data);
-  });    
+  });
 
   it('check loadJsFile throws error if .js file is invalid', async function() {
     const jsFilename = makePathToFixture('invalid-js-file', 'build', 'invalid_js_file.js');
@@ -767,7 +767,7 @@ describe('keyboard-info-compiler', function () {
     } finally {
       Intl.DisplayNames.prototype.of = origIntlDisplayNamesOf;
     }
-  });  
+  });
 
   it('check fillLanguages returns false if fontSourceToKeyboardInfoFont fails for display font', async function() {
     const kmpJsonData: KmpJsonFile.KmpJsonFile = {
@@ -833,5 +833,18 @@ describe('keyboard-info-compiler', function () {
     const fonts = [KHMER_ANGKOR_DISPLAY_FONT];
     const result = await compiler['fontSourceToKeyboardInfoFont'](KHMER_ANGKOR_KPS, kmpJsonData, fonts);
     assert.deepEqual(result, KHMER_ANGKOR_DISPLAY_FONT_INFO);
-  });  
+  });
+
+  it('handles missing info.version in a package file', async function() {
+    const sources = {
+      ...KHMER_ANGKOR_SOURCES,
+      kpsFilename: makePathToFixture('missing-info-version-in-kps-11856', 'khmer_angkor.kps')
+    };
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    const kpjFilename = KHMER_ANGKOR_KPJ;
+    const result = await compiler.run(kpjFilename);
+    const actual = JSON.parse(new TextDecoder().decode(result.artifacts.keyboard_info.data));
+    assert.equal(actual.version, '1.0');
+  });
 });

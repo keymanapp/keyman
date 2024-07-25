@@ -5,9 +5,9 @@ export class DynamicElements {
   static inputCounter = 0;
 
   static addInput() {
-    var masterDiv = document.getElementById('DynamicElements');
-    var newInput = document.createElement("input");
-    var i = this.inputCounter++;
+    const masterDiv = document.getElementById('DynamicElements');
+    const newInput = document.createElement("input");
+    const i = this.inputCounter++;
 
     newInput.id = 'input' + i;
     newInput.className = 'test';
@@ -18,9 +18,9 @@ export class DynamicElements {
   }
 
   static addText() {
-    var masterDiv = document.getElementById('DynamicElements');
-    var newTextArea = document.createElement("textarea");
-    var i = this.inputCounter++;
+    const masterDiv = document.getElementById('DynamicElements');
+    const newTextArea = document.createElement("textarea");
+    const i = this.inputCounter++;
 
     newTextArea.id = 'textarea' + i;
     newTextArea.className = 'test';
@@ -30,10 +30,10 @@ export class DynamicElements {
     return newTextArea.id;
   }
 
-  static addIFrame(loadCallback) {
-    var masterDiv = document.getElementById('DynamicElements');
-    var frame = document.createElement("iframe");
-    var i = this.inputCounter++;
+  static addIFrame(loadCallback: any) {
+    const masterDiv = document.getElementById('DynamicElements');
+    const frame = document.createElement("iframe");
+    const i = this.inputCounter++;
 
     frame.height = "100";
     frame.id = 'iframe' + i;
@@ -49,10 +49,10 @@ export class DynamicElements {
     return frame.id;
   }
 
-  static addDesignIFrame(loadCallback) {
-    var masterDiv = document.getElementById('DynamicElements');
-    var frame = document.createElement("iframe");
-    var i = this.inputCounter++;
+  static addDesignIFrame(loadCallback: any) {
+    const masterDiv = document.getElementById('DynamicElements');
+    const frame = document.createElement("iframe");
+    const i = this.inputCounter++;
 
     frame.height = "100";
     frame.id = 'designIFrame' + i;
@@ -69,9 +69,9 @@ export class DynamicElements {
   }
 
   static addEditable() {
-    var masterDiv = document.getElementById('DynamicElements');
-    var editable = document.createElement("div");
-    var i = this.inputCounter++;
+    const masterDiv = document.getElementById('DynamicElements');
+    const editable = document.createElement("div");
+    const i = this.inputCounter++;
 
     editable.contentEditable = 'true';
     editable.textContent = "Edit me!";

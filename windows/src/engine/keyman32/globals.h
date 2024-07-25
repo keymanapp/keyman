@@ -151,7 +151,7 @@ public:
 /* External interface functions */
 
 typedef HRESULT (WINAPI *PKEYMANPROCESSOUTPUTFUNC)(int n, WCHAR *buf, int nbuf);
-typedef HRESULT (WINAPI *PKEYMANGETCONTEXTFUNC)(int n, PWSTR buf);
+typedef HRESULT (WINAPI *PKEYMANGETCONTEXTFUNC)(int n, PWSTR buf, BOOL* isTextSelected);
 typedef BOOL (WINAPI *PTIPCALLBACK)();  // Tells the TIP to update its status (used to be done through 0x88)
 
 typedef BOOL (WINAPI *PKeymanOutputBackspace)(HWND hwnd);
@@ -252,8 +252,6 @@ extern UINT
   wm_keyman,						// user message - ignore msg
   wm_keyman_control,				// messages to main Keyman window - replaces WM_USER+*
   wm_keyman_control_internal,       // messages to all windows to notify of changes to Keyman   // I4412
-  wm_keymankeydown,
-  wm_keymankeyup,
   wm_keyman_grabwindowproc,
   wm_keyman_refresh,
   wm_kmgetactivekeymanid,

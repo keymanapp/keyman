@@ -26,9 +26,9 @@
 #include "serialkeyeventserver.h"
 #include "kbd.h"	/* DDK kbdlayout */
 
-#ifdef _WIN64
-#error k32_lowlevelkeyboardhook.cpp is not required for win64.
-#endif
+// This file is used only in keyman32.dll; it implements our low level keyboard hook
+// in the main keyman.exe process for hotkeys, serial key event server
+#ifndef _WIN64
 
 BOOL ProcessHotkey(UINT vkCode, BOOL isUp, DWORD ShiftState);
 
@@ -329,3 +329,5 @@ BOOL ProcessHotkey(UINT vkCode, BOOL isUp, DWORD ShiftState) {
 
   return TRUE;
 }
+
+#endif

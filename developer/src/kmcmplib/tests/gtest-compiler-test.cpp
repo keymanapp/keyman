@@ -14,11 +14,14 @@ KMX_BOOL AddCompileError(KMX_DWORD msg);
 KMX_DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 KMX_DWORD ValidateMatchNomatchOutput(PKMX_WCHAR p);
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString);
+PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_WORD Flags);
 KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
   PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isUnicode
 );
 KMX_DWORD GetRHS(PFILE_KEYBOARD fk, PKMX_WCHAR p, PKMX_WCHAR buf, int bufsize, int offset, int IsUnicode);
+bool isIntegerWstring(PKMX_WCHAR p);
 bool hasPreamble(std::u16string result);
+KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnicode, PKMX_WCHAR pklIn, PKMX_WCHAR pklKey, PKMX_WCHAR pklOut);
 
 extern kmcmp_CompilerMessageProc msgproc;
 
@@ -82,6 +85,20 @@ class CompilerTest : public testing::Test {
             fk.cxVKDictionary    = 0;
             fk.dpVKDictionary    = nullptr;
             fk.extra             = nullptr;
+        }
+
+        void initFileGroupArray(FILE_KEYBOARD &fk, KMX_BOOL fUsingKeys) {
+            fk.dpGroupArray = new FILE_GROUP[1];
+            fk.cxGroupArray = 1;
+
+            fk.dpGroupArray->szName[0] = 0;
+            fk.dpGroupArray->cxKeyArray = 0;
+            fk.dpGroupArray->dpKeyArray = nullptr;
+            fk.dpGroupArray->dpMatch = nullptr;
+            fk.dpGroupArray->dpNoMatch = nullptr;
+            fk.dpGroupArray->fUsingKeys = fUsingKeys;
+            fk.dpGroupArray->fReadOnly = FALSE;
+            fk.dpGroupArray->Line = 0;
         }
 
         void deleteFileKeyboard(FILE_KEYBOARD &fk) {
@@ -266,10 +283,278 @@ TEST_F(CompilerTest, IsValidKeyboardVersion_test) {
 // KMX_DWORD InjectContextToReadonlyOutput(PKMX_WCHAR pklOut)
 // KMX_DWORD CheckOutputIsReadonly(const PFILE_KEYBOARD fk, const PKMX_WCHAR output)
 // KMX_DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnicode)
-// KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnicode, PKMX_WCHAR pklIn, PKMX_WCHAR pklKey, PKMX_WCHAR pklOut)
+
+TEST_F(CompilerTest, ProcessKeyLineImpl_test) {
+    initFileGroupArray(fileKeyboard, TRUE);
+
+    PKMX_WCHAR pklIn, pklKey, pklOut;
+    KMX_WCHAR str[128];
+
+    pklIn  = new KMX_WCHAR[GLOBAL_BUFSIZE];
+    pklKey = new KMX_WCHAR[GLOBAL_BUFSIZE];
+    pklOut = new KMX_WCHAR[GLOBAL_BUFSIZE];
+
+    // #11643: non-BMP characters do not makes sense for key codes
+    u16cpy(str, u"+ 'A' > 'test'\n"); // baseline
+    EXPECT_EQ(CERR_None, ProcessKeyLineImpl(&fileKeyboard, str, TRUE, pklIn, pklKey, pklOut));
+
+    u16cpy(str, u"+ '\U00010000' > 'test'\n"); // surrogate pair
+    EXPECT_EQ(CERR_NonBMPCharactersNotSupportedInKeySection, ProcessKeyLineImpl(&fileKeyboard, str, TRUE, pklIn, pklKey, pklOut));
+
+    delete[] pklIn;
+    delete[] pklKey;
+    delete[] pklOut;
+
+    // TODO: other tests for this function
+
+}
+
 // KMX_DWORD ExpandKp_ReplaceIndex(PFILE_KEYBOARD fk, PFILE_KEY k, KMX_DWORD keyIndex, int nAnyIndex)
 // KMX_DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, KMX_DWORD storeIndex)
-// PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_WORD Flags)
+
+TEST_F(CompilerTest, GetDelimitedString_test) {
+    KMX_WCHAR str[LINESIZE];
+    PKMX_WCHAR p = str;
+    PKMX_WCHAR q = nullptr;
+
+    // no open delimiter, cut spaces after open and before close delimiter
+    u16cpy(str, u"");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_FALSE(q);
+
+    // no close delimiter, cut spaces after open and before close delimiter
+    u16cpy(str, u"(");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_FALSE(q);
+
+    // no argument, cut spaces after open and before close delimiter
+    u16cpy(str, u"()");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(1, p-str); // deleted close delimiter
+
+    // no argument, single space, no flags
+    u16cpy(str, u"( )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", 0x00);
+    EXPECT_EQ(0, u16cmp(u" ", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(2, p-str); // deleted close delimiter
+
+    // no argument, single space, cut spaces after open delimiter
+    u16cpy(str, u"( )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD);
+    EXPECT_EQ(0, u16cmp(u"", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(2, p-str); // deleted close delimiter
+
+    // no argument, single space, cut spaces before close delimiter
+    u16cpy(str, u"( )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(2, p-str); // deleted close delimiter
+
+    // no argument, single space, cut spaces after open and before close delimiter
+    u16cpy(str, u"( )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(2, p-str); // deleted close delimiter
+
+    // no argument, two spaces, no flags
+    u16cpy(str, u"(  )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", 0x00);
+    EXPECT_EQ(0, u16cmp(u"  ", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(3, p-str); // deleted close delimiter
+
+    // no argument, two spaces, cut spaces after open delimiter
+    u16cpy(str, u"(  )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD);
+    EXPECT_EQ(0, u16cmp(u"", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(3, p-str); // deleted close delimiter
+
+    // no argument, two spaces, cut spaces before close delimiter
+    u16cpy(str, u"(  )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(3, p-str); // deleted close delimiter
+
+    // no argument, two spaces, cut spaces after open and before close delimiter
+    u16cpy(str, u"(  )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(3, p-str); // deleted close delimiter
+
+    // single-character argument, cut spaces after open and before close delimiter, valid
+    u16cpy(str, u"(b)");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(2, p-str); // deleted close delimiter
+
+    // multi-character argument, cut spaces after open and before close delimiter, valid
+    u16cpy(str, u"(abc)");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"abc", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(4, p-str); // deleted close delimiter
+
+    // multi-word argument, cut spaces after open and before close delimiter, valid
+    u16cpy(str, u"(abc def)");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"abc def", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(8, p-str); // deleted close delimiter
+
+    // single-character argument, leading single space, cut spaces after open and before close delimiter, valid
+    u16cpy(str, u" (b)");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(3, p-str); // deleted close delimiter
+
+    // single-character argument, leading double space, cut open and close delimiter, valid
+    u16cpy(str, u"  (b)");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(4, p-str); // deleted close delimiter
+
+    // single-character argument, space before argument, cut spaces after open and before close delimiter, valid
+    u16cpy(str, u"( b)");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(3, p-str); // deleted close delimiter
+
+    // single-character argument, space before argument, no flags, valid
+    u16cpy(str, u"( b)");
+    p = str;
+    q = GetDelimitedString(&p, u"()", 0x00);
+    EXPECT_EQ(0, u16cmp(u" b", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(3, p-str); // deleted close delimiter
+
+    // single-character argument, double space before argument, cut spaces after open and before close delimiter, valid
+    u16cpy(str, u"(  b)");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(4, p-str); // deleted close delimiter
+
+    // single-character argument, double space before argument, no flags, valid
+    u16cpy(str, u"(  b)");
+    p = str;
+    q = GetDelimitedString(&p, u"()", 0x00);
+    EXPECT_EQ(0, u16cmp(u"  b", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(4, p-str); // deleted close delimiter
+
+    // single-character argument, space after argument, cut spaces after open and before close delimiter, valid
+    u16cpy(str, u"(b )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(3, p-str); // deleted close delimiter
+
+    // single-character argument, space after argument, no flags, valid
+    u16cpy(str, u"(b )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", 0x00);
+    EXPECT_EQ(0, u16cmp(u"b ", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(3, p-str); // deleted close delimiter
+
+    // single-character argument, two spaces after argument, cut spaces after open and before close delimiter, valid
+    u16cpy(str, u"(b  )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(4, p-str); // deleted close delimiter
+
+    // single-character argument, two spaces after argument, no flags, valid
+    u16cpy(str, u"(b  )");
+    p = str;
+    q = GetDelimitedString(&p, u"()", 0x00);
+    EXPECT_EQ(0, u16cmp(u"b  ", q));
+    EXPECT_FALSE(*p);
+    EXPECT_EQ(4, p-str); // deleted close delimiter
+
+    // single-character argument, space after close delimiter, cut spaces after open and before close delimiter, valid
+    u16cpy(str, u"(b) ");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_EQ(' ', *p);
+    EXPECT_EQ(3, p-str); // space after the close delimiter
+
+    // single-character argument, two spaces after close delimiter, cut spaces after open and before close delimiter, valid
+    u16cpy(str, u"(b)  ");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_EQ(' ', *p);
+    EXPECT_EQ(4, p-str); // last space after the close delimiter
+
+    // single-character argument, two spaces after argument and two spaces after close delimiter,
+    // cut spaces after open and before close delimiter, valid
+    u16cpy(str, u"(b  )  ");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_EQ(' ', *p);
+    EXPECT_EQ(6, p-str); // last space after the close delimiter
+
+    // single-character argument, two spaces after argument and two spaces after close delimiter, no flags, valid
+    u16cpy(str, u"(b  )  ");
+    p = str;
+    q = GetDelimitedString(&p, u"()", 0x00);
+    EXPECT_EQ(0, u16cmp(u"b  ", q));
+    EXPECT_EQ(' ', *p);
+    EXPECT_EQ(6, p-str); // last space after the close delimiter
+
+    // single-character argument, two spaces and text after close delimiter, cut spaces after open and before close delimiter, valid
+    u16cpy(str, u"(b)  def");
+    p = str;
+    q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_EQ('d', *p);
+    EXPECT_EQ(5, p-str); // first text character after the close delimiter
+
+    // single-character argument, two spaces and text after close delimiter, no flags, valid
+    u16cpy(str, u"(b)  def");
+    p = str;
+    q = GetDelimitedString(&p, u"()", 0x00);
+    EXPECT_EQ(0, u16cmp(u"b", q));
+    EXPECT_EQ('d', *p);
+    EXPECT_EQ(5, p-str); // first text character after the close delimiter
+}
+
 // LinePrefixType GetLinePrefixType(PKMX_WCHAR *p)
 // int LineTokenType(PKMX_WCHAR *str)
 // KMX_BOOL StrValidChrs(PKMX_WCHAR q, KMX_WCHAR const * chrs)
@@ -401,6 +686,128 @@ TEST_F(CompilerTest, GetXStringImpl_type_single_quote_test) {
     // CERR_StringInVirtualKeySection *** TODO ***
 }
 
+// tests strings starting with 'i'
+TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
+    KMX_WCHAR tstr[128];
+    fileKeyboard.version = VERSION_80;
+    KMX_WCHAR str[LINESIZE];
+    KMX_WCHAR output[GLOBAL_BUFSIZE];
+    PKMX_WCHAR newp = nullptr;
+    PFILE_STORE file_store = new FILE_STORE[100];
+    fileKeyboard.cxStoreArray = 3u;
+    fileKeyboard.dpStoreArray = file_store;
+    file_store[1].fIsStore = TRUE;
+    u16cpy(file_store[0].szName, u"a");
+    u16cpy(file_store[1].szName, u"b");
+    u16cpy(file_store[2].szName, u"c");
+
+    // index, CERR_InvalidInVirtualKeySection *** TODO ***
+
+    // index, no close delimiter => NULL
+    u16cpy(str, u"index(");
+    EXPECT_EQ(CERR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // index, empty delimiters => empty string
+    u16cpy(str, u"index()");
+    EXPECT_EQ(CERR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // index, space in delimiters ... investigate u16tok()
+    // u16cpy(str, u"index( )");
+    // EXPECT_EQ(CERR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // index, no comma or space
+    u16cpy(str, u"index(b)");
+    EXPECT_EQ(CERR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // index, no comma, space before store
+    u16cpy(str, u"index( b)");
+    EXPECT_EQ(CERR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // index, no comma, space after store
+    u16cpy(str, u"index(b )");
+    EXPECT_EQ(CERR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // index, CERR_StoreDoesNotExist
+    u16cpy(str, u"index(d 4)");
+    EXPECT_EQ(CERR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // index, comma, offset=0
+    fileKeyboard.cxStoreArray = 3u;
+    fileKeyboard.dpStoreArray = file_store;
+    u16cpy(str, u"index(b,0)");
+    EXPECT_EQ(CERR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // index, comma, negative offset
+    fileKeyboard.cxStoreArray = 3u;
+    fileKeyboard.dpStoreArray = file_store;
+    u16cpy(str, u"index(b,-1)");
+    EXPECT_EQ(CERR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // index, comma, valid
+    fileKeyboard.cxStoreArray = 3u;
+    fileKeyboard.dpStoreArray = file_store;
+    u16cpy(str, u"index(b,4)");
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_index_comma_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 4, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_index_comma_valid, tstr));
+
+    // index, space before store, comma, valid
+    fileKeyboard.cxStoreArray = 3u;
+    fileKeyboard.dpStoreArray = file_store;
+    u16cpy(str, u"index( b,4)");
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_index_initial_space_and_comma_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 4, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_index_initial_space_and_comma_valid, tstr));
+
+    // index, comma and space, valid
+    fileKeyboard.cxStoreArray = 3u;
+    fileKeyboard.dpStoreArray = file_store;
+    u16cpy(str, u"index(b, 4)");
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_index_comma_and_space_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 4, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_index_comma_and_space_valid, tstr));
+
+    // index, space, valid ... should not be valid (see #11833)
+    u16cpy(str, u"index(b 4)");
+    fileKeyboard.cxStoreArray = 3u;
+    fileKeyboard.dpStoreArray = file_store;
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_index_space_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 4, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_index_space_valid, tstr));
+
+    // index, two-digit parameter, valid
+    u16cpy(str, u"index(b,42)");
+    fileKeyboard.cxStoreArray = 3u;
+    fileKeyboard.dpStoreArray = file_store;
+    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_index_two_digit_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 42, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_index_two_digit_valid, tstr));
+
+    // index, comma, non-digit parameter, CERR_InvalidIndex
+    u16cpy(str, u"index(b,g)");
+    fileKeyboard.cxStoreArray = 3u;
+    fileKeyboard.dpStoreArray = file_store;
+    EXPECT_EQ(CERR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // index, comma, no parameter, CERR_InvalidIndex
+    u16cpy(str, u"index(b,)");
+    fileKeyboard.cxStoreArray = 3u;
+    fileKeyboard.dpStoreArray = file_store;
+    EXPECT_EQ(CERR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // index, space and comma, no parameter, CERR_InvalidIndex
+    u16cpy(str, u"index(b ,)");
+    fileKeyboard.cxStoreArray = 3u;
+    fileKeyboard.dpStoreArray = file_store;
+    EXPECT_EQ(CERR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // index, comma, no parameter but space, CERR_InvalidIndex
+    u16cpy(str, u"index(b, )");
+    fileKeyboard.cxStoreArray = 3u;
+    fileKeyboard.dpStoreArray = file_store;
+    EXPECT_EQ(CERR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+}
+
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
 // KMX_DWORD process_platform(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
 // KMX_DWORD process_if_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
@@ -442,6 +849,24 @@ TEST_F(CompilerTest, GetRHS_test) {
 // KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD FileSize, PKMX_BYTE *Buf)
 // int atoiW(PKMX_WCHAR p)
 // KMX_DWORD kmcmp::CheckUTF16(int n)
+
+TEST_F(CompilerTest, isIntegerWstring_test) {
+    EXPECT_FALSE(isIntegerWstring(nullptr));
+    EXPECT_FALSE(isIntegerWstring((PKMX_WCHAR)u""));
+    EXPECT_FALSE(isIntegerWstring((PKMX_WCHAR)u"a"));
+    EXPECT_TRUE(isIntegerWstring((PKMX_WCHAR)u"-1"));
+    EXPECT_TRUE(isIntegerWstring((PKMX_WCHAR)u"1"));
+    EXPECT_FALSE(isIntegerWstring((PKMX_WCHAR)u" 1"));
+    EXPECT_FALSE(isIntegerWstring((PKMX_WCHAR)u"1 "));
+    EXPECT_TRUE(isIntegerWstring((PKMX_WCHAR)u"42"));
+    EXPECT_TRUE(isIntegerWstring((PKMX_WCHAR)u"2147483647")); // INT_MAX
+    EXPECT_FALSE(isIntegerWstring((PKMX_WCHAR)u"2147483648")); // INT_MAX + 1
+    EXPECT_FALSE(isIntegerWstring((PKMX_WCHAR)u"9999999999")); // > INT_MAX
+    EXPECT_TRUE(isIntegerWstring((PKMX_WCHAR)u"-2147483648")); // -INT_MAX - 1
+    EXPECT_FALSE(isIntegerWstring((PKMX_WCHAR)u"-2147483649")); // -INT_MAX - 2
+    EXPECT_FALSE(isIntegerWstring((PKMX_WCHAR)u"-9999999999")); // < -INT_MAX - 1
+}
+
 // KMX_DWORD kmcmp::UTF32ToUTF16(int n, int *n1, int *n2)
 // KMX_DWORD BuildVKDictionary(PFILE_KEYBOARD fk)
 // int GetVKCode(PFILE_KEYBOARD fk, PKMX_WCHAR p)
