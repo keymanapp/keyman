@@ -11,6 +11,8 @@ import ModelCompositor from './model-compositor.js';
  * correction/prediction process at the core of our predictive-text engine.
  */
 
+export const AUTOSELECT_PROPORTION_THRESHOLD = .66;
+
 export type CorrectionPredictionTuple = {
   prediction: ProbabilityMass<Suggestion>,
   correction: ProbabilityMass<string>,
@@ -571,10 +573,21 @@ export function predictionAutoSelect(suggestionDistribution: CorrectionPredictio
     return;
   }
 
-  // compare best vs other probabilities.
-  const probSum = suggestionDistribution.reduce((accum, current) => accum + current.totalProb, 0);
+  // If we allow an option to allow same-key suggestions to replace context automatically
+  // - such as replacing `cant` with `can't` if the latter is much more frequent -
+  // we may wish to group matchLevel values below by 'mapping' them with an appropriate
+  // function.  (Both on the next line and within the reduce functor.)
+  const bestSuggestionTier = bestSuggestion.matchLevel;
+
+  // compare best vs other probabilities of compatible tier.
+  const probSum = suggestionDistribution.reduce((accum, current) => {
+    // If the suggestion is from a different similarity tier, do not count it against
+    // the required auto-select probability ratio threshold.  That threshold should
+    // only apply within the suggestion's tier.
+    return accum + (current.matchLevel == bestSuggestionTier ? current.totalProb : 0)
+  }, 0);
   const proportionOfBest = bestSuggestion.totalProb / probSum;
-  if(proportionOfBest < .66) {
+  if(proportionOfBest < AUTOSELECT_PROPORTION_THRESHOLD) {
     return;
   }
 
