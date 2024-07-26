@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.76 alpha 2024-07-26
+
+* change(linux): improve changelog PRs after upload to debian (#12024)
+* test(developer): kmcmplib compiler unit tests 2 (#11663)
+* fix(linux): set local directory if not specified (#12032)
+
 ## 18.0.75 alpha 2024-07-25
 
 * chore(windows): remove the posting WM_KEYUP/DOWN events to IM (#12002)
