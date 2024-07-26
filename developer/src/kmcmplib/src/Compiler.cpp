@@ -1300,8 +1300,13 @@ KMX_DWORD CheckStatementOffsets(PFILE_KEYBOARD fk, PFILE_GROUP gp, PKMX_WCHAR co
 
         int anyStore = *(q + 2) - 1;
 
-        if (xstrlen(fk->dpStoreArray[indexStore].dpString) < xstrlen(fk->dpStoreArray[anyStore].dpString)) {
-          AddWarning(CWARN_IndexStoreShort); //TODO: if this fails, then we return FALSE instead of an error
+        const int anyLength = xstrlen(fk->dpStoreArray[anyStore].dpString);
+        const int indexLength = xstrlen(fk->dpStoreArray[indexStore].dpString);
+
+        if (indexLength < anyLength) {
+          AddWarning(CWARN_IndexStoreShort);
+        } else if(indexLength > anyLength) {
+          AddWarning(CHINT_IndexStoreLong);
         }
       } else if (*(p + 1) == CODE_CONTEXTEX) {
         int contextOffset = *(p + 2);

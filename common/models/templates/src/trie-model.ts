@@ -454,9 +454,26 @@ class Trie {
    * @param prefix
    */
   lookup(prefix: string): TextWithProbability[] {
-    let searchKey = this.toKey(prefix);
-    let rootTraversal = this.traverseFromRoot().child(searchKey);
-    return rootTraversal ? getSortedResults(rootTraversal) : [];
+    const searchKey = this.toKey(prefix);
+    const rootTraversal = this.traverseFromRoot().child(searchKey);
+
+    if(!rootTraversal) {
+      return [];
+    }
+
+    const directEntries = rootTraversal.entries;
+    // `Set` requires Chrome 38+, which is more recent than Chrome 35.
+    const directSet: Record<string, string> = {};
+    for(const entry of directEntries) {
+      directSet[entry.text] = entry.text;
+    }
+
+    const bestEntries = getSortedResults(rootTraversal);
+    const deduplicated = bestEntries.filter((entry) => !directSet[entry.text]);
+
+    // Any entries directly hosted on the current node should get full display
+    // priority over anything from its descendants.
+    return directEntries.concat(deduplicated);
   }
 
   /**

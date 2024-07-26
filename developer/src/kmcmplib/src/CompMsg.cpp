@@ -115,6 +115,7 @@ std::map<KMX_DWORD, const KMX_CHAR*> CompilerErrorMap = {
 
     { CHINT_UnreachableRule                              , "This rule will never be matched as another rule takes precedence"},
     { CHINT_NonUnicodeFile                               , "Keyman Developer has detected that the file has ANSI encoding. Consider converting this file to UTF-8"},
+    { CHINT_IndexStoreLong                               , "The store referenced in index() is longer than the store referenced in any()"},
 
     { CWARN_TooManyWarnings                              , "Too many warnings or errors"},
     { CWARN_OldVersion                                   , "The keyboard file is an old version"},

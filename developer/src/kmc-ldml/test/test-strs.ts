@@ -1,7 +1,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import { compileKeyboard, compilerTestCallbacks, compilerTestOptions, makePathToFixture } from './helpers/index.js';
-import { CompilerMessages } from '../src/compiler/messages.js';
+import { LdmlCompilerMessages } from '../src/compiler/ldml-compiler-messages.js';
 
 
 /** strs tests */
@@ -17,8 +17,8 @@ describe('strs', function () {
         const kmx = await compileKeyboard(inputFilename, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false },
             [
                 // validation messages
-                CompilerMessages.Error_IllegalCharacters({ count: 5, lowestCh: 0xFDD0 }),
-                CompilerMessages.Hint_PUACharacters({ count: 2, lowestCh: 0xE010 }),
+                LdmlCompilerMessages.Error_IllegalCharacters({ count: 5, lowestCh: 0xFDD0 }),
+                LdmlCompilerMessages.Hint_PUACharacters({ count: 2, lowestCh: 0xE010 }),
             ],
             true, // validation should fail
             [
@@ -32,12 +32,12 @@ describe('strs', function () {
         const kmx = await compileKeyboard(inputFilename, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false },
             [
                 // validation messages
-                CompilerMessages.Hint_PUACharacters({ count: 2, lowestCh: 0xE010 }),
+                LdmlCompilerMessages.Hint_PUACharacters({ count: 2, lowestCh: 0xE010 }),
             ],
             false, // validation should pass
             [
                 // same messages
-                CompilerMessages.Hint_PUACharacters({ count: 2, lowestCh: 0xE010 }),
+                LdmlCompilerMessages.Hint_PUACharacters({ count: 2, lowestCh: 0xE010 }),
             ]);
         assert.isNotNull(kmx);
     });
@@ -47,14 +47,14 @@ describe('strs', function () {
         const kmx = await compileKeyboard(inputFilename, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false },
             [
                 // validation messages
-                CompilerMessages.Hint_PUACharacters({ count: 2, lowestCh: 0xE010 }),
-                CompilerMessages.Warn_UnassignedCharacters({ count: 1, lowestCh: 0x0CFFFD }),
+                LdmlCompilerMessages.Hint_PUACharacters({ count: 2, lowestCh: 0xE010 }),
+                LdmlCompilerMessages.Warn_UnassignedCharacters({ count: 1, lowestCh: 0x0CFFFD }),
             ],
             false, // validation should pass
             [
                 // same messages
-                CompilerMessages.Hint_PUACharacters({ count: 2, lowestCh: 0xE010 }),
-                CompilerMessages.Warn_UnassignedCharacters({ count: 1, lowestCh: 0x0CFFFD }),
+                LdmlCompilerMessages.Hint_PUACharacters({ count: 2, lowestCh: 0xE010 }),
+                LdmlCompilerMessages.Warn_UnassignedCharacters({ count: 1, lowestCh: 0x0CFFFD }),
             ]);
         assert.isNotNull(kmx);
     });
@@ -63,7 +63,7 @@ describe('strs', function () {
         const inputFilename = makePathToFixture('sections/tran/fail-bad-tran-2.xml');
         const kmx = await compileKeyboard(inputFilename, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false },
             [
-                CompilerMessages.Error_InvalidQuadEscape({ cp: 295 }),
+                LdmlCompilerMessages.Error_InvalidQuadEscape({ cp: 295 }),
             ],
             true, // validation should fail
             [
