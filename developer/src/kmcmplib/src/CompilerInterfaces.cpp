@@ -29,14 +29,16 @@ EXTERN bool kmcmp_CompileKeyboard(
     return FALSE;
   }
 
-  msgproc = messageProc;
+  kmcmp::msgproc = messageProc;
   loadfileproc = loadFileProc;
   msgprocContext = (void*)procContext;
   kmcmp::currentLine = 0;
   kmcmp::nErrors = 0;
 
   int sz;
-  if(!loadFileProc(pszInfile, "", nullptr, &sz, msgprocContext)) {
+  std::vector<uint8_t> bufvec = loadFileProc(pszInfile, "");
+  sz = bufvec.size();
+  if(!sz) {
     AddCompileError(CERR_InfileNotExist);
     return FALSE;
   }
@@ -53,11 +55,7 @@ EXTERN bool kmcmp_CompileKeyboard(
     AddCompileError(CERR_CannotAllocateMemory);
     return FALSE;
   }
-  if(!loadFileProc(pszInfile, "", infile, &sz, msgprocContext)) {
-    delete[] infile;
-    AddCompileError(CERR_CannotReadInfile);
-    return FALSE;
-  }
+  std::copy(bufvec.begin(), bufvec.end(), infile);
   infile[sz] = 0; // zero-terminate for safety, not technically needed but helps avoid memory bugs
 
   int offset = 0;

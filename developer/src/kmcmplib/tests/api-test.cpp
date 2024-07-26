@@ -65,7 +65,7 @@ void test_kmcmp_CompileKeyboard(char *kmn_file) {
   options.target = CKF_KEYMAN;
   assert(!kmcmp_CompileKeyboard(kmn_file, options, msgproc, loadfileProc, nullptr, result));
   assert(error_vec.size() == 1);
-  assert(error_vec[0] == CERR_CannotReadInfile);
+  assert(error_vec[0] == CERR_InfileNotExist); // zero byte no longer gives us CERR_CannotReadInfile
 
   unlink(kmn_file);
 }

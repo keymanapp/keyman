@@ -3,49 +3,20 @@
 
 #ifdef __EMSCRIPTEN__
 
-/*
-  WASM interface for compiler message callback
-*/
-EM_JS(int, wasm_msgproc, (int line, int msgcode, const char* text, char* context), {
-  const proc = globalThis[UTF8ToString(context)].message;
-  if(!proc || typeof proc != 'function') {
-    console.log(`[${line}: ${msgcode}: ${UTF8ToString(text)}]`);
-    return 0;
-  } else {
-    return proc(line, msgcode, UTF8ToString(text));
+struct WasmCallbackInterface {
+  virtual void message(const KMCMP_COMPILER_RESULT_MESSAGE& message) = 0;
+  virtual const std::vector<uint8_t> loadFile(const std::string& filename, const std::string& baseFilename) = 0;
+  virtual ~WasmCallbackInterface() {}
+};
+
+struct WasmCallbackInterfaceWrapper : public emscripten::wrapper<WasmCallbackInterface> {
+  EMSCRIPTEN_WRAPPER(WasmCallbackInterfaceWrapper);
+  void message(const KMCMP_COMPILER_RESULT_MESSAGE& message) {
+    return call<void>("message", message);
   }
-});
-
-EM_JS(int, wasm_loadfileproc, (const char* filename, const char* baseFilename, void* buffer, int bufferSize, char* context), {
-  const proc = globalThis[UTF8ToString(context)].loadFile;
-  if(!proc || typeof proc != 'function') {
-    return 0;
-  } else {
-    if(buffer == 0) {
-      return proc(UTF8ToString(filename), UTF8ToString(baseFilename), 0, 0);
-    } else {
-      return proc(UTF8ToString(filename), UTF8ToString(baseFilename), buffer, bufferSize);
-    }
+  const std::vector<uint8_t> loadFile(const std::string& filename, const std::string& baseFilename) {
+    return call<const std::vector<uint8_t>>("loadFile", filename, baseFilename);
   }
-});
-
-bool wasm_LoadFileProc(const char* filename, const char* baseFilename, void* buffer, int* bufferSize, void* context) {
-  char* msgProc = static_cast<char*>(context);
-  if(buffer == nullptr) {
-    *bufferSize = wasm_loadfileproc(filename, baseFilename, 0, 0, msgProc);
-    return *bufferSize != -1;
-  } else {
-    return wasm_loadfileproc(filename, baseFilename, buffer, *bufferSize, msgProc) == 1;
-  }
-}
-
-int wasm_CompilerMessageProc(int line, uint32_t dwMsgCode, const char* szText, void* context) {
-  char* msgProc = static_cast<char*>(context);
-  return wasm_msgproc(line, dwMsgCode, szText, msgProc);
-}
-
-struct WASM_COMPILER_INTERFACE {
-  std::string callbacksKey;    // key of callbacks object on globalThis
 };
 
 struct WASM_COMPILER_RESULT {
@@ -56,16 +27,28 @@ struct WASM_COMPILER_RESULT {
   KMCMP_COMPILER_RESULT_EXTRA extra;
 };
 
-WASM_COMPILER_RESULT kmcmp_wasm_compile(std::string pszInfile, const KMCMP_COMPILER_OPTIONS options, const WASM_COMPILER_INTERFACE intf) {
+WasmCallbackInterface* globalCallbacks = nullptr;
+
+const std::vector<uint8_t> wasm_LoadFileProc(const std::string& filename, const std::string& baseFilename) {
+  return globalCallbacks->loadFile(filename, baseFilename);
+}
+
+void wasm_CompilerMessageProc(const KMCMP_COMPILER_RESULT_MESSAGE& message, void* context) {
+  globalCallbacks->message(message);
+}
+
+WASM_COMPILER_RESULT kmcmp_wasm_compile(std::string pszInfile, const KMCMP_COMPILER_OPTIONS options, WasmCallbackInterface& callbacks) {
   WASM_COMPILER_RESULT r = {false};
   KMCMP_COMPILER_RESULT kr;
+
+  globalCallbacks = &callbacks;
 
   r.result = kmcmp_CompileKeyboard(
     pszInfile.c_str(),
     options,
     wasm_CompilerMessageProc,
     wasm_LoadFileProc,
-    intf.callbacksKey.c_str(),
+    "", //TODO: eliminate?
     kr
   );
 
@@ -75,6 +58,8 @@ WASM_COMPILER_RESULT kmcmp_wasm_compile(std::string pszInfile, const KMCMP_COMPI
     r.kmxSize = (int) kr.kmxSize;
     r.extra = kr.extra;
   }
+
+  globalCallbacks = nullptr;
 
   return r;
 }
@@ -119,6 +104,12 @@ int kmcmp_testSentry() {
 
 EMSCRIPTEN_BINDINGS(compiler_interface) {
 
+  emscripten::class_<WasmCallbackInterface>("WasmCallbackInterface")
+    .function("message", &WasmCallbackInterface::message, emscripten::pure_virtual())
+    .function("loadFile", &WasmCallbackInterface::loadFile, emscripten::pure_virtual())
+    .allow_subclass<WasmCallbackInterfaceWrapper>("WasmCallbackInterfaceWrapper")
+    ;
+
   emscripten::class_<KMCMP_COMPILER_OPTIONS>("CompilerOptions")
     .constructor<>()
     .property("saveDebug", &KMCMP_COMPILER_OPTIONS::saveDebug)
@@ -128,17 +119,19 @@ EMSCRIPTEN_BINDINGS(compiler_interface) {
     .property("target", &KMCMP_COMPILER_OPTIONS::target)
     ;
 
-  emscripten::class_<WASM_COMPILER_INTERFACE>("CompilerInterface")
-    .constructor<>()
-    .property("callbacksKey", &WASM_COMPILER_INTERFACE::callbacksKey)
-    ;
-
   emscripten::class_<WASM_COMPILER_RESULT>("CompilerResult")
     .constructor<>()
     .property("result", &WASM_COMPILER_RESULT::result)
     .property("kmx", &WASM_COMPILER_RESULT::kmx)
     .property("kmxSize", &WASM_COMPILER_RESULT::kmxSize)
     .property("extra", &WASM_COMPILER_RESULT::extra)
+    ;
+
+  emscripten::class_<KMCMP_COMPILER_RESULT_MESSAGE>("CompilerResultMessage")
+    .constructor<>()
+    .property("message", &KMCMP_COMPILER_RESULT_MESSAGE::message)
+    .property("errorCode", &KMCMP_COMPILER_RESULT_MESSAGE::errorCode)
+    .property("lineNumber", &KMCMP_COMPILER_RESULT_MESSAGE::lineNumber)
     ;
 
   emscripten::class_<KMCMP_COMPILER_RESULT_EXTRA>("CompilerResultExtra")
