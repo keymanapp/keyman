@@ -10,11 +10,4 @@
   },
 
   "include": [ "src/**/*.ts" ],
-
-  "references": [
-    { "path": "../../../../common/web/input-processor" },
-    { "path": "../../../../common/web/gesture-recognizer" },
-    { "path": "../dom-utils" },
-    { "path": "../events" }
-  ]
 }

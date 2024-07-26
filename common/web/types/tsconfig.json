@@ -13,8 +13,4 @@
     "src/**/*.ts",
     "src/schemas/*.mjs", // Import the validators
   ],
-  "references": [
-    { "path": "../keyman-version" },
-    { "path": "../../../core/include/ldml/tsconfig.json"},
-  ]
 }

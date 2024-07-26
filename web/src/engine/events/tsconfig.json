@@ -9,9 +9,4 @@
   },
 
   "include": [ "src/**/*.ts" ],
-
-  "references": [
-    { "path": "../../../../common/web/utils" },
-    { "path": "../../../../common/web/keyboard-processor" }
-  ]
 }

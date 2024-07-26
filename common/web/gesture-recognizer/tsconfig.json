@@ -9,7 +9,4 @@
   },
   "include": ["./src/engine/**/*.ts"],
   "exclude": ["./src/test/**/*.ts", "./src/tools/**/*.ts"],
-  "references": [
-    { "path": "../utils" }
-  ]
 }

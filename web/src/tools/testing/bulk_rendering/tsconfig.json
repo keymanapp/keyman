@@ -11,9 +11,4 @@
   "files": [
     "renderer_core.ts"
   ],
-
-	"references": [
-    { "path": "../../../app/browser" },
-    { "path": "../../../engine/device-detect" }
-	]
 }

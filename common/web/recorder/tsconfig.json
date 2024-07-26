@@ -12,11 +12,4 @@
   "include": [
     "src/**/*.ts"
   ],
-
-  "references": [
-    { "path": "../keyman-version" },
-    { "path": "../utils/" },
-    { "path": "../keyboard-processor/" },
-    { "path": "../lm-message-types" }
-  ],
 }

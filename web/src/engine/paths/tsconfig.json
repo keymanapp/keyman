@@ -10,10 +10,4 @@
   },
 
   "include": [ "**/*.ts" ],
-
-  "references": [
-    // We want OSK to be free from the need to reference this child project for its paths definitions.
-    // There are a number of extra components here the OSK doesn't need.
-    { "path": "../osk" }
-  ]
 }
