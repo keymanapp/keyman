@@ -13,11 +13,6 @@
   },
   "files": [],
   "references": [
-    { "path": "../web/utils" },
-    { "path": "../models/types"},
-    { "path": "../models/wordbreakers"},
-    { "path": "../web/lm-message-types"},
-    { "path": "../models/templates"},
     { "path": "src/node" },
     { "path": "src/web" }
   ],

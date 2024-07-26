@@ -7,15 +7,10 @@
     "tsBuildInfoFile": "build/obj/tsconfig.tsbuildinfo",
     "rootDir": "./src"
   },
-  "references": [
-    { "path": "../types" },
-    { "path": "../../web/utils" },
-    { "path": "../../models/wordbreakers" }
-  ],
   "include": [
-	"src/**/*.ts"
+    "src/**/*.ts"
   ],
   "exclude": [
-	"test"
+    "test"
   ]
 }

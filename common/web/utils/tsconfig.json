@@ -6,9 +6,6 @@
     "outDir": "./build/obj/",
     "rootDir": "./src"
   },
-  "references": [
-    { "path": "../keyman-version"}
-  ],
   "include": [
     "src/*.ts"
   ],

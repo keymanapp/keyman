@@ -9,9 +9,4 @@
   },
 
   "include": [ "**/*.ts" ],
-
-  "references": [
-    { "path": "../../engine/attachment" },
-    { "path": "../../engine/main" }
-  ]
 }

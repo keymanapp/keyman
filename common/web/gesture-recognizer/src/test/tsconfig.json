@@ -24,7 +24,4 @@
   ],
   // Undo the base config's exclude.
   "exclude": ["../../../../../node_modules/promise-status-async/lib/index.d.ts"],
-  "references": [
-    {"path": "../../"}
-  ]
 }

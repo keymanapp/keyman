@@ -13,9 +13,4 @@
     "**/test-*.ts",
     "./helpers/*.ts",
   ],
-  "references": [
-    { "path": "../../keyman-version" },
-    { "path": "../../../../core/include/ldml/"},
-    { "path": "../" },
-  ]
 }

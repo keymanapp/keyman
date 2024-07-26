@@ -8,11 +8,6 @@
     "tsBuildInfoFile": "build/obj/tsconfig.tsbuildinfo",
     "rootDir": "./src"
   },
-  "references": [
-    { "path": "../utils" },
-    { "path": "../keyboard-processor" },
-    { "path": "../../predictive-text/tsconfig.all.json" },
-  ],
   // The extra .d.ts is necessary to avoid issues with lack of a Worker type definition when not including
   // the standard DOM in the TS "lib" configuration.
   "include": ["./src/**/*.ts", "../../predictive-text/src/worker-interface.d.ts"]

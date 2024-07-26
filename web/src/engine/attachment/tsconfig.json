@@ -9,9 +9,4 @@
   },
 
   "include": [ "src/**/*.ts" ],
-
-  "references": [
-    { "path": "../dom-utils" },
-    { "path": "../element-wrappers" }
-  ]
 }
