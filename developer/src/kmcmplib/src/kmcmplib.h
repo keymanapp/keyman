@@ -3,9 +3,9 @@
 #include <kmcmplibapi.h>
 #include "compfile.h"
 #include "NamedCodeConstants.h"
+#include <CompilerErrors.h>
 
 namespace kmcmp {
-  KMX_BOOL AddCompileWarning(char* buf);
   extern int currentLine;
   extern KMX_BOOL FShouldAddCompilerVersion;
   extern KMX_BOOL  FSaveDebug, FCompilerWarningsAsErrors;   // I4865   // I4866
@@ -22,19 +22,9 @@ namespace kmcmp {
   KMX_DWORD AddCompilerVersionStore(PFILE_KEYBOARD fk);
 }
 
-extern kmcmp_CompilerMessageProc msgproc;
 extern kmcmp_LoadFileProc loadfileproc;
-extern void* msgprocContext;
 
 extern KMX_BOOL AWarnDeprecatedCode_GLOBAL_LIB;
-#define ERR_EXTRA_LIB_LEN 256
-extern char ErrExtraLIB[ERR_EXTRA_LIB_LEN];
-KMX_BOOL AddCompileError(KMX_DWORD msg);
-
-/// Use AddWarningBool for functions that return bool or KMX_BOOL
-#define AddWarningBool(warn)  { if(AddCompileError(warn)) return FALSE; }
-/// Use AddWarning for functions that return KMX_DWORD
-#define AddWarning(warn)      { if(AddCompileError(warn)) return CERR_Break; }
 
 PKMX_WCHAR strtowstr(PKMX_STR in);
 PFILE_STORE FindSystemStore(PFILE_KEYBOARD fk, KMX_DWORD dwSystemID);

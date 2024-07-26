@@ -4,6 +4,7 @@
 #include "../src/kmx_u16.h"
 #include "../src/compfile.h"
 #include "../src/CompMsg.h"
+#include "../src/CompilerErrors.h"
 #include "../../common/include/kmn_compiler_errors.h"
 #include "../../../../common/include/km_types.h"
 #include "../../../../common/include/kmx_file.h"
