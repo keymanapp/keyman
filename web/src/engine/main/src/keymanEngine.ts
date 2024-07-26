@@ -352,7 +352,7 @@ export default class KeymanEngine<
     // As the `new context` ruleset is designed to facilitate OSK layer-change updates
     // based on the context being entered, we want the keyboard processor's current
     // contextDevice to match that of the active OSK.  See #11740.
-    this.core.keyboardProcessor.contextDevice = value.targetDevice ?? this.config.softDevice;
+    this.core.keyboardProcessor.contextDevice = value?.targetDevice ?? this.config.softDevice;
     if(value) {
       // Don't build an OSK if no keyboard is available yet; avoid the extra flash.
       if(this.contextManager.activeKeyboard) {
