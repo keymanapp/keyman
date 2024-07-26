@@ -10,7 +10,7 @@ const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
 /**
  * @internal
  */
-export class CompilerMessages {
+export class PackageCompilerMessages {
   static FATAL_UnexpectedException = SevFatal | 0x0001;
   static Fatal_UnexpectedException = (o:{e: any}) => CompilerMessageSpecWithException(this.FATAL_UnexpectedException, null, o.e ?? 'unknown error');
 

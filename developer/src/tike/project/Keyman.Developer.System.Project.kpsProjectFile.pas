@@ -77,6 +77,7 @@ implementation
 
 uses
   System.Variants,
+  System.Win.ComObj,
 
   Keyman.Developer.System.Project.Project,
   PackageInfo;
@@ -117,6 +118,12 @@ begin
         end;
         on E:DOMException do
         begin
+          // ignore errors in the xml; reduce metadata visible to the user
+          Exit;
+        end;
+        on E:EOleException do
+        begin
+          // ignore errors in interpreting xml; reduce metadata visible to the user
           Exit;
         end;
       end;
