@@ -22,8 +22,4 @@
   "include": [
     "src/**/*.ts"
   ],
-  "references": [
-    { "path": "../../../common/web/keyman-version" },
-    { "path": "../common/web/utils" },
-  ]
 }

@@ -13,10 +13,6 @@
       "./helpers/index.ts"
   ],
   "references": [
-      { "path": "../../../../common/web/keyman-version" },
-      { "path": "../../../../common/web/types/" },
-      { "path": "../../../../common/tools/hextobin/" },
-      { "path": "../../common/web/test-helpers/" },
       { "path": "../" }
     ]
 }
