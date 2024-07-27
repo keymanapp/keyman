@@ -6,7 +6,7 @@
 
 import { CompilerCallbacks } from '@keymanapp/common-types';
 import { CompilerEvent } from '@keymanapp/common-types';
-import { Osk } from '@keymanapp/developer-utils';
+import { Osk } from '@keymanapp/kmc-kmn';
 
 // @public
 export class AnalyzeOskCharacterUse {
