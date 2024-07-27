@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 18.0.77 alpha 2024-07-27
+
+* refactor(windows): clean up logging (#11921)
+* chore(developer): rename to analyzer-messages.ts (#12017)
+* fix(developer): remove `paths` from tsconfig.json (#12028)
+* chore(developer): api doc refresh (#12029)
+
 ## 18.0.76 alpha 2024-07-26
 
 * change(linux): improve changelog PRs after upload to debian (#12024)
