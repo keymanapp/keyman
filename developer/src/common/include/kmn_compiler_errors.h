@@ -48,6 +48,11 @@ namespace CompilerErrorSeverity {
 #define SevHint                                          (MESSAGE_NAMESPACE_KmnCompiler | CompilerErrorSeverity::Hint)
 #define SevInfo                                          (MESSAGE_NAMESPACE_KmnCompiler | CompilerErrorSeverity::Info)
 
+// These two values are not true error codes; they are used as
+// return values in kmcmplib and are never passed to kmc-kmn
+#define STATUS_Success                                       0x00000000 // NOTE: Not a message code
+#define STATUS_EndOfFile                                     0x00000001 // NOTE: Not a message code
+
 // Message codes
 //
 // All errors here and below are mirrored in
@@ -55,8 +60,6 @@ namespace CompilerErrorSeverity {
 // sure to update that file also. Note that this correlation is currently
 // maintained manually. All values must be below 0x1000 (exclusive of severity
 // code).
-#define CERR_None                                          0x00000000
-#define CERR_EndOfFile                                     0x00000001
 
 #define FATAL_BadCallParams                                 0x00008002
 #define FATAL_CannotAllocateMemory                          0x00008004

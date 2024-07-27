@@ -66,7 +66,7 @@ KMX_DWORD VerifyCasedKeys(PFILE_STORE sp) {
   delete[] sp->dpString;
   sp->dpString = buf;
 
-  return CERR_None;
+  return STATUS_Success;
 }
 
 KMX_DWORD ExpandCapsRulesForGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) {
@@ -76,14 +76,14 @@ KMX_DWORD ExpandCapsRulesForGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) {
   if (kmcmp::FMnemonicLayout) {
     // The &CasedKeys system store is not supported for
     // mnemonic layouts in 14.0
-    return CERR_None;
+    return STATUS_Success;
   }
 
   PFILE_STORE sp = FindSystemStore(fk, TSS_CASEDKEYS);
   if (!sp) {
     // If there is no &CasedKeys system store, then we do not
     // process the key
-    return CERR_None;
+    return STATUS_Success;
   }
 
   KMX_DWORD msg;
@@ -92,11 +92,11 @@ KMX_DWORD ExpandCapsRulesForGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) {
   // dereference the array every call
   int cxKeyArray = gp->cxKeyArray;
   for (int i = 0; i < cxKeyArray; i++) {
-    if ((msg = ExpandCapsRule(gp, &gp->dpKeyArray[i], sp)) != CERR_None) {
+    if ((msg = ExpandCapsRule(gp, &gp->dpKeyArray[i], sp)) != STATUS_Success) {
       return msg;
     }
   }
-  return CERR_None;
+  return STATUS_Success;
 }
 
 KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
@@ -106,13 +106,13 @@ KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
   if (shift == 0) {
     // Convert US key cap to a virtual key
     if (!kmcmp::MapUSCharToVK(kpp->Key, &key, &shift)) {
-      return CERR_None;
+      return STATUS_Success;
     }
   }
 
   if (shift & (CAPITALFLAG | NOTCAPITALFLAG)) {
     // Don't attempt expansion if either Caps Lock flag is specified in the key rule
-    return CERR_None;
+    return STATUS_Success;
   }
 
   PKMX_WCHAR p = sp->dpString;
@@ -125,7 +125,7 @@ KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
 
   if (!*p) {
     // This key is not modified by Caps Lock
-    return CERR_None;
+    return STATUS_Success;
   }
 
   // This key is modified by Caps Lock, so we need to duplicate this rule
@@ -149,5 +149,5 @@ KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
   kpp->Key = key;
   kpp->ShiftFlags = shift | NOTCAPITALFLAG;
 
-  return CERR_None;
+  return STATUS_Success;
 }

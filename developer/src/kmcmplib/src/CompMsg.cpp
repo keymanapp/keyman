@@ -74,7 +74,7 @@ std::map<KMX_DWORD, const KMX_CHAR*> CompilerErrorMap = {
     { CERR_CodeInvalidInThisSection                      , "This line is invalid in this section of the file"},
     { CERR_InvalidMessage                                , "Invalid 'message' command"},
     { CERR_InvalidLanguageName                           , "Invalid 'languagename' command"},
-    { CERR_EndOfFile                                     , "(no error - reserved code)"},
+    { STATUS_EndOfFile                                     , "(no error - reserved code)"},
     { CERR_InvalidToken                                  , "Invalid token found"},
     { CERR_InvalidBegin                                  , "Invalid 'begin' command"},
     { CERR_InvalidName                                   , "Invalid 'name' command"},

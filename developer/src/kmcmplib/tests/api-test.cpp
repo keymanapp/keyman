@@ -74,19 +74,19 @@ extern KMX_DWORD GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &
 
 void test_GetCompileTargetsFromTargetsStore() {
   int targets = 0;
-  assert(GetCompileTargetsFromTargetsStore(u"any", targets) == CERR_None);
+  assert(GetCompileTargetsFromTargetsStore(u"any", targets) == STATUS_Success);
   assert(targets == (COMPILETARGETS_KMX | COMPILETARGETS_JS));
-  assert(GetCompileTargetsFromTargetsStore(u"windows", targets) == CERR_None);
+  assert(GetCompileTargetsFromTargetsStore(u"windows", targets) == STATUS_Success);
   assert(targets == COMPILETARGETS_KMX);
-  assert(GetCompileTargetsFromTargetsStore(u"desktop", targets) == CERR_None);
+  assert(GetCompileTargetsFromTargetsStore(u"desktop", targets) == STATUS_Success);
   assert(targets == COMPILETARGETS_KMX);
-  assert(GetCompileTargetsFromTargetsStore(u"mobile", targets) == CERR_None);
+  assert(GetCompileTargetsFromTargetsStore(u"mobile", targets) == STATUS_Success);
   assert(targets == COMPILETARGETS_JS);
-  assert(GetCompileTargetsFromTargetsStore(u"web", targets) == CERR_None);
+  assert(GetCompileTargetsFromTargetsStore(u"web", targets) == STATUS_Success);
   assert(targets == COMPILETARGETS_JS);
-  assert(GetCompileTargetsFromTargetsStore(u"desktop mobile", targets) == CERR_None);
+  assert(GetCompileTargetsFromTargetsStore(u"desktop mobile", targets) == STATUS_Success);
   assert(targets == (COMPILETARGETS_KMX | COMPILETARGETS_JS));
-  assert(GetCompileTargetsFromTargetsStore(u"desktop   tablet", targets) == CERR_None);
+  assert(GetCompileTargetsFromTargetsStore(u"desktop   tablet", targets) == STATUS_Success);
   assert(targets == (COMPILETARGETS_KMX | COMPILETARGETS_JS));
   assert(GetCompileTargetsFromTargetsStore(u"foo bar baz", targets) == CERR_InvalidTarget);
   assert(targets == 0);

@@ -22,14 +22,14 @@ KMX_DWORD CheckForDuplicateGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) noexcept {
       return CERR_DuplicateGroup;
     }
   }
-  return CERR_None;
+  return STATUS_Success;
 }
 
 KMX_DWORD CheckForDuplicateStore(PFILE_KEYBOARD fk, PFILE_STORE sp) noexcept {
   if (!sp->szName[0]) {
     // Stores with zero length names are reserved system stores.
     // They cannot be defined in user code. This is not an issue.
-    return CERR_None;
+    return STATUS_Success;
   }
   KMX_DWORD i;
   PFILE_STORE sp0 = fk->dpStoreArray;
@@ -42,5 +42,5 @@ KMX_DWORD CheckForDuplicateStore(PFILE_KEYBOARD fk, PFILE_STORE sp) noexcept {
       return CERR_DuplicateStore;
     }
   }
-  return CERR_None;
+  return STATUS_Success;
 }

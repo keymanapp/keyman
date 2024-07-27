@@ -238,8 +238,8 @@ TEST_F(CompilerTest, ProcessBeginLine_test) {
 };
 
 TEST_F(CompilerTest, ValidateMatchNomatchOutput_test) {
-    EXPECT_EQ(CERR_None, ValidateMatchNomatchOutput(NULL));
-    EXPECT_EQ(CERR_None, ValidateMatchNomatchOutput((PKMX_WCHAR)u""));
+    EXPECT_EQ(STATUS_Success, ValidateMatchNomatchOutput(NULL));
+    EXPECT_EQ(STATUS_Success, ValidateMatchNomatchOutput((PKMX_WCHAR)u""));
     const KMX_WCHAR context[] = { 'a', 'b', 'c', UC_SENTINEL, CODE_CONTEXT, 'd', 'e', 'f', 0 };
     EXPECT_EQ(CERR_ContextAndIndexInvalidInMatchNomatch, ValidateMatchNomatchOutput((PKMX_WCHAR)context));
     const KMX_WCHAR contextex[] = { 'a', 'b', 'c', UC_SENTINEL, CODE_CONTEXTEX, 'd', 'e', 'f', 0 };
@@ -247,7 +247,7 @@ TEST_F(CompilerTest, ValidateMatchNomatchOutput_test) {
     const KMX_WCHAR index[] = { 'a', 'b', 'c', UC_SENTINEL, CODE_INDEX, 'd', 'e', 'f', 0 };
     EXPECT_EQ(CERR_ContextAndIndexInvalidInMatchNomatch, ValidateMatchNomatchOutput((PKMX_WCHAR)index));
     const KMX_WCHAR sentinel[] = { 'a', 'b', 'c', UC_SENTINEL, 'd', 'e', 'f', 0 };
-    EXPECT_EQ(CERR_None, ValidateMatchNomatchOutput((PKMX_WCHAR)sentinel));
+    EXPECT_EQ(STATUS_Success, ValidateMatchNomatchOutput((PKMX_WCHAR)sentinel));
 };
 
 // KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
@@ -296,7 +296,7 @@ TEST_F(CompilerTest, ProcessKeyLineImpl_test) {
 
     // #11643: non-BMP characters do not makes sense for key codes
     u16cpy(str, u"+ 'A' > 'test'\n"); // baseline
-    EXPECT_EQ(CERR_None, ProcessKeyLineImpl(&fileKeyboard, str, TRUE, pklIn, pklKey, pklOut));
+    EXPECT_EQ(STATUS_Success, ProcessKeyLineImpl(&fileKeyboard, str, TRUE, pklIn, pklKey, pklOut));
 
     u16cpy(str, u"+ '\U00010000' > 'test'\n"); // surrogate pair
     EXPECT_EQ(CERR_NonBMPCharactersNotSupportedInKeySection, ProcessKeyLineImpl(&fileKeyboard, str, TRUE, pklIn, pklKey, pklOut));
@@ -571,9 +571,9 @@ TEST_F(CompilerTest, GetXStringImpl_test) {
     // FATAL_BufferOverflow, max=0
     EXPECT_EQ(FATAL_BufferOverflow, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 0, 0, &newp, FALSE));
 
-    // CERR_None, no token
+    // STATUS_Success, no token
     str[0] = '\0';
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // CERR_NoTokensFound, empty
     u16cpy(str, u"");
@@ -593,18 +593,18 @@ TEST_F(CompilerTest, GetXStringImpl_type_xd_test) {
 
     // hex 32-bit
     u16cpy(str, u"x10330"); // Gothic A
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_GothicA[] = { 0xD800, 0xDF30, 0 }; // see UTF32ToUTF16
     EXPECT_EQ(0, u16cmp(tstr_GothicA, tstr));
 
     // decimal 8-bit
     u16cpy(str, u"d18");
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(u"\u0012", tstr));
 
     // hex capital 8-bit
     u16cpy(str, u"X12");
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(u"\u0012", tstr));
 
     // hex 32-bit, CERR_InvalidCharacter
@@ -614,7 +614,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_xd_test) {
     // dk, valid
     u16cpy(str, u"dk(A)");
     EXPECT_EQ(0, (int)fileKeyboard.cxDeadKeyArray);
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_dk_valid[] = { UC_SENTINEL, CODE_DEADKEY, 1, 0 }; // setup deadkeys
     EXPECT_EQ(0, u16cmp(tstr_dk_valid, tstr));
     fileKeyboard.cxDeadKeyArray = 0;
@@ -622,7 +622,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_xd_test) {
     // deadkey, valid
     u16cpy(str, u"deadkey(A)");
     EXPECT_EQ(0, (int)fileKeyboard.cxDeadKeyArray);
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_deadkey_valid[] = { UC_SENTINEL, CODE_DEADKEY, 1, 0 }; // setup deadkeys
     EXPECT_EQ(0, u16cmp(tstr_deadkey_valid, tstr));
     fileKeyboard.cxDeadKeyArray = 0;
@@ -649,7 +649,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_double_quote_test) {
 
     // valid
     u16cpy(str, u"\"abc\"");
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(u"abc", tstr));
 
     // CERR_UnterminatedString
@@ -672,7 +672,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_single_quote_test) {
 
     // valid
     u16cpy(str, u"\'abc\'");
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(u"abc", tstr));
 
     // CERR_UnterminatedString
@@ -747,7 +747,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
     u16cpy(str, u"index(b,4)");
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_index_comma_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 4, 0 };
     EXPECT_EQ(0, u16cmp(tstr_index_comma_valid, tstr));
 
@@ -755,7 +755,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
     u16cpy(str, u"index( b,4)");
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_index_initial_space_and_comma_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 4, 0 };
     EXPECT_EQ(0, u16cmp(tstr_index_initial_space_and_comma_valid, tstr));
 
@@ -763,7 +763,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
     u16cpy(str, u"index(b, 4)");
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_index_comma_and_space_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 4, 0 };
     EXPECT_EQ(0, u16cmp(tstr_index_comma_and_space_valid, tstr));
 
@@ -771,7 +771,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     u16cpy(str, u"index(b 4)");
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_index_space_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 4, 0 };
     EXPECT_EQ(0, u16cmp(tstr_index_space_valid, tstr));
 
@@ -779,7 +779,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     u16cpy(str, u"index(b,42)");
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_index_two_digit_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 42, 0 };
     EXPECT_EQ(0, u16cmp(tstr_index_two_digit_valid, tstr));
 
@@ -838,9 +838,9 @@ TEST_F(CompilerTest, GetRHS_test) {
     u16cpy(str, u"abc");
     EXPECT_EQ(CERR_NoTokensFound, GetRHS(&fileKeyboard, str, tstr, 80, 0, FALSE));
 
-    // CERR_None
+    // STATUS_Success
     u16cpy(str, u"> nul c\n");
-    EXPECT_EQ(CERR_None, GetRHS(&fileKeyboard, str, tstr, 80, 0, FALSE));
+    EXPECT_EQ(STATUS_Success, GetRHS(&fileKeyboard, str, tstr, 80, 0, FALSE));
 }
 
 // void safe_wcsncpy(PKMX_WCHAR out, PKMX_WCHAR in, int cbMax)

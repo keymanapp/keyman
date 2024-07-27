@@ -76,28 +76,28 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
   int offset = 0;
 
   // must preprocess for group and store names -> this isn't really necessary, but never mind!
-  while ((msg = ReadLine(infile, sz, offset, str, TRUE)) == CERR_None)
+  while ((msg = ReadLine(infile, sz, offset, str, TRUE)) == STATUS_Success)
   {
     p = str;
     switch (LineTokenType(&p))
     {
       case T_VERSION:
         *(p + 4) = 0;
-        if ((msg = AddStore(fk, TSS_VERSION, p)) != CERR_None) {
+        if ((msg = AddStore(fk, TSS_VERSION, p)) != STATUS_Success) {
           AddCompileError(msg);
           return FALSE;
         }
         break;
 
       case T_GROUP:
-        if ((msg = ProcessGroupLine(fk, p)) != CERR_None) {
+        if ((msg = ProcessGroupLine(fk, p)) != STATUS_Success) {
           AddCompileError(msg);
           return FALSE;
         }
         break;
 
       case T_STORE:
-        if ((msg = ProcessStoreLine(fk, p)) != CERR_None) {
+        if ((msg = ProcessStoreLine(fk, p)) != STATUS_Success) {
           AddCompileError(msg);
           return FALSE;
         }
@@ -108,7 +108,7 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
     }
   }
 
-  if (msg != CERR_EndOfFile) {
+  if (msg != STATUS_EndOfFile) {
     AddCompileError(msg);
     return FALSE;
   }
@@ -121,16 +121,16 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
   kmcmp::CodeConstants->reindex();
 
   /* ReadLine will automatically skip over $Keyman lines, and parse wrapped lines */
-  while ((msg = ReadLine(infile, sz, offset, str, FALSE)) == CERR_None)
+  while ((msg = ReadLine(infile, sz, offset, str, FALSE)) == STATUS_Success)
   {
     msg = ParseLine(fk, str);
-    if (msg != CERR_None) {
+    if (msg != STATUS_Success) {
       AddCompileError(msg);
       return FALSE;
     }
   }
 
-  if (msg != CERR_EndOfFile) {
+  if (msg != STATUS_EndOfFile) {
     AddCompileError(msg);
     return FALSE;
   }
@@ -140,12 +140,12 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
   if (kmcmp::FSaveDebug) kmcmp::RecordDeadkeyNames(fk);
 
   /* Add the compiler version as a system store */
-  if ((msg = kmcmp::AddCompilerVersionStore(fk)) != CERR_None) {
+  if ((msg = kmcmp::AddCompilerVersionStore(fk)) != STATUS_Success) {
     AddCompileError(msg);
     return FALSE;
   }
 
-  if ((msg = BuildVKDictionary(fk)) != CERR_None) {
+  if ((msg = BuildVKDictionary(fk)) != STATUS_Success) {
     AddCompileError(msg);
     return FALSE;
   }

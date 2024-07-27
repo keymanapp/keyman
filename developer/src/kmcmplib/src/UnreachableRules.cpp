@@ -52,5 +52,5 @@ KMX_DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
 
   kmcmp::currentLine = oldCurrentLine;
 
-  return CERR_None;
+  return STATUS_Success;
 }

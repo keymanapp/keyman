@@ -94,7 +94,7 @@ EXTERN bool kmcmp_CompileKeyboard(
 
   //TODO: FreeKeyboardPointers(fk);
 
-  if(msg != CERR_None) {
+  if(msg != STATUS_Success) {
     AddCompileError(msg);
     return FALSE;
   }
