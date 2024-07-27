@@ -154,9 +154,9 @@ TEST_F(CompilerTest, wstrtostr_test) {
 
 //     // CERR_FATAL
 //     EXPECT_EQ(0, kmcmp::nErrors);
-//     EXPECT_EQ(CERR_FATAL, CERR_CannotCreateTempfile & CERR_FATAL);
-//     EXPECT_TRUE(AddCompileError(CERR_CannotCreateTempfile));
-//     EXPECT_EQ(0, strcmp(GetCompilerErrorString(CERR_CannotCreateTempfile), szText_stub));
+//     EXPECT_EQ(CERR_FATAL, FATAL_CannotCreateTempfile & CERR_FATAL);
+//     EXPECT_TRUE(AddCompileError(FATAL_CannotCreateTempfile));
+//     EXPECT_EQ(0, strcmp(GetCompilerErrorString(FATAL_CannotCreateTempfile), szText_stub));
 //     EXPECT_EQ(1, kmcmp::nErrors);
 
 //     // CERR_ERROR
@@ -568,8 +568,8 @@ TEST_F(CompilerTest, GetXStringImpl_test) {
     KMX_WCHAR output[GLOBAL_BUFSIZE];
     PKMX_WCHAR newp = NULL;
 
-    // CERR_BufferOverflow, max=0
-    EXPECT_EQ(CERR_BufferOverflow, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 0, 0, &newp, FALSE));
+    // FATAL_BufferOverflow, max=0
+    EXPECT_EQ(FATAL_BufferOverflow, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 0, 0, &newp, FALSE));
 
     // CERR_None, no token
     str[0] = '\0';

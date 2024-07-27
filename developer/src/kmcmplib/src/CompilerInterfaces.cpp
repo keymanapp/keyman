@@ -25,7 +25,7 @@ EXTERN bool kmcmp_CompileKeyboard(
   kmcmp::CompileTarget = options.target;
 
   if (!messageProc || !loadFileProc || !pszInfile) {
-    AddCompileError(CERR_BadCallParams);
+    AddCompileError(FATAL_BadCallParams);
     return FALSE;
   }
 
@@ -52,7 +52,7 @@ EXTERN bool kmcmp_CompileKeyboard(
 
   KMX_BYTE* infile = new KMX_BYTE[sz+1];
   if(!infile) {
-    AddCompileError(CERR_CannotAllocateMemory);
+    AddCompileError(FATAL_CannotAllocateMemory);
     return FALSE;
   }
   std::copy(bufvec.begin(), bufvec.end(), infile);
@@ -68,7 +68,7 @@ EXTERN bool kmcmp_CompileKeyboard(
     int sz16;
     if(!UTF16TempFromUTF8(infile, sz, &infile16, &sz16)) {
       delete[] infile;
-      AddCompileError(CERR_CannotCreateTempfile);
+      AddCompileError(FATAL_CannotCreateTempfile);
       return FALSE;
     }
     delete[] infile;

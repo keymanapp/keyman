@@ -567,7 +567,7 @@ KMX_DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   PKMX_WCHAR q;
 
   gp = new FILE_GROUP[fk->cxGroupArray + 1];
-  if (!gp) return CERR_CannotAllocateMemory;
+  if (!gp) return FATAL_CannotAllocateMemory;
 
   if (fk->dpGroupArray)
   {
@@ -690,7 +690,7 @@ KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   }
 
   if(!resizeStoreArray(fk)) {
-    return CERR_CannotAllocateMemory;
+    return FATAL_CannotAllocateMemory;
   }
   sp = &fk->dpStoreArray[fk->cxStoreArray];
 
@@ -779,7 +779,7 @@ KMX_DWORD AddStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, const KMX_WCHAR * str,
 {
   PFILE_STORE sp;
   if(!resizeStoreArray(fk)) {
-    return CERR_CannotAllocateMemory;
+    return FATAL_CannotAllocateMemory;
   }
 
   sp = &fk->dpStoreArray[fk->cxStoreArray];
@@ -812,7 +812,7 @@ KMX_DWORD AddDebugStore(PFILE_KEYBOARD fk, KMX_WCHAR const * str)
   u16sprintf(tstr, _countof(tstr), L"%d", kmcmp::currentLine);  // I3481
 
   if(!resizeStoreArray(fk)) {
-    return CERR_CannotAllocateMemory;
+    return FATAL_CannotAllocateMemory;
   }
   sp = &fk->dpStoreArray[fk->cxStoreArray];
 
@@ -1355,7 +1355,7 @@ KMX_DWORD CheckVirtualKeysInOutput(PKMX_WCHAR output) {
 KMX_DWORD InjectContextToReadonlyOutput(PKMX_WCHAR pklOut) {
   if (pklOut[0] != UC_SENTINEL || pklOut[1] != CODE_CONTEXT) {
     if (u16len(pklOut) > GLOBAL_BUFSIZE - 3) {
-      return CERR_CannotAllocateMemory;
+      return FATAL_CannotAllocateMemory;
     }
     memmove(pklOut + 2, pklOut, (u16len(pklOut) + 1) * 2);
     pklOut[0] = UC_SENTINEL;
@@ -1425,7 +1425,7 @@ KMX_DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnicode)
   pklKey = new KMX_WCHAR[GLOBAL_BUFSIZE];
   pklOut = new KMX_WCHAR[GLOBAL_BUFSIZE];
   if (!pklIn || !pklKey || !pklOut)
-    return CERR_CannotAllocateMemory; // forget about the little leak if pklKey or pklOut fail...
+    return FATAL_CannotAllocateMemory; // forget about the little leak if pklKey or pklOut fail...
 
   KMX_DWORD result = ProcessKeyLineImpl(fk, str, IsUnicode, pklIn, pklKey, pklOut);
 
@@ -1500,7 +1500,7 @@ KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnico
   }
 
   if(!resizeKeyArray(gp)) {
-    return CERR_CannotAllocateMemory;
+    return FATAL_CannotAllocateMemory;
   }
 
   kp = &gp->dpKeyArray[gp->cxKeyArray];
@@ -1615,7 +1615,7 @@ KMX_DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, KMX_DWORD storeIndex)
   int offset = (int)(kpp - gp->dpKeyArray);
 
   if (!resizeKeyArray(gp, nchrs)) {
-    return CERR_CannotAllocateMemory;
+    return FATAL_CannotAllocateMemory;
   }
 
   kpp = &gp->dpKeyArray[offset];
@@ -1847,7 +1847,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     if (mx >= max) {
       // This is an error condition, we want the compiler
       // to crash if we reach this
-      return CERR_BufferOverflow;
+      return FATAL_BufferOverflow;
     }
 
     tokenFound = FALSE;
@@ -3045,7 +3045,7 @@ KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, KMX_BYTE**data, size_t& dataS
   }
 
   buf = new KMX_BYTE[size];
-  if (!buf) return CERR_CannotAllocateMemory;
+  if (!buf) return FATAL_CannotAllocateMemory;
   memset(buf, 0, size);
 
   ck = (PCOMP_KEYBOARD)buf;
@@ -3161,7 +3161,7 @@ KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, KMX_BYTE**data, size_t& dataS
 
   if (offset != size) {
     delete[] buf;
-    return CERR_SomewhereIGotItWrong;
+    return FATAL_SomewhereIGotItWrong;
   }
 
   SetChecksum(buf, &ck->dwCheckSum, (KMX_DWORD)size);

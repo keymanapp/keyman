@@ -131,7 +131,7 @@ KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
   // This key is modified by Caps Lock, so we need to duplicate this rule
   int offset = (int)(kpp - gp->dpKeyArray);
   if(!resizeKeyArray(gp)) {
-    return CERR_CannotAllocateMemory;
+    return FATAL_CannotAllocateMemory;
   }
   kpp = &gp->dpKeyArray[offset];
   gp->cxKeyArray++;
