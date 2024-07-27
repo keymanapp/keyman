@@ -152,22 +152,22 @@ TEST_F(CompilerTest, wstrtostr_test) {
 //     ErrExtraLIB[0] = '\0';
 //     KMX_CHAR expected[COMPILE_ERROR_MAX_LEN];
 
-//     // CERR_FATAL
+//     // SevFatal
 //     EXPECT_EQ(0, kmcmp::nErrors);
-//     EXPECT_EQ(CERR_FATAL, FATAL_CannotCreateTempfile & CERR_FATAL);
+//     EXPECT_EQ(SevFatal, FATAL_CannotCreateTempfile & SevFatal);
 //     EXPECT_TRUE(AddCompileError(FATAL_CannotCreateTempfile));
 //     EXPECT_EQ(0, strcmp(GetCompilerErrorString(FATAL_CannotCreateTempfile), szText_stub));
 //     EXPECT_EQ(1, kmcmp::nErrors);
 
-//     // CERR_ERROR
-//     EXPECT_EQ(CERR_ERROR, CERR_InvalidLayoutLine & CERR_ERROR);
+//     // SevError
+//     EXPECT_EQ(SevError, CERR_InvalidLayoutLine & SevError);
 //     EXPECT_FALSE(AddCompileError(CERR_InvalidLayoutLine));
 //     EXPECT_EQ(0, strcmp(GetCompilerErrorString(CERR_InvalidLayoutLine), szText_stub));
 //     EXPECT_EQ(2, kmcmp::nErrors);
 
 //     // Unknown
 //     const KMX_DWORD UNKNOWN_ERROR = 0x00004FFF; // top of range ERROR
-//     EXPECT_EQ(CERR_ERROR, UNKNOWN_ERROR & CERR_ERROR);
+//     EXPECT_EQ(SevError, UNKNOWN_ERROR & SevError);
 //     EXPECT_FALSE(AddCompileError(UNKNOWN_ERROR));
 //     sprintf(expected, "Unknown error %x", UNKNOWN_ERROR);
 //     EXPECT_EQ(0, strcmp(expected, szText_stub));
@@ -176,7 +176,7 @@ TEST_F(CompilerTest, wstrtostr_test) {
 //     // ErrChr
 //     const int ERROR_CHAR_INDEX = 42;
 //     kmcmp::ErrChr = ERROR_CHAR_INDEX ;
-//     EXPECT_EQ(CERR_ERROR, CERR_InvalidLayoutLine & CERR_ERROR);
+//     EXPECT_EQ(SevError, CERR_InvalidLayoutLine & SevError);
 //     EXPECT_FALSE(AddCompileError(CERR_InvalidLayoutLine));
 //     sprintf(expected, "%s character offset: %d", GetCompilerErrorString(CERR_InvalidLayoutLine), ERROR_CHAR_INDEX);
 //     EXPECT_EQ(0, strcmp(expected, szText_stub));
@@ -186,7 +186,7 @@ TEST_F(CompilerTest, wstrtostr_test) {
 //     // ErrExtraLIB
 //     const char *const EXTRA_LIB_TEXT = " extra lib";
 //     strcpy(ErrExtraLIB, EXTRA_LIB_TEXT);
-//     EXPECT_EQ(CERR_ERROR, CERR_InvalidLayoutLine & CERR_ERROR);
+//     EXPECT_EQ(SevError, CERR_InvalidLayoutLine & SevError);
 //     EXPECT_FALSE(AddCompileError(CERR_InvalidLayoutLine));
 //     sprintf(expected, "%s%s", GetCompilerErrorString(CERR_InvalidLayoutLine), EXTRA_LIB_TEXT);
 //     EXPECT_EQ(0, strcmp(expected, szText_stub));
@@ -195,7 +195,7 @@ TEST_F(CompilerTest, wstrtostr_test) {
 
 //     // msgproc returns FALSE
 //     msgproc = msgproc_false_stub;
-//     EXPECT_EQ(CERR_ERROR, CERR_InvalidLayoutLine & CERR_ERROR);
+//     EXPECT_EQ(SevError, CERR_InvalidLayoutLine & SevError);
 //     EXPECT_TRUE(AddCompileError(CERR_InvalidLayoutLine));
 //     EXPECT_EQ(0, strcmp(GetCompilerErrorString(CERR_InvalidLayoutLine), szText_stub));
 //     EXPECT_EQ(6, kmcmp::nErrors);

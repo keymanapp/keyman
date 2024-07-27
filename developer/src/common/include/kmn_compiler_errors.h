@@ -23,21 +23,30 @@
 #ifndef _kmn_compiler_errors_h
 #define _kmn_compiler_errors_h
 
-// Compiler Error Masks
+// Compiler Error Masks -- matches compiler-interfaces.ts
 
-#define CERR_SEVERITY_MASK                                 0x0000F000
-#define CERR_MESSAGE_MASK                                  0x00000FFF
-#define CERR_MASK                                          0x0000FFFF
+namespace CompilerErrorSeverity {
+  // We use a namespace to stop the enum names leaking out into global namespace scope
+  enum {
+    Info =          0x000000, // Informational, not necessarily a problem
+    Hint =          0x100000, // Something the user might want to be aware of
+    Warn =          0x200000, // Warning: Not great, but we can keep going.
+    Error =         0x300000, // Severe error where we can't continue
+    Fatal =         0x400000, // OOM or should-not-happen internal problem
+  };
+};
+
+#define MESSAGE_NAMESPACE_KmnCompiler      0x2000
 
 // Severity codes
 //
 // Note: these may not be combined, and are not a bitmask, for historical
 // reasons they are separate bits
-#define CERR_FATAL                                         0x00008000
-#define CERR_ERROR                                         0x00004000
-#define CERR_WARNING                                       0x00002000
-#define CERR_HINT                                          0x00001000
-#define CERR_INFO                                          0x00000000
+#define SevFatal                                         (MESSAGE_NAMESPACE_KmnCompiler | CompilerErrorSeverity::Fatal)
+#define SevError                                         (MESSAGE_NAMESPACE_KmnCompiler | CompilerErrorSeverity::Error)
+#define SevWarn                                          (MESSAGE_NAMESPACE_KmnCompiler | CompilerErrorSeverity::Warn)
+#define SevHint                                          (MESSAGE_NAMESPACE_KmnCompiler | CompilerErrorSeverity::Hint)
+#define SevInfo                                          (MESSAGE_NAMESPACE_KmnCompiler | CompilerErrorSeverity::Info)
 
 // Message codes
 //

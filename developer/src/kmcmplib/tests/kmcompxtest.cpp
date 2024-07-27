@@ -24,11 +24,6 @@
 
 using namespace std;
 
-#define CERR_FATAL                                         0x00008000
-#define CERR_ERROR                                         0x00004000
-#define CERR_WARNING                                       0x00002000
-#define CERR_HINT                                          0x00001000
-
 int main(int argc, char *argv[])
 {
 	if(argc < 4) {

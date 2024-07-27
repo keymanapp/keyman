@@ -28,7 +28,7 @@ KMX_BOOL AddCompileError(KMX_DWORD msg)
   KMX_CHAR szText[COMPILE_ERROR_MAX_LEN];
   const KMX_CHAR* szTextp = NULL;
 
-  if (msg & CERR_FATAL)
+  if (msg & SevFatal)
   {
     szTextp = GetCompilerErrorString(msg);
     KMCMP_COMPILER_RESULT_MESSAGE message;
@@ -40,7 +40,7 @@ KMX_BOOL AddCompileError(KMX_DWORD msg)
     return TRUE;
   }
 
-  if (msg & CERR_ERROR) {
+  if (msg & SevError) {
     kmcmp::nErrors++;
   }
 

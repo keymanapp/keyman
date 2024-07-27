@@ -11,10 +11,10 @@ void msgproc(const KMCMP_COMPILER_RESULT_MESSAGE &message, void* context) {
   error_vec.push_back(message.errorCode);
   const char*t = "unknown";
   switch(message.errorCode & 0xF000) {
-    case CERR_HINT:    t="   hint"; break;
-    case CERR_WARNING: t="warning"; break;
-    case CERR_ERROR:   t="  error"; break;
-    case CERR_FATAL:   t="  fatal"; break;
+    case SevHint:    t="   hint"; break;
+    case SevWarn:    t="warning"; break;
+    case SevError:   t="  error"; break;
+    case SevFatal:   t="  fatal"; break;
   }
   printf("line %d  %s %4.4x:  %s\n", message.lineNumber, t, (unsigned int)message.errorCode, message.message.c_str());
 }
