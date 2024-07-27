@@ -85,7 +85,7 @@ void InitDebugging() {
   }
 }
 
-int SendDebugMessageFormat_1(wchar_t *file, int line, PWCHAR fmt, ...) {
+int SendDebugMessageFormat_1(wchar_t *file, int line, wchar_t* function, PWCHAR fmt, ...) {
   if (ShouldDebug()) {
     WCHAR fmtbuf[256];
 
@@ -95,23 +95,33 @@ int SendDebugMessageFormat_1(wchar_t *file, int line, PWCHAR fmt, ...) {
       wcscpy_s(fmtbuf, L"fail");  // I2248   // I3547
     }
     fmtbuf[255] = 0;
-    SendDebugMessage_1(file, line, fmtbuf);
+    SendDebugMessage_1(file, line, function, fmtbuf);
   }
   return 0;
 }
 
-int SendDebugMessage_1(wchar_t *file, int line, PWCHAR msg) {
+int SendDebugMessage_1(wchar_t *file, int line, wchar_t* function, PWCHAR msg) {
   if (ShouldDebug()) {
-    Keyman32Interface::WriteDebugEvent(file, line, msg);
+    Keyman32Interface::WriteDebugEvent(file, line, function, msg);
   }
   return 0;
 }
 
-void DebugLastError_1(wchar_t *file, int line, char *func, PWCHAR msg, DWORD err) {
+int SendDebugEntry_1(wchar_t* file, int line, wchar_t* function) {
+  Keyman32Interface::WriteDebugEntry(file, line, function);
+  return 0;
+}
+
+int SendDebugExit_1(wchar_t* file, int line, wchar_t* function) {
+  Keyman32Interface::WriteDebugExit(file, line, function);
+  return 0;
+}
+
+void DebugLastError_1(wchar_t *file, int line, wchar_t* function, PWCHAR msg, DWORD err) {
   if(ShouldDebug()) {
     WCHAR buf[256];
     FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ARGUMENT_ARRAY, NULL, err, 0, buf, _countof(buf), NULL);
-    SendDebugMessageFormat(L"ERROR %d in %hs [%hs:%d] calling %s: %s", err, func, file, line, msg, buf);
+    SendDebugMessageFormat_1(file, line, function, L"ERROR %d calling %s: %s", err, msg, buf);
   }
 }
 
@@ -121,10 +131,10 @@ void WINAPI Keyman_Diagnostic(int mode) {
   }
 }
 
-BOOL _LogSUCCEEDED(wchar_t *file, int line, PWSTR caller, PSTR callee, HRESULT hr) {
+BOOL _LogSUCCEEDED(wchar_t *file, int line, wchar_t* function, PSTR callee, HRESULT hr) {
   BOOL result = SUCCEEDED(hr);
   if (!result) {
-    SendDebugMessageFormat_1(file, line, L"CKMTipTextService::Log: call in %s to %hs failed with %x", caller, callee, hr);
+    SendDebugMessageFormat_1(file, line, function, L"call to %hs failed with %x", callee, hr);
   }
   return result;
 }
