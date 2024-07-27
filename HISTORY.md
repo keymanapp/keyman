@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 17.0.328 stable 2024-07-27
+
+* fix(web): add nullish test in setOsk (#12041)
+
 ## 17.0.327 stable 2024-07-25
 
 * fix(android): include DOMRect polyfill for older ES6-supporting devices (#11654)
