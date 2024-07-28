@@ -66,12 +66,18 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
 
   if(kmcmp::FShouldAddCompilerVersion) {
     u16sprintf(str,LINESIZE, L"Created with Keyman Developer version %d.%d.%d.%d", KEYMAN_VersionMajor, KEYMAN_VersionMinor, KEYMAN_VersionPatch, 0);
-    AddStore(fk, TSS_KEYMANCOPYRIGHT, str);
+    if(!AddStore(fk, TSS_KEYMANCOPYRIGHT, str)) {
+      return FALSE;
+    }
   }
 
   /* Add a system store for the Keyman edition number */
-  AddStore(fk, TSS_CUSTOMKEYMANEDITION, u"0");
-  AddStore(fk, TSS_CUSTOMKEYMANEDITIONNAME, u"Keyman");
+  if(!AddStore(fk, TSS_CUSTOMKEYMANEDITION, u"0")) {
+    return FALSE;
+  }
+  if(!AddStore(fk, TSS_CUSTOMKEYMANEDITIONNAME, u"Keyman")) {
+    return FALSE;
+  }
 
   int offset = 0;
 
@@ -83,8 +89,7 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
     {
       case T_VERSION:
         *(p + 4) = 0;
-        if ((msg = AddStore(fk, TSS_VERSION, p)) != STATUS_Success) {
-          AddCompileError(msg);
+        if (!AddStore(fk, TSS_VERSION, p)) {
           return FALSE;
         }
         break;
@@ -121,9 +126,7 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
   /* ReadLine will automatically skip over $Keyman lines, and parse wrapped lines */
   while ((msg = ReadLine(infile, sz, offset, str, FALSE)) == STATUS_Success)
   {
-    msg = ParseLine(fk, str);
-    if (msg != STATUS_Success) {
-      AddCompileError(msg);
+    if(!ParseLine(fk, str)) {
       return FALSE;
     }
   }
@@ -138,13 +141,11 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
   if (kmcmp::FSaveDebug) kmcmp::RecordDeadkeyNames(fk);
 
   /* Add the compiler version as a system store */
-  if ((msg = kmcmp::AddCompilerVersionStore(fk)) != STATUS_Success) {
-    AddCompileError(msg);
+  if (!kmcmp::AddCompilerVersionStore(fk)) {
     return FALSE;
   }
 
-  if ((msg = BuildVKDictionary(fk)) != STATUS_Success) {
-    AddCompileError(msg);
+  if (!BuildVKDictionary(fk)) {
     return FALSE;
   }
 
