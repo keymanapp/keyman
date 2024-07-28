@@ -96,8 +96,7 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
         break;
 
       case T_STORE:
-        if ((msg = ProcessStoreLine(fk, p)) != STATUS_Success) {
-          AddCompileError(msg);
+        if (!ProcessStoreLine(fk, p)) {
           return FALSE;
         }
         break;

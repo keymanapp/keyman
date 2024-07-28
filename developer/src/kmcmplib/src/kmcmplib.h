@@ -35,6 +35,6 @@ KMX_DWORD ReadLine(KMX_BYTE* infile, int sz, int& offset, PKMX_WCHAR wstr, KMX_B
 KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str);
 KMX_BOOL ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 KMX_DWORD ProcessGroupFinish(PFILE_KEYBOARD fk);
-KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p);
+KMX_BOOL ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 int LineTokenType(PKMX_WCHAR *str);
 KMX_DWORD BuildVKDictionary(PFILE_KEYBOARD fk); // I3438

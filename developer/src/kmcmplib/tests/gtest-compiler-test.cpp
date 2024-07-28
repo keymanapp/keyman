@@ -250,10 +250,10 @@ TEST_F(CompilerTest, ValidateMatchNomatchOutput_test) {
 };
 
 // KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
-// KMX_DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
+// KMX_BOOL ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
 // int kmcmp::cmpkeys(const void *key, const void *elem)
 // KMX_DWORD ProcessGroupFinish(PFILE_KEYBOARD fk)
-// KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
+// KMX_BOOL ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
 // bool resizeStoreArray(PFILE_KEYBOARD fk)
 // bool resizeKeyArray(PFILE_GROUP gp, int increment)
 // KMX_DWORD AddStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, const KMX_WCHAR * str, KMX_DWORD *dwStoreID)

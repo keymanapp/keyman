@@ -26,11 +26,11 @@ KMX_BOOL CheckForDuplicateGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) noexcept {
   return TRUE;
 }
 
-KMX_DWORD CheckForDuplicateStore(PFILE_KEYBOARD fk, PFILE_STORE sp) noexcept {
+KMX_BOOL CheckForDuplicateStore(PFILE_KEYBOARD fk, PFILE_STORE sp) noexcept {
   if (!sp->szName[0]) {
     // Stores with zero length names are reserved system stores.
     // They cannot be defined in user code. This is not an issue.
-    return STATUS_Success;
+    return TRUE;
   }
   KMX_DWORD i;
   PFILE_STORE sp0 = fk->dpStoreArray;
@@ -40,8 +40,9 @@ KMX_DWORD CheckForDuplicateStore(PFILE_KEYBOARD fk, PFILE_STORE sp) noexcept {
     }
     if (u16icmp(sp0->szName, sp->szName) == 0) {
       snprintf(ErrExtraLIB, ERR_EXTRA_LIB_LEN, " Store '%s' declared on line %d", string_from_u16string(sp0->szName).c_str(), sp0->line);
-      return KmnCompilerMessages::ERROR_DuplicateStore;
+      AddCompileError(KmnCompilerMessages::ERROR_DuplicateStore);
+      return FALSE;
     }
   }
-  return STATUS_Success;
+  return TRUE;
 }

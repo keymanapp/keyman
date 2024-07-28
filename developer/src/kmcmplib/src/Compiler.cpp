@@ -675,28 +675,34 @@ KMX_DWORD ProcessGroupFinish(PFILE_KEYBOARD fk)
 * Store management
 */
 
-KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
-{
+KMX_BOOL ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p) {
   PKMX_WCHAR q, pp;
   PFILE_STORE sp;
-  //WCHAR temp[GLOBAL_BUFSIZE];
   KMX_DWORD msg;
   int i = 0;
 
   pp = p;
 
-  if ((q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL)) == NULL) return KmnCompilerMessages::ERROR_InvalidStoreLine;
+  if ((q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL)) == NULL) {
+    AddCompileError(KmnCompilerMessages::ERROR_InvalidStoreLine);
+    return FALSE;
+  }
 
-  if (*q == *SSN__PREFIX)
-  {
-    for (i = 0; StoreTokens[i]; i++)
-      if (!u16icmp(q, StoreTokens[i]))  // I3481
+  if (*q == *SSN__PREFIX) {
+    for (i = 0; StoreTokens[i]; i++) {
+      if (!u16icmp(q, StoreTokens[i])) {  // I3481
         break;
-    if (!StoreTokens[i]) return KmnCompilerMessages::ERROR_InvalidSystemStore;
+      }
+    }
+    if (!StoreTokens[i]) {
+      AddCompileError(KmnCompilerMessages::ERROR_InvalidSystemStore);
+      return FALSE;
+    }
   }
 
   if(!resizeStoreArray(fk)) {
-    return KmnCompilerMessages::FATAL_CannotAllocateMemory;
+    AddCompileError(KmnCompilerMessages::FATAL_CannotAllocateMemory);
+    return FALSE;
   }
   sp = &fk->dpStoreArray[fk->cxStoreArray];
 
@@ -711,10 +717,10 @@ KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   {
     PKMX_WCHAR temp = new KMX_WCHAR[GLOBAL_BUFSIZE];
 
-    if ((msg = GetXString(fk, p, u"c\n", temp, GLOBAL_BUFSIZE - 1, (int)(p - pp), &p, FALSE, TRUE)) != STATUS_Success)
-    {
+    if ((msg = GetXString(fk, p, u"c\n", temp, GLOBAL_BUFSIZE - 1, (int)(p - pp), &p, FALSE, TRUE)) != STATUS_Success) {
       delete[] temp;
-      return msg;
+      AddCompileError(msg);
+      return FALSE;
     }
 
     sp->dwSystemID = i;
@@ -725,23 +731,27 @@ KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   }
 
   if (xstrlen(sp->dpString) == 1 && *sp->dpString != UC_SENTINEL &&
-    sp->dwSystemID == 0 && (fk->version >= VERSION_60 || fk->version == 0))
-  {
+    sp->dwSystemID == 0 && (fk->version >= VERSION_60 || fk->version == 0)) {
     // In this case, we want to change behaviour for older versioned keyboards so that
     // we don't mix up named character codes which weren't supported in 5.x
     VERIFY_KEYBOARD_VERSION(fk, VERSION_60, KmnCompilerMessages::ERROR_60FeatureOnly_NamedCodes);
     // Add a single char store as a defined character constant
-    if (Uni_IsSurrogate1(*sp->dpString))
+    if (Uni_IsSurrogate1(*sp->dpString)) {
       kmcmp::CodeConstants->AddCode(Uni_SurrogateToUTF32(sp->dpString[0], sp->dpString[1]), sp->szName, fk->cxStoreArray);
-    else
+    } else {
       kmcmp::CodeConstants->AddCode(sp->dpString[0], sp->szName, fk->cxStoreArray);
+    }
     kmcmp::CodeConstants->reindex(); // has to be done after every character add due to possible use in another store.   // I4982
   }
 
   fk->cxStoreArray++;	// increment now, because GetXString refers to stores
 
-  if (i > 0)
-    if ((msg = ProcessSystemStore(fk, i, sp)) != STATUS_Success) return msg;
+  if (i > 0) {
+    if ((msg = ProcessSystemStore(fk, i, sp)) != STATUS_Success) {
+      AddCompileError(msg);
+      return FALSE;
+    }
+  }
 
   return CheckForDuplicateStore(fk, sp);
 }
