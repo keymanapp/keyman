@@ -10,7 +10,7 @@
 
 #include "CheckForDuplicates.h"
 
-KMX_DWORD CheckForDuplicateGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) noexcept {
+KMX_BOOL CheckForDuplicateGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) noexcept {
   KMX_DWORD i;
   PFILE_GROUP gp0 = fk->dpGroupArray;
   for (i = 0; i < fk->cxGroupArray; i++, gp0++) {
@@ -19,10 +19,11 @@ KMX_DWORD CheckForDuplicateGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) noexcept {
     }
     if (u16icmp(gp0->szName, gp->szName) == 0) {
       snprintf(ErrExtraLIB, ERR_EXTRA_LIB_LEN, " Group '%s' declared on line %d", string_from_u16string(gp->szName).c_str(), gp0->Line);
-      return KmnCompilerMessages::ERROR_DuplicateGroup;
+      AddCompileError(KmnCompilerMessages::ERROR_DuplicateGroup);
+      return FALSE;
     }
   }
-  return STATUS_Success;
+  return TRUE;
 }
 
 KMX_DWORD CheckForDuplicateStore(PFILE_KEYBOARD fk, PFILE_STORE sp) noexcept {

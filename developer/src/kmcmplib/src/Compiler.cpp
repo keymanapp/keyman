@@ -561,13 +561,16 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
 
 //**********************************************************************************************************************
 
-KMX_DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
+KMX_BOOL ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
 {
   PFILE_GROUP gp;
   PKMX_WCHAR q;
 
   gp = new FILE_GROUP[fk->cxGroupArray + 1];
-  if (!gp) return KmnCompilerMessages::FATAL_CannotAllocateMemory;
+  if (!gp) {
+    AddCompileError(KmnCompilerMessages::FATAL_CannotAllocateMemory);
+    return FALSE;
+  }
 
   if (fk->dpGroupArray)
   {
@@ -585,7 +588,10 @@ KMX_DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   gp->cxKeyArray = 0;
 
   q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-  if (!q) return KmnCompilerMessages::ERROR_InvalidGroupLine;
+  if (!q) {
+    AddCompileError(KmnCompilerMessages::ERROR_InvalidGroupLine);
+    return FALSE;
+  }
 
   gp->fUsingKeys = FALSE;
   gp->fReadOnly  = IsSameToken(&p, u"readonly");

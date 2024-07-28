@@ -90,8 +90,7 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
         break;
 
       case T_GROUP:
-        if ((msg = ProcessGroupLine(fk, p)) != STATUS_Success) {
-          AddCompileError(msg);
+        if (!ProcessGroupLine(fk, p)) {
           return FALSE;
         }
         break;
