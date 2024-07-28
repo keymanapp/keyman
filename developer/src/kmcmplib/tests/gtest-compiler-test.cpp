@@ -11,7 +11,6 @@
 
 PKMX_WCHAR strtowstr(PKMX_STR in);
 PKMX_STR wstrtostr(PKMX_WCHAR in);
-KMX_BOOL AddCompileError(KMX_DWORD msg);
 KMX_DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 KMX_DWORD ValidateMatchNomatchOutput(PKMX_WCHAR p);
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString);
