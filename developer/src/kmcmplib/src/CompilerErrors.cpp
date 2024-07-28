@@ -16,7 +16,7 @@ namespace kmcmp {
 KMX_BOOL kmcmp::AddCompileWarning(PKMX_CHAR buf)
 {
   KMCMP_COMPILER_RESULT_MESSAGE message;
-  message.errorCode = CWARN_Info;
+  message.errorCode = CINFO_Info;
   message.lineNumber = kmcmp::currentLine + 1;
   message.message = buf;
   (*msgproc)(message, msgprocContext);

@@ -206,10 +206,9 @@ namespace CompilerErrorSeverity {
 #define CWARN_ANSIInUnicodeGroup                           0x00002087
 #define CWARN_UnicodeSurrogateUsed                         0x00002088
 #define CWARN_ReservedCharacter                            0x00002089
-// Note: CWARN_Info has an "info" severity; this changed in 17.0. Earlier versions
-// had a special case for CWARN_Info in message output.
-#define CWARN_Info                                         0x0000008A
-#define CINFO_Info                                         CWARN_Info
+
+#define CINFO_Info                                         0x0000008A
+
 #define CWARN_VirtualKeyWithMnemonicLayout                 0x0000208B
 #define CWARN_VirtualCharKeyWithPositionalLayout           0x0000208C
 #define CWARN_StoreAlreadyUsedAsOptionOrCall               0x0000208D

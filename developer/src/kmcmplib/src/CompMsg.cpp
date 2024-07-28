@@ -127,7 +127,7 @@ std::map<KMX_DWORD, const KMX_CHAR*> CompilerErrorMap = {
     { CWARN_ANSIInUnicodeGroup                           , "An ANSI character was found in a Unicode group"},
     { CWARN_UnicodeSurrogateUsed                         , "A Unicode surrogate character was found. You should use Unicode scalar values to represent values > U+FFFF"},
     { CWARN_ReservedCharacter                            , "A Unicode character was found that should not be used"},
-    { CWARN_Info                                         , "Information"},
+    { CINFO_Info                                         , "Information"},
     { CWARN_VirtualKeyWithMnemonicLayout                 , "Virtual key used instead of virtual character key with a mnemonic layout"},
     { CWARN_VirtualCharKeyWithPositionalLayout           , "Virtual character key used with a positional layout instead of mnemonic layout"},
     { CWARN_StoreAlreadyUsedAsOptionOrCall               , "Store already used as an option or in a call statement and should not be used as a normal store"},
