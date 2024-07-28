@@ -187,10 +187,8 @@ export class KmnCompilerMessages {
     to the file.`
   );
 
-  // static INFO_None                                            = SevInfo | 0x000;
-
-  static INFO_EndOfFile                                       = SevInfo | 0x001;
-  static Info_EndOfFile                                       = () => m(this.INFO_EndOfFile, `(no error - reserved code)`);
+  // static STATUS_None                                            = 0x000;   // This is not a real error
+  // static STATUS_EndOfFile                                       = 0x001;   // This is not a real error
 
   static FATAL_BadCallParams                                  = SevFatal | 0x002;
   static Fatal_BadCallParams                                  = () => m(this.FATAL_BadCallParams, `CompileKeyboardFile was called with bad parameters`);
@@ -204,8 +202,8 @@ export class KmnCompilerMessages {
   // static ERROR_CannotCreateOutfile                            = SevError | 0x006; // #10678: reduced from fatal to error in 17.0, but unused
   // static Error_CannotCreateOutfile                            = () => m(this.ERROR_CannotCreateOutfile, `Cannot open output file for writing`); unused
 
-  static FATAL_UnableToWriteFully                             = SevFatal | 0x007;
-  static Fatal_UnableToWriteFully                             = () => m(this.FATAL_UnableToWriteFully, `Unable to write the file completely`);
+  // static FATAL_UnableToWriteFully                             = SevFatal | 0x007;
+  // static Fatal_UnableToWriteFully                             = () => m(this.FATAL_UnableToWriteFully, `Unable to write the file completely`);
 
   static ERROR_CannotReadInfile                               = SevError | 0x008; // #10678: reduced from fatal to error in 17.0
   static Error_CannotReadInfile                               = () => m(this.ERROR_CannotReadInfile, `Cannot read the input file`);
@@ -720,6 +718,6 @@ export class KmnCompilerMessages {
   static FATAL_BufferOverflow                                 = SevFatal | 0x0C0;
   static Fatal_BufferOverflow                                 = () => m(this.FATAL_BufferOverflow, `The compiler memory buffer overflowed`);
 
-  static FATAL_Break                                          = SevFatal | 0x0C1;
-  static Fatal_Break                                          = () => m(this.FATAL_Break, `Compiler interrupted by user`);
+  // static FATAL_Break                                          = SevFatal | 0x0C1;
+  // static Fatal_Break                                          = () => m(this.FATAL_Break, `Compiler interrupted by user`);
 };

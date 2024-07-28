@@ -223,21 +223,21 @@ namespace KmnCompilerMessages {
     WARN_TouchLayoutMissingRequiredKeys =               SevWarn | 0x093,
     WARN_HelpFileMissing =                              SevWarn | 0x094,
     WARN_EmbedJsFileMissing =                           SevWarn | 0x095,
-    WARN_TouchLayoutFileMissing =                       SevWarn | 0x096,
-    WARN_VisualKeyboardFileMissing =                    SevWarn | 0x097,
+    // WARN_TouchLayoutFileMissing =                       SevWarn | 0x096,
+    // WARN_VisualKeyboardFileMissing =                    SevWarn | 0x097,
     WARN_ExtendedShiftFlagsNotSupportedInKeymanWeb =    SevWarn | 0x098,   // I4118
     WARN_TouchLayoutUnidentifiedKey =                   SevWarn | 0x099,
     HINT_UnreachableKeyCode =                           SevHint | 0x09A,
 
-    WARN_CouldNotCopyJsonFile =                         SevWarn | 0x09B,
+    // WARN_CouldNotCopyJsonFile =                         SevWarn | 0x09B,
     WARN_PlatformNotInTargets =                         SevWarn | 0x09C,
 
     WARN_HeaderStatementIsDeprecated =                  SevWarn | 0x09D,
     WARN_UseNotLastStatementInRule =                    SevWarn | 0x09E,
 
     WARN_TouchLayoutFontShouldBeSameForAllPlatforms =   SevWarn | 0x09F,
-    WARN_InvalidJSONMetadataFile =                      SevWarn | 0x0A0,
-    WARN_JSONMetadataOSKFontShouldMatchTouchFont =      SevWarn | 0x0A1,
+    // WARN_InvalidJSONMetadataFile =                      SevWarn | 0x0A0,
+    // WARN_JSONMetadataOSKFontShouldMatchTouchFont =      SevWarn | 0x0A1,
     WARN_KVKFileIsInSourceFormat =                      SevWarn | 0x0A2,
 
     WARN_DontMixChiralAndNonChiralModifiers =           SevWarn | 0x0A3,
@@ -247,7 +247,7 @@ namespace KmnCompilerMessages {
 
     HINT_NonUnicodeFile =                               SevHint | 0x0A6,
 
-    WARN_TooManyErrorsOrWarnings =                      SevWarn | 0x0A7,
+    // WARN_TooManyErrorsOrWarnings =                      SevWarn | 0x0A7,
 
     WARN_HotkeyHasInvalidModifier =                     SevWarn | 0x0A8,
 
