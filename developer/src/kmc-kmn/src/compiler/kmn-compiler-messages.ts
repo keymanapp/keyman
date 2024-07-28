@@ -18,30 +18,6 @@ const mw = (code: number, message: string, o?: {filename?: string, line?: number
   line: o?.line,
 });
 
-/**
- * LogLevel comes from kmn_compiler_errors.h, for legacy compiler error messages
- */
-const enum LogLevel {
-  LEVEL_MASK = 0xF000,
-  CODE_MASK = 0x0FFF,
-  CERR_FATAL = 0x8000,
-  CERR_ERROR = 0x4000,
-  CERR_WARNING = 0x2000,
-  CERR_HINT = 0x1000,
-  CERR_INFO = 0
-};
-
-/**
- * Translate the legacy compiler error messages to Severity codes
- */
-const LogLevelToSeverity: Record<number,number> = {
-  [LogLevel.CERR_FATAL]:   SevFatal,
-  [LogLevel.CERR_ERROR]:   SevError,
-  [LogLevel.CERR_WARNING]: SevWarn,
-  [LogLevel.CERR_HINT]:    SevHint,
-  [LogLevel.CERR_INFO]:    SevInfo
-}
-
 export const enum KmnCompilerMessageRanges {
   RANGE_KMN_COMPILER_MIN    = 0x001, // from kmn_compiler_errors.h
   RANGE_KMN_COMPILER_MAX    = 0x7FF, // from kmn_compiler_errors.h
@@ -746,15 +722,4 @@ export class KmnCompilerMessages {
 
   static FATAL_Break                                          = SevFatal | 0x0C1;
   static Fatal_Break                                          = () => m(this.FATAL_Break, `Compiler interrupted by user`);
-};
-
-export function mapErrorFromKmcmplib(line: number, code: number, msg: string): CompilerEvent {
-  const severity = LogLevelToSeverity[code & LogLevel.LEVEL_MASK];
-  const baseCode = code & LogLevel.CODE_MASK;
-  const event: CompilerEvent = {
-    line: line,
-    code: severity | CompilerErrorNamespace.KmnCompiler | baseCode,
-    message: msg
-  };
-  return event;
 };

@@ -16,5 +16,5 @@
 // TEST_F(CompMsgTest, GetCompilerErrorString) {
 //     EXPECT_EQ(nullptr, GetCompilerErrorString(STATUS_Success));
 //     EXPECT_EQ(nullptr, GetCompilerErrorString(0x00004FFF)); // top of range ERROR
-//     EXPECT_EQ("Invalid 'layout' command", GetCompilerErrorString(CERR_InvalidLayoutLine));
+//     EXPECT_EQ("Invalid 'layout' command", GetCompilerErrorString(KmnCompilerMessages::ERROR_InvalidLayoutLine));
 // };

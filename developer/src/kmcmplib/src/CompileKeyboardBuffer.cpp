@@ -20,13 +20,13 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
   kmcmp::FMnemonicLayout = FALSE;
 
   if (!fk) {
-    AddCompileError(FATAL_SomewhereIGotItWrong);
+    AddCompileError(KmnCompilerMessages::FATAL_SomewhereIGotItWrong);
     return FALSE;
   }
 
   str = new KMX_WCHAR[LINESIZE];
   if (!str) {
-    AddCompileError(FATAL_CannotAllocateMemory);
+    AddCompileError(KmnCompilerMessages::FATAL_CannotAllocateMemory);
     return FALSE;
   }
 

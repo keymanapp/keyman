@@ -16,7 +16,7 @@ namespace kmcmp {
 KMX_BOOL kmcmp::AddCompileWarning(PKMX_CHAR buf)
 {
   KMCMP_COMPILER_RESULT_MESSAGE message;
-  message.errorCode = CINFO_Info;
+  message.errorCode = KmnCompilerMessages::INFO_Info;
   message.lineNumber = kmcmp::currentLine + 1;
   message.message = buf;
   (*msgproc)(message, msgprocContext);
@@ -27,8 +27,9 @@ KMX_BOOL AddCompileError(KMX_DWORD msg)
 {
   KMX_CHAR szText[COMPILE_ERROR_MAX_LEN];
   const KMX_CHAR* szTextp = NULL;
+  const KMX_DWORD severity = msg & MESSAGE_SEVERITY_MASK;
 
-  if (msg & SevFatal)
+  if (severity == CompilerErrorSeverity::Fatal)
   {
     szTextp = GetCompilerErrorString(msg);
     KMCMP_COMPILER_RESULT_MESSAGE message;
@@ -40,7 +41,7 @@ KMX_BOOL AddCompileError(KMX_DWORD msg)
     return TRUE;
   }
 
-  if (msg & SevError) {
+  if (severity == CompilerErrorSeverity::Error) {
     kmcmp::nErrors++;
   }
 

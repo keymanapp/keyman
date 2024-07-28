@@ -8,7 +8,7 @@
 
 KMX_BOOL kmcmp::WarnDeprecatedHeader() {   // I4866
 if( AWarnDeprecatedCode_GLOBAL_LIB){
-  AddWarningBool(CWARN_HeaderStatementIsDeprecated);
+  AddWarningBool(KmnCompilerMessages::WARN_HeaderStatementIsDeprecated);
   }
   return TRUE;
 }
@@ -42,7 +42,7 @@ KMX_BOOL kmcmp::CheckForDeprecatedFeatures(PFILE_KEYBOARD fk) {
           sp->dwSystemID == TSS_ETHNOLOGUECODE ||
           sp->dwSystemID == TSS_WINDOWSLANGUAGES) {
         kmcmp::currentLine = sp->line;
-        AddWarningBool(CWARN_LanguageHeadersDeprecatedInKeyman10);
+        AddWarningBool(KmnCompilerMessages::WARN_LanguageHeadersDeprecatedInKeyman10);
       }
     }
   }

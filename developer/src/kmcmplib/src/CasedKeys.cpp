@@ -24,7 +24,7 @@ KMX_DWORD VerifyCasedKeys(PFILE_STORE sp) {
   if (kmcmp::FMnemonicLayout) {
     // The &CasedKeys system store is not supported for
     // mnemonic layouts in 14.0
-    return CERR_CasedKeysNotSupportedWithMnemonicLayout;
+    return KmnCompilerMessages::ERROR_CasedKeysNotSupportedWithMnemonicLayout;
   }
 
   // We will rewrite this store with virtual keys
@@ -37,20 +37,20 @@ KMX_DWORD VerifyCasedKeys(PFILE_STORE sp) {
     KMX_UINT key = 0, shift = 0;
     if (*p != UC_SENTINEL) {
       if (!kmcmp::MapUSCharToVK(*p, &key, &shift)) {
-        return CERR_CasedKeysMustContainOnlyVirtualKeys;
+        return KmnCompilerMessages::ERROR_CasedKeysMustContainOnlyVirtualKeys;
       }
       if (shift & K_SHIFTFLAG) {
-        return CERR_CasedKeysMustNotIncludeShiftStates;
+        return KmnCompilerMessages::ERROR_CasedKeysMustNotIncludeShiftStates;
       }
     }
     else {
       if (*(p + 1) != CODE_EXTENDED) {
-        return CERR_CasedKeysMustContainOnlyVirtualKeys;
+        return KmnCompilerMessages::ERROR_CasedKeysMustContainOnlyVirtualKeys;
       }
       shift = *(p + 2);
       key = *(p + 3);
       if (shift != ISVIRTUALKEY) {
-        return CERR_CasedKeysMustNotIncludeShiftStates;
+        return KmnCompilerMessages::ERROR_CasedKeysMustNotIncludeShiftStates;
       }
     }
     *q++ = UC_SENTINEL;
@@ -131,7 +131,7 @@ KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
   // This key is modified by Caps Lock, so we need to duplicate this rule
   int offset = (int)(kpp - gp->dpKeyArray);
   if(!resizeKeyArray(gp)) {
-    return FATAL_CannotAllocateMemory;
+    return KmnCompilerMessages::FATAL_CannotAllocateMemory;
   }
   kpp = &gp->dpKeyArray[offset];
   gp->cxKeyArray++;

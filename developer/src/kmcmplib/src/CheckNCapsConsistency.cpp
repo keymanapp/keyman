@@ -87,7 +87,7 @@ bool CheckNCapsConsistency(PFILE_KEYBOARD fk) {
     if (caps_ncaps_usage[i].neither_line && (caps_ncaps_usage[i].caps_line || caps_ncaps_usage[i].ncaps_line)) {
       // We set the current line to one needing work: the developer should add the NCAPS flag
       kmcmp::currentLine = caps_ncaps_usage[i].neither_line;
-      AddWarningBool(CWARN_KeyShouldIncludeNCaps);
+      AddWarningBool(KmnCompilerMessages::WARN_KeyShouldIncludeNCaps);
     }
   }
 

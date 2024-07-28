@@ -10,11 +10,12 @@ std::vector<int> error_vec;
 void msgproc(const KMCMP_COMPILER_RESULT_MESSAGE &message, void* context) {
   error_vec.push_back(message.errorCode);
   const char*t = "unknown";
-  switch(message.errorCode & 0xF000) {
-    case SevHint:    t="   hint"; break;
-    case SevWarn:    t="warning"; break;
-    case SevError:   t="  error"; break;
-    case SevFatal:   t="  fatal"; break;
+  switch(message.errorCode & MESSAGE_SEVERITY_MASK) {
+    case CompilerErrorSeverity::Hint:    t="   hint"; break;
+    case CompilerErrorSeverity::Warn:    t="warning"; break;
+    case CompilerErrorSeverity::Error:   t="  error"; break;
+    case CompilerErrorSeverity::Fatal:   t="  fatal"; break;
+    case CompilerErrorSeverity::Info:    t="   info"; break;
   }
   printf("line %d  %s %4.4x:  %s\n", message.lineNumber, t, (unsigned int)message.errorCode, message.message.c_str());
 }
