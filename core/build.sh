@@ -59,6 +59,7 @@ Libraries will be built in 'build/<target>/<configuration>/src'.
 " \
   "@/common/tools/hextobin" \
   "@/common/web/keyman-version" \
+  "@/core/include/ldml" \
   "@/developer/src/kmc" \
   "clean" \
   "configure" \
