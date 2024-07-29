@@ -72,6 +72,7 @@
 		98FE10631B4DEE5600525F54 /* KMInfoWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98FE10611B4DEE5600525F54 /* KMInfoWindowController.m */; };
 		9A3D6C5D221531B0008785A3 /* KMOSVersion.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A3D6C5C221531B0008785A3 /* KMOSVersion.m */; };
 		B90818AF7ED302187DE0E026 /* Pods_Keyman.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B644E63217FFE54B91C71C94 /* Pods_Keyman.framework */; };
+		D861B03F2C5747F70003675E /* KMSettingsRepository.m in Sources */ = {isa = PBXBuildFile; fileRef = D861B03E2C5747F70003675E /* KMSettingsRepository.m */; };
 		E211769D20E182DD00F8065D /* NoContextTestClient.m in Sources */ = {isa = PBXBuildFile; fileRef = E211769C20E182DD00F8065D /* NoContextTestClient.m */; };
 		E21176A020E18C5200F8065D /* AppleCompliantTestClient.m in Sources */ = {isa = PBXBuildFile; fileRef = E211769F20E18C5200F8065D /* AppleCompliantTestClient.m */; };
 		E211CCF620B600A500505C36 /* KeymanEngine4Mac.framework.dSYM in CopyFiles */ = {isa = PBXBuildFile; fileRef = E211CCF520B600A500505C36 /* KeymanEngine4Mac.framework.dSYM */; };
@@ -350,6 +351,8 @@
 		CEFFECDB2A417FEC00D58C36 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/KMKeyboardHelpWindowController.strings; sourceTree = "<group>"; };
 		CEFFECDC2A417FEC00D58C36 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		CEFFECDD2A4180FD00D58C36 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		D861B03D2C5747F70003675E /* KMSettingsRepository.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMSettingsRepository.h; sourceTree = "<group>"; };
+		D861B03E2C5747F70003675E /* KMSettingsRepository.m */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.c.objc; path = KMSettingsRepository.m; sourceTree = "<group>"; tabWidth = 2; };
 		E211769B20E1826800F8065D /* NoContextTestClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NoContextTestClient.h; sourceTree = "<group>"; };
 		E211769C20E182DD00F8065D /* NoContextTestClient.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NoContextTestClient.m; sourceTree = "<group>"; };
 		E211769E20E18C0B00F8065D /* AppleCompliantTestClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppleCompliantTestClient.h; sourceTree = "<group>"; };
@@ -548,6 +551,8 @@
 				29B4A0D32BF7675A00682049 /* KMLogs.m */,
 				299ABD6F29ECE75B00AA5948 /* KeySender.m */,
 				299ABD7029ECE75B00AA5948 /* KeySender.h */,
+				D861B03D2C5747F70003675E /* KMSettingsRepository.h */,
+				D861B03E2C5747F70003675E /* KMSettingsRepository.m */,
 				297A501128DF4D360074EB1B /* Privacy */,
 				98FE105B1B4DE86300525F54 /* Categories */,
 				98D6DA791A799EE700B09822 /* Frameworks */,
@@ -974,6 +979,7 @@
 				29B4A0D52BF7675A00682049 /* KMLogs.m in Sources */,
 				98BF924F1BF02DC20002126A /* KMBarView.m in Sources */,
 				E240F599202DED740000067D /* KMPackage.m in Sources */,
+				D861B03F2C5747F70003675E /* KMSettingsRepository.m in Sources */,
 				984B8F441AF1C3D900E096A8 /* OSKWindowController.m in Sources */,
 				9836B3711AE5F11D00780482 /* mztools.c in Sources */,
 				9836B3701AE5F11D00780482 /* ioapi.c in Sources */,

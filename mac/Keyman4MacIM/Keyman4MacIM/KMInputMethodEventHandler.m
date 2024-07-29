@@ -10,6 +10,7 @@
 #import <Carbon/Carbon.h> /* For kVK_ constants. */
 #import "KeySender.h"
 #import "TextApiCompliance.h"
+#import "KMSettingsRepository.h"
 #import "KMLogs.h"
 @import Sentry;
 
@@ -238,6 +239,17 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
       // return NO to pass through to client app
       return NO;
     }
+
+    // TODO: remove test code
+    /*
+    if (event.keyCode == kVK_ANSI_Slash) {
+      if ([KMSettingsRepository.shared keyboardsMigrationNeeded]) {
+        os_log_info([KMLogs startupLog], "keyboards migration needed");
+      } else {
+        os_log_info([KMLogs startupLog], "keyboards migration not needed");
+      }
+    }
+     */
   }
   
   if (event.type == NSEventTypeFlagsChanged) {
@@ -412,11 +424,11 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   for(NSString *key in options) {
     NSString *value = [options objectForKey:key];
     if(key && value) {
-      os_log_debug([KMLogs keyLog], "applyNonTextualOutput calling writePersistedOptions, key: %{public}@, value: %{public}@", key, value);
+      os_log_debug([KMLogs keyLog], "persistOptions, key: %{public}@, value: %{public}@", key, value);
       [self.appDelegate writePersistedOptions:key withValue:value];
     }
     else {
-      os_log_debug([KMLogs keyLog], "applyNonTextualOutput, invalid values in optionsToPersist, not writing to UserDefaults, key: %{public}@, value: %{public}@", key, value);
+      os_log_debug([KMLogs keyLog], "invalid values in persistOptions, not writing to UserDefaults, key: %{public}@, value: %{public}@", key, value);
     }
   }
 }

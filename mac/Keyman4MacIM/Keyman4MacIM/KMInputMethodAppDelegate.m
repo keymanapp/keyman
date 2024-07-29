@@ -16,6 +16,7 @@
 // Keyman4MacIM[6245]: IMK Stall detected, *please Report* your user scenario in <rdar://problem/16792073> - (sessionFinished) block performed very slowly (0.00 secs)
 
 #import "KMInputMethodAppDelegate.h"
+#import "KMSettingsRepository.h"
 #import "KMConfigurationWindowController.h"
 #import "KMDownloadKBWindowController.h"
 #import "ZipArchive.h"
@@ -509,7 +510,9 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   if(_keymanDataPath == nil) {
     NSString *documentDirPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     _keymanDataPath = [documentDirPath stringByAppendingPathComponent:@"Keyman-Keyboards"];
-    
+
+    os_log_debug([KMLogs dataLog], "creating keymanDataPath, %{public}@", _keymanDataPath);
+
     NSFileManager *fm = [NSFileManager defaultManager];
     if (![fm fileExistsAtPath:_keymanDataPath]) {
       [fm createDirectoryAtPath:_keymanDataPath withIntermediateDirectories:YES attributes:nil error:nil];
@@ -531,6 +534,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (NSArray *)kmxFileList {
+  os_log_debug([KMLogs dataLog], "kmxFileList");
   if (_kmxFileList == nil) {
     NSArray *kmxFiles = [self KMXFiles];
     _kmxFileList = [[NSMutableArray alloc] initWithCapacity:0];
@@ -650,6 +654,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (NSArray *)keyboardNamesFromFolder:(NSString *)packageFolder {
+  os_log_debug([KMLogs dataLog], "keyboardNamesFromFolder, folder = %{public}@", packageFolder);
   NSMutableArray *kbNames = [[NSMutableArray alloc] initWithCapacity:0];;
   for (NSString *kmxFile in [self KMXFilesAtPath:packageFolder]) {
     NSDictionary * infoDict = [KMXFile keyboardInfoFromKmxFile:kmxFile];
@@ -756,6 +761,12 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (void)awakeFromNib {
+  if ([KMSettingsRepository.shared keyboardsMigrationNeeded]) {
+    os_log_info([KMLogs startupLog], "keyboards migration needed");
+  } else {
+    os_log_info([KMLogs startupLog], "keyboards migration not needed");
+  }
+
   [self setDefaultKeymanMenuItems];
   [self updateKeyboardMenuItems];
 }
@@ -928,13 +939,16 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (NSArray *)KMXFilesAtPath:(NSString *)path {
+  os_log_debug([KMLogs dataLog], "Reading KMXFiles at path %{public}@", path);
   NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:path];
   NSMutableArray *kmxFiles = [[NSMutableArray alloc] initWithCapacity:0];
   NSString *filePath;
   while (filePath = (NSString *)[dirEnum nextObject]) {
     NSString *extension = [[filePath pathExtension] lowercaseString];
-    if ([extension isEqualToString:@"kmx"])
+    if ([extension isEqualToString:@"kmx"]) {
       [kmxFiles addObject:[path stringByAppendingPathComponent:filePath]];
+      os_log_debug([KMLogs dataLog], "file = %{public}@", filePath);
+    }
   }
   
   return kmxFiles;
