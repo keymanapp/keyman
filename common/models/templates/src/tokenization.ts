@@ -36,6 +36,12 @@ export function tokenize(
     rejoins?: string[]
   }
 ): Tokenization {
+  // The Unicode word-breaker algorithm looks for places where it's "safe" to
+  // split a word across lines, operating upon _completed_ words.  There are
+  // some cases where, if placed mid-word, it would add a boundary that does not
+  // exist at the end of the word.  The single-quote character is one such
+  // location - it's hard to tell if `can'` is the end of a quote or the prefix
+  // to `can't`.  So, if `'` is immediately pre-caret, we "rejoin" it.
   const rejoins = options?.rejoins || ["'"];
   context = context || {
     left: undefined,
@@ -78,9 +84,9 @@ export function tokenize(
   //
   // Note:  the default wordbreaker won't need this code, as it emits a `''`
   // after final whitespace.
-  if(currentIndex != (context.left?.length ?? 0)) {
+  if(context.left != null && currentIndex != context.left.length) {
     tokenization.left.push({
-      text: context.left!.substring(currentIndex, context.left!.length),
+      text: context.left.substring(currentIndex, context.left!.length),
       isWhitespace: true
     });
     currentIndex = context.left!.length;
@@ -168,9 +174,9 @@ export function tokenize(
   //
   // Also note:  is pretty much WET with the similar check after the
   // leftSpan loop.
-  if(currentIndex != (context.right?.length ?? 0)) {
+  if(context.right && currentIndex != context.right.length) {
     tokenization.right.push({
-      text: context.right!.substring(currentIndex, context.right!.length),
+      text: context.right.substring(currentIndex, context.right!.length),
       isWhitespace: true
     });
     currentIndex = context.right!.length;
