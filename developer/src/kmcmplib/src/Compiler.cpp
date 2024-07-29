@@ -381,8 +381,7 @@ KMX_BOOL ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str) {
     if (fk->currentGroup == 0xFFFFFFFF) {
       fk->currentGroup = 0;
     } else {
-      if ((msg = ProcessGroupFinish(fk)) != STATUS_Success) {
-        AddCompileError(msg);
+      if (!ProcessGroupFinish(fk)) {
         return FALSE;		// finish off previous group first?
       }
       fk->currentGroup++;
@@ -733,21 +732,27 @@ int kmcmp::cmpkeys(const void *key, const void *elem)
   return(char_key - char_elem); // akey->Key - aelem->Key);
 }
 
-KMX_DWORD ProcessGroupFinish(PFILE_KEYBOARD fk)
-{
+KMX_BOOL ProcessGroupFinish(PFILE_KEYBOARD fk) {
   PFILE_GROUP gp;
   KMX_DWORD msg;
 
-  if (fk->currentGroup == 0xFFFFFFFF) return STATUS_Success;
-  // Just got to first group - so nothing to finish yet
+  if (fk->currentGroup == 0xFFFFFFFF) {
+    // Just got to first group - so nothing to finish yet
+    return TRUE;
+  }
 
   gp = &fk->dpGroupArray[fk->currentGroup];
 
   // Finish off the previous group stuff!
-  if ((msg = ExpandCapsRulesForGroup(fk, gp)) != STATUS_Success) return msg;
+  if ((msg = ExpandCapsRulesForGroup(fk, gp)) != STATUS_Success) {
+    AddCompileError(msg);
+    return FALSE;
+  }
   qsort(gp->dpKeyArray, gp->cxKeyArray, sizeof(FILE_KEY), kmcmp::cmpkeys);
 
-  return VerifyUnreachableRules(gp);
+  VerifyUnreachableRules(gp);
+
+  return TRUE;
 }
 
 /***************************************

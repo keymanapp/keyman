@@ -34,7 +34,7 @@ KMX_BOOL AddStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, const KMX_WCHAR * str, 
 KMX_DWORD ReadLine(KMX_BYTE* infile, int sz, int& offset, PKMX_WCHAR wstr, KMX_BOOL PreProcess);
 KMX_BOOL ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str);
 KMX_BOOL ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p);
-KMX_DWORD ProcessGroupFinish(PFILE_KEYBOARD fk);
+KMX_BOOL ProcessGroupFinish(PFILE_KEYBOARD fk);
 KMX_BOOL ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 int LineTokenType(PKMX_WCHAR *str);
 KMX_BOOL BuildVKDictionary(PFILE_KEYBOARD fk); // I3438

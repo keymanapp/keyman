@@ -278,7 +278,7 @@ TEST_F(CompilerTest, ValidateMatchNomatchOutput_test) {
 // KMX_BOOL ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
 // KMX_BOOL ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
 // int kmcmp::cmpkeys(const void *key, const void *elem)
-// KMX_DWORD ProcessGroupFinish(PFILE_KEYBOARD fk)
+// KMX_BOOL ProcessGroupFinish(PFILE_KEYBOARD fk)
 // KMX_BOOL ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
 // bool resizeStoreArray(PFILE_KEYBOARD fk)
 // bool resizeKeyArray(PFILE_GROUP gp, int increment)
