@@ -85,7 +85,7 @@ export class TrackedContextToken {
     // Preserve existing text if new text isn't specified.
     tokenText = tokenText || (tokenText === '' ? '' : this.raw);
 
-    if(transformDistribution && transformDistribution.length > 0) {
+    if(transformDistribution?.length > 0) {
       this.transformDistributions.push(transformDistribution);
     }
 
