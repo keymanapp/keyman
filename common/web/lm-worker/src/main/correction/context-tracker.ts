@@ -520,8 +520,8 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
       context = applyTransform(inputTransform.sample, context);
     }
 
-    let tokenize = determineModelTokenizer(model);
-    let tokenizedContext = tokenize(context);
+    const tokenize = determineModelTokenizer(model);
+    const tokenizedContext = tokenize(context);
 
     if(tokenizedContext.left.length > 0) {
       for(let i = this.count - 1; i >= 0; i--) {
