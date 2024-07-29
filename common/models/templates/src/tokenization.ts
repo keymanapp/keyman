@@ -143,13 +143,15 @@ export function tokenize(
       });
       currentIndex = nextSpan.start;
     } else {
-      // If the first non-whitespace token to the right is non-whitespace,
-      // and the last token to the left is non-whitespace, the caret may
-      // be splitting a token.
       const leftTail = tokenization.left[leftTokenCount-1];
-      if(firstRightToken && !leftTail.isWhitespace) {
-        if(wordBreaker(leftTail!.text + nextSpan.text).length == 1) {
-          tokenization.caretSplitsToken = true;
+      if(leftTail) {
+        // If the first non-whitespace token to the right is non-whitespace,
+        // and the last token to the left is non-whitespace, the caret may
+        // be splitting a token.
+        if(firstRightToken && !leftTail.isWhitespace) {
+          if(wordBreaker(leftTail!.text + nextSpan.text).length == 1) {
+            tokenization.caretSplitsToken = true;
+          }
         }
       }
 
