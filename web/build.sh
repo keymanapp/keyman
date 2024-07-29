@@ -139,18 +139,15 @@ builder_run_child_actions build:engine/device-detect
 builder_run_child_actions build:engine/dom-utils
 builder_run_child_actions build:engine/element-wrappers
 builder_run_child_actions build:engine/events
+builder_run_child_actions build:engine/interfaces
 
-# Uses engine/dom-utils
+# Uses engine/dom-utils and engine/interfaces
 builder_run_child_actions build:engine/osk
 
 # Uses engine/element-wrappers
 builder_run_child_actions build:engine/attachment
 
-# Uses engine/osk (due to resource-path config interface)
-builder_run_child_actions build:engine/interfaces
-
-# Uses engine/config (also due to resource-path config interface, but for the
-# more complete version of that interface)
+# Uses engine/interfaces (due to resource-path config interface)
 builder_run_child_actions build:engine/package-cache
 
 # Uses engine/interfaces, engine/device-detect, engine/package-cache, & engine/osk

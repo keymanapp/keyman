@@ -99,7 +99,6 @@
     "test": "gosh ./test.sh"
   },
   "dependencies": {
-    "@keymanapp/input-processor": "*",
     "@keymanapp/keyboard-processor": "*",
     "@keymanapp/keyman-version": "*",
     "@keymanapp/lexical-model-layer": "*",

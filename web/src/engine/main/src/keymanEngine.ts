@@ -1,16 +1,16 @@
 import { type Keyboard, KeyboardKeymanGlobal, ProcessorInitOptions } from "@keymanapp/keyboard-processor";
 import { DOMKeyboardLoader as KeyboardLoader } from "@keymanapp/keyboard-processor/dom-keyboard-loader";
-import { InputProcessor, PredictionContext } from "@keymanapp/input-processor";
+import { InputProcessor } from './text/inputProcessor.js';
 import { OSKView } from "keyman/engine/osk";
-import { KeyboardRequisitioner, ModelCache, ModelSpec, toUnprefixedKeyboardId as unprefixed } from "keyman/engine/package-cache";
+import { KeyboardRequisitioner, ModelCache, toUnprefixedKeyboardId as unprefixed } from "keyman/engine/package-cache";
+import { ModelSpec, PredictionContext } from "keyman/engine/interfaces";
 
 import { EngineConfiguration, InitOptionSpec } from "./engineConfiguration.js";
 import KeyboardInterface from "./keyboardInterface.js";
 import { ContextManagerBase } from "./contextManagerBase.js";
-import { KeyEventHandler } from 'keyman/engine/events';
 import HardKeyboardBase from "./hardKeyboard.js";
 import { LegacyAPIEvents } from "./legacyAPIEvents.js";
-import { EventNames, EventListener, LegacyEventEmitter } from "keyman/engine/events";
+import { KeyEventHandler, EventNames, EventListener, LegacyEventEmitter } from "keyman/engine/events";
 import DOMCloudRequester from "keyman/engine/package-cache/dom-requester";
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 

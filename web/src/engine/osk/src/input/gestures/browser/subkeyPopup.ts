@@ -6,7 +6,7 @@ import VisualKeyboard from '../../../visualKeyboard.js';
 import { DeviceSpec, ActiveSubKey, KeyDistribution, ActiveKeyBase } from '@keymanapp/keyboard-processor';
 import { ConfigChangeClosure, GestureRecognizerConfiguration, GestureSequence, PaddedZoneSource, RecognitionZoneSource } from '@keymanapp/gesture-recognizer';
 import { GestureHandler } from '../gestureHandler.js';
-import { CorrectionLayout, CorrectionLayoutEntry, distributionFromDistanceMaps, keyTouchDistances } from '@keymanapp/input-processor';
+import { CorrectionLayout, CorrectionLayoutEntry, distributionFromDistanceMaps, keyTouchDistances } from 'keyman/engine/osk';
 import { GestureParams } from '../specsForLayout.js';
 
 /**

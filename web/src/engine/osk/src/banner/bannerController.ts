@@ -1,5 +1,5 @@
 import { DeviceSpec } from '@keymanapp/web-utils';
-import type { PredictionContext, StateChangeEnum } from '@keymanapp/input-processor';
+import type { PredictionContext, StateChangeEnum } from 'keyman/engine/interfaces';
 import { ImageBanner } from './imageBanner.js';
 import { SuggestionBanner } from './suggestionBanner.js';
 import { BannerView } from './bannerView.js';
