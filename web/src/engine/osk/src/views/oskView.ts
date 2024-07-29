@@ -257,6 +257,8 @@ export default abstract class OSKView
     if(this.hostDevice.touchable) {
       this.setBaseTouchEventListeners();
     }
+
+    this._Box.style.display = 'none';
   }
 
   protected get configuration(): Configuration {
