@@ -625,9 +625,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
       tokenizedDistribution = tokenizedDistribution.filter((entry) => entry.sample.length == transformTokenLength);
     }
 
-    // As `context` may be updated by the prior if-block, we need to wait to this point in order
-    // to tokenize the context.
-    let tokenizedContext = tokenize(context);
+    const tokenizedContext = tokenize(context);
 
     if(tokenizedContext.left.length > 0) {
       for(let i = this.count - 1; i >= 0; i--) {
