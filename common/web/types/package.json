@@ -12,10 +12,6 @@
     ".": {
       "es6-bundling": "./src/main.ts",
       "default": "./build/src/main.js"
-    },
-    "./utils": {
-      "es6-bundling": "./src/util/index.ts",
-      "default": "./build/src/util/index.js"
     }
   },
   "files": [
