@@ -11,7 +11,7 @@ const SevErrorTransform = SevError | 0xF00;
 /**
  * @internal
  */
-export class CompilerMessages {
+export class LdmlCompilerMessages {
   static HINT_NormalizationDisabled = SevHint | 0x0001;
   static Hint_NormalizationDisabled = () => m(this.HINT_NormalizationDisabled, `normalization=disabled is not recommended.`);
 
@@ -83,7 +83,7 @@ export class CompilerMessages {
 
   static ERROR_DisplayIsRepeated = SevError | 0x0010;
   static Error_DisplayIsRepeated = (o:{output?: string, keyId?: string}) =>
-    m(this.ERROR_DisplayIsRepeated, `display ${CompilerMessages.outputOrKeyId(o)} has more than one display entry.`);
+    m(this.ERROR_DisplayIsRepeated, `display ${LdmlCompilerMessages.outputOrKeyId(o)} has more than one display entry.`);
 
   static ERROR_KeyMissingToGapOrSwitch = SevError | 0x0011;
   static Error_KeyMissingToGapOrSwitch = (o:{keyId: string}) =>
@@ -97,9 +97,17 @@ export class CompilerMessages {
   static Error_InvalidHardware = (o:{formId: string}) => m(this.ERROR_InvalidHardware,
     `layers has invalid value formId=${def(o.formId)}`);
 
+  private static layerIdOrEmpty(layer : string) {
+    if (layer) {
+      return ` on layer id=${def(layer)}`;
+    } else {
+      return '';
+    }
+  }
+
   static ERROR_InvalidModifier = SevError | 0x0014;
   static Error_InvalidModifier = (o:{layer: string, modifiers: string}) => m(this.ERROR_InvalidModifier,
-    `layer has invalid modifiers='${def(o.modifiers)}' on layer id=${def(o.layer)}`);
+    `layer has invalid modifiers='${def(o.modifiers)}'` + LdmlCompilerMessages.layerIdOrEmpty(o.layer));
 
   static ERROR_MissingFlicks = SevError | 0x0015;
   static Error_MissingFlicks = (o:{flickId: string, id: string}) => m(this.ERROR_MissingFlicks,
@@ -152,7 +160,7 @@ export class CompilerMessages {
 
   static ERROR_DisplayNeedsToOrId = SevError | 0x0022;
   static Error_DisplayNeedsToOrId = (o:{output?: string, keyId?: string}) =>
-  m(this.ERROR_DisplayNeedsToOrId, `display ${CompilerMessages.outputOrKeyId(o)} needs output= or keyId=, but not both`);
+  m(this.ERROR_DisplayNeedsToOrId, `display ${LdmlCompilerMessages.outputOrKeyId(o)} needs output= or keyId=, but not both`);
 
   static HINT_PUACharacters = SevHint | 0x0023;
   static Hint_PUACharacters = (o: { count: number, lowestCh: number }) =>

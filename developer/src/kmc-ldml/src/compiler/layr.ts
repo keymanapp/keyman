@@ -1,6 +1,6 @@
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { KMXPlus } from '@keymanapp/common-types';
-import { CompilerMessages } from './messages.js';
+import { LdmlCompilerMessages } from './ldml-compiler-messages.js';
 import { SectionCompiler } from "./section-compiler.js";
 import { translateLayerAttrToModifier, validModifier } from '../util/util.js';
 
@@ -33,14 +33,14 @@ export class LayrCompiler extends SectionCompiler {
         hardwareLayers++;
         if (hardwareLayers > 1) {
           valid = false;
-          this.callbacks.reportMessage(CompilerMessages.Error_ExcessHardware({formId}));
+          this.callbacks.reportMessage(LdmlCompilerMessages.Error_ExcessHardware({formId}));
         }
       }
       layers.layer.forEach((layer) => {
         const { modifiers, id } = layer;
         totalLayerCount++;
         if (!validModifier(modifiers)) {
-          this.callbacks.reportMessage(CompilerMessages.Error_InvalidModifier({ modifiers, layer: id || '' }));
+          this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidModifier({ modifiers, layer: id || '' }));
           valid = false;
         }
       });
@@ -48,7 +48,7 @@ export class LayrCompiler extends SectionCompiler {
     if (totalLayerCount === 0) { // TODO-LDML: does not validate touch layers yet
       // no layers seen anywhere
       valid = false;
-      this.callbacks.reportMessage(CompilerMessages.Error_MustBeAtLeastOneLayerElement());
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_MustBeAtLeastOneLayerElement());
     }
     return valid;
   }

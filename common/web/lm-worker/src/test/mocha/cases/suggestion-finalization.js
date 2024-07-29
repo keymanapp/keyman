@@ -1,9 +1,9 @@
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
-import { deepCopy } from '@keymanapp/web-utils';
 import { assert } from 'chai';
 
 import { finalizeSuggestions } from "#./predict-helpers.js";
 import { DummyModel } from "#./models/dummy-model.js";
+import { deepCopy } from '@keymanapp/web-utils';
 
 /*
  * This file's tests use these parts of a lexical model:
@@ -12,7 +12,7 @@ import { DummyModel } from "#./models/dummy-model.js";
  */
 
 const testModelWithSpacing = new DummyModel({
-  wordBreaker: wordBreakers.default,
+  wordbreaker: wordBreakers.default,
   punctuation: {
     quotesForKeepSuggestion: {
       open: '<',
@@ -23,7 +23,7 @@ const testModelWithSpacing = new DummyModel({
 });
 
 const testModelWithoutSpacing = new DummyModel({
-  wordBreaker: wordBreakers.default,
+  wordbreaker: wordBreakers.default,
   punctuation: {
     quotesForKeepSuggestion: {
       open: '<',
@@ -36,9 +36,12 @@ const testModelWithoutSpacing = new DummyModel({
 /**
  * Builds a fresh copy of test values useful for suggestion-similarity
  * testing.
+ * @param {'verbose'=} verbose
  * @returns
  */
-const build_its_is_set = () => {
+const build_its_is_set = (verbose) => {
+  const verboseFlag = (verbose == 'verbose' ? true : false);
+
   /** @type {import('#./predict-helpers.js').CorrectionPredictionTuple} */
   const its = {
     correction: {
@@ -116,17 +119,35 @@ const build_its_is_set = () => {
     totalProb: 0.1
   };
 
-  return {
+  const baseDefinitions = {
     its,
     it_is,
     is,
     is_not
   }
+
+  const unfinalized = [...Object.values(baseDefinitions)].map((entry) => deepCopy(entry));
+  const expected = unfinalized.map((entry) => {
+
+    const mapped = {
+      ...deepCopy(entry.prediction.sample),
+      p: entry.totalProb
+    };
+
+    if(verboseFlag) {
+      mapped['correction-p'] = entry.correction.p;
+      mapped['lexical-p'] = entry.prediction.p;
+    }
+
+    return mapped;
+  });
+
+  return { baseDefinitions, unfinalized, expected };
 };
 
 describe('finalizeSuggestions', () => {
-  describe('with custom post-token insert', () => {
-    it('with caret at end of current token and context', () => {
+  describe('for models with custom post-token insert', () => {
+    it('adds whitespace when caret is at token + context end', () => {
       /** @type {Context} */
       const context = {
         left: 'It',
@@ -141,21 +162,14 @@ describe('finalizeSuggestions', () => {
         deleteLeft: 0
       };
 
-      const testSet = build_its_is_set();
-      const analyzedSuggestions = [...Object.values(testSet).map((entry) => deepCopy(entry))];
+      const { unfinalized, expected } = build_its_is_set();
+      const finalized = finalizeSuggestions(testModelWithSpacing, unfinalized, context, transform, false);
 
-      const finalized = finalizeSuggestions(testModelWithSpacing, analyzedSuggestions, context, transform, false);
-      const expected = [...Object.values(testSet)].map((entry) => {
-        return {
-          ...entry.prediction.sample,
-          p: entry.totalProb
-        };
-      });
       expected.forEach((entry) => entry.transform.insert += testModelWithSpacing.punctuation.insertAfterWord);
       assert.sameDeepOrderedMembers(finalized, expected);
     });
 
-    it('with caret at end of current token, but mid-context', () => {
+    it('does not add whitespace when caret is followed by whitespace', () => {
       /** @type {Context} */
       const context = {
         left: 'It',
@@ -170,22 +184,17 @@ describe('finalizeSuggestions', () => {
         deleteLeft: 0
       };
 
-      const testSet = build_its_is_set();
-      const analyzedSuggestions = [...Object.values(testSet).map((entry) => deepCopy(entry))];
+      const { unfinalized, expected } = build_its_is_set();
+      const finalized = finalizeSuggestions(testModelWithSpacing, unfinalized, context, transform, false);
 
-      const finalized = finalizeSuggestions(testModelWithSpacing, analyzedSuggestions, context, transform, false);
-      const expected = [...Object.values(testSet)].map((entry) => {
-        return {
-          ...entry.prediction.sample,
-          p: entry.totalProb
-        };
-      });
       // We do not add a whitespace despite not splitting a token if there's a
       // matching whitespace immediately to the caret's right.
       assert.sameDeepOrderedMembers(finalized, expected);
     });
 
-    it('with caret at end of current token, punctuation word-break before next', () => {
+    // Not saying this is ideal... just that this is what it's currently set to do.
+    // May be possible to improve once better tokenization is ready.
+    it('adds whitespace when caret is followed by word-breaking punctuation', () => {
       /** @type {Context} */
       const context = {
         left: 'It',
@@ -200,16 +209,8 @@ describe('finalizeSuggestions', () => {
         deleteLeft: 0
       };
 
-      const testSet = build_its_is_set();
-      const analyzedSuggestions = [...Object.values(testSet).map((entry) => deepCopy(entry))];
-
-      const finalized = finalizeSuggestions(testModelWithSpacing, analyzedSuggestions, context, transform, false);
-      const expected = [...Object.values(testSet)].map((entry) => {
-        return {
-          ...entry.prediction.sample,
-          p: entry.totalProb
-        };
-      });
+      const { unfinalized, expected } = build_its_is_set();
+      const finalized = finalizeSuggestions(testModelWithSpacing, unfinalized, context, transform, false);
 
       // The character after the caret isn't the whitespace we'd usually insert,
       // so we don't swallow it this time.
@@ -217,7 +218,7 @@ describe('finalizeSuggestions', () => {
       assert.sameDeepOrderedMembers(finalized, expected);
     });
 
-    it('with caret mid-token', () => {
+    it('adds whitespace when caret is mid-token', () => {
       // Current behavior - conceptually splits the current token at the current
       // location, then acts as if it's end-token.  The whitespace added at "end
       // of token" actually enforces the split.
@@ -235,23 +236,16 @@ describe('finalizeSuggestions', () => {
         deleteLeft: 0
       };
 
-      const testSet = build_its_is_set();
-      const analyzedSuggestions = [...Object.values(testSet).map((entry) => deepCopy(entry))];
+      const { unfinalized, expected } = build_its_is_set();
+      const finalized = finalizeSuggestions(testModelWithSpacing, unfinalized, context, transform, false);
 
-      const finalized = finalizeSuggestions(testModelWithSpacing, analyzedSuggestions, context, transform, false);
-      const expected = [...Object.values(testSet)].map((entry) => {
-        return {
-          ...entry.prediction.sample,
-          p: entry.totalProb
-        };
-      });
       expected.forEach((entry) => entry.transform.insert += testModelWithSpacing.punctuation.insertAfterWord);
       assert.sameDeepOrderedMembers(finalized, expected);
     });
   });
 
-  describe('without post-token insert text', () => {
-    it('with caret at end of current token and context', () => {
+  describe('for models without post-token insert text', () => {
+    it('does not add whitespace when caret is at token + context end', () => {
       /** @type {Context} */
       const context = {
         left: 'It',
@@ -266,20 +260,13 @@ describe('finalizeSuggestions', () => {
         deleteLeft: 0
       };
 
-      const testSet = build_its_is_set();
-      const analyzedSuggestions = [...Object.values(testSet).map((entry) => deepCopy(entry))];
+      const { unfinalized, expected } = build_its_is_set();
+      const finalized = finalizeSuggestions(testModelWithoutSpacing, unfinalized, context, transform, false);
 
-      const finalized = finalizeSuggestions(testModelWithoutSpacing, analyzedSuggestions, context, transform, false);
-      const expected = [...Object.values(testSet)].map((entry) => {
-        return {
-          ...entry.prediction.sample,
-          p: entry.totalProb
-        };
-      });
       assert.sameDeepOrderedMembers(finalized, expected);
     });
 
-    it('with caret at end of current token, but mid-context', () => {
+    it('does not add whitespace when caret is followed by whitespace', () => {
       /** @type {Context} */
       const context = {
         left: 'It',
@@ -296,22 +283,16 @@ describe('finalizeSuggestions', () => {
         deleteLeft: 0
       };
 
-      const testSet = build_its_is_set();
-      const analyzedSuggestions = [...Object.values(testSet).map((entry) => deepCopy(entry))];
 
-      const finalized = finalizeSuggestions(testModelWithoutSpacing, analyzedSuggestions, context, transform, false);
-      const expected = [...Object.values(testSet)].map((entry) => {
-        return {
-          ...entry.prediction.sample,
-          p: entry.totalProb
-        };
-      });
+      const { unfinalized, expected } = build_its_is_set();
+      const finalized = finalizeSuggestions(testModelWithoutSpacing, unfinalized, context, transform, false);
+
       // We do not add a whitespace despite not splitting a token if there's a
       // matching whitespace immediately to the caret's right.
       assert.sameDeepOrderedMembers(finalized, expected);
     });
 
-    it('with caret mid-token', () => {
+    it('does not add whitespace when caret is mid-token', () => {
       // Current behavior - conceptually splits the current token at the current
       // location, then acts as if it's end-token.  The whitespace added at "end
       // of token" actually enforces the split.
@@ -329,22 +310,16 @@ describe('finalizeSuggestions', () => {
         deleteLeft: 0
       };
 
-      const testSet = build_its_is_set();
-      const analyzedSuggestions = [...Object.values(testSet).map((entry) => deepCopy(entry))];
 
-      const finalized = finalizeSuggestions(testModelWithoutSpacing, analyzedSuggestions, context, transform, false);
-      const expected = [...Object.values(testSet)].map((entry) => {
-        return {
-          ...entry.prediction.sample,
-          p: entry.totalProb
-        };
-      });
+      const { unfinalized, expected } = build_its_is_set();
+      const finalized = finalizeSuggestions(testModelWithoutSpacing, unfinalized, context, transform, false);
+
       assert.sameDeepOrderedMembers(finalized, expected);
     });
   });
 
-  describe('with output mode', () => {
-    it('verbose', () => {
+  describe('suggestion output-mode configuration', () => {
+    it('adds extra data to suggestions when set to "verbose"', () => {
       /** @type {Context} */
       const context = {
         left: 'It',
@@ -359,34 +334,15 @@ describe('finalizeSuggestions', () => {
         deleteLeft: 0
       };
 
-      const testSet = build_its_is_set();
-      const analyzedSuggestions = [...Object.values(testSet).map((entry) => deepCopy(entry))];
 
-      const finalized = finalizeSuggestions(testModelWithSpacing, analyzedSuggestions, context, transform, true);
-      const expected = [...Object.values(testSet)].map((entry) => {
-        /** @type{
-            Suggestion & {
-              p?: number;
-              "lexical-p"?: number;
-              "correction-p"?: number;
-              }
-            }
-         */
-        const mapped = {
-          ...entry.prediction.sample,
-          p: entry.totalProb
-        };
+      const { unfinalized, expected } = build_its_is_set('verbose');
+      const finalized = finalizeSuggestions(testModelWithSpacing, unfinalized, context, transform, /* verbose */ true);
 
-        mapped['correction-p'] = entry.correction.p;
-        mapped['lexical-p'] = entry.prediction.p;
-
-        return mapped;
-      });
       expected.forEach((entry) => entry.transform.insert += testModelWithSpacing.punctuation.insertAfterWord);
       assert.sameDeepOrderedMembers(finalized, expected);
     });
 
-    it('standard', () => {
+    it('does not add extra data to suggestions when not "verbose"', () => {
       /** @type {Context} */
       const context = {
         left: 'It',
@@ -401,16 +357,10 @@ describe('finalizeSuggestions', () => {
         deleteLeft: 0
       };
 
-      const testSet = build_its_is_set();
-      const analyzedSuggestions = [...Object.values(testSet).map((entry) => deepCopy(entry))];
 
-      const finalized = finalizeSuggestions(testModelWithSpacing, analyzedSuggestions, context, transform, false);
-      const expected = [...Object.values(testSet)].map((entry) => {
-        return {
-          ...entry.prediction.sample,
-          p: entry.totalProb
-        };
-      });
+      const { unfinalized, expected } = build_its_is_set();
+      const finalized = finalizeSuggestions(testModelWithSpacing, unfinalized, context, transform, false);
+
       expected.forEach((entry) => entry.transform.insert += testModelWithSpacing.punctuation.insertAfterWord);
       assert.sameDeepOrderedMembers(finalized, expected);
     });

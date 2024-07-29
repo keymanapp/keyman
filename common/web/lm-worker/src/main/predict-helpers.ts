@@ -451,7 +451,7 @@ export function processSimilarity(
   const { sample: inputTransform, p: inputTransformProb } = trueInput;
   const wordbreak = determineModelWordbreaker(lexicalModel);
 
-  let postContext = models.applyTransform(inputTransform, context);
+  const postContext = models.applyTransform(inputTransform, context);
   const truePrefix = wordbreak(postContext);
 
   const keyed = (text: string) => lexicalModel.toKey ? lexicalModel.toKey(text) : text;
@@ -462,6 +462,11 @@ export function processSimilarity(
   let keepOption: Outcome<Keep>;
 
   for(let tuple of suggestionDistribution) {
+    // Don't set it unnecessarily; this can have side-effects in some automated tests.
+    if(inputTransform.id !== undefined) {
+      tuple.prediction.sample.transformId = inputTransform.id;
+    }
+
     const predictedWord = wordbreak(models.applyTransform(tuple.prediction.sample.transform, context));
 
     // Is the suggestion an exact match (or, "similar enough") to the
@@ -469,14 +474,22 @@ export function processSimilarity(
     // prioritize such a suggestion over suggestions that are not.
     if(keyed(tuple.correction.sample) == keyedPrefix) {
       if(predictedWord == truePrefix) {
+        // Exact match:  it's a perfect 'keep' suggestion.
         tuple.matchLevel = SuggestionSimilarity.exact;
         keepOption = toAnnotatedSuggestion(lexicalModel, tuple.prediction.sample, 'keep',  models.QuoteBehavior.noQuotes);
+
+        // Indicates that this suggestion exists directly within the lexical
+        // model as a valid suggestion.  (We actively display it if it's an
+        // exact match, but hide it if not, only preserving it for reversions
+        // if/when needed.)
         keepOption.matchesModel = true;
         Object.assign(tuple.prediction.sample, keepOption);
         keepOption = tuple.prediction.sample as Outcome<Keep>;
       } else if(keyCased(predictedWord) == lowercasedPrefix) {
+        // Case-insensitive match.  No diacritic differences; the ONLY difference is casing.
         tuple.matchLevel = SuggestionSimilarity.sameText;
       } else if(keyed(predictedWord) == keyedPrefix) {
+        // Diacritic-insensitive / exact-key match.
         tuple.matchLevel = SuggestionSimilarity.sameKey;
       } else {
         tuple.matchLevel = SuggestionSimilarity.none;
@@ -508,7 +521,7 @@ export function processSimilarity(
   }
   keepOption.matchesModel = false;
 
-  // Insert our
+  // Insert our synthetic keepOption as a prediction.
   suggestionDistribution.unshift({
     totalProb: keepOption.p,
     prediction: {
@@ -519,12 +532,12 @@ export function processSimilarity(
       sample: truePrefix,
       p: inputTransformProb
     },
-    matchLevel: SuggestionSimilarity.exact,
+    matchLevel: SuggestionSimilarity.exact
   });
 }
 
 export function predictionAutoSelect(suggestionDistribution: CorrectionPredictionTuple[]) {
-  if(suggestionDistribution.length < 1) {
+  if(suggestionDistribution.length == 0) {
     return;
   }
 

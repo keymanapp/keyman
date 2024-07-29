@@ -62,7 +62,7 @@ const DUMMY_MODEL_CONFIG = {
 };
 
 describe('predictFromCorrections', () => {
-  it('single correction prefixing multiple entries - no transform ID', () => {
+  it('handles a single correction prefixing multiple entries - no transform ID', () => {
     /** @type {Context} */
     const context = {
       left: 'It',
@@ -116,7 +116,7 @@ describe('predictFromCorrections', () => {
     assert.approximately(predictions[1].totalProb, 0.02 * 0.6, 0.00001);
   });
 
-  it('single correction prefixing multiple entries - with transform ID', () => {
+  it('handles a single correction prefixing multiple entries - with transform ID', () => {
     /** @type {Context} */
     const context = {
       left: 'It',
@@ -176,7 +176,7 @@ describe('predictFromCorrections', () => {
     assert.approximately(predictions[1].totalProb, 0.02 * 0.6, 0.00001);
   });
 
-  it('multiple corrections at once', () => {
+  it('handles multiple corrections at once', () => {
     /** @type {Context} */
     const context = {
       left: 'It',

@@ -67,21 +67,10 @@ export class DummyModel implements LexicalModel {
       this.punctuation = options.punctuation;
     }
 
-    if (options.toKey) {
-      this.toKey = options.toKey;
-    }
-
-    if (options.wordbreaker) {
-      this.wordbreaker = options.wordbreaker;
-    }
-
-    if (options.applyCasing) {
-      this.applyCasing = options.applyCasing;
-    }
-
-    if (options.languageUsesCasing) {
-      this.languageUsesCasing = options.languageUsesCasing;
-    }
+    this.toKey = options.toKey;
+    this.wordbreaker = options.wordbreaker;
+    this.applyCasing = options.applyCasing;
+    this.languageUsesCasing = options.languageUsesCasing;
   }
 
   configure(capabilities: Capabilities): Configuration {

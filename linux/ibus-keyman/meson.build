@@ -2,7 +2,12 @@ project('ibus-keyman', 'c', 'cpp',
         version: run_command('cat', '../../VERSION.md', check: true).stdout().strip(),
         license: 'GPL-2+',
         meson_version: '>=1.0')
-cc = meson.get_compiler('c')
+
+# Import our standard compiler defines; this is copied from
+# /resources/build/standard.meson.build by build.sh, because
+# meson doesn't allow us to reference a file outside its root
+subdir('resources')
+
 conf = configuration_data()
 
 ibus =           dependency('ibus-1.0',             version: '>= 1.2.0')
@@ -14,7 +19,7 @@ icu =            dependency('icu-i18n')
 core_dir = meson.current_source_dir() / '../../core'
 common_dir = meson.current_source_dir() / '../../common'
 
-keymancore_lib = cc.find_library(
+keymancore_lib = c_compiler.find_library(
   'keymancore', # meson will prefix 'lib'
   dirs: [ core_dir / 'build/arch' / get_option('buildtype') / 'src' ]
 )
@@ -26,7 +31,7 @@ endif
 env = find_program('env')
 
 # Check if we have patched ibus (https://github.com/ibus/ibus/pull/2440)
-if cc.has_header_symbol('ibus.h', 'IBUS_CAP_PREFILTER', dependencies: [ibus], required: false)
+if c_compiler.has_header_symbol('ibus.h', 'IBUS_CAP_PREFILTER', dependencies: [ibus], required: false)
   conf.set('IBUS_HAS_PREFILTER', 1)
 endif
 

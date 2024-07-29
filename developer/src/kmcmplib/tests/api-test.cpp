@@ -70,15 +70,30 @@ void test_kmcmp_CompileKeyboard(char *kmn_file) {
   unlink(kmn_file);
 }
 
-extern int GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store);
+extern KMX_DWORD GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &targets);
 
 void test_GetCompileTargetsFromTargetsStore() {
-  assert(GetCompileTargetsFromTargetsStore(u"any") == (COMPILETARGETS_KMX | COMPILETARGETS_JS));
-  assert(GetCompileTargetsFromTargetsStore(u"windows") == COMPILETARGETS_KMX);
-  assert(GetCompileTargetsFromTargetsStore(u"desktop") == COMPILETARGETS_KMX);
-  assert(GetCompileTargetsFromTargetsStore(u"mobile") == COMPILETARGETS_JS);
-  assert(GetCompileTargetsFromTargetsStore(u"web") == COMPILETARGETS_JS);
-  assert(GetCompileTargetsFromTargetsStore(u"desktop mobile") == (COMPILETARGETS_KMX | COMPILETARGETS_JS));
-  assert(GetCompileTargetsFromTargetsStore(u"desktop   tablet") == (COMPILETARGETS_KMX | COMPILETARGETS_JS));
-  assert(GetCompileTargetsFromTargetsStore(u"foo bar baz") == 0);
+  int targets = 0;
+  assert(GetCompileTargetsFromTargetsStore(u"any", targets) == CERR_None);
+  assert(targets == (COMPILETARGETS_KMX | COMPILETARGETS_JS));
+  assert(GetCompileTargetsFromTargetsStore(u"windows", targets) == CERR_None);
+  assert(targets == COMPILETARGETS_KMX);
+  assert(GetCompileTargetsFromTargetsStore(u"desktop", targets) == CERR_None);
+  assert(targets == COMPILETARGETS_KMX);
+  assert(GetCompileTargetsFromTargetsStore(u"mobile", targets) == CERR_None);
+  assert(targets == COMPILETARGETS_JS);
+  assert(GetCompileTargetsFromTargetsStore(u"web", targets) == CERR_None);
+  assert(targets == COMPILETARGETS_JS);
+  assert(GetCompileTargetsFromTargetsStore(u"desktop mobile", targets) == CERR_None);
+  assert(targets == (COMPILETARGETS_KMX | COMPILETARGETS_JS));
+  assert(GetCompileTargetsFromTargetsStore(u"desktop   tablet", targets) == CERR_None);
+  assert(targets == (COMPILETARGETS_KMX | COMPILETARGETS_JS));
+  assert(GetCompileTargetsFromTargetsStore(u"foo bar baz", targets) == CERR_InvalidTarget);
+  assert(targets == 0);
+  assert(GetCompileTargetsFromTargetsStore(u"windows chromeos", targets) == CERR_InvalidTarget);
+  assert(targets == 0);
+  assert(GetCompileTargetsFromTargetsStore(u" ", targets) == CERR_NoTargetsSpecified);
+  assert(targets == 0);
+  assert(GetCompileTargetsFromTargetsStore(u"", targets) == CERR_NoTargetsSpecified);
+  assert(targets == 0);
 }

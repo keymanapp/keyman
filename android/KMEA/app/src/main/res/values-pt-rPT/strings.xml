@@ -45,7 +45,7 @@
     <!-- Context: Button label -->
     <string name="label_update" comment="Dialog button to update a resource">Atualizar</string>
     <!-- Context: No internet for updates -->
-    <string name="no_internet_connection" comment="Internet connection missing">No internet connection</string>
+    <string name="no_internet_connection" comment="Internet connection missing">Sem ligação à Internet</string>
     <!-- Context: Keyboard Updates -->
     <string name="cannot_connect" comment="Error message when network connection fails">Não foi possível conectar ao servidor Keyman!</string>
     <!-- Context: Keyboard Updates -->
@@ -84,7 +84,7 @@
     <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">      Erro no teclado %1$s:%2$s para %3$s idioma.</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Verificando o download do dicionário associado</string>
-    <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">      Cannot connect to Keyman server to check for associated dictionary to download</string>
+    <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">A ligação ao servidor do Keyman para verificar dicionários para descarregar falhou</string>
     <!-- Context: Model Updates -->
     <string name="confirm_download_model" comment="Confirmation to download a dictionary update">Gostaria de baixar a versão mais recente deste dicionário?</string>
     <!-- Context: No associated dictionary found -->
@@ -107,7 +107,7 @@
     <string name="dictionary_download_start_in_background" comment="Notification that a dictionary download has started">Download do dicionário iniciado em segundo plano</string>
     <!-- Context: Background download messages-->
     <string name="dictionary_download_is_running_in_background" comment="Notification that a dictionary download is still running">O dicionário selecionado já está baixando; por favor, tente novamente mais tarde!</string>
-    <!-- Context: Background download messages-->
+    <!-- Context: Background download messages. Removed in Keyman 17-->
     <string name="dictionary_download_finished" comment="Notification that a dictionary download has finished">O download do dicionário terminou.</string>
     <!-- Context: Background download messages -->
     <string name="download_failed" comment="Notification that a download failed">Download falhou</string>
@@ -119,7 +119,7 @@
     <string name="update_check_current" comment="Notification that all resources are up to date">"Todos os recursos estão atualizados!"</string>
     <!-- Context: General Updates -->
     <string name="update_failed" comment="Notification that a resource update failed">Um ou mais recursos falharam ao atualizar!</string>
-    <!-- Context: General Updates -->
+    <!-- Context: General Updates. Removed in Keyman 17 -->
     <string name="update_success" comment="Notification that a resource update successfully updated">Recursos atualizados com sucesso!</string>
     <!-- Context: Model Info -->
     <string name="model_version" comment="Title for a dictionary version">Versão do dicionário</string>
@@ -128,11 +128,11 @@
     <!-- Context: Model Info -->
     <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">Você gostaria de excluir este dicionário?</string>
     <!-- Context: Model Deleted -->
-    <string name="model_deleted" comment="Notification when a dictionary is deleted">Dictionary deleted</string>
+    <string name="model_deleted" comment="Notification when a dictionary is deleted">Dicionário eliminado</string>
     <!-- Context: Language Settings Keyboard install strings -->
     <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">Teclado %1$s instalado</string>
     <!-- Context: Language Settings Keyboard uninstall strings -->
-    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">Keyboard deleted</string>
+    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">Teclado eliminado</string>
     <!-- Context: Language Settings menu strings -->
     <string name="enable_corrections" comment="Enable corrections from the suggestion banner">Habilitar correções</string>
     <!-- Context: Language Settings menu strings -->
@@ -140,12 +140,12 @@
     <!-- Context: Language Settings menu strings -->
     <string name="model_label">Dicionário</string>
     <plurals name="model_count">
-        <item quantity="one">Dictionary</item>
-        <item quantity="other">Dictionaries</item>
+        <item quantity="one">Dicionário</item>
+        <item quantity="other">Dicionários</item>
     </plurals>
     <!-- Context: Language Settings menu substring - Check for available dictionary -->
     <string name="check_available_model" comment="Check for available dictionary">Verificar dicionário disponível</string>
-    <string name="check_model_online" comment="Check for dictionaries online">Check for dictionaries online</string>
+    <string name="check_model_online" comment="Check for dictionaries online">Verifique dicionários online</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_info_header" comment="Dictionary name">Dicionário: %1$s</string>
     <!-- Context: Language Settings menu strings -->
@@ -168,5 +168,5 @@
     <!-- Context: Other strings -->
     <string name="help_bubble_text">Toque aqui para alterar o teclado</string>
     <!-- Context: anywhere -->
-    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
+    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Não foi possível carregar o navegador</string>
 </resources>
