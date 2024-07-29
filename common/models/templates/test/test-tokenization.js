@@ -169,7 +169,7 @@ describe('Tokenization functions', function() {
       assert.deepEqual(tokenization, expectedResult);
     });
 
-    it('empty context case', function() {
+    it('properly handles empty-context cases', function() {
       // Wordbreaking on a empty space => no word.
       let context = {
         left: '', startOfBuffer: true,
@@ -187,7 +187,7 @@ describe('Tokenization functions', function() {
       assert.deepEqual(tokenization, expectedResult);
     });
 
-    it('nil context case', function() {
+    it('properly handles null context cases', function() {
       // Wordbreaking on a empty space => no word.
       let tokenization = models.tokenize(wordBreakers.default, null);
 
@@ -200,7 +200,7 @@ describe('Tokenization functions', function() {
       assert.deepEqual(tokenization, expectedResult);
     });
 
-    it('near-empty context:  one space before caret', function() {
+    it('properly handles a near-empty context:  one space before caret', function() {
       // Wordbreaking on a empty space => no word.
       let context = {
         left: ' ', startOfBuffer: true,
@@ -437,7 +437,7 @@ describe('Tokenization functions', function() {
       return wordBreakers.default(text, customization);
     }
 
-    it('treats caret as `eot` for pre-caret text', function() {
+    it('treats caret as `eot` for pre-caret text tokenization', function() {
       let context = {
         left: "don-",  // We use a hyphen here b/c single-quote is hardcoded.
         right: " worry",
@@ -493,7 +493,7 @@ describe('Tokenization functions', function() {
   });
 
   describe('getLastPreCaretToken', function() {
-    it('with pre-whitespace caret', function() {
+    it('operates properly with pre-whitespace caret', function() {
       let context = {
         left: "The quick brown fox",
         right: " jumped over the lazy dog",
@@ -506,7 +506,7 @@ describe('Tokenization functions', function() {
       assert.equal(tokenization, 'fox');
     });
 
-    it('with post-whitespace caret', function() {
+    it('operates properly with post-whitespace caret', function() {
       let context = {
         left: "The quick brown fox ",
         right: "jumped over the lazy dog",
@@ -520,7 +520,7 @@ describe('Tokenization functions', function() {
     });
 
 
-    it('with post-whitespace caret, ascii breaker', function() {
+    it('operates properly with post-whitespace caret, ascii breaker', function() {
       let context = {
         left: "The quick brown fox ",
         right: "jumped over the lazy dog",
@@ -533,7 +533,7 @@ describe('Tokenization functions', function() {
       assert.equal(tokenization, '');
     });
 
-    it('within a token', function() {
+    it('operates properly within a token', function() {
       let context = {
         left: "The quick brown fox jum",
         right: "ped over the lazy dog",
@@ -546,14 +546,14 @@ describe('Tokenization functions', function() {
       assert.equal(tokenization, 'jum');
     });
 
-    it('with no context', function() {
+    it('operates properly with no context', function() {
       let tokenization = models.getLastPreCaretToken(wordBreakers.default, null);
       assert.equal(tokenization, '');
     });
   });
 
   describe('wordbreak', function() {
-    it('with pre-whitespace caret', function() {
+    it('operates properly with pre-whitespace caret', function() {
       let context = {
         left: "The quick brown fox",
         right: " jumped over the lazy dog",
@@ -566,7 +566,7 @@ describe('Tokenization functions', function() {
       assert.equal(tokenization, 'fox');
     });
 
-    it('with post-whitespace caret', function() {
+    it('operates properly with post-whitespace caret', function() {
       let context = {
         left: "The quick brown fox ",
         right: "jumped over the lazy dog",
@@ -581,7 +581,7 @@ describe('Tokenization functions', function() {
 
     // This version is subject to change.  In the future, we may wish the wordbreak
     // operation to include "the rest of the word" - the post-caret part.
-    it('within a token', function() {
+    it('operates properly within a token', function() {
       let context = {
         left: "The quick brown fox jum",
         right: "ped over the lazy dog",

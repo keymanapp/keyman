@@ -536,8 +536,8 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
       throw "This lexical model does not provide adequate data for correction algorithms and context reuse";
     }
 
-    let tokenize = determineModelTokenizer(model);
-    let tokenizedContext = tokenize(context);
+    const tokenize = determineModelTokenizer(model);
+    const tokenizedContext = tokenize(context);
 
     if(tokenizedContext.left.length > 0) {
       for(let i = this.count - 1; i >= 0; i--) {
