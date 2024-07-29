@@ -12,6 +12,6 @@
 
   "references": [
     { "path": "../../../../common/web/input-processor" },
-    { "path": "../paths" }
+    { "path": "../interfaces" }
   ]
 }

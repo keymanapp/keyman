@@ -4,8 +4,8 @@
 
   "compilerOptions": {
     "baseUrl": "./",
-    "outDir": "../../../build/engine/paths/obj/",
-    "tsBuildInfoFile": "../../../build/engine/paths/obj/tsconfig.tsbuildinfo",
+    "outDir": "../../../build/engine/interfaces/obj/",
+    "tsBuildInfoFile": "../../../build/engine/interfaces/obj/tsconfig.tsbuildinfo",
     "rootDir": "./src"
   },
 

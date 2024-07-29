@@ -15,6 +15,6 @@
     { "path": "../device-detect" },
     { "path": "../osk" },
     { "path": "../package-cache" },
-    { "path": "../paths" },
+    { "path": "../interfaces" },
   ]
 }

@@ -14,7 +14,7 @@ SUBPROJECT_NAME=engine/main
 
 builder_describe "Builds the Keyman Engine for Web's common top-level base classes." \
   "@/common/web/input-processor build" \
-  "@/web/src/engine/paths build" \
+  "@/web/src/engine/interfaces build" \
   "@/web/src/engine/device-detect build" \
   "@/web/src/engine/package-cache build" \
   "@/web/src/engine/osk build" \
