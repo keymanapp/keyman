@@ -1,6 +1,6 @@
 import { type Keyboard, KeyboardKeymanGlobal, ProcessorInitOptions } from "@keymanapp/keyboard-processor";
 import { DOMKeyboardLoader as KeyboardLoader } from "@keymanapp/keyboard-processor/dom-keyboard-loader";
-import { InputProcessor } from './text/inputProcessor.js';
+import { InputProcessor } from './headless/inputProcessor.js';
 import { OSKView } from "keyman/engine/osk";
 import { KeyboardRequisitioner, ModelCache, toUnprefixedKeyboardId as unprefixed } from "keyman/engine/package-cache";
 import { ModelSpec, PredictionContext } from "keyman/engine/interfaces";

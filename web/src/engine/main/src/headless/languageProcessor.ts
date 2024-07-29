@@ -2,8 +2,13 @@ import { EventEmitter } from "eventemitter3";
 import { LMLayer } from "@keymanapp/lexical-model-layer/web";
 import { OutputTarget, Transcription, Mock } from "@keymanapp/keyboard-processor";
 import { LanguageProcessorEventMap, ModelSpec, StateChangeEnum, ReadySuggestions } from 'keyman/engine/interfaces';
+<<<<<<<< HEAD:web/src/engine/main/src/text/prediction/languageProcessor.ts
 import ContextWindow from "../contextWindow.js";
 import { TranscriptionCache } from "../transcriptionCache.js";
+========
+import ContextWindow from "./contextWindow.js";
+import { TranscriptionCache } from "./transcriptionCache.js";
+>>>>>>>> e57c3059e3 (chore(web): move `common/web/input-processor/` → `web/src/engine/main/`):web/src/engine/main/src/headless/languageProcessor.ts
 
 /* Is more like the model configuration engine */
 export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
