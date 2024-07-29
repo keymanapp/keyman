@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 18.0.78 alpha 2024-07-29
+
+* chore(common): Update history from 17.0.327 and add missing descriptions (#12021)
+* change(web): revert #11174, which loads keyboards before initializing the OSK (#12015)
+* feat(web): add unit testing for finalization of generated suggestions (#11946)
+* feat(web): add unit tests for prediction lookup component (#11949)
+
 ## 18.0.77 alpha 2024-07-27
 
 * refactor(windows): clean up logging (#11921)
