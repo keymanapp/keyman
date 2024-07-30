@@ -42,7 +42,7 @@ void VerifyUnreachableRules(PFILE_GROUP gp) {
       if (kp->Line != k1.Line && reportedLines.count(kp->Line) == 0) {
         reportedLines.insert(kp->Line);
         kmcmp::currentLine = kp->Line;
-        AddCompileError(KmnCompilerMessages::HINT_UnreachableRule, {
+        ReportCompilerMessage(KmnCompilerMessages::HINT_UnreachableRule, {
           /* LineNumber */ std::to_string(k1.Line)
         });
       }

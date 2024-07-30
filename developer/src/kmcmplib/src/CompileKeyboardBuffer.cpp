@@ -20,13 +20,13 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
   kmcmp::FMnemonicLayout = FALSE;
 
   if (!fk) {
-    AddCompileError(KmnCompilerMessages::FATAL_SomewhereIGotItWrong);
+    ReportCompilerMessage(KmnCompilerMessages::FATAL_SomewhereIGotItWrong);
     return FALSE;
   }
 
   str = new KMX_WCHAR[LINESIZE];
   if (!str) {
-    AddCompileError(KmnCompilerMessages::FATAL_CannotAllocateMemory);
+    ReportCompilerMessage(KmnCompilerMessages::FATAL_CannotAllocateMemory);
     return FALSE;
   }
 
@@ -112,7 +112,7 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
   }
 
   if (msg != STATUS_EndOfFile) {
-    AddCompileError(msg);
+    ReportCompilerMessage(msg);
     return FALSE;
   }
 
@@ -132,7 +132,7 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
   }
 
   if (msg != STATUS_EndOfFile) {
-    AddCompileError(msg);
+    ReportCompilerMessage(msg);
     return FALSE;
   }
 

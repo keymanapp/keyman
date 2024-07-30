@@ -18,7 +18,7 @@ KMX_BOOL CheckForDuplicateGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) noexcept {
       continue;
     }
     if (u16icmp(gp0->szName, gp->szName) == 0) {
-      AddCompileError(KmnCompilerMessages::ERROR_DuplicateGroup, {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_DuplicateGroup, {
         /*groupName*/  string_from_u16string(gp->szName),
         /*lineNumber*/ std::to_string(gp0->Line)
       });
@@ -41,7 +41,7 @@ KMX_BOOL CheckForDuplicateStore(PFILE_KEYBOARD fk, PFILE_STORE sp) noexcept {
       continue;
     }
     if (u16icmp(sp0->szName, sp->szName) == 0) {
-      AddCompileError(KmnCompilerMessages::ERROR_DuplicateStore, {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_DuplicateStore, {
         /*storeName*/  string_from_u16string(sp0->szName),
         /*lineNumber*/ std::to_string(sp0->line)
       });

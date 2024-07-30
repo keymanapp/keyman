@@ -5,7 +5,7 @@
 
 #define VERIFY_KEYBOARD_VERSION(fk, ver, err) { \
   if(!VerifyKeyboardVersion((fk), (ver))) { \
-    AddCompileError((err)); \
+    ReportCompilerMessage((err)); \
     return FALSE; \
   } \
 }
