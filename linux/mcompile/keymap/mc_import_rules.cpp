@@ -49,8 +49,13 @@ bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
   return false;
 }
 
-/**   // _S2 at merge: better description in other branch:
+/**
  * @brief  Find a keyvalue for given keycode, shiftstate and caps. A function similar to Window`s ToUnicodeEx() function.
+ *
+ * Contrary to what the function name might suggest, the function KMX_ToUnicodeEx does not process surrogate pairs. 
+ * This is because it is used in mcompile only which only deals with latin scripts.
+ * In case this function should be used for surrogate pairs, they will be ignored and a message will be printed out
+
  * @param  keycode a key of the currently used keyboard Layout
  * @param  pwszBuff Buffer to store resulting character
  * @param  ss a shiftstate of the currently used keyboard Layout
