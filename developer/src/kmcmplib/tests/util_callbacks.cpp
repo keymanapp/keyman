@@ -11,13 +11,22 @@ void msgproc(const KMCMP_COMPILER_RESULT_MESSAGE &message, void* context) {
   error_vec.push_back(message.errorCode);
   const char*t = "unknown";
   switch(message.errorCode & MESSAGE_SEVERITY_MASK) {
-    case CompilerErrorSeverity::Hint:    t="   hint"; break;
-    case CompilerErrorSeverity::Warn:    t="warning"; break;
-    case CompilerErrorSeverity::Error:   t="  error"; break;
-    case CompilerErrorSeverity::Fatal:   t="  fatal"; break;
-    case CompilerErrorSeverity::Info:    t="   info"; break;
+    case CompilerErrorSeverity::Hint:    t=" SevHint"; break;
+    case CompilerErrorSeverity::Warn:    t=" SevWarn"; break;
+    case CompilerErrorSeverity::Error:   t="SevError"; break;
+    case CompilerErrorSeverity::Fatal:   t="SevFatal"; break;
+    case CompilerErrorSeverity::Info:    t=" SevInfo"; break;
   }
-  printf("line %d  %s %4.4x:  %s\n", message.lineNumber, t, (unsigned int)message.errorCode, message.message.c_str());
+  printf("[CompilerMessage] %s(%d): %s | 0x%3.3x (",
+    message.filename.c_str(),
+    message.lineNumber,
+    t,
+    (unsigned int)message.errorCode & MESSAGE_BASEERROR_MASK
+  );
+  for(auto it = message.parameters.begin(); it != message.parameters.end(); it++) {
+    printf("%s'%s'", it == message.parameters.begin() ? "" : ", ", it->c_str());
+  }
+  printf(")\n");
 }
 
 const std::vector<uint8_t> loadfileProc(const std::string& filename, const std::string& baseFilename) {

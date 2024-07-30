@@ -129,9 +129,11 @@ EMSCRIPTEN_BINDINGS(compiler_interface) {
 
   emscripten::class_<KMCMP_COMPILER_RESULT_MESSAGE>("CompilerResultMessage")
     .constructor<>()
-    .property("message", &KMCMP_COMPILER_RESULT_MESSAGE::message)
     .property("errorCode", &KMCMP_COMPILER_RESULT_MESSAGE::errorCode)
     .property("lineNumber", &KMCMP_COMPILER_RESULT_MESSAGE::lineNumber)
+    .property("columnNumber", &KMCMP_COMPILER_RESULT_MESSAGE::columnNumber)
+    .property("filename", &KMCMP_COMPILER_RESULT_MESSAGE::filename)
+    .property("parameters", &KMCMP_COMPILER_RESULT_MESSAGE::parameters)
     ;
 
   emscripten::class_<KMCMP_COMPILER_RESULT_EXTRA>("CompilerResultExtra")

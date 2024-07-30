@@ -3,7 +3,6 @@
 #include "../include/kmcmplibapi.h"
 #include "../src/kmx_u16.h"
 #include "../src/compfile.h"
-#include "../src/CompMsg.h"
 #include "../src/CompilerErrors.h"
 #include "../../common/include/kmn_compiler_errors.h"
 #include "../../../../common/include/km_types.h"
@@ -27,11 +26,7 @@ namespace kmcmp {
     extern int nErrors;
     extern int ErrChr;
     extern int BeginLine[4];
-    KMX_BOOL AddCompileWarning(char* buf);
 }
-
-#define ERR_EXTRA_LIB_LEN 256
-extern char ErrExtraLIB[ERR_EXTRA_LIB_LEN];
 
 class CompilerTest : public testing::Test {
     protected:
@@ -50,10 +45,8 @@ class CompilerTest : public testing::Test {
         void initGlobals() {
             kmcmp::msgproc = msgproc_collect;
             msgproc_errors.clear();
-            szText_stub[0] = '\0';
             kmcmp::nErrors = 0;
             kmcmp::ErrChr = 0;
-            ErrExtraLIB[0] = '\0';
             kmcmp::BeginLine[BEGIN_ANSI] = -1;
             kmcmp::BeginLine[BEGIN_UNICODE] = -1;
             kmcmp::BeginLine[BEGIN_NEWCONTEXT] = -1;
@@ -110,27 +103,13 @@ class CompilerTest : public testing::Test {
         }
 
     public:
-        static KMX_CHAR szText_stub[];
-
         static std::vector<KMCMP_COMPILER_RESULT_MESSAGE> msgproc_errors;
 
         static void msgproc_collect(const KMCMP_COMPILER_RESULT_MESSAGE &message, void* context) {
             msgproc_errors.push_back(message);
         }
-
-        static int msgproc_true_stub(int line, uint32_t dwMsgCode, const char* szText, void* context) {
-            strcpy(szText_stub, szText);
-            return 1;
-        };
-
-        static int msgproc_false_stub(int line, uint32_t dwMsgCode, const char* szText, void* context) {
-            strcpy(szText_stub, szText);
-            return 0;
-        };
 };
 
-#define COMPILE_ERROR_MAX_LEN (SZMAX_ERRORTEXT + 1 + 280)
-KMX_CHAR CompilerTest::szText_stub[COMPILE_ERROR_MAX_LEN];
 std::vector<KMCMP_COMPILER_RESULT_MESSAGE> CompilerTest::msgproc_errors;
 
 TEST_F(CompilerTest, strtowstr_test) {
@@ -143,33 +122,19 @@ TEST_F(CompilerTest, wstrtostr_test) {
     EXPECT_EQ(0, strcmp("", wstrtostr((PKMX_WCHAR)u"")));
 };
 
-
-// TEST_F(CompilerTest, AddCompileWarning_test) {
-//     msgproc = msgproc_false_stub;
-//     const char *const WARNING_TEXT = "warning";
-//     EXPECT_EQ(0, kmcmp::nErrors);
-//     EXPECT_FALSE(kmcmp::AddCompileWarning((PKMX_CHAR)WARNING_TEXT));
-//     EXPECT_EQ(0, strcmp(WARNING_TEXT, szText_stub));
-//     EXPECT_EQ(0, kmcmp::nErrors);
-// };
-
 // TEST_F(CompilerTest, AddCompileError_test) {
 //     msgproc = msgproc_true_stub;
 //     kmcmp::ErrChr = 0;
-//     ErrExtraLIB[0] = '\0';
-//     KMX_CHAR expected[COMPILE_ERROR_MAX_LEN];
 
 //     // SevFatal
 //     EXPECT_EQ(0, kmcmp::nErrors);
 //     EXPECT_EQ(SevFatal, KmnCompilerMessages::FATAL_CannotCreateTempfile & SevFatal);
 //     EXPECT_TRUE(AddCompileError(KmnCompilerMessages::FATAL_CannotCreateTempfile));
-//     EXPECT_EQ(0, strcmp(GetCompilerErrorString(KmnCompilerMessages::FATAL_CannotCreateTempfile), szText_stub));
 //     EXPECT_EQ(1, kmcmp::nErrors);
 
 //     // SevError
 //     EXPECT_EQ(SevError, KmnCompilerMessages::ERROR_InvalidLayoutLine & SevError);
 //     EXPECT_FALSE(AddCompileError(KmnCompilerMessages::ERROR_InvalidLayoutLine));
-//     EXPECT_EQ(0, strcmp(GetCompilerErrorString(KmnCompilerMessages::ERROR_InvalidLayoutLine), szText_stub));
 //     EXPECT_EQ(2, kmcmp::nErrors);
 
 //     // Unknown
@@ -177,7 +142,6 @@ TEST_F(CompilerTest, wstrtostr_test) {
 //     EXPECT_EQ(SevError, UNKNOWN_ERROR & SevError);
 //     EXPECT_FALSE(AddCompileError(UNKNOWN_ERROR));
 //     sprintf(expected, "Unknown error %x", UNKNOWN_ERROR);
-//     EXPECT_EQ(0, strcmp(expected, szText_stub));
 //     EXPECT_EQ(3, kmcmp::nErrors);
 
 //     // ErrChr
@@ -185,26 +149,13 @@ TEST_F(CompilerTest, wstrtostr_test) {
 //     kmcmp::ErrChr = ERROR_CHAR_INDEX ;
 //     EXPECT_EQ(SevError, KmnCompilerMessages::ERROR_InvalidLayoutLine & SevError);
 //     EXPECT_FALSE(AddCompileError(KmnCompilerMessages::ERROR_InvalidLayoutLine));
-//     sprintf(expected, "%s character offset: %d", GetCompilerErrorString(KmnCompilerMessages::ERROR_InvalidLayoutLine), ERROR_CHAR_INDEX);
-//     EXPECT_EQ(0, strcmp(expected, szText_stub));
 //     kmcmp::ErrChr = 0;
 //     EXPECT_EQ(4, kmcmp::nErrors);
-
-//     // ErrExtraLIB
-//     const char *const EXTRA_LIB_TEXT = " extra lib";
-//     strcpy(ErrExtraLIB, EXTRA_LIB_TEXT);
-//     EXPECT_EQ(SevError, KmnCompilerMessages::ERROR_InvalidLayoutLine & SevError);
-//     EXPECT_FALSE(AddCompileError(KmnCompilerMessages::ERROR_InvalidLayoutLine));
-//     sprintf(expected, "%s%s", GetCompilerErrorString(KmnCompilerMessages::ERROR_InvalidLayoutLine), EXTRA_LIB_TEXT);
-//     EXPECT_EQ(0, strcmp(expected, szText_stub));
-//     ErrExtraLIB[0] = '\0';
-//     EXPECT_EQ(5, kmcmp::nErrors);
 
 //     // msgproc returns FALSE
 //     msgproc = msgproc_false_stub;
 //     EXPECT_EQ(SevError, KmnCompilerMessages::ERROR_InvalidLayoutLine & SevError);
 //     EXPECT_TRUE(AddCompileError(KmnCompilerMessages::ERROR_InvalidLayoutLine));
-//     EXPECT_EQ(0, strcmp(GetCompilerErrorString(KmnCompilerMessages::ERROR_InvalidLayoutLine), szText_stub));
 //     EXPECT_EQ(6, kmcmp::nErrors);
 // };
 

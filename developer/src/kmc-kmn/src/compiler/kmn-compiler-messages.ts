@@ -27,6 +27,8 @@ export const enum KmnCompilerMessageRanges {
   RANGE_CompilerMessage_Max = 0xFFF, // Highest available error code for kmc-kmn
 }
 
+type KmcmpLibMessageParameters = {p:string[]};
+
 /**
  * @internal
  *
@@ -522,10 +524,16 @@ export class KmnCompilerMessages {
   static Error_PostKeystrokeGroupMustBeReadonly               = () => m(this.ERROR_PostKeystrokeGroupMustBeReadonly, `Group used in begin postKeystroke must be readonly`);
 
   static ERROR_DuplicateGroup                                 = SevError | 0x071;
-  static Error_DuplicateGroup                                 = () => m(this.ERROR_DuplicateGroup, `A group with this name has already been defined.`);
+  static Error_DuplicateGroup                                 = (o:KmcmpLibMessageParameters) => m(
+    this.ERROR_DuplicateGroup,
+    `A group with the name '${o.p?.[0]}' has already been defined on line ${o.p?.[1]}.`
+  );
 
   static ERROR_DuplicateStore                                 = SevError | 0x072;
-  static Error_DuplicateStore                                 = () => m(this.ERROR_DuplicateStore, `A store with this name has already been defined.`);
+  static Error_DuplicateStore                                 = (o:KmcmpLibMessageParameters) => m(
+    this.ERROR_DuplicateStore,
+    `A store with the name '${o.p?.[0]}' has already been defined on line ${o.p?.[1]}.`
+  );
 
   static ERROR_RepeatedBegin                                  = SevError | 0x073;
   static Error_RepeatedBegin                                  = () => m(this.ERROR_RepeatedBegin, `Begin has already been set`);
@@ -549,7 +557,10 @@ export class KmnCompilerMessages {
   static Error_NonBMPCharactersNotSupportedInKeySection       = () => m(this.ERROR_NonBMPCharactersNotSupportedInKeySection, `Characters with codepoints over U+FFFF are not supported in the key part of the rule`);
 
   static ERROR_InvalidTarget                                  = SevError | 0x07A;
-  static Error_InvalidTarget                                  = () => m(this.ERROR_InvalidTarget, `Unrecognized compile target`);
+  static Error_InvalidTarget                                  = (o:KmcmpLibMessageParameters) => m(
+    this.ERROR_InvalidTarget,
+    `Unrecognized compile target '${o.p?.[0]}'`
+  );
 
   static ERROR_NoTargetsSpecified                             = SevError | 0x07B;
   static Error_NoTargetsSpecified                             = () => m(this.ERROR_NoTargetsSpecified, `At least one compile target must be specified`);
@@ -584,10 +595,11 @@ export class KmnCompilerMessages {
   static WARN_ReservedCharacter                               = SevWarn | 0x089;
   static Warn_ReservedCharacter                               = () => m(this.WARN_ReservedCharacter, `A Unicode character was found that should not be used`);
 
-  // Note: INFO_Info is called CWARN_Info in kmn_compiler_errors.h, but should have an "info" severity
-  static INFO_Info                                            = SevInfo | 0x08A;
-  static Info_Info                                            = () => m(this.INFO_Info, `Information`);
-
+  static INFO_MinimumCoreEngineVersion                            = SevInfo | 0x08A;
+  static Info_MinimumCoreEngineVersion                            = (o:KmcmpLibMessageParameters) => m(
+    this.INFO_MinimumCoreEngineVersion,
+    `The compiler has assigned a minimum engine version of ${o.p?.[0]}.${o.p?.[1]} based on features used in this keyboard`
+  );
 
   static WARN_VirtualKeyWithMnemonicLayout                    = SevWarn | 0x08B;
   static Warn_VirtualKeyWithMnemonicLayout                    = () => m(this.WARN_VirtualKeyWithMnemonicLayout, `Virtual key used instead of virtual character key with a mnemonic layout`);
@@ -704,7 +716,10 @@ export class KmnCompilerMessages {
   static Warn_KeyShouldIncludeNCaps                           = () => m(this.WARN_KeyShouldIncludeNCaps, `Other rules which reference this key include CAPS or NCAPS modifiers, so this rule must include NCAPS modifier to avoid inconsistent matches`);
 
   static HINT_UnreachableRule                                 = SevHint | 0x0AE;
-  static Hint_UnreachableRule                                 = () => m(this.HINT_UnreachableRule, `This rule will never be matched as another rule takes precedence`);
+  static Hint_UnreachableRule                                 = (o:KmcmpLibMessageParameters) => m(
+    this.HINT_UnreachableRule,
+    `This rule will never be matched as the rule on line ${o.p?.[0]} takes precedence`
+  );
 
   static WARN_VirtualKeyInOutput                              = SevWarn | 0x0AF;
   static Warn_VirtualKeyInOutput                              = () => m(this.WARN_VirtualKeyInOutput, `Virtual keys are not supported in output`);

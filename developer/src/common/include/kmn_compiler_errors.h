@@ -36,7 +36,11 @@ namespace CompilerErrorSeverity {
   };
 };
 
-#define MESSAGE_SEVERITY_MASK 0xF00000
+#define MESSAGE_SEVERITY_MASK    0x00F00000  // includes reserved bits, 16 possible severity levels
+#define MESSAGE_ERROR_MASK       0x000FFFFF  // error | namespace
+#define MESSAGE_NAMESPACE_MASK   0x000FF000  // 256 possible namespaces
+#define MESSAGE_BASEERROR_MASK   0x00000FFF  // error code, 2,048 possible error codes per namespace
+#define MESSAGE_RESERVED_MASK    0xFF000000  // do not use these error values at this time
 
 #define MESSAGE_NAMESPACE_KmnCompiler      0x2000
 
@@ -208,7 +212,7 @@ namespace KmnCompilerMessages {
     WARN_UnicodeSurrogateUsed =                         SevWarn | 0x088,
     WARN_ReservedCharacter =                            SevWarn | 0x089,
 
-    INFO_Info =                                         SevInfo | 0x08A,
+    INFO_MinimumCoreEngineVersion =                     SevInfo | 0x08A, // renamed from INFO_Info in 18.0-alpha
 
     WARN_VirtualKeyWithMnemonicLayout =                 SevWarn | 0x08B,
     WARN_VirtualCharKeyWithPositionalLayout =           SevWarn | 0x08C,

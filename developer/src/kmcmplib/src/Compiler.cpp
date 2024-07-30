@@ -103,7 +103,6 @@
 #include "UnreachableRules.h"
 #include "CheckForDuplicates.h"
 #include "kmx_u16.h"
-#include <CompMsg.h>
 
 /* These macros are adapted from winnt.h and legacy use only */
 #define MAKELANGID(p, s)       ((((uint16_t)(s)) << 10) | (uint16_t)(p))
@@ -1313,10 +1312,11 @@ KMX_BOOL GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &targets)
       }
 
       if(!found) {
-        snprintf(ErrExtraLIB, ERR_EXTRA_LIB_LEN, " target: %s", string_from_u16string(token).c_str());
+        AddCompileError(KmnCompilerMessages::ERROR_InvalidTarget, {
+          /*target*/ string_from_u16string(token).c_str()
+        });
         delete[] p;
         targets = 0;
-        AddCompileError(KmnCompilerMessages::ERROR_InvalidTarget);
         return FALSE;
       }
     }
@@ -2045,9 +2045,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     {
     case 99:
       if (tokenFound) break;
-      {
-        snprintf(ErrExtraLIB, ERR_EXTRA_LIB_LEN, "token: %c",(int)*p);
-      }
+      // TODO: report an error about the missing token details --> "token: %c",(int)*p);
       return KmnCompilerMessages::ERROR_InvalidToken;
     case 0:
       if (u16nicmp(p, u"deadkey", z = 7) == 0 ||
