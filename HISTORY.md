@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.79 alpha 2024-07-30
+
+* change(mac): add custom tags in sentry to better identify errors (#11947)
+* feat(web): add unit tests for case-detection & handling (#11950)
+* refactor(web): spin off method for correction-search probability-thresholding check (#11952)
+
 ## 18.0.78 alpha 2024-07-29
 
 * chore(common): Update history from 17.0.327 and add missing descriptions (#12021)
