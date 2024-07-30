@@ -19,8 +19,8 @@ cpp_files = files(
 
 comon_include_dir = [
   include_directories('../../../common/include'),
+  include_directories('../../../core/src'),
 ]
-
 
 mcompile = executable(
     'mcompile',
