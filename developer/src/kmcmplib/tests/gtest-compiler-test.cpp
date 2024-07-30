@@ -253,7 +253,7 @@ TEST_F(CompilerTest, IsValidKeyboardVersion_test) {
 
 // KMX_DWORD kmcmp::AddCompilerVersionStore(PFILE_KEYBOARD fk)
 // KMX_DWORD CheckStatementOffsets(PFILE_KEYBOARD fk, PFILE_GROUP gp, PKMX_WCHAR context, PKMX_WCHAR output, PKMX_WCHAR key)
-// KMX_BOOL CheckContextStatementPositions(PKMX_WCHAR context)
+// void CheckContextStatementPositions(PKMX_WCHAR context)
 // KMX_DWORD CheckUseStatementsInOutput(PKMX_WCHAR output)
 // KMX_DWORD CheckVirtualKeysInOutput(PKMX_WCHAR output)
 // KMX_DWORD InjectContextToReadonlyOutput(PKMX_WCHAR pklOut)
@@ -798,7 +798,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
 // KMX_DWORD ProcessEthnologueStore(PKMX_WCHAR p)
 // KMX_DWORD ProcessHotKey(PKMX_WCHAR p, KMX_DWORD *hk)
 // void SetChecksum(PKMX_BYTE buf, PKMX_DWORD CheckSum, KMX_DWORD sz)
-// KMX_BOOL kmcmp::CheckStoreUsage(PFILE_KEYBOARD fk, int storeIndex, KMX_BOOL fIsStore, KMX_BOOL fIsOption, KMX_BOOL fIsCall)
+// void kmcmp::CheckStoreUsage(PFILE_KEYBOARD fk, int storeIndex, KMX_BOOL fIsStore, KMX_BOOL fIsOption, KMX_BOOL fIsCall)
 // KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, KMX_BYTE**data, size_t& dataSize)
 // KMX_DWORD ReadLine(KMX_BYTE* infile, int sz, int& offset, PKMX_WCHAR wstr, KMX_BOOL PreProcess)
 
