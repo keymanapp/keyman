@@ -201,7 +201,6 @@ export default abstract class OSKView
   private _baseFontSize: ParsedLengthStyle;
 
   private needsLayout: boolean = true;
-  private initialized: boolean;
 
   private _animatedHideTimeout: number;
 
@@ -239,7 +238,7 @@ export default abstract class OSKView
 
     this._bannerController = new BannerController(this.bannerView, this.hostDevice, this.config.predictionContextManager);
 
-    this.keyboardView = new EmptyView();
+    this.keyboardView = this._GenerateKeyboardView(null, null);
     this._Box.appendChild(this.keyboardView.element);
 
     // Install the default OSK stylesheets - but don't have it managed by the keyboard-specific stylesheet manager.
@@ -252,22 +251,10 @@ export default abstract class OSKView
       this.uiStyleSheetManager.linkExternalSheet(sheetHref);
     }
 
-    this.activeKeyboard = this.config.keyboardToActivate;
-
-    // Ensure the appropriate banner mode is activated; it's possible for a model to have either
-    // partially or fully loaded, especially if the prior line has a full Keyboard instance.
-    const modelState = this.config.predictionContextManager?.modelState;
-    if(modelState) {
-      this.bannerController.selectBanner(modelState);
-    }
-
     this.setBaseMouseEventListeners();
     if(this.hostDevice.touchable) {
       this.setBaseTouchEventListeners();
     }
-
-    this._Box.style.display = 'none';
-    this.initialized = true;
   }
 
   protected get configuration(): Configuration {
@@ -553,13 +540,6 @@ export default abstract class OSKView
     keyboard: Keyboard,
     metadata: KeyboardProperties
   }) {
-    // Is the keyboard already loaded?  If so, ignore the change command.
-    //
-    // Note:  ensures that the _instances_ are the same; it's possible to make new instances
-    // to force a refresh.  Does not perform a deep-equals.
-    if(this.initialized && this.keyboardData?.keyboard == keyboardData?.keyboard && this.keyboardData?.metadata == keyboardData?.metadata) {
-      return;
-    }
     this.keyboardData = keyboardData;
     this.loadActiveKeyboard();
 

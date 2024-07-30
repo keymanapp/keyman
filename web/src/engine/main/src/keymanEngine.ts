@@ -120,8 +120,6 @@ export default class KeymanEngine<
       // so we handle that here.
       this.osk?.bannerController.selectBanner(state);
       this.osk?.refreshLayout();
-
-      // If `this.osk` is not yet initialized, the OSK itself will check if the model is loaded
     });
 
     // The OSK does not possess a direct connection to the KeyboardProcessor's state-key
