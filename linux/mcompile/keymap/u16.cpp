@@ -11,31 +11,31 @@
 #include "utfcodec.hpp"
 
 
-//String <- wstring
+// string <- wstring
 /** @brief Obtain a std::string from a std::wstring */
 std::string string_from_wstring(std::wstring const str) {
   return convert<wchar_t, char>((const std::wstring)str);
 }
 
-//wstring <- string
+// wstring <- string
 /** @brief Obtain a std::wstring from a std::string */
 std::wstring wstring_from_string(std::string const str) {
   return convert<char, wchar_t>((const std::string)str);
 }
 
-//u16String <- string
+// u16string <- string
 /** @brief  Obtain a std::string from a std::wstring */
 std::u16string u16string_from_string(std::string const str) {
  return convert<char, char16_t>((const std::string)str);
 }
 
-//string <- u16string
+// string <- u16string
 /** @brief  Obtain a std::string from a std::u16string */
 std::string string_from_u16string(std::u16string const str) {
   return convert<char16_t, char>((const std::u16string)str);
 }
 
-//wstring <- u16string
+// wstring <- u16string
 /** @brief  Obtain a std::wstring from a std::u16string */
 std::wstring wstring_from_u16string(std::u16string const str) {
   std::string  s  = convert<char16_t, char>((const std::u16string)str);
@@ -43,7 +43,7 @@ std::wstring wstring_from_u16string(std::u16string const str) {
   return ws;
 }
 
-//u16string <- wstring
+// u16string <- wstring
 /** @brief  Obtain a std::u16string from a std::wstring */
 std::u16string u16string_from_wstring(std::wstring const str) {
   std::string s = convert<wchar_t, char>((const std::wstring)str);
@@ -52,7 +52,7 @@ std::u16string u16string_from_wstring(std::wstring const str) {
 }
 
   // UTF16 (=const wchar_t*) -> -> std::string  -> std::u16string -> UTF16 ( = char16_t*)
-/** @brief @brief  Convert pointer to wchar_t to pointer to char16_t and copy sz elements into dst */
+/** @brief @brief  Convert pointer to wchar_t to u16string and copy sz elements into dst */
 void u16sprintf(KMX_WCHAR* dst, const size_t sz, const wchar_t* fmt, ...) {
   wchar_t* wbuf = new wchar_t[sz];
   va_list args;

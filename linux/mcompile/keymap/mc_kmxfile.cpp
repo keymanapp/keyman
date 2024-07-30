@@ -210,7 +210,7 @@ KMX_DWORD KMX_WriteCompiledKeyboardToFile(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX
   } else {
     ck->dwBitmapSize = 0;
 	  ck->dpBitmapOffset = 0;
-   }
+  }
 
   size_t nr_elements = fwrite(buf, size, 1, hOutfile);
 
@@ -560,20 +560,6 @@ FILE* Open_File(const KMX_CHAR* Filename, const KMX_CHAR* mode) {
   std::string cpath, cmode;
   cpath = (const KMX_CHAR*)Filename;
   cmode = (const KMX_CHAR*)mode;
-  return fopen(cpath.c_str(), cmode.c_str());
-#endif
-};
-
-FILE* Open_File(const KMX_WCHAR* Filename, const KMX_WCHAR* mode) {
-#ifdef _MSC_VER
-  std::wstring cpath = convert_pchar16T_To_wstr((KMX_WCHAR*)Filename);
-  std::wstring cmode = convert_pchar16T_To_wstr((KMX_WCHAR*)mode);
-  std::replace(cpath.begin(), cpath.end(), '/', '\\');
-  return _wfsopen(cpath.c_str(), cmode.c_str(), _SH_DENYWR);
-#else
-  std::string cpath, cmode;
-  cpath = string_from_u16string(Filename);
-  cmode = string_from_u16string(mode);
   return fopen(cpath.c_str(), cmode.c_str());
 #endif
 };

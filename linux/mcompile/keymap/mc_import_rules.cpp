@@ -250,13 +250,13 @@ public:
 
   bool KMX_LayoutRow(int MaxShiftState, LPKMX_KEY key, std::vector<DeadKey*>* deadkeys, int deadkeyBase, BOOL bDeadkeyConversion, vec_dword_3D& all_vector, GdkKeymap* keymap) {  // I4552
     // Get the CAPSLOCK value
-    int capslock =
+    /*int capslock =
           (this->KMX_IsCapsEqualToShift() ? 1 : 0) |
           (this->KMX_IsSGCAPS() ? 2 : 0) |
           (this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
-          (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
+          (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);*/
 
-    //int capslock = 1;  // we do not use the equation to obtain capslock. On Linux we set capslock = 1
+    int capslock = 1;  // we do not use the equation to obtain capslock. On Linux we set capslock = 1
 
     for (int ss = 0; ss <= MaxShiftState; ss++) {
       if (ss == Menu || ss == ShftMenu) {
