@@ -160,7 +160,7 @@ TEST(kmx_u16_Test, u16tok_str_compare_to_strtok) {
 
   // check sensitivity of ordering with multiple delimiters
   strcpy(str, "abc<def>ghi");
-  const char *reverse_delim = "<>";
+  const char *reverse_delim = "><";
 	EXPECT_TRUE(!strcmp("abc", strtok(str, reverse_delim)));
   EXPECT_TRUE(!strcmp("def", strtok(nullptr, reverse_delim)));
   EXPECT_TRUE(!strcmp("ghi", strtok(nullptr, reverse_delim)));
