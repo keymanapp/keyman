@@ -229,6 +229,11 @@ export async function correctAndEnumerate(
     // Corrections obtained:  now to predict from them!
     const correction = match.matchString;
 
+    // If our 'match' results in fully deleting the new token, reject it and try again.
+    if(match.matchSequence.length == 0 && match.inputSequence.length != 0) {
+      continue;
+    }
+
     // Worth considering:  extend Traversal to allow direct prediction lookups?
     // let traversal = match.finalTraversal;
 

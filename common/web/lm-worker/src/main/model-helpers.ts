@@ -46,6 +46,7 @@ export function determineModelWordbreaker(model: LexicalModel): (context: Contex
       let wordbreaker = model.wordbreaker || wordBreakers.default;
 
       return models.wordbreak(wordbreaker, context);
+      /* c8 ignore start */
     } else {
       // 1.  This model does not provide a model following the 14.0+ wordbreaking spec
       // 2.  This model DOES define a custom wordbreaker following the 12.0-13.0 spec.
@@ -54,6 +55,7 @@ export function determineModelWordbreaker(model: LexicalModel): (context: Contex
       // old, deprecated wordbreaking pattern.
       return model.wordbreak(context);
     }
+    /* c8 ignore end */
   };
 }
 
@@ -64,5 +66,41 @@ export function determineModelTokenizer(model: LexicalModel) {
     } else {
       return null;
     }
+  }
+}
+
+export function detectCurrentCasing(lexicalModel: LexicalModel, context: Context): CasingForm {
+  let model = lexicalModel;
+  const wordbreak = determineModelWordbreaker(lexicalModel);
+
+  let text = wordbreak(context);
+
+  if(!model.languageUsesCasing) {
+    throw "Invalid attempt to detect casing: languageUsesCasing is set to false";
+  }
+
+  if(!model.applyCasing) {
+    // The worker should automatically 'sub in' default behavior during the model's load if that
+    // function isn't defined explicitly as part of the model.
+    throw "Invalid LMLayer state:  languageUsesCasing is set to true, but no applyCasing function exists";
+  }
+
+  // If the user has selected Shift or Caps layer, that overrides our
+  // text analysis
+  if(context.casingForm == 'upper' || context.casingForm == 'initial') {
+    return context.casingForm;
+  }
+  if(model.applyCasing('lower', text) == text) {
+    return 'lower';
+  } else if(model.applyCasing('upper', text) == text) {
+    // If only a single character has been input, assume we're in 'initial' mode.
+    return text.kmwLength() > 1 ? 'upper' : 'initial';
+  } else if(model.applyCasing('initial', text) == text) {
+    // We check 'initial' last, as upper-case input is indistinguishable.
+    return 'initial';
+  } else {
+    // If we do not have a casing form given to us by the keyboard, then
+    // 'null' is returned when no casing pattern matches the input.
+    return context.casingForm ?? null;
   }
 }
