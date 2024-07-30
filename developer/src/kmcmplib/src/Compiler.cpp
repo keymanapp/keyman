@@ -815,7 +815,10 @@ KMX_BOOL ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p) {
     sp->dwSystemID == 0 && (fk->version >= VERSION_60 || fk->version == 0)) {
     // In this case, we want to change behaviour for older versioned keyboards so that
     // we don't mix up named character codes which weren't supported in 5.x
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_60, KmnCompilerMessages::ERROR_60FeatureOnly_NamedCodes);
+    if(!VerifyKeyboardVersion(fk, VERSION_60)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_60FeatureOnly_NamedCodes);
+      return FALSE;
+    }
     // Add a single char store as a defined character constant
     if (Uni_IsSurrogate1(*sp->dpString)) {
       kmcmp::CodeConstants->AddCode(Uni_SurrogateToUTF32(sp->dpString[0], sp->dpString[1]), sp->szName, fk->cxStoreArray);
@@ -981,7 +984,10 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
     break;
 
   case TSS_ETHNOLOGUECODE:
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_60, KmnCompilerMessages::ERROR_60FeatureOnly_EthnologueCode);
+    if(!VerifyKeyboardVersion(fk, VERSION_60)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_60FeatureOnly_EthnologueCode);
+      return FALSE;
+    }
     if ((msg = ProcessEthnologueStore(sp->dpString)) != STATUS_Success) {
       ReportCompilerMessage(msg);
       return FALSE;  // I2646
@@ -1000,7 +1006,10 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
     break;
 
   case TSS_INCLUDECODES:
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_60, KmnCompilerMessages::ERROR_60FeatureOnly_NamedCodes);
+    if(!VerifyKeyboardVersion(fk, VERSION_60)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_60FeatureOnly_NamedCodes);
+      return FALSE;
+    }
     if (!kmcmp::CodeConstants->LoadFile(fk, sp->dpString)) {
       ReportCompilerMessage(KmnCompilerMessages::ERROR_CannotLoadIncludeFile);
       return FALSE;
@@ -1028,7 +1037,10 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
     q = u16tok(NULL, p_sep_n, &context);  // I3481
     if (!q)
     {
-      VERIFY_KEYBOARD_VERSION(fk, VERSION_70, KmnCompilerMessages::ERROR_InvalidLanguageLine);
+      if(!VerifyKeyboardVersion(fk, VERSION_70)) {
+        ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidLanguageLine);
+        return FALSE;
+      }
       j = SUBLANGID(i);
       i = PRIMARYLANGID(i);
     }
@@ -1073,7 +1085,10 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
     break;
 
   case TSS_MNEMONIC:
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_60, KmnCompilerMessages::ERROR_60FeatureOnly_MnemonicLayout);
+    if(!VerifyKeyboardVersion(fk, VERSION_60)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_60FeatureOnly_MnemonicLayout);
+      return FALSE;
+    };
     kmcmp::FMnemonicLayout = atoiW(sp->dpString) == 1;
     if (kmcmp::FMnemonicLayout && FindSystemStore(fk, TSS_CASEDKEYS) != NULL) {
       // The &CasedKeys system store is not supported for
@@ -1087,7 +1102,10 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
     break;
 
   case TSS_OLDCHARPOSMATCHING:
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_60, KmnCompilerMessages::ERROR_60FeatureOnly_OldCharPosMatching);
+    if(!VerifyKeyboardVersion(fk, VERSION_60)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_60FeatureOnly_OldCharPosMatching);
+      return FALSE;
+    }
     kmcmp::FOldCharPosMatching = atoiW(sp->dpString);
     break;
 
@@ -1139,7 +1157,10 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
     break;
 
   case TSS_VISUALKEYBOARD:
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_70, KmnCompilerMessages::ERROR_70FeatureOnly);
+    if(!VerifyKeyboardVersion(fk, VERSION_70)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_70FeatureOnly);
+      return FALSE;
+    }
     {
       // Store extra metadata for callers as we mutate this store during
       // compilation
@@ -1169,20 +1190,32 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
     break;
   case TSS_KMW_RTL:
   case TSS_KMW_HELPTEXT:
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_70, KmnCompilerMessages::ERROR_70FeatureOnly);
+    if(!VerifyKeyboardVersion(fk, VERSION_70)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_70FeatureOnly);
+      return FALSE;
+    }
     break;
 
   case TSS_KMW_HELPFILE:
   case TSS_KMW_EMBEDJS:
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_70, KmnCompilerMessages::ERROR_70FeatureOnly);
+    if(!VerifyKeyboardVersion(fk, VERSION_70)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_70FeatureOnly);
+      return FALSE;
+    }
     break;
 
   case TSS_KMW_EMBEDCSS:
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_90, KmnCompilerMessages::ERROR_90FeatureOnlyEmbedCSS);
+    if(!VerifyKeyboardVersion(fk, VERSION_90)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_90FeatureOnlyEmbedCSS);
+      return FALSE;
+    }
     break;
 
   case TSS_TARGETS:   // I4504
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_90, KmnCompilerMessages::ERROR_90FeatureOnlyTargets);
+    if(!VerifyKeyboardVersion(fk, VERSION_90)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_90FeatureOnlyTargets);
+      return FALSE;
+    }
     if(!GetCompileTargetsFromTargetsStore(sp->dpString, fk->extra->targets)) {
       return FALSE;
     }
@@ -1190,8 +1223,11 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
 
   case TSS_WINDOWSLANGUAGES:
   {
+    if(!VerifyKeyboardVersion(fk, VERSION_70)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_70FeatureOnly);
+      return FALSE;
+    }
     KMX_WCHAR *context = NULL;
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_70, KmnCompilerMessages::ERROR_70FeatureOnly);
     size_t szQ = u16len(sp->dpString) * 6 + 1;  // I3481
     q = new KMX_WCHAR[szQ]; // guaranteed to be enough space for recoding
     *q = 0; KMX_WCHAR *r = q;
@@ -1223,20 +1259,32 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
     break;
   }
   case TSS_COMPARISON:
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_80, KmnCompilerMessages::ERROR_80FeatureOnly);
+    if(!VerifyKeyboardVersion(fk, VERSION_80)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_80FeatureOnly);
+      return FALSE;
+    }
     break;
 
   case TSS_VKDICTIONARY:  // I3438
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_90, KmnCompilerMessages::ERROR_90FeatureOnlyVirtualKeyDictionary);
+    if(!VerifyKeyboardVersion(fk, VERSION_90)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_90FeatureOnlyVirtualKeyDictionary);
+      return FALSE;
+    }
     break;
 
   case TSS_LAYOUTFILE:  // I3483
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_90, KmnCompilerMessages::ERROR_90FeatureOnlyLayoutFile);   // I4140
+    if(!VerifyKeyboardVersion(fk, VERSION_90)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_90FeatureOnlyLayoutFile);
+      return FALSE;
+    }
     // Used by KMW compiler
     break;
 
   case TSS_KEYBOARDVERSION:   // I4140
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_90, KmnCompilerMessages::ERROR_90FeatureOnlyKeyboardVersion);
+    if(!VerifyKeyboardVersion(fk, VERSION_90)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_90FeatureOnlyKeyboardVersion);
+      return FALSE;
+    }
     if (!IsValidKeyboardVersion(sp->dpString)) {
       ReportCompilerMessage(KmnCompilerMessages::ERROR_KeyboardVersionFormatInvalid);
       return FALSE;
@@ -1418,7 +1466,9 @@ KMX_DWORD CheckStatementOffsets(PFILE_KEYBOARD fk, PFILE_GROUP gp, PKMX_WCHAR co
         if (kmcmp::CompileTarget == CKF_KEYMANWEB) {
           for (q = context, i = 1; *q && i < contextOffset; q = incxstr(q), i++);
           if (*q == UC_SENTINEL && *(q + 1) == CODE_NOTANY) {
-            VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_140, KmnCompilerMessages::ERROR_140FeatureOnlyContextAndNotAnyWeb);
+            if(!VerifyKeyboardVersion(fk, VERSION_140)) {
+              return KmnCompilerMessages::ERROR_140FeatureOnlyContextAndNotAnyWeb;
+            }
           }
         }
       }
@@ -2124,7 +2174,9 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       }
       else if (u16nicmp(p, u"baselayout", 10) == 0)  // I3430
       {
-        VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_90, KmnCompilerMessages::ERROR_90FeatureOnly_IfSystemStores);
+        if(!VerifyKeyboardVersion(fk, VERSION_90)) {
+          return KmnCompilerMessages::ERROR_90FeatureOnly_IfSystemStores;
+        }
         if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
         p += 10;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -2139,7 +2191,9 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     case 5:
       if (u16nicmp(p, u"if", 2) == 0)
       {
-        VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_80, KmnCompilerMessages::ERROR_80FeatureOnly);
+        if(!VerifyKeyboardVersion(fk, VERSION_80)) {
+          return KmnCompilerMessages::ERROR_80FeatureOnly;
+        }
         if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
         p += 2;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -2217,7 +2271,9 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
         if (q && *q)
         {
-          VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_60, KmnCompilerMessages::ERROR_60FeatureOnly_Contextn);
+          if(!VerifyKeyboardVersion(fk, VERSION_60)) {
+            return KmnCompilerMessages::ERROR_60FeatureOnly_Contextn;
+          }
           int n1b;
           n1b = atoiW(q);
           if (n1b < 1 || n1b >= 0xF000) return KmnCompilerMessages::ERROR_InvalidToken;
@@ -2242,7 +2298,9 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       }
       else if (u16nicmp(p, u"call", 4) == 0)
       {
-        VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_501, KmnCompilerMessages::ERROR_501FeatureOnly_Call);
+        if(!VerifyKeyboardVersion(fk, VERSION_501)) {
+          return KmnCompilerMessages::ERROR_501FeatureOnly_Call;
+        }
         if (sFlag) return KmnCompilerMessages::ERROR_CallInVirtualKeySection;
         p += 4;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -2270,7 +2328,9 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     case 8:
       if (u16nicmp(p, u"notany", 6) == 0)
       {
-        VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_70, KmnCompilerMessages::ERROR_70FeatureOnly);
+        if(!VerifyKeyboardVersion(fk, VERSION_70)) {
+          return KmnCompilerMessages::ERROR_70FeatureOnly;
+        }
         if (sFlag) return KmnCompilerMessages::ERROR_AnyInVirtualKeySection;
         p += 6;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -2326,7 +2386,9 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     case 10:
       if (u16nicmp(p, u"reset", 5) == 0)
       {
-        VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_80, KmnCompilerMessages::ERROR_80FeatureOnly);
+        if(!VerifyKeyboardVersion(fk, VERSION_80)) {
+          return KmnCompilerMessages::ERROR_80FeatureOnly;
+        }
         if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
         p += 5;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -2405,14 +2467,20 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         ReportCompilerMessage(KmnCompilerMessages::WARN_MixingLeftAndRightModifiers);
       }
 
-      // If we use chiral modifiers, or we use state keys, and we target web in the keyboard, and we don't manually specify a keyboard version, bump the minimum
-      // version to 10.0. This makes an assumption that if we are using these features in a keyboard and it has no version specified, that we want to use the features
-      // in the web target platform, even if there are platform() rules excluding this possibility. In that (rare) situation, the keyboard developer should simply specify
-      // the &version to be 9.0 or whatever to avoid this behaviour.
+      // If we use chiral modifiers, or we use state keys, and we target web in
+      // the keyboard, and we don't manually specify a keyboard version, bump
+      // the minimum version to 10.0. This makes an assumption that if we are
+      // using these features in a keyboard and it has no version specified,
+      // that we want to use the features in the web target platform, even if
+      // there are platform() rules excluding this possibility. In that (rare)
+      // situation, the keyboard developer should simply specify the &version to
+      // be 9.0 or whatever to avoid this behaviour.
       if (sFlag & (LCTRLFLAG | LALTFLAG | RCTRLFLAG | RALTFLAG | CAPITALFLAG | NOTCAPITALFLAG | NUMLOCKFLAG | NOTNUMLOCKFLAG | SCROLLFLAG | NOTSCROLLFLAG) &&
         kmcmp::CompileTarget == CKF_KEYMANWEB &&
         fk->dwFlags & KF_AUTOMATICVERSION) {
-        VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_100, 0);
+        if(!VerifyKeyboardVersion(fk, VERSION_100)) {
+          return STATUS_Success;
+        }
       }
       //printf("sFlag: %x\n", sFlag);
 
@@ -2433,7 +2501,9 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       {
         if (*q == '\'' || *q == '"')
         {
-          VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_60, KmnCompilerMessages::ERROR_60FeatureOnly_VirtualCharKey);
+          if(!VerifyKeyboardVersion(fk, VERSION_60)) {
+            return KmnCompilerMessages::ERROR_60FeatureOnly_VirtualCharKey;
+          }
           if (!kmcmp::FMnemonicLayout) {
             ReportCompilerMessage(KmnCompilerMessages::WARN_VirtualCharKeyWithPositionalLayout);
           }
@@ -2472,7 +2542,9 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
 
         if (i == VK__MAX + 1)
         {
-          VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_90, KmnCompilerMessages::ERROR_InvalidToken);
+          if(!VerifyKeyboardVersion(fk, VERSION_90)) {
+            return KmnCompilerMessages::ERROR_InvalidToken;
+          }
 
           i = GetVKCode(fk, vkname);  // I3438
           if (i == 0)
@@ -2501,7 +2573,9 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     case 14:
       if (u16nicmp(p, u"set", 3) == 0)
       {
-        VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_80, KmnCompilerMessages::ERROR_80FeatureOnly);
+        if(!VerifyKeyboardVersion(fk, VERSION_80)) {
+          return KmnCompilerMessages::ERROR_80FeatureOnly;
+        }
         p += 3;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
         if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidSet;
@@ -2511,7 +2585,9 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       }
       else if (u16nicmp(p, u"save", 4) == 0)
       {
-        VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_80, KmnCompilerMessages::ERROR_80FeatureOnly);
+        if(!VerifyKeyboardVersion(fk, VERSION_80)) {
+          return KmnCompilerMessages::ERROR_80FeatureOnly;
+        }
         p += 4;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
         if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidSave;
@@ -2543,7 +2619,9 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         return KmnCompilerMessages::ERROR_InvalidToken;
       continue;
     case 16:
-      VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_60, KmnCompilerMessages::ERROR_60FeatureOnly_NamedCodes);
+      if(!VerifyKeyboardVersion(fk, VERSION_60)) {
+        return KmnCompilerMessages::ERROR_60FeatureOnly_NamedCodes;
+      }
       q = p + 1;
       while (*q && !iswspace(*q)) q++;
       c = *q; *q = 0;
@@ -2563,7 +2641,9 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       continue;
     case 17:
       if (u16nicmp(p, u"platform", 8) != 0) return KmnCompilerMessages::ERROR_InvalidToken;  // I3430
-      VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_90, KmnCompilerMessages::ERROR_90FeatureOnly_IfSystemStores);
+      if(!VerifyKeyboardVersion(fk, VERSION_90)) {
+        return KmnCompilerMessages::ERROR_90FeatureOnly_IfSystemStores;
+      }
       if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
       p += 8;
       q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -2573,7 +2653,9 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       continue;
     case 18:  // I3437
       if (u16nicmp(p, u"layer", 5) != 0) return KmnCompilerMessages::ERROR_InvalidToken;
-      VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_90, KmnCompilerMessages::ERROR_90FeatureOnly_SetSystemStores);
+      if(!VerifyKeyboardVersion(fk, VERSION_90)) {
+        return KmnCompilerMessages::ERROR_90FeatureOnly_SetSystemStores;
+      }
       if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
       p += 5;
       q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -2684,7 +2766,9 @@ KMX_DWORD process_if(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx) 
 
   if (r[0] == '&')
   {
-    VERIFY_KEYBOARD_VERSION_ret( fk, VERSION_90, KmnCompilerMessages::ERROR_90FeatureOnly_IfSystemStores);
+    if(!VerifyKeyboardVersion( fk, VERSION_90)) {
+      return KmnCompilerMessages::ERROR_90FeatureOnly_IfSystemStores;
+    }
     for (i = 0; StoreTokens[i]; i++)
     {
       if (u16icmp(r, StoreTokens[i]) == 0) break;
@@ -2904,7 +2988,9 @@ KMX_DWORD process_set(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
 
   if (r[0] == '&')
   {
-    VERIFY_KEYBOARD_VERSION_ret((PFILE_KEYBOARD) fk, VERSION_90, KmnCompilerMessages::ERROR_90FeatureOnly_SetSystemStores);  // I3437
+    if(!VerifyKeyboardVersion(fk, VERSION_90)) {
+      return KmnCompilerMessages::ERROR_90FeatureOnly_SetSystemStores;  // I3437
+    }
     for (i = 0; StoreTokens[i]; i++)
     {
       if (u16icmp(r, StoreTokens[i]) == 0) break;
@@ -3515,7 +3601,9 @@ KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD File
 
   /* Test for version 7.0 icon support */
   if (*((PKMX_CHAR)*Buf) != 'B' && *(((PKMX_CHAR)*Buf) + 1) != 'M') {
-    VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_70, KmnCompilerMessages::ERROR_70FeatureOnly);
+    if(!VerifyKeyboardVersion(fk, VERSION_70)) {
+      return KmnCompilerMessages::ERROR_70FeatureOnly;
+    }
   }
 
   return STATUS_Success;
