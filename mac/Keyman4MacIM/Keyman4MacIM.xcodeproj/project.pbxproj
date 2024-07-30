@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		29015ABD2C58D86F00CCBB94 /* KMDataRepository.m in Sources */ = {isa = PBXBuildFile; fileRef = 29015ABC2C58D86F00CCBB94 /* KMDataRepository.m */; };
 		290BC680274B9DB1005CD1C3 /* KMPackageInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 290BC67F274B9DB1005CD1C3 /* KMPackageInfo.m */; };
 		290BC75E274F3FD7005CD1C3 /* KMKeyboardInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 290BC75D274F3FD7005CD1C3 /* KMKeyboardInfo.m */; };
 		2915DC512BFE35DB0051FC52 /* KMLogs.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B4A0D32BF7675A00682049 /* KMLogs.m */; };
@@ -136,6 +137,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		29015ABB2C58D86F00CCBB94 /* KMDataRepository.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KMDataRepository.h; sourceTree = "<group>"; };
+		29015ABC2C58D86F00CCBB94 /* KMDataRepository.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KMDataRepository.m; sourceTree = "<group>"; };
 		2901BA8A292332B3009903EC /* ff-NG */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ff-NG"; path = "ff-NG.lproj/KMAboutWindowController.strings"; sourceTree = "<group>"; };
 		2901BA8B292332B3009903EC /* ff-NG */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ff-NG"; path = "ff-NG.lproj/preferences.strings"; sourceTree = "<group>"; };
 		2901BA8C292332B3009903EC /* ff-NG */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "ff-NG"; path = "ff-NG.lproj/KMInfoWindowController.strings"; sourceTree = "<group>"; };
@@ -553,6 +556,8 @@
 				299ABD7029ECE75B00AA5948 /* KeySender.h */,
 				D861B03D2C5747F70003675E /* KMSettingsRepository.h */,
 				D861B03E2C5747F70003675E /* KMSettingsRepository.m */,
+				29015ABB2C58D86F00CCBB94 /* KMDataRepository.h */,
+				29015ABC2C58D86F00CCBB94 /* KMDataRepository.m */,
 				297A501128DF4D360074EB1B /* Privacy */,
 				98FE105B1B4DE86300525F54 /* Categories */,
 				98D6DA791A799EE700B09822 /* Frameworks */,
@@ -982,6 +987,7 @@
 				D861B03F2C5747F70003675E /* KMSettingsRepository.m in Sources */,
 				984B8F441AF1C3D900E096A8 /* OSKWindowController.m in Sources */,
 				9836B3711AE5F11D00780482 /* mztools.c in Sources */,
+				29015ABD2C58D86F00CCBB94 /* KMDataRepository.m in Sources */,
 				9836B3701AE5F11D00780482 /* ioapi.c in Sources */,
 				E21799051FC5B7BC00F2D66A /* KMInputMethodEventHandler.m in Sources */,
 				98E6729F1B532F5E00DBDE2F /* KMDownloadKBWindowController.m in Sources */,

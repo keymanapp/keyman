@@ -17,6 +17,7 @@
 
 #import "KMInputMethodAppDelegate.h"
 #import "KMSettingsRepository.h"
+#import "KMDataRepository.h"
 #import "KMConfigurationWindowController.h"
 #import "KMDownloadKBWindowController.h"
 #import "ZipArchive.h"
@@ -763,10 +764,12 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 - (void)awakeFromNib {
   if ([KMSettingsRepository.shared keyboardsMigrationNeeded]) {
     os_log_info([KMLogs startupLog], "keyboards migration needed");
+    [KMDataRepository.shared migrateResources];
   } else {
     os_log_info([KMLogs startupLog], "keyboards migration not needed");
   }
 
+  
   [self setDefaultKeymanMenuItems];
   [self updateKeyboardMenuItems];
 }
