@@ -4,11 +4,11 @@ import {
 
 import {
   Keyboard,
-  KeyboardInterface,
   KeyboardProperties,
   MinimalKeymanGlobal
 } from '@keymanapp/keyboard-processor';
 
+import { KeyboardInterface } from 'keyman/engine/js-processor';
 import { KeyboardStub } from 'keyman/engine/package-cache';
 
 const loader = new DOMKeyboardLoader(new KeyboardInterface(window, MinimalKeymanGlobal));

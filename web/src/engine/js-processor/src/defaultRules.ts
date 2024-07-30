@@ -1,18 +1,11 @@
-// TODO:  Move to separate folder:  'codes'
-// We should start splitting off code needed by keyboards even without a KeyboardProcessor active.
-// There's an upcoming `/common/web/types` package that 'codes' and 'keyboards' may fit well within.
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Implementation of default rules
+ */
 
-import { ModifierKeyConstants} from '@keymanapp/common-types';
-import Codes from "./codes.js";
-import type KeyEvent from "./keyEvent.js";
-import type OutputTarget from "./outputTarget.js";
-
-// The only members referenced are to produce warning and error logs.  A little abstraction
-// via an optional 'logger' interface can maintain it while facilitating a the split alluded
-// to above.
-//
-// Alternatively, we could just... not take in the parameter at all, which'd also facilitate
-// the future modularization effort.
+import { ModifierKeyConstants } from '@keymanapp/common-types';
+import { BASE_DEFAULT_RULES, Codes, type KeyEvent, type OutputTarget } from "@keymanapp/keyboard-processor";
 import RuleBehavior from "./ruleBehavior.js";
 
 export enum EmulationKeystrokes {
@@ -191,7 +184,7 @@ export default class DefaultRules {
 
     // check if exact match to SHIFT's code.  Only the 'default' and 'shift' layers should have default key outputs.
     // TODO:  Extend to allow AltGr as well - better mnemonic support.
-    if(keyShiftState == ModifierKeyConstants.K_SHIFTFLAG) {
+    if (keyShiftState == ModifierKeyConstants.K_SHIFTFLAG) {
       keyShiftState = 1;
     } else if(keyShiftState != 0) {
       if(ruleBehavior) {
@@ -224,3 +217,9 @@ export default class DefaultRules {
     return null;
   }
 }
+
+/**
+ * A simple instance of the standard 'default rules' for keystroke processing from the
+ * DefaultRules base class.
+ */
+BASE_DEFAULT_RULES.instance = new DefaultRules();

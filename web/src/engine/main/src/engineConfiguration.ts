@@ -1,6 +1,7 @@
 import { EventEmitter } from "eventemitter3";
 
-import { DeviceSpec, KeyboardProperties, ManagedPromise, OutputTarget, physicalKeyDeviceAlias, RuleBehavior, SpacebarText } from "@keymanapp/keyboard-processor";
+import { DeviceSpec, KeyboardProperties, ManagedPromise, OutputTarget, physicalKeyDeviceAlias, SpacebarText } from "@keymanapp/keyboard-processor";
+import { RuleBehavior } from 'keyman/engine/js-processor';
 import { PathConfiguration, PathOptionDefaults, PathOptionSpec } from "keyman/engine/interfaces";
 import { Device } from "keyman/engine/device-detect";
 import { KeyboardStub } from "keyman/engine/package-cache";

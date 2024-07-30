@@ -1,5 +1,6 @@
 import Keyboard from "./keyboard.js";
 import Codes from "../text/codes.js";
+import { DeviceSpec } from '@keymanapp/web-utils';
 
 /**
  * Defines members of the top-level `keyman` global object necessary to guarantee
@@ -40,6 +41,8 @@ export const MinimalKeymanGlobal: KeyboardKeymanGlobal = {
 export class KeyboardHarness {
   public readonly _jsGlobal: any;
   public readonly keymanGlobal: KeyboardKeymanGlobal;
+  activeDevice: DeviceSpec;
+
 
   /**
    * Constructs and configures a harness for receiving dynamically-loaded Keyman keyboards.

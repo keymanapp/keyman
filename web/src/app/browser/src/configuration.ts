@@ -1,7 +1,8 @@
 import { EngineConfiguration, InitOptionSpec, InitOptionDefaults } from "keyman/engine/main";
 
 import { OutputTarget as DOMOutputTarget } from 'keyman/engine/element-wrappers';
-import { isEmptyTransform, OutputTarget, RuleBehavior } from '@keymanapp/keyboard-processor';
+import { isEmptyTransform, OutputTarget } from '@keymanapp/keyboard-processor';
+import { RuleBehavior } from 'keyman/engine/js-processor';
 import { AlertHost } from "./utils/alertHost.js";
 import { whenDocumentReady } from "./utils/documentReady.js";
 

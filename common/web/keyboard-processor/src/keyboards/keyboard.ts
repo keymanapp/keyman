@@ -6,10 +6,82 @@ import type OutputTarget from "../text/outputTarget.js";
 import { ModifierKeyConstants, TouchLayout } from "@keymanapp/common-types";
 type TouchLayoutSpec = TouchLayout.TouchLayoutPlatform & { isDefault?: boolean};
 
-import type { ComplexKeyboardStore } from "../text/kbdInterface.js";
+import type { ComplexKeyboardStore, KeyboardStore } from "../text/systemStores.js";
 
 import { Version, DeviceSpec } from "@keymanapp/web-utils";
 import StateKeyMap from "./stateKeyMap.js";
+
+export class RuleDeadkey {
+  /** Discriminant field - 'd' for Deadkey.
+   */
+  t: 'd';
+
+  /**
+   * Value:  the deadkey's ID.
+   */
+  d: number; // For 'd'eadkey; also reflects the Deadkey class's 'd' property.
+}
+
+export class StoreBeep {
+  /** Discriminant field - 'b' for `beep`
+   */
+  ['t']: 'b';
+}
+
+export type RuleChar = string;
+
+export class ContextAny {
+  /** Discriminant field - 'a' for `any()`.
+   */
+  ['t']: 'a';
+
+  /**
+   * Value:  the store to search.
+   */
+  ['a']: KeyboardStore; // For 'a'ny statement.
+
+  /**
+   * If set to true, negates the 'any'.
+   */
+  ['n']: boolean | 0 | 1;
+}
+
+export class RuleIndex {
+  /** Discriminant field - 'i' for `index()`.
+   */
+  ['t']: 'i';
+
+  /**
+   * Value: the Store from which to output
+   */
+  ['i']: KeyboardStore;
+
+  /**
+   * Offset: the offset in context for the corresponding `any()`.
+   */
+  ['o']: number;
+}
+
+export class ContextEx {
+  /** Discriminant field - 'c' for `context()`.
+   */
+  ['t']: 'c';
+
+  /**
+   * Value:  The offset into the current rule's context to be matched.
+   */
+  ['c']: number; // For 'c'ontext statement.
+}
+
+export class ContextNul {
+  /** Discriminant field - 'n' for `nul`
+   */
+  ['t']: 'n';
+}
+
+
+
+export type StoreNonCharEntry = RuleDeadkey | StoreBeep;
 
 /**
  * Stores preprocessed properties of a keyboard for quick retrieval later.

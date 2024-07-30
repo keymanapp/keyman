@@ -27,6 +27,7 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   ":engine/dom-utils         A common subset of function used for DOM calculations, layout, etc" \
   ":engine/events            Specialized classes utilized to support KMW API events" \
   ":engine/element-wrappers  Subset used to integrate with website elements" \
+  ":engine/js-processor      Build JS processor for KMW" \
   ":engine/main              Builds all common code used by KMW's app/-level targets" \
   ":engine/osk               Builds the Web OSK module" \
   ":engine/package-cache     Subset used to collate keyboards and request them from the cloud" \
@@ -57,6 +58,7 @@ builder_describe_outputs \
   build:engine/dom-utils        "/web/build/engine/dom-utils/obj/index.js" \
   build:engine/events           "/web/build/engine/events/lib/index.mjs" \
   build:engine/element-wrappers "/web/build/engine/element-wrappers/lib/index.mjs" \
+  build:engine/js-processor     "/web/build/engine/js-processor/lib/index.mjs" \
   build:engine/main             "/web/build/engine/main/lib/index.mjs" \
   build:engine/osk              "/web/build/engine/osk/lib/index.mjs" \
   build:engine/package-cache    "/web/build/engine/package-cache/lib/index.mjs" \

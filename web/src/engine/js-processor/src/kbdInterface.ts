@@ -7,18 +7,8 @@
 
 import { type DeviceSpec } from "@keymanapp/web-utils";
 import { ModifierKeyConstants } from '@keymanapp/common-types';
-
-import Codes from "./codes.js";
-import type KeyEvent from "./keyEvent.js";
-import type { Deadkey } from "./deadkeys.js";
-import KeyMapping from "./keyMapping.js";
-import { SystemStore, MutableSystemStore, PlatformSystemStore } from "./systemStores.js";
-import type { VariableStoreSerializer } from "./keyboardProcessor.js";
-import type OutputTarget from "./outputTarget.js";
-import { Mock } from "./outputTarget.js";
+import { Codes, type KeyEvent, type Deadkey, ComplexKeyboardStore, type KeyboardStore, KeyboardStoreElement, KeyMapping, SystemStoreIDs, SystemStore, MutableSystemStore, PlatformSystemStore, type OutputTarget, Mock, Keyboard, VariableStore, VariableStoreDictionary, VariableStoreSerializer, KeyboardHarness, KeyboardKeymanGlobal, RuleDeadkey, ContextAny, RuleIndex, ContextEx, ContextNul, RuleChar } from "@keymanapp/keyboard-processor";
 import RuleBehavior from "./ruleBehavior.js";
-import Keyboard, { VariableStoreDictionary } from "../keyboards/keyboard.js";
-import { KeyboardHarness, KeyboardKeymanGlobal } from "../keyboards/keyboardHarness.js";
 
 //#endregion
 
@@ -30,92 +20,8 @@ export class KeyInformation {
   modifiers: number;
 }
 
-/*
-* Type alias definitions to reflect the parameters of the fullContextMatch() callback (KMW 10+).
-* No constructors or methods since keyboards will not utilize the same backing prototype, and
-* property names are shorthanded to promote minification.
-*/
-type PlainKeyboardStore = string;
-
-export type KeyboardStoreElement = (string|StoreNonCharEntry);
-export type ComplexKeyboardStore = KeyboardStoreElement[];
-
-type KeyboardStore = PlainKeyboardStore | ComplexKeyboardStore;
-
-export type VariableStore = {[name: string]: string};
-
-type RuleChar = string;
-
-class RuleDeadkey {
-  /** Discriminant field - 'd' for Deadkey.
-   */
-  t: 'd';
-
-  /**
-   * Value:  the deadkey's ID.
-   */
-  d: number; // For 'd'eadkey; also reflects the Deadkey class's 'd' property.
-}
-
-class ContextAny {
-  /** Discriminant field - 'a' for `any()`.
-   */
-  ['t']: 'a';
-
-  /**
-   * Value:  the store to search.
-   */
-  ['a']: KeyboardStore; // For 'a'ny statement.
-
-  /**
-   * If set to true, negates the 'any'.
-   */
-  ['n']: boolean|0|1;
-}
-
-class RuleIndex {
-  /** Discriminant field - 'i' for `index()`.
-   */
-  ['t']: 'i';
-
-  /**
-   * Value: the Store from which to output
-   */
-  ['i']: KeyboardStore;
-
-  /**
-   * Offset: the offset in context for the corresponding `any()`.
-   */
-  ['o']: number;
-}
-
-class ContextEx {
-  /** Discriminant field - 'c' for `context()`.
-   */
-  ['t']: 'c';
-
-  /**
-   * Value:  The offset into the current rule's context to be matched.
-   */
-  ['c']: number; // For 'c'ontext statement.
-}
-
-class ContextNul {
-  /** Discriminant field - 'n' for `nul`
-   */
-  ['t']: 'n';
-}
-
-class StoreBeep {
-  /** Discriminant field - 'b' for `beep`
-   */
-  ['t']: 'b';
-}
-
 type ContextNonCharEntry = RuleDeadkey | ContextAny | RuleIndex | ContextEx | ContextNul;
 type ContextEntry = RuleChar | ContextNonCharEntry;
-
-type StoreNonCharEntry = RuleDeadkey | StoreBeep;
 
 /**
  * Cache of context storing and retrieving return values from KC
@@ -182,13 +88,6 @@ class CachedContextEx {
     return r;
   }
 };
-
-export enum SystemStoreIDs {
-  TSS_LAYER = 33,
-  TSS_PLATFORM = 31,
-  TSS_NEWLAYER = 42,
-  TSS_OLDLAYER = 43
-}
 
 //#endregion
 

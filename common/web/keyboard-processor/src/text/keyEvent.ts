@@ -10,18 +10,30 @@ import type Keyboard from "../keyboards/keyboard.js";
 import { type DeviceSpec } from "@keymanapp/web-utils";
 
 import Codes from './codes.js';
-import DefaultRules from './defaultRules.js';
 import { ActiveKeyBase } from "../index.js";
+
+interface DefaultRulesInterface {
+  forAny(Lkc: KeyEvent, isMnemonic: boolean): string;
+}
+
+export class BASE_DEFAULT_RULES {
+  private static _instance: DefaultRulesInterface;
+
+  // Prevent direct instantiation.
+  private constructor() { }
+
+  public static forAny(Lkc: KeyEvent, isMnemonic: boolean): string {
+    return this._instance.forAny(Lkc, isMnemonic);
+  }
+
+  public static set instance(value: DefaultRulesInterface) {
+    this._instance = value;
+  }
+}
 
 // Represents a probability distribution over a keyboard's keys.
 // Defined here to avoid compilation issues.
-export type KeyDistribution = {keySpec: ActiveKeyBase, p: number}[];
-
-/**
- * A simple instance of the standard 'default rules' for keystroke processing from the
- * DefaultRules base class.
- */
-const BASE_DEFAULT_RULES = new DefaultRules();
+export type KeyDistribution = { keySpec: ActiveKeyBase, p: number }[];
 
 export interface KeyEventSpec {
 

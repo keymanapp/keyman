@@ -1,4 +1,5 @@
-import { type Keyboard, KeyboardKeymanGlobal, ProcessorInitOptions } from "@keymanapp/keyboard-processor";
+import { type KeyEvent, type Keyboard, KeyboardKeymanGlobal } from "@keymanapp/keyboard-processor";
+import { ProcessorInitOptions, RuleBehavior } from 'keyman/engine/js-processor';
 import { DOMKeyboardLoader as KeyboardLoader } from "@keymanapp/keyboard-processor/dom-keyboard-loader";
 import { InputProcessor } from './headless/inputProcessor.js';
 import { OSKView } from "keyman/engine/osk";
@@ -10,7 +11,7 @@ import KeyboardInterface from "./keyboardInterface.js";
 import { ContextManagerBase } from "./contextManagerBase.js";
 import HardKeyboardBase from "./hardKeyboard.js";
 import { LegacyAPIEvents } from "./legacyAPIEvents.js";
-import { KeyEventHandler, EventNames, EventListener, LegacyEventEmitter } from "keyman/engine/events";
+import { EventNames, EventListener, LegacyEventEmitter } from "keyman/engine/events";
 import DOMCloudRequester from "keyman/engine/package-cache/dom-requester";
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
@@ -28,6 +29,9 @@ function determineBaseLayout(): string {
     return 'us';
   }
 }
+
+export type KeyEventFullResultCallback = (result: RuleBehavior, error?: Error) => void;
+export type KeyEventFullHandler = (event: KeyEvent, callback?: KeyEventFullResultCallback) => void;
 
 export default class KeymanEngine<
   Configuration extends EngineConfiguration,
@@ -47,7 +51,7 @@ export default class KeymanEngine<
 
   protected keyEventRefocus?: () => void;
 
-  private keyEventListener: KeyEventHandler = (event, callback) => {
+  private keyEventListener: KeyEventFullHandler = (event, callback) => {
     const outputTarget = this.contextManager.activeTarget;
 
     if(!this.contextManager.activeKeyboard || !outputTarget) {

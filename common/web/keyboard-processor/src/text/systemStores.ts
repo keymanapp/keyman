@@ -1,5 +1,31 @@
-import type KeyboardInterface from "./kbdInterface.js";
-import { SystemStoreIDs } from "./kbdInterface.js";
+import { type KeyboardHarness } from "../keyboards/keyboardHarness.js";
+import { StoreNonCharEntry } from '../keyboards/keyboard.js';
+
+export enum SystemStoreIDs {
+  TSS_LAYER = 33,
+  TSS_PLATFORM = 31,
+  TSS_NEWLAYER = 42,
+  TSS_OLDLAYER = 43
+}
+
+/*
+* Type alias definitions to reflect the parameters of the fullContextMatch() callback (KMW 10+).
+* No constructors or methods since keyboards will not utilize the same backing prototype, and
+* property names are shorthanded to promote minification.
+*/
+type PlainKeyboardStore = string;
+
+export type KeyboardStoreElement = (string | StoreNonCharEntry);
+export type ComplexKeyboardStore = KeyboardStoreElement[];
+
+export type KeyboardStore = PlainKeyboardStore | ComplexKeyboardStore;
+
+export type VariableStore = { [name: string]: string };
+
+export interface VariableStoreSerializer {
+  loadStore(keyboardID: string, storeName: string): VariableStore;
+  saveStore(keyboardID: string, storeName: string, storeMap: VariableStore): void;
+}
 
 /**
  * Defines common behaviors associated with system stores.
@@ -61,9 +87,9 @@ export class MutableSystemStore extends SystemStore {
  * Handles checks against the current platform.
  */
 export class PlatformSystemStore extends SystemStore {
-  private readonly kbdInterface: KeyboardInterface;
+  private readonly kbdInterface: KeyboardHarness;
 
-  constructor(keyboardInterface: KeyboardInterface) {
+  constructor(keyboardInterface: KeyboardHarness) {
     super(SystemStoreIDs.TSS_PLATFORM);
 
     this.kbdInterface = keyboardInterface;
