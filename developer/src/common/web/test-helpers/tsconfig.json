@@ -9,7 +9,4 @@
   "include": [
     "./*.ts",
   ],
-  "references": [
-    { "path": "../../../../../common/web/types/" },
-  ]
 }

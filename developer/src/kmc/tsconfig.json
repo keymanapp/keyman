@@ -9,15 +9,4 @@
   "include": [
     "src/**/*.ts"
   ],
-  "references": [
-    { "path": "../../../common/web/keyman-version" },
-    { "path": "../../../common/web/types" },
-    { "path": "../kmc-analyze" },
-    { "path": "../kmc-keyboard-info" },
-    { "path": "../kmc-kmn" },
-    { "path": "../kmc-ldml" },
-    { "path": "../kmc-model" },
-    { "path": "../kmc-model-info" },
-    { "path": "../kmc-package" },
-  ]
 }
