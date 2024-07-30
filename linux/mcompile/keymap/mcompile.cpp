@@ -11,28 +11,11 @@
 
 #include "mcompile.h"
 
-/**
- * @brief  convert mnemonic keyboard layout to positional keyboard layout and translate keyboard
- * @param  kbd pointer to US keyboard
- * @param  bDeadkeyConversion option for converting a deadkey to a character: 1 = dk conversion; 0 = no dk conversion
- * @param  argc number of command line arguments
- * @param  argv pointer to command line arguments
- * @return TRUE if conversion was successful;
- *         FALSE if not
- */
 KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint argc, gchar* argv[]);
 
-/** @brief  Collect the key data, translate it to kmx and append to the existing keyboard */
-bool KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, GdkKeymap** keymap, std::vector<KMX_DeadkeyMapping>* KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion);  // I4353   // I4327
+bool KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, GdkKeymap** keymap, std::vector<KMX_DeadkeyMapping>* KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion); // I4353   // I4327
 
-/**
- * @brief  start of mcompile; load, convert and save keyboard
- * @param  argc number of commandline arguments
- * @param  argv pointer to commandline arguments: executable, inputfile, outputfile
- * @param  argv_gdk pointer to (commandline arguments)
- * @return 0 on success, 1 for wrong usage of calling parameters, 3 if unable to load keyboard
- */
-int run(int argc, char* argv[], char* argv_gdk[] = NULL);
+int run(int argc, char* argv[]);
 
 /**
  * @brief  return an array of [usvk, ch_out] pairs: all existing combinations of a deadkey + character for the underlying keyboard
@@ -55,22 +38,21 @@ std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;  // I4353
  * @return 0 on success
  */
 #if defined(_WIN32) || defined(_WIN64)
-int wmain(int argc, wchar_t* argv[]) {
-  /**
+  int wmain(int argc, wchar_t* argv[]) {  
+/**
  * TODO for cros platform use: if we want to use wmain instead of main:
  * inside wmain convert wchar_t* argv[] to char* argv_ch[]
  * to be able to use run(int argc, char* argv[])
  */
-  run(argc, argv);
-
 #else  // LINUX
-int main(int argc, char* argv[]) {
-  run(argc, argv, argv);
+  int main(int argc, char* argv[]) {
 #endif
+
+  run(argc, argv);
 }
 
-/** @brief  start of mcompile; load, convert and save keyboard */
-int run(int argc, char* argv[], char* argv_gdk[]) {
+int run(int argc, char* argv[]) {
+
   int bDeadkeyConversion = 0;
 
   if (argc > 1)
@@ -135,12 +117,7 @@ int run(int argc, char* argv[], char* argv_gdk[]) {
   }*/
 
 #else  // LINUX
-  if (argv_gdk == NULL) {
-    KMX_LogError(L"Missing parameter for initializing GdkKeymap \n");
-    return 3;
-  }
-
-  if (KMX_DoConvert(kmxfile, bDeadkeyConversion, argc, (gchar**)argv_gdk)) {  // I4552F
+  if (KMX_DoConvert(kmxfile, bDeadkeyConversion, argc, (gchar**)argv)) {  // I4552F
     KMX_SaveKeyboard(kmxfile, outfile);
   }
 

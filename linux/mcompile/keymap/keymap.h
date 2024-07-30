@@ -60,7 +60,7 @@ typedef std::vector<std::vector<KMX_DWORD> > vec_dword_2D;
 typedef std::vector<std::vector<std::vector<KMX_DWORD> > > vec_dword_3D;
 
 static KMX_DWORD INVALID_NAME = 0;
-static KMX_DWORD keycode_max  = 94;
+static gint keycode_max  = 94;
 static KMX_DWORD deadkey_min  = 0xfe50;  // X11's keysymdef.h defines deadkeys between 0xfe50-0xfe93
 static KMX_DWORD deadkey_max  = 0xfe93;  // https://fossies.org/linux/tk/xlib/X11/keysymdef.h
 
@@ -73,6 +73,7 @@ inline bool isLittleEndianSystem() {
   return (reinterpret_cast<char*>(&test))[0] == 0x02;
 }
 
+
 /**
  * @brief  map a shiftstate used on windows to a shiftstate suitable for gdk_keymap_translate_keyboard_state() on Linux
  *            Windows: (Base: 00000000 (0); Shift 00010000 (16); AltGr 00001001 (9); Shift+AltGr 00011001 (25))
@@ -83,16 +84,16 @@ inline bool isLittleEndianSystem() {
  *         if shiftState is NOT a windows ShiftState (then in_ShiftState is already a Linux shiftstate): return the entered shiftstate
  */
 int convert_Shiftstate_to_LinuxShiftstate(int shiftState);
+int convert_rgkey_Shiftstate_to_LinuxShiftstate(ShiftState shiftState);
 
 /**
  * @brief  check for correct input parameter that will later be used in gdk_keymap_translate_keyboard_state()
  * @param  shiftstate the currently used shiftstate
- * @param  count the number of valid group/levels
  * @param  keycode the code of the key in question
  * @return true if all parameters are OK;
  * 				 false if not
  */
-bool ensureValidInputForKeyboardTranslation(int shiftstate, gint count, gint keycode);
+bool ensureValidInputForKeyboardTranslation(int shiftstate, gint keycode);
 
 /**
  * @brief  convert names of keys stated in a symbol file to a keyvalue

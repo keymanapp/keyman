@@ -39,6 +39,7 @@ std::u16string u16string_from_string(std::string const str);
  */
 std::string string_from_u16string(std::u16string const str);
 
+
 /**
  * @brief  Obtain a std::wstring from a std::u16string
  * @param  str the std::u16string to be converted
@@ -69,6 +70,7 @@ void u16sprintf(KMX_WCHAR* dst, const size_t sz, const wchar_t* fmt, ...);
  * @param  base Numerical base (radix) that determines the valid characters and their interpretation
  * @return a std::string
  */
+
 long int u16tol(const KMX_WCHAR* str, KMX_WCHAR** endptr, int base);
 
 /**

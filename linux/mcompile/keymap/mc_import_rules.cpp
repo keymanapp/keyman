@@ -65,7 +65,7 @@ bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
  *          0 if no translation is available;
  *          +1 if character was found and written to pwszBuff
  */
-int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int ss, int caps, GdkKeymap* keymap) {
+int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, ShiftState rgkey_ss, int caps, GdkKeymap* keymap) {
   GdkKeymapKey* maps;
   guint* keyvals;
   gint count;
@@ -73,15 +73,22 @@ int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, int ss, int caps, GdkKey
   if (!gdk_keymap_get_entries_for_keycode(keymap, keycode, &maps, &keyvals, &count))
     return 0;
 
-  if (!(ensureValidInputForKeyboardTranslation(ss, count, keycode))) {
+  if (!(ensureValidInputForKeyboardTranslation(convert_rgkey_Shiftstate_to_LinuxShiftstate(rgkey_ss), keycode))){
     g_free(keyvals);
     g_free(maps);
     return 0;
   }
 
-  KMX_DWORD keyVal = KMX_get_KeyVal_From_KeyCode(keymap, keycode, ShiftState(ss), caps);
+  KMX_DWORD keyVal = (KMX_DWORD)KMX_get_KeyVal_From_KeyCode(keymap, keycode, rgkey_ss, caps);
   std::u16string str = convert_DeadkeyValues_To_U16str(keyVal);
-  pwszBuff[0] = *(PKMX_WCHAR)str.c_str();
+  KMX_WCHAR firstchar = *(PKMX_WCHAR)str.c_str();
+
+  if ((firstchar >= 0xD800) &&(firstchar <= 0xDFFF)) {
+    wprintf(L"Surrogate pair found that is not processed in KMX_ToUnicodeEx\n");
+    return 0;
+  }
+
+  pwszBuff[0] = firstchar;
 
   g_free(keyvals);
   g_free(maps);

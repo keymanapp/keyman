@@ -10,7 +10,6 @@
 #include <stdarg.h>
 #include "utfcodec.hpp"
 
-
 // string <- wstring
 /** @brief Obtain a std::string from a std::wstring */
 std::string string_from_wstring(std::wstring const str) {
