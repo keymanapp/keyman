@@ -13,6 +13,39 @@ import ModelCompositor from './model-compositor.js';
 
 export const AUTOSELECT_PROPORTION_THRESHOLD = .66;
 
+/**
+ * Defines thresholds used to determine when it is appropriate to stop searching
+ * for more prediction-roots.
+ *
+ * Note that these costs are defined in log-space; a value of 4 corresponds to
+ * a factor of `e^-4`, or about 0.0183.
+ */
+export const CORRECTION_SEARCH_THRESHOLDS = {
+  /**
+   * Defines the maximum search range used to find additional prediction roots
+   * once the first correction yielding a viable prediction has been found.
+   *
+   * If that "first correction" has an edge cost of 1 in log-space, the search
+   * would stop at a total cost of 1 + this value.
+   */
+  MAX_SEARCH_THRESHOLD: 8 as const,
+  /**
+   * Defines the maximum search range used to find additional prediction roots
+   * once enough viable predictions have been found to return a "full" set.
+   * ("Full": enough to meet the count set by `ModelCompositor.MAX_SUGGESTIONS`)
+   *
+   * It _is_ possible to find 'better' predictions rooted on 'worse'
+   * corrections, but the further we search, the less likely it is we'll find
+   * strong enough replacements.
+   *
+   *
+   * If the first correction yielding a viable prediction has an edge cost of 1
+   * in log-space, the search would stop at a total cost of 1 + this value if
+   * a "full" set of suggestions had already been found.
+   */
+  REPLACEMENT_SEARCH_THRESHOLD: 4 as const // e^-4 = 0.0183156388.  Allows "80%" of an extra edit.
+}
+
 export type CorrectionPredictionTuple = {
   prediction: ProbabilityMass<Suggestion>,
   correction: ProbabilityMass<string>,
@@ -71,10 +104,6 @@ export async function correctAndEnumerate(
   // Assertion / pre-condition:  `transformDistribution` should be sorted!
   const inputTransform = transformDistribution[0].sample;
 
-  // Only allow new-word suggestions if space was the most likely keypress.
-  const allowSpace = TransformUtils.isWhitespace(inputTransform);
-  const allowBksp = TransformUtils.isBackspace(inputTransform);
-
   const postContext = models.applyTransform(inputTransform, context);
   let postContextState: TrackedContextState = null;
 
@@ -89,6 +118,10 @@ export async function correctAndEnumerate(
   // when the `LexiconTraversal` pattern was established.
   if(!contextTracker) {
     let predictionRoots: ProbabilityMass<Transform>[];
+
+    // Only allow new-word suggestions if space was the most likely keypress.
+    const allowSpace = TransformUtils.isWhitespace(inputTransform);
+    const allowBksp = TransformUtils.isBackspace(inputTransform);
 
     // Generates raw prediction distributions for each valid input.  Can only 'correct'
     // against the final input.
@@ -155,6 +188,7 @@ export async function correctAndEnumerate(
   // from the received input.
   const postContextTokens = postContextState.tokens;
   let postContextLength = postContextTokens.length;
+  // Only use of `contextState`.
   let contextLengthDelta = postContextTokens.length - contextState.tokens.length;
   // If the context now has more tokens, the token we'll be 'predicting' didn't originally exist.
   if(postContextLength == 0 || contextLengthDelta > 0) {
@@ -192,7 +226,6 @@ export async function correctAndEnumerate(
                               // should not be replaced.  Predictions are to be rooted on
                               // text "up for correction" - so we want a null root for this
                               // branch.
-      contextState = postContextState;
     }
     // If the tokenized context length is shorter... sounds like a backspace (or similar).
   } else if (contextLengthDelta < 0) {
@@ -283,7 +316,7 @@ export async function correctAndEnumerate(
 
     // Only set 'best correction' cost when a correction ACTUALLY YIELDS predictions.
     if(predictions.length > 0 && bestCorrectionCost === undefined) {
-      bestCorrectionCost = -Math.log(predictionRoot.p);
+      bestCorrectionCost = rootCost;
     }
 
     // If we're getting the same prediction again, it's lower-cost.  Update!
@@ -296,26 +329,8 @@ export async function correctAndEnumerate(
 
     rawPredictions = rawPredictions.concat(predictions);
 
-    let correctionCost = match.totalCost;
-    // Searching a bit longer is permitted when no predictions have been found.
-    if(correctionCost >= bestCorrectionCost + 8) {
+    if(shouldStopSearchingEarly(bestCorrectionCost, match.totalCost, rawPredictions)) {
       break;
-      // If enough have been found, we're safe to terminate earlier.
-    } else if(rawPredictions.length >= ModelCompositor.MAX_SUGGESTIONS) {
-        if(correctionCost >= bestCorrectionCost + 4) { // e^-4 = 0.0183156388.  Allows "80%" of an extra edit.
-        // Very useful for stopping 'sooner' when words reach a sufficient length.
-        break;
-      } else {
-        // Sort the prediction list; we need them in descending order for the next check.
-        rawPredictions.sort(tupleDisplayOrderSort);
-
-        // If the best suggestion from the search's current tier fails to beat the worst
-        // pending suggestion from previous tiers, assume all further corrections will
-        // similarly fail to win; terminate the search-loop.
-        if(rawPredictions[ModelCompositor.MAX_SUGGESTIONS-1].totalProb > Math.exp(-correctionCost)) {
-          break;
-        }
-      }
     }
   }
 
@@ -326,6 +341,34 @@ export async function correctAndEnumerate(
     postContextState: postContextState,
     rawPredictions: rawPredictions
   };
+}
+
+export function shouldStopSearchingEarly(
+  bestCorrectionCost: number,
+  currentCorrectionCost: number,
+  rawPredictions: CorrectionPredictionTuple[]
+) {
+  if(currentCorrectionCost >= bestCorrectionCost + CORRECTION_SEARCH_THRESHOLDS.MAX_SEARCH_THRESHOLD) {
+    return true;
+    // If enough have been found, we're safe to terminate earlier.
+  } else if(rawPredictions.length >= ModelCompositor.MAX_SUGGESTIONS) {
+    if(currentCorrectionCost >= bestCorrectionCost + CORRECTION_SEARCH_THRESHOLDS.REPLACEMENT_SEARCH_THRESHOLD) {
+      // Very useful for stopping 'sooner' when words reach a sufficient length.
+      return true;
+    } else {
+      // Sort the prediction list; we need them in descending order for the next check.
+      rawPredictions.sort(tupleDisplayOrderSort);
+
+      // If the best suggestion from the search's current tier fails to beat the worst
+      // pending suggestion from previous tiers, assume all further corrections will
+      // similarly fail to win; terminate the search-loop.
+      if(rawPredictions[ModelCompositor.MAX_SUGGESTIONS-1].totalProb > Math.exp(-currentCorrectionCost)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 /**
