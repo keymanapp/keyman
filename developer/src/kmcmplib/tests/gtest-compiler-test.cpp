@@ -641,7 +641,7 @@ TEST_F(CompilerTest, LineTokenType_test) {
     EXPECT_EQ(T_COMMENT, LineTokenType(&p));
     EXPECT_EQ(0, p - str);
 
-    // comment without following space
+    // comment without following space ... potential bug, but ReadLine() currently ensures following space
     u16cpy(str, u"c");
     p = str;
     EXPECT_EQ(T_UNKNOWN, LineTokenType(&p));
