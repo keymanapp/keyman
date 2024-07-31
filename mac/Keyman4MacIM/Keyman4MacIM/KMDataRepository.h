@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface KMDataRepository : NSObject
 + (KMDataRepository *)shared;
 - (void)migrateResources;
-- (NSString *)keymanDataDirectory;
+- (NSURL *)keymanDataDirectory;
 @end
 
 NS_ASSUME_NONNULL_END
