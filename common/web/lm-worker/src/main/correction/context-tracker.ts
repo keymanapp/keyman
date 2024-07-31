@@ -340,7 +340,14 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     }
 
     const firstMatch = editPath.indexOf('match');
-    const lastMatch = editPath.lastIndexOf('match');
+    let lastMatch = editPath.lastIndexOf('match');
+
+    // Special handling: appending whitespace to whitespace with the default wordbreaker.
+    // The default wordbreaker currently adds an empty token after whitespace; this would
+    // show up with 'substitute', 'match' at the end of the edit path.
+    if(editPath.length >= 2 && editPath[editPath.length - 2] == 'substitute' && editPath[editPath.length - 1] == 'match') {
+      lastMatch = editPath.lastIndexOf('match', editPath.length - 2);
+    }
 
     // Assertion:  for a long context, the bulk of the edit path should be a
     // continuous block of 'match' entries.  If there's anything else in
@@ -488,7 +495,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
 
           break;
         case 'insert':
-          if(priorEdit && priorEdit != 'substitute' && priorEdit != 'match') {
+          if(priorEdit && priorEdit != 'substitute' && priorEdit != 'match' && priorEdit != 'insert') {
             return null;
           }
 
@@ -527,6 +534,15 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
           // Auto-replaces the search space to correspond with the new token.
           state.pushTail(pushedToken);
           break;
+        case 'match':
+          // The default (Unicode) wordbreaker returns an empty token after whitespace blocks.
+          // Adding new whitespace extends the whitespace block but preserves the empty token
+          // following it.
+          if(priorEdit == 'substitute' && tokenizedContext[tokenizedContext.length-1].text == '') {
+            // Keep the blank token as-is; no edit needed!
+            continue;
+          }
+          // else 'fallthrough' / return null
         default:
           // No 'delete' should exist on the trailing edge of context when the
           // context window slides.  While it can happen due to keystrokes with
@@ -537,6 +553,8 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
           // No 'transform' edits should exist within this section, either.
           return null;
       }
+
+      priorEdit = editPath[i];
     }
 
     return { state, baseState: matchState, preservationTransform };

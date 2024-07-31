@@ -98,13 +98,9 @@ class Traversal implements LexiconTraversal {
   }
 
   child(char: USVString): LexiconTraversal | undefined {
-    /*
-      Note: would otherwise return the current instance if `char == ''`.  If
-      such a call is happening, it's probably indicative of an implementation
-      issue elsewhere - let's signal now in order to catch such stuff early.
-    */
+    // May result for blank tokens resulting immediately after whitespace.
     if(char == '') {
-      return undefined;
+      return this;
     }
 
     // Split into individual code units.

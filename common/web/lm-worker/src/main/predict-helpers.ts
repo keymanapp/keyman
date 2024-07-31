@@ -232,6 +232,13 @@ export async function correctAndEnumerate(
   // NOTE:  we only want this applied word-initially, when any corrections 'correct'
   // 100% of the word.  Things are generally fine once it's not "all or nothing."
   let tailToken = postContextTokens[postContextTokens.length - 1];
+
+  // Did the wordbreaker (or similar) append a blank token before the caret?  If so,
+  // preserve that by preventing corrections from triggering left-deletion.
+  if(tailToken.raw == '') {
+    deleteLeft = 0;
+  }
+
   const isTokenStart = tailToken.transformDistributions.length <= 1;
 
   // TODO:  whitespace, backspace filtering.  Do it here.
@@ -246,6 +253,11 @@ export async function correctAndEnumerate(
 
     // If our 'match' results in fully deleting the new token, reject it and try again.
     if(match.matchSequence.length == 0 && match.inputSequence.length != 0) {
+      continue;
+    }
+
+    // If our 'match' fully replaces the token, reject it and try again.
+    if(match.matchSequence.length != 0 && match.matchSequence.length == match.knownCost) {
       continue;
     }
 
