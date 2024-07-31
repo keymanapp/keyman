@@ -13,14 +13,6 @@ import { timedPromise } from '@keymanapp/web-utils';
 describe('LMLayerWorker', function () {
   describe('#predict()', function () {
     it('should send back suggestions', async function () {
-      var suggestion = {
-        transform: {
-          insert: 'I ',
-          deleteLeft: 0
-        },
-        displayAs: 'I'
-      };
-
       // Initialize the worker with a model that will produce one suggestion.
       var fakePostMessage = sinon.fake();
       var filteredFakePostMessage = function(event) {
