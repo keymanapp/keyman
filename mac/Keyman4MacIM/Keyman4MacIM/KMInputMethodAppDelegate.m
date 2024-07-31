@@ -182,6 +182,9 @@ NSString* _keymanDataPath = nil;
   }];
   
   // [SentrySDK captureMessage:@"Starting Keyman [test message]"];
+  
+  [self setDefaultKeymanMenuItems];
+  [self updateKeyboardMenuItems];
 }
 
 #ifdef USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE
@@ -769,9 +772,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     os_log_info([KMLogs startupLog], "keyboards migration not needed");
   }
 
-  
-  [self setDefaultKeymanMenuItems];
-  [self updateKeyboardMenuItems];
 }
 
 - (void)setDefaultKeymanMenuItems {
