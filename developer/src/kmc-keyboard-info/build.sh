@@ -10,6 +10,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 builder_describe "Build Keyman kmc keyboard-info Compiler module" \
   "@/common/web/types" \
   "@/developer/src/common/web/utils" \
+  "@/developer/src/kmc-package" \  
   "clean" \
   "configure" \
   "build" \
