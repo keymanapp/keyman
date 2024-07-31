@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 18.0.80 alpha 2024-07-31
+
+* chore(developer): remove redundant references from tsconfig.json (#12037)
+* fix(web): add nullish test in setOsk (#12039)
+* fix(web): unrevert #11258, leaving OSK hidden before instructed to display (#12049)
+* test(developer): check correct use of u16chr when second parameter could be null (#11894)
+* change(web): remove support for es5 (#11881)
+
 ## 18.0.79 alpha 2024-07-30
 
 * change(mac): add custom tags in sentry to better identify errors (#11947)
