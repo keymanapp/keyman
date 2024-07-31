@@ -15,9 +15,11 @@ KMX_DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 KMX_DWORD ValidateMatchNomatchOutput(PKMX_WCHAR p);
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString);
 PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_WORD Flags);
+int LineTokenType(PKMX_WCHAR *str);
 KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
   PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isUnicode
 );
+KMX_DWORD ProcessEthnologueStore(PKMX_WCHAR p);
 KMX_DWORD GetRHS(PFILE_KEYBOARD fk, PKMX_WCHAR p, PKMX_WCHAR buf, int bufsize, int offset, int IsUnicode);
 bool isIntegerWstring(PKMX_WCHAR p);
 bool hasPreamble(std::u16string result);
@@ -29,6 +31,7 @@ namespace kmcmp {
     extern int nErrors;
     extern int ErrChr;
     extern int BeginLine[4];
+    extern int CompileTarget;
     KMX_BOOL AddCompileWarning(char* buf);
 }
 
@@ -59,6 +62,7 @@ class CompilerTest : public testing::Test {
             kmcmp::BeginLine[BEGIN_UNICODE] = -1;
             kmcmp::BeginLine[BEGIN_NEWCONTEXT] = -1;
             kmcmp::BeginLine[BEGIN_POSTKEYSTROKE] = -1;
+            kmcmp::CompileTarget = CKF_KEYMAN;
         }
 
         void initFileKeyboard(FILE_KEYBOARD &fk) {
@@ -556,7 +560,106 @@ TEST_F(CompilerTest, GetDelimitedString_test) {
 }
 
 // LinePrefixType GetLinePrefixType(PKMX_WCHAR *p)
-// int LineTokenType(PKMX_WCHAR *str)
+
+TEST_F(CompilerTest, LineTokenType_test) {
+    KMX_WCHAR str[LINESIZE];
+    PKMX_WCHAR p = nullptr;
+
+    // T_BLANK, lptOther, empty string
+    u16cpy(str, u"");
+    p = str;
+    EXPECT_EQ(T_BLANK, LineTokenType(&p));
+
+    // T_BLANK, lptOther, one space
+    u16cpy(str, u" ");
+    p = str;
+    EXPECT_EQ(T_BLANK, LineTokenType(&p));
+
+    // T_BLANK, mismatched prefix, CKF_KEYMAN, lptKeymanWebOnly
+    u16cpy(str, u"$keymanweb:");
+    p = str;
+    kmcmp::CompileTarget = CKF_KEYMAN;
+    EXPECT_EQ(T_BLANK, LineTokenType(&p));
+
+    // T_BLANK, mismatched prefix, CKF_KEYMANWEB, lptKeymanOnly
+    u16cpy(str, u"$keymanonly:");
+    p = str;
+    kmcmp::CompileTarget = CKF_KEYMANWEB;
+    EXPECT_EQ(T_BLANK, LineTokenType(&p));
+
+    // T_BLANK, nothing after prefix
+    u16cpy(str, u"$keyman:");
+    p = str;
+    kmcmp::CompileTarget = CKF_KEYMAN;
+    EXPECT_EQ(T_BLANK, LineTokenType(&p));
+
+    // T_STORE (=T_W_START)
+    u16cpy(str, u"store(b)");
+    p = str;
+    EXPECT_EQ(T_STORE, LineTokenType(&p));
+    EXPECT_EQ(u16len(u"store"), p - str);
+    EXPECT_TRUE(!u16cmp(p, u"(b)"));
+
+    // T_BITMAPS (=T_W_END)
+    u16cpy(str, u"bitmaps \"b\"");
+    p = str;
+    EXPECT_EQ(T_BITMAPS, LineTokenType(&p));
+    EXPECT_EQ(u16len(u"bitmaps "), p - str);
+    EXPECT_TRUE(!u16cmp(p, u"\"b\""));
+
+    // T_STORE, preceeded by one space
+    u16cpy(str, u" store(b)");
+    p = str;
+    EXPECT_EQ(T_STORE, LineTokenType(&p));
+    EXPECT_EQ(u16len(u" store"), p - str);
+    EXPECT_TRUE(!u16cmp(p, u"(b)"));
+
+    // T_STORE, preceeded by two spaces
+    u16cpy(str, u"  store(b)");
+    p = str;
+    EXPECT_EQ(T_STORE, LineTokenType(&p));
+    EXPECT_EQ(u16len(u"  store"), p - str);
+    EXPECT_TRUE(!u16cmp(p, u"(b)"));
+
+    // T_STORE, followed by one space
+    u16cpy(str, u"store (b)");
+    p = str;
+    EXPECT_EQ(T_STORE, LineTokenType(&p));
+    EXPECT_EQ(u16len(u"store "), p - str);
+    EXPECT_TRUE(!u16cmp(p, u"(b)"));
+
+    // T_STORE, followed by two spaces
+    u16cpy(str, u"store  (b)");
+    p = str;
+    EXPECT_EQ(T_STORE, LineTokenType(&p));
+    EXPECT_EQ(u16len(u"store  "), p - str);
+    EXPECT_TRUE(!u16cmp(p, u"(b)"));
+
+    // T_COMMENT
+    u16cpy(str, u"c ");
+    p = str;
+    EXPECT_EQ(T_COMMENT, LineTokenType(&p));
+    EXPECT_EQ(0, p - str);
+
+    // comment without following space ... potential bug, but ReadLine() currently ensures following space
+    u16cpy(str, u"c");
+    p = str;
+    EXPECT_EQ(T_UNKNOWN, LineTokenType(&p));
+    EXPECT_EQ(0, p - str);
+
+    // T_KEYTOKEY
+    u16cpy(str, u"abc");
+    p = str;
+    EXPECT_EQ(T_KEYTOKEY, LineTokenType(&p));
+    EXPECT_EQ(0, p - str);
+
+     // T_UNKNOWN
+    u16cpy(str, u"z");
+    p = str;
+    EXPECT_EQ(T_UNKNOWN, LineTokenType(&p));
+    EXPECT_EQ(0, p - str);
+}
+
 // KMX_BOOL StrValidChrs(PKMX_WCHAR q, KMX_WCHAR const * chrs)
 // KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token,
 //  PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int /*isVKey*/, int isUnicode
@@ -1243,7 +1346,24 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
 // KMX_DWORD process_save(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
 // int xatoi(PKMX_WCHAR *p)
 // int GetGroupNum(PFILE_KEYBOARD fk, PKMX_WCHAR p)
-// KMX_DWORD ProcessEthnologueStore(PKMX_WCHAR p)
+
+TEST_F(CompilerTest, ProcessEthnologueStore_test) {
+    EXPECT_EQ(CERR_None, ProcessEthnologueStore((PKMX_WCHAR)u"abc"));
+    EXPECT_EQ(CWARN_PunctuationInEthnologueCode, ProcessEthnologueStore((PKMX_WCHAR)u";abc"));
+    EXPECT_EQ(CWARN_PunctuationInEthnologueCode, ProcessEthnologueStore((PKMX_WCHAR)u",abc"));
+    EXPECT_EQ(CERR_None, ProcessEthnologueStore((PKMX_WCHAR)u" abc"));
+    EXPECT_EQ(CERR_InvalidEthnologueCode, ProcessEthnologueStore((PKMX_WCHAR)u"abc "));
+    EXPECT_EQ(CERR_InvalidEthnologueCode, ProcessEthnologueStore((PKMX_WCHAR)u"abcd"));
+    EXPECT_EQ(CERR_InvalidEthnologueCode, ProcessEthnologueStore((PKMX_WCHAR)u"ab"));
+    EXPECT_EQ(CERR_InvalidEthnologueCode, ProcessEthnologueStore((PKMX_WCHAR)u"a"));
+    EXPECT_EQ(CERR_InvalidEthnologueCode, ProcessEthnologueStore((PKMX_WCHAR)u"a2b"));
+    EXPECT_EQ(CERR_None, ProcessEthnologueStore((PKMX_WCHAR)u"")); // needs correcting ... see #11955
+    EXPECT_EQ(CERR_None, ProcessEthnologueStore((PKMX_WCHAR)u"abc def"));
+    EXPECT_EQ(CERR_None, ProcessEthnologueStore((PKMX_WCHAR)u"abc  def"));
+    EXPECT_EQ(CWARN_PunctuationInEthnologueCode, ProcessEthnologueStore((PKMX_WCHAR)u"abc,def"));
+    EXPECT_EQ(CWARN_PunctuationInEthnologueCode, ProcessEthnologueStore((PKMX_WCHAR)u"abc;def"));
+}
+
 // KMX_DWORD ProcessHotKey(PKMX_WCHAR p, KMX_DWORD *hk)
 // void SetChecksum(PKMX_BYTE buf, PKMX_DWORD CheckSum, KMX_DWORD sz)
 // KMX_BOOL kmcmp::CheckStoreUsage(PFILE_KEYBOARD fk, int storeIndex, KMX_BOOL fIsStore, KMX_BOOL fIsOption, KMX_BOOL fIsCall)

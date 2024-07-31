@@ -6,18 +6,12 @@
     "rootDirs": ["./", "../src/"],
     "outDir": "../build/test",
     "baseUrl": ".",
-    "paths": {
-      "@keymanapp/common-types": ["../../../../common/web/types/src/main"],
-      "@keymanapp/developer-test-helpers": ["../../common/web/test-helpers/index"],
-    },
   },
   "include": [
     "**/test-*.ts",
     "./helpers/index.ts",
   ],
   "references": [
-    { "path": "../../../../common/web/types/" },
-    { "path": "../../common/web/test-helpers/" },
     { "path": "../" }
   ]
 }
