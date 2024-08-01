@@ -1,4 +1,4 @@
-import { applyTransform } from '@keymanapp/models-templates';
+import { Token, applyTransform } from '@keymanapp/models-templates';
 
 import { ClassicalDistanceCalculation } from './classical-calculation.js';
 import { SearchSpace } from './distance-modeler.js';
@@ -290,7 +290,7 @@ class CircularArray<Item> {
 
 export class ContextTracker extends CircularArray<TrackedContextState> {
   static attemptMatchContext(
-    tokenizedContext: { text: USVString, isWhitespace?: boolean } [],
+    tokenizedContext: Token[],
     matchState: TrackedContextState,
     transformDistribution?: Distribution<Transform>
   ): TrackedContextState {

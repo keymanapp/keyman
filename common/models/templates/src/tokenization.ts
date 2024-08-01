@@ -1,24 +1,23 @@
 // While we _could_ define this within @keymanapp/models-wordbreakers instead, it's probably
 // better to leave that package as _just_ the wordbreakers.
 
+export interface Token {
+  text: string,
+  isWhitespace?: boolean
+}
+
 export interface Tokenization {
   /**
    * An array of tokens to the left of the caret.  If the caret is in the middle of a token,
    * only the part to the left of the caret is included.
    */
-  left: {
-    text: USVString,
-    isWhitespace?: boolean
-  }[],
+  left: Token[],
 
   /**
    * An array of tokens to the right of the caret.  If the caret is in the middle of a token,
    * only the part to the right of the caret is included.
    */
-  right: {
-    text: USVString,
-    isWhitespace?: boolean
-  }[],
+  right: Token[],
 
   /**
    * A flag indicating whether or not the caret's position in the context caused a token
