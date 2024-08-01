@@ -481,7 +481,6 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     }
 
     while(baseTokens.length > 0) {
-      // state.pushWhitespaceToTail();
       state.pushTail(baseTokens.splice(0, 1)[0]);
     }
 
