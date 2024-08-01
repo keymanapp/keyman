@@ -3,7 +3,7 @@
 #ifndef MC_IMPORT_RULES_H
 #define MC_IMPORT_RULES_H
 
-/** @brief  Base class for Deadkey*/
+/** @brief Base class for Deadkey*/
 class DeadKey {
 private:
   KMX_WCHAR m_deadchar;
@@ -12,8 +12,8 @@ private:
 
 public:
   /**
-   * @brief Constructor
-   * @param deadCharacter a deadkey
+   * @brief  Constructor
+   * @param  deadCharacter a deadkey
    */
   DeadKey(KMX_WCHAR deadCharacter);
 
@@ -24,10 +24,9 @@ public:
   KMX_WCHAR KMX_DeadCharacter();
 
   /**
-   * @brief set Deadkey with values
-   * @param baseCharacter the base character
-   * @param combinedCharacter the combined character
-   * @return void
+   * @brief  set Deadkey with values
+   * @param  baseCharacter     the base character
+   * @param  combinedCharacter the combined character
    */
   void KMX_AddDeadKeyRow(KMX_WCHAR baseCharacter, KMX_WCHAR combinedCharacter);
 
@@ -48,9 +47,10 @@ public:
   }
 
   /**
-   * @brief check if character exists in DeadKey
-   * @param baseCharacter a character to be found
-   * @return true if found; false if not found
+   * @brief  check if character exists in DeadKey
+   * @param  baseCharacter a character to be found
+   * @return true if found;
+   *         false if not found
    */
   bool KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter);
 };

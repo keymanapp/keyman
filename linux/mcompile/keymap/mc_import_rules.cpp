@@ -1,8 +1,9 @@
 /*
- * Keyman is copyright (C) 2004 SIL International. MIT License.
+ * Keyman is copyright (C) 2004 - 2024 SIL International. MIT License.
  *
  * Mnemonic layout support for Linux
  */
+
 
 #include <vector>
 #include <string>
@@ -27,7 +28,7 @@ DeadKey::DeadKey(KMX_WCHAR deadCharacter) {
   this->m_deadchar = deadCharacter;
 }
 
-/** @brief  return dead character */
+/** @brief return dead character */
 KMX_WCHAR DeadKey::KMX_DeadCharacter() {
   return this->m_deadchar;
 }
@@ -56,11 +57,11 @@ bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
  * This is because it is used in mcompile only which only deals with latin scripts.
  * In case this function should be used for surrogate pairs, they will be ignored and a message will be printed out
 
- * @param  keycode a key of the currently used keyboard Layout
+ * @param  keycode  a key of the currently used keyboard Layout
  * @param  pwszBuff Buffer to store resulting character
- * @param  ss a shiftstate of the currently used keyboard Layout
- * @param  caps state of the caps key of the currently used keyboard Layout
- * @param  keymap the currently used (underlying)keyboard Layout
+ * @param  ss       a shiftstate of the currently used keyboard Layout
+ * @param  caps     state of the caps key of the currently used keyboard Layout
+ * @param  keymap   the currently used (underlying)keyboard Layout
  * @return -1 if a deadkey was found;
  *          0 if no translation is available;
  *          +1 if character was found and written to pwszBuff
@@ -119,7 +120,7 @@ KMX_WCHAR KMX_DeadKeyMap(int index, std::vector<DeadKey*>* deadkeys, int deadkey
   return 0xFFFF;
 }
 
-/** @brief  Base class for dealing with rgkey*/
+/** @brief Base class for dealing with rgkey*/
 class KMX_VirtualKey {
 private:
   UINT m_vk;
@@ -339,7 +340,7 @@ public:
   }
 };
 
-/** @brief  Base class for KMX_loader*/
+/** @brief Base class for KMX_loader*/
 class KMX_Loader {
 private:
   KMX_BYTE lpKeyStateNull[256];
@@ -369,8 +370,8 @@ public:
 };
 
 /**
- * @brief find the maximum index of a deadkey
- * @param p pointer to deadkey
+ * @brief  find the maximum index of a deadkey
+ * @param  p pointer to deadkey
  * @return index of deadkey
  */
 int KMX_GetMaxDeadkeyIndex(KMX_WCHAR* p) {
@@ -390,10 +391,10 @@ int KMX_GetMaxDeadkeyIndex(KMX_WCHAR* p) {
  *         On Linux   the values of rgkey are sorted according to the VK of the the US keyboard
  *         Since Linux Keyboards do not use a VK mcompile uses the VK of the the US keyboard because
  *         these are available in mcompile through USVirtualKeyToScanCode/ScanCodeToUSVirtualKey and an offset of 8
- * @param  kp pointer to keyboard
- * @param  all_vector vector that holds the data of the US keyboard and the currently used (underlying) keyboard
- * @param  keymap the currently used (underlying)keyboard Layout
- * @param  FDeadkeys vector of all deadkeys for the currently used (underlying)keyboard Layout
+ * @param  kp                 pointer to keyboard
+ * @param  all_vector         vector that holds the data of the US keyboard and the currently used (underlying) keyboard
+ * @param  keymap             the currently used (underlying)keyboard Layout
+ * @param  FDeadkeys          vector of all deadkeys for the currently used (underlying)keyboard Layout
  * @param  bDeadkeyConversion 1 to convert a deadkey to a character; 0 no conversion
  * @return true in case of success
  */

@@ -1,5 +1,5 @@
 /*
- * Keyman is copyright (C) 2004 SIL International. MIT License.
+ * Keyman is copyright (C) 2004 - 2024 SIL International. MIT License.
  *
  * Mnemonic layout support for Linux
  */
@@ -43,28 +43,28 @@ const int CODE__SIZE[] = {
 
 /**
  * @brief check if the file has correct version
- * @param filebase containing data of the input file
- * @param file_size a size
+ * @param  filebase  containing data of the input file
+ * @param  file_size a size
  * @return true if successful;
  *         false if not
  */
 KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD file_size);
 
 /**
- * @brief Fixup the keyboard by expanding pointers. On disk the pointers are stored relative to the
- *        beginning of the file, but we need real pointers. This method is used on 32-bit architectures.
- * @param bufp pointer to buffer where data will be copied into
- * @param base pointer to starting point
- * @param dwFileSize size of the file
+ * @brief  Fixup the keyboard by expanding pointers. On disk the pointers are stored relative to the
+ *         beginning of the file, but we need real pointers. This method is used on 32-bit architectures.
+ * @param  bufp       pointer to buffer where data will be copied into
+ * @param  base       pointer to starting point
+ * @param  dwFileSize size of the file
  * @return pointer to the keyboard
  */
 LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize);
 
 /**
- * @brief Save a Keyboard to a file
- * @param fk pointer to the keyboard
- * @param hOutfile pointer to the output file
- * @param FSaveDebug
+ * @brief  Save a Keyboard to a file
+ * @param  fk         pointer to the keyboard
+ * @param  hOutfile   pointer to the output file
+ * @param  FSaveDebug
  * @return an Error in case of failure
  */
 KMX_DWORD KMX_WriteCompiledKeyboardToFile(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX_BOOL FSaveDebug) {
@@ -253,9 +253,9 @@ KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, KMX_CHAR* filename) {
 }
 
 /**
- * @brief add an offset
- * @param base pointer to starting point
- * @param offset a given offset
+ * @brief  add an offset
+ * @param  base   pointer to starting point
+ * @param  offset a given offset
  * @return pointer to base + offset
  */
 PKMX_WCHAR KMX_StringOffset(PKMX_BYTE base, KMX_DWORD offset) {
@@ -267,12 +267,12 @@ PKMX_WCHAR KMX_StringOffset(PKMX_BYTE base, KMX_DWORD offset) {
 #ifdef KMX_64BIT
 
 /**
- * @brief CopyKeyboard will copy the data into bufp from x86-sized structures into
- * x64-sized structures starting at `base`. After this function finishes, we still
- * need to keep the original data because we don't copy the strings. The method is
- * used on 64-bit architectures.
- * @param bufp pointer to buffer where data is copied into
- * @param base pointer to starting point
+ * @brief  CopyKeyboard will copy the data into bufp from x86-sized structures into
+ *         x64-sized structures starting at `base`. After this function finishes, we still
+ *         need to keep the original data because we don't copy the strings. The method is
+ *         used on 64-bit architectures.
+ * @param  bufp pointer to buffer where data is copied into
+ * @param  base pointer to starting point
  * @return pointer to the keyboard
  */
 LPKMX_KEYBOARD CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base) {
@@ -550,15 +550,15 @@ PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p) {
 }
 
 /** @brief open a file */
-FILE* Open_File(const KMX_CHAR* Filename, const KMX_CHAR* mode) {
+FILE* Open_File(const KMX_CHAR* filename, const KMX_CHAR* mode) {
 #ifdef _MSC_VER
-  std::string cpath = Filename;  //, cmode = mode;
+  std::string cpath = filename;  //, cmode = mode;
   std::replace(cpath.begin(), cpath.end(), '/', '\\');
   return fopen(cpath.c_str(), (const KMX_CHAR*)mode);
 #else
-  return fopen(Filename, mode);
+  return fopen(filename, mode);
   std::string cpath, cmode;
-  cpath = (const KMX_CHAR*)Filename;
+  cpath = (const KMX_CHAR*)filename;
   cmode = (const KMX_CHAR*)mode;
   return fopen(cpath.c_str(), cmode.c_str());
 #endif

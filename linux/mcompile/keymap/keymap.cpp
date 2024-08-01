@@ -1,5 +1,5 @@
 /*
- * Keyman is copyright (C) 2004 SIL International. MIT License.
+ * Keyman is copyright (C) 2004 - 2024 SIL International. MIT License.
  *
  * Mnemonic layout support for Linux
  *
@@ -388,7 +388,7 @@ bool createCompleteVector_US(vec_string_1D& complete_List) {
 
   if (!inputFile.is_open()) {
     printf("ERROR: could not open file!\n");
-    return 1;
+    return TRUE;
   }
 
   else {
@@ -410,7 +410,7 @@ bool createCompleteVector_US(vec_string_1D& complete_List) {
   complete_List.push_back("    key <SPCE>  { [ space,        space] };");
 
   inputFile.close();
-  return 0;
+  return FALSE;
 }
 
 /** @brief convert the key name obtained from symbol file to the matching keycode */
@@ -640,17 +640,17 @@ bool InitializeGDK(GdkKeymap** keymap, int argc, gchar* argv[]) {
   GdkDisplay* display = gdk_display_get_default();
   if (!display) {
     printf("ERROR: can't get display\n");
-    return 1;
+    return TRUE;
   }
 
   *keymap = gdk_keymap_get_for_display(display);
   if (!keymap) {
     printf("ERROR: Can't get keymap\n");
     gdk_display_close(display);
-    return 2;
+    return TRUE;
   }
   // intentionally leaking `display` in order to still be able to access `keymap`
-  return 0;
+  return FALSE;
 }
 
 /** @brief check if keyval correponds to a character we use in mcompile */

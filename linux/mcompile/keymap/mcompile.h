@@ -35,7 +35,6 @@ extern std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;  // I4353
 /**
  * @brief  print (error) messages
  * @param  fmt text to print
- * @return void
  */
 void KMX_LogError(const wchar_t* fmt, ...);
 
