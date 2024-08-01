@@ -274,7 +274,7 @@ export class BreakerContext {
  * @param chunk a chunk of text. Starts and ends at word boundaries.
  */
 function isNonSpace(chunk: string, options?: DefaultWordBreakerOptions): boolean {
-  return !Array.from(chunk).map((char) => property(char, options)).every(wb => (
+  return !chunk.split('').map((char) => property(char, options)).every(wb => (
     wb === WordBreakProperty.CR ||
     wb === WordBreakProperty.LF ||
     wb === WordBreakProperty.Newline ||

@@ -15,7 +15,7 @@ describe('LMLayer using the trie model', function () {
 
   beforeEach(function() {
     worker = Worker.constructInstance();
-    lmLayer = new LMLayer(capabilities(), worker);
+    lmLayer = new LMLayer(capabilities(), worker, true);
   });
 
   afterEach(function () {
@@ -82,7 +82,8 @@ describe('LMLayer using the trie model', function () {
         var suggestions = rawSuggestions.filter(function skimKeepSuggestions(s) {
           return s.tag !== 'keep'
         })
-        assert.isAtLeast(suggestions.length, 1)
+        assert.isAtLeast(rawSuggestions.length, 1);
+        assert.isAtLeast(suggestions.length, 1);
 
         // We SHOULD get 'naïve' suggested
         var topSuggestion = suggestions[0];

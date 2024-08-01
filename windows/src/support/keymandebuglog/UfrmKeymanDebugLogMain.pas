@@ -67,7 +67,7 @@ begin
   gridLog.ColCount := 11;
   gridLog.RowCount := 2;
   gridLog.FixedRows := 1;
-  Report('Platform	Process	PID	TID	ShiftState	ActualShiftState	TickCount	FocusHWND	ActiveHKL	SourceFile	Message', True);
+  Report('Platform	Process	PID	TID	ShiftState	ActualShiftState	TickCount	FocusHWND	ActiveHKL	SourceFile	Function	Message', True);
 end;
 
 procedure TfrmDebugLog.Report(Message: string; TopRow: Boolean = False);

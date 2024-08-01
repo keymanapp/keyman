@@ -16,7 +16,7 @@ int msgproc(int line, uint32_t dwMsgCode, const char* szText, void* context) {
     case CERR_ERROR:   t="  error"; break;
     case CERR_FATAL:   t="  fatal"; break;
   }
-  printf("line %d  %s %04.4x:  %s\n", line, t, (unsigned int)dwMsgCode, szText);
+  printf("line %d  %s %4.4x:  %s\n", line, t, (unsigned int)dwMsgCode, szText);
 	return 1;
 }
 
@@ -49,7 +49,7 @@ bool loadfileProc(const char* filename, const char* baseFilename, void* data, in
     }
   } else {
     // return data
-    if(fread(data, 1, *size, fp) != *size) {
+    if(fread(data, 1, *size, fp) != (size_t)(*size)) {
       fclose(fp);
       return false;
     }

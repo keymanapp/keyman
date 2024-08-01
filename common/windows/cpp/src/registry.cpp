@@ -206,7 +206,7 @@ BOOL RegistryReadOnly::WrapError(DWORD res)
 {
 	/*if(res != ERROR_SUCCESS)
 	{
-		SendDebugMessageFormat(0,KDS_PROGRAM,0,"RegistryFullAccess::WrapError = %d", res);
+		__logerror(0,KDS_PROGRAM,0,"RegistryFullAccess::WrapError = %d", res);
 	}*/
 	return res == ERROR_SUCCESS;
 }

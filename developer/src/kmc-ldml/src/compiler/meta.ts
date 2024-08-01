@@ -1,7 +1,7 @@
 import { SectionIdent, constants } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlus } from '@keymanapp/common-types';
 
-import { CompilerMessages } from "./messages.js";
+import { LdmlCompilerMessages } from "./ldml-compiler-messages.js";
 import { SectionCompiler } from "./section-compiler.js";
 import semver from "semver";
 
@@ -28,11 +28,11 @@ export class MetaCompiler extends SectionCompiler {
     if(versionNumber !== undefined) {
       if(versionNumber.match(/^[=v]/i)) {
         // semver ignores a preceding '=' or 'v'
-        this.callbacks.reportMessage(CompilerMessages.Error_InvalidVersion({ version: versionNumber }));
+        this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidVersion({ version: versionNumber }));
         return false;
       }
       if(!semver.parse(versionNumber, {loose: false})) {
-        this.callbacks.reportMessage(CompilerMessages.Error_InvalidVersion({ version: versionNumber }));
+        this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidVersion({ version: versionNumber }));
         return false;
       }
     }
@@ -41,7 +41,7 @@ export class MetaCompiler extends SectionCompiler {
 
   private validateNormalization(normalization?: string) {
     if (normalization === 'disabled') {
-      this.callbacks.reportMessage(CompilerMessages.Hint_NormalizationDisabled());
+      this.callbacks.reportMessage(LdmlCompilerMessages.Hint_NormalizationDisabled());
     }
     return true;
   }

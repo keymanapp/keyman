@@ -1,18 +1,18 @@
 /*
   Name:             syskbdnt
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      22 Jan 2007
 
   Modified Date:    6 Feb 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          22 Jan 2007 - mcdurdin - Don't translate any number pad keys
                     13 Jul 2007 - mcdurdin - I911 - Fix for Ctrl+BKSP
                     10 Sep 2008 - mcdurdin - I1635 - mnemonic layouts on x64 fail
@@ -35,8 +35,9 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include "pch.h"
-#include "kbd.h"	/* DDK kbdlayout */ 
+#include "kbd.h"	/* DDK kbdlayout */
 
+// This file is used only in keyman32.dll; it maps syskbd for x86 builds of Windows
 #ifndef _WIN64
 
 extern BOOL KeyboardGivesCtrlRAltForRAlt_NT_x64();
@@ -73,19 +74,19 @@ BOOL LoadNewLibrary()
 			if(r->ReadString("Layout File", buf, 32))
 			{
 				hKbdLibrary = LoadLibrary(buf);
-				if(!hKbdLibrary) 
-				{ 	
-					SendDebugMessageFormat(GetFocus(), sdmKeyboard, 0, "LoadNewLibrary: Exit -- could not load library");
-					return FALSE; 
+				if(!hKbdLibrary)
+				{
+					SendDebugMessageFormat("Exit -- could not load library");
+					return FALSE;
 				}
 				PKBDLAYERDESCRIPTORFUNC KbdLayerDescriptorFunc = (PKBDLAYERDESCRIPTORFUNC) GetProcAddress(hKbdLibrary, "KbdLayerDescriptor");
 				if(KbdLayerDescriptorFunc)
 				{
 					KbdTables = (*KbdLayerDescriptorFunc)();
-					if(KbdTables) 
+					if(KbdTables)
 						return TRUE;
 				}
-				
+
 				FreeLibrary(hKbdLibrary);
 			}
 		}
@@ -97,7 +98,7 @@ BOOL LoadNewLibrary()
 	{
 		delete r;
 	}
-	SendDebugMessageFormat(GetFocus(), sdmKeyboard, 0, "LoadNewLibrary: Exit -- failed to find function");
+	SendDebugMessageFormat("Exit -- failed to find function");
 	return FALSE;
 }
 
@@ -109,15 +110,15 @@ BOOL KeyboardGivesCtrlRAltForRAlt_NT()
 
 	HKL hkl = GetKeyboardLayout(0);
 
-	/* Find the appropriate keyboard tables */ 
+	/* Find the appropriate keyboard tables */
 
 	if(hkl != ActiveHKL_NT)
 	{
-		ActiveHKL_NT = hkl; 
+		ActiveHKL_NT = hkl;
 		LoadNewLibrary();
 	}
 
-	if(!KbdTables)				/* Could not load keyboard DLL */ 
+	if(!KbdTables)				/* Could not load keyboard DLL */
 		return FALSE;
 
 	return (KbdTables->fLocaleFlags & 0x1) ? TRUE : FALSE;

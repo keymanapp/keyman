@@ -17,7 +17,7 @@ function buildBaseOskConfiguration(engine: KeymanEngine) {
 };
 
 class PublishedAnchoredOSKView extends AnchoredOSKView {
-  constructor(engine: KeymanEngine, config?: Partial<ViewConfiguration>) {
+  constructor(engine: KeymanEngine, config?: ViewConfiguration) {
     let finalConfig = {
       ...buildBaseOskConfiguration(engine),
       ...(config || {})
@@ -28,7 +28,7 @@ class PublishedAnchoredOSKView extends AnchoredOSKView {
 }
 
 class PublishedFloatingOSKView extends FloatingOSKView {
-  constructor(engine: KeymanEngine, config?: Partial<FloatingOSKViewConfiguration>) {
+  constructor(engine: KeymanEngine, config?: FloatingOSKViewConfiguration) {
     let finalConfig: FloatingOSKViewConfiguration = {
       ...buildBaseOskConfiguration(engine),
       ...(config || {})
@@ -39,7 +39,7 @@ class PublishedFloatingOSKView extends FloatingOSKView {
 }
 
 class PublishedInlineOSKView extends InlinedOSKView {
-  constructor(engine: KeymanEngine, config?: Partial<ViewConfiguration>) {
+  constructor(engine: KeymanEngine, config?: ViewConfiguration) {
     let finalConfig: ViewConfiguration = {
       ...buildBaseOskConfiguration(engine),
       ...(config || {})

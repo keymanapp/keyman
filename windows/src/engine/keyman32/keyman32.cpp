@@ -190,8 +190,6 @@ void DoChangeWindowMessageFilter()
   }
 
 	DoCWMF(wm_keyman);   // I3594
-  DoCWMF(wm_keymankeydown);
-  DoCWMF(wm_keymankeyup);
   DoCWMF(wm_keyman_grabwindowproc);
   DoCWMF(wm_keyman_refresh);
   DoCWMF(wm_kmgetactivekeymanid);
@@ -204,7 +202,7 @@ void DoChangeWindowMessageFilter()
   FreeLibrary(hUser32);
 }
 
-BOOL InitThread(HWND hwnd)
+BOOL InitThread()
 {
   PKEYMAN64THREADDATA _td = ThreadGlobals();
   if(!_td)
@@ -221,15 +219,15 @@ BOOL InitThread(HWND hwnd)
     // I2448 - Removed "|| _td->FInitialised" -- this should not be included because sometimes it can be re-initialised.
   }
 
+  SendDebugEntry();
+
   _td->FInitialising = TRUE;  // Control re-entrancy, this is thread safe because the variable is per-thread
 
 	RefreshKeyboards(TRUE);
 
-	SendDebugMessageFormat(hwnd, sdmGlobal, 0, "--InitialiseProcess LEAVE--");
-
   _td->FInitialising = FALSE;  // Control re-entrancy, this is thread safe because the variable is per-thread
 
-  return _td->FInitialised = TRUE;
+  return_SendDebugExit(_td->FInitialised = TRUE);
 }
 
 /*
@@ -240,23 +238,22 @@ void Initialise_Flag_ShouldSerializeInput() {
   flag_ShouldSerializeInput = Reg_GetDebugFlag(REGSZ_Flag_ShouldSerializeInput, TRUE);
 }
 
-BOOL InitialiseProcess(HWND hwnd)
-{
+BOOL InitialiseProcess() {
+	SendDebugEntry();
+
 	if(InterlockedExchange(&FStartedInitialise, TRUE))
 	{
-		//SendDebugMessage(hwnd, sdmGlobal, 0, "InitialiseProcess: Failed because process is already initialising");
-    return InitThread(hwnd);
+		//SendDebugMessage("InitialiseProcess: Failed because process is already initialising");
+    BOOL result = InitThread();
+    return_SendDebugExit(result);
 	}
 
-	SendDebugMessageFormat(hwnd, sdmGlobal, 0, "--InitialiseProcess ENTER--");
-	SendDebugMessageFormat(hwnd, sdmGlobal, 0, "ProcessID=%d ThreadID=%d CmdLine=%s", GetCurrentProcessId(), GetCurrentThreadId(),
+	SendDebugMessageFormat("ProcessID=%d ThreadID=%d CmdLine=%s", GetCurrentProcessId(), GetCurrentThreadId(),
 		GetCommandLine());
 
   Initialise_Flag_ShouldSerializeInput();
 
 	wm_keyman = RegisterWindowMessage(RWM_KEYMAN);
-	wm_keymankeydown = RegisterWindowMessage("WM_KEYMANKEYDOWN");
-	wm_keymankeyup = RegisterWindowMessage("WM_KEYMANKEYUP");
 	wm_keyman_grabwindowproc = RegisterWindowMessage("WM_KEYMAN_GRABWINDOWPROC");
 	wm_keyman_refresh = RegisterWindowMessage("WM_KEYMANREFRESH");
 	wm_kmgetactivekeymanid = RegisterWindowMessage("WM_KEYMAN_GETACTIVEKEYMANID");
@@ -272,7 +269,8 @@ BOOL InitialiseProcess(HWND hwnd)
 
 	DoChangeWindowMessageFilter();
 
-  return InitThread(hwnd);
+  BOOL result = InitThread();
+  return_SendDebugExit(result);
 }
 
 extern "C" BOOL _declspec(dllexport) WINAPI Keyman_GetInitialised(BOOL *FSingleApp)
@@ -328,7 +326,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_ResetInitialisation()  // I30
 {
   if(!Globals::ResetControllers())
   {
-    SendDebugMessage(0, sdmGlobal, 0, "Keyman_ResetInitialisation: Failed because controllers and global data could not be reset.");
+    SendDebugMessage("Failed because controllers and global data could not be reset.");
     return FALSE;
   }
   return TRUE;
@@ -338,13 +336,15 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Initialise(HWND Handle, BOOL 
 {
 	HINSTANCE hinst;
 
+  SendDebugEntry();
+
   Globals::LoadDebugSettings();
 
 	if(Globals::get_Keyman_Initialised())
  	{
- 	  SendDebugMessage(Handle, sdmGlobal, 0, "Keyman_Initialise: Failed because " LIBRARY_NAME " is already initialised");
+ 	  SendDebugMessage("Failed because " LIBRARY_NAME " is already initialised");
     SetLastError(ERROR_ALREADY_INITIALIZED);  // I3143   // I3523
-		return FALSE;
+		return_SendDebugExit(FALSE);
 	}
 
   if(Globals::get_Keyman_Shutdown() || !ThreadGlobals())  // I3108   // I3127
@@ -352,9 +352,9 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Initialise(HWND Handle, BOOL 
     *Globals::Keyman_Shutdown() = FALSE;  // I2255, I2244
     if(!Globals_InitThread())  // I3108 - must re-init thread because it would have failed during the initial startup of the process due to thinking we were shutting down
     {
- 	    SendDebugMessage(Handle, sdmGlobal, 0, "Keyman_Initialise: Failed for " LIBRARY_NAME " because Keyman_Shutdown was set and could not be reset.");
+ 	    SendDebugMessage("Failed for " LIBRARY_NAME " because Keyman_Shutdown was set and could not be reset.");
       // SetLastError already set by Globals_InitThread  // I3143   // I3523
-		  return FALSE;
+		  return_SendDebugExit(FALSE);
 	  }
   }
 
@@ -370,22 +370,22 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Initialise(HWND Handle, BOOL 
 	InitDebugging();
 
   if (!Globals::InitSettings()) {
-    SendDebugMessageFormat(Handle, sdmGlobal, 0, "Keyman_Initialise: Failed to initialise global settings.  GetLastError = %d", GetLastError());
-    return FALSE;
+    SendDebugMessageFormat("Failed to initialise global settings.  GetLastError = %d", GetLastError());
+    return_SendDebugExit(FALSE);
   }
 
   if(!Globals::InitHandles())  // I3040
   {
     DebugLastError("Globals::InitHandles");
     // SetLastError: Globals::InitHandles will return a windows error code  // I3143   // I3523
-    return FALSE;
+    return_SendDebugExit(FALSE);
   }
 
-	if(!InitialiseProcess(Handle))
+	if(!InitialiseProcess())
  	{
- 	  SendDebugMessage(Handle, sdmGlobal, 0, "Keyman_Initialise: Failed to initialise for current process");
+ 	  SendDebugMessage("Failed to initialise for current process");
     // SetLastError: InitialiseProcess will return an error code  // I3143   // I3523
-		return FALSE;	/* Failed to verify certificate */
+		return_SendDebugExit(FALSE);	/* Failed to verify certificate */
 	}
 
 #ifndef _WIN64
@@ -395,11 +395,11 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Initialise(HWND Handle, BOOL 
   InitHooks();
 
   DWORD dwLastError = GetLastError();
-  SendDebugMessageFormat(Handle, sdmGlobal, 0, "GetMessage=%x CallWndProc=%x GetLastError=%d",
+  SendDebugMessageFormat("GetMessage=%x CallWndProc=%x GetLastError=%d",
     Globals::get_hhookGetMessage(), Globals::get_hhookCallWndProc(), dwLastError);
 
 #ifndef _WIN64
-	SendDebugMessageFormat(Handle, sdmGlobal, 0, "Keyboard_LL=%x",    // I4124
+	SendDebugMessageFormat("Keyboard_LL=%x",    // I4124
     Globals::get_hhookLowLevelKeyboardProc());
 #endif
 
@@ -408,9 +408,9 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Initialise(HWND Handle, BOOL 
 	*Globals::Keyman_Initialised() = TRUE;
 	RefreshKeyboards(TRUE);   // I4786
 
-  SendDebugMessageFormat(Handle, sdmGlobal, 0, "Keyman is now initialised");
+  SendDebugMessageFormat("Keyman is now initialised");
 
-	return TRUE;
+	return_SendDebugExit(TRUE);
 }
 
 extern "C" BOOL _declspec(dllexport) WINAPI Keyman_StartExit(void)  // I3092
@@ -422,7 +422,7 @@ extern "C" BOOL _declspec(dllexport) WINAPI Keyman_StartExit(void)  // I3092
 extern "C" BOOL _declspec(dllexport) WINAPI Keyman_Exit(void)
 {
   if(Globals::get_InitialisingThread() != GetCurrentThreadId()) {   // I4326
-    SendDebugMessageFormat(0, sdmGlobal, 0, "Keyman_Exit called from thread %d that did not initialise (which was %d)", GetCurrentThreadId(), Globals::get_InitialisingThread());
+    SendDebugMessageFormat("Keyman_Exit called from thread %d that did not initialise (which was %d)", GetCurrentThreadId(), Globals::get_InitialisingThread());
     return FALSE;
   }
 
@@ -565,7 +565,7 @@ void HandleRefresh(int code, LONG tag)
   {
   case KR_REQUEST_REFRESH:
     // This is sent by Keyman COM API, ApplyToRunningKeymanEngine
-    SendDebugMessageFormat(0, sdmGlobal, 0, "#### Refresh Requested ####");
+    SendDebugMessageFormat("#### Refresh Requested ####");
 
     // We ask the master controller window to tell all instances
     // of keyman32/keyman64 that a refresh is coming through
@@ -702,7 +702,7 @@ void RefreshKeyboardProfiles(INTKEYBOARDINFO *kp, BOOL isTransient) {
           reg3->ReadString(REGWSZ_ProfileGUID, bufW, _countof(bufW));
           ConvertStringToGuid(bufW, &ikp->Guid);
           ikp->LangID = (LANGID)reg3->ReadInteger(REGSZ_LanguageProfiles_LangID);
-          SendDebugMessageFormat(0, sdmGlobal, 0, "Found profile %ls, language id %x for keyboard %s", bufW, ikp->LangID, kp->Name);
+          SendDebugMessageFormat("Found profile %ls, language id %x for keyboard %s", bufW, ikp->LangID, kp->Name);
         }
         delete reg3;
         nProfile++;
@@ -748,7 +748,7 @@ void RefreshKeyboards(BOOL Initialising)
 
   // Can happen when multiple top-level windows for one process
 
-	SendDebugMessageFormat(0,sdmGlobal,0,"---ENTER RefreshKeyboards---");
+  SendDebugEntry();
 	//FInRefreshKeyboards = TRUE;
 
 	oldname[0] = 0;
@@ -816,7 +816,7 @@ void RefreshKeyboards(BOOL Initialising)
       RefreshKeyboardProfiles(kp, FALSE); // Read standard profiles
       RefreshKeyboardProfiles(kp, TRUE);  // Read transient profiles
 
-			SendDebugMessageFormat(0,sdmGlobal,0,"RefreshKeyboards: Added keyboard %s, %d",
+			SendDebugMessageFormat("Added keyboard %s, %d",
 				kp->Name, kp->KeymanID);
 			i++;
 		}
@@ -831,9 +831,9 @@ void RefreshKeyboards(BOOL Initialising)
 			  break;
 		  }
 
-	SendDebugMessageFormat(0,sdmGlobal,0,"---LEAVE RefreshKeyboards---");
-
   _td->FInRefreshKeyboards = FALSE;
+
+  SendDebugExit();
 }
 
 void ReleaseKeyboards(BOOL Lock)

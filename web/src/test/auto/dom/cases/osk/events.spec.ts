@@ -3,11 +3,11 @@ import Device from 'keyman/engine/device-detect';
 
 import { loadKeyboardsFromStubs } from '../../kbdLoader.js';
 import { timedPromise } from '@keymanapp/web-utils';
-import { type Keyboard } from '@keymanapp/keyboard-processor';
 
 import sinon from 'sinon';
 
 import { assert } from 'chai';
+import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
 
 const device = new Device();
 device.detect();
@@ -29,7 +29,7 @@ const host = document.createElement('div');
 document.body.appendChild(host);
 
 describe('OSK events', function () {
-  this.timeout(5000);
+  this.timeout(DEFAULT_BROWSER_TIMEOUT);
 
   before(async () => {
     const fixture = await fetch('resources/stubs/khmer_angkor.json');
@@ -48,7 +48,7 @@ describe('OSK events', function () {
   it('InlinedOSK - onHide / onShow', async () => {
     const container = document.getElementById('osk-container');
 
-    let osk = new KeymanOSK.InlinedOSKView(TestResources.OskConfig);
+    const osk = new KeymanOSK.InlinedOSKView(TestResources.OskConfig);
 
     osk.setSize(600, 400);
     container.appendChild(osk.element);
@@ -65,7 +65,7 @@ describe('OSK events', function () {
     // Setup complete.
 
     // Hide the OSK + check for related event
-    let legacyHideStub = sinon.fake();
+    const legacyHideStub = sinon.fake();
     osk.legacyEvents.addEventListener('hide', legacyHideStub);
 
     osk.activationModel.enabled = false;
@@ -76,7 +76,7 @@ describe('OSK events', function () {
     await Promise.resolve();
 
     // Show the OSK + check for related event
-    let legacyShowStub = sinon.fake();
+    const legacyShowStub = sinon.fake();
     osk.legacyEvents.addEventListener('show', legacyShowStub);
 
     osk.activationModel.enabled = true;

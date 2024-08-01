@@ -97,6 +97,8 @@
 #include <codecvt>
 #include <locale>
 #include <string>
+#include <iostream>
+#include <sstream>
 
 #include "UnreachableRules.h"
 #include "CheckForDuplicates.h"
@@ -134,6 +136,7 @@ namespace kmcmp{
 
 int xatoi(PKMX_WCHAR *p);
 int atoiW(PKMX_WCHAR p);
+bool isIntegerWstring(PKMX_WCHAR p);
 void safe_wcsncpy(PKMX_WCHAR out, PKMX_WCHAR in, int cbMax);
 int GetDeadKey(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 
@@ -141,7 +144,7 @@ KMX_BOOL IsSameToken(PKMX_WCHAR *p, KMX_WCHAR const * token);
 KMX_DWORD GetRHS(PFILE_KEYBOARD fk, PKMX_WCHAR p, PKMX_WCHAR buf, int bufsize, int offset, int IsUnicode);
 PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_WORD Flags);
 KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token, PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isVKey, int isUnicode);
-int GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store);
+KMX_DWORD GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &targets);
 
 int GetGroupNum(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 
@@ -276,7 +279,7 @@ KMX_BOOL kmcmp::AddCompileWarning(PKMX_CHAR buf)
 KMX_BOOL AddCompileError(KMX_DWORD msg)
 {
   KMX_CHAR szText[COMPILE_ERROR_MAX_LEN];
-  KMX_CHAR* szTextp = NULL;
+  const KMX_CHAR* szTextp = NULL;
 
   if (msg & CERR_FATAL)
   {
@@ -806,12 +809,13 @@ bool resizeStoreArray(PFILE_KEYBOARD fk) {
  * reallocates the key array in increments of 100
  */
 bool resizeKeyArray(PFILE_GROUP gp, int increment) {
-  if((gp->cxKeyArray + increment - 1) % 100 < increment) {
-    PFILE_KEY kp = new FILE_KEY[((gp->cxKeyArray + increment)/100 + 1) * 100];
+  const int cxKeyArray = (int)gp->cxKeyArray;
+  if((cxKeyArray + increment - 1) % 100 < increment) {
+    PFILE_KEY kp = new FILE_KEY[((cxKeyArray + increment)/100 + 1) * 100];
     if (!kp) return false;
     if (gp->dpKeyArray)
     {
-      memcpy(kp, gp->dpKeyArray, gp->cxKeyArray * sizeof(FILE_KEY));
+      memcpy(kp, gp->dpKeyArray, cxKeyArray * sizeof(FILE_KEY));
       delete[] gp->dpKeyArray;
     }
 
@@ -1085,7 +1089,9 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
 
   case TSS_TARGETS:   // I4504
     VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnlyTargets);
-    fk->extra->targets = GetCompileTargetsFromTargetsStore(sp->dpString);
+    if((msg = GetCompileTargetsFromTargetsStore(sp->dpString, fk->extra->targets)) != CERR_None) {
+      return msg;
+    }
     break;
 
   case TSS_WINDOWSLANGUAGES:
@@ -1168,7 +1174,7 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
   return CERR_None;
 }
 
-int GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store) {
+KMX_DWORD GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &targets) {
   // Compile to .kmx
   const std::vector<std::u16string> KMXKeymanTargets{
     u"windows", u"macosx", u"linux", u"desktop"
@@ -1182,35 +1188,53 @@ int GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store) {
 
   const std::u16string AnyTarget = u"any";
 
-  int result = 0;
+  targets = 0;
   auto p = new KMX_WCHAR[u16len(store)+1];
   u16cpy(p, store);
   KMX_WCHAR* ctx;
   auto token = u16tok(p, u" ", &ctx);
   while(token) {
-    if(AnyTarget == token) {
-      result |= COMPILETARGETS_KMX | COMPILETARGETS_JS;
-    }
-    for(auto p: KMXKeymanTargets) {
-      if(p == token) result |= COMPILETARGETS_KMX;
-    }
-    for(auto p: KMWKeymanTargets) {
-      if(p == token) result |= COMPILETARGETS_JS;
-    }
+    bool found = false;
+    if(*token) {
+      if(AnyTarget == token) {
+        targets |= COMPILETARGETS_KMX | COMPILETARGETS_JS;
+        found = true;
+      }
+      for(auto target: KMXKeymanTargets) {
+        if(target == token) {
+          targets |= COMPILETARGETS_KMX;
+          found = true;
+        }
+      }
+      for(auto target: KMWKeymanTargets) {
+        if(target == token) {
+          targets |= COMPILETARGETS_JS;
+          found = true;
+        }
+      }
 
+      if(!found) {
+        snprintf(ErrExtraLIB, ERR_EXTRA_LIB_LEN, " target: %s", string_from_u16string(token).c_str());
+        delete[] p;
+        targets = 0;
+        return CERR_InvalidTarget;
+      }
+    }
     token = u16tok(nullptr, u" ", &ctx);
-
-    // Future: consider warnings on invalid compile targets?
   }
   delete[] p;
 
-  return result;
+  if(targets == 0) {
+    return CERR_NoTargetsSpecified;
+  }
+
+  return CERR_None;
 }
 
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString) {   // I4140
   /**
     version format: /^\d+(\.\d+)*$/
-    e.g. 9.0.3, 1.0, 1.2.3.4, 6.2.1.4.6.4, 11.22.3 are all ok; 
+    e.g. 9.0.3, 1.0, 1.2.3.4, 6.2.1.4.6.4, 11.22.3 are all ok;
     empty string is not permitted; whitespace is not permitted
   */
 
@@ -1276,8 +1300,13 @@ KMX_DWORD CheckStatementOffsets(PFILE_KEYBOARD fk, PFILE_GROUP gp, PKMX_WCHAR co
 
         int anyStore = *(q + 2) - 1;
 
-        if (xstrlen(fk->dpStoreArray[indexStore].dpString) < xstrlen(fk->dpStoreArray[anyStore].dpString)) {
-          AddWarning(CWARN_IndexStoreShort); //TODO: if this fails, then we return FALSE instead of an error
+        const int anyLength = xstrlen(fk->dpStoreArray[anyStore].dpString);
+        const int indexLength = xstrlen(fk->dpStoreArray[indexStore].dpString);
+
+        if (indexLength < anyLength) {
+          AddWarning(CWARN_IndexStoreShort);
+        } else if(indexLength > anyLength) {
+          AddWarning(CHINT_IndexStoreLong);
         }
       } else if (*(p + 1) == CODE_CONTEXTEX) {
         int contextOffset = *(p + 2);
@@ -1471,7 +1500,14 @@ KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnico
 
     str = p + 1;
     if ((msg = GetXString(fk, str, u">", pklKey, GLOBAL_BUFSIZE - 1, (int)(str - pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
+
     if (pklKey[0] == 0) return CERR_ZeroLengthString;
+
+    if(Uni_IsSurrogate1(pklKey[0])) {
+      // #11643: non-BMP characters do not makes sense for key codes
+      return CERR_NonBMPCharactersNotSupportedInKeySection;
+    }
+
     if (xstrlen(pklKey) > 1) AddWarning(CWARN_KeyBadLength);
   } else {
     if ((msg = GetXString(fk, str, u">", pklIn, GLOBAL_BUFSIZE - 1, (int)(str - pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
@@ -1653,9 +1689,10 @@ KMX_DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, KMX_DWORD storeIndex)
       default:
         return CERR_CodeInvalidInKeyStore;
       }
-    }
-    else
-    {
+    } else if(Uni_IsSurrogate1(*pn)) {
+      // #11643: non-BMP characters do not makes sense for key codes
+      return CERR_NonBMPCharactersNotSupportedInKeySection;
+    } else {
       k->Key = *pn;				// set the key to store offset.
       k->ShiftFlags = 0;
     }
@@ -1670,7 +1707,27 @@ KMX_DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, KMX_DWORD storeIndex)
   return CERR_None;
 }
 
-
+/**
+ * When called with a pointer to a wide-character C-string string, the open and close delimiters, and
+ * optional flags, returns a pointer to the section of the KMX_WCHAR string identified by the delimiters.
+ * The supplied string will be terminated by a null where the close delimiter was.  The pointer to the supplied
+ * string is adjusted to point either to the null where the close delimiter was, or if there are trailing
+ * whitespaces after the close delimiter, to the last of these.  Whitespaces before the open delimiter
+ * are always skipped.  If the flag contains GDS_CUTLEAD, whitespaces after the open delimiter are skipped;
+ * if the flag contains GDS_CUTFOLL, whitespace immediately before the close delimiter is skipped by setting
+ * the first such character to null.
+ *
+ * @param p a pointer to a wide-character C-string
+ *
+ * @param Delimiters a pointer to a two-character wide-character C-string containing the open and close
+ * delimiters
+ *
+ * @param Flags include GDS_CUTLEAD and/or GDS_CUTFOLL to cut leading and/or following whitespace from
+ * the delimited string
+ *
+ * @return a pointer to the section of the wide-character C-string identified by the delimiters, or NULL if
+ * the delimiters cannot be found
+*/
 PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_WORD Flags)
 {
   PKMX_WCHAR q, r;
@@ -1692,15 +1749,20 @@ PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_W
     while (iswspace(*q)) q++;	        // cut off leading spaces
 
   if (Flags & GDS_CUTFOLL)
-    if (!iswspace(*(r - 1))) *r = 0;
+    if (!iswspace(*(r - 1))) *r = 0; // delete close delimiter
     else
     {
       r--;							// Cut off following spaces
       while (iswspace(*r) && r > q) r--;
-      r++;
-      *r = 0; r = (PKMX_WCHAR) u16chr((r + 1), dClose);
+      if (!iswspace(*r)) r++;
+
+      *r = 0; // delete first following space
+
+      r = (PKMX_WCHAR) u16chr((r + 1), dClose);
+
+      *r = 0; // delete close delimiter
     }
-  else *r = 0;
+  else *r = 0; // delete close delimiter
 
   r++; while (iswspace(*r)) r++;	        // Ignore spaces after the close
   if (*r == 0) r--;					    // Safety for terminating strings.
@@ -2013,7 +2075,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
           kmcmp::CheckStoreUsage(fk, i, TRUE, FALSE, FALSE);
 
           r = u16tok(NULL, p_sep_com, &context);  // I3481
-          if (!r) return CERR_InvalidIndex;
+          if (!r || !*r || !isIntegerWstring(r) || atoiW(r) < 1) return CERR_InvalidIndex;
         }
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_INDEX;
@@ -3361,6 +3423,26 @@ int atoiW(PKMX_WCHAR p)
   return i;
 }
 
+/**
+ * Checks if a wide-character C-string represents an integer.
+ * It does not strip whitespace, and depends on the action of atoi()
+ * to determine if the C-string is an integer.
+ *
+ * @param p a pointer to a wide-character C-string
+ *
+ * @return true if p represents an integer, false otherwise
+*/
+bool isIntegerWstring(PKMX_WCHAR p) {
+  if (!p || !*p)
+    return false;
+  PKMX_STR q = wstrtostr(p);
+  std::ostringstream os;
+  os << atoi(q);
+  int cmp = strcmp(q, os.str().c_str());
+  delete[] q;
+  return cmp == 0 ? true : false;
+}
+
 KMX_DWORD kmcmp::CheckUTF16(int n)
 {
   const int res[] = {
@@ -3516,7 +3598,7 @@ bool UTF16TempFromUTF8(KMX_BYTE* infile, int sz, KMX_BYTE** tempfile, int *sz16)
   try {
     std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
     result = converter.from_bytes((char*)infile, (char*)infile+sz);
-  } catch(std::range_error e) {
+  } catch(std::range_error& e) {
     AddCompileError(CHINT_NonUnicodeFile);
     result.resize(sz);
     for(int i = 0; i < sz; i++) {

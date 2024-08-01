@@ -1,11 +1,13 @@
 #include "../../../src/ldml/ldml_markers.hpp"
 #include "../../../src/ldml/ldml_transforms.hpp"
+#include "../../../src/util_regex.hpp"
 #include "kmx/kmx_plus.h"
 #include "kmx/kmx_xstring.h"
 #include "test_color.h"
 #include <iostream>
 #include <string>
 #include <test_assert.h>
+#include "../../../src/util_regex.hpp"
 
 // TODO-LDML: normal asserts wern't working, so using some hacks.
 // #include "ldml_test_utils.hpp"
@@ -13,14 +15,14 @@
 // #include "debuglog.h"
 
 #ifndef zassert_string_equal
-#define zassert_string_equal(actual, expected)                                                              \
-  {                                                                                                         \
-    if (actual != expected) {                                                                               \
-      std::wcerr << __FILE__ << ":" << __LINE__ << ": " << console_color::fg(console_color::BRIGHT_RED)     \
-                 << "got: " << km::core::kmx::Debug_UnicodeString(actual, 0) << " expected "                \
-                 << km::core::kmx::Debug_UnicodeString(expected, 1) << console_color::reset() << std::endl; \
-      return EXIT_FAILURE;                                                                                  \
-    }                                                                                                       \
+#define zassert_string_equal(actual, expected)                                                                               \
+  {                                                                                                                          \
+    if (actual != expected) {                                                                                                \
+      std::wcerr << __FILE__ << ":" << __LINE__ << ": " << console_color::fg(console_color::BRIGHT_RED) << "got: " << actual \
+                 << " " << km::core::kmx::Debug_UnicodeString(actual, 0) << " expected " << expected << " "                  \
+                 << km::core::kmx::Debug_UnicodeString(expected, 1) << console_color::reset() << std::endl;                  \
+      return EXIT_FAILURE;                                                                                                   \
+    }                                                                                                                        \
   }
 #endif
 
@@ -624,16 +626,16 @@ test_map() {
   std::cout << __FILE__ << ":" << __LINE__ << "  transform_entry::findIndex" << std::endl;
   {
     std::deque<std::u32string> list;
-    assert_equal(transform_entry::findIndex(U"Does Not Exist", list), -1);
+    assert_equal(km::core::util::km_regex::findIndex(U"Does Not Exist", list), -1);
 
     list.emplace_back(U"0th");
     list.emplace_back(U"First");
     list.emplace_back(U"Second");
 
-    assert_equal(transform_entry::findIndex(U"First", list), 1);
-    assert_equal(transform_entry::findIndex(U"0th", list), 0);
-    assert_equal(transform_entry::findIndex(U"Second", list), 2);
-    assert_equal(transform_entry::findIndex(U"Nowhere", list), -1);
+    assert_equal(km::core::util::km_regex::findIndex(U"First", list), 1);
+    assert_equal(km::core::util::km_regex::findIndex(U"0th", list), 0);
+    assert_equal(km::core::util::km_regex::findIndex(U"Second", list), 2);
+    assert_equal(km::core::util::km_regex::findIndex(U"Nowhere", list), -1);
   }
 
   return EXIT_SUCCESS;
@@ -1135,6 +1137,102 @@ test_normalize() {
   return EXIT_SUCCESS;
 }
 
+/** test for the util_regex.hpp functions */
+int
+test_util_regex() {
+  std::cout << "== " << __FUNCTION__ << std::endl;
+
+  {
+    std::cout << __FILE__ << ":" << __LINE__ << " * util_regex.hpp null tests" << std::endl;
+    km::core::util::km_regex r;
+    assert(!r.valid()); // not valid because of an empty string
+  }
+  {
+    std::cout << __FILE__ << ":" << __LINE__ << " * util_regex.hpp simple tests" << std::endl;
+    km::core::util::km_regex r(U"ion");
+    assert(r.valid());
+    const std::u32string to(U"ivity");
+    const std::deque<std::u32string> fromList;
+    const std::deque<std::u32string> toList;
+    std::u32string output;
+    auto apply0 = r.apply(U"not present", output, to, fromList, toList);
+    assert_equal(apply0, 0); // not found
+
+    const std::u32string input(U"action");
+    auto apply1 = r.apply(input, output, to, fromList, toList);
+    assert_equal(apply1, 3); // matched last 3 codepoints
+    std::u32string expect(U"ivity");
+    zassert_string_equal(output, expect)
+  }
+  {
+    std::cout << __FILE__ << ":" << __LINE__ << " * util_regex.hpp wide tests" << std::endl;
+    km::core::util::km_regex r(U"e𐒻");
+    assert(r.valid());
+    const std::u32string to(U"𐓏");
+    const std::deque<std::u32string> fromList;
+    const std::deque<std::u32string> toList;
+    std::u32string output;
+    const std::u32string input(U":e𐒻");
+    auto apply1 = r.apply(input, output, to, fromList, toList);
+    assert_equal(apply1, 2); // matched last 2 codepoints
+    std::u32string expect(U"𐓏");
+    zassert_string_equal(output, expect)
+  }
+  {
+    std::cout << __FILE__ << ":" << __LINE__ << " * util_regex.hpp simple map tests" << std::endl;
+    km::core::util::km_regex r(U"(A|B|C)");
+    assert(r.valid());
+    const std::u32string to(U"$[1:alpha2]"); // ignored
+    std::deque<std::u32string> fromList;
+    fromList.emplace_back(U"A");
+    fromList.emplace_back(U"B");
+    fromList.emplace_back(U"C");
+    std::deque<std::u32string> toList;
+    toList.emplace_back(U"N");
+    toList.emplace_back(U"O");
+    toList.emplace_back(U"P");
+    std::u32string output;
+    auto apply0 = r.apply(U"not present", output, to, fromList, toList);
+    assert_equal(apply0, 0); // not found
+
+    const std::u32string input(U"WHOA");
+    auto apply1 = r.apply(input, output, to, fromList, toList);
+    assert_equal(apply1, 1); // matched last 1 codepoint
+    std::u32string expect(U"N");
+    zassert_string_equal(output, expect)
+  }
+  {
+    std::cout << __FILE__ << ":" << __LINE__ << " * util_regex.hpp wide map tests" << std::endl;
+    km::core::util::km_regex r(U"(𐒷|𐒻|𐓏𐓏|x)");
+    assert(r.valid());
+    const std::u32string to(U"$[1:alpha2]"); // ignored
+    std::deque<std::u32string> fromList;
+    fromList.emplace_back(U"𐒷");
+    fromList.emplace_back(U"𐒻");
+    fromList.emplace_back(U"𐓏𐓏");
+    fromList.emplace_back(U"x");
+    std::deque<std::u32string> toList;
+    toList.emplace_back(U"x");
+    toList.emplace_back(U"𐒷");
+    toList.emplace_back(U"𐒻");
+    toList.emplace_back(U"𐓏");
+    std::u32string output;
+    auto apply0 = r.apply(U"not present", output, to, fromList, toList);
+    assert_equal(apply0, 0); // not found
+
+    assert_equal(r.apply(U"WHO𐓏𐒷", output, to, fromList, toList), 1);
+    zassert_string_equal(output, U"x");
+
+    assert_equal(r.apply(U"WHO𐓏x", output, to, fromList, toList), 1);
+    zassert_string_equal(output, U"𐓏");
+
+    assert_equal(r.apply(U"WHO𐓏𐓏", output, to, fromList, toList), 2); // 2 codepoints
+    zassert_string_equal(output, U"𐒻");
+  }
+
+  return EXIT_SUCCESS;
+}
+
 int
 main(int argc, const char *argv[]) {
   int rc = EXIT_SUCCESS;
@@ -1152,6 +1250,9 @@ main(int argc, const char *argv[]) {
 
   console_color::enabled = console_color::isaterminal() || arg_color;
 
+  if (test_util_regex() != EXIT_SUCCESS) {
+    rc = EXIT_FAILURE;
+  }
 
   if (test_transforms() != EXIT_SUCCESS) {
     rc = EXIT_FAILURE;
