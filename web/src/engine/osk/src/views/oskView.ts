@@ -1,4 +1,4 @@
-import EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter3';
 
 import { BannerView } from '../banner/bannerView.js';
 import { BannerController } from '../banner/bannerController.js';
@@ -14,7 +14,6 @@ import {
   Codes,
   DeviceSpec,
   Keyboard,
-  KeyEvent,
   KeyboardProperties,
   ManagedPromise,
   type MinimalCodesInterface,
@@ -22,7 +21,7 @@ import {
   type SystemStoreMutationHandler
 } from '@keymanapp/keyboard-processor';
 import { createUnselectableElement, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
-import { EventListener, EventNames, KeyEventHandler, KeyEventSourceInterface, LegacyEventEmitter } from 'keyman/engine/events';
+import { EventListener, KeyEventHandler, KeyEventSourceInterface, LegacyEventEmitter } from 'keyman/engine/events';
 
 import Configuration from '../config/viewConfiguration.js';
 import Activator, { StaticActivator } from './activator.js';
@@ -46,13 +45,17 @@ export type OSKRect = {
  * https://help.keyman.com/DEVELOPER/ENGINE/WEB/16.0/reference/events/.
  */
 export interface LegacyOSKEventMap {
-  'configclick'(obj: {});
-  'helpclick'(obj: {});
-  'resizemove'(obj: {});
-  'show'(obj: {});
+  'configclick'(obj: {}): void;
+  'helpclick'(obj: {}): void;
+  'resizemove'(obj: {}): void;
+  'show'(obj: {
+    x?: number,
+    y?: number,
+    userLocated?: boolean
+  }): void;
   'hide'(obj: {
-    HiddenByUser: boolean
-  });
+    HiddenByUser?: boolean
+  }): void;
 }
 
 /**
@@ -161,7 +164,6 @@ export default abstract class OSKView
   private config: Configuration;
   private deferLayout: boolean;
 
-  private _boxBaseMouseDown:        (e: MouseEvent) => boolean;
   private _boxBaseTouchStart:       (e: TouchEvent) => boolean;
   private _boxBaseTouchEventCancel: (e: TouchEvent) => boolean;
 
@@ -201,7 +203,6 @@ export default abstract class OSKView
   private _baseFontSize: ParsedLengthStyle;
 
   private needsLayout: boolean = true;
-  private initialized: boolean;
 
   private _animatedHideTimeout: number;
 
@@ -239,7 +240,7 @@ export default abstract class OSKView
 
     this._bannerController = new BannerController(this.bannerView, this.hostDevice, this.config.predictionContextManager);
 
-    this.keyboardView = new EmptyView();
+    this.keyboardView = this._GenerateKeyboardView(null, null);
     this._Box.appendChild(this.keyboardView.element);
 
     // Install the default OSK stylesheets - but don't have it managed by the keyboard-specific stylesheet manager.
@@ -252,22 +253,12 @@ export default abstract class OSKView
       this.uiStyleSheetManager.linkExternalSheet(sheetHref);
     }
 
-    this.activeKeyboard = this.config.keyboardToActivate;
-
-    // Ensure the appropriate banner mode is activated; it's possible for a model to have either
-    // partially or fully loaded, especially if the prior line has a full Keyboard instance.
-    const modelState = this.config.predictionContextManager?.modelState;
-    if(modelState) {
-      this.bannerController.selectBanner(modelState);
-    }
-
     this.setBaseMouseEventListeners();
     if(this.hostDevice.touchable) {
       this.setBaseTouchEventListeners();
     }
 
     this._Box.style.display = 'none';
-    this.initialized = true;
   }
 
   protected get configuration(): Configuration {
@@ -290,24 +281,8 @@ export default abstract class OSKView
     return this.config.isEmbedded;
   }
 
-  /**
-   * Function     _VKbdMouseEnter
-   * Scope        Private
-   * @param       {Object}      e      event
-   * Description  Activate the KMW UI when mouse enters the OSK element hierarchy
-   */
-  private _VKbdMouseEnter: (e: MouseEvent) => void;
-
-  /**
-   * Function     _VKbdMouseLeave
-   * Scope        Private
-   * @param       {Object}      e      event
-   * Description  Cancel activation of KMW UI when mouse leaves the OSK element hierarchy
-   */
-  private _VKbdMouseLeave: (e: MouseEvent) => void;
-
   private setBaseMouseEventListeners() {
-    this._Box.onmouseenter = this._VKbdMouseEnter = (e) => {
+    this._Box.onmouseenter = (e) => {
       if(this.mouseEnterPromise) {
         // The chain was somehow interrupted, with the mouseleave never occurring!
         this.mouseEnterPromise.resolve();
@@ -317,7 +292,7 @@ export default abstract class OSKView
       this.emit('pointerinteraction', this.mouseEnterPromise.corePromise);
     };
 
-    this._Box.onmouseleave = this._VKbdMouseLeave = (e) => {
+    this._Box.onmouseleave = (e) => {
       this.mouseEnterPromise.resolve();
       this.mouseEnterPromise = null;
       // focusAssistant.setMaintainingFocus(false);
@@ -553,13 +528,6 @@ export default abstract class OSKView
     keyboard: Keyboard,
     metadata: KeyboardProperties
   }) {
-    // Is the keyboard already loaded?  If so, ignore the change command.
-    //
-    // Note:  ensures that the _instances_ are the same; it's possible to make new instances
-    // to force a refresh.  Does not perform a deep-equals.
-    if(this.initialized && this.keyboardData?.keyboard == keyboardData?.keyboard && this.keyboardData?.metadata == keyboardData?.metadata) {
-      return;
-    }
     this.keyboardData = keyboardData;
     this.loadActiveKeyboard();
 
@@ -898,7 +866,7 @@ export default abstract class OSKView
       //
       // Also, only change the layer ID itself if there is an actual corresponding layer
       // in the OSK.
-      if(this.vkbd?.layerGroup.layers[newValue] && !this.vkbd?.layerLocked) {
+      if(this.vkbd?.layerGroup.getLayer(newValue) && !this.vkbd?.layerLocked) {
         // triggers state-update + layer refresh automatically.
         this.vkbd.layerId = newValue;
       }
@@ -956,7 +924,7 @@ export default abstract class OSKView
    * Method usable by subclasses of OSKView to control that OSKView type's
    * positioning behavior when needed by the present() method.
    */
-  protected abstract setDisplayPositioning();
+  protected abstract setDisplayPositioning(): void;
 
   /**
    * Method used to start a potentially-asynchronous hide of the OSK.
@@ -1271,7 +1239,11 @@ export default abstract class OSKView
    * @return      {boolean}
    *
    */
-  doShow(p) {
+  doShow(p: {
+    x: number,
+    y: number,
+    userLocated: boolean
+  }) {
     // Newer style 'doShow' emitted from .present by default.
     this.legacyEvents.callEvent('show', p);
   }

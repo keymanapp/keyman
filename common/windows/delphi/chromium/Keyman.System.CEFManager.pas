@@ -31,7 +31,7 @@ type
     procedure Cleanup(Sender: TObject);
     procedure LaunchWatchdog;
   public
-    constructor Create;
+    constructor Create(IsDeveloper: Boolean);
     destructor Destroy; override;
     function Start: Boolean;
     function StartSubProcess: Boolean;  // Use for browser sub process only
@@ -78,7 +78,7 @@ begin
   end;
 end;
 
-constructor TCEFManager.Create;
+constructor TCEFManager.Create(IsDeveloper: Boolean);
 begin
   FWindows := TList<IKeymanCEFHost>.Create;
   // You *MUST* call GlobalCEFApp.StartMainProcess in a if..then clause
@@ -95,7 +95,7 @@ begin
   // debug the CEF interactions more easily
 //  GlobalCEFApp.SingleProcess        := TikeDebugMode;
 
-  GlobalCEFApp.BrowserSubprocessPath := TKeymanPaths.CEFSubprocessPath;
+  GlobalCEFApp.BrowserSubprocessPath := TKeymanPaths.CEFSubprocessPath(IsDeveloper);
 
   // In case you want to use custom directories for the CEF3 binaries, cache, cookies and user data.
   // If you don't set a cache directory the browser will use in-memory cache.

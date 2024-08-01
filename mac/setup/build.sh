@@ -12,6 +12,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 verify_on_mac
 
+cd "${THIS_SCRIPT_PATH}"
+
 #
 # Constants
 #
@@ -25,7 +27,7 @@ KEYMANAPP=../Keyman4MacIM/build/Release/Keyman.app
 # Build basic app and copy icons
 #
 
-if [ -f "$SOURCEAPP" ]; then
+if [ -e "$SOURCEAPP" ]; then
   rm -rf "$SOURCEAPP"
 fi
 

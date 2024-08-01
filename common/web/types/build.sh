@@ -6,6 +6,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
 builder_describe "Build Keyman common file types module" \
   "@/core/include/ldml" \
@@ -14,9 +15,10 @@ builder_describe "Build Keyman common file types module" \
   "build" \
   "clean" \
   "test" \
-  "pack                      build a local .tgz pack for testing" \
   "publish                   publish to npm" \
+  "--npm-publish+            For publish, do a npm publish, not npm pack (only for CI)" \
   "--dry-run,-n              don't actually publish, just dry run"
+
 builder_describe_outputs \
   configure   /common/web/types/src/schemas/kpj.schema.ts \
   build       /common/web/types/build/src/main.js
@@ -87,8 +89,12 @@ function copy_cldr_imports() {
 
 function do_configure() {
   compile_schemas
-  copy_cldr_imports
   verify_npm_setup
+}
+
+function do_build() {
+  copy_cldr_imports
+  tsc --build
 }
 
 function do_test() {
@@ -101,17 +107,6 @@ function do_test() {
 
 builder_run_action clean      rm -rf ./build/ ./tsconfig.tsbuildinfo
 builder_run_action configure  do_configure
-builder_run_action build      tsc --build
+builder_run_action build      do_build
 builder_run_action test       do_test
-
-#-------------------------------------------------------------------------------------------------------------------
-
-if builder_start_action publish; then
-  . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
-  builder_publish_to_npm
-  builder_finish_action success publish
-elif builder_start_action pack; then
-  . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
-  builder_publish_to_pack
-  builder_finish_action success pack
-fi
+builder_run_action publish    builder_publish_npm

@@ -1,17 +1,18 @@
 /**
  * Keyman is copyright (C) SIL International. MIT License.
- * 
+ *
  * TextApiComplianceTests.m
  * KeymanTests
- * 
+ *
  * Created by Shawn Schantz on 2024-04-08.
- * 
+ *
  * Unit tests of TextApiCompliance class
  */
 
 #import <XCTest/XCTest.h>
 #import "TextApiCompliance.h"
 #import "AppleCompliantTestClient.h"
+#import "KMLogs.h"
 
 @interface TextApiComplianceTests : XCTestCase
 @end
@@ -29,11 +30,11 @@
 @implementation TextApiComplianceTests
 
 - (void)setUp {
-    // Put setup code here. This method is called before the invocation of each test method in the class.
+  // Put setup code here. This method is called before the invocation of each test method in the class.
 }
 
 - (void)tearDown {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
+  // Put teardown code here. This method is called after the invocation of each test method in the class.
 }
 
 - (void)testValidateNewLocation_locationNotFound_returnsNo {
@@ -149,21 +150,21 @@
   id client = [[AppleCompliantTestClient alloc] init];
   NSString *clientAppId = @"com.compliant.app";
   TextApiCompliance *apiCompliance = [[TextApiCompliance alloc]initWithClient:client applicationId:clientAppId];
-
+  
   NSArray *legacyAppsArray = [NSArray arrayWithObjects:@"com.microsoft.VSCode",@"com.adobe.Photoshop",nil];
-
+  
   BOOL isLegacy = [apiCompliance arrayContainsApplicationId:clientAppId fromArray:legacyAppsArray];
-  NSLog(@"isLegacy = %@", isLegacy?@"yes":@"no");
-    XCTAssertFalse(isLegacy, @"App not expected to be in legacy list");
+  os_log_debug([KMLogs testLog], "isLegacy = %@", isLegacy?@"yes":@"no");
+  XCTAssertFalse(isLegacy, @"App not expected to be in legacy list");
 }
 
 - (void)testIsClientAppLegacy_listedClientAppId_returnsYes {
   id client = [[AppleCompliantTestClient alloc] init];
   NSString *clientAppId = @"com.microsoft.VSCode";
   TextApiCompliance *apiCompliance = [[TextApiCompliance alloc]initWithClient:client applicationId:clientAppId];
-
+  
   NSArray *legacyAppsArray = [NSArray arrayWithObjects:@"com.adobe.Photoshop",@"com.microsoft.VSCode",nil];
-
+  
   BOOL isLegacy = [apiCompliance arrayContainsApplicationId:clientAppId fromArray:legacyAppsArray];
   XCTAssertTrue(isLegacy, @"App expected to be in legacy list");
 }

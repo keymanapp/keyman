@@ -1,5 +1,5 @@
 import { KeymanTargets, CompilerCallbacks, KmpJsonFile } from "@keymanapp/common-types";
-import { CompilerMessages } from "./package-compiler-messages.js";
+import { PackageCompilerMessages } from "./package-compiler-messages.js";
 import { KeyboardMetadataCollection } from "./package-metadata-collector.js";
 
 
@@ -15,7 +15,7 @@ export class PackageKeyboardTargetValidator {
         hasJS = this.verifyTargets(metadata[keyboard].keyboard, metadata[keyboard].data.targets, kmp);
       }
       if(hasJS && !metadata[keyboard].data.hasTouchLayout) {
-        this.callbacks.reportMessage(CompilerMessages.Hint_JsKeyboardFileHasNoTouchTargets({id: metadata[keyboard].keyboard.id}));
+        this.callbacks.reportMessage(PackageCompilerMessages.Hint_JsKeyboardFileHasNoTouchTargets({id: metadata[keyboard].keyboard.id}));
       }
     }
   }
@@ -36,9 +36,9 @@ export class PackageKeyboardTargetValidator {
     // package also includes the .js
     const targets = KeymanTargets.keymanTargetsFromString(targetsText, {expandTargets: true});
     if(targets.some(target => KeymanTargets.TouchKeymanTargets.includes(target))) {
-      if(!kmp.files.find(file => this.callbacks.path.basename(file.name, '.js') == keyboard.id)) {
+      if(!kmp.files.find(file => this.callbacks.path.basename(file.name ?? '', '.js') == keyboard.id)) {
         // .js version of the keyboard is not found, warn
-        this.callbacks.reportMessage(CompilerMessages.Warn_JsKeyboardFileIsMissing({id: keyboard.id}));
+        this.callbacks.reportMessage(PackageCompilerMessages.Warn_JsKeyboardFileIsMissing({id: keyboard.id}));
         return false;
       }
       // A js file is included and targeted

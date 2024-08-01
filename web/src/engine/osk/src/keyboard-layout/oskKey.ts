@@ -42,9 +42,10 @@ export function renameSpecialKey(oldText: string, vkbd: VisualKeyboard): string 
      // do nothing.
  }
 
- let specialCodePUA = 0XE000 + specialChars[oldText];
+ const specialCode = specialChars[oldText as keyof typeof specialChars];
+ let specialCodePUA = 0XE000 + specialCode;
 
- return specialChars[oldText] ?
+ return specialCode ?
    String.fromCharCode(specialCodePUA) :
    oldText;
 }
@@ -87,6 +88,7 @@ export default abstract class OSKKey {
     let btn = this.btn;
 
     var n=0;
+    // @ts-ignore // (Probably) supports legacy KMW keyboards that predate the sp entry
     if(typeof key['dk'] == 'string' && key['dk'] == '1') {
       n=8;
     }

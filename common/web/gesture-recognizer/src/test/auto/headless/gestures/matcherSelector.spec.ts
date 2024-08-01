@@ -8,12 +8,11 @@ import { assertingPromiseStatus as promiseStatus } from '../../../resources/asse
 import { simulateMultiSourceMatcherInput, simulateSelectorInput } from "../../../resources/simulateMultiSourceInput.js";
 
 import { timedPromise } from '@keymanapp/web-utils';
-import { GestureSource, gestures } from '@keymanapp/gesture-recognizer';
+import { gestures } from '@keymanapp/gesture-recognizer';
 
 import { TouchpathTurtle } from '#tools';
 
 type MatcherSelection<Type> = gestures.matchers.MatcherSelection<Type>;
-type MatcherSelector<Type> = gestures.matchers.MatcherSelector<Type>;
 type GestureModel<Type> = gestures.specs.GestureModel<Type>;
 
 import {
@@ -24,8 +23,7 @@ import {
 } from './isolatedGestureSpecs.js';
 
 import {
-  LongpressDistanceThreshold,
-  MainLongpressSourceModel
+  LongpressDistanceThreshold
 } from './isolatedPathSpecs.js';
 
 describe("MatcherSelector", function () {
@@ -60,7 +58,7 @@ describe("MatcherSelector", function () {
         }, this.fakeClock);
 
         let completion = executor();
-        const selector = await selectorPromise;
+        await selectorPromise;
         await Promise.race([completion, selectionPromises[0]]);
 
         assert.equal(await promiseStatus(selectionPromises[0]), PromiseStatuses.PROMISE_RESOLVED);
@@ -131,7 +129,6 @@ describe("MatcherSelector", function () {
         turtle.commitPending();
 
         const {
-          sources,
           selectionPromises,
           selectorPromise,
           executor
@@ -434,7 +431,7 @@ describe("MatcherSelector", function () {
         , this.fakeClock);
 
         let completion = executor();
-        const selector = await selectorPromise;
+        await selectorPromise;
         await Promise.race([completion, selectionPromises[0]]);
 
         assert.equal(await promiseStatus(selectionPromises[0]), PromiseStatuses.PROMISE_RESOLVED);
@@ -483,7 +480,7 @@ describe("MatcherSelector", function () {
         }, this.fakeClock);
 
         let completion = executor();
-        const selector = await selectorPromise;
+        await selectorPromise;
         await Promise.race([completion, selectionPromises[0]]);
 
         // So, the terminate signal didn't complete the selection?
@@ -636,7 +633,7 @@ describe("MatcherSelector", function () {
         , this.fakeClock);
 
         let completion = executor();
-        const selector = await selectorPromise;
+        await selectorPromise;
         await Promise.race([completion, selectionPromises[0]]);
 
         assert.equal(await promiseStatus(selectionPromises[0]), PromiseStatuses.PROMISE_RESOLVED);
@@ -723,7 +720,7 @@ describe("MatcherSelector", function () {
         , this.fakeClock);
 
         let completion = executor();
-        const selector = await selectorPromise;
+        await selectorPromise;
         await Promise.race([completion, selectionPromises[0]]);
 
         assert.equal(await promiseStatus(selectionPromises[0]), PromiseStatuses.PROMISE_RESOLVED);

@@ -8,11 +8,8 @@ import { GestureModelDefs, GestureSource, gestures, TouchpointCoordinator } from
 const { matchers } = gestures;
 
 // Huh... gotta do BOTH here?  One for constructor use, the other for generic-parameter use?
-const { GestureSequence, GestureStageReport, MatcherSelector } = matchers;
+const { GestureSequence } = matchers;
 type GestureSequence<Type> = gestures.matchers.GestureSequence<Type>;
-type MatcherSelector<Type> = gestures.matchers.MatcherSelector<Type>;
-type MatcherSelection<Type> = gestures.matchers.MatcherSelection<Type>;
-type GestureStageReport<Type> = gestures.matchers.GestureStageReport<Type>;
 
 import { HeadlessInputEngine, TouchpathTurtle } from '#tools';
 import { ManagedPromise, timedPromise } from '@keymanapp/web-utils';

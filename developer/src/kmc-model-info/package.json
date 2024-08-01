@@ -35,15 +35,12 @@
     "@keymanapp/developer-utils": "*"
   },
   "devDependencies": {
-    "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.7",
     "@types/node": "^20.4.1",
     "c8": "^7.12.0",
-    "chai": "^4.3.4",
     "chalk": "^2.4.2",
     "mocha": "^8.4.0",
-    "ts-node": "^9.1.1",
-    "typescript": "^4.9.5"
+    "typescript": "^5.4.5"
   },
   "mocha": {
     "spec": "build/test/**/test-*.js",

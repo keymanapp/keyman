@@ -45,21 +45,24 @@ test-headless ( ) {
     MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
   fi
 
-  c8 mocha --recursive $MOCHA_FLAGS ./src/test/auto/headless/
+  # The currently-bundled declaration file for this package generates errors when compiling against it
+  # with current tsc versions.
+  rm -f "${KEYMAN_ROOT}/node_modules/promise-status-async/lib/index.d.ts"
+
+  tsc -b ./src/test/tsconfig.json
+  c8 mocha --recursive $MOCHA_FLAGS ./build/test/auto/headless/
 }
 
 test-browser ( ) {
-  KARMA_FLAGS=
+  local WTR_DEBUG=
+  local WTR_CONFIG=
   if [[ $# -eq 1  && $1 == "debug" ]]; then
-    KARMA_CONFIG="manual.conf.cjs"
-    KARMA_FLAGS="--no-single-run"
-  elif [ $REPORT_STYLE == "local" ]; then
-    KARMA_CONFIG="manual.conf.cjs"
-  else
-    KARMA_CONFIG="CI.conf.cjs"
+    WTR_DEBUG=" --manual"
+  elif [ $REPORT_STYLE != "local" ]; then
+    WTR_CONFIG=.CI
   fi
 
-  karma start src/test/auto/browser/$KARMA_CONFIG "$KARMA_FLAGS"
+  web-test-runner --config src/test/auto/browser/web-test-runner${WTR_CONFIG}.config.mjs ${WTR_DEBUG}
 }
 
 if builder_start_action test:headless; then

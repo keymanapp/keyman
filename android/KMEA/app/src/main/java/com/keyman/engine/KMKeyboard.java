@@ -170,51 +170,69 @@ final class KMKeyboard extends WebView {
     return result;
   }
 
+  /**
+   * Updates the selection range of the current context.
+   * Returns boolean - true if the selection range was updated successfully
+   */
   protected boolean updateSelectionRange() {
-    boolean result = false;
+
     InputConnection ic = KMManager.getInputConnection(this.keyboardType);
-    if (ic != null) {
-      ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
-      if (icText == null) {
-        return false;
-      }
-
-      String rawText = icText.text.toString();
-      updateText(rawText.toString());
-
-      int selStart = icText.selectionStart;
-      int selEnd = icText.selectionEnd;
-
-      int selMin = selStart, selMax = selEnd;
-      if (selStart > selEnd) {
-        // Selection is reversed so "swap"
-        selMin = selEnd;
-        selMax = selStart;
-      }
-
-      /*
-        The values of selStart & selEnd provided by the system are in code units,
-        not code-points.  We need to account for surrogate pairs here.
-
-        Fortunately, it uses UCS-2 encoding... just like JS.
-
-        References:
-        - https://stackoverflow.com/a/23980211
-        - https://android.googlesource.com/platform/frameworks/base/+/152944f/core/java/android/view/inputmethod/InputConnection.java#326
-       */
-
-      // Count the number of characters which are surrogate pairs.
-      int pairsAtStart = CharSequenceUtil.countSurrogatePairs(rawText.substring(0, selStart), rawText.length());
-      String selectedText = rawText.substring(selStart, selEnd);
-      int pairsSelected = CharSequenceUtil.countSurrogatePairs(selectedText, selectedText.length());
-
-      selStart -= pairsAtStart;
-      selEnd -= (pairsAtStart + pairsSelected);
-      this.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selStart, selEnd));
+    if (ic == null) {
+      // Unable to get connection to the text
+      return false;
     }
-    result = true;
 
-    return result;
+    ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
+    if (icText == null) {
+      // Failed to get text becausee either input connection became invalid or client is taking too long to respond
+      // https://developer.android.com/reference/android/view/inputmethod/InputConnection#getExtractedText(android.view.inputmethod.ExtractedTextRequest,%20int)
+      return false;
+    }
+
+    String rawText = icText.text.toString();
+    updateText(rawText.toString());
+
+    int selMin = icText.selectionStart, selMax = icText.selectionEnd;
+
+    int textLength = rawText.length();
+
+    if (selMin < 0 || selMax < 0) {
+      // There is no selection or cursor
+      // Reference https://developer.android.com/reference/android/text/Selection#getSelectionEnd(java.lang.CharSequence)
+      return false;
+    } else if (selMin > textLength || selMax > textLength) {
+      // Selection is past end of existing text -- should not be possible but we
+      // are seeing it happen; #11506
+      return false;
+    }
+
+    if (selMin > selMax) {
+      // Selection is reversed so "swap"
+      selMin = icText.selectionEnd;
+      selMax = icText.selectionStart;
+    }
+
+    /*
+      The values of selStart & selEnd provided by the system are in code units,
+      not code-points.  We need to account for surrogate pairs here.
+
+      Fortunately, it uses UCS-2 encoding... just like JS.
+
+      References:
+      - https://stackoverflow.com/a/23980211
+      - https://android.googlesource.com/platform/frameworks/base/+/152944f/core/java/android/view/inputmethod/InputConnection.java#326
+      */
+
+    // Count the number of characters which are surrogate pairs.
+    int pairsAtStart = CharSequenceUtil.countSurrogatePairs(rawText.substring(0, selMin), rawText.length());
+    String selectedText = rawText.substring(selMin, selMax);
+    int pairsSelected = CharSequenceUtil.countSurrogatePairs(selectedText, selectedText.length());
+
+    selMin -= pairsAtStart;
+    selMax -= (pairsAtStart + pairsSelected);
+    this.loadJavascript(KMString.format("updateKMSelectionRange(%d,%d)", selMin, selMax));
+
+    return true;
   }
 
 
@@ -244,7 +262,7 @@ final class KMKeyboard extends WebView {
     // When `.isTestMode() == true`, the setWebContentsDebuggingEnabled method is not available
     // and thus will trigger unit-test failures.
     if (!KMManager.isTestMode() && (
-      (context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0 || 
+      (context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0 ||
       KMManager.getTier(null) != KMManager.Tier.STABLE
     )) {
       // Enable debugging of WebView via adb. Not used during unit tests
@@ -295,6 +313,12 @@ final class KMKeyboard extends WebView {
       public void onLongPress(MotionEvent event) {
          if (KMManager.getGlobeKeyState() == KMManager.GlobeKeyState.GLOBE_KEY_STATE_DOWN) {
           KMManager.setGlobeKeyState(KMManager.GlobeKeyState.GLOBE_KEY_STATE_LONGPRESS);
+
+          // When we activate the keyboard picker, this will disrupt the JS-side's control
+          // flow for gesture-handling; we should pre-emptively clear the globe key,
+          // as Web will not receive a "globe key up" event.
+          loadJavascript("clearGlobeHighlight()");
+
           KMManager.handleGlobeKeyAction(context, true, keyboardType);
           return;
         /* For future implementation
@@ -425,26 +449,42 @@ final class KMKeyboard extends WebView {
     dismissHelpBubble();
   }
 
+  @Override
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
 
     RelativeLayout.LayoutParams params = KMManager.getKeyboardLayoutParams();
+    // I suspect this is the part we should actually be calling directly...
     this.setLayoutParams(params);
-
-    int bannerHeight = KMManager.getBannerHeight(context);
-    int oskHeight = KMManager.getKeyboardHeight(context);
-    if (this.htmlBannerString != null && !this.htmlBannerString.isEmpty()) {
-      setHTMLBanner(this.htmlBannerString);
-    }
-    loadJavascript(KMString.format("setBannerHeight(%d)", bannerHeight));
-    loadJavascript(KMString.format("setOskWidth(%d)", newConfig.screenWidthDp));
-    loadJavascript(KMString.format("setOskHeight(%d)", oskHeight));
+    this.invalidate();
+    this.requestLayout();
 
     this.dismissHelpBubble();
 
     if(this.getShouldShowHelpBubble()) {
       this.showHelpBubbleAfterDelay(2000);
     }
+  }
+
+  @Override
+  public void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
+    super.onSizeChanged(width, height, oldWidth, oldHeight);
+    int bannerHeight = KMManager.getBannerHeight(context);
+    int oskHeight = KMManager.getKeyboardHeight(context);
+
+    if(bannerHeight + oskHeight != height) {
+      // We'll proceed, but cautiously and with logging.
+      KMLog.LogInfo(TAG, "Height mismatch: onSizeChanged = " + height + ", our version = " + (bannerHeight + oskHeight));
+    }
+
+    if (this.htmlBannerString != null && !this.htmlBannerString.isEmpty()) {
+      setHTMLBanner(this.htmlBannerString);
+    }
+
+    loadJavascript(KMString.format("setBannerHeight(%d)", bannerHeight));
+    loadJavascript(KMString.format("setOskWidth(%d)", width));
+    // Must be last - it's the one that triggers a Web-engine layout refresh.
+    loadJavascript(KMString.format("setOskHeight(%d)", oskHeight));
   }
 
   public void dismissSuggestionMenuWindow() {
@@ -895,10 +935,7 @@ final class KMKeyboard extends WebView {
     rotateSuggestions.setClickable(false);
 
     // Compute the actual display position (offset coordinate by actual screen pos of kbd)
-    WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-    DisplayMetrics metrics = new DisplayMetrics();
-    wm.getDefaultDisplay().getMetrics(metrics);
-    float density = metrics.density;
+    float density = KMManager.getWindowDensity(context);
 
     int posX, posY;
     if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {

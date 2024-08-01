@@ -3,12 +3,11 @@ import { Device as DeviceDetector } from 'keyman/engine/device-detect';
 import { getAbsoluteY } from 'keyman/engine/dom-utils';
 import { OutputTarget } from 'keyman/engine/element-wrappers';
 import {
-  OSKView,
   TwoStateActivator,
   VisualKeyboard
 } from 'keyman/engine/osk';
 import { ErrorStub, KeyboardStub, CloudQueryResult, toPrefixedKeyboardId as prefixed } from 'keyman/engine/package-cache';
-import { DeviceSpec, Keyboard, extendString } from "@keymanapp/keyboard-processor";
+import { DeviceSpec, Keyboard, KeyboardObject } from "@keymanapp/keyboard-processor";
 
 import * as views from './viewsAnchorpoint.js';
 import { BrowserConfiguration, BrowserInitOptionDefaults, BrowserInitOptionSpec } from './configuration.js';
@@ -39,6 +38,11 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
   hotkeyManager: HotkeyManager = new HotkeyManager();
   private readonly beepHandler: BeepHandler;
 
+
+  // Properties sometimes set up by a hosting page
+  getOskHeight?: () => number = null;
+  getOskWidth?: () => number = null;
+
   /**
    * Provides a quick link to the base help page for Keyman keyboards.
    *
@@ -53,11 +57,11 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
   constructor(worker: Worker, sourceUri: string) {
     const config = new BrowserConfiguration(sourceUri);  // currently set to perform device auto-detect.
 
-    super(worker, config, new ContextManager(config, () => this.legacyAPIEvents), (engine: KeymanEngine) => {
+    super(worker, config, new ContextManager(config, () => this.legacyAPIEvents), (engine) => {
       return {
         // The `engine` parameter cannot be supplied with the constructing instance before calling
         // `super`, hence the 'fun' rigging to supply it _from_ `super` via this closure.
-        keyboardInterface: new KeyboardInterface(window, engine),
+        keyboardInterface: new KeyboardInterface(window, engine as KeymanEngine),
         defaultOutputRules: new DefaultBrowserRules(engine.contextManager)
       };
     });
@@ -69,8 +73,8 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     this.hardKeyboard = new HardwareEventKeyboard(config.hardDevice, this.core.keyboardProcessor, this.contextManager);
 
     // Scrolls the document-body to ensure that a focused element remains visible after the OSK appears.
-    this.contextManager.on('targetchange', (target: OutputTarget<any>) => {
-      const e = target?.getElement();
+    this.contextManager.on('targetchange', (target) => {
+      const e = (target as OutputTarget<any>)?.getElement();
       if(this.osk) {
         (this.osk.activationModel as TwoStateActivator<HTMLElement>).activationTrigger = e;
       }
@@ -200,6 +204,14 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     // or do anything that would mutate the value.
     const savedKeyboardStr = this.contextManager.getSavedKeyboardRaw();
 
+    if(device.touchable) {
+      this.osk = new views.AnchoredOSKView(this);
+    } else {
+      this.osk = new views.FloatingOSKView(this);
+    }
+
+    setupOskListeners(this, this.osk, this.contextManager);
+
     // Automatically performs related handler setup & maintains references
     // needed for related cleanup / shutdown.
     this.pageIntegration = new PageIntegrationHandlers(window, this);
@@ -213,34 +225,16 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     this._initialized = 2;
 
     // Let any deferred, pre-init stubs complete registration
-    await this.config.deferForInitialization;
+    await Promise.resolve();
 
-    /*
-      Attempt to restore the user's last-used keyboard from their previous session.
-      The method auto-loads the default stub if one is available and the last-used keyboard
-      has no registered stub.
+    // Attempt to restore the user's last-used keyboard from their previous session.
+    //
+    // Note:  any cloud stubs will probably not be available yet.
+    // If we tracked cloud requests and awaited a Promise.all on pending queries,
+    // we could handle that too.
+    this.contextManager.restoreSavedKeyboard(savedKeyboardStr);
 
-      Note:  any cloud stubs will probably not be available yet.
-      If we tracked cloud requests and awaited a Promise.all on pending queries,
-      we could handle that too.
-    */
-    const loadingKbd: Promise<any> = this.contextManager.restoreSavedKeyboard(savedKeyboardStr);
-
-    // Wait for the initial keyboard to load before setting the OSK; this will avoid building an
-    // empty OSK that we'll instantly discard after.
-    try {
-      await loadingKbd;
-    } catch { /* in case of failed fetch due to network error or bad URI; we must still let the OSK init. */ };
-
-    const firstKbdConfig = {
-      keyboardToActivate: this.contextManager.activeKeyboard
-    };
-    const osk = device.touchable ? new views.AnchoredOSKView(this, firstKbdConfig) : new views.FloatingOSKView(this, firstKbdConfig);
-
-    setupOskListeners(this, osk, this.contextManager);
-    // And, now that we have our loaded active keyboard - or failed, thus must use that default...
-    // Now we set the OSK in place, an act which triggers VisualKeyboard construction.
-    this.osk = osk;
+    await Promise.resolve();
   }
 
   get register(): (x: CloudQueryResult) => void {
@@ -313,7 +307,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/getKeyboardForControl
    */
-  public getKeyboardForControl(Pelem) {
+  public getKeyboardForControl(Pelem: HTMLElement) {
     const target = outputTargetForElement(Pelem);
     return this.contextManager.getKeyboardStubForTarget(target).id;
   }
@@ -327,7 +321,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    * Description  Returns the language code used with the current independently-managed keyboard for this control.
    *              If it is currently following the global keyboard setting, returns null instead.
    */
-  getLanguageForControl(Pelem) {
+  getLanguageForControl(Pelem: HTMLElement) {
     const target = outputTargetForElement(Pelem);
     return this.contextManager.getKeyboardStubForTarget(target).langId;
   }
@@ -403,8 +397,11 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
       LanguageCode: Lstub.KLC, // I1702 - Add support for language codes, region names, region codes, country names and country codes
       RegionName: Lstub.KR,
       RegionCode: Lstub.KRC,
+      // @ts-ignore
       CountryName: Lstub['KC'] as string,
+      // @ts-ignore
       CountryCode: Lstub['KCC'] as string,
+      // @ts-ignore
       KeyboardID: Lstub['KD'] as string,
       Font: Lstub.KFont,
       OskFont: Lstub.KOskFont,
@@ -426,12 +423,12 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/isCJK
    */
-  public isCJK(k0? /* keyboard script object | return-type of _GetKeyboardDetail [b/c Toolbar UI]*/) {
+  public isCJK(k0?: KeyboardObject | ReturnType<KeymanEngine['_GetKeyboardDetail']> /* [b/c Toolbar UI]*/) {
     let kbd: Keyboard;
     if(k0) {
       let kbdDetail = k0 as ReturnType<KeymanEngine['_GetKeyboardDetail']>;
       if(kbdDetail.KeyboardID){
-        kbd = this.keyboardRequisitioner.cache.getKeyboard(k0.KeyboardID);
+        kbd = this.keyboardRequisitioner.cache.getKeyboard(kbdDetail.KeyboardID);
       } else {
         kbd = new Keyboard(k0);
       }
@@ -546,7 +543,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *  @param  {Object|string} e         element id or element
    *  @param  {boolean=}      setFocus  optionally set focus  (KMEW-123)
    **/
-  setActiveElement(e: string|HTMLElement, setFocus: boolean) {
+  setActiveElement(e: string|HTMLElement, setFocus?: boolean) {
     if(typeof e == 'string') {
       const id = e;
       e = document.getElementById(e);

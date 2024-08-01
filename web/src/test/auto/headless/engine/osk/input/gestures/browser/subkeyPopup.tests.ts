@@ -1,4 +1,5 @@
 import { assert } from 'chai';
+// @ts-ignore  // Type info unavailable; doing a npm-install for it breaks things much worse in other ways.
 import { JSDOM } from 'jsdom';
 import sinon from 'sinon';
 

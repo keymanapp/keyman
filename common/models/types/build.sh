@@ -9,15 +9,15 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
-
-builder_describe "Build Keyman model types package" \
+builder_describe "Keyman model types package" \
   "clean" \
   "configure" \
   "build" \
   "test" \
-  "pack                      build a local .tgz pack for testing" \
   "publish                   publish to npm" \
+  "--npm-publish+            For publish, do a npm publish, not npm pack (only for CI)" \
   "--dry-run,-n              don't actually publish, just dry run"
 
 builder_describe_outputs \
@@ -28,40 +28,8 @@ builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
 
-if builder_start_action clean; then
-  rm -rf ./build/
-  builder_finish_action success clean
-fi
-
-#-------------------------------------------------------------------------------------------------------------------
-
-if builder_start_action configure; then
-  verify_npm_setup
-  builder_finish_action success configure
-fi
-
-#-------------------------------------------------------------------------------------------------------------------
-
-if builder_start_action build; then
-  tsc --build
-  builder_finish_action success build
-fi
-
-#-------------------------------------------------------------------------------------------------------------------
-
-if builder_start_action test; then
-  npm test
-  builder_finish_action success test
-fi
-
-#-------------------------------------------------------------------------------------------------------------------
-
-if builder_start_action publish; then
-  . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
-  builder_publish_to_npm
-  builder_finish_action success publish
-elif builder_start_action pack; then
-  . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
-  builder_publish_to_pack
-  builder_finish_action success pack
-fi
+builder_run_action clean        rm -rf ./build/
+builder_run_action configure    verify_npm_setup
+builder_run_action build        tsc --build
+builder_run_action test         tsc test.ts -lib es6
+builder_run_action publish      builder_publish_npm

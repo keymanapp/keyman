@@ -17,9 +17,9 @@ binary_tests = [
 
 foreach kbd : binary_tests
   configure_file(
-    command: copy_cmd + ['@INPUT@', '@OUTPUT@'],
     input: kbd + '.kmn',
-    output: kbd + '.kmn'
+    output: kbd + '.kmn',
+    copy: true
   )
 
   configure_file(

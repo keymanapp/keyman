@@ -1,7 +1,6 @@
 import {
   gestures,
   GestureModelDefs,
-  InputSample,
   CumulativePathStats
 } from '@keymanapp/gesture-recognizer';
 
@@ -199,6 +198,7 @@ interface LayoutGestureSupportFlags {
 
 // Simple compile-time validation that OSKLayerGroup's spec object provides the fields expected above.
 let dummy: ActiveLayout;
+// @ts-ignore // so that we don't trigger "unused local" warnings.
 let dummy2: LayoutGestureSupportFlags = dummy;
 
 /**
@@ -440,6 +440,8 @@ export function flickMidContactModel(params: GestureParams): gestures.specs.Cont
         } else if(path.isComplete) {
           return 'reject';
         }
+
+        return undefined;
       }
     },
     pathResolutionAction: 'resolve',
@@ -464,6 +466,7 @@ export function flickEndContactModel(params: GestureParams): ContactModel {
             return 'reject';
           }
         }
+        return undefined;
       }
     },
     pathResolutionAction: 'resolve',
@@ -544,6 +547,7 @@ export function modipressContactHoldModel(): ContactModel {
         if(path.isComplete) {
           return 'reject';
         }
+        return undefined;
       }
     }
   }
@@ -559,6 +563,7 @@ export function modipressContactEndModel(): ContactModel {
         if(path.isComplete) {
           return 'resolve';
         }
+        return undefined;
       }
     }
   };
@@ -580,6 +585,8 @@ export function simpleTapContactModel(params: GestureParams, isNotInitial?: bool
         if(path.isComplete && !path.wasCancelled) {
           return 'resolve';
         }
+
+        return undefined;
       }
     }
   };
@@ -594,6 +601,7 @@ export function subkeySelectContactModel(): ContactModel {
         if(path.isComplete && !path.wasCancelled) {
           return 'resolve';
         }
+        return undefined;
       }
     }
   }
@@ -908,6 +916,8 @@ export function flickResetCenteringModel(params: GestureParams): GestureModel<Ke
               if(oldDist < newDist) {
                 return 'resolve';
               }
+
+              return undefined;
             },
           },
           itemPriority: 0,

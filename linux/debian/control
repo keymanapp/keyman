@@ -19,7 +19,7 @@ Build-Depends:
  libjson-glib-dev (>= 1.4.0),
  liblocale-gettext-perl,
  libsystemd-dev,
- meson (>= 0.53),
+ meson (>= 1.0),
  metacity,
  ninja-build,
  perl,
@@ -116,7 +116,7 @@ Architecture: amd64 arm64 armel armhf i386 loong64 mipsel mips64el ppc64el riscv
 Section: libdevel
 Depends:
  libicu-dev,
- libkeymancore1 (= ${binary:Version}),
+ libkeymancore2 (= ${binary:Version}),
  ${misc:Depends},
 Conflicts: libkmnkbp-dev
 Replaces: libkmnkbp-dev
@@ -138,7 +138,7 @@ Description: Development files for Keyman keyboard processing library
  .
  This package contains development headers and libraries.
 
-Package: libkeymancore1
+Package: libkeymancore2
 Architecture: amd64 arm64 armel armhf i386 loong64 mipsel mips64el ppc64el riscv64
 Section: libs
 Pre-Depends:
@@ -148,8 +148,8 @@ Depends:
  ${shlibs:Depends},
 Suggests:
  keyman,
-Conflicts: libkmnkbp0-0, libkeymancore
-Replaces: libkmnkbp0-0, libkeymancore
+Conflicts: libkmnkbp0-0, libkeymancore, libkeymancore1
+Replaces: libkmnkbp0-0, libkeymancore, libkeymancore1
 Multi-Arch: same
 Description: Keyman keyboard processing library
  Originally created in 1993 to type Lao on Windows, Keyman is now a free and
@@ -170,7 +170,7 @@ Package: ibus-keyman
 Architecture: amd64 arm64 armel armhf i386 loong64 mipsel mips64el ppc64el riscv64
 Depends:
  ibus (>= 1.3.7),
- libkeymancore1 (= ${binary:Version}),
+ libkeymancore2 (= ${binary:Version}),
  keyman-system-service (= ${binary:Version}),
  ${misc:Depends},
  ${shlibs:Depends},

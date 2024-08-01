@@ -1,4 +1,4 @@
-import EventEmitter from "eventemitter3";
+import { EventEmitter } from "eventemitter3";
 import { InputEngineBase } from "./inputEngineBase.js";
 import { GestureSource } from "./gestureSource.js";
 import { MatcherSelection, MatcherSelector } from "./gestures/matchers/matcherSelector.js";
@@ -323,7 +323,7 @@ export class TouchpointCoordinator<HoveredItemType, StateToken=any> extends Even
   }
 
   public get historyJSON() {
-    const sanitizingReplacer = function (key: string, value) {
+    const sanitizingReplacer = function (key: string, value: any) {
       if(key == 'item') {
         // KMW 'key' elements involve circular refs.
         // Just return the key ID.  (Assumes use in KMW)

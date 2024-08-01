@@ -47,6 +47,21 @@ describe('KmwCompilerMessages', function () {
 
   // TODO: other messages
 
+  // WARN_ExtendedShiftFlagsNotSupportedInKeymanWeb:
+  // * Implemented in test-kmw-compiler.ts: 'should give warning
+  //   WARN_ExtendedShiftFlagsNotSupportedInKeymanWeb for v9 keyboards if
+  //   ${mode} found'
+
+  // WARN_TouchLayoutSpecialLabelOnNormalKey
+  // * Implemented in test-kmw-compiler.ts: 'should give warning
+  //   WARN_TouchLayoutSpecialLabelOnNormalKey if the minimum version specified
+  //   in the keyboard does not support special key caps on normal keys'
+
+  // HINT_TouchLayoutUsesUnsupportedGesturesDownlevel
+  // * Implemented in test-kmw-compiler.ts: 'should give warning
+  //   HINT_TouchLayoutUsesUnsupportedGesturesDownlevel if the minimum version
+  //   specified in the keyboard does not support gestures'
+
   // ERROR_NotAnyRequiresVersion14
 
   // it('should generate ERROR_NotAnyRequiresVersion14 if ...', async function() {
@@ -70,5 +85,12 @@ describe('KmwCompilerMessages', function () {
   // it('should generate ERROR_TouchLayoutFileDoesNotExist if ...', async function() {
   //   await testForMessage(this, ['kmw', '....kmn'], KmwCompilerMessages.ERROR_TouchLayoutFileDoesNotExist);
   // });
+
+  // ERROR_NotSupportedInKeymanWebOutput
+
+  it('should generate ERROR_NotSupportedInKeymanWebOutput if the command is not supported in output for KeymanWeb', async function() {
+    await testForMessage(this, ['kmw', 'error_not_supported_in_keyman_web_output.kmn'], KmwCompilerMessages.ERROR_NotSupportedInKeymanWebOutput);
+  });
+
 
 });

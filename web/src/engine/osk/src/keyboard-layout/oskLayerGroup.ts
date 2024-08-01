@@ -1,4 +1,4 @@
-import { ActiveLayer, type DeviceSpec, Keyboard, LayoutLayer, ActiveLayout, ButtonClasses } from '@keymanapp/keyboard-processor';
+import { type DeviceSpec, Keyboard, ActiveLayout, ButtonClasses } from '@keymanapp/keyboard-processor';
 
 import { InputSample } from '@keymanapp/gesture-recognizer';
 
@@ -6,14 +6,16 @@ import { KeyElement } from '../keyElement.js';
 import OSKLayer, { LayerLayoutParams } from './oskLayer.js';
 import VisualKeyboard from '../visualKeyboard.js';
 import OSKBaseKey from './oskBaseKey.js';
-import { ParsedLengthStyle } from '../lengthStyle.js';
 
 const NEAREST_KEY_TOUCH_MARGIN_PERCENT = 0.06;
 
 export default class OSKLayerGroup {
   public readonly element: HTMLDivElement;
-  public readonly layers: {[layerID: string]: OSKLayer} = {};
+  private readonly _layers: {[layerID: string]: OSKLayer} = {};
   public readonly spec: ActiveLayout;
+
+  // Currently stored to facilitate lazy layer construction.
+  private vkbd: VisualKeyboard;
 
   // Exist as local copies of the VisualKeyboard values, updated via refreshLayout.
   private computedWidth: number;
@@ -23,8 +25,9 @@ export default class OSKLayerGroup {
   private _heightPadding: number;
 
   public constructor(vkbd: VisualKeyboard, keyboard: Keyboard, formFactor: DeviceSpec.FormFactor) {
-    let layout = keyboard.layout(formFactor);
+    const layout = keyboard.layout(formFactor);
     this.spec = layout;
+    this.vkbd = vkbd;
 
     const lDiv = this.element = document.createElement('div');
     const ls=lDiv.style;
@@ -48,27 +51,37 @@ export default class OSKLayerGroup {
     ls.width = '100%';
     ls.height = '100%';
 
-    // Create a separate OSK div for each OSK layer, only one of which will ever be visible
-    var n: number, i: number, j: number;
-    var layers: LayoutLayer[];
+    // Trigger construction of the default layer.
+    this.activeLayerId = 'default';
+  }
 
-    layers=layout['layer'];
+  private buildLayer(layerId: string) {
+    const layout = this.spec;
 
-    // Set key default attributes (must use exportable names!)
-    var tKey=vkbd.getDefaultKeyObject();
-    tKey['fontsize']=ls.fontSize;
-
-    for(n=0; n<layers.length; n++) {
-      let layer=layers[n] as ActiveLayer;
-      const layerObj = new OSKLayer(vkbd, layout, layer);
-      this.layers[layer.id] = layerObj;
-
-      // Always make the 'default' layer visible by default.
-      layerObj.element.style.display = (layer.id == 'default' ? 'block' : 'none');
-
-      // Add layer to group
-      lDiv.appendChild(layerObj.element);
+    const layerSpec = layout.getLayer(layerId);
+    if(!layerSpec) {
+      return null;
     }
+
+    const layer = new OSKLayer(this.vkbd, layout, layerSpec);
+    this._layers[layerId] = layer;
+
+    // Add layer to group
+    this.element.appendChild(layer.element);
+    return layer;
+  }
+
+  public getLayer(id: string) {
+    let layer = this._layers[id];
+    if(!layer) {
+      layer = this.buildLayer(id);
+      if(layer) {
+        this._layers[id] = layer;
+        layer.element.style.display = 'none';
+      }
+    }
+
+    return layer;
   }
 
   public get activeLayer(): OSKLayer {
@@ -76,7 +89,18 @@ export default class OSKLayerGroup {
       return null;
     }
 
-    return this.layers[this.activeLayerId];
+    return this._layers[this.activeLayerId];
+  }
+
+  public get layers() {
+    const layerSpecs = this.spec.layer;
+    const layerIds = layerSpecs.map((spec) => spec.id);
+
+    for(const id of layerIds) {
+      this.buildLayer(id);
+    }
+
+    return this._layers;
   }
 
   public get activeLayerId(): string {
@@ -86,8 +110,11 @@ export default class OSKLayerGroup {
   public set activeLayerId(id: string) {
     this._activeLayerId = id;
 
-    for (let key of Object.keys(this.layers)) {
-      const layer = this.layers[key];
+    // Trigger construction of the layer if it does not already exist.
+    this.getLayer(id);
+
+    for (let key of Object.keys(this._layers)) {
+      const layer = this._layers[key];
       const layerElement = layer.element;
       if (layer.id == id) {
         layerElement.style.display = 'block';
@@ -117,7 +144,7 @@ export default class OSKLayerGroup {
       throw new Error(`Layer id not set for input coordinate`);
     }
 
-    const layer = this.layers[layerId];
+    const layer = this._layers[layerId];
     if(!layer) {
       throw new Error(`Layer id ${layerId} could not be found`);
     }
@@ -134,23 +161,23 @@ export default class OSKLayerGroup {
   public blinkLayer(arg: OSKLayer | string) {
     if(typeof arg === 'string') {
       const layerId = arg;
-      arg = this.layers[layerId];
+      arg = this.getLayer(layerId);
       if(!arg) {
         throw new Error(`Layer id ${layerId} could not be found`);
       }
     }
 
-    const layer = arg;
+    const layer = arg as OSKLayer;
 
     // Note:  we do NOT manipulate `._activeLayerId` here!  This is designed
     // explicitly to be temporary.
     if(layer.element.style.display != 'block') {
-      for(let id in this.layers) {
-        if(this.layers[id].element.style.display == 'block') {
-          const priorLayer = this.layers[id];
+      for(let id in this._layers) {
+        if(this._layers[id].element.style.display == 'block') {
+          const priorLayer = this._layers[id];
           priorLayer.element.style.display = 'none';
         }
-        this.layers[id].element.style.display = 'none';
+        this._layers[id].element.style.display = 'none';
       }
     }
     layer.element.style.display = 'block';
@@ -167,7 +194,7 @@ export default class OSKLayerGroup {
      * On "layout thrashing": https://webperf.tips/tip/layout-thrashing/
      */
     Promise.resolve().then(() => {
-      const trueLayer = this.layers[this._activeLayerId];
+      const trueLayer = this._layers[this._activeLayerId];
       // If either condition holds, we have to trigger a layout reflow; it's the same cost
       // whether one changes or both do.
       if(layer.element.style.display == 'block' || trueLayer.element.style.display != 'block') {
@@ -258,7 +285,7 @@ export default class OSKLayerGroup {
   }
 
   public resetPrecalcFontSizes() {
-    for(const layer of Object.values(this.layers)) {
+    for(const layer of Object.values(this._layers)) {
       for(const row of layer.rows) {
         for(const key of row.keys) {
           key.resetFontPrecalc();
@@ -272,6 +299,11 @@ export default class OSKLayerGroup {
   }
 
   public refreshLayout(layoutParams: LayerLayoutParams) {
+    if(isNaN(layoutParams.keyboardWidth) || isNaN(layoutParams.keyboardHeight)) {
+      // We're not in the DOM yet; we'll refresh properly once that changes.
+      // Can be reached if the layerId is changed before the keyboard enters the DOM.
+      return;
+    }
     // Set layer-group copies of relevant computed-size values; they are used by nearest-key
     // detection.
     this.computedWidth = layoutParams.keyboardWidth;

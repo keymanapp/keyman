@@ -116,10 +116,22 @@ vcs_stable_15_0=HttpsGithubComKeymanappKeyman
 
 bc_stable_16_0_android=(KeymanAndroid_Build)
 bc_stable_16_0_ios=(Keyman_iOS_Master)
-bc_stable_16_0_linux=(KeymanLinux_Master)
+bc_stable_16_0_linux=(KeymanLinux_Master deb-release-packaging_GitHub)
 bc_stable_16_0_mac=(KeymanMac_Master)
 bc_stable_16_0_windows=(Keyman_Build)
 bc_stable_16_0_web=(Keymanweb_Build)
 bc_stable_16_0_developer=(Keyman_Developer_Release)
 
 vcs_stable_16_0=HttpsGithubComKeymanappKeyman
+
+# Stable 17.0 Build Configurations
+
+bc_stable_17_0_android=(KeymanAndroid_Build)
+bc_stable_17_0_ios=(Keyman_iOS_Master)
+bc_stable_17_0_linux=(KeymanLinux_Master deb-release-packaging_GitHub)
+bc_stable_17_0_mac=(KeymanMac_Master)
+bc_stable_17_0_windows=(Keyman_Build)
+bc_stable_17_0_web=(Keymanweb_Build)
+bc_stable_17_0_developer=(Keyman_Developer_Release)
+
+vcs_stable_17_0=HttpsGithubComKeymanappKeyman

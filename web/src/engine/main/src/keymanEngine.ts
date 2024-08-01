@@ -2,7 +2,7 @@ import { type Keyboard, KeyboardKeymanGlobal, ProcessorInitOptions } from "@keym
 import { DOMKeyboardLoader as KeyboardLoader } from "@keymanapp/keyboard-processor/dom-keyboard-loader";
 import { InputProcessor, PredictionContext } from "@keymanapp/input-processor";
 import { OSKView } from "keyman/engine/osk";
-import { KeyboardRequisitioner, KeyboardStub, ModelCache, ModelSpec, toUnprefixedKeyboardId as unprefixed } from "keyman/engine/package-cache";
+import { KeyboardRequisitioner, ModelCache, ModelSpec, toUnprefixedKeyboardId as unprefixed } from "keyman/engine/package-cache";
 
 import { EngineConfiguration, InitOptionSpec } from "./engineConfiguration.js";
 import KeyboardInterface from "./keyboardInterface.js";
@@ -20,7 +20,9 @@ type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 type ProcessorConfiguration = WithRequired<WithRequired<ProcessorInitOptions, 'keyboardInterface'>, 'defaultOutputRules'>;
 
 function determineBaseLayout(): string {
+  // @ts-ignore
   if(typeof(window['KeymanWeb_BaseLayout']) !== 'undefined') {
+    // @ts-ignore
     return window['KeymanWeb_BaseLayout'];
   } else {
     return 'us';
@@ -120,8 +122,6 @@ export default class KeymanEngine<
       // so we handle that here.
       this.osk?.bannerController.selectBanner(state);
       this.osk?.refreshLayout();
-
-      // If `this.osk` is not yet initialized, the OSK itself will check if the model is loaded
     });
 
     // The OSK does not possess a direct connection to the KeyboardProcessor's state-key
@@ -347,6 +347,10 @@ export default class KeymanEngine<
       this.core.keyboardProcessor.layerStore.handler = this.osk.layerChangeHandler;
     }
     this._osk = value;
+    // As the `new context` ruleset is designed to facilitate OSK layer-change updates
+    // based on the context being entered, we want the keyboard processor's current
+    // contextDevice to match that of the active OSK.  See #11740.
+    this.core.keyboardProcessor.contextDevice = value?.targetDevice ?? this.config.softDevice;
     if(value) {
       // Don't build an OSK if no keyboard is available yet; avoid the extra flash.
       if(this.contextManager.activeKeyboard) {

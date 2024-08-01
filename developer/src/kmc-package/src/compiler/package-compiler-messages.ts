@@ -10,7 +10,7 @@ const SevFatal = CompilerErrorSeverity.Fatal | Namespace;
 /**
  * @internal
  */
-export class CompilerMessages {
+export class PackageCompilerMessages {
   static FATAL_UnexpectedException = SevFatal | 0x0001;
   static Fatal_UnexpectedException = (o:{e: any}) => CompilerMessageSpecWithException(this.FATAL_UnexpectedException, null, o.e ?? 'unknown error');
 
@@ -130,5 +130,13 @@ export class CompilerMessages {
   static ERROR_InvalidPackageFile = SevError | 0x001E;
   static Error_InvalidPackageFile = (o:{e:any}) => m(this.ERROR_InvalidPackageFile,
     `Package source file is invalid: ${(o.e ?? 'unknown error').toString()}`);
+
+  static ERROR_FileRecordIsMissingName = SevError | 0x001F;
+  static Error_FileRecordIsMissingName = (o:{description:string}) => m(this.ERROR_FileRecordIsMissingName,
+    `File record in the package with description '${o.description}' is missing a filename.`);
+
+  static ERROR_InvalidAuthorEmail = SevError | 0x0020;
+  static Error_InvalidAuthorEmail = (o:{email:string}) => m(this.ERROR_InvalidAuthorEmail,
+    `Invalid author email: ${def(o.email)}`);
 }
 

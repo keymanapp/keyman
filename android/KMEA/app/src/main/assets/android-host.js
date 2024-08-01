@@ -12,6 +12,7 @@ var bannerHeight = 0;
 var bannerImagePath = '';
 var bannerHTMLContents = '';
 var fragmentToggle = 0;
+var deferredBannerCall;
 
 var sentryManager = new KeymanSentryManager({
   hostPlatform: "android"
@@ -36,11 +37,7 @@ function init() {
   keyman.beepKeyboard = beepKeyboard;
 
   // Readies the keyboard stub for instant loading during the init process.
-  try {
-    KeymanWeb.registerStub(JSON.parse(jsInterface.initialKeyboard()));
-  } catch(error) {
-    console.error(error);
-  }
+  KeymanWeb.registerStub(JSON.parse(jsInterface.initialKeyboard()));
 
   keyman.init({
     'embeddingApp':device,
@@ -53,6 +50,12 @@ function init() {
 
       // The OSK is not available until initialization is complete.
       keyman.osk.bannerView.activeBannerHeight = bannerHeight;
+
+      if(deferredBannerCall) {
+        deferredBannerCall();
+        deferredBannerCall = null;
+      }
+
       keyman.refreshOskLayout();
     }
   });
@@ -67,10 +70,19 @@ function init() {
 }
 
 function showBanner(flag) {
+  if(!keyman.osk) {
+    deferredBannerCall = function() {
+      showBanner(flag);
+    }
+
+    return;
+  }
+
+  var bc = keyman.osk.bannerController;
+
   console_debug("Setting banner display for dictionaryless keyboards to " + flag);
   console_debug("bannerHTMLContents: " + bannerHTMLContents);
-  var bc = keyman.osk.bannerController;
-  if (bc) {
+  if(bc) {
     if (bannerHTMLContents != '') {
       bc.inactiveBanner = flag ? new bc.HTMLBanner(bannerHTMLContents) : null;
     } else {
@@ -129,7 +141,7 @@ function setOskHeight(h) {
 
 function setOskWidth(w) {
   if(w > 0) {
-    oskWidth = w;
+    oskWidth = w / window.devicePixelRatio;
   }
 }
 
@@ -319,6 +331,14 @@ function menuKeyUp() {
   fragmentToggle = (fragmentToggle + 1) % 100;
   var hash = 'globeKeyAction&fragmentToggle=' + fragmentToggle + '&keydown=false';
   window.location.hash = hash;
+}
+
+// The keyboard-picker displayed via Android longpress disrupts Web-side
+// gesture-handling; this function helps force-clear the globe key's highlighting.
+function clearGlobeHighlight() {
+  if(keyman.osk && keyman.osk.vkbd && keyman.osk.vkbd.currentLayer.globeKey) {
+    keyman.osk.vkbd.currentLayer.globeKey.highlight(false)
+  }
 }
 
 function hideKeyboard() {

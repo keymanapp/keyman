@@ -22,10 +22,9 @@
     "@keymanapp/keyboard-processor": "*",
     "@keymanapp/models-types": "*",
     "@keymanapp/keyman-version": "*",
-    "@keymanapp/web-utils": "*",
-    "@types/node": "^11.9.4"
+    "@keymanapp/web-utils": "*"
   },
   "devDependencies": {
-    "typescript": "^4.9.5"
+    "typescript": "^5.4.5"
   }
 }

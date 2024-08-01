@@ -1,7 +1,6 @@
 import Codes from "../text/codes.js";
 import KeyEvent, { KeyEventSpec } from "../text/keyEvent.js";
 import KeyMapping from "../text/keyMapping.js";
-import type { KeyDistribution } from "../text/keyEvent.js";
 import { ButtonClasses, Layouts } from "./defaultLayouts.js";
 import type { LayoutKey, LayoutSubKey, LayoutRow, LayoutLayer, LayoutFormFactor, ButtonClass } from "./defaultLayouts.js";
 import type Keyboard from "./keyboard.js";
@@ -9,6 +8,9 @@ import type Keyboard from "./keyboard.js";
 import { TouchLayout } from "@keymanapp/common-types";
 import TouchLayoutDefaultHint = TouchLayout.TouchLayoutDefaultHint;
 import TouchLayoutFlick = TouchLayout.TouchLayoutFlick;
+import TouchLayoutSpec = TouchLayout.TouchLayoutPlatform;
+import TouchLayerSpec = TouchLayout.TouchLayoutLayer;
+import TouchLayoutKeySp = TouchLayout.TouchLayoutKeySp;
 import { type DeviceSpec } from "@keymanapp/web-utils";
 
 // TS 3.9 changed behavior of getters to make them
@@ -61,6 +63,35 @@ const KeyTypesOfKeyMap = {
 // based on available hints.  (i.e., `layout.defaultHint == 'flick'`)
 const KeyTypesOfFlickList = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'] as const;
 
+/**
+ * Copies non-computed properties and enumerable scomputed property definitions
+ * for any properties not yet defined on the target object.
+ * @param rawObj
+ * @param defaults
+ */
+function assignDefaultsWithPropDefs<RawType, Type extends RawType>(rawObj: RawType, defaults: Type) {
+  const proto = Object.getPrototypeOf(defaults);
+
+  for(let prop in defaults) {
+    if(!rawObj.hasOwnProperty(prop)) {
+      let descriptor = Object.getOwnPropertyDescriptor(proto, prop);
+      if(descriptor) {
+        // It's a computed property!  Copy the descriptor onto the key's object.
+        Object.defineProperty(rawObj, prop, descriptor);
+      } else {
+        // Type 'Extract<keyof Type, string>' cannot be used to index type
+        // 'RawType'. (ts2536)
+        // @ts-ignore
+        // the whole point of this function is to polyfill `rawObj` so that it's
+        // duck-typable to `Type`.
+        rawObj[prop] = defaults[prop];
+      }
+    }
+  }
+
+  return rawObj as Type;
+}
+
 export class ActiveKeyBase {
   static readonly DEFAULT_PAD=15;          // Padding to left of key, in virtual units
   static readonly DEFAULT_RIGHT_MARGIN=15; // Padding to right of right-most key, in virtual units
@@ -90,9 +121,9 @@ export class ActiveKeyBase {
   layer: string;
   displayLayer: string;
   nextlayer: string;
-  sp?: ButtonClass;
+  sp?: TouchLayoutKeySp;
 
-  private _baseKeyEvent: KeyEvent;
+  private _baseKeyEvent: KeyEvent | (() => KeyEvent);
   isMnemonic: boolean = false;
 
   /**
@@ -106,7 +137,7 @@ export class ActiveKeyBase {
   proportionalWidth: number;
 
   // While they're only valid on ActiveKey, spec'ing them here makes references more concise within the OSK.
-  sk?: ActiveKey[];
+  sk?: ActiveSubKey[];
   multitap?: ActiveSubKey[];
   flick?: TouchLayout.TouchLayoutFlick;
 
@@ -205,7 +236,29 @@ export class ActiveKeyBase {
 
   @Enumerable
   public get baseKeyEvent(): KeyEvent {
-    return new KeyEvent(this._baseKeyEvent);
+    let val = this._baseKeyEvent;
+    if(typeof val == 'function') {
+      val = val();
+    }
+    return new KeyEvent(val);
+  }
+
+  constructor();
+  constructor(spec: LayoutKey | LayoutSubKey, layout: ActiveLayout, displayLayer: string);
+  constructor(spec?: LayoutKey | LayoutSubKey, layout?: ActiveLayout, displayLayer?: string) {
+    // First things first:  this class's fields are designed to match that of the spec.
+    Object.assign(this, spec);
+
+    if(!this.text && typeof this.id == 'string') {
+      this.text = ActiveKey.unicodeIDToText(this.id);
+    }
+
+    this.displayLayer = displayLayer;
+    this.layer = this.layer || displayLayer;
+
+    // Compute the key's base KeyEvent properties for use in future event generation
+    // It's actually somewhat expensive to do this at the start, so we do a lazy-init.
+    this._baseKeyEvent = () => this.constructBaseKeyEvent(layout, displayLayer);
   }
 
   /**
@@ -268,9 +321,12 @@ export class ActiveKeyBase {
       const value = KeyTypesOfKeyMap[key as keyof typeof KeyTypesOfKeyMap];
       switch(value) {
         case 'subkeys':
-          const arr = rawKey[key] as LayoutSubKey[];
-          if(!Array.isArray(arr)) {
-            delete rawKey[key];
+          const arr = rawKey[key as 'sk' | 'multitap'] as LayoutSubKey[];
+          if(arr === undefined) {
+            // `delete` has a small yet significant performance cost; bypass it.
+            break;
+          } else if(!Array.isArray(arr)) {
+            delete rawKey[key as 'sk' | 'multitap'];
           } else {
             for(let i=0; i < arr.length; i++) {
               const sk = arr[i];
@@ -283,13 +339,18 @@ export class ActiveKeyBase {
           }
           break;
         case 'flicks':
-          const flickObj = rawKey[key];
-          if(typeof flickObj != 'object') {
-            delete rawKey[key];
+          const flickObj = rawKey[key as 'flick'];
+          if(flickObj === undefined) {
+            // `delete` has a small yet significant performance cost; bypass it.
+            break;
+          } else if(typeof flickObj != 'object') {
+            delete rawKey[key as 'flick'];
           } else {
             for(const flickKey of KeyTypesOfFlickList) {
               const sk = flickObj[flickKey];
-              if(typeof sk != 'object') {
+              if(sk === undefined) {
+                break;
+              } else if(typeof sk != 'object') {
                 delete flickObj[flickKey];
               } else {
                 ActiveKey.sanitize(sk);
@@ -298,9 +359,9 @@ export class ActiveKeyBase {
           }
           break;
         default:
-          const prop = rawKey[key];
-          if(typeof prop != value) {
-            delete rawKey[key];
+          const prop = rawKey[key as keyof (LayoutKey | LayoutSubKey)];
+          if(prop !== undefined && typeof prop != value) {
+            delete rawKey[key as keyof (LayoutKey | LayoutSubKey)];
           }
       }
     }
@@ -308,123 +369,8 @@ export class ActiveKeyBase {
     rawKey.text ||= ActiveKey.DEFAULT_KEY.text;
   }
 
-  static polyfill(key: LayoutKey, keyboard: Keyboard, layout: ActiveLayout, displayLayer: string, analysisFlagObj?: AnalysisMetadata) {
-    analysisFlagObj ||= {
-      hasFlicks: false,
-      hasLongpresses: false,
-      hasMultitaps: false
-    }
-
-    // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
-    let dummy = new ActiveKeyBase();
-    let proto = Object.getPrototypeOf(dummy);
-
-    for(let prop in dummy) {
-      if(!key.hasOwnProperty(prop)) {
-        let descriptor = Object.getOwnPropertyDescriptor(proto, prop);
-        if(descriptor) {
-          // It's a computed property!  Copy the descriptor onto the key's object.
-          Object.defineProperty(key, prop, descriptor);
-        } else {
-          key[prop] = dummy[prop];
-        }
-      }
-    }
-
-    if(!key.text && typeof key.id == 'string') {
-      key.text = ActiveKey.unicodeIDToText(key.id);
-    }
-
-    // Ensure subkeys are also properly extended.
-    if(key.sk) {
-      analysisFlagObj.hasLongpresses = true;
-      for(let subkey of key.sk) {
-        ActiveSubKey.polyfill(subkey, keyboard, layout, displayLayer, analysisFlagObj);
-      }
-    }
-
-    // Also multitap keys.
-    if(key.multitap) {
-      analysisFlagObj.hasMultitaps = true;
-      for(let mtKey of key.multitap) {
-        ActiveSubKey.polyfill(mtKey, keyboard, layout, displayLayer, analysisFlagObj);
-      }
-    }
-
-
-    if(key.flick) {
-      analysisFlagObj.hasFlicks = true;
-      for(let flickKey in key.flick) {
-        ActiveSubKey.polyfill(key.flick[flickKey as keyof TouchLayoutFlick], keyboard, layout, displayLayer, analysisFlagObj);
-      }
-    }
-
-    let aKey = key as ActiveKey;
-    aKey.displayLayer = displayLayer;
-    aKey.layer = aKey.layer || displayLayer;
-
-    ActiveKeyBase.determineHint(aKey, layout.defaultHint);
-
-    // Compute the key's base KeyEvent properties for use in future event generation
-    aKey.constructBaseKeyEvent(keyboard, layout, displayLayer);
-  }
-
-  private static determineHint(spec: ActiveKey, defaultHint: TouchLayout.TouchLayoutDefaultHint): void {
-    // If a hint was directly specified, don't override it.
-    if(spec.hint) {
-      spec.hintSrc = spec;
-      return;
-    }
-
-    // Is more compact than writing 8 separate cases.
-    if(defaultHint?.includes('flick-')) {
-      if(spec.flick) {
-        // 6 = length of 'flick-'
-        const dir = defaultHint.substring(6);
-
-        if(spec.flick[dir]?.text) {
-          spec.hintSrc = spec.flick[dir];
-        }
-      }
-
-      return;
-    }
-
-    switch(defaultHint) {
-      case 'none':
-        return;
-      case 'multitap':
-        if(spec.multitap) {
-          spec.hintSrc = spec.multitap[0];
-        }
-        return;
-      case 'flick':
-        if(spec.flick) {
-          for(const key of KeyTypesOfFlickList) {
-            if(spec.flick[key]) {
-              spec.hintSrc = spec.flick[key];
-              return;
-            }
-          }
-        }
-        return;
-      case 'longpress':
-        if(spec.sk) {
-          spec.hintSrc = spec.sk[0];
-        }
-        return;
-      case 'dot':
-      default:
-        if(spec.sk) {
-          spec.hint = '\u2022';
-          spec.hintSrc = spec;
-        }
-        return;
-    }
-  }
-
   @Enumerable
-  private constructBaseKeyEvent(keyboard: Keyboard, layout: ActiveLayout, displayLayer: string) {
+  private constructBaseKeyEvent(layout: ActiveLayout, displayLayer: string) {
     // Get key name and keyboard shift state (needed only for default layouts and physical keyboard handling)
     // Note - virtual keys should be treated case-insensitive, so we force uppercasing here.
     let layer = this.layer || displayLayer || '';
@@ -472,13 +418,12 @@ export class ActiveKeyBase {
       }
     }
 
-    this._baseKeyEvent = Lkc;
+    return Lkc;
   }
 }
 
-
 export class ActiveKey extends ActiveKeyBase implements LayoutKey {
-  public getSubkey(coreID: string): ActiveKey {
+  public getSubkey(coreID: string): ActiveSubKey {
     if(this.sk) {
       for(let key of this.sk) {
         if(key.coreID == coreID) {
@@ -488,6 +433,91 @@ export class ActiveKey extends ActiveKeyBase implements LayoutKey {
     }
 
     return null;
+  }
+
+  constructor();
+  constructor(spec: LayoutKey, layout: ActiveLayout, displayLayer: string);
+  constructor(spec?: LayoutKey, layout?: ActiveLayout, displayLayer?: string) {
+    super(spec, layout, displayLayer);
+
+    // Ensure subkeys are also properly extended.
+    const sk = this.sk;
+    if(sk) {
+      for(let i=0; i < sk.length; i++) {
+        sk[i] = new ActiveSubKey(sk[i], layout, displayLayer);
+      }
+    }
+
+    // Also multitap keys.
+    const multitap = this.multitap;
+    if(multitap) {
+      for(let i=0; i < multitap.length; i++) {
+        multitap[i] = new ActiveSubKey(multitap[i], layout, displayLayer);
+      }
+    }
+
+    const flick = this.flick;
+    if(flick) {
+      for(let flickKey in flick) {
+        flick[flickKey as keyof TouchLayoutFlick] = new ActiveSubKey(flick[flickKey as keyof TouchLayoutFlick], layout, displayLayer);
+      }
+    }
+
+    ActiveKey.determineHint(this, layout.defaultHint);
+  }
+
+  private static determineHint(spec: ActiveKey, defaultHint: TouchLayout.TouchLayoutDefaultHint): void {
+    // If a hint was directly specified, don't override it.
+    if(spec.hint) {
+      spec.hintSrc = spec;
+      return;
+    }
+
+    // Is more compact than writing 8 separate cases.
+    if(defaultHint?.includes('flick-')) {
+      if(spec.flick) {
+        // 6 = length of 'flick-'
+        const dir = defaultHint.substring(6) as keyof TouchLayoutFlick;
+
+        if(spec.flick[dir]?.text) {
+          spec.hintSrc = spec.flick[dir];
+        }
+      }
+
+      return;
+    }
+
+    switch(defaultHint) {
+      case 'none':
+        return;
+      case 'multitap':
+        if(spec.multitap) {
+          spec.hintSrc = spec.multitap[0];
+        }
+        return;
+      case 'flick':
+        if(spec.flick) {
+          for(const key of KeyTypesOfFlickList) {
+            if(spec.flick[key]) {
+              spec.hintSrc = spec.flick[key];
+              return;
+            }
+          }
+        }
+        return;
+      case 'longpress':
+        if(spec.sk) {
+          spec.hintSrc = spec.sk[0];
+        }
+        return;
+      case 'dot':
+      default:
+        if(spec.sk) {
+          spec.hint = '\u2022';
+          spec.hintSrc = spec;
+        }
+        return;
+    }
   }
 }
 
@@ -530,20 +560,23 @@ export class ActiveRow implements LayoutRow {
 
   static polyfill(
     row: LayoutRow,
-    keyboard: Keyboard,
     layout: ActiveLayout,
     displayLayer: string,
     totalWidth: number,
-    proportionalY: number,
-    analysisFlagObj: AnalysisMetadata
+    proportionalY: number
   ) {
     // Apply defaults, setting the width and other undefined properties for each key
     let keys=row['key'];
+    const DEFAULT_KEY = ActiveKeyBase.DEFAULT_KEY;
     for(let j=0; j<keys.length; j++) {
       let key=keys[j];
-      for(var tp in ActiveKey.DEFAULT_KEY) {
-        if(typeof key[tp] != 'string' && typeof key[tp] != 'number') {
-          key[tp]=ActiveKey.DEFAULT_KEY[tp];
+      let keySet = Object.keys(DEFAULT_KEY);
+      for(let tp of keySet) {
+        const typedKey = tp as keyof typeof DEFAULT_KEY;
+        if(typeof key[typedKey] != 'string' && typeof key[typedKey] != 'number') {
+          // We detected a value of the wrong type.
+          // @ts-ignore  // Type 'string' is not assignable to type 'never'. (ts2322)
+          key[typedKey]=DEFAULT_KEY[typedKey];
         }
       }
 
@@ -563,7 +596,8 @@ export class ActiveRow implements LayoutRow {
           break;
       }
 
-      ActiveKey.polyfill(key, keyboard, layout, displayLayer, analysisFlagObj);
+      const processedKey = new ActiveKey(key, layout, displayLayer);
+      keys[j] = processedKey;
     }
 
     /* The calculations here are effectively 'virtualized'.  When used with the OSK, the VisualKeyboard
@@ -615,13 +649,7 @@ export class ActiveRow implements LayoutRow {
       }
     }
 
-    // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
-    let dummy = new ActiveRow();
-    for(let key in dummy) {
-      if(!row.hasOwnProperty(key)) {
-        row[key] = dummy[key];
-      }
-    }
+    assignDefaultsWithPropDefs(row, new ActiveRow());
 
     let aRow = row as ActiveRow;
     aRow.proportionalY = proportionalY;
@@ -667,7 +695,7 @@ export class ActiveLayer implements LayoutLayer {
     }
   }
 
-  static polyfill(layer: LayoutLayer, keyboard: Keyboard, layout: ActiveLayout, analysisFlagObj: AnalysisMetadata) {
+  static polyfill(layer: LayoutLayer, layout: ActiveLayout) {
     layer.aligned=false;
 
     // Create a DIV for each row of the group
@@ -700,16 +728,10 @@ export class ActiveLayer implements LayoutLayer {
     for(let i=0; i<rowCount; i++) {
       // Calculate proportional y-coord of row.  0 is at top with highest y-coord.
       let rowProportionalY = (i + 0.5) / rowCount;
-      ActiveRow.polyfill(layer.row[i], keyboard, layout, layer.id, totalWidth, rowProportionalY, analysisFlagObj);
+      ActiveRow.polyfill(layer.row[i], layout, layer.id, totalWidth, rowProportionalY);
     }
 
-    // Add class functions and properties to the existing layout object, allowing it to act as an ActiveLayout.
-    let dummy = new ActiveLayer();
-    for(let key in dummy) {
-      if(!layer.hasOwnProperty(key)) {
-        layer[key] = dummy[key];
-      }
-    }
+    assignDefaultsWithPropDefs(layer, new ActiveLayer());
 
     let aLayer = layer as ActiveLayer;
     aLayer.totalWidth = totalWidth;
@@ -746,13 +768,19 @@ export class ActiveLayer implements LayoutLayer {
 }
 
 export class ActiveLayout implements LayoutFormFactor{
-  layer: ActiveLayer[];
+  /**
+   * Holds all layer specifications for the layout.  There is no guarantee that they
+   * have been fully preprocessed.
+   */
+  layer: TouchLayerSpec[];
   font: string;
   keyLabels: boolean;
   isDefault?: boolean;
   keyboard: Keyboard;
   formFactor: DeviceSpec.FormFactor;
   defaultHint: TouchLayoutDefaultHint;
+  displayUnderlying?: boolean;
+  fontsize?: string;
 
   hasFlicks: boolean = false;
   hasLongpresses: boolean = false;
@@ -761,14 +789,31 @@ export class ActiveLayout implements LayoutFormFactor{
   /**
    * Facilitates mapping layer id strings to their specification objects.
    */
-  layerMap: {[layerId: string]: ActiveLayer};
+  private layerMap: {[layerId: string]: ActiveLayer};
 
   private constructor() {
 
   }
 
+  /**
+   * Returns a fully preprocessed version of the specified layer spec.
+   * @param layerId
+   * @returns
+   */
   @Enumerable
   getLayer(layerId: string): ActiveLayer {
+    if(!this.layerMap[layerId]) {
+      const spec = this.layer.find((layerSpec) => layerSpec.id == layerId);
+      if(!spec) {
+        return null;
+      }
+
+      // Prepare the layer-spec for actual use.
+      ActiveLayer.sanitize(spec);
+      ActiveLayer.polyfill(spec, this);
+      this.layerMap[layerId] = spec as ActiveLayer;
+    }
+
     return this.layerMap[layerId];
   }
 
@@ -787,22 +832,18 @@ export class ActiveLayout implements LayoutFormFactor{
   static correctLayerEmptyRowBug(layers: LayoutLayer[]) {
     for(let n=0; n<layers.length; n++) {
       let layer=layers[n];
-      let rows=layer['row'];
+      let rows=layer.row;
       let i: number;
       for(i=rows.length-1; i>=0; i--) {
-        if(!Array.isArray(rows[i]['key']) || rows[i]['key'].length == 0) {
+        if(!Array.isArray(rows[i].key) || rows[i].key.length == 0) {
           rows.splice(i, 1)
         }
       }
     }
   }
 
-  static sanitize(rawLayout: LayoutFormFactor) {
+  static sanitize(rawLayout: TouchLayoutSpec) {
     ActiveLayout.correctLayerEmptyRowBug(rawLayout.layer);
-
-    for(const layer of rawLayout.layer) {
-      ActiveLayer.sanitize(layer);
-    }
   }
 
   /**
@@ -810,7 +851,7 @@ export class ActiveLayout implements LayoutFormFactor{
    * @param layout
    * @param formFactor
    */
-  static polyfill(layout: LayoutFormFactor, keyboard: Keyboard, formFactor: DeviceSpec.FormFactor): ActiveLayout {
+  static polyfill(layout: TouchLayoutSpec, keyboard: Keyboard, formFactor: DeviceSpec.FormFactor): ActiveLayout {
     /* c8 ignore start */
     if(layout == null) {
       throw new Error("Cannot build an ActiveLayout for a null specification.");
@@ -831,38 +872,38 @@ export class ActiveLayout implements LayoutFormFactor{
       */
     this.sanitize(layout);
 
-    // Create a separate OSK div for each OSK layer, only one of which will ever be visible
-    var n: number;
-    let layerMap: {[layerId: string]: ActiveLayer} = {};
-
-    let layers=layout.layer;
-
-    // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
-    let dummy = new ActiveLayout();
-    for(let key in dummy) {
-      if(!layout.hasOwnProperty(key)) {
-        layout[key] = dummy[key];
+    // This bit of preprocessing is a must; we need to know what gestures are available
+    // across all layers, "out of the gate".
+    for(let layer of layout.layer) {
+      for(let row of layer.row) {
+        for(let key of row.key) {
+          analysisMetadata.hasLongpresses ||= !!key.sk;
+          analysisMetadata.hasFlicks      ||= !!key.flick;
+          analysisMetadata.hasMultitaps   ||= !!key.multitap;
+        }
       }
     }
 
-    let aLayout = layout as ActiveLayout;
+    // Create a separate OSK div for each OSK layer, only one of which will ever be visible
+    let layerMap: {[layerId: string]: ActiveLayer} = {};
+
+    // Add class functions to the existing layout object, allowing it to act as an ActiveLayout.
+    assignDefaultsWithPropDefs(layout, new ActiveLayout());
+
+    let aLayout = layout as unknown as ActiveLayout;
     aLayout.keyboard = keyboard;
     aLayout.formFactor = formFactor;
-
-    for(n=0; n<layers.length; n++) {
-      ActiveLayer.polyfill(layers[n], keyboard, aLayout, analysisMetadata);
-      layerMap[layers[n].id] = layers[n] as ActiveLayer;
-    }
-
-    // After all layers are preprocessed...
+    aLayout.layerMap = layerMap;
 
     // The default-layer shift key & shift-layer shift key on mobile platforms should have a
     //  default multitap re: a 'caps' layer under select conditions.
     //
     // Note:  whether or not any other keys have multitaps doesn't matter here.  Just THESE.
     if(formFactor != 'desktop' && !!layout.layer.find((entry) => entry.id == 'caps')) {
-      const defaultLayer = layout.layer.find((entry) => entry.id == 'default') as ActiveLayer;
-      const shiftLayer   = layout.layer.find((entry) => entry.id == 'shift') as ActiveLayer;
+      // Triggers preprocessing for both default and shift layers.  They're the
+      // most-frequently referenced, at least.
+      const defaultLayer = aLayout.getLayer('default') as ActiveLayer;
+      const shiftLayer   = aLayout.getLayer('shift') as ActiveLayer;
 
       const defaultShift = defaultLayer.getKey('K_SHIFT');
       const shiftShift   = shiftLayer ?.getKey('K_SHIFT');
@@ -878,8 +919,8 @@ export class ActiveLayout implements LayoutFormFactor{
         defaultShift.multitap = [{...Layouts.dfltShiftToCaps}, {...Layouts.dfltShiftToDefault}] as ActiveSubKey[];
         shiftShift.multitap   = [{...Layouts.dfltShiftToCaps}, {...Layouts.dfltShiftToShift}] as ActiveSubKey[];
 
-        defaultShift.multitap.forEach((sk) => ActiveSubKey.polyfill(sk, keyboard, aLayout, 'default'));
-        shiftShift  .multitap.forEach((sk) => ActiveSubKey.polyfill(sk, keyboard, aLayout, 'shift'));
+        defaultShift.multitap.forEach((sk, index) => defaultShift.multitap[index] = new ActiveSubKey(sk, aLayout, 'default'));
+        shiftShift  .multitap.forEach((sk, index) => shiftShift.multitap[index]   = new ActiveSubKey(sk, aLayout, 'shift'));
       } // else no default shift -> caps multitaps.
     }
 
@@ -887,7 +928,7 @@ export class ActiveLayout implements LayoutFormFactor{
     aLayout.hasLongpresses = analysisMetadata.hasLongpresses;
     aLayout.hasMultitaps = analysisMetadata.hasMultitaps;
 
-    aLayout.layerMap = layerMap;
+    // All layers are lazy-processed, with the usual processing applied when first referenced.
 
     return aLayout;
   }

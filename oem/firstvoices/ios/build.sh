@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Build FirstVoices for iOS app
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
@@ -8,6 +9,9 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 # Include our resource functions; they're pretty useful!
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+. "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
+
+# ################################ Main script ################################
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
 verify_on_mac
@@ -53,10 +57,15 @@ function carthage_die() {
 }
 
 function do_configure() {
-  export KEYBOARDS_TARGET="$TARGET/Keyboards"
-  export KEYBOARDS_CSV_TARGET="$TARGET/Keyboards/keyboards.csv"
-  # TODO: support passing -copy-keyboards, -debug, -clean etc in to build_keyboards
-  ../common/build_keyboards.sh -download-keyboards
+  KEYBOARDS_CSV="$KEYMAN_ROOT/oem/firstvoices/keyboards.csv"
+  KEYBOARDS_CSV_TARGET="$KEYMAN_ROOT/oem/firstvoices/ios/FirstVoices/Keyboards/keyboards.csv"
+
+  KEYBOARD_PACKAGE_ID="fv_all"
+  KEYBOARDS_TARGET="$KEYMAN_ROOT/oem/firstvoices/ios/FirstVoices/Keyboards/${KEYBOARD_PACKAGE_ID}.kmp"
+
+  mkdir -p "$KEYMAN_ROOT/oem/firstvoices/ios/FirstVoices/Keyboards"
+  cp "$KEYBOARDS_CSV" "$KEYBOARDS_CSV_TARGET"
+  downloadKeyboardPackage "$KEYBOARD_PACKAGE_ID" "$KEYBOARDS_TARGET"
 
   echo
   echo "Load dependencies with Carthage"

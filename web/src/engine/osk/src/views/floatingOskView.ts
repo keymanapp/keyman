@@ -1,6 +1,6 @@
-import { Codes, DeviceSpec, ManagedPromise, Version } from '@keymanapp/keyboard-processor';
+import { DeviceSpec, ManagedPromise, Version } from '@keymanapp/keyboard-processor';
 import { getAbsoluteX, getAbsoluteY, landscapeView } from 'keyman/engine/dom-utils';
-import { EmitterListenerSpy, LegacyEventMap } from 'keyman/engine/events';
+import { EmitterListenerSpy } from 'keyman/engine/events';
 
 import OSKView, { EventMap, type LegacyOSKEventMap, OSKPos, OSKRect } from './oskView.js';
 import TitleBar from '../components/titleBar.js';
@@ -31,7 +31,7 @@ export default class FloatingOSKView extends OSKView {
   dfltX: string;
   dfltY: string;
 
-  private layoutSerializer = new FloatingOSKCookieSerializer();
+  layoutSerializer = new FloatingOSKCookieSerializer();
 
   private titleBar: TitleBar;
   private resizeBar: ResizeBar;
@@ -51,6 +51,7 @@ export default class FloatingOSKView extends OSKView {
 
     // Add header element to OSK only for desktop browsers
     this.titleBar = new TitleBar(this.titleDragHandler);
+    //
     this.titleBar.on('help', () => {
       this.legacyEvents.callEvent('helpclick', {});
     });
@@ -91,6 +92,12 @@ export default class FloatingOSKView extends OSKView {
       listenerSpy.on('listenerremoved', onListenedEvent);
     }
 
+    if(this.activeKeyboard) {
+      // If the keyboard was loaded during OSK init, we may need to set the
+      // title in place now, as it wasn't possible at the standard time.
+      this.postKeyboardAdjustments();
+    }
+
     this.loadPersistedLayout();
   }
 
@@ -119,6 +126,12 @@ export default class FloatingOSKView extends OSKView {
   }
 
   protected postKeyboardAdjustments() {
+    // It is possible for this to be called during OSK initialization,
+    // when `this.titleBar` has not yet been initialized.
+    if(!this.titleBar) {
+      return;
+    }
+
     // Add header element to OSK only for desktop browsers
     this.enableMoveResizeHandlers();
     if(this.activeKeyboard) {
@@ -220,15 +233,6 @@ export default class FloatingOSKView extends OSKView {
    *  @return {boolean}
    */
   private loadPersistedLayout(): void {
-    /*
-      If a keyboard is available during OSK construction, it is possible
-      for this field to be `undefined`.  `loadPersistedLayout` will be called
-      later in construction, so it's safe to skip.
-    */
-    if(!this.layoutSerializer) {
-      return;
-    }
-
     let c = this.layoutSerializer.loadWithDefaults({
       visible: 1,
       userSet: 0,
@@ -365,7 +369,7 @@ export default class FloatingOSKView extends OSKView {
    * @param       {Object=}     p       object with coordinates and userdefined flag
    *
    */
-  doResizeMove(p?) {
+  doResizeMove(p?: any) {
     this.legacyEvents.callEvent('resizemove', p);
   }
 
@@ -568,11 +572,11 @@ export default class FloatingOSKView extends OSKView {
     super.present();
 
     // Allow desktop UI to execute code when showing the OSK
-    var Lpos={};
-    Lpos['x']=this._Box.offsetLeft;
-    Lpos['y']=this._Box.offsetTop;
-    Lpos['userLocated']=this.userPositioned;
-    this.doShow(Lpos);
+    this.doShow({
+      x: this._Box.offsetLeft,
+      y: this._Box.offsetTop,
+      userLocated: this.userPositioned
+    });
   }
 
   public startHide(hiddenByUser: boolean) {

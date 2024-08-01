@@ -71,4 +71,4 @@
 "privacy-alert-text" = "Um richtig zu funktionieren, benötigt Keyman Funktionen zur Barrierefreiheit:\n\nDazu in den Systemeinstellungen, Sicherheit & Privatsphäre den Zugriff gewähren.\nStarten Sie anschließend Ihr System neu.";
 
 /* Text of menu item in Input Menu when no Keyboards are configured -- include parentheses  */
-"no-keyboard-configured-menu-placeholder" = "(No Keyboard Configured)";
+"no-keyboard-configured-menu-placeholder" = "(Keine Tastatur konfiguriert)";

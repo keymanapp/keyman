@@ -246,7 +246,7 @@ run_test(const km::core::path &source, const km::core::path &compiled) {
     size_t n = 0;
     try_status(km_core_context_get(km_core_state_context(test_state), &citems));
     try_status(context_items_to_utf16(citems, nullptr, &n));
-    km_core_cp *core_context_str = new km_core_cp[n];
+    km_core_cu *core_context_str = new km_core_cu[n];
     try_status(context_items_to_utf16(citems, core_context_str, &n));
 
     // Verify that both our local test_context and the core's test_state.context have
@@ -273,7 +273,7 @@ run_test(const km::core::path &source, const km::core::path &compiled) {
   size_t n = 0;
   try_status(km_core_context_get(km_core_state_context(test_state), &citems));
   try_status(context_items_to_utf16(citems, nullptr, &n));
-  km_core_cp *core_context_str = new km_core_cp[n];
+  km_core_cu *core_context_str = new km_core_cu[n];
   try_status(context_items_to_utf16(citems, core_context_str, &n));
 
   // Verify that both our local test_context and the core's test_state.context have
@@ -301,7 +301,7 @@ run_test(const km::core::path &source, const km::core::path &compiled) {
   for (auto it = options.begin(); it != options.end(); it++) {
     if (it->type == km::tests::KOT_OUTPUT) {
       std::cout << "output option-key: " << it->key << " expected: " << it->value;
-      km_core_cp const *value;
+      km_core_cu const *value;
       try_status(km_core_state_option_lookup(test_state, KM_CORE_OPT_KEYBOARD, it->key.c_str(), &value));
       std::cout << " actual: " << value << std::endl;
       if (it->value.compare(value) != 0) return __LINE__;

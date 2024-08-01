@@ -112,7 +112,6 @@ export class CumulativePathStats<Type = any> {
       // arc length stuff!
       const xDelta = sample.targetX - this.lastSample.targetX;
       const yDelta = sample.targetY - this.lastSample.targetY;
-      const tDelta = sample.t       - this.lastSample.t;
 
       const coordArcDeltaSq = xDelta * xDelta + yDelta * yDelta;
       const coordArcDelta = Math.sqrt(coordArcDeltaSq);
@@ -176,7 +175,6 @@ export class CumulativePathStats<Type = any> {
     if(subsetStats.followingSample && subsetStats.lastSample) {
       const xDelta = subsetStats.followingSample.targetX - subsetStats.lastSample.targetX;
       const yDelta = subsetStats.followingSample.targetY - subsetStats.lastSample.targetY;
-      const tDelta = subsetStats.followingSample.t       - subsetStats.lastSample.t;
 
       const coordArcDeltaSq = xDelta * xDelta + yDelta * yDelta;
       const coordArcDelta = Math.sqrt(coordArcDeltaSq);

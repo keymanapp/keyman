@@ -25,6 +25,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.graphics.Point;
 import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
 import android.net.ConnectivityManager;
@@ -32,6 +34,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.IBinder;
 import android.text.InputType;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.Display;
@@ -39,6 +42,7 @@ import android.view.Surface;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.WindowMetrics;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
@@ -291,9 +295,7 @@ public final class KMManager {
 
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
-  protected static final String KMFilename_KeyboardHtml_Legacy = "keyboard.es5.html";
   protected static final String KMFilename_JSEngine = "keymanweb-webview.js";
-  protected static final String KMFilename_JSLegacyEngine = "keymanweb-webview.es5.js";
   protected static final String KMFilename_JSSentry = "sentry.min.js";
   protected static final String KMFilename_JSSentryInit = "keyman-sentry.js";
   protected static final String KMFilename_AndroidHost = "android-host.js";
@@ -854,25 +856,11 @@ public final class KMManager {
   private static void copyAssets(Context context) {
     AssetManager assetManager = context.getAssets();
 
-    // Will build a temp WebView in order to check Chrome version internally.
-    boolean legacyMode = WebViewUtils.getEngineWebViewVersionStatus(context, null, null) != WebViewUtils.EngineWebViewVersionStatus.FULL;
-
     try {
       // Copy KMW files
-      if(legacyMode) {
-        // Replaces the standard ES6-friendly version of the host page with a legacy one that
-        // includes polyfill requests and that links the legacy, ES5-compatible version of KMW.
-        copyAssetWithRename(context, KMFilename_KeyboardHtml_Legacy, KMFilename_KeyboardHtml, "", true);
+      copyAsset(context, KMFilename_KeyboardHtml, "", true);
 
-        copyAsset(context, KMFilename_JSLegacyEngine, "", true);
-      } else {
-        copyAsset(context, KMFilename_KeyboardHtml, "", true);
-
-        // For versions of Chrome with full ES6 support, we use the ES6 artifact.
-        copyAsset(context, KMFilename_JSEngine, "", true);
-      }
-
-      // Is still built targeting ES5.
+      copyAsset(context, KMFilename_JSEngine, "", true);
       copyAsset(context, KMFilename_JSSentry, "", true);
       copyAsset(context, KMFilename_JSSentryInit, "", true);
       copyAsset(context, KMFilename_AndroidHost, "", true);
@@ -882,12 +870,6 @@ public final class KMManager {
 
       // Copy default keyboard font
       copyAsset(context, KMDefault_KeyboardFont, "", true);
-
-      if(legacyMode) {
-        copyAsset(context, KMFilename_JSPolyfill, "", true);
-        copyAsset(context, KMFilename_JSPolyfill2, "", true);
-        copyAsset(context, KMFilename_JSPolyfill3, "", true);
-      }
 
       // Keyboard packages directory
       File packagesDir = new File(getPackagesDir());
@@ -1634,7 +1616,7 @@ public final class KMManager {
 
   public static boolean isDefaultKey(String key) {
     return (
-      key != null && 
+      key != null &&
       key.equals(KMString.format("%s_%s", KMDefault_LanguageID, KMDefault_KeyboardID)));
   }
 
@@ -2005,7 +1987,20 @@ public final class KMManager {
   }
 
   public static int getOrientation(Context context) {
-    Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+    Display display;
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+      // https://developer.android.com/reference/android/content/Context#getDisplay()
+      try {
+        display = context.getDisplay();
+      } catch (UnsupportedOperationException e) {
+        // if the method is called on an instance that is not associated with any display.
+        return context.getResources().getConfiguration().orientation;
+      }
+    } else {
+      WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+      // Deprecated in API 30
+      display = wm.getDefaultDisplay();
+    }
     int rotation = display.getRotation();
     if (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180) {
       return Configuration.ORIENTATION_PORTRAIT;
@@ -2050,6 +2045,34 @@ public final class KMManager {
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
     }
+  }
+
+  /**
+   * Get the size of the area the window would occupy.
+   * API 30+
+   * https://developer.android.com/reference/android/view/WindowManager#getCurrentWindowMetrics()
+   * @param context
+   * @return Point (width, height)
+   */
+  public static Point getWindowSize(Context context) {
+    WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+      // Deprecated in API 30
+      Point size = new Point(0, 0);
+      wm.getDefaultDisplay().getSize(size);
+      return size;
+    }
+
+    WindowMetrics windowMetrics = wm.getCurrentWindowMetrics();
+    return new Point(
+      windowMetrics.getBounds().width(),
+      windowMetrics.getBounds().height());
+  }
+
+  public static float getWindowDensity(Context context) {
+    DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+    Log.d(TAG, "KMManager: metrics.density " + metrics.density);
+    return metrics.density;
   }
 
   protected static void setPersistentShouldShowHelpBubble(boolean flag) {
@@ -2361,7 +2384,7 @@ public final class KMManager {
     if (KMManager.shouldAllowSetKeyboard()) {
       // inKeyguardRestrictedInputMode() deprecated, so check isKeyguardLocked() to determine if screen is locked
       if (isLocked()) {
-        if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_UP) {
+        if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_DOWN) {
           doGlobeKeyLockscreenAction(context);
         }
         // clear globeKeyState

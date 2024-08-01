@@ -1,9 +1,9 @@
-import * as xml2js from 'xml2js';
+import { xml2js } from '@keymanapp/common-types';
 import JSZip from 'jszip';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
 import { KmpJsonFile, KpsFile, SchemaValidators, CompilerCallbacks, KeymanFileTypes, KvkFile, KeymanCompiler, CompilerOptions, KeymanCompilerResult, KeymanCompilerArtifacts, KeymanCompilerArtifact } from '@keymanapp/common-types';
-import { CompilerMessages } from './package-compiler-messages.js';
+import { PackageCompilerMessages } from './package-compiler-messages.js';
 import { PackageMetadataCollector } from './package-metadata-collector.js';
 import { KmpInfWriter } from './kmp-inf-writer.js';
 import { transcodeToCP1252 } from './cp1252.js';
@@ -172,7 +172,7 @@ export class KmpCompiler implements KeymanCompiler {
     // Load the KPS data from XML as JS structured data.
     const buffer = this.callbacks.loadFile(kpsFilename);
     if(!buffer) {
-      this.callbacks.reportMessage(CompilerMessages.Error_FileDoesNotExist({filename: kpsFilename}));
+      this.callbacks.reportMessage(PackageCompilerMessages.Error_FileDoesNotExist({filename: kpsFilename}));
       return null;
     }
     const data = new TextDecoder().decode(buffer);
@@ -186,7 +186,7 @@ export class KmpCompiler implements KeymanCompiler {
         try {
           parser.parseString(data, (e: unknown, r: unknown) => { if(e) throw e; a = r as KpsFile.KpsPackage });
         } catch(e) {
-          this.callbacks.reportMessage(CompilerMessages.Error_InvalidPackageFile({e}));
+          this.callbacks.reportMessage(PackageCompilerMessages.Error_InvalidPackageFile({e}));
         }
         return a;
     })();
@@ -269,11 +269,21 @@ export class KmpCompiler implements KeymanCompiler {
       kmp.files = this.arrayWrap(kps.Files.File).map((file: KpsFile.KpsFileContentFile) => {
         return {
           name: this.normalizePath(file.Name),
-          description: file.Description.trim(),
+          description: (file.Description ?? '').trim(),
           copyLocation: parseInt(file.CopyLocation, 10) || undefined
           // note: we don't emit fileType as that is not permitted in kmp.json
         };
       });
+      if(!kmp.files.reduce((result: boolean, file) => {
+        if(!file.name) {
+          // as the filename field is missing or blank, we'll try with the description instead
+          this.callbacks.reportMessage(PackageCompilerMessages.Error_FileRecordIsMissingName({description: file.description ?? '(no description)'}));
+          return false;
+        }
+        return result;
+      }, true)) {
+        return null;
+      }
     }
     kmp.files = kmp.files ?? [];
 
@@ -300,9 +310,9 @@ export class KmpCompiler implements KeymanCompiler {
       kmp.keyboards = this.arrayWrap(kps.Keyboards.Keyboard).map((keyboard: KpsFile.KpsFileKeyboard) => ({
         displayFont: keyboard.DisplayFont ? this.callbacks.path.basename(this.normalizePath(keyboard.DisplayFont)) : undefined,
         oskFont: keyboard.OSKFont ? this.callbacks.path.basename(this.normalizePath(keyboard.OSKFont)) : undefined,
-        name:keyboard.Name.trim(),
-        id:keyboard.ID.trim(),
-        version:keyboard.Version.trim(),
+        name:keyboard.Name?.trim(),
+        id:keyboard.ID?.trim(),
+        version:keyboard.Version?.trim(),
         rtl:keyboard.RTL == 'True' ? true : undefined,
         languages: keyboard.Languages ?
           this.kpsLanguagesToKmpLanguages(this.arrayWrap(keyboard.Languages.Language) as KpsFile.KpsFileLanguage[]) :
@@ -499,14 +509,14 @@ export class KmpCompiler implements KeymanCompiler {
 
       if(this.callbacks.path.isAbsolute(filename)) {
         // absolute paths are not portable to other computers
-        this.callbacks.reportMessage(CompilerMessages.Warn_AbsolutePath({filename: filename}));
+        this.callbacks.reportMessage(PackageCompilerMessages.Warn_AbsolutePath({filename: filename}));
       }
 
       filename = this.callbacks.resolveFilename(kpsFilename, filename);
       const basename = this.callbacks.path.basename(filename);
 
       if(!this.callbacks.fs.existsSync(filename)) {
-        this.callbacks.reportMessage(CompilerMessages.Error_FileDoesNotExist({filename: filename}));
+        this.callbacks.reportMessage(PackageCompilerMessages.Error_FileDoesNotExist({filename: filename}));
         failed = true;
         return;
       }
@@ -515,7 +525,7 @@ export class KmpCompiler implements KeymanCompiler {
       try {
         memberFileData = this.callbacks.loadFile(filename);
       } catch(e) {
-        this.callbacks.reportMessage(CompilerMessages.Error_FileCouldNotBeRead({filename: filename, e: e}));
+        this.callbacks.reportMessage(PackageCompilerMessages.Error_FileCouldNotBeRead({filename: filename, e: e}));
         failed = true;
         return;
       }
@@ -595,7 +605,7 @@ export class KmpCompiler implements KeymanCompiler {
       data[1] != KvkFile.KVK_HEADER_IDENTIFIER_BYTES[1] ||
       data[2] != KvkFile.KVK_HEADER_IDENTIFIER_BYTES[2] ||
       data[3] != KvkFile.KVK_HEADER_IDENTIFIER_BYTES[3]) {
-      this.callbacks.reportMessage(CompilerMessages.Warn_FileIsNotABinaryKvkFile({filename: filename}));
+      this.callbacks.reportMessage(PackageCompilerMessages.Warn_FileIsNotABinaryKvkFile({filename: filename}));
     }
   }
 }

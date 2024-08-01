@@ -1,11 +1,7 @@
 #include <CompMsg.h>
+#include <map>
 
-struct CompilerError {
-  KMX_DWORD ErrorCode;
-  const  KMX_CHAR* Text;
-  };
-
-const struct CompilerError CompilerErrors[] = {
+std::map<KMX_DWORD, const KMX_CHAR*> CompilerErrorMap = {
     { CERR_InvalidLayoutLine                             , "Invalid 'layout' command"},
     { CERR_NoVersionLine                                 , "No version line found for file"},
     { CERR_InvalidGroupLine                              , "Invalid 'group' command"},
@@ -86,14 +82,14 @@ const struct CompilerError CompilerErrors[] = {
     { CERR_InvalidLanguageLine                           , "Invalid 'language' command"},
     { CERR_LayoutButNoLanguage                           , "Layout command found but no language command"},
     { CERR_CannotCreateTempfile                          , "Cannot create temp file"},
-    { CERR_90FeatureOnlyLayoutFile                       , "Touch layout file reference requires store(version) '9.0'or higher"},
-    { CERR_90FeatureOnlyKeyboardVersion                  , "KeyboardVersion system store requires store(version) '9.0'or higher"},
+    { CERR_90FeatureOnlyLayoutFile                       , "Touch layout file reference requires store(version) '9.0' or higher"},
+    { CERR_90FeatureOnlyKeyboardVersion                  , "KeyboardVersion system store requires store(version) '9.0' or higher"},
     { CERR_KeyboardVersionFormatInvalid                  , "KeyboardVersion format is invalid, expecting dot-separated integers"},
     { CERR_ContextExHasInvalidOffset                     , "context() statement has offset out of range"},
-    { CERR_90FeatureOnlyEmbedCSS                         , "Embedding CSS requires store(version) '9.0'or higher"},
-    { CERR_90FeatureOnlyTargets                          , "TARGETS system store requires store(version) '9.0'or higher"},
+    { CERR_90FeatureOnlyEmbedCSS                         , "Embedding CSS requires store(version) '9.0' or higher"},
+    { CERR_90FeatureOnlyTargets                          , "TARGETS system store requires store(version) '9.0' or higher"},
     { CERR_ContextAndIndexInvalidInMatchNomatch          , "context and index statements cannot be used in a match or nomatch statement"},
-    { CERR_140FeatureOnlyContextAndNotAnyWeb             , "For web and touch platforms, context() statement referring to notany() requires store(version) '14.0'or higher"},
+    { CERR_140FeatureOnlyContextAndNotAnyWeb             , "For web and touch platforms, context() statement referring to notany() requires store(version) '14.0' or higher"},
     { CERR_ExpansionMustFollowCharacterOrVKey            , "An expansion must follow a character or a virtual key"},
     { CERR_VKeyExpansionMustBeFollowedByVKey             , "A virtual key expansion must be terminated by a virtual key"},
     { CERR_CharacterExpansionMustBeFollowedByCharacter   , "A character expansion must be terminated by a character key"},
@@ -115,9 +111,11 @@ const struct CompilerError CompilerErrors[] = {
     { CERR_ExtendedStringTooLong                         , "Extended string is too long" },
     { CERR_VirtualKeyExpansionTooLong                    , "Virtual key expansion is too large" },
     { CERR_CharacterRangeTooLong                         , "Character range is too large and cannot be expanded" },
+    { CERR_NonBMPCharactersNotSupportedInKeySection      , "Characters with codepoints over U+FFFF are not supported in the key part of the rule" },
 
     { CHINT_UnreachableRule                              , "This rule will never be matched as another rule takes precedence"},
     { CHINT_NonUnicodeFile                               , "Keyman Developer has detected that the file has ANSI encoding. Consider converting this file to UTF-8"},
+    { CHINT_IndexStoreLong                               , "The store referenced in index() is longer than the store referenced in any()"},
 
     { CWARN_TooManyWarnings                              , "Too many warnings or errors"},
     { CWARN_OldVersion                                   , "The keyboard file is an old version"},
@@ -150,14 +148,8 @@ const struct CompilerError CompilerErrors[] = {
     { CWARN_VirtualKeyInOutput                           , "Virtual keys are not supported in output"},
 
     { 0, nullptr }
-  };
+};
 
-KMX_CHAR *GetCompilerErrorString(KMX_DWORD code)
-{
-  for(int i = 0; CompilerErrors[i].ErrorCode; i++) {
-    if(CompilerErrors[i].ErrorCode == code) {
-      return ( KMX_CHAR*) CompilerErrors[i].Text;
-    }
-  }
-  return nullptr;
+const KMX_CHAR *GetCompilerErrorString(KMX_DWORD code) {
+    return CompilerErrorMap[code];
 }
