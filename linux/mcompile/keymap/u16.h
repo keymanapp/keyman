@@ -190,8 +190,7 @@ KMX_WCHAR* u16tok(KMX_WCHAR* p, const KMX_WCHAR* delim, KMX_WCHAR** ctx);
 
 /**
  * @brief  Convert a u16string to a double
- * @param  tr Pointer to u16string
-
+ * @param  str Pointer to u16string
  * @return double value equivalent to the string
  */
 double u16tof(KMX_WCHAR* str);
