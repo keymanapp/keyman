@@ -117,6 +117,9 @@ int u16ncmp(const km_core_cu *p, const km_core_cu *q, size_t count);
 km_core_cu *u16tok(km_core_cu *p, km_core_cu ch, km_core_cu **ctx);
 km_core_cu *u16dup(km_core_cu *src);
 
+size_t u32len(const km_core_usv *p);
+km_core_usv *u32dup(const km_core_usv *src);
+
 //KMX_BOOL MapUSCharToVK(KMX_WORD ch, PKMX_WORD puKey, PKMX_DWORD puShiftFlags);
 
 //  --- implementation ---

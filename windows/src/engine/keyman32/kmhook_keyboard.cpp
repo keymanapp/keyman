@@ -62,9 +62,12 @@
 #include "pch.h"
 #include <Psapi.h>
 
-#ifdef _WIN64
-#error kmhook_keyboard.cpp is not required for win64.
-#endif
+// This file is used only in keyman32.dll; it has support functions for hotkeys
+// which used to be in a keyboard hook but are now in the low-level keyboard
+// hook
+// TODO: rename this file
+#ifndef _WIN64
+
    // I3617
 BOOL IsLanguageSwitchWindowVisible();
 void SendToLanguageSwitchWindow(WPARAM wParam, LPARAM lParam);
@@ -192,3 +195,5 @@ int ProcessLanguageSwitchShiftKey(WPARAM wParam, BOOL isUp)
   PostDummyKeyEvent();  // I3301 - this is imperfect because we don't deal with HC_NOREMOVE.  But good enough?   // I3534   // I4844
   return 0;
 }
+
+#endif

@@ -82,6 +82,17 @@ ldml = executable('ldml',
     objects: lib.extract_all_objects(recursive: false),
     )
 
+core_ldml_min = executable('core_ldml_min',
+    ['core_ldml_min.cpp'],
+    cpp_args: defns + warns,
+    include_directories: [inc, libsrc],
+    link_args: links,
+    dependencies: [],
+    link_with: [lib],
+    # objects: lib.extract_all_objects(recursive: false),
+    )
+test('core_ldml_min', core_ldml_min, suite: 'ldml', should_fail: true)
+
 
 # Build and run additional test_kmx_plus test
 
@@ -126,7 +137,7 @@ test('test_context_normalization', test_context_normalization, suite: 'ldml')
 # Build and run additional test_unicode test
 
 test_unicode = executable('test_unicode', 'test_unicode.cpp',
-    ['test_unicode.cpp', common_test_files],
+    ['test_unicode.cpp', common_test_files, generated_headers],
     cpp_args: defns + warns,
     include_directories: [inc, libsrc, '../../../../developer/src/ext/json'],
     link_args: links + tests_flags,

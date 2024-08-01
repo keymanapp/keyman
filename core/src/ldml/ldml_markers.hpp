@@ -17,10 +17,6 @@
 #include "debuglog.h"
 
 #include "core_icu.h"
-#include "unicode/uniset.h"
-#include "unicode/usetiter.h"
-#include "unicode/regex.h"
-#include "unicode/utext.h"
 
 namespace km {
 namespace core {

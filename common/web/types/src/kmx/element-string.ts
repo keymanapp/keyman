@@ -1,7 +1,8 @@
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { DependencySections, StrsItem, UsetItem } from './kmx-plus.js';
 import { ElementParser, ElementSegment, ElementType } from '../ldml-keyboard/pattern-parser.js';
-import { MATCH_HEX_ESCAPE, unescapeOneQuadString } from '../util/util.js';
+import { MATCH_HEX_ESCAPE } from '../util/consts.js';
+import { unescapeOneQuadString } from '../util/util.js';
 
 export enum ElemElementFlags {
   none = 0,

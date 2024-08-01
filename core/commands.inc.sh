@@ -91,7 +91,14 @@ do_test() {
   if [[ $target =~ ^(x86|x64)$ ]]; then
     cmd //C build.bat $target $BUILDER_CONFIGURATION test $testparams
   else
-    meson test -C "$MESON_PATH" $testparams
+    if [[ $target == wasm ]] && [[ $BUILDER_OS == mac ]]; then
+      # 11794 -- parallel tests failing on some mac build agents; temporary
+      # mitigation until we diagnose root cause
+      meson test -j 1 -C "$MESON_PATH" $testparams
+    else
+      meson test -C "$MESON_PATH" $testparams
+    fi
+
   fi
   builder_finish_action success test:$target
 }

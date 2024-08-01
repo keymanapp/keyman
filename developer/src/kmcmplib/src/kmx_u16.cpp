@@ -9,6 +9,7 @@
 #include <codecvt>
 #include <locale>
 #include <stdarg.h>
+#include <algorithm>
 
 //String <- wstring
 std::string string_from_wstring(std::wstring const str) {
@@ -96,7 +97,7 @@ std::string toHex(int num1) {
 			s += (87 + temp);
 		num = num / 16;
 	}
-	reverse(s.begin(), s.end());
+	std::reverse(s.begin(), s.end());
 	return s;
 }
 
@@ -242,7 +243,7 @@ KMX_WCHAR * u16tok(KMX_WCHAR *p, const KMX_WCHAR ch,  KMX_WCHAR **ctx) {
   else {
     *ctx = NULL;
   }
-  return p;
+  return *p ? p : NULL;
 }
 
 KMX_WCHAR * u16tok(KMX_WCHAR* p, const KMX_WCHAR* delim, KMX_WCHAR** ctx) {
@@ -258,13 +259,13 @@ KMX_WCHAR * u16tok(KMX_WCHAR* p, const KMX_WCHAR* delim, KMX_WCHAR** ctx) {
 	if (*q) {
 		*q = 0;
 		q++;
-		while (u16chr(delim, *q)) q++;
+		while (*q && u16chr(delim, *q)) q++;
 		*ctx = q;
 	}
 	else {
 		*ctx = NULL;
 	}
-	return p;
+  return *p ? p : NULL;
 }
 
 double u16tof( KMX_WCHAR* str)
@@ -274,10 +275,7 @@ double u16tof( KMX_WCHAR* str)
 	char digit;
 
 	PKMX_WCHAR q = (PKMX_WCHAR)u16chr(str, '.');
-	size_t pos_dot = q-str  ;
-
-	if (pos_dot < 0)
-		pos_dot = u16len(str);
+	size_t pos_dot = (q-str < 0) ?  u16len(str) : q-str;
 
 	for (size_t i = 0; i < u16len(str); i++)
 	{

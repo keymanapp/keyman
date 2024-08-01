@@ -2,7 +2,12 @@ import { assert } from 'chai';
 import * as models from '#./models/index.js';
 import * as correction from '#./correction/index.js';
 
+import { PriorityQueue } from '@keymanapp/web-utils';
 import { jsonFixture } from '@keymanapp/common-test-resources/model-helpers.mjs';
+
+function buildTestTimer() {
+  return new correction.ExecutionTimer(Number.MAX_VALUE, Number.MAX_VALUE);
+}
 
 function assertEdgeChars(edge, input, match) {
   assert.isTrue(edgeHasChars(edge, input, match));
@@ -138,7 +143,7 @@ describe('Correction Distance Modeler', function() {
       assert.equal(edges.length, expectedChildCount);
 
       // One final bit, which is a bit of integration - we know the top two nodes that should result.
-      let queue = new models.PriorityQueue(correction.QUEUE_NODE_COMPARATOR, edges);
+      let queue = new PriorityQueue(correction.QUEUE_NODE_COMPARATOR, edges);
 
       let firstEdge = queue.dequeue();
       assert.equal(firstEdge.priorInput[0].sample.insert, 't');
@@ -181,13 +186,13 @@ describe('Correction Distance Modeler', function() {
       ];
 
       let layer1Edges = rootNode.buildSubstitutionEdges(synthDistribution1);
-      let layer1Queue = new models.PriorityQueue(correction.QUEUE_NODE_COMPARATOR, layer1Edges);
+      let layer1Queue = new PriorityQueue(correction.QUEUE_NODE_COMPARATOR, layer1Edges);
 
       let tEdge = layer1Queue.dequeue();
       assertEdgeChars(tEdge, 't', 't');
 
       let layer2Edges = tEdge.buildSubstitutionEdges(synthDistribution2);
-      let layer2Queue = new models.PriorityQueue(correction.QUEUE_NODE_COMPARATOR, layer2Edges);
+      let layer2Queue = new PriorityQueue(correction.QUEUE_NODE_COMPARATOR, layer2Edges);
 
       let eEdge = layer2Queue.dequeue();
       assertEdgeChars(eEdge, 'e', 'e');
@@ -204,7 +209,7 @@ describe('Correction Distance Modeler', function() {
       let layer3eEdges  = eEdge.buildSubstitutionEdges(synthDistribution3);
       let layer3hEdges  = hEdge.buildSubstitutionEdges(synthDistribution3);
       let layer3ehEdges = ehEdge.buildSubstitutionEdges(synthDistribution3);
-      let layer3Queue = new models.PriorityQueue(correction.QUEUE_NODE_COMPARATOR, layer3eEdges.concat(layer3hEdges).concat(layer3ehEdges));
+      let layer3Queue = new PriorityQueue(correction.QUEUE_NODE_COMPARATOR, layer3eEdges.concat(layer3hEdges).concat(layer3ehEdges));
 
       // Find the first result with an actual word directly represented.
       let bestEdge;
@@ -248,14 +253,13 @@ describe('Correction Distance Modeler', function() {
       testModel = new models.TrieModel(jsonFixture('models/tries/english-1000'));
     });
 
-    let checkResults_teh = function(iter) {
-      let firstSet = iter.next();  // {value: <actual value>, done: <iteration complete?>}
-      assert.isFalse(firstSet.done);
+    let checkResults_teh = async function(iter) {
+      let firstResult = await iter.next();  // {value: <actual value>, done: <iteration complete?>}
+      assert.isFalse(firstResult.done);
 
-      firstSet = firstSet.value; // Retrieves <actual value>
+      firstResult = firstResult.value; // Retrieves <actual value>
       // No checks on the first set's cost.
-      assert.equal(firstSet.length, 1); // A single sequence ("ten") should be the best match.
-      assert.equal(firstSet[0].matchString, "ten");
+      assert.equal(firstResult.matchString, "ten");
 
       let secondBatch = [
         'beh',  'te',  'tec',
@@ -264,15 +268,30 @@ describe('Correction Distance Modeler', function() {
         'the'
       ];
 
-      let secondSet = iter.next();  // {value: <actual value>, done: <iteration complete?>}
-      assert.isFalse(secondSet.done);
+      async function checkBatch(batch, prevCost) {
+        let cost;
+        firstResult = firstResult;
+        while(batch.length > 0) {
+          const iter_result = await iter.next();
+          assert.isFalse(iter_result.done);
 
-      secondSet = secondSet.value; // Retrieves <actual value>
-      assert.isAbove(secondSet[0].totalCost, firstSet[0].totalCost); // assert it 'costs more'.
-      assert.equal(secondSet.length, secondBatch.length);
+          const result = iter_result.value;
+          assert.isAbove(result.totalCost, prevCost);
+          if(cost !== undefined) {
+            assert.equal(result.totalCost, cost);
+          } else {
+            cost = result.totalCost;
+          }
 
-      let entries = secondSet.map(result => result.matchString).sort();
-      assert.deepEqual(entries, secondBatch);
+          const matchIndex = batch.findIndex((entry) => entry == result.matchString);
+          assert.notEqual(matchIndex, -1, `'${result.matchString}' received as prediction too early`);
+          batch.splice(matchIndex, 1);
+        }
+
+        return cost;
+      }
+
+      const secondCost = await checkBatch(secondBatch, firstResult.totalCost);
 
       let thirdBatch = [
         'cen', 'en',  'gen',
@@ -282,30 +301,22 @@ describe('Correction Distance Modeler', function() {
         'thu', 'wen'
       ];
 
-      let thirdSet = iter.next();  // {value: <actual value>, done: <iteration complete?>}
-      assert.isFalse(thirdSet.done);
-
-      thirdSet = thirdSet.value; // Retrieves <actual value>
-      assert.isAbove(thirdSet[0].totalCost, secondSet[0].totalCost); // assert it 'costs more'.
-      assert.equal(thirdSet.length, thirdBatch.length);
-
-      entries = thirdSet.map(result => result.matchString).sort();
-      assert.deepEqual(entries, thirdBatch);
+      await checkBatch(thirdBatch, secondCost);
     }
 
-    it('Simple search without input', function() {
+    it('Simple search without input', async function() {
       // The combinatorial effect here is a bit much to fully test.
       let rootTraversal = testModel.traverseFromRoot();
       assert.isNotEmpty(rootTraversal);
 
       let searchSpace = new correction.SearchSpace(testModel);
 
-      let iter = searchSpace.getBestMatches();
-      let firstSet = iter.next();
-      assert.isFalse(firstSet.done);
+      let iter = searchSpace.getBestMatches(buildTestTimer());
+      let firstResult = await iter.next();
+      assert.isFalse(firstResult.done);
     });
 
-    it('Simple search (paralleling "Small integration test")', function() {
+    it('Simple search (paralleling "Small integration test")', async function() {
       // The combinatorial effect here is a bit much to fully test.
       let rootTraversal = testModel.traverseFromRoot();
       assert.isNotEmpty(rootTraversal);
@@ -331,35 +342,11 @@ describe('Correction Distance Modeler', function() {
       searchSpace.addInput(synthDistribution2);
       searchSpace.addInput(synthDistribution3);
 
-      let iter = searchSpace.getBestMatches(0); // disables the correction-search timeout.
-      checkResults_teh(iter);
-
-      // // Debugging method:  a simple loop for printing out the generated sets, in succession.
-      // //
-      // for(let i = 1; i <= 8; i++) {  // After 8 tiers, we run out of entries for this particular case.
-      //   console.log();
-      //   console.log("Batch " + i);
-
-      //   let set = iter.next();
-      //   assert.isFalse(set.done);
-
-      //   set = set.value;
-
-      //   let entries = set.map(function(result) {
-      //     return result.matchString;
-      //   });
-
-      //   console.log("Entry count: " + set.length);
-      //   entries.sort();
-      //   console.log(entries);
-      //   console.log("Probablility:  " + set[0].totalCost);
-      //   console.log("Analysis (first entry):");
-      //   console.log(" - Edit cost:  " + set[0].knownCost);
-      //   console.log(" - Input cost: " + set[0].inputSamplingCost);
-      // }
+      let iter = searchSpace.getBestMatches(buildTestTimer()); // disables the correction-search timeout.
+      await checkResults_teh(iter);
     });
 
-    it('Allows reiteration (sequentially)', function() {
+    it('Allows reiteration (sequentially)', async function() {
       // The combinatorial effect here is a bit much to fully test.
       let rootTraversal = testModel.traverseFromRoot();
       assert.isNotEmpty(rootTraversal);
@@ -385,32 +372,32 @@ describe('Correction Distance Modeler', function() {
       searchSpace.addInput(synthDistribution2);
       searchSpace.addInput(synthDistribution3);
 
-      let iter = searchSpace.getBestMatches(0); // disables the correction-search timeout.
-      checkResults_teh(iter);
+      let iter = searchSpace.getBestMatches(buildTestTimer()); // disables the correction-search timeout.
+      await checkResults_teh(iter);
 
       // The key: do we get the same results the second time?
       // Reset the iterator first...
-      let iter2 = searchSpace.getBestMatches(0); // disables the correction-search timeout.
-      checkResults_teh(iter2);
+      let iter2 = searchSpace.getBestMatches(buildTestTimer()); // disables the correction-search timeout.
+      await checkResults_teh(iter2);
     });
 
-    it('Empty search space, loaded model', function() {
+    it('Empty search space, loaded model', async function() {
       // The combinatorial effect here is a bit much to fully test.
       let rootTraversal = testModel.traverseFromRoot();
       assert.isNotEmpty(rootTraversal);
 
       let searchSpace = new correction.SearchSpace(testModel);
-      let iter = searchSpace.getBestMatches();
+      const timer = buildTestTimer();
+      let iter = searchSpace.getBestMatches(timer);
 
       // While there's no input, insertion operations can produce suggestions.
-      let resultState = iter.next();
-      let results = resultState.value;
+      let resultState = await iter.next();
+      let result = resultState.value;
 
       // Just one suggestion should be returned.
-      assert.equal(results.length, 1);
-      assert.equal(results[0].totalCost, 0);             // Gives a perfect match
-      assert.equal(results[0].inputSequence.length, 0);  // for a state with no input and
-      assert.equal(results[0].matchString, '');          // an empty match string.
+      assert.equal(result.totalCost, 0);             // Gives a perfect match
+      assert.equal(result.inputSequence.length, 0);  // for a state with no input and
+      assert.equal(result.matchString, '');          // an empty match string.
       assert.isFalse(resultState.done);
     });
   });

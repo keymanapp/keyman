@@ -1,18 +1,18 @@
 /*
   Name:             inserttext
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      19 Jun 2007
 
   Modified Date:    28 Mar 2016
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          19 Jun 2007 - mcdurdin - I890 - Fix deadkeys in TSF
                     19 Jun 2007 - mcdurdin - I890 - Fix crash with deadkeys - logging
                     11 Dec 2009 - mcdurdin - Header files
@@ -67,7 +67,7 @@ void DePseudofy(WCHAR *pchText)   // I3564
     {
       if(*pchText == PseudoMap[k])
       {
-        *pchText = k; 
+        *pchText = k;
         break;
       }
     }
@@ -77,77 +77,85 @@ void DePseudofy(WCHAR *pchText)   // I3564
 
 void InsertTextAtSelection(TfEditCookie ec, ITfContext *pContext, const WCHAR *pchText, ULONG cchText)
 {
-  LogEnter();
-  
-  ITfInsertAtSelection *pInsertAtSelection;
-    ITfRange *pRange;
-    TF_SELECTION tfSelection;
+  SendDebugEntry();
 
-    // we need a special interface to insert text at the selection
-    if (pContext->QueryInterface(IID_ITfInsertAtSelection, (void **)&pInsertAtSelection) != S_OK)
-        return;
+  ITfInsertAtSelection *pInsertAtSelection;
+  ITfRange *pRange;
+  TF_SELECTION tfSelection;
+
+  // we need a special interface to insert text at the selection
+  if (pContext->QueryInterface(IID_ITfInsertAtSelection, (void **)&pInsertAtSelection) != S_OK) {
+    SendDebugExit();
+    return;
+  }
 
 #ifdef DEBUG_PSEUDO   // I3607
-    WCHAR *PseudoBuf = new WCHAR[cchText+1];   // I3564
-    
-    wcsncpy_s(PseudoBuf, cchText+1, pchText, cchText);
-    PseudoBuf[cchText] = 0;
-    Pseudofy(PseudoBuf);
+  WCHAR *PseudoBuf = new WCHAR[cchText+1];   // I3564
 
-    // insert the text
-    if (pInsertAtSelection->InsertTextAtSelection(ec, 0, PseudoBuf, cchText, &pRange) != S_OK)   // I3564
-        goto Exit;
+  wcsncpy_s(PseudoBuf, cchText+1, pchText, cchText);
+  PseudoBuf[cchText] = 0;
+  Pseudofy(PseudoBuf);
+
+  // insert the text
+  if (pInsertAtSelection->InsertTextAtSelection(ec, 0, PseudoBuf, cchText, &pRange) != S_OK)   // I3564
+    goto Exit;
 #else   // I3607
-    // insert the text
-    if (pInsertAtSelection->InsertTextAtSelection(ec, 0, pchText, cchText, &pRange) != S_OK)   // I3564
-        goto Exit;
+  // insert the text
+  if (pInsertAtSelection->InsertTextAtSelection(ec, 0, pchText, cchText, &pRange) != S_OK)   // I3564
+    goto Exit;
 #endif
 
-    // update the selection, we'll make it an insertion point just past
-    // the inserted text.
-    pRange->Collapse(ec, TF_ANCHOR_END);
+  // update the selection, we'll make it an insertion point just past
+  // the inserted text.
+  pRange->Collapse(ec, TF_ANCHOR_END);
 
-    tfSelection.range = pRange;
-    tfSelection.style.ase = TF_AE_NONE;
-    tfSelection.style.fInterimChar = FALSE;
+  tfSelection.range = pRange;
+  tfSelection.style.ase = TF_AE_NONE;
+  tfSelection.style.fInterimChar = FALSE;
 
-    pContext->SetSelection(ec, 1, &tfSelection);
+  pContext->SetSelection(ec, 1, &tfSelection);
 
-    pRange->Release();
+  pRange->Release();
 
 Exit:
 
 #ifdef DEBUG_PSEUDO   // I3607
-    delete PseudoBuf;   // I3564
+  delete PseudoBuf;   // I3564
 #endif   // I3607
 
-    pInsertAtSelection->Release();
+  pInsertAtSelection->Release();
+  SendDebugExit();
 }
 
 void DeleteLeftOfSelection(TfEditCookie ec, ITfContext *pContext, LONG n)
 {
-  LogEnter();
+  SendDebugEntry();
   TF_SELECTION tfSelection;
 	ULONG cFetched;
 	LONG outn;
 
-  if(pContext->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &tfSelection, &cFetched) != S_OK || cFetched == 0)
+  if(pContext->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &tfSelection, &cFetched) != S_OK || cFetched == 0) {
+    SendDebugExit();
 		return;
-	
+  }
+
   //TODO: log failures
 	if(tfSelection.range->ShiftStart(ec, -n, &outn, NULL) != S_OK) {
     tfSelection.range->Release();
+    SendDebugExit();
     return;
   }
 
   WCHAR buf[2] = L"";
 	if(tfSelection.range->SetText(ec, 0, buf, 0) != S_OK) {
     tfSelection.range->Release();
+    SendDebugExit();
     return;
   }
 
   // release the range
   tfSelection.range->Release();
+  SendDebugExit();
 }
 
 char *debugstr(PWSTR buf) {
@@ -163,20 +171,27 @@ char *debugstr(PWSTR buf) {
 	return bufout;
 }
 
-BOOL GetLeftOfSelection(TfEditCookie ec, ITfContext *pContext, WCHAR *buf, LONG n)   // I4933
+BOOL
+GetLeftOfSelection(
+  TfEditCookie ec,
+  ITfContext *pContext,
+  WCHAR *buf,
+  LONG n,
+  HRESULT *hrGetSelection,
+  ULONG *cFetched,
+  TF_SELECTION *tfSelection)  // I4933
 {
-  LogEnter();
+  SendDebugEntry();
 
-  TF_SELECTION tfSelection = {0};
-  TF_STATUS tfStatus = {0};
-	ULONG cFetched;
+  TF_SELECTION tfSelectionLocal = {0};
+  ULONG cFetchedLocal;
 	LONG outn;
 	ITfRange *pRange, *pRangeEnd;
   HRESULT hr;
 
   /*   // I4933
     First we will try to see if there is any text in the control, and if not, then treat
-    it as transitory (that is, no ability to read context. This seems to happen in Firefox 
+    it as transitory (that is, no ability to read context. This seems to happen in Firefox
     with RICHEDIT controls - for example, SourceForge comment fields e.g. reported on page
     https://sourceforge.net/p/greekpolytonicsp/discussion/general/thread/9b6fa46d/
     This also happens in Internet Explorer in the same fields. It is unclear at this point
@@ -184,29 +199,29 @@ BOOL GetLeftOfSelection(TfEditCookie ec, ITfContext *pContext, WCHAR *buf, LONG 
   */
 
   if(!SUCCEEDED(hr = pContext->GetStart(ec, &pRange))) {
-    Log(L"GetLeftOfSelection: Exit -- Failed GetStart = %x", hr);   // I3565
-		return FALSE;
+    SendDebugMessageFormat(L"Exit -- Failed GetStart = %x", hr);   // I3565
+    return_SendDebugExit(FALSE);
 	}
 
   if(!SUCCEEDED(hr = pContext->GetEnd(ec, &pRangeEnd))) {
-    Log(L"GetLeftOfSelection: Exit -- Failed GetEnd = %x", hr);   // I3565
+    SendDebugMessageFormat(L"Exit -- Failed GetEnd = %x", hr);   // I3565
     pRange->Release(); pRange = NULL;
-		return FALSE;
+    return_SendDebugExit(FALSE);
 	}
 
   if(!SUCCEEDED(hr = pRange->ShiftEndToRange(ec, pRangeEnd, TF_ANCHOR_END))) {
-    Log(L"GetLeftOfSelection: Exit -- Failed ShiftEndToRange = %x", hr);
+    SendDebugMessageFormat(L"Exit -- Failed ShiftEndToRange = %x", hr);
     pRange->Release(); pRange = NULL;
     pRangeEnd->Release(); pRangeEnd = NULL;
-    return FALSE;
+    return_SendDebugExit(FALSE);
   }
 
-  BOOL bTreatAsTransitory = FALSE; 
-  if(!SUCCEEDED(hr = pRange->GetText(ec, 0, buf, n, &cFetched))) {
-    Log(L"GetLeftOfSelection: Exit -- Failed GetRange (all text to 63 chars) = %x", hr);
+  BOOL bTreatAsTransitory = FALSE;
+  if(!SUCCEEDED(hr = pRange->GetText(ec, 0, buf, n, &cFetchedLocal))) {
+    SendDebugMessageFormat(L"Exit -- Failed GetRange (all text to 63 chars) = %x", hr);
     bTreatAsTransitory = TRUE;
-  } else if(cFetched == 0) {
-    Log(L"GetLeftOfSelection: Exit -- no text in edit control, treating as transitory");
+  } else if(cFetchedLocal == 0) {
+    SendDebugMessageFormat(L"Exit -- no text in edit control, treating as transitory");
     bTreatAsTransitory = TRUE;
   }
 
@@ -215,58 +230,65 @@ BOOL GetLeftOfSelection(TfEditCookie ec, ITfContext *pContext, WCHAR *buf, LONG 
 
   if(bTreatAsTransitory) {
     buf[0] = 0;
-    return FALSE;
+    return_SendDebugExit(FALSE);
   }
 
-  /* 
+  /*
     At this point, we know we can read content from the edit control, so we just need
     to read the range to the left of the selection - up to (n) characters.
   */
 
-  if(!SUCCEEDED(hr = pContext->GetSelection(ec, TF_DEFAULT_SELECTION, 1, &tfSelection, &cFetched)))   // I3565
+  if (!SUCCEEDED(hr = *hrGetSelection = pContext->GetSelection(ec, TF_DEFAULT_SELECTION, 1, tfSelection, cFetched)))  // I3565
 	{
-		Log(L"GetLeftOfSelection: Exit -- Failed GetSelection = %x", hr);   // I3565
-		return FALSE;
+		SendDebugMessageFormat(L"Exit -- Failed GetSelection = %x", hr);   // I3565
+    return_SendDebugExit(FALSE);
 	}
 
-  if(cFetched == 0)   // I3565
-  {
-    Log(L"GetLeftOfSelection: Exit -- cFetched == 0");   // I3565
-    if(tfSelection.range != NULL)
-      tfSelection.range->Release();
-    return FALSE;
+  // copy the values for local processing, preserving the function call variables
+  cFetchedLocal    = *cFetched;
+  tfSelectionLocal = *tfSelection;
+  if (tfSelectionLocal.range) {
+    tfSelectionLocal.range->AddRef();
   }
-	
-	if(!SUCCEEDED(hr = tfSelection.range->Clone(&pRange)))   // I3565
+
+  if(cFetchedLocal == 0)   // I3565
   {
-    Log(L"GetLeftOfSelection: Failed range->Clone = %x", hr);   // I3565
-    tfSelection.range->Release();
-    return FALSE;
+    SendDebugMessageFormat(L"Exit -- cFetchedLocal == 0");   // I3565
+    if(tfSelectionLocal.range != NULL)
+      tfSelectionLocal.range->Release();
+    return_SendDebugExit(FALSE);
+  }
+
+	if(!SUCCEEDED(hr = tfSelectionLocal.range->Clone(&pRange)))   // I3565
+  {
+    SendDebugMessageFormat(L"Failed range->Clone = %x", hr);   // I3565
+    tfSelectionLocal.range->Release();
+    return_SendDebugExit(FALSE);
   }
 
 	if(!SUCCEEDED(hr = pRange->Collapse(ec, TF_ANCHOR_START)))   // I3565
   {
-    Log(L"GetLeftOfSelection: Failed range->Collapse = %x", hr);   // I3565
-    tfSelection.range->Release();
+    SendDebugMessageFormat(L"Failed range->Collapse = %x", hr);   // I3565
+    tfSelectionLocal.range->Release();
     pRange->Release();
-    return FALSE;
+    return_SendDebugExit(FALSE);
   }
 	if(!SUCCEEDED(hr = pRange->ShiftStart(ec, -n, &outn, NULL)))   // I3565
   {
-    Log(L"GetLeftOfSelection: Failed range->ShiftStart = %x", hr);   // I3565
-    tfSelection.range->Release();
+    SendDebugMessageFormat(L"Failed range->ShiftStart = %x", hr);   // I3565
+    tfSelectionLocal.range->Release();
     pRange->Release();
-    return FALSE;
+    return_SendDebugExit(FALSE);
   }
 
   BOOL result = TRUE;
 
-	if(SUCCEEDED(hr = pRange->GetText(ec, 0, buf, n, &cFetched)))   // I3565
+	if(SUCCEEDED(hr = pRange->GetText(ec, 0, buf, n, &cFetchedLocal)))   // I3565
   {
-		buf[cFetched] = 0;
+		buf[cFetchedLocal] = 0;
     if(ShouldDebug()) {
       char *p = debugstr(buf);
-      Log(L"GetLeftOfSelection(%d) = %hs [%d fetched]", n, p, cFetched);
+      SendDebugMessageFormat(L"(%d) = %hs [%d fetched]", n, p, cFetchedLocal);
       delete[] p;
     }
 #ifdef DEBUG_PSEUDO   // I3607
@@ -275,13 +297,13 @@ BOOL GetLeftOfSelection(TfEditCookie ec, ITfContext *pContext, WCHAR *buf, LONG 
   }
 	else
   {
-    Log(L"GetLeftOfSelection: Failed range->GetText = %x", hr);   // I3565
+    SendDebugMessageFormat(L"Failed range->GetText = %x", hr);   // I3565
     buf[0] = 0;
     result = FALSE;
   }
 
 	pRange->Release();
-  tfSelection.range->Release();
+  tfSelectionLocal.range->Release();
 
-  return result;   // I4933
+  return_SendDebugExit(result);
 }

@@ -204,6 +204,14 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     // or do anything that would mutate the value.
     const savedKeyboardStr = this.contextManager.getSavedKeyboardRaw();
 
+    if(device.touchable) {
+      this.osk = new views.AnchoredOSKView(this);
+    } else {
+      this.osk = new views.FloatingOSKView(this);
+    }
+
+    setupOskListeners(this, this.osk, this.contextManager);
+
     // Automatically performs related handler setup & maintains references
     // needed for related cleanup / shutdown.
     this.pageIntegration = new PageIntegrationHandlers(window, this);
@@ -217,34 +225,16 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     this._initialized = 2;
 
     // Let any deferred, pre-init stubs complete registration
-    await this.config.deferForInitialization;
+    await Promise.resolve();
 
-    /*
-      Attempt to restore the user's last-used keyboard from their previous session.
-      The method auto-loads the default stub if one is available and the last-used keyboard
-      has no registered stub.
+    // Attempt to restore the user's last-used keyboard from their previous session.
+    //
+    // Note:  any cloud stubs will probably not be available yet.
+    // If we tracked cloud requests and awaited a Promise.all on pending queries,
+    // we could handle that too.
+    this.contextManager.restoreSavedKeyboard(savedKeyboardStr);
 
-      Note:  any cloud stubs will probably not be available yet.
-      If we tracked cloud requests and awaited a Promise.all on pending queries,
-      we could handle that too.
-    */
-    const loadingKbd: Promise<any> = this.contextManager.restoreSavedKeyboard(savedKeyboardStr);
-
-    // Wait for the initial keyboard to load before setting the OSK; this will avoid building an
-    // empty OSK that we'll instantly discard after.
-    try {
-      await loadingKbd;
-    } catch { /* in case of failed fetch due to network error or bad URI; we must still let the OSK init. */ };
-
-    const firstKbdConfig = {
-      keyboardToActivate: this.contextManager.activeKeyboard
-    };
-    const osk = device.touchable ? new views.AnchoredOSKView(this, firstKbdConfig) : new views.FloatingOSKView(this, firstKbdConfig);
-
-    setupOskListeners(this, osk, this.contextManager);
-    // And, now that we have our loaded active keyboard - or failed, thus must use that default...
-    // Now we set the OSK in place, an act which triggers VisualKeyboard construction.
-    this.osk = osk;
+    await Promise.resolve();
   }
 
   get register(): (x: CloudQueryResult) => void {

@@ -16,7 +16,7 @@
     "multer": "^1.4.5-lts.1",
     "ngrok": "^5.0.0-beta.2",
     "open": "^8.4.0",
-    "ws": "^8.3.0"
+    "ws": "^8.17.1"
   },
   "optionalDependencies": {
     "hetrodo-node-hide-console-window-napi": "keymanapp/hetrodo-node-hide-console-window-napi#keyman-15.0",

@@ -63,7 +63,7 @@ function run_tests() {
 
   G_TEST_BUILDDIR="$(dirname "$0")/../../../build/$(arch)/${CONFIG}/tests"
 
-  setup "$DISPLAY_SERVER" "$ENV_FILE" "$CLEANUP_FILE" "$PID_FILE"
+  setup "$DISPLAY_SERVER" "$ENV_FILE" "$CLEANUP_FILE" "$PID_FILE" --standalone
 
   echo "# NOTE: When the tests fail check /tmp/ibus-engine-keyman.log and /tmp/ibus-daemon.log!"
   echo ""

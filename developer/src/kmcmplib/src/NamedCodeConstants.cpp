@@ -268,7 +268,7 @@ int IsHangulSyllable(const KMX_WCHAR *codename, int *code)
   if(strchr("GNDRMBSJCKTPH", ch))
   {
     /* Has an initial syllable */
-    int isDoubled = towupper(*(codename+1)) == ch;
+    int isDoubled = towupper(*(codename+1)) == (wint_t)ch;
 
     LIndex = -1;
     for(i = 0; i < HangulLCount; i++) {

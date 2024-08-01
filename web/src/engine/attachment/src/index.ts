@@ -6,7 +6,7 @@ export { AttachmentInfo } from './attachmentInfo.js';
  * **same bundle** must contain reference points for those classes' definitions.
  */
 export { eventOutputTarget, outputTargetForElement } from './outputTargetForElement.js';
-export { PageContextAttachment } from './pageContextAttachment.js';
+export { PageContextAttachment, PageAttachmentOptions } from './pageContextAttachment.js';
 
 /*
  * Following from the prior "Note:", we republish `engine/element-wrappers` here -
