@@ -1,6 +1,7 @@
 import { KmpJsonFile, CompilerCallbacks, CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
-import { CompilerMessages } from './package-compiler-messages.js';
+import { PackageCompilerMessages } from './package-compiler-messages.js';
 import { keymanEngineForWindowsFiles, keymanForWindowsInstallerFiles, keymanForWindowsRedistFiles } from './redist-files.js';
+import { isValidEmail } from '@keymanapp/developer-utils';
 
 // The keyboard ID SHOULD adhere to this pattern:
 const KEYBOARD_ID_PATTERN_PACKAGE = /^[a-z_][a-z0-9_]*\.(kps|kmp)$/;
@@ -48,9 +49,9 @@ export class PackageValidation {
 
     if(languages.length == 0) {
       if(resourceType == 'keyboard') {
-        this.callbacks.reportMessage(CompilerMessages.Warn_KeyboardShouldHaveAtLeastOneLanguage({id}));
+        this.callbacks.reportMessage(PackageCompilerMessages.Warn_KeyboardShouldHaveAtLeastOneLanguage({id}));
       } else {
-        this.callbacks.reportMessage(CompilerMessages.Error_ModelMustHaveAtLeastOneLanguage({id}));
+        this.callbacks.reportMessage(PackageCompilerMessages.Error_ModelMustHaveAtLeastOneLanguage({id}));
         return false;
       }
     }
@@ -60,18 +61,18 @@ export class PackageValidation {
       try {
         locale = new Intl.Locale(lang.id);
       } catch(e: any) {
-        this.callbacks.reportMessage(CompilerMessages.Error_LanguageTagIsNotValid({resourceType, id, lang: lang.id, e}));
+        this.callbacks.reportMessage(PackageCompilerMessages.Error_LanguageTagIsNotValid({resourceType, id, lang: lang.id, e}));
         return false;
       }
 
       const minimalTag = locale.minimize().toString();
 
       if(minimalTag.toLowerCase() !== lang.id.toLowerCase()) {
-        this.callbacks.reportMessage(CompilerMessages.Hint_LanguageTagIsNotMinimal({resourceType, id, actual: lang.id, expected: minimalTag}));
+        this.callbacks.reportMessage(PackageCompilerMessages.Hint_LanguageTagIsNotMinimal({resourceType, id, actual: lang.id, expected: minimalTag}));
       }
 
       if(minimalTags[minimalTag]) {
-        this.callbacks.reportMessage(CompilerMessages.Hint_PackageShouldNotRepeatLanguages({resourceType, id, minimalTag, firstTag: lang.id, secondTag: minimalTags[minimalTag]}));
+        this.callbacks.reportMessage(PackageCompilerMessages.Hint_PackageShouldNotRepeatLanguages({resourceType, id, minimalTag, firstTag: lang.id, secondTag: minimalTags[minimalTag]}));
       }
       else {
         minimalTags[minimalTag] = lang.id;
@@ -83,7 +84,7 @@ export class PackageValidation {
 
   private checkForModelsAndKeyboardsInSamePackage(kmpJson: KmpJsonFile.KmpJsonFile): boolean {
     if(kmpJson.lexicalModels?.length > 0 && kmpJson.keyboards?.length > 0) {
-      this.callbacks.reportMessage(CompilerMessages.Error_PackageCannotContainBothModelsAndKeyboards());
+      this.callbacks.reportMessage(PackageCompilerMessages.Error_PackageCannotContainBothModelsAndKeyboards());
       return false;
     }
 
@@ -91,7 +92,7 @@ export class PackageValidation {
       // Note: we require at least 1 keyboard or model in the package. This may
       // change in the future if we start to use packages to distribute, e.g.
       // localizations or themes.
-      this.callbacks.reportMessage(CompilerMessages.Error_PackageMustContainAModelOrAKeyboard());
+      this.callbacks.reportMessage(PackageCompilerMessages.Error_PackageMustContainAModelOrAKeyboard());
       return false;
     }
 
@@ -108,7 +109,7 @@ export class PackageValidation {
     filename = this.callbacks.path.basename(filename);
 
     if(!MODEL_ID_PATTERN_PACKAGE.test(filename)) {
-      this.callbacks.reportMessage(CompilerMessages.Warn_PackageNameDoesNotFollowLexicalModelConventions({filename}));
+      this.callbacks.reportMessage(PackageCompilerMessages.Warn_PackageNameDoesNotFollowLexicalModelConventions({filename}));
     }
 
     for(let model of kmpJson.lexicalModels) {
@@ -128,7 +129,7 @@ export class PackageValidation {
     filename = this.callbacks.path.basename(filename);
 
     if(!KEYBOARD_ID_PATTERN_PACKAGE.test(filename)) {
-      this.callbacks.reportMessage(CompilerMessages.Warn_PackageNameDoesNotFollowKeyboardConventions({filename}));
+      this.callbacks.reportMessage(PackageCompilerMessages.Warn_PackageNameDoesNotFollowKeyboardConventions({filename}));
     }
 
     for(let keyboard of kmpJson.keyboards) {
@@ -158,7 +159,7 @@ export class PackageValidation {
     const base = filename.substring(0, filename.length-ext.length);
     if(this.options.checkFilenameConventions) {
       if(!CONTENT_FILE_BASENAME_PATTERN.test(base) || !CONTENT_FILE_EXTENSION_PATTERN.test(ext)) {
-        this.callbacks.reportMessage(CompilerMessages.Warn_FileInPackageDoesNotFollowFilenameConventions({filename}));
+        this.callbacks.reportMessage(PackageCompilerMessages.Warn_FileInPackageDoesNotFollowFilenameConventions({filename}));
       }
     }
 
@@ -177,13 +178,13 @@ export class PackageValidation {
     if(keymanForWindowsInstallerFiles.includes(filename) ||
         keymanForWindowsRedistFiles.includes(filename) ||
         keymanEngineForWindowsFiles.includes(filename)) {
-      this.callbacks.reportMessage(CompilerMessages.Warn_RedistFileShouldNotBeInPackage({filename}));
+      this.callbacks.reportMessage(PackageCompilerMessages.Warn_RedistFileShouldNotBeInPackage({filename}));
     }
 
     // # Test for inclusion of .doc or .docx files
 
     if(filename.match(/\.doc(x?)$/)) {
-      this.callbacks.reportMessage(CompilerMessages.Warn_DocFileDangerous({filename}));
+      this.callbacks.reportMessage(PackageCompilerMessages.Warn_DocFileDangerous({filename}));
     }
 
     // # Test for inclusion of keyboard source files
@@ -196,7 +197,7 @@ export class PackageValidation {
     // which may be valid, not just LDML keyboards
     const fileType = KeymanFileTypes.sourceTypeFromFilename(file.name);
     if(fileType !== null && fileType !== KeymanFileTypes.Source.LdmlKeyboard) {
-      this.callbacks.reportMessage(CompilerMessages.Hint_PackageContainsSourceFile({filename: file.name}));
+      this.callbacks.reportMessage(PackageCompilerMessages.Hint_PackageContainsSourceFile({filename: file.name}));
     }
 
     return true;
@@ -204,8 +205,23 @@ export class PackageValidation {
 
   private checkPackageInfo(file: KmpJsonFile.KmpJsonFile) {
     if(!file.info || !file.info.name || !file.info.name.description.trim()) {
-      this.callbacks.reportMessage(CompilerMessages.Error_PackageNameCannotBeBlank());
+      this.callbacks.reportMessage(PackageCompilerMessages.Error_PackageNameCannotBeBlank());
       return false;
+    }
+
+    if(file.info?.author?.url) {
+      // we strip the mailto: from the .kps file for the .model_info
+      const match = file.info.author.url.match(/^(mailto\:)?(.+)$/);
+      /* c8 ignore next 3 */
+      if (match === null) {
+        this.callbacks.reportMessage(PackageCompilerMessages.Error_InvalidAuthorEmail({email:file.info.author.url}));
+        return null;
+      }
+      if(!isValidEmail(match[2])) {
+        this.callbacks.reportMessage(PackageCompilerMessages.Error_InvalidAuthorEmail({email:file.info.author.url}));
+        return null;
+      }
+
     }
 
     return true;

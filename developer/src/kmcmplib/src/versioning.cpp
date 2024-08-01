@@ -12,8 +12,12 @@ KMX_BOOL kmcmp::CheckKeyboardFinalVersion(PFILE_KEYBOARD fk) {
       fk->version = VERSION_60; // minimum version that we can be safe with
     }
 
-    snprintf(buf, 128, "The compiler has assigned a minimum engine version of %d.%d based on features used in this keyboard", (int)((fk->version & 0xFF00) >> 8), (int)(fk->version & 0xFF));
-    AddCompileWarning(buf);
+    if(kmcmp::CompileTarget != CKF_KEYMANWEB) {
+      // Note: the KeymanWeb compiler is responsible for reporting minimum
+      // version for the web targets
+      snprintf(buf, 128, "The compiler has assigned a minimum engine version of %d.%d based on features used in this keyboard", (int)((fk->version & 0xFF00) >> 8), (int)(fk->version & 0xFF));
+      AddCompileWarning(buf);
+    }
   }
 
   return TRUE;

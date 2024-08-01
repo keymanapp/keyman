@@ -11,7 +11,7 @@ import { CompilerCallbacks, CompilerEvent, CompilerOptions, KeymanFileTypes, Kvk
 import { KvksFileReader } from '@keymanapp/developer-utils';
 import * as Osk from './osk.js';
 import loadWasmHost from '../import/kmcmplib/wasm-host.js';
-import { CompilerMessages, mapErrorFromKmcmplib } from './kmn-compiler-messages.js';
+import { KmnCompilerMessages, mapErrorFromKmcmplib } from './kmn-compiler-messages.js';
 import { WriteCompiledKeyboard } from '../kmw-compiler/kmw-compiler.js';
 
 //
@@ -166,7 +166,7 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
         Module = await loadWasmHost();
       } catch(e: any) {
         /* c8 ignore next 3 */
-        this.callbacks.reportMessage(CompilerMessages.Fatal_MissingWasmModule({e}));
+        this.callbacks.reportMessage(KmnCompilerMessages.Fatal_MissingWasmModule({e}));
         return false;
       }
     }
@@ -186,7 +186,7 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
     if(!Module) {
       /* c8 ignore next 4 */
       // fail if wasm not loaded or function not found
-      this.callbacks.reportMessage(CompilerMessages.Fatal_MissingWasmModule({}));
+      this.callbacks.reportMessage(KmnCompilerMessages.Fatal_MissingWasmModule({}));
       return false;
     }
     return true;
@@ -400,7 +400,7 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
       return result;
     } catch(e) {
       /* c8 ignore next 3 */
-      this.callbacks.reportMessage(CompilerMessages.Fatal_UnexpectedException({e:e}));
+      this.callbacks.reportMessage(KmnCompilerMessages.Fatal_UnexpectedException({e:e}));
       return null;
     } finally {
       if(wasm_result) {
@@ -441,7 +441,7 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
     kvksFilename = this.callbacks.resolveFilename(kmnFilename, kvksFilename);
     const data = this.callbacks.loadFile(kvksFilename);
     if(!data) {
-      this.callbacks.reportMessage(CompilerMessages.Error_FileNotFound({filename: kvksFilename}));
+      this.callbacks.reportMessage(KmnCompilerMessages.Error_FileNotFound({filename: kvksFilename}));
       return null;
     }
 
@@ -456,7 +456,7 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
       try {
         vk = reader.read(data);
       } catch(e) {
-        this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvkFile({filename, e}));
+        this.callbacks.reportMessage(KmnCompilerMessages.Error_InvalidKvkFile({filename, e}));
         return null;
       }
     } else {
@@ -467,13 +467,13 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
         kvks = reader.read(data);
         reader.validate(kvks);
       } catch(e) {
-        this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvksFile({filename, e}));
+        this.callbacks.reportMessage(KmnCompilerMessages.Error_InvalidKvksFile({filename, e}));
         return null;
       }
       let invalidVkeys: string[] = [];
       vk = reader.transform(kvks, invalidVkeys);
       for(let invalidVkey of invalidVkeys) {
-        this.callbacks.reportMessage(CompilerMessages.Warn_InvalidVkeyInKvksFile({filename, invalidVkey}));
+        this.callbacks.reportMessage(KmnCompilerMessages.Warn_InvalidVkeyInKvksFile({filename, invalidVkey}));
       }
     }
 
@@ -501,13 +501,13 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
       // Expected file format: displaymap.schema.json
       const data = this.callbacks.loadFile(displayMapFilename);
       if(!data) {
-        this.callbacks.reportMessage(CompilerMessages.Error_FileNotFound({filename: displayMapFilename}));
+        this.callbacks.reportMessage(KmnCompilerMessages.Error_FileNotFound({filename: displayMapFilename}));
         return null;
       }
       const mapping = JSON.parse(new TextDecoder().decode(data));
       return Osk.parseMapping(mapping);
     } catch(e) {
-      this.callbacks.reportMessage(CompilerMessages.Error_InvalidDisplayMapFile({filename: displayMapFilename, e}));
+      this.callbacks.reportMessage(KmnCompilerMessages.Error_InvalidDisplayMapFile({filename: displayMapFilename, e}));
       return null;
     }
   }
@@ -617,16 +617,16 @@ function getUnicodeSetError(rc: number) : CompilerEvent {
   const KMCMP_FATAL_OUT_OF_RANGE = -4;
   switch(rc) {
     case KMCMP_ERROR_SYNTAX_ERR:
-       return CompilerMessages.Error_UnicodeSetSyntaxError();
+       return KmnCompilerMessages.Error_UnicodeSetSyntaxError();
     case KMCMP_ERROR_HAS_STRINGS:
-    return CompilerMessages.Error_UnicodeSetHasStrings();
+    return KmnCompilerMessages.Error_UnicodeSetHasStrings();
     case KMCMP_ERROR_UNSUPPORTED_PROPERTY:
-       return CompilerMessages.Error_UnicodeSetHasProperties();
+       return KmnCompilerMessages.Error_UnicodeSetHasProperties();
     case KMCMP_FATAL_OUT_OF_RANGE:
-      return CompilerMessages.Fatal_UnicodeSetOutOfRange();
+      return KmnCompilerMessages.Fatal_UnicodeSetOutOfRange();
     default:
       /* c8 ignore next */
-      return CompilerMessages.Fatal_UnexpectedException({e: `Unexpected UnicodeSet error code ${rc}`});
+      return KmnCompilerMessages.Fatal_UnexpectedException({e: `Unexpected UnicodeSet error code ${rc}`});
   }
 }
 

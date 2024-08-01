@@ -116,7 +116,7 @@ function _setup_init() {
   echo > "$CLEANUP_FILE"
   echo > "$PID_FILE"
   TEMP_DATA_DIR=$(mktemp --directory)
-  echo "rm -rf ${TEMP_DATA_DIR} || true" >> "$CLEANUP_FILE"
+  echo "rm -rf \"${TEMP_DATA_DIR}\" || true # TEMP_DATA_DIR" >> "${CLEANUP_FILE}"
 
   COMMON_ARCH_DIR=
   [ -d "${TOP_SRCDIR}"/../../core/build/arch ] && COMMON_ARCH_DIR=${TOP_SRCDIR}/../../core/build/arch
@@ -170,7 +170,7 @@ function _setup_display_server() {
     # mutter-Message: 18:56:15.422: Using Wayland display name 'wayland-1'
     mutter --wayland --headless --no-x11 --virtual-monitor 1024x768 &> "$TMPFILE" &
     PID=$!
-    echo "kill -9 ${PID} || true" >> "$CLEANUP_FILE"
+    echo "kill -9 ${PID} || true # mutter" >> "$CLEANUP_FILE"
     echo "${PID} mutter" >> "${PID_FILE}"
     sleep 1s
     export WAYLAND_DISPLAY
@@ -189,7 +189,7 @@ function _setup_display_server() {
         break
       fi
     done
-    echo "kill -9 ${PID} || true" >> "$CLEANUP_FILE"
+    echo "kill -9 ${PID} || true # Xvfb" >> "$CLEANUP_FILE"
     echo "${PID} Xvfb" >> "${PID_FILE}"
     while true; do
       echo "Starting Xephyr..."
@@ -201,12 +201,12 @@ function _setup_display_server() {
         break
       fi
     done
-    echo "kill -9 ${PID} || true" >> "$CLEANUP_FILE"
+    echo "kill -9 ${PID} || true # Xephyr" >> "$CLEANUP_FILE"
     echo "${PID} Xephyr" >> "${PID_FILE}"
     echo "Starting metacity"
     metacity --display=:${DISP_XEPHYR} &> /dev/null &
     PID=$!
-    echo "kill -9 ${PID} || true" >> "$CLEANUP_FILE"
+    echo "kill -9 ${PID} || true # metacity" >> "$CLEANUP_FILE"
     echo "${PID} metacity" >> "${PID_FILE}"
 
     export DISPLAY=:${DISP_XEPHYR}
@@ -241,16 +241,23 @@ function _setup_schema_and_gsettings() {
 }
 
 function _setup_ibus() {
-  local ENV_FILE CLEANUP_FILE PID_FILE PID
+  local ENV_FILE CLEANUP_FILE PID_FILE PID STANDALONE
   ENV_FILE=$1
   CLEANUP_FILE=$2
   PID_FILE=$3
+  STANDALONE=${4:-}
 
   echo "Starting ibus-daemon..."
   #shellcheck disable=SC2086
   ibus-daemon ${ARG_VERBOSE-} --daemonize --panel=disable --address=unix:abstract="${TEMP_DATA_DIR}/test-ibus" ${IBUS_CONFIG-} &> /tmp/ibus-daemon.log
   PID=$(pgrep -f "${TEMP_DATA_DIR}/test-ibus")
-  echo "kill -9 ${PID} || true" >> "$CLEANUP_FILE"
+  if [[ "${STANDALONE}" == "--standalone" ]]; then
+    # manual test run
+    echo "if kill -9 ${PID}; then ibus restart || ibus start; fi # ibus-daemon" >> "${CLEANUP_FILE}"
+  else
+    # test run as part of the build
+    echo "kill -9 ${PID} || true" >> "${CLEANUP_FILE}"
+  fi
   echo "${PID} ibus-daemon" >> "${PID_FILE}"
   sleep 1s
 
@@ -263,17 +270,18 @@ function _setup_ibus() {
   #shellcheck disable=SC2086
   "${TOP_BINDIR}/src/ibus-engine-keyman" --testing ${ARG_VERBOSE-} &> /tmp/ibus-engine-keyman.log &
   PID=$!
-  echo "kill -9 ${PID} || true" >> "$CLEANUP_FILE"
+  echo "kill -9 ${PID} || true # ibus-engine-keyman" >> "${CLEANUP_FILE}"
   echo "${PID} ibus-engine-keyman" >> "${PID_FILE}"
   sleep 1s
 }
 
 function setup() {
-  local DISPLAY_SERVER ENV_FILE CLEANUP_FILE PID_FILE TESTBASEDIR TESTDIR
+  local DISPLAY_SERVER ENV_FILE CLEANUP_FILE PID_FILE TESTBASEDIR TESTDIR STANDALONE
   DISPLAY_SERVER=$1
   ENV_FILE=$2
   CLEANUP_FILE=$3
   PID_FILE=$4
+  STANDALONE=${5:-}
 
   _setup_init "${ENV_FILE}" "${CLEANUP_FILE}" "${PID_FILE}"
 
@@ -287,7 +295,7 @@ function setup() {
   _setup_test_dbus_server "${ENV_FILE}" "${CLEANUP_FILE}"
   _setup_display_server "${ENV_FILE}" "${CLEANUP_FILE}" "${PID_FILE}" "${DISPLAY_SERVER}"
   _setup_schema_and_gsettings "${ENV_FILE}"
-  _setup_ibus "${ENV_FILE}" "${CLEANUP_FILE}" "${PID_FILE}"
+  _setup_ibus "${ENV_FILE}" "${CLEANUP_FILE}" "${PID_FILE}" "${STANDALONE}"
 }
 
 function setup_display_server_only() {

@@ -225,7 +225,7 @@ uses
   Keyman.System.HttpServer.Base in '..\..\..\common\windows\delphi\web\Keyman.System.HttpServer.Base.pas',
   Keyman.Developer.System.HttpServer.AppSource in 'http\Keyman.Developer.System.HttpServer.AppSource.pas',
   Keyman.UI.FontUtils in 'main\Keyman.UI.FontUtils.pas',
-  Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter in '..\kmconvert\Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter.pas',
+  Keyman.Developer.System.VisualKeyboardToTouchLayoutConverter in '..\kmconvert\Keyman.Developer.System.VisualKeyboardToTouchLayoutConverter.pas',
   Keyman.Developer.System.Project.kmnProjectFileAction in 'project\Keyman.Developer.System.Project.kmnProjectFileAction.pas',
   Keyman.Developer.System.Project.kpsProjectFileAction in 'project\Keyman.Developer.System.Project.kpsProjectFileAction.pas',
   Keyman.Developer.UI.Project.UfrmNewProjectParameters in 'project\Keyman.Developer.UI.Project.UfrmNewProjectParameters.pas' {frmNewProjectParameters},

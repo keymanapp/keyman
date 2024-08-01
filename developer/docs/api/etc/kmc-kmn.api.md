@@ -11,15 +11,10 @@ import { KeymanCompiler } from '@keymanapp/common-types';
 import { KeymanCompilerArtifactOptional } from '@keymanapp/common-types';
 import { KeymanCompilerArtifacts } from '@keymanapp/common-types';
 import { KeymanCompilerResult } from '@keymanapp/common-types';
-import { Osk } from '@keymanapp/developer-utils';
+import { TouchLayout } from '@keymanapp/common-types';
 import { UnicodeSet } from '@keymanapp/common-types';
 import { UnicodeSetParser } from '@keymanapp/common-types';
-
-// Warning: (ae-internal-missing-underscore) The name "CompilerMessages" should be prefixed with an underscore because the declaration is marked as @internal
-//
-// @internal
-export class CompilerMessages extends KmnCompilerMessages {
-}
+import { VisualKeyboard } from '@keymanapp/common-types';
 
 // Warning: (ae-internal-missing-underscore) The name "CompilerResultExtraGroup" should be prefixed with an underscore because the declaration is marked as @internal
 //
@@ -184,6 +179,10 @@ export class KmnCompilerMessages {
     // (undocumented)
     static Error_CharacterExpansionMustBeFollowedByCharacter: () => CompilerEvent;
     // (undocumented)
+    static ERROR_CharacterRangeTooLong: number;
+    // (undocumented)
+    static Error_CharacterRangeTooLong: () => CompilerEvent;
+    // (undocumented)
     static ERROR_CodeInvalidInKeyStore: number;
     // (undocumented)
     static Error_CodeInvalidInKeyStore: () => CompilerEvent;
@@ -219,6 +218,10 @@ export class KmnCompilerMessages {
     static ERROR_ExpansionMustFollowCharacterOrVKey: number;
     // (undocumented)
     static Error_ExpansionMustFollowCharacterOrVKey: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_ExtendedStringTooLong: number;
+    // (undocumented)
+    static Error_ExtendedStringTooLong: () => CompilerEvent;
     // (undocumented)
     static ERROR_FileNotFound: number;
     // (undocumented)
@@ -381,6 +384,10 @@ export class KmnCompilerMessages {
     // (undocumented)
     static Error_InvalidSystemStore: () => CompilerEvent;
     // (undocumented)
+    static ERROR_InvalidTarget: number;
+    // (undocumented)
+    static Error_InvalidTarget: () => CompilerEvent;
+    // (undocumented)
     static ERROR_InvalidToken: number;
     // (undocumented)
     static Error_InvalidToken: () => CompilerEvent;
@@ -419,6 +426,14 @@ export class KmnCompilerMessages {
     // (undocumented)
     static Error_NewContextGroupMustBeReadonly: () => CompilerEvent;
     // (undocumented)
+    static ERROR_NonBMPCharactersNotSupportedInKeySection: number;
+    // (undocumented)
+    static Error_NonBMPCharactersNotSupportedInKeySection: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_NoTargetsSpecified: number;
+    // (undocumented)
+    static Error_NoTargetsSpecified: () => CompilerEvent;
+    // (undocumented)
     static ERROR_NoTokensFound: number;
     // (undocumented)
     static Error_NoTokensFound: () => CompilerEvent;
@@ -455,6 +470,10 @@ export class KmnCompilerMessages {
     static ERROR_OutsInVirtualKeySection: number;
     // (undocumented)
     static Error_OutsInVirtualKeySection: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_OutsTooLong: number;
+    // (undocumented)
+    static Error_OutsTooLong: () => CompilerEvent;
     // (undocumented)
     static ERROR_PostKeystrokeGroupMustBeReadonly: number;
     // (undocumented)
@@ -521,6 +540,10 @@ export class KmnCompilerMessages {
     static Error_VirtualCharacterKeysNotSupportedInKeymanWeb: (o: {
         line: number;
     }) => CompilerEvent;
+    // (undocumented)
+    static ERROR_VirtualKeyExpansionTooLong: number;
+    // (undocumented)
+    static Error_VirtualKeyExpansionTooLong: () => CompilerEvent;
     // (undocumented)
     static ERROR_VirtualKeyInContext: number;
     // (undocumented)
@@ -595,6 +618,10 @@ export class KmnCompilerMessages {
     static FATAL_UnicodeSetOutOfRange: number;
     // (undocumented)
     static Fatal_UnicodeSetOutOfRange: () => CompilerEvent;
+    // (undocumented)
+    static HINT_IndexStoreLong: number;
+    // (undocumented)
+    static Hint_IndexStoreLong: () => CompilerEvent;
     // (undocumented)
     static HINT_NonUnicodeFile: number;
     // (undocumented)
@@ -850,12 +877,6 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
         msg: string;
     }) => CompilerEvent;
     // (undocumented)
-    static ERROR_NotAnyRequiresVersion14: number;
-    // (undocumented)
-    static Error_NotAnyRequiresVersion14: (o: {
-        line: number;
-    }) => CompilerEvent;
-    // (undocumented)
     static ERROR_TouchLayoutFileDoesNotExist: number;
     // (undocumented)
     static Error_TouchLayoutFileDoesNotExist: (o: {
@@ -875,6 +896,63 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
     static Hint_TouchLayoutUsesUnsupportedGesturesDownlevel: (o: {
         keyId: string;
     }) => CompilerEvent;
+    // (undocumented)
+    static INFO_MinimumEngineVersion: number;
+    // (undocumented)
+    static Info_MinimumEngineVersion: (o: {
+        version: string;
+    }) => CompilerEvent;
+}
+
+declare namespace Osk {
+    export {
+        parseMapping,
+        remapVisualKeyboard,
+        remapTouchLayout,
+        StringRefUsage,
+        StringRef,
+        StringResult,
+        PuaMap
+    }
+}
+export { Osk }
+
+// @public (undocumented)
+function parseMapping(mapping: any): PuaMap;
+
+// @public (undocumented)
+type PuaMap = {
+    [index: string]: string;
+};
+
+// @public (undocumented)
+function remapTouchLayout(source: TouchLayout.TouchLayoutFile, map: PuaMap): boolean;
+
+// @public (undocumented)
+function remapVisualKeyboard(vk: VisualKeyboard.VisualKeyboard, map: PuaMap): boolean;
+
+// @public (undocumented)
+interface StringRef {
+    // (undocumented)
+    str: string;
+    // (undocumented)
+    usages: StringRefUsage[];
+}
+
+// @public (undocumented)
+interface StringRefUsage {
+    // (undocumented)
+    count: number;
+    // (undocumented)
+    filename: string;
+}
+
+// @public
+interface StringResult {
+    pua: string;
+    str: string;
+    unicode: string;
+    usages: StringRefUsage[] | string[];
 }
 
 ```

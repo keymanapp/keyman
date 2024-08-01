@@ -19,7 +19,7 @@ export type StateChangeHandler = (state: StateChangeEnum) => any;
 /**
  * Covers 'tryaccept' events.
  */
-export type TryUIHandler = (source: string) => boolean;
+export type TryUIHandler = (source: string, returnObj: {shouldSwallow: boolean}) => boolean;
 
 export type InvalidateSourceEnum = 'new'|'context';
 
@@ -168,9 +168,9 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
       let transcription = outputTarget.buildTranscriptionFrom(outputTarget, null, false);
       return this.predict_internal(transcription, true, layerId);
     } else {
-      // if there's no active context source, there's nothing to 
-      // provide suggestions for. In that case, there's no reason 
-      // to even request suggestions, so bypass the prediction 
+      // if there's no active context source, there's nothing to
+      // provide suggestions for. In that case, there's no reason
+      // to even request suggestions, so bypass the prediction
       // engine and say that there aren't any.
       return Promise.resolve([]);
     }
@@ -296,7 +296,7 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
     let original = this.getPredictionState(-reversion.transformId);
     if(!original) {
       console.warn("Could not apply the Suggestion!");
-      return Promise.resolve([]);
+      return Promise.resolve([] as Suggestion[]);
     }
 
     // Apply the Reversion!
@@ -312,15 +312,12 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
     outputTarget.apply(transform);
 
     // The reason we need to preserve the additive-inverse 'transformId' property on Reversions.
-    let promise = this.lmEngine.revertSuggestion(reversion, new ContextWindow(original.preInput, this.configuration, null))
+    let promise = this.currentPromise = this.lmEngine.revertSuggestion(reversion, new ContextWindow(original.preInput, this.configuration, null))
+    // If the "current Promise" is as set above, clear it.
+    // If another one has been triggered since... don't.
+    promise.then(() => this.currentPromise = (this.currentPromise == promise) ? null : this.currentPromise);
 
-    return promise.then((suggestions: Suggestion[]) => {
-      let result = new ReadySuggestions(suggestions, transform.id);
-      this.emit("suggestionsready", result);
-      this.currentPromise = null;
-
-      return suggestions;
-    });
+    return promise;
   }
 
   public predictFromTarget(outputTarget: OutputTarget, layerId: string): Promise<Suggestion[]> {
@@ -453,12 +450,13 @@ export default class LanguageProcessor extends EventEmitter<LanguageProcessorEve
   }
 
   public tryAcceptSuggestion(source: string): boolean {
-    // If and when we do auto-correct, the suggestion is to pass this object to the event and
-    // denote any mutations to the contained value.
-    //let returnObj = {shouldSwallow: false};
-    this.emit('tryaccept', source);
+    // The object below is to facilitate a pass-by-reference on the boolean flag,
+    // allowing the event's handler to signal if whitespace has been added via
+    // auto-applied suggestion that should be blocked on the next keystroke.
+    let returnObj = {shouldSwallow: false};
+    this.emit('tryaccept', source, returnObj);
 
-    return false;
+    return returnObj.shouldSwallow ?? false;
   }
 
   public tryRevertSuggestion(): boolean {

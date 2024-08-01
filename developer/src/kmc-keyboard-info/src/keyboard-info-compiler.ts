@@ -8,7 +8,7 @@ import { KeyboardInfoFile, KeyboardInfoFileIncludes, KeyboardInfoFileLanguageFon
 import { KeymanFileTypes, CompilerCallbacks, KmpJsonFile, KmxFileReader, KMX, KeymanTargets, KeymanCompiler, CompilerOptions, KeymanCompilerResult, KeymanCompilerArtifacts, KeymanCompilerArtifact } from "@keymanapp/common-types";
 import { KeyboardInfoCompilerMessages } from "./keyboard-info-compiler-messages.js";
 import langtags from "./imports/langtags.js";
-import { KeymanUrls, validateMITLicense } from "@keymanapp/developer-utils";
+import { KeymanUrls, isValidEmail, validateMITLicense } from "@keymanapp/developer-utils";
 import { KmpCompiler } from "@keymanapp/kmc-package";
 
 import { SchemaValidators } from "@keymanapp/common-types";
@@ -238,6 +238,11 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
           return null;
         }
 
+        if(!isValidEmail(match[2])) {
+          this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_InvalidAuthorEmail({email:author.url}));
+          return null;
+        }
+
         keyboard_info.authorEmail = match[2];
       }
     }
@@ -294,7 +299,7 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
     }
     keyboard_info.packageIncludes = [...includes];
 
-    keyboard_info.version = kmpJsonData.info.version.description;
+    keyboard_info.version = kmpJsonData.info?.version?.description ?? '1.0';
 
     let minVersion = minKeymanVersion;
     const m = jsFile?.match(/this.KMINVER\s*=\s*(['"])(.*?)\1/);

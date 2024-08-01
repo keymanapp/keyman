@@ -1,6 +1,8 @@
 import { assert } from 'chai';
 
 import { LMLayer, Worker }   from "@keymanapp/lexical-model-layer/web";
+
+import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
 import { defaultCapabilities } from '../helpers.mjs';
 
 // Import assertions, even using 'with', aren't yet supported in Firefox's engine.
@@ -20,7 +22,7 @@ let hazelModel;
  * of suggestions when loaded and return them sequentially.
  */
 describe('LMLayer using dummy model', function () {
-  this.timeout(5000);
+  this.timeout(DEFAULT_BROWSER_TIMEOUT);
 
   before(async () => {
     let loc = document.location;
@@ -34,6 +36,18 @@ describe('LMLayer using dummy model', function () {
     // Since Firefox can't do JSON imports quite yet.
     const hazelFixture = await fetch(new URL(`${domain}/resources/json/models/future_suggestions/i_got_distracted_by_hazel.json`));
     hazelModel = await hazelFixture.json();
+    hazelModel = hazelModel.map((set) => set.map((entry) => {
+      return {
+        ...entry,
+        // Dummy-model predictions all claim probability 1; there's no actual probability stuff
+        // used here.
+        'lexical-p': 1,
+        // We're predicting from a single transform, not a distribution, so probability 1.
+        'correction-p': 1,
+        // Multiply 'em together.
+        p: 1,
+      }
+    }));
   });
 
   describe('Prediction', function () {

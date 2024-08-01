@@ -42,7 +42,7 @@ AppActionQueue::AppActionQueue()
 
 void AppActionQueue::ResetQueue()
 {
-	//SendDebugMessageFormat(0, sdmAIDefault, 0, "App::ResetQueue");
+	//SendDebugMessageFormat("Resetting queue");
 	QueueSize = 0;   // I4262
 }
 
@@ -59,7 +59,7 @@ BOOL AppActionQueue::QueueAction(int ItemType, DWORD dwData)
 
 	QueueSize++;
 
-	SendDebugMessageFormat(0, sdmAIDefault, 0, "App::QueueAction: %s %x", ItemTypes[ItemType], dwData);
+	SendDebugMessageFormat("Queueing %s %x", ItemTypes[ItemType], dwData);
 
 	return TRUE;
 }

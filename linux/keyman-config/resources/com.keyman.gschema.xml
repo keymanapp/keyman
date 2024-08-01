@@ -7,6 +7,12 @@
         <summary>Automatic error reporting</summary>
         <description>true to enable automatic reporting of errors to Sentry</description>
     </key>
+    <key name="simulate-altgr" type="b">
+      <default>false</default>
+      <summary>Simulate AltGr with Ctrl+Alt</summary>
+      <description>true will allow Ctrl+Alt to be used for AltGr. If false
+      Ctrl+Alt will not be used to simulate the AltGr key.</description>
+    </key>
   </schema>
 
   <schema id="com.keyman.options.child">

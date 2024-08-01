@@ -4,7 +4,7 @@
     hasProp = {}.hasOwnProperty;
 
 import sax from 'sax';
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'eventemitter3';
 import * as bom from './bom.js';
 import * as processors from './processors.js';
 import { setImmediate } from 'timers';
@@ -323,7 +323,11 @@ export class Parser extends EventEmitter {
       } catch (error1) {
         err = error1;
         if (!(this.saxParser.errThrown || this.saxParser.ended)) {
-          this.emit('error', err);
+          if(this.listenerCount('error') > 0) {
+            this.emit('error', err);
+          } else {
+            throw err;
+          }
           return this.saxParser.errThrown = true;
         } else if (this.saxParser.ended) {
           throw err;

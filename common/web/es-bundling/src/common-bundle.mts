@@ -12,7 +12,7 @@ let profilePath;
 let sourceRoot;
 let platform;
 
-let jsVersionTarget='es5';
+let jsVersionTarget='es6';
 
 function doHelp(errCode?: number) {
   console.log(`
