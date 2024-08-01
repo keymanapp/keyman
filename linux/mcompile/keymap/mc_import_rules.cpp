@@ -67,6 +67,7 @@ bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
  *          +1 if character was found and written to pwszBuff
  */
 int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, ShiftState rgkey_ss, int caps, GdkKeymap* keymap) {
+
   GdkKeymapKey* maps;
   guint* keyvals;
   gint count;

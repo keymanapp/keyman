@@ -1,5 +1,6 @@
 /*
  * Keyman is copyright 2004 - 2024 (C) SIL International. MIT License.
+
  *
  * Functions for u16string
  */
@@ -23,7 +24,6 @@ std::wstring wstring_from_string(std::string const str) {
 }
 
 // u16string <- string
-/** @brief Obtain a std::16string from a std::string */
 std::u16string u16string_from_string(std::string const str) {
  return convert<char, char16_t>((const std::string)str);
 }
@@ -48,6 +48,7 @@ std::u16string u16string_from_wstring(std::wstring const wstr) {
 
 // UTF16 (=const wchar_t*) -> -> std::string  -> std::u16string -> UTF16 ( = char16_t*)
 /** @brief Convert pointer to wchar_t to u16string and copy sz elements into dst */
+
 void u16sprintf(KMX_WCHAR* dst, const size_t sz, const wchar_t* fmt, ...) {
   wchar_t* wbuf = new wchar_t[sz];
   va_list args;
@@ -84,8 +85,7 @@ const KMX_WCHAR* u16ncat(KMX_WCHAR* dst, const KMX_WCHAR* src, size_t max) {
 }
 
 /** @brief find last '/' or '\\' in an array of char16_t */
-const KMX_WCHAR* u16rchr_slash(KMX_WCHAR const* name)
-{
+const KMX_WCHAR* u16rchr_slash(KMX_WCHAR const* name) {
   const KMX_WCHAR* cp = NULL;
   cp = u16rchr(name, '\\');
   if (cp == NULL)
@@ -94,8 +94,7 @@ const KMX_WCHAR* u16rchr_slash(KMX_WCHAR const* name)
 }
 
 /** @brief find last '/' or '\\' in an array of char */
-KMX_CHAR* strrchr_slash(KMX_CHAR* name)
-{
+KMX_CHAR* strrchr_slash(KMX_CHAR* name) {
   KMX_CHAR* cp = NULL;
   cp = strrchr(name, '\\');
   if (cp == NULL)
@@ -108,6 +107,7 @@ const KMX_WCHAR* u16rchr(const KMX_WCHAR* p, KMX_WCHAR ch) {
   const KMX_WCHAR* p_end = p + u16len(p);
 
   while (p_end > p) {
+
     if (*p_end == ch)
       return p_end;
     p_end--;
@@ -170,7 +170,8 @@ int   u16cmp(const KMX_WCHAR* p, const KMX_WCHAR* q) {
 /** @brief Case insensitive comparison of up to count characters in two strings */
 int   u16nicmp(const KMX_WCHAR* p, const KMX_WCHAR* q, size_t count) {
   while (*p && *q && count) {
-    if (toupper(*p) != toupper(*q)) return *p - *q;
+    if (toupper(*p) != toupper(*q)) 
+      return *p - *q;
     p++;
     q++;
     count--;
@@ -183,7 +184,8 @@ int   u16nicmp(const KMX_WCHAR* p, const KMX_WCHAR* q, size_t count) {
 /** @brief Case insensitive comparison of two strings */
 int   u16icmp(const KMX_WCHAR* p, const KMX_WCHAR* q) {
   while (*p && *q) {
-    if (toupper(*p) != toupper(*q)) return *p - *q;
+    if (toupper(*p) != toupper(*q)) 
+      return *p - *q;
     p++;
     q++;
   }
@@ -251,8 +253,7 @@ KMX_WCHAR* u16tok(KMX_WCHAR* p, const KMX_WCHAR* delimiters, KMX_WCHAR** ctx) {
 }
 
 /** @brief Convert a u16string to a double */
-double u16tof(KMX_WCHAR* str)
-{
+double u16tof(KMX_WCHAR* str) {
   double val = 0;
   int offsetdot = 0;
   char digit;
@@ -260,8 +261,7 @@ double u16tof(KMX_WCHAR* str)
   PKMX_WCHAR q = (PKMX_WCHAR)u16chr(str, '.');
   size_t pos_dot = (q - str < 0) ? u16len(str) : q - str;
 
-  for (size_t i = 0; i < u16len(str); i++)
-  {
+  for (size_t i = 0; i < u16len(str); i++) {
     digit = static_cast<char>(towupper(*str));
 
     if (i > pos_dot - 1)
@@ -269,6 +269,7 @@ double u16tof(KMX_WCHAR* str)
 
     if (digit != '.')
       val = val + ((int(digit)) - 48) * pow(10, (pos_dot - 1 - i + offsetdot));
+
 
     str++;
   }

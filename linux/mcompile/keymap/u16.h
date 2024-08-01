@@ -10,7 +10,6 @@
 #include <cstring>
 #include <vector>
 
-
 /**
  * @brief  Obtain a std::string from a std::wstring
  * @param  wstr the std::wstring to be converted
@@ -38,7 +37,6 @@ std::u16string u16string_from_string(std::string const str);
  * @return a std::string
  */
 std::string string_from_u16string(std::u16string const str16);
-
 
 /**
  * @brief  Obtain a std::wstring from a std::u16string
@@ -69,7 +67,6 @@ void u16sprintf(KMX_WCHAR* dst, const size_t sz, const wchar_t* fmt, ...);
  * @param  base   Numerical base (radix) that determines the valid characters and their interpretation
  * @return a long
  */
-
 long int u16tol(const KMX_WCHAR* str, KMX_WCHAR** endptr, int base);
 
 /**
@@ -94,6 +91,7 @@ const KMX_WCHAR* u16rchr_slash(KMX_WCHAR const* name);
  * @return Pointer to the last slash/backslash
  */
 KMX_CHAR* strrchr_slash(KMX_CHAR* name);
+
 /**
  * @brief  Locate last occurrence of character in u16string
  * @param  p  Pointer to the source
@@ -193,6 +191,7 @@ KMX_WCHAR* u16tok(KMX_WCHAR* p, const KMX_WCHAR* delim, KMX_WCHAR** ctx);
 /**
  * @brief  Convert a u16string to a double
  * @param  tr Pointer to u16string
+
  * @return double value equivalent to the string
  */
 double u16tof(KMX_WCHAR* str);

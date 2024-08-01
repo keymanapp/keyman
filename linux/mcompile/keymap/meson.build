@@ -22,7 +22,6 @@ comon_include_dir = [
   include_directories('../../../core/src'),
 ]
 
-
 mcompile = executable(
     'mcompile',
     sources: [cpp_files],
