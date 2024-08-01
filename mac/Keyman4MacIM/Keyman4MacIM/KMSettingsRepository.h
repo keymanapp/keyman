@@ -14,7 +14,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface KMSettingsRepository : NSObject
 + (KMSettingsRepository *)shared;
-- (BOOL)keyboardsMigrationNeeded;
+- (BOOL)dataMigrationNeeded;
+- (void)convertSettingsForMigration;
+- (void)createStorageFlagIfNecessary;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -511,6 +511,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
  * Locate and create the Keyman data path; currently in ~/Documents/Keyman-Keyboards
  */
 - (NSString *)keymanDataPath {
+  /*
   if(_keymanDataPath == nil) {
     NSString *documentDirPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
     _keymanDataPath = [documentDirPath stringByAppendingPathComponent:@"Keyman-Keyboards"];
@@ -523,18 +524,22 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     }
   }
   return _keymanDataPath;
+  */
+  return [KMDataRepository shared].keymanDataDirectory.path;
 }
 
 /**
  * Returns the root folder where keyboards are stored; currently the same
  * as the keymanDataPath, but may diverge in future versions (possibly a sub-folder)
+ *
+ * Actually divering now, get this from KMDataRepository
  */
 - (NSString *)keyboardsPath {
   if (_keyboardsPath == nil) {
     _keyboardsPath = [self keymanDataPath];
   }
   
-  return _keyboardsPath;
+  return [KMDataRepository shared].keymanKeyboardsDirectory.path;
 }
 
 - (NSArray *)kmxFileList {
@@ -765,13 +770,23 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (void)awakeFromNib {
-  if ([KMSettingsRepository.shared keyboardsMigrationNeeded]) {
-    os_log_info([KMLogs startupLog], "keyboards migration needed");
-    [KMDataRepository.shared migrateResources];
-  } else {
-    os_log_info([KMLogs startupLog], "keyboards migration not needed");
-  }
+  [self preparePersistence];
+}
 
+/**
+ * Prepare the app for all the things that need to be persisted:
+ * namely, the settings in UserDefaults and keyboard data on disk
+ */
+- (void)preparePersistence {
+  [KMDataRepository.shared createDataDirectoriesIfNecessary];
+  
+  if ([KMSettingsRepository.shared dataMigrationNeeded]) {
+    BOOL movedData = [KMDataRepository.shared migrateData];
+    //os_log_info([KMLogs startupLog], "test: call migrateData again");
+    //[KMDataRepository.shared migrateData];
+    [KMSettingsRepository.shared convertSettingsForMigration];
+  }
+  [KMSettingsRepository.shared createStorageFlagIfNecessary];
 }
 
 - (void)setDefaultKeymanMenuItems {

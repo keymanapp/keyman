@@ -17,10 +17,7 @@
 @interface KMDataRepository ()
 @property (readonly) NSURL *applicationSupportSubDirectory;   // '~/Library/Application Support'
 @property (readonly) NSURL *documentsSubDirectory;    // '~/Documents'
-@property (readonly) NSURL *keymanDataDirectory;      // '~/Library/Application Support/com.keyman.app'
-@property (readonly) NSURL *keymanKeyboardsDirectory;
-// keymanKeyboardsDirectory = '~/Library/Application Support/com.keyman.app/Keyman-Keyboards'
-@property (readonly) NSURL *obsoleteKeymanDataDirectory; // '~/Library/Documents/Keyman-Keyboards'
+@property (readonly) NSURL *obsoleteKeymanKeyboardsDirectory; // '~/Library/Documents/Keyman-Keyboards'
 @end
 
 @implementation KMDataRepository
@@ -28,22 +25,17 @@
 @synthesize applicationSupportSubDirectory = _applicationSupportSubDirectory;
 @synthesize documentsSubDirectory = _documentsSubDirectory;
 @synthesize keymanKeyboardsDirectory = _keymanKeyboardsDirectory;
-@synthesize obsoleteKeymanDataDirectory = _obsoleteKeymanDataDirectory;
+@synthesize obsoleteKeymanKeyboardsDirectory = _obsoleteKeymanKeyboardsDirectory;
 @synthesize keymanDataDirectory = _keymanDataDirectory;
 
 NSString *const kKeyboardsDirectoryName = @"Keyman-Keyboards";
 /* 
- name of the subdirectory within '~/Library/Application Support'
- the convention is to use bundle identifier ("keyman.inputmethod.Keyman")
- but we'll use this name, which matches our logging subsystem
+ The name of the subdirectory within '~/Library/Application Support'.
+ The convention is to use bundle identifier.
+ (Using the subsystem id, "com.keyman.app", is a poor choice because the API
+ createDirectoryAtPath sees the .app extension and creates an application file.
  */
-NSString *const kKeymanSubdirectoryName = @"com.keyman.app";
-/*
-NSString* _obsoleteKeymanDataDirectory = nil;
-NSString* _keymanDataDirectory = nil;
-NSURL* _ApplicationSupportSubDirectory = nil;
-NSURL* _DocumentsSubDirectory = nil;
-*/
+NSString *const kKeymanSubdirectoryName = @"keyman.inputmethod.Keyman";
 
 + (KMDataRepository *)shared
 {
@@ -56,7 +48,7 @@ NSURL* _DocumentsSubDirectory = nil;
 }
 
 - (NSURL *)documentsSubDirectory {
-  if (self.documentsSubDirectory == nil) {
+  if (_documentsSubDirectory == nil) {
     NSError *directoryError = nil;
     
     NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -69,11 +61,11 @@ NSURL* _DocumentsSubDirectory = nil;
       _documentsSubDirectory = documentsUrl;
     }
   }
-  return self.documentsSubDirectory;
+  return _documentsSubDirectory;
 }
 
 - (NSURL *)applicationSupportSubDirectory {
-  if (self.applicationSupportSubDirectory == nil) {
+  if (_applicationSupportSubDirectory == nil) {
     NSError *directoryError = nil;
     
     NSFileManager *fileManager = [NSFileManager defaultManager];
@@ -86,50 +78,88 @@ NSURL* _DocumentsSubDirectory = nil;
       _applicationSupportSubDirectory = applicationSupportUrl;
     }
   }
-  return self.applicationSupportSubDirectory;
+  return _applicationSupportSubDirectory;
 }
 
 - (NSURL *)keymanDataDirectory {
-  if (self.keymanDataDirectory == nil) {
+  if (_keymanDataDirectory == nil) {
     NSURL *keymanDataUrl = [self.applicationSupportSubDirectory URLByAppendingPathComponent:kKeymanSubdirectoryName  isDirectory: TRUE];
     _keymanDataDirectory = keymanDataUrl;
   }
-  return self.keymanDataDirectory;
+  return _keymanDataDirectory;
 }
 
 - (NSURL *)keymanKeyboardsDirectory {
-  if (self.keymanKeyboardsDirectory == nil) {
+  if (_keymanKeyboardsDirectory == nil) {
     NSURL *keyboardsUrl = [self.keymanDataDirectory URLByAppendingPathComponent:kKeyboardsDirectoryName  isDirectory: TRUE];
     _keymanKeyboardsDirectory = keyboardsUrl;
   }
-  return self.keymanKeyboardsDirectory;
+  return _keymanKeyboardsDirectory;
 }
 
-- (NSURL *)obsoleteKeymanDataDirectory {
-  if (self.obsoleteKeymanDataDirectory == nil) {
-    NSURL *keymanUrl = [self.documentsSubDirectory URLByAppendingPathComponent:kKeymanSubdirectoryName  isDirectory: TRUE];
-    _obsoleteKeymanDataDirectory = keymanUrl;
-  }
-  return self.obsoleteKeymanDataDirectory;
-}
-
-- (void)migrateResources {
-  os_log_info([KMLogs startupLog], "keymanKeyboardsDirectory: '%{public}@'", self.keymanKeyboardsDirectory);
-  os_log_info([KMLogs startupLog], "obsoleteKeymanDataDirectory: '%{public}@'", self.obsoleteKeymanDataDirectory);
-
-  /*
+/**
+ * creates Keyman data directories if they do not exist yet
+ * This includes 1) the main data subdirectory: keyman.inputmethod.Keyman
+ * and 2) its subdirectory, Keyman-Keyboards
+ *
+ */
+- (void)createDataDirectoriesIfNecessary {
+  NSFileManager *fileManager = [NSFileManager defaultManager];
   BOOL isDir;
-  BOOL exists = [fileManager fileExistsAtPath:keymanUrl.path isDirectory:&isDir];
-  
-  if (exists) {
-    os_log_info([KMLogs startupLog], "keymanUrl '%{public}@' exists", keymanUrl);
-      if (isDir) {
-        os_log_info([KMLogs startupLog], "keymanUrl '%{public}@' is a directory", keymanUrl);
-      }
+  BOOL exists = [fileManager fileExistsAtPath:self.keymanKeyboardsDirectory.path isDirectory:&isDir];
+
+  if (!exists) {
+    NSError *createError = nil;
+    [fileManager createDirectoryAtPath:self.keymanKeyboardsDirectory.path withIntermediateDirectories:YES attributes:nil error:nil];
+    if (createError) {
+      os_log_error([KMLogs startupLog], "error creating Keyman-Keyboards directory: '%{public}@'", createError.localizedDescription);
+    } else {
+      os_log_info([KMLogs startupLog], "created Keyman-Keyboards subdirectory: '%{public}@'", self.keymanKeyboardsDirectory.path);
+    }
   } else {
-    os_log_info([KMLogs startupLog], "keymanUrl '%{public}@' does not exist", keymanUrl);
+    os_log_info([KMLogs startupLog], "Keyman-Keyboards already exists: '%{public}@'", self.keymanKeyboardsDirectory.path);
   }
-   */
+}
+
+- (NSURL *)obsoleteKeymanKeyboardsDirectory {
+  if (_obsoleteKeymanKeyboardsDirectory == nil) {
+    NSURL *keymanUrl = [self.documentsSubDirectory URLByAppendingPathComponent:kKeyboardsDirectoryName  isDirectory: TRUE];
+    _obsoleteKeymanKeyboardsDirectory = keymanUrl;
+  }
+  return _obsoleteKeymanKeyboardsDirectory;
+}
+
+- (BOOL)keyboardsExistInDocumentsFolder {
+  NSFileManager *fileManager = [NSFileManager defaultManager];
+  BOOL isDir;
+  BOOL exists = ([fileManager fileExistsAtPath:self.obsoleteKeymanKeyboardsDirectory.path isDirectory:&isDir]);
+  return exists;
+}
+
+- (BOOL)migrateData {
+  BOOL didMoveData = NO;
+  NSString *obsoleteKeymanKeyboardsDirectory = self.obsoleteKeymanKeyboardsDirectory.path;
+  NSString *dataDirectory = self.keymanDataDirectory.path;
+  os_log_info([KMLogs startupLog], "migrateData, move obsoleteKeymanKeyboardsDirectory: '%{public}@' to '%{public}@'", obsoleteKeymanKeyboardsDirectory, dataDirectory);
+
+  // delete, happens whether migration or not
+  //[self createKeyboardsDirectoriesIfNecessary];
+  
+  BOOL dataExistsInOldLocation = [self keyboardsExistInDocumentsFolder];
+  os_log([KMLogs startupLog], "obsolete keyman keyboards directory exists: %@", dataExistsInOldLocation?@"YES":@"NO");
+
+  if (dataExistsInOldLocation) {
+    NSError *moveError = nil;
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    didMoveData = [fileManager moveItemAtURL:self.obsoleteKeymanKeyboardsDirectory
+                         toURL:self.keymanDataDirectory
+                         error:&moveError];
+    if (moveError) {
+      os_log_error([KMLogs startupLog], "error migrating data: '%{public}@'", moveError.localizedDescription);
+    }
+  }
+  
+  return didMoveData;
 }
 
 /**

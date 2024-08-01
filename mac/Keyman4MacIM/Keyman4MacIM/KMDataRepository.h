@@ -13,9 +13,12 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface KMDataRepository : NSObject
+@property (readonly) NSURL *keymanDataDirectory;      // '~/Library/Application Support/com.keyman.app'
+@property (readonly) NSURL *keymanKeyboardsDirectory;
+// keymanKeyboardsDirectory = '~/Library/Application Support/com.keyman.app/Keyman-Keyboards'
 + (KMDataRepository *)shared;
-- (void)migrateResources;
-- (NSURL *)keymanDataDirectory;
+- (void)createDataDirectoriesIfNecessary;
+- (BOOL)migrateData;
 @end
 
 NS_ASSUME_NONNULL_END
