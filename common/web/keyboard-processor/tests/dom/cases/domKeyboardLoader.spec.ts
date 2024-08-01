@@ -1,7 +1,13 @@
 import { assert } from 'chai';
 
 import { DOMKeyboardLoader } from '@keymanapp/keyboard-processor/dom-keyboard-loader';
-import { extendString, KeyboardHarness, Keyboard, KeyboardInterface, MinimalKeymanGlobal, Mock, DeviceSpec } from '@keymanapp/keyboard-processor';
+import { extendString, KeyboardHarness, Keyboard, KeyboardInterface, MinimalKeymanGlobal, Mock, DeviceSpec, KeyboardKeymanGlobal } from '@keymanapp/keyboard-processor';
+
+declare let window: typeof globalThis;
+// KeymanEngine from the web/ folder... when available.
+// At this level, though... we just mock it.
+declare let keyman: KeyboardKeymanGlobal;
+declare let KeymanWeb: KeyboardInterface;
 
 // Note:  rule processing tests will fail if string extensions are not established beforehand.
 extendString();
@@ -15,8 +21,8 @@ const device: DeviceSpec = {
 
 describe('Keyboard loading in DOM', function() {
   afterEach(() => {
-    if(window['KeymanWeb']) {
-      window['KeymanWeb'].uninstall();
+    if (KeymanWeb) {
+      KeymanWeb.uninstall();
     }
   })
 
@@ -29,8 +35,10 @@ describe('Keyboard loading in DOM', function() {
     assert.equal(keyboard.id, 'Keyboard_khmer_angkor');
     assert.isTrue(keyboard.isChiral);
     assert.isFalse(keyboard.isCJK);
-    assert.isOk(window['KeymanWeb']);
-    assert.isOk(window['keyman']);
+    assert.isOk(KeymanWeb);
+    assert.isOk(keyman);
+    assert.isOk(keyman.osk);
+    assert.isOk(keyman.osk.keyCodes);
 
     // Should be cleared post-keyboard-load.
     assert.isNotOk(harness.loadedKeyboard);
@@ -46,8 +54,10 @@ describe('Keyboard loading in DOM', function() {
     assert.equal(keyboard.id, 'Keyboard_khmer_angkor');
     assert.isTrue(keyboard.isChiral);
     assert.isFalse(keyboard.isCJK);
-    assert.isOk(window['KeymanWeb']);
-    assert.isOk(window['keyman']);
+    assert.isOk(KeymanWeb);
+    assert.isOk(keyman);
+    assert.isOk(keyman.osk);
+    assert.isOk(keyman.osk.keyCodes);
 
     // TODO:  verify actual rule processing.
     const nullKeyEvent = keyboard.constructNullKeyEvent(device);
@@ -55,8 +65,10 @@ describe('Keyboard loading in DOM', function() {
     const result = harness.processKeystroke(mock, nullKeyEvent);
 
     assert.isOk(result);
-    assert.isOk(window['KeymanWeb']);
-    assert.isOk(window['keyman']);
+    assert.isOk(KeymanWeb);
+    assert.isOk(keyman);
+    assert.isOk(keyman.osk);
+    assert.isOk(keyman.osk.keyCodes);
 
     // Should be cleared post-keyboard-load.
     assert.isNotOk(harness.loadedKeyboard);

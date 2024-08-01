@@ -48,6 +48,22 @@ export class BrowserDriver {
         this.simulateHardwareEvent(eventSpec as PhysicalInputEventSpec);
         break;
       case "osk":
+        const oskEventSpec = eventSpec as OSKInputEventSpec;
+
+        // Undocumented api stuff:  ensure the layer has been built before
+        // force-triggering the key, as it may not exist otherwise!
+        //
+        // Some unit tests bypass emitting keys that change layer, so we set it
+        // directly here.
+        const keyID = oskEventSpec.keyID;
+        const keyIDPieces = keyID.split('-');
+        if(keyIDPieces.length > 1) {
+          // Drop the actual 'key' part of the key-id, leaving layer components
+          // intact.
+          keyIDPieces.pop();
+          keyman.osk.vkbd.layerId = keyIDPieces.join('-');
+        }
+
         await this.simulateOSKEvent(eventSpec as OSKInputEventSpec);
         break;
     }

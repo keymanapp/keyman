@@ -54,6 +54,10 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   else
     _easterEggForSentry = nil;
   
+  [SentrySDK configureScope:^(SentryScope * _Nonnull scope) {
+      [scope setTagValue:clientAppId forKey:@"clientAppId"];
+  }];
+
   return self;
 }
 

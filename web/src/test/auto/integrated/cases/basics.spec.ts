@@ -9,6 +9,9 @@ const baseTimeout = 5000;
 const host = document.createElement('div');
 document.body.appendChild(host);
 
+type WindowKey = keyof typeof window;
+const keyman_window = 'keyman' as WindowKey;
+
 describe('Basic KeymanWeb', function() {
   this.timeout(baseTimeout);
 
@@ -34,13 +37,13 @@ describe('Basic KeymanWeb', function() {
 
   describe('Initialization', function() {
     it('KMW should attach to the input element.', function() {
-      const keyman = window['keyman'] as KeymanEngine;
-      var singleton = document.getElementById('singleton');
+      const keyman = window[keyman_window] as KeymanEngine;
+      const singleton = document.getElementById('singleton');
       assert.isTrue(keyman.isAttached(singleton), "KeymanWeb did not automatically attach to the element!");
     });
 
     it('KMW\'s initialization variable should indicate completion.', function() {
-      const keyman = window['keyman'] as KeymanEngine;
+      const keyman = window[keyman_window] as KeymanEngine;
       assert.equal(keyman.initialized, 2, 'Keyman indicates incomplete initialization!');
     });
   });
@@ -69,7 +72,7 @@ if(!device.touchable) {
     });
 
     it('The Toggle UI initializes correctly.', function() {
-      const keyman = window['keyman'] as KeymanEngine;
+      const keyman = window[keyman_window] as KeymanEngine;
 
       // UI-module specific typings are currently not available.
       const ui = keyman.ui as any;
@@ -109,7 +112,7 @@ if(!device.touchable) {
     });
 
     it('The Button UI initializes correctly.', function() {
-      const keyman = window['keyman'] as KeymanEngine;
+      const keyman = window[keyman_window] as KeymanEngine;
 
       // UI-module specific typings are currently not available.
       const ui = keyman.ui as any;
@@ -137,7 +140,7 @@ if(!device.touchable) {
     });
 
     it('The Float UI initializes correctly.', function() {
-      const keyman = window['keyman'] as KeymanEngine;
+      const keyman = window[keyman_window] as KeymanEngine;
 
       // UI-module specific typings are currently not available.
       const ui = keyman.ui as any;
@@ -178,7 +181,7 @@ if(!device.touchable) {
     });
 
     it('The Toolbar UI initializes correctly.', function() {
-      const keyman = window['keyman'] as KeymanEngine;
+      const keyman = window[keyman_window] as KeymanEngine;
 
       // UI-module specific typings are currently not available.
       const ui = keyman.ui as any;

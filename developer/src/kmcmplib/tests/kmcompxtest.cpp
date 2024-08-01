@@ -19,6 +19,7 @@
 #ifdef _MSC_VER
 #else
 #include <unistd.h>
+#include <cstring>
 #endif
 
 using namespace std;
@@ -85,10 +86,11 @@ int main(int argc, char *argv[])
     fseek(fp2, 0, SEEK_END);
     auto sz2 = ftell(fp2);
     fseek(fp2, 0, SEEK_SET);
-    if (result.kmxSize != sz2) return __LINE__;                //  exit code: size of kmx-file in build differs from size of kmx-file in source folder
+    if (result.kmxSize != (size_t)sz2) return __LINE__;                //  exit code: size of kmx-file in build differs from size of kmx-file in source folder
 
     char* buf2 = new char[result.kmxSize];
-    fread(buf2, 1, result.kmxSize, fp2);
+    auto sz3 = fread(buf2, 1, result.kmxSize, fp2);
+    if (result.kmxSize != sz3) return __LINE__;                // exit code:  when not able to read the build into the buffer
     return memcmp(result.kmx, buf2, result.kmxSize) ? __LINE__ : 0;  // exit code:  when contents of kmx-file in build differs from contents of kmx-file in source folder
                                                     // success:    when contents of kmx-file in build and source folder are the same
   }
@@ -102,7 +104,7 @@ int main(int argc, char *argv[])
       std::istringstream(ErrNr) >> std::hex >> error_val;
 
       // check if error_val is in Array of Errors; if it is found return 0 (it's not an error)
-      for (int i = 0; i < error_vec.size() ; i++) {
+      for (size_t i = 0; i < error_vec.size() ; i++) {
         if (error_vec[i] == error_val) {
           return 0;  // success: CERR_ in Name + Error (specified in CERR_Name) IS found
         }
@@ -156,7 +158,7 @@ bool isDesktopKeyboard(FILE* fp) {
 
   PCOMP_STORE s = pfs;
 
-  for(int i = 0; i < fk.cxStoreArray; i++, s++) {
+  for(KMX_DWORD i = 0; i < fk.cxStoreArray; i++, s++) {
     if(s->dwSystemID != TSS_TARGETS) {
       continue;
     }

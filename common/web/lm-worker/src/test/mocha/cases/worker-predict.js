@@ -8,18 +8,11 @@ import LMLayerWorker from '#./index.js';
 
 import { configWorker, createMessageEventWithData, emptyContext, iGotDistractedByHazel,
          importScriptsWith, randomToken, zeroTransform } from '@keymanapp/common-test-resources/model-helpers.mjs';
+import { timedPromise } from '@keymanapp/web-utils';
 
 describe('LMLayerWorker', function () {
   describe('#predict()', function () {
-    it('should send back suggestions', function () {
-      var suggestion = {
-        transform: {
-          insert: 'I ',
-          deleteLeft: 0
-        },
-        displayAs: 'I'
-      };
-
+    it('should send back suggestions', async function () {
       // Initialize the worker with a model that will produce one suggestion.
       var fakePostMessage = sinon.fake();
       var filteredFakePostMessage = function(event) {
@@ -62,6 +55,10 @@ describe('LMLayerWorker', function () {
         transform: zeroTransform(),
         context: emptyContext()
       }));
+
+      // predict() is async, so we need to relinquish control flow temporarily
+      // in order for a return message to become available.
+      await timedPromise(500);
 
       // Retrieve the internal 'dummy' suggestions for comparison.
       var hazel = iGotDistractedByHazel();

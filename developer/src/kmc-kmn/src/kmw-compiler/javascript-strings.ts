@@ -1,10 +1,13 @@
 import { TSentinelRecord, GetSuppChar, ExpandSentinel, incxstr, xstrlen, xstrlen_printing } from "./util.js";
 import { KMX } from "@keymanapp/common-types";
 
-import { callbacks, FCallFunctions, FFix183_LadderLength, FMnemonic, FTabStop, FUnreachableKeys, IsKeyboardVersion10OrLater, IsKeyboardVersion14OrLater, kmxResult, nl, options } from "./compiler-globals.js";
+import { callbacks, FCallFunctions, FFix183_LadderLength, FMnemonic, FTabStop, FUnreachableKeys,
+         kmxResult, nl, options, isKeyboardVersion10OrLater, isKeyboardVersion14OrLater,
+         verifyAndSetMinimumRequiredKeymanVersion10 } from "./compiler-globals.js";
 import { KmwCompilerMessages } from "./kmw-compiler-messages.js";
 import { FormatModifierAsBitflags, RuleIsExcludedByPlatform } from "./kmw-compiler.js";
-import { KMXCodeNames, SValidIdentifierCharSet, UnreachableKeyCodes, USEnglishShift, USEnglishUnshift, USEnglishValues } from "./constants.js";
+import { KMXCodeNames, SValidIdentifierCharSet, UnreachableKeyCodes, USEnglishShift,
+         USEnglishUnshift, USEnglishValues } from "./constants.js";
 import { KMWVKeyNames, TKeymanWebTouchStandardKey, VKeyNames } from "./keymanweb-key-codes.js";
 
 export function JavaScript_Name(i: number, pwszName: string, KeepNameForPersistentStorage: boolean = false): string {   // I3659
@@ -49,7 +52,7 @@ export function JavaScript_Store(fk: KMX.KEYBOARD, line: number, pwsz: string): 
   let n = pwsz.indexOf(wcsentinel);
 
   // Start:  plain text store.  Always use for < 10.0, conditionally for >= 10.0.
-  if(n < 0 || !IsKeyboardVersion10OrLater()) {
+  if(n < 0 || !isKeyboardVersion10OrLater()) {
     result = '"';
     while(pwsz.length) {
       if(pwsz.charCodeAt(0) == KMX.KMXFile.UC_SENTINEL) {
@@ -247,20 +250,29 @@ export function JavaScript_Shift(fkp: KMX.KEY, FMnemonic: boolean): number {
   }
 
   if (fkp.ShiftFlags & KMX.KMXFile.ISVIRTUALKEY) {
-    if(IsKeyboardVersion10OrLater()) {
+    if(isKeyboardVersion10OrLater()) {
+      // don't attempt to upgrade to v10 at this point, only if we are already v10+
       // Full chiral modifier and state key support starts with KeymanWeb 10.0
       return fkp.ShiftFlags;
     }
 
     // Non-chiral support only and no support for state keys
     if (fkp.ShiftFlags & (KMX.KMXFile.LCTRLFLAG | KMX.KMXFile.RCTRLFLAG | KMX.KMXFile.LALTFLAG | KMX.KMXFile.RALTFLAG)) {   // I4118
+      if(verifyAndSetMinimumRequiredKeymanVersion10()) {
+        // upgrade to v10 if possible
+        return fkp.ShiftFlags;
+      }
       callbacks.reportMessage(KmwCompilerMessages.Warn_ExtendedShiftFlagsNotSupportedInKeymanWeb({line:fkp.Line, flags: 'LALT, RALT, LCTRL, RCTRL'}));
     }
 
     if (fkp.ShiftFlags & (
       KMX.KMXFile.CAPITALFLAG | KMX.KMXFile.NOTCAPITALFLAG | KMX.KMXFile.NUMLOCKFLAG | KMX.KMXFile.NOTNUMLOCKFLAG |
       KMX.KMXFile.SCROLLFLAG | KMX.KMXFile.NOTSCROLLFLAG)) {   // I4118
-      callbacks.reportMessage(KmwCompilerMessages.Warn_ExtendedShiftFlagsNotSupportedInKeymanWeb({line:fkp.Line, flags: 'CAPS and NCAPS'}));
+        if(verifyAndSetMinimumRequiredKeymanVersion10()) {
+          // upgrade to v10 if possible
+          return fkp.ShiftFlags;
+        }
+        callbacks.reportMessage(KmwCompilerMessages.Warn_ExtendedShiftFlagsNotSupportedInKeymanWeb({line:fkp.Line, flags: 'CAPS and NCAPS'}));
     }
 
     return KMX.KMXFile.ISVIRTUALKEY | (fkp.ShiftFlags & (KMX.KMXFile.K_SHIFTFLAG | KMX.KMXFile.K_CTRLFLAG | KMX.KMXFile.K_ALTFLAG));
@@ -403,7 +415,7 @@ export function JavaScript_KeyAsString(fkp: KMX.KEY, FMnemonic: boolean): string
 }
 
 export function JavaScript_ContextMatch(fk: KMX.KEYBOARD, fkp: KMX.KEY, context: string): string {
-  if(IsKeyboardVersion10OrLater()) {
+  if(isKeyboardVersion10OrLater()) {
     return JavaScript_FullContextValue(fk, fkp, context);
   }
   else {
@@ -429,7 +441,7 @@ function CheckStoreForInvalidFunctions(fk: KMX.KEYBOARD, key: KMX.KEY, store: KM
   n = store.dpString.indexOf(wcsentinel);
 
   // Disable the check with versions >= 10.0, since we now support deadkeys in stores.
-  if (n >= 0 && !IsKeyboardVersion10OrLater) {
+  if (n >= 0 && !isKeyboardVersion10OrLater()) {
     rec = ExpandSentinel(fk, store.dpString, n);
     callbacks.reportMessage(KmwCompilerMessages.Error_NotSupportedInKeymanWebStore({code:GetCodeName(rec.Code), store:store.dpName}));
   }
@@ -630,7 +642,7 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
     for(let I = 1; I < Index; I++) {
       let recContext = ExpandSentinel(fk, pwszContext, x);
 
-      if(IsKeyboardVersion10OrLater()) {
+      if(isKeyboardVersion10OrLater()) {
         if(recContext.IsSentinel && [KMX.KMXFile.CODE_NUL, KMX.KMXFile.CODE_IFOPT, KMX.KMXFile.CODE_IFSYSTEMSTORE].includes(recContext.Code)) {
           Result--;
         }
@@ -665,9 +677,9 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
         break;
       case KMX.KMXFile.CODE_NOTANY:
         // #917: Minimum version required is 14.0: the KCXO function was only added for 14.0
-        // Note that this is checked in compiler.cpp as well, so this error can probably never occur
-        if(!IsKeyboardVersion14OrLater()) {
-          callbacks.reportMessage(KmwCompilerMessages.Error_NotAnyRequiresVersion14({line:fkp.Line}));
+        if(!isKeyboardVersion14OrLater()) {
+          // Note that this is checked in compiler.cpp as well, so this error can probably never occur
+          throw new Error('Unexpected: notany() encountered with invalid version');
         }
         Result += nlt + `k.KCXO(${len},t,${AdjustIndex(fkp.dpContext, xstrlen(fkp.dpContext))},${AdjustIndex(fkp.dpContext, ContextIndex)+1});`;
         break;
@@ -701,7 +713,7 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
   let pwsz = pwszOutput;
 
   if(fkp != null) {
-    if(IsKeyboardVersion10OrLater()) {
+    if(isKeyboardVersion10OrLater()) {
       // KMW >= 10.0 use the full, sentinel-based length for context deletions.
       len = xstrlen(fkp.dpContext);
       let n = len;
@@ -726,7 +738,7 @@ export function JavaScript_OutputString(fk: KMX.KEYBOARD, FTabStops: string, fkp
   }
 
   let x = 0;
-  if(IsKeyboardVersion10OrLater() && pwsz.length > 0) {
+  if(isKeyboardVersion10OrLater() && pwsz.length > 0) {
     if(!isGroupReadOnly(fk, fgp)) {
       Result += nlt+`k.KDC(${len},t);`;   // I3681
     }
@@ -932,7 +944,7 @@ export function zeroPadHex(n: number, len: number): string {
  * @return string of JavaScript code, e.g. 'keyCodes.K_A /* 0x41 * /'
  */
 function FormatKeyAsString(key: number): string {
-  if(IsKeyboardVersion10OrLater()) {
+  if(isKeyboardVersion10OrLater()) {
     // Depends on flags defined in KeymanWeb 10.0
     if (key <= 255 && KMWVKeyNames[key] != '') {
       return 'keyCodes.'+KMWVKeyNames[key]+ ' /* 0x' + zeroPadHex(key, 2) + ' */';
