@@ -1,4 +1,4 @@
-import { applyTransform, buildMergedTransform } from '@keymanapp/models-templates';
+import { applyTransform, buildMergedTransform, Token } from '@keymanapp/models-templates';
 
 import { ClassicalDistanceCalculation } from './classical-calculation.js';
 import { SearchSpace } from './distance-modeler.js';
@@ -311,7 +311,7 @@ interface ContextMatchResult {
 
 export class ContextTracker extends CircularArray<TrackedContextState> {
   static attemptMatchContext(
-    tokenizedContext: { text: USVString, isWhitespace?: boolean } [],
+    tokenizedContext: Token[],
     matchState: TrackedContextState,
     transformSequenceDistribution?: Distribution<Transform[]>
   ): ContextMatchResult {
