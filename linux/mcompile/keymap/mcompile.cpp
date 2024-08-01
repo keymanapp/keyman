@@ -59,7 +59,7 @@ std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;  // I4353
 #if defined(_WIN32) || defined(_WIN64)
   int wmain(int argc, wchar_t* argv[]) {  
 /**
- * TODO for cros platform use: if we want to use wmain instead of main:
+ * TODO for cross platform use: if we want to use wmain instead of main:
  * inside wmain convert wchar_t* argv[] to char* argv_ch[]
  * to be able to use run(int argc, char* argv[])
  */
