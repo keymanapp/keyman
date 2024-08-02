@@ -19,8 +19,7 @@
     "ws": "^8.17.1"
   },
   "optionalDependencies": {
-    "hetrodo-node-hide-console-window-napi": "keymanapp/hetrodo-node-hide-console-window-napi#keyman-15.0",
-    "node-windows-trayicon": "keymanapp/node-windows-trayicon#keyman-16.0"
+    "node-hide-console-window": "^2.2.0"
   },
   "devDependencies": {
     "@keymanapp/keyman-version": "*",
@@ -32,6 +31,7 @@
     "@types/ws": "^8.2.2",
     "copyfiles": "^2.4.1",
     "mocha": "^10.0.0",
+    "node-gyp": "^10.2.0",
     "tsc-watch": "^4.5.0",
     "typescript": "^5.4.5"
   }
