@@ -291,11 +291,26 @@ namespace Trie {
    * @returns A JSON-serialiable object that can be given to the TrieModel constructor.
    */
   export function buildTrie(wordlist: WordList, keyFunction: SearchTermToKey): object {
-    let root = new Trie(keyFunction).buildFromWordList(wordlist).root;
+    let trie = new Trie(keyFunction);
+    buildFromWordList(trie, wordlist);
+    const root = trie.root;
     return {
       totalWeight: sumWeights(root),
       root: root
     }
+  }
+
+  /**
+   * Populates the trie with the contents of an entire wordlist.
+   * @param words a list of word and count pairs.
+   */
+  function buildFromWordList(trie: Trie, words: WordList): Trie {
+    for (let [wordform, weight] of Object.entries(words)) {
+      let key = trie.toKey(wordform);
+      addUnsorted(trie.root, { key, weight, content: wordform }, 0);
+    }
+    sortTrie(trie.root);
+    return trie;
   }
 
   /**
@@ -306,19 +321,6 @@ namespace Trie {
     toKey: SearchTermToKey;
     constructor(wordform2key: SearchTermToKey) {
       this.toKey = wordform2key;
-    }
-
-    /**
-     * Populates the trie with the contents of an entire wordlist.
-     * @param words a list of word and count pairs.
-     */
-    buildFromWordList(words: WordList): Trie {
-      for (let [wordform, weight] of Object.entries(words)) {
-        let key = this.toKey(wordform);
-        addUnsorted(this.root, { key, weight, content: wordform }, 0);
-      }
-      sortTrie(this.root);
-      return this;
     }
   }
 
