@@ -1,5 +1,4 @@
 import { isHighSurrogate, isSentinel, SearchKey, SENTINEL_CODE_UNIT, Wordform2Key } from "./common.js";
-import { sortNode } from "./trie-builder.js";
 
 // The following trie implementation has been (heavily) derived from trie-ing
 // by Conrad Irwin.
@@ -51,6 +50,37 @@ export interface Entry {
   /** A search key that usually simplifies the word form, for ease of search. */
   key: SearchKey;
   weight: number;
+}
+
+/**
+ * Recursively sort the trie, in descending order of weight.
+ * @param node any node in the trie
+ */
+export function sortNode(node: Node, onlyLocal?: boolean) {
+  if (node.type === 'leaf') {
+    if (!node.unsorted) {
+      return;
+    }
+
+    node.entries.sort(function (a, b) { return b.weight - a.weight; });
+  } else {
+    if(!onlyLocal) {
+      // We recurse and sort children before returning if sorting the full Trie.
+      for (let char of node.values) {
+        sortNode(node.children[char], onlyLocal);
+      }
+    }
+
+    if (!node.unsorted) {
+      return;
+    }
+
+    node.values.sort((a, b) => {
+      return node.children[b].weight - node.children[a].weight;
+    });
+  }
+
+  delete node.unsorted;
 }
 
 export class TrieTraversal implements LexiconTraversal {

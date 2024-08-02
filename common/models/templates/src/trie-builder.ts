@@ -1,5 +1,5 @@
 import { SENTINEL_CODE_UNIT, Wordform2Key } from "./common.js";
-import { Entry, InternalNode, Leaf, Node, Trie } from "./trie.js";
+import { Entry, InternalNode, Leaf, Node, Trie, sortNode } from "./trie.js";
 
 export function createRootNode(): Node {
   return {
@@ -103,37 +103,6 @@ export function convertLeafToInternalNode(leaf: Leaf, depth: number): void {
   }
 
   internal.unsorted = true;
-}
-
-/**
- * Recursively sort the trie, in descending order of weight.
- * @param node any node in the trie
- */
-export function sortNode(node: Node, onlyLocal?: boolean) {
-  if (node.type === 'leaf') {
-    if (!node.unsorted) {
-      return;
-    }
-
-    node.entries.sort(function (a, b) { return b.weight - a.weight; });
-  } else {
-    if(!onlyLocal) {
-      // We recurse and sort children before returning if sorting the full Trie.
-      for (let char of node.values) {
-        sortNode(node.children[char], onlyLocal);
-      }
-    }
-
-    if (!node.unsorted) {
-      return;
-    }
-
-    node.values.sort((a, b) => {
-      return node.children[b].weight - node.children[a].weight;
-    });
-  }
-
-  delete node.unsorted;
 }
 
 /**
