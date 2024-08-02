@@ -124,7 +124,7 @@
 
 ## 18.0.63 alpha 2024-06-26
 
-* feat(linux): implement Linux side of SimulateAltGr option :checkered_flag: (#11852)
+* feat(linux): implement Linux side of SimulateAltGr option (#11852)
 
 ## 18.0.62 alpha 2024-06-25
 
@@ -136,8 +136,8 @@
 
 * feat(web): optimization via lazy preprocessing of keyboard touch-layout info (#11265)
 * fix(android): clear globe highlight when displaying keyboard picker (#11826)
-* refactor(linux): add KeymanOption class for options :checkered_flag: (#11850)
-* refactor(linux): rename methods that deal with keyboard options :checkered_flag: (#11851)
+* refactor(linux): add KeymanOption class for options (#11850)
+* refactor(linux): rename methods that deal with keyboard options (#11851)
 
 ## 18.0.60 alpha 2024-06-21
 
