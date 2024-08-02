@@ -20,3 +20,22 @@ import { fileURLToPath } from 'url';
 export function loadFile(filename: string | URL): Buffer {
   return fs.readFileSync(filename);
 }
+
+export function resolveFilename(baseFilename: string, filename: string) {
+  const basePath =
+    baseFilename.endsWith('/') || baseFilename.endsWith('\\') ?
+    baseFilename :
+    path.dirname(baseFilename);
+  // Transform separators to platform separators -- we are agnostic
+  // in our use here but path prefers files may use
+  // either / or \, although older kps files were always \.
+  if(path.sep == '/') {
+    filename = filename.replace(/\\/g, '/');
+  } else {
+    filename = filename.replace(/\//g, '\\');
+  }
+  if(!path.isAbsolute(filename)) {
+    filename = path.resolve(basePath, filename);
+  }
+  return filename;
+}

@@ -2,7 +2,8 @@
 // Version 1.0 and 2.0 of Keyman Developer Project .kpj file
 //
 
-import { CompilerCallbacks, KeymanFileTypes } from '@keymanapp/common-types';
+import { KeymanFileTypes } from '@keymanapp/common-types';
+import { CompilerCallbacks } from '../../compiler-interfaces.js';
 
 export class KeymanDeveloperProject {
   options: KeymanDeveloperProjectOptions;

@@ -1,5 +1,5 @@
-import { KMXPlus, CompilerCallbacks } from "@keymanapp/common-types";
-import { LDMLKeyboard } from "@keymanapp/developer-utils";
+import { KMXPlus } from "@keymanapp/common-types";
+import { CompilerCallbacks, LDMLKeyboard } from "@keymanapp/developer-utils";
 import { SectionIdent, constants } from '@keymanapp/ldml-keyboard-constants';
 
 /** newable interface to SectionCompiler c'tor */

@@ -2,7 +2,7 @@ import 'mocha';
 import {assert} from 'chai';
 import { loadFile, makePathToFixture } from './index.js';
 import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboardXMLSourceFileReaderOptions } from '../../src/types/ldml-keyboard/ldml-keyboard-xml-reader.js';
-import { CompilerEvent } from '@keymanapp/common-types';
+import { CompilerEvent } from '../../src/compiler-interfaces.js';
 import { LDMLKeyboardXMLSourceFile } from '../../src/types/ldml-keyboard/ldml-keyboard-xml.js';
 import { LDMLKeyboardTestDataXMLSourceFile } from '../../src/types/ldml-keyboard/ldml-keyboard-testdata-xml.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';

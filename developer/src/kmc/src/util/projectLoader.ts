@@ -1,8 +1,8 @@
 
 import * as path from 'path';
 import * as fs from 'fs';
-import { CompilerCallbacks, KeymanFileTypes } from "@keymanapp/common-types";
-import { KeymanDeveloperProject, KPJFileReader } from "@keymanapp/developer-utils";
+import { KeymanFileTypes } from "@keymanapp/common-types";
+import { CompilerCallbacks, KeymanDeveloperProject, KPJFileReader } from "@keymanapp/developer-utils";
 import { InfrastructureMessages } from "../messages/infrastructureMessages.js";
 
 export const isProject = (filename: string): boolean =>
