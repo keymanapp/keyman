@@ -477,9 +477,16 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMDisplayIM(HWND hwnd, BOOL FShowAlw
 
     IMTop.x = Caret.x + RectApp.left;
     IMTop.y = Caret.y + RectApp.top + 24;
+    LONG IMWidth = RectIM.right - RectIM.left;
 
-    if (IMTop.x + RectIM.right - RectIM.left > RectApp.right) {
-      IMTop.x = RectApp.right - (RectIM.right - RectIM.left);
+    if (IMTop.x + IMWidth > RectApp.right) {
+      // align IM right edge with App right edge
+      if (IMWidth < (RectApp.right - RectApp.left)) {
+        IMTop.x = RectApp.right - IMWidth;
+      }
+      else { // align IM left edge with App left edge
+        IMTop.x = RectApp.left;
+      }
     }
 
     if (IMTop.y + RectIM.bottom - RectIM.top > RectApp.bottom) {
