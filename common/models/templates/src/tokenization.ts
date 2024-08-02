@@ -113,7 +113,7 @@ export function tokenize(
       // But we don't have character class access here; it's all wordbreaker-function internal.
       // Upon inspection of the wordbreaker data definitions... the single-quote-class is ONLY "'".
       // So... we'll just be lazy for now and append the `'`.
-      if(rejoins.indexOf(leftTail!.text) != -1) {
+      if(rejoins.indexOf(leftTail.text) != -1) {
         tokenization.left.pop(); // leftTail
         tokenization.left.pop(); // leftTailBase
         tokenization.left.push({
