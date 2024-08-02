@@ -48,7 +48,6 @@ std::u16string u16string_from_wstring(std::wstring const wstr) {
 
 // UTF16 (=const wchar_t*) -> -> std::string  -> std::u16string -> UTF16 ( = char16_t*)
 /** @brief Convert pointer to wchar_t to u16string and copy sz elements into dst */
-
 void u16sprintf(KMX_WCHAR* dst, const size_t sz, const wchar_t* fmt, ...) {
   wchar_t* wbuf = new wchar_t[sz];
   va_list args;

@@ -150,8 +150,7 @@ int get_keycode_from_keyname(std::string key_name);
  * @brief  process each element of a 1D-Vector, split and write to a 3D-Vector
  * @param[in,out] all_US        a 3D_Vector containing all keyvalues of the US keyboard
  * @param         completeList  a 1D-Vector containing all relevant entries copied from the symbol file us basic
- * @return 0 on success;
- *         if entry can be split
+ * @return 0 on success if entry can be split
  */
 int split_US_To_3D_Vector(vec_dword_3D& all_US, vec_string_1D completeList);
 
@@ -175,7 +174,7 @@ int append_underlying_ToVector(vec_dword_3D& all_vector, GdkKeymap* keymap);
 
 /**
  * @brief  create a pointer to pointer of the current keymap for later use
- * @param  keymap pointer to pointer to currently used (underlying) keyborad layout
+ * @param  keymap pointer to pointer to currently used (underlying) keyboard layout
  * @param  argc   count of arguments
  * @param  argv   array of arguments
  * @return FALSE on success;
@@ -661,7 +660,7 @@ KMX_DWORD KMX_get_KeyValUnderlying_From_KeyValUS(vec_dword_3D& all_vector, KMX_D
 KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeyCodeUS(GdkKeymap* keymap, vec_dword_3D& all_vector, KMX_DWORD kc_us, ShiftState ss, int caps);
 
 /**
- *  return the keycode of the currently used (underlying) keyboard for a given virtual key of the US keyboard
+ * @brief return the keycode of the currently used (underlying) keyboard for a given virtual key of the US keyboard
  *         "Where on an underlying keyboard do we find a character of a US keyboard?"
  * @param  virtualKeyUS a virtual key of the US keyboard
  * @return the keycode of the currently used (underlying) keyboard
@@ -669,7 +668,7 @@ KMX_DWORD KMX_get_KeyCodeUnderlying_From_KeyCodeUS(GdkKeymap* keymap, vec_dword_
 KMX_DWORD KMX_get_KeyCodeUnderlying_From_VKUS(KMX_DWORD virtualKeyUS);
 
 /**
- *  return a virtual key of the US keyboard for a given keycode of the currently used (underlying) keyboard
+ * @brief return a virtual key of the US keyboard for a given keycode of the currently used (underlying) keyboard
  *         "Which key of a underlying keyboard will be mapped to a virtual key of a US keyboard?"
  * @param  keycode a keycode of the currently used (underlying) keyboard
  * @return the virtual key of the US keyboard or

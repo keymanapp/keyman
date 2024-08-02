@@ -175,7 +175,7 @@ int  u16ncmp(const KMX_WCHAR* p, const KMX_WCHAR* q, size_t count);
  * @param  p   Pointer to u16string to parse.
  * @param  ch  the delimiter character
  * @param  ctx the remaining string after the first delimiter
- * @return PPointer to the first token in p
+ * @return Pointer to the first token in p
  */
 KMX_WCHAR* u16tok(KMX_WCHAR* p, const KMX_WCHAR ch, KMX_WCHAR** ctx);
 

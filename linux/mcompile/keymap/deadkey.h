@@ -37,7 +37,7 @@ bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey*>& dkVec);
  * @return true if successful;
  *         false if not
  */
-bool query_dk_combinations_for_specific_dk(vec_dword_2D& dk_ComposeTable, KMX_DWORD dk, vec_dword_2D& dk_SingleTable);
+bool query_dk_combinations_for_specific_dk(vec_dword_2D& r_dk_ComposeTable, KMX_DWORD dk, vec_dword_2D& dk_SingleTable);
 
 /**
  * @brief  convert a character to the upper-case equivalent and find the corresponding shiftstate
