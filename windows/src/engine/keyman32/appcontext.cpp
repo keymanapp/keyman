@@ -28,21 +28,16 @@ AppContext::Delete() {
   } else if (CharIsSurrogatePair()) {
     pos--;
   }
-  // SendDebugMessageFormat(0, sdmAIDefault, 0, "AppContext::Delete");
 
   if (pos > 0)
     pos--;
   CurContext[pos] = 0;
-  // if(--pos < 0) pos = 0;
-  // SendDebugMessageFormat(0, sdmAIDefault, 0, "AppContext: Delete");
 }
 
 void
 AppContext::Reset() {
   pos           = 0;
   CurContext[0] = 0;
-
-  //	SendDebugMessageFormat(0, sdmAIDefault, 0, "AppContext: Reset");
 }
 
 void

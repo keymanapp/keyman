@@ -484,10 +484,10 @@ export class KmnCompilerMessages {
     `Invalid key identifier "${def(o.keyId)}"`);
 
   static ERROR_90FeatureOnlyLayoutFile                        = SevError | 0x05C;
-  static Error_90FeatureOnlyLayoutFile                        = () => m(this.ERROR_90FeatureOnlyLayoutFile, `Touch layout file reference requires store(version) '9.0'or higher`);
+  static Error_90FeatureOnlyLayoutFile                        = () => m(this.ERROR_90FeatureOnlyLayoutFile, `Touch layout file reference requires store(version) '9.0' or higher`);
 
   static ERROR_90FeatureOnlyKeyboardVersion                   = SevError | 0x05D;
-  static Error_90FeatureOnlyKeyboardVersion                   = () => m(this.ERROR_90FeatureOnlyKeyboardVersion, `KeyboardVersion system store requires store(version) '9.0'or higher`);
+  static Error_90FeatureOnlyKeyboardVersion                   = () => m(this.ERROR_90FeatureOnlyKeyboardVersion, `KeyboardVersion system store requires store(version) '9.0' or higher`);
 
   static ERROR_KeyboardVersionFormatInvalid                   = SevError | 0x05E;
   static Error_KeyboardVersionFormatInvalid                   = () => m(this.ERROR_KeyboardVersionFormatInvalid, `KeyboardVersion format is invalid, expecting dot-separated integers`);
@@ -496,16 +496,16 @@ export class KmnCompilerMessages {
   static Error_ContextExHasInvalidOffset                      = () => m(this.ERROR_ContextExHasInvalidOffset, `context() statement has offset out of range`);
 
   static ERROR_90FeatureOnlyEmbedCSS                          = SevError | 0x060;
-  static Error_90FeatureOnlyEmbedCSS                          = () => m(this.ERROR_90FeatureOnlyEmbedCSS, `Embedding CSS requires store(version) '9.0'or higher`);
+  static Error_90FeatureOnlyEmbedCSS                          = () => m(this.ERROR_90FeatureOnlyEmbedCSS, `Embedding CSS requires store(version) '9.0' or higher`);
 
   static ERROR_90FeatureOnlyTargets                           = SevError | 0x061;
-  static Error_90FeatureOnlyTargets                           = () => m(this.ERROR_90FeatureOnlyTargets, `TARGETS system store requires store(version) '9.0'or higher`);
+  static Error_90FeatureOnlyTargets                           = () => m(this.ERROR_90FeatureOnlyTargets, `TARGETS system store requires store(version) '9.0' or higher`);
 
   static ERROR_ContextAndIndexInvalidInMatchNomatch           = SevError | 0x062;
   static Error_ContextAndIndexInvalidInMatchNomatch           = () => m(this.ERROR_ContextAndIndexInvalidInMatchNomatch, `context and index statements cannot be used in a match or nomatch statement`);
 
   static ERROR_140FeatureOnlyContextAndNotAnyWeb              = SevError | 0x063;
-  static Error_140FeatureOnlyContextAndNotAnyWeb              = () => m(this.ERROR_140FeatureOnlyContextAndNotAnyWeb, `For web and touch platforms, context() statement referring to notany() requires store(version) '14.0'or higher`);
+  static Error_140FeatureOnlyContextAndNotAnyWeb              = () => m(this.ERROR_140FeatureOnlyContextAndNotAnyWeb, `For web and touch platforms, context() statement referring to notany() requires store(version) '14.0' or higher`);
 
 
   static ERROR_ExpansionMustFollowCharacterOrVKey             = SevError | 0x064;
@@ -573,6 +573,12 @@ export class KmnCompilerMessages {
 
   static ERROR_NonBMPCharactersNotSupportedInKeySection       = SevError | 0x079;
   static Error_NonBMPCharactersNotSupportedInKeySection       = () => m(this.ERROR_NonBMPCharactersNotSupportedInKeySection, `Characters with codepoints over U+FFFF are not supported in the key part of the rule`);
+
+  static ERROR_InvalidTarget                                  = SevError | 0x07A;
+  static Error_InvalidTarget                                  = () => m(this.ERROR_InvalidTarget, `Unrecognized compile target`);
+
+  static ERROR_NoTargetsSpecified                             = SevError | 0x07B;
+  static Error_NoTargetsSpecified                             = () => m(this.ERROR_NoTargetsSpecified, `At least one compile target must be specified`);
 
   static WARN_TooManyWarnings                                 = SevWarn | 0x080;
   static Warn_TooManyWarnings                                 = () => m(this.WARN_TooManyWarnings, `Too many warnings or errors`);
@@ -729,20 +735,18 @@ export class KmnCompilerMessages {
   static WARN_VirtualKeyInOutput                              = SevWarn | 0x0AF;
   static Warn_VirtualKeyInOutput                              = () => m(this.WARN_VirtualKeyInOutput, `Virtual keys are not supported in output`);
 
+  static HINT_IndexStoreLong                                  = SevHint | 0x0B0;
+  static Hint_IndexStoreLong                                  = () => m(
+    this.HINT_IndexStoreLong,
+    `The store referenced in index() is longer than the store referenced in any()`
+  );
+
   static FATAL_BufferOverflow                                 = SevFatal | 0x0C0;
-  static Fatal_BufferOverflow                                = () => m(this.FATAL_BufferOverflow, `The compiler memory buffer overflowed`);
+  static Fatal_BufferOverflow                                 = () => m(this.FATAL_BufferOverflow, `The compiler memory buffer overflowed`);
 
   static FATAL_Break                                          = SevFatal | 0x0C1;
-  static Fatal_Break                                         = () => m(this.FATAL_Break, `Compiler interrupted by user`);
+  static Fatal_Break                                          = () => m(this.FATAL_Break, `Compiler interrupted by user`);
 };
-
-/**
- * @internal
- * TODO: This class is here as a stopgap as we merged it with
- * KmnCompilerMessages. It should be removed in v18.0.
- */
-export class CompilerMessages extends KmnCompilerMessages {
-}
 
 export function mapErrorFromKmcmplib(line: number, code: number, msg: string): CompilerEvent {
   const severity = LogLevelToSeverity[code & LogLevel.LEVEL_MASK];
