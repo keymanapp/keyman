@@ -19,6 +19,7 @@
 #include <atlbase.h>
 #include<sstream>
 #include<iomanip>
+#include <kmtip_guids.h>
 
 const LPCTSTR SFolderKeymanRoot = TEXT("\\Keyman");
 
@@ -98,12 +99,9 @@ __declspec(dllexport) DWORD EnginePostInstall(MSIHANDLE hInstall) {
     CloseHandle(hFile);
   }
 
-  CoTaskMemFree(path);
+  delete[] path;
   return ERROR_SUCCESS;
 }
-
-// Define the CLS ID for KMTip Text Service
-DEFINE_GUID(c_clsidKMTipTextService, 0xFE0420F1, 0x38D1, 0x4B4C, 0x96, 0xBF, 0xE7, 0xE2, 0x0A, 0x74, 0xCF, 0xB7);
 
 // Define the CLASS_TF_InputProcessorProfiles constant
 DEFINE_GUID(CLASS_TF_InputProcessorProfiles, 0x33C53A50, 0xF456, 0x4884, 0xB0, 0x49, 0x85, 0xFD, 0x64, 0x3E, 0xCF, 0xED);
