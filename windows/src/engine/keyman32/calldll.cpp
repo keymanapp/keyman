@@ -439,11 +439,11 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMDisplayIM(HWND hwnd, BOOL FShowAlw
 	*Globals::hwndIMAlways() = FShowAlways;
 
 	POINT IMTop, Caret;
-  RECT RectIM, RectApp;
-  HWND hFocus;
-  int n = 0;
+	RECT RectIM, RectApp;
+	HWND hFocus;
+	int n = 0;
 
-  HMONITOR hMonitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+	HMONITOR hMonitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
 	if (hMonitor == NULL) {
 		return FALSE;
 	}
@@ -459,9 +459,9 @@ extern "C" BOOL _declspec(dllexport) WINAPI KMDisplayIM(HWND hwnd, BOOL FShowAlw
   }
 
   // Only adjust the IM window coordinates if it is not going to be visible on the
-  // monitor it is currently showing on. Otherwise leave it to the 3rd paryt app
+  // monitor it is currently showing on. Otherwise leave it to the 3rd party app
   // to control the location of the IM Window.
-  // If changing the coordinates place the IM window use the caret postion of the
+  // If changing the coordinates to place the IM window use the caret postion of the
   // application that has focus.
   if ((RectIM.left < monitor_info.rcMonitor.left) || (RectIM.right > monitor_info.rcMonitor.right) ||
       (RectIM.top < monitor_info.rcMonitor.top) || (RectIM.bottom > monitor_info.rcMonitor.bottom)) {
