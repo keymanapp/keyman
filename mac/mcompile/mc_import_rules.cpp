@@ -1,5 +1,5 @@
 /*
- * Keyman is copyright (C) 2004 SIL International. MIT License.
+ * Keyman is copyright (C) 2004 - 2024 SIL International. MIT License.
  *
  * Mnemonic layout support for mac
  */
@@ -94,7 +94,7 @@ KMX_WCHAR mac_KMX_DeadKeyMap(int index, std::vector<DeadKey*>*deadkeys, int dead
   return 0xFFFF;
 }
 
-/** @brief  Base class for dealing with rgkey*/
+/** @brief Base class for dealing with rgkey*/
 class mac_KMX_VirtualKey {
 private:
   UINT m_vk;
@@ -316,7 +316,7 @@ public:
   }
 };
 
-/** @brief  Base class for KMX_loader*/
+/** @brief Base class for KMX_loader*/
 class mac_KMX_Loader {
 private:
   KMX_BYTE lpKeyStateNull[256];
@@ -382,8 +382,8 @@ public:
 };
 
 /** 
- * @brief find the maximum index of a deadkey
- * @param p pointer to deadkey
+ * @brief  find the maximum index of a deadkey
+ * @param  p pointer to deadkey
  * @return index of deadkey
  */
 int mac_KMX_GetMaxDeadkeyIndex(KMX_WCHAR* p) {
@@ -403,10 +403,10 @@ int mac_KMX_GetMaxDeadkeyIndex(KMX_WCHAR* p) {
  *         On Linux   the values of rgkey are sorted according to the VK of the the US keyboard
  *         Since Linux Keyboards do not use a VK mcompile uses the VK of the the US keyboard because
  *         these are available in mcompile through USVirtualKeyToScanCode/ScanCodeToUSVirtualKey and an offset of 8
- * @param  kp pointer to keyboard
- * @param  all_vector vector that holds the data of the US keyboard and the currently used (underlying) keyboard
- * @param  keyboard_layout the currently used (underlying)keyboard Layout
- * @param  FDeadkeys vector of all deadkeys for the currently used (underlying)keyboard Layout
+ * @param  kp                 pointer to keyboard
+ * @param  all_vector         vector that holds the data of the US keyboard and the currently used (underlying) keyboard
+ * @param  keyboard_layout    the currently used (underlying)keyboard Layout
+ * @param  FDeadkeys          vector of all deadkeys for the currently used (underlying)keyboard Layout
  * @param  bDeadkeyConversion 1 to convert a deadkey to a character; 0 no conversion
  * @return true in case of success
  */

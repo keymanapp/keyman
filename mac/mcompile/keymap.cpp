@@ -1,5 +1,5 @@
 /*
- * Keyman is copyright (C) SIL International. MIT License.
+ * Keyman is copyright (C) 2004 - 2024 SIL International. MIT License.
  *
  * Mnemonic layout support for mac
  *
@@ -139,17 +139,17 @@ bool mac_InitializeUCHR(const UCKeyboardLayout** keyboard_layout) {
   TISInputSourceRef source = TISCopyCurrentKeyboardInputSource();
   if (!source) {
     printf("ERROR: can't get source\n");
-    return 1;
+    return TRUE;
   }
 
   CFDataRef layout_data = static_cast<CFDataRef>((TISGetInputSourceProperty(source, kTISPropertyUnicodeKeyLayoutData)));
   *keyboard_layout = reinterpret_cast<const UCKeyboardLayout*>(CFDataGetBytePtr(layout_data));
   if (!keyboard_layout) {
     printf("ERROR: Can't get keyboard_layout\n");
-    return 2;
+    return TRUE;
   }
   // intentionally leaking `source` in order to still be able to access `keyboard_layout`
-  return 0;
+  return FALSE;
 }
 
 /** @brief return the keyvalue for a given Keycode, shiftstate and caps */
