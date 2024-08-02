@@ -3,11 +3,7 @@
 /// <reference types="@keymanapp/models-types" />
 
 import ContextWindow from "./contextWindow.js";
-<<<<<<<< HEAD:web/src/engine/main/src/text/inputProcessor.ts
-import { LanguageProcessor }  from "./prediction/languageProcessor.js";
-========
 import { LanguageProcessor }  from "./languageProcessor.js";
->>>>>>>> e57c3059e3 (chore(web): move `common/web/input-processor/` → `web/src/engine/main/`):web/src/engine/main/src/headless/inputProcessor.ts
 import type { ModelSpec }  from "keyman/engine/interfaces";
 import { globalObject, DeviceSpec } from "@keymanapp/web-utils";
 
