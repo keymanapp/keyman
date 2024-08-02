@@ -1,7 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as kmcLdml from '@keymanapp/kmc-ldml';
-import { CompilerCallbacks, defaultCompilerOptions, LDMLKeyboardTestDataXMLSourceFile, LDMLKeyboardXMLSourceFileReader } from '@keymanapp/common-types';
+import { CompilerCallbacks, defaultCompilerOptions } from '@keymanapp/common-types';
+import { LDMLKeyboardTestDataXMLSourceFile, LDMLKeyboardXMLSourceFileReader } from '@keymanapp/developer-utils';
 import { NodeCompilerCallbacks } from '../../util/NodeCompilerCallbacks.js';
 import { fileURLToPath } from 'url';
 import { CommandLineBaseOptions } from 'src/util/baseOptions.js';
