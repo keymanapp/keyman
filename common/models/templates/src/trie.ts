@@ -23,12 +23,22 @@ export interface InternalNode {
    * in sorted order in the .values array.
    */
   children: { [codeunit: string]: Node };
+
+  /**
+   * Used during compilation.
+   */
+  unsorted?: boolean;
 }
 /** Only leaf nodes actually contain entries (i.e., the words proper). */
 export interface Leaf {
   type: 'leaf';
   weight: number;
   entries: Entry[];
+
+  /**
+   * Used during compilation.
+   */
+  unsorted?: boolean;
 }
 
 /**
@@ -88,11 +98,25 @@ export class TrieTraversal implements LexiconTraversal {
     return traversal;
   }
 
+  private sortNodeIfNeeded(node: Node) {
+    if(node.unsorted) {
+      if(node.type == 'leaf') {
+        node.entries.sort((a, b) => b.weight - a.weight)
+      } else {
+        node.values.sort((a, b) => node.children[b].weight - node.children[a].weight);
+      }
+
+      node.unsorted = false;
+    }
+  }
+
   // Handles one code unit at a time.
   private _child(char: USVString): TrieTraversal | undefined {
     const root = this.root;
     const totalWeight = this.totalWeight;
     const nextPrefix = this.prefix + char;
+
+    this.sortNodeIfNeeded(root);
 
     if(root.type == 'internal') {
       let childNode = root.children[char];
@@ -118,6 +142,8 @@ export class TrieTraversal implements LexiconTraversal {
   *children(): Generator<{char: USVString, traversal: () => LexiconTraversal}> {
     let root = this.root;
     const totalWeight = this.totalWeight;
+
+    this.sortNodeIfNeeded(root);
 
     if(root.type == 'internal') {
       for(let entry of root.values) {
@@ -223,7 +249,7 @@ export class TrieTraversal implements LexiconTraversal {
  * Wrapper class for the trie and its nodes.
  */
 export class Trie {
-  private root: Node;
+  protected root: Node;
   /** The total weight of the entire trie. */
   readonly totalWeight: number;
   /**
