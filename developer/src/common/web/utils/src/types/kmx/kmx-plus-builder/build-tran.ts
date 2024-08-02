@@ -1,9 +1,12 @@
 
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { Bksp, Tran } from "../kmx-plus.js";
+import { KMXPlus } from "@keymanapp/common-types";
 import { BUILDER_ELEM, BUILDER_ELEM_REF, build_elem_index } from "./build-elem.js";
 import { BUILDER_STRS, BUILDER_STR_REF, build_strs_index } from "./build-strs.js";
 import { BUILDER_SECTION } from "./builder-section.js";
+
+import Bksp = KMXPlus.Bksp;
+import Tran = KMXPlus.Tran;
 
 /* ------------------------------------------------------------------
 * tran section
@@ -44,7 +47,7 @@ export function build_tran(source_tran: Tran | Bksp, sect_strs: BUILDER_STRS, se
     return null;
   }
 
-  let tran: BUILDER_TRAN = {
+  const tran: BUILDER_TRAN = {
     ident: constants.hex_section_id(source_tran.id),
     size: 0, // need to compute total transforms + reorders
     _offset: 0,
@@ -56,14 +59,14 @@ export function build_tran(source_tran: Tran | Bksp, sect_strs: BUILDER_STRS, se
     reorders: [],
   };
 
-  for (let group of source_tran.groups) {
+  for (const group of source_tran.groups) {
     if (group.type === constants.tran_group_type_transform) {
       tran.groups.push({
         type: group.type,
         count: group.transforms.length,
         index: tran.transforms.length, // index of first item
       });
-      for (let transform of group.transforms) {
+      for (const transform of group.transforms) {
         tran.transforms.push({
           from: build_strs_index(sect_strs, transform.from),
           to: build_strs_index(sect_strs, transform.to),
@@ -77,7 +80,7 @@ export function build_tran(source_tran: Tran | Bksp, sect_strs: BUILDER_STRS, se
         count: group.reorders.length,
         index: tran.reorders.length, // index of first item
       });
-      for (let reorder of group.reorders) {
+      for (const reorder of group.reorders) {
         tran.reorders.push({
           elements: build_elem_index(sect_elem, reorder.elements),
           before: build_elem_index(sect_elem, reorder.before),

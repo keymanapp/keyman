@@ -1,11 +1,9 @@
-import * as xml2js from '../deps/xml2js/xml2js.js';
+import { SchemaValidators, CommonTypesMessages, CompilerCallbacks, util, xml2js } from '@keymanapp/common-types';
 import { LDMLKeyboardXMLSourceFile, LKImport, ImportStatus } from './ldml-keyboard-xml.js';
-import { boxXmlArray } from '../util/util.js';
-import { CompilerCallbacks } from '../util/compiler-interfaces.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
-import { CommonTypesMessages } from '../util/common-events.js';
 import { LDMLKeyboardTestDataXMLSourceFile, LKTTest, LKTTests } from './ldml-keyboard-testdata-xml.js';
-import SchemaValidators from '../schema-validators.js';
+
+import boxXmlArray = util.boxXmlArray;
 
 interface NameAndProps  {
   '$'?: any; // content
@@ -22,7 +20,7 @@ export class LDMLKeyboardXMLSourceFileReader {
   }
 
   static get defaultImportsURL(): [string,string] {
-    return ['../import/', import.meta.url];
+    return ['../../import/', import.meta.url];
   }
 
   readImportFile(version: string, subpath: string): Uint8Array {
@@ -63,10 +61,10 @@ export class LDMLKeyboardXMLSourceFileReader {
     boxXmlArray(source?.keyboard3?.locales, 'locale');
     boxXmlArray(source?.keyboard3, 'transforms');
     if(source?.keyboard3?.layers) {
-      for(let layers of source?.keyboard3?.layers) {
+      for(const layers of source?.keyboard3?.layers) {
         boxXmlArray(layers, 'layer');
         if(layers?.layer) {
-          for(let layer of layers?.layer) {
+          for(const layer of layers?.layer) {
             boxXmlArray(layer, 'row');
           }
         }
@@ -74,13 +72,13 @@ export class LDMLKeyboardXMLSourceFileReader {
     }
     if(source?.keyboard3?.forms?.form) {
       boxXmlArray(source?.keyboard3?.forms, 'form');
-      for(let form of source?.keyboard3?.forms?.form) {
+      for(const form of source?.keyboard3?.forms?.form) {
         boxXmlArray(form, 'scanCodes');
       }
     }
     if(source?.keyboard3?.flicks) {
       boxXmlArray(source?.keyboard3?.flicks, 'flick');
-      for(let flick of source?.keyboard3?.flicks?.flick) {
+      for(const flick of source?.keyboard3?.flicks?.flick) {
         boxXmlArray(flick, 'flickSegment');
       }
     }
@@ -90,9 +88,9 @@ export class LDMLKeyboardXMLSourceFileReader {
       boxXmlArray(source?.keyboard3?.variables, 'uset');
     }
     if(source?.keyboard3?.transforms) {
-      for(let transforms of source.keyboard3.transforms)  {
+      for(const transforms of source.keyboard3.transforms)  {
         boxXmlArray(transforms, 'transformGroup');
-        for (let transformGroup of transforms.transformGroup) {
+        for (const transformGroup of transforms.transformGroup) {
           boxXmlArray(transformGroup, 'transform');
           boxXmlArray(transformGroup, 'reorder');
         }
@@ -235,8 +233,8 @@ export class LDMLKeyboardXMLSourceFileReader {
    * @returns true if valid, false if invalid
    */
   public validate(source: LDMLKeyboardXMLSourceFile | LDMLKeyboardTestDataXMLSourceFile): boolean {
-    if(!SchemaValidators.ldmlKeyboard3(source)) {
-      for (let err of (<any>SchemaValidators.ldmlKeyboard3).errors) {
+    if(!SchemaValidators.default.ldmlKeyboard3(source)) {
+      for (const err of (<any>SchemaValidators.default.ldmlKeyboard3).errors) {
         this.callbacks.reportMessage(CommonTypesMessages.Error_SchemaValidationError({
           instancePath: err.instancePath,
           keyword: err.keyword,
@@ -250,9 +248,9 @@ export class LDMLKeyboardXMLSourceFileReader {
   }
 
   loadUnboxed(file: Uint8Array): LDMLKeyboardXMLSourceFile {
-    let source = (() => {
+    const source = (() => {
       let a: LDMLKeyboardXMLSourceFile;
-      let parser = new xml2js.Parser({
+      const parser = new xml2js.Parser({
         explicitArray: false,
         mergeAttrs: true,
         includeWhiteChars: false,
@@ -289,9 +287,9 @@ export class LDMLKeyboardXMLSourceFileReader {
   }
 
   loadTestDataUnboxed(file: Uint8Array): any {
-    let source = (() => {
+    const source = (() => {
       let a: any;
-      let parser = new xml2js.Parser({
+      const parser = new xml2js.Parser({
         // explicitArray: false,
         preserveChildrenOrder:true, // needed for test data
         explicitChildren: true, // needed for test data

@@ -1,12 +1,18 @@
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import * as r from 'restructure';
 import { ElementString } from './element-string.js';
-import { ListItem } from './string-list.js';
-import { isOneChar, toOneChar, unescapeString, escapeStringForRegex } from '../util/util.js';
-import { KMXFile } from './kmx.js';
-import { UnicodeSetParser, UnicodeSet } from '@keymanapp/common-types';
-import { VariableParser } from '../ldml-keyboard/pattern-parser.js';
-import { MarkerParser } from '../ldml-keyboard/pattern-parser.js';
+import { ListItem } from '../../ldml-keyboard/string-list.js';
+import { util } from '@keymanapp/common-types';
+import { KMX } from '@keymanapp/common-types';
+import { UnicodeSetParser, UnicodeSet } from '../../ldml-keyboard/unicodeset-parser-api.js';
+import { VariableParser } from '../../ldml-keyboard/pattern-parser.js';
+import { MarkerParser } from '../../ldml-keyboard/pattern-parser.js';
+
+import isOneChar = util.isOneChar;
+import toOneChar = util.toOneChar;
+import unescapeString = util.unescapeString;
+import escapeStringForRegex = util.escapeStringForRegex;
+import KMXFile = KMX.KMXFile;
 
 // Implementation of file structures from /core/src/ldml/C7043_ldml.md
 // Writer in kmx-builder.ts

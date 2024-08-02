@@ -2,6 +2,7 @@
  * Helpers and utilities for the Mocha tests.
  */
 import * as path from 'path';
+import * as fs from "fs";
 import { fileURLToPath } from 'url';
 
 /**
@@ -16,3 +17,6 @@ import { fileURLToPath } from 'url';
   return fileURLToPath(new URL(path.join('..', '..', '..', 'test', 'fixtures', ...components), import.meta.url));
 }
 
+export function loadFile(filename: string | URL): Buffer {
+  return fs.readFileSync(filename);
+}

@@ -1,9 +1,14 @@
 
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { KMXPlusData, LayrEntry, LayrRow, StrsItem } from "../kmx-plus.js";
+import { KMXPlus } from "@keymanapp/common-types";
 import { build_strs_index, BUILDER_STR_REF, BUILDER_STRS } from "./build-strs.js";
 import { BUILDER_LIST } from "./build-list.js";
 import { BUILDER_SECTION } from "./builder-section.js";
+
+import KMXPlusData = KMXPlus.KMXPlusData;
+import LayrEntry = KMXPlus.LayrEntry;
+import LayrRow = KMXPlus.LayrRow;
+import StrsItem = KMXPlus.StrsItem;
 
 /* ------------------------------------------------------------------
  * layr section -
@@ -66,7 +71,7 @@ export function build_layr(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
     return null;  // if there aren't any layers at all (which should be an invalid keyboard)
   }
 
-  let layr: BUILDER_LAYR = {
+  const layr: BUILDER_LAYR = {
     ident: constants.hex_section_id(constants.section.layr),
     size: constants.length_layr,
     _offset: 0,
@@ -145,7 +150,7 @@ export function build_layr(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
   layr.rowCount = layr.rows.length;
   layr.keyCount = layr.keys.length;
 
-  let offset = constants.length_layr +
+  const offset = constants.length_layr +
     (constants.length_layr_list * layr.listCount) +
     (constants.length_layr_entry * layr.layerCount) +
     (constants.length_layr_row * layr.rowCount) +

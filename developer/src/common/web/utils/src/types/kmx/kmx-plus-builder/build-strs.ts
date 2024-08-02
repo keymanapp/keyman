@@ -1,6 +1,9 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { Strs, StrsItem } from "../kmx-plus.js";
+import { KMXPlus } from "@keymanapp/common-types";
 import { BUILDER_SECTION } from "./builder-section.js";
+
+import Strs = KMXPlus.Strs;
+import StrsItem = KMXPlus.StrsItem;
 
 /** reference from build_strs_index */
 export type BUILDER_STR_REF = number;
@@ -26,7 +29,7 @@ export interface BUILDER_STRS extends BUILDER_SECTION {
 };
 
 export function build_strs(source_strs: Strs): BUILDER_STRS {
-  let result: BUILDER_STRS = {
+  const result: BUILDER_STRS = {
     ident: constants.hex_section_id(constants.section.strs),
     size: 0,  // finalized later
     _offset: 0,
@@ -39,7 +42,7 @@ export function build_strs(source_strs: Strs): BUILDER_STRS {
 
   let offset = constants.length_strs + constants.length_strs_item * result.count;
   // TODO: consider padding
-  for(let item of result.items) {
+  for(const item of result.items) {
     item.offset = offset;
     offset += item.length * 2 + 2; /* UTF-16 code units + sizeof null terminator */
   }
@@ -64,7 +67,7 @@ export function build_strs_index(sect_strs: BUILDER_STRS, value: StrsItem) : BUI
     return <BUILDER_STR_REF>value.char;
   }
 
-  let result = sect_strs.items.findIndex(v => v._value === value.value);
+  const result = sect_strs.items.findIndex(v => v._value === value.value);
   if(result < 0) {
     throw new Error('unexpectedly missing StrsItem '+value.value);
   }

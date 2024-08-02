@@ -1,5 +1,5 @@
-import { OrderedStringList } from '../ldml-keyboard/pattern-parser.js';
-import { DependencySections, StrsItem, StrsOptions } from './kmx-plus.js';
+import { OrderedStringList } from './pattern-parser.js';
+import { DependencySections, StrsItem, StrsOptions } from '../kmx/kmx-plus/kmx-plus.js';
 
 /**
  * A single entry in a ListItem.

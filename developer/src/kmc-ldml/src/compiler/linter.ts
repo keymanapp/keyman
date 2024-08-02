@@ -1,4 +1,5 @@
-import { LDMLKeyboard, KMXPlus, CompilerCallbacks } from "@keymanapp/common-types";
+import { CompilerCallbacks, KMXPlus } from "@keymanapp/common-types";
+import { LDMLKeyboard } from "@keymanapp/developer-utils";
 
 /** newable interface to Linter c'tor */
 export type LinterNew = new (source: LDMLKeyboard.LDMLKeyboardXMLSourceFile, kmx: KMXPlus.KMXPlusFile, callbacks: CompilerCallbacks) => Linter;

@@ -1,7 +1,9 @@
 import { constants } from '@keymanapp/ldml-keyboard-constants';
-import { KMXPlusData } from "../kmx-plus.js";
+import { KMXPlus } from "@keymanapp/common-types";
 import { build_strs_index, BUILDER_STR_REF, BUILDER_STRS } from "./build-strs.js";
 import { BUILDER_SECTION } from './builder-section.js';
+
+import KMXPlusData = KMXPlus.KMXPlusData;
 
 /* ------------------------------------------------------------------
  * disp section
@@ -27,7 +29,7 @@ export function build_disp(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS): BUILD
     return null;
   }
 
-  let disp: BUILDER_DISP = {
+  const disp: BUILDER_DISP = {
     ident: constants.hex_section_id(constants.section.disp),
     size: constants.length_disp + constants.length_disp_item * kmxplus.disp.disps.length,
     _offset: 0,
@@ -36,7 +38,7 @@ export function build_disp(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS): BUILD
     items: []
   };
 
-  for(let item of kmxplus.disp.disps) {
+  for(const item of kmxplus.disp.disps) {
     disp.items.push({
       to: build_strs_index(sect_strs, item.to),
       id: build_strs_index(sect_strs, item.id),

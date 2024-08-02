@@ -6,8 +6,8 @@ TODO: implement additional interfaces:
 */
 
 // TODO: rename wasm-host?
-import { UnicodeSetParser, UnicodeSet, VisualKeyboard, KvkFileReader, KeymanCompiler, KeymanCompilerArtifacts, KeymanCompilerArtifactOptional, KeymanCompilerResult, KeymanCompilerArtifact } from '@keymanapp/common-types';
-import { CompilerCallbacks, CompilerEvent, CompilerOptions, KeymanFileTypes, KvkFileWriter } from '@keymanapp/common-types';
+import { VisualKeyboard, KvkFileReader, KeymanCompiler, KeymanCompilerArtifacts, KeymanCompilerArtifactOptional, KeymanCompilerResult, KeymanCompilerArtifact } from '@keymanapp/common-types';
+import { UnicodeSetParser, UnicodeSet, CompilerCallbacks, CompilerEvent, CompilerOptions, KeymanFileTypes, KvkFileWriter } from '@keymanapp/common-types';
 import { KvksFileReader } from '@keymanapp/developer-utils';
 import * as Osk from './osk.js';
 import loadWasmHost from '../import/kmcmplib/wasm-host.js';

@@ -1,10 +1,11 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { KMXPlusData } from "../kmx-plus.js";
+import { KMXPlus } from "@keymanapp/common-types";
 import { build_strs_index, BUILDER_STR_REF, BUILDER_STRS } from "./build-strs.js";
 import { BUILDER_SECTION } from "./builder-section.js";
 import { build_list_index, BUILDER_LIST, BUILDER_LIST_REF } from "./build-list.js";
 import { build_elem_index, BUILDER_ELEM, BUILDER_ELEM_REF } from "./build-elem.js";
 
+import KMXPlusData = KMXPlus.KMXPlusData;
 
 interface BUILDER_VARS_ITEM {
   type: number;

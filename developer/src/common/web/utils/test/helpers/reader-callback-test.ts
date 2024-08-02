@@ -1,11 +1,11 @@
 import 'mocha';
 import {assert} from 'chai';
-import { loadFile, makePathToFixture } from '../helpers/index.js';
-import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboardXMLSourceFileReaderOptions } from '../../src/ldml-keyboard/ldml-keyboard-xml-reader.js';
-import { CompilerEvent } from '../../src/util/compiler-interfaces.js';
-import { LDMLKeyboardXMLSourceFile } from '../../src/ldml-keyboard/ldml-keyboard-xml.js';
-import { LDMLKeyboardTestDataXMLSourceFile } from '../ldml-keyboard/ldml-keyboard-testdata-xml.js';
-import { TestCompilerCallbacks } from './TestCompilerCallbacks.js';
+import { loadFile, makePathToFixture } from './index.js';
+import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboardXMLSourceFileReaderOptions } from '../../src/types/ldml-keyboard/ldml-keyboard-xml-reader.js';
+import { CompilerEvent } from '@keymanapp/common-types';
+import { LDMLKeyboardXMLSourceFile } from '../../src/types/ldml-keyboard/ldml-keyboard-xml.js';
+import { LDMLKeyboardTestDataXMLSourceFile } from '../../src/types/ldml-keyboard/ldml-keyboard-testdata-xml.js';
+import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { fileURLToPath } from 'url';
 
 const readerOptions: LDMLKeyboardXMLSourceFileReaderOptions = {
@@ -77,14 +77,14 @@ export function testReaderCases(cases : CompilationCase[]) {
   // we need our own callbacks rather than using the global so messages don't get mixed
   const callbacks = new TestCompilerCallbacks();
   const reader = new LDMLKeyboardXMLSourceFileReader(readerOptions, callbacks);
-  for (let testcase of cases) {
+  for (const testcase of cases) {
     const expectFailure = testcase.throws || !!(testcase.errors); // if true, we expect this to fail
     const testHeading = expectFailure ? `should fail to load: ${testcase.subpath}`:
                                         `should load: ${testcase.subpath}`;
     it(testHeading, function () {
       callbacks.clear();
 
-      const data = loadFile(makePathToFixture(testcase.subpath));
+      const data = loadFile(makePathToFixture('ldml-keyboard', testcase.subpath));
       assert.ok(data, `reading ${testcase.subpath}`);
       const source = reader.load(data);
       if (!testcase.loadfail) {
@@ -128,14 +128,14 @@ export function testTestdataReaderCases(cases : TestDataCase[]) {
   // we need our own callbacks rather than using the global so messages don't get mixed
   const callbacks = new TestCompilerCallbacks();
   const reader = new LDMLKeyboardXMLSourceFileReader(readerOptions, callbacks);
-  for (let testcase of cases) {
+  for (const testcase of cases) {
     const expectFailure = testcase.throws || !!(testcase.errors); // if true, we expect this to fail
     const testHeading = expectFailure ? `should fail to load: ${testcase.subpath}`:
                                         `should load: ${testcase.subpath}`;
     it(testHeading, function () {
       callbacks.clear();
 
-      const data = loadFile(makePathToFixture(testcase.subpath));
+      const data = loadFile(makePathToFixture('ldml-keyboard', testcase.subpath));
       assert.ok(data, `reading ${testcase.subpath}`);
       const source = reader.loadTestData(data);
       if (!testcase.loadfail) {

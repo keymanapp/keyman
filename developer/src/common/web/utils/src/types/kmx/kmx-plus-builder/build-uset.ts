@@ -1,7 +1,11 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { KMXPlusData, StrsItem, UsetItem } from "../kmx-plus.js";
+import { KMXPlus } from "@keymanapp/common-types";
 import { build_strs_index, BUILDER_STR_REF, BUILDER_STRS } from "./build-strs.js";
 import { BUILDER_SECTION, BUILDER_U32CHAR } from "./builder-section.js";
+
+import KMXPlusData = KMXPlus.KMXPlusData;
+import StrsItem = KMXPlus.StrsItem;
+import UsetItem = KMXPlus.UsetItem;
 
 /** reference from build_uset_index */
 export type BUILDER_USET_REF = number;
@@ -80,7 +84,7 @@ export function build_uset_index(sect_uset: BUILDER_USET, value: UsetItem) {
     }
   }
 
-  let result = sect_uset.usets.findIndex(v => v._pattern.value === value.str.value);
+  const result = sect_uset.usets.findIndex(v => v._pattern.value === value.str.value);
   if(result < 0) {
     throw new Error('unexpectedly missing UsetItem ' + value.uset.toString());
   }

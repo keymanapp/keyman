@@ -4,9 +4,11 @@
    ------------------------------------------------------------------ */
 
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { KMXPlusData } from "../kmx-plus.js";
+import { KMXPlus } from "@keymanapp/common-types";
 import { build_strs_index, BUILDER_STR_REF, BUILDER_STRS } from "./build-strs.js";
 import { BUILDER_SECTION } from "./builder-section.js";
+
+import KMXPlusData = KMXPlus.KMXPlusData;
 
 /**
  * Builder for the 'loca' section
@@ -17,7 +19,7 @@ export interface BUILDER_LOCA extends BUILDER_SECTION {
 };
 
 export function build_loca(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS): BUILDER_LOCA {
-  let loca: BUILDER_LOCA = {
+  const loca: BUILDER_LOCA = {
     ident: constants.hex_section_id(constants.section.loca),
     size: constants.length_loca + constants.length_loca_item * kmxplus.loca.locales.length,
     _offset: 0,
@@ -25,7 +27,7 @@ export function build_loca(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS): BUILD
     items: []
   };
 
-  for(let item of kmxplus.loca.locales) {
+  for(const item of kmxplus.loca.locales) {
     loca.items.push(build_strs_index(sect_strs, item));
   }
 

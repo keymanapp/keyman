@@ -1,7 +1,10 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { List, ListItem } from "../kmx-plus.js";
+import { KMXPlus } from "@keymanapp/common-types";
 import { build_strs_index, BUILDER_STR_REF, BUILDER_STRS } from "./build-strs.js";
 import { BUILDER_SECTION } from "./builder-section.js";
+
+import List = KMXPlus.List;
+import ListItem = KMXPlus.ListItem;
 
 /* ------------------------------------------------------------------
  * list section
@@ -40,7 +43,7 @@ export function build_list(source_list: List, sect_strs: BUILDER_STRS): BUILDER_
     return null;
   }
 
-  let result: BUILDER_LIST = {
+  const result: BUILDER_LIST = {
     ident: constants.hex_section_id(constants.section.list),
     size: 0,
     _offset: 0,
@@ -51,13 +54,13 @@ export function build_list(source_list: List, sect_strs: BUILDER_STRS): BUILDER_
   };
 
   result.lists = source_list.lists.map(array => {
-    let list : BUILDER_LIST_LIST = {
+    const list : BUILDER_LIST_LIST = {
       index: result.indices.length, // the next indexcount
       count: array.length,
       _value: array
     };
     array.forEach((i) => {
-      let index : BUILDER_LIST_INDEX = {
+      const index : BUILDER_LIST_INDEX = {
         // Get the final string index
         str: build_strs_index(sect_strs, i.value),
         _value: i.value.value, // unwrap the actual string value
@@ -71,7 +74,7 @@ export function build_list(source_list: List, sect_strs: BUILDER_STRS): BUILDER_
   // Sort the lists.
   result.lists.sort((a,b) => a._value.compareTo(b._value));
 
-  let offset = constants.length_list +
+  const offset = constants.length_list +
     (constants.length_list_item * result.listCount) +
     (constants.length_list_index * result.indexCount);
   result.size = offset;
@@ -86,14 +89,14 @@ export function build_list(source_list: List, sect_strs: BUILDER_STRS): BUILDER_
  * @returns
  */
 export function build_list_index(sect_list: BUILDER_LIST, value: ListItem) : BUILDER_LIST_REF {
-  if (!value) { 
+  if (!value) {
     return 0; // empty list
   }
   if(!(value instanceof ListItem)) {
     throw new Error('unexpected value '+ value);
   }
 
-  let result = sect_list.lists.findIndex(v => v._value === value);
+  const result = sect_list.lists.findIndex(v => v._value === value);
   if(result < 0) {
     throw new Error('unexpectedly missing ListItem ' + value); // TODO-LDML: it's an array of strs
   }
