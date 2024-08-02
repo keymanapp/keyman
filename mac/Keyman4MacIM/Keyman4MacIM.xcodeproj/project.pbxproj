@@ -31,6 +31,8 @@
 		29B42A602728343B00EDD5D3 /* KMKeyboardHelpWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 29B42A622728343B00EDD5D3 /* KMKeyboardHelpWindowController.xib */; };
 		29B4A0D52BF7675A00682049 /* KMLogs.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B4A0D32BF7675A00682049 /* KMLogs.m */; };
 		29B6FB732BC39DD60074BF7F /* TextApiComplianceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B6FB722BC39DD60074BF7F /* TextApiComplianceTests.m */; };
+		29C1CDE22C5B2F8B003C23BB /* KMSettingsRepository.m in Sources */ = {isa = PBXBuildFile; fileRef = D861B03E2C5747F70003675E /* KMSettingsRepository.m */; };
+		29C1CDE32C5B2F8B003C23BB /* KMDataRepository.m in Sources */ = {isa = PBXBuildFile; fileRef = 29015ABC2C58D86F00CCBB94 /* KMDataRepository.m */; };
 		37A245C12565DFA6000BBF92 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 37A245C02565DFA6000BBF92 /* Assets.xcassets */; };
 		37AE5C9D239A7B770086CC7C /* qrcode.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 37AE5C9C239A7B770086CC7C /* qrcode.min.js */; };
 		37C2B0CB25FF2C350092E16A /* Help in Resources */ = {isa = PBXBuildFile; fileRef = 37C2B0CA25FF2C340092E16A /* Help */; };
@@ -1017,6 +1019,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				29C1CDE22C5B2F8B003C23BB /* KMSettingsRepository.m in Sources */,
+				29C1CDE32C5B2F8B003C23BB /* KMDataRepository.m in Sources */,
 				2915DC512BFE35DB0051FC52 /* KMLogs.m in Sources */,
 				2992F4202A28482800E08929 /* PrivacyWindowController.m in Sources */,
 				2992F41F2A2847C900E08929 /* TextApiCompliance.m in Sources */,

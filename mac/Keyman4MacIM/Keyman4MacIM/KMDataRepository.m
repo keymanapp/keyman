@@ -74,7 +74,7 @@ NSString *const kKeymanSubdirectoryName = @"keyman.inputmethod.Keyman";
     if (directoryError) {
       os_log_error([KMLogs startupLog], "error getting Application Support subdirectory: '%{public}@'", directoryError.localizedDescription);
     } else {
-      os_log_info([KMLogs startupLog], "Application Support subdirectory: '%{public}@'", applicationSupportUrl);
+      os_log_info([KMLogs startupLog], "Application Support subdirectory: '%{public}@'", applicationSupportUrl.path);
       _applicationSupportSubDirectory = applicationSupportUrl;
     }
   }
@@ -98,18 +98,39 @@ NSString *const kKeymanSubdirectoryName = @"keyman.inputmethod.Keyman";
 }
 
 /**
- * creates Keyman data directories if they do not exist yet
- * This includes 1) the main data subdirectory: keyman.inputmethod.Keyman
- * and 2) its subdirectory, Keyman-Keyboards
- *
+ * Creates Keyman data directory if it do not exist yet. This is the main data subdirectory: keyman.inputmethod.Keyman
  */
-- (void)createDataDirectoriesIfNecessary {
+- (void)createDataDirectoryIfNecessary {
+  NSFileManager *fileManager = [NSFileManager defaultManager];
+  BOOL isDir;
+  BOOL exists = [fileManager fileExistsAtPath:self.keymanDataDirectory.path isDirectory:&isDir];
+
+  if (!exists) {
+    NSError *createError = nil;
+    os_log_info([KMLogs startupLog], "createDataDirectoryIfNecessary, about to attempt createDirectoryAtPath for: '%{public}@'", self.keymanDataDirectory.path);
+    [fileManager createDirectoryAtPath:self.keymanDataDirectory.path withIntermediateDirectories:YES attributes:nil error:nil];
+    if (createError) {
+      os_log_error([KMLogs startupLog], "error creating Keyman data directory: '%{public}@'", createError.localizedDescription);
+    } else {
+      os_log_info([KMLogs startupLog], "created Keyman data directory: '%{public}@'", self.keymanDataDirectory.path);
+    }
+  } else {
+    os_log_info([KMLogs startupLog], "Keyman data directory already exists: '%{public}@'", self.keymanDataDirectory.path);
+  }
+}
+
+/**
+ * Creates Keyman keyboard directory if it does not exist yet. This is the 'Keyman-Keyboards' directory.
+ * It should not be created until after migrating because its existence would block migrating data from the old location.
+ */
+- (void)createKeyboardsDirectoryIfNecessary {
   NSFileManager *fileManager = [NSFileManager defaultManager];
   BOOL isDir;
   BOOL exists = [fileManager fileExistsAtPath:self.keymanKeyboardsDirectory.path isDirectory:&isDir];
 
   if (!exists) {
     NSError *createError = nil;
+    os_log_info([KMLogs startupLog], "createKeyboardsDirectoryIfNecessary, about to attempt createDirectoryAtPath for: '%{public}@'", self.keymanKeyboardsDirectory.path);
     [fileManager createDirectoryAtPath:self.keymanKeyboardsDirectory.path withIntermediateDirectories:YES attributes:nil error:nil];
     if (createError) {
       os_log_error([KMLogs startupLog], "error creating Keyman-Keyboards directory: '%{public}@'", createError.localizedDescription);
@@ -138,24 +159,30 @@ NSString *const kKeymanSubdirectoryName = @"keyman.inputmethod.Keyman";
 
 - (BOOL)migrateData {
   BOOL didMoveData = NO;
+  NSFileManager *fileManager = [NSFileManager defaultManager];
   NSString *obsoleteKeymanKeyboardsDirectory = self.obsoleteKeymanKeyboardsDirectory.path;
   NSString *dataDirectory = self.keymanDataDirectory.path;
   os_log_info([KMLogs startupLog], "migrateData, move obsoleteKeymanKeyboardsDirectory: '%{public}@' to '%{public}@'", obsoleteKeymanKeyboardsDirectory, dataDirectory);
 
-  // delete, happens whether migration or not
-  //[self createKeyboardsDirectoriesIfNecessary];
-  
+  BOOL isDir;
+  BOOL dataDirectoryExistsInNewLocation = ([fileManager fileExistsAtPath:self.keymanDataDirectory.path isDirectory:&isDir]);
+  os_log([KMLogs startupLog], "data directory exists in new location, %{public}@: %{public}@", self.keymanDataDirectory.path, dataDirectoryExistsInNewLocation?@"YES":@"NO");
+
+  BOOL keyboardsDirectoryExistsInNewLocation = ([fileManager fileExistsAtPath:self.keymanKeyboardsDirectory.path isDirectory:&isDir]);
+  os_log([KMLogs startupLog], "keyboards directory exists in new location, %{public}@: %{public}@", self.keymanKeyboardsDirectory.path, keyboardsDirectoryExistsInNewLocation?@"YES":@"NO");
+
   BOOL dataExistsInOldLocation = [self keyboardsExistInDocumentsFolder];
   os_log([KMLogs startupLog], "obsolete keyman keyboards directory exists: %@", dataExistsInOldLocation?@"YES":@"NO");
 
   if (dataExistsInOldLocation) {
     NSError *moveError = nil;
-    NSFileManager *fileManager = [NSFileManager defaultManager];
     didMoveData = [fileManager moveItemAtURL:self.obsoleteKeymanKeyboardsDirectory
-                         toURL:self.keymanDataDirectory
+                         toURL:self.keymanKeyboardsDirectory
                          error:&moveError];
     if (moveError) {
       os_log_error([KMLogs startupLog], "error migrating data: '%{public}@'", moveError.localizedDescription);
+    } else {
+      os_log_error([KMLogs startupLog], "data migrated successfully to: '%{public}@'", self.keymanKeyboardsDirectory.path);
     }
   }
   

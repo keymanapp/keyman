@@ -69,6 +69,8 @@ typedef enum {
   return packageInfo;
 }
 
+/*
+ // TODO: not used, delete
 - (NSString *)packageNameFromPackageInfo:(NSString *)path {
   NSString *packageName = nil;
   
@@ -77,6 +79,7 @@ typedef enum {
   
   return packageName;
 }
+*/
 
 /**
  * read JSON file and load it into KMPackageInfo object

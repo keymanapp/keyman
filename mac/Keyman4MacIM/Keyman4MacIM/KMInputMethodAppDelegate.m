@@ -182,7 +182,7 @@ NSString* _keymanDataPath = nil;
   }];
   
   // [SentrySDK captureMessage:@"Starting Keyman [test message]"];
-  
+
   [self setDefaultKeymanMenuItems];
   [self updateKeyboardMenuItems];
 }
@@ -532,7 +532,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
  * Returns the root folder where keyboards are stored; currently the same
  * as the keymanDataPath, but may diverge in future versions (possibly a sub-folder)
  *
- * Actually divering now, get this from KMDataRepository
+ * Actually diverting now, get this from KMDataRepository
  */
 - (NSString *)keyboardsPath {
   if (_keyboardsPath == nil) {
@@ -774,11 +774,11 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 /**
- * Prepare the app for all the things that need to be persisted:
- * namely, the settings in UserDefaults and keyboard data on disk
+ * Prepare the app environment for all the things that need to be persisted:
+ * namely, the  keyboard data on disk and the settings in UserDefaults 
  */
 - (void)preparePersistence {
-  [KMDataRepository.shared createDataDirectoriesIfNecessary];
+  [KMDataRepository.shared createDataDirectoryIfNecessary];
   
   if ([KMSettingsRepository.shared dataMigrationNeeded]) {
     BOOL movedData = [KMDataRepository.shared migrateData];
@@ -786,6 +786,8 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     //[KMDataRepository.shared migrateData];
     [KMSettingsRepository.shared convertSettingsForMigration];
   }
+  
+  [KMDataRepository.shared createKeyboardsDirectoryIfNecessary];
   [KMSettingsRepository.shared createStorageFlagIfNecessary];
 }
 

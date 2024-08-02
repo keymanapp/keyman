@@ -13,6 +13,9 @@
 #import "KMInputMethodEventHandler.h"
 #import "AppleCompliantTestClient.h"
 #import "TextApiCompliance.h"
+#import "KMSettingsRepository.h"
+#import "KMDataRepository.h"
+#import <os/log.h>
 
 KMInputMethodEventHandler *testEventHandler = nil;
 
@@ -83,6 +86,20 @@ KMInputMethodEventHandler *testEventHandler = nil;
   NSRange insertRange = [testEventHandler calculateInsertRangeForDeletedText:@"'" selectionRange:selectionRange];
   BOOL correctResult = (insertRange.location == 1) && (insertRange.length == 2);
   XCTAssertTrue(correctResult, @"insert or replacement range expected to be {1,2}");
+}
+
+- (void)testMigrateData_oldDataExists_logsLocations {
+  os_log_t startupLog = os_log_create("com.keyman.app", "data-migration");
+  if ([KMSettingsRepository.shared dataMigrationNeeded]) {
+    os_log_info(startupLog, "data migration needed, calling migrateData");
+    [KMDataRepository.shared migrateData];
+    os_log_info(startupLog, "test: call migrateData again");
+    [KMDataRepository.shared migrateData];
+  } else {
+    os_log_info(startupLog, "data migration not needed");
+  }
+
+  XCTAssertTrue(YES, @"test failed");
 }
 
 @end

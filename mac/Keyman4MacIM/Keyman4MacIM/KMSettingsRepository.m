@@ -11,14 +11,15 @@
  */
 
 #import "KMSettingsRepository.h"
+//#import "KMDataRepository.h"
 #import "KMLogs.h"
 
-NSString *const kStoreDataInLibraryKey = @"KMStoreDataInLibraryKey";
+NSString *const kStoreDataInLibraryKey = @"KMStoreDataInLibrary";
 NSString *const kActiveKeyboardsKey = @"KMActiveKeyboardsKey";
 NSString *const kSelectedKeyboardKey = @"KMSelectedKeyboardKey";
 
 NSString *const kObsoletePathComponent = @"/Documents/";
-NSString *const kNewPathComponent = @"/Application Support/keyman.inputmethod.Keyman/";
+NSString *const kNewPathComponent = @"/Library/Application Support/keyman.inputmethod.Keyman/";
 
 @implementation KMSettingsRepository
 
