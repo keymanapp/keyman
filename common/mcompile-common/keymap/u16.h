@@ -1,3 +1,5 @@
+
+// _S2 full version
 #ifndef U16_H
 #define U16_H
 #pragma once
@@ -9,6 +11,7 @@
 #include <string>
 #include <cstring>
 #include <vector>
+
 
 /**
  * @brief  Obtain a std::string from a std::wstring
@@ -91,7 +94,6 @@ const KMX_WCHAR* u16rchr_slash(KMX_WCHAR const* name);
  * @return Pointer to the last slash/backslash
  */
 KMX_CHAR* strrchr_slash(KMX_CHAR* name);
-
 /**
  * @brief  Locate last occurrence of character in u16string
  * @param  p  Pointer to the source
@@ -190,7 +192,7 @@ KMX_WCHAR* u16tok(KMX_WCHAR* p, const KMX_WCHAR* delim, KMX_WCHAR** ctx);
 
 /**
  * @brief  Convert a u16string to a double
- * @param  str Pointer to u16string
+ * @param  tr Pointer to u16string
  * @return double value equivalent to the string
  */
 double u16tof(KMX_WCHAR* str);

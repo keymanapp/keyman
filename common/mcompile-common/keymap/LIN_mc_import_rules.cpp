@@ -1,24 +1,10 @@
+
+// _S2 full version
 /*
-  Name:             mc_import_rules
-  Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
-  Create Date:      3 Aug 2014
-
-  Modified Date:    6 Feb 2015
-  Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
-
-  Bugs:             
-  Todo:             
-  Notes:            
-  History:          03 Aug 2014 - mcdurdin - I4327 - V9.0 - Mnemonic layout compiler follow-up
-                    03 Aug 2014 - mcdurdin - I4353 - V9.0 - mnemonic layout recompiler mixes up deadkey rules
-                    31 Dec 2014 - mcdurdin - I4550 - V9.0 - logical flaw in mnemonic layout recompiler means that AltGr base keys are never processed
-                    06 Feb 2015 - mcdurdin - I4552 - V9.0 - Add mnemonic recompile option to ignore deadkeys
-*/
-
+ * Keyman is copyright (C) 2004 - 2024 SIL International. MIT License.
+ *
+ * Mnemonic layout support for Linux
+ */
 
 #include <vector>
 #include <string>
@@ -38,19 +24,23 @@ const int KMX_ShiftStateMap[] = {
     0,
     0};
 
+/** @brief Constructor */
 DeadKey::DeadKey(KMX_WCHAR deadCharacter) {
   this->m_deadchar = deadCharacter;
 }
 
+/** @brief return dead character */
 KMX_WCHAR DeadKey::KMX_DeadCharacter() {
   return this->m_deadchar;
 }
 
+/** @brief set Deadkey with values */
 void DeadKey::KMX_AddDeadKeyRow(KMX_WCHAR baseCharacter, KMX_WCHAR combinedCharacter) {
   this->m_rgbasechar.push_back(baseCharacter);
   this->m_rgcombchar.push_back(combinedCharacter);
 }
 
+/** @brief check if character exists in DeadKey */
 bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
   std::vector<KMX_WCHAR>::iterator it;
   for (it = this->m_rgbasechar.begin(); it < m_rgbasechar.end(); it++) {
@@ -61,13 +51,23 @@ bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
   return false;
 }
 
-int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, ShiftState rgkey_ss, int caps, GdkKeymap* keymap) {
-/*
-  * Contrary to what the function name might suggest, the function KMX_ToUnicodeEx does not process surrogate pairs. 
-  * This is because it is used in mcompile only which only deals with latin scripts.
-  * In case this function is used for surrogate pairs, they will be ignored and a message will be printed out
-*/
+/**
+ * @brief  Find a keyvalue for given keycode, shiftstate and caps. A function similar to Window`s ToUnicodeEx() function.
+ *
+ * Contrary to what the function name might suggest, the function KMX_ToUnicodeEx does not process surrogate pairs. 
+ * This is because it is used in mcompile only which only deals with latin scripts.
+ * In case this function should be used for surrogate pairs, they will be ignored and a message will be printed out
 
+ * @param  keycode  a key of the currently used keyboard Layout
+ * @param  pwszBuff Buffer to store resulting character
+ * @param  ss       a shiftstate of the currently used keyboard Layout
+ * @param  caps     state of the caps key of the currently used keyboard Layout
+ * @param  keymap   the currently used (underlying)keyboard Layout
+ * @return -1 if a deadkey was found;
+ *          0 if no translation is available;
+ *          +1 if character was found and written to pwszBuff
+ */
+int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, ShiftState rgkey_ss, int caps, GdkKeymap* keymap) {
   GdkKeymapKey* maps;
   guint* keyvals;
   gint count;
@@ -121,6 +121,7 @@ KMX_WCHAR KMX_DeadKeyMap(int index, std::vector<DeadKey*>* deadkeys, int deadkey
   return 0xFFFF;
 }
 
+/** @brief Base class for dealing with rgkey*/
 class KMX_VirtualKey {
 private:
   UINT m_vk;
@@ -135,10 +136,12 @@ public:
     memset(this->m_rgfDeadKey, 0, sizeof(this->m_rgfDeadKey));
   }
 
+/** @brief return member variable virtual key */
   UINT VK() {
     return this->m_vk;
   }
 
+/** @brief return member variable scancode */
   UINT SC() {
     return this->m_sc;
   }
@@ -153,35 +156,51 @@ public:
   }
 
   bool KMX_IsSGCAPS() {
-    std::u16string stBase      = this->KMX_GetShiftState(Base, false);
-    std::u16string stShift     = this->KMX_GetShiftState(Shft, false);
-    std::u16string stCaps      = this->KMX_GetShiftState(Base, true);
+    std::u16string stBase = this->KMX_GetShiftState(Base, false);
+    std::u16string stShift = this->KMX_GetShiftState(Shft, false);
+    std::u16string stCaps = this->KMX_GetShiftState(Base, true);
     std::u16string stShiftCaps = this->KMX_GetShiftState(Shft, true);
     return (
-        ((stCaps.size() > 0) && (stBase.compare(stCaps) != 0) && (stShift.compare(stCaps) != 0)) ||
-        ((stShiftCaps.size() > 0) && (stBase.compare(stShiftCaps) != 0) && (stShift.compare(stShiftCaps) != 0)));
+        ((stCaps.size() > 0) &&
+        (stBase.compare(stCaps) != 0) &&
+        (stShift.compare(stCaps) != 0)) ||
+        ((stShiftCaps.size() > 0) &&
+        (stBase.compare(stShiftCaps) != 0) &&
+        (stShift.compare(stShiftCaps) != 0)));
   }
 
   bool KMX_IsCapsEqualToShift() {
-    std::u16string stBase  = this->KMX_GetShiftState(Base, false);
+    std::u16string stBase = this->KMX_GetShiftState(Base, false);
     std::u16string stShift = this->KMX_GetShiftState(Shft, false);
-    std::u16string stCaps  = this->KMX_GetShiftState(Base, true);
-    return ((stBase.size() > 0) && (stShift.size() > 0) && (stBase.compare(stShift) != 0) && (stShift.compare(stCaps) == 0));
+    std::u16string stCaps = this->KMX_GetShiftState(Base, true);
+    return (
+        (stBase.size() > 0) &&
+        (stShift.size() > 0) &&
+        (stBase.compare(stShift) != 0) &&
+        (stShift.compare(stCaps) == 0));
   }
 
   bool KMX_IsAltGrCapsEqualToAltGrShift() {
     std::u16string stBase  = this->KMX_GetShiftState(MenuCtrl, false);
     std::u16string stShift = this->KMX_GetShiftState(ShftMenuCtrl, false);
     std::u16string stCaps  = this->KMX_GetShiftState(MenuCtrl, true);
-    return ((stBase.size() > 0) && (stShift.size() > 0) && (stBase.compare(stShift) != 0) && (stShift.compare(stCaps) == 0));
+    return (
+        (stBase.size() > 0) &&
+        (stShift.size() > 0) &&
+        (stBase.compare(stShift) != 0) &&
+        (stShift.compare(stCaps) == 0));
   }
 
   bool KMX_IsXxxxGrCapsEqualToXxxxShift() {
-    std::u16string stBase  = this->KMX_GetShiftState(Xxxx, false);
+    std::u16string stBase = this->KMX_GetShiftState(Xxxx, false);
     std::u16string stShift = this->KMX_GetShiftState(ShftXxxx, false);
-    std::u16string stCaps  = this->KMX_GetShiftState(Xxxx, true);
-    return ((stBase.size() > 0) && (stShift.size() > 0) && (stBase.compare(stShift) != 0) && (stShift.compare(stCaps) == 0));
-  }
+    std::u16string stCaps = this->KMX_GetShiftState(Xxxx, true);
+    return (
+        (stBase.size() > 0) &&
+        (stShift.size() > 0) &&
+        (stBase.compare(stShift) != 0) &&
+        (stShift.compare(stCaps) == 0));
+    }
 
   bool KMX_IsEmpty() {
     for (int i = 0; i < 10; i++) {
@@ -193,7 +212,7 @@ public:
     }
     return true;
   }
-
+/** @brief check if we use only keys used in mcompile */
   bool KMX_IsKeymanUsedKey() {
     return (this->m_vk >= 0x20 && this->m_vk <= 0x5F) || (this->m_vk >= 0x88);
   }
@@ -202,6 +221,7 @@ public:
     return KMX_ShiftStateMap[(int)ss] | (capslock ? (caps ? CAPITALFLAG : NOTCAPITALFLAG) : 0);
   }
 
+/** @brief count the number of keys */
   int KMX_GetKeyCount(int MaxShiftState) {
     int nkeys = 0;
 
@@ -213,7 +233,7 @@ public:
       }
       for (int caps = 0; caps <= 1; caps++) {
         std::u16string st = this->KMX_GetShiftState((ShiftState)ss, (caps == 1));
-
+        // ctrl and shift+ctrl will be skipped since rgkey has no entries in m_rgss[2] m_rgss[3]
         if (st.size() == 0) {
           // No character assigned here
         } else if (this->m_rgfDeadKey[(int)ss][caps]) {
@@ -224,7 +244,6 @@ public:
           for (size_t ich = 0; ich < st.size(); ich++) {
             if (st[ich] < 0x20 || st[ich] == 0x7F) {
               isvalid = false;
-
               printf("invalid for: %i\n", st[ich]);
               break;
             }
@@ -240,8 +259,13 @@ public:
 
   bool KMX_LayoutRow(int MaxShiftState, LPKMX_KEY key, std::vector<DeadKey*>* deadkeys, int deadkeyBase, BOOL bDeadkeyConversion, vec_dword_3D& all_vector, GdkKeymap* keymap) {  // I4552
     // Get the CAPSLOCK value
-    int capslock = (this->KMX_IsCapsEqualToShift() ? 1 : 0) | (this->KMX_IsSGCAPS() ? 2 : 0) |
-                   (this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) | (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);
+    /*int capslock =
+          (this->KMX_IsCapsEqualToShift() ? 1 : 0) |
+          (this->KMX_IsSGCAPS() ? 2 : 0) |
+          (this->KMX_IsAltGrCapsEqualToAltGrShift() ? 4 : 0) |
+          (this->KMX_IsXxxxGrCapsEqualToXxxxShift() ? 8 : 0);*/
+
+    int capslock = 1;  // we do not use the equation to obtain capslock. On Linux we set capslock = 1
 
     for (int ss = 0; ss <= MaxShiftState; ss++) {
       if (ss == Menu || ss == ShftMenu) {
@@ -261,7 +285,7 @@ public:
           *key->dpContext = 0;
 
           key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState)ss);
-          // we already use VK_US so no need to convert it as we do on windows
+          // we already use VK_US so no need to convert it as we do on Windows
           key->Key = this->VK();
           key->Line = 0;
 
@@ -287,14 +311,16 @@ public:
             }
           }
           if (isvalid) {
-            // this is different to mcompile windows !!!!
-            // this->m_sc    stores SC-US = SCUnderlying
-            // this->m_vk    stores VK-US ( not underlying !!)
-            // key->Key      stores VK-US ( not underlying !!)
-            // key->dpOutput stores character Underlying
+           /*
+             * this is different to mcompile Windows !!!!
+             * this->m_sc    stores SC-US = SCUnderlying
+             * this->m_vk    stores VK-US ( not VK underlying !!)
+             * key->Key      stores VK-US ( not VK underlying !!)
+             * key->dpOutput stores character Underlying
+             */
+            KMX_DWORD sc_underlying = KMX_get_KeyCodeUnderlying_From_KeyCodeUS(keymap, all_vector, this->SC(), (ShiftState)ss, caps);
 
-            KMX_DWORD SC_Underlying = KMX_get_KeyCodeUnderlying_From_KeyCodeUS(keymap, all_vector, this->SC(), (ShiftState)ss, caps);
-            key->Key = KMX_get_VKUS_From_KeyCodeUnderlying(SC_Underlying);
+            key->Key = KMX_get_VKUS_From_KeyCodeUnderlying(sc_underlying);
 
             key->Line = 0;
             key->ShiftFlags = this->KMX_GetShiftStateValue(capslock, caps, (ShiftState)ss);
@@ -315,6 +341,7 @@ public:
   }
 };
 
+/** @brief Base class for KMX_loader*/
 class KMX_Loader {
 private:
   KMX_BYTE lpKeyStateNull[256];
@@ -343,6 +370,11 @@ public:
   }
 };
 
+/**
+ * @brief  find the maximum index of a deadkey
+ * @param  p pointer to deadkey
+ * @return index of deadkey
+ */
 int KMX_GetMaxDeadkeyIndex(KMX_WCHAR* p) {
   int n = 0;
   while (p && *p) {
@@ -353,10 +385,24 @@ int KMX_GetMaxDeadkeyIndex(KMX_WCHAR* p) {
   return n;
 }
 
+/**
+ * @brief  Collect the key data, translate it to kmx and append to the existing keyboard
+ *         It is important to understand that this function has different sorting order in rgkey compared to mcompile-windows!
+ *         On Windows the values of rgkey are sorted according to the VK of the underlying keyboard
+ *         On Linux   the values of rgkey are sorted according to the VK of the the US keyboard
+ *         Since Linux Keyboards do not use a VK mcompile uses the VK of the the US keyboard because
+ *         these are available in mcompile through USVirtualKeyToScanCode/ScanCodeToUSVirtualKey and an offset of 8
+ * @param  kp                 pointer to keyboard
+ * @param  all_vector         vector that holds the data of the US keyboard and the currently used (underlying) keyboard
+ * @param  keymap             the currently used (underlying)keyboard Layout
+ * @param  FDeadkeys          vector of all deadkeys for the currently used (underlying)keyboard Layout
+ * @param  bDeadkeyConversion 1 to convert a deadkey to a character; 0 no conversion
+ * @return true in case of success
+ */
 bool KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, GdkKeymap** keymap, std::vector<KMX_DeadkeyMapping>* FDeadkeys, KMX_BOOL bDeadkeyConversion) {  // I4353   // I4552
   KMX_Loader loader;
 
-  std::vector<KMX_VirtualKey*> rgKey; //= new VirtualKey[256];
+  std::vector<KMX_VirtualKey*> rgKey;  //= new VirtualKey[256];
   std::vector<DeadKey*> alDead;
   std::vector<DeadKey*> alDead_byBasechar = create_deadkeys_by_basechar();
 
@@ -366,13 +412,17 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, GdkKeymap** ke
   // values in it. Then, store the SC in each valid VK so it can act as both a
   // flag that the VK is valid, and it can store the SC value.
 
+  // Windows and Linux Keycodes start with 1; Mac keycodes start with 0
   for (UINT sc = 0x01; sc <= 0x7f; sc++) {
-    // fills m_vk with the VK of the US keyboard
-    // ( mcompile win uses MapVirtualKeyEx() to fill m_vk with the VK of the Underlying keyboard)
-    // Linux can get a VK for the US Keyboard using USVirtualKeyToScanCode/ScanCodeToUSVirtualKey
-    // Linux cannot get a VK for the underling Keyboard
-    // this "connection" is possible only when using all_vector
+    /* HERE IS A BIG DIFFERENCE COMPARED TO MCOMPILE FOR WINDOWS:
+    * mcompile on Windows fills rgkey.m_vk with the VK of the Underlying keyboard
+    * mcompile for Linux  fills rgkey.m_vk with the VK of the US keyboard
+    * this results in a different sorting order in rgkey[] !
 
+    * Linux cannot get a VK for the underling Keyboard since this does not exist
+    * Linux can only get a VK for the US Keyboard (by using USVirtualKeyToScanCode/ScanCodeToUSVirtualKey)
+    * therefore we use VK_US in rgkey[ ] which we get from all_vector
+    */
     KMX_VirtualKey* key = new KMX_VirtualKey(sc);
 
     if ((key->VK() != 0)) {
@@ -382,40 +432,34 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, GdkKeymap** ke
     }
   }
 
-  /* _S2 TODO I assume we do not need those...
-  rgKey[VK_DIVIDE] = new KMX_VirtualKey(hkl, VK_DIVIDE);
-  rgKey[VK_CANCEL] = new KMX_VirtualKey(hkl, VK_CANCEL);
-  rgKey[VK_DECIMAL] = new KMX_VirtualKey(hkl, VK_DECIMAL);*/
-
   // in this part we skip shiftstates 4, 5, 8, 9
   for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
     if (rgKey[iKey] != NULL) {
       KMX_WCHAR sbBuffer[256];  // Scratchpad we use many places
-
       for (ShiftState ss = Base; ss <= loader.KMX_MaxShiftState(); ss = (ShiftState)((int)ss + 1)) {
         if (ss == Menu || ss == ShftMenu) {
           // Alt and Shift+Alt don't work, so skip them (ss 4+5)
           continue;
         }
 
-        KMX_DWORD kc_us = (KMX_DWORD)KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
+        KMX_DWORD kc_underlying = KMX_get_KeyCodeUnderlying_From_VKUS(iKey);
 
         for (int caps = 0; caps <= 1; caps++) {
-          int rc = KMX_ToUnicodeEx(kc_us, sbBuffer, ss, caps, *keymap);
+          int rc = KMX_ToUnicodeEx(kc_underlying, sbBuffer, ss, caps, *keymap);
 
           if (rc > 0) {
             if (*sbBuffer == 0) {
-              rgKey[iKey]->KMX_SetShiftState(ss, u"", false, (caps));  // different to windows since behavior on Linux is different
+              rgKey[iKey]->KMX_SetShiftState(ss, u"", false, (caps));  // different to windows since behavior on Linux is different (see above)
             } else {
-              if ((ss == Ctrl || ss == ShftCtrl)) {
+            if ((ss == Ctrl || ss == ShftCtrl)) {
                 continue;
               }
               sbBuffer[rc] = 0;
-              rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, false, (caps));  // different to windows since behavior on Linux is different
-            }
+              rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, false, (caps));  // different to windows since behavior on Linux is different (see above)
+          }
           } else if (rc < 0) {
             sbBuffer[2] = 0;
-            rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, true, (caps));  // different to windows since behavior on Linux is different
+            rgKey[iKey]->KMX_SetShiftState(ss, sbBuffer, true, (caps));  // different to windows since behavior on Linux is different (see above)
 
             refine_alDead(sbBuffer[0], alDead, alDead_byBasechar);
           }
@@ -460,9 +504,9 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, GdkKeymap** ke
   }
 
   gp->fUsingKeys = TRUE;
-  gp->dpMatch    = NULL;
-  gp->dpName     = NULL;
-  gp->dpNoMatch  = NULL;
+  gp->dpMatch = NULL;
+  gp->dpName = NULL;
+  gp->dpNoMatch = NULL;
   gp->cxKeyArray = nkeys;
   gp->dpKeyArray = new KMX_KEY[gp->cxKeyArray];
 
@@ -538,9 +582,9 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, GdkKeymap** ke
     gp++;
 
     gp->fUsingKeys = FALSE;
-    gp->dpMatch    = NULL;
-    gp->dpName     = NULL;
-    gp->dpNoMatch  = NULL;
+    gp->dpMatch = NULL;
+    gp->dpName = NULL;
+    gp->dpNoMatch = NULL;
     gp->cxKeyArray = alDead.size();
     LPKMX_KEY kkp = gp->dpKeyArray = new KMX_KEY[alDead.size()];
 
@@ -594,6 +638,5 @@ bool KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, GdkKeymap** ke
       kkp++;
     }
   }
-
   return true;
 }

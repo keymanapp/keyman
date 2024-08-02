@@ -1,3 +1,4 @@
+// _S2 full version
 /*
   Name:             mcompile
   Copyright:        Copyright (C) 2003-2017 SIL International.
@@ -33,6 +34,10 @@ struct KMX_DeadkeyMapping {  // I4353
 
 extern std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;  // I4353
 
+/**
+ * @brief  print (error) messages
+ * @param  fmt text to print
+ */
 void KMX_LogError(const wchar_t* fmt, ...);
 
 
