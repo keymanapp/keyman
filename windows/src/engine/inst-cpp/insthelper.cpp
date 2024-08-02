@@ -110,13 +110,8 @@ GuidToWString(const GUID& guid) {
   wchar_t guidCStr[40] = {0};
   int length           = StringFromGUID2(guid, guidCStr, 40);
 
-  if (length > 0) {
-    // Successfully converted GUID to wstring
-    return std::wstring(guidCStr);
-  } else {
-    // Handle the error, for example, return an empty wstring
-    return std::wstring();
-  }
+  // Successfully converted GUID to wstring
+  return std::wstring(guidCStr);
 }
 
 std::wstring
