@@ -28,7 +28,7 @@
     "@keymanapp/keyman-version": "*",
     "@keymanapp/kmc-kmn": "*",
     "@keymanapp/ldml-keyboard-constants": "*",
-    "semver": "^7.5.2"
+    "semver": "^7.5.4"
   },
   "devDependencies": {
     "@keymanapp/developer-test-helpers": "*",

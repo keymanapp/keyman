@@ -32,7 +32,7 @@
     "@keymanapp/ldml-keyboard-constants": "*",
     "@keymanapp/keyman-version": "*",
     "restructure": "3.0.1",
-    "semver": "^7.5.2",
+    "semver": "^7.5.4",
     "sax": ">=0.6.0",
     "xmlbuilder": "~11.0.0"
   },
