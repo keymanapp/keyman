@@ -59,9 +59,11 @@ export interface KmnCompilerResultExtra {
 
 /** @internal */
 export interface KmnCompilerResultMessage {
-  message: string;
   errorCode: number;
   lineNumber: number;
+  columnNumber: number;
+  filename: string;
+  parameters: string[];
 }
 
 /**
@@ -250,6 +252,31 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
     return new Uint8Array(new Uint8Array(Module.HEAP8.buffer, offset, size));
   }
 
+  private toTitleCase = (s: string) => s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
+
+  private generateKmcmpLibMessage(filename: string, line: number, code: number, parameters: string[]) {
+    const keys = Object.keys(KmnCompilerMessages);
+    const m = KmnCompilerMessages as Record<string,any>;
+    const key = keys.find(key => m[key] === code);
+    if(!key) {
+      return `Unknown message ${code.toString(16)} -- message identifier not found`;
+    }
+
+    const o = /^(INFO|HINT|WARN|ERROR|FATAL)_([A-Za-z0-9_]+)$/.exec(key);
+    if(!o) {
+      return `Unknown message ${code.toString(16)} -- message identifier is not a valid format`;
+    }
+
+    const generator = this.toTitleCase(o[1])+'_'+o[2];
+    if(!generator || typeof m[generator] != 'function') {
+      return `Unknown message ${code.toString(16)} -- generator function not found`;
+    }
+    const result = m[generator]({p:parameters});
+    result.filename = filename;
+    result.line = line;
+    return result;
+  }
+
   /**
    * Compiles a .kmn file to .kmx, .kvk, and/or .js files. Returns an object
    * containing binary artifacts on success. The files are passed in by name,
@@ -276,7 +303,7 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
     const compiler = this;
     const wasm_callbacks = Module.WasmCallbackInterface.implement({
       message: function(message: KmnCompilerResultMessage) {
-        compiler.callbacks.reportMessage({line:message.lineNumber, code: message.errorCode, message: message.message});
+        compiler.callbacks.reportMessage(compiler.generateKmcmpLibMessage(message.filename, message.lineNumber, message.errorCode, message.parameters));
       },
       loadFile: function(filename: string, baseFilename: string): number[] {
         const data: Uint8Array = compiler.callbacks.loadFile(compiler.callbacks.resolveFilename(baseFilename, filename));

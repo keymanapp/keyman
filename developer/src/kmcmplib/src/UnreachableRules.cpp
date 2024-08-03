@@ -42,8 +42,9 @@ void VerifyUnreachableRules(PFILE_GROUP gp) {
       if (kp->Line != k1.Line && reportedLines.count(kp->Line) == 0) {
         reportedLines.insert(kp->Line);
         kmcmp::currentLine = kp->Line;
-        snprintf(ErrExtraLIB, ERR_EXTRA_LIB_LEN, " Overridden by rule on line %d", k1.Line);
-        AddWarning(KmnCompilerMessages::HINT_UnreachableRule);
+        AddCompileError(KmnCompilerMessages::HINT_UnreachableRule, {
+          /* LineNumber */ std::to_string(k1.Line)
+        });
       }
     }
     else {

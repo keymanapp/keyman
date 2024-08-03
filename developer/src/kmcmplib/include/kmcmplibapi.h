@@ -54,11 +54,11 @@ struct KMCMP_COMPILER_RESULT_EXTRA_GROUP {
 };
 
 struct KMCMP_COMPILER_RESULT_MESSAGE {
-  std::string message; // TODO: move to kmc-kmn, utf-8
   unsigned int errorCode;
   int lineNumber;
-  // TODO add filename
-  // TODO add parameters
+  int columnNumber;
+  std::string filename;
+  std::vector<std::string> parameters;
 };
 
 #define COMPILETARGETS_KMX     0x01
