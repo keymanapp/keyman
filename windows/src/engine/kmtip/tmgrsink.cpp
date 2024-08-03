@@ -39,7 +39,7 @@
 
 STDAPI CKMTipTextService::OnInitDocumentMgr(ITfDocumentMgr *pDocMgr)
 {
-  LogEnter();
+  SendDebugMessage(L"");
   return S_OK;
 }
 
@@ -53,7 +53,7 @@ STDAPI CKMTipTextService::OnInitDocumentMgr(ITfDocumentMgr *pDocMgr)
 
 STDAPI CKMTipTextService::OnUninitDocumentMgr(ITfDocumentMgr *pDocMgr)
 {
-  LogEnter();
+  SendDebugMessage(L"");
   return S_OK;
 }
 
@@ -72,7 +72,7 @@ STDAPI CKMTipTextService::OnSetFocus(ITfDocumentMgr *pDocMgrFocus, ITfDocumentMg
   // reinitialise our preserved keys and a focus change may
   // be the first change we get to do something about it
   if (!_InitPreservedKeys()) {
-    SendDebugMessage(L"OnSetFocus: _InitPreservedKeys failed");
+    SendDebugMessage(L"_InitPreservedKeys failed");
     return S_OK;
   }
 
@@ -123,7 +123,7 @@ bool isTransitory = false;
 
 STDAPI CKMTipTextService::OnPushContext(ITfContext *pContext)
 {
-  LogEnter();
+  SendDebugMessage(L"");
   return S_OK;
 }
 
@@ -136,7 +136,7 @@ STDAPI CKMTipTextService::OnPushContext(ITfContext *pContext)
 
 STDAPI CKMTipTextService::OnPopContext(ITfContext *pContext)
 {
-  LogEnter();
+  SendDebugMessage(L"");
   return S_OK;
 }
 
@@ -149,17 +149,17 @@ STDAPI CKMTipTextService::OnPopContext(ITfContext *pContext)
 
 STDAPI CKMTipTextService::OnActivated(REFCLSID clsid, REFGUID guidProfile, BOOL fActivated)   // I3581
 {
-  LogEnter();
+  SendDebugEntry();
 
   WCHAR bufClsid[40] = L"", bufProfile[40] = L"";
   if (StringFromGUID2(clsid, bufClsid, 40) == 0) bufClsid[0] = 0;
   if (StringFromGUID2(guidProfile, bufProfile, 40) == 0) bufProfile[0] = 0;
 
   if(IsEqualGUID(clsid, c_clsidKMTipTextService)) {
-    SendDebugMessageFormat(L"CKMTipTextService::OnActivated(c_clsidKMTipTextService, %s, %d)", bufProfile, fActivated);
+    SendDebugMessageFormat(L"c_clsidKMTipTextService, %s, %d", bufProfile, fActivated);
     TIPNotifyActivate(fActivated ? (GUID *)&guidProfile : NULL);
   } else {
-    SendDebugMessageFormat(L"CKMTipTextService::OnActivated(%s, %s, %d)", bufClsid, bufProfile, fActivated);
+    SendDebugMessageFormat(L"%s, %s, %d", bufClsid, bufProfile, fActivated);
 
     if (fActivated) {
       BOOL bIsDeactivating = TRUE;
@@ -179,7 +179,7 @@ STDAPI CKMTipTextService::OnActivated(REFCLSID clsid, REFGUID guidProfile, BOOL 
             while (SUCCEEDED(pEnumTfInputProcessorProfiles->Next(1, &profile, &cFetch)) && cFetch == 1) {
               if (guidProfile == profile.guidProfile) {
                 bIsDeactivating = profile.catid == GUID_TFCAT_TIP_KEYBOARD;
-                SendDebugMessageFormat(L"CKMTipTextService::OnActivated is it GUID_TFCAT_TIP_KEYBOARD? %d", bIsDeactivating);
+                SendDebugMessageFormat(L"is it GUID_TFCAT_TIP_KEYBOARD? %d", bIsDeactivating);
                 break;
               }
             }
@@ -197,7 +197,7 @@ STDAPI CKMTipTextService::OnActivated(REFCLSID clsid, REFGUID guidProfile, BOOL 
       }
     }
   }
-
+  SendDebugExit();
   return S_OK;
 }
 
@@ -210,7 +210,7 @@ STDAPI CKMTipTextService::OnActivated(REFCLSID clsid, REFGUID guidProfile, BOOL 
 
 BOOL CKMTipTextService::_InitThreadMgrSink()
 {
-  LogEnter();
+  SendDebugEntry();
 
   ITfSource *pSource;
   BOOL fRet;
@@ -257,7 +257,7 @@ BOOL CKMTipTextService::_InitThreadMgrSink()
   res = _pThreadMgr->QueryInterface(IID_ITfSource, (void **)&pSource);
   if (res != S_OK) {
     DebugLastError0(L"QueryInterface(ITfSource)", res);
-    return FALSE;
+    return_SendDebugExit(FALSE);
   }
 
   fRet = FALSE;
@@ -282,7 +282,7 @@ BOOL CKMTipTextService::_InitThreadMgrSink()
 
 Exit:
   pSource->Release();
-  return fRet;
+  return_SendDebugExit(fRet);
 }
 
 //+---------------------------------------------------------------------------
@@ -294,7 +294,7 @@ Exit:
 
 void CKMTipTextService::_UninitThreadMgrSink()
 {
-  LogEnter();
+  SendDebugEntry();
 
   ITfSource *pSource;
 
@@ -312,5 +312,6 @@ void CKMTipTextService::_UninitThreadMgrSink()
   }
 
   _dwThreadMgrEventSinkCookie = TF_INVALID_COOKIE;
+  SendDebugExit();
 }
 

@@ -21,7 +21,7 @@ export default {
   ],
   concurrency: 10,
   nodeResolve: true,
-  // // Top-level, implicit 'default' group
+  // Top-level, implicit 'default' group
   files: [
     'src/test/auto/dom/test_init_check.spec.ts',
     // '**/*.spec.html'
@@ -31,34 +31,34 @@ export default {
       name: 'engine/attachment',
       // Relative, from the containing package.json
       files: [
-        'src/test/auto/dom/cases/attachment/**/*.spec.html',
-        'src/test/auto/dom/cases/attachment/**/*.spec.ts'
+        'build/test/dom/cases/attachment/**/*.spec.html',
+        'build/test/dom/cases/attachment/**/*.spec.mjs'
       ]
     },
     {
       name: 'app/browser',
       // Relative, from the containing package.json
-      files: ['src/test/auto/dom/cases/browser/**/*.spec.ts']
+      files: ['build/test/dom/cases/browser/**/*.spec.mjs']
     },
     {
       name: 'engine/dom-utils',
       // Relative, from the containing package.json
-      files: ['src/test/auto/dom/cases/dom-utils/**/*.spec.ts']
+      files: ['build/test/dom/cases/dom-utils/**/*.spec.mjs']
     },
     {
       name: 'engine/element-wrappers',
       // Relative, from the containing package.json
-      files: ['src/test/auto/dom/cases/element-wrappers/**/*.spec.ts']
+      files: ['build/test/dom/cases/element-wrappers/**/*.spec.mjs']
     },
     {
       name: 'engine/osk',
       // Relative, from the containing package.json
-      files: ['src/test/auto/dom/cases/osk/**/*.spec.ts']
+      files: ['build/test/dom/cases/osk/**/*.spec.mjs']
     },
     {
       name: 'engine/package-cache',
       // Relative, from the containing package.json
-      files: ['src/test/auto/dom/cases/packages/**/*.spec.ts']
+      files: ['build/test/dom/cases/packages/**/*.spec.mjs']
     }
   ],
   middleware: [

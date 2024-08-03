@@ -68,13 +68,13 @@ DWORD HKLToKeyboardID(HKL hkl)
 	FILETIME ft;
 	DWORD len;
 
-  //SendDebugMessageFormat(0, sdmGlobal, 0, "HKLToKeyboardID: hkl=%x", hkl);
+  //SendDebugMessageFormat("hkl=%x", hkl);
 
 	// Test for IME, and if IME return LanguageID
 
 	if(HKLIsIME(hkl)) // I1498 - was ImmIsIME
   {
-    //SendDebugMessageFormat(0, sdmGlobal, 0, "HKLToKeyboardID: return HKLIsIME is true=%x", hkl);
+    //SendDebugMessageFormat("return HKLIsIME is true=%x", hkl);
     return ForceHKLToKeymanID(hkl);  // MCD 19/03/02  // I3191   // I3526
   }
 	//if((HIWORD(hkl) & 0xF000) == 0xE000) return (DWORD) hkl;
@@ -85,17 +85,17 @@ DWORD HKLToKeyboardID(HKL hkl)
 	DWORD LayoutID = HKLToLayoutID(hkl);
 	if(LayoutID == 0)
   {
-    //SendDebugMessageFormat(0, sdmGlobal, 0, "HKLToKeyboardID: no LayoutID, so return HIWORD(hkl)=%x", HIWORD(hkl));
+    //SendDebugMessageFormat("no LayoutID, so return HIWORD(hkl)=%x", HIWORD(hkl));
     return HIWORD(hkl);
   }
 
- //SendDebugMessageFormat(0, sdmGlobal, 0, "HKLToKeyboardID: LayoutID=%x", LayoutID);
+ //SendDebugMessageFormat("LayoutID=%x", LayoutID);
 
 	// Find the KeyboardID associated with the LayoutID
 
 	if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, REGSZ_SystemKeyboardLayouts, NULL, KEY_READ, &hkey) != ERROR_SUCCESS)
   {
-    //SendDebugMessageFormat(0, sdmGlobal, 0, "HKLToKeyboardID: fails, return LOWORD(hkl)=%x", LOWORD(hkl));
+    //SendDebugMessageFormat("fails, return LOWORD(hkl)=%x", LOWORD(hkl));
 		return (DWORD) LOWORD(hkl);
   }
 
@@ -112,7 +112,7 @@ DWORD HKLToKeyboardID(HKL hkl)
         RegCloseKey(hsubkey); // I1545
         RegCloseKey(hkey);
       	n = strtoul(str, NULL, 16); // I1546
-        SendDebugMessageFormat(0, sdmGlobal, 0, "HKLToKeyboardID: return keyboard from LayoutID = %x [%s]", n, str);
+        SendDebugMessageFormat("return keyboard from LayoutID = %x [%s]", n, str);
         return n;
       }
 		}
@@ -121,7 +121,7 @@ DWORD HKLToKeyboardID(HKL hkl)
 
 	RegCloseKey(hkey);
 
-  //SendDebugMessageFormat(0, sdmGlobal, 0, "HKLToKeyboardID: fails[2], return LOWORD(hkl)=%x", LOWORD(hkl));
+  //SendDebugMessageFormat("fails[2], return LOWORD(hkl)=%x", LOWORD(hkl));
   return (DWORD) LOWORD(hkl);		// should never happen
 }
 
