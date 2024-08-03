@@ -10,11 +10,16 @@ char ErrExtraLIB[ERR_EXTRA_LIB_LEN]; // utf-8
 namespace kmcmp {
   int ErrChr;
   int nErrors = 0;
+  kmcmp_CompilerMessageProc msgproc = nullptr;
 }
 
 KMX_BOOL kmcmp::AddCompileWarning(PKMX_CHAR buf)
 {
-  (*msgproc)(kmcmp::currentLine + 1, CWARN_Info, buf, msgprocContext);
+  KMCMP_COMPILER_RESULT_MESSAGE message;
+  message.errorCode = CWARN_Info;
+  message.lineNumber = kmcmp::currentLine + 1;
+  message.message = buf;
+  (*msgproc)(message, msgprocContext);
   return FALSE;
 }
 
@@ -26,13 +31,19 @@ KMX_BOOL AddCompileError(KMX_DWORD msg)
   if (msg & CERR_FATAL)
   {
     szTextp = GetCompilerErrorString(msg);
-    (*msgproc)(kmcmp::currentLine + 1, msg, szTextp, msgprocContext);
+    KMCMP_COMPILER_RESULT_MESSAGE message;
+    message.errorCode = msg;
+    message.lineNumber = kmcmp::currentLine + 1;
+    message.message = szTextp;
+    (*kmcmp::msgproc)(message, msgprocContext);
     kmcmp::nErrors++;
     return TRUE;
   }
 
-  if (msg & CERR_ERROR)
+  if (msg & CERR_ERROR) {
     kmcmp::nErrors++;
+  }
+
   szTextp = GetCompilerErrorString(msg);
 
   if (szTextp) {
@@ -52,6 +63,11 @@ KMX_BOOL AddCompileError(KMX_DWORD msg)
   }
 
   kmcmp::ErrChr = 0;  *ErrExtraLIB =0;
-  if (!(*msgproc)(kmcmp::currentLine, msg, szText, msgprocContext)) return TRUE;
+
+  KMCMP_COMPILER_RESULT_MESSAGE message;
+  message.errorCode = msg;
+  message.lineNumber = kmcmp::currentLine + 1;
+  message.message = szText;
+  (*kmcmp::msgproc)(message, msgprocContext);
   return FALSE;
 }

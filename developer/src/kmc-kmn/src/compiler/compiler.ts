@@ -57,6 +57,13 @@ export interface KmnCompilerResultExtra {
   groups: CompilerResultExtraGroup[];
 };
 
+/** @internal */
+export interface KmnCompilerResultMessage {
+  message: string;
+  errorCode: number;
+  lineNumber: number;
+}
+
 /**
  * @public
  * Internal in-memory build artifacts from a successful compilation
@@ -114,16 +121,6 @@ const baseOptions: KmnCompilerOptions = {
   warnDeprecatedCode: true,
 };
 
-/**
- * Allows multiple instances of the Compiler class, by ensuring that the
- * 'unique' kmnCompilerCallback global will be correlated with a specific
- * instance of the Compiler class
- */
-let callbackProcIdentifier = 0;
-
-const
-  callbackPrefix = 'kmnCompilerCallbacks_';
-
 interface MallocAndFree {
   malloc(sz: number) : number;
   free(p: number) : null;
@@ -139,15 +136,9 @@ let
  * external IO.
  */
 export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
-  private readonly callbackID: string; // a unique numeric id added to globals with prefixed names
   private callbacks: CompilerCallbacks;
   private wasmExports: MallocAndFree;
   private options: KmnCompilerOptions;
-
-  constructor() {
-    this.callbackID = callbackPrefix + callbackProcIdentifier.toString();
-    callbackProcIdentifier++;
-  }
 
   /**
    * Initialize the compiler, including loading the WASM host for kmcmplib.
@@ -220,46 +211,6 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
     return true;
   }
 
-  private compilerMessageCallback = (line: number, code: number, msg: string): number => {
-    this.callbacks.reportMessage(mapErrorFromKmcmplib(line, code, msg));
-    return 1;
-  }
-
-  private cachedFile: {filename: string; data: Uint8Array} = {
-    filename: null,
-    data: null
-  };
-
-  private loadFileCallback = (filename: string, baseFilename: string, buffer: number, bufferSize: number): number => {
-    let resolvedFilename = this.callbacks.resolveFilename(baseFilename, filename);
-    let data: Uint8Array;
-    if(this.cachedFile.filename == resolvedFilename) {
-      data = this.cachedFile.data;
-    }
-    else {
-      data = this.callbacks.loadFile(resolvedFilename);
-      if(!data) {
-        return -1;
-      }
-      this.cachedFile.filename = resolvedFilename;
-      this.cachedFile.data = data;
-    }
-
-    if(buffer == 0) {
-      /* We need to return buffer size required */
-      return data.byteLength;
-    }
-
-    if(bufferSize != data.byteLength) {
-      /* c8 ignore next 2 */
-      throw new Error(`loadFileCallback: second call, expected file size ${bufferSize} == ${data.byteLength}`);
-    }
-
-    Module.HEAP8.set(data, buffer);
-
-    return 1;
-  }
-
   private copyWasmResult(wasm_result: any): KmnCompilerResult {
     let result: KmnCompilerResult = {
       // We cannot Object.assign or {...} on a wasm-defined object, so...
@@ -322,12 +273,17 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
 
     outfile = outfile ?? infile.replace(/\.kmn$/i, '.kmx');
 
-    (globalThis as any)[this.callbackID] = {
-      message: this.compilerMessageCallback,
-      loadFile: this.loadFileCallback
-    };
+    const compiler = this;
+    const wasm_callbacks = Module.WasmCallbackInterface.implement({
+      message: function(message: KmnCompilerResultMessage) {
+        compiler.callbacks.reportMessage(mapErrorFromKmcmplib(message.lineNumber, message.errorCode, message.message));
+      },
+      loadFile: function(filename: string, baseFilename: string): number[] {
+        const data: Uint8Array = compiler.callbacks.loadFile(compiler.callbacks.resolveFilename(baseFilename, filename));
+        return data ? Array.from(data) : null;
+      }
+    });
 
-    let wasm_interface = new Module.CompilerInterface();
     let wasm_options = new Module.CompilerOptions();
     let wasm_result = null;
     try {
@@ -336,8 +292,8 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
       wasm_options.warnDeprecatedCode = options.warnDeprecatedCode;
       wasm_options.shouldAddCompilerVersion = options.shouldAddCompilerVersion;
       wasm_options.target = 0; // CKF_KEYMAN; TODO use COMPILETARGETS_KMX
-      wasm_interface.callbacksKey = this.callbackID; // key of object on globalThis
-      wasm_result = Module.kmcmp_compile(infile, wasm_options, wasm_interface);
+
+      wasm_result = Module.kmcmp_compile(infile, wasm_options, wasm_callbacks);
       if(!wasm_result.result) {
         return null;
       }
@@ -382,7 +338,7 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
         // should have no impact on the final .js if options.debug is false
         wasm_options.saveDebug = true;
 
-        wasm_result = Module.kmcmp_compile(infile, wasm_options, wasm_interface);
+        wasm_result = Module.kmcmp_compile(infile, wasm_options, wasm_callbacks);
         if(!wasm_result.result) {
           return null;
         }
@@ -405,9 +361,8 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
       if(wasm_result) {
         wasm_result.delete();
       }
-      wasm_interface.delete();
+      wasm_callbacks.delete();
       wasm_options.delete();
-      delete (globalThis as any)[this.callbackID];
     }
   }
 

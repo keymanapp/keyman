@@ -5,13 +5,12 @@
 #define ERR_EXTRA_LIB_LEN 256
 
 namespace kmcmp {
-
+  extern kmcmp_CompilerMessageProc msgproc;
   KMX_BOOL AddCompileWarning(char* buf);
 }
 
 extern char ErrExtraLIB[ERR_EXTRA_LIB_LEN];
 
-extern kmcmp_CompilerMessageProc msgproc;
 extern void* msgprocContext;
 KMX_BOOL AddCompileError(KMX_DWORD msg);
 

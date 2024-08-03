@@ -234,7 +234,6 @@ enum LinePrefixType { lptNone, lptKeymanAndKeymanWeb, lptKeymanWebOnly, lptKeyma
 
 /* Compile target */
 
-kmcmp_CompilerMessageProc msgproc = NULL;
 kmcmp_LoadFileProc loadfileproc = NULL;
 
 void* msgprocContext = NULL;
@@ -3336,28 +3335,25 @@ KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD File
 {
   auto szNameUtf8 = string_from_u16string(szName);
 
-  if(!loadfileproc(szNameUtf8.c_str(), fk->extra->kmnFilename.c_str(), nullptr, (int*) FileSize, msgprocContext)) {
+  std::vector<uint8_t> bufvec = loadfileproc(szNameUtf8, fk->extra->kmnFilename);
+  if(!bufvec.size()) {
     // Append .bmp and try again
     if(endsWith(szNameUtf8, ".bmp")) {
       return CERR_CannotReadBitmapFile;
     }
     szNameUtf8.append(".bmp");
-    if(!loadfileproc(szNameUtf8.c_str(), fk->extra->kmnFilename.c_str(), nullptr, (int*) FileSize, msgprocContext)) {
-      return CERR_CannotReadBitmapFile;
-    }
+    bufvec = loadfileproc(szNameUtf8, fk->extra->kmnFilename);
   }
 
-  if(*FileSize < 2) {
+  if(bufvec.size() < 2) {
     // Zero-byte file is invalid; 2 byte file is too, but we only really care
     // about the prolog at this point so we don't overrun our buffer
     return CERR_CannotReadBitmapFile;
   }
 
+  *FileSize = bufvec.size();
   *Buf = new KMX_BYTE[*FileSize];
-  if(!loadfileproc(szNameUtf8.c_str(), fk->extra->kmnFilename.c_str(), *Buf, (int*) FileSize, msgprocContext)) {
-    delete[] *Buf;
-    return CERR_CannotReadBitmapFile;
-  }
+  std::copy(bufvec.begin(), bufvec.end(), *Buf);
 
   /* Test for version 7.0 icon support */
   if (*((PKMX_CHAR)*Buf) != 'B' && *(((PKMX_CHAR)*Buf) + 1) != 'M') {
