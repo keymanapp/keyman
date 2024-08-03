@@ -18,30 +18,6 @@ const mw = (code: number, message: string, o?: {filename?: string, line?: number
   line: o?.line,
 });
 
-/**
- * LogLevel comes from kmn_compiler_errors.h, for legacy compiler error messages
- */
-const enum LogLevel {
-  LEVEL_MASK = 0xF000,
-  CODE_MASK = 0x0FFF,
-  CERR_FATAL = 0x8000,
-  CERR_ERROR = 0x4000,
-  CERR_WARNING = 0x2000,
-  CERR_HINT = 0x1000,
-  CERR_INFO = 0
-};
-
-/**
- * Translate the legacy compiler error messages to Severity codes
- */
-const LogLevelToSeverity: Record<number,number> = {
-  [LogLevel.CERR_FATAL]:   SevFatal,
-  [LogLevel.CERR_ERROR]:   SevError,
-  [LogLevel.CERR_WARNING]: SevWarn,
-  [LogLevel.CERR_HINT]:    SevHint,
-  [LogLevel.CERR_INFO]:    SevInfo
-}
-
 export const enum KmnCompilerMessageRanges {
   RANGE_KMN_COMPILER_MIN    = 0x001, // from kmn_compiler_errors.h
   RANGE_KMN_COMPILER_MAX    = 0x7FF, // from kmn_compiler_errors.h
@@ -211,10 +187,8 @@ export class KmnCompilerMessages {
     to the file.`
   );
 
-  // static INFO_None                                            = SevInfo | 0x000;
-
-  static INFO_EndOfFile                                       = SevInfo | 0x001;
-  static Info_EndOfFile                                       = () => m(this.INFO_EndOfFile, `(no error - reserved code)`);
+  // static STATUS_None                                            = 0x000;   // This is not a real error
+  // static STATUS_EndOfFile                                       = 0x001;   // This is not a real error
 
   static FATAL_BadCallParams                                  = SevFatal | 0x002;
   static Fatal_BadCallParams                                  = () => m(this.FATAL_BadCallParams, `CompileKeyboardFile was called with bad parameters`);
@@ -228,8 +202,8 @@ export class KmnCompilerMessages {
   // static ERROR_CannotCreateOutfile                            = SevError | 0x006; // #10678: reduced from fatal to error in 17.0, but unused
   // static Error_CannotCreateOutfile                            = () => m(this.ERROR_CannotCreateOutfile, `Cannot open output file for writing`); unused
 
-  static FATAL_UnableToWriteFully                             = SevFatal | 0x007;
-  static Fatal_UnableToWriteFully                             = () => m(this.FATAL_UnableToWriteFully, `Unable to write the file completely`);
+  // static FATAL_UnableToWriteFully                             = SevFatal | 0x007;
+  // static Fatal_UnableToWriteFully                             = () => m(this.FATAL_UnableToWriteFully, `Unable to write the file completely`);
 
   static ERROR_CannotReadInfile                               = SevError | 0x008; // #10678: reduced from fatal to error in 17.0
   static Error_CannotReadInfile                               = () => m(this.ERROR_CannotReadInfile, `Cannot read the input file`);
@@ -744,17 +718,6 @@ export class KmnCompilerMessages {
   static FATAL_BufferOverflow                                 = SevFatal | 0x0C0;
   static Fatal_BufferOverflow                                 = () => m(this.FATAL_BufferOverflow, `The compiler memory buffer overflowed`);
 
-  static FATAL_Break                                          = SevFatal | 0x0C1;
-  static Fatal_Break                                          = () => m(this.FATAL_Break, `Compiler interrupted by user`);
-};
-
-export function mapErrorFromKmcmplib(line: number, code: number, msg: string): CompilerEvent {
-  const severity = LogLevelToSeverity[code & LogLevel.LEVEL_MASK];
-  const baseCode = code & LogLevel.CODE_MASK;
-  const event: CompilerEvent = {
-    line: line,
-    code: severity | CompilerErrorNamespace.KmnCompiler | baseCode,
-    message: msg
-  };
-  return event;
+  // static FATAL_Break                                          = SevFatal | 0x0C1;
+  // static Fatal_Break                                          = () => m(this.FATAL_Break, `Compiler interrupted by user`);
 };

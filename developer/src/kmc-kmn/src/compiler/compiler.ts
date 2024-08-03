@@ -10,7 +10,7 @@ import { UnicodeSetParser, UnicodeSet, VisualKeyboard, KvkFileReader, KeymanComp
 import { CompilerCallbacks, CompilerEvent, CompilerOptions, KeymanFileTypes, KvkFileWriter, KvksFileReader } from '@keymanapp/common-types';
 import * as Osk from './osk.js';
 import loadWasmHost from '../import/kmcmplib/wasm-host.js';
-import { KmnCompilerMessages, mapErrorFromKmcmplib } from './kmn-compiler-messages.js';
+import { KmnCompilerMessages } from './kmn-compiler-messages.js';
 import { WriteCompiledKeyboard } from '../kmw-compiler/kmw-compiler.js';
 
 //
@@ -276,7 +276,7 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
     const compiler = this;
     const wasm_callbacks = Module.WasmCallbackInterface.implement({
       message: function(message: KmnCompilerResultMessage) {
-        compiler.callbacks.reportMessage(mapErrorFromKmcmplib(message.lineNumber, message.errorCode, message.message));
+        compiler.callbacks.reportMessage({line:message.lineNumber, code: message.errorCode, message: message.message});
       },
       loadFile: function(filename: string, baseFilename: string): number[] {
         const data: Uint8Array = compiler.callbacks.loadFile(compiler.callbacks.resolveFilename(baseFilename, filename));

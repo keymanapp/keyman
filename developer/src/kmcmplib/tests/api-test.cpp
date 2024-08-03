@@ -65,7 +65,7 @@ void test_kmcmp_CompileKeyboard(char *kmn_file) {
   options.target = CKF_KEYMAN;
   assert(!kmcmp_CompileKeyboard(kmn_file, options, msgproc, loadfileProc, nullptr, result));
   assert(error_vec.size() == 1);
-  assert(error_vec[0] == CERR_InfileNotExist); // zero byte no longer gives us CERR_CannotReadInfile
+  assert(error_vec[0] == KmnCompilerMessages::ERROR_InfileNotExist); // zero byte no longer gives us KmnCompilerMessages::ERROR_CannotReadInfile
 
   unlink(kmn_file);
 }
@@ -74,26 +74,26 @@ extern KMX_DWORD GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &
 
 void test_GetCompileTargetsFromTargetsStore() {
   int targets = 0;
-  assert(GetCompileTargetsFromTargetsStore(u"any", targets) == CERR_None);
+  assert(GetCompileTargetsFromTargetsStore(u"any", targets) == STATUS_Success);
   assert(targets == (COMPILETARGETS_KMX | COMPILETARGETS_JS));
-  assert(GetCompileTargetsFromTargetsStore(u"windows", targets) == CERR_None);
+  assert(GetCompileTargetsFromTargetsStore(u"windows", targets) == STATUS_Success);
   assert(targets == COMPILETARGETS_KMX);
-  assert(GetCompileTargetsFromTargetsStore(u"desktop", targets) == CERR_None);
+  assert(GetCompileTargetsFromTargetsStore(u"desktop", targets) == STATUS_Success);
   assert(targets == COMPILETARGETS_KMX);
-  assert(GetCompileTargetsFromTargetsStore(u"mobile", targets) == CERR_None);
+  assert(GetCompileTargetsFromTargetsStore(u"mobile", targets) == STATUS_Success);
   assert(targets == COMPILETARGETS_JS);
-  assert(GetCompileTargetsFromTargetsStore(u"web", targets) == CERR_None);
+  assert(GetCompileTargetsFromTargetsStore(u"web", targets) == STATUS_Success);
   assert(targets == COMPILETARGETS_JS);
-  assert(GetCompileTargetsFromTargetsStore(u"desktop mobile", targets) == CERR_None);
+  assert(GetCompileTargetsFromTargetsStore(u"desktop mobile", targets) == STATUS_Success);
   assert(targets == (COMPILETARGETS_KMX | COMPILETARGETS_JS));
-  assert(GetCompileTargetsFromTargetsStore(u"desktop   tablet", targets) == CERR_None);
+  assert(GetCompileTargetsFromTargetsStore(u"desktop   tablet", targets) == STATUS_Success);
   assert(targets == (COMPILETARGETS_KMX | COMPILETARGETS_JS));
-  assert(GetCompileTargetsFromTargetsStore(u"foo bar baz", targets) == CERR_InvalidTarget);
+  assert(GetCompileTargetsFromTargetsStore(u"foo bar baz", targets) == KmnCompilerMessages::ERROR_InvalidTarget);
   assert(targets == 0);
-  assert(GetCompileTargetsFromTargetsStore(u"windows chromeos", targets) == CERR_InvalidTarget);
+  assert(GetCompileTargetsFromTargetsStore(u"windows chromeos", targets) == KmnCompilerMessages::ERROR_InvalidTarget);
   assert(targets == 0);
-  assert(GetCompileTargetsFromTargetsStore(u" ", targets) == CERR_NoTargetsSpecified);
+  assert(GetCompileTargetsFromTargetsStore(u" ", targets) == KmnCompilerMessages::ERROR_NoTargetsSpecified);
   assert(targets == 0);
-  assert(GetCompileTargetsFromTargetsStore(u"", targets) == CERR_NoTargetsSpecified);
+  assert(GetCompileTargetsFromTargetsStore(u"", targets) == KmnCompilerMessages::ERROR_NoTargetsSpecified);
   assert(targets == 0);
 }

@@ -12,9 +12,9 @@ namespace kmcmp {
 extern char ErrExtraLIB[ERR_EXTRA_LIB_LEN];
 
 extern void* msgprocContext;
-KMX_BOOL AddCompileError(KMX_DWORD msg);
+KMX_BOOL AddCompileError(KMX_DWORD msg); // TODO rename to AddCompileMessage
 
-/// Use AddWarningBool for functions that return bool or KMX_BOOL
-#define AddWarningBool(warn)  { if(AddCompileError(warn)) return FALSE; }
-/// Use AddWarning for functions that return KMX_DWORD
-#define AddWarning(warn)      { if(AddCompileError(warn)) return CERR_Break; }
+/// Use AddWarningBool for functions that return bool or KMX_BOOL; TODO merge with AddCompileMessage
+#define AddWarningBool(warn)  AddCompileError(warn)
+/// Use AddWarning for functions that return KMX_DWORD; TODO merge with AddCompileMessage
+#define AddWarning(warn)      AddCompileError(warn)

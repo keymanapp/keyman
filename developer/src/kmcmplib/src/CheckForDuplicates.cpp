@@ -19,17 +19,17 @@ KMX_DWORD CheckForDuplicateGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) noexcept {
     }
     if (u16icmp(gp0->szName, gp->szName) == 0) {
       snprintf(ErrExtraLIB, ERR_EXTRA_LIB_LEN, " Group '%s' declared on line %d", string_from_u16string(gp->szName).c_str(), gp0->Line);
-      return CERR_DuplicateGroup;
+      return KmnCompilerMessages::ERROR_DuplicateGroup;
     }
   }
-  return CERR_None;
+  return STATUS_Success;
 }
 
 KMX_DWORD CheckForDuplicateStore(PFILE_KEYBOARD fk, PFILE_STORE sp) noexcept {
   if (!sp->szName[0]) {
     // Stores with zero length names are reserved system stores.
     // They cannot be defined in user code. This is not an issue.
-    return CERR_None;
+    return STATUS_Success;
   }
   KMX_DWORD i;
   PFILE_STORE sp0 = fk->dpStoreArray;
@@ -39,8 +39,8 @@ KMX_DWORD CheckForDuplicateStore(PFILE_KEYBOARD fk, PFILE_STORE sp) noexcept {
     }
     if (u16icmp(sp0->szName, sp->szName) == 0) {
       snprintf(ErrExtraLIB, ERR_EXTRA_LIB_LEN, " Store '%s' declared on line %d", string_from_u16string(sp0->szName).c_str(), sp0->line);
-      return CERR_DuplicateStore;
+      return KmnCompilerMessages::ERROR_DuplicateStore;
     }
   }
-  return CERR_None;
+  return STATUS_Success;
 }

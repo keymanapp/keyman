@@ -42,7 +42,7 @@ KMX_DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
         reportedLines.insert(kp->Line);
         kmcmp::currentLine = kp->Line;
         snprintf(ErrExtraLIB, ERR_EXTRA_LIB_LEN, " Overridden by rule on line %d", k1.Line);
-        AddWarning(CHINT_UnreachableRule);
+        AddWarning(KmnCompilerMessages::HINT_UnreachableRule);
       }
     }
     else {
@@ -52,5 +52,5 @@ KMX_DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
 
   kmcmp::currentLine = oldCurrentLine;
 
-  return CERR_None;
+  return STATUS_Success;
 }
