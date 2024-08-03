@@ -126,25 +126,25 @@ TEST_F(CompilerTest, wstrtostr_test) {
     EXPECT_EQ(0, strcmp("", wstrtostr((PKMX_WCHAR)u"")));
 };
 
-// TEST_F(CompilerTest, AddCompileError_test) {
+// TEST_F(CompilerTest, ReportCompilerMessage_test) {
 //     msgproc = msgproc_true_stub;
 //     kmcmp::ErrChr = 0;
 
 //     // SevFatal
 //     EXPECT_EQ(0, kmcmp::nErrors);
 //     EXPECT_EQ(SevFatal, KmnCompilerMessages::FATAL_CannotCreateTempfile & SevFatal);
-//     EXPECT_TRUE(AddCompileError(KmnCompilerMessages::FATAL_CannotCreateTempfile));
+//     EXPECT_TRUE(ReportCompilerMessage(KmnCompilerMessages::FATAL_CannotCreateTempfile));
 //     EXPECT_EQ(1, kmcmp::nErrors);
 
 //     // SevError
 //     EXPECT_EQ(SevError, KmnCompilerMessages::ERROR_InvalidLayoutLine & SevError);
-//     EXPECT_FALSE(AddCompileError(KmnCompilerMessages::ERROR_InvalidLayoutLine));
+//     EXPECT_FALSE(ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidLayoutLine));
 //     EXPECT_EQ(2, kmcmp::nErrors);
 
 //     // Unknown
 //     const KMX_DWORD UNKNOWN_ERROR = 0x00004FFF; // top of range ERROR
 //     EXPECT_EQ(SevError, UNKNOWN_ERROR & SevError);
-//     EXPECT_FALSE(AddCompileError(UNKNOWN_ERROR));
+//     EXPECT_FALSE(ReportCompilerMessage(UNKNOWN_ERROR));
 //     sprintf(expected, "Unknown error %x", UNKNOWN_ERROR);
 //     EXPECT_EQ(3, kmcmp::nErrors);
 
@@ -152,14 +152,14 @@ TEST_F(CompilerTest, wstrtostr_test) {
 //     const int ERROR_CHAR_INDEX = 42;
 //     kmcmp::ErrChr = ERROR_CHAR_INDEX ;
 //     EXPECT_EQ(SevError, KmnCompilerMessages::ERROR_InvalidLayoutLine & SevError);
-//     EXPECT_FALSE(AddCompileError(KmnCompilerMessages::ERROR_InvalidLayoutLine));
+//     EXPECT_FALSE(ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidLayoutLine));
 //     kmcmp::ErrChr = 0;
 //     EXPECT_EQ(4, kmcmp::nErrors);
 
 //     // msgproc returns FALSE
 //     msgproc = msgproc_false_stub;
 //     EXPECT_EQ(SevError, KmnCompilerMessages::ERROR_InvalidLayoutLine & SevError);
-//     EXPECT_TRUE(AddCompileError(KmnCompilerMessages::ERROR_InvalidLayoutLine));
+//     EXPECT_TRUE(ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidLayoutLine));
 //     EXPECT_EQ(6, kmcmp::nErrors);
 // };
 
@@ -257,7 +257,7 @@ TEST_F(CompilerTest, IsValidKeyboardVersion_test) {
 
 // KMX_DWORD kmcmp::AddCompilerVersionStore(PFILE_KEYBOARD fk)
 // KMX_DWORD CheckStatementOffsets(PFILE_KEYBOARD fk, PFILE_GROUP gp, PKMX_WCHAR context, PKMX_WCHAR output, PKMX_WCHAR key)
-// KMX_BOOL CheckContextStatementPositions(PKMX_WCHAR context)
+// void CheckContextStatementPositions(PKMX_WCHAR context)
 // KMX_DWORD CheckUseStatementsInOutput(PKMX_WCHAR output)
 // KMX_DWORD CheckVirtualKeysInOutput(PKMX_WCHAR output)
 // KMX_DWORD InjectContextToReadonlyOutput(PKMX_WCHAR pklOut)
@@ -1256,7 +1256,7 @@ TEST_F(CompilerTest, ProcessEthnologueStore_test) {
 
 // KMX_DWORD ProcessHotKey(PKMX_WCHAR p, KMX_DWORD *hk)
 // void SetChecksum(PKMX_BYTE buf, PKMX_DWORD CheckSum, KMX_DWORD sz)
-// KMX_BOOL kmcmp::CheckStoreUsage(PFILE_KEYBOARD fk, int storeIndex, KMX_BOOL fIsStore, KMX_BOOL fIsOption, KMX_BOOL fIsCall)
+// void kmcmp::CheckStoreUsage(PFILE_KEYBOARD fk, int storeIndex, KMX_BOOL fIsStore, KMX_BOOL fIsOption, KMX_BOOL fIsCall)
 // KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, KMX_BYTE**data, size_t& dataSize)
 // KMX_DWORD ReadLine(KMX_BYTE* infile, int sz, int& offset, PKMX_WCHAR wstr, KMX_BOOL PreProcess)
 

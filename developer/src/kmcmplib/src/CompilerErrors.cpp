@@ -10,7 +10,7 @@ namespace kmcmp {
   kmcmp_CompilerMessageProc msgproc = nullptr;
 }
 
-void AddCompileError(KMX_DWORD msg, const std::vector<std::string>& parameters) {
+void ReportCompilerMessage(KMX_DWORD msg, const std::vector<std::string>& parameters) {
   const KMX_DWORD severity = msg & MESSAGE_SEVERITY_MASK;
 
   if (severity == CompilerErrorSeverity::Error || severity == CompilerErrorSeverity::Fatal) {

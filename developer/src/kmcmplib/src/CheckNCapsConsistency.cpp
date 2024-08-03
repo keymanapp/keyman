@@ -33,7 +33,7 @@
  *
  * @param fk     Keyboard to check
  */
-bool CheckNCapsConsistency(PFILE_KEYBOARD fk) {
+void CheckNCapsConsistency(PFILE_KEYBOARD fk) {
   struct CapsUsage {
     int ncaps_line, caps_line, neither_line;
   };
@@ -87,13 +87,11 @@ bool CheckNCapsConsistency(PFILE_KEYBOARD fk) {
     if (caps_ncaps_usage[i].neither_line && (caps_ncaps_usage[i].caps_line || caps_ncaps_usage[i].ncaps_line)) {
       // We set the current line to one needing work: the developer should add the NCAPS flag
       kmcmp::currentLine = caps_ncaps_usage[i].neither_line;
-      AddWarningBool(KmnCompilerMessages::WARN_KeyShouldIncludeNCaps);
+      ReportCompilerMessage(KmnCompilerMessages::WARN_KeyShouldIncludeNCaps);
     }
   }
 
   delete[] caps_ncaps_usage;
 
   kmcmp::currentLine = oldCurrentLine;
-
-  return TRUE;
 }

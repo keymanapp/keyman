@@ -25,7 +25,7 @@ EXTERN bool kmcmp_CompileKeyboard(
   kmcmp::CompileTarget = options.target;
 
   if (!messageProc || !loadFileProc || !pszInfile) {
-    AddCompileError(KmnCompilerMessages::FATAL_BadCallParams);
+    ReportCompilerMessage(KmnCompilerMessages::FATAL_BadCallParams);
     return FALSE;
   }
 
@@ -39,20 +39,20 @@ EXTERN bool kmcmp_CompileKeyboard(
   std::vector<uint8_t> bufvec = loadFileProc(pszInfile, "");
   sz = bufvec.size();
   if(!sz) {
-    AddCompileError(KmnCompilerMessages::ERROR_InfileNotExist);
+    ReportCompilerMessage(KmnCompilerMessages::ERROR_InfileNotExist);
     return FALSE;
   }
 
   if(sz < 3) {
     // Technically, a 3 byte file can never be a valid .kmn, so we can shortcut
     // here and avoid testing outside memory bounds for looking at BOM
-    AddCompileError(KmnCompilerMessages::ERROR_CannotReadInfile);
+    ReportCompilerMessage(KmnCompilerMessages::ERROR_CannotReadInfile);
     return FALSE;
   }
 
   KMX_BYTE* infile = new KMX_BYTE[sz+1];
   if(!infile) {
-    AddCompileError(KmnCompilerMessages::FATAL_CannotAllocateMemory);
+    ReportCompilerMessage(KmnCompilerMessages::FATAL_CannotAllocateMemory);
     return FALSE;
   }
   std::copy(bufvec.begin(), bufvec.end(), infile);
@@ -68,7 +68,7 @@ EXTERN bool kmcmp_CompileKeyboard(
     int sz16;
     if(!UTF16TempFromUTF8(infile, sz, &infile16, &sz16)) {
       delete[] infile;
-      AddCompileError(KmnCompilerMessages::FATAL_CannotCreateTempfile);
+      ReportCompilerMessage(KmnCompilerMessages::FATAL_CannotCreateTempfile);
       return FALSE;
     }
     delete[] infile;
@@ -95,7 +95,7 @@ EXTERN bool kmcmp_CompileKeyboard(
   //TODO: FreeKeyboardPointers(fk);
 
   if(msg != STATUS_Success) {
-    AddCompileError(msg);
+    ReportCompilerMessage(msg);
     return FALSE;
   }
 

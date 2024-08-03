@@ -13,7 +13,7 @@ KMX_BOOL kmcmp::CheckKeyboardFinalVersion(PFILE_KEYBOARD fk) {
     if(kmcmp::CompileTarget != CKF_KEYMANWEB) {
       // Note: the KeymanWeb compiler is responsible for reporting minimum
       // version for the web targets
-      AddCompileError(KmnCompilerMessages::INFO_MinimumCoreEngineVersion, {
+      ReportCompilerMessage(KmnCompilerMessages::INFO_MinimumCoreEngineVersion, {
         /* majorVersion */ std::to_string((fk->version & 0xFF00) >> 8),
         /* minorVersion */ std::to_string(fk->version & 0xFF)
       });
