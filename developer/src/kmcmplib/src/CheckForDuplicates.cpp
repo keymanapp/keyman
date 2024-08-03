@@ -10,7 +10,7 @@
 
 #include "CheckForDuplicates.h"
 
-KMX_DWORD CheckForDuplicateGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) noexcept {
+KMX_BOOL CheckForDuplicateGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) noexcept {
   KMX_DWORD i;
   PFILE_GROUP gp0 = fk->dpGroupArray;
   for (i = 0; i < fk->cxGroupArray; i++, gp0++) {
@@ -19,17 +19,18 @@ KMX_DWORD CheckForDuplicateGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) noexcept {
     }
     if (u16icmp(gp0->szName, gp->szName) == 0) {
       snprintf(ErrExtraLIB, ERR_EXTRA_LIB_LEN, " Group '%s' declared on line %d", string_from_u16string(gp->szName).c_str(), gp0->Line);
-      return KmnCompilerMessages::ERROR_DuplicateGroup;
+      AddCompileError(KmnCompilerMessages::ERROR_DuplicateGroup);
+      return FALSE;
     }
   }
-  return STATUS_Success;
+  return TRUE;
 }
 
-KMX_DWORD CheckForDuplicateStore(PFILE_KEYBOARD fk, PFILE_STORE sp) noexcept {
+KMX_BOOL CheckForDuplicateStore(PFILE_KEYBOARD fk, PFILE_STORE sp) noexcept {
   if (!sp->szName[0]) {
     // Stores with zero length names are reserved system stores.
     // They cannot be defined in user code. This is not an issue.
-    return STATUS_Success;
+    return TRUE;
   }
   KMX_DWORD i;
   PFILE_STORE sp0 = fk->dpStoreArray;
@@ -39,8 +40,9 @@ KMX_DWORD CheckForDuplicateStore(PFILE_KEYBOARD fk, PFILE_STORE sp) noexcept {
     }
     if (u16icmp(sp0->szName, sp->szName) == 0) {
       snprintf(ErrExtraLIB, ERR_EXTRA_LIB_LEN, " Store '%s' declared on line %d", string_from_u16string(sp0->szName).c_str(), sp0->line);
-      return KmnCompilerMessages::ERROR_DuplicateStore;
+      AddCompileError(KmnCompilerMessages::ERROR_DuplicateStore);
+      return FALSE;
     }
   }
-  return STATUS_Success;
+  return TRUE;
 }

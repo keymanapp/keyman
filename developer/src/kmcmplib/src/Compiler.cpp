@@ -152,7 +152,7 @@ KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD File
 KMX_DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, KMX_DWORD storeIndex);
 
 int GetVKCode(PFILE_KEYBOARD fk, PKMX_WCHAR p); // I3438 // TODO: Consolidate GetDeadKey and GetVKCode?
-KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE sp);
+KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE sp);
 
 KMX_DWORD process_if(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx);
 KMX_DWORD process_reset(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx);
@@ -265,8 +265,7 @@ PKMX_STR wstrtostr(PKMX_WCHAR in)
 }
 
 
-KMX_DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
-{
+KMX_BOOL ProcessBeginLine(PFILE_KEYBOARD fk, PKMX_WCHAR p) {
   KMX_WCHAR tstr[128];
   PKMX_WCHAR q, pp;
   int BeginMode;
@@ -274,30 +273,42 @@ KMX_DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
 
   pp = p;
 
-  q = ( PKMX_WCHAR) u16chr(p, '>');
-  if (!q) return KmnCompilerMessages::ERROR_NoTokensFound;
+  q = (PKMX_WCHAR) u16chr(p, '>');
+  if (!q) {
+    AddCompileError(KmnCompilerMessages::ERROR_NoTokensFound);
+    return FALSE;
+  }
 
   while (iswspace(*p)) p++;
   if (u16nicmp(p, u"unicode", 7) == 0) BeginMode = BEGIN_UNICODE;
   else if (u16nicmp(p, u"ansi", 4) == 0) BeginMode = BEGIN_ANSI;
   else if (u16nicmp(p, u"newContext", 10) == 0) BeginMode = BEGIN_NEWCONTEXT;
   else if (u16nicmp(p, u"postKeystroke", 13) == 0) BeginMode = BEGIN_POSTKEYSTROKE;
-  else if (*p != '>') return KmnCompilerMessages::ERROR_InvalidToken;
+  else if (*p != '>') {
+    AddCompileError(KmnCompilerMessages::ERROR_InvalidToken);
+    return FALSE;
+  }
   else BeginMode = BEGIN_ANSI;
 
   if(kmcmp::BeginLine[BeginMode] != -1) {
-    return KmnCompilerMessages::ERROR_RepeatedBegin;
+    AddCompileError(KmnCompilerMessages::ERROR_RepeatedBegin);
+    return FALSE;
   }
 
   kmcmp::BeginLine[BeginMode] = kmcmp::currentLine;
 
-  if ((msg = GetRHS(fk, p, tstr, 80, (int)(p - pp), FALSE)) != STATUS_Success) return msg;
+  if ((msg = GetRHS(fk, p, tstr, 80, (int)(p - pp), FALSE)) != STATUS_Success) {
+    AddCompileError(msg);
+    return FALSE;
+  }
 
   if (tstr[0] != UC_SENTINEL || tstr[1] != CODE_USE) {
-    return KmnCompilerMessages::ERROR_InvalidBegin;
+    AddCompileError(KmnCompilerMessages::ERROR_InvalidBegin);
+    return FALSE;
   }
   if (tstr[3] != 0) {
-    return KmnCompilerMessages::ERROR_InvalidToken;
+    AddCompileError(KmnCompilerMessages::ERROR_InvalidToken);
+    return FALSE;
   }
 
   if (BeginMode == BEGIN_ANSI || BeginMode == BEGIN_UNICODE) {
@@ -310,20 +321,18 @@ KMX_DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
       /* Record a system store for the line number of the begin statement */
       AddDebugStore(fk, BeginMode == BEGIN_UNICODE ? DEBUGSTORE_BEGIN u"Unicode" : DEBUGSTORE_BEGIN u"ANSI");
     }
-  }
-  else {
-      PFILE_GROUP gp = &fk->dpGroupArray[tstr[2] - 1];
-      if (!gp->fReadOnly) {
-        return BeginMode == BEGIN_NEWCONTEXT ?
-          KmnCompilerMessages::ERROR_NewContextGroupMustBeReadonly :
-          KmnCompilerMessages::ERROR_PostKeystrokeGroupMustBeReadonly;
-      }
-      return AddStore(fk, BeginMode == BEGIN_NEWCONTEXT ? TSS_BEGIN_NEWCONTEXT : TSS_BEGIN_POSTKEYSTROKE, tstr, NULL);
+  } else {
+    PFILE_GROUP gp = &fk->dpGroupArray[tstr[2] - 1];
+    if (!gp->fReadOnly) {
+      AddCompileError(BeginMode == BEGIN_NEWCONTEXT ?
+        KmnCompilerMessages::ERROR_NewContextGroupMustBeReadonly :
+        KmnCompilerMessages::ERROR_PostKeystrokeGroupMustBeReadonly);
+      return FALSE;
     }
+    return AddStore(fk, BeginMode == BEGIN_NEWCONTEXT ? TSS_BEGIN_NEWCONTEXT : TSS_BEGIN_POSTKEYSTROKE, tstr, NULL);
+  }
 
-
-
-  return STATUS_Success;
+  return TRUE;
 }
 
 KMX_DWORD ValidateMatchNomatchOutput(PKMX_WCHAR p) {
@@ -341,8 +350,7 @@ KMX_DWORD ValidateMatchNomatchOutput(PKMX_WCHAR p) {
   return STATUS_Success;
 }
 
-KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
-{
+KMX_BOOL ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str) {
   PKMX_WCHAR p, q, pp;
   PFILE_GROUP gp;
   KMX_DWORD msg;
@@ -364,49 +372,73 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
 
   case T_BEGIN:
     // after a begin can be "Unicode" or "ANSI" or nothing (=ANSI)
-    if ((msg = ProcessBeginLine(fk, p)) != STATUS_Success) return msg;
+    if (!ProcessBeginLine(fk, p)) {
+      return FALSE;
+    }
     break;
 
   case T_GROUP:
-    if (fk->currentGroup == 0xFFFFFFFF) fk->currentGroup = 0;
-    else
-    {
-      if ((msg = ProcessGroupFinish(fk)) != STATUS_Success) return msg;		// finish off previous group first?
+    if (fk->currentGroup == 0xFFFFFFFF) {
+      fk->currentGroup = 0;
+    } else {
+      if ((msg = ProcessGroupFinish(fk)) != STATUS_Success) {
+        AddCompileError(msg);
+        return FALSE;		// finish off previous group first?
+      }
       fk->currentGroup++;
     }
-    //		if( (err = ProcessGroupLine( fk, p )) != STATUS_Success ) return err;
     break;
 
   case T_NAME:
     kmcmp::WarnDeprecatedHeader();   // I4866
     q = GetDelimitedString(&p, u"\"\"", 0);
-    if (!q) return KmnCompilerMessages::ERROR_InvalidName;
+    if (!q) {
+      AddCompileError(KmnCompilerMessages::ERROR_InvalidName);
+      return FALSE;
+    }
 
-    if ((msg = AddStore(fk, TSS_NAME, q)) != STATUS_Success) return msg;
+    if (!AddStore(fk, TSS_NAME, q)) {
+      return FALSE;
+    }
     break;
 
   case T_COPYRIGHT:
     kmcmp::WarnDeprecatedHeader();   // I4866
     q = GetDelimitedString(&p, u"\"\"", 0);
-    if (!q) return KmnCompilerMessages::ERROR_InvalidCopyright;
+    if (!q) {
+      AddCompileError(KmnCompilerMessages::ERROR_InvalidCopyright);
+      return FALSE;
+    }
 
-    if ((msg = AddStore(fk, TSS_COPYRIGHT, q)) != STATUS_Success) return msg;
+    if (!AddStore(fk, TSS_COPYRIGHT, q)) {
+      return FALSE;
+    }
     break;
 
   case T_MESSAGE:
     kmcmp::WarnDeprecatedHeader();   // I4866
     q = GetDelimitedString(&p, u"\"\"", 0);
-    if (!q) return KmnCompilerMessages::ERROR_InvalidMessage;
+    if (!q) {
+      AddCompileError(KmnCompilerMessages::ERROR_InvalidMessage);
+      return FALSE;
+    }
 
-    if ((msg = AddStore(fk, TSS_MESSAGE, q)) != STATUS_Success) return msg;
+    if (!AddStore(fk, TSS_MESSAGE, q)) {
+      return FALSE;
+    }
     break;
 
   case T_LANGUAGENAME:
     kmcmp::WarnDeprecatedHeader();   // I4866
     q = GetDelimitedString(&p, u"\"\"", 0);
-    if (!q) return KmnCompilerMessages::ERROR_InvalidLanguageName;
+    if (!q) {
+      AddCompileError(KmnCompilerMessages::ERROR_InvalidLanguageName);
+      return FALSE;
+    }
 
-    if ((msg = AddStore(fk, TSS_LANGUAGENAME, q)) != STATUS_Success) return msg;
+    if (!AddStore(fk, TSS_LANGUAGENAME, q)) {
+      return FALSE;
+    }
     break;
 
   case T_LANGUAGE:
@@ -415,7 +447,9 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
     KMX_WCHAR *tokcontext = NULL;
     q = u16tok(p,  p_sep, &tokcontext);  // I3481
 
-    if ((msg = AddStore(fk, TSS_LANGUAGE, q)) != STATUS_Success) return msg;
+    if (!AddStore(fk, TSS_LANGUAGE, q)) {
+      return FALSE;
+    }
     break;
   }
   case T_LAYOUT:
@@ -423,46 +457,67 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
     kmcmp::WarnDeprecatedHeader();   // I4866
     KMX_WCHAR *tokcontext = NULL;
     q = u16tok(p, p_sep, &tokcontext);  // I3481
-    if ((msg = AddStore(fk, TSS_LAYOUT, q)) != STATUS_Success) return msg;
+    if (!AddStore(fk, TSS_LAYOUT, q)) {
+      return FALSE;
+    }
     break;
   }
   case T_CAPSOFF:
     kmcmp::WarnDeprecatedHeader();   // I4866
-    if ((msg = AddStore(fk, TSS_CAPSALWAYSOFF, u"1")) != STATUS_Success) return msg;
+    if (!AddStore(fk, TSS_CAPSALWAYSOFF, u"1")) {
+      return FALSE;
+    }
     break;
 
   case T_CAPSON:
     kmcmp::WarnDeprecatedHeader();   // I4866
-    if ((msg = AddStore(fk, TSS_CAPSONONLY, u"1")) != STATUS_Success) return msg;
+    if (!AddStore(fk, TSS_CAPSONONLY, u"1")) {
+      return FALSE;
+    }
     break;
 
   case T_SHIFT:
     kmcmp::WarnDeprecatedHeader();   // I4866
-    if ((msg = AddStore(fk, TSS_SHIFTFREESCAPS, u"1")) != STATUS_Success) return msg;
+    if (!AddStore(fk, TSS_SHIFTFREESCAPS, u"1")) {
+      return FALSE;
+    }
     break;
 
   case T_HOTKEY:
   {
     kmcmp::WarnDeprecatedHeader();   // I4866
     KMX_WCHAR *tokcontext = NULL;
-    if ((q = u16tok(p,  p_sep, &tokcontext)) == NULL) return KmnCompilerMessages::ERROR_CodeInvalidInThisSection;  // I3481
-    if ((msg = AddStore(fk, TSS_HOTKEY, q)) != STATUS_Success) return msg;
+    if ((q = u16tok(p,  p_sep, &tokcontext)) == NULL) {
+      AddCompileError(KmnCompilerMessages::ERROR_CodeInvalidInThisSection);  // I3481
+      return FALSE;
+    }
+    if (!AddStore(fk, TSS_HOTKEY, q)) {
+      return FALSE;
+    }
     break;
   }
   case T_BITMAP:
   {
     kmcmp::WarnDeprecatedHeader();   // I4866
     KMX_WCHAR *tokcontext = NULL;
-    if ((q = u16tok(p,  p_sep, &tokcontext)) == NULL) return KmnCompilerMessages::ERROR_InvalidBitmapLine;  // I3481
+    if ((q = u16tok(p,  p_sep, &tokcontext)) == NULL) {
+      AddCompileError(KmnCompilerMessages::ERROR_InvalidBitmapLine);  // I3481
+      return FALSE;
+    }
 
     while (iswspace(*q)) q++;
     if (*q == '"') {
       p = q;
       q = GetDelimitedString(&p, u"\"\"", 0);
-      if (!q) return KmnCompilerMessages::ERROR_InvalidBitmapLine;
+      if (!q) {
+        AddCompileError(KmnCompilerMessages::ERROR_InvalidBitmapLine);
+        return FALSE;
+      }
     }
 
-    if ((msg = AddStore(fk, TSS_BITMAP, q)) != STATUS_Success) return msg;
+    if (!AddStore(fk, TSS_BITMAP, q)) {
+      return FALSE;
+    }
     break;
   }
   case T_BITMAPS:
@@ -471,31 +526,49 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
     KMX_WCHAR *tokcontext = NULL;
     AddWarning(KmnCompilerMessages::WARN_BitmapNotUsed);
 
-    if ((q = u16tok(p,  p_sep, &tokcontext)) == NULL) return KmnCompilerMessages::ERROR_InvalidBitmapLine;  // I3481
+    if ((q = u16tok(p,  p_sep, &tokcontext)) == NULL) {
+      AddCompileError(KmnCompilerMessages::ERROR_InvalidBitmapLine);  // I3481
+      return FALSE;
+    }
 
-    if ((PKMX_WCHAR) u16chr(q, ','))    *(PKMX_WCHAR) u16chr(q, ',') = 0;
-    if ((msg = AddStore(fk, TSS_BITMAP, q)) != STATUS_Success) return msg;
+    if ((PKMX_WCHAR) u16chr(q, ',')) {
+      *(PKMX_WCHAR) u16chr(q, ',') = 0;
+    }
+    if (!AddStore(fk, TSS_BITMAP, q)) {
+      return FALSE;
+    }
 
     break;
   }
   case T_KEYTOKEY:			// A rule
-    if (fk->currentGroup == 0xFFFFFFFF) return KmnCompilerMessages::ERROR_CodeInvalidInThisSection;
-    if ((msg = ProcessKeyLine(fk, p, IsUnicode)) != STATUS_Success) return msg;
+    if (fk->currentGroup == 0xFFFFFFFF) {
+      AddCompileError(KmnCompilerMessages::ERROR_CodeInvalidInThisSection);
+      return FALSE;
+    }
+    if ((msg = ProcessKeyLine(fk, p, IsUnicode)) != STATUS_Success) {
+      AddCompileError(msg);
+      return FALSE;
+    }
     break;
 
   case T_MATCH:
-    if (fk->currentGroup == 0xFFFFFFFF) return KmnCompilerMessages::ERROR_CodeInvalidInThisSection;
+    if (fk->currentGroup == 0xFFFFFFFF) {
+      AddCompileError(KmnCompilerMessages::ERROR_CodeInvalidInThisSection);
+      return FALSE;
+    }
     {
       PKMX_WCHAR buf = new KMX_WCHAR[GLOBAL_BUFSIZE];
       if ((msg = GetRHS(fk, p, buf, GLOBAL_BUFSIZE - 1, (int)(p - pp), IsUnicode)) != STATUS_Success)
       {
         delete[] buf;
-        return msg;
+        AddCompileError(msg);
+        return FALSE;
       }
 
       if ((msg = ValidateMatchNomatchOutput(buf)) != STATUS_Success) {
         delete[] buf;
-        return msg;
+        AddCompileError(msg);
+        return FALSE;
       }
 
       gp = &fk->dpGroupArray[fk->currentGroup];
@@ -520,18 +593,23 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
     break;
 
   case T_NOMATCH:
-    if (fk->currentGroup == 0xFFFFFFFF) return KmnCompilerMessages::ERROR_CodeInvalidInThisSection;
+    if (fk->currentGroup == 0xFFFFFFFF) {
+      AddCompileError(KmnCompilerMessages::ERROR_CodeInvalidInThisSection);
+      return FALSE;
+    }
     {
       PKMX_WCHAR buf = new KMX_WCHAR[GLOBAL_BUFSIZE];
       if ((msg = GetRHS(fk, p, buf, GLOBAL_BUFSIZE, (int)(p - pp), IsUnicode)) != STATUS_Success)
       {
         delete[] buf;
-        return msg;
+        AddCompileError(msg);
+        return FALSE;
       }
 
       if ((msg = ValidateMatchNomatchOutput(buf)) != STATUS_Success) {
         delete[] buf;
-        return msg;
+        AddCompileError(msg);
+        return FALSE;
       }
 
       gp = &fk->dpGroupArray[fk->currentGroup];
@@ -553,21 +631,25 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
     break;
 
   default:
-    return KmnCompilerMessages::ERROR_InvalidToken;
+    AddCompileError(KmnCompilerMessages::ERROR_InvalidToken);
+    return FALSE;
   }
 
-  return STATUS_Success;
+  return TRUE;
 }
 
 //**********************************************************************************************************************
 
-KMX_DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
+KMX_BOOL ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
 {
   PFILE_GROUP gp;
   PKMX_WCHAR q;
 
   gp = new FILE_GROUP[fk->cxGroupArray + 1];
-  if (!gp) return KmnCompilerMessages::FATAL_CannotAllocateMemory;
+  if (!gp) {
+    AddCompileError(KmnCompilerMessages::FATAL_CannotAllocateMemory);
+    return FALSE;
+  }
 
   if (fk->dpGroupArray)
   {
@@ -585,7 +667,10 @@ KMX_DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   gp->cxKeyArray = 0;
 
   q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-  if (!q) return KmnCompilerMessages::ERROR_InvalidGroupLine;
+  if (!q) {
+    AddCompileError(KmnCompilerMessages::ERROR_InvalidGroupLine);
+    return FALSE;
+  }
 
   gp->fUsingKeys = FALSE;
   gp->fReadOnly  = IsSameToken(&p, u"readonly");
@@ -669,28 +754,34 @@ KMX_DWORD ProcessGroupFinish(PFILE_KEYBOARD fk)
 * Store management
 */
 
-KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
-{
+KMX_BOOL ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p) {
   PKMX_WCHAR q, pp;
   PFILE_STORE sp;
-  //WCHAR temp[GLOBAL_BUFSIZE];
   KMX_DWORD msg;
   int i = 0;
 
   pp = p;
 
-  if ((q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL)) == NULL) return KmnCompilerMessages::ERROR_InvalidStoreLine;
+  if ((q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL)) == NULL) {
+    AddCompileError(KmnCompilerMessages::ERROR_InvalidStoreLine);
+    return FALSE;
+  }
 
-  if (*q == *SSN__PREFIX)
-  {
-    for (i = 0; StoreTokens[i]; i++)
-      if (!u16icmp(q, StoreTokens[i]))  // I3481
+  if (*q == *SSN__PREFIX) {
+    for (i = 0; StoreTokens[i]; i++) {
+      if (!u16icmp(q, StoreTokens[i])) {  // I3481
         break;
-    if (!StoreTokens[i]) return KmnCompilerMessages::ERROR_InvalidSystemStore;
+      }
+    }
+    if (!StoreTokens[i]) {
+      AddCompileError(KmnCompilerMessages::ERROR_InvalidSystemStore);
+      return FALSE;
+    }
   }
 
   if(!resizeStoreArray(fk)) {
-    return KmnCompilerMessages::FATAL_CannotAllocateMemory;
+    AddCompileError(KmnCompilerMessages::FATAL_CannotAllocateMemory);
+    return FALSE;
   }
   sp = &fk->dpStoreArray[fk->cxStoreArray];
 
@@ -705,10 +796,10 @@ KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   {
     PKMX_WCHAR temp = new KMX_WCHAR[GLOBAL_BUFSIZE];
 
-    if ((msg = GetXString(fk, p, u"c\n", temp, GLOBAL_BUFSIZE - 1, (int)(p - pp), &p, FALSE, TRUE)) != STATUS_Success)
-    {
+    if ((msg = GetXString(fk, p, u"c\n", temp, GLOBAL_BUFSIZE - 1, (int)(p - pp), &p, FALSE, TRUE)) != STATUS_Success) {
       delete[] temp;
-      return msg;
+      AddCompileError(msg);
+      return FALSE;
     }
 
     sp->dwSystemID = i;
@@ -719,23 +810,26 @@ KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   }
 
   if (xstrlen(sp->dpString) == 1 && *sp->dpString != UC_SENTINEL &&
-    sp->dwSystemID == 0 && (fk->version >= VERSION_60 || fk->version == 0))
-  {
+    sp->dwSystemID == 0 && (fk->version >= VERSION_60 || fk->version == 0)) {
     // In this case, we want to change behaviour for older versioned keyboards so that
     // we don't mix up named character codes which weren't supported in 5.x
     VERIFY_KEYBOARD_VERSION(fk, VERSION_60, KmnCompilerMessages::ERROR_60FeatureOnly_NamedCodes);
     // Add a single char store as a defined character constant
-    if (Uni_IsSurrogate1(*sp->dpString))
+    if (Uni_IsSurrogate1(*sp->dpString)) {
       kmcmp::CodeConstants->AddCode(Uni_SurrogateToUTF32(sp->dpString[0], sp->dpString[1]), sp->szName, fk->cxStoreArray);
-    else
+    } else {
       kmcmp::CodeConstants->AddCode(sp->dpString[0], sp->szName, fk->cxStoreArray);
+    }
     kmcmp::CodeConstants->reindex(); // has to be done after every character add due to possible use in another store.   // I4982
   }
 
   fk->cxStoreArray++;	// increment now, because GetXString refers to stores
 
-  if (i > 0)
-    if ((msg = ProcessSystemStore(fk, i, sp)) != STATUS_Success) return msg;
+  if (i > 0) {
+    if (!ProcessSystemStore(fk, i, sp)) {
+      return FALSE;
+    }
+  }
 
   return CheckForDuplicateStore(fk, sp);
 }
@@ -775,11 +869,11 @@ bool resizeKeyArray(PFILE_GROUP gp, int increment) {
   return true;
 }
 
-KMX_DWORD AddStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, const KMX_WCHAR * str, KMX_DWORD *dwStoreID)
-{
+KMX_BOOL AddStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, const KMX_WCHAR * str, KMX_DWORD *dwStoreID) {
   PFILE_STORE sp;
   if(!resizeStoreArray(fk)) {
-    return KmnCompilerMessages::FATAL_CannotAllocateMemory;
+    AddCompileError(KmnCompilerMessages::FATAL_CannotAllocateMemory);
+    return FALSE;
   }
 
   sp = &fk->dpStoreArray[fk->cxStoreArray];
@@ -802,7 +896,7 @@ KMX_DWORD AddStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, const KMX_WCHAR * str,
 
   fk->cxStoreArray++;
 
-  return ProcessSystemStore( fk, SystemID, sp);
+  return ProcessSystemStore(fk, SystemID, sp);
 }
 
 KMX_DWORD AddDebugStore(PFILE_KEYBOARD fk, KMX_WCHAR const * str)
@@ -834,8 +928,7 @@ KMX_DWORD AddDebugStore(PFILE_KEYBOARD fk, KMX_WCHAR const * str)
 
 PKMX_WCHAR pssBuf = NULL;
 
-KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE sp)
-{
+KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE sp) {
   //WCHAR buf[GLOBAL_BUFSIZE];
   int i, j;
   KMX_DWORD msg;
@@ -846,9 +939,14 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
 
   switch (SystemID)
   {
+  case TSS_BASELAYOUT:
+    break;
+
   case TSS_BITMAP:
-    if ((msg = ImportBitmapFile(fk, sp->dpString, &fk->dwBitmapSize, &fk->lpBitmap)) != STATUS_Success)
-      return msg;
+    if ((msg = ImportBitmapFile(fk, sp->dpString, &fk->dwBitmapSize, &fk->lpBitmap)) != STATUS_Success) {
+      AddCompileError(msg);
+      return FALSE;
+    }
     break;
 
   case TSS_CALLDEFINITION:
@@ -871,16 +969,28 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
   case TSS_COPYRIGHT:
     break;
 
+  case TSS_CUSTOMKEYMANEDITION:
+    break;
+
+  case TSS_CUSTOMKEYMANEDITIONNAME:
+    break;
+
   case TSS_DEBUG_LINE:
     break;
 
   case TSS_ETHNOLOGUECODE:
     VERIFY_KEYBOARD_VERSION(fk, VERSION_60, KmnCompilerMessages::ERROR_60FeatureOnly_EthnologueCode);
-    if ((msg = ProcessEthnologueStore(sp->dpString)) != STATUS_Success) return msg;  // I2646
+    if ((msg = ProcessEthnologueStore(sp->dpString)) != STATUS_Success) {
+      AddCompileError(msg);
+      return FALSE;  // I2646
+    }
     break;
 
   case TSS_HOTKEY:
-    if ((msg = ProcessHotKey(sp->dpString, &fk->dwHotKey)) != STATUS_Success) return msg;
+    if ((msg = ProcessHotKey(sp->dpString, &fk->dwHotKey)) != STATUS_Success) {
+      AddCompileError(msg);
+      return FALSE;
+    }
     u16sprintf(buf, GLOBAL_BUFSIZE, L"%d", (int)fk->dwHotKey);  // I3481
     delete[] sp->dpString;
     sp->dpString = new KMX_WCHAR[u16len(buf) + 1];
@@ -890,9 +1000,13 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
   case TSS_INCLUDECODES:
     VERIFY_KEYBOARD_VERSION(fk, VERSION_60, KmnCompilerMessages::ERROR_60FeatureOnly_NamedCodes);
     if (!kmcmp::CodeConstants->LoadFile(fk, sp->dpString)) {
-      return KmnCompilerMessages::ERROR_CannotLoadIncludeFile;
+      AddCompileError(KmnCompilerMessages::ERROR_CannotLoadIncludeFile);
+      return FALSE;
     }
     kmcmp::CodeConstants->reindex();   // I4982
+    break;
+
+  case TSS_KEYMANCOPYRIGHT:
     break;
 
   case TSS_LANGUAGE:
@@ -901,7 +1015,10 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
     KMX_WCHAR sep_c[3] = u", ";
     PKMX_WCHAR p_sep_c = sep_c;
     q = u16tok(sp->dpString, p_sep_c, &context);  // I3481
-    if (!q) return KmnCompilerMessages::ERROR_InvalidLanguageLine;
+    if (!q) {
+      AddCompileError(KmnCompilerMessages::ERROR_InvalidLanguageLine);
+      return FALSE;
+    }
 
     i = xatoi(&q);
     KMX_WCHAR sep_n[4] = u" c\n";
@@ -916,7 +1033,10 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
     else
       j = xatoi(&q);
 
-    if (i < 1 || j < 1 || i > 0x3FF || j > 0x3F) return KmnCompilerMessages::ERROR_InvalidLanguageLine;
+    if (i < 1 || j < 1 || i > 0x3FF || j > 0x3F) {
+      AddCompileError(KmnCompilerMessages::ERROR_InvalidLanguageLine);
+      return FALSE;
+    }
     if (i >= 0x200 || j >= 0x20) AddWarning(KmnCompilerMessages::WARN_CustomLanguagesNotSupported);
 
     fk->KeyboardID = (KMX_DWORD)MAKELANGID(i, j);
@@ -931,8 +1051,14 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
   case TSS_LANGUAGENAME:
     break;
 
+  case TSS_LAYER:
+    break;
+
   case TSS_LAYOUT:
-    if (fk->KeyboardID == 0) return KmnCompilerMessages::ERROR_LayoutButNoLanguage;
+    if (fk->KeyboardID == 0) {
+      AddCompileError(KmnCompilerMessages::ERROR_LayoutButNoLanguage);
+      return FALSE;
+    }
 
     q = sp->dpString;
 
@@ -948,7 +1074,8 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
     if (kmcmp::FMnemonicLayout && FindSystemStore(fk, TSS_CASEDKEYS) != NULL) {
       // The &CasedKeys system store is not supported for
       // mnemonic layouts
-      return KmnCompilerMessages::ERROR_CasedKeysNotSupportedWithMnemonicLayout;
+      AddCompileError(KmnCompilerMessages::ERROR_CasedKeysNotSupportedWithMnemonicLayout);
+      return FALSE;
     }
     break;
 
@@ -960,12 +1087,21 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
     kmcmp::FOldCharPosMatching = atoiW(sp->dpString);
     break;
 
+  case TSS_PLATFORM:
+  case TSS_PLATFORM_MATCH:
+  case TSS_PLATFORM_NOMATCH:
+    // Never matched but included for completeness
+    break;
+
   case TSS_SHIFTFREESCAPS:
     if (*sp->dpString == u'1') fk->dwFlags |= KF_SHIFTFREESCAPS;
     break;
 
   case TSS_VERSION:
-    if ((fk->dwFlags & KF_AUTOMATICVERSION) == 0) return KmnCompilerMessages::ERROR_VersionAlreadyIncluded;
+    if ((fk->dwFlags & KF_AUTOMATICVERSION) == 0) {
+      AddCompileError(KmnCompilerMessages::ERROR_VersionAlreadyIncluded);
+      return FALSE;
+    }
     p = sp->dpString;
     if (u16tof (p) < 5.0) {
       AddWarning(KmnCompilerMessages::WARN_OldVersion);
@@ -987,7 +1123,10 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
     else if (u16ncmp(p, u"16.0", 4) == 0)  fk->version = VERSION_160; // KMXPlus
     else if (u16ncmp(p, u"17.0", 4) == 0)  fk->version = VERSION_170; // Flicks and gestures
 
-    else return KmnCompilerMessages::ERROR_InvalidVersion;
+    else {
+      AddCompileError(KmnCompilerMessages::ERROR_InvalidVersion);
+      return FALSE;
+    }
 
     if (fk->version < VERSION_60) kmcmp::FOldCharPosMatching = TRUE;
 
@@ -1041,7 +1180,8 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
   case TSS_TARGETS:   // I4504
     VERIFY_KEYBOARD_VERSION(fk, VERSION_90, KmnCompilerMessages::ERROR_90FeatureOnlyTargets);
     if((msg = GetCompileTargetsFromTargetsStore(sp->dpString, fk->extra->targets)) != STATUS_Success) {
-      return msg;
+      AddCompileError(msg);
+      return FALSE;
     }
     break;
 
@@ -1064,7 +1204,8 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
 
       if (i < 1 || j < 1 || i > 0x3FF || j > 0x3F) {
         delete[] q;
-        return KmnCompilerMessages::ERROR_InvalidLanguageLine;
+        AddCompileError(KmnCompilerMessages::ERROR_InvalidLanguageLine);
+        return FALSE;
       }
 
       u16sprintf(r, szQ - (size_t)(r - q), L"x%04.4x ", n);  // I3481
@@ -1094,13 +1235,15 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
   case TSS_KEYBOARDVERSION:   // I4140
     VERIFY_KEYBOARD_VERSION(fk, VERSION_90, KmnCompilerMessages::ERROR_90FeatureOnlyKeyboardVersion);
     if (!IsValidKeyboardVersion(sp->dpString)) {
-      return KmnCompilerMessages::ERROR_KeyboardVersionFormatInvalid;
+      AddCompileError(KmnCompilerMessages::ERROR_KeyboardVersionFormatInvalid);
+      return FALSE;
     }
     break;
 
   case TSS_CASEDKEYS:
     if ((msg = VerifyCasedKeys(sp)) != STATUS_Success) {
-      return msg;
+      AddCompileError(msg);
+      return FALSE;
     }
     break;
 
@@ -1120,9 +1263,10 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
     break;
 
   default:
-    return KmnCompilerMessages::ERROR_InvalidSystemStore;
+    AddCompileError(KmnCompilerMessages::ERROR_InvalidSystemStore);
+    return FALSE;
   }
-  return STATUS_Success;
+  return TRUE;
 }
 
 KMX_DWORD GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &targets) {
@@ -1208,17 +1352,16 @@ KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString) {   // I4140
 }
 
 
-KMX_DWORD kmcmp::AddCompilerVersionStore(PFILE_KEYBOARD fk)
-{
-  KMX_DWORD msg;
-
+KMX_BOOL kmcmp::AddCompilerVersionStore(PFILE_KEYBOARD fk) {
   if(!kmcmp::FShouldAddCompilerVersion) {
-    return STATUS_Success;
+    return TRUE;
   }
 
-  if ((msg = AddStore(fk, TSS_COMPILEDVERSION, KEYMAN_VersionWin_W16)) != STATUS_Success) return msg;
+  if (!AddStore(fk, TSS_COMPILEDVERSION, KEYMAN_VersionWin_W16)) {
+    return FALSE;
+  }
 
-  return STATUS_Success;
+  return TRUE;
 }
 
 /****************************
@@ -1269,7 +1412,7 @@ KMX_DWORD CheckStatementOffsets(PFILE_KEYBOARD fk, PFILE_GROUP gp, PKMX_WCHAR co
         if (kmcmp::CompileTarget == CKF_KEYMANWEB) {
           for (q = context, i = 1; *q && i < contextOffset; q = incxstr(q), i++);
           if (*q == UC_SENTINEL && *(q + 1) == CODE_NOTANY) {
-            VERIFY_KEYBOARD_VERSION(fk, VERSION_140, KmnCompilerMessages::ERROR_140FeatureOnlyContextAndNotAnyWeb);
+            VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_140, KmnCompilerMessages::ERROR_140FeatureOnlyContextAndNotAnyWeb);
           }
         }
       }
@@ -1977,7 +2120,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       }
       else if (u16nicmp(p, u"baselayout", 10) == 0)  // I3430
       {
-        VERIFY_KEYBOARD_VERSION(fk, VERSION_90, KmnCompilerMessages::ERROR_90FeatureOnly_IfSystemStores);
+        VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_90, KmnCompilerMessages::ERROR_90FeatureOnly_IfSystemStores);
         if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
         p += 10;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -1992,7 +2135,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     case 5:
       if (u16nicmp(p, u"if", 2) == 0)
       {
-        VERIFY_KEYBOARD_VERSION(fk, VERSION_80, KmnCompilerMessages::ERROR_80FeatureOnly);
+        VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_80, KmnCompilerMessages::ERROR_80FeatureOnly);
         if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
         p += 2;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -2070,7 +2213,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
         if (q && *q)
         {
-          VERIFY_KEYBOARD_VERSION(fk, VERSION_60, KmnCompilerMessages::ERROR_60FeatureOnly_Contextn);
+          VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_60, KmnCompilerMessages::ERROR_60FeatureOnly_Contextn);
           int n1b;
           n1b = atoiW(q);
           if (n1b < 1 || n1b >= 0xF000) return KmnCompilerMessages::ERROR_InvalidToken;
@@ -2095,7 +2238,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       }
       else if (u16nicmp(p, u"call", 4) == 0)
       {
-        VERIFY_KEYBOARD_VERSION(fk, VERSION_501, KmnCompilerMessages::ERROR_501FeatureOnly_Call);
+        VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_501, KmnCompilerMessages::ERROR_501FeatureOnly_Call);
         if (sFlag) return KmnCompilerMessages::ERROR_CallInVirtualKeySection;
         p += 4;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -2123,8 +2266,8 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     case 8:
       if (u16nicmp(p, u"notany", 6) == 0)
       {
-        VERIFY_KEYBOARD_VERSION(fk, VERSION_70, KmnCompilerMessages::ERROR_70FeatureOnly)
-          if (sFlag) return KmnCompilerMessages::ERROR_AnyInVirtualKeySection;
+        VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_70, KmnCompilerMessages::ERROR_70FeatureOnly);
+        if (sFlag) return KmnCompilerMessages::ERROR_AnyInVirtualKeySection;
         p += 6;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
         if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidAny;
@@ -2177,7 +2320,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     case 10:
       if (u16nicmp(p, u"reset", 5) == 0)
       {
-        VERIFY_KEYBOARD_VERSION(fk, VERSION_80, KmnCompilerMessages::ERROR_80FeatureOnly);
+        VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_80, KmnCompilerMessages::ERROR_80FeatureOnly);
         if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
         p += 5;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -2263,7 +2406,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       if (sFlag & (LCTRLFLAG | LALTFLAG | RCTRLFLAG | RALTFLAG | CAPITALFLAG | NOTCAPITALFLAG | NUMLOCKFLAG | NOTNUMLOCKFLAG | SCROLLFLAG | NOTSCROLLFLAG) &&
         kmcmp::CompileTarget == CKF_KEYMANWEB &&
         fk->dwFlags & KF_AUTOMATICVERSION) {
-        VERIFY_KEYBOARD_VERSION(fk, VERSION_100, 0);
+        VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_100, 0);
       }
       //printf("sFlag: %x\n", sFlag);
 
@@ -2284,7 +2427,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       {
         if (*q == '\'' || *q == '"')
         {
-          VERIFY_KEYBOARD_VERSION(fk, VERSION_60, KmnCompilerMessages::ERROR_60FeatureOnly_VirtualCharKey);
+          VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_60, KmnCompilerMessages::ERROR_60FeatureOnly_VirtualCharKey);
           if (!kmcmp::FMnemonicLayout) AddWarning(KmnCompilerMessages::WARN_VirtualCharKeyWithPositionalLayout);
           KMX_WCHAR chQuote = *q;
           q++; if (*q == chQuote || *q == '\n' || *q == 0) return KmnCompilerMessages::ERROR_InvalidToken;
@@ -2321,7 +2464,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
 
         if (i == VK__MAX + 1)
         {
-          VERIFY_KEYBOARD_VERSION(fk, VERSION_90, KmnCompilerMessages::ERROR_InvalidToken);
+          VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_90, KmnCompilerMessages::ERROR_InvalidToken);
 
           i = GetVKCode(fk, vkname);  // I3438
           if (i == 0)
@@ -2348,7 +2491,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     case 14:
       if (u16nicmp(p, u"set", 3) == 0)
       {
-        VERIFY_KEYBOARD_VERSION(fk, VERSION_80, KmnCompilerMessages::ERROR_80FeatureOnly);
+        VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_80, KmnCompilerMessages::ERROR_80FeatureOnly);
         p += 3;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
         if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidSet;
@@ -2358,7 +2501,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       }
       else if (u16nicmp(p, u"save", 4) == 0)
       {
-        VERIFY_KEYBOARD_VERSION(fk, VERSION_80, KmnCompilerMessages::ERROR_80FeatureOnly);
+        VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_80, KmnCompilerMessages::ERROR_80FeatureOnly);
         p += 4;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
         if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidSave;
@@ -2390,7 +2533,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         return KmnCompilerMessages::ERROR_InvalidToken;
       continue;
     case 16:
-      VERIFY_KEYBOARD_VERSION(fk, VERSION_60, KmnCompilerMessages::ERROR_60FeatureOnly_NamedCodes);
+      VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_60, KmnCompilerMessages::ERROR_60FeatureOnly_NamedCodes);
       q = p + 1;
       while (*q && !iswspace(*q)) q++;
       c = *q; *q = 0;
@@ -2410,7 +2553,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       continue;
     case 17:
       if (u16nicmp(p, u"platform", 8) != 0) return KmnCompilerMessages::ERROR_InvalidToken;  // I3430
-      VERIFY_KEYBOARD_VERSION(fk, VERSION_90, KmnCompilerMessages::ERROR_90FeatureOnly_IfSystemStores);
+      VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_90, KmnCompilerMessages::ERROR_90FeatureOnly_IfSystemStores);
       if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
       p += 8;
       q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -2420,7 +2563,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       continue;
     case 18:  // I3437
       if (u16nicmp(p, u"layer", 5) != 0) return KmnCompilerMessages::ERROR_InvalidToken;
-      VERIFY_KEYBOARD_VERSION(fk, VERSION_90, KmnCompilerMessages::ERROR_90FeatureOnly_SetSystemStores);
+      VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_90, KmnCompilerMessages::ERROR_90FeatureOnly_SetSystemStores);
       if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
       p += 5;
       q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -2490,11 +2633,13 @@ KMX_DWORD process_if_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, PKMX_WCHAR
 
   KMX_DWORD dwStoreID;
 
-  if ((msg = AddStore(fk, TSS_COMPARISON, temp, &dwStoreID)) != STATUS_Success)
-  {
+  if (!AddStore(fk, TSS_COMPARISON, temp, &dwStoreID)) {
     delete[] temp;
-    return msg;
+    // TODO: redundant error
+    return KmnCompilerMessages::ERROR_InvalidIf;
   }
+
+  delete[] temp;
 
   tstr[(*mx)++] = UC_SENTINEL;
   tstr[(*mx)++] = (KMX_WCHAR)CODE_IFSYSTEMSTORE;
@@ -2502,8 +2647,6 @@ KMX_DWORD process_if_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, PKMX_WCHAR
   tstr[(*mx)++] = 2;
   tstr[(*mx)++] = (KMX_WCHAR)(dwStoreID + 1);
   tstr[(*mx)] = 0;
-
-  delete[] temp;
 
   return STATUS_Success;
 }
@@ -2531,7 +2674,7 @@ KMX_DWORD process_if(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx) 
 
   if (r[0] == '&')
   {
-    VERIFY_KEYBOARD_VERSION( fk, VERSION_90, KmnCompilerMessages::ERROR_90FeatureOnly_IfSystemStores);
+    VERIFY_KEYBOARD_VERSION_ret( fk, VERSION_90, KmnCompilerMessages::ERROR_90FeatureOnly_IfSystemStores);
     for (i = 0; StoreTokens[i]; i++)
     {
       if (u16icmp(r, StoreTokens[i]) == 0) break;
@@ -2563,11 +2706,13 @@ KMX_DWORD process_if(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx) 
 
   KMX_DWORD dwStoreID;
 
-  if ((msg = AddStore(fk, TSS_COMPARISON, temp, &dwStoreID)) != STATUS_Success)
-  {
+  if (!AddStore(fk, TSS_COMPARISON, temp, &dwStoreID)) {
     delete[] temp;
-    return msg;
+    // TODO: redundant error
+    return KmnCompilerMessages::ERROR_InvalidIf;
   }
+
+  delete[] temp;
 
   tstr[(*mx)++] = UC_SENTINEL;
   tstr[(*mx)++] = (KMX_WCHAR)code;
@@ -2716,9 +2861,13 @@ KMX_DWORD process_set_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, PKMX_WCHA
 
   KMX_DWORD dwStoreID;
 
-  msg = AddStore(fk, TSS_COMPARISON, temp, &dwStoreID);
+  if(!AddStore(fk, TSS_COMPARISON, temp, &dwStoreID)) {
+    delete[] temp;
+    // TODO: redundant error
+    return KmnCompilerMessages::ERROR_InvalidSet;
+  }
+
   delete[] temp;
-  if (msg != STATUS_Success) return msg;
 
   tstr[(*mx)++] = UC_SENTINEL;
   tstr[(*mx)++] = (KMX_WCHAR)CODE_SETSYSTEMSTORE;
@@ -2745,7 +2894,7 @@ KMX_DWORD process_set(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
 
   if (r[0] == '&')
   {
-    VERIFY_KEYBOARD_VERSION((PFILE_KEYBOARD) fk, VERSION_90, KmnCompilerMessages::ERROR_90FeatureOnly_SetSystemStores);  // I3437
+    VERIFY_KEYBOARD_VERSION_ret((PFILE_KEYBOARD) fk, VERSION_90, KmnCompilerMessages::ERROR_90FeatureOnly_SetSystemStores);  // I3437
     for (i = 0; StoreTokens[i]; i++)
     {
       if (u16icmp(r, StoreTokens[i]) == 0) break;
@@ -2782,9 +2931,13 @@ KMX_DWORD process_set(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
 
   KMX_DWORD dwStoreID;
 
-  msg = AddStore(fk, TSS_COMPARISON, temp, &dwStoreID);
+  if(!AddStore(fk, TSS_COMPARISON, temp, &dwStoreID)) {
+    delete[] temp;
+    // TODO: redundant error
+    return KmnCompilerMessages::ERROR_InvalidSet;
+  }
+
   delete[] temp;
-  if (msg != STATUS_Success) return msg;
 
   tstr[(*mx)++] = UC_SENTINEL;
   tstr[(*mx)++] = (KMX_WCHAR)code;
@@ -3357,7 +3510,7 @@ KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD File
 
   /* Test for version 7.0 icon support */
   if (*((PKMX_CHAR)*Buf) != 'B' && *(((PKMX_CHAR)*Buf) + 1) != 'M') {
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_70, KmnCompilerMessages::ERROR_70FeatureOnly);
+    VERIFY_KEYBOARD_VERSION_ret(fk, VERSION_70, KmnCompilerMessages::ERROR_70FeatureOnly);
   }
 
   return STATUS_Success;
@@ -3430,11 +3583,10 @@ KMX_DWORD kmcmp::UTF32ToUTF16(int n, int *n1, int *n2)
   return kmcmp::CheckUTF16(*n2);
 }
 
-KMX_DWORD BuildVKDictionary(PFILE_KEYBOARD fk)
-{
+KMX_BOOL BuildVKDictionary(PFILE_KEYBOARD fk) {
   KMX_DWORD i;
   size_t len = 0;
-  if (fk->cxVKDictionary == 0) return STATUS_Success;
+  if (fk->cxVKDictionary == 0) return TRUE;
   for (i = 0; i < fk->cxVKDictionary; i++)
   {
     len += u16len(fk->dpVKDictionary[i].szName) + 1;
@@ -3452,9 +3604,12 @@ KMX_DWORD BuildVKDictionary(PFILE_KEYBOARD fk)
   *p = 0;
 
   KMX_DWORD dwStoreID;
-  KMX_DWORD msg = AddStore(fk, TSS_VKDICTIONARY, storeval, &dwStoreID);
+  if(!AddStore(fk, TSS_VKDICTIONARY, storeval, &dwStoreID)) {
+    delete[] storeval;
+    return FALSE;
+  }
   delete[] storeval;
-  return msg;
+  return TRUE;
 }
 
 int GetVKCode(PFILE_KEYBOARD fk, PKMX_WCHAR p)

@@ -12,7 +12,7 @@ namespace kmcmp {
 extern char ErrExtraLIB[ERR_EXTRA_LIB_LEN];
 
 extern void* msgprocContext;
-KMX_BOOL AddCompileError(KMX_DWORD msg); // TODO rename to AddCompileMessage
+void AddCompileError(KMX_DWORD msg); // TODO rename to AddCompileMessage
 
 /// Use AddWarningBool for functions that return bool or KMX_BOOL; TODO merge with AddCompileMessage
 #define AddWarningBool(warn)  AddCompileError(warn)

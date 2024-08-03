@@ -11,8 +11,7 @@
 
 PKMX_WCHAR strtowstr(PKMX_STR in);
 PKMX_STR wstrtostr(PKMX_WCHAR in);
-KMX_BOOL AddCompileError(KMX_DWORD msg);
-KMX_DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PKMX_WCHAR p);
+KMX_BOOL ProcessBeginLine(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 KMX_DWORD ValidateMatchNomatchOutput(PKMX_WCHAR p);
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString);
 PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_WORD Flags);
@@ -52,7 +51,8 @@ class CompilerTest : public testing::Test {
         }
 
         void initGlobals() {
-            kmcmp::msgproc = NULL;
+            kmcmp::msgproc = msgproc_collect;
+            msgproc_errors.clear();
             szText_stub[0] = '\0';
             kmcmp::nErrors = 0;
             kmcmp::ErrChr = 0;
@@ -116,6 +116,12 @@ class CompilerTest : public testing::Test {
     public:
         static KMX_CHAR szText_stub[];
 
+        static std::vector<KMCMP_COMPILER_RESULT_MESSAGE> msgproc_errors;
+
+        static void msgproc_collect(const KMCMP_COMPILER_RESULT_MESSAGE &message, void* context) {
+            msgproc_errors.push_back(message);
+        }
+
         static int msgproc_true_stub(int line, uint32_t dwMsgCode, const char* szText, void* context) {
             strcpy(szText_stub, szText);
             return 1;
@@ -129,6 +135,7 @@ class CompilerTest : public testing::Test {
 
 #define COMPILE_ERROR_MAX_LEN (SZMAX_ERRORTEXT + 1 + 280)
 KMX_CHAR CompilerTest::szText_stub[COMPILE_ERROR_MAX_LEN];
+std::vector<KMCMP_COMPILER_RESULT_MESSAGE> CompilerTest::msgproc_errors;
 
 TEST_F(CompilerTest, strtowstr_test) {
     EXPECT_EQ(0, u16cmp(u"hello", strtowstr((PKMX_STR)"hello")));
@@ -209,35 +216,53 @@ TEST_F(CompilerTest, ProcessBeginLine_test) {
     KMX_WCHAR str[LINESIZE];
 
     // KmnCompilerMessages::ERROR_NoTokensFound
+    msgproc_errors.clear();
     u16cpy(str, u"");
-    EXPECT_EQ(KmnCompilerMessages::ERROR_NoTokensFound, ProcessBeginLine(&fileKeyboard, str));
+    EXPECT_EQ(FALSE, ProcessBeginLine(&fileKeyboard, str));
+    EXPECT_EQ(1, msgproc_errors.size());
+    EXPECT_EQ(KmnCompilerMessages::ERROR_NoTokensFound, msgproc_errors[0].errorCode);
 
     // KmnCompilerMessages::ERROR_InvalidToken
+    msgproc_errors.clear();
     u16cpy(str, u"abc >");
-    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, ProcessBeginLine(&fileKeyboard, str));
+    EXPECT_EQ(FALSE, ProcessBeginLine(&fileKeyboard, str));
+    EXPECT_EQ(1, msgproc_errors.size());
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, msgproc_errors[0].errorCode);
 
     // KmnCompilerMessages::ERROR_RepeatedBegin, BEGIN_UNICODE
+    msgproc_errors.clear();
     kmcmp::BeginLine[BEGIN_UNICODE] = 0; // not -1
     u16cpy(str, u" unicode>");
-    EXPECT_EQ(KmnCompilerMessages::ERROR_RepeatedBegin, ProcessBeginLine(&fileKeyboard, str));
+    EXPECT_EQ(FALSE, ProcessBeginLine(&fileKeyboard, str));
+    EXPECT_EQ(1, msgproc_errors.size());
+    EXPECT_EQ(KmnCompilerMessages::ERROR_RepeatedBegin, msgproc_errors[0].errorCode);
     kmcmp::BeginLine[BEGIN_UNICODE] = -1;
 
     // KmnCompilerMessages::ERROR_RepeatedBegin, BEGIN_ANSI
+    msgproc_errors.clear();
     kmcmp::BeginLine[BEGIN_ANSI] = 0; // not -1
     u16cpy(str, u" ansi>");
-    EXPECT_EQ(KmnCompilerMessages::ERROR_RepeatedBegin, ProcessBeginLine(&fileKeyboard, str));
+    EXPECT_EQ(FALSE, ProcessBeginLine(&fileKeyboard, str));
+    EXPECT_EQ(1, msgproc_errors.size());
+    EXPECT_EQ(KmnCompilerMessages::ERROR_RepeatedBegin, msgproc_errors[0].errorCode);
     kmcmp::BeginLine[BEGIN_ANSI] = -1;
 
     // KmnCompilerMessages::ERROR_RepeatedBegin, BEGIN_NEWCONTEXT
+    msgproc_errors.clear();
     kmcmp::BeginLine[BEGIN_NEWCONTEXT] = 0; // not -1
     u16cpy(str, u" newContext>");
-    EXPECT_EQ(KmnCompilerMessages::ERROR_RepeatedBegin, ProcessBeginLine(&fileKeyboard, str));
+    EXPECT_EQ(FALSE, ProcessBeginLine(&fileKeyboard, str));
+    EXPECT_EQ(1, msgproc_errors.size());
+    EXPECT_EQ(KmnCompilerMessages::ERROR_RepeatedBegin, msgproc_errors[0].errorCode);
     kmcmp::BeginLine[BEGIN_NEWCONTEXT] = -1;
 
     // KmnCompilerMessages::ERROR_RepeatedBegin, BEGIN_POSTKEYSTROKE
+    msgproc_errors.clear();
     kmcmp::BeginLine[BEGIN_POSTKEYSTROKE] = 0; // not -1
     u16cpy(str, u" postKeystroke>");
-    EXPECT_EQ(KmnCompilerMessages::ERROR_RepeatedBegin, ProcessBeginLine(&fileKeyboard, str));
+    EXPECT_EQ(FALSE, ProcessBeginLine(&fileKeyboard, str));
+    EXPECT_EQ(1, msgproc_errors.size());
+    EXPECT_EQ(KmnCompilerMessages::ERROR_RepeatedBegin, msgproc_errors[0].errorCode);
     kmcmp::BeginLine[BEGIN_POSTKEYSTROKE] = -1;
 };
 
@@ -254,16 +279,16 @@ TEST_F(CompilerTest, ValidateMatchNomatchOutput_test) {
     EXPECT_EQ(STATUS_Success, ValidateMatchNomatchOutput((PKMX_WCHAR)sentinel));
 };
 
-// KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
-// KMX_DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
+// KMX_BOOL ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
+// KMX_BOOL ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
 // int kmcmp::cmpkeys(const void *key, const void *elem)
 // KMX_DWORD ProcessGroupFinish(PFILE_KEYBOARD fk)
-// KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
+// KMX_BOOL ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
 // bool resizeStoreArray(PFILE_KEYBOARD fk)
 // bool resizeKeyArray(PFILE_GROUP gp, int increment)
-// KMX_DWORD AddStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, const KMX_WCHAR * str, KMX_DWORD *dwStoreID)
+// KMX_BOOL AddStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, const KMX_WCHAR * str, KMX_DWORD *dwStoreID)
 // KMX_DWORD AddDebugStore(PFILE_KEYBOARD fk, KMX_WCHAR const * str)
-// KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE sp)
+// KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE sp)
 // int GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store)
 
 TEST_F(CompilerTest, IsValidKeyboardVersion_test) {
@@ -1326,7 +1351,7 @@ TEST_F(CompilerTest, isIntegerWstring_test) {
 }
 
 // KMX_DWORD kmcmp::UTF32ToUTF16(int n, int *n1, int *n2)
-// KMX_DWORD BuildVKDictionary(PFILE_KEYBOARD fk)
+// KMX_BOOL BuildVKDictionary(PFILE_KEYBOARD fk)
 // int GetVKCode(PFILE_KEYBOARD fk, PKMX_WCHAR p)
 // int GetDeadKey(PFILE_KEYBOARD fk, PKMX_WCHAR p)
 // void kmcmp::RecordDeadkeyNames(PFILE_KEYBOARD fk)
