@@ -136,7 +136,9 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
     return FALSE;
   }
 
-  ProcessGroupFinish(fk);
+  if(!ProcessGroupFinish(fk)) {
+    return FALSE;
+  }
 
   if (kmcmp::FSaveDebug) kmcmp::RecordDeadkeyNames(fk);
 

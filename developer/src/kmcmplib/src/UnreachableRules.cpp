@@ -25,7 +25,8 @@ namespace kmcmp {
   }
 
 }
-KMX_DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
+
+void VerifyUnreachableRules(PFILE_GROUP gp) {
   PFILE_KEY kp = gp->dpKeyArray;
   KMX_DWORD i;
 
@@ -51,6 +52,4 @@ KMX_DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
   }
 
   kmcmp::currentLine = oldCurrentLine;
-
-  return STATUS_Success;
 }

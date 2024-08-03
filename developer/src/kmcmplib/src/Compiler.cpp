@@ -139,7 +139,7 @@ KMX_BOOL IsSameToken(PKMX_WCHAR *p, KMX_WCHAR const * token);
 KMX_DWORD GetRHS(PFILE_KEYBOARD fk, PKMX_WCHAR p, PKMX_WCHAR buf, int bufsize, int offset, int IsUnicode);
 PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_WORD Flags);
 KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token, PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isVKey, int isUnicode);
-KMX_DWORD GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &targets);
+KMX_BOOL GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &targets);
 
 int GetGroupNum(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 
@@ -381,8 +381,7 @@ KMX_BOOL ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str) {
     if (fk->currentGroup == 0xFFFFFFFF) {
       fk->currentGroup = 0;
     } else {
-      if ((msg = ProcessGroupFinish(fk)) != STATUS_Success) {
-        AddCompileError(msg);
+      if (!ProcessGroupFinish(fk)) {
         return FALSE;		// finish off previous group first?
       }
       fk->currentGroup++;
@@ -733,21 +732,27 @@ int kmcmp::cmpkeys(const void *key, const void *elem)
   return(char_key - char_elem); // akey->Key - aelem->Key);
 }
 
-KMX_DWORD ProcessGroupFinish(PFILE_KEYBOARD fk)
-{
+KMX_BOOL ProcessGroupFinish(PFILE_KEYBOARD fk) {
   PFILE_GROUP gp;
   KMX_DWORD msg;
 
-  if (fk->currentGroup == 0xFFFFFFFF) return STATUS_Success;
-  // Just got to first group - so nothing to finish yet
+  if (fk->currentGroup == 0xFFFFFFFF) {
+    // Just got to first group - so nothing to finish yet
+    return TRUE;
+  }
 
   gp = &fk->dpGroupArray[fk->currentGroup];
 
   // Finish off the previous group stuff!
-  if ((msg = ExpandCapsRulesForGroup(fk, gp)) != STATUS_Success) return msg;
+  if ((msg = ExpandCapsRulesForGroup(fk, gp)) != STATUS_Success) {
+    AddCompileError(msg);
+    return FALSE;
+  }
   qsort(gp->dpKeyArray, gp->cxKeyArray, sizeof(FILE_KEY), kmcmp::cmpkeys);
 
-  return VerifyUnreachableRules(gp);
+  VerifyUnreachableRules(gp);
+
+  return TRUE;
 }
 
 /***************************************
@@ -1179,8 +1184,7 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
 
   case TSS_TARGETS:   // I4504
     VERIFY_KEYBOARD_VERSION(fk, VERSION_90, KmnCompilerMessages::ERROR_90FeatureOnlyTargets);
-    if((msg = GetCompileTargetsFromTargetsStore(sp->dpString, fk->extra->targets)) != STATUS_Success) {
-      AddCompileError(msg);
+    if(!GetCompileTargetsFromTargetsStore(sp->dpString, fk->extra->targets)) {
       return FALSE;
     }
     break;
@@ -1269,7 +1273,7 @@ KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE s
   return TRUE;
 }
 
-KMX_DWORD GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &targets) {
+KMX_BOOL GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &targets) {
   // Compile to .kmx
   const std::vector<std::u16string> KMXKeymanTargets{
     u"windows", u"macosx", u"linux", u"desktop"
@@ -1312,7 +1316,8 @@ KMX_DWORD GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &targets
         snprintf(ErrExtraLIB, ERR_EXTRA_LIB_LEN, " target: %s", string_from_u16string(token).c_str());
         delete[] p;
         targets = 0;
-        return KmnCompilerMessages::ERROR_InvalidTarget;
+        AddCompileError(KmnCompilerMessages::ERROR_InvalidTarget);
+        return FALSE;
       }
     }
     token = u16tok(nullptr, u" ", &ctx);
@@ -1320,10 +1325,11 @@ KMX_DWORD GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &targets
   delete[] p;
 
   if(targets == 0) {
-    return KmnCompilerMessages::ERROR_NoTargetsSpecified;
+    AddCompileError(KmnCompilerMessages::ERROR_NoTargetsSpecified);
+    return FALSE;
   }
 
-  return STATUS_Success;
+  return TRUE;
 }
 
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString) {   // I4140
