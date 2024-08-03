@@ -29,14 +29,15 @@ EXTERN bool kmcmp_CompileKeyboard(
     return FALSE;
   }
 
+  kmcmp::messageFilename = pszInfile;
   kmcmp::msgproc = messageProc;
-  loadfileproc = loadFileProc;
-  msgprocContext = (void*)procContext;
+  kmcmp::loadfileproc = loadFileProc;
+  kmcmp::msgprocContext = (void*)procContext;
   kmcmp::currentLine = 0;
   kmcmp::nErrors = 0;
 
   int sz;
-  std::vector<uint8_t> bufvec = loadFileProc(pszInfile, "");
+  std::vector<uint8_t> bufvec = kmcmp::loadfileproc(pszInfile, "");
   sz = bufvec.size();
   if(!sz) {
     ReportCompilerMessage(KmnCompilerMessages::ERROR_InfileNotExist);

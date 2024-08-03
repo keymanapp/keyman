@@ -17,12 +17,12 @@ namespace kmcmp {
   extern int BeginLine[4];
   extern int currentLine;
   extern NamedCodeConstants *CodeConstants;
+  extern kmcmp_LoadFileProc loadfileproc;
 
   void RecordDeadkeyNames(PFILE_KEYBOARD fk);
   KMX_BOOL AddCompilerVersionStore(PFILE_KEYBOARD fk);
 }
 
-extern kmcmp_LoadFileProc loadfileproc;
 
 extern KMX_BOOL AWarnDeprecatedCode_GLOBAL_LIB;
 

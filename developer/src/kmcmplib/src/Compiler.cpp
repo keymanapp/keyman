@@ -233,9 +233,7 @@ enum LinePrefixType { lptNone, lptKeymanAndKeymanWeb, lptKeymanWebOnly, lptKeyma
 
 /* Compile target */
 
-kmcmp_LoadFileProc loadfileproc = NULL;
-
-void* msgprocContext = NULL;
+kmcmp_LoadFileProc kmcmp::loadfileproc = NULL;
 
 int kmcmp::currentLine = 0;
 

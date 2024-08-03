@@ -8,6 +8,8 @@ namespace kmcmp {
   int ErrChr;
   int nErrors = 0;
   kmcmp_CompilerMessageProc msgproc = nullptr;
+  void* msgprocContext = NULL;
+  std::string messageFilename;
 }
 
 void ReportCompilerMessage(KMX_DWORD msg, const std::vector<std::string>& parameters) {
@@ -22,8 +24,8 @@ void ReportCompilerMessage(KMX_DWORD msg, const std::vector<std::string>& parame
   message.lineNumber = kmcmp::currentLine + 1;
   message.columnNumber = kmcmp::ErrChr;
   message.parameters = parameters;
-  //TODO: message.filename =
-  (*kmcmp::msgproc)(message, msgprocContext);
+  message.filename = kmcmp::messageFilename;
+  (*kmcmp::msgproc)(message, kmcmp::msgprocContext);
 
   kmcmp::ErrChr = 0;
 }
