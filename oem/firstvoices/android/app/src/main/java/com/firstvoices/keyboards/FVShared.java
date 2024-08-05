@@ -139,7 +139,8 @@ final class FVShared {
       JSONParser parser = new JSONParser();
       File jsonFile = new File(keyboardsJSONPath);
       if (!jsonFile.exists()) {
-          return list;
+          // Fatal error
+          throw new Error("keyboards.json file doesn't exist");
       }
       try {
           // At this point in initialization, fv_all.kmp is now extracted, so
@@ -147,19 +148,19 @@ final class FVShared {
           JSONArray keyboardsArray = parser.getJSONObjectFromFile(jsonFile, JSONArray.class);
 
           if (keyboardsArray == null) {
-              Log.d("loadRegionList", "unable to load keyboards.json");
+              KMLog.LogError(TAG, "Unable to parse keyboards.json");
               return list;
           }
 
           for (int i=0; i<keyboardsArray.length(); i++) {
               JSONObject keyboardObj = keyboardsArray.getJSONObject(i);
               if (keyboardObj == null) {
-                  Log.d("loadRegionList", "keyboard Obj is null");
+                  KMLog.LogError(TAG, "keyboard Object in keyboards.json is null");
                   continue;
               }
               JSONArray languageArray = keyboardObj.getJSONArray("languages");
               if (languageArray == null) {
-                  Log.d("loadRegionList", "language Array is null");
+                  KMLog.LogError(TAG, "languages Array in keyboards.json is null");
                   continue;
               }
               String regionName = keyboardObj.getString("region");
@@ -197,8 +198,10 @@ final class FVShared {
               region.keyboards.add(kbd);
           }
       } catch (Exception e) {
-          Log.e("createKeyboardList", "Error: " + e);
-          // We'll return a malformed list for now in this situation
+          String errorMsg = "loadRegionList had malformed keyboard list";
+          KMLog.LogException(TAG, errorMsg, e);
+          // Crash the app
+          throw new Error(errorMsg);
       }
 
       // Sort by region name
