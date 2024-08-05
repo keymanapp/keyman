@@ -8,8 +8,6 @@ import { ModifierKeyConstants, USVirtualKeyCodes } from '@keymanapp/common-types
 
 const Codes = {
   modifierCodes: {
-    ...ModifierKeyConstants,
-
     // Debug-mode keyboards compiled before Keyman 18.0 referenced the `ModifierKeyConstants`
     // constants via the names established below.  We must continue to support them, as they're
     // essentially part of the keyboard API now.
