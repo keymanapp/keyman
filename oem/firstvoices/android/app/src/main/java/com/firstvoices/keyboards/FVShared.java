@@ -112,7 +112,8 @@ final class FVShared {
         }
 
         this.context = context.getApplicationContext();
-        this.regionList = loadRegionList();
+        String keyboardsJSONPath = getPackagesDir() + FVDefault_PackageID + File.separator + FVKeyboards_JSON;
+        this.regionList = loadRegionList(keyboardsJSONPath);
         this.loadedKeyboards = loadLoadedKeyboardList();
 
         isInitialized = true;
@@ -128,12 +129,15 @@ final class FVShared {
     return instance;
   }
 
-  private FVRegionList loadRegionList() {
+  /**
+   * Parse keyboards.json file to associate region info for each keyboard
+   * @param keyboardsJSONPath - path to the keyboards.json file containing region info for each keyboard
+   * @return FVRegionList
+   */
+  private FVRegionList loadRegionList(String keyboardsJSONPath) {
       FVRegionList list = new FVRegionList();
-      File resourceRoot = new File(getResourceRoot());
-      PackageProcessor kmpProcessor = new PackageProcessor(resourceRoot);
       JSONParser parser = new JSONParser();
-      File jsonFile = new File(getPackagesDir() + FVDefault_PackageID + File.separator + FVKeyboards_JSON);
+      File jsonFile = new File(keyboardsJSONPath);
       if (!jsonFile.exists()) {
           return list;
       }
