@@ -151,8 +151,8 @@ function publish_server() {
 
 builder_run_action clean:server        clean_server
 builder_run_action configure:server    configure_server
-builder_run_action build:server        build_server
 builder_run_action build:addins        build_addins
+builder_run_action build:server        build_server
 builder_run_action test:server         test_server
 # builder_run_action test:addins       # no op
 builder_run_action installer:server    installer_server # TODO: rename to install-prep
