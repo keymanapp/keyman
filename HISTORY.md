@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.82 alpha 2024-08-05
+
+* chore(windows): remove QIT_VSHIFTDOWN QIT _VSHIFTUP (#11973)
+* chore(developer): add language/reference (#11799)
+
 ## 18.0.81 alpha 2024-08-03
 
 * chore(developer): Revert "chore(developer): remove redundant references from tsconfig.json" (#12076)
