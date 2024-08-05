@@ -1,5 +1,5 @@
 import { constants, SectionIdent } from "@keymanapp/ldml-keyboard-constants";
-import { KMXPlus, LDMLKeyboard, CompilerCallbacks, VariableParser, MarkerParser, util } from '@keymanapp/common-types';
+import { util, KMXPlus, LDMLKeyboard, CompilerCallbacks, VariableParser, MarkerParser } from '@keymanapp/common-types';
 import { SectionCompiler } from "./section-compiler.js";
 
 import Bksp = KMXPlus.Bksp;
@@ -14,7 +14,7 @@ import LKReorder = LDMLKeyboard.LKReorder;
 import LKTransform = LDMLKeyboard.LKTransform;
 import LKTransforms = LDMLKeyboard.LKTransforms;
 import { verifyValidAndUnique } from "../util/util.js";
-import { CompilerMessages } from "./messages.js";
+import { LdmlCompilerMessages } from "./ldml-compiler-messages.js";
 import { Substitutions, SubstitutionUse } from "./substitution-tracker.js";
 
 type TransformCompilerType = 'simple' | 'backspace';
@@ -59,9 +59,9 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     if (transforms) {
       const types : string[] = transforms.map(({type}) => type);
       if (!verifyValidAndUnique(types,
-        types => reportMessage(CompilerMessages.Error_DuplicateTransformsType({ types })),
+        types => reportMessage(LdmlCompilerMessages.Error_DuplicateTransformsType({ types })),
         new Set(['simple', 'backspace']),
-        types => reportMessage(CompilerMessages.Error_InvalidTransformsType({ types })))) {
+        types => reportMessage(LdmlCompilerMessages.Error_InvalidTransformsType({ types })))) {
         valid = false;
       }
 
@@ -78,11 +78,11 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       }));
       if (mixed) {
         valid = false;
-        reportMessage(CompilerMessages.Error_MixedTransformGroup()); // report this once
+        reportMessage(LdmlCompilerMessages.Error_MixedTransformGroup()); // report this once
       }
       if (empty) {
         valid = false;
-        reportMessage(CompilerMessages.Error_EmptyTransformGroup()); // report this once
+        reportMessage(LdmlCompilerMessages.Error_EmptyTransformGroup()); // report this once
       }
 
       // TODO-LDML: linting here should check for identical from, but this involves a double-parse which is ugly
@@ -200,15 +200,15 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
   private isValidRegex(cookedFrom: string, from: string) : boolean {
     // check for any unescaped dollar sign here
     if (/(?<!\\)(?:\\\\)*\$/.test(cookedFrom)) {
-      this.callbacks.reportMessage(CompilerMessages.Error_IllegalTransformDollarsign({ from }));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalTransformDollarsign({ from }));
       return false;
     }
     if (/(?<!\\)(?:\\\\)*\*/.test(cookedFrom)) {
-      this.callbacks.reportMessage(CompilerMessages.Error_IllegalTransformAsterisk({ from }));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalTransformAsterisk({ from }));
       return false;
     }
     if (/(?<!\\)(?:\\\\)*\+/.test(cookedFrom)) {
-      this.callbacks.reportMessage(CompilerMessages.Error_IllegalTransformPlus({ from }));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalTransformPlus({ from }));
       return false;
     }
     // Verify that the regex is syntactically valid
@@ -218,14 +218,14 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
 
       // does it match an empty string?
       if (rg.test('')) {
-        this.callbacks.reportMessage(CompilerMessages.Error_TransformFromMatchesNothing({ from }));
+        this.callbacks.reportMessage(LdmlCompilerMessages.Error_TransformFromMatchesNothing({ from }));
         return false;
       }
     } catch (e) {
       // We're exposing the internal regex error message here.
       // In the future, CLDR plans to expose the EBNF for the transform,
       // at which point we would have more precise validation prior to getting to this point.
-      this.callbacks.reportMessage(CompilerMessages.Error_UnparseableTransformFrom({ from, message: e.message }));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_UnparseableTransformFrom({ from, message: e.message }));
       return false;
     }
     return true;
@@ -295,7 +295,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     for (const [, sub] of cookedFrom.matchAll(anyQuad)) {
       const s = util.unescapeOne(sub);
       if (s !== '\uffff' && s !== '\u0008') { // markers
-        this.callbacks.reportMessage(CompilerMessages.Error_InvalidQuadEscape({ cp: s.codePointAt(0) }));
+        this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidQuadEscape({ cp: s.codePointAt(0) }));
         return null; // exit on the first error
       }
     }
@@ -357,13 +357,13 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     let needCooking = false;
     const explicitSet = rangeExplicit.analyze()?.get(util.BadStringType.denormalized);
     if (explicitSet) {
-      this.callbacks.reportMessage(CompilerMessages.Warn_CharClassExplicitDenorm({ lowestCh: explicitSet.values().next().value }));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Warn_CharClassExplicitDenorm({ lowestCh: explicitSet.values().next().value }));
       needCooking = true;
     } else {
       // don't analyze the implicit set of THIS range, if explicit is already problematic
       const implicitSet = rangeImplicit.analyze()?.get(util.BadStringType.denormalized);
       if (implicitSet) {
-        this.callbacks.reportMessage(CompilerMessages.Hint_CharClassImplicitDenorm({ lowestCh: implicitSet.values().next().value }));
+        this.callbacks.reportMessage(LdmlCompilerMessages.Hint_CharClassImplicitDenorm({ lowestCh: implicitSet.values().next().value }));
         needCooking = true;
       }
     }

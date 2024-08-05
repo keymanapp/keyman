@@ -116,7 +116,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        dist: [focal, jammy, mantic, noble]
+        dist: [focal, jammy, noble]
 
     steps:
     - name: Checkout

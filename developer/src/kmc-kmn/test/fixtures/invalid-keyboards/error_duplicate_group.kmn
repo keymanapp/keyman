@@ -1,7 +1,7 @@
 c Description: Verifies that kmcmplib picks up on duplicated groups with Unicode names,
 c and that the Unicode names are correctly reported in error messages in UTF-8
 
-store(&NAME) 'cerr_duplicate_group'
+store(&NAME) 'error_duplicate_group'
 store(&VERSION) '9.0'
 
 begin unicode > use(ខ្មែរ)

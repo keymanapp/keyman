@@ -28,8 +28,10 @@
 
 PWSTR decxstr(PWSTR p, PWSTR pStart);
 
+// QIT_VSHIFTDOWN and QIT_VSHIFTUP deprecated see #11925
+// Change to Deprecated to avoid array and index reshuffle
 const LPSTR ItemTypes[8] = {
-	"QIT_VKEYDOWN", "QIT_VKEYUP", "QIT_VSHIFTDOWN", "QIT_VSHIFTUP",
+	"QIT_VKEYDOWN", "QIT_VKEYUP", "QIT_DEPRECATED", "QIT_DEPRECATED",
     "QIT_CHAR", "QIT_DEADKEY", "QIT_BELL", "QIT_BACK" };
 
 /* AppActionQueue */
@@ -42,7 +44,7 @@ AppActionQueue::AppActionQueue()
 
 void AppActionQueue::ResetQueue()
 {
-	//SendDebugMessageFormat(0, sdmAIDefault, 0, "App::ResetQueue");
+	//SendDebugMessageFormat("Resetting queue");
 	QueueSize = 0;   // I4262
 }
 
@@ -59,7 +61,7 @@ BOOL AppActionQueue::QueueAction(int ItemType, DWORD dwData)
 
 	QueueSize++;
 
-	SendDebugMessageFormat(0, sdmAIDefault, 0, "App::QueueAction: %s %x", ItemTypes[ItemType], dwData);
+	SendDebugMessageFormat("Queueing %s %x", ItemTypes[ItemType], dwData);
 
 	return TRUE;
 }

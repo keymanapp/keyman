@@ -7,4 +7,4 @@ export {
   WindowsPackageInstallerCompilerResult,
   WindowsPackageInstallerCompilerArtifacts,
 } from "./compiler/windows-package-installer-compiler.js";
-export { CompilerMessages as PackageCompilerMessages } from './compiler/package-compiler-messages.js';
+export { PackageCompilerMessages } from './compiler/package-compiler-messages.js';
