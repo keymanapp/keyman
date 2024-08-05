@@ -178,10 +178,8 @@ BOOL ProcessHook()
       _td->app->GetQueueSize(), _td->app->IsLegacy(), _td->TIPFUpdateable);
 
     if (_td->app->IsLegacy()) {
-      _td->app->QueueAction(QIT_VSHIFTDOWN, Globals::get_ShiftState());
       _td->app->QueueAction(QIT_VKEYDOWN, _td->state.vkey);
       _td->app->QueueAction(QIT_VKEYUP, _td->state.vkey);
-      _td->app->QueueAction(QIT_VSHIFTUP, Globals::get_ShiftState());
       fOutputKeystroke = FALSE;
     }
 		else if (!_td->TIPFUpdateable) {
