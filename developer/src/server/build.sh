@@ -90,11 +90,13 @@ function build_server() {
   cp -r "$THIS_SCRIPT_PATH/src/site/"** "$THIS_SCRIPT_PATH/build/src/site/"
 
   mkdir -p "$THIS_SCRIPT_PATH/build/src/win32/"
-  cp "$THIS_SCRIPT_PATH/src/win32/"* "$THIS_SCRIPT_PATH/build/src/win32/"
   mkdir -p "$THIS_SCRIPT_PATH/build/src/win32/console"
-  cp "$THIS_SCRIPT_PATH/src/win32/console/"* "$THIS_SCRIPT_PATH/build/src/win32/console/"
   mkdir -p "$THIS_SCRIPT_PATH/build/src/win32/trayicon"
-  cp "$THIS_SCRIPT_PATH/src/win32/trayicon/"* "$THIS_SCRIPT_PATH/build/src/win32/trayicon/"
+  cp "$THIS_SCRIPT_PATH/src/win32/README.md" "$THIS_SCRIPT_PATH/build/src/win32/"
+  cp "$THIS_SCRIPT_PATH/src/win32/console/node-hide-console-window.node" "$THIS_SCRIPT_PATH/build/src/win32/console/"
+  cp "$THIS_SCRIPT_PATH/src/win32/console/node-hide-console-window.x64.node" "$THIS_SCRIPT_PATH/build/src/win32/console/"
+  cp "$THIS_SCRIPT_PATH/src/win32/trayicon/addon.node" "$THIS_SCRIPT_PATH/build/src/win32/trayicon/"
+  cp "$THIS_SCRIPT_PATH/src/win32/trayicon/addon.x64.node" "$THIS_SCRIPT_PATH/build/src/win32/trayicon/"
 
   replaceVersionStrings "$THIS_SCRIPT_PATH/build/src/site/lib/sentry/init.js.in" "$THIS_SCRIPT_PATH/build/src/site/lib/sentry/init.js"
   rm "$THIS_SCRIPT_PATH/build/src/site/lib/sentry/init.js.in"
