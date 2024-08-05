@@ -21,8 +21,6 @@ export * as KeymanFileTypes from './util/file-types.js';
 export * as Schemas from './schemas.js';
 export * as SchemaValidators from './schema-validators.js';
 
-export * as xml2js from './deps/xml2js/xml2js.js';
-
 export * as KMXPlus from './kmx/kmx-plus/kmx-plus.js';
 // TODO: these exports are really not well named
 export { UnicodeSetParser, UnicodeSet } from './ldml-keyboard/unicodeset-parser-api.js';

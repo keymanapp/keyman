@@ -1,4 +1,4 @@
-import { xml2js } from '@keymanapp/common-types';
+import { xml2js } from '../../index.js';
 import { KPJFile, KPJFileProject } from './kpj-file.js';
 import { util } from '@keymanapp/common-types';
 import { KeymanDeveloperProject, KeymanDeveloperProjectFile10, KeymanDeveloperProjectType } from './keyman-developer-project.js';

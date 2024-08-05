@@ -1,4 +1,5 @@
-import { SchemaValidators, util, xml2js } from '@keymanapp/common-types';
+import { SchemaValidators, util } from '@keymanapp/common-types';
+import { xml2js } from '../../index.js';
 import { CommonTypesMessages } from '../../common-events.js';
 import { CompilerCallbacks } from '../../compiler-interfaces.js';
 import { LDMLKeyboardXMLSourceFile, LKImport, ImportStatus } from './ldml-keyboard-xml.js';

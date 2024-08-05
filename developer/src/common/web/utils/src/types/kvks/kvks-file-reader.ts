@@ -1,4 +1,5 @@
-import { SchemaValidators as SV, KvkFile, xml2js, util, Constants } from '@keymanapp/common-types';
+import { SchemaValidators as SV, KvkFile, util, Constants } from '@keymanapp/common-types';
+import { xml2js } from '../../index.js'
 import KVKSourceFile from './kvks-file.js';
 const SchemaValidators = SV.default;
 import boxXmlArray = util.boxXmlArray;

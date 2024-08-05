@@ -1,5 +1,6 @@
-import { VisualKeyboard as VK, Constants, xml2js } from '@keymanapp/common-types';
+import { VisualKeyboard as VK, Constants } from '@keymanapp/common-types';
 import KVKSourceFile, { KVKSEncoding, KVKSFlags, KVKSKey, KVKSLayer } from './kvks-file.js';
+import { xml2js } from '../../index.js';
 
 import USVirtualKeyCodes = Constants.USVirtualKeyCodes;
 import VisualKeyboard = VK.VisualKeyboard;
