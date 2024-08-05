@@ -17,6 +17,7 @@
 NSString *const kStoreDataInLibraryKey = @"KMStoreDataInLibrary";
 NSString *const kActiveKeyboardsKey = @"KMActiveKeyboardsKey";
 NSString *const kSelectedKeyboardKey = @"KMSelectedKeyboardKey";
+NSString *const kPersistedOptionsKey = @"KMPersistedOptionsKey";
 
 NSString *const kObsoletePathComponent = @"/Documents/";
 NSString *const kNewPathComponent = @"/Library/Application Support/keyman.inputmethod.Keyman/";
@@ -66,6 +67,7 @@ NSString *const kNewPathComponent = @"/Library/Application Support/keyman.inputm
 - (void)convertSettingsForMigration {
   [self convertSelectedKeyboardPathForMigration];
   [self convertActiveKeyboardArrayForMigration];
+  [self convertPersistedOptionsPathsForMigration];
 }
 
 - (void)convertSelectedKeyboardPathForMigration {
@@ -135,6 +137,53 @@ NSString *const kNewPathComponent = @"/Library/Application Support/keyman.inputm
     activeKeyboards = [[NSMutableArray alloc] initWithCapacity:0];
   }
   return activeKeyboards;
+}
+
+- (void)convertPersistedOptionsPathsForMigration {
+  NSDictionary * optionsMap = [self persistedOptions];
+  NSMutableDictionary *mutableOptionsMap = nil;
+  BOOL optionsChanged = NO;
+
+  if (optionsMap != nil) {
+    os_log_info([KMLogs configLog], "optionsMap != nil");
+    mutableOptionsMap = [[NSMutableDictionary alloc] initWithCapacity:0];
+    for(id key in optionsMap) {
+      os_log_info([KMLogs configLog], "persisted options found in UserDefaults with key = %{public}@", key);
+    }
+    for (NSString *key in optionsMap) {
+      NSString *newPathString = [self convertOldKeyboardPath:key];
+      NSDictionary *optionsValue = [optionsMap objectForKey:key];
+
+      if ([key isNotEqualTo:newPathString]) {
+        optionsChanged = YES;
+        
+        // insert options into new map with newly converted path as key
+        [mutableOptionsMap setObject:optionsValue forKey:newPathString];
+        os_log([KMLogs startupLog], "converted option key from '%{public}@' to '%{public}@'", key, newPathString);
+      } else {
+        // retain options that did not need converting
+        [mutableOptionsMap setObject:optionsValue forKey:key];  
+      }
+    }
+    if (optionsChanged) {
+      [self savePersistedOptions:mutableOptionsMap];
+    }
+  }
+}
+
+- (NSDictionary *)persistedOptions {
+  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
+  return [userData dictionaryForKey:kPersistedOptionsKey];
+}
+
+- (void)savePersistedOptions:(NSDictionary *) optionsDictionary {
+  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
+  [userData setObject:optionsDictionary forKey:kPersistedOptionsKey];
+}
+
+- (void)removePersistedOptions {
+  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
+  return [userData removeObjectForKey:kPersistedOptionsKey];
 }
 
 

@@ -126,7 +126,6 @@ static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX = 0;
 - (NSString *)oskWindowTitle;
 - (void)postKeyboardEventWithSource: (CGEventSourceRef)source code:(CGKeyCode) virtualKey postCallback:(PostEventCallback)postEvent;
 - (KeymanVersionInfo)versionInfo;
-- (NSString *)keymanDataPath;
 - (void)registerConfigurationWindow:(NSWindowController *)window;
 @end
 

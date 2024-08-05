@@ -157,23 +157,16 @@ NSString *const kKeymanSubdirectoryName = @"keyman.inputmethod.Keyman";
   return exists;
 }
 
+/**
+ * Migrate the keyboards data from the old location in '/Documents' to the new location '/Application Support/keyman.inputmethod.Keyman/'
+ */
 - (BOOL)migrateData {
   BOOL didMoveData = NO;
   NSFileManager *fileManager = [NSFileManager defaultManager];
-  NSString *obsoleteKeymanKeyboardsDirectory = self.obsoleteKeymanKeyboardsDirectory.path;
-  NSString *dataDirectory = self.keymanDataDirectory.path;
-  os_log_info([KMLogs startupLog], "migrateData, move obsoleteKeymanKeyboardsDirectory: '%{public}@' to '%{public}@'", obsoleteKeymanKeyboardsDirectory, dataDirectory);
-
-  BOOL isDir;
-  BOOL dataDirectoryExistsInNewLocation = ([fileManager fileExistsAtPath:self.keymanDataDirectory.path isDirectory:&isDir]);
-  os_log([KMLogs startupLog], "data directory exists in new location, %{public}@: %{public}@", self.keymanDataDirectory.path, dataDirectoryExistsInNewLocation?@"YES":@"NO");
-
-  BOOL keyboardsDirectoryExistsInNewLocation = ([fileManager fileExistsAtPath:self.keymanKeyboardsDirectory.path isDirectory:&isDir]);
-  os_log([KMLogs startupLog], "keyboards directory exists in new location, %{public}@: %{public}@", self.keymanKeyboardsDirectory.path, keyboardsDirectoryExistsInNewLocation?@"YES":@"NO");
-
   BOOL dataExistsInOldLocation = [self keyboardsExistInDocumentsFolder];
   os_log([KMLogs startupLog], "obsolete keyman keyboards directory exists: %@", dataExistsInOldLocation?@"YES":@"NO");
 
+  // only move data if there is something there to move
   if (dataExistsInOldLocation) {
     NSError *moveError = nil;
     didMoveData = [fileManager moveItemAtURL:self.obsoleteKeymanKeyboardsDirectory
@@ -182,34 +175,11 @@ NSString *const kKeymanSubdirectoryName = @"keyman.inputmethod.Keyman";
     if (moveError) {
       os_log_error([KMLogs startupLog], "error migrating data: '%{public}@'", moveError.localizedDescription);
     } else {
-      os_log_error([KMLogs startupLog], "data migrated successfully to: '%{public}@'", self.keymanKeyboardsDirectory.path);
+      os_log_info([KMLogs startupLog], "data migrated successfully to: '%{public}@'", self.keymanKeyboardsDirectory.path);
     }
   }
   
   return didMoveData;
 }
 
-/**
- * Locate and create the Keyman data path; currently in ~/Documents/Keyman-Keyboards
- */
-/*
-- (NSString *)_obsoleteKeymanDataDirectory {
-  if(_keymanDataDirectory == nil) {
-    NSString *documentDirPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-    _keymanDataDirectory = [documentDirPath stringByAppendingPathComponent:@"Keyman-Keyboards"];
-
-    os_log_debug([KMLogs dataLog], "creating keymanDataPath, %{public}@", _keymanDataDirectory);
-
-    NSFileManager *fm = [NSFileManager defaultManager];
-    if (![fm fileExistsAtPath:_keymanDataDirectory]) {
-      [fm createDirectoryAtPath:_keymanDataDirectory withIntermediateDirectories:YES attributes:nil error:nil];
-    }
-  }
-  return _keymanDataDirectory;
-}
-
-- (NSString *)keymanDataDirectory {
-  return _keymanDataDirectory;
-}
-*/
 @end

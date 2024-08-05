@@ -85,7 +85,6 @@ NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboard
 @synthesize alwaysShowOSK = _alwaysShowOSK;
 
 id _lastServerWithOSKShowing = nil;
-NSString* _keymanDataPath = nil;
 
 - (id)init {
   self = [super init];
@@ -508,38 +507,14 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 #pragma mark - Keyman Data
 
 /**
- * Locate and create the Keyman data path; currently in ~/Documents/Keyman-Keyboards
- */
-- (NSString *)keymanDataPath {
-  /*
-  if(_keymanDataPath == nil) {
-    NSString *documentDirPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-    _keymanDataPath = [documentDirPath stringByAppendingPathComponent:@"Keyman-Keyboards"];
-
-    os_log_debug([KMLogs dataLog], "creating keymanDataPath, %{public}@", _keymanDataPath);
-
-    NSFileManager *fm = [NSFileManager defaultManager];
-    if (![fm fileExistsAtPath:_keymanDataPath]) {
-      [fm createDirectoryAtPath:_keymanDataPath withIntermediateDirectories:YES attributes:nil error:nil];
-    }
-  }
-  return _keymanDataPath;
-  */
-  return [KMDataRepository shared].keymanDataDirectory.path;
-}
-
-/**
- * Returns the root folder where keyboards are stored; currently the same
- * as the keymanDataPath, but may diverge in future versions (possibly a sub-folder)
- *
- * Actually diverting now, get this from KMDataRepository
+ * Returns the root folder where keyboards are stored
  */
 - (NSString *)keyboardsPath {
   if (_keyboardsPath == nil) {
-    _keyboardsPath = [self keymanDataPath];
+    _keyboardsPath = [KMDataRepository shared].keymanKeyboardsDirectory.path;
   }
   
-  return [KMDataRepository shared].keymanKeyboardsDirectory.path;
+  return _keyboardsPath;
 }
 
 - (NSArray *)kmxFileList {
@@ -652,7 +627,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 - (NSString *)packageNameFromPackageInfo:(NSString *)packageFolder {
   NSString *packageName = nil;
   
-  NSString *path = [[self keymanDataPath] stringByAppendingPathComponent:packageFolder];
+  NSString *path = [[self keyboardsPath] stringByAppendingPathComponent:packageFolder];
   KMPackageInfo *packageInfo = [self.packageReader loadPackageInfo:path];
   
   if (packageInfo) {
