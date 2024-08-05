@@ -8,8 +8,10 @@ import {
   SequenceRecorder
 } from '#tools';
 
+import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
+
 describe("Layer one - DOM -> InputSequence", function() {
-  this.timeout(5000);
+  this.timeout(DEFAULT_BROWSER_TIMEOUT);
 
   let controller: HostFixtureLayoutController;
 

@@ -77,10 +77,24 @@ PATH="$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin:$PATH"
 
 ## KeymanWeb Dependencies
 
-* node.js 18+, emscripten 3.1.46 or later, openjdk 8
+* node.js, emscripten 3.1.46 or later
+
+### node.js
+
+Our recommended way to install node.js is with
+[nvm](https://github.com/nvm-sh/nvm). This makes it easy to switch between
+versions of node.js.
+
+Alternatively, you can install node.js with `brew`.
+
+See [node.md](node.md) for more information.
+
+### emscripten
+
+To install emscripten:
 
 ```shell
-brew install node emscripten openjdk@8
+brew install emscripten
 ```
 
 Note: if you install emscripten with brew on macOS, only emscripten binaries are

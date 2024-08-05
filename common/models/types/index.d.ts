@@ -20,12 +20,31 @@ declare type USVString = string;
 declare type CasingForm = 'lower' | 'initial' | 'upper';
 
 /**
+ * Represents one lexical entry and its probability..
+ */
+type TextWithProbability = {
+  /**
+   * A lexical entry (word) offered by the model.
+   *
+   * Note:  not the search-term keyed part.  This will match the actual, unkeyed form.
+   */
+  text: string;
+
+  /**
+   * The probability of the lexical entry, directly based upon its frequency.
+   *
+   * A real-number weight, from 0 to 1.
+   */
+  p: number;
+}
+
+/**
  * Used to facilitate edit-distance calculations by allowing the LMLayer to
  * efficiently search the model's lexicon in a Trie-like manner.
  */
 declare interface LexiconTraversal {
   /**
-   * Provides an iterable pattern used to search for words with a prefix matching
+   * Provides an iterable pattern used to search for words with a 'keyed' prefix matching
    * the current traversal state's prefix when a new character is appended.  Iterating
    * across `children` provides 'breadth' to a lexical search.
    *
@@ -51,6 +70,20 @@ declare interface LexiconTraversal {
   children(): Generator<{char: USVString, traversal: () => LexiconTraversal}>;
 
   /**
+   * Allows direct access to the traversal state that results when appending one
+   * or more codepoints encoded in UTF-16 to the current traversal state's prefix.
+   * This allows bypassing iteration among all legal child Traversals.
+   *
+   * If such a traversal state is not supported, returns `undefined`.
+   *
+   * Note: traversals navigate and represent the lexicon in its "keyed" state,
+   * as produced by use of the search-term keying function defined for the model.
+   * That is, if a model "keys" `è` to `e`, there will be no `è` child.
+   * @param char
+   */
+  child(char: USVString): LexiconTraversal | undefined;
+
+  /**
    * Any entries directly keyed by the currently-represented lookup prefix.  Entries and
    * children may exist simultaneously, but `entries` must always exist when no children are
    * available in the returned `children()` iterable.
@@ -70,7 +103,14 @@ declare interface LexiconTraversal {
    * - prefix of 'crepe': ['crêpe', 'crêpé']
    * - other examples:  https://www.thoughtco.com/french-accent-homographs-1371072
    */
-  entries: USVString[];
+  entries: TextWithProbability[];
+
+  // Note:  `p`, not `maxP` - we want to see the same name for `this.entries.p` and `this.p`
+  /**
+   * Gives the probability of the highest-frequency lexical entry that is either a member or
+   * descendent of the represented trie `Node`.
+   */
+  p: number;
 }
 
 /**
@@ -294,6 +334,11 @@ declare interface Suggestion {
    * to the input text.  Ex:  'keep', 'emoji', 'correction', etc.
    */
   tag?: SuggestionTag;
+
+  /**
+   * Set to true if this suggestion is a valid auto-accept target.
+   */
+  autoAccept?: boolean
 }
 
 interface Reversion extends Suggestion {

@@ -21,7 +21,7 @@ export { default as extendString } from "./kmwstring.js";
 export { default as ManagedPromise } from "./managedPromise.js";
 export { default as TimeoutPromise, timedPromise } from "./timeoutPromise.js";
 
-export { Uni_IsSurrogate1, Uni_IsSurrogate2 } from "./surrogates.js";
+export { default as PriorityQueue, QueueComparator } from "./priority-queue.js"
 
 // // Uncomment the following line and run the bundled output to verify successful
 // // esbuild bundling of this submodule:

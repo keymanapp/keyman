@@ -1,13 +1,14 @@
 import { PageContextAttachment } from 'keyman/engine/attachment';
 import { DeviceSpec, timedPromise } from '@keymanapp/web-utils';
+import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
 
 import { assert } from 'chai';
 
 const host = document.createElement('div');
 document.body.appendChild(host);
 
-let STANDARD_OPTIONS = {
-  owner: null,
+const STANDARD_OPTIONS = {
+  owner: null as any,
   hostDevice: {
     formFactor: 'desktop',
     OS: 'windows',
@@ -16,7 +17,7 @@ let STANDARD_OPTIONS = {
   } as DeviceSpec
 };
 
-async function promiseForIframeLoad(iframe) {
+async function promiseForIframeLoad(iframe: HTMLIFrameElement) {
   // Falling back to the macrotask queue allows an unset iframe.src to re-enter loading state.
   await Promise.resolve();
 
@@ -35,7 +36,7 @@ async function promiseForIframeLoad(iframe) {
 }
 
 describe('KMW element-attachment logic', function () {
-  this.timeout(5000);
+  this.timeout(DEFAULT_BROWSER_TIMEOUT);
 
   describe('attachMode: auto', () => {
     beforeEach(function() {
@@ -55,13 +56,13 @@ describe('KMW element-attachment logic', function () {
         host.innerHTML = await fixture.text();
 
         const attacher = this.attacher;
-        let attached = [];
+        const attached = [] as HTMLElement[];
 
-        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.on('enabled', (elem: HTMLElement) => attached.push(elem));
         attacher.install(false);
 
-        assert.sameMembers(attached.map((elem) => elem.id), ['input', 'textarea']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), ['input', 'textarea']);
+        assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), ['input', 'textarea']);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), ['input', 'textarea']);
         attacher.shutdown();
       });
 
@@ -70,16 +71,16 @@ describe('KMW element-attachment logic', function () {
         host.innerHTML = await fixture.text();
 
         const attacher = this.attacher;
-        let attached = [];
-        let detached = [];
+        const attached = [] as HTMLElement[];
+        const detached = [] as HTMLElement[];
 
-        attacher.on('enabled', (elem) => attached.push(elem));
-        attacher.on('disabled', (elem) => detached.push(elem));
+        attacher.on('enabled', (elem: HTMLElement) => attached.push(elem));
+        attacher.on('disabled', (elem: HTMLElement) => detached.push(elem));
         attacher.install(false);
 
-        assert.sameMembers(attached.map((elem) => elem.id), ['input']);
-        assert.sameMembers(detached.map((elem) => elem.id), ['textarea']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), ['input']);
+        assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), ['input']);
+        assert.sameMembers(detached.map((elem: HTMLElement) => elem.id), ['textarea']);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), ['input']);
         attacher.shutdown();
       });
 
@@ -90,16 +91,16 @@ describe('KMW element-attachment logic', function () {
         const attacher = this.attacher;
         attacher.install(false);
 
-        let detached = [];
-        attacher.on('disabled', (elem) => detached.push(elem));
+        const detached = [] as HTMLElement[];
+        attacher.on('disabled', (elem: HTMLElement) => detached.push(elem));
 
         attacher.disableControl(document.getElementById('input'));
 
         // Give the MutationObservers time to trigger.
         await timedPromise(10);
 
-        assert.sameMembers(detached.map((elem) => elem.id), ['input']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), []);
+        assert.sameMembers(detached.map((elem: HTMLElement) => elem.id), ['input']);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), []);
         attacher.shutdown();
       });
 
@@ -118,10 +119,10 @@ describe('KMW element-attachment logic', function () {
 
         // Events are only tracked after this point.
 
-        let attached = [];
-        let detached = [];
-        attacher.on('enabled', (elem) => attached.push(elem));
-        attacher.on('disabled', (elem) => detached.push(elem));
+        const attached = [] as HTMLElement[];
+        const detached = [] as HTMLElement[];
+        attacher.on('enabled', (elem: HTMLElement) => attached.push(elem));
+        attacher.on('disabled', (elem: HTMLElement) => detached.push(elem));
 
         const textarea = document.getElementById('textarea');
         attacher.disableControl(textarea);
@@ -130,8 +131,8 @@ describe('KMW element-attachment logic', function () {
         await timedPromise(10);
 
         // Verify setup, just to be safe.
-        assert.sameMembers(detached.map((elem) => elem.id), ['textarea']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), ['input']);
+        assert.sameMembers(detached.map((elem: HTMLElement) => elem.id), ['textarea']);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), ['input']);
 
         // And, setup complete.
 
@@ -141,8 +142,8 @@ describe('KMW element-attachment logic', function () {
         // Give the MutationObservers time to trigger.
         await timedPromise(10);
 
-        assert.sameMembers(attached.map((elem) => elem.id), ['textarea']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), ['input', 'textarea']);
+        assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), ['textarea']);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), ['input', 'textarea']);
         attacher.shutdown();
       });
 
@@ -151,20 +152,20 @@ describe('KMW element-attachment logic', function () {
         host.innerHTML = await fixture.text();
 
         const attacher = this.attacher;
-        let attached = [];
+        const attached = [] as HTMLElement[];
 
-        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.on('enabled', (elem: HTMLElement) => attached.push(elem));
         attacher.install(false);
 
-        assert.sameMembers(attached.map((elem) => elem.id), ['input', 'textarea']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), ['input', 'textarea']);
+        assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), ['input', 'textarea']);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), ['input', 'textarea']);
 
-        let detached = [];
-        attacher.on('disabled', (elem) => detached.push(elem));
+        const detached = [] as HTMLElement[];
+        attacher.on('disabled', (elem: HTMLElement) => detached.push(elem));
         attacher.detachFromControl(attached[1]);
 
         assert.sameMembers(detached, [attached[1]]);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), ['input']);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), ['input']);
         attacher.shutdown();
       });
 
@@ -173,13 +174,13 @@ describe('KMW element-attachment logic', function () {
         host.innerHTML = await fixture.text();
 
         const attacher = this.attacher;
-        let attached = [];
+        const attached = [] as HTMLElement[];
 
-        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.on('enabled', (elem: HTMLElement) => attached.push(elem));
         attacher.install(false);
 
-        assert.sameMembers(attached.map((elem) => elem.id), ['editable']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), ['editable']);
+        assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), ['editable']);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), ['editable']);
         attacher.shutdown();
       });
 
@@ -188,8 +189,8 @@ describe('KMW element-attachment logic', function () {
         host.innerHTML = await fixture.text();
 
         const attacher = this.attacher;
-        let detached = [];
-        attacher.on('disabled', (elem) => {
+        const detached = [] as HTMLElement[];
+        attacher.on('disabled', (elem: HTMLElement) => {
           detached.push(elem)
         });
 
@@ -197,8 +198,8 @@ describe('KMW element-attachment logic', function () {
 
         attacher.detachFromControl(document.getElementById('editable'));
 
-        assert.sameMembers(detached.map((elem) => elem.id), ['editable']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), []);
+        assert.sameMembers(detached.map((elem: HTMLElement) => elem.id), ['editable']);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), []);
         attacher.shutdown();
       });
 
@@ -207,16 +208,16 @@ describe('KMW element-attachment logic', function () {
         host.innerHTML = await fixture.text();
 
         // Note:  iframes require additional time to resolve.
-        await promiseForIframeLoad(document.getElementById('iframe'));
+        await promiseForIframeLoad(document.getElementById('iframe') as HTMLIFrameElement as HTMLIFrameElement);
 
         const attacher = this.attacher;
-        let attached = [];
+        const attached = [] as HTMLElement[];
 
-        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.on('enabled', (elem: HTMLElement) => attached.push(elem));
         attacher.install(false);
 
-        assert.sameMembers(attached.map((elem) => elem.id), ['iframe-input']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), ['iframe-input']);
+        assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), ['iframe-input']);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), ['iframe-input']);
         attacher.shutdown();
       });
 
@@ -225,20 +226,20 @@ describe('KMW element-attachment logic', function () {
         host.innerHTML = await fixture.text();
 
         // Note:  iframes require additional time to resolve.
-        await promiseForIframeLoad(document.getElementById('iframe'));
+        await promiseForIframeLoad(document.getElementById('iframe') as HTMLIFrameElement as HTMLIFrameElement);
 
         const attacher = this.attacher;
-        let detached = [];
-        attacher.on('disabled', (elem) => {
+        const detached = [] as HTMLElement[];
+        attacher.on('disabled', (elem: HTMLElement) => {
           detached.push(elem)
         });
 
         attacher.install(false);
 
-        attacher.detachFromControl(document.getElementById('iframe'));
+        attacher.detachFromControl(document.getElementById('iframe') as HTMLIFrameElement);
 
-        assert.sameMembers(detached.map((elem) => elem.id), ['iframe-input']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), []);
+        assert.sameMembers(detached.map((elem: HTMLElement) => elem.id), ['iframe-input']);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), []);
 
         attacher.shutdown();
       });
@@ -248,16 +249,16 @@ describe('KMW element-attachment logic', function () {
         host.innerHTML = await fixture.text();
 
         // Note:  iframes require additional time to resolve.
-        await promiseForIframeLoad(document.getElementById('iframe'));
+        await promiseForIframeLoad(document.getElementById('iframe') as HTMLIFrameElement);
 
         const attacher = this.attacher;
-        let attached = [];
+        const attached = [] as HTMLElement[];
 
-        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.on('enabled', (elem: HTMLElement) => attached.push(elem));
         attacher.install(false);
 
-        assert.sameMembers(attached.map((elem) => elem.id), ['iframe']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), ['iframe']);
+        assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), ['iframe']);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), ['iframe']);
         attacher.shutdown();
       });
 
@@ -266,19 +267,19 @@ describe('KMW element-attachment logic', function () {
         host.innerHTML = await fixture.text();
 
         // Note:  iframes require additional time to resolve.
-        await promiseForIframeLoad(document.getElementById('iframe'));
+        await promiseForIframeLoad(document.getElementById('iframe') as HTMLIFrameElement);
 
         const attacher = this.attacher;
-        let detached = [];
-        attacher.on('disabled', (elem) => {
+        const detached = [] as HTMLElement[];
+        attacher.on('disabled', (elem: HTMLElement) => {
           detached.push(elem)
         });
 
         attacher.install(false);
-        attacher.detachFromControl(document.getElementById('iframe'));
+        attacher.detachFromControl(document.getElementById('iframe') as HTMLIFrameElement);
 
-        assert.sameMembers(detached.map((elem) => elem.id), ['iframe']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), []);
+        assert.sameMembers(detached.map((elem: HTMLElement) => elem.id), ['iframe']);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), []);
 
         attacher.shutdown();
       });
@@ -288,22 +289,22 @@ describe('KMW element-attachment logic', function () {
         host.innerHTML = await fixture.text();
 
         const attacher = this.attacher;
-        let attached = [];
+        const attached = [] as HTMLElement[];
 
         // Note:  iframes require additional time to resolve.
-        await promiseForIframeLoad(document.getElementById('iframe'));
-        await promiseForIframeLoad(document.getElementById('design-iframe'));
+        await promiseForIframeLoad(document.getElementById('iframe') as HTMLIFrameElement);
+        await promiseForIframeLoad(document.getElementById('design-iframe') as HTMLIFrameElement);
 
         // Give the design-mode iframe a bit of time to set itself up properly.
         // Note: it is thus important that whatever sends the `install` command has also
         // alloted a brief window of time like this as well.
         await timedPromise(20);
 
-        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.on('enabled', (elem: HTMLElement) => attached.push(elem));
         attacher.install(false);
 
-        assert.sameMembers(attached.map((elem) => elem.id), ['iframe-input', 'design-iframe', 'editable', 'input', 'textarea']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), ['iframe-input', 'design-iframe', 'editable', 'input', 'textarea']);
+        assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), ['iframe-input', 'design-iframe', 'editable', 'input', 'textarea']);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), ['iframe-input', 'design-iframe', 'editable', 'input', 'textarea']);
         attacher.shutdown();
       });
 
@@ -312,20 +313,20 @@ describe('KMW element-attachment logic', function () {
         host.innerHTML = await fixture.text();
 
         const attacher = this.attacher;
-        let attached = [];
+        const attached = [] as HTMLElement[];
 
         // Note:  iframes require additional time to resolve.
         const outerIframe = document.getElementById('outer-iframe') as HTMLIFrameElement;
         await promiseForIframeLoad(outerIframe);
 
-        const innerIframe = outerIframe.contentDocument.getElementById('inner-iframe');
+        const innerIframe = outerIframe.contentDocument.getElementById('inner-iframe') as HTMLIFrameElement;
         await promiseForIframeLoad(innerIframe);
 
-        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.on('enabled', (elem: HTMLElement) => attached.push(elem));
         attacher.install(false);
 
-        assert.sameMembers(attached.map((elem) => elem.id), ['outer-textarea', 'inner-input']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), ['outer-textarea', 'inner-input']);
+        assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), ['outer-textarea', 'inner-input']);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), ['outer-textarea', 'inner-input']);
         attacher.shutdown();
       });
     });
@@ -333,12 +334,12 @@ describe('KMW element-attachment logic', function () {
     describe('for dynamic elements, main document only', function() {
       it('input and textarea', async function () {
         const attacher = this.attacher;
-        let attached = [];
+        const attached = [] as HTMLElement[];
 
-        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.on('enabled', (elem: HTMLElement) => attached.push(elem));
         attacher.install(false);
 
-        assert.sameMembers(attached.map((elem) => elem.id), []);
+        assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), []);
 
         const fixture = await fetch('/resources/fixtures/input-and-text.html');
         host.innerHTML = await fixture.text();
@@ -348,21 +349,21 @@ describe('KMW element-attachment logic', function () {
 
         // Note:  anything with iframes (design or not) requires an extra timeout for the internal doc to load.
 
-        assert.sameMembers(attached.map((elem) => elem.id), ['input', 'textarea']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), ['input', 'textarea']);
+        assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), ['input', 'textarea']);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), ['input', 'textarea']);
 
         attacher.shutdown();
       });
 
       it('input and kmw-disabled textarea', async function () {
         const attacher = this.attacher;
-        let attached = [];
+        const attached = [] as HTMLElement[];
 
-        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.on('enabled', (elem: HTMLElement) => attached.push(elem));
         attacher.install(false);
 
-        assert.sameMembers(attached.map((elem) => elem.id), []);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), []);
+        assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), []);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), []);
 
         // Okay, detachment test components done - now for the alternative attachment.
 
@@ -374,8 +375,8 @@ describe('KMW element-attachment logic', function () {
 
         // Note:  anything with iframes (design or not) requires an extra timeout for the internal doc to load.
 
-        assert.sameMembers(attached.map((elem) => elem.id), ['input']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), ['input']);
+        assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), ['input']);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), ['input']);
         attacher.shutdown();
       });
 
@@ -384,36 +385,36 @@ describe('KMW element-attachment logic', function () {
         host.innerHTML = await fixture.text();
 
         const attacher = this.attacher;
-        let attached = [];
+        const attached = [] as HTMLElement[];
 
-        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.on('enabled', (elem: HTMLElement) => attached.push(elem));
         attacher.install(false);
 
-        assert.sameMembers(attached.map((elem) => elem.id), ['input', 'textarea']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), ['input', 'textarea']);
+        assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), ['input', 'textarea']);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), ['input', 'textarea']);
 
         // Now the fun part.
-        let detached = [];
-        attacher.on('disabled', (elem) => detached.push(elem));
+        const detached = [] as HTMLElement[];
+        attacher.on('disabled', (elem: HTMLElement) => detached.push(elem));
 
         host.innerHTML = '';
 
         // This gives the mutation observers a moment to 'kick in' and is required for test success.
         await Promise.resolve();
 
-        assert.sameMembers(detached.map((elem) => elem.id), ['input', 'textarea']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), []);
+        assert.sameMembers(detached.map((elem: HTMLElement) => elem.id), ['input', 'textarea']);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), []);
 
         attacher.shutdown();
       });
 
       it('content-editable div', async function () {
         const attacher = this.attacher;
-        let attached = [];
+        const attached = [] as HTMLElement[];
 
-        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.on('enabled', (elem: HTMLElement) => attached.push(elem));
         attacher.install(false);
-        assert.sameMembers(attached.map((elem) => elem.id), []);
+        assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), []);
 
         const fixture = await fetch('/resources/fixtures/simple-editable-div.html');
         host.innerHTML = await fixture.text();
@@ -421,30 +422,30 @@ describe('KMW element-attachment logic', function () {
         // This gives the mutation observers a moment to 'kick in' and is required for test success.
         await Promise.resolve();
 
-        assert.sameMembers(attached.map((elem) => elem.id), ['editable']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), ['editable']);
+        assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), ['editable']);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), ['editable']);
         attacher.shutdown();
       });
 
       it('simple iframe with input', async function () {
         const attacher = this.attacher;
-        let attached = [];
+        const attached = [] as HTMLElement[];
 
-        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.on('enabled', (elem: HTMLElement) => attached.push(elem));
         attacher.install(false);
 
         const fixture = await fetch('/resources/fixtures/simple-iframe-with-input.html');
         host.innerHTML = await fixture.text();
 
         // Note:  iframes require additional time to resolve.
-        await promiseForIframeLoad(document.getElementById('iframe'));
+        await promiseForIframeLoad(document.getElementById('iframe') as HTMLIFrameElement);
 
         // Our mutation observers delay slightly here to ensure that any doc-internal handlers
         // have a chance to resolve before we attach.  Currently: 10ms.
         await timedPromise(20);
 
-        assert.sameMembers(attached.map((elem) => elem.id), ['iframe-input']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), ['iframe-input']);
+        assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), ['iframe-input']);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), ['iframe-input']);
         attacher.shutdown();
       });
 
@@ -453,11 +454,11 @@ describe('KMW element-attachment logic', function () {
         host.innerHTML = await fixture.text();
 
         // Note:  iframes require additional time to resolve.
-        await promiseForIframeLoad(document.getElementById('iframe'));
+        await promiseForIframeLoad(document.getElementById('iframe') as HTMLIFrameElement);
 
         const attacher = this.attacher;
-        let detached = [];
-        attacher.on('disabled', (elem) => {
+        const detached = [] as HTMLElement[];
+        attacher.on('disabled', (elem: HTMLElement) => {
           detached.push(elem)
         });
 
@@ -467,31 +468,31 @@ describe('KMW element-attachment logic', function () {
 
         await Promise.resolve();
 
-        assert.sameMembers(detached.map((elem) => elem.id), ['iframe-input']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), []);
+        assert.sameMembers(detached.map((elem: HTMLElement) => elem.id), ['iframe-input']);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), []);
 
         attacher.shutdown();
       });
 
       it('design-mode iframe', async function () {
         const attacher = this.attacher;
-        let attached = [];
+        const attached = [] as HTMLElement[];
 
-        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.on('enabled', (elem: HTMLElement) => attached.push(elem));
         attacher.install(false);
 
         const fixture = await fetch('/resources/fixtures/simple-design-iframe.html');
         host.innerHTML = await fixture.text();
 
         // Note:  iframes require additional time to resolve.
-        await promiseForIframeLoad(document.getElementById('iframe'));
+        await promiseForIframeLoad(document.getElementById('iframe') as HTMLIFrameElement);
 
         // Our mutation observers delay slightly here to ensure that any doc-internal handlers
         // have a chance to resolve before we attach.  Currently: 10ms.
         await timedPromise(20);
 
-        assert.sameMembers(attached.map((elem) => elem.id), ['iframe']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), ['iframe']);
+        assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), ['iframe']);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), ['iframe']);
         attacher.shutdown();
       });
 
@@ -500,11 +501,11 @@ describe('KMW element-attachment logic', function () {
         host.innerHTML = await fixture.text();
 
         // Note:  iframes require additional time to resolve.
-        await promiseForIframeLoad(document.getElementById('iframe'));
+        await promiseForIframeLoad(document.getElementById('iframe') as HTMLIFrameElement);
 
         const attacher = this.attacher;
-        let detached = [];
-        attacher.on('disabled', (elem) => {
+        const detached = [] as HTMLElement[];
+        attacher.on('disabled', (elem: HTMLElement) => {
           detached.push(elem)
         });
 
@@ -514,40 +515,40 @@ describe('KMW element-attachment logic', function () {
 
         await Promise.resolve();
 
-        assert.sameMembers(detached.map((elem) => elem.id), ['iframe']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), []);
+        assert.sameMembers(detached.map((elem: HTMLElement) => elem.id), ['iframe']);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), []);
 
         attacher.shutdown();
       });
 
       it('one of each supported element', async function () {
         const attacher = this.attacher;
-        let attached = [];
+        const attached = [] as HTMLElement[];
 
-        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.on('enabled', (elem: HTMLElement) => attached.push(elem));
         attacher.install(false);
 
         const fixture = await fetch('/resources/fixtures/a-bit-of-everything.html');
         host.innerHTML = await fixture.text();
 
         // Note:  iframes require additional time to resolve.
-        await promiseForIframeLoad(document.getElementById('iframe'));
-        await promiseForIframeLoad(document.getElementById('design-iframe'));
+        await promiseForIframeLoad(document.getElementById('iframe') as HTMLIFrameElement);
+        await promiseForIframeLoad(document.getElementById('design-iframe') as HTMLIFrameElement);
 
         // Our mutation observers delay slightly here to ensure that any doc-internal handlers
         // have a chance to resolve before we attach.  Currently: 10ms.
         await timedPromise(20);
 
-        assert.sameMembers(attached.map((elem) => elem.id), ['iframe-input', 'design-iframe', 'editable', 'input', 'textarea']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), ['iframe-input', 'design-iframe', 'editable', 'input', 'textarea']);
+        assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), ['iframe-input', 'design-iframe', 'editable', 'input', 'textarea']);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), ['iframe-input', 'design-iframe', 'editable', 'input', 'textarea']);
         attacher.shutdown();
       });
 
       it('complex: nested iframe', async function() {
         const attacher = this.attacher;
-        let attached = [];
+        const attached = [] as HTMLElement[];
 
-        attacher.on('enabled', (elem) => attached.push(elem));
+        attacher.on('enabled', (elem: HTMLElement) => attached.push(elem));
         attacher.install(false);
 
         const fixture = await fetch('/resources/fixtures/nested-iframe.html');
@@ -559,11 +560,11 @@ describe('KMW element-attachment logic', function () {
         await timedPromise(20);
 
         const innerIframe = outerIframe.contentDocument.getElementById('inner-iframe');
-        await promiseForIframeLoad(innerIframe);
+        await promiseForIframeLoad(innerIframe as HTMLIFrameElement);
         await timedPromise(20);
 
-        assert.sameMembers(attached.map((elem) => elem.id), ['outer-textarea', 'inner-input']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), ['outer-textarea', 'inner-input']);
+        assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), ['outer-textarea', 'inner-input']);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), ['outer-textarea', 'inner-input']);
         attacher.shutdown();
       });
 
@@ -576,21 +577,21 @@ describe('KMW element-attachment logic', function () {
         await promiseForIframeLoad(outerIframe);
 
         const innerIframe = outerIframe.contentDocument.getElementById('inner-iframe');
-        await promiseForIframeLoad(innerIframe);
+        await promiseForIframeLoad(innerIframe as HTMLIFrameElement);
 
         const attacher = this.attacher;
         attacher.install(false);
 
         // The test setup is complete; now to do the actual test.
-        let detached = [];
-        attacher.on('disabled', (elem) => detached.push(elem));
+        const detached = [] as HTMLElement[];
+        attacher.on('disabled', (elem: HTMLElement) => detached.push(elem));
         host.innerHTML = '';
 
         // And now to trigger the MutationObserver.
         await Promise.resolve();
 
-        assert.sameMembers(detached.map((elem) => elem.id), ['outer-textarea', 'inner-input']);
-        assert.sameMembers(attacher.inputList.map((elem) => elem.id), []);
+        assert.sameMembers(detached.map((elem: HTMLElement) => elem.id), ['outer-textarea', 'inner-input']);
+        assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), []);
         attacher.shutdown();
       });
     });
@@ -613,22 +614,22 @@ describe('KMW element-attachment logic', function () {
 
       const attacher = this.attacher;
 
-      let attached = [];
-      attacher.on('enabled', (elem) => attached.push(elem));
-      let detached = [];
-      attacher.on('disabled', (elem) => detached.push(elem));
+      const attached = [] as HTMLElement[];
+      attacher.on('enabled', (elem: HTMLElement) => attached.push(elem));
+      const detached = [] as HTMLElement[];
+      attacher.on('disabled', (elem: HTMLElement) => detached.push(elem));
       attacher.install(true);
 
       // Nothing should attach ('enabled' or 'disabled') by default.
-      assert.sameMembers(attached.map((elem) => elem.id), []);
-      assert.sameMembers(detached.map((elem) => elem.id), []);
-      assert.sameMembers(attacher.inputList.map((elem) => elem.id), []);
+      assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), []);
+      assert.sameMembers(detached.map((elem: HTMLElement) => elem.id), []);
+      assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), []);
 
       attacher.attachToControl(document.getElementById('input'));
       attacher.attachToControl(document.getElementById('textarea'));
 
-      assert.sameMembers(attached.map((elem) => elem.id), ['input', 'textarea']);
-      assert.sameMembers(attacher.inputList.map((elem) => elem.id), ['input', 'textarea']);
+      assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), ['input', 'textarea']);
+      assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), ['input', 'textarea']);
 
       attacher.shutdown();
     });
@@ -639,16 +640,16 @@ describe('KMW element-attachment logic', function () {
 
       const attacher = this.attacher;
 
-      let attached = [];
-      attacher.on('enabled', (elem) => attached.push(elem));
-      let detached = [];
-      attacher.on('disabled', (elem) => detached.push(elem));
+      const attached = [] as HTMLElement[];
+      attacher.on('enabled', (elem: HTMLElement) => attached.push(elem));
+      const detached = [] as HTMLElement[];
+      attacher.on('disabled', (elem: HTMLElement) => detached.push(elem));
       attacher.install(true);
 
       // Nothing should attach ('enabled' or 'disabled') by default.
-      assert.sameMembers(attached.map((elem) => elem.id), []);
-      assert.sameMembers(detached.map((elem) => elem.id), []);
-      assert.sameMembers(attacher.inputList.map((elem) => elem.id), []);
+      assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), []);
+      assert.sameMembers(detached.map((elem: HTMLElement) => elem.id), []);
+      assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), []);
 
 
       attacher.attachToControl(document.getElementById('input'));
@@ -656,9 +657,9 @@ describe('KMW element-attachment logic', function () {
       // overridable via enableControl, though.
       attacher.attachToControl(document.getElementById('textarea'));
 
-      assert.sameMembers(attached.map((elem) => elem.id), ['input']);
-      assert.sameMembers(detached.map((elem) => elem.id), ['textarea']);
-      assert.sameMembers(attacher.inputList.map((elem) => elem.id), ['input']);
+      assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), ['input']);
+      assert.sameMembers(detached.map((elem: HTMLElement) => elem.id), ['textarea']);
+      assert.sameMembers(attacher.inputList.map((elem: HTMLElement) => elem.id), ['input']);
       attacher.shutdown();
     });
   });
@@ -679,22 +680,22 @@ describe('KMW element-attachment logic', function () {
       host.innerHTML = await fixture.text();
 
       const attacher = this.attacher;
-      let attached = [];
+      const attached = [] as HTMLElement[];
 
       // Note:  iframes require additional time to resolve.
-      await promiseForIframeLoad(document.getElementById('iframe'));
-      await promiseForIframeLoad(document.getElementById('design-iframe'));
+      await promiseForIframeLoad(document.getElementById('iframe') as HTMLIFrameElement);
+      await promiseForIframeLoad(document.getElementById('design-iframe') as HTMLIFrameElement);
 
       await timedPromise(20); // for the design-iframe to set itself into design-mode.
 
-      attacher.on('enabled', (elem) => attached.push(elem));
+      attacher.on('enabled', (elem: HTMLElement) => attached.push(elem));
       attacher.install(false);
 
-      assert.sameMembers(attached.map((elem) => elem.id), ['iframe-input', 'design-iframe', 'editable', 'input', 'textarea']);
+      assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), ['iframe-input', 'design-iframe', 'editable', 'input', 'textarea']);
 
       // At this time, `.sortedInputs` never includes iframe-embedded elements, design-iframes,
       // or content-editables.  (This matches KMW 16.0 + before behavior.)
-      assert.sameOrderedMembers(attacher.sortedInputs.map((elem) => elem.id), ['input', 'textarea']);
+      assert.sameOrderedMembers(attacher.sortedInputs.map((elem: HTMLElement) => elem.id), ['input', 'textarea']);
       attacher.shutdown();
     });
 
@@ -703,9 +704,9 @@ describe('KMW element-attachment logic', function () {
       host.innerHTML = await fixture.text();
 
       const attacher = this.attacher;
-      let attached = [];
+      const attached = [] as HTMLElement[];
 
-      attacher.on('enabled', (elem) => attached.push(elem));
+      attacher.on('enabled', (elem: HTMLElement) => attached.push(elem));
       attacher.install(false);
 
       // Numerals:  the order of their definition within the HTML fixture.
@@ -718,9 +719,9 @@ describe('KMW element-attachment logic', function () {
         "input5-bottom-right"
       ];
 
-      assert.sameMembers(attached.map((elem) => elem.id), elements);
+      assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), elements);
       // Top to bottom, left to right.
-      assert.sameOrderedMembers(attacher.sortedInputs.map((elem) => elem.id), [
+      assert.sameOrderedMembers(attacher.sortedInputs.map((elem: HTMLElement) => elem.id), [
         "input4-top-left",
         "input2-top-right",
         "input1-middle",
@@ -735,9 +736,9 @@ describe('KMW element-attachment logic', function () {
       host.innerHTML = await fixture.text();
 
       const attacher = this.attacher;
-      let attached = [];
+      const attached = [] as HTMLElement[];
 
-      attacher.on('enabled', (elem) => attached.push(elem));
+      attacher.on('enabled', (elem: HTMLElement) => attached.push(elem));
       attacher.install(false);
 
       // Numerals:  the order of their definition within the HTML fixture.
@@ -750,9 +751,9 @@ describe('KMW element-attachment logic', function () {
         "input5-bottom-right"
       ];
 
-      assert.sameMembers(attached.map((elem) => elem.id), elements);
+      assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), elements);
       // Top to bottom, left to right.
-      assert.sameOrderedMembers(attacher.sortedInputs.map((elem) => elem.id), [
+      assert.sameOrderedMembers(attacher.sortedInputs.map((elem: HTMLElement) => elem.id), [
         "input4-top-left",
         "input2-top-right",
         "input1-middle",
@@ -771,9 +772,9 @@ describe('KMW element-attachment logic', function () {
       elements.push("input6-middle-left");
       elements.push("input7-top-middle");
 
-      assert.sameMembers(attached.map((elem) => elem.id), elements);
+      assert.sameMembers(attached.map((elem: HTMLElement) => elem.id), elements);
       // Top to bottom, left to right.
-      assert.sameOrderedMembers(attacher.sortedInputs.map((elem) => elem.id), [
+      assert.sameOrderedMembers(attacher.sortedInputs.map((elem: HTMLElement) => elem.id), [
         "input4-top-left",
         "input7-top-middle",
         "input2-top-right",

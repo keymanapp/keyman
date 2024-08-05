@@ -116,8 +116,6 @@ procedure TfrmDebugStatus_Events.AddActionEvent(action: TDebugEventActionData);
 begin
   case action.ActionType of
     KM_CORE_IT_EMIT_KEYSTROKE: AddItem('emit_keystroke', action);
-//    QIT_VSHIFTDOWN:  AddItem('vshiftdown', action);
-//    QIT_VSHIFTUP:    AddItem('vshiftup', action);
     KM_CORE_IT_CHAR:        AddItem('char', action);
     KM_CORE_IT_MARKER:     AddItem('marker', action);
     KM_CORE_IT_ALERT:        AddItem('alert', action);

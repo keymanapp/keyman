@@ -3,9 +3,9 @@ import Device from 'keyman/engine/device-detect';
 
 import { loadKeyboardsFromStubs } from '../../kbdLoader.js';
 import { timedPromise } from '@keymanapp/web-utils';
-import { type Keyboard } from '@keymanapp/keyboard-processor';
 
 import { assert } from 'chai';
+import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
 
 const device = new Device();
 device.detect();
@@ -27,7 +27,7 @@ const host = document.createElement('div');
 document.body.appendChild(host);
 
 describe('OSK activation', function () {
-  this.timeout(5000);
+  this.timeout(DEFAULT_BROWSER_TIMEOUT);
 
   before(async () => {
     const fixture = await fetch('resources/stubs/khmer_angkor.json');
@@ -46,7 +46,7 @@ describe('OSK activation', function () {
   it('InlinedOSK - standard case', async () => {
     const container = document.getElementById('osk-container');
 
-    let osk = new KeymanOSK.InlinedOSKView(TestResources.OskConfig);
+    const osk = new KeymanOSK.InlinedOSKView(TestResources.OskConfig);
 
     osk.setSize(600, 400);
     container.appendChild(osk.element);
@@ -80,7 +80,7 @@ describe('OSK activation', function () {
     // So, make sure we don't make unexpected errors.
     const container = document.getElementById('osk-container');
 
-    let osk = new KeymanOSK.InlinedOSKView({
+    const osk = new KeymanOSK.InlinedOSKView({
       ...TestResources.OskConfig,
       activator: new KeymanOSK.StaticActivator()
     });

@@ -16,11 +16,6 @@ if cpp_compiler.get_id() == 'msvc'
   version_res += import('windows').compile_resources('version.rc', args:['/n','/c65001'])
 endif
 
-if cpp_compiler.get_id() == 'emscripten'
-  # TODO: why do we need this defn here?
-  defns += ['-DKM_CORE_LIBRARY']
-endif
-
 # ICU4C is used for repertoire tests and core implementation
 
 if target_machine.system() == 'linux'
@@ -36,8 +31,40 @@ else
   icu_i18n = icu4c.get_variable('icui18n_dep')
 endif
 
+if cpp_compiler.get_id() == 'emscripten'
+  # TODO: why do we need this defn here?
+  defns += ['-DKM_CORE_LIBRARY']
+  icu_if_not_on_wasm = []
+else
+  # only include this if NOT on wasm.
+  icu_if_not_on_wasm = [icu_uc, icu_i18n]
+endif
+
 if icu_uc.found()
   defns += '-DHAVE_ICU4C'
+endif
+
+# On wasm, generate util_normalize_table.h automatically from ICU
+generated_headers = []
+
+if cpp_compiler.get_id() == 'emscripten'
+
+util_normalize_table_generator = executable('util_normalize_table_generator',
+    ['util_normalize_table_generator.cpp'],
+    cpp_args: defns + warns,
+    include_directories: [inc],
+    link_args: links,
+    dependencies: [icu_uc, icu_i18n],
+    )
+
+util_normalize_table_h = custom_target('util_normalize_table.h',
+                    output: 'util_normalize_table.h',
+                    command: [util_normalize_table_generator],
+                    capture:true)
+
+generated_headers += util_normalize_table_h
+
+
 endif
 
 
@@ -60,6 +87,8 @@ kmx_files = files(
   'km_core_processevent_api.cpp',
   'jsonpp.cpp',
   'util_normalize.cpp',
+  'util_regex.cpp',
+  'core_icu.cpp',
   'ldml/ldml_processor.cpp',
   'ldml/ldml_transforms.cpp',
   'ldml/ldml_markers.cpp',
@@ -110,18 +139,19 @@ lib = library('keymancore',
   kmx_files,
   mock_files,
   version_res,
+  generated_headers,
   cpp_args: defns + warns + flags,
   link_args: links,
   version: lib_version,
   include_directories: inc,
   pic: true,
   install: true,
-  dependencies: [icu_uc, icu_i18n],
+  dependencies: icu_if_not_on_wasm,
   )
 
 headerdirs = [ '.', 'keyman' ] # subdirectories of ${prefix}/include to add to header path
 
-keymancore = declare_dependency(link_with: lib, include_directories: inc, dependencies: [icu_uc, icu_i18n])
+keymancore = declare_dependency(link_with: lib, include_directories: inc, dependencies: icu_if_not_on_wasm)
 
 pkg = import('pkgconfig')
 pkg.generate(

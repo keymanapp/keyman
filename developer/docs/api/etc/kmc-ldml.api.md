@@ -16,36 +16,10 @@ import { LDMLKeyboardTestDataXMLSourceFile } from '@keymanapp/common-types';
 import { LDMLKeyboardXMLSourceFileReaderOptions } from '@keymanapp/common-types';
 import { UnicodeSetParser } from '@keymanapp/common-types';
 
-// @public
-export interface LdmlCompilerOptions extends CompilerOptions {
-    readerOptions: LDMLKeyboardXMLSourceFileReaderOptions;
-}
-
-// @public
-export class LdmlKeyboardCompiler implements KeymanCompiler {
-    // @internal
-    compile(source: LDMLKeyboardXMLSourceFile, postValidate?: boolean): Promise<KMXPlus.KMXPlusFile>;
-    // @internal
-    getUsetParser(): Promise<UnicodeSetParser>;
-    init(callbacks: CompilerCallbacks, options: LdmlCompilerOptions): Promise<boolean>;
-    // Warning: (ae-forgotten-export) The symbol "LDMLKeyboardXMLSourceFile" needs to be exported by the entry point main.d.ts
-    //
-    // @internal
-    load(filename: string): LDMLKeyboardXMLSourceFile | null;
-    // @internal
-    loadTestData(filename: string): LDMLKeyboardTestDataXMLSourceFile | null;
-    // Warning: (ae-forgotten-export) The symbol "LdmlKeyboardCompilerResult" needs to be exported by the entry point main.d.ts
-    run(inputFilename: string, outputFilename?: string): Promise<LdmlKeyboardCompilerResult>;
-    // @internal
-    validate(source: LDMLKeyboardXMLSourceFile): Promise<boolean>;
-    // Warning: (ae-forgotten-export) The symbol "LdmlKeyboardCompilerArtifacts" needs to be exported by the entry point main.d.ts
-    write(artifacts: LdmlKeyboardCompilerArtifacts): Promise<boolean>;
-}
-
-// Warning: (ae-internal-missing-underscore) The name "LdmlKeyboardCompilerMessages" should be prefixed with an underscore because the declaration is marked as @internal
+// Warning: (ae-internal-missing-underscore) The name "LdmlCompilerMessages" should be prefixed with an underscore because the declaration is marked as @internal
 //
 // @internal (undocumented)
-export class LdmlKeyboardCompilerMessages {
+export class LdmlCompilerMessages {
     // (undocumented)
     static ERROR_CantReferenceSetFromUnicodeSet: number;
     // (undocumented)
@@ -106,6 +80,24 @@ export class LdmlKeyboardCompilerMessages {
     static Error_IllegalCharacters: (o: {
         count: number;
         lowestCh: number;
+    }) => CompilerEvent;
+    // (undocumented)
+    static ERROR_IllegalTransformAsterisk: number;
+    // (undocumented)
+    static Error_IllegalTransformAsterisk: (o: {
+        from: string;
+    }) => CompilerEvent;
+    // (undocumented)
+    static ERROR_IllegalTransformDollarsign: number;
+    // (undocumented)
+    static Error_IllegalTransformDollarsign: (o: {
+        from: string;
+    }) => CompilerEvent;
+    // (undocumented)
+    static ERROR_IllegalTransformPlus: number;
+    // (undocumented)
+    static Error_IllegalTransformPlus: (o: {
+        from: string;
     }) => CompilerEvent;
     // (undocumented)
     static ERROR_InvalidFile: number;
@@ -227,6 +219,12 @@ export class LdmlKeyboardCompilerMessages {
         modifiers: string;
     }) => CompilerEvent;
     // (undocumented)
+    static ERROR_TransformFromMatchesNothing: number;
+    // (undocumented)
+    static Error_TransformFromMatchesNothing: (o: {
+        from: string;
+    }) => CompilerEvent;
+    // (undocumented)
     static ERROR_UnparseableReorderSet: number;
     // (undocumented)
     static Error_UnparseableReorderSet: (o: {
@@ -241,12 +239,6 @@ export class LdmlKeyboardCompilerMessages {
         message: string;
     }) => CompilerEvent;
     // (undocumented)
-    static FATAL_SectionCompilerFailed: number;
-    // (undocumented)
-    static Fatal_SectionCompilerFailed: (o: {
-        sect: string;
-    }) => CompilerEvent;
-    // (undocumented)
     static HINT_CharClassImplicitDenorm: number;
     // (undocumented)
     static Hint_CharClassImplicitDenorm: (o: {
@@ -258,6 +250,18 @@ export class LdmlKeyboardCompilerMessages {
     static Hint_LocaleIsNotMinimalAndClean: (o: {
         sourceLocale: string;
         locale: string;
+    }) => CompilerEvent;
+    // (undocumented)
+    static HINT_NoDisplayForMarker: number;
+    // (undocumented)
+    static Hint_NoDisplayForMarker: (o: {
+        id: string;
+    }) => CompilerEvent;
+    // (undocumented)
+    static HINT_NoDisplayForSwitch: number;
+    // (undocumented)
+    static Hint_NoDisplayForSwitch: (o: {
+        id: string;
     }) => CompilerEvent;
     // (undocumented)
     static HINT_NormalizationDisabled: number;
@@ -293,6 +297,32 @@ export class LdmlKeyboardCompilerMessages {
         count: number;
         lowestCh: number;
     }) => CompilerEvent;
+}
+
+// @public
+export interface LdmlCompilerOptions extends CompilerOptions {
+    readerOptions: LDMLKeyboardXMLSourceFileReaderOptions;
+}
+
+// @public
+export class LdmlKeyboardCompiler implements KeymanCompiler {
+    // @internal
+    compile(source: LDMLKeyboardXMLSourceFile, postValidate?: boolean): Promise<KMXPlus.KMXPlusFile>;
+    // @internal
+    getUsetParser(): Promise<UnicodeSetParser>;
+    init(callbacks: CompilerCallbacks, options: LdmlCompilerOptions): Promise<boolean>;
+    // Warning: (ae-forgotten-export) The symbol "LDMLKeyboardXMLSourceFile" needs to be exported by the entry point main.d.ts
+    //
+    // @internal
+    load(filename: string): LDMLKeyboardXMLSourceFile | null;
+    // @internal
+    loadTestData(filename: string): LDMLKeyboardTestDataXMLSourceFile | null;
+    // Warning: (ae-forgotten-export) The symbol "LdmlKeyboardCompilerResult" needs to be exported by the entry point main.d.ts
+    run(inputFilename: string, outputFilename?: string): Promise<LdmlKeyboardCompilerResult>;
+    // @internal
+    validate(source: LDMLKeyboardXMLSourceFile): Promise<boolean>;
+    // Warning: (ae-forgotten-export) The symbol "LdmlKeyboardCompilerArtifacts" needs to be exported by the entry point main.d.ts
+    write(artifacts: LdmlKeyboardCompilerArtifacts): Promise<boolean>;
 }
 
 // (No @packageDocumentation comment for this package)

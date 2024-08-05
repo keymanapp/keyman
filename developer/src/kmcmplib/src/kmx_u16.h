@@ -4,6 +4,7 @@
 #include <vector>
 #include <ctype.h>
 #include <string>
+#include <cstring>
 #include "kmcompx.h"
 
 std::string string_from_wstring(std::wstring const str);
