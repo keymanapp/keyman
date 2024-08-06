@@ -14,38 +14,16 @@
 #include "mcompile.h"
 #include "u16.h"
 
-/**
- * @brief  convert mnemonic keyboard layout to positional keyboard layout and translate keyboard
- * @param  kbd                pointer to US keyboard
- * @param  bDeadkeyConversion option for converting a deadkey to a character: 1 = dk conversion; 0 = no dk conversion
- * @param  argc               number of command line arguments
- * @return TRUE if conversion was successful;
- *         FALSE if not
- */
+/** @brief  convert mnemonic keyboard layout to positional keyboard layout and translate keyboard */
 KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, int argc);
 
 /** @brief  Collect the key data, translate it to kmx and append to the existing keyboard */
 bool mac_KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D &all_vector, const UCKeyboardLayout** keyboard_layout, std::vector<KMX_DeadkeyMapping>* KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion);  // I4353   // I4327
 
-/**
- * @brief  start of mcompile; load, convert and save keyboard
- * @param  argc number of commandline arguments
- * @param  argv pointer to commandline arguments: executable, inputfile, outputfile
- * @return 0 on success;
- *         1 for wrong usage of calling parameters;
- *         3 if unable to load keyboard
- */
+/** @brief start of mcompile; load, convert and save keyboard */
 int mac_run(int argc, char* argv[]);
 
-/**
- * @brief  return an array of [usvk, ch_out] pairs: all existing combinations of a deadkey + character for the underlying keyboard
- * @param      keyboard_layout pointer to  the currently used (underlying) keyboard Layout
- * @param      all_vector      vector that holds the data of the US keyboard and the currently used (underlying) keyboard
- * @param      deadkey         deadkey character
- * @param      shift_dk        shiftstate opf a deadkey character
- * @param[out] outputPairs     pointer to array of [usvk, ch_out] pairs
- * @return size of array of [usvk, ch_out] pairs
- */
+/** @brief  return an array of [usvk, ch_out] pairs: all existing combinations of a deadkey + character for the underlying keyboard */
 int mac_KMX_GetDeadkeys(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& all_vector, KMX_WCHAR deadkey, UINT shift_dk, KMX_WORD* outputPairs);  // returns array of [usvk, ch_out] pairs
 
 std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;  // I4353
@@ -77,7 +55,14 @@ std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;  // I4353
   mac_run(argc, argv);
 }
  
-/** @brief start of mcompile; load, convert and save keyboard */
+/**
+ * @brief  start of mcompile; load, convert and save keyboard
+ * @param  argc number of commandline arguments
+ * @param  argv pointer to commandline arguments: executable, inputfile, outputfile
+ * @return 0 on success;
+ *         1 for wrong usage of calling parameters;
+ *         3 if unable to load keyboard
+ */
 int mac_run(int argc, char* argv[]) {
   int bDeadkeyConversion = 0;
 
@@ -502,7 +487,14 @@ KMX_BOOL mac_KMX_SetKeyboardToPositional(LPKMX_KEYBOARD kbd) {
   return FALSE;
 }
 
-/** @brief  convert mnemonic keyboard layout to positional keyboard layout and translate keyboard */
+/**
+ * @brief  convert mnemonic keyboard layout to positional keyboard layout and translate keyboard
+ * @param  kbd                pointer to US keyboard
+ * @param  bDeadkeyConversion option for converting a deadkey to a character: 1 = dk conversion; 0 = no dk conversion
+ * @param  argc               number of command line arguments
+ * @return TRUE if conversion was successful;
+ *         FALSE if not
+ */
 KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, int argc) {
   KMX_WCHAR DeadKey = 0;
   if (!mac_KMX_SetKeyboardToPositional(kbd))
@@ -622,7 +614,10 @@ int mac_KMX_GetDeadkeys(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& a
   return (p - outputPairs);
 }
 
-/** @brief  print (error) messages */
+/**
+ * @brief  print (error) messages
+ * @param  fmt text to print
+ */
   void mac_KMX_LogError(const wchar_t* fmt, ...) {
   WCHAR fmtbuf[256];
   const wchar_t* end = L"\0";

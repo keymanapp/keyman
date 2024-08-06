@@ -12,7 +12,6 @@
 #define CERR_UnableToWriteFully                            0x00008007
 #define CERR_SomewhereIGotItWrong                          0x00008009
 
-
 const int CODE__SIZE[] = {
    -1,   // undefined                0x00
     1,   // CODE_ANY                 0x01
@@ -41,23 +40,10 @@ const int CODE__SIZE[] = {
     2    // CODE_SETSYSTEMSTORE      0x18
 };
 
-/**
- * @brief  check if the file has correct version
- * @param  filebase  containing data of the input file
- * @param  file_size a size
- * @return true if successful;
- *         false if not
- */
+/** @brief check if the file has correct version */
 KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD file_size);
 
-/**
- * @brief  Fixup the keyboard by expanding pointers. On disk the pointers are stored relative to the
- *         beginning of the file, but we need real pointers. This method is used on 32-bit architectures.
- * @param  bufp       pointer to buffer where data will be copied into
- * @param  base       pointer to starting point
- * @param  dwFileSize size of the file
- * @return pointer to the keyboard
- */
+/** @brief Fixup the keyboard by expanding pointers. */
 LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize);
 
 /**
@@ -227,7 +213,12 @@ KMX_DWORD KMX_WriteCompiledKeyboardToFile(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX
 	return CERR_None;
 }
 
-/** @brief save keyboard to file */
+/**
+ * @brief  save keyboard to file
+ * @param  kbd 			pointer to the keyboard
+ * @param  fileName pointer to fileName of a kmx-file
+ * @return TRUE on success; else FALSE
+ */
 KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, KMX_CHAR* fileName) {
   FILE* fp;
   fp = Open_File(fileName, "wb");
@@ -339,7 +330,15 @@ LPKMX_KEYBOARD KMX_CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base) {
 
 // else KMX_FixupKeyboard
 #else  
-/** @brief Fixup the keyboard by expanding pointers. */
+
+/**
+ * @brief  Fixup the keyboard by expanding pointers. On disk the pointers are stored relative to the
+ *         beginning of the file, but we need real pointers. This method is used on 32-bit architectures.
+ * @param  bufp       pointer to buffer where data will be copied into
+ * @param  base       pointer to starting point
+ * @param  dwFileSize size of the file
+ * @return pointer to the keyboard
+ */
 LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize) {
   UNREFERENCED_PARAMETER(dwFileSize);
 
@@ -378,7 +377,12 @@ LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFil
 
 #endif
 
-/** @brief load a keyboard kmx-file */
+/**
+ * @brief  load a keyboard kmx-file
+ * @param         fileName   pointer to fileName of kmx-file
+ * @param[in,out] lpKeyboard pointer to pointer to keyboard
+ * @return TRUE on success; else FALSE
+ */
 KMX_BOOL KMX_LoadKeyboard(KMX_CHAR* fileName, LPKMX_KEYBOARD* lpKeyboard) {
   *lpKeyboard = NULL;
   PKMX_BYTE buf;
@@ -484,7 +488,13 @@ KMX_BOOL KMX_LoadKeyboard(KMX_CHAR* fileName, LPKMX_KEYBOARD* lpKeyboard) {
   return TRUE;
 }
 
-/** @brief check if the file has correct version */
+/**
+ * @brief  check if the file has correct version
+ * @param  filebase  containing data of the input file
+ * @param  file_size a size
+ * @return true if successful;
+ *         false if not
+ */
 KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD file_size) {
  KMX_DWORD i;
   PKMX_COMP_KEYBOARD ckbp = (PKMX_COMP_KEYBOARD)filebase;
@@ -510,7 +520,11 @@ KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD file_size) {
   return TRUE;
 }
 
-/** @brief increment in a string */
+/**
+ * @brief  increment in a string
+ * @param  p pointer to a character
+ * @return pointer to the incremented character
+ */
 PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p) {
   if (p == NULL || *p == 0)
     return p;
@@ -545,7 +559,12 @@ PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p) {
   return p;
 }
 
-/** @brief open a file */
+/**
+ * @brief  open a file
+ * @param  Filename name of the file
+ * @param  mode same as mode in fopen
+ * @return pointer to file. On error, returns a null pointer
+ */
 FILE* Open_File(const KMX_CHAR* Filename, const KMX_CHAR* mode) {
 #ifdef _MSC_VER
   std::string cpath = Filename;  //, cmode = mode;

@@ -22,23 +22,37 @@ const int KMX_ShiftStateMap[] = {
   0,
   0};
 
-/** @brief Constructor */
+ /**
+  * @brief  Constructor
+  * @param  deadCharacter a deadkey
+  */
 DeadKey::DeadKey(KMX_WCHAR deadCharacter) {
   this->m_deadchar = deadCharacter;
 }
 
-/** @brief  return dead character */
+  /**
+   * @brief  return dead character
+   * @return deadkey character
+   */
 KMX_WCHAR DeadKey::KMX_DeadCharacter() {
   return this->m_deadchar;
 }
 
-/** @brief set Deadkey with values */
+  /**
+  * @brief  set member variable with base and combined character
+  * @param  baseCharacter     the base character
+  * @param  combinedCharacter the combined character
+  */
 void DeadKey::KMX_AddDeadKeyRow(KMX_WCHAR baseCharacter, KMX_WCHAR combinedCharacter) {
   this->m_rgbasechar.push_back(baseCharacter);
   this->m_rgcombchar.push_back(combinedCharacter);
 }
 
-/** @brief check if character exists in DeadKey */
+/**
+ * @brief  check if character exists in DeadKey
+ * @param  baseCharacter a character to be found
+ * @return true if found; false if not found
+ */
 bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
   std::vector<KMX_WCHAR>::iterator it;
   for (it = this->m_rgbasechar.begin(); it < m_rgbasechar.end(); it++) {
@@ -49,7 +63,22 @@ bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
   return false;
 }
 
-/** @brief Find a keyvalue for given keycode, shiftstate and caps. A function similar to Window`s ToUnicodeEx() function. */
+/**
+ * @brief  Find a keyvalue for given keycode, shiftstate and caps. A function similar to Window`s ToUnicodeEx() function.
+ *
+ *         Contrary to what the function name might suggest, the function the mac_KMX_ToUnicodeEx does NOT process surrogate pairs.
+ *         This is because it is used in mcompile only which only deals with latin scripts.
+ *         In case this function is used for surrogate pairs, they will be ignored and a message will be printed out
+ *
+ * @param  keycode         a key of the currently used keyboard Layout
+ * @param  pwszBuff        Buffer to store resulting character
+ * @param  ss_rgkey        a Windows-style shiftstate of the currently used keyboard Layout
+ * @param  caps            state of the caps key of the currently used keyboard Layout
+ * @param  keyboard_layout the currently used (underlying)keyboard Layout
+ * @return -1 if a deadkey was found;
+ *          0 if no translation is available;
+ *         +1 if character was found and written to pwszBuff
+ */
 int mac_KMX_ToUnicodeEx(int keycode, PKMX_WCHAR pwszBuff, ShiftState ss, int caps, const UCKeyboardLayout* keyboard_layout) {
   KMX_DWORD keyval;
   UInt32 isdk = 0;
@@ -94,7 +123,9 @@ KMX_WCHAR mac_KMX_DeadKeyMap(int index, std::vector<DeadKey*>*deadkeys, int dead
   return 0xFFFF;
 }
 
-/** @brief Base class for dealing with rgkey*/
+/**
+ * @brief Base class for dealing with rgkey
+*/
 class mac_KMX_VirtualKey {
 private:
   UINT m_vk;
@@ -316,7 +347,9 @@ public:
   }
 };
 
-/** @brief Base class for KMX_loader*/
+/**
+ *  @brief Base class for KMX_loader
+*/
 class mac_KMX_Loader {
 private:
   KMX_BYTE lpKeyStateNull[256];

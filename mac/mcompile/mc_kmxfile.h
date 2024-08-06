@@ -65,35 +65,16 @@ typedef struct KMX_tagKEYBOARD {
 	//HBITMAP	hBitmap;				// handle to the bitmap in the file;
 } KMX_KEYBOARD, *LPKMX_KEYBOARD;
 
-/**
- * @brief  load a keyboard kmx-file
- * @param         fileName   pointer to fileName of kmx-file
- * @param[in,out] lpKeyboard pointer to pointer to keyboard
- * @return TRUE on success; else FALSE
- */
+/** @brief load a keyboard kmx-file */
 KMX_BOOL KMX_LoadKeyboard(KMX_CHAR* fileName, LPKMX_KEYBOARD* lpKeyboard);
 
-/**
- * @brief  save keyboard to file
- * @param  kbd 			pointer to the keyboard
- * @param  fileName pointer to fileName of a kmx-file
- * @return TRUE on success; else FALSE
- */
+/** @brief save keyboard to file */
 KMX_BOOL KMX_SaveKeyboard(LPKMX_KEYBOARD kbd, KMX_CHAR* fileName);
 
-/**
- * @brief  increment in a string
- * @param  p pointer to a character
- * @return pointer to the incremented character
- */
+/** @brief increment in a string */
 PKMX_WCHAR KMX_incxstr(PKMX_WCHAR p);
 
-/**
- * @brief  open a file
- * @param  Filename name of the file
- * @param  mode same as mode in fopen
- * @return pointer to file. On error, returns a null pointer
- */
+/** @brief open a file */
 FILE* Open_File(const KMX_CHAR* Filename, const KMX_CHAR* mode);
 
 #endif  // _KMXFILE_H
