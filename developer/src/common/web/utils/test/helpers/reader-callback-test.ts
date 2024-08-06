@@ -8,8 +8,13 @@ import { LDMLKeyboardTestDataXMLSourceFile } from '../../src/types/ldml-keyboard
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { fileURLToPath } from 'url';
 
+
+function defaultImportsURL(): [string,string] {
+  return ['../../src/import/', import.meta.url];
+}
+
 const readerOptions: LDMLKeyboardXMLSourceFileReaderOptions = {
-  importsPath: fileURLToPath(new URL(...LDMLKeyboardXMLSourceFileReader.defaultImportsURL))
+  importsPath: fileURLToPath(new URL(...defaultImportsURL()))
 };
 
 export interface CompilationCase {

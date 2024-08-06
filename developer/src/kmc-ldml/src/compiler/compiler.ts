@@ -107,6 +107,13 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
   async init(callbacks: CompilerCallbacks, options: LdmlCompilerOptions): Promise<boolean> {
     this.options = { ...options };
     this.callbacks = callbacks;
+
+    // catch this early, as it must be provided.
+    if (!this.options.readerOptions?.importsPath) {
+      callbacks.reportMessage(LdmlCompilerMessages.Fatal_MissingImportsPath());
+      return false;
+    }
+
     return true;
   }
 

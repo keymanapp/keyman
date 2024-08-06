@@ -4,6 +4,8 @@ import hextobin from '@keymanapp/hextobin';
 import { KMXBuilder } from '@keymanapp/developer-utils';
 import {checkMessages, compileKeyboard, compilerTestCallbacks, compilerTestOptions, makePathToFixture} from './helpers/index.js';
 import { LdmlKeyboardCompiler } from '../src/compiler/compiler.js';
+import { LdmlCompilerMessages } from '../src/compiler/ldml-compiler-messages.js';
+import { LdmlCompilerOptions } from './main.js';
 
 /** Overall compiler tests */
 describe('compiler-tests', function() {
@@ -71,5 +73,22 @@ describe('compiler-tests', function() {
     await k.init(compilerTestCallbacks, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false });
     const source = k.load(filename);
     assert.notOk(source, `Trying to loadTestData(${filename})`);
+  });
+
+  it('should complain if importPath not set', async function() {
+    {
+      compilerTestCallbacks.clear();
+      const k = new LdmlKeyboardCompiler();
+      assert.isFalse(await k.init(compilerTestCallbacks,
+        { /* no compilerTestOptions */ readerOptions: { importsPath: null }, saveDebug: true, shouldAddCompilerVersion: false }));
+      assert.isTrue(compilerTestCallbacks.hasMessage(LdmlCompilerMessages.FATAL_MissingImportsPath));
+    }
+    {
+      compilerTestCallbacks.clear();
+      const k = new LdmlKeyboardCompiler();
+      assert.isFalse(await k.init(compilerTestCallbacks, <LdmlCompilerOptions>
+        { /* no compilerTestOptions or readerOptions */ saveDebug: true, shouldAddCompilerVersion: false }));
+      assert.isTrue(compilerTestCallbacks.hasMessage(LdmlCompilerMessages.FATAL_MissingImportsPath));
+    }
   });
 });

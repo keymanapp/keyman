@@ -4,7 +4,7 @@ import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m
 const SevHint = CompilerErrorSeverity.Hint | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevWarn = CompilerErrorSeverity.Warn | CompilerErrorNamespace.LdmlKeyboardCompiler;
 const SevError = CompilerErrorSeverity.Error | CompilerErrorNamespace.LdmlKeyboardCompiler;
-// const SevFatal = CompilerErrorSeverity.Fatal | CompilerErrorNamespace.LdmlKeyboardCompiler;
+const SevFatal = CompilerErrorSeverity.Fatal | CompilerErrorNamespace.LdmlKeyboardCompiler;
 
 // sub-numberspace for transform errors
 const SevErrorTransform = SevError | 0xF00;
@@ -13,6 +13,7 @@ const SevErrorTransform = SevError | 0xF00;
  * @internal
  */
 export class LdmlCompilerMessages {
+  // Note: These are indented so that the error symbols line up after the underscore (_)
   static HINT_NormalizationDisabled = SevHint | 0x0001;
   static Hint_NormalizationDisabled = () => m(this.HINT_NormalizationDisabled, `normalization=disabled is not recommended.`);
 
@@ -27,7 +28,7 @@ export class LdmlCompilerMessages {
 
   static ERROR_KeyNotFoundInKeyBag = SevError | 0x0005;
   static Error_KeyNotFoundInKeyBag = (o:{keyId: string, col: number, row: number, layer: string, form: string}) =>
-    m(this.ERROR_KeyNotFoundInKeyBag, `Key '${def(o.keyId)}' in position #${def(o.col)} on row #${def(o.row)} of layer ${def(o.layer)}, form '${def(o.form)}' not found in key bag`);
+  m(this.ERROR_KeyNotFoundInKeyBag, `Key '${def(o.keyId)}' in position #${def(o.col)} on row #${def(o.row)} of layer ${def(o.layer)}, form '${def(o.form)}' not found in key bag`);
 
   static HINT_OneOrMoreRepeatedLocales = SevHint | 0x0006;
   static Hint_OneOrMoreRepeatedLocales = () =>
@@ -84,7 +85,7 @@ export class LdmlCompilerMessages {
 
   static ERROR_DisplayIsRepeated = SevError | 0x0010;
   static Error_DisplayIsRepeated = (o:{output?: string, keyId?: string}) =>
-    m(this.ERROR_DisplayIsRepeated, `display ${LdmlCompilerMessages.outputOrKeyId(o)} has more than one display entry.`);
+  m(this.ERROR_DisplayIsRepeated, `display ${LdmlCompilerMessages.outputOrKeyId(o)} has more than one display entry.`);
 
   static ERROR_KeyMissingToGapOrSwitch = SevError | 0x0011;
   static Error_KeyMissingToGapOrSwitch = (o:{keyId: string}) =>
@@ -187,7 +188,9 @@ export class LdmlCompilerMessages {
   static Error_UnparseableReorderSet = (o: { from: string, set: string }) =>
   m(this.ERROR_UnparseableReorderSet, `Illegal UnicodeSet "${def(o.set)}" in reorder "${def(o.from)}`);
 
-  // Available: 0x029
+  static FATAL_MissingImportsPath = SevFatal | 0x0029;
+  static Fatal_MissingImportsPath = () =>
+  m(this.FATAL_MissingImportsPath, `Internal Error: readerOptions.importsPath was not set.`);
 
   static ERROR_InvalidQuadEscape = SevError | 0x0030;
   static Error_InvalidQuadEscape = (o: { cp: number }) =>

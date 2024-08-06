@@ -36,9 +36,13 @@ export function makePathToFixture(...components: string[]): string {
 
 export const compilerTestCallbacks = new TestCompilerCallbacks();
 
+function defaultImportsURL(): [string,string] {
+  return ['../../../../common/web/utils/build/src/import/', import.meta.url];
+}
+
 export const compilerTestOptions: LdmlCompilerOptions = {
   readerOptions: {
-    importsPath: fileURLToPath(new URL(...LDMLKeyboardXMLSourceFileReader.defaultImportsURL))
+    importsPath: fileURLToPath(new URL(...defaultImportsURL()))
   }
 };
 

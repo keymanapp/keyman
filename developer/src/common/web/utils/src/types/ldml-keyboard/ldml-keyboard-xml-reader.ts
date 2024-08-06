@@ -22,10 +22,6 @@ export class LDMLKeyboardXMLSourceFileReader {
   constructor(private options: LDMLKeyboardXMLSourceFileReaderOptions, private callbacks : CompilerCallbacks) {
   }
 
-  static get defaultImportsURL(): [string,string] {
-    return ['../../import/', import.meta.url];
-  }
-
   readImportFile(version: string, subpath: string): Uint8Array {
     const importPath = this.callbacks.resolveFilename(this.options.importsPath, `${version}/${subpath}`);
     return this.callbacks.loadFile(importPath);
