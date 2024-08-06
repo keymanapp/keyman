@@ -1,6 +1,6 @@
 import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboard, KMXPlus, CompilerCallbacks, LDMLKeyboardTestDataXMLSourceFile, UnicodeSetParser, KeymanCompiler, KeymanCompilerResult, KeymanCompilerArtifacts, defaultCompilerOptions, KMXBuilder, KvkFileWriter, KeymanCompilerArtifactOptional } from '@keymanapp/common-types';
 import { LdmlCompilerOptions } from './ldml-compiler-options.js';
-import { CompilerMessages } from './messages.js';
+import { LdmlCompilerMessages } from './ldml-compiler-messages.js';
 import { BkspCompiler, TranCompiler } from './tran.js';
 import { DispCompiler } from './disp.js';
 import { KeysCompiler } from './keys.js';
@@ -229,13 +229,13 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
     // load the file from disk into a string
     const data = this.callbacks.loadFile(filename);
     if(!data) {
-      this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: 'Unable to read XML file'}));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({errorText: 'Unable to read XML file'}));
       return null;
     }
     // parse (load) the string into an object tree
     const source = reader.load(data);
     if(!source) {
-      this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: 'Unable to load XML file'}));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({errorText: 'Unable to load XML file'}));
       return null;
     }
     try {
@@ -244,7 +244,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
         return null;
       }
     } catch(e) {
-      this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: e.toString()}));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({errorText: e.toString()}));
       return null;
     }
 
@@ -262,13 +262,13 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
     const reader = new LDMLKeyboardXMLSourceFileReader(this.options.readerOptions, this.callbacks);
     const data = this.callbacks.loadFile(filename);
     if(!data) {
-      this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: 'Unable to read XML file'}));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({errorText: 'Unable to read XML file'}));
       return null;
     }
     const source = reader.loadTestData(data);
     /* c8 ignore next 4 */
     if(!source) {
-      this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: 'Unable to load XML file'}));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({errorText: 'Unable to load XML file'}));
       return null;
     }
     // TODO-LDML: The unboxed data doesn't match the schema anymore. Skipping validation, for now.
@@ -278,7 +278,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
     //     return null;
     //   }
     // } catch(e) {
-    //   this.callbacks.reportMessage(CompilerMessages.Error_InvalidFile({errorText: e.toString()}));
+    //   this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({errorText: e.toString()}));
     //   return null;
     // }
 

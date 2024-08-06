@@ -107,10 +107,10 @@ export class ModelCompositor {
     // Only use of `truePrefix`.
     const basePrefix = (allowBksp || allowWhitespace) ? truePrefix : this.wordbreak(context);
 
-    let currentCasing: CasingForm = null;
-    if(lexicalModel.languageUsesCasing) {
-      currentCasing = detectCurrentCasing(this.lexicalModel, postContext);
-    }
+    // Used to restore whitespaces if operations would remove them.
+    const currentCasing: CasingForm = lexicalModel.languageUsesCasing
+      ? detectCurrentCasing(lexicalModel, postContext)
+      : null;
 
     // Section 1:  determine 'prediction roots' - enumerate corrections from most to least likely,
     // searching for results that yield viable predictions from the model.
@@ -137,7 +137,7 @@ export class ModelCompositor {
 
     // We want to dedupe before trimming the list so that we can present a full set
     // of viable distinct suggestions if available.
-    let deduplicatedSuggestionTuples = dedupeSuggestions(this.lexicalModel, rawPredictions, context);
+    const deduplicatedSuggestionTuples = dedupeSuggestions(this.lexicalModel, rawPredictions, context);
 
     // Needs "casing" to be applied first.
     //
@@ -147,7 +147,7 @@ export class ModelCompositor {
 
     // Section 3:  Sort the suggestions in display priority order to determine
     // which are most optimal, then auto-select based on the results.
-    deduplicatedSuggestionTuples = deduplicatedSuggestionTuples.sort(tupleDisplayOrderSort);
+    deduplicatedSuggestionTuples.sort(tupleDisplayOrderSort);
     predictionAutoSelect(deduplicatedSuggestionTuples);
 
     // Section 4: Trim down the suggestion list to the N (MAX_SUGGESTIONS) most optimal,
@@ -276,6 +276,9 @@ export class ModelCompositor {
         // A reversion's transform ID is the additive inverse of its original suggestion;
         // we revert to the state of said original suggestion.
         suggestion.transformId = -reversion.transformId;
+        // Prevent auto-selection of any suggestion immediately after a reversion.
+        // It's fine after at least one keystroke, but not before.
+        suggestion.autoAccept = false;
       });
 
       return suggestions;
@@ -318,6 +321,7 @@ export class ModelCompositor {
       // A reversion's transform ID is the additive inverse of its original suggestion;
       // we revert to the state of said original suggestion.
       suggestion.transformId = -reversion.transformId;
+      suggestion.autoAccept = false;
     });
     return suggestions;
   }

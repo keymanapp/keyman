@@ -1,0 +1,12 @@
+﻿store(&NAME) 'version_notany'
+store(&TARGETS) 'web'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+store(abc) 'abc'
+
+c Use of notany with corresponding context() should make compiler select version 14
+
+notany(abc) + 'a' > context(1)

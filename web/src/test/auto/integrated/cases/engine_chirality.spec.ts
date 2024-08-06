@@ -7,7 +7,6 @@ import {
 } from "../test_utils.js";
 
 const baseTimeout = 5000;
-const eventTimeout = 500;
 
 const host = document.createElement('div');
 document.body.appendChild(host);

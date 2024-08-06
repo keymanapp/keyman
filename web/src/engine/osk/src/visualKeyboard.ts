@@ -628,7 +628,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           try {
             shouldLockLayer && this.lockLayer(true);
             // Once the best coord to use for fat-finger calculations has been determined:
-            keyResult = this.modelKeyClick(gestureStage.item, coord);
+            keyResult = this.modelKeyClick(gestureStage.item, coord, correctionKeyDistribution);
           } finally {
             shouldLockLayer && this.lockLayer(false);
           }
@@ -1316,6 +1316,12 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return allottedHeight;
     }
 
+    /*
+      Note:  these may not be fully preprocessed yet!
+
+      However, any "empty row bug" preprocessing has been applied, and that's
+      what we care about here.
+    */
     const layers = this.layerGroup.spec.layer;
     let oskHeight = 0;
 

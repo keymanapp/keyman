@@ -206,7 +206,15 @@ installed emsdk (most likely %LocalAppData%\emsdk\upstream\emscripten)
 **Environment variables**:
 * `EMSCRIPTEN_BASE`: `<your-emsdk-path>\upstream\emscripten`
 
-After installing emscripten, you'll need to install node.js and openjdk:
+After installing emscripten, you'll need to install node.js and openjdk.
+
+#### node.js
+
+Our recommended way to install node.js is to use
+[nvm-windows](https://github.com/coreybutler/nvm-windows). This makes it
+easy to switch between versions of node.js.
+
+Alternatively, use Powershell + Chocolatey to install node.js:
 
 ```ps1
 # Elevated PowerShell
@@ -214,8 +222,22 @@ After installing emscripten, you'll need to install node.js and openjdk:
 # for *much* faster download, hide progress bar (PowerShell/PowerShell#2138)
 $ProgressPreference = 'SilentlyContinue'
 choco install nodejs
+```
+
+See [node.md](node.md) for more information.
+
+#### openjdk
+
+Use Powershell + Chocolatey to install OpenJDK:
+
+```ps1
+# Elevated PowerShell
+
+# for *much* faster download, hide progress bar (PowerShell/PowerShell#2138)
+$ProgressPreference = 'SilentlyContinue'
 choco install openjdk
 ```
+
 
 ### Windows Platform Dependencies
 

@@ -85,7 +85,7 @@ public:
     // Check inputs
     //
     if (nInputs > MAX_KEYEVENT_INPUTS) {
-      SendDebugMessageFormat(0, sdmGlobal, 0, "Too many INPUT events for queue (%d)", nInputs);
+      SendDebugMessageFormat("Too many INPUT events for queue (%d)", nInputs);
       nInputs = MAX_KEYEVENT_INPUTS;
     }
 
@@ -96,17 +96,17 @@ public:
 
     //
     // Capture the mutex and copy input buffer into global shared buffer. We have a fairly
-    // short buffer here to avoid stalling the active application for too long if for some 
+    // short buffer here to avoid stalling the active application for too long if for some
     // reason Keyman's g_SerialKeyEventServer thread is not responding.
     //
     switch (WaitForSingleObject(m_hKeyMutex, 500)) {
     case WAIT_OBJECT_0:
       break;
     case WAIT_TIMEOUT:
-      SendDebugMessage(0, sdmGlobal, 0, "Timed out waiting to send input to host app");
+      SendDebugMessage("Timed out waiting to send input to host app");
       return FALSE;
     case WAIT_ABANDONED_0:
-      SendDebugMessage(0, sdmGlobal, 0, "Host app closed mutex");
+      SendDebugMessage("Host app closed mutex");
       return FALSE;
     case WAIT_FAILED:
     default:
