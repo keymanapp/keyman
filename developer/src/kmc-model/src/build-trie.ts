@@ -304,13 +304,12 @@ namespace Trie {
    * Populates the trie with the contents of an entire wordlist.
    * @param words a list of word and count pairs.
    */
-  function buildFromWordList(trie: Trie, words: WordList): Trie {
+  function buildFromWordList(trie: Trie, words: WordList): void {
     for (let [wordform, weight] of Object.entries(words)) {
-      let key = trie.toKey(wordform);
+      const key = trie.toKey(wordform);
       addUnsorted(trie.root, { key, weight, content: wordform }, 0);
     }
     sortTrie(trie.root);
-    return trie;
   }
 
   /**
