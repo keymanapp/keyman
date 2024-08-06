@@ -745,25 +745,23 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (void)awakeFromNib {
-  [self preparePersistence];
+  [self prepareStorage];
 }
 
 /**
  * Prepare the app environment for all the things that need to be persisted:
- * namely, the  keyboard data on disk and the settings in UserDefaults 
+ * namely, the keyboard data on disk and the settings in UserDefaults
  */
-- (void)preparePersistence {
+- (void)prepareStorage {
   [KMDataRepository.shared createDataDirectoryIfNecessary];
   
   if ([KMSettingsRepository.shared dataMigrationNeeded]) {
     BOOL movedData = [KMDataRepository.shared migrateData];
-    //os_log_info([KMLogs startupLog], "test: call migrateData again");
-    //[KMDataRepository.shared migrateData];
     [KMSettingsRepository.shared convertSettingsForMigration];
   }
   
   [KMDataRepository.shared createKeyboardsDirectoryIfNecessary];
-  [KMSettingsRepository.shared createStorageFlagIfNecessary];
+  [KMSettingsRepository.shared setDataModelVersionIfNecessary];
 }
 
 - (void)setDefaultKeymanMenuItems {

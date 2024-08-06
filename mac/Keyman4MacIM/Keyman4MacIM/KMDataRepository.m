@@ -55,9 +55,9 @@ NSString *const kKeymanSubdirectoryName = @"keyman.inputmethod.Keyman";
     NSURL *documentsUrl = [fileManager URLForDirectory:NSDocumentDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:&directoryError];
     
     if (directoryError) {
-      os_log_error([KMLogs startupLog], "error getting Documents subdirectory: '%{public}@'", directoryError.localizedDescription);
+      os_log_error([KMLogs dataLog], "error getting Documents subdirectory: '%{public}@'", directoryError.localizedDescription);
     } else {
-      os_log_info([KMLogs startupLog], "Documents subdirectory: '%{public}@'", documentsUrl);
+      os_log_info([KMLogs dataLog], "Documents subdirectory: '%{public}@'", documentsUrl);
       _documentsSubDirectory = documentsUrl;
     }
   }
@@ -72,9 +72,9 @@ NSString *const kKeymanSubdirectoryName = @"keyman.inputmethod.Keyman";
     NSURL *applicationSupportUrl = [fileManager URLForDirectory:NSApplicationSupportDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:&directoryError];
 
     if (directoryError) {
-      os_log_error([KMLogs startupLog], "error getting Application Support subdirectory: '%{public}@'", directoryError.localizedDescription);
+      os_log_error([KMLogs dataLog], "error getting Application Support subdirectory: '%{public}@'", directoryError.localizedDescription);
     } else {
-      os_log_info([KMLogs startupLog], "Application Support subdirectory: '%{public}@'", applicationSupportUrl.path);
+      os_log_info([KMLogs dataLog], "Application Support subdirectory: '%{public}@'", applicationSupportUrl.path);
       _applicationSupportSubDirectory = applicationSupportUrl;
     }
   }
@@ -107,15 +107,15 @@ NSString *const kKeymanSubdirectoryName = @"keyman.inputmethod.Keyman";
 
   if (!exists) {
     NSError *createError = nil;
-    os_log_info([KMLogs startupLog], "createDataDirectoryIfNecessary, about to attempt createDirectoryAtPath for: '%{public}@'", self.keymanDataDirectory.path);
+    os_log_info([KMLogs dataLog], "createDataDirectoryIfNecessary, about to attempt createDirectoryAtPath for: '%{public}@'", self.keymanDataDirectory.path);
     [fileManager createDirectoryAtPath:self.keymanDataDirectory.path withIntermediateDirectories:YES attributes:nil error:nil];
     if (createError) {
-      os_log_error([KMLogs startupLog], "error creating Keyman data directory: '%{public}@'", createError.localizedDescription);
+      os_log_error([KMLogs dataLog], "error creating Keyman data directory: '%{public}@'", createError.localizedDescription);
     } else {
-      os_log_info([KMLogs startupLog], "created Keyman data directory: '%{public}@'", self.keymanDataDirectory.path);
+      os_log_info([KMLogs dataLog], "created Keyman data directory: '%{public}@'", self.keymanDataDirectory.path);
     }
   } else {
-    os_log_info([KMLogs startupLog], "Keyman data directory already exists: '%{public}@'", self.keymanDataDirectory.path);
+    os_log_info([KMLogs dataLog], "Keyman data directory already exists: '%{public}@'", self.keymanDataDirectory.path);
   }
 }
 
@@ -130,15 +130,15 @@ NSString *const kKeymanSubdirectoryName = @"keyman.inputmethod.Keyman";
 
   if (!exists) {
     NSError *createError = nil;
-    os_log_info([KMLogs startupLog], "createKeyboardsDirectoryIfNecessary, about to attempt createDirectoryAtPath for: '%{public}@'", self.keymanKeyboardsDirectory.path);
+    os_log_info([KMLogs dataLog], "createKeyboardsDirectoryIfNecessary, about to attempt createDirectoryAtPath for: '%{public}@'", self.keymanKeyboardsDirectory.path);
     [fileManager createDirectoryAtPath:self.keymanKeyboardsDirectory.path withIntermediateDirectories:YES attributes:nil error:nil];
     if (createError) {
-      os_log_error([KMLogs startupLog], "error creating Keyman-Keyboards directory: '%{public}@'", createError.localizedDescription);
+      os_log_error([KMLogs dataLog], "error creating Keyman-Keyboards directory: '%{public}@'", createError.localizedDescription);
     } else {
-      os_log_info([KMLogs startupLog], "created Keyman-Keyboards subdirectory: '%{public}@'", self.keymanKeyboardsDirectory.path);
+      os_log_info([KMLogs dataLog], "created Keyman-Keyboards subdirectory: '%{public}@'", self.keymanKeyboardsDirectory.path);
     }
   } else {
-    os_log_info([KMLogs startupLog], "Keyman-Keyboards already exists: '%{public}@'", self.keymanKeyboardsDirectory.path);
+    os_log_info([KMLogs dataLog], "Keyman-Keyboards already exists: '%{public}@'", self.keymanKeyboardsDirectory.path);
   }
 }
 
@@ -150,7 +150,7 @@ NSString *const kKeymanSubdirectoryName = @"keyman.inputmethod.Keyman";
   return _obsoleteKeymanKeyboardsDirectory;
 }
 
-- (BOOL)keyboardsExistInDocumentsFolder {
+- (BOOL)keyboardsExistInObsoleteDirectory {
   NSFileManager *fileManager = [NSFileManager defaultManager];
   BOOL isDir;
   BOOL exists = ([fileManager fileExistsAtPath:self.obsoleteKeymanKeyboardsDirectory.path isDirectory:&isDir]);
@@ -163,19 +163,19 @@ NSString *const kKeymanSubdirectoryName = @"keyman.inputmethod.Keyman";
 - (BOOL)migrateData {
   BOOL didMoveData = NO;
   NSFileManager *fileManager = [NSFileManager defaultManager];
-  BOOL dataExistsInOldLocation = [self keyboardsExistInDocumentsFolder];
-  os_log([KMLogs startupLog], "obsolete keyman keyboards directory exists: %@", dataExistsInOldLocation?@"YES":@"NO");
+  BOOL dataExistsInOldLocation = [self keyboardsExistInObsoleteDirectory];
+  os_log([KMLogs dataLog], "obsolete keyman keyboards directory exists: %@", dataExistsInOldLocation?@"YES":@"NO");
 
-  // only move data if there is something there to move
+  // only move data if there is something to move
   if (dataExistsInOldLocation) {
     NSError *moveError = nil;
     didMoveData = [fileManager moveItemAtURL:self.obsoleteKeymanKeyboardsDirectory
                          toURL:self.keymanKeyboardsDirectory
                          error:&moveError];
     if (moveError) {
-      os_log_error([KMLogs startupLog], "error migrating data: '%{public}@'", moveError.localizedDescription);
+      os_log_error([KMLogs dataLog], "data migration failed: '%{public}@'", moveError.localizedDescription);
     } else {
-      os_log_info([KMLogs startupLog], "data migrated successfully to: '%{public}@'", self.keymanKeyboardsDirectory.path);
+      os_log_info([KMLogs dataLog], "data migrated successfully to: '%{public}@'", self.keymanKeyboardsDirectory.path);
     }
   }
   

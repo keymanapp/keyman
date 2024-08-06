@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (KMSettingsRepository *)shared;
 - (BOOL)dataMigrationNeeded;
 - (void)convertSettingsForMigration;
-- (void)createStorageFlagIfNecessary;
+- (void)setDataModelVersionIfNecessary;
 @end
 
 NS_ASSUME_NONNULL_END

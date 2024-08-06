@@ -7,20 +7,26 @@
  * Created by Shawn Schantz on 2024-07-29.
  *
  * Singleton object for reading and writing Keyman application settings.
- * Serves as an abstraction to StandardUserDefaults which is currently used to persist application settings.
+ * Serves as an abstraction to StandardUserDefaults which is currently used to store application settings.
  */
 
 #import "KMSettingsRepository.h"
-//#import "KMDataRepository.h"
 #import "KMLogs.h"
 
-NSString *const kStoreDataInLibraryKey = @"KMStoreDataInLibrary";
 NSString *const kActiveKeyboardsKey = @"KMActiveKeyboardsKey";
 NSString *const kSelectedKeyboardKey = @"KMSelectedKeyboardKey";
 NSString *const kPersistedOptionsKey = @"KMPersistedOptionsKey";
 
 NSString *const kObsoletePathComponent = @"/Documents/";
 NSString *const kNewPathComponent = @"/Library/Application Support/keyman.inputmethod.Keyman/";
+
+/**
+ * Store the version number of the data model in the UserDefaults with this key.
+ * The first version, 1, is defined to indicate that we are storing the data/keyboards in the Library
+ * directory instead of in the Documents directory.
+ */
+NSString *const kDataModelVersion = @"KMDataModelVersion";
+NSInteger const kVersionStoreDataInLibraryDirectory = 1;
 
 @implementation KMSettingsRepository
 
@@ -34,18 +40,29 @@ NSString *const kNewPathComponent = @"/Library/Application Support/keyman.inputm
   return shared;
 }
 
-- (void)createStorageFlagIfNecessary {
-  [[NSUserDefaults standardUserDefaults] setBool:YES forKey:kStoreDataInLibraryKey];
+- (void)setDataModelVersionIfNecessary {
+  if (![self dataStoredInLibraryDirectory]) {
+    [[NSUserDefaults standardUserDefaults] setInteger:kVersionStoreDataInLibraryDirectory forKey:kDataModelVersion];
+  }
 }
 
+/**
+ * If the selectedKeyboard has not been set, then the settings have not been saved in the UserDefaults.
+ * If this method is called after applicationDidFinishLaunching, then it will always return true.
+ * If called from awakeFromNib, then it will return false when running for the first time.
+ */
 - (BOOL)settingsExist
 {
-  return [[NSUserDefaults standardUserDefaults] objectForKey:kActiveKeyboardsKey] != nil;
+  return [[NSUserDefaults standardUserDefaults] objectForKey:kSelectedKeyboardKey] != nil;
 }
 
+/**
+ * For the first numbered version of the data model, the app stores the keyboards under the /Library directory
+ * For versions before version 1, the keyboards were stored under the /Documents directory.
+ */
 - (BOOL)dataStoredInLibraryDirectory
 {
-  return [[NSUserDefaults standardUserDefaults] boolForKey:kStoreDataInLibraryKey];
+  return [[NSUserDefaults standardUserDefaults] integerForKey:kDataModelVersion] == kVersionStoreDataInLibraryDirectory;
 }
 
 /**
@@ -56,12 +73,45 @@ NSString *const kNewPathComponent = @"/Library/Application Support/keyman.inputm
  */
 - (BOOL)dataMigrationNeeded {
   BOOL keymanSettingsExist = [self settingsExist];
-  os_log([KMLogs startupLog], "  keyman settings exist: %{public}@", keymanSettingsExist ? @"YES" : @"NO" );
+  os_log([KMLogs dataLog], "  keyman settings exist: %{public}@", keymanSettingsExist ? @"YES" : @"NO" );
   
   BOOL dataInLibrary = [self dataStoredInLibraryDirectory];
-  os_log([KMLogs startupLog], "  data stored in Library: %{public}@", dataInLibrary ? @"YES" : @"NO" );
+  os_log([KMLogs dataLog], "  data stored in Library: %{public}@", dataInLibrary ? @"YES" : @"NO" );
   
   return !(keymanSettingsExist && dataInLibrary);
+}
+
+- (NSString *)selectedKeyboard {
+  return [[NSUserDefaults standardUserDefaults] objectForKey:kSelectedKeyboardKey];
+}
+
+- (void)saveSelectedKeyboard:(NSString *)selectedKeyboard {
+  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
+  [userData setObject:selectedKeyboard forKey:kSelectedKeyboardKey];
+}
+
+- (NSMutableArray *)activeKeyboards {
+  NSMutableArray * activeKeyboards = [[[NSUserDefaults standardUserDefaults] arrayForKey:kActiveKeyboardsKey] mutableCopy];
+  
+  if (!activeKeyboards) {
+    activeKeyboards = [[NSMutableArray alloc] initWithCapacity:0];
+  }
+  return activeKeyboards;
+}
+
+- (NSDictionary *)persistedOptions {
+  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
+  return [userData dictionaryForKey:kPersistedOptionsKey];
+}
+
+- (void)savePersistedOptions:(NSDictionary *) optionsDictionary {
+  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
+  [userData setObject:optionsDictionary forKey:kPersistedOptionsKey];
+}
+
+- (void)removePersistedOptions {
+  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
+  return [userData removeObjectForKey:kPersistedOptionsKey];
 }
 
 - (void)convertSettingsForMigration {
@@ -78,7 +128,7 @@ NSString *const kNewPathComponent = @"/Library/Application Support/keyman.inputm
     
     if ([selectedKeyboardPath isNotEqualTo:newPathString]) {
       [self saveSelectedKeyboard:newPathString];
-      os_log([KMLogs startupLog], "converted selected keyboard setting from '%{public}@' to '%{public}@'", selectedKeyboardPath, newPathString);
+      os_log([KMLogs dataLog], "converted selected keyboard setting from '%{public}@' to '%{public}@'", selectedKeyboardPath, newPathString);
     }
   }
 }
@@ -96,15 +146,6 @@ NSString *const kNewPathComponent = @"/Library/Application Support/keyman.inputm
   return newPathString;
 }
 
-- (NSString *)selectedKeyboard {
-  return [[NSUserDefaults standardUserDefaults] objectForKey:kSelectedKeyboardKey];
-}
-
-- (void)saveSelectedKeyboard:(NSString *)selectedKeyboard {
-  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-  [userData setObject:selectedKeyboard forKey:kSelectedKeyboardKey];
-}
-
 - (void)convertActiveKeyboardArrayForMigration {
   NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
   NSMutableArray *activeKeyboards = [self activeKeyboards];
@@ -115,7 +156,7 @@ NSString *const kNewPathComponent = @"/Library/Application Support/keyman.inputm
     NSString *newPath = [self convertOldKeyboardPath:oldPath];
     if ([oldPath isNotEqualTo:newPath]) {
       [convertedActiveKeyboards addObject:newPath];
-      os_log([KMLogs startupLog], "converted active keyboard from old path '%{public}@' to '%{public}@'", oldPath, newPath);
+      os_log([KMLogs dataLog], "converted active keyboard from old path '%{public}@' to '%{public}@'", oldPath, newPath);
       // if we have adjusted at least one path, set flag
       didConvert = YES;
     } else {
@@ -126,17 +167,8 @@ NSString *const kNewPathComponent = @"/Library/Application Support/keyman.inputm
   
   // only update array in UserDefaults if we actually converted something
   if (didConvert) {
-  [[NSUserDefaults standardUserDefaults] setObject:convertedActiveKeyboards forKey:kActiveKeyboardsKey];
+    [[NSUserDefaults standardUserDefaults] setObject:convertedActiveKeyboards forKey:kActiveKeyboardsKey];
   }
-}
-
-- (NSMutableArray *)activeKeyboards {
-  NSMutableArray * activeKeyboards = [[[NSUserDefaults standardUserDefaults] arrayForKey:kActiveKeyboardsKey] mutableCopy];
-  
-  if (!activeKeyboards) {
-    activeKeyboards = [[NSMutableArray alloc] initWithCapacity:0];
-  }
-  return activeKeyboards;
 }
 
 - (void)convertPersistedOptionsPathsForMigration {
@@ -159,10 +191,10 @@ NSString *const kNewPathComponent = @"/Library/Application Support/keyman.inputm
         
         // insert options into new map with newly converted path as key
         [mutableOptionsMap setObject:optionsValue forKey:newPathString];
-        os_log([KMLogs startupLog], "converted option key from '%{public}@' to '%{public}@'", key, newPathString);
+        os_log([KMLogs dataLog], "converted option key from '%{public}@' to '%{public}@'", key, newPathString);
       } else {
         // retain options that did not need converting
-        [mutableOptionsMap setObject:optionsValue forKey:key];  
+        [mutableOptionsMap setObject:optionsValue forKey:key];
       }
     }
     if (optionsChanged) {
@@ -170,21 +202,5 @@ NSString *const kNewPathComponent = @"/Library/Application Support/keyman.inputm
     }
   }
 }
-
-- (NSDictionary *)persistedOptions {
-  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-  return [userData dictionaryForKey:kPersistedOptionsKey];
-}
-
-- (void)savePersistedOptions:(NSDictionary *) optionsDictionary {
-  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-  [userData setObject:optionsDictionary forKey:kPersistedOptionsKey];
-}
-
-- (void)removePersistedOptions {
-  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-  return [userData removeObjectForKey:kPersistedOptionsKey];
-}
-
 
 @end
