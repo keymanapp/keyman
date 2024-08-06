@@ -302,6 +302,7 @@ namespace Trie {
 
   /**
    * Populates the trie with the contents of an entire wordlist.
+   * @param trie The Trie object under construction
    * @param words a list of word and count pairs.
    */
   function buildFromWordList(trie: Trie, words: WordList): void {
