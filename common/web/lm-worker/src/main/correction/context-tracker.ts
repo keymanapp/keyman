@@ -1,9 +1,10 @@
-import { Token, applyTransform } from '@keymanapp/models-templates';
+import { applyTransform, buildMergedTransform, Token } from '@keymanapp/models-templates';
 
 import { ClassicalDistanceCalculation } from './classical-calculation.js';
 import { SearchSpace } from './distance-modeler.js';
 import TransformUtils from '../transformUtils.js';
 import { determineModelTokenizer } from '../model-helpers.js';
+import { tokenizeTransform, tokenizeTransformDistribution } from './transform-tokenization.js';
 
 function textToCharTransforms(text: string, transformId?: number) {
   let perCharTransforms: Transform[] = [];
@@ -78,6 +79,18 @@ export class TrackedContextToken {
 
     this.raw = tokenText;
     this.transformDistributions = backspacedTokenContext;
+  }
+
+  update(transformDistribution: Distribution<Transform>, tokenText?: USVString) {
+    // Preserve existing text if new text isn't specified.
+    tokenText = tokenText || (tokenText === '' ? '' : this.raw);
+
+    if(transformDistribution?.length > 0) {
+      this.transformDistributions.push(transformDistribution);
+    }
+
+    // Replace old token's raw-text with new token's raw-text.
+    this.raw = tokenText;
   }
 }
 
@@ -167,20 +180,6 @@ export class TrackedContextState {
     if(state.searchSpace.length > 0) {
       token.transformDistributions.forEach(distrib => state.searchSpace[0].addInput(distrib));
     }
-  }
-
-  updateToken(token: TrackedContextToken, transformDistribution: Distribution<Transform>, tokenText?: USVString) {
-    // Preserve existing text if new text isn't specified.
-    tokenText = tokenText || (tokenText === '' ? '' : token.raw);
-
-    if(transformDistribution && transformDistribution.length > 0) {
-      token.transformDistributions.push(transformDistribution);
-      if(this.searchSpace) {
-        this.searchSpace.forEach(space => space.addInput(transformDistribution));
-      }
-    }
-    // Replace old token's raw-text with new token's raw-text.
-    token.raw = tokenText;
   }
 
   toRawTokenization() {
@@ -288,12 +287,34 @@ class CircularArray<Item> {
   }
 }
 
+interface ContextMatchResult {
+  /**
+   * Represents the current state of the context after applying incoming keystroke data.
+   */
+  state: TrackedContextState;
+
+  /**
+   * Represents the previously-cached context state that best matches `state` if available.
+   * May be `null` if no such state could be found within the context-state cache.
+   */
+  baseState: TrackedContextState;
+
+  /**
+   * Indicates the portion of the incoming keystroke data, if any, that applies to
+   * tokens before the last pre-caret token and thus should not be replaced by predictions
+   * based upon `state`.
+   *
+   * Should always be non-null if the token before the caret did not previously exist.
+   */
+  preservationTransform?: Transform;
+}
+
 export class ContextTracker extends CircularArray<TrackedContextState> {
   static attemptMatchContext(
     tokenizedContext: Token[],
     matchState: TrackedContextState,
-    transformDistribution?: Distribution<Transform>
-  ): TrackedContextState {
+    transformSequenceDistribution?: Distribution<Transform[]>
+  ): ContextMatchResult {
     // Map the previous tokenized state to an edit-distance friendly version.
     let matchContext: USVString[] = matchState.toRawTokenization();
 
@@ -319,7 +340,14 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     }
 
     const firstMatch = editPath.indexOf('match');
-    const lastMatch = editPath.lastIndexOf('match');
+    let lastMatch = editPath.lastIndexOf('match');
+
+    // Special handling: appending whitespace to whitespace with the default wordbreaker.
+    // The default wordbreaker currently adds an empty token after whitespace; this would
+    // show up with 'substitute', 'match' at the end of the edit path.
+    if(editPath.length >= 2 && editPath[editPath.length - 2] == 'substitute' && editPath[editPath.length - 1] == 'match') {
+      lastMatch = editPath.lastIndexOf('match', editPath.length - 2);
+    }
 
     // Assertion:  for a long context, the bulk of the edit path should be a
     // continuous block of 'match' entries.  If there's anything else in
@@ -335,7 +363,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     // If we have a perfect match with a pre-existing context, no mutations have
     // happened; just re-use the old context state.
     if(firstMatch == 0 && lastMatch == editPath.length - 1) {
-      return matchState;
+      return { state: matchState, baseState: matchState };
     }
 
     // If mutations HAVE happened, we have work to do.
@@ -368,24 +396,53 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
       }
     }
 
-    const hasDistribution = transformDistribution && Array.isArray(transformDistribution);
-    let primaryInput = hasDistribution ? transformDistribution[0].sample : null;
-    if(primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft == 0 && !primaryInput.deleteRight) {
-      primaryInput = null;
-    }
-
-    // TODO:  "wordbreak" the `insert` section of the transform (if it exists).
-    // ... wait, might have to be done at a higher level...
-    // ... and will probably want its own unit test ...
-
-    const isBackspace = primaryInput && TransformUtils.isBackspace(primaryInput);
+    const hasDistribution = transformSequenceDistribution && Array.isArray(transformSequenceDistribution);
 
     // Reset priorEdit for the end-of-context updating loop.
     priorEdit = undefined;
 
+    // Used to construct and represent the part of the incoming transform that
+    // does not land as part of the final token in the resulting context.  This
+    // component should be preserved by any suggestions that get applied.
+    let preservationTransform: Transform;
+
     // Now to update the end of the context window.
     for(let i = lastMatch+1; i < editPath.length; i++) {
       const isLastToken = i == editPath.length - 1;
+
+      // If we didn't get any input, we really should perfectly match
+      // a previous context state.  If such a state is out of our cache,
+      // it should simply be rebuilt.
+      if(!hasDistribution) {
+        return null;
+      }
+      const transformDistIndex = i - (lastMatch + 1);
+      const tokenDistribution = transformSequenceDistribution.map((entry) => {
+        return {
+          sample: entry.sample[transformDistIndex],
+          p: entry.p
+        };
+      });
+
+      // If the tokenized part of the input is a completely empty transform,
+      // replace it with null.  This can happen with our default wordbreaker
+      // immediately after a whitespace.  We don't want to include this
+      // transform as part of the input when doing correction-search.
+      let primaryInput = hasDistribution ? tokenDistribution[0]?.sample : null;
+      if(primaryInput && primaryInput.insert == "" && primaryInput.deleteLeft == 0 && !primaryInput.deleteRight) {
+        primaryInput = null;
+      }
+
+      // If this token's transform component is not part of the final token,
+      // it's something we'll want to preserve even when applying suggestions
+      // for the final token.
+      //
+      // Note:  will need a either a different approach or more specialized
+      // handling if/when supporting phrase-level (multi-token) suggestions.
+      if(!isLastToken) {
+        preservationTransform = preservationTransform ? buildMergedTransform(preservationTransform, primaryInput) : primaryInput;
+      }
+      const isBackspace = primaryInput && TransformUtils.isBackspace(primaryInput);
 
       const incomingToken = tokenizedContext[i - poppedTokenCount]
       switch(editPath[i]) {
@@ -397,10 +454,31 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
           const token = state.tokens[i - poppedTokenCount];
           const matchToken = matchState.tokens[i];
 
+          // TODO:  I'm beginning to believe that searchSpace should (eventually) be tracked
+          // on the tokens, rather than on the overall 'state'.
+          // - Reason:  phrase-level corrections / predictions would likely need a search-state
+          //   across per potentially-affected token.
+          // - Shifting the paradigm should be a separate work unit than the
+          //   context-tracker rework currently being done, though.
           if(isBackspace) {
             token.updateWithBackspace(incomingToken.text, primaryInput.id);
+            if(isLastToken) {
+              state.tokens.pop(); // pops `token`
+              // puts it back in, rebuilding a fresh search-space that uses the rebuilt
+              // keystroke distribution from updateWithBackspace.
+              state.pushTail(token);
+            }
           } else {
-            state.updateToken(token, transformDistribution, incomingToken.text);
+            token.update(
+              tokenDistribution,
+              incomingToken.text
+            );
+
+            if(isLastToken) {
+              // Search spaces may not exist during some unit tests; the state
+              // may not have an associated model during some.
+              state.searchSpace[0]?.addInput(tokenDistribution);
+            }
           }
 
           // For this case, we were _likely_ called by
@@ -414,10 +492,19 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
           if(state != matchState && !isLastToken) {
             matchToken.replacementText = incomingToken.text;
           }
+
           break;
         case 'insert':
-          if(priorEdit && priorEdit != 'substitute' && priorEdit != 'match') {
+          if(priorEdit && priorEdit != 'substitute' && priorEdit != 'match' && priorEdit != 'insert') {
             return null;
+          }
+
+          if(!preservationTransform) {
+            // Allows for consistent handling of "insert" cases; even if there's no edit
+            // from a prior token, having a defined transform here indicates that
+            // a new token has been produced.  This serves as a useful conditional flag
+            // for prediction logic.
+            preservationTransform = { insert: '', deleteLeft: 0 };
           }
 
           if(state == matchState) {
@@ -427,15 +514,35 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
           let pushedToken = new TrackedContextToken();
           pushedToken.raw = incomingToken.text;
 
-          // TODO: May need something more complicated if the keystroke's
-          // transform triggers a wordbreak _within_ its boundaries (rather than
-          // on an edge).  (Probably some way to map the tokenization to the indices
-          // within `insert`.)
-          pushedToken.transformDistributions = transformDistribution ? [transformDistribution] : [];
+          // TODO:  assumes that there was no shift in wordbreaking from the
+          // prior context to the current one.  This may actually be a major
+          // issue for dictionary-based wordbreaking!
+          //
+          // If there was such a shift, then we may have extra transforms
+          // originally on a 'previous' token that got moved into this one!
+          //
+          // Suppose we're using a dictionary-based wordbreaker and have
+          // `butterfl` for our context, which could become butterfly.  If the
+          // next keystroke results in `butterfli`, this would likely be
+          // tokenized `butter` `fli`.  (e.g: `fli` leads to `flight`.) How do
+          // we know to properly relocate the `f` and `l` transforms?
+          if(primaryInput) {
+            pushedToken.transformDistributions = tokenDistribution ? [tokenDistribution] : [];
+          }
           pushedToken.isWhitespace = incomingToken.isWhitespace;
 
+          // Auto-replaces the search space to correspond with the new token.
           state.pushTail(pushedToken);
           break;
+        case 'match':
+          // The default (Unicode) wordbreaker returns an empty token after whitespace blocks.
+          // Adding new whitespace extends the whitespace block but preserves the empty token
+          // following it.
+          if(priorEdit == 'substitute' && tokenizedContext[tokenizedContext.length-1].text == '') {
+            // Keep the blank token as-is; no edit needed!
+            continue;
+          }
+          // else 'fallthrough' / return null
         default:
           // No 'delete' should exist on the trailing edge of context when the
           // context window slides.  While it can happen due to keystrokes with
@@ -446,13 +553,15 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
           // No 'transform' edits should exist within this section, either.
           return null;
       }
+
+      priorEdit = editPath[i];
     }
 
-    return state;
+    return { state, baseState: matchState, preservationTransform };
   }
 
   private static modelContextState(
-    tokenizedContext: {text: USVString, isWhitespace?: boolean}[],
+    tokenizedContext: Token[],
     lexicalModel: LexicalModel
   ): TrackedContextState {
     let baseTokens = tokenizedContext.map(function(entry) {
@@ -476,11 +585,12 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     // And now build the final context state object, which includes whitespace 'tokens'.
     let state = new TrackedContextState(lexicalModel);
 
-    if(baseTokens.length > 0) {
-      state.pushTail(baseTokens.splice(0, 1)[0]);
-    }
-
     while(baseTokens.length > 0) {
+      // We don't have a pre-existing distribution for this token, so we'll build one as
+      // if we'd just produced the token from a backspace.
+      if(baseTokens.length == 1) {
+        baseTokens[0].updateWithBackspace(baseTokens[0].raw, null);
+      }
       state.pushTail(baseTokens.splice(0, 1)[0]);
     }
 
@@ -507,19 +617,32 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     model: LexicalModel,
     context: Context,
     transformDistribution?: Distribution<Transform>
-  ): TrackedContextState {
+  ): ContextMatchResult {
     if(!model.traverseFromRoot) {
       // Assumption:  LexicalModel provides a valid traverseFromRoot function.  (Is technically optional)
       // Without it, no 'corrections' may be made; the model can only be used to predict, not correct.
       throw "This lexical model does not provide adequate data for correction algorithms and context reuse";
     }
 
+    let tokenize = determineModelTokenizer(model);
+
     const inputTransform = transformDistribution?.[0];
+    let transformTokenLength = 0;
+    let tokenizedDistribution: Distribution<Transform[]> = null;
     if(inputTransform) {
+      // These two methods apply transforms internally; do not mutate context here.
+      // This particularly matters for the 'distribution' variant.
+      transformTokenLength = tokenizeTransform(tokenize, context, inputTransform.sample).length;
+      tokenizedDistribution = tokenizeTransformDistribution(tokenize, context, transformDistribution);
+
+      // Now we update the context used for context-state management based upon our input.
       context = applyTransform(inputTransform.sample, context);
+
+      // While we lack phrase-based / phrase-oriented prediction support, we'll just extract the
+      // set that matches the token length that results from our input.
+      tokenizedDistribution = tokenizedDistribution.filter((entry) => entry.sample.length == transformTokenLength);
     }
 
-    const tokenize = determineModelTokenizer(model);
     const tokenizedContext = tokenize(context);
 
     if(tokenizedContext.left.length > 0) {
@@ -546,22 +669,22 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
           continue;
         }
 
-        let resultState = ContextTracker.attemptMatchContext(tokenizedContext.left, this.item(i), transformDistribution);
+        let result = ContextTracker.attemptMatchContext(tokenizedContext.left, this.item(i), tokenizedDistribution);
 
-        if(resultState) {
+        if(result?.state) {
           // Keep it reasonably current!  And it's probably fine to have it more than once
           // in the history.  However, if it's the most current already, there's no need
           // to refresh it.
-          if(this.newest != resultState && this.newest != priorMatchState) {
+          if(this.newest != result.state && this.newest != priorMatchState) {
             // Already has a taggedContext.
             this.enqueue(priorMatchState);
           }
 
-          resultState.taggedContext = context;
-          if(resultState != this.item(i)) {
-            this.enqueue(resultState);
+          result.state.taggedContext = context;
+          if(result.state != this.item(i)) {
+            this.enqueue(result.state);
           }
-          return resultState;
+          return result;
         }
       }
     }
@@ -574,7 +697,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     let state = ContextTracker.modelContextState(tokenizedContext.left, model);
     state.taggedContext = context;
     this.enqueue(state);
-    return state;
+    return { state, baseState: null };
   }
 
   clearCache() {

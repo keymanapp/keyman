@@ -95,10 +95,17 @@ export class ModelCompositor {
     // const allowSpace = TransformUtils.isWhitespace(inputTransform);
     const inputTransform = transformDistribution[0].sample;
     const allowBksp = TransformUtils.isBackspace(inputTransform);
+    const allowWhitespace = TransformUtils.isWhitespace(inputTransform);
 
     const postContext = models.applyTransform(inputTransform, context);
+
+    // TODO:  It would be best for the correctAndEnumerate method to return the
+    // suggestion's prefix, as it already has lots of logic oriented to this.
+    // The context-tracker used there with v14+ models can determine this more
+    // robustly.
     const truePrefix = this.wordbreak(postContext);
-    const basePrefix = allowBksp ? truePrefix : this.wordbreak(context);
+    // Only use of `truePrefix`.
+    const basePrefix = (allowBksp || allowWhitespace) ? truePrefix : this.wordbreak(context);
 
     // Used to restore whitespaces if operations would remove them.
     const currentCasing: CasingForm = lexicalModel.languageUsesCasing
@@ -247,7 +254,7 @@ export class ModelCompositor {
     if(this.contextTracker) {
       let contextState = this.contextTracker.newest;
       if(!contextState) {
-        contextState = this.contextTracker.analyzeState(this.lexicalModel, context);
+        contextState = this.contextTracker.analyzeState(this.lexicalModel, context).state;
       }
 
       contextState.tail.activeReplacementId = suggestion.id;

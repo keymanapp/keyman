@@ -202,7 +202,9 @@ describe('ModelCompositor', function() {
         //   returning a standard full set.
         await firstPredict;
         const finalSuggestions = await secondPredict;
-
+        if(terminatedSuggestions.length > 0) {
+          assert.isOk(terminatedSuggestions.find((entry) => entry.displayAs == 'a'));
+        }
         assert.isOk(finalSuggestions.find((entry) => entry.displayAs == 'applied'));
       });
     });
