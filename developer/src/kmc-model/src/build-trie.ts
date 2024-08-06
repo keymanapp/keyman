@@ -291,7 +291,7 @@ namespace Trie {
    * @returns A JSON-serialiable object that can be given to the TrieModel constructor.
    */
   export function buildTrie(wordlist: WordList, keyFunction: SearchTermToKey): object {
-    let trie = new Trie(keyFunction);
+    const trie = new Trie(keyFunction);
     buildFromWordList(trie, wordlist);
     const root = trie.root;
     return {
