@@ -3,6 +3,7 @@
  */
 
 import ModelCompositor from '#./model-compositor.js';
+import { toAnnotatedSuggestion } from '#./predict-helpers.js';
 import * as models from '#./models/index.js';
 import * as wordBreakers from '@keymanapp/models-wordbreakers';
 
@@ -156,6 +157,55 @@ describe('ModelCompositor', function() {
           // replace => nothing for the suggestion to delete.
           assert.equal(suggestion.transform.deleteLeft, 0);
         });
+      });
+
+      it('stops predicting early if new prediction request comes in', async function() {
+        const compositor = new ModelCompositor(plainModel, true);
+
+        const firstPredict = compositor.predict({
+          insert: "a",
+          deleteLeft: 0
+        }, {
+          left: "the ", startOfBuffer: true, endOfBuffer: true
+        });
+
+        const firstTimer = compositor.activeTimer;
+        assert.isOk(firstTimer);
+        assert.isFalse(firstTimer.elapsed);
+
+        const secondPredict = compositor.predict({
+          insert: "l",
+          deleteLeft: 0
+        }, {
+          left: "the apl", startOfBuffer: true, endOfBuffer: true
+        });
+
+        assert.notEqual(compositor.activeTimer, firstTimer);
+        assert.isTrue(firstTimer.elapsed);
+
+        await Promise.race([
+          firstPredict,
+          secondPredict.then(() => Promise.reject(new Error("second prediction should not beat the first"))),
+        ]);
+
+        await Promise.all([firstPredict, secondPredict]);
+
+        // We can't make many solid guarantees about the state at which the first predict()
+        // call was interrupted.
+        //
+        // Possible cases:
+        // - an early OS-level context switch can land between processing the root search node
+        //   and the first possible search result (even for a single char)
+        // - It's possible to interrupt after the first result (exact match) and before any
+        //   secondary corrections may be found
+        // - It's possible to interrupt "too late" if the correction search proceeds quickly,
+        //   returning a standard full set.
+        const terminatedSuggestions = await firstPredict;
+        const finalSuggestions = await secondPredict;
+        if(terminatedSuggestions.length > 0) {
+          assert.isOk(terminatedSuggestions.find((entry) => entry.displayAs == 'a'));
+        }
+        assert.isOk(finalSuggestions.find((entry) => entry.displayAs == 'applied'));
       });
     });
 
@@ -602,13 +652,12 @@ describe('ModelCompositor', function() {
         };
 
         let model = new models.DummyModel(options);
-        let compositor = new ModelCompositor(model, true);
 
         var keep;
         if(quoteStyle) {
-          keep = compositor.toAnnotatedSuggestion(baseSuggestion, 'keep', quoteStyle);
+          keep = toAnnotatedSuggestion(model, baseSuggestion, 'keep', quoteStyle);
         } else {
-          keep = compositor.toAnnotatedSuggestion(baseSuggestion, 'keep');
+          keep = toAnnotatedSuggestion(model, baseSuggestion, 'keep');
         }
 
         // Make sure we didn't accidentally leak any mutations to the parameter.

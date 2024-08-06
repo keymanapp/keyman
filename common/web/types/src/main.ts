@@ -19,7 +19,9 @@ export { UnicodeSetParser, UnicodeSet } from './ldml-keyboard/unicodeset-parser-
 export { VariableParser, MarkerParser } from './ldml-keyboard/pattern-parser.js';
 export { LDMLKeyboardXMLSourceFileReader, LDMLKeyboardXMLSourceFileReaderOptions } from './ldml-keyboard/ldml-keyboard-xml-reader.js';
 
+export { USVirtualKeyCodes } from './consts/virtual-key-constants.js';
 export * as Constants from './consts/virtual-key-constants.js';
+export { ModifierKeyConstants } from './consts/modifier-key-constants.js';
 
 export { defaultCompilerOptions, CompilerBaseOptions, CompilerCallbacks, CompilerOptions, CompilerEvent, CompilerErrorNamespace,
          CompilerErrorSeverity, CompilerPathCallbacks, CompilerFileSystemCallbacks, CompilerCallbackOptions,
@@ -50,6 +52,7 @@ export { KeymanDeveloperProject, KeymanDeveloperProjectFile, KeymanDeveloperProj
 export * as KpsFile from './package/kps-file.js';
 export * as KmpJsonFile from './package/kmp-json-file.js';
 
+export { Uni_IsSurrogate1, Uni_IsSurrogate2 } from './util/util.js';
 export * as util from './util/util.js';
 
 export * as KeymanFileTypes from './util/file-types.js';

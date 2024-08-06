@@ -4,9 +4,9 @@
 ***/
 
 import { Version, deepCopy } from "@keymanapp/web-utils";
-import { TouchLayout } from "@keymanapp/common-types";
+import { ModifierKeyConstants, TouchLayout } from "@keymanapp/common-types";
 
-import LayoutFormFactorBase = TouchLayout.TouchLayoutPlatform;
+import LayoutFormFactorSpec = TouchLayout.TouchLayoutPlatform;
 import LayoutLayerBase = TouchLayout.TouchLayoutLayer;
 export type LayoutRow = TouchLayout.TouchLayoutRow;
 export type LayoutKey = TouchLayout.TouchLayoutKey;
@@ -52,15 +52,15 @@ export interface LayoutLayer extends LayoutLayerBase {
   aligned?: boolean,
   nextlayer?: string
 };
-export interface LayoutFormFactor extends LayoutFormFactorBase {
+export interface LayoutFormFactor extends LayoutFormFactorSpec {
   // To facilitate those post-processing elements.
   layer: LayoutLayer[]
 };
 
 export type LayoutSpec = {
-  "desktop"?: LayoutFormFactor,
-  "phone"?: LayoutFormFactor,
-  "tablet"?: LayoutFormFactor
+  "desktop"?: LayoutFormFactorSpec,
+  "phone"?: LayoutFormFactorSpec,
+  "tablet"?: LayoutFormFactorSpec
 }
 
 const KEY_102_WIDTH = 200;
@@ -136,9 +136,9 @@ export class Layouts {
     }
 
     // Clone the default layout object for this device
-    var layout: LayoutFormFactor = deepCopy(Layouts.dfltLayout[layoutType]);
+    var layout: LayoutFormFactorSpec = deepCopy(Layouts.dfltLayout[layoutType]);
 
-    var n,layers=layout['layer'], keyLabels: EncodedVisualKeyboard['KLS'] = PVK['KLS'], key102=PVK['K102'];
+    var n,layers=layout['layer'] as LayoutLayer[], keyLabels: EncodedVisualKeyboard['KLS'] = PVK['KLS'], key102=PVK['K102'];
     var i, j, k, rows: LayoutRow[], key: LayoutKey, keys: LayoutKey[];
     var chiral: boolean = (kbdBitmask & Codes.modifierBitmasks.IS_CHIRAL) != 0;
 
@@ -255,7 +255,7 @@ export class Layouts {
 
     // *** Step 2: Layer objects now exist; time to fill them with the appropriate key labels and key styles ***
     for(n=0; n<layers.length; n++) {
-      var layer=layers[n], kx, shiftKey: LayoutKey = null;
+      var layer=layers[n] as LayoutLayer, kx, shiftKey: LayoutKey = null;
       var capsKey: LayoutKey = null, numKey: LayoutKey = null, scrollKey: LayoutKey = null;  // null if not in the OSK layout.
       var layerSpec = keyLabels[layer['id']];
       var isShift = layer['id'] == 'shift' ? 1 : 0;
@@ -349,31 +349,29 @@ export class Layouts {
    * Description  Get name of layer from code, where the modifer order is determined by ascending bit-flag value.
    */
   static getLayerId(m: number): string {
-    let modifierCodes = Codes.modifierCodes;
-
     var s='';
     if(m == 0) {
       return 'default';
     } else {
-      if(m & modifierCodes['LCTRL']) {
+      if(m & ModifierKeyConstants.LCTRLFLAG) {
         s = (s.length > 0 ? s + '-' : '') + 'leftctrl';
       }
-      if(m & modifierCodes['RCTRL']) {
+      if(m & ModifierKeyConstants.RCTRLFLAG) {
         s = (s.length > 0 ? s + '-' : '') + 'rightctrl';
       }
-      if(m & modifierCodes['LALT']) {
+      if(m & ModifierKeyConstants.LALTFLAG) {
         s = (s.length > 0 ? s + '-' : '') + 'leftalt';
       }
-      if(m & modifierCodes['RALT']) {
+      if(m & ModifierKeyConstants.RALTFLAG) {
         s = (s.length > 0 ? s + '-' : '') + 'rightalt';
       }
-      if(m & modifierCodes['SHIFT']) {
+      if(m & ModifierKeyConstants.K_SHIFTFLAG) {
         s = (s.length > 0 ? s + '-' : '') + 'shift';
       }
-      if(m & modifierCodes['CTRL']) {
+      if(m & ModifierKeyConstants.K_CTRLFLAG) {
         s = (s.length > 0 ? s + '-' : '') + 'ctrl';
       }
-      if(m & modifierCodes['ALT']) {
+      if(m & ModifierKeyConstants.K_ALTFLAG) {
         s = (s.length > 0 ? s + '-' : '') + 'alt';
       }
       return s;

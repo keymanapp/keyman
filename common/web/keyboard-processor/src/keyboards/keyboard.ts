@@ -1,8 +1,10 @@
 import Codes from "../text/codes.js";
-import { EncodedVisualKeyboard, LayoutSpec, Layouts, type LayoutFormFactor } from "./defaultLayouts.js";
+import { EncodedVisualKeyboard, LayoutSpec, Layouts } from "./defaultLayouts.js";
 import { ActiveKey, ActiveLayout, ActiveSubKey } from "./activeLayout.js";
 import KeyEvent from "../text/keyEvent.js";
 import type OutputTarget from "../text/outputTarget.js";
+import { ModifierKeyConstants, TouchLayout } from "@keymanapp/common-types";
+type TouchLayoutSpec = TouchLayout.TouchLayoutPlatform & { isDefault?: boolean};
 
 import type { ComplexKeyboardStore } from "../text/kbdInterface.js";
 
@@ -106,7 +108,7 @@ export type KeyboardObject = {
   KRTL?: boolean;
   /**
    * Keyboard Modifier BitMask:  a set of bitflags indicating which modifiers
-   * the keyboard's rules utilize.  See also: `Codes.modifierCodes`.
+   * the keyboard's rules utilize.  See also: `ModifierKeyConstants`.
    */
   KMBM?: number;
   /**
@@ -418,8 +420,6 @@ export default class Keyboard {
    * @return  {boolean}
    */
   get emulatesAltGr(): boolean {
-    let modifierCodes = Codes.modifierCodes;
-
     // If we're not chiral, we're not emulating.
     if(!this.isChiral) {
       return false;
@@ -435,9 +435,9 @@ export default class Keyboard {
       return false;
     }
 
-    var emulationMask = modifierCodes['LCTRL'] | modifierCodes['LALT'];
+    var emulationMask = ModifierKeyConstants.LCTRLFLAG | ModifierKeyConstants.LALTFLAG;
     var unshiftedEmulationLayer = layers[Layouts.getLayerId(emulationMask)];
-    var shiftedEmulationLayer = layers[Layouts.getLayerId(modifierCodes['SHIFT'] | emulationMask)];
+    var shiftedEmulationLayer = layers[Layouts.getLayerId(ModifierKeyConstants.K_SHIFTFLAG | emulationMask)];
 
     // buildDefaultLayout ensures that these are aliased to the original modifier set being emulated.
     // As a result, we can directly test for reference equality.
@@ -445,12 +445,12 @@ export default class Keyboard {
     // This allows us to still return `true` after creating the layers for emulation; during keyboard
     // construction, the two layers should be null for AltGr emulation to succeed.
     if(unshiftedEmulationLayer != null &&
-        unshiftedEmulationLayer != layers[Layouts.getLayerId(modifierCodes['RALT'])]) {
+        unshiftedEmulationLayer != layers[Layouts.getLayerId(ModifierKeyConstants.RALTFLAG)]) {
       return false;
     }
 
     if(shiftedEmulationLayer != null &&
-        shiftedEmulationLayer != layers[Layouts.getLayerId(modifierCodes['RALT'] | modifierCodes['SHIFT'])]) {
+        shiftedEmulationLayer != layers[Layouts.getLayerId(ModifierKeyConstants.RALTFLAG | ModifierKeyConstants.K_SHIFTFLAG)]) {
       return false;
     }
 
@@ -506,7 +506,7 @@ export default class Keyboard {
     }
   }
 
-  private findOrConstructLayout(formFactor: DeviceSpec.FormFactor): LayoutFormFactor {
+  private findOrConstructLayout(formFactor: DeviceSpec.FormFactor): TouchLayoutSpec {
     if(this._layouts) {
       // Search for viable layouts.  `null` is allowed for desktop form factors when help text is available,
       // so we check explicitly against `undefined`.
@@ -550,7 +550,7 @@ export default class Keyboard {
     // Final check - do we construct a layout, or is this a case where helpText / insertHelpHTML should take over?
     if(rawSpecifications) {
       // Now to generate a layout from our raw specifications.
-      let layout = this._layouts[formFactor] = Layouts.buildDefaultLayout(rawSpecifications, this, formFactor) as ActiveLayout;
+      let layout: TouchLayoutSpec = this._layouts[formFactor] = Layouts.buildDefaultLayout(rawSpecifications, this, formFactor);
       layout.isDefault = true;
       return layout;
     } else {
@@ -572,11 +572,13 @@ export default class Keyboard {
     if(rawLayout) {
       // Prevents accidentally reprocessing layouts; it's a simple enough check.
       if(this.layoutStates[formFactor] == LayoutState.NOT_LOADED) {
-        rawLayout = ActiveLayout.polyfill(rawLayout, this, formFactor);
+        const layout = ActiveLayout.polyfill(rawLayout, this, formFactor);
         this.layoutStates[formFactor] = LayoutState.POLYFILLED;
+        return layout;
+      } else {
+        return rawLayout as unknown as ActiveLayout;
       }
 
-      return rawLayout as ActiveLayout;
     } else {
       return null;
     }
@@ -661,9 +663,9 @@ export default class Keyboard {
        * same for the other modifiers.
        */
       Lkc.Lstates = 0;
-      Lkc.Lstates |= stateKeys['K_CAPS']    ? Codes.modifierCodes['CAPS'] : Codes.modifierCodes['NO_CAPS'];
-      Lkc.Lstates |= stateKeys['K_NUMLOCK'] ? Codes.modifierCodes['NUM_LOCK'] : Codes.modifierCodes['NO_NUM_LOCK'];
-      Lkc.Lstates |= stateKeys['K_SCROLL']  ? Codes.modifierCodes['SCROLL_LOCK'] : Codes.modifierCodes['NO_SCROLL_LOCK'];
+      Lkc.Lstates |= stateKeys['K_CAPS']    ? ModifierKeyConstants.CAPITALFLAG : ModifierKeyConstants.NOTCAPITALFLAG;
+      Lkc.Lstates |= stateKeys['K_NUMLOCK'] ? ModifierKeyConstants.NUMLOCKFLAG : ModifierKeyConstants.NOTNUMLOCKFLAG;
+      Lkc.Lstates |= stateKeys['K_SCROLL']  ? ModifierKeyConstants.SCROLLFLAG : ModifierKeyConstants.NOTSCROLLFLAG;
     }
 
     // Set LisVirtualKey to false to ensure that nomatch rule does fire for U_xxxx keys
@@ -685,7 +687,7 @@ export default class Keyboard {
     // Handles modifier states when the OSK is emulating rightalt through the leftctrl-leftalt layer.
     if((Lkc.Lmodifiers & Codes.modifierBitmasks['ALT_GR_SIM']) == Codes.modifierBitmasks['ALT_GR_SIM'] && this.emulatesAltGr) {
       Lkc.Lmodifiers &= ~Codes.modifierBitmasks['ALT_GR_SIM'];
-      Lkc.Lmodifiers |= Codes.modifierCodes['RALT'];
+      Lkc.Lmodifiers |= ModifierKeyConstants.RALTFLAG;
     }
   }
 
