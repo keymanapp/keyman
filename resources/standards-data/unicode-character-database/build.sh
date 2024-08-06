@@ -51,7 +51,9 @@ function downloadPropertyFile() {
 }
 
 do_clean() {
-  rm -rf **/*.txt
+  mv unicode-copyright.txt unicode-copyright.txt.bak
+  rm -rf *.txt
+  mv unicode-copyright.txt.bak unicode-copyright.txt
 }
 
 do_configure() {
