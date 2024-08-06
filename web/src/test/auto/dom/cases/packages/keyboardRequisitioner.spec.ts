@@ -3,7 +3,7 @@ import sinon from 'sinon';
 
 import { KeyboardHarness, MinimalKeymanGlobal } from '@keymanapp/keyboard-processor';
 import { DOMKeyboardLoader } from '@keymanapp/keyboard-processor/dom-keyboard-loader';
-import { PathConfiguration } from 'keyman/engine/paths';
+import { PathConfiguration } from 'keyman/engine/interfaces';
 import { CloudQueryEngine, KeyboardRequisitioner, type KeyboardStub } from 'keyman/engine/package-cache';
 import DOMCloudRequester from 'keyman/engine/package-cache/dom-requester';
 

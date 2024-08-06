@@ -1,5 +1,5 @@
 import { PathOptionSpec } from "./optionSpec.interface.js";
-import { OSKResourcePathConfiguration } from 'keyman/engine/osk';
+import { OSKResourcePathConfiguration } from './oskResourcePathConfiguration.interface.js';
 
 const addDelimiter = (p: string) => {
   // Add delimiter if missing

@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
-import { PathOptionDefaults, PathConfiguration } from 'keyman/engine/paths';
+import { PathOptionDefaults, PathConfiguration } from 'keyman/engine/interfaces';
 
 // Tests the activation-state logic abstraction & implementations used to model and control OSK visibility.
 
