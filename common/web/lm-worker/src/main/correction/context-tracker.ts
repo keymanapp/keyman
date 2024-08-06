@@ -1,4 +1,4 @@
-import { applyTransform } from '@keymanapp/models-templates';
+import { Token, applyTransform } from '@keymanapp/models-templates';
 
 import { ClassicalDistanceCalculation } from './classical-calculation.js';
 import { SearchSpace } from './distance-modeler.js';
@@ -31,6 +31,7 @@ export class TrackedContextSuggestion {
 export class TrackedContextToken {
   raw: string;
   replacementText: string;
+  isWhitespace?: boolean;
 
   transformDistributions: Distribution<Transform>[] = [];
   replacements: TrackedContextSuggestion[];
@@ -53,6 +54,30 @@ export class TrackedContextToken {
 
   revert() {
     delete this.activeReplacementId;
+  }
+
+  /**
+   * Used for 14.0's backspace workaround, which flattens all previous Distribution<Transform>
+   * entries because of limitations with direct use of backspace transforms.
+   * @param tokenText
+   * @param transformId
+   */
+  updateWithBackspace(tokenText: USVString, transformId: number) {
+    // It's a backspace transform; time for special handling!
+    //
+    // For now, with 14.0, we simply compress all remaining Transforms for the token into
+    // multiple single-char transforms.  Probabalistically modeling BKSP is quite complex,
+    // so we simplify by assuming everything remaining after a BKSP is 'true' and 'intended' text.
+    //
+    // Note that we cannot just use a single, monolithic transform at this point b/c
+    // of our current edit-distance optimization strategy; diagonalization is currently...
+    // not very compatible with that.
+    let backspacedTokenContext: Distribution<Transform>[] = textToCharTransforms(tokenText, transformId).map(function(transform) {
+      return [{sample: transform, p: 1.0}];
+    });
+
+    this.raw = tokenText;
+    this.transformDistributions = backspacedTokenContext;
   }
 }
 
@@ -126,7 +151,7 @@ export class TrackedContextState {
   }
 
   popHead() {
-    this.tokens.splice(0, 2);
+    this.tokens.splice(0, 1);
     this.indexOffset -= 1;
   }
 
@@ -144,59 +169,18 @@ export class TrackedContextState {
     }
   }
 
-  pushWhitespaceToTail(transformDistribution: Distribution<Transform> = null) {
-    let whitespaceToken = new TrackedContextToken();
-
-    // Track the Transform that resulted in the whitespace 'token'.
-    // Will be needed for phrase-level correction/prediction.
-    whitespaceToken.transformDistributions = transformDistribution ? [transformDistribution] : [];
-
-    whitespaceToken.raw = null;
-    this.tokens.push(whitespaceToken);
-  }
-
-  /**
-   * Used for 14.0's backspace workaround, which flattens all previous Distribution<Transform>
-   * entries because of limitations with direct use of backspace transforms.
-   * @param tokenText
-   * @param transformId
-   */
-  replaceTailForBackspace(tokenText: USVString, transformId: number) {
-    this.tokens.pop();
-
-    // It's a backspace transform; time for special handling!
-    //
-    // For now, with 14.0, we simply compress all remaining Transforms for the token into
-    // multiple single-char transforms.  Probabalistically modeling BKSP is quite complex,
-    // so we simplify by assuming everything remaining after a BKSP is 'true' and 'intended' text.
-    //
-    // Note that we cannot just use a single, monolithic transform at this point b/c
-    // of our current edit-distance optimization strategy; diagonalization is currently...
-    // not very compatible with that.
-    let backspacedTokenContext: Distribution<Transform>[] = textToCharTransforms(tokenText, transformId).map(function(transform) {
-      return [{sample: transform, p: 1.0}];
-    });
-
-    let compactedToken = new TrackedContextToken();
-    compactedToken.raw = tokenText;
-    compactedToken.transformDistributions = backspacedTokenContext;
-    this.pushTail(compactedToken);
-  }
-
-  updateTail(transformDistribution: Distribution<Transform>, tokenText?: USVString) {
-    let editedToken = this.tail;
-
+  updateToken(token: TrackedContextToken, transformDistribution: Distribution<Transform>, tokenText?: USVString) {
     // Preserve existing text if new text isn't specified.
-    tokenText = tokenText || (tokenText === '' ? '' : editedToken.raw);
+    tokenText = tokenText || (tokenText === '' ? '' : token.raw);
 
     if(transformDistribution && transformDistribution.length > 0) {
-      editedToken.transformDistributions.push(transformDistribution);
+      token.transformDistributions.push(transformDistribution);
       if(this.searchSpace) {
         this.searchSpace.forEach(space => space.addInput(transformDistribution));
       }
     }
     // Replace old token's raw-text with new token's raw-text.
-    editedToken.raw = tokenText;
+    token.raw = tokenText;
   }
 
   toRawTokenization() {
@@ -295,7 +279,8 @@ class CircularArray<Item> {
    */
   item(index: number) {
     if(index >= this.count) {
-      throw "Invalid array index";
+      // JS arrays return `undefined` for invalid array indices.
+      return undefined;
     }
 
     let mappedIndex = (this.currentTail + index) % this.maxCount;
@@ -304,85 +289,83 @@ class CircularArray<Item> {
 }
 
 export class ContextTracker extends CircularArray<TrackedContextState> {
-  static attemptMatchContext(tokenizedContext: USVString[],
-                              matchState: TrackedContextState,
-                              transformDistribution?: Distribution<Transform>): TrackedContextState {
+  static attemptMatchContext(
+    tokenizedContext: Token[],
+    matchState: TrackedContextState,
+    transformDistribution?: Distribution<Transform>
+  ): TrackedContextState {
     // Map the previous tokenized state to an edit-distance friendly version.
     let matchContext: USVString[] = matchState.toRawTokenization();
 
     // Inverted order, since 'match' existed before our new context.
-    let mapping = ClassicalDistanceCalculation.computeDistance(matchContext.map(value => ({key: value})),
-                                                                tokenizedContext.map(value => ({key: value})),
-                                                                1);
+    let mapping = ClassicalDistanceCalculation.computeDistance(
+      matchContext.map(value => ({key: value})),
+      tokenizedContext.map(value => ({key: value.text})),
+      // Must be at least 2, as adding a single whitespace after a token tends
+      // to add two tokens: one for whitespace, one for the empty token to
+      // follow it.
+      3
+    );
 
     let editPath = mapping.editPath();
 
-    let poppedHead = false;
-    let pushedTail = false;
+    // When the context has but two tokens, the path algorithm tends to invert
+    // 'insert' and 'substitute' from our preferred ordering for them.
+    // Logically, either order makes sense... but logic for other cases is
+    // far simpler if we have 'substitute' before 'insert'.
+    if(editPath.length == 2 && editPath[0] == 'insert' && editPath[1] == 'substitute') {
+      editPath[0] = 'substitute';
+      editPath[1] = 'insert';
+    }
 
-    // Matters greatly when starting from a nil context.
-    if(editPath.length > 1) {
-      // First entry:  may not be an 'insert' or a 'transpose' op.
-      // 'insert' allowed if the next token is 'substitute', as this may occur with an edit path of length 2.
-      if((editPath[0] == 'insert' && !(editPath[1] == 'substitute' && editPath.length == 2)) || editPath[0].indexOf('transpose') >= 0) {
-        return null;
-      } else if(editPath[0] == 'delete') {
-        poppedHead = true; // a token from the previous state has been wholly removed.
+    const firstMatch = editPath.indexOf('match');
+    const lastMatch = editPath.lastIndexOf('match');
+
+    // Assertion:  for a long context, the bulk of the edit path should be a
+    // continuous block of 'match' entries.  If there's anything else in
+    // the middle, we have a context mismatch.
+    if(firstMatch) {
+      for(let i = firstMatch+1; i < lastMatch; i++) {
+        if(editPath[i] != 'match') {
+          return null;
+        }
       }
     }
 
-    // Last entry:  may not be a 'delete' or a 'transpose' op.
-    let tailIndex = editPath.length -1;
-    let ignorePenultimateMatch = false;
-    if(editPath[tailIndex] == 'delete' || editPath[0].indexOf('transpose') >= 0) {
-      return null;
-    } else if(editPath[tailIndex] == 'insert') {
-      pushedTail = true;
-    } else if(tailIndex > 0 && editPath[tailIndex-1] == 'insert' && editPath[tailIndex] == 'substitute') {
-      // Tends to happen when accepting suggestions.
-      pushedTail = true;
-      ignorePenultimateMatch = true;
+    // If we have a perfect match with a pre-existing context, no mutations have
+    // happened; just re-use the old context state.
+    if(firstMatch == 0 && lastMatch == editPath.length - 1) {
+      return matchState;
     }
 
-    // Can happen for the first text input after backspace deletes a wordbreaking character,
-    // thus the new input continues a previous word while dropping the empty word after
-    // that prior wordbreaking character.
-    //
-    // We can't handle it reliably from this match state, but a previous entry (without the empty token)
-    // should still be in the cache and will be reliable for this example case.
-    if(tailIndex > 0 && editPath[tailIndex-1] == 'delete' && editPath[tailIndex] == 'substitute') {
-      return null;
-    }
+    // If mutations HAVE happened, we have work to do.
+    let state = matchState;
 
-    // Now to check everything in-between:  should be exclusively 'match'es.
-    for(let index = 1; index < editPath.length - (ignorePenultimateMatch ? 2 : 1); index++) {
-      if(editPath[index] != 'match') {
-        return null;
+    let priorEdit: typeof editPath[0];
+    let poppedTokenCount = 0;
+    for(let i = 0; i < firstMatch; i++) {
+      switch(editPath[i]) {
+        case 'delete':
+          if(priorEdit && priorEdit != 'delete') {
+            return null;
+          }
+          if(state == matchState) {
+            state = new TrackedContextState(state);
+          }
+          state.popHead();
+          poppedTokenCount++;
+          break;
+        case 'substitute':
+          // There's no major need to drop parts of a token being 'slid' out of the context window.
+          // We'll leave it intact.
+          break;
+        default:
+          // No 'insert' should exist on the leading edge of context when the
+          // context window slides.
+          //
+          // No 'transform' edits should exist within this section, either.
+          return null;
       }
-    }
-
-    // If we've made it here... success!  We have a context match!
-    let state: TrackedContextState;
-
-    if(pushedTail) {
-      // On suggestion acceptance, we should update the previous final token.
-      // We do it first so that the acceptance is replicated in the new TrackedContextState
-      // as well.
-      if(ignorePenultimateMatch) {
-        // For this case, we were likely called by ModelCompositor.acceptSuggestion(), which
-        // would have marked the accepted suggestion.
-        matchState.tail.replacementText = tokenizedContext[tokenizedContext.length-2];
-      }
-
-      state = new TrackedContextState(matchState);
-    } else {
-      // We're continuing a previously-cached context; create a deep-copy of it.
-      // We can't just re-use the old instance, unfortunately; predictions break
-      // with multitaps otherwise - we should avoid tracking keystrokes that were
-      // rewound.
-      //
-      // If there are no incoming transforms, though... yeah, re-use is safe then.
-      state = !!transformDistribution ? new TrackedContextState(matchState) : matchState;
     }
 
     const hasDistribution = transformDistribution && Array.isArray(transformDistribution);
@@ -391,100 +374,94 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
       primaryInput = null;
     }
 
-    const isWhitespace = primaryInput && TransformUtils.isWhitespace(primaryInput);
+    // TODO:  "wordbreak" the `insert` section of the transform (if it exists).
+    // ... wait, might have to be done at a higher level...
+    // ... and will probably want its own unit test ...
+
     const isBackspace = primaryInput && TransformUtils.isBackspace(primaryInput);
-    const finalToken = tokenizedContext[tokenizedContext.length-1];
 
-    /* Assumption:  This is an adequate check for its two sub-branches.
-      *
-      * Basis:
-      * - Assumption: one keystroke may only cause a single token to rotate out of context.
-      *   - That is, no "reasonable" keystroke would emit enough code points to 'bump' two words simultaneously.
-      *   - ... This one may need to be loosened a bit... but it should be enough for initial correction testing as-is.
-      * - Assumption:  one keystroke may only cause a single token to be appended to the context
-      *   - That is, no "reasonable" keystroke would emit a Transform adding two separate word tokens
-      *     - For languages using whitespace to word-break, said keystroke would have to include said whitespace to break the assumption.
-      */
+    // Reset priorEdit for the end-of-context updating loop.
+    priorEdit = undefined;
 
-    function maintainLastToken() {
-      if(isWhitespace && editPath[tailIndex] == 'match') {
-        /*
-          We can land here if there are multiple whitespaces in a row.
-          There's already an implied whitespace to the left, so we conceptually
-          merge the new whitespace with that one.
-        */
-        return;
-      } else if(isBackspace) {
-        // Consider backspace entry for this case?
-        state.replaceTailForBackspace(finalToken, primaryInput.id);
-      } else {
-        state.updateTail(primaryInput ? transformDistribution : null, finalToken);
-      }
-    }
+    // Now to update the end of the context window.
+    for(let i = lastMatch+1; i < editPath.length; i++) {
+      const isLastToken = i == editPath.length - 1;
 
-    // If there is/was more than one context token available...
-    if(editPath.length > 1) {
-      // We're removing a context token, but at least one remains.
-      if(poppedHead) {
-        state.popHead();
-      }
+      const incomingToken = tokenizedContext[i - poppedTokenCount]
+      switch(editPath[i]) {
+        case 'substitute':
+          if(isLastToken) {
+            state = new TrackedContextState(state);
+          }
 
-      // We're adding an additional context token.
-      if(pushedTail) {
-        const tokenizedTail = tokenizedContext[tokenizedContext.length - 1];
-        /*
-          * Common-case:  most transforms that trigger this case are from pure-whitespace Transforms.  MOST.
-          *
-          * Less-common, but noteworthy:  some wordbreaks may occur without whitespace.  Example:
-          * `"o` => ['"', 'o'].  Make sure to double-check against `tokenizedContext`!
-          */
-        let pushedToken = new TrackedContextToken();
-        pushedToken.raw = tokenizedTail;
+          const token = state.tokens[i - poppedTokenCount];
+          const matchToken = matchState.tokens[i];
 
-        if(isWhitespace || !primaryInput) {
-          state.pushWhitespaceToTail(transformDistribution ?? []);
-          // Continuing the earlier assumption, that 'pure-whitespace Transform' does not emit any initial characters
-          // for the new word (token), so the input keystrokes do not correspond to the new text token.
-          pushedToken.transformDistributions = [];
-        } else {
-          state.pushWhitespaceToTail();
-          // Assumption: Since we only allow one-transform-at-a-time changes between states, we shouldn't be missing
-          // any metadata used to construct the new context state token.
+          if(isBackspace) {
+            token.updateWithBackspace(incomingToken.text, primaryInput.id);
+          } else {
+            state.updateToken(token, transformDistribution, incomingToken.text);
+          }
+
+          // For this case, we were _likely_ called by
+          // ModelCompositor.acceptSuggestion(), which would have marked the
+          // accepted suggestion.
+          //
+          // Upon inspection, this doesn't seem entirely ideal.  It works for
+          // the common case, but not for specially crafted keystroke
+          // transforms.  That said, it's also very low impact.  Best as I can
+          // see, this is only really used for debugging info?
+          if(state != matchState && !isLastToken) {
+            matchToken.replacementText = incomingToken.text;
+          }
+          break;
+        case 'insert':
+          if(priorEdit && priorEdit != 'substitute' && priorEdit != 'match') {
+            return null;
+          }
+
+          if(state == matchState) {
+            state = new TrackedContextState(state);
+          }
+
+          let pushedToken = new TrackedContextToken();
+          pushedToken.raw = incomingToken.text;
+
+          // TODO: May need something more complicated if the keystroke's
+          // transform triggers a wordbreak _within_ its boundaries (rather than
+          // on an edge).  (Probably some way to map the tokenization to the indices
+          // within `insert`.)
           pushedToken.transformDistributions = transformDistribution ? [transformDistribution] : [];
-        }
+          pushedToken.isWhitespace = incomingToken.isWhitespace;
 
-        state.pushTail(pushedToken);
-      } else {
-        // We're editing the final context token.
-        // TODO:  Assumption:  we didn't 'miss' any inputs somehow.
-        //        As is, may be prone to fragility should the lm-layer's tracked context 'desync' from its host's.
-        maintainLastToken();
-      }
-      // There is only one word in the context.
-    } else {
-      // TODO:  Assumption:  we didn't 'miss' any inputs somehow.
-      //        As is, may be prone to fragility should the lm-layer's tracked context 'desync' from its host's.
-
-      if(editPath[tailIndex] == 'insert') {
-        // Construct appropriate initial token.
-        let token = new TrackedContextToken();
-        token.raw = tokenizedContext[0];
-        token.transformDistributions = [transformDistribution];
-        state.pushTail(token);
-      } else {
-        // Edit the lone context token.
-        maintainLastToken();
+          state.pushTail(pushedToken);
+          break;
+        default:
+          // No 'delete' should exist on the trailing edge of context when the
+          // context window slides.  While it can happen due to keystrokes with
+          // `deleteLeft`, we keep a cache of recent contexts - an older one will
+          // likely match sufficiently.
+          // - may see 'delete' followed by 'substitute' in such cases.
+          //
+          // No 'transform' edits should exist within this section, either.
+          return null;
       }
     }
+
     return state;
   }
 
-  private static modelContextState(tokenizedContext: USVString[],
-                            transformDistribution: Distribution<Transform>,
-                            lexicalModel: LexicalModel): TrackedContextState {
+  private static modelContextState(
+    tokenizedContext: {text: USVString, isWhitespace?: boolean}[],
+    lexicalModel: LexicalModel
+  ): TrackedContextState {
     let baseTokens = tokenizedContext.map(function(entry) {
       let token = new TrackedContextToken();
-      token.raw = entry;
+      token.raw = entry.text;
+      if(entry.isWhitespace) {
+        token.isWhitespace = true;
+      }
+
       if(token.raw) {
         token.transformDistributions = textToCharTransforms(token.raw).map(function(transform) {
           return [{sample: transform, p: 1.0}];
@@ -504,7 +481,6 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     }
 
     while(baseTokens.length > 0) {
-      state.pushWhitespaceToTail();
       state.pushTail(baseTokens.splice(0, 1)[0]);
     }
 
@@ -527,13 +503,20 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
    * @param context
    * @param transformDistribution
    */
-  analyzeState(model: LexicalModel,
-                context: Context,
-                transformDistribution?: Distribution<Transform>): TrackedContextState {
+  analyzeState(
+    model: LexicalModel,
+    context: Context,
+    transformDistribution?: Distribution<Transform>
+  ): TrackedContextState {
     if(!model.traverseFromRoot) {
       // Assumption:  LexicalModel provides a valid traverseFromRoot function.  (Is technically optional)
       // Without it, no 'corrections' may be made; the model can only be used to predict, not correct.
       throw "This lexical model does not provide adequate data for correction algorithms and context reuse";
+    }
+
+    const inputTransform = transformDistribution?.[0];
+    if(inputTransform) {
+      context = applyTransform(inputTransform.sample, context);
     }
 
     const tokenize = determineModelTokenizer(model);
@@ -542,6 +525,10 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     if(tokenizedContext.left.length > 0) {
       for(let i = this.count - 1; i >= 0; i--) {
         const priorMatchState = this.item(i);
+
+        // Skip intermediate multitap-produced contexts.
+        // When multitapping, we skip all contexts from prior taps within the same interaction,
+        // but not any contexts from before the multitap started.
         const priorTaggedContext = priorMatchState.taggedContext;
         if(priorTaggedContext && transformDistribution && transformDistribution.length > 0) {
           // Using the potential `matchState` + the incoming transform, do the results line up for
@@ -584,7 +571,7 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
     //
     // Assumption:  as a caret needs to move to context before any actual transform distributions occur,
     // this state is only reached on caret moves; thus, transformDistribution is actually just a single null transform.
-    let state = ContextTracker.modelContextState(tokenizedContext.left, transformDistribution, model);
+    let state = ContextTracker.modelContextState(tokenizedContext.left, model);
     state.taggedContext = context;
     this.enqueue(state);
     return state;

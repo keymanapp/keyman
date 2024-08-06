@@ -216,11 +216,8 @@ export class ModelCompositor {
     let postContextTokenization = this.tokenize(postContext);
     if(postContextTokenization) {
       // Handles display string for reversions triggered by accepting a suggestion mid-token.
-      if(postContextTokenization.left.length > 0) {
-        revertedPrefix = postContextTokenization.left[postContextTokenization.left.length-1];
-      } else {
-        revertedPrefix = '';
-      }
+      const preCaretToken = postContextTokenization.left[postContextTokenization.left.length - 1];
+      revertedPrefix = (preCaretToken && !preCaretToken.isWhitespace) ? preCaretToken.text : '';
       revertedPrefix += postContextTokenization.caretSplitsToken ? postContextTokenization.right[0] : '';
     } else {
       revertedPrefix = this.wordbreak(postContext);

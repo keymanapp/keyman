@@ -162,14 +162,19 @@ export async function correctAndEnumerate(
   // facilitates a more thorough correction-search pattern.
 
   // Token replacement benefits greatly from knowledge of the prior context state.
-  let contextState = contextTracker.analyzeState(lexicalModel, context, null);
+  let contextState = contextTracker.analyzeState(
+    lexicalModel,
+    context,
+    null
+  );
   // Corrections and predictions are based upon the post-context state, though.
-  postContextState = contextTracker.analyzeState( lexicalModel,
-                                                  postContext,
-                                                  !TransformUtils.isEmpty(inputTransform)
-                                                    ? transformDistribution
-                                                    : null
-                                                );
+  postContextState = contextTracker.analyzeState(
+    lexicalModel,
+    context,
+    !TransformUtils.isEmpty(inputTransform)
+      ? transformDistribution
+      : null
+  );
 
   // TODO:  Should we filter backspaces & whitespaces out of the transform distribution?
   //        Ideally, the answer (in the future) will be no, but leaving it in right now may pose an issue.
