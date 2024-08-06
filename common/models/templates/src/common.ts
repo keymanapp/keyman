@@ -158,14 +158,12 @@ export function defaultApplyCasing(casing: CasingForm, text: string): string {
  * the trie. There should be a function that converts arbitrary strings
  * (queries) and converts them into a standard search key for a given language
  * model.
- *
- * Fun fact: This opaque type has ALREADY saved my bacon and found a bug!
  */
 export type SearchKey = string & { _: 'SearchKey'};
 
 /**
  * A function that converts a string (word form or query) into a search key
- * (secretly, this is also a string).
+ * (which, internally, is also a string type).
  */
 export interface Wordform2Key {
   (wordform: string): SearchKey;
