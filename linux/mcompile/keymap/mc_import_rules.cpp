@@ -23,23 +23,38 @@ const int KMX_ShiftStateMap[] = {
     0,
     0};
 
-/** @brief Constructor */
+/**
+ * @brief Constructor
+ * @param deadCharacter a deadkey
+*/
 DeadKey::DeadKey(KMX_WCHAR deadCharacter) {
   this->m_deadchar = deadCharacter;
 }
 
-/** @brief return dead character */
+/**
+ * @brief  return dead character
+ * @return deadkey character
+*/
 KMX_WCHAR DeadKey::KMX_DeadCharacter() {
   return this->m_deadchar;
 }
 
-/** @brief set Deadkey with values */
+/**
+ * @brief  set Deadkey with values
+ * @param baseCharacter     the base character
+ * @param  combinedCharacter the combined character
+*/
 void DeadKey::KMX_AddDeadKeyRow(KMX_WCHAR baseCharacter, KMX_WCHAR combinedCharacter) {
   this->m_rgbasechar.push_back(baseCharacter);
   this->m_rgcombchar.push_back(combinedCharacter);
 }
 
-/** @brief check if character exists in DeadKey */
+/**
+ * @brief  check if character exists in DeadKey
+ * @param  baseCharacter a character to be found
+ * @return true if found;
+ *         false if not found
+*/
 bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
   std::vector<KMX_WCHAR>::iterator it;
   for (it = this->m_rgbasechar.begin(); it < m_rgbasechar.end(); it++) {
@@ -53,10 +68,10 @@ bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
 /**
  * @brief  Find a keyvalue for given keycode, shiftstate and caps. A function similar to Window`s ToUnicodeEx() function.
  *
- * Contrary to what the function name might suggest, the function KMX_ToUnicodeEx does not process surrogate pairs. 
+ * Contrary to what the function name might suggest, the function KMX_ToUnicodeEx does not process surrogate pairs.
  * This is because it is used in mcompile only which only deals with latin scripts.
  * In case this function should be used for surrogate pairs, they will be ignored and a message will be printed out
-
+ *
  * @param  keycode  a key of the currently used keyboard Layout
  * @param  pwszBuff Buffer to store resulting character
  * @param  ss       a shiftstate of the currently used keyboard Layout
@@ -65,7 +80,7 @@ bool DeadKey::KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter) {
  * @return -1 if a deadkey was found;
  *          0 if no translation is available;
  *          +1 if character was found and written to pwszBuff
- */
+*/
 int KMX_ToUnicodeEx(guint keycode, PKMX_WCHAR pwszBuff, ShiftState rgkey_ss, int caps, GdkKeymap* keymap) {
 
   GdkKeymapKey* maps;
@@ -121,7 +136,9 @@ KMX_WCHAR KMX_DeadKeyMap(int index, std::vector<DeadKey*>* deadkeys, int deadkey
   return 0xFFFF;
 }
 
-/** @brief Base class for dealing with rgkey*/
+/**
+ * @brief  Base class for dealing with rgkey
+*/
 class KMX_VirtualKey {
 private:
   UINT m_vk;
@@ -136,12 +153,16 @@ public:
     memset(this->m_rgfDeadKey, 0, sizeof(this->m_rgfDeadKey));
   }
 
-/** @brief return member variable virtual key */
+/**
+ * @brief  return member variable virtual key
+*/
   UINT VK() {
     return this->m_vk;
   }
 
-/** @brief return member variable scancode */
+/**
+ * @brief  return member variable scancode
+*/
   UINT SC() {
     return this->m_sc;
   }
@@ -212,7 +233,9 @@ public:
     }
     return true;
   }
-/** @brief check if we use only keys used in mcompile */
+/**
+ * @brief  check if we use only keys used in mcompile
+*/
   bool KMX_IsKeymanUsedKey() {
     return (this->m_vk >= 0x20 && this->m_vk <= 0x5F) || (this->m_vk >= 0x88);
   }
@@ -221,7 +244,9 @@ public:
     return KMX_ShiftStateMap[(int)ss] | (capslock ? (caps ? CAPITALFLAG : NOTCAPITALFLAG) : 0);
   }
 
-/** @brief count the number of keys */
+/**
+ * @brief  count the number of keys
+*/
   int KMX_GetKeyCount(int MaxShiftState) {
     int nkeys = 0;
 
@@ -341,7 +366,9 @@ public:
   }
 };
 
-/** @brief Base class for KMX_loader*/
+/**
+ * @brief  Base class for KMX_loader
+ */
 class KMX_Loader {
 private:
   KMX_BYTE lpKeyStateNull[256];
@@ -372,9 +399,9 @@ public:
 
 /**
  * @brief  find the maximum index of a deadkey
- * @param  p pointer to deadkey
+   @param  p pointer to deadkey
  * @return index of deadkey
- */
+*/
 int KMX_GetMaxDeadkeyIndex(KMX_WCHAR* p) {
   int n = 0;
   while (p && *p) {

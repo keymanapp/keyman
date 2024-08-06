@@ -11,23 +11,13 @@ private:
   std::vector<KMX_WCHAR> m_rgcombchar;
 
 public:
-  /**
-   * @brief  Constructor
-   * @param  deadCharacter a deadkey
-   */
+  /** @brief Constructor */
   DeadKey(KMX_WCHAR deadCharacter);
 
-  /**
-   * @brief  return dead character
-   * @return deadkey character
-   */
+  /** @brief return dead character */
   KMX_WCHAR KMX_DeadCharacter();
 
-  /**
-   * @brief  set Deadkey with values
-   * @param  baseCharacter     the base character
-   * @param  combinedCharacter the combined character
-   */
+  /** @brief set Deadkey with values */
   void KMX_AddDeadKeyRow(KMX_WCHAR baseCharacter, KMX_WCHAR combinedCharacter);
 
   int KMX_Count() {
@@ -46,12 +36,7 @@ public:
     return this->m_rgcombchar[index];
   }
 
-  /**
-   * @brief  check if character exists in DeadKey
-   * @param  baseCharacter a character to be found
-   * @return true if found;
-   *         false if not found
-   */
+  /** @brief check if character exists in DeadKey */
   bool KMX_ContainsBaseCharacter(KMX_WCHAR baseCharacter);
 };
 
