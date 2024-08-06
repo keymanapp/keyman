@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { KeysCompiler } from '../src/compiler/keys.js';
 import { assertCodePoints, compilerTestCallbacks, loadSectionFixture, testCompilationCases } from './helpers/index.js';
 import { KMXPlus, Constants, MarkerParser } from '@keymanapp/common-types';
-import { CompilerMessages } from '../src/compiler/messages.js';
+import { LdmlCompilerMessages } from '../src/compiler/ldml-compiler-messages.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { MetaCompiler } from '../src/compiler/meta.js';
 const keysDependencies = [ ...BASIC_DEPENDENCIES, MetaCompiler ];
@@ -120,7 +120,7 @@ describe('keys', function () {
 
       },
       warnings: [
-        CompilerMessages.Hint_NormalizationDisabled()
+        LdmlCompilerMessages.Hint_NormalizationDisabled()
       ],
     },
     {
@@ -298,18 +298,18 @@ describe('keys.kmap', function () {
     {
       subpath: 'sections/keys/invalid-bad-modifier.xml',
       errors: [
-        CompilerMessages.Error_InvalidModifier({layer:'base',modifiers:'altR-shift'}),
+        LdmlCompilerMessages.Error_InvalidModifier({layer:'base',modifiers:'altR-shift'}),
       ]
     },
     {
       subpath: 'sections/keys/invalid-missing-flick.xml',
       errors: [
-        CompilerMessages.Error_MissingFlicks({flickId:'an-undefined-flick-id',id:'Q'}),
+        LdmlCompilerMessages.Error_MissingFlicks({flickId:'an-undefined-flick-id',id:'Q'}),
       ]
     },
     {
       subpath: 'sections/layr/invalid-invalid-form.xml',
-      errors: [CompilerMessages.Error_InvalidHardware({
+      errors: [LdmlCompilerMessages.Error_InvalidHardware({
         formId: 'holographic',
       }),],
     },
@@ -317,7 +317,7 @@ describe('keys.kmap', function () {
       // warning on custom form
       subpath: 'sections/layr/warn-custom-us-form.xml',
       warnings: [
-        CompilerMessages.Warn_CustomForm({id: "us"}),
+        LdmlCompilerMessages.Warn_CustomForm({id: "us"}),
       ],
       callback: (sect, subpath, callbacks) => {
         const keys = sect as Keys;
@@ -347,7 +347,7 @@ describe('keys.kmap', function () {
       // warning on a custom unknown form - but no error!
       subpath: 'sections/layr/warn-custom-zzz-form.xml',
       warnings: [
-        CompilerMessages.Warn_CustomForm({id: "zzz"}),
+        LdmlCompilerMessages.Warn_CustomForm({id: "zzz"}),
       ],
       callback: (sect, subpath, callbacks) => {
         const keys = sect as Keys;
@@ -376,20 +376,51 @@ describe('keys.kmap', function () {
     {
       subpath: 'sections/layr/error-custom-us-form.xml',
       warnings: [
-        CompilerMessages.Warn_CustomForm({id: "us"}),
+        LdmlCompilerMessages.Warn_CustomForm({id: "us"}),
       ],
       errors: [
-        CompilerMessages.Error_InvalidScanCode({ form: "us", codes: ['ff'] }),
+        LdmlCompilerMessages.Error_InvalidScanCode({ form: "us", codes: ['ff'] }),
       ],
     },
     {
       subpath: 'sections/layr/error-custom-zzz-form.xml',
       warnings: [
-        CompilerMessages.Warn_CustomForm({id: "zzz"}),
+        LdmlCompilerMessages.Warn_CustomForm({id: "zzz"}),
       ],
       errors: [
-        CompilerMessages.Error_InvalidScanCode({ form: "zzz", codes: ['ff'] }),
+        LdmlCompilerMessages.Error_InvalidScanCode({ form: "zzz", codes: ['ff'] }),
       ],
+    },
+    {
+      subpath: 'sections/keys/invalid-undefined-var-1.xml',
+      errors: [
+        LdmlCompilerMessages.Error_MissingStringVariable({id: "varsok"}),
+      ],
+    },
+    {
+      subpath: 'sections/keys/invalid-undefined-var-1b.xml',
+      errors: [
+        LdmlCompilerMessages.Error_MissingStringVariable({id: "varsok"}),
+      ],
+    },
+    // modifiers test
+    {
+      // keep in sync with similar test in test-layr.ts
+      subpath: 'sections/keys/many-modifiers.xml',
+      callback(sect) {
+        const keys = <Keys> sect;
+        assert.ok(keys);
+        const { kmap } = keys;
+        const aMods = kmap.filter(({ key }) => key === 'a').map(({ mod }) => mod);
+        assert.sameDeepMembers(aMods, [
+          constants.keys_mod_none,
+        ], 'modifiers for a');
+        const cMods = kmap.filter(({ key }) => key === 'c').map(({ mod }) => mod);
+        assert.sameDeepMembers(cMods, [
+          constants.keys_mod_altR,
+          constants.keys_mod_ctrl | constants.keys_mod_shift,
+        ], 'modifiers for c');
+      },
     },
   ], keysDependencies);
 
@@ -398,7 +429,7 @@ describe('keys.kmap', function () {
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
-    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_HardwareLayerHasTooManyRows());
+    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_HardwareLayerHasTooManyRows());
   });
 
   it('should reject layouts with too many hardware keys', async function() {
@@ -406,7 +437,7 @@ describe('keys.kmap', function () {
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
-    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({row: 1, hardware: 'us', modifiers: 'none'}));
+    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_RowOnHardwareLayerHasTooManyKeys({row: 1, hardware: 'us', modifiers: 'none'}));
   });
 
   it('should reject layouts with undefined keys', async function() {
@@ -414,13 +445,13 @@ describe('keys.kmap', function () {
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
 
-    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_KeyNotFoundInKeyBag({col: 1, form: 'hardware', keyId: 'foo', layer: 'base', row: 1}));
+    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_KeyNotFoundInKeyBag({col: 1, form: 'hardware', keyId: 'foo', layer: 'base', row: 1}));
   });
   it('should reject layouts with invalid keys', async function() {
     let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/invalid-key-missing-attrs.xml', compilerTestCallbacks, keysDependencies) as Keys;
     assert.isNull(keys);
     assert.equal(compilerTestCallbacks.messages.length, 1);
-    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_KeyMissingToGapOrSwitch({keyId: 'Q'}));
+    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_KeyMissingToGapOrSwitch({keyId: 'Q'}));
   });
   it('should accept layouts with gap/switch keys', async function() {
     let keys = await loadSectionFixture(KeysCompiler, 'sections/keys/gap-switch.xml', compilerTestCallbacks, keysDependencies) as Keys;

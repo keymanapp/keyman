@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="und" conformsTo="45">
+  <info name="layr-hint-custom-form" />
+
+  <layers formId="us">
+    <layer modifiers="caps bogus">
+      <row keys="a b c" />
+    </layer>
+  </layers>
+
+</keyboard3>

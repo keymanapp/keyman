@@ -97,7 +97,6 @@ static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX = 0;
 @property (nonatomic, assign) BOOL useNullChar;
 @property (nonatomic, assign) BOOL debugMode;
 
-- (void)logDebugMessage:(NSString *)format, ...;
 - (NSMenu *)menu;
 - (void)saveActiveKeyboards;
 - (void)readPersistedOptions;

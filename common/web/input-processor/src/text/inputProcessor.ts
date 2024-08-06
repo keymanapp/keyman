@@ -20,7 +20,6 @@ import {
   type ProcessorInitOptions,
   RuleBehavior,
   SystemStoreIDs,
-  type TextTransform
 } from "@keymanapp/keyboard-processor";
 import { TranscriptionCache } from "../transcriptionCache.js";
 
@@ -107,8 +106,20 @@ export default class InputProcessor {
       if(keyEvent.baseTranscriptionToken) {
         const transcription = this.contextCache.get(keyEvent.baseTranscriptionToken);
         if(transcription) {
-          // Restores full context, including deadkeys in their exact pre-keystroke state.
-          outputTarget.restoreTo(transcription.preInput);
+          // Has there been a context change at any point during the multitap?  If so, we need
+          // to revert it.  If not, we assume it's a layer-change multitap, in which case
+          // no such reset is needed.
+          if(!isEmptyTransform(transcription.transform) || !transcription.preInput.isEqual(Mock.from(outputTarget))) {
+            // Restores full context, including deadkeys in their exact pre-keystroke state.
+            outputTarget.restoreTo(transcription.preInput);
+          }
+          /*
+            else:
+            1. We don't need to restore the original context, as it's already
+               in-place.
+            2. Restoring anyway would obliterate any selected text, which is bad
+               if this is a purely-layer-switching multitap.  (#11230)
+          */
         } else {
           console.warn('The base context for the multitap could not be found');
         }
@@ -188,7 +199,7 @@ export default class InputProcessor {
 
     // If it's a key that we 'optimize out' of our fat-finger correction algorithm,
     // we MUST NOT trigger it for this keystroke.
-    let isOnlyLayerSwitchKey = Codes.isKnownOSKModifierKey(keyEvent.kName);
+    let isOnlyLayerSwitchKey = Codes.isFrameKey(keyEvent.kName);
 
     // Best-guess stopgap for possible custom modifier keys.
     // If a key (1) does not affect the context and (2) shifts the active layer,

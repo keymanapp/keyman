@@ -1,8 +1,8 @@
 import 'mocha';
 import { assert } from 'chai';
 import { VarsCompiler } from '../src/compiler/vars.js';
-import { CompilerMessages } from '../src/compiler/messages.js';
-import { CompilerMessages as KmnCompilerMessages } from '@keymanapp/kmc-kmn';
+import { LdmlCompilerMessages } from '../src/compiler/ldml-compiler-messages.js';
+import { KmnCompilerMessages } from '@keymanapp/kmc-kmn';
 import { testCompilationCases } from './helpers/index.js';
 import { KMXPlus, KMX } from '@keymanapp/common-types';
 import { BASIC_DEPENDENCIES } from '../src/compiler/empty-compiler.js';
@@ -32,7 +32,7 @@ describe('vars', function () {
         const vars = <Vars> sect;
         assert.equal(1, vars.sets?.length);
         assert.equal(1, vars.strings?.length);
-        assert.equal(1, vars.unicodeSets?.length);
+        assert.equal(1, vars.usets?.length);
         const set0 = vars.sets[0];
         assert.equal(set0.id.value, "upper");
         assert.equal(set0.value.value, "A B C D E FF");
@@ -42,7 +42,7 @@ describe('vars', function () {
         const string0 = vars.strings[0];
         assert.equal(string0.id.value, "y");
         assert.equal(string0.value.value, "yes");
-        const unicodeSet0 = vars.unicodeSets[0];
+        const unicodeSet0 = vars.usets[0];
         assert.equal(unicodeSet0.id.value, "consonants");
         assert.equal(unicodeSet0.value.value, "[कसतनमह]");
         assert.sameDeepOrderedMembers(unicodeSet0.unicodeSet.ranges, [
@@ -84,8 +84,8 @@ describe('vars', function () {
             "A", "B", "C", "D", "E", "FF", "Yes", "a", "b", "c", "Z",
           ]);
 
-        assert.equal(2, vars.unicodeSets?.length);
-        const unicodeSet0 = vars.unicodeSets[0];
+        assert.equal(2, vars.usets?.length);
+        const unicodeSet0 = vars.usets[0];
         assert.equal(unicodeSet0.id.value, "consonants");
         assert.equal(unicodeSet0.value.value, "[कसतनमह]");
         assert.sameDeepOrderedMembers(unicodeSet0.unicodeSet.ranges, [
@@ -96,7 +96,7 @@ describe('vars', function () {
           [cp('स'), cp('ह')], // range of 2
         ]);
 
-        const unicodeSet1 = vars.unicodeSets[1];
+        const unicodeSet1 = vars.usets[1];
         assert.equal(unicodeSet1.id.value, "mixture");
         assert.equal(unicodeSet1.value.value, "[[abc][कसतनमह]]"); // not canonicalized, just the raw expansion
         assert.sameDeepOrderedMembers(unicodeSet1.unicodeSet.ranges, [
@@ -112,13 +112,13 @@ describe('vars', function () {
     {
       subpath: 'sections/vars/dup0.xml',
       errors: [
-        CompilerMessages.Error_DuplicateVariable({ids: 'y'})
+        LdmlCompilerMessages.Error_DuplicateVariable({ids: 'y'})
       ],
     },
     {
       subpath: 'sections/vars/dup1.xml',
       errors: [
-        CompilerMessages.Error_DuplicateVariable({ids: 'upper, y'})
+        LdmlCompilerMessages.Error_DuplicateVariable({ids: 'upper, y'})
       ],
     },
     {
@@ -148,43 +148,43 @@ describe('vars', function () {
     {
       subpath: 'sections/vars/fail-badref-0.xml',
       errors: [
-        CompilerMessages.Error_MissingStringVariable({id: "yes"}),
+        LdmlCompilerMessages.Error_MissingStringVariable({id: "yes"}),
       ],
     },
     {
       subpath: 'sections/vars/fail-badref-1.xml',
       errors: [
-        CompilerMessages.Error_MissingSetVariable({id: "lower"}),
+        LdmlCompilerMessages.Error_MissingSetVariable({id: "lower"}),
       ],
     },
     {
       subpath: 'sections/vars/fail-badref-2.xml',
       errors: [
-        CompilerMessages.Error_MissingStringVariable({ id: 'doesnotexist' })
+        LdmlCompilerMessages.Error_MissingStringVariable({ id: 'doesnotexist' })
       ],
     },
     {
       subpath: 'sections/vars/fail-badref-3.xml',
       errors: [
-        CompilerMessages.Error_MissingUnicodeSetVariable({id: 'doesnotexist'})
+        LdmlCompilerMessages.Error_MissingUnicodeSetVariable({id: 'doesnotexist'})
       ],
     },
     {
       subpath: 'sections/vars/fail-badref-4.xml',
       errors: [
-        CompilerMessages.Error_NeedSpacesBetweenSetVariables({item: '$[vowels]$[consonants]'})
+        LdmlCompilerMessages.Error_NeedSpacesBetweenSetVariables({item: '$[vowels]$[consonants]'})
       ],
     },
     {
       subpath: 'sections/vars/fail-badref-5.xml',
       errors: [
-        CompilerMessages.Error_CantReferenceSetFromUnicodeSet({id: 'nonUnicodeSet'})
+        LdmlCompilerMessages.Error_CantReferenceSetFromUnicodeSet({id: 'nonUnicodeSet'})
       ],
     },
     {
       subpath: 'sections/vars/fail-badref-6.xml',
       errors: [
-        CompilerMessages.Error_MissingStringVariable({id: 'missingStringInSet'})
+        LdmlCompilerMessages.Error_MissingStringVariable({id: 'missingStringInSet'})
       ],
     },
   ], varsDependencies);
@@ -211,7 +211,7 @@ describe('vars', function () {
       {
         subpath: 'sections/vars/fail-markers-badref-0.xml',
         errors: [
-          CompilerMessages.Error_MissingMarkers({
+          LdmlCompilerMessages.Error_MissingMarkers({
             ids: [
               'doesnt_exist_1',
               'doesnt_exist_2',

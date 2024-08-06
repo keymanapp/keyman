@@ -33,6 +33,7 @@ type
   TDebugEventActionData = class
     ActionType: km_core_action_type;
     dwData: Integer;
+    nExpectedValue: NativeUInt;
     Text: WideString;
   end;
 
@@ -198,6 +199,7 @@ begin
   event.EventType := etAction;
   event.Action.ActionType := KM_CORE_IT_BACK;
   event.Action.dwData := expected_type;
+  event.Action.nExpectedValue := expected_value;
   Add(event);
 end;
 
@@ -359,6 +361,13 @@ begin
   end;
 
   AddDebugItem(debug, debugkeyboard, vk, modifier_state);
+
+  if action._type = KM_CORE_IT_INVALIDATE_CONTEXT then
+  begin
+    // We always ignore invalidate context which can come when a frame key is
+    // pressed (#11172, #11486)
+    Inc(action);
+  end;
 
   if action._type = KM_CORE_IT_EMIT_KEYSTROKE then
   begin

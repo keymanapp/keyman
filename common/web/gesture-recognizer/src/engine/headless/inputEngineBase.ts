@@ -1,4 +1,4 @@
-import EventEmitter from "eventemitter3";
+import { EventEmitter } from "eventemitter3";
 
 import { GestureRecognizerConfiguration } from "../configuration/gestureRecognizerConfiguration.js";
 import { Nonoptional } from "../nonoptional.js";
@@ -56,15 +56,17 @@ export abstract class InputEngineBase<HoveredItemType, StateToken = any> extends
     return source;
   }
 
+  public fulfillInputStart(touchpoint: GestureSource<HoveredItemType, StateToken>) {}
+
   /**
    * Calls to this method will cancel any touchpoints whose internal IDs are _not_ included in the parameter.
    * Designed to facilitate recovery from error cases and peculiar states that sometimes arise when debugging.
    * @param identifiers
    */
-  maintainTouchpointsWithIds(identifiers: number[]) {
-    const identifiersToMaintain = identifiers.map((internal_id) => this.identifierMap[internal_id]);
+  maintainTouchpoints(touchpoints: GestureSource<HoveredItemType, StateToken>[]) {
+    touchpoints ||= [];
     this._activeTouchpoints
-      .filter((source) => !identifiersToMaintain.includes(source.rawIdentifier))
+      .filter((source) => !touchpoints.includes(source))
       // Will trigger `.dropTouchpoint` later in the event chain.
       .forEach((source) => source.terminate(true));
   }
@@ -113,8 +115,9 @@ export abstract class InputEngineBase<HoveredItemType, StateToken = any> extends
 
     this._activeTouchpoints = this._activeTouchpoints.filter((pt) => point != pt);
     for(const key of Object.keys(this.identifierMap)) {
-      if(this.identifierMap[key] == id) {
-        delete this.identifierMap[key];
+      const keyVal = Number.parseInt(key, 10);
+      if(this.identifierMap[keyVal] == id) {
+        delete this.identifierMap[keyVal];
       }
     }
   }

@@ -1,4 +1,4 @@
-import EventEmitter from "eventemitter3";
+import { EventEmitter } from "eventemitter3";
 import { type KeyEvent, type RuleBehavior } from "@keymanapp/keyboard-processor";
 
 export type KeyEventResultCallback = (result: RuleBehavior, error?: Error) => void;

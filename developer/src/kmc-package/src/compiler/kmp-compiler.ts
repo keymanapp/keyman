@@ -1,9 +1,9 @@
-import * as xml2js from 'xml2js';
+import { xml2js } from '@keymanapp/common-types';
 import JSZip from 'jszip';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
 import { KmpJsonFile, KpsFile, SchemaValidators, CompilerCallbacks, KeymanFileTypes, KvkFile, KeymanCompiler, CompilerOptions, KeymanCompilerResult, KeymanCompilerArtifacts, KeymanCompilerArtifact } from '@keymanapp/common-types';
-import { CompilerMessages } from './package-compiler-messages.js';
+import { PackageCompilerMessages } from './package-compiler-messages.js';
 import { PackageMetadataCollector } from './package-metadata-collector.js';
 import { KmpInfWriter } from './kmp-inf-writer.js';
 import { transcodeToCP1252 } from './cp1252.js';
@@ -21,29 +21,76 @@ const KMP_INF_FILENAME = 'kmp.inf';
 // this filename for existing keyboard packages.
 const WELCOME_HTM_FILENAME = 'welcome.htm';
 
+/**
+ * @public
+ * Options for the .kps compiler
+ */
 export interface KmpCompilerOptions extends CompilerOptions {
   // Note: WindowsPackageInstallerCompilerOptions extends KmpCompilerOptions, so
   // be careful when modifying this interface
 };
 
+/**
+ * @public
+ * Internal in-memory build artifacts from a successful compilation
+ */
 export interface KmpCompilerArtifacts extends KeymanCompilerArtifacts {
+  /**
+   * Binary keyboard package filedata and filename - installable into Keyman
+   * desktop and mobile projects
+   */
   kmp: KeymanCompilerArtifact;
 };
 
+/**
+ * @public
+ * Build artifacts from the .kps compiler
+ */
 export interface KmpCompilerResult extends KeymanCompilerResult {
+  /**
+   * Internal in-memory build artifacts from a successful compilation. Caller
+   * can write these to disk with {@link KmpCompiler.write}
+   */
   artifacts: KmpCompilerArtifacts;
 };
 
+/**
+ * @public
+ * Compiles a .kps file to a .kmp archive. The compiler does not read or write
+ * from filesystem or network directly, but relies on callbacks for all external
+ * IO.
+ */
 export class KmpCompiler implements KeymanCompiler {
   private callbacks: CompilerCallbacks;
   private options: KmpCompilerOptions;
 
+  /**
+   * Initialize the compiler.
+   * Copies options.
+   * @param callbacks - Callbacks for external interfaces, including message
+   *                    reporting and file io
+   * @param options   - Compiler options
+   * @returns false if initialization fails
+   */
   public async init(callbacks: CompilerCallbacks, options: KmpCompilerOptions): Promise<boolean> {
     this.callbacks = callbacks;
     this.options = options ? {...options} : {};
     return true;
   }
 
+  /**
+   * Compiles a .kps file to .kmp file. Returns an object containing binary
+   * artifacts on success. The files are passed in by name, and the compiler
+   * will use callbacks as passed to the {@link KmpCompiler.init} function
+   * to read any input files by disk.
+   * @param infile  - Path to source file. Path will be parsed to find relative
+   *                  references in the .kmn file, such as icon or On Screen
+   *                  Keyboard file
+   * @param outfile - Path to output file. The file will not be written to, but
+   *                  will be included in the result for use by
+   *                  {@link KmpCompiler.write}.
+   * @returns         Binary artifacts on success, null on failure.
+   */
   public async run(inputFilename: string, outputFilename?: string): Promise<KmpCompilerResult> {
     const kmpJsonData = this.transformKpsToKmpObject(inputFilename);
     if(!kmpJsonData) {
@@ -80,11 +127,24 @@ export class KmpCompiler implements KeymanCompiler {
     return result;
   }
 
+  /**
+   * Write artifacts from a successful compile to disk, via callbacks methods.
+   * The artifacts written may include:
+   *
+   * - .kmp file - binary keyboard package used by Keyman on desktop and touch
+   *   platforms
+   *
+   * @param artifacts - object containing artifact binary data to write out
+   * @returns true on success
+   */
   public async write(artifacts: KmpCompilerArtifacts): Promise<boolean> {
     this.callbacks.fs.writeFileSync(artifacts.kmp.filename, artifacts.kmp.data);
     return true;
   }
 
+  /**
+   * @internal
+   */
   public transformKpsToKmpObject(kpsFilename: string): KmpJsonFile.KmpJsonFile {
     const kps = this.loadKpsFile(kpsFilename);
     if(!kps) {
@@ -105,11 +165,14 @@ export class KmpCompiler implements KeymanCompiler {
     return kmp;
   }
 
+  /**
+   * @internal
+   */
   public loadKpsFile(kpsFilename: string): KpsFile.KpsFile {
     // Load the KPS data from XML as JS structured data.
     const buffer = this.callbacks.loadFile(kpsFilename);
     if(!buffer) {
-      this.callbacks.reportMessage(CompilerMessages.Error_FileDoesNotExist({filename: kpsFilename}));
+      this.callbacks.reportMessage(PackageCompilerMessages.Error_FileDoesNotExist({filename: kpsFilename}));
       return null;
     }
     const data = new TextDecoder().decode(buffer);
@@ -123,7 +186,7 @@ export class KmpCompiler implements KeymanCompiler {
         try {
           parser.parseString(data, (e: unknown, r: unknown) => { if(e) throw e; a = r as KpsFile.KpsPackage });
         } catch(e) {
-          this.callbacks.reportMessage(CompilerMessages.Error_InvalidPackageFile({e}));
+          this.callbacks.reportMessage(PackageCompilerMessages.Error_InvalidPackageFile({e}));
         }
         return a;
     })();
@@ -136,6 +199,11 @@ export class KmpCompiler implements KeymanCompiler {
     return kps;
   }
 
+  readonly normalizePath = (path: string) => path || path === '' ? path.trim().replaceAll('\\','/') : undefined;
+
+  /**
+   * @internal
+   */
   public transformKpsFileToKmpObject(kpsFilename: string, kps: KpsFile.KpsFile): KmpJsonFile.KmpJsonFile {
 
     //
@@ -164,13 +232,13 @@ export class KmpCompiler implements KeymanCompiler {
     //
 
     if(kps.Options) {
-      kmp.options.executeProgram = kps.Options.ExecuteProgram || undefined;
-      kmp.options.graphicFile = kps.Options.GraphicFile || undefined;
-      kmp.options.msiFilename = kps.Options.MsiFileName || undefined;
-      kmp.options.msiOptions = kps.Options.MsiOptions || undefined;
-      kmp.options.readmeFile = kps.Options.ReadMeFile || undefined;
-      kmp.options.licenseFile = kps.Options.LicenseFile || undefined;
-      kmp.options.welcomeFile = kps.Options.WelcomeFile || undefined;
+      kmp.options.executeProgram = this.normalizePath(kps.Options.ExecuteProgram || undefined);
+      kmp.options.graphicFile = this.normalizePath(kps.Options.GraphicFile || undefined);
+      kmp.options.msiFilename = this.normalizePath(kps.Options.MSIFileName || undefined);
+      kmp.options.msiOptions = kps.Options.MSIOptions || undefined;
+      kmp.options.readmeFile = this.normalizePath(kps.Options.ReadMeFile || undefined);
+      kmp.options.licenseFile = this.normalizePath(kps.Options.LicenseFile || undefined);
+      kmp.options.welcomeFile = this.normalizePath(kps.Options.WelcomeFile || undefined);
     }
 
     //
@@ -200,12 +268,22 @@ export class KmpCompiler implements KeymanCompiler {
     if(kps.Files && kps.Files.File) {
       kmp.files = this.arrayWrap(kps.Files.File).map((file: KpsFile.KpsFileContentFile) => {
         return {
-          name: file.Name.trim().replaceAll('\\','/'),
-          description: file.Description.trim(),
+          name: this.normalizePath(file.Name),
+          description: (file.Description ?? '').trim(),
           copyLocation: parseInt(file.CopyLocation, 10) || undefined
           // note: we don't emit fileType as that is not permitted in kmp.json
         };
       });
+      if(!kmp.files.reduce((result: boolean, file) => {
+        if(!file.name) {
+          // as the filename field is missing or blank, we'll try with the description instead
+          this.callbacks.reportMessage(PackageCompilerMessages.Error_FileRecordIsMissingName({description: file.description ?? '(no description)'}));
+          return false;
+        }
+        return result;
+      }, true)) {
+        return null;
+      }
     }
     kmp.files = kmp.files ?? [];
 
@@ -230,11 +308,11 @@ export class KmpCompiler implements KeymanCompiler {
 
     if(kps.Keyboards && kps.Keyboards.Keyboard) {
       kmp.keyboards = this.arrayWrap(kps.Keyboards.Keyboard).map((keyboard: KpsFile.KpsFileKeyboard) => ({
-        displayFont: keyboard.DisplayFont ? this.callbacks.path.basename(keyboard.DisplayFont) : undefined,
-        oskFont: keyboard.OSKFont ? this.callbacks.path.basename(keyboard.OSKFont) : undefined,
-        name:keyboard.Name.trim(),
-        id:keyboard.ID.trim(),
-        version:keyboard.Version.trim(),
+        displayFont: keyboard.DisplayFont ? this.callbacks.path.basename(this.normalizePath(keyboard.DisplayFont)) : undefined,
+        oskFont: keyboard.OSKFont ? this.callbacks.path.basename(this.normalizePath(keyboard.OSKFont)) : undefined,
+        name:keyboard.Name?.trim(),
+        id:keyboard.ID?.trim(),
+        version:keyboard.Version?.trim(),
         rtl:keyboard.RTL == 'True' ? true : undefined,
         languages: keyboard.Languages ?
           this.kpsLanguagesToKmpLanguages(this.arrayWrap(keyboard.Languages.Language) as KpsFile.KpsFileLanguage[]) :
@@ -246,12 +324,12 @@ export class KmpCompiler implements KeymanCompiler {
           undefined,
         webDisplayFonts: keyboard.WebDisplayFonts ?
           (this.arrayWrap(keyboard.WebDisplayFonts.Font) as KpsFile.KpsFileFont[]).map(
-            e => (this.callbacks.path.basename(e.$.Filename))
+            e => (this.callbacks.path.basename(this.normalizePath(e.$.Filename)))
           ) :
           undefined,
         webOskFonts: keyboard.WebOSKFonts ?
           (this.arrayWrap(keyboard.WebOSKFonts.Font) as KpsFile.KpsFileFont[]).map(
-            e => (this.callbacks.path.basename(e.$.Filename))
+            e => (this.callbacks.path.basename(this.normalizePath(e.$.Filename)))
           ) :
           undefined,
       }));
@@ -401,6 +479,7 @@ export class KmpCompiler implements KeymanCompiler {
   }
 
   /**
+   * @internal
    * Returns a Promise to the serialized data which can then be written to a .kmp file.
    *
    * @param kpsFilename - Filename of the kps, not read, used only for calculating relative paths
@@ -430,14 +509,14 @@ export class KmpCompiler implements KeymanCompiler {
 
       if(this.callbacks.path.isAbsolute(filename)) {
         // absolute paths are not portable to other computers
-        this.callbacks.reportMessage(CompilerMessages.Warn_AbsolutePath({filename: filename}));
+        this.callbacks.reportMessage(PackageCompilerMessages.Warn_AbsolutePath({filename: filename}));
       }
 
       filename = this.callbacks.resolveFilename(kpsFilename, filename);
       const basename = this.callbacks.path.basename(filename);
 
       if(!this.callbacks.fs.existsSync(filename)) {
-        this.callbacks.reportMessage(CompilerMessages.Error_FileDoesNotExist({filename: filename}));
+        this.callbacks.reportMessage(PackageCompilerMessages.Error_FileDoesNotExist({filename: filename}));
         failed = true;
         return;
       }
@@ -446,7 +525,7 @@ export class KmpCompiler implements KeymanCompiler {
       try {
         memberFileData = this.callbacks.loadFile(filename);
       } catch(e) {
-        this.callbacks.reportMessage(CompilerMessages.Error_FileCouldNotBeRead({filename: filename, e: e}));
+        this.callbacks.reportMessage(PackageCompilerMessages.Error_FileCouldNotBeRead({filename: filename, e: e}));
         failed = true;
         return;
       }
@@ -526,7 +605,7 @@ export class KmpCompiler implements KeymanCompiler {
       data[1] != KvkFile.KVK_HEADER_IDENTIFIER_BYTES[1] ||
       data[2] != KvkFile.KVK_HEADER_IDENTIFIER_BYTES[2] ||
       data[3] != KvkFile.KVK_HEADER_IDENTIFIER_BYTES[3]) {
-      this.callbacks.reportMessage(CompilerMessages.Warn_FileIsNotABinaryKvkFile({filename: filename}));
+      this.callbacks.reportMessage(PackageCompilerMessages.Warn_FileIsNotABinaryKvkFile({filename: filename}));
     }
   }
 }

@@ -53,10 +53,10 @@ void debug_context(km_core_debug_context_type context_type) {
   } else {
     std::cout << "cached context: " << context << std::endl;
   }
-  km_core_cp_dispose(context);
+  km_core_cu_dispose(context);
 }
 
-bool is_identical_context(km_core_cp const *cached_context, km_core_debug_context_type context_type) {
+bool is_identical_context(km_core_cu const *cached_context, km_core_debug_context_type context_type) {
   size_t buf_size;
   km_core_context_item * citems = nullptr;
 
@@ -68,7 +68,7 @@ bool is_identical_context(km_core_cp const *cached_context, km_core_debug_contex
     try_status(km_core_context_get(km_core_state_context(test_state), &citems));
   }
   try_status(context_items_to_utf16(citems, nullptr, &buf_size));
-  km_core_cp* new_cached_context = new km_core_cp[buf_size];
+  km_core_cu* new_cached_context = new km_core_cu[buf_size];
   try_status(context_items_to_utf16(citems, new_cached_context, &buf_size));
 
   km_core_context_items_dispose(citems);
@@ -79,7 +79,7 @@ bool is_identical_context(km_core_cp const *cached_context, km_core_debug_contex
 }
 
 void test_context_normalization_already_nfd() {
-  km_core_cp const *app_context_nfd = u"A\u0300";
+  km_core_cu const *app_context_nfd = u"A\u0300";
   setup("k_001_tiny.kmx");
   assert(km_core_state_context_set_if_needed(test_state, app_context_nfd) == KM_CORE_CONTEXT_STATUS_UPDATED);
   assert(is_identical_context(app_context_nfd, KM_CORE_DEBUG_CONTEXT_APP));
@@ -88,8 +88,8 @@ void test_context_normalization_already_nfd() {
 }
 
 void test_context_normalization_basic() {
-  km_core_cp const *application_context = u"This is a test À";
-  km_core_cp const *cached_context =      u"This is a test A\u0300";
+  km_core_cu const *application_context = u"This is a test À";
+  km_core_cu const *cached_context =      u"This is a test A\u0300";
   setup("k_001_tiny.kmx");
   assert(km_core_state_context_set_if_needed(test_state, application_context) == KM_CORE_CONTEXT_STATUS_UPDATED);
   assert(is_identical_context(application_context, KM_CORE_DEBUG_CONTEXT_APP));
@@ -99,8 +99,8 @@ void test_context_normalization_basic() {
 
 void test_context_normalization_hefty() {
                                           // Latin     Latin            "ṩ"                   "Å"                 Tirhuta U+114bc -> U+114B9 U+114B0
-  km_core_cp const *application_context = u"À"       u"é̖"             u"\u1e69"              u"\u212b"           u"\U000114BC";
-  km_core_cp const *cached_context =      u"A\u0300" u"e\u0316\u0301" u"\u0073\u0323\u0307"  u"\u0041\u030a"     u"\U000114B9\U000114B0";
+  km_core_cu const *application_context = u"À"       u"é̖"             u"\u1e69"              u"\u212b"           u"\U000114BC";
+  km_core_cu const *cached_context =      u"A\u0300" u"e\u0316\u0301" u"\u0073\u0323\u0307"  u"\u0041\u030a"     u"\U000114B9\U000114B0";
   setup("k_001_tiny.kmx");
   assert(km_core_state_context_set_if_needed(test_state, application_context) == KM_CORE_CONTEXT_STATUS_UPDATED);
   assert(is_identical_context(application_context, KM_CORE_DEBUG_CONTEXT_APP));
@@ -110,11 +110,22 @@ void test_context_normalization_hefty() {
 
 void test_context_normalization_invalid_unicode() {
                                           // unpaired surrogate     illegal
-  km_core_cp const application_context[] = { 0xDC01, 0x0020, 0x0020, 0xFFFF, 0x0000 };
-  km_core_cp const cached_context[] =      { 0xDC01, 0x0020, 0x0020, 0xFFFF, 0x0000 };
+  km_core_cu const application_context[] = { 0xDC01, 0x0020, 0x0020, 0xFFFF, 0x0000 };
+  km_core_cu const cached_context[] =      { 0xDC01, 0x0020, 0x0020, 0xFFFF, 0x0000 };
   setup("k_001_tiny.kmx");
   assert(km_core_state_context_set_if_needed(test_state, application_context) == KM_CORE_CONTEXT_STATUS_UPDATED);
   assert(is_identical_context(application_context, KM_CORE_DEBUG_CONTEXT_APP));
+  assert(is_identical_context(cached_context, KM_CORE_DEBUG_CONTEXT_CACHED));
+  teardown();
+}
+
+void test_context_normalization_lone_trailing_surrogate() {
+                                   // unpaired trail surrogate
+  km_core_cu const application_context[] = { 0xDC01, 0x0020, 0x0020, 0x0000 };
+  km_core_cu const cached_context[] = /* skipped*/ { 0x0020, 0x0020, 0x0000 };
+  setup("k_001_tiny.kmx");
+  assert(km_core_state_context_set_if_needed(test_state, application_context) == KM_CORE_CONTEXT_STATUS_UPDATED);
+  assert(is_identical_context(application_context+1, KM_CORE_DEBUG_CONTEXT_APP)); // first code unit is skipped
   assert(is_identical_context(cached_context, KM_CORE_DEBUG_CONTEXT_CACHED));
   teardown();
 }
@@ -123,7 +134,8 @@ void test_context_normalization() {
   test_context_normalization_already_nfd();
   test_context_normalization_basic();
   test_context_normalization_hefty();
-  // TODO: we need to strip illegal chars: test_context_normalization_invalid_unicode(); // -- unpaired surrogate, illegals
+  // TODO: see #10392 we need to strip illegal chars: test_context_normalization_invalid_unicode(); // -- unpaired surrogate, illegals
+  test_context_normalization_lone_trailing_surrogate();
 }
 
 //-------------------------------------------------------------------------------------

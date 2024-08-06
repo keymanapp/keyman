@@ -31,7 +31,6 @@
 #define SZMAX_STORENAME	80
 #define SZMAX_GROUPNAME 80
 #define SZMAX_DEADKEYNAME 80
-#define SZMAX_ERRORTEXT 512
 #define SZMAX_VKDICTIONARYNAME 80
 
 #define MAX_WARNINGS 100
@@ -166,27 +165,5 @@ const KMX_DWORD sz_FILE_GROUP = sizeof(FILE_GROUP);
 const KMX_DWORD sz_FILE_DEADKEY = sizeof(FILE_DEADKEY);
 const KMX_DWORD sz_FILE_VKDICTIONARY = sizeof(FILE_VKDICTIONARY);
 const KMX_DWORD sz_FILE_KEYBOARD = sizeof(FILE_KEYBOARD);
-
-struct COMPMSG {
-  KMX_CHAR szText[SZMAX_ERRORTEXT];
-  KMX_DWORD Line;
-  KMX_DWORD dwMsgCode;
-};
-
-typedef COMPMSG *PCOMPMSG;
-
-struct COMPILEMESSAGES {
-  int nMessages;
-  int nErrors;
-
-  PCOMPMSG cm;
-
-  KMX_DWORD fatalCode;
-  KMX_CHAR szFatalText[SZMAX_ERRORTEXT];
-
-  KMX_DWORD currentLine;
-};
-
-typedef COMPILEMESSAGES *PCOMPILEMESSAGES;
 
 #endif	// _COMPFILE_H

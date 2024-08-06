@@ -17,10 +17,6 @@
 #include "debuglog.h"
 
 #include "core_icu.h"
-#include "unicode/uniset.h"
-#include "unicode/usetiter.h"
-#include "unicode/regex.h"
-#include "unicode/utext.h"
 
 namespace km {
 namespace core {
@@ -71,31 +67,12 @@ typedef std::deque<marker_entry> marker_map;
 /** count number of non-end entries */
 size_t count_markers(const marker_map &map);
 
-/** Normalize a u32string inplace to NFD. @return false on failure */
-bool normalize_nfd(std::u32string &str);
-/** Normalize a u16string inplace to NFD. @return false on failure */
-bool normalize_nfd(std::u16string &str);
 /** Normalize a u32string inplace to NFD, retaining markers.
  * @param markers will be populated with marker chars
  * @return false on failure
  **/
 bool normalize_nfd_markers_segment(std::u32string &str, marker_map &markers, marker_encoding encoding = plain_sentinel);
 bool normalize_nfd_markers(std::u32string &str, marker_encoding encoding = plain_sentinel);
-
-// /** Normalize a u32string inplace to NFC, retaining markers.
-//  * @param markers will be populated with marker chars
-//  * @return false on failure
-//  **/
-// bool normalize_nfd_markers_segment(std::u32string &str, marker_map &markers, marker_encoding encoding = plain_sentinel);
-// bool normalize_nfd_markers_segment(std::u16string &str, marker_map &markers, marker_encoding encoding = plain_sentinel);
-// inline bool normalize_nfc_markers(std::u32string &str, marker_encoding encoding = plain_sentinel);
-// inline bool normalize_nfc_markers(std::u16string &str, marker_encoding encoding = plain_sentinel);
-
-// /** Normalize a u32string inplace to NFC. @return false on failure */
-// bool normalize_nfc(std::u32string &str);
-
-// /** Normalize a u16string inplace to NFC. @return false on failure */
-// bool normalize_nfc(std::u16string &str);
 
 /** Remove markers and optionally note their glue characters in the map */
 std::u32string remove_markers(const std::u32string &str, marker_map *markers = nullptr, marker_encoding encoding = plain_sentinel);

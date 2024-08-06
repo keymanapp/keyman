@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="fail-bad-tran-2"/>
+
+  <keys />
+
+  <!-- this is here because this test is used by test-compiler-e2e -->
+  <layers formId="us">
+    <layer id="base">
+      <row keys="a b c" />
+    </layer>
+  </layers>
+
+  <transforms type="simple">
+    <transformGroup>
+      <transform from="\u0127" to="x"/> <!-- fail: use \u{1234} instead -->
+    </transformGroup>
+  </transforms>
+</keyboard3>

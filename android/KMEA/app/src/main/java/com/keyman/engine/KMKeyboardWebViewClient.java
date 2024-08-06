@@ -90,10 +90,7 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
         // Revert to default (index 0) or fallback keyboard
         keyboardInfo = KMManager.getKeyboardInfo(context, 0);
         if (keyboardInfo == null) {
-          // Only log SystemKeyboard to Sentry because some keyboard apps like FV don't install keyboards until the user chooses
-          if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-            KMLog.LogError(TAG, "No keyboards installed. Reverting to fallback");
-          }
+          // Don't log to Sentry because some keyboard apps like FV don't install keyboards until the user chooses
           keyboardInfo = KMManager.getDefaultKeyboard(context);
         }
         if (keyboardInfo != null) {

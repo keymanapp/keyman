@@ -22,7 +22,7 @@ working on ‘layr’, using ‘disp’ as a model from https://github.com/keyma
 
 ## XML changes
 
-- `resources/standards-data/ldml-keyboards/techpreview/`  : update / reimport / fix fixup script if needed
+- `resources/standards-data/ldml-keyboards/45/`  : update / reimport / fix fixup script if needed
 - E/C: `common/web/types/src/ldml-keyboard/ldml-keyboard-xml.ts`
     - add to `LKKeyboard` and subproperties as needed to support the structure on the XML side
 - Now would be a good time to stop and make sure everything compiles. It didn’t, there was an unrelated issue with snprintf!

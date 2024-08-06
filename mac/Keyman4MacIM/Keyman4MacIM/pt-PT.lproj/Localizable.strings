@@ -26,10 +26,10 @@
 "message-keyboard-file-unreadable" = "Não foi possível ler o arquivo Keyman '%@'.";
 
 /* Message displayed in Configuration window when keyboard cannot be loaded */
-"message-error-loading-keyboard" = "(error loading keyboard)";
+"message-error-loading-keyboard" = "(erro ao carregar teclado)";
 
 /* Message displayed in Configuration window when keyboard metadata cannot be loaded */
-"message-error-unknown-metadata" = "unknown";
+"message-error-unknown-metadata" = "desconhecido";
 
 /* Button text to acknowledge that .kmp file could not be read  */
 "button-keyboard-file-unreadable" = "OK";
@@ -50,22 +50,25 @@
 "button-download-complete" = "Concluído";
 
 /* keyboards label in the Package Information window */
-"keyboards-label" = "Keyboards:";
+"keyboards-label" = "Teclados:";
 
 /* fonts label in the Package Information window */
-"fonts-label" = "Fonts:";
+"fonts-label" = "Tipos de letra:";
 
 /* package version label in the Package Information window */
-"package-version-label" = "Package Version:";
+"package-version-label" = "Versão do pacote:";
 
 /* author label in the Package Information window */
-"author-label" = "Author:";
+"author-label" = "Autor:";
 
 /* website label in the Package Information window */
-"website-label" = "Website:";
+"website-label" = "Página web:";
 
 /* copyright label in the Package Information window */
-"copyright-label" = "Copyright:";
+"copyright-label" = "Direitos de autor:";
 
 /* message displayed to alert user to need grant accessibility permission */
-"privacy-alert-text" = "To function properly, Keyman requires accessibility features:\n\nGrant access in System Preferences, Security & Privacy.\nRestart your system.";
+"privacy-alert-text" = "Para funcionar corretamente, o Keyman requer recursos de acessibilidade:\n\nConceda acesso em Definições do Sistema, Segurança e Privacidade.\nReinício do sistema.";
+
+/* Text of menu item in Input Menu when no Keyboards are configured -- include parentheses  */
+"no-keyboard-configured-menu-placeholder" = "(Nenhum teclado configurado)";

@@ -30,15 +30,33 @@
  * prediction API exclusively.
  */
 
+interface Wordform2Key {
+  (wordform: string): string;
+}
+
+export interface DummyOptions {
+  toKey?: Wordform2Key,
+  futureSuggestions?: Outcome<Suggestion>[][];
+  punctuation?: LexicalModelPunctuation;
+  applyCasing?: (form: CasingForm, text: string) => string;
+  wordbreaker?: WordBreakingFunction;
+  languageUsesCasing?: boolean;
+}
+
 /**
  * The Dummy Model that returns nonsensical, but predictable results.
  */
-export default class DummyModel implements LexicalModel {
+export class DummyModel implements LexicalModel {
   configuration: Configuration;
   punctuation?: LexicalModelPunctuation;
-  private _futureSuggestions: Suggestion[][];
+  toKey?: Wordform2Key;
+  applyCasing?: (form: CasingForm, text: string) => string;
+  wordbreaker?: WordBreakingFunction;
+  languageUsesCasing?: boolean;
 
-  constructor(options?: any) {
+  private _futureSuggestions: Outcome<Suggestion>[][];
+
+  constructor(options?: DummyOptions) {
     options = options || {};
     // Create a shallow copy of the suggestions;
     // this class mutates the array.
@@ -48,6 +66,11 @@ export default class DummyModel implements LexicalModel {
     if (options.punctuation) {
       this.punctuation = options.punctuation;
     }
+
+    this.toKey = options.toKey;
+    this.wordbreaker = options.wordbreaker;
+    this.applyCasing = options.applyCasing;
+    this.languageUsesCasing = options.languageUsesCasing;
   }
 
   configure(capabilities: Capabilities): Configuration {
@@ -59,13 +82,12 @@ export default class DummyModel implements LexicalModel {
     return this.configuration;
   }
 
-  predict(transform: Transform, context: Context, injectedSuggestions?: Suggestion[]): Distribution<Suggestion> {
-    let makeUniformDistribution = function(suggestions: Suggestion[]): Distribution<Suggestion> {
+  predict(transform: Transform, context: Context, injectedSuggestions?: Outcome<Suggestion>[]): Distribution<Suggestion> {
+    let makeUniformDistribution = function(suggestions: Outcome<Suggestion>[]): Distribution<Suggestion> {
       let distribution: Distribution<Suggestion> = [];
-      let n = suggestions.length;
 
       for(let s of suggestions) {
-        distribution.push({sample: s, p: 1});  // For a dummy model, this is sufficient.  The uniformness is all that matters.
+        distribution.push({sample: s, p: s.p !== undefined ? s.p : 1});  // For a dummy model, this is sufficient.  The uniformness is all that matters.
       }
 
       return distribution;
@@ -84,3 +106,5 @@ export default class DummyModel implements LexicalModel {
     }
   }
 };
+
+export default DummyModel;

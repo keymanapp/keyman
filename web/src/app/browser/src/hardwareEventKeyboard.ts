@@ -256,10 +256,6 @@ export default class HardwareEventKeyboard extends HardKeyboard {
     });
   }
 
-  get activeKeyboard(): Keyboard {
-    return this.contextManager.activeKeyboard.keyboard;
-  }
-
   /**
    * Function     _KeyDown
    * Scope        Private
@@ -279,7 +275,7 @@ export default class HardwareEventKeyboard extends HardKeyboard {
 
     // Prevent mapping element is readonly or tagged as kmw-disabled
     const el = target.getElement();
-    if(el?.className?.indexOf('kmw-disabled') >= 0) {
+    if(el?.getAttribute('class')?.indexOf('kmw-disabled') >= 0) {
       return true;
     }
 
@@ -293,7 +289,7 @@ export default class HardwareEventKeyboard extends HardKeyboard {
    */
   _KeyPress: (e: KeyboardEvent) => boolean = (e) => {
     const target = eventOutputTarget(e);
-    if(!target || this.activeKeyboard == null) {
+    if(!target || this.contextManager.activeKeyboard?.keyboard == null) {
       return true;
     }
 
@@ -406,7 +402,7 @@ export default class HardwareEventKeyboard extends HardKeyboard {
     // _Debug('KeyPress code='+Levent.Lcode+'; Ltarg='+Levent.Ltarg.tagName+'; LisVirtualKey='+Levent.LisVirtualKey+'; _KeyPressToSwallow='+keymanweb._KeyPressToSwallow+'; keyCode='+(e?e.keyCode:'nothing'));
 
     /* I732 START - 13/03/2007 MCD: Swedish: Start positional keyboard layout code: prevent keystroke */
-    if(!this.activeKeyboard.isMnemonic) {
+    if(!this.contextManager.activeKeyboard?.keyboard.isMnemonic) {
       if(!this.swallowKeypress) {
         return true;
       }

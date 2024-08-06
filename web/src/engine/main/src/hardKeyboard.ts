@@ -1,4 +1,4 @@
-import EventEmitter from "eventemitter3";
+import { EventEmitter } from "eventemitter3";
 import { Keyboard, KeyMapping, KeyEvent, type RuleBehavior, Codes } from "@keymanapp/keyboard-processor";
 import { KeyEventSourceInterface } from 'keyman/engine/events';
 

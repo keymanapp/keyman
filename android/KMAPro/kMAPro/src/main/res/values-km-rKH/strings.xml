@@ -53,6 +53,7 @@
   <string name="request_storage_permission" comment="Request storage permission to access keyboard packages">    ដើម្បី​ដំឡើង​កញ្ចប់​ក្ដារ​ចុច សូម​អនុញ្ញាត​ឱ្យ Keyman មាន​សិទ្ធិ​អាន​ឧបករណ៍​ផ្ទុក​ខាង​ក្រៅ។</string>
   <!-- Context: Android Storage Permission -->
   <string name="storage_permission_denied" comment="Keyboard package installation may fail since Android storage permission not granted">សំណើ​សុំ​សិទ្ធិ​ចូល​ប្រើ​ឧបករណ៍​ផ្ទុក​ត្រូវ​បាន​បដិសេធ។ អាច​បរាជ័យ​ក្នុង​ការដំឡើង​កញ្ចប់​ក្ដារចុច</string>
+  <string name="storage_permission_denied2" comment="Keyboard package installation failed. Recommend install from local file">សំណើ​សុំ​សិទ្ធិ​ចូល​ប្រើ​ឧបករណ៍​ផ្ទុក​ត្រូវ​បានបរាជ័យ។ សូមទៅកាន់ការកំណត់ Keyman - ដំឡើង​ពី​​​ឧបករណ៍នេះ</string>
   <!-- Context: Keyman Settings menu -->
   <string name="keyman_settings" comment="Settings menu title">ការ​កំណត់</string>
   <!-- Context: Keyman Settings menu -->

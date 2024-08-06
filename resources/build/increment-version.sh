@@ -30,6 +30,8 @@ gitbranch=`git branch --show-current`
 
 FORCE=0
 HISTORY_FORCE=
+fromversion=
+toversion=
 
 if [[ $# -gt 0 ]]; then
   if [[ "$1" == "-f" ]]; then
@@ -42,13 +44,14 @@ fi
 if [[ $# -gt 0 ]]; then
   # We want the action to specify the branch as a consistency check
   # for now at least.
-
   action=$1
   if [[ $# -gt 1 ]]; then
     base=$2
+    shift
   else
     action=help
   fi
+  shift
 
   if [[ $action == commit ]]; then
     if [ "$base" != "master" ] && [ "$base" != "beta" ] && [[ ! "$base" =~ ^stable-[0-9]+\.[0-9]+$ ]]; then
@@ -59,6 +62,13 @@ if [[ $# -gt 0 ]]; then
     if [ "$base" != "$gitbranch" ]; then
       echo "Branch doesn't match currently checked out branch."
       exit 2
+    fi
+
+    # commit action parameters
+    if [[ $# -gt 0 ]]; then
+      # next two parameters are --from and --to
+      fromversion="$1"
+      toversion="$2"
     fi
   fi
 else
@@ -93,7 +103,11 @@ npm ci
 echo "increment-version.sh: running resources/build/version"
 pushd "$KEYMAN_ROOT"
 ABORT=0
-node resources/build/version/build/src/index.js history version -t "$GITHUB_TOKEN" -b "$base" $HISTORY_FORCE || ABORT=$?
+if [[ -z "$fromversion" ]]; then
+  node resources/build/version/build/src/index.js history version -t "$GITHUB_TOKEN" -b "$base" $HISTORY_FORCE || ABORT=$?
+else
+  node resources/build/version/build/src/index.js history version -t "$GITHUB_TOKEN" -b "$base" $HISTORY_FORCE --from "$fromversion" --to "$toversion" || ABORT=$?
+fi
 
 if [[ $ABORT = 50 ]]; then
   if [[ $FORCE = 0 ]]; then

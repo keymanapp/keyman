@@ -15,6 +15,7 @@
 #import "CoreTestStaticHelperMethods.h"
 #import "CoreAction.h"
 #import "MacVKCodes.h"
+#import "KMELogs.h"
 
 @interface CoreWrapperTests : XCTestCase
 
@@ -27,14 +28,14 @@ CoreWrapper *mockWrapper;
 
 + (void)setUp {
   NSString *khmerKeyboardPath = [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:@"khmer_angkor.kmx"];
-
-  NSLog(@"mockKmxFilePath  = %@\n", mockKmxFilePath);
+  
+  os_log_debug([KMELogs testLog], "mockKmxFilePath  = %@\n", mockKmxFilePath);
 
   mockWrapper = [[CoreWrapper alloc] initWithHelper: [CoreTestStaticHelperMethods helper] kmxFilePath:mockKmxFilePath];
 }
 
 - (void)tearDown {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
+  // Put teardown code here. This method is called after the invocation of each test method in the class.
 }
 
 - (void)testCreateWrapper_mockKeyboardPath_noException {
@@ -57,7 +58,7 @@ CoreWrapper *mockWrapper;
 - (void)testprocessEvent_lowercaseA_returnsExpectedCharacterForKmx {
   NSString *kmxPath = [CoreTestStaticHelperMethods getKmxFilePathTestMacEngine];
   CoreWrapper *core = [[CoreWrapper alloc] initWithHelper: [CoreTestStaticHelperMethods helper] kmxFilePath:kmxPath];
-
+  
   // expecting character with 'Ç'
   CoreKeyOutput *coreOutput = [core processMacVirtualKey:MVK_A withModifiers:0 withKeyDown:YES];
   XCTAssert([coreOutput.textToInsert isEqualToString:@"\u00C7"], @"Expected capital C cedille (U+00C7)");

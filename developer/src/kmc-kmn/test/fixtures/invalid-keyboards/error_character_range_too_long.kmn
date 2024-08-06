@@ -1,0 +1,14 @@
+store(&NAME) 'error_character_range_too_long'
+store(&VERSION) '9.0'
+
+begin unicode > use(main)
+
+group(main) using keys
+
+c maximum store length is 4096 UTF-16 code units, including U+0000 terminator
+c #define GLOBAL_BUFSIZE  4096   // compfile.h
+c so we need 0x101E - 0x0020 + 1 = 0x0FFF --> 4095 words
+
+store(x)    U+0020 .. U+101E
+
+any(x) + 'x' > 'x' context

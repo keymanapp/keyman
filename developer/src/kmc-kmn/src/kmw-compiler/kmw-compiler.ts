@@ -1,6 +1,6 @@
 import { KMX, CompilerOptions, CompilerCallbacks, KvkFileReader, VisualKeyboard, KmxFileReader, KvkFile } from "@keymanapp/common-types";
 import { ExpandSentinel, incxstr, xstrlen } from "./util.js";
-import { options, nl, FTabStop, setupGlobals, IsKeyboardVersion10OrLater, callbacks, FFix183_LadderLength, FCallFunctions, fk, IsKeyboardVersion17OrLater } from "./compiler-globals.js";
+import { options, nl, FTabStop, setupGlobals, callbacks, FFix183_LadderLength, FCallFunctions, fk, minimumKeymanVersionToString, isKeyboardVersion10OrLater, isKeyboardVersion17OrLater } from "./compiler-globals.js";
 import { JavaScript_ContextMatch, JavaScript_KeyAsString, JavaScript_Name, JavaScript_OutputString, JavaScript_Rules, JavaScript_Shift, JavaScript_ShiftAsString, JavaScript_Store, zeroPadHex } from './javascript-strings.js';
 import { KmwCompilerMessages } from "./kmw-compiler-messages.js";
 import { ValidateLayoutFile } from "./validate-layout-file.js";
@@ -206,8 +206,13 @@ export function WriteCompiledKeyboard(
     // Following line caches the Keyman major version
     `${FTabStop}this._v=(typeof keyman!="undefined"&&typeof keyman.version=="string")?parseInt(keyman.version,10):9;${nl}` +
     `${FTabStop}this.KI="${sName}";${nl}` +
-    `${FTabStop}this.KN="${RequotedString(sFullName)}";${nl}` +
-    `${FTabStop}this.KMINVER="${(keyboard.fileVersion & KMX.KMXFile.VERSION_MASK_MAJOR) >> 8}.${keyboard.fileVersion & KMX.KMXFile.VERSION_MASK_MINOR}";${nl}` +
+    `${FTabStop}this.KN="${RequotedString(sFullName)}";${nl}`;
+
+  // We split the result text here to allow for setting the minimum required
+  // version at the very end of this function
+  const resultPrefix = result;
+
+  result =
     `${FTabStop}this.KV=${sVisualKeyboard};${nl}` +
     `${FTabStop}this.KDU=${fDisplayUnderlying?'1':'0'};${nl}` +
     `${FTabStop}this.KH=${sHelp};${nl}` +
@@ -400,7 +405,17 @@ export function WriteCompiledKeyboard(
   }
 
   result += sEmbedJS + '}' + nl;   // I3681
-  return result;
+
+  const minVer = minimumKeymanVersionToString();
+  const resultMinVer = `${FTabStop}this.KMINVER="${minVer}";${nl}`;
+
+  if((fk.flags & KMX.KMXFile.KF_AUTOMATICVERSION) == KMX.KMXFile.KF_AUTOMATICVERSION) {
+    // Note: the KeymanWeb compiler is responsible for reporting minimum
+    // version for the web targets
+    callbacks.reportMessage(KmwCompilerMessages.Info_MinimumWebEngineVersion({version:minVer}));
+  }
+
+  return resultPrefix + resultMinVer + result;
 }
 
 ///
@@ -440,9 +455,9 @@ function GetKeyboardModifierBitmask(keyboard: KMX.KEYBOARD, fMnemonic: boolean):
 /// @return string of JavaScript code
 ///
 function JavaScript_SetupDebug() {
-  if(IsKeyboardVersion10OrLater()) {
+  if(isKeyboardVersion10OrLater()) {
     if(options.saveDebug) {
-      if(IsKeyboardVersion17OrLater()) {
+      if(isKeyboardVersion17OrLater()) {
         return 'var modCodes = KeymanWeb.Codes.modifierCodes;'+nl+
               FTabStop+'var keyCodes = KeymanWeb.Codes.keyCodes;'+nl;
       } else {
@@ -455,7 +470,7 @@ function JavaScript_SetupDebug() {
 }
 
 function JavaScript_SetupProlog() {
-  if(IsKeyboardVersion10OrLater()) {
+  if(isKeyboardVersion10OrLater()) {
     return 'if(typeof keyman === \'undefined\') {'+nl+
       FTabStop+'console.log(\'Keyboard requires KeymanWeb 10.0 or later\');'+nl+
       FTabStop+'if(typeof tavultesoft !== \'undefined\') tavultesoft.keymanweb.util.alert("This keyboard requires KeymanWeb 10.0 or later");'+nl+
@@ -465,7 +480,7 @@ function JavaScript_SetupProlog() {
 }
 
 function JavaScript_SetupEpilog() {
-  if(IsKeyboardVersion10OrLater()) {
+  if(isKeyboardVersion10OrLater()) {
     return '}';
   }
   return '';
@@ -560,7 +575,7 @@ export function FormatModifierAsBitflags(FBitMask: number): string {
   //TODO: We need to think about mnemonic layouts which are incompletely supported at present
   //tavultesoft.keymanweb.osk.
 
-  if(IsKeyboardVersion10OrLater()) {
+  if(isKeyboardVersion10OrLater()) {
     // This depends on flags defined in KeymanWeb 10.0
     result = '';
 

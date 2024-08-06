@@ -1,9 +1,9 @@
 import 'mocha';
 import {assert} from 'chai';
 import { DispCompiler } from '../src/compiler/disp.js';
-import { compilerTestCallbacks, loadSectionFixture } from './helpers/index.js';
+import { compilerTestCallbacks, loadSectionFixture, testCompilationCases } from './helpers/index.js';
 import { KMXPlus } from '@keymanapp/common-types';
-import { CompilerMessages } from '../src/compiler/messages.js';
+import { LdmlCompilerMessages } from '../src/compiler/ldml-compiler-messages.js';
 
 import Disp = KMXPlus.Disp;
 
@@ -61,26 +61,34 @@ describe('disp', function () {
     let disp = await loadSectionFixture(DispCompiler, 'sections/disp/invalid-dupto.xml', compilerTestCallbacks) as Disp;
     assert.isNull(disp);
     assert.equal(compilerTestCallbacks.messages.length, 1);
-    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_DisplayIsRepeated({ output: 'e' }));
+    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_DisplayIsRepeated({ output: 'e' }));
   });
   it('should reject duplicate ids', async function() {
     let disp = await loadSectionFixture(DispCompiler, 'sections/disp/invalid-dupid.xml', compilerTestCallbacks) as Disp;1
     assert.isNull(disp);
     assert.equal(compilerTestCallbacks.messages.length, 1);
-    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_DisplayIsRepeated({ keyId: 'e' }));
+    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_DisplayIsRepeated({ keyId: 'e' }));
   });
   it('should reject if neither to nor id', async function() {
     let disp = await loadSectionFixture(DispCompiler, 'sections/disp/invalid-none.xml', compilerTestCallbacks) as Disp;
     assert.isNull(disp);
     assert.equal(compilerTestCallbacks.messages.length, 1);
-    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_DisplayNeedsToOrId({}));
+    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_DisplayNeedsToOrId({}));
   });
   it('should reject if both to and id', async function() {
     let disp = await loadSectionFixture(DispCompiler, 'sections/disp/invalid-both.xml', compilerTestCallbacks) as Disp;
     assert.isNull(disp);
     assert.equal(compilerTestCallbacks.messages.length, 1);
-    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_DisplayNeedsToOrId({ output: 'e', keyId: 'e' }));
+    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_DisplayNeedsToOrId({ output: 'e', keyId: 'e' }));
   });
-
+  testCompilationCases(DispCompiler, [
+    {
+      subpath: 'sections/disp/invalid-var.xml',
+      errors: [
+        LdmlCompilerMessages.Error_MissingStringVariable({id: "missingdisplay"}),
+        LdmlCompilerMessages.Error_MissingStringVariable({id: "missingoutput"}),
+      ],
+    },
+  ]);
 });
 

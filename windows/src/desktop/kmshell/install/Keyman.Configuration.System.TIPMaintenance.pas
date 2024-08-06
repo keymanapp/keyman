@@ -396,11 +396,16 @@ class function TTIPMaintenance.GetKeyboardLanguage(const KeyboardID,
   BCP47Tag: string): IKeymanKeyboardLanguageInstalled;
 var
   keyboard: IKeymanKeyboardInstalled;
-  i: Integer;
+  i, n: Integer;
 begin
-  keyboard := kmcom.Keyboards[KeyboardID];
-  if keyboard = nil then
+  n := kmcom.Keyboards.IndexOf(KeyboardID);
+  if n < 0 then
+  begin
+    KL.Log('TTIPMaintenance.GetKeyboardLanguage = KeyboardID:%s not found', [KeyboardID]);
     Exit(nil);
+  end;
+
+  keyboard := kmcom.Keyboards[n];
 
   for i := 0 to keyboard.Languages.Count - 1 do
     if SameText(keyboard.Languages[i].BCP47Code, BCP47Tag) then

@@ -174,7 +174,7 @@
         <DCCReference Include="Keyman.Developer.System.KMConvertParameters.pas"/>
         <DCCReference Include="Keyman.Developer.System.ImportKeyboardDLL.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\ScanCodeMap.pas"/>
-        <DCCReference Include="Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter.pas"/>
+        <DCCReference Include="Keyman.Developer.System.VisualKeyboardToTouchLayoutConverter.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\OnScreenKeyboardData.pas"/>
         <DCCReference Include="..\TIKE\oskbuilder\TouchLayout.pas"/>
         <DCCReference Include="..\TIKE\oskbuilder\TouchLayoutDefinitions.pas"/>
@@ -195,6 +195,7 @@
         <DCCReference Include="..\tike\main\KeymanDeveloperOptions.pas"/>
         <DCCReference Include="..\tike\main\Keyman.Developer.System.KeymanDeveloperPaths.pas"/>
         <DCCReference Include="Keyman.Developer.System.LdmlKeyboardProjectTemplate.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\general\utilhttp.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

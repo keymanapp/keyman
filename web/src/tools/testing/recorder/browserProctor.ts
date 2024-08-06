@@ -99,6 +99,8 @@ export class BrowserProctor extends Proctor {
       // Converts the sequence back to version 10.0, since it's very well made for browser simulation.
       let eventSpecSequence = new InputEventSpecSequence(inputSpecs, sequence.output, sequence.msg);
       return driver.simulateSequence(eventSpecSequence);
+    } else {
+      throw new Error("Unexpected test-recording type");
     }
   }
 }

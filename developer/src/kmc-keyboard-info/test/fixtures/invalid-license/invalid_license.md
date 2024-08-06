@@ -1,0 +1,1 @@
+This is a file used to test the license is not valid error (see keyboard-info-compiler-messages.ts)

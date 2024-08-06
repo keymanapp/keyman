@@ -34,7 +34,7 @@
   <!-- Context: Text Size dialog -->
   <string name="ic_text_size_down" comment="Make text smaller">Text kleiner</string>
   <!-- Context: Text Size dialog -->
-  <string name="ic_text_size_slider" comment="Adjust text size">Text size slider</string>
+  <string name="ic_text_size_slider" comment="Adjust text size">Slider für Textgröße</string>
   <!-- Context: Clear Text dialog -->
   <string name="all_text_will_be_cleared" comment="Erase all the text">\nDer gesamte Text wird gelöscht\n</string>
   <!-- Context: Get Started menu -->
@@ -53,6 +53,7 @@
   <string name="request_storage_permission" comment="Request storage permission to access keyboard packages">    Um Tastaturpakete zu installieren, braucht Keyman die Berechtigung zum Lesen von externem Speicher.</string>
   <!-- Context: Android Storage Permission -->
   <string name="storage_permission_denied" comment="Keyboard package installation may fail since Android storage permission not granted">    Zugriff auf den Speicher wurde abgelehnt. Möglicherweise funktioniert die Installation des Tastaturpakets nicht korrekt</string>
+  <string name="storage_permission_denied2" comment="Keyboard package installation failed. Recommend install from local file">    Speicherberechtigungsanfrage fehlgeschlagen. Versuchen Sie die Keyman Einstellungen - Aus der lokalen Datei installieren</string>
   <!-- Context: Keyman Settings menu -->
   <string name="keyman_settings" comment="Settings menu title">Einstellungen</string>
   <!-- Context: Keyman Settings menu -->
@@ -63,7 +64,7 @@
   <!-- Context: Keyman Settings menu -->
   <string name="install_keyboard_or_dictionary" comment="Menu item to install keyboard or dictionary">Tastatur oder Wörterbuch installieren</string>
   <!-- Context: Keyman Settings menu -->
-  <string name="change_display_language" comment="Menu action to change interface language">Sprache anzeigen</string>
+  <string name="change_display_language" comment="Menu action to change interface language">Anzeigesprache</string>
   <!-- Context: Keyman Settings menu -->
   <string name="adjust_keyboard_height" comment="Menu action to adjust keyboard height">Tastaturhöhe anpassen</string>
   <!-- Context: Keyman Settings menu -->

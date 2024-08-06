@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<!--
-  DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd"
-  Disabling doctype for this invalid file, not used by compiler, and avoids complaints in IDEs etc.
--->
-<keyboard3 locale="mt" conformsTo="nothing-anyone-ever-heard-of"> <!-- invalid -->
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="nothing-anyone-ever-heard-of"> <!-- invalid -->
   <info author="srl295" indicator="🙀" layout="qwerty"  name="TestKbd"/>
 
   <keys>

@@ -1,3 +1,48 @@
+keyman (17.0.326-1) unstable; urgency=medium
+
+  * New upstream release
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Mon, 03 Jun 2024 21:58:16 +0200
+
+keyman (17.0.295-1) unstable; urgency=medium
+
+  * Remove ibus-keyman.post{inst,rm} (closes: #1034040)
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Wed, 27 Mar 2024 17:14:32 +0100
+
+keyman (17.0.279-1) unstable; urgency=medium
+
+  * Add libicu-dev dependency to libkeymancore-dev (closes: #1064915)
+  * Remove ibus-keyman.post{inst,rm} (closes: #1034040)
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Thu, 29 Feb 2024 19:17:08 +0100
+
+keyman (17.0.274-2) UNRELEASED; urgency=medium
+
+  * Add libicu-dev dependency to libkeymancore-dev (closes: #1064915)
+
+ -- Eberhard Beilharz <eb1@sil.org>  Wed, 28 Feb 2024 17:54:58 +0100
+
+keyman (17.0.274-1) unstable; urgency=medium
+
+  * Fix autopkg tests
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Fri, 23 Feb 2024 15:45:13 +0100
+
+keyman (17.0.272-1) unstable; urgency=medium
+
+  * New upstream release.
+  * Re-release to Debian
+
+ -- Eberhard Beilharz <eb1@sil.org>  Wed, 21 Feb 2024 16:36:14 +0100
+
 keyman (16.0.145-1) unstable; urgency=medium
 
   [Jeremy Bicha]
