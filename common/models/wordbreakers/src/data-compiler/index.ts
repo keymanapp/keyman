@@ -33,16 +33,10 @@ const MAX_CODE_POINT = 0x10FFFF;
 const projectDir = path.dirname(require.resolve("@keymanapp/models-wordbreakers/UNICODE_VERSION.md"));
 const generatedFilename = path.join(projectDir, 'src', 'main', 'default', 'data.ts');
 
-// Ensure this package's major version number is in sync with the Unicode
-// major version.
-
-const packageVersion = new String(fs.readFileSync(`${projectDir}/UNICODE_VERSION.md`));
-const UNICODE_VERSION = packageVersion.split('.')[0] + '.0.0';
-
 // The data files should be in this repository, with names matching the
 // Unicode version.
-let wordBoundaryFilename = path.join(projectDir, `./src/imports/WordBreakProperty-${UNICODE_VERSION}.txt`);
-let emojiDataFilename = path.join(projectDir, `./src/imports/emoji-data-${UNICODE_VERSION}.txt`);
+const wordBoundaryFilename = path.join(projectDir, `./resources/standards-data/unicode-character-database/WordBreakProperty.txt`);
+const emojiDataFilename = path.join(projectDir, `./resources/standards-data/unicode-character-database/emoji-data.txt`);
 
 ///////////////////////////// Word_Boundary file /////////////////////////////
 

@@ -2,8 +2,11 @@
 
 /**
  * Valid values for a word break property.
+ *
+ * Is optimized away at compile-time; use `propertyMap` to find the mapped
+ * value at runtime for a property name if needed.
  */
-export const enum WordBreakProperty { // Scary bit:  this does not exist as an object at run-time!
+export const enum WordBreakProperty {
   Other,
   LF,
   Newline,
@@ -27,8 +30,10 @@ export const enum WordBreakProperty { // Scary bit:  this does not exist as an o
   eot
 };
 
-// Not currently built by the auto-generator tool, but it easily could be.
-// If and when we import the data.ts rebuilder, we can add this in.
+/**
+ * Contains property names per associated index, as this is compiled away
+ * by TypeScript for `const enum` cases like `WordBreakProperty`.
+ */
 export const propertyMap = [
   "Other",
   "LF",

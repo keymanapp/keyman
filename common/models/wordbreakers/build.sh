@@ -13,6 +13,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ################################ Main script ################################
 
 builder_describe "Builds the predictive-text wordbreaker implementation module" \
+  "@/resources/standards-data/unicode-character-database" \
   "clean" \
   "configure" \
   "build" \
@@ -26,7 +27,8 @@ builder_describe_outputs \
 builder_parse "$@"
 
 function do_build() {
-  tsc -b
+  tsc -b src/data-compiler/tsconfig.json
+  tsc -b src/main/tsconfig.json
 
   # Declaration bundling.
   tsc -p src/main/tsconfig.json --emitDeclarationOnly --outFile ./build/lib/index.d.ts
