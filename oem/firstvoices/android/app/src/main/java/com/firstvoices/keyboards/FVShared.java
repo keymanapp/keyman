@@ -155,13 +155,11 @@ final class FVShared {
           for (int i=0; i<keyboardsArray.length(); i++) {
               JSONObject keyboardObj = keyboardsArray.getJSONObject(i);
               if (keyboardObj == null) {
-                  KMLog.LogError(TAG, "keyboard Object in keyboards.json is null");
-                  continue;
+                  throw new Error("keyboard Object in keyboards.json is null");
               }
               JSONArray languageArray = keyboardObj.getJSONArray("languages");
               if (languageArray == null) {
-                  KMLog.LogError(TAG, "languages Array in keyboards.json is null");
-                  continue;
+                  throw new Error("languages Array in keyboards.json is null");
               }
               String regionName = keyboardObj.getString("region");
               FVRegion region = list.findRegion(regionName);
@@ -198,10 +196,8 @@ final class FVShared {
               region.keyboards.add(kbd);
           }
       } catch (Exception e) {
-          String errorMsg = "loadRegionList had malformed keyboard list";
-          KMLog.LogException(TAG, errorMsg, e);
-          // Crash the app
-          throw new Error(errorMsg);
+          // loadRegionList had malformed keyboard list
+          throw new Error(e.getMessage());
       }
 
       // Sort by region name
