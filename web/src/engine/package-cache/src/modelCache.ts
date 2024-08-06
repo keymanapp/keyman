@@ -1,4 +1,4 @@
-import { ModelSpec } from "@keymanapp/input-processor";
+import { ModelSpec } from 'keyman/engine/interfaces';
 
 export default class ModelManager {
   // Tracks registered models by ID.

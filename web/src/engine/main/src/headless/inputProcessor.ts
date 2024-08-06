@@ -3,8 +3,8 @@
 /// <reference types="@keymanapp/models-types" />
 
 import ContextWindow from "./contextWindow.js";
-import LanguageProcessor from "./prediction/languageProcessor.js";
-import type ModelSpec from "./prediction/modelSpec.js";
+import { LanguageProcessor }  from "./languageProcessor.js";
+import type { ModelSpec }  from "keyman/engine/interfaces";
 import { globalObject, DeviceSpec } from "@keymanapp/web-utils";
 
 import {
@@ -21,9 +21,9 @@ import {
   RuleBehavior,
   SystemStoreIDs,
 } from "@keymanapp/keyboard-processor";
-import { TranscriptionCache } from "../transcriptionCache.js";
+import { TranscriptionCache } from "./transcriptionCache.js";
 
-export default class InputProcessor {
+export class InputProcessor {
   public static readonly DEFAULT_OPTIONS: ProcessorInitOptions = {
     baseLayout: 'us'
   }

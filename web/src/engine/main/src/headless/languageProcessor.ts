@@ -1,61 +1,12 @@
 import { EventEmitter } from "eventemitter3";
 import { LMLayer } from "@keymanapp/lexical-model-layer/web";
 import { OutputTarget, Transcription, Mock } from "@keymanapp/keyboard-processor";
-import ContextWindow from "../contextWindow.js";
-import ModelSpec from "./modelSpec.js"
-import { TranscriptionCache } from "../../transcriptionCache.js";
-
-/**
- * Corresponds to the 'suggestionsready' LanguageProcessor event.
- */
-export type ReadySuggestionsHandler = (prediction: ReadySuggestions) => boolean;
-
-export type StateChangeEnum = 'active'|'configured'|'inactive';
-/**
- * Corresponds to the 'statechange' LanguageProcessor event.
- */
-export type StateChangeHandler = (state: StateChangeEnum) => any;
-
-/**
- * Covers 'tryaccept' events.
- */
-export type TryUIHandler = (source: string, returnObj: {shouldSwallow: boolean}) => boolean;
-
-export type InvalidateSourceEnum = 'new'|'context';
-
-/**
- * Corresponds to the 'invalidatesuggestions' LanguageProcessor event.
- */
-export type InvalidateSuggestionsHandler = (source: InvalidateSourceEnum) => boolean;
-
-export class ReadySuggestions {
-  suggestions: Suggestion[];
-  transcriptionID: number;
-
-  constructor(suggestions: Suggestion[], id: number) {
-    this.suggestions = suggestions;
-    this.transcriptionID = id;
-  }
-}
-
-interface LanguageProcessorEventMap {
-  'suggestionsready': ReadySuggestionsHandler,
-  'invalidatesuggestions': InvalidateSuggestionsHandler,
-  'statechange': StateChangeHandler,
-  'tryaccept': TryUIHandler,
-  'tryrevert': () => void,
-
-  /**
-   * Is called synchronously once suggestion application is successful and the context has been updated.
-   *
-   * @param outputTarget The `OutputTarget` representation of the context the suggestion was applied to.
-   * @returns
-   */
-  'suggestionapplied': (outputTarget: OutputTarget) => boolean
-}
+import { LanguageProcessorEventMap, ModelSpec, StateChangeEnum, ReadySuggestions } from 'keyman/engine/interfaces';
+import ContextWindow from "./contextWindow.js";
+import { TranscriptionCache } from "./transcriptionCache.js";
 
 /* Is more like the model configuration engine */
-export default class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
+export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
   private lmEngine: LMLayer;
   private currentModel?: ModelSpec;
   private configuration?: Configuration;

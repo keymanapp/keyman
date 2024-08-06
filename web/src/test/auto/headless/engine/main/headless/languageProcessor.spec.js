@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { LanguageProcessor, TranscriptionCache } from '@keymanapp/input-processor';
+import { LanguageProcessor, TranscriptionCache } from 'keyman/engine/main';
 import { SourcemappedWorker as LMWorker } from "@keymanapp/lexical-model-layer/node";
 import { Mock } from '@keymanapp/keyboard-processor';
 
