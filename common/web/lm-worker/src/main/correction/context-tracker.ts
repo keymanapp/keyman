@@ -1,9 +1,9 @@
-import { applyTransform, tokenize } from '@keymanapp/models-templates';
-import { defaultWordbreaker } from '@keymanapp/models-wordbreakers';
+import { applyTransform } from '@keymanapp/models-templates';
 
 import { ClassicalDistanceCalculation } from './classical-calculation.js';
 import { SearchSpace } from './distance-modeler.js';
 import TransformUtils from '../transformUtils.js';
+import { determineModelTokenizer } from '../model-helpers.js';
 
 function textToCharTransforms(text: string, transformId?: number) {
   let perCharTransforms: Transform[] = [];
@@ -536,7 +536,8 @@ export class ContextTracker extends CircularArray<TrackedContextState> {
       throw "This lexical model does not provide adequate data for correction algorithms and context reuse";
     }
 
-    let tokenizedContext = tokenize(model.wordbreaker || defaultWordbreaker, context);
+    const tokenize = determineModelTokenizer(model);
+    const tokenizedContext = tokenize(context);
 
     if(tokenizedContext.left.length > 0) {
       for(let i = this.count - 1; i >= 0; i--) {
