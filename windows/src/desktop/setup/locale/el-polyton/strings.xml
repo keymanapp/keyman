@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="ssLanguageName" comment="User interface language name in the UI language">Ἑλληνικά Πολυτονικά</string>
+  <string name="ssApplicationTitle">Ἐγκατάσταση $APPNAME $VERSION</string>
+  <string name="ssTitle">Ἐγκαταστῆστε $APPNAME $VERSION</string>
+  <string name="ssInstallSuccess">Τὸ $APPNAME $VERSION ἐγκατεστάθη ἐπιτυχῶς.</string>
+  <string name="ssCancelQuery">Εἶσθε βέβαιοι ὅτι θέλετε νὰ ἀκυρώσετε τὴν ἐγκατάσταση τοῦ $APPNAME?</string>
+  <string name="ssBootstrapExtractingBundle">Ἐξαγωγὴ πακέτου...</string>
+  <string name="ssBootstrapCheckingPackages">Ἔλεγχος πακέτων...</string>
+  <string name="ssBootstrapCheckingForUpdates">Ἀναζητοῦνται ἐνημερώσεις ὀνλάϊν...</string>
+  <string name="ssBootstrapCheckingInstalledVersions">Ἐλέγχονται ἐγκατεστημένες ἐκδόσεις...</string>
+  <string name="ssBootstrapReady">Τελειώνουμε...</string>
+  <!-- Parameters: %0:s: version, %1:s: ssActionDownload -->
+  <string name="ssActionInstallKeyman">• %1:s $APPNAME %0:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: ssActionDownload -->
+  <string name="ssActionInstallPackage">• %2:s %0:s %1:s</string>
+  <!-- Parameters: %0:s: package name %1:s: version %2:s: language %3:s: ssActionDownload -->
+  <string name="ssActionInstallPackageLanguage">• %3:s %0:s %1:s γιὰ %2:s</string>
+  <string name="ssActionNothingToInstall">Δὲν ὑπάρχει τίποτε πρὸς ἐγκατάστασιν.</string>
+  <!-- Parameters: %0:s download size -->
+  <string name="ssActionDownload">(μεταφόρτωση %0:s)</string>
+  <string name="ssActionInstall">Ἡ ἐγκατάσταση περιλαμβάνει:</string>
+  <string name="ssFreeCaption">Τὸ $APPNAME $VERSION προσφέρεται δωρεὰν καὶ εἶναι ἐφαρμογὴ ἀνοικτοῦ κώδικα</string>
+  <string name="ssLicenseLink">&amp;Διαβάστε τὴν ἄδεια χρήσης</string>
+  <string name="ssInstallOptionsLink">&amp;Ἐπιλογὲς ἐγκατάστασης</string>
+  <string name="ssMessageBoxTitle">Ἐγκατάσταση $APPNAME</string>
+  <string name="ssOkButton">OK</string>
+  <string name="ssInstallButton">&amp;Ἐγκατάσταση</string>
+  <string name="ssCancelButton">Ἀκύρωση</string>
+  <string name="ssExitButton">Ἔξοδος</string>
+  <string name="ssStatusInstalling">Ἐγκαθίσταται τὸ $APPNAME</string>
+  <string name="ssStatusRemovingOlderVersions">Ἀφαιροῦνται παλαιότερες ἐκδόσεις</string>
+  <string name="ssStatusComplete">Ἡ ἐγκατάσταση ὁλοκληρώθηκε</string>
+  <string name="ssQueryRestart">Γιὰ νὰ ὁλοκληρωθεῖ ἡ ἐγκατάσταση, πρέπει νὰ ἐπανεκκινήσετε τὰ Windows. Ἀφοῦ τὸ κάνετε ἡ ἐγκατάσταση θὰ συνεχισθεῖ.
+
+Νὰ γίνει ἐπανεκκίνηση τώρα;</string>
+  <string name="ssErrorUnableToAutomaticallyRestart">Τὰ Windows δὲν μπόρεσαν νὰ ξεκινήσουν αὐτομάτως. Θὰ πρέπει νὰ ἐπανεκκινήσετε τὰ Windows πρὶν προσπαθήσετε νὰ ξεκινήσετε τὸ $APPNAME.</string>
+  <string name="ssMustRestart">Γιὰ νὰ ὁλοκληρώσετε τὴν ἐγκατάσταση θὰ πρέπει νὰ ἐπανεκκινήσετε τὰ Windows. Ὅταν τὸ κάνετε, ἡ ἐγκατάσταση θὰ τελειώσει.</string>
+  <string name="ssOldOsVersionInstallKeyboards">Τὸ $APPNAME $VERSION ἀπαιτεῖ Windows 7 ἢ νεώτερα. Ὡστόσο ἀνιχνεύθηκαν τὰ Keyman Desktop 7, 8 ἢ 9. Θέλετε νὰ ἐγκαταστήσετε τὰ πληκτρολόγια ποὺ περιέχονται σὲ αὐτὸ τὸ πακέτο ἐγκατάστασης στὴν ἤδη ἐγκατεστημένη ἔκδοση τοῦ Keyman Desktop;</string>
+  <string name="ssOldOsVersionDownload">Αὐτὴ ἡ ἔκδοση τοῦ $APPNAME ἀπαιτεῖ τὰ Windows 7 ἢ νεώτερα. Θέλετε νὰ κατεβάσετε τὸ Keyman Desktop 8;</string>
+  <string name="ssOptionsTitle">Ἐπιλογὲς ἐγκατάστασης</string>
+  <string name="ssOptionsTitleInstallOptions">Ἐπιλογὲς ἐγκατάστασης</string>
+  <string name="ssOptionsTitleDefaultKeymanSettings">Προκαθορισμένες ρυθμίσεις $APPNAME</string>
+  <string name="ssOptionsTitleSelectModulesToInstall">Ἑνότητες πρὸς ἐγκατάστασιν ἢ ἀναβάθμισιν</string>
+  <string name="ssOptionsTitleAssociatedKeyboardLanguage">Ἡ γλῶσσα τοῦ πληκτρολογίου</string>
+  <string name="ssOptionsTitleLocation">Ἡ πρὸς ἐγκατάστασιν ἔκδοση</string>
+  <string name="ssOptionsStartWithWindows">Ξεκινῆστε τὸ $APPNAME μόλις ξεκινήσουν τὰ Windows</string>
+  <string name="ssOptionsStartAfterInstall">Ξεκινῆστε τὸ $APPNAME μόλις ὁλοκληρωθεῖ ἡ ἐγκατάσταση</string>
+  <string name="ssOptionsCheckForUpdates">Ἐλέγχετε ὀνλάϊν περιοδικῶς ἂν ὑπάρχουν ἀναβαθμίσεις</string>
+  <string name="ssOptionsUpgradeKeyboards">Ἀναβαθμίστε πληκτρολόγια ἐγκατεστημένα μὲ παλαιότερες ἐκδόσεις στὴν ἔκδοση $VERSION</string>
+  <string name="ssOptionsAutomaticallyReportUsage">Μοιρασθῆτε ἀνώνυμα στατιστικὰ στοιχεῖα χρήσεως μὲ τὸ keyman.com</string>
+  <!-- Parameters: %0:s: version of installer (may differ from Keyman version) -->
+  <string name="ssInstallerVersion">Ἔκδοση ἐγκατάστασης: %0:s</string>
+  <string name="ssOptionsInstallKeyman">Ἐγκαταστῆστε τὸ $APPNAME</string>
+  <string name="ssOptionsUpgradeKeyman">Ἀναβαθμίστε τὸ $APPNAME</string>
+  <!-- Parameters: %0:s: installed version -->
+  <string name="ssOptionsKeymanAlreadyInstalled">Τὸ $APPNAME %0:s ἔχει ἤδη ἐγκατασταθεῖ.</string>
+  <!-- Parameters: %0:s: version, %1:s: size -->
+  <string name="ssOptionsDownloadKeymanVersion">Κατεβάστε τὴν ἔκδοση %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: version -->
+  <string name="ssOptionsInstallKeymanVersion">Ἔκδοση %0:s</string>
+  <!-- Parameters: %0:s: package name %1:s -->
+  <string name="ssOptionsInstallPackage">Ἐγκαταστῆστε τὸ %0:s</string>
+  <!-- Parameters: %0:s: package version %1:s package size -->
+  <string name="ssOptionsDownloadPackageVersion">Κατεβάστε τὴν ἔκδοση %0:s (%1:s)</string>
+  <!-- Parameters: %0:s: package version -->
+  <string name="ssOptionsInstallPackageVersion">Ἔκδοση %0:s</string>
+  <!-- Parameters: %0:s package name -->
+  <string name="ssOptionsPackageLanguageAssociation">Ἐπιλέξτε τὴν γλῶσσα ποὺ θέλετε νὰ χρησιμοποιήσετε μὲ τὸ πληκτρολόγιο %0:s</string>
+  <string name="ssOptionsDefaultLanguage">Ἡ προεπιλεγμένη γλῶσσα</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingTitle">Φορτώνεται τὸ %0:s</string>
+  <!-- Parameters: %0:s: filename -->
+  <string name="ssDownloadingText">Φορτώνεται τὸ %0:s</string>
+  <string name="ssOffline">Τὸ πρόγραμμα ἐγκατάστασης τοῦ $APPNAME δὲν μπόρεσε νὰ συνδεθεῖ μὲ τὸ keyman.com γιὰ νὰ κατεβάσει πρόσθετους πόρους.</string>
+  <string name="ssOffline2">Παρακαλοῦμε ἐλέγξτε ἂν εἶσθε ὀνλάϊν καὶ ἐπιτρέψτε στὸ πρόγραμμα ἐγκατάστασης τοῦ $APPNAME νὰ προσπελάσει τὸ Διαδίκτυο ρυθμίζοντας ἀναλόγως τὸ τοῖχος προστασίας σας.</string>
+  <string name="ssOffline3">Πατῆστε \"Διακοπή\" γιὰ νὰ σταματήσετε τὴν ἐγκατάσταση, \"Ξαναδοκιμάστε\" γιὰ νὰ προσπαθήσετε ἐκ νέου νὰ φορτώσετε πόρους ἢ \"Ἀγνοῆστε\" γιὰ νὰ συνεχίσετε χωρὶς ὀνλάϊν σύνδεση.</string>
+</resources>
