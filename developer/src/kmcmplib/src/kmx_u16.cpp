@@ -386,24 +386,8 @@ KMX_WCHAR* u16tok(KMX_WCHAR* p, const KMX_WCHAR* delimiters, KMX_WCHAR** ctx) {
  * @param  str Pointer to u16string
  * @return double value equivalent to the string
  */
-double u16tof(KMX_WCHAR* str) {
-  double val = 0;
-  int offsetdot = 0;
-  char digit;
-
-  PKMX_WCHAR q = (PKMX_WCHAR)u16chr(str, '.');
-  size_t pos_dot = (q - str < 0) ? u16len(str) : q - str;
-
-  for (size_t i = 0; i < u16len(str); i++) {
-    digit = static_cast<char>(towupper(*str));
-
-    if (i > pos_dot - 1)
-      offsetdot = 1;
-
-    if (digit != '.')
-      val = val + ((int(digit)) - 48) * pow(10, (pos_dot - 1 - i + offsetdot));
-
-    str++;
-  }
-  return val;
+double u16tof(KMX_WCHAR* str16) {
+  char* pEnd;
+  std::string str = string_from_u16string(str16);
+  return strtof(str.c_str(), &pEnd);
 }
