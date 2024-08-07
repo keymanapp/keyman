@@ -1,0 +1,10 @@
+﻿store(&VERSION) '9.0'
+store(&NAME) 'error_not_supported_in_keyman_web_output'
+store(&TARGETS) 'web'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+c `return` is supported only in KMX; see also #11545
+nomatch > return

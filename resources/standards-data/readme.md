@@ -6,14 +6,13 @@ the version data in this file also.
 
 ## Current Versions
 
+See [minimum-versions.md](../../docs/minimum-versions.md)
+
+Unversioned data:
+
 | data                       | version     |
 |----------------------------|-------------|
 | ethnologue                 | ?           |
-| iso639-3                   | 2023        |
-| langtags                   | 2023-05-04  |
-| langtags-subtag-registry   | 2023-05-11  |
-| ldml-keyboards             | techpreview |
-| unicode-character-database | 15          |
 | windows-lcid-to-bcp-47     | ?           |
 
 ## File Sources
@@ -58,10 +57,10 @@ See also [ldml-keyboards/readme.md](ldml-keyboards/readme.md).
 
 ### unicode-character-database
 
-Data from <https://www.unicode.org/Public/15.0.0/ucd/>:
+Data from <https://www.unicode.org/Public/15.1.0/ucd/>:
 
 ```bash
-UNICODE_VERSION=15.0.0
+UNICODE_VERSION=15.1.0
 wget https://www.unicode.org/Public/${UNICODE_VERSION}/ucd/Blocks.txt -O unicode-character-database/Blocks.txt
 wget https://www.unicode.org/Public/${UNICODE_VERSION}/ucd/UnicodeData.txt -O unicode-character-database/UnicodeData.txt
 ```

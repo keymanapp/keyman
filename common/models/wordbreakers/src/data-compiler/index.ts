@@ -4,10 +4,8 @@
 
 // TODO:  Adapt to produce two string-encoded arrays - one for BMP chars, one for non-BMP chars.
 
-import zlib from 'zlib';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
@@ -27,30 +25,30 @@ const require = createRequire(import.meta.url);
 const MAX_CODE_POINT = 0x10FFFF;
 
 // Where to get the data:
-//  - http://www.unicode.org/reports/tr51/#emoji_data
-//  - https://www.unicode.org/reports/tr41/tr41-26.html#Props0
+//  - https://www.unicode.org/reports/tr51/#emoji_data
+//  - https://www.unicode.org/reports/tr41/#Props0
 
 //////////////////////////////////// Main ////////////////////////////////////
 
-const projectDir = path.dirname(require.resolve("@keymanapp/models-wordbreakers/UNICODE_VERSION.md"));
-const generatedFilename = path.join(projectDir, 'src', 'main', 'default', 'data_test.ts');
-
-// Ensure this package's major version number is in sync with the Unicode
-// major version.
-
-const packageVersion = new String(fs.readFileSync(`${projectDir}/UNICODE_VERSION.md`));
-const UNICODE_VERSION = packageVersion.split('.')[0] + '.0.0';
+const projectDir = path.dirname(require.resolve("@keymanapp/models-wordbreakers/README.md"));
+const generatedFilename = path.join(projectDir, 'src', 'main', 'default', 'data.ts');
 
 // The data files should be in this repository, with names matching the
 // Unicode version.
-let wordBoundaryFilename = path.join(projectDir, `./src/imports/WordBreakProperty-${UNICODE_VERSION}.txt.gz`);
-let emojiDataFilename = path.join(projectDir, `./src/imports/emoji-data-${UNICODE_VERSION}.txt.gz`);
+const wordBoundaryFilename = path.join(projectDir, `../../../resources/standards-data/unicode-character-database/WordBreakProperty.txt`);
+const emojiDataFilename = path.join(projectDir, `../../../resources/standards-data/unicode-character-database/emoji-data.txt`);
 
 ///////////////////////////// Word_Boundary file /////////////////////////////
 
+interface DataRange {
+  start: number;
+  end: number;
+  property: string;
+}
+
 // Extract the ranges IN ASCENDING ORDER from the file.
 // This will be the big binary search table.
-let ranges = readZippedCharacterPropertyFile(wordBoundaryFilename)
+let ranges = readCharacterPropertyFile(wordBoundaryFilename)
   .sort((a, b) => {
     return a.start - b.start;
   });
@@ -71,22 +69,22 @@ categories.add('eot');
 
 ///////////////////////// Extended_Pictographic=Yes //////////////////////////
 
-let extendedPictographicCodePoints = readZippedCharacterPropertyFile(emojiDataFilename)
+let extendedPictographicCodePoints = readCharacterPropertyFile(emojiDataFilename)
   .filter(({property}) => property === 'Extended_Pictographic');
 
 // Try generating the regular expression both in a way that is
 // backwards-compatbile and one that only works in ES6+.
-let extendedPictographicRegExp;
+// let extendedPictographicRegExp;
 let compatibleRegexp = utf16AlternativesStrategy();
 let es6Regexp = unicodeRangeStrategy();
 
 // Choose the shortest regular expression.
 // In my experience, the ES6 regexp is an order of magnitude smaller!
 if (es6Regexp.length < compatibleRegexp.length) {
-  extendedPictographicRegExp = es6Regexp;
+  // extendedPictographicRegExp = es6Regexp;
   console.warn(`Using ES6 regexp [${es6Regexp.length} chars]`);
 } else {
-  extendedPictographicRegExp = compatibleRegexp;
+  // extendedPictographicRegExp = compatibleRegexp;
   console.warn(`Using compatibility regexp [${compatibleRegexp.length} chars]`);
 }
 
@@ -138,8 +136,13 @@ let stream = fs.createWriteStream(generatedFilename);
 
 // Generate the file!
 stream.write(`// Automatically generated file. DO NOT MODIFY.
+// The generator script is defined at /common/models/wordbreakers/src/data-compiler/index.ts.
+
 /**
  * Valid values for a word break property.
+ *
+ * Is optimized away at compile-time; use \`propertyMap\` to find the mapped
+ * value at runtime for a property name if needed.
  */
 export const enum WordBreakProperty {
 ${ /* Create enum values for each word break property */
@@ -148,6 +151,26 @@ ${ /* Create enum values for each word break property */
     .join(',\n')
 }
 };
+
+/**
+ * Contains property names per associated index, as this is compiled away
+ * by TypeScript for \`const enum\` cases like \`WordBreakProperty\`.
+ */
+export const propertyMap = [
+${ /* Enumerate the plain-text names for ease of lookup at runtime */
+  Array.from(categories)
+  .map(x => `  "${x}"`)
+  .join(',\n')
+}
+];
+
+/**
+ * Constants for indexing values in WORD_BREAK_PROPERTY.
+ */
+export const enum I {
+  Start = 0,
+  Value = 1
+}
 
 export const WORD_BREAK_PROPERTY_BMP: string = \`${
   // To consider:  emit `\uxxxx` codes instead of the raw char?
@@ -194,10 +217,8 @@ export const WORD_BREAK_PROPERTY_NON_BMP: string = \`${
  * If the property specifies a single code point (i.e., not a range of code
  * points), then end === start.
  */
-function readZippedCharacterPropertyFile(filename) {
-  let textContents = zlib.gunzipSync(
-    fs.readFileSync(filename)
-  ).toString('utf8');
+function readCharacterPropertyFile(filename: string) {
+  let textContents = fs.readFileSync(filename, { encoding: 'utf8'});
 
   return textContents.split('\n')
     .filter(line => !line.startsWith('#') && line.trim())
@@ -220,7 +241,7 @@ function readZippedCharacterPropertyFile(filename) {
  * Does some bounds checking in order to determine if the string is in fact a
  * valid code point.
  */
-function parseCodepoint(hexString) {
+function parseCodepoint(hexString: string) {
   let number = parseInt(hexString, 16);
   if (Number.isNaN(number)) {
     throw new SyntaxError(`Cannot parse codepoint: ${hexString}`);
@@ -233,7 +254,7 @@ function parseCodepoint(hexString) {
   return number;
 }
 
-function toUnicodeEscape(codePoint) {
+function toUnicodeEscape(codePoint: number) {
   let isBMP = codePoint <= 0xFFFF;
   let simpleConversion = codePoint.toString(16).toUpperCase();
 
@@ -259,7 +280,7 @@ function utf16AlternativesStrategy() {
   return `/^(?:${alternatives.join('|')})/`;
 }
 
-function codePointToUTF16Escape(codePoint) {
+function codePointToUTF16Escape(codePoint: number): string {
   // Scalar values remain the same
   if (codePoint <= 0xFFFF) {
     return toUnicodeEscape(codePoint);
@@ -290,11 +311,11 @@ function unicodeRangeStrategy() {
   return `/^[${regexp}]/u`;
 }
 
-function makeDense(ranges) {
+function makeDense(ranges: DataRange[]) {
   return joinSameAdjacentProperties(fillInGaps(ranges));
 }
 
-function ensureDense(ranges) {
+function ensureDense(ranges: DataRange[]) {
   let lastEnd = -1;
   let lastProperty = 'sot';
   for (let range of ranges) {
@@ -314,7 +335,7 @@ function ensureDense(ranges) {
 }
 
 
-function joinSameAdjacentProperties(ranges) {
+function joinSameAdjacentProperties(ranges: DataRange[]) {
   console.assert(ranges.length > 1);
 
   let conjoinedRanges = [];
@@ -332,7 +353,7 @@ function joinSameAdjacentProperties(ranges) {
   return conjoinedRanges;
 }
 
-function fillInGaps(ranges) {
+function fillInGaps(ranges: DataRange[]) {
   console.assert(ranges.length > 1);
 
   let denseRanges = [];

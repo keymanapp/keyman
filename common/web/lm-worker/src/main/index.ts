@@ -87,17 +87,20 @@ export default class LMLayerWorker {
    */
   private _importScripts: ImportScripts;
 
+  // @ts-ignore // We don't reference it directly here, but it's worth noting
+  // during debug sessions, especially for unit tests.
   private self: any;
 
   private _platformCapabilities: Capabilities;
 
   private _testMode: boolean = false;
 
-  private _hostURL: string;
-
   private _currentModelSource: ModelSourceSpec;
 
-  constructor(options = {
+  constructor(options: {
+    importScripts: typeof importScripts,
+    postMessage: typeof postMessage
+  } = {
     importScripts: null,
     postMessage: null
   }) {
@@ -325,12 +328,12 @@ export default class LMLayerWorker {
         switch(payload.message) {
           case 'predict':
             var {transform, context} = payload;
-            var suggestions = compositor.predict(transform, context);
-
-            // Now that the suggestions are ready, send them out!
-            this.cast('suggestions', {
-              token: payload.token,
-              suggestions: suggestions
+            compositor.predict(transform, context).then((suggestions) => {
+              // Now that the suggestions are ready, send them out!
+              this.cast('suggestions', {
+                token: payload.token,
+                suggestions: suggestions
+              });
             });
             break;
           case 'wordbreak':
@@ -355,11 +358,12 @@ export default class LMLayerWorker {
             break;
           case 'revert':
             var {reversion, context} = payload;
-            var suggestions: Suggestion[] = compositor.applyReversion(reversion, context);
 
-            this.cast('postrevert', {
-              token: payload.token,
-              suggestions: suggestions
+            compositor.applyReversion(reversion, context).then((suggestions) => {
+              this.cast('postrevert', {
+                token: payload.token,
+                suggestions: suggestions
+              });
             });
             break;
           case 'reset-context':
@@ -401,9 +405,13 @@ export default class LMLayerWorker {
 
     // Ensures that the worker instance is accessible for loaded model scripts.
     // Assists unit-testing.
+    // @ts-ignore
     scope['LMLayerWorker'] = worker;
+    // @ts-ignore
     scope['models'] = models;
+    // @ts-ignore
     scope['correction'] = correction;
+    // @ts-ignore
     scope['wordBreakers'] = wordBreakers;
 
     return worker;

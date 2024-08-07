@@ -1,20 +1,13 @@
 #!/usr/bin/env bash
 # Build Keyman Engine for Android using Keyman Web artifacts
 #
-
-#set -x
-set -eu
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
 
 # ################################ Main script ################################
 
@@ -84,8 +77,6 @@ if builder_start_action build:engine; then
   echo "Copying Keyman Web artifacts"
   cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/keymanweb-webview.js" "$ENGINE_ASSETS/keymanweb-webview.js"
   cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/keymanweb-webview.js.map" "$ENGINE_ASSETS/keymanweb-webview.js.map"
-  cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/keymanweb-webview.es5.js" "$ENGINE_ASSETS/keymanweb-webview.es5.js"
-  cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/keymanweb-webview.es5.js.map" "$ENGINE_ASSETS/keymanweb-webview.es5.js.map"
   cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/map-polyfill.js" "$ENGINE_ASSETS/map-polyfill.js"
   cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/ajax-loader.gif" "$ENGINE_ASSETS/ajax-loader.gif"
   cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/kmwosk.css" "$ENGINE_ASSETS/kmwosk.css"

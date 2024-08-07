@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "ES2022",
+    "module": "node16",
     "target": "es2022",
     "moduleResolution": "node16",
     "forceConsistentCasingInFileNames": true,
@@ -26,7 +26,6 @@
 
     "paths": {
       "@keymanapp/common-types": ["./common/web/types/src/main"],
-      "@keymanapp/input-processor": ["./common/web/input-processor/src"],
       "@keymanapp/keyboard-processor": ["./common/web/keyboard-processor/src"],
       "@keymanapp/keyman": ["./web" ],
       "@keymanapp/models-types": ["./common/models/types"],
@@ -35,6 +34,7 @@
       "@keymanapp/web-utils": ["./common/web/utils"],
       "@keymanapp/lm-message-types": ["./common/web/lm-message-types"],
       "@keymanapp/keyman-version": ["./common/web/keyman-version"],
+      "@keymanapp/ldml-keyboard-constants": [ "./core/include/ldml" ],
     }
   }
 }

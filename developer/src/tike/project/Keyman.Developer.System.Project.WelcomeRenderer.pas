@@ -34,10 +34,10 @@ begin
   // so it was saving this file in the wrong location. This small patch
   // moves the file into the right location.
   path := GetFolderPath(CSIDL_APPDATA) + SFolderKeymanDeveloper;
+  ForceDirectories(path);
+
   if FileExists(path + SMRUFilename) then
   begin
-    if not DirectoryExists(path) then
-      CreateDir(path);
     if FileExists(path + '\' + SMRuFilename)
       then System.SysUtils.DeleteFile(path + SMRUFilename)
       else RenameFile(path + SMRUFilename, path + '\' + SMRUFilename);

@@ -34,7 +34,7 @@ cd `dirname ${KEYMAN_MACIM_BASE_PATH}` > /dev/null
 KEYMAN_MACIM_BASE_PATH=`pwd`;
 popd  > /dev/null
 
-. $KEYMAN_MACIM_BASE_PATH/../bashHelperFunctions.sh
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 DEST_DIR="$KEYMAN_MACIM_BASE_PATH/output/upload"
 ADD_VERSION_TO_DEST_DIR=true

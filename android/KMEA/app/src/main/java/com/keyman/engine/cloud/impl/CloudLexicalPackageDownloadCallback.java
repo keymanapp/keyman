@@ -2,7 +2,6 @@ package com.keyman.engine.cloud.impl;
 
 import android.content.Context;
 import android.net.Uri;
-import android.widget.Toast;
 
 import com.keyman.engine.BaseActivity;
 import com.keyman.engine.KMKeyboardDownloaderActivity;
@@ -99,8 +98,6 @@ public class CloudLexicalPackageDownloadCallback implements ICloudDownloadCallba
   @Override
   public void applyCloudDownloadToModel(Context aContext, Void aModel, CloudKeyboardDownloadReturns aCloudResult)
   {
-    BaseActivity.makeToast(aContext, R.string.dictionary_download_finished, Toast.LENGTH_SHORT);
-
     if(aCloudResult.installedResource != null)
     {
       KeyboardEventHandler.notifyListeners(KMKeyboardDownloaderActivity.getKbDownloadEventListeners(),

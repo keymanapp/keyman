@@ -1,6 +1,6 @@
 // #region Big ol' list of imports
 
-import EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter3';
 
 import Codes from "./codes.js";
 import type Keyboard from "../keyboards/keyboard.js";
@@ -17,6 +17,7 @@ import KeyboardInterface, { SystemStoreIDs, VariableStore } from "./kbdInterface
 import RuleBehavior from "./ruleBehavior.js";
 
 import { DeviceSpec, globalObject } from "@keymanapp/web-utils";
+import { ModifierKeyConstants } from '@keymanapp/common-types';
 
 // #endregion
 
@@ -27,7 +28,7 @@ export type LogMessageHandler = (str: string) => void;
 
 export interface VariableStoreSerializer {
   loadStore(keyboardID: string, storeName: string): VariableStore;
-  saveStore(keyboardID: string, storeName: string, storeMap: VariableStore);
+  saveStore(keyboardID: string, storeName: string, storeMap: VariableStore): void;
 }
 
 export interface ProcessorInitOptions {
@@ -235,6 +236,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
       matchBehavior = this.defaultRuleBehavior(keyEvent, outputTarget, false);
       matchBehavior.triggerKeyDefault = true;
       // Force a single `deleteLeft`.
+      // @ts-ignore // force value override, because deleteLeft is marked readonly.
       matchBehavior.transcription.transform.deleteLeft = 1;
     } else if(!matchBehavior || matchBehavior.triggerKeyDefault) {
       // Restore the virtual key code if a mnemonic keyboard is being used
@@ -273,8 +275,9 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
   _UpdateVKShift(e: KeyEvent): boolean {
     let keyShiftState=0;
 
-    const lockNames  = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'];
-    const lockKeys   = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'];
+    const lockNames  = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'] as const;
+    const lockKeys = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'] as const;
+    const lockModifiers = [ ModifierKeyConstants.CAPITALFLAG, ModifierKeyConstants.NUMLOCKFLAG, ModifierKeyConstants.SCROLLFLAG] as const;
 
     if(!this.activeKeyboard) {
       return true;
@@ -288,14 +291,14 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
       if(this.activeKeyboard.isChiral && (this.activeKeyboard.emulatesAltGr) &&
           (this.modStateFlags & Codes.modifierBitmasks['ALT_GR_SIM']) == Codes.modifierBitmasks['ALT_GR_SIM']) {
         keyShiftState |= Codes.modifierBitmasks['ALT_GR_SIM'];
-        keyShiftState &= ~Codes.modifierCodes['RALT'];
+        keyShiftState &= ~ModifierKeyConstants.RALTFLAG;
       }
 
       // Set stateKeys where corresponding value is passed in e.Lstates
       let stateMutation = false;
       for(let i=0; i < lockNames.length; i++) {
         if(e.Lstates & Codes.stateBitmasks[lockNames[i]]) {
-          this.stateKeys[lockKeys[i]] = !!(e.Lstates & Codes.modifierCodes[lockNames[i]]);
+          this.stateKeys[lockKeys[i]] = !!(e.Lstates & lockModifiers[i]);
           stateMutation = true;
         }
       }
@@ -313,7 +316,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
       if(!e || !e.isModifier) {
         // Mnemonic keystrokes manipulate the SHIFT property based on CAPS state.
         // We need to unflip them when tracking the OSK layer.
-        keyShiftState ^= Codes.modifierCodes['SHIFT'];
+        keyShiftState ^= ModifierKeyConstants.K_SHIFTFLAG;
       }
     }
 
@@ -322,23 +325,22 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
   }
 
   private updateStates(): void {
-    var lockNames  = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'];
-    var lockKeys   = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'];
+    const lockKeys = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'] as const;
+    const lockModifiers = [ModifierKeyConstants.CAPITALFLAG, ModifierKeyConstants.NUMLOCKFLAG, ModifierKeyConstants.SCROLLFLAG] as const;
+    const noLockModifers = [ModifierKeyConstants.NOTCAPITALFLAG, ModifierKeyConstants.NOTNUMLOCKFLAG, ModifierKeyConstants.NOTSCROLLFLAG] as const;
 
     for(let i=0; i < lockKeys.length; i++) {
       const key = lockKeys[i];
       const flag = this.stateKeys[key];
-      const onBit = lockNames[i];
-      const offBit = 'NO_' + lockNames[i];
 
       // Ensures that the current mod-state info properly matches the currently-simulated
       // state key states.
       if(flag) {
-        this.modStateFlags |= Codes.modifierCodes[onBit];
-        this.modStateFlags &= ~Codes.modifierCodes[offBit];
+        this.modStateFlags |= lockModifiers[i];
+        this.modStateFlags &= ~noLockModifers[i];
       } else {
-        this.modStateFlags &= ~Codes.modifierCodes[onBit];
-        this.modStateFlags |= Codes.modifierCodes[offBit];
+        this.modStateFlags &= ~lockModifiers[i];
+        this.modStateFlags |= noLockModifers[i];
       }
     }
   }
@@ -443,7 +445,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
 
     // Do not change layer unless needed (27/08/2015)
     if(id == activeLayer && keyEvent.device.formFactor != DeviceSpec.FormFactor.Desktop) {
-      return false;
+      return;
     }
 
     var idx=id;
@@ -483,25 +485,25 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
         // Toggle the modifier represented by our input argument.
         switch(id) {
           case 'shift':
-            modifier ^= Codes.modifierCodes['SHIFT'];
+            modifier ^= ModifierKeyConstants.K_SHIFTFLAG;
             break;
           case 'leftctrl':
-            modifier ^= Codes.modifierCodes['LCTRL'];
+            modifier ^= ModifierKeyConstants.LCTRLFLAG;
             break;
           case 'rightctrl':
-            modifier ^= Codes.modifierCodes['RCTRL'];
+            modifier ^= ModifierKeyConstants.RCTRLFLAG;
             break;
           case 'ctrl':
-            modifier ^= Codes.modifierCodes['CTRL'];
+            modifier ^= ModifierKeyConstants.K_CTRLFLAG;
             break;
           case 'leftalt':
-            modifier ^= Codes.modifierCodes['LALT'];
+            modifier ^= ModifierKeyConstants.LALTFLAG;
             break;
           case 'rightalt':
-            modifier ^= Codes.modifierCodes['RALT'];
+            modifier ^= ModifierKeyConstants.RALTFLAG;
             break;
           case 'alt':
-            modifier ^= Codes.modifierCodes['ALT'];
+            modifier ^= ModifierKeyConstants.K_ALTFLAG;
             break;
           default:
             s = id;

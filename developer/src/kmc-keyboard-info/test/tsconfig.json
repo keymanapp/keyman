@@ -8,10 +8,6 @@
       "esModuleInterop": true,
       "allowSyntheticDefaultImports": true,
       "baseUrl": ".",
-      "paths": {
-        "@keymanapp/developer-test-helpers": ["../../common/web/test-helpers/index"],
-        "@keymanapp/kmc-package": ["../../kmc-package/source"],
-      },
   },
   "include": [
       "**/test-*.ts",

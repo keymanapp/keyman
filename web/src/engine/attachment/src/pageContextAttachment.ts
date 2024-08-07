@@ -1,4 +1,4 @@
-import EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter3';
 
 import { DeviceSpec, InternalKeyboardFont } from "@keymanapp/keyboard-processor";
 import { Input, nestedInstanceOf, wrapElement } from "keyman/engine/element-wrappers";
@@ -308,7 +308,8 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
   isKMWDisabled(x: HTMLElement): boolean {
     const c = x.className;
 
-    // Exists for some HTMLElements.
+    // Exists for some HTMLElements, such as HTMLInputElement.
+    // @ts-ignore
     if(x['readOnly']) {
       return true;
     } else if(c && c.indexOf('kmw-disabled') >= 0) {
@@ -917,8 +918,8 @@ export class PageContextAttachment extends EventEmitter<EventMap> {
   };
 
   _AutoAttachObserverCore = (mutations: MutationRecord[]) => {
-    var inputElementAdditions = [];
-    var inputElementRemovals = [];
+    var inputElementAdditions: HTMLElement[] = [];
+    var inputElementRemovals: HTMLElement[] = [];
 
     for(var i=0; i < mutations.length; i++) {
       let mutation = mutations[i];

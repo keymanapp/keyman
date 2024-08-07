@@ -144,6 +144,9 @@ let sourceFileSet = [
   // Needed for Android / Chromium browser pre-41.
   loadPolyfill('../../../node_modules/string.prototype.codepointat/codepointat.js', 'src/polyfills/string.codepointat.js'),
   // Needed for Android / Chromium browser pre-45.
+  // Not used in this codebase, but used by some compiled model defaults.
+  loadPolyfill('src/polyfills/array.from.js', 'src/polyfills/array.from.js'),
+  // Needed for Android / Chromium browser pre-45.
   loadPolyfill('src/polyfills/array.fill.js', 'src/polyfills/array.fill.js'),
   // Needed for Android / Chromium browser pre-45.
   loadPolyfill('src/polyfills/array.findIndex.js', 'src/polyfills/array.findIndex.js'),
@@ -188,6 +191,6 @@ await esbuild.build({
   // Do NOT enable - will break under Android 5.0 / Chrome 35 environments, likely through Chrome 42.
   // https://caniuse.com/mdn-javascript_builtins_function_name_configurable_true
   keepNames: false,
-  target: 'es5',
+  target: 'es6',
   outfile: minDestFile
 });

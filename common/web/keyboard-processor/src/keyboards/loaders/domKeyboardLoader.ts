@@ -46,7 +46,7 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
         script.id = id;
       }
       document.head.appendChild(script);
-      script.onerror = (err) => {
+      script.onerror = (err: any) => {
         promise.reject(errorBuilder.missingError(err));
       }
       script.onload = () => {

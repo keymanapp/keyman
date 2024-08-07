@@ -94,6 +94,7 @@ struct _IBusKeymanEngine {
   IBusLookupTable *table;
   IBusProperty    *status_prop;
   IBusPropList    *prop_list;
+  void            *settings;
 
   commit_queue_item commit_queue[MAX_QUEUE_SIZE];
   commit_queue_item *commit_item;
@@ -219,9 +220,9 @@ static gchar *
 get_context_debug(IBusEngine *engine) {
   IBusKeymanEngine *keyman       = (IBusKeymanEngine *)engine;
 
-  km_core_cp *buf = km_core_state_context_debug(keyman->state, KM_CORE_DEBUG_CONTEXT_CACHED);
+  km_core_cu *buf = km_core_state_context_debug(keyman->state, KM_CORE_DEBUG_CONTEXT_CACHED);
   gchar *result = g_utf16_to_utf8((gunichar2 *)buf, -1, NULL, NULL, NULL);
-  km_core_cp_dispose(buf);
+  km_core_cu_dispose(buf);
   if(result) {
     return result;
   }
@@ -292,7 +293,7 @@ set_context_if_needed(IBusEngine *engine) {
   g_message("%s: new application context: |%s| (len:%u) cursor:%d anchor:%d", __FUNCTION__,
     application_context_utf8, context_end - context_start, cursor_pos, anchor_pos);
 
-  km_core_cp *application_context_utf16 = g_utf8_to_utf16(application_context_utf8, -1, NULL, NULL, NULL);
+  km_core_cu *application_context_utf16 = g_utf8_to_utf16(application_context_utf8, -1, NULL, NULL, NULL);
   km_core_context_status result;
   result = km_core_state_context_set_if_needed(keyman->state, application_context_utf16);
   g_free(application_context_utf16);
@@ -326,7 +327,7 @@ ibus_keyman_engine_init(IBusKeymanEngine *keyman) {
   keyman->state = NULL;
 }
 
-static km_core_cp* get_base_layout()
+static km_core_cu* get_base_layout()
 {
   return u"en-US";
 
@@ -354,7 +355,7 @@ static km_core_cp* get_base_layout()
     lang = strdup("en-US");
   }
   g_message("lang is %s", lang);
-  km_core_cp *cp = g_utf8_to_utf16(lang, -1, NULL, NULL, NULL);
+  km_core_cu *cp = g_utf8_to_utf16(lang, -1, NULL, NULL, NULL);
   return cp;
   // g_free(lang);
 #endif
@@ -366,8 +367,8 @@ setup_environment(IBusKeymanEngine *keyman)
   g_assert(keyman);
   g_message("%s: setting up environment", __FUNCTION__);
 
-  // Allocate enough options for: 3 environments plus 1 pad struct of 0's
-  km_core_option_item environment_opts[4] = {0};
+  // Allocate enough options for: 4 environments plus 1 pad struct of 0's
+  km_core_option_item environment_opts[5] = {0};
 
   environment_opts[0].scope = KM_CORE_OPT_ENVIRONMENT;
   environment_opts[0].key   = KM_CORE_KMX_ENV_PLATFORM;
@@ -381,6 +382,9 @@ setup_environment(IBusKeymanEngine *keyman)
   environment_opts[2].key   = KM_CORE_KMX_ENV_BASELAYOUTALT;
   environment_opts[2].value = get_base_layout();  // TODO: free when mnemonic layouts are to be supported
 
+  environment_opts[3].scope = KM_CORE_OPT_ENVIRONMENT;
+  environment_opts[3].key   = KM_CORE_KMX_ENV_SIMULATEALTGR;
+  environment_opts[3].value = keyman_get_option_fromdconf(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR) ? u"1" : u"0";
 
   km_core_status status = km_core_state_create(keyman->keyboard, environment_opts, &(keyman->state));
   if (status != KM_CORE_STATUS_OK) {
@@ -389,14 +393,25 @@ setup_environment(IBusKeymanEngine *keyman)
   return status;
 }
 
+static void
+on_dconf_settings_change(GSettings *settings, gchar *key, gpointer user_data) {
+  if (!user_data || g_strcmp0(key, KEYMAN_DCONF_OPTIONS_SIMULATEALTGR) != 0) {
+    // not the SimulateAltGr option...
+    return;
+  }
+  IBusKeymanEngine *keyman = (IBusKeymanEngine *)user_data;
+  km_core_state_dispose(keyman->state);
+  setup_environment(keyman);
+}
+
 void
 free_km_core_option_item(gpointer data) {
   if (!data)
     return;
 
   km_core_option_item *opt = (km_core_option_item *)data;
-  g_free((km_core_cp *)opt->key);
-  g_free((km_core_cp *)opt->value);
+  g_free((km_core_cu *)opt->key);
+  g_free((km_core_cu *)opt->value);
   g_free(opt);
 }
 
@@ -407,7 +422,7 @@ load_keyboard_options(IBusKeymanEngine *keyman) {
   // Retrieve keyboard options from DConf
   // TODO: May need unique packageID and keyboard ID
   g_message("%s: Loading options for kb_name: %s", __FUNCTION__, keyman->kb_name);
-  GQueue *queue_options = keyman_get_options_queue_fromdconf(keyman->kb_name, keyman->kb_name);
+  GQueue *queue_options = keyman_get_keyboard_options_queue_fromdconf(keyman->kb_name, keyman->kb_name);
   int num_options       = g_queue_get_length(queue_options);
   if (num_options < 1) {
     g_queue_free_full(queue_options, free_km_core_option_item);
@@ -515,6 +530,8 @@ ibus_keyman_engine_constructor(
       return NULL;
     }
 
+    keyman->settings = keyman_subscribe_option_changes(on_dconf_settings_change, keyman);
+
     status = load_keyboard_options(keyman);
     if (status != KM_CORE_STATUS_OK) {
       ibus_keyman_engine_destroy(keyman);
@@ -536,6 +553,11 @@ ibus_keyman_engine_destroy (IBusKeymanEngine *keyman)
     engine_name = ibus_engine_get_name ((IBusEngine *) keyman);
     g_assert (engine_name);
     g_message("DAR: %s %s", __FUNCTION__, engine_name);
+
+    if (keyman->settings) {
+      keyman_unsubscribe_option_changes(keyman->settings, on_dconf_settings_change, keyman);
+      keyman->settings = NULL;
+    }
 
     if (keyman->prop_list) {
         g_debug("DAR: %s: unref keyman->prop_list", __FUNCTION__);
@@ -655,7 +677,7 @@ process_persist_action(IBusEngine *engine, km_core_option_item *persist_options)
     g_assert(option->key != NULL && option->value != NULL);
     g_message("%s: Saving keyboard option to DConf", __FUNCTION__);
     // Load the current keyboard options from DConf
-    keyman_put_options_todconf(keyman->kb_name, keyman->kb_name, (gchar *)option->key, (gchar *)option->value);
+    keyman_put_keyboard_options_todconf(keyman->kb_name, keyman->kb_name, (gchar *)option->key, (gchar *)option->value);
   }
 }
 

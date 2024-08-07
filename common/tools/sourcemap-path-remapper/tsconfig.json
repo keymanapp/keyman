@@ -10,7 +10,7 @@
     "inlineSources": true,
     "sourceRoot": "/common/tools/sourcemap-path-remapper/src",
     "lib": ["dom", "es6"],
-    "target": "es5",
+    "target": "es6",
     "types": ["node"],
     "downlevelIteration": true,
     "baseUrl": "./",

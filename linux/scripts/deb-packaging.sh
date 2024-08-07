@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2154 # (variables are set in build-utils.sh)
-# Actions for creating a Debian source package. Used by deb-packaging.yml GHA.
+# Actions for creating a Debian source package and verifying the API.
+# Used by deb-packaging.yml and api-verification.yml GHAs.
 
 set -eu
 shopt -s inherit_errexit
@@ -36,6 +37,10 @@ fi
 
 dependencies_action() {
   sudo mk-build-deps --install --tool='apt-get -o Debug::pkgProblemResolver=yes --no-install-recommends --yes' debian/control
+  # Additionally we need quilt to be able to create the source package.
+  # Since this is not needed to build the binary package, it is not
+  # (and should not be) included in `build-depends` in `debian/control`.
+  sudo DEBIAN_FRONTEND=noninteractive apt-get -q -y install quilt
 }
 
 source_action() {
@@ -50,7 +55,7 @@ source_action() {
   echo "${END_STEP}"
 
   echo "${START_STEP}Make deb source${COLOR_RESET}"
-  ./scripts/deb.sh sourcepackage
+  ./scripts/deb.sh
   echo "${END_STEP}"
 
   mv builddebs/* "${OUTPUT_PATH:-..}"
@@ -105,7 +110,7 @@ is_symbols_file_changed() {
 
 get_changes() {
   local WHAT_CHANGED
-  WHAT_CHANGED=$(git diff -I "^${PKG_NAME}.so" "$1".."$2" -- "debian/${PKG_NAME}.symbols" | diffstat -m -t | tail -n +2)
+  WHAT_CHANGED=$(git diff -I "^${LIB_NAME}.so" "$1".."$2" | diffstat -m -t | grep "${PKG_NAME}.symbols" )
 
   IFS=',' read -r -a CHANGES <<< "${WHAT_CHANGED:-0,0,0}"
 }
@@ -142,21 +147,67 @@ check_updated_version_number() {
 }
 
 get_api_version_in_symbols_file() {
-  # Extract 1 from "libkeymancore.so.1 libkeymancore #MINVER#"
-  local firstline
-  firstline="$(head -1 "debian/${PKG_NAME}.symbols")"
-  firstline="${firstline#"${PKG_NAME}".so.}"
+  # Retrieve symbols file at commit $1 and extract "1" from
+  # "libkeymancore.so.1 libkeymancore1 #MINVER#"
+  local firstline tmpfile
+  local sha="$1"
+
+  tmpfile=$(mktemp)
+  if ! git cat-file blob "${sha}:linux/debian/${PKG_NAME}.symbols" > "${tmpfile}" 2>/dev/null; then
+    rm "${tmpfile}"
+    echo "-1"
+    return
+  fi
+
+  firstline="$(head -1 "${tmpfile}")"
+  firstline="${firstline#"${LIB_NAME}".so.}"
   firstline="${firstline%% *}"
+
+  rm "${tmpfile}"
   echo "${firstline}"
 }
 
+get_api_version_from_core() {
+  # Retrieve CORE_API_VERSION.md from commit $1 and extract major version
+  # number ("1") from "1.0.0"
+  local api_version tmpfile
+  local sha="$1"
+  tmpfile=$(mktemp)
+
+  if ! git cat-file blob "${sha}:core/CORE_API_VERSION.md" > "${tmpfile}" 2>/dev/null; then
+    rm "${tmpfile}"
+    echo "-1"
+    return
+  fi
+
+  api_version=$(cat "${tmpfile}")
+  api_version=${api_version%%.*}
+
+  rm "${tmpfile}"
+  echo "${api_version}"
+}
+
+# Check if the API version got updated
+# Returns:
+#   0 - if the API version got updated
+#   1 - the .symbols file got changed but the API version didn't get updated
+#   2 - if we're in the alpha tier and the API version got updated since
+#       the last stable version
+# NOTE: it is up to the caller to check if this is a major version
+# change that requires an API version update.
+# Check if the API version got updated
+# Returns:
+#   0 - if the API version got updated
+#   1 - the .symbols file got changed but the API version didn't get updated
+#   2 - if we're in the alpha tier and the API version got updated since
+#       the last stable version
+# NOTE: it is up to the caller to check if this is a major version
+# change that requires an API version update.
 is_api_version_updated() {
-  local NEW_VERSION OLD_VERSION TIER
-  git checkout "${GIT_BASE}" -- "debian/${PKG_NAME}.symbols"
-  OLD_VERSION=$(get_api_version_in_symbols_file)
-  git checkout "${GIT_SHA}" -- "debian/${PKG_NAME}.symbols"
-  NEW_VERSION=$(get_api_version_in_symbols_file)
-  if (( NEW_VERSION > OLD_VERSION )); then
+  local OLD_API_VERSION NEW_API_VERSION TIER
+  OLD_API_VERSION=$(get_api_version_in_symbols_file "${GIT_BASE}")
+  NEW_API_VERSION=$(get_api_version_in_symbols_file "${GIT_SHA}")
+  if (( NEW_API_VERSION > OLD_API_VERSION )); then
     echo "0"
     return
   fi
@@ -166,12 +217,25 @@ is_api_version_updated() {
   TIER=$(cat "${REPO_ROOT}/TIER.md")
   case ${TIER} in
     alpha)
-      local STABLE_VERSION
+      local STABLE_VERSION STABLE_API_VERSION STABLE_BRANCH
       STABLE_VERSION=$((${VERSION%%.*} - 1))
-      git checkout "stable-${STABLE_VERSION}.0" -- "debian/${PKG_NAME}.symbols"
-      STABLE_API_VERSION=$(get_api_version_in_symbols_file)
-      git checkout "${GIT_SHA}" -- "debian/${PKG_NAME}.symbols"
-      if (( NEW_VERSION > STABLE_API_VERSION )); then
+      STABLE_BRANCH="origin/stable-${STABLE_VERSION}.0"
+      STABLE_API_VERSION=$(get_api_version_in_symbols_file "${STABLE_BRANCH}")
+      if (( STABLE_API_VERSION == -1 )); then
+        # .symbols file doesn't exist in stable branch, so let's check CORE_API_VERSION.md. That
+        # doesn't exist in 16.0 but appeared in 17.0.
+        STABLE_API_VERSION=$(get_api_version_from_core "${STABLE_BRANCH}")
+        if (( STABLE_API_VERSION == -1 )); then
+          # CORE_API_VERSION.md doesn't exist either
+          if (( NEW_API_VERSION > 0 )); then
+            # .symbols and CORE_API_VERSION.md file don't exist in stable branch; however, we
+            # incremented the version number compared to 16.0, so that's ok
+            echo "2"
+            return
+          fi
+        fi
+      fi
+      if (( NEW_API_VERSION > STABLE_API_VERSION )); then
         echo "2"
         return
       fi ;;
@@ -220,10 +284,8 @@ check_for_api_version_consistency() {
   # Checks that the (major) API version number in the .symbols file and
   # in CORE_API_VERSION.md are the same
   local symbols_version api_version
-  symbols_version=$(get_api_version_in_symbols_file)
-  api_version=$(cat ../core/CORE_API_VERSION.md)
-  # Extract major version number from "1.0.0"
-  api_version=${api_version%%.*}
+  symbols_version=$(get_api_version_in_symbols_file "HEAD")
+  api_version=$(get_api_version_from_core "HEAD")
 
   if (( symbols_version == api_version )); then
     output_ok "API version in .symbols file and in CORE_API_VERSION.md is the same"
@@ -234,10 +296,12 @@ check_for_api_version_consistency() {
 }
 
 verify_action() {
-  PKG_NAME=libkeymancore
+  local SONAME
+  SONAME=$(get_api_version_from_core "HEAD")
   LIB_NAME=libkeymancore
+  PKG_NAME="${LIB_NAME}${SONAME}"
   if [[ ! -f debian/${PKG_NAME}.symbols ]]; then
-    output_warning "Missing ${PKG_NAME}.symbols file"
+    output_error "Missing ${PKG_NAME}.symbols file"
     exit 0
   fi
 

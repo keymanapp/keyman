@@ -290,6 +290,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
 
   @Override
   public void onBackPressed() {
+    super.onBackPressed();
     finish();
   }
 

@@ -3,6 +3,7 @@ import { KeyElement } from '../../../keyElement.js';
 import KeyTipInterface from '../../../keytip.interface.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 import { GesturePreviewHost } from '../../../keyboard-layout/gesturePreviewHost.js';
+import { ParsedLengthStyle } from '../../../lengthStyle.js';
 
 const CSS_PREFIX = 'kmw-';
 const DEFAULT_TIP_ORIENTATION: PhoneKeyTipOrientation = 'top';
@@ -90,7 +91,6 @@ export default class KeyTip implements KeyTipInterface {
       let xLeft = rkey.left - rrow.left,
           xWidth = rkey.width,
           xHeight = rkey.height,
-          kc = key.key.label,
           previewFontScale = 1.8;
 
       let kts = this.element.style;
@@ -111,15 +111,14 @@ export default class KeyTip implements KeyTipInterface {
       let canvasWidth = xWidth + Math.ceil(xWidth * 0.3) * 2;
       let canvasHeight = Math.ceil(2.3 * xHeight) + (ySubPixelPadding); //
 
-      kts.top = 'auto';
-
-      const unselectedOrientation = orientation == 'top' ? 'bottom' : 'top';
-      this.tip.classList.remove(`${CSS_PREFIX}${unselectedOrientation}`);
-      this.tip.classList.add(`${CSS_PREFIX}${orientation}`);
-
       if(orientation == 'bottom') {
         y += canvasHeight - xHeight;
       }
+
+      kts.top = 'auto';
+      const unselectedOrientation = orientation == 'top' ? 'bottom' : 'top';
+      this.tip.classList.remove(`${CSS_PREFIX}${unselectedOrientation}`);
+      this.tip.classList.add(`${CSS_PREFIX}${orientation}`);
 
       kts.bottom = Math.floor(_BoxRect.height - y) + 'px';
       kts.textAlign = 'center';
@@ -141,14 +140,14 @@ export default class KeyTip implements KeyTipInterface {
       }
 
       if(px != 0) {
-        let popupFS = previewFontScale * px;
         let scaleStyle = {
-          fontFamily: kts.fontFamily,
-          fontSize: popupFS + 'px',
-          height: 1.6 * xHeight + 'px' // as opposed to the canvas height of 2.3 * xHeight.
+          keyWidth: 1.6 * xWidth,
+          keyHeight: 1.6 * xHeight, // as opposed to the canvas height of 2.3 * xHeight.
+          baseEmFontSize: vkbd.getKeyEmFontSize(),
+          layoutFontSize: new ParsedLengthStyle(vkbd.kbdDiv.style.fontSize)
         };
 
-        kts.fontSize = key.key.getIdealFontSize(vkbd, key.key.keyText, scaleStyle, true);
+        kts.fontSize = key.key.getIdealFontSize(key.key.keyText, scaleStyle, previewFontScale).styleString;
       }
 
       // Adjust shape if at edges

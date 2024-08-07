@@ -1,4 +1,4 @@
-import EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter3';
 
 import { createUnselectableElement } from 'keyman/engine/dom-utils';
 
@@ -86,6 +86,7 @@ export class BannerView implements OSKViewComponent {
         let prevBanner = this.currentBanner;
         this.currentBanner = banner;
         this.bannerContainer.replaceChild(banner.getDiv(), prevBanner.getDiv());
+        prevBanner.shutdown();
       }
     } else {
       this.currentBanner = banner;

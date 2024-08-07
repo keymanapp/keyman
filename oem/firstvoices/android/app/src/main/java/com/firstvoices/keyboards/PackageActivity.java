@@ -155,6 +155,7 @@ public class PackageActivity extends AppCompatActivity {
 
   @Override
   public void onBackPressed() {
+    super.onBackPressed();
     finish();
     overridePendingTransition(0, android.R.anim.fade_out);
   }

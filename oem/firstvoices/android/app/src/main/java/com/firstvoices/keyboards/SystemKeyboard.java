@@ -49,6 +49,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
         if (DependencyUtil.libraryExists(LibraryType.SENTRY) && !Sentry.isEnabled()) {
             Log.d(TAG, "Initializing Sentry");
             SentryAndroid.init(getApplicationContext(), options -> {
+                options.setEnableAutoSessionTracking(false);
                 options.setRelease(com.firstvoices.keyboards.BuildConfig.VERSION_GIT_TAG);
                 options.setEnvironment(com.firstvoices.keyboards.BuildConfig.VERSION_ENVIRONMENT);
             });
@@ -61,29 +62,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
         KMManager.setShouldCheckKeyboardUpdates(false);
         KMManager.setKeyboardPickerFont(Typeface.createFromAsset(getAssets(), "fonts/NotoSansCanadianAboriginal.ttf"));
         KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
-
-        /**
-         * We need to set the default (fallback) keyboard to sil_euro_latin inside the fv_all package
-         * rather than the normal default of sil_euro_latin inside the sil_euro_latin package.
-         * Fallback keyboard needed in case the user never selects a FV keyboard to add
-         * as a system keyboard.
-         */
-        String version = KMManager.getLatestKeyboardFileVersion(
-          this, FVShared.FVDefault_PackageID, KMManager.KMDefault_KeyboardID);
-        KMManager.setDefaultKeyboard(
-          new Keyboard(
-            FVShared.FVDefault_PackageID,
-            KMManager.KMDefault_KeyboardID,
-            KMManager.KMDefault_KeyboardName,
-            KMManager.KMDefault_LanguageID,
-            KMManager.KMDefault_LanguageName,
-            version,
-            null, // will use help.keyman.com link because context required to determine local welcome.htm path,
-            "",
-            false,
-            KMManager.KMDefault_KeyboardFont,
-            KMManager.KMDefault_KeyboardFont)
-        );
+        DefaultLanguageResource.install(this);
 
         interpreter = new KMHardwareKeyboardInterpreter(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
         KMManager.setInputMethodService(this); // for HW interface
@@ -223,13 +202,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
         super.onComputeInsets(outInsets);
 
         // We should extend the touchable region so that Keyman sub keys menu can receive touch events outside the keyboard frame
-        WindowManager wm = (WindowManager)getSystemService(Context.WINDOW_SERVICE);
-        if(wm == null) return;
-        Point size = new Point(0, 0);
-        Display display = wm.getDefaultDisplay();
-        if(display == null) return;
-
-        display.getSize(size);
+        Point size = KMManager.getWindowSize(getApplicationContext());
 
         int inputViewHeight = 0;
         if (inputView != null)

@@ -1,4 +1,4 @@
-import EventEmitter from 'eventemitter3';
+import { EventEmitter } from 'eventemitter3';
 import { GestureRecognizer, GestureRecognizerConfiguration } from '@keymanapp/gesture-recognizer';
 
 import { FixtureLayoutConfiguration } from './fixtureLayoutConfiguration.js';

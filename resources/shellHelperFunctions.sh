@@ -1,5 +1,16 @@
 #!/usr/bin/env bash
 
+# We only import JQ if not already defined; jq is used by
+# _select_node_version_with_nvm()
+
+if [[ -z "${JQ+x}" ]]; then
+  if [[ "$BUILDER_OS" == win ]]; then
+    . "$KEYMAN_ROOT/resources/build/jq.inc.sh"
+  else
+    JQ=jq
+  fi
+fi
+
 # Allows for a quick macOS check for those scripts requiring a macOS environment.
 verify_on_mac() {
   if [[ "${OSTYPE}" != "darwin"* ]]; then
@@ -179,6 +190,54 @@ set_npm_version () {
 }
 
 #
+# Re-runs the specified command-line instruction up to 5 times should it fail, waiting a
+# random delay between each attempt.  No re-runs are attempted after successful commands.
+#
+# ### Usage
+#   try_multiple_times command [param1 param2...]
+#
+# ### Parameters
+#   1: $@         command-line arguments
+try_multiple_times ( ) {
+  _try_multiple_times 0 "$@"
+}
+
+# $1  The current retry count
+# $2+ (everything else) the command to retry should it fail
+_try_multiple_times ( ) {
+  local RETRY_MAX=5
+
+  # Configuration:  wait between 10 sec and 120 sec.
+
+  # in seconds.
+  local RETRY_MAX_WAIT_RANGE=111
+  # in seconds
+  local RETRY_MIN_WAIT=10
+
+  local retryCount=$1
+  shift
+
+  if (( "$retryCount" == "$RETRY_MAX" )); then
+    builder_die "Retry limit of $RETRY_MAX attempts reached."
+  fi
+
+  retryCount=$(( $retryCount + 1 ))
+
+  if (( $retryCount != 1 )); then
+    local wait_length=$(( RANDOM % RETRY_MAX_WAIT_RANGE + RETRY_MIN_WAIT ))
+    builder_echo "Delaying $wait_length seconds before attempt $retryCount: \`$@\`"
+    sleep $wait_length
+  fi
+
+  local code=0
+  "$@" || code=$?
+  if (( $code != 0 )); then
+    builder_echo "Command failed with error $code"
+    _try_multiple_times $retryCount "$@"
+  fi
+}
+
+#
 # Verifies that node is installed, and installs npm packages, but only once per
 # build invocation
 #
@@ -195,11 +254,45 @@ verify_npm_setup() {
   fi
   builder_set_module_has_been_built /external/npm-ci
 
+  # If we are on CI environment, automatically select a node version with nvm
+  # Also, a developer can set KEYMAN_USE_NVM variable to get this behaviour
+  # automatically too (see /docs/build/node.md)
+  if [[ "$VERSION_ENVIRONMENT" != local || ! -z "${KEYMAN_USE_NVM+x}" ]]; then
+    _select_node_version_with_nvm
+  fi
+
   # Check if Node.JS/npm is installed.
   type npm >/dev/null ||\
     builder_die "Build environment setup error detected!  Please ensure Node.js is installed!"
 
   pushd "$KEYMAN_ROOT" > /dev/null
-  npm ci
+
+  try_multiple_times npm ci
+
   popd > /dev/null
+}
+
+# Use nvm to select a node version according to package.json
+# see /docs/build/node.md
+_select_node_version_with_nvm() {
+  local REQUIRED_NODE_VERSION="$("$JQ" -r '.engines.node' "$KEYMAN_ROOT/package.json")"
+
+  if [[ $BUILDER_OS != win ]]; then
+    # launch nvm in a sub process, see _builder_nvm.sh for details
+    "$KEYMAN_ROOT/resources/build/_builder_nvm.sh" "$REQUIRED_NODE_VERSION"
+  else
+    nvm install "$REQUIRED_NODE_VERSION"
+    nvm use "$REQUIRED_NODE_VERSION"
+  fi
+
+  # Now, check that the node version is correct, on all systems
+
+  # Note: On windows, `nvm use` and `nvm install` always return success.
+  # https://github.com/coreybutler/nvm-windows/issues/738
+
+  # note the 'v' prefix that node emits (and npm doesn't!)
+  local CURRENT_NODE_VERSION="$(node --version)"
+  if [[ "$CURRENT_NODE_VERSION" != "v$REQUIRED_NODE_VERSION" ]]; then
+    builder_die "Attempted to select node.js version $REQUIRED_NODE_VERSION but found $CURRENT_NODE_VERSION instead"
+  fi
 }

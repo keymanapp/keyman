@@ -3,6 +3,7 @@
 #include "security.h"
 #include "kbd.h"
 
+// This file is used only in keyman32.dll; implements the serial key event server
 #ifndef _WIN64
 
 /*
@@ -327,7 +328,7 @@ private:
     focused window with the SendInput API.
   */
   BOOL ProcessQueuedKeyEvents() {
-    SendDebugMessage(0, sdmDebug, 0, "Processing queued key events");
+    SendDebugMessage("Processing queued key events");
 
     HANDLE handles[2] = { m_hThreadExitEvent, m_hKeyMutex };
 
@@ -438,6 +439,11 @@ private:
 
     if ((msg == WM_KEYMAN_KEY_EVENT || msg == WM_KEYMAN_MODIFIER_EVENT) && flag_ShouldSerializeInput  /*&& _td->lpActiveKeyboard*/) {
 
+      SendDebugMessageFormat("hwnd=%x msg=%s wParam=%x lParam=%x m_ModifierKeyboardState=[LS:%x LC:%x LA:%x RS:%x RC:%x RA:%x]",
+        hwnd, msg == WM_KEYMAN_KEY_EVENT ? "WM_KEYMAN_KEY_EVENT" : "WM_KEYMAN_MODIFIER_EVENT", wParam, lParam,
+        m_ModifierKeyboardState[VK_LSHIFT], m_ModifierKeyboardState[VK_LCONTROL], m_ModifierKeyboardState[VK_LMENU],
+        m_ModifierKeyboardState[VK_RSHIFT], m_ModifierKeyboardState[VK_RCONTROL], m_ModifierKeyboardState[VK_RMENU]);
+
       if (wParam == VK_RMENU && (lParam & (KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP)) == (KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP) && GetKeyState(VK_LCONTROL) < 0) {
         /*
           When Windows has a European layout that uses AltGr installed, it can emit an additional LCtrl down via software
@@ -487,7 +493,7 @@ private:
 
         if (msg == WM_KEYMAN_KEY_EVENT) {
           // We track changes to modifiers with WM_KEYMAN_MODIFIER_EVENT, but only ever
-          // pass them on to the app when we receive them with the WM_KEYMAN_KEY_EVENT 
+          // pass them on to the app when we receive them with the WM_KEYMAN_KEY_EVENT
           // message.
           if (!SendInput(2, input, sizeof(INPUT))) {
             DebugLastError("SendInput");

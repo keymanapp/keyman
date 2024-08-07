@@ -8,7 +8,6 @@
 #include <sstream>
 #include <string>
 #include <type_traits>
-#include <codecvt>
 
 #if 0
 // TODO-LDML If we need to avoid exceptions in JSON
@@ -18,6 +17,9 @@
 #endif
 
 #include <json.hpp>
+
+// Ensure that ICU gets included even on wasm.
+#define KMN_IN_LDML_TESTS
 
 #include <kmx/kmx_processevent.h> // for char to vk mapping tables
 #include <kmx/kmx_xstring.h> // for surrogate pair macros
@@ -29,6 +31,7 @@
 #include "path.hpp"
 #include "state.hpp"
 #include "utfcodec.hpp"
+#include "util_normalize.hpp"
 
 #include "ldml_test_source.hpp"
 #include "ldml_test_utils.hpp"
@@ -36,6 +39,8 @@
 #include "core_icu.h"
 #include "unicode/uniset.h"
 #include "unicode/usetiter.h"
+
+#include <test_color.h>
 
 #define assert_or_return(expr) if(!(expr)) { \
   std::wcerr << __FILE__ << ":" << __LINE__ << ": " << \
@@ -50,7 +55,6 @@
 namespace km {
 namespace tests {
 
-#include <test_color.h>
 
 
 
@@ -174,10 +178,10 @@ LdmlTestSource::parse_source_string(std::string const &s) {
         assert(v >= 0x0001 && v <= 0x10FFFF);
         p += n - 1;
         if (v < 0x10000) {
-          t += km_core_cp(v);
+          t += km_core_cu(v);
         } else {
-          t += km_core_cp(Uni_UTF32ToSurrogate1(v));
-          t += km_core_cp(Uni_UTF32ToSurrogate2(v));
+          t += km_core_cu(Uni_UTF32ToSurrogate1(v));
+          t += km_core_cu(Uni_UTF32ToSurrogate2(v));
         }
         if (had_open_curly) {
           p++;
@@ -200,7 +204,7 @@ LdmlTestSource::parse_source_string(std::string const &s) {
 std::u16string
 LdmlTestSource::parse_u8_source_string(std::string const &u8s) {
   // convert from utf-8 to utf-16 first
-  std::u16string s = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.from_bytes(u8s);
+  std::u16string s = convert<char, char16_t>(u8s);
   std::u16string t;
   for (auto p = s.begin(); p != s.end(); p++) {
     if (*p == '\\') {
@@ -219,16 +223,16 @@ LdmlTestSource::parse_u8_source_string(std::string const &u8s) {
         size_t n;
         std::u16string s1 = s.substr(p - s.begin(), 8);
         // TODO-LDML: convert back first?
-        std::string s1b = std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(s1);
+        std::string s1b = convert<char16_t, char>(s1);
         v              = std::stoul(s1b, &n, 16);
         // Allow deadkey_number (U+0001) characters and onward
         assert(v >= 0x0001 && v <= 0x10FFFF);
         p += n - 1;
         if (v < 0x10000) {
-          t += km_core_cp(v);
+          t += km_core_cu(v);
         } else {
-          t += km_core_cp(Uni_UTF32ToSurrogate1(v));
-          t += km_core_cp(Uni_UTF32ToSurrogate2(v));
+          t += km_core_cu(Uni_UTF32ToSurrogate1(v));
+          t += km_core_cu(Uni_UTF32ToSurrogate2(v));
         }
         if (had_open_curly) {
           p++;
@@ -280,13 +284,15 @@ LdmlEmbeddedTestSource::load_source( const km::core::path &path ) {
     if (!line.length())
       continue;
     if (line.compare(0, s_keys.length(), s_keys) == 0) {
-      keys = line.substr(s_keys.length());
-      trim(keys);
+      auto k = line.substr(s_keys.length());
+      trim(k);
+      keys.emplace_back(k);
     } else if (is_token(s_expected, line)) {
       if (line == "\\b") {
         expected_beep = true;
       } else {
-        expected = parse_source_string(line);
+        // allow multiple expected lines
+        expected.emplace_back(parse_source_string(line));
       }
     } else if (is_token(s_expecterror, line)) {
       expected_error = true;
@@ -297,8 +303,15 @@ LdmlEmbeddedTestSource::load_source( const km::core::path &path ) {
     }
   }
 
-  if (keys == "") {
+  if (keys.empty() && expected.empty() && !expected_error) {
+    // don't note this, the parent will complain if there's neither json nor embedded
+    return __LINE__;
+  } else if (keys.empty()) {
     // We must at least have a key sequence to run the test
+    std::cerr << "Need at least one key sequence." << std::endl;
+    return __LINE__;
+  } else if(!expected_error && (keys.size() != expected.size())) {
+    std::cerr << "Need the same number of " << s_keys << " and " << s_expected << " lines." << std::endl;
     return __LINE__;
   }
 
@@ -367,12 +380,19 @@ LdmlEmbeddedTestSource::vkey_to_event(std::string const &vk_event) {
       modifier_state |= modifier;
     } else {
       vk = get_vk(s);
-      break;
+      if (vk == 0) {
+        std::cerr << "Error parsing [" << vk_event << "] - could not find vkey or modifier: " << s << std::endl;
+      }
+      assert(vk != 0);
+      break; // only one vkey allowed
     }
   }
 
   // The string should be empty at this point
-  assert(!std::getline(f, s, ' '));
+  if (std::getline(f, s, ' ')) {
+    std::cerr << "Error parsing vkey ["<<vk_event<<"] - excess string after key: " << s << std::endl;
+    assert(false);
+  }
   assert(vk != 0);
 
   return {vk, modifier_state};
@@ -380,15 +400,19 @@ LdmlEmbeddedTestSource::vkey_to_event(std::string const &vk_event) {
 
 void
 LdmlEmbeddedTestSource::next_action(ldml_action &fillin) {
-  if (is_done) {
+  if (is_done || keys.empty()) {
     // We were already done. return done.
     fillin.type = LDML_ACTION_DONE;
     return;
-  } else if(keys.empty()) {
-    // Got to the end of the keys. time to check
+  } else if(keys[0].empty()) {
+    // Got to the end of a key set. time to check
     fillin.type = LDML_ACTION_CHECK_EXPECTED;
-    fillin.string = expected; // copy expected
-    is_done = true; // so we get DONE next time
+    fillin.string = expected[0]; // copy expected
+    expected.pop_front();
+    keys.pop_front();
+    if (keys.empty()) {
+      is_done = true; // so we get DONE next time
+    }
   } else {
     fillin.type = LDML_ACTION_KEY_EVENT;
     fillin.k = next_key();
@@ -399,7 +423,7 @@ LdmlEmbeddedTestSource::next_action(ldml_action &fillin) {
 key_event
 LdmlEmbeddedTestSource::next_key() {
   // mutate this->keys
-  return next_key(keys);
+  return next_key(keys[0]);
 }
 
 key_event
@@ -512,7 +536,7 @@ LdmlJsonTestSource::next_action(ldml_action &fillin) {
     fillin.type   = LDML_ACTION_CHECK_EXPECTED;
     fillin.string = LdmlTestSource::parse_u8_source_string(result.get<std::string>());
     if (!get_normalization_disabled()) {
-      assert(km::core::ldml::normalize_nfd(fillin.string)); // TODO-LDML: will be NFC when core is normalizing to NFC
+      assert(km::core::util::normalize_nfd(fillin.string)); // TODO-LDML: will be NFC when core is normalizing to NFC
     }
     return;
   } else if (type == "keystroke") {
@@ -527,7 +551,7 @@ LdmlJsonTestSource::next_action(ldml_action &fillin) {
     fillin.type   = LDML_ACTION_EMIT_STRING;
     fillin.string = LdmlTestSource::parse_u8_source_string(to.get<std::string>());
     if (!get_normalization_disabled()) {
-      assert(km::core::ldml::normalize_nfd(fillin.string)); // TODO-LDML: will be NFC when core is normalizing to NFC
+      assert(km::core::util::normalize_nfd(fillin.string)); // TODO-LDML: will be NFC when core is normalizing to NFC
     }
     return;
   } else if (type == "backspace") {
@@ -554,7 +578,7 @@ LdmlJsonTestSource::get_context() {
     auto startContext = data["/startContext/to"_json_pointer];
     context = LdmlTestSource::parse_u8_source_string(startContext);
     if (!get_normalization_disabled()) {
-      assert(km::core::ldml::normalize_nfd(context)); // TODO-LDML: should be NFC
+      assert(km::core::util::normalize_nfd(context)); // TODO-LDML: should be NFC
     }
   }
   loaded_context = true;
@@ -625,7 +649,7 @@ LdmlJsonRepertoireTestSource::next_action(ldml_action &fillin) {
   std::size_t len = km::core::kmx::Utf32CharToUtf16(ch, ch16);
   std::u16string chstr = std::u16string(ch16.ch, len);
   if (!get_normalization_disabled()) {
-    assert(km::core::ldml::normalize_nfd(chstr)); // TODO-LDML: will be NFC when core is normalizing to NFC
+    assert(km::core::util::normalize_nfd(chstr)); // TODO-LDML: will be NFC when core is normalizing to NFC
   }
   // append to expected
   expected.append(chstr);
@@ -753,7 +777,7 @@ int LdmlJsonTestSourceFactory::load(const km::core::path &compiled, const km::co
   }
 
   auto conformsTo = data["/keyboardTest3/conformsTo"_json_pointer].get<std::string>();
-  assert_or_return(std::string(LDML_CLDR_VERSION_LATEST) == conformsTo);
+  assert_or_return(std::string(LDML_CLDR_TEST_VERSION_LATEST) == conformsTo);
   auto info_keyboard = data["/keyboardTest3/info/keyboard"_json_pointer].get<std::string>();
   auto info_author = data["/keyboardTest3/info/author"_json_pointer].get<std::string>();
   auto info_name = data["/keyboardTest3/info/name"_json_pointer].get<std::string>();

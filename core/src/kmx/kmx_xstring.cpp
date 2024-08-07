@@ -4,7 +4,6 @@
 */
 #include <vector>
 #include <iterator>
-#include <codecvt>
 #include <locale>
 #include "kmx_processevent.h"
 #include "utfcodec.hpp"
@@ -12,7 +11,7 @@
 using namespace km::core;
 using namespace kmx;
 
-const km_core_cp *km::core::kmx::u16chr(const km_core_cp *p, km_core_cp ch) {
+const km_core_cu *km::core::kmx::u16chr(const km_core_cu *p, km_core_cu ch) {
   while (*p) {
     if (*p == ch) return p;
     p++;
@@ -20,8 +19,8 @@ const km_core_cp *km::core::kmx::u16chr(const km_core_cp *p, km_core_cp ch) {
   return ch == 0 ? p : NULL;
 }
 
-const km_core_cp *km::core::kmx::u16cpy(km_core_cp *dst, const km_core_cp *src) {
-  km_core_cp *o = dst;
+const km_core_cu *km::core::kmx::u16cpy(km_core_cu *dst, const km_core_cu *src) {
+  km_core_cu *o = dst;
   while (*src) {
     *dst++ = *src++;
   }
@@ -29,8 +28,8 @@ const km_core_cp *km::core::kmx::u16cpy(km_core_cp *dst, const km_core_cp *src) 
   return o;
 }
 
-const km_core_cp *km::core::kmx::u16ncpy(km_core_cp *dst, const km_core_cp *src, size_t max) {
-  km_core_cp *o = dst;
+const km_core_cu *km::core::kmx::u16ncpy(km_core_cu *dst, const km_core_cu *src, size_t max) {
+  km_core_cu *o = dst;
   while (*src && max > 0) {
     *dst++ = *src++;
     max--;
@@ -42,7 +41,7 @@ const km_core_cp *km::core::kmx::u16ncpy(km_core_cp *dst, const km_core_cp *src,
   return o;
 }
 
-size_t km::core::kmx::u16len(const km_core_cp *p) {
+size_t km::core::kmx::u16len(const km_core_cu *p) {
   int i = 0;
   while (*p) {
     p++;
@@ -51,7 +50,16 @@ size_t km::core::kmx::u16len(const km_core_cp *p) {
   return i;
 }
 
-int km::core::kmx::u16cmp(const km_core_cp *p, const km_core_cp *q) {
+size_t km::core::kmx::u32len(const km_core_usv *p) {
+  int i = 0;
+  while (*p) {
+    p++;
+    i++;
+  }
+  return i;
+}
+
+int km::core::kmx::u16cmp(const km_core_cu *p, const km_core_cu *q) {
   while (*p && *q) {
     if (*p != *q) return *p - *q;
     p++;
@@ -60,7 +68,7 @@ int km::core::kmx::u16cmp(const km_core_cp *p, const km_core_cp *q) {
   return *p - *q;
 }
 
-int km::core::kmx::u16icmp(const km_core_cp *p, const km_core_cp *q) {
+int km::core::kmx::u16icmp(const km_core_cu *p, const km_core_cu *q) {
   while (*p && *q) {
     if (toupper(*p) != toupper(*q)) return *p - *q;
     p++;
@@ -69,7 +77,7 @@ int km::core::kmx::u16icmp(const km_core_cp *p, const km_core_cp *q) {
   return *p - *q;
 }
 
-int km::core::kmx::u16ncmp(const km_core_cp *p, const km_core_cp *q, size_t count) {
+int km::core::kmx::u16ncmp(const km_core_cu *p, const km_core_cu *q, size_t count) {
   while (*p && *q && count) {
     if (*p != *q) return *p - *q;
     p++;
@@ -81,13 +89,13 @@ int km::core::kmx::u16ncmp(const km_core_cp *p, const km_core_cp *q, size_t coun
   return 0;
 }
 
-km_core_cp *km::core::kmx::u16tok(km_core_cp *p, km_core_cp ch, km_core_cp **ctx) {
+km_core_cu *km::core::kmx::u16tok(km_core_cu *p, km_core_cu ch, km_core_cu **ctx) {
   if (!p) {
     p = *ctx;
     if (!p) return NULL;
   }
 
-  km_core_cp *q = p;
+  km_core_cu *q = p;
   while (*q && *q != ch) {
     q++;
   }
@@ -103,9 +111,14 @@ km_core_cp *km::core::kmx::u16tok(km_core_cp *p, km_core_cp ch, km_core_cp **ctx
   return p;
 }
 
-km_core_cp *km::core::kmx::u16dup(km_core_cp *src) {
-  km_core_cp *dup = new km_core_cp[u16len(src) + 1];
-  memcpy(dup, src, (u16len(src) + 1) * sizeof(km_core_cp));
+km_core_cu *km::core::kmx::u16dup(km_core_cu *src) {
+  km_core_cu *dup = new km_core_cu[u16len(src) + 1];
+  memcpy(dup, src, (u16len(src) + 1) * sizeof(km_core_cu));
+  return dup;
+}
+km_core_usv *km::core::kmx::u32dup(const km_core_usv *src) {
+  km_core_usv *dup = new km_core_usv[u32len(src) + 1];
+  memcpy(dup, src, (u32len(src) + 1) * sizeof(src[0]));
   return dup;
 }
 

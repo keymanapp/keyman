@@ -4,9 +4,9 @@
 ***/
 
 import { Version, deepCopy } from "@keymanapp/web-utils";
-import { TouchLayout } from "@keymanapp/common-types";
+import { ModifierKeyConstants, TouchLayout } from "@keymanapp/common-types";
 
-import LayoutFormFactorBase = TouchLayout.TouchLayoutPlatform;
+import LayoutFormFactorSpec = TouchLayout.TouchLayoutPlatform;
 import LayoutLayerBase = TouchLayout.TouchLayoutLayer;
 export type LayoutRow = TouchLayout.TouchLayoutRow;
 export type LayoutKey = TouchLayout.TouchLayoutKey;
@@ -19,10 +19,29 @@ export { ButtonClasses };
 import Codes from "../text/codes.js";
 import type Keyboard from "./keyboard.js";
 
-export type KLS = {[layerName: string]: string[]};
+export interface EncodedVisualKeyboard {
+  /** Represents CSS font styling to use for VisualKeyboard text */
+  F: string;
+  /** Should there be a 102nd key? */
+  K102?: boolean,
+  /**
+   * Keyboard Layer Specification: an object-based map of layer name to the keycaps for its
+   * 65 keys.  The 65 keys are ordered from left to right, then top to bottom.
+   *
+   * The key ID corresponding to each index of the array is specified within `Codes.dfltCodes`.
+   * Entries corresponding to `K_*` in `Codes.dfltCodes` are reserved for future use.
+   */
+  KLS?: {[layerName: string]: string[]},
+  /**
+   * @deprecated
+   * The older form for data in KLS - defines keycaps for 'default' keys, then 'shift' keys,
+   * in a single concatenated array.
+   */
+  BK?: string[];
+}
 
 // The following types provide type definitions for the full JSON format we use for visual keyboard definitions.
-export type ButtonClass       =  0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
+export type ButtonClass       =  0 | 1 | 2 | 3 | 4 | /*5 | 6 | 7 |*/ 8 | 9 | 10;
 
 export interface LayoutLayer extends LayoutLayerBase {
   // Post-processing elements.
@@ -30,18 +49,18 @@ export interface LayoutLayer extends LayoutLayerBase {
   capsKey?: LayoutKey,
   numKey?: LayoutKey,
   scrollKey?: LayoutKey,
-  aligned?: boolean
+  aligned?: boolean,
+  nextlayer?: string
 };
-
-export interface LayoutFormFactor extends LayoutFormFactorBase {
+export interface LayoutFormFactor extends LayoutFormFactorSpec {
   // To facilitate those post-processing elements.
   layer: LayoutLayer[]
 };
 
 export type LayoutSpec = {
-  "desktop"?: LayoutFormFactor,
-  "phone"?: LayoutFormFactor,
-  "tablet"?: LayoutFormFactor
+  "desktop"?: LayoutFormFactorSpec,
+  "phone"?: LayoutFormFactorSpec,
+  "tablet"?: LayoutFormFactorSpec
 }
 
 const KEY_102_WIDTH = 200;
@@ -61,7 +80,10 @@ export class Layouts {
   static readonly dfltText='`1234567890-=\xA7~~qwertyuiop[]\\~~~asdfghjkl;\'~~~~~?zxcvbnm,./~~~~~ '
     +'~!@#$%^&*()_+\xA7~~QWERTYUIOP{}\\~~~ASDFGHJKL:"~~~~~?ZXCVBNM<>?~~~~~ ';
 
-  static readonly DEFAULT_RAW_SPEC = {'F':'Tahoma', 'BK': Layouts.dfltText} as const;
+  // The function baked into keyboards by the current Web compiler creates an
+  // array of single-char strings for BK. Refer to
+  // developer/src/kmc-kmn/src/kmw-compiler/visual-keyboard-compiler.ts.
+  static readonly DEFAULT_RAW_SPEC = {'F':'Tahoma', 'BK': Layouts.dfltText.split('')} as const;
 
   static modifierSpecials = {
     'leftalt': '*LAlt*',
@@ -93,9 +115,9 @@ export class Layouts {
   * @param   {string} formFactor   (really utils.FormFactor)
   * @return  {LayoutFormFactor}
   */
-  static buildDefaultLayout(PVK, keyboard: Keyboard, formFactor: string): LayoutFormFactor {
+  static buildDefaultLayout(PVK: EncodedVisualKeyboard, keyboard: Keyboard, formFactor: string): LayoutFormFactor {
     // Build a layout using the default for the device
-    var layoutType=formFactor;
+    let layoutType = formFactor as keyof TouchLayout.TouchLayoutFile;
 
     if(typeof Layouts.dfltLayout[layoutType] != 'object') {
       layoutType = 'desktop';
@@ -114,10 +136,10 @@ export class Layouts {
     }
 
     // Clone the default layout object for this device
-    var layout: LayoutFormFactor = deepCopy(Layouts.dfltLayout[layoutType]);
+    var layout: LayoutFormFactorSpec = deepCopy(Layouts.dfltLayout[layoutType]);
 
-    var n,layers=layout['layer'], keyLabels: KLS=PVK['KLS'], key102=PVK['K102'];
-    var i, j, k, m, row, rows: LayoutRow[], key: LayoutKey, keys: LayoutKey[];
+    var n,layers=layout['layer'] as LayoutLayer[], keyLabels: EncodedVisualKeyboard['KLS'] = PVK['KLS'], key102=PVK['K102'];
+    var i, j, k, rows: LayoutRow[], key: LayoutKey, keys: LayoutKey[];
     var chiral: boolean = (kbdBitmask & Codes.modifierBitmasks.IS_CHIRAL) != 0;
 
     if(PVK['F']) {
@@ -136,13 +158,10 @@ export class Layouts {
       keyLabels = PVK['KLS'] = Layouts.processLegacyDefinitions(PVK['BK']);
     }
 
-    // Identify key labels (e.g. *Shift*) that require the special OSK font
-    var specialLabel=/\*\w+\*/;
-
     // *** Step 1:  instantiate the layer objects. ***
 
     // Get the list of valid layers, enforcing that the 'default' layer must be the first one processed.
-    var validIdList = Object.getOwnPropertyNames(keyLabels), invalidIdList = [];
+    var validIdList = Object.getOwnPropertyNames(keyLabels), invalidIdList: string[] = [];
     validIdList.splice(validIdList.indexOf('default'), 1);
     validIdList = [ 'default' ].concat(validIdList);
 
@@ -200,14 +219,14 @@ export class Layouts {
         // Erase the legacy shifted subkey array.
         shiftKey['sk'] = [];
 
-        for(var layerID in keyLabels) {
+        for(let layerID in keyLabels) {
           if(layerID == 'default' || layerID == 'shift') {
             // These two are accessible from the layer without subkeys.
             continue;
           }
 
           // Create a new subkey for the specified layer so that it will be accessible via OSK.
-          var specialChar = Layouts.modifierSpecials[layerID];
+          var specialChar = Layouts.modifierSpecials[(layerID as keyof typeof Layouts.modifierSpecials)];
           let subkey: LayoutSubKey = {
             id: `K_${specialChar}`,
             text: specialChar,
@@ -236,7 +255,7 @@ export class Layouts {
 
     // *** Step 2: Layer objects now exist; time to fill them with the appropriate key labels and key styles ***
     for(n=0; n<layers.length; n++) {
-      var layer=layers[n], kx, shiftKey: LayoutKey = null, nextKey=null, allText='';
+      var layer=layers[n] as LayoutLayer, kx, shiftKey: LayoutKey = null;
       var capsKey: LayoutKey = null, numKey: LayoutKey = null, scrollKey: LayoutKey = null;  // null if not in the OSK layout.
       var layerSpec = keyLabels[layer['id']];
       var isShift = layer['id'] == 'shift' ? 1 : 0;
@@ -275,9 +294,6 @@ export class Layouts {
             case "K_SHIFT":
               shiftKey=key;
               break;
-            case "K_TAB":
-              nextKey=key;
-              break;
             case "K_CAPS":
               capsKey=key;
               break;
@@ -310,12 +326,14 @@ export class Layouts {
       layer.numKey=numKey;
       layer.scrollKey=scrollKey;
 
+      const layerId = layers[n].id as keyof typeof Layouts.modifierSpecials;
+
       // Set modifier key appearance and behaviour for non-desktop devices using the default layout
       if(formFactor != 'desktop') {
         if(n > 0 && shiftKey != null) {
           shiftKey['sp']=ButtonClasses.specialActive;
           shiftKey['sk']=null;
-          shiftKey['text'] = Layouts.modifierSpecials[layers[n].id] ? Layouts.modifierSpecials[layers[n].id] : "*Shift*";
+          shiftKey['text'] = Layouts.modifierSpecials[layerId] ?? "*Shift*";
         }
       }
     }
@@ -331,31 +349,29 @@ export class Layouts {
    * Description  Get name of layer from code, where the modifer order is determined by ascending bit-flag value.
    */
   static getLayerId(m: number): string {
-    let modifierCodes = Codes.modifierCodes;
-
     var s='';
     if(m == 0) {
       return 'default';
     } else {
-      if(m & modifierCodes['LCTRL']) {
+      if(m & ModifierKeyConstants.LCTRLFLAG) {
         s = (s.length > 0 ? s + '-' : '') + 'leftctrl';
       }
-      if(m & modifierCodes['RCTRL']) {
+      if(m & ModifierKeyConstants.RCTRLFLAG) {
         s = (s.length > 0 ? s + '-' : '') + 'rightctrl';
       }
-      if(m & modifierCodes['LALT']) {
+      if(m & ModifierKeyConstants.LALTFLAG) {
         s = (s.length > 0 ? s + '-' : '') + 'leftalt';
       }
-      if(m & modifierCodes['RALT']) {
+      if(m & ModifierKeyConstants.RALTFLAG) {
         s = (s.length > 0 ? s + '-' : '') + 'rightalt';
       }
-      if(m & modifierCodes['SHIFT']) {
+      if(m & ModifierKeyConstants.K_SHIFTFLAG) {
         s = (s.length > 0 ? s + '-' : '') + 'shift';
       }
-      if(m & modifierCodes['CTRL']) {
+      if(m & ModifierKeyConstants.K_CTRLFLAG) {
         s = (s.length > 0 ? s + '-' : '') + 'ctrl';
       }
-      if(m & modifierCodes['ALT']) {
+      if(m & ModifierKeyConstants.K_ALTFLAG) {
         s = (s.length > 0 ? s + '-' : '') + 'alt';
       }
       return s;
@@ -485,11 +501,11 @@ export class Layouts {
    * @param   {Array}   BK      keyboard object (as loaded)
    * @return  {Object}
    */
-  static processLegacyDefinitions(BK: string[]): KLS {
+  static processLegacyDefinitions(BK: string[]): EncodedVisualKeyboard['KLS'] {
     //['default','shift','ctrl','shiftctrl','alt','shiftalt','ctrlalt','shiftctrlalt'];
     var idList=Layouts.generateLayerIds(false); // Non-chiral.
 
-    var KLS: KLS = {};
+    var KLS: EncodedVisualKeyboard['KLS'] = {};
 
     // The old default:  eight auto-managed layers...
     for(var n=0; n<idList.length; n++) {
@@ -854,6 +870,6 @@ export class Layouts {
               }
           ]
       }
-  };
+  } as TouchLayout.TouchLayoutFile;
   /* c8 ignore end */
 }

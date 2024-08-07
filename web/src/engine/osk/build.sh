@@ -3,21 +3,19 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 SUBPROJECT_NAME=engine/osk
 . "$KEYMAN_ROOT/web/common.inc.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
-
 # ################################ Main script ################################
 
 builder_describe "Builds the Keyman Engine for Web's On-Screen Keyboard package (OSK)." \
-  "@/common/web/input-processor build" \
+  "@/common/web/keyboard-processor build" \
   "@/common/web/gesture-recognizer build" \
+  "@/web/src/engine/interfaces build" \
   "@/web/src/engine/dom-utils build" \
   "@/web/src/engine/events build" \
   "clean" \
@@ -56,4 +54,4 @@ do_build() {
 builder_run_action configure do_configure
 builder_run_action clean rm -rf "${KEYMAN_ROOT}/web/build/${SUBPROJECT_NAME}"
 builder_run_action build do_build
-builder_run_action test test-headless "${SUBPROJECT_NAME}"
+builder_run_action test test-headless-typescript "${SUBPROJECT_NAME}"

@@ -181,7 +181,7 @@ You can use Windows Settings to add these environment variables permanently:
 * KeymanWeb
 
 **Requirements**:
-* emscripten 3.1.40
+* emscripten 3.1.46 or later
 * node.js 18+
 * [openjdk 11](https://learn.microsoft.com/en-us/java/openjdk/download#openjdk-11)+
 
@@ -191,7 +191,7 @@ You can use Windows Settings to add these environment variables permanently:
 # for *much* faster download, hide progress bar (PowerShell/PowerShell#2138)
 $ProgressPreference = 'SilentlyContinue'
 
-choco install emscripten --version 3.1.40
+choco install emscripten --version 3.1.46
 ```
 
 Note: emscripten very unhelpfully overwrites JAVA_HOME, and adds its own
@@ -206,7 +206,15 @@ installed emsdk (most likely %LocalAppData%\emsdk\upstream\emscripten)
 **Environment variables**:
 * `EMSCRIPTEN_BASE`: `<your-emsdk-path>\upstream\emscripten`
 
-After installing emscripten, you'll need to install node.js and openjdk:
+After installing emscripten, you'll need to install node.js and openjdk.
+
+#### node.js
+
+Our recommended way to install node.js is to use
+[nvm-windows](https://github.com/coreybutler/nvm-windows). This makes it
+easy to switch between versions of node.js.
+
+Alternatively, use Powershell + Chocolatey to install node.js:
 
 ```ps1
 # Elevated PowerShell
@@ -214,8 +222,22 @@ After installing emscripten, you'll need to install node.js and openjdk:
 # for *much* faster download, hide progress bar (PowerShell/PowerShell#2138)
 $ProgressPreference = 'SilentlyContinue'
 choco install nodejs
+```
+
+See [node.md](node.md) for more information.
+
+#### openjdk
+
+Use Powershell + Chocolatey to install OpenJDK:
+
+```ps1
+# Elevated PowerShell
+
+# for *much* faster download, hide progress bar (PowerShell/PowerShell#2138)
+$ProgressPreference = 'SilentlyContinue'
 choco install openjdk
 ```
+
 
 ### Windows Platform Dependencies
 

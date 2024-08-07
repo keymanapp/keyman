@@ -2,7 +2,6 @@ import { CumulativePathStats } from "../../cumulativePathStats.js";
 import { GestureSource, GestureSourceSubview } from "../../gestureSource.js";
 import { ContactModel } from "../specs/contactModel.js";
 import { ManagedPromise, TimeoutPromise } from "@keymanapp/web-utils";
-import { GesturePath } from "../../gesturePath.js";
 
 export type FulfillmentCause = 'path' | 'timer' | 'item' | 'cancelled';
 
@@ -93,11 +92,7 @@ export class PathMatcher<Type, StateToken = any> {
         }
 
         // Check for validation as needed.
-        if(!model.timer.validateItem) {
-          this.finalize(true, 'timer');
-        } else {
-          this.finalize(model.timer.validateItem(this.source.path.stats.lastSample.item, this.baseItem), 'timer');
-        }
+        this.finalize(true, 'timer');
       });
     }
   }
@@ -108,6 +103,14 @@ export class PathMatcher<Type, StateToken = any> {
     }
 
     const model = this.model;
+
+    // Check for validation as needed.
+    if(model.validateItem && result) {
+      // If we're finalizing on a positive note but there's an item-validation check, we need
+      // to obey the results of that check.
+      result = model.validateItem(this.source.path.stats.lastSample.item, this.baseItem);
+    }
+
     let retVal: PathMatchResult;
     if(result) {
       retVal = {

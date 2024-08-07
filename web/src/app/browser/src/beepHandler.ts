@@ -33,7 +33,7 @@ export class BeepHandler {
    * Description  Flash body as substitute for audible beep; notify embedded device to vibrate
    */
   beep(outputTarget: OutputTarget<any>) {
-    if(!(outputTarget instanceof OutputTarget<any>)) {
+    if(!(outputTarget instanceof OutputTarget)) {
       return;
     }
 

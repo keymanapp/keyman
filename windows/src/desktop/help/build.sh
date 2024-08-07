@@ -1,73 +1,33 @@
 #!/usr/bin/env bash
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
-
-QUIET=0
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-set -e
-set -u
+builder_describe "Help documentation for Keyman for Windows" \
+  clean configure build test install \
+  ":web    copy documentation to bin/help/md folder. This can then be deployed with help-keyman-com.sh" \
+  ":chm    convert documentation to html using pandoc and then build .chm"
 
-THIS_DIR="$(dirname "$THIS_SCRIPT")"
+builder_parse "$@"
 
-display_usage() {
-  echo "build.sh [--no-clean] target [...target]"
-  echo "Builds help documentation for Keyman for Windows"
-  echo "Targets:"
-  echo "  * web: copy documentation to bin/help/php folder. This can then be"
-  echo "         deployed with help-keyman-com.sh"
-  echo "  * chm: convert documentation to html using pandoc and then build .chm"
-  echo
-  echo " --no-clean: don't clean target folder before building"
-}
+#-------------------------------------------------------------------------------------------------------------------
 
-DO_CHM=false
-DO_WEB=false
-DO_CLEAN=true
+source "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
+source "$KEYMAN_ROOT/resources/build/win/hhc.inc.sh"
 
-# Debug flags
-DO_CHM_CONVERSION=true
+builder_describe_outputs \
+  build:web          /windows/bin/help/md/desktop/index.md \
+  build:chm          /windows/bin/desktop/keymandesktop.chm
 
-#
-# Parse args
-#
+#-------------------------------------------------------------------------------------------------------------------
 
-shopt -s nocasematch
-
-while [[ $# -gt 0 ]] ; do
-  key="$1"
-  case $key in
-    chm)
-      DO_CHM=true
-      ;;
-    web)
-      DO_WEB=true
-      ;;
-    --no-clean)
-      DO_CLEAN=false
-      ;;
-    *)
-      display_usage
-      exit 1
-  esac
-  shift # past argument
-done
-
-if ! $DO_WEB && ! $DO_CHM ; then
-  display_usage
-  exit 1
-fi
-
-displayInfo "" \
-  "DO_CHM: $DO_CHM" \
-  "DO_WEB: $DO_WEB" \
-  "DO_CLEAN: $DO_CLEAN" \
-  ""
+MD=`find -name "*.md"`
+DESTCHM="$KEYMAN_ROOT/windows/bin/help/desktop"
+DESTWEB="$KEYMAN_ROOT/windows/bin/help/md/desktop"
 
 #
 # Build toc.hhc
@@ -132,44 +92,36 @@ build_hhc() {
 ' >> "$DESTCHM/toc.hhc"
 }
 
+#-------------------------------------------------------------------------------------------------------------------
+
+function do_clean_chm() {
+  rm -rf "$DESTCHM"
+}
+
 #
 # Compile all .md to .htm
 #
-
-MDLUA="$KEYMAN_ROOT/resources/build/htm-link.lua"
-CSS="../../../../resources/build/offline-help-style-spec.txt"
-MD=`find -name "*.md"`
-DESTCHM="$THIS_DIR/../../../bin/help/desktop"
-
-if $DO_CHM; then
-  #
-  # Clean existing folder
-  #
-
-  if $DO_CLEAN; then
-    rm -rf "$DESTCHM" || true # We don't want to die when we clean an empty folder
-  fi
+function do_build_chm() {
+  do_clean_chm
   mkdir -p "$DESTCHM"
 
   #
   # Generate HTML files from Markdown
   #
 
-  if $DO_CHM_CONVERSION; then
-    for INFILE in $MD; do
-      OUTFILE="$DESTCHM/${INFILE%.md}.htm"
-      echo "Processing $INFILE to $(basename "$OUTFILE")"
-      mkdir -p "$(dirname "$OUTFILE")"
-      pandoc -s -H "$CSS" --lua-filter="$MDLUA" -t html -o "$OUTFILE" $INFILE
-    done
-  fi
+  for INFILE in $MD; do
+    OUTFILE="$DESTCHM/${INFILE%.md}.htm"
+    echo "Processing $INFILE to $(basename "$OUTFILE")"
+    mkdir -p "$(dirname "$OUTFILE")"
+    pandoc -s -H "$HHC_CSS" --lua-filter="$HHC_MDLUA" -t html -o "$OUTFILE" $INFILE
+  done
 
   #
   # Copy Images
   #
 
   mkdir -p "$DESTCHM/desktop_images"
-  cp "$THIS_DIR"/desktop_images/* "$DESTCHM/desktop_images/"
+  cp "$THIS_SCRIPT_PATH/desktop_images"/* "$DESTCHM/desktop_images/"
 
   #
   # Prepare TOC and HHP files
@@ -177,7 +129,7 @@ if $DO_CHM; then
 
   pushd "$DESTCHM" > /dev/null
 
-  cp "$THIS_DIR/keymandesktop.hhp" "$DESTCHM/keymandesktop.hhp"
+  cp "$THIS_SCRIPT_PATH/keymandesktop.hhp" "$DESTCHM/keymandesktop.hhp"
   find -name '*.htm' >> "$DESTCHM/keymandesktop.hhp"
 
   build_hhc_header
@@ -185,23 +137,23 @@ if $DO_CHM; then
   build_hhc_footer
 
   # hhc.exe returns 1 on success!
-  "/c/program files (x86)/html help workshop/hhc.exe" keymandesktop.hhp && false || true
-  cp keymandesktop.chm "$THIS_DIR/../../../bin/desktop/keymandesktop.chm"
+  "$HHC" keymandesktop.hhp && false || true
+  cp keymandesktop.chm "$WINDOWS_PROGRAM_APP/keymandesktop.chm"
 
   popd > /dev/null
-fi
+}
+
+#-------------------------------------------------------------------------------------------------------------------
+
+function do_clean_web() {
+  rm -rf "$DESTWEB"
+}
 
 #
 # Copy files to help.keyman.com
 #
-
-if $DO_WEB; then
-  DESTWEB="$THIS_DIR/../../../bin/help/md/desktop"
-
-  if $DO_CLEAN; then
-    rm -rf "$DESTWEB" || true
-  fi
-
+function do_build_web() {
+  do_clean_web
   mkdir -p "$DESTWEB"
 
   for INFILE in $MD; do
@@ -211,6 +163,11 @@ if $DO_WEB; then
   done
 
   mkdir -p "$DESTWEB/desktop_images"
-  cp "$THIS_DIR"/desktop_images/* "$DESTWEB/desktop_images/"
-fi
+  cp "$THIS_SCRIPT_PATH/desktop_images"/* "$DESTWEB/desktop_images/"
+}
+
+builder_run_action clean:chm   do_clean_chm
+builder_run_action clean:web   do_clean_web
+builder_run_action build:chm   do_build_chm
+builder_run_action build:web   do_build_web
 

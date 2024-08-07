@@ -3,7 +3,8 @@
  */
 
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { MATCH_QUAD_ESCAPE, isOneChar, unescapeOneQuadString, unescapeString, hexQuad } from "../util/util.js";
+import { MATCH_QUAD_ESCAPE } from "../util/consts.js";
+import { isOneChar, unescapeOneQuadString, unescapeString, hexQuad } from "../util/util.js";
 
 /**
  * Helper function for extracting matched items
@@ -400,7 +401,7 @@ export class VariableParser {
   /**
    * Pattern for matching a capture set reference `($[set])`
    */
-  public static readonly CAPTURE_SET_REFERENCE = /\(\$\[([0-9A-Za-z_]{1,32})\]\)/g;
+  public static readonly CAPTURE_SET_REFERENCE = /\(\$\[([0-9A-Za-z_]{1,32})\]\)/;
 
   /**
    * `$[1:variable]`

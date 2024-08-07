@@ -1,11 +1,9 @@
 #!/usr/bin/env bash
 
-set -eu
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 ################################ Main script ################################
@@ -37,8 +35,6 @@ else
 fi
 MESON_PATH="../build/$(uname -m)/$MESON_TARGET"
 
-cd "$THIS_SCRIPT_PATH"
-
 builder_describe_outputs \
   configure "${MESON_PATH}/build.ninja" \
   build "${MESON_PATH}/src/ibus-engine-keyman"
@@ -47,6 +43,15 @@ if builder_has_option --coverage; then
   MESON_COVERAGE=-Db_coverage=true
 else
   MESON_COVERAGE=
+fi
+
+# Import our standard compiler defines; this is copied from
+# /resources/build/meson/standard.meson.build by build.sh, because meson doesn't
+# allow us to reference a file outside its root. ${THIS_SCRIPT_PATH}/meson.build
+# then includes `resources` as a subdir.
+if builder_has_action configure; then
+  mkdir -p "${THIS_SCRIPT_PATH}/resources"
+  cp "${KEYMAN_ROOT}/resources/build/meson/standard.meson.build" "${THIS_SCRIPT_PATH}/resources/meson.build"
 fi
 
 configure_action() {

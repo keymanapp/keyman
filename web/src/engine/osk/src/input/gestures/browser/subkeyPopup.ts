@@ -3,10 +3,11 @@ import { type KeyElement } from '../../../keyElement.js';
 import OSKBaseKey from '../../../keyboard-layout/oskBaseKey.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 
-import { DeviceSpec, KeyEvent, ActiveSubKey, KeyDistribution, ActiveKeyBase } from '@keymanapp/keyboard-processor';
+import { DeviceSpec, ActiveSubKey, KeyDistribution, ActiveKeyBase } from '@keymanapp/keyboard-processor';
 import { ConfigChangeClosure, GestureRecognizerConfiguration, GestureSequence, PaddedZoneSource, RecognitionZoneSource } from '@keymanapp/gesture-recognizer';
 import { GestureHandler } from '../gestureHandler.js';
-import { CorrectionLayout, CorrectionLayoutEntry, distributionFromDistanceMaps, keyTouchDistances } from '@keymanapp/input-processor';
+import { CorrectionLayout, CorrectionLayoutEntry } from '../../../correctionLayout.js';
+import { distributionFromDistanceMaps, keyTouchDistances } from '../../../corrections.js';
 import { GestureParams } from '../specsForLayout.js';
 
 /**
@@ -126,7 +127,6 @@ export default class SubkeyPopup implements GestureHandler {
     // position:static and display:inline-block
     const elements = this.element = document.createElement('div');
 
-    var i;
     elements.id='kmw-popup-keys';
 
     // #3718: No longer prepend base key to popup array
@@ -143,33 +143,49 @@ export default class SubkeyPopup implements GestureHandler {
     ss.fontSize=computedStyle.fontSize;
     ss.visibility='hidden';
 
-    var nKeys=subKeySpec.length,nRows,nCols;
-    nRows=Math.min(Math.ceil(nKeys/9),2);
-    nCols=Math.ceil(nKeys/nRows);
+    let layer = e['key'].layer;
+    if (typeof (layer) != 'string' || layer == '') {
+      // Use the currently-active layer.
+      layer = vkbd.layerId;
+    }
 
-    this.menuWidth = (nCols*e.offsetWidth + nCols*SUBKEY_DEFAULT_MARGIN_LEFT);
-    ss.width = this.menuWidth+'px';
+    const nKeys = subKeySpec.length;
+    // Put a maximum of 9 keys in a row to reduce travel distance
+    const nRows=Math.ceil(nKeys/9);
+    const nCols=Math.ceil(nKeys/nRows);
 
     // Add nested button elements for each sub-key
     this.subkeys = [];
-    for(i=0; i<nKeys; i++) {
-      var needsTopMargin = false;
-      let nRow=Math.floor(i/nCols);
-      if(nRows > 1 && nRow > 0) {
-        needsTopMargin = true;
+    let thisRowWidth = SUBKEY_DEFAULT_MARGIN_LEFT;
+    let iRow = 0;
+    for(let i=0, iCol=0; i<nKeys; i++, iCol++) {
+      let subkeyWidth = (typeof subKeySpec[i]['width'] != 'undefined') ?
+        subKeySpec[i]['width'] * e.offsetWidth / 100 :
+        e.offsetWidth;
+
+      if (subkeyWidth > vkbd.width - 2 * SUBKEY_DEFAULT_MARGIN_LEFT) {
+        subkeyWidth = vkbd.width - 2 * SUBKEY_DEFAULT_MARGIN_LEFT;
       }
 
-      let layer = e['key'].layer;
-      if(typeof(layer) != 'string' || layer == '') {
-        // Use the currently-active layer.
-        layer = vkbd.layerId;
+      if (thisRowWidth + subkeyWidth + SUBKEY_DEFAULT_MARGIN_LEFT > vkbd.width || iCol >= nCols) {
+        // New subkey doesn't fit in the current row. Start a new row.
+        // TODO: currently we don't check that the rows fit vertically,
+        // so it's possible that the top or bottom of the subkey menu
+        // is not visible.
+        iRow++;
+        iCol = 0;
+        thisRowWidth = SUBKEY_DEFAULT_MARGIN_LEFT;
       }
-      let keyGenerator = new OSKSubKey(subKeySpec[i], layer);
-      let kDiv = keyGenerator.construct(vkbd, <KeyElement> e, needsTopMargin);
+      const keyGenerator = new OSKSubKey(subKeySpec[i], layer);
+      const kDiv = keyGenerator.construct(vkbd, <KeyElement>e, subkeyWidth, iRow > 0);
+      thisRowWidth += subkeyWidth + SUBKEY_DEFAULT_MARGIN_LEFT;
+      this.menuWidth = Math.max(this.menuWidth ?? 0, thisRowWidth);
       this.subkeys.push(kDiv.firstChild as KeyElement);
 
       elements.appendChild(kDiv);
     }
+
+    ss.width = this.menuWidth + 'px';
 
     // And add a filter to fade main keyboard
     this.shim = document.createElement('div');

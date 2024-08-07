@@ -552,11 +552,22 @@ begin
 
   FFilesToOpen := TStringList.Create;
 
-  if not ForceDirectories(FKeymanDeveloperOptions.DefaultProjectPath) then
-  begin
-    // Fall back to Documents folder if we cannot create the default project path
-    // Documents folder should always exist
-    FKeymanDeveloperOptions.DefaultProjectPath := GetFolderPath(CSIDL_PERSONAL);
+  try
+    if not ForceDirectories(FKeymanDeveloperOptions.DefaultProjectPath) then
+    begin
+      // Fall back to Documents folder if we cannot create the default project path
+      // Documents folder should always exist
+      FKeymanDeveloperOptions.DefaultProjectPath := GetFolderPath(CSIDL_PERSONAL);
+    end;
+  except
+    on E:EInOutError do
+    begin
+      // If the DefaultProjectPath is a relative, invalid path, then it may
+      // cause EInOutError (#11554). Note that this exception should no longer
+      // be possible because the path is sanitized when loaded in
+      // KeymanDeveloperOptions.pas, but keeping this fallback just in case.
+      FKeymanDeveloperOptions.DefaultProjectPath := GetFolderPath(CSIDL_PERSONAL);
+    end;
   end;
 
   FFirstShow := True;
@@ -1300,7 +1311,7 @@ begin
 
       if ext = Ext_ProjectSource then
       begin
-        if SameFileName(GetGlobalProjectUI.FileName, FFileName) then
+        if IsGlobalProjectUIReady and SameFileName(GetGlobalProjectUI.FileName, FFileName) then
         begin
           ShowProject;
           Exit;
@@ -1466,8 +1477,12 @@ begin
   if n >= 0 then
     Result.ProjectFile := FGlobalProject.Files[n];
 
-  (Result as frmClass).OpenFile(FFileName);
   LockWindowUpdate(0);
+
+  if not (Result as frmClass).OpenFile(FFileName) then
+  begin
+    Result.Release;
+  end;
 end;
 
 procedure TfrmKeymanDeveloper.HelpTopic(s: string);

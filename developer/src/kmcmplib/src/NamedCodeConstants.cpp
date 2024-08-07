@@ -120,15 +120,14 @@ KMX_BOOL NamedCodeConstants::LoadFile(PFILE_KEYBOARD fk, const KMX_WCHAR *filena
 
   int FileSize;
   KMX_BYTE* Buf;
-  if(!loadfileproc(szNameUtf8.c_str(), fk->extra->kmnFilename.c_str(), nullptr, &FileSize, msgprocContext)) {
+  std::vector<uint8_t> bufvec = loadfileproc(szNameUtf8, fk->extra->kmnFilename);
+  FileSize = bufvec.size();
+  if(!FileSize) {
     return FALSE;
   }
 
   Buf = new KMX_BYTE[FileSize+1];
-  if(!loadfileproc(szNameUtf8.c_str(), fk->extra->kmnFilename.c_str(), Buf, &FileSize, msgprocContext)) {
-    delete[] Buf;
-    return FALSE;
-  }
+  std::copy(bufvec.begin(), bufvec.end(), Buf);
   Buf[FileSize] = 0; // zero-terminate for strtok
 
   char* filetok;
@@ -268,7 +267,7 @@ int IsHangulSyllable(const KMX_WCHAR *codename, int *code)
   if(strchr("GNDRMBSJCKTPH", ch))
   {
     /* Has an initial syllable */
-    int isDoubled = towupper(*(codename+1)) == ch;
+    int isDoubled = towupper(*(codename+1)) == (wint_t)ch;
 
     LIndex = -1;
     for(i = 0; i < HangulLCount; i++) {

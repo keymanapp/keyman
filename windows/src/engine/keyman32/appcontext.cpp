@@ -28,21 +28,16 @@ AppContext::Delete() {
   } else if (CharIsSurrogatePair()) {
     pos--;
   }
-  // SendDebugMessageFormat(0, sdmAIDefault, 0, "AppContext::Delete");
 
   if (pos > 0)
     pos--;
   CurContext[pos] = 0;
-  // if(--pos < 0) pos = 0;
-  // SendDebugMessageFormat(0, sdmAIDefault, 0, "AppContext: Delete");
 }
 
 void
 AppContext::Reset() {
   pos           = 0;
   CurContext[0] = 0;
-
-  //	SendDebugMessageFormat(0, sdmAIDefault, 0, "AppContext: Reset");
 }
 
 void
@@ -136,7 +131,7 @@ ContextItemToAppContext(km_core_context_item *contextItems, PWSTR outBuf, DWORD 
         buf[idx++] = static_cast<WCHAR> Uni_UTF32ToSurrogate1(km_core_context_it->character);
         buf[idx++] = static_cast<WCHAR> Uni_UTF32ToSurrogate2(km_core_context_it->character);
       } else {
-        buf[idx++] = (km_core_cp)km_core_context_it->character;
+        buf[idx++] = (km_core_cu)km_core_context_it->character;
       }
       break;
     case KM_CORE_CT_MARKER:

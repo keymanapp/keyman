@@ -20,7 +20,7 @@ kmcompxtest = executable('kmcompxtest', ['kmcompxtest.cpp','util_filesystem.cpp'
     include_directories: inc,
     name_suffix: name_suffix,
     link_args: links + tests_links,
-    objects: lib.extract_all_objects(),
+    objects: lib.extract_all_objects(recursive: false),
     dependencies: icuuc_dep,
   )
 
@@ -129,26 +129,52 @@ if get_option('full_test')
 
 endif
 
+common_test_files = [ meson.global_source_root() / '../../../common/include/test_color.cpp' ]
+
 # Test the API endpoints
 
-apitest = executable('api-test', ['api-test.cpp','util_filesystem.cpp','util_callbacks.cpp'],
+apitest = executable('api-test', ['api-test.cpp','util_filesystem.cpp','util_callbacks.cpp', common_test_files],
     cpp_args: defns + flags,
     include_directories: inc,
     name_suffix: name_suffix,
     link_args: links + tests_links,
-    objects: lib.extract_all_objects(),
+    objects: lib.extract_all_objects(recursive: false),
     dependencies: icuuc_dep
   )
 
 test('api-test', apitest, args: [output_path / 'blank_keyboard.kmx'])
 
-usetapitest = executable('uset-api-test', 'uset-api-test.cpp',
+usetapitest = executable('uset-api-test', 'uset-api-test.cpp', common_test_files,
+    cpp_args: defns + flags,
+    include_directories: inc,
+    name_suffix: name_suffix,
+    link_args: links + tests_links,
+    objects: lib.extract_all_objects(recursive: false),
+    dependencies: icuuc_dep,
+  )
+
+test('uset-api-test', usetapitest)
+
+# Google Test
+
+gtestcompilertest = executable('gtest-compiler-test', 'gtest-compiler-test.cpp',
     cpp_args: defns + flags,
     include_directories: inc,
     name_suffix: name_suffix,
     link_args: links + tests_links,
     objects: lib.extract_all_objects(),
-    dependencies: icuuc_dep,
+    dependencies: [ icuuc_dep, gtest_dep, gmock_dep ],
   )
 
-test('uset-api-test', usetapitest)
+test('gtest-compiler-test', gtestcompilertest)
+
+gtestkmx_u16test = executable('gtest-kmx_u16-test', 'gtest-kmx_u16-test.cpp',
+    cpp_args: defns + flags,
+    include_directories: inc,
+    name_suffix: name_suffix,
+    link_args: links + tests_links,
+    objects: lib.extract_all_objects(),
+    dependencies: [ icuuc_dep, gtest_dep, gmock_dep ],
+  )
+
+test('gtest-kmx_u16-test', gtestkmx_u16test)

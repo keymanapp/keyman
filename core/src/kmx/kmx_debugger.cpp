@@ -61,7 +61,7 @@ void KMX_DebugItems::fill_store_offsets(km_core_state_debug_kmx_info *info, PKMX
 
   int i, n;
 
-  km_core_cp *p;
+  km_core_cu *p;
 
   // TODO turn this into a struct rather than interwoven values
   for(i = n = 0, p = static_cast<LPKEY>(info->rule)->dpContext; p && *p; p = incxstr(p), i++) {

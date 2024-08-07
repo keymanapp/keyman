@@ -8,19 +8,9 @@
     "allowSyntheticDefaultImports": true,
 
     "lib": ["es6"],
-    "module": "es6",
-    "target": "es5",
-
-    // TODO: These override ../tsconfig.base.json settings, and so should be removed if possible,
-    //       but existing code in web/ breaks some of these settinsg
-    "noImplicitThis": false,
-    "noImplicitReturns": false,
-    "noImplicitAny": false,
-    "strictFunctionTypes": false,
-    "noUnusedLocals": false,
+    "target": "es6",
 
     // Other settings - declaration files, sourcemapping, and other miscellaneous bits.
-    "allowJs": false,
     "declaration": true,
     "experimentalDecorators": true,
     "importHelpers": true,

@@ -16,10 +16,11 @@
 
 @implementation CoreKeyOutput
 
--(instancetype)init:(NSUInteger)codePointsToDelete textToInsert:(NSString*)text optionsToPersist:(NSDictionary*)options alert:(BOOL)alert emitKeystroke:(BOOL)emit capsLockState:(CapsLockState)capsLock {
+-(instancetype)init:(NSUInteger)codePointsToDelete textToDelete:(NSString*)deletedText textToInsert:(NSString*)text optionsToPersist:(NSDictionary*)options alert:(BOOL)alert emitKeystroke:(BOOL)emit capsLockState:(CapsLockState)capsLock {
   self = [super init];
   if (self) {
     self->_codePointsToDeleteBeforeInsert = codePointsToDelete;
+    self->_textToDelete = deletedText;
     self->_textToInsert = text;
     self->_optionsToPersist = options;
     self->_alert = alert;
@@ -31,10 +32,10 @@
 
 -(NSString *)description
 {
-  NSString* str = @"teststring";
-  NSData* data = [self.textToInsert dataUsingEncoding:NSUTF16LittleEndianStringEncoding];
+  NSData* deleteData = [self.textToDelete dataUsingEncoding:NSUTF16LittleEndianStringEncoding];
+  NSData* insertData = [self.textToInsert dataUsingEncoding:NSUTF16LittleEndianStringEncoding];
 
-  return [[NSString alloc] initWithFormat: @"codePointsToDeleteBeforeInsert: %li, textToInsert: '%@', optionsToPersist: %@, alert: %d, emitKeystroke: %d, capsLockState: %d ", self.codePointsToDeleteBeforeInsert, data, self.optionsToPersist, self.alert, self.emitKeystroke, self.capsLockState];
+  return [[NSString alloc] initWithFormat: @"codePointsToDeleteBeforeInsert: %li, textToDelete: '%@' [data: '%@'], textToInsert: '%@' [data: '%@], optionsToPersist: %@, alert: %d, emitKeystroke: %d, capsLockState: %d ", self.codePointsToDeleteBeforeInsert, self.textToDelete, deleteData, self.textToInsert, insertData, self.optionsToPersist, self.alert, self.emitKeystroke, self.capsLockState];
 }
 
 -(BOOL)hasCodePointsToDelete {

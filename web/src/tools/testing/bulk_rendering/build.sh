@@ -2,19 +2,15 @@
 #
 # Compile the KeymanWeb bulk-renderer module for use with developing/running engine tests.
 
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 SUBPROJECT_NAME=tools/testing/bulk_rendering
 . "$KEYMAN_ROOT/web/common.inc.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 
@@ -37,6 +33,10 @@ function do_build ( ) {
   $BUNDLE_CMD    "${KEYMAN_ROOT}/web/build/$SUBPROJECT_NAME/obj/renderer_core.js" \
     --out        "${KEYMAN_ROOT}/web/build/$SUBPROJECT_NAME/lib/bulk_render.js" \
     --sourceRoot "@keymanapp/keyman/web/build/$SUBPROJECT_NAME/lib/"
+
+  # To ensure it's available to the testing pages when served via localhost or build agent.
+  cp "${KEYMAN_ROOT}/node_modules/@zip.js/zip.js/dist/zip.min.js" \
+     "${KEYMAN_ROOT}/web/build/$SUBPROJECT_NAME/lib/zip.min.js"
 }
 
 builder_run_action configure  verify_npm_setup

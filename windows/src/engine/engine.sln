@@ -3,9 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31313.79
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Keyman32", "keyman32\Keyman32.vcxproj", "{BD5564FB-35A5-4A3C-B96A-4A6578E2B593}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keyman64", "keyman64\keyman64.vcxproj", "{D1115FB2-230D-4FD8-90B9-982E49953D18}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keyman32", "keyman32\Keyman32.vcxproj", "{BD5564FB-35A5-4A3C-B96A-4A6578E2B593}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "keymanx64", "keymanx64\keymanx64.vcxproj", "{A34650EA-D6E8-4229-8091-6BF1443565B5}"
 EndProject
@@ -31,16 +29,12 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{BD5564FB-35A5-4A3C-B96A-4A6578E2B593}.Debug|Win32.ActiveCfg = Debug|Win32
 		{BD5564FB-35A5-4A3C-B96A-4A6578E2B593}.Debug|Win32.Build.0 = Debug|Win32
-		{BD5564FB-35A5-4A3C-B96A-4A6578E2B593}.Debug|x64.ActiveCfg = Debug|Win32
+		{BD5564FB-35A5-4A3C-B96A-4A6578E2B593}.Debug|x64.ActiveCfg = Debug|x64
+		{BD5564FB-35A5-4A3C-B96A-4A6578E2B593}.Debug|x64.Build.0 = Debug|x64
 		{BD5564FB-35A5-4A3C-B96A-4A6578E2B593}.Release|Win32.ActiveCfg = Release|Win32
 		{BD5564FB-35A5-4A3C-B96A-4A6578E2B593}.Release|Win32.Build.0 = Release|Win32
-		{BD5564FB-35A5-4A3C-B96A-4A6578E2B593}.Release|x64.ActiveCfg = Release|Win32
-		{D1115FB2-230D-4FD8-90B9-982E49953D18}.Debug|Win32.ActiveCfg = Debug|x64
-		{D1115FB2-230D-4FD8-90B9-982E49953D18}.Debug|x64.ActiveCfg = Debug|x64
-		{D1115FB2-230D-4FD8-90B9-982E49953D18}.Debug|x64.Build.0 = Debug|x64
-		{D1115FB2-230D-4FD8-90B9-982E49953D18}.Release|Win32.ActiveCfg = Release|x64
-		{D1115FB2-230D-4FD8-90B9-982E49953D18}.Release|x64.ActiveCfg = Release|x64
-		{D1115FB2-230D-4FD8-90B9-982E49953D18}.Release|x64.Build.0 = Release|x64
+		{BD5564FB-35A5-4A3C-B96A-4A6578E2B593}.Release|x64.ActiveCfg = Release|x64
+		{BD5564FB-35A5-4A3C-B96A-4A6578E2B593}.Release|x64.Build.0 = Release|x64
 		{A34650EA-D6E8-4229-8091-6BF1443565B5}.Debug|Win32.ActiveCfg = Debug|x64
 		{A34650EA-D6E8-4229-8091-6BF1443565B5}.Debug|x64.ActiveCfg = Debug|x64
 		{A34650EA-D6E8-4229-8091-6BF1443565B5}.Debug|x64.Build.0 = Debug|x64

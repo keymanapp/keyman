@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE keyboardTest3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboardTest3.dtd">
+<!DOCTYPE keyboardTest3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/45/dtd/ldmlKeyboardTest3.dtd">
 <keyboardTest3 conformsTo="techpreview">
   <info keyboard="k_210_marker.xml" author="Team Keyboard" name="marker" />
   <tests name="marker-tests">
@@ -48,6 +48,79 @@
       <check result="x" />
       <keystroke key="acute" />
       <check result="x" />
+    </test>
+  </tests>
+  <tests name="regression-11045">
+    <test name="regression-11045-grave">
+      <keystroke key="v" />
+      <keystroke key="grave"/>
+      <check result="`"/>
+    </test>
+    <test name="regression-11045-acute">
+      <keystroke key="v" />
+      <keystroke key="acute"/>
+      <check result="´"/>
+    </test>
+  </tests>
+  <tests name="double-marker-10955">
+    <!-- unmatched delete should delete ALL markers, not just one -->
+    <test name="double-marker-10955-null">
+      <keystroke key="v" />
+      <keystroke key="squiggle" />
+      <keystroke key="squiggle" />
+      <keystroke key="b" />
+      <check result="v2-squiggles" />
+    </test>
+    <test name="double-marker-10955-del-1">
+      <keystroke key="v" />
+      <keystroke key="squiggle" />
+      <backspace />
+      <keystroke key="b" />
+      <check result="no-squiggles" />
+    </test>
+    <test name="double-marker-10955-del-2">
+      <keystroke key="v" />
+      <keystroke key="squiggle" />
+      <keystroke key="squiggle" />
+      <backspace />
+      <keystroke key="b" />
+      <check result="no-squiggles" />
+    </test>
+    <test name="double-marker-10955-del-3">
+      <keystroke key="v" />
+      <keystroke key="squiggle" />
+      <keystroke key="squiggle" />
+      <keystroke key="squiggle" />
+      <backspace />
+      <keystroke key="b" />
+      <check result="no-squiggles" />
+    </test>
+    <test name="double-marker-10955-del-2-1">
+      <keystroke key="v" />
+      <keystroke key="v" />
+      <keystroke key="squiggle" />
+      <backspace />
+      <keystroke key="b" />
+      <check result="vno-squiggles" />
+    </test>
+    <test name="double-marker-10955-del-2-2">
+      <keystroke key="v" />
+      <keystroke key="v" />
+      <keystroke key="squiggle" />
+      <keystroke key="squiggle" />
+      <backspace />
+      <keystroke key="b" />
+      <check result="vno-squiggles" />
+    </test>
+    <test name="double-marker-10955-del-2-3">
+      <keystroke key="v" />
+      <keystroke key="v" />
+      <keystroke key="squiggle" />
+      <keystroke key="squiggle" />
+      <keystroke key="squiggle" />
+      <backspace />
+      <keystroke key="b" />
+      <check result="vno-squiggles" />
     </test>
   </tests>
 </keyboardTest3>

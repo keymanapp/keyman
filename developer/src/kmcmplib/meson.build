@@ -5,7 +5,7 @@
 #
 
 project('kmcmplib', 'cpp', 'c',
-        version: run_command(find_program('getversion.bat', 'getversion.sh')).stdout().strip(),
+        version: run_command(find_program('getversion.bat', 'getversion.sh'), check: true).stdout().strip(),
         license: 'MIT',
         default_options : ['buildtype=release',
                            'cpp_std=c++14',

@@ -1,6 +1,8 @@
-import { Comparator, isHighSurrogate, SENTINEL_CODE_UNIT, PriorityQueue } from '@keymanapp/models-templates';
+import { isHighSurrogate, SENTINEL_CODE_UNIT } from '@keymanapp/models-templates';
+import { QueueComparator as Comparator, PriorityQueue } from '@keymanapp/web-utils';
 
 import { ClassicalDistanceCalculation, EditToken } from './classical-calculation.js';
+import { ExecutionTimer, STANDARD_TIME_BETWEEN_DEFERS } from './execution-timer.js';
 
 type RealizedInput = ProbabilityMass<Transform>[];  // NOT Distribution - they're masses from separate distributions.
 
@@ -11,6 +13,12 @@ export type TraversableToken<TUnit> = {
 
 export const QUEUE_NODE_COMPARATOR: Comparator<SearchNode> = function(arg1, arg2) {
   return arg1.currentCost - arg2.currentCost;
+}
+
+enum TimedTaskTypes {
+  CACHED_RESULT = 0,
+  PREDICTING = 1,
+  CORRECTING = 2
 }
 
 // Represents a processed node for the correction-search's search-space's tree-like graph.  May represent
@@ -39,9 +47,9 @@ export class SearchNode {
   // Internal lazy-cache for .inputSamplingCost, as it's a bit expensive to re-compute.
   private _inputCost?: number;
 
-  constructor(rootTraversal: LexiconTraversal, toKey?: (USVString) => USVString);
+  constructor(rootTraversal: LexiconTraversal, toKey?: (arg0: USVString) => USVString);
   constructor(node: SearchNode);
-  constructor(rootTraversal: LexiconTraversal | SearchNode, toKey?: (USVString) => USVString) {
+  constructor(rootTraversal: LexiconTraversal | SearchNode, toKey?: (arg0: USVString) => USVString) {
     toKey = toKey || (x => x);
 
     if(rootTraversal instanceof SearchNode) {
@@ -200,12 +208,27 @@ export class SearchNode {
     return edges;
   }
 
-  get mapKey(): string {
+  /**
+   * A key uniquely identifying identical search path nodes.  Replacement of a keystroke's
+   * text in a manner that results in identical path to a different keystroke should result
+   * in both path nodes sharing the same pathKey value.
+   */
+  get pathKey(): string {
     let inputString = this.priorInput.map((value) => '+' + value.sample.insert + '-' + value.sample.deleteLeft).join('');
     let matchString =  this.calculation.matchSequence.map((value) => value.key).join('');
 
     // TODO:  might should also track diagonalWidth.
     return inputString + SENTINEL_CODE_UNIT + matchString;
+  }
+
+  /**
+   * A key uniquely identifying identical match sequences.  Reaching the same net result
+   * by different paths should result in identical `resultKey` values.
+   */
+  get resultKey(): string {
+    // Filter out any duplicated match sequences.  The same match sequence may be reached via
+    // different input sequences, after all.
+    return this.calculation.matchSequence.map(value => value.key).join('');
   }
 
   get isFullReplacement(): boolean {
@@ -265,17 +288,34 @@ export class SearchResult {
   };
 
   get matchString(): USVString {
-    return this.matchSequence.map(value => value.key).join('');
+    return this.resultNode.resultKey;
   }
 
+  /**
+   * Gets the number of Damerau-Levenshtein edits needed to reach the node's
+   * matchString from the output induced by the input sequence used to reach it.
+   *
+   * (This is scaled by `SearchSpace.EDIT_DISTANCE_COST_SCALE` when included in
+   * `totalCost`.)
+   */
   get knownCost(): number {
     return this.resultNode.knownCost;
   }
 
+  /**
+   * Gets the "input sampling cost" of the edge, which should be considered as the
+   * negative log-likelihood of the input path taken to reach the node.
+   */
   get inputSamplingCost(): number {
     return this.resultNode.inputSamplingCost;
   }
 
+  /**
+   * Gets the "total cost" of the edge, which should be considered as the
+   * negative log-likelihood of the input path taken to reach the node
+   * multiplied by the 'probability' induced by needed Damerau-Levenshtein edits
+   * to the resulting output.
+   */
   get totalCost(): number {
     return this.resultNode.currentCost;
   }
@@ -325,10 +365,10 @@ export class SearchSpace {
   private completedPaths: SearchNode[];
 
   // Marks all results that have already been returned since the last input was received.
-  private returnedValues: {[mapKey: string]: SearchNode} = {};
+  private returnedValues: {[resultKey: string]: SearchNode} = {};
 
   // Signals that the edge has already been processed.
-  private processedEdgeSet: {[mapKey: string]: boolean} = {};
+  private processedEdgeSet: {[pathKey: string]: boolean} = {};
 
   /**
    * Clone constructor.  Deep-copies its internal queues, but not search nodes.
@@ -490,11 +530,11 @@ export class SearchSpace {
 
     // Have we already processed a matching edge?  If so, skip it.
     // We already know the previous edge is of lower cost.
-    if(this.processedEdgeSet[currentNode.mapKey]) {
+    if(this.processedEdgeSet[currentNode.pathKey]) {
       this.selectionQueue.enqueue(bestTier);
       return unmatchedResult;
     } else {
-      this.processedEdgeSet[currentNode.mapKey] = true;
+      this.processedEdgeSet[currentNode.pathKey] = true;
     }
 
     // Stage 1:  filter out nodes/edges we want to prune
@@ -549,7 +589,7 @@ export class SearchSpace {
 
       let inputIndex = nextTier.index;
 
-      let deletionEdges = [];
+      let deletionEdges: SearchNode[] = [];
       if(!substitutionsOnly) {
         deletionEdges       = currentNode.buildDeletionEdges(this.inputSequence[inputIndex-1]);
       }
@@ -569,275 +609,91 @@ export class SearchSpace {
   }
 
   // Current best guesstimate of how compositor will retrieve ideal corrections.
-  *getBestMatches(waitMillis?: number): Generator<SearchResult[]> {
-    // might should also include a 'base cost' parameter of sorts?
-    let searchSpace = this;
-    let currentReturns: {[mapKey: string]: SearchNode} = {};
-
-    let maxTime: number;
-    if(waitMillis == 0) {
-      maxTime = Infinity;
-    } else if(waitMillis == undefined || Number.isNaN(waitMillis)) { // also covers null.
-      maxTime = SearchSpace.DEFAULT_ALLOTTED_CORRECTION_TIME_INTERVAL;
-    } else  {
-      maxTime = waitMillis;
-    }
-
-    /**
-     * This inner class is designed to help the algorithm detect its active execution time.
-     * While there's no official JS way to do this, we can approximate it by polling the
-     * current system time (in ms) after each iteration of a short-duration loop.  Unusual
-     * spikes in system time for a single iteration is likely to indicate that an OS
-     * context switch occurred at some point during the iteration's execution.
-     */
-    class ExecutionTimer {
-      /**
-       * The system time when this instance was created.
-       */
-      private start: number;
-
-      /**
-       * Marks the system time at the start of the currently-running loop, as noted
-       * by a call to the `startLoop` function.
-       */
-      private loopStart: number;
-
-      private maxExecutionTime: number;
-      private maxTrueTime: number;
-
-      private executionTime: number;
-
-      /**
-       * Used to track intervals in which potential context swaps by the OS may
-       * have occurred.  Context switches generally seem to pause threads for
-       * at least 16 ms, while we expect each loop iteration to complete
-       * within just 1 ms.  So, any possible context switch should have the
-       * longest observed change in system time.
-       *
-       * See `updateOutliers` for more details.
-       */
-      private largestIntervals: number[] = [0];
-
-      constructor(maxExecutionTime: number, maxTrueTime: number) {
-        // JS measures time by the number of milliseconds since Jan 1, 1970.
-        this.loopStart = this.start = Date.now();
-        this.maxExecutionTime = maxExecutionTime;
-        this.maxTrueTime = maxTrueTime;
-      }
-
-      startLoop() {
-        this.loopStart = Date.now();
-      }
-
-      markIteration() {
-        const now = Date.now();
-        const delta = now - this.loopStart;
-        this.executionTime += delta;
-
-        /**
-         * Update the list of the three longest system-time intervals observed
-         * for execution of a single loop iteration.
-         *
-         * Ignore any zero-ms length intervals; they'd make the logic much
-         * messier than necessary otherwise.
-         */
-        if(delta && delta > this.largestIntervals[0]) {
-          // If the currently-observed interval is longer than the shortest of the 3
-          // previously-observed longest intervals, replace it.
-          if(this.largestIntervals.length > 2) {
-            this.largestIntervals[0] = delta;
-          } else {
-            this.largestIntervals.push(delta);
-          }
-
-          // Puts the list in ascending order.  Shortest of the list becomes the head,
-          // longest one the tail.
-          this.largestIntervals.sort();
-
-          // Then, determine if we need to update our outlier-based tweaks.
-          this.updateOutliers();
-        }
-      }
-
-      updateOutliers() {
-        /* Base assumption:  since each loop of the search should evaluate within ~1ms,
-          *                   notably longer execution times are probably context switches.
-          *
-          * Base assumption:  OS context switches generally last at least 16ms.  (Based on
-          *                   a window.setTimeout() usually not evaluating for at least
-          *                   that long, even if set to 1ms.)
-          *
-          * To mitigate these assumptions:  we'll track the execution time of every loop
-          * iteration.  If the longest observation somehow matches or exceeds the length of
-          * the next two almost-longest observations twice over... we have a very strong
-          * 'context switch' candidate.
-          *
-          * Or, in near-formal math/stats:  we expect a very low variance in execution
-          * time among the iterations of the search's loops.  With a very low variance,
-          * ANY significant proportional spikes in execution time are outliers - outliers
-          * likely caused by an OS context switch.
-          *
-          * Rather than do intensive math, we use a somewhat lazy approach below that
-          * achieves the same net results given our assumptions, even when relaxed somewhat.
-          *
-          * The logic below relaxes the base assumptions a bit to be safe:
-          * - [2ms, 2ms, 8ms]  will cause 8ms to be seen as an outlier.
-          * - [2ms, 3ms, 10ms] will cause 10ms to be seen as an outlier.
-          *
-          * Ideally:
-          * - [1ms, 1ms, 4ms] will view 4ms as an outlier.
-          *
-          * So we can safely handle slightly longer average intervals and slightly shorter
-          * OS context-switch time intervals.
-          */
-        if(this.largestIntervals.length > 2) {
-          // Precondition:  the `largestIntervals` array is sorted in ascending order.
-          // Shortest entry is at the head, longest at the tail.
-          if(this.largestIntervals[2] >= 2 * (this.largestIntervals[0] + this.largestIntervals[1])) {
-            this.executionTime -= this.largestIntervals[2];
-            this.largestIntervals.pop();
-          }
-        }
-      }
-
-      shouldTimeout(): boolean {
-        const now = Date.now();
-        if(now - this.start > this.maxTrueTime) {
-          return true;
-        }
-
-        return this.executionTime > this.maxExecutionTime;
-      }
-
-      resetOutlierCheck() {
-        this.largestIntervals = [];
-      }
-    }
-
-    class BatchingAssistant {
-      currentCost = Number.MIN_SAFE_INTEGER;
-      entries: SearchResult[] = [];
-
-      checkAndAdd(entry: SearchNode): SearchResult[] | null {
-        var result: SearchResult[] = null;
-
-        if(entry.currentCost > this.currentCost) {
-          result = this.tryFinalize();
-
-          this.currentCost = entry.currentCost;
-        }
-
-        // Filter out any duplicated match sequences.  The same match sequence may be reached via
-        // different input sequences, after all.
-        let outputMapKey = entry.calculation.matchSequence.map(value => value.key).join('');
-
-        // First, ensure the edge has an existing 'shared' cache entry.
-        if(!searchSpace.returnedValues[outputMapKey]) {
-          searchSpace.returnedValues[outputMapKey] = entry;
-        }
-
-        // Check the generator's local returned-value cache - this determines whether or not we
-        // need to add a new 'return' to the batch.
-        if(!currentReturns[outputMapKey]) {
-          this.entries.push(new SearchResult(entry));
-          currentReturns[outputMapKey] = entry;
-        }
-
-        return result;
-      }
-
-      tryFinalize(): SearchResult[] | null {
-        var result: SearchResult[] = null;
-        if(this.entries.length > 0) {
-          result = this.entries;
-          this.entries = [];
-        }
-
-        return result;
-      }
-    }
-
-    let batcher = new BatchingAssistant();
-
-    const timer = new ExecutionTimer(maxTime*1.5, maxTime);
+  async *getBestMatches(timer: ExecutionTimer): AsyncGenerator<SearchResult> {
+    let currentReturns: {[resultKey: string]: SearchNode} = {};
 
     // Stage 1 - if we already have extracted results, build a queue just for them and iterate over it first.
     let returnedValues = Object.values(this.returnedValues);
     if(returnedValues.length > 0) {
       let preprocessedQueue = new PriorityQueue<SearchNode>(QUEUE_NODE_COMPARATOR, returnedValues);
 
-      // Build batches of same-cost entries.
-      timer.startLoop();
       while(preprocessedQueue.count > 0) {
-        let entry = preprocessedQueue.dequeue();
+        const entryFromCache = timer.time(() => {
+          let entry = preprocessedQueue.dequeue();
 
-        // Is the entry a reasonable result?
-        if(entry.isFullReplacement) {
-          // If the entry's 'match' fully replaces the input string, we consider it
-          // unreasonable and ignore it.
-          continue;
-        }
+          // Is the entry a reasonable result?
+          if(entry.isFullReplacement) {
+            // If the entry's 'match' fully replaces the input string, we consider it
+            // unreasonable and ignore it.
+            return null;
+          }
 
-        let batch = batcher.checkAndAdd(entry);
-        timer.markIteration();
-
-        if(batch) {
+          currentReturns[entry.resultKey] = entry;
           // Do not track yielded time.
-          yield batch;
-        }
-      }
+          return new SearchResult(entry);
+        }, TimedTaskTypes.CACHED_RESULT);
 
-      // As we only return a batch once all entries of the same cost have been processed, we can safely
-      // finalize the last preprocessed group without issue.
-      let batch = batcher.tryFinalize();
-      if(batch) {
-        // Do not track yielded time.
-        yield batch;
+        if(entryFromCache) {
+          // Time yielded here is generally spent on turning corrections into predictions.
+          // It's timing a different sort of task, so... different task set ID.
+          const timeSpan = timer.start(TimedTaskTypes.PREDICTING);
+          yield entryFromCache;
+          timeSpan.end();
+
+          if(timer.timeSinceLastDefer > STANDARD_TIME_BETWEEN_DEFERS) {
+            await timer.defer();
+          }
+        }
       }
     }
 
     // Stage 2:  the fun part; actually searching!
-    timer.resetOutlierCheck();
-    timer.startLoop();
-    let timedOut = false;
     do {
-      let newResult: PathResult;
+      const entry = timer.time(() => {
+        let newResult: PathResult = this.handleNextNode();
 
-      // Search for a 'complete' path, skipping all partial paths as long as time remains.
-      do {
-        newResult = this.handleNextNode();
-        timer.markIteration();
+        if(newResult.type == 'none') {
+          return null;
+        } else if(newResult.type == 'complete') {
+          const node = newResult.finalNode;
 
-        if(timer.shouldTimeout()) {
-          timedOut = true;
+          // Is the entry a reasonable result?
+          if(node.isFullReplacement) {
+            // If the entry's 'match' fully replaces the input string, we consider it
+            // unreasonable and ignore it.  Also, if we've reached this point...
+            // we can(?) assume that everything thereafter is as well.
+            return null;
+          }
+
+          const entry = newResult.finalNode;
+
+          // As we can't guarantee a monotonically-increasing cost during the search -
+          // due to effects from keystrokes with deleteLeft > 0 - it's technically
+          // possible to find a lower-cost path later in such cases.
+          //
+          // If it occurs, we should re-emit it - it'll show up earlier in the
+          // suggestions that way, as it should.
+          if((currentReturns[entry.resultKey]?.currentCost ?? Number.MAX_VALUE) > entry.currentCost) {
+            currentReturns[entry.resultKey] = entry;
+            this.returnedValues[entry.resultKey] = entry;
+            // Do not track yielded time.
+            return new SearchResult(entry);
+          }
         }
-      } while(!timedOut && newResult.type == 'intermediate')
 
-      // TODO:  check 'cost' on intermediate, running it through batcher to early-detect cost changes.
-      let batch: SearchResult[];
-      if(newResult.type == 'none') {
-        break;
-      } else if(newResult.type == 'complete') {
-        // Is the entry a reasonable result?
-        if(newResult.finalNode.isFullReplacement) {
-          // If the entry's 'match' fully replaces the input string, we consider it
-          // unreasonable and ignore it.  Also, if we've reached this point...
-          // we can(?) assume that everything thereafter is as well.
-          break;
-        }
-        batch = batcher.checkAndAdd(newResult.finalNode);
+        return null;
+      }, TimedTaskTypes.CORRECTING);
+
+      if(entry) {
+        const timeSpan = timer.start(TimedTaskTypes.PREDICTING);
+        yield entry;
+        timeSpan.end();
       }
 
-      if(batch) {
-        yield batch;
+      if(timer.timeSinceLastDefer > STANDARD_TIME_BETWEEN_DEFERS) {
+        await timer.defer();
       }
-    } while(!timedOut && this.hasNextMatchEntry());
-
-    // If we _somehow_ exhaust all search options, make sure to return the final results.
-    let batch = batcher.tryFinalize();
-    if(batch) {
-      yield batch;
-    }
+    } while(!timer.elapsed && this.hasNextMatchEntry());
 
     return null;
   }

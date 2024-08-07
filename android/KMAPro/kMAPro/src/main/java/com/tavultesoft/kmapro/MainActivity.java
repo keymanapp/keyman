@@ -4,6 +4,8 @@
 
 package com.tavultesoft.kmapro;
 
+import static android.content.pm.PackageManager.PERMISSION_GRANTED;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -50,11 +52,17 @@ import android.net.Uri;
 import android.net.Uri.Builder;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.os.Parcelable;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AlertDialog;
 import android.content.ClipData;
@@ -75,7 +83,9 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.provider.Settings;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
@@ -101,7 +111,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   public static Context context;
 
   // Fields used for installing kmp packages
-  private static final int PERMISSION_REQUEST_STORAGE = 0;
+  public static final int PERMISSION_REQUEST_STORAGE = 0;
   public static final int READ_REQUEST_CODE = 42;
 
   private static final String TAG = "MainActivity";
@@ -111,8 +121,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   private final int maxTextSize = 72;
   private int textSize = minTextSize;
   private int lastOrientation = Configuration.ORIENTATION_UNDEFINED;
-  private static final String defaultKeyboardInstalled = "DefaultKeyboardInstalled";
-  private static final String defaultDictionaryInstalled = "DefaultDictionaryInstalled";
   private static final String userTextKey = "UserText";
   private static final String userTextSizeKey = "UserTextSize";
   private Toolbar toolbar;
@@ -133,6 +141,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     checkSendCrashReport();
     if (KMManager.getMaySendCrashReport()) {
       SentryAndroid.init(context, options -> {
+        options.setEnableAutoSessionTracking(false);
         options.setRelease(com.tavultesoft.kmapro.BuildConfig.VERSION_GIT_TAG);
         options.setEnvironment(com.tavultesoft.kmapro.BuildConfig.VERSION_ENVIRONMENT);
       });
@@ -147,43 +156,9 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_INAPP);
     KMManager.executeResourceUpdate(this);
 
+    DefaultLanguageResource.install(context);
+
     SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    // Add default keyboard
-    boolean installDefaultKeyboard = prefs.getBoolean(defaultKeyboardInstalled, false);
-    if (!installDefaultKeyboard) {
-      if (!KMManager.keyboardExists(context, KMManager.KMDefault_PackageID, KMManager.KMDefault_KeyboardID,
-          KMManager.KMDefault_LanguageID)) {
-        KMManager.addKeyboard(this, KMManager.getDefaultKeyboard(getApplicationContext()));
-      }
-      SharedPreferences.Editor editor = prefs.edit();
-      editor.putBoolean(defaultKeyboardInstalled, true);
-      editor.commit();
-    }
-
-    // Add default dictionary
-    boolean installDefaultDictionary = prefs.getBoolean(defaultDictionaryInstalled, false);
-    if (!installDefaultDictionary) {
-      LexicalModel defaultLexicalModel = LexicalModel.getDefaultLexicalModel(context);
-      HashMap<String, String> lexicalModelInfo = new HashMap<String, String>();
-      lexicalModelInfo.put(KMManager.KMKey_PackageID, defaultLexicalModel.getPackageID());
-      lexicalModelInfo.put(KMManager.KMKey_LanguageID, defaultLexicalModel.getLanguageID());
-      lexicalModelInfo.put(KMManager.KMKey_LanguageName, defaultLexicalModel.getLanguageName());
-      lexicalModelInfo.put(KMManager.KMKey_LexicalModelID, defaultLexicalModel.getLexicalModelID());
-      lexicalModelInfo.put(KMManager.KMKey_LexicalModelName, defaultLexicalModel.getLexicalModelName());
-      lexicalModelInfo.put(KMManager.KMKey_LexicalModelVersion, defaultLexicalModel.getVersion());
-      /*
-      // If welcome.htm exists, add custom help link
-      welcomeFile = new File(KMManager.getLexicalModelsDir(), KMManager.KMDefault_DictionaryPackageID + File.separator + FileUtils.WELCOME_HTM);
-      lexicalModelInfo.put(KMManager.KMKey_CustomHelpLink, welcomeFile.getPath());
-       */
-      KMManager.addLexicalModel(context, lexicalModelInfo);
-      KMManager.registerAssociatedLexicalModel(KMManager.KMDefault_LanguageID);
-
-      SharedPreferences.Editor editor = prefs.edit();
-      editor.putBoolean(defaultDictionaryInstalled, true);
-      editor.commit();
-    }
-
     KMManager.SpacebarText spacebarText = KMManager.SpacebarText.fromString(prefs.getString(KeymanSettingsActivity.spacebarTextKey, KMManager.SpacebarText.LANGUAGE_KEYBOARD.toString()));
     KMManager.setSpacebarText(spacebarText);
 
@@ -292,7 +267,12 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         // file:// Chrome downloads and Filebrowsers
         case "content":
         case "file":
-          checkStoragePermission(loadingIntentUri);
+          requestPermissionIntentUri = loadingIntentUri;
+          if (CheckPermissions.isPermissionOK(this)) {
+            useLocalKMP(context, loadingIntentUri);
+          } else {
+            CheckPermissions.requestPermission(this, context);
+          }
           break;
         case "http" :
         case "https" :
@@ -623,8 +603,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     if (resourceId > 0)
       statusBarHeight = getResources().getDimensionPixelSize(resourceId);
 
-    Point size = new Point(0, 0);
-    getWindowManager().getDefaultDisplay().getSize(size);
+    Point size = KMManager.getWindowSize(context);
     int screenHeight = size.y;
     Log.d(TAG, "Main resizeTextView bannerHeight: " + bannerHeight);
     textView.setHeight(screenHeight - statusBarHeight - actionBarHeight - bannerHeight - keyboardHeight);
@@ -820,51 +799,13 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     if (requestCode == PERMISSION_REQUEST_STORAGE) {
       // Request for storage permission
       if (grantResults.length == 1 &&
-          grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+          grantResults[0] == PERMISSION_GRANTED) {
         // Permission has been granted. Resume task needing this permission
         useLocalKMP(context, requestPermissionIntentUri);
       } else {
         // Permission request denied
-        String message = getString(R.string.storage_permission_denied);
-        Toast.makeText(getApplicationContext(), message,
-          Toast.LENGTH_SHORT).show();
+        CheckPermissions.showPermissionDenied(context);
       }
-    }
-  }
-
-  private void checkStoragePermission(Uri data) {
-    // Check if the Storage permission has been granted
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-        useLocalKMP(context, data);
-      } else {
-        // Permission is missing and must be requested
-        requestPermissionIntentUri = data;
-        requestStoragePermission();
-      }
-    } else {
-      // Permission automatically granted on older Android versions
-      useLocalKMP(context, data);
-    }
-  }
-
-  /**
-   * Requests the {@link android.Manifest.permission#READ_EXTERNAL_STORAGE} permissions
-   */
-  private void requestStoragePermission() {
-    if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)) {
-      // Provide additional rationale to the user if the permission was not granted
-      String message = getString(R.string.request_storage_permission);
-      Toast.makeText(getApplicationContext(), message ,
-        Toast.LENGTH_LONG).show();
-      ActivityCompat.requestPermissions(this,
-        new String[]{ Manifest.permission.READ_EXTERNAL_STORAGE },
-        PERMISSION_REQUEST_STORAGE);
-    } else {
-      // Request the permission. The result will be received in onRequestPermissionsResult().
-      ActivityCompat.requestPermissions(this,
-        new String[]{ Manifest.permission.READ_EXTERNAL_STORAGE },
-        PERMISSION_REQUEST_STORAGE);
     }
   }
 
@@ -925,9 +866,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
   }
 
   public static Drawable getActionBarDrawable(Context context) {
-    Point size = new Point();
-    WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-    wm.getDefaultDisplay().getSize(size);
+    Point size = KMManager.getWindowSize(context);
     int width = size.x;
 
     TypedValue outValue = new TypedValue();

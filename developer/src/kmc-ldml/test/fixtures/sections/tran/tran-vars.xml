@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE keyboard3 SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard3.dtd">
-<keyboard3 locale="mt" conformsTo="techpreview">
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
   <info name="tran-vars"/>
 
   <keys />
@@ -11,9 +10,9 @@
     <string id="n" value="no" /> <!-- a simple string-->
     <set id="upper" value="A B C D FF E" /> <!-- a set with 6 items. Purposely out of order.-->
     <set id="lower" value="a b c d ƒ ƒ" /> <!-- a set with 6 items. Purposely out of order and with a dup.-->
-    <unicodeSet id="alpha" value="[a-z]" />
-    <unicodeSet id="vowels" value="[aeiou]" />
-    <unicodeSet id="consonants" value="[$[alpha]-$[vowels]]" />
+    <uset id="alpha" value="[a-z]" />
+    <uset id="vowels" value="[aeiou]" />
+    <uset id="consonants" value="[$[alpha]-$[vowels]]" />
   </variables>
 
   <transforms type="simple">

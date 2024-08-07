@@ -78,7 +78,8 @@ type
     debugkeyboard: TDebugKeyboard;
     FDefaultFont: Boolean;
     FUIStatus: TLdmlDebugUIStatus;
-    FUIDisabled: Boolean;
+
+    FIgnoreNextUIKey: Boolean;
 
     { Deadkey member variables }
     FSelectedDeadkey: TDeadKeyInfo;
@@ -131,7 +132,6 @@ type
     procedure ShowDebugForm;
     procedure HideDebugForm;
 
-    function ShortcutDisabled(Key: Word): Boolean;
   end;
 
 implementation
@@ -247,7 +247,10 @@ begin
     WM_SYSKEYDOWN:
       Handled := HandleMemoKeydown(Message);
     WM_SYSCHAR:
-      Handled := FUIDisabled;
+      begin
+        Handled := FIgnoreNextUIKey;
+        FIgnoreNextUIKey := False;
+      end;
     WM_CHAR:
       Handled := True;
   end;
@@ -449,6 +452,7 @@ procedure TfrmLdmlKeyboardDebug.Run(vkey: Word);
     msg: TMessage;
     state: TMemoSelectionState;
   begin
+    FIgnoreNextUIKey := False;
     if (LOBYTE(dwData) < VK_F1) or (LOBYTE(dwData) > VK_F12) then
     begin
       flag := KEYFLAG_KEYMAN;
@@ -532,7 +536,7 @@ var
   state: TMemoSelectionState;
   Adjustment: Integer;
 begin
-  FUIDisabled := True;
+  FIgnoreNextUIKey := True;
 
   actions := km_core_state_get_actions(FDebugCore.State);
   if actions = nil then
@@ -636,7 +640,6 @@ begin
   finally
     km_core_context_items_dispose(context_items);
 
-    FUIDisabled := False;
     UpdateCharacterGrid;
 
     // We want to refresh the memo and character grid for rapid typing
@@ -812,23 +815,6 @@ end;
 procedure TfrmLdmlKeyboardDebug.memoClick(Sender: TObject);
 begin
   memoSelMove(memo);
-end;
-
-{-------------------------------------------------------------------------------
- - Control captions                                                            -
- ------------------------------------------------------------------------------}
-
-function TfrmLdmlKeyboardDebug.ShortcutDisabled(Key: Word): Boolean;
-begin
-  Result := False;
-  if not FUIDisabled then Exit;
-  if Key in [VK_F1..VK_F12] then
-    Result := True
-  else if GetKeyState(VK_CONTROL) < 0 then
-  begin
-    if Key in [Ord('A')..Ord('Z'), Ord('0')..Ord('9')] then
-      Result := True;
-  end;
 end;
 
 procedure TfrmLdmlKeyboardDebug.memoSelMove(Sender: TObject);

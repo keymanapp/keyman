@@ -9,10 +9,11 @@ project('keyman_core', 'cpp', 'c',
         version: run_command(find_program('getversion.bat', 'getversion.sh'), check:true).stdout().strip(),
         license: 'MIT',
         default_options : ['buildtype=release',
-                           'cpp_std=c++14',
+                           'cpp_std=c++17',
                            'b_vscrt=static_from_buildtype',
-                           'warning_level=2'],
-        meson_version: '>=0.57.0')
+                           'warning_level=2',
+                           'debug=true'],
+        meson_version: '>=1.0')
 
 # Import our standard compiler defines; this is copied from
 # /resources/build/standard.meson.build by build.sh, because
@@ -32,6 +33,11 @@ defns += ['-DKM_CORE_LIBRARY']
 # #define DEBUG when we are on a debug build
 if get_option('buildtype') == 'debug'
   add_global_arguments('-DDEBUG', language : 'cpp')
+endif
+
+# shared with a number of subdirs
+if cpp_compiler.get_id() == 'emscripten'
+  wasm_exported_runtime_methods = '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\',\'stringToNewUTF8\']'
 endif
 
 subdir('doc')
