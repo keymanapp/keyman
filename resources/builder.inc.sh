@@ -1945,12 +1945,13 @@ _builder_has_function_been_called() {
 #   linux      Linux
 #
 # Development tooling platforms:
-#   delphi     (On Windows only, Delphi is installed)
+#   delphi     Delphi is installed (on Windows only)
+#   android    Android Studio is installed
 #
 builder_describe_platform() {
 
   local builder_platforms=(linux mac win)
-  local builder_tools=(delphi)
+  local builder_tools=(android-studio delphi)
 
   # --- Detect platform ---
 
@@ -1977,6 +1978,13 @@ builder_describe_platform() {
       builder_installed_tools+=(delphi)
     fi
   fi
+
+  # Detect Android Studio based on ANDROID_HOME environment variable
+  if [[ ! -z ${ANDROID_HOME+x} ]]; then
+    builder_installed_tools+=(android-studio)
+  fi
+
+  # --- Overrides ---
 
   # For testing, we can override the current platform
   if [[ ! -z "${BUILDER_PLATFORM_OVERRIDE+x}" ]]; then
