@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { loadFile, resolveFilename } from '../helpers/index.js';
-import { CompilerCallbacks, CompilerError, CompilerEvent, CompilerFileSystemCallbacks, CompilerPathCallbacks } from '../../src/util/compiler-interfaces.js';
+import { loadFile, resolveFilename } from './helpers/index.js';
+import { CompilerCallbacks, CompilerError, CompilerEvent, CompilerFileSystemCallbacks, CompilerPathCallbacks } from '../src/compiler-interfaces.js';
 
 // This is related to developer/src/common/web/test-helpers/index.ts but has a slightly different API surface
 // as this runs at a lower level than the compiler.
@@ -40,7 +40,7 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
       return loadFile(filename);
     } catch (e) {
       if (e.code === 'ENOENT') {
-        return null;
+        return <Uint8Array><unknown>null;
       } else {
         throw e;
       }

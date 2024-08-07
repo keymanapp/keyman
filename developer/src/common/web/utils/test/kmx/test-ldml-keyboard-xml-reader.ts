@@ -1,7 +1,7 @@
 import { LKKey, ImportStatus } from '../../src/types/ldml-keyboard/ldml-keyboard-xml.js';
 import 'mocha';
 import {assert} from 'chai';
-import { CommonTypesMessages } from '@keymanapp/common-types';
+import { CommonTypesMessages } from '../../src/common-events.js';
 import { testReaderCases } from '../helpers/reader-callback-test.js';
 import { Constants } from '@keymanapp/common-types';
 

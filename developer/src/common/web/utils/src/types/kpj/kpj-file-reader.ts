@@ -2,7 +2,8 @@ import { xml2js } from '@keymanapp/common-types';
 import { KPJFile, KPJFileProject } from './kpj-file.js';
 import { util } from '@keymanapp/common-types';
 import { KeymanDeveloperProject, KeymanDeveloperProjectFile10, KeymanDeveloperProjectType } from './keyman-developer-project.js';
-import { CompilerCallbacks, SchemaValidators } from '@keymanapp/common-types';
+import { SchemaValidators } from '@keymanapp/common-types';
+import { CompilerCallbacks } from '../../compiler-interfaces.js';
 
 export class KPJFileReader {
   constructor(private callbacks: CompilerCallbacks) {

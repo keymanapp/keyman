@@ -1,7 +1,7 @@
-import { KmpJsonFile, CompilerCallbacks } from '@keymanapp/common-types';
+import { KmpJsonFile } from '@keymanapp/common-types';
 import { PackageCompilerMessages } from './package-compiler-messages.js';
 import { KeyboardMetadataCollection } from './package-metadata-collector.js';
-import { KpsFile } from '@keymanapp/developer-utils';
+import { KpsFile, CompilerCallbacks } from '@keymanapp/developer-utils';
 
 export const DEFAULT_KEYBOARD_VERSION = '1.0';
 export const MIN_LM_FILEVERSION_KMP_JSON = '12.0';

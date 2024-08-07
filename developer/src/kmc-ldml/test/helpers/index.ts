@@ -5,8 +5,8 @@ import 'mocha';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { SectionCompiler, SectionCompilerNew } from '../../src/compiler/section-compiler.js';
-import { util, KMXPlus, UnicodeSetParser, VisualKeyboard, CompilerEvent, compilerEventFormat, CompilerCallbacks } from '@keymanapp/common-types';
-import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboardTestDataXMLSourceFile, LDMLKeyboard, } from "@keymanapp/developer-utils";
+import { util, KMXPlus, UnicodeSetParser, VisualKeyboard } from '@keymanapp/common-types';
+import { CompilerEvent, compilerEventFormat, CompilerCallbacks, LDMLKeyboardXMLSourceFileReader, LDMLKeyboardTestDataXMLSourceFile, LDMLKeyboard, } from "@keymanapp/developer-utils";
 import { LdmlKeyboardCompiler } from '../../src/main.js'; // make sure main.js compiles
 import { assert } from 'chai';
 import { KMXPlusMetadataCompiler } from '../../src/compiler/metadata-compiler.js';

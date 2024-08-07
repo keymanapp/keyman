@@ -12,25 +12,6 @@ export { USVirtualKeyCodes } from './consts/virtual-key-constants.js';
 export * as Constants from './consts/virtual-key-constants.js';
 export { ModifierKeyConstants } from './consts/modifier-key-constants.js';
 
-export { defaultCompilerOptions, CompilerBaseOptions, CompilerCallbacks, CompilerOptions, CompilerEvent, CompilerErrorNamespace,
-         CompilerErrorSeverity, CompilerPathCallbacks, CompilerFileSystemCallbacks, CompilerCallbackOptions,
-         CompilerError, CompilerMessageSpec, CompilerMessageSpecWithException, compilerErrorSeverity, CompilerErrorMask, CompilerFileCallbacks, compilerErrorSeverityName,
-         compilerErrorFormatCode, CompilerMessageDef,
-         compilerLogLevelToSeverity, CompilerLogLevel, compilerEventFormat, ALL_COMPILER_LOG_LEVELS,
-         ALL_COMPILER_LOG_FORMATS, CompilerLogFormat,
-         CompilerMessageOverride,
-         CompilerMessageOverrideMap,
-
-         KeymanCompilerArtifact,
-         KeymanCompilerArtifactOptional,
-         KeymanCompilerArtifacts,
-         KeymanCompilerResult,
-         KeymanCompiler
-
-         } from './util/compiler-interfaces.js';
-
-export { CommonTypesMessages } from './util/common-events.js';
-
 export * as TouchLayout from './keyman-touch-layout/keyman-touch-layout-file.js';
 
 export * as KmpJsonFile from './package/kmp-json-file.js';

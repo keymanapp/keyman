@@ -24,3 +24,22 @@ export { default as KMXPlusBuilder}  from './types/kmx/kmx-plus-builder/kmx-plus
 export * as LDMLKeyboard from './types/ldml-keyboard/ldml-keyboard-xml.js';
 export { LDMLKeyboardTestDataXMLSourceFile } from './types/ldml-keyboard/ldml-keyboard-testdata-xml.js';
 export { LDMLKeyboardXMLSourceFileReader, LDMLKeyboardXMLSourceFileReaderOptions } from './types/ldml-keyboard/ldml-keyboard-xml-reader.js';
+
+export { defaultCompilerOptions, CompilerBaseOptions, CompilerCallbacks, CompilerOptions, CompilerEvent, CompilerErrorNamespace,
+  CompilerErrorSeverity, CompilerPathCallbacks, CompilerFileSystemCallbacks, CompilerCallbackOptions,
+  CompilerError, CompilerMessageSpec, CompilerMessageSpecWithException, compilerErrorSeverity, CompilerErrorMask, CompilerFileCallbacks, compilerErrorSeverityName,
+  compilerErrorFormatCode, CompilerMessageDef,
+  compilerLogLevelToSeverity, CompilerLogLevel, compilerEventFormat, ALL_COMPILER_LOG_LEVELS,
+  ALL_COMPILER_LOG_FORMATS, CompilerLogFormat,
+  CompilerMessageOverride,
+  CompilerMessageOverrideMap,
+
+  KeymanCompilerArtifact,
+  KeymanCompilerArtifactOptional,
+  KeymanCompilerArtifacts,
+  KeymanCompilerResult,
+  KeymanCompiler
+
+  } from './compiler-interfaces.js';
+
+export { CommonTypesMessages } from './common-events.js';

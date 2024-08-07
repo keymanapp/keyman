@@ -181,7 +181,7 @@ export class CompilerError {
    */
   static severityNameToValue(name: string): CompilerErrorSeverity {
     name = name.toLowerCase();
-    for(let level of CompilerErrorSeverityValues) {
+    for(const level of CompilerErrorSeverityValues) {
       if(errorSeverityName[level].startsWith(name)) {
         return level;
       }

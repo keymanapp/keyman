@@ -1,5 +1,10 @@
-import { KMXPlus, UnicodeSetParser, CompilerCallbacks, KeymanCompiler, KeymanCompilerResult, KeymanCompilerArtifacts, defaultCompilerOptions, KvkFileWriter, KeymanCompilerArtifactOptional } from '@keymanapp/common-types';
-import { LDMLKeyboardXMLSourceFileReader, LDMLKeyboard, LDMLKeyboardTestDataXMLSourceFile, KMXBuilder, } from "@keymanapp/developer-utils"
+import { KMXPlus, UnicodeSetParser, KvkFileWriter } from '@keymanapp/common-types';
+import {
+  CompilerCallbacks, KeymanCompiler, KeymanCompilerResult, KeymanCompilerArtifacts,
+  defaultCompilerOptions, LDMLKeyboardXMLSourceFileReader, LDMLKeyboard,
+  LDMLKeyboardTestDataXMLSourceFile, KMXBuilder,
+  KeymanCompilerArtifactOptional
+} from "@keymanapp/developer-utils";
 import { LdmlCompilerOptions } from './ldml-compiler-options.js';
 import { LdmlCompilerMessages } from './ldml-compiler-messages.js';
 import { BkspCompiler, TranCompiler } from './tran.js';
@@ -100,7 +105,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
    * @returns           false if initialization fails
    */
   async init(callbacks: CompilerCallbacks, options: LdmlCompilerOptions): Promise<boolean> {
-    this.options = {...options};
+    this.options = { ...options };
     this.callbacks = callbacks;
     return true;
   }
@@ -179,15 +184,15 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
    * @returns true on success
    */
   async write(artifacts: LdmlKeyboardCompilerArtifacts): Promise<boolean> {
-    if(artifacts.kmx) {
+    if (artifacts.kmx) {
       this.callbacks.fs.writeFileSync(artifacts.kmx.filename, artifacts.kmx.data);
     }
 
-    if(artifacts.kvk) {
+    if (artifacts.kvk) {
       this.callbacks.fs.writeFileSync(artifacts.kvk.filename, artifacts.kvk.data);
     }
 
-    if(artifacts.js) {
+    if (artifacts.js) {
       this.callbacks.fs.writeFileSync(artifacts.js.filename, artifacts.js.data);
     }
 
@@ -199,7 +204,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
    * Construct or return a UnicodeSetParser, aka KmnCompiler
    * @returns the held UnicodeSetParser
    */
-  async getUsetParser() : Promise<UnicodeSetParser> {
+  async getUsetParser(): Promise<UnicodeSetParser> {
     if (this.usetparser === undefined) {
       // initialize
       const compiler = new KmnCompiler();
@@ -229,14 +234,14 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
     const reader = new LDMLKeyboardXMLSourceFileReader(this.options.readerOptions, this.callbacks);
     // load the file from disk into a string
     const data = this.callbacks.loadFile(filename);
-    if(!data) {
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({errorText: 'Unable to read XML file'}));
+    if (!data) {
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({ errorText: 'Unable to read XML file' }));
       return null;
     }
     // parse (load) the string into an object tree
     const source = reader.load(data);
-    if(!source) {
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({errorText: 'Unable to load XML file'}));
+    if (!source) {
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({ errorText: 'Unable to load XML file' }));
       return null;
     }
     try {
@@ -244,8 +249,8 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
       if (!reader.validate(source)) {
         return null;
       }
-    } catch(e) {
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({errorText: e.toString()}));
+    } catch (e) {
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({ errorText: e.toString() }));
       return null;
     }
 
@@ -262,14 +267,14 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
   public loadTestData(filename: string): LDMLKeyboardTestDataXMLSourceFile | null {
     const reader = new LDMLKeyboardXMLSourceFileReader(this.options.readerOptions, this.callbacks);
     const data = this.callbacks.loadFile(filename);
-    if(!data) {
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({errorText: 'Unable to read XML file'}));
+    if (!data) {
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({ errorText: 'Unable to read XML file' }));
       return null;
     }
     const source = reader.loadTestData(data);
     /* c8 ignore next 4 */
-    if(!source) {
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({errorText: 'Unable to load XML file'}));
+    if (!source) {
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({ errorText: 'Unable to load XML file' }));
       return null;
     }
     // TODO-LDML: The unboxed data doesn't match the schema anymore. Skipping validation, for now.
@@ -295,7 +300,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
    * Runs any linter steps
    * @internal
    */
-  private async lint(source: LDMLKeyboardXMLSourceFile, kmx: KMXPlus.KMXPlusFile) : Promise<boolean> {
+  private async lint(source: LDMLKeyboardXMLSourceFile, kmx: KMXPlus.KMXPlusFile): Promise<boolean> {
     // run each of the linters
     for (const linter of this.buildLinters(source, kmx)) {
       if (!await linter.lint()) {
@@ -341,8 +346,8 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
 
     const kmx = new KMXPlusFile();
 
-    for(let section of sections) {
-      if(!section.validate()) {
+    for (let section of sections) {
+      if (!section.validate()) {
         // TODO-LDML: coverage
         passed = false;
         // We'll keep validating other sections anyway, so we get a full set of
@@ -350,13 +355,13 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
         continue;
       }
       // clone
-      const globalSections : DependencySections = Object.assign({}, kmx.kmxplus);
+      const globalSections: DependencySections = Object.assign({}, kmx.kmxplus);
       // pre-initialize the usetparser
       globalSections.usetparser = await this.getUsetParser();
       const dependencies = section.dependencies;
       let dependencyProblem = false;
-      Object.keys(constants.section).forEach((sectstr : string) => {
-        const sectid : SectionIdent = constants.section[<SectionIdent>sectstr];
+      Object.keys(constants.section).forEach((sectstr: string) => {
+        const sectid: SectionIdent = constants.section[<SectionIdent>sectstr];
         if (dependencies.has(sectid)) {
           /* c8 ignore next 4 */
           if (!kmx.kmxplus[sectid]) {
@@ -380,12 +385,12 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
       }
       const sect = section.compile(globalSections);
 
-      if(!sect) {
+      if (!sect) {
         passed = false;
         continue;
       }
       /* c8 ignore next 4 */
-      if(kmx.kmxplus[section.id]) {
+      if (kmx.kmxplus[section.id]) {
         // Internal error useful during section bring-up
         throw new Error(`Internal error: section ${section.id} would be assigned twice`);
       }
@@ -394,8 +399,8 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
 
     // give all sections a chance to postValidate
     if (postValidate) {
-      for(let section of sections) {
-        if(!section.postValidate(kmx.kmxplus[section.id])) {
+      for (let section of sections) {
+        if (!section.postValidate(kmx.kmxplus[section.id])) {
           passed = false;
         }
       }

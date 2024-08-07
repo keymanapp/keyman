@@ -4,7 +4,7 @@ import { KmwCompilerMessages } from '../../src/kmw-compiler/kmw-compiler-message
 import { TestCompilerCallbacks, verifyCompilerMessagesObject } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from '../helpers/index.js';
 import { KmnCompiler } from '../../src/main.js';
-import { CompilerErrorNamespace } from '@keymanapp/common-types';
+import { CompilerErrorNamespace } from '@keymanapp/developer-utils';
 
 describe('KmwCompilerMessages', function () {
   const callbacks = new TestCompilerCallbacks();

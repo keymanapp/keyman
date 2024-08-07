@@ -1,5 +1,5 @@
-import { CompilerCallbacks, VisualKeyboard, KeymanFileTypes } from "@keymanapp/common-types";
-import { LDMLKeyboard, TouchLayoutFileWriter } from "@keymanapp/developer-utils";
+import { VisualKeyboard, KeymanFileTypes } from "@keymanapp/common-types";
+import { CompilerCallbacks, LDMLKeyboard, TouchLayoutFileWriter } from "@keymanapp/developer-utils";
 import { LdmlCompilerOptions } from "./ldml-compiler-options.js";
 import { TouchLayoutCompiler } from "./touch-layout-compiler.js";
 import { LdmlKeyboardVisualKeyboardCompiler } from "./visual-keyboard-compiler.js";
