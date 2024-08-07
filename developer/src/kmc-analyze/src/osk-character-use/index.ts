@@ -1,6 +1,6 @@
-import { CompilerCallbacks, KeymanFileTypes, TouchLayout, TouchLayoutFileReader } from "@keymanapp/common-types";
+import { CompilerCallbacks, KeymanFileTypes, TouchLayout } from "@keymanapp/common-types";
 import { KmnCompilerMessages, Osk } from '@keymanapp/kmc-kmn';
-import { escapeMarkdownChar, KvksFile, KvksFileReader } from '@keymanapp/developer-utils';
+import { escapeMarkdownChar, KvksFile, KvksFileReader, TouchLayoutFileReader } from '@keymanapp/developer-utils';
 import { getOskFromKmnFile } from "../util/get-osk-from-kmn-file.js";
 import { AnalyzerMessages } from "../analyzer-messages.js";
 

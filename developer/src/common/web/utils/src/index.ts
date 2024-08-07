@@ -15,3 +15,5 @@ export { default as KvksFileReader } from './types/kvks/kvks-file-reader.js';
 export { default as KvksFileWriter } from './types/kvks/kvks-file-writer.js';
 export * as KvksFile from './types/kvks/kvks-file.js';
 
+export { TouchLayoutFileReader } from './types/keyman-touch-layout/keyman-touch-layout-file-reader.js';
+export { TouchLayoutFileWriter, TouchLayoutFileWriterOptions } from './types/keyman-touch-layout/keyman-touch-layout-file-writer.js';

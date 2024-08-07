@@ -39,8 +39,6 @@ export { defaultCompilerOptions, CompilerBaseOptions, CompilerCallbacks, Compile
 export { CommonTypesMessages } from './util/common-events.js';
 
 export * as TouchLayout from './keyman-touch-layout/keyman-touch-layout-file.js';
-export { TouchLayoutFileReader } from './keyman-touch-layout/keyman-touch-layout-file-reader.js';
-export { TouchLayoutFileWriter, TouchLayoutFileWriterOptions } from './keyman-touch-layout/keyman-touch-layout-file-writer.js';
 
 export * as KmpJsonFile from './package/kmp-json-file.js';
 

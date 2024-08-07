@@ -1,4 +1,8 @@
-import { TouchLayoutFile, TouchLayoutPlatform, TouchLayoutKey, TouchLayoutSubKey } from "./keyman-touch-layout-file.js";
+import { TouchLayout } from "@keymanapp/common-types";
+import TouchLayoutFile = TouchLayout.TouchLayoutFile;
+import TouchLayoutPlatform = TouchLayout.TouchLayoutPlatform;;
+import TouchLayoutKey = TouchLayout.TouchLayoutKey;
+import TouchLayoutSubKey = TouchLayout.TouchLayoutSubKey;
 
 export interface TouchLayoutFileWriterOptions {
   formatted?: boolean;
@@ -87,24 +91,24 @@ export class TouchLayoutFileWriter {
       // displayUnderlying is always written out by kmcomp, so we do the same for kmc:
       platform.displayUnderlying = !!platform.displayUnderlying;
 
-      for(let layer of platform.layer) {
-        for(let row of layer.row) {
+      for(const layer of platform.layer) {
+        for(const row of layer.row) {
           // this matches the old spec for touch layout files
           (row.id as any) = row.id.toString();
-          for(let key of row.key) {
+          for(const key of row.key) {
             fixupKey(key);
             if(key.sk) {
-              for(let sk of key.sk) {
+              for(const sk of key.sk) {
                 fixupKey(sk);
               }
             }
             if(key.multitap) {
-              for(let sk of key.multitap) {
+              for(const sk of key.multitap) {
                 fixupKey(sk);
               }
             }
             if(key.flick) {
-              for(let id of Object.keys(key.flick)) {
+              for(const id of Object.keys(key.flick)) {
                 fixupKey((key.flick as any)[id] as TouchLayoutSubKey);
               }
             }
