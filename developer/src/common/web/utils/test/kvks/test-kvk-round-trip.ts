@@ -5,10 +5,9 @@ import Hexy from 'hexy';
 import gitDiff from 'git-diff';
 const { hexy } = Hexy;
 import { makePathToFixture } from '../helpers/index.js';
-import KvksFileReader from "../../src/kvk/kvks-file-reader.js";
-import KvkFileReader from "../../src/kvk/kvk-file-reader.js";
-import KvkFileWriter from "../../src/kvk/kvk-file-writer.js";
-import KvksFileWriter from "../../src/kvk/kvks-file-writer.js";
+import KvksFileReader from "../../src/types/kvks/kvks-file-reader.js";
+import { KvkFileReader, KvkFileWriter } from "@keymanapp/common-types";
+import KvksFileWriter from "../../src/types/kvks/kvks-file-writer.js";
 
 /**
  *
@@ -28,7 +27,7 @@ function assertBufferMatch(actual: Buffer, expected: Buffer) {
 
 describe('kvk-file-reader', function () {
   it('kvk-file-reader should round-trip with kvk-file-writer', function() {
-    const path = makePathToFixture('kvk', 'khmer_angkor.kvk');
+    const path = makePathToFixture('kvks', 'khmer_angkor.kvk');
     const input = fs.readFileSync(path);
     const reader = new KvkFileReader();
     const vk = reader.read(input);
@@ -44,8 +43,8 @@ describe('kvk-file-reader', function () {
 
 describe('kvks-file-reader', function () {
   it('kvks-file-reader should compile with kvk-file-writer', function() {
-    const inputPath = makePathToFixture('kvk', 'khmer_angkor.kvks');
-    const compiledPath = makePathToFixture('kvk', 'khmer_angkor.kvk');
+    const inputPath = makePathToFixture('kvks', 'khmer_angkor.kvks');
+    const compiledPath = makePathToFixture('kvks', 'khmer_angkor.kvk');
     const input = fs.readFileSync(inputPath);
     const compiled = fs.readFileSync(compiledPath);
     const reader = new KvksFileReader();
@@ -63,7 +62,7 @@ describe('kvks-file-reader', function () {
 
   describe('kvks-file-writer', function() {
     it('kvks-file-writer should match what kvk-file-reader reads', function() {
-      const kvkIn = makePathToFixture('kvk', 'khmer_angkor.kvk');
+      const kvkIn = makePathToFixture('kvks', 'khmer_angkor.kvk');
       const kvkBuf = fs.readFileSync(kvkIn);
       const kvkReader = new KvkFileReader();
       const kvksReader = new KvksFileReader();
@@ -85,7 +84,7 @@ describe('kvks-file-reader', function () {
     });
 
     it('should have identical input and output for kvk and kvks', function() {
-      const path = makePathToFixture('kvk', 'balochi_inpage.kvks');
+      const path = makePathToFixture('kvks', 'balochi_inpage.kvks');
       const input = fs.readFileSync(path);
 
       const reader = new KvksFileReader();
@@ -104,7 +103,7 @@ describe('kvks-file-reader', function () {
       assert.deepEqual(vk, vkExpected);
 
       // Then compare against the .kvk
-      const kvkPath = makePathToFixture('kvk', 'balochi_inpage.kvk');
+      const kvkPath = makePathToFixture('kvks', 'balochi_inpage.kvk');
       const kvkInput = fs.readFileSync(kvkPath);
 
       const kvkReader = new KvkFileReader();

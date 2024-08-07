@@ -10,3 +10,8 @@ export { KeymanDeveloperProject, KeymanDeveloperProjectFile, KeymanDeveloperProj
 export { isValidEmail } from './is-valid-email.js';
 
 export * as KpsFile from './types/kps/kps-file.js';
+
+export { default as KvksFileReader } from './types/kvks/kvks-file-reader.js';
+export { default as KvksFileWriter } from './types/kvks/kvks-file-writer.js';
+export * as KvksFile from './types/kvks/kvks-file.js';
+

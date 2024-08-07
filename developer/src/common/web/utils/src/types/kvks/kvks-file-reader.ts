@@ -1,10 +1,18 @@
-import * as xml2js from '../deps/xml2js/xml2js.js';
+import { SchemaValidators as SV, KvkFile, xml2js, util, Constants } from '@keymanapp/common-types';
 import KVKSourceFile from './kvks-file.js';
-import { boxXmlArray } from '../util/util.js';
-import { DEFAULT_KVK_FONT, VisualKeyboard, VisualKeyboardHeaderFlags, VisualKeyboardKey, VisualKeyboardKeyFlags, VisualKeyboardLegalShiftStates, VisualKeyboardShiftState } from './visual-keyboard.js';
-import { USVirtualKeyCodes } from '../consts/virtual-key-constants.js';
-import { BUILDER_KVK_HEADER_VERSION, KVK_HEADER_IDENTIFIER_BYTES } from './kvk-file.js';
-import SchemaValidators from '../schema-validators.js';
+const SchemaValidators = SV.default;
+import boxXmlArray = util.boxXmlArray;
+import USVirtualKeyCodes = Constants.USVirtualKeyCodes;
+import { VisualKeyboard as VK } from '@keymanapp/common-types';
+import DEFAULT_KVK_FONT = VK.DEFAULT_KVK_FONT;
+import VisualKeyboard = VK.VisualKeyboard;
+import VisualKeyboardHeaderFlags = VK.VisualKeyboardHeaderFlags;
+import VisualKeyboardKey = VK.VisualKeyboardKey;
+import VisualKeyboardKeyFlags = VK.VisualKeyboardKeyFlags;
+import VisualKeyboardLegalShiftStates = VK.VisualKeyboardLegalShiftStates;
+import VisualKeyboardShiftState = VK.VisualKeyboardShiftState;
+import BUILDER_KVK_HEADER_VERSION = KvkFile.BUILDER_KVK_HEADER_VERSION;
+import KVK_HEADER_IDENTIFIER_BYTES = KvkFile.KVK_HEADER_IDENTIFIER_BYTES;
 
 
 export default class KVKSFileReader {
@@ -69,9 +77,9 @@ export default class KVKSFileReader {
       }
     }
 
-    for(let key of Object.keys(source)) {
+    for(const key of Object.keys(source)) {
       if(Array.isArray(source[key])) {
-        for(let item of source[key]) {
+        for(const item of source[key]) {
           if(typeof(item) === 'object') {
             this.cleanupUnderscore(key, item);
           }
@@ -92,7 +100,7 @@ export default class KVKSFileReader {
     // NOTE: at this point, the xml should have been validated
     // and matched the schema result so we can assume properties exist
 
-    let result: VisualKeyboard = {
+    const result: VisualKeyboard = {
       header: {
         version: BUILDER_KVK_HEADER_VERSION,
         flags: 0,
@@ -117,22 +125,22 @@ export default class KVKSFileReader {
       result.header.flags |= VisualKeyboardHeaderFlags.kvkhUseUnderlying;
     }
 
-    for(let encoding of source.visualkeyboard.encoding) {
-      let isUnicode = (encoding.$?.name == 'unicode'),
+    for(const encoding of source.visualkeyboard.encoding) {
+      const isUnicode = (encoding.$?.name == 'unicode'),
         font = isUnicode ? result.header.unicodeFont : result.header.ansiFont;
       font.name = encoding.$?.fontname ?? DEFAULT_KVK_FONT.name;
       font.size = parseInt(encoding.$?.fontsize ?? DEFAULT_KVK_FONT.size.toString(), 10);
-      for(let layer of encoding.layer) {
-        let shift = this.kvksShiftToKvkShift(layer.$?.shift);
-        for(let sourceKey of layer.key) {
-          let vkey = (USVirtualKeyCodes as any)[sourceKey.$?.vkey];
+      for(const layer of encoding.layer) {
+        const shift = this.kvksShiftToKvkShift(layer.$?.shift);
+        for(const sourceKey of layer.key) {
+          const vkey = (USVirtualKeyCodes as any)[sourceKey.$?.vkey];
           if(!vkey) {
             if(typeof invalidVkeys !== 'undefined') {
               invalidVkeys.push(sourceKey.$?.vkey);
             }
             continue;
           }
-          let key: VisualKeyboardKey = {
+          const key: VisualKeyboardKey = {
             flags:
               (isUnicode ? VisualKeyboardKeyFlags.kvkkUnicode : 0) |
               (sourceKey.bitmap ? VisualKeyboardKeyFlags.kvkkBitmap : 0),
@@ -167,9 +175,9 @@ export default class KVKSFileReader {
    */
   private boxArrays(source: KVKSourceFile) {
     boxXmlArray(source.visualkeyboard, 'encoding');
-    for(let encoding of source.visualkeyboard.encoding) {
+    for(const encoding of source.visualkeyboard.encoding) {
       boxXmlArray(encoding, 'layer');
-      for(let layer of encoding.layer) {
+      for(const layer of encoding.layer) {
         boxXmlArray(layer, 'key');
       }
     }
@@ -181,7 +189,7 @@ export default class KVKSFileReader {
     shift = shift.toUpperCase();
 
     // TODO-LDML(lowpri): make a map of this?
-    for(let state of VisualKeyboardLegalShiftStates) {
+    for(const state of VisualKeyboardLegalShiftStates) {
       if(state.name == shift) {
         return state.shift;
       }

@@ -7,11 +7,8 @@ export * as KeymanTargets from './kmx/keyman-targets.js';
 export * as VisualKeyboard from './kvk/visual-keyboard.js';
 export { default as KMXPlusBuilder}  from './kmx/kmx-plus-builder/kmx-plus-builder.js';
 export { default as KvkFileReader } from './kvk/kvk-file-reader.js';
-export { default as KvksFileReader } from './kvk/kvks-file-reader.js';
 export { default as KvkFileWriter } from './kvk/kvk-file-writer.js';
-export { default as KvksFileWriter } from './kvk/kvks-file-writer.js';
 export * as KvkFile from './kvk/kvk-file.js';
-export * as KvksFile from './kvk/kvks-file.js';
 
 export * as LDMLKeyboard from './ldml-keyboard/ldml-keyboard-xml.js';
 export { LDMLKeyboardTestDataXMLSourceFile } from './ldml-keyboard/ldml-keyboard-testdata-xml.js';
