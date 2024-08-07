@@ -28,10 +28,12 @@ builder_parse "$@"
 
 function do_build() {
   tsc -b src/data-compiler/tsconfig.json
-  tsc -b src/main/tsconfig.json
+  node ./build/obj/data-compiler/index.js
+
+  tsc -b ./tsconfig.json
 
   # Declaration bundling.
-  tsc -p src/main/tsconfig.json --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+  tsc -p ./tsconfig.json --emitDeclarationOnly --outFile ./build/lib/index.d.ts
 }
 
 function do_test() {
