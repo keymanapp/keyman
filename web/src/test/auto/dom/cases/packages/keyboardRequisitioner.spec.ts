@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
-import { KeyboardHarness, MinimalKeymanGlobal } from '@keymanapp/keyboard-processor';
-import { DOMKeyboardLoader } from '@keymanapp/keyboard-processor/dom-keyboard-loader';
+import { KeyboardHarness, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
+import { DOMKeyboardLoader } from 'keyman/engine/keyboard/dom-keyboard-loader';
 import { PathConfiguration } from 'keyman/engine/interfaces';
 import { CloudQueryEngine, KeyboardRequisitioner, type KeyboardStub } from 'keyman/engine/package-cache';
 import DOMCloudRequester from 'keyman/engine/package-cache/dom-requester';

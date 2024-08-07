@@ -1,4 +1,4 @@
-import { Transcription } from "@keymanapp/keyboard-processor";
+import { Transcription } from "keyman/engine/keyboard";
 
 const TRANSCRIPTION_BUFFER_SIZE = 10;
 

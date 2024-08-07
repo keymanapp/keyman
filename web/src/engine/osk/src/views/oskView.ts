@@ -19,7 +19,7 @@ import {
   type MinimalCodesInterface,
   type MutableSystemStore,
   type SystemStoreMutationHandler
-} from '@keymanapp/keyboard-processor';
+} from 'keyman/engine/keyboard';
 import { createUnselectableElement, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
 import { EventListener, KeyEventHandler, KeyEventSourceInterface, LegacyEventEmitter } from 'keyman/engine/events';
 

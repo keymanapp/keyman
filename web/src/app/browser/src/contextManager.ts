@@ -1,4 +1,4 @@
-import { type Keyboard, KeyboardScriptError } from '@keymanapp/keyboard-processor';
+import { type Keyboard, KeyboardScriptError } from 'keyman/engine/keyboard';
 import { type KeyboardStub } from 'keyman/engine/package-cache';
 import { CookieSerializer } from 'keyman/engine/dom-utils';
 import { eventOutputTarget, outputTargetForElement, PageContextAttachment } from 'keyman/engine/attachment';

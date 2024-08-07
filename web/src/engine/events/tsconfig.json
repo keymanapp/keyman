@@ -12,6 +12,6 @@
 
   "references": [
     { "path": "../../../../common/web/utils" },
-    { "path": "../../../../common/web/keyboard-processor" }
+    { "path": "../keyboard" }
   ]
 }

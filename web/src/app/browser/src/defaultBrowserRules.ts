@@ -3,7 +3,7 @@ import {
   Codes,
   type KeyEvent,
   type OutputTarget
-} from '@keymanapp/keyboard-processor';
+} from 'keyman/engine/keyboard';
 import { DefaultRules } from 'keyman/engine/js-processor';
 
 import ContextManager from './contextManager.js';

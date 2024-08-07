@@ -1,6 +1,6 @@
-import { type KeyEvent, type Keyboard, KeyboardKeymanGlobal } from "@keymanapp/keyboard-processor";
+import { type KeyEvent, type Keyboard, KeyboardKeymanGlobal } from "keyman/engine/keyboard";
 import { ProcessorInitOptions, RuleBehavior } from 'keyman/engine/js-processor';
-import { DOMKeyboardLoader as KeyboardLoader } from "@keymanapp/keyboard-processor/dom-keyboard-loader";
+import { DOMKeyboardLoader as KeyboardLoader } from "keyman/engine/keyboard/dom-keyboard-loader";
 import { InputProcessor } from './headless/inputProcessor.js';
 import { OSKView } from "keyman/engine/osk";
 import { KeyboardRequisitioner, ModelCache, toUnprefixedKeyboardId as unprefixed } from "keyman/engine/package-cache";
@@ -244,7 +244,7 @@ export default class KeymanEngine<
     this.contextManager.configure({
       resetContext: (target) => {
         // Could reset the target's deadkeys here, but it's really more of a 'core' task.
-        // So we delegate that to keyboard-processor.
+        // So we delegate that to keyboard.
         if(this.osk) {
           this.osk.batchLayoutAfter(() => {
             this.core.resetContext(target);

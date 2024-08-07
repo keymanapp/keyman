@@ -2,8 +2,8 @@ import { assert } from 'chai';
 import sinon from 'sinon';
 import fs from 'fs';
 
-import { KeyboardHarness, ManagedPromise, MinimalKeymanGlobal } from '@keymanapp/keyboard-processor';
-import { NodeKeyboardLoader } from '@keymanapp/keyboard-processor/node-keyboard-loader';
+import { KeyboardHarness, ManagedPromise, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
+import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 import {
   KeyboardRequisitioner,
   toPrefixedKeyboardId as prefixed

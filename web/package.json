@@ -42,6 +42,21 @@
       "types": "./build/engine/js-processor/obj/index.d.ts",
       "import": "./build/engine/js-processor/obj/index.js"
     },
+    "./engine/keyboard": {
+      "es6-bundling": "./src/engine/keyboard/src/index.ts",
+      "types": "./build/engine/keyboard/obj/index.d.ts",
+      "import": "./build/engine/keyboard/obj/index.js"
+    },
+    "./engine/keyboard/node-keyboard-loader": {
+      "es6-bundling": "./src/engine/keyboard/src/keyboards/loaders/node-keyboard-loader.ts",
+      "types": "./build/engine/keyboard/obj/keyboards/loaders/node-keyboard-loader.d.ts",
+      "import": "./build/engine/keyboard/obj/keyboards/loaders/node-keyboard-loader.js"
+    },
+    "./engine/keyboard/dom-keyboard-loader": {
+      "es6-bundling": "./src/engine/keyboard/src/keyboards/loaders/dom-keyboard-loader.ts",
+      "types": "./build/engine/keyboard/obj/keyboards/loaders/dom-keyboard-loader.d.ts",
+      "import": "./build/engine/keyboard/obj/keyboards/loaders/dom-keyboard-loader.js"
+    },
     "./engine/package-cache": {
       "es6-bundling": "./src/engine/package-cache/src/index.ts",
       "types": "./build/engine/package-cache/obj/index.d.ts",
@@ -104,7 +119,6 @@
     "test": "gosh ./test.sh"
   },
   "dependencies": {
-    "@keymanapp/keyboard-processor": "*",
     "@keymanapp/keyman-version": "*",
     "@keymanapp/lexical-model-layer": "*",
     "@keymanapp/models-types": "*",

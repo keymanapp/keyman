@@ -8,7 +8,7 @@ import {
   RecordedSyntheticKeystroke
 } from "./index.js";
 
-import { KeyEvent, KeyEventSpec, Mock, type OutputTarget, KeyboardHarness } from "@keymanapp/keyboard-processor";
+import { KeyEvent, KeyEventSpec, Mock, type OutputTarget, KeyboardHarness } from "keyman/engine/keyboard";
 import { DeviceSpec } from "@keymanapp/web-utils";
 import { KeyboardInterface, KeyboardProcessor } from 'keyman/engine/js-processor';
 

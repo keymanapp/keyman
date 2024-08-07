@@ -1,4 +1,4 @@
-import { Mock } from "@keymanapp/keyboard-processor";
+import { Mock } from "keyman/engine/keyboard";
 
 export default class ContextWindow implements Context {
   // Used to limit the range of context replicated for use of keyboard rules within

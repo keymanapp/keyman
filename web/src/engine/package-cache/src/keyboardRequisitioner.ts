@@ -3,7 +3,7 @@ import {
   KeyboardLoaderBase as KeyboardLoader,
   LanguageAPIPropertySpec,
   RawKeyboardMetadata
-} from "@keymanapp/keyboard-processor";
+} from "keyman/engine/keyboard";
 import { PathConfiguration } from "keyman/engine/interfaces";
 
 // TODO:  is cleanup needed here, to use local paths instead?

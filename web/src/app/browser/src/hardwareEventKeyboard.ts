@@ -1,4 +1,4 @@
-import { Codes, DeviceSpec, KeyEvent, KeyMapping, Keyboard } from '@keymanapp/keyboard-processor';
+import { Codes, DeviceSpec, KeyEvent, KeyMapping, Keyboard } from 'keyman/engine/keyboard';
 import { KeyboardProcessor } from 'keyman/engine/js-processor';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 

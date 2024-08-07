@@ -1,4 +1,4 @@
-import { OutputTarget as OutputTargetBase } from "@keymanapp/keyboard-processor";
+import { OutputTarget as OutputTargetBase } from "keyman/engine/keyboard";
 import { EventEmitter } from 'eventemitter3';
 
 export default abstract class OutputTarget<EventMap extends EventEmitter.ValidEventTypes> extends OutputTargetBase {

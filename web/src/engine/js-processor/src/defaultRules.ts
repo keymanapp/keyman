@@ -5,14 +5,13 @@
  */
 
 import { ModifierKeyConstants } from '@keymanapp/common-types';
-import { Codes, type KeyEvent, type OutputTarget, setDefaultRules } from "@keymanapp/keyboard-processor";
+import { Codes, type KeyEvent, type OutputTarget, setDefaultRules } from 'keyman/engine/keyboard';
 import RuleBehavior from "./ruleBehavior.js";
 
 export enum EmulationKeystrokes {
   Enter = '\n',
   Backspace = '\b'
 }
-
 
 /**
  * Defines a collection of static library functions that define KeymanWeb's default (implied) keyboard rule behaviors.

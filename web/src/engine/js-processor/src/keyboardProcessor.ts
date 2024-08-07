@@ -11,7 +11,7 @@ import { ModifierKeyConstants } from '@keymanapp/common-types';
 import {
   Codes, type Keyboard, MinimalKeymanGlobal, KeyEvent, Layouts, type MutableSystemStore,
   type OutputTarget, Mock, SystemStoreIDs,
-} from "@keymanapp/keyboard-processor";
+} from "keyman/engine/keyboard";
 import DefaultRules, { EmulationKeystrokes } from "./defaultRules.js";
 import RuleBehavior from "./ruleBehavior.js";
 import KeyboardInterface from './kbdInterface.js';

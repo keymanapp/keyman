@@ -16,8 +16,8 @@
   "references": [
     { "path": "../../../../../common/web/keyman-version" },
     { "path": "../../../../../common/web/utils/" },
-    { "path": "../../../../../common/web/keyboard-processor/" },
     { "path": "../../../../../common/web/lm-message-types" },
-    { "path": "../../../engine/js-processor" }
+    { "path": "../../../engine/js-processor" },
+    { "path": "../../../engine/keyboard" },
   ],
 }

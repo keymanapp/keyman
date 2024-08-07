@@ -1,4 +1,4 @@
-import { type Keyboard, Mock, OutputTarget, Transcription, findCommonSubstringEndIndex, isEmptyTransform, TextTransform } from '@keymanapp/keyboard-processor';
+import { type Keyboard, Mock, OutputTarget, Transcription, findCommonSubstringEndIndex, isEmptyTransform, TextTransform } from 'keyman/engine/keyboard';
 import { KeyboardStub } from 'keyman/engine/package-cache';
 import { ContextManagerBase } from 'keyman/engine/main';
 import { WebviewConfiguration } from './configuration.js';

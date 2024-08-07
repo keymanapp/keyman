@@ -4,7 +4,7 @@ import sinon from 'sinon';
 import { LanguageProcessor, TranscriptionCache } from 'keyman/engine/main';
 import { PredictionContext } from 'keyman/engine/interfaces';
 import { Worker as LMWorker } from "@keymanapp/lexical-model-layer/node";
-import { DeviceSpec, Mock } from '@keymanapp/keyboard-processor';
+import { DeviceSpec, Mock } from 'keyman/engine/keyboard';
 import { KeyboardProcessor } from 'keyman/engine/js-processor';
 
 function compileDummyModel(suggestionSets) {

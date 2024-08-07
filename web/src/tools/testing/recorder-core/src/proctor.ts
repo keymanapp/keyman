@@ -1,5 +1,5 @@
 import { type DeviceSpec } from "@keymanapp/web-utils";
-import { type OutputTarget } from "@keymanapp/keyboard-processor";
+import { type OutputTarget } from "keyman/engine/keyboard";
 
 import type { KeyboardTest, TestSet, TestSequence } from "./index.js";
 
@@ -9,7 +9,7 @@ export type AssertCallback = (s1: any, s2: any, msg?: string) => void;
  * Facilitates running Recorder-generated tests on various platforms.
  *
  * Note that DOM-aware KeymanWeb will implement a Browser-based version, while
- * keyboard-processor and input-processor will use a Node-based version instead.
+ * keyboard and input-processor will use a Node-based version instead.
  */
 export default abstract class Proctor {
   device: DeviceSpec;

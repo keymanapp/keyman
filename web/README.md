@@ -81,7 +81,7 @@ title: Dependency Graph
 %%{init: {"flowchart": {"htmlLabels": false}} }%%
 graph TD;
     OSK["/web/src/engine/osk"];
-    KP["@keymanapp/keyboard-processor<br>(/common/web/keyboard-processor)"];
+    KP["/web/src/engine/keyboard"];
     JSProc["/web/src/engine/js-processor"];
     OSK-->KP;
     WebUtils["@keymanapp/web-utils<br>(/common/web/utils)"];

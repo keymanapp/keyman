@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { extendString, Mock } from '@keymanapp/keyboard-processor';
+import { extendString, Mock } from 'keyman/engine/keyboard';
 import * as wrappers from 'keyman/engine/element-wrappers';
 
 import { DynamicElements } from '../../test_utils.js';
@@ -1385,7 +1385,7 @@ describe('Element Input/Output Interfacing', function () {
     // Unique to the Mock type - element interface cloning tests.  Is element state properly copied?
     // As those require a very different setup, they're in the target_mocks.js test case file instead.
 
-    // Basic text-retrieval unit tests are now done headlessly in @keymanapp/keyboard-processor.
+    // Basic text-retrieval unit tests are now done headlessly in keyman/engine/keyboard.
 
     describe('Text Mutation', function () {
       describe('deleteCharsBeforeCaret', function () {

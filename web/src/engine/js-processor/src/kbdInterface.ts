@@ -7,7 +7,7 @@
 
 import { type DeviceSpec } from "@keymanapp/web-utils";
 import { ModifierKeyConstants } from '@keymanapp/common-types';
-import { Codes, type KeyEvent, type Deadkey, ComplexKeyboardStore, type KeyboardStore, KeyboardStoreElement, KeyMapping, SystemStoreIDs, SystemStore, MutableSystemStore, PlatformSystemStore, type OutputTarget, Mock, Keyboard, VariableStore, VariableStoreDictionary, VariableStoreSerializer, KeyboardHarness, KeyboardKeymanGlobal, RuleDeadkey, ContextAny, RuleIndex, ContextEx, ContextNul, RuleChar } from "@keymanapp/keyboard-processor";
+import { Codes, type KeyEvent, type Deadkey, ComplexKeyboardStore, type KeyboardStore, KeyboardStoreElement, KeyMapping, SystemStoreIDs, SystemStore, MutableSystemStore, PlatformSystemStore, type OutputTarget, Mock, Keyboard, VariableStore, VariableStoreDictionary, VariableStoreSerializer, KeyboardHarness, KeyboardKeymanGlobal, RuleDeadkey, ContextAny, RuleIndex, ContextEx, ContextNul, RuleChar } from "keyman/engine/keyboard";
 import RuleBehavior from "./ruleBehavior.js";
 
 //#endregion
@@ -1076,6 +1076,6 @@ export default class KeyboardInterface extends KeyboardHarness {
 }
 
 (function() {
-  // This will be the only call within the keyboard-processor module.
+  // This will be the only call within the keyboard module.
   KeyboardInterface.__publishShorthandAPI();
 }());

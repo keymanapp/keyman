@@ -3,7 +3,7 @@ import { EventEmitter } from 'eventemitter3';
 import { PathConfiguration } from 'keyman/engine/interfaces';
 
 import { default as KeyboardStub, ErrorStub, KeyboardAPISpec, mergeAndResolveStubPromises } from '../keyboardStub.js';
-import { LanguageAPIPropertySpec, ManagedPromise, Version } from '@keymanapp/keyboard-processor';
+import { LanguageAPIPropertySpec, ManagedPromise, Version } from 'keyman/engine/keyboard';
 import CloudRequesterInterface from './requesterInterface.js';
 
 // For when the API call straight-up times out.

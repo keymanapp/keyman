@@ -3,7 +3,7 @@ import {
   type KeyboardAPIPropertyMultilangSpec as APICompoundKeyboard,
   KeyboardProperties,
   type LanguageAPIPropertySpec,
-} from '@keymanapp/keyboard-processor';
+} from 'keyman/engine/keyboard';
 import { toPrefixedKeyboardId as prefixed } from './stubAndKeyboardCache.js';
 
 

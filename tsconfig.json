@@ -10,7 +10,6 @@
 
     { "path": "./common/web/gesture-recognizer/tsconfig.json" },
     { "path": "./common/web/gesture-recognizer/src/tools/unit-test-resources/tsconfig.json" },
-    { "path": "./common/web/keyboard-processor/tsconfig.json" },
     { "path": "./common/web/keyman-version" },
     { "path": "./common/web/lm-message-types/" },
     { "path": "./common/web/lm-worker/" },
