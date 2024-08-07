@@ -1,4 +1,4 @@
-import { Entry, InternalNode, Leaf, Node } from "../trie-model.js";
+import { Entry, InternalNode, Leaf, Node } from "./trie.js";
 
 // const SINGLE_CHAR_RANGE = Math.pow(2, 16) - 64;
 // const ENCODED_NUM_BASE = 64;
