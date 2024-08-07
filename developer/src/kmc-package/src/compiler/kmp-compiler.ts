@@ -2,7 +2,7 @@ import { xml2js } from '@keymanapp/common-types';
 import JSZip from 'jszip';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
-import { KmpJsonFile, KpsFile, SchemaValidators, CompilerCallbacks, KeymanFileTypes, KvkFile, KeymanCompiler, CompilerOptions, KeymanCompilerResult, KeymanCompilerArtifacts, KeymanCompilerArtifact } from '@keymanapp/common-types';
+import { KmpJsonFile, SchemaValidators, CompilerCallbacks, KeymanFileTypes, KvkFile, KeymanCompiler, CompilerOptions, KeymanCompilerResult, KeymanCompilerArtifacts, KeymanCompilerArtifact } from '@keymanapp/common-types';
 import { PackageCompilerMessages } from './package-compiler-messages.js';
 import { PackageMetadataCollector } from './package-metadata-collector.js';
 import { KmpInfWriter } from './kmp-inf-writer.js';
@@ -12,6 +12,7 @@ import { PackageKeyboardTargetValidator } from './package-keyboard-target-valida
 import { PackageMetadataUpdater } from './package-metadata-updater.js';
 import { markdownToHTML } from './markdown.js';
 import { PackageValidation } from './package-validation.js';
+import { KpsFile } from '@keymanapp/developer-utils';
 
 const KMP_JSON_FILENAME = 'kmp.json';
 const KMP_INF_FILENAME = 'kmp.inf';

@@ -11,10 +11,11 @@
  */
 
 import JSZip from 'jszip';
-import { CompilerCallbacks, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KeymanFileTypes, KmpJsonFile, KpsFile } from "@keymanapp/common-types";
+import { CompilerCallbacks, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KeymanFileTypes, KmpJsonFile } from "@keymanapp/common-types";
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { KmpCompiler, KmpCompilerOptions } from "./kmp-compiler.js";
 import { PackageCompilerMessages } from "./package-compiler-messages.js";
+import { KpsFile } from '@keymanapp/developer-utils';
 
 const SETUP_INF_FILENAME = 'setup.inf';
 const PRODUCT_NAME = 'Keyman';
