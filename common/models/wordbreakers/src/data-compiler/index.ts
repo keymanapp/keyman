@@ -30,13 +30,13 @@ const MAX_CODE_POINT = 0x10FFFF;
 
 //////////////////////////////////// Main ////////////////////////////////////
 
-const projectDir = path.dirname(require.resolve("@keymanapp/models-wordbreakers/UNICODE_VERSION.md"));
+const projectDir = path.dirname(require.resolve("@keymanapp/models-wordbreakers/README.md"));
 const generatedFilename = path.join(projectDir, 'src', 'main', 'default', 'data.ts');
 
 // The data files should be in this repository, with names matching the
 // Unicode version.
-const wordBoundaryFilename = path.join(projectDir, `./resources/standards-data/unicode-character-database/WordBreakProperty.txt`);
-const emojiDataFilename = path.join(projectDir, `./resources/standards-data/unicode-character-database/emoji-data.txt`);
+const wordBoundaryFilename = path.join(projectDir, `../../../resources/standards-data/unicode-character-database/WordBreakProperty.txt`);
+const emojiDataFilename = path.join(projectDir, `../../../resources/standards-data/unicode-character-database/emoji-data.txt`);
 
 ///////////////////////////// Word_Boundary file /////////////////////////////
 
@@ -105,6 +105,7 @@ let stream = fs.createWriteStream(generatedFilename);
 
 // Generate the file!
 stream.write(`// Automatically generated file. DO NOT MODIFY.
+// The generator script is defined at /common/models/wordbreakers/src/data-compiler/index.ts.
 
 /**
  * Valid values for a word break property.
@@ -140,6 +141,21 @@ export const enum I {
   Value = 1
 }
 
+/**
+ * Defines a mapping of all characters to their assigned word-breaking
+ * property type.
+ *
+ * There are implicit buckets starting at the char with specified code \`number\`
+ * of an entry up to, but not including, the value in the next entry.  All
+ * entries in each bucket share the same property value.
+ *
+ * Consider the following two consecutive buckets:
+ * - [0x0041, WordBreakProperty.ALetter]
+ * - [0x005B, WordBreakProperty.Other]
+ *
+ * For this example, all characters from 0x0041 to 0x005B (that is, 'A'-'Z')
+ * have the wordbreaking property \`ALetter\`.
+ */
 export const WORD_BREAK_PROPERTY: [number, WordBreakProperty][] = [
 ${
   // TODO:  Two versions:  one that's BMP-encoded, one that's non-BMP encoded.

@@ -28,8 +28,8 @@
     "./test-index": {
       "default": "./build/obj/test-index.js"
     },
-    "./UNICODE_VERSION.md": {
-      "default": "./UNICODE_VERSION.md"
+    "./README.md": {
+      "default": "./README.md"
     }
   },
   "directories": {
