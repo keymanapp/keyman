@@ -13,7 +13,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ################################ Main script ################################
 
 builder_describe "Builds the predictive-text wordbreaker implementation module" \
-  "@/resources/standards-data/unicode-character-database" \
+  "@/resources/standards-data/unicode-character-database configure" \
   "clean" \
   "configure" \
   "build" \
