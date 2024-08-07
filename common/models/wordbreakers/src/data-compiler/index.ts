@@ -2,8 +2,6 @@
 
 // Original version found at: https://github.com/eddieantonio/unicode-default-word-boundary/blob/master/libexec/compile-word-break.js
 
-// TODO:  Adapt to produce two string-encoded arrays - one for BMP chars, one for non-BMP chars.
-
 import fs from 'fs';
 import path from 'path';
 
@@ -115,11 +113,13 @@ for(let range of ranges) { // already sorted
         end: undefined
       });
 
-      nonBmpRanges.push({
-        start: 0x10000,
-        property: finalBmpRange.property,
-        end: undefined
-      });
+      if(range.start != 0x10000) {
+        nonBmpRanges.push({
+          start: 0x10000,
+          property: finalBmpRange.property,
+          end: undefined
+        });
+      }
     }
 
     nonBmpRanges.push(range);
@@ -130,6 +130,14 @@ for(let range of ranges) { // already sorted
 
 // Save the output in the gen/ directory.
 let stream = fs.createWriteStream(generatedFilename);
+
+function escape(codedChar: string) {
+  if(codedChar == '`' || codedChar == '\\') {
+    return '\\' + codedChar;
+  } else {
+    return codedChar;
+  }
+}
 
 // // Former entry in the original version by Eddie that was never included in our repo:
 // export const extendedPictographic = ${extendedPictographicRegExp};
@@ -164,37 +172,30 @@ ${ /* Enumerate the plain-text names for ease of lookup at runtime */
 }
 ];
 
-/**
- * Constants for indexing values in WORD_BREAK_PROPERTY.
- */
-export const enum I {
-  Start = 0,
-  Value = 1
-}
-
 export const WORD_BREAK_PROPERTY_BMP: string = \`${
   // To consider:  emit `\uxxxx` codes instead of the raw char?
   bmpRanges.map(({start, property}) => {
-    let codedStart = String.fromCodePoint(start);
-    if(codedStart == '`') {
-      // Prevents accidental unescaped use of the string start/end char.
-      // The backslash gets removed on file-load.
-      codedStart = '\\`';
-    }
-    const codedProp = String.fromCharCode(categoryMap.get(property));
+    let codedStart = escape(String.fromCodePoint(start));
+
+    // Offset the encoded property value to lie within a friendlier range,
+    // with characters that render naturally within code editors.
+    const codedProp = escape(String.fromCharCode(categoryMap.get(property) + 0x20));
     return `${codedStart}${codedProp}`;
   }).join('')
-}\`
+}\`;
 
 export const WORD_BREAK_PROPERTY_NON_BMP: string = \`${
   // To consider:  emit `\uxxxx` codes instead of the raw char?
   nonBmpRanges.map(({start, property}) => {
-    const codedStart = String.fromCodePoint(start);
-    const codedProp = String.fromCharCode(categoryMap.get(property));
+    const codedStart = escape(String.fromCodePoint(start));
+
+    // Offset the encoded property value to lie within a friendlier range,
+    // with characters that render naturally within code editors.
+    const codedProp = escape(String.fromCharCode(categoryMap.get(property) + 0x20));
     return `${codedStart}${codedProp}`;
   }).join('')
-}
-\``);
+}\`;
+`);
 
 /**
  * Reads a Unicode character property file.

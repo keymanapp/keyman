@@ -1,4 +1,6 @@
-import { WordBreakProperty, WORD_BREAK_PROPERTY, I, propertyMap } from "./data.js";
+import { WordBreakProperty, propertyMap } from "./data.js";
+
+import { searchForProperty } from "./searchForProperty.js";
 
 /**
  * A set of options used to customize and extend the behavior of the default
@@ -566,7 +568,7 @@ function property(character: string, options?: DefaultWordBreakerOptions): WordB
   // TODO: remove dependence on character.codepointAt()?
   let codepoint = character.codePointAt(0) as number;
 
-  return searchForProperty(codepoint, 0, WORD_BREAK_PROPERTY.length - 1);
+  return searchForProperty(codepoint);
 }
 
 function propertyVal(propName: string, options?: DefaultWordBreakerOptions) {
@@ -574,35 +576,4 @@ function propertyVal(propName: string, options?: DefaultWordBreakerOptions) {
 
   const customIndex = options?.customProperties?.findIndex(matcher) ?? -1;
   return customIndex != -1 ? -customIndex - 1 : propertyMap.findIndex(matcher);
-}
-
-/**
- * Binary search for the word break property of a given CODE POINT.
- *
- * The auto-generated data.ts master array defines a **character range**
- * lookup table.  If a character's codepoint is equal to or greater than
- * the I.Start value for an entry and exclusively less than the next entry,
- * it falls in the first entry's range bucket and is classified accordingly
- * by this method.
- */
-function searchForProperty(codePoint: number, left: number, right: number): WordBreakProperty {
-  // All items that are not found in the array are assigned the 'Other' property.
-  if (right < left) {
-    return WordBreakProperty.Other;
-  }
-
-  let midpoint = left + ~~((right - left) / 2);
-  let candidate = WORD_BREAK_PROPERTY[midpoint];
-
-  let nextRange = WORD_BREAK_PROPERTY[midpoint + 1];
-  let startOfNextRange = nextRange ? nextRange[I.Start] : Infinity;
-
-  if (codePoint < candidate[I.Start]) {
-    return searchForProperty(codePoint, left, midpoint - 1);
-  } else if (codePoint >= startOfNextRange) {
-    return searchForProperty(codePoint, midpoint + 1, right);
-  }
-
-  // We found it!
-  return candidate[I.Value];
 }
