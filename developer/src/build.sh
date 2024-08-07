@@ -49,10 +49,14 @@ builder_describe_platform \
   :kmdecomp  win \
   :kmconvert win,delphi \
   :samples   win \
+  :server    win \
   :setup     win,delphi \
   :test      win,delphi \
   :tike      win,delphi \
   :inst      win,delphi
+
+# TODO: in future :server could be built on other platforms, potentially, but it
+# has addons that are Windows-specific currently
 
 builder_parse "$@"
 
