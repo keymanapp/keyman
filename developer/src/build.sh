@@ -58,7 +58,9 @@ builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
 
-source "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
+if [[ $BUILDER_OS == win ]]; then
+  source "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
+fi
 
 #
 # We want to do some checks before we head down the long publish path
