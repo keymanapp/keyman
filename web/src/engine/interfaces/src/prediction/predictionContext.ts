@@ -1,6 +1,5 @@
 import { EventEmitter } from "eventemitter3";
-import type LanguageProcessor from "./languageProcessor.js";
-import { ReadySuggestions, type InvalidateSourceEnum, StateChangeHandler } from './languageProcessor.js';
+import { type LanguageProcessorSpec , ReadySuggestions, type InvalidateSourceEnum, StateChangeHandler } from './languageProcessor.interface.js';
 import { type KeyboardProcessor, type OutputTarget } from "@keymanapp/keyboard-processor";
 
 interface PredictionContextEventMap {
@@ -32,7 +31,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
   private doRevert: boolean = false;
   private recentRevert: boolean = false;
 
-  private langProcessor: LanguageProcessor;
+  private langProcessor: LanguageProcessorSpec;
   private kbdProcessor: KeyboardProcessor;
 
   /**
@@ -69,7 +68,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
    */
   private readonly postApplicationHandler: () => void;
 
-  public constructor(langProcessor: LanguageProcessor, kbdProcessor: KeyboardProcessor) {
+  public constructor(langProcessor: LanguageProcessorSpec, kbdProcessor: KeyboardProcessor) {
     super();
 
     this.langProcessor = langProcessor;
@@ -340,7 +339,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     // Do we have a keep suggestion?  If so, remove it from the list so that we can control its display position
     // and prevent it from being hidden after reversion operations.
     this.keepSuggestion = null;
-    for(let s of suggestions) {
+    for (let s of suggestions) {
       if(s.tag == 'keep') {
         this.keepSuggestion = s as Keep;
       }

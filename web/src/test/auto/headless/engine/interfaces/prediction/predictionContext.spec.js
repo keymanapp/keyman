@@ -1,7 +1,8 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
-import { LanguageProcessor, PredictionContext, TranscriptionCache } from '@keymanapp/input-processor';
+import { LanguageProcessor, TranscriptionCache } from 'keyman/engine/main';
+import { PredictionContext } from 'keyman/engine/interfaces';
 import { Worker as LMWorker } from "@keymanapp/lexical-model-layer/node";
 import { DeviceSpec, KeyboardProcessor, Mock } from '@keymanapp/keyboard-processor';
 

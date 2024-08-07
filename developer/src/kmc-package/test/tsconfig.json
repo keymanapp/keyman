@@ -14,5 +14,8 @@
   ],
   "references": [
       { "path": "../" },
+      { "path": "../../../../common/web/types" },
+      { "path": "../../../../common/web/keyman-version" },
+      { "path": "../../common/web/test-helpers/" },
     ]
 }

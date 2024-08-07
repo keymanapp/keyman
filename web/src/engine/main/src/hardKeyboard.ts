@@ -1,6 +1,7 @@
 import { EventEmitter } from "eventemitter3";
 import { Keyboard, KeyMapping, KeyEvent, type RuleBehavior, Codes } from "@keymanapp/keyboard-processor";
 import { KeyEventSourceInterface } from 'keyman/engine/events';
+import { ModifierKeyConstants } from '@keymanapp/common-types';
 
 interface EventMap {
   /**
@@ -12,14 +13,12 @@ interface EventMap {
 export default class HardKeyboard extends EventEmitter<EventMap> implements KeyEventSourceInterface<EventMap> { }
 
 export function processForMnemonicsAndLegacy(s: KeyEvent, activeKeyboard: Keyboard, baseLayout: string): KeyEvent {
-  const modCodes = Codes.modifierCodes;
-
   // Mnemonic handling.
   if(activeKeyboard && activeKeyboard.isMnemonic) {
     // The following will never set a code corresponding to a modifier key, so it's fine to do this,
     // which may change the value of Lcode, here.
 
-    s.setMnemonicCode(!!(s.Lmodifiers & modCodes.SHIFT), !!(s.Lmodifiers & modCodes.CAPS));
+    s.setMnemonicCode(!!(s.Lmodifiers & ModifierKeyConstants.K_SHIFTFLAG), !!(s.Lmodifiers & ModifierKeyConstants.CAPITALFLAG));
   }
 
   // Other minor physical-keyboard adjustments

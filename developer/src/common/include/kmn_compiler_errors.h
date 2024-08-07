@@ -23,21 +23,38 @@
 #ifndef _kmn_compiler_errors_h
 #define _kmn_compiler_errors_h
 
-// Compiler Error Masks
+// Compiler Error Masks -- matches compiler-interfaces.ts
 
-#define CERR_SEVERITY_MASK                                 0x0000F000
-#define CERR_MESSAGE_MASK                                  0x00000FFF
-#define CERR_MASK                                          0x0000FFFF
+namespace CompilerErrorSeverity {
+  // We use a namespace to stop the enum names leaking out into global namespace scope
+  enum {
+    Info =          0x000000, // Informational, not necessarily a problem
+    Hint =          0x100000, // Something the user might want to be aware of
+    Warn =          0x200000, // Warning: Not great, but we can keep going.
+    Error =         0x300000, // Severe error where we can't continue
+    Fatal =         0x400000, // OOM or should-not-happen internal problem
+  };
+};
 
-// Severity codes
-//
-// Note: these may not be combined, and are not a bitmask, for historical
-// reasons they are separate bits
-#define CERR_FATAL                                         0x00008000
-#define CERR_ERROR                                         0x00004000
-#define CERR_WARNING                                       0x00002000
-#define CERR_HINT                                          0x00001000
-#define CERR_INFO                                          0x00000000
+#define MESSAGE_SEVERITY_MASK    0x00F00000  // includes reserved bits, 16 possible severity levels
+#define MESSAGE_ERROR_MASK       0x000FFFFF  // error | namespace
+#define MESSAGE_NAMESPACE_MASK   0x000FF000  // 256 possible namespaces
+#define MESSAGE_BASEERROR_MASK   0x00000FFF  // error code, 2,048 possible error codes per namespace
+#define MESSAGE_RESERVED_MASK    0xFF000000  // do not use these error values at this time
+
+#define MESSAGE_NAMESPACE_KmnCompiler      0x2000
+
+// Severity codes + namespace for shorthand use
+#define SevFatal                                         (MESSAGE_NAMESPACE_KmnCompiler | CompilerErrorSeverity::Fatal)
+#define SevError                                         (MESSAGE_NAMESPACE_KmnCompiler | CompilerErrorSeverity::Error)
+#define SevWarn                                          (MESSAGE_NAMESPACE_KmnCompiler | CompilerErrorSeverity::Warn)
+#define SevHint                                          (MESSAGE_NAMESPACE_KmnCompiler | CompilerErrorSeverity::Hint)
+#define SevInfo                                          (MESSAGE_NAMESPACE_KmnCompiler | CompilerErrorSeverity::Info)
+
+// These two values are not true error codes; they are used as
+// return values in kmcmplib and are never passed to kmc-kmn
+#define STATUS_Success                                       0x00000000 // NOTE: Not a message code
+#define STATUS_EndOfFile                                     0x00000001 // NOTE: Not a message code
 
 // Message codes
 //
@@ -46,215 +63,216 @@
 // sure to update that file also. Note that this correlation is currently
 // maintained manually. All values must be below 0x1000 (exclusive of severity
 // code).
-#define CERR_None                                          0x00000000
-#define CERR_EndOfFile                                     0x00000001
 
-#define CERR_BadCallParams                                 0x00008002      // TODO: rename to CFATAL_
-#define CERR_CannotAllocateMemory                          0x00008004      // TODO: rename to CFATAL_
-#define CERR_InfileNotExist                                0x00004005   // #10678: reduced from fatal to error in 17.0
-// #define CERR_CannotCreateOutfile                           0x00004006   // #10678: reduced from fatal to error in 17.0, but unused
-#define CERR_UnableToWriteFully                            0x00008007      // TODO: rename to CFATAL_
-#define CERR_CannotReadInfile                              0x00004008   // #10678: reduced from fatal to error in 17.0
-#define CERR_SomewhereIGotItWrong                          0x00008009      // TODO: rename to CFATAL_
+namespace KmnCompilerMessages {
+  enum {
+    FATAL_BadCallParams =                                 SevFatal | 0x002,
+    FATAL_CannotAllocateMemory =                          SevFatal | 0x004,
+    ERROR_InfileNotExist =                                SevError | 0x005,   // #10678: reduced from fatal to error in 17.0
+//    ERROR_CannotCreateOutfile =                           SevError | 0x006,   // #10678: reduced from fatal to error in 17.0, but unused
+//    FATAL_UnableToWriteFully =                            SevFatal | 0x007,     // unused
+    ERROR_CannotReadInfile =                              SevError | 0x008,   // #10678: reduced from fatal to error in 17.0
+    FATAL_SomewhereIGotItWrong =                          SevFatal | 0x009,
 
-#define CERR_InvalidToken                                  0x0000400A
-#define CERR_InvalidBegin                                  0x0000400B
-#define CERR_InvalidName                                   0x0000400C
-#define CERR_InvalidVersion                                0x0000400D
-#define CERR_InvalidLanguageLine                           0x0000400E
-#define CERR_LayoutButNoLanguage                           0x0000400F
-#define CERR_InvalidLayoutLine                             0x00004010
-#define CERR_NoVersionLine                                 0x00004011
-#define CERR_InvalidGroupLine                              0x00004012
-#define CERR_InvalidStoreLine                              0x00004013
-#define CERR_InvalidCodeInKeyPartOfRule                    0x00004014
-#define CERR_InvalidDeadkey                                0x00004015
-#define CERR_InvalidValue                                  0x00004016
-#define CERR_ZeroLengthString                              0x00004017
-#define CERR_TooManyIndexToKeyRefs                         0x00004018
-#define CERR_UnterminatedString                            0x00004019
-#define CERR_StringInVirtualKeySection                     0x0000401A
-#define CERR_AnyInVirtualKeySection                        0x0000401B
-#define CERR_InvalidAny                                    0x0000401C
-#define CERR_StoreDoesNotExist                             0x0000401D
-#define CERR_BeepInVirtualKeySection                       0x0000401E
-#define CERR_IndexInVirtualKeySection                      0x0000401F
-#define CERR_InvalidIndex                                  0x00004020
-#define CERR_OutsInVirtualKeySection                       0x00004021
-#define CERR_InvalidOuts                                   0x00004022
-#define CERR_ContextInVirtualKeySection                    0x00004024
-#define CERR_InvalidUse                                    0x00004025
-#define CERR_GroupDoesNotExist                             0x00004026
-#define CERR_VirtualKeyNotAllowedHere                      0x00004027
-#define CERR_InvalidSwitch                                 0x00004028
-#define CERR_NoTokensFound                                 0x00004029
-#define CERR_InvalidLineContinuation                       0x0000402A
-#define CERR_LineTooLong                                   0x0000402B
-#define CERR_InvalidCopyright                              0x0000402C
-#define CERR_CodeInvalidInThisSection                      0x0000402D
-#define CERR_InvalidMessage                                0x0000402E
-#define CERR_InvalidLanguageName                           0x0000402F
-#define CERR_InvalidBitmapLine                             0x00004030
-#define CERR_CannotReadBitmapFile                          0x00004031
-#define CERR_IndexDoesNotPointToAny                        0x00004032
-#define CERR_ReservedCharacter                             0x00004033
-#define CERR_InvalidCharacter                              0x00004034
-#define CERR_InvalidCall                                   0x00004035
-#define CERR_CallInVirtualKeySection                       0x00004036
-#define CERR_CodeInvalidInKeyStore                         0x00004037
-#define CERR_CannotLoadIncludeFile                         0x00004038
+    ERROR_InvalidToken =                                  SevError | 0x00A,
+    ERROR_InvalidBegin =                                  SevError | 0x00B,
+    ERROR_InvalidName =                                   SevError | 0x00C,
+    ERROR_InvalidVersion =                                SevError | 0x00D,
+    ERROR_InvalidLanguageLine =                           SevError | 0x00E,
+    ERROR_LayoutButNoLanguage =                           SevError | 0x00F,
+    ERROR_InvalidLayoutLine =                             SevError | 0x010,
+    ERROR_NoVersionLine =                                 SevError | 0x011,
+    ERROR_InvalidGroupLine =                              SevError | 0x012,
+    ERROR_InvalidStoreLine =                              SevError | 0x013,
+    ERROR_InvalidCodeInKeyPartOfRule =                    SevError | 0x014,
+    ERROR_InvalidDeadkey =                                SevError | 0x015,
+    ERROR_InvalidValue =                                  SevError | 0x016,
+    ERROR_ZeroLengthString =                              SevError | 0x017,
+    ERROR_TooManyIndexToKeyRefs =                         SevError | 0x018,
+    ERROR_UnterminatedString =                            SevError | 0x019,
+    ERROR_StringInVirtualKeySection =                     SevError | 0x01A,
+    ERROR_AnyInVirtualKeySection =                        SevError | 0x01B,
+    ERROR_InvalidAny =                                    SevError | 0x01C,
+    ERROR_StoreDoesNotExist =                             SevError | 0x01D,
+    ERROR_BeepInVirtualKeySection =                       SevError | 0x01E,
+    ERROR_IndexInVirtualKeySection =                      SevError | 0x01F,
+    ERROR_InvalidIndex =                                  SevError | 0x020,
+    ERROR_OutsInVirtualKeySection =                       SevError | 0x021,
+    ERROR_InvalidOuts =                                   SevError | 0x022,
+    ERROR_ContextInVirtualKeySection =                    SevError | 0x024,
+    ERROR_InvalidUse =                                    SevError | 0x025,
+    ERROR_GroupDoesNotExist =                             SevError | 0x026,
+    ERROR_VirtualKeyNotAllowedHere =                      SevError | 0x027,
+    ERROR_InvalidSwitch =                                 SevError | 0x028,
+    ERROR_NoTokensFound =                                 SevError | 0x029,
+    ERROR_InvalidLineContinuation =                       SevError | 0x02A,
+    ERROR_LineTooLong =                                   SevError | 0x02B,
+    ERROR_InvalidCopyright =                              SevError | 0x02C,
+    ERROR_CodeInvalidInThisSection =                      SevError | 0x02D,
+    ERROR_InvalidMessage =                                SevError | 0x02E,
+    ERROR_InvalidLanguageName =                           SevError | 0x02F,
+    ERROR_InvalidBitmapLine =                             SevError | 0x030,
+    ERROR_CannotReadBitmapFile =                          SevError | 0x031,
+    ERROR_IndexDoesNotPointToAny =                        SevError | 0x032,
+    ERROR_ReservedCharacter =                             SevError | 0x033,
+    ERROR_InvalidCharacter =                              SevError | 0x034,
+    ERROR_InvalidCall =                                   SevError | 0x035,
+    ERROR_CallInVirtualKeySection =                       SevError | 0x036,
+    ERROR_CodeInvalidInKeyStore =                         SevError | 0x037,
+    ERROR_CannotLoadIncludeFile =                         SevError | 0x038,
 
-#define CERR_60FeatureOnly_EthnologueCode                  0x00004039
-#define CERR_60FeatureOnly_MnemonicLayout                  0x0000403A
-#define CERR_60FeatureOnly_OldCharPosMatching              0x0000403B
-#define CERR_60FeatureOnly_NamedCodes                      0x0000403C
-#define CERR_60FeatureOnly_Contextn                        0x0000403D
-#define CERR_501FeatureOnly_Call                           0x0000403E
+    ERROR_60FeatureOnly_EthnologueCode =                  SevError | 0x039,
+    ERROR_60FeatureOnly_MnemonicLayout =                  SevError | 0x03A,
+    ERROR_60FeatureOnly_OldCharPosMatching =              SevError | 0x03B,
+    ERROR_60FeatureOnly_NamedCodes =                      SevError | 0x03C,
+    ERROR_60FeatureOnly_Contextn =                        SevError | 0x03D,
+    ERROR_501FeatureOnly_Call =                           SevError | 0x03E,
 
-#define CERR_InvalidNamedCode                              0x0000403F
-#define CERR_InvalidSystemStore                            0x00004040
+    ERROR_InvalidNamedCode =                              SevError | 0x03F,
+    ERROR_InvalidSystemStore =                            SevError | 0x040,
 
-#define CERR_60FeatureOnly_VirtualCharKey                  0x00004044
+    ERROR_60FeatureOnly_VirtualCharKey =                  SevError | 0x044,
 
-#define CERR_VersionAlreadyIncluded                        0x00004045
+    ERROR_VersionAlreadyIncluded =                        SevError | 0x045,
 
-#define CERR_70FeatureOnly                                 0x00004046
+    ERROR_70FeatureOnly =                                 SevError | 0x046,
 
-#define CERR_80FeatureOnly                                 0x00004047
-#define CERR_InvalidInVirtualKeySection                    0x00004048
-#define CERR_InvalidIf                                     0x00004049
-#define CERR_InvalidReset                                  0x0000404A
-#define CERR_InvalidSet                                    0x0000404B
-#define CERR_InvalidSave                                   0x0000404C
+    ERROR_80FeatureOnly =                                 SevError | 0x047,
+    ERROR_InvalidInVirtualKeySection =                    SevError | 0x048,
+    ERROR_InvalidIf =                                     SevError | 0x049,
+    ERROR_InvalidReset =                                  SevError | 0x04A,
+    ERROR_InvalidSet =                                    SevError | 0x04B,
+    ERROR_InvalidSave =                                   SevError | 0x04C,
 
-#define CERR_InvalidEthnologueCode                         0x0000404D
+    ERROR_InvalidEthnologueCode =                         SevError | 0x04D,
 
-#define CERR_CannotCreateTempfile                          0x0000804E         // TODO: rename to CFATAL_
+    FATAL_CannotCreateTempfile =                          SevFatal | 0x04E,
 
-#define CERR_90FeatureOnly_IfSystemStores                  0x0000404F
-#define CERR_IfSystemStore_NotFound                        0x00004050
-#define CERR_90FeatureOnly_SetSystemStores                 0x00004051
-#define CERR_SetSystemStore_NotFound                       0x00004052
-#define CERR_90FeatureOnlyVirtualKeyDictionary             0x00004053
+    ERROR_90FeatureOnly_IfSystemStores =                  SevError | 0x04F,
+    ERROR_IfSystemStore_NotFound =                        SevError | 0x050,
+    ERROR_90FeatureOnly_SetSystemStores =                 SevError | 0x051,
+    ERROR_SetSystemStore_NotFound =                       SevError | 0x052,
+    ERROR_90FeatureOnlyVirtualKeyDictionary =             SevError | 0x053,
 
-#define CERR_NotSupportedInKeymanWebContext                0x00004054
-#define CERR_NotSupportedInKeymanWebOutput                 0x00004055
-#define CERR_NotSupportedInKeymanWebStore                  0x00004056
-#define CERR_VirtualCharacterKeysNotSupportedInKeymanWeb   0x00004057
-#define CERR_VirtualKeysNotValidForMnemonicLayouts         0x00004058
-#define CERR_InvalidTouchLayoutFile                        0x00004059
-#define CERR_TouchLayoutInvalidIdentifier                  0x0000405A
-#define CERR_InvalidKeyCode                                0x0000405B
-#define CERR_90FeatureOnlyLayoutFile                       0x0000405C
-#define CERR_90FeatureOnlyKeyboardVersion                  0x0000405D
-#define CERR_KeyboardVersionFormatInvalid                  0x0000405E
-#define CERR_ContextExHasInvalidOffset                     0x0000405F
-#define CERR_90FeatureOnlyEmbedCSS                         0x00004060
-#define CERR_90FeatureOnlyTargets                          0x00004061
-#define CERR_ContextAndIndexInvalidInMatchNomatch          0x00004062
-#define CERR_140FeatureOnlyContextAndNotAnyWeb             0x00004063
+    ERROR_NotSupportedInKeymanWebContext =                SevError | 0x054,
+    ERROR_NotSupportedInKeymanWebOutput =                 SevError | 0x055,
+    ERROR_NotSupportedInKeymanWebStore =                  SevError | 0x056,
+    ERROR_VirtualCharacterKeysNotSupportedInKeymanWeb =   SevError | 0x057,
+    ERROR_VirtualKeysNotValidForMnemonicLayouts =         SevError | 0x058,
+    ERROR_InvalidTouchLayoutFile =                        SevError | 0x059,
+    ERROR_TouchLayoutInvalidIdentifier =                  SevError | 0x05A,
+    ERROR_InvalidKeyCode =                                SevError | 0x05B,
+    ERROR_90FeatureOnlyLayoutFile =                       SevError | 0x05C,
+    ERROR_90FeatureOnlyKeyboardVersion =                  SevError | 0x05D,
+    ERROR_KeyboardVersionFormatInvalid =                  SevError | 0x05E,
+    ERROR_ContextExHasInvalidOffset =                     SevError | 0x05F,
+    ERROR_90FeatureOnlyEmbedCSS =                         SevError | 0x060,
+    ERROR_90FeatureOnlyTargets =                          SevError | 0x061,
+    ERROR_ContextAndIndexInvalidInMatchNomatch =          SevError | 0x062,
+    ERROR_140FeatureOnlyContextAndNotAnyWeb =             SevError | 0x063,
 
-#define CERR_ExpansionMustFollowCharacterOrVKey            0x00004064
-#define CERR_VKeyExpansionMustBeFollowedByVKey             0x00004065
-#define CERR_CharacterExpansionMustBeFollowedByCharacter   0x00004066
-#define CERR_VKeyExpansionMustUseConsistentShift           0x00004067
-#define CERR_ExpansionMustBePositive                       0x00004068
+    ERROR_ExpansionMustFollowCharacterOrVKey =            SevError | 0x064,
+    ERROR_VKeyExpansionMustBeFollowedByVKey =             SevError | 0x065,
+    ERROR_CharacterExpansionMustBeFollowedByCharacter =   SevError | 0x066,
+    ERROR_VKeyExpansionMustUseConsistentShift =           SevError | 0x067,
+    ERROR_ExpansionMustBePositive =                       SevError | 0x068,
 
-#define CERR_CasedKeysMustContainOnlyVirtualKeys           0x00004069
-#define CERR_CasedKeysMustNotIncludeShiftStates            0x0000406A
-#define CERR_CasedKeysNotSupportedWithMnemonicLayout       0x0000406B
+    ERROR_CasedKeysMustContainOnlyVirtualKeys =           SevError | 0x069,
+    ERROR_CasedKeysMustNotIncludeShiftStates =            SevError | 0x06A,
+    ERROR_CasedKeysNotSupportedWithMnemonicLayout =       SevError | 0x06B,
 
-#define CERR_CannotUseReadWriteGroupFromReadonlyGroup      0x0000406C
-#define CERR_StatementNotPermittedInReadonlyGroup          0x0000406D
-#define CERR_OutputInReadonlyGroup                         0x0000406E
-#define CERR_NewContextGroupMustBeReadonly                 0x0000406F
-#define CERR_PostKeystrokeGroupMustBeReadonly              0x00004070
+    ERROR_CannotUseReadWriteGroupFromReadonlyGroup =      SevError | 0x06C,
+    ERROR_StatementNotPermittedInReadonlyGroup =          SevError | 0x06D,
+    ERROR_OutputInReadonlyGroup =                         SevError | 0x06E,
+    ERROR_NewContextGroupMustBeReadonly =                 SevError | 0x06F,
+    ERROR_PostKeystrokeGroupMustBeReadonly =              SevError | 0x070,
 
-#define CERR_DuplicateGroup                                0x00004071
-#define CERR_DuplicateStore                                0x00004072
-#define CERR_RepeatedBegin                                 0x00004073
-#define CERR_VirtualKeyInContext                           0x00004074
+    ERROR_DuplicateGroup =                                SevError | 0x071,
+    ERROR_DuplicateStore =                                SevError | 0x072,
+    ERROR_RepeatedBegin =                                 SevError | 0x073,
+    ERROR_VirtualKeyInContext =                           SevError | 0x074,
 
-#define CERR_OutsTooLong                                   0x00004075
-#define CERR_ExtendedStringTooLong                         0x00004076
-#define CERR_VirtualKeyExpansionTooLong                    0x00004077
-#define CERR_CharacterRangeTooLong                         0x00004078
-#define CERR_NonBMPCharactersNotSupportedInKeySection      0x00004079
+    ERROR_OutsTooLong =                                   SevError | 0x075,
+    ERROR_ExtendedStringTooLong =                         SevError | 0x076,
+    ERROR_VirtualKeyExpansionTooLong =                    SevError | 0x077,
+    ERROR_CharacterRangeTooLong =                         SevError | 0x078,
+    ERROR_NonBMPCharactersNotSupportedInKeySection =      SevError | 0x079,
 
-#define CERR_InvalidTarget                                 0x0000407A
-#define CERR_NoTargetsSpecified                            0x0000407B
+    ERROR_InvalidTarget =                                 SevError | 0x07A,
+    ERROR_NoTargetsSpecified =                            SevError | 0x07B,
 
-#define CWARN_TooManyWarnings                              0x00002080
-#define CWARN_OldVersion                                   0x00002081
-#define CWARN_BitmapNotUsed                                0x00002082
-#define CWARN_CustomLanguagesNotSupported                  0x00002083
-#define CWARN_KeyBadLength                                 0x00002084
-#define CWARN_IndexStoreShort                              0x00002085
-#define CWARN_UnicodeInANSIGroup                           0x00002086
-#define CWARN_ANSIInUnicodeGroup                           0x00002087
-#define CWARN_UnicodeSurrogateUsed                         0x00002088
-#define CWARN_ReservedCharacter                            0x00002089
-// Note: CWARN_Info has an "info" severity; this changed in 17.0. Earlier versions
-// had a special case for CWARN_Info in message output.
-#define CWARN_Info                                         0x0000008A
-#define CINFO_Info                                         CWARN_Info
-#define CWARN_VirtualKeyWithMnemonicLayout                 0x0000208B
-#define CWARN_VirtualCharKeyWithPositionalLayout           0x0000208C
-#define CWARN_StoreAlreadyUsedAsOptionOrCall               0x0000208D
-#define CWARN_StoreAlreadyUsedAsStoreOrCall                0x0000208E
-#define CWARN_StoreAlreadyUsedAsStoreOrOption              0x0000208F
+    WARN_TooManyWarnings =                              SevWarn | 0x080,
+    WARN_OldVersion =                                   SevWarn | 0x081,
+    WARN_BitmapNotUsed =                                SevWarn | 0x082,
+    WARN_CustomLanguagesNotSupported =                  SevWarn | 0x083,
+    WARN_KeyBadLength =                                 SevWarn | 0x084,
+    WARN_IndexStoreShort =                              SevWarn | 0x085,
+    WARN_UnicodeInANSIGroup =                           SevWarn | 0x086,
+    WARN_ANSIInUnicodeGroup =                           SevWarn | 0x087,
+    WARN_UnicodeSurrogateUsed =                         SevWarn | 0x088,
+    WARN_ReservedCharacter =                            SevWarn | 0x089,
 
-#define CWARN_PunctuationInEthnologueCode                  0x00002090
+    INFO_MinimumCoreEngineVersion =                     SevInfo | 0x08A, // renamed from INFO_Info in 18.0-alpha
 
-#define CWARN_TouchLayoutMissingLayer                      0x00002091
-#define CWARN_TouchLayoutCustomKeyNotDefined               0x00002092
-#define CWARN_TouchLayoutMissingRequiredKeys               0x00002093
-#define CWARN_HelpFileMissing                              0x00002094
-#define CWARN_EmbedJsFileMissing                           0x00002095
-#define CWARN_TouchLayoutFileMissing                       0x00002096
-#define CWARN_VisualKeyboardFileMissing                    0x00002097
-#define CWARN_ExtendedShiftFlagsNotSupportedInKeymanWeb    0x00002098   // I4118
-#define CWARN_TouchLayoutUnidentifiedKey                   0x00002099
-#define CHINT_UnreachableKeyCode                           0x0000109A
+    WARN_VirtualKeyWithMnemonicLayout =                 SevWarn | 0x08B,
+    WARN_VirtualCharKeyWithPositionalLayout =           SevWarn | 0x08C,
+    WARN_StoreAlreadyUsedAsOptionOrCall =               SevWarn | 0x08D,
+    WARN_StoreAlreadyUsedAsStoreOrCall =                SevWarn | 0x08E,
+    WARN_StoreAlreadyUsedAsStoreOrOption =              SevWarn | 0x08F,
 
-#define CWARN_CouldNotCopyJsonFile                         0x0000209B
-#define CWARN_PlatformNotInTargets                         0x0000209C
+    WARN_PunctuationInEthnologueCode =                  SevWarn | 0x090,
 
-#define CWARN_HeaderStatementIsDeprecated                  0x0000209D
-#define CWARN_UseNotLastStatementInRule                    0x0000209E
+    WARN_TouchLayoutMissingLayer =                      SevWarn | 0x091,
+    WARN_TouchLayoutCustomKeyNotDefined =               SevWarn | 0x092,
+    WARN_TouchLayoutMissingRequiredKeys =               SevWarn | 0x093,
+    WARN_HelpFileMissing =                              SevWarn | 0x094,
+    WARN_EmbedJsFileMissing =                           SevWarn | 0x095,
+    // WARN_TouchLayoutFileMissing =                       SevWarn | 0x096,
+    // WARN_VisualKeyboardFileMissing =                    SevWarn | 0x097,
+    WARN_ExtendedShiftFlagsNotSupportedInKeymanWeb =    SevWarn | 0x098,   // I4118
+    WARN_TouchLayoutUnidentifiedKey =                   SevWarn | 0x099,
+    HINT_UnreachableKeyCode =                           SevHint | 0x09A,
 
-#define CWARN_TouchLayoutFontShouldBeSameForAllPlatforms   0x0000209F
-#define CWARN_InvalidJSONMetadataFile                      0x000020A0
-#define CWARN_JSONMetadataOSKFontShouldMatchTouchFont      0x000020A1
-#define CWARN_KVKFileIsInSourceFormat                      0x000020A2
+    // WARN_CouldNotCopyJsonFile =                         SevWarn | 0x09B,
+    WARN_PlatformNotInTargets =                         SevWarn | 0x09C,
 
-#define CWARN_DontMixChiralAndNonChiralModifiers           0x000020A3
-#define CWARN_MixingLeftAndRightModifiers                  0x000020A4
+    WARN_HeaderStatementIsDeprecated =                  SevWarn | 0x09D,
+    WARN_UseNotLastStatementInRule =                    SevWarn | 0x09E,
 
-#define CWARN_LanguageHeadersDeprecatedInKeyman10          0x000020A5
+    WARN_TouchLayoutFontShouldBeSameForAllPlatforms =   SevWarn | 0x09F,
+    // WARN_InvalidJSONMetadataFile =                      SevWarn | 0x0A0,
+    // WARN_JSONMetadataOSKFontShouldMatchTouchFont =      SevWarn | 0x0A1,
+    WARN_KVKFileIsInSourceFormat =                      SevWarn | 0x0A2,
 
-#define CHINT_NonUnicodeFile                               0x000010A6
+    WARN_DontMixChiralAndNonChiralModifiers =           SevWarn | 0x0A3,
+    WARN_MixingLeftAndRightModifiers =                  SevWarn | 0x0A4,
 
-#define CWARN_TooManyErrorsOrWarnings                      0x000020A7
+    WARN_LanguageHeadersDeprecatedInKeyman10 =          SevWarn | 0x0A5,
 
-#define CWARN_HotkeyHasInvalidModifier                     0x000020A8
+    HINT_NonUnicodeFile =                               SevHint | 0x0A6,
 
-#define CWARN_TouchLayoutSpecialLabelOnNormalKey           0x000020A9
+    // WARN_TooManyErrorsOrWarnings =                      SevWarn | 0x0A7,
 
-#define CWARN_OptionStoreNameInvalid                       0x000020AA
+    WARN_HotkeyHasInvalidModifier =                     SevWarn | 0x0A8,
 
-#define CWARN_NulNotFirstStatementInContext                0x000020AB
-#define CWARN_IfShouldBeAtStartOfContext                   0x000020AC
+    WARN_TouchLayoutSpecialLabelOnNormalKey =           SevWarn | 0x0A9,
 
-#define CWARN_KeyShouldIncludeNCaps                        0x000020AD
+    WARN_OptionStoreNameInvalid =                       SevWarn | 0x0AA,
 
-#define CHINT_UnreachableRule                              0x000010AE
+    WARN_NulNotFirstStatementInContext =                SevWarn | 0x0AB,
+    WARN_IfShouldBeAtStartOfContext =                   SevWarn | 0x0AC,
 
-#define CWARN_VirtualKeyInOutput                           0x000020AF
+    WARN_KeyShouldIncludeNCaps =                        SevWarn | 0x0AD,
 
-#define CHINT_IndexStoreLong                               0x000010B0
+    HINT_UnreachableRule =                              SevHint | 0x0AE,
 
-#define CERR_BufferOverflow                                0x000080C0      // TODO: Rename to CFATAL_...
-#define CERR_Break                                         0x000080C1      // TODO: Rename to CFATAL_...
+    WARN_VirtualKeyInOutput =                           SevWarn | 0x0AF,
+
+    HINT_IndexStoreLong =                               SevHint | 0x0B0,
+
+    FATAL_BufferOverflow =                                SevFatal | 0x0C0
+//    FATAL_Break =                                         SevFatal | 0x0C1,      unused
+  };
+}
 
 #endif  // _kmn_compiler_errors_h

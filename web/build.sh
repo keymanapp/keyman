@@ -30,7 +30,7 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   ":engine/main              Builds all common code used by KMW's app/-level targets" \
   ":engine/osk               Builds the Web OSK module" \
   ":engine/package-cache     Subset used to collate keyboards and request them from the cloud" \
-  ":engine/paths             Subset used to configure KMW" \
+  ":engine/interfaces        Subset used to configure KMW" \
   ":samples                  Builds all needed resources for the KMW sample-page set" \
   ":tools                    Builds engine-related development resources" \
   ":test-pages=src/test/manual   Builds resources needed for the KMW manual testing pages" \
@@ -60,7 +60,7 @@ builder_describe_outputs \
   build:engine/main             "/web/build/engine/main/lib/index.mjs" \
   build:engine/osk              "/web/build/engine/osk/lib/index.mjs" \
   build:engine/package-cache    "/web/build/engine/package-cache/lib/index.mjs" \
-  build:engine/paths            "/web/build/engine/paths/lib/index.mjs" \
+  build:engine/interfaces       "/web/build/engine/interfaces/lib/index.mjs" \
   build:samples                 "/web/src/samples/simplest/keymanweb.js" \
   build:tools                   "/web/build/tools/building/sourcemap-root/index.js" \
   build:test-pages              "/web/build/test-resources/sentry-manager.js"
@@ -139,21 +139,18 @@ builder_run_child_actions build:engine/device-detect
 builder_run_child_actions build:engine/dom-utils
 builder_run_child_actions build:engine/element-wrappers
 builder_run_child_actions build:engine/events
+builder_run_child_actions build:engine/interfaces
 
-# Uses engine/dom-utils
+# Uses engine/dom-utils and engine/interfaces
 builder_run_child_actions build:engine/osk
 
 # Uses engine/element-wrappers
 builder_run_child_actions build:engine/attachment
 
-# Uses engine/osk (due to resource-path config interface)
-builder_run_child_actions build:engine/paths
-
-# Uses engine/config (also due to resource-path config interface, but for the
-# more complete version of that interface)
+# Uses engine/interfaces (due to resource-path config interface)
 builder_run_child_actions build:engine/package-cache
 
-# Uses engine/paths, engine/device-detect, engine/package-cache, & engine/osk
+# Uses engine/interfaces, engine/device-detect, engine/package-cache, & engine/osk
 builder_run_child_actions build:engine/main
 
 # Uses all but engine/element-wrappers and engine/attachment

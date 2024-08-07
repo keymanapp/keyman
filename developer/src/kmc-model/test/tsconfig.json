@@ -17,5 +17,6 @@
   ],
   "references": [
       { "path": "../" },
+      { "path": "../../common/web/test-helpers/" },
     ]
 }

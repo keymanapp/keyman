@@ -2,7 +2,7 @@ import { assert } from 'chai';
 import sinon from 'sinon';
 
 import { CloudQueryEngine, type KeyboardStub } from 'keyman/engine/package-cache';
-import { PathConfiguration } from 'keyman/engine/paths';
+import { PathConfiguration } from 'keyman/engine/interfaces';
 import DOMCloudRequester from 'keyman/engine/package-cache/dom-requester';
 import { ManagedPromise } from '@keymanapp/web-utils';
 

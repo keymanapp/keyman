@@ -55,6 +55,9 @@ function do_build() {
   # Declaration bundling.
   tsc --emitDeclarationOnly --outFile $INTERMEDIATE/worker-main.d.ts
 
+  # Some automated tests currently rely upon the individual output files.
+  tsc
+
   mkdir -p $LIB
 
 
