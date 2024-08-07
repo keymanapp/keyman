@@ -167,6 +167,11 @@ public class KMKeyboardJSHandler {
                 ic.performEditorAction(EditorInfo.IME_ACTION_SEARCH);
                 break;
 
+              // Done action
+              case DONE :
+                ic.performEditorAction(EditorInfo.IME_ACTION_DONE);
+                break;
+
               // Messaging apps
               case NEWLINE :
                 // Send newline without advancing cursor

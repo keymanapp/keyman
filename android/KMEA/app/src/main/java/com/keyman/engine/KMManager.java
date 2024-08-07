@@ -185,6 +185,7 @@ public final class KMManager {
     GO,        // Go action
     SEARCH,    // Search action
     NEWLINE,   // Send newline character
+    DONE,      // Done action
     DEFAULT,   // Default ENTER action
   }
 
@@ -1266,9 +1267,15 @@ public final class KMManager {
    * Sets enterMode which specifies how the System keyboard ENTER key is handled
    *
    * @param imeOptions EditorInfo.imeOptions
+   * @param inputType  InputType
    */
-  public static void setEnterMode(int imeOptions) {
-    int imeActions = imeOptions&EditorInfo.IME_MASK_ACTION;
+  public static void setEnterMode(int imeOptions, int inputType) {
+    if ((inputType & InputType.TYPE_TEXT_FLAG_MULTI_LINE) != 0) {
+      enterMode = EnterModeType.NEWLINE;
+      return;
+    }
+
+    int imeActions = imeOptions & EditorInfo.IME_MASK_ACTION;
     EnterModeType value = EnterModeType.DEFAULT;
 
     switch (imeActions) {
@@ -1281,12 +1288,13 @@ public final class KMManager {
         break;
 
       case EditorInfo.IME_ACTION_DONE:
-        value = EnterModeType.NEWLINE;
+        value = EnterModeType.DONE;
         break;
 
       default:
         value = EnterModeType.DEFAULT;
     }
+
     enterMode = value;
   }
 

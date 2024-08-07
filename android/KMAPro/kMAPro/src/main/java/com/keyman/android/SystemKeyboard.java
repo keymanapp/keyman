@@ -147,9 +147,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     KMManager.onStartInput(attribute, restarting);
     KMManager.resetContext(KeyboardType.KEYBOARD_TYPE_SYSTEM);
 
-    // Determine special handling for ENTER key
-    KMManager.setEnterMode(attribute.imeOptions);
-
     // This method (likely) includes the IME equivalent to `onResume` for `Activity`-based classes,
     // making it an important time to detect orientation changes.
     Context appContext = getApplicationContext();
@@ -177,6 +174,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
         KMManager.setBannerOptions(false);
       }
     }
+
+    // Determine special handling for ENTER key
+    KMManager.setEnterMode(attribute.imeOptions, inputType);
 
     InputConnection ic = getCurrentInputConnection();
     if (ic != null) {
