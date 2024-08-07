@@ -4,8 +4,8 @@ import { Entry, InternalNode, Leaf, Node } from "./trie.js";
 // const ENCODED_NUM_BASE = 64;
 
 // Offsetting by even just 0x0020 avoids control-code chars + avoids VS Code not liking the encoding.
-const ENCODED_NUM_BASE = 0x0000;
-const SINGLE_CHAR_RANGE = Math.pow(2, 16) - ENCODED_NUM_BASE;
+export const ENCODED_NUM_BASE = 0x0020;
+export const SINGLE_CHAR_RANGE = Math.pow(2, 16) - ENCODED_NUM_BASE;
 
 const WEIGHT_WIDTH = 2;
 const NODE_SIZE_WIDTH = 2;

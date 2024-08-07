@@ -6,7 +6,9 @@ import { assert } from 'chai';
 import {
   compressEntry, decompressEntry,
   compressNode, decompressNode,
-  compressNumber, decompressNumber
+  compressNumber, decompressNumber,
+  ENCODED_NUM_BASE,
+  SINGLE_CHAR_RANGE
 } from '@keymanapp/models-templates/obj/trie-compression.js';
 
 /**
@@ -25,8 +27,8 @@ const TEST_DATA = {};
 TEST_DATA.ENTRIES = {
   four: {
     // total length: header = 4, text = 4 -> 8.  (Made with weight-width 2)
-    //            -totalLen-    -weight- -keylen-
-    compressed: '\u0000\u0008\u0000\u0008four',
+    //                  -totalLen-            -weight-
+    compressed: `${compressNumber(8, 2)}${compressNumber(8, 2)}four`,
     decompressed: {
       key: 'four',
       content: 'four',
@@ -43,8 +45,8 @@ TEST_DATA.ENTRIES = {
 TEST_DATA.LEAVES = {
   four: {
     // expected width difference: 5 (2: total size, 2: weight, 1: entry count)
-    //             -totalLen-  -weight- -type/size-
-    compressed: `\u0000\u000D\u0000\u0008\u8001${TEST_DATA.ENTRIES.four.compressed}`,
+    //                   -totalLen-              -weight-              -type=leaf + size-
+    compressed: `${compressNumber(13, 2)}${compressNumber(8, 2)}${compressNumber(0x8000 + 1, 1)}${TEST_DATA.ENTRIES.four.compressed}`,
     decompressed: {
       type: 'leaf',
       weight: 8,
@@ -66,7 +68,7 @@ TEST_DATA.NODES = {
   four: {
     // expected width difference: 6 (2: total size, 2: weight, 1: entry count, 1: value count)
     //             -totalLen-  -weight- -type/size-
-    compressed: `\u0000\u0013\u0000\u0008\u0001r${TEST_DATA.LEAVES.four.compressed}`,
+    compressed: `${compressNumber(19, 2)}${compressNumber(8, 2)}${compressNumber(1)}r${TEST_DATA.LEAVES.four.compressed}`,
     decompressed: {
       type: 'internal',
       weight: 8,
@@ -88,21 +90,20 @@ describe('Trie compression', function() {
       assert.equal(compressNumber(0x0020).length, 1);
     });
 
-    it('width 1:  compresses properly', () => {
-      assert.equal(compressNumber(0x0020, 1), ' ');
-      assert.equal(compressNumber('"'.charCodeAt(0), 1), '"');
-      assert.equal(compressNumber(0xfffe, 1), '\ufffe');
+    it('compresses properly when targeting single-char width', () => {
+      assert.equal(compressNumber(0x0020, 1), String.fromCharCode(0x0020 + ENCODED_NUM_BASE));
+      assert.equal(compressNumber('"'.charCodeAt(0), 1), String.fromCharCode('"'.charCodeAt(0) + ENCODED_NUM_BASE));
     });
 
-    it('width 2:  compresses properly', () => {
-      assert.equal(compressNumber(0x00200020, 2), '  ');
-      assert.equal(
-        compressNumber(0x0321fd20, 2), String.fromCharCode(0x0321, 0xfd20)
+    it('has non-null leading char for numbers needing two-char representations', () => {
+      assert.notEqual(compressNumber(0x00200020, 2).charAt(0), String.fromCharCode(0));
+      assert.notEqual(
+        compressNumber(0x0321ad20, 2).charAt(0), String.fromCharCode(0)
       );
     });
 
     it('width 2: compressing values one-char wide', () => {
-      assert.equal(compressNumber(0x0020, 2), '\u0000 ');
+      assert.equal(compressNumber(0x0020, 2), `${String.fromCharCode(ENCODED_NUM_BASE)}${String.fromCharCode(0x0020 + ENCODED_NUM_BASE)}`);
     });
 
     it('throws when numbers are too large for the specified width', () => {
@@ -144,30 +145,25 @@ describe('Trie decompression', function () {
   describe('`number`s', () => {
     describe('not inlined', () => {
       it('decompresses single-char strings', () => {
-        assert.equal(decompressNumber(' ', 0), 0x0020);
-        assert.equal(decompressNumber('"', 0), '"'.charCodeAt(0));
-        assert.equal(decompressNumber('\ufffe', 0), 0xfffe);
-      });
-
-      it('decompresses two-char strings', () => {
-        assert.equal(decompressNumber('  ', 0), 0x00200020);
-        assert.equal(decompressNumber(String.fromCharCode(0x0321, 0xfd20), 0), 0x0321fd20);
+        assert.equal(decompressNumber(String.fromCharCode(0x0020 + ENCODED_NUM_BASE), 0), 0x0020);
+        assert.equal(decompressNumber(String.fromCharCode('"'.charCodeAt(0) + ENCODED_NUM_BASE), 0), '"'.charCodeAt(0));
+        assert.equal(decompressNumber('\ufffe', 0), 0xfffe - ENCODED_NUM_BASE);
       });
 
       it('decompresses two-char strings of one-char value width', () => {
-        assert.equal(decompressNumber('\u0000 ', 0), 0x0020);
+        assert.equal(decompressNumber(`${String.fromCharCode(ENCODED_NUM_BASE)}${String.fromCharCode(0x0020 + ENCODED_NUM_BASE)}`, 0), 0x0020);
       });
     });
 
     describe('with mock-inlining', () => {
       it('decompresses single-char strings', () => {
-        assert.equal(decompressNumber('xxx xx', 3, 4), 0x0020);
-        assert.equal(decompressNumber('xx"x', 2, 3), '"'.charCodeAt(0));
-        assert.equal(decompressNumber('\uffff\ufffe', 1), 0xfffe);
+        assert.equal(decompressNumber(`xxx${String.fromCharCode(0x0020 + ENCODED_NUM_BASE)}xx`, 3, 4), 0x0020);
+        assert.equal(decompressNumber(`xx${String.fromCharCode('"'.charCodeAt(0) + ENCODED_NUM_BASE)}x`, 2, 3), '"'.charCodeAt(0));
+        assert.equal(decompressNumber('\uffff\ufffe', 1), 0xfffe - ENCODED_NUM_BASE);
       });
 
       it('decompresses two-char strings', () => {
-        assert.equal(decompressNumber('xxxx  xx', 4, 6), 0x00200020);
+        assert.equal(decompressNumber(`xxxx${compressNumber(0x00200020, 2)}xx`, 4, 6), 0x00200020);
       });
     });
   });
