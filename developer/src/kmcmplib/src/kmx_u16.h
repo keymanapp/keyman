@@ -25,13 +25,8 @@ std::wstring wstring_from_u16string(std::u16string const str16);
 /** @brief Obtain a std::u16string from a std::wstring */
 std::u16string u16string_from_wstring(std::wstring const wstr);
 
-/** @brief Obtain a std::wstring from a std::u16tring */
-std::wstring u16fmt(const KMX_WCHAR* str);
-
 /** @brief Convert pointer to wchar_t to pointer to char16_t and copy sz elements into dst */
 void u16sprintf(KMX_WCHAR* dst, const size_t sz, const wchar_t* fmt, ...);
-
-std::wstring convert_pchar16T_To_wstr(KMX_WCHAR* Name);
 
 /** @brief Return the length of the u16string str */
 size_t u16len(const KMX_WCHAR* p);

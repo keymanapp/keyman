@@ -84,29 +84,6 @@ void u16sprintf(KMX_WCHAR* dst, const size_t sz, const wchar_t* fmt, ...) {
   delete[] wbuf;
 }
 
-/**   wstring <- u16string
- * @brief  Obtain a std::wstring from a std::u16tring
- *         the same as an above function but since it is used in Keyman we wrap it here
- * @param  str16 the std::string to be converted
- * @return a std::wstring
- */
-std::wstring u16fmt(const KMX_WCHAR* str16) {
-  return wstring_from_u16string(str16);
-}
-
-/**
- * @brief  Convert pointer to wchar_t to pointer to char16_t and copy sz elements into dst
- *         the same as an above function but since it is used in Keyman we wrap it here
- * @param  ch16 the char16 to be converted
- * @return a std::wstring
- */
-std::wstring convert_pchar16T_To_wstr(KMX_WCHAR* ch16) {
-  std::u16string u16str(ch16);
-  std::string stri = string_from_u16string(u16str);
-  std::wstring wstr = wstring_from_string(stri);
-  return wstr;
-}
-
 /**
  * @brief  Convert u16string to long integer
  * @param  str    u16string beginning with the representation of an integral number.

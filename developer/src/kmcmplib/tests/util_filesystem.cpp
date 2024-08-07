@@ -132,8 +132,8 @@ FILE* Open_File(const KMX_WCHART* Filename, const KMX_WCHART* mode) {
 
 FILE* Open_File(const KMX_WCHAR* Filename, const KMX_WCHAR* mode) {
 #ifdef _MSC_VER
-  std::wstring cpath = convert_pchar16T_To_wstr((KMX_WCHAR*) Filename);
-  std::wstring cmode = convert_pchar16T_To_wstr((KMX_WCHAR*) mode);
+  std::wstring cpath = wstring_from_u16string(Filename);
+  std::wstring cmode = wstring_from_u16string(mode);
   std::replace(cpath.begin(), cpath.end(), '/', '\\');
   return _wfsopen(cpath.c_str(), cmode.c_str(), _SH_DENYWR);
 #else
