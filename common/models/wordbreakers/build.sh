@@ -26,10 +26,14 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
-function do_build() {
+function do_configure() {
+  verify_npm_setup
+
   tsc -b src/data-compiler/tsconfig.json
   node ./build/obj/data-compiler/index.js
+}
 
+function do_build() {
   tsc -b ./tsconfig.json
 
   # Declaration bundling.
@@ -44,7 +48,7 @@ function do_test() {
   fi
 }
 
-builder_run_action configure  verify_npm_setup
+builder_run_action configure  do_configure
 builder_run_action clean      rm -rf build/
 builder_run_action build      do_build
 builder_run_action test       do_test
