@@ -2,4 +2,4 @@
 
 #include <compfile.h>
 
-bool CheckNCapsConsistency(PFILE_KEYBOARD fk);
+void CheckNCapsConsistency(PFILE_KEYBOARD fk);

@@ -1,7 +1,7 @@
 import { DeviceSpec } from "@keymanapp/web-utils";
 
 import EmbeddedGestureConfig from './embeddedGestureConfig.js';
-import OSKResourcePathConfiguration from "./oskResourcePathConfiguration.interface.js";
+import { OSKResourcePathConfiguration } from "keyman/engine/interfaces";
 
 export default interface CommonConfiguration {
   /**

@@ -12,6 +12,8 @@
     "./helpers/index.ts",
   ],
   "references": [
+    { "path": "../../../../common/web/types/" },
+    { "path": "../../common/web/test-helpers/" },
     { "path": "../" }
   ]
 }

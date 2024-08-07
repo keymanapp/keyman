@@ -4,7 +4,7 @@
 ***/
 
 import { Version, deepCopy } from "@keymanapp/web-utils";
-import { TouchLayout } from "@keymanapp/common-types";
+import { ModifierKeyConstants, TouchLayout } from "@keymanapp/common-types";
 
 import LayoutFormFactorSpec = TouchLayout.TouchLayoutPlatform;
 import LayoutLayerBase = TouchLayout.TouchLayoutLayer;
@@ -349,31 +349,29 @@ export class Layouts {
    * Description  Get name of layer from code, where the modifer order is determined by ascending bit-flag value.
    */
   static getLayerId(m: number): string {
-    let modifierCodes = Codes.modifierCodes;
-
     var s='';
     if(m == 0) {
       return 'default';
     } else {
-      if(m & modifierCodes['LCTRL']) {
+      if(m & ModifierKeyConstants.LCTRLFLAG) {
         s = (s.length > 0 ? s + '-' : '') + 'leftctrl';
       }
-      if(m & modifierCodes['RCTRL']) {
+      if(m & ModifierKeyConstants.RCTRLFLAG) {
         s = (s.length > 0 ? s + '-' : '') + 'rightctrl';
       }
-      if(m & modifierCodes['LALT']) {
+      if(m & ModifierKeyConstants.LALTFLAG) {
         s = (s.length > 0 ? s + '-' : '') + 'leftalt';
       }
-      if(m & modifierCodes['RALT']) {
+      if(m & ModifierKeyConstants.RALTFLAG) {
         s = (s.length > 0 ? s + '-' : '') + 'rightalt';
       }
-      if(m & modifierCodes['SHIFT']) {
+      if(m & ModifierKeyConstants.K_SHIFTFLAG) {
         s = (s.length > 0 ? s + '-' : '') + 'shift';
       }
-      if(m & modifierCodes['CTRL']) {
+      if(m & ModifierKeyConstants.K_CTRLFLAG) {
         s = (s.length > 0 ? s + '-' : '') + 'ctrl';
       }
-      if(m & modifierCodes['ALT']) {
+      if(m & ModifierKeyConstants.K_ALTFLAG) {
         s = (s.length > 0 ? s + '-' : '') + 'alt';
       }
       return s;

@@ -412,7 +412,7 @@ export function WriteCompiledKeyboard(
   if((fk.flags & KMX.KMXFile.KF_AUTOMATICVERSION) == KMX.KMXFile.KF_AUTOMATICVERSION) {
     // Note: the KeymanWeb compiler is responsible for reporting minimum
     // version for the web targets
-    callbacks.reportMessage(KmwCompilerMessages.Info_MinimumEngineVersion({version:minVer}));
+    callbacks.reportMessage(KmwCompilerMessages.Info_MinimumWebEngineVersion({version:minVer}));
   }
 
   return resultPrefix + resultMinVer + result;

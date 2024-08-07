@@ -6,6 +6,7 @@
 //#region Imports
 
 import { type DeviceSpec } from "@keymanapp/web-utils";
+import { ModifierKeyConstants } from '@keymanapp/common-types';
 
 import Codes from "./codes.js";
 import type KeyEvent from "./keyEvent.js";
@@ -552,8 +553,8 @@ export default class KeyboardInterface extends KeyboardHarness {
    * @returns
    */
   private static matchModifiersToRuleChirality(eventModifiers: number, targetModifierMask: number): number {
-    const CHIRAL_ALT  = Codes.modifierCodes["LALT"]  | Codes.modifierCodes["RALT"];
-    const CHIRAL_CTRL = Codes.modifierCodes["LCTRL"] | Codes.modifierCodes["RCTRL"];
+    const CHIRAL_ALT  = ModifierKeyConstants.LALTFLAG  | ModifierKeyConstants.RALTFLAG;
+    const CHIRAL_CTRL = ModifierKeyConstants.LCTRLFLAG | ModifierKeyConstants.RCTRLFLAG;
 
     let modifiers = eventModifiers;
 
@@ -563,7 +564,7 @@ export default class KeyboardInterface extends KeyboardHarness {
 
       if(altIntersection) {
         // Undo the chiral part         and replace with non-chiral.
-        modifiers ^= altIntersection  | Codes.modifierCodes["ALT"];
+        modifiers ^= altIntersection  | ModifierKeyConstants.K_ALTFLAG;
       }
     }
 
@@ -573,7 +574,7 @@ export default class KeyboardInterface extends KeyboardHarness {
 
       if(ctrlIntersection) {
         // Undo the chiral part         and replace with non-chiral.
-        modifiers ^= ctrlIntersection | Codes.modifierCodes["CTRL"];
+        modifiers ^= ctrlIntersection | ModifierKeyConstants.K_CTRLFLAG;
       }
     }
 
@@ -939,7 +940,7 @@ export default class KeyboardInterface extends KeyboardHarness {
       // Denote the changed store as part of the matched rule's behavior.
       this.ruleBehavior.setStore[systemId] = strValue;
       return true;
-    } 
+    }
     return false;
   }
 
