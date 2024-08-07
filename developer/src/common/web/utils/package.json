@@ -9,13 +9,14 @@
     "/build/"
   ],
   "dependencies": {
-    "@sentry/node": "^7.57.0"
+    "@sentry/node": "^7.57.0",
+    "restructure": "^3.0.1"
   },
   "devDependencies": {
     "@types/node": "^20.4.1",
-    "typescript": "^5.4.5",
     "c8": "^7.12.0",
-    "mocha": "^8.4.0"
+    "mocha": "^8.4.0",
+    "typescript": "^5.4.5"
   },
   "scripts": {
     "build": "tsc -b"

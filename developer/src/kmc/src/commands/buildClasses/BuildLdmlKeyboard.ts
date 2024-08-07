@@ -1,5 +1,6 @@
 import * as kmcLdml from '@keymanapp/kmc-ldml';
-import { CompilerCallbacks, LDMLKeyboardXMLSourceFileReader, CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
+import { CompilerCallbacks, CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
+import { LDMLKeyboardXMLSourceFileReader } from '@keymanapp/developer-utils';
 import { BuildActivity } from './BuildActivity.js';
 import { fileURLToPath } from 'url';
 

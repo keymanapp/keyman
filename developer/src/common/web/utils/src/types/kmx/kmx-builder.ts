@@ -1,7 +1,17 @@
+import { KMXPlus, KMX } from '@keymanapp/common-types';
 import * as r from 'restructure';
-import { KMXFile, GROUP, KEY, STORE, BUILDER_COMP_KEYBOARD, BUILDER_COMP_KEYBOARD_KMXPLUSINFO, BUILDER_COMP_STORE, BUILDER_COMP_GROUP, BUILDER_COMP_KEY } from './kmx.js';
-import { KMXPlusFile } from './kmx-plus.js';
 import KMXPlusBuilder from './kmx-plus-builder/kmx-plus-builder.js';
+
+import KMXPlusFile = KMXPlus.KMXPlusFile;
+import KMXFile = KMX.KMXFile;
+import GROUP = KMX.GROUP;
+import KEY = KMX.KEY;
+import STORE = KMX.STORE;
+import BUILDER_COMP_KEYBOARD = KMX.BUILDER_COMP_KEYBOARD;
+import BUILDER_COMP_KEYBOARD_KMXPLUSINFO = KMX.BUILDER_COMP_KEYBOARD_KMXPLUSINFO;
+import BUILDER_COMP_STORE = KMX.BUILDER_COMP_STORE;
+import BUILDER_COMP_GROUP = KMX.BUILDER_COMP_GROUP;
+import BUILDER_COMP_KEY = KMX.BUILDER_COMP_KEY;
 
 export default class KMXBuilder {
   file: KMXFile;
@@ -69,8 +79,8 @@ export default class KMXBuilder {
     this.comp_header.dpStoreArray = this.comp_header.cxStoreArray ? size : 0;
     let storeBase = size;
     size += this.file.keyboard.stores.length * KMXFile.COMP_STORE_SIZE;
-    for(let store of this.file.keyboard.stores) {
-      let comp_store: BUILDER_COMP_STORE = {
+    for(const store of this.file.keyboard.stores) {
+      const comp_store: BUILDER_COMP_STORE = {
         dwSystemID: store.dwSystemID,
         dpName: 0,
         dpString: 0
@@ -90,8 +100,8 @@ export default class KMXBuilder {
     this.comp_header.dpGroupArray = this.comp_header.cxGroupArray ? size : 0;
     let groupBase = size;
     size += this.file.keyboard.groups.length * KMXFile.COMP_GROUP_SIZE;
-    for(let group of this.file.keyboard.groups) {
-      let comp_group: BUILDER_COMP_GROUP = {
+    for(const group of this.file.keyboard.groups) {
+      const comp_group: BUILDER_COMP_GROUP = {
         dpName: 0,
         dpKeyArray: 0,
         dpMatch: 0,
@@ -100,7 +110,7 @@ export default class KMXBuilder {
         fUsingKeys: group.fUsingKeys ? 1 : 0
       };
 
-      let comp_keys: {base: number, key: KEY, obj: BUILDER_COMP_KEY}[] = [];
+      const comp_keys: {base: number, key: KEY, obj: BUILDER_COMP_KEY}[] = [];
 
       this.comp_groups.push({base: groupBase, group: group, obj: comp_group, keys: comp_keys});
 
@@ -116,8 +126,8 @@ export default class KMXBuilder {
 
       let keyBase = size;
       size += group.keys.length * KMXFile.COMP_KEY_SIZE;
-      for(let key of group.keys) {
-        let comp_key: BUILDER_COMP_KEY = {
+      for(const key of group.keys) {
+        const comp_key: BUILDER_COMP_KEY = {
           Key: key.Key,
           _padding: 0,
           Line: key.Line,
@@ -164,11 +174,11 @@ export default class KMXBuilder {
     if(requireString && !str.length) {
       // Just write zero terminator, as r.String for a zero-length string
       // seems to fail.
-      let sbuf = r.uint16le;
+      const sbuf = r.uint16le;
       file.set(sbuf.toBuffer(0), pos);
     }
     else if(pos && str.length) {
-      let sbuf = new r.String(null, 'utf16le'); // null-terminated string
+      const sbuf = new r.String(null, 'utf16le'); // null-terminated string
       file.set(sbuf.toBuffer(str), pos);
     }
   }
@@ -176,7 +186,7 @@ export default class KMXBuilder {
   compile(): Uint8Array {
     const fileSize = this.build();
 
-    let file: Uint8Array = new Uint8Array(fileSize);
+    const file: Uint8Array = new Uint8Array(fileSize);
 
     // Write headers
 
@@ -190,7 +200,7 @@ export default class KMXBuilder {
 
     // Write store array and data
 
-    for(let store of this.comp_stores) {
+    for(const store of this.comp_stores) {
       file.set(this.file.COMP_STORE.toBuffer(store.obj), store.base);
       if(this.writeDebug) {
         this.setString(file, store.obj.dpName, store.store.dpName);
@@ -200,7 +210,7 @@ export default class KMXBuilder {
 
     // Write group array and data
 
-    for(let group of this.comp_groups) {
+    for(const group of this.comp_groups) {
       file.set(this.file.COMP_GROUP.toBuffer(group.obj), group.base);
       if(this.writeDebug) {
         this.setString(file, group.obj.dpName, group.group.dpName);
@@ -208,7 +218,7 @@ export default class KMXBuilder {
       this.setString(file, group.obj.dpMatch, group.group.dpMatch);
       this.setString(file, group.obj.dpNoMatch, group.group.dpNoMatch);
 
-      for(let key of group.keys) {
+      for(const key of group.keys) {
         file.set(this.file.COMP_KEY.toBuffer(key.obj), key.base);
         // for back-compat reasons, these are never NULL strings
         this.setString(file, key.obj.dpContext, key.key.dpContext, true);

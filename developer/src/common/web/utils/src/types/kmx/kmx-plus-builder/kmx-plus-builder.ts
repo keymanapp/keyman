@@ -1,5 +1,5 @@
 import * as r from 'restructure';
-import { KMXPlusFile } from "../kmx-plus.js";
+import { KMXPlus } from "@keymanapp/common-types";
 import { constants, SectionIdent } from '@keymanapp/ldml-keyboard-constants';
 import { BUILDER_SECTION } from './builder-section.js';
 import { BUILDER_SECT, build_sect } from './build-sect.js';
@@ -14,6 +14,8 @@ import { BUILDER_STRS, build_strs } from './build-strs.js';
 import { BUILDER_TRAN, build_tran } from './build-tran.js';
 import { BUILDER_USET, build_uset } from './build-uset.js';
 import { BUILDER_VARS, build_vars } from './build-vars.js';
+
+import KMXPlusFile = KMXPlus.KMXPlusFile;
 
 type BUILDER_BKSP = BUILDER_TRAN;
 // type BUILDER_FINL = BUILDER_TRAN;
@@ -50,7 +52,7 @@ export default class KMXPlusBuilder {
 
   public compile(): Uint8Array {
     const fileSize = this.build();
-    let file: Uint8Array = new Uint8Array(fileSize);
+    const file: Uint8Array = new Uint8Array(fileSize);
 
     this.emitSection(file, this.file.COMP_PLUS_SECT, this.sect.sect);
     // Keep the rest of these in order.
@@ -155,13 +157,13 @@ export default class KMXPlusBuilder {
   }
 
   private emitStrings(file: Uint8Array) {
-    for(let item of this.sect.strs.items) {
+    for(const item of this.sect.strs.items) {
       if(item._value === '') {
         // We have a special case for the zero-length string
-        let sbuf = r.uint16le;
+        const sbuf = r.uint16le;
         file.set(sbuf.toBuffer(0), item.offset + this.sect.strs._offset);
       } else {
-        let sbuf = new r.String(null, 'utf16le');
+        const sbuf = new r.String(null, 'utf16le');
         file.set(sbuf.toBuffer(item._value), item.offset + this.sect.strs._offset);
       }
     }
@@ -169,9 +171,9 @@ export default class KMXPlusBuilder {
 
   private emitElements(file: Uint8Array) {
     if(this.sect.elem) {
-      for(let str of this.sect.elem.strings) {
+      for(const str of this.sect.elem.strings) {
         if(str.items.length > 0) {
-          let COMP_PLUS_ELEM_ELEMENTS = new r.Array(this.file.COMP_PLUS_ELEM_ELEMENT, str.items.length);
+          const COMP_PLUS_ELEM_ELEMENTS = new r.Array(this.file.COMP_PLUS_ELEM_ELEMENT, str.items.length);
           file.set(COMP_PLUS_ELEM_ELEMENTS.toBuffer(str.items), str.offset + this.sect.elem._offset);
         }
       }

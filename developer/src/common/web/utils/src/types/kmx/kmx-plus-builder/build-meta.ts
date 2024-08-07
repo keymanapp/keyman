@@ -4,9 +4,11 @@
    ------------------------------------------------------------------ */
 
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { KMXPlusData } from "../kmx-plus.js";
+import { KMXPlus } from "@keymanapp/common-types";
 import { build_strs_index, BUILDER_STR_REF, BUILDER_STRS } from "./build-strs.js";
 import { BUILDER_SECTION } from "./builder-section.js";
+
+import KMXPlusData = KMXPlus.KMXPlusData;
 
 /**
  * Builder for the 'meta' section

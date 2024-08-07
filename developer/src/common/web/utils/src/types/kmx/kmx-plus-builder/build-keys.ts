@@ -1,9 +1,13 @@
 
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { KeysFlick, KMXPlusData, StrsItem } from "../kmx-plus.js";
+import { KMXPlus } from "@keymanapp/common-types";
 import { build_strs_index, BUILDER_STR_REF, BUILDER_STRS } from "./build-strs.js";
 import { build_list_index, BUILDER_LIST, BUILDER_LIST_REF } from "./build-list.js";
 import { BUILDER_SECTION, BUILDER_U32CHAR } from "./builder-section.js";
+
+import KeysFlick = KMXPlus.KeysFlick;
+import KMXPlusData = KMXPlus.KMXPlusData;
+import StrsItem = KMXPlus.StrsItem;
 
 /* ------------------------------------------------------------------
  * keys section
@@ -71,7 +75,7 @@ export function build_keys(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
     return null;
   }
 
-  let keys: BUILDER_KEYS = {
+  const keys: BUILDER_KEYS = {
     ident: constants.hex_section_id(constants.section.keys),
     size: 0,
     keyCount: kmxplus.keys.keys.length,
@@ -89,7 +93,7 @@ export function build_keys(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
 
   // Note that per the Keys class and spec, there is always a flicks=0 meaning 'no flicks'
   keys.flicks = kmxplus.keys.flicks.map((flicks) => {
-    let result : BUILDER_KEYS_FLICKS = {
+    const result : BUILDER_KEYS_FLICKS = {
       count: flicks.flicks.length,
       flick: keys.flick.length, // index of first flick
       id: build_strs_index(sect_strs, flicks.id),
@@ -113,7 +117,7 @@ export function build_keys(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
 
   // now, keys
   keys.keys = kmxplus.keys.keys.map((key) => {
-    let result : BUILDER_KEYS_KEY = {
+    const result : BUILDER_KEYS_KEY = {
       to: build_strs_index(sect_strs, key.to),
       flags: key.flags,
       id: build_strs_index(sect_strs, key.id),
@@ -136,7 +140,7 @@ export function build_keys(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
 
   // finally, kmap
   keys.kmap = kmxplus.keys.kmap.map(({vkey, mod, key}) => {
-    let result : BUILDER_KEYS_KMAP = {
+    const result : BUILDER_KEYS_KMAP = {
       vkey,
       mod,
       key: keys.keys.findIndex(k => k._id === key),
@@ -160,7 +164,7 @@ export function build_keys(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS, sect_l
     return rc;
   });
 
-  let offset = constants.length_keys +
+  const offset = constants.length_keys +
     (constants.length_keys_key * keys.keyCount) +
     (constants.length_keys_flick_element * keys.flickCount) +
     (constants.length_keys_flick_list * keys.flicksCount) +

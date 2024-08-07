@@ -1,9 +1,10 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { ElementString } from "../element-string.js";
-import { Elem } from "../kmx-plus.js";
+import { KMXPlus, ElementString } from "@keymanapp/common-types";
 import { build_strs_index, BUILDER_STR_REF, BUILDER_STRS } from "./build-strs.js";
 import { BUILDER_SECTION, BUILDER_U32CHAR } from "./builder-section.js";
 import { build_uset_index, BUILDER_USET, BUILDER_USET_REF } from "./build-uset.js";
+
+import Elem = KMXPlus.Elem;
 
 /* ------------------------------------------------------------------
  * elem section
@@ -46,7 +47,7 @@ function binaryElemCompare(a: BUILDER_ELEM_STRING, b: BUILDER_ELEM_STRING): numb
 }
 
 export function build_elem(source_elem: Elem, sect_strs: BUILDER_STRS, sect_uset: BUILDER_USET): BUILDER_ELEM {
-  let result: BUILDER_ELEM = {
+  const result: BUILDER_ELEM = {
     ident: constants.hex_section_id(constants.section.elem),
     size: 0,  // finalized below
     _offset: 0,
@@ -55,7 +56,7 @@ export function build_elem(source_elem: Elem, sect_strs: BUILDER_STRS, sect_uset
   };
 
   result.strings = source_elem.strings.map(item => {
-    let res: BUILDER_ELEM_STRING = {
+    const res: BUILDER_ELEM_STRING = {
       offset: 0, // finalized below
       length: item.length,
       items: [],
@@ -87,7 +88,7 @@ export function build_elem(source_elem: Elem, sect_strs: BUILDER_STRS, sect_uset
   /* Calculate offsets and total size */
 
   let offset = constants.length_elem + constants.length_elem_item * result.count;
-  for(let item of result.strings) {
+  for(const item of result.strings) {
     if (item.length === 0) {
       // no length gets a zero offset
       item.offset = 0;

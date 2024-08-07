@@ -1,20 +1,12 @@
 export * as KMX from './kmx/kmx.js';
-export * as KMXPlus from './kmx/kmx-plus.js';
-export { default as KMXBuilder } from './kmx/kmx-builder.js';
 export { KmxFileReader, KmxFileReaderError } from './kmx/kmx-file-reader.js';
 export * as KeymanTargets from './kmx/keyman-targets.js';
 
 export * as VisualKeyboard from './kvk/visual-keyboard.js';
-export { default as KMXPlusBuilder}  from './kmx/kmx-plus-builder/kmx-plus-builder.js';
 export { default as KvkFileReader } from './kvk/kvk-file-reader.js';
 export { default as KvkFileWriter } from './kvk/kvk-file-writer.js';
 export * as KvkFile from './kvk/kvk-file.js';
 
-export * as LDMLKeyboard from './ldml-keyboard/ldml-keyboard-xml.js';
-export { LDMLKeyboardTestDataXMLSourceFile } from './ldml-keyboard/ldml-keyboard-testdata-xml.js';
-export { UnicodeSetParser, UnicodeSet } from './ldml-keyboard/unicodeset-parser-api.js';
-export { VariableParser, MarkerParser } from './ldml-keyboard/pattern-parser.js';
-export { LDMLKeyboardXMLSourceFileReader, LDMLKeyboardXMLSourceFileReaderOptions } from './ldml-keyboard/ldml-keyboard-xml-reader.js';
 
 export { USVirtualKeyCodes } from './consts/virtual-key-constants.js';
 export * as Constants from './consts/virtual-key-constants.js';
@@ -36,6 +28,7 @@ export { defaultCompilerOptions, CompilerBaseOptions, CompilerCallbacks, Compile
          KeymanCompiler
 
          } from './util/compiler-interfaces.js';
+
 export { CommonTypesMessages } from './util/common-events.js';
 
 export * as TouchLayout from './keyman-touch-layout/keyman-touch-layout-file.js';
@@ -51,3 +44,9 @@ export * as Schemas from './schemas.js';
 export * as SchemaValidators from './schema-validators.js';
 
 export * as xml2js from './deps/xml2js/xml2js.js';
+
+export * as KMXPlus from './kmx/kmx-plus/kmx-plus.js';
+// TODO: these exports are really not well named
+export { UnicodeSetParser, UnicodeSet } from './ldml-keyboard/unicodeset-parser-api.js';
+export { VariableParser, MarkerParser } from './ldml-keyboard/pattern-parser.js';
+export { ElementString } from './kmx/kmx-plus/element-string.js';

@@ -2,7 +2,7 @@ import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { assert } from 'chai';
 import 'mocha';
 import { testTestdataReaderCases } from '../helpers/reader-callback-test.js';
-import { LKTAnyAction } from './ldml-keyboard-testdata-xml.js';
+import { LKTAnyAction } from '../../src/types/ldml-keyboard/ldml-keyboard-testdata-xml.js';
 
 describe('ldml keyboard xml reader tests', function () {
   this.slow(500); // 0.5 sec -- json schema validation takes a while

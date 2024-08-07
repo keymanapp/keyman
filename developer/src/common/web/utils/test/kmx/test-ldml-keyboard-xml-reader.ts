@@ -1,9 +1,13 @@
-import { LKKey, ImportStatus } from './../../src/ldml-keyboard/ldml-keyboard-xml.js';
+import { LKKey, ImportStatus } from '../../src/types/ldml-keyboard/ldml-keyboard-xml.js';
 import 'mocha';
 import {assert} from 'chai';
-import { CommonTypesMessages } from '../../src/util/common-events.js';
+import { CommonTypesMessages } from '@keymanapp/common-types';
 import { testReaderCases } from '../helpers/reader-callback-test.js';
-import { CLDRScanToVkey, CLDRScanToKeyMap, USVirtualKeyCodes } from '../../src/consts/virtual-key-constants.js';
+import { Constants } from '@keymanapp/common-types';
+
+import CLDRScanToVkey = Constants.CLDRScanToVkey;
+import CLDRScanToKeyMap = Constants.CLDRScanToKeyMap;
+import USVirtualKeyCodes = Constants.USVirtualKeyCodes;
 
 function pluckKeysFromKeybag(keys: LKKey[], ids: string[]) {
   return keys.filter(({id}) => ids.indexOf(id) !== -1);
