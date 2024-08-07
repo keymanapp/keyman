@@ -1,5 +1,5 @@
 import { KmnCompilerMessages } from "../compiler/kmn-compiler-messages.js";
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageDef as def, CompilerMessageSpec } from "@keymanapp/common-types";
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageDef as def, CompilerMessageSpec } from "@keymanapp/developer-utils";
 import { kmnfile } from "./compiler-globals.js";
 
 const Namespace = CompilerErrorNamespace.KmwCompiler;

@@ -1,4 +1,4 @@
-import { CompilerError, CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, CompilerMessageSpecWithException } from "@keymanapp/common-types";
+import { CompilerError, CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, CompilerMessageSpecWithException } from "@keymanapp/developer-utils";
 
 const Namespace = CompilerErrorNamespace.Infrastructure;
 const SevInfo = CompilerErrorSeverity.Info | Namespace;

@@ -1,8 +1,9 @@
-import { xml2js } from '@keymanapp/common-types';
+import { xml2js } from '@keymanapp/developer-utils';
 import JSZip from 'jszip';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
-import { KmpJsonFile, KpsFile, SchemaValidators, CompilerCallbacks, KeymanFileTypes, KvkFile, KeymanCompiler, CompilerOptions, KeymanCompilerResult, KeymanCompilerArtifacts, KeymanCompilerArtifact } from '@keymanapp/common-types';
+import { KmpJsonFile, SchemaValidators, KeymanFileTypes, KvkFile } from '@keymanapp/common-types';
+import { CompilerCallbacks, KpsFile, KeymanCompiler, CompilerOptions, KeymanCompilerResult, KeymanCompilerArtifacts, KeymanCompilerArtifact } from '@keymanapp/developer-utils';
 import { PackageCompilerMessages } from './package-compiler-messages.js';
 import { PackageMetadataCollector } from './package-metadata-collector.js';
 import { KmpInfWriter } from './kmp-inf-writer.js';
