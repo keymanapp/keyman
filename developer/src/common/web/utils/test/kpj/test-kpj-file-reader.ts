@@ -2,9 +2,9 @@ import * as fs from 'fs';
 import 'mocha';
 import {assert} from 'chai';
 import { makePathToFixture } from '../helpers/index.js';
-import { KPJFileReader } from "../../src/kpj/kpj-file-reader.js";
-import { KeymanDeveloperProjectFile10, KeymanDeveloperProjectType } from '../../src/kpj/keyman-developer-project.js';
-import { TestCompilerCallbacks } from '../helpers/TestCompilerCallbacks.js';
+import { KPJFileReader } from "../../src/types/kpj/kpj-file-reader.js";
+import { KeymanDeveloperProjectFile10, KeymanDeveloperProjectType } from '../../src/types/kpj/keyman-developer-project.js';
+import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 
 const callbacks = new TestCompilerCallbacks();
 
