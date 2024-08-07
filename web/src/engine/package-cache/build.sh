@@ -14,8 +14,6 @@ SUBPROJECT_NAME=engine/package-cache
 
 builder_describe "Builds Keyman Engine modules for keyboard cloud-querying & caching + model caching." \
   "@/common/web/es-bundling" \
-  "@/common/web/input-processor build" \
-  "@/web/src/engine/paths" \
   "clean" \
   "configure" \
   "build" \

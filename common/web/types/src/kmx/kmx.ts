@@ -1,4 +1,5 @@
 import * as r from 'restructure';
+import { ModifierKeyConstants } from '../consts/modifier-key-constants.js';
 
 /* Definitions from kmx_file.h. Must be kept in sync */
 
@@ -343,25 +344,25 @@ export class KMXFile {
   public static readonly HK_CTRL =     0x00020000;
   public static readonly HK_SHIFT =    0x00040000;
 
-  public static readonly LCTRLFLAG =   0x0001;    // Left Control flag
-  public static readonly RCTRLFLAG =   0x0002;    // Right Control flag
-  public static readonly LALTFLAG =    0x0004;    // Left Alt flag
-  public static readonly RALTFLAG =    0x0008;    // Right Alt flag
-  public static readonly K_SHIFTFLAG = 0x0010;    // Either shift flag
-  public static readonly K_CTRLFLAG =  0x0020;    // Either ctrl flag
-  public static readonly K_ALTFLAG =   0x0040;    // Either alt flag
+  public static readonly LCTRLFLAG      = ModifierKeyConstants.LCTRLFLAG;      // Left Control flag
+  public static readonly RCTRLFLAG      = ModifierKeyConstants.RCTRLFLAG;      // Right Control flag
+  public static readonly LALTFLAG       = ModifierKeyConstants.LALTFLAG;       // Left Alt flag
+  public static readonly RALTFLAG       = ModifierKeyConstants.RALTFLAG;       // Right Alt flag
+  public static readonly K_SHIFTFLAG    = ModifierKeyConstants.K_SHIFTFLAG;    // Either shift flag
+  public static readonly K_CTRLFLAG     = ModifierKeyConstants.K_CTRLFLAG;     // Either ctrl flag
+  public static readonly K_ALTFLAG      = ModifierKeyConstants.K_ALTFLAG;      // Either alt flag
   //public static readonly K_METAFLAG =  0x0080;    // Either Meta-key flag (tentative).  Not usable in keyboard rules;
                                   // Used internally (currently, only by KMW) to ensure Meta-key
                                   // shortcuts safely bypass rules
                                   // Meta key = Command key on macOS, Windows key on Windows
-  public static readonly CAPITALFLAG    = 0x0100;    // Caps lock on
-  public static readonly NOTCAPITALFLAG = 0x0200;    // Caps lock NOT on
-  public static readonly NUMLOCKFLAG    = 0x0400;    // Num lock on
-  public static readonly NOTNUMLOCKFLAG = 0x0800;    // Num lock NOT on
-  public static readonly SCROLLFLAG     = 0x1000;    // Scroll lock on
-  public static readonly NOTSCROLLFLAG  = 0x2000;    // Scroll lock NOT on
-  public static readonly ISVIRTUALKEY   = 0x4000;    // It is a Virtual Key Sequence
-  public static readonly VIRTUALCHARKEY = 0x8000;    // Keyman 6.0: Virtual Key Cap Sequence NOT YET
+  public static readonly CAPITALFLAG    = ModifierKeyConstants.CAPITALFLAG;    // Caps lock on
+  public static readonly NOTCAPITALFLAG = ModifierKeyConstants.NOTCAPITALFLAG; // Caps lock NOT on
+  public static readonly NUMLOCKFLAG    = ModifierKeyConstants.NUMLOCKFLAG;    // Num lock on
+  public static readonly NOTNUMLOCKFLAG = ModifierKeyConstants.NOTNUMLOCKFLAG; // Num lock NOT on
+  public static readonly SCROLLFLAG     = ModifierKeyConstants.SCROLLFLAG;     // Scroll lock on
+  public static readonly NOTSCROLLFLAG  = ModifierKeyConstants.NOTSCROLLFLAG;  // Scroll lock NOT on
+  public static readonly ISVIRTUALKEY   = ModifierKeyConstants.ISVIRTUALKEY;   // It is a Virtual Key Sequence
+  public static readonly VIRTUALCHARKEY = ModifierKeyConstants.VIRTUALCHARKEY; // Keyman 6.0: Virtual Key Cap Sequence NOT YET
 
   // Note: OTHER_MODIFIER = 0x10000, used by KMX+ for the
   // other modifier flag in layers, > 16 bit so not available here.

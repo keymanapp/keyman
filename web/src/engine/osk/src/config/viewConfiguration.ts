@@ -1,4 +1,4 @@
-import { type PredictionContext } from "@keymanapp/input-processor";
+import { type PredictionContext } from 'keyman/engine/interfaces';
 import type Activator from "../views/activator.js";
 import CommonConfiguration from "./commonConfiguration.js";
 

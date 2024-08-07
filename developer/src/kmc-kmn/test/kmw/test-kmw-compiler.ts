@@ -87,10 +87,9 @@ describe('KeymanWeb Compiler', function() {
 
     let result = await kmnCompiler.run(filenames.source, null);
     assert.isNotNull(result);
-    assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumEngineVersion));
-    // The min version message from the .kmn compiler is generic 208A INFO_Info;
+    assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumWebEngineVersion));
     // we expect only 1 of the info messages -- for the .kmx target (not 2)
-    assert.equal(callbacks.messages.filter(item => item.code == KmnCompilerMessages.INFO_Info).length, 1);
+    assert.equal(callbacks.messages.filter(item => item.code == KmnCompilerMessages.INFO_MinimumCoreEngineVersion).length, 1);
 
     const data = new TextDecoder('utf-8').decode(result.artifacts.js.data);
     assert.match(data, /KMINVER="15.0"/, `Could not find expected 'KMINVER="15.0"'`);
@@ -101,9 +100,8 @@ describe('KeymanWeb Compiler', function() {
 
     let result = await kmnCompiler.run(filenames.source, null);
     assert.isNull(result);
-    // The min version message from the .kmn compiler is generic 208A INFO_Info
-    assert.isFalse(callbacks.hasMessage(KmnCompilerMessages.INFO_Info));
-    assert.isFalse(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumEngineVersion));
+    assert.isFalse(callbacks.hasMessage(KmnCompilerMessages.INFO_MinimumCoreEngineVersion));
+    assert.isFalse(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumWebEngineVersion));
     assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.ERROR_TouchLayoutIdentifierRequires15));
   });
 
@@ -113,9 +111,8 @@ describe('KeymanWeb Compiler', function() {
 
       let result = await kmnCompiler.run(filenames.source, null);
       assert.isNotNull(result); // only a warning, so output is generated
-      // The min version message from the .kmn compiler is generic 208A INFO_Info
-      assert.isFalse(callbacks.hasMessage(KmnCompilerMessages.INFO_Info));
-      assert.isFalse(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumEngineVersion));
+      assert.isFalse(callbacks.hasMessage(KmnCompilerMessages.INFO_MinimumCoreEngineVersion));
+      assert.isFalse(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumWebEngineVersion));
       assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.WARN_ExtendedShiftFlagsNotSupportedInKeymanWeb));
     });
 
@@ -125,10 +122,9 @@ describe('KeymanWeb Compiler', function() {
       let result = await kmnCompiler.run(filenames.source, null);
       assert.isNotNull(result);
 
-      // The min version message from the .kmn compiler is generic 208A INFO_Info;
       // we expect only 1 of the info messages -- for the .kmx target (not 2)
-      assert.equal(callbacks.messages.filter(item => item.code == KmnCompilerMessages.INFO_Info).length, 1);
-      assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumEngineVersion));
+      assert.equal(callbacks.messages.filter(item => item.code == KmnCompilerMessages.INFO_MinimumCoreEngineVersion).length, 1);
+      assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumWebEngineVersion));
       assert.isFalse(callbacks.hasMessage(KmwCompilerMessages.WARN_ExtendedShiftFlagsNotSupportedInKeymanWeb));
 
       const data = new TextDecoder('utf-8').decode(result.artifacts.js.data);
@@ -142,10 +138,9 @@ describe('KeymanWeb Compiler', function() {
 
     let result = await kmnCompiler.run(filenames.source, null);
     assert.isNotNull(result);
-    assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumEngineVersion));
-    // The min version message from the .kmn compiler is generic 208A INFO_Info;
+    assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumWebEngineVersion));
     // we expect only 1 of the info messages -- for the .kmx target (not 2)
-    assert.equal(callbacks.messages.filter(item => item.code == KmnCompilerMessages.INFO_Info).length, 1);
+    assert.equal(callbacks.messages.filter(item => item.code == KmnCompilerMessages.INFO_MinimumCoreEngineVersion).length, 1);
 
     const data = new TextDecoder('utf-8').decode(result.artifacts.js.data);
     assert.match(data, /KMINVER="14.0"/, `Could not find expected 'KMINVER="14.0"'`);
@@ -157,9 +152,8 @@ describe('KeymanWeb Compiler', function() {
 
     let result = await kmnCompiler.run(filenames.source, null);
     assert.isNull(result);
-    // The min version message from the .kmn compiler is generic 208A INFO_Info
-    assert.isFalse(callbacks.hasMessage(KmnCompilerMessages.INFO_Info));
-    assert.isFalse(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumEngineVersion));
+    assert.isFalse(callbacks.hasMessage(KmnCompilerMessages.INFO_MinimumCoreEngineVersion));
+    assert.isFalse(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumWebEngineVersion));
     assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.ERROR_140FeatureOnlyContextAndNotAnyWeb));
   });
 
@@ -168,10 +162,9 @@ describe('KeymanWeb Compiler', function() {
 
     let result = await kmnCompiler.run(filenames.source, null);
     assert.isNotNull(result);
-    assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumEngineVersion));
-    // The min version message from the .kmn compiler is generic 208A INFO_Info;
+    assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumWebEngineVersion));
     // we expect only 1 of the info messages -- for the .kmx target (not 2)
-    assert.equal(callbacks.messages.filter(item => item.code == KmnCompilerMessages.INFO_Info).length, 1);
+    assert.equal(callbacks.messages.filter(item => item.code == KmnCompilerMessages.INFO_MinimumCoreEngineVersion).length, 1);
 
     const data = new TextDecoder('utf-8').decode(result.artifacts.js.data);
     assert.match(data, /KMINVER="14.0"/, `Could not find expected 'KMINVER="14.0"'`);
@@ -182,9 +175,8 @@ describe('KeymanWeb Compiler', function() {
 
     let result = await kmnCompiler.run(filenames.source, null);
     assert.isNotNull(result);
-    // The min version message from the .kmn compiler is generic 208A INFO_Info
-    assert.isFalse(callbacks.hasMessage(KmnCompilerMessages.INFO_Info));
-    assert.isFalse(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumEngineVersion));
+    assert.isFalse(callbacks.hasMessage(KmnCompilerMessages.INFO_MinimumCoreEngineVersion));
+    assert.isFalse(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumWebEngineVersion));
     assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.WARN_TouchLayoutSpecialLabelOnNormalKey));
   });
 
@@ -193,10 +185,9 @@ describe('KeymanWeb Compiler', function() {
 
     let result = await kmnCompiler.run(filenames.source, null);
     assert.isNotNull(result);
-    assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumEngineVersion));
-    // The min version message from the .kmn compiler is generic 208A INFO_Info;
+    assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumWebEngineVersion));
     // we expect only 1 of the info messages -- for the .kmx target (not 2)
-    assert.equal(callbacks.messages.filter(item => item.code == KmnCompilerMessages.INFO_Info).length, 1);
+    assert.equal(callbacks.messages.filter(item => item.code == KmnCompilerMessages.INFO_MinimumCoreEngineVersion).length, 1);
 
     const data = new TextDecoder('utf-8').decode(result.artifacts.js.data);
     assert.match(data, /KMINVER="17.0"/, `Could not find expected 'KMINVER="17.0"'`);
@@ -207,9 +198,8 @@ describe('KeymanWeb Compiler', function() {
 
     let result = await kmnCompiler.run(filenames.source, null);
     assert.isNotNull(result);
-    // The min version message from the .kmn compiler is generic 208A INFO_Info
-    assert.isFalse(callbacks.hasMessage(KmnCompilerMessages.INFO_Info));
-    assert.isFalse(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumEngineVersion));
+    assert.isFalse(callbacks.hasMessage(KmnCompilerMessages.INFO_MinimumCoreEngineVersion));
+    assert.isFalse(callbacks.hasMessage(KmwCompilerMessages.INFO_MinimumWebEngineVersion));
     assert.isTrue(callbacks.hasMessage(KmwCompilerMessages.HINT_TouchLayoutUsesUnsupportedGesturesDownlevel));
   });
 

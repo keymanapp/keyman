@@ -4,9 +4,10 @@ import fs from 'fs';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { Codes, KeyboardInterface, MinimalKeymanGlobal } from '@keymanapp/keyboard-processor';
+import { KeyboardInterface, MinimalKeymanGlobal } from '@keymanapp/keyboard-processor';
 import { NodeKeyboardLoader } from '@keymanapp/keyboard-processor/node-keyboard-loader';
 import { KeyboardTest, NodeProctor } from '@keymanapp/recorder-core';
+import { ModifierKeyConstants } from '@keymanapp/common-types';
 
 describe('Engine - Chirality', function() {
   let testJSONtext = fs.readFileSync(require.resolve('@keymanapp/common-test-resources/json/engine_tests/chirality.json'));
@@ -53,14 +54,14 @@ describe('Engine - Chirality', function() {
   }
 
   describe("Chiral modifier mapping", function() {
-    let VIRTUAL_KEY_CODE = Codes.modifierCodes["VIRTUAL_KEY"];
-    let CTRL_CODE  = Codes.modifierCodes["CTRL"];
-    let LCTRL_CODE = Codes.modifierCodes["LCTRL"];
-    let RCTRL_CODE = Codes.modifierCodes["RCTRL"];
-    let ALT_CODE   = Codes.modifierCodes["ALT"];
-    let LALT_CODE  = Codes.modifierCodes["LALT"];
-    let RALT_CODE  = Codes.modifierCodes["RALT"];
-    let SHIFT_CODE = Codes.modifierCodes["SHIFT"];
+    let VIRTUAL_KEY_CODE = ModifierKeyConstants.VIRTUAL_KEYFLAG;
+    let CTRL_CODE  = ModifierKeyConstants.K_CTRLFLAG;
+    let LCTRL_CODE = ModifierKeyConstants.LCTRLFLAG;
+    let RCTRL_CODE = ModifierKeyConstants.RCTRLFLAG;
+    let ALT_CODE   = ModifierKeyConstants.K_ALTFLAG;
+    let LALT_CODE  = ModifierKeyConstants.LALTFLAG;
+    let RALT_CODE  = ModifierKeyConstants.RALTFLAG;
+    let SHIFT_CODE = ModifierKeyConstants.K_SHIFTFLAG;
 
     it("does not affect non-chiral KeyEvents - CTRL only", function() {
       let initialModifiers = VIRTUAL_KEY_CODE | CTRL_CODE;

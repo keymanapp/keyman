@@ -15,5 +15,7 @@
   ],
   "references": [
       { "path": "../" },
+      { "path": "../../common/web/test-helpers/" },
+      { "path": "../../kmc-package/" },
     ]
 }

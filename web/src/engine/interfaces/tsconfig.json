@@ -1,0 +1,17 @@
+{
+  // While the actual references themselves are headless, it compiles against the DOM-reliant OSK module.
+  "extends": "../../tsconfig.dom.json",
+
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "../../../build/engine/interfaces/obj/",
+    "tsBuildInfoFile": "../../../build/engine/interfaces/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src"
+  },
+
+  "include": [ "**/*.ts" ],
+
+  "references": [
+    { "path": "../../../../common/web/keyboard-processor" },
+  ]
+}

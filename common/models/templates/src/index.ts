@@ -3,5 +3,5 @@ export {
   transformToSuggestion, defaultApplyCasing
 } from "./common.js";
 export { default as QuoteBehavior } from "./quote-behavior.js";
-export { Tokenization, tokenize, getLastPreCaretToken, wordbreak } from "./tokenization.js";
+export { getLastPreCaretToken, Token, Tokenization, tokenize, wordbreak } from "./tokenization.js";
 export { default as TrieModel, TrieModelOptions } from "./trie-model.js";
