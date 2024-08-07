@@ -834,6 +834,7 @@ builder_describe() {
   _builder_deps=()                    # array of all dependencies for this script
   _builder_options_inheritable=()     # array of all options that should be passed to child scripts
   _builder_default_action=build
+  declare -A -g _builder_targets_excluded_by_platform=()
   declare -A -g _builder_params
   declare -A -g _builder_options_short
   declare -A -g _builder_options_var
@@ -1325,7 +1326,14 @@ _builder_parse_expanded_parameters() {
       # apply the selected action to all targets
       if [[ ! -z $target ]]; then
         # A target was specified but is not valid
-        _builder_parameter_error "$0" target "$target"
+        if builder_is_target_excluded_by_platform "$target"; then
+          builder_echo red "$0: Target $target is unavailable because it requires ${_builder_targets_excluded_by_platform[$target]}"
+          echo
+          builder_display_usage
+          exit 64
+        else
+          _builder_parameter_error "$0" target "$target"
+        fi
       fi
 
       for e in "${_builder_targets[@]}"; do
@@ -1392,7 +1400,17 @@ _builder_parse_expanded_parameters() {
           ;;
         *)
           # script does not recognize anything of action or target form at this point.
-          if builder_is_child_build; then
+          if [[ $key =~ ^: ]]; then
+            # This is an unsupported target
+            if builder_is_target_excluded_by_platform "$key"; then
+              builder_echo red "$0: Target $key is unavailable because it requires ${_builder_targets_excluded_by_platform[$key]}"
+              echo
+              builder_display_usage
+              exit 64
+            else
+              _builder_parameter_error "$0" target "$key"
+            fi
+          elif builder_is_child_build; then
             # For child builds, don't fail the build when pass inheritable
             # parameters (#11408)
             builder_echo_debug "Parameter '$key' is not supported, ignoring"
@@ -1519,6 +1537,19 @@ builder_display_usage() {
     fi
     _builder_pad $width "  $e" "$description"
   done
+
+  if [[ ${#_builder_targets_excluded_by_platform[@]} -gt 0 ]]; then
+    echo
+    echo "Unavailable Targets: "
+    for e in "${!_builder_targets_excluded_by_platform[@]}"; do
+      if [[ ! -z "${_builder_params[$e]+x}" ]]; then
+        description="${_builder_params[$e]}"
+      else
+        description=$(_builder_get_default_description "$e")
+      fi
+      _builder_pad $width "  $e" "$description (requires ${_builder_targets_excluded_by_platform[$e]})"
+    done
+  fi
 
   echo
   echo "Options: "
@@ -1892,6 +1923,118 @@ _builder_has_function_been_called() {
   fi
   return 1
 }
+
+################################################################################
+# Platform restrictions
+################################################################################
+
+# Describes the platforms for which a given target will be available, and
+# filters the list of targets accordingly, removing targets that cannot be built
+# on the current platform. Removed targets will be listed in a separate section
+# in the help documentation.
+#
+# Parameters: target platform[s] ...     Target and its list of corresponding
+#                                        platform(s)
+#
+# Multiple targets can be listed. Each target must be followed by a comma
+# separated list of platforms. The currently supported platforms are:
+#
+# Operating System platforms:
+#   win        Windows
+#   mac        macOS
+#   linux      Linux
+#
+# Development tooling platforms:
+#   delphi     (On Windows only, Delphi is installed)
+#
+builder_describe_platform() {
+
+  local builder_platforms=(linux mac win)
+  local builder_tools=(delphi)
+
+  # --- Detect platform ---
+
+  # Default value, since it's the most general case/configuration to detect.
+  local builder_platform=linux
+
+  # This is copied from build-utils.sh to avoid creating a dependency on it
+  if [[ $OSTYPE == darwin* ]]; then
+    builder_platform=mac
+  elif [[ $OSTYPE == msys ]]; then
+    builder_platform=win
+  elif [[ $OSTYPE == cygwin ]]; then
+    builder_platform=win
+  fi
+
+  # --- Detect tools ---
+
+  local builder_installed_tools=()
+
+  # Detect delphi compiler (see also delphi_environment.inc.sh)
+  if [[ $builder_platform == win ]]; then
+    local ProgramFilesx86="$(cygpath -w -F 42)"
+    if [[ -x "$(cygpath -u "$ProgramFilesx86\\Embarcadero\\Studio\\20.0\\bin\\dcc32.exe")" ]]; then
+      builder_installed_tools+=(delphi)
+    fi
+  fi
+
+  # For testing, we can override the current platform
+  if [[ ! -z "${BUILDER_PLATFORM_OVERRIDE+x}" ]]; then
+    builder_warn "BUILDER_PLATFORM_OVERRIDE variable found. Overriding detected platform '$builder_platform' with '$BUILDER_PLATFORM_OVERRIDE'"
+    builder_platform="$BUILDER_PLATFORM_OVERRIDE"
+  fi
+
+  # For testing, we can override the current tools
+  if [[ ! -z "${BUILDER_TOOLS_OVERRIDE+x}" ]]; then
+    builder_warn "BUILDER_TOOLS_OVERRIDE variable found. Overriding detected tools (${builder_installed_tools[@]}) with (${BUILDER_TOOLS_OVERRIDE[@]})"
+    builder_installed_tools=("${BUILDER_TOOLS_OVERRIDE[@]}")
+  fi
+
+  # --- Exclude targets depending on missing tools and platforms
+  while [[ $# -gt 1 ]]; do
+    local target="$1"
+    shift
+    local platforms platform
+    IFS="," read -r -a platforms <<< "$1"
+    shift
+
+    for platform in "${platforms[@]}"; do
+      if _builder_item_in_array "$platform" "${builder_platforms[@]}"; then
+        # Check operating system
+        if [[ "$platform" != "$builder_platform" ]]; then
+          _builder_targets_excluded_by_platform[$target]=$platform
+          _builder_targets=( ${_builder_targets[@]/$target} )
+        fi
+      elif _builder_item_in_array "$platform" "${builder_tools[@]}"; then
+        # Check installed tools
+        if ! _builder_item_in_array "$platform" "${builder_installed_tools[@]}"; then
+          _builder_targets_excluded_by_platform[$target]=$platform
+          _builder_targets=( ${_builder_targets[@]/$target} )
+        fi
+      else
+        builder_warn "Available platforms: ${builder_platforms[@]}"
+        builder_warn "Available tools: ${builder_tools[@]}"
+        builder_die "Invalid platform or tool specified for builder_describe_platforms: $platform"
+      fi
+    done
+  done
+}
+
+# Returns 0 if the specified target is excluded by platform requirements
+#
+# Parameters: target     Target to verify
+#
+builder_is_target_excluded_by_platform() {
+  local target="$1"
+  if [[ ! -z "${_builder_targets_excluded_by_platform[$target]+x}" ]]; then
+    return 0
+  fi
+  return 1
+}
+
+################################################################################
+# Final initialization
+################################################################################
 
 #
 # Initialize builder once all functions are declared
