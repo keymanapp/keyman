@@ -1,20 +1,19 @@
-import { WordBreakProperty } from "./data.js";
+import { WordBreakProperty, WORD_BREAK_PROPERTY_BMP, WORD_BREAK_PROPERTY_NON_BMP } from "./data.js";
 
 export function searchForProperty(codePoint: number): WordBreakProperty {
   const bucketSize = codePoint <= 0xFFFF ? 2 : 3;
 
   // SMP chars take a bit more space to encode.
-  // TODO:  encode the strings & import them here.
-  const encodedArray = bucketSize == 2 ? "" /* BMP string */ : "" /* non-BMP string */;
+  const encodedArray = bucketSize == 2 ? WORD_BREAK_PROPERTY_BMP : WORD_BREAK_PROPERTY_NON_BMP;
 
-  return _searchForProperty(encodedArray, codePoint, bucketSize, 0, encodedArray.length / bucketSize - 1);
+  return _searchForProperty(encodedArray, codePoint, bucketSize, 0, encodedArray.length / bucketSize - 1) - 0x20;
 }
 
 /**
  * Binary search for the word break property of a given CODE POINT.
  *
- * The auto-generated data.ts master array defines a **character range**
- * lookup table.  If a character's codepoint is equal to or greater than
+ * The auto-generated data.ts master strings encode **character range**
+ * lookup tables.  If a character's codepoint is equal to or greater than
  * the start-of-range value for an entry and exclusively less than the next
  * entry's start-of-range, it falls within the first entry's range bucket
  * and is classified accordingly by this method.
