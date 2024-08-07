@@ -6,8 +6,6 @@ function assert-equal() {
     message="$3: "
   fi
 
-  builder_echo "Testing: '$*'"
-
   if [[ "$actual" != "$expected" ]]; then
     builder_die "FAIL: ${message}expected actual '$actual' to equal expected '$expected'"
   else

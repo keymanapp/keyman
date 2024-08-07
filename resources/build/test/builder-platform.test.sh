@@ -30,7 +30,10 @@ builder_describe_platform \
   :delphi-project win,delphi
 
 assert-equal "${_builder_targets[*]}" ":linux-project" "_builder_targets"
-assert-equal "${!_builder_targets_excluded_by_platform[*]}" ":delphi-project :win-project :mac-project" "_builder_targets_excluded_by_platform"
+
+# seems bash associative array order is unstable? so sort array for test
+readarray -t btebp_sorted < <(printf '%s\n' "${!_builder_targets_excluded_by_platform[@]}" | sort)
+assert-equal "${btebp_sorted[*]}" ":delphi-project :mac-project :win-project" "_builder_targets_excluded_by_platform"
 
 # Test overrides with enable win, delphi
 
@@ -51,5 +54,8 @@ builder_describe_platform \
   :win-project win \
   :delphi-project win,delphi
 
-assert-equal "${_builder_targets[*]}" ":win-project :delphi-project" "_builder_targets"
-assert-equal "${!_builder_targets_excluded_by_platform[*]}" ":linux-project :mac-project" "_builder_targets_excluded_by_platform"
+readarray -t bt_sorted < <(printf '%s\n' "${_builder_targets[@]}" | sort)
+assert-equal "${bt_sorted[*]}" ":delphi-project :win-project" "_builder_targets"
+
+readarray -t btebp_sorted < <(printf '%s\n' "${!_builder_targets_excluded_by_platform[@]}" | sort)
+assert-equal "${btebp_sorted[*]}" ":linux-project :mac-project" "_builder_targets_excluded_by_platform"
