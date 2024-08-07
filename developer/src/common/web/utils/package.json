@@ -10,11 +10,18 @@
   ],
   "dependencies": {
     "@sentry/node": "^7.57.0",
-    "restructure": "^3.0.1"
+    "restructure": "^3.0.1",
+    "semver": "^7.5.2",
+    "sax": ">=0.6.0",
+    "xmlbuilder": "~11.0.0"
   },
   "devDependencies": {
+    "@types/git-diff": "^2.0.3",
     "@types/node": "^20.4.1",
+    "@types/semver": "^7.3.12",
+    "@types/xml2js": "^0.4.5",
     "c8": "^7.12.0",
+    "git-diff": "^2.0.6",
     "mocha": "^8.4.0",
     "typescript": "^5.4.5"
   },
