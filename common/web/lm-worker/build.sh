@@ -64,6 +64,7 @@ function do_build() {
   # The ES6 target needs no polyfills - we go straight to the wrapped version.
   $bundle_cmd src/main/worker-main.ts \
     --out $INTERMEDIATE/worker-main.js \
+    --charset "utf8" \
     --target "es6" \
     --sourceRoot '@keymanapp/keyman/common/web/lm-worker/src/main'
 
@@ -75,6 +76,7 @@ function do_build() {
   $bundle_cmd src/main/worker-main.ts \
     --out $INTERMEDIATE/worker-main.min.js \
     --minify \
+    --charset "utf8" \
     --profile build/filesize-profile.log \
     --target "es6" \
     --sourceRoot '@keymanapp/keyman/common/web/lm-worker/src/main'

@@ -55,11 +55,13 @@ compile_and_copy() {
 
   $BUNDLE_CMD    "${SRC_ROOT}/debug-main.js" \
     --out        "${BUILD_ROOT}/debug/keymanweb.js" \
+    --charset    "utf8" \
     --sourceRoot "@keymanapp/keyman/web/build/app/browser/debug" \
     --target     "es6"
 
   $BUNDLE_CMD    "${SRC_ROOT}/release-main.js" \
     --out        "${BUILD_ROOT}/release/keymanweb.js" \
+    --charset    "utf8" \
     --profile    "${BUILD_ROOT}/filesize-profile.log" \
     --sourceRoot "@keymanapp/keyman/web/build/app/browser/release" \
     --minify \
@@ -67,6 +69,7 @@ compile_and_copy() {
 
   $BUNDLE_CMD    "${BUILD_ROOT}/obj/test-index.js" \
     --out        "${BUILD_ROOT}/lib/index.mjs" \
+    --charset    "utf8" \
     --sourceRoot "@keymanapp/keyman/web/build/app/browser/lib" \
     --format esm
 

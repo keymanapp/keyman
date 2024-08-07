@@ -45,11 +45,13 @@ compile_and_copy() {
 
   $BUNDLE_CMD    "${SRC_ROOT}/debug-main.js" \
     --out        "${BUILD_ROOT}/debug/keymanweb-webview.js" \
+    --charset    "utf8" \
     --sourceRoot "@keymanapp/keyman/web/build/app/webview/debug" \
     --target     "es6"
 
   $BUNDLE_CMD    "${SRC_ROOT}/release-main.js" \
     --out        "${BUILD_ROOT}/release/keymanweb-webview.js" \
+    --charset    "utf8" \
     --profile    "${BUILD_ROOT}/filesize-profile.log" \
     --sourceRoot "@keymanapp/keyman/web/build/app/webview/release" \
     --minify \
