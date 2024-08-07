@@ -9,7 +9,11 @@ import {
   compressNumber, decompressNumber
 } from '@keymanapp/models-templates/obj/trie-compression.js';
 
-import fs from 'fs';
+/**
+ * @param {string} str
+ * @returns
+ */
+const identityKey = (str) => str;
 
 // Written with:
 // const ENCODED_NUM_BASE = 0; // 0x0020;
@@ -20,9 +24,9 @@ import fs from 'fs';
 const TEST_DATA = {};
 TEST_DATA.ENTRIES = {
   four: {
-    // total length: header = 5, text = 8 -> 13.  (Made with weight-width 2)
+    // total length: header = 4, text = 4 -> 8.  (Made with weight-width 2)
     //            -totalLen-    -weight- -keylen-
-    compressed: '\u0000\u000d\u0000\u0008\u0004fourfour',
+    compressed: '\u0000\u0008\u0000\u0008four',
     decompressed: {
       key: 'four',
       content: 'four',
@@ -40,7 +44,7 @@ TEST_DATA.LEAVES = {
   four: {
     // expected width difference: 5 (2: total size, 2: weight, 1: entry count)
     //             -totalLen-  -weight- -type/size-
-    compressed: `\u0000\u0012\u0000\u0008\u8001${TEST_DATA.ENTRIES.four.compressed}`,
+    compressed: `\u0000\u000D\u0000\u0008\u8001${TEST_DATA.ENTRIES.four.compressed}`,
     decompressed: {
       type: 'leaf',
       weight: 8,
@@ -62,7 +66,7 @@ TEST_DATA.NODES = {
   four: {
     // expected width difference: 6 (2: total size, 2: weight, 1: entry count, 1: value count)
     //             -totalLen-  -weight- -type/size-
-    compressed: `\u0000\u0018\u0000\u0008\u0001r${TEST_DATA.LEAVES.four.compressed}`,
+    compressed: `\u0000\u0013\u0000\u0008\u0001r${TEST_DATA.LEAVES.four.compressed}`,
     decompressed: {
       type: 'internal',
       weight: 8,
@@ -109,12 +113,6 @@ describe('Trie compression', function() {
 
   describe('`Entry`s', () => {
     it('compresses properly', () => {
-      const entry = {
-        key: 'four',
-        content: 'four',
-        weight: 8
-      };
-
       assert.equal(compressEntry(TEST_DATA.ENTRIES.four.original), TEST_DATA.ENTRIES.four.compressed);
     });
   });
@@ -178,7 +176,7 @@ describe('Trie decompression', function () {
     it('not inlined', () => {
       const mockedDecompression = TEST_DATA.ENTRIES.four.decompressed;
       const compressionSrc = TEST_DATA.ENTRIES.four.compressed;
-      assert.deepEqual(decompressEntry(compressionSrc), mockedDecompression);
+      assert.deepEqual(decompressEntry(compressionSrc, identityKey), mockedDecompression);
     });
 
     it('inlined', () => {
@@ -186,7 +184,7 @@ describe('Trie decompression', function () {
 
       // total length: header = 5, text = 8 -> 13.
       const compressionSrc = `xxxxx${TEST_DATA.ENTRIES.four.compressed}xx`;
-      assert.deepEqual(decompressEntry(compressionSrc, /* start index */ 5), mockedDecompression);
+      assert.deepEqual(decompressEntry(compressionSrc, identityKey, /* start index */ 5), mockedDecompression);
     });
   });
 

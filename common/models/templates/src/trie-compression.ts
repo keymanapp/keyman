@@ -44,30 +44,29 @@ export function compressNumber(num: number, width?: number) {
   return compressed;
 }
 
-const ENTRY_HEADER_WIDTH = NODE_SIZE_WIDTH + WEIGHT_WIDTH + 1;
+const ENTRY_HEADER_WIDTH = NODE_SIZE_WIDTH + WEIGHT_WIDTH;
 
 // encoded ENTRY:
 // - entryLen: 2 char
 //   - total encoded size of all following bits.
 //   - as raw, concatenated string data - no JSON.stringify action taken.
 // - weight: 2? chars (with quote-offset on each char?)
-// - keyLen: 1 char (with quote-offset?)
 // - contentLen: safe to infer from all other values
-// - key: string: from index [header+5] to [header+5 + keyLen - 1]
-// - content: string: from [header+5 + keyLen] to [header+5 + keyLen + contentLen - 1]
+// - content: string: from [header+4] to [header+4 + contentLen - 1]
+//
+// - key: not encoded; we can regenerate it via the keying function
 
 export function compressEntry(entry: Entry): string {
-  const { key, content, weight } = entry;
+  const { content, weight } = entry;
 
-  const keyLenEnc = compressNumber(key.length);
   const weightEnc = compressNumber(weight, WEIGHT_WIDTH);
 
-  const entryLenEnc = compressNumber(key.length + content.length + ENTRY_HEADER_WIDTH, 2);
+  const entryLenEnc = compressNumber(content.length + ENTRY_HEADER_WIDTH, 2);
 
-  return `${entryLenEnc}${weightEnc}${keyLenEnc}${key}${content}`;
+  return `${entryLenEnc}${weightEnc}${content}`;
 }
 
-export function decompressEntry(str: string, baseIndex: number): Entry {
+export function decompressEntry(str: string, keyFunction: (val: string) => string, baseIndex: number): Entry {
   baseIndex ||= 0;
 
   const entryLen = decompressNumber(str, baseIndex + 0, baseIndex + NODE_SIZE_WIDTH);
@@ -78,15 +77,11 @@ export function decompressEntry(str: string, baseIndex: number): Entry {
   // c8 ignore end
 
   const headerEnd = baseIndex + ENTRY_HEADER_WIDTH;
-  const weight = decompressNumber(str, baseIndex + NODE_SIZE_WIDTH, headerEnd - 1);
-  const keyLen = decompressNumber(str, headerEnd - 1, headerEnd);
-
-  const contentStart = headerEnd + keyLen;
-  const key = str.substring(headerEnd, contentStart);
-  const content = str.substring(contentStart, baseIndex + entryLen);
+  const weight = decompressNumber(str, baseIndex + NODE_SIZE_WIDTH, headerEnd);
+  const content = str.substring(headerEnd, baseIndex + entryLen);
 
   return {
-    key: key as any, // due to special `SearchKey` type shenanigans in its definition.
+    key: keyFunction(content) as any, // needed due to special `SearchKey` type shenanigans in its definition.
     content: content,
     weight: weight
   }
