@@ -7,7 +7,7 @@ import {
   compressEntry, decompressEntry,
   compressNode, decompressNode,
   compressNumber, decompressNumber
-} from '@keymanapp/models-templates/obj/tries/compression.js';
+} from '@keymanapp/models-templates/obj/trie-compression.js';
 
 import fs from 'fs';
 
