@@ -48,7 +48,7 @@ TEST_DATA.LEAVES = {
     decompressed: {
       type: 'leaf',
       weight: 8,
-      entries: [TEST_DATA.ENTRIES.four.compressed]
+      entries: [TEST_DATA.ENTRIES.four.decompressed]
     },
     original: {
       type: 'leaf',
@@ -192,12 +192,12 @@ describe('Trie decompression', function () {
     describe('bootstrapping cases', () => {
       it('not inlined', () => {
         const encodedLeaf = TEST_DATA.LEAVES.four.compressed;
-        assert.deepEqual(decompressNode(encodedLeaf, 0), TEST_DATA.LEAVES.four.decompressed);
+        assert.deepEqual(decompressNode(encodedLeaf, identityKey, 0), TEST_DATA.LEAVES.four.decompressed);
       });
 
       it('inlined', () => {
         const encodedLeaf = TEST_DATA.LEAVES.four.compressed;
-        assert.deepEqual(decompressNode(`xxxxxxxxx${encodedLeaf}xx`, 9), TEST_DATA.LEAVES.four.decompressed);
+        assert.deepEqual(decompressNode(`xxxxxxxxx${encodedLeaf}xx`, identityKey, 9), TEST_DATA.LEAVES.four.decompressed);
       });
     });
   });
@@ -206,12 +206,12 @@ describe('Trie decompression', function () {
     describe('bootstrapping cases', () => {
       it('not inlined', () => {
         const encodedNode = TEST_DATA.NODES.four.compressed;
-        assert.deepEqual(decompressNode(encodedNode, 0), TEST_DATA.NODES.four.decompressed);
+        assert.deepEqual(decompressNode(encodedNode, identityKey, 0), TEST_DATA.NODES.four.decompressed);
       });
 
       it('inlined', () => {
         const encodedNode = TEST_DATA.NODES.four.compressed;
-        assert.deepEqual(decompressNode(`xxxxxxx${encodedNode}xx`, 7), TEST_DATA.NODES.four.decompressed);
+        assert.deepEqual(decompressNode(`xxxxxxx${encodedNode}xx`, identityKey, 7), TEST_DATA.NODES.four.decompressed);
       });
     });
   });
@@ -230,18 +230,15 @@ describe('Trie decompression', function () {
     }`;
 
     const compression = {
-      // Achieves FAR better compression than JSON.stringify, which \u-escapes most chars.
-      // As of the commit when this was written...
+      // The encoding pattern used above achives FAR better compression than
+      // JSON.stringify, which \u-escapes most chars.  As of the commit when
+      // this was written, before we stopped storing 'key' for entries...
       // - length of encoding below: 26097
       // - JSON-encoding length:  69122
       // - Source fixture's filesize: 141309 bytes
       root: `\`${encodedSerializableString}\``,
       totalWeight: trie.totalWeight
     }
-
-    // We could easily get even better savings (with some cost) by using the search-term-to-key function
-    // as part of decompression, avoiding the near-duplicating key/content effect we currently have.
-    // - if we didn't save the keys: 20490 (estimation)  (~21.4% savings)
 
     // TODO:  Temp code for diagnostics & exploration.
     console.log(`Compressed length: ${compression.root.length}`);

@@ -66,7 +66,7 @@ export function compressEntry(entry: Entry): string {
   return `${entryLenEnc}${weightEnc}${content}`;
 }
 
-export function decompressEntry(str: string, keyFunction: (val: string) => string, baseIndex: number): Entry {
+export function decompressEntry(str: string, keyFunction: (text: string) => string, baseIndex: number): Entry {
   baseIndex ||= 0;
 
   const entryLen = decompressNumber(str, baseIndex + 0, baseIndex + NODE_SIZE_WIDTH);
@@ -106,7 +106,7 @@ export function compressNode(node: Node) {
   return `${compressNumber(charLength, 2)}${weightEnc}${encodedSpecifics}`;
 }
 
-export function decompressNode(str: string, baseIndex: number) {
+export function decompressNode(str: string, keyFunction: (text: string) => string, baseIndex: number) {
   baseIndex ||= 0;
 
   const entryLen = decompressNumber(str, baseIndex + 0, baseIndex + NODE_SIZE_WIDTH);
@@ -119,7 +119,7 @@ export function decompressNode(str: string, baseIndex: number) {
   const typeFlagSrc = decompressNumber(str, baseIndex + NODE_TYPE_INDEX, baseIndex + NODE_TYPE_INDEX + 1);
   const isLeafType = typeFlagSrc & 0x8000;
 
-  return isLeafType ? decompressLeaf(str, baseIndex) : decompressInternal(str, baseIndex);
+  return isLeafType ? decompressLeaf(str, keyFunction, baseIndex) : decompressInternal(str, baseIndex);
 }
 
 // encoded LEAF:
@@ -146,7 +146,7 @@ function compressLeaf(leaf: Leaf): string {
   return compressedEntries.join('');
 }
 
-function decompressLeaf(str: string, baseIndex: number): Omit<Leaf, 'entries'> & {entries: string[]} {
+function decompressLeaf(str: string, keyFunction: (text: string) => string, baseIndex: number): Leaf {
   const weight = decompressNumber(str, baseIndex + NODE_SIZE_WIDTH, baseIndex + NODE_SIZE_WIDTH + WEIGHT_WIDTH);
 
   // Assumes string-subsection size check has passed.
@@ -154,12 +154,12 @@ function decompressLeaf(str: string, baseIndex: number): Omit<Leaf, 'entries'> &
   // Remove the type-flag bit indicating 'leaf node'.
   const entryCnt = entryCntSrc & 0x007F;
 
-  let compressedEntries: string[] = [];
+  let entries: Entry[] = [];
   baseIndex = baseIndex + NODE_TYPE_INDEX + 1;
   for(let i = 0; i < entryCnt; i++) {
     const entryWidth = decompressNumber(str, baseIndex, baseIndex+2);
     const nextIndex = baseIndex + entryWidth;
-    compressedEntries.push(str.substring(baseIndex, nextIndex));
+    entries.push(decompressEntry(str, keyFunction, baseIndex));
     baseIndex = nextIndex;
   }
 
@@ -171,7 +171,7 @@ function decompressLeaf(str: string, baseIndex: number): Omit<Leaf, 'entries'> &
     // - would use more memory, especially once a Trie is "mostly" decompressed
     //   - current approach 'discards' decoded parts of the original string.
     // - would likely decompress a bit faster.
-    entries: compressedEntries
+    entries: entries
   }
 }
 
