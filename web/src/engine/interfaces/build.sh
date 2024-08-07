@@ -6,7 +6,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-SUBPROJECT_NAME=engine/paths
+SUBPROJECT_NAME=engine/interfaces
 . "$KEYMAN_ROOT/web/common.inc.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
@@ -14,7 +14,7 @@ SUBPROJECT_NAME=engine/paths
 
 builder_describe "Builds configuration subclasses used by the Keyman Engine for Web (KMW)." \
   "@/common/web/es-bundling" \
-  "@/web/src/engine/osk build" \
+  "@/common/web/keyboard-processor" \
   "clean" \
   "configure" \
   "build" \

@@ -2,6 +2,7 @@
 // We should start splitting off code needed by keyboards even without a KeyboardProcessor active.
 // There's an upcoming `/common/web/types` package that 'codes' and 'keyboards' may fit well within.
 
+import { ModifierKeyConstants} from '@keymanapp/common-types';
 import Codes from "./codes.js";
 import type KeyEvent from "./keyEvent.js";
 import type OutputTarget from "./outputTarget.js";
@@ -190,7 +191,7 @@ export default class DefaultRules {
 
     // check if exact match to SHIFT's code.  Only the 'default' and 'shift' layers should have default key outputs.
     // TODO:  Extend to allow AltGr as well - better mnemonic support.
-    if(keyShiftState == Codes.modifierCodes['SHIFT']) {
+    if(keyShiftState == ModifierKeyConstants.K_SHIFTFLAG) {
       keyShiftState = 1;
     } else if(keyShiftState != 0) {
       if(ruleBehavior) {

@@ -2,7 +2,7 @@
  * Defines the metadata needed to support and load lexical models compatible with
  * Keyman Engine for Web.
  */
-export default interface ModelSpec {
+export interface ModelSpec {
   /**
    * The model's unique identifier.
    */
