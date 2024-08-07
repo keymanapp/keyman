@@ -109,7 +109,7 @@ for(let range of ranges) { // already sorted
       const finalBmpRange = bmpRanges[bmpRanges.length - 1];
       bmpRanges.push({
         start: 0xFFFF,
-        property: range.property,
+        property: finalBmpRange.property,
         end: undefined
       });
 
