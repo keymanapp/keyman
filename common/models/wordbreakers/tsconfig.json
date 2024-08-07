@@ -1,0 +1,19 @@
+{
+  "extends": "../tsconfig.kmw-worker-base.json",
+
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "./build/obj",
+    "tsBuildInfoFile": "./build/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src/main"
+  },
+  "references": [
+    { "path": "../types" }
+  ],
+  "include": [
+	  "./src/main/**/*"
+  ],
+  "exclude": [
+	  "node_modules"
+  ]
+}
