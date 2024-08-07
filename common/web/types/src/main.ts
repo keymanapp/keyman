@@ -7,7 +7,10 @@ export { default as KvkFileReader } from './kvk/kvk-file-reader.js';
 export { default as KvkFileWriter } from './kvk/kvk-file-writer.js';
 export * as KvkFile from './kvk/kvk-file.js';
 
+
+export { USVirtualKeyCodes } from './consts/virtual-key-constants.js';
 export * as Constants from './consts/virtual-key-constants.js';
+export { ModifierKeyConstants } from './consts/modifier-key-constants.js';
 
 export { defaultCompilerOptions, CompilerBaseOptions, CompilerCallbacks, CompilerOptions, CompilerEvent, CompilerErrorNamespace,
          CompilerErrorSeverity, CompilerPathCallbacks, CompilerFileSystemCallbacks, CompilerCallbackOptions,

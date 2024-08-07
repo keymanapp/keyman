@@ -20,13 +20,13 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
   kmcmp::FMnemonicLayout = FALSE;
 
   if (!fk) {
-    AddCompileError(CERR_SomewhereIGotItWrong);
+    ReportCompilerMessage(KmnCompilerMessages::FATAL_SomewhereIGotItWrong);
     return FALSE;
   }
 
   str = new KMX_WCHAR[LINESIZE];
   if (!str) {
-    AddCompileError(CERR_CannotAllocateMemory);
+    ReportCompilerMessage(KmnCompilerMessages::FATAL_CannotAllocateMemory);
     return FALSE;
   }
 
@@ -66,39 +66,42 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
 
   if(kmcmp::FShouldAddCompilerVersion) {
     u16sprintf(str,LINESIZE, L"Created with Keyman Developer version %d.%d.%d.%d", KEYMAN_VersionMajor, KEYMAN_VersionMinor, KEYMAN_VersionPatch, 0);
-    AddStore(fk, TSS_KEYMANCOPYRIGHT, str);
+    if(!AddStore(fk, TSS_KEYMANCOPYRIGHT, str)) {
+      return FALSE;
+    }
   }
 
   /* Add a system store for the Keyman edition number */
-  AddStore(fk, TSS_CUSTOMKEYMANEDITION, u"0");
-  AddStore(fk, TSS_CUSTOMKEYMANEDITIONNAME, u"Keyman");
+  if(!AddStore(fk, TSS_CUSTOMKEYMANEDITION, u"0")) {
+    return FALSE;
+  }
+  if(!AddStore(fk, TSS_CUSTOMKEYMANEDITIONNAME, u"Keyman")) {
+    return FALSE;
+  }
 
   int offset = 0;
 
   // must preprocess for group and store names -> this isn't really necessary, but never mind!
-  while ((msg = ReadLine(infile, sz, offset, str, TRUE)) == CERR_None)
+  while ((msg = ReadLine(infile, sz, offset, str, TRUE)) == STATUS_Success)
   {
     p = str;
     switch (LineTokenType(&p))
     {
       case T_VERSION:
         *(p + 4) = 0;
-        if ((msg = AddStore(fk, TSS_VERSION, p)) != CERR_None) {
-          AddCompileError(msg);
+        if (!AddStore(fk, TSS_VERSION, p)) {
           return FALSE;
         }
         break;
 
       case T_GROUP:
-        if ((msg = ProcessGroupLine(fk, p)) != CERR_None) {
-          AddCompileError(msg);
+        if (!ProcessGroupLine(fk, p)) {
           return FALSE;
         }
         break;
 
       case T_STORE:
-        if ((msg = ProcessStoreLine(fk, p)) != CERR_None) {
-          AddCompileError(msg);
+        if (!ProcessStoreLine(fk, p)) {
           return FALSE;
         }
         break;
@@ -108,8 +111,8 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
     }
   }
 
-  if (msg != CERR_EndOfFile) {
-    AddCompileError(msg);
+  if (msg != STATUS_EndOfFile) {
+    ReportCompilerMessage(msg);
     return FALSE;
   }
 
@@ -121,32 +124,30 @@ bool CompileKeyboardBuffer(KMX_BYTE* infile, int sz, PFILE_KEYBOARD fk)
   kmcmp::CodeConstants->reindex();
 
   /* ReadLine will automatically skip over $Keyman lines, and parse wrapped lines */
-  while ((msg = ReadLine(infile, sz, offset, str, FALSE)) == CERR_None)
+  while ((msg = ReadLine(infile, sz, offset, str, FALSE)) == STATUS_Success)
   {
-    msg = ParseLine(fk, str);
-    if (msg != CERR_None) {
-      AddCompileError(msg);
+    if(!ParseLine(fk, str)) {
       return FALSE;
     }
   }
 
-  if (msg != CERR_EndOfFile) {
-    AddCompileError(msg);
+  if (msg != STATUS_EndOfFile) {
+    ReportCompilerMessage(msg);
     return FALSE;
   }
 
-  ProcessGroupFinish(fk);
+  if(!ProcessGroupFinish(fk)) {
+    return FALSE;
+  }
 
   if (kmcmp::FSaveDebug) kmcmp::RecordDeadkeyNames(fk);
 
   /* Add the compiler version as a system store */
-  if ((msg = kmcmp::AddCompilerVersionStore(fk)) != CERR_None) {
-    AddCompileError(msg);
+  if (!kmcmp::AddCompilerVersionStore(fk)) {
     return FALSE;
   }
 
-  if ((msg = BuildVKDictionary(fk)) != CERR_None) {
-    AddCompileError(msg);
+  if (!BuildVKDictionary(fk)) {
     return FALSE;
   }
 

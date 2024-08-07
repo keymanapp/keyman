@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import fs from 'fs';
+import { ModifierKeyConstants } from '@keymanapp/common-types';
 
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
@@ -44,8 +44,8 @@ describe('Engine - rule processing', function() {
       let mnemonicEvent = new KeyEvent({
         // sil_ipa is a mnenomic keyboard:  it expects codes based on the key's standard character output.
         Lcode: '>'.charCodeAt(0), // 62
-        Lmodifiers: Codes.modifierCodes.SHIFT, // '>' is shift-layer.
-        Lstates: Codes.modifierCodes.NO_CAPS | Codes.modifierCodes.NO_NUM_LOCK | Codes.modifierCodes.NO_SCROLL_LOCK,
+        Lmodifiers: ModifierKeyConstants.K_SHIFTFLAG, // '>' is shift-layer.
+        Lstates: ModifierKeyConstants.NOTCAPITALFLAG | ModifierKeyConstants.NOTNUMLOCKFLAG | ModifierKeyConstants.NOTSCROLLFLAG,
         LisVirtualKey: true,
         kName: '',
         vkCode: Codes.keyCodes.K_N,
@@ -66,7 +66,7 @@ describe('Engine - rule processing', function() {
         // sil_ipa is a mnenomic keyboard:  it expects codes based on the key's standard character output.
         Lcode: '>'.charCodeAt(0), // 62
         Lmodifiers: 0, // '>' is shift-layer, not default - and this matters for context matching.
-        Lstates: Codes.modifierCodes.NO_CAPS | Codes.modifierCodes.NO_NUM_LOCK | Codes.modifierCodes.NO_SCROLL_LOCK,
+        Lstates: ModifierKeyConstants.NOTCAPITALFLAG | ModifierKeyConstants.NOTNUMLOCKFLAG | ModifierKeyConstants.NOTSCROLLFLAG,
         LisVirtualKey: true,
         kName: '',
         vkCode: Codes.keyCodes.K_N,
@@ -84,8 +84,8 @@ describe('Engine - rule processing', function() {
       let positionalEvent = new KeyEvent({
         // If it were positional, we'd use this instead:
         Lcode: Codes.keyCodes.K_COMMA, // 188
-        Lmodifiers: Codes.modifierCodes.SHIFT, // '>' is shift-layer.
-        Lstates: Codes.modifierCodes.NO_CAPS | Codes.modifierCodes.NO_NUM_LOCK | Codes.modifierCodes.NO_SCROLL_LOCK,
+        Lmodifiers: ModifierKeyConstants.K_SHIFTFLAG, // '>' is shift-layer.
+        Lstates: ModifierKeyConstants.NOTCAPITALFLAG | ModifierKeyConstants.NOTNUMLOCKFLAG | ModifierKeyConstants.NOTSCROLLFLAG,
         LisVirtualKey: true,
         kName: '',
         vkCode: Codes.keyCodes.K_N,
@@ -123,7 +123,7 @@ describe('Engine - rule processing', function() {
         // armenian is a KMW 1.0 keyboard:  it expects codes based on the key's standard character output.
         Lcode: 'a'.charCodeAt(0),
         Lmodifiers: 0,
-        Lstates: Codes.modifierCodes.NO_CAPS | Codes.modifierCodes.NO_NUM_LOCK | Codes.modifierCodes.NO_SCROLL_LOCK,
+        Lstates: ModifierKeyConstants.NO_CAPSFLAG | ModifierKeyConstants.NO_NUM_LOCKFLAG | ModifierKeyConstants.NO_SCROLL_LOCKFLAG,
         LisVirtualKey: false,
         kName: '',
         vkCode: Codes.keyCodes.K_N,
@@ -143,7 +143,7 @@ describe('Engine - rule processing', function() {
         // armenian is a KMW 1.0 keyboard:  it expects codes based on the key's standard character output.
         Lcode: 'a'.charCodeAt(0),
         Lmodifiers: 27,
-        Lstates: Codes.modifierCodes.CAPS | Codes.modifierCodes.NO_NUM_LOCK | Codes.modifierCodes.SCROLL_LOCK | 0x5C00,
+        Lstates: ModifierKeyConstants.CAPITALFLAG | ModifierKeyConstants.NOTNUMLOCKFLAG | ModifierKeyConstants.SCROLLFLAG | 0x5C00,
         LisVirtualKey: false,
         kName: '',
         vkCode: Codes.keyCodes.K_N,
@@ -163,7 +163,7 @@ describe('Engine - rule processing', function() {
         // armenian is a KMW 1.0 keyboard:  it expects codes based on the key's standard character output.
         Lcode: 'a'.charCodeAt(0),
         Lmodifiers: 0,
-        Lstates: Codes.modifierCodes.NO_CAPS | Codes.modifierCodes.NO_NUM_LOCK | Codes.modifierCodes.NO_SCROLL_LOCK,
+        Lstates: ModifierKeyConstants.NOTCAPITALFLAG | ModifierKeyConstants.NOTNUMLOCKFLAG | ModifierKeyConstants.NOTSCROLLFLAG,
         LisVirtualKey: true,
         kName: '',
         vkCode: Codes.keyCodes.K_N,
@@ -182,7 +182,7 @@ describe('Engine - rule processing', function() {
         // If it were positional, we'd use this instead:
         Lcode: Codes.keyCodes.K_A,
         Lmodifiers: 0,
-        Lstates: Codes.modifierCodes.NO_CAPS | Codes.modifierCodes.NO_NUM_LOCK | Codes.modifierCodes.NO_SCROLL_LOCK,
+        Lstates: ModifierKeyConstants.NOTCAPITALFLAG | ModifierKeyConstants.NOTNUMLOCKFLAG | ModifierKeyConstants.NOTSCROLLFLAG,
         LisVirtualKey: true,
         kName: '',
         vkCode: Codes.keyCodes.K_N,
