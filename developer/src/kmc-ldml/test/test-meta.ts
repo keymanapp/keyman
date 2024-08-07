@@ -3,7 +3,7 @@ import {assert} from 'chai';
 import { MetaCompiler } from '../src/compiler/meta.js';
 import { compilerTestCallbacks, loadSectionFixture } from './helpers/index.js';
 import { KMXPlus } from '@keymanapp/common-types';
-import { CompilerMessages } from '../src/compiler/messages.js';
+import { LdmlCompilerMessages } from '../src/compiler/ldml-compiler-messages.js';
 
 import KeyboardSettings = KMXPlus.KeyboardSettings;
 import Meta = KMXPlus.Meta;
@@ -39,19 +39,19 @@ describe('meta', function () {
     let meta = await loadSectionFixture(MetaCompiler, 'sections/meta/hint-normalization.xml', compilerTestCallbacks) as Meta;
     assert.isNotNull(meta);
     assert.equal(compilerTestCallbacks.messages.length, 1);
-    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Hint_NormalizationDisabled());
+    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Hint_NormalizationDisabled());
   });
 
   it('should reject invalid version', async function() {
     let meta = await loadSectionFixture(MetaCompiler, 'sections/meta/invalid-version-1.0.xml', compilerTestCallbacks) as Meta;
     assert.isNull(meta);
     assert.equal(compilerTestCallbacks.messages.length, 1);
-    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_InvalidVersion({version:'1.0'}));
+    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_InvalidVersion({version:'1.0'}));
 
     meta = await loadSectionFixture(MetaCompiler, 'sections/meta/invalid-version-v1.0.3.xml', compilerTestCallbacks) as Meta;
     assert.isNull(meta);
     assert.equal(compilerTestCallbacks.messages.length, 1);
-    assert.deepEqual(compilerTestCallbacks.messages[0], CompilerMessages.Error_InvalidVersion({version:'v1.0.3'}));
+    assert.deepEqual(compilerTestCallbacks.messages[0], LdmlCompilerMessages.Error_InvalidVersion({version:'v1.0.3'}));
   });
 });
 

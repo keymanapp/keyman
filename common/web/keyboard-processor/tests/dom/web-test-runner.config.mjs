@@ -21,7 +21,7 @@ export default {
   concurrency: 10,
   nodeResolve: true,
   files: [
-    '**/*.spec.ts'
+    'build/tests/dom/**/*.spec.mjs'
   ],
   middleware: [
     // Rewrites short-hand paths for test resources, making them fully relative to the repo root.

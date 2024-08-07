@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -332,6 +332,7 @@
 		CE7FF1EF239A0293007859D9 /* PackageBrowserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackageBrowserViewController.swift; sourceTree = "<group>"; };
 		CE80AD32257F2B4A008D2150 /* KeymanEngine.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KeymanEngine.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE98E6BD2615593300F3F2C0 /* ff */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ff; path = ff.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CEAC2A272C2A50E100C99ABD /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEACC90E25F07D58006EAB45 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEACC90F25F07D5A006EAB45 /* km */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = km; path = km.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CEACC91225F07D77006EAB45 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -793,6 +794,7 @@
 				sv,
 				uk,
 				ru,
+				el,
 			);
 			mainGroup = 98ABADA7176935E400B62590;
 			productRefGroup = 98ABADB1176935E400B62590 /* Products */;
@@ -1106,6 +1108,7 @@
 				298566C42980C493004ACA95 /* sv */,
 				298566D02980D354004ACA95 /* uk */,
 				298566DC2980E416004ACA95 /* ru */,
+				CEAC2A272C2A50E100C99ABD /* el */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";

@@ -47,29 +47,6 @@ function do_configure() {
 }
 
 function do_build() {
-  # Build worker with tsc first
-  tsc -b $builder_verbose || builder_die "Could not build worker."
-
-  $bundle_cmd build/obj/worker-main.js \
-    --out $INTERMEDIATE/worker-main.es5.js \
-    --sourceRoot '@keymanapp/keyman/common/web/lm-worker/src/main'
-
-  $SRCMAP_CLEANER \
-    $INTERMEDIATE/worker-main.es5.js.map \
-    $INTERMEDIATE/worker-main.es5.js.map \
-    --clean
-
-  $bundle_cmd build/obj/worker-main.js \
-    --out $INTERMEDIATE/worker-main.min.es5.js \
-    --minify \
-    --profile build/filesize-profile.es5.log \
-    --sourceRoot '@keymanapp/keyman/common/web/lm-worker/src/main'
-
-  $SRCMAP_CLEANER \
-    $INTERMEDIATE/worker-main.min.es5.js.map \
-    $INTERMEDIATE/worker-main.min.es5.js.map \
-    --clean
-
   EXT_FLAGS=
   if builder_has_option --ci; then
     EXT_FLAGS=--ci
@@ -78,16 +55,10 @@ function do_build() {
   # Declaration bundling.
   tsc --emitDeclarationOnly --outFile $INTERMEDIATE/worker-main.d.ts
 
-  echo "Preparing the polyfills + worker for script-embedding"
-  node build-polyfiller.js $INTERMEDIATE/worker-main.es5.js \
-    --out $INTERMEDIATE/worker-main.polyfilled.es5.js
+  # Some automated tests currently rely upon the individual output files.
+  tsc
 
   mkdir -p $LIB
-  node build-wrapper.js $INTERMEDIATE/worker-main.polyfilled.es5.js \
-    --out $LIB/worker-main.wrapped.es5.js \
-    --sourceMap
-  node build-wrapper.js $INTERMEDIATE/worker-main.polyfilled.es5.min.js \
-    --out $LIB/worker-main.wrapped.es5.min.js
 
 
   # The ES6 target needs no polyfills - we go straight to the wrapped version.

@@ -2,16 +2,13 @@ import type * as esbuild from 'esbuild';
 import { pluginForDowncompiledClassTreeshaking } from './classTreeshaker.mjs';
 
 export const esmConfiguration: esbuild.BuildOptions = {
-  alias: {
-    'tslib': '@keymanapp/tslib'
-  },
   bundle: true,
   format: "esm",
   outExtension: { '.js': '.mjs'},
   plugins: [ pluginForDowncompiledClassTreeshaking ],
   sourcemap: true,
   sourcesContent: true,
-  target: "es5"
+  target: "es6"
 };
 
 export const iifeConfiguration: esbuild.BuildOptions = {

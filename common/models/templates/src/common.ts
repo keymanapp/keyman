@@ -115,9 +115,12 @@ export function transformToSuggestion(transform: Transform, p: number): WithOutc
 export function transformToSuggestion(transform: Transform, p?: number): Outcome<Suggestion> {
   let suggestion: Outcome<Suggestion> = {
     transform: transform,
-    transformId: transform.id,
     displayAs: transform.insert
   };
+
+  if(transform.id !== undefined) {
+    suggestion.transformId = transform.id;
+  }
 
   if(p === 0 || p) {
     suggestion.p = p;
@@ -148,4 +151,22 @@ export function defaultApplyCasing(casing: CasingForm, text: string): string {
       // Capitalizes the first code unit of the string, leaving the rest intact.
       return text.substring(0, headUnitLength).toUpperCase() .concat(text.substring(headUnitLength));
   }
+}
+
+/**
+ * An **opaque** type for a string that is exclusively used as a search key in
+ * the trie. There should be a function that converts arbitrary strings
+ * (queries) and converts them into a standard search key for a given language
+ * model.
+ *
+ * Fun fact: This opaque type has ALREADY saved my bacon and found a bug!
+ */
+export type SearchKey = string & { _: 'SearchKey'};
+
+/**
+ * A function that converts a string (word form or query) into a search key
+ * (secretly, this is also a string).
+ */
+export interface Wordform2Key {
+  (wordform: string): SearchKey;
 }
