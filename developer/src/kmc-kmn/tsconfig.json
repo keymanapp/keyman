@@ -12,4 +12,9 @@
     "src/**/*.ts",
     "src/import/kmcmplib/wasm-host.js"
   ],
+  "references": [
+    { "path": "../../../common/web/types/" },
+    { "path": "../../../common/web/keyman-version/" },
+    { "path": "../common/web/utils/" },
+  ]
 }

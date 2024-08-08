@@ -2,10 +2,225 @@
 <?xml-stylesheet type="text/xsl" href="help.xsl" ?>
 <ContextHelp>
 
-  <LanguageReference Name="group">
-    <p>(TODO: add  documentation on group)</p>
+
+  <!-- language/reference -->
+  <LanguageReference Name="store" Title="store()">
+    <p>The store() statement lets you store a string of characters or keys in a buffer for 
+    use elsewhere in the keyboard source file. The store() statement can be used with any() 
+    and index() to reduce sets of similar rules down to a single rule. </p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      store(storeName) value
+    </div>
   </LanguageReference>
 
+  <LanguageReference Name="name" Title="&amp;name">
+    <p>The &amp;name store lets you give a more descriptive name to your keyboard than just the 
+    file name. If &amp;name isn't specified in the keyboard file, Keyman will use the filename 
+    of the keyboard, excluding the extension, so the &amp;name statement is optional.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      store(&amp;name) "nameText"
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="version" Title="&amp;version">
+    <p>The &amp;version store allows Keyman to distinguish what version of Keyman the keyboard 
+    was written for and handle it accordingly. The &amp;version store is optional. For most keyboards, 
+    it should be omitted.
+    <br></br><br></br>
+    If the &amp;version store is omitted, the compiler will infer the lowest version that 
+    supports the full set of features used in the keyboard, and assign that version number 
+    value to this store internally. The compiler will also report on the version it infers 
+    in the compile process.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      store(&amp;version) "version"
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="begin" Title="begin rule">
+    <p>The begin rule tells Keyman which groups should be entry points to the keyboard.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      begin [entrypoint] > use(startGroup)
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="use" Title="use() statement">
+    <p>The use() statement tells Keyman to switch processing to a new group; after Keyman 
+    has gone through the new group, and any other nested groups, it will return to the 
+    previous one. The use() statement can be used with the match and nomatch rules; it will 
+    work the same way.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      begin > use(groupName) <br></br>
+      ... > use(groupName)
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="outs" Title="outs()">
+    <p>The outs() statement simply copies the store 'storeName' into the position in which it 
+    has been inserted. This can be used in stores, in the context and the output. If the 
+    store to be emitted is a single character or virtual key, it can also be used in the 
+    key part of the rule.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      store(store1) ... outs(storeName) ... <br></br>
+      ... outs(storeName) ... + ... >  ...  <br></br>
+      ... > ... outs(storeName) ...
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="any" Title="any()">
+    <p>The any() statement will match any character that is in the store 'inputStore'. This 
+    statement is only valid on the left side of a rule; the index() statement is used to match 
+    again or output the character matched by the any() statement in the output. The any() 
+    statement remembers the offset in the store where the match occurred for later use with 
+    the index() statement.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      any(inputStore)
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="index" Title="index()">
+    <p>The index() statement works together with any() to map an array of characters in 
+    'inputStore' to a corresponding array in 'outputStore'. index() can be used in the context 
+    and output sections of a rule. If used in the context section, the offset parameter must 
+    be less than the offset of the index() statement in the context.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      any(inputStore) > index(outputStore,offset)
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="group" Title="group()">
+    <p>The group() statement tells Keyman to start a new set of rules. Keyman supports 
+    three sorts of groups: key processing groups, read-only groups, and context processing 
+    groups.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      group(groupName) <br></br>
+      group(groupName) using keys <br></br>
+      group(groupName) readonly
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="context" Title="context">
+    <p>The context statement reproduces the context stored from the rule match, or a single 
+    character of it, into the output. Use the context statement as much as possible as it is 
+    significantly faster than using the index statement.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      ... > context <br></br>
+      ... > context(offset) <br></br>
+      ... context(offset) > ...
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="beep" Title="beep">
+    <p>The beep statement produces a beep with the system speaker when the rule is matched. 
+    In Keyman Desktop, beep will produce the sound specified by "Asterisk" in Windows Sounds 
+    configuration.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      beep
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="platform" Title="platform() statement">
+    <p>The platform() statement allows rules to match based on the device on which the 
+    Keyman keyboard is running.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      platform("platformConstraint") ... > ... <br></br>
+      if(&amp;platform = "platformConstraint") ... > ...
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="nul" Title="nul">
+    <p>The nul statement has two purposes: in the output of a rule, it signifies deleting 
+    context and keystroke, and at the start of the context it signifies that the context 
+    buffer in the application must be empty (or no longer than the context of the rule) in 
+    order for the rule to match.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      nul [...] [+ key] > output <br></br>
+      [...] [+ key] > nul
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="copyright" Title="&amp;copyright">
+    <p>The &amp;copyright store allows a keyboard author to embed a copyright statement in 
+    a keyboard when it is compiled.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      store(&amp;copyright) "message"
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="message" Title="&amp;message">
+    <p>This is a generic message, such as a shareware notice that you can display when the 
+    keyboard is installed. This statement is optional.The MESSAGE statement is deprecated 
+    and the &amp;message store should be used instead.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      store(&amp;message) "messageText"
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="targets" Title="&amp;targets">
+    <p>The &amp;targets store specifies the target platforms for which a keyboard should be built.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      store(&amp;targets) "target [target ...]"
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="layoutfile" Title="&amp;layoutfile">
+    <p>The &amp;layoutfile store specifies a touch layout .JSON file to incorporate in the Keyman 
+    keyboard. If a touch layout is not specified, then Keyman will build one from the visual 
+    keyboard description file referenced in the &amp;visualkeyboard store. If neither is specified, 
+    then Keyman builds a touch layout based on the US English desktop keyboard layout.
+    </p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      store(&amp;layoutfile) "layoutFilename"
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="keyboardversion" Title="&amp;keyboardversion">
+    <p>The &amp;keyboardversion store documents the version of the keyboard. Keyman uses this on 
+    touch platforms to check for updated versions of the keyboard and update them 
+    automatically.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      store(&amp;keyboardversion) "version"
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="bitmap" Title="&amp;bitmap">
+    <p>The bitmap can be in two different formats: .bmp or .ico. A .bmp file must be a 16x16 
+    image. Keyman supports .ico files with multiple image sizes, and the appropriate size 
+    will be used if available.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      store(&amp;bitmap) "filename"
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="visualkeyboard" Title="&amp;visualkeyboard">
+    <p>The &amp;visualkeyboard store specifies a .kvks file to reference in the compiled Keyman 
+    keyboard. The .kvks (XML format) is compiled into a .kvk binary On Screen Keyboard which 
+    needs to be distributed with the .kmx.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      store(&amp;visualkeyboard) "visualkeyboardname"
+    </div>
+  </LanguageReference>
+
+  <!-- Character Map -->
   <Form Name="context/character-map">
     <Control Name="editFilter" Title="Character Map Filter">
       <p>The Filter allows a user to reduce the number of characters displayed in the character map. The standard filter options used are by font name or block name.</p>

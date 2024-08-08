@@ -1,4 +1,4 @@
-import { CompilerEvent } from '@keymanapp/common-types';
+import { CompilerEvent } from '@keymanapp/developer-utils';
 import 'mocha';
 import {assert} from 'chai';
 import { CompilerEventOrMatch, matchCompilerEvents } from './helpers/index.js';

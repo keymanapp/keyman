@@ -1,5 +1,48 @@
 # Keyman Version History
 
+## 18.0.84 alpha 2024-08-07
+
+* refactor(common): move kpj-related files into developer-utils (#11531)
+* refactor(common): move kps-file.ts to @keymanapp/developer-utils (#11763)
+* refactor(common): move kvks-file to @keymanapp/developer-utils (#11764)
+* refactor(common): move .keyman-touch-layout reader/writer to @keymanapp/developer-utils (#11765)
+* refactor(common): move LDML keyboard .xml reader/writer and kmx-plus builder to @keymanapp/developer-utils (#12081)
+* refactor(common): move compiler-interfaces to @keymanapp/developer-utils (#12088)
+* refactor(common): move xml2js and related deps to @keymanapp/developer-utils (#12101)
+
+## 18.0.83 alpha 2024-08-06
+
+* chore(common): Update history from 17.0.328 (#12093)
+* change(common/models): change model tokenization to also tokenize whitespace (#11975)
+* feat(web): support transform tokenization when given a root context (#11998)
+* change(web): track whitespace-aware tokenization for context + correction-search caching (#11979)
+* change(web): leverage tokenization to preserve punctuation and whitespace when predicting (#11997)
+* fix(web): patch up worker build to provide artifacts for its tests (#12082)
+* chore(web): move `web/src/engine/paths/` → `web/src/engine/interfaces/` (#12064)
+* chore(web): move `common/web/input-processor/` → `web/src/engine/main/` (#12066)
+* refactor(web): refactor and harmonize constants (#12072)
+* chore(common): add data versions to minimum-versions.inc.sh (#12103)
+* fix(web): fix lm-worker test broken by botched merge conflict resolution (#12104)
+
+## 18.0.82 alpha 2024-08-05
+
+* chore(windows): remove QIT_VSHIFTDOWN QIT _VSHIFTUP (#11973)
+* chore(developer): add language/reference (#11799)
+
+## 18.0.81 alpha 2024-08-03
+
+* chore(developer): Revert "chore(developer): remove redundant references from tsconfig.json" (#12076)
+* chore(common): use nvm in builds to select a node version automatically (#12069)
+* refactor(developer): move functions and variables into CompilerErrors.cpp (#12030)
+* refactor(developer): improve the callbacks for kmcmplib (#12031)
+* refactor(developer): align kmcmplib error codes and names with kmc-kmn (#12044)
+* refactor(developer): move error reporting to error site in kmcmplib (part 1) (#12045)
+* refactor(developer): move error reporting inside `GetCompileTargetsFromTargetsStore` and `ProcessGroupFinish` (#12048)
+* refactor(developer): move kmcmplib message construction to kmc-kmn (#12059)
+* refactor(developer): rename compiler error reporting functions in kmcmplib (#12060)
+* chore(developer): support filename field in kmcmplib compiler messages (#12061)
+* refactor(developer): replace `VERIFY_KEYBOARD_VERSION()` calls with `VerifyKeyboardVersion()` (#12063)
+
 ## 18.0.80 alpha 2024-07-31
 
 * chore(developer): remove redundant references from tsconfig.json (#12037)
@@ -124,7 +167,7 @@
 
 ## 18.0.63 alpha 2024-06-26
 
-* feat(linux): implement Linux side of SimulateAltGr option :checkered_flag: (#11852)
+* feat(linux): implement Linux side of SimulateAltGr option (#11852)
 
 ## 18.0.62 alpha 2024-06-25
 
@@ -136,8 +179,8 @@
 
 * feat(web): optimization via lazy preprocessing of keyboard touch-layout info (#11265)
 * fix(android): clear globe highlight when displaying keyboard picker (#11826)
-* refactor(linux): add KeymanOption class for options :checkered_flag: (#11850)
-* refactor(linux): rename methods that deal with keyboard options :checkered_flag: (#11851)
+* refactor(linux): add KeymanOption class for options (#11850)
+* refactor(linux): rename methods that deal with keyboard options (#11851)
 
 ## 18.0.60 alpha 2024-06-21
 
@@ -551,6 +594,10 @@
 
 * chore(common): move to 18.0 alpha (#10713)
 * chore: move to 18.0 alpha
+
+## 17.0.328 stable 2024-07-27
+
+* fix(web): add nullish test in setOsk (#12041)
 
 ## 17.0.327 stable 2024-07-25
 

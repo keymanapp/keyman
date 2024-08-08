@@ -6,14 +6,13 @@ the version data in this file also.
 
 ## Current Versions
 
+See [minimum-versions.md](../../docs/minimum-versions.md)
+
+Unversioned data:
+
 | data                       | version     |
 |----------------------------|-------------|
 | ethnologue                 | ?           |
-| iso639-3                   | 2024-05-22  |
-| langtags                   | 2024-05-22  |
-| langtags-subtag-registry   | 2024-05-16  |
-| ldml-keyboards             | 45          |
-| unicode-character-database | 15.1.0      |
 | windows-lcid-to-bcp-47     | ?           |
 
 ## File Sources

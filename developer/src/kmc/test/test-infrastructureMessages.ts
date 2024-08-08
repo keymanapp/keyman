@@ -4,12 +4,12 @@ import { InfrastructureMessages } from '../src/messages/infrastructureMessages.j
 import { verifyCompilerMessagesObject } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
 import { NodeCompilerCallbacks } from '../src/util/NodeCompilerCallbacks.js';
-import { CompilerErrorNamespace, CompilerEvent, KeymanFileTypes } from '@keymanapp/common-types';
+import {  KeymanFileTypes } from '@keymanapp/common-types';
 import { unitTestEndpoints } from '../src/commands/build.js';
 import { KmnCompilerMessages } from '@keymanapp/kmc-kmn';
 import { clearOptions } from '@keymanapp/developer-utils';
 import { loadProject } from '../src/util/projectLoader.js';
-import { defaultCompilerOptions, CompilerOptions} from '@keymanapp/common-types';
+import { CompilerErrorNamespace, CompilerEvent, defaultCompilerOptions, CompilerOptions} from '@keymanapp/developer-utils';
 import { analyzeUnitTestEndpoints } from '../src/commands/analyze.js';
 import { BuildKeyboardInfo } from '../src/commands/buildClasses/BuildKeyboardInfo.js';
 import { BuildModelInfo } from '../src/commands/buildClasses/BuildModelInfo.js';

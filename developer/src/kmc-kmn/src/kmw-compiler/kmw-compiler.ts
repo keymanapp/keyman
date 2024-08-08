@@ -1,4 +1,5 @@
-import { KMX, CompilerOptions, CompilerCallbacks, KvkFileReader, VisualKeyboard, KmxFileReader, KvkFile } from "@keymanapp/common-types";
+import { KMX, KvkFileReader, VisualKeyboard, KmxFileReader, KvkFile } from "@keymanapp/common-types";
+import { CompilerOptions, CompilerCallbacks } from "@keymanapp/developer-utils";
 import { ExpandSentinel, incxstr, xstrlen } from "./util.js";
 import { options, nl, FTabStop, setupGlobals, callbacks, FFix183_LadderLength, FCallFunctions, fk, minimumKeymanVersionToString, isKeyboardVersion10OrLater, isKeyboardVersion17OrLater } from "./compiler-globals.js";
 import { JavaScript_ContextMatch, JavaScript_KeyAsString, JavaScript_Name, JavaScript_OutputString, JavaScript_Rules, JavaScript_Shift, JavaScript_ShiftAsString, JavaScript_Store, zeroPadHex } from './javascript-strings.js';
@@ -412,7 +413,7 @@ export function WriteCompiledKeyboard(
   if((fk.flags & KMX.KMXFile.KF_AUTOMATICVERSION) == KMX.KMXFile.KF_AUTOMATICVERSION) {
     // Note: the KeymanWeb compiler is responsible for reporting minimum
     // version for the web targets
-    callbacks.reportMessage(KmwCompilerMessages.Info_MinimumEngineVersion({version:minVer}));
+    callbacks.reportMessage(KmwCompilerMessages.Info_MinimumWebEngineVersion({version:minVer}));
   }
 
   return resultPrefix + resultMinVer + result;

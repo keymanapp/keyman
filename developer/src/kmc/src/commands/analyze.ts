@@ -3,7 +3,7 @@ import * as path from 'path';
 import { Command, Option } from 'commander';
 import { NodeCompilerCallbacks } from '../util/NodeCompilerCallbacks.js';
 import { InfrastructureMessages } from '../messages/infrastructureMessages.js';
-import { CompilerCallbacks, CompilerLogLevel } from '@keymanapp/common-types';
+import { CompilerCallbacks, CompilerLogLevel } from '@keymanapp/developer-utils';
 import { AnalyzeOskCharacterUse, AnalyzeOskRewritePua } from '@keymanapp/kmc-analyze';
 import { BaseOptions } from '../util/baseOptions.js';
 import { runOnFiles } from '../util/projectRunner.js';

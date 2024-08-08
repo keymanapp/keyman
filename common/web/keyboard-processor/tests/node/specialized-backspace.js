@@ -6,6 +6,7 @@ const require = createRequire(import.meta.url);
 
 import { Codes, KeyboardInterface, KeyboardProcessor, KeyEvent, MinimalKeymanGlobal, Mock } from '@keymanapp/keyboard-processor';
 import { NodeKeyboardLoader } from '@keymanapp/keyboard-processor/node-keyboard-loader';
+import { ModifierKeyConstants } from '@keymanapp/common-types';
 
 
 const TEST_DEVICE = {
@@ -17,8 +18,6 @@ const TEST_DEVICE = {
 
 // Basic scaffolding necessary to use special, locally-defined test keyboards.
 const COMMON_KBD_SCRIPT_PROPS = new (function (){
-  var modCodes = Codes.modifierCodes;
-
   this.KMINVER="10.0";
   // this.KV left empty - we aren't doing layout stuff for this test, so it's "fine".
   // - also this.KV.KLS
@@ -26,7 +25,7 @@ const COMMON_KBD_SCRIPT_PROPS = new (function (){
   this.KH='';
   this.KM=0;
   this.KBVER="0.0.1";
-  this.KMBM=modCodes.SHIFT /* 0x0010 */;
+  this.KMBM=ModifierKeyConstants.K_SHIFTFLAG /* 0x0010 */;
   this.gs=function(t,e) {
     return this.g_main(t,e);
   };
@@ -131,7 +130,7 @@ describe('Engine - specialized backspace handling', function() {
     let event = new KeyEvent({
       Lcode: Codes.keyCodes.K_BKSP,
       Lmodifiers: 0,
-      Lstates: Codes.modifierCodes.NO_CAPS | Codes.modifierCodes.NO_NUM_LOCK | Codes.modifierCodes.NO_SCROLL_LOCK,
+      Lstates: ModifierKeyConstants.NOTCAPITALFLAG | ModifierKeyConstants.NOTNUMLOCKFLAG | ModifierKeyConstants.NOTSCROLLFLAG,
       LisVirtualKey: true,
       kName: '',
       vkCode: Codes.keyCodes.K_BKSP,
@@ -159,7 +158,7 @@ describe('Engine - specialized backspace handling', function() {
     let event = new KeyEvent({
       Lcode: Codes.keyCodes.K_A,
       Lmodifiers: 0,
-      Lstates: Codes.modifierCodes.NO_CAPS | Codes.modifierCodes.NO_NUM_LOCK | Codes.modifierCodes.NO_SCROLL_LOCK,
+      Lstates: ModifierKeyConstants.NOTCAPITALFLAG | ModifierKeyConstants.NOTNUMLOCKFLAG | ModifierKeyConstants.NOTSCROLLFLAG,
       LisVirtualKey: true,
       kName: '',
       vkCode: Codes.keyCodes.K_A,
@@ -194,7 +193,7 @@ describe('Engine - specialized backspace handling', function() {
     let event = new KeyEvent({
       Lcode: Codes.keyCodes.K_BKSP,
       Lmodifiers: 0,
-      Lstates: Codes.modifierCodes.NO_CAPS | Codes.modifierCodes.NO_NUM_LOCK | Codes.modifierCodes.NO_SCROLL_LOCK,
+      Lstates: ModifierKeyConstants.NOTCAPITALFLAG | ModifierKeyConstants.NOTNUMLOCKFLAG | ModifierKeyConstants.NOTSCROLLFLAG,
       LisVirtualKey: true,
       kName: '',
       vkCode: Codes.keyCodes.K_BKSP,
@@ -229,7 +228,7 @@ describe('Engine - specialized backspace handling', function() {
     let event = new KeyEvent({
       Lcode: Codes.keyCodes.K_BKSP,
       Lmodifiers: 0,
-      Lstates: Codes.modifierCodes.NO_CAPS | Codes.modifierCodes.NO_NUM_LOCK | Codes.modifierCodes.NO_SCROLL_LOCK,
+      Lstates: ModifierKeyConstants.NOTCAPITALFLAG | ModifierKeyConstants.NOTNUMLOCKFLAG | ModifierKeyConstants.NOTSCROLLFLAG,
       LisVirtualKey: true,
       kName: '',
       vkCode: Codes.keyCodes.K_BKSP,
@@ -257,7 +256,7 @@ describe('Engine - specialized backspace handling', function() {
     let event = new KeyEvent({
       Lcode: Codes.keyCodes.K_BKSP,
       Lmodifiers: 0,
-      Lstates: Codes.modifierCodes.NO_CAPS | Codes.modifierCodes.NO_NUM_LOCK | Codes.modifierCodes.NO_SCROLL_LOCK,
+      Lstates: ModifierKeyConstants.NOTCAPITALFLAG | ModifierKeyConstants.NOTNUMLOCKFLAG | ModifierKeyConstants.NOTSCROLLFLAG,
       LisVirtualKey: true,
       kName: '',
       vkCode: Codes.keyCodes.K_BKSP,
@@ -285,7 +284,7 @@ describe('Engine - specialized backspace handling', function() {
     let event = new KeyEvent({
       Lcode: Codes.keyCodes.K_BKSP,
       Lmodifiers: 0,
-      Lstates: Codes.modifierCodes.NO_CAPS | Codes.modifierCodes.NO_NUM_LOCK | Codes.modifierCodes.NO_SCROLL_LOCK,
+      Lstates: ModifierKeyConstants.NOTCAPITALFLAG | ModifierKeyConstants.NOTNUMLOCKFLAG | ModifierKeyConstants.NOTSCROLLFLAG,
       LisVirtualKey: true,
       kName: '',
       vkCode: Codes.keyCodes.K_BKSP,
@@ -320,7 +319,7 @@ describe('Engine - specialized backspace handling', function() {
     let event = new KeyEvent({
       Lcode: Codes.keyCodes.K_BKSP,
       Lmodifiers: 0,
-      Lstates: Codes.modifierCodes.NO_CAPS | Codes.modifierCodes.NO_NUM_LOCK | Codes.modifierCodes.NO_SCROLL_LOCK,
+      Lstates: ModifierKeyConstants.NOTCAPITALFLAG | ModifierKeyConstants.NOTNUMLOCKFLAG | ModifierKeyConstants.NOTSCROLLFLAG,
       LisVirtualKey: true,
       kName: '',
       vkCode: Codes.keyCodes.K_BKSP,

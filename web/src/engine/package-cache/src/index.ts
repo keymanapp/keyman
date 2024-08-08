@@ -1,5 +1,3 @@
-export { ModelSpec } from '@keymanapp/input-processor';
-
 export {
   ErrorStub,
   type KeyboardAPISpec,

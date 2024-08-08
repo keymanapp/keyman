@@ -200,9 +200,11 @@ describe('ModelCompositor', function() {
         //   secondary corrections may be found
         // - It's possible to interrupt "too late" if the correction search proceeds quickly,
         //   returning a standard full set.
-        await firstPredict;
+        const terminatedSuggestions = await firstPredict;
         const finalSuggestions = await secondPredict;
-
+        if(terminatedSuggestions.length > 0) {
+          assert.isOk(terminatedSuggestions.find((entry) => entry.displayAs == 'a'));
+        }
         assert.isOk(finalSuggestions.find((entry) => entry.displayAs == 'applied'));
       });
     });

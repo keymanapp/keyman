@@ -223,8 +223,8 @@ typedef struct
 // QueueAction ItemTypes
 #define QIT_VKEYDOWN	0
 #define QIT_VKEYUP		1
-#define QIT_VSHIFTDOWN	2
-#define QIT_VSHIFTUP	3
+//#define QIT_VSHIFTDOWN	2 // deprecated see #11925
+//#define QIT_VSHIFTUP	3   // deprecated see #11925
 #define QIT_CHAR		4
 #define QIT_DEADKEY		5
 #define QIT_BELL		6
@@ -267,10 +267,6 @@ BOOL WINAPI PostKeyCallback(APPACTIONQUEUEITEM* Queue, int QueueSize) {
         //pInputs[i].ki.wScan = SCAN_FLAG_KEYMAN_KEY_EVENT;
         //pInputs[i].ki.dwFlags = KEYEVENTF_KEYUP | ((Queue[n].dwData & QVK_EXTENDED) ? KEYEVENTF_EXTENDEDKEY : 0);  // I3438
       }
-      break;
-    case QIT_VSHIFTDOWN:
-      break;
-    case QIT_VSHIFTUP:
       break;
     case QIT_CHAR:
       // TODO: surrogate pairs
