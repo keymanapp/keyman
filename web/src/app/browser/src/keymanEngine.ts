@@ -6,7 +6,7 @@ import {
   TwoStateActivator,
   VisualKeyboard
 } from 'keyman/engine/osk';
-import { ErrorStub, KeyboardStub, CloudQueryResult, toPrefixedKeyboardId as prefixed } from 'keyman/engine/package-cache';
+import { ErrorStub, KeyboardStub, CloudQueryResult, toPrefixedKeyboardId as prefixed } from 'keyman/engine/keyboard-storage';
 import { DeviceSpec, Keyboard, KeyboardObject } from "keyman/engine/keyboard";
 
 import * as views from './viewsAnchorpoint.js';

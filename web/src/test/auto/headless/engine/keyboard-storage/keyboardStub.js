@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
-import { KeyboardStub } from 'keyman/engine/package-cache';
-import NodeCloudRequester from 'keyman/engine/package-cache/node-requester';
+import { KeyboardStub } from 'keyman/engine/keyboard-storage';
+import NodeCloudRequester from 'keyman/engine/keyboard-storage/node-requester';
 
 import path from 'path';
 import { fileURLToPath } from 'url';

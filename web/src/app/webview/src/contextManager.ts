@@ -1,6 +1,6 @@
 import { type Keyboard  } from 'keyman/engine/keyboard';
 import { Mock, OutputTarget, Transcription, findCommonSubstringEndIndex, isEmptyTransform, TextTransform } from 'keyman/engine/js-processor';
-import { KeyboardStub } from 'keyman/engine/package-cache';
+import { KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { ContextManagerBase } from 'keyman/engine/main';
 import { WebviewConfiguration } from './configuration.js';
 

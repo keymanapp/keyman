@@ -7,9 +7,9 @@ import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader'
 import {
   KeyboardRequisitioner,
   toPrefixedKeyboardId as prefixed
-} from 'keyman/engine/package-cache';
+} from 'keyman/engine/keyboard-storage';
 import { PathConfiguration } from 'keyman/engine/interfaces';
-import NodeCloudRequester from 'keyman/engine/package-cache/node-requester';
+import NodeCloudRequester from 'keyman/engine/keyboard-storage/node-requester';
 
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -33,7 +33,7 @@ const pathConfig = new PathConfiguration({
   // Keyboard paths in fixtures are relative to the repository root.
   keyboards: `file:///${resolvedResourcePackage}/../../..`, // the one part NEEDED for unit tests below.
   fonts: '',
-}, `file:///${path.dirname(require.resolve('keyman/engine/package-cache'))}`);
+}, `file:///${path.dirname(require.resolve('keyman/engine/keyboard-storage'))}`);
 
 /**
  * Performs mocking setup to facilitate unit testing for the `CloudQueryEngine` class.

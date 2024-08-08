@@ -3,7 +3,7 @@ import { ProcessorInitOptions, RuleBehavior } from 'keyman/engine/js-processor';
 import { DOMKeyboardLoader as KeyboardLoader } from "keyman/engine/keyboard/dom-keyboard-loader";
 import { InputProcessor } from './headless/inputProcessor.js';
 import { OSKView } from "keyman/engine/osk";
-import { KeyboardRequisitioner, ModelCache, toUnprefixedKeyboardId as unprefixed } from "keyman/engine/package-cache";
+import { KeyboardRequisitioner, ModelCache, toUnprefixedKeyboardId as unprefixed } from "keyman/engine/keyboard-storage";
 import { ModelSpec, PredictionContext } from "keyman/engine/interfaces";
 
 import { EngineConfiguration, InitOptionSpec } from "./engineConfiguration.js";
@@ -12,7 +12,7 @@ import { ContextManagerBase } from "./contextManagerBase.js";
 import HardKeyboardBase from "./hardKeyboard.js";
 import { LegacyAPIEvents } from "./legacyAPIEvents.js";
 import { EventNames, EventListener, LegacyEventEmitter } from "keyman/engine/events";
-import DOMCloudRequester from "keyman/engine/package-cache/dom-requester";
+import DOMCloudRequester from "keyman/engine/keyboard-storage/dom-requester";
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
 // From https://stackoverflow.com/a/69328045
