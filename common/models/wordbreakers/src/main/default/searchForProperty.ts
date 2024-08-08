@@ -1,4 +1,4 @@
-import { WordBreakProperty } from "./data.js";
+import { WordBreakProperty } from "./data.inc.js";
 
 export function searchForProperty(codePoint: number): WordBreakProperty {
   const bucketSize = codePoint <= 0xFFFF ? 2 : 3;

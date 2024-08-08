@@ -21,7 +21,7 @@ builder_describe "Builds the predictive-text wordbreaker implementation module" 
   "--ci"
 
 builder_describe_outputs \
-  configure          /node_modules \
+  configure          src/main/default/data.inc.ts \
   build              build/obj/index.js
 
 builder_parse "$@"
@@ -29,7 +29,10 @@ builder_parse "$@"
 function do_configure() {
   verify_npm_setup
 
-  tsc -b src/data-compiler/tsconfig.json
+  # This is a script used to build the data.inc.ts file needed by the
+  # default wordbreaker.  We rarely update the backing data, but it
+  # is needed _before_ the `build` action's compilation step.
+  tsc -b tools/data-compiler/tsconfig.json
   node ./build/obj/data-compiler/index.js
 }
 

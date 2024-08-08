@@ -1,4 +1,4 @@
-import { WordBreakProperty, WORD_BREAK_PROPERTY, I, propertyMap } from "./data.js";
+import { WordBreakProperty, WORD_BREAK_PROPERTY, I, propertyMap } from "./data.inc.js";
 
 /**
  * A set of options used to customize and extend the behavior of the default
