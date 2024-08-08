@@ -21,6 +21,6 @@ describe('getLastGitCommitDate', function () {
     // The expected date was manually extracted using the following command, with msec appended:
     //   TZ=UTC git log --date=iso-strict-local -- fixtures/get-last-git-commit-date/README.md
     // If the fixture modified, then this will also need to be updated.
-    assert.equal(date, '2024-08-01T00:07:07.000Z');
+    assert.equal(date, '2024-06-17T20:43:48.000Z');
   });
 });
