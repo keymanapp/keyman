@@ -1,3 +1,4 @@
+import { Wordform2Key } from "./common.js";
 import { Entry, InternalNode, Leaf, Node } from "./trie.js";
 
 // const SINGLE_CHAR_RANGE = Math.pow(2, 16) - 64;
@@ -66,15 +67,15 @@ export function compressEntry(entry: Entry): string {
   return `${entryLenEnc}${weightEnc}${content}`;
 }
 
-export function decompressEntry(str: string, keyFunction: (text: string) => string, baseIndex: number): Entry {
+export function decompressEntry(str: string, keyFunction: Wordform2Key, baseIndex: number): Entry {
   baseIndex ||= 0;
 
   const entryLen = decompressNumber(str, baseIndex + 0, baseIndex + NODE_SIZE_WIDTH);
-  // c8 ignore start
+  /* c8 ignore start */
   if(str.length < baseIndex + entryLen) {
     throw new Error('Parts of the encoded entry are missing');
   }
-  // c8 ignore end
+  /* c8 ignore end */
 
   const headerEnd = baseIndex + ENTRY_HEADER_WIDTH;
   const weight = decompressNumber(str, baseIndex + NODE_SIZE_WIDTH, headerEnd);
@@ -106,15 +107,15 @@ export function compressNode(node: Node) {
   return `${compressNumber(charLength, 2)}${weightEnc}${encodedSpecifics}`;
 }
 
-export function decompressNode(str: string, keyFunction: (text: string) => string, baseIndex: number) {
+export function decompressNode(str: string, keyFunction: Wordform2Key, baseIndex: number) {
   baseIndex ||= 0;
 
   const entryLen = decompressNumber(str, baseIndex + 0, baseIndex + NODE_SIZE_WIDTH);
-  // c8 ignore start
+  /* c8 ignore start */
   if(str.length < baseIndex + entryLen) {
     throw new Error('Parts of the encoded node are missing');
   }
-  // c8 ignore end
+  /* c8 ignore end */
 
   const typeFlagSrc = decompressNumber(str, baseIndex + NODE_TYPE_INDEX, baseIndex + NODE_TYPE_INDEX + 1);
   const isLeafType = typeFlagSrc & 0x8000;
@@ -133,11 +134,11 @@ function compressLeaf(leaf: Leaf): string {
 
   // key, content, weight - per entry
   const entryCntAndType = entries.length | 0x8000;
-  // c8 ignore start
+  /* c8 ignore start */
   if(entries.length >= 0x8000) {
     throw new Error("Cannot encode leaf:  too many direct entries");
   }
-  // c8 ignore end
+  /* c8 ignore end */
   let compressedEntries = [compressNumber(entryCntAndType)].concat(entries.map((entry) => {
     // if already compressed,  no need to recompress it.
     return typeof entry == 'string' ? entry : compressEntry(entry);
@@ -146,7 +147,7 @@ function compressLeaf(leaf: Leaf): string {
   return compressedEntries.join('');
 }
 
-function decompressLeaf(str: string, keyFunction: (text: string) => string, baseIndex: number): Leaf {
+function decompressLeaf(str: string, keyFunction: Wordform2Key, baseIndex: number): Leaf {
   const weight = decompressNumber(str, baseIndex + NODE_SIZE_WIDTH, baseIndex + NODE_SIZE_WIDTH + WEIGHT_WIDTH);
 
   // Assumes string-subsection size check has passed.
@@ -190,38 +191,31 @@ function decompressLeaf(str: string, keyFunction: (text: string) => string, base
 function compressInternal(node: InternalNode): string {
   let values = node.values;
   const valueCntAndType = values.length;
-  // c8 ignore start
+  /* c8 ignore start */
   if(valueCntAndType >= 0x8000) {
     throw new Error("Cannot encode node:  too many direct children");
   }
-  // c8 ignore end
+  /* c8 ignore end */
 
   const compressedChildren = values.map((value) => {
-    // BIG ERROR DETECTED:  lexical-model compiler is not emitting SENTINEL chars correctly
-    // for _some_ cases!  '﷐' shows up for 'most', but not _all_, places where it belongs.
-    // Approx 20% error rate!?
-    //
-    // STRONG SUSPICION: addItemToInternalNode
-    // - current line 376:  let char = item.key[index];
-    //   - does not validate that the char exists!
-    //
-    // detected via `sil.km.gcc - 1.0`.
+    // In case of regression for #11073
     if(value === null) {
       value = "undefined"; // yes, really.
     }
     const child = node.children[value];
 
-    // c8 ignore start
+    /* c8 ignore start */
     if(!child) {
       throw new Error("unexpected empty reference for child");
     }
-    // c8 ignore end
+    /* c8 ignore end */
 
     // No need to recompress it if it's already compressed.
     return typeof child == 'string' ? child : compressNode(child);
   });
 
   // Properly fix the sentinel-value issue.
+  // Also of note:  this array may contain halves of surrogate pairs.
   values = values.map((value) => value === null ? '\ufdd0' : value);
 
   const totalArr = [compressNumber(valueCntAndType)].concat(values).concat(compressedChildren);
@@ -254,15 +248,8 @@ function decompressInternal(str: string, baseIndex: number): Omit<InternalNode, 
     // To consider:  is it better to just make a 'lazy span' against the original string?
     // - would use more memory, especially once a Trie is "mostly" decompressed
     // - would likely decompress a bit faster.
+    // - would not be wise if we ever wish to have live editing of a loaded Trie; it's only
+    //   a useful strategy if the backing data is static.
     children: compressedChildren
   }
 }
-
-// Finally...
-//
-// encoded ROOT:
-// - JSON.stringify(encoded INTERNAL form) - to be loadable in the file.
-// - loads to a decoded InternalNode equivalent, but with still-encoded children.
-// - upon a request _for_ the children, decodes them.
-//   - they are requested as an array.
-//   - fully decodes leaf nodes, does one decode layer for internals (stopping at still-encoded [grand]children)
