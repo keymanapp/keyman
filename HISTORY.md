@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.85 alpha 2024-08-08
+
+* fix(developer): update date for last git commit date fixture (#12122)
+* refactor(android/engine): Parse keyboards.json for FirstVoices app (#11943)
+
 ## 18.0.84 alpha 2024-08-07
 
 * refactor(common): move kpj-related files into developer-utils (#11531)
