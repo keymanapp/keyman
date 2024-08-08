@@ -30,7 +30,7 @@ std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;  // I4353
 /**
  * @brief  main function for mcompile for Windows, Linux, Mac
  * @param  argc number of commandline arguments
- * @param  argv commandline arguments
+ * @param  argv pointer to commandline arguments: executable, inputfile, outputfile
  * @return 0 on success
  */
 #if defined(_WIN32) || defined(_WIN64)
