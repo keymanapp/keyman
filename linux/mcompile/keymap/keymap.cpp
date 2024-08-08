@@ -670,7 +670,7 @@ vec_dword_2D create_empty_2D_Vector(int dim_rows, int dim_ss) {
  * @param[in,out] all_vector 3D-vector that holds the data of the US keyboard and the currently used (underlying) keyboard
  * @param         keymap     pointer to currently used (underlying) keybord layout
  * @return 0 on success;
- *         1 if the initialization of the underlying vector failes;
+ *         1 if the initialization of the underlying vector fails;
  *         2 if data of less than 2 keyboards is contained in all_vector
 */
 int append_underlying_ToVector(vec_dword_3D& all_vector, GdkKeymap* keymap) {
@@ -706,10 +706,8 @@ int append_underlying_ToVector(vec_dword_3D& all_vector, GdkKeymap* keymap) {
 }
 
 /**
- * @brief  create a pointer to pointer of the current keymap for later use
- * @param  keymap pointer to pointer to currently used (underlying) keyboard layout
- * @param  argc   count of arguments
- * @param  argv   array of arguments
+ * @brief  initializes GDK and return the current keymap for later use
+ * @param  keymap [out] currently used (underlying) keyboard layout
  * @return FALSE on success;
  *         TRUE if the display or keymap is not found
 */

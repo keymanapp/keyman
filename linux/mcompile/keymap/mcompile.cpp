@@ -52,7 +52,6 @@ std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;  // I4353
  * @brief  start of mcompile; load, convert and save keyboard
  * @param  argc    number of commandline arguments
  * @param  argv     pointer to commandline arguments: executable, inputfile, outputfile
- * @param  argv_gdk pointer to (commandline arguments)
  * @return 0 on success,
  *         1 for wrong usage of calling parameters,
  *         3 if unable to load keyboard
