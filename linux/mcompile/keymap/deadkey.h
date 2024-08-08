@@ -6,23 +6,25 @@
 #include "mc_import_rules.h"
 #include <map>
 
+/** @brief create a Vector of DeadKey containing all combinations of deadkey + character for ALL possible Linux keyboards */
+std::vector<DeadKey*> create_deadkeys_by_basechar();
 
-// create a 2D-vector of all dk combinations ( ` + a -> à ;  ^ + a -> â ; `+ e -> è; ...)
-void create_DKTable(vec_dword_2D &dk_ComposeTable);
+/** @brief filter entries for the currently used Linux Keyboard out of a vector of all existing deadKey combinations */
+void refine_alDead(KMX_WCHAR dk, std::vector<DeadKey*>& dkVec, std::vector<DeadKey*>& r_All_Vec);
 
-// find all possible dk combinations that exist
-std::vector<DeadKey *> create_deadkeys_by_basechar();
+/** @brief check whether a deadkey already exists in the deadkey vector */
+bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey*>& dkVec);
 
-// refine dk to those used in the underlying keyboard
-void refine_alDead(KMX_WCHAR dk, std::vector<DeadKey *> &myVec, std::vector<DeadKey *> &r_All_Vec);
+/** @brief find all deadkey combinations for a certain deadkey in a vector of all deadkey combinations */
+bool query_dk_combinations_for_specific_dk(vec_dword_2D& r_dk_ComposeTable, KMX_DWORD dk, vec_dword_2D& dk_SingleTable);
 
-// check if entry is already there
-bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey *> &myVec);
+/** @brief convert a character to the upper-case equivalent and find the corresponding shiftstate of the entered keyval */
+KMX_DWORD KMX_change_keyname_to_capital(KMX_DWORD kVal, KMX_DWORD& shift, GdkKeymap* keymap);
 
-// query_dk_combinations_for_a specific_dk from dk_ComposeTable(which holds all dk combinations) e.g. for dk: ^ get â,ê,î,ô,û,...
-bool query_dk_combinations_for_specific_dk(vec_dword_2D &dk_ComposeTable, KMX_DWORD dk, vec_dword_2D &dk_SingleTable);
+/** @brief append a 1D-vector containing name, base character and unicode_value to a 2D-Vector */
+void add_deadkey_combination(vec_dword_2D& dk_ComposeTable, std::string diacritic_name, std::string base_char, KMX_DWORD unicode_value);
 
-// get the shifted character of a key and write shiftstate of KVal to shift
-KMX_DWORD KMX_change_keyname_to_capital(KMX_DWORD kVal, KMX_DWORD &shift, GdkKeymap *keymap);
+/** @brief create a 2D-Vector containing all possible combinations of deadkey + character for all Linux keyboards */
+void create_DKTable(vec_dword_2D& dk_ComposeTable);
 
 #endif /*DEADKEY_H*/
