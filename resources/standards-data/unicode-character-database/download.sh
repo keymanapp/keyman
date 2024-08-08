@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-#
-# Compile our sourcemap-path remapping module for use by Web builds, releases, etc.
-#
+
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
@@ -13,12 +11,11 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ################################ Main script ################################
 
 builder_describe \
-  "Downloads Unicode data consumed by various Keyman platforms." \
-  clean configure build
+  "Downloads Unicode data files, version $KEYMAN_VERSION_UNICODE (see minimum-versions.inc.sh), to be committed to repo." \
+  download+
 
 builder_describe_outputs \
-  configure     /resources/standards-data/unicode-character-database/UnicodeData.txt \
-  build         /resources/standards-data/unicode-character-database/UnicodeData.txt
+  download     /resources/standards-data/unicode-character-database/UnicodeData.txt
 
 builder_parse "$@"
 
@@ -50,13 +47,7 @@ function downloadPropertyFile() {
   }
 }
 
-do_clean() {
-  mv unicode-copyright.txt unicode-copyright.txt.bak
-  rm -rf *.txt
-  mv unicode-copyright.txt.bak unicode-copyright.txt
-}
-
-do_configure() {
+do_download() {
   downloadPropertyFile "${BLOCKS_SRC_HREF}"          "${BLOCKS_SRC_LOCAL}"
   downloadPropertyFile "${UNICODE_DATA_SRC_HREF}"    "${UNICODE_DATA_SRC_LOCAL}"
 
@@ -64,5 +55,4 @@ do_configure() {
   downloadPropertyFile "${EMOJI_DATA_SRC_HREF}"      "${EMOJI_DATA_SRC_LOCAL}"
 }
 
-builder_run_action clean      do_clean
-builder_run_action configure  do_configure
+builder_run_action download  do_download

@@ -12,8 +12,9 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 ################################ Main script ################################
 
+# Note:  the raw text files used for data.inc.ts are found within
+# /resources/standards-data/unicode-character-database.
 builder_describe "Builds the predictive-text wordbreaker implementation module" \
-  "@/resources/standards-data/unicode-character-database configure" \
   "clean" \
   "configure" \
   "build" \
