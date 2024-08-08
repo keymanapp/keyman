@@ -68,18 +68,18 @@ std::u16string u16string_from_wstring(std::wstring const wstr) {
 /**   UTF16 (=const wchar_t*) -> -> std::string  -> std::u16string -> UTF16 ( = char16_t*)
  * @brief  Convert pointer to wchar_t to pointer to char16_t and copy sz elements into dst
  * @param  dst destination
- * @param  sz  nr of characters to be copied
+ * @param  max nr of characters to be copied
  * @param  fmt source to convert and copy
  */
-void u16sprintf(KMX_WCHAR* dst, const size_t sz, const wchar_t* fmt, ...) {
-  wchar_t* wbuf = new wchar_t[sz];
+void u16sprintf(KMX_WCHAR* dst, const size_t max, const wchar_t* fmt, ...) {
+  wchar_t* wbuf = new wchar_t[max];
   va_list args;
   va_start(args, fmt);
-  vswprintf(wbuf, sz, fmt, args);
+  vswprintf(wbuf, max, fmt, args);
   va_end(args);
 
   std::u16string u16str = u16string_from_wstring(wbuf);
-  u16ncpy(dst, u16str.c_str(), sz);
+  u16ncpy(dst, u16str.c_str(), max);
   delete[] wbuf;
 }
 
@@ -153,8 +153,7 @@ KMX_CHAR* strrchr_slash(KMX_CHAR* name) {
 const KMX_WCHAR* u16rchr(const KMX_WCHAR* p, KMX_WCHAR ch) {
   const KMX_WCHAR* p_end = p + u16len(p);
 
-  while (p_end > p) {
-
+  while (p_end >= p) {
     if (*p_end == ch)
       return p_end;
     p_end--;
