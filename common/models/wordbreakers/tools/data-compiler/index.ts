@@ -29,7 +29,7 @@ const MAX_CODE_POINT = 0x10FFFF;
 //////////////////////////////////// Main ////////////////////////////////////
 
 const projectDir = path.dirname(require.resolve("@keymanapp/models-wordbreakers/README.md"));
-const generatedFilename = path.join(projectDir, 'src', 'main', 'default', 'data.ts');
+const generatedFilename = path.join(projectDir, 'src', 'main', 'default', 'data.inc.ts');
 
 // The data files should be in this repository, with names matching the
 // Unicode version.
