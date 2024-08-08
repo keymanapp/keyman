@@ -32,7 +32,7 @@ export function createTrieDataStructure(filenames: string[], searchTermToKey?: (
   filenames.forEach(filename => parseWordListFromFilename(wordlist, filename));
 
   let trie = buildTrie(wordlist, searchTermToKey as SearchTermToKey);
-  return JSON.stringify(trie);
+  return `{"data":${JSON.stringify(trie.compress())},"totalWeight":${trie.getTotalWeight()}}`;
 }
 
 /**
@@ -212,14 +212,11 @@ export interface SearchTermToKey {
  * @param keyFunction Function that converts word forms into indexed search keys
  * @returns A JSON-serialiable object that can be given to the TrieModel constructor.
  */
-export function buildTrie(wordlist: WordList, keyFunction: SearchTermToKey): object {
+export function buildTrie(wordlist: WordList, keyFunction: SearchTermToKey): TrieBuilder {
   let collater = new TrieBuilder(keyFunction);
 
   buildFromWordList(collater, wordlist);
-  return {
-    totalWeight: collater.getTotalWeight(),
-    root: collater.getRoot()
-  }
+  return collater;
 }
 
 /**
