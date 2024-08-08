@@ -61,7 +61,8 @@ export function addItemToInternalNode(node: InternalNode, item: Entry, index: nu
     node.children[char] = createRootNode();
     node.values.push(char);
   }
-  addUnsorted(node.children[char], item, index + 1);
+  // Assertion - the path being taken is not compressed.
+  addUnsorted(node.children[char] as Node, item, index + 1);
 }
 
 export function addItemToLeaf(leaf: Leaf, item: Entry) {
@@ -100,7 +101,8 @@ export function convertLeafToInternalNode(leaf: Leaf, depth: number): void {
       internal.children[char] = createRootNode();
       internal.values.push(char);
     }
-    addUnsorted(internal.children[char], item, depth + 1);
+    // Assertion - the path being taken is not compressed.
+    addUnsorted(internal.children[char] as Node, item, depth + 1);
   }
 
   internal.unsorted = true;
@@ -113,14 +115,24 @@ export class TrieBuilder extends Trie {
   /** The total weight of the entire trie. */
   totalWeight: number;
 
-  constructor(toKey: Wordform2Key) {
-    super(createRootNode(), 0, toKey);
-    this.totalWeight = 0;
+  constructor(toKey: Wordform2Key);
+  constructor(toKey: Wordform2Key, root: Node, totalWeight: number);
+  constructor(toKey: Wordform2Key, root?: Node, totalWeight?: number) {
+    super(root ?? createRootNode(), 0, toKey);
+    this.totalWeight = totalWeight ?? 0;
   }
 
   addEntry(word: string, weight?: number) {
     weight = (isNaN(weight ?? NaN) || !weight) ? 1 : weight;
     this.totalWeight += weight;
+
+    // // Should the Trie have previously been compressed, this will decompress
+    // // the needed parts of the path for `addUnsorted` and its helpers.
+    // //
+    // // kmc-model doesn't do this, of course, but it may matter down the road
+    // // for 'learning' features.  Such features would benefit from this
+    // // partial decompression strategy.
+    // this.traverseFromRoot().child(this.toKey(word));
 
     addUnsorted(
       this.root, {
@@ -134,7 +146,7 @@ export class TrieBuilder extends Trie {
 
   sort() {
     // Sorts the full Trie, not just a part of it.
-    sortNode(this.root);
+    sortNode(this.root, this.toKey);
   }
 
   getRoot(): Node {

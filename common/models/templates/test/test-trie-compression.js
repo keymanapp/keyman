@@ -253,8 +253,52 @@ describe('Trie decompression', function () {
       assert.doesNotThrow(() => builder.compress());
     });
 
-    it.skip('properly round-trips a Trie through compression and decompression', () => {
-      // Requires full Trie integration, which isn't included yet.
+    it('properly round-trips a Trie through compression and decompression', () => {
+      const builder = new TrieBuilder(lowercaseKey);
+      smpWordlist.forEach((tuple) => builder.addEntry(tuple[0], tuple[1]));
+
+      const compressedTrie = builder.compress();
+      const root = decompressNode(compressedTrie, lowercaseKey);
+      assert.equal(root.weight, smpWordlist[0][1]);
+      assert.sameDeepMembers(
+        root.values, [
+          'c',  /* keyed to lowercase */
+          '🙄'.charAt(0), /* is non-BMP, shares same high surrogate as '😇' */
+          '🇸'.charAt(0),  /* is non-BMP, uses a different high surrogate */
+          'u'   /* was already lowercase */
+        ]
+      );
+      root.values.forEach((key) => assert.isOk(root.children[key]));
+
+      const roundtrippedTrie = new Trie(root, builder.getTotalWeight(), lowercaseKey);
+
+      // Decompresses the path traversed; we wish to ensure it's usable even if
+      // initially compressed.
+      const uNode = roundtrippedTrie.traverseFromRoot().child('u');
+      assert.isOk(uNode);
+      const uEntries = uNode.entries;
+      assert.isOk(uEntries);
+      assert.sameDeepMembers(uEntries, [{text: 'u', p: 1.0 / builder.getTotalWeight()}]);
+
+      // Tests a simple surrogate-pair path; this path must also cross an internal node
+      // before reaching a leaf.
+      const emojiNode = roundtrippedTrie.traverseFromRoot().child('🙄');
+      assert.isOk(emojiNode);
+      const emojiEntries = emojiNode.entries;
+      assert.isOk(emojiEntries);
+      assert.sameDeepMembers(emojiEntries.map((entry) => entry.text), ['🙄']);
+
+      // This sequence tests that keying is fully in-place, even if keys aren't
+      // directly emitted.
+      const crazNode = roundtrippedTrie.traverseFromRoot().child('craz');
+      // There is no internal node at this position; it's an intermediate stage
+      // of traversal based upon the key in the leaf's entry.
+      assert.isOk(crazNode);
+      const crazyNode = crazNode.child('🤪');
+      assert.isOk(crazyNode);
+      const crazyEntries = crazyNode.entries;
+      assert.isOk(crazyEntries);
+      assert.sameDeepMembers(crazyEntries.map((entry) => entry.text), ['CRAZ🤪']);
     });
   });
 });

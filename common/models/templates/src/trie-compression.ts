@@ -123,6 +123,13 @@ export function decompressNode(str: string, keyFunction: Wordform2Key, baseIndex
   return isLeafType ? decompressLeaf(str, keyFunction, baseIndex) : decompressInternal(str, baseIndex);
 }
 
+export function inflateChild(childMap: Record<string, string | Node>, char: string, toKey: Wordform2Key) {
+  let child = childMap[char];
+  const inflated = typeof child == 'string' ? decompressNode(child, toKey, 0) : child;
+  childMap[char] = inflated;
+  return inflated;
+}
+
 // encoded LEAF:
 // - BOTH-section header
 // - entriesCnt: 1 char (fixed position)

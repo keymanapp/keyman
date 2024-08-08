@@ -1,4 +1,5 @@
 import { isHighSurrogate, isSentinel, SearchKey, SENTINEL_CODE_UNIT, Wordform2Key } from "./common.js";
+import { decompressNode, inflateChild } from "./trie-compression.js";
 
 // The following trie implementation has been (heavily) derived from trie-ing
 // by Conrad Irwin.
@@ -22,7 +23,7 @@ export interface InternalNode {
    * node may be a leaf or an internal node. The keys of this object are kept
    * in sorted order in the .values array.
    */
-  children: { [codeunit: string]: Node };
+  children: { [codeunit: string]: Node | string };
 
   /**
    * Used during compilation.
@@ -56,7 +57,7 @@ export interface Entry {
  * Recursively sort the trie, in descending order of weight.
  * @param node any node in the trie
  */
-export function sortNode(node: Node, onlyLocal?: boolean) {
+export function sortNode(node: Node, toKey: Wordform2Key, onlyLocal?: boolean) {
   if (node.type === 'leaf') {
     if (!node.unsorted) {
       return;
@@ -67,7 +68,8 @@ export function sortNode(node: Node, onlyLocal?: boolean) {
     if(!onlyLocal) {
       // We recurse and sort children before returning if sorting the full Trie.
       for (let char of node.values) {
-        sortNode(node.children[char], onlyLocal);
+        const childNode = inflateChild(node.children, char, toKey);
+        sortNode(childNode, toKey, onlyLocal);
       }
     }
 
@@ -76,7 +78,7 @@ export function sortNode(node: Node, onlyLocal?: boolean) {
     }
 
     node.values.sort((a, b) => {
-      return node.children[b].weight - node.children[a].weight;
+      return (node.children[b] as Node).weight - (node.children[a] as Node).weight;
     });
   }
 
@@ -95,14 +97,17 @@ export class TrieTraversal implements LexiconTraversal {
    */
   readonly root: Node;
 
+  readonly toKey: Wordform2Key;
+
   /**
    * The max weight for the Trie being 'traversed'.  Needed for probability
    * calculations.
    */
   totalWeight: number;
 
-  constructor(root: Node, prefix: string, totalWeight: number) {
+  constructor(root: Node, toKey: Wordform2Key, prefix: string, totalWeight: number) {
     this.root = root;
+    this.toKey = toKey;
     this.prefix = prefix;
     this.totalWeight = totalWeight;
   }
@@ -132,20 +137,22 @@ export class TrieTraversal implements LexiconTraversal {
   // Handles one code unit at a time.
   private _child(char: USVString): TrieTraversal | undefined {
     const root = this.root;
+    const toKey = this.toKey;
     const totalWeight = this.totalWeight;
     const nextPrefix = this.prefix + char;
 
     // Sorts _just_ the current level, and only if needed.
     // We only care about sorting parts that we're actually accessing.
-    sortNode(root, true);
+    sortNode(root, toKey, true);
 
     if(root.type == 'internal') {
-      let childNode = root.children[char];
-      if(!childNode) {
+      let child = root.children[char];
+      if(!child) {
         return undefined;
       }
 
-      return new TrieTraversal(childNode, nextPrefix, totalWeight);
+      const childNode = inflateChild(root.children, char, toKey);
+      return new TrieTraversal(childNode, toKey, nextPrefix, totalWeight);
     } else {
       // root.type == 'leaf';
       const legalChildren = root.entries.filter(function(entry) {
@@ -156,21 +163,22 @@ export class TrieTraversal implements LexiconTraversal {
         return undefined;
       }
 
-      return new TrieTraversal(root, nextPrefix, totalWeight);
+      return new TrieTraversal(root, toKey, nextPrefix, totalWeight);
     }
   }
 
   *children(): Generator<{char: USVString, traversal: () => LexiconTraversal}> {
-    let root = this.root;
+    const root = this.root;
+    const toKey = this.toKey;
     const totalWeight = this.totalWeight;
 
     // Sorts _just_ the current level, and only if needed.
     // We only care about sorting parts that we're actually accessing.
-    sortNode(root, true);
+    sortNode(root, toKey, true);
 
     if(root.type == 'internal') {
       for(let entry of root.values) {
-        let entryNode = root.children[entry];
+        let entryNode = inflateChild(root.children, entry, toKey);
 
         // UTF-16 astral plane check.
         if(isHighSurrogate(entry)) {
@@ -185,7 +193,7 @@ export class TrieTraversal implements LexiconTraversal {
               let prefix = this.prefix + entry + lowSurrogate;
               yield {
                 char: entry + lowSurrogate,
-                traversal: function() { return new TrieTraversal(internalNode.children[lowSurrogate], prefix, totalWeight) }
+                traversal: function() { return new TrieTraversal(inflateChild(internalNode.children, lowSurrogate, toKey), toKey, prefix, totalWeight) }
               }
             }
           } else {
@@ -196,7 +204,7 @@ export class TrieTraversal implements LexiconTraversal {
 
             yield {
               char: entry,
-              traversal: function () {return new TrieTraversal(entryNode, prefix, totalWeight)}
+              traversal: function () {return new TrieTraversal(entryNode, toKey, prefix, totalWeight)}
             }
           }
         } else if(isSentinel(entry)) {
@@ -208,7 +216,7 @@ export class TrieTraversal implements LexiconTraversal {
           let prefix = this.prefix + entry;
           yield {
             char: entry,
-            traversal: function() { return new TrieTraversal(entryNode, prefix, totalWeight)}
+            traversal: function() { return new TrieTraversal(entryNode, toKey, prefix, totalWeight)}
           }
         }
       }
@@ -230,7 +238,7 @@ export class TrieTraversal implements LexiconTraversal {
         }
         yield {
           char: nodeKey,
-          traversal: function() { return new TrieTraversal(root, prefix + nodeKey, totalWeight)}
+          traversal: function() { return new TrieTraversal(root, toKey, prefix + nodeKey, totalWeight)}
         }
       };
       return;
@@ -238,6 +246,7 @@ export class TrieTraversal implements LexiconTraversal {
   }
 
   get entries() {
+    const root = this.root;
     const totalWeight = this.totalWeight;
     const entryMapper = function(value: Entry) {
       return {
@@ -246,15 +255,17 @@ export class TrieTraversal implements LexiconTraversal {
       }
     }
 
-    if(this.root.type == 'leaf') {
+    if(root.type == 'leaf') {
+      const leaf = root;
       let prefix = this.prefix;
-      let matches = this.root.entries.filter(function(entry) {
+      let matches = leaf.entries.filter(function(entry) {
         return entry.key == prefix;
       });
 
       return matches.map(entryMapper);
     } else {
-      let matchingLeaf = this.root.children[SENTINEL_CODE_UNIT];
+      const node = root;
+      let matchingLeaf = inflateChild(node.children, SENTINEL_CODE_UNIT, this.toKey);
       if(matchingLeaf && matchingLeaf.type == 'leaf') {
         return matchingLeaf.entries.map(entryMapper);
       } else {
@@ -272,7 +283,7 @@ export class TrieTraversal implements LexiconTraversal {
  * Wrapper class for the trie and its nodes.
  */
 export class Trie {
-  protected root: Node;
+  readonly root: Node;
   /** The total weight of the entire trie. */
   readonly totalWeight: number;
   /**
@@ -281,13 +292,14 @@ export class Trie {
    */
   toKey: Wordform2Key;
 
-  constructor(root: Node, totalWeight: number, wordform2key: Wordform2Key) {
+  constructor(trie: Node | string, totalWeight: number, wordform2key: Wordform2Key) {
+    const root = (typeof trie == 'string') ? decompressNode(trie, wordform2key, 0) : trie;
     this.root = root;
     this.toKey = wordform2key;
     this.totalWeight = totalWeight;
   }
 
   public traverseFromRoot(): LexiconTraversal {
-    return new TrieTraversal(this.root, '', this.totalWeight);
+    return new TrieTraversal(this.root, this.toKey, '', this.totalWeight);
   }
 }
