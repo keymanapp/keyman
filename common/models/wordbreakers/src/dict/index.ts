@@ -1,4 +1,4 @@
-import { LazySpan, positionAfter } from "../default/index.js";
+import { LazySpan } from "../default/index.js";
 
 // Based on the MIN_KEYSTROKE_PROBABILITY penalty used by the lm-worker.
 const CHAR_SKIP_PENALTY = -Math.log2(.0001);
@@ -27,27 +27,6 @@ export function splitOnWhitespace(text: string): Span[] {
   }
 
   return sections;
-}
-
-/**
- * Splits a string into its constituent codepoints.
- *
- * BMP chars will be placed within single-char strings; non-BMP chars will
- * be represented by a single string with their surrogate-chars paired.
- * @param text
- * @returns
- */
-export function splitOnCodepoints(text: string): string[] {
-  const splayed: string[] = [];
-  let tailIndex = 0;
-  let end = text.length;
-  while(tailIndex != end) {
-    const startIndex = tailIndex;
-    tailIndex = positionAfter(text, tailIndex);
-    splayed.push(text.substring(startIndex, tailIndex));
-  }
-
-  return splayed;
 }
 
 export type DictBreakerPath = {
@@ -130,7 +109,7 @@ export function _dict_break(span: Span, dictRoot: LexiconTraversal): Span[] {
   const splitIndex = span.start;
 
   // 1.  Splay the string into individual codepoints.
-  const codepointArr = splitOnCodepoints(text);
+  const codepointArr = [...text];
 
   // 2.  Initialize tracking vars and prep the loop.
   let bestBoundingPath: DictBreakerPath = {
