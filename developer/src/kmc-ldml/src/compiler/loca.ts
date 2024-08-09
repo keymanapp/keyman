@@ -1,7 +1,8 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { LDMLKeyboard, KMXPlus } from '@keymanapp/common-types';
+import { KMXPlus } from '@keymanapp/common-types';
+import { LDMLKeyboard } from '@keymanapp/developer-utils';
 import { SectionCompiler } from "./section-compiler.js";
-import { CompilerMessages } from "./messages.js";
+import { LdmlCompilerMessages } from "./ldml-compiler-messages.js";
 
 import DependencySections = KMXPlus.DependencySections;
 import Loca = KMXPlus.Loca;
@@ -30,7 +31,7 @@ export class LocaCompiler extends SectionCompiler {
         new Intl.Locale(tag);
       } catch(e) {
         if(e instanceof RangeError) {
-          this.callbacks.reportMessage(CompilerMessages.Error_InvalidLocale({tag}));
+          this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidLocale({tag}));
           valid = false;
         } else {
           /* c8 ignore next 2 */
@@ -50,7 +51,7 @@ export class LocaCompiler extends SectionCompiler {
     const locales = sourceLocales.map((sourceLocale: string) => {
       const locale = new Intl.Locale(sourceLocale).minimize().toString();
       if(locale != sourceLocale) {
-        this.callbacks.reportMessage(CompilerMessages.Hint_LocaleIsNotMinimalAndClean({sourceLocale, locale}));
+        this.callbacks.reportMessage(LdmlCompilerMessages.Hint_LocaleIsNotMinimalAndClean({sourceLocale, locale}));
       }
       return locale;
     });
@@ -62,7 +63,7 @@ export class LocaCompiler extends SectionCompiler {
     result.locales = canonicalLocales.map(locale => sections.strs.allocString(locale));
 
     if(result.locales.length < locales.length) {
-      this.callbacks.reportMessage(CompilerMessages.Hint_OneOrMoreRepeatedLocales());
+      this.callbacks.reportMessage(LdmlCompilerMessages.Hint_OneOrMoreRepeatedLocales());
     }
 
     return result;

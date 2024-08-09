@@ -1,8 +1,8 @@
-import { CompilerCallbacks, KeymanFileTypes, KvksFile, KvksFileReader, TouchLayout, TouchLayoutFileReader } from "@keymanapp/common-types";
-import { CompilerMessages, Osk } from '@keymanapp/kmc-kmn';
-import { escapeMarkdownChar } from '@keymanapp/developer-utils';
+import { KeymanFileTypes, TouchLayout } from "@keymanapp/common-types";
+import { KmnCompilerMessages, Osk } from '@keymanapp/kmc-kmn';
+import { CompilerCallbacks, escapeMarkdownChar, KvksFile, KvksFileReader, TouchLayoutFileReader } from '@keymanapp/developer-utils';
 import { getOskFromKmnFile } from "../util/get-osk-from-kmn-file.js";
-import { AnalyzerMessages } from "../messages.js";
+import { AnalyzerMessages } from "../analyzer-messages.js";
 
 
 type StringRefUsageMap = {[index:string]: Osk.StringRefUsage[]};
@@ -167,13 +167,13 @@ export class AnalyzeOskCharacterUse {
     try {
       source = reader.read(this.callbacks.loadFile(filename));
     } catch(e) {
-      this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvksFile({filename, e}));
+      this.callbacks.reportMessage(KmnCompilerMessages.Error_InvalidKvksFile({filename, e}));
       return null;
     }
     let invalidKeys: string[] = [];
     const vk = reader.transform(source, invalidKeys);
     if(!vk) {
-      this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvksFile({filename, e:null}));
+      this.callbacks.reportMessage(KmnCompilerMessages.Error_InvalidKvksFile({filename, e:null}));
       return null;
     }
     for(let key of vk.keys) {

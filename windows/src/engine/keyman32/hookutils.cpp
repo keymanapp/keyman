@@ -25,7 +25,7 @@ DWORD ExceptionMessage(LPSTR Proc, LPEXCEPTION_POINTERS ep) {
   if (GetTempPath(MAX_PATH, temppath) == 0 ||
       GetTempFileName(temppath, "kmc", 0, filename) == 0) {
     OutputThreadDebugString("Minidump failed to generate temp file name\n");
-  } 
+  }
   else {
     HANDLE hFile = CreateFile(filename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL);
     if (!hFile) {
@@ -50,7 +50,7 @@ DWORD ExceptionMessage(LPSTR Proc, LPEXCEPTION_POINTERS ep) {
             (MINIDUMP_TYPE)(MiniDumpWithDataSegs | MiniDumpWithHandleData),
             &mei, NULL, NULL)) {
             DebugLastError("MiniDumpWriteDump");
-          } 
+          }
           else {
             OutputThreadDebugString("Minidump written to ");
             OutputThreadDebugString(filename);
@@ -74,19 +74,19 @@ DWORD ExceptionMessage(LPSTR Proc, LPEXCEPTION_POINTERS ep) {
     return EXCEPTION_CONTINUE_SEARCH;
   }
   LPEXCEPTION_RECORD er = ep->ExceptionRecord;
-  
+
   while(er != NULL) {
     if (er->ExceptionCode == EXCEPTION_ACCESS_VIOLATION) {
       OutputThreadDebugString("EXCEPTION_ACCESS_VIOLATION in ");
       OutputThreadDebugString(Proc);
-      /*SendDebugMessageFormat(0, sdmGlobal, 0, "CAUGHT EXCEPTION %d (ACCESS VIOLATION) IN %s AT %x; attempted to %s %x",
+      /*SendDebugMessageFormat("CAUGHT EXCEPTION %d (ACCESS VIOLATION) IN %s AT %x; attempted to %s %x",
         er->ExceptionCode, Proc, er->ExceptionAddress,
         er->ExceptionInformation[0] == 0 ? "read from" : "write to",
         er->ExceptionInformation[1]);*/
     }
     else {
       OutputThreadDebugString("CAUGHT EXCEPTION");
-      /*SendDebugMessageFormat(0, sdmGlobal, 0, "CAUGHT EXCEPTION %d IN %s AT %x",
+      /*SendDebugMessageFormat("CAUGHT EXCEPTION %d IN %s AT %x",
         er->ExceptionCode, Proc, er->ExceptionAddress);*/
     }
     er = er->ExceptionRecord;

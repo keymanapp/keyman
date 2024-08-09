@@ -1,6 +1,5 @@
 
 // Define standard keycode numbers (exposed for use by other modules)
-// TODO-LDML: merge with common\web\keyboard-processor\src\text\codes.ts
 
 /**
  * May include non-US virtual key codes
@@ -128,7 +127,7 @@ export const USVirtualKeyCodes = {
   'k_?C1':193,
   K_oDF:0xDF,
   K_ODF:0xDF,
-  /*K_LOPT:50001,
+  K_LOPT:50001,
   K_ROPT:50002,
   K_NUMERALS:50003,
   K_SYMBOLS:50004,
@@ -139,7 +138,7 @@ export const USVirtualKeyCodes = {
   K_SHIFTED:50009,
   K_ALTGR:50010,
   K_TABBACK:50011,
-  K_TABFWD:50012*/
+  K_TABFWD:50012
 };
 
 const k = USVirtualKeyCodes;

@@ -1,6 +1,6 @@
 import { SectionIdent, constants } from "@keymanapp/ldml-keyboard-constants";
-import { KMXPlus, LDMLKeyboard, CompilerCallbacks, MarkerParser } from '@keymanapp/common-types';
-import { VariableParser } from '@keymanapp/common-types';
+import { KMXPlus, VariableParser, MarkerParser } from '@keymanapp/common-types';
+import { LDMLKeyboard, CompilerCallbacks } from '@keymanapp/developer-utils';
 import { SectionCompiler } from "./section-compiler.js";
 import Vars = KMXPlus.Vars;
 import StringVarItem = KMXPlus.StringVarItem;
@@ -8,7 +8,7 @@ import SetVarItem = KMXPlus.SetVarItem;
 import UnicodeSetItem = KMXPlus.UnicodeSetItem;
 import DependencySections = KMXPlus.DependencySections;
 import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;
-import { CompilerMessages } from "./messages.js";
+import { LdmlCompilerMessages } from "./ldml-compiler-messages.js";
 import { KeysCompiler } from "./keys.js";
 import { TransformCompiler } from "./tran.js";
 import { DispCompiler } from "./disp.js";
@@ -87,7 +87,7 @@ export class VarsCompiler extends SectionCompiler {
           if (setrefs.length > 1) {
             // this is the form $[seta]$[setb]
             valid = false;
-            this.callbacks.reportMessage(CompilerMessages.Error_NeedSpacesBetweenSetVariables({ item }));
+            this.callbacks.reportMessage(LdmlCompilerMessages.Error_NeedSpacesBetweenSetVariables({ item }));
           } else {
             st.set.add(SubstitutionUse.variable, setrefs); // the reference to a 'map'
           }
@@ -106,7 +106,7 @@ export class VarsCompiler extends SectionCompiler {
             valid = false;
             if (allSets.has(id2)) {
               // $[set] in a UnicodeSet must be another UnicodeSet.
-              this.callbacks.reportMessage(CompilerMessages.Error_CantReferenceSetFromUnicodeSet({ id: id2 }));
+              this.callbacks.reportMessage(LdmlCompilerMessages.Error_CantReferenceSetFromUnicodeSet({ id: id2 }));
             } else {
               st.uset.add(SubstitutionUse.variable, [id2]);
             }
@@ -116,7 +116,7 @@ export class VarsCompiler extends SectionCompiler {
     }
     // one report if any dups
     if (dups.size > 0) {
-      this.callbacks.reportMessage(CompilerMessages.Error_DuplicateVariable({
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_DuplicateVariable({
         ids: Array.from(dups.values()).sort().join(', ')
       }));
       valid = false;
@@ -128,19 +128,19 @@ export class VarsCompiler extends SectionCompiler {
       // intended. collisions are handled separately.
       if (!allSets.has(id) && !allUnicodeSets.has(id)) {
         valid = false;
-        this.callbacks.reportMessage(CompilerMessages.Error_MissingSetVariable({ id }));
+        this.callbacks.reportMessage(LdmlCompilerMessages.Error_MissingSetVariable({ id }));
       }
     }
     for (const id of st.string.all) {
       if (!allStrings.has(id)) {
         valid = false;
-        this.callbacks.reportMessage(CompilerMessages.Error_MissingStringVariable({ id }));
+        this.callbacks.reportMessage(LdmlCompilerMessages.Error_MissingStringVariable({ id }));
       }
     }
     for (const id of st.uset.all) {
       if (!allUnicodeSets.has(id)) {
         valid = false;
-        this.callbacks.reportMessage(CompilerMessages.Error_MissingUnicodeSetVariable({ id }));
+        this.callbacks.reportMessage(LdmlCompilerMessages.Error_MissingUnicodeSetVariable({ id }));
       }
     }
 
@@ -179,7 +179,7 @@ export class VarsCompiler extends SectionCompiler {
 
     // report once
     if (matchedNotEmitted.size > 0) {
-      this.callbacks.reportMessage(CompilerMessages.Error_MissingMarkers({ ids: Array.from(matchedNotEmitted.values()).sort() }));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_MissingMarkers({ ids: Array.from(matchedNotEmitted.values()).sort() }));
       valid = false;
     }
 

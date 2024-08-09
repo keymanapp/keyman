@@ -1,6 +1,5 @@
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageSpec as m, CompilerMessageDef as def, CompilerMessageSpecWithException } from "@keymanapp/common-types";
 import { kmnfile } from "../kmw-compiler/compiler-globals.js";
-import { KeymanUrls } from "@keymanapp/developer-utils";
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageSpec as m, CompilerMessageDef as def, CompilerMessageSpecWithException, KeymanUrls } from "@keymanapp/developer-utils";
 
 const Namespace = CompilerErrorNamespace.KmnCompiler;
 const SevInfo = CompilerErrorSeverity.Info | Namespace;
@@ -18,30 +17,6 @@ const mw = (code: number, message: string, o?: {filename?: string, line?: number
   line: o?.line,
 });
 
-/**
- * LogLevel comes from kmn_compiler_errors.h, for legacy compiler error messages
- */
-const enum LogLevel {
-  LEVEL_MASK = 0xF000,
-  CODE_MASK = 0x0FFF,
-  CERR_FATAL = 0x8000,
-  CERR_ERROR = 0x4000,
-  CERR_WARNING = 0x2000,
-  CERR_HINT = 0x1000,
-  CERR_INFO = 0
-};
-
-/**
- * Translate the legacy compiler error messages to Severity codes
- */
-const LogLevelToSeverity: Record<number,number> = {
-  [LogLevel.CERR_FATAL]:   SevFatal,
-  [LogLevel.CERR_ERROR]:   SevError,
-  [LogLevel.CERR_WARNING]: SevWarn,
-  [LogLevel.CERR_HINT]:    SevHint,
-  [LogLevel.CERR_INFO]:    SevInfo
-}
-
 export const enum KmnCompilerMessageRanges {
   RANGE_KMN_COMPILER_MIN    = 0x001, // from kmn_compiler_errors.h
   RANGE_KMN_COMPILER_MAX    = 0x7FF, // from kmn_compiler_errors.h
@@ -50,6 +25,8 @@ export const enum KmnCompilerMessageRanges {
   RANGE_CompilerMessage_Min = 0x900, // All compiler messages listed here must be >= this value
   RANGE_CompilerMessage_Max = 0xFFF, // Highest available error code for kmc-kmn
 }
+
+type KmcmpLibMessageParameters = {p:string[]};
 
 /**
  * @internal
@@ -211,10 +188,8 @@ export class KmnCompilerMessages {
     to the file.`
   );
 
-  // static INFO_None                                            = SevInfo | 0x000;
-
-  static INFO_EndOfFile                                       = SevInfo | 0x001;
-  static Info_EndOfFile                                       = () => m(this.INFO_EndOfFile, `(no error - reserved code)`);
+  // static STATUS_None                                            = 0x000;   // This is not a real error
+  // static STATUS_EndOfFile                                       = 0x001;   // This is not a real error
 
   static FATAL_BadCallParams                                  = SevFatal | 0x002;
   static Fatal_BadCallParams                                  = () => m(this.FATAL_BadCallParams, `CompileKeyboardFile was called with bad parameters`);
@@ -228,8 +203,8 @@ export class KmnCompilerMessages {
   // static ERROR_CannotCreateOutfile                            = SevError | 0x006; // #10678: reduced from fatal to error in 17.0, but unused
   // static Error_CannotCreateOutfile                            = () => m(this.ERROR_CannotCreateOutfile, `Cannot open output file for writing`); unused
 
-  static FATAL_UnableToWriteFully                             = SevFatal | 0x007;
-  static Fatal_UnableToWriteFully                             = () => m(this.FATAL_UnableToWriteFully, `Unable to write the file completely`);
+  // static FATAL_UnableToWriteFully                             = SevFatal | 0x007;
+  // static Fatal_UnableToWriteFully                             = () => m(this.FATAL_UnableToWriteFully, `Unable to write the file completely`);
 
   static ERROR_CannotReadInfile                               = SevError | 0x008; // #10678: reduced from fatal to error in 17.0
   static Error_CannotReadInfile                               = () => m(this.ERROR_CannotReadInfile, `Cannot read the input file`);
@@ -548,10 +523,16 @@ export class KmnCompilerMessages {
   static Error_PostKeystrokeGroupMustBeReadonly               = () => m(this.ERROR_PostKeystrokeGroupMustBeReadonly, `Group used in begin postKeystroke must be readonly`);
 
   static ERROR_DuplicateGroup                                 = SevError | 0x071;
-  static Error_DuplicateGroup                                 = () => m(this.ERROR_DuplicateGroup, `A group with this name has already been defined.`);
+  static Error_DuplicateGroup                                 = (o:KmcmpLibMessageParameters) => m(
+    this.ERROR_DuplicateGroup,
+    `A group with the name '${o.p?.[0]}' has already been defined on line ${o.p?.[1]}.`
+  );
 
   static ERROR_DuplicateStore                                 = SevError | 0x072;
-  static Error_DuplicateStore                                 = () => m(this.ERROR_DuplicateStore, `A store with this name has already been defined.`);
+  static Error_DuplicateStore                                 = (o:KmcmpLibMessageParameters) => m(
+    this.ERROR_DuplicateStore,
+    `A store with the name '${o.p?.[0]}' has already been defined on line ${o.p?.[1]}.`
+  );
 
   static ERROR_RepeatedBegin                                  = SevError | 0x073;
   static Error_RepeatedBegin                                  = () => m(this.ERROR_RepeatedBegin, `Begin has already been set`);
@@ -575,7 +556,10 @@ export class KmnCompilerMessages {
   static Error_NonBMPCharactersNotSupportedInKeySection       = () => m(this.ERROR_NonBMPCharactersNotSupportedInKeySection, `Characters with codepoints over U+FFFF are not supported in the key part of the rule`);
 
   static ERROR_InvalidTarget                                  = SevError | 0x07A;
-  static Error_InvalidTarget                                  = () => m(this.ERROR_InvalidTarget, `Unrecognized compile target`);
+  static Error_InvalidTarget                                  = (o:KmcmpLibMessageParameters) => m(
+    this.ERROR_InvalidTarget,
+    `Unrecognized compile target '${o.p?.[0]}'`
+  );
 
   static ERROR_NoTargetsSpecified                             = SevError | 0x07B;
   static Error_NoTargetsSpecified                             = () => m(this.ERROR_NoTargetsSpecified, `At least one compile target must be specified`);
@@ -610,10 +594,11 @@ export class KmnCompilerMessages {
   static WARN_ReservedCharacter                               = SevWarn | 0x089;
   static Warn_ReservedCharacter                               = () => m(this.WARN_ReservedCharacter, `A Unicode character was found that should not be used`);
 
-  // Note: INFO_Info is called CWARN_Info in kmn_compiler_errors.h, but should have an "info" severity
-  static INFO_Info                                            = SevInfo | 0x08A;
-  static Info_Info                                            = () => m(this.INFO_Info, `Information`);
-
+  static INFO_MinimumCoreEngineVersion                            = SevInfo | 0x08A;
+  static Info_MinimumCoreEngineVersion                            = (o:KmcmpLibMessageParameters) => m(
+    this.INFO_MinimumCoreEngineVersion,
+    `The compiler has assigned a minimum engine version of ${o.p?.[0]}.${o.p?.[1]} based on features used in this keyboard`
+  );
 
   static WARN_VirtualKeyWithMnemonicLayout                    = SevWarn | 0x08B;
   static Warn_VirtualKeyWithMnemonicLayout                    = () => m(this.WARN_VirtualKeyWithMnemonicLayout, `Virtual key used instead of virtual character key with a mnemonic layout`);
@@ -730,33 +715,23 @@ export class KmnCompilerMessages {
   static Warn_KeyShouldIncludeNCaps                           = () => m(this.WARN_KeyShouldIncludeNCaps, `Other rules which reference this key include CAPS or NCAPS modifiers, so this rule must include NCAPS modifier to avoid inconsistent matches`);
 
   static HINT_UnreachableRule                                 = SevHint | 0x0AE;
-  static Hint_UnreachableRule                                 = () => m(this.HINT_UnreachableRule, `This rule will never be matched as another rule takes precedence`);
+  static Hint_UnreachableRule                                 = (o:KmcmpLibMessageParameters) => m(
+    this.HINT_UnreachableRule,
+    `This rule will never be matched as the rule on line ${o.p?.[0]} takes precedence`
+  );
 
   static WARN_VirtualKeyInOutput                              = SevWarn | 0x0AF;
   static Warn_VirtualKeyInOutput                              = () => m(this.WARN_VirtualKeyInOutput, `Virtual keys are not supported in output`);
 
+  static HINT_IndexStoreLong                                  = SevHint | 0x0B0;
+  static Hint_IndexStoreLong                                  = () => m(
+    this.HINT_IndexStoreLong,
+    `The store referenced in index() is longer than the store referenced in any()`
+  );
+
   static FATAL_BufferOverflow                                 = SevFatal | 0x0C0;
-  static Fatal_BufferOverflow                                = () => m(this.FATAL_BufferOverflow, `The compiler memory buffer overflowed`);
+  static Fatal_BufferOverflow                                 = () => m(this.FATAL_BufferOverflow, `The compiler memory buffer overflowed`);
 
-  static FATAL_Break                                          = SevFatal | 0x0C1;
-  static Fatal_Break                                         = () => m(this.FATAL_Break, `Compiler interrupted by user`);
-};
-
-/**
- * @internal
- * TODO: This class is here as a stopgap as we merged it with
- * KmnCompilerMessages. It should be removed in v18.0.
- */
-export class CompilerMessages extends KmnCompilerMessages {
-}
-
-export function mapErrorFromKmcmplib(line: number, code: number, msg: string): CompilerEvent {
-  const severity = LogLevelToSeverity[code & LogLevel.LEVEL_MASK];
-  const baseCode = code & LogLevel.CODE_MASK;
-  const event: CompilerEvent = {
-    line: line,
-    code: severity | CompilerErrorNamespace.KmnCompiler | baseCode,
-    message: msg
-  };
-  return event;
+  // static FATAL_Break                                          = SevFatal | 0x0C1;
+  // static Fatal_Break                                          = () => m(this.FATAL_Break, `Compiler interrupted by user`);
 };

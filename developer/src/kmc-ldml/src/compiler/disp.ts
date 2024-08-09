@@ -1,7 +1,8 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { KMXPlus, LDMLKeyboard } from '@keymanapp/common-types';
+import { LDMLKeyboard } from '@keymanapp/developer-utils';
+import { KMXPlus } from "@keymanapp/common-types";
 
-import { CompilerMessages } from "./messages.js";
+import { LdmlCompilerMessages } from "./ldml-compiler-messages.js";
 import { SectionCompiler } from "./section-compiler.js";
 
 import DependencySections = KMXPlus.DependencySections;
@@ -32,18 +33,18 @@ export class DispCompiler extends SectionCompiler {
     if (this.keyboard3.displays?.display) {
       for (const { output, keyId } of this.keyboard3.displays?.display) {
         if ((output && keyId) || (!output && !keyId)) {
-          this.callbacks.reportMessage(CompilerMessages.Error_DisplayNeedsToOrId({ output, keyId }));
+          this.callbacks.reportMessage(LdmlCompilerMessages.Error_DisplayNeedsToOrId({ output, keyId }));
           return false;
         } else if (output) {
           if (tos.has(output)) {
-            this.callbacks.reportMessage(CompilerMessages.Error_DisplayIsRepeated({ output }));
+            this.callbacks.reportMessage(LdmlCompilerMessages.Error_DisplayIsRepeated({ output }));
             return false;
           } else {
             tos.add(output);
           }
         } else if (keyId) {
           if (ids.has(keyId)) {
-            this.callbacks.reportMessage(CompilerMessages.Error_DisplayIsRepeated({ keyId }));
+            this.callbacks.reportMessage(LdmlCompilerMessages.Error_DisplayIsRepeated({ keyId }));
             return false;
           } else {
             ids.add(keyId);

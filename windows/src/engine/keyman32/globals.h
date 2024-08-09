@@ -226,6 +226,7 @@ typedef struct tagKEYMAN64THREADDATA
   HWND CurrenthWnd;
 
   BOOL debug_DebugInit;   // I3951
+  int debug_Depth;
   char debug_buf[64];
 
    // I3617   // I3618

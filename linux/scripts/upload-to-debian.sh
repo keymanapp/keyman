@@ -95,18 +95,20 @@ function get_latest_stable_branch_name() {
 function push_to_github_and_create_pr() {
   local BRANCH=$1
   local BASE=$2
-  local COMMIT_MSG=$3
-  local PR_MSG=$4
-  local pr_number
+  local PR_TITLE=$3
+  local PR_BODY=$4
 
   if [[ -n "${PUSH}" ]]; then
-      ${NOOP} git push --force-with-lease origin "${BRANCH}"
-      pr_number=$(gh pr list --draft --search "${COMMIT_MSG}" --base "${BASE}" --json number --jq '.[].number')
-      if [[ -n ${pr_number} ]]; then
-        builder_echo "PR #${pr_number} already exists"
-      else
-        ${NOOP} gh pr create --draft --base "${BASE}" --title "${PR_MSG}" --body "@keymanapp-test-bot skip"
-      fi
+    ${NOOP} git push --force-with-lease origin "${BRANCH}"
+    PR_NUMBER=$(gh pr list --draft --search "${PR_TITLE}" --base "${BASE}" --json number --jq '.[].number')
+    if [[ -n ${PR_NUMBER} ]]; then
+      builder_echo "PR #${PR_NUMBER} already exists"
+    else
+      ${NOOP} gh pr create --draft --base "${BASE}" --title "${PR_TITLE}" --body "${PR_BODY}"
+      PR_NUMBER=$(gh pr list --draft --search "${PR_TITLE}" --base "${BASE}" --json number --jq '.[].number')
+    fi
+  else
+    PR_NUMBER=""
   fi
 }
 
@@ -142,12 +144,14 @@ cp debianpackage/keyman-*/debian/changelog debian/
 git add debian/changelog
 COMMIT_MESSAGE="chore(linux): Update debian changelog"
 git commit -m "${COMMIT_MESSAGE}"
-push_to_github_and_create_pr chore/linux/changelog "${DEPLOY_BRANCH#origin/}" "${COMMIT_MESSAGE}" "${COMMIT_MESSAGE}"
+push_to_github_and_create_pr chore/linux/changelog "${DEPLOY_BRANCH#origin/}" "${COMMIT_MESSAGE}" "@keymanapp-test-bot skip"
 
 # Create cherry-pick on master branch
 git checkout -B chore/linux/cherry-pick/changelog origin/master
 git cherry-pick -x chore/linux/changelog
-push_to_github_and_create_pr chore/linux/cherry-pick/changelog master "${COMMIT_MESSAGE}" "${COMMIT_MESSAGE} 🍒"
+push_to_github_and_create_pr chore/linux/cherry-pick/changelog master "${COMMIT_MESSAGE} 🍒" \
+"Cherry-pick-of: #${PR_NUMBER}
+@keymanapp-test-bot skip"
 
 builder_heading "Finishing"
 git checkout "${CURRENT_BRANCH}"

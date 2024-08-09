@@ -45,17 +45,17 @@ export class KeyboardInfoCompilerMessages {
         filename: string;
     }) => CompilerEvent;
     // (undocumented)
-    static ERROR_FileIsNotValid: number;
-    // (undocumented)
-    static Error_FileIsNotValid: (o: {
-        filename: string;
-        e: any;
-    }) => CompilerEvent;
-    // (undocumented)
     static ERROR_FontFileCannotBeRead: number;
     // (undocumented)
     static Error_FontFileCannotBeRead: (o: {
         filename: string;
+    }) => CompilerEvent;
+    // (undocumented)
+    static ERROR_FontFileMetaDataIsInvalid: number;
+    // (undocumented)
+    static Error_FontFileMetaDataIsInvalid: (o: {
+        filename: string;
+        message: string;
     }) => CompilerEvent;
     // (undocumented)
     static ERROR_InvalidAuthorEmail: number;
@@ -87,36 +87,10 @@ export class KeyboardInfoCompilerMessages {
     // (undocumented)
     static Error_NoLicenseFound: () => CompilerEvent;
     // (undocumented)
-    static ERROR_OutputValidation: number;
-    // (undocumented)
-    static Error_OutputValidation: (o: {
-        message: any;
-    }) => CompilerEvent;
-    // (undocumented)
     static FATAL_UnexpectedException: number;
     // (undocumented)
     static Fatal_UnexpectedException: (o: {
         e: any;
-    }) => CompilerEvent;
-    // (undocumented)
-    static HINT_OutputValidation: number;
-    // (undocumented)
-    static Hint_OutputValidation: (o: {
-        message: any;
-    }) => CompilerEvent;
-    // (undocumented)
-    static WARN_MetadataFieldInconsistent: number;
-    // (undocumented)
-    static Warn_MetadataFieldInconsistent: (o: {
-        field: string;
-        value: any;
-        expected: any;
-    }) => CompilerEvent;
-    // (undocumented)
-    static WARN_OutputValidation: number;
-    // (undocumented)
-    static Warn_OutputValidation: (o: {
-        message: any;
     }) => CompilerEvent;
 }
 

@@ -17,7 +17,8 @@ import {
   isEmptyTransform
 } from '@keymanapp/keyboard-processor';
 
-import { buildCorrectiveLayout, distributionFromDistanceMaps, keyTouchDistances } from '@keymanapp/input-processor';
+import { buildCorrectiveLayout } from './correctionLayout.js';
+import { distributionFromDistanceMaps, keyTouchDistances } from './corrections.js';
 
 import {
   GestureRecognizer,
@@ -57,7 +58,7 @@ import Modipress from './input/gestures/browser/modipress.js';
 import Flick from './input/gestures/browser/flick.js';
 import { GesturePreviewHost } from './keyboard-layout/gesturePreviewHost.js';
 import OSKBaseKey from './keyboard-layout/oskBaseKey.js';
-import { OSKResourcePathConfiguration } from './index.js';
+import { OSKResourcePathConfiguration } from 'keyman/engine/interfaces';
 import KEYMAN_VERSION from '@keymanapp/keyman-version';
 
 /**

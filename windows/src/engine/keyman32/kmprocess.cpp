@@ -84,18 +84,18 @@ Process_Event_Core(PKEYMAN64THREADDATA _td) {
     km_core_context_status result;
     result = km_core_state_context_set_if_needed(_td->lpActiveKeyboard->lpCoreKeyboardState, reinterpret_cast<const km_core_cu *>(application_context));
     if (result == KM_CORE_CONTEXT_STATUS_ERROR || result == KM_CORE_CONTEXT_STATUS_INVALID_ARGUMENT) {
-      SendDebugMessageFormat(0, sdmGlobal, 0, "Process_Event_Core: km_core_state_context_set_if_needed returned [%d]", result);
+      SendDebugMessageFormat("km_core_state_context_set_if_needed returned [%d]", result);
     }
   }
 
   SendDebugMessageFormat(
-      0, sdmGlobal, 0, "ProcessEvent: vkey[%d] ShiftState[%d] isDown[%d]", _td->state.vkey,
+      "vkey[%d] ShiftState[%d] isDown[%d]", _td->state.vkey,
       static_cast<uint16_t>(Globals::get_ShiftState() & (KM_CORE_MODIFIER_MASK_ALL | KM_CORE_MODIFIER_MASK_CAPS)), (uint8_t)_td->state.isDown);
   //  Mask the bits supported according to `km_core_modifier_state` enum, update the mask if this enum is expanded.
   if (KM_CORE_STATUS_OK != km_core_process_event(
     _td->lpActiveKeyboard->lpCoreKeyboardState, _td->state.vkey,
     static_cast<uint16_t>(Globals::get_ShiftState() & (KM_CORE_MODIFIER_MASK_ALL | KM_CORE_MODIFIER_MASK_CAPS)), (uint8_t)_td->state.isDown, KM_CORE_EVENT_FLAG_DEFAULT)) {
-    SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessEvent CoreProcessEvent Result:False %d ", FALSE);
+    SendDebugMessageFormat("CoreProcessEvent Result:False %d ", FALSE);
     return FALSE;
   }
   return TRUE;
@@ -121,9 +121,9 @@ BOOL ProcessHook()
 
   fOutputKeystroke = FALSE;  // TODO: 5442 no longer needs to be global once we use core processor
 
-  if (ShouldDebug(sdmKeyboard)) {
+  if (ShouldDebug()) {
     if(!_td->lpActiveKeyboard || !_td->lpActiveKeyboard->lpCoreKeyboardState) {
-      SendDebugMessageFormat(0, sdmKeyboard, 0, "Key %s: %s Context <unavailable>",
+      SendDebugMessageFormat("Key %s: %s Context <unavailable>",
         _td->state.isDown ? "pressed" : "released",
         Debug_VirtualKey(_td->state.vkey));
     } else {
@@ -131,8 +131,8 @@ BOOL ProcessHook()
         _td->lpActiveKeyboard->lpCoreKeyboardState,
         KM_CORE_DEBUG_CONTEXT_CACHED
       );
-      SendDebugMessageFormat(0, sdmKeyboard, 0, "Key %s: %s Context '%ls'",
-        _td->state.isDown ? "pressed" : "released",
+      SendDebugMessageFormatW(L"Key %s: %hs Context '%s'",
+        _td->state.isDown ? L"pressed" : L"released",
         Debug_VirtualKey(_td->state.vkey), debug_context);
       km_core_cu_dispose(debug_context);
     }
@@ -174,13 +174,12 @@ BOOL ProcessHook()
     // block the default keystroke, emit those characters, and
     // then synthesize the original keystroke
     //
-    SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessHook: %d events in queue and default output requested. [IsLegacy:%d, IsUpdateable:%d]", _td->app->GetQueueSize(), _td->app->IsLegacy(), _td->TIPFUpdateable);
+    SendDebugMessageFormat("%d events in queue and default output requested. [IsLegacy:%d, IsUpdateable:%d]",
+      _td->app->GetQueueSize(), _td->app->IsLegacy(), _td->TIPFUpdateable);
 
     if (_td->app->IsLegacy()) {
-      _td->app->QueueAction(QIT_VSHIFTDOWN, Globals::get_ShiftState());
       _td->app->QueueAction(QIT_VKEYDOWN, _td->state.vkey);
       _td->app->QueueAction(QIT_VKEYUP, _td->state.vkey);
-      _td->app->QueueAction(QIT_VSHIFTUP, Globals::get_ShiftState());
       fOutputKeystroke = FALSE;
     }
 		else if (!_td->TIPFUpdateable) {

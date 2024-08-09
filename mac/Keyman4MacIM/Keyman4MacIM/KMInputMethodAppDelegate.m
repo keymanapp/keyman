@@ -168,22 +168,40 @@ id _lastServerWithOSKShowing = nil;
 -(void)applicationDidFinishLaunching:(NSNotification *)aNotification {
   [[NSUserDefaults standardUserDefaults] registerDefaults:@{ @"NSApplicationCrashOnExceptions": @YES }];
   
+  [KMLogs reportLogStatus];
+  
+  [self startSentry];
+
+  [self setDefaultKeymanMenuItems];
+  [self updateKeyboardMenuItems];
+  
+  [self setPostLaunchKeymanSentryTags];
+  // [SentrySDK captureMessage:@"Starting Keyman [test message]"];
+}
+
+- (void)startSentry {
   KeymanVersionInfo keymanVersionInfo = [self versionInfo];
   NSString *releaseName = [NSString stringWithFormat:@"%@", keymanVersionInfo.versionGitTag];
-  
-  [KMLogs reportLogStatus];
   
   [SentrySDK startWithConfigureOptions:^(SentryOptions *options) {
     options.dsn = @"https://960f8b8e574c46e3be385d60ce8e1fea@o1005580.ingest.sentry.io/5983522";
     options.releaseName = releaseName;
     options.environment = keymanVersionInfo.sentryEnvironment;
-    // options.debug = @YES;
+    //options.debug = YES;
   }];
-  
-  // [SentrySDK captureMessage:@"Starting Keyman [test message]"];
+}
 
-  [self setDefaultKeymanMenuItems];
-  [self updateKeyboardMenuItems];
+- (void)setPostLaunchKeymanSentryTags {
+  NSString *keyboardFileName = [self.kmx.filePath lastPathComponent];
+   os_log_info([KMLogs keyboardLog], "initial kmx set to %{public}@", keyboardFileName);
+
+  NSString *hasAccessibility = [PrivacyConsent.shared checkAccessibility]?@"Yes":@"No";
+
+   // assign custom keyboard tag in Sentry to initial keyboard
+   [SentrySDK configureScope:^(SentryScope * _Nonnull scope) {
+      [scope setTagValue:hasAccessibility forKey:@"accessibilityEnabled"];
+      [scope setTagValue:keyboardFileName forKey:@"keyboard"];
+   }];
 }
 
 #ifdef USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE
@@ -403,6 +421,14 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 - (void)setKmx:(KMXFile *)kmx {
   _kmx = kmx;
   [self.kme setKmx:_kmx];
+  
+  NSString *keyboardFileName = [kmx.filePath lastPathComponent];
+   os_log_info([KMLogs keyboardLog], "setKmx to %{public}@", keyboardFileName);
+
+   // assign custom keyboard tag in Sentry to default keyboard
+   [SentrySDK configureScope:^(SentryScope * _Nonnull scope) {
+       [scope setTagValue:keyboardFileName forKey:@"keyboard"];
+   }];
 }
 
 - (void)setKvk:(KVKFile *)kvk {

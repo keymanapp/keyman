@@ -21,6 +21,8 @@ export class KmpCompiler implements KeymanCompiler {
     init(callbacks: CompilerCallbacks, options: KmpCompilerOptions): Promise<boolean>;
     // @internal (undocumented)
     loadKpsFile(kpsFilename: string): KpsFile.KpsFile;
+    // (undocumented)
+    readonly normalizePath: (path: string) => string;
     run(inputFilename: string, outputFilename?: string): Promise<KmpCompilerResult>;
     // @internal (undocumented)
     transformKpsFileToKmpObject(kpsFilename: string, kps: KpsFile.KpsFile): KmpJsonFile.KmpJsonFile;
@@ -61,6 +63,12 @@ export class PackageCompilerMessages {
         filename: string;
     }) => CompilerEvent;
     // (undocumented)
+    static ERROR_FileRecordIsMissingName: number;
+    // (undocumented)
+    static Error_FileRecordIsMissingName: (o: {
+        description: string;
+    }) => CompilerEvent;
+    // (undocumented)
     static ERROR_FollowKeyboardVersionButNoKeyboards: number;
     // (undocumented)
     static Error_FollowKeyboardVersionButNoKeyboards: () => CompilerEvent;
@@ -68,6 +76,12 @@ export class PackageCompilerMessages {
     static ERROR_FollowKeyboardVersionNotAllowedForModelPackages: number;
     // (undocumented)
     static Error_FollowKeyboardVersionNotAllowedForModelPackages: () => CompilerEvent;
+    // (undocumented)
+    static ERROR_InvalidAuthorEmail: number;
+    // (undocumented)
+    static Error_InvalidAuthorEmail: (o: {
+        email: string;
+    }) => CompilerEvent;
     // (undocumented)
     static ERROR_InvalidPackageFile: number;
     // (undocumented)

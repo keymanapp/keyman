@@ -11,6 +11,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 builder_describe "Keyman Developer Compiler Analysis Tools" \
   "@/common/web/types" \
   "@/developer/src/kmc-kmn" \
+  "@/developer/src/common/web/utils" \
   clean configure build api test publish \
   "--npm-publish+            For publish, do a npm publish, not npm pack (only for CI)" \
   "--dry-run,-n              don't actually publish, just dry run"
