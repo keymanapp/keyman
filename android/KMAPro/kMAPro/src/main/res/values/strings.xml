@@ -114,6 +114,9 @@
   <string name="adjust_keyboard_height" comment="Menu action to adjust keyboard height">Adjust keyboard height</string>
 
   <!-- Context: Keyman Settings menu -->
+  <string name="adjust_longpress_delay" comment="Menu action to adjust longpress delay duration">Adjust longpress delay</string>
+
+  <!-- Context: Keyman Settings menu -->
   <string name="spacebar_caption" comment="Menu action to set the spacebar caption">Spacebar caption</string>
 
   <!-- Context: Keyman Settings menu / Spacebar caption -->

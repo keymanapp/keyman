@@ -28,7 +28,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
   private static Context context;
 
   private Preference languagesPreference, installKeyboardOrDictionary, displayLanguagePreference,
-    adjustKeyboardHeight;
+    adjustKeyboardHeight, adjustLongpressDelay;
   private ListPreference spacebarTextPreference;
   private CheckBoxPreference setSystemKeyboardPreference;
   private CheckBoxPreference setDefaultKeyboardPreference;
@@ -99,12 +99,20 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     });
 
     setDefaultKeyboardPreference.setOnPreferenceChangeListener(checkBlocker);
+
     adjustKeyboardHeight = new Preference(context);
     adjustKeyboardHeight.setKey(AdjustKeyboardHeightActivity.adjustKeyboardHeightKey);
     adjustKeyboardHeight.setTitle(getString(R.string.adjust_keyboard_height));
     adjustKeyboardHeight.setWidgetLayoutResource(R.layout.preference_height_icon_layout);
     Intent adjustKeyboardHeightIntent = new Intent(context, AdjustKeyboardHeightActivity.class);
     adjustKeyboardHeight.setIntent(adjustKeyboardHeightIntent);
+
+    adjustLongpressDelay = new Preference(context);
+    adjustLongpressDelay.setKey(AdjustLongpressDelayActivity.adjustLongpressDelayKey);
+    adjustLongpressDelay.setTitle(getString(R.string.adjust_longpress_delay));
+    adjustLongpressDelay.setWidgetLayoutResource(R.layout.preference_duration_icon_layout);
+    Intent adjustLongpressDelayIntent = new Intent(context, AdjustLongpressDelayActivity.class);
+    adjustLongpressDelay.setIntent(adjustLongpressDelayIntent);
 
     /* Spacebar Caption Preference */
 
@@ -197,6 +205,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     screen.addPreference(setDefaultKeyboardPreference);
 
     screen.addPreference(adjustKeyboardHeight);
+    screen.addPreference(adjustLongpressDelay);
     screen.addPreference(spacebarTextPreference);
 
     screen.addPreference(hapticFeedbackPreference);
