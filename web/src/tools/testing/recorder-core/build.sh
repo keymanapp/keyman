@@ -7,7 +7,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -24,7 +24,7 @@ builder_describe \
 
 builder_describe_outputs \
   configure   "/node_modules" \
-  build       "/common/web/recorder/build/obj/index.js"
+  build       "/web/src/tools/testing/recorder-core/build/obj/index.js"
 
 builder_parse "$@"
 
