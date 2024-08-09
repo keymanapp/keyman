@@ -247,13 +247,12 @@ export function _dict_break(span: Span, dictRoot: LexiconTraversal): Span[] {
     - What words are possible to reach given recent possible boundaries?
       - idea: keep a running 'tally' of all Traversals that have valid paths at the
         current processing stage, noting what their starting points were.
-        - ... instead of 'tally'... 'priority queue'?
+        - matches the approach seen above.
+        - Possible optimization: ... instead of 'tally'... 'priority queue'?
           - cheapest (start point cost) + (current traversal min cost) makes a good
             A* heuristic.
             - valid heuristic - traversal min-cost will never overestimate.
             - would likely avoid a need to search expensive branches this way.
-            - ** NOTE: traversals do not CURRENTLY track their min-cost. **
-              - should be possible to add as a feature, though.
               - current correction considers fat-finger prob * correction cost.
               - lexical probability only factors in 100%-after corrections, as a
                 final step, at present, hence why it's not currently available.
@@ -276,20 +275,7 @@ export function _dict_break(span: Span, dictRoot: LexiconTraversal): Span[] {
       O(N [worst-case]): loop over each still-valid traversal
         - at most, matches the index of the current codepoint
         - in practice, will be NOTABLY fewer after the first few codepoints.
-        O(A), A = size of alphabet: loop over traversal branches
-          - ** though, in theory... couldn't we just direct look-up the exact branch? **
-            - Trie format's traversal absolutely has the needed backing data.
-            Would reduce O(A) => O(1), which is significant.
-          - on valid transition, add new, initial-rooted traversal based at the new spot, referring to
-            prev spot as ancestor.
-
-
-    So far, those're two aspects of Traversals (noted with **'s) that could be enhanced to help optimize
-    dict-breaking.
-    - One to provide a heuristic & allow pruning paths via A*
-      - also... to allow needing to use a Trie model from within the wordbreaker for word-prob lookups.
-    - One to dramatically trim down the number of needed loop-iterations / branches for the search update indexing.
-      - See:  O(A) => O(1).
+        O(1): check if the Traversal can continue with the new incoming char.
   */
 
   // 2.  Initial state:  one traversal @ root pointing to 'no ancestor'.
@@ -302,5 +288,5 @@ export function _dict_break(span: Span, dictRoot: LexiconTraversal): Span[] {
   //     - but... how to clear that cache on model change?
   //       - duh!  validate the passed-in root traversal.  If unequal, is diff model.  ezpz.
 
-  return [];
+  // return [];
 }
