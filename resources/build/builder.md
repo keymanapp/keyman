@@ -229,6 +229,14 @@ builder_describe \
   "--feature=FOO   Enable feature foo"
 ```
 
+## Constraining build targets by platform or tooling
+
+You can use [`builder_describe_platform`](#builderdescribeplatform-function) to
+constrain certain targets to only run on specific platforms or if specific
+toolchains are installed.
+
+## Parsing command line
+
 After describing the available parameters, you need to pass the command line
 parameters in for parsing and validation:
 
@@ -555,6 +563,47 @@ repository root, not filesystem root.
 
 --------------------------------------------------------------------------------
 
+## `builder_describe_platform` function
+
+Describes the platforms for which a given target will be available, and
+filters the list of targets accordingly, removing targets that cannot be built
+on the current platform. Removed targets will be listed in a separate section
+in the help documentation.
+
+### Usage
+
+```bash
+builder_describe_platform :target platform[,...] [:target platform[,...] ...]
+```
+
+### Parameters
+
+* `target platform[s]` ...:     Target and its list of corresponding platform(s)
+
+### Description
+
+Multiple targets can be listed. Each target must be followed by a comma
+separated list of platforms. The currently supported platforms are:
+
+Operating System platforms:
+* `win`:        Windows
+* `mac`:        macOS
+* `linux`:      Linux
+
+Development tooling platforms:
+* `delphi`:     (On Windows only, Delphi is installed)
+
+Targets not specified will be built on all platforms.
+
+### Example
+
+```bash
+builder_describe_platform \
+  :tike  win,delphi
+```
+
+--------------------------------------------------------------------------------
+
 ## `builder_display_usage` function
 
 Prints the help for the script, constructed from the [`builder_describe`]
@@ -792,6 +841,21 @@ It should never be declared in [`builder_describe`], because it is always
 available anyway.
 
 `--debug` is automatically passed to child scripts and dependency scripts.
+
+--------------------------------------------------------------------------------
+
+## `builder_is_target_excluded_by_platform` function
+
+Returns `true` (aka 0) if the target has been excluded from the build because
+it is for a different platform, or because the required tools are not installed.
+
+### Usage
+
+```bash
+if builder_is_target_excluded_by_platform $target; then
+  ...
+fi
+```
 
 --------------------------------------------------------------------------------
 

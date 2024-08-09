@@ -42,6 +42,18 @@ builder_describe \
   "--npm-publish+               For publish, do a npm publish, not npm pack (only for CI)" \
   "--dry-run,-n+                Don't actually publish anything to external endpoints, just dry run"
 
+builder_describe_platform \
+  :ext       win,delphi \
+  :kmanalyze win \
+  :kmdbrowserhost win,delphi \
+  :kmdecomp  win \
+  :kmconvert win,delphi \
+  :samples   win \
+  :setup     win,delphi \
+  :test      win,delphi \
+  :tike      win,delphi \
+  :inst      win,delphi
+
 builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
