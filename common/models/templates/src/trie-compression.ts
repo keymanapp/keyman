@@ -89,12 +89,14 @@ export function decompressEntry(str: string, keyFunction: Wordform2Key, baseInde
 }
 
 
-// BOTH node types:
-// totalLen: 2 chars (fixed position, size) - size of the encoded node.
-// weight: number - could be encoded.
+// BOTH node types: totalLen: 2 chars (fixed position, size) - size of the
+// encoded node.  weight: number - could be encoded.
 // - 2^32 ~= 4*10^9, representable in 2 chars... if it weren't for `"`-escaping.
 // - 2^64 ~= 1.8*10^19 - surely far, far more than enough.
-// Next char:  indicates BOTH a flag of something and a high-bit indicating 'leaf' or 'internal'.
+//
+// Next char:
+//   indicates BOTH a count of something (entries or direct children) and a
+//   high-bit indicating 'leaf' or 'internal'.
 // - function of other bits will be indicated by their sections.
 
 export const NODE_TYPE_INDEX = NODE_SIZE_WIDTH + WEIGHT_WIDTH;
