@@ -36,6 +36,8 @@
 }
 
 - (void)webView:(WebView *)sender decidePolicyForNewWindowAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request newFrameName:(NSString *)frameName decisionListener:(id<WebPolicyDecisionListener>)listener {
+  NSString* url = [[request URL] absoluteString];
+  os_log_debug([KMLogs uiLog], "decidePolicyForNewWindowAction, url = %@", url);
   [[NSWorkspace sharedWorkspace] openURL:[actionInformation objectForKey:WebActionOriginalURLKey]];
   [listener ignore];
 }
