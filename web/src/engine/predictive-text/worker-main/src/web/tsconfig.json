@@ -1,5 +1,5 @@
 {
-  "extends": "../../../web/tsconfig.kmw-main-base.json",
+  "extends": "../../../../../../tsconfig.base.json",
   "compilerOptions": {
     "lib": ["es6", "DOM"],
     "baseUrl": "../",

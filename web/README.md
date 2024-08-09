@@ -92,7 +92,7 @@ graph TD;
     LMWorker["@keymanapp/lm-worker<br>(/common/web/lm-worker)"];
     LMWorker-->Models;
     LMWorker-->Wordbreakers;
-    LMLayer["@keymanapp/lexical-model-layer<br>(/common/predictive-text)"];
+    LMLayer["@keymanapp/lexical-model-layer<br>(/web/src/engine/predictive-text/worker-main)"];
     LMLayer-->LMWorker;
     Gestures["@keymanapp/gesture-recognizer<br>(/common/web/gesture-recognizer)"];
     Gestures-->WebUtils;

@@ -1,0 +1,23 @@
+{
+  "extends": "../../../../../tsconfig.base.json",
+
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "../build/obj",
+    "tsBuildInfoFile": "../build/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./"
+  },
+  "references": [
+    { "path": "../../../../../../common/web/utils" },
+    { "path": "../../../../../../common/models/types"},
+    { "path": "../../../../../../common/models/wordbreakers"},
+    { "path": "../../../../../../common/web/lm-message-types"},
+    { "path": "../../../../../../common/models/templates"}
+  ],
+  "include" : [ "./*.ts" ],
+  "exclude" : [
+    "node",
+    "web",
+    "index.ts" // It's handled by the final layer.
+  ]
+}

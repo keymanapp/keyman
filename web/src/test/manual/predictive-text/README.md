@@ -9,10 +9,9 @@ Install
 **NOTE**: Requires Node >= 10.0
 
 First, ensure that Keyman web and the LMLayer are built. You can run the
-build script in `/web/source` to do this for you:
+build script in `/web` to do this for you:
 
-    cd ../../../web/source
-    ./build.sh
+    ../../../../web/build.sh
 
 Then, you can install locally with `npm`:
 

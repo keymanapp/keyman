@@ -8,7 +8,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -31,7 +31,7 @@ builder_describe "Builds the lm-layer module" \
 
 builder_describe_outputs \
   configure  /node_modules \
-  build      /common/predictive-text/build/lib/web/index.mjs # is built by the final step.
+  build      /web/src/engine/predictive-text/worker-main/build/lib/web/index.mjs # is built by the final step.
 
 builder_parse "$@"
 
@@ -48,8 +48,8 @@ function do_build() {
   tsc -b ./tsconfig.all.json
 
   # esbuild-bundled products at this level are not intended to be used for anything but testing.
-  $BUNDLE_CMD    "${KEYMAN_ROOT}/common/predictive-text/build/obj/web/index.js" \
-    --out        "${KEYMAN_ROOT}/common/predictive-text/build/lib/web/index.mjs" \
+  $BUNDLE_CMD    "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-main/build/obj/web/index.js" \
+    --out        "${KEYMAN_ROOT}/web/src/engine/predictive-text/worker-main/build/lib/web/index.mjs" \
     --format esm
 }
 
