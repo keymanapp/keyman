@@ -330,7 +330,7 @@ function findBoundaries(text: string, options?: DefaultWordBreakerOptions): numb
   do  {
     // Shift all positions, one scalar value to the right.
     rightPos = lookaheadPos;
-    lookaheadPos = positionAfter(text, lookaheadPos);
+    lookaheadPos = positionAfter(lookaheadPos);
     // Shift all properties, one scalar value to the right.
     state = state.next(lookaheadPos);
 
@@ -383,7 +383,7 @@ function findBoundaries(text: string, options?: DefaultWordBreakerOptions): numb
       // Continue advancing in the string, as if these
       // characters do not exist. DO NOT update left and
       // lookbehind however!
-      [rightPos, lookaheadPos] = [lookaheadPos, positionAfter(text, lookaheadPos)];
+      [rightPos, lookaheadPos] = [lookaheadPos, positionAfter(lookaheadPos)];
       state = state.ignoringRight(lookaheadPos);
     }
     // In ignoring the characters in the previous loop, we could
@@ -399,7 +399,7 @@ function findBoundaries(text: string, options?: DefaultWordBreakerOptions): numb
       // Continue advancing in the string, as if these
       // characters do not exist. DO NOT update left and right,
       // however!
-      lookaheadPos = positionAfter(text, lookaheadPos);
+      lookaheadPos = positionAfter(lookaheadPos);
       state = state.ignoringLookahead(lookaheadPos);
     }
 
@@ -525,22 +525,22 @@ function findBoundaries(text: string, options?: DefaultWordBreakerOptions): numb
   return boundaries;
 
   ///// Internal utility functions /////
-}
 
-/**
- * Returns the position of the start of the next scalar value. This jumps
- * over surrogate pairs.
- *
- * If asked for the character AFTER the end of the string, this always
- * returns the length of the string.
- */
-export function positionAfter(text: string, pos: number): number {
-  if (pos >= text.length) {
-    return text.length;
-  } else if (isStartOfSurrogatePair(text[pos])) {
-    return pos + 2;
+  /**
+   * Returns the position of the start of the next scalar value. This jumps
+   * over surrogate pairs.
+   *
+   * If asked for the character AFTER the end of the string, this always
+   * returns the length of the string.
+   */
+  function positionAfter(pos: number): number {
+    if (pos >= text.length) {
+      return text.length;
+    } else if (isStartOfSurrogatePair(text[pos])) {
+      return pos + 2;
+    }
+    return pos + 1;
   }
-  return pos + 1;
 }
 
 function isStartOfSurrogatePair(character: string) {
