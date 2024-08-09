@@ -5,16 +5,17 @@
  * model.
  */
 
-const fs = require('fs');
-const path = require('path');
-const readline = require('readline');
+import fs from 'fs';
+import path from 'path';
+import readline from 'readline';
+import vm from 'vm';
 
-const {EventIterator} = require('event-iterator');
-const program =  require('commander');
+import {EventIterator} from 'event-iterator';
+import program from 'commander';
 
 // Load the most recent LMLayer code locally.
-const LMLayer = require('../../../engine/predictive-text/worker-main');
-
+import { LMLayer } from 'keyman/engine/predictive-text/worker-main';
+import { LMLayerWorker } from '@keymanapp/lm-worker';
 
 ///////////////////////////////// Constants /////////////////////////////////
 
@@ -22,7 +23,7 @@ const WORKER_DEBUG = false;
 const EXIT_USAGE = 1;
 
 /** "Control sequence introducer" for ANSI escape codes: */
-const CSI = '\033[';
+const CSI = '\u001b[';
 /**
  * ANSI escape codes to deal with the screen and the cursor.
  * See https://en.wikipedia.org/wiki/ANSI_escape_code#CSI_sequences
@@ -47,8 +48,7 @@ main();
 function main() {
   // Command line options:
   program
-    .name(require('./package.json').name)
-    .version(require('./package.json').version)
+    .name('lmlayer-cli')
     .usage('[-i <test-file> | -p <phrase> [-p <phrase> ...]] (-f <model-file> | <model-id>)')
     .description('CLI for trying lexical models.')
     .arguments('[model-id]')
@@ -330,9 +330,6 @@ async function asyncRepl(modelFile) {
 
 
 function createAsyncWorker() {
-  // XXX: import the LMLayerWorker directly -- I know where it is built.
-  const LMLayerWorker = require('../../../engine/predictive-text/build/intermediate');
-  const vm = require('vm');
 
   let worker = {
     postMessage(message) {

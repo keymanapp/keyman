@@ -10,7 +10,7 @@
   "references": [
     { "path": "../../../../../../common/web/utils" },
     { "path": "../../../../../../common/models/types"},
-    { "path": "../../../../../../common/web/lm-message-types"}
+    { "path": "../../types"}
   ],
   "include" : [ "./*.ts" ],
   "exclude" : [
