@@ -196,8 +196,6 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     sendCrashReportPreference.setSummaryOff(getString(R.string.show_send_crash_report_off));
     sendCrashReportPreference.setDefaultValue(true);
 
-
-
     screen.addPreference(languagesPreference);
     screen.addPreference(installKeyboardOrDictionary);
     screen.addPreference(displayLanguagePreference);

@@ -248,6 +248,8 @@ public final class KMManager {
   public static final String KMKey_KeyboardHeightPortrait = "keyboardHeightPortrait";
   public static final String KMKey_KeyboardHeightLandscape = "keyboardHeightLandscape";
 
+  public static final String KMKey_LongpressDelay = "longpressDelay";
+
   public static final String KMKey_CustomHelpLink = "CustomHelpLink";
   public static final String KMKey_KMPLink = "kmp";
   public static final String KMKey_UserKeyboardIndex = "UserKeyboardIndex";
@@ -2008,6 +2010,17 @@ public final class KMManager {
       return Configuration.ORIENTATION_LANDSCAPE;
     }
     return Configuration.ORIENTATION_UNDEFINED;
+  }
+
+  public static int getLongpressDelay(Context context) {
+    int defaultDelay = 500; // default longpress delay in KeymanWeb (ms)
+    SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+
+    return prefs.getInt(KMManager.KMKey_LongpressDelay, defaultDelay);
+  }
+
+  public static void setLongpressDelay(Context context, int longpressDelay) {
+
   }
 
   public static int getBannerHeight(Context context) {
