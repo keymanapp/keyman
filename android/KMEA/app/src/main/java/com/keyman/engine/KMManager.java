@@ -184,8 +184,11 @@ public final class KMManager {
   public enum EnterModeType {
     GO,        // Go action
     SEARCH,    // Search action
-    NEWLINE,   // Send newline character
+    SEND,      // Send action
+    NEXT,      // Next action
     DONE,      // Done action
+    PREVIOUS,  // Previous action
+    NEWLINE,   // Send newline character
     DEFAULT,   // Default ENTER action
   }
 
@@ -1287,8 +1290,20 @@ public final class KMManager {
         value = EnterModeType.SEARCH;
         break;
 
+      case EditorInfo.IME_ACTION_SEND:
+        value = EnterModeType.SEND;
+        break;
+
+      case EditorInfo.IME_ACTION_NEXT:
+        value = EnterModeType.NEXT;
+        break;
+
       case EditorInfo.IME_ACTION_DONE:
         value = EnterModeType.DONE;
+        break;
+
+      case EditorInfo.IME_ACTION_PREVIOUS:
+        value = EnterModeType.PREVIOUS;
         break;
 
       default:

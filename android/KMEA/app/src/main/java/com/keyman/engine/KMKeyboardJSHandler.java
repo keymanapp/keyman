@@ -167,9 +167,24 @@ public class KMKeyboardJSHandler {
                 ic.performEditorAction(EditorInfo.IME_ACTION_SEARCH);
                 break;
 
+              // Send action
+              case SEND :
+                ic.performEditorAction(EditorInfo.IME_ACTION_SEND);
+                break;
+
+              // Next action
+              case NEXT :
+                ic.performEditorAction(EditorInfo.IME_ACTION_NEXT);
+                break;
+
               // Done action
               case DONE :
                 ic.performEditorAction(EditorInfo.IME_ACTION_DONE);
+                break;
+
+              // Previous action
+              case PREVIOUS :
+                ic.performEditorAction(EditorInfo.IME_ACTION_PREVIOUS);
                 break;
 
               // Messaging apps
