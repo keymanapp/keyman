@@ -586,12 +586,13 @@ Multiple targets can be listed. Each target must be followed by a comma
 separated list of platforms. The currently supported platforms are:
 
 Operating System platforms:
-* `win`:        Windows
-* `mac`:        macOS
-* `linux`:      Linux
+* `win`: Windows
+* `mac`: macOS
+* `linux`: Linux
 
 Development tooling platforms:
-* `delphi`:     (On Windows only, Delphi is installed)
+* `delphi`: Delphi is installed (Windows only)
+* `android-studio`: Android Studio is installed (`$ANDROID_HOME` variable)
 
 Targets not specified will be built on all platforms.
 
