@@ -6,7 +6,7 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -17,7 +17,7 @@ WORKER_OUTPUT_FILENAME=build/lib/worker-main.js
 INTERMEDIATE=./build/intermediate
 LIB=./build/lib
 
-bundle_cmd="node ../es-bundling/build/common-bundle.mjs"
+bundle_cmd="node ${KEYMAN_ROOT}/common/web/es-bundling/build/common-bundle.mjs"
 
 SRCMAP_CLEANER="node $KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js"
 
@@ -34,7 +34,7 @@ builder_describe \
 
 builder_describe_outputs \
   configure     /node_modules \
-  build         /common/web/lm-worker/$LIB/worker-main.wrapped.min.js
+  build         "/web/src/engine/predictive-text/worker-thread/${LIB}/worker-main.wrapped.min.js"
 
 builder_parse "$@"
 
@@ -65,7 +65,7 @@ function do_build() {
   $bundle_cmd src/main/worker-main.ts \
     --out $INTERMEDIATE/worker-main.js \
     --target "es6" \
-    --sourceRoot '@keymanapp/keyman/common/web/lm-worker/src/main'
+    --sourceRoot '@keymanapp/keyman/web/src/engine/predictive-text/worker-thread/src/main'
 
   $SRCMAP_CLEANER \
     $INTERMEDIATE/worker-main.js.map \
@@ -77,7 +77,7 @@ function do_build() {
     --minify \
     --profile build/filesize-profile.log \
     --target "es6" \
-    --sourceRoot '@keymanapp/keyman/common/web/lm-worker/src/main'
+    --sourceRoot '@keymanapp/keyman/web/src/engine/predictive-text/worker-thread/src/main'
 
   $SRCMAP_CLEANER \
     $INTERMEDIATE/worker-main.min.js.map \

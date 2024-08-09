@@ -89,7 +89,7 @@ graph TD;
     Wordbreakers["@keymanapp/models-wordbreakers<br>(/common/models/wordbreakers)"];
     Models["@keymanapp/models-templates<br>(/common/models/templates)"];
     Models-->WebUtils;
-    LMWorker["@keymanapp/lm-worker<br>(/common/web/lm-worker)"];
+    LMWorker["@keymanapp/lm-worker<br>(/web/src/engine/predictive-text/worker-thread)"];
     LMWorker-->Models;
     LMWorker-->Wordbreakers;
     LMLayer["@keymanapp/lexical-model-layer<br>(/web/src/engine/predictive-text/worker-main)"];
