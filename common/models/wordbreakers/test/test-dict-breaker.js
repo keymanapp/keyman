@@ -7,7 +7,7 @@
  */
 
 import { assert } from 'chai';
-import { default as dict, splitOnCodepoints, splitOnWhitespace } from '@keymanapp/models-wordbreakers/obj/dict/index.js';
+import { default as dict, splitOnWhitespace } from '@keymanapp/models-wordbreakers/obj/dict/index.js';
 import { fixture as fixture1 } from './fixtures/mocked-traversals/apples-and-ale.js';
 
 function assertSpanSplit(text, actualSplitSpans, expectedSplitStr) {
@@ -27,36 +27,6 @@ function assertSpanSplit(text, actualSplitSpans, expectedSplitStr) {
 
 describe('dictionary-based wordbreaker', () => {
   describe('helpers', () => {
-    describe('splitOnCodepoints', () => {
-      it('handles empty text', () => {
-        const text = "";
-        const expectedSplit = [];
-
-        const actualSplit = splitOnCodepoints(text);
-        assert.deepEqual(actualSplit, expectedSplit);
-      });
-
-      it('handles BMP text properly', () => {
-        const text = 'apple';
-        const expectedSplit = text.split('');
-
-        const actualSplit = splitOnCodepoints(text);
-        assert.deepEqual(actualSplit, expectedSplit);
-      });
-
-      it('handles non-BMP text properly', () => {
-        let smpA = String.fromCodePoint(0x1d5ba);
-        let smpP = String.fromCodePoint(0x1d5c9);
-        let smpE = String.fromCodePoint(0x1d5be);
-
-        const expectedSplit = [smpA, 'p', smpP, 'l', smpE];
-        const text = expectedSplit.join('');
-
-        const actualSplit = splitOnCodepoints(text);
-        assert.deepEqual(actualSplit, expectedSplit);
-      });
-    });
-
     describe('splits on existing whitespace and ZWNJ chars', () => {
       it('handles no-split cases', () => {
         const text = "supercalifragilisticexpialidocious";
