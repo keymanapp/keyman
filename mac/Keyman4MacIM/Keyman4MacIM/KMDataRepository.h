@@ -20,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)createDataDirectoryIfNecessary;
 - (void)createKeyboardsDirectoryIfNecessary;
 - (BOOL)migrateData;
+- (NSString*)buildFullPathWith:(NSString *)partialPath;
 @end
 
 NS_ASSUME_NONNULL_END

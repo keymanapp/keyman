@@ -12,12 +12,14 @@
 
 #import "KMSettingsRepository.h"
 #import "KMLogs.h"
+#import "KMDataRepository.h"
 
 NSString *const kActiveKeyboardsKey = @"KMActiveKeyboardsKey";
 NSString *const kSelectedKeyboardKey = @"KMSelectedKeyboardKey";
 NSString *const kPersistedOptionsKey = @"KMPersistedOptionsKey";
 
-NSString *const kObsoletePathComponent = @"/Documents/";
+//NSString *const kObsoletePathComponent = @"/Documents/";
+NSString *const kObsoletePathComponent = @"/Documents/Keyman-Keyboards";
 NSString *const kNewPathComponent = @"/Library/Application Support/keyman.inputmethod.Keyman/";
 
 /**
@@ -53,7 +55,7 @@ NSInteger const kVersionStoreDataInLibraryDirectory = 1;
  */
 - (BOOL)settingsExist
 {
-  return [[NSUserDefaults standardUserDefaults] objectForKey:kSelectedKeyboardKey] != nil;
+  return ([[NSUserDefaults standardUserDefaults] objectForKey:kSelectedKeyboardKey] != nil);
 }
 
 /**
@@ -122,13 +124,13 @@ NSInteger const kVersionStoreDataInLibraryDirectory = 1;
 
 - (void)convertSelectedKeyboardPathForMigration {
   NSString *selectedKeyboardPath = [self selectedKeyboard];
-  
   if (selectedKeyboardPath != nil) {
-    NSString *newPathString = [self convertOldKeyboardPath:selectedKeyboardPath];
+    NSString *newPathString = [self trimObsoleteKeyboardPath:selectedKeyboardPath];
     
     if ([selectedKeyboardPath isNotEqualTo:newPathString]) {
       [self saveSelectedKeyboard:newPathString];
-      os_log([KMLogs dataLog], "converted selected keyboard setting from '%{public}@' to '%{public}@'", selectedKeyboardPath, newPathString);
+      os_log_debug([KMLogs dataLog], "converted selected keyboard setting from '%{public}@' to '%{public}@'", selectedKeyboardPath, newPathString);
+      os_log_debug([KMLogs dataLog], "full path of selected keyboard from buildFullPathWith = '%{public}@'", [KMDataRepository.shared buildFullPathWith:newPathString]);
     }
   }
 }
@@ -137,7 +139,7 @@ NSInteger const kVersionStoreDataInLibraryDirectory = 1;
  * Convert the path of the keyboard designating the Documents folder to its new location
  * in the Application Support folder
  */
-
+/*
 - (NSString *)convertOldKeyboardPath:(NSString *)oldPath {
   NSString *newPathString = @"";
   if(oldPath != nil) {
@@ -145,18 +147,36 @@ NSInteger const kVersionStoreDataInLibraryDirectory = 1;
   }
   return newPathString;
 }
+*/
+
+/**
+ * To convert the keyboard path for the new location, just trim the parent directory from the path
+ * No need to repeatedly store the parent directory with the path of each keyboard
+ * If the old directory is not found in the string, then return the string unchanged
+ */
+- (NSString *)trimObsoleteKeyboardPath:(NSString *)oldPath {
+  NSString *newPath = oldPath;
+  if(oldPath != nil) {
+    NSRange range = [oldPath rangeOfString:kObsoletePathComponent];
+    if (range.length > 0) {
+      newPath = [oldPath substringFromIndex:range.location + range.length];
+      os_log_debug([KMLogs dataLog], "trimmed keyboard path from '%{public}@' to '%{public}@'", oldPath, newPath);
+    }
+  }
+  return newPath;
+}
 
 - (void)convertActiveKeyboardArrayForMigration {
   NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-  NSMutableArray *activeKeyboards = [self activeKeyboards];
+  NSMutableArray *keyboards = [self activeKeyboards];
   NSMutableArray *convertedActiveKeyboards = [[NSMutableArray alloc] initWithCapacity:0];
   BOOL didConvert = NO;
   
-  for (NSString *oldPath in activeKeyboards) {
-    NSString *newPath = [self convertOldKeyboardPath:oldPath];
+  for (NSString *oldPath in keyboards) {
+    NSString *newPath = [self trimObsoleteKeyboardPath:oldPath];
     if ([oldPath isNotEqualTo:newPath]) {
       [convertedActiveKeyboards addObject:newPath];
-      os_log([KMLogs dataLog], "converted active keyboard from old path '%{public}@' to '%{public}@'", oldPath, newPath);
+      os_log_debug([KMLogs dataLog], "converted active keyboard from old path '%{public}@' to '%{public}@'", oldPath, newPath);
       // if we have adjusted at least one path, set flag
       didConvert = YES;
     } else {
@@ -183,7 +203,7 @@ NSInteger const kVersionStoreDataInLibraryDirectory = 1;
       os_log_info([KMLogs configLog], "persisted options found in UserDefaults with key = %{public}@", key);
     }
     for (NSString *key in optionsMap) {
-      NSString *newPathString = [self convertOldKeyboardPath:key];
+      NSString *newPathString = [self trimObsoleteKeyboardPath:key];
       NSDictionary *optionsValue = [optionsMap objectForKey:key];
 
       if ([key isNotEqualTo:newPathString]) {
@@ -191,7 +211,7 @@ NSInteger const kVersionStoreDataInLibraryDirectory = 1;
         
         // insert options into new map with newly converted path as key
         [mutableOptionsMap setObject:optionsValue forKey:newPathString];
-        os_log([KMLogs dataLog], "converted option key from '%{public}@' to '%{public}@'", key, newPathString);
+        os_log_debug([KMLogs dataLog], "converted option key from '%{public}@' to '%{public}@'", key, newPathString);
       } else {
         // retain options that did not need converting
         [mutableOptionsMap setObject:optionsValue forKey:key];

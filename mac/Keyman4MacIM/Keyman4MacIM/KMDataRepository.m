@@ -164,7 +164,7 @@ NSString *const kKeymanSubdirectoryName = @"keyman.inputmethod.Keyman";
   BOOL didMoveData = NO;
   NSFileManager *fileManager = [NSFileManager defaultManager];
   BOOL dataExistsInOldLocation = [self keyboardsExistInObsoleteDirectory];
-  os_log([KMLogs dataLog], "obsolete keyman keyboards directory exists: %@", dataExistsInOldLocation?@"YES":@"NO");
+  os_log_debug([KMLogs dataLog], "obsolete keyman keyboards directory exists: %@", dataExistsInOldLocation?@"YES":@"NO");
 
   // only move data if there is something to move
   if (dataExistsInOldLocation) {
@@ -182,4 +182,9 @@ NSString *const kKeymanSubdirectoryName = @"keyman.inputmethod.Keyman";
   return didMoveData;
 }
 
+- (NSString*)buildFullPathWith:(NSString *)partialPath {
+  NSString *fullPath = [self.keymanKeyboardsDirectory.path stringByAppendingString:partialPath];
+  os_log_debug([KMLogs dataLog], "createFullPathWith: '%{public}@' with partialPath '%{public}@'", self.keymanKeyboardsDirectory.path, partialPath);
+  return fullPath;
+}
 @end
