@@ -1,4 +1,5 @@
-import { VisualKeyboard, LDMLKeyboard, CompilerCallbacks } from "@keymanapp/common-types";
+import { VisualKeyboard } from "@keymanapp/common-types";
+import { LDMLKeyboard, CompilerCallbacks } from "@keymanapp/developer-utils";
 import { KeysCompiler } from "./keys.js";
 import { LdmlCompilerMessages } from "./ldml-compiler-messages.js";
 

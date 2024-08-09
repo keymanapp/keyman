@@ -1,5 +1,5 @@
 
-import { type PredictionContext } from '@keymanapp/input-processor';
+import { type PredictionContext } from 'keyman/engine/interfaces';
 import { createUnselectableElement } from 'keyman/engine/dom-utils';
 
 import {

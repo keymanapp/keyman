@@ -3,7 +3,7 @@ import sinon from 'sinon';
 
 import { ManagedPromise } from '@keymanapp/web-utils';
 import { CloudQueryEngine, StubAndKeyboardCache, toPrefixedKeyboardId as prefixed } from 'keyman/engine/package-cache';
-import { PathConfiguration } from 'keyman/engine/paths';
+import { PathConfiguration } from 'keyman/engine/interfaces';
 import NodeCloudRequester from 'keyman/engine/package-cache/node-requester';
 
 import path from 'path';

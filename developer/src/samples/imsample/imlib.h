@@ -4,8 +4,8 @@
 
 #define QIT_VKEYDOWN	0
 #define QIT_VKEYUP		1
-#define QIT_VSHIFTDOWN	2
-#define QIT_VSHIFTUP	3
+//#define QIT_VSHIFTDOWN	2 // deprecated see #11925
+//#define QIT_VSHIFTUP	3
 #define QIT_CHAR		4
 #define QIT_DEADKEY		5
 #define QIT_BELL		6

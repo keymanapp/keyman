@@ -1,7 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { BuildActivity } from './BuildActivity.js';
-import { CompilerCallbacks, KeymanFileTypes } from '@keymanapp/common-types';
+import { KeymanFileTypes } from '@keymanapp/common-types';
+import { CompilerCallbacks } from '@keymanapp/developer-utils';
 import { ModelInfoCompiler } from '@keymanapp/kmc-model-info';
 import { KmpCompiler } from '@keymanapp/kmc-package';
 import { loadProject } from '../../util/projectLoader.js';

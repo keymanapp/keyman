@@ -4,7 +4,7 @@ import { TestCompilerCallbacks, verifyCompilerMessagesObject } from '@keymanapp/
 import { PackageCompilerMessages } from '../src/compiler/package-compiler-messages.js';
 import { makePathToFixture } from './helpers/index.js';
 import { KmpCompiler } from '../src/compiler/kmp-compiler.js';
-import { CompilerErrorNamespace, CompilerOptions } from '@keymanapp/common-types';
+import { CompilerErrorNamespace, CompilerOptions } from '@keymanapp/developer-utils';
 
 const debug = false;
 const callbacks = new TestCompilerCallbacks();
