@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.87 alpha 2024-08-12
+
+* chore(web): drop flaky auto-test component (#12155)
+* fix(common): show description even if child projects specifies path (#12145)
+
 ## 18.0.86 alpha 2024-08-09
 
 * chore(android): Update splash screen with SIL Tai Heritage Pro logo (#12127)
