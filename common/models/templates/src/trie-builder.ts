@@ -1,7 +1,7 @@
 import { SENTINEL_CODE_UNIT, Wordform2Key } from "./common.js";
-import { Entry, InternalNode, Leaf, Node, Trie } from "./trie.js";
+import { Entry, InternalNode, Leaf, Node, Trie, sortNode } from "./trie.js";
 
-function createRootNode(): Node {
+export function createRootNode(): Node {
   return {
     type: 'leaf',
     weight: 0,
@@ -10,7 +10,8 @@ function createRootNode(): Node {
 }
 
 /**
- * Adds an entry to the trie.
+ * Adds an entry to the trie.  Currently assumes there is no pre-existing match
+ * for the entry.
  *
  * Note that the trie will likely be unsorted after the add occurs. Before
  * performing a lookup on the trie, use call sortTrie() on the root note!
@@ -20,7 +21,7 @@ function createRootNode(): Node {
  * @param index the index in the key and also the trie depth. Should be set to
  *              zero when adding onto the root node of the trie.
  */
-function addUnsorted(node: Node, entry: Entry, index: number = 0) {
+export function addUnsorted(node: Node, entry: Entry, index: number = 0) {
   // Each node stores the MAXIMUM weight out of all of its decesdents, to
   // enable a greedy search through the trie.
   node.weight = Math.max(node.weight, entry.weight);
@@ -48,7 +49,7 @@ function addUnsorted(node: Node, entry: Entry, index: number = 0) {
  * @param item
  * @param index
  */
-function addItemToInternalNode(node: InternalNode, item: Entry, index: number) {
+export function addItemToInternalNode(node: InternalNode, item: Entry, index: number) {
   let char = item.key[index];
   // If an internal node is the proper site for item, it belongs under the
   // corresponding (sentinel, internal-use) child node signifying this.
@@ -62,7 +63,7 @@ function addItemToInternalNode(node: InternalNode, item: Entry, index: number) {
   addUnsorted(node.children[char], item, index + 1);
 }
 
-function addItemToLeaf(leaf: Leaf, item: Entry) {
+export function addItemToLeaf(leaf: Leaf, item: Entry) {
   leaf.entries.push(item);
 }
 
@@ -74,7 +75,7 @@ function addItemToLeaf(leaf: Leaf, item: Entry) {
  *
  * @param depth depth of the trie at this level.
  */
-function convertLeafToInternalNode(leaf: Leaf, depth: number): void {
+export function convertLeafToInternalNode(leaf: Leaf, depth: number): void {
   let entries = leaf.entries;
 
   // Alias the current node, as the desired type.
@@ -105,35 +106,6 @@ function convertLeafToInternalNode(leaf: Leaf, depth: number): void {
 }
 
 /**
- * Recursively sort the trie, in descending order of weight.
- * @param node any node in the trie
- */
-function sortTrie(node: Node) {
-  if (node.type === 'leaf') {
-    if (!node.unsorted) {
-      return;
-    }
-
-    node.entries.sort(function (a, b) { return b.weight - a.weight; });
-  } else {
-    // We MUST recurse and sort children before returning.
-    for (let char of node.values) {
-      sortTrie(node.children[char]);
-    }
-
-    if (!node.unsorted) {
-      return;
-    }
-
-    node.values.sort((a, b) => {
-      return node.children[b].weight - node.children[a].weight;
-    });
-  }
-
-  delete node.unsorted;
-}
-
-/**
  * Wrapper class for the trie and its nodes.
  */
 export class TrieBuilder extends Trie {
@@ -160,7 +132,8 @@ export class TrieBuilder extends Trie {
   }
 
   sort() {
-    sortTrie(this.root);
+    // Sorts the full Trie, not just a part of it.
+    sortNode(this.root);
   }
 
   getRoot(): Node {

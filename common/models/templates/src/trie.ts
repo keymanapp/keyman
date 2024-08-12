@@ -52,6 +52,37 @@ export interface Entry {
   weight: number;
 }
 
+/**
+ * Recursively sort the trie, in descending order of weight.
+ * @param node any node in the trie
+ */
+export function sortNode(node: Node, onlyLocal?: boolean) {
+  if (node.type === 'leaf') {
+    if (!node.unsorted) {
+      return;
+    }
+
+    node.entries.sort(function (a, b) { return b.weight - a.weight; });
+  } else {
+    if(!onlyLocal) {
+      // We recurse and sort children before returning if sorting the full Trie.
+      for (let char of node.values) {
+        sortNode(node.children[char], onlyLocal);
+      }
+    }
+
+    if (!node.unsorted) {
+      return;
+    }
+
+    node.values.sort((a, b) => {
+      return node.children[b].weight - node.children[a].weight;
+    });
+  }
+
+  delete node.unsorted;
+}
+
 export class TrieTraversal implements LexiconTraversal {
   /**
    * The lexical prefix corresponding to the current traversal state.
@@ -62,7 +93,7 @@ export class TrieTraversal implements LexiconTraversal {
    * The current traversal node.  Serves as the 'root' of its own sub-Trie,
    * and we cannot navigate back to its parent.
    */
-  root: Node;
+  readonly root: Node;
 
   /**
    * The max weight for the Trie being 'traversed'.  Needed for probability
@@ -94,25 +125,15 @@ export class TrieTraversal implements LexiconTraversal {
     return traversal;
   }
 
-  private sortNodeIfNeeded(node: Node) {
-    if(node.unsorted) {
-      if(node.type == 'leaf') {
-        node.entries.sort((a, b) => b.weight - a.weight)
-      } else {
-        node.values.sort((a, b) => node.children[b].weight - node.children[a].weight);
-      }
-
-      node.unsorted = false;
-    }
-  }
-
   // Handles one code unit at a time.
   private _child(char: USVString): TrieTraversal | undefined {
     const root = this.root;
     const totalWeight = this.totalWeight;
     const nextPrefix = this.prefix + char;
 
-    this.sortNodeIfNeeded(root);
+    // Sorts _just_ the current level, and only if needed.
+    // We only care about sorting parts that we're actually accessing.
+    sortNode(root, true);
 
     if(root.type == 'internal') {
       let childNode = root.children[char];
@@ -143,7 +164,9 @@ export class TrieTraversal implements LexiconTraversal {
     // through `this.`.
     const totalWeight = this.totalWeight;
 
-    this.sortNodeIfNeeded(root);
+    // Sorts _just_ the current level, and only if needed.
+    // We only care about sorting parts that we're actually accessing.
+    sortNode(root, true);
 
     if(root.type == 'internal') {
       for(let entry of root.values) {
