@@ -12,23 +12,14 @@ import { type DeviceSpec } from "@keymanapp/web-utils";
 import Codes from './codes.js';
 import { ActiveKeyBase } from "../index.js";
 
-interface DefaultRulesInterface {
+export interface DefaultRulesInterface {
   forAny(Lkc: KeyEvent, isMnemonic: boolean): string;
 }
 
-export class BASE_DEFAULT_RULES {
-  private static _instance: DefaultRulesInterface;
+let defaultRules: DefaultRulesInterface;
 
-  // Prevent direct instantiation.
-  private constructor() { }
-
-  public static forAny(Lkc: KeyEvent, isMnemonic: boolean): string {
-    return this._instance.forAny(Lkc, isMnemonic);
-  }
-
-  public static set instance(value: DefaultRulesInterface) {
-    this._instance = value;
-  }
+export function setDefaultRules(rules: DefaultRulesInterface) {
+  defaultRules = rules;
 }
 
 // Represents a probability distribution over a keyboard's keys.
@@ -168,7 +159,7 @@ export default class KeyEvent implements KeyEventSpec {
       // the actual keyname instead.
       mappingEvent.kName = 'K_xxxx';
       mappingEvent.Lmodifiers = (shifted ? 0x10 : 0);  // mnemonic lookups only exist for default & shift layers.
-      var mappedChar: string = BASE_DEFAULT_RULES.forAny(mappingEvent, true);
+      var mappedChar: string = defaultRules.forAny(mappingEvent, true);
 
       /* First, save a backup of the original code.  This one won't needlessly trigger keyboard
         * rules, but allows us to replicate/emulate commands after rule processing if needed.

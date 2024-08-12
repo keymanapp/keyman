@@ -5,7 +5,7 @@
  */
 
 import { ModifierKeyConstants } from '@keymanapp/common-types';
-import { BASE_DEFAULT_RULES, Codes, type KeyEvent, type OutputTarget } from "@keymanapp/keyboard-processor";
+import { Codes, type KeyEvent, type OutputTarget, setDefaultRules } from "@keymanapp/keyboard-processor";
 import RuleBehavior from "./ruleBehavior.js";
 
 export enum EmulationKeystrokes {
@@ -13,11 +13,13 @@ export enum EmulationKeystrokes {
   Backspace = '\b'
 }
 
+
 /**
  * Defines a collection of static library functions that define KeymanWeb's default (implied) keyboard rule behaviors.
  */
 export default class DefaultRules {
   public constructor() {
+    setDefaultRules(this);
   }
 
   codeForEvent(Lkc: KeyEvent) {
@@ -28,7 +30,7 @@ export default class DefaultRules {
    * Serves as a default keycode lookup table.  This may be referenced safely by mnemonic handling without fear of side-effects.
    * Also used by Processor.defaultRuleBehavior to generate output after filtering for special cases.
    */
-  public forAny(Lkc: KeyEvent, isMnemonic: boolean, ruleBehavior?: RuleBehavior) {
+  public forAny(Lkc: KeyEvent, isMnemonic: boolean, ruleBehavior?: RuleBehavior): string {
     var char = '';
 
     // A pretty simple table of lookups, corresponding VERY closely to the original defaultKeyOutput.
@@ -217,9 +219,3 @@ export default class DefaultRules {
     return null;
   }
 }
-
-/**
- * A simple instance of the standard 'default rules' for keystroke processing from the
- * DefaultRules base class.
- */
-BASE_DEFAULT_RULES.instance = new DefaultRules();
