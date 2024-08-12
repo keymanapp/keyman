@@ -156,13 +156,15 @@ export class TrieTraversal implements LexiconTraversal {
     }
   }
 
-  *children(): Generator<{char: USVString, traversal: () => LexiconTraversal}> {
+  children(): {char: USVString, p: number, traversal: () => LexiconTraversal}[] {
     let root = this.root;
 
     // We refer to the field multiple times in this method, and it doesn't change.
     // This also assists minification a bit, since we can't minify when re-accessing
     // through `this.`.
     const totalWeight = this.totalWeight;
+
+    const results: {char: USVString, p: number, traversal: () => LexiconTraversal}[] = [];
 
     // Sorts _just_ the current level, and only if needed.
     // We only care about sorting parts that we're actually accessing.
@@ -183,21 +185,26 @@ export class TrieTraversal implements LexiconTraversal {
             let internalNode = entryNode;
             for(let lowSurrogate of internalNode.values) {
               let prefix = this.prefix + entry + lowSurrogate;
-              yield {
+              results.push({
                 char: entry + lowSurrogate,
+                p: internalNode.children[lowSurrogate].weight / totalWeight,
                 traversal: function() { return new TrieTraversal(internalNode.children[lowSurrogate], prefix, totalWeight) }
-              }
+              });
             }
           } else {
-            // Determine how much of the 'leaf' entry has no Trie nodes, emulate them.
+            // No deduplication needed.  If there were multiple keys available,
+            // we wouldn't be in a leaf node.
             let fullText = entryNode.entries[0].key;
             entry = entry + fullText[this.prefix.length + 1]; // The other half of the non-BMP char.
             let prefix = this.prefix + entry;
 
-            yield {
+            const weight = entryNode.entries.reduce((best, current) => Math.max(best, current.weight), 0);
+
+            results.push({
               char: entry,
+              p: weight / totalWeight,
               traversal: function () {return new TrieTraversal(entryNode, prefix, totalWeight)}
-            }
+            });
           }
         } else if(isSentinel(entry)) {
           continue;
@@ -206,34 +213,41 @@ export class TrieTraversal implements LexiconTraversal {
           continue;
         } else {
           let prefix = this.prefix + entry;
-          yield {
+          results.push({
             char: entry,
+            p: entryNode.weight / totalWeight,
             traversal: function() { return new TrieTraversal(entryNode, prefix, totalWeight)}
-          }
+          });
         }
       }
 
-      return;
+      return results;
     } else { // type == 'leaf'
       let prefix = this.prefix;
 
+      // No actual deduplication needed.  If there were multiple keys available,
+      // we wouldn't be in a leaf node.
       let children = root.entries.filter(function(entry) {
         return entry.key != prefix && prefix.length < entry.key.length;
-      })
+      });
 
-      for(let {key} of children) {
+      let weight = children.reduce((best, current) => Math.max(current.weight, best), 0);
+
+      if(children.length > 0) {
+        const key = children[0].content;
         let nodeKey = key[prefix.length];
 
         if(isHighSurrogate(nodeKey)) {
           // Merge the other half of an SMP char in!
           nodeKey = nodeKey + key[prefix.length+1];
         }
-        yield {
+        results.push({
           char: nodeKey,
+          p: weight / totalWeight,
           traversal: function() { return new TrieTraversal(root, prefix + nodeKey, totalWeight)}
-        }
+        });
       };
-      return;
+      return results;
     }
   }
 
