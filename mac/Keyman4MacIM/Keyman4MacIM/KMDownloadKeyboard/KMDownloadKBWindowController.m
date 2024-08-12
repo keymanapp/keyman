@@ -29,7 +29,7 @@
   
   NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
   KeymanVersionInfo keymanVersionInfo = [[self AppDelegate] versionInfo];
-  NSString *url = [NSString stringWithFormat:@"https:// /go/macos/14.0/download-keyboards/?version=%@", keymanVersionInfo.keymanCom, version];
+  NSString *url = [NSString stringWithFormat:@"https://%@/go/macos/14.0/download-keyboards/?version=%@", keymanVersionInfo.keymanCom, version];
   
   os_log_debug([KMLogs uiLog], "KMDownloadKBWindowController opening url = %{public}@, version = '%{public}@'", url, version);
   [self.webView.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:url]]];
