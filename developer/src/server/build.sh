@@ -121,10 +121,11 @@ function installer_server() {
   rm -f node_modules/ngrok/bin/ngrok.exe
   popd
 
-  # @keymanapp/keyman-version is required in build/ now but we need to copy it in manually
+  # Dependencies are required in build/ but we need to copy them in manually
   mkdir -p "$PRODBUILDTEMP/node_modules/@keymanapp/"
   cp -R "$KEYMAN_ROOT/node_modules/@keymanapp/keyman-version/" "$PRODBUILDTEMP/node_modules/@keymanapp/"
   cp -R "$KEYMAN_ROOT/node_modules/@keymanapp/developer-utils/" "$PRODBUILDTEMP/node_modules/@keymanapp/"
+  cp -R "$KEYMAN_ROOT/node_modules/@keymanapp/common-types/" "$PRODBUILDTEMP/node_modules/@keymanapp/"
 
   # We'll build in the $KEYMAN_ROOT/developer/bin/server/ folder
   rm -rf "$KEYMAN_ROOT/developer/bin/server/"
