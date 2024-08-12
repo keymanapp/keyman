@@ -18,8 +18,6 @@ const sharedCapabilities = {
   'browserstack.console': 'verbose',
 
   project: 'Keyman',
-  // for the child package.
-  name: `@keymanapp/keyboard-processor`,
   // if you are running tests in a CI, the build id might be available as an
   // environment variable. this is useful for identifying test runs
   // this is for example the name for github actions
@@ -29,7 +27,7 @@ const sharedCapabilities = {
 /**
  * @param {import('@web/test-runner').TestRunnerConfig} config
  * */
-export function buildLegacyTestingConfig(config) {
+export function buildLegacyTestingConfig(config, projectName) {
   return {
     ...config,
     // how many browsers to run concurrently in browserstack. increasing this significantly
@@ -46,6 +44,8 @@ export function buildLegacyTestingConfig(config) {
         capabilities: {
           // Requires the dev-server-legacy plugin to operate properly.
           ...sharedCapabilities,
+          // The display name visible on browserstack.com's dashboard
+          name: projectName || `${KEYMAN_VERSION.VERSION_WITH_TAG}`,
           browserName: 'Chrome',
           os: 'Windows',
           os_version: '10',
@@ -58,26 +58,33 @@ export function buildLegacyTestingConfig(config) {
       named(browserstackLauncher({
         capabilities: {
           ...sharedCapabilities,
+          name: projectName || `${KEYMAN_VERSION.VERSION_WITH_TAG}`,
           browserName: 'Safari',
           // '13.4' does not appear to work, nor does '14'.
           // '15', however, does!
           os_version: '15',
           deviceName: 'iPhone SE 2022'
+          // os_version: '13.4',
+          // deviceName: 'iPhone SE 2020' // 2022 for Safari 15.
         },
       }), 'Safari for iOS'),
 
-      named(browserstackLauncher({
-        capabilities: {
-          ...sharedCapabilities,
-          browserName: 'Chrome',
-          os_version: '6.0',
-          deviceName: 'Samsung Galaxy S7'
-        },
-      }), 'Chrome for Android'),
+      // // was S7, 6.0 - but the API gave us a 'deprecated' report and errored there.
+      // // S8, 7.0 ... seems that the test-process outright crashes for no clearly stated reason?
+      // // named(browserstackLauncher({
+      // //   capabilities: {
+      // //     ...sharedCapabilities,
+      //        name: projectName || `${KEYMAN_VERSION.VERSION_WITH_TAG}`,
+      // //     browserName: 'Chrome',
+      // //     os_version: '7.0',
+      // //     deviceName: 'Samsung Galaxy S8'
+      // //   },
+      // // }), 'Chrome for Android'),
 
       browserstackLauncher({
         capabilities: {
           ...sharedCapabilities,
+          name: projectName || `${KEYMAN_VERSION.VERSION_WITH_TAG}`,
           browserName: 'Firefox',
           // 'latest' would work, but not 90.
           // '100' does work, at least.
@@ -97,7 +104,7 @@ export function buildLegacyTestingConfig(config) {
     testsStartTimeout: 1000 * 60 * 2,
     testsFinishTimeout: 1000 * 60 * 2,
 
-    reporters: [...config.reporters, summaryReporter, defaultReporter]
-    // debug: true
+    reporters: [...config.reporters, summaryReporter, defaultReporter],
+    debug: true
   };
 };

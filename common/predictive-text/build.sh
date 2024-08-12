@@ -27,7 +27,8 @@ builder_describe "Builds the lm-layer module" \
   "configure" \
   "build" \
   "test" \
-  "--ci        Sets $(builder_term test) action to use CI-based test configurations & reporting"
+  "--ci        Sets $(builder_term test) action to use CI-based test configurations & reporting" \
+  "--remote    Sets $(builder_term test) action to use a BrowserStack-based testing configuration"
 
 builder_describe_outputs \
   configure  /node_modules \
@@ -59,6 +60,8 @@ function do_test() {
   local TEST_OPTIONS=
   if builder_has_option --ci; then
     TEST_OPTIONS=--ci
+  elif builder_has_option --remote; then
+    TEST_OPTIONS=--remote
   fi
 
   # We'll test the included libraries here for now.  At some point, we may wish

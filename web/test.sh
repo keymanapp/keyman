@@ -21,7 +21,8 @@ builder_describe "Runs the Keyman Engine for Web unit-testing suites" \
   "test+" \
   ":dom                  Runs DOM-oriented unit tests (reduced footprint, nothing browser-specific)" \
   ":integrated           Runs KMW's integration test suite" \
-  "--ci                  Set to utilize CI-based test configurations & reporting.  May not be set with $(builder_term --debug)."
+  "--ci                  Set to utilize CI-based test configurations & reporting.  May not be set with $(builder_term --debug)." \
+  "--remote              Uses a BrowserStack-based test configuration for legacy devices"
 
 builder_parse "$@"
 
@@ -31,6 +32,8 @@ builder_parse "$@"
 WTR_CONFIG=
 if builder_has_option --ci; then
   WTR_CONFIG=.CI
+elif builder_has_option --remote; then
+  WTR_CONFIG=.remote
 fi
 
 # Prepare the flags for the karma command.

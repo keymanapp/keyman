@@ -23,7 +23,8 @@ builder_describe "Runs all tests for the language-modeling / predictive-text lay
   ":libraries  Runs unit tests for in-repo libraries used by this module"\
   ":headless   Runs this module's headless user tests" \
   ":browser    Runs this module's browser-based user tests" \
-  "--ci        Uses CI-based test configurations & emits CI-friendly test reports"
+  "--ci        Uses CI-based test configurations & emits CI-friendly test reports" \
+  "--remote    Uses a BrowserStack-based test configuration for legacy devices"
 
 # TODO: consider dependencies? ideally this will be test.inc.sh?
 
@@ -58,9 +59,14 @@ if builder_start_action test:libraries; then
   popd
 
   pushd "$KEYMAN_ROOT/common/web/lm-worker"
+  if builder_has_option --remote; then
+    WORKER_TEST_OPTS="$TEST_OPTS --remote"
+  else
+    WORKER_TEST_OPTS="$TEST_OPTS"
+  fi
   echo
   echo "### Running ${BUILDER_TERM_START}common/web/lm-worker${BUILDER_TERM_END} tests"
-  ./build.sh test $TEST_OPTS
+  ./build.sh test $WORKER_TEST_OPTS
   popd
 
   builder_finish_action success test:libraries
@@ -111,6 +117,8 @@ if builder_start_action test:browser; then
 
   if builder_has_option --ci; then
     WTR_CONFIG=.CI
+  elif builder_has_option --remote; then
+    WTR_CONFIG=.remote
   fi
 
   if builder_has_option --debug; then

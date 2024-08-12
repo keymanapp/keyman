@@ -30,7 +30,7 @@ builder_describe \
   "@/common/web/es-bundling" \
   "@/common/models/wordbreakers" \
   "@/common/models/templates" \
-  configure clean build test --ci
+  configure clean build test --ci --remote
 
 builder_describe_outputs \
   configure     /node_modules \
@@ -99,6 +99,8 @@ function do_test() {
   if builder_has_option --ci; then
     MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
     WTR_CONFIG=.ci
+  elif builder_has_option --remote; then
+    WTR_CONFIG=.remote
   fi
 
   if builder_has_option --debug; then

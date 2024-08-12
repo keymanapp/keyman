@@ -25,7 +25,8 @@ builder_describe \
   clean \
   build \
   test \
-  "--ci    For use with action $(builder_term test) - emits CI-friendly test reports"
+  "--ci    For use with action $(builder_term test) - emits CI-friendly test reports" \
+  "--remote    Uses a BrowserStack-based test configuration for legacy devices"
 
 builder_describe_outputs \
   configure     /node_modules \
@@ -83,6 +84,8 @@ function do_test() {
     echo "Replacing user-friendly test reports with CI-friendly versions."
     MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
     WTR_CONFIG=.CI
+  elif builder_has_option --remote; then
+    WTR_CONFIG=.remote
   fi
 
   c8 mocha --recursive $MOCHA_FLAGS ./tests/node/
