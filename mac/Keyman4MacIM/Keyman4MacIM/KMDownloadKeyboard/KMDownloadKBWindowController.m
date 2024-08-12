@@ -29,22 +29,22 @@
   
   NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
   KeymanVersionInfo keymanVersionInfo = [[self AppDelegate] versionInfo];
-  NSString *url = [NSString stringWithFormat:@"https://%@/go/macos/14.0/download-keyboards/?version=%@", keymanVersionInfo.keymanCom, version];
+  NSString *url = [NSString stringWithFormat:@"https:// /go/macos/14.0/download-keyboards/?version=%@", keymanVersionInfo.keymanCom, version];
   
-  os_log_debug([KMLogs uiLog], "KMDownloadKBWindowController opening url = %@, version = '%@'", url, version);
+  os_log_debug([KMLogs uiLog], "KMDownloadKBWindowController opening url = %{public}@, version = '%{public}@'", url, version);
   [self.webView.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:url]]];
 }
 
 - (void)webView:(WebView *)sender decidePolicyForNewWindowAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request newFrameName:(NSString *)frameName decisionListener:(id<WebPolicyDecisionListener>)listener {
   NSString* url = [[request URL] absoluteString];
-  os_log_debug([KMLogs uiLog], "decidePolicyForNewWindowAction, url = %@", url);
+  os_log_debug([KMLogs uiLog], "decidePolicyForNewWindowAction, url = %{public}@", url);
   [[NSWorkspace sharedWorkspace] openURL:[actionInformation objectForKey:WebActionOriginalURLKey]];
   [listener ignore];
 }
 
 - (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener {
   NSString* url = [[request URL] absoluteString];
-  os_log_debug([KMLogs uiLog], "decidePolicyForNavigationAction, navigating to %@", url);
+  os_log_debug([KMLogs uiLog], "decidePolicyForNavigationAction, navigating to %{public}@", url);
 
   // The pattern for matching links matches work in #3602
   NSString* urlPathMatchKeyboardsInstall = @"^http(?:s)?://keyman(?:-staging)?\\.com(?:\\.local)?/keyboards/install/([^?/]+)(?:\\?(.+))?$";
@@ -81,7 +81,7 @@
   else if([url startsWith:@"keyman:"]) {
     if ([url startsWith:@"keyman:link?url="])
     {
-      os_log_debug([KMLogs uiLog], "Opening keyman:link URL in default browser: %@", url);
+      os_log_debug([KMLogs uiLog], "Opening keyman:link URL in default browser: %{public}@", url);
       [listener ignore];
       url = [request.URL.absoluteString substringFromIndex:[@"keyman:link?url=" length]];
       [[NSWorkspace sharedWorkspace] openURL: [[NSURL alloc] initWithString:url]];
@@ -95,7 +95,7 @@
   else
   {
     // Open in external browser
-    os_log_debug([KMLogs uiLog], "Opening URL in default browser: %@", url);
+    os_log_debug([KMLogs uiLog], "Opening URL in default browser: %{public}@", url);
     [listener ignore];
     [[NSWorkspace sharedWorkspace] openURL: [[NSURL alloc] initWithString:url]];
   }
