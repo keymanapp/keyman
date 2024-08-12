@@ -26,7 +26,9 @@ KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnico
 
 namespace kmcmp {
     extern int nErrors;
+    extern int currentLine;
     extern int ErrChr;
+    extern std::string messageFilename;
     extern int BeginLine[4];
     extern int CompileTarget;
 }
@@ -49,7 +51,9 @@ class CompilerTest : public testing::Test {
             kmcmp::msgproc = msgproc_collect;
             msgproc_errors.clear();
             kmcmp::nErrors = 0;
+            kmcmp::currentLine = 0;
             kmcmp::ErrChr = 0;
+            kmcmp::messageFilename = "";
             kmcmp::BeginLine[BEGIN_ANSI] = -1;
             kmcmp::BeginLine[BEGIN_UNICODE] = -1;
             kmcmp::BeginLine[BEGIN_NEWCONTEXT] = -1;
@@ -126,42 +130,48 @@ TEST_F(CompilerTest, wstrtostr_test) {
     EXPECT_EQ(0, strcmp("", wstrtostr((PKMX_WCHAR)u"")));
 };
 
-// TEST_F(CompilerTest, ReportCompilerMessage_test) {
-//     msgproc = msgproc_true_stub;
-//     kmcmp::ErrChr = 0;
+TEST_F(CompilerTest, ReportCompilerMessage_test) {
+    kmcmp::msgproc = msgproc_collect;
+    kmcmp::currentLine = 42;
+    std::vector<std::string> params{"parameter"};
+    kmcmp::messageFilename = "filename";
+    kmcmp::ErrChr = 0;
 
-//     // SevFatal
-//     EXPECT_EQ(0, kmcmp::nErrors);
-//     EXPECT_EQ(SevFatal, KmnCompilerMessages::FATAL_CannotCreateTempfile & SevFatal);
-//     EXPECT_TRUE(ReportCompilerMessage(KmnCompilerMessages::FATAL_CannotCreateTempfile));
-//     EXPECT_EQ(1, kmcmp::nErrors);
+    // SevFatal
+    EXPECT_EQ(0, kmcmp::nErrors);
+    EXPECT_EQ(SevFatal, KmnCompilerMessages::FATAL_CannotCreateTempfile & SevFatal);
+    ReportCompilerMessage(KmnCompilerMessages::FATAL_CannotCreateTempfile, params);
+    EXPECT_EQ(1, kmcmp::nErrors);
+    EXPECT_EQ(msgproc_errors[0].errorCode, KmnCompilerMessages::FATAL_CannotCreateTempfile);
+    EXPECT_EQ(msgproc_errors[0].lineNumber, kmcmp::currentLine+1);
+    EXPECT_EQ(msgproc_errors[0].columnNumber, kmcmp::ErrChr);
+    EXPECT_TRUE(msgproc_errors[0].filename == kmcmp::messageFilename);
+    EXPECT_TRUE(msgproc_errors[0].parameters == params);
 
-//     // SevError
-//     EXPECT_EQ(SevError, KmnCompilerMessages::ERROR_InvalidLayoutLine & SevError);
-//     EXPECT_FALSE(ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidLayoutLine));
-//     EXPECT_EQ(2, kmcmp::nErrors);
+    // SevError
+    EXPECT_EQ(SevError, KmnCompilerMessages::ERROR_InvalidLayoutLine & SevError);
+    ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidLayoutLine);
+    EXPECT_EQ(2, kmcmp::nErrors);
+    EXPECT_EQ(msgproc_errors[1].errorCode, KmnCompilerMessages::ERROR_InvalidLayoutLine);
 
-//     // Unknown
-//     const KMX_DWORD UNKNOWN_ERROR = 0x00004FFF; // top of range ERROR
-//     EXPECT_EQ(SevError, UNKNOWN_ERROR & SevError);
-//     EXPECT_FALSE(ReportCompilerMessage(UNKNOWN_ERROR));
-//     sprintf(expected, "Unknown error %x", UNKNOWN_ERROR);
-//     EXPECT_EQ(3, kmcmp::nErrors);
+    // SevWarn
+    EXPECT_EQ(SevWarn, KmnCompilerMessages::WARN_ReservedCharacter & SevWarn);
+    ReportCompilerMessage(KmnCompilerMessages::WARN_ReservedCharacter);
+    EXPECT_EQ(2, kmcmp::nErrors);
+    EXPECT_EQ(msgproc_errors[2].errorCode, KmnCompilerMessages::WARN_ReservedCharacter);
 
-//     // ErrChr
-//     const int ERROR_CHAR_INDEX = 42;
-//     kmcmp::ErrChr = ERROR_CHAR_INDEX ;
-//     EXPECT_EQ(SevError, KmnCompilerMessages::ERROR_InvalidLayoutLine & SevError);
-//     EXPECT_FALSE(ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidLayoutLine));
-//     kmcmp::ErrChr = 0;
-//     EXPECT_EQ(4, kmcmp::nErrors);
+    // SevHint
+    EXPECT_EQ(SevHint, KmnCompilerMessages::HINT_NonUnicodeFile & SevHint);
+    ReportCompilerMessage(KmnCompilerMessages::HINT_NonUnicodeFile);
+    EXPECT_EQ(2, kmcmp::nErrors);
+    EXPECT_EQ(msgproc_errors[3].errorCode, KmnCompilerMessages::HINT_NonUnicodeFile);
 
-//     // msgproc returns FALSE
-//     msgproc = msgproc_false_stub;
-//     EXPECT_EQ(SevError, KmnCompilerMessages::ERROR_InvalidLayoutLine & SevError);
-//     EXPECT_TRUE(ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidLayoutLine));
-//     EXPECT_EQ(6, kmcmp::nErrors);
-// };
+    // SevInfo
+    EXPECT_EQ(SevInfo, KmnCompilerMessages::INFO_MinimumCoreEngineVersion & SevInfo);
+    ReportCompilerMessage(KmnCompilerMessages::INFO_MinimumCoreEngineVersion);
+    EXPECT_EQ(2, kmcmp::nErrors);
+    EXPECT_EQ(msgproc_errors[4].errorCode, KmnCompilerMessages::INFO_MinimumCoreEngineVersion);
+};
 
 TEST_F(CompilerTest, ProcessBeginLine_test) {
     KMX_WCHAR str[LINESIZE];
