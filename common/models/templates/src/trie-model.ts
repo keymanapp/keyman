@@ -26,12 +26,11 @@
 // Should probably make a 'lm-utils' submodule.
 
 // Allows the kmwstring bindings to resolve.
-import { extendString, PriorityQueue } from "@keymanapp/web-utils";
-import { default as defaultWordBreaker } from "@keymanapp/models-wordbreakers";
+import { extendString } from "@keymanapp/web-utils";
 
-import { applyTransform, SearchKey, transformToSuggestion, Wordform2Key } from "./common.js";
+import { SearchKey, Wordform2Key } from "./common.js";
 import { Node, Trie } from './trie.js';
-import { getLastPreCaretToken } from "./tokenization.js";
+import { TraversalModel } from './traversal-model.js';
 
 extendString();
 
@@ -40,9 +39,6 @@ extendString();
  *
  * Defines a simple word list (unigram) model.
  */
-
-/** Upper bound on the amount of suggestions to generate. */
-const MAX_SUGGESTIONS = 12;
 
 /**
  * Additional arguments to pass into the model, in addition to the model
@@ -83,184 +79,25 @@ export interface TrieModelOptions {
  * prefix searches within words, however they are not very good
  * at predicting the next word.
  */
-export default class TrieModel implements LexicalModel {
+export default class TrieModel extends TraversalModel implements LexicalModel {
   configuration?: Configuration;
-  private _trie: Trie;
-  readonly breakWords: WordBreakingFunction;
+  public readonly trie: Trie;
   readonly punctuation?: LexicalModelPunctuation;
   readonly languageUsesCasing?: boolean;
 
   readonly applyCasing?: CasingFunction;
 
   constructor(trieData: {root: Node, totalWeight: number}, options: TrieModelOptions = {}) {
-    this.languageUsesCasing = options.languageUsesCasing;
-    this.applyCasing = options.applyCasing;
-
-    this._trie = new Trie(
+    const trie = new Trie(
       trieData['root'],
       trieData['totalWeight'],
       options.searchTermToKey as Wordform2Key || defaultSearchTermToKey
     );
-    this.breakWords = options.wordBreaker || defaultWordBreaker;
-    this.punctuation = options.punctuation;
-  }
 
-  configure(capabilities: Capabilities): Configuration {
-    return this.configuration = {
-      leftContextCodePoints: capabilities.maxLeftContextCodePoints,
-      rightContextCodePoints: capabilities.maxRightContextCodePoints ?? 0
-    };
-  }
-
-  toKey(text: USVString): USVString {
-    return this._trie.toKey(text);
-  }
-
-  predict(transform: Transform, context: Context): Distribution<Suggestion> {
-    // Special-case the empty buffer/transform: return the top suggestions.
-    if (!transform.insert && !context.left && !context.right && context.startOfBuffer && context.endOfBuffer) {
-      return makeDistribution(this.firstN(MAX_SUGGESTIONS).map(({text, p}) => ({
-        transform: {
-          insert: text,
-          deleteLeft: 0
-        },
-        displayAs: text,
-        p: p
-      })));
-    }
-
-    // Compute the results of the keystroke:
-    let newContext = applyTransform(transform, context);
-
-    // Computes the different in word length after applying the transform above.
-    let leftDelOffset = transform.deleteLeft - transform.insert.kmwLength();
-
-    // All text to the left of the cursor INCLUDING anything that has
-    // just been typed.
-    let prefix = getLastPreCaretToken(this.breakWords, newContext);
-
-    // Return suggestions from the trie.
-    return makeDistribution(this.lookup(prefix).map(({text, p}) =>
-      transformToSuggestion({
-        insert: text,
-        // Delete whatever the prefix that the user wrote.
-        deleteLeft: leftDelOffset + prefix.kmwLength()
-        // Note: a separate capitalization/orthography engine can take this
-        // result and transform it as needed.
-      },
-      p
-    )));
-
-    /* Helper */
-
-    function makeDistribution(suggestions: WithOutcome<Suggestion>[]): Distribution<Suggestion> {
-      let distribution: Distribution<Suggestion> = [];
-
-      for(let s of suggestions) {
-        distribution.push({sample: s, p: s.p});
-      }
-
-      return distribution;
-    }
-  }
-
-  get wordbreaker(): WordBreakingFunction {
-    return this.breakWords;
-  }
-
-  public traverseFromRoot(): LexiconTraversal {
-    return this._trie.traverseFromRoot();
-  }
-
-  /**
-   * Returns the top N suggestions from the trie.
-   * @param n How many suggestions, maximum, to return.
-   */
-  firstN(n: number): TextWithProbability[] {
-    return getSortedResults(this._trie.traverseFromRoot(), n);
-  }
-
-  /**
-   * Lookups an arbitrary prefix (a query) in the trie. Returns the top 3
-   * results in sorted order.
-   *
-   * @param prefix
-   */
-  lookup(prefix: string): TextWithProbability[] {
-    const searchKey = this.toKey(prefix);
-    const rootTraversal = this.traverseFromRoot().child(searchKey);
-
-    if(!rootTraversal) {
-      return [];
-    }
-
-    const directEntries = rootTraversal.entries;
-    // `Set` requires Chrome 38+, which is more recent than Chrome 35.
-    const directSet: Record<string, string> = {};
-    for(const entry of directEntries) {
-      directSet[entry.text] = entry.text;
-    }
-
-    const bestEntries = getSortedResults(rootTraversal);
-    const deduplicated = bestEntries.filter((entry) => !directSet[entry.text]);
-
-    // Any entries directly hosted on the current node should get full display
-    // priority over anything from its descendants.
-    return directEntries.concat(deduplicated);
+    super(trie.traverseFromRoot(), options);
+    this.trie = trie;
   }
 };
-
-/////////////////////////////////////////////////////////////////////////////////
-// What remains in this file is the trie implementation proper. Note: to       //
-// reduce bundle size, any functions/methods related to creating the trie have //
-// been removed.                                                               //
-/////////////////////////////////////////////////////////////////////////////////
-
-/**
- * The priority queue will always pop the most probable item - be it a Traversal
- * state or a lexical entry reached via Traversal.
- */
-type TraversableWithProb = TextWithProbability | LexiconTraversal;
-
-/**
- * Returns all entries matching the given prefix, in descending order of
- * weight.
- *
- * @param prefix  the prefix to match.
- * @param results the current results
- * @param queue
- */
-function getSortedResults(traversal: LexiconTraversal, limit = MAX_SUGGESTIONS): TextWithProbability[] {
-  let queue = new PriorityQueue(function(a: TraversableWithProb, b: TraversableWithProb) {
-    // In case of Trie compilation issues that emit `null` or `undefined`
-    return (b ? b.p : 0) - (a ? a.p : 0);
-  });
-  let results: TextWithProbability[] = [];
-
-  queue.enqueue(traversal);
-
-  while(queue.count > 0) {
-    const entry = queue.dequeue();
-
-    if((entry as TextWithProbability)!.text !== undefined) {
-      const lexicalEntry = entry as TextWithProbability;
-      results.push(lexicalEntry);
-      if(results.length >= limit) {
-        return results;
-      }
-    } else {
-      const traversal = entry as LexiconTraversal;
-      queue.enqueueAll(traversal.entries);
-      let children: LexiconTraversal[] = []
-      for(let child of traversal.children()) {
-        children.push(child.traversal());
-      }
-      queue.enqueueAll(children);
-    }
-  }
-
-  return results;
-}
 
 /**
  * Converts wordforms into an indexable form. It does this by
