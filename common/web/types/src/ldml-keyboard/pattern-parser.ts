@@ -3,7 +3,8 @@
  */
 
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { MATCH_QUAD_ESCAPE, isOneChar, unescapeOneQuadString, unescapeString, hexQuad } from "../util/util.js";
+import { MATCH_QUAD_ESCAPE } from "../util/consts.js";
+import { isOneChar, unescapeOneQuadString, unescapeString, hexQuad } from "../util/util.js";
 
 /**
  * Helper function for extracting matched items

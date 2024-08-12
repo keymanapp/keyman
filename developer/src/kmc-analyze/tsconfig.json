@@ -9,4 +9,9 @@
   "include": [
     "src/**/*.ts"
   ],
+  "references": [
+    { "path": "../../../common/web/types" },
+    { "path": "../kmc-kmn" },
+    { "path": "../common/web/utils/" },
+  ]
 }

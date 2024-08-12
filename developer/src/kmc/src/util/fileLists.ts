@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { CompilerCallbacks } from "@keymanapp/common-types";
+import { CompilerCallbacks } from "@keymanapp/developer-utils";
 import { InfrastructureMessages } from "../messages/infrastructureMessages.js";
 
 /**

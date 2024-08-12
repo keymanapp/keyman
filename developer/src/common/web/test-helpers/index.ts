@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { CompilerEvent, CompilerCallbacks, CompilerPathCallbacks, CompilerFileSystemCallbacks, CompilerError } from '@keymanapp/common-types';
+import { CompilerEvent, CompilerCallbacks, CompilerPathCallbacks, CompilerFileSystemCallbacks, CompilerError } from '@keymanapp/developer-utils';
 export { verifyCompilerMessagesObject } from './verifyCompilerMessagesObject.js';
 
 /**

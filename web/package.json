@@ -12,10 +12,10 @@
       "types": "./build/engine/attachment/obj/index.d.ts",
       "import": "./build/engine/attachment/obj/index.js"
     },
-    "./engine/paths": {
-      "es6-bundling": "./src/engine/paths/src/index.ts",
-      "types": "./build/engine/paths/obj/index.d.ts",
-      "import": "./build/engine/paths/obj/index.js"
+    "./engine/interfaces": {
+      "es6-bundling": "./src/engine/interfaces/src/index.ts",
+      "types": "./build/engine/interfaces/obj/index.d.ts",
+      "import": "./build/engine/interfaces/obj/index.js"
     },
     "./engine/device-detect": {
       "es6-bundling": "./src/engine/device-detect/src/index.ts",
@@ -99,13 +99,11 @@
     "test": "gosh ./test.sh"
   },
   "dependencies": {
-    "@keymanapp/input-processor": "*",
     "@keymanapp/keyboard-processor": "*",
     "@keymanapp/keyman-version": "*",
     "@keymanapp/lexical-model-layer": "*",
     "@keymanapp/models-types": "*",
     "@keymanapp/recorder-core": "*",
-    "@keymanapp/tslib": "*",
     "@keymanapp/web-utils": "*",
     "core-js": "^3.34.0",
     "eventemitter3": "^5.0.0",

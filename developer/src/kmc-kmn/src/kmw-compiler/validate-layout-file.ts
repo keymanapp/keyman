@@ -1,4 +1,5 @@
-import { KMX, TouchLayout, TouchLayoutFileReader, TouchLayoutFileWriter } from "@keymanapp/common-types";
+import { KMX, TouchLayout } from "@keymanapp/common-types";
+import { TouchLayoutFileReader, TouchLayoutFileWriter } from "@keymanapp/developer-utils";
 import { callbacks, minimumKeymanVersion, verifyAndSetMinimumRequiredKeymanVersion15,
          isKeyboardVersion14OrLater, isKeyboardVersion17OrLater,
          verifyAndSetMinimumRequiredKeymanVersion14,

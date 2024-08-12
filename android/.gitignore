@@ -37,8 +37,6 @@ KMEA/**/assets/keymanandroid.js
 KMEA/**/assets/keyman.js.map
 KMEA/**/assets/keymanweb-webview.js
 KMEA/**/assets/keymanweb-webview.js.map
-KMEA/**/assets/keymanweb-webview.es5.js
-KMEA/**/assets/keymanweb-webview.es5.js.map
 KMEA/**/assets/map-polyfill.js
 KMEA/**/assets/sentry.min.js
 KMEA/**/assets/keyman-sentry.js
