@@ -126,6 +126,7 @@ function installer_server() {
   cp -R "$KEYMAN_ROOT/node_modules/@keymanapp/keyman-version/" "$PRODBUILDTEMP/node_modules/@keymanapp/"
   cp -R "$KEYMAN_ROOT/node_modules/@keymanapp/developer-utils/" "$PRODBUILDTEMP/node_modules/@keymanapp/"
   cp -R "$KEYMAN_ROOT/node_modules/@keymanapp/common-types/" "$PRODBUILDTEMP/node_modules/@keymanapp/"
+  cp -R "$KEYMAN_ROOT/node_modules/@keymanapp/ldml-keyboard-constants/" "$PRODBUILDTEMP/node_modules/@keymanapp/"
 
   # We'll build in the $KEYMAN_ROOT/developer/bin/server/ folder
   rm -rf "$KEYMAN_ROOT/developer/bin/server/"
