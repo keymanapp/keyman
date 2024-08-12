@@ -424,14 +424,21 @@ function TfrmDebug.ProcessKeyEvent(var Message: TMessage): Boolean;
     end;
   end;
 var
-  vkey, modifier: uint16_t;
+  scan, vkey, modifier: uint16_t;
 begin
   Assert(Assigned(FDebugCore));
 
   // We always use the US virtual key code as a basis for our keystroke
   // mapping; the best way to do this is to extract the scan code from
   // the message data and work from that
-  vkey := MapScanCodeToUSVK((Message.LParam and $FF0000) shr 16);
+
+  // Note: if a key event has a zero scan code, it has probably been
+  // injected, so we will do our best with it, using the VK as provided.
+  // See also #11978
+  scan := (Message.LParam and $FF0000) shr 16;
+  if scan = 0
+    then vkey := Message.WParam
+    else vkey := MapScanCodeToUSVK(scan);
 
   // We don't support the Right Shift modifier in Keyman;
   // we treat it as Left Shift, even though MapScanCodeToUSVK
