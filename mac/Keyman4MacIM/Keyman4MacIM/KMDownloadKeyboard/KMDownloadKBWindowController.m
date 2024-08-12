@@ -29,10 +29,13 @@
   
   NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
   KeymanVersionInfo keymanVersionInfo = [[self AppDelegate] versionInfo];
-  NSString *url = [NSString stringWithFormat:@"https://%@/go/macos/14.0/download-keyboards/?version=%@", keymanVersionInfo.keymanCom, version];
+  NSString *urlString = [NSString stringWithFormat:@"https://%@/go/macos/14.0/download-keyboards/?version=%@", keymanVersionInfo.keymanCom, version];
+  os_log_debug([KMLogs uiLog], "KMDownloadKBWindowController opening url = %{public}@, version = '%{public}@'", urlString, version);
   
-  os_log_debug([KMLogs uiLog], "KMDownloadKBWindowController opening url = %{public}@, version = '%{public}@'", url, version);
-  [self.webView.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:url]]];
+  NSURL * downloadsUrl = [NSURL URLWithString:urlString];
+  os_log_debug([KMLogs uiLog], "download site url = '%{public}@'", downloadsUrl.absoluteString);
+
+  [self.webView.mainFrame loadRequest:[NSURLRequest requestWithURL:downloadsUrl]];
 }
 
 - (void)webView:(WebView *)sender decidePolicyForNewWindowAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request newFrameName:(NSString *)frameName decisionListener:(id<WebPolicyDecisionListener>)listener {
@@ -43,6 +46,7 @@
 }
 
 - (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener {
+  os_log_debug([KMLogs uiLog], "decidePolicyForNavigationAction, request = %{public}@", request);
   NSString* url = [[request URL] absoluteString];
   os_log_debug([KMLogs uiLog], "decidePolicyForNavigationAction, navigating to %{public}@", url);
 
