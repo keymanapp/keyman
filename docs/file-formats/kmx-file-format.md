@@ -22,24 +22,24 @@ source files.
 
 The very first section is a header that describes the remainder of the file.
 
-| ∆ | Bits | Name               | Description                                                                       |
-|---|------|--------------------|-----------------------------------------------------------------------------------|
-| 0 |  32  | dwIdentifier       | `KXTS` 0x5354584B, `kmx.FILEID_COMPILED`                                          |
-| 4 |  32  | dwFileVersion      | minimum Keyman version that can read the file, `KMX_Version` enum                 |
-| 8 |  32  | dwCheckSum         | deprecated in 16.0, `0x0`; CRC32 checksum of entire file                          |
-|12 |  32  | KeyboardID         | deprecated in 10.0, `0x0`; Windows LANGID for keyboard                            |
-|16 |  32  | IsRegistered       | deprecated in 10.0, `0x1`; registration status of compiler                        |
-|20 |  32  | version            | deprecated, `0x0`; was version of keyboard, see `TSS_KEYBOARDVERSION`             |
-|24 |  32  | cxStoreArray       | number of `COMP_STORE` entries in `COMP_KEYBOARD.dpStoreArray`                    |
-|28 |  32  | cxGroupArray       | number of `COMP_GROUP` entries in `COMP_KEYBOARD.dpGroupArray`                    |
-|32 |  32  | dpStoreArray       | offset of first `COMP_STORE` entry                                                |
-|36 |  32  | dpGroupArray       | offset of first `COMP_GROUP` entry                                                |
-|40 |  32  | StartGroup_ANSI    | deprecated; index of starting non-Unicode `COMP_GROUP`, `0xFFFFFFFF` means unused |
-|44 |  32  | StartGroup_Unicode | index of starting Unicode `COMP_GROUP`, `0xFFFFFFFF` means unused                 |
-|48 |  32  | dwFlags            | global flags for the keyboard, see description below                              |
-|52 |  32  | dwHotKey           | default hotkey for keyboard, from [`&Hotkey`], see description below              |
-|56 |  32  | dpBitmapOffset     | offset of keyboard icon, `0x0` if not present                                     |
-|60 |  32  | dwBitmapSize       | size in bytes of keyboard icon, `0x0` if not present                              |
+| ∆ | Bits | Name                 | Description                                                                       |
+|---|------|----------------------|-----------------------------------------------------------------------------------|
+| 0 |  32  | `dwIdentifier`       | `KXTS` 0x5354584B, `kmx.FILEID_COMPILED`                                          |
+| 4 |  32  | `dwFileVersion`      | minimum Keyman version that can read the file, `KMX_Version` enum                 |
+| 8 |  32  | `dwCheckSum`         | deprecated in 16.0, `0x0`; CRC32 checksum of entire file                          |
+|12 |  32  | `KeyboardID`         | deprecated in 10.0, `0x0`; Windows LANGID for keyboard                            |
+|16 |  32  | `IsRegistered`       | deprecated in 10.0, `0x1`; registration status of compiler                        |
+|20 |  32  | `version`            | deprecated, `0x0`; was version of keyboard, see `TSS_KEYBOARDVERSION`             |
+|24 |  32  | `cxStoreArray`       | number of `COMP_STORE` entries in `COMP_KEYBOARD.dpStoreArray`                    |
+|28 |  32  | `cxGroupArray`       | number of `COMP_GROUP` entries in `COMP_KEYBOARD.dpGroupArray`                    |
+|32 |  32  | `dpStoreArray`       | offset of first `COMP_STORE` entry                                                |
+|36 |  32  | `dpGroupArray`       | offset of first `COMP_GROUP` entry                                                |
+|40 |  32  | `StartGroup_ANSI`    | deprecated; index of starting non-Unicode `COMP_GROUP`, `0xFFFFFFFF` means unused |
+|44 |  32  | `StartGroup_Unicode` | index of starting Unicode `COMP_GROUP`, `0xFFFFFFFF` means unused                 |
+|48 |  32  | `dwFlags`            | global flags for the keyboard, see description below                              |
+|52 |  32  | `dwHotKey`           | default hotkey for keyboard, from [`&Hotkey`], see description below              |
+|56 |  32  | `dpBitmapOffset`     | offset of keyboard icon, `0x0` if not present                                     |
+|60 |  32  | `dwBitmapSize`       | size in bytes of keyboard icon, `0x0` if not present                              |
 
 This structure is present at the start of every .kmx file. The `KXTS` identifier
 can be used as a 'magic' to determine whether a binary file is a .kmx file.
@@ -51,23 +51,23 @@ other data in the file. If it is not a recognized version, then no further
 attempt should be made to read the file. The recognized versions are listed in
 the `KMX_Version` enum:
 
-| Value      | Identifier    | Description                                                      |
-|------------|---------------|------------------------------------------------------------------|
-| 0x00000300 | `VERSION_30`  | Keyman 3.0. Non-Unicode, Windows 3.1 only, not supported         |
-| 0x00000301 | `VERSION_31`  | Keyman 3.1. Non-Unicode, Windows 3.1 only, not supported         |
-| 0x00000302 | `VERSION_32`  | Keyman 3.2. Non-Unicode, Windows 3.1, 95, 98 only, not supported |
-| 0x00000400 | `VERSION_40`  | Keyman 4.0. Non-Unicode, Windows 3.1, 95, 98 only, not supported |
-| 0x00000500 | `VERSION_50`  | Keyman 5.0. Unicode, Windows only                                |
-| 0x00000501 | `VERSION_501` | Keyman 5.1, added support for `call()` statement                 |
-| 0x00000600 | `VERSION_60`  | Keyman 6.0                                                       |
-| 0x00000700 | `VERSION_70`  | Keyman 7.0                                                       |
-| 0x00000800 | `VERSION_80`  | Keyman 8.0                                                       |
-| 0x00000900 | `VERSION_90`  | Keyman 9.0                                                       |
-| 0x00000A00 | `VERSION_100` | Keyman 10.0, first true multi-platform version                   |
-| 0x00000E00 | `VERSION_140` | Keyman 14.0 (versions 11.0-13.0 had no binary format changes)    |
-| 0x00000F00 | `VERSION_150` | Keyman 15.0                                                      |
-| 0x00001000 | `VERSION_160` | Keyman 16.0                                                      |
-| 0x00001100 | `VERSION_170` | Keyman 17.0                                                      |
+| Value        | Identifier    | Description                                                      |
+|--------------|---------------|------------------------------------------------------------------|
+| `0x00000300` | `VERSION_30`  | Keyman 3.0. Non-Unicode, Windows 3.1 only, not supported         |
+| `0x00000301` | `VERSION_31`  | Keyman 3.1. Non-Unicode, Windows 3.1 only, not supported         |
+| `0x00000302` | `VERSION_32`  | Keyman 3.2. Non-Unicode, Windows 3.1, 95, 98 only, not supported |
+| `0x00000400` | `VERSION_40`  | Keyman 4.0. Non-Unicode, Windows 3.1, 95, 98 only, not supported |
+| `0x00000500` | `VERSION_50`  | Keyman 5.0. Unicode, Windows only                                |
+| `0x00000501` | `VERSION_501` | Keyman 5.1, added support for `call()` statement                 |
+| `0x00000600` | `VERSION_60`  | Keyman 6.0                                                       |
+| `0x00000700` | `VERSION_70`  | Keyman 7.0                                                       |
+| `0x00000800` | `VERSION_80`  | Keyman 8.0                                                       |
+| `0x00000900` | `VERSION_90`  | Keyman 9.0                                                       |
+| `0x00000A00` | `VERSION_100` | Keyman 10.0, first true multi-platform version                   |
+| `0x00000E00` | `VERSION_140` | Keyman 14.0 (versions 11.0-13.0 had no binary format changes)    |
+| `0x00000F00` | `VERSION_150` | Keyman 15.0                                                      |
+| `0x00001000` | `VERSION_160` | Keyman 16.0                                                      |
+| `0x00001100` | `VERSION_170` | Keyman 17.0                                                      |
 
 ### `StartGroup`
 
@@ -115,10 +115,10 @@ data, but this is not a requirement of the file format.
 
 ## `COMP_KEYBOARD_KMXPLUSINFO`: KMX+ secondary header
 
-| ∆ | Bits | Name               | Description                |
-|---|------|--------------------|----------------------------|
-| 0 |  32  | dpKMXPlus          | offset of KMX+ data        |
-| 4 |  32  | dwKMXPlusSize      | size in bytes of KMX+ data |
+| ∆ | Bits | Name            | Description                |
+|---|------|-----------------|----------------------------|
+| 0 |  32  | `dpKMXPlus`     | offset of KMX+ data        |
+| 4 |  32  | `dwKMXPlusSize` | size in bytes of KMX+ data |
 
 The `COMP_KEYBOARD_KMXPLUSINFO` structure is present only if
 `COMP_KEYBOARD.dwFlags` flag has bit `KF_KMXPLUS` (`0x20`) set. If present, it
@@ -129,11 +129,11 @@ See [KMX+ File Format] for details of the KMX+ file format.
 
 ## `COMP_STORE`
 
-| ∆ | Bits | Name       | Description                                                            |
-|---|------|------------|------------------------------------------------------------------------|
-| 0 |  32  | dwSystemID | `0x0` for a normal store, or a system store value                      |
-| 4 |  32  | dpName     | offset to name of the store from keyboard source, `0x0` if not present |
-| 8 |  32  | dpString   | offset to value of the store                                           |
+| ∆ | Bits | Name         | Description                                                            |
+|---|------|--------------|------------------------------------------------------------------------|
+| 0 |  32  | `dwSystemID` | `0x0` for a normal store, or a system store value                      |
+| 4 |  32  | `dpName`     | offset to name of the store from keyboard source, `0x0` if not present |
+| 8 |  32  | `dpString`   | offset to value of the store                                           |
 
 The `COMP_STORE` structure describes a [`store`] in the keyboard source file.
 `COMP_STORE` structures are also used for additional metadata such as compiler
@@ -197,14 +197,14 @@ If `dwSystemID` is non-zero, then it will be one of the following values:
 
 ## `COMP_GROUP`
 
-| ∆  | Bits | Name       | Description                                                                 |
-|----|------|------------|-----------------------------------------------------------------------------|
-| 0  |  32  | dpName     | offset to name of the group from keyboard source, `0x0` if not present      |
-| 4  |  32  | dpKeyArray | offset to array of `COMP_KEY` entries                                       |
-| 8  |  32  | dpMatch    | offset to string for the [`match`] statement output, `0x0` if not present   |
-| 12 |  32  | dpNoMatch  | offset to string for the [`nomatch`] statement output, `0x0` if not present |
-| 16 |  32  | cxKeyArray | number of `COMP_KEY` entries in `COMP_GROUP.dpKeyArray`                     |
-| 20 |  32  | fUsingKeys | `0x1` if group is `using keys`, `0x0` otherwise                             |
+| ∆  | Bits | Name         | Description                                                                 |
+|----|------|--------------|-----------------------------------------------------------------------------|
+| 0  |  32  | `dpName`     | offset to name of the group from keyboard source, `0x0` if not present      |
+| 4  |  32  | `dpKeyArray` | offset to array of `COMP_KEY` entries                                       |
+| 8  |  32  | `dpMatch`    | offset to string for the [`match`] statement output, `0x0` if not present   |
+| 12 |  32  | `dpNoMatch`  | offset to string for the [`nomatch`] statement output, `0x0` if not present |
+| 16 |  32  | `cxKeyArray` | number of `COMP_KEY` entries in `COMP_GROUP.dpKeyArray`                     |
+| 20 |  32  | `fUsingKeys` | `0x1` if group is `using keys`, `0x0` otherwise                             |
 
 The `COMP_GROUP` structure describes a [`group`] in the keyboard source file.
 Note that the `readonly` property of a group is only applicable in the source
@@ -212,14 +212,14 @@ file and is never written to the binary format.
 
 ## `COMP_KEY`
 
-| ∆  | Bits | Name       | Description                                                                                    |
-|----|------|------------|------------------------------------------------------------------------------------------------|
-| 0  |  16  | Key        | Keyman virtual key for the rule, 0 if unused                                                   |
-| 2  |  16  | (unused)   | padding, reserved                                                                              |
-| 4  |  32  | Line       | Line number for the rule, 0 if not compiled with debug information                             |
-| 8  |  32  | ShiftFlags | Modifier flags for the key, see description below                                              |
-| 12 |  32  | dpOutput   | offset to string for the output of the rule, always present even for zero-length output        |
-| 16 |  32  | dpContext  | offset to string for the context part of the rule, always present even for zero-length context |
+| ∆  | Bits | Name         | Description                                                                                    |
+|----|------|--------------|------------------------------------------------------------------------------------------------|
+| 0  |  16  | `Key`        | Keyman virtual key for the rule, 0 if unused                                                   |
+| 2  |  16  | (unused)     | padding, reserved                                                                              |
+| 4  |  32  | `Line`       | Line number for the rule, 0 if not compiled with debug information                             |
+| 8  |  32  | `ShiftFlags` | Modifier flags for the key, see description below                                              |
+| 12 |  32  | `dpOutput`   | offset to string for the output of the rule, always present even for zero-length output        |
+| 16 |  32  | `dpContext`  | offset to string for the context part of the rule, always present even for zero-length context |
 
 The `COMP_KEY` structure describes a single rule in a keyboard source file. The
 compiler expands `any()` statements found in the key part of a rule into
