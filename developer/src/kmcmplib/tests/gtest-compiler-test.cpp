@@ -1236,77 +1236,77 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
     // are comments stripped before this point?
     // if so, why the test on whitespace after 'c'?
 
-    // CERR_InvalidToken
+    // KmnCompilerMessages::ERROR_InvalidToken
     fileKeyboard.version = VERSION_60;
     u16cpy(str, u"cde");
-    EXPECT_EQ(CERR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // context, CERR_ContextInVirtualKeySection *** TODO ***
+    // context, KmnCompilerMessages::ERROR_ContextInVirtualKeySection *** TODO ***
 
     // context, no offset, valid
     fileKeyboard.version = VERSION_60;
     u16cpy(str, u"context");
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_context_no_offset_valid[] = { UC_SENTINEL, CODE_CONTEXT, 0 };
     EXPECT_EQ(0, u16cmp(tstr_context_no_offset_valid, tstr));
 
-    // context, CERR_InvalidToken, no close delimiter => NULL
+    // context, KmnCompilerMessages::ERROR_InvalidToken, no close delimiter => NULL
     fileKeyboard.version = VERSION_60;
     u16cpy(str, u"context(");
-    EXPECT_EQ(CERR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // context, empty delimiters => empty string, valid
     fileKeyboard.version = VERSION_60;
     u16cpy(str, u"context()");
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_context_empty_offset_valid[] = { UC_SENTINEL, CODE_CONTEXT, 0 };
     EXPECT_EQ(0, u16cmp(tstr_context_empty_offset_valid, tstr));
 
     // context, space in delimiters (see I11814, I11937, #11910, #11894, #11938)
     fileKeyboard.version = VERSION_60;
     u16cpy(str, u"context( )");
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // context, offset, valid
     fileKeyboard.version = VERSION_60;
     u16cpy(str, u"context(1)");
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_context_offset_valid[] = { UC_SENTINEL, CODE_CONTEXTEX, 1, 0 };
     EXPECT_EQ(0, u16cmp(tstr_context_offset_valid, tstr));
 
     // context, CERR_InvalidToke, offset < 1
     fileKeyboard.version = VERSION_60;
     u16cpy(str, u"context(0)");
-    EXPECT_EQ(CERR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // context, large offset < 0xF000, valid
     fileKeyboard.version = VERSION_60;
     u16cpy(str, u"context(61439)"); //0xF000 - 1
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_context_large_offset_valid[] = { UC_SENTINEL, CODE_CONTEXTEX, 61439, 0 };
     EXPECT_EQ(0, u16cmp(tstr_context_large_offset_valid, tstr));
 
-    // context, CERR_InvalidToken, too large offset == 0xF000
+    // context, KmnCompilerMessages::ERROR_InvalidToken, too large offset == 0xF000
     fileKeyboard.version = VERSION_60;
     u16cpy(str, u"context(61440)"); //0xF000
-    EXPECT_EQ(CERR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // context, CERR_60FeatureOnly_Contextn
+    // context, KmnCompilerMessages::ERROR_60FeatureOnly_Contextn
     fileKeyboard.version = VERSION_50;
     u16cpy(str, u"context(1)");
-    EXPECT_EQ(CERR_60FeatureOnly_Contextn, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(KmnCompilerMessages::ERROR_60FeatureOnly_Contextn, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // context, space before offset, valid
     fileKeyboard.version = VERSION_60;
     u16cpy(str, u"context( 1)");
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_context_space_before_offset_valid[] = { UC_SENTINEL, CODE_CONTEXTEX, 1, 0 };
     EXPECT_EQ(0, u16cmp(tstr_context_space_before_offset_valid, tstr));
 
     // context, space after offset, valid (see I11937, #11938)
     fileKeyboard.version = VERSION_60;
     u16cpy(str, u"context(1 )");
-    EXPECT_EQ(CERR_None, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_context_space_after_offset_valid[] = { UC_SENTINEL, CODE_CONTEXTEX, 1, 0 };
     EXPECT_EQ(0, u16cmp(tstr_context_space_after_offset_valid, tstr));
 }
