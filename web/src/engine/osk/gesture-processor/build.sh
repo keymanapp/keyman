@@ -3,12 +3,14 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../resources/build/builder.inc.sh"
+. "$(dirname "$THIS_SCRIPT")/../../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
+
+BUILD_DIR="/web/src/engine/osk/gesture-processor/build"
 
 ################################ Main script ################################
 
@@ -25,8 +27,8 @@ builder_describe "Builds the gesture-recognition model for Web-based on-screen k
 
 builder_describe_outputs \
   configure        /node_modules \
-  build:module     /common/web/gesture-recognizer/build/lib/index.mjs \
-  build:tools      /common/web/gesture-recognizer/build/tools/lib/index.mjs
+  build:module     "${BUILD_DIR}/lib/index.mjs" \
+  build:tools      "${BUILD_DIR}/tools/lib/index.mjs"
 
 builder_parse "$@"
 
@@ -41,38 +43,36 @@ function do_configure() {
   playwright install
 }
 
-builder_run_action configure do_configure
-
-if builder_start_action clean; then
-  rm -rf build/
-  builder_finish_action success clean
-fi
-
-if builder_start_action build:module; then
+function do_build_module() {
   # Build
   tsc --build $builder_verbose
 
-  $BUNDLE_CMD    "${KEYMAN_ROOT}/common/web/gesture-recognizer/build/obj/index.js" \
-    --out        "${KEYMAN_ROOT}/common/web/gesture-recognizer/build/lib/index.mjs" \
+  $BUNDLE_CMD    "${KEYMAN_ROOT}/${BUILD_DIR}/obj/index.js" \
+    --out        "${KEYMAN_ROOT}/${BUILD_DIR}/lib/index.mjs" \
     --format esm
+}
 
-  builder_finish_action success build:module
-fi
-
-if builder_start_action build:tools; then
+function do_build_tools() {
   src/tools/build.sh build
-  builder_finish_action success build:tools
-fi
+}
 
-if builder_start_action test:module; then
+function do_test_module() {
   if builder_has_option --ci; then
     ./test.sh --ci
   else
     ./test.sh
   fi
-  builder_finish_action success test:module
-fi
+}
 
-if builder_has_action test:tools && ! builder_has_action test:module; then
-  echo "The $(builder_term test:tools) action is currently a no-op."
-fi
+function do_test_tools() {
+  if ! builder_has_action test:module; then
+    echo "The $(builder_term test:tools) action is currently a no-op."
+  fi
+}
+
+builder_run_action configure     do_configure
+builder_run_action clean         rm -rf build/ intermediate/
+builder_run_action build:module  do_build_module
+builder_run_action build:tools   do_build_tools
+builder_run_action test:module   do_test_module
+builder_run_action test:tools    do_test_tools

@@ -16,6 +16,7 @@
     "test": "gosh ./test.sh"
   },
   "dependencies": {
+    "@keymanapp/web-utils": "*",
     "eventemitter3": "^5.0.0"
   },
   "main": "./build/obj/index.js",

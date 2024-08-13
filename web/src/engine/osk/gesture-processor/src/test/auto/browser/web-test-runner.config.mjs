@@ -34,7 +34,7 @@ export default {
     // Rewrites short-hand paths for test resources, making them fully relative to the repo root.
     function rewriteResourcePath(context, next) {
       if(context.url.startsWith('/resources/')) {
-        context.url = '/common/web/gesture-recognizer/src/test' + context.url;
+        context.url = '/web/src/engine/osk/gesture-processor/src/test' + context.url;
       }
 
       return next();

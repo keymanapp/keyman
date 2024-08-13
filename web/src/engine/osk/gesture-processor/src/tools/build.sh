@@ -3,29 +3,32 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "$(dirname "$THIS_SCRIPT")/../../../../../resources/build/builder.inc.sh"
+. "$(dirname "$THIS_SCRIPT")/../../../../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
 
+BASE_DIR="/web/src/engine/osk/gesture-processor"
+BUILD_DIR="${BASE_DIR}/build"
+
 ################################ Main script ################################
 
-builder_describe "Testing-oriented tools for the Gesture Recognizer module of web-based Keyman OSKs" \
+builder_describe "Testing-oriented tools for the Gesture Processor module of web-based Keyman OSKs" \
   "clean" \
   "build" \
   ":fixture       The HTML-element fixture and CSS fixture used for both user-testing and unit-testing" \
   ":recorder      The web page used for recording input sequences for use in unit-testing" \
-  ":test-module   The TS library used to interface with the main gesture-recognizer module for tests"
+  ":test-module   The TS library used to interface with the main gesture-processor module for tests"
 
 builder_parse "$@"
 
 builder_describe_outputs \
   configure            /node_modules \
-  build:fixture        /common/web/gesture-recognizer/build/tools/host-fixture.html \
-  build:recorder       /common/web/gesture-recognizer/src/tools/recorder/build/recorder.mjs \
-  build:test-module    /common/web/gesture-recognizer/build/tools/lib/index.mjs
+  build:fixture        "${BUILD_DIR}/tools/host-fixture.html" \
+  build:recorder       "${BASE_DIR}/src/tools/recorder/build/recorder.mjs" \
+  build:test-module    "${BUILD_DIR}/tools/lib/index.mjs"
 
 # TODO: build if out-of-date if test is specified
 # TODO: configure if npm has not been run, and build is specified
@@ -76,8 +79,8 @@ fi
 if builder_start_action build:test-module; then
   tsc -b "$THIS_SCRIPT_PATH/unit-test-resources/tsconfig.json"
 
-  $BUNDLE_CMD    "${KEYMAN_ROOT}/common/web/gesture-recognizer/build/tools/obj/index.js" \
-    --out        "${KEYMAN_ROOT}/common/web/gesture-recognizer/build/tools/lib/index.mjs" \
+  $BUNDLE_CMD    "${KEYMAN_ROOT}/${BUILD_DIR}/tools/obj/index.js" \
+    --out        "${KEYMAN_ROOT}/${BUILD_DIR}/tools/lib/index.mjs" \
     --format "esm"
 
   builder_finish_action success build:test-module
