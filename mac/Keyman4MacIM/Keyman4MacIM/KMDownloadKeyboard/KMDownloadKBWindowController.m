@@ -28,9 +28,12 @@
   [self.webView setPolicyDelegate:(id<WebPolicyDelegate>)self];
   
   NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+  NSString *percentEncodedVersion = [version stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+
   KeymanVersionInfo keymanVersionInfo = [[self AppDelegate] versionInfo];
-  NSString *urlString = [NSString stringWithFormat:@"https://%@/go/macos/14.0/download-keyboards/?version=%@", keymanVersionInfo.keymanCom, version];
-  os_log_debug([KMLogs uiLog], "KMDownloadKBWindowController opening url = %{public}@, version = '%{public}@'", urlString, version);
+  NSString *urlString = [NSString stringWithFormat:@"https://%@/go/macos/14.0/download-keyboards/?version=%@", keymanVersionInfo.keymanCom, percentEncodedVersion];
+  os_log_debug([KMLogs uiLog], "KMDownloadKBWindowController opening url = %{public}@, version = '%{public}@', percentEncodedVersion = '%{public}@'",
+               urlString, version, percentEncodedVersion);
   
   NSURL * downloadsUrl = [NSURL URLWithString:urlString];
   os_log_debug([KMLogs uiLog], "download site url = '%{public}@'", downloadsUrl.absoluteString);
