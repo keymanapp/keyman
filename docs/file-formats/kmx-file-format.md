@@ -16,7 +16,13 @@ source files.
 - The file format has a header section followed by data. There is no specific
   defined order for data in the file. Empty space is permitted but should be
   zeroed. Note that `COMP_KEYBOARD_KMXPLUS` must follow immediately after
-  `COMP_KEYBOARD` with no empty space (that is at byte 0x40).
+  `COMP_KEYBOARD` with no empty space (that is at byte offset 64).
+
+A .kmx file is essentially a 32-bit memory mapped file. In a 32-bit process, the
+file can be loaded into a memory buffer, and (assuming the file is valid), all
+offset values in the file can be rewritten into pointers by adding the base of
+the memory buffer to them. (In a 64-bit process, a fixup is needed to make space
+for 64-bit pointers.)
 
 ## `COMP_KEYBOARD`: KMX header
 
@@ -123,7 +129,7 @@ data, but this is not a requirement of the file format.
 The `COMP_KEYBOARD_KMXPLUSINFO` structure is present only if
 `COMP_KEYBOARD.dwFlags` flag has bit `KF_KMXPLUS` (`0x20`) set. If present, it
 must be located immediately after the `COMP_KEYBOARD` structure, that is, at
-byte offset `0x40`.
+byte offset 64.
 
 See [KMX+ File Format] for details of the KMX+ file format.
 
