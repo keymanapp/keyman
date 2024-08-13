@@ -9,13 +9,13 @@
 import { EventEmitter } from 'eventemitter3';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 import {
-  Codes, type Keyboard, MinimalKeymanGlobal, KeyEvent, Layouts, type MutableSystemStore,
-  type OutputTarget, Mock, SystemStoreIDs,
+  Codes, type Keyboard, MinimalKeymanGlobal, KeyEvent, Layouts,
+  type OutputTarget, Mock, DefaultRules, EmulationKeystrokes
 } from "@keymanapp/keyboard-processor";
-import DefaultRules, { EmulationKeystrokes } from "./defaultRules.js";
 import RuleBehavior from "./ruleBehavior.js";
 import KeyboardInterface from './kbdInterface.js';
 import { DeviceSpec, globalObject } from "@keymanapp/web-utils";
+import { type MutableSystemStore, SystemStoreIDs } from "./systemStores.js";
 
 // #endregion
 
@@ -167,7 +167,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
     let isMnemonic = this.activeKeyboard && this.activeKeyboard.isMnemonic;
 
     if(!matched) {
-      if((char = this.defaultRules.forAny(Lkc, isMnemonic)) != null) {
+      if((char = this.defaultRules.forAny(Lkc, isMnemonic, ruleBehavior)) != null) {
         special = this.defaultRules.forSpecialEmulation(Lkc)
         if(special == EmulationKeystrokes.Backspace) {
           // A browser's default backspace may fail to delete both parts of an SMP character.

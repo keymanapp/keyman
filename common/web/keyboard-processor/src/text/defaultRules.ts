@@ -5,23 +5,24 @@
  */
 
 import { ModifierKeyConstants } from '@keymanapp/common-types';
-import { Codes, type KeyEvent, type OutputTarget, setDefaultRules } from "@keymanapp/keyboard-processor";
-import RuleBehavior from "./ruleBehavior.js";
+import Codes from './codes.js';
+import type KeyEvent from './keyEvent.js';
+import type OutputTarget  from './outputTarget.js';
 
 export enum EmulationKeystrokes {
   Enter = '\n',
   Backspace = '\b'
 }
 
+export class LogMessages {
+  errorLog?: string;
+  warningLog?: string;
+}
 
 /**
  * Defines a collection of static library functions that define KeymanWeb's default (implied) keyboard rule behaviors.
  */
 export default class DefaultRules {
-  public constructor() {
-    setDefaultRules(this);
-  }
-
   codeForEvent(Lkc: KeyEvent) {
     return Codes.keyCodes[Lkc.kName] || Lkc.Lcode;;
   }
@@ -30,7 +31,7 @@ export default class DefaultRules {
    * Serves as a default keycode lookup table.  This may be referenced safely by mnemonic handling without fear of side-effects.
    * Also used by Processor.defaultRuleBehavior to generate output after filtering for special cases.
    */
-  public forAny(Lkc: KeyEvent, isMnemonic: boolean, ruleBehavior?: RuleBehavior): string {
+  public forAny(Lkc: KeyEvent, isMnemonic: boolean, logMessages?: LogMessages): string {
     var char = '';
 
     // A pretty simple table of lookups, corresponding VERY closely to the original defaultKeyOutput.
@@ -38,9 +39,9 @@ export default class DefaultRules {
       return char;
     } else if(!isMnemonic && ((char = this.forNumpadKeys(Lkc)) != null)) {
       return char;
-    } else if((char = this.forUnicodeKeynames(Lkc, ruleBehavior)) != null) {
+    } else if((char = this.forUnicodeKeynames(Lkc, logMessages)) != null) {
       return char;
-    } else if((char = this.forBaseKeys(Lkc, ruleBehavior)) != null) {
+    } else if((char = this.forBaseKeys(Lkc, logMessages)) != null) {
       return char;
     } else {
       // // For headless and embeddded, we may well allow '\t'.  It's DOM mode that has other uses.
@@ -147,7 +148,7 @@ export default class DefaultRules {
 
   // Test for fall back to U_xxxxxx key id
   // For this first test, we ignore the keyCode and use the keyName
-  public forUnicodeKeynames(Lkc: KeyEvent, ruleBehavior?: RuleBehavior) {
+  public forUnicodeKeynames(Lkc: KeyEvent, logMessages?: LogMessages) {
     const keyName = Lkc.kName;
 
     // Test for fall back to U_xxxxxx key id
@@ -164,8 +165,8 @@ export default class DefaultRules {
         // Code points [U_0000 - U_001F] and [U_0080 - U_009F] refer to Unicode C0 and C1 control codes.
         // Check the codePoint number and do not allow output of these codes via U_xxxxxx shortcuts.
         // Also handles invalid identifiers (e.g. `U_ghij`) for which parseInt returns NaN
-        if(ruleBehavior) {
-          ruleBehavior.errorLog = ("Suppressing Unicode control code in " + keyName);
+        if(logMessages) {
+          logMessages.errorLog = ("Suppressing Unicode control code in " + keyName);
         }
         // We'll attempt to add valid chars
         continue;
@@ -180,7 +181,7 @@ export default class DefaultRules {
 
   // Test for otherwise unimplemented keys on the the base default & shift layers.
   // Those keys must be blocked by keyboard rules if intentionally unimplemented; otherwise, this function will trigger.
-  public forBaseKeys(Lkc: KeyEvent, ruleBehavior?: RuleBehavior) {
+  public forBaseKeys(Lkc: KeyEvent, logMessages?: LogMessages) {
     let n = Lkc.Lcode;
     let keyShiftState = Lkc.Lmodifiers;
 
@@ -189,8 +190,8 @@ export default class DefaultRules {
     if (keyShiftState == ModifierKeyConstants.K_SHIFTFLAG) {
       keyShiftState = 1;
     } else if(keyShiftState != 0) {
-      if(ruleBehavior) {
-        ruleBehavior.warningLog = "KMW only defines default key output for the 'default' and 'shift' layers!";
+      if(logMessages) {
+        logMessages.warningLog = "KMW only defines default key output for the 'default' and 'shift' layers!";
       }
       return null;
     }
@@ -211,8 +212,8 @@ export default class DefaultRules {
         return keyShiftState ? '|' : '\\';
       }
     } catch (e) {
-      if(ruleBehavior) {
-        ruleBehavior.errorLog = "Error detected with default mapping for key:  code = " + n + ", shift state = " + (keyShiftState == 1 ? 'shift' : 'default');
+      if(logMessages) {
+        logMessages.errorLog = "Error detected with default mapping for key:  code = " + n + ", shift state = " + (keyShiftState == 1 ? 'shift' : 'default');
       }
     }
 

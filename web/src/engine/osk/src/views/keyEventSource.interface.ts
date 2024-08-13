@@ -1,7 +1,8 @@
 import { EventEmitter } from "eventemitter3";
-import { type KeyEvent, type RuleBehaviorInterface } from "@keymanapp/keyboard-processor";
+import { type KeyEvent } from "@keymanapp/keyboard-processor";
+import { type RuleBehavior } from 'keyman/engine/js-processor';
 
-export type KeyEventResultCallback = (result: RuleBehaviorInterface, error?: Error) => void;
+export type KeyEventResultCallback = (result: RuleBehavior, error?: Error) => void;
 export type KeyEventHandler = (event: KeyEvent, callback?: KeyEventResultCallback) => void;
 
 interface EventMap {

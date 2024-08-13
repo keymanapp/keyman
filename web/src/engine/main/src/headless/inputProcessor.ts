@@ -15,9 +15,8 @@ import {
   type KeyEvent,
   Mock,
   type OutputTarget,
-  SystemStoreIDs,
 } from "@keymanapp/keyboard-processor";
-import { KeyboardInterface, KeyboardProcessor, RuleBehavior, type ProcessorInitOptions } from 'keyman/engine/js-processor';
+import { KeyboardInterface, KeyboardProcessor, RuleBehavior, type ProcessorInitOptions, SystemStoreIDs } from 'keyman/engine/js-processor';
 
 import { TranscriptionCache } from "./transcriptionCache.js";
 

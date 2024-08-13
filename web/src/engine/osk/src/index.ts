@@ -4,6 +4,7 @@ export { default as OSKView } from './views/oskView.js';
 export { default as FloatingOSKView, FloatingOSKViewConfiguration } from './views/floatingOskView.js';
 export { default as AnchoredOSKView } from './views/anchoredOskView.js';
 export { default as InlinedOSKView } from './views/inlinedOskView.js';
+export { type KeyEventResultCallback, type KeyEventHandler, KeyEventSourceInterface } from './views/keyEventSource.interface.js';
 export { BannerController } from './banner/bannerController.js';
 // Is referenced by at least one desktop UI module.
 export { FloatingOSKCookie as FloatingOSKViewCookie } from './views/floatingOskCookie.js';
