@@ -2,7 +2,7 @@
 import os
 import tempfile
 import unittest
-from unittest.mock import patch, ANY
+from unittest.mock import patch
 from importlib.machinery import SourceFileLoader
 from importlib.util import module_from_spec, spec_from_loader
 
@@ -10,17 +10,11 @@ from importlib.util import module_from_spec, spec_from_loader
 class PackageInstallCompletionTests(unittest.TestCase):
 
     def setUp(self):
-        patcher1 = patch('keyman_config.install_kmp.extract_kmp')
-        self.mockExtractKmp = patcher1.start()
-        self.addCleanup(patcher1.stop)
-        patcher2 = patch('keyman_config.kmpmetadata.get_metadata')
-        self.mockGetMetadata = patcher2.start()
-        self.addCleanup(patcher2.stop)
-
+        self.mockExtractKmp = self._setupMock('keyman_config.install_kmp.extract_kmp')
+        self.mockGetMetadata = self._setupMock('keyman_config.kmpmetadata.get_metadata')
         loader = SourceFileLoader('km_package_install', os.path.join(os.path.dirname(
           os.path.abspath(__file__)), '../km-package-install'))
-        spec = spec_from_loader(loader.name, loader)
-        if spec:
+        if spec := spec_from_loader(loader.name, loader):
             self.mod = module_from_spec(spec)
             loader.exec_module(self.mod)
 
@@ -29,32 +23,43 @@ class PackageInstallCompletionTests(unittest.TestCase):
         self.cacheDir = os.path.join(self.tempDir.name, 'keyman')
         os.makedirs(self.cacheDir)
 
+    def tearDown(self):
+        self.tempDir.cleanup()
+
+    def _setupMock(self, arg0):
+        patcher = patch(arg0)
+        result = patcher.start()
+        self.addCleanup(patcher.stop)
+        return result
+
     def _list_languages_for_keyboard_impl(self, packageId):
         return self.mod._list_languages_for_keyboard_impl(packageId, 'someDir')
 
     def test_PackageCompletionNoLanguage(self):
-        open(os.path.join(self.cacheDir, 'foo'), 'w')
-        self.mockGetMetadata.return_value = (None, None, None, [{}], None)
-        result = self._list_languages_for_keyboard_impl('foo')
-        self.assertEqual(result, "")
+        with open(os.path.join(self.cacheDir, 'foo'), 'w'):
+            self.mockGetMetadata.return_value = (None, None, None, [{}], None)
+            result = self._list_languages_for_keyboard_impl('foo')
+            self.assertEqual(result, "")
 
     def test_PackageCompletionOneLanguage(self):
-        open(os.path.join(self.cacheDir, 'khmer_angkor'), 'w')
-        self.mockGetMetadata.return_value = (
-          None, None, None,
-          [{'languages': [{'name': 'Central Khmer (Khmer, Cambodia)', 'id': 'km'}]}],
-          None)
-        result = self._list_languages_for_keyboard_impl('khmer_angkor')
-        self.assertEqual(result, "km")
+        with open(os.path.join(self.cacheDir, 'khmer_angkor'), 'w'):
+            self.mockGetMetadata.return_value = (
+              None, None, None,
+              [{'languages': [{'name': 'Central Khmer (Khmer, Cambodia)', 'id': 'km'}]}],
+              None
+            )
+            result = self._list_languages_for_keyboard_impl('khmer_angkor')
+            self.assertEqual(result, "km")
 
     def test_PackageCompletionMultipleLanguages(self):
-        open(os.path.join(self.cacheDir, 'sil_euro_latin'), 'w')
-        self.mockGetMetadata.return_value = (
-          None, None, None,
-          [{'languages': [
-            {'name': 'English', 'id': 'en'},
-            {'name': 'French', 'id': 'fr'},
-            {'name': 'German', 'id': 'de'}]}],
-          None)
-        result = self._list_languages_for_keyboard_impl('sil_euro_latin')
-        self.assertEqual(result, 'en\nfr\nde')
+        with open(os.path.join(self.cacheDir, 'sil_euro_latin'), 'w'):
+            self.mockGetMetadata.return_value = (
+              None, None, None,
+              [{'languages': [
+                {'name': 'English', 'id': 'en'},
+                {'name': 'French', 'id': 'fr'},
+                {'name': 'German', 'id': 'de'}]}],
+              None
+            )
+            result = self._list_languages_for_keyboard_impl('sil_euro_latin')
+            self.assertEqual(result, 'en\nfr\nde')

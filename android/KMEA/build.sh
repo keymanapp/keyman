@@ -1,20 +1,13 @@
 #!/usr/bin/env bash
 # Build Keyman Engine for Android using Keyman Web artifacts
 #
-
-#set -x
-set -eu
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
 
 # ################################ Main script ################################
 
@@ -29,7 +22,8 @@ TEST_FLAGS="-x aR lintRelease testRelease" # Gradle test w/o build
 JUNIT_RESULTS="##teamcity[importData type='junit' path='keyman\android\KMEA\app\build\test-results\testReleaseUnitTest\']"
 
 builder_describe "Builds Keyman Engine for Android." \
-  "@/web" \
+  "@/web/src/app/webview" \
+  "@/common/web/sentry-manager" \
   "clean" \
   "configure" \
   "build" \
@@ -49,7 +43,6 @@ if builder_is_debug_build; then
 fi
 
 builder_describe_outputs \
-  configure:engine /android/KMEA/app/src/main/assets/keymanandroid.js \
   build:engine     /android/KMEA/app/build/outputs/aar/keyman-engine-${CONFIG}.aar
 
 #### Build
@@ -82,14 +75,16 @@ if builder_start_action build:engine; then
 
   # Copy KeymanWeb artifacts
   echo "Copying Keyman Web artifacts"
-  cp "$KEYMAN_WEB_ROOT/build/app/embed/$CONFIG/osk/ajax-loader.gif" "$ENGINE_ASSETS/ajax-loader.gif"
-  cp "$KEYMAN_WEB_ROOT/build/app/embed/$CONFIG/keyman.js" "$ENGINE_ASSETS/keymanandroid.js"
-  cp "$KEYMAN_WEB_ROOT/build/app/embed/$CONFIG/keyman.js.map" "$ENGINE_ASSETS/keyman.js.map"
-  cp "$KEYMAN_WEB_ROOT/build/app/embed/$CONFIG/osk/kmwosk.css" "$ENGINE_ASSETS/kmwosk.css"
-  cp "$KEYMAN_WEB_ROOT/build/app/embed/$CONFIG/osk/globe-hint.css" "$ENGINE_ASSETS/globe-hint.css"
-  cp "$KEYMAN_WEB_ROOT/build/app/embed/$CONFIG/osk/keymanweb-osk.ttf" "$ENGINE_ASSETS/keymanweb-osk.ttf"
+  cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/keymanweb-webview.js" "$ENGINE_ASSETS/keymanweb-webview.js"
+  cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/keymanweb-webview.js.map" "$ENGINE_ASSETS/keymanweb-webview.js.map"
+  cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/map-polyfill.js" "$ENGINE_ASSETS/map-polyfill.js"
+  cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/ajax-loader.gif" "$ENGINE_ASSETS/ajax-loader.gif"
+  cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/kmwosk.css" "$ENGINE_ASSETS/kmwosk.css"
+  cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/globe-hint.css" "$ENGINE_ASSETS/globe-hint.css"
+  cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/keymanweb-osk.ttf" "$ENGINE_ASSETS/keymanweb-osk.ttf"
 
-  cp "$KEYMAN_ROOT/common/web/sentry-manager/build/index.js" "$ENGINE_ASSETS/keyman-sentry.js"
+  cp "$KEYMAN_ROOT/node_modules/@sentry/browser/build/bundle.min.js" "$ENGINE_ASSETS/sentry.min.js"
+  cp "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js" "$ENGINE_ASSETS/keyman-sentry.js"
 
   echo "Copying es6-shim polyfill"
   cp "$KEYMAN_ROOT/node_modules/es6-shim/es6-shim.min.js" "$ENGINE_ASSETS/es6-shim.min.js"

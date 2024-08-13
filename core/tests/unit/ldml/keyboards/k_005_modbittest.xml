@@ -6,40 +6,35 @@
 @@expected: \u0061\u0041\u0062\u0063\u0064\u0064\u0065\u0066\u0067\u0067
 
 -->
-<!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="mt" conformsTo="techpreview">
-  <info author="srl295" indicator="🙀" layout="qwerty" normalization="NFC" />
-
-  <names>
-    <name value="TestKbd" />
-  </names>
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info author="srl295" indicator="🙀" layout="qwerty"  name="TestKbd"/>
 
   <keys/> <!-- implied only -->
 
-  <layers form="us">
-    <layer id="base" modifier="none">
+  <layers formId="us">
+    <layer id="base" modifiers="none">
       <row keys="a" /> <!-- K_BKQUOTE -->
     </layer>
-    <layer modifier="shift">
+    <layer modifiers="shift">
       <row keys="A" /> <!-- K_BKQUOTE -->
     </layer>
-    <layer modifier="altL">
+    <layer modifiers="altL">
       <row keys="b" /> <!-- K_BKQUOTE -->
     </layer>
-    <layer modifier="altR">
+    <layer modifiers="altR">
       <row keys="c" /> <!-- K_BKQUOTE -->
     </layer>
-    <layer modifier="shift alt"> <!-- LALT+shift or RALT+shift -->
+    <layer modifiers="shift alt"> <!-- LALT+shift or RALT+shift -->
       <row keys="d" /> <!-- K_BKQUOTE -->
     </layer>
-    <layer modifier="ctrlL">
+    <layer modifiers="ctrlL">
       <row keys="e" /> <!-- K_BKQUOTE -->
     </layer>
-    <layer modifier="ctrlR">
+    <layer modifiers="ctrlR">
       <row keys="f" /> <!-- K_BKQUOTE -->
     </layer>
-    <layer modifier="shift ctrl"> <!-- LALT+shift or RALT+shift -->
+    <layer modifiers="shift ctrl"> <!-- LALT+shift or RALT+shift -->
       <row keys="g" /> <!-- K_BKQUOTE -->
     </layer>
   </layers>
-</keyboard>
+</keyboard3>

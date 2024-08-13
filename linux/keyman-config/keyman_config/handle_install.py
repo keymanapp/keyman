@@ -22,9 +22,9 @@ def download_and_install_package(url):
     bcp47 = _extract_bcp47(parsedUrl.query)
 
     if parsedUrl.scheme == 'keyman':
-        logging.info("downloading " + url)
+        logging.info(f"downloading {url}")
         if not url.startswith('keyman://download/keyboard/'):
-            logging.error("Don't know what to do with URL " + url)
+            logging.error(f"Don't know what to do with URL {url}")
             return
 
         packageId = parsedUrl.path[len('/keyboard/'):]
@@ -33,22 +33,22 @@ def download_and_install_package(url):
             return
 
         downloadFile = os.path.join(get_download_folder(), packageId)
-        downloadUrl = KeymanComUrl + '/go/package/download/' + packageId + '?platform=linux&tier=' + __tier__
+        downloadUrl = f'{KeymanComUrl}/go/package/download/{packageId}?platform=linux&tier={__tier__}'
         packageFile = download_kmp_file(downloadUrl, downloadFile)
         if packageFile is None:
             return
-    elif parsedUrl.scheme == '' or parsedUrl.scheme == 'file':
+    elif parsedUrl.scheme in ['', 'file']:
         packageFile = parsedUrl.path
     else:
-        logging.error("Invalid URL: " + url)
+        logging.error(f"Invalid URL: {url}")
         return
 
     if not is_zipfile(packageFile):
-        logging.error("Not a valid KMP package: " + url)
+        logging.error(f"Not a valid KMP package: {url}")
         return
 
     if packageFile and not _install_package(packageFile, bcp47):
-        logging.error("Can't find file " + url)
+        logging.error(f"Can't find file {url}")
 
 
 def _extract_bcp47(query):

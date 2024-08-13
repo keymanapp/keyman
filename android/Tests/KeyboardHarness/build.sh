@@ -1,20 +1,13 @@
 #!/usr/bin/env bash
 #
 # Build Test app: KeyboardHarness
-
-#set -x
-set -eu
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 
@@ -32,17 +25,19 @@ builder_describe "Build KeyboardHarness test app for Android." \
   ":app                   KeyboardHarness" \
   "--ci                   Don't start the Gradle daemon. Use for CI"
 
-# parse before describe outputs to check debug flags  
+# parse before describe outputs to check debug flags
 builder_parse "$@"
+
+ARTIFACT="app-release-unsigned.apk"
 
 if builder_is_debug_build; then
   builder_heading "### Debug config ####"
   CONFIG="debug"
   BUILD_FLAGS="assembleDebug -x lint -x test"
   TEST_FLAGS="-x assembleDebug lintDebug testDebug"
+  ARTIFACT="app-$CONFIG.apk"
 fi
 
-ARTIFACT="app-$CONFIG.apk"
 
 builder_describe_outputs \
   configure    /android/Tests/KeyboardHarness/app/libs/keyman-engine.aar \

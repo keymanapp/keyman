@@ -101,14 +101,14 @@
       "type": "shell",
       "label": "ibus-keyman: configure",
       "command": "./build.sh",
-      "args": ["configure", "--debug"],
+      "args": ["configure", "--debug", "--coverage"],
       "options": {
         "cwd": "${workspaceFolder}/linux/ibus-keyman",
         "env": {
           "CPPFLAGS": "-DG_MESSAGES_DEBUG -I${workspaceFolder}/core/build/arch/debug/include/ -I${workspaceFolder}/core/include/ -I/home/eberhard/Develop/keyman/ibus/ibus/src -I${workspaceFolder}/common/include",
           "CFLAGS": "-g -O0",
           "CXXFLAGS": "-g -O0",
-          "KEYMAN_PROC_LIBS": "-L${workspaceFolder}/core/build/arch/debug/src -lkmnkbp0",
+          "KEYMAN_PROC_LIBS": "-L${workspaceFolder}/core/build/arch/debug/src -lkeymancore",
           "KEYMAN_PROC_CFLAGS": "-I${workspaceFolder}/core/build/arch/debug/include -I${workspaceFolder}/core/include -I${workspaceFolder}/common/include",
           "PKG_CONFIG_PATH": "${workspaceFolder}/core/build/arch/debug/meson-private"
         },
@@ -121,7 +121,7 @@
       "type": "shell",
       "label": "ibus-keyman: build",
       "command": "./build.sh",
-      "args": [ "build", "--debug" ],
+      "args": [ "build", "--debug", "--coverage" ],
       "options": {
         "cwd": "${workspaceFolder}/linux/ibus-keyman/",
       },
@@ -139,14 +139,51 @@
     },
     {
       "type": "shell",
-      "label": "ibus-keyman: test",
+      "label": "ibus-keyman: unit tests",
       "command": "./build.sh",
-      "args": ["test", "--debug"],
+      "args": [
+        "test",
+        "--debug",
+        "--no-integration",
+        "--coverage"
+      ],
       "options": {
         "cwd": "${workspaceFolder}/linux/ibus-keyman/",
       },
       "group": "build",
-      "detail": "run tests of ibus-keyman"
+      "detail": "run unit tests of ibus-keyman"
+    },
+    {
+      "type": "shell",
+      "label": "ibus-keyman: test (unit+integration)",
+      "command": "./build.sh",
+      "args": [
+        "test",
+        "--debug",
+        "--coverage"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/linux/ibus-keyman/",
+      },
+      "group": "build",
+      "detail": "run unit and integration tests of ibus-keyman"
+    },
+    {
+      "type": "shell",
+      "label": "ibus-keyman: report",
+      "command": "./build.sh",
+      "args": [
+        "test",
+        "--report",
+        "--debug",
+        "--coverage",
+        "--no-integration"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/linux/ibus-keyman/",
+      },
+      "group": "build",
+      "detail": "run tests and create unit test coverage report"
     },
     {
       "type": "shell",
@@ -157,6 +194,136 @@
       },
       "group": "test",
       "detail": "unit test keyman-config"
+    },
+    {
+      "type": "shell",
+      "label": "keyman-config: report",
+      "command": "${workspaceFolder}/linux/keyman-config/build.sh",
+      "args": [
+        "test",
+        "--report",
+        "--debug",
+        "--coverage",
+        "--no-integration"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/linux/keyman-config",
+      },
+      "group": "test",
+      "detail": "run tests and create unit test coverage report"
+    },
+    {
+      "type": "shell",
+      "label": "keyman-system-service: clean",
+      "command": "${workspaceFolder}/linux/keyman-system-service/build.sh",
+      "args": [
+        "--debug",
+        "clean"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/linux/keyman-system-service"
+      },
+      "group": "build",
+      "detail": "clean keyman-system-service"
+    },
+    {
+      "type": "shell",
+      "label": "keyman-system-service: build",
+      "command": "${workspaceFolder}/linux/keyman-system-service/build.sh",
+      "args": [
+        "--debug",
+        "build"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/linux/keyman-system-service"
+      },
+      "problemMatcher": [
+        {
+          "owner": "cpp",
+          "source": "compiler",
+          "fileLocation": [
+            "relative",
+            "${workspaceFolder}/linux/keyman-system-service/"
+          ],
+          "pattern": [
+            {
+              "regexp": "^../../../(.*):(\\d+):(\\d+):\\s+(warning|error|note):\\s+(.*)(\\s+\\[.*\\])?$",
+              "file": 1,
+              "line": 2,
+              "column": 3,
+              "severity": 4,
+              "message": 5
+            }
+          ]
+        },
+        {
+          "owner": "cpp",
+          "source": "linker",
+          "fileLocation": "absolute",
+          "pattern": [
+            {
+              "regexp": "^(/usr/bin/ld:\\s+)?(.*):(\\d+):\\s+(.*)$",
+              "file": 2,
+              "location": 3,
+              "message": 4
+            }
+          ]
+        }
+      ],
+      "presentation": {
+        "clear": true
+      },
+      "group": "build",
+      "detail": "build keyman-system-service"
+    },
+    {
+      "type": "shell",
+      "label": "keyman-system-service: configure",
+      "command": "${workspaceFolder}/linux/keyman-system-service/build.sh",
+      "args": [
+        "--debug",
+        "--coverage",
+        "configure"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/linux/keyman-system-service",
+      },
+      "presentation": {
+        "clear": true
+      },
+      "group": "build",
+      "detail": "configure keyman-system-service"
+    },
+    {
+      "type": "shell",
+      "label": "keyman-system-service: test",
+      "command": "${workspaceFolder}/linux/keyman-system-service/build.sh",
+      "args": [
+        "--debug",
+        "test"
+      ],
+      "problemMatcher": [
+        "$gcc"
+      ],
+      "group": "test",
+      "detail": "run tests for keyman-system-service"
+    },
+    {
+      "type": "shell",
+      "label": "keyman-system-service: report",
+      "command": "${workspaceFolder}/linux/keyman-system-service/build.sh",
+      "args": [
+        "test",
+        "--report",
+        "--debug",
+        "--coverage",
+        "--no-integration",
+      ],
+      "problemMatcher": [
+        "$gcc"
+      ],
+      "group": "test",
+      "detail": "run tests and create unit test coverage report"
     },
   ]
 }

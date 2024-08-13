@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
@@ -17,13 +17,20 @@ echo "Found tier ${TIER}, version ${VERSION}"
 cd ../core
 ./build.sh --no-tests clean:arch configure:arch build:arch
 
+# Building ibus-keyman will also build dependency keyman-system-service
 cd "$BASEDIR/ibus-keyman"
 ./build.sh clean configure
 
 cd "$BASEDIR/keyman-config"
-make clean
+./build.sh clean
 
-cd keyman_config
+cd "$BASEDIR/keyman-config/keyman_config"
+export QUILT_PATCHES="${BASEDIR}/debian/patches"
+export QUILT_REFRESH_ARGS="-p ab --no-timestamps --no-index"
+quilt push -a || true
+quilt new version_py.diff
+quilt add "version.py"
+
 sed \
     -e "s/_VERSION_/${VERSION}/g" \
     -e "s/_VERSIONWITHTAG_/${VERSION_WITH_TAG}/g" \
@@ -34,5 +41,7 @@ sed \
     -e "s/_ENVIRONMENT_/${VERSION_ENVIRONMENT}/g" \
     -e "s/_UPLOADSENTRY_/${UPLOAD_SENTRY}/g" \
     version.py.in > version.py
+quilt refresh
+quilt pop -a
 cd ../buildtools && python3 ./build-langtags.py
 cd "$BASEDIR"

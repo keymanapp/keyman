@@ -7,10 +7,10 @@
 
 #include <km_types.h>
 
-#ifdef KMN_KBP
+#ifdef KM_CORE_LIBRARY
 // TODO: move this to a common namespace keyman::common::kmx_file or similar in the future
 namespace km {
-namespace kbp {
+namespace core {
 namespace kmx {
 #endif
 
@@ -50,9 +50,10 @@ namespace kmx {
 #define VERSION_150 0x00000F00
 
 #define VERSION_160 0x00001000
+#define VERSION_170 0x00001100
 
 #define VERSION_MIN VERSION_50
-#define VERSION_MAX VERSION_160
+#define VERSION_MAX VERSION_170
 
 //
 // Backspace types
@@ -153,7 +154,13 @@ namespace kmx {
 
 #define TSS__KEYMAN_150_MAX  43
 
-#define TSS__MAX        43
+/* Keyman 17.0 system stores */
+
+#define TSS_DISPLAYMAP       44
+
+#define TSS__KEYMAN_170_MAX  44
+
+#define TSS__MAX        44
 
 /* wm_keyman_control_internal message control codes */
 
@@ -295,29 +302,32 @@ namespace kmx {
 
 #define K_MODIFIERFLAG  0x007F
 #define K_NOTMODIFIERFLAG 0xFF00   // I4548
+// Note: OTHER_MODIFIER = 0x10000, used by KMX+ for the
+// other modifier flag in layers, > 16 bit so not available here.
+// See keys_mod_other in keyman_core_ldml.ts
 
 struct COMP_STORE {
-  KMX_DWORD dwSystemID;
-  KMX_DWORD dpName;
-  KMX_DWORD dpString;
+  KMX_DWORD_unaligned dwSystemID;
+  KMX_DWORD_unaligned dpName;
+  KMX_DWORD_unaligned dpString;
   };
 
 struct COMP_KEY {
-  KMX_WORD Key;
-  KMX_WORD _reserved;
-  KMX_DWORD Line;
-  KMX_DWORD ShiftFlags;
-  KMX_DWORD dpOutput;
-  KMX_DWORD dpContext;
+  KMX_WORD_unaligned Key;
+  KMX_WORD_unaligned _reserved;
+  KMX_DWORD_unaligned Line;
+  KMX_DWORD_unaligned ShiftFlags;
+  KMX_DWORD_unaligned dpOutput;
+  KMX_DWORD_unaligned dpContext;
   };
 
 struct COMP_GROUP {
-  KMX_DWORD dpName;
-  KMX_DWORD dpKeyArray;   // [LPKEY] address of first item in key array
-  KMX_DWORD dpMatch;
-  KMX_DWORD dpNoMatch;
-  KMX_DWORD cxKeyArray;   // in array entries
-  KMX_BOOL  fUsingKeys;   // group(xx) [using keys] <-- specified or not
+  KMX_DWORD_unaligned dpName;
+  KMX_DWORD_unaligned dpKeyArray;   // [LPKEY] address of first item in key array
+  KMX_DWORD_unaligned dpMatch;
+  KMX_DWORD_unaligned dpNoMatch;
+  KMX_DWORD_unaligned cxKeyArray;   // in array entries
+  KMX_BOOL_unaligned  fUsingKeys;   // group(xx) [using keys] <-- specified or not
   };
 
 struct COMP_KEYBOARD {
@@ -377,8 +387,8 @@ static_assert(sizeof(COMP_KEY) == KEYBOARDFILEKEY_SIZE, "COMP_KEY must be KEYBOA
 static_assert(sizeof(COMP_GROUP) == KEYBOARDFILEGROUP_SIZE, "COMP_GROUP must be KEYBOARDFILEGROUP_SIZE bytes");
 static_assert(sizeof(COMP_KEYBOARD) == KEYBOARDFILEHEADER_SIZE, "COMP_KEYBOARD must be KEYBOARDFILEHEADER_SIZE bytes");
 
-#ifdef KMN_KBP
+#ifdef KM_CORE_LIBRARY
 } // namespace kmx
-} // namespace kbp
+} // namespace core
 } // namespace km
 #endif

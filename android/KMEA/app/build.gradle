@@ -7,12 +7,12 @@ ext.rootPath = '../../'
 apply from: "$rootPath/version.gradle"
 
 android {
-    compileSdkVersion 33
+    compileSdk 34
     namespace "com.keyman.engine"
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 33
+        targetSdkVersion 34
 
         // VERSION_CODE and VERSION_NAME from version.gradle but Gradle removes them for libraries
         buildConfigField "String", "KEYMAN_ENGINE_VERSION_NAME", "\""+VERSION_NAME+"\""
@@ -55,17 +55,17 @@ android {
 
 dependencies {
     // 1.6.0-rc01 needed to resolve https://issuetracker.google.com/issues/238425626
-    implementation 'androidx.appcompat:appcompat:1.6.0-rc01' // 1.5.1
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     // material:1.7.0 will need Gradle plugin 7.1.0+
-    implementation 'com.google.android.material:material:1.6.0'
-    implementation 'commons-io:commons-io:2.6'
-    implementation 'io.sentry:sentry-android:6.9.2'
-    implementation 'androidx.preference:preference:1.2.0'
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'commons-io:commons-io:2.13.0'
+    implementation 'io.sentry:sentry-android:7.8.0'
+    implementation 'androidx.preference:preference:1.2.1'
 
     // Robolectric
     testImplementation 'androidx.test:core:1.5.0'
-    testImplementation 'androidx.test.ext:junit:1.1.4'
-    testImplementation 'org.robolectric:robolectric:4.8.1'
+    testImplementation 'androidx.test.ext:junit:1.1.5'
+    testImplementation 'org.robolectric:robolectric:4.10.3'
 
     // Generate QR Codes
     implementation ('com.github.kenglxn.QRGen:android:3.0.1') {

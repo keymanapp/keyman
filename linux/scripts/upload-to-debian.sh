@@ -7,12 +7,14 @@ usage()
 
 ${0} -k <Debian signing key> [-n] [--push]
 
-Create source package for latest stable release and upload to Debian,
+Create source package for latest stable or beta release and upload to Debian,
 and update (and optionally push) changelog file.
 
     -k <key>    The PGP key used to sign the source package
     -n          Simulate upload
     --push      Push changelog changes to GitHub
+    --beta      Deploy beta release. Default: latest stable release.
+    --stable    Deploy latest stable release.
     --debian-revision <revision>
                 The debian revision to use. Default: 1
     --help      Display usage help
@@ -40,11 +42,13 @@ NOOP=
 PUSH=
 DEBKEYID=
 REVISION=1
+IS_BETA=false
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
 
 while (( $# )); do
     case $1 in
         -k) shift
-            if [ ! $# -eq 0 ]; then
+            if [[ ! $# -eq 0 ]]; then
                 DEBKEYID=$1
             else
                 builder_die "Error: The -k argument is missing a value. Exiting."
@@ -52,9 +56,11 @@ while (( $# )); do
         -n) NOOP=: ;;
         --help) usage ; exit 0 ;;
         --push) PUSH=1 ;;
+        --beta) IS_BETA=true ;;
+        --stable) IS_BETA=false ;;
         --debian-revision)
             shift
-            if [ ! $# -eq 0 ]; then
+            if [[ ! $# -eq 0 ]]; then
                 REVISION=$1
             else
                 builder_die "Error: The --debian-revision argument is missing a value. Exiting."
@@ -64,7 +70,7 @@ while (( $# )); do
     shift || builder_die "Error: The last argument is missing a value. Exiting."
 done
 
-if [ -z "$DEBKEYID" ]; then
+if [[ -z ${DEBKEYID} ]]; then
     usage
     exit 2
 fi
@@ -73,57 +79,79 @@ if ! git diff --quiet; then
     builder_die "You have changed files in your git working directory. Exiting."
 fi
 
+function get_latest_stable_branch_name() {
+  # Get the list of stable branches and take the one with the highest number.
+  # Extract `origin/stable-16.0` from `  origin/stable-16.0`
+  local branches stable_branch
+  branches=$(git branch -r | grep origin/stable-)
+  stable_branch=$(echo "${branches}" | sort | tail -1)
+  if [[ -z ${stable_branch} ]]; then
+    builder_die "Can't find stable-* branch" > /dev/stderr
+    exit 2
+  fi
+  echo "${stable_branch##* }"
+}
+
+function push_to_github_and_create_pr() {
+  local BRANCH=$1
+  local BASE=$2
+  local PR_TITLE=$3
+  local PR_BODY=$4
+
+  if [[ -n "${PUSH}" ]]; then
+    ${NOOP} git push --force-with-lease origin "${BRANCH}"
+    PR_NUMBER=$(gh pr list --draft --search "${PR_TITLE}" --base "${BASE}" --json number --jq '.[].number')
+    if [[ -n ${PR_NUMBER} ]]; then
+      builder_echo "PR #${PR_NUMBER} already exists"
+    else
+      ${NOOP} gh pr create --draft --base "${BASE}" --title "${PR_TITLE}" --body "${PR_BODY}"
+      PR_NUMBER=$(gh pr list --draft --search "${PR_TITLE}" --base "${BASE}" --json number --jq '.[].number')
+    fi
+  else
+    PR_NUMBER=""
+  fi
+}
+
 builder_heading "Fetching latest changes"
 git fetch -p origin
-stable_branch=$(git branch -r | grep origin/stable- | sort | tail -1)
-stable_branch=${stable_branch##* }
-# Checkout stable branch so that `scripts/debian.sh` picks up correct version
-git checkout "${stable_branch#origin/}"
-git pull origin "${stable_branch#origin/}"
 
-if git branch -r | grep origin/beta; then
-    ISBETA=true
+if ${IS_BETA}; then
+  DEPLOY_BRANCH=origin/beta
 else
-    ISBETA=false
+  # shellcheck disable=2311
+  DEPLOY_BRANCH=$(get_latest_stable_branch_name)
 fi
 
-cd "$KEYMAN_ROOT/linux"
+# Checkout stable/beta branch so that `scripts/debian.sh` picks up correct version
+git checkout "${DEPLOY_BRANCH#origin/}"
+git pull origin "${DEPLOY_BRANCH#origin/}"
+
 builder_heading "Building source package"
-DIST=unstable DEBREVISION=$REVISION scripts/debian.sh
+cd "${KEYMAN_ROOT}/linux"
+DIST=unstable DEBREVISION=${REVISION} scripts/debian.sh
 cd debianpackage/
 builder_heading "Signing source package"
-debsign -k"$DEBKEYID" --re-sign ./*.changes
+debsign -k"${DEBKEYID}" --re-sign ./*.changes
 builder_heading "Uploading packages to mentors.debian.net"
-$NOOP dput mentors ./*.changes
+${NOOP} dput mentors ./*.changes
 cd ..
 
 builder_heading "Updating changelog"
-# base changelog branch on remote stable branch
-git checkout -B chore/linux/changelog "$stable_branch"
+
+# base changelog branch on remote stable/beta branch
+git checkout -B chore/linux/changelog "${DEPLOY_BRANCH}"
 cp debianpackage/keyman-*/debian/changelog debian/
 git add debian/changelog
-git commit -m "chore(linux): Update debian changelog"
-if [ -n "$PUSH" ]; then
-    $NOOP git push --force-with-lease origin chore/linux/changelog
-    $NOOP gh pr create --draft --base "$stable_branch" --title "chore(linux): Update debian changelog" --body "@keymanapp-test-bot skip"
-fi
+COMMIT_MESSAGE="chore(linux): Update debian changelog"
+git commit -m "${COMMIT_MESSAGE}"
+push_to_github_and_create_pr chore/linux/changelog "${DEPLOY_BRANCH#origin/}" "${COMMIT_MESSAGE}" "@keymanapp-test-bot skip"
 
-if $ISBETA; then
-    CLBRANCH=origin/beta
-else
-    CLBRANCH=origin/master
-fi
-
-git checkout -B chore/linux/cherry-pick/changelog ${CLBRANCH}
+# Create cherry-pick on master branch
+git checkout -B chore/linux/cherry-pick/changelog origin/master
 git cherry-pick -x chore/linux/changelog
-if [ -n "$PUSH" ]; then
-    $NOOP git push --force-with-lease origin chore/linux/cherry-pick/changelog
-    $NOOP gh pr create --draft --base ${CLBRANCH} --title "chore(linux): Update debian changelog 🍒" --body "@keymanapp-test-bot skip"
-fi
+push_to_github_and_create_pr chore/linux/cherry-pick/changelog master "${COMMIT_MESSAGE} 🍒" \
+"Cherry-pick-of: #${PR_NUMBER}
+@keymanapp-test-bot skip"
 
 builder_heading "Finishing"
-if $ISBETA; then
-    git checkout beta
-else
-    git checkout master
-fi
+git checkout "${CURRENT_BRANCH}"

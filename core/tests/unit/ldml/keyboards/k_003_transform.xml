@@ -3,48 +3,54 @@
 <!--
 from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-keyboards.md#element-transform
 
-Note: keys should start with [K_A][K_B][K_C] not [K_Y] when transforms are functioning properly.
-
-#TODO-LDML: transforms broken
-#@@keys: [K_Y][K_BKQUOTE][K_A][K_B][K_D][K_BKQUOTE][K_A][K_B][K_E][K_Q][K_BKQUOTE][K_B][K_C]
-#@@expected: y\u0020xd\u0020xeq\u0020m
-
-@@keys: [K_T][K_O][K_D][K_O]
-@@expected: todo
+@@keys: [K_Q][K_U][K_BKQUOTE][K_E]
+@@expected: qu\u00ea
 
 -->
-<!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="en" conformsTo="techpreview">
-  <info author="srl295" indicator="🙀" layout="qwerty" normalization="NFC" />
-
-  <names>
-    <name value="TestKbd" />
-  </names>
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="en" conformsTo="45">
+  <info author="srl295" indicator="🙀" layout="qwerty"  name="TransformKbd"/>
 
   <keys>
-    <key id="backslash" to="\u{005c}" />
-    <key id="bquote" to="`" />
-    <key id="equals" to="=" />
-    <key id="hyphen" to="-" />
+    <key id="equal" output="=" />
+    <key id="hyphen" output="-" />
+    <key id="untransformed-hat" output="^"/>
+    <key id="hat" output="\m{hat}"/>
   </keys>
 
-  <layers form="us">
-    <layer id="base">
-      <row keys="space" /> <!-- number row -->
+  <layers formId="us">
+    <layer modifiers="none" id="base">
+      <row keys="hat 1 2 3 4 5 6 7 8 9 0 hyphen equal" />
       <row keys="q w e r t y u i o p" />
       <row keys="a s d f g h j k l" />
       <row keys="z x c v b n m" />
       <row keys="space" />
     </layer>
+    <layer modifiers="shift" id="shift">
+      <row keys="untransformed-hat 1 2 3 4 5 6 7 8 9 0 hyphen equal" />
+      <row keys="Q W E R T Y U I O P" />
+      <row keys="A S D F G H J K L" />
+      <row keys="Z X C V B N M" />
+      <row keys="space" />
+    </layer>
   </layers>
+
+  <variables>
+    <string id="e" value="e" />
+  </variables>
 
   <transforms type="simple">
     <transformGroup>
-      <transform from="ab" to="x" />
-      <transform from="abc" to="y" />
-      <transform from="abef" to="z" />
-      <transform from="bc" to="m" />
-      <transform from="beq" to="n" />
+      <transform from="\m{hat}${e}" to="ê"/> <!-- TODO-LDML: ^ should not need escape here ideally -->
+    </transformGroup>
+    <transformGroup>
+      <!-- testing -->
+      <reorder from="ABCD" order="4 2 1 3" />
     </transformGroup>
   </transforms>
-</keyboard>
+  <transforms type="backspace">
+    <transformGroup>
+      <!-- 'ab' deleted as a group -->
+      <transform from="ab" />
+    </transformGroup>
+  </transforms>
+</keyboard3>

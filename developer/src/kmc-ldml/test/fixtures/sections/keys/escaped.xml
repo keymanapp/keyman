@@ -1,30 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="mt" conformsTo="techpreview">
-  <names>
-    <name value="hardware-escaped" /> <!-- see maximal.xml -->
-  </names>
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="hardware-escaped" />
 
   <keys>
+    <key id="eee" output="\u{ea 0301}"/>
+    <key id="a-acute" output="á" />
+    <key id="e-acute" output="\u{00e9}" />
+    <key id="i-acute" output="í" />
+    <key id="a-umlaut" output="ä" />
+    <key id="e-umlaut" output="\u{eb}" />
+    <key id="i-umlaut" output="ï" />
     <key id="Q" gap="true" />
-    <key id="W" switch="shift" />
+    <key id="W" layerId="shift" />
     <!-- This key gets a bunch of other status -->
-    <key id="q" flicks="flick0" to="\u{71}" longPress="á \u{00e9} í" longPressDefault="\u{e9}"
-        multiTap="ä \u{eb} ï" transform="no" width="3.14159" />
-    <key id="w" to="\u{77}" />
-    <flicks id="flick0">
-        <flick directions="nw se" to="ç" />
-        <flick directions="ne sw" to="\u{ea 0301}" /> <!-- ế -->
-    </flicks>
+    <key id="q" flickId="flick0" output="\u{71}" longPressKeyIds="a-acute e-acute i-acute" longPressDefaultKeyId="e-acute"
+        multiTapKeyIds="a-umlaut e-umlaut i-umlaut" width="3.14159" />
+    <key id="w" output="\u{77}" />
   </keys>
-
-  <layers form="touch" minDeviceWidth="300">
+  <flicks>
+    <flick id="flick0">
+      <flickSegment directions="nw se" keyId="c" />
+      <flickSegment directions="ne sw" keyId="eee" /> <!-- ế -->
+    </flick>
+  </flicks>
+  <layers formId="touch" minDeviceWidth="300">
     <layer id="base">
       <row keys="Q q W w" />
     </layer>
   </layers>
-  <layers form="iso">
+  <layers formId="iso">
     <layer id="base">
       <!-- beware: this is mapping ` and 1! -->
       <row keys="Q W" />
@@ -34,4 +39,4 @@
       <row keys="q w" />
     </layer>
   </layers>
-</keyboard>
+</keyboard3>

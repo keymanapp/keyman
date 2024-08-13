@@ -7,8 +7,7 @@ https://github.com/keymanapp/keyboards.
 
 Currently, the regression tests run only on Windows because we have a dependency on
 the `kmanalyze` program which is not yet available outside the keyman source repo. This
-is the only Windows dependency (the `kmcomp` compiler is also used, but this runs under
-WINE and is available in binary form outside the source repo).
+is the only Windows dependency (the `kmc` compiler is also used).
 
 The test suite runs in Node.js and launches Chrome for the tests. In the future, the
 tests may be able to be run in native Node.js.
@@ -34,7 +33,7 @@ the keyman repository, for example:
         - testing
           - regression-tests
 
-Keyman Engine for Web, Keyman Developer (kmcomp, kmcmpdll, kmanalyze) must be built
+Keyman Engine for Web, Keyman Developer (kmc, kmanalyze) must be built
 prior to running the tests. (If not testing source versions, only kmanalyze is
 required). See the build documentation for each project for details; summary below:
 

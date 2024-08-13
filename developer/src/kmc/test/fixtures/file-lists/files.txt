@@ -1,0 +1,15 @@
+
+#
+# This is a comment
+#
+
+file1.kmn
+
+  #
+  # we want to compile these files too
+  #
+
+  file2.kmn
+  file with space.kps
+
+# Some more commentary

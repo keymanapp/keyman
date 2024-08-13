@@ -18,8 +18,8 @@ $(function() {
   this.saveSelection = function() {
     let key = builder.selectedKey(), subKey = builder.selectedSubKey();
     return {
-      id: key ? $(key).data('id') : null,
-      subId: subKey ? $(subKey).data('id') : null
+      id: key.length ? $(key).data('id') : null,
+      subId: subKey.length ? $(subKey).data('id') : null
     };
   }
 
@@ -40,14 +40,16 @@ $(function() {
     builder.selectSubKey(subKey);
   }
 
-  $('#selPlatformPresentation').change(function () {
+  builder.selPlatformPresentationChange = function () {
     let lastSelection = builder.saveSelection();
     builder.selectKey(null, false);
     builder.selectSubKey(null);
     builder.prepareLayer();
     builder.restoreSelection(lastSelection);
     builder.saveState();
-  });
+  }
+
+  $('#selPlatformPresentation').change(builder.selPlatformPresentationChange);
 
   builder.removeAllSubKeys = function() {
     $('#sub-key-groups .key').remove();
@@ -266,6 +268,20 @@ $(function() {
     }
   }
 
+  this.hexToCodePoint = function(codePoint) {
+    const codePointValue = parseInt(codePoint, 16);
+    if (
+      isNaN(codePointValue) ||
+      codePointValue < 0 ||
+      codePointValue > 0x10FFFF ||
+      (0x0 <= codePointValue && codePointValue <= 0x1F) ||
+      (0x80 <= codePointValue && codePointValue <= 0x9F)
+    ) {
+      return null;
+    }
+    return String.fromCodePoint(codePointValue);
+  }
+
   this.unicodeKeyIdToString = function(id) {
     // duplicated from oskKey.ts
     if(!id || id.substr(0,2) != 'U_') {
@@ -275,13 +291,9 @@ $(function() {
     let result = '';
     const codePoints = id.substr(2).split('_');
     for(let codePoint of codePoints) {
-      const codePointValue = parseInt(codePoint, 16);
-      if (((0x0 <= codePointValue) && (codePointValue <= 0x1F)) ||
-          ((0x80 <= codePointValue) && (codePointValue <= 0x9F)) ||
-          isNaN(codePointValue)) {
-        continue;
-      } else {
-        result += String.fromCodePoint(codePointValue);
+      const codePointValue = this.hexToCodePoint(codePoint);
+      if(codePointValue) {
+        result += codePointValue;
       }
     }
     return result ? result : null;
@@ -292,10 +304,12 @@ $(function() {
     return val;
   }
 
-  this.inferKeyHintText = function(keyHint, longpress, flick, multitap) {
+  this.inferKeyHintText = function(keyHint, longpress, flickArray, multitap) {
     let hint = keyHint;
+    const flick = flickArray ? flickArray.reduce((o,f) => {o[f.direction] = f; return o}, {}) : null;
     if(!hint) {
-      switch(KVKL[builder.lastPlatform].defaultHint ?? 'dot') {
+      const source = KVKL[builder.lastPlatform].defaultHint ?? 'dot';
+      switch(source) {
         case 'none':
           break;
         case 'dot':
@@ -331,7 +345,7 @@ $(function() {
     }
 
     if(hint == null) return '';
-    return hint;
+    return builder.renameSpecialKey(hint);
   }
 
   this.prepareLayer = function () {
@@ -416,7 +430,8 @@ $(function() {
         builder.addKeyAnnotations(nkey);
 
         $('.text', nkey).text(this.renameSpecialKey(text));
-        $('.hint', nkey).text(this.inferKeyHintText(key.hint, key.sk, key.flick, key.multitap));
+        builder.updateHint($(nkey));
+
         if(KVKL[builder.lastPlatform].displayUnderlying) $('.underlying', nkey).text(this.getStandardKeyCap(key.id, key.layer ? builder.isLayerIdShifted(key.layer) : isLayerShifted));
 
 
@@ -578,17 +593,7 @@ $(function() {
         $('input#inpKeyCap').css('display', 'block');
       }
       $('.kcontrol.wedge-horz,.kcontrol.wedge-vert,div#btnDelKey').css('display', 'block');
-      var rowOffset = $(key).parent().offset();
-      var offset = $(key).offset();
-
-      $('#wedgeAddRowAbove').offset({ left: rowOffset.left - 18, top: rowOffset.top - 7 });
-      $('#wedgeAddRowBelow').offset({ left: rowOffset.left - 18, top: rowOffset.top + $(key).parent().outerHeight() - 7 });
-      $('#wedgeAddKeyLeft').offset({ left: offset.left - 9, top: offset.top + $(key).outerHeight() + 2 });
-      $('#wedgeAddKeyRight').offset({ left: offset.left + $(key).outerWidth() - 7, top: offset.top + $(key).outerHeight() + 2 });
-      $('div#btnDelKey').offset({ left: offset.left + $(key).outerWidth() - 5, top: offset.top - 8 });
-      if(!builder.textControlsInToolbar()) {
-        $('input#inpKeyCap').offset({ left: offset.left + 16, top: offset.top + 4 }).width($(key).width() - 32);
-      }
+      builder.moveWedgesAround(key);
       this.prepareKey();
       let subKeys = $('#sub-key-groups div.key');
       if(subKeys.length) {
@@ -605,6 +610,22 @@ $(function() {
     }
     builder.saveState();
   };
+
+  this.moveWedgesAround = function(key) {
+    const scrollOffset = $('#kbd-scroll-container').offset();
+    const rowOffset = $(key).parent().offset();
+    const offset = $(key).offset();
+    const wedgeLeft = rowOffset.left < scrollOffset.left ? offset.left - 18 : rowOffset.left - 18;
+
+    $('#wedgeAddRowAbove').offset({ left: wedgeLeft, top: rowOffset.top - 7 });
+    $('#wedgeAddRowBelow').offset({ left: wedgeLeft, top: rowOffset.top + $(key).parent().outerHeight() - 7 });
+    $('#wedgeAddKeyLeft').offset({ left: offset.left - 9, top: offset.top + $(key).outerHeight() + 2 });
+    $('#wedgeAddKeyRight').offset({ left: offset.left + $(key).outerWidth() - 7, top: offset.top + $(key).outerHeight() + 2 });
+    $('div#btnDelKey').offset({ left: offset.left + $(key).outerWidth() - 5, top: offset.top - 8 });
+    if(!builder.textControlsInToolbar()) {
+      $('input#inpKeyCap').offset({ left: offset.left + 16, top: offset.top + 4 }).width($(key).width() - 32);
+    }
+  }
 
   this.selectedKey = function () {
     return $('#kbd .selected');
@@ -706,7 +727,10 @@ $(function() {
     let chars = s.split(' '), r = '';
     for(let ch of chars) {
       if(!ch.match(/^u\+[0-9a-f]{1,6}$/i)) continue;
-      r += String.fromCodePoint(parseInt(ch.substring(2), 16));
+      const codePointValue = this.hexToCodePoint(ch.substring(2));
+      if(codePointValue) {
+        r += codePointValue;
+      }
     }
     return r;
   }
@@ -736,15 +760,27 @@ $(function() {
     builder.keyCapChange(val);
   }, {saveOnce: true});
 
+  builder.updateHint = function(key) {
+    const val = key.data('hint');
+    const hintElement = $('.hint', key);
+    hintElement.text(builder.inferKeyHintText(val, $(key).data('longpress'), $(key).data('flick'), $(key).data('multitap')));
+    if(val && val.length) {
+      hintElement.addClass('custom-hint');
+    } else {
+      hintElement.removeClass('custom-hint');
+    }
+    if(builder.specialCharacters[val]) {
+      hintElement.addClass('key-special-text');
+    } else {
+      hintElement.removeClass('key-special-text');
+    }
+
+  }
+
   builder.keyHintChange = function(val) {
     const key = builder.selectedKey();
     key.data('hint', val);
-    $('.hint', key).text(builder.inferKeyHintText(val, $(key).data('longpress'), $(key).data('flick'), $(key).data('multitap')));
-    if(val && val.length) {
-      $('.hint', key).addClass('custom-hint');
-    } else {
-      $('.hint', key).removeClass('custom-hint');
-    }
+    builder.updateHint(key);
   }
 
   const inpKeyHintChange = builder.wrapChange(function (e) {
@@ -863,10 +899,17 @@ $(function() {
 
   this.rescale = function () {
     builder.saveUndo();
-    var keyId = builder.selectedKey().data('id');
+    const k = builder.selectedKey();
+    const keyId = k.data('id');
+    const keyItems = $('#kbd .key').filter((_index,item) => $(item).data('id') === keyId);
+    const keyItemIndex = keyItems.toArray().indexOf(k.length ? k[0] : null);
     builder.prepareLayer();
-    if (keyId !== null)
-      builder.selectKey($('#kbd .key').filter(function (index) { return $(this).data('id') === keyId; }).first());
+    if (keyId !== null && keyItemIndex >= 0) {
+      const newKeyItems = $('#kbd .key').filter((_index,item) => $(item).data('id') === keyId);
+      if(keyItemIndex < newKeyItems.length) {
+        builder.selectKey(newKeyItems[keyItemIndex]);
+      }
+    }
   };
 
   this.translateFlickArrayToObject = function(flicks) {
@@ -941,6 +984,12 @@ $(function() {
     }
   };
 
+  $('#kbd-scroll-container').on('scroll', function () {
+    const key = builder.selectedKey();
+    if(key.length) {
+      builder.moveWedgesAround(key[0]);
+    }
+  });
   $('#wedgeAddRowAbove').click(builder.wrapChange(function () {
     var row = builder.addRow('above'); builder.selectKey(builder.addKey('key', row));
   }, {rescale: true}));
@@ -1062,7 +1111,11 @@ $(function() {
             // The last selected presentation is no longer available; select the first option instead
             $('#selPlatformPresentation').val($('#selPlatformPresentation option:first').val());
           }
+
+          let selection = builder.saveSelection();
           builder.prepareLayer();
+          builder.restoreSelection(selection);
+
           if(data.layer && KVKL[builder.lastPlatform][data.layer]) {
             $('#selLayer').val(data.layer);
             builder.selectLayer();

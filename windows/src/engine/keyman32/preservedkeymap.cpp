@@ -49,13 +49,13 @@ public:
    * @param   cPreservedKeys  number of preserved keys in pPreservedKeys - or the size pPreservedKeys needs to be
    * @return  BOOL  return TRUE on success
    */
-  BOOL MapKeyboard(km_kbp_keyboard *pKeyboard, PreservedKey **pPreservedKeys, size_t *cPreservedKeys);
+  BOOL MapKeyboard(km_core_keyboard *pKeyboard, PreservedKey **pPreservedKeys, size_t *cPreservedKeys);
 
 private:
   BOOL m_BaseKeyboardUsesAltGr;   // I4592
   UINT ShiftToTSFShift(UINT ShiftFlags);
   BOOL MapUSCharToVK(UINT *puKey, UINT *puShiftFlags);
-  BOOL MapKeyRule(km_kbp_keyboard_key *pKeyRule, TF_PRESERVEDKEY *pPreservedKey);
+  BOOL MapKeyRule(km_core_keyboard_key *pKeyRule, TF_PRESERVEDKEY *pPreservedKey);
   BOOL IsMatchingKey(PreservedKey *pKey, PreservedKey *pKeys, size_t cKeys);
 };
 
@@ -198,7 +198,7 @@ UINT PreservedKeyMap::ShiftToTSFShift(UINT ShiftFlags)
 }
 
 BOOL
-PreservedKeyMap::MapKeyRule(km_kbp_keyboard_key *pKeyRule, TF_PRESERVEDKEY *pPreservedKey) {
+PreservedKeyMap::MapKeyRule(km_core_keyboard_key *pKeyRule, TF_PRESERVEDKEY *pPreservedKey) {
   UINT ShiftFlags;
   UINT Key;
 
@@ -242,7 +242,7 @@ BOOL PreservedKeyMap::IsMatchingKey(PreservedKey *pKey, PreservedKey *pKeys, siz
 }
 
 BOOL
-PreservedKeyMap::MapKeyboard(km_kbp_keyboard *pKeyboard, PreservedKey **pPreservedKeys, size_t *cPreservedKeys) {
+PreservedKeyMap::MapKeyboard(km_core_keyboard *pKeyboard, PreservedKey **pPreservedKeys, size_t *cPreservedKeys) {
   size_t cKeys = 0, cRules = 0, n = 0;
   DWORD i;
 
@@ -259,20 +259,20 @@ PreservedKeyMap::MapKeyboard(km_kbp_keyboard *pKeyboard, PreservedKey **pPreserv
   const UINT RALT_MATCHING_MASK = TF_MOD_CONTROL | TF_MOD_ALT | TF_MOD_LCONTROL | TF_MOD_RCONTROL | TF_MOD_LALT | TF_MOD_RALT;
 
   // This is where we will call down to the api to get list of keys used in the keyboard rules
-  km_kbp_keyboard_key *kb_key_list;
+  km_core_keyboard_key *kb_key_list;
 
-  km_kbp_status err_status = km_kbp_keyboard_get_key_list(pKeyboard, &kb_key_list);
-  if ((err_status != KM_KBP_STATUS_OK) || (kb_key_list ==nullptr)) {
+  km_core_status err_status = km_core_keyboard_get_key_list(pKeyboard, &kb_key_list);
+  if ((err_status != KM_CORE_STATUS_OK) || (kb_key_list ==nullptr)) {
     return FALSE;
   }
 
-  km_kbp_keyboard_key *key_rule_it = kb_key_list;
+  km_core_keyboard_key *key_rule_it = kb_key_list;
   for (; key_rule_it->key; ++key_rule_it) {
     ++cRules;
   }
   cKeys = cRules;
   if (cKeys == 0) {
-    km_kbp_keyboard_key_list_dispose(kb_key_list);
+    km_core_keyboard_key_list_dispose(kb_key_list);
     return FALSE;
   }
 
@@ -283,12 +283,12 @@ PreservedKeyMap::MapKeyboard(km_kbp_keyboard *pKeyboard, PreservedKey **pPreserv
 
   if (pPreservedKeys == NULL) {
     *cPreservedKeys = cKeys;
-    km_kbp_keyboard_key_list_dispose(kb_key_list);
+    km_core_keyboard_key_list_dispose(kb_key_list);
     return TRUE;
   }
 
   if (*cPreservedKeys < cKeys) {
-    km_kbp_keyboard_key_list_dispose(kb_key_list);
+    km_core_keyboard_key_list_dispose(kb_key_list);
     return FALSE;
   }
 
@@ -315,7 +315,7 @@ PreservedKeyMap::MapKeyboard(km_kbp_keyboard *pKeyboard, PreservedKey **pPreserv
     }
   }
 
-  km_kbp_keyboard_key_list_dispose(kb_key_list);
+  km_core_keyboard_key_list_dispose(kb_key_list);
 
   *cPreservedKeys = n;  // return actual count of allocated keys, usually smaller than allocated count
   return TRUE;

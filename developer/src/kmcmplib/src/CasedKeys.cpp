@@ -14,6 +14,8 @@ namespace kmcmp {
   extern KMX_BOOL FMnemonicLayout; // TODO: these globals should be consolidated one day
 }
 
+bool resizeKeyArray(PFILE_GROUP gp, int increment = 1);
+
 KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp);
 
 KMX_DWORD VerifyCasedKeys(PFILE_STORE sp) {
@@ -22,7 +24,7 @@ KMX_DWORD VerifyCasedKeys(PFILE_STORE sp) {
   if (kmcmp::FMnemonicLayout) {
     // The &CasedKeys system store is not supported for
     // mnemonic layouts in 14.0
-    return CERR_CasedKeysNotSupportedWithMnemonicLayout;
+    return KmnCompilerMessages::ERROR_CasedKeysNotSupportedWithMnemonicLayout;
   }
 
   // We will rewrite this store with virtual keys
@@ -35,20 +37,20 @@ KMX_DWORD VerifyCasedKeys(PFILE_STORE sp) {
     KMX_UINT key = 0, shift = 0;
     if (*p != UC_SENTINEL) {
       if (!kmcmp::MapUSCharToVK(*p, &key, &shift)) {
-        return CERR_CasedKeysMustContainOnlyVirtualKeys;
+        return KmnCompilerMessages::ERROR_CasedKeysMustContainOnlyVirtualKeys;
       }
       if (shift & K_SHIFTFLAG) {
-        return CERR_CasedKeysMustNotIncludeShiftStates;
+        return KmnCompilerMessages::ERROR_CasedKeysMustNotIncludeShiftStates;
       }
     }
     else {
       if (*(p + 1) != CODE_EXTENDED) {
-        return CERR_CasedKeysMustContainOnlyVirtualKeys;
+        return KmnCompilerMessages::ERROR_CasedKeysMustContainOnlyVirtualKeys;
       }
       shift = *(p + 2);
       key = *(p + 3);
       if (shift != ISVIRTUALKEY) {
-        return CERR_CasedKeysMustNotIncludeShiftStates;
+        return KmnCompilerMessages::ERROR_CasedKeysMustNotIncludeShiftStates;
       }
     }
     *q++ = UC_SENTINEL;
@@ -64,7 +66,7 @@ KMX_DWORD VerifyCasedKeys(PFILE_STORE sp) {
   delete[] sp->dpString;
   sp->dpString = buf;
 
-  return CERR_None;
+  return STATUS_Success;
 }
 
 KMX_DWORD ExpandCapsRulesForGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) {
@@ -74,14 +76,14 @@ KMX_DWORD ExpandCapsRulesForGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) {
   if (kmcmp::FMnemonicLayout) {
     // The &CasedKeys system store is not supported for
     // mnemonic layouts in 14.0
-    return CERR_None;
+    return STATUS_Success;
   }
 
   PFILE_STORE sp = FindSystemStore(fk, TSS_CASEDKEYS);
   if (!sp) {
     // If there is no &CasedKeys system store, then we do not
     // process the key
-    return CERR_None;
+    return STATUS_Success;
   }
 
   KMX_DWORD msg;
@@ -90,11 +92,11 @@ KMX_DWORD ExpandCapsRulesForGroup(PFILE_KEYBOARD fk, PFILE_GROUP gp) {
   // dereference the array every call
   int cxKeyArray = gp->cxKeyArray;
   for (int i = 0; i < cxKeyArray; i++) {
-    if ((msg = ExpandCapsRule(gp, &gp->dpKeyArray[i], sp)) != CERR_None) {
+    if ((msg = ExpandCapsRule(gp, &gp->dpKeyArray[i], sp)) != STATUS_Success) {
       return msg;
     }
   }
-  return CERR_None;
+  return STATUS_Success;
 }
 
 KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
@@ -104,13 +106,13 @@ KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
   if (shift == 0) {
     // Convert US key cap to a virtual key
     if (!kmcmp::MapUSCharToVK(kpp->Key, &key, &shift)) {
-      return CERR_None;
+      return STATUS_Success;
     }
   }
 
   if (shift & (CAPITALFLAG | NOTCAPITALFLAG)) {
     // Don't attempt expansion if either Caps Lock flag is specified in the key rule
-    return CERR_None;
+    return STATUS_Success;
   }
 
   PKMX_WCHAR p = sp->dpString;
@@ -123,21 +125,18 @@ KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
 
   if (!*p) {
     // This key is not modified by Caps Lock
-    return CERR_None;
+    return STATUS_Success;
   }
 
   // This key is modified by Caps Lock, so we need to duplicate this rule
-  PFILE_KEY k = new FILE_KEY[gp->cxKeyArray + 1];
-  if (!k) return CERR_CannotAllocateMemory;
-  memcpy(k, gp->dpKeyArray, gp->cxKeyArray * sizeof(FILE_KEY));
-
-  kpp = &k[(int)(kpp - gp->dpKeyArray)];
-
-  delete gp->dpKeyArray;
-  gp->dpKeyArray = k;
+  int offset = (int)(kpp - gp->dpKeyArray);
+  if(!resizeKeyArray(gp)) {
+    return KmnCompilerMessages::FATAL_CannotAllocateMemory;
+  }
+  kpp = &gp->dpKeyArray[offset];
   gp->cxKeyArray++;
 
-  k = &k[gp->cxKeyArray - 1];
+  PFILE_KEY k = &gp->dpKeyArray[gp->cxKeyArray - 1];
   k->dpContext = new KMX_WCHAR[u16len(kpp->dpContext) + 1];
   k->dpOutput  = new KMX_WCHAR[u16len(kpp->dpOutput) + 1];
   u16cpy(k->dpContext, kpp->dpContext );  // copy the context.
@@ -150,5 +149,5 @@ KMX_DWORD ExpandCapsRule(PFILE_GROUP gp, PFILE_KEY kpp, PFILE_STORE sp) {
   kpp->Key = key;
   kpp->ShiftFlags = shift | NOTCAPITALFLAG;
 
-  return CERR_None;
+  return STATUS_Success;
 }

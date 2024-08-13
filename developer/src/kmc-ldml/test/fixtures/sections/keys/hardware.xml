@@ -1,26 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="mt" conformsTo="techpreview">
-  <names>
-    <name value="hardware-minimal" />
-  </names>
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="hardware-minimal"/>
 
   <keys>
-    <key id="qqq" to="qqq" />
-    <key id="www" to="www" />
-    <key id="QQQ" to="QQQ" />
-    <key id="WWW" to="WWW" />
+    <key id="qqq" output="qqq" />
+    <key id="www" output="www" />
+    <key id="QQQ" output="QQQ" />
+    <key id="WWW" output="WWW" />
   </keys>
 
-  <layers form="us">
-    <layer id="base" modifier="none">
+  <layers formId="us">
+    <layer id="base" modifiers="none">
       <!-- beware: this is mapping ` and 1! -->
       <row keys="qqq www" />
     </layer>
-    <layer id="shift" modifier="shift">
+    <layer id="shift" modifiers="shift">
       <!-- beware: this is mapping ` and 1! -->
       <row keys="QQQ WWW" />
     </layer>
   </layers>
-</keyboard>
+</keyboard3>

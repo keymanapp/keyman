@@ -13,8 +13,8 @@ int
 main (gint argc, gchar **argv)
 {
     struct stat filestat;
-    kmp_details details;
-    gchar *kmp_json;
+    g_autofree gchar *kmp_json = NULL;
+    g_autoptr(kmp_details) details = g_new0(kmp_details, 1);
 
     if (argc < 2)
     {
@@ -29,16 +29,13 @@ main (gint argc, gchar **argv)
     {
       g_print ("Usage: kmpdetails <path to kmp.json>\n");
       g_print ("ERROR: file %s not found\n", kmp_json);
-      g_free(kmp_json);
       return EXIT_FAILURE;
     }
 
-    g_free(kmp_json);
     setlocale(LC_ALL, "C.UTF-8");
 
-    get_kmp_details(argv[1], &details);
-    print_kmp_details(&details);
-    free_kmp_details(&details);
+    get_kmp_details(argv[1], details);
+    print_kmp_details(details);
 
     return EXIT_SUCCESS;
 }

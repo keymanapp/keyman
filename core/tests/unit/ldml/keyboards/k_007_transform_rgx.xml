@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+from https://github.com/unicode-org/cldr/blob/keyboard-preview/docs/ldml/tr35-keyboards.md#element-transform
+
+-->
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="en" conformsTo="45">
+  <info author="srl295" indicator="🙀" layout="qwerty" name="k_007_transform_rgx" />
+
+  <keys>
+    <key id="grave" output="`"/>
+    <key id="zz" output="zz" />
+    <key id="zzz" output="zzz" />
+    <key id="zzzz" output="zzzz" />
+    <key id="caret" output="${caret}"/>
+    <key id="pipe" output="${pipe}"/>
+    <key id="name" output="\m{name}"/>
+  </keys>
+
+  <layers formId="us">
+    <layer modifiers="none" id="base">
+      <row keys="grave 1 2 3 4 5 6 7 8 9 0" />
+      <row keys="q w e r t y u i o p" />
+      <row keys="a s d f g h j k l" />
+      <row keys="z x c v b n m" />
+      <row keys="space" />
+    </layer>
+    <layer modifiers="shift" id="shift">
+      <row keys="grave 1 2 3 4 5 6 7 8 9 0" />
+      <row keys="Q W E R T Y U I O P" />
+      <row keys="A S D F G H J K L" />
+      <row keys="Z X C V zz zzz zzzz caret pipe name" />
+      <row keys="space" />
+    </layer>
+  </layers>
+
+  <variables>
+    <set id="upper" value="A E I O U YY" />
+    <set id="lower" value="a e i o u yy" />
+    <set id="direct" value="| ^ `"/>
+    <set id="indirect" value="${pipe} ${caret} ${grave}"/>
+    <set id="name" value="pipe caret grave"/>
+    <!-- for regression #11037 -->
+    <string id="caret" value="^" />
+    <string id="pipe" value="|" />
+    <string id="grave" value="`" />
+  </variables>
+
+  <transforms type="simple">
+    <transformGroup>
+      <transform from="([abc])`([def])" to="$2`$1"/> <!-- flip the order:   a`e » e`a -->
+      <transform from="($[upper])`" to="$[1:lower]"/> <!-- Lowercase (and drop grave): A` » a -->
+      <transform from="$[upper]x" to="Z" />
+      <transform from="$[upper]x" to="Z" />
+    </transformGroup>
+    <transformGroup>
+      <transform from="ez{2,3}" to="E" />
+      <transform from="${caret}a" to="â" />
+      <transform from="${pipe}a" to="ą" />
+      <!-- 'd' and 'i' should give the same result. -->
+      <transform from="d\m{name}($[direct])" to="$[1:name]"/>
+      <transform from="i\m{name}($[indirect])" to="$[1:name]"/>
+    </transformGroup>
+  </transforms>
+</keyboard3>

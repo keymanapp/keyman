@@ -101,6 +101,15 @@
     doAddKeyboards({id:'obolo_chwerty_6351',name:'obolo_chwerty_6351',languages:{id:'en',name:'English'},
       filename:(prefix + 'obolo_chwerty_6351.js')});
 
+    doAddKeyboards({id:'gesture_prototyping',name:'Gesture Prototyping',languages:{id:'en',name:'English'},
+      filename:(prefix + 'keyboards/gesture_prototyping/build/gesture_prototyping.js')});
+
+    doAddKeyboards({id:'diacritic_rota',name:'Diacritic 10-key Rota',languages:{id:'en',name:'English'},
+      filename:(prefix + 'keyboards/diacritic_rota/build/diacritic_rota.js')});
+
+    doAddKeyboards({id:'ye_old_ten_key',name:'Classic 10-key',languages:{id:'en',name:'English'},
+      filename:(prefix + 'keyboards/ye_old_ten_key/build/ye_old_ten_key.js')});
+
       // Add more keyboards to the language menu, by keyboard name,
     // keyboard name and language code, or just the BCP-47 language code.
     // We use a different loading pattern here than in the samples version to provide a slightly different set of test cases.

@@ -10,13 +10,28 @@
 #include <kmx/kmx_xstring.h>
 
 #include "kmx_processevent.h" // for debug functions
-#include "ldml/keyboardprocessor_ldml.h"
+#include "ldml/keyman_core_ldml.h"
 
 #include <assert.h>
+#include "kmx_plus.h"
 
 namespace km {
-namespace kbp {
+namespace core {
 namespace kmx {
+
+/**
+ * \def KMXPLUS_DEBUG_LOAD set to 1 to print messages on KMXPLUS loading.
+ * Off by default.
+*/
+#ifndef KMXPLUS_DEBUG_LOAD
+#define KMXPLUS_DEBUG_LOAD 0
+#endif
+
+#if KMXPLUS_DEBUG_LOAD
+#define DebugLoad(msg,...) DebugLog(msg, __VA_ARGS__)
+#else
+#define DebugLoad(msg,...)
+#endif
 
 // double check these modifier mappings
 static_assert(LCTRLFLAG == LDML_KEYS_MOD_CTRLL, "LDML modifier bitfield vs. kmx_file.h #define mismatch");
@@ -27,6 +42,7 @@ static_assert(LALTFLAG == LDML_KEYS_MOD_ALTL, "LDML modifier bitfield vs. kmx_fi
 static_assert(K_ALTFLAG == LDML_KEYS_MOD_ALT, "LDML modifier bitfield vs. kmx_file.h #define mismatch");
 static_assert(CAPITALFLAG == LDML_KEYS_MOD_CAPS, "LDML modifier bitfield vs. kmx_file.h #define mismatch");
 static_assert(K_SHIFTFLAG == LDML_KEYS_MOD_SHIFT, "LDML modifier bitfield vs. kmx_file.h #define mismatch"); // "either" shift
+// LDML_KEYS_MOD_OTHER is not present in kmx_file.h (>16 bit)
 
 /**
  * \def LDML_IS_VALID_MODIFIER_BITS test whether x is a valid modifier bitfield
@@ -194,28 +210,9 @@ COMP_KMXPLUS_META::valid(KMX_DWORD _kmn_unused(length)) const {
   DebugLog(" author:\t#0x%X\n", author);
   DebugLog(" conform:\t#0x%X\n", conform);
   DebugLog(" layout:\t#0x%X\n", layout);
-  DebugLog(" normalization:\t#0x%X\n", normalization);
+  DebugLog(" name:\t#0x%X\n", name);
   DebugLog(" indicator:\t#0x%X\n", indicator);
   DebugLog(" settings:\t0x%X\n", settings);
-  return true;
-}
-
-bool
-COMP_KMXPLUS_VKEY::valid(KMX_DWORD _kmn_unused(length)) const {
-  DebugLog("vkey: count 0x%X\n", count);
-  if (header.size < sizeof(*this)+(sizeof(entries[0])*count)) {
-    DebugLog("header.size < expected size");
-    assert(false);
-    return false;
-  }
-  for (KMX_DWORD i = 0; i < count; i++) {
-    DebugLog("vkey #0x%X: 0x%X->0x%X", i, entries[i].vkey, entries[i].target);
-    if (entries[i].vkey > 0xFF || entries[i].target > 0xFF) {
-      DebugLog("vkey source or target out of range [0x00…0xFF]");
-      assert(false);
-      return false;
-    }
-  }
   return true;
 }
 
@@ -231,9 +228,9 @@ COMP_KMXPLUS_DISP::valid(KMX_DWORD _kmn_unused(length)) const {
     DebugLog("disp: baseCharacter str#0x%X", baseCharacter);
   }
   for (KMX_DWORD i=0; i<count; i++) {
-    DebugLog("disp#%d: to: str0x%X -> str0x%X", i, entries[i].to, entries[i].display);
-    if (entries[i].to == 0 || entries[i].display == 0) {
-      DebugLog("disp to: or display: has a zero string");
+    DebugLoad("disp#%d: id: str0x%X to: str0x%X -> str0x%X", i, entries[i].id, entries[i].to, entries[i].display);
+    if ((entries[i].to == 0 && entries[i].id == 0) || entries[i].display == 0) {
+      DebugLog("disp must have either keyId/output, and must have display");
       assert(false);
       return false;
     }
@@ -250,7 +247,6 @@ COMP_KMXPLUS_STRS::valid(KMX_DWORD _kmn_unused(length)) const {
     return false;
   }
   for (KMX_DWORD i=0; i<count; i++) {
-    DebugLog("#0x%X: ...", i);
     KMX_DWORD offset = entries[i].offset;
     KMX_DWORD length = entries[i].length;
     if(offset+((length+1)*2) > header.size) {
@@ -266,10 +262,22 @@ COMP_KMXPLUS_STRS::valid(KMX_DWORD _kmn_unused(length)) const {
       return false;
     }
     // TODO-LDML: validate valid UTF-16LE?
-    DebugLog("#0x%X: '%s'", i, Debug_UnicodeString(start));
+    DebugLoad("strs #0x%X: '%s'", i, Debug_UnicodeString(start));
   }
   return true;
 }
+
+/**
+ * helper for extracting single char values
+ * @param v field with char type
+ * @return value a string
+ */
+std::u16string COMP_KMXPLUS_STRS::str_from_char(KMX_DWORD v) {
+  char16_single buf;
+  const int len = Utf32CharToUtf16(v, buf);
+  return std::u16string(buf.ch, len);
+}
+
 
 bool
 COMP_KMXPLUS_SECT::valid(KMX_DWORD length) const {
@@ -358,25 +366,193 @@ COMP_KMXPLUS_ELEM::getElementList(KMX_DWORD elementNumber, KMX_DWORD &length) co
   return reinterpret_cast<const COMP_KMXPLUS_ELEM_ELEMENT *>(rawdata + entry.offset);
 }
 
+
 std::u16string
-COMP_KMXPLUS_ELEM_ELEMENT::get_string() const {
-  assert(!(flags & LDML_ELEM_FLAGS_UNICODE_SET)); // should not be called.
-  char16_single buf;
-  const int len = Utf32CharToUtf16(element, buf);
-  return std::u16string(buf.ch, len);
+COMP_KMXPLUS_ELEM_ELEMENT::get_element_string() const {
+  assert(type() == LDML_ELEM_FLAGS_TYPE_CHAR); // should only be called on char
+  return COMP_KMXPLUS_STRS::str_from_char(element);
 }
 
+std::deque<std::u32string>
+COMP_KMXPLUS_ELEM_ELEMENT::loadAsStringList(KMX_DWORD length, const COMP_KMXPLUS_STRS &strs) const {
+  std::deque<std::u32string> list;
+  for (KMX_DWORD i = 0; i<length; i++) {
+    const auto &o = this[i];
+    std::u32string str;
+    if (o.type() == LDML_ELEM_FLAGS_TYPE_STR) {
+      // fetch the string
+      const auto str16 = strs.get(o.element);
+      str = km::core::kmx::u16string_to_u32string(str16);
+    } else {
+      // single char
+      str = std::u32string(1, (km_core_usv)o.element);
+    }
+    list.emplace_back(str);
+  }
+  return list;
+}
+
+KMX_DWORD
+COMP_KMXPLUS_ELEM_ELEMENT::type() const {
+  return (flags & LDML_ELEM_FLAGS_TYPE);
+}
+
+  // Note: shared with subclass COMP_KMXPLUS_BKSP
 bool
 COMP_KMXPLUS_TRAN::valid(KMX_DWORD _kmn_unused(length)) const {
-  if (header.size < sizeof(*this)+(sizeof(entries[0])*count)) {
+  if (header.size < sizeof(*this) + (sizeof(COMP_KMXPLUS_TRAN_GROUP) * groupCount) +
+                        (sizeof(COMP_KMXPLUS_TRAN_TRANSFORM) * transformCount) +
+                        (sizeof(COMP_KMXPLUS_TRAN_REORDER) * reorderCount)) {
     DebugLog("header.size < expected size");
     assert(false);
     return false;
   }
-  // TODO-LDML
-  DebugLog("!! More to do here.");
   return true;
 }
+
+COMP_KMXPLUS_TRAN_Helper::COMP_KMXPLUS_TRAN_Helper()
+    : tran(nullptr), is_valid(false), groups(nullptr), transforms(nullptr), reorders(nullptr) {
+}
+
+bool COMP_KMXPLUS_TRAN_Helper::valid() const {
+  return is_valid;
+}
+
+const COMP_KMXPLUS_TRAN_GROUP *
+COMP_KMXPLUS_TRAN_Helper::getGroup(KMX_DWORD group) const {
+  if (!valid() || group >= tran->groupCount) {
+    assert(false);
+    return nullptr;
+  }
+  return groups + group;
+}
+
+
+const COMP_KMXPLUS_TRAN_TRANSFORM *
+COMP_KMXPLUS_TRAN_Helper::getTransform(KMX_DWORD transform) const {
+  if (!valid() || transform >= tran->transformCount) {
+    assert(false);
+    return nullptr;
+  }
+  return transforms + transform;
+}
+
+
+const COMP_KMXPLUS_TRAN_REORDER *
+COMP_KMXPLUS_TRAN_Helper::getReorder(KMX_DWORD reorder) const {
+  if (!valid() || reorder >= tran->reorderCount) {
+    assert(false);
+    return nullptr;
+  }
+  return reorders + reorder;
+}
+
+
+bool
+COMP_KMXPLUS_TRAN_Helper::setTran(const COMP_KMXPLUS_TRAN *newTran) {
+  is_valid = true;
+  if (newTran == nullptr) {
+    DebugLog("tran helper: invalid, newTran=%p", newTran);
+    // Note: kmx_plus::kmx_plus has already called section_from_bytes()
+    // which validates this section's length. Will be nullptr here if invalid.
+    is_valid = false;
+    // No assert here: just a missing layer
+    return false;
+  }
+  DebugLog("tran helper: validating '%c%c%c%c' newTran=%p", DEBUG_IDENT(newTran->header.ident), newTran);
+  tran = newTran;
+  const uint8_t *rawdata = reinterpret_cast<const uint8_t *>(tran);
+  rawdata += LDML_LENGTH_TRAN;  // skip past non-dynamic portion
+
+  // groups
+  if (tran->groupCount > 0) {
+    groups = reinterpret_cast<const COMP_KMXPLUS_TRAN_GROUP *>(rawdata);
+  } else {
+    groups   = nullptr;
+    is_valid = false;
+    assert(is_valid);
+  }
+  rawdata += sizeof(COMP_KMXPLUS_TRAN_GROUP) * tran->groupCount;
+
+  // transforms
+  if (tran->transformCount > 0) {
+    transforms = reinterpret_cast<const COMP_KMXPLUS_TRAN_TRANSFORM *>(rawdata);
+  } else {
+    transforms   = nullptr;
+    // is_valid = false;
+    // assert(is_valid);
+  }
+  rawdata += sizeof(COMP_KMXPLUS_TRAN_TRANSFORM) * tran->transformCount;
+
+  // reorders
+  if (tran->reorderCount > 0) {
+    reorders = reinterpret_cast<const COMP_KMXPLUS_TRAN_REORDER *>(rawdata);
+  } else {
+    reorders   = nullptr;
+    // is_valid = false;
+    // assert(is_valid);
+  }
+  // rawdata += sizeof(COMP_KMXPLUS_TRAN_REORDER) * tran->reorderCount;
+
+  // Now, validate offsets by walking
+  if (is_valid) {
+    for(KMX_DWORD i = 0; is_valid && i < tran->groupCount; i++) {
+      const COMP_KMXPLUS_TRAN_GROUP &group = groups[i];
+      // is the count off the end?
+      DebugLog(
+          "<transformGroup> %d: type 0x%X, entries [%d..%d]", i, group.type, group.index,
+          group.index + group.count - 1);
+      if (group.type == LDML_TRAN_GROUP_TYPE_TRANSFORM) {
+        DebugLog(" .. type=transform");
+        if ((group.index >= tran->transformCount) || (group.index + group.count > tran->transformCount)) {
+          DebugLog("COMP_KMXPLUS_TRAN_Helper: group[%d] would access transform %d+%d, > count %d",
+              i, group.index, group.count, tran->transformCount);
+          is_valid = false;
+          assert(is_valid);
+        }
+        for(KMX_DWORD t = 0; is_valid && t < group.count; t++) {
+          const auto &transform = transforms[group.index + t];
+          if (transform.from == 0) {
+            DebugLog("COMP_KMXPLUS_TRAN_Helper: transform [%d].[%d] has empty 'from' string", i, t);
+            is_valid = false;
+            assert(is_valid);
+          } else if ((transform.mapFrom == 0) != (transform.mapTo == 0)) {
+            DebugLog("COMP_KMXPLUS_TRAN_Helper: transform [%d].[%d] should have neither or both mapFrom=%d/mapTo=%d", i, t, transform.mapFrom, transform.mapTo);
+            is_valid = false;
+            assert(is_valid);
+          }
+        }
+      } else if (group.type == LDML_TRAN_GROUP_TYPE_REORDER) {
+        DebugLog(" .. type=reorder");
+        if ((group.index >= tran->reorderCount) || (group.index + group.count > tran->reorderCount)) {
+          DebugLog("COMP_KMXPLUS_TRAN_Helper: group[%d] would access reorder %d+%d, > count %d",
+              i, group.index, group.count, tran->reorderCount);
+          is_valid = false;
+          assert(is_valid);
+        }
+        for(KMX_DWORD t = 0; is_valid && t < group.count; t++) {
+          const auto &reorder = reorders[group.index + t];
+          if (reorder.elements == 0) {
+            DebugLog("COMP_KMXPLUS_TRAN_Helper: reorder [%d].[%d] has elements=0", i, t);
+            // TODO-LDML: is this an error?
+            // is_valid = false;
+            // assert(is_valid);
+          }
+        }
+      } else {
+        DebugLog(" .. type=illegal 0x%X", group.type);
+        is_valid = false;
+        assert(is_valid);
+      }
+    }
+  }
+  // Return results
+  DebugLog("COMP_KMXPLUS_TRAN_Helper.setTran(): %s", is_valid ? "valid" : "invalid");
+  assert(is_valid);
+  return is_valid;
+}
+
+
 
 bool
 COMP_KMXPLUS_LAYR::valid(KMX_DWORD _kmn_unused(length)) const {
@@ -404,7 +580,8 @@ COMP_KMXPLUS_LAYR_Helper::setLayr(const COMP_KMXPLUS_LAYR *newLayr) {
   DebugLog("validating newLayr=%p", newLayr);
   is_valid = true;
   if (newLayr == nullptr) {
-    // null = invalid
+    // Note: kmx_plus::kmx_plus has already called section_from_bytes()
+    // which validates this section's length. Will be nullptr here if invalid.
     is_valid = false;
     // No assert here: just a missing layer
     return false;
@@ -561,7 +738,8 @@ COMP_KMXPLUS_KEYS_Helper::setKeys(const COMP_KMXPLUS_KEYS *newKeys) {
   DebugLog("validating newKeys=%p", newKeys);
   is_valid = true;
   if (newKeys == nullptr) {
-    // null = invalid
+    // Note: kmx_plus::kmx_plus has already called section_from_bytes()
+    // which validates this section's length. Will be nullptr here if invalid.
     is_valid = false;
     // No assert here: just a missing layer
     return false;
@@ -604,7 +782,7 @@ COMP_KMXPLUS_KEYS_Helper::setKeys(const COMP_KMXPLUS_KEYS *newKeys) {
     for(KMX_DWORD i = 0; is_valid && i < key2->keyCount; i++) {
       const auto &key = keys[i];
       // is the count off the end?
-      DebugLog( "<key #%d> id=0x%X, to=0x%X, flicks=%d", i, key.id, key.to, key.flicks); // TODO-LDML: could dump more fields here
+      DebugLoad( "<key #%d> id=0x%X, to=0x%X, flicks=%d", i, key.id, key.to, key.flicks); // TODO-LDML: could dump more fields here
       if (key.flicks >0 && key.flicks >= key2->flicksCount) {
         DebugLog("key[%d] has invalid flicks index %d", i, key.flicks);
         is_valid = false;
@@ -614,7 +792,7 @@ COMP_KMXPLUS_KEYS_Helper::setKeys(const COMP_KMXPLUS_KEYS *newKeys) {
     for(KMX_DWORD i = 0; is_valid && i < key2->flicksCount; i++) {
       const auto &e = flickLists[i];
       // is the count off the end?
-      DebugLog("<flicks> %d: index %d, count %d", i, e.flick, e.count);
+      DebugLoad("<flicks> %d: index %d, count %d", i, e.flick, e.count);
       if (i == 0) {
         if (e.flick != 0 || e.count != 0) {
           DebugLog("Error: Invalid Flick #0");
@@ -629,17 +807,22 @@ COMP_KMXPLUS_KEYS_Helper::setKeys(const COMP_KMXPLUS_KEYS *newKeys) {
     }
     for(KMX_DWORD i = 0; is_valid && i < key2->flickCount; i++) {
       const auto &e = flickElements[i];
-      // is the count off the end?
-      DebugLog("<flick> %d: to=0x%X, directions=0x%X, flags=0x%X", i, e.to, e.directions, e.flags);
+      // validate to is present
+      if (e.to == 0 || e.directions == 0) {
+        DebugLog("flickElement[%d] has empty to=%0x%X or directions=%0x%X", i, e.to, e.directions);
+        is_valid = false;
+        assert(is_valid);
+      }
+      DebugLoad("<flick> %d: to=0x%X, directions=0x%X", i, e.to, e.directions);
     }
     // now the kmap
-    DebugLog(" kmap count: #0x%X\n", key2->kmapCount);
+    DebugLoad(" kmap count: #0x%X", key2->kmapCount);
     for (KMX_DWORD i = 0; i < key2->kmapCount; i++) {
-      DebugLog(" #0x%d\n", i);
+      DebugLoad(" #0x%d\n", i);
       auto &entry = kmap[i];
-      DebugLog("  vkey\t0x%X\n", entry.vkey);
-      DebugLog("  mod\t0x%X\n", entry.mod);
-      DebugLog("  key\t#0x%X\n", entry.key);
+      DebugLoad("  vkey\t0x%X", entry.vkey);
+      DebugLoad("  mod\t0x%X", entry.mod);
+      DebugLoad("  key\t#0x%X", entry.key);
       if (!LDML_IS_VALID_MODIFIER_BITS(entry.mod)) {
         DebugLog("Invalid modifier value");
         assert(false);
@@ -679,9 +862,13 @@ COMP_KMXPLUS_KEYS_Helper::findKeyByStringId(KMX_DWORD strId, KMX_DWORD &i) const
 }
 
 const COMP_KMXPLUS_KEYS_KEY*
-COMP_KMXPLUS_KEYS_Helper::findKeyByStringTo(KMX_DWORD strId, KMX_DWORD &i) const {
+COMP_KMXPLUS_KEYS_Helper::findKeyByStringTo(const std::u16string& str, KMX_DWORD strId, KMX_DWORD &i) const {
   for (; i < key2->keyCount; i++) {
-    if (keys[i].to == strId) {
+    if (keys[i].flags & LDML_KEYS_KEY_FLAGS_EXTEND) {
+      if (strId != 0 && keys[i].to == strId) {
+        return &keys[i];
+      }
+    } else if (keys[i].get_to_string() == str) {
       return &keys[i];
     }
   }
@@ -716,11 +903,9 @@ COMP_KMXPLUS_KEYS_Helper::getKmap(KMX_DWORD i) const {
 }
 
 std::u16string
-COMP_KMXPLUS_KEYS_KEY::get_string() const {
+COMP_KMXPLUS_KEYS_KEY::get_to_string() const {
   assert(!(flags & LDML_KEYS_KEY_FLAGS_EXTEND)); // should not be called.
-  char16_single buf;
-  const int len = Utf32CharToUtf16(to, buf);
-  return std::u16string(buf.ch, len);
+  return COMP_KMXPLUS_STRS::str_from_char(to);
 }
 
 // LIST
@@ -746,7 +931,8 @@ COMP_KMXPLUS_LIST_Helper::setList(const COMP_KMXPLUS_LIST *newList) {
   DebugLog("validating newList=%p", newList);
   is_valid = true;
   if (newList == nullptr) {
-    // null = invalid
+    // Note: kmx_plus::kmx_plus has already called section_from_bytes()
+    // which validates this section's length. Will be nullptr here if invalid.
     is_valid = false;
     // No assert here: just a missing layer
     return false;
@@ -788,10 +974,12 @@ COMP_KMXPLUS_LIST_Helper::setList(const COMP_KMXPLUS_LIST *newList) {
         assert(is_valid);
       }
     }
+#if KMXPLUS_DEBUG_LOAD
     for (KMX_DWORD i = 0; is_valid && i < list->indexCount; i++) {
       const auto &e = indices[i];
-      DebugLog(" index %d: str 0x%X", i, e);
+      DebugLoad(" index %d: str 0x%X", i, e);
     }
+#endif
   }
   // Return results
   DebugLog("COMP_KMXPLUS_LIST_Helper.setList(): %s", is_valid ? "valid" : "invalid");
@@ -817,13 +1005,171 @@ COMP_KMXPLUS_LIST_Helper::getIndex(KMX_DWORD i) const {
   return indices + i;
 }
 
+
+// USET
+
+bool
+COMP_KMXPLUS_USET::valid(KMX_DWORD _kmn_unused(length)) const {
+  if (header.size < sizeof(*this)
+      + (usetCount  * sizeof(COMP_KMXPLUS_USET_USET))
+      + (rangeCount * sizeof(COMP_KMXPLUS_USET_RANGE))) {
+    DebugLog("header.size < expected size");
+    assert(false);
+    return false;
+  }
+  return true; // see helper
+}
+
+COMP_KMXPLUS_USET_RANGE::COMP_KMXPLUS_USET_RANGE(KMX_DWORD s, KMX_DWORD e) : start(s), end(e) {
+}
+
+COMP_KMXPLUS_USET_RANGE::COMP_KMXPLUS_USET_RANGE(const COMP_KMXPLUS_USET_RANGE &other) : start(other.start), end(other.end) {
+}
+
+COMP_KMXPLUS_USET_Helper::COMP_KMXPLUS_USET_Helper() : uset(nullptr), is_valid(false), usets(nullptr), ranges(nullptr) {
+}
+
+bool
+COMP_KMXPLUS_USET_Helper::setUset(const COMP_KMXPLUS_USET *newUset) {
+  DebugLoad("validating newUset=%p", newUset);
+  is_valid = true;
+  if (newUset == nullptr) {
+    // Note: kmx_plus::kmx_plus has already called section_from_bytes()
+    // which validates this section's length. Will be nullptr here if invalid.
+    is_valid = false;
+    // No assert here: just a missing layer
+    return false;
+  }
+  uset = newUset;
+  const uint8_t *rawdata = reinterpret_cast<const uint8_t *>(newUset);
+  rawdata += LDML_LENGTH_USET;  // skip past non-dynamic portion
+  // usets
+  if (uset->usetCount > 0) {
+    usets = reinterpret_cast<const COMP_KMXPLUS_USET_USET *>(rawdata);
+  } else {
+    usets = nullptr;
+    // not invalid, just empty.
+  }
+  rawdata += sizeof(COMP_KMXPLUS_USET_USET) * uset->usetCount;
+  // entries
+  if (uset->rangeCount > 0) {
+    ranges = reinterpret_cast<const COMP_KMXPLUS_USET_RANGE *>(rawdata);
+  } else {
+    ranges = nullptr;
+  }
+
+  // Now, validate offsets by walking
+  // is_valid must be true at this point.
+  for (KMX_DWORD i = 0; is_valid && i < uset->usetCount; i++) {
+    const auto &e = usets[i];
+    // is the count off the end?
+    DebugLog("uset 0x%X: range %d, count %d, pattern 0x%X", i, e.range, e.count, e.pattern);
+    if ((e.range >= uset->rangeCount) || (e.range + e.count > uset->rangeCount)) {
+      DebugLog("uset[%d] would access range %d+%d, > count %d", i, e.range, e.count, uset->rangeCount);
+      is_valid = false;
+      assert(is_valid);
+    } else {
+      /** last lastEnd value */
+      KMX_DWORD lastEnd = 0x0;
+      for (KMX_DWORD r = 0; is_valid && r < e.count; r++) {
+        const auto &range = ranges[e.range + r];  // already range-checked 'r' above
+        if (!Uni_IsValid(range.start, range.end)) {
+          DebugLog("uset[%d][%d] not valid: [U+%04X-U+%04X]", i, r, range.start, range.end);
+          is_valid = false;
+          assert(is_valid);
+        } else if (range.end < range.start) {
+          // range swapped
+          DebugLog("uset[%d]: range[%d+%d] end 0x%X<start 0x%X", i, e.range, r, range.end, range.start);
+          is_valid = false;
+          assert(is_valid);
+        } else if (range.start < lastEnd) {
+          // overlaps prior range AND/OR ranges aren't in order
+          DebugLog("uset[%d]: range[%d+%d] has start 0x%X, not > prior range (overlap/ranges unsorted?)",
+            i, e.range, r, range.start);
+            is_valid = false;
+            assert(is_valid);
+        } else {
+          lastEnd = range.end;
+        }
+      }
+    }
+  }
+  // Return results
+  DebugLog("COMP_KMXPLUS_USET_Helper.setUset(): %s", is_valid ? "valid" : "invalid");
+  assert(is_valid);
+  return is_valid;
+}
+
+SimpleUSet::SimpleUSet(const COMP_KMXPLUS_USET_RANGE *newRange, size_t newCount)  {
+  for (size_t i = 0; i < newCount; i++) {
+    ranges.emplace_back(newRange[i].start, newRange[i].end);
+  }
+}
+
+SimpleUSet::SimpleUSet() {
+}
+
+bool SimpleUSet::contains(km_core_usv ch) const {
+  for (const auto &range : ranges) {
+    if (range.start <= ch && range.end >= ch) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool
+SimpleUSet::valid() const {
+  // double check
+  for (const auto &range : ranges) {
+    if (!Uni_IsValid(range.start, range.end)) {
+      DebugLog("Invalid UnicodeSet (contains noncharacters): [U+%04X,U+%04X]", (int)range.start, (int)range.end);
+      return false;
+    }
+  }
+  return true;
+}
+
+void
+SimpleUSet::dump() const {
+  DebugLog(" - USet size=%d", ranges.size());
+  for (const auto &range : ranges) {
+    if (range.start == range.end) {
+      DebugLog("  - [U+%04X]", (uint32_t)range.start);
+    } else {
+      DebugLog("  - [U+%04X-U+%04X]", (uint32_t)range.start, (uint32_t)range.end);
+    }
+  }
+}
+
+SimpleUSet
+COMP_KMXPLUS_USET_Helper::getUset(KMXPLUS_USET i) const {
+  if (!valid() || i >= uset->usetCount) {
+    assert(false);
+    return SimpleUSet(nullptr, 0); // empty set
+  }
+  auto &set = usets[i];
+  return SimpleUSet(getRange(set.range), set.count);
+}
+
+const COMP_KMXPLUS_USET_RANGE *
+COMP_KMXPLUS_USET_Helper::getRange(KMX_DWORD i) const {
+  if (!valid() || i >= uset->rangeCount) {
+    assert(false);
+    return nullptr;
+  }
+  return ranges + i;
+}
+
 // ---- constructor
 
 kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
-    : loca(nullptr), meta(nullptr),
-      sect(nullptr), strs(nullptr), vkey(nullptr), valid(false) {
-
-  DebugLog("kmx_plus(): Got a COMP_KEYBOARD at %p\n", keyboard);
+    : bksp(nullptr), disp(nullptr), elem(nullptr), key2(nullptr), layr(nullptr), list(nullptr), loca(nullptr), meta(nullptr),
+      sect(nullptr), strs(nullptr), tran(nullptr), vars(nullptr), valid(false) {
+  DebugLog("kmx_plus: Got a COMP_KEYBOARD at %p\n", keyboard);
+#if !KMXPLUS_DEBUG_LOAD
+  DebugLog("Note: define KMXPLUS_DEBUG_LOAD=1 at compile time for more verbosity in loading");
+#endif
   if (!(keyboard->dwFlags & KF_KMXPLUS)) {
     DebugLog("Err: flags COMP_KEYBOARD.dwFlags did not have KF_KMXPLUS set");
     valid = false;
@@ -833,7 +1179,7 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
   const COMP_KEYBOARD_EX* ex = reinterpret_cast<const COMP_KEYBOARD_EX*>(keyboard);
 
   DebugLog("kmx_plus(): KMXPlus offset 0x%X, KMXPlus size 0x%X\n", ex->kmxplus.dpKMXPlus, ex->kmxplus.dwKMXPlusSize);
-  if (ex->kmxplus.dpKMXPlus < sizeof(kmx::COMP_KEYBOARD_EX)) {
+  if (ex->kmxplus.dpKMXPlus < sizeof(COMP_KEYBOARD_EX)) {
     DebugLog("dwKMXPlus is not past the end of COMP_KEYBOARD_EX");
     valid = false;
     assert(valid);
@@ -855,7 +1201,8 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
   } else {
     valid = true;
     // load other sections, validating as we go
-    // these will be nullptr if they don't validate
+    // each field will be set to nullptr if validation fails
+    bksp = section_from_sect<COMP_KMXPLUS_BKSP>(sect);
     disp = section_from_sect<COMP_KMXPLUS_DISP>(sect);
     elem = section_from_sect<COMP_KMXPLUS_ELEM>(sect);
     key2 = section_from_sect<COMP_KMXPLUS_KEYS>(sect);
@@ -865,12 +1212,19 @@ kmx_plus::kmx_plus(const COMP_KEYBOARD *keyboard, size_t length)
     meta = section_from_sect<COMP_KMXPLUS_META>(sect);
     strs = section_from_sect<COMP_KMXPLUS_STRS>(sect);
     tran = section_from_sect<COMP_KMXPLUS_TRAN>(sect);
-    vkey = section_from_sect<COMP_KMXPLUS_VKEY>(sect);
+    uset = section_from_sect<COMP_KMXPLUS_USET>(sect);
+    vars = section_from_sect<COMP_KMXPLUS_VARS>(sect);
 
-    // calculate and validate the dynamic parts
+    // Initialize the helper objects for sections with dynamic parts.
+    // Note: all of these setters will be passed 'nullptr'
+    //  if any section had failed validation.
+
+    (void)bkspHelper.setTran(bksp); // bksp handled by …TRAN_Helper
     (void)key2Helper.setKeys(key2);
     (void)layrHelper.setLayr(layr);
     (void)listHelper.setList(list);
+    (void)tranHelper.setTran(tran);
+    (void)usetHelper.setUset(uset);
   }
 }
 
@@ -910,7 +1264,31 @@ KMX_DWORD COMP_KMXPLUS_STRS::find(const std::u16string& s) const {
   return 0; // not found
 }
 
+bool
+COMP_KMXPLUS_VARS::valid(KMX_DWORD _kmn_unused(length)) const {
+  if (header.size < sizeof(*this)
+      + (varCount  * sizeof(COMP_KMXPLUS_VARS_ITEM))) {
+    DebugLog("header.size < expected size");
+    assert(false);
+    return false;
+  }
+  return true;
+}
+
+const COMP_KMXPLUS_VARS_ITEM *COMP_KMXPLUS_VARS::findByStringId(KMX_DWORD strId) const {
+  if (strId == 0) {
+    return nullptr;
+  }
+  for (KMX_DWORD index = 0; index < varCount; index++) {
+    if (varEntries[index].id == strId) {
+      return &(varEntries[index]);
+    }
+  }
+  return nullptr;
+}
+
+
 
 }  // namespace kmx
-}  // namespace kbp
+}  // namespace core
 }  // namespace km

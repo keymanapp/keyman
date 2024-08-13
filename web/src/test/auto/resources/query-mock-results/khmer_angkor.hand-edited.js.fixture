@@ -1,0 +1,49 @@
+keyman.register(
+  {
+    "options": {
+      "context":"keyboard",
+      "dateFormat":"standard",
+      "device":"any",
+      // Change 1:  redirect to /common/test/resources' subfolder.
+      // "keyboardBaseUri":"https://s.keyman.com/keyboard/",
+      "keyboardBaseUri":"common/test/resources/keyboards/",
+      "fontBaseUri":"https://s.keyman.com/font/deploy/",
+      "keyboardid":"khmer_angkor",
+      "keyboardVersion":"current"
+    },
+    "keyboard": [
+      {
+        "id":"khmer_angkor",
+        "name":"Khmer Angkor",
+        // Change 2: Is unversioned within /common/test/resources.
+        // "filename":"khmer_angkor/1.3/khmer_angkor-1.3.js",
+        "filename": "khmer_angkor.js",
+        "version":"1.3",
+        "source":"https://github.com/keymanapp/keyboards/tree/master/release/k/khmer_angkor",
+        "devices": {
+          "phone":2,
+          "tablet":2,
+          "desktop":2
+        },
+        "languages": [
+          {
+            "id":"km",
+            "name":"Khmer",
+            "region":3,
+            "font": {
+              "family":"Khmer Mondulkiri",
+              "source": [
+                "Mondulkiri-R.ttf"
+              ]
+            }, "oskFont": {
+              "family":"Khmer Busra Kbd",
+              "source": [
+                "khmer_busra_kbd.ttf"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+);

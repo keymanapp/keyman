@@ -45,13 +45,19 @@ function KGetTempPath: string;
 
 function GetLongFileName(const fname: string): string;
 
+function DosSlashes(const filename: string): string;
+
 implementation
 
 uses
+  System.StrUtils,
   System.SysUtils,
   Winapi.Windows;
 
-
+function DosSlashes(const filename: string): string;
+begin
+  Result := ReplaceStr(filename, '/', '\');
+end;
 
 function DirectoryEmpty(dir: WideString): Boolean;
 var

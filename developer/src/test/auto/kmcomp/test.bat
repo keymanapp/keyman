@@ -23,7 +23,7 @@ if "%1"=="-t" (
 )
 
 if "%1"=="" (
-  set compiler=..\..\..\..\bin\developer\kmcomp.exe
+  set compiler=..\..\..\..\bin\kmc.cmd
 ) else (
   set compiler=%1
   shift
@@ -110,7 +110,7 @@ goto :eof
 
 :should-pass
 echo %BLUE%TEST: %1 %WHITE%
-"%compiler%" -no-color -s -w tests.kpj -t "%2"
+call "%compiler%" build --no-color --log-level hint --compiler-warnings-as-errors "%2"
 if !ERRORLEVEL! EQU 0 (
   echo %GREEN%TEST PASSED%WHITE%
   exit /b 0
@@ -120,7 +120,7 @@ exit /b 1
 
 :should-fail
 echo %BLUE%TEST: %1 %WHITE%
-"%compiler%" -no-color -s -w tests.kpj -t "%2"
+call "%compiler%" build --no-color --log-level hint --compiler-warnings-as-errors  "%2"
 if !ERRORLEVEL! GTR 0 (
   echo %GREEN%TEST PASSED%WHITE%
   exit /b 0
@@ -141,7 +141,7 @@ if %1 == -f (
 echo %BLUE%TEST: %1 %WHITE%
 
 if exist error.log del error.log
-"%compiler%" -no-color -nologo -ss -w tests.kpj -t "%2" > error.log
+call "%compiler%" build --no-color --log-level hint --compiler-warnings-as-errors "%2" > error.log
 if !ERRORLEVEL! GTR 0 (
   echo %RED%FAILED: expected %2 to be a valid keyboard.%WHITE% 1>&2
   echo ---------------------------------------------------------------------------
@@ -184,6 +184,6 @@ echo %GREEN%TEST PASSED%WHITE%
 exit /b 0
 
 :usage
-echo Usage: test.bat [-c] [path-to-kmcomp.exe]
+echo Usage: test.bat [-c] [path-to-kmc.cmd]
 echo -c will add colour via ANSI escapes (don't use in redirected scripts)
-echo path-to-kmcomp.exe, if not included will default to ..\..\..\..\bin\developer\kmcomp.exe
+echo path-to-kmc.cmd, if not included will default to ..\..\..\..\bin\kmc.cmd

@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-import * as fs from 'fs';
-import * as rd from 'readline';
-import * as program from 'commander';
+import { Command } from 'commander';
+import hextobin from './index.js';
 
 let inputFilename: string = "";
 let outputFilename: string = "";
 
+const program = new Command();
 program
   .description(
 `Will convert the input file which is a hex dump to the output file. Hex dump can contain
@@ -19,10 +19,11 @@ Format:
   11 22 33 44 55 aa bb            # inserts hex bytes
   offset(block)                   # inserts 4 byte offset of block from BOF
   sizeof(block[,divisor])         # inserts 4 byte size of block, optionally divided by divisor
-  diff(block1,block2)             # inserts 4 byte offset diff between start of block1 and block2
+  diff(block1,block2[,divisor])  # inserts 4 byte offset diff between start of block1 and block2, ÷divisor (default: ÷1)
   index(block1,block2[,divisor])  # inserts 4 byte index diff between block1 and block2,
                                   # optionally divided by divisor
   # block names are required, but if not referenced can be reused (e.g. block(x))
+  # Spaces after commas aren't allowed:  'sizeof(block,3)' not 'sizeof(block, 3)'
 `
   )
   .arguments('<infile>')
@@ -42,6 +43,16 @@ function exitDueToUsageError(message: string): never  {
   return process.exit(64); // SysExits.EX_USAGE
 }
 
-import hextobin from './index';
-
-hextobin(inputFilename, outputFilename, {silent: false});
+hextobin(inputFilename, outputFilename, { silent: false })
+  .then((buffer) => {
+    if (buffer) {
+      process.exit(0); // OK
+    } else {
+      console.error(`${program._name}: Failed.`);
+      process.exit(1); // no buffer - some err.
+    }
+  }, (err) => {
+    console.error(err);
+    console.error(`${program._name}: Failed.`);
+    process.exit(1);
+  });

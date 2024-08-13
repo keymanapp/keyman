@@ -8,6 +8,7 @@
 
 import Foundation
 import Sentry
+import os.log
 
 // MARK: - Static members
 extension Storage {
@@ -17,7 +18,9 @@ extension Storage {
     if paths.isEmpty {
       return nil
     }
-    SentryManager.breadcrumbAndLog("Storage.nonShared:  using path \(paths[0])")
+    let message = "Storage.nonShared:  using path \(paths[0])"
+    os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
+    SentryManager.breadcrumb(message)
     return Storage(baseURL: paths[0], userDefaults: UserDefaults.standard)
   }()
 
@@ -81,7 +84,9 @@ class Storage {
                                               attributes: nil)
       return newDir
     } catch {
-      SentryManager.captureAndLog(error, message: "Failed to create subdirectory at \(newDir)")
+      let message = ("Failed to create subdirectory at \(newDir)")
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
+      SentryManager.capture(error, message:message)
       return nil
     }
   }
@@ -124,11 +129,11 @@ class Storage {
       return nil
     }
   }
-  
+
   func keyboardURL(for keyboard: InstallableKeyboard) -> URL {
     return resourceDir(for: keyboard)!.appendingPathComponent("\(keyboard.id).js")
   }
-  
+
   func lexicalModelURL(for lexicalModel: InstallableLexicalModel) -> URL {
     return resourceDir(for: lexicalModel)!.appendingPathComponent("\(lexicalModel.id).model.js")
   }
@@ -154,7 +159,7 @@ class Storage {
       return nil
     }
   }
-  
+
   func lexicalModelPackageURL(for lexicalModel: InstallableLexicalModel) -> URL {
     return resourceDir(for: lexicalModel)!.appendingPathComponent("\(lexicalModel.id).model.kmp")
   }
@@ -178,11 +183,11 @@ class Storage {
     }
     return legacyKeyboardDir(forID: keyboardID).appendingPathComponent("\(keyboardID)-\(version).js")
   }
-  
+
   func legacyLexicalModelURL(forID lexicalModelID: String, version: String) -> URL {
     return legacyLexicalModelDir(forID: lexicalModelID).appendingPathComponent("\(lexicalModelID)-\(version).model.js")
   }
-  
+
   func legacyLexicalModelPackageURL(forID lexicalModelID: String, version: String, asZip: Bool = false) -> URL {
     // Our unzipping dependency requires a .zip extension to function, so we append that here.
     return legacyLexicalModelDir(forID: lexicalModelID).appendingPathComponent("\(lexicalModelID)-\(version).model.kmp\(asZip ? ".zip" : "")")
@@ -198,7 +203,9 @@ class Storage {
       contents = try FileManager.default.contentsOfDirectory(at: keyboardDir,
                                                              includingPropertiesForKeys: [.isDirectoryKey])
     } catch {
-      SentryManager.captureAndLog(error, message: "Failed to list contents at \(keyboardDir) with error \(error)")
+      let message = ("Failed to list contents at \(keyboardDir) with error \(error)")
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
+      SentryManager.capture(error, message:message)
       return nil
     }
     return contents.filter { url in
@@ -206,7 +213,9 @@ class Storage {
         let values = try url.resourceValues(forKeys: [.isDirectoryKey])
         return values.isDirectory ?? false
       } catch {
-        SentryManager.captureAndLog(error)
+        let message = "\(String(describing: error))"
+        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
+        SentryManager.capture(error)
         return false
       }
     }
@@ -225,20 +234,17 @@ extension Storage {
                      dstDir: baseDir,
                      excludeFromBackup: true)
     try Storage.copy(from: bundle,
-                     resourceName: "keymanios.js",
+                     resourceName: "keymanweb-webview.js",
+                     dstDir: baseDir,
+                     excludeFromBackup: true)
+    try Storage.copy(from: bundle,
+                     resourceName: "sentry.min.js",
                      dstDir: baseDir,
                      excludeFromBackup: true)
     try Storage.copy(from: bundle,
                      resourceName: "keyman-sentry.js",
                      dstDir: baseDir,
                      excludeFromBackup: true)
-    // For debug compilations - IF we have a sourcemap file, copy that over too.
-    if bundle.url(forResource: "keyman.js.map", withExtension: nil) != nil {
-      try Storage.copy(from: bundle,
-                       resourceName: "keyman.js.map",
-                       dstDir: baseDir,
-                       excludeFromBackup: true)
-    }
     try Storage.copy(from: bundle,
                      resourceName: "kmwosk.css",
                      dstDir: baseDir,
@@ -266,7 +272,9 @@ extension Storage {
       let package = try ResourceFileManager.shared.prepareKMPInstall(from: defaultKMPFile) as! KeyboardKeymanPackage
       try ResourceFileManager.shared.install(resourceWithID: Defaults.keyboard.fullID, from: package)
     } catch {
-      SentryManager.captureAndLog(error, message: "Failed to install the default keyboard from the bundled KMP: \(error)")
+      let message = "Failed to install the default keyboard from the bundled KMP: \(error)"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
+      SentryManager.capture(error, message:message)
     }
   }
 
@@ -286,17 +294,21 @@ extension Storage {
       // Perform an auto-install of the lexical model's KMP if not already installed.
       let defaultKMPFile = defaultLexicalModelDir.appendingPathComponent("\(Defaults.lexicalModel.id).model.kmp")
       let package = try ResourceFileManager.shared.prepareKMPInstall(from: defaultKMPFile) as! LexicalModelKeymanPackage
-      
+
       // Install all languages for the model, not just the default-listed one.
       try ResourceFileManager.shared.install(resourcesWithIDs: package.installables[0].map { $0.fullID }, from: package)
     } catch {
-      SentryManager.captureAndLog(error, message: "Failed to install the default lexical model from the bundled KMP: \(error)")
+      let message = "Failed to install the default lexical model from the bundled KMP: \(error)"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
+      SentryManager.capture(error, message:message)
     }
   }
 
   func copyFiles(to dst: Storage) throws {
     if FileManager.default.fileExists(atPath: dst.baseDir.path) {
-      SentryManager.breadcrumbAndLog("Deleting \(dst.baseDir) for copy from \(baseDir) to \(dst.baseDir)")
+      let message = "Deleting \(dst.baseDir) for copy from \(baseDir) to \(dst.baseDir)"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
+      SentryManager.breadcrumb(message)
       try FileManager.default.removeItem(at: dst.baseDir)
     }
     try FileManager.default.copyItem(at: baseDir, to: dst.baseDir)

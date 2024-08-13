@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #
 # This prepare-commit-msg hook prepares commit messages to ensure
@@ -13,9 +13,9 @@
 # Reference: https://github.com/keymanapp/keyman/wiki/Pull-Request-and-Commit-workflow-notes
 #
 
-COMMIT_MSG_FILE=$1
-COMMIT_SOURCE=$2
-SHA1=$3
+COMMIT_MSG_FILE="$1"
+COMMIT_SOURCE="$2"
+SHA1="$3"
 
 # Get the directory where this script lives, i.e. resources/git-hooks
 HOOK_DIRECTORY="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
@@ -65,17 +65,17 @@ function prepend_scope() {
   # COMMIT_MSG_FILE and $COMMIT_SOURCE are already available.
 
   # Step 1:  if the branch follows our preferred branch conventions, we can use that!
-  branch=$(git rev-parse --abbrev-ref HEAD)
+  branch="$(git rev-parse --abbrev-ref HEAD)"
   build_regex
 
   # Perform the actual regex check.
   if [[ $branch =~ $regexp ]]; then
-    TYPE=${BASH_REMATCH[1]}
-    SCOPE=${BASH_REMATCH[2]}
-    # 3 - cherry-pick (if it exists)
+    TYPE="${BASH_REMATCH[1]}"
+    SCOPE="${BASH_REMATCH[2]}"
+    CHERRYPICK="${BASH_REMATCH[3]}"
     # 4 - just ISSUE, but with an appended '-'.  Ashame BASH doesn't support non-capture groups.
-    ISSUE=${BASH_REMATCH[5]}
-    NAME=${BASH_REMATCH[6]}
+    ISSUE="${BASH_REMATCH[5]}"
+    NAME="${BASH_REMATCH[6]}"
 
     EXTRA_WHITESPACE="\n"
 
@@ -86,22 +86,48 @@ function prepend_scope() {
       EXTRA_WHITESPACE=
     fi
 
-    # Now that we have the components finalized, we can proceed.
-    if [ -n "${ISSUE// }" ]; then # Refer to https://unix.stackexchange.com/a/146945 for explanation.
-      # This technically does pass the conventional commits test - it doesn't -ensure- that the
-      # "Fixes #____" section doesn't count toward the core message.
-      postfix="\n"
-      postfix="${postfix}# Keyman Conventional Commit suggestions:\n"
-      postfix="${postfix}# - Consider appending the text \". Fixes #$ISSUE\" to your commit message."
-    else
-      postfix=""
-    fi
+    # Build commit message title
 
     if [ -z "$SCOPE" ]; then
       prefix="$TYPE: $EXTRA_WHITESPACE"
     else
       prefix="$TYPE($SCOPE): $EXTRA_WHITESPACE"
     fi
+
+    if [ ! -z "$CHERRYPICK" ]; then
+      prefix ="${prefix}🍒"
+    fi
+
+    # Add commit message trailers
+
+    if [ "${COMMIT_SOURCE}" != "merge" ]; then
+      if [ -n "${ISSUE// }" ] || [ ! -z "$CHERRYPICK" ]; then
+        prefix="${prefix}\n"
+      fi
+
+      if [ -n "${ISSUE// }" ]; then # Refer to https://unix.stackexchange.com/a/146945 for explanation.
+        prefix="${prefix}Fixes: #$ISSUE\n"
+      fi
+
+      if [ ! -z "$CHERRYPICK" ]; then
+        prefix="${prefix}Cherry-pick-of: #_ID_"
+      fi
+    fi
+
+    postfix=$(
+      cat <<EOF
+\n# Keyman Conventional Commit suggestions:
+#
+# - Link to a Sentry issue with git trailer:
+#     Fixes: _MODULE_-_ID_
+# - Give credit to co-authors:
+#     Co-authored-by: _Name_ <_email_>
+# - Use imperative, present tense ('attach' not 'attaches', 'attached' etc)
+# - Don't include a period at the end of the title
+# - Always include a blank line before trailers
+# - More: https://github.com/keymanapp/keyman/wiki/Pull-Request-and-Commit-workflow-notes
+EOF
+    )
 
     # Reuse any existing message text, wrapping it in our conventional commit formatting before
     # presenting it to the user for any final edits.

@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="mt" conformsTo="techpreview">
-  <names>
-    <name value="layr-invalid-missing-layer2" />
-  </names>
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="layr-invalid-missing-layer2"/>
 
   <keys />
   <!-- invalid: need a layer! -->
-</keyboard>
+</keyboard3>

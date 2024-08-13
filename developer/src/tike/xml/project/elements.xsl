@@ -2,6 +2,23 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:k="http://www.tavultesoft.com/xml/70">
 
+<!-- IsInSourcePath and IsCompilable props are injected by ProjectSaver.pas for render time only -->
+<xsl:variable name="ParentFiles" select="/KeymanDeveloperProject/Files/File[not(ParentFileID)]" />
+<xsl:variable name="SourcePathFiles" select="$ParentFiles[
+  IsInSourcePath='true' or
+  /KeymanDeveloperProject/Options/Version != '2.0'
+]" />
+<xsl:variable name="SourceKeyboardFiles" select="$SourcePathFiles[FileType='.kmn' or FileType='.xml-ldml-keyboard']" />
+<xsl:variable name="SourcePackageFiles" select="$SourcePathFiles[FileType='.kps']" />
+<xsl:variable name="SourceModelFiles" select="$SourcePathFiles[FileType='.ts' or FileType='.tsv']" />
+<xsl:variable name="SourceFiles" select="$SourcePathFiles[FileType='.kmn' or FileType='.xml-ldml-keyboard' or FileType='.kps' or FileType='.model.ts']" />
+<xsl:variable name="NonSourceFiles" select="$ParentFiles[
+    IsInSourcePath != 'true' or
+    (FileType != '.kmn' and FileType != '.kps' and FileType != '.xml-ldml-keyboard' and FileType != '.ts' and FileType != '.tsv') or
+    /KeymanDeveloperProject/Options/Version != '2.0'
+  ]" />
+
+
 <xsl:template name="head">
   <head>
     <script src="/app/lib/sentry/bundle.min.js"><xsl:text> </xsl:text></script>
@@ -59,6 +76,7 @@
     <xsl:param name="file_description" />
     <xsl:param name="file_has_details" />
     <xsl:param name="file_has_no_options" />
+    <xsl:param name="file_relative_path" />
 
     <span tabindex="1" class="file" onmousedown="javascript:this.focus();">
       <xsl:attribute name="id">file<xsl:value-of select="ID"/></xsl:attribute>
@@ -86,7 +104,10 @@
       <div class="filename">
         <a tabindex="-1">
           <xsl:attribute name="href">keyman:editfile?id=<xsl:value-of select="ID"/></xsl:attribute>
-          <xsl:value-of select="Filename" />
+          <xsl:choose>
+            <xsl:when test="$file_relative_path = 'true'"><xsl:value-of select="Filepath" /></xsl:when>
+            <xsl:otherwise><xsl:value-of select="Filename" /></xsl:otherwise>
+          </xsl:choose>
         </a>
       </div>
       <div class="filedescription"><xsl:value-of select="$file_description"/></div>
@@ -154,6 +175,12 @@
   <xsl:template name="filetype_kmn">
     <xsl:call-template name="filetype">
       <xsl:with-param name="icontype">png</xsl:with-param> <xsl:with-param name="type">kmn</xsl:with-param> <xsl:with-param name="title">Keyman Keyboard Source File</xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>
+
+  <xsl:template name="filetype_xml">
+    <xsl:call-template name="filetype">
+      <xsl:with-param name="icontype">gif</xsl:with-param> <xsl:with-param name="type">xml</xsl:with-param> <xsl:with-param name="title">LDML Keyboard Source File</xsl:with-param>
     </xsl:call-template>
   </xsl:template>
 
@@ -252,6 +279,22 @@
         <xsl:attribute name="src">res/icon32_<xsl:value-of select="$type" />.<xsl:value-of select="$icontype" /></xsl:attribute>
       </img><br />.<xsl:value-of select="translate($type,'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')" />
     </a></td>
+  </xsl:template>
+
+  <!-- Upgrades -->
+
+  <xsl:template name="upgrade-warning">
+    <xsl:if test="KeymanDeveloperProject/DeveloperState/@promptToUpgradeProjects != '0' and
+       (KeymanDeveloperProject/Options/Version != '2.0' or not(KeymanDeveloperProject/Options/Version))">
+    <div class="upgrade-warning">
+      <p>⚠️ This project file is in an old format. You should upgrade it to the Keyman Developer 17.0 project format.
+        <xsl:call-template name="button">
+          <xsl:with-param name="caption">Upgrade project</xsl:with-param>
+          <xsl:with-param name="command">keyman:upgradeproject</xsl:with-param>
+        </xsl:call-template>
+      </p>
+    </div>
+  </xsl:if>
   </xsl:template>
 
 </xsl:stylesheet>

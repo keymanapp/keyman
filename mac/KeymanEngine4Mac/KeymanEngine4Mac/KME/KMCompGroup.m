@@ -12,22 +12,22 @@
 @implementation KMCompGroup
 
 - (id)init {
-    self = [super init];
-    if (self) {
-        _name = @"";
-        _keys = [[NSMutableArray alloc] initWithCapacity:0];
-        _match = @"";
-        _noMatch = @"";
-    }
-    
-    return self;
+  self = [super init];
+  if (self) {
+    _name = @"";
+    _keys = [[NSMutableArray alloc] initWithCapacity:0];
+    _match = @"";
+    _noMatch = @"";
+  }
+  
+  return self;
 }
 
 - (NSString *)description {
-    NSString *format = @"<%@:%p, Name:%@ Match:%@ NoMatch:%@ fUsingKeys:%d Keys:%@>";
-    NSString *str = [NSString stringWithFormat:format,
-                     [self className], self, _name, [_match codeString], [_noMatch codeString], _fUsingKeys, _keys];
-    return str;
+  NSString *format = @"<%@:%p, Name:%@ Match:%@ NoMatch:%@ fUsingKeys:%d Keys:%@>";
+  NSString *str = [NSString stringWithFormat:format,
+                   [self className], self, _name, [_match codeString], [_noMatch codeString], _fUsingKeys, _keys];
+  return str;
 }
 
 @end

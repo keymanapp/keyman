@@ -6,12 +6,8 @@
       "rootDirs": ["./", "../src/"],
       "outDir": "../build/test",
       "esModuleInterop": true,
-      "moduleResolution": "node16",
       "allowSyntheticDefaultImports": true,
       "baseUrl": ".",
-      "paths": {
-        "@keymanapp/developer-test-helpers": ["../../common/web/test-helpers/index"],
-      },
   },
   "include": [
       "**/test-*.ts",

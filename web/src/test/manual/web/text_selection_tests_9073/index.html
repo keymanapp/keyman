@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8' />
+
+    <!-- Set the viewport width to match phone and tablet device widths -->
+    <meta name="viewport" content="width=device-width,user-scalable=no" />
+
+    <title>KeymanWeb #9073</title>
+
+    <!-- Your page CSS -->
+    <style type='text/css'>
+      body {font-family: Tahoma,helvetica;}
+      h3 {font-size: 1em;font-weight:normal;color: darkred; margin-bottom: 4px}
+      .test {font-size: 1.5em; width:80%; min-height:30px; border: 1px solid gray;}
+      #KeymanWebControl {width:50%;min-width:600px;}
+    </style>
+    <script src="../../../../../build/publish/debug/keymanweb.js" type="application/javascript"></script>
+    <script src="../../../../../build/publish/debug/kmwuitoggle.js"></script>
+
+    <!-- Initialization: set paths to keyboards, resources and fonts as required -->
+    <script>
+      (function(kmw) {
+        kmw.init({
+          attachType:'auto'
+        }).then(function() {
+          kmw.addKeyboards({
+            id:'text_selection_tests_keyboard_9073',
+            name:'Text selection test cases (#9073)',
+            languages:{
+              id:'en',
+              name:'English'
+            },
+            filename:'./text_selection_tests_keyboard_9073.js',
+            displayName: 'Text selection test cases (#9073)'
+          });
+        });
+        })(keyman);
+      </script>
+
+
+  </head>
+
+<!-- Sample page HTML -->
+  <body>
+    <h2>Text Selection Test Cases (#9073)</h2>
+
+    <div>
+    <!--
+      The following DIV is used to position the Button or Toolbar User Interfaces on the page.
+      If omitted, those User Interfaces will appear at the top of the document body.
+      (It is ignored by other User Interfaces.)
+    -->
+    <div id='KeymanWebControl'></div>
+
+    <textarea id='ta1' class='test' placeholder='Type here'></textarea>
+  </div>
+
+  <hr />
+  <h3><a href="../index.html">Return to testing home page</a></h3>
+  </body>
+
+  <!--
+    *** DEVELOPER NOTE -- FIREFOX CONFIGURATION FOR TESTING ***
+    *
+    * If the URL bar starts with <b>file://</b>, Firefox may not load the font used
+    * to display the special characters used in the On-Screen Keyboard.
+    *
+    * To work around this Firefox bug, navigate to <b>about:config</b>
+    * and set <b>security.fileuri.strict_origin_policy</b> to <b>false</b>
+    * while testing.
+    *
+    * Firefox resolves website-based CSS URI references correctly without needing
+    * any configuration change, so this change should only be made for file-based testing.
+    *
+    ***
+  -->
+</html>

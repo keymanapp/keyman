@@ -1,0 +1,20 @@
+﻿c test9469 generated from template at 2023-08-17 19:34:17
+c with name "test9469"
+store(&VERSION) '10.0'
+store(&NAME) 'test9469'
+store(&COPYRIGHT) '© 2023 SIL International'
+store(&KEYBOARDVERSION) '1.1'
+store(&TARGETS) 'any'
+store(&BITMAP) 'test9469.ico'
+store(&VISUALKEYBOARD) 'test9469.kvks'
+store(&LAYOUTFILE) 'test9469.keyman-touch-layout'
+store(&MESSAGE) 'Test touch-layout keyboard to visually inspect keycaps and longpress usage of keymanweb-osk.ttf'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+c This keyboard is just to visually inspect the touch layout key caps / longpress so nearly all of the T_new_ keys are not defined
++ [T_ZWNJ] > U+200C
++ [T_ZWNJIOS] > U+200C
++ [T_ZWNJANDROID] > U+200C

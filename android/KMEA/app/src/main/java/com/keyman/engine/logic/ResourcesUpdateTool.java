@@ -562,7 +562,9 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
 
   void tryFinalizeUpdate() {
     if (openUpdates.isEmpty()) {
-
+      // Trigger a host-page reset - we need to transition to the up-to-date versions.
+      // TODO: make it smoother.  Documented as #11097.
+      KMManager.clearKeyboardCache();
 
       if (failedUpdateCount > 0) {
         BaseActivity.makeToast(currentContext, R.string.update_failed, Toast.LENGTH_SHORT);
@@ -570,7 +572,6 @@ public class ResourcesUpdateTool implements KeyboardEventHandler.OnKeyboardDownl
         updateFailed = true;
         checkingUpdates = false;
       } else {
-        BaseActivity.makeToast(currentContext, R.string.update_success, Toast.LENGTH_SHORT);
         lastUpdateCheck = Calendar.getInstance();
         SharedPreferences prefs = currentContext.getSharedPreferences(currentContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();

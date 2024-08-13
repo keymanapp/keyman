@@ -1,4 +1,7 @@
-#!/usr/bin/env bash
+# shellcheck shell=bash
+# no hashbang for .inc.sh
+
+. "$KEYMAN_ROOT/resources/locate_emscripten.inc.sh"
 
 # ----------------------------------------------------------------------------
 # clean
@@ -8,7 +11,18 @@ do_clean() {
   # clean: note build/<target> will be left, but build/<target>/<configuration> should be gone
   local target=$1
   builder_start_action clean:$target || return 0
+
   rm -rf "$MESON_PATH"
+
+  # Removes ICU cached components so it will be re-downloaded and built. Note:
+  # we could use `git clean`, but this clarifies exactly what is deleted, and
+  # but we try not to use git commands in build scripts, to maintain clear
+  # responsibility
+  rm -rf \
+    "$THIS_SCRIPT_PATH/subprojects/icu" \
+    "$THIS_SCRIPT_PATH/subprojects/*.tgz" \
+    "$THIS_SCRIPT_PATH/subprojects/*.zip"
+
   builder_finish_action success clean:$target
 }
 
@@ -75,9 +89,16 @@ do_test() {
   local target=$1
   builder_start_action test:$target || return 0
   if [[ $target =~ ^(x86|x64)$ ]]; then
-    cmd //C build.bat $target $BUILDER_CONFIGURATION test "${builder_extra_params[@]}"
+    cmd //C build.bat $target $BUILDER_CONFIGURATION test $testparams
   else
-    meson test -C "$MESON_PATH" "${builder_extra_params[@]}"
+    if [[ $target == wasm ]] && [[ $BUILDER_OS == mac ]]; then
+      # 11794 -- parallel tests failing on some mac build agents; temporary
+      # mitigation until we diagnose root cause
+      meson test -j 1 -C "$MESON_PATH" $testparams
+    else
+      meson test -C "$MESON_PATH" $testparams
+    fi
+
   fi
   builder_finish_action success test:$target
 }
@@ -114,34 +135,6 @@ do_uninstall() {
 # utility functions
 # ----------------------------------------------------------------------------
 
-#
-# We don't want to rely on emcc being on the path, because Emscripten puts far
-# too many things onto the path (in particular for us, node).
-#
-# The following comment suggests that we don't need emcc on the path.
-# https://github.com/emscripten-core/emscripten/issues/4848#issuecomment-1097357775
-#
-# So we try and locate emcc in common locations ourselves. The search pattern
-# is:
-#
-# 1. Look for $EMSCRIPTEN_BASE (our primary emscripten variable), which should
-#    point to the folder that emcc is located in
-# 2. Look for $EMCC which should point to the emcc executable
-# 3. Look for emcc on the path
-#
-locate_emscripten() {
-  if [[ -z ${EMSCRIPTEN_BASE+x} ]]; then
-    if [[ -z ${EMCC+x} ]]; then
-      local EMCC=`which emcc`
-      [[ -z $EMCC ]] && builder_die "locate_emscripten: Could not locate emscripten (emcc) on the path or with \$EMCC or \$EMSCRIPTEN_BASE"
-    fi
-    [[ -x $EMCC ]] || builder_die "locate_emscripten: Variable EMCC ($EMCC) does not point to a valid executable emcc"
-    EMSCRIPTEN_BASE="$(dirname "$EMCC")"
-  fi
-
-  [[ -x ${EMSCRIPTEN_BASE}/emcc ]] || builder_die "locate_emscripten: Variable EMSCRIPTEN_BASE ($EMSCRIPTEN_BASE) does not point to emcc's folder"
-}
-
 build_meson_cross_file_for_wasm() {
   if [ $BUILDER_OS == win ]; then
     local R=$(cygpath -w $(echo $EMSCRIPTEN_BASE) | sed 's_\\_\\\\_g')
@@ -158,6 +151,8 @@ build_meson_cross_file_for_wasm() {
 #     meson.build:8:0: ERROR: Found GNU link.exe instead of MSVC link.exe in C:\Program Files\Git\usr\bin\link.EXE.
 #     This link.exe is not a linker.
 #     You may need to reorder entries to your %PATH% variable to resolve this.
+#
+# TODO: is this still required with meson 1.0?
 #
 
 cleanup_visual_studio_path() {

@@ -5,9 +5,9 @@ if(typeof keyman === 'undefined') {
 }
 function Keyboard_basic() {
   this.KI="Keyboard_basic";
-  this.KN={"value":"TestKbd"};
+  this.KN="TestKbd";
   this.KMINVER="16.0";
-  this.KV={F: '10pt "Arial"', K102: 0};
+  this.KV={F: ' 1em "Arial"', K102: 0};
   this.KV.KLS={
     TODO_LDML: 2
   };
@@ -24,7 +24,7 @@ function Keyboard_basic() {
         "id": "base",
         "row": [
           {
-            "id": 0,
+            "id": "0",
             "key": [
               {
                 "id": "T_hmaqtugha",
@@ -38,7 +38,8 @@ function Keyboard_basic() {
           }
         ]
       }
-    ]
+    ],
+    "displayUnderlying": false
   }
 };
   this.gs=function(t,e){

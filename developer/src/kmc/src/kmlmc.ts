@@ -3,12 +3,11 @@
  * kmlmc - Keyman Lexical Model Compiler
  */
 
-import * as fs from 'fs';
 import { Command } from 'commander';
-import { compileModel } from '@keymanapp/kmc-model';
+import { LexicalModelCompiler } from '@keymanapp/kmc-model';
 import { SysExits } from './util/sysexits.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
-import { NodeCompilerCallbacks } from './messages/NodeCompilerCallbacks.js';
+import { NodeCompilerCallbacks } from './util/NodeCompilerCallbacks.js';
 
 let inputFilename: string;
 const program = new Command();
@@ -28,12 +27,18 @@ if (!inputFilename) {
   exitDueToUsageError('Must provide a lexical model source file.');
 }
 
-const callbacks = new NodeCompilerCallbacks();
+const callbacks = new NodeCompilerCallbacks({logLevel: 'info'});
+
+const compiler = new LexicalModelCompiler();
+if(!await compiler.init(callbacks, null)) {
+  console.error('Initialization failed.');
+  process.exit(SysExits.EX_DATAERR);
+}
 
 let code = null;
 // Compile:
 try {
-  code = compileModel(inputFilename, callbacks);
+  code = await compiler.run(inputFilename, program.opts().outFile);
 } catch(e) {
   console.error(e);
   process.exit(SysExits.EX_DATAERR);
@@ -46,9 +51,12 @@ if(!code) {
 
 // Output:
 if (program.opts().outFile) {
-  fs.writeFileSync(program.opts().outFile, code, 'utf8');
+  compiler.write(code.artifacts);
 } else {
-  console.log(code);
+  // TODO(lowpri): if writing to console then log messages should all be to stderr?
+  const decoder = new TextDecoder();
+  const text = decoder.decode(code.artifacts.js.data);
+  console.log(text);
 }
 
 function exitDueToUsageError(message: string): never  {

@@ -46,6 +46,10 @@
   <string name="SKButtonCancel" comment="Cancel button in message boxes">Annuler</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
+  <!-- Introduced: 16.0.47 -->
+  <string name="SKAddremove" comment="Add or Remove languages button opens a dialog window">Ajouter ou supprimer des langues...</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.330.0 -->
   <string name="SKBalloonClickToSelectKeyboard" comment="Balloon that shows when Keyman icon is first shown during the tutorial">Cliquez sur cette icône pour sélectionner un clavier</string>
   <!-- Context: Formatted Messages -->
@@ -64,6 +68,18 @@
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.239.0 -->
   <string name="S_Caption_Help" comment="Configuration dialog link to Help">Assistance</string>
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47.0 -->
+  <string name="S_Caption_Uninstall" comment="Configuration dialog link to Uninstall Keyboard">Désinstaller</string>
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47.0 -->
+  <string name="S_Caption_Enable" comment="Configuration dialog link to Enable Keyboard">Activer</string>
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47.0 -->
+  <string name="S_Caption_Disable" comment="Configuration dialog link to Disable Keyboard">Désactiver</string>
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -174,6 +190,10 @@
   <string name="S_Languages_Install" comment="Add language profile">Ajouter une langue</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47 -->
+  <string name="S_Languages_Addremove" comment="Title for dialog to add or remove languages for keyboard layout">Ajouter/Supprimer des langues</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Caption_OnScreenKeyboard" comment="Term for the On Screen Keyboard">Clavier visuel :</string>
   <!-- Context: Configuration Dialog - Captions -->
@@ -223,7 +243,7 @@
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.287.0 -->
-  <string name="S_Menu_Options" comment="KL option button submenu - keyboard options">Paramètres Clavier</string>
+  <string name="S_Menu_Options" comment="KL option button submenu - keyboard options">Paramètres clavier...</string>
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -341,7 +361,7 @@
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Hotkey_None" comment="Hotkey - text used when no hotkey set for an option">(aucun)</string>
+  <string name="S_Hotkey_None" comment="Hotkey - text used when no hotkey set">(pas de raccourci clavier)</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -429,7 +449,7 @@
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_DownloadKeyboard_Title" comment="Download keyboard layout from keyman.com dialog title">Télécharger le clavier à partir du site Tavultesoft</string>
+  <string name="S_DownloadKeyboard_Title" comment="Download keyboard layout from keyman.com dialog title">Télécharger un clavier à partir du site keyman.com</string>
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->

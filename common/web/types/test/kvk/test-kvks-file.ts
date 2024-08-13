@@ -1,9 +1,9 @@
 import * as fs from 'fs';
 import 'mocha';
-import { loadSchema, makePathToFixture } from '../helpers/index.js';
-import KvksFileReader, { KVKSParseError } from "../../src/kvk/kvks-file-reader.js";
+import { makePathToFixture } from '../helpers/index.js';
+import KvksFileReader from "../../src/kvk/kvks-file-reader.js";
 import KvksFileWriter from "../../src/kvk/kvks-file-writer.js";
-import { verify_khmer_angkor } from './test-kvk-utils.js';
+import { verify_khmer_angkor, verify_balochi_inpage } from './test-kvk-utils.js';
 import { assert } from 'chai';
 
 describe('kvks-file-reader', function() {
@@ -14,12 +14,31 @@ describe('kvks-file-reader', function() {
     const reader = new KvksFileReader();
     const kvks = reader.read(input);
     assert.doesNotThrow(() => {
-      reader.validate(kvks, loadSchema('kvks'));
+      reader.validate(kvks);
     });
-    const errors: KVKSParseError[] = [];
-    const vk = reader.transform(kvks, errors);
-    assert.isEmpty(errors);
+    const invalidVkeys: string[] = [];
+    const vk = reader.transform(kvks, invalidVkeys);
+    assert.isEmpty(invalidVkeys);
     verify_khmer_angkor(vk);
+  });
+
+  it('should read a valid file with bitmaps', function() {
+    const path = makePathToFixture('kvk', 'balochi_inpage.kvks');
+    const input = fs.readFileSync(path);
+    const reader = new KvksFileReader();
+    const kvks = reader.read(input);
+    const invalidVkeys: string[] = [];
+    const vk = reader.transform(kvks, invalidVkeys);
+    assert.isEmpty(invalidVkeys);
+    verify_balochi_inpage(vk);
+  });
+
+  it('should give a sensible error on a .kvk file', function() {
+    const path = makePathToFixture('kvk', 'khmer_angkor.kvk');
+    const input = fs.readFileSync(path);
+
+    const reader = new KvksFileReader();
+    assert.throws(() => reader.read(input), 'File appears to be a binary .kvk file');
   });
 });
 
@@ -30,9 +49,9 @@ describe('kvks-file-writer', function() {
 
     const reader = new KvksFileReader();
     const kvksExpected = reader.read(input);
-    const errors: KVKSParseError[] = [];
-    const vk = reader.transform(kvksExpected, errors);
-    assert.isEmpty(errors);
+    const invalidVkeys: string[] = [];
+    const vk = reader.transform(kvksExpected, invalidVkeys);
+    assert.isEmpty(invalidVkeys);
 
     const writer = new KvksFileWriter();
     const output = writer.write(vk);

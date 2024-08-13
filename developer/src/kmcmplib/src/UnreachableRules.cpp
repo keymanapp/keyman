@@ -14,7 +14,7 @@
 #include "UnreachableRules.h"
 
 namespace kmcmp {
-    std::wstring MakeHashKeyFromFileKey(PFILE_KEY kp) {
+  std::wstring MakeHashKeyFromFileKey(PFILE_KEY kp) {
     std::wstringstream key;
     key << kp->Key << "," << kp->ShiftFlags << ",";
     if (kp->dpContext) {
@@ -25,7 +25,8 @@ namespace kmcmp {
   }
 
 }
-KMX_DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
+
+void VerifyUnreachableRules(PFILE_GROUP gp) {
   PFILE_KEY kp = gp->dpKeyArray;
   KMX_DWORD i;
 
@@ -41,9 +42,9 @@ KMX_DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
       if (kp->Line != k1.Line && reportedLines.count(kp->Line) == 0) {
         reportedLines.insert(kp->Line);
         kmcmp::currentLine = kp->Line;
-        u16sprintf(ErrExtraW, ERR_EXTRA_W_LEN, L" Overridden by rule on line %d", k1.Line);
-        strcpy(ErrExtraLIB, string_from_u16string(ErrExtraW).c_str());
-        AddWarning(CHINT_UnreachableRule);
+        ReportCompilerMessage(KmnCompilerMessages::HINT_UnreachableRule, {
+          /* LineNumber */ std::to_string(k1.Line)
+        });
       }
     }
     else {
@@ -52,6 +53,4 @@ KMX_DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
   }
 
   kmcmp::currentLine = oldCurrentLine;
-
-  return CERR_None;
 }

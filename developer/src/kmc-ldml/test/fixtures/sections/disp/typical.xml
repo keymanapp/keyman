@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="mt" conformsTo="techpreview">
-  <names>
-    <name value="disp-typical" />
-  </names>
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="disp-typical"/>
 
   <displays>
-    <display to="\u{0300}" display="`" />
+    <display output="\u{0300}" display="`" />
   </displays>
-</keyboard>
+</keyboard3>

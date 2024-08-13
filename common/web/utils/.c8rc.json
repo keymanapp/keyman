@@ -1,0 +1,17 @@
+{
+  "all": true,
+  "check-coverage": false,
+  "clean": true,
+  "exclude": [
+    "src/deviceSpec.ts",
+    "src/globalObject.ts",
+    "node_modules/*",
+    "src/test"
+  ],
+  "exclude-after-remap": true,
+  "reporter": ["text", "text-summary"],
+  "reports-dir": "build/coverage",
+  "src": [
+    "src/"
+  ]
+}

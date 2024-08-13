@@ -1,23 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="mt" conformsTo="techpreview">
-  <names>
-    <name value="hardware-missing-flick" />
-  </names>
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="hardware-missing-flick" />
 
   <keys>
-    <key id="Q" to="Q" flicks="an-undefined-flick-id"/>
-    <key id="W" to="W" flicks="flick0" />
-    <flicks id="flick0">
-        <flick directions="nw se" to="ç" />
-    </flicks>
+    <key id="Q" output="Q" flickId="an-undefined-flick-id" />
+    <key id="W" output="W" flickId="flick0" />
   </keys>
-
-  <layers form="iso">
+  <flicks>
+    <flick id="flick0">
+      <flickSegment directions="nw se" keyId="c" />
+    </flick>
+  </flicks>
+  <layers formId="iso">
     <layer id="base">
       <!-- beware: this is mapping ` and 1! -->
       <row keys="Q W" />
     </layer>
   </layers>
-</keyboard>
+</keyboard3>

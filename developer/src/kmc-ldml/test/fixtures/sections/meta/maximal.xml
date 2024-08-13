@@ -1,16 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="mt" conformsTo="techpreview">
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
   <version number="1.2.3" />
 
-  <info author="The Keyman Team" indicator="QW" layout="QWIRKY" normalization="NFC" />
-
-  <names>
-    <name value="meta-maximal" />
-  </names>
-
-  <settings fallback="omit" />
+  <info author="The Keyman Team" indicator="QW" layout="QWIRKY" name="meta-maximal" />
 
   <keys />
-</keyboard>
+</keyboard3>

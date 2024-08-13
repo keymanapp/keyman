@@ -1,21 +1,16 @@
+<!DOCTYPE html>
 <html>
 <!--
  Copyright (C) 2017-2019 SIL International. All rights reserved.
 -->
-
 <head>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, user-scalable=no">
   <title>Keyman</title>
-  <!-- Provides polyfills needed by un-updated Chromium versions found
-       on older, but still-supported, Android APIs.
-
-       If and when our minimum supported Android version shipped with
-       Chromium version 54 or greater, we should be able to drop this
-       polyfill.
-  -->
-  <script src="es6-shim.min.js"></script>
-  <script src="keymanandroid.js"></script>
+  <!-- DOMRect only exists as of Chrome 61... thus coming later than ES6. -->
+  <script src="other-polyfills.js"></script>
+  <script src="keymanweb-webview.js"></script>
+  <script src="sentry.min.js"></script>
   <script src="keyman-sentry.js"></script>
   <script src="android-host.js"></script>
   <style type="text/css">
@@ -23,6 +18,5 @@
   </style>
 </head>
 <body class="kmw-embedded keyman-app">
-  <textarea id="ta" cols="1" rows="1" style="display: none;"></textarea>
 </body>
 </html>

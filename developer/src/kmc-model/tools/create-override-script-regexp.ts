@@ -1,5 +1,3 @@
-#!/usr/bin/env npx ts-node
-
 /**
  * Prints a JavaScript regular expression suitable for use in the
  * **overrideScriptDefaults** word breaker decorator.
@@ -67,7 +65,7 @@ export const HAS_SOUTHEAST_ASIAN_LETTER = /[${characterClasses}]/;`);
 ////////////////////////////////// Helpers ///////////////////////////////////
 
 function* unicodeData() {
-  let unicodeDataFile = readFileSync(path.join(UCD_DIR, "UnicodeData.txt"), "UTF-8");
+  let unicodeDataFile = readFileSync(path.join(UCD_DIR, "UnicodeData.txt"), "utf8");
   for (let line of unicodeDataFile.split("\n")) {
     if (line.trim() == "") {
       continue;
@@ -82,7 +80,7 @@ function* unicodeData() {
 }
 
 function* blocks() {
-  let blocksFile = readFileSync(path.join(UCD_DIR, "Blocks.txt"), "UTF-8");
+  let blocksFile = readFileSync(path.join(UCD_DIR, "Blocks.txt"), "utf8");
   for (let line of blocksFile.split("\n")) {
     if (line.trim() === "") {
       continue;

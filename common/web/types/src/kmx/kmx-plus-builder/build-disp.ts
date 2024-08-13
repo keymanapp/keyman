@@ -1,6 +1,6 @@
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { KMXPlusData } from "../kmx-plus.js";
-import { build_strs_index, BUILDER_STRS } from "./build-strs.js";
+import { build_strs_index, BUILDER_STR_REF, BUILDER_STRS } from "./build-strs.js";
 import { BUILDER_SECTION } from './builder-section.js';
 
 /* ------------------------------------------------------------------
@@ -11,13 +11,14 @@ import { BUILDER_SECTION } from './builder-section.js';
  * Builder for the 'disp' section
  */
 interface BUILDER_DISP_ITEM {
-  to: number;
-  display: number;
+  to: BUILDER_STR_REF;
+  id: BUILDER_STR_REF;
+  display: BUILDER_STR_REF;
 };
 
 export interface BUILDER_DISP extends BUILDER_SECTION {
   count: number;
-  baseCharacter: number;
+  baseCharacter: BUILDER_STR_REF;
   items: BUILDER_DISP_ITEM[];
 };
 
@@ -38,6 +39,7 @@ export function build_disp(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS): BUILD
   for(let item of kmxplus.disp.disps) {
     disp.items.push({
       to: build_strs_index(sect_strs, item.to),
+      id: build_strs_index(sect_strs, item.id),
       display: build_strs_index(sect_strs, item.display),
     });
   }

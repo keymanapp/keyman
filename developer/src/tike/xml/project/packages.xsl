@@ -9,7 +9,7 @@
           <p><img src='res/header_package.png' /></p>
           <div class='quicklinks'>
             <h3>Quick Links</h3>
-          
+
             <ul>
               <li><a href="help:guides/distribute/tutorial">Package Tutorial</a></li>
               <li><a href="help:context/package-editor">Package Editor Help</a></li>
@@ -22,11 +22,11 @@
 
           <p>After creating a keyboard, you should create a package in order to distribute the keyboard to all Windows, macOS, iOS and Android. A package can include multiple
           keyboards, fonts, a welcome page, documentation and shortcuts.</p>
-          
+
           <p>A package can be installed into any of the end user Keyman apps, and uploaded to the Keyman website to share with others.</p>
-          
+
           <p>Learn more about distributing your packages and keyboards on the Distribution tab.</p>
-                    
+
           <table class="io">
             <tr>
               <th colspan="4">Input Files</th>
@@ -48,29 +48,33 @@
           </table>
         </div>
       </div>
-   
+
+      <xsl:call-template name="upgrade-warning" />
+
       <div class='filelist' id="packagelist">
         <xsl:call-template name="button">
           <xsl:with-param name="caption">New package...</xsl:with-param>
           <xsl:with-param name="command">keyman:fileaddnew?type=package</xsl:with-param>
         </xsl:call-template>
-        <xsl:call-template name="button">
-          <xsl:with-param name="caption">Add existing package...</xsl:with-param>
-          <xsl:with-param name="command">keyman:fileaddexisting?type=package</xsl:with-param>
-        </xsl:call-template>
+        <xsl:if test="KeymanDeveloperProject/Options/Version != '2.0' or not(KeymanDeveloperProject/Options/Version)">
+          <xsl:call-template name="button">
+            <xsl:with-param name="caption">Add existing package...</xsl:with-param>
+            <xsl:with-param name="command">keyman:fileaddexisting?type=package</xsl:with-param>
+          </xsl:call-template>
+        </xsl:if>
         |
         <xsl:call-template name="button">
           <xsl:with-param name="caption">Build all</xsl:with-param>
           <xsl:with-param name="command">keyman:compileall</xsl:with-param>
           <xsl:with-param name="enabled">
-            <xsl:if test="not(KeymanDeveloperProject/Files/File[(FileType='.kps' or FileType='.kmn') and not (ParentFileID)])">false</xsl:if>
+            <xsl:if test="not(KeymanDeveloperProject/Files/File[(FileType='.kps' or FileType='.kmn' or FileType='.xml-ldml-keyboard') and not (ParentFileID)])">false</xsl:if>
           </xsl:with-param>
         </xsl:call-template>
         <xsl:call-template name="button">
           <xsl:with-param name="caption">Clean all</xsl:with-param>
           <xsl:with-param name="command">keyman:cleanall</xsl:with-param>
           <xsl:with-param name="enabled">
-            <xsl:if test="not(KeymanDeveloperProject/Files/File[(FileType='.kps' or FileType='.kmn') and not (ParentFileID)])">false</xsl:if>
+            <xsl:if test="not(KeymanDeveloperProject/Files/File[(FileType='.kps' or FileType='.kmn' or FileType='.xml-ldml-keyboard') and not (ParentFileID)])">false</xsl:if>
           </xsl:with-param>
           <xsl:with-param name="width">auto</xsl:with-param>
         </xsl:call-template>
@@ -90,12 +94,12 @@
           </xsl:with-param>
           <xsl:with-param name="width">auto</xsl:with-param>
         </xsl:call-template>
-        
+
         <br />
         <br />
 
         <div>
-          <xsl:for-each select="/KeymanDeveloperProject/Files/File[FileType='.kps' and not(ParentFileID)]">
+          <xsl:for-each select="$SourcePackageFiles">
             <xsl:variable name="FileState" select="/KeymanDeveloperProject/FileStates/FileState[ID=current()/ID]" />
             <xsl:call-template name="file">
               <xsl:with-param name="file_description"><xsl:if test="string-length(Details/Name) &gt; 0">(<xsl:value-of select="Details/Name" />)</xsl:if></xsl:with-param>
@@ -106,7 +110,7 @@
           </xsl:for-each>
         </div>
       </div>
-      
+
     </div>
   </xsl:template>
 
@@ -121,12 +125,6 @@
         <xsl:with-param name="caption">Build</xsl:with-param>
         <xsl:with-param name="command">keyman:compilefile?id=<xsl:value-of select="ID" /></xsl:with-param>
       </xsl:call-template>
-      <xsl:if test="/KeymanDeveloperProject/Modules/Module[ID='BrandingPack']">
-        <xsl:call-template name="menuitem">
-          <xsl:with-param name="caption">Build installer</xsl:with-param>
-          <xsl:with-param name="command">keyman:package_compileinstaller?id=<xsl:value-of select="ID" /></xsl:with-param>
-        </xsl:call-template>
-      </xsl:if>
       <xsl:call-template name="menuitem">
         <xsl:with-param name="caption">Clean</xsl:with-param>
         <xsl:with-param name="command">keyman:cleanfile?id=<xsl:value-of select="ID" /></xsl:with-param>
@@ -148,13 +146,15 @@
         <xsl:with-param name="command">keyman:openbuildfolder?id=<xsl:value-of select="ID" />
         </xsl:with-param>
       </xsl:call-template>
-      <xsl:call-template name="menuitem">
-        <xsl:with-param name="caption">Remove from Project</xsl:with-param>
-        <xsl:with-param name="command">keyman:removefile?id=<xsl:value-of select="ID" /></xsl:with-param>
-      </xsl:call-template>
+      <xsl:if test="/KeymanDeveloperProject/Options/Version != '2.0' or not(/KeymanDeveloperProject/Options/Version)">
+        <xsl:call-template name="menuitem">
+          <xsl:with-param name="caption">Remove from Project</xsl:with-param>
+          <xsl:with-param name="command">keyman:removefile?id=<xsl:value-of select="ID" /></xsl:with-param>
+        </xsl:call-template>
+      </xsl:if>
     </div>
   </xsl:template>
-  
+
   <xsl:template mode="filedetails" match="/KeymanDeveloperProject/Files/File[FileType='.kps']">
     <xsl:variable name="FileState" select="/KeymanDeveloperProject/FileStates/FileState[ID=current()/ID]" />
     <table class="filedetailtext">
@@ -196,5 +196,5 @@
       </a>
     </span><br />
   </xsl:template>
-  
+
 </xsl:stylesheet>

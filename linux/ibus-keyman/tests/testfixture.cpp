@@ -2,7 +2,7 @@
 #include <glib.h>
 #include <ibus.h>
 #include <iostream>
-#include <keyman/keyboardprocessor.h>
+#include <keyman/keyman_core_api.h>
 #include <kmx/kmx_processevent.h>
 #include <linux/input-event-codes.h>
 #include <list>
@@ -13,16 +13,9 @@
 #include "ibusimcontext.h"
 #include "keycodes.h"
 #include "keymanutil.h"
+#include "KeymanSystemServiceClient.h"
 #include "kmx_test_source.hpp"
 #include "testmodule.h"
-
-#ifdef GDK_WINDOWING_X11
-#include <X11/XKBlib.h>
-#include <gdk/gdkx.h>
-#endif
-#ifdef GDK_WINDOWING_WAYLAND
-#include <gdk/gdkwayland.h>
-#endif
 
 typedef struct {
   IBusBus *bus;
@@ -42,12 +35,7 @@ static gboolean use_wayland   = FALSE;
 static GdkWindow *window      = NULL;
 static GMainLoop *thread_loop = NULL;
 static GTypeModule *module    = NULL;
-#ifdef GDK_WINDOWING_X11
-static Display *display = NULL;
-#endif
-#ifdef GDK_WINDOWING_WAYLAND
-static GdkWaylandDisplay *wldisplay = NULL;
-#endif
+gboolean testing              = TRUE;
 
 static void
 module_register(GTypeModule *module) {
@@ -68,18 +56,6 @@ ibus_keyman_tests_fixture_set_up(IBusKeymanTestsFixture *fixture, gconstpointer 
     g_signal_connect(widget, "destroy", G_CALLBACK(destroy), NULL);
     window = gtk_widget_get_window(widget);
   }
-
-  GdkDisplay *gdkDisplay = gdk_display_get_default();
-#ifdef GDK_WINDOWING_X11
-  if (!use_wayland && !display && GDK_IS_X11_DISPLAY(gdkDisplay)) {
-    display = GDK_DISPLAY_XDISPLAY(gdkDisplay);
-  }
-#endif
-#ifdef GDK_WINDOWING_WAYLAND
-  if (use_wayland && !wldisplay && GDK_IS_WAYLAND_DISPLAY(gdkDisplay)) {
-    wldisplay = GDK_WAYLAND_DISPLAY(gdkDisplay);
-  }
-#endif
 
   if (!loaded) {
     ibus_init();
@@ -114,35 +90,12 @@ ibus_keyman_tests_fixture_tear_down(IBusKeymanTestsFixture *fixture, gconstpoint
 
 static void
 set_caps_lock_state(IBusKeymanTestsFixture *fixture, bool caps_lock_on) {
-#ifdef GDK_WINDOWING_X11
-  if (!use_wayland && display) {
-    XkbLockModifiers(display, XkbUseCoreKbd, LockMask, caps_lock_on ? LockMask : 0);
-    XSync(display, False);
-  }
-#endif
-#ifdef GDK_WINDOWING_WAYLAND
-  if (use_wayland && wldisplay) {
-    // TODO
-  }
-#endif
+  set_capslock_indicator((guint32)caps_lock_on);
 }
 
 static bool
 get_caps_lock_state(IBusKeymanTestsFixture *fixture) {
-#ifdef GDK_WINDOWING_X11
-  if (!use_wayland && display) {
-    XKeyboardState state;
-    XGetKeyboardControl(display, &state);
-    return state.led_mask & 1;
-  }
-#endif
-#ifdef GDK_WINDOWING_WAYLAND
-  if (use_wayland && wldisplay) {
-    // TODO
-  }
-#endif
-
-  return false;
+  return get_capslock_indicator();
 }
 
 static void
@@ -240,28 +193,28 @@ get_involved_keys(IBusKeymanTestsFixture *fixture, km::tests::key_event test_eve
 
   // process all modifiers
   std::list<gdk_key_event> result;
-  if (test_event.modifier_state & KM_KBP_MODIFIER_SHIFT) {
+  if (test_event.modifier_state & KM_CORE_MODIFIER_SHIFT) {
     // we don't distinguish between R and L Shift
     result.push_back(get_key_event_for_modifier(IBUS_SHIFT_MASK, modifiers, GDK_KEY_Shift_L, KEY_LEFTSHIFT));
   }
-  if (test_event.modifier_state & KM_KBP_MODIFIER_ALT || test_event.modifier_state & KM_KBP_MODIFIER_LALT) {
+  if (test_event.modifier_state & KM_CORE_MODIFIER_ALT || test_event.modifier_state & KM_CORE_MODIFIER_LALT) {
     result.push_back(get_key_event_for_modifier(IBUS_MOD1_MASK, modifiers, GDK_KEY_Alt_L, KEY_LEFTALT));
   }
-  if (test_event.modifier_state & KM_KBP_MODIFIER_RALT) {
+  if (test_event.modifier_state & KM_CORE_MODIFIER_RALT) {
     if (test_event.vk == KEYMAN_RALT)
       result.push_back(get_key_event_for_modifier(IBUS_MOD1_MASK, modifiers, GDK_KEY_Alt_R, KEY_RIGHTALT));
     else
       result.push_back(get_key_event_for_modifier(IBUS_MOD5_MASK, modifiers, GDK_KEY_Alt_R, KEY_RIGHTALT));
   }
-  if (test_event.modifier_state & KM_KBP_MODIFIER_CTRL || test_event.modifier_state & KM_KBP_MODIFIER_LCTRL) {
+  if (test_event.modifier_state & KM_CORE_MODIFIER_CTRL || test_event.modifier_state & KM_CORE_MODIFIER_LCTRL) {
     result.push_back(get_key_event_for_modifier(IBUS_CONTROL_MASK, modifiers, GDK_KEY_Control_L, KEY_LEFTCTRL));
   }
-  if (test_event.modifier_state & KM_KBP_MODIFIER_RCTRL) {
+  if (test_event.modifier_state & KM_CORE_MODIFIER_RCTRL) {
     result.push_back(get_key_event_for_modifier(IBUS_CONTROL_MASK, modifiers, GDK_KEY_Control_R, KEY_RIGHTCTRL));
   }
 
   // process key
-  guint keyval = (test_event.modifier_state & KM_KBP_MODIFIER_SHIFT) ? gdk_keyval_to_upper(test_event.vk)
+  guint keyval = (test_event.modifier_state & KM_CORE_MODIFIER_SHIFT) ? gdk_keyval_to_upper(test_event.vk)
                                                                      : gdk_keyval_to_lower(test_event.vk);
 
   // REVIEW: the keyval we use here are not correct for < 0x20 and >= 0x7f
@@ -290,8 +243,8 @@ get_context_keys(std::u16string context) {
           G_LOG_DOMAIN, __FILE__, __LINE__, G_STRFUNC, "We can only deal with ASCII characters in the context", utf8, "", "");
     }
     result.push_back(
-        {km::kbp::kmx::s_char_to_vkey[(int)utf8[0] - 32].vk,
-         (uint16_t)(km::kbp::kmx::s_char_to_vkey[(int)utf8[0] - 32].shifted ? KM_KBP_MODIFIER_SHIFT : 0)});
+        {km::core::kmx::s_char_to_vkey[(int)utf8[0] - 32].vk,
+         (uint16_t)(km::core::kmx::s_char_to_vkey[(int)utf8[0] - 32].shifted ? KM_CORE_MODIFIER_SHIFT : 0)});
   }
   return result;
 }
@@ -356,18 +309,18 @@ static void test_source(IBusKeymanTestsFixture *fixture, gconstpointer user_data
 
   km::tests::KmxTestSource test_source;
   std::string keys        = "";
-  std::u16string expected = u"", context = u"";
+  std::u16string expected = u"", expected_context = u"", context = u"";
   km::tests::kmx_options options;
   bool expected_beep = false;
   // NOTE: we don't verify expected beeps since engine.c directly calls a gdk method so we
   // don't know when it gets called.
-  g_assert_cmpint(test_source.load_source(sourcefile.c_str(), keys, expected, context, options, expected_beep), ==, 0);
+  g_assert_cmpint(test_source.load_source(sourcefile.c_str(), keys, expected, expected_context, context, options, expected_beep), ==, 0);
 
   for (auto & option : options) {
     if (option.type == km::tests::KOT_INPUT) {
       auto key = g_utf16_to_utf8((gunichar2 *)option.key.c_str(), option.key.length(), NULL, NULL, NULL);
       auto value = g_utf16_to_utf8((gunichar2 *)option.value.c_str(), option.value.length(), NULL, NULL, NULL);
-      keyman_put_options_todconf(data->test_name, data->test_name, key, value);
+      keyman_put_keyboard_options_todconf(data->test_name, data->test_name, key, value);
     }
   }
   g_settings_sync();
@@ -493,23 +446,6 @@ main(int argc, char *argv[]) {
     return 2;
   }
 
-  if (!argWayland && !argX11) {
-    GdkDisplay *gdkDisplay = gdk_display_get_default();
-#ifdef GDK_WINDOWING_WAYLAND
-    if (GDK_IS_WAYLAND_DISPLAY(gdkDisplay)) {
-      argWayland = true;
-    } else
-#endif
-#ifdef GDK_WINDOWING_X11
-    if (GDK_IS_X11_DISPLAY(gdkDisplay)) {
-      argX11 = true;
-    } else
-#endif
-    {
-      g_error("Neither X11 nor Wayland display!");
-    }
-  }
-
   use_wayland     = argWayland;
   int nTests      = argc - iArg;
   char **tests    = &argv[iArg];
@@ -528,13 +464,6 @@ main(int argc, char *argv[]) {
       skipReason = "mnemonic keyboards are not yet supported on Linux (#3345)";
     }
 
-    // Wayland related tests - #4273
-    if (use_wayland && (
-        strcmp(filename->str, "k_031___caps_lock") == 0 ||
-        strcmp(filename->str, "k_032___caps_control") == 0)) {
-      skipReason = "capslock related keyboards are not yet working with Wayland (#4273)";
-    }
-
     if (runSurroundingTextTests) {
       add_test(directory, filename->str, TRUE, skipReason, use_wayland);
     }
@@ -548,20 +477,6 @@ main(int argc, char *argv[]) {
 
   // Run tests
   int retVal = g_test_run();
-
-  // Cleanup
-#ifdef GDK_WINDOWING_X11
-  if (!use_wayland && display) {
-    XCloseDisplay(display);
-    display = NULL;
-  }
-#endif
-#ifdef GDK_WINDOWING_WAYLAND
-  if (use_wayland) {
-    // REVIEW: do we have to call something for cleanup?
-    wldisplay = NULL;
-  }
-#endif
 
   test_module_unuse(module);
   return retVal;

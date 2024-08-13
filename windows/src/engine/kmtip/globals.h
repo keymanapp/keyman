@@ -45,33 +45,54 @@ void DllRelease();
 
 void InsertTextAtSelection(TfEditCookie ec, ITfContext *pContext, const WCHAR *pchText, ULONG cchText);
 void DeleteLeftOfSelection(TfEditCookie ec, ITfContext *pContext, LONG n);
-BOOL GetLeftOfSelection(TfEditCookie ec, ITfContext *pContext, WCHAR *buf, LONG n);   // I4933
+/**
+ * Retrieves the text to the left of the current selection in the context.
+ * In addition it also returns the output values of the TSF call 'GetSelection'.
+ * 
+ * @param[in]   ec               The edit cookie.
+ * @param[in]   pContext         The text input context.
+ * @param[out]  buf              The buffer to store the text.
+ * @param[in]   n                The maximum number of characters to retrieve.
+ * @param[out]  hrGetSelection   The result of the 'GetSelection' call.
+ * @param[out]  cFetched         The number of selections fetched.
+ * @param[out]  tfSelection      The selection details.
+ * @return                       TRUE if successful, otherwise FALSE.
+ */
+BOOL GetLeftOfSelection(TfEditCookie ec, ITfContext *pContext, WCHAR *buf, LONG n, HRESULT *hrGetSelection, ULONG *cFetched, TF_SELECTION *tfSelection);  // I4933
 void GetDeadkeyFlags(TfEditCookie ec, ITfContext *pContext, PWSTR buf, int n);
 
 //
 // Logging functions
 //
 
-void Log(WCHAR *fmt, ...);
+// Following macros widen a constant string, ugly it is true
+#define __WIDEN2__(m)  L ## m
+#define __WIDEN1__(m)  __WIDEN2__(m)
+
+#define __WIDEN__(m)  __WIDEN1__(m)
+#define __WFILE__ __WIDEN1__(__FILE__)
+#define __WFUNCTION__ __WIDEN1__(__FUNCTION__)
 
 BOOL ShouldDebug();
-int SendDebugMessage_1(char *file, int line, PWCHAR msg);   // I4379
-int SendDebugMessageFormat_1(char *file, int line, PWCHAR fmt, ...);   // I4379
-void DebugLastError_1(char *file, int line, char *func, PWCHAR msg, DWORD err);
+int SendDebugMessage_1(wchar_t *file, int line, wchar_t *function, PWCHAR msg);   // I4379
+int SendDebugMessageFormat_1(wchar_t *file, int line, wchar_t *function, PWCHAR fmt, ...);   // I4379
+void DebugLastError_1(wchar_t *file, int line, wchar_t *function, PWCHAR msg, DWORD err);
 
-#define SendDebugMessage(msg) (SendDebugMessage_1(__FILE__, __LINE__, (msg)))
-#define SendDebugMessageFormat(msg,...) (SendDebugMessageFormat_1(__FILE__, __LINE__, (msg),__VA_ARGS__))
+#define SendDebugMessage(msg) (SendDebugMessage_1(__WFILE__, __LINE__, __WFUNCTION__, (msg)))
+#define SendDebugMessageFormat(msg,...) (SendDebugMessageFormat_1(__WFILE__, __LINE__, __WFUNCTION__, (msg),__VA_ARGS__))
 
-#define DebugLastError(msg) (DebugLastError_1(__FILE__,__LINE__,__FUNCTION__,(msg),GetLastError()))
-#define DebugLastError0(msg,err) (DebugLastError_1(__FILE__,__LINE__,__FUNCTION__,(msg),(err)))
+#define DebugLastError(msg) (DebugLastError_1(__WFILE__,__LINE__,__WFUNCTION__,(msg),GetLastError()))
+#define DebugLastError0(msg,err) (DebugLastError_1(__WFILE__,__LINE__,__WFUNCTION__,(msg),(err)))
 
-#define LogSUCCEEDED(hr) _LogSUCCEEDED(__FILE__, __LINE__, __FUNCTIONW__, (#hr), (hr))
-BOOL _LogSUCCEEDED(char *file, int line, PWSTR caller, PSTR callee, HRESULT hr);
+#define LogSUCCEEDED(hr) _LogSUCCEEDED(__WFILE__, __LINE__, __WFUNCTION__, (#hr), (hr))
+BOOL _LogSUCCEEDED(wchar_t *file, int line, PWSTR caller, PSTR callee, HRESULT hr);
 
-//#define LogEnter() (SendDebugMessageFormat_1(__FILE__, __LINE__, L"%hs ENTER", __FUNCTION__))
-//#define LogExit() (SendDebugMessageFormat_1(__FILE__, __LINE__, L"%hs EXIT", __FUNCTION__))
-#define LogEnter()
-#define LogExit()
+#define SendDebugEntry() (ShouldDebug() ? SendDebugEntry_1(__WFILE__, __LINE__, __WFUNCTION__) : 0)
+#define SendDebugExit() (ShouldDebug() ? SendDebugExit_1(__WFILE__, __LINE__, __WFUNCTION__) : 0)
+#define return_SendDebugExit(v) { SendDebugExit(); return v; }
+
+int SendDebugEntry_1(wchar_t* file, int line, wchar_t* function);
+int SendDebugExit_1(wchar_t* file, int line, wchar_t* function);
 
 //
 // Defines

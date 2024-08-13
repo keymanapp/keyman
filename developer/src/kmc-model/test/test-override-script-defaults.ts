@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import defaultWordBreaker from './wordbreakers/default-wordbreaker-esm.js';
+import defaultWordBreaker from '@keymanapp/models-wordbreakers';
 import {decorateWithScriptOverrides} from '../src/script-overrides-decorator.js';
 
 const THIN_SPACE = "\u2009";

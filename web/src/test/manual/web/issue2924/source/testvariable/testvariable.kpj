@@ -52,13 +52,6 @@
       <FileType>.md</FileType>
     </File>
     <File>
-      <ID>id_efaa79249320cda8d8e2886ddbf0475e</ID>
-      <Filename>testvariable.keyboard_info</Filename>
-      <Filepath>testvariable.keyboard_info</Filepath>
-      <FileVersion></FileVersion>
-      <FileType>.keyboard_info</FileType>
-    </File>
-    <File>
       <ID>id_0c280146c90477c06029a32b48581f90</ID>
       <Filename>testvariable.kmx</Filename>
       <Filepath>source\..\build\testvariable.kmx</Filepath>

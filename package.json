@@ -2,24 +2,43 @@
   "name": "root",
   "private": true,
   "devDependencies": {
-    "chai": "^4.3.4",
-    "mocha": "^10.0.0",
-    "mocha-teamcity-reporter": "^4.0.0",
-    "ts-node": "^10.9.1",
-    "typescript": "^4.9.5",
-    "@typescript-eslint/eslint-plugin": "^5.59.1",
+    "@microsoft/api-documenter": "^7.23.31",
+    "@microsoft/api-extractor": "^7.47.3",
+    "@types/chai": "^4.3.14",
+    "@types/node": "^20.4.1",
+    "@typescript-eslint/eslint-plugin": "^7.13.1",
+    "@web/dev-server-esbuild": "^1.0.2",
+    "@web/dev-server-import-maps": "^0.2.0",
+    "@web/test-runner": "^0.18.1",
+    "@web/test-runner-playwright": "^0.11.0",
+    "ajv": "^8.12.0",
+    "ajv-cli": "^5.0.0",
+    "ajv-formats": "^2.1.1",
+    "chai": "^5.1.0",
+    "esbuild": "^0.18.9",
     "eslint": "^8.39.0",
-    "eslint-config-standard-with-typescript": "^34.0.1",
+    "eslint-config-love": "^53.0.0",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-n": "^15.7.0",
-    "eslint-plugin-promise": "^6.1.1"
+    "eslint-plugin-promise": "^6.1.1",
+    "mocha": "^10.0.0",
+    "mocha-teamcity-reporter": "^4.0.0",
+    "playwright": "^1.43.1",
+    "sinon": "^17.0.1",
+    "source-map-support": "^0.5.21",
+    "tslib": "^2.5.2",
+    "typescript": "^5.4.5"
   },
   "scripts": {},
   "workspaces": [
     "resources/gosh",
+    "resources/tools/strip-emoji",
     "resources/build/version",
     "core/include/ldml",
     "developer/src/common/web/test-helpers",
+    "developer/src/common/web/utils",
+    "developer/src/kmc-analyze",
+    "developer/src/kmc-keyboard-info",
     "developer/src/kmc-kmn",
     "developer/src/kmc-ldml",
     "developer/src/kmc-model",
@@ -28,6 +47,7 @@
     "developer/src/kmc",
     "developer/src/server",
     "common/models/*",
+    "common/test/resources",
     "common/tools/*",
     "common/web/*",
     "common/predictive-text",
@@ -35,10 +55,14 @@
     "web"
   ],
   "dependencies": {
+    "@keymanapp/common-types": "file:common/web/types",
+    "@keymanapp/developer-test-helpers": "file:developer/src/common/web/test-helpers",
+    "@keymanapp/developer-utils": "file:developer/src/common/web/utils",
     "@keymanapp/hextobin": "file:common/tools/hextobin",
     "@keymanapp/keyman-version": "file:common/web/keyman-version",
-    "@keymanapp/common-types": "file:common/web/types",
-    "@keymanapp/ldml-keyboard-constants": "file:core/include/ldml",
-    "@keymanapp/developer-test-helpers": "file:developer/src/common/web/test-helpers"
+    "@keymanapp/ldml-keyboard-constants": "file:core/include/ldml"
+  },
+  "engines": {
+    "node": "20.16.0"
   }
 }

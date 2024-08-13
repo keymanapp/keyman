@@ -2,7 +2,7 @@ import {parseWordListFromContents, parseWordListFromFilename, WordList} from '..
 import {assert} from 'chai';
 import 'mocha';
 import { makePathToFixture } from './helpers/index.js';
-import { ModelCompilerMessages } from '../src/model-compiler-errors.js';
+import { ModelCompilerMessages } from '../src/model-compiler-messages.js';
 import { setCompilerCallbacks } from '../src/compiler-callbacks.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 
@@ -108,9 +108,9 @@ describe('parsing a word list', function () {
 
     assert.lengthOf(testCallbacks.messages, 4);
     // hello has been seen multiple times:
-    assert.isTrue(testCallbacks.hasMessage(ModelCompilerMessages.WARN_DuplicateWordInSameFile));
+    assert.isTrue(testCallbacks.hasMessage(ModelCompilerMessages.HINT_DuplicateWordInSameFile));
     // helló and hello + U+0301 have both been seen:
-    assert.isTrue(testCallbacks.hasMessage(ModelCompilerMessages.WARN_MixedNormalizationForms));
+    assert.isTrue(testCallbacks.hasMessage(ModelCompilerMessages.HINT_MixedNormalizationForms));
 
     // Let's parse another file:
 
@@ -119,9 +119,9 @@ describe('parsing a word list', function () {
     parseWordListFromContents(repeatedWords, "hello\u0301\t5\n");
     assert.lengthOf(testCallbacks.messages, 1);
     // hello + U+0301 (NFD) has been seen, but...
-    assert.isTrue(testCallbacks.hasMessage(ModelCompilerMessages.WARN_MixedNormalizationForms));
+    assert.isTrue(testCallbacks.hasMessage(ModelCompilerMessages.HINT_MixedNormalizationForms));
     // BUT! We have not seen a duplicate **within the same file**
-    assert.isFalse(testCallbacks.hasMessage(ModelCompilerMessages.WARN_DuplicateWordInSameFile));
+    assert.isFalse(testCallbacks.hasMessage(ModelCompilerMessages.HINT_DuplicateWordInSameFile));
 
     assert.deepEqual(repeatedWords, {
       hello: expected['hello'],

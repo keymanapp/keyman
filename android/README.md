@@ -1,33 +1,48 @@
 # Keyman for Android & Keyman Engine for Android
 
 ## Prerequisites
-See [build configuration](../docs/build/index.md) for details on how to configure your build environment.
+
+See [build configuration](../docs/build/index.md) for details on how to configure
+your build environment.
 
 ## Keyman Minimum Android Requirements
+
 Keyman for Android has a minSdkVersion of 21 for [Android 5.0 Lollipop](https://developer.android.com/about/versions/lollipop)
 
 ## Keyman for Android Development
-Keyman for Android (formerly named KMAPro) can be built from a command line (preferred) or Android Studio.
 
-Building Keyman Web is a precursor for compiling KMEA, so verify your system has all the [Minimum Web Compilation Requirements](../web/README.md#minimum-web-compilation-requirements)
+Keyman for Android (formerly named KMAPro) can be built from a command line
+(preferred) or Android Studio.
 
-When attempting to build via Android Studio the first time, you'll also need to accept the SDK licenses. Depending on your OS, you may need to run a command line similar to:
+Building Keyman Web is a precursor for compiling KMEA, so verify your system has
+all the [Minimum Web Compilation Requirements](../web/README.md#minimum-web-compilation-requirements)
+
+When attempting to build via Android Studio the first time, you'll also need to
+accept the SDK licenses. Depending on your OS, you may need to run a command
+line similar to:
+
 ```bash
 yes | ~/Library/Android/sdk/tools/bin/sdkmanager --licenses
 ```
 
 ### Crash Reporting
-Keyman for Android uses [Sentry](https://sentry.io) for crash reporting at a server https://sentry.keyman.com. The analytics for Debug are associated with an App Bundle ID `com.tavultesoft.kmapro.debug`.
- 
+
+Keyman for Android uses [Sentry](https://sentry.io) for crash reporting. The 
+analytics for Debug are associated with an App Bundle ID 
+`com.tavultesoft.kmapro.debug`.
+
 ### Compiling From Command Line
+
 1. Launch a command prompt and cd to the directory **keyman/android**
 2. Run the top level build script `./build.sh configure build --debug` which will:
     * Compile KMEA (and its KMW dependency)
     * Download default keyboard and dictionary resources as needed
     * Compile KMAPro
-3. The APK will be found in **keyman/android/KMAPro/kMAPro/build/outputs/apk/debug/keyman-${version}.apk** where `${version}` is the current version number.
+3. The APK will be found in **keyman/android/KMAPro/kMAPro/build/outputs/apk/debug/keyman-\${version}.apk**
+   where `${version}` is the current version number.
 
 ### Compiling From Android Studio
+
 1. Ensure that [Keyman Engine for Android](#how-to-build-keyman-engine-for-android) is built.
 2. Launch Android Studio and import the Gradle project **keyman/android/KMAPro/build.gradle**
 3. From the project view, *configure* anything that Gradle reports.
@@ -37,24 +52,31 @@ Keyman for Android uses [Sentry](https://sentry.io) for crash reporting at a ser
     3. Change Module to kMAPro
     4. Name your run configuration kMAPro (or as desired)
 5. Run your new configuration: Select Run --> Run 'kMAPro'
-6. Select a physical device or create a new virtual device to match your target API version
-    For Ubuntu 18.04, you will need to add your user to the `kvm` group for permission accessing the emulator.
-```
+6. Select a physical device or create a new virtual device to match your target
+   API version.
+
+   For Ubuntu 18.04, you will need to add your user to the `kvm` group
+   for permission accessing the emulator.
+
+   ```bash
     sudo apt install qemu-kvm
     sudo adduser <username> kvm
-```
+   ```
 
 ### Running From Command Line
+
 1. Launch a command prompt
 2. Ensure that a physical device is connected or an emulator is running.
     1. To list physical devices: `$ANDROID_HOME/platform-tools/adb.exe devices`
     2. To list created emulator devices: `$ANDROID_HOME/tools/emulator.exe -list-avds`
-    3. [Create a new virtual device](https://developer.android.com/studio/run/managing-avds.html) if there are no
-    existing devices.    
+    3. [Create a new virtual device](https://developer.android.com/studio/run/managing-avds.html)
+       if there are no existing devices.
     4. Start an emulator: `$ANDROID_HOME/tools/emulator.exe @nameofemulator`
 3. Load the APK: `$ANDROID_HOME/platform-tools/adb.exe install -r path/to/apk.apk`
-    * If multiple devices are connected you may need `$ANDROID_HOME/platform-tools/adb.exe install -r -s SERIAL path/to/apk.apk`. Replace `SERIAL` with
-       the device serial number listed in step 2.
+
+    * If multiple devices are connected you may need
+      `$ANDROID_HOME/platform-tools/adb.exe install -r -s SERIAL path/to/apk.apk`.
+      Replace `SERIAL` with the device serial number listed in step 2.
 
 ### Compiling the app's offline help
 Keyman for Android help is maintained in the Markdown files in android/help/.
@@ -113,7 +135,7 @@ Keyman Engine for Android library (**keyman-engine.aar**) is now ready to be imp
 4. Check that the `android{}` object, includes the following:
 ```gradle
 android {
-    compileSdkVersion 33
+    compileSdkVersion 34
 
     // Don't compress kmp files so they can be copied via AssetManager
     aaptOptions {
@@ -132,10 +154,10 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.6.0-rc01'
-    implementation 'com.google.android.material:material:1.6.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.12.0'
     api (name:'keyman-engine', ext:'aar')
-    implementation 'androidx.preference:preference:1.2.0'
+    implementation 'androidx.preference:preference:1.2.1'
 
     // Include this if you want to have QR Codes displayed on Keyboard Info
     implementation ('com.github.kenglxn.QRGen:android:3.0.1') {

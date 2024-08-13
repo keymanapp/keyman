@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+@@keys: [K_A][K_B][K_A][K_BKQUOTE][K_B][K_Q][K_BKQUOTE][K_B][K_W][K_BKQUOTE][K_E][K_B][K_E][K_1][K_B][K_D][K_1][K_B][K_C][K_1][K_SPACE][SHIFT K_A][K_BKQUOTE][K_B][SHIFT K_E][K_1]
+@@expected: abplusbPlusbPLUSebasteriskbAsteriskbASTERISK tardbstar
+-->
+
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="en" conformsTo="45">
+  <info author="srl295" indicator="🙀" layout="qwerty" name="k_030_transform_plus" />
+
+  <keys>
+    <key id="plus" output="+" />
+    <key id="asterisk" output="*" />
+  </keys>
+
+  <layers formId="us">
+    <layer modifiers="none" id="base">
+      <row keys="plus asterisk 2 3 4 5 6 7 8 9 0" />
+      <row keys="q w e r t y u i o p" />
+      <row keys="a s d f g h j k l" />
+      <row keys="z x c v b n m" />
+      <row keys="space" />
+    </layer>
+    <layer modifiers="shift" id="base">
+      <row keys="gap" />
+      <row keys="Q W E R T Y U I O P" />
+      <row keys="A S D F G H J K L" />
+      <row keys="Z X C V B N M" />
+      <row keys="space" />
+    </layer>
+  </layers>
+
+  <variables>
+    <string id="plus" value="+"/>
+    <string id="plusescaped" value="\u{002B}"/>
+    <string id="asterisk" value="*"/>
+    <string id="asteriskescaped" value="\u{002A}"/>
+  </variables>
+
+  <transforms type="simple">
+    <transformGroup>
+      <!-- these three should all be the same -->
+      <transform from="a\u{002B}" to="plus" />
+      <transform from="A\+" to="tard" />
+      <transform from="q${plus}" to="Plus" />
+      <transform from="w${plusescaped}" to="PLUS" />
+      <transform from="e\u{002A}" to="asterisk" />
+      <transform from="E\*" to="star" />
+      <transform from="d${asterisk}" to="Asterisk" />
+      <transform from="c${asteriskescaped}" to="ASTERISK" />
+    </transformGroup>
+  </transforms>
+</keyboard3>

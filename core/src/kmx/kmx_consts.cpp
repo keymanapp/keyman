@@ -2,26 +2,26 @@
 #include "kmx_processevent.h"
 
 namespace km {
-namespace kbp {
+namespace core {
 namespace kmx {
 
 const struct char_to_vkey s_char_to_vkey[] = {
-  {KM_KBP_VKEY_SPACE, 0, 0},     //
+  {KM_CORE_VKEY_SPACE, 0, 0},     //
   {'1', 1, 0},       // !
-  {KM_KBP_VKEY_QUOTE, 1, 0},  // "
+  {KM_CORE_VKEY_QUOTE, 1, 0},  // "
   {'3', 1, 0},       // #
   {'4', 1, 0},       // $
   {'5', 1, 0},       // %
   {'7', 1, 0},       // &
-  {KM_KBP_VKEY_QUOTE, 0, 0},     // '
+  {KM_CORE_VKEY_QUOTE, 0, 0},     // '
   {'9', 1, 0},       // (
   {'0', 1, 0},       // )
   {'8', 1, 0},       // *
-  {KM_KBP_VKEY_EQUAL, 1, 0},  // +
-  {KM_KBP_VKEY_COMMA, 0, 0},     // ,
-  {KM_KBP_VKEY_HYPHEN, 0, 0},    // -
-  {KM_KBP_VKEY_PERIOD, 0, 0},    // .
-  {KM_KBP_VKEY_SLASH, 0, 0},     // /
+  {KM_CORE_VKEY_EQUAL, 1, 0},  // +
+  {KM_CORE_VKEY_COMMA, 0, 0},     // ,
+  {KM_CORE_VKEY_HYPHEN, 0, 0},    // -
+  {KM_CORE_VKEY_PERIOD, 0, 0},    // .
+  {KM_CORE_VKEY_SLASH, 0, 0},     // /
   {'0', 0, 0},
   {'1', 0, 0},
   {'2', 0, 0},
@@ -32,12 +32,12 @@ const struct char_to_vkey s_char_to_vkey[] = {
   {'7', 0, 0},
   {'8', 0, 0},
   {'9', 0, 0},
-  {KM_KBP_VKEY_COLON, 1, 0},  // :
-  {KM_KBP_VKEY_COLON, 0, 0},     // ;
-  {KM_KBP_VKEY_COMMA, 1, 0},  // <
-  {KM_KBP_VKEY_EQUAL, 0, 0},     // =
-  {KM_KBP_VKEY_PERIOD, 1, 0}, // >
-  {KM_KBP_VKEY_SLASH, 1, 0},  // ?
+  {KM_CORE_VKEY_COLON, 1, 0},  // :
+  {KM_CORE_VKEY_COLON, 0, 0},     // ;
+  {KM_CORE_VKEY_COMMA, 1, 0},  // <
+  {KM_CORE_VKEY_EQUAL, 0, 0},     // =
+  {KM_CORE_VKEY_PERIOD, 1, 0}, // >
+  {KM_CORE_VKEY_SLASH, 1, 0},  // ?
   {'2', 1, 0},       // @
   {'A', 1, 1},
   {'B', 1, 1},
@@ -65,12 +65,12 @@ const struct char_to_vkey s_char_to_vkey[] = {
   {'X', 1, 1},
   {'Y', 1, 1},
   {'Z', 1, 1},
-  {KM_KBP_VKEY_LBRKT, 0, 0},
-  {KM_KBP_VKEY_BKSLASH, 0, 0},
-  {KM_KBP_VKEY_RBRKT, 0, 0},
+  {KM_CORE_VKEY_LBRKT, 0, 0},
+  {KM_CORE_VKEY_BKSLASH, 0, 0},
+  {KM_CORE_VKEY_RBRKT, 0, 0},
   {'6', 1, 0},
-  {KM_KBP_VKEY_HYPHEN, 1, 0},
-  {KM_KBP_VKEY_BKQUOTE, 0, 0},
+  {KM_CORE_VKEY_HYPHEN, 1, 0},
+  {KM_CORE_VKEY_BKQUOTE, 0, 0},
   {'A', 0, 1},
   {'B', 0, 1},
   {'C', 0, 1},
@@ -97,13 +97,13 @@ const struct char_to_vkey s_char_to_vkey[] = {
   {'X', 0, 1},
   {'Y', 0, 1},
   {'Z', 0, 1},
-  {KM_KBP_VKEY_LBRKT, 1, 0},
-  {KM_KBP_VKEY_BKSLASH, 1, 0},
-  {KM_KBP_VKEY_RBRKT, 1, 0},
-  {KM_KBP_VKEY_BKQUOTE, 1, 0},
+  {KM_CORE_VKEY_LBRKT, 1, 0},
+  {KM_CORE_VKEY_BKSLASH, 1, 0},
+  {KM_CORE_VKEY_RBRKT, 1, 0},
+  {KM_CORE_VKEY_BKQUOTE, 1, 0},
   {0, 0, 0}
 };
 
 } // namespace kmx
-} // namespace kbp
+} // namespace core
 } // namespace km

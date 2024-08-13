@@ -52,13 +52,6 @@
       <FileType>.md</FileType>
     </File>
     <File>
-      <ID>id_e7fcb5e5546db6914d2f9d00de067f23</ID>
-      <Filename>test_917.keyboard_info</Filename>
-      <Filepath>test_917.keyboard_info</Filepath>
-      <FileVersion></FileVersion>
-      <FileType>.keyboard_info</FileType>
-    </File>
-    <File>
       <ID>id_00188325e13e88dc8f51b78b3fcd756e</ID>
       <Filename>test_917.kmx</Filename>
       <Filepath>source\..\build\test_917.kmx</Filepath>

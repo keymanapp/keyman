@@ -2,18 +2,15 @@
 #
 # Compile KeymanWeb's 'keyboard-processor' module, one of the components of Web's 'core' module.
 #
-set -eu
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
+BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
 
 ################################ Main script ################################
 
@@ -30,43 +27,31 @@ builder_describe "Builds the standalone, headless form of Keyman Engine for Web'
 
 builder_describe_outputs \
   configure          /node_modules \
-  build              /common/web/input-processor/build/index.js
+  build              /common/web/input-processor/build/lib/index.mjs \
 
 builder_parse "$@"
 
-### CONFIGURE ACTIONS
+function do_build() {
+  tsc -b ./tsconfig.json
 
-if builder_start_action configure; then
-  verify_npm_setup
-  builder_finish_action success configure
-fi
+  $BUNDLE_CMD    "${KEYMAN_ROOT}/common/web/input-processor/build/obj/index.js" \
+    --out        "${KEYMAN_ROOT}/common/web/input-processor/build/lib/index.mjs" \
+    --format esm
 
-### CLEAN ACTIONS
+  # Declaration bundling.
+  tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+}
 
-if builder_start_action clean; then
-  rm -rf build/
-  builder_finish_action success clean
-fi
-
-### BUILD ACTIONS
-
-if builder_start_action build; then
-  tsc --build src/tsconfig.json
-  builder_finish_action success build
-fi
-
-# TEST ACTIONS
-
-if builder_start_action test; then
-  FLAGS=
+function do_test() {
+  local FLAGS=
   if builder_has_option --ci; then
     FLAGS="--reporter mocha-teamcity-reporter"
   fi
 
-  # Build the leaf-style, bundled version of input-processor for use in testing.
-  tsc -b src/tsconfig.bundled.json
-
   mocha --recursive $FLAGS ./tests/cases/
+}
 
-  builder_finish_action success test
-fi
+builder_run_action configure  verify_npm_setup
+builder_run_action clean      rm -rf build/
+builder_run_action build      do_build
+builder_run_action test       do_test

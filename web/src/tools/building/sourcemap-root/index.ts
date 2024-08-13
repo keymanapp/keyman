@@ -1,13 +1,19 @@
 import SourcemapRemapper from "@keymanapp/sourcemap-path-remapper"
+import convertSourceMap from 'convert-source-map'; // Transforms sourcemaps among various common formats.
+                                                   // Base64, stringified-JSON, end-of-file comment...
+import fs from 'fs';
 
 function displayHelp() {
   console.log("KeymanWeb's sourcemap-cleansing tool.  This tool is designed to produce clean filepaths");
   console.log("in the sourcemaps for ease of reference in browser and Sentry, copying the clean paths TS");
   console.log("is able to provide, whereas Closure's minification is not.");
   console.log("");
-  console.log("Usage:  node sourcemap-root <source.map> <dest.map> [-c|--clean] [-s|--sourceRoot <path>]");
+  console.log("Usage:  node sourcemap-root <source.js> <source.map> [-c|--clean] [-s|--sourceRoot <path>]");
   console.log("        -c|--clean Runs source-filepath cleaning operations.");
+  console.log("        -i|--inline Inlines <source.map> as a comment within <source.js>.");
   console.log("        -s|--sourceRoot <path> Sets the input sourcemap's 'sourceRoot' to <path>.");
+  console.log("");
+  console.log("        <source.js> is ignored unless the --inline option is specified.");
 }
 
 // By default, any node-based process has two command-line args:
@@ -38,15 +44,17 @@ function assert_is_map(filename: string) {
     process.exit(1);
   }
 }
-// Verify the first parameter is a sourcemap filepath.
-// let sourceFile = process.argv[2]; // Used to be necessary, but no longer is.
-let destFile = process.argv[3];
 
-assert_is_map(destFile);
+// Verify the second parameter is a sourcemap filepath.
+let scriptFile = process.argv[2];
+let mapFile = process.argv[3];
+
+assert_is_map(mapFile);
 
 // Now to process any additional flags.
 var sourceRoot = "";
 let shouldClean = false;
+let shouldInline = false;
 
 // Starting at [5] - optional command-line arguments
 for(let procArgIndex = 4; procArgIndex < process.argv.length; procArgIndex++) {
@@ -62,6 +70,10 @@ for(let procArgIndex = 4; procArgIndex < process.argv.length; procArgIndex++) {
     case "--clean":
       shouldClean = true;
       break;
+    case "-i":
+    case "--inline":
+      shouldInline = true;
+      break;
     case "-s":
     case "--sourceRoot":
       procArgIndex++;
@@ -72,23 +84,23 @@ for(let procArgIndex = 4; procArgIndex < process.argv.length; procArgIndex++) {
   }
 }
 
-let srcMap = SourcemapRemapper.fromFile(destFile);
+let srcMap = SourcemapRemapper.fromFile(mapFile);
 
 if(shouldClean) {
-  // First pass:  remove any closure prepended ../../../ pathing.
-  srcMap.remapPaths([
-    { from: "../../../", to: "" }
-  ]);
-
-  // Second pass:  fix up any mangled source paths
-  srcMap.remapPaths([
-    { from: "common/web/input-processor/build/keyman/", to: "" },
-    { from: "common/web/keyboard-processor/build/keyman/", to: "" }
-  ]);
+  // Keeps "@keymanapp/keyman" as sourceRoot, but prepends all `sources` entries with
+  // the remainder / suffix of sourceRoot and normalizes the paths.
+  srcMap.normalizeWithSourceRoot('@keymanapp/keyman/'.length);
 }
 
 if(sourceRoot) {
   srcMap.sourceRoot = sourceRoot;
 }
 
-srcMap.toFile(destFile);
+srcMap.toFile(mapFile);
+
+if(shouldInline) {
+  const mapToInline = SourcemapRemapper.fromFile(mapFile).sourceMap;
+  const inlineableComment = convertSourceMap.fromObject(mapToInline).toComment();
+
+  fs.appendFileSync(scriptFile, `\n${inlineableComment}`);
+}

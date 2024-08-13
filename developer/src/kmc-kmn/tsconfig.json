@@ -1,22 +1,20 @@
 {
-  "extends": "../../../tsconfig.esm-base.json",
+  "extends": "../../../tsconfig.base.json",
 
   "compilerOptions": {
     "outDir": "build/src/",
     "rootDir": "src/",
     "baseUrl": ".",
     "allowJs": true,
-    "paths": {
-      "@keymanapp/common-types": ["../../../common/web/types/src/main"],
-    },
-
+    "preserveConstEnums": true,
   },
   "include": [
     "src/**/*.ts",
     "src/import/kmcmplib/wasm-host.js"
   ],
   "references": [
-    { "path": "../../../common/web/keyman-version/tsconfig.esm.json" },
     { "path": "../../../common/web/types/" },
+    { "path": "../../../common/web/keyman-version/" },
+    { "path": "../common/web/utils/" },
   ]
 }

@@ -13,7 +13,7 @@ coretest_files = files(
     'kmx_test_source.cpp',
 )
 
-kmx_test_source_lib = static_library('kmnkbp-tests',
+kmx_test_source_lib = static_library('keymancore-tests',
   coretest_files,
   cpp_args: defns + warns + flags,
   include_directories: [inc, libsrc],

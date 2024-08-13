@@ -43,16 +43,9 @@
 #include "pch.h"   // I4128   // I4287
 #include "serialkeyeventclient.h"
 
-
-AIWin2000Unicode::AIWin2000Unicode()
-{
-	context = new AppContext;
+AIWin2000Unicode::AIWin2000Unicode() {
 }
-
-AIWin2000Unicode::~AIWin2000Unicode()
-{
-	delete context;
-}
+AIWin2000Unicode::~AIWin2000Unicode(){}
 
 /* Information functions */
 
@@ -68,7 +61,7 @@ BOOL AIWin2000Unicode::HandleWindow(HWND ahwnd)
 	if(hwnd != ahwnd)
 	{
 		hwnd = ahwnd;
-		context->Reset();
+    ResetContext();
 	}
 	return TRUE;
 }
@@ -81,39 +74,26 @@ BOOL AIWin2000Unicode::IsWindowHandled(HWND ahwnd)
 BOOL AIWin2000Unicode::IsUnicode()
 {
   BOOL Result = IsWindowUnicode(hwnd);
-  SendDebugMessageFormat(0, sdmAIDefault, 0, "IsWindowUnicode=%s", Result ? "Yes" : "No");
+  SendDebugMessageFormat("IsWindowUnicode=%s", Result ? "Yes" : "No");
 	return Result;
 }
 
 /* Context functions */
 
-void AIWin2000Unicode::ReadContext()
-{
-}
-
-void AIWin2000Unicode::AddContext(WCHAR ch)  //I2436
-{
-  context->Add(ch);
+BOOL AIWin2000Unicode::ReadContext(PWSTR buf) {
+  UNREFERENCED_PARAMETER(buf);
+  // We cannot read any context from legacy apps, so we return a
+  // failure here -- telling Core to maintain its own cached
+  // context.
+  return FALSE;
 }
 
 void AIWin2000Unicode::ResetContext()
 {
-	context->Reset();
-}
-
-WCHAR *AIWin2000Unicode::ContextBuf(int n)
-{
-	return context->Buf(n);
-}
-
-WCHAR *AIWin2000Unicode::ContextBufMax(int n)
-{
-	return context->BufMax(n);
-}
-
-void AIWin2000Unicode::SetContext(const WCHAR* buf)
-{
-  return context->Set(buf);
+  PKEYMAN64THREADDATA _td = ThreadGlobals();
+  if (_td && _td->lpActiveKeyboard && _td->lpActiveKeyboard->lpCoreKeyboardState) {
+    km_core_state_context_clear(_td->lpActiveKeyboard->lpCoreKeyboardState);
+  }
 }
 
 BYTE SavedKbdState[256];
@@ -124,40 +104,6 @@ BOOL AIWin2000Unicode::SendActions()   // I4196
     PostMessage(*Globals::hwndIM(), wm_keymanim_contextchanged, 0, 0);
   }
 	return PostKeys();
-}
-
-BOOL AIWin2000Unicode::QueueAction(int ItemType, DWORD dwData)
-{
-	int result = AppIntegration::QueueAction(ItemType, dwData);
-
-  //SendDebugMessageFormat(hwnd, sdmAIDefault, 0, "App::QueueAction ItemType=%d dwData=%x", ItemType, dwData);
-
-	switch(ItemType)
-	{
-	case QIT_VKEYDOWN:
-		break;
-
-	case QIT_DEADKEY:
-		context->Add(UC_SENTINEL);
-		context->Add(CODE_DEADKEY);
-		context->Add((WORD) dwData);
-		break;
-
-	case QIT_CHAR:
-		context->Add((WORD) dwData);
-		break;
-
-	case QIT_BACK:
-		if(dwData & BK_BACKSPACE)
-			while(context->CharIsDeadkey()) context->Delete();
-		//if(dwData == CODE_DEADKEY) break;
-		context->Delete();
-		if(dwData & BK_BACKSPACE)
-			while(context->CharIsDeadkey()) context->Delete();
-		break;
-	}
-
-	return result;
 }
 
 // I1512 - SendInput with VK_PACKET for greater robustness
@@ -233,10 +179,6 @@ BOOL AIWin2000Unicode::PostKeys()
       }
 
 		  break;
-	  case QIT_VSHIFTDOWN:
-		  break;
-	  case QIT_VSHIFTUP:
-		  break;
 	  case QIT_CHAR:
       pInputs[i].type = INPUT_KEYBOARD;
       pInputs[i].ki.wVk = 0;
@@ -281,9 +223,9 @@ BOOL AIWin2000Unicode::PostKeys()
 
 	QueueSize = 0;
 
-  if(ShouldDebug(sdmAIDefault)) {
+  if(ShouldDebug()) {
     for(int j = 0; j < i; j++ ) {   // I4548
-      SendDebugMessageFormat(0, sdmAIDefault, 0, "App::PostKeys: sending input [i=%d, input[%d]=vk:%s scan:%x flags:%x", i, j, Debug_VirtualKey(pInputs[j].ki.wVk), pInputs[j].ki.wScan, pInputs[j].ki.dwFlags);
+      SendDebugMessageFormat("sending input [i=%d, input[%d]=vk:%s scan:%x flags:%x", i, j, Debug_VirtualKey(pInputs[j].ki.wVk), pInputs[j].ki.wScan, pInputs[j].ki.dwFlags);
     }
   }
 
@@ -293,7 +235,7 @@ BOOL AIWin2000Unicode::PostKeys()
     _td->pSerialKeyEventClient->SignalServer(pInputs, i);
   }
 
-  SendDebugMessageFormat(0, sdmAIDefault, 0, "App::PostKeys: sending input finished");
+  SendDebugMessageFormat("sending input finished");
 
   delete[] pInputs;
 

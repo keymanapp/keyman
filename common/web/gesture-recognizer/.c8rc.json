@@ -1,0 +1,18 @@
+{
+  "check-coverage": false,
+  "clean": true,
+  "exclude": [
+    "src/test/*",
+    "node_modules/*",
+    "src/tools/*"
+  ],
+  "exclude-after-remap": true,
+  "include": [
+    "src/engine/headless/*"
+  ],
+  "reporter": ["text", "text-summary"],
+  "reports-dir": "build/coverage",
+  "src": [
+    "src/engine/headless/*"
+  ]
+}

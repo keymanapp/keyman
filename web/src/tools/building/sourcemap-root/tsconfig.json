@@ -1,10 +1,12 @@
 {
+  "extends": "../../../../tsconfig.base.json",
   "compilerOptions": {
-    "allowJs": false,
     "outDir": "../../../../build/tools/building/sourcemap-root",
-    "module": "es6",
-    "moduleResolution": "node",
-    "types": ["node"],
-    "lib": ["es6", "dom"]
+    "tsBuildInfoFile": "../../../../build/tools/building/sourcemap-root/tsconfig.tsbuildinfo",
+    "baseUrl": "./",
+    "rootDir": "./",
+
+    // override for now, see #11716
+    "allowJs": false
   }
 }

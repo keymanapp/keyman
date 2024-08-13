@@ -1,6 +1,11 @@
-import { Constants, VisualKeyboard, LDMLKeyboard } from "@keymanapp/common-types";
+import { VisualKeyboard, LDMLKeyboard, CompilerCallbacks } from "@keymanapp/common-types";
+import { KeysCompiler } from "./keys.js";
+import { LdmlCompilerMessages } from "./ldml-compiler-messages.js";
 
 export class LdmlKeyboardVisualKeyboardCompiler {
+  public constructor(private callbacks: CompilerCallbacks) {
+  }
+
   public compile(source: LDMLKeyboard.LDMLKeyboardXMLSourceFile): VisualKeyboard.VisualKeyboard {
     let result = new VisualKeyboard.VisualKeyboard();
 
@@ -8,18 +13,15 @@ export class LdmlKeyboardVisualKeyboardCompiler {
     result.header.flags = 0;
     result.header.version = 0x0600;
 
-    /* TODO-LDML: consider font, associatedKeyboard */
+    /* TODO-LDML: consider associatedKeyboard: this _must_ be set to id (aka basename sans ext) of keyboard .kmx file */
     result.header.associatedKeyboard = '';
-    result.header.ansiFont.name = 'Arial';
-    result.header.ansiFont.size = 10;
-    result.header.ansiFont.color = 0;
-    result.header.unicodeFont.name = 'Arial';
-    result.header.unicodeFont.size = 10;
-    result.header.unicodeFont.color = 0;
+    result.header.ansiFont = {...VisualKeyboard.DEFAULT_KVK_FONT};
+    result.header.unicodeFont = {...VisualKeyboard.DEFAULT_KVK_FONT};
 
-    for(let layers of source.keyboard.layers) {
+    for(let layers of source.keyboard3.layers) {
+      const { formId } = layers;
       for(let layer of layers.layer) {
-        this.compileHardwareLayer(source, result, layer);
+        this.compileHardwareLayer(source, result, layer, formId);
       }
     }
     return result;
@@ -28,9 +30,20 @@ export class LdmlKeyboardVisualKeyboardCompiler {
   private compileHardwareLayer(
     source: LDMLKeyboard.LDMLKeyboardXMLSourceFile,
     vk: VisualKeyboard.VisualKeyboard,
-    layer: LDMLKeyboard.LKLayer
+    layer: LDMLKeyboard.LKLayer,
+    hardware: string,
   ) {
-    // TODO-LDML: consider consolidation with keys.ts?
+    const layerId = layer.id;
+    if (hardware === 'touch') {
+      hardware = 'us'; // TODO-LDML: US Only. Do something different here?
+    }
+    const keymap = KeysCompiler.getKeymapFromForms(source.keyboard3?.forms?.form, hardware);
+    if (!keymap) {
+      this.callbacks.reportMessage(
+        LdmlCompilerMessages.Error_InvalidHardware({ formId: hardware })
+      );
+      return;
+    }
     const shift = this.translateLayerIdToVisualKeyboardShift(layer.id);
 
     let y = -1;
@@ -40,16 +53,23 @@ export class LdmlKeyboardVisualKeyboardCompiler {
       const keys = row.keys.split(' ');
       let x = -1;
       for(let key of keys) {
+        const keyId = key;
         x++;
 
-        let keydef = source.keyboard.keys?.key?.find(x => x.id == key);
+        let keydef = source.keyboard3.keys?.key?.find(x => x.id == key);
 
-        vk.keys.push({
-          flags: VisualKeyboard.VisualKeyboardKeyFlags.kvkkUnicode,
-          shift: shift,
-          text: keydef.to, // TODO-LDML: displays
-          vkey: Constants.USVirtualKeyMap[y][x] // TODO-LDML: #7965  US-only
-        });
+        if (!keydef) {
+          this.callbacks.reportMessage(
+            LdmlCompilerMessages.Error_KeyNotFoundInKeyBag({ keyId, layer: layerId, row: y, col: x, form: hardware })
+          );
+        } else {
+          vk.keys.push({
+            flags: VisualKeyboard.VisualKeyboardKeyFlags.kvkkUnicode,
+            shift: shift,
+            text: keydef.output, // TODO-LDML: displays
+            vkey: keymap[y][x],
+          });
+        }
       }
     }
   }

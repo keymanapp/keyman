@@ -90,10 +90,7 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
         // Revert to default (index 0) or fallback keyboard
         keyboardInfo = KMManager.getKeyboardInfo(context, 0);
         if (keyboardInfo == null) {
-          // Only log SystemKeyboard to Sentry because some keyboard apps like FV don't install keyboards until the user chooses
-          if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-            KMLog.LogError(TAG, "No keyboards installed. Reverting to fallback");
-          }
+          // Don't log to Sentry because some keyboard apps like FV don't install keyboards until the user chooses
           keyboardInfo = KMManager.getDefaultKeyboard(context);
         }
         if (keyboardInfo != null) {
@@ -163,90 +160,14 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
       // The user has begun interacting with the keyboard; we'll disable the help bubble
       // for the rest of the lifetime of this keyboard instance.
       kmKeyboard.setShouldShowHelpBubble(false);
-    } else if (url.indexOf("showKeyPreview") >= 0) {
-      String deviceType = context.getResources().getString(R.string.device_type);
-      if (deviceType.equals("AndroidTablet")) {
-        return false;
-      }
-
-      if (kmKeyboard.subKeysWindow != null) {
-        return false;
-      }
-
-      int start = url.indexOf("x=") + 2;
-      int end = url.indexOf("+y=");
-      float x = Float.valueOf(url.substring(start, end));
-
-      start = url.indexOf("y=") + 2;
-      end = url.indexOf("+w=");
-      float y = Float.valueOf(url.substring(start, end));
-
-      start = url.indexOf("w=") + 2;
-      end = url.indexOf("+h=");
-      float w = Float.valueOf(url.substring(start, end));
-
-      start = url.indexOf("h=") + 2;
-      end = url.indexOf("+t=");
-      float h = Float.valueOf(url.substring(start, end));
-
-      start = url.indexOf("t=") + 2;
-      String t = url.substring(start);
-      String text = kmKeyboard.convertKeyText(t);
-
-      float left = x - w / 2.0f;
-      float right = left + w;
-      float top = y - 1;
-      float bottom = top + h;
-
-      RectF keyFrame = new RectF(left, top, right, bottom);
-      kmKeyboard.showKeyPreview(context, (int) x, (int) y, keyFrame, text);
-    } else if (url.indexOf("dismissKeyPreview") >= 0) {
-      kmKeyboard.dismissKeyPreview(100);
-    } else if (url.indexOf("showMore") >= 0) {
-      if (kmKeyboard.subKeysWindow != null && kmKeyboard.subKeysWindow.isShowing()) {
-        return false;
-      }
-
-      int start = url.indexOf("keyPos=") + 7;
-      int end = url.indexOf("+keys=");
-      kmKeyboard.subKeysWindowPos = url.substring(start, end).split("\\,");
-
-      start = end + 6;
-      end = url.indexOf("+font=");
-      if (end < 0) {
-        end = url.length();
-        kmKeyboard.specialOskFont = "";
-      } else {
-        kmKeyboard.specialOskFont = KMManager.KMFilename_Osk_Ttf_Font;
-      }
-
-      String keys = url.substring(start, end);
-
-      String[] keyList = keys.split("\\;");
-      int klCount = keyList.length;
-      kmKeyboard.subKeysList = new ArrayList<HashMap<String, String>>();
-      for (int i = 0; i < klCount; i++) {
-        String[] values = keyList[i].split("\\:");
-        String keyId = (values.length > 0) ? values[0] : "";
-        String keyText = (values.length > 1) ? values[1] : "";
-
-        HashMap<String, String> hashMap = new HashMap<String, String>();
-        hashMap.put("keyId", keyId);
-        hashMap.put("keyText", keyText);
-        kmKeyboard.subKeysList.add(hashMap);
-      }
     } else if (url.indexOf("refreshBannerHeight") >= 0) {
-      int start = url.indexOf("change=") + 7;
-      String change = url.substring(start);
-      boolean isModelActive = change.equals("active");
       // appContext instead of context?
       SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
       boolean modelPredictionPref = false;
       if (KMManager.currentLexicalModel != null) {
         modelPredictionPref = prefs.getBoolean(KMManager.getLanguagePredictionPreferenceKey(KMManager.currentLexicalModel.get(KMManager.KMKey_LanguageID)), true);
       }
-      kmKeyboard.setCurrentBanner((isModelActive && modelPredictionPref) ?
-        KMKeyboard.KM_BANNER_STATE_SUGGESTION : KMKeyboard.KM_BANNER_STATE_BLANK);
+      KMManager.setBannerOptions(modelPredictionPref);
       RelativeLayout.LayoutParams params = KMManager.getKeyboardLayoutParams();
       kmKeyboard.setLayoutParams(params);
     } else if (url.indexOf("suggestPopup") >= 0) {

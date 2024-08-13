@@ -10,6 +10,4 @@
 #include "../../../../common/windows/cpp/include/crc32.h"
 
 #include <ctype.h>
-#include <stdio.h>
-
 #include <string.h>

@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+# shellcheck disable=SC2148
+# No hashbang for bash completion scripts! They are intended to be sourced, not executed.
 
 _km-config_completions()
 {

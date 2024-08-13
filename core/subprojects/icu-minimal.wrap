@@ -10,5 +10,4 @@ patch_directory = icu
 
 [provide]
 icu-uc = icuuc_dep
-# TODO-LDML: not including i18n at present
-#icu-i18n = icui18n_dep
+icu-i18n = icui18n_dep

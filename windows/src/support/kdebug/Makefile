@@ -1,5 +1,5 @@
 #
-# KMCmpDll Makefile
+# KDebug Makefile
 #
 
 !include ..\..\Defines.mak

@@ -25,32 +25,28 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.RectF;
+import android.content.res.Resources;
+import android.graphics.Point;
 import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
 import android.text.InputType;
+import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.HapticFeedbackConstants;
-import android.view.KeyEvent;
 import android.view.View;
+import android.view.Display;
+import android.view.Surface;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
+import android.view.WindowMetrics;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.ExtractedText;
-import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
-import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 
@@ -71,7 +67,6 @@ import com.keyman.engine.packages.JSONUtils;
 import com.keyman.engine.packages.LexicalModelPackageProcessor;
 import com.keyman.engine.packages.PackageProcessor;
 import com.keyman.engine.util.BCP47;
-import com.keyman.engine.util.CharSequenceUtil;
 import com.keyman.engine.util.DependencyUtil;
 import com.keyman.engine.util.DependencyUtil.LibraryType;
 import com.keyman.engine.util.FileUtils;
@@ -156,6 +151,34 @@ public final class KMManager {
       return modes[this.ordinal()];
     }
   };
+
+  // Maps to enum BannerType in bannerView.ts
+  public enum BannerType {
+    BLANK,
+    IMAGE,
+    SUGGESTION,
+    HTML;
+
+    public static BannerType fromString(String mode) {
+      if (mode == null) return BLANK;
+      switch (mode) {
+        case "BLANK":
+          return BLANK;
+        case "image":
+          return IMAGE;
+        case "suggestion":
+          return SUGGESTION;
+        case "html":
+          return HTML;
+      }
+      return BLANK;
+    }
+
+    public String toString() {
+      String modes[] = { "blank", "image", "suggestion", "html"};
+      return modes[this.ordinal()];
+    }
+  }
 
   protected static InputMethodService IMService;
 
@@ -272,19 +295,24 @@ public final class KMManager {
 
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
-  protected static final String KMFilename_JSEngine = "keymanandroid.js";
-  protected static final String KMFilename_JSEngine_Sourcemap = "keyman.js.map";
-  protected static final String KMFilename_JSSentry = "keyman-sentry.js";
+  protected static final String KMFilename_JSEngine = "keymanweb-webview.js";
+  protected static final String KMFilename_JSSentry = "sentry.min.js";
+  protected static final String KMFilename_JSSentryInit = "keyman-sentry.js";
   protected static final String KMFilename_AndroidHost = "android-host.js";
   protected static final String KMFilename_KmwCss = "kmwosk.css";
   protected static final String KMFilename_KmwGlobeHintCss = "globe-hint.css";
   protected static final String KMFilename_Osk_Ttf_Font = "keymanweb-osk.ttf";
   protected static final String KMFilename_JSPolyfill = "es6-shim.min.js";
+  protected static final String KMFilename_JSPolyfill2 = "other-polyfills.js";
+  protected static final String KMFilename_JSPolyfill3 = "map-polyfill.js";
 
   // Deprecated by KeyboardController.KMFilename_Installed_KeyboardsList
   public static final String KMFilename_KeyboardsList = "keyboards_list.dat";
 
   public static final String KMFilename_LexicalModelsList = "lexical_models_list.dat";
+
+  public static final String KMBLACK_BANNER = "<div style=\"background: black; width: 100%; height: 100%; position: absolute; left: 0; top: 0\"></div>";
+  public static final String KMGRAY_BANNER = "<div style=\"background: #b4b4b8; width: 100%; height: 100%; position: absolute; left: 0; top: 0\"></div>";
 
   private static Context appContext;
 
@@ -624,14 +652,27 @@ public final class KMManager {
       return;
     }
 
-    RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
-    keyboard.setLayoutParams(params);
+    if (!isTestMode()) {
+      // Keyboard layout not needed in unit tests. #5125
+      RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
+      keyboard.setLayoutParams(params);
+    }
     keyboard.setVerticalScrollBarEnabled(false);
     keyboard.setHorizontalScrollBarEnabled(false);
     keyboard.setWebViewClient(webViewClient);
     keyboard.addJavascriptInterface(new KMKeyboardJSHandler(appContext, keyboard), "jsInterface");
     keyboard.loadKeyboard();
 
+    if (!isTestMode()) {
+      // For apps that don't specify an HTML banner, specify a default phone/tablet HTML banner
+      if (getFormFactor() == FormFactor.PHONE) {
+        keyboard.setHTMLBanner(KMBLACK_BANNER);
+      } else {
+        keyboard.setHTMLBanner(KMGRAY_BANNER);
+      }
+      keyboard.setBanner(KMManager.BannerType.HTML);
+      keyboard.showBanner(true);
+    }
     setEngineWebViewVersionStatus(appContext, keyboard);
   }
 
@@ -743,12 +784,10 @@ public final class KMManager {
     // KMKeyboard
     if (InAppKeyboard != null) {
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
-      InAppKeyboard.setLayoutParams(params);
       InAppKeyboard.onConfigurationChanged(newConfig);
     }
     if (SystemKeyboard != null) {
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
-      SystemKeyboard.setLayoutParams(params);
       SystemKeyboard.onConfigurationChanged(newConfig);
     }
   }
@@ -789,24 +828,48 @@ public final class KMManager {
     return hasPermission(context, Manifest.permission.INTERNET);
   }
 
+  /**
+   * Copy HTML banner assets to the app
+   * @param context - The context
+   * @param path - Folder relative to assets/ containing the banner file.
+   * @return boolean - true if assets copied
+   */
+  public static boolean copyHTMLBannerAssets(Context context, String path) {
+    AssetManager assetManager = context.getAssets();
+    try {
+      File bannerDir = new File(getResourceRoot() + File.separator + path);
+      if (!bannerDir.exists()) {
+        bannerDir.mkdir();
+      }
+
+      String[] bannerFiles = assetManager.list(path);
+      for (String bannerFile : bannerFiles) {
+        copyAsset(context, bannerFile, path, true);
+      }
+      return true;
+    } catch (Exception e) {
+      KMLog.LogException(TAG, "copyHTMLBannerAssets() failed. Error: ", e);
+    }
+    return false;
+  }
+
   private static void copyAssets(Context context) {
     AssetManager assetManager = context.getAssets();
+
     try {
       // Copy KMW files
       copyAsset(context, KMFilename_KeyboardHtml, "", true);
+
       copyAsset(context, KMFilename_JSEngine, "", true);
       copyAsset(context, KMFilename_JSSentry, "", true);
+      copyAsset(context, KMFilename_JSSentryInit, "", true);
       copyAsset(context, KMFilename_AndroidHost, "", true);
-      if(KMManager.isDebugMode()) {
-        copyAsset(context, KMFilename_JSEngine_Sourcemap, "", true);
-      }
       copyAsset(context, KMFilename_KmwCss, "", true);
       copyAsset(context, KMFilename_KmwGlobeHintCss, "", true);
       copyAsset(context, KMFilename_Osk_Ttf_Font, "", true);
 
       // Copy default keyboard font
       copyAsset(context, KMDefault_KeyboardFont, "", true);
-      copyAsset(context, KMFilename_JSPolyfill, "", true);
 
       // Keyboard packages directory
       File packagesDir = new File(getPackagesDir());
@@ -902,6 +965,10 @@ public final class KMManager {
   }
 
   private static int copyAsset(Context context, String filename, String directory, boolean overwrite) {
+    return copyAssetWithRename(context, filename, filename, directory, overwrite);
+  }
+
+  private static int copyAssetWithRename(Context context, String srcName, String destName, String directory, boolean overwrite) {
     int result;
     AssetManager assetManager = context.getAssets();
     try {
@@ -918,9 +985,9 @@ public final class KMManager {
         dirPath = getResourceRoot();
       }
 
-      File file = new File(dirPath, filename);
+      File file = new File(dirPath, destName);
       if (!file.exists() || overwrite) {
-        InputStream inputStream = assetManager.open(directory + filename);
+        InputStream inputStream = assetManager.open(directory + srcName);
         FileOutputStream outputStream = new FileOutputStream(file);
         FileUtils.copy(inputStream, outputStream);
 
@@ -1327,12 +1394,14 @@ public final class KMManager {
     RelativeLayout.LayoutParams params;
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreTextChange() && modelFileExists) {
       params = getKeyboardLayoutParams();
-      InAppKeyboard.setLayoutParams(params);
+
+      // Do NOT re-layout here; it'll be triggered once the banner loads.
       InAppKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreTextChange() && modelFileExists) {
       params = getKeyboardLayoutParams();
-      SystemKeyboard.setLayoutParams(params);
+
+      // Do NOT re-layout here; it'll be triggered once the banner loads.
       SystemKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
     }
     return true;
@@ -1365,7 +1434,13 @@ public final class KMManager {
     KeyboardPickerActivity.deleteLexicalModel(context, position, silenceNotification);
   }
 
-    public static boolean setBannerOptions(boolean mayPredict) {
+  /**
+   * setBannerOptions - Update KMW whether to generate predictions.
+   *                    For now, also display banner
+   * @param mayPredict - boolean whether KMW should generate predictions
+   * @return boolean - Success
+   */
+  public static boolean setBannerOptions(boolean mayPredict) {
     String url = KMString.format("setBannerOptions(%s)", mayPredict);
     if (InAppKeyboard != null) {
       InAppKeyboard.loadJavascript(url);
@@ -1373,6 +1448,73 @@ public final class KMManager {
 
     if (SystemKeyboard != null) {
       SystemKeyboard.loadJavascript(url);
+    }
+
+    return true;
+  }
+
+  /**
+   * Update KeymanWeb banner type
+   * @param {KeyboardType} keyboard
+   * @param {BannerType} bannerType
+   * @return status
+   */
+  public static boolean setBanner(KeyboardType keyboard, BannerType bannerType) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
+      InAppKeyboard.setBanner(bannerType);
+    } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
+      SystemKeyboard.setBanner(bannerType);
+    } else {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Set the HTML content to use with the HTML banner
+   * @param {KeyboardType} keyboard
+   * @param {String} HTMl string
+   * @return {boolean}
+   */
+  public static boolean setHTMLBanner(KeyboardType keyboard, String htmlContent) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
+      InAppKeyboard.setHTMLBanner(htmlContent);
+    } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
+      SystemKeyboard.setHTMLBanner(htmlContent);
+    } else {
+      Log.d(TAG, "setHTMLBanner() but keyboard is null");
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Get the HTML content associated with the HTML banner
+   * @param {KeyboardType} keyboard
+   * @return {String}
+   */
+  public static String getHTMLBanner(KeyboardType keyboard) {
+    if (keyboard == KeyboardType.KEYBOARD_TYPE_INAPP && InAppKeyboard != null) {
+      return InAppKeyboard.getHTMLBanner();
+    } else if (keyboard == KeyboardType.KEYBOARD_TYPE_SYSTEM && SystemKeyboard != null) {
+      return SystemKeyboard.getHTMLBanner();
+    }
+    return "";
+  }
+
+  /**
+   * showBanner - Update KMW whether to display banner.
+   *              For now, always keep displaying banner
+   * @param flag - boolean whether KMW should display banner
+   * @return boolean - Success
+   */
+  public static boolean showBanner(boolean flag) {
+    if (InAppKeyboard != null) {
+      InAppKeyboard.showBanner(flag);
+    }
+
+    if (SystemKeyboard != null) {
+      SystemKeyboard.showBanner(flag);
     }
     return true;
   }
@@ -1470,6 +1612,12 @@ public final class KMManager {
 
   public static boolean removeKeyboard(Context context, int position) {
     return KeyboardPickerActivity.removeKeyboard(context, position);
+  }
+
+  public static boolean isDefaultKey(String key) {
+    return (
+      key != null &&
+      key.equals(KMString.format("%s_%s", KMDefault_LanguageID, KMDefault_KeyboardID)));
   }
 
   /**
@@ -1838,11 +1986,35 @@ public final class KMManager {
     KMKeyboard.removeOnKeyboardEventListener(listener);
   }
 
+  public static int getOrientation(Context context) {
+    Display display;
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+      // https://developer.android.com/reference/android/content/Context#getDisplay()
+      try {
+        display = context.getDisplay();
+      } catch (UnsupportedOperationException e) {
+        // if the method is called on an instance that is not associated with any display.
+        return context.getResources().getConfiguration().orientation;
+      }
+    } else {
+      WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+      // Deprecated in API 30
+      display = wm.getDefaultDisplay();
+    }
+    int rotation = display.getRotation();
+    if (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180) {
+      return Configuration.ORIENTATION_PORTRAIT;
+    } else if (rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270) {
+      return Configuration.ORIENTATION_LANDSCAPE;
+    }
+    return Configuration.ORIENTATION_UNDEFINED;
+  }
+
   public static int getBannerHeight(Context context) {
     int bannerHeight = 0;
-    if (InAppKeyboard != null && InAppKeyboard.currentBanner().equals(KMKeyboard.KM_BANNER_STATE_SUGGESTION)) {
+    if (InAppKeyboard != null && InAppKeyboard.getBanner() != BannerType.BLANK) {
       bannerHeight = (int) context.getResources().getDimension(R.dimen.banner_height);
-    } else if (SystemKeyboard != null && SystemKeyboard.currentBanner().equals(KMKeyboard.KM_BANNER_STATE_SUGGESTION)) {
+    } else if (SystemKeyboard != null && SystemKeyboard.getBanner() != BannerType.BLANK) {
       bannerHeight = (int) context.getResources().getDimension(R.dimen.banner_height);
     }
     return bannerHeight;
@@ -1851,7 +2023,8 @@ public final class KMManager {
   public static int getKeyboardHeight(Context context) {
     int defaultHeight = (int) context.getResources().getDimension(R.dimen.keyboard_height);
     SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    int orientation = context.getResources().getConfiguration().orientation;
+
+    int orientation = getOrientation(context);
     if (orientation == Configuration.ORIENTATION_PORTRAIT) {
       return prefs.getInt(KMManager.KMKey_KeyboardHeightPortrait, defaultHeight);
     } else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -1872,6 +2045,34 @@ public final class KMManager {
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
     }
+  }
+
+  /**
+   * Get the size of the area the window would occupy.
+   * API 30+
+   * https://developer.android.com/reference/android/view/WindowManager#getCurrentWindowMetrics()
+   * @param context
+   * @return Point (width, height)
+   */
+  public static Point getWindowSize(Context context) {
+    WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+      // Deprecated in API 30
+      Point size = new Point(0, 0);
+      wm.getDefaultDisplay().getSize(size);
+      return size;
+    }
+
+    WindowMetrics windowMetrics = wm.getCurrentWindowMetrics();
+    return new Point(
+      windowMetrics.getBounds().width(),
+      windowMetrics.getBounds().height());
+  }
+
+  public static float getWindowDensity(Context context) {
+    DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+    Log.d(TAG, "KMManager: metrics.density " + metrics.density);
+    return metrics.density;
   }
 
   protected static void setPersistentShouldShowHelpBubble(boolean flag) {
@@ -1920,7 +2121,6 @@ public final class KMManager {
 
     if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       i.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-      i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
     }
 
     i.putExtra(KMKey_DisplayKeyboardSwitcher, kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM);
@@ -1960,17 +2160,40 @@ public final class KMManager {
     return result;
   }
 
+  /**
+   * Updates the active range for selected text.
+   * @deprecated
+   * This method no longer needs the `selStart` and `selEnd` parameters.
+   * <p>Use {@link KMManager#updateSelectionRange(KeyboardType)} instead.</p>
+   *
+   * @param kbType    A value indicating if this request is for the in-app keyboard or the system keyboard
+   * @param selStart  (deprecated) the start index for the range
+   * @param selEnd  (deprecated) the end index for the selected range
+   * @return
+   */
+  @Deprecated
   public static boolean updateSelectionRange(KeyboardType kbType, int selStart, int selEnd) {
+    return updateSelectionRange(kbType);
+  }
+
+  /**
+   * Performs a synchronization check for the active range for selected text,
+   * ensuring it matches the text-editor's current state.
+   * @param kbType  A value indicating if this request is for the in-app or system keyboard.
+   * @return
+   */
+  public static boolean updateSelectionRange(KeyboardType kbType) {
     boolean result = false;
+
     if (kbType == KeyboardType.KEYBOARD_TYPE_INAPP) {
       if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreSelectionChange()) {
-        result = InAppKeyboard.updateSelectionRange(selStart, selEnd);
+        result = InAppKeyboard.updateSelectionRange();
       }
 
       InAppKeyboard.setShouldIgnoreSelectionChange(false);
     } else if (kbType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
       if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreSelectionChange()) {
-        result = SystemKeyboard.updateSelectionRange(selStart, selEnd);
+        result = SystemKeyboard.updateSelectionRange();
       }
 
       SystemKeyboard.setShouldIgnoreSelectionChange(false);
@@ -1999,13 +2222,13 @@ public final class KMManager {
   public static Keyboard getCurrentKeyboardInfo(Context context) {
     int index = getCurrentKeyboardIndex(context);
     if(index < 0) {
-      // As of 15.0-beta and 15.0-stable, this only appears to occur when
-      // #6703 would trigger.  This logging may help us better identify the
-      // root cause.
+      // index can be undefined if user installs Keyman (without launching it)
+      // and then enables Keyaman as a system keyboard from the Android settings menus.
+      // We'll only log if key isn't for fallback keyboard
       String key = KMKeyboard.currentKeyboard();
-      // Even if it's null, it's still a notable error.  This function shouldn't
-      // be reachable in execution (15.0) at a time this variable would be set to `null`.
-      KMLog.LogError(TAG, "Failed getCurrentKeyboardIndex check for keyboard: " + key);
+      if (!isDefaultKey(key)) {
+        KMLog.LogError(TAG, "Failed getCurrentKeyboardIndex check for keyboard: " + key);
+      }
       return null;
     }
     return KeyboardController.getInstance().getKeyboardInfo(index);
@@ -2148,13 +2371,9 @@ public final class KMManager {
    * @param keyboardType KeyboardType KEYBOARD_TYPE_INAPP or KEYBOARD_TYPE_SYSTEM
    */
   public static void handleGlobeKeyAction(Context context, boolean globeKeyDown, KeyboardType keyboardType) {
-    // Clear preview and subkeys
-    if (keyboardType == KeyboardType.KEYBOARD_TYPE_INAPP) {
-      InAppKeyboard.dismissKeyPreview(0);
-      InAppKeyboard.dismissSubKeysWindow();
-    } else if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
-      SystemKeyboard.dismissKeyPreview(0);
-      SystemKeyboard.dismissSubKeysWindow();
+    if (globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_UP && !globeKeyDown) {
+      // No globe key action to process
+      return;
     }
 
     // Update globeKeyState
@@ -2165,7 +2384,7 @@ public final class KMManager {
     if (KMManager.shouldAllowSetKeyboard()) {
       // inKeyguardRestrictedInputMode() deprecated, so check isKeyguardLocked() to determine if screen is locked
       if (isLocked()) {
-        if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_UP) {
+        if (keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM && globeKeyState == GlobeKeyState.GLOBE_KEY_STATE_DOWN) {
           doGlobeKeyLockscreenAction(context);
         }
         // clear globeKeyState

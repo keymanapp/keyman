@@ -3,7 +3,6 @@
 /windows/debug/
 /windows/lib/
 /windows/release/
-/windows/src/PathDefines.mak
 /windows/src/**/*.err
 /windows/src/**/*.Build.CppClean.log
 /windows/src/**/*.dproj.local
@@ -73,7 +72,6 @@
 
 # /developer/TIKE/
 /windows/src/developer/TIKE/stock.kct
-/windows/src/developer/TIKE/kmcmpdll.dll
 
 # /developer/TIKE/redist/
 /windows/src/developer/TIKE/redist/Addins
@@ -84,12 +82,6 @@
 /windows/src/developer/inst/*.wixpdb
 /windows/src/developer/inst/download.mak
 /windows/src/developer/inst/copydev.mak
-
-# /developer/kmcmpdll/
-/windows/src/developer/kmcmpdll/*.lastbuildstate
-
-# /developer/kmcmpdll/Debug/
-/windows/src/developer/kmcmpdll/Debug/*.idb
 
 /windows/src/developer/stock/stock.kct
 /windows/src/developer/uitemplates/keyman.kct

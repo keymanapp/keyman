@@ -5,12 +5,11 @@
 
 // Note: this is a deprecated package and will be removed in Keyman 18.0
 
-import * as fs from 'fs';
 import { Command } from 'commander';
-import { PackageValidation, KmpCompiler } from '@keymanapp/kmc-package';
+import { KmpCompiler } from '@keymanapp/kmc-package';
 import { SysExits } from './util/sysexits.js';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
-import { NodeCompilerCallbacks } from './messages/NodeCompilerCallbacks.js';
+import { NodeCompilerCallbacks } from './util/NodeCompilerCallbacks.js';
 
 let inputFilename: string;
 const program = new Command();
@@ -34,36 +33,24 @@ if (!inputFilename) {
 let outputFilename: string = program.opts().outFile ? program.opts().outFile : inputFilename.replace(/\.kps$/, ".kmp");
 
 //
-// Load .kps source data
+// Run the compiler
 //
 
-const callbacks = new NodeCompilerCallbacks();
-let kmpCompiler = new KmpCompiler(callbacks);
-let kmpJsonData = kmpCompiler.transformKpsToKmpObject(inputFilename);
-if(!kmpJsonData) {
+const callbacks = new NodeCompilerCallbacks({logLevel: 'info'});
+let kmpCompiler = new KmpCompiler();
+if(!await kmpCompiler.init(callbacks, null)) {
   process.exit(1);
 }
 
-//
-// Validate the package file
-//
-
-const validation = new PackageValidation(callbacks);
-if(!validation.validate(inputFilename, kmpJsonData)) {
+let result = await kmpCompiler.run(inputFilename, outputFilename);
+if(!result) {
   process.exit(1);
 }
 
-//
-// Build the .kmp package file
-//
-
-let promise = kmpCompiler.buildKmpFile(inputFilename, kmpJsonData);
-promise.then(data => {
-  fs.writeFileSync(outputFilename, data, 'binary');
-}).catch(error => {
-  // Consumer decides how to handle errors
+if(!await kmpCompiler.write(result.artifacts)) {
   console.error('Failed to write kmp file');
-});
+  process.exit(1);
+}
 
 function exitDueToUsageError(message: string): never  {
   console.error(`${program.name()}: ${message}`);

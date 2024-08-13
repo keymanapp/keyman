@@ -1,0 +1,14 @@
+{
+  "extends": "../../../../tsconfig.kmw-main-base.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "lib": [ "dom", "es6" ],
+    "outDir": "../../../build/tools/obj",
+    "rootDir": "./src",
+    "tsBuildInfoFile": "../../../build/tools/tsconfig.tsbuildinfo"
+  },
+  "references": [
+    { "path": "../../../." }
+  ],
+  "include": ["./src/**/*.ts"]
+}

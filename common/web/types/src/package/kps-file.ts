@@ -17,40 +17,44 @@ export interface KpsPackage {
   /**
    * <Package> -- the root element.
    */
-  package: KpsFile;
+  Package: KpsFile;
 }
 
 export interface KpsFile {
-  system: KpsFileSystem;
-  options: KpsFileOptions;
-  info?: KpsFileInfo;
-  files?: KpsFileContentFiles;
-  keyboards?: KpsFileKeyboards;
-  lexicalModels?: KpsFileLexicalModels;
-  startMenu?: KpsFileStartMenu;
-  strings?: KpsFileStrings;
+  System: KpsFileSystem;
+  Options: KpsFileOptions;
+  Info?: KpsFileInfo;
+  Files?: KpsFileContentFiles;
+  Keyboards?: KpsFileKeyboards;
+  LexicalModels?: KpsFileLexicalModels;
+  StartMenu?: KpsFileStartMenu;
+  Strings?: KpsFileStrings;
+  RelatedPackages?: KpsFileRelatedPackages;
 }
 
 export interface KpsFileSystem {
-  keymanDeveloperVersion: string;
-  fileVersion: string;
+  KeymanDeveloperVersion: string;
+  FileVersion: string;
 }
 
 export interface KpsFileOptions {
-  followKeyboardVersion?: string;
-  readMeFile?: string;
-  graphicFile?: string;
-  executeProgram?: string;
-  msiFileName?: string;
-  msiOptions?: string;
+  FollowKeyboardVersion?: string;
+  ReadMeFile?: string;
+  GraphicFile?: string;
+  LicenseFile?: string;
+  WelcomeFile?: string;
+  ExecuteProgram?: string;
+  MSIFileName?: string;
+  MSIOptions?: string;
 }
 
 export interface KpsFileInfo {
-  name?: KpsFileInfoItem;
-  copyright?: KpsFileInfoItem;
-  author?: KpsFileInfoItem;
-  webSite?: KpsFileInfoItem;
-  version?: KpsFileInfoItem;
+  Name?: KpsFileInfoItem;
+  Copyright?: KpsFileInfoItem;
+  Author?: KpsFileInfoItem;
+  WebSite?: KpsFileInfoItem;
+  Version?: KpsFileInfoItem;
+  Description?: KpsFileInfoItem;
 }
 
 export interface KpsFileInfoItem {
@@ -59,28 +63,31 @@ export interface KpsFileInfoItem {
 }
 
 export interface KpsFileContentFiles {
-  file: KpsFileContentFile[] | KpsFileContentFile;
+  File: KpsFileContentFile[] | KpsFileContentFile;
 }
 
 export interface KpsFileContentFile {
-  name: string;
-  description: string;
-  copyLocation: string;
-  fileType: string;
+  Name: string;
+  /** @deprecated */
+  Description: string;
+  /** @deprecated */
+  CopyLocation: string;
+  /** @deprecated */
+  FileType: string;
 }
 
 export interface KpsFileLexicalModel {
-  name: string;
-  iD: string;
-  languages: KpsFileLanguages;
+  Name: string;
+  ID: string;
+  Languages: KpsFileLanguages;
 }
 
 export interface KpsFileLexicalModels {
-  lexicalModel: KpsFileLexicalModel[] | KpsFileLexicalModel;
+  LexicalModel: KpsFileLexicalModel[] | KpsFileLexicalModel;
 }
 
 export interface KpsFileLanguages {
-  language: KpsFileLanguage[] | KpsFileLanguage;
+  Language: KpsFileLanguage[] | KpsFileLanguage;
 }
 
 export interface KpsFileLanguage {
@@ -88,39 +95,116 @@ export interface KpsFileLanguage {
   $: { ID: string }
 }
 
+export interface KpsFileRelatedPackages {
+  RelatedPackage: KpsFileRelatedPackage | KpsFileRelatedPackage[];
+}
+
+export interface KpsFileRelatedPackage {
+  $: {
+    ID: string;
+    /**
+     * relationship between this package and the related package, "related" is default if not specified
+     */
+    Relationship?: "deprecates";
+  }
+}
+
 export interface KpsFileKeyboard {
-  name: string;     /// the descriptive name of the keyboard
-  iD: string;       /// the keyboard identifier, equal to the basename of the keyboard file sans extension
-  version: string;
-  oSKFont?: string;
-  displayFont?: string;
-  rtl?: boolean;
-  languages?: KpsFileLanguages;
+  Name: string;     /// the descriptive name of the keyboard
+  ID: string;       /// the keyboard identifier, equal to the basename of the keyboard file sans extension
+  Version: string;
+  OSKFont?: string;
+  DisplayFont?: string;
+  RTL?: string;
+  Languages?: KpsFileLanguages;
+  Examples?: KpsFileLanguageExamples;
+  /**
+   * array of web font alternatives for OSK. should be same font data as oskFont
+   */
+  WebOSKFonts?: KpsFileFonts;
+  /**
+   * array of web font alternatives for display. should be same font data as displayFont
+   */
+  WebDisplayFonts?: KpsFileFonts;
+}
+
+export interface KpsFileFonts {
+  Font: KpsFileFont[] | KpsFileFont;
+}
+
+export interface KpsFileFont {
+  $: {
+    Filename: string;
+  }
 }
 
 export interface KpsFileKeyboards {
-  keyboard: KpsFileKeyboard[] | KpsFileKeyboard;
+  Keyboard: KpsFileKeyboard[] | KpsFileKeyboard;
 }
 
 export interface KpsFileStartMenu {
-  folder?: string;
-  addUninstallEntry?: string;
-  items?: KpsFileStartMenuItems;
+  Folder?: string;
+  AddUninstallEntry?: string;
+  Items?: KpsFileStartMenuItems;
 }
 
 export interface KpsFileStartMenuItem {
-  name: string;
-  filename: string;
-  arguments?: string;
-  icon?: string;
-  location?: string;
+  Name: string;
+  FileName: string;
+  Arguments?: string;
+  Icon?: string;
+  Location?: string;
 }
 
 export interface KpsFileStartMenuItems {
-  item: KpsFileStartMenuItem[] | KpsFileStartMenuItem;
+  Item: KpsFileStartMenuItem[] | KpsFileStartMenuItem;
 }
 
 export interface KpsFileStrings {
-  //TODO: validate this structure
-  string: string[] | string;
+  String: KpsFileString[] | KpsFileString;
+}
+
+export interface KpsFileString {
+  $: {
+    Name: string;
+    Value: string;
+  }
+}
+
+export interface KpsFileLanguageExamples {
+  Example: KpsFileLanguageExample | KpsFileLanguageExample[];
+}
+
+/**
+ * An example key sequence intended to demonstrate how the keyboard works
+ */
+export interface KpsFileLanguageExample {
+  $: {
+    /**
+     * BCP 47 identifier for the example
+     */
+    ID: string;
+    /**
+     * A space-separated list of keys.
+     * - modifiers indicated with "+"
+     * - spacebar is "space"
+     * - plus key is "shift+=" or "plus" on US English (all other punctuation as per key cap).
+     * - Hardware modifiers are: "shift", "ctrl", "alt", "left-ctrl",
+     *   "right-ctrl", "left-alt", "right-alt"
+     * - Key caps should generally be their character for desktop (Latin script
+     *   case insensitive), or the actual key cap for touch
+     * - Caps Lock should be indicated with "caps-on", "caps-off"
+     *
+     * e.g. "shift+a b right-alt+c space plus z z z" represents something like: "Ab{AltGr+C} +zzz"
+     */
+    Keys: string;
+    /**
+     * The text that would be generated by typing those keys
+     */
+    Text?: string;
+    /**
+     * A short description of what the text means or represents
+     */
+    Note?: string;
+  }
 }

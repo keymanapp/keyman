@@ -1,4 +1,5 @@
-import { Strs, StrsItem } from './kmx-plus.js';
+import { OrderedStringList } from '../ldml-keyboard/pattern-parser.js';
+import { DependencySections, StrsItem, StrsOptions } from './kmx-plus.js';
 
 /**
  * A single entry in a ListItem.
@@ -22,24 +23,29 @@ export class ListIndex {
  * A string list in memory. This will be replaced with an index
  * into the string table at finalization.
  */
-export class ListItem extends Array<ListIndex> {
+export class ListItem extends Array<ListIndex> implements OrderedStringList {
   /**
    * Construct a new list from an array of strings.
    * Use List. This is meant to be called by the List.allocString*() functions.
-   * @param strs the Strs section is needed to construct this object.
    * @param source array of strings
+   * @param opts string handling options
+   * @param sections the Strs section is needed to construct this object, and other sections may
+   * be needed depending on the options
    * @returns
    */
-  constructor(strs: Strs, source: Array<string>) {
-    super();
-    if(!source) {
-      return;
+  static fromStrings(source: Array<string>, opts: StrsOptions, sections: DependencySections) : ListItem {
+    const a = new ListItem();
+    if (!source) {
+      return a;
     }
-
     for (const str of source) {
-        let index = new ListIndex(strs.allocString(str));
-        this.push(index);
+        let index = new ListIndex(sections.strs.allocString(str, opts, sections));
+        a.push(index);
     }
+    return a;
+  }
+  getItemOrder(item: string): number {
+    return this.findIndex(({value}) => value.value === item);
   }
   isEqual(a: ListItem | string[]): boolean {
     if (a.length != this.length) {
@@ -68,7 +74,13 @@ export class ListItem extends Array<ListIndex> {
       return 0;
     }
   }
+  /** for debugging and tests, print as single string */
   toString(): string {
-    return this.map(v => v.value.value).join(' ');
+    return this.toStringArray().join(' ');
+  }
+  /** for debugging and tests, map to string array */
+  toStringArray(): string[] {
+    // TODO-LDML: this crashes: return this.map(v => v.toString());
+    return Array.from(this.values()).map(v => v.toString());
   }
 };

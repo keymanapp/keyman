@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="en-t-k0-esk" conformsTo="45">
+  <info author="srl295" indicator="🙀" layout="qwerty"  name="esk reorder test"/>
+
+  <displays>
+    <display keyId="overbar" display="¯" />
+    <display keyId="underbar" display="_" />
+    <display keyId="circumflex" display="^" />
+  </displays>
+
+  <keys>
+    <key id="overbar" output="${overbar}" />
+    <key id="underbar" output="${underbar}" />
+    <key id="circumflex" output="${circumflex}" />
+    <key id="test0" output="ax${overbar}" />
+    <key id="markertest0" output="a\m{m4}x\m{marker0}${overbar}" />
+    <key id="test1" output="az${overbar}x${underbar}" />
+    <key id="markertest1" output="a\m{m0}z\m{m1}${overbar}\m{m2}x\m{m3}${underbar}\m{m3}" />
+  </keys>
+
+  <layers formId="us">
+    <layer modifiers="none" id="base">
+      <row keys="gap overbar underbar circumflex" />
+      <row keys="gap gap e gap gap y u i o gap" />
+      <row keys="a" />
+      <row keys="z x" />
+      <row keys="space" />
+    </layer>
+    <layer modifiers="shift">
+      <row keys="gap test0 test1" />
+    </layer>
+    <layer modifiers="altR shift">
+      <row keys="gap markertest0 markertest1" />
+    </layer>
+  </layers>
+
+  <variables>
+    <string id="overbar" value="\u{0305}" />
+    <string id="underbar" value="\u{0332}" />
+    <string id="circumflex" value="\u{0302}" />
+  </variables>
+
+  <transforms type="simple">
+    <transformGroup>
+      <!--
+        ordering for this 'language'
+
+
+        [aeiou]  [_] [¯^] [x] [y] [z]
+
+      -->
+
+      <reorder from="[aeiou]" order="0" tertiaryBase="true" />    <!-- p=0: implied, but here for pedagogical purposes -->
+      <reorder from="[\u{0332}]" tertiary="1" />                  <!--    t=1: lower first -->
+      <reorder from="[\u{0305}\u{0302}]" tertiary="2" />          <!--    t=2: upper next -->
+      <reorder from="x" order="1" />                              <!-- p=1: this follows the 'vowel cluster' -->
+      <reorder from="y" order="2" />                              <!-- p=2: this follows the 'vowel cluster' -->
+      <reorder from="z" order="3" />                              <!-- p=3: this follows the 'vowel cluster' -->
+    </transformGroup>
+  </transforms>
+</keyboard3>

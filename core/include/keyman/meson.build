@@ -19,16 +19,18 @@ cfg.set('patchver', project_ver[2])
 
 configure_file(
   configuration: cfg,
-  input: 'keyboardprocessor_version.h.in',
-  output: 'keyboardprocessor_version.h',
+  input: 'keyman_core_api_version.h.in',
+  output: 'keyman_core_api_version.h',
 )
 
-install_headers('keyboardprocessor.h',
-                'keyboardprocessor_bits.h',
-                'keyboardprocessor_consts.h',
-                'keyboardprocessor_debug.h',
-                'keyboardprocessor_vkeys.h',
-                join_paths(meson.current_build_dir(), 'keyboardprocessor_version.h'),
+install_headers('keyman_core_api.h',
+                'keyman_core_api_actions.h',
+                'keyman_core_api_bits.h',
+                'keyman_core_api_consts.h',
+                'keyman_core_api_context.h',
+                'keyman_core_api_debug.h',
+                'keyman_core_api_vkeys.h',
+                join_paths(meson.current_build_dir(), 'keyman_core_api_version.h'),
                 '../../../common/include/km_types.h',
                 '../../../common/include/kmx_file.h',
                 subdir: 'keyman')

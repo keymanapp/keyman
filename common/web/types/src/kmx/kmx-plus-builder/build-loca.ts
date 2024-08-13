@@ -5,7 +5,7 @@
 
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { KMXPlusData } from "../kmx-plus.js";
-import { build_strs_index, BUILDER_STRS } from "./build-strs.js";
+import { build_strs_index, BUILDER_STR_REF, BUILDER_STRS } from "./build-strs.js";
 import { BUILDER_SECTION } from "./builder-section.js";
 
 /**
@@ -13,7 +13,7 @@ import { BUILDER_SECTION } from "./builder-section.js";
  */
 export interface BUILDER_LOCA extends BUILDER_SECTION {
   count: number;
-  items: number[]; //str[]
+  items: BUILDER_STR_REF[]; //str[]
 };
 
 export function build_loca(kmxplus: KMXPlusData, sect_strs: BUILDER_STRS): BUILDER_LOCA {

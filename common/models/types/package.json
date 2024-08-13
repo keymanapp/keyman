@@ -29,7 +29,7 @@
   },
   "homepage": "https://github.com/keymanapp/keyman/tree/master/common/models/types#readme",
   "devDependencies": {
-    "typescript": "^4.9.5"
+    "typescript": "^5.4.5"
   },
   "files": [
     "README.md",

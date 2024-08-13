@@ -7,7 +7,7 @@ namespace km {
 namespace tests {
 
 struct key_event {
-  km_kbp_virtual_key vk;
+  km_core_virtual_key vk;
   uint16_t modifier_state;
 };
 
@@ -25,20 +25,21 @@ public:
   KmxTestSource();
 
   int load_source(
-      const km::kbp::path &path,
+      const km::core::path &path,
       std::string &keys,
       std::u16string &expected,
+      std::u16string &expected_context,
       std::u16string &context,
       kmx_options &options,
       bool &expected_beep);
 
-  km_kbp_option_item *get_keyboard_options(kmx_options options);
+  km_core_option_item *get_keyboard_options(kmx_options options);
 
   key_event next_key(std::string &keys);
 
   int
   caps_lock_state() {
-    return _caps_lock_on ? KM_KBP_MODIFIER_CAPS : 0;
+    return _caps_lock_on ? KM_CORE_MODIFIER_CAPS : 0;
   }
 
   void
@@ -58,7 +59,7 @@ private:
   bool is_token(const std::string token, std::string &line);
   key_event char_to_event(char ch);
   uint16_t get_modifier(std::string const m);
-  km_kbp_virtual_key get_vk(std::string const &vk);
+  km_core_virtual_key get_vk(std::string const &vk);
   key_event vkey_to_event(std::string const &vk_event);
 };
 

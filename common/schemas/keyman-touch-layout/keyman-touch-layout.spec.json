@@ -44,7 +44,7 @@
 
     "layer-id": {
       "type": "string",
-      "pattern": "^[a-zA-Z0-9_-]+$"
+      "pattern": "^[\\S]+$"
     },
 
     "rows": {
@@ -131,7 +131,8 @@
         "width": { "$ref" : "#/definitions/numeric" },
         "fontsize": { "$ref": "#/definitions/fontsize-spec" },
         "font": { "$ref": "#/definitions/font-spec" },
-        "dk": { "type": "string" }
+        "dk": { "type": "string" },
+        "default": { "type": "boolean" }
       },
       "required": ["id"],
       "additionalProperties": false

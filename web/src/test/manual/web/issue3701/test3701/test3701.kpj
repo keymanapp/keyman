@@ -52,13 +52,6 @@
       <FileType>.md</FileType>
     </File>
     <File>
-      <ID>id_e18bba9285544da2bad5cb8bf0b153d6</ID>
-      <Filename>test3701.keyboard_info</Filename>
-      <Filepath>test3701.keyboard_info</Filepath>
-      <FileVersion></FileVersion>
-      <FileType>.keyboard_info</FileType>
-    </File>
-    <File>
       <ID>id_e944ee9b3d06f36294030601f3bd33ae</ID>
       <Filename>test3701.js</Filename>
       <Filepath>source\..\build\test3701.js</Filepath>

@@ -6,27 +6,22 @@
 @@expected: \u0037\u1790\u17B6\u0127
 
 -->
-<!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="mt" conformsTo="techpreview">
-  <info author="srl295" indicator="🙀" layout="qwerty" normalization="NFC" />
-
-  <names>
-    <name value="TestKbd" />
-  </names>
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info author="srl295" indicator="🙀" layout="qwerty"  name="TestKbd"/>
 
   <keys>
-    <key id="hmaqtugha" to="ħ" />
-    <key id="that" to="ថា" />
-    <key id="seven" to="7" />
-    <key id="eee" to="e" />
+    <key id="hmaqtugha" output="ħ" />
+    <key id="that" output="ថា" />
+    <key id="seven" output="7" />
+    <key id="eee" output="e" />
   </keys>
 
-  <layers form="us">
-    <layer id="base" modifier="none">
+  <layers formId="us">
+    <layer id="base" modifiers="none">
       <row keys="hmaqtugha that" /> <!-- number row -->
     </layer>
-    <layer id="shift" modifier="shift">
+    <layer id="shift" modifiers="shift">
       <row keys="seven eee" /> <!-- number row -->
     </layer>
   </layers>
-</keyboard>
+</keyboard3>

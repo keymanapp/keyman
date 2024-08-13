@@ -10,7 +10,7 @@ We use different channels to build and distribute the Linux packages:
   [alpha](https://launchpad.net/~keymanapp/+archive/ubuntu/keyman-alpha) versions
 - [pso](http://packages.sil.org/) and [llso](http://linux.lsdev.sil.org/ubuntu/)
   for stable, beta, and alpha versions
-- artifacts on [Jenkins](https://jenkins.lsdev.sil.org/view/Keyman/view/Pipeline/job/pipeline-keyman-packaging/view/change-requests/)
+- artifacts on [GitHub](https://github.com/keymanapp/keyman/actions/workflows/deb-packaging.yml)
   for pull requests
 
 Packages on [llso](http://linux.lsdev.sil.org/ubuntu/) are uploaded automatically and are
@@ -21,191 +21,63 @@ pso enabled.
 ## Package builds
 
 Package builds happen on [Launchpad](#package-builds-on-launchpad) and
-[Jenkins](#package-builds-on-jenkins). Package builds for the official Ubuntu/Debian
+[GitHub](#github-actions-package-builds). Package builds for the official Ubuntu/Debian
 repos happen outside of our control. However, we
 [upload source packages](#uploading-debian-source-packages) to the Debian community.
 
-## Package builds on Jenkins
+## GitHub Actions package builds
 
 ### Build jobs
 
-The definition of the packaging jobs, the triggering of the jobs and the necessary build scripts
-are scattered over several source repos:
+The [Keyman GitHub repo](https://github.com/keymanapp/keyman) contains various
+scripts that are used to trigger a build and as part of the package build,
+and of course the source code for the packages:
 
-- [ci-builder-scripts](https://github.com/sillsdev/ci-builder-scripts) contains the definition of
-  a meta job (multi-branch pipeline job) that gets triggered when a change gets pushed to the
-  [Keyman GitHub repo](https://github.com/keymanapp/keyman). The meta job creates a new build
-  configuration/job for each branch/pull request on GitHub. The new job gets triggered to initialize
-  itself, but then exits immediately. We use the Jenkins
-  [Job DSL plugin](https://github.com/jenkinsci/job-dsl-plugin/wiki) to define the meta job.
+- [.github/workflows/deb-packaging.yml](https://github.com/keymanapp/keyman/blob/master/.github/workflows/deb-packaging.yml)
+  contains the definition of the packaging GHA
+- [resources/build/run-required-test-builds.sh](https://github.com/keymanapp/keyman/blob/master/resources/build/run-required-test-builds.sh)
+  runs on [TeamCity](https://build.palaso.org/buildConfiguration/Keyman_Test?)
+  to trigger the builds for the various platforms, among them the GHA package build.
+- [resources/build/increment-version.sh](https://github.com/keymanapp/keyman/blob/master/resources/build/increment-version.sh)
+  runs on [TeamCity](https://build.palaso.org/buildConfiguration/Keyman_TriggerReleaseBuildsMaster?)
+  and increments the version number before triggering the builds for the
+  various platforms.
+- The [linux/scripts](https://github.com/keymanapp/keyman/tree/master/linux/scripts)
+  subdirectory contains `bash` scripts that are used during the package build.
+  Some are only needed for Launchpad builds.
 
-  ci-builder-scripts also contains several generic scripts to set up a package build environment
-  (using `sbuilder`) and for building source and binary packages. These scripts are shared with
-  other projects.
+  - [deb-packaging.sh](https://github.com/keymanapp/keyman/blob/master/linux/scripts/deb-packaging.sh)
+    gets called by the packaging GHA to install dependencies, create the source
+    package and to verify the API.
 
-  The Keyman GitHub repo defines a webhook that triggers the meta job on Jenkins.
-
-  Changes to ci-builder-scripts go through [Gerrit](https://gerrit.lsdev.sil.org). See
-  [CONTRIBUTING.md](https://github.com/sillsdev/ci-builder-scripts/blob/master/CONTRIBUTING.md)
-  for details.
-
-  File structure:
-
-  - [groovy/KeymanPackagingJobs.groovy](https://github.com/sillsdev/ci-builder-scripts/blob/master/groovy/KeymanPackagingJobs.groovy)
-    contains the meta job definition
-  - The [bash/](https://github.com/sillsdev/ci-builder-scripts/tree/master/bash) subdirectory
-    contains `bash` scripts:
-
-    - [setup.sh](https://github.com/sillsdev/ci-builder-scripts/blob/master/bash/setup.sh) -
-      setup sbuild chroot environment
-    - [update](https://github.com/sillsdev/ci-builder-scripts/blob/master/bash/update) -
-      update the sbuild chroot environment
-    - [build-package](https://github.com/sillsdev/ci-builder-scripts/blob/master/bash/build-package) -
-      create a binary package
-
-- [lsdev-pipeline-library](https://github.com/sillsdev/lsdev-pipeline-library) contains a reusable
-  Jenkins pipeline library. The
-  [vars/keymanPackaging.groovy](https://github.com/sillsdev/lsdev-pipeline-library/blob/master/vars/keymanPackaging.groovy)
-  file contains the bulk of the logic of the Keyman packaging job.
-
-- The [Keyman GitHub repo](https://github.com/keymanapp/keyman) contains various scripts that are
-  used to trigger a build and as part of the package build, and of course the source code for the
-  packages:
-
-  - [resources/build/run-required-test-builds.sh](https://github.com/keymanapp/keyman/blob/master/resources/build/run-required-test-builds.sh)
-    runs on [TeamCity](https://build.palaso.org/buildConfiguration/Keyman_Test?) to trigger the
-    builds for the various platforms, among them the Jenkins package build.
-  - [resources/build/increment-version.sh](https://github.com/keymanapp/keyman/blob/master/resources/build/increment-version.sh)
-    runs on [TeamCity](https://build.palaso.org/buildConfiguration/Keyman_TriggerReleaseBuildsMaster?)
-    and increments the version number before triggering the builds for the various platforms.
-  - [linux/Jenkinsfile](https://github.com/keymanapp/keyman/blob/master/linux/Jenkinsfile) is a flag
-    for the meta job. If the meta job finds this file, it will create a new build configuration. This
-    file simply calls the packaging functionality defined in `lsdev-pipeline-library` and passes the
-    distributions and architectures to build as parameters.
-  - [linux/build/agent/install-deps](https://github.com/keymanapp/keyman/blob/master/linux/build/agent/install-deps)
-    installs dependencies on the current build agent.
-  - The [linux/scripts](https://github.com/keymanapp/keyman/tree/master/linux/scripts) subdirectory
-    contains `bash` scripts that are used during the package build. Some are only needed for
-    Launchpad builds.
-
-    - [jenkins.sh](https://github.com/keymanapp/keyman/blob/master/linux/scripts/jenkins.sh)
-      gets called from `lsdev-pipeline-library` to create a source package.
-
-  - [linux/debian](https://github.com/keymanapp/keyman/tree/master/linux/debian) - this is the `debian`
-    subdirectory for Keyman for Linux with the meta data for the Linux package.
-    See [Debian New Maintainers' Guide](https://www.debian.org/doc/manuals/maint-guide/) for
-    details to the various files.
+- [linux/debian](https://github.com/keymanapp/keyman/tree/master/linux/debian) -
+  this is the `debian` subdirectory for Keyman for Linux with the meta data
+  for the Linux package.
+  See [Debian New Maintainers' Guide](https://www.debian.org/doc/manuals/maint-guide/)
+  for details to the various files in the `debian` directory.
 
 ### Flow of a Linux package build
 
-- TeamCity jobs [Keyman_Test](https://build.palaso.org/buildConfiguration/Keyman_Test) or
-  [Keyman_TriggerReleaseBuilds*](https://build.palaso.org/buildConfiguration/Keyman_TriggerReleaseBuildsBeta)
-  trigger a build on [Jenkins](https://jenkins.lsdev.sil.org/view/Keyman/view/Pipeline/job/pipeline-keyman-packaging/)
-- Jenkins verifies the build parameters and starts the matching build configuration for the PR or
-  branch
-- The [build job](https://github.com/sillsdev/lsdev-pipeline-library/blob/master/vars/keymanPackaging.groovy) runs several checks:
-
-  - it exits immediately if the build is not manually triggered and no parameters are passed in
-    (i.e. it got triggered by the GitHub webhook)
-  - it doesn't build if this is a PR, didn't get triggered manually and the PR is not from a trusted
-    user
-  - it doesn't build if no Linux-relevant files changed unless the parameter `force` was passed
-  - manually triggered builds will always build
-
-- build job installs
-  [dependencies](https://github.com/keymanapp/keyman/blob/master/linux/build/agent/install-deps)
-  on the current build agent
-- build job creates a source package for the linux packages (keyman, kmflcomp,
-  libkmfl, and ibus-kmfl). This is done by calling
-  [scripts/jenkins.sh](https://github.com/keymanapp/keyman/blob/master/linux/scripts/jenkins.sh).
-- build job creates the binary package for each linux package on each distribution (currently
-  bionic, focal, and groovy) and each architecture (amd64, i386 only for bionic)
-- at the end of the build if it is not a build of a PR, the `.deb` file gets uploaded to llso
-  (alpha packages to e.g. `bionic-experimental`, beta packages to `bionic-proposed` and
-  packages build from the stable branch to the main section `bionic`)
+- TeamCity jobs [Keyman_Test](https://build.palaso.org/buildConfiguration/Keyman_Test)
+  or [Keyman_TriggerReleaseBuilds*](https://build.palaso.org/buildConfiguration/Keyman_TriggerReleaseBuildsBeta)
+  trigger a packaging GHA build
+- packaging GHA calls [deb-packaging.sh](https://github.com/keymanapp/keyman/blob/master/linux/scripts/deb-packaging.sh)
+  which installs dependencies and creates the source package
+- packaging GHA creates the binary package for each linux package on each
+  distribution
+- packaging GHA verifies that the API didn't change with the help of
+  [deb-packaging.sh](https://github.com/keymanapp/keyman/blob/master/linux/scripts/deb-packaging.sh)
+- at the end of the build if it is not a build of a PR, the `.deb` files get
+  uploaded to llso (alpha packages to e.g. `jammy-experimental`, beta
+  packages to `jammy-proposed` and packages build from the stable branch
+  to the main section `jammy`)
 - if the build is successful the job archives the artifacts
 
-The Jenkins build progress is visible in two ways:
-
-- [traditional view](https://jenkins.lsdev.sil.org/view/Keyman/view/Pipeline/job/pipeline-keyman-packaging/)
-- [blue ocean view](https://jenkins.lsdev.sil.org/blue/organizations/jenkins/pipeline-keyman-packaging/activity)
-
-**Note:** TC release builds pass the git tag to build to the Jenkins job. The same tag
-gets passed twice as parameters `tag` and `tag2`. The first parameter gets persisted between
-builds, allowing to retrigger a tag-build. The second parameter is necessary to distinguish
-if this is a retriggered build of a tag-build.
-
-### Local package builds
-
-It is possible to use the usual Debian/Ubuntu tools to create the package locally. For someone who
-only occasionally deals with packaging it might be easier to use the scripts that Jenkins runs:
-
-#### Prerequisites for local package builds
-
-Install `sbuild` (and probably some other packages that I forgot).
-
-You’ll need a chroot image before you can use sbuild. The scripts in
-[ci-builder-scripts](https://github.com/sillsdev/ci-builder-scripts) will help
-with that. [`setup.sh`](https://github.com/sillsdev/ci-builder-scripts/blob/master/bash/setup.sh)
-can setup such chroots:
-
-```bash
-bash/setup.sh --dists "focal bionic" --arches "amd64 i386"
-```
-
-[`update`](https://github.com/sillsdev/ci-builder-scripts/blob/master/bash/update) is used to
-later update those chroots:
-
-```bash
-bash/update --dists "focal bionic" --arches "amd64 i386"
-```
-
-Set the `DEBSIGNKEY` environment variable to your public GPG key that will be used to sign
-the packages.
-
-#### Building packages
-
-Building packages happen in the [Keyman source tree](https://github.com/keymanapp/keyman).
-
-The Keyman
-[`linux/scripts/jenkins.sh`](https://github.com/keymanapp/keyman/blob/master/linux/scripts/jenkins.sh)
-script can be used to create a source package.
-
-```bash
-cd linux
-./scripts/jenkins.sh keyman ${DEBSIGNKEY}
-```
-
-This creates a source package (`keyman_<version>-1.dsc`) and some `*.tar.?z`
-files in the source root directory for `keyman`.
-
-ci-builder-script's [`build-package`](https://github.com/sillsdev/ci-builder-scripts/blob/master/bash/build-package)
-script creates the binary packages:
-
-```bash
-cd $KEYMAN_ROOT
-~/ci-builder-scripts/bash/build-package \
-    --dists "focal bionic" --arches "amd64 i386" \
-    --debkeyid ${DEBSIGNKEY} --build-in-place --no-upload
-```
-
-This will create the binary package `keyman_<version>-1+<dist>1_<arch>.deb`.
-
-To speed up package building you might want to limit the build to a single dist
-(e.g. `--dists "bionic"`) and arch (e.g. `--arches "amd64"`).
-
-After building packages it might be a good idea to clean up the source tree
-before doing further work:
-
-```bash
-git clean -dxf
-```
-
-### Local package builds (Docker)
+### Local package builds with Docker
 
 It is possible to use the usual Debian/Ubuntu tools to create the package locally.
 For someone who only occasionally deals with packaging it might be easier to use
-the scripts that run on GitHub actions:
+Docker and the scripts that run on GitHub actions:
 
 #### Prerequisites for local package builds with Docker
 
@@ -238,8 +110,11 @@ You'll have to create the docker image.
 
   ```bash
   cd $KEYMAN_ROOT
-  docker run -v $(pwd):/source -i -t -w /source --platform=linux/amd64 \
-    sillsdev/jammy keyman_*.dsc /source
+  DIST=jammy
+  docker run -v $(pwd):/source -i -t -w /source --platform=amd64 \
+    --env INPUT_DIST=$DIST --env INPUT_SOURCE_DIR=. \
+    --env INPUT_SOURCEPACKAGE=$(ls keyman_*.dsc | sort | tail -1) \
+    sillsdev/$DIST
   ```
 
   This will create the binary packages in `$KEYMAN_ROOT/artifacts`.

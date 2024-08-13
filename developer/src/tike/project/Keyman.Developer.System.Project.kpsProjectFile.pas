@@ -1,18 +1,18 @@
 (*
   Name:             Keyman.Developer.System.Project.kpsProjectFile
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      20 Jun 2006
 
   Modified Date:    6 Jun 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          20 Jun 2006 - mcdurdin - Initial version
                     01 Aug 2006 - mcdurdin - Add loading and saving from XML
                     23 Aug 2006 - mcdurdin - Refactor to use actions
@@ -54,7 +54,6 @@ type
     FHeader_Copyright: string;
     FHeader_Version: string;
     FMSIFileName: WideString;
-    FWarnAsError: Boolean;   // I4706
     function GetOutputFilename: string;
     function GetTargetFilename: string;
     function GetTargetInstallerFilename: string;
@@ -62,10 +61,9 @@ type
     function GetRelativeOrder: Integer; override;
     procedure GetFileParameters; override;
   public
-    procedure Load(node: IXMLNode; LoadState: Boolean); override;   // I4698
-    procedure Save(node: IXMLNode; SaveState: Boolean); override;   // I4698
-
-    property WarnAsError: Boolean read FWarnAsError write FWarnAsError;   // I4706
+    function IsCompilable: Boolean; override;
+    procedure Load(node: IXMLNode); override;   // I4698
+    procedure Save(node: IXMLNode); override;   // I4698
 
     property OutputFilename: string read GetOutputFilename;
     property TargetFilename: string read GetTargetFilename;
@@ -79,6 +77,7 @@ implementation
 
 uses
   System.Variants,
+  System.Win.ComObj,
 
   Keyman.Developer.System.Project.Project,
   PackageInfo;
@@ -119,6 +118,12 @@ begin
         end;
         on E:DOMException do
         begin
+          // ignore errors in the xml; reduce metadata visible to the user
+          Exit;
+        end;
+        on E:EOleException do
+        begin
+          // ignore errors in interpreting xml; reduce metadata visible to the user
           Exit;
         end;
       end;
@@ -163,9 +168,14 @@ begin
   Result := OwnerProject.GetTargetFilename(ChangeFileExt(ExtractFileName(FMSIFileName),'') + '-' + ChangeFileExt(ExtractFileName(OutputFilename), '') + '.exe', Filename, FileVersion);
 end;
 
-procedure TkpsProjectFile.Load(node: IXMLNode; LoadState: Boolean);   // I4698
+function TkpsProjectFile.IsCompilable: Boolean;
 begin
-  inherited Load(node, LoadState);
+  Result := True;
+end;
+
+procedure TkpsProjectFile.Load(node: IXMLNode);   // I4698
+begin
+  inherited Load(node);
 
   if node.ChildNodes.IndexOf('Details') < 0 then Exit;
   node := node.ChildNodes['Details'];
@@ -174,9 +184,9 @@ begin
   if node.ChildNodes.IndexOf('Version') >= 0 then FHeader_Version := VarToWideStr(node.ChildValues['Version']);
 end;
 
-procedure TkpsProjectFile.Save(node: IXMLNode; SaveState: Boolean);   // I4698
+procedure TkpsProjectFile.Save(node: IXMLNode);   // I4698
 begin
-  inherited Save(node, SaveState);
+  inherited Save(node);
   node := node.AddChild('Details');
   if FHeader_Name <> '' then node.AddChild('Name').NodeValue := FHeader_Name;
   if FHeader_Copyright <> '' then node.AddChild('Copyright').NodeValue := FHeader_Copyright;

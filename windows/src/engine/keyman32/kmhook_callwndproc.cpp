@@ -114,7 +114,7 @@ LRESULT _kmnCallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
 	  else
 	  {
   /*
-		  SendDebugMessageFormat(cp->hwnd, sdmGlobal, 0, "kmnCallWndProc %s %x %x "
+		  SendDebugMessageFormat("kmnCallWndProc %s %x %x "
 		  "{hwnd:%d msg:%d wp:%d lp:%d} ctrl: %x/%x alt: %x/%x shift: %x/%x",
 		  MessageName(cp->message), cp->wParam, cp->lParam,
 		  cp->hwnd, cp->message, cp->wParam, cp->lParam,
@@ -152,7 +152,7 @@ LRESULT _kmnCallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
           DebugLastError("CheckControllers");
           return CallNextHookEx(Globals::get_hhookCallWndProc(), nCode, wParam, lParam);
         }
-        if(!InitialiseProcess(cp->hwnd))
+        if(!InitialiseProcess())
         {
           DebugLastError("InitialiseProcess");
           return CallNextHookEx(Globals::get_hhookCallWndProc(), nCode, wParam, lParam);
@@ -167,11 +167,11 @@ LRESULT _kmnCallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
           HWND hwnd = IsLanguageSwitchWindowVisible();   // I4326
           if(hwnd != NULL && !Globals::IsControllerThread(GetCurrentThreadId())) SendToLanguageSwitchWindow(hwnd, VK_ESCAPE, 0); // I3025
 
-          SendDebugMessageFormat(cp->hwnd, sdmGlobal, 0, "WM_KILLFOCUS %x -> %x", cp->hwnd, cp->wParam);  // I3226   // I3531
+          SendDebugMessageFormat("WM_KILLFOCUS %x -> %x", cp->hwnd, cp->wParam);  // I3226   // I3531
           if(!IsSysTrayWindow(cp->hwnd) && !Globals::IsControllerThread(GetCurrentThreadId()))   // I2443 - always do the focus change now? really unsure about this one
           {
   			    PostMessage(cp->hwnd, wm_keyman, KM_FOCUSCHANGED, 0);
-	  		    SendDebugMessageFormat(cp->hwnd, sdmGlobal, 0, "WM_KILLFOCUS -- Telling Keyman focus has changed");
+	  		    SendDebugMessageFormat("WM_KILLFOCUS -- Telling Keyman focus has changed");
   			    KMHideIM();
 	  		    if(_td->app) _td->app->ResetContext();
           }
@@ -180,13 +180,13 @@ LRESULT _kmnCallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
       case WM_SETFOCUS:
         CheckScheduledRefresh();
         if (IsSysTrayWindow(cp->hwnd))      // I2443 - always do the focus change now? really unsure about this one
-          SendDebugMessageFormat(cp->hwnd, sdmGlobal, 0, "WM_SETFOCUS -- not hooking because IsSysTrayWindow");
+          SendDebugMessageFormat("WM_SETFOCUS -- not hooking because IsSysTrayWindow");
         else if (Globals::IsControllerThread(GetCurrentThreadId()))
-          SendDebugMessageFormat(cp->hwnd, sdmGlobal, 0, "WM_SETFOCUS -- not hooking because IsControllerThread");
+          SendDebugMessageFormat("WM_SETFOCUS -- not hooking because IsControllerThread");
         else
         {
           PostMessage(cp->hwnd, wm_keyman, KM_FOCUSCHANGED, KMF_WINDOWCHANGED);
-          SendDebugMessageFormat(cp->hwnd, sdmGlobal, 0, "WM_SETFOCUS %x <- %x", cp->hwnd, cp->wParam);  // I3226   // I3531
+          SendDebugMessageFormat("WM_SETFOCUS %x <- %x", cp->hwnd, cp->wParam);  // I3226   // I3531
           if (_td->app) _td->app->ResetContext();
         }
         break;
@@ -198,7 +198,7 @@ LRESULT _kmnCallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
         break;
 		  case WM_INPUTLANGCHANGE:
         CheckScheduledRefresh();
-        SendDebugMessageFormat(cp->hwnd, sdmGlobal, 0, "WM_INPUTLANGCHANGE %x %x Hwnd=%x Parent=%x Focus=%x Active=%x", cp->wParam, cp->lParam, cp->hwnd, GetParent(cp->hwnd), GetFocus(), GetActiveWindow());
+        SendDebugMessageFormat("WM_INPUTLANGCHANGE %x %x Hwnd=%x Parent=%x Focus=%x Active=%x", cp->wParam, cp->lParam, cp->hwnd, GetParent(cp->hwnd), GetFocus(), GetActiveWindow());
           ReportActiveKeyboard(PC_UPDATE);   // I4288
 
           // The input language has changed, so tell Keyman window about it
@@ -206,10 +206,10 @@ LRESULT _kmnCallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
       default:
         if(cp->message == wm_keyman)    // I2435 - Make Keyman Engine unload more reliably by sending a broadcast message to all apps rather than posting
         {
-          SendDebugMessageFormat(0, sdmInternat, 0, "CallWndProc: wm_keyman hwnd=%x %x %x", cp->hwnd, cp->wParam, cp->lParam);   // I4674
+          SendDebugMessageFormat("wm_keyman hwnd=%x %x %x", cp->hwnd, cp->wParam, cp->lParam);   // I4674
           ProcessWMKeyman(cp->hwnd, cp->wParam, cp->lParam);
         } else if(cp->message == wm_keyman_control_internal) {
-          SendDebugMessageFormat(0, sdmInternat, 0, "CallWndProc: wm_keyman_control_internal hwnd=%x %x %x", cp->hwnd, cp->wParam, cp->lParam);   // I4674
+          SendDebugMessageFormat("wm_keyman_control_internal hwnd=%x %x %x", cp->hwnd, cp->wParam, cp->lParam);   // I4674
       		ProcessWMKeymanControlInternal(cp->hwnd, cp->wParam, cp->lParam);   // I4271
         }
 		  }

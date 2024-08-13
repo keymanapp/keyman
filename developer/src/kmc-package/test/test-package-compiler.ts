@@ -1,5 +1,6 @@
 import 'mocha';
 import * as fs from 'fs';
+import * as path from 'path';
 import { assert } from 'chai';
 import JSZip from 'jszip';
 
@@ -10,19 +11,23 @@ import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
 
 import { KmpCompiler } from '../src/compiler/kmp-compiler.js';
-import { PackageValidation } from '../src/compiler/package-validation.js';
-import { CompilerMessages } from '../src/compiler/messages.js';
+import { PackageCompilerMessages } from '../src/compiler/package-compiler-messages.js';
 
-const debug = true;
+const debug = false;
 
 describe('KmpCompiler', function () {
   const MODELS : string[] = [
     'example.qaa.sencoten',
     'withfolders.qaa.sencoten',
   ];
-
   const callbacks = new TestCompilerCallbacks();
-  let kmpCompiler = new KmpCompiler(callbacks);
+  let kmpCompiler: KmpCompiler = null;
+
+  this.beforeAll(async function() {
+    callbacks.clear();
+    kmpCompiler = new KmpCompiler();
+    assert.isTrue(await kmpCompiler.init(callbacks, null));
+  });
 
   for (let modelID of MODELS) {
     const kpsPath = modelID.includes('withfolders') ?
@@ -89,7 +94,9 @@ describe('KmpCompiler', function () {
     const kpsPath = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
     const kmpJsonRefPath = makePathToFixture('khmer_angkor', 'ref', 'kmp.json');
 
-    const kmpCompiler = new KmpCompiler(callbacks);
+    const kmpCompiler = new KmpCompiler();
+    assert.isTrue(await kmpCompiler.init(callbacks, null));
+
     const kmpJsonFixture: KmpJsonFile.KmpJsonFile = JSON.parse(fs.readFileSync(kmpJsonRefPath, 'utf-8'));
 
     // We override the fixture version so that we can compare with the compiler output
@@ -113,6 +120,7 @@ describe('KmpCompiler', function () {
       'khmer_busra_kbd.ttf', 'Mondulkiri-R.ttf', 'OFL.txt', 'OFL-FAQ.txt', 'readme.htm',
       'splash.gif', 'welcome.htm',
       'kmp.json', // standard .kmp metadata file
+      'kmp.inf', // legacy keyboard .kmp metdata file
     ];
 
     assert.sameMembers(Object.entries(jszip.files).map(([s, o]) => o.name).sort(),
@@ -124,6 +132,65 @@ describe('KmpCompiler', function () {
   });
 
   /*
+   * Testing kmp.json generation
+   */
+
+  it(`should transform a .kps file for a keyboard package to a correct kmp.json`, function () {
+    callbacks.clear();
+
+    const kpsPath = makePathToFixture('kmp.json', 'ahom_star.kps');
+    const kmpJsonRefPath = makePathToFixture('kmp.json', 'kmp.json');
+
+    let kmpJsonActual = kmpCompiler.transformKpsToKmpObject(kpsPath);
+    if(kmpJsonActual == null) {
+      callbacks.printMessages();
+      assert.isNotNull(kmpJsonActual);
+    }
+    let kmpJsonFixture = JSON.parse(fs.readFileSync(kmpJsonRefPath, 'utf-8'));
+    assert.isNotNull(kmpJsonFixture);
+
+    // Blank out system.keymanDeveloperVersion which will vary
+    kmpJsonActual.system.keymanDeveloperVersion = '-';
+    kmpJsonFixture.system.keymanDeveloperVersion = '-';
+
+    // Strip file paths to basename for the actual (this is currently part of the
+    // zip phase and not unit testable without refactoring)
+    for(const file of kmpJsonActual.files) {
+      file.name = path.basename(file.name);
+    }
+
+    assert.deepEqual(kmpJsonActual, kmpJsonFixture);
+  });
+
+  it(`should support .kps 17.0 metadata correctly`, function () {
+    callbacks.clear();
+
+    const kpsPath = makePathToFixture('kmp_2.0', 'khmer_angkor.kps');
+    const kmpJsonRefPath = makePathToFixture('kmp_2.0', 'kmp.json');
+
+    debugger;
+
+    let kmpJsonActual = kmpCompiler.transformKpsToKmpObject(kpsPath);
+    if(kmpJsonActual == null) {
+      callbacks.printMessages();
+      assert.isNotNull(kmpJsonActual);
+    }
+    let kmpJsonFixture = JSON.parse(fs.readFileSync(kmpJsonRefPath, 'utf-8'));
+    assert.isNotNull(kmpJsonFixture);
+
+    // Blank out system.keymanDeveloperVersion which will vary
+    kmpJsonActual.system.keymanDeveloperVersion = '-';
+    kmpJsonFixture.system.keymanDeveloperVersion = '-';
+
+    // Strip file paths to basename for the actual (this is currently part of the
+    // zip phase and not unit testable without refactoring)
+    for(const file of kmpJsonActual.files) {
+      file.name = path.basename(file.name);
+    }
+
+    assert.deepEqual(kmpJsonActual, kmpJsonFixture);
+  });
+  /*
    * Testing Warnings and Errors
    */
 
@@ -133,7 +200,8 @@ describe('KmpCompiler', function () {
     callbacks.clear();
 
     const kpsPath = makePathToFixture('absolute_path', 'source', 'absolute_path.kps');
-    const kmpCompiler = new KmpCompiler(callbacks);
+    const kmpCompiler = new KmpCompiler();
+    assert.isTrue(await kmpCompiler.init(callbacks, null));
 
     let kmpJson: KmpJsonFile.KmpJsonFile = null;
 
@@ -146,182 +214,72 @@ describe('KmpCompiler', function () {
     if(debug) callbacks.printMessages();
 
     assert.lengthOf(callbacks.messages, 2);
-    assert.deepEqual(callbacks.messages[0].code, CompilerMessages.WARN_AbsolutePath);
-    assert.deepEqual(callbacks.messages[1].code, CompilerMessages.ERROR_FileDoesNotExist);
+    assert.deepEqual(callbacks.messages[0].code, PackageCompilerMessages.WARN_AbsolutePath);
+    assert.deepEqual(callbacks.messages[1].code, PackageCompilerMessages.ERROR_FileDoesNotExist);
   });
 
-  //
-  // Message tests
-  //
+  // Testing path normalization
 
-  function testForMessage(context: Mocha.Context, fixture: string[], messageId?: number) {
-    context.timeout(10000);
+  it('should normalize DOS pathnames from \\ to /', async function() {
+    // this.timeout(10000); // building a zip file can sometimes be slow
 
     callbacks.clear();
 
-    const kpsPath = makePathToFixture(...fixture);
-    const kmpCompiler = new KmpCompiler(callbacks);
+    const kpsPath = makePathToFixture('normalize_paths', 'source', 'khmer_angkor.kps');
+    const kmpCompiler = new KmpCompiler();
+    assert.isTrue(await kmpCompiler.init(callbacks, null));
 
-    let kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
-    if(kmpJson && callbacks.messages.length == 0) {
-      const validator = new PackageValidation(callbacks);
-      validator.validate(kpsPath, kmpJson); // we'll ignore return value and rely on the messages
-    }
+    let kmpJson: KmpJsonFile.KmpJsonFile = null;
 
-    if(kmpJson && callbacks.messages.length == 0) {
-      // We'll try building the package if we have not yet received any messages
-      kmpCompiler.buildKmpFile(kpsPath, kmpJson)
-    }
+    assert.doesNotThrow(() => {
+      kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
+    });
 
-    if(debug) callbacks.printMessages();
+    callbacks.printMessages();
+    assert.lengthOf(callbacks.messages, 0);
+    /*
+    <ExecuteProgram>exe\myprogram.exe</ExecuteProgram>
+    <ReadMeFile>..\source\readme.htm</ReadMeFile>
+    <GraphicFile>..\source\splash.gif</GraphicFile>
+    <WelcomeFile>..\source\welcome.htm</WelcomeFile>
+    <MSIFileName>msi\myprogram.msi</MSIFileName>
+    */
+    assert.equal(kmpJson.options.executeProgram, 'exe/myprogram.exe');
+    assert.equal(kmpJson.options.readmeFile, '../source/readme.htm');
+    assert.equal(kmpJson.options.graphicFile, '../source/splash.gif');
+    assert.equal(kmpJson.options.welcomeFile, '../source/welcome.htm');
+    assert.equal(kmpJson.options.msiFilename, 'msi/myprogram.msi');
+    assert.equal(kmpJson.files[0].name, '../build/khmer_angkor.js');
 
-    if(messageId) {
-      assert.lengthOf(callbacks.messages, 1);
-      assert.isTrue(callbacks.hasMessage(messageId));
-    } else {
-      assert.lengthOf(callbacks.messages, 0);
-    }
-  }
+    /*
+      <OSKFont>..\shared\fonts\khmer\busrakbd\khmer_busra_kbd.ttf</OSKFont>
+      <DisplayFont>..\shared\fonts\khmer\mondulkiri\Mondulkiri-R.ttf</DisplayFont>
+    */
 
-  // WARN_FileIsNotABinaryKvkFile
-
-  it('should generate WARN_FileIsNotABinaryKvkFile if a non-binary kvk file is included', async function() {
-    testForMessage(this, ['xml_kvk_file', 'source', 'xml_kvk_file.kps'], CompilerMessages.WARN_FileIsNotABinaryKvkFile);
+    // These are stripped to basename; note that there may be platform
+    // differences
+    assert.equal(kmpJson.keyboards[0].oskFont, 'khmer_busra_kbd.ttf');
+    assert.equal(kmpJson.keyboards[0].displayFont, 'Mondulkiri-R.ttf');
   });
 
-  it('should not warn if a binary kvk file is included', async function() {
-    testForMessage(this, ['binary_kvk_file', 'source', 'binary_kvk_file.kps']);
+  //
+  // Test some invalid package metadata
+  //
+  it(`should load a package with missing keyboard ID metadata`, function () {
+    const kmpJson = kmpCompiler.transformKpsToKmpObject(makePathToFixture('invalid', 'missing_keyboard_id.kps'));
+    assert.isNull(kmpJson); // with a missing keyboard_id, the package shouldn't load, but it shouldn't crash either
+    assert.deepEqual(callbacks.messages[0].code, PackageCompilerMessages.ERROR_KeyboardContentFileNotFound);
+
   });
 
-  // ERROR_FollowKeyboardVersionNotAllowedForModelPackages
-
-  it('should generate ERROR_FollowKeyboardVersionNotAllowedForModelPackages if <FollowKeyboardVersion> is set for model packages', async function() {
-    testForMessage(this, ['invalid', 'followkeyboardversion.qaa.sencoten.model.kps'], CompilerMessages.ERROR_FollowKeyboardVersionNotAllowedForModelPackages);
+  it(`should load a package with missing keyboard name metadata`, function () {
+    const kmpJson = kmpCompiler.transformKpsToKmpObject(makePathToFixture('invalid', 'missing_keyboard_name.kps'));
+    assert.equal(kmpJson.keyboards[0].name, 'version 4'); // picks up example.kmx's name
   });
 
-  // ERROR_FollowKeyboardVersionButNoKeyboards
-
-  it('should generate ERROR_FollowKeyboardVersionButNoKeyboards if <FollowKeyboardVersion> is set for a package with no keyboards', async function() {
-    testForMessage(this, ['invalid', 'followkeyboardversion.empty.kps'], CompilerMessages.ERROR_FollowKeyboardVersionButNoKeyboards);
+  it(`should load a package with missing keyboard version metadata`, function () {
+    const kmpJson = kmpCompiler.transformKpsToKmpObject(makePathToFixture('invalid', 'missing_keyboard_version.kps'));
+    assert.equal(kmpJson.keyboards[0].version, '4.0');  // picks up example.kmx's version
   });
 
-  // ERROR_KeyboardContentFileNotFound
-
-  it('should generate ERROR_KeyboardContentFileNotFound if a <Keyboard> is listed in a package but not found in <Files>', async function() {
-    testForMessage(this, ['invalid', 'keyboardcontentfilenotfound.kps'], CompilerMessages.ERROR_KeyboardContentFileNotFound);
-  });
-
-  // ERROR_KeyboardFileNotValid
-
-  it('should generate ERROR_KeyboardFileNotValid if a .kmx is not valid in <Files>', async function() {
-    testForMessage(this, ['invalid', 'keyboardfilenotvalid.kps'], CompilerMessages.ERROR_KeyboardFileNotValid);
-  });
-
-  // INFO_KeyboardFileHasNoKeyboardVersion
-
-  it('should generate INFO_KeyboardFileHasNoKeyboardVersion if <FollowKeyboardVersion> is set but keyboard has no version', async function() {
-    testForMessage(this, ['invalid', 'nokeyboardversion.kps'], CompilerMessages.INFO_KeyboardFileHasNoKeyboardVersion);
-  });
-
-  // ERROR_PackageCannotContainBothModelsAndKeyboards
-
-  it('should generate ERROR_PackageCannotContainBothModelsAndKeyboards if package has both keyboards and models', async function() {
-    testForMessage(this, ['invalid', 'error_package_cannot_contain_both_models_and_keyboards.kps'], CompilerMessages.ERROR_PackageCannotContainBothModelsAndKeyboards);
-  });
-
-  // WARN_PackageShouldNotRepeatLanguages (models)
-
-  it('should generate WARN_PackageShouldNotRepeatLanguages if model has same language repeated', async function() {
-    testForMessage(this, ['invalid', 'keyman.en.warn_package_should_not_repeat_languages.model.kps'], CompilerMessages.WARN_PackageShouldNotRepeatLanguages);
-  });
-
-  // WARN_PackageShouldNotRepeatLanguages (keyboards)
-
-  it('should generate WARN_PackageShouldNotRepeatLanguages if keyboard has same language repeated', async function() {
-    testForMessage(this, ['invalid', 'warn_package_should_not_repeat_languages.kps'], CompilerMessages.WARN_PackageShouldNotRepeatLanguages);
-  });
-
-  // WARN_PackageNameDoesNotFollowLexicalModelConventions
-
-  it('should generate WARN_PackageNameDoesNotFollowLexicalModelConventions if filename has wrong conventions', async function() {
-    testForMessage(this, ['invalid', 'WARN_PackageNameDoesNotFollowLexicalModelConventions.kps'], CompilerMessages.WARN_PackageNameDoesNotFollowLexicalModelConventions);
-  });
-
-  // WARN_PackageNameDoesNotFollowKeyboardConventions
-
-  it('should generate WARN_PackageNameDoesNotFollowKeyboardConventions if filename has wrong conventions', async function() {
-    testForMessage(this, ['invalid', 'WARN_PackageNameDoesNotFollowKeyboardConventions.kps'], CompilerMessages.WARN_PackageNameDoesNotFollowKeyboardConventions);
-  });
-
-  // WARN_FileInPackageDoesNotFollowFilenameConventions
-
-  it('should generate WARN_FileInPackageDoesNotFollowFilenameConventions if content filename has wrong conventions', async function() {
-    testForMessage(this, ['invalid', 'warn_file_in_package_does_not_follow_filename_conventions.kps'], CompilerMessages.WARN_FileInPackageDoesNotFollowFilenameConventions);
-    testForMessage(this, ['invalid', 'warn_file_in_package_does_not_follow_filename_conventions_2.kps'], CompilerMessages.WARN_FileInPackageDoesNotFollowFilenameConventions);
-  });
-
-  // ERROR_PackageNameCannotBeBlank
-
-  it('should generate ERROR_PackageNameCannotBeBlank if package info has empty name', async function() {
-    testForMessage(this, ['invalid', 'error_package_name_cannot_be_blank.kps'], CompilerMessages.ERROR_PackageNameCannotBeBlank); // blank field
-    testForMessage(this, ['invalid', 'error_package_name_cannot_be_blank_2.kps'], CompilerMessages.ERROR_PackageNameCannotBeBlank); // missing field
-  });
-
-  // ERROR_KeyboardFileNotFound
-
-  it('should generate ERROR_KeyboardFileNotFound if a <Keyboard> is listed in a package but not found in <Files>', async function() {
-    testForMessage(this, ['invalid', 'keyboardfilenotfound.kps'], CompilerMessages.ERROR_KeyboardFileNotFound);
-  });
-
-  // WARN_KeyboardVersionsDoNotMatch
-
-  it('should generate WARN_KeyboardVersionsDoNotMatch if two <Keyboards> have different versions', async function() {
-    testForMessage(this, ['invalid', 'warn_keyboard_versions_do_not_match.kps'], CompilerMessages.WARN_KeyboardVersionsDoNotMatch);
-  });
-
-  // WARN_KeyboardVersionsDoNotMatchPackageVersion
-
-  it('should generate WARN_KeyboardVersionsDoNotMatchPackageVersion if <Keyboard> version does not match package version', async function() {
-    testForMessage(this, ['invalid', 'warn_keyboard_versions_do_not_match_package_version.kps'], CompilerMessages.WARN_KeyboardVersionsDoNotMatchPackageVersion);
-  });
-
-  // ERROR_LanguageTagIsNotValid
-
-  it('should generate ERROR_LanguageTagIsNotValid if keyboard has an invalid language tag', async function() {
-    testForMessage(this, ['invalid', 'error_language_tag_is_not_valid.kps'], CompilerMessages.ERROR_LanguageTagIsNotValid);
-  });
-
-  // WARN_LanguageTagIsNotMinimal
-
-  it('should generate WARN_LanguageTagIsNotMinimal if keyboard has a non-minimal language tag', async function() {
-    testForMessage(this, ['invalid', 'warn_language_tag_is_not_minimal.kps'], CompilerMessages.WARN_LanguageTagIsNotMinimal);
-  });
-
-  // ERROR_MustHaveAtLeastOneLanguage
-
-  it('should generate ERROR_MustHaveAtLeastOneLanguage if model or keyboard has zero language tags', async function() {
-    testForMessage(this, ['invalid', 'keyman.en.error_must_have_at_least_one_language.model.kps'],
-      CompilerMessages.ERROR_MustHaveAtLeastOneLanguage);
-  });
-
-  // WARN_RedistFileShouldNotBeInPackage
-
-  it('should generate WARN_RedistFileShouldNotBeInPackage if package contains a redist file', async function() {
-    testForMessage(this, ['invalid', 'warn_redist_file_should_not_be_in_package.kps'],
-      CompilerMessages.WARN_RedistFileShouldNotBeInPackage);
-  });
-
-  // WARN_DocFileDangerous
-
-  it('should generate WARN_DocFileDangerous if package contains a .doc file', async function() {
-    testForMessage(this, ['invalid', 'warn_doc_file_dangerous.kps'],
-      CompilerMessages.WARN_DocFileDangerous);
-  });
-
-  // ERROR_PackageMustContainAPackageOrAKeyboard
-
-  it('should generate ERROR_PackageMustContainAModelOrAKeyboard if package contains a .doc file', async function() {
-    testForMessage(this, ['invalid', 'error_package_must_contain_a_model_or_a_keyboard.kps'],
-      CompilerMessages.ERROR_PackageMustContainAModelOrAKeyboard);
-  });
 });

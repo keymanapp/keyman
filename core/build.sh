@@ -1,19 +1,14 @@
 #!/usr/bin/env bash
 
-set -e
-set -u
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../resources/build/builder.inc.sh"
 
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 . "$THIS_SCRIPT_PATH/commands.inc.sh"
-
-cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 
@@ -73,7 +68,7 @@ Libraries will be built in 'build/<target>/<configuration>/src'.
   "uninstall                       uninstall libraries from current system" \
   "${archtargets[@]}" \
   "--no-tests                      do not configure tests (used by other projects)" \
-  "--test=opt_tests,-t             test[s] to run (space separated)"
+  "--test,-t=opt_tests             test[s] to run (space separated)"
 
 builder_parse "$@"
 
@@ -107,13 +102,13 @@ builder_describe_outputs \
   configure:mac-arm64       /core/build/mac-arm64/$BUILDER_CONFIGURATION/build.ninja \
   configure:arch            /core/build/arch/$BUILDER_CONFIGURATION/build.ninja \
   configure:wasm            /core/build/wasm/$BUILDER_CONFIGURATION/build.ninja \
-  build:x86                 /core/build/x86/$BUILDER_CONFIGURATION/src/libkmnkbp0.a \
-  build:x64                 /core/build/x64/$BUILDER_CONFIGURATION/src/libkmnkbp0.a \
-  build:mac                 /core/build/mac/$BUILDER_CONFIGURATION/libkmnkbp0.a \
-  build:mac-x86_64          /core/build/mac-x86_64/$BUILDER_CONFIGURATION/src/libkmnkbp0.a \
-  build:mac-arm64           /core/build/mac-arm64/$BUILDER_CONFIGURATION/src/libkmnkbp0.a \
-  build:arch                /core/build/arch/$BUILDER_CONFIGURATION/src/libkmnkbp0.a \
-  build:wasm                /core/build/wasm/$BUILDER_CONFIGURATION/src/libkmnkbp0.a
+  build:x86                 /core/build/x86/$BUILDER_CONFIGURATION/src/libkeymancore.a \
+  build:x64                 /core/build/x64/$BUILDER_CONFIGURATION/src/libkeymancore.a \
+  build:mac                 /core/build/mac/$BUILDER_CONFIGURATION/libkeymancore.a \
+  build:mac-x86_64          /core/build/mac-x86_64/$BUILDER_CONFIGURATION/src/libkeymancore.a \
+  build:mac-arm64           /core/build/mac-arm64/$BUILDER_CONFIGURATION/src/libkeymancore.a \
+  build:arch                /core/build/arch/$BUILDER_CONFIGURATION/src/libkeymancore.a \
+  build:wasm                /core/build/wasm/$BUILDER_CONFIGURATION/src/libkeymancore.a
 
 # Import our standard compiler defines; this is copied from
 # /resources/build/meson/standard.meson.build by build.sh, because meson doesn't
@@ -157,13 +152,18 @@ do_action build
 
 if builder_start_action build:mac; then
   lipo -create \
-    "$KEYMAN_ROOT/core/build/mac-x86_64/$BUILDER_CONFIGURATION/src/libkmnkbp0.a" \
-    "$KEYMAN_ROOT/core/build/mac-arm64/$BUILDER_CONFIGURATION/src/libkmnkbp0.a" \
-    -output "$KEYMAN_ROOT/core/build/mac/$BUILDER_CONFIGURATION/libkmnkbp0.a"
+    "$KEYMAN_ROOT/core/build/mac-x86_64/$BUILDER_CONFIGURATION/src/libkeymancore.a" \
+    "$KEYMAN_ROOT/core/build/mac-arm64/$BUILDER_CONFIGURATION/src/libkeymancore.a" \
+    -output "$KEYMAN_ROOT/core/build/mac/$BUILDER_CONFIGURATION/libkeymancore.a"
   builder_finish_action success build:mac
 fi
 
 # -------------------------------------------------------------------------------
+
+testparams="${builder_extra_params[@]} --print-errorlogs"
+if builder_has_option --test; then
+  testparams="$opt_tests $testparams"
+fi
 
 do_action test
 
@@ -173,7 +173,7 @@ if builder_start_action test:mac; then
   # available
   target=mac-`uname -m`
   MESON_PATH="$KEYMAN_ROOT/core/build/$target/$BUILDER_CONFIGURATION"
-  meson test -C "$MESON_PATH" "${builder_extra_params[@]}"
+  meson test -C "$MESON_PATH" $testparams
   builder_finish_action success test:mac
 fi
 

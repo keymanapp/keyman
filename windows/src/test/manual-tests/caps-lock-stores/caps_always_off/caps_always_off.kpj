@@ -91,12 +91,5 @@
       <FileVersion></FileVersion>
       <FileType>.md</FileType>
     </File>
-    <File>
-      <ID>id_60f11cd4dd88c1ad232f0099b86b071f</ID>
-      <Filename>caps_always_off.keyboard_info</Filename>
-      <Filepath>caps_always_off.keyboard_info</Filepath>
-      <FileVersion></FileVersion>
-      <FileType>.keyboard_info</FileType>
-    </File>
   </Files>
 </KeymanDeveloperProject>

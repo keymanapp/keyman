@@ -174,19 +174,16 @@
         <DCCReference Include="Keyman.Developer.System.KMConvertParameters.pas"/>
         <DCCReference Include="Keyman.Developer.System.ImportKeyboardDLL.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\ScanCodeMap.pas"/>
-        <DCCReference Include="Keyman.Developer.System.TouchLayoutToVisualKeyboardConverter.pas"/>
+        <DCCReference Include="Keyman.Developer.System.VisualKeyboardToTouchLayoutConverter.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\visualkeyboard\OnScreenKeyboardData.pas"/>
         <DCCReference Include="..\TIKE\oskbuilder\TouchLayout.pas"/>
         <DCCReference Include="..\TIKE\oskbuilder\TouchLayoutDefinitions.pas"/>
         <DCCReference Include="..\common\delphi\general\KeyboardFonts.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\ui\Keyman.System.Util.RenderLanguageIcon.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\general\utilicon.pas"/>
-        <DCCReference Include="..\common\delphi\compiler\CompileErrorCodes.pas"/>
         <DCCReference Include="Keyman.Developer.System.ModelProjectTemplate.pas"/>
         <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.modelTsProjectFile.pas"/>
-        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.wordlistTsvProjectFile.pas">
-            <Form>$R icons.RES</Form>
-        </DCCReference>
+        <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.wordlistTsvProjectFile.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\ext\sentry\Sentry.Client.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\ext\sentry\Sentry.Client.Console.pas"/>
         <DCCReference Include="..\..\..\common\windows\delphi\ext\sentry\sentry.pas"/>
@@ -195,6 +192,10 @@
         <DCCReference Include="..\..\..\common\windows\delphi\standards\Keyman.System.Standards.LangTagsRegistry.pas"/>
         <DCCReference Include="..\TIKE\project\Keyman.Developer.System.Project.UrlRenderer.pas"/>
         <DCCReference Include="..\common\delphi\lexicalmodels\Keyman.System.LexicalModelUtils.pas"/>
+        <DCCReference Include="..\tike\main\KeymanDeveloperOptions.pas"/>
+        <DCCReference Include="..\tike\main\Keyman.Developer.System.KeymanDeveloperPaths.pas"/>
+        <DCCReference Include="Keyman.Developer.System.LdmlKeyboardProjectTemplate.pas"/>
+        <DCCReference Include="..\..\..\common\windows\delphi\general\utilhttp.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

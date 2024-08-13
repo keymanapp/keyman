@@ -21,7 +21,7 @@
   },
   "files": [
     {
-      "name": "..\\build\\withfolders.qaa.sencoten.model.js",
+      "name": "../build/withfolders.qaa.sencoten.model.js",
       "description": "Lexical model withfolders.qaa.sencoten.model.js"
     },
     {

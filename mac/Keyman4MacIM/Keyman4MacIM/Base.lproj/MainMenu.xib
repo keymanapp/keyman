@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -19,19 +19,16 @@
         </customObject>
         <menu id="Uod-T8-nBO">
             <items>
-                <menuItem title="Keyboards" tag="1" id="bQa-j9-nHe">
-                    <modifierMask key="keyEquivalentModifierMask"/>
-                    <menu key="submenu" title="Keyboards" id="goP-aK-3WB"/>
-                </menuItem>
-                <menuItem title="Configuration..." tag="2" id="P1b-lE-yFw"/>
-                <menuItem title="On-Screen Keyboard" tag="3" id="s96-JI-YDh">
+                <menuItem isSeparatorItem="YES" tag="-4" id="uqs-C7-aK3"/>
+                <menuItem title="Configuration..." tag="-3" id="P1b-lE-yFw"/>
+                <menuItem title="On-Screen Keyboard" tag="-2" id="s96-JI-YDh">
                     <modifierMask key="keyEquivalentModifierMask"/>
                 </menuItem>
-                <menuItem title="About" tag="4" id="kb2-ww-RS3">
+                <menuItem title="About..." tag="-1" id="kb2-ww-RS3" userLabel="About">
                     <modifierMask key="keyEquivalentModifierMask"/>
                 </menuItem>
             </items>
-            <point key="canvasLocation" x="57" y="152"/>
+            <point key="canvasLocation" x="56.5" y="151.5"/>
         </menu>
     </objects>
 </document>

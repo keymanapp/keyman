@@ -37,7 +37,7 @@ interface
 
 uses
   System.Classes,
-  SysUtils,
+  System.SysUtils,
   Winapi.Windows,
   Xml.XMLDoc,
   Xml.XMLIntf,
@@ -52,10 +52,14 @@ type
   private
     FFileName: string;
     FProject: TProject;
+    FXML: string;
+    FXMLUser: string;
   public
     constructor Create(AProject: TProject; AFileName: string);
     procedure Execute;
     procedure SaveUser;   // I4698
+    property XML: string read FXML;
+    property XMLUser: string read FXMLUser;
   end;
 
 implementation
@@ -79,8 +83,11 @@ procedure TProjectSaver.Execute;   // I4698
 var
   i: Integer;
   doc: IXMLDocument;
-  node, root: IXMLNode;
+  filenode, node, root: IXMLNode;
+  defopts: TProjectOptionsRecord;
 begin
+  defopts := DefaultProjectOptions[FProject.Options.Version];
+
   doc := NewXMLDocument();
   doc.Options := doc.Options + [doNodeAutoIndent];   // I4704
   doc.Encoding := 'utf-8';
@@ -91,19 +98,63 @@ begin
   // options
 
   node := root.AddChild('Options');   // I4688
-  node.AddChild('BuildPath').NodeValue := FProject.Options.BuildPath;
-  node.AddChild('CompilerWarningsAsErrors').NodeValue := FProject.Options.CompilerWarningsAsErrors;   // I4866
-  node.AddChild('WarnDeprecatedCode').NodeValue := FProject.Options.WarnDeprecatedCode;   // I4865
-  node.AddChild('CheckFilenameConventions').NodeValue := FProject.Options.CheckFilenameConventions;   // I4866
-  node.AddChild('ProjectType').NodeValue := ProjectTypeToString(FProject.Options.ProjectType);
+  if FProject.Options.Version = pv20 then
+    // Only v2.0 projects have a version number
+    node.AddChild('Version').NodeValue := ProjectVersionToString(FProject.Options.Version);
+
+  if FProject.Options.BuildPath <> defopts.BuildPath then
+    node.AddChild('BuildPath').NodeValue := FProject.Options.BuildPath;
+
+  if FProject.Options.SourcePath <> defopts.SourcePath then
+    node.AddChild('SourcePath').NodeValue := FProject.Options.SourcePath;
+
+  if FProject.Options.CompilerWarningsAsErrors <> defopts.CompilerWarningsAsErrors then
+    node.AddChild('CompilerWarningsAsErrors').NodeValue := FProject.Options.CompilerWarningsAsErrors;   // I4866
+
+  if FProject.Options.WarnDeprecatedCode <> defopts.WarnDeprecatedCode then
+    node.AddChild('WarnDeprecatedCode').NodeValue := FProject.Options.WarnDeprecatedCode;   // I4865
+
+  if FProject.Options.CheckFilenameConventions <> defopts.CheckFilenameConventions then
+    node.AddChild('CheckFilenameConventions').NodeValue := FProject.Options.CheckFilenameConventions;   // I4866
+
+  if FProject.Options.SkipMetadataFiles <> defopts.SkipMetadataFiles then
+    node.AddChild('SkipMetadataFiles').NodeValue := FProject.Options.SkipMetadataFiles;
+    
+  if FProject.Options.ProjectType <> defopts.ProjectType then
+    node.AddChild('ProjectType').NodeValue := ProjectTypeToString(FProject.Options.ProjectType);
 
   // files
 
-  node := root.AddChild('Files');
-  for i := 0 to FProject.Files.Count - 1 do
-    FProject.Files[i].Save(node.AddChild('File'), False);
+  if (FProject.Options.Version = pv10) or (FFileName = '') then
+  begin
+    node := root.AddChild('Files');
+    for i := 0 to FProject.Files.Count - 1 do
+    begin
+      filenode := node.AddChild('File');
 
-  doc.SaveToFile(FFileName);
+      // For xsl renderer, we have additional metadata we provide for v2.0
+      // projects, at least until we replace the project view with a tree
+      // structure
+      if (FFileName = '') then
+      begin
+        if FProject.Files[i].IsSourceFile
+          then filenode.AddChild('IsInSourcePath').NodeValue := 'true'
+          else filenode.AddChild('IsInSourcePath').NodeValue := 'false';
+        if FProject.Files[i].IsCompilable
+          then filenode.AddChild('IsCompilable').NodeValue := 'true'
+          else filenode.AddChild('IsCompilable').NodeValue := 'false';
+      end;
+
+      FProject.Files[i].Save(filenode);
+    end;
+  end;
+
+  if FFileName <> '' then
+  begin
+    doc.SaveToFile(FFileName);
+  end
+  else
+    doc.SaveToXML(FXML);
 
   SaveUser;
 end;
@@ -153,7 +204,12 @@ begin
     end;
   end;
 
-  doc.SaveToFile(ChangeFileExt(FFileName, Ext_ProjectSourceUser));
+  if FFileName <> '' then
+  begin
+    doc.SaveToFile(ChangeFileExt(FFileName, Ext_ProjectSourceUser));
+  end
+  else
+    doc.SaveToXML(FXMLUser);
 end;
 
 end.

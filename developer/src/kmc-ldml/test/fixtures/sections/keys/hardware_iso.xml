@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="mt" conformsTo="techpreview">
-  <names>
-    <name value="hardware-minimal" />
-  </names>
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="hardware-minimal"/>
 
   <keys>
-    <import base="cldr" path="techpreview/keys-Zyyy-punctuation.xml"/>
+    <import base="cldr" path="45/keys-Zyyy-punctuation.xml"/>
   </keys>
 
-  <layers form="iso">
-    <layer id="base" modifier="none">
+  <layers formId="iso">
+    <layer id="base" modifiers="none">
       <row keys="grave 1 2 3 4 5 6 7 8 9 0 hyphen equal" />
       <row keys="q w e r t y u i o p open-square close-square" />
       <row keys="a s d f g h j k l semi-colon apos" />
@@ -19,4 +16,4 @@
       <row keys="space" />
     </layer>
   </layers>
-</keyboard>
+</keyboard3>

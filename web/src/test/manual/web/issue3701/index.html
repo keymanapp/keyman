@@ -23,7 +23,7 @@
     </style>
 
     <!-- Insert uncompiled KeymanWeb source scripts -->
-    <script src="../../../../../build/app/web/debug/keymanweb.js" type="application/javascript"></script>
+    <script src="../../../../../build/publish/debug/keymanweb.js" type="application/javascript"></script>
 
     <!--
       For desktop browsers, a script for the user interface must be inserted here.
@@ -32,7 +32,7 @@
       The toolbar UI is best for any page designed to support keyboards for
       a large number of languages.
     -->
-    <script src="../../../../../build/app/ui/debug/kmwuitoggle.js"></script>
+    <script src="../../../../../build/publish/debug/kmwuitoggle.js"></script>
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
@@ -50,20 +50,20 @@
           languages: ['en'],
           path: (pageRef + "../prediction-mtnt/nrc.en.mtnt.model.js")
         };
-        kmw.modelManager.register(modelStub);
+        kmw.addModel(modelStub);
       });
 
       function togglePredictions() {
-        let newVal = !keyman.modelManager.mayPredict;
-        keyman.osk.banner.setOptions({'mayPredict': newVal});
+        let newVal = !keyman.core.languageProcessor.mayPredict;
+        keyman.core.languageProcessor.mayPredict = newVal;
 
         let btnPredict = document.getElementById("btnPredict");
         btnPredict.value = (newVal ? "Disable" : "Enable") + " predictions";
       }
 
       function toggleCorrections() {
-        let newVal = !keyman.modelManager.mayCorrect;
-        keyman.osk.banner.setOptions({'mayCorrect': newVal});
+        let newVal = !keyman.core.languageProcessor.mayCorrect;
+        keyman.core.languageProcessor.mayCorrect = newVal;
 
         let btnCorrect = document.getElementById("btnCorrect");
         btnCorrect.value = (newVal ? "Disable" : "Enable") + " corrections";
@@ -75,7 +75,8 @@
   <body>
     <h2>KeymanWeb Sample Page - Fat-finger Interactions with Beep Feedback</h2>
     <p>Since erroneous input should not be considered with predictions & corrections, this page
-      uses a US-style keyboard that prohibits use of the letter 'x'.
+      uses a US-style keyboard that gives error feedback on use of the letter 'x'.
+      Suggestions using 'x' should be FAR less common than normal unless each 'x' was directly typed.
     </p>
     <div>
     <!--

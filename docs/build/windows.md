@@ -101,7 +101,7 @@ Building:
 * Ant
 * Gradle
 * Maven
-* OpenJDK 11
+* Optional: OpenJDK 11 (https://learn.microsoft.com/en-us/java/openjdk/download)
 
 ```ps1
 # Elevated PowerShell
@@ -149,10 +149,9 @@ PowerShell.
 # Elevated PowerShell
 # for *much* faster download, hide progress bar (PowerShell/PowerShell#2138)
 $ProgressPreference = 'SilentlyContinue'
-choco install git jq python ninja pandoc
+choco install git jq python ninja pandoc meson
 refreshenv
-# choco meson (0.55) is too old, 1.0 required:
-python -m pip install meson
+```
 
 **Environment variables**:
 * [`KEYMAN_ROOT`](#keyman_root)
@@ -182,8 +181,8 @@ You can use Windows Settings to add these environment variables permanently:
 * KeymanWeb
 
 **Requirements**:
-* emscripten 3.1.32
-* node.js 18
+* emscripten 3.1.46 or later
+* node.js 18+
 * [openjdk 11](https://learn.microsoft.com/en-us/java/openjdk/download#openjdk-11)+
 
 ```ps1
@@ -192,7 +191,7 @@ You can use Windows Settings to add these environment variables permanently:
 # for *much* faster download, hide progress bar (PowerShell/PowerShell#2138)
 $ProgressPreference = 'SilentlyContinue'
 
-choco install emscripten
+choco install emscripten --version 3.1.46
 ```
 
 Note: emscripten very unhelpfully overwrites JAVA_HOME, and adds its own
@@ -207,7 +206,15 @@ installed emsdk (most likely %LocalAppData%\emsdk\upstream\emscripten)
 **Environment variables**:
 * `EMSCRIPTEN_BASE`: `<your-emsdk-path>\upstream\emscripten`
 
-After installing emscripten, you'll need to install node.js and openjdk:
+After installing emscripten, you'll need to install node.js and openjdk.
+
+#### node.js
+
+Our recommended way to install node.js is to use
+[nvm-windows](https://github.com/coreybutler/nvm-windows). This makes it
+easy to switch between versions of node.js.
+
+Alternatively, use Powershell + Chocolatey to install node.js:
 
 ```ps1
 # Elevated PowerShell
@@ -215,8 +222,22 @@ After installing emscripten, you'll need to install node.js and openjdk:
 # for *much* faster download, hide progress bar (PowerShell/PowerShell#2138)
 $ProgressPreference = 'SilentlyContinue'
 choco install nodejs
+```
+
+See [node.md](node.md) for more information.
+
+#### openjdk
+
+Use Powershell + Chocolatey to install OpenJDK:
+
+```ps1
+# Elevated PowerShell
+
+# for *much* faster download, hide progress bar (PowerShell/PowerShell#2138)
+$ProgressPreference = 'SilentlyContinue'
 choco install openjdk
 ```
+
 
 ### Windows Platform Dependencies
 
@@ -253,8 +274,8 @@ choco install openjdk
   choco install visualstudio2019community visualstudio2019-workload-nativedesktop visualstudio2019buildtools
   ```
   * Verify required build tools are installed
-    * Run `Visual Studio Installer` 
-    * Check the `Individual components` tab 
+    * Run `Visual Studio Installer`
+    * Check the `Individual components` tab
     * Verify `MSVC v142 - VS 2019 c++ x64/x86 build tools (Latest)` is installed. If not, install it.
 
   Recommended: configure Visual Studio to use two-space tab stops:

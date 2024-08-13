@@ -1,8 +1,8 @@
 
 #pragma once
 
-#ifndef KMN_KBP
-#define KMN_KBP
+#ifndef KM_CORE_LIBRARY
+#define KM_CORE_LIBRARY
 #endif
 #ifndef USE_CHAR16_T
 #define USE_CHAR16_T
@@ -11,7 +11,7 @@
 #include <assert.h>
 #include <string>
 #include <string.h>
-#include <keyman/keyboardprocessor_bits.h>
+#include <keyman/keyman_core_api_bits.h>
 #include "debuglog.h"
 #include "kmx_base.h"
 #include "kmx_file.h"
@@ -27,7 +27,7 @@
 /***************************************************************************/
 
 namespace km {
-namespace kbp {
+namespace core {
 namespace kmx {
 
 /* Utility */
@@ -40,7 +40,7 @@ private:
   PKMX_WCHAR m_miniContext;
   int m_miniContextIfLen; // number of if() statements excluded from start of m_miniContext
   KMSTATE m_state;
-  km_kbp_state *m_kbp_state;
+  km_core_state *m_core_state;
 
 
   kmx::KMX_Actions m_actions;
@@ -54,7 +54,7 @@ private:
   KMX_DWORD m_modifiers = 0;
 
   /* File loading */
-  KMX_BOOL LoadKeyboard(km_kbp_path_name fileName, LPKEYBOARD *lpKeyboard);
+  KMX_BOOL LoadKeyboard(km_core_path_name fileName, LPKEYBOARD *lpKeyboard);
   KMX_BOOL VerifyKeyboard(PKMX_BYTE filebase, size_t sz);
   KMX_BOOL VerifyChecksum(PKMX_BYTE buf,  size_t sz);
 #ifdef KMX_64BIT
@@ -86,7 +86,6 @@ private:
   /* Caps Lock and modifier management */
 
   KMX_BOOL IsCapsLockOn(KMX_DWORD modifiers);
-  void SetCapsLock(KMX_DWORD &modifiers, KMX_BOOL capsLockOn, KMX_BOOL force = FALSE);
   void ResetCapsLock(KMX_DWORD &modifiers, KMX_BOOL isKeyDown);
   KMX_BOOL KeyCapsLockPress(KMX_DWORD &modifiers, KMX_BOOL isKeyDown);
   void KeyShiftPress(KMX_DWORD &modifiers, KMX_BOOL isKeyDown);
@@ -97,8 +96,8 @@ public:
   KMX_ProcessEvent();
   ~KMX_ProcessEvent();
 
-  KMX_BOOL Load(km_kbp_path_name keyboardName);
-  KMX_BOOL ProcessEvent(km_kbp_state *state, KMX_UINT vkey, KMX_DWORD modifiers, KMX_BOOL isKeyDown);  // returns FALSE on error or key not matched
+  KMX_BOOL Load(km_core_path_name keyboardName);
+  KMX_BOOL ProcessEvent(km_core_state *state, KMX_UINT vkey, KMX_DWORD modifiers, KMX_BOOL isKeyDown);  // returns FALSE on error or key not matched
 
   KMX_Actions *GetActions();
   KMX_Context *GetContext();
@@ -107,6 +106,7 @@ public:
   KMX_Environment *GetEnvironment();
   KMX_Environment const *GetEnvironment() const;
   INTKEYBOARDINFO const *GetKeyboard() const;
+  void SetCapsLock(KMX_DWORD &modifiers, KMX_BOOL capsLockOn, KMX_BOOL force = FALSE);
 
   // Utility function
 public:
@@ -120,12 +120,12 @@ inline KMX_BOOL KMX_ProcessEvent::IsCapsLockOn(KMX_DWORD modifiers) {
 /* Global Constants */
 
 struct char_to_vkey {
-  km_kbp_virtual_key vk;
+  km_core_virtual_key vk;
   bool shifted, caps;
 };
 
 extern const struct char_to_vkey s_char_to_vkey[];
 
 } // namespace kmx
-} // namespace kbp
+} // namespace core
 } // namespace km

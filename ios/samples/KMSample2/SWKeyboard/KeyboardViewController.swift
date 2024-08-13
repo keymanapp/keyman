@@ -11,10 +11,6 @@ import UIKit
 
 class KeyboardViewController: InputViewController {
   override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
-    // Set desired level before release
-    KeymanEngine.log.outputLevel = .debug
-    KeymanEngine.log.logAppDetails()
-
     // Replace with your application group id
     Manager.applicationGroupIdentifier = "group.KMSample"
 
@@ -56,7 +52,7 @@ class KeyboardViewController: InputViewController {
   func setupTopBarImage(isPortrait: Bool) {
     let imgPath = getTopBarImage(isPortrait: isPortrait)
     guard let path = imgPath else {
-      log.error("No image specified for the image banner!")
+      print("No image specified for the image banner!")
       return
     }
 

@@ -5,21 +5,15 @@
     "outDir": "build/src/",
     "rootDir": "src/",
     "baseUrl": ".",
-    "paths": {
-      "@keymanapp/common-types": [ "../../../common/web/types/src/main" ],
-      "@keymanapp/kmc-kmn": [ "../kmc-kmn/src/main" ],
-      "@keymanapp/kmc-ldml": [ "../kmc-ldml/src/main" ],
-      "@keymanapp/kmc-model": [ "../kmc-model/src/main" ],
-      "@keymanapp/kmc-model-info": [ "../kmc-model-info/src/model-info-compiler" ],
-      "@keymanapp/kmc-package": [ "../kmc-package/src/kmp-compiler" ],
-    }
   },
   "include": [
     "src/**/*.ts"
   ],
   "references": [
-    { "path": "../../../common/web/keyman-version/tsconfig.esm.json" },
+    { "path": "../../../common/web/keyman-version" },
     { "path": "../../../common/web/types" },
+    { "path": "../kmc-analyze" },
+    { "path": "../kmc-keyboard-info" },
     { "path": "../kmc-kmn" },
     { "path": "../kmc-ldml" },
     { "path": "../kmc-model" },

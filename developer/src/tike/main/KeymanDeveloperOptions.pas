@@ -29,11 +29,13 @@ unit KeymanDeveloperOptions;
 interface
 
 uses
+  System.JSON,
   System.SysUtils,
   Winapi.Windows,
 
   ErrorControlledRegistry,
-  RegistryKeys;
+  RegistryKeys,
+  Keyman.System.KeymanSentryClient;
 
 type
   TKeymanDeveloperOptions = class
@@ -49,7 +51,6 @@ type
     FCharMapAutoLookup: Boolean;
     FCharMapDisableDatabaseLookups: Boolean;
     FDebuggerAutoRecompileWithDebugInfo: Boolean;
-    FAllowMultipleInstances: Boolean;
     FExternalEditorPath: WideString;
     FServerDefaultPort: Integer;   // I4021
     FSMTPServer: string;   // I4506
@@ -68,18 +69,20 @@ type
     FServerUseNgrok: Boolean;
     FServerServerShowConsoleWindow: Boolean;
     FServerNgrokToken: string;
-    FServerNgrokRegion: string;
     FServerKeepAlive: Boolean;
-    FUseLegacyCompiler: Boolean;
-    procedure CloseRegistry;
-    procedure OpenRegistry;
-    function regReadString(const nm, def: string): string;
-    function regReadBool(const nm: string; def: Boolean): Boolean;
-    function regReadInt(const nm: string; def: Integer): Integer;
-    procedure regWriteString(const nm, value: string);
-    procedure regWriteBool(const nm: string; value: Boolean);
-    procedure regWriteInt(const nm: string; value: Integer);
+    FToolbarVisible: Boolean;
+    FStartupProjectPath: string;
+    FPromptToUpgradeProjects: Boolean;
+    json: TJSONObject;
+    procedure OpenOptionsFileOrRegistry;
+    function optReadString(const nm, def: string): string;
+    function optReadBool(const nm: string; def: Boolean): Boolean;
+    function optReadInt(const nm: string; def: Integer): Integer;
+    procedure optWriteString(const nm, value: string);
+    procedure optWriteBool(const nm: string; value: Boolean);
+    procedure optWriteInt(const nm: string; value: Integer);
     procedure WriteServerConfigurationJson;
+    class function Get_Initial_DefaultProjectPath: string; static;
   public
     procedure Read;
     procedure Write;
@@ -104,8 +107,7 @@ type
     property DebuggerAutoResetBeforeCompiling: Boolean read FDebuggerAutoResetBeforeCompiling write FDebuggerAutoResetBeforeCompiling;
     property AutoSaveBeforeCompiling: Boolean read FAutoSaveBeforeCompiling write FAutoSaveBeforeCompiling;
     property OSKAutoSaveBeforeImporting: Boolean read FOSKAutoSaveBeforeImporting write FOSKAutoSaveBeforeImporting;
-
-    property UseLegacyCompiler: Boolean read FUseLegacyCompiler write FUseLegacyCompiler;
+    property PromptToUpgradeProjects: Boolean read FPromptToUpgradeProjects write FPromptToUpgradeProjects;
 
     property ReportErrors: Boolean read FReportErrors write FReportErrors;
     property ReportUsage: Boolean read FReportUsage write FReportUsage;
@@ -115,11 +117,8 @@ type
     property ServerUseLocalAddresses: Boolean read FServerUseLocalAddresses write FServerUseLocalAddresses;
 
     property ServerNgrokToken: string read FServerNgrokToken write FServerNgrokToken;
-    property ServerNgrokRegion: string read FServerNgrokRegion write FServerNgrokRegion;
     property ServerUseNgrok: Boolean read FServerUseNgrok write FServerUseNgrok;
     property ServerServerShowConsoleWindow: Boolean read FServerServerShowConsoleWindow write FServerServerShowConsoleWindow;
-
-    property AllowMultipleInstances: Boolean read FAllowMultipleInstances write FAllowMultipleInstances;
 
     property OpenKeyboardFilesInSourceView: Boolean read FOpenKeyboardFilesInSourceView write FOpenKeyboardFilesInSourceView;   // I4751
     property DefaultProjectPath: string read FDefaultProjectPath write FDefaultProjectPath;
@@ -129,9 +128,13 @@ type
     property ExternalEditorPath: WideString read FExternalEditorPath write FExternalEditorPath;
     property SMTPServer: string read FSMTPServer write FSMTPServer;   // I4506
     property TestEmailAddresses: string read FTestEmailAddresses write FTestEmailAddresses;   // I4506
+
+    property ToolbarVisible: Boolean read FToolbarVisible write FToolbarVisible;
+    property StartupProjectPath: string read FStartupProjectPath write FStartupProjectPath;
   end;
 
 function FKeymanDeveloperOptions: TKeymanDeveloperOptions;
+function LoadKeymanDeveloperSentryFlags: TKeymanSentryClientFlags;
 //procedure CreateKeymanDeveloperOptions;
 //procedure DestroyKeymanDeveloperOptions;
 
@@ -154,14 +157,70 @@ implementation
 
 uses
   System.Classes,
-  System.JSON,
   System.Math,
+  System.StrUtils,
   Winapi.ShlObj,
 
   JsonUtil,
   Keyman.Developer.System.KeymanDeveloperPaths,
   utilsystem,
   GetOSVersion;
+
+const
+  Max_Retries = 5;
+
+const
+  { SRegKey_IDEOptions values }
+  SRegKey_IDEOptions_CU          = SRegKey_IDE_CU                 + '\Options';             // CU
+
+  { SRegKey_IDEOptions values }
+
+  SRegValue_IDEOptLinkFontSizes    = 'link font sizes';                            // CU
+  SRegValue_IDEOptUseTabCharacter  = 'use tab char';                               // CU
+  SRegValue_IDEOptIndentSize       = 'indent size';                                // CU
+  SRegValue_IDEOptDocVirusCheck    = 'warn if packaging doc files';                // CU
+  SRegValue_IDEOptUseSyntaxHighlighting = 'use syntax highlighting';               // CU
+  SRegValue_IDEOptToolbarVisible   = 'toolbar visible';                            // CU
+  SRegValue_IDEOptUseOldDebugger   = 'use old debugger';                           // CU
+  SRegValue_IDEOptEditorTheme      = 'editor theme';                               // CU
+
+  SRegValue_IDEOptDebuggerBreakWhenExitingLine = 'debugger break when exiting line';    // CU
+  SRegValue_IDEOptDebuggerSingleStepAfterBreak = 'debugger single step after break';    // CU
+  SRegValue_IDEOptDebuggerShowStoreOffset      = 'debugger show store offset';          // CU
+  SRegValue_IDEOptDebuggerAutoRecompileWithDebugInfo = 'debugger recompile with debug info'; // CU
+
+  SRegValue_IDEOptDebuggerAutoResetBeforeCompiling = 'debugger auto reset before compilng'; // CU
+  SRegValue_IDEOptAutoSaveBeforeCompiling = 'auto save before compiling'; // CU
+  SRegValue_IDEOptOSKAutoSaveBeforeImporting = 'osk auto save before importing'; // CU
+  SRegValue_IDEOptPromptToUpgradeProjects = 'prompt to upgrade projects'; // CU
+
+  // Note: keeping 'web host port' reg value name to ensure settings maintained
+  //       from version 14.0 and earlier of Keyman Developer. Other values are
+  //       new with Keyman Developer 15.0
+  SRegValue_IDEOptServerPort = 'web host port';   // I4021
+  SRegValue_IDEOptServerKeepAlive = 'server keep alive';
+  SRegValue_IDEOptServerNgrokToken = 'server ngrok token';
+  SRegValue_IDEOptServerUseLocalAddresses = 'server use local addresses';
+  SRegValue_IDEOptServerUseNgrok = 'server use ngrok';
+  SRegValue_IDEOptServerShowConsoleWindow = 'server show console window';
+
+  SRegValue_IDEOptCharMapDisableDatabaseLookups = 'char map disable database lookups';  // CU
+  SRegValue_IDEOptCharMapAutoLookup             = 'char map auto lookup';               // CU
+
+  SRegValue_IDEOptOpenKeyboardFilesInSourceView = 'open keyboard files in source view';  // CU   // I4751
+
+  SRegValue_IDEDisplayTheme = 'display theme';   // I4796
+
+  SRegValue_IDEOptExternalEditorPath = 'external editor path';                      // CU
+
+  SRegValue_IDEOptSMTPServer = 'smtp server';                                       // CU   // I4506
+  SRegValue_IDEOptTestEmailAddresses = 'test email addresses';                      // CU   // I4506
+
+  SRegValue_IDEOpt_WebLadderLength = 'web ladder length';                           // CU
+  CRegValue_IDEOpt_WebLadderLength_Default = 100;
+
+  SRegValue_IDEOpt_DefaultProjectPath = 'default project path';
+
 
 var
   AFKeymanDeveloperOptions: TKeymanDeveloperOptions = nil;
@@ -185,138 +244,264 @@ begin
 end;
 
 
-procedure TKeymanDeveloperOptions.OpenRegistry;
+procedure TKeymanDeveloperOptions.OpenOptionsFileOrRegistry;
+var
+  count, offset: Integer;
+  OptionsPath: string;
 begin
-  reg := TRegistryErrorControlled.Create;  // I2890
-  reg.RootKey := HKEY_CURRENT_USER;
-  reg.OpenKey(SRegKey_IDEOptions_CU, True);
-end;
+  FreeAndNil(reg);
+  FreeAndNil(json);
 
-procedure TKeymanDeveloperOptions.CloseRegistry;
-begin
-  reg.Free;
-  reg := nil;
+  // The JSON file ~/.keymandeveloper/options.json replaces the registry
+  // settings from 17.0 onwards. There is an transition from the registry
+  // to the file on the first run of Keyman Developer
+  OptionsPath := TKeymanDeveloperPaths.OptionsPath + TKeymanDeveloperPaths.S_OptionsJson;
+  if FileExists(OptionsPath) then
+  begin
+    try
+      offset := 0;
+      count := 0;
+      repeat
+        try
+          json := LoadJSONFromFile(OptionsPath, offset);
+          Break;
+        except
+          on E:EOSError do
+          begin
+            if E.ErrorCode = ERROR_ACCESS_DENIED then
+            begin
+              // Back off and retry 0.5 sec later, it's probably another
+              // instance happening to write to the settings file
+              Inc(count);
+              Sleep(500);
+            end
+            else
+              raise;
+          end
+          else
+            raise;
+        end;
+      until count >= Max_Retries;
+      if count >= Max_Retries then
+      begin
+        // In this instance, we'll treat the file as unreadable and fall back to
+        // registry. This isn't great but there are no great options if this
+        // happens
+        if TKeymanSentryClient.Instance <> nil then
+          TKeymanSentryClient.Instance.ReportMessage('TKeymanDeveloperOptions: Failed to read settings after 5 tries');
+        json := nil;
+      end;
+    except
+      on E:Exception do
+      begin
+        // There's not much we can do here, except log this to Sentry.
+        // Showing a message is not workable because we don't have UI here.
+        if TKeymanSentryClient.Instance <> nil then
+          TKeymanSentryClient.Instance.ReportHandledException(E);
+        json := nil;
+      end;
+    end;
+  end;
+
+  if not Assigned(json) then
+  begin
+    // No JSON file found, so we import from old registry settings, if present
+    reg := TRegistryErrorControlled.Create;  // I2890
+    reg.RootKey := HKEY_CURRENT_USER;
+    if not reg.OpenKeyReadOnly(SRegKey_IDEOptions_CU) then
+    begin
+      // In this scenario, it's a new install of 17.0+, so we'll work from the
+      // empty JSON object
+      FreeAndNil(reg);
+    end;
+
+    // we always have a valid, if empty json object, even if reg is created
+    json := TJSONObject.Create;
+  end;
 end;
 
 procedure TKeymanDeveloperOptions.Read;
 var
   FDefaultDisplayTheme: string;
 begin
-  OpenRegistry;
+  OpenOptionsFileOrRegistry;
   try
-    FUseTabChar     := regReadBool(SRegValue_IDEOptUseTabCharacter, False);
-    FLinkFontSizes  := regReadBool(SRegValue_IDEOptLinkFontSizes,   True);
-    FIndentSize     := regReadInt (SRegValue_IDEOptIndentSize,      4);
-    FUseOldDebugger := regReadBool(SRegValue_IDEOptUseOldDebugger,  False);
-    FEditorTheme    := regReadString(SRegValue_IDEOptEditorTheme,   '');
+    FUseTabChar     := optReadBool(SRegValue_IDEOptUseTabCharacter, False);
+    FLinkFontSizes  := optReadBool(SRegValue_IDEOptLinkFontSizes,   True);
+    FIndentSize     := optReadInt (SRegValue_IDEOptIndentSize,      4);
+    FUseOldDebugger := optReadBool(SRegValue_IDEOptUseOldDebugger,  False);
+    FEditorTheme    := optReadString(SRegValue_IDEOptEditorTheme,   '');
 
-    FDebuggerBreakWhenExitingLine  := regReadBool(SRegValue_IDEOptDebuggerBreakWhenExitingLine, True);
-    FDebuggerSingleStepAfterBreak  := regReadBool(SRegValue_IDEOptDebuggerSingleStepAfterBreak, False);
-    FDebuggerShowStoreOffset       := regReadBool(SRegValue_IDEOptDebuggerShowStoreOffset,      False);
-    FDebuggerAutoRecompileWithDebugInfo := regReadBool(SRegValue_IDEOptDebuggerAutoRecompileWithDebugInfo, False);
-    FDebuggerAutoResetBeforeCompiling := regReadBool(SRegValue_IDEOptDebuggerAutoResetBeforeCompiling, False);
-    FAutoSaveBeforeCompiling := regReadBool(SRegValue_IDEOptAutoSaveBeforeCompiling, False);
-    FOSKAutoSaveBeforeImporting := regReadBool(SRegValue_IDEOptOSKAutoSaveBeforeImporting, False);
+    FDebuggerBreakWhenExitingLine  := optReadBool(SRegValue_IDEOptDebuggerBreakWhenExitingLine, True);
+    FDebuggerSingleStepAfterBreak  := optReadBool(SRegValue_IDEOptDebuggerSingleStepAfterBreak, False);
+    FDebuggerShowStoreOffset       := optReadBool(SRegValue_IDEOptDebuggerShowStoreOffset,      False);
+    FDebuggerAutoRecompileWithDebugInfo := optReadBool(SRegValue_IDEOptDebuggerAutoRecompileWithDebugInfo, False);
+    FDebuggerAutoResetBeforeCompiling := optReadBool(SRegValue_IDEOptDebuggerAutoResetBeforeCompiling, False);
+    FAutoSaveBeforeCompiling := optReadBool(SRegValue_IDEOptAutoSaveBeforeCompiling, False);
+    FOSKAutoSaveBeforeImporting := optReadBool(SRegValue_IDEOptOSKAutoSaveBeforeImporting, False);
+    FPromptToUpgradeProjects := optReadBool(SRegValue_IDEOptPromptToUpgradeProjects, True);
 
-    FUseLegacyCompiler := regReadBool(SRegValue_IDEOptUseLegacyCompiler, False);
+    FServerDefaultPort := optReadInt(SRegValue_IDEOptServerPort, 8008);
+    FServerKeepAlive := optReadBool(SRegValue_IDEOptServerKeepAlive, False);
+    FServerUseLocalAddresses := optReadBool(SRegValue_IDEOptServerUseLocalAddresses, True);
 
-    FServerDefaultPort := regReadInt(SRegValue_IDEOptServerPort, 8008);
-    FServerKeepAlive := regReadBool(SRegValue_IDEOptServerKeepAlive, False);
-    FServerUseLocalAddresses := regReadBool(SRegValue_IDEOptServerUseLocalAddresses, True);
+    FServerNgrokToken := optReadString(SRegValue_IDEOptServerNgrokToken, '');
+    FServerUseNgrok := optReadBool(SRegValue_IDEOptServerUseNgrok, False);
+    FServerServerShowConsoleWindow := optReadBool(SRegValue_IDEOptServerShowConsoleWindow, False);
 
-    FServerNgrokToken := regReadString(SRegValue_IDEOptServerNgrokToken, '');
-    FServerNgrokRegion := regReadString(SRegValue_IDEOptServerNgrokRegion, 'us');
-    FServerUseNgrok := regReadBool(SRegValue_IDEOptServerUseNgrok, False);
-    FServerServerShowConsoleWindow := regReadBool(SRegValue_IDEOptServerShowConsoleWindow, False);
+    FCharMapDisableDatabaseLookups := optReadBool(SRegValue_IDEOptCharMapDisableDatabaseLookups, False);
+    FCharMapAutoLookup             := optReadBool(SRegValue_IDEOptCharMapAutoLookup,             True);
 
-    FCharMapDisableDatabaseLookups := regReadBool(SRegValue_IDEOptCharMapDisableDatabaseLookups, False);
-    FCharMapAutoLookup             := regReadBool(SRegValue_IDEOptCharMapAutoLookup,             True);
-
-    FAllowMultipleInstances := regReadBool(SRegValue_IDEOptMultipleInstances, False);
-
-    FOpenKeyboardFilesInSourceView  := regReadBool(SRegValue_IDEOptOpenKeyboardFilesInSourceView,  False);   // I4751
+    FOpenKeyboardFilesInSourceView  := optReadBool(SRegValue_IDEOptOpenKeyboardFilesInSourceView,  False);   // I4751
 
     if GetOS in [osWin10, osOther]
       then FDefaultDisplayTheme := 'Windows10'
       else FDefaultDisplayTheme := 'Sapphire Kamri';
 
-    FDisplayTheme := regReadString(SRegValue_IDEDisplayTheme, FDefaultDisplayTheme);   // I4796
+    FDisplayTheme := optReadString(SRegValue_IDEDisplayTheme, FDefaultDisplayTheme);   // I4796
 
-    FExternalEditorPath := regReadString(SRegValue_IDEOptExternalEditorPath, '');
-    FSMTPServer := regReadString(SRegValue_IDEOptSMTPServer, '');   // I4506
-    FTestEmailAddresses := regReadString(SRegValue_IDEOptTestEmailAddresses, '');   // I4506
+    FExternalEditorPath := optReadString(SRegValue_IDEOptExternalEditorPath, '');
+    FSMTPServer := optReadString(SRegValue_IDEOptSMTPServer, '');   // I4506
+    FTestEmailAddresses := optReadString(SRegValue_IDEOptTestEmailAddresses, '');   // I4506
 
-    FFix183_LadderLength := regReadInt(SRegValue_IDEOpt_WebLadderLength, CRegValue_IDEOpt_WebLadderLength_Default);
+    FFix183_LadderLength := optReadInt(SRegValue_IDEOpt_WebLadderLength, CRegValue_IDEOpt_WebLadderLength_Default);
 
-    FDefaultProjectPath := IncludeTrailingPathDelimiter(regReadString(SRegValue_IDEOpt_DefaultProjectPath, GetFolderPath(CSIDL_PERSONAL) + CDefaultProjectPath));
+    FDefaultProjectPath := IncludeTrailingPathDelimiter(optReadString(SRegValue_IDEOpt_DefaultProjectPath, Get_Initial_DefaultProjectPath));
+    if (FDefaultProjectPath = '\') or IsRelativePath(FDefaultProjectPath) then
+    begin
+      // #11554
+      FDefaultProjectPath := Get_Initial_DefaultProjectPath;
+    end;
 
     // for consistency with Keyman.System.KeymanSentryClient, we need to use
     // reg.ReadInteger, as regReadInt, which in the dim dark past started
     // to read integers as a REG_SZ type and that's far too messy to change now.
-    FReportErrors := not reg.ValueExists(SRegValue_AutomaticallyReportErrors) or
-      (reg.ReadInteger(SRegValue_AutomaticallyReportErrors) <> 0);
-    FReportUsage := not reg.ValueExists(SRegValue_AutomaticallyReportUsage) or
-      (reg.ReadInteger(SRegValue_AutomaticallyReportUsage) <> 0);
+    if Assigned(reg) then
+    begin
+      FReportErrors := not reg.ValueExists(SRegValue_AutomaticallyReportErrors) or
+        (reg.ReadInteger(SRegValue_AutomaticallyReportErrors) <> 0);
+      FReportUsage := not reg.ValueExists(SRegValue_AutomaticallyReportUsage) or
+        (reg.ReadInteger(SRegValue_AutomaticallyReportUsage) <> 0);
+      FToolbarVisible := optReadString(SRegValue_IDEOptToolbarVisible, '1') <> '0';
+    end
+    else
+    begin
+      FReportErrors := optReadBool(SRegValue_AutomaticallyReportErrors, True);
+      FReportUsage := optReadBool(SRegValue_AutomaticallyReportUsage, True);
+      FToolbarVisible := optReadBool(SRegValue_IDEOptToolbarVisible, True);
+    end;
+
+    FStartupProjectPath := optReadString(SRegValue_ActiveProject, '');
+
+    if Assigned(reg) then
+    begin
+      // If we loaded from the registry, then we want to save the results to our
+      // new ~/.keymandeveloper/options.json file
+      Write;
+    end;
   finally
-    CloseRegistry;
+    FreeAndNil(json);
+    FreeAndNil(reg);
   end;
 end;
 
 procedure TKeymanDeveloperOptions.Write;
+var
+  count: Integer;
 begin
-  OpenRegistry;
+  // If the output file does not exist, this creates it. Note that we load
+  // from the existing file before writing out our set of options, which is
+  // usually going to be irrelevant
+  json := TJSONObject.Create;
+
   try
-    regWriteBool(SRegValue_IDEOptUseTabCharacter, FUseTabChar);
-    regWriteBool(SRegValue_IDEOptLinkFontSizes,   FLinkFontSizes);
-    regWriteInt (SRegValue_IDEOptIndentSize,      FIndentSize);
-    regWriteBool(SRegValue_IDEOptUseOldDebugger,  FUseOldDebugger);
-    regWriteString(SRegValue_IDEOptEditorTheme,   FEditorTheme);
+    optWriteBool(SRegValue_IDEOptUseTabCharacter, FUseTabChar);
+    optWriteBool(SRegValue_IDEOptLinkFontSizes,   FLinkFontSizes);
+    optWriteInt (SRegValue_IDEOptIndentSize,      FIndentSize);
+    optWriteBool(SRegValue_IDEOptUseOldDebugger,  FUseOldDebugger);
+    optWriteString(SRegValue_IDEOptEditorTheme,   FEditorTheme);
 
-    regWriteBool(SRegValue_IDEOptDebuggerBreakWhenExitingLine, FDebuggerBreakWhenExitingLine);
-    regWriteBool(SRegValue_IDEOptDebuggerSingleStepAfterBreak, FDebuggerSingleStepAfterBreak);
-    regWriteBool(SRegValue_IDEOptDebuggerShowStoreOffset,      FDebuggerShowStoreOffset);
-    regWriteBool(SRegValue_IDEOptDebuggerAutoRecompileWithDebugInfo, FDebuggerAutoRecompileWithDebugInfo);
+    optWriteBool(SRegValue_IDEOptDebuggerBreakWhenExitingLine, FDebuggerBreakWhenExitingLine);
+    optWriteBool(SRegValue_IDEOptDebuggerSingleStepAfterBreak, FDebuggerSingleStepAfterBreak);
+    optWriteBool(SRegValue_IDEOptDebuggerShowStoreOffset,      FDebuggerShowStoreOffset);
+    optWriteBool(SRegValue_IDEOptDebuggerAutoRecompileWithDebugInfo, FDebuggerAutoRecompileWithDebugInfo);
 
-    regWriteBool(SRegValue_IDEOptDebuggerAutoResetBeforeCompiling, FDebuggerAutoResetBeforeCompiling);
-    regWriteBool(SRegValue_IDEOptAutoSaveBeforeCompiling, FAutoSaveBeforeCompiling);
-    regWriteBool(SRegValue_IDEOptOSKAutoSaveBeforeImporting, FOSKAutoSaveBeforeImporting);
+    optWriteBool(SRegValue_IDEOptDebuggerAutoResetBeforeCompiling, FDebuggerAutoResetBeforeCompiling);
+    optWriteBool(SRegValue_IDEOptAutoSaveBeforeCompiling, FAutoSaveBeforeCompiling);
+    optWriteBool(SRegValue_IDEOptOSKAutoSaveBeforeImporting, FOSKAutoSaveBeforeImporting);
+    optWriteBool(SRegValue_IDEOptPromptToUpgradeProjects, FPromptToUpgradeProjects);
 
-    regWriteBool(SRegValue_IDEOptUseLegacyCompiler, FUseLegacyCompiler);
+    optWriteInt(SRegValue_IDEOptServerPort, FServerDefaultPort);
+    optWriteBool(SRegValue_IDEOptServerKeepAlive, FServerKeepAlive);
+    optWriteBool(SRegValue_IDEOptServerUseLocalAddresses, FServerUseLocalAddresses);
 
-    regWriteInt(SRegValue_IDEOptServerPort, FServerDefaultPort);
-    regWriteBool(SRegValue_IDEOptServerKeepAlive, FServerKeepAlive);
-    regWriteBool(SRegValue_IDEOptServerUseLocalAddresses, FServerUseLocalAddresses);
-
-    regWriteString(SRegValue_IDEOptServerNgrokToken, FServerNgrokToken);
-    regWriteString(SRegValue_IDEOptServerNgrokRegion, FServerNgrokRegion);
-    regWriteBool(SRegValue_IDEOptServerUseNgrok, FServerUseNgrok);
-    regWriteBool(SRegValue_IDEOptServerShowConsoleWindow, FServerServerShowConsoleWindow);
+    optWriteString(SRegValue_IDEOptServerNgrokToken, FServerNgrokToken);
+    optWriteBool(SRegValue_IDEOptServerUseNgrok, FServerUseNgrok);
+    optWriteBool(SRegValue_IDEOptServerShowConsoleWindow, FServerServerShowConsoleWindow);
 
 
-    regWriteBool(SRegValue_IDEOptCharMapDisableDatabaseLookups, FCharMapDisableDatabaseLookups);
-    regWriteBool(SRegValue_IDEOptCharMapAutoLookup,             FCharMapAutoLookup);
+    optWriteBool(SRegValue_IDEOptCharMapDisableDatabaseLookups, FCharMapDisableDatabaseLookups);
+    optWriteBool(SRegValue_IDEOptCharMapAutoLookup,             FCharMapAutoLookup);
 
-    regWriteBool(SRegValue_IDEOptMultipleInstances,             FAllowMultipleInstances);
+    optWriteBool(SRegValue_IDEOptOpenKeyboardFilesInSourceView,  FOpenKeyboardFilesInSourceView);   // I4751
 
-    regWriteBool(SRegValue_IDEOptOpenKeyboardFilesInSourceView,  FOpenKeyboardFilesInSourceView);   // I4751
+    optWriteString(SRegValue_IDEDisplayTheme, FDisplayTheme);   // I4796
 
-    regWriteString(SRegValue_IDEDisplayTheme, FDisplayTheme);   // I4796
+    optWriteString(SRegValue_IDEOptExternalEditorPath,          FExternalEditorPath);
+    optWriteString(SRegValue_IDEOptSMTPServer,                  FSMTPServer);   // I4506
+    optWriteString(SRegValue_IDEOptTestEmailAddresses,          FTestEmailAddresses);   // I4506
 
-    regWriteString(SRegValue_IDEOptExternalEditorPath,          FExternalEditorPath);
-    regWriteString(SRegValue_IDEOptSMTPServer,                  FSMTPServer);   // I4506
-    regWriteString(SRegValue_IDEOptTestEmailAddresses,          FTestEmailAddresses);   // I4506
+    optWriteInt(SRegValue_IDEOpt_WebLadderLength, FFix183_LadderLength);
 
-    regWriteInt(SRegValue_IDEOpt_WebLadderLength, FFix183_LadderLength);
+    optWriteString(SRegValue_IDEOpt_DefaultProjectPath, FDefaultProjectPath);
 
-    regWriteString(SRegValue_IDEOpt_DefaultProjectPath, FDefaultProjectPath);
+    optWriteBool(SRegValue_AutomaticallyReportErrors, FReportErrors);
+    optWriteBool(SRegValue_AutomaticallyReportUsage, FReportUsage);
+    optWriteBool(SRegValue_IDEOptToolbarVisible, FToolbarVisible);
 
-    // for consistency with Keyman.System.KeymanSentryClient, we need to use
-    // reg.WriteInteger, as regWriteInt, which in the dim dark past started
-    // to write integers as a REG_SZ type and that's far too messy to change now.
-    reg.WriteInteger(SRegValue_AutomaticallyReportErrors, IfThen(FReportErrors, 1, 0));
-    reg.WriteInteger(SRegValue_AutomaticallyReportUsage, IfThen(FReportUsage, 1, 0));
+    optWriteString(SRegValue_ActiveProject, FStartupProjectPath);
+
+    ForceDirectories(TKeymanDeveloperPaths.OptionsPath);
+
+    try
+      count := 0;
+      repeat
+        try
+          SaveJSONToFile(TKeymanDeveloperPaths.OptionsPath + TKeymanDeveloperPaths.S_OptionsJson, json);
+          Break;
+        except
+          on E:EOSError do
+          begin
+            if E.ErrorCode = ERROR_ACCESS_DENIED then
+            begin
+              // Back off and retry 0.5 sec later, it's probably another
+              // instance happening to read or write the settings file
+              Inc(count);
+              Sleep(500);
+            end
+            else
+              raise;
+          end
+          else
+            raise;
+        end;
+      until count >= Max_Retries;
+      if count >= Max_Retries then
+      begin
+        if TKeymanSentryClient.Instance <> nil then
+          TKeymanSentryClient.Instance.ReportMessage('TKeymanDeveloperOptions: Failed to write settings after 5 tries');
+      end;
+    except
+      on E:Exception do
+      begin
+        // There's not much we can do here, except log this to Sentry.
+        // Showing a message is not workable because we don't have UI here.
+        if TKeymanSentryClient.Instance <> nil then
+          TKeymanSentryClient.Instance.ReportHandledException(E);
+      end;
+    end;
   finally
-    CloseRegistry;
+    FreeAndNil(json);
   end;
 
   WriteServerConfigurationJson;
@@ -325,76 +510,96 @@ end;
 procedure TKeymanDeveloperOptions.WriteServerConfigurationJson;
 var
   o: TJSONObject;
-  s: TStringList;
-  ss: TStringStream;
 begin
   o := TJSONObject.Create;
   try
     o.AddPair('port', TJSONNumber.Create(FServerDefaultPort));
     o.AddPair('ngrokToken', FServerNgrokToken);
-    o.AddPair('ngrokRegion', FServerNgrokRegion);
     o.AddPair('useNgrok', TJSONBool.Create(FServerUseNgrok));
     o.AddPair('ngrokVisible', TJSONBool.Create(FServerServerShowConsoleWindow));
-    s := TStringList.Create;
-    try
-      PrettyPrintJSON(o, s, 2);
-      ss := TStringStream.Create(s.Text, TEncoding.UTF8);
-      try
-        ss.SaveToFile(TKeymanDeveloperPaths.ServerDataPath + TKeymanDeveloperPaths.S_ServerConfigJson);
-      finally
-        ss.Free;
-      end;
-    finally
-      s.Free;
-    end;
-    o.ToJSON
+    SaveJSONToFile(TKeymanDeveloperPaths.ServerDataPath + TKeymanDeveloperPaths.S_ServerConfigJson, o);
   finally
     o.Free;
   end;
 end;
 
-procedure TKeymanDeveloperOptions.regWriteBool(const nm: string; value: Boolean);
+procedure TKeymanDeveloperOptions.optWriteBool(const nm: string; value: Boolean);
 begin
-  if value then reg.WriteString(nm, '1') else reg.WriteString(nm, '0');
+  json.AddPair(nm, TJSONBool.Create(value));
 end;
 
-procedure TKeymanDeveloperOptions.regWriteInt(const nm: string; value: Integer);
+procedure TKeymanDeveloperOptions.optWriteInt(const nm: string; value: Integer);
 begin
-  reg.WriteString(nm, IntToStr(value));
+  json.AddPair(nm, TJSONNumber.Create(value));
 end;
 
-procedure TKeymanDeveloperOptions.regWriteString(const nm, value: string);
+procedure TKeymanDeveloperOptions.optWriteString(const nm, value: string);
 begin
-  reg.WriteString(nm, value);
+  json.AddPair(nm, value);
 end;
 
-function TKeymanDeveloperOptions.regReadBool(const nm: string; def: Boolean): Boolean;
+function TKeymanDeveloperOptions.optReadBool(const nm: string; def: Boolean): Boolean;
+var
+  v: TJSONValue;
 begin
   Result := def;
-  if not reg.ValueExists(nm) then Exit;
-  try
-    Result := reg.ReadString(nm) = '1';
-  except
+
+  if Assigned(reg) then
+  begin
+    if not reg.ValueExists(nm) then Exit;
+    try
+      Result := reg.ReadString(nm) = '1';
+    except
+    end;
+  end;
+
+  v := json.GetValue(nm);
+  if Assigned(v) then
+  begin
+    v.TryGetValue<Boolean>(Result);
   end;
 end;
 
-function TKeymanDeveloperOptions.regReadInt(const nm: string; def: Integer): Integer;
+function TKeymanDeveloperOptions.optReadInt(const nm: string; def: Integer): Integer;
+var
+  v: TJSONValue;
 begin
   Result := def;
-  if not reg.ValueExists(nm) then Exit;
-  try
-    Result := StrToInt(reg.ReadString(nm));
-  except
+  if Assigned(reg) then
+  begin
+    if not reg.ValueExists(nm) then Exit;
+    try
+      Result := StrToInt(reg.ReadString(nm));
+    except
+    end;
+  end;
+
+  v := json.GetValue(nm);
+  if Assigned(v) then
+  begin
+    v.TryGetValue<Integer>(Result);
   end;
 end;
 
-function TKeymanDeveloperOptions.regReadString(const nm, def: string): string;
+function TKeymanDeveloperOptions.optReadString(const nm, def: string): string;
+var
+  v: TJSONValue;
 begin
   Result := def;
-  if not reg.ValueExists(nm) then Exit;
-  try
-    Result := reg.ReadString(nm);
-  except
+  if Assigned(reg) then
+  begin
+    if not reg.ValueExists(nm) then Exit;
+    try
+      Result := reg.ReadString(nm);
+    except
+    end;
+    Exit;
+  end;
+
+  v := json.GetValue(nm);
+  if Assigned(v) then
+  begin
+    v.TryGetValue<string>(Result);
   end;
 end;
 
@@ -412,6 +617,20 @@ end;
 class function TKeymanDeveloperOptions.IsDefaultEditorTheme(s: string): Boolean;
 begin
   Result := DefaultEditorThemeItemIndex(s) >= 0;
+end;
+
+class function TKeymanDeveloperOptions.Get_Initial_DefaultProjectPath: string;
+begin
+  Result := GetFolderPath(CSIDL_PERSONAL) + CDefaultProjectPath;
+end;
+
+function LoadKeymanDeveloperSentryFlags: TKeymanSentryClientFlags;
+begin
+  Result := [kscfCaptureExceptions, kscfShowUI, kscfTerminate];
+  if FKeymanDeveloperOptions.ReportErrors then
+    Include(Result, kscfReportExceptions);
+  if FKeymanDeveloperOptions.ReportUsage then
+    Include(Result, kscfReportMessages);
 end;
 
 initialization

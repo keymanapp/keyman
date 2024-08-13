@@ -1,0 +1,9 @@
+﻿store(&NAME) 'version_special_key_caps'
+store(&TARGETS) 'mobile'
+store(&LAYOUTFILE) 'version_special_key_caps.keyman-touch-layout'
+
+c Use of special key caps on nomral keys should make compiler select version 14
+
+begin Unicode > use(main)
+
+group(main) using keys

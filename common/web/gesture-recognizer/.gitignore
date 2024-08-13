@@ -1,0 +1,11 @@
+# Build products
+build
+
+# Legacy build folders.
+
+# Other local files.
+node_modules/
+unit_tests/modernizr.js
+.idea/**/*.xml
+*.iml
+*.kpj.user

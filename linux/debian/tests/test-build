@@ -1,30 +1,74 @@
 #!/bin/bash
-# autopkgtest check: Build a program against libkmnkbp-dev to verify that the
+# autopkgtest check: Build a program against libkeymancore-dev to verify that the
 # headers and pkg-config file are included and installed correctly.
 # cf https://github.com/keymanapp/keyman/issues/7490
 
 set -e
 
 WORKDIR=$(mktemp -d)
-trap "rm -rf $WORKDIR" 0 INT QUIT ABRT PIPE TERM
-cd "$WORKDIR"
+# shellcheck disable=SC2064
+trap "rm -rf ${WORKDIR}" 0 INT QUIT ABRT PIPE TERM
+cd "${WORKDIR}"
 
+#
 # Test all include files are available
 cat <<EOF > keymantest.c
-#include <keyman/keyboardprocessor.h>
-km_kbp_context* c;
+#include <keyman/keyman_core_api.h>
+km_core_actions* a;
 EOF
 
-# shellcheck disable=SC2046
-gcc -c keymantest.c $(pkg-config --cflags --libs keyman_kmn_processor)
+# shellcheck disable=SC2046 disable=SC2312
+gcc -c keymantest.c $(pkg-config --cflags --libs keyman_core)
 echo "build 1: OK"
 
+#
 # Test pkg-config file - include without path
 cat <<EOF > keymantest.c
-#include <keyboardprocessor.h>
-km_kbp_context* c;
+#include <keyman_core_api.h>
+km_core_actions* a;
 EOF
 
-# shellcheck disable=SC2046
-gcc -c keymantest.c $(pkg-config --cflags --libs keyman_kmn_processor)
+# shellcheck disable=SC2046 disable=SC2312
+gcc -c keymantest.c $(pkg-config --cflags --libs keyman_core)
 echo "build 2: OK"
+
+#
+# Test dynamic linking
+cat <<EOF > keymantest.c
+#include <keyman/keyman_core_api.h>
+
+int main(int argc, char *argv[]) {
+  km_core_option_item opts[] = {KM_CORE_OPTIONS_END};
+  km_core_keyboard *kb = NULL;
+  km_core_state *state = NULL;
+  km_core_keyboard_load(NULL, &kb);
+  km_core_state_create(kb, opts, &state);
+  km_core_actions const *a = km_core_state_get_actions(state);
+}
+EOF
+
+# shellcheck disable=SC2046 disable=SC2312
+g++ keymantest.c $(pkg-config --cflags --libs keyman_core)
+echo "build 3: OK"
+
+# It would be nice to test static linking, but that results in a warning
+# which causes autopkgtest to report the tests as FAILED. See #10882.
+# #
+# # Test static linking
+# cat <<EOF > keymantest.c
+# #include <keyman/keyman_core_api.h>
+
+# int main(int argc, char *argv[]) {
+#   km_core_option_item opts[] = {KM_CORE_OPTIONS_END};
+#   km_core_keyboard *kb = NULL;
+#   km_core_state *state = NULL;
+#   km_core_keyboard_load(NULL, &kb);
+#   km_core_state_create(kb, opts, &state);
+#   km_core_actions const *a = km_core_state_get_actions(state);
+# }
+# EOF
+
+# # shellcheck disable=SC2046 disable=SC2312
+# g++ keymantest.c -static $(pkg-config --cflags --libs keyman_core) \
+#   $(pkg-config --cflags --libs icu-uc) $(pkg-config --cflags --libs icu-i18n)
+# echo "build 4: OK"

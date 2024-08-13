@@ -6,6 +6,17 @@
 
 import { BUILDER_KVK_SHIFT_STATE, BUILDER_KVK_HEADER_FLAGS, BUILDER_KVK_KEY_FLAGS } from "./kvk-file.js";
 
+/**
+ * The default font and size are not very important, as generally they are
+ * unused, because font information is provided in the package, but we include
+ * them for completeness. The size is included as a negative value which is
+ * defined in the LOGFONT structure in Windows API.
+ */
+export const DEFAULT_KVK_FONT = {
+  name: "Arial",
+  size: -12
+};
+
 export class VisualKeyboard {
   header: VisualKeyboardHeader = {flags: 0, ansiFont:{}, unicodeFont:{}, underlyingLayout: undefined};
   keys: VisualKeyboardKey[] = [];
@@ -25,7 +36,6 @@ export class VisualKeyboardHeader {
 export class VisualKeyboardFont {
   name?: string;
   size?: number;
-  color?: number; // unused
 };
 
 export { BUILDER_KVK_KEY_FLAGS as VisualKeyboardKeyFlags } from "./kvk-file.js";
@@ -37,7 +47,7 @@ export class VisualKeyboardKey {
   shift?: BUILDER_KVK_SHIFT_STATE;
   vkey?: number;
   text?: string;
-  //bitmap: bitmap-image, unsupported in ldml keyboards; may include for round-tripabilty?
+  bitmap?: Uint8Array;  // .bmp, unsupported in ldml keyboards; included for round-tripabilty
 };
 
 interface VisualKeyboardLegalShiftState {

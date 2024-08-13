@@ -1,7 +1,9 @@
 {
   "name": "@keymanapp/recorder-core",
   "description": "Core classes used to develop KeymanWeb test cases based on keystrokes",
-  "main": "index.js",
+  "main": "build/obj/index.js",
+  "types": "build/obj/index.d.ts",
+  "type": "module",
   "scripts": {
     "tsc": "tsc",
     "clean": "tsc -b --clean src/tsconfig.json && tsc -b --clean src/nodeProctor.tsconfig.json"
@@ -20,10 +22,9 @@
     "@keymanapp/keyboard-processor": "*",
     "@keymanapp/models-types": "*",
     "@keymanapp/keyman-version": "*",
-    "@keymanapp/web-utils": "*",
-    "@types/node": "^11.9.4"
+    "@keymanapp/web-utils": "*"
   },
   "devDependencies": {
-    "typescript": "^4.9.5"
+    "typescript": "^5.4.5"
   }
 }

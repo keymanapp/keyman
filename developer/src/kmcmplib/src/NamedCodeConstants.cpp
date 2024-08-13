@@ -24,18 +24,14 @@
 #include "pch.h"
 #include <limits.h>
 #include "NamedCodeConstants.h"
-#include "CheckFilenameConsistency.h"
 #include <kmcmplib.h>
 #include "kmcompx.h"
-#include "filesystem.h"
 
 using namespace kmcmp;
 
 int IsHangulSyllable(const KMX_WCHAR *codename, int *code);
 
 namespace kmcmp {
-  extern KMX_CHAR CompileDir[];
-
   int __cdecl sort_entries(const void *elem1, const void *elem2)
   {
     return u16icmp(
@@ -55,8 +51,8 @@ NamedCodeConstants::NamedCodeConstants()
 
 NamedCodeConstants::~NamedCodeConstants()
 {
-  if(entries) delete entries;
-  if(entries_file) delete entries_file;
+  if(entries) delete[] entries;
+  if(entries_file) delete[] entries_file;
 }
 
 void NamedCodeConstants::AddCode(int n, const KMX_WCHAR *p, KMX_DWORD storeIndex)
@@ -67,7 +63,7 @@ void NamedCodeConstants::AddCode(int n, const KMX_WCHAR *p, KMX_DWORD storeIndex
     if(nEntries_file > 0)
     {
       memcpy(bn, entries_file, sizeof(NCCENTRY) * nEntries_file);
-      delete entries_file;
+      delete[] entries_file;
     }
     entries_file = bn;
   }
@@ -91,7 +87,7 @@ void NamedCodeConstants::AddCode_IncludedCodes(int n, const KMX_WCHAR *p)
     if(nEntries > 0)
     {
       memcpy(bn, entries, sizeof(NCCENTRY) * nEntries);
-      delete entries;
+      delete[] entries;
     }
     entries = bn;
   }
@@ -117,85 +113,56 @@ char *kmc_strupr(char *s) {
   return s;
 }
 
-KMX_BOOL NamedCodeConstants::IntLoadFile(const KMX_CHAR *filename)
-{
+KMX_BOOL NamedCodeConstants::LoadFile(PFILE_KEYBOARD fk, const KMX_WCHAR *filename) {
   const int str_size = 256;
-  FILE *fp = NULL;
 
-  if (CheckFilenameConsistency(filename, FALSE) != 0) {
+  auto szNameUtf8 = string_from_u16string(filename);
+
+  int FileSize;
+  KMX_BYTE* Buf;
+  std::vector<uint8_t> bufvec = loadfileproc(szNameUtf8, fk->extra->kmnFilename);
+  FileSize = bufvec.size();
+  if(!FileSize) {
     return FALSE;
   }
 
-  fp = Open_File(filename, "rt");
-  if(fp == NULL) {
-    return FALSE;  // I3481
-  }
+  Buf = new KMX_BYTE[FileSize+1];
+  std::copy(bufvec.begin(), bufvec.end(), Buf);
+  Buf[FileSize] = 0; // zero-terminate for strtok
 
-  KMX_CHAR str[str_size], *p, *q, *context = NULL;
-  KMX_BOOL isEol , first = TRUE;
+  char* filetok;
+  char* filecontext;
+  filetok = strtok_r((char*)Buf, "\n", &filecontext);
 
-  while(fgets(str, str_size, fp))
-  {
-    isEol  = *(strchr(str, 0) - 1) == '\n';
-    p = strtok_r(str, ";", &context);  // I3481
-    q = strtok_r(NULL, ";\n", &context);
-    if(p && q)
-    {
-      if(first && *p == (KMX_CHAR)0xEF && *(p+1) == (KMX_CHAR)0xBB && *(p+2) == (KMX_CHAR)0xBF) p += 3;  // I3056 UTF-8   // I3512
-      first = FALSE;
+  if(*filetok == (KMX_CHAR)0xEF && *(filetok+1) == (KMX_CHAR)0xBB && *(filetok+2) == (KMX_CHAR)0xBF) filetok += 3;  // I3056 UTF-8   // I3512
+
+  while(filetok) {
+    KMX_CHAR str[str_size], *p, *q, *context = NULL;
+
+    if(strlen(filetok) >= str_size) {
+      delete[] Buf;
+      // TODO chuck a wobbly
+      return FALSE;
+    }
+    strcpy(str, filetok);
+    p = strtok_r(str, ";\r", &context);  // I3481
+    q = strtok_r(nullptr, ";\r", &context);
+    if(p && q) {
       kmc_strupr(q);  // I3481   // I3641
-      long n = strtol(p, NULL, 16);
+      long n = strtol(p, nullptr, 16);
       if (*q != '<') {
         PKMX_WCHAR q0 =  strtowstr(q);
         AddCode_IncludedCodes((int)n, q0);
         delete[] q0;
       }
     }
-    if(!isEol )
-    {
-      while(fgets(str, str_size, fp)) if(*(strchr(str, 0)-1) == '\n') break;
-    }
+    filetok = strtok_r(nullptr, "\n", &filecontext);
   }
 
-  fclose(fp);
-
-  return TRUE;
-}
-
-KMX_BOOL NamedCodeConstants::LoadFile(const KMX_CHAR *filename)
-{
-  const int buf_size = 260;
-  KMX_CHAR buf[buf_size];
-  // Look in current directory first -- REMOVED AS DANGEROUS
-  /* strncpy(buf, filename, (buf_size-1)); buf[buf_size-1] = 0;  // I3481
-  if(kmcmp_FileExists(buf))
-    return IntLoadFile(buf);
-  */
-  // Then look in keyboard file directory (CompileDir)
-  strncpy(buf, CompileDir, (buf_size-1)); buf[buf_size-1] = 0;  // I3481
-  strncat(buf, filename, (buf_size-1)-strlen(CompileDir)); buf[buf_size-1] = 0;
-  if(kmcmp_FileExists(buf))
-    return IntLoadFile(buf);
-
-  //TODO: sort out how to find common includes in non-Windows platforms:
-  #ifdef _WINDOWS_
-    // Finally look in kmcmpdll.dll directory
-    GetModuleFileName(0, buf, buf_size);
-
-    KMX_CHAR *p = strrchr_slash(buf);
-    if(p)
-      p++;
-    else
-      p = buf;
-    *p = 0;
-    strncat_s(buf, _countof(buf), filename, (buf_size-1)-strlen(buf)); buf[buf_size-1] = 0;  // I3481   // I3641
-    if(kmcmp_FileExists(buf))
-      return IntLoadFile(buf);
-  #endif
+  delete[] Buf;
 
   reindex();
-
-  return FALSE;
+  return TRUE;
 }
 
 void NamedCodeConstants::reindex()
@@ -300,7 +267,7 @@ int IsHangulSyllable(const KMX_WCHAR *codename, int *code)
   if(strchr("GNDRMBSJCKTPH", ch))
   {
     /* Has an initial syllable */
-    int isDoubled = towupper(*(codename+1)) == ch;
+    int isDoubled = towupper(*(codename+1)) == (wint_t)ch;
 
     LIndex = -1;
     for(i = 0; i < HangulLCount; i++) {

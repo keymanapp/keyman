@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="mt" conformsTo="techpreview">
-  <info author="srl295" indicator="🙀" layout="qwerty" normalization="NFC" />
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="TestKbd" author="srl295" indicator="🙀" layout="qwerty" />
 
-  <names>
-    <import base="cldr" path="techpreview/keys-Zyyy-punctuation.xml"/> <!-- wrong root! -->
-    <name value="TestKbd" />
-  </names>
 
   <keys>
-    <key id="hmaqtugha" to="ħ" />
-    <key id="that" to="ថា" />
+    <key id="hmaqtugha" output="ħ" />
+    <key id="that" flickId="test" output="ថា" />
   </keys>
 
-</keyboard>
+  <flicks>
+    <import base="cldr" path="45/keys-Zyyy-punctuation.xml"/> <!-- wrong root! -->
+    <flick id="test">
+      <flickSegment directions="n nw" keyId="hmaqtugha" />
+    </flick>
+  </flicks>
+
+</keyboard3>

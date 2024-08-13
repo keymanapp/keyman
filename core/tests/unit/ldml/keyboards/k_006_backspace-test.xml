@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE keyboardTest3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/45/dtd/ldmlKeyboardTest3.dtd">
+<keyboardTest3 conformsTo="techpreview">
+  <info keyboard="k_006_backspace.xml" author="Team Keyboard" name="backspace" />
+  <tests name="backspace">
+    <test name="regex-test-0-a">
+      <keystroke key="t" />
+      <keystroke key="a" />
+      <keystroke key="b" />
+      <backspace />
+      <check result="t" />
+    </test>
+  </tests>
+</keyboardTest3>

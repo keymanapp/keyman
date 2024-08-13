@@ -6,7 +6,7 @@ ltmain.sh
 __pycache__
 *.egg-info
 build-*
-deb-*
+./deb-*
 builddebs
 keyman-config/make_deb
 tmp/
@@ -17,7 +17,7 @@ dist/
 upload/
 launchpad
 launchpad-*
-keyman-config/build
+build/
 keyman-config/debian/man
 keyman-config/experiments/*.txt
 keyman-config/keyman_config/version.py

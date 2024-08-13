@@ -58,6 +58,9 @@
               <Directory Id="dir_sentry_0.6.0" Name="sentry-0.6.0" />
               <Directory Id="dirNode" Name="node.js" />
               <Directory Id="dirProjects" Name="Projects" />
+              <Directory Id="dir_import" Name="import">
+                <Directory Id="dir_import_45" Name="45" />
+              </Directory>
             </Directory>
           </Directory>
         </Directory>
@@ -148,7 +151,7 @@
       </Component>
 
       <Component>
-        <File Name="kmbrowserhost.exe" KeyPath="yes" Source="..\..\..\windows\bin\desktop\kmbrowserhost.exe" />
+        <File Name="kmdbrowserhost.exe" KeyPath="yes" />
       </Component>
 
       <Component>
@@ -160,35 +163,19 @@
       </Component>
 
       <Component>
-        <File Name="kmcomp.exe" KeyPath="yes" />
-      </Component>
-
-      <Component>
         <File Name="kmconvert.exe" KeyPath="yes" />
       </Component>
 
       <Component>
-        <File Name="kmcmpdll.dll" KeyPath="yes" />
+        <File Name="keymancore-2.dll" KeyPath="yes" />
       </Component>
 
       <Component>
-        <File Name="kmcmpdll.x64.dll" KeyPath="yes" />
+        <File Name="keyboard_info.schema.json" Source="..\..\..\common\schemas\keyboard_info\" KeyPath="yes" />
       </Component>
 
       <Component>
-        <File Name="kmcomp.x64.exe" KeyPath="yes" />
-      </Component>
-
-      <Component>
-        <File Name="kmnkbp0-0.dll" KeyPath="yes" />
-      </Component>
-
-      <Component>
-        <File Name="keyboard_info.distribution.json" Source="..\..\..\common\schemas\keyboard_info\" KeyPath="yes" />
-      </Component>
-
-      <Component>
-        <File Name="keyboard_info.source.json" Source="..\..\..\common\schemas\keyboard_info\" KeyPath="yes" />
+        <File Name="kmp.schema.json" Source="..\..\..\common\schemas\kmp\" KeyPath="yes" />
       </Component>
 
       <!-- Data Files -->
@@ -207,6 +194,28 @@
 
       <Component>
         <File Name="blocks.txt" Source="..\..\..\resources\standards-data\unicode-character-database\" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <!-- LDML Imports -->
+    <ComponentGroup Id="LdmlImports" Directory="dir_import_45" Source="..\..\..\resources\standards-data\ldml-keyboards\45\import">
+      <Component>
+        <File Id="LdmlImportReadme" Name="README.md" KeyPath="yes" />
+      </Component>
+      <Component>
+        <File Id="LdmlImportLicense" Name="unicode-license.txt" Source="..\..\..\resources\standards-data\ldml-keyboards\unicode-license.txt" />
+      </Component>
+      <Component>
+        <File Name="keys-Latn-implied.xml" KeyPath="yes" />
+      </Component>
+      <Component>
+        <File Name="keys-Zyyy-currency.xml" KeyPath="yes" />
+      </Component>
+      <Component>
+        <File Name="keys-Zyyy-punctuation.xml" KeyPath="yes" />
+      </Component>
+      <Component>
+        <File Name="scanCodes-implied.xml" KeyPath="yes" />
       </Component>
     </ComponentGroup>
 
@@ -258,10 +267,6 @@
       </Component>
 
       <Component Directory="INSTALLDIR">
-        <File Name='kmlmi.cmd' KeyPath="yes" Source="node\kmlmi.cmd" />
-      </Component>
-
-      <Component Directory="INSTALLDIR">
         <File Name='kmlmp.cmd' KeyPath="yes" Source="node\kmlmp.cmd" />
       </Component>
 
@@ -295,9 +300,10 @@
       <ComponentGroupRef Id="Node" />
       <ComponentGroupRef Id="KeymanDevSentryComponents" />
       <ComponentGroupRef Id="Server" />
+      <ComponentGroupRef Id="LdmlImports" />
     </Feature>
 
-    <Media Id="1" EmbedCab="yes" CompressionLevel="high" Cabinet="Data1.cab" VolumeLabel="DISK1" />
+    <Media Id="1" EmbedCab="yes" Cabinet="Data1.cab" VolumeLabel="DISK1" />
 
     <UIRef Id="WixUI_FeatureTree"/>
 

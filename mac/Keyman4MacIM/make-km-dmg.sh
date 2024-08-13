@@ -46,7 +46,7 @@ cd `dirname ${KEYMAN_MACIM_BASE_PATH}` > /dev/null
 KEYMAN_MACIM_BASE_PATH=`pwd`;
 popd  > /dev/null
 
-. $KEYMAN_MACIM_BASE_PATH/../bashHelperFunctions.sh
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 KM_APP_NAME="Install Keyman.app"
 OUTPUT_DIR="$KEYMAN_MACIM_BASE_PATH/output"
@@ -190,11 +190,17 @@ displayInfo "Detaching \"$WORKING_COPY_OF_IMAGE\""
 # because macOS may still be working in the folder in the
 # background
 DETACH_SUCCESS=0
+DETACH_FORCE=
 while (( DETACH_SUCCESS < 10 )); do
-    hdiutil detach $STAGING_DIR $VERBOSITY
-    if  [[ $? != 0 || -d "$STAGING_DIR" ]] ; then
+    DETACH_RESULT=0
+    hdiutil detach $STAGING_DIR $VERBOSITY $DETACH_FORCE || DETACH_RESULT=$?
+    if  [[ $DETACH_RESULT != 0 || -d "$STAGING_DIR" ]] ; then
         (( DETACH_SUCCESS++ ))
         echo "Failed to unmount: \"$STAGING_DIR\" on attempt #$DETACH_SUCCESS. Waiting 5 seconds to try again."
+        if (( DETACH_SUCCESS > 5 )); then
+            echo "  Note: Detach failed first five times, so now attempting with '-force'"
+            DETACH_FORCE=-force
+        fi
         sleep 5
     else
         DETACH_SUCCESS=999

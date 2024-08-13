@@ -7,8 +7,8 @@ if [ -v KEYMAN_PKG_BUILD ]; then
   # During package builds we skip these tests - they often fail, e.g.
   # during Debian reproducibility testing with an error like
   # "cannot open display: :32"
-  echo "1..1"
-  echo "ok 1 # SKIP on package build"
+  echo "TAP version 14"
+  echo "1..0  # SKIP on package build"
   exit 0
 fi
 
@@ -53,9 +53,9 @@ SCHEMA_DIR=$TEMP_DATA_DIR/glib-2.0/schemas
 export XDG_DATA_DIRS=$TEMP_DATA_DIR:$XDG_DATA_DIRS
 
 mkdir -p "$SCHEMA_DIR"
-cp "$SRCDIR/../keyman-config/com.keyman.gschema.xml" "$SCHEMA_DIR/"
+cp "$SRCDIR/../keyman-config/resources/com.keyman.gschema.xml" "$SCHEMA_DIR/"
 glib-compile-schemas "$SCHEMA_DIR"
 
 export GSETTINGS_BACKEND=memory
 
-${G_TEST_BUILDDIR:-.}/keymanutil-tests "$@"
+"${G_TEST_BUILDDIR:-.}/keymanutil-tests" "$@" --testdata "${SRCDIR}/src/test/testdata"

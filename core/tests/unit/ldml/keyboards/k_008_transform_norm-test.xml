@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE keyboardTest3 SYSTEM "../../../../../resources/standards-data/ldml-keyboards/45/dtd/ldmlKeyboardTest3.dtd">
+<keyboardTest3 conformsTo="techpreview">
+  <info keyboard="k_008_transform_norm.xml" author="Team Keyboard" name="transform-norm" />
+  <tests name="regex-test-dot0">
+    <test name="regex-test-dot0a">
+      <keystroke key="0" />
+      <keystroke key="stampy" />
+      <check result="YES0" />
+    </test>
+    <test name="regex-test-0b">
+      <keystroke key="0" />
+      <keystroke key="lgtm" />
+      <check result="YES0" />
+    </test>
+  </tests>
+  <tests name="regex-tests-0">
+    <!-- none of these should match the transform -->
+    <test name="regex-test-0-a">
+      <keystroke key="e" />
+      <keystroke key="u-0300" />
+      <keystroke key="u-0320" />
+      <check result="e\u{0320}\u{0300}" />
+    </test>
+    <test name="regex-test-0-b">
+      <keystroke key="e" />
+      <keystroke key="u-0320" />
+      <keystroke key="u-0300" />
+      <check result="e\u{0320}\u{0300}" />
+    </test>
+    <test name="regex-test-0-c">
+      <keystroke key="u-00e8" />
+      <keystroke key="u-0320" />
+      <check result="e\u{0320}\u{0300}" />
+    </test>
+  </tests>
+  <tests name="regex-tests-1">
+    <test name="regex-test-1-nfd">
+      <keystroke key="1" />
+      <keystroke key="e" />
+      <keystroke key="u-0300" />
+      <keystroke key="u-0320" />
+      <check result="YES1" />
+    </test>
+    <test name="regex-test-1-nfd2">
+      <keystroke key="1" />
+      <keystroke key="nfd" />
+      <check result="YES1" />
+    </test>
+    <test name="regex-test-1-nfc">
+      <keystroke key="1" />
+      <keystroke key="nfc" />
+      <check result="YES1" />
+    </test>
+    <test name="regex-test-1-nfd-ooo">
+      <keystroke key="1" />
+      <keystroke key="e" />
+      <keystroke key="u-0320" />
+      <keystroke key="u-0300" />
+      <check result="YES1" />
+    </test>
+    <test name="regex-test-1-nfd-ooo2">
+      <keystroke key="1" />
+      <keystroke key="not-nfd" />
+      <check result="YES1" />
+    </test>
+  </tests>
+  <tests name="regex-tests-2">
+    <test name="regex-test-2-nfd">
+      <keystroke key="2" />
+      <keystroke key="e" />
+      <keystroke key="u-0300" />
+      <keystroke key="u-0320" />
+      <check result="YES2" />
+    </test>
+    <test name="regex-test-2-nfd2">
+      <keystroke key="2" />
+      <keystroke key="nfd" />
+      <check result="YES2" />
+    </test>
+    <test name="regex-test-2-nfc">
+      <keystroke key="2" />
+      <keystroke key="nfc" />
+      <check result="YES2" />
+    </test>
+    <test name="regex-test-2-nfd-ooo">
+      <keystroke key="2" />
+      <keystroke key="e" />
+      <keystroke key="u-0320" />
+      <keystroke key="u-0300" />
+      <check result="YES2" />
+    </test>
+    <test name="regex-test-2-nfd-ooo2">
+      <keystroke key="2" />
+      <keystroke key="not-nfd" />
+      <check result="YES2" />
+    </test>
+  </tests>
+  <tests name="regex-tests-3">
+    <test name="regex-test-3-nfd">
+      <keystroke key="3" />
+      <keystroke key="e" />
+      <keystroke key="u-0300" />
+      <keystroke key="u-0320" />
+      <check result="YES3" />
+    </test>
+    <test name="regex-test-3-nfd2">
+      <keystroke key="3" />
+      <keystroke key="nfd" />
+      <check result="YES3" />
+    </test>
+    <test name="regex-test-3-nfc">
+      <keystroke key="3" />
+      <keystroke key="nfc" />
+      <check result="YES3" />
+    </test>
+    <test name="regex-test-3-nfd-ooo">
+      <keystroke key="3" />
+      <keystroke key="e" />
+      <keystroke key="u-0320" />
+      <keystroke key="u-0300" />
+      <check result="YES3" />
+    </test>
+    <test name="regex-test-3-nfd-ooo2">
+      <keystroke key="3" />
+      <keystroke key="not-nfd" />
+      <check result="YES3" />
+    </test>
+  </tests>
+  <tests name="regex-tests-4">
+    <test name="regex-test-4a-0">
+      <keystroke key="stampy" />
+      <keystroke key="4" />
+      <keystroke key="e" />
+      <keystroke key="u-0320" />
+      <keystroke key="u-0300" />
+      <backspace /> <!-- skip the number, match any -->
+      <check result="YES4" />
+    </test>
+    <test name="regex-test-4a-1">
+      <keystroke key="4" />
+      <keystroke key="stampy" />
+      <keystroke key="e" />
+      <keystroke key="u-0320" />
+      <keystroke key="u-0300" />
+      <backspace /> <!-- skip the number, match any -->
+      <check result="YES4" />
+    </test>
+    <test name="regex-test-4a-2">
+      <keystroke key="4" />
+      <keystroke key="e" />
+      <keystroke key="stampy" />
+      <keystroke key="u-0320" />
+      <keystroke key="u-0300" />
+      <backspace /> <!-- skip the number, match any -->
+      <check result="YES4" />
+    </test>
+    <test name="regex-test-4a-3">
+      <keystroke key="4" />
+      <keystroke key="e" />
+      <keystroke key="u-0320" />
+      <keystroke key="stampy" />
+      <keystroke key="u-0300" />
+      <backspace /> <!-- skip the number, match any -->
+      <check result="YES4" />
+    </test>
+    <test name="regex-test-4a-4">
+      <keystroke key="4" />
+      <keystroke key="e" />
+      <keystroke key="u-0320" />
+      <keystroke key="u-0300" />
+      <keystroke key="stampy" />
+      <check result="YES4d" />
+      <backspace />
+      <check result="YES4" />
+    </test>
+  </tests>
+  <tests name="regex-tests-5">
+    <test name="regex-test-5a-0">
+      <keystroke key="stampy" />
+      <keystroke key="5" />
+      <keystroke key="e" />
+      <keystroke key="u-0320" />
+      <keystroke key="u-0300" />
+      <backspace /> <!-- skip the number, match any -->
+      <check result="YES5" />
+    </test>
+  </tests>
+  <tests name="regex-tests-6">
+    <test name="regex-test-6a-0">
+      <keystroke key="6" />
+      <keystroke key="stampy" />
+      <keystroke key="e" />
+      <keystroke key="u-0320" />
+      <backspace /> <!-- skip the number, match any -->
+      <check result="YES6" />
+    </test>
+    <test name="regex-test-6a-1">
+      <keystroke key="6" />
+      <keystroke key="e" />
+      <keystroke key="stampy" />
+      <keystroke key="u-0320" />
+      <backspace /> <!-- skip the number, match any -->
+      <check result="YES6" />
+    </test>
+    <test name="regex-test-6a-2">
+      <keystroke key="6" />
+      <keystroke key="e" />
+      <keystroke key="u-0320" />
+      <keystroke key="stampy" />
+      <check result="YES6c" />
+      <backspace />
+      <check result="YES6" />
+    </test>
+  </tests>
+  <tests name="regex-tests-7">
+    <test name="regex-test-7a-0">
+      <keystroke key="stampy" />
+      <keystroke key="7" />
+      <keystroke key="e" />
+      <keystroke key="u-0300" />
+      <backspace /> <!-- skip the number, match any -->
+      <check result="YES7" />
+    </test>
+    <!-- TODO: all the variations -->
+  </tests>
+  <tests name="regex-tests-8">
+    <test name="regex-test-8a-0">
+      <!-- simple test, exactly as written-->
+      <keystroke key="8" />
+      <keystroke key="e" />
+      <keystroke key="stampy"/>
+      <keystroke key="u-0300"/>
+      <keystroke key="lgtm"/>
+      <keystroke key="u-0320"/>
+      <check result="YES8a"/>
+    </test>
+    <test name="regex-test-8b-0">
+      <!-- simple test, exactly as written-->
+      <keystroke key="8" />
+      <keystroke key="e" />
+      <keystroke key="u-0300"/>
+      <keystroke key="stampy"/>
+      <keystroke key="lgtm"/>
+      <keystroke key="u-0320"/>
+      <check result="YES8b"/>
+    </test>
+    <test name="regex-test-8e-0">
+      <!-- simple test, exactly as written-->
+      <keystroke key="8" />
+      <keystroke key="e" />
+      <keystroke key="u-0300"/> <!-- denorm-->
+      <keystroke key="u-0320"/>
+      <keystroke key="stampy"/>
+      <keystroke key="lgtm"/>
+      <check result="YES8c"/>
+    </test>
+    <test name="regex-test-8e-1">
+      <keystroke key="8" />
+      <keystroke key="e" />
+      <keystroke key="u-0320"/> <!-- NFD-->
+      <keystroke key="u-0300"/>
+      <keystroke key="stampy"/>
+      <keystroke key="lgtm"/>
+      <check result="YES8c"/>
+    </test>
+    <test name="regex-test-8f-0">
+      <keystroke key="8" />
+      <keystroke key="f" />
+      <keystroke key="u-0300"/> <!-- denorm-->
+      <keystroke key="u-0320"/>
+      <keystroke key="stampy"/>
+      <keystroke key="lgtm"/>
+      <check result="YES8d"/>
+    </test>
+    <test name="regex-test-8f-1">
+      <keystroke key="8" />
+      <keystroke key="f" />
+      <keystroke key="u-0320"/> <!-- NFD-->
+      <keystroke key="u-0300"/>
+      <keystroke key="stampy"/>
+      <keystroke key="lgtm"/>
+      <check result="YES8d"/>
+    </test>
+  </tests>
+  <tests name="regex-tests-9">
+    <test name="regex-test-9a">
+      <keystroke key="9" />
+      <keystroke key="a" />
+      <check result="9e\u{0300}\u{0320}"/>
+    </test>
+    <test name="regex-test-9b">
+      <keystroke key="9" />
+      <keystroke key="a" />
+      <check result="9e\u{0320}\u{0300}"/>
+    </test>
+    <test name="regex-test-9c">
+      <keystroke key="9" />
+      <keystroke key="c" />
+      <check result="YES9c"/>
+    </test>
+    <test name="regex-test-9d">
+      <keystroke key="9" />
+      <keystroke key="d" />
+      <check result="YES9d"/>
+    </test>
+  </tests>
+  <!-- separate tests for NFC-->
+  <tests name="regex-tests-9e">
+    <test name="regex-test-9e-0">
+      <keystroke key="9" />
+      <keystroke key="e" />
+      <keystroke key="e" />
+      <keystroke key="u-0300" />
+      <keystroke key="stampy" />
+      <keystroke key="e" />
+      <keystroke key="u-0300" /> <!-- out of order -->
+      <keystroke key="u-0320" />
+      <keystroke key="lgtm" />
+      <check result="YES9e" />
+    </test>
+    <test name="regex-test-9e-0">
+      <keystroke key="9" />
+      <keystroke key="e" />
+      <keystroke key="e" />
+      <keystroke key="u-0300" />
+      <keystroke key="stampy" />
+      <keystroke key="e" />
+      <keystroke key="u-0320" />
+      <keystroke key="u-0300" /> <!-- in order -->
+      <keystroke key="lgtm" />
+      <check result="YES9e" />
+    </test>
+  </tests>
+  <tests name="regex-tests-9f">
+    <test name="regex-test-9f-0">
+      <keystroke key="9" />
+      <keystroke key="f" />
+      <keystroke key="e" />
+      <keystroke key="stampy" />
+      <keystroke key="u-0344" />
+      <check result="YES9f" />
+    </test>
+  </tests>
+</keyboardTest3>

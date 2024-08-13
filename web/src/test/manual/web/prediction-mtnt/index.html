@@ -23,7 +23,7 @@
     </style>
 
     <!-- Insert uncompiled KeymanWeb source scripts -->
-    <script src="../../../../../build/app/web/debug/keymanweb.js" type="application/javascript"></script>
+    <script src="../../../../../build/publish/debug/keymanweb.js" type="application/javascript"></script>
 
     <!--
       For desktop browsers, a script for the user interface must be inserted here.
@@ -32,7 +32,7 @@
       The toolbar UI is best for any page designed to support keyboards for
       a large number of languages.
     -->
-    <script src="../../../../../build/app/ui/debug/kmwuitoggle.js"></script>
+    <script src="../../../../../build/publish/debug/kmwuitoggle.js"></script>
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
@@ -43,29 +43,36 @@
         kmw.addKeyboards({id:'us',name:'English',languages:{id:'en',name:'English'}, filename:'../us-1.0.js'});
         kmw.addKeyboards({id:'lao_2008_basic',name:'Lao',languages:{id:'lo',name:'Lao'}, filename:'../lao_2008_basic-1.2.js'});
         kmw.addKeyboards('sil_euro_latin@en');
+        kmw.addKeyboards({id:'ye_old_ten_key',name:'Classic 10-key',languages:{id:'en',name:'English'},
+          filename:('../keyboards/ye_old_ten_key/build/ye_old_ten_key.js')});
+        kmw.addKeyboards({id:'gesture_prototyping',name:'Gesture prototyping',languages:{id:'en',name:'English'},
+          filename:('../keyboards/gesture_prototyping/build/gesture_prototyping.js')});
 
-        var pageRef = (window.location.protocol == 'file:')
-          ? window.location.href.substr(0, window.location.href.lastIndexOf('/')+1)
-          : window.location.href;
+        // Ensure the URL we prefix to the page's path is the page's directory, not including
+        // the actual HTML page itself.
+        var urlIncludesIndex = window.location.href.lastIndexOf('.html') > 1;
+        var pageRef = (urlIncludesIndex
+          ? window.location.href.substr(0, window.location.href.lastIndexOf('/'))
+          : window.location.href) + '/';
 
         var modelStub = {'id': 'nrc.en.mtnt',
           languages: ['en'],
           path: (pageRef + "nrc.en.mtnt.model.js")
         };
-        kmw.modelManager.register(modelStub);
+        kmw.addModel(modelStub);
       });
 
       function togglePredictions() {
-        let newVal = !keyman.modelManager.mayPredict;
-        keyman.osk.banner.setOptions({'mayPredict': newVal});
+        let newVal = !keyman.core.languageProcessor.mayPredict;
+        keyman.core.languageProcessor.mayPredict = newVal;
 
         let btnPredict = document.getElementById("btnPredict");
         btnPredict.value = (newVal ? "Disable" : "Enable") + " predictions";
       }
 
       function toggleCorrections() {
-        let newVal = !keyman.modelManager.mayCorrect;
-        keyman.osk.banner.setOptions({'mayCorrect': newVal});
+        let newVal = !keyman.core.languageProcessor.mayCorrect;
+        keyman.core.languageProcessor.mayCorrect = newVal;
 
         let btnCorrect = document.getElementById("btnCorrect");
         btnCorrect.value = (newVal ? "Disable" : "Enable") + " corrections";

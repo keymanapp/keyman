@@ -6,7 +6,7 @@ Source code for Keyman engine for IBus is in [linux/ibus-keyman](../../linux/ibu
 
 ## Requirements
 
-meson (>= 0.53)
+meson (>= 1.0)
 
 ## Building
 

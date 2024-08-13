@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="en-*" conformsTo="techpreview">
-  <names>
-    <name value="invalid-loca" />
-  </names>
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="en-*" conformsTo="45">
+  <info name="invalid-loca"/>
   <keys />
-</keyboard>
+</keyboard3>

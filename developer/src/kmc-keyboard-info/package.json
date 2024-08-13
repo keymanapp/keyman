@@ -1,0 +1,48 @@
+{
+  "name": "@keymanapp/kmc-keyboard-info",
+  "description": "Keyman Developer .keyboard_info compiler",
+  "keywords": [
+    "keyboard",
+    "keyman",
+    "unicode"
+  ],
+  "type": "module",
+  "exports": {
+    ".": "./build/src/index.js"
+  },
+  "files": [
+    "/build/src/"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "lint": "eslint .",
+    "test": "npm run lint"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/keymanapp/keyman/issues"
+  },
+  "dependencies": {
+    "@keymanapp/common-types": "*",
+    "@keymanapp/developer-utils": "*",
+    "@keymanapp/kmc-package": "*"
+  },
+  "devDependencies": {
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^20.4.1",
+    "c8": "^7.12.0",
+    "chalk": "^2.4.2",
+    "mocha": "^8.4.0",
+    "typescript": "^5.4.5"
+  },
+  "mocha": {
+    "spec": "build/test/**/test-*.js",
+    "require": [
+      "source-map-support/register"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git"
+  }
+}

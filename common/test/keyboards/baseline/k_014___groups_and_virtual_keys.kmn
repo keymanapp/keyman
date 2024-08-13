@@ -11,16 +11,16 @@ store(&MnemonicLayout) "0"
 
 c ----------------------------------------------
 
-group(UMain) using keys 
-  + [K_A] > U+03B1
-  + [CTRL  K_2] > deadkey(MacronBug)
-  + [ALT  K_2] > deadkey(MacronBug)
-  + [SHIFT    K_2] > deadkey(BreveBug)
-      
+group(UMain) using keys
+  + [K_A]        > U+03B1
+  + [CTRL   K_2] > deadkey(MacronBug)
+  + [ALT    K_2] > deadkey(MacronBug)
+  + [SHIFT  K_2] > deadkey(BreveBug)
+
   match > use(DK1)
- 
+
 c ----------------------------------------------
 
-group(DK1)           
-  deadkey(MacronBug) U+03B1 > U+1FB1 c won't work
-  deadkey(BreveBug)  U+03B1 > U+1FB0 c works
+group(DK1)
+  deadkey(MacronBug) U+03B1 > U+1FB1
+  deadkey(BreveBug)  U+03B1 > U+1FB0

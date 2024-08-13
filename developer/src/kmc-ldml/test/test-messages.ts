@@ -1,9 +1,10 @@
 import 'mocha';
-import { CompilerMessages } from '../src/compiler/messages.js';
+import { LdmlCompilerMessages } from '../src/compiler/ldml-compiler-messages.js';
 import { verifyCompilerMessagesObject } from '@keymanapp/developer-test-helpers';
+import { CompilerErrorNamespace } from '@keymanapp/common-types';
 
-describe('CompilerMessages', function () {
-  it('should have a valid CompilerMessages object', function() {
-    return verifyCompilerMessagesObject(CompilerMessages);
+describe('LdmlCompilerMessages', function () {
+  it('should have a valid LdmlCompilerMessages object', function() {
+    return verifyCompilerMessagesObject(LdmlCompilerMessages, CompilerErrorNamespace.LdmlKeyboardCompiler);
   });
 });

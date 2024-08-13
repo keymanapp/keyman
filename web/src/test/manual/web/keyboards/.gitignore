@@ -1,0 +1,10 @@
+# Reference: https://stackoverflow.com/a/69970899
+
+# Don't exclude the keyboards' build directories...
+!**/build/
+
+# ... just everything in them.
+**/build/*
+
+# EXCEPT the compiled keyboard.
+!**/build/*.js

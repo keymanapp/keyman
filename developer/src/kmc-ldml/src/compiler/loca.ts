@@ -1,9 +1,9 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { LDMLKeyboard, KMXPlus } from '@keymanapp/common-types';
 import { SectionCompiler } from "./section-compiler.js";
-import { CompilerMessages } from "./messages.js";
+import { LdmlCompilerMessages } from "./ldml-compiler-messages.js";
 
-import GlobalSections = KMXPlus.GlobalSections;
+import DependencySections = KMXPlus.DependencySections;
 import Loca = KMXPlus.Loca;
 import LKKeyboard = LDMLKeyboard.LKKeyboard;
 
@@ -24,15 +24,16 @@ export class LocaCompiler extends SectionCompiler {
 
   public validate(): boolean {
     let valid = true;
-    const locales = this.getLocales(this.keyboard);
+    const locales = this.getLocales(this.keyboard3);
     for(let tag of locales) {
       try {
         new Intl.Locale(tag);
       } catch(e) {
         if(e instanceof RangeError) {
-          this.callbacks.reportMessage(CompilerMessages.Error_InvalidLocale({tag}));
+          this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidLocale({tag}));
           valid = false;
         } else {
+          /* c8 ignore next 2 */
           throw e;
         }
       }
@@ -40,16 +41,16 @@ export class LocaCompiler extends SectionCompiler {
     return valid;
   }
 
-  public compile(sections: GlobalSections): Loca {
+  public compile(sections: DependencySections): Loca {
     let result = new Loca();
 
     // This also minimizes locales according to Remove Likely Subtags algorithm:
     // https://www.unicode.org/reports/tr35/#Likely_Subtags
-    const sourceLocales = this.getLocales(this.keyboard);
+    const sourceLocales = this.getLocales(this.keyboard3);
     const locales = sourceLocales.map((sourceLocale: string) => {
       const locale = new Intl.Locale(sourceLocale).minimize().toString();
       if(locale != sourceLocale) {
-        this.callbacks.reportMessage(CompilerMessages.Hint_LocaleIsNotMinimalAndClean({sourceLocale, locale}));
+        this.callbacks.reportMessage(LdmlCompilerMessages.Hint_LocaleIsNotMinimalAndClean({sourceLocale, locale}));
       }
       return locale;
     });
@@ -61,7 +62,7 @@ export class LocaCompiler extends SectionCompiler {
     result.locales = canonicalLocales.map(locale => sections.strs.allocString(locale));
 
     if(result.locales.length < locales.length) {
-      this.callbacks.reportMessage(CompilerMessages.Hint_OneOrMoreRepeatedLocales());
+      this.callbacks.reportMessage(LdmlCompilerMessages.Hint_OneOrMoreRepeatedLocales());
     }
 
     return result;

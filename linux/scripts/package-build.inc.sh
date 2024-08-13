@@ -28,10 +28,7 @@ function downloadSource() {
 
     if [ "${proj:=}" == "keyman" ]; then
        cd "${BASEDIR}" || exit
-    fi
-
-    if [ "${proj}" == "keyman" ]; then
-        make clean
+        ./build.sh clean
     fi
 
     # Update tier in Debian watch files (replacing any previously set tier) and remove comment
@@ -52,26 +49,34 @@ function downloadSource() {
     sha256sum -c --ignore-missing SHA256SUMS |grep "${proj}"
 }
 
+function wait_for_apt_deb {
+    # from https://gist.github.com/hrpatel/117419dcc3a75e46f79a9f1dce99ef52
+    while sudo fuser /var/{lib/{dpkg,apt/lists},cache/apt/archives}/lock &>/dev/null 2>&1; do
+       echo "Waiting for apt/dpkg lock to release, sleeping 10s"
+       sleep 10
+    done
+}
+
 function checkAndInstallRequirements()
 {
 	local TOINSTALL=""
 
-	for p in devscripts equivs
+	for p in devscripts equivs python3-dev
 	do
-		if ! dpkg -s $p >/dev/null 2>&1; then
-			TOINSTALL="$TOINSTALL $p"
+		if ! dpkg -s "${p}" >/dev/null 2>&1; then
+			TOINSTALL="${TOINSTALL} ${p}"
 		fi
 	done
 
 	export DEBIAN_FRONTEND=noninteractive
 
-	if [ -n "$TOINSTALL" ]; then
-		sudo apt-get update
+	if [[ -n "${TOINSTALL}" ]]; then
+		wait_for_apt_deb && sudo apt-get update
 		# shellcheck disable=SC2086
-		sudo apt-get -qy install $TOINSTALL
+		wait_for_apt_deb && sudo apt-get -qy install ${TOINSTALL}
 	fi
 
 	sudo mk-build-deps debian/control
-	sudo apt-get -qy --allow-downgrades install ./keyman-build-deps_*.deb
+	wait_for_apt_deb && sudo apt-get -qy --allow-downgrades install ./keyman-build-deps_*.deb
 	sudo rm -f keyman-buid-deps_*
 }

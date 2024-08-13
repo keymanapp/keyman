@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import 'mocha';
 import {assert} from 'chai';
-import { loadSchema, makePathToFixture } from '../helpers/index.js';
+import { makePathToFixture } from '../helpers/index.js';
 import { KPJFileReader } from "../../src/kpj/kpj-file-reader.js";
 import { KeymanDeveloperProjectFile10, KeymanDeveloperProjectType } from '../../src/kpj/keyman-developer-project.js';
 import { TestCompilerCallbacks } from '../helpers/TestCompilerCallbacks.js';
@@ -15,15 +15,15 @@ describe('kpj-file-reader', function () {
     const input = fs.readFileSync(path);
     const reader = new KPJFileReader(callbacks);
     const kpj = reader.read(input);
-    console.dir(kpj);
     assert.doesNotThrow(() => {
-      reader.validate(kpj, loadSchema('kpj'));
+      reader.validate(kpj);
     });
     assert.equal(kpj.KeymanDeveloperProject.Options.BuildPath, '$PROJECTPATH\\build');
     assert.equal(kpj.KeymanDeveloperProject.Options.CheckFilenameConventions, 'False');
     assert.equal(kpj.KeymanDeveloperProject.Options.CompilerWarningsAsErrors, 'True');
     assert.equal(kpj.KeymanDeveloperProject.Options.ProjectType, 'keyboard');
     assert.equal(kpj.KeymanDeveloperProject.Options.WarnDeprecatedCode, 'True');
+    assert.isUndefined(kpj.KeymanDeveloperProject.Options.SkipMetadataFiles); // because this is a 1.0 version file
     assert.isUndefined(kpj.KeymanDeveloperProject.Options.Version);
 
     assert.lengthOf(kpj.KeymanDeveloperProject.Files.File, 21);
@@ -74,12 +74,12 @@ describe('kpj-file-reader', function () {
     assert.isTrue(project.options.compilerWarningsAsErrors);
     assert.equal(project.options.projectType, KeymanDeveloperProjectType.Keyboard);
     assert.isTrue(project.options.warnDeprecatedCode);
+    assert.isTrue(project.options.skipMetadataFiles);
     assert.equal(project.options.version, '1.0');
 
     assert.lengthOf(project.files, 2);
 
     let f: KeymanDeveloperProjectFile10 = <KeymanDeveloperProjectFile10>project.files[0];
-    console.dir(f);
     assert.equal(f.id, 'id_f347675c33d2e6b1c705c787fad4941a');
     assert.equal(f.filename, 'khmer_angkor.kmn');
     assert.equal(f.filePath, 'source/khmer_angkor.kmn');
@@ -123,4 +123,34 @@ describe('kpj-file-reader', function () {
     assert.isEmpty(f.details);
     assert.lengthOf(f.childFiles, 0);
   });
+
+  it('should load a v1.0 keyboard project with missing <File>', function() {
+    const path = makePathToFixture('kpj', 'project-missing-file', 'project_missing_file.kpj');
+    const input = fs.readFileSync(path);
+    const reader = new KPJFileReader(callbacks);
+    const kpj = reader.read(input);
+    reader.validate(kpj);
+    if(callbacks.messages.length) {
+      callbacks.printMessages();
+    }
+    assert.equal(callbacks.messages.length, 0);
+    assert.lengthOf(kpj.KeymanDeveloperProject.Files.File, 0);
+    const project = reader.transform(path, kpj);
+    assert.equal(callbacks.messages.length, 0);
+    assert.isNotNull(project);
+  });
+
+  it('should load a v1.0 keyboard project with missing <Files>', function() {
+    const path = makePathToFixture('kpj', 'project-missing-file', 'project_missing_files.kpj');
+    const input = fs.readFileSync(path);
+    const reader = new KPJFileReader(callbacks);
+    const kpj = reader.read(input);
+    reader.validate(kpj);
+    assert.equal(callbacks.messages.length, 0);
+    assert.lengthOf(kpj.KeymanDeveloperProject.Files.File, 0);
+    const project = reader.transform(path, kpj);
+    assert.equal(callbacks.messages.length, 0);
+    assert.isNotNull(project);
+  });
+
 });

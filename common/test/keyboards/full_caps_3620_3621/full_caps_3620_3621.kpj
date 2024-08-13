@@ -52,13 +52,6 @@
       <FileType>.md</FileType>
     </File>
     <File>
-      <ID>id_da795226173614238dd92754311e5f15</ID>
-      <Filename>full_caps_3620_3621.keyboard_info</Filename>
-      <Filepath>full_caps_3620_3621.keyboard_info</Filepath>
-      <FileVersion></FileVersion>
-      <FileType>.keyboard_info</FileType>
-    </File>
-    <File>
       <ID>id_3087832d59de33f9903fc21ba620b576</ID>
       <Filename>full_caps_3620_3621.kmx</Filename>
       <Filepath>source\..\build\full_caps_3620_3621.kmx</Filepath>

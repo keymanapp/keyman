@@ -25,6 +25,8 @@ $(function() {
   this.loadUndo = function (s) {
     KVKL = JSON.parse(s.KVKL);
 
+    const lastPresentation = $('#selPlatformPresentation').val();
+
     builder.preparePlatforms();
     builder.enableUndoControls();
 
@@ -34,6 +36,15 @@ $(function() {
     builder.selectLayer();
     builder.selectKey($('#kbd .key').filter(function (index) { return $(this).data('id') === s.key; }).first());
     if (s.subkey) builder.selectSubKey($('#sub-key-groups .key').filter(function (index) { return $(this).data('id') === s.subkey; }).first());
+
+    // If we are on the same platform, restore the user's current presentation,
+    // which has been reset by the earlier `preparePlatforms()` call. We can't
+    // manage this across platforms because the presentation values are unique
+    // per platform
+    if($(`#selPlatformPresentation option[value="${lastPresentation}"]`).length) {
+      $('#selPlatformPresentation').val(lastPresentation);
+      builder.selPlatformPresentationChange();
+    }
   }
 
   this.saveUndo = function (saveToRedo) {

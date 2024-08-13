@@ -1,7 +1,6 @@
 #pragma once
 
-#include <keyman/keyboardprocessor_bits.h>
-#include <keyman/keyboardprocessor.h>
+#include "keyman_core.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 #define snprintf _snprintf
@@ -11,7 +10,7 @@
 #endif
 
 namespace km {
-namespace kbp {
+namespace core {
 namespace kmx {
 
 typedef struct tagSTORE
@@ -95,5 +94,5 @@ typedef struct tagKMSTATE
 enum ProcessStringReturn { psrPostMessages, psrCheckMatches };
 
 } // namespace kmx
-} // namespace kbp
+} // namespace core
 } // namespace km

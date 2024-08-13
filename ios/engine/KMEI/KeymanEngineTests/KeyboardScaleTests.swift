@@ -9,6 +9,7 @@
 import XCTest
 @testable import KeymanEngine
 import DeviceKit
+import os.log
 
 extension KeyboardSize: Equatable {
   public static func == (lhs: KeyboardSize, rhs: KeyboardSize) -> Bool {
@@ -51,7 +52,8 @@ class KeyboardScaleTests: XCTestCase {
 
   func testScaleForUnknown() {
     let device = Device.unknown("granny smith")
-    log.info(device.isPad)
+    let message = "\(device.isPad)"
+    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
     let size1 = CGSize(width: 375, height: 667) // iPhone 8 device height
 
     let mappedScale1 = KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: true,

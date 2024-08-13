@@ -13,10 +13,10 @@
 namespace km {
 namespace tests {
 
-km_kbp_virtual_key
+km_core_virtual_key
 get_vk(std::string const &vk) {
   for (int i = 1; i < 256; i++) {
-    if (vk == km::kbp::kmx::s_key_names[i]) {
+    if (vk == km::core::kmx::s_key_names[i]) {
       return i;
     }
   }

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+
+@@keys: [LALT K_BKQUOTE]
+@@expected: \u0064
+
+will match the default layer
+
+-->
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info author="srl295" indicator="🙀" layout="qwerty"  name="TestKbd"/>
+
+  <keys/>
+
+  <layers formId="us">
+    <layer id="base" modifiers="none">
+      <row keys="b" /> <!-- number row -->
+    </layer>
+    <layer id="shift" modifiers="shift">
+      <row keys="s" /> <!-- number row -->
+    </layer>
+    <layer id="other" modifiers="other">
+      <row keys="d" /> <!-- number row -->
+    </layer>
+  </layers>
+</keyboard3>

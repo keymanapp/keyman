@@ -2,25 +2,25 @@
 
 import argparse
 import logging
+import sys
+import gi
 
-from keyman_config import __versionwithtag__, __pkgversion__
+gi.require_version('Gtk', '3.0')
+
+from gi.repository import Gtk
+
+from keyman_config import __versionwithtag__, __pkgversion__, add_standard_arguments, initialize_logging, initialize_sentry, verify_dbus_running
 from keyman_config.handle_install import download_and_install_package
 from keyman_config.ibus_util import verify_ibus_daemon
+from keyman_config.view_installed import ViewInstalledWindow
 
 
 if __name__ == '__main__':
-    if __pkgversion__:
-        versionstring = "%s (package version %s)" % (__versionwithtag__, __pkgversion__)
-    else:
-        versionstring = "%s" % __versionwithtag__
     parser = argparse.ArgumentParser(description='km-config shows the currently installed ' +
                                      'Keyman keyboard packages and allows you to view ' +
                                      'information about them. It enables you to download new ' +
                                      'keyboard packages from the website or install from ' +
                                      'local files.')
-    parser.add_argument('--version', action='version', version='%(prog)s version ' + versionstring)
-    parser.add_argument('-v', '--verbose', action='store_true', help='verbose logging')
-    parser.add_argument('-vv', '--veryverbose', action='store_true', help='very verbose logging')
     parser.add_argument('-i', '--install', action='store', help='download and/or install .kmp ' +
                         'package. INSTALL can either be a downloaded .kmp file, a file:// URL ' +
                         'pointing to a .kmp file, or a keyman:// URL, possibly with a ' +
@@ -32,14 +32,15 @@ if __name__ == '__main__':
                         'pointing to a .kmp file, or a keyman:// URL, possibly with a ' +
                         'bcp47=<language> specified (e.g. keyman://download/keyboard/' +
                         'sil_el_ethiopian_latin?bcp47=ssy-latn).')
+    add_standard_arguments(parser)
 
     args = parser.parse_args()
-    if args.verbose:
-        logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(message)s')
-    elif args.veryverbose:
-        logging.basicConfig(level=logging.DEBUG, format='%(levelname)s:%(message)s')
-    else:
-        logging.basicConfig(format='%(levelname)s:%(message)s')
+
+    Gtk.init(sys.argv[1:])
+
+    initialize_logging(args)
+    initialize_sentry()
+    verify_dbus_running()
 
     logging.info('Keyman version %s %s', __versionwithtag__, __pkgversion__)
 
@@ -50,7 +51,6 @@ if __name__ == '__main__':
     elif args.url:
         download_and_install_package(args.url)
     else:
-        from keyman_config.view_installed import ViewInstalledWindow
         w = ViewInstalledWindow()
         try:
             w.run()

@@ -13,36 +13,16 @@
 #include <sstream>
 #include <kmcmplibapi.h>
 #include <kmx_file.h>
+#include "util_filesystem.h"
+#include "util_callbacks.h"
 
 #ifdef _MSC_VER
 #else
 #include <unistd.h>
+#include <cstring>
 #endif
 
 using namespace std;
-
-vector < int > error_vec;
-
-#define CERR_FATAL                                         0x00008000
-#define CERR_ERROR                                         0x00004000
-#define CERR_WARNING                                       0x00002000
-#define CERR_HINT                                          0x00001000
-
-int msgproc(int line, uint32_t dwMsgCode, char* szText, void* context)
-{
-  error_vec.push_back(dwMsgCode);
-  const char*t = "unknown";
-  switch(dwMsgCode & 0xF000) {
-    case CERR_HINT:    t="   hint"; break;
-    case CERR_WARNING: t="warning"; break;
-    case CERR_ERROR:   t="  error"; break;
-    case CERR_FATAL:   t="  fatal"; break;
-  }
-  printf("line %d  %s %04.4x:  %s\n", line, t, (unsigned int)dwMsgCode, szText);
-	return 1;
-}
-
-#include "../src/filesystem.h"
 
 int main(int argc, char *argv[])
 {
@@ -68,45 +48,44 @@ int main(int argc, char *argv[])
     if(*p == '\\') *p = '/';
   }
 
-  char  first5[6] = "CERR_";
-  char* pfirst5 = first5;
+  const char* first5 = "CERR_";
 
-  KMCMP_COMPILER_OPTIONS kcopts;
-  kcopts.dwSize = sizeof(KMCMP_COMPILER_OPTIONS);
-  kcopts.ShouldAddCompilerVersion = false; // So we can compare against existing compiled keyboards that also don't have compiler version
-  if(!kmcmp_SetCompilerOptions(&kcopts)) {
-    return __LINE__;
-  }
+  KMCMP_COMPILER_RESULT result;
+  KMCMP_COMPILER_OPTIONS options;
+  options.saveDebug = true;
+  options.compilerWarningsAsErrors = false;
+  options.warnDeprecatedCode = true;
+  options.shouldAddCompilerVersion = false;
+  options.target = CKF_KEYMAN;
 
-  if(kmcmp_CompileKeyboardFile(kmn_file, kmx_file, true, false, true, msgproc, nullptr)) {
+  if(kmcmp_CompileKeyboard(kmn_file, options, msgproc, loadfileProc, nullptr, result)) {
     char* testname = strrchr( (char*) kmn_file, '/') + 1;
-    if(strncmp(testname, pfirst5, 5) == 0){
+    if(strncmp(testname, first5, strlen(first5)) == 0){
       return __LINE__;  // exit code: CERR_ in Name + no Error found
     }
 
     // On non-win32 platforms, we cannot get kmcmpdll.dll to build keyboards
     // legacy-mode, so we'll compare to a hopefully existing file that we've
     // been passed
-    FILE* fp1 = Open_File(kmx_file, "rb");
+    FILE* fp1 = Open_File(kmx_file, "wb");
     if(!fp1) return __LINE__;
 
+    // Write out for reference
+    fwrite(result.kmx, 1, result.kmxSize, fp1);
+    fclose(fp1);
 
     FILE* fp2 = Open_File(reference_kmx, "rb");
     if(!fp2) return __LINE__;                      // exit code: fail if no reference kmx file in build-folder
 
-    fseek(fp1, 0, SEEK_END);
-    auto sz1 = ftell(fp1);
-    fseek(fp1, 0, SEEK_SET);
     fseek(fp2, 0, SEEK_END);
     auto sz2 = ftell(fp2);
     fseek(fp2, 0, SEEK_SET);
-    if (sz1 != sz2) return __LINE__;                //  exit code: size of kmx-file in build differs from size of kmx-file in source folder
+    if (result.kmxSize != (size_t)sz2) return __LINE__;                //  exit code: size of kmx-file in build differs from size of kmx-file in source folder
 
-    char* buf1 = new char[sz1];
-    char* buf2 = new char[sz1];
-    fread(buf1, 1, sz1, fp1);
-    fread(buf2, 1, sz1, fp2);
-    return memcmp(buf1, buf2, sz1) ? __LINE__ : 0;  // exit code:  when contents of kmx-file in build differs from contents of kmx-file in source folder
+    char* buf2 = new char[result.kmxSize];
+    auto sz3 = fread(buf2, 1, result.kmxSize, fp2);
+    if (result.kmxSize != sz3) return __LINE__;                // exit code:  when not able to read the build into the buffer
+    return memcmp(result.kmx, buf2, result.kmxSize) ? __LINE__ : 0;  // exit code:  when contents of kmx-file in build differs from contents of kmx-file in source folder
                                                     // success:    when contents of kmx-file in build and source folder are the same
   }
   else {  /*if Errors found: check number (e.g. CERR_4061_balochi_phonetic.kmn should produce Error 4061)*/
@@ -114,12 +93,12 @@ int main(int argc, char *argv[])
     char* testname = strrchr( (char*) kmn_file, '/') + 1;
 
     // Does testname contain CERR_  && contains '_' on pos 9 ? ->  Get ErrorValue
-    if ((strncmp(testname, pfirst5, 5) == 0) &&   (testname[9] == '_')) {
+    if ((strncmp(testname, first5, strlen(first5)) == 0) &&   (testname[9] == '_')) {
       char* ErrNr = strchr(testname, '_') +1 ;
       std::istringstream(ErrNr) >> std::hex >> error_val;
 
       // check if error_val is in Array of Errors; if it is found return 0 (it's not an error)
-      for (int i = 0; i < error_vec.size() ; i++) {
+      for (size_t i = 0; i < error_vec.size() ; i++) {
         if (error_vec[i] == error_val) {
           return 0;  // success: CERR_ in Name + Error (specified in CERR_Name) IS found
         }
@@ -173,7 +152,7 @@ bool isDesktopKeyboard(FILE* fp) {
 
   PCOMP_STORE s = pfs;
 
-  for(int i = 0; i < fk.cxStoreArray; i++, s++) {
+  for(KMX_DWORD i = 0; i < fk.cxStoreArray; i++, s++) {
     if(s->dwSystemID != TSS_TARGETS) {
       continue;
     }

@@ -17,8 +17,7 @@
     "build": "tsc -b",
     "lint": "eslint .",
     "test": "npm run lint && cd test && tsc -b && cd .. && c8 --reporter=lcov --reporter=text mocha",
-    "coverage": "npm test",
-    "prepublishOnly": "npm run build"
+    "coverage": "npm test"
   },
   "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
   "contributors": [
@@ -30,20 +29,18 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "dependencies": {
+    "@keymanapp/common-types": "*",
     "jszip": "^3.7.0",
-    "@keymanapp/common-types": "*"
+    "marked": "^7.0.0"
   },
   "devDependencies": {
-    "@types/chai": "^4.1.7",
+    "@keymanapp/developer-test-helpers": "*",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^10.14.6",
+    "@types/node": "^20.4.1",
     "c8": "^7.12.0",
-    "chai": "^4.3.4",
     "chalk": "^2.4.2",
     "mocha": "^8.4.0",
-    "ts-node": "^9.1.1",
-    "typescript": "^4.9.5",
-    "@keymanapp/developer-test-helpers": "*"
+    "typescript": "^5.4.5"
   },
   "mocha": {
     "spec": "build/test/**/test-*.js",
@@ -59,8 +56,7 @@
     "exclude-after-remap": true,
     "exclude": [
       "test/",
-      "src/kmp-json-file.ts",
-      "src/kps-file.ts"
+      "src/main.ts"
     ]
   },
   "repository": {

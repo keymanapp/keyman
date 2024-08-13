@@ -1,20 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="und" conformsTo="techpreview">
-  <names>
-    <name value="layr-invalid-form" />
-  </names>
-
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="und" conformsTo="45">
+  <info name="layr-invalid-form"/>
   <keys>
-    <key id="grave" to="`" />
-    <key id="one" to="1" />
+    <key id="grave" output="`" />
+    <key id="one" output="1" />
   </keys>
 
-  <layers> <!-- INVALID: Missing 'form=' attribute -->
+  <layers> <!-- INVALID: Missing 'formId=' attribute -->
     <layer id="base">
       <!-- beware: this is mapping ` and 1! -->
       <row keys="grave one " />
     </layer>
   </layers>
-</keyboard>
+</keyboard3>

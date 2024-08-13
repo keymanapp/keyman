@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 
 import com.keyman.engine.util.KMLog;
@@ -39,6 +40,7 @@ public class CloudDownloadMgr{
   {
     if(instance!=null)
       return;
+    KMLog.LogBreadcrumb("CloudDownloadMgr", "CloudDownloadMgr.createInstance() - first call", true);
     instance = new CloudDownloadMgr();
   }
 
@@ -59,12 +61,22 @@ public class CloudDownloadMgr{
     if(isInitialized)
       return;
     try {
-      aContext.registerReceiver(completeListener, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-    } catch (IllegalStateException e) {
+      KMLog.LogBreadcrumb("CloudDownloadMgr", "attempting CloudDownloadMgr.initialize()", true);
+      // Runtime-registered boradcasts receivers must specify export behavior to indicate whether
+      // or not the receiver should be exported to all other apps on the device
+      // https://developer.android.com/about/versions/14/behavior-changes-14#runtime-receivers-exported
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        aContext.registerReceiver(completeListener, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE),
+          Context.RECEIVER_EXPORTED);
+      } else {
+        aContext.registerReceiver(completeListener, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+      }
+    } catch (IllegalArgumentException e) {
       String message = "initialize error: ";
       KMLog.LogException(TAG, message, e);
     }
     isInitialized = true;
+    KMLog.LogBreadcrumb("CloudDownloadMgr", ".initialize() call complete", false);
   }
 
   /**
@@ -73,11 +85,15 @@ public class CloudDownloadMgr{
    */
   public synchronized void shutdown(Context aContext)
   {
-    if(!isInitialized)
+    if(!isInitialized) {
       return;
+    }
+
+    KMLog.LogBreadcrumb("CloudDownloadMgr", "CloudDownloadMgr.shutdown()", true);
+
     try {
       aContext.unregisterReceiver(completeListener);
-    } catch (IllegalStateException e) {
+    } catch (IllegalArgumentException e) {
       String message = "shutdown error: ";
       KMLog.LogException(TAG, message, e);
     }
@@ -197,8 +213,10 @@ public class CloudDownloadMgr{
                                 CloudApiTypes.CloudApiParam... params)
   {
     if(!isInitialized) {
-      Log.w(TAG, "Downloadmanager not initialized. Initializing CloudDownloadMgr.");
+      Log.w(TAG, "DownloadManager not initialized. Initializing CloudDownloadMgr.");
       initialize(aContext);
+    } else {
+      KMLog.LogBreadcrumb("CloudDownloadMgr", "CloudDownloadMgr.executeAsDownload() called; already initialized", true);
     }
 
     synchronized (downloadSetByDownloadIdentifier) {
@@ -209,7 +227,7 @@ public class CloudDownloadMgr{
 
       DownloadManager downloadManager = (DownloadManager) aContext.getSystemService(Context.DOWNLOAD_SERVICE);
       if(downloadManager==null)
-        throw new IllegalStateException("Downloadmanager is not available");
+        throw new IllegalStateException("DownloadManager is not available");
 
       aCallback.initializeContext(aContext);
 

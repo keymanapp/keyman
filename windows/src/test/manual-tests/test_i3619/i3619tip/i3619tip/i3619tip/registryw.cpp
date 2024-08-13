@@ -1,18 +1,18 @@
 /*
   Name:             registryw
   Copyright:        Copyright (C) 2003-2017 SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      1 Dec 2012
 
   Modified Date:    13 Dec 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          01 Dec 2012 - mcdurdin - I3622 - V9.0 - Add Registry*W classes for Unicode
                     13 Dec 2012 - mcdurdin - I3675 - V9.0 - Minor updates to I3622 for consistency
 */
@@ -42,7 +42,7 @@ BOOL RegistryReadOnlyW::CloseKey(void)
 BOOL RegistryFullAccessW::CreateKey(LPCWSTR AKey)
 {
 	DWORD dwDisposition;
-	return WrapError(RegCreateKeyExW(FhKey ? FhKey : FhRootKey, AKey, 0, NULL, 0, KEY_ALL_ACCESS, NULL, 
+	return WrapError(RegCreateKeyExW(FhKey ? FhKey : FhRootKey, AKey, 0, NULL, 0, KEY_ALL_ACCESS, NULL,
 		&FhKey, &dwDisposition));
 }
 
@@ -53,7 +53,7 @@ BOOL RegistryFullAccessW::RecursiveDeleteKey(LPCWSTR AKey)
 	if(RegOpenKeyExW(FhKey ? FhKey : FhRootKey, AKey, 0, KEY_ALL_ACCESS, &hkey) != ERROR_SUCCESS)
 		return FALSE;
 
-	if(!IntRecursiveDeleteKey(hkey)) 
+	if(!IntRecursiveDeleteKey(hkey))
 	{
 		RegCloseKey(hkey);
 		return FALSE;
@@ -182,17 +182,17 @@ BOOL RegistryReadOnlyW::WrapError(DWORD res)
 {
 	/*if(res != ERROR_SUCCESS)
 	{
-		SendDebugMessageFormat(0,KDS_PROGRAM,0,"RegistryFullAccessW::WrapError = %d", res);
+		__logerror(0,KDS_PROGRAM,0,"RegistryFullAccessW::WrapError = %d", res);
 	}*/
 	return res == ERROR_SUCCESS;
 }
 
-BOOL RegistryFullAccessW::WriteInteger(LPCWSTR AName, int AValue)
+BOOL RegistryFullAccessW::WriteInteger(LPCWSTR AName, const int AValue)
 {
 	return WrapError(RegSetValueExW(FhKey, AName, 0, REG_DWORD, (LPBYTE) &AValue, sizeof(int)));
 }
 
-BOOL RegistryFullAccessW::WriteString(LPCWSTR AName, LPWSTR AValue)
+BOOL RegistryFullAccessW::WriteString(LPCWSTR AName, LPCWSTR AValue)
 {
   DWORD dwLen = (DWORD) (wcslen(AValue)+1) * sizeof(WCHAR);   // I3675
 	return WrapError(RegSetValueExW(FhKey, AName, 0, REG_SZ, (LPBYTE) AValue, dwLen));

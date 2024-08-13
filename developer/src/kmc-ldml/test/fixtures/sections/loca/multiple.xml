@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="mt" conformsTo="techpreview">
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
   <locales>
     <locale id="fr-FR" />
     <locale id="km-khmr-kh" />
@@ -10,9 +9,7 @@
     <locale id="en-fonipa" />
   </locales>
 
-  <names>
-    <name value="loca-multiple" />
-  </names>
+  <info name="loca-multiple"/>
 
   <keys />
-</keyboard>
+</keyboard3>

@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import os.log
 
 public class LexicalModelKeymanPackage : TypedKeymanPackage<InstallableLexicalModel> {
   internal var models : [KMPLexicalModel]!
@@ -24,7 +25,9 @@ public class LexicalModelKeymanPackage : TypedKeymanPackage<InstallableLexicalMo
         if(model.isValid && FileManager.default.fileExists(atPath: self.sourceFolder.appendingPathComponent("\(model.lexicalModelId).model.js").path)) {
           models.append(model)
         } else {
-          SentryManager.breadcrumbAndLog("\(model.name) not valid / corresponding file not found")
+          let message = "\(model.name) not valid / corresponding file not found"
+          os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
+          SentryManager.breadcrumb(message)
         }
       }
     }

@@ -1,0 +1,18 @@
+// Is used by the keyboard-loader submodules.
+{
+  "extends": "../tsconfig.kmw-main-base.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "build/obj/",
+    "tsBuildInfoFile": "build/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src/"
+  },
+  "references": [
+    { "path": "../types" },
+    { "path": "../../models/types" },
+    { "path": "../keyman-version/" },
+    { "path": "../utils/" }
+  ],
+  "include": [ "./src/**/*.ts"],
+  "exclude": ["./src/keyboards/loaders/**/*.ts"]
+}

@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="mt" conformsTo="techpreview">
-  <names>
-    <name value="disp-maximal" />
-  </names>
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="disp-maximal"/>
 
   <displays>
-    <display to="f" display="(f)"/> <!-- Note: in opposite lexical order, as the compiler will sort -->
-    <display to="e" display="(e)"/>
+    <display keyId="g" display="(g)"/>
+    <display output="f" display="(f)"/> <!-- Note: in opposite lexical order, as the compiler will sort -->
+    <display output="${eee}" display="(${eee})"/>
     <displayOptions baseCharacter="x" />
   </displays>
-</keyboard>
+
+  <variables>
+    <string id="eee" value="e" />
+  </variables>
+</keyboard3>

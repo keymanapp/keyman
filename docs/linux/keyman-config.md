@@ -9,7 +9,7 @@ then you will need to:
 
 ```bash
 sudo apt install python3-lxml python3-magic python3-numpy python3-qrcode python3-pil \
-    python3-requests python3-requests-cache python3 python3-gi gir1.2-webkit2-4.0 dconf-cli \
+    python3-requests python3-requests-cache python3 python3-gi gir1.2-webkit2-4.1 dconf-cli \
     python3-setuptools python3-pip python3-dbus ibus libglib2.0-bin liblocale-gettext-perl
 ```
 
@@ -35,14 +35,10 @@ or install it with pip:
 pip3 install sentry-sdk
 ```
 
-Run the script `./createkeymandirs.sh` to create the directories for these
-programs to install the packages to.
-
-Also copy and compile the GSettings schema:
+Copy and compile the GSettings schema:
 
 ```bash
-cd keyman_config
-sudo cp com.keyman.gschema.xml /usr/share/glib-2.0/schemas
+sudo cp linux/keyman-config/resources/com.keyman.gschema.xml /usr/share/glib-2.0/schemas
 sudo glib-compile-schemas /usr/share/glib-2.0/schemas
 ```
 
@@ -50,15 +46,16 @@ sudo glib-compile-schemas /usr/share/glib-2.0/schemas
 
 Running `km-config` requires a language tag mapping file
 `keyman_config/standards/lang_tags_map.py`. This file gets generated during a package
-build, and also when running `make`.
+build, and also when running `build.sh build`.
 
 ## Installing manually from the repo
 
-`make && sudo make install` will install locally to `/usr/local`.
+`linux/keyman-config/build.sh build && sudo linux/keyman-config/build.sh install`
+will install locally to `/usr/local`.
 
 `pip3 help install` will give you more install options.
 
-To uninstall you can run `sudo make uninstall`.
+To uninstall you can run `sudo linux/keyman-config/build.sh uninstall`.
 
 ## Things to run from the command line
 

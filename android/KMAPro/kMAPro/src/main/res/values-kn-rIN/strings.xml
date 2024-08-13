@@ -26,6 +26,7 @@
   <!-- Context: Textfield prompt (&#8230; is the ellipsis character "...") -->
   <string name="textview_hint" comment="Prompt to start typing">ಇಲ್ಲಿ ಟೈಪ್ ಮಾಡಲು ಪ್ರಾರಂಭಿಸಿ&#8230;</string>
   <!-- Context: Splash screen (version/copyright info currently disabled -->
+  <string name="splash_blank" translatable="false" comment="Blank text while version info on splash page is disabled"></string>
   <!-- Context: Splash screen (version/copyright info currently disabled -->
   <!-- Context: Text Size dialog -->
   <string name="text_size" comment="Current text size (number)">ಅಕ್ಷರದ ಗಾತ್ರ: %1$d</string>
@@ -33,6 +34,8 @@
   <string name="ic_text_size_up" comment="Make text bigger">ಅಕ್ಷರದ ಗಾತ್ರ ಹೆಚ್ಚಿಸಿ</string>
   <!-- Context: Text Size dialog -->
   <string name="ic_text_size_down" comment="Make text smaller">ಅಕ್ಷರದ ಗಾತ್ರ ತಗ್ಗಿಸಿ</string>
+  <!-- Context: Text Size dialog -->
+  <string name="ic_text_size_slider" comment="Adjust text size">ಅಕ್ಷರ ಗಾತ್ರದ ಸ್ಲೈಡರ್</string>
   <!-- Context: Clear Text dialog -->
   <string name="all_text_will_be_cleared" comment="Erase all the text">\nಎಲ್ಲಾ ಪಠ್ಯವನ್ನು ತೆರವುಗೊಳಿಸಲಾಗುತ್ತದೆ\n</string>
   <!-- Context: Get Started menu -->

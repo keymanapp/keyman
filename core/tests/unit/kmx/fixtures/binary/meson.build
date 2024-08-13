@@ -1,5 +1,5 @@
 # Copyright:    © 2018 SIL International.
-# Description:  Cross platform build script to compile libkmnkbp API unit tests.
+# Description:  Cross platform build script to compile libkeymancore API unit tests.
 # Create Date:  19 Oct 2018
 # Authors:      Marc Durdin, Tim Eves (TSE)
 # History:      19  Oct 2018 - TSE - Added test for context API functions.
@@ -17,9 +17,9 @@ binary_tests = [
 
 foreach kbd : binary_tests
   configure_file(
-    command: copy_cmd + ['@INPUT@', '@OUTPUT@'],
     input: kbd + '.kmn',
-    output: kbd + '.kmn'
+    output: kbd + '.kmn',
+    copy: true
   )
 
   configure_file(

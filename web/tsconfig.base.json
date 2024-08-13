@@ -1,0 +1,20 @@
+{
+  "extends": "../tsconfig.base.json",
+
+  // TODO: eliminate settings duplicated in ../tsconfig.base.json
+  "compilerOptions": {
+    // Primary settings - the version of ES6 we can target in TS, our downcompile target,
+    // and our module-related settings.
+    "allowSyntheticDefaultImports": true,
+
+    "lib": ["es6"],
+    "target": "es6",
+
+    // Other settings - declaration files, sourcemapping, and other miscellaneous bits.
+    "declaration": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "inlineSources": true,
+    "sourceMap": true,
+  }
+}

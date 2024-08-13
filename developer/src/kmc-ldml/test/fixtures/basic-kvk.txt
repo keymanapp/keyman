@@ -18,16 +18,16 @@ block(ansi_font)
   41 00 72 00 69 00 61 00 6c 00 00 00           # 'Arial\0'
 
 block(ansi_font_extra)
-  0a 00 00 00      # size
-  00 00 00 00      # color
+  f4 ff ff ff      # size -12pt per Winapi LOGFONT
+  08 00 00 ff      # color (TColor.clWindowText)
 
 block(unicode_font)
   06 00            # string len in UTF-16 code units incl zterm
   41 00 72 00 69 00 61 00 6c 00 00 00           # 'Arial\0'
 
 block(unicode_font_extra)
-  0a 00 00 00      # size
-  00 00 00 00      # color
+  f4 ff ff ff      # size -12pt per Winapi LOGFONT
+  08 00 00 ff      # color (TColor.clWindowText)
 
 block(keys_header)
   02 00 00 00      # number of keys

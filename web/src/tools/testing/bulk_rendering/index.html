@@ -26,17 +26,17 @@
 
     <!-- Insert unminified KeymanWeb source scripts -->
     <!--<script src="https://s.keyman.com/kmw/engine/14.0.227/keymanweb.js" type="application/javascript"></script>-->
-    <script src="../../../../build/app/web/debug/keymanweb.js" type="application/javascript"></script>
-    <script src="../../../../build/tools/testing/bulk_rendering/bulk_render.js" type="application/javascript"></script>
+    <script src="../../../../build/publish/debug/keymanweb.js" type="application/javascript"></script>
+    <script src="../../../../build/tools/testing/bulk_rendering/lib/bulk_render.js" type="application/javascript"></script>
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
       var kmw=window.keyman;
       kmw.init({
         attachType:'auto'
-        }).then(function() {
-          kmw.addKeyboards();
-        });
+      }).then(function() {
+        kmw.addKeyboards();
+      });
 
 
       function runRenderer() {

@@ -8,6 +8,7 @@
 
 import Foundation
 import Sentry
+import os.log
 
 private let userInfoKey = "value"
 
@@ -42,7 +43,9 @@ public extension NotificationCenter {
       if let value = notification.userInfo?[userInfoKey] as? T {
         block(value)
       } else {
-        SentryManager.captureAndLog("Unexpected userInfo in notification: \(String(describing: notification))")
+        let message = "Unexpected userInfo in notification: \(String(describing: notification))"
+        os_log("%{public}s", log:KeymanEngineLogger.settings, type: .info, message)
+        SentryManager.capture(message)
       }
     }
     return NotificationObserver(observer: observer, center: self)

@@ -139,11 +139,15 @@ private:
 //
 
 typedef HRESULT(WINAPI *PKEYMANPROCESSOUTPUTFUNC)(int n, WCHAR *buf, int nbuf);   // I3567
-typedef HRESULT(WINAPI *PKEYMANGETCONTEXTFUNC)(int n, PWSTR buf);   // I3567
+// Adding a new interface call IsTextSelected could make sense however this would
+// also require update TIPProcessKey to have another call back function as an argument
+typedef HRESULT(WINAPI *PKEYMANGETCONTEXTFUNC)(int n, PWSTR buf, BOOL* isTextSelected);   // I3567
 
 class Keyman32Interface {
 public:
-  static void WriteDebugEvent(char *file, int line, PWCHAR msg);
+  static void WriteDebugEvent(PWCHAR file, int line, PWCHAR function, PWCHAR msg);
+  static void WriteDebugEntry(PWCHAR file, int line, PWCHAR function);
+  static void WriteDebugExit(PWCHAR file, int line, PWCHAR function);
 
   static BOOL TIPActivateEx(BOOL fActivate);
   static BOOL TIPActivateKeyboard(GUID *profile);

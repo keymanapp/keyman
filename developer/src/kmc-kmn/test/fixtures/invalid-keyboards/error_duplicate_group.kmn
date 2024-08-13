@@ -1,0 +1,30 @@
+c Description: Verifies that kmcmplib picks up on duplicated groups with Unicode names,
+c and that the Unicode names are correctly reported in error messages in UTF-8
+
+store(&NAME) 'error_duplicate_group'
+store(&VERSION) '9.0'
+
+begin unicode > use(ខ្មែរ)
+
+group(ខ្មែរ) using keys
+
+store(c_key)           [K_K] [K_X] [SHIFT K_K] [SHIFT K_X] [K_G] \
+                       [K_C] [K_Q] [SHIFT K_C] [SHIFT K_Q] [SHIFT K_J] \
+                       [K_D] [K_Z] [SHIFT K_D] [SHIFT K_Z] [SHIFT K_N] \
+                       [K_T] [K_F] [SHIFT K_T] [SHIFT K_F] [K_N] \
+                       [K_B] [K_P] [SHIFT K_B] [SHIFT K_P] [K_M] \
+                       [K_Y] [K_R] [K_L] [K_V] [K_S] [K_H] [SHIFT K_L] [SHIFT K_G] \
+                       [RALT K_K] [RALT K_B]
+store(c_out)           U+1780 U+1781 U+1782 U+1783 U+1784 \
+    	   	   	       U+1785 U+1786 U+1787 U+1788 U+1789 \
+    	   	   	       U+178A U+178B U+178C U+178D U+178E \
+    	   	   	       U+178F U+1790 U+1791 U+1792 U+1793 \
+    	   	   	       U+1794 U+1795 U+1796 U+1797 U+1798 \
+    	   	   	       U+1799 U+179A U+179B U+179C U+179F U+17A0 U+17A1 U+17A2 \
+    	   	   	       U+179D U+179E c deprecated, but they are used in minority languages
+
++ any(c_key) > index(c_out, 1)
+
+group(ខ្មែរ) using keys
+
++ 'a' > 'oops two groups!'

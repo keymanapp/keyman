@@ -1,5 +1,4 @@
-import { readFileSync } from "fs";
-import { ModelCompilerError, ModelCompilerMessageContext, ModelCompilerMessages } from "./model-compiler-errors.js";
+import { ModelCompilerError, ModelCompilerMessageContext, ModelCompilerMessages } from "./model-compiler-messages.js";
 import { callbacks } from "./compiler-callbacks.js";
 
 // Supports LF or CRLF line terminators.
@@ -113,8 +112,10 @@ function _parseWordList(wordlist: WordList, source:  WordListSource): void {
 
     wordform = wordform.normalize('NFC');
     if (original !== wordform) {
-      // Mixed normalization forms are yucky! Warn about it.
-      callbacks.reportMessage(ModelCompilerMessages.Warn_MixedNormalizationForms({wordform: wordform}));
+      // Mixed normalization forms are yucky! Hint about it, because it may
+      // result in unexpected counts where multiple normalization forms for one
+      // word
+      callbacks.reportMessage(ModelCompilerMessages.Hint_MixedNormalizationForms({wordform: wordform}));
     }
 
     wordform = wordform.trim()
@@ -130,9 +131,9 @@ function _parseWordList(wordlist: WordList, source:  WordListSource): void {
     }
 
     if (wordsSeenInThisFile.has(wordform)) {
-      // The same word seen across multiple files is fine,
-      // but a word seen multiple times in one file is a problem!
-      callbacks.reportMessage(ModelCompilerMessages.Warn_DuplicateWordInSameFile({wordform: wordform}));
+      // The same word seen across multiple files is fine, but a word seen
+      // multiple times in one file may be a problem
+      callbacks.reportMessage(ModelCompilerMessages.Hint_DuplicateWordInSameFile({wordform: wordform}));
     }
     wordsSeenInThisFile.add(wordform);
 
@@ -167,7 +168,8 @@ class WordListFromFilename {
   }
 
   *lines() {
-    let contents = readFileSync(this.name, detectEncoding(this.name));
+    const data = callbacks.loadFile(this.name);
+    const contents = new TextDecoder(detectEncoding(data)).decode(data);
     yield *enumerateLines(contents.split(NEWLINE_SEPARATOR));
   }
 }
@@ -372,6 +374,11 @@ namespace Trie {
    */
   function addItemToInternalNode(node: InternalNode, item: Entry, index: number) {
     let char = item.key[index];
+    // If an internal node is the proper site for item, it belongs under the
+    // corresponding (sentinel, internal-use) child node signifying this.
+    if(char == undefined) {
+      char = INTERNAL_VALUE;
+    }
     if (!node.children[char]) {
       node.children[char] = createRootNode();
       node.values.push(char);
@@ -491,18 +498,21 @@ namespace Trie {
  *
  * @param filename filename of the file to detect encoding
  */
-function detectEncoding(filename: string): 'utf8' | 'utf16le' {
-  let buffer = readFileSync(filename);
+function detectEncoding(buffer: Uint8Array): 'utf-8' | 'utf-16le' {
+  if(buffer.length < 2) {
+    return 'utf-8';
+  }
+
   // Note: BOM is U+FEFF
   // In little endian, this is 0xFF 0xFE
   if (buffer[0] == 0xFF && buffer[1] == 0xFE) {
-    return 'utf16le';
+    return 'utf-16le';
   } else if (buffer[0] == 0xFE && buffer[1] == 0xFF) {
     // Big Endian, is NOT supported because Node does not support it (???)
     // See: https://stackoverflow.com/a/14551669/6626414
     throw new ModelCompilerError(ModelCompilerMessages.Error_UTF16BEUnsupported());
   } else {
     // Assume its in UTF-8, with or without a BOM.
-    return 'utf8';
+    return 'utf-8';
   }
 }

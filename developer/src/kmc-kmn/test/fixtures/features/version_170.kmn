@@ -1,0 +1,8 @@
+c Description: Verifies that kmcmplib can compile a v17.0 keyboard
+
+store(&NAME) 'version_170'
+store(&VERSION) '17.0'
+
+begin unicode > use(main)
+
+group(main) using keys

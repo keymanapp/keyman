@@ -1,4 +1,4 @@
-import * as xml2js from 'xml2js';
+import * as xml2js from '../deps/xml2js/xml2js.js';
 import KVKSourceFile, { KVKSEncoding, KVKSFlags, KVKSKey, KVKSLayer } from './kvks-file.js';
 import { VisualKeyboard, VisualKeyboardHeaderFlags, VisualKeyboardKeyFlags, VisualKeyboardLegalShiftStates, VisualKeyboardShiftState } from './visual-keyboard.js';
 import { USVirtualKeyCodes } from '../consts/virtual-key-constants.js';
@@ -92,14 +92,22 @@ export default class KVKSFileWriter {
         $: {vkey: vkeyName},
         _: key.text,
       }
+      if(key.bitmap) {
+        k.bitmap = this.arrayToBase64(key.bitmap);
+      }
 
       l.key.push(k);
     }
 
-    // console.dir(kvks, {depth:8});
     let result = builder.buildObject(kvks);
     return result; //Uint8Array.from(result);
   }
+
+  private arrayToBase64(source: Uint8Array): string {
+    const ascii = String.fromCharCode(...source);
+    return btoa(ascii);
+  }
+
 
   public kvkShiftToKvksShift(shift: VisualKeyboardShiftState): string {
     // TODO-LDML(lowpri): make a map of this?

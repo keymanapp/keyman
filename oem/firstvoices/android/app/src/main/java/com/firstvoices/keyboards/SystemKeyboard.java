@@ -20,6 +20,7 @@ import android.view.inputmethod.ExtractedTextRequest;
 import android.view.inputmethod.InputConnection;
 import android.widget.FrameLayout;
 
+import com.firstvoices.android.BannerController;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.KMManager.KeyboardType;
 import com.keyman.engine.KMHardwareKeyboardInterpreter;
@@ -33,7 +34,6 @@ import io.sentry.android.core.SentryAndroid;
 import io.sentry.Sentry;
 
 public class SystemKeyboard extends InputMethodService implements OnKeyboardEventListener {
-
     private View inputView = null;
     private static ExtractedText exText = null;
     private KMHardwareKeyboardInterpreter interpreter = null;
@@ -49,6 +49,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
         if (DependencyUtil.libraryExists(LibraryType.SENTRY) && !Sentry.isEnabled()) {
             Log.d(TAG, "Initializing Sentry");
             SentryAndroid.init(getApplicationContext(), options -> {
+                options.setEnableAutoSessionTracking(false);
                 options.setRelease(com.firstvoices.keyboards.BuildConfig.VERSION_GIT_TAG);
                 options.setEnvironment(com.firstvoices.keyboards.BuildConfig.VERSION_ENVIRONMENT);
             });
@@ -61,9 +62,13 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
         KMManager.setShouldCheckKeyboardUpdates(false);
         KMManager.setKeyboardPickerFont(Typeface.createFromAsset(getAssets(), "fonts/NotoSansCanadianAboriginal.ttf"));
         KMManager.initialize(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
+        DefaultLanguageResource.install(this);
 
         interpreter = new KMHardwareKeyboardInterpreter(getApplicationContext(), KeyboardType.KEYBOARD_TYPE_SYSTEM);
         KMManager.setInputMethodService(this); // for HW interface
+
+        // Set the system keyboard HTML banner
+        BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
     }
 
     @Override
@@ -79,7 +84,10 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
      * is called after creation and any configuration change. */
     @Override
     public void onInitializeInterface() {
-        super.onInitializeInterface();
+      super.onInitializeInterface();
+
+      // KeymanWeb reloaded, so we have to pass the banner again
+      BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
     }
 
     /** Called by the framework when your view for creating input needs to
@@ -194,13 +202,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
         super.onComputeInsets(outInsets);
 
         // We should extend the touchable region so that Keyman sub keys menu can receive touch events outside the keyboard frame
-        WindowManager wm = (WindowManager)getSystemService(Context.WINDOW_SERVICE);
-        if(wm == null) return;
-        Point size = new Point(0, 0);
-        Display display = wm.getDefaultDisplay();
-        if(display == null) return;
-
-        display.getSize(size);
+        Point size = KMManager.getWindowSize(getApplicationContext());
 
         int inputViewHeight = 0;
         if (inputView != null)

@@ -1,6 +1,7 @@
 // Page-global variable definitions.
 {
 var inputCounter = 0;
+var kmw = keyman;
 }
 
 function generateDiagnosticDiv(elem) {
@@ -25,8 +26,10 @@ function generateDiagnosticDiv(elem) {
     kmw.attachToControl(document.getElementById(elemId));
     var attached = kmw.isAttached(elem);
     document.getElementById('attachment_' + elemId).textContent = " Currently " + (attached ? "attached." : "detached.");
-    if(elem.tagName.toLowerCase() != "iframe") {
-      document.getElementById("independence_" + elemId).textContent = attached ? " Using globally-selected keyboard." : '';
+    const indepLabel = document.getElementById("independence_" + elemId);
+    // does not exist for iframes
+    if(indepLabel) {
+      indepLabel.textContent = attached ? " Using globally-selected keyboard." : '';
     }
   };
   attachBtn.value   = 'Attach';
@@ -40,8 +43,10 @@ function generateDiagnosticDiv(elem) {
     kmw.detachFromControl(document.getElementById(elemId));
     var attached = kmw.isAttached(elem);
     document.getElementById('attachment_' + elemId).textContent = " Currently " + (attached ? "attached." : "detached.");
-    if(!attached) {
-      document.getElementById('independence_' + elemId).textContent = "";
+    const indepLabel = document.getElementById("independence_" + elemId);
+    // does not exist for iframes
+    if(indepLabel) {
+      indepLabel.textContent = '';
     }
   };
   detachBtn.value   = 'Detach';
@@ -184,13 +189,13 @@ function addDesignIFrame() {
   var masterDiv = document.getElementById('DynamicDesignFrames');
   var frame = document.createElement("iframe");
   var i = inputCounter++;
-  
+
   frame.height = "100";
   frame.id = 'designIFrame' + i;
   frame.src = "editableFrame.html";
-  
+
   // The iframe's document sets design-mode on with its body.onload handler.
- 
+
   var newDiv = generateDiagnosticDiv(frame);
   masterDiv.appendChild(newDiv);
   return frame.id;

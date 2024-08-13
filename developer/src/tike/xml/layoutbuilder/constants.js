@@ -551,8 +551,8 @@ $(function() {
   }
   this.lookupKeyNames.sort();
 
-  // Defines the PUA code mapping for the various 'special' modifier/control keys on keyboards.
-  // This is lifted directly from visualKeyboard.ts and must be kept in sync. See also CompileKeymanWeb.pas: CSpecialText10
+  // Defines the PUA code mapping for the various 'special' modifier/control/non-printing keys on keyboards.
+  // This is lifted directly from specialCharacters.ts and must be kept in sync. See also CompileKeymanWeb.pas: CSpecialText10
   this.specialCharacters = {
     '*Shift*':    8,
     '*Enter*':    5,
@@ -586,7 +586,9 @@ $(function() {
     '*RAltShift*':      0x68,
     '*LCtrlShift*':     0x69,
     '*RCtrlShift*':     0x70,
-    // Following codes introduced in Keyman 14.0
+    // Added in Keyman 14.0
+    '*LTREnter*':       0x05, // Default alias of '*Enter*'.
+    '*LTRBkSp*':        0x04, // Default alias of '*BkSp*'.
     '*RTLEnter*':       0x71,
     '*RTLBkSp*':        0x72,
     '*ShiftLock*':      0x73,
@@ -594,8 +596,29 @@ $(function() {
     '*ZWNJ*':           0x75, // * If this one is specified, auto-detection will kick in.
     '*ZWNJiOS*':        0x75, //   The iOS version will be used by default, but the
     '*ZWNJAndroid*':    0x76, //   Android platform has its own default glyph.
-    '*LTREnter*':       5,    // * Forces LTR shaping for the Enter/BkSp keys regardless
-    '*LTRBkSp*':        4,    //   of layout's directionality.
+    // Added in Keyman 17.0.
+    // Reference: https://github.com/silnrsi/font-symchar/blob/v4.000/documentation/encoding.md
+    '*ZWNJGeneric*':    0x79, // Generic version of ZWNJ (no override)
+    '*Sp*':             0x80, // Space
+    '*NBSp*':           0x82, // No-break Space
+    '*NarNBSp*':        0x83, // Narrow No-break Space
+    '*EnQ*':            0x84, // En Quad
+    '*EmQ*':            0x85, // Em Quad
+    '*EnSp*':           0x86, // En Space
+    '*EmSp*':           0x87, // Em Space
+    // TODO: Skipping #-per-em-space
+    '*PunctSp*':        0x8c, // Punctuation Space
+    '*ThSp*':           0x8d, // Thin Space
+    '*HSp*':            0x8e, // Hair Space
+    '*ZWSp*':           0x81, // Zero Width Space
+    '*ZWJ*':            0x77, // Zero Width Joiner
+    '*WJ*':             0x78, // Word Joiner
+    '*CGJ*':            0x7a, // Combining Grapheme Joiner
+    '*LTRM*':           0x90, // Left-to-right Mark
+    '*RTLM*':           0x91, // Right-to-left Mark
+    '*SH*':             0xa1, // Soft Hyphen
+    '*HTab*':           0xa2, // Horizontal Tabulation
+    // TODO: Skipping size references
   };
 
   this.specialKeyNames = Object.entries(this.specialCharacters).map(ch => ch[0]);

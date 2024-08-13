@@ -1,23 +1,18 @@
 {
   "name": "@keymanapp/keyman-version",
   "description": "Keyman global version data",
-  "main": "./build/index.js",
   "exports": {
     ".": {
-      "import": "./build/keyman-version.mjs",
-      "require": "./build/index.js"
+      "es6-bundling": "./version.inc.ts",
+      "default": "./build/version.inc.js"
     }
   },
   "files": [
     "/build/"
   ],
-  "scripts": {
-    "build": "echo 'Building @keymanapp/keyman-version' && tsc -b",
-    "clean": "tsc -b --clean"
-  },
   "license": "MIT",
+  "type": "module",
   "devDependencies": {
-    "@types/node": "^18.7.13",
-    "typescript": "^4.9.5"
+    "typescript": "^5.4.5"
   }
 }

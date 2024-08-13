@@ -59,7 +59,7 @@ PKMX_WCHAR decxstr(PKMX_WCHAR p, PKMX_WCHAR pStart)
   if(*p == UC_SENTINEL_EXTENDEDEND) {
     int n = 0;
     while (p > pStart && *p != UC_SENTINEL && n < 10) {
-      p--; 
+      p--;
       n++;
     }
 
@@ -110,14 +110,6 @@ int xstrpos(PKMX_WCHAR p1, PKMX_WCHAR p)
   int i;
   for(i = 0; p < p1; p = incxstr(p), i++);
   return i;
-}
-
-PKMX_WCHAR xstrchr(PKMX_WCHAR buf, PKMX_WCHAR chr)
-{
-  for(PKMX_WCHAR q = incxstr(buf); *buf; buf = q, q = incxstr(buf))
-    if(!u16ncmp(buf, chr, (intptr_t)(q-buf)))
-      return buf;
-  return NULL;
 }
 
 const int CODE__SIZE[] = {

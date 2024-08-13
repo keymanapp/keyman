@@ -1136,7 +1136,7 @@ th
   position: fixed;
   display: none;
   width: 256px;
-  height: 324px;
+  height: auto;
   margin: -180px 0 0 -128px;
   left: 50%;
   top: 50%;
@@ -1149,6 +1149,8 @@ th
 
 .qrcode .qrcode_caption {
   display: block;
+  max-height: 130px;
+  overflow-y: auto;
   white-space: normal;
   font-size: 12pt;
   padding: 8px;

@@ -8,20 +8,18 @@ import sys
 import numpy as np
 from PIL import Image, ImageFile
 
-Image.LOAD_TRUNCATED_IMAGES = True
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
-def changeblacktowhite(im):
-    data = np.array(im)   # "data" is a height x width x 4 numpy array
+def _changeblacktowhite(image):
+    data = np.array(image)   # "data" is a height x width x 4 numpy array
     red, green, blue, alpha = data.T  # Temporarily unpack the bands for readability
 
     # Replace black with white... (leaves alpha values alone...)
     white_areas = (red == 0) & (blue == 0) & (green == 0)
     data[..., :-1][white_areas.T] = (255, 255, 255)  # Transpose back needed
 
-    im2 = Image.fromarray(data)
-    return im2
+    return Image.fromarray(data)
 
 
 def checkandsaveico(icofile):
@@ -35,30 +33,32 @@ def checkandsaveico(icofile):
         icofile (str): path to ico file
     """
     name, ext = os.path.splitext(icofile)
-    bmpfile = name + ".bmp"
+    bmpfile = f"{name}.bmp"
     if ext == '.ico':
-        im = Image.open(icofile)
-        im = im.convert('RGBA')
-        im2 = im
-        num, colour = max(im.getcolors(im.size[0] * im.size[1]))
-        logging.debug("checkandsaveico maxcolour: num {0}: colour {1}".format(num, colour))
-        if num > 160 and colour == (0, 0, 0, 0):
-            logging.info("checkandsaveico:" + icofile + " mostly black so changing black to white")
-            im2 = changeblacktowhite(im)
-        im2.save(bmpfile)
-
+        _convert_ico_to_bmp(icofile, bmpfile)
     try:
-        im3 = Image.open(bmpfile)
-        im4 = im3.resize([64, 64], Image.ANTIALIAS)
-        # Using .bmp.png file extension so it won't conflict if the package already contains .png
-        im4.save(bmpfile + '.png', 'png')
+        with Image.open(bmpfile) as im3:
+            with im3.resize((64, 64), Image.LANCZOS) as im4:
+                # Using .bmp.png file extension so it won't conflict if the package already contains .png
+                im4.save(f'{bmpfile}.png', 'png')
     except (IOError, OSError):
         logging.error("Cannot convert %s to png", icofile)
-        pass
     finally:
         # Clean up intermediary .bmp file if it was generated
         if ext == '.ico':
             os.remove(bmpfile)
+
+
+def _convert_ico_to_bmp(icofile, bmpfile):
+    with Image.open(icofile) as image:
+        with image.convert('RGBA') as image2:
+            num, colour = max(image.getcolors(image2.size[0] * image2.size[1]))
+            logging.debug(f"checkandsaveico maxcolour: num {num}: colour {colour}")
+            if num > 160 and colour == (0, 0, 0, 0):
+                logging.info(f"checkandsaveico:{icofile} mostly black so changing black to white")
+                image2.close()
+                image2 = _changeblacktowhite(image)
+            image2.save(bmpfile)
 
 
 def extractico(kmxfile):
@@ -95,9 +95,9 @@ def extractico(kmxfile):
 
     # Read first two bytes to determine if icon is .bmp or .ico
     if bitmap.startswith(b'BM'):
-        imagefilename = imagefilename + ".bmp"
+        imagefilename = f"{imagefilename}.bmp"
     else:
-        imagefilename = imagefilename + ".ico"
+        imagefilename = f"{imagefilename}.ico"
 
     try:
         with open(imagefilename, mode='wb') as imagefile:
@@ -109,7 +109,7 @@ def extractico(kmxfile):
     return True
 
 
-def main(argv):
+def main():
     if len(sys.argv) != 2:
         logging.error("convertico.py <ico file | kmx file>")
         sys.exit(2)
@@ -122,4 +122,4 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()

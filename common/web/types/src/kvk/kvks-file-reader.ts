@@ -1,17 +1,11 @@
-import * as xml2js from 'xml2js';
+import * as xml2js from '../deps/xml2js/xml2js.js';
 import KVKSourceFile from './kvks-file.js';
-import { default as AjvModule } from 'ajv';
-const Ajv = AjvModule.default; // The actual expected Ajv type.
 import { boxXmlArray } from '../util/util.js';
-import { VisualKeyboard, VisualKeyboardHeaderFlags, VisualKeyboardKey, VisualKeyboardKeyFlags, VisualKeyboardLegalShiftStates, VisualKeyboardShiftState } from './visual-keyboard.js';
+import { DEFAULT_KVK_FONT, VisualKeyboard, VisualKeyboardHeaderFlags, VisualKeyboardKey, VisualKeyboardKeyFlags, VisualKeyboardLegalShiftStates, VisualKeyboardShiftState } from './visual-keyboard.js';
 import { USVirtualKeyCodes } from '../consts/virtual-key-constants.js';
-import { BUILDER_KVK_HEADER_VERSION } from './kvk-file.js';
+import { BUILDER_KVK_HEADER_VERSION, KVK_HEADER_IDENTIFIER_BYTES } from './kvk-file.js';
+import SchemaValidators from '../schema-validators.js';
 
-export enum KVKSParseErrorType { invalidVkey };
-export class KVKSParseError extends Error {
-  public type: KVKSParseErrorType;
-  public vkey: string;
-};
 
 export default class KVKSFileReader {
   public read(file: Uint8Array): KVKSourceFile {
@@ -33,10 +27,27 @@ export default class KVKSFileReader {
       // rather than using the version tagged on npmjs.com.
     });
 
-    parser.parseString(file, (e: unknown, r: unknown) => { source = r as KVKSourceFile });
-    source = this.boxArrays(source);
-    this.cleanupUnderscore('visualkeyboard', source.visualkeyboard);
+    parser.parseString(file, (e: unknown, r: unknown) => {
+      if(e) {
+        if(file.byteLength > 4 && file.subarray(0,3).every((v,i) => v == KVK_HEADER_IDENTIFIER_BYTES[i])) {
+          throw new Error('File appears to be a binary .kvk file', {cause: e});
+        }
+        throw e;
+      };
+      source = r as KVKSourceFile;
+    });
+    if(source) {
+      source = this.boxArrays(source);
+      this.cleanupFlags(source);
+      this.cleanupUnderscore('visualkeyboard', source.visualkeyboard);
+    }
     return source;
+  }
+
+  private cleanupFlags(source: any) {
+    if(source.visualkeyboard?.header?.flags === '') {
+      source.visualkeyboard.header.flags = {};
+    }
   }
 
   /**
@@ -49,6 +60,12 @@ export default class KVKSFileReader {
     if(root != 'key') {
       if(source?.['_']?.trim() === '') {
         delete source['_'];
+      }
+    } else {
+      // If key text is pure whitespace, replace with empty string,
+      // which matches kmcomp reader
+      if(source?.['_']?.match(/^( +)$/)) {
+        source['_'] = '';
       }
     }
 
@@ -65,23 +82,22 @@ export default class KVKSFileReader {
     }
   }
 
-  public validate(source: KVKSourceFile, schemaBuffer: Buffer): void {
-    const schema = JSON.parse(schemaBuffer.toString('utf8'));
-    const ajv = new Ajv();
-    if(!ajv.validate(schema, source)) {
-      throw new Error(ajv.errorsText());
+  public validate(source: KVKSourceFile): void {
+    if(!SchemaValidators.kvks(source)) {
+      throw new Error(JSON.stringify((<any>SchemaValidators.kvks).errors));
     }
   }
 
-  public transform(source: KVKSourceFile, errors?: KVKSParseError[]): VisualKeyboard {
+  public transform(source: KVKSourceFile, invalidVkeys?: string[]): VisualKeyboard {
     // NOTE: at this point, the xml should have been validated
     // and matched the schema result so we can assume properties exist
+
     let result: VisualKeyboard = {
       header: {
         version: BUILDER_KVK_HEADER_VERSION,
         flags: 0,
-        ansiFont: { name: "Arial", size: -12, color: 0xFF000008 }, // TODO-LDML: consider defaults
-        unicodeFont: { name: "Arial", size: -12, color: 0xFF000008 }, // TODO-LDML: consider defaults
+        ansiFont: {...DEFAULT_KVK_FONT},
+        unicodeFont: {...DEFAULT_KVK_FONT},
         associatedKeyboard: source.visualkeyboard?.header?.kbdname,
         underlyingLayout: source.visualkeyboard?.header?.layout,
       },
@@ -104,26 +120,28 @@ export default class KVKSFileReader {
     for(let encoding of source.visualkeyboard.encoding) {
       let isUnicode = (encoding.$?.name == 'unicode'),
         font = isUnicode ? result.header.unicodeFont : result.header.ansiFont;
-      font.name = encoding.$?.fontname;
-      font.size = parseInt(encoding.$?.fontsize,10);
+      font.name = encoding.$?.fontname ?? DEFAULT_KVK_FONT.name;
+      font.size = parseInt(encoding.$?.fontsize ?? DEFAULT_KVK_FONT.size.toString(), 10);
       for(let layer of encoding.layer) {
         let shift = this.kvksShiftToKvkShift(layer.$?.shift);
         for(let sourceKey of layer.key) {
           let vkey = (USVirtualKeyCodes as any)[sourceKey.$?.vkey];
           if(!vkey) {
-            if(errors) {
-              let e = new KVKSParseError();
-              e.type = KVKSParseErrorType.invalidVkey;
-              e.vkey = sourceKey.$?.vkey;
-              errors.push(e);
+            if(typeof invalidVkeys !== 'undefined') {
+              invalidVkeys.push(sourceKey.$?.vkey);
             }
             continue;
           }
           let key: VisualKeyboardKey = {
-            flags: isUnicode ? VisualKeyboardKeyFlags.kvkkUnicode : 0, // TODO-LDML: bitmap support
+            flags:
+              (isUnicode ? VisualKeyboardKeyFlags.kvkkUnicode : 0) |
+              (sourceKey.bitmap ? VisualKeyboardKeyFlags.kvkkBitmap : 0),
             shift: shift,
-            text: sourceKey._ ?? '',
+            text: sourceKey.bitmap ? '' : (sourceKey._ ?? ''),
             vkey: vkey
+          };
+          if(sourceKey.bitmap) {
+            key.bitmap = this.base64ToArray(sourceKey.bitmap);
           }
           result.keys.push(key);
         }
@@ -131,6 +149,15 @@ export default class KVKSFileReader {
     }
 
     return result;
+  }
+
+  private base64ToArray(source: string): Uint8Array {
+    const binary = atob(source);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes;
   }
 
   /**

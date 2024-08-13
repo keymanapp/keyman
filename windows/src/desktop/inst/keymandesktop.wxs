@@ -67,7 +67,6 @@
 
               <Component>
                 <File Name="kmshell.exe" KeyPath="yes">
-                  <Shortcut Id="desktopKeyman" Advertise="yes" Directory="DesktopFolder" Name="Keyman" WorkingDirectory='INSTALLDIR' Icon="appicon.ico" IconIndex="0" />
                   <Shortcut Id="startmenuKeyman" Advertise="yes" Directory="ProgramMenuDir" Name="Keyman" WorkingDirectory='INSTALLDIR' Icon="appicon.ico" IconIndex="0" />
                   <Shortcut Id="startmenuKeymanConfiguration" Advertise="yes" Directory="ProgramMenuDir" Arguments="-c" Name="Keyman Configuration" WorkingDirectory='INSTALLDIR' Icon="KMSHELL.ico" IconIndex="0" />
                 </File>
@@ -298,7 +297,7 @@
       <Custom Action='SaveARPInstallLocation' After='InstallValidate'><![CDATA[Not Installed Or REINSTALL]]></Custom>
     </InstallExecuteSequence>
 
-    <Media Id="1" CompressionLevel="high" EmbedCab="yes" Cabinet="Data1.cab" VolumeLabel="DISK1" />
+    <Media Id="1" EmbedCab="yes" Cabinet="Data1.cab" VolumeLabel="DISK1" />
 
     <Property Id="ALLUSERS">1</Property>
 

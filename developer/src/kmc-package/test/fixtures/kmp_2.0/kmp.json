@@ -1,0 +1,141 @@
+{
+  "system": {
+    "keymanDeveloperVersion": "16.0.60.0",
+    "fileVersion": "7.0"
+  },
+  "options": {
+    "readmeFile": "readme.htm",
+    "graphicFile": "splash.gif"
+  },
+  "info": {
+    "name": {
+      "description": "Khmer Angkor"
+    },
+    "copyright": {
+      "description": "\u00A9 2015-2022 SIL International"
+    },
+    "author": {
+      "description": "Makara Sok",
+      "url": "mailto:makara_sok@sil.org"
+    },
+    "version": {
+      "description": "1.3"
+    },
+    "website": {
+      "description": "https://keyman.com/keyboards/khmer_angkor",
+      "url": "https://keyman.com/keyboards/khmer_angkor"
+    },
+    "description": {
+      "description": "<h1>Khmer Angkor</h1>\n<p>Khmer Unicode keyboard layout based on the NiDA keyboard layout. Automatically corrects many common keying errors, including:</p>\n<ul>\n<li>Using wrong vowel combination</li>\n<li>Typing clusters out of order</li>\n<li>Typing wrong mark for consonant shifters</li>\n<li>And more!</li>\n</ul>"
+    }
+  },
+  "files": [
+    {
+      "name": "khmer_angkor.js",
+      "description": "File khmer_angkor.js"
+    },
+    {
+      "name": "khmer_angkor.kvk",
+      "description": "File khmer_angkor.kvk"
+    },
+    {
+      "name": "khmer_angkor.kmx",
+      "description": "Keyboard Khmer Angkor"
+    },
+    {
+      "name": "keyboard_layout.png",
+      "description": "File keyboard_layout.png"
+    },
+    {
+      "name": "welcome.htm",
+      "description": "File welcome.htm"
+    },
+    {
+      "name": "FONTLOG.txt",
+      "description": "File FONTLOG.txt"
+    },
+    {
+      "name": "Mondulkiri-R.ttf",
+      "description": "Font Khmer Mondulkiri"
+    },
+    {
+      "name": "OFL.txt",
+      "description": "File OFL.txt"
+    },
+    {
+      "name": "OFL-FAQ.txt",
+      "description": "File OFL-FAQ.txt"
+    },
+    {
+      "name": "KAK_Documentation_EN.pdf",
+      "description": "File KAK_Documentation_EN.pdf"
+    },
+    {
+      "name": "KAK_Documentation_KH.pdf",
+      "description": "File KAK_Documentation_KH.pdf"
+    },
+    {
+      "name": "readme.htm",
+      "description": "File readme.htm"
+    },
+    {
+      "name": "image002.png",
+      "description": "File image002.png"
+    },
+    {
+      "name": "khmer_busra_kbd.ttf",
+      "description": "Font KhmerBusraKbd"
+    },
+    {
+      "description": "Font DejaVuSans",
+      "name": "DejaVuSans.ttf"
+    },
+    {
+      "name": "splash.gif",
+      "description": "File splash.gif"
+    },
+    {
+      "name": "kmp.inf",
+      "description": "Package information"
+    },
+    {
+      "name": "kmp.json",
+      "description": "Package information (JSON)"
+    }
+  ],
+  "keyboards": [
+    {
+      "name": "Khmer Angkor",
+      "id": "khmer_angkor",
+      "version": "1.3",
+      "oskFont": "khmer_busra_kbd.ttf",
+      "displayFont": "Mondulkiri-R.ttf",
+      "webOskFonts": ["khmer_busra_kbd.ttf"],
+      "webDisplayFonts": ["DejaVuSans.ttf"],
+      "languages": [
+        {
+          "name": "Central Khmer (Khmer, Cambodia)",
+          "id": "km"
+        }
+      ],
+      "examples": [
+        {
+          "id": "km",
+          "keys": "x j m E r",
+          "text": "ខ្មែរ",
+          "note": "Name of language"
+        },
+        {
+          "id": "km",
+          "keys": "B j r H r a C a N a c k j r k m j B u C a",
+          "text": "ព្រះរាជាណាចក្រកម្ពុជា",
+          "note": "'Kingdom of Cambodia'"
+        }
+      ]
+    }
+  ],
+  "relatedPackages": [
+    { "id": "modern_khmer", "relationship": "deprecates" },
+    { "id": "khmer_nida", "relationship": "related" }
+  ]
+}

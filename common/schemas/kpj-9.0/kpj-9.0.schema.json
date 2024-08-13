@@ -1,0 +1,134 @@
+{
+  "title": "kpj-9.0.xsd",
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "KeymanDeveloperProject": {
+      "properties": {
+        "Options": {
+          "$ref": "#/definitions/Options"
+        },
+        "Files": {
+          "$ref": "#/definitions/Files"
+        },
+        "templatepath": { "type":"string", "$comment": "Keyman Developer 9, no longer used in modern .kpj files" },
+        "stringspath": { "type":"string", "$comment": "Keyman Developer 9, no longer used in modern .kpj files" },
+        "state": { "type": "string", "$comment": "Keyman Developer 9, no longer used in modern .kpj files" },
+        "Modules": { "oneOf": [{"type": "object"}, {"type": "string"}], "$comment": "Keyman Developer 9, no longer used in modern .kpj files" },
+        "MRU": { "type": "object", "$comment": "Keyman Developer 9, no longer used in modern .kpj files" }
+      },
+      "required": [
+      ],
+      "additionalProperties": false,
+      "type": "object"
+    }
+  },
+  "required": [
+    "KeymanDeveloperProject"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "Options": {
+      "type": "object",
+      "properties": {
+        "BuildPath": {
+          "type": "string"
+        },
+        "SourcePath": {
+          "type": "string"
+        },
+        "CompilerWarningsAsErrors": {
+          "type": "string",
+          "pattern": "^(True|False)$"
+        },
+        "WarnDeprecatedCode": {
+          "type": "string",
+          "pattern": "^(True|False)$"
+        },
+        "CheckFilenameConventions": {
+          "type": "string",
+          "pattern": "^(True|False)$"
+        },
+        "ProjectType": {
+          "type": "string",
+          "pattern": "^(keyboard|lexicalmodel)$"
+        },
+        "Version": {
+          "type": "string",
+          "pattern": "^(1\\.0|2\\.0)$"
+        }
+      },
+      "required": [
+      ],
+      "additionalProperties": false
+    },
+    "Files": {
+      "type": "object",
+      "properties": {
+        "File": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/File"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "File"
+      ]
+    },
+    "File": {
+      "type": "object",
+      "properties": {
+        "ID": {
+          "type": "string"
+        },
+        "Filename": {
+          "type": "string"
+        },
+        "Filepath": {
+          "type": "string"
+        },
+        "FileVersion": {
+          "type": "string"
+        },
+        "FileType": {
+          "type": "string"
+        },
+        "Details": {
+          "$ref": "#/definitions/FileDetails"
+        },
+        "ParentFileID": {
+          "type": "string"
+        },
+        "FullPath": { "type":"string", "$comment": "Keyman Developer 9, no longer used in modern .kpj files" },
+        "IDEState": { "type":"object", "$comment": "Keyman Developer 9, no longer used in modern .kpj files" }
+      },
+      "required": [
+        "Filename"
+      ],
+      "additionalProperties": false
+    },
+    "FileDetails": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string"
+        },
+        "Copyright": {
+          "type": "string"
+        },
+        "Message": {
+          "type": "string"
+        },
+        "Version": {
+          "type": "string"
+        },
+        "Debug": { "type":"string", "$comment": "Keyman Developer 9, no longer used in modern .kpj files" }
+      },
+      "required": [
+      ],
+      "additionalProperties": false
+    }
+  }
+}

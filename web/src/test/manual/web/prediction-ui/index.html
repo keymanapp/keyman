@@ -23,7 +23,7 @@
     </style>
 
     <!-- Insert uncompiled KeymanWeb source scripts -->
-    <script src="../../../../../build/app/web/debug/keymanweb.js" type="application/javascript"></script>
+    <script src="../../../../../build/publish/debug/keymanweb.js" type="application/javascript"></script>
 
     <!--
       For desktop browsers, a script for the user interface must be inserted here.
@@ -32,7 +32,7 @@
       The toolbar UI is best for any page designed to support keyboards for
       a large number of languages.
     -->
-    <script src="../../../../../build/app/ui/debug/kmwuitoggle.js"></script>
+    <script src="../../../../../build/publish/debug/kmwuitoggle.js"></script>
 
     <!-- Initialization: set paths to keyboards, resources and fonts as required -->
     <script>
@@ -46,28 +46,31 @@
         kmw.addKeyboards({id:'obolo_chwerty_6351',name:'obolo_chwerty_6351',languages:{id:'en',name:'English'},
           filename:('../obolo_chwerty_6351.js')});
 
-        var pageRef = (window.location.protocol == 'file:')
-          ? window.location.href.substr(0, window.location.href.lastIndexOf('/')+1)
-          : window.location.href;
+        // Ensure the URL we prefix to the page's path is the page's directory, not including
+        // the actual HTML page itself.
+        var urlIncludesIndex = window.location.href.lastIndexOf('.html') > 1;
+        var pageRef = (urlIncludesIndex
+          ? window.location.href.substr(0, window.location.href.lastIndexOf('/'))
+          : window.location.href) + '/';
 
         var modelStub = {'id': 'example.en.trie',
           languages: ['en'],
           path: (pageRef + "simple-en-trie.js")
         };
-        kmw.modelManager.register(modelStub);
+        kmw.addModel(modelStub);
       });
 
       function togglePredictions() {
-        let newVal = !keyman.modelManager.mayPredict;
-        keyman.osk.banner.setOptions({'mayPredict': newVal});
+        let newVal = !keyman.core.languageProcessor.mayPredict;
+        keyman.core.languageProcessor.mayPredict = newVal;
 
         let btnPredict = document.getElementById("btnPredict");
         btnPredict.value = (newVal ? "Disable" : "Enable") + " predictions";
       }
 
       function toggleCorrections() {
-        let newVal = !keyman.modelManager.mayCorrect;
-        keyman.osk.banner.setOptions({'mayCorrect': newVal});
+        let newVal = !keyman.core.languageProcessor.mayCorrect;
+        keyman.core.languageProcessor.mayCorrect = newVal;
 
         let btnCorrect = document.getElementById("btnCorrect");
         btnCorrect.value = (newVal ? "Disable" : "Enable") + " corrections";

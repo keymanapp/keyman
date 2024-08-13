@@ -1,5 +1,5 @@
 import { KMX, KMXPlus } from '@keymanapp/common-types';
-import { CompilerOptions } from "./compiler-options.js";
+import { LdmlCompilerOptions } from "./ldml-compiler-options.js";
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
 import KMXPlusData = KMXPlus.KMXPlusData;
@@ -12,7 +12,7 @@ export class KMXPlusMetadataCompiler {
    * through to the relevant KMX stores
    * @param kmxplus const KMXPlusData
    */
-  public static addKmxMetadata(kmxplus: KMXPlusData, keyboard: KEYBOARD, options: CompilerOptions): void {
+  public static addKmxMetadata(kmxplus: KMXPlusData, keyboard: KEYBOARD, options: LdmlCompilerOptions): void {
     // Order of stores is not significant by kmx spec, but kmxplus compiler will
     // always store according to dwSystemID binary order for non-zero
     // dwSystemID, then by dpName binary order, and finally by dpString binary
@@ -26,11 +26,11 @@ export class KMXPlusMetadataCompiler {
     // TSS_NAME: User friendly name of keyboard
     keyboard.stores.push({
       dpName: '&NAME',
-      dpString: kmxplus.name?.names?.[0]?.value ?? 'unknown',  // Empty name should not happen, so ok to use 'unknown' here
+      dpString: kmxplus.meta?.name?.value ?? 'unknown',  // Empty name should not happen, so ok to use 'unknown' here
       dwSystemID: KMXFile.TSS_NAME
     });
 
-    if(options.addCompilerVersion) {
+    if(options.shouldAddCompilerVersion) {
       // TSS_COMPILEDVERSION: version of the compiler
       keyboard.stores.push({
         dpName: '',

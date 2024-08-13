@@ -138,6 +138,9 @@
     <ClCompile Include="CoreEnvironment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="appcontext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="KEYMAN32.DEF">
@@ -149,12 +152,18 @@
     <None Include="..\..\..\..\common\resources\bitmaps\mask.bmp">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="keyman64.def">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="KEYMAN32.RC">
       <Filter>Source Files</Filter>
     </ResourceCompile>
     <ResourceCompile Include="keyman-debug-etw.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+    <ResourceCompile Include="keyman64.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>
   </ItemGroup>
@@ -244,6 +253,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\kmtip_guids.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="appcontext.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

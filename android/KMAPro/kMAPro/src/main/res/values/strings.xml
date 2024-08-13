@@ -57,6 +57,9 @@
   <!-- Context: Text Size dialog -->
   <string name="ic_text_size_down" comment="Make text smaller">Text size down</string>
 
+  <!-- Context: Text Size dialog -->
+  <string name="ic_text_size_slider" comment="Adjust text size">Text size slider</string>
+
 
   <!-- Context: Clear Text dialog -->
   <string name="all_text_will_be_cleared" comment="Erase all the text">\nAll text will be cleared\n</string>
@@ -88,6 +91,9 @@
   <!-- Context: Android Storage Permission -->
   <string name="storage_permission_denied" comment="Keyboard package installation may fail since Android storage permission not granted">
     Storage permission request was denied. May fail to install keyboard package</string>
+
+  <string name="storage_permission_denied2" comment="Keyboard package installation failed. Recommend install from local file">
+    Storage permission request failed. Try Keyman Settings - Install from local file</string>
 
   <!-- Context: Keyman Settings menu -->
   <string name="keyman_settings" comment="Settings menu title">Settings</string>

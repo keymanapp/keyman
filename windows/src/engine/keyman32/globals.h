@@ -54,10 +54,6 @@
 
 #include <evntprov.h>
 
-#define GLOBAL_ContextStackSize 80
-#define GLOBAL_MsgStackSize 80
-#define GLOBAL_MaxKeyboards 32
-
 #include "serialkeyeventclient.h"
 #include "SharedBuffers.h"
 
@@ -66,8 +62,6 @@
 class Globals
 {
 public:
-	//static INI *Ini();
-
 	static HHOOK *hhookGetMessage();
 	static HHOOK *hhookCallWndProc();
 
@@ -157,7 +151,7 @@ public:
 /* External interface functions */
 
 typedef HRESULT (WINAPI *PKEYMANPROCESSOUTPUTFUNC)(int n, WCHAR *buf, int nbuf);
-typedef HRESULT (WINAPI *PKEYMANGETCONTEXTFUNC)(int n, PWSTR buf);
+typedef HRESULT (WINAPI *PKEYMANGETCONTEXTFUNC)(int n, PWSTR buf, BOOL* isTextSelected);
 typedef BOOL (WINAPI *PTIPCALLBACK)();  // Tells the TIP to update its status (used to be done through 0x88)
 
 typedef BOOL (WINAPI *PKeymanOutputBackspace)(HWND hwnd);
@@ -196,15 +190,8 @@ typedef struct tagKEYMAN64THREADDATA
   LPINTKEYBOARDINFO lpKeyboards;			// keyboard definitions
   LPINTKEYBOARDINFO lpActiveKeyboard;
 
-   // I3616
-  LPMSG msgbuf;						// Message buffer (alloc at runtime)
-
   int nKeyboards;						// nLoadedKeyboards
   int nLanguages;           // I1087 //TODO UNUSED
-
-  LPWORD IndexStack;
-  LPWSTR miniContext;
-  int miniContextIfLen;
 
   KMSTATE state;
 
@@ -239,6 +226,7 @@ typedef struct tagKEYMAN64THREADDATA
   HWND CurrenthWnd;
 
   BOOL debug_DebugInit;   // I3951
+  int debug_Depth;
   char debug_buf[64];
 
    // I3617   // I3618
@@ -263,12 +251,8 @@ typedef struct tagKEYMAN64THREADDATA
 
 extern UINT
   wm_keyman,						// user message - ignore msg
-  wm_kmdebug,						//  " "  "  "   - debugging
   wm_keyman_control,				// messages to main Keyman window - replaces WM_USER+*
   wm_keyman_control_internal,       // messages to all windows to notify of changes to Keyman   // I4412
-  wm_keymankeydown,
-  wm_keymankeyup,
-  wm_keymandebug,
   wm_keyman_grabwindowproc,
   wm_keyman_refresh,
   wm_kmgetactivekeymanid,

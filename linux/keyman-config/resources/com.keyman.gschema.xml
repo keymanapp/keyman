@@ -1,0 +1,34 @@
+<schemalist>
+  <schema id="com.keyman.options" path="/desktop/ibus/keyman/options/">
+    <child name="keyboard-options" schema="com.keyman.options.child"/>
+
+    <key name="error-reporting" type="b">
+        <default>true</default>
+        <summary>Automatic error reporting</summary>
+        <description>true to enable automatic reporting of errors to Sentry</description>
+    </key>
+    <key name="simulate-altgr" type="b">
+      <default>false</default>
+      <summary>Simulate AltGr with Ctrl+Alt</summary>
+      <description>true will allow Ctrl+Alt to be used for AltGr. If false
+      Ctrl+Alt will not be used to simulate the AltGr key.</description>
+    </key>
+  </schema>
+
+  <schema id="com.keyman.options.child">
+    <key name="options" type="as">
+      <default>[]</default>
+      <summary>keyboard options.htm settings</summary>
+      <description>List of strings</description>
+    </key>
+  </schema>
+
+  <schema id="com.keyman.engine" path="/com/keyman/engine/">
+    <key name="additional-keyboards" type="as">
+        <default>[]</default>
+        <summary>User-added additional language/keyboards</summary>
+        <description>This setting contains installed keyboards for bcp47 codes
+        that are not listed in the keyboard metadata.</description>
+    </key>
+  </schema>
+</schemalist>

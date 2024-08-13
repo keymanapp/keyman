@@ -12,9 +12,6 @@
         <Projects Include="kmconvert\kmconvert.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="kmcomp\kmcomp.dproj">
-            <Dependencies/>
-        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -50,23 +47,14 @@
     <Target Name="kmconvert:Make">
         <MSBuild Projects="kmconvert\kmconvert.dproj" Targets="Make"/>
     </Target>
-    <Target Name="kmcomp">
-        <MSBuild Projects="kmcomp\kmcomp.dproj"/>
-    </Target>
-    <Target Name="kmcomp:Clean">
-        <MSBuild Projects="kmcomp\kmcomp.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="kmcomp:Make">
-        <MSBuild Projects="kmcomp\kmcomp.dproj" Targets="Make"/>
-    </Target>
     <Target Name="Build">
-        <CallTarget Targets="Tike;setup;kmconvert;kmcomp"/>
+        <CallTarget Targets="Tike;setup;kmconvert"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="Tike:Clean;setup:Clean;kmconvert:Clean;kmcomp:Clean"/>
+        <CallTarget Targets="Tike:Clean;setup:Clean;kmconvert:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="Tike:Make;setup:Make;kmconvert:Make;kmcomp:Make"/>
+        <CallTarget Targets="Tike:Make;setup:Make;kmconvert:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

@@ -1,13 +1,16 @@
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 import { List, ListItem } from "../kmx-plus.js";
-import { build_strs_index, BUILDER_STRS } from "./build-strs.js";
+import { build_strs_index, BUILDER_STR_REF, BUILDER_STRS } from "./build-strs.js";
 import { BUILDER_SECTION } from "./builder-section.js";
 
 /* ------------------------------------------------------------------
  * list section
    ------------------------------------------------------------------ */
 
-/**
+/** reference from build_list_index */
+export type BUILDER_LIST_REF = number;
+
+   /**
  * A list entry.
  */
 interface BUILDER_LIST_LIST {
@@ -17,7 +20,7 @@ interface BUILDER_LIST_LIST {
 };
 
 interface BUILDER_LIST_INDEX {
-  str: number; // str for this string
+  str: BUILDER_STR_REF; // str for this string
   _value: string; // for locating this string during finalization
 };
 
@@ -82,7 +85,10 @@ export function build_list(source_list: List, sect_strs: BUILDER_STRS): BUILDER_
  * @param value
  * @returns
  */
-export function build_list_index(sect_list: BUILDER_LIST, value: ListItem) {
+export function build_list_index(sect_list: BUILDER_LIST, value: ListItem) : BUILDER_LIST_REF {
+  if (!value) { 
+    return 0; // empty list
+  }
   if(!(value instanceof ListItem)) {
     throw new Error('unexpected value '+ value);
   }
@@ -91,5 +97,5 @@ export function build_list_index(sect_list: BUILDER_LIST, value: ListItem) {
   if(result < 0) {
     throw new Error('unexpectedly missing ListItem ' + value); // TODO-LDML: it's an array of strs
   }
-  return result;
+  return <BUILDER_LIST_REF>result;
 }

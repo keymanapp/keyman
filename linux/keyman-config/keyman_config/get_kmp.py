@@ -3,12 +3,14 @@
 import datetime
 import logging
 import os
+import tempfile
 import time
 
 import requests
 import requests_cache
 from gi.repository import GObject
 
+from keyman_config import _
 from keyman_config import KeymanApiUrl, KeymanDownloadsUrl
 from keyman_config.deprecated_decorator import deprecated
 
@@ -18,6 +20,46 @@ class InstallLocation(GObject.GEnum):
     Shared = 2
     User = 3
     Unknown = 99
+
+can_use_cache = True
+
+def get_install_area_string(area):
+    if area == InstallLocation.OS:
+        return _('System')
+    elif area == InstallLocation.Shared:
+        return _('Shared')
+    elif area == InstallLocation.User:
+        return _('User')
+    return _('Unknown')
+
+
+def _install_cache(cache_name, backend, expire_after):
+    global can_use_cache
+    if can_use_cache:
+        try:
+            requests_cache.install_cache(cache_name=cache_name, backend=backend, expire_after=expire_after)
+        except AttributeError as e:
+            logging.debug(f'Got exception trying to use `install_cache`: {e}')
+            can_use_cache = False
+
+
+def _uninstall_cache():
+    global can_use_cache
+    if can_use_cache:
+        try:
+            requests_cache.uninstall_cache()
+        except AttributeError as e:
+            logging.debug(f'Got exception trying to use `uninstall_cache`: {e}')
+            can_use_cache = False
+
+
+def _did_use_cache(response):
+    if can_use_cache:
+        try:
+            return response.from_cache
+        except AttributeError as e:
+            logging.debug(f'Got exception trying to access `response.from_cache`: {e}')
+    return False
 
 
 def get_package_download_data(packageID, weekCache=False):
@@ -40,12 +82,12 @@ def get_package_download_data(packageID, weekCache=False):
     else:
         expire_after = datetime.timedelta(days=1)
     os.chdir(cache_dir)
-    requests_cache.install_cache(cache_name='keyman_cache', backend='sqlite', expire_after=expire_after)
+    _install_cache(cache_name='keyman_cache', backend='sqlite', expire_after=expire_after)
     now = time.ctime(int(time.time()))
     response = requests.get(api_url)
-    logging.debug('Time: {0} / Used Cache: {1}'.format(now, response.from_cache))
+    logging.debug('Time: {0} / Used Cache: {1}'.format(now, _did_use_cache(response)))
     os.chdir(current_dir)
-    requests_cache.uninstall_cache()
+    _uninstall_cache()
     if response.status_code == 200:
         return response.json()
     else:
@@ -72,15 +114,15 @@ def get_keyboard_data(keyboardID, weekCache=False):
     else:
         expire_after = datetime.timedelta(days=1)
     os.chdir(cache_dir)
-    requests_cache.install_cache(cache_name='keyman_cache', backend='sqlite', expire_after=expire_after)
+    _install_cache(cache_name='keyman_cache', backend='sqlite', expire_after=expire_after)
     now = time.ctime(int(time.time()))
     try:
         response = requests.get(api_url)
-    except requests.exceptions.RequestException as e:  # This is the correct syntax
+    except requests.exceptions.RequestException:  # This is the correct syntax
         return None
-    logging.debug('Time: {0} / Used Cache: {1}'.format(now, response.from_cache))
+    logging.debug('Time: {0} / Used Cache: {1}'.format(now, _did_use_cache(response)))
     os.chdir(current_dir)
-    requests_cache.uninstall_cache()
+    _uninstall_cache()
     if response.status_code == 200:
         return response.json()
     else:
@@ -109,7 +151,11 @@ def keyman_cache_dir():
     cachebase = os.environ.get('XDG_CACHE_HOME', os.path.join(home, '.cache'))
     km_cache = os.path.join(cachebase, 'keyman')
     if not os.path.isdir(km_cache):
-        os.mkdir(km_cache)
+        try:
+            os.makedirs(km_cache)
+        except:
+            km_cache = tempfile.TemporaryDirectory().name
+            os.makedirs(km_cache)
     return km_cache
 
 
@@ -196,7 +242,7 @@ def download_kmp_file(url, kmpfile, cache=False):
         if not os.path.isdir(cache_dir):
             os.makedirs(cache_dir)
         os.chdir(cache_dir)
-        requests_cache.install_cache(cache_name='keyman_kmp_cache', backend='sqlite', expire_after=expire_after)
+        _install_cache(cache_name='keyman_kmp_cache', backend='sqlite', expire_after=expire_after)
         now = time.ctime(int(time.time()))
 
     try:
@@ -206,9 +252,9 @@ def download_kmp_file(url, kmpfile, cache=False):
         return downloadfile
 
     if cache:
-        logging.debug('Time: {0} / Used Cache: {1}'.format(now, response.from_cache))
+        logging.debug('Time: {0} / Used Cache: {1}'.format(now, _did_use_cache(response)))
         os.chdir(current_dir)
-        requests_cache.uninstall_cache()
+        _uninstall_cache()
 
     if response.status_code == 200:
         try:

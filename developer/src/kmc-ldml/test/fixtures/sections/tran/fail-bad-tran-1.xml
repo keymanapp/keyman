@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="fail-bad-tran-1"/>
+
+  <keys />
+
+  <transforms type="simple">
+    <transformGroup>
+      <transform from="AB(now if only I would terminate this group.." to="x"/>
+    </transformGroup>
+  </transforms>
+</keyboard3>

@@ -1,5 +1,5 @@
 # Editor configuration, see https://editorconfig.org
-[*]
+[*.py]
 indent_style = space
 indent_size = 4
 

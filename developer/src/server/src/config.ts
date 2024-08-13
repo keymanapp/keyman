@@ -1,4 +1,5 @@
-import fs = require('fs');
+import { mkdirSync } from 'fs';
+import { loadJsonFile } from './load-json-file.js';
 
 export class Configuration {
   public readonly appDataPath: string;
@@ -18,7 +19,6 @@ export class Configuration {
   public readonly useNgrok: boolean;
   public readonly ngrokControlPort: number;
   public readonly ngrokToken: string;
-  public readonly ngrokRegion: string;
   public readonly ngrokVisible: boolean;
 
   public ngrokEndpoint: string = '';
@@ -34,13 +34,9 @@ export class Configuration {
     this.pidFilename = this.appDataPath + 'pid.json';
     this.configFilename = this.appDataPath + 'config.json';
 
-    fs.mkdirSync(this.cachePath, { recursive: true});
+    mkdirSync(this.cachePath, { recursive: true});
 
-    let cfg = null;
-    if(fs.existsSync(this.configFilename)) {
-      const data = fs.readFileSync(this.configFilename, 'utf-8');
-      cfg = JSON.parse(data);
-    }
+    const cfg = loadJsonFile(this.configFilename);
 
     this.port = cfg?.port ?? 8008;
 
@@ -49,7 +45,6 @@ export class Configuration {
     this.ngrokBinPath = this.appDataPath + 'bin/';
     this.ngrokControlPort = cfg?.ngrokControlPort ?? 8009;
     this.ngrokToken = cfg?.ngrokToken ?? '';
-    this.ngrokRegion = cfg?.ngrokRegion ?? '';
     this.ngrokVisible = cfg?.ngrokVisible ?? false;
   }
 };

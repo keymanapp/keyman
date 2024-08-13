@@ -14,7 +14,18 @@
   ],
   "homepage": "https://github.com/keymanapp/keyman",
   "license": "MIT",
-  "main": "build/index.js",
+  "main": "build/obj/index.js",
+  "types": "build/obj/index.d.ts",
+  "exports": {
+    ".": {
+      "es6-bundling": "./src/index.ts",
+      "default": "./build/obj/index.js"
+    },
+    "./lib": {
+      "types": "./build/lib/index.d.ts"
+    },
+    "./obj/*.js": "./build/obj/*.js"
+  },
   "directories": {
     "lib": "lib",
     "test": "test"
@@ -30,24 +41,20 @@
     "url": "git+https://github.com/keymanapp/keyman.git"
   },
   "scripts": {
-    "build": "tsc",
-    "prepublish": "npm run build",
-    "pretest": "npm run build",
-    "test": "mocha"
+    "build": "gosh ./build.sh",
+    "test": "gosh ./build.sh test"
   },
   "bugs": {
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "devDependencies": {
     "@keymanapp/models-types": "*",
-    "@types/chai": "^4.2.11",
+    "@keymanapp/resources-gosh": "*",
     "@types/mocha": "^7.0.2",
-    "chai": "^4.3.4",
+    "c8": "^7.12.0",
     "mocha": "^10.0.0",
-    "ts-node": "^10.9.1",
-    "typescript": "^4.9.5"
+    "mocha-teamcity-reporter": "^4.0.0",
+    "typescript": "^5.4.5"
   },
-  "dependencies": {
-    "@types/node": "^14.0.3"
-  }
+  "type": "module"
 }

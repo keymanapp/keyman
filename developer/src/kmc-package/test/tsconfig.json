@@ -7,9 +7,6 @@
       "outDir": "../build/test",
       "baseUrl": ".",
       "allowSyntheticDefaultImports": true, // for jszip
-      "paths": {
-        "@keymanapp/developer-test-helpers": ["../../common/web/test-helpers/index"],
-      },
     },
   "include": [
       "**/test-*.ts",
@@ -18,7 +15,7 @@
   "references": [
       { "path": "../" },
       { "path": "../../../../common/web/types" },
-      { "path": "../../../../common/web/keyman-version/tsconfig.esm.json" },
+      { "path": "../../../../common/web/keyman-version" },
       { "path": "../../common/web/test-helpers/" },
     ]
 }

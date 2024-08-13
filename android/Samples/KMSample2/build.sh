@@ -1,21 +1,13 @@
 #!/usr/bin/env bash
 #
 # Samples: KMSample2
-
-set -eu
-# set -x: Debugging use, print each statement
-# set -x
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
 
 ################################ Main script ################################
 
@@ -36,13 +28,15 @@ builder_describe "Build KMSample2 app for Android." \
 # parse before describe_outputs to check debug flags
 builder_parse "$@"
 
+ARTIFACT="app-release-unsigned.apk"
+
 if builder_is_debug_build; then
   builder_heading "### Debug config ####"
   CONFIG="debug"
   SAMPLE_FLAGS="assembleDebug"
+  ARTIFACT="app-$CONFIG.apk"
 fi
 
-ARTIFACT="app-$CONFIG.apk"
 
 
 builder_describe_outputs \

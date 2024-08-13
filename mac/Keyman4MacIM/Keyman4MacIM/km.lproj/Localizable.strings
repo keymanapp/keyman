@@ -26,10 +26,10 @@
 "message-keyboard-file-unreadable" = "មិនអាចអានឯកសារ Keyman '%@' នេះបានទេ។";
 
 /* Message displayed in Configuration window when keyboard cannot be loaded */
-"message-error-loading-keyboard" = "(error loading keyboard)";
+"message-error-loading-keyboard" = "(មានបញ្ហាពេលផ្ទុកក្ដារចុច)";
 
 /* Message displayed in Configuration window when keyboard metadata cannot be loaded */
-"message-error-unknown-metadata" = "unknown";
+"message-error-unknown-metadata" = "មិនស្គាល់";
 
 /* Button text to acknowledge that .kmp file could not be read  */
 "button-keyboard-file-unreadable" = "យល់ព្រម";
@@ -68,4 +68,7 @@
 "copyright-label" = "រក្សាសិទ្ធិ៖";
 
 /* message displayed to alert user to need grant accessibility permission */
-"privacy-alert-text" = "To function properly, Keyman requires accessibility features:\n\nGrant access in System Preferences, Security & Privacy.\nRestart your system.";
+"privacy-alert-text" = "ដើម្បីឱ្យដំណើរការសមស្រប, Keyman តម្រូវឱ្យមានលទ្ធភាពចូលប្រើ៖\n\nបើកការអនុញ្ញាតនៅក្នុង Security & Privacy នៃ System Preferences។\nបិទរួចបើកប្រព័ន្ធរបស់អ្នក។";
+
+/* Text of menu item in Input Menu when no Keyboards are configured -- include parentheses  */
+"no-keyboard-configured-menu-placeholder" = "(គ្មានក្ដារចុច ដែលត្រូវបានកំណត់រចនាសម្ព័ន្ធទេ)";

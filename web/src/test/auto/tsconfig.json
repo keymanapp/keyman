@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.dom.json",
+
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "../../../build/test",
+    "tsBuildInfoFile": "../../../build/test/tsconfig.tsbuildinfo",
+    "rootDir": "."
+  },
+
+  "include": [
+    "dom/**/*.ts",
+    "headless/**/*.ts",
+    "integrated/**/*.ts"
+  ]
+}

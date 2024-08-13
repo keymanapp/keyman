@@ -75,7 +75,7 @@
 #include "versioning.h"
 #include "kmcmplib.h"
 #include "DeprecationChecks.h"
-
+#include "cp1252.h"
 #include "virtualcharkeys.h"
 
 // TODO: These three should be under common/cpp/include -- not windows specific
@@ -94,39 +94,35 @@
 #include "CasedKeys.h"
 #include <vector>
 #include <xstring.h>
-#include "CheckFilenameConsistency.h"
+#include <codecvt>
+#include <locale>
+#include <string>
+#include <iostream>
+#include <sstream>
+
 #include "UnreachableRules.h"
 #include "CheckForDuplicates.h"
 #include "kmx_u16.h"
-#include "filesystem.h"
-#include <CompMsg.h>
 
 /* These macros are adapted from winnt.h and legacy use only */
 #define MAKELANGID(p, s)       ((((uint16_t)(s)) << 10) | (uint16_t)(p))
 #define PRIMARYLANGID(lgid)    ((uint16_t)(lgid) & 0x3ff)
 #define SUBLANGID(lgid)        ((uint16_t)(lgid) >> 10)
 
-#define COMPILE_ERROR_MAX_LEN (SZMAX_ERRORTEXT + 1 + 280)
-
 using namespace kmcmp;
 
-  char ErrExtraLIB[ERR_EXTRA_LIB_LEN];
-  KMX_WCHAR ErrExtraW[ERR_EXTRA_W_LEN];
   KMX_BOOL AWarnDeprecatedCode_GLOBAL_LIB;
 
 namespace kmcmp{
   KMX_BOOL  FShouldAddCompilerVersion = TRUE;
   KMX_BOOL  FSaveDebug, FCompilerWarningsAsErrors;   // I4865   // I4866
-  int ErrChr;
-  int nErrors = 0;
   KMX_BOOL FMnemonicLayout = FALSE;
   KMX_BOOL FOldCharPosMatching = FALSE;
   int CompileTarget;
-  KMX_CHAR CompileDir[260];  // TODO: this should not be a fixed buffer
   int BeginLine[4];
 
   KMX_BOOL IsValidCallStore(PFILE_STORE fs);
-  KMX_BOOL CheckStoreUsage(PFILE_KEYBOARD fk, int storeIndex, KMX_BOOL fIsStore, KMX_BOOL fIsOption, KMX_BOOL fIsCall);
+  void CheckStoreUsage(PFILE_KEYBOARD fk, int storeIndex, KMX_BOOL fIsStore, KMX_BOOL fIsOption, KMX_BOOL fIsCall);
   KMX_DWORD UTF32ToUTF16(int n, int *n1, int *n2);
   KMX_DWORD CheckUTF16(int n);
   int cmpkeys(const void *key, const void *elem);
@@ -134,6 +130,7 @@ namespace kmcmp{
 
 int xatoi(PKMX_WCHAR *p);
 int atoiW(PKMX_WCHAR p);
+bool isIntegerWstring(PKMX_WCHAR p);
 void safe_wcsncpy(PKMX_WCHAR out, PKMX_WCHAR in, int cbMax);
 int GetDeadKey(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 
@@ -141,6 +138,7 @@ KMX_BOOL IsSameToken(PKMX_WCHAR *p, KMX_WCHAR const * token);
 KMX_DWORD GetRHS(PFILE_KEYBOARD fk, PKMX_WCHAR p, PKMX_WCHAR buf, int bufsize, int offset, int IsUnicode);
 PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_WORD Flags);
 KMX_DWORD GetXString(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_WCHAR const * token, PKMX_WCHAR output, int max, int offset, PKMX_WCHAR *newp, int isVKey, int isUnicode);
+KMX_BOOL GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &targets);
 
 int GetGroupNum(PFILE_KEYBOARD fk, PKMX_WCHAR p);
 
@@ -153,7 +151,7 @@ KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD File
 KMX_DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, KMX_DWORD storeIndex);
 
 int GetVKCode(PFILE_KEYBOARD fk, PKMX_WCHAR p); // I3438 // TODO: Consolidate GetDeadKey and GetVKCode?
-KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE sp);
+KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE sp);
 
 KMX_DWORD process_if(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx);
 KMX_DWORD process_reset(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx);
@@ -165,6 +163,9 @@ KMX_DWORD process_set_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, PKMX_WCHA
 KMX_DWORD process_expansion(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx, int max);
 
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString);
+
+bool resizeStoreArray(PFILE_KEYBOARD fk);
+bool resizeKeyArray(PFILE_GROUP gp, int increment = 1);
 
 const KMX_WCHAR * LineTokens[] = {
    u"SVNBHBGMNSCCLLCMLB",  u"store",  u"VERSION ",  u"NAME ",
@@ -220,6 +221,9 @@ const KMX_WCHAR * StoreTokens[TSS__MAX + 2] = {
   SSN__PREFIX u"", // TSS_BEGIN_POSTKEYSTROKE
   SSN__PREFIX u"NEWLAYER",
   SSN__PREFIX u"OLDLAYER",
+
+  // Keyman 17.0+
+  SSN__PREFIX u"DISPLAYMAP",  // TSS_DISPLAYMAP (compile-time usage only)
   NULL
 };
 
@@ -229,8 +233,7 @@ enum LinePrefixType { lptNone, lptKeymanAndKeymanWeb, lptKeymanWebOnly, lptKeyma
 
 /* Compile target */
 
-kmcmp_CompilerMessageProc msgproc = NULL;
-void* msgprocContext = NULL;
+kmcmp_LoadFileProc kmcmp::loadfileproc = NULL;
 
 int kmcmp::currentLine = 0;
 
@@ -258,52 +261,8 @@ PKMX_STR wstrtostr(PKMX_WCHAR in)
   return result;
 }
 
-KMX_BOOL kmcmp::AddCompileWarning(PKMX_CHAR buf)
-{
-  (*msgproc)(kmcmp::currentLine + 1, CWARN_Info, buf, msgprocContext);
-  return FALSE;
-}
 
-KMX_BOOL AddCompileError(KMX_DWORD msg)
-{
-  KMX_CHAR szText[COMPILE_ERROR_MAX_LEN];
-  KMX_CHAR* szTextp = NULL;
-
-  if (msg & CERR_FATAL)
-  {
-    szTextp = GetCompilerErrorString(msg);
-    (*msgproc)(kmcmp::currentLine + 1, msg, szTextp, msgprocContext);
-    kmcmp::nErrors++;
-    return TRUE;
-  }
-
-  if (msg & CERR_ERROR)
-    kmcmp::nErrors++;
-  szTextp = GetCompilerErrorString(msg);
-
-  if (szTextp) {
-    strcpy(szText, szTextp);
-  } else {
-    snprintf(szText, COMPILE_ERROR_MAX_LEN, "Unknown error %x", msg);
-  }
-
-  if (kmcmp::ErrChr > 0) {
-    char *szTextNull = strchr(szText, 0);
-    snprintf(szTextNull, COMPILE_ERROR_MAX_LEN-(szTextNull-szText), " character offset: %d", kmcmp::ErrChr);
-  }
-
-  if (*ErrExtraLIB) {
-    char *szTextNull = strchr(szText, 0);
-    snprintf(szTextNull, COMPILE_ERROR_MAX_LEN-(szTextNull-szText), "%s", ErrExtraLIB);
-  }
-
-  ErrChr = 0;  *ErrExtraLIB =0;
-  if (!(*msgproc)(kmcmp::currentLine, msg, szText, msgprocContext)) return TRUE;
-  return FALSE;
-}
-
-KMX_DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
-{
+KMX_BOOL ProcessBeginLine(PFILE_KEYBOARD fk, PKMX_WCHAR p) {
   KMX_WCHAR tstr[128];
   PKMX_WCHAR q, pp;
   int BeginMode;
@@ -311,30 +270,42 @@ KMX_DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
 
   pp = p;
 
-  q = ( PKMX_WCHAR) u16chr(p, '>');
-  if (!q) return CERR_NoTokensFound;
+  q = (PKMX_WCHAR) u16chr(p, '>');
+  if (!q) {
+    ReportCompilerMessage(KmnCompilerMessages::ERROR_NoTokensFound);
+    return FALSE;
+  }
 
   while (iswspace(*p)) p++;
   if (u16nicmp(p, u"unicode", 7) == 0) BeginMode = BEGIN_UNICODE;
   else if (u16nicmp(p, u"ansi", 4) == 0) BeginMode = BEGIN_ANSI;
   else if (u16nicmp(p, u"newContext", 10) == 0) BeginMode = BEGIN_NEWCONTEXT;
   else if (u16nicmp(p, u"postKeystroke", 13) == 0) BeginMode = BEGIN_POSTKEYSTROKE;
-  else if (*p != '>') return CERR_InvalidToken;
+  else if (*p != '>') {
+    ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidToken);
+    return FALSE;
+  }
   else BeginMode = BEGIN_ANSI;
 
   if(kmcmp::BeginLine[BeginMode] != -1) {
-    return CERR_RepeatedBegin;
+    ReportCompilerMessage(KmnCompilerMessages::ERROR_RepeatedBegin);
+    return FALSE;
   }
 
   kmcmp::BeginLine[BeginMode] = kmcmp::currentLine;
 
-  if ((msg = GetRHS(fk, p, tstr, 80, (int)(p - pp), FALSE)) != CERR_None) return msg;
+  if ((msg = GetRHS(fk, p, tstr, 80, (int)(p - pp), FALSE)) != STATUS_Success) {
+    ReportCompilerMessage(msg);
+    return FALSE;
+  }
 
   if (tstr[0] != UC_SENTINEL || tstr[1] != CODE_USE) {
-    return CERR_InvalidBegin;
+    ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidBegin);
+    return FALSE;
   }
   if (tstr[3] != 0) {
-    return CERR_InvalidToken;
+    ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidToken);
+    return FALSE;
   }
 
   if (BeginMode == BEGIN_ANSI || BeginMode == BEGIN_UNICODE) {
@@ -347,20 +318,18 @@ KMX_DWORD ProcessBeginLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
       /* Record a system store for the line number of the begin statement */
       AddDebugStore(fk, BeginMode == BEGIN_UNICODE ? DEBUGSTORE_BEGIN u"Unicode" : DEBUGSTORE_BEGIN u"ANSI");
     }
-  }
-  else {
-      PFILE_GROUP gp = &fk->dpGroupArray[tstr[2] - 1];
-      if (!gp->fReadOnly) {
-        return BeginMode == BEGIN_NEWCONTEXT ?
-          CERR_NewContextGroupMustBeReadonly :
-          CERR_PostKeystrokeGroupMustBeReadonly;
-      }
-      return AddStore(fk, BeginMode == BEGIN_NEWCONTEXT ? TSS_BEGIN_NEWCONTEXT : TSS_BEGIN_POSTKEYSTROKE, tstr, NULL);
+  } else {
+    PFILE_GROUP gp = &fk->dpGroupArray[tstr[2] - 1];
+    if (!gp->fReadOnly) {
+      ReportCompilerMessage(BeginMode == BEGIN_NEWCONTEXT ?
+        KmnCompilerMessages::ERROR_NewContextGroupMustBeReadonly :
+        KmnCompilerMessages::ERROR_PostKeystrokeGroupMustBeReadonly);
+      return FALSE;
     }
+    return AddStore(fk, BeginMode == BEGIN_NEWCONTEXT ? TSS_BEGIN_NEWCONTEXT : TSS_BEGIN_POSTKEYSTROKE, tstr, NULL);
+  }
 
-
-
-  return CERR_None;
+  return TRUE;
 }
 
 KMX_DWORD ValidateMatchNomatchOutput(PKMX_WCHAR p) {
@@ -370,16 +339,15 @@ KMX_DWORD ValidateMatchNomatchOutput(PKMX_WCHAR p) {
       case CODE_CONTEXT:
       case CODE_CONTEXTEX:
       case CODE_INDEX:
-        return CERR_ContextAndIndexInvalidInMatchNomatch;
+        return KmnCompilerMessages::ERROR_ContextAndIndexInvalidInMatchNomatch;
       }
     }
     p = incxstr(p);
   }
-  return CERR_None;
+  return STATUS_Success;
 }
 
-KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
-{
+KMX_BOOL ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str) {
   PKMX_WCHAR p, q, pp;
   PFILE_GROUP gp;
   KMX_DWORD msg;
@@ -401,49 +369,72 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
 
   case T_BEGIN:
     // after a begin can be "Unicode" or "ANSI" or nothing (=ANSI)
-    if ((msg = ProcessBeginLine(fk, p)) != CERR_None) return msg;
+    if (!ProcessBeginLine(fk, p)) {
+      return FALSE;
+    }
     break;
 
   case T_GROUP:
-    if (fk->currentGroup == 0xFFFFFFFF) fk->currentGroup = 0;
-    else
-    {
-      if ((msg = ProcessGroupFinish(fk)) != CERR_None) return msg;		// finish off previous group first?
+    if (fk->currentGroup == 0xFFFFFFFF) {
+      fk->currentGroup = 0;
+    } else {
+      if (!ProcessGroupFinish(fk)) {
+        return FALSE;		// finish off previous group first?
+      }
       fk->currentGroup++;
     }
-    //		if( (err = ProcessGroupLine( fk, p )) != CERR_None ) return err;
     break;
 
   case T_NAME:
     kmcmp::WarnDeprecatedHeader();   // I4866
     q = GetDelimitedString(&p, u"\"\"", 0);
-    if (!q) return CERR_InvalidName;
+    if (!q) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidName);
+      return FALSE;
+    }
 
-    if ((msg = AddStore(fk, TSS_NAME, q)) != CERR_None) return msg;
+    if (!AddStore(fk, TSS_NAME, q)) {
+      return FALSE;
+    }
     break;
 
   case T_COPYRIGHT:
     kmcmp::WarnDeprecatedHeader();   // I4866
     q = GetDelimitedString(&p, u"\"\"", 0);
-    if (!q) return CERR_InvalidCopyright;
+    if (!q) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidCopyright);
+      return FALSE;
+    }
 
-    if ((msg = AddStore(fk, TSS_COPYRIGHT, q)) != CERR_None) return msg;
+    if (!AddStore(fk, TSS_COPYRIGHT, q)) {
+      return FALSE;
+    }
     break;
 
   case T_MESSAGE:
     kmcmp::WarnDeprecatedHeader();   // I4866
     q = GetDelimitedString(&p, u"\"\"", 0);
-    if (!q) return CERR_InvalidMessage;
+    if (!q) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidMessage);
+      return FALSE;
+    }
 
-    if ((msg = AddStore(fk, TSS_MESSAGE, q)) != CERR_None) return msg;
+    if (!AddStore(fk, TSS_MESSAGE, q)) {
+      return FALSE;
+    }
     break;
 
   case T_LANGUAGENAME:
     kmcmp::WarnDeprecatedHeader();   // I4866
     q = GetDelimitedString(&p, u"\"\"", 0);
-    if (!q) return CERR_InvalidLanguageName;
+    if (!q) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidLanguageName);
+      return FALSE;
+    }
 
-    if ((msg = AddStore(fk, TSS_LANGUAGENAME, q)) != CERR_None) return msg;
+    if (!AddStore(fk, TSS_LANGUAGENAME, q)) {
+      return FALSE;
+    }
     break;
 
   case T_LANGUAGE:
@@ -452,7 +443,9 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
     KMX_WCHAR *tokcontext = NULL;
     q = u16tok(p,  p_sep, &tokcontext);  // I3481
 
-    if ((msg = AddStore(fk, TSS_LANGUAGE, q)) != CERR_None) return msg;
+    if (!AddStore(fk, TSS_LANGUAGE, q)) {
+      return FALSE;
+    }
     break;
   }
   case T_LAYOUT:
@@ -460,79 +453,118 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
     kmcmp::WarnDeprecatedHeader();   // I4866
     KMX_WCHAR *tokcontext = NULL;
     q = u16tok(p, p_sep, &tokcontext);  // I3481
-    if ((msg = AddStore(fk, TSS_LAYOUT, q)) != CERR_None) return msg;
+    if (!AddStore(fk, TSS_LAYOUT, q)) {
+      return FALSE;
+    }
     break;
   }
   case T_CAPSOFF:
     kmcmp::WarnDeprecatedHeader();   // I4866
-    if ((msg = AddStore(fk, TSS_CAPSALWAYSOFF, u"1")) != CERR_None) return msg;
+    if (!AddStore(fk, TSS_CAPSALWAYSOFF, u"1")) {
+      return FALSE;
+    }
     break;
 
   case T_CAPSON:
     kmcmp::WarnDeprecatedHeader();   // I4866
-    if ((msg = AddStore(fk, TSS_CAPSONONLY, u"1")) != CERR_None) return msg;
+    if (!AddStore(fk, TSS_CAPSONONLY, u"1")) {
+      return FALSE;
+    }
     break;
 
   case T_SHIFT:
     kmcmp::WarnDeprecatedHeader();   // I4866
-    if ((msg = AddStore(fk, TSS_SHIFTFREESCAPS, u"1")) != CERR_None) return msg;
+    if (!AddStore(fk, TSS_SHIFTFREESCAPS, u"1")) {
+      return FALSE;
+    }
     break;
 
   case T_HOTKEY:
   {
     kmcmp::WarnDeprecatedHeader();   // I4866
     KMX_WCHAR *tokcontext = NULL;
-    if ((q = u16tok(p,  p_sep, &tokcontext)) == NULL) return CERR_CodeInvalidInThisSection;  // I3481
-    if ((msg = AddStore(fk, TSS_HOTKEY, q)) != CERR_None) return msg;
+    if ((q = u16tok(p,  p_sep, &tokcontext)) == NULL) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_CodeInvalidInThisSection);  // I3481
+      return FALSE;
+    }
+    if (!AddStore(fk, TSS_HOTKEY, q)) {
+      return FALSE;
+    }
     break;
   }
   case T_BITMAP:
   {
     kmcmp::WarnDeprecatedHeader();   // I4866
     KMX_WCHAR *tokcontext = NULL;
-    if ((q = u16tok(p,  p_sep, &tokcontext)) == NULL) return CERR_InvalidBitmapLine;  // I3481
+    if ((q = u16tok(p,  p_sep, &tokcontext)) == NULL) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidBitmapLine);  // I3481
+      return FALSE;
+    }
 
     while (iswspace(*q)) q++;
     if (*q == '"') {
       p = q;
       q = GetDelimitedString(&p, u"\"\"", 0);
-      if (!q) return CERR_InvalidBitmapLine;
+      if (!q) {
+        ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidBitmapLine);
+        return FALSE;
+      }
     }
 
-    if ((msg = AddStore(fk, TSS_BITMAP, q)) != CERR_None) return msg;
+    if (!AddStore(fk, TSS_BITMAP, q)) {
+      return FALSE;
+    }
     break;
   }
   case T_BITMAPS:
   {
     kmcmp::WarnDeprecatedHeader();   // I4866
     KMX_WCHAR *tokcontext = NULL;
-    AddWarning(CWARN_BitmapNotUsed);
+    ReportCompilerMessage(KmnCompilerMessages::WARN_BitmapNotUsed);
 
-    if ((q = u16tok(p,  p_sep, &tokcontext)) == NULL) return CERR_InvalidBitmapLine;  // I3481
+    if ((q = u16tok(p,  p_sep, &tokcontext)) == NULL) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidBitmapLine);  // I3481
+      return FALSE;
+    }
 
-    if ((PKMX_WCHAR) u16chr(q, ','))    *(PKMX_WCHAR) u16chr(q, ',') = 0;
-    if ((msg = AddStore(fk, TSS_BITMAP, q)) != CERR_None) return msg;
+    if ((PKMX_WCHAR) u16chr(q, ',')) {
+      *(PKMX_WCHAR) u16chr(q, ',') = 0;
+    }
+    if (!AddStore(fk, TSS_BITMAP, q)) {
+      return FALSE;
+    }
 
     break;
   }
   case T_KEYTOKEY:			// A rule
-    if (fk->currentGroup == 0xFFFFFFFF) return CERR_CodeInvalidInThisSection;
-    if ((msg = ProcessKeyLine(fk, p, IsUnicode)) != CERR_None) return msg;
+    if (fk->currentGroup == 0xFFFFFFFF) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_CodeInvalidInThisSection);
+      return FALSE;
+    }
+    if ((msg = ProcessKeyLine(fk, p, IsUnicode)) != STATUS_Success) {
+      ReportCompilerMessage(msg);
+      return FALSE;
+    }
     break;
 
   case T_MATCH:
-    if (fk->currentGroup == 0xFFFFFFFF) return CERR_CodeInvalidInThisSection;
+    if (fk->currentGroup == 0xFFFFFFFF) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_CodeInvalidInThisSection);
+      return FALSE;
+    }
     {
       PKMX_WCHAR buf = new KMX_WCHAR[GLOBAL_BUFSIZE];
-      if ((msg = GetRHS(fk, p, buf, GLOBAL_BUFSIZE - 1, (int)(p - pp), IsUnicode)) != CERR_None)
+      if ((msg = GetRHS(fk, p, buf, GLOBAL_BUFSIZE - 1, (int)(p - pp), IsUnicode)) != STATUS_Success)
       {
         delete[] buf;
-        return msg;
+        ReportCompilerMessage(msg);
+        return FALSE;
       }
 
-      if ((msg = ValidateMatchNomatchOutput(buf)) != CERR_None) {
+      if ((msg = ValidateMatchNomatchOutput(buf)) != STATUS_Success) {
         delete[] buf;
-        return msg;
+        ReportCompilerMessage(msg);
+        return FALSE;
       }
 
       gp = &fk->dpGroupArray[fk->currentGroup];
@@ -557,18 +589,23 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
     break;
 
   case T_NOMATCH:
-    if (fk->currentGroup == 0xFFFFFFFF) return CERR_CodeInvalidInThisSection;
+    if (fk->currentGroup == 0xFFFFFFFF) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_CodeInvalidInThisSection);
+      return FALSE;
+    }
     {
       PKMX_WCHAR buf = new KMX_WCHAR[GLOBAL_BUFSIZE];
-      if ((msg = GetRHS(fk, p, buf, GLOBAL_BUFSIZE, (int)(p - pp), IsUnicode)) != CERR_None)
+      if ((msg = GetRHS(fk, p, buf, GLOBAL_BUFSIZE, (int)(p - pp), IsUnicode)) != STATUS_Success)
       {
         delete[] buf;
-        return msg;
+        ReportCompilerMessage(msg);
+        return FALSE;
       }
 
-      if ((msg = ValidateMatchNomatchOutput(buf)) != CERR_None) {
+      if ((msg = ValidateMatchNomatchOutput(buf)) != STATUS_Success) {
         delete[] buf;
-        return msg;
+        ReportCompilerMessage(msg);
+        return FALSE;
       }
 
       gp = &fk->dpGroupArray[fk->currentGroup];
@@ -590,26 +627,30 @@ KMX_DWORD ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str)
     break;
 
   default:
-    return CERR_InvalidToken;
+    ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidToken);
+    return FALSE;
   }
 
-  return CERR_None;
+  return TRUE;
 }
 
 //**********************************************************************************************************************
 
-KMX_DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
+KMX_BOOL ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
 {
   PFILE_GROUP gp;
   PKMX_WCHAR q;
 
   gp = new FILE_GROUP[fk->cxGroupArray + 1];
-  if (!gp) return CERR_CannotAllocateMemory;
+  if (!gp) {
+    ReportCompilerMessage(KmnCompilerMessages::FATAL_CannotAllocateMemory);
+    return FALSE;
+  }
 
   if (fk->dpGroupArray)
   {
     memcpy(gp, fk->dpGroupArray, sizeof(FILE_GROUP) * fk->cxGroupArray);
-    delete fk->dpGroupArray;
+    delete[] fk->dpGroupArray;
   }
 
   fk->dpGroupArray = gp;
@@ -622,7 +663,10 @@ KMX_DWORD ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   gp->cxKeyArray = 0;
 
   q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-  if (!q) return CERR_InvalidGroupLine;
+  if (!q) {
+    ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidGroupLine);
+    return FALSE;
+  }
 
   gp->fUsingKeys = FALSE;
   gp->fReadOnly  = IsSameToken(&p, u"readonly");
@@ -685,57 +729,62 @@ int kmcmp::cmpkeys(const void *key, const void *elem)
   return(char_key - char_elem); // akey->Key - aelem->Key);
 }
 
-KMX_DWORD ProcessGroupFinish(PFILE_KEYBOARD fk)
-{
+KMX_BOOL ProcessGroupFinish(PFILE_KEYBOARD fk) {
   PFILE_GROUP gp;
   KMX_DWORD msg;
 
-  if (fk->currentGroup == 0xFFFFFFFF) return CERR_None;
-  // Just got to first group - so nothing to finish yet
+  if (fk->currentGroup == 0xFFFFFFFF) {
+    // Just got to first group - so nothing to finish yet
+    return TRUE;
+  }
 
   gp = &fk->dpGroupArray[fk->currentGroup];
 
   // Finish off the previous group stuff!
-  if ((msg = ExpandCapsRulesForGroup(fk, gp)) != CERR_None) return msg;
+  if ((msg = ExpandCapsRulesForGroup(fk, gp)) != STATUS_Success) {
+    ReportCompilerMessage(msg);
+    return FALSE;
+  }
   qsort(gp->dpKeyArray, gp->cxKeyArray, sizeof(FILE_KEY), kmcmp::cmpkeys);
 
-  return VerifyUnreachableRules(gp);
+  VerifyUnreachableRules(gp);
+
+  return TRUE;
 }
 
 /***************************************
 * Store management
 */
 
-KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
-{
+KMX_BOOL ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p) {
   PKMX_WCHAR q, pp;
   PFILE_STORE sp;
-  //WCHAR temp[GLOBAL_BUFSIZE];
   KMX_DWORD msg;
   int i = 0;
 
   pp = p;
 
-  if ((q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL)) == NULL) return CERR_InvalidStoreLine;
+  if ((q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL)) == NULL) {
+    ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidStoreLine);
+    return FALSE;
+  }
 
-  if (*q == *SSN__PREFIX)
-  {
-    for (i = 0; StoreTokens[i]; i++)
-      if (!u16icmp(q, StoreTokens[i]))  // I3481
+  if (*q == *SSN__PREFIX) {
+    for (i = 0; StoreTokens[i]; i++) {
+      if (!u16icmp(q, StoreTokens[i])) {  // I3481
         break;
-    if (!StoreTokens[i]) return CERR_InvalidSystemStore;
+      }
+    }
+    if (!StoreTokens[i]) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidSystemStore);
+      return FALSE;
+    }
   }
 
-  sp = new FILE_STORE[fk->cxStoreArray + 1];
-  if (!sp) return CERR_CannotAllocateMemory;
-
-  if (fk->dpStoreArray)
-  {
-    memcpy(sp, fk->dpStoreArray, sizeof(FILE_STORE) * fk->cxStoreArray);
-    delete fk->dpStoreArray;
+  if(!resizeStoreArray(fk)) {
+    ReportCompilerMessage(KmnCompilerMessages::FATAL_CannotAllocateMemory);
+    return FALSE;
   }
-
-  fk->dpStoreArray = sp;
   sp = &fk->dpStoreArray[fk->cxStoreArray];
 
   sp->line = kmcmp::currentLine;
@@ -749,10 +798,10 @@ KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   {
     PKMX_WCHAR temp = new KMX_WCHAR[GLOBAL_BUFSIZE];
 
-    if ((msg = GetXString(fk, p, u"c\n", temp, GLOBAL_BUFSIZE - 1, (int)(p - pp), &p, FALSE, TRUE)) != CERR_None)
-    {
+    if ((msg = GetXString(fk, p, u"c\n", temp, GLOBAL_BUFSIZE - 1, (int)(p - pp), &p, FALSE, TRUE)) != STATUS_Success) {
       delete[] temp;
-      return msg;
+      ReportCompilerMessage(msg);
+      return FALSE;
     }
 
     sp->dwSystemID = i;
@@ -763,40 +812,75 @@ KMX_DWORD ProcessStoreLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   }
 
   if (xstrlen(sp->dpString) == 1 && *sp->dpString != UC_SENTINEL &&
-    sp->dwSystemID == 0 && (fk->version >= VERSION_60 || fk->version == 0))
-  {
+    sp->dwSystemID == 0 && (fk->version >= VERSION_60 || fk->version == 0)) {
     // In this case, we want to change behaviour for older versioned keyboards so that
     // we don't mix up named character codes which weren't supported in 5.x
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_NamedCodes);
+    if(!VerifyKeyboardVersion(fk, VERSION_60)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_60FeatureOnly_NamedCodes);
+      return FALSE;
+    }
     // Add a single char store as a defined character constant
-    if (Uni_IsSurrogate1(*sp->dpString))
+    if (Uni_IsSurrogate1(*sp->dpString)) {
       kmcmp::CodeConstants->AddCode(Uni_SurrogateToUTF32(sp->dpString[0], sp->dpString[1]), sp->szName, fk->cxStoreArray);
-    else
+    } else {
       kmcmp::CodeConstants->AddCode(sp->dpString[0], sp->szName, fk->cxStoreArray);
+    }
     kmcmp::CodeConstants->reindex(); // has to be done after every character add due to possible use in another store.   // I4982
   }
 
   fk->cxStoreArray++;	// increment now, because GetXString refers to stores
 
-  if (i > 0)
-    if ((msg = ProcessSystemStore(fk, i, sp)) != CERR_None) return msg;
+  if (i > 0) {
+    if (!ProcessSystemStore(fk, i, sp)) {
+      return FALSE;
+    }
+  }
 
   return CheckForDuplicateStore(fk, sp);
 }
 
-KMX_DWORD AddStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, KMX_WCHAR const * str, KMX_DWORD *dwStoreID)
-{
-  PFILE_STORE sp;
-  sp = new FILE_STORE[fk->cxStoreArray + 1];
-  if (!sp) return CERR_CannotAllocateMemory;
+bool resizeStoreArray(PFILE_KEYBOARD fk) {
+  if(fk->cxStoreArray % 100 == 0) {
+    PFILE_STORE sp = new FILE_STORE[fk->cxStoreArray + 100];
+    if (!sp) return false;
 
-  if (fk->dpStoreArray)
-  {
-    memcpy(sp, fk->dpStoreArray, sizeof(FILE_STORE) * fk->cxStoreArray);
-    delete fk->dpStoreArray;
+    if (fk->dpStoreArray)
+    {
+      memcpy(sp, fk->dpStoreArray, sizeof(FILE_STORE) * fk->cxStoreArray);
+      delete[] fk->dpStoreArray;
+    }
+
+    fk->dpStoreArray = sp;
+  }
+  return true;
+}
+
+/**
+ * reallocates the key array in increments of 100
+ */
+bool resizeKeyArray(PFILE_GROUP gp, int increment) {
+  const int cxKeyArray = (int)gp->cxKeyArray;
+  if((cxKeyArray + increment - 1) % 100 < increment) {
+    PFILE_KEY kp = new FILE_KEY[((cxKeyArray + increment)/100 + 1) * 100];
+    if (!kp) return false;
+    if (gp->dpKeyArray)
+    {
+      memcpy(kp, gp->dpKeyArray, cxKeyArray * sizeof(FILE_KEY));
+      delete[] gp->dpKeyArray;
+    }
+
+    gp->dpKeyArray = kp;
+  }
+  return true;
+}
+
+KMX_BOOL AddStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, const KMX_WCHAR * str, KMX_DWORD *dwStoreID) {
+  PFILE_STORE sp;
+  if(!resizeStoreArray(fk)) {
+    ReportCompilerMessage(KmnCompilerMessages::FATAL_CannotAllocateMemory);
+    return FALSE;
   }
 
-  fk->dpStoreArray = sp;
   sp = &fk->dpStoreArray[fk->cxStoreArray];
 
   sp->line = kmcmp::currentLine;
@@ -817,7 +901,7 @@ KMX_DWORD AddStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, KMX_WCHAR const * str,
 
   fk->cxStoreArray++;
 
-  return ProcessSystemStore( fk, SystemID, sp);
+  return ProcessSystemStore(fk, SystemID, sp);
 }
 
 KMX_DWORD AddDebugStore(PFILE_KEYBOARD fk, KMX_WCHAR const * str)
@@ -826,16 +910,9 @@ KMX_DWORD AddDebugStore(PFILE_KEYBOARD fk, KMX_WCHAR const * str)
   KMX_WCHAR tstr[16];
   u16sprintf(tstr, _countof(tstr), L"%d", kmcmp::currentLine);  // I3481
 
-  sp = new FILE_STORE[fk->cxStoreArray + 1];
-  if (!sp) return CERR_CannotAllocateMemory;
-
-  if (fk->dpStoreArray)
-  {
-    memcpy(sp, fk->dpStoreArray, sizeof(FILE_STORE) * fk->cxStoreArray);
-    delete[] fk->dpStoreArray;
+  if(!resizeStoreArray(fk)) {
+    return KmnCompilerMessages::FATAL_CannotAllocateMemory;
   }
-
-  fk->dpStoreArray = sp;
   sp = &fk->dpStoreArray[fk->cxStoreArray];
 
   safe_wcsncpy(sp->szName, (PKMX_WCHAR) str, SZMAX_STORENAME);
@@ -851,27 +928,30 @@ KMX_DWORD AddDebugStore(PFILE_KEYBOARD fk, KMX_WCHAR const * str)
   sp->dwSystemID = TSS_DEBUG_LINE;
   fk->cxStoreArray++;
 
-  return CERR_None;
+  return STATUS_Success;
 }
 
 PKMX_WCHAR pssBuf = NULL;
 
-KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE sp)
-{
+KMX_BOOL ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE sp) {
   //WCHAR buf[GLOBAL_BUFSIZE];
   int i, j;
   KMX_DWORD msg;
   PKMX_WCHAR p, q;
-  KMX_CHAR *pp;
 
   if (!pssBuf) pssBuf = new KMX_WCHAR[GLOBAL_BUFSIZE];
   PKMX_WCHAR buf = pssBuf;
 
   switch (SystemID)
   {
+  case TSS_BASELAYOUT:
+    break;
+
   case TSS_BITMAP:
-    if ((msg = ImportBitmapFile(fk, sp->dpString, &fk->dwBitmapSize, &fk->lpBitmap)) != CERR_None)
-      return msg;
+    if ((msg = ImportBitmapFile(fk, sp->dpString, &fk->dwBitmapSize, &fk->lpBitmap)) != STATUS_Success) {
+      ReportCompilerMessage(msg);
+      return FALSE;
+    }
     break;
 
   case TSS_CALLDEFINITION:
@@ -894,16 +974,31 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
   case TSS_COPYRIGHT:
     break;
 
+  case TSS_CUSTOMKEYMANEDITION:
+    break;
+
+  case TSS_CUSTOMKEYMANEDITIONNAME:
+    break;
+
   case TSS_DEBUG_LINE:
     break;
 
   case TSS_ETHNOLOGUECODE:
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_EthnologueCode);
-    if ((msg = ProcessEthnologueStore(sp->dpString)) != CERR_None) return msg;  // I2646
+    if(!VerifyKeyboardVersion(fk, VERSION_60)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_60FeatureOnly_EthnologueCode);
+      return FALSE;
+    }
+    if ((msg = ProcessEthnologueStore(sp->dpString)) != STATUS_Success) {
+      ReportCompilerMessage(msg);
+      return FALSE;  // I2646
+    }
     break;
 
   case TSS_HOTKEY:
-    if ((msg = ProcessHotKey(sp->dpString, &fk->dwHotKey)) != CERR_None) return msg;
+    if ((msg = ProcessHotKey(sp->dpString, &fk->dwHotKey)) != STATUS_Success) {
+      ReportCompilerMessage(msg);
+      return FALSE;
+    }
     u16sprintf(buf, GLOBAL_BUFSIZE, L"%d", (int)fk->dwHotKey);  // I3481
     delete[] sp->dpString;
     sp->dpString = new KMX_WCHAR[u16len(buf) + 1];
@@ -911,15 +1006,18 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
     break;
 
   case TSS_INCLUDECODES:
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_NamedCodes);
-    pp = wstrtostr(sp->dpString);
-    if (!kmcmp::CodeConstants->LoadFile(pp))
-    {
-      delete[] pp;
-      return CERR_CannotLoadIncludeFile;
+    if(!VerifyKeyboardVersion(fk, VERSION_60)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_60FeatureOnly_NamedCodes);
+      return FALSE;
     }
-    delete[] pp;
+    if (!kmcmp::CodeConstants->LoadFile(fk, sp->dpString)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_CannotLoadIncludeFile);
+      return FALSE;
+    }
     kmcmp::CodeConstants->reindex();   // I4982
+    break;
+
+  case TSS_KEYMANCOPYRIGHT:
     break;
 
   case TSS_LANGUAGE:
@@ -928,7 +1026,10 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
     KMX_WCHAR sep_c[3] = u", ";
     PKMX_WCHAR p_sep_c = sep_c;
     q = u16tok(sp->dpString, p_sep_c, &context);  // I3481
-    if (!q) return CERR_InvalidLanguageLine;
+    if (!q) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidLanguageLine);
+      return FALSE;
+    }
 
     i = xatoi(&q);
     KMX_WCHAR sep_n[4] = u" c\n";
@@ -936,15 +1037,23 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
     q = u16tok(NULL, p_sep_n, &context);  // I3481
     if (!q)
     {
-      VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_InvalidLanguageLine);
+      if(!VerifyKeyboardVersion(fk, VERSION_70)) {
+        ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidLanguageLine);
+        return FALSE;
+      }
       j = SUBLANGID(i);
       i = PRIMARYLANGID(i);
     }
     else
       j = xatoi(&q);
 
-    if (i < 1 || j < 1 || i > 0x3FF || j > 0x3F) return CERR_InvalidLanguageLine;
-    if (i >= 0x200 || j >= 0x20) AddWarning(CWARN_CustomLanguagesNotSupported);
+    if (i < 1 || j < 1 || i > 0x3FF || j > 0x3F) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidLanguageLine);
+      return FALSE;
+    }
+    if (i >= 0x200 || j >= 0x20) {
+      ReportCompilerMessage(KmnCompilerMessages::WARN_CustomLanguagesNotSupported);
+    }
 
     fk->KeyboardID = (KMX_DWORD)MAKELANGID(i, j);
 
@@ -958,8 +1067,14 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
   case TSS_LANGUAGENAME:
     break;
 
+  case TSS_LAYER:
+    break;
+
   case TSS_LAYOUT:
-    if (fk->KeyboardID == 0) return CERR_LayoutButNoLanguage;
+    if (fk->KeyboardID == 0) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_LayoutButNoLanguage);
+      return FALSE;
+    }
 
     q = sp->dpString;
 
@@ -970,12 +1085,16 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
     break;
 
   case TSS_MNEMONIC:
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_MnemonicLayout);
+    if(!VerifyKeyboardVersion(fk, VERSION_60)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_60FeatureOnly_MnemonicLayout);
+      return FALSE;
+    };
     kmcmp::FMnemonicLayout = atoiW(sp->dpString) == 1;
     if (kmcmp::FMnemonicLayout && FindSystemStore(fk, TSS_CASEDKEYS) != NULL) {
       // The &CasedKeys system store is not supported for
       // mnemonic layouts
-      return CERR_CasedKeysNotSupportedWithMnemonicLayout;
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_CasedKeysNotSupportedWithMnemonicLayout);
+      return FALSE;
     }
     break;
 
@@ -983,8 +1102,17 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
     break;
 
   case TSS_OLDCHARPOSMATCHING:
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_OldCharPosMatching);
+    if(!VerifyKeyboardVersion(fk, VERSION_60)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_60FeatureOnly_OldCharPosMatching);
+      return FALSE;
+    }
     kmcmp::FOldCharPosMatching = atoiW(sp->dpString);
+    break;
+
+  case TSS_PLATFORM:
+  case TSS_PLATFORM_MATCH:
+  case TSS_PLATFORM_NOMATCH:
+    // Never matched but included for completeness
     break;
 
   case TSS_SHIFTFREESCAPS:
@@ -992,10 +1120,13 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
     break;
 
   case TSS_VERSION:
-    if ((fk->dwFlags & KF_AUTOMATICVERSION) == 0) return CERR_VersionAlreadyIncluded;
+    if ((fk->dwFlags & KF_AUTOMATICVERSION) == 0) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_VersionAlreadyIncluded);
+      return FALSE;
+    }
     p = sp->dpString;
     if (u16tof (p) < 5.0) {
-      AddWarning(CWARN_OldVersion);
+      ReportCompilerMessage(KmnCompilerMessages::WARN_OldVersion);
     }
 
     if (u16ncmp(p, u"3.0", 3) == 0)       fk->version = VERSION_50;   //0x0a0b000n= a.bn
@@ -1011,8 +1142,13 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
     else if (u16ncmp(p, u"10.0", 4) == 0)  fk->version = VERSION_100;
     else if (u16ncmp(p, u"14.0", 4) == 0)  fk->version = VERSION_140; // Adds support for #917 -- context() with notany() for KeymanWeb
     else if (u16ncmp(p, u"15.0", 4) == 0)  fk->version = VERSION_150; // Adds support for U_xxxx_yyyy #2858
+    else if (u16ncmp(p, u"16.0", 4) == 0)  fk->version = VERSION_160; // KMXPlus
+    else if (u16ncmp(p, u"17.0", 4) == 0)  fk->version = VERSION_170; // Flicks and gestures
 
-    else return CERR_InvalidVersion;
+    else {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidVersion);
+      return FALSE;
+    }
 
     if (fk->version < VERSION_60) kmcmp::FOldCharPosMatching = TRUE;
 
@@ -1021,8 +1157,14 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
     break;
 
   case TSS_VISUALKEYBOARD:
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly);
+    if(!VerifyKeyboardVersion(fk, VERSION_70)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_70FeatureOnly);
+      return FALSE;
+    }
     {
+      // Store extra metadata for callers as we mutate this store during
+      // compilation
+      fk->extra->kvksFilename = string_from_u16string(sp->dpString);
       // Strip path from the store, leaving bare filename only
       p = sp->dpString;
 
@@ -1037,47 +1179,55 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
       u16ncpy(q, pp2, u16len(pp2) + 1);
 
       // Change compiled reference file extension to .kvk
-      pp2 = ( km_kbp_cp *) u16chr(q, 0) - 5;
+      pp2 = ( km_core_cu *) u16chr(q, 0) - 5;
       if (pp2 > q && u16icmp(pp2, u".kvks") == 0) {
         pp2[4] = 0;
       }
 
       delete[] sp->dpString;
       sp->dpString = q;
-
-      if ((msg = CheckFilenameConsistency( (sp->dpString), FALSE)) != CERR_None) {
-        return msg;
-      }
     }
     break;
   case TSS_KMW_RTL:
   case TSS_KMW_HELPTEXT:
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly);
+    if(!VerifyKeyboardVersion(fk, VERSION_70)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_70FeatureOnly);
+      return FALSE;
+    }
     break;
 
   case TSS_KMW_HELPFILE:
   case TSS_KMW_EMBEDJS:
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly);
-    if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
-       return msg;
-     }
+    if(!VerifyKeyboardVersion(fk, VERSION_70)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_70FeatureOnly);
+      return FALSE;
+    }
     break;
 
   case TSS_KMW_EMBEDCSS:
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnlyEmbedCSS);
-    if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
-       return msg;
-     }
+    if(!VerifyKeyboardVersion(fk, VERSION_90)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_90FeatureOnlyEmbedCSS);
+      return FALSE;
+    }
     break;
 
   case TSS_TARGETS:   // I4504
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnlyTargets);
+    if(!VerifyKeyboardVersion(fk, VERSION_90)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_90FeatureOnlyTargets);
+      return FALSE;
+    }
+    if(!GetCompileTargetsFromTargetsStore(sp->dpString, fk->extra->targets)) {
+      return FALSE;
+    }
     break;
 
   case TSS_WINDOWSLANGUAGES:
   {
+    if(!VerifyKeyboardVersion(fk, VERSION_70)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_70FeatureOnly);
+      return FALSE;
+    }
     KMX_WCHAR *context = NULL;
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly);
     size_t szQ = u16len(sp->dpString) * 6 + 1;  // I3481
     q = new KMX_WCHAR[szQ]; // guaranteed to be enough space for recoding
     *q = 0; KMX_WCHAR *r = q;
@@ -1093,7 +1243,8 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
 
       if (i < 1 || j < 1 || i > 0x3FF || j > 0x3F) {
         delete[] q;
-        return CERR_InvalidLanguageLine;
+        ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidLanguageLine);
+        return FALSE;
       }
 
       u16sprintf(r, szQ - (size_t)(r - q), L"x%04.4x ", n);  // I3481
@@ -1108,31 +1259,42 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
     break;
   }
   case TSS_COMPARISON:
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_80, CERR_80FeatureOnly);
+    if(!VerifyKeyboardVersion(fk, VERSION_80)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_80FeatureOnly);
+      return FALSE;
+    }
     break;
 
   case TSS_VKDICTIONARY:  // I3438
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnlyVirtualKeyDictionary);
+    if(!VerifyKeyboardVersion(fk, VERSION_90)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_90FeatureOnlyVirtualKeyDictionary);
+      return FALSE;
+    }
     break;
 
   case TSS_LAYOUTFILE:  // I3483
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnlyLayoutFile);   // I4140
-    if ((msg = CheckFilenameConsistency(sp->dpString, FALSE)) != CERR_None) {
-          return msg;
+    if(!VerifyKeyboardVersion(fk, VERSION_90)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_90FeatureOnlyLayoutFile);
+      return FALSE;
     }
     // Used by KMW compiler
     break;
 
   case TSS_KEYBOARDVERSION:   // I4140
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnlyKeyboardVersion);
+    if(!VerifyKeyboardVersion(fk, VERSION_90)) {
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_90FeatureOnlyKeyboardVersion);
+      return FALSE;
+    }
     if (!IsValidKeyboardVersion(sp->dpString)) {
-      return CERR_KeyboardVersionFormatInvalid;
+      ReportCompilerMessage(KmnCompilerMessages::ERROR_KeyboardVersionFormatInvalid);
+      return FALSE;
     }
     break;
 
   case TSS_CASEDKEYS:
-    if ((msg = VerifyCasedKeys(sp)) != CERR_None) {
-      return msg;
+    if ((msg = VerifyCasedKeys(sp)) != STATUS_Success) {
+      ReportCompilerMessage(msg);
+      return FALSE;
     }
     break;
 
@@ -1144,14 +1306,86 @@ KMX_DWORD ProcessSystemStore(PFILE_KEYBOARD fk, KMX_DWORD SystemID, PFILE_STORE 
   case TSS_OLDLAYER:
     break;
 
+  case TSS_DISPLAYMAP:
+    // This store is allowed in older versions of Keyman, as it is a
+    // compile-time only feature. Implemented only in kmc-kmn, not in
+    // the legacy compilers.
+    fk->extra->displayMapFilename = string_from_u16string(sp->dpString);
+    break;
+
   default:
-    return CERR_InvalidSystemStore;
+    ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidSystemStore);
+    return FALSE;
   }
-  return CERR_None;
+  return TRUE;
+}
+
+KMX_BOOL GetCompileTargetsFromTargetsStore(const KMX_WCHAR* store, int &targets) {
+  // Compile to .kmx
+  const std::vector<std::u16string> KMXKeymanTargets{
+    u"windows", u"macosx", u"linux", u"desktop"
+  };
+
+  // Compile to .js
+  const std::vector<std::u16string> KMWKeymanTargets{
+    u"web", u"iphone", u"ipad", u"androidphone", u"androidtablet",
+    u"mobile", u"tablet"
+  };
+
+  const std::u16string AnyTarget = u"any";
+
+  targets = 0;
+  auto p = new KMX_WCHAR[u16len(store)+1];
+  u16cpy(p, store);
+  KMX_WCHAR* ctx;
+  auto token = u16tok(p, u" ", &ctx);
+  while(token) {
+    bool found = false;
+    if(*token) {
+      if(AnyTarget == token) {
+        targets |= COMPILETARGETS_KMX | COMPILETARGETS_JS;
+        found = true;
+      }
+      for(auto target: KMXKeymanTargets) {
+        if(target == token) {
+          targets |= COMPILETARGETS_KMX;
+          found = true;
+        }
+      }
+      for(auto target: KMWKeymanTargets) {
+        if(target == token) {
+          targets |= COMPILETARGETS_JS;
+          found = true;
+        }
+      }
+
+      if(!found) {
+        ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidTarget, {
+          /*target*/ string_from_u16string(token).c_str()
+        });
+        delete[] p;
+        targets = 0;
+        return FALSE;
+      }
+    }
+    token = u16tok(nullptr, u" ", &ctx);
+  }
+  delete[] p;
+
+  if(targets == 0) {
+    ReportCompilerMessage(KmnCompilerMessages::ERROR_NoTargetsSpecified);
+    return FALSE;
+  }
+
+  return TRUE;
 }
 
 KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString) {   // I4140
-  /* version format \d+(\.\d+)*  e.g. 9.0.3, 1.0, 1.2.3.4, 6.2.1.4.6.4, blank is not allowed */
+  /**
+    version format: /^\d+(\.\d+)*$/
+    e.g. 9.0.3, 1.0, 1.2.3.4, 6.2.1.4.6.4, 11.22.3 are all ok;
+    empty string is not permitted; whitespace is not permitted
+  */
 
   do {
     if (!iswdigit(*dpString)) {
@@ -1172,17 +1406,16 @@ KMX_BOOL IsValidKeyboardVersion(KMX_WCHAR *dpString) {   // I4140
 }
 
 
-KMX_DWORD kmcmp::AddCompilerVersionStore(PFILE_KEYBOARD fk)
-{
-  KMX_DWORD msg;
-
+KMX_BOOL kmcmp::AddCompilerVersionStore(PFILE_KEYBOARD fk) {
   if(!kmcmp::FShouldAddCompilerVersion) {
-    return CERR_None;
+    return TRUE;
   }
 
-  if ((msg = AddStore(fk, TSS_COMPILEDVERSION, KEYMAN_VersionWin_W16)) != CERR_None) return msg;
+  if (!AddStore(fk, TSS_COMPILEDVERSION, KEYMAN_VersionWin_W16)) {
+    return FALSE;
+  }
 
-  return CERR_None;
+  return TRUE;
 }
 
 /****************************
@@ -1202,62 +1435,73 @@ KMX_DWORD CheckStatementOffsets(PFILE_KEYBOARD fk, PFILE_GROUP gp, PKMX_WCHAR co
         if (*q == 0) {
           if (!gp->fUsingKeys)
             // no key in the rule, so offset is past end of context
-            return CERR_IndexDoesNotPointToAny;
+            return KmnCompilerMessages::ERROR_IndexDoesNotPointToAny;
           if (i < contextOffset) // I4914
             // offset is beyond the key
-            return CERR_IndexDoesNotPointToAny;
+            return KmnCompilerMessages::ERROR_IndexDoesNotPointToAny;
           q = key;
         }
 
         // find the any
         if (*q != UC_SENTINEL || *(q + 1) != CODE_ANY)
-          return CERR_IndexDoesNotPointToAny;
+          return KmnCompilerMessages::ERROR_IndexDoesNotPointToAny;
 
         int anyStore = *(q + 2) - 1;
 
-        if (xstrlen(fk->dpStoreArray[indexStore].dpString) < xstrlen(fk->dpStoreArray[anyStore].dpString)) {
-          AddWarning(CWARN_IndexStoreShort); //TODO: if this fails, then we return FALSE instead of an error
+        const int anyLength = xstrlen(fk->dpStoreArray[anyStore].dpString);
+        const int indexLength = xstrlen(fk->dpStoreArray[indexStore].dpString);
+
+        if (indexLength < anyLength) {
+          ReportCompilerMessage(KmnCompilerMessages::WARN_IndexStoreShort);
+        } else if(indexLength > anyLength) {
+          ReportCompilerMessage(KmnCompilerMessages::HINT_IndexStoreLong);
         }
       } else if (*(p + 1) == CODE_CONTEXTEX) {
         int contextOffset = *(p + 2);
         if (contextOffset > xstrlen(context))
-          return CERR_ContextExHasInvalidOffset;
+          return KmnCompilerMessages::ERROR_ContextExHasInvalidOffset;
 
         // Due to a limitation in earlier versions of KeymanWeb, the minimum version
         // for context() referring to notany() is 14.0. See #917 for details.
         if (kmcmp::CompileTarget == CKF_KEYMANWEB) {
           for (q = context, i = 1; *q && i < contextOffset; q = incxstr(q), i++);
           if (*q == UC_SENTINEL && *(q + 1) == CODE_NOTANY) {
-            VERIFY_KEYBOARD_VERSION(fk, VERSION_140, CERR_140FeatureOnlyContextAndNotAnyWeb);
+            if(!VerifyKeyboardVersion(fk, VERSION_140)) {
+              return KmnCompilerMessages::ERROR_140FeatureOnlyContextAndNotAnyWeb;
+            }
           }
         }
       }
     }
   }
-  return CERR_None;
+  return STATUS_Success;
 }
 
 /**
- *Checks that the order of statements in the context matches the specification
+ * Checks that the order of statements in the context matches the specification.
  *   Rule structure: [context] ['+' key] '>' output
  *   Context structure: [nul] [if()|baselayout()|platform()]+ [char|any|context()|deadkey()|dk()|index()|notany()|outs()]
- * Test that nul is first, then if(), baselayout(), platform() statements are before any other content
+ * Test that nul is first, then if(), baselayout(), platform() statements are before any other content.
+ * Also verifies that virtual keys are not found in the context.
  */
-KMX_BOOL CheckContextStatementPositions(PKMX_WCHAR context) {
+void CheckContextStatementPositions(PKMX_WCHAR context) {
   KMX_BOOL hadContextChar = FALSE;
   for (PKMX_WCHAR p = context; *p; p = incxstr(p)) {
     if (*p == UC_SENTINEL) {
       switch (*(p + 1)) {
       case CODE_NUL:
         if (p > context) {
-          AddWarningBool(CWARN_NulNotFirstStatementInContext);
+          ReportCompilerMessage(KmnCompilerMessages::WARN_NulNotFirstStatementInContext);
         }
         break;
       case CODE_IFOPT:
       case CODE_IFSYSTEMSTORE:
         if (hadContextChar) {
-          AddWarningBool(CWARN_IfShouldBeAtStartOfContext);
+          ReportCompilerMessage(KmnCompilerMessages::WARN_IfShouldBeAtStartOfContext);
         }
+        break;
+      case CODE_EXTENDED:
+        ReportCompilerMessage(KmnCompilerMessages::ERROR_VirtualKeyInContext);
         break;
       default:
         hadContextChar = TRUE;
@@ -1267,9 +1511,8 @@ KMX_BOOL CheckContextStatementPositions(PKMX_WCHAR context) {
       hadContextChar = TRUE;
     }
   }
-
-  return TRUE;
 }
+
 /**
  *  Checks if a use() statement is followed by other content in the output of a rule
  */
@@ -1280,11 +1523,27 @@ KMX_DWORD CheckUseStatementsInOutput(PKMX_WCHAR output) {
     if (*p == UC_SENTINEL && *(p + 1) == CODE_USE) {
       hasUse = TRUE;
     } else if (hasUse) {
-      AddWarning(CWARN_UseNotLastStatementInRule);
+      ReportCompilerMessage(KmnCompilerMessages::WARN_UseNotLastStatementInRule);
       break;
     }
   }
-  return CERR_None;
+  return STATUS_Success;
+}
+
+/**
+ * Warn if output has virtual keys in it, which is not supported by Core at all,
+ * but was unofficially supported, but never worked properly, in Keyman for
+ * Windows for many years
+ */
+KMX_DWORD CheckVirtualKeysInOutput(PKMX_WCHAR output) {
+  PKMX_WCHAR p;
+  for (p = output; *p; p = incxstr(p)) {
+    if (*p == UC_SENTINEL && *(p + 1) == CODE_EXTENDED) {
+      ReportCompilerMessage(KmnCompilerMessages::WARN_VirtualKeyInOutput);
+      break;
+    }
+  }
+  return STATUS_Success;
 }
 
 /**
@@ -1293,13 +1552,13 @@ KMX_DWORD CheckUseStatementsInOutput(PKMX_WCHAR output) {
 KMX_DWORD InjectContextToReadonlyOutput(PKMX_WCHAR pklOut) {
   if (pklOut[0] != UC_SENTINEL || pklOut[1] != CODE_CONTEXT) {
     if (u16len(pklOut) > GLOBAL_BUFSIZE - 3) {
-      return CERR_CannotAllocateMemory;
+      return KmnCompilerMessages::FATAL_CannotAllocateMemory;
     }
     memmove(pklOut + 2, pklOut, (u16len(pklOut) + 1) * 2);
     pklOut[0] = UC_SENTINEL;
     pklOut[1] = CODE_CONTEXT;
   }
-  return CERR_None;
+  return STATUS_Success;
 }
 
 /**
@@ -1310,7 +1569,7 @@ KMX_DWORD CheckOutputIsReadonly(const PFILE_KEYBOARD fk, const PKMX_WCHAR output
   PKMX_WCHAR p;
   for (p = output; *p; p = incxstr(p)) {
     if (*p != UC_SENTINEL) {
-      return CERR_OutputInReadonlyGroup;
+      return KmnCompilerMessages::ERROR_OutputInReadonlyGroup;
     }
     switch (*(p + 1)) {
     case CODE_CALL:
@@ -1323,7 +1582,7 @@ KMX_DWORD CheckOutputIsReadonly(const PFILE_KEYBOARD fk, const PKMX_WCHAR output
       {
         PFILE_GROUP targetGroup = &fk->dpGroupArray[*(p + 2) - 1];
         if (!targetGroup->fReadOnly) {
-          return CERR_CannotUseReadWriteGroupFromReadonlyGroup;
+          return KmnCompilerMessages::ERROR_CannotUseReadWriteGroupFromReadonlyGroup;
         }
       }
       continue;
@@ -1342,15 +1601,15 @@ KMX_DWORD CheckOutputIsReadonly(const PFILE_KEYBOARD fk, const PKMX_WCHAR output
       if (p == output) {
         continue;
       }
-      return CERR_OutputInReadonlyGroup;
+      return KmnCompilerMessages::ERROR_OutputInReadonlyGroup;
     default:
       // Note: conceptually, CODE_NUL could be transformed to CODE_CONTEXT
       // if the context was also empty, but it is probably safest to avoid this,
       // given CODE_CONTEXT does what we need anyway
-      return CERR_StatementNotPermittedInReadonlyGroup;
+      return KmnCompilerMessages::ERROR_StatementNotPermittedInReadonlyGroup;
     }
   }
-  return CERR_None;
+  return STATUS_Success;
 }
 
 KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnicode, PKMX_WCHAR pklIn, PKMX_WCHAR pklKey, PKMX_WCHAR pklOut);
@@ -1363,7 +1622,7 @@ KMX_DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnicode)
   pklKey = new KMX_WCHAR[GLOBAL_BUFSIZE];
   pklOut = new KMX_WCHAR[GLOBAL_BUFSIZE];
   if (!pklIn || !pklKey || !pklOut)
-    return CERR_CannotAllocateMemory; // forget about the little leak if pklKey or pklOut fail...
+    return KmnCompilerMessages::FATAL_CannotAllocateMemory; // forget about the little leak if pklKey or pklOut fail...
 
   KMX_DWORD result = ProcessKeyLineImpl(fk, str, IsUnicode, pklIn, pklKey, pklOut);
 
@@ -1385,55 +1644,64 @@ KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnico
   pp = str;
 
   if (gp->fUsingKeys) {
-    if ((msg = GetXString(fk, str, u"+", pklIn, GLOBAL_BUFSIZE - 1, (int)(str - pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
+    if ((msg = GetXString(fk, str, u"+", pklIn, GLOBAL_BUFSIZE - 1, (int)(str - pp), &p, TRUE, IsUnicode)) != STATUS_Success) return msg;
 
     str = p + 1;
-    if ((msg = GetXString(fk, str, u">", pklKey, GLOBAL_BUFSIZE - 1, (int)(str - pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
-    if (pklKey[0] == 0) return CERR_ZeroLengthString;
-    if (xstrlen(pklKey) > 1) AddWarning(CWARN_KeyBadLength);
+    if ((msg = GetXString(fk, str, u">", pklKey, GLOBAL_BUFSIZE - 1, (int)(str - pp), &p, TRUE, IsUnicode)) != STATUS_Success) return msg;
+
+    if (pklKey[0] == 0) return KmnCompilerMessages::ERROR_ZeroLengthString;
+
+    if(Uni_IsSurrogate1(pklKey[0])) {
+      // #11643: non-BMP characters do not makes sense for key codes
+      return KmnCompilerMessages::ERROR_NonBMPCharactersNotSupportedInKeySection;
+    }
+
+    if (xstrlen(pklKey) > 1) {
+      ReportCompilerMessage(KmnCompilerMessages::WARN_KeyBadLength);
+    }
   } else {
-    if ((msg = GetXString(fk, str, u">", pklIn, GLOBAL_BUFSIZE - 1, (int)(str - pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
-    if (pklIn[0] == 0) return CERR_ZeroLengthString;
+    if ((msg = GetXString(fk, str, u">", pklIn, GLOBAL_BUFSIZE - 1, (int)(str - pp), &p, TRUE, IsUnicode)) != STATUS_Success) return msg;
+    if (pklIn[0] == 0) return KmnCompilerMessages::ERROR_ZeroLengthString;
   }
 
   str = p + 1;
-  if ((msg = GetXString(fk, str, u"c\n", pklOut, GLOBAL_BUFSIZE - 1, (int)(str - pp), &p, TRUE, IsUnicode)) != CERR_None) return msg;
+  if ((msg = GetXString(fk, str, u"c\n", pklOut, GLOBAL_BUFSIZE - 1, (int)(str - pp), &p, TRUE, IsUnicode)) != STATUS_Success) return msg;
 
-  if (pklOut[0] == 0) return CERR_ZeroLengthString;
+  if (pklOut[0] == 0) return KmnCompilerMessages::ERROR_ZeroLengthString;
 
   CheckContextStatementPositions(pklIn);
 
   // Test index and context offsets in context
-  if ((msg = CheckStatementOffsets(fk, gp, pklIn, pklOut, pklKey)) != CERR_None) return msg;
+  if ((msg = CheckStatementOffsets(fk, gp, pklIn, pklOut, pklKey)) != STATUS_Success) return msg;
 
   // Test that use() statements are not followed by other content
-  if ((msg = CheckUseStatementsInOutput(pklOut)) != CERR_None) {
+  if ((msg = CheckUseStatementsInOutput(pklOut)) != STATUS_Success) {
     return msg;   // I4867
+  }
+
+  // Warn if virtual keys are used in the output, as they are unsupported by Core
+  if ((msg = CheckVirtualKeysInOutput(pklOut)) != STATUS_Success) {
+    return msg;
   }
 
   if (gp->fReadOnly) {
     // Ensure no output is made from the rule, and that
     // use() statements meet required readonly semantics
-    if ((msg = CheckOutputIsReadonly(fk, pklOut)) != CERR_None) {
+    if ((msg = CheckOutputIsReadonly(fk, pklOut)) != STATUS_Success) {
       return msg;
     }
 
     // Inject `context` to start of output if group is readonly
     // to keep the output internally consistent
-    if ((msg = InjectContextToReadonlyOutput(pklOut)) != CERR_None) {
+    if ((msg = InjectContextToReadonlyOutput(pklOut)) != STATUS_Success) {
       return msg;
     }
   }
 
-  kp = new FILE_KEY[gp->cxKeyArray + 1];
-  if (!kp) return CERR_CannotAllocateMemory;
-  if (gp->dpKeyArray)
-  {
-    memcpy(kp, gp->dpKeyArray, gp->cxKeyArray * sizeof(FILE_KEY));
-    delete gp->dpKeyArray;
+  if(!resizeKeyArray(gp)) {
+    return KmnCompilerMessages::FATAL_CannotAllocateMemory;
   }
 
-  gp->dpKeyArray = kp;
   kp = &gp->dpKeyArray[gp->cxKeyArray];
 
   gp->cxKeyArray++;
@@ -1453,19 +1721,19 @@ KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnico
   {
     kp->Key = 0;
     kp->ShiftFlags = 0;
-    return CERR_None;
+    return STATUS_Success;
   }
 
   // Expand each rule out into multiple rules - much faster processing at the key hit time
 
-  if (*pklKey == 0) return CERR_ZeroLengthString;
+  if (*pklKey == 0) return KmnCompilerMessages::ERROR_ZeroLengthString;
 
   if (*pklKey == UC_SENTINEL)
     switch (*(pklKey + 1))
     {
     case CODE_ANY:
       kp->ShiftFlags = 0;
-      if ((msg = ExpandKp(fk, kp, *(pklKey + 2) - 1)) != CERR_None) return msg;
+      if ((msg = ExpandKp(fk, kp, *(pklKey + 2) - 1)) != STATUS_Success) return msg;
       break;
 
     case CODE_EXTENDED:
@@ -1474,7 +1742,7 @@ KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnico
       break;
 
     default:
-      return CERR_InvalidCodeInKeyPartOfRule;
+      return KmnCompilerMessages::ERROR_InvalidCodeInKeyPartOfRule;
     }
   else
   {
@@ -1482,7 +1750,7 @@ KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnico
     kp->Key = *pklKey;
   }
 
-  return CERR_None;
+  return STATUS_Success;
 }
 
 
@@ -1517,7 +1785,7 @@ KMX_DWORD ExpandKp_ReplaceIndex(PFILE_KEYBOARD fk, PFILE_KEY k, KMX_DWORD keyInd
     }
   }
 
-  return CERR_None;
+  return STATUS_Success;
 }
 
 
@@ -1543,14 +1811,13 @@ KMX_DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, KMX_DWORD storeIndex)
    and set the keystroke to the appropriate character in the store.
   */
 
-  k = new FILE_KEY[gp->cxKeyArray + nchrs - 1];
-  if (!k) return CERR_CannotAllocateMemory;
-  memcpy(k, gp->dpKeyArray, gp->cxKeyArray * sizeof(FILE_KEY));
+  int offset = (int)(kpp - gp->dpKeyArray);
 
-  kpp = &k[(int)(kpp - gp->dpKeyArray)];
+  if (!resizeKeyArray(gp, nchrs)) {
+    return KmnCompilerMessages::FATAL_CannotAllocateMemory;
+  }
 
-  delete gp->dpKeyArray;
-  gp->dpKeyArray = k;
+  kpp = &gp->dpKeyArray[offset];
   gp->cxKeyArray += nchrs - 1;
 
   for (k = kpp, n = 0, pn = sp->dpString; *pn; pn = incxstr(pn), k++, n++)
@@ -1570,11 +1837,12 @@ KMX_DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, KMX_DWORD storeIndex)
         k->ShiftFlags = *(pn + 2);
         break;
       default:
-        return CERR_CodeInvalidInKeyStore;
+        return KmnCompilerMessages::ERROR_CodeInvalidInKeyStore;
       }
-    }
-    else
-    {
+    } else if(Uni_IsSurrogate1(*pn)) {
+      // #11643: non-BMP characters do not makes sense for key codes
+      return KmnCompilerMessages::ERROR_NonBMPCharactersNotSupportedInKeySection;
+    } else {
       k->Key = *pn;				// set the key to store offset.
       k->ShiftFlags = 0;
     }
@@ -1583,13 +1851,33 @@ KMX_DWORD ExpandKp(PFILE_KEYBOARD fk, PFILE_KEY kpp, KMX_DWORD storeIndex)
     ExpandKp_ReplaceIndex(fk, k, keyIndex, n);
   }
 
-  delete dpContext;
-  delete dpOutput;
+  delete[] dpContext;
+  delete[] dpOutput;
 
-  return CERR_None;
+  return STATUS_Success;
 }
 
-
+/**
+ * When called with a pointer to a wide-character C-string string, the open and close delimiters, and
+ * optional flags, returns a pointer to the section of the KMX_WCHAR string identified by the delimiters.
+ * The supplied string will be terminated by a null where the close delimiter was.  The pointer to the supplied
+ * string is adjusted to point either to the null where the close delimiter was, or if there are trailing
+ * whitespaces after the close delimiter, to the last of these.  Whitespaces before the open delimiter
+ * are always skipped.  If the flag contains GDS_CUTLEAD, whitespaces after the open delimiter are skipped;
+ * if the flag contains GDS_CUTFOLL, whitespace immediately before the close delimiter is skipped by setting
+ * the first such character to null.
+ *
+ * @param p a pointer to a wide-character C-string
+ *
+ * @param Delimiters a pointer to a two-character wide-character C-string containing the open and close
+ * delimiters
+ *
+ * @param Flags include GDS_CUTLEAD and/or GDS_CUTFOLL to cut leading and/or following whitespace from
+ * the delimited string
+ *
+ * @return a pointer to the section of the wide-character C-string identified by the delimiters, or NULL if
+ * the delimiters cannot be found
+*/
 PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_WORD Flags)
 {
   PKMX_WCHAR q, r;
@@ -1604,22 +1892,27 @@ PKMX_WCHAR GetDelimitedString(PKMX_WCHAR *p, KMX_WCHAR const * Delimiters, KMX_W
 
   q++;
 
-  r = xstrchr(q, &dClose);			        // Find closing delimiter
+  r = (PKMX_WCHAR) u16chr(q, dClose);			        // Find closing delimiter
   if (!r) return NULL;
 
   if (Flags & GDS_CUTLEAD)
     while (iswspace(*q)) q++;	        // cut off leading spaces
 
   if (Flags & GDS_CUTFOLL)
-    if (!iswspace(*(r - 1))) *r = 0;
+    if (!iswspace(*(r - 1))) *r = 0; // delete close delimiter
     else
     {
       r--;							// Cut off following spaces
       while (iswspace(*r) && r > q) r--;
-      r++;
-      *r = 0; r = xstrchr((r + 1), &dClose);
+      if (!iswspace(*r)) r++;
+
+      *r = 0; // delete first following space
+
+      r = (PKMX_WCHAR) u16chr((r + 1), dClose);
+
+      *r = 0; // delete close delimiter
     }
-  else *r = 0;
+  else *r = 0; // delete close delimiter
 
   r++; while (iswspace(*r)) r++;	        // Ignore spaces after the close
   if (*r == 0) r--;					    // Safety for terminating strings.
@@ -1750,6 +2043,12 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
   p = str;
   do
   {
+    if (mx >= max) {
+      // This is an error condition, we want the compiler
+      // to crash if we reach this
+      return KmnCompilerMessages::FATAL_BufferOverflow;
+    }
+
     tokenFound = FALSE;
     while (iswspace(*p) && !u16chr(token, *p)) p++;
     if (!*p) break;
@@ -1796,29 +2095,27 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     {
     case 99:
       if (tokenFound) break;
-      {
-        snprintf(ErrExtraLIB, ERR_EXTRA_LIB_LEN, "token: %c",(int)*p);
-      }
-      return CERR_InvalidToken;
+      // TODO: report an error about the missing token details --> "token: %c",(int)*p);
+      return KmnCompilerMessages::ERROR_InvalidToken;
     case 0:
       if (u16nicmp(p, u"deadkey", z = 7) == 0 ||
         u16nicmp(p, u"dk", z = 2) == 0)
       {
         p += z;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-        if (!q || !*q) return CERR_InvalidDeadkey;
+        if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidDeadkey;
 
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_DEADKEY;
-        if (!StrValidChrs(q, DeadKeyChars)) return CERR_InvalidDeadkey;
+        if (!StrValidChrs(q, DeadKeyChars)) return KmnCompilerMessages::ERROR_InvalidDeadkey;
         tstr[mx++] = GetDeadKey(fk, q); //atoiW(q); 7-5-01: named deadkeys
         tstr[mx] = 0;
       }
       else
       {
         n = xatoi(&p);
-        if (*p != '\0' && !iswspace(*p)) return CERR_InvalidValue;
-        if ((err = kmcmp::UTF32ToUTF16(n, &n1, &n2)) != CERR_None) return err;
+        if (*p != '\0' && !iswspace(*p)) return KmnCompilerMessages::ERROR_InvalidValue;
+        if ((err = kmcmp::UTF32ToUTF16(n, &n1, &n2)) != STATUS_Success) return err;
         tstr[mx++] = n1;
         if (n2 >= 0) tstr[mx++] = n2;
         tstr[mx] = 0;
@@ -1827,9 +2124,9 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
 
     case 1:
       q = (PKMX_WCHAR) u16chr(p + 1, '\"');
-      if (!q) return CERR_UnterminatedString;
-      if ((int)(q - p) - 1 + mx > max) return CERR_UnterminatedString;
-      if (sFlag) return CERR_StringInVirtualKeySection;
+      if (!q) return KmnCompilerMessages::ERROR_UnterminatedString;
+      if ((int)(q - p) - 1 + mx > max) return KmnCompilerMessages::ERROR_ExtendedStringTooLong;
+      if (sFlag) return KmnCompilerMessages::ERROR_StringInVirtualKeySection;
       u16ncat(tstr,  p + 1, (int)(q - p) - 1);  // I3481
       mx += (int)(q - p) - 1;
       tstr[mx] = 0;
@@ -1837,28 +2134,28 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       continue;
     case 2:
       q = (PKMX_WCHAR) u16chr(p + 1, '\'');
-      if (!q) return CERR_UnterminatedString;
-      if ((int)(q - p) - 1 + mx > max) return CERR_UnterminatedString;
-      if (sFlag) return CERR_StringInVirtualKeySection;
+      if (!q) return KmnCompilerMessages::ERROR_UnterminatedString;
+      if ((int)(q - p) - 1 + mx > max) return KmnCompilerMessages::ERROR_ExtendedStringTooLong;
+      if (sFlag) return KmnCompilerMessages::ERROR_StringInVirtualKeySection;
       u16ncat(tstr,  p + 1, (int)(q - p) - 1);  // I3481
       mx += (int)(q - p) - 1;
       tstr[mx] = 0;
       p = q + 1;
       continue;
     case 3:
-      if (u16nicmp(p, u"any", 3) != 0) return CERR_InvalidToken;
-      if (sFlag) return CERR_AnyInVirtualKeySection;
+      if (u16nicmp(p, u"any", 3) != 0) return KmnCompilerMessages::ERROR_InvalidToken;
+      if (sFlag) return KmnCompilerMessages::ERROR_AnyInVirtualKeySection;
       p += 3;
       q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-      if (!q || !*q) return CERR_InvalidAny;
+      if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidAny;
 
       for (i = 0; i < fk->cxStoreArray; i++)
       {
         if (u16icmp(q, fk->dpStoreArray[i].szName) == 0) break;
       }
-      if (i == fk->cxStoreArray) return CERR_StoreDoesNotExist;
+      if (i == fk->cxStoreArray) return KmnCompilerMessages::ERROR_StoreDoesNotExist;
 
-      if (!*fk->dpStoreArray[i].dpString) return CERR_ZeroLengthString;
+      if (!*fk->dpStoreArray[i].dpString) return KmnCompilerMessages::ERROR_ZeroLengthString;
       kmcmp::CheckStoreUsage(fk, i, TRUE, FALSE, FALSE);
 
       tstr[mx++] = UC_SENTINEL;
@@ -1869,7 +2166,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     case 4:
       if (u16nicmp(p, u"beep", 4) == 0)
       {
-        if (sFlag) return CERR_BeepInVirtualKeySection;
+        if (sFlag) return KmnCompilerMessages::ERROR_BeepInVirtualKeySection;
         p += 4;
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_BEEP;
@@ -1877,56 +2174,60 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       }
       else if (u16nicmp(p, u"baselayout", 10) == 0)  // I3430
       {
-        VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnly_IfSystemStores);
-        if (sFlag) return CERR_InvalidInVirtualKeySection;
+        if(!VerifyKeyboardVersion(fk, VERSION_90)) {
+          return KmnCompilerMessages::ERROR_90FeatureOnly_IfSystemStores;
+        }
+        if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
         p += 10;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-        if (!q || !*q) return CERR_InvalidToken;
+        if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidToken;
         err = process_baselayout(fk, q, tstr, &mx);
-        if (err != CERR_None) return err;
+        if (err != STATUS_Success) return err;
       }
       else
-        return CERR_InvalidToken;
+        return KmnCompilerMessages::ERROR_InvalidToken;
 
       continue;
     case 5:
       if (u16nicmp(p, u"if", 2) == 0)
       {
-        VERIFY_KEYBOARD_VERSION(fk, VERSION_80, CERR_80FeatureOnly);
-        if (sFlag) return CERR_InvalidInVirtualKeySection;
+        if(!VerifyKeyboardVersion(fk, VERSION_80)) {
+          return KmnCompilerMessages::ERROR_80FeatureOnly;
+        }
+        if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
         p += 2;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-        if (!q || !*q) return CERR_InvalidIf;
+        if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidIf;
 
         err = process_if(fk, q, tstr, &mx);
-        if (err != CERR_None) return err;
+        if (err != STATUS_Success) return err;
       }
       else
       {
-        if (u16nicmp(p, u"index", 5) != 0) return CERR_InvalidToken;
-        if (sFlag) return CERR_IndexInVirtualKeySection;
+        if (u16nicmp(p, u"index", 5) != 0) return KmnCompilerMessages::ERROR_InvalidToken;
+        if (sFlag) return KmnCompilerMessages::ERROR_IndexInVirtualKeySection;
         p += 5;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
 
-        if (!q || !*q) return CERR_InvalidIndex;
+        if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidIndex;
 
         {
           KMX_WCHAR *context = NULL;
           KMX_WCHAR sep_com[3] = u" ,";
           PKMX_WCHAR p_sep_com = sep_com;
           r = u16tok(q, p_sep_com, &context);  // I3481
-          if (!r) return CERR_InvalidIndex;
+          if (!r) return KmnCompilerMessages::ERROR_InvalidIndex;
 
           for (i = 0; i < fk->cxStoreArray; i++)
           {
             if (u16icmp(r, fk->dpStoreArray[i].szName) == 0) break;
           }
-          if (i == fk->cxStoreArray) return CERR_StoreDoesNotExist;
+          if (i == fk->cxStoreArray) return KmnCompilerMessages::ERROR_StoreDoesNotExist;
 
           kmcmp::CheckStoreUsage(fk, i, TRUE, FALSE, FALSE);
 
           r = u16tok(NULL, p_sep_com, &context);  // I3481
-          if (!r) return CERR_InvalidIndex;
+          if (!r || !*r || !isIntegerWstring(r) || atoiW(r) < 1) return KmnCompilerMessages::ERROR_InvalidIndex;
         }
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_INDEX;
@@ -1937,24 +2238,26 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       }
       continue;
     case 6:
-      if (u16nicmp(p, u"outs", 4) != 0) return CERR_InvalidToken;
-      if (sFlag) return CERR_OutsInVirtualKeySection;
+      if (u16nicmp(p, u"outs", 4) != 0) return KmnCompilerMessages::ERROR_InvalidToken;
+      if (sFlag) return KmnCompilerMessages::ERROR_OutsInVirtualKeySection;
       p += 4;
       q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-      if (!q || !*q) return CERR_InvalidOuts;
+      if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidOuts;
 
       for (i = 0; i < fk->cxStoreArray; i++)
       {
         if (u16icmp(q, fk->dpStoreArray[i].szName) == 0) break;
       }
-      if (i == fk->cxStoreArray) return CERR_StoreDoesNotExist;
+      if (i == fk->cxStoreArray) return KmnCompilerMessages::ERROR_StoreDoesNotExist;
 
       kmcmp::CheckStoreUsage(fk, i, TRUE, FALSE, FALSE);
 
       for (q = fk->dpStoreArray[i].dpString; *q; q++)
       {
         tstr[mx++] = *q;
-        if (mx >= max - 1) return CERR_BufferOverflow;
+        if (mx >= max - 1) {
+          return KmnCompilerMessages::ERROR_OutsTooLong;
+        }
       }
       tstr[mx] = 0;
       continue;
@@ -1962,16 +2265,18 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       if (iswspace(*(p + 1))) break;		// is a comment -- pre-stripped - so why this test?
       if (u16nicmp(p, u"context", 7) == 0)
       {
-        if (sFlag) return CERR_ContextInVirtualKeySection;
+        if (sFlag) return KmnCompilerMessages::ERROR_ContextInVirtualKeySection;
         p += 7;
 
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
         if (q && *q)
         {
-          VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_Contextn);
+          if(!VerifyKeyboardVersion(fk, VERSION_60)) {
+            return KmnCompilerMessages::ERROR_60FeatureOnly_Contextn;
+          }
           int n1b;
           n1b = atoiW(q);
-          if (n1b < 1 || n1b >= 0xF000) return CERR_InvalidToken;
+          if (n1b < 1 || n1b >= 0xF000) return KmnCompilerMessages::ERROR_InvalidToken;
           tstr[mx++] = UC_SENTINEL;
           tstr[mx++] = CODE_CONTEXTEX;
           tstr[mx++] = n1b;
@@ -1993,21 +2298,23 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       }
       else if (u16nicmp(p, u"call", 4) == 0)
       {
-        VERIFY_KEYBOARD_VERSION(fk, VERSION_501, CERR_501FeatureOnly_Call);
-        if (sFlag) return CERR_CallInVirtualKeySection;
+        if(!VerifyKeyboardVersion(fk, VERSION_501)) {
+          return KmnCompilerMessages::ERROR_501FeatureOnly_Call;
+        }
+        if (sFlag) return KmnCompilerMessages::ERROR_CallInVirtualKeySection;
         p += 4;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-        if (!q || !*q) return CERR_InvalidCall;
+        if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidCall;
 
         for (i = 0; i < fk->cxStoreArray; i++)
         {
           if (u16icmp(q, fk->dpStoreArray[i].szName) == 0) break;
         }
 
-        if (!kmcmp::IsValidCallStore(&fk->dpStoreArray[i])) return CERR_InvalidCall;
+        if (!kmcmp::IsValidCallStore(&fk->dpStoreArray[i])) return KmnCompilerMessages::ERROR_InvalidCall;
         kmcmp::CheckStoreUsage(fk, i, FALSE, FALSE, TRUE);
 
-        if (i == fk->cxStoreArray) return CERR_StoreDoesNotExist;
+        if (i == fk->cxStoreArray) return KmnCompilerMessages::ERROR_StoreDoesNotExist;
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_CALL;
         tstr[mx++] = (KMX_WCHAR)i + 1;
@@ -2016,22 +2323,24 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         fk->dpStoreArray[i].dwSystemID = TSS_CALLDEFINITION;
       }
       else
-        return CERR_InvalidToken;
+        return KmnCompilerMessages::ERROR_InvalidToken;
       continue;
     case 8:
       if (u16nicmp(p, u"notany", 6) == 0)
       {
-        VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly)
-          if (sFlag) return CERR_AnyInVirtualKeySection;
+        if(!VerifyKeyboardVersion(fk, VERSION_70)) {
+          return KmnCompilerMessages::ERROR_70FeatureOnly;
+        }
+        if (sFlag) return KmnCompilerMessages::ERROR_AnyInVirtualKeySection;
         p += 6;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-        if (!q || !*q) return CERR_InvalidAny;
+        if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidAny;
 
         for (i = 0; i < fk->cxStoreArray; i++)
         {
           if (u16icmp(q, fk->dpStoreArray[i].szName) == 0) break;
         }
-        if (i == fk->cxStoreArray) return CERR_StoreDoesNotExist;
+        if (i == fk->cxStoreArray) return KmnCompilerMessages::ERROR_StoreDoesNotExist;
         kmcmp::CheckStoreUsage(fk, i, TRUE, FALSE, FALSE);
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_NOTANY;
@@ -2039,7 +2348,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         tstr[mx] = 0;
         continue;
       }
-      if (u16nicmp(p, u"nul", 3) != 0) return CERR_InvalidToken;
+      if (u16nicmp(p, u"nul", 3) != 0) return KmnCompilerMessages::ERROR_InvalidToken;
 
       p += 3;
       tstr[mx++] = UC_SENTINEL;
@@ -2052,41 +2361,45 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         if (*(p + 1) == '+')
         {
           n = xatoi(&p);
-          if (*p != '\0' && !iswspace(*p)) return CERR_InvalidValue;
-          if ((err = kmcmp::UTF32ToUTF16(n, &n1, &n2)) != CERR_None) return err;
+          if (*p != '\0' && !iswspace(*p)) return KmnCompilerMessages::ERROR_InvalidValue;
+          if ((err = kmcmp::UTF32ToUTF16(n, &n1, &n2)) != STATUS_Success) return err;
           tstr[mx++] = n1;
           if (n2 >= 0) tstr[mx++] = n2;
           tstr[mx] = 0;
-          if (!isUnicode) AddWarning(CWARN_UnicodeInANSIGroup);
+          if (!isUnicode) {
+            ReportCompilerMessage(KmnCompilerMessages::WARN_UnicodeInANSIGroup);
+          }
           continue;
         }
-        return CERR_InvalidToken;
+        return KmnCompilerMessages::ERROR_InvalidToken;
       }
       p += 3;
 
       q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-      if (!q || !*q) return CERR_InvalidUse;
+      if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidUse;
       tstr[mx++] = UC_SENTINEL;
       tstr[mx++] = CODE_USE;
       tstr[mx] = GetGroupNum(fk, q);
-      if (tstr[mx] == 0) return CERR_GroupDoesNotExist;
+      if (tstr[mx] == 0) return KmnCompilerMessages::ERROR_GroupDoesNotExist;
       tstr[++mx] = 0;
       continue;
     case 10:
       if (u16nicmp(p, u"reset", 5) == 0)
       {
-        VERIFY_KEYBOARD_VERSION(fk, VERSION_80, CERR_80FeatureOnly);
-        if (sFlag) return CERR_InvalidInVirtualKeySection;
+        if(!VerifyKeyboardVersion(fk, VERSION_80)) {
+          return KmnCompilerMessages::ERROR_80FeatureOnly;
+        }
+        if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
         p += 5;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-        if (!q || !*q) return CERR_InvalidReset;
+        if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidReset;
 
         err = process_reset(fk, q, tstr, &mx);
-        if (err != CERR_None) return err;
+        if (err != STATUS_Success) return err;
       }
       else
       {
-        if (u16nicmp(p, u"return", 6) != 0) return CERR_InvalidToken;
+        if (u16nicmp(p, u"return", 6) != 0) return KmnCompilerMessages::ERROR_InvalidToken;
 
         p += 6;
         tstr[mx++] = UC_SENTINEL;
@@ -2151,17 +2464,23 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       } while (!finished);
 
       if ((sFlag & (LCTRLFLAG | LALTFLAG)) && (sFlag & (RCTRLFLAG | RALTFLAG))) {
-        AddWarning(CWARN_MixingLeftAndRightModifiers);
+        ReportCompilerMessage(KmnCompilerMessages::WARN_MixingLeftAndRightModifiers);
       }
 
-      // If we use chiral modifiers, or we use state keys, and we target web in the keyboard, and we don't manually specify a keyboard version, bump the minimum
-      // version to 10.0. This makes an assumption that if we are using these features in a keyboard and it has no version specified, that we want to use the features
-      // in the web target platform, even if there are platform() rules excluding this possibility. In that (rare) situation, the keyboard developer should simply specify
-      // the &version to be 9.0 or whatever to avoid this behaviour.
+      // If we use chiral modifiers, or we use state keys, and we target web in
+      // the keyboard, and we don't manually specify a keyboard version, bump
+      // the minimum version to 10.0. This makes an assumption that if we are
+      // using these features in a keyboard and it has no version specified,
+      // that we want to use the features in the web target platform, even if
+      // there are platform() rules excluding this possibility. In that (rare)
+      // situation, the keyboard developer should simply specify the &version to
+      // be 9.0 or whatever to avoid this behaviour.
       if (sFlag & (LCTRLFLAG | LALTFLAG | RCTRLFLAG | RALTFLAG | CAPITALFLAG | NOTCAPITALFLAG | NUMLOCKFLAG | NOTNUMLOCKFLAG | SCROLLFLAG | NOTSCROLLFLAG) &&
         kmcmp::CompileTarget == CKF_KEYMANWEB &&
         fk->dwFlags & KF_AUTOMATICVERSION) {
-        VERIFY_KEYBOARD_VERSION(fk, VERSION_100, 0);
+        if(!VerifyKeyboardVersion(fk, VERSION_100)) {
+          return STATUS_Success;
+        }
       }
       //printf("sFlag: %x\n", sFlag);
 
@@ -2175,33 +2494,37 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
 
       if (*q == ']')
       {
-        return CERR_InvalidToken; // I3137 - key portion of VK is missing e.g. "[CTRL ALT]", this generates invalid kmx file that can crash Keyman or compiler later on   // I3511
+        return KmnCompilerMessages::ERROR_InvalidToken; // I3137 - key portion of VK is missing e.g. "[CTRL ALT]", this generates invalid kmx file that can crash Keyman or compiler later on   // I3511
       }
 
       while (*q != ']')
       {
         if (*q == '\'' || *q == '"')
         {
-          VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_VirtualCharKey);
-          if (!kmcmp::FMnemonicLayout) AddWarning(CWARN_VirtualCharKeyWithPositionalLayout);
+          if(!VerifyKeyboardVersion(fk, VERSION_60)) {
+            return KmnCompilerMessages::ERROR_60FeatureOnly_VirtualCharKey;
+          }
+          if (!kmcmp::FMnemonicLayout) {
+            ReportCompilerMessage(KmnCompilerMessages::WARN_VirtualCharKeyWithPositionalLayout);
+          }
           KMX_WCHAR chQuote = *q;
-          q++; if (*q == chQuote || *q == '\n' || *q == 0) return CERR_InvalidToken;
+          q++; if (*q == chQuote || *q == '\n' || *q == 0) return KmnCompilerMessages::ERROR_InvalidToken;
           tstr[mx - 1] |= VIRTUALCHARKEY;
           tstr[mx++] = *q;
-          q++; if (*q != chQuote) return CERR_InvalidToken;
+          q++; if (*q != chQuote) return KmnCompilerMessages::ERROR_InvalidToken;
           q++;
           while (iswspace(*q)) q++;
-          if (*q != ']') return CERR_InvalidToken;
+          if (*q != ']') return KmnCompilerMessages::ERROR_InvalidToken;
           break; /* out of while loop */
         }
 
         for (j = 0; !iswspace(*q) && *q != ']' && *q != 0; q++, j++);
 
-        if (*q == 0) return CERR_InvalidToken;
+        if (*q == 0) return KmnCompilerMessages::ERROR_InvalidToken;
 
         KMX_WCHAR vkname[SZMAX_VKDICTIONARYNAME];  // I3438
 
-        if (j >= SZMAX_VKDICTIONARYNAME) return CERR_InvalidToken;
+        if (j >= SZMAX_VKDICTIONARYNAME) return KmnCompilerMessages::ERROR_InvalidToken;
 
         u16ncpy(vkname,  p, j);  // I3481
         vkname[j] = 0;
@@ -2219,18 +2542,22 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
 
         if (i == VK__MAX + 1)
         {
-          VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_InvalidToken);
+          if(!VerifyKeyboardVersion(fk, VERSION_90)) {
+            return KmnCompilerMessages::ERROR_InvalidToken;
+          }
 
           i = GetVKCode(fk, vkname);  // I3438
           if (i == 0)
-            return CERR_InvalidToken;
+            return KmnCompilerMessages::ERROR_InvalidToken;
         }
 
         p = q;
 
         tstr[mx++] = (int)i;
 
-        if (kmcmp::FMnemonicLayout && (i <= VK__MAX) && VKeyMayBeVCKey[i]) AddWarning(CWARN_VirtualKeyWithMnemonicLayout);  // I3438
+        if (kmcmp::FMnemonicLayout && (i <= VK__MAX) && VKeyMayBeVCKey[i]) {
+          ReportCompilerMessage(KmnCompilerMessages::WARN_VirtualKeyWithMnemonicLayout);  // I3438
+        }
 
         while (iswspace(*q)) q++;
       }
@@ -2246,30 +2573,34 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     case 14:
       if (u16nicmp(p, u"set", 3) == 0)
       {
-        VERIFY_KEYBOARD_VERSION(fk, VERSION_80, CERR_80FeatureOnly);
+        if(!VerifyKeyboardVersion(fk, VERSION_80)) {
+          return KmnCompilerMessages::ERROR_80FeatureOnly;
+        }
         p += 3;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-        if (!q || !*q) return CERR_InvalidSet;
+        if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidSet;
 
         err = process_set(fk, q, tstr, &mx);
-        if (err != CERR_None) return err;
+        if (err != STATUS_Success) return err;
       }
       else if (u16nicmp(p, u"save", 4) == 0)
       {
-        VERIFY_KEYBOARD_VERSION(fk, VERSION_80, CERR_80FeatureOnly);
+        if(!VerifyKeyboardVersion(fk, VERSION_80)) {
+          return KmnCompilerMessages::ERROR_80FeatureOnly;
+        }
         p += 4;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-        if (!q || !*q) return CERR_InvalidSave;
+        if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidSave;
 
         err = process_save(fk, q, tstr, &mx);
-        if (err != CERR_None) return err;
+        if (err != STATUS_Success) return err;
       }
       else
       {
-        if (u16nicmp(p, u"switch", 6) != 0) return CERR_InvalidToken;
+        if (u16nicmp(p, u"switch", 6) != 0) return KmnCompilerMessages::ERROR_InvalidToken;
         p += 6;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-        if (!q || !*q) return CERR_InvalidSwitch;
+        if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidSwitch;
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_SWITCH;
         tstr[mx++] = atoiW(q);
@@ -2285,16 +2616,18 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         tstr[mx] = 0;
       }
       else
-        return CERR_InvalidToken;
+        return KmnCompilerMessages::ERROR_InvalidToken;
       continue;
     case 16:
-      VERIFY_KEYBOARD_VERSION(fk, VERSION_60, CERR_60FeatureOnly_NamedCodes);
+      if(!VerifyKeyboardVersion(fk, VERSION_60)) {
+        return KmnCompilerMessages::ERROR_60FeatureOnly_NamedCodes;
+      }
       q = p + 1;
       while (*q && !iswspace(*q)) q++;
       c = *q; *q = 0;
       n = kmcmp::CodeConstants->GetCode(p + 1, &i);
       *q = c;
-      if (n == 0) return CERR_InvalidNamedCode;
+      if (n == 0) return KmnCompilerMessages::ERROR_InvalidNamedCode;
       if (i < 0xFFFFFFFFL) kmcmp::CheckStoreUsage(fk, i, TRUE, FALSE, FALSE);   // I2993
       if (n > 0xFFFF)
       {
@@ -2307,34 +2640,38 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       p = q;
       continue;
     case 17:
-      if (u16nicmp(p, u"platform", 8) != 0) return CERR_InvalidToken;  // I3430
-      VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnly_IfSystemStores);
-      if (sFlag) return CERR_InvalidInVirtualKeySection;
+      if (u16nicmp(p, u"platform", 8) != 0) return KmnCompilerMessages::ERROR_InvalidToken;  // I3430
+      if(!VerifyKeyboardVersion(fk, VERSION_90)) {
+        return KmnCompilerMessages::ERROR_90FeatureOnly_IfSystemStores;
+      }
+      if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
       p += 8;
       q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-      if (!q || !*q) return CERR_InvalidToken;
+      if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidToken;
       err = process_platform(fk, q, tstr, &mx);
-      if (err != CERR_None) return err;
+      if (err != STATUS_Success) return err;
       continue;
     case 18:  // I3437
-      if (u16nicmp(p, u"layer", 5) != 0) return CERR_InvalidToken;
-      VERIFY_KEYBOARD_VERSION(fk, VERSION_90, CERR_90FeatureOnly_SetSystemStores);
-      if (sFlag) return CERR_InvalidInVirtualKeySection;
+      if (u16nicmp(p, u"layer", 5) != 0) return KmnCompilerMessages::ERROR_InvalidToken;
+      if(!VerifyKeyboardVersion(fk, VERSION_90)) {
+        return KmnCompilerMessages::ERROR_90FeatureOnly_SetSystemStores;
+      }
+      if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
       p += 5;
       q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
-      if (!q || !*q) return CERR_InvalidToken;
+      if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidToken;
       err = process_set_synonym(TSS_LAYER, fk, q, tstr, &mx);
-      if (err != CERR_None) return err;
+      if (err != STATUS_Success) return err;
       continue;
     case 19:  // #2241
-      if (*(p + 1) != '.') return CERR_InvalidToken;
-      if (sFlag) return CERR_InvalidInVirtualKeySection;
+      if (*(p + 1) != '.') return KmnCompilerMessages::ERROR_InvalidToken;
+      if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
       p += 2;
       err = process_expansion(fk, p, tstr, &mx, max);
-      if (err != CERR_None) return err;
+      if (err != STATUS_Success) return err;
       continue;
     default:
-      return CERR_InvalidToken;
+      return KmnCompilerMessages::ERROR_InvalidToken;
     }
     if (tokenFound)
     {
@@ -2342,9 +2679,8 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       u16ncpy(output,  tstr, max);  // I3481
       output[max - 1] = 0;
       ErrChr = 0;
-      return CERR_None;
+      return STATUS_Success;
     }
-    if (mx >= max) return CERR_BufferOverflow;
   } while (*p);
 
   if (!*token)
@@ -2353,10 +2689,10 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     u16ncpy(output, tstr, max);  // I3481
     output[max - 1] = 0;
     ErrChr = 0;
-    return CERR_None;
+    return STATUS_Success;
   }
 
-  return CERR_NoTokensFound;
+  return KmnCompilerMessages::ERROR_NoTokensFound;
 }
 
 KMX_DWORD process_if_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx);  // I3430
@@ -2381,7 +2717,7 @@ KMX_DWORD process_if_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, PKMX_WCHAR
 
   PKMX_WCHAR r;
 
-  if ((msg = GetXString(fk, q, u"", temp, GLOBAL_BUFSIZE - 1, 0, &r, FALSE, TRUE)) != CERR_None)
+  if ((msg = GetXString(fk, q, u"", temp, GLOBAL_BUFSIZE - 1, 0, &r, FALSE, TRUE)) != STATUS_Success)
   {
     delete[] temp;
     return msg;
@@ -2389,11 +2725,13 @@ KMX_DWORD process_if_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, PKMX_WCHAR
 
   KMX_DWORD dwStoreID;
 
-  if ((msg = AddStore(fk, TSS_COMPARISON, temp, &dwStoreID)) != CERR_None)
-  {
+  if (!AddStore(fk, TSS_COMPARISON, temp, &dwStoreID)) {
     delete[] temp;
-    return msg;
+    // TODO: redundant error
+    return KmnCompilerMessages::ERROR_InvalidIf;
   }
+
+  delete[] temp;
 
   tstr[(*mx)++] = UC_SENTINEL;
   tstr[(*mx)++] = (KMX_WCHAR)CODE_IFSYSTEMSTORE;
@@ -2402,9 +2740,7 @@ KMX_DWORD process_if_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, PKMX_WCHAR
   tstr[(*mx)++] = (KMX_WCHAR)(dwStoreID + 1);
   tstr[(*mx)] = 0;
 
-  delete[] temp;
-
-  return CERR_None;
+  return STATUS_Success;
 }
 
 KMX_DWORD process_if(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)  // I3431
@@ -2422,7 +2758,7 @@ KMX_DWORD process_if(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx) 
     nnot = TRUE;
   }
 
-  if (*s != '=') return CERR_InvalidIf;
+  if (*s != '=') return KmnCompilerMessages::ERROR_InvalidIf;
   s++;
   while (*s == ' ') s++;
   *r = 0;
@@ -2430,12 +2766,14 @@ KMX_DWORD process_if(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx) 
 
   if (r[0] == '&')
   {
-    VERIFY_KEYBOARD_VERSION( fk, VERSION_90, CERR_90FeatureOnly_IfSystemStores);
+    if(!VerifyKeyboardVersion( fk, VERSION_90)) {
+      return KmnCompilerMessages::ERROR_90FeatureOnly_IfSystemStores;
+    }
     for (i = 0; StoreTokens[i]; i++)
     {
       if (u16icmp(r, StoreTokens[i]) == 0) break;
     }
-    if (!StoreTokens[i]) return CERR_IfSystemStore_NotFound;
+    if (!StoreTokens[i]) return KmnCompilerMessages::ERROR_IfSystemStore_NotFound;
     code = CODE_IFSYSTEMSTORE;
   }
   else
@@ -2446,7 +2784,7 @@ KMX_DWORD process_if(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx) 
     {
       if (u16icmp(r, fk->dpStoreArray[i].szName) == 0) break;
     }
-    if (i == fk->cxStoreArray) return CERR_StoreDoesNotExist;
+    if (i == fk->cxStoreArray) return KmnCompilerMessages::ERROR_StoreDoesNotExist;
     kmcmp::CheckStoreUsage(fk, i, FALSE, TRUE, FALSE);
   }
 
@@ -2454,7 +2792,7 @@ KMX_DWORD process_if(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx) 
 
   KMX_DWORD msg;
 
-  if ((msg = GetXString(fk, s, u"", temp, GLOBAL_BUFSIZE - 1, 0, &r, FALSE, TRUE)) != CERR_None)
+  if ((msg = GetXString(fk, s, u"", temp, GLOBAL_BUFSIZE - 1, 0, &r, FALSE, TRUE)) != STATUS_Success)
   {
     delete[] temp;
     return msg;
@@ -2462,11 +2800,13 @@ KMX_DWORD process_if(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx) 
 
   KMX_DWORD dwStoreID;
 
-  if ((msg = AddStore(fk, TSS_COMPARISON, temp, &dwStoreID)) != CERR_None)
-  {
+  if (!AddStore(fk, TSS_COMPARISON, temp, &dwStoreID)) {
     delete[] temp;
-    return msg;
+    // TODO: redundant error
+    return KmnCompilerMessages::ERROR_InvalidIf;
   }
+
+  delete[] temp;
 
   tstr[(*mx)++] = UC_SENTINEL;
   tstr[(*mx)++] = (KMX_WCHAR)code;
@@ -2475,7 +2815,7 @@ KMX_DWORD process_if(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx) 
   tstr[(*mx)++] = (KMX_WCHAR)(dwStoreID + 1);
   tstr[(*mx)] = 0;
 
-  return CERR_None;
+  return STATUS_Success;
 }
 
 KMX_DWORD process_reset(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
@@ -2486,7 +2826,7 @@ KMX_DWORD process_reset(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *m
   {
     if (u16icmp(q, fk->dpStoreArray[i].szName) == 0) break;
   }
-  if (i == fk->cxStoreArray) return CERR_StoreDoesNotExist;
+  if (i == fk->cxStoreArray) return KmnCompilerMessages::ERROR_StoreDoesNotExist;
   kmcmp::CheckStoreUsage(fk, i, FALSE, TRUE, FALSE);
 
   tstr[(*mx)++] = UC_SENTINEL;
@@ -2494,7 +2834,7 @@ KMX_DWORD process_reset(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *m
   tstr[(*mx)++] = (KMX_WCHAR)(i + 1);
   tstr[(*mx)] = 0;
 
-  return CERR_None;
+  return STATUS_Success;
 }
 
 KMX_DWORD process_expansion(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx, int max) {
@@ -2504,13 +2844,13 @@ KMX_DWORD process_expansion(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, in
   KMX_DWORD BaseChar=0;
 
   if (*mx == 0) {
-    return CERR_ExpansionMustFollowCharacterOrVKey;
+    return KmnCompilerMessages::ERROR_ExpansionMustFollowCharacterOrVKey;
   }
   PKMX_WCHAR p = &tstr[*mx];
   p = decxstr(p, tstr);
   if (*p == UC_SENTINEL) {
     if (*(p + 1) != CODE_EXTENDED) {
-      return CERR_ExpansionMustFollowCharacterOrVKey;
+      return KmnCompilerMessages::ERROR_ExpansionMustFollowCharacterOrVKey;
     }
     isVKey = TRUE;
     BaseKey = *(p + 3);
@@ -2526,7 +2866,7 @@ KMX_DWORD process_expansion(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, in
 
   KMX_DWORD msg;
 
-  if ((msg = GetXString(fk, q, u"", temp, (KMX_DWORD)_countof(temp) - 1, 0, &r, FALSE, TRUE)) != CERR_None)
+  if ((msg = GetXString(fk, q, u"", temp, (KMX_DWORD)_countof(temp) - 1, 0, &r, FALSE, TRUE)) != STATUS_Success)
   {
     return msg;
   }
@@ -2536,24 +2876,26 @@ KMX_DWORD process_expansion(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, in
 
   switch(temp[0]) {
   case 0:
-    return isVKey ? CERR_VKeyExpansionMustBeFollowedByVKey : CERR_CharacterExpansionMustBeFollowedByCharacter;
+    return isVKey ? KmnCompilerMessages::ERROR_VKeyExpansionMustBeFollowedByVKey : KmnCompilerMessages::ERROR_CharacterExpansionMustBeFollowedByCharacter;
   case UC_SENTINEL:
     // Verify that range is valid virtual key range
     if(!isVKey) {
-      return CERR_CharacterExpansionMustBeFollowedByCharacter;
+      return KmnCompilerMessages::ERROR_CharacterExpansionMustBeFollowedByCharacter;
     }
     if (temp[1] != CODE_EXTENDED) {
-      return CERR_VKeyExpansionMustBeFollowedByVKey;
+      return KmnCompilerMessages::ERROR_VKeyExpansionMustBeFollowedByVKey;
     }
     HighKey = temp[3], HighShiftFlags = temp[2];
     if (HighShiftFlags != BaseShiftFlags) {
-      return CERR_VKeyExpansionMustUseConsistentShift;
+      return KmnCompilerMessages::ERROR_VKeyExpansionMustUseConsistentShift;
     }
     if (HighKey <= BaseKey) {
-      return CERR_ExpansionMustBePositive;
+      return KmnCompilerMessages::ERROR_ExpansionMustBePositive;
     }
     // Verify space in buffer
-    if (*mx + (HighKey - BaseKey) * 5 + 1 >= max) return CERR_BufferOverflow;
+    if (*mx + (HighKey - BaseKey) * 5 + 1 >= max) {
+      return KmnCompilerMessages::ERROR_VirtualKeyExpansionTooLong;
+    }
     // Inject an expansion.
     for (BaseKey++; BaseKey < HighKey; BaseKey++) {
       // < HighKey because caller will add HighKey to output
@@ -2568,31 +2910,35 @@ KMX_DWORD process_expansion(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, in
   default:
     // Verify that range is a valid character range
     if (isVKey) {
-      return CERR_VKeyExpansionMustBeFollowedByVKey;
+      return KmnCompilerMessages::ERROR_VKeyExpansionMustBeFollowedByVKey;
     }
 
     HighChar = Uni_UTF16ToUTF32(temp);
     if (HighChar <= BaseChar) {
-      return CERR_ExpansionMustBePositive;
+      return KmnCompilerMessages::ERROR_ExpansionMustBePositive;
     }
     // Inject an expansion.
     for (BaseChar++; BaseChar < HighChar; BaseChar++) {
       // < HighChar because caller will add HighChar to output
       if (Uni_IsSMP(BaseChar)) {
         // We'll test on each char to avoid complex calculations crossing SMP boundary
-        if (*mx + 3 >= max) return CERR_BufferOverflow;
+        if (*mx + 3 >= max) {
+          return KmnCompilerMessages::ERROR_CharacterRangeTooLong;
+        }
         tstr[(*mx)++] = (KMX_WCHAR) Uni_UTF32ToSurrogate1(BaseChar);
         tstr[(*mx)++] = (KMX_WCHAR) Uni_UTF32ToSurrogate2(BaseChar);
       }
       else {
-        if (*mx + 2 >= max) return CERR_BufferOverflow;
+        if (*mx + 2 >= max) {
+          return KmnCompilerMessages::ERROR_CharacterRangeTooLong;
+        }
         tstr[(*mx)++] = (KMX_WCHAR) BaseChar;
       }
     }
     tstr[*mx] = 0;
   }
 
-  return CERR_None;
+  return STATUS_Success;
 }
 
 KMX_DWORD process_set_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)  // I3437
@@ -2601,7 +2947,7 @@ KMX_DWORD process_set_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, PKMX_WCHA
   PKMX_WCHAR temp = new KMX_WCHAR[GLOBAL_BUFSIZE], r;
   KMX_DWORD msg;
 
-  if ((msg = GetXString(fk, q, u"", temp, GLOBAL_BUFSIZE - 1, 0, &r, FALSE, TRUE)) != CERR_None)
+  if ((msg = GetXString(fk, q, u"", temp, GLOBAL_BUFSIZE - 1, 0, &r, FALSE, TRUE)) != STATUS_Success)
   {
     delete[] temp;
     return msg;
@@ -2609,16 +2955,20 @@ KMX_DWORD process_set_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, PKMX_WCHA
 
   KMX_DWORD dwStoreID;
 
-  msg = AddStore(fk, TSS_COMPARISON, temp, &dwStoreID);
+  if(!AddStore(fk, TSS_COMPARISON, temp, &dwStoreID)) {
+    delete[] temp;
+    // TODO: redundant error
+    return KmnCompilerMessages::ERROR_InvalidSet;
+  }
+
   delete[] temp;
-  if (msg != CERR_None) return msg;
 
   tstr[(*mx)++] = UC_SENTINEL;
   tstr[(*mx)++] = (KMX_WCHAR)CODE_SETSYSTEMSTORE;
   tstr[(*mx)++] = (KMX_WCHAR)(dwSystemID + 1);
   tstr[(*mx)++] = (KMX_WCHAR)(dwStoreID + 1);
   tstr[(*mx)] = 0;
-  return CERR_None;
+  return STATUS_Success;
 }
 
 KMX_DWORD process_set(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
@@ -2628,7 +2978,7 @@ KMX_DWORD process_set(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
   while (*s && *s != u' ' && *s != u'=') s++;
   r = s;
   while (*s == u' ') s++;
-  if (*s != '=') return CERR_InvalidSet;
+  if (*s != '=') return KmnCompilerMessages::ERROR_InvalidSet;
   s++;
   while (*s == ' ') s++;
   *r = 0;
@@ -2638,12 +2988,14 @@ KMX_DWORD process_set(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
 
   if (r[0] == '&')
   {
-    VERIFY_KEYBOARD_VERSION((PFILE_KEYBOARD) fk, VERSION_90, CERR_90FeatureOnly_SetSystemStores);  // I3437
+    if(!VerifyKeyboardVersion(fk, VERSION_90)) {
+      return KmnCompilerMessages::ERROR_90FeatureOnly_SetSystemStores;  // I3437
+    }
     for (i = 0; StoreTokens[i]; i++)
     {
       if (u16icmp(r, StoreTokens[i]) == 0) break;
     }
-    if (!StoreTokens[i]) return CERR_SetSystemStore_NotFound;
+    if (!StoreTokens[i]) return KmnCompilerMessages::ERROR_SetSystemStore_NotFound;
     code = CODE_SETSYSTEMSTORE;
   }
   else
@@ -2656,7 +3008,7 @@ KMX_DWORD process_set(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
     {
       if (u16icmp(r2, fk->dpStoreArray[i].szName) == 0) break;
     }
-    if (i == fk->cxStoreArray) return CERR_StoreDoesNotExist;
+    if (i == fk->cxStoreArray) return KmnCompilerMessages::ERROR_StoreDoesNotExist;
     kmcmp::CheckStoreUsage(fk, i, FALSE, TRUE, FALSE);
     code = CODE_SETOPT;
   }
@@ -2667,7 +3019,7 @@ KMX_DWORD process_set(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
 
   //r = wcstok(NULL, L" =");
 
-  if ((msg = GetXString(fk, s, u"", temp, GLOBAL_BUFSIZE - 1, 0, &r, FALSE, TRUE)) != CERR_None)
+  if ((msg = GetXString(fk, s, u"", temp, GLOBAL_BUFSIZE - 1, 0, &r, FALSE, TRUE)) != STATUS_Success)
   {
     delete[] temp;
     return msg;
@@ -2675,16 +3027,20 @@ KMX_DWORD process_set(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
 
   KMX_DWORD dwStoreID;
 
-  msg = AddStore(fk, TSS_COMPARISON, temp, &dwStoreID);
+  if(!AddStore(fk, TSS_COMPARISON, temp, &dwStoreID)) {
+    delete[] temp;
+    // TODO: redundant error
+    return KmnCompilerMessages::ERROR_InvalidSet;
+  }
+
   delete[] temp;
-  if (msg != CERR_None) return msg;
 
   tstr[(*mx)++] = UC_SENTINEL;
   tstr[(*mx)++] = (KMX_WCHAR)code;
   tstr[(*mx)++] = (KMX_WCHAR)(i + 1);
   tstr[(*mx)++] = (KMX_WCHAR)(dwStoreID + 1);
   tstr[(*mx)] = 0;
-  return CERR_None;
+  return STATUS_Success;
 }
 
 KMX_DWORD process_save(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
@@ -2695,14 +3051,14 @@ KMX_DWORD process_save(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx
   {
     if (u16icmp(q, fk->dpStoreArray[i].szName) == 0) break;
   }
-  if (i == fk->cxStoreArray) return CERR_StoreDoesNotExist;
+  if (i == fk->cxStoreArray) return KmnCompilerMessages::ERROR_StoreDoesNotExist;
   kmcmp::CheckStoreUsage(fk, i, FALSE, TRUE, FALSE);
 
   tstr[(*mx)++] = UC_SENTINEL;
   tstr[(*mx)++] = CODE_SAVEOPT;
   tstr[(*mx)++] = (KMX_WCHAR)(i + 1);
   tstr[(*mx)] = 0;
-  return CERR_None;
+  return STATUS_Success;
 }
 
 int xatoi(PKMX_WCHAR *p)
@@ -2752,21 +3108,21 @@ int GetGroupNum(PFILE_KEYBOARD fk, PKMX_WCHAR p)
 
 KMX_DWORD ProcessEthnologueStore(PKMX_WCHAR p) // I2646
 {
-  KMX_DWORD res = CERR_None;
+  KMX_DWORD res = STATUS_Success;
   PKMX_WCHAR q = NULL;
   while (*p)
   {
     while (u16chr(u" ,;", *p))
     {
-      if (*p != ' ') res = CWARN_PunctuationInEthnologueCode;
+      if (*p != ' ') res = KmnCompilerMessages::WARN_PunctuationInEthnologueCode;
       p++;
     }
-    if (q == p) return CERR_InvalidEthnologueCode;
+    if (q == p) return KmnCompilerMessages::ERROR_InvalidEthnologueCode;
     if (*p)
     {
       for (int i = 0; i < 3; i++)
       {
-        if (!iswalpha(*p)) return CERR_InvalidEthnologueCode;
+        if (!iswalpha(*p)) return KmnCompilerMessages::ERROR_InvalidEthnologueCode;
         p++;
       }
     }
@@ -2792,7 +3148,7 @@ KMX_DWORD ProcessHotKey(PKMX_WCHAR p, KMX_DWORD *hk)
     // Convert virtual key to hotkey (different bitflags)
 
     if (ShiftFlags & ~K_HOTKEYSHIFTFLAGS) {
-      AddWarning(CWARN_HotkeyHasInvalidModifier);
+      ReportCompilerMessage(KmnCompilerMessages::WARN_HotkeyHasInvalidModifier);
     }
 
     if (ShiftFlags & K_SHIFTFLAG) *hk |= HK_SHIFT;
@@ -2801,7 +3157,7 @@ KMX_DWORD ProcessHotKey(PKMX_WCHAR p, KMX_DWORD *hk)
 
     *hk |= Key;
 
-    return CERR_None;
+    return STATUS_Success;
   }
 
   q = (PKMX_WCHAR) u16chr(p, '[');
@@ -2817,7 +3173,7 @@ KMX_DWORD ProcessHotKey(PKMX_WCHAR p, KMX_DWORD *hk)
       if (u16nicmp(q, u"ALT", 3) == 0) sFlag |= HK_ALT, q += 3;
       else if (u16nicmp(q, u"CTRL", 4) == 0) sFlag |= HK_CTRL, q += 4;
       else if (u16nicmp(q, u"SHIFT", 5) == 0) sFlag |= HK_SHIFT, q += 5;
-      else if (towupper(*q) != 'K') return CERR_InvalidToken;
+      else if (towupper(*q) != 'K') return KmnCompilerMessages::ERROR_InvalidToken;
     } while (towupper(*q) != 'K');
 
     r = (PKMX_WCHAR) u16chr(q, ']');
@@ -2827,18 +3183,18 @@ KMX_DWORD ProcessHotKey(PKMX_WCHAR p, KMX_DWORD *hk)
       while (iswspace(*r) && r > q) r--;
       r++;
     }
-    else return CERR_NoTokensFound;
+    else return KmnCompilerMessages::ERROR_NoTokensFound;
 
     j = (int)(r - q);
 
     for (i = 0; i <= VK__MAX; i++)  // I3438
       if (j == (int) u16len(VKeyNames[i]) && u16nicmp(q, VKeyNames[i], j) == 0) break;
 
-    if (i == VK__MAX + 1) return CERR_InvalidToken;  // I3438
+    if (i == VK__MAX + 1) return KmnCompilerMessages::ERROR_InvalidToken;  // I3438
 
     *hk = i | sFlag;
 
-    return CERR_None;
+    return STATUS_Success;
   }
 
   q = GetDelimitedString(&p, u"\"\"", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -2849,10 +3205,10 @@ KMX_DWORD ProcessHotKey(PKMX_WCHAR p, KMX_DWORD *hk)
     if (u16chr(q, '%')) *hk |= HK_ALT;
     q = (PKMX_WCHAR) u16chr(q, 0) - 1;
     *hk |= *q;
-    return CERR_None;
+    return STATUS_Success;
   }
 
-  return CERR_CodeInvalidInThisSection;
+  return KmnCompilerMessages::ERROR_CodeInvalidInThisSection;
 }
 
 
@@ -2863,32 +3219,27 @@ void SetChecksum(PKMX_BYTE buf, PKMX_DWORD CheckSum, KMX_DWORD sz)
 }
 
 
-KMX_BOOL kmcmp::CheckStoreUsage(PFILE_KEYBOARD fk, int storeIndex, KMX_BOOL fIsStore, KMX_BOOL fIsOption, KMX_BOOL fIsCall)
-{
+void kmcmp::CheckStoreUsage(PFILE_KEYBOARD fk, int storeIndex, KMX_BOOL fIsStore, KMX_BOOL fIsOption, KMX_BOOL fIsCall) {
   PFILE_STORE sp = &fk->dpStoreArray[storeIndex];
-  if (fIsStore && !sp->fIsStore)
-  {
-    if (sp->fIsDebug || sp->fIsOption || sp->fIsReserved || sp->fIsCall)
-      AddWarningBool(CWARN_StoreAlreadyUsedAsOptionOrCall);
+  if (fIsStore && !sp->fIsStore) {
+    if (sp->fIsDebug || sp->fIsOption || sp->fIsReserved || sp->fIsCall) {
+      ReportCompilerMessage(KmnCompilerMessages::WARN_StoreAlreadyUsedAsOptionOrCall);
+    }
     sp->fIsStore = TRUE;
-  }
-  else if (fIsOption && !sp->fIsOption)
-  {
-    if (sp->fIsDebug || sp->fIsStore || sp->fIsReserved || sp->fIsCall)
-      AddWarningBool(CWARN_StoreAlreadyUsedAsStoreOrCall);
+  } else if (fIsOption && !sp->fIsOption) {
+    if (sp->fIsDebug || sp->fIsStore || sp->fIsReserved || sp->fIsCall) {
+      ReportCompilerMessage(KmnCompilerMessages::WARN_StoreAlreadyUsedAsStoreOrCall);
+    }
     sp->fIsOption = TRUE;
-  }
-  else if (fIsCall && !sp->fIsCall)
-  {
-    if (sp->fIsDebug || sp->fIsStore || sp->fIsReserved || sp->fIsOption)
-      AddWarningBool(CWARN_StoreAlreadyUsedAsStoreOrOption);
+  } else if (fIsCall && !sp->fIsCall) {
+    if (sp->fIsDebug || sp->fIsStore || sp->fIsReserved || sp->fIsOption) {
+      ReportCompilerMessage(KmnCompilerMessages::WARN_StoreAlreadyUsedAsStoreOrOption);
+    }
     sp->fIsCall = TRUE;
   }
-
-  return TRUE;
 }
 
-KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, FILE* fp_out)
+KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, KMX_BYTE**data, size_t& dataSize)
 {
   PFILE_GROUP fgp;
   PFILE_STORE fsp;
@@ -2902,6 +3253,9 @@ KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, FILE* fp_out)
   size_t offset;
   size_t size;
   KMX_DWORD i, j;
+
+  *data = nullptr;
+  dataSize = 0;
 
   // Calculate how much memory to allocate
 
@@ -2935,7 +3289,7 @@ KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, FILE* fp_out)
   }
 
   buf = new KMX_BYTE[size];
-  if (!buf) return CERR_CannotAllocateMemory;
+  if (!buf) return KmnCompilerMessages::FATAL_CannotAllocateMemory;
   memset(buf, 0, size);
 
   ck = (PCOMP_KEYBOARD)buf;
@@ -3051,25 +3405,18 @@ KMX_DWORD WriteCompiledKeyboard(PFILE_KEYBOARD fk, FILE* fp_out)
 
   if (offset != size) {
     delete[] buf;
-    return CERR_SomewhereIGotItWrong;
+    return KmnCompilerMessages::FATAL_SomewhereIGotItWrong;
   }
 
   SetChecksum(buf, &ck->dwCheckSum, (KMX_DWORD)size);
 
-  KMX_DWORD dwBytesWritten = 0;
-  dwBytesWritten = (KMX_DWORD)fwrite(buf,1, (KMX_DWORD)size ,  fp_out);
+  *data = buf;
+  dataSize = size;
 
-  if (dwBytesWritten != size) {
-    delete[] buf;
-    return CERR_UnableToWriteFully;
-  }
-
-  delete[] buf;
-
-  return CERR_None;
+  return STATUS_Success;
 }
 
-KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess)
+KMX_DWORD ReadLine(KMX_BYTE* infile, int sz, int& offset, PKMX_WCHAR wstr, KMX_BOOL PreProcess)
 {
   KMX_DWORD len;
   PKMX_WCHAR p;
@@ -3077,30 +3424,28 @@ KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess)
   KMX_DWORD n;
   KMX_WCHAR currentQuotes = 0;
   KMX_WCHAR str[LINESIZE + 3];
-  len = (KMX_DWORD)fread( str , 1 ,LINESIZE * 2,fp_in);
-  if (ferror(fp_in) ) return CERR_CannotReadInfile;
-  len /= 2;
-  str[len] = 0; auto cur = ftell(fp_in);
-  fseek(fp_in, 0, SEEK_END);
-  auto fsize = ftell(fp_in);
-  fseek(fp_in, cur, SEEK_SET);
 
-  if (cur == fsize)
-
-  // \r\n is still added here even though Linux doesn`t use \r.
-  // This is to ensure to still have a working windows-only-version
-  u16ncat(str, u"\r\n", _countof(str));  // I3481     // Always a "\r\n" to the EOF, avoids funny bugs
-
-  if (len == 0) return CERR_EndOfFile;
-
-  // neccessary to add this block for using on non-windows platforms (removes all \r for platforms that use \n instead of \r\n)
-  for (p = str, n = 0; n < len; n++, p++) {
-    if (*p == L'\r')
-      *p = L' ';
+  if(offset >= sz)  {
+    return STATUS_EndOfFile;
   }
 
-  // \r is still left in this block even though Linux doesn`t use \r.
-  // This is to ensure to still have a working windows-only-version
+  len = offset + LINESIZE*2 > sz ? sz-offset : LINESIZE*2;
+  memcpy(str, infile+offset, len);
+  offset += len;
+  len /= 2;
+  str[len] = 0;
+
+  if(offset == sz) {
+    // \r\n is still added here even though Linux doesn`t use \r.
+    // This is to ensure to still have a working windows-only-version
+    u16ncat(str, u"\r\n", _countof(str));  // I3481     // Always a "\r\n" to the EOF, avoids funny bugs
+  }
+
+  if (len == 0) {
+    return STATUS_EndOfFile;
+  }
+
+
   for (p = str, n = 0; n < len; n++, p++)
   {
     if (currentQuotes != 0)
@@ -3109,7 +3454,7 @@ KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess)
       {
         *p = 0;  // I2525
         u16ncpy(wstr, str, LINESIZE);  // I3481
-        return (PreProcess ? CERR_None : CERR_UnterminatedString);
+        return (PreProcess ? STATUS_Success : KmnCompilerMessages::ERROR_UnterminatedString);
       }
       if (*p == currentQuotes) currentQuotes = 0;
       continue;
@@ -3141,7 +3486,7 @@ KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess)
       }
       *p = 0; // I2525
       u16ncpy(wstr, str, LINESIZE);  // I3481
-      return (PreProcess ? CERR_None : CERR_InvalidLineContinuation);
+      return (PreProcess ? STATUS_Success : KmnCompilerMessages::ERROR_InvalidLineContinuation);
     }
 
     if (*p == L'\n') break;
@@ -3170,12 +3515,16 @@ KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess)
     str[LINESIZE - 1] = 0;  // I2525
     u16ncpy(wstr, str, LINESIZE);  // I3481
     if (len == LINESIZE)
-      return (PreProcess ? CERR_None : CERR_LineTooLong);
+      return (PreProcess ? STATUS_Success : KmnCompilerMessages::ERROR_LineTooLong);
   }
 
-  if (*p == L'\n') kmcmp::currentLine++;
+  kmcmp::currentLine++;
 
-  fseek(fp_in, -(int)(len * 2 - (int)(p - str) * 2 - 2), SEEK_CUR);
+  offset -= (int)(len * 2 - (int)(p - str) * 2 - 2);
+  if(offset >= sz) {
+    // If we've appended a \n, we can go past EOF
+    offset = sz;
+  }
 
   p--;
   while (p >= str && iswspace(*p)) p--;
@@ -3185,7 +3534,7 @@ KMX_DWORD ReadLine(FILE* fp_in , PKMX_WCHAR wstr, KMX_BOOL PreProcess)
   // trim spaces now, why not?
   u16ncpy(wstr, str, LINESIZE);  // I3481
 
-  return CERR_None;
+  return STATUS_Success;
 }
 
 KMX_DWORD GetRHS(PFILE_KEYBOARD fk, PKMX_WCHAR p, PKMX_WCHAR buf, int bufsize, int offset, int IsUnicode)
@@ -3193,7 +3542,7 @@ KMX_DWORD GetRHS(PFILE_KEYBOARD fk, PKMX_WCHAR p, PKMX_WCHAR buf, int bufsize, i
   PKMX_WCHAR q;
   p = (const PKMX_WCHAR) u16chr(p, '>');
 
-  if (!p) return CERR_NoTokensFound;
+  if (!p) return KmnCompilerMessages::ERROR_NoTokensFound;
 
   p++;
 
@@ -3221,64 +3570,43 @@ KMX_BOOL IsSameToken(PKMX_WCHAR *p, KMX_WCHAR const * token)
   return FALSE;
 }
 
+static bool endsWith(const std::string& str, const std::string& suffix)
+{
+    return str.size() >= suffix.size() && 0 == str.compare(str.size()-suffix.size(), suffix.size(), suffix);
+}
+
 KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD FileSize, PKMX_BYTE *Buf)
 {
-  FILE *fp;
-  KMX_WCHAR szNewName[260];
+  auto szNameUtf8 = string_from_u16string(szName);
 
-  if (IsRelativePath(szName))
-  {
-    PKMX_WCHAR WCompileDir = strtowstr(kmcmp::CompileDir);
-    u16ncpy(szNewName, WCompileDir, _countof(szNewName));  // I3481
-    u16ncat(szNewName,szName,   _countof(szNewName ));  // I3481
-  }
-  else
-    u16ncpy(szNewName, szName, _countof(szNewName));  // I3481
-
-  fp=Open_File(szNewName, u"rb");
-
-  if ( fp == NULL)
-  {
-    // else if filename.bmp is not in the folder -> attempt to open filename.bmp.bmp !
-    if ( u16cmp(szNewName+u16len(szNewName)-4, u".bmp") )
-      u16ncat(szNewName, u".bmp", _countof(szNewName));  // I3481
-
-    fp= Open_File(szNewName, u"rb");
-
-    if ( fp == NULL)
-      return CERR_CannotReadBitmapFile;
+  std::vector<uint8_t> bufvec = loadfileproc(szNameUtf8, fk->extra->kmnFilename);
+  if(!bufvec.size()) {
+    // Append .bmp and try again
+    if(endsWith(szNameUtf8, ".bmp")) {
+      return KmnCompilerMessages::ERROR_CannotReadBitmapFile;
+    }
+    szNameUtf8.append(".bmp");
+    bufvec = loadfileproc(szNameUtf8, fk->extra->kmnFilename);
   }
 
-  KMX_DWORD msg;
-  if ((msg = CheckFilenameConsistency(szNewName, FALSE)) != CERR_None) {
-    return msg;
+  if(bufvec.size() < 2) {
+    // Zero-byte file is invalid; 2 byte file is too, but we only really care
+    // about the prolog at this point so we don't overrun our buffer
+    return KmnCompilerMessages::ERROR_CannotReadBitmapFile;
   }
 
-  fseek(fp, 0, SEEK_END);
-  *FileSize = (KMX_DWORD)ftell(fp);
-  fseek(fp ,0,SEEK_SET);
-  if (*FileSize < 0) {
-    fclose(fp);
-    return CERR_CannotReadBitmapFile;
-  }
-
-  if (*FileSize < 2) return CERR_CannotReadBitmapFile;
+  *FileSize = bufvec.size();
   *Buf = new KMX_BYTE[*FileSize];
-
-  if (fread(*Buf, 1, *FileSize, fp) < (size_t) *FileSize) {
-    delete[] * Buf;
-    *Buf = NULL;
-    return CERR_CannotReadBitmapFile;
-  }
-
-  fclose(fp);
+  std::copy(bufvec.begin(), bufvec.end(), *Buf);
 
   /* Test for version 7.0 icon support */
   if (*((PKMX_CHAR)*Buf) != 'B' && *(((PKMX_CHAR)*Buf) + 1) != 'M') {
-    VERIFY_KEYBOARD_VERSION(fk, VERSION_70, CERR_70FeatureOnly);
+    if(!VerifyKeyboardVersion(fk, VERSION_70)) {
+      return KmnCompilerMessages::ERROR_70FeatureOnly;
+    }
   }
 
-  return CERR_None;
+  return STATUS_Success;
 }
 
 int atoiW(PKMX_WCHAR p)
@@ -3287,6 +3615,26 @@ int atoiW(PKMX_WCHAR p)
   int i = atoi(q);
   delete[] q;
   return i;
+}
+
+/**
+ * Checks if a wide-character C-string represents an integer.
+ * It does not strip whitespace, and depends on the action of atoi()
+ * to determine if the C-string is an integer.
+ *
+ * @param p a pointer to a wide-character C-string
+ *
+ * @return true if p represents an integer, false otherwise
+*/
+bool isIntegerWstring(PKMX_WCHAR p) {
+  if (!p || !*p)
+    return false;
+  PKMX_STR q = wstrtostr(p);
+  std::ostringstream os;
+  os << atoi(q);
+  int cmp = strcmp(q, os.str().c_str());
+  delete[] q;
+  return cmp == 0 ? true : false;
 }
 
 KMX_DWORD kmcmp::CheckUTF16(int n)
@@ -3298,14 +3646,14 @@ KMX_DWORD kmcmp::CheckUTF16(int n)
     0xFDE8, 0xFDE9, 0xFDEA, 0xFDEB, 0xFDEC, 0xFDED, 0xFDEE, 0xFDEF,
     0xFFFF, 0xFFFE, 0 };
 
-  if (n == 0) return CERR_ReservedCharacter;
+  if (n == 0) return KmnCompilerMessages::ERROR_ReservedCharacter;
   for (int i = 0; res[i] > 0; i++)
     if (n == res[i])
     {
-      AddWarning(CWARN_ReservedCharacter);
+      ReportCompilerMessage(KmnCompilerMessages::WARN_ReservedCharacter);
       break;
     }
-  return CERR_None;
+  return STATUS_Success;
 }
 
 KMX_DWORD kmcmp::UTF32ToUTF16(int n, int *n1, int *n2)
@@ -3314,25 +3662,30 @@ KMX_DWORD kmcmp::UTF32ToUTF16(int n, int *n1, int *n2)
   if (n <= 0xFFFF)
   {
     *n1 = n;
-    if (n >= 0xD800 && n <= 0xDFFF) AddWarning(CWARN_UnicodeSurrogateUsed);
+    if (n >= 0xD800 && n <= 0xDFFF) {
+      ReportCompilerMessage(KmnCompilerMessages::WARN_UnicodeSurrogateUsed);
+    }
     return kmcmp::CheckUTF16(*n1);
   }
 
-  if ((n & 0xFFFF) == 0xFFFF || (n & 0xFFFF) == 0xFFFE) AddWarning(CWARN_ReservedCharacter);
-  if (n < 0 || n > 0x10FFFF) return CERR_InvalidCharacter;
+  if ((n & 0xFFFF) == 0xFFFF || (n & 0xFFFF) == 0xFFFE) {
+    ReportCompilerMessage(KmnCompilerMessages::WARN_ReservedCharacter);
+  }
+  if (n < 0 || n > 0x10FFFF) {
+    return KmnCompilerMessages::ERROR_InvalidCharacter;
+  }
   n = n - 0x10000;
   *n1 = (n / 0x400) + 0xD800;
   *n2 = (n % 0x400) + 0xDC00;
   KMX_DWORD msg;
-  if ((msg = kmcmp::CheckUTF16(*n1)) != CERR_None) return msg;
+  if ((msg = kmcmp::CheckUTF16(*n1)) != STATUS_Success) return msg;
   return kmcmp::CheckUTF16(*n2);
 }
 
-KMX_DWORD BuildVKDictionary(PFILE_KEYBOARD fk)
-{
+KMX_BOOL BuildVKDictionary(PFILE_KEYBOARD fk) {
   KMX_DWORD i;
   size_t len = 0;
-  if (fk->cxVKDictionary == 0) return CERR_None;
+  if (fk->cxVKDictionary == 0) return TRUE;
   for (i = 0; i < fk->cxVKDictionary; i++)
   {
     len += u16len(fk->dpVKDictionary[i].szName) + 1;
@@ -3350,9 +3703,12 @@ KMX_DWORD BuildVKDictionary(PFILE_KEYBOARD fk)
   *p = 0;
 
   KMX_DWORD dwStoreID;
-  KMX_DWORD msg = AddStore(fk, TSS_VKDICTIONARY, storeval, &dwStoreID);
+  if(!AddStore(fk, TSS_VKDICTIONARY, storeval, &dwStoreID)) {
+    delete[] storeval;
+    return FALSE;
+  }
   delete[] storeval;
-  return msg;
+  return TRUE;
 }
 
 int GetVKCode(PFILE_KEYBOARD fk, PKMX_WCHAR p)
@@ -3367,7 +3723,7 @@ int GetVKCode(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   {
     PFILE_VKDICTIONARY pvk = new FILE_VKDICTIONARY[fk->cxVKDictionary + 10];
     memcpy(pvk, fk->dpVKDictionary, fk->cxVKDictionary * sizeof(FILE_VKDICTIONARY));
-    delete fk->dpVKDictionary;
+    delete[] fk->dpVKDictionary;
     fk->dpVKDictionary = pvk;
   }
   u16ncpy(fk->dpVKDictionary[fk->cxVKDictionary].szName, p, _countof(fk->dpVKDictionary[fk->cxVKDictionary].szName) );  // I3481
@@ -3428,81 +3784,41 @@ KMX_BOOL kmcmp::IsValidCallStore(PFILE_STORE fs)
   return i == 1;
 }
 
-FILE* CreateTempFile()
-{
-  return tmpfile();
-}
-
 ///////////////////
 
-FILE* UTF16TempFromUTF8(FILE* fp_in , KMX_BOOL hasPreamble)
-{
-  FILE *fp_out = CreateTempFile();
-  if(fp_out == NULL)    // I3228   // I3510
-  {
-    fclose(fp_in);
-    return NULL;                               //return  INVALID_HANDLE_VALUE;   _S2 can I exchange that?
+bool hasPreamble(std::u16string result) {
+  return result.size() > 0 && result[0] == 0xFEFF;
+}
+
+bool UTF16TempFromUTF8(KMX_BYTE* infile, int sz, KMX_BYTE** tempfile, int *sz16) {
+  if(sz == 0) {
+    return FALSE;
   }
 
-  PKMX_BYTE buf, p;
-  PKMX_WCHAR outbuf, poutbuf;
-  KMX_DWORD len;
-  KMX_DWORD len2;
-  KMX_WCHAR prolog = 0xFEFF;
-  fwrite(&prolog,2, 1, fp_out);
+  std::u16string result;
 
-  fseek(fp_in, 0, SEEK_END);
-  len = (KMX_DWORD)ftell(fp_in);
-  fseek(fp_in, 0, SEEK_SET);
-  if (hasPreamble) {
-    fseek( fp_in,3,SEEK_SET); // Cut off UTF-8 marker
-    len -= 3;
-  }
-
-  buf = new KMX_BYTE[len + 1];  // null terminated
-  outbuf = new KMX_WCHAR[len + 1];
-
-  len2= (KMX_DWORD)fread(buf,1,len,fp_in);
-  if (len2) {
-    buf[len2] = 0;
-    p = buf;
-    poutbuf = outbuf;
-    if (hasPreamble) {
-      // We have a preamble, so we attempt to read as UTF-8 and allow conversion errors to be filtered. This is not great for a
-      // compiler but matches existing behaviour -- in future versions we may not do lenient conversion.
-      ConvertUTF8toUTF16(&p, &buf[len2], (UTF16 **)&poutbuf, (const UTF16 *)&outbuf[len], lenientConversion);
-      fwrite(outbuf, (KMX_DWORD)(poutbuf - outbuf) * 2 , 1, fp_out);
-    }
-    else {
-      // No preamble, so we attempt to read as strict UTF-8 and fall back to ANSI if that fails
-      ConversionResult cr = ConvertUTF8toUTF16(&p, &buf[len2], (UTF16 **)&poutbuf, (const UTF16 *)&outbuf[len], strictConversion);
-      if (cr == sourceIllegal) {
-        // Not a valid UTF-8 file, so fall back to ANSI
-        // AddCompileError(CHINT_NonUnicodeFile);
-        // note, while this message is defined, for now we will not emit it
-        // because we don't support HINT/INFO messages yet and we don't want
-        // this to cause a blocking compile at this stage
-        // do strtowstr only when no invalid characters are found
-        if( p==0){
-          poutbuf = strtowstr((PKMX_STR)buf);
-          fwrite(poutbuf, (KMX_DWORD)u16len(poutbuf) * 2 , 1, fp_out);
-          delete[] poutbuf;
-        }
-        else
-          AddCompileError(CERR_InvalidCharacter);
-      }
-
-      else {
-        fwrite(outbuf, (KMX_DWORD)(poutbuf - outbuf) * 2 , 1, fp_out);
-      }
+  try {
+    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
+    result = converter.from_bytes((char*)infile, (char*)infile+sz);
+  } catch(std::range_error& e) {
+    ReportCompilerMessage(KmnCompilerMessages::HINT_NonUnicodeFile);
+    result.resize(sz);
+    for(int i = 0; i < sz; i++) {
+      result[i] = CP1252_UNICODE[infile[i]];
     }
   }
 
-  fclose( fp_in);
-  delete[] buf;
-  delete[] outbuf;
-  fseek( fp_out,2,SEEK_SET);
-  return fp_out;
+  if(hasPreamble(result)) {
+    *sz16 = result.size() * 2 - 2;
+    *tempfile = new KMX_BYTE[*sz16];
+    memcpy(*tempfile, result.c_str() + 1, *sz16);
+  } else {
+    *sz16 = result.size() * 2;
+    *tempfile = new KMX_BYTE[*sz16];
+    memcpy(*tempfile, result.c_str(), *sz16);
+  }
+
+  return TRUE;
 }
 
 PFILE_STORE FindSystemStore(PFILE_KEYBOARD fk, KMX_DWORD dwSystemID)

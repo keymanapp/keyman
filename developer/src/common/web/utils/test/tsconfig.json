@@ -1,0 +1,21 @@
+{
+  "extends": "../../../../kmc/tsconfig.kmc-base.json",
+
+  "compilerOptions": {
+      "rootDir": ".",
+      "rootDirs": ["./", "../src/"],
+      "outDir": "../build/test",
+      "esModuleInterop": true,
+      "moduleResolution": "node16",
+      "allowSyntheticDefaultImports": true,
+      "baseUrl": ".",
+  },
+  "include": [
+      "**/test-*.ts",
+      "helpers/*.ts",
+  ],
+  "references": [
+      { "path": "../" },
+      { "path": "../../test-helpers/" },
+    ]
+}

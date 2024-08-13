@@ -1,21 +1,22 @@
-import express = require('express');
-import multer = require('multer');
-import ws = require('ws');
-import handleIncKeyboardsJs from './handlers/inc/keyboards-js';
-import { data, DebugFont, DebugKeyboard, DebugModel, DebugObject, DebugPackage, isValidId } from './data';
-import apiGet from './handlers/api/debugobject/get';
-import apiRegister, { apiRegisterFile } from './handlers/api/debugobject/register';
-import apiKeyboardRegister from './handlers/api/keyboard/register';
-import apiFontRegister from './handlers/api/font/register';
-import apiUnregister from './handlers/api/debugobject/unregister';
-import handleIncPackagesJson from './handlers/inc/packages-json';
-import apiPackageRegister from './handlers/api/package/register';
-import handleIncKeyboardsCss from './handlers/inc/keyboards-css';
-import { Environment } from './version-data';
-import { configuration } from './config';
-import chalk = require('chalk');
+import * as express from 'express';
+import * as ws from 'ws';
+import * as multer from 'multer';
+import handleIncKeyboardsJs from './handlers/inc/keyboards-js.js';
+import { data, DebugFont, DebugKeyboard, DebugModel, DebugObject, DebugPackage, isValidId } from './data.js';
+import apiGet from './handlers/api/debugobject/get.js';
+import apiRegister, { apiRegisterFile } from './handlers/api/debugobject/register.js';
+import apiKeyboardRegister from './handlers/api/keyboard/register.js';
+import apiFontRegister from './handlers/api/font/register.js';
+import apiUnregister from './handlers/api/debugobject/unregister.js';
+import handleIncPackagesJson from './handlers/inc/packages-json.js';
+import apiPackageRegister from './handlers/api/package/register.js';
+import handleIncKeyboardsCss from './handlers/inc/keyboards-css.js';
+import { Environment } from './version-data.js';
+import { configuration } from './config.js';
+import chalk from 'chalk';
+import { shutdown } from './shutdown.js';
 
-export default function setupRoutes(app: express.Express, upload: multer.Multer, wsServer: ws.Server, environment: Environment ) {
+export default function setupRoutes(app: express.Express, upload: multer.Multer, wsServer: ws.WebSocketServer, environment: Environment ) {
 
   /* Middleware - JSON and logging */
 
@@ -49,7 +50,7 @@ export default function setupRoutes(app: express.Express, upload: multer.Multer,
 
   /* All routes */
 
-  app.use('/', express.static('dist/site'));
+  app.use('/', express.static('build/src/site'));
 
   app.post('/upload', localhostOnly, upload.single('file'), (req, res, next) => {
     const name = req.file.originalname;
@@ -97,7 +98,7 @@ export default function setupRoutes(app: express.Express, upload: multer.Multer,
 
   /* Localhost only routes -- todo /api/internal/ vs /api/... */
 
-  app.post('/api/shutdown', (_req,res) => { setTimeout(() => process.exit(0), 100); res.send('ok'); });
+  app.post('/api/shutdown', (_req,res) => { setTimeout(shutdown, 100); res.send('ok'); });
 
   appGetData(app, /\/data\/keyboard\/(.+)\.js$/, data.keyboards);
   appGetData(app, /\/data\/model\/(.+)\.model\.js$/, data.models);
@@ -170,7 +171,7 @@ export default function setupRoutes(app: express.Express, upload: multer.Multer,
 
 /* Utility functions */
 
-function notifyClients(wsServer: ws.Server, res: express.Request, req: express.Response, next: express.NextFunction) {
+function notifyClients(wsServer: ws.WebSocketServer, res: express.Request, req: express.Response, next: express.NextFunction) {
   wsServer.clients.forEach(c => {
     c.send('refresh', (err) => {
       if(err) console.error(chalk.red('Websocket send error '+err.message));

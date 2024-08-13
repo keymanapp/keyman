@@ -4,7 +4,7 @@
 */
 #include <kmx/kmx_processevent.h>
 
-using namespace km::kbp;
+using namespace km::core;
 using namespace kmx;
 
 void KMX_Actions::ResetQueue()
@@ -35,9 +35,6 @@ KMX_BOOL KMX_Actions::QueueAction(int ItemType, KMX_DWORD dwData)
 
   switch(ItemType)
   {
-  case QIT_VKEYDOWN:
-    break;
-
   case QIT_DEADKEY:
     m_context->Add(UC_SENTINEL);
     m_context->Add(CODE_DEADKEY);

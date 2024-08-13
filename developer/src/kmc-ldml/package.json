@@ -17,8 +17,7 @@
   "scripts": {
     "build": "tsc -b",
     "lint": "eslint .",
-    "test": "npm run lint && cd test && tsc -b && cd .. && c8 --reporter=lcov --reporter=text mocha",
-    "prepublishOnly": "npm run build"
+    "test": "gosh ./build.sh test"
   },
   "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
   "license": "MIT",
@@ -27,25 +26,20 @@
   },
   "dependencies": {
     "@keymanapp/keyman-version": "*",
+    "@keymanapp/kmc-kmn": "*",
     "@keymanapp/ldml-keyboard-constants": "*",
-    "ajv": "^8.11.0",
-    "restructure": "git+https://github.com/keymanapp/dependency-restructure.git#49d129cf0916d082a7278bb09296fb89cecfcc50",
-    "semver": "^7.3.7",
-    "xml2js": "git+https://github.com/keymanapp/dependency-node-xml2js#535fe732dc408d697e0f847c944cc45f0baf0829"
+    "semver": "^7.5.2"
   },
   "devDependencies": {
-    "@types/chai": "^4.1.7",
+    "@keymanapp/developer-test-helpers": "*",
+    "@keymanapp/resources-gosh": "*",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^10.14.6",
+    "@types/node": "^20.4.1",
     "@types/semver": "^7.3.12",
-    "@types/xml2js": "^0.4.5",
     "c8": "^7.12.0",
-    "chai": "^4.3.4",
     "chalk": "^2.4.2",
     "mocha": "^8.4.0",
-    "ts-node": "^9.1.1",
-    "typescript": "^4.9.5",
-    "@keymanapp/developer-test-helpers": "*"
+    "typescript": "^5.4.5"
   },
   "mocha": {
     "spec": "build/test/**/test-*.js",

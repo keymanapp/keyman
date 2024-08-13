@@ -58,11 +58,10 @@ const bash = process.platform == 'win32'
 
 const compilerDestPath = path.join(config.KEYBOARDS_ROOT, 'tools');
 const kmcompDestPath = path.join(compilerDestPath, 'kmcomp', 'kmcomp.exe');
-const kmcmpdllDestPath = path.join(compilerDestPath, 'kmcomp', 'kmcmpdll.dll');
 
 let testedCompilerVersions = [], testedEngineVersions = [], firstCompile = true;
 
-// Build keyboards -- get kmcomp.exe, kmcmpdll.dll from appropriate location
+// Build keyboards -- get kmcomp.exe from appropriate location
 
 process.on('SIGINT', () => {
   console.log('Received Ctrl+C, aborting');
@@ -119,15 +118,11 @@ if(!program.skipAnalysis) {
 
 cleanKeyboards.then(() => {
   fs.renameSync(kmcompDestPath, kmcompDestPath + '.bak');
-  fs.renameSync(kmcmpdllDestPath, kmcmpdllDestPath + '.bak');
 
   process.on('exit', () => {
     console.log('Restoring original compiler files');
     if(fs.existsSync(kmcompDestPath + '.bak')) {
       fs.renameSync(kmcompDestPath + '.bak', kmcompDestPath);
-    }
-    if(fs.existsSync(kmcmpdllDestPath + '.bak')) {
-      fs.renameSync(kmcmpdllDestPath + '.bak', kmcmpdllDestPath);
     }
   });
 }).then(() => forEachPromise(program.compilerVersions, version => {
@@ -146,7 +141,6 @@ cleanKeyboards.then(() => {
           reject();
         }
         fs.copyFileSync(path.join(config.KEYMAN_REPO_BASE_RELATIVE_PATH, 'developer', 'bin', 'kmcomp.exe'), kmcompDestPath);
-        fs.copyFileSync(path.join(config.KEYMAN_REPO_BASE_RELATIVE_PATH, 'developer', 'bin', 'kmcmpdll.dll'), kmcmpdllDestPath);
         resolve();
       });
       break;
@@ -162,7 +156,6 @@ cleanKeyboards.then(() => {
           console.log('Unzipping compiler');
           let zip = new AdmZip(response.body);
           zip.extractEntryTo('kmcomp.exe', compilerDestPath, false, true);
-          zip.extractEntryTo('kmcmpdll.dll', compilerDestPath, false, true);
         });
       break;
     default:
@@ -173,7 +166,6 @@ cleanKeyboards.then(() => {
           console.log('Unzipping compiler');
           let zip = new AdmZip(response.body);
           zip.extractEntryTo('kmcomp.exe', compilerDestPath, false, true);
-          zip.extractEntryTo('kmcmpdll.dll', compilerDestPath, false, true);
         });
   }
 

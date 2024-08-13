@@ -9,6 +9,7 @@
 import KeymanEngine
 import UIKit
 import QuartzCore
+import os
 
 // Internal strings
 private let baseUri = "https://r.keymanweb.com/20/fonts/get_mobileconfig.php?id="
@@ -191,7 +192,7 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     userData.set(self.textView?.text, forKey: userTextKey)
     userData.set(self.textSize.description, forKey: userTextSizeKey)
     userData.synchronize()
-    log.debug("saving text size: \(textSize.description).")
+    os_log("saving text size: %{public}s", log: KeymanLogger.settings, type: .debug, textSize.description)
   }
 
   private func calculateDefaultTextSize() -> CGFloat {
@@ -940,16 +941,26 @@ class MainViewController: UIViewController, TextViewDelegate, UIActionSheetDeleg
     wasKeyboardVisible = textView.isFirstResponder
     textView.dismissKeyboard()
 
-    let w: CGFloat = 160
-    let h: CGFloat = 44
-    let x: CGFloat = navBarWidth() - w
-    let y: CGFloat = AppDelegate.statusBarHeight() + navBarHeight()
-
-    let dropDownList = DropDownListView(listItems: dropdownItems, itemSize: CGSize(width: w, height: h),
-                                        position: CGPoint(x: x, y: y))
+    let menuRect: CGRect = self.calculateDropDownMenuRect()
+    let dropDownList = DropDownListView(listItems: dropdownItems, itemSize: menuRect.size, position: menuRect.origin)
     dropDownList.tag = dropDownListTag
 
     navigationController?.view?.addSubview(dropDownList)
+  }
+
+  /**
+   * Calculates coordinates of Keyman app dropdown menu
+   * takes into account safearea so that menu does display over iPhone notch when
+   * rotated to landscape (issue #8168)
+   */
+  private func calculateDropDownMenuRect() -> CGRect {
+    let rightInset: CGFloat? = self.view.window?.safeAreaInsets.right
+    let width: CGFloat = 160
+    let height: CGFloat = 44
+    let x: CGFloat = navBarWidth() - width - (rightInset ?? 0)
+    let y: CGFloat = AppDelegate.statusBarHeight() + navBarHeight()
+    let menuRect = CGRect(x: x, y: y, width: width, height: height)
+    return menuRect
   }
 
   private func dismissDropDownMenu() -> Bool {

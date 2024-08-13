@@ -1,28 +1,25 @@
-.TH IBUS-ENGINE-KEYMAN "1" "September 2018" "ibus-engine-keyman" "User Commands"
+.TH IBUS-ENGINE-KEYMAN "1" "September 2023" "ibus-engine-keyman" "User Commands"
 .SH NAME
 ibus-engine-keyman \- multiple language input engine based on ibus
 .SH DESCRIPTION
-\&ibus\-engine\-keyman [options] [engines]
+\&ibus\-engine\-keyman [options]
 .TP
 this command should run from ibus, don't run it directly.
 .TP
 \fB\-h\fR, \fB\-\-help\fR
 show this message.
 .TP
-\fB\-d\fR, \fB\-\-daemonize\fR
-daemonize ibus engine
+\fB\-x\fR, \fB\-\-xml\fR
+generate XML listing all keyboards. This is used by ibus.
 .TP
-\fB\-l\fR, \fB\-\-list\fR
-list all Keyman input methods
+\fB\-i\fR, \fB\-\-ibus\fR
+Component is executed by ibus
 .TP
-\fB\-a\fR, \fB\-\-all\fR
-enable all Keyman input methods
+\fB\-\-testing\fR
+Component is executed by integration tests.
 .SS "example:"
 .IP
-\&./ibus\-engine\-keyman zh:py ja:trycode
+\&./ibus\-engine\-keyman --ibus
 
-\&./ibus\-engine\-keyman zh:py,pinyin hi:inscript
-
-\&./ibus\-engine\-keyman \fB\-a\fR
 .SH "SEE ALSO"
 .BR ibus(1)

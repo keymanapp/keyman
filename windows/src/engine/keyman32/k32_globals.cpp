@@ -72,10 +72,7 @@
 UINT
   //TODO: consolidate these messages -- they are probably not all required now
   wm_keyman = 0,						// user message - ignore msg   // I3594
-	wm_kmdebug = 0,						//  " "  "  "   - debugging
 
-	wm_keymankeydown = 0,
-	wm_keymankeyup = 0,
   wm_keyman_grabwindowproc = 0,
 	wm_keyman_refresh = 0,
 	wm_kmgetactivekeymanid = 0,
@@ -218,9 +215,6 @@ BOOL Globals_ProcessInitialised()
 
 #pragma data_seg(".SHARDATA")
 
-//static INI     // I3158   // I3524
-//    f_Ini = {0};								// KEYMAN.INI options
-
 static HHOOK
     f_hhookGetMessage = NULL,				// GETMESSAGE hook handle
     f_hhookCallWndProc = NULL;			// CALLWNDPROC hook handle
@@ -296,8 +290,6 @@ DWORD	//static
 
 HANDLE f_hLockMutex = 0;
 
-//INI   *Globals::Ini()                 { return &f_Ini;                }  // I3158   // I3524
-
 HHOOK *Globals::hhookGetMessage()     { return &f_hhookGetMessage;    }
 HHOOK *Globals::hhookCallWndProc()    { return &f_hhookCallWndProc;   }
 
@@ -368,11 +360,13 @@ void Globals::SetBaseKeyboardName(wchar_t *baseKeyboardName, wchar_t *baseKeyboa
 }
 
 void Globals::SetBaseKeyboardFlags(char *baseKeyboard, BOOL simulateAltGr, BOOL mnemonicDeadkeyConversionMode) {   // I4583   // I4552
-  SendDebugMessageFormat(0, sdmAIDefault, 0, "Globals::SetBaseKeyboardFlags(baseKeyboard='%s', simulateAltGr=%d, mnemonicDeadkeyConversionMode=%d",
+  SendDebugEntry();
+  SendDebugMessageFormat("baseKeyboard='%s', simulateAltGr=%d, mnemonicDeadkeyConversionMode=%d",
     baseKeyboard, simulateAltGr, mnemonicDeadkeyConversionMode);
   strcpy_s(f_BaseKeyboard, baseKeyboard);
   f_SimulateAltGr = simulateAltGr;
   f_MnemonicDeadkeyConversionMode = mnemonicDeadkeyConversionMode;
+  SendDebugExit();
 }
 
 /**
@@ -380,14 +374,16 @@ void Globals::SetBaseKeyboardFlags(char *baseKeyboard, BOOL simulateAltGr, BOOL 
   be changed until Keyman is restarted.
 */
 BOOL Globals::InitSettings() {
+  SendDebugEntry();
   f_vk_prefix = _VK_PREFIX_DEFAULT;
   RegistryReadOnly reg(HKEY_LOCAL_MACHINE);
   if (reg.OpenKeyReadOnly(REGSZ_KeymanLM) &&
       reg.ValueExists(REGSZ_ZapVirtualKeyCode)) {
     f_vk_prefix = reg.ReadInteger(REGSZ_ZapVirtualKeyCode);
     reg.CloseKey();
-    SendDebugMessageFormat(0, sdmAIDefault, 0, "Globals::InitSettings - vk_prefix set in '" REGSZ_ZapVirtualKeyCode "' to %x" , f_vk_prefix);
+    SendDebugMessageFormat("vk_prefix set in '" REGSZ_ZapVirtualKeyCode "' to %x" , f_vk_prefix);
   }
+  SendDebugExit();
   return TRUE;
 }
 
@@ -422,17 +418,15 @@ BOOL Globals::Unlock()
 
 BOOL Globals::ResetControllers()  // I3092
 {
-  SendDebugMessage(0, sdmGlobal, 0, "Globals::ResetControllers");
+  SendDebugEntry();
 
-  if(!Globals::Lock()) return FALSE;
+  if(!Globals::Lock()) {
+    SendDebugExit();
+    return FALSE;
+  }
 
   f_MasterController = NULL;
   f_MaxControllerThreads = 0;
-  /*   I3158   // I3524
-  f_Ini.ContextStackSize = 0;
-  f_Ini.MaxKeyboards = 0;
-  f_Ini.MsgStackSize = 0;
-  */
   f_hhookCallWndProc = NULL;
   f_hhookGetMessage = NULL;
 #ifndef _WIN64
@@ -452,7 +446,7 @@ BOOL Globals::ResetControllers()  // I3092
 
   Globals::Unlock();
 
-  SendDebugMessage(0, sdmGlobal, 0, "Globals::ResetControllers EXIT");
+  SendDebugExit();
   return TRUE;
 }
 
@@ -496,48 +490,53 @@ BOOL Globals::IsControllerThread(DWORD tid)
 void Globals::PostMasterController(UINT msg, WPARAM wParam, LPARAM lParam)
 {
   if(!Lock()) return;
+  SendDebugEntry();
   CheckControllers();
 	if(f_MasterController == NULL)
 	{
-		SendDebugMessageFormat(0, sdmGlobal, 0, "PostMasterController: no controllers [%x : %x, %x]", msg, wParam, lParam);
+		SendDebugMessageFormat("no controllers [%x : %x, %x]", msg, wParam, lParam);
     Unlock();
+    SendDebugExit();
 		return;
 	}
 
-  if(ShouldDebug(sdmGlobal))
+  if(ShouldDebug())
   {
   	char buf[64];
 	  GetClassName(f_MasterController, buf, 64);
 	  buf[63] = 0;
-	  SendDebugMessageFormat(f_MasterController, sdmGlobal, 0, "PostMasterController %s [%x : %x, %x]", buf, msg, wParam, lParam);
+	  SendDebugMessageFormat("%s [%x : %x, %x]", buf, msg, wParam, lParam);
   }
 
 	if(!PostMessage(f_MasterController, msg, wParam, lParam)) {
     DebugLastError("PostMessage");
   }
   Unlock();
+  SendDebugExit();
 }
 
 LRESULT Globals::SendMasterController(UINT msg, WPARAM wParam, LPARAM lParam)
 {
   if(!Lock()) return 0;
+  SendDebugEntry();
   CheckControllers();
 	if(f_MasterController == NULL)
 	{
     Unlock();
-		SendDebugMessageFormat(0, sdmGlobal, 0, "SendMasterController: no controllers [%x : %x, %x]", msg, wParam, lParam);
+		SendDebugMessageFormat("no controllers [%x : %x, %x]", msg, wParam, lParam);
+    SendDebugExit();
 		return 0;
 	}
 
   HWND hwnd = f_MasterController;
   Unlock();
 
-  if(ShouldDebug(sdmGlobal))
+  if(ShouldDebug())
   {
   	char buf[64];
 	  GetClassName(hwnd, buf, 64);
 	  buf[63] = 0;
-	  SendDebugMessageFormat(hwnd, sdmGlobal, 0, "SendMasterController %s [%x : %x, %x]", buf, msg, wParam, lParam);
+	  SendDebugMessageFormat("%s [%x : %x, %x]", buf, msg, wParam, lParam);
   }
 
   // Window may be taken out of list between Lock and Unlock but let's not worry about this
@@ -547,8 +546,9 @@ LRESULT Globals::SendMasterController(UINT msg, WPARAM wParam, LPARAM lParam)
 	if(!SendMessageTimeout(hwnd, msg, wParam, lParam, SMTO_BLOCK, 100, &dwResult)) {
     DebugLastError("SendMessageTimeout");
   } else {
-	  SendDebugMessageFormat(hwnd, sdmGlobal, 0, "SendMasterController returned %x", dwResult);
+	  SendDebugMessageFormat("returned %x", dwResult);
   }
+  SendDebugExit();
   return dwResult;
 }
 

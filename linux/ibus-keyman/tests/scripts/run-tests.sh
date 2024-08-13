@@ -4,17 +4,22 @@ set -eu
 TOP_SRCDIR=${top_srcdir:-$(realpath "$(dirname "$0")/../..")}
 TESTBASEDIR=${XDG_DATA_HOME:-$HOME/.local/share}/keyman
 TESTDIR=${TESTBASEDIR}/test_kmx
-PID_FILE=/tmp/ibus-keyman-test-pids
+CLEANUP_FILE=/tmp/ibus-keyman-test-cleanup
+PID_FILE=/tmp/ibus-keyman-test.pids
+ENV_FILE=/tmp/keyman-env.txt
 
-. "$(dirname "$0")"/test-helper.sh
+. "$(dirname "$0")"/test-helper.inc.sh
+
+local_cleanup() {
+  cleanup "$CLEANUP_FILE"
+}
 
 if [ -v KEYMAN_PKG_BUILD ]; then
   # During package builds we skip these tests that require to start ibus because
   # ibus requires to find /var/lib/dbus/machine-id or /etc/machine-id, otherwise it fails with:
   # "Bail out! IBUS-FATAL-WARNING: Unable to load /var/lib/dbus/machine-id: Failed to open file
   # “/var/lib/dbus/machine-id”: No such file or directory"
-  echo "1..1"
-  echo "ok 1 - Integration tests # SKIP on package build"
+  echo "1..0 # SKIP on package build"
   exit 0
 fi
 
@@ -22,16 +27,6 @@ if ! which Xvfb > /dev/null || ! which Xephyr > /dev/null || ! which metacity > 
   echo "Please install Xvfb, Xephyr, metacity and mutter before running these tests!"
   exit 1
 fi
-
-function cleanup() {
-  if [ -f "$PID_FILE" ]; then
-    echo
-    echo "# Shutting down processes..."
-    bash "$PID_FILE" > /dev/null 2>&1
-    rm "$PID_FILE"
-    echo "# Finished shutdown of processes."
-  fi
-}
 
 function help() {
   echo "Usage:"
@@ -57,67 +52,21 @@ function run_tests() {
   DISPLAY_SERVER=$1
   shift
 
-  echo > "$PID_FILE"
-  TEMP_DATA_DIR=$(mktemp --directory)
-  echo "rm -rf ${TEMP_DATA_DIR} || true" >> "$PID_FILE"
-
-  COMMON_ARCH_DIR=
-  [ -d "${TOP_SRCDIR}"/../../core/build/arch ] && COMMON_ARCH_DIR=${TOP_SRCDIR}/../../core/build/arch
-
-  if [ -d "${COMMON_ARCH_DIR}"/release ]; then
-    COMMON_ARCH_DIR=${COMMON_ARCH_DIR}/release
-  elif [ -d "${COMMON_ARCH_DIR}"/debug ]; then
-    COMMON_ARCH_DIR=${COMMON_ARCH_DIR}/debug
+  if [ -d "$(dirname "$0")/../../../build/$(arch)/debug" ]; then
+    CONFIG=debug
+  elif [ -d "$(dirname "$0")/../../../build/$(arch)/release" ]; then
+    CONFIG=release
   else
-    echo "Can't find neither ${COMMON_ARCH_DIR}/release nor ${COMMON_ARCH_DIR}/debug"
-    exit 2
+    echo "Cannot find ../../../build/$(arch)/debug or ../../../build/$(arch)/release"
+    exit 9
   fi
 
-  link_test_keyboards "${TOP_SRCDIR}/../../common/test/keyboards/baseline" "$TESTDIR" "$TESTBASEDIR"
+  G_TEST_BUILDDIR="$(dirname "$0")/../../../build/$(arch)/${CONFIG}/tests"
 
-  generate_kmpjson "$TESTDIR"
+  setup "$DISPLAY_SERVER" "$ENV_FILE" "$CLEANUP_FILE" "$PID_FILE" --standalone
 
   echo "# NOTE: When the tests fail check /tmp/ibus-engine-keyman.log and /tmp/ibus-daemon.log!"
   echo ""
-
-  if [ "$DISPLAY_SERVER" == "wayland" ]; then
-    if ! can_run_wayland; then
-      # support for --headless got added in mutter 40.x
-      echo "ERROR: mutter doesn't support running headless. Can't run Wayland tests."
-      exit 7
-    fi
-    echo "# Running on Wayland..."
-    TMPFILE=$(mktemp)
-    # mutter-Message: 18:56:15.422: Using Wayland display name 'wayland-1'
-    mutter --wayland --headless --no-x11 --virtual-monitor 1024x768 &> "$TMPFILE" &
-    echo "kill -9 $! || true" >> "$PID_FILE"
-    sleep 1s
-    export WAYLAND_DISPLAY
-    WAYLAND_DISPLAY=$(grep "Using Wayland display" "$TMPFILE" | cut -d"'" -f2)
-    rm "$TMPFILE"
-  else
-    echo "# Starting Xvfb..."
-    Xvfb -screen 0 1024x768x24 :33 &> /dev/null &
-    echo "kill -9 $! || true" >> "$PID_FILE"
-    sleep 1
-    echo "# Starting Xephyr..."
-    DISPLAY=:33 Xephyr :32 -screen 1024x768 &> /dev/null &
-    echo "kill -9 $! || true" >> "$PID_FILE"
-    sleep 1
-    echo "# Starting metacity"
-    metacity --display=:32 &> /dev/null &
-    echo "kill -9 $! || true" >> "$PID_FILE"
-
-    export DISPLAY=:32
-  fi
-
-  # Install schema to temporary directory. This removes the build dependency on the keyman package.
-  SCHEMA_DIR=$TEMP_DATA_DIR/glib-2.0/schemas
-  export XDG_DATA_DIRS=$TEMP_DATA_DIR:$XDG_DATA_DIRS
-
-  mkdir -p "$SCHEMA_DIR"
-  cp "${TOP_SRCDIR}"/../keyman-config/com.keyman.gschema.xml "$SCHEMA_DIR"/
-  glib-compile-schemas "$SCHEMA_DIR"
 
   if [ $# -gt 0 ]; then
     #shellcheck disable=SC2206
@@ -128,47 +77,20 @@ function run_tests() {
     popd > /dev/null || exit
   fi
 
-  export LD_LIBRARY_PATH=${COMMON_ARCH_DIR}/src:${LD_LIBRARY_PATH-}
-
-  # Ubuntu 18.04 Bionic doesn't have ibus-memconf, and glib is not compiled with the keyfile
-  # backend enabled, so we just use the default backend. Otherwise we use the keyfile
-  # store which interferes less when running on a dev machine.
-  if [ -f /usr/libexec/ibus-memconf ]; then
-    export GSETTINGS_BACKEND=keyfile
-    IBUS_CONFIG=--config=/usr/libexec/ibus-memconf
-  fi
-
-  #shellcheck disable=SC2086
-  ibus-daemon "${ARG_VERBOSE-}" --panel=disable --address=unix:abstract="${TEMP_DATA_DIR}"/test-ibus ${IBUS_CONFIG-} &> /tmp/ibus-daemon.log &
-  echo "kill -9 $! || true" >> "$PID_FILE"
-  sleep 1s
-
-  IBUS_ADDRESS=$(ibus address)
-  export IBUS_ADDRESS
-
-  if [ -d "../../build/$(arch)/debug" ]; then
-    CONFIG=debug
-  elif [ -d "../../build/$(arch)/release" ]; then
-    CONFIG=release
-  else
-    echo "Can't find neither ../../build/$(arch)/debug nor ../../build/$(arch)/release"
-    exit 9
-  fi
-
-  "../../build/$(arch)/${CONFIG}/src/ibus-engine-keyman" "${ARG_VERBOSE-}" &> /tmp/ibus-engine-keyman.log &
-  echo "kill -9 $! || true" >> "$PID_FILE"
-  sleep 1s
-
   echo "# Starting tests..."
+  # shellcheck disable=SC1090
+  source "$ENV_FILE"
+  echo "DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS"
+
   # Note: -k and --tap are consumed by the GLib testing framework
   #shellcheck disable=SC2068 # we want to split array elements!
   #shellcheck disable=SC2086
   "${G_TEST_BUILDDIR:-../../build/$(arch)/${CONFIG}/tests}/ibus-keyman-tests" ${ARG_K-} ${ARG_TAP-} \
     ${ARG_VERBOSE-} ${ARG_DEBUG-} ${ARG_SURROUNDING_TEXT-} ${ARG_NO_SURROUNDING_TEXT-} \
-    --directory "$TESTDIR" --"${DISPLAY_SERVER}" ${TESTFILES[@]}
+    --directory "$TESTDIR" "${DISPLAY_SERVER}" ${TESTFILES[@]}
   echo "# Finished tests."
 
-  cleanup
+  cleanup "$CLEANUP_FILE"
 }
 
 USE_WAYLAND=1
@@ -191,7 +113,7 @@ while (( $# )); do
   shift || (echo "Error: The last argument is missing a value. Exiting."; false) || exit 5
 done
 
-if ! can_run_wayland; then
+if ! can_run_wayland && [ "$USE_WAYLAND" == "0" ]; then
   # support for --headless got added in mutter 40.x
   echo "# WARNING: mutter doesn't support running headless. Skipping Wayland tests."
   USE_WAYLAND=0
@@ -211,13 +133,14 @@ if [ ! -f "${G_TEST_BUILDDIR}/ibus-keyman-tests" ]; then
   G_TEST_BUILDDIR="${G_TEST_BUILDDIR:-../../build/$(arch)/release/tests}"
 fi
 
+echo > "$CLEANUP_FILE"
 echo > "$PID_FILE"
-trap cleanup EXIT SIGINT
+trap local_cleanup EXIT SIGINT
 
 if [ "$USE_WAYLAND" == "1" ]; then
-  ( run_tests wayland "$@" )
+  run_tests --wayland "$@"
 fi
 
 if [ "$USE_X11" == "1" ]; then
-  ( run_tests x11 "$@" )
+  run_tests --x11 "$@"
 fi

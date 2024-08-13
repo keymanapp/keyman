@@ -1,13 +1,19 @@
 {
+  "extends": "../../tsconfig.dom.json",
+
 	"compilerOptions": {
+    "baseUrl": "./",
 		"outDir": "../../../build/app/ui/obj",
-		"rootDir": ""
+		"rootDir": "",
+    "tsBuildInfoFile": "../../../build/app/ui/obj/tsconfig.tsbuildinfo",
   },
-  "extends": "../../tsconfig.base.json",
   "files": [
 		"kmwuibutton.ts",
 		"kmwuifloat.ts",
 		"kmwuitoggle.ts",
 		"kmwuitoolbar.ts"
-  ]
+  ],
+	"references": [
+		{ "path": "../browser" }
+	]
 }

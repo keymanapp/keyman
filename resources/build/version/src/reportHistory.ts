@@ -2,8 +2,9 @@ import { warning as logWarning, info as logInfo } from '@actions/core';
 
 import { GitHub } from '@actions/github';
 
-import { findLastHistoryPR, getAssociatedPR} from './graphql/queries';
-import { spawnChild } from './util/spawnAwait';
+import { findLastHistoryPR, getAssociatedPR} from './graphql/queries.js';
+import { spawnChild } from './util/spawnAwait.js';
+import emojiRegex from 'emoji-regex';
 
 const getPullRequestInformation = async (
   octokit: GitHub, base: string
@@ -67,7 +68,7 @@ const getAssociatedPRInformation = async (
     }
   }: any = response;
 
-  const node = nodes.find(node => node.state == 'MERGED');
+  const node = nodes.find((node:any) => node.state == 'MERGED');
   return node ? { title: node.title, number: node.number } : undefined;
 };
 
@@ -125,10 +126,10 @@ export const reportHistory = async (
   } else {
     let git_tag = 'Next Version', git_tag_data = 'Next Version';
     const re = /#(\d+)/;
-    const emojiRE = /[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}\u{1f1e6}-\u{1f1ff}\u{1f191}-\u{1f251}\u{1f004}\u{1f0cf}\u{1f170}-\u{1f171}\u{1f17e}-\u{1f17f}\u{1f18e}\u{3030}\u{2b50}\u{2b55}\u{2934}-\u{2935}\u{2b05}-\u{2b07}\u{2b1b}-\u{2b1c}\u{3297}\u{3299}\u{303d}\u{00a9}\u{00ae}\u{2122}\u{23f3}\u{24c2}\u{23e9}-\u{23ef}\u{25b6}\u{23f8}-\u{23fa}]/gu;
+    const emojiRE = emojiRegex();
     for(const commit of new_commits) {
       if(!useGitHubPRInfo) {
-        const git_pr_title = (await spawnChild('git', ['log', '--format=%b', '-n', '1', commit])).replace(emojiRE, ' ').trim();
+        const git_pr_title = (await spawnChild('git', ['log', '--format=%b', '-n', '1', commit])).replaceAll(emojiRE, ' ').trim();
         if(git_pr_title.match(/^auto\:/)) continue;
         const git_pr_data = (await spawnChild('git', ['log', '--format=%s', '-n', '1', commit])).trim();
         const this_git_tag = (await spawnChild('git', ['tag', '--points-at', commit])).trim();
@@ -164,7 +165,7 @@ export const reportHistory = async (
         if(pulls.find(p => p.number == pr.number) == undefined) {
           pr.tag_data = git_tag_data;
           pr.version = git_tag;
-          pr.title = pr.title.replace(emojiRE, ' ').trim();
+          pr.title = pr.title.replaceAll(emojiRE, ' ').trim();
           pulls.push(pr);
         }
       }

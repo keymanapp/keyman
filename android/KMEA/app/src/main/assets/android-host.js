@@ -1,4 +1,4 @@
-var _debug = 0;
+var _debug = false;
 
 // Android harness attachment
 if(window.parent && window.parent.jsInterface && !window.jsInterface) {
@@ -8,9 +8,13 @@ if(window.parent && window.parent.jsInterface && !window.jsInterface) {
 var device = window.jsInterface.getDeviceType();
 var oskHeight = Math.ceil(window.jsInterface.getKeyboardHeight() / window.devicePixelRatio);
 var oskWidth = 0;
+var bannerHeight = 0;
+var bannerImagePath = '';
+var bannerHTMLContents = '';
 var fragmentToggle = 0;
+var deferredBannerCall;
 
-var sentryManager = new com.keyman.KeymanSentryManager({
+var sentryManager = new KeymanSentryManager({
   hostPlatform: "android"
 });
 sentryManager.init();
@@ -25,24 +29,36 @@ function init() {
   //document.body.style.backgroundColor="transparent";
   //window.console.log('Device type = '+device);
   //window.console.log('Keyboard height = '+oskHeight);
-  keyman.init({'app':device,'fonts':'packages/',root:'./'});
-  keyman.util.setOption('attachType','manual');
-  keyman.oninserttext = insertText;
   keyman.showKeyboardList = showMenu;
-  keyman.menuKeyUp = menuKeyUp;
   keyman.hideKeyboard = hideKeyboard;
+  keyman.menuKeyUp = menuKeyUp;
   keyman.getOskHeight = getOskHeight;
   keyman.getOskWidth = getOskWidth;
   keyman.beepKeyboard = beepKeyboard;
-  var ta = document.getElementById('ta');
-  keyman.setActiveElement(ta);
 
-  ta.readOnly = false;
-  checkTextArea();
+  // Readies the keyboard stub for instant loading during the init process.
+  KeymanWeb.registerStub(JSON.parse(jsInterface.initialKeyboard()));
 
-  // Tell KMW the default banner height to use
-  com.keyman.osk.Banner.DEFAULT_HEIGHT =
-    Math.ceil(window.jsInterface.getDefaultBannerHeight() / window.devicePixelRatio);
+  keyman.init({
+    'embeddingApp':device,
+    'fonts':'packages/',
+    oninserttext: insertText,
+    root:'./'
+  }).then(function () {  // Note:  For non-upgraded API 21, arrow functions will break the keyboard!
+    bannerHeight = Math.ceil(window.jsInterface.getDefaultBannerHeight() / window.devicePixelRatio);
+    if (bannerHeight > 0) {
+
+      // The OSK is not available until initialization is complete.
+      keyman.osk.bannerView.activeBannerHeight = bannerHeight;
+
+      if(deferredBannerCall) {
+        deferredBannerCall();
+        deferredBannerCall = null;
+      }
+
+      keyman.refreshOskLayout();
+    }
+  });
 
   keyman.addEventListener('keyboardloaded', setIsChiral);
   keyman.addEventListener('keyboardchange', setIsChiral);
@@ -51,6 +67,38 @@ function init() {
   document.body.addEventListener('touchend', loadDefaultKeyboard);
 
   notifyHost('pageLoaded');
+}
+
+function showBanner(flag) {
+  if(!keyman.osk) {
+    deferredBannerCall = function() {
+      showBanner(flag);
+    }
+
+    return;
+  }
+
+  var bc = keyman.osk.bannerController;
+
+  console_debug("Setting banner display for dictionaryless keyboards to " + flag);
+  console_debug("bannerHTMLContents: " + bannerHTMLContents);
+  if(bc) {
+    if (bannerHTMLContents != '') {
+      bc.inactiveBanner = flag ? new bc.HTMLBanner(bannerHTMLContents) : null;
+    } else {
+      bc.inactiveBanner = flag ? new bc.ImageBanner(bannerImagePath) : null;
+    }
+  }
+}
+
+function setBannerImage(path) {
+  bannerImagePath = path;
+}
+
+// Set the HTML banner to use when predictive-text is not available
+// contents - HTML content to use for the banner
+function setBannerHTML(contents) {
+  bannerHTMLContents = contents;
 }
 
 function notifyHost(event, params) {
@@ -65,13 +113,20 @@ function notifyHost(event, params) {
 }
 
 // Update the KMW banner height
+// h is in dpi (different from iOS)
 function setBannerHeight(h) {
   if (h > 0) {
-    var osk = keyman.osk;
-    osk.banner.height = Math.ceil(h / window.devicePixelRatio);
+    // The banner itself may not be loaded yet.  This will preemptively help set
+    // its eventual display height.
+    bannerHeight = Math.ceil(h / window.devicePixelRatio);
+
+    if (keyman.osk) {
+      keyman.osk.bannerView.activeBannerHeight = bannerHeight;
+    }
   }
-  // Refresh KMW OSK
-  keyman.correctOSKTextSize();
+
+  // Refresh KMW's OSK
+  keyman.refreshOskLayout();
 }
 
 function setOskHeight(h) {
@@ -81,12 +136,12 @@ function setOskHeight(h) {
   if(keyman && keyman.core && keyman.core.activeKeyboard) {
     keyman.core.activeKeyboard.refreshLayouts();
   }
-  keyman.correctOSKTextSize();
+  keyman.refreshOskLayout();
 }
 
 function setOskWidth(w) {
   if(w > 0) {
-    oskWidth = w;
+    oskWidth = w / window.devicePixelRatio;
   }
 }
 
@@ -111,11 +166,11 @@ function onStateChange(change) {
   //window.console.log('onStateChange change: ' + change);
 
   // Refresh KMW OSK
-  keyman.correctOSKTextSize();
+  keyman.refreshOskLayout();
 
   fragmentToggle = (fragmentToggle + 1) % 100;
-  if(change != 'configured') { // doesn't change the display; only initiates suggestions.
-    window.location.hash = 'refreshBannerHeight-'+fragmentToggle+'+change='+change;
+  if(change != 'configured') {
+    window.location.hash = 'refreshBannerHeight-'+fragmentToggle;
   }
 }
 
@@ -129,16 +184,12 @@ function setIsChiral(keyboardProperties) {
 
 function setKeymanLanguage(k) {
   KeymanWeb.registerStub(k);
-  keyman.setActiveKeyboard(k.KP + '::'+k.KI, k.KLC);
-  keyman.osk.show(true);
+  keyman.setActiveKeyboard(k.KI, k.KLC);
 }
 
 function setSpacebarText(mode) {
-  keyman.options['spacebarText'] = mode;
-  keyman.osk.show(true);
-
-  // Refresh KMW OSK
-  keyman.correctOSKTextSize();
+  var text = (mode == undefined) || !mode.text ? '' : mode.text;
+  keyman.config.spacebarText = text;
 }
 
 // #6665: we need to know when the user has pressed a hardware key so we don't
@@ -164,29 +215,25 @@ function insertText(dn, s, dr) {
 }
 
 function deregisterModel(modelID) {
-  keyman.modelManager.deregister(modelID);
+  keyman.removeModel(modelID);
 }
 
 function enableSuggestions(model, mayPredict, mayCorrect) {
   // Set the options first so that KMW's ModelManager can properly handle model enablement states
   // the moment we actually register the new model.
-  keyman.osk.banner.setOptions({
-    'mayPredict': mayPredict,
-    'mayCorrect': mayCorrect
-  });
+  keyman.core.languageProcessor.mayPredict = mayPredict;
+  keyman.core.languageProcessor.mayCorrect = mayCorrect;
 
   registerModel(model);
 }
 
 function setBannerOptions(mayPredict) {
-  keyman.osk.banner.setOptions({
-    'mayPredict': mayPredict
-  });
+  keyman.core.languageProcessor.mayPredict = mayPredict;
 }
 
 function registerModel(model) {
   //window.console.log('registerModel: ' + model);
-  keyman.registerModel(model);
+  keyman.addModel(model);
 }
 
 function resetContext() {
@@ -200,17 +247,19 @@ function setNumericLayer() {
   }
 }
 
-function updateKMText(text) {
-  var ta = document.getElementById('ta');
-  console_debug('updateKMText(text='+text+') ta.value='+ta.value);
+function updateKMText(k) {
+  var text = (k == undefined) || !k.text ? '' : k.text;
 
-  if(text == undefined) {
-      text = '';
-  }
+  console_debug('updateKMText(text=' + text + ') with: \n' + build_context_string(keyman.context));
 
-  if(ta.value != text) {
-    ta.value = text;
-    window.resetContext();
+  if(!text || text != keyman.context.getText()) {
+    keyman.context.setText(text);
+    keyman.resetContext();
+
+
+    console_debug('result: \n' + build_context_string(keyman.context));
+  } else {
+    console_debug('context unchanged');
   }
 }
 
@@ -220,78 +269,39 @@ function console_debug(s) {
   }
 }
 
-function updateKMSelectionRange(start, end) {
-  var ta = document.getElementById('ta');
-  console_debug('updateKMSelectionRange('+start+','+end+'): ta.selectionStart='+ta.selectionStart+' '+
-    '['+ta._KeymanWebSelectionStart+'] ta.selectionEnd='+ta.selectionEnd+' '+ta._KeymanWebSelectionEnd);
+function build_context_string(context) {
+  // Sadly, ES6-style "template strings" - strings with backticks - require Chrome 41+.
+  return 'preCaret: `' + context.getTextBeforeCaret() + '`\n' +
+    'selected: `' + context.getSelectedText() + '`\n' +
+    'postCaret: `' + context.getTextAfterCaret() + '`';
+}
 
-  var selDirection = 'forward';
+function updateKMSelectionRange(start, end) {
+  var context = keyman.context;
+
+  console_debug('updateKMSelectionRange(' + start + ', ' + end + ') with: \n' + build_context_string(context));
+
   if(start > end) {
     var e0 = end;
     end = start;
     start = e0;
-    selDirection = 'backward';
   }
 
-  if(ta.selectionStart != start || ta.selectionEnd != end || ta.selectionDirection != selDirection) {
-    ta.selectionStart = ta._KeymanWebSelectionStart = start;
-    ta.selectionEnd = ta._KeymanWebSelectionEnd = end;
-    ta.selectionDirection = selDirection;
+  if(context.selStart != start || context.selEnd != end) {
+    keyman.context.setSelection(start, end);
     keyman.resetContext();
+
+    console_debug('result:\n' + build_context_string(context));
+  } else {
+    console.debug('range unchanged');
   }
 }
 
 var lastKeyTip = null;
-function oskCreateKeyPreview(x,y,w,h,t) {
-  if(lastKeyTip &&
-      lastKeyTip.t == t &&
-      lastKeyTip.x == x &&
-      lastKeyTip.y == y &&
-      lastKeyTip.w == w &&
-      lastKeyTip.h == h) {
-    return;
-    }
-  lastKeyTip = {x:x,y:y,w:w,h:h,t:t};
-
-  fragmentToggle = (fragmentToggle + 1) % 100;
-  var div = document.createElement('div');
-  div.innerHTML = t;
-  var dt = div.firstChild.nodeValue;
-  window.location.hash = 'showKeyPreview-'+fragmentToggle+'+x='+x+'+y='+y+'+w='+w+'+h='+h+'+t='+toHex(dt);
-}
-
-function oskClearKeyPreview() {
-  lastKeyTip = null;
-  fragmentToggle = (fragmentToggle + 1) % 100;
-  window.location.hash = 'dismissKeyPreview-'+fragmentToggle;
-}
 
 function signalHelpBubbleDismissal() {
   fragmentToggle = (fragmentToggle + 1) % 100;
   window.location.hash = 'helpBubbleDismissed-'+fragmentToggle;
-}
-
-function oskCreatePopup(obj,x,y) {
-  if(obj != null) {
-    var i;
-    var s = '';
-    var shift = false;
-    var keyPos = x.toString() + ',' + y.toString();
-    for(i=0; i<obj.length; i++)
-    {
-      // elementID contains the layer and coreID
-      s=s+obj[i].elementID;
-      if(obj[i].sp == 1 || obj[i].sp == 2) shift = true;
-      if(typeof(obj[i].text) != 'undefined' && obj[i].text != null && obj[i].text != '') s=s+':'+toHex(obj[i].text);
-      if(i < (obj.length -1)) s=s+';'
-    }
-    fragmentToggle=(fragmentToggle+1) % 100;
-    var hash = 'showMore-' + fragmentToggle + '+keyPos=' + keyPos + '+keys=' + s;
-    if(shift) {
-      hash = hash + '+font=' + 'SpecialOSK';
-    }
-    window.location.hash = hash;
-  }
 }
 
 function suggestionPopup(obj,custom,x,y,w,h) {
@@ -323,6 +333,14 @@ function menuKeyUp() {
   window.location.hash = hash;
 }
 
+// The keyboard-picker displayed via Android longpress disrupts Web-side
+// gesture-handling; this function helps force-clear the globe key's highlighting.
+function clearGlobeHighlight() {
+  if(keyman.osk && keyman.osk.vkbd && keyman.osk.vkbd.currentLayer.globeKey) {
+    keyman.osk.vkbd.currentLayer.globeKey.highlight(false)
+  }
+}
+
 function hideKeyboard() {
   fragmentToggle = (fragmentToggle + 1) % 100;
   window.location.hash = 'hideKeyboard' + fragmentToggle;
@@ -330,28 +348,27 @@ function hideKeyboard() {
 
 function showKeyboard() {
   // Refresh KMW OSK
-  keyman.correctOSKTextSize();
+  keyman.refreshOskLayout();
 }
 
-function executePopupKey(keyID, keyText) {
-  // KMW only needs keyID to process the popup key. keyText merely logged to console
-  //window.console.log('executePopupKey('+keyID+'); keyText: ' + keyText);
-  keyman.executePopupKey(keyID);
-}
-
+// Cannot make it explicitly async / await on API 21.
 function executeHardwareKeystroke(code, shift, lstates, eventModifiers) {
   console_debug('executeHardwareKeystroke(code='+code+',shift='+shift+',lstates='+lstates+',eventModifiers='+eventModifiers+')');
-  try {
-    executingHardwareKeystroke = true;
-    if (keyman.executeHardwareKeystroke(code, shift, lstates)) { // false if matched, true if not
+
+  executingHardwareKeystroke = true;
+
+  // Would be cleaner if we could async / await here, which would give us a simple try-catch implementation.
+  var promise = keyman.hardKeyboard.raiseKeyEvent(code, shift, lstates);
+  promise.then(function (result) {
+    if(result) { // false if matched, true if not
       // KMW didn't process the key, so have the Android app dispatch the key with the original event modifiers
       window.jsInterface.dispatchKey(code, eventModifiers);
+      executingHardwareKeystroke = false;
     }
-    executingHardwareKeystroke = false;
-  } catch(e) {
+  }).catch(function (e) {
     window.console.log('executeHardwareKeystroke exception: '+e);
     executingHardwareKeystroke = false;
-  }
+  });
 }
 
 function popupVisible(value) {
@@ -372,25 +389,4 @@ function toHex(theString) {
     hexString += theHex;
   }
   return hexString;
-}
-
-/**
- * Check the WebView version and determine if the textarea that KeymanWeb uses needs to be "visible".
- * Normally, this textarea is not displayed to avoid redundant layout calculations.
- * In older WebViews on Android 5.0 though, selectionStart and selectionEnd positions fail to
- * update unless the textarea is visible.
- * Reference: Issue #5376
- */
-function checkTextArea() {
-  var uaRe = /Chrome\/([0-9]*)\./g;
-  var chromeMajorVersion = uaRe.exec(navigator.userAgent);
-  if (chromeMajorVersion && parseInt(chromeMajorVersion[1]) <= 37) {
-    var ta = document.getElementById('ta');
-    if (ta != null) {
-      ta.style.display = '';
-      ta.style.position = 'absolute';
-      ta.style.left = '-500px';
-      ta.style.top = '0px';
-    }
-  }
 }

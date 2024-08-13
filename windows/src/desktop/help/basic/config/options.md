@@ -60,23 +60,6 @@ To open the Options tab of Keyman Configuration:
     Click the Reset Hints button to switch all hint messages on again,
     even those that you have switched off on a case-by-case basis.
 
--   Select keyboard layout for all applications (Windows 7)
-
-    Unlike Windows 7 default behaviour, Keyman allows you to select one
-    Windows language and Keyman keyboard for all open applications and
-    text fields across your entire system. Tick this option to select
-    one Windows language and Keyman keyboard across your entire system.
-    Untick this option to select Windows language and Keyman keyboards
-    independently for different programs.
-
-    On Windows 8, 8.1, 10 and later versions, this checkbox is disabled
-    because Windows has this functionality built in. The setting can be
-    changed in Windows, with the following steps:
-
-    -   Search for "Advanced Keyboard Settings"
-    -   Check the \"Let me set a different input method for each app
-        window\" checkbox.
-
 -   Automatically report errors to keyman.com
 
     If Keyman crashes, then it can automatically send a report to the

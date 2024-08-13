@@ -1,8 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="und" conformsTo="techpreview">
-  <info author="srl295" indicator="🙀" layout="qwerty" normalization="NFC" />
-  <names>
-    <name value="Test Minimal Keyboard" />
-  </names>
-</keyboard>
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="und" conformsTo="45">
+  <info author="srl295" indicator="🙀" layout="qwerty"  name="Test Minimal Keyboard"/>
+</keyboard3>

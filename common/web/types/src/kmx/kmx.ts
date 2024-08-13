@@ -7,10 +7,48 @@ import * as r from 'restructure';
 // In memory representations of KMX structures
 // kmx-builder will transform these to the corresponding COMP_xxxx
 
+export enum KMX_Version {
+  VERSION_30 =  0x00000300,
+  VERSION_31 =  0x00000301,
+  VERSION_32 =  0x00000302,
+  VERSION_40 =  0x00000400,
+  VERSION_50 =  0x00000500,
+  VERSION_501 = 0x00000501,
+  VERSION_60 =  0x00000600,
+  VERSION_70 =  0x00000700,
+  VERSION_80 =  0x00000800,
+  VERSION_90 =  0x00000900,
+  VERSION_100 = 0x00000A00,
+  VERSION_140 = 0x00000E00,
+  VERSION_150 = 0x00000F00,
+  VERSION_160 = 0x00001000,
+  VERSION_170 = 0x00001100
+};
+
+
 export class KEYBOARD {
-  //TODO: additional header fields
+  fileVersion?: number;  // dwFileVersion (TSS_FILEVERSION)
+
+  startGroup: {
+    ansi: number;           // from COMP_KEYBOARD
+    unicode: number;        // from COMP_KEYBOARD
+    newContext: number;     // from TSS_BEGIN_NEWCONTEXT store
+    postKeystroke: number;  // from TSS_BEGIN_POSTKEYSTROKE store
+  } = {ansi:-1, unicode:-1, newContext:-1, postKeystroke:-1};
+
+  flags?: number;
+  hotkey?: number;
+
+  //bitmap:
   groups: GROUP[] = [];
   stores: STORE[] = [];
+
+  // Following values are extracted from stores[] but are
+  // informative only
+
+  keyboardVersion?: string;   // version (TSS_KEYBOARDVERSION)
+  isMnemonic: boolean;        // TSS_MNEMONICLAYOUT store
+  targets: string;            // TSS_TARGETS store ('desktop' if missing)
 };
 
 export class STORE {
@@ -21,7 +59,7 @@ export class STORE {
 
 export class GROUP {
   dpName: string;
-  keys: KEY[];
+  keys: KEY[] = [];
   dpMatch: string;
   dpNoMatch: string;
   fUsingKeys: boolean;
@@ -110,24 +148,24 @@ export class KMXFile {
   // File version identifiers (COMP_KEYBOARD.dwFileVersion)
   //
 
-  public static readonly VERSION_30 =  0x00000300;
-  public static readonly VERSION_31 =  0x00000301;
-  public static readonly VERSION_32 =  0x00000302;
-  public static readonly VERSION_40 =  0x00000400;
-  public static readonly VERSION_50 =  0x00000500;
-  public static readonly VERSION_501 = 0x00000501;
-  public static readonly VERSION_60 =  0x00000600;
-  public static readonly VERSION_70 =  0x00000700;
-  public static readonly VERSION_80 =  0x00000800;
-  public static readonly VERSION_90 =  0x00000900;
-  public static readonly VERSION_100 = 0x00000A00;
-  public static readonly VERSION_140 = 0x00000E00;
-  public static readonly VERSION_150 = 0x00000F00;
-
-  public static readonly VERSION_160 = 0x00001000;
+  public static readonly VERSION_30 =  KMX_Version.VERSION_30;
+  public static readonly VERSION_31 =  KMX_Version.VERSION_31;
+  public static readonly VERSION_32 =  KMX_Version.VERSION_32;
+  public static readonly VERSION_40 =  KMX_Version.VERSION_40;
+  public static readonly VERSION_50 =  KMX_Version.VERSION_50;
+  public static readonly VERSION_501 = KMX_Version.VERSION_501;
+  public static readonly VERSION_60 =  KMX_Version.VERSION_60;
+  public static readonly VERSION_70 =  KMX_Version.VERSION_70;
+  public static readonly VERSION_80 =  KMX_Version.VERSION_80;
+  public static readonly VERSION_90 =  KMX_Version.VERSION_90;
+  public static readonly VERSION_100 = KMX_Version.VERSION_100;
+  public static readonly VERSION_140 = KMX_Version.VERSION_140;
+  public static readonly VERSION_150 = KMX_Version.VERSION_150;
+  public static readonly VERSION_160 = KMX_Version.VERSION_160;
+  public static readonly VERSION_170 = KMX_Version.VERSION_170;
 
   public static readonly VERSION_MIN = this.VERSION_50;
-  public static readonly VERSION_MAX = this.VERSION_160;
+  public static readonly VERSION_MAX = this.VERSION_170;
 
   //
   // Backspace types
@@ -231,7 +269,13 @@ export class KMXFile {
 
   public static readonly TSS__KEYMAN_150_MAX =     43;
 
-  public static readonly TSS__MAX =                43;
+  /* Keyman 17.0 system stores */
+
+  public static readonly TSS_DISPLAYMAP =          44;
+
+  public static readonly TSS__KEYMAN_170_MAX =     44;
+
+  public static readonly TSS__MAX =                44;
 
 
   public static readonly UC_SENTINEL =       0xFFFF;
@@ -319,6 +363,25 @@ export class KMXFile {
   public static readonly ISVIRTUALKEY   = 0x4000;    // It is a Virtual Key Sequence
   public static readonly VIRTUALCHARKEY = 0x8000;    // Keyman 6.0: Virtual Key Cap Sequence NOT YET
 
+  // Note: OTHER_MODIFIER = 0x10000, used by KMX+ for the
+  // other modifier flag in layers, > 16 bit so not available here.
+  // See keys_mod_other in keyman_core_ldml.ts
+
+  public static readonly MASK_MODIFIER_CHIRAL = KMXFile.LCTRLFLAG | KMXFile.RCTRLFLAG | KMXFile.LALTFLAG | KMXFile.RALTFLAG;
+  public static readonly MASK_MODIFIER_SHIFT = KMXFile.K_SHIFTFLAG;
+  public static readonly MASK_MODIFIER_NONCHIRAL = KMXFile.K_CTRLFLAG | KMXFile.K_ALTFLAG;
+
+  public static readonly MASK_STATEKEY = KMXFile.CAPITALFLAG | KMXFile.NOTCAPITALFLAG |
+                                         KMXFile.NUMLOCKFLAG | KMXFile.NOTNUMLOCKFLAG |
+                                         KMXFile.SCROLLFLAG | KMXFile.NOTSCROLLFLAG;
+  public static readonly MASK_KEYTYPE  = KMXFile.ISVIRTUALKEY | KMXFile.VIRTUALCHARKEY;
+
+  public static readonly MASK_MODIFIER = KMXFile.MASK_MODIFIER_CHIRAL | KMXFile.MASK_MODIFIER_SHIFT | KMXFile.MASK_MODIFIER_NONCHIRAL;
+
+  public static readonly MASK_KEYS = KMXFile.MASK_MODIFIER | KMXFile.MASK_STATEKEY;
+  public static readonly KMX_MASK_VALID    = KMXFile.MASK_KEYS | KMXFile.MASK_KEYTYPE;
+
+
   public static readonly K_MODIFIERFLAG    = 0x007F;
   public static readonly K_NOTMODIFIERFLAG = 0xFF00;   // I4548
 
@@ -328,12 +391,13 @@ export class KMXFile {
   public static readonly COMP_GROUP_SIZE  = 24;
   public static readonly COMP_KEY_SIZE    = 20;
 
+
+  public static readonly VERSION_MASK_MINOR = 0x00FF;
+  public static readonly VERSION_MASK_MAJOR = 0xFF00;
+
   /* In-memory representation of the keyboard */
 
-  public keyboard: KEYBOARD = {
-    groups: [],
-    stores: []
-  };
+  public keyboard: KEYBOARD = new KEYBOARD();
 
   constructor() {
 

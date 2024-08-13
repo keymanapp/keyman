@@ -47,3 +47,4 @@ coverage
 # Build output
 dist
 lib
+build

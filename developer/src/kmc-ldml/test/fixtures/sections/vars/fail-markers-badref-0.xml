@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+This will fail because the two markers given don't exist anywhere.
+
+-->
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="vars-markers-badref-0"/>
+
+  <displays>
+    <!-- Not ok, nobody emits this, so this display doesn't make sense -->
+    <display output="\m{doesnt_exist_1}" display="¬" />
+    <!-- OK - it is in the strings list.  Could warn that it matches no keys -->
+    <display output="\m{maybe_emitted}" display="‽" />
+  </displays>
+
+  <variables>
+    <!-- This may be emitted, so at present it does not cause an error. -->
+    <!-- A linter could, however, hint on an unused variable. -->
+    <!-- Removing this variable would cause \m{maybe-emitted}  to error in the transform group -->
+    <string id="unused_variable" value="\m{maybe_emitted}" />
+  </variables>
+
+  <transforms type="simple">
+    <transformGroup>
+      <!-- not OK, nobody emits this. -->
+      <transform from="\m{doesnt_exist_3}" to="3" />
+    </transformGroup>
+  </transforms>
+  <transforms type="backspace">
+    <transformGroup>
+      <!-- not OK, nobody emits this. -->
+      <transform from="\m{doesnt_exist_2}" />
+      <!-- OK - it's in the variable list -->
+      <transform from="\m{maybe_emitted}" />
+      <!-- OK - matches all markers -->
+      <transform from="\m{.}" />
+    </transformGroup>
+  </transforms>
+</keyboard3>

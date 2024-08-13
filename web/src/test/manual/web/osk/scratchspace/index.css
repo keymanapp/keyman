@@ -1,0 +1,113 @@
+body {font-family: Tahoma,helvetica;}
+h3 {font-size: 1em;font-weight:normal;color: darkred; margin-bottom: 4px}
+.test {font-size: 24px; width:80%; min-height:30px; border: 1px solid gray;}
+#KeymanWebControl {width:50%;min-width:600px;}
+
+.inactive {
+  display: none;
+}
+
+textarea.selected, input.selected {
+  border-width: 3px;
+}
+
+#keyboard-controller,
+#osk-selector {
+  width: fit-content;
+  margin-bottom: 4px;
+}
+
+
+body.phone #keyboard-controller,
+body.phone #osk-selector {
+  width: unset;
+  height: unset;
+}
+
+#keyboard-controller button,
+#osk-selector button {
+  min-width: fit-content;
+}
+
+div.panel {
+  padding: 4px;
+  background-color: lightgray;
+  width: fit-content;
+}
+
+div.panel p.category {
+  display: inline-block;
+  font-weight: bold;
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}
+
+div.panel .group {
+  border: 1px darkgray solid;
+  padding: 4px;
+}
+
+div.panel div {
+  min-width: fit-content;
+  padding: 4px 0px;
+}
+
+body.phone div.panel {
+  width: calc(100% - 8px); /* 4px padding on div.panel, both sides */
+}
+
+div.panel .gap {
+  width: 4px;
+  display: inline-block;
+}
+
+div.panel div input {
+  float: right;
+}
+
+div.flex {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 4px;
+
+  flex-wrap: wrap;
+}
+
+div.flex.inactive {
+  display: none;
+}
+
+div.flex button {
+  flex-grow: 1;
+}
+
+div.flex .group {
+  flex-grow: 1;
+}
+
+#eventlog {
+  width: 100%;
+}
+
+body.touch .notouch {
+  display: none;
+}
+
+body .touch {
+  display: none;
+}
+
+body.touch div.touch {
+  display: block;
+}
+
+div.disabled {
+  font-size: 0.9em;
+  font-style:italic;
+  color:darkslategray"
+}
+
+button.selected {
+  font-weight: bold;
+}

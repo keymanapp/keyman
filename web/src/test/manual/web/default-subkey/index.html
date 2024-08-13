@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+    <!-- Set the viewport width to match phone and tablet device widths -->
+    <meta name="viewport" content="width=device-width,user-scalable=no" />
+
+    <!-- Allow KeymanWeb to be saved to the iPhone home screen -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <!-- Enable IE9 Standards mode -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    <title>KeymanWeb Testing Page - Predictive Text: robust testing</title>
+
+    <!-- Your page CSS -->
+    <style type='text/css'>
+      body {font-family: Tahoma,helvetica;}
+      h3 {font-size: 1em;font-weight:normal;color: darkred; margin-bottom: 4px}
+      .test {font-size: 1.5em; width:80%; min-height:30px; border: 1px solid gray;}
+      #KeymanWebControl {width:50%;min-width:600px;}
+    </style>
+
+    <!-- Insert uncompiled KeymanWeb source scripts -->
+    <script src="../../../../../build/publish/debug/keymanweb.js" type="application/javascript"></script>
+
+    <!--
+      For desktop browsers, a script for the user interface must be inserted here.
+
+      Standard UIs are toggle, button, float and toolbar.
+      The toolbar UI is best for any page designed to support keyboards for
+      a large number of languages.
+    -->
+    <script src="../../../../../build/publish/debug/kmwuitoggle.js"></script>
+
+    <!-- Initialization: set paths to keyboards, resources and fonts as required -->
+    <script>
+      var kmw=window.keyman;
+      kmw.init({
+		    attachType:'auto'
+      }).then(function() {
+        kmw.addKeyboards({id:'default_subkey',name:'English',languages:{id:'en',name:'English'}, filename:'./default_subkey.js'});
+
+        var pageRef = (window.location.protocol == 'file:')
+          ? window.location.href.substr(0, window.location.href.lastIndexOf('/')+1)
+          : window.location.href;
+      });
+    </script>
+  </head>
+
+<!-- Sample page HTML -->
+  <body>
+    <h2>KeymanWeb Sample Page - default subkey bootstrap-testing</h2>
+    <p>Note:  the intended tests require use of a touch-form-factor device or emulation thereof.
+    </p>
+    <p>
+      The primary test is held on the default layer's 'd' key - the key labeled 'default' should
+      be autoselected.
+    </p>
+    <p>
+      A secondary test is held on the default layer's 'a' key - the key labeled 'a', matching the
+      base key, should be autoselected.
+    </p>
+    <div>
+    <!--
+      The following DIV is used to position the Button or Toolbar User Interfaces on the page.
+      If omitted, those User Interfaces will appear at the top of the document body.
+      (It is ignored by other User Interfaces.)
+    -->
+    <div id='KeymanWebControl'></div>
+
+    <h3>Type in your language in this text area:</h3>
+    <textarea id='ta1' class='test' placeholder='Type here'></textarea>
+
+    <h3>or in this input field:</h3>
+    <input class='test' value='' placeholder='or here'/>
+
+    <h3><a href="./">Return to testing home page</a></h3>
+  </div>
+
+  </body>
+
+  <!--
+    *** DEVELOPER NOTE -- FIREFOX CONFIGURATION FOR TESTING ***
+    *
+    * If the URL bar starts with <b>file://</b>, Firefox may not load the font used
+    * to display the special characters used in the On-Screen Keyboard.
+    *
+    * To work around this Firefox bug, navigate to <b>about:config</b>
+    * and set <b>security.fileuri.strict_origin_policy</b> to <b>false</b>
+    * while testing.
+    *
+    * Firefox resolves website-based CSS URI references correctly without needing
+    * any configuration change, so this change should only be made for file-based testing.
+    *
+    ***
+  -->
+</html>

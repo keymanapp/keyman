@@ -73,14 +73,14 @@
     },
     {
       "name": "Python: Current File",
-      "type": "python",
+      "type": "debugpy",
       "request": "launch",
       "program": "${file}",
       "console": "integratedTerminal"
     },
     {
       "name": "km-config",
-      "type": "python",
+      "type": "debugpy",
       "request": "launch",
       "program": "linux/keyman-config/km-config",
       "cwd": "${workspaceFolder}",
@@ -91,7 +91,7 @@
     },
     {
       "name": "km-package-install",
-      "type": "python",
+      "type": "debugpy",
       "request": "launch",
       "program": "linux/keyman-config/km-package-install",
       "cwd": "${workspaceFolder}",

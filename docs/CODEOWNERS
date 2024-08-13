@@ -26,7 +26,7 @@
 /oem/firstvoices/windows/     @rc-swag      @ermshiperete
 /resources/                   @mcdurdin     @jahorton
 
-# Web is currently shared between Marc and Joshua:
-/web/                         @jahorton     @mcdurdin
+# Web is currently shared between Eberhard and Joshua:
+/web/                         @ermshiperete @jahorton
 
 /windows/                     @rc-swag      @ermshiperete

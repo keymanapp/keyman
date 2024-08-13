@@ -1,17 +1,14 @@
 util_files = files(
   'keymanutil.c',
-  'keymanutil.h',
   'kmpdetails.c',
-  'kmpdetails.h',
+  'bcp47util.c',
 )
 
 engine_files = files(
   'main.c',
   'engine.c',
-  'engine.h',
-  'keycodes.h',
   'keyman-service.c',
-  'keyman-service.h',
+  'KeymanSystemServiceClient.cpp',
 )
 
 include_dirs = [
@@ -20,7 +17,7 @@ include_dirs = [
   include_directories(meson.current_build_dir() / '..'),
 ]
 
-deps = [ibus, gtk, x11, json_glib, kmnkbp_lib]
+deps = [gtk, ibus, icu, json_glib, keymancore_lib, systemd]
 
 prefix = get_option('prefix')
 cfg = configuration_data()

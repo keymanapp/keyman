@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.kmw-main-base.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "build/obj/",
+    "tsBuildInfoFile": "build/obj/tsconfig.all.tsbuildinfo",
+    "rootDir": "./src/"
+  },
+  "references": [
+    { "path": "./src/keyboards/loaders/tsconfig.dom.json" },
+    { "path": "./src/keyboards/loaders/tsconfig.node.json" },
+    { "path": "./tests/tsconfig.json" },
+  ],
+  // Actual main-body compilation is in tsconfig.json.  This config is just a wrapper
+  // to trigger all three components at once.
+  "include": []
+}

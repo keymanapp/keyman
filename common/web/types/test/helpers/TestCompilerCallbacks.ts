@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { loadFile, loadSchema, resolveFilename } from '../helpers/index.js';
-import { CompilerCallbacks, CompilerEvent, CompilerFileSystemCallbacks, CompilerPathCallbacks, CompilerSchema } from '../../src/util/compiler-interfaces.js';
+import { loadFile, resolveFilename } from '../helpers/index.js';
+import { CompilerCallbacks, CompilerError, CompilerEvent, CompilerFileSystemCallbacks, CompilerPathCallbacks } from '../../src/util/compiler-interfaces.js';
 
 // This is related to developer/src/common/web/test-helpers/index.ts but has a slightly different API surface
 // as this runs at a lower level than the compiler.
@@ -9,23 +9,15 @@ import { CompilerCallbacks, CompilerEvent, CompilerFileSystemCallbacks, Compiler
  * A CompilerCallbacks implementation for testing
  */
 export class TestCompilerCallbacks implements CompilerCallbacks {
-  loadSchema(schema: CompilerSchema): Buffer {
-    switch (schema) {
-      case 'kpj':
-        throw new Error('loadKpjJsonSchema not implemented.'); // not needed for this test
-      case 'kvks':
-        throw new Error('loadKvksJsonSchema not implemented.');
-      case 'ldml-keyboard':
-        return loadSchema(schema);
-      case 'ldml-keyboardtest':
-        return loadSchema(schema);
-    }
-  }
   clear() {
     this.messages = [];
   }
   debug(msg: string): void {
     console.debug(msg);
+  }
+
+  printMessages() {
+    process.stdout.write(CompilerError.formatEvent(this.messages));
   }
 
   messages: CompilerEvent[] = [];
@@ -42,7 +34,7 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
     return resolveFilename(baseFilename, filename);
   }
 
-  loadFile(filename: string | URL): Buffer {
+  loadFile(filename: string): Uint8Array {
     // TODO: error management, does it belong here?
     try {
       return loadFile(filename);
@@ -53,6 +45,10 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
         throw e;
       }
     }
+  }
+
+  fileSize(filename: string): number {
+    return fs.statSync(filename).size;
   }
 
   reportMessage(event: CompilerEvent): void {

@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="mt" conformsTo="techpreview">
-  <info author="srl295" indicator="🙀" layout="qwerty" normalization="NFC" />
-
-  <names>
-    <name value="TestKbd" />
-  </names>
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info author="srl295" indicator="🙀" layout="qwerty"  name="TestKbd"/>
 
   <keys>
-    <import base="cldr" path="techpreview/none-Zxxx-does-not-exist.xml"/> <!-- invalid -->
-    <key id="hmaqtugha" to="ħ" />
-    <key id="that" to="ថា" />
+    <import base="cldr" path="45/none-Zxxx-does-not-exist.xml"/> <!-- invalid -->
+    <key id="hmaqtugha" output="ħ" />
+    <key id="that" output="ថា" />
   </keys>
 
-</keyboard>
+</keyboard3>

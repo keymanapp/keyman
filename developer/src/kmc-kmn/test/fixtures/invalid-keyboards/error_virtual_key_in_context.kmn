@@ -1,0 +1,9 @@
+store(&NAME) 'ERROR_VirtualKeyInContext'
+store(&VERSION) '9.0'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+c ERROR_VirtualKeyInContext
+[K_BKQUOTE] + 'a' > 'b'

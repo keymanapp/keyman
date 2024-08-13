@@ -1,0 +1,13 @@
+c Description: Verifies that kmcmplib picks up on duplicated stores with Unicode names,
+c and that the Unicode names are correctly reported in error messages in UTF-8
+
+store(&NAME) 'error_duplicate_store'
+store(&VERSION) '9.0'
+
+begin unicode > use(ខ្មែរ)
+
+group(ខ្មែរ) using keys
+
+store(ខ្មែរ) 'abc'
+store(ខ្មែរ) 'def'
+

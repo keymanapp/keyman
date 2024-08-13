@@ -1,5 +1,5 @@
 # Copyright:    © 2018 SIL International.
-# Description:  Cross platform build script to compile libkmnkbp API unit tests.
+# Description:  Cross platform build script to compile libkeymancore API unit tests.
 # Create Date:  19 Oct 2018
 # Authors:      Marc Durdin, Tim Eves (TSE)
 # History:      19  Oct 2018 - TSE - Added test for context API functions.
@@ -23,14 +23,15 @@ common_test_keyboards_baseline = source_path / '../../../../common/test/keyboard
 if cpp_compiler.get_id() == 'emscripten'
   # TODO: we will move the tests to ES6 in the future
   # '-sMODULARIZE', '-sEXPORT_ES6',
-  tests_flags += ['-lnodefs.js', '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\']']
+  tests_flags += ['-lnodefs.js', wasm_exported_runtime_methods]
 endif
 
 kmx = executable('kmx',
-    ['kmx.cpp', '../emscripten_filesystem.cpp'],
+    ['kmx.cpp', common_test_files],
     cpp_args: defns + warns,
     include_directories: [inc, libsrc, '../../kmx_test_source'],
     link_args: links + tests_flags,
+    dependencies: [icu_uc, icu_i18n],
     objects: [lib.extract_all_objects(recursive: false), kmx_test_source_lib.extract_all_objects(recursive: false)])
 
 tests = [
@@ -78,19 +79,18 @@ tests = [
   'k_045___deadkey_and_context',
   'k_046___deadkey_and_contextex',
   'k_047___caps_always_off_initially_on',
-  'k_048___modifier_keys_keep_context'
+  'k_048___modifier_keys_keep_context',
+  'k_049___enter_invalidates_context'
 ]
 
 node = find_program('node', required: true)
 
 kmc_root = meson.current_source_dir() / '../../../../developer/src/kmc/build/src/kmc.js'
-kmc_cmd = [node, kmc_root]
+kmc_cmd = [node, '--enable-source-maps', kmc_root]
 
 if build_machine.system() == 'windows'
-  copy_cmd = [find_program('cmd.exe', required: true), '/c', 'copy']
-  cat_cmd = [find_program('cmd.exe', required: true), '/c', 'type']
+  cat_cmd = [find_program(meson.current_source_dir() / 'cat.bat', required: true)]
 else
-  copy_cmd = [find_program('cp', required: true)]
   cat_cmd = [find_program('cat', required: true)]
 endif
 
@@ -125,7 +125,7 @@ foreach kbd : tests
   kbd_src_path = common_test_keyboards_baseline / kbd + '.kmn'
 
   content = run_command(
-    cat_cmd, files(kbd_src_path),
+    cat_cmd, files(kbd_src_path), check: true,
   ).stdout().strip()
 
   cfg = configuration_data()
@@ -167,17 +167,18 @@ endforeach
 
 subdir('fixtures')
 
-# test for km_kbp_keyboard_get_key_list
+# test for km_core_keyboard_get_key_list
 
 # For following tests, we need to be copying from source_path,
 # not build_path, so we'll just update test_path accordingly. This
 # should work for Linux, macOS, and WASM.
 test_path = source_path
 
-key_e = executable('key_list', ['kmx_key_list.cpp', '../emscripten_filesystem.cpp'],
+key_e = executable('key_list', ['kmx_key_list.cpp', common_test_files],
                 cpp_args: defns + warns,
                 include_directories: [inc, libsrc],
                 link_args: links + tests_flags,
+                dependencies: [icu_uc, icu_i18n],
                 objects: lib.extract_all_objects(recursive: false))
 test_kbd = 'kmx_key_list'
 
@@ -192,10 +193,11 @@ test('key_list', key_e,  depends: kbd_log, args: [kbd_obj] )
 
 # test for imx list
 
-imx_e = executable('imx_list', ['kmx_imx.cpp', '../emscripten_filesystem.cpp'],
+imx_e = executable('imx_list', ['kmx_imx.cpp', common_test_files],
                 cpp_args: defns + warns,
                 include_directories: [inc, libsrc],
                 link_args: links + tests_flags,
+                dependencies: [icu_uc, icu_i18n],
                 objects: lib.extract_all_objects(recursive: false))
 
 test_kbd = 'kmx_imsample'
@@ -208,3 +210,22 @@ kbd_log = custom_target(test_kbd + '.kmx'.underscorify(),
   command: kmc_cmd + ['build', '--debug', '--no-compiler-version', '@INPUT@', '--out-file', kbd_obj]
 )
   test('imx_list', imx_e,  depends: kbd_log, args: [kbd_obj] )
+
+external_e = executable('ext_event', ['kmx_external_event.cpp', common_test_files],
+                cpp_args: defns + warns,
+                include_directories: [inc, libsrc],
+                link_args: links + tests_flags,
+                dependencies: [icu_uc, icu_i18n],
+                objects: lib.extract_all_objects(recursive: false))
+
+test_kbd = 'k_033___caps_always_off'
+
+
+kbd_src = common_test_keyboards_baseline + '/' + test_kbd + '.kmn'
+kbd_obj = join_paths(meson.current_build_dir(), test_kbd) + '.kmx'
+kbd_log = custom_target(test_kbd + '.kmx'.underscorify(),
+  output: test_kbd + '.log',
+  input: kbd_src,
+  command: kmc_cmd + ['build', '--debug', '--no-compiler-version', '@INPUT@', '--out-file', kbd_obj]
+)
+  test('ext_event', external_e,  depends: kbd_log, args: [kbd_obj] )

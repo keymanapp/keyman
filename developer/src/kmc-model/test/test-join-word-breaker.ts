@@ -1,5 +1,5 @@
 import { assert } from "chai";
-import defaultWordBreaker from './wordbreakers/default-wordbreaker-esm.js';
+import defaultWordBreaker from '@keymanapp/models-wordbreakers';
 import {decorateWithJoin} from '../src/join-word-breaker-decorator.js';
 
 describe('The join word breaker decorator', function () {

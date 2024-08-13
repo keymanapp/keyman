@@ -8,11 +8,11 @@
     "unicode"
   ],
   "files": [
-    "/build/keyboardprocessor_ldml.*"
+    "/build/keyman_core_ldml.*"
   ],
   "license": "MIT",
   "type": "module",
-  "main": "build/keyboardprocessor_ldml.js",
+  "main": "build/keyman_core_ldml.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/keymanapp/keyman.git"

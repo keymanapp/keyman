@@ -11,13 +11,11 @@
   ],
   "scripts": {
     "build": "tsc -b",
-    "bundle": "npm run bundle-kmc && npm run bundle-kmlmc && npm run bundle-kmlmi && npm run bundle-kmlmp",
+    "bundle": "npm run bundle-kmc && npm run bundle-kmlmc && npm run bundle-kmlmp",
     "bundle-kmc": "esbuild build/src/kmc.js --bundle --platform=node --target=es2022 > build/cjs-src/kmc.cjs",
     "bundle-kmlmc": "esbuild build/src/kmlmc.js --bundle --platform=node --target=es2022 > build/cjs-src/kmlmc.cjs",
-    "bundle-kmlmi": "esbuild build/src/kmlmi.js --bundle --platform=node --target=es2022 > build/cjs-src/kmlmi.cjs",
     "bundle-kmlmp": "esbuild build/src/kmlmp.js --bundle --platform=node --target=es2022 > build/cjs-src/kmlmp.cjs",
-    "test": "eslint . && cd test && tsc -b && cd .. && mocha",
-    "prepublishOnly": "npm run build"
+    "test": "eslint . && cd test && tsc -b && cd .. && mocha"
   },
   "type": "module",
   "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
@@ -33,35 +31,37 @@
   "bin": {
     "kmc": "build/src/kmc.js",
     "kmlmc": "build/src/kmlmc.js",
-    "kmlmp": "build/src/kmlmp.js",
-    "kmlmi": "build/src/kmlmi.js"
+    "kmlmp": "build/src/kmlmp.js"
   },
   "dependencies": {
-    "@keymanapp/keyman-version": "*",
     "@keymanapp/common-types": "*",
+    "@keymanapp/developer-utils": "*",
+    "@keymanapp/keyman-version": "*",
+    "@keymanapp/kmc-analyze": "*",
+    "@keymanapp/kmc-keyboard-info": "*",
     "@keymanapp/kmc-kmn": "*",
     "@keymanapp/kmc-ldml": "*",
     "@keymanapp/kmc-model": "*",
     "@keymanapp/kmc-model-info": "*",
     "@keymanapp/kmc-package": "*",
     "@keymanapp/models-types": "*",
-    "commander": "^10.0.0"
+    "@sentry/node": "^7.57.0",
+    "chalk": "^2.4.2",
+    "commander": "^10.0.0",
+    "supports-color": "^9.4.0"
   },
   "files": [
-    "build/src/"
+    "build/src/",
+    "build/unicode-license.txt"
   ],
   "devDependencies": {
-    "@types/chai": "^4.1.7",
+    "@sentry/cli": "^2.31.0",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^10.14.6",
-    "@types/xml2js": "^0.4.5",
+    "@types/node": "^20.4.1",
     "c8": "^7.12.0",
-    "chai": "^4.3.4",
-    "chalk": "^2.4.2",
-    "esbuild": "^0.15.8",
+    "esbuild": "^0.18.9",
     "mocha": "^8.4.0",
-    "ts-node": "^9.1.1",
-    "typescript": "^4.9.5"
+    "typescript": "^5.4.5"
   },
   "mocha": {
     "spec": "build/test/**/test-*.js",

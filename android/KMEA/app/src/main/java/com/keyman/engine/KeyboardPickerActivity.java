@@ -51,6 +51,7 @@ import android.widget.Toast;
 import androidx.appcompat.widget.Toolbar;
 
 public final class KeyboardPickerActivity extends BaseActivity {
+  private boolean hasDeleted = false;
 
   //TODO: view instances should not be static
   private static Toolbar toolbar = null;
@@ -123,7 +124,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        switchKeyboard(position,dismissOnSelect && ! KMManager.isTestMode());
+        switchKeyboard(position);
         if (dismissOnSelect)
           finish();
       }
@@ -140,6 +141,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
             public boolean onMenuItemClick(MenuItem item) {
               if (item.getItemId() == R.id.popup_delete) {
                 deleteKeyboard(context, position);
+                KeyboardPickerActivity.this.hasDeleted = true;
                 return true;
               } else {
                 return false;
@@ -267,11 +269,16 @@ public final class KeyboardPickerActivity extends BaseActivity {
   protected void onPause() {
     super.onPause();
 
-    if (KMManager.InAppKeyboard != null) {
-      KMManager.InAppKeyboard.loadKeyboard();
-    }
-    if (KMManager.SystemKeyboard != null) {
-      KMManager.SystemKeyboard.loadKeyboard();
+    if (this.hasDeleted) {
+      this.hasDeleted = false;
+
+      if (KMManager.InAppKeyboard != null) {
+        KMManager.InAppKeyboard.loadKeyboard();
+      }
+
+      if (KMManager.SystemKeyboard != null) {
+        KMManager.SystemKeyboard.loadKeyboard();
+      }
     }
   }
 
@@ -283,6 +290,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
 
   @Override
   public void onBackPressed() {
+    super.onBackPressed();
     finish();
   }
 
@@ -335,7 +343,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
    * @param position the keyboard index in list
    * @param aPrepareOnly prepare switch, it is executed on keyboard reload
    */
-  private static void switchKeyboard(int position, boolean aPrepareOnly) {
+  private static void switchKeyboard(int position) {
     setSelection(position);
     int size = KeyboardController.getInstance().get().size();
     int listPosition = (position >= size) ? size-1 : position;
@@ -344,10 +352,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
     String kbId = kbInfo.getKeyboardID();
     String langId = kbInfo.getLanguageID();
     String kbName = kbInfo.getKeyboardName();
-    if(aPrepareOnly)
-      KMManager.prepareKeyboardSwitch(pkgId, kbId, langId, kbName);
-    else
-      KMManager.setKeyboard(kbInfo);
+    KMManager.setKeyboard(kbInfo);
   }
 
   protected static boolean addKeyboard(Context context, Keyboard keyboardInfo) {
@@ -449,7 +454,7 @@ public final class KeyboardPickerActivity extends BaseActivity {
         adapter.notifyDataSetChanged();
       }
       if (position == curKbPos) {
-        switchKeyboard(0,false);
+        switchKeyboard(0);
       } else if(listView != null) { // A bit of a hack, since LanguageSettingsActivity calls this method too.
         curKbPos = KeyboardController.getInstance().getKeyboardIndex(KMKeyboard.currentKeyboard());
         setSelection(curKbPos);

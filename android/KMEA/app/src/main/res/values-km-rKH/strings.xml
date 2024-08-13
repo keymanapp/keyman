@@ -43,7 +43,7 @@
     <!-- Context: Button label -->
     <string name="label_update" comment="Dialog button to update a resource">អាប់ដេត</string>
     <!-- Context: No internet for updates -->
-    <string name="no_internet_connection" comment="Internet connection missing">No internet connection</string>
+    <string name="no_internet_connection" comment="Internet connection missing">មិនមាន​ការតភ្ជាប់អ៊ីធើណិត</string>
     <!-- Context: Keyboard Updates -->
     <string name="cannot_connect" comment="Error message when network connection fails">មិនអាច​ភ្ជាប់​ទៅម៉ាស៊ីនមេរបស់ Keyman បានទេ!</string>
     <!-- Context: Keyboard Updates -->
@@ -105,7 +105,7 @@
     <string name="dictionary_download_start_in_background" comment="Notification that a dictionary download has started">ការទាញយកបញ្ជី​ពាក្យបាន​ចាប់ផ្ដើម​ក្នុង​ផ្ទៃ​ខាងក្រោយ</string>
     <!-- Context: Background download messages-->
     <string name="dictionary_download_is_running_in_background" comment="Notification that a dictionary download is still running">បញ្ជី​ពាក្យ​ដែល​បាន​ជ្រើសរើស​នេះ​កំពុង​ទាញយកហើយ សូម​ព្យាយាម​ម្ដងទៀត​ក្នុង​ពេល​ឆាប់ៗ នេះ!</string>
-    <!-- Context: Background download messages-->
+    <!-- Context: Background download messages. Removed in Keyman 17-->
     <string name="dictionary_download_finished" comment="Notification that a dictionary download has finished">ការទាញយកបញ្ជី​ពាក្យបាន​ចប់​សព្វគ្រប់​ហើយ!</string>
     <!-- Context: Background download messages -->
     <string name="download_failed" comment="Notification that a download failed">ការទាញយកបានបរាជ័យ</string>
@@ -117,7 +117,7 @@
     <string name="update_check_current" comment="Notification that all resources are up to date">"ធនធានទាំង​អស់​គឺ​ថ្មី​បំផុត​ហើយ!"</string>
     <!-- Context: General Updates -->
     <string name="update_failed" comment="Notification that a resource update failed">ធនធាន​មួយ​ឬ​ច្រើន​បាន​បរាជ័យ​ក្នុង​ការអាប់ដេត!</string>
-    <!-- Context: General Updates -->
+    <!-- Context: General Updates. Removed in Keyman 17 -->
     <string name="update_success" comment="Notification that a resource update successfully updated">បាន​អាប់ដេត​ធនធាននានា​ដោយ​ជោគជ័យ!</string>
     <!-- Context: Model Info -->
     <string name="model_version" comment="Title for a dictionary version">ជំនាន់​របស់បញ្ជី​ពាក្យ</string>
@@ -126,11 +126,11 @@
     <!-- Context: Model Info -->
     <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">តើ​អ្នក​ចង់​លុប​បញ្ជី​ពាក្យនេះ​ឬ?</string>
     <!-- Context: Model Deleted -->
-    <string name="model_deleted" comment="Notification when a dictionary is deleted">Dictionary deleted</string>
+    <string name="model_deleted" comment="Notification when a dictionary is deleted">បញ្ជី​ពាក្យត្រូវបានលុប</string>
     <!-- Context: Language Settings Keyboard install strings -->
     <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">បានដំឡើង​ក្ដារចុច %1$s</string>
     <!-- Context: Language Settings Keyboard uninstall strings -->
-    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">Keyboard deleted</string>
+    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">ក្ដារចុចត្រូវបានលុប</string>
     <!-- Context: Language Settings menu strings -->
     <string name="enable_corrections" comment="Enable corrections from the suggestion banner">បើក​ការកែពាក្យ</string>
     <!-- Context: Language Settings menu strings -->
@@ -164,5 +164,5 @@
     <!-- Context: Other strings -->
     <string name="help_bubble_text">ចុច​ត្រង់​នេះ​ដើម្បី​ប្ដូរ​ក្ដារចុច</string>
     <!-- Context: anywhere -->
-    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
+    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">មិនអាចដំណើរការកម្មវិធីបើកមើលគេហទំព័រ</string>
 </resources>

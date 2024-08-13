@@ -1,19 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!DOCTYPE keyboard SYSTEM "../../../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="mt" conformsTo="techpreview">
-  <names>
-    <name value="keys-escaped2" />
-  </names>
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="keys-escaped2"/>
 
   <keys>
-    <key id="grave" to="\u{1faa6}" />
+    <key id="grave" output="\u{1faa6}" />
   </keys>
 
-  <layers form="us">
+  <layers formId="us">
     <layer id="base">
       <row keys="grave" />
     </layer>
   </layers>
 
-</keyboard>
+</keyboard3>

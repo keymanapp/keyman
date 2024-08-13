@@ -4,16 +4,11 @@
 @@keys: [K_BKQUOTE]
 @@expected: \u0061
 -->
-<!DOCTYPE keyboard SYSTEM "../../../../../resources/standards-data/ldml-keyboards/techpreview/dtd/ldmlKeyboard.dtd">
-<keyboard locale="en" conformsTo="techpreview">
-  <info author="srl295" indicator="🙀" layout="qwerty" normalization="NFC" />
-
-  <names>
-    <name value="TestKbd" />
-  </names>
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="en" conformsTo="45">
+  <info author="srl295" indicator="🙀" layout="qwerty"  name="TestKbd"/>
 
   <displays>
-    <display to="a" display="(a)"/>
+    <display output="a" display="(a)"/>
     <displayOptions baseCharacter="x"/>
   </displays>
 
@@ -21,9 +16,9 @@
     <!-- no keys listed, keys-Latn-implied.xml will be implicitly imported -->
   </keys>
 
-  <layers form="us">
+  <layers formId="us">
     <layer id="base">
       <row keys="a" /> <!-- number row -->
     </layer>
   </layers>
-</keyboard>
+</keyboard3>

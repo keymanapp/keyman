@@ -32,15 +32,9 @@ private:
 
 	BOOL PostKeys();
 
-
-protected:
-  AppContext *context;
-
 public:
-	AIWin2000Unicode();
-	~AIWin2000Unicode();
-
-	virtual BOOL QueueAction(int ItemType, DWORD dwData);
+  AIWin2000Unicode();
+  ~AIWin2000Unicode();
 
 	/* Information functions */
 
@@ -51,13 +45,9 @@ public:
 
 	/* Context functions */
 
-	virtual void ReadContext();
+	virtual BOOL ReadContext(PWSTR buf);
 	virtual void ResetContext();
-  virtual void AddContext(WCHAR ch);  //I2436
-	virtual WCHAR *ContextBuf(int n);
-	virtual WCHAR *ContextBufMax(int n);
-  virtual void SetContext(const WCHAR* buf);
-
+ 
 	/* Queue and sending functions */
 
 	virtual BOOL SendActions();   // I4196

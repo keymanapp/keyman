@@ -9,7 +9,9 @@ export PYBUILD_INSTALL_ARGS=--install-scripts=/usr/share/keyman-config/
 
 export KEYMAN_PKG_BUILD=1
 
+export HOME=$(shell mktemp -d)
 export XDG_DATA_HOME=$(shell mktemp -d)
+export XDG_CONFIG_HOME=$(shell mktemp -d)
 
 # xenial needs this to be explicit
 export LC_ALL=C.UTF-8
@@ -22,61 +24,61 @@ include /usr/share/dpkg/pkg-info.mk
 	dh $@ --with-python3
 
 override_dh_auto_configure:
-	# keymankeyboardprocessor - we need to configure and build core before
+	# keyman core - we need to configure and build core before
 	# we can configure ibus-keyman!
-	cd core && \
-		./build.sh --no-tests configure:arch build:arch -- --wrap-mode=nodownload --prefix=/usr --sysconfdir=/etc \
-			--localstatedir=/var --libdir=lib/$(DEB_TARGET_MULTIARCH) \
-			--libexecdir=lib/$(DEB_TARGET_MULTIARCH)
-	# ibus-keyman
-	cd linux/ibus-keyman && \
-		./build.sh configure -- --wrap-mode=nodownload --prefix=/usr --sysconfdir=/etc \
-			--localstatedir=/var
-	# keyman-config
+	core/build.sh --no-tests configure:arch build:arch -- \
+		--wrap-mode=nodownload --prefix=/usr --sysconfdir=/etc \
+		--localstatedir=/var --libdir=lib/$(DEB_TARGET_MULTIARCH) \
+		--libexecdir=lib/$(DEB_TARGET_MULTIARCH)
+	linux/keyman-system-service/build.sh configure -- \
+		--wrap-mode=nodownload --prefix=/usr --sysconfdir=/etc --localstatedir=/var
+	linux/ibus-keyman/build.sh configure -- \
+		--wrap-mode=nodownload --prefix=/usr --sysconfdir=/etc --localstatedir=/var \
+		 -Dkeyman_deb_pkg_build=true
+	linux/keyman-config/build.sh configure
 
 override_dh_auto_build:
-	# keymankeyboardprocessor
-	cd core && \
-	  ./build.sh --no-tests build:arch
-	# ibus-keyman
-	cd linux/ibus-keyman && \
-		./build.sh build
-	# keyman-config
+	cp linux/keyman-config/resources/keyman.sharedmimeinfo debian/
+	core/build.sh --no-tests build:arch
+	linux/keyman-system-service/build.sh build
+	linux/ibus-keyman/build.sh build
+	linux/keyman-config/build.sh build
 	cd linux/keyman-config && \
-		make man && \
 		sed -i -e "s/^__pkgversion__ = \"[^\"]*\"/__pkgversion__ = \"$(DEB_VERSION)\"/g" keyman_config/version.py && \
 		make compile-po
-	dh_auto_build --sourcedir=linux/keyman-config --buildsystem=pybuild $@
 
 override_dh_auto_test:
 ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
-	# keymankeyboardprocessor
-	cd core && \
-	  ./build.sh --no-tests test:arch
-	# ibus-keyman
-	cd linux/ibus-keyman && \
-		./build.sh test
-	# keyman-config
-	dh_auto_test --sourcedir=linux/keyman-config --buildsystem=pybuild $@
+	core/build.sh --no-tests test:arch
+	linux/keyman-system-service/build.sh test
+	linux/ibus-keyman/build.sh test
+	linux/keyman-config/build.sh test
 endif
 
 override_dh_auto_install:
 	install -d $(CURDIR)/debian/tmp
-	cd core && \
-	  DESTDIR=$(CURDIR)/debian/tmp ./build.sh --no-tests install:arch
-	# ibus-keyman
-	cd linux/ibus-keyman && \
-		DESTDIR=$(CURDIR)/debian/tmp ./build.sh install
+	DESTDIR=$(CURDIR)/debian/tmp core/build.sh --no-tests install:arch
+	DESTDIR=$(CURDIR)/debian/tmp linux/keyman-system-service/build.sh install
+	DESTDIR=$(CURDIR)/debian/tmp linux/ibus-keyman/build.sh install
 	# keyman-config
 	install -d $(CURDIR)/debian/keyman/usr/share/
 	cp -r linux/keyman-config/locale/ $(CURDIR)/debian/keyman/usr/share/
 	rm $(CURDIR)/debian/keyman/usr/share/locale/*.po*
+	# Don't call `build.sh install` - dh_auto_install does some extra smarts
 	dh_auto_install --sourcedir=linux/keyman-config --buildsystem=pybuild $@
 	# Unfortunately bash-completion 2.10 (focal) doesn't yet provide dh-sequence-bash-completion,
 	# which we could add as build-dependency, so we'll have to explicitly call
-	# dh_bash_completion here...
+	# dh_bash_completion here instead of using `dh $@ --with-python3 --with bash-completion`
 	dh_bash-completion -O--buildsystem=pybuild
 	dh_python3 -O--buildsystem=pybuild
 
 override_dh_missing:
 	dh_missing --fail-missing
+
+override_dh_auto_clean:
+	core/build.sh clean
+	linux/keyman-system-service/build.sh clean
+	linux/ibus-keyman/build.sh clean
+	linux/keyman-config/build.sh clean
+	rm -rf .pybuild/
+	dh_auto_clean $@

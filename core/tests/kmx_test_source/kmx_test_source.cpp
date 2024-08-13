@@ -50,7 +50,7 @@ KmxTestSource::parse_source_string(std::string const &s) {
   for (auto p = s.begin(); p != s.end(); p++) {
     if (*p == '\\') {
       p++;
-      km_kbp_usv v;
+      km_core_usv v;
       assert(p != s.end());
       if (*p == 'u' || *p == 'U') {
         // Unicode value
@@ -62,10 +62,10 @@ KmxTestSource::parse_source_string(std::string const &s) {
         assert(v >= 0x0001 && v <= 0x10FFFF);
         p += n - 1;
         if (v < 0x10000) {
-          t += km_kbp_cp(v);
+          t += km_core_cu(v);
         } else {
-          t += km_kbp_cp(Uni_UTF32ToSurrogate1(v));
-          t += km_kbp_cp(Uni_UTF32ToSurrogate2(v));
+          t += km_core_cu(Uni_UTF32ToSurrogate1(v));
+          t += km_core_cu(Uni_UTF32ToSurrogate2(v));
         }
       } else if (*p == 'd') {
         // Deadkey
@@ -107,14 +107,16 @@ KmxTestSource::is_token(const std::string token, std::string &line) {
 
 int
 KmxTestSource::load_source(
-    const km::kbp::path &path,
+    const km::core::path &path,
     std::string &keys,
     std::u16string &expected,
+    std::u16string &expected_context,
     std::u16string &context,
     kmx_options &options,
     bool &expected_beep) {
   const std::string s_keys = "c keys: ";
   const std::string s_expected = "c expected: ";
+  const std::string s_expected_context = "c expected context: ";
   const std::string s_context = "c context: ";
   const std::string s_option = "c option: ";
   const std::string s_option_expected = "c expected option: ";
@@ -143,6 +145,8 @@ KmxTestSource::load_source(
       } else {
         expected = parse_source_string(line);
       }
+    } else if (is_token(s_expected_context, line)) {
+      expected_context = parse_source_string(line);
     } else if (is_token(s_context, line)) {
       context = parse_source_string(line);
     } else if (is_token(s_option, line)) {
@@ -167,9 +171,9 @@ KmxTestSource::load_source(
   return 0;
 }
 
-km_kbp_option_item *
+km_core_option_item *
 KmxTestSource::get_keyboard_options(kmx_options options) {
-  km_kbp_option_item *keyboard_opts = new km_kbp_option_item[options.size() + 1];
+  km_core_option_item *keyboard_opts = new km_core_option_item[options.size() + 1];
 
   int i = 0;
   for (auto it = options.begin(); it != options.end(); it++) {
@@ -182,18 +186,18 @@ KmxTestSource::get_keyboard_options(kmx_options options) {
     if (key[0] == u'&') {
       // environment value (aka system store)
       key.erase(0, 1);
-      keyboard_opts[i].scope = KM_KBP_OPT_ENVIRONMENT;
+      keyboard_opts[i].scope = KM_CORE_OPT_ENVIRONMENT;
     } else {
-      keyboard_opts[i].scope = KM_KBP_OPT_KEYBOARD;
+      keyboard_opts[i].scope = KM_CORE_OPT_KEYBOARD;
     }
 
-    km_kbp_cp *cp = new km_kbp_cp[key.length() + 1];
+    km_core_cu *cp = new km_core_cu[key.length() + 1];
     key.copy(cp, key.length());
     cp[key.length()] = 0;
 
     keyboard_opts[i].key = cp;
 
-    cp = new km_kbp_cp[it->value.length() + 1];
+    cp = new km_core_cu[it->value.length() + 1];
     it->value.copy(cp, it->value.length());
     cp[it->value.length()] = 0;
 
@@ -202,7 +206,7 @@ KmxTestSource::get_keyboard_options(kmx_options options) {
     i++;
   }
 
-  keyboard_opts[i] = KM_KBP_OPTIONS_END;
+  keyboard_opts[i] = KM_CORE_OPTIONS_END;
   return keyboard_opts;
 }
 
@@ -210,24 +214,24 @@ key_event
 KmxTestSource::char_to_event(char ch) {
   assert(ch >= 32);
   return {
-      km::kbp::kmx::s_char_to_vkey[(int)ch - 32].vk,
-      (uint16_t)(km::kbp::kmx::s_char_to_vkey[(int)ch - 32].shifted ? KM_KBP_MODIFIER_SHIFT : 0)};
+      km::core::kmx::s_char_to_vkey[(int)ch - 32].vk,
+      (uint16_t)(km::core::kmx::s_char_to_vkey[(int)ch - 32].shifted ? KM_CORE_MODIFIER_SHIFT : 0)};
 }
 
 uint16_t
 KmxTestSource::get_modifier(std::string const m) {
-  for (int i = 0; km::kbp::kmx::s_modifier_names[i].name; i++) {
-    if (m == km::kbp::kmx::s_modifier_names[i].name) {
-      return km::kbp::kmx::s_modifier_names[i].modifier;
+  for (int i = 0; km::core::kmx::s_modifier_names[i].name; i++) {
+    if (m == km::core::kmx::s_modifier_names[i].name) {
+      return km::core::kmx::s_modifier_names[i].modifier;
     }
   }
   return 0;
 }
 
-km_kbp_virtual_key
+km_core_virtual_key
 KmxTestSource::get_vk(std::string const &vk) {
   for (int i = 1; i < 256; i++) {
-    if (vk == km::kbp::kmx::s_key_names[i]) {
+    if (vk == km::core::kmx::s_key_names[i]) {
       return i;
     }
   }
@@ -242,7 +246,7 @@ KmxTestSource::vkey_to_event(std::string const &vk_event) {
   std::stringstream f(vk_event);
   std::string s;
   uint16_t modifier_state = 0;
-  km_kbp_virtual_key vk   = 0;
+  km_core_virtual_key vk   = 0;
   while (std::getline(f, s, ' ')) {
     uint16_t modifier = get_modifier(s);
     if (modifier != 0) {
