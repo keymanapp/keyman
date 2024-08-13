@@ -14,8 +14,7 @@ export interface KeyboardKeymanGlobal {
  * Defines any public API points used by debug-compiled keyboards for human-readable
  * nomenclature in rules within a Keyman keyboard's script for keyboard rules.
  *
- * Refer to C:\keymanapp\keyman\developer\src\tike\compile\CompileKeymanWeb.pas,
- * TCompileKeymanWeb.JavaScript_SetupDebug.
+ * Refer to TCompileKeymanWeb.JavaScript_SetupDebug.
  */
 export interface MinimalCodesInterface {
   readonly modifierCodes: typeof Codes.modifierCodes;

@@ -1,4 +1,5 @@
-import { KMX, CompilerCallbacks, CompilerOptions } from "@keymanapp/common-types";
+import { KMX } from "@keymanapp/common-types";
+import { CompilerCallbacks, CompilerOptions } from "@keymanapp/developer-utils";
 import { KmnCompilerResult } from "../compiler/compiler.js";
 
 export let FTabStop: string;

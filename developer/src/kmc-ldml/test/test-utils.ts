@@ -5,7 +5,7 @@ import {
   isValidEnumValue, calculateUniqueKeys, allUsedKeyIdsInLayers,
   translateLayerAttrToModifier, validModifier, verifyValidAndUnique } from '../src/util/util.js';
 import { constants } from "@keymanapp/ldml-keyboard-constants";
-import { LDMLKeyboard } from '@keymanapp/common-types';
+import { LDMLKeyboard } from '@keymanapp/developer-utils';
 
 describe('test of util/util.ts', () => {
   describe('isValidEnumValue()', () => {

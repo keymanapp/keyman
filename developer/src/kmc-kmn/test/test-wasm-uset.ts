@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { KmnCompiler } from '../src/main.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { KmnCompilerMessages } from '../src/compiler/kmn-compiler-messages.js';
-import { compilerErrorFormatCode } from '@keymanapp/common-types';
+import { compilerErrorFormatCode } from '@keymanapp/developer-utils';
 
 describe('Compiler UnicodeSet function', function() {
   it('should fixup "short" \\u{} escapes', function () {

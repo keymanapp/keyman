@@ -17,6 +17,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@keymanapp/common-types": "*"
+    "@keymanapp/developer-utils": "*"
   }
 }
