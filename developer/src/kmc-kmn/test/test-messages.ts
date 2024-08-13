@@ -4,7 +4,7 @@ import { KmnCompilerMessageRanges, KmnCompilerMessages } from '../src/compiler/k
 import { TestCompilerCallbacks, verifyCompilerMessagesObject } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
 import { KmnCompiler } from '../src/main.js';
-import { CompilerErrorMask, CompilerErrorNamespace } from '@keymanapp/common-types';
+import { CompilerErrorMask, CompilerErrorNamespace } from '@keymanapp/developer-utils';
 
 describe('KmnCompilerMessages', function () {
   const callbacks = new TestCompilerCallbacks();

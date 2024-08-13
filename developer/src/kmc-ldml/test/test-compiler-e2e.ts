@@ -1,7 +1,7 @@
 import 'mocha';
 import {assert} from 'chai';
 import hextobin from '@keymanapp/hextobin';
-import { KMXBuilder } from '@keymanapp/common-types';
+import { KMXBuilder } from '@keymanapp/developer-utils';
 import {checkMessages, compileKeyboard, compilerTestCallbacks, compilerTestOptions, makePathToFixture} from './helpers/index.js';
 import { LdmlKeyboardCompiler } from '../src/compiler/compiler.js';
 

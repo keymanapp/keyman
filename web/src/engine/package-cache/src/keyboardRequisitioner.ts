@@ -4,7 +4,7 @@ import {
   LanguageAPIPropertySpec,
   RawKeyboardMetadata
 } from "@keymanapp/keyboard-processor";
-import { PathConfiguration } from "keyman/engine/paths";
+import { PathConfiguration } from "keyman/engine/interfaces";
 
 // TODO:  is cleanup needed here, to use local paths instead?
 import {

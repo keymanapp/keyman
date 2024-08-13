@@ -1,4 +1,4 @@
-import { CompilerCallbacks, CompilerError, CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageOverride, CompilerMessageOverrideMap, CompilerOptions } from '@keymanapp/common-types';
+import { CompilerCallbacks, CompilerError, CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageOverride, CompilerMessageOverrideMap, CompilerOptions } from '@keymanapp/developer-utils';
 import { InfrastructureMessages } from '../messages/infrastructureMessages.js';
 import { CompilerMessageSource, messageNamespaceKeys, messageSources } from '../messages/messageNamespaces.js';
 

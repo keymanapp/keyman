@@ -3595,7 +3595,7 @@ KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD File
     return KmnCompilerMessages::ERROR_CannotReadBitmapFile;
   }
 
-  *FileSize = bufvec.size();
+  *FileSize = static_cast<KMX_DWORD>(bufvec.size());
   *Buf = new KMX_BYTE[*FileSize];
   std::copy(bufvec.begin(), bufvec.end(), *Buf);
 
@@ -3809,11 +3809,11 @@ bool UTF16TempFromUTF8(KMX_BYTE* infile, int sz, KMX_BYTE** tempfile, int *sz16)
   }
 
   if(hasPreamble(result)) {
-    *sz16 = result.size() * 2 - 2;
+    *sz16 = static_cast<int>(result.size()) * 2 - 2;
     *tempfile = new KMX_BYTE[*sz16];
     memcpy(*tempfile, result.c_str() + 1, *sz16);
   } else {
-    *sz16 = result.size() * 2;
+    *sz16 = static_cast<int>(result.size()) * 2;
     *tempfile = new KMX_BYTE[*sz16];
     memcpy(*tempfile, result.c_str(), *sz16);
   }

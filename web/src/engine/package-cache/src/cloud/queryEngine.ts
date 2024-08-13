@@ -1,6 +1,6 @@
 import { EventEmitter } from 'eventemitter3';
 
-import { PathConfiguration } from 'keyman/engine/paths';
+import { PathConfiguration } from 'keyman/engine/interfaces';
 
 import { default as KeyboardStub, ErrorStub, KeyboardAPISpec, mergeAndResolveStubPromises } from '../keyboardStub.js';
 import { LanguageAPIPropertySpec, ManagedPromise, Version } from '@keymanapp/keyboard-processor';

@@ -14,6 +14,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 builder_describe "Build Keyman kmc Package Compiler module" \
   "@/common/web/keyman-version" \
   "@/developer/src/common/web/test-helpers" \
+  "@/developer/src/common/web/utils" \
   "configure" \
   "build" \
   "api                       analyze API and prepare API documentation" \

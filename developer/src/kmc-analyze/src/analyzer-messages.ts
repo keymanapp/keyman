@@ -1,8 +1,7 @@
 /// <reference types="@keymanapp/common-types" />
 // above is required for now, seemingly https://github.com/microsoft/TypeScript/issues/42873
 // probably addressed in ts 5.5.2
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, CompilerMessageSpecWithException } from "@keymanapp/common-types";
-import { KeymanUrls } from "@keymanapp/developer-utils";
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, CompilerMessageSpecWithException, KeymanUrls } from "@keymanapp/developer-utils";
 
 const Namespace = CompilerErrorNamespace.Analyzer;
 const SevInfo = CompilerErrorSeverity.Info | Namespace;

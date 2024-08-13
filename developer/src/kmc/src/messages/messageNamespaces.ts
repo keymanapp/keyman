@@ -1,4 +1,4 @@
-import { CommonTypesMessages, CompilerErrorNamespace } from '@keymanapp/common-types';
+import { CommonTypesMessages, CompilerErrorNamespace } from '@keymanapp/developer-utils';
 import { AnalyzerMessages } from '@keymanapp/kmc-analyze';
 import { KeyboardInfoCompilerMessages } from '@keymanapp/kmc-keyboard-info';
 import { KmnCompilerMessages, KmwCompilerMessages } from '@keymanapp/kmc-kmn';
