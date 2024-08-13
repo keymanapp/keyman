@@ -22,7 +22,7 @@ begin
     atom := GlobalFindAtom(AtomName);
     if atom = 0 then
     begin
-      if GetLastError <> ERROR_SUCCESS then
+      if GetLastError <> ERROR_FILE_NOT_FOUND then
         RaiseLastOSError;
       atom := GlobalAddAtom(AtomName);
       KL.Log('RecordKeymanStarted: True');
@@ -52,7 +52,11 @@ begin
       Result := True;
     end
     else
+    begin
+      KL.Log('HasKeymanRun: Keyman Has Run');
       Result := False;
+    end;
+
   except
     on E: Exception do
       KL.log(E.ClassName + ': ' + E.Message);
