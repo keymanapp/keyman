@@ -10,6 +10,8 @@
 #import "KMInputMethodAppDelegate.h"
 #import "KMLogs.h"
 
+NSString *const keyboardDownloadUrlTemplate = @"https://%@/go/macos/14.0/download-keyboards/?version=%@";
+
 @interface KMDownloadKBWindowController ()
 @property (nonatomic, weak) IBOutlet WebView *webView;
 @end
@@ -27,18 +29,20 @@
   [self.webView setGroupName:@"KMDownloadKB"];
   [self.webView setPolicyDelegate:(id<WebPolicyDelegate>)self];
   
+  NSURL *keyboardDownloadUrl = [self buildKeyboardDownloadUrl];
+  [self.webView.mainFrame loadRequest:[NSURLRequest requestWithURL:keyboardDownloadUrl]];
+}
+
+-(NSURL*) buildKeyboardDownloadUrl {
   NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
   NSString *percentEncodedVersion = [version stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
-
   KeymanVersionInfo keymanVersionInfo = [[self AppDelegate] versionInfo];
-  NSString *urlString = [NSString stringWithFormat:@"https://%@/go/macos/14.0/download-keyboards/?version=%@", keymanVersionInfo.keymanCom, percentEncodedVersion];
-  os_log_debug([KMLogs uiLog], "KMDownloadKBWindowController opening url = %{public}@, version = '%{public}@', percentEncodedVersion = '%{public}@'",
+  
+  NSString *urlString = [NSString stringWithFormat:keyboardDownloadUrlTemplate, keymanVersionInfo.keymanCom, percentEncodedVersion];
+  os_log_debug([KMLogs uiLog], "KMDownloadKBWindowController building Keyboard Download url = %{public}@, version = '%{public}@', percentEncodedVersion = '%{public}@'",
                urlString, version, percentEncodedVersion);
   
-  NSURL * downloadsUrl = [NSURL URLWithString:urlString];
-  os_log_debug([KMLogs uiLog], "download site url = '%{public}@'", downloadsUrl.absoluteString);
-
-  [self.webView.mainFrame loadRequest:[NSURLRequest requestWithURL:downloadsUrl]];
+  return [NSURL URLWithString:urlString];
 }
 
 - (void)webView:(WebView *)sender decidePolicyForNewWindowAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request newFrameName:(NSString *)frameName decisionListener:(id<WebPolicyDecisionListener>)listener {
@@ -49,7 +53,6 @@
 }
 
 - (void)webView:(WebView *)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request frame:(WebFrame *)frame decisionListener:(id<WebPolicyDecisionListener>)listener {
-  os_log_debug([KMLogs uiLog], "decidePolicyForNavigationAction, request = %{public}@", request);
   NSString* url = [[request URL] absoluteString];
   os_log_debug([KMLogs uiLog], "decidePolicyForNavigationAction, navigating to %{public}@", url);
 
