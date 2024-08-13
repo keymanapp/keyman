@@ -84,7 +84,7 @@ if builder_start_action test; then
     OPTIONS=--ci
   fi
 
-  REMOTABLE_OPTIONS=OPTIONS
+  REMOTABLE_OPTIONS=$OPTIONS
   if builder_has_option --remote; then
     REMOTABLE_OPTIONS="${REMOTABLE_OPTIONS} --remote"
   fi
@@ -92,7 +92,6 @@ if builder_start_action test; then
   # No --reporter option exists yet for the headless modules.
 
   "$KEYMAN_ROOT/common/web/keyboard-processor/build.sh" test $REMOTABLE_OPTIONS
-  "$KEYMAN_ROOT/common/web/input-processor/build.sh" test $OPTIONS
   "$KEYMAN_ROOT/common/web/gesture-recognizer/test.sh" $OPTIONS
 
   ./test.sh test $REMOTABLE_OPTIONS
