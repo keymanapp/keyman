@@ -161,8 +161,6 @@ describe("PredictionContext", () => {
     await Promise.all([skippedPromise, expectedPromise]);
     const expected = await expectedPromise;
 
-    // TODO:  adjust the following.
-
     // Despite two predict calls, we should only increase the counter by ONE - we ignore
     // the 'outdated' / 'skipped' round because it could not respond before its followup.
     assert.equal(updateFake.callCount, 3);
