@@ -25,7 +25,7 @@ describe('Engine - Basic Simulation', function() {
   before(async function() {
     // -- START: Standard Recorder-based unit test loading boilerplate --
     let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
-    let keyboard = await keyboardLoader.loadKeyboardFromPath('../../../../common/test/' + testSuite.keyboard.filename);
+    let keyboard = await keyboardLoader.loadKeyboardFromPath('../../../../../common/test/' + testSuite.keyboard.filename);
     keyboardWithHarness = keyboardLoader.harness;
     keyboardWithHarness.activeKeyboard = keyboard;
 

@@ -79,19 +79,7 @@ function do_build() {
   tsc --emitDeclarationOnly --outFile "${BUILD_DIR}/lib/node-keyboard-loader.d.ts" -p src/keyboards/loaders/tsconfig.node.json
 }
 
-function do_test() {
-  local MOCHA_FLAGS=
-  local WTR_CONFIG=
-  if builder_has_option --ci; then
-    echo "Replacing user-friendly test reports with CI-friendly versions."
-    MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
-    WTR_CONFIG=.CI
-  fi
-
-  c8 mocha --recursive $MOCHA_FLAGS ./tests/node/
-}
-
 builder_run_action configure  do_configure
 builder_run_action clean      rm -rf "${BUILD_DIR}"
 builder_run_action build      do_build
-builder_run_action test       do_test
+builder_run_action test       test-headless "${SUBPROJECT_NAME}" ""

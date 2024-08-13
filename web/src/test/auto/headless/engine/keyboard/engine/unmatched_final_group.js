@@ -9,13 +9,12 @@ import { KeyboardInterface } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 import { KeyboardTest, NodeProctor } from '@keymanapp/recorder-core';
 
-describe('Engine - Deadkeys', function() {
-  let testJSONtext = fs.readFileSync(require.resolve('@keymanapp/common-test-resources/json/engine_tests/deadkeys.json'));
+describe('Engine - Unmatched Final Groups', function() {
+  let testJSONtext = fs.readFileSync(require.resolve('@keymanapp/common-test-resources/json/engine_tests/ghp_enter.json'));
   // Common test suite setup.
   let testSuite = new KeyboardTest(JSON.parse(testJSONtext));
 
-  let keyboardWithHarness;
-
+  var keyboardWithHarness;
   let device = {
     formFactor: 'desktop',
     OS: 'windows',
@@ -25,7 +24,7 @@ describe('Engine - Deadkeys', function() {
   before(async function() {
     // -- START: Standard Recorder-based unit test loading boilerplate --
     let keyboardLoader = new NodeKeyboardLoader(new KeyboardInterface({}, MinimalKeymanGlobal));
-    let keyboard = await keyboardLoader.loadKeyboardFromPath('../../../../common/test/' + testSuite.keyboard.filename);
+    const keyboard = await keyboardLoader.loadKeyboardFromPath('../../../../../common/test/' + testSuite.keyboard.filename);
     keyboardWithHarness = keyboardLoader.harness;
     keyboardWithHarness.activeKeyboard = keyboard;
 
@@ -33,21 +32,11 @@ describe('Engine - Deadkeys', function() {
     // --  END:  Standard Recorder-based unit test loading boilerplate --
 
     // This part provides extra assurance that the keyboard properly loaded.
-    assert.equal(keyboard.id, "Keyboard_test_deadkeys");
+    assert.equal(keyboard.id, "Keyboard_galaxie_hebrew_positional");
   });
 
-  // Converts each test set into its own Mocha-level test.
-  for(let set of testSuite.inputTestSets) {
+  it('Emits default enter AND matches rule from early group', function() {
     let proctor = new NodeProctor(keyboardWithHarness, device, assert.equal);
-
-    if(!proctor.compatibleWithSuite(testSuite)) {
-      it.skip(set.toTestName() + " - Cannot run this test suite on Node.");
-    } else {
-      it(set.toTestName(), async function() {
-        // Refresh the proctor instance at runtime.
-        let proctor = new NodeProctor(keyboardWithHarness, device, assert.equal);
-        await set.test(proctor);
-      });
-    }
-  }
+    testSuite.test(proctor);
+  });
 });
