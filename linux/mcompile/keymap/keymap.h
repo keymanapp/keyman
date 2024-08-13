@@ -29,6 +29,40 @@ enum ShiftState {
   ShftXxxx     = Shft | Xxxx,         // 9
 };
 
+#define VK_SPACE    0x20
+#define VK_COLON	  0xBA
+#define VK_EQUAL	  0xBB
+#define VK_COMMA	  0xBC
+#define VK_HYPHEN   0xBD
+#define VK_PERIOD	  0xBE
+#define	VK_SLASH	  0xBF
+#define VK_ACCENT	  0xC0
+#define VK_LBRKT	  0xDB
+#define VK_BKSLASH	0xDC
+#define VK_RBRKT	  0xDD
+#define VK_QUOTE	  0xDE
+#define VK_xDF		  0xDF
+#define VK_OEM_102  0xE2  //  "<>" or "\|" on RT 102-key kbd.
+
+#define VK_DIVIDE   0x6F
+#define VK_CANCEL   3
+#define VK_DECIMAL  0x2E
+
+#define VK_OEM_CLEAR      0xFE
+#define VK_LSHIFT         0xA0
+#define VK_RSHIFT         0xA1
+#define VK_LCONTROL       0xA2
+#define VK_RCONTROL       0xA3
+#define VK_LMENU          0xA4
+#define VK_RMENU          0xA5
+
+#define VK_SHIFT          0x10
+#define VK_CONTROL        0x11
+#define VK_MENU           0x12
+#define VK_PAUSE          0x13
+#define VK_CAPITAL        0x14
+
+
 // Map of all US English virtual key codes that we can translate
 const KMX_DWORD KMX_VKMap[] = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
                                'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
@@ -108,7 +142,7 @@ int append_underlying_ToVector(vec_dword_3D& all_vector, GdkKeymap* keymap);
 /** @brief create a pointer to pointer of the current keymap for later use */
 bool InitializeGDK(GdkKeymap** keymap, int argc, gchar* argv[]);
 
-const UINT USVirtualKeyToScanCode[256] = {
+const KMX_DWORD USVirtualKeyToScanCode[256] = {
     0x00,   // L"K_?00",				// &H0
     0x00,   // L"K_LBUTTON",		// &H1
     0x00,   // L"K_RBUTTON",		// &H2
@@ -376,7 +410,7 @@ const UINT USVirtualKeyToScanCode[256] = {
     0x00   // L"K_?FF"				  // &HFF
 };
 
-const UINT ScanCodeToUSVirtualKey[128] = {
+const KMX_DWORD ScanCodeToUSVirtualKey[128] = {
     0x01,  // 0x00 => K_LBUTTON
     0x1b,  // 0x01 => K_ESC
     0x31,  // 0x02 => K_1
@@ -520,7 +554,7 @@ KMX_DWORD KMX_get_KeyVal_From_KeyCode(GdkKeymap* keymap, guint keycode, ShiftSta
 KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap* keymap, guint keycode, int shiftState);
 
 /** @brief return the keyvalue for a given Keycode and shiftstate of the currently used (underlying) keyboard layout. */
-KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap* keymap, guint keycode, UINT shiftState, PKMX_WCHAR deadkey);
+KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap* keymap, guint keycode, KMX_DWORD shiftState, PKMX_WCHAR deadkey);
 
 /** @brief return the keyvalue of a key of the the currently used (underlying) keyboard for a given keyvalue of the US keyboard */
 KMX_DWORD KMX_get_KeyValUnderlying_From_KeyValUS(vec_dword_3D& all_vector, KMX_DWORD kv_us);

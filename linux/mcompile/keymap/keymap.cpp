@@ -920,7 +920,7 @@ KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap* keymap, gui
  *         0xFFFE in case a deadkey is out of range
  *         the keyval obtained from Keycode and shiftstate and caps;
 */
-KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap* keymap, guint keycode, UINT shiftState, PKMX_WCHAR deadkey) {
+KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap* keymap, guint keycode, KMX_DWORD shiftState, PKMX_WCHAR deadkey) {
   GdkKeymapKey* maps;
   guint* keyvals;
   gint count;

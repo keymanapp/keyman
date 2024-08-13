@@ -133,7 +133,7 @@ int run(int argc, char* argv[]) {
 }
 
 // Map of all shift states that we will work with
-const UINT VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG | RALTFLAG, K_SHIFTFLAG | LCTRLFLAG | RALTFLAG, 0xFFFF};
+const KMX_DWORD VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG | RALTFLAG, K_SHIFTFLAG | LCTRLFLAG | RALTFLAG, 0xFFFF};
 
 //
 // TranslateKey
@@ -149,7 +149,7 @@ const UINT VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG | RALTFLAG, K_SHIFTFLAG |
  * @param  shift shiftstate
  * @param  ch    character of the underlying keyboard to be remapped
  */
-void KMX_TranslateKey(LPKMX_KEY key, KMX_WORD vk, UINT shift, KMX_WCHAR ch) {
+void KMX_TranslateKey(LPKMX_KEY key, KMX_WORD vk, KMX_DWORD shift, KMX_WCHAR ch) {
   // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
   // We store that as just RALT, and use the option "Simulate RAlt with Ctrl+Alt"
   // to provide an alternate..
@@ -181,7 +181,7 @@ void KMX_TranslateKey(LPKMX_KEY key, KMX_WORD vk, UINT shift, KMX_WCHAR ch) {
  * @param  shift shiftstate
  * @param  ch    character of the underlying keyboard to be remapped
  */
-void KMX_TranslateGroup(LPKMX_GROUP group, KMX_WORD vk, UINT shift, KMX_WCHAR ch) {
+void KMX_TranslateGroup(LPKMX_GROUP group, KMX_WORD vk, KMX_DWORD shift, KMX_WCHAR ch) {
   for (unsigned int i = 0; i < group->cxKeyArray; i++) {
     KMX_TranslateKey(&group->dpKeyArray[i], vk, shift, ch);
   }
@@ -194,7 +194,7 @@ void KMX_TranslateGroup(LPKMX_GROUP group, KMX_WORD vk, UINT shift, KMX_WCHAR ch
  * @param  shift shiftstate
  * @param  ch    character of the underlying keyboard to be remapped
  */
-void KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR ch) {
+void KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, KMX_WORD vk, KMX_DWORD shift, KMX_WCHAR ch) {
   for (unsigned int i = 0; i < kbd->cxGroupArray; i++) {
     if (kbd->dpGroupArray[i].fUsingKeys) {
       KMX_TranslateGroup(&kbd->dpGroupArray[i], vk, shift, ch);
@@ -244,7 +244,7 @@ void KMX_ReportUnconvertedKeyboardRules(LPKMX_KEYBOARD kbd) {
  * @param  shift   shiftstate
  * @param  ch      character of the underlying keyboard
  */
-void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch) {
+void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, KMX_DWORD shift, KMX_WORD ch) {
 
   if ((key->ShiftFlags == 0 || key->ShiftFlags & VIRTUALCHARKEY) && key->Key == ch) {
     // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
@@ -282,7 +282,7 @@ void KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT
  * @param  shift   shiftstate
  * @param  ch      character of the underlying keyboard
  */
-void KMX_TranslateDeadkeyGroup(LPKMX_GROUP group, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch) {
+void KMX_TranslateDeadkeyGroup(LPKMX_GROUP group, KMX_WCHAR deadkey, KMX_WORD vk, KMX_DWORD shift, KMX_WORD ch) {
   for (unsigned int i = 0; i < group->cxKeyArray; i++) {
     KMX_TranslateDeadkeyKey(&group->dpKeyArray[i], deadkey, vk, shift, ch);
   }
@@ -296,7 +296,7 @@ void KMX_TranslateDeadkeyGroup(LPKMX_GROUP group, KMX_WCHAR deadkey, KMX_WORD vk
  * @param  shift   shiftstate
  * @param  ch      character of the underlying keyboard
  */
-void KMX_TranslateDeadkeyKeyboard(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch) {
+void KMX_TranslateDeadkeyKeyboard(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, KMX_DWORD shift, KMX_WORD ch) {
   for (unsigned int i = 0; i < kbd->cxGroupArray; i++) {
     if (kbd->dpGroupArray[i].fUsingKeys) {
       KMX_TranslateDeadkeyGroup(&kbd->dpGroupArray[i], deadkey, vk, shift, ch);
@@ -311,7 +311,7 @@ void KMX_TranslateDeadkeyKeyboard(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WOR
  * @param  vk      a keyvalue of the US keyboard
  * @param  shift   shiftstate
  */
-void KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift) {
+void KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, KMX_DWORD shift) {
   // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
   // We store that as just RALT, and use the option "Simulate RAlt with Ctrl+Alt"
   // to provide an alternate..
@@ -373,7 +373,7 @@ KMX_WCHAR KMX_GetUniqueDeadkeyID(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey) {
   LPKMX_GROUP gp;
   LPKMX_KEY kp;
   LPKMX_STORE sp;
-  UINT i, j;
+  KMX_DWORD i, j;
   KMX_WCHAR dkid = 0;
   static KMX_WCHAR s_next_dkid = 0;
   static KMX_dkidmap* s_dkids = NULL;
@@ -429,7 +429,7 @@ KMX_WCHAR KMX_GetUniqueDeadkeyID(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey) {
  * @param  keymap     pointer to the currently used (underlying) keyboard Layout
  * @param  dk_Table   a vector of all possible deadkey combinations for all Linux keyboards
  */
-void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk_US, UINT shift, KMX_WCHAR deadkey, vec_dword_3D& all_vector, GdkKeymap* keymap, vec_dword_2D dk_Table) {
+void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk_US, KMX_DWORD shift, KMX_WCHAR deadkey, vec_dword_3D& all_vector, GdkKeymap* keymap, vec_dword_2D dk_Table) {
   KMX_WORD deadkeys[512], *pdk;
 
   // Lookup the deadkey table for the deadkey in the physical keyboard
@@ -446,7 +446,7 @@ void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk_US, UINT shift, KMX_WCHA
 
   while (*pdk) {
     // Look up the ch
-    UINT KeyValUnderlying = (UINT) KMX_get_KeyValUnderlying_From_KeyValUS(all_vector, *pdk);
+    KMX_DWORD KeyValUnderlying = (KMX_DWORD) KMX_get_KeyValUnderlying_From_KeyValUS(all_vector, *pdk);
     KMX_TranslateDeadkeyKeyboard(kbd, dkid, KeyValUnderlying, *(pdk + 1), *(pdk + 2));
     pdk += 3;
   }
@@ -461,7 +461,7 @@ void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk_US, UINT shift, KMX_WCHA
  */
 KMX_BOOL KMX_SetKeyboardToPositional(LPKMX_KEYBOARD kbd) {
   LPKMX_STORE sp;
-  UINT i;
+  KMX_DWORD i;
   for (i = 0, sp = kbd->dpStoreArray; i < kbd->cxStoreArray; i++, sp++) {
     if (sp->dwSystemID == TSS_MNEMONIC) {
       if (!sp->dpString) {
@@ -523,7 +523,7 @@ KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint arg
     for (int i = 0; KMX_VKMap[i]; i++) {  // I4651
 
       // windows uses  VK, Linux uses SC/Keycode
-      UINT scUnderlying = (UINT)KMX_get_KeyCodeUnderlying_From_VKUS(KMX_VKMap[i]);
+      KMX_DWORD scUnderlying = (KMX_DWORD)KMX_get_KeyCodeUnderlying_From_VKUS(KMX_VKMap[i]);
       KMX_WCHAR ch = KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(keymap, scUnderlying, VKShiftState[j], &DeadKey);
 
       // printf("--- VK_%d -> SC_ [%c] dk=%d  ( ss %i) \n", KMX_VKMap[i], ch == 0 ? 32 : ch, DeadKey, VKShiftState[j]);
@@ -583,7 +583,7 @@ int KMX_GetDeadkeys(vec_dword_2D& dk_Table, KMX_WORD deadkey, KMX_WORD* outputPa
  * @param  fmt text to print
  */
 void KMX_LogError(const wchar_t* fmt, ...) {
-  WCHAR fmtbuf[256];
+  wchar_t fmtbuf[256];
   const wchar_t* end = L"\0";
   const wchar_t* nl  = L"\n";
   va_list vars;
