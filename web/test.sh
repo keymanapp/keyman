@@ -32,8 +32,6 @@ builder_parse "$@"
 WTR_CONFIG=
 if builder_has_option --ci; then
   WTR_CONFIG=.CI
-elif builder_has_option --remote; then
-  WTR_CONFIG=.remote
 fi
 
 # Prepare the flags for the karma command.
@@ -45,5 +43,9 @@ fi
 # End common configs.
 
 builder_run_action test:dom web-test-runner --config "src/test/auto/dom/web-test-runner${WTR_CONFIG}.config.mjs" ${WTR_DEBUG}
+
+if ! builder_has_option --ci && builder_has_option --remote; then
+  WTR_CONFIG=.remote
+fi
 
 builder_run_action test:integrated web-test-runner --config "src/test/auto/integrated/web-test-runner${WTR_CONFIG}.config.mjs" ${WTR_DEBUG}
