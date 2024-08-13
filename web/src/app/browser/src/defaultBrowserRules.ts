@@ -1,10 +1,10 @@
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 import {
   Codes,
+  DefaultRules,
   type KeyEvent,
   type OutputTarget
 } from 'keyman/engine/keyboard';
-import { DefaultRules } from 'keyman/engine/js-processor';
 
 import ContextManager from './contextManager.js';
 

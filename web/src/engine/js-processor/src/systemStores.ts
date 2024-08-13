@@ -1,5 +1,5 @@
-import { type KeyboardHarness } from "./keyboards/keyboardHarness.js";
-import { StoreNonCharEntry } from './keyboards/keyboard.js';
+import { type KeyboardHarness } from 'keyman/engine/keyboard';
+import { StoreNonCharEntry } from './kbdInterface.js';
 
 export enum SystemStoreIDs {
   TSS_LAYER = 33,

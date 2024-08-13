@@ -27,14 +27,14 @@ export { default as StateKeyMap } from "./keyboards/stateKeyMap.js";
 export { default as Codes } from "./codes.js";
 export * from "./codes.js";
 export * from "./deadkeys.js";
+export { default as DefaultRules } from "./defaultRules.js";
+export * from "./defaultRules.js";
 export { default as KeyEvent } from "./keyEvent.js";
 export * from "./keyEvent.js";
 export { default as KeyMapping } from "./keyMapping.js";
 export { default as OutputTarget } from "./outputTarget.js";
 export * from "./outputTarget.js";
 export * from "./stringDivergence.js";
-export * from "./systemStores.js";
-export * from "./ruleBehavior.interface.js";
 
 export * from "@keymanapp/web-utils";
 
