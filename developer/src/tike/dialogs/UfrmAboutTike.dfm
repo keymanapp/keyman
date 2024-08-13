@@ -509,7 +509,7 @@ inherited frmAboutTike: TfrmAboutTike
     Width = 200
     Height = 11
     Anchors = [akLeft, akBottom]
-    Caption = 'Copyright SIL International. All Rights Reserved'
+    Caption = 'Copyright SIL Global. All Rights Reserved'
     Font.Charset = ANSI_CHARSET
     Font.Color = clBlack
     Font.Height = -9
@@ -635,7 +635,7 @@ inherited frmAboutTike: TfrmAboutTike
     Top = 284
     Width = 184
     Height = 18
-    Caption = 'Created by SIL International'
+    Caption = 'Created by SIL Global'
     Color = clWhite
     Font.Charset = ANSI_CHARSET
     Font.Color = clBlack

@@ -4,7 +4,7 @@
 
 # License
 
-Copyright (c) SIL International.
+Copyright (c) SIL Global.
 
 Keyman is an open source project distributed under the [MIT license](LICENSE.md).
 
