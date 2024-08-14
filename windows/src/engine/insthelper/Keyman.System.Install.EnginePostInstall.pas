@@ -37,7 +37,7 @@ begin
   Result := False;
   UpdateStr := 'usPostInstall';
     //KL.Log('SetBackgroundState State Entry');
-  if RegOpenKeyEx(HKEY_LOCAL_MACHINE, PChar(SRegKey_KeymanEngine_LM), 0, KEY_ALL_ACCESS, hk) = ERROR_SUCCESS then
+  if RegOpenKeyEx(HKEY_LOCAL_MACHINE, PChar(SRegKey_KeymanEngine_CU), 0, KEY_ALL_ACCESS, hk) = ERROR_SUCCESS then
   begin
     try
       if RegSetValueEx(hk, PChar(SRegValue_Update_State), 0, REG_SZ, PWideChar(UpdateStr), Length(UpdateStr) * SizeOf(Char)) = ERROR_SUCCESS then
