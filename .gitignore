@@ -183,11 +183,3 @@ lcov.info
 /keyman*.buildinfo
 /keyman*.changes
 /keyman*.tar.?z
-
-#Sabine:
-# /common/test/keyboards/invalid/source/*.kmx
-# /developer/src/test/auto/kmcomp/*.kmn
-# /developer/src/test/auto/kmcomp/*.kvk
-# /developer/src/test/auto/kmcomp/*.kvk*
-# /developer/src/test/auto/kmcomp/*.txt
-/linux/mcompile/keymap/X_bak
