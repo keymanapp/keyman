@@ -135,7 +135,7 @@ public class AdjustLongpressDelayActivity extends BaseActivity {
   @Override
   public void onBackPressed() {
     // Apply the adjusted longpress delay on exit
-    KMManager.setLongpressDelay(this, currentDelayTime);
+    KMManager.setLongpressDelay(currentDelayTime);
 
     super.onBackPressed();
   }
