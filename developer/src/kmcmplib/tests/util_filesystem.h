@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdio.h>
-#include "../src/kmx_u16.h"
+#include <km_u16.h>
 
 // Opens files on windows and non-windows platforms. Datatypes for Filename and mode must be the same.
 // returns FILE* if file could be opened; FILE needs to be closed in calling function

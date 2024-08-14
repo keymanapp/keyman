@@ -6,7 +6,7 @@
 
 #include <stdarg.h>
 #include "utfcodec.hpp"
-#include "kmx_u16.h"
+#include "km_u16.h"
 
 /**   string <- wstring
  * @brief  Obtain a std::string from a std::wstring

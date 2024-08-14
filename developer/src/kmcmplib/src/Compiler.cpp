@@ -102,7 +102,7 @@
 
 #include "UnreachableRules.h"
 #include "CheckForDuplicates.h"
-#include "kmx_u16.h"
+#include "km_u16.h"
 
 /* These macros are adapted from winnt.h and legacy use only */
 #define MAKELANGID(p, s)       ((((uint16_t)(s)) << 10) | (uint16_t)(p))
