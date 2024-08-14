@@ -1,0 +1,86 @@
+#
+# Shared configuration for all meson-based builds
+#
+# This file has the master location /resources/build/meson/standard.meson.build,
+# and is copied into each project's <project>/resources/meson.build in the
+# configure step, so that it can be referenced by meson directly.
+#
+# Where possible, we want to use these flags everywhere
+#
+
+cpp_compiler = meson.get_compiler('cpp')
+c_compiler = meson.get_compiler('c')
+
+# Once we can assume meson 0.60 we can delete this
+# (https://mesonbuild.com/Release-notes-for-0-60-0.html#msvc-compiler-now-assumes-utf8-source-code-by-default)
+if cpp_compiler.get_id() == 'msvc'
+  add_global_arguments('/source-charset:utf-8', language: ['c', 'cpp'])
+endif
+
+#
+# Standard informational messages for our builds
+#
+
+message('meson.project_version(): ' + meson.project_version())
+message('host_machine.system(): ' + host_machine.system())
+message('compiler.get_id(): ' + cpp_compiler.get_id())
+
+#
+# Standard compiler flags for all platforms
+#
+
+warns = []
+flags = []
+links = []
+defns = []
+
+if cpp_compiler.get_id() == 'gcc' or cpp_compiler.get_id() == 'clang'
+  warns += [
+     '-Wctor-dtor-privacy',
+     '-Wdouble-promotion',
+     '-Wendif-labels',
+     '-Wno-unknown-pragmas',
+     '-Wno-missing-field-initializers',
+     '-Wnon-virtual-dtor',
+     '-Wshadow'
+  ]
+  flags += [
+    '-fvisibility=hidden',
+    '-fvisibility-inlines-hidden'
+  ]
+
+  if cpp_compiler.get_id() == 'clang'
+    warns += [
+      '-Wimplicit-fallthrough',
+      '-Wno-double-promotion',
+      '-Wshorten-64-to-32'
+    ]
+  endif
+
+  if host_machine.system() == 'darwin'
+    # TODO: this seems to be inverting above options, is this necessary, or can
+    #       we resolve another way?
+    warns += [
+      '-Wno-ctor-dtor-privacy',
+      '-Wno-non-virtual-dtor'
+    ]
+  endif
+endif
+
+if cpp_compiler.get_id() == 'msvc'
+  defns += [
+    '-D_SCL_SECURE_NO_WARNINGS',
+    '-D_CRT_SECURE_NO_WARNINGS'
+  ]
+endif
+
+if cpp_compiler.get_id() == 'emscripten'
+  if get_option('buildtype') == 'debug'
+    # Enable DWARF symbols for debug builds
+    flags += ['-g']
+    links += ['-g']
+  else
+    flags += ['-O2']
+    links += ['-O2']
+  endif
+endif
