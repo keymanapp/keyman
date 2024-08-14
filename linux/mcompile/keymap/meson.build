@@ -16,11 +16,11 @@ cpp_files = files(
     'mcompile.cpp',
     'mc_kmxfile.cpp',
     'mc_import_rules.cpp',
-    'u16.cpp',)
+    '../../../common/cpp/km_u16.cpp',
+    )
 
 comon_include_dir = [
-  include_directories('../../../common/include'),
-  include_directories('../../../core/src'),
+  include_directories('../../../common/include')
 ]
 
 mcompile = executable(
