@@ -248,7 +248,14 @@ export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: Ge
 
   const _initialTapModel: GestureModel<KeyElement> = deepCopy(!doRoaming ? initialTapModel(params) : initialTapModelWithReset(params));
   const _simpleTapModel: GestureModel<KeyElement> = deepCopy(!doRoaming ? simpleTapModel(params) : simpleTapModelWithReset(params));
-  const _longpressModel: GestureModel<KeyElement> = deepCopy(longpressModel(params, true, doRoaming));
+  // Ensure all deep-copy operations for longpress modeling occur before the property-redefining block.
+  const _longpressModel: GestureModel<KeyElement> = withKeySpecFiltering(deepCopy(longpressModel(params, true, doRoaming)), 0);
+
+  // `deepCopy` does not preserve property definitions, instead raw-copying its value.
+  // We need to re-instate the longpress delay property here.
+  Object.defineProperty(_longpressModel.contacts[0].model.timer, 'duration', {
+    get: () => params.longpress.waitLength
+  });
 
   // #region Functions for implementing and/or extending path initial-state checks
   function withKeySpecFiltering(model: GestureModel<KeyElement>, contactIndices: number | number[]) {
@@ -281,7 +288,7 @@ export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: Ge
   const specialStartModel = specialKeyStartModel();
   const _modipressStartModel = modipressStartModel();
   const gestureModels: GestureModel<KeyElement>[] = [
-    withKeySpecFiltering(_longpressModel, 0),
+    _longpressModel,
     withKeySpecFiltering(multitapStartModel(params), 0),
     multitapEndModel(params),
     _initialTapModel,
@@ -481,7 +488,8 @@ export function longpressContactModel(params: GestureParams, enabledFlicks: bool
     itemPriority: 0,
     pathResolutionAction: 'resolve',
     timer: {
-      duration: spec.waitLength,
+      // Needs to be a getter so that it dynamically updates if the backing value is changed.
+      get duration() { return spec.waitLength },
       expectedResult: true
     },
     validateItem: (_: KeyElement, baseKey: KeyElement) => !!baseKey?.key.spec.sk,
