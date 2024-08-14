@@ -8,6 +8,7 @@ libxklavier = dependency('libxklavier')
 
 deps = [gtk, xkb,libxklavier]
 
+subdir('resources')
 
 cpp_files = files(
     'keymap.cpp',
