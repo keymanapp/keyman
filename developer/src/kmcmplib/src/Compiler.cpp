@@ -580,7 +580,7 @@ KMX_BOOL ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str) {
         //swprintf(tstr, "%d", fk->currentGroup);
         /* Record a system store for the line number of the begin statement */
         //wcscpy(tstr, DEBUGSTORE_MATCH);
-        u16sprintf(tstr, _countof(tstr), L"%ls%d ", u16fmt(DEBUGSTORE_MATCH).c_str(), (int) fk->currentGroup);
+        u16sprintf(tstr, _countof(tstr), L"%ls%d ", DEBUGSTORE_MATCH_L, (int) fk->currentGroup);
         u16ncat(tstr, gp->szName, _countof(tstr));
 
         AddDebugStore(fk, tstr);
@@ -619,7 +619,7 @@ KMX_BOOL ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str) {
       {
         KMX_WCHAR tstr[128];
         /* Record a system store for the line number of the begin statement */
-        u16sprintf(tstr, _countof(tstr), L"%ls%d ", u16fmt(DEBUGSTORE_NOMATCH).c_str(), (int) fk->currentGroup);
+        u16sprintf(tstr, _countof(tstr), L"%ls%d ", DEBUGSTORE_NOMATCH_L, (int) fk->currentGroup);
         u16ncat(tstr, gp->szName, _countof(tstr));
         AddDebugStore(fk, tstr);
       }
@@ -683,7 +683,7 @@ KMX_BOOL ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   {
     KMX_WCHAR tstr[128];
     /* Record a system store for the line number of the begin statement */
-    u16sprintf(tstr, _countof(tstr), L"%ls%d ", u16fmt(DEBUGSTORE_GROUP).c_str(), fk->cxGroupArray - 1);
+    u16sprintf(tstr, _countof(tstr), L"%ls%d ", DEBUGSTORE_GROUP_L, fk->cxGroupArray - 1);
     u16ncat(tstr, gp->szName, _countof(tstr));
     AddDebugStore(fk, tstr);
   }
@@ -3761,7 +3761,7 @@ void kmcmp::RecordDeadkeyNames(PFILE_KEYBOARD fk)
   KMX_DWORD i;
   for (i = 0; i < fk->cxDeadKeyArray; i++)
   {
-    u16sprintf(buf, _countof(buf), L"%ls%d ", u16fmt(DEBUGSTORE_DEADKEY).c_str(), (int)i);
+    u16sprintf(buf, _countof(buf), L"%ls%d ", DEBUGSTORE_DEADKEY_L, (int)i);
     u16ncat(buf, fk->dpDeadKeyArray[i].szName, _countof(buf));
 
     AddDebugStore(fk, buf);
