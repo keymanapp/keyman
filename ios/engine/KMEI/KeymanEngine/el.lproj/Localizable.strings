@@ -44,19 +44,19 @@
 "command-uninstall-keyboard-confirm" = "Θὰ θέλατε νὰ ἀπεγκαταστήσετε αὐτὸ τὸ πληκτρολόγιο;";
 
 /* Text for the command to uninstall a lexical model */
-"command-uninstall-lexical-model" = "Ἀπεγκαταστῆτε λεξικό";
+"command-uninstall-lexical-model" = "Ἀπεγκαταστῆστε λεξικό";
 
 /* Confirmation text to display before uninstalling a lexical model */
 "command-uninstall-lexical-model-confirm" = "Θὰ θέλατε νὰ ἀπεγκαταστήσετε αὐτὸ τὸ λεξικό;";
 
 /* Text for error when a keyboard cannot load properly */
-"error-loading-keyboard" = "Ἀδυνατοῦμε νὰ φορτώσομε τὸ πληκτρολόγιο ποὺ ζητήσατε";
+"error-loading-keyboard" = "Ἀδυναμία φορτώσεως τοῦ πληκτρολογίου ποὺ ζητήσατε";
 
 /* Text for error when a lexical model cannot load properly */
-"error-loading-lexical-model" = "Ἀδυνατοῦμε νὰ φορτώσομε τὸ λεξικὸ ποὺ ζητήσατε";
+"error-loading-lexical-model" = "Ἀδυναμία φορτώσεως τοῦ λεξικοῦ ποὺ ζητήσατε";
 
 /* Text for error when an installed file is unexpectedly missing */
-"error-missing-file" = "Δὲν βρέθηκε κάποιο ἀπαραίτητο ἀρχεῖο.";
+"error-missing-file" = "Δὲν βρέθηκε κάποιο ἀπαιτούμενο ἀρχεῖο.";
 
 /* Text for error when an installed file is unexpectedly missing */
 "error-missing-file-critical" = "Κάποιο σημαντικὸ ἀρχεῖο δὲν εὑρέθη. Παρακαλοῦμε προσπαθῆστε νὰ ἐγκαταστήσετε ἐκ νέου τὴν ἐφαρμογή.";
@@ -77,7 +77,7 @@
 "error-update-no-link" = "Δὲν ὑπάρχει πηγαῖος κώδικας πρὸς ἐνημέρωσιν αὐτοῦ τοῦ πακέτου";
 
 /* Text for error when updating a resource:  Keyman does not know how to update the resource */
-"error-update-not-managed" = "Ἀδυνατοῦμε νὰ ἐνημερώσομε πόρο μὴ διαχειριζόμενο ἀπὸ τὴν μηχανὴ Κῆμαν";
+"error-update-not-managed" = "Ἀδυναμία ἐνημερώσεως πόρου μὴ διαχειριζομένου ἀπὸ μηχανὴ Keyman";
 
 /* Text for the command to open the help page of a keyboard, as shown on resource information views */
 "info-command-help-keyboard" = "Βοήθεια γιὰ τὸ πληκτρολόγιο";
@@ -155,7 +155,7 @@
 "menu-langsettings-toggle-correct" = "Ἐνεργοποιῆστε τὶς διορθώσεις";
 
 /* Label for the toggle that enables predictions that is displayed within a language-specific settings menu */
-"menu-langsettings-toggle-predict" = "Ἐνεργοποιῆστε προβλέψεις";
+"menu-langsettings-toggle-predict" = "Ἐνεργοποιῆστε τὶς προβλέψεις κειμένου";
 
 /* Help message for a prompt that appears for confirming a lexical model download:  language (1): lexical model (dictionary) name (2) */
 "menu-lexical-model-install-message" = "Θὰ θέλατε νὰ ἐγκαταστήσετε αὐτὸ τὸ λεξικό;";
@@ -200,13 +200,13 @@
 "menu-settings-spacebar-hint-blank" = "Καμμία λεζάντα στὸ πλῆκτρο διαστήματος";
 
 /* Secondary text showing current setting for spacebar caption - keyboard */
-"menu-settings-spacebar-hint-keyboard" = "Νὰ ἐμφανίζεται στὸ στὸ πλῆκτρο διαστήματος τὸ ὄνομα τοῦ πληκτρολογίου";
+"menu-settings-spacebar-hint-keyboard" = "Ὄνομα πληκτρολογίου στὸ πλῆκτρο διαστήματος";
 
 /* Secondary text showing current setting for spacebar caption - language */
-"menu-settings-spacebar-hint-language" = "Νὰ ἐμφανίζεται στὸ στὸ πλῆκτρο διαστήματος τὸ ὄνομα τῆς γλώσσας";
+"menu-settings-spacebar-hint-language" = "Ὄνομα γλώσσας στὸ πλῆκτρο διαστήματος";
 
 /* Secondary text showing current setting for spacebar caption - language + keyboard */
-"menu-settings-spacebar-hint-languageKeyboard" = "Νὰ ἐμφανίζεται στὸ στὸ πλῆκτρο διαστήματος τὸ ὄνομα τοῦ πληκτρολογίου καὶ τῆς γλώσσας";
+"menu-settings-spacebar-hint-languageKeyboard" = "Ὄνομα πληκτρολογίου καὶ γλώσσας στὸ πλῆκτρο διαστήματος";
 
 /* Label for the "Spacebar Caption" item on the main settings screen */
 "menu-settings-spacebar-text" = "Λεζάντα Πλήκτρου Διαστήματος";
