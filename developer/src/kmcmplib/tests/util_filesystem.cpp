@@ -117,19 +117,6 @@ FILE* Open_File(const KMX_CHAR* Filename, const KMX_CHAR* mode) {
 #endif
 };
 
-FILE* Open_File(const KMX_WCHART* Filename, const KMX_WCHART* mode) {
-#ifdef _MSC_VER
-  std::wstring cpath = Filename; //, cmode = mode;
-  std::replace(cpath.begin(), cpath.end(), '/', '\\');
-  return _wfsopen(cpath.c_str(), mode, _SH_DENYWR);
-#else
-  std::string cpath, cmode;
-  cpath = string_from_wstring(Filename);
-  cmode = string_from_wstring(mode);
-  return fopen_wrapper(cpath.c_str(), cmode.c_str());
-#endif
-};
-
 FILE* Open_File(const KMX_WCHAR* Filename, const KMX_WCHAR* mode) {
 #ifdef _MSC_VER
   std::wstring cpath = wstring_from_u16string(Filename);
