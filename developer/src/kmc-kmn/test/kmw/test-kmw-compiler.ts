@@ -229,7 +229,7 @@ async function run_test_keyboard(kmnCompiler: KmnCompiler, id: string):
     fs.writeFileSync(filenames.binary, value.actualCode);
   }
 
-  assert.deepEqual(value.actual.js, value.expected.js);
+  assert.deepEqual(value.actual.js.replaceAll(/\r\n/g, '\n'), value.expected.js.replaceAll(/\r\n/g, '\n'));
   assert.deepEqual(JSON.parse(value.actual.touchLayout), JSON.parse(value.expected.touchLayout));
 
   return value;

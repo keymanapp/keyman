@@ -18,8 +18,8 @@
               <p id='header-version'>Version <xsl:value-of select="/Data/Version" /></p>
               <div id='header-sil'>
                 <img src='res/sil.png' />
-                <div>Created by SIL International
-                  <div id='header-copyright'>Copyright &#169; SIL International. All Rights Reserved.</div>
+                <div>Created by SIL Global
+                  <div id='header-copyright'>Copyright &#169; SIL Global. All Rights Reserved.</div>
                 </div>
               </div>
 

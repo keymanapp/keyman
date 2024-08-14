@@ -11,7 +11,8 @@
  */
 
 import JSZip from 'jszip';
-import { CompilerCallbacks, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KeymanFileTypes, KmpJsonFile, KpsFile } from "@keymanapp/common-types";
+import { KeymanFileTypes, KmpJsonFile } from "@keymanapp/common-types";
+import { CompilerCallbacks, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KpsFile } from '@keymanapp/developer-utils';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { KmpCompiler, KmpCompilerOptions } from "./kmp-compiler.js";
 import { PackageCompilerMessages } from "./package-compiler-messages.js";

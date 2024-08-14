@@ -1,7 +1,8 @@
 import * as path from 'path';
 import { platform } from 'os';
 import { KmnCompiler } from '@keymanapp/kmc-kmn';
-import { CompilerOptions, CompilerCallbacks, KeymanFileTypes } from '@keymanapp/common-types';
+import { KeymanFileTypes } from '@keymanapp/common-types';
+import { CompilerOptions, CompilerCallbacks } from '@keymanapp/developer-utils';
 import { BuildActivity } from './BuildActivity.js';
 
 export class BuildKmnKeyboard extends BuildActivity {
