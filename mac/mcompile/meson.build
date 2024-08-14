@@ -6,7 +6,7 @@ carbon =         dependency('Carbon')
 
 deps = [carbon]
 
-# subdir('resources')
+subdir('resources')
 
 cpp_files = files(
     'keymap.cpp',
