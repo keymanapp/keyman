@@ -571,14 +571,6 @@
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Menu_Diagnostics_Diagnostics" comment="Support button submenu - performs a diagnostic report">Diagnostics</string>
 
-   <!-- Context: Configuration Dialog - Updates tab -->
-   <!-- String Type: PlainText -->
-   <!-- Introduced: 17.0.235.0 -->
-   <string name="S_Button_CheckForUpdates" comment="Support button - manually checks for product updates">Check for Updates</string>
-
-
-
-
   <!-- Context: Download Keyboard Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
