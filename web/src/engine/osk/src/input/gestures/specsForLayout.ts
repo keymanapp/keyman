@@ -21,12 +21,16 @@ import { calcLockedDistance, lockedAngleForDir, MAX_TOLERANCE_ANGLE_SKEW, type O
 import specs = gestures.specs;
 
 export interface GestureParams<Item = any> {
-  longpress: {
+  readonly longpress: {
     /**
-     * Allows enabling or disabling the longpress up-flick shortcut for keyboards that do not
-     * include any defined flick gestures.
+     * Allows enabling or disabling the longpress up-flick shortcut for
+     * keyboards that do not include any defined flick gestures.
      *
-     * Will be ignored (in favor of `false`) for keyboards that do have defined flicks.
+     * Will be ignored (in favor of `false`) for keyboards that do have defined
+     * flicks.
+     *
+     * Note:  this is automatically overwritten during keyboard initialization
+     * to match the keyboard's properties.
      */
     permitsFlick: (item?: Item) => boolean,
 
@@ -57,7 +61,7 @@ export interface GestureParams<Item = any> {
      */
     waitLength: number
   },
-  multitap: {
+  readonly multitap: {
     /**
      * The duration (in ms) permitted between taps.  Taps with a greater time interval
      * between them will be considered separate.
@@ -70,7 +74,7 @@ export interface GestureParams<Item = any> {
      */
     holdLength: number;
   },
-  flick: {
+  readonly flick: {
     /**
      * The minimum _net_ touch-path distance that must be traversed to "lock in" on
      * a flick gesture.  When keys support both longpresses and flicks, this distance
