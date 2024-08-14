@@ -295,6 +295,9 @@ public final class KMManager {
   public static final String KMDefault_DictionaryVersion = "0.1.4";
   public static final String KMDefault_DictionaryKMP = KMDefault_DictionaryPackageID + FileUtils.MODELPACKAGE;
 
+  // Default KeymanWeb long-press delay
+  public static final int KMDefault_LongpressDelay = 500; // ms
+
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
   protected static final String KMFilename_JSEngine = "keymanweb-webview.js";
@@ -2018,10 +2021,11 @@ public final class KMManager {
    * @return int - long-press delay in milliseconds
    */
   public static int getLongpressDelay(Context context) {
-    int defaultDelay = 500; // default longpress delay in KeymanWeb (ms)
     SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
 
-    return prefs.getInt(KMManager.KMKey_LongpressDelay, defaultDelay);
+    return prefs.getInt(
+      KMKey_LongpressDelay,
+      KMDefault_LongpressDelay);
   }
 
   /**

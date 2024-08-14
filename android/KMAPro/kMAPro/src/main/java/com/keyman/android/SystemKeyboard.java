@@ -4,6 +4,7 @@
 
 package com.keyman.android;
 
+import com.tavultesoft.kmapro.AdjustLongpressDelayActivity;
 import com.tavultesoft.kmapro.BuildConfig;
 import com.tavultesoft.kmapro.DefaultLanguageResource;
 import com.tavultesoft.kmapro.KeymanSettingsActivity;
@@ -79,6 +80,8 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     // Set the system keyboard HTML banner
     BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
 
+    int longpressDelay = KMManager.getLongpressDelay(this);
+    KMManager.setLongpressDelay(longpressDelay);
     boolean mayHaveHapticFeedback = prefs.getBoolean(KeymanSettingsActivity.hapticFeedbackKey, false);
     KMManager.setHapticFeedback(mayHaveHapticFeedback);
 
@@ -244,6 +247,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       if (exText != null)
         exText = null;
     }
+    // Initialize the longpress delay
+    int longpressDelay = KMManager.getLongpressDelay(this);
+    KMManager.setLongpressDelay(longpressDelay);
   }
 
   @Override

@@ -115,6 +115,10 @@ function notifyHost(event, params) {
 // Update the KeymanWeb longpress delay
 // delay is in milliseconds
 function setLongpressDelay(delay) {
+  if (keyman.osk) {
+    keyman.osk.gestureParams.longpress.waitLength = delay;
+    console.debug('setLongpressDelay('+delay+')');
+  }
 }
 
 // Update the KMW banner height

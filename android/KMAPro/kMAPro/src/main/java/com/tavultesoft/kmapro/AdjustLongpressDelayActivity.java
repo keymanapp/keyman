@@ -29,7 +29,7 @@ public class AdjustLongpressDelayActivity extends BaseActivity {
 
   // Keeps track of the adjusted longpress delay time for saving.
   // Internally use milliseconds, but GUI displays seconds
-  private static int currentDelayTime = 500;  // ms
+  private static int currentDelayTime = KMManager.KMDefault_LongpressDelay;  // ms
   private static int minLongpressTime = 300;   // ms
   private static int maxLongpressTime = 1500;  // ms
   private static int delayTimeIncrement = 200; // ms
