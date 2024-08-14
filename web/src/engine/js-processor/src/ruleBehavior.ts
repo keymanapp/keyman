@@ -1,7 +1,9 @@
 ///<reference types="@keymanapp/models-types" />
 
 import KeyboardProcessor from "./keyboardProcessor.js";
-import { OutputTarget, Mock, type Transcription, VariableStoreDictionary } from "keyman/engine/keyboard";
+import { VariableStoreDictionary } from "keyman/engine/keyboard";
+import OutputTarget, { type Transcription } from './outputTarget.js';
+import { Mock } from "./mock.js";
 import { type VariableStore } from "./systemStores.js";
 
 /**

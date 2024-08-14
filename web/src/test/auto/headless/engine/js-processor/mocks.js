@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { Mock } from 'keyman/engine/keyboard';
+import { Mock } from 'keyman/engine/js-processor';
 
 describe('Mocks', function() {
   describe('app|les', () => {

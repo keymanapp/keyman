@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { Mock, findCommonSubstringEndIndex } from 'keyman/engine/keyboard';
+import { Mock, findCommonSubstringEndIndex } from 'keyman/engine/js-processor';
 import { extendString } from '@keymanapp/web-utils';
 
 extendString();  // Ensure KMW's string-extension functionality is available.

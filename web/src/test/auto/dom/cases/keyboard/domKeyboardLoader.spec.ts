@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 
 import { DOMKeyboardLoader } from 'keyman/engine/keyboard/dom-keyboard-loader';
-import { extendString, KeyboardHarness, Keyboard, MinimalKeymanGlobal, Mock, DeviceSpec, KeyboardKeymanGlobal } from 'keyman/engine/keyboard';
-import { KeyboardInterface } from 'keyman/engine/js-processor';
+import { extendString, KeyboardHarness, Keyboard, MinimalKeymanGlobal, DeviceSpec, KeyboardKeymanGlobal } from 'keyman/engine/keyboard';
+import { KeyboardInterface, Mock } from 'keyman/engine/js-processor';
 
 declare let window: typeof globalThis;
 // KeymanEngine from the web/ folder... when available.

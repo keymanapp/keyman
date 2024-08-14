@@ -1,6 +1,6 @@
 import { EventEmitter } from "eventemitter3";
 import { LMLayer } from "@keymanapp/lexical-model-layer/web";
-import { OutputTarget, Transcription, Mock } from "keyman/engine/keyboard";
+import { OutputTarget, Transcription, Mock } from "keyman/engine/js-processor";
 import { LanguageProcessorEventMap, ModelSpec, StateChangeEnum, ReadySuggestions } from 'keyman/engine/interfaces';
 import ContextWindow from "./contextWindow.js";
 import { TranscriptionCache } from "./transcriptionCache.js";

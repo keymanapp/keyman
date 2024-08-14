@@ -1,7 +1,7 @@
 ///<reference types="@keymanapp/models-types" />
 
 import { EventEmitter } from "eventemitter3";
-import { OutputTarget } from "keyman/engine/keyboard";
+import { OutputTarget } from "keyman/engine/js-processor";
 
 export class ReadySuggestions {
   suggestions: Suggestion[];

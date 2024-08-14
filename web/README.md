@@ -119,7 +119,7 @@ graph TD;
         Device["/web/src/engine/device-detect"];
         Device----->WebUtils;
         Elements["/web/src/engine/element-wrappers"];
-        Elements-->KP;
+        Elements-->JSProc;
         KeyboardCache["/web/src/engine/package-cache"];
         KeyboardCache-->Interfaces;
         DomUtils["/web/src/engine/dom-utils"];

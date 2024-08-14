@@ -4,8 +4,8 @@ import { ModifierKeyConstants } from '@keymanapp/common-types';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { Codes, KeyEvent, MinimalKeymanGlobal, Mock } from 'keyman/engine/keyboard';
-import { KeyboardInterface } from 'keyman/engine/js-processor';
+import { Codes, KeyEvent, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
+import { KeyboardInterface, Mock } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 
 // Compare and contrast the unit tests here with those for app/browser key-event unit testing

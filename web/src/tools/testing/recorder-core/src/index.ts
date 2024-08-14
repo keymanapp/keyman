@@ -1,5 +1,5 @@
-import { type OutputTarget } from "keyman/engine/keyboard";
-import { KeyDistribution, KeyEvent, Mock } from "keyman/engine/keyboard";
+import { Mock, type OutputTarget } from "keyman/engine/js-processor";
+import { KeyDistribution, KeyEvent } from "keyman/engine/keyboard";
 
 import Proctor from "./proctor.js";
 

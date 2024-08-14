@@ -2,7 +2,7 @@ import Codes from "../codes.js";
 import { EncodedVisualKeyboard, LayoutSpec, Layouts } from "./defaultLayouts.js";
 import { ActiveKey, ActiveLayout, ActiveSubKey } from "./activeLayout.js";
 import KeyEvent from "../keyEvent.js";
-import type OutputTarget from "../outputTarget.js";
+import { type OutputTarget } from "../outputTarget.interface.js";
 import { ModifierKeyConstants, TouchLayout } from "@keymanapp/common-types";
 type TouchLayoutSpec = TouchLayout.TouchLayoutPlatform & { isDefault?: boolean};
 

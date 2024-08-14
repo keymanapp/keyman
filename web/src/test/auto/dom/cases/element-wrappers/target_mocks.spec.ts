@@ -1,6 +1,7 @@
 import { assert } from 'chai';
 
-import { extendString, Mock } from 'keyman/engine/keyboard';
+import { extendString } from 'keyman/engine/keyboard';
+import { Mock } from 'keyman/engine/js-processor';
 import { Input } from 'keyman/engine/element-wrappers';
 
 import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';

@@ -1,6 +1,7 @@
 import { assert } from 'chai';
 
-import { extendString, Mock } from 'keyman/engine/keyboard';
+import { extendString } from 'keyman/engine/keyboard';
+import { Mock } from 'keyman/engine/js-processor';
 import * as wrappers from 'keyman/engine/element-wrappers';
 
 import { DynamicElements } from '../../test_utils.js';
