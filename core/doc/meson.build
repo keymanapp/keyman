@@ -20,7 +20,7 @@ if hotdoc.found()
   deps = files(
     '../include/keyman/keyman_core_api.h',
     '../src/jsonpp.hpp',
-    '../src/utfcodec.hpp'
+    '../../common/cpp/utfcodec.hpp'
   )
 
   docs = custom_target('docs',
