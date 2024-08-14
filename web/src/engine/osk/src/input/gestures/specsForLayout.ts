@@ -254,9 +254,7 @@ export function gestureSetForLayout(flags: LayoutGestureSupportFlags, params: Ge
   // `deepCopy` does not preserve property definitions, instead raw-copying its value.
   // We need to re-instate the longpress delay property here.
   Object.defineProperty(_longpressModel.contacts[0].model.timer, 'duration', {
-    get: () => {
-      return params.longpress.waitLength
-    }
+    get: () => params.longpress.waitLength
   });
 
   // #region Functions for implementing and/or extending path initial-state checks
