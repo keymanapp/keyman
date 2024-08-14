@@ -6,7 +6,8 @@
 #include <Carbon/Carbon.h>
 #include <string>
 #include <vector>
-#include "u16.h"
+
+#include "../../common/include/km_u16.h"
 
 enum ShiftState {
   Base         = 0,                   // 0

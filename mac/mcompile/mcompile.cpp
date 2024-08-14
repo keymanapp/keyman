@@ -13,7 +13,7 @@
 #include <stdarg.h>
 #include <wchar.h>
 #include "mcompile.h"
-#include "u16.h"
+#include "../../common/include/km_u16.h"
 
 /** @brief  convert mnemonic keyboard layout to positional keyboard layout and translate keyboard */
 KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, int argc);
