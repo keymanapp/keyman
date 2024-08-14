@@ -1,11 +1,8 @@
 #pragma once
 
-#include <cmath>
-#include <vector>
-#include <ctype.h>
 #include <string>
 #include <cstring>
-#include "kmcompx.h"
+#include <km_types.h>
 
 /** @brief Obtain a std::string from a std::wstring */
 std::string string_from_wstring(std::wstring const wstr);

@@ -1,16 +1,12 @@
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * std::u16string functions and string conversion utility functions
+ */
 
-//#include "../../kmcompx/include/kmcompx.h"
-#include <kmcompx.h>
-#include "kmx_u16.h"
-
-#include <xstring.h>
-#include <km_types.h>
-#include <kmx_file.h>
-#include <codecvt>
-#include <locale>
 #include <stdarg.h>
-#include <algorithm>
 #include "utfcodec.hpp"
+#include "km_u16.h"
 
 /**   string <- wstring
  * @brief  Obtain a std::string from a std::wstring
