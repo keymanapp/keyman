@@ -38,7 +38,7 @@ EXTERN bool kmcmp_CompileKeyboard(
 
   int sz;
   std::vector<uint8_t> bufvec = kmcmp::loadfileproc(pszInfile, "");
-  sz = bufvec.size();
+  sz = static_cast<int>(bufvec.size());
   if(!sz) {
     ReportCompilerMessage(KmnCompilerMessages::ERROR_InfileNotExist);
     return FALSE;

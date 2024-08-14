@@ -6,7 +6,7 @@ import { CompilerCallbacks, CompilerEvent,
          compilerLogLevelToSeverity, CompilerErrorSeverity,
          CompilerError,
          CompilerCallbackOptions,
-         CompilerFileCallbacks} from '@keymanapp/common-types';
+         CompilerFileCallbacks} from '@keymanapp/developer-utils';
 import { InfrastructureMessages } from '../messages/infrastructureMessages.js';
 import chalk from 'chalk';
 import supportsColor from 'supports-color';

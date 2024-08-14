@@ -87,9 +87,16 @@ function build_server() {
 
   # Post build
   mkdir -p "$THIS_SCRIPT_PATH/build/src/site/"
-  mkdir -p "$THIS_SCRIPT_PATH/build/src/win32/"
   cp -r "$THIS_SCRIPT_PATH/src/site/"** "$THIS_SCRIPT_PATH/build/src/site/"
-  cp -r "$THIS_SCRIPT_PATH/src/win32/"** "$THIS_SCRIPT_PATH/build/src/win32/"
+
+  mkdir -p "$THIS_SCRIPT_PATH/build/src/win32/"
+  mkdir -p "$THIS_SCRIPT_PATH/build/src/win32/console"
+  mkdir -p "$THIS_SCRIPT_PATH/build/src/win32/trayicon"
+  cp "$THIS_SCRIPT_PATH/src/win32/README.md" "$THIS_SCRIPT_PATH/build/src/win32/"
+  cp "$THIS_SCRIPT_PATH/src/win32/console/node-hide-console-window.node" "$THIS_SCRIPT_PATH/build/src/win32/console/"
+  cp "$THIS_SCRIPT_PATH/src/win32/console/node-hide-console-window.x64.node" "$THIS_SCRIPT_PATH/build/src/win32/console/"
+  cp "$THIS_SCRIPT_PATH/src/win32/trayicon/addon.node" "$THIS_SCRIPT_PATH/build/src/win32/trayicon/"
+  cp "$THIS_SCRIPT_PATH/src/win32/trayicon/addon.x64.node" "$THIS_SCRIPT_PATH/build/src/win32/trayicon/"
 
   replaceVersionStrings "$THIS_SCRIPT_PATH/build/src/site/lib/sentry/init.js.in" "$THIS_SCRIPT_PATH/build/src/site/lib/sentry/init.js"
   rm "$THIS_SCRIPT_PATH/build/src/site/lib/sentry/init.js.in"
@@ -114,10 +121,13 @@ function installer_server() {
   rm -f node_modules/ngrok/bin/ngrok.exe
   popd
 
-  # @keymanapp/keyman-version is required in build/ now but we need to copy it in manually
+  # Dependencies are required in build/ but we need to copy them in manually
   mkdir -p "$PRODBUILDTEMP/node_modules/@keymanapp/"
   cp -R "$KEYMAN_ROOT/node_modules/@keymanapp/keyman-version/" "$PRODBUILDTEMP/node_modules/@keymanapp/"
   cp -R "$KEYMAN_ROOT/node_modules/@keymanapp/developer-utils/" "$PRODBUILDTEMP/node_modules/@keymanapp/"
+  cp -R "$KEYMAN_ROOT/node_modules/@keymanapp/common-types/" "$PRODBUILDTEMP/node_modules/@keymanapp/"
+  cp -R "$KEYMAN_ROOT/node_modules/@keymanapp/ldml-keyboard-constants/" "$PRODBUILDTEMP/node_modules/@keymanapp/"
+  cp -R "$KEYMAN_ROOT/node_modules/eventemitter3/" "$PRODBUILDTEMP/node_modules/"
 
   # We'll build in the $KEYMAN_ROOT/developer/bin/server/ folder
   rm -rf "$KEYMAN_ROOT/developer/bin/server/"
@@ -144,8 +154,8 @@ function publish_server() {
 
 builder_run_action clean:server        clean_server
 builder_run_action configure:server    configure_server
-builder_run_action build:server        build_server
 builder_run_action build:addins        build_addins
+builder_run_action build:server        build_server
 builder_run_action test:server         test_server
 # builder_run_action test:addins       # no op
 builder_run_action installer:server    installer_server # TODO: rename to install-prep

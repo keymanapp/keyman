@@ -8,7 +8,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 builder_describe "Keyman Developer unit test helpers" \
-  "@/common/web/types" \
+  "@/developer/src/common/web/utils" \
   clean configure build test
 
 builder_describe_outputs \

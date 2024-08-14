@@ -2,6 +2,7 @@ import { DeviceSpec } from "@keymanapp/web-utils";
 
 import EmbeddedGestureConfig from './embeddedGestureConfig.js';
 import { OSKResourcePathConfiguration } from "keyman/engine/interfaces";
+import { GestureParams } from "../input/gestures/specsForLayout.js";
 
 export default interface CommonConfiguration {
   /**
@@ -30,4 +31,9 @@ export default interface CommonConfiguration {
    * embedded within a WebView.
    */
   embeddedGestureConfig?: EmbeddedGestureConfig;
+
+  /**
+   * Specifies the gesture parameterizations to use for the active keyboard.
+   */
+  gestureParams?: GestureParams;
 }

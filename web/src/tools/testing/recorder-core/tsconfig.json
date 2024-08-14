@@ -1,0 +1,22 @@
+{
+  "extends": "../../../../tsconfig.base.json",
+
+  "compilerOptions": {
+    "types": ["node"],
+    "baseUrl": "./",
+    "outDir": "./build/obj/",
+    "tsBuildInfoFile": "./build/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src"
+  },
+
+  "include": [
+    "src/**/*.ts"
+  ],
+
+  "references": [
+    { "path": "../../../../../common/web/keyman-version" },
+    { "path": "../../../../../common/web/utils/" },
+    { "path": "../../../../../common/web/keyboard-processor/" },
+    { "path": "../../../../../common/web/lm-message-types" }
+  ],
+}
