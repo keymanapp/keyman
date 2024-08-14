@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 18.0.89 alpha 2024-08-14
+
+* feat(web): test skipped prediction round handling (#12169)
+* fix(web): support live configuration of longpress delay (#12175)
+* feat(web): add osk.gestureParams for better gesture-config persistence (#12176)
+* refactor(core): move utfcodec to common (#12171)
+* refactor: move kmx_u16 to common and rename to km_u16 (#12177)
+* refactor(developer): use npm or local source for server addons instead of github references (#12090)
+* fix(developer): fix crash with Windows Clipboard by ignoring zero scan code in debugger (#12166)
+* chore(developer): update SIL logo (#12168)
+
 ## 18.0.88 alpha 2024-08-13
 
 * docs: add .kmx specification (#12163)
