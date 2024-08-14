@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.88 alpha 2024-08-13
+
+* docs: add .kmx specification (#12163)
+
 ## 18.0.87 alpha 2024-08-12
 
 * chore(web): drop flaky auto-test component (#12155)
