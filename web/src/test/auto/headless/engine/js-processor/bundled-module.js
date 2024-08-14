@@ -1,5 +1,6 @@
 import { assert } from "chai";
-import * as Package from "keyman/engine/keyboard";
+import * as Package from "keyman/engine/js-processor";
+import * as Package2 from "keyman/engine/keyboard";
 
 // A few small tests to ensure that the ES Module bundle was successfully constructed and is usable.
 
@@ -12,10 +13,10 @@ var toSupplementaryPairString = function(code){
 
 let u = toSupplementaryPairString;
 
-describe('Bundled ES Module', function() {
-  describe('Keyboard', function () {
+describe('Bundled ES Module for js-processor', function() {
+  describe('KeyboardProcessor', function () {
     it('should initialize without errors', function () {
-      let kp = new Package.Keyboard();
+      let kp = new Package.KeyboardProcessor();
       assert.isNotNull(kp);
     });
   });
@@ -40,11 +41,20 @@ describe('Bundled ES Module', function() {
       }
     });
   });
+});
 
-  describe("Imported `utils`", function() {
+describe('Bundled ES Module for keyboard', function () {
+  describe('Keyboard', function () {
+    it('should initialize without errors', function () {
+      let kp = new Package2.Keyboard();
+      assert.isNotNull(kp);
+    });
+  });
+
+  describe("Imported `utils`", function () {
     it("should include `utils` package's Version class", () => {
-      let v16 = new Package.Version([16, 1]);
+      let v16 = new Package2.Version([16, 1]);
       assert.equal(v16.toString(), "16.1");
     });
-  })
+  });
 });

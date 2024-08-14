@@ -44,7 +44,7 @@ describe('LanguageProcessor', function() {
       let languageProcessor = new LanguageProcessor(worker, new TranscriptionCache());
 
       // These checks are lifted from the keyboard init checks found in
-      // engine/keyboard/tests/cases/basic-init.js.
+      // web/src/test/auto/headless/engine/js-processor/basic-init.js.
       assert.isDefined(languageProcessor.lmEngine);
       assert.isUndefined(languageProcessor.activeModel);
       assert.isFalse(languageProcessor.isActive);

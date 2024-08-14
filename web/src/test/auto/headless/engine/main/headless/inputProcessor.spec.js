@@ -49,7 +49,7 @@ describe('InputProcessor', function() {
         assert.isUndefined(core.activeModel);    // Same for the model.
 
         // These checks are lifted from the keyboard init checks found in
-        // common/web/keyboard/tests/cases/basic-init.js.
+        // web/src/test/auto/headless/engine/js-processor/basic-init.js.
         assert.equal('us', core.keyboardProcessor.baseLayout, 'KeyboardProcessor has unexpected base layout')
         assert.isNotNull(global.KeymanWeb, 'KeymanWeb global was not automatically installed');
         assert.equal('default', core.keyboardProcessor.layerId, 'Default layer is not set to "default"');
