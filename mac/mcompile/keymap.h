@@ -21,7 +21,38 @@ enum ShiftState {
   ShftXxxx     = Shft | Xxxx,         // 9
 };
 
+#define VK_SPACE    0x20
+#define VK_COLON	  0xBA
+#define VK_EQUAL	  0xBB
+#define VK_COMMA	  0xBC
+#define VK_HYPHEN   0xBD
+#define VK_PERIOD	  0xBE
+#define	VK_SLASH	  0xBF
+#define VK_ACCENT	  0xC0
+#define VK_LBRKT	  0xDB
+#define VK_BKSLASH	0xDC
+#define VK_RBRKT	  0xDD
+#define VK_QUOTE	  0xDE
+#define VK_xDF		  0xDF
+#define VK_OEM_102  0xE2  //  "<>" or "\|" on RT 102-key kbd.
 
+#define VK_DIVIDE   0x6F
+#define VK_CANCEL   3
+#define VK_DECIMAL  0x2E
+
+#define VK_OEM_CLEAR      0xFE
+#define VK_LSHIFT         0xA0
+#define VK_RSHIFT         0xA1
+#define VK_LCONTROL       0xA2
+#define VK_RCONTROL       0xA3
+#define VK_LMENU          0xA4
+#define VK_RMENU          0xA5
+
+#define VK_SHIFT          0x10
+#define VK_CONTROL        0x11
+#define VK_MENU           0x12
+#define VK_PAUSE          0x13
+#define VK_CAPITAL        0x14
 // Map of all US English virtual key codes that we can translate
 const KMX_DWORD KMX_VKMap[] = {
   'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
@@ -93,7 +124,7 @@ bool mac_InitializeUCHR(const UCKeyboardLayout** keyboard_layout);
  * @brief  array of USVirtualKey-ScanCode-pairs
  *         we use the same type of array as throughout Keyman even though we have lots of unused fields
  */
-const UINT mac_USVirtualKeyToScanCode[256] = {
+const KMX_DWORD mac_USVirtualKeyToScanCode[256] = {
 	0xFFFF, 		    // not used
 	0xFFFF, 		    // not used
 	0xFFFF, 		    // not used
@@ -356,7 +387,7 @@ const UINT mac_USVirtualKeyToScanCode[256] = {
  * @brief  array of ScanCode-USVirtualKey-pairs
  * 				 we use the same type of array as throughout Keyman even though we have lots of unused fields
  */
-const UINT mac_ScanCodeToUSVirtualKey[128] = {
+const KMX_DWORD mac_ScanCodeToUSVirtualKey[128] = {
 	0x41,    //	L"K_A",	          //	&H41
 	0x53,    //	L"K_S",	          //	&H53
 	0x44,    //	L"K_D",	          //	&H44
@@ -494,7 +525,7 @@ KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode(const UCKeyboardLayout* keyboard_layou
 KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode_dk(const UCKeyboardLayout* keyboard_layout, int keycode, int shiftstate_mac, int caps, UInt32& deadkeystate);
 
 /** @brief return the keyvalue for a given Keycode and shiftstate of the currently used (underlying) keyboard layout. */
-KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLayout* keyboard_layout, UINT kc_underlying, UINT vk_ShiftState, PKMX_WCHAR deadKey);
+KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLayout* keyboard_layout, KMX_DWORD kc_underlying, KMX_DWORD vk_ShiftState, PKMX_WCHAR deadKey);
 
 /** @brief return the keyvalue of a key of the the currently used (underlying) keyboard for a given keyvalue of the US keyboard */
 KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyValUS(vec_dword_3D& all_vector, KMX_DWORD kv_us);

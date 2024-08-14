@@ -154,7 +154,7 @@ vec_dword_2D mac_create_empty_2D_Vector(int dim_rows, int dim_ss) {
  * @param[in,out] all_vector 		  3D-vector that holds the data of the US keyboard and the currently used (underlying) keyboard
  * @param         keyboard_layout pointer to currently used (underlying) keybord layout
  * @return  0 on success;
- * 					1 if the initialization of the underlying vector failes;
+ * 					1 if the initialization of the underlying vector fails;
  * 					2 if data of less than 2 keyboards is contained in all_vector;
  */
 int mac_append_underlying_ToVector(vec_dword_3D& all_vector, const UCKeyboardLayout* keyboard_layout) {
@@ -190,8 +190,8 @@ int mac_append_underlying_ToVector(vec_dword_3D& all_vector, const UCKeyboardLay
 }
 
 /**
- * @brief  create a pointer to pointer of the current keyboard_layout for later use
- * @param  keyboard_layout  pointer to pointer to currently used (underlying) keyboard layout
+ * @brief  initializes GDK and return the current keyboard_layout for later use
+ * @param  keyboard_layoutout[out] currently used (underlying) keyboard layout
  * @return 0 on success;
  * 				 1 if the display is not found;
  * 				 2 if the keymap is not found
@@ -302,7 +302,7 @@ KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode_dk(const UCKeyboardLayout* keyboard_la
  * @return 0xFFFF in case a deadkey was found, then the deadkey is stored in deadKey;
  *         or else the keyval obtained from Keycode and shiftstate and caps;
  */
-KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLayout* keyboard_layout, UINT kc_underlying, UINT vk_ShiftState, PKMX_WCHAR deadKey) {
+KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLayout* keyboard_layout, KMX_DWORD kc_underlying, KMX_DWORD vk_ShiftState, PKMX_WCHAR deadKey) {
   PKMX_WCHAR dky = NULL;
   UInt32 isdk = 0;
   KMX_DWORD keyV;

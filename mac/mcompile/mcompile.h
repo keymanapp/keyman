@@ -27,7 +27,7 @@
 
 struct KMX_DeadkeyMapping {  // I4353
   KMX_WCHAR deadkey, dkid;
-  UINT shift;
+  KMX_DWORD shift;
   KMX_WORD vk;
 };
 

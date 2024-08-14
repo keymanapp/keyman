@@ -41,7 +41,7 @@ const int CODE__SIZE[] = {
 };
 
 /** @brief check if the file has correct version */
-KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD file_size);
+KMX_BOOL KMX_VerifyKeyboard(PKMX_BYTE filebase, KMX_DWORD file_size);
 
 /** @brief Fixup the keyboard by expanding pointers. */
 LPKMX_KEYBOARD KMX_FixupKeyboard(PKMX_BYTE bufp, PKMX_BYTE base, KMX_DWORD dwFileSize);
@@ -64,7 +64,7 @@ KMX_DWORD KMX_WriteCompiledKeyboardToFile(LPKMX_KEYBOARD fk, FILE* hOutfile, KMX
 	PKMX_COMP_KEY kp;
 	PKMX_BYTE buf;
 	KMX_DWORD size, offset;
-	DWORD i, j;
+	KMX_DWORD i, j;
 
 	// Calculate how much memory to allocate
 	size = sizeof(KMX_COMP_KEYBOARD) +
@@ -495,7 +495,7 @@ KMX_BOOL KMX_LoadKeyboard(KMX_CHAR* fileName, LPKMX_KEYBOARD* lpKeyboard) {
  * @return true if successful;
  *         false if not
  */
-KMX_BOOL KMX_VerifyKeyboard(LPKMX_BYTE filebase, KMX_DWORD file_size) {
+KMX_BOOL KMX_VerifyKeyboard(PKMX_BYTE filebase, KMX_DWORD file_size) {
  KMX_DWORD i;
   PKMX_COMP_KEYBOARD ckbp = (PKMX_COMP_KEYBOARD)filebase;
   PKMX_COMP_STORE csp;

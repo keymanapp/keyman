@@ -10,6 +10,7 @@
 */
 
 #include <stdio.h>
+#include <stdarg.h>
 #include <wchar.h>
 #include "mcompile.h"
 #include "u16.h"
@@ -24,7 +25,7 @@ bool mac_KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D &all_vector, const UCKe
 int mac_run(int argc, char* argv[]);
 
 /** @brief  return an array of [usvk, ch_out] pairs: all existing combinations of a deadkey + character for the underlying keyboard */
-int mac_KMX_GetDeadkeys(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& all_vector, KMX_WCHAR deadkey, UINT shift_dk, KMX_WORD* outputPairs);  // returns array of [usvk, ch_out] pairs
+int mac_KMX_GetDeadkeys(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& all_vector, KMX_WCHAR deadkey, KMX_DWORD shift_dk, KMX_WORD* outputPairs);  // returns array of [usvk, ch_out] pairs
 
 std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;  // I4353
 
@@ -142,7 +143,7 @@ int mac_run(int argc, char* argv[]) {
 }
 
 // Map of all shift states that we will work with
-const UINT VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG | RALTFLAG, K_SHIFTFLAG | LCTRLFLAG | RALTFLAG, 0xFFFF};
+const KMX_DWORD VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG | RALTFLAG, K_SHIFTFLAG | LCTRLFLAG | RALTFLAG, 0xFFFF};
 
 //
 // TranslateKey
@@ -158,7 +159,7 @@ const UINT VKShiftState[] = {0, K_SHIFTFLAG, LCTRLFLAG | RALTFLAG, K_SHIFTFLAG |
  * @param  shift shiftstate
  * @param  ch    character of the underlying keyboard to be remapped
  */
-void mac_KMX_TranslateKey(LPKMX_KEY key, KMX_WORD vk, UINT shift, KMX_WCHAR ch) {
+void mac_KMX_TranslateKey(LPKMX_KEY key, KMX_WORD vk, KMX_DWORD shift, KMX_WCHAR ch) {
   // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
   // We store that as just RALT, and use the option "Simulate RAlt with Ctrl+Alt"
   // to provide an alternate..
@@ -190,7 +191,7 @@ void mac_KMX_TranslateKey(LPKMX_KEY key, KMX_WORD vk, UINT shift, KMX_WCHAR ch) 
  * @param  shift shiftstate
  * @param  ch    character of the underlying keyboard to be remapped
  */
-void mac_KMX_TranslateGroup(LPKMX_GROUP group, KMX_WORD vk, UINT shift, KMX_WCHAR ch) {
+void mac_KMX_TranslateGroup(LPKMX_GROUP group, KMX_WORD vk, KMX_DWORD shift, KMX_WCHAR ch) {
   for (unsigned int i = 0; i < group->cxKeyArray; i++) {
     mac_KMX_TranslateKey(&group->dpKeyArray[i], vk, shift, ch);
   }
@@ -203,7 +204,7 @@ void mac_KMX_TranslateGroup(LPKMX_GROUP group, KMX_WORD vk, UINT shift, KMX_WCHA
  * @param  shift shiftstate
  * @param  ch    character of the underlying keyboard to be remapped
  */
-void mac_KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, KMX_WORD vk, UINT shift, KMX_WCHAR ch) {
+void mac_KMX_TranslateKeyboard(LPKMX_KEYBOARD kbd, KMX_WORD vk, KMX_DWORD shift, KMX_WCHAR ch) {
   for (unsigned int i = 0; i < kbd->cxGroupArray; i++) {
     if (kbd->dpGroupArray[i].fUsingKeys) {
       mac_KMX_TranslateGroup(&kbd->dpGroupArray[i], vk, shift, ch);
@@ -253,7 +254,7 @@ void mac_KMX_ReportUnconvertedKeyboardRules(LPKMX_KEYBOARD kbd) {
  * @param  shift   shiftstate
  * @param  ch      character of the underlying keyboard
  */
-void mac_KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch) {
+void mac_KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, KMX_DWORD shift, KMX_WORD ch) {
    if ((key->ShiftFlags == 0 || key->ShiftFlags & VIRTUALCHARKEY) && key->Key == ch) {
     // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
     // We store that as just RALT, and use the option "Simulate RAlt with Ctrl+Alt"
@@ -290,7 +291,7 @@ void mac_KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, 
  * @param  shift     shiftstate
  * @param  character of the underlying keyboard
  */
-void mac_KMX_TranslateDeadkeyGroup(LPKMX_GROUP group, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch) {
+void mac_KMX_TranslateDeadkeyGroup(LPKMX_GROUP group, KMX_WCHAR deadkey, KMX_WORD vk, KMX_DWORD shift, KMX_WORD ch) {
   for (unsigned int i = 0; i < group->cxKeyArray; i++) {
     mac_KMX_TranslateDeadkeyKey(&group->dpKeyArray[i], deadkey, vk, shift, ch);
   }
@@ -304,7 +305,7 @@ void mac_KMX_TranslateDeadkeyGroup(LPKMX_GROUP group, KMX_WCHAR deadkey, KMX_WOR
  * @param  shift     shiftstate
  * @param  character of the underlying keyboard
  */
-void mac_KMX_TranslateDeadkeyKeyboard(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift, KMX_WORD ch) {
+void mac_KMX_TranslateDeadkeyKeyboard(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, KMX_DWORD shift, KMX_WORD ch) {
   for (unsigned int i = 0; i < kbd->cxGroupArray; i++) {
     if (kbd->dpGroupArray[i].fUsingKeys) {
       mac_KMX_TranslateDeadkeyGroup(&kbd->dpGroupArray[i], deadkey, vk, shift, ch);
@@ -319,7 +320,7 @@ void mac_KMX_TranslateDeadkeyKeyboard(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX
  * @param  vk      a keyvalue of the US keyboard
  * @param  shift   shiftstate
  */
-void mac_KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, UINT shift) {
+void mac_KMX_AddDeadkeyRule(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey, KMX_WORD vk, KMX_DWORD shift) {
   // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
   // We store that as just RALT, and use the option "Simulate RAlt with Ctrl+Alt"
   // to provide an alternate..
@@ -381,7 +382,7 @@ KMX_WCHAR mac_KMX_GetUniqueDeadkeyID(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey) {
   LPKMX_GROUP gp;
   LPKMX_KEY kp;
   LPKMX_STORE sp;
-  UINT i, j;
+  KMX_DWORD i, j;
   KMX_WCHAR dkid = 0;
   static KMX_WCHAR s_next_dkid = 0;
   static KMX_dkidmap* s_dkids = NULL;
@@ -437,7 +438,7 @@ KMX_WCHAR mac_KMX_GetUniqueDeadkeyID(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey) {
  * @param  keymap     pointer to the currently used (underlying) keyboard Layout
  * @param  dk_Table   a vector of all possible deadkey combinations for all Linux keyboards
  */
-void mac_KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk_US, UINT shift, KMX_WCHAR deadkey, vec_dword_3D& all_vector, const UCKeyboardLayout* keyboard_layout) {
+void mac_KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk_US, KMX_DWORD shift, KMX_WCHAR deadkey, vec_dword_3D& all_vector, const UCKeyboardLayout* keyboard_layout) {
   KMX_WORD deadkeys[512] = {0};
   KMX_WORD* pdk;
 
@@ -454,7 +455,7 @@ void mac_KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk_US, UINT shift, KMX_
 
   while (*pdk) {
     // Look up the ch
-    UINT KeyValUnderlying = mac_KMX_get_KeyValUnderlying_From_KeyValUS(all_vector, *pdk);
+    KMX_DWORD KeyValUnderlying = mac_KMX_get_KeyValUnderlying_From_KeyValUS(all_vector, *pdk);
      mac_KMX_TranslateDeadkeyKeyboard(kbd, dkid, KeyValUnderlying, *(pdk + 1), *(pdk + 2));
     pdk += 3;
   }
@@ -468,7 +469,7 @@ void mac_KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk_US, UINT shift, KMX_
  */
 KMX_BOOL mac_KMX_SetKeyboardToPositional(LPKMX_KEYBOARD kbd) {
   LPKMX_STORE sp;
-  UINT i;
+  KMX_DWORD i;
   for (i = 0, sp = kbd->dpStoreArray; i < kbd->cxStoreArray; i++, sp++) {
     if (sp->dwSystemID == TSS_MNEMONIC) {
       if (!sp->dpString) {
@@ -529,7 +530,7 @@ KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, int 
     for (int i = 0; KMX_VKMap[i]; i++) {  // I4651
 
       // Windows uses VK as sorting order in rgkey[], Linux and macOS use SC/Keycode as sorting order
-      UINT scUnderlying = mac_KMX_get_KeyCodeUnderlying_From_VKUS(KMX_VKMap[i]);
+      KMX_DWORD scUnderlying = mac_KMX_get_KeyCodeUnderlying_From_VKUS(KMX_VKMap[i]);
       KMX_WCHAR ch = mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(keyboard_layout, scUnderlying, VKShiftState[j], &DeadKey);
 
       // wprintf(L"--- VK_%d -> SC_ [%c] dk=%d  ( ss %i) \n", KMX_VKMap[i], ch == 0 ? 32 : ch, DeadKey, VKShiftState[j]);
@@ -565,7 +566,7 @@ KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, int 
  * @param[out] outputPairs     pointer to array of [usvk, ch_out] pairs
  * @return size of array of [usvk, ch_out] pairs
  */
-int mac_KMX_GetDeadkeys(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& all_vector, KMX_WCHAR deadkey, UINT shift_dk, KMX_WORD* outputPairs) {
+int mac_KMX_GetDeadkeys(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& all_vector, KMX_WCHAR deadkey, KMX_DWORD shift_dk, KMX_WORD* outputPairs) {
   UInt32 deadkeystate;
   UniCharCount maxStringlength    = 5;
   UniCharCount actualStringlength = 0;
@@ -619,7 +620,7 @@ int mac_KMX_GetDeadkeys(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& a
  * @param  fmt text to print
  */
   void mac_KMX_LogError(const wchar_t* fmt, ...) {
-  WCHAR fmtbuf[256];
+  wchar_t fmtbuf[256];
   const wchar_t* end = L"\0";
   const wchar_t* nl  = L"\n";
 	va_list vars;

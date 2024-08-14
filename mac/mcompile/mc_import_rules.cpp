@@ -128,35 +128,35 @@ KMX_WCHAR mac_KMX_DeadKeyMap(int index, std::vector<DeadKey*>*deadkeys, int dead
 */
 class mac_KMX_VirtualKey {
 private:
-  UINT m_vk;
-  UINT m_sc;
+  KMX_DWORD m_vk;
+  KMX_DWORD m_sc;
   bool m_rgfDeadKey[10][2];
   std::u16string m_rgss[10][2];
 
 public:
-  mac_KMX_VirtualKey(UINT scanCode) {
+  mac_KMX_VirtualKey(KMX_DWORD scanCode) {
     this->m_vk = mac_KMX_get_VKUS_From_KeyCodeUnderlying(scanCode);
     this->m_sc = scanCode;
     memset(this->m_rgfDeadKey, 0, sizeof(this->m_rgfDeadKey));
   }
 
 /** @brief return member variable virtual key */
-  UINT VK() {
+  KMX_DWORD VK() {
     return this->m_vk;
   }
 
 /** @brief return member variable scancode */
-  UINT SC() {
+  KMX_DWORD SC() {
     return this->m_sc;
   }
 
   std::u16string mac_KMX_GetShiftState(ShiftState shiftState, bool capsLock) {
-    return this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)];
+    return this->m_rgss[(KMX_DWORD)shiftState][(capsLock ? 1 : 0)];
   }
 
   void mac_KMX_SetShiftState(ShiftState shiftState, std::u16string value, bool isDeadKey, bool capsLock) {
-    this->m_rgfDeadKey[(UINT)shiftState][(capsLock ? 1 : 0)] = isDeadKey;
-    this->m_rgss[(UINT)shiftState][(capsLock ? 1 : 0)] = value;
+    this->m_rgfDeadKey[(KMX_DWORD)shiftState][(capsLock ? 1 : 0)] = isDeadKey;
+    this->m_rgss[(KMX_DWORD)shiftState][(capsLock ? 1 : 0)] = value;
   }
 
   bool mac_KMX_IsSGCAPS() {
@@ -222,7 +222,7 @@ public:
     return (this->m_vk >= 0x20 && this->m_vk <= 0x5F) || (this->m_vk >= 0x88);
   }
 
-  UINT KMX_GetShiftStateValue(int capslock, int caps, ShiftState ss) {
+  KMX_DWORD KMX_GetShiftStateValue(int capslock, int caps, ShiftState ss) {
     return KMX_ShiftStateMap[(int)ss] | (capslock ? (caps ? CAPITALFLAG : NOTCAPITALFLAG) : 0);
   }
 
@@ -263,7 +263,7 @@ public:
   }
 
 /** @brief edit the row of kmx-file */
-  bool mac_KMX_LayoutRow(int MaxShiftState, LPKMX_KEY key, std::vector<DeadKey*>* deadkeys, int deadkeyBase, BOOL bDeadkeyConversion, vec_dword_3D& all_vector, const UCKeyboardLayout* keyboard_layout) {  // I4552
+  bool mac_KMX_LayoutRow(int MaxShiftState, LPKMX_KEY key, std::vector<DeadKey*>* deadkeys, int deadkeyBase, bool bDeadkeyConversion, vec_dword_3D& all_vector, const UCKeyboardLayout* keyboard_layout) {  // I4552
     // Get the CAPSLOCK value
     /*int capslock =
           (this->mac_KMX_IsCapsEqualToShift() ? 1 : 0) |
@@ -353,7 +353,7 @@ public:
 class mac_KMX_Loader {
 private:
   KMX_BYTE lpKeyStateNull[256];
-  UINT m_XxxxVk;
+  KMX_DWORD m_XxxxVk;
 
 public:
   mac_KMX_Loader() {
@@ -361,11 +361,11 @@ public:
     memset(lpKeyStateNull, 0, sizeof(lpKeyStateNull));
   }
 
-  UINT Get_XxxxVk() {
+  KMX_DWORD Get_XxxxVk() {
     return m_XxxxVk;
   }
 
-  void Set_XxxxVk(UINT value) {
+  void Set_XxxxVk(KMX_DWORD value) {
     m_XxxxVk = value;
   }
 
@@ -378,7 +378,7 @@ public:
   }
 
   DeadKey* ProcessDeadKey(
-    UINT iKeyDead,                              // The index into the VirtualKey of the dead key
+    KMX_DWORD iKeyDead,                              // The index into the VirtualKey of the dead key
     ShiftState shiftStateDead,                  // The shiftstate that contains the dead key
     std::vector<mac_KMX_VirtualKey*> rgKey,     // Our array of dead keys
     bool fCapsLock,                             // Was the caps lock key pressed?
@@ -456,7 +456,7 @@ bool mac_KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, const UCKe
   // flag that the VK is valid, and it can store the SC value.
 
   // Windows and Linux Keycodes start with 1; Mac keycodes start with 0
-  for (UINT sc = 0x00; sc <= 0x7f; sc++) {
+  for (KMX_DWORD sc = 0x00; sc <= 0x7f; sc++) {
     /* HERE IS A BIG DIFFERENCE COMPARED TO MCOMPILE FOR WINDOWS:
     * mcompile on Windows fills rgkey.m_vk with the VK of the Underlying keyboard
     * mcompile for macOS  fills rgkey.m_vk with the VK of the US keyboard
@@ -476,7 +476,7 @@ bool mac_KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, const UCKe
   }
 
     // in this part we skip shiftstates 4, 5, 8, 9
-    for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
+    for (KMX_DWORD iKey = 0; iKey < rgKey.size(); iKey++) {
       if (rgKey[iKey] != NULL) {
         KMX_WCHAR sbBuffer[256];  // Scratchpad we use many places
         for (ShiftState ss = Base; ss <= loader.KMX_MaxShiftState(); ss = (ShiftState)((int)ss + 1)) {
@@ -507,7 +507,7 @@ bool mac_KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, const UCKe
             sbBuffer[2] = 0;
             rgKey[iKey]->mac_KMX_SetShiftState(ss, sbBuffer, true, (caps == 0));
             DeadKey* dk = NULL;
-            for (UINT iDead = 0; iDead < alDead.size(); iDead++) {
+            for (KMX_DWORD iDead = 0; iDead < alDead.size(); iDead++) {
                 dk = alDead[iDead];
                 if (dk->KMX_DeadCharacter() == rgKey[iKey]->mac_KMX_GetShiftState(ss, caps == 0)[0]) {
                     break;
@@ -537,10 +537,10 @@ bool mac_KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, const UCKe
   //
 
   kp->dpGroupArray = gp;
-  for (UINT i = 0; i < kp->cxGroupArray; i++, gp++) {
+  for (KMX_DWORD i = 0; i < kp->cxGroupArray; i++, gp++) {
     LPKMX_KEY kkp = gp->dpKeyArray;
 
-    for (UINT j = 0; j < gp->cxKeyArray; j++, kkp++) {
+    for (KMX_DWORD j = 0; j < gp->cxKeyArray; j++, kkp++) {
       nDeadkey = std::max(nDeadkey, mac_KMX_GetMaxDeadkeyIndex(kkp->dpContext));
       nDeadkey = std::max(nDeadkey, mac_KMX_GetMaxDeadkeyIndex(kkp->dpOutput));
     }
@@ -551,8 +551,8 @@ bool mac_KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, const UCKe
 
   // calculate the required size of `gp->dpKeyArray`
 
-  UINT nkeys = 0;
-  for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
+  KMX_DWORD nkeys = 0;
+  for (KMX_DWORD iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->mac_KMX_IsKeymanUsedKey() && (!rgKey[iKey]->mac_KMX_IsEmpty())) {
       nkeys += rgKey[iKey]->mac_KMX_GetKeyCount(loader.KMX_MaxShiftState());
     }
@@ -571,7 +571,7 @@ bool mac_KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, const UCKe
   // Fill in the new rules
   //
   nkeys = 0;
-  for (UINT iKey = 0; iKey < rgKey.size(); iKey++) {
+  for (KMX_DWORD iKey = 0; iKey < rgKey.size(); iKey++) {
     if ((rgKey[iKey] != NULL) && rgKey[iKey]->mac_KMX_IsKeymanUsedKey() && (!rgKey[iKey]->mac_KMX_IsEmpty())) {
       if (rgKey[iKey]->mac_KMX_LayoutRow(loader.KMX_MaxShiftState(), &gp->dpKeyArray[nkeys], &alDead, nDeadkey, bDeadkeyConversion, all_vector, *keyboard_layout)) {  // I4552
         nkeys += rgKey[iKey]->mac_KMX_GetKeyCount(loader.KMX_MaxShiftState());
@@ -585,7 +585,7 @@ bool mac_KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, const UCKe
   // Add nomatch control to each terminating 'using keys' group   // I4550
   //
   LPKMX_GROUP gp2 = kp->dpGroupArray;
-  for (UINT i = 0; i < kp->cxGroupArray - 1; i++, gp2++) {
+  for (KMX_DWORD i = 0; i < kp->cxGroupArray - 1; i++, gp2++) {
     if (gp2->fUsingKeys && gp2->dpNoMatch == NULL) {
       KMX_WCHAR* p = gp2->dpNoMatch = new KMX_WCHAR[4];
       *p++ = UC_SENTINEL;
@@ -597,7 +597,7 @@ bool mac_KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, const UCKe
       // the AltGr and ShiftAltGr combinations as rules to allow them to be matched as well.  Yes, this
       // loop is not very efficient but it's not worthy of optimisation.
       //
-      UINT j;
+      KMX_DWORD j;
       LPKMX_KEY kkp;
       for (j = 0, kkp = gp->dpKeyArray; j < gp->cxKeyArray; j++, kkp++) {
          if ((kkp->ShiftFlags & (K_CTRLFLAG | K_ALTFLAG | LCTRLFLAG | LALTFLAG | RCTRLFLAG | RALTFLAG)) != 0) {
@@ -652,7 +652,7 @@ bool mac_KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, const UCKe
     int nStoreBase = kp->cxStoreArray;
     kp->cxStoreArray += alDead.size() * 2;
 
-    for (UINT i = 0; i < alDead.size(); i++) {
+    for (KMX_DWORD i = 0; i < alDead.size(); i++) {
       DeadKey* dk = alDead[i];
 
       sp->dpName = NULL;

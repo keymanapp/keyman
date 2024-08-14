@@ -2,7 +2,7 @@
 #ifndef MC_KMXFILE_H
 #define MC_KMXFILE_H
 
-#include "km_types.h"
+#include "../../common/include/km_types.h"
 #include "kmx_file.h"
 #include "mcompile.h"
 
