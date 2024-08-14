@@ -2036,8 +2036,6 @@ public final class KMManager {
     if (SystemKeyboard != null) {
       SystemKeyboard.loadJavascript(KMString.format("setLongpressDelay(%d)", longpressDelay));
     }
-
-    Log.d(TAG, "setLongpressDelay(" + longpressDelay + ")");
   }
 
   public static int getBannerHeight(Context context) {
