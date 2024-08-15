@@ -9,8 +9,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 builder_describe "Keyman kmc-convert keyboard conversion tools module" \
-  "@/common/web/types" \
-  "@/developer/src/kmc-kmn" \
   "@/developer/src/common/web/utils" \
   "@/developer/src/common/web/test-helpers" \
   "configure" \
