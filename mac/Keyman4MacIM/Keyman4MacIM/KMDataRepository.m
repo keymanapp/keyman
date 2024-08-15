@@ -182,9 +182,35 @@ NSString *const kKeymanSubdirectoryName = @"keyman.inputmethod.Keyman";
   return didMoveData;
 }
 
-- (NSString*)buildFullPathWith:(NSString *)partialPath {
-  NSString *fullPath = [self.keymanKeyboardsDirectory.path stringByAppendingString:partialPath];
-  os_log_debug([KMLogs dataLog], "createFullPathWith: '%{public}@' with partialPath '%{public}@'", self.keymanKeyboardsDirectory.path, partialPath);
+- (NSString*)buildFullPath:(NSString *)fromPartialPath {
+  NSString *fullPath = [self.keymanKeyboardsDirectory.path stringByAppendingString:fromPartialPath];
+  os_log_debug([KMLogs dataLog], "buildFullPath: '%{public}@' fromPartialPath '%{public}@'",
+               fullPath, fromPartialPath);
   return fullPath;
 }
+
+- (NSString *)trimToPartialPath:(NSString *)fromFullPath {
+  NSString *partialPath = fromFullPath;
+  if(fromFullPath != nil) {
+    NSRange range = [fromFullPath rangeOfString:kKeyboardsDirectoryName];
+    if (range.length > 0) {
+      partialPath = [fromFullPath substringFromIndex:range.location + range.length];
+      os_log_debug([KMLogs dataLog], "trimToPartialPath: fromFullPath: '%{public}@' to partialPath: '%{public}@'", fromFullPath, partialPath);
+    }
+  }
+  return partialPath;
+}
+
+- (NSString *)buildPartialPathFrom:(NSString *)keyboardSubdirectory keyboardFile:(NSString *)kmxFilename {
+  NSMutableArray *pathComponents = [[NSMutableArray alloc] initWithCapacity:0];
+  [pathComponents addObject:@"/"];
+  [pathComponents addObject:keyboardSubdirectory];
+  [pathComponents addObject:kmxFilename];
+  NSString *keyboardPartialPath = [NSString pathWithComponents:pathComponents];
+  os_log_debug([KMLogs keyboardLog], "buildPartialPathFrom, keyboardSubdirectory: %{public}@, kmxFileName: %{public}@, keyboardPartialPath : %{public}@",
+               keyboardSubdirectory, kmxFilename, keyboardPartialPath);
+  return keyboardPartialPath;
+}
+
+
 @end

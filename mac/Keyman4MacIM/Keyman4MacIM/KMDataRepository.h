@@ -20,7 +20,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)createDataDirectoryIfNecessary;
 - (void)createKeyboardsDirectoryIfNecessary;
 - (BOOL)migrateData;
-- (NSString*)buildFullPathWith:(NSString *)partialPath;
+- (NSString*)buildFullPath:(NSString *)fromPartialPath;
+- (NSString*)trimToPartialPath:(NSString *)fromFullPath;
+- (NSString *)buildPartialPathFrom:(NSString *)keyboardSubdirectory keyboardFile:(NSString *)kmxFilename;
 @end
 
 NS_ASSUME_NONNULL_END

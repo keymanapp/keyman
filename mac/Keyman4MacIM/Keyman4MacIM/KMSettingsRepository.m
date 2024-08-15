@@ -130,7 +130,6 @@ NSInteger const kVersionStoreDataInLibraryDirectory = 1;
     if ([selectedKeyboardPath isNotEqualTo:newPathString]) {
       [self saveSelectedKeyboard:newPathString];
       os_log_debug([KMLogs dataLog], "converted selected keyboard setting from '%{public}@' to '%{public}@'", selectedKeyboardPath, newPathString);
-      os_log_debug([KMLogs dataLog], "full path of selected keyboard from buildFullPathWith = '%{public}@'", [KMDataRepository.shared buildFullPathWith:newPathString]);
     }
   }
 }
