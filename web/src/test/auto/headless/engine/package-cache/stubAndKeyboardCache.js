@@ -4,8 +4,8 @@ import fs from 'fs';
 
 import { KeyboardStub, StubAndKeyboardCache } from 'keyman/engine/package-cache';
 
-import { NodeKeyboardLoader } from '@keymanapp/keyboard-processor/node-keyboard-loader';
-import { KeyboardHarness, MinimalKeymanGlobal } from '@keymanapp/keyboard-processor';
+import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
+import { KeyboardHarness, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
 
 import path from 'path';
 

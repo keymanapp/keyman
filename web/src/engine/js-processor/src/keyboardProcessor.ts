@@ -10,8 +10,10 @@ import { EventEmitter } from 'eventemitter3';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 import {
   Codes, type Keyboard, MinimalKeymanGlobal, KeyEvent, Layouts,
-  type OutputTarget, Mock, DefaultRules, EmulationKeystrokes
-} from "@keymanapp/keyboard-processor";
+  DefaultRules, EmulationKeystrokes
+} from "keyman/engine/keyboard";
+import { Mock } from "./mock.js";
+import type OutputTarget from "./outputTarget.js";
 import RuleBehavior from "./ruleBehavior.js";
 import KeyboardInterface from './kbdInterface.js';
 import { DeviceSpec, globalObject } from "@keymanapp/web-utils";

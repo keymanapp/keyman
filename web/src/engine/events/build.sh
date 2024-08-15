@@ -14,7 +14,7 @@ SUBPROJECT_NAME=engine/events
 
 builder_describe "Builds specialized event-related modules utilized by Keyman Engine for Web." \
   "@/common/web/utils build" \
-  "@/common/web/keyboard-processor build" \
+  "@/web/src/engine/keyboard build" \
   "clean" \
   "configure" \
   "build" \

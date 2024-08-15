@@ -17,7 +17,7 @@ import {
   KeyboardProperties,
   ManagedPromise,
   type MinimalCodesInterface
-} from '@keymanapp/keyboard-processor';
+} from 'keyman/engine/keyboard';
 import { createUnselectableElement, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
 import { EventListener, LegacyEventEmitter } from 'keyman/engine/events';
 import { type MutableSystemStore, type SystemStoreMutationHandler } from 'keyman/engine/js-processor';

@@ -1,4 +1,4 @@
-import { ManagedPromise } from '@keymanapp/keyboard-processor';
+import { ManagedPromise } from 'keyman/engine/keyboard';
 import CloudRequesterInterface from './cloud/requesterInterface.js';
 import {
   CLOUD_TIMEOUT_ERR,

@@ -1,6 +1,6 @@
 import { EventEmitter } from 'eventemitter3';
 
-import { Keyboard } from '@keymanapp/keyboard-processor';
+import { Keyboard } from 'keyman/engine/keyboard';
 
 import OSKViewComponent from './oskViewComponent.interface.js';
 import { ParsedLengthStyle } from '../lengthStyle.js';

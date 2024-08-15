@@ -1,0 +1,12 @@
+// Is used by the keyboard-loader submodules.
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "../../../build/engine/keyboard/obj/",
+    "tsBuildInfoFile": "../../../build/engine/keyboard/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src/"
+  },
+  "include": [ "./src/**/*.ts"],
+  "exclude": ["./src/keyboards/loaders/**/*.ts"]
+}

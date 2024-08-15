@@ -1,12 +1,12 @@
 import {
   DOMKeyboardLoader
-} from '@keymanapp/keyboard-processor/dom-keyboard-loader';
+} from 'keyman/engine/keyboard/dom-keyboard-loader';
 
 import {
   Keyboard,
   KeyboardProperties,
   MinimalKeymanGlobal
-} from '@keymanapp/keyboard-processor';
+} from 'keyman/engine/keyboard';
 
 import { KeyboardInterface } from 'keyman/engine/js-processor';
 import { KeyboardStub } from 'keyman/engine/package-cache';

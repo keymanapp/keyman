@@ -1,4 +1,4 @@
-import { type KeyboardHarness } from '@keymanapp/keyboard-processor';
+import { type KeyboardHarness } from 'keyman/engine/keyboard';
 import { StoreNonCharEntry } from './kbdInterface.js';
 
 export enum SystemStoreIDs {

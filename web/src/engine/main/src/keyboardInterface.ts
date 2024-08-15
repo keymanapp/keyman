@@ -1,4 +1,4 @@
-import { KeyboardObject } from "@keymanapp/keyboard-processor";
+import { KeyboardObject } from "keyman/engine/keyboard";
 import { KeyboardInterface as KeyboardInterfaceBase } from 'keyman/engine/js-processor';
 import { KeyboardStub, RawKeyboardStub, toUnprefixedKeyboardId as unprefixed } from 'keyman/engine/package-cache';
 

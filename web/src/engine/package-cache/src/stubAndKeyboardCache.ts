@@ -1,4 +1,4 @@
-import { Keyboard, KeyboardLoaderBase as KeyboardLoader } from "@keymanapp/keyboard-processor";
+import { Keyboard, KeyboardLoaderBase as KeyboardLoader } from "keyman/engine/keyboard";
 import { EventEmitter } from "eventemitter3";
 
 import KeyboardStub from "./keyboardStub.js";

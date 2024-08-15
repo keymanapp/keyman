@@ -13,9 +13,9 @@ import {
   StateKeyMap,
   ActiveSubKey,
   timedPromise,
-  ActiveKeyBase,
-  isEmptyTransform
-} from '@keymanapp/keyboard-processor';
+  ActiveKeyBase
+} from 'keyman/engine/keyboard';
+import { isEmptyTransform } from 'keyman/engine/js-processor';
 
 import { buildCorrectiveLayout } from './correctionLayout.js';
 import { distributionFromDistanceMaps, keyTouchDistances } from './corrections.js';

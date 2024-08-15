@@ -81,7 +81,7 @@ title: Dependency Graph
 %%{init: {"flowchart": {"htmlLabels": false}} }%%
 graph TD;
     OSK["/web/src/engine/osk"];
-    KP["@keymanapp/keyboard-processor<br>(/common/web/keyboard-processor)"];
+    KP["/web/src/engine/keyboard"];
     JSProc["/web/src/engine/js-processor"];
     OSK-->KP;
     WebUtils["@keymanapp/web-utils<br>(/common/web/utils)"];
@@ -119,7 +119,7 @@ graph TD;
         Device["/web/src/engine/device-detect"];
         Device----->WebUtils;
         Elements["/web/src/engine/element-wrappers"];
-        Elements-->KP;
+        Elements-->JSProc;
         KeyboardCache["/web/src/engine/package-cache"];
         KeyboardCache-->Interfaces;
         DomUtils["/web/src/engine/dom-utils"];

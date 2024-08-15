@@ -12,7 +12,7 @@ import ButtonClasses = TouchLayout.TouchLayoutKeySp;
 import {
   ActiveLayout,
   deepCopy
-} from '@keymanapp/keyboard-processor';
+} from 'keyman/engine/keyboard';
 
 import { type KeyElement } from '../../keyElement.js';
 

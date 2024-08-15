@@ -7,16 +7,18 @@ import { LanguageProcessor }  from "./languageProcessor.js";
 import type { ModelSpec }  from "keyman/engine/interfaces";
 import { globalObject, DeviceSpec } from "@keymanapp/web-utils";
 
+import { Codes, type Keyboard, type KeyEvent } from "keyman/engine/keyboard";
 import {
   type Alternate,
-  Codes,
   isEmptyTransform,
-  type Keyboard,
-  type KeyEvent,
+  KeyboardInterface,
+  KeyboardProcessor,
   Mock,
   type OutputTarget,
-} from "@keymanapp/keyboard-processor";
-import { KeyboardInterface, KeyboardProcessor, RuleBehavior, type ProcessorInitOptions, SystemStoreIDs } from 'keyman/engine/js-processor';
+  RuleBehavior,
+  type ProcessorInitOptions,
+  SystemStoreIDs
+} from 'keyman/engine/js-processor';
 
 import { TranscriptionCache } from "./transcriptionCache.js";
 
