@@ -1,5 +1,34 @@
 # Keyman Version History
 
+## 18.0.89 alpha 2024-08-14
+
+* feat(web): test skipped prediction round handling (#12169)
+* fix(web): support live configuration of longpress delay (#12175)
+* feat(web): add osk.gestureParams for better gesture-config persistence (#12176)
+* refactor(core): move utfcodec to common (#12171)
+* refactor: move kmx_u16 to common and rename to km_u16 (#12177)
+* refactor(developer): use npm or local source for server addons instead of github references (#12090)
+* fix(developer): fix crash with Windows Clipboard by ignoring zero scan code in debugger (#12166)
+* chore(developer): update SIL logo (#12168)
+
+## 18.0.88 alpha 2024-08-13
+
+* docs: add .kmx specification (#12163)
+
+## 18.0.87 alpha 2024-08-12
+
+* chore(web): drop flaky auto-test component (#12155)
+* fix(common): show description even if child projects specifies path (#12145)
+
+## 18.0.86 alpha 2024-08-09
+
+* chore(android): Update splash screen with SIL Tai Heritage Pro logo (#12127)
+* chore(common): Update localization for Greek Polytonic (#12112)
+* chore(common): add support for build target platform exclusions (#12113)
+* feat(common): add top-level build.sh (#12114)
+* chore(developer): start building Developer on linux,mac (#12117)
+* refactor(web): Move `common/web/recorder` → `web/src/tools/testing/recorder-core` (#12092)
+
 ## 18.0.85 alpha 2024-08-08
 
 * fix(developer): update date for last git commit date fixture (#12122)

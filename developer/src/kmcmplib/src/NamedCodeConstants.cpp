@@ -121,7 +121,7 @@ KMX_BOOL NamedCodeConstants::LoadFile(PFILE_KEYBOARD fk, const KMX_WCHAR *filena
   int FileSize;
   KMX_BYTE* Buf;
   std::vector<uint8_t> bufvec = loadfileproc(szNameUtf8, fk->extra->kmnFilename);
-  FileSize = bufvec.size();
+  FileSize = static_cast<int>(bufvec.size());
   if(!FileSize) {
     return FALSE;
   }

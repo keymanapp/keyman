@@ -16,7 +16,7 @@ BUNDLE_CMD="node ${KEYMAN_ROOT}/common/web/es-bundling/build/common-bundle.mjs"
 
 builder_describe \
   "Compiles the web-oriented utility function module." \
-  "@/common/web/recorder  test" \
+  "@/web/src/tools/testing/recorder-core  test" \
   "@/common/web/keyman-version" \
   "@/common/web/es-bundling" \
   "@/common/web/types" \
