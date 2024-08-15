@@ -752,8 +752,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   private void checkLongpressDelay() {
     // Initialize the longpress delay
-    int longpressDelay = KMManager.getLongpressDelay(this);
-    KMManager.setLongpressDelay(longpressDelay);
+    int longpressDelay = KMManager.getLongpressDelay();
+    KMManager.applyLongpressDelay(longpressDelay);
   }
 
   private void checkHapticFeedback() {

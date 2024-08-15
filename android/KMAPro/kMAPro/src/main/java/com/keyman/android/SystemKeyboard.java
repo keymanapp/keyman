@@ -80,8 +80,6 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
     // Set the system keyboard HTML banner
     BannerController.setHTMLBanner(this, KeyboardType.KEYBOARD_TYPE_SYSTEM);
 
-    int longpressDelay = KMManager.getLongpressDelay(this);
-    KMManager.setLongpressDelay(longpressDelay);
     boolean mayHaveHapticFeedback = prefs.getBoolean(KeymanSettingsActivity.hapticFeedbackKey, false);
     KMManager.setHapticFeedback(mayHaveHapticFeedback);
 
@@ -248,8 +246,8 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
         exText = null;
     }
     // Initialize the longpress delay
-    int longpressDelay = KMManager.getLongpressDelay(this);
-    KMManager.setLongpressDelay(longpressDelay);
+    int longpressDelay = KMManager.getLongpressDelay();
+    KMManager.applyLongpressDelay(longpressDelay);
   }
 
   @Override

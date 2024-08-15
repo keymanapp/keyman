@@ -25,7 +25,6 @@ import com.keyman.engine.KMManager;
 public class AdjustLongpressDelayActivity extends BaseActivity {
   private static final String TAG = "AdjustLongpressDelay";
   public static final String adjustLongpressDelayKey = "AdjustLongpressDelay";
-  private static SharedPreferences.Editor editor = null;
 
   // Keeps track of the adjusted longpress delay time for saving.
   // Internally use milliseconds, but GUI displays seconds
@@ -77,9 +76,7 @@ public class AdjustLongpressDelayActivity extends BaseActivity {
     adjustLongpressDelayActivityTitle.setTextColor(ContextCompat.getColor(this, R.color.ms_white));
     adjustLongpressDelayActivityTitle.setText(titleStr);
 
-    SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    editor = prefs.edit();
-    currentDelayTime = KMManager.getLongpressDelay(this);
+    currentDelayTime = KMManager.getLongpressDelay();
 
     TextView adjustLongpressDelayText = (TextView) findViewById(R.id.delayTimeText);
     String longpressDelayText = String.format(getString(R.string.longpress_delay_time), (float)(currentDelayTime/1000.0));
@@ -106,8 +103,7 @@ public class AdjustLongpressDelayActivity extends BaseActivity {
         String longpressDelayText = String.format(getString(R.string.longpress_delay_time), (float)(currentDelayTime/1000.0));
         adjustLongpressDelayText.setText(longpressDelayText);
 
-        editor.putInt(KMManager.KMKey_LongpressDelay, currentDelayTime);
-        editor.commit();
+        KMManager.setLongpressDelay(currentDelayTime);
       }
     });
 
@@ -134,7 +130,8 @@ public class AdjustLongpressDelayActivity extends BaseActivity {
 
   @Override
   public void onBackPressed() {
-    // Apply the adjusted longpress delay on exit
+    // setLongpressDelay stores the longpress delay as a preference
+    // and then updates KeymanWeb with the longpress delay
     KMManager.setLongpressDelay(currentDelayTime);
 
     super.onBackPressed();
