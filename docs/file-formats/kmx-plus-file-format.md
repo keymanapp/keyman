@@ -2,7 +2,7 @@
 
 - copied from <https://github.com/keymanapp/keyman/issues/7043>
 
-- Authors: MD SL
+- Authors: MD SRL
 
 ## C7043.0 Introduction
 
@@ -13,7 +13,10 @@ Draft spec PR: <https://github.com/unicode-org/cldr/pull/1847>
 
 ## C7043.1 Principles
 
-- The data described here is located at byte offset `dpKMXPlus`.
+- When embedded in a .kmx file, the data described here is located at byte
+  offset `COMP_KEYBOARD_KMXPLUS.dpKMXPlus`. See
+  [KMX file format](kmx-file-format.md) for a full description of the .kmx
+  format.
 - All integer values are unsigned 32-bit little-endian unless otherwise
   specified.
 - All strings are UTF-16LE unless otherwise specified. (See the `strs` section.)
@@ -21,7 +24,7 @@ Draft spec PR: <https://github.com/unicode-org/cldr/pull/1847>
   the `strs` table.
 - All offsets are 32-bit little-endian values.  For all sections except for the
   `'sect'` section (which see), offsets are relative to the beginning of each
-  section.
+  section and must fall within the `size` of the section.
 
 ## C7043.2 Sections
 
@@ -39,8 +42,8 @@ Draft spec PR: <https://github.com/unicode-org/cldr/pull/1847>
 The very first section is a table of contents listing the rest of the sections.
 The table of contents does not list itself.
 
-This is the only section where all byte offsets are relative to the value of
-`dpKMXPlus`.
+Unlike all other sections, all byte offsets are relative to start of the `sect`
+section and do not have to be located within the `size` of the section.
 
 | ∆ | Bits | Name    | Description                              |
 |---|------|---------|------------------------------------------|

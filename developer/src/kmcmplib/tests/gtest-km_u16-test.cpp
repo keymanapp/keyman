@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
-#include "../src/kmx_u16.h"
+#include <km_u16.h>
+#include <km_types.h>
 #include "../src/compfile.h"
-#include "../../../../common/include/km_types.h"
 
-TEST(kmx_u16_Test, u16chr) {
+TEST(km_u16_Test, u16chr) {
   KMX_WCHAR str[LINESIZE];
 
   u16cpy(str, u"abc");
@@ -14,7 +14,7 @@ TEST(kmx_u16_Test, u16chr) {
   EXPECT_EQ(3, u16chr(str, '\0') - str); // locate null terminator
 }
 
-TEST(kmx_u16_Test, u16chr_compare_to_strchr) {
+TEST(km_u16_Test, u16chr_compare_to_strchr) {
   // Compare behaviour of strchr:
   char str[LINESIZE];
 
@@ -26,7 +26,7 @@ TEST(kmx_u16_Test, u16chr_compare_to_strchr) {
   EXPECT_EQ(3, strchr(str, '\0') - str); // locate null terminator
 }
 
-TEST(kmx_u16_Test, u16tok_char_delim) {
+TEST(km_u16_Test, u16tok_char_delim) {
   // For char delimiter: KMX_WCHAR * u16tok(KMX_WCHAR *p, const KMX_WCHAR ch,  KMX_WCHAR **ctx) ;
 
 	KMX_WCHAR str[LINESIZE];
@@ -67,7 +67,7 @@ TEST(kmx_u16_Test, u16tok_char_delim) {
 	EXPECT_TRUE(!u16cmp(u"def", ctx));
 }
 
-TEST(kmx_u16_Test, u16tok_str_delim) {
+TEST(km_u16_Test, u16tok_str_delim) {
   // For string delimiter: KMX_WCHAR * u16tok(KMX_WCHAR* p, const KMX_WCHAR* ch, KMX_WCHAR** ctx) ;
 
 	KMX_WCHAR str[LINESIZE];
@@ -126,7 +126,7 @@ TEST(kmx_u16_Test, u16tok_str_delim) {
   EXPECT_EQ(nullptr, ctx);
 }
 
-TEST(kmx_u16_Test, u16tok_str_compare_to_strtok) {
+TEST(km_u16_Test, u16tok_str_compare_to_strtok) {
   // Compare behaviour of strtok:
 	char str[LINESIZE];
 

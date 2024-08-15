@@ -114,6 +114,65 @@ describe("PredictionContext", () => {
     assert.equal(suggestions.find((obj) => obj.transform.deleteLeft != 0).displayAs, 'apps');
   });
 
+  it('ignores outdated predictions', async function () {
+    const langProcessor = new LanguageProcessor(worker, new TranscriptionCache());
+    await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
+
+    const kbdProcessor = new KeyboardProcessor(deviceSpec);
+    const predictiveContext = new PredictionContext(langProcessor, kbdProcessor);
+
+    let updateFake = sinon.fake();
+    predictiveContext.on('update', updateFake);
+
+    let mock = new Mock("appl", 4); // "appl|", with '|' as the caret position.
+    const initialMock = Mock.from(mock);
+    const promise = predictiveContext.setCurrentTarget(mock);
+
+    // Initial predictive state:  no suggestions.  context.initializeState() has not yet been called.
+    assert.equal(updateFake.callCount, 1);
+    assert.isEmpty(updateFake.firstCall.args[0]); // should have no suggestions. (if convenient for testing)
+
+    await promise;
+    let suggestions;
+
+    // Initialization results:  our first set of dummy suggestions.
+    assert.equal(updateFake.callCount, 2);
+    suggestions = updateFake.secondCall.args[0];
+    assert.deepEqual(suggestions.map((obj) => obj.displayAs), ['apple', 'apply', 'apples']);
+    assert.isNotOk(suggestions.find((obj) => obj.tag == 'keep'));
+    assert.isNotOk(suggestions.find((obj) => obj.transform.deleteLeft != 0));
+
+    const baseTranscription = mock.buildTranscriptionFrom(initialMock, null, true);
+
+    // Mocking:  corresponds to the second set of mocked predictions - round 2 of
+    // 'apple', 'apply', 'apples'.
+    const skippedPromise = langProcessor.predict(baseTranscription, kbdProcessor.layerId);
+
+    mock.insertTextBeforeCaret('e'); // appl| + e = apple
+    const finalTranscription = mock.buildTranscriptionFrom(initialMock, null, true);
+
+    // Mocking:  corresponds to the third set of mocked predictions - 'applied'.
+    const expectedPromise = langProcessor.predict(finalTranscription, kbdProcessor.layerId);
+
+    await Promise.all([skippedPromise, expectedPromise]);
+    const expected = await expectedPromise;
+
+    // Despite two predict calls, we should only increase the counter by ONE - we ignore
+    // the 'outdated' / 'skipped' round because it could not respond before its followup.
+    assert.equal(updateFake.callCount, 3);
+    suggestions = updateFake.thirdCall.args[0];
+
+    // This does re-use the apply-revert oriented mocking.
+    // Should skip the (second) "apple", "apply", "apps" round, as it became outdated
+    // by its following request before its response could be received.
+    assert.deepEqual(suggestions.map((obj) => obj.displayAs), ['“apple”', 'applied']);
+    assert.equal(suggestions.find((obj) => obj.tag == 'keep').displayAs, '“apple”');
+    assert.equal(suggestions.find((obj) => obj.transform.deleteLeft != 0).displayAs, 'applied');
+    // Our reused mocking doesn't directly provide the 'keep' suggestion; we
+    // need to remove it before testing for set equality.
+    assert.deepEqual(suggestions.splice(1), expected);
+  });
+
   it('sendUpdateState retrieves the most recent suggestion set', async function() {
     const langProcessor = new LanguageProcessor(worker, new TranscriptionCache());
     await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.

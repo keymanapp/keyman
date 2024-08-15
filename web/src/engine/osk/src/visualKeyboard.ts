@@ -151,8 +151,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   /**
    * Tweakable gesture parameters referenced by supported gestures and the gesture engine.
    */
-  readonly gestureParams: GestureParams<KeyElement> = {
-    ...DEFAULT_GESTURE_PARAMS,
+  get gestureParams(): GestureParams<KeyElement> {
+    return this.config.gestureParams;
   };
 
   // Legacy alias, maintaining a reference for code built against older
@@ -306,6 +306,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     if (config.isStatic) {
       this.isStatic = config.isStatic;
     }
+
+    this.config.gestureParams ||= {
+      ...DEFAULT_GESTURE_PARAMS,
+    };
 
     this._fixedWidthScaling  = this.device.touchable && !this.isStatic;
     this._fixedHeightScaling = this.device.touchable && !this.isStatic;
