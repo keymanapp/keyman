@@ -16,16 +16,16 @@ import {
   Keyboard,
   KeyboardProperties,
   ManagedPromise,
-  type MinimalCodesInterface,
-  type MutableSystemStore,
-  type SystemStoreMutationHandler
+  type MinimalCodesInterface
 } from '@keymanapp/keyboard-processor';
 import { createUnselectableElement, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
-import { EventListener, KeyEventHandler, KeyEventSourceInterface, LegacyEventEmitter } from 'keyman/engine/events';
+import { EventListener, LegacyEventEmitter } from 'keyman/engine/events';
+import { type MutableSystemStore, type SystemStoreMutationHandler } from 'keyman/engine/js-processor';
 
 import Configuration from '../config/viewConfiguration.js';
 import Activator, { StaticActivator } from './activator.js';
 import TouchEventPromiseMap from './touchEventPromiseMap.js';
+import { KeyEventHandler, KeyEventSourceInterface } from './keyEventSource.interface.js';
 import { DEFAULT_GESTURE_PARAMS, GestureParams } from '../input/gestures/specsForLayout.js';
 
 // These will likely be eliminated from THIS file at some point.\

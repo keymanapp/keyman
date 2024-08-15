@@ -31,7 +31,7 @@ import {
 
 import { createStyleSheet, StylesheetManager } from 'keyman/engine/dom-utils';
 
-import { KeyEventHandler, KeyEventResultCallback } from 'keyman/engine/events';
+import { KeyEventHandler, KeyEventResultCallback } from './views/keyEventSource.interface.js';
 
 import GlobeHint from './globehint.interface.js';
 import KeyboardView from './components/keyboardView.interface.js';

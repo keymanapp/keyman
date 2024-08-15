@@ -1,6 +1,5 @@
-import {
-  KeyboardInterface as KeyboardInterfaceBase, KeyboardObject,
-} from "@keymanapp/keyboard-processor";
+import { KeyboardObject } from "@keymanapp/keyboard-processor";
+import { KeyboardInterface as KeyboardInterfaceBase } from 'keyman/engine/js-processor';
 import { KeyboardStub, RawKeyboardStub, toUnprefixedKeyboardId as unprefixed } from 'keyman/engine/package-cache';
 
 import { ContextManagerBase } from './contextManagerBase.js';

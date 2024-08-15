@@ -82,6 +82,7 @@ title: Dependency Graph
 graph TD;
     OSK["/web/src/engine/osk"];
     KP["@keymanapp/keyboard-processor<br>(/common/web/keyboard-processor)"];
+    JSProc["/web/src/engine/js-processor"];
     OSK-->KP;
     WebUtils["@keymanapp/web-utils<br>(/common/web/utils)"];
     KP---->WebUtils;
@@ -107,6 +108,7 @@ graph TD;
     Fully headless components`"]
         direction LR
         KP;
+        JSProc-->KP;
         WebUtils;
         PredText;
         Gestures;
@@ -127,9 +129,9 @@ graph TD;
         OSK-->Gestures;
         Interfaces["/web/src/engine/interfaces"];
         Interfaces-->KP;
+        Interfaces-->JSProc;
         OSK-->Interfaces;
         CommonEngine["/web/src/engine/main"];
-        CommonEngine-->Interfaces;
         CommonEngine-->Device;
         CommonEngine-->KeyboardCache;
         CommonEngine-->OSK;

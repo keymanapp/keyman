@@ -1,23 +1,21 @@
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Implementation of the JavaScript keyboard processor
+ */
+
 // #region Big ol' list of imports
 
 import { EventEmitter } from 'eventemitter3';
-
-import Codes from "./codes.js";
-import type Keyboard from "../keyboards/keyboard.js";
-import { MinimalKeymanGlobal } from '../keyboards/keyboardHarness.js';
-import KeyEvent from "./keyEvent.js";
-import { Layouts } from "../keyboards/defaultLayouts.js";
-import type { MutableSystemStore } from "./systemStores.js";
-
-import DefaultRules, { EmulationKeystrokes } from "./defaultRules.js";
-import type OutputTarget from "./outputTarget.js";
-import { Mock } from "./outputTarget.js";
-
-import KeyboardInterface, { SystemStoreIDs, VariableStore } from "./kbdInterface.js";
-import RuleBehavior from "./ruleBehavior.js";
-
-import { DeviceSpec, globalObject } from "@keymanapp/web-utils";
 import { ModifierKeyConstants } from '@keymanapp/common-types';
+import {
+  Codes, type Keyboard, MinimalKeymanGlobal, KeyEvent, Layouts,
+  type OutputTarget, Mock, DefaultRules, EmulationKeystrokes
+} from "@keymanapp/keyboard-processor";
+import RuleBehavior from "./ruleBehavior.js";
+import KeyboardInterface from './kbdInterface.js';
+import { DeviceSpec, globalObject } from "@keymanapp/web-utils";
+import { type MutableSystemStore, SystemStoreIDs } from "./systemStores.js";
 
 // #endregion
 
@@ -25,11 +23,6 @@ import { ModifierKeyConstants } from '@keymanapp/common-types';
 
 export type BeepHandler = (outputTarget: OutputTarget) => void;
 export type LogMessageHandler = (str: string) => void;
-
-export interface VariableStoreSerializer {
-  loadStore(keyboardID: string, storeName: string): VariableStore;
-  saveStore(keyboardID: string, storeName: string, storeMap: VariableStore): void;
-}
 
 export interface ProcessorInitOptions {
   baseLayout?: string;
@@ -174,7 +167,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
     let isMnemonic = this.activeKeyboard && this.activeKeyboard.isMnemonic;
 
     if(!matched) {
-      if((char = this.defaultRules.forAny(Lkc, isMnemonic)) != null) {
+      if((char = this.defaultRules.forAny(Lkc, isMnemonic, ruleBehavior)) != null) {
         special = this.defaultRules.forSpecialEmulation(Lkc)
         if(special == EmulationKeystrokes.Backspace) {
           // A browser's default backspace may fail to delete both parts of an SMP character.
@@ -277,7 +270,8 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
 
     const lockNames  = ['CAPS', 'NUM_LOCK', 'SCROLL_LOCK'] as const;
     const lockKeys = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'] as const;
-    const lockModifiers = [ ModifierKeyConstants.CAPITALFLAG, ModifierKeyConstants.NUMLOCKFLAG, ModifierKeyConstants.SCROLLFLAG] as const;
+    const lockModifiers = [ModifierKeyConstants.CAPITALFLAG, ModifierKeyConstants.NUMLOCKFLAG, ModifierKeyConstants.SCROLLFLAG] as const;
+
 
     if(!this.activeKeyboard) {
       return true;
@@ -328,6 +322,8 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
     const lockKeys = ['K_CAPS', 'K_NUMLOCK', 'K_SCROLL'] as const;
     const lockModifiers = [ModifierKeyConstants.CAPITALFLAG, ModifierKeyConstants.NUMLOCKFLAG, ModifierKeyConstants.SCROLLFLAG] as const;
     const noLockModifers = [ModifierKeyConstants.NOTCAPITALFLAG, ModifierKeyConstants.NOTNUMLOCKFLAG, ModifierKeyConstants.NOTSCROLLFLAG] as const;
+
+
 
     for(let i=0; i < lockKeys.length; i++) {
       const key = lockKeys[i];

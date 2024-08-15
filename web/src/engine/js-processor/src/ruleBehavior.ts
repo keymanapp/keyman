@@ -1,9 +1,8 @@
 ///<reference types="@keymanapp/models-types" />
 
 import KeyboardProcessor from "./keyboardProcessor.js";
-import OutputTarget, { Mock, type Transcription } from "./outputTarget.js";
-import { VariableStoreDictionary } from "../keyboards/keyboard.js";
-import type { VariableStore } from "./kbdInterface.js";
+import { OutputTarget, Mock, type Transcription, VariableStoreDictionary } from "@keymanapp/keyboard-processor";
+import { type VariableStore } from "./systemStores.js";
 
 /**
  * Represents the commands and state changes that result from a matched keyboard rule.

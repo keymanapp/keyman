@@ -15,5 +15,6 @@
     { "path": "../osk" },
     { "path": "../package-cache" },
     { "path": "../interfaces" },
+    { "path": "../js-processor" }
   ]
 }
