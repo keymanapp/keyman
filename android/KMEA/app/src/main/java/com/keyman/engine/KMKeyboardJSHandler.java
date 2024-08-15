@@ -189,8 +189,8 @@ public class KMKeyboardJSHandler {
 
               // Messaging apps
               case NEWLINE :
-                // Send newline without advancing cursor
-                ic.commitText("\n", 0);
+                // Send newline and advance cursor
+                ic.commitText("\n", 1);
                 break;
 
               // Default ENTER action
