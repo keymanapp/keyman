@@ -12,15 +12,12 @@ import {
   Codes,
   isEmptyTransform,
   type Keyboard,
-  KeyboardInterface,
-  KeyboardProcessor,
   type KeyEvent,
   Mock,
   type OutputTarget,
-  type ProcessorInitOptions,
-  RuleBehavior,
-  SystemStoreIDs,
 } from "@keymanapp/keyboard-processor";
+import { KeyboardInterface, KeyboardProcessor, RuleBehavior, type ProcessorInitOptions, SystemStoreIDs } from 'keyman/engine/js-processor';
+
 import { TranscriptionCache } from "./transcriptionCache.js";
 
 export class InputProcessor {

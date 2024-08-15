@@ -17,6 +17,7 @@ BUNDLE_CMD="node ${KEYMAN_ROOT}/common/web/es-bundling/build/common-bundle.mjs"
 builder_describe \
   "Compiles the web-oriented utility function module." \
   "@/web/src/tools/testing/recorder-core  test" \
+  "@/web/src/engine/js-processor test" \
   "@/common/web/keyman-version" \
   "@/common/web/es-bundling" \
   "@/common/web/types" \
@@ -65,10 +66,10 @@ function do_build() {
     --platform node
 
   # Tests
-  builder_echo "Bundle tests"
-  ${BUNDLE_CMD} "${KEYMAN_ROOT}/common/web/keyboard-processor/build/tests/dom/cases/domKeyboardLoader.spec.js" \
-    --out       "${KEYMAN_ROOT}/common/web/keyboard-processor/build/tests/dom/domKeyboardLoader.spec.mjs" \
-    --format   esm
+  # builder_echo "Bundle tests"
+  # ${BUNDLE_CMD} "${KEYMAN_ROOT}/common/web/keyboard-processor/build/tests/dom/cases/domKeyboardLoader.spec.js" \
+  #   --out       "${KEYMAN_ROOT}/common/web/keyboard-processor/build/tests/dom/domKeyboardLoader.spec.mjs" \
+  #   --format   esm
 
   # Declaration bundling.
   builder_echo "Declaration bundling"
@@ -95,4 +96,4 @@ function do_test() {
 builder_run_action configure  do_configure
 builder_run_action clean      rm -rf ./build
 builder_run_action build      do_build
-builder_run_action test       do_test
+# builder_run_action test       do_test

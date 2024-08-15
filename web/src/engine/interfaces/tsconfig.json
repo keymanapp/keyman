@@ -13,5 +13,6 @@
 
   "references": [
     { "path": "../../../../common/web/keyboard-processor" },
+    { "path": "../js-processor" }
   ]
 }

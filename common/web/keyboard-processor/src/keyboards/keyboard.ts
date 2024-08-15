@@ -6,10 +6,10 @@ import type OutputTarget from "../text/outputTarget.js";
 import { ModifierKeyConstants, TouchLayout } from "@keymanapp/common-types";
 type TouchLayoutSpec = TouchLayout.TouchLayoutPlatform & { isDefault?: boolean};
 
-import type { ComplexKeyboardStore } from "../text/kbdInterface.js";
-
 import { Version, DeviceSpec } from "@keymanapp/web-utils";
 import StateKeyMap from "./stateKeyMap.js";
+
+type ComplexKeyboardStore = ( string | { t: 'd', d: number } | { ['t']: 'b' })[];
 
 /**
  * Stores preprocessed properties of a keyboard for quick retrieval later.

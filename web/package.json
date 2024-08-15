@@ -37,6 +37,11 @@
       "types": "./build/engine/events/obj/index.d.ts",
       "import": "./build/engine/events/obj/index.js"
     },
+    "./engine/js-processor": {
+      "es6-bundling": "./src/engine/js-processor/src/index.ts",
+      "types": "./build/engine/js-processor/obj/index.d.ts",
+      "import": "./build/engine/js-processor/obj/index.js"
+    },
     "./engine/package-cache": {
       "es6-bundling": "./src/engine/package-cache/src/index.ts",
       "types": "./build/engine/package-cache/obj/index.d.ts",

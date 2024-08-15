@@ -98,7 +98,7 @@ function do_test() {
 
   if builder_has_option --ci; then
     MOCHA_FLAGS="$MOCHA_FLAGS --reporter mocha-teamcity-reporter"
-    WTR_CONFIG=.ci
+    WTR_CONFIG=.CI
   elif builder_has_option --remote; then
     WTR_CONFIG=.remote
   fi
