@@ -44,11 +44,13 @@ The very first section is a header that describes the remainder of the file.
 |44 |  32  | `StartGroup_Unicode` | index of starting Unicode `COMP_GROUP`, `0xFFFFFFFF` means unused                 |
 |48 |  32  | `dwFlags`            | global flags for the keyboard, see description below                              |
 |52 |  32  | `dwHotKey`           | default hotkey for keyboard, from [`&Hotkey`], see description below              |
-|56 |  32  | `dpBitmapOffset`     | offset of keyboard icon, `0x0` if not present                                     |
+|56 |  32  | `dpBitmapOffset`     | offset of keyboard icon                                                           |
 |60 |  32  | `dwBitmapSize`       | size in bytes of keyboard icon, `0x0` if not present                              |
 
 This structure is present at the start of every .kmx file. The `KXTS` identifier
 can be used as a 'magic' to determine whether a binary file is a .kmx file.
+
+Note that `dpBitmapOffset` should be ignored if `dwBitmapSize` is `0x0` -- it may be a non-zero value.
 
 ### `dwFileVersion`: Minimum version of Keyman required to read the file
 
@@ -220,7 +222,7 @@ file and is never written to the binary format.
 
 | ∆  | Bits | Name         | Description                                                                                    |
 |----|------|--------------|------------------------------------------------------------------------------------------------|
-| 0  |  16  | `Key`        | Keyman virtual key for the rule, 0 if unused                                                   |
+| 0  |  16  | `Key`        | [Keyman virtual key], virtual character key, or character, for the rule, 0 if unused           |
 | 2  |  16  | (unused)     | padding, reserved                                                                              |
 | 4  |  32  | `Line`       | Line number for the rule, 0 if not compiled with debug information                             |
 | 8  |  32  | `ShiftFlags` | Modifier flags for the key, see description below                                              |
@@ -231,6 +233,58 @@ The `COMP_KEY` structure describes a single rule in a keyboard source file. The
 compiler expands `any()` statements found in the key part of a rule into
 multiple rules -- so the key part of the rule is always only ever matching a
 single key combination.
+
+`ShiftFlags` contains a set of modifier and state key flags, and some additional
+flags that determine how to interpret `Key`.
+
+### Modifier and state key flags
+
+The modifier and state key flags are:
+
+| Bit mask     | Name             | Description                                               |
+|--------------|------------------|-----------------------------------------------------------|
+| `0x00000001` | `LCTRLFLAG`      | Left <kbd>Control</kbd> key                               |
+| `0x00000002` | `RCTRLFLAG`      | Right <kbd>Control</kbd> key                              |
+| `0x00000004` | `LALTFLAG`       | Left <kbd>Alt</kbd> key (<kbd>Option</kbd> on macOS)      |
+| `0x00000008` | `RALTFLAG`       | Right <kbd>Alt</kbd> key                                  |
+| `0x00000010` | `K_SHIFTFLAG`    | Either <kbd>Shift</kbd> key                               |
+| `0x00000020` | `K_CTRLFLAG`     | Either <kbd>Ctrl</kbd> key                                |
+| `0x00000040` | `K_ALTFLAG`      | Either <kbd>Alt</kbd> key                                 |
+| `0x00000080` | `K_METAFLAG`     | Either <kbd>Meta</kbd> key. Reserved, not for use in .kmx |
+| `0x00000100` | `CAPITALFLAG`    | <kbd>Caps lock</kbd> on                                   |
+| `0x00000200` | `NOTCAPITALFLAG` | <kbd>Caps lock</kbd> NOT on                               |
+| `0x00000400` | `NUMLOCKFLAG`    | <kbd>Num lock</kbd> on                                    |
+| `0x00000800` | `NOTNUMLOCKFLAG` | <kbd>Num lock</kbd> NOT on                                |
+| `0x00001000` | `SCROLLFLAG`     | <kbd>Scroll lock</kbd> on                                 |
+| `0x00002000` | `NOTSCROLLFLAG`  | <kbd>Scroll lock</kbd> NOT on                             |
+
+* The chiral (left/right) modifier flags should not be used together with the
+  non-chiral flags.
+* If neither `CAPITALFLAG` nor `NOTCAPITALFLAG` are set, then the state of the
+  Caps Lock key is ignored, and the same principle applies for Num lock and
+  Scroll lock.
+* The <kbd>Meta</kbd> key may be the <kbd>Windows</kbd> key on Windows, or the
+  <kbd>Command</kbd> key on macOS. This flag is reserved for internal use, and
+  is not valid in a .kmx file.
+
+### Additional flags
+
+The meaning of `Key` is determined by the flags `ISVIRTUALKEY` and
+`VIRTUALCHARKEY` in `ShiftFlags` (mask `0x0000C000`):
+
+* `0`: `Key` is a character on a key cap (US English unless the keyboard is a
+  mnemonic layout). All other shift flags are ignord
+* `ISVIRTUALKEY`: `Key` is a US English virtual key
+* `VIRTUALCHARKEY`: `Key` is a character on a key cap, combined with the shift
+  flags (US English unless the keyboard is a mnemonic layout)
+
+| Bit mask     | Name             | Description                                   |
+|--------------|------------------|-----------------------------------------------|
+| `0x00004000` | `ISVIRTUALKEY`   | `Key` is a virtual key                        |
+| `0x00008000` | `VIRTUALCHARKEY` | Keyman 6.0+: `Key` is a Virtual character key |
+
+Note that the shift flags for key rules do not use the same values as hotkeys
+for historical reasons.
 
 ## Debug information for keyboards
 
