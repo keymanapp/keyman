@@ -118,8 +118,7 @@ describe("PredictionContext", () => {
     const langProcessor = new LanguageProcessor(worker, new TranscriptionCache());
     await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
 
-    const kbdProcessor = new KeyboardProcessor(deviceSpec);
-    const predictiveContext = new PredictionContext(langProcessor, kbdProcessor);
+    const predictiveContext = new PredictionContext(langProcessor, dummiedGetLayer);
 
     let updateFake = sinon.fake();
     predictiveContext.on('update', updateFake);
@@ -146,13 +145,13 @@ describe("PredictionContext", () => {
 
     // Mocking:  corresponds to the second set of mocked predictions - round 2 of
     // 'apple', 'apply', 'apples'.
-    const skippedPromise = langProcessor.predict(baseTranscription, kbdProcessor.layerId);
+    const skippedPromise = langProcessor.predict(baseTranscription, dummiedGetLayer());
 
     mock.insertTextBeforeCaret('e'); // appl| + e = apple
     const finalTranscription = mock.buildTranscriptionFrom(initialMock, null, true);
 
     // Mocking:  corresponds to the third set of mocked predictions - 'applied'.
-    const expectedPromise = langProcessor.predict(finalTranscription, kbdProcessor.layerId);
+    const expectedPromise = langProcessor.predict(finalTranscription, dummiedGetLayer());
 
     await Promise.all([skippedPromise, expectedPromise]);
     const expected = await expectedPromise;
