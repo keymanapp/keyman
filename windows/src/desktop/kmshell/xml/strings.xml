@@ -10,7 +10,7 @@
   <!-- Context: System -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.1.266.0 -->
-  <string name="S_LocaleAuthors" translatable="false" comment="Name(s) of people who created this translation - i.e. your name">Keyman</string>
+  <string name="S_LocaleAuthors" comment="Name(s) of people who created this translation - i.e. your name">Keyman</string>
 
   <!-- Context: _Font -->
   <!-- String Type: PlainText -->
