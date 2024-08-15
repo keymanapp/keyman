@@ -206,6 +206,10 @@ echo -e "${COLOR_BLUE}## Running dependency tests${COLOR_RESET}"
 "$THIS_SCRIPT_PATH/debug-deps/test.sh"
 "$THIS_SCRIPT_PATH/ignored-flags/test.sh"
 
+echo -e "${COLOR_BLUE}## Test builder.inc.sh platform and tool constraints${COLOR_RESET}"
+"$THIS_SCRIPT_PATH/builder-platform.test.sh"
+
+
 echo -e "${COLOR_BLUE}## Test builder.inc.sh 'builder-style' script${COLOR_RESET}"
 ./builder-invalid-script.test.sh || builder_die "FAIL: builder-invalid-script.test.sh returned failure code $?"
 

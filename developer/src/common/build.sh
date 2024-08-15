@@ -11,5 +11,8 @@ builder_describe \
   ":delphi                      Delphi components" \
   ":web                         Web components"
 
+builder_describe_platform \
+  :delphi win,delphi
+
 builder_parse "$@"
 builder_run_child_actions clean configure build test

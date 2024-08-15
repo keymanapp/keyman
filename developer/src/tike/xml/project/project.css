@@ -281,7 +281,8 @@ k\:menuitem.down {
 
 #header-sil img {
   vertical-align: top;
-  margin-left: 4px;
+  margin-left: -6px;
+  margin-top: 7px;
 }
 
 #header-sil > div {
