@@ -213,9 +213,6 @@ let dummy2: LayoutGestureSupportFlags = dummy;
  *                    closure-captured and referred to by reference; changes to
  *                    its values will take immediate effect during gesture
  *                    processing.
- *
- *                    `params.roamingEnabled` will be initialized by this
- *                    method based upon layout properties.
  * @returns
  */
 export function gestureSetForLayout(flags: LayoutGestureSupportFlags, paramObj: GestureParams): GestureModelDefs<KeyElement, string> {
