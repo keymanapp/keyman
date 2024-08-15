@@ -2,6 +2,9 @@ project('mcompile', 'c', 'cpp',
         license: 'MIT',
         meson_version: '>=1.0')
 
+# see https://github.com/keymanapp/keyman/pull/11334#issuecomment-2290784399
+add_project_arguments('-O0', language : 'cpp')
+
 carbon =         dependency('Carbon')
 
 deps = [carbon]

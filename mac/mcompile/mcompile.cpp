@@ -398,9 +398,9 @@ KMX_WCHAR mac_KMX_GetUniqueDeadkeyID(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey) {
     return 0;
   }
 
-  for (int i = 0; i < s_ndkids; i++) {
-    if (s_dkids[i].src_deadkey == deadkey) {
-      return s_dkids[i].dst_deadkey;
+  for (int xi = 0; xi < s_ndkids; xi++) {
+    if (s_dkids[xi].src_deadkey == deadkey) {
+      return s_dkids[xi].dst_deadkey;
     }
   }
 
