@@ -209,7 +209,7 @@ let dummy2: LayoutGestureSupportFlags = dummy;
  * Defines the set of gestures appropriate for use with the specified Keyman
  * keyboard.
  * @param layerGroup  The active keyboard's layer group
- * @param params      A set of tweakable gesture parameters.  It will be
+ * @param paramObj    A set of tweakable gesture parameters.  It will be
  *                    closure-captured and referred to by reference; changes to
  *                    its values will take immediate effect during gesture
  *                    processing.
