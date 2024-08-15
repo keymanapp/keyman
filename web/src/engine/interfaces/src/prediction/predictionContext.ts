@@ -1,6 +1,6 @@
 import { EventEmitter } from "eventemitter3";
 import { type LanguageProcessorSpec , ReadySuggestions, type InvalidateSourceEnum, StateChangeHandler } from './languageProcessor.interface.js';
-import { type KeyboardProcessor, type OutputTarget } from 'keyman/engine/js-processor';
+import { type OutputTarget } from "keyman/engine/keyboard";
 
 interface PredictionContextEventMap {
   update: (suggestions: Suggestion[]) => void;
@@ -32,7 +32,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
   private recentRevert: boolean = false;
 
   private langProcessor: LanguageProcessorSpec;
-  private kbdProcessor: KeyboardProcessor;
+  private getLayerId: () => string;
 
   /**
    * Represents the active context used when requesting and applying predictive-text operations.
@@ -59,27 +59,18 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
   private readonly suggestionApplier: (suggestion: Suggestion) => Promise<Reversion>;
   private readonly suggestionReverter: (reversion: Reversion) => void;
 
-  /**
-   * Handler for post-processing once a suggestion has been applied: calls
-   * into the active keyboard's `begin postKeystroke` entry point.
-   *
-   * Called after the suggestion is applied but _before_ new predictions are
-   * requested based on the resulting context.
-   */
-  private readonly postApplicationHandler: () => void;
-
-  public constructor(langProcessor: LanguageProcessorSpec, kbdProcessor: KeyboardProcessor) {
+  public constructor(langProcessor: LanguageProcessorSpec, getLayerId: () => string) {
     super();
 
     this.langProcessor = langProcessor;
-    this.kbdProcessor = kbdProcessor;
+    this.getLayerId = getLayerId;
 
     const validSuggestionState: () => boolean = () =>
       this.currentTarget && langProcessor.state == 'configured';
 
     this.suggestionApplier = (suggestion) => {
       if(validSuggestionState()) {
-        return langProcessor.applySuggestion(suggestion, this.currentTarget, () => kbdProcessor.layerId);
+        return langProcessor.applySuggestion(suggestion, this.currentTarget, getLayerId);
       } else {
         return null;
       }
@@ -94,19 +85,6 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
       }
     }
 
-    // As it's called synchronously via event-callback during `this.suggestionApplier`,
-    // `this.currentTarget` is guaranteed to remain unchanged.
-    this.postApplicationHandler = () => {
-      // Tell the keyboard that the current layer has not changed
-      kbdProcessor.newLayerStore.set('');
-      kbdProcessor.oldLayerStore.set('');
-      // Call the keyboard's entry point.
-      kbdProcessor.processPostKeystroke(kbdProcessor.contextDevice, this.currentTarget)
-        // If we have a RuleBehavior as a result, run it on the target. This should
-        // only change system store and variable store values.
-        ?.finalize(kbdProcessor, this.currentTarget, true);
-    };
-
     this.connect();
   }
 
@@ -116,8 +94,6 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     this.langProcessor.addListener('tryaccept', this.doTryAccept);
     this.langProcessor.addListener('tryrevert', this.doTryRevert);
     this.langProcessor.addListener('statechange', this.onModelStateChange);
-
-    this.langProcessor.addListener('suggestionapplied', this.postApplicationHandler);
   }
 
   public disconnect() {
@@ -126,8 +102,6 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     this.langProcessor.removeListener('tryaccept', this.doTryAccept);
     this.langProcessor.removeListener('tryrevert', this.doTryRevert);
     this.langProcessor.removeListener('statechange', this.onModelStateChange);
-
-    this.langProcessor.removeListener('suggestionapplied', this.postApplicationHandler);
     this.clearSuggestions();
   }
 
@@ -376,7 +350,7 @@ export default class PredictionContext extends EventEmitter<PredictionContextEve
     if(target) {
       // Note:  should be triggered after the corresponding new-context event rule has been processed,
       // as that may affect the value of layerId here.
-      return this.langProcessor.invalidateContext(target, this.kbdProcessor.layerId);
+      return this.langProcessor.invalidateContext(target, this.getLayerId());
     } else {
       return Promise.resolve([]);
     }

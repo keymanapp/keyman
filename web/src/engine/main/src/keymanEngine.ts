@@ -1,5 +1,5 @@
 import { type KeyEvent, type Keyboard, KeyboardKeymanGlobal } from "keyman/engine/keyboard";
-import { ProcessorInitOptions, RuleBehavior } from 'keyman/engine/js-processor';
+import { OutputTarget, ProcessorInitOptions, RuleBehavior } from 'keyman/engine/js-processor';
 import { DOMKeyboardLoader as KeyboardLoader } from "keyman/engine/keyboard/dom-keyboard-loader";
 import { InputProcessor } from './headless/inputProcessor.js';
 import { OSKView } from "keyman/engine/osk";
@@ -241,6 +241,8 @@ export default class KeymanEngine<
     this.modelCache = new ModelCache();
     const kbdCache = this.keyboardRequisitioner.cache;
 
+    const keyboardProcessor = this.core.keyboardProcessor;
+    const predictionContext = new PredictionContext(this.core.languageProcessor, () => keyboardProcessor.layerId);
     this.contextManager.configure({
       resetContext: (target) => {
         // Could reset the target's deadkeys here, but it's really more of a 'core' task.
@@ -253,8 +255,25 @@ export default class KeymanEngine<
           this.core.resetContext(target);
         }
       },
-      predictionContext: new PredictionContext(this.core.languageProcessor, this.core.keyboardProcessor),
+      predictionContext: predictionContext,
       keyboardCache: this.keyboardRequisitioner.cache
+    });
+
+    /*
+     * Handler for post-processing once a suggestion has been applied.
+     *
+     * This is called after the suggestion is applied but _before_ new
+     * predictions are requested based on the resulting context.
+     */
+    this.core.languageProcessor.on('suggestionapplied', () => {
+      // Tell the keyboard that the current layer has not changed
+      keyboardProcessor.newLayerStore.set('');
+      keyboardProcessor.oldLayerStore.set('');
+      // Call the keyboard's entry point.
+      keyboardProcessor.processPostKeystroke(keyboardProcessor.contextDevice, predictionContext.currentTarget as OutputTarget)
+        // If we have a RuleBehavior as a result, run it on the target. This should
+        // only change system store and variable store values.
+        ?.finalize(keyboardProcessor, predictionContext.currentTarget as OutputTarget, true);
     });
 
     // #region Event handler wiring
