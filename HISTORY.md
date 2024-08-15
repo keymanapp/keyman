@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 18.0.90 alpha 2024-08-15
+
+* refactor(web): move parts of `keyboard-processor` → `js-processor` (#12111)
+* fix(web): allow `lm-worker` to build on Linux (#12181)
+* refactor(web): move remaining parts of `keyboard-processor` → `keyboard` (#12131)
+* docs: update .kmx documentation around bitmaps, modifier state (#12183)
+* refactor(web): rename `package-cache` → `keyboard-storage` (#12135)
+
 ## 18.0.89 alpha 2024-08-14
 
 * feat(web): test skipped prediction round handling (#12169)
