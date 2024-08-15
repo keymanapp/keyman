@@ -4,7 +4,7 @@ import { DeviceSpec, KeyboardProperties, ManagedPromise, physicalKeyDeviceAlias,
 import { OutputTarget, RuleBehavior } from 'keyman/engine/js-processor';
 import { PathConfiguration, PathOptionDefaults, PathOptionSpec } from "keyman/engine/interfaces";
 import { Device } from "keyman/engine/device-detect";
-import { KeyboardStub } from "keyman/engine/package-cache";
+import { KeyboardStub } from "keyman/engine/keyboard-storage";
 
 interface EventMap {
   'spacebartext': (mode: SpacebarText) => void;

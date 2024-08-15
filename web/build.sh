@@ -29,9 +29,9 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   ":engine/element-wrappers  Subset used to integrate with website elements" \
   ":engine/js-processor      Build JS processor for KMW" \
   ":engine/keyboard          Builds KMW's keyboard-loading and caching code" \
+  ":engine/keyboard-storage  Subset used to collate keyboards and request them from the cloud" \
   ":engine/main              Builds all common code used by KMW's app/-level targets" \
   ":engine/osk               Builds the Web OSK module" \
-  ":engine/package-cache     Subset used to collate keyboards and request them from the cloud" \
   ":engine/interfaces        Subset used to configure KMW" \
   ":samples                  Builds all needed resources for the KMW sample-page set" \
   ":tools                    Builds engine-related development resources" \
@@ -61,9 +61,9 @@ builder_describe_outputs \
   build:engine/element-wrappers "/web/build/engine/element-wrappers/lib/index.mjs" \
   build:engine/js-processor     "/web/build/engine/js-processor/lib/index.mjs" \
   build:engine/keyboard         "/web/build/engine/keyboard/lib/index.mjs" \
+  build:engine/keyboard-storage "/web/build/engine/keyboard-storage/lib/index.mjs" \
   build:engine/main             "/web/build/engine/main/lib/index.mjs" \
   build:engine/osk              "/web/build/engine/osk/lib/index.mjs" \
-  build:engine/package-cache    "/web/build/engine/package-cache/lib/index.mjs" \
   build:engine/interfaces       "/web/build/engine/interfaces/lib/index.mjs" \
   build:samples                 "/web/src/samples/simplest/keymanweb.js" \
   build:tools                   "/web/build/tools/building/sourcemap-root/index.js" \
@@ -152,9 +152,9 @@ builder_run_child_actions build:engine/osk
 builder_run_child_actions build:engine/attachment
 
 # Uses engine/interfaces (due to resource-path config interface)
-builder_run_child_actions build:engine/package-cache
+builder_run_child_actions build:engine/keyboard-storage
 
-# Uses engine/interfaces, engine/device-detect, engine/package-cache, & engine/osk
+# Uses engine/interfaces, engine/device-detect, engine/keyboard-storage, & engine/osk
 builder_run_child_actions build:engine/main
 
 # Uses all but engine/element-wrappers and engine/attachment

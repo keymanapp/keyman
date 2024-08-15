@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 
-import DOMCloudRequester from 'keyman/engine/package-cache/dom-requester';
+import DOMCloudRequester from 'keyman/engine/keyboard-storage/dom-requester';
 
 describe("Mocked cloud query results ('canary' testing)", () => {
   function performMockedRequest(mockedResultsPath: string) {

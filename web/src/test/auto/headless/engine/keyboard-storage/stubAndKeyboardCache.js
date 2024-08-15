@@ -2,7 +2,7 @@ import { assert } from 'chai';
 import sinon from 'sinon';
 import fs from 'fs';
 
-import { KeyboardStub, StubAndKeyboardCache } from 'keyman/engine/package-cache';
+import { KeyboardStub, StubAndKeyboardCache } from 'keyman/engine/keyboard-storage';
 
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 import { KeyboardHarness, MinimalKeymanGlobal } from 'keyman/engine/keyboard';

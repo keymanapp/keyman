@@ -9,7 +9,7 @@ import {
 } from 'keyman/engine/keyboard';
 
 import { KeyboardInterface } from 'keyman/engine/js-processor';
-import { KeyboardStub } from 'keyman/engine/package-cache';
+import { KeyboardStub } from 'keyman/engine/keyboard-storage';
 
 const loader = new DOMKeyboardLoader(new KeyboardInterface(window, MinimalKeymanGlobal));
 

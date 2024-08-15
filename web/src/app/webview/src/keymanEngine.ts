@@ -3,7 +3,7 @@ import { RuleBehavior } from 'keyman/engine/js-processor';
 import { KeymanEngine as KeymanEngineBase, KeyboardInterface } from 'keyman/engine/main';
 import { AnchoredOSKView, ViewConfiguration, StaticActivator } from 'keyman/engine/osk';
 import { getAbsoluteX, getAbsoluteY } from 'keyman/engine/dom-utils';
-import { toPrefixedKeyboardId, toUnprefixedKeyboardId } from 'keyman/engine/package-cache';
+import { toPrefixedKeyboardId, toUnprefixedKeyboardId } from 'keyman/engine/keyboard-storage';
 
 import { WebviewConfiguration, WebviewInitOptionDefaults, WebviewInitOptionSpec } from './configuration.js';
 import ContextManager, { ContextHost } from './contextManager.js';
