@@ -6,7 +6,10 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$(dirname "$THIS_SCRIPT")/../../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+SUBPROJECT_NAME=engine/osk/gesture-processor
+
+. "${KEYMAN_ROOT}/web/common.inc.sh"
+. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
 
 BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
 
@@ -37,10 +40,6 @@ builder_parse "$@"
 
 function do_configure() {
   verify_npm_setup
-
-  # Configure Web browser-engine testing environments.  As is, this should only
-  # make changes when we update the dependency, even on our CI build agents.
-  playwright install
 }
 
 function do_build_module() {
@@ -52,18 +51,6 @@ function do_build_module() {
     --format esm
 }
 
-function do_build_tools() {
-  src/tools/build.sh build
-}
-
-function do_test_module() {
-  if builder_has_option --ci; then
-    ./test.sh --ci
-  else
-    ./test.sh
-  fi
-}
-
 function do_test_tools() {
   if ! builder_has_action test:module; then
     echo "The $(builder_term test:tools) action is currently a no-op."
@@ -73,6 +60,6 @@ function do_test_tools() {
 builder_run_action configure     do_configure
 builder_run_action clean         rm -rf build/ intermediate/
 builder_run_action build:module  do_build_module
-builder_run_action build:tools   do_build_tools
-builder_run_action test:module   do_test_module
+builder_run_action build:tools   src/tools/build.sh build
+builder_run_action test:module   test-headless "${SUBPROJECT_NAME}"
 builder_run_action test:tools    do_test_tools

@@ -6,14 +6,14 @@ import fs from 'fs';
 
 import { GestureDebugPath } from '@keymanapp/gesture-recognizer';
 import { timedPromise } from '@keymanapp/web-utils';
-import { TouchpathTurtle } from '#tools';
+import { TouchpathTurtle } from '#gesture-tools';
 
 // Ensures that the resources are resolved relative to this script's source, not
 // to the cwd when the test runner was launched or to its built version.
 const scriptFolder = path.dirname(url.fileURLToPath(import.meta.url))
   .replace("build/test/auto", "src/test/auto")       // Mac/Linux
   .replace("build\\test\\auto", "src\\test\\auto");  // Windows
-const SEGMENT_TEST_JSON_FOLDER = path.resolve(`${scriptFolder}/../../resources/json/segmentation`);
+const SEGMENT_TEST_JSON_FOLDER = path.resolve(`${scriptFolder}/../../../../resources/json/segmentation`);
 
 describe("GesturePath", function() {
   // Note:  if part of the suite below fails, it'll probably cascade into failures for some of the

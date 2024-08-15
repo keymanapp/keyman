@@ -6,6 +6,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$(dirname "$THIS_SCRIPT")/../../../../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+. "$KEYMAN_ROOT/web/common.inc.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
@@ -33,34 +34,18 @@ builder_describe_outputs \
 # TODO: build if out-of-date if test is specified
 # TODO: configure if npm has not been run, and build is specified
 
-if builder_start_action clean:recorder; then
-  rm -rf ./recorder/build
-  builder_finish_action success clean:recorder
-fi
-
-if builder_start_action clean:fixture; then
+function do_clean_fixture() {
   rm -f ../../build/tools/host-fixture.html
   rm -f ../../build/tools/gestureHost.css
-  builder_finish_action success clean:fixture
-fi
+}
 
-if builder_start_action clean:test-module; then
+function do_clean_testmodule() {
   rm -rf ../../build/tools/*.ts*
   rm -rf ../../build/tools/*.js*
-  builder_finish_action success clean:test-module
-fi
+}
 
-if builder_start_action build:fixture; then
-  if [ ! -d ../../build/tools ]; then
-    mkdir -p ../../build/tools
-  fi
-  ./host-fixture/extract-fixture.sh > ../../build/tools/host-fixture.html
-  cp ./host-fixture/gestureHost.css ../../build/tools/gestureHost.css
-  builder_finish_action success build:fixture
-fi
-
-if builder_start_action build:recorder; then
-  if [ ! -d recorder/build ]; then
+function do_build_recorder() {
+  if [[ ! -d recorder/build ]]; then
     mkdir -p recorder/build
   fi
   cp recorder/src/pageStyle.css    recorder/build/pageStyle.css
@@ -73,15 +58,27 @@ if builder_start_action build:recorder; then
   pushd recorder >/dev/null
   node update-index.cjs build/index.html
   popd >/dev/null
-  builder_finish_action success build:recorder
-fi
+}
 
-if builder_start_action build:test-module; then
-  tsc -b "$THIS_SCRIPT_PATH/unit-test-resources/tsconfig.json"
+function do_build_fixture() {
+  if [[ ! -d ../../build/tools ]]; then
+    mkdir -p ../../build/tools
+  fi
+  ./host-fixture/extract-fixture.sh > ../../build/tools/host-fixture.html
+  cp ./host-fixture/gestureHost.css ../../build/tools/gestureHost.css
+}
+
+function do_build_testmodule() {
+  compile "" "${THIS_SCRIPT_PATH}/unit-test-resources" "${KEYMAN_ROOT}/${BUILD_DIR}/tools"
 
   $BUNDLE_CMD    "${KEYMAN_ROOT}/${BUILD_DIR}/tools/obj/index.js" \
     --out        "${KEYMAN_ROOT}/${BUILD_DIR}/tools/lib/index.mjs" \
     --format "esm"
+}
 
-  builder_finish_action success build:test-module
-fi
+builder_run_action clean:recorder     rm -rf ./recorder/build
+builder_run_action clean:fixture      do_clean_fixture
+builder_run_action clean:test-module  do_clean_testmodule
+builder_run_action build:recorder     do_build_recorder
+builder_run_action build:fixture      do_build_fixture
+builder_run_action build:test-module  do_build_testmodule

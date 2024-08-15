@@ -5,12 +5,13 @@ import type { GestureDebugSource, InputSample, SerializedGestureSource } from '@
 
 import {
   HostFixtureLayoutController,
-  InputSequenceSimulator
-} from '#tools';
+  InputSequenceSimulator,
+  RecordedCoordSequenceSet
+} from '#gesture-tools';
 
 function isOnAndroid() {
   const agent=navigator.userAgent;
-  return agent.indexOf('Android' >= 0);
+  return agent.indexOf('Android') >= 0;
 }
 
 const loc = document.location;
@@ -18,7 +19,7 @@ const loc = document.location;
 // filesystem for the drive.
 const domain = `${loc.protocol}/${loc.host}`
 
-async function fetchRecording(jsonFilename) {
+async function fetchRecording(jsonFilename: string): Promise<any> {
   const jsonResponse = await fetch(new URL(`${domain}/resources/json/${jsonFilename}.json`));
   return await jsonResponse.json();
 }
@@ -47,7 +48,7 @@ describe("Layer one - DOM -> InputSequence", function() {
     });
 
     // We rely on this function to have the same context as `it` - the test-definition function.
-    let replayAndCompare = function(testObj) {
+    let replayAndCompare = function(testObj: RecordedCoordSequenceSet, mochaContext: Mocha.Context) {
       let playbackEngine = new InputSequenceSimulator(controller);
 
       // **********************************
@@ -68,18 +69,18 @@ describe("Layer one - DOM -> InputSequence", function() {
 
       // replayAsync sets up timeouts against the `clock` object.
       // This will run through the simulated timeout queue asynchronously.
-      this.clock.runAllAsync();
+      mochaContext.clock.runAllAsync();
 
       // resultPromise resolves on the final timeout in the queue.
-      return resultPromise.then((result) => {
+      return resultPromise.then((result: RecordedCoordSequenceSet) => {
         assert.equal(result.inputs.length, testObj.inputs.length);
 
         // Removes the timestamp element; we know that this component may not match perfectly.
-        let sampleCleaner = (sample) => { return {targetX: sample.targetX, targetY: sample.targetY} };
+        let sampleCleaner = (sample: InputSample<any>) => { return {targetX: sample.targetX, targetY: sample.targetY} };
 
         // Returns just the observed, cleaned samples for a sequence object.  The recorded coordinates
         // should match perfectly.
-        let seqCleaner = (input) => {
+        let seqCleaner = (input: SerializedGestureSource<any>) => {
           return input.path.coords.map(sampleCleaner);
         };
 
@@ -124,7 +125,7 @@ describe("Layer one - DOM -> InputSequence", function() {
 
         // The 'terminationEvent' property should match.  Any sequence that was "canceled" should still
         // cancel; that's a pretty critical detail!
-        let terminationEventMapper = (seq) => {
+        let terminationEventMapper = (seq: SerializedGestureSource<any>) => {
           return seq.path.wasCancelled;
         }
 
@@ -151,7 +152,7 @@ describe("Layer one - DOM -> InputSequence", function() {
 
         // 'describe' has a notably different `this` reference than `it`, `before`, etc,
         // hence the `.call` construction.
-        return replayAndCompare.call(this, testObj);
+        return replayAndCompare.call(this, testObj, this);
       });
     }
   });
