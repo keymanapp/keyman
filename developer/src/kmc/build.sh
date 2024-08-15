@@ -18,6 +18,7 @@ builder_describe "Build Keyman Keyboard Compiler kmc" \
   "@/common/web/types" \
   "@/developer/src/common/web/utils" \
   "@/developer/src/kmc-analyze" \
+  "@/developer/src/kmc-convert" \
   "@/developer/src/kmc-keyboard-info" \
   "@/developer/src/kmc-kmn" \
   "@/developer/src/kmc-ldml" \
