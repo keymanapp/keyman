@@ -1,5 +1,5 @@
 {
-  "extends": "../../../web/tsconfig.kmw-main-base.json",
+  "extends": "../../../../../../tsconfig.base.json",
   "compilerOptions": {
     // The Worker class needs access to the `new` keyword, else Node will throw an
     // error when constructing the Worker for unit tests.  ES6 is sufficient.

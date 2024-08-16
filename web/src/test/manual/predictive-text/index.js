@@ -13,7 +13,7 @@ const {EventIterator} = require('event-iterator');
 const program =  require('commander');
 
 // Load the most recent LMLayer code locally.
-const LMLayer = require('../../predictive-text');
+const LMLayer = require('../../../engine/predictive-text/worker-main');
 
 
 ///////////////////////////////// Constants /////////////////////////////////
@@ -331,7 +331,7 @@ async function asyncRepl(modelFile) {
 
 function createAsyncWorker() {
   // XXX: import the LMLayerWorker directly -- I know where it is built.
-  const LMLayerWorker = require('../../predictive-text/build/intermediate');
+  const LMLayerWorker = require('../../../engine/predictive-text/build/intermediate');
   const vm = require('vm');
 
   let worker = {

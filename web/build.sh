@@ -27,12 +27,13 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   ":engine/dom-utils         A common subset of function used for DOM calculations, layout, etc" \
   ":engine/events            Specialized classes utilized to support KMW API events" \
   ":engine/element-wrappers  Subset used to integrate with website elements" \
+  ":engine/interfaces        Subset used to configure KMW" \
   ":engine/js-processor      Build JS processor for KMW" \
   ":engine/keyboard          Builds KMW's keyboard-loading and caching code" \
   ":engine/keyboard-storage  Subset used to collate keyboards and request them from the cloud" \
   ":engine/main              Builds all common code used by KMW's app/-level targets" \
   ":engine/osk               Builds the Web OSK module" \
-  ":engine/interfaces        Subset used to configure KMW" \
+  ":engine/predictive-text=src/engine/predictive-text/worker-main     Builds KMW's predictive text module" \
   ":samples                  Builds all needed resources for the KMW sample-page set" \
   ":tools                    Builds engine-related development resources" \
   ":test-pages=src/test/manual   Builds resources needed for the KMW manual testing pages" \
@@ -59,12 +60,13 @@ builder_describe_outputs \
   build:engine/dom-utils        "/web/build/engine/dom-utils/obj/index.js" \
   build:engine/events           "/web/build/engine/events/lib/index.mjs" \
   build:engine/element-wrappers "/web/build/engine/element-wrappers/lib/index.mjs" \
+  build:engine/interfaces       "/web/build/engine/interfaces/lib/index.mjs" \
   build:engine/js-processor     "/web/build/engine/js-processor/lib/index.mjs" \
   build:engine/keyboard         "/web/build/engine/keyboard/lib/index.mjs" \
   build:engine/keyboard-storage "/web/build/engine/keyboard-storage/lib/index.mjs" \
   build:engine/main             "/web/build/engine/main/lib/index.mjs" \
   build:engine/osk              "/web/build/engine/osk/lib/index.mjs" \
-  build:engine/interfaces       "/web/build/engine/interfaces/lib/index.mjs" \
+  build:engine/predictive-text  "/web/src/engine/predictive-text/worker-main/build/lib/web/index.mjs" \
   build:samples                 "/web/src/samples/simplest/keymanweb.js" \
   build:tools                   "/web/build/tools/building/sourcemap-root/index.js" \
   build:test-pages              "/web/build/test-resources/sentry-manager.js"

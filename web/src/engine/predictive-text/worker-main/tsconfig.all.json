@@ -3,7 +3,7 @@
   // require separate sub-tsconfigs, both of which require common references.  The multi-config
   // setup in this project and its subfolders ensure all modules can compile cleanly and in the
   // necessary compilation order.
-  "extends": "../web/tsconfig.kmw-main-base.json",
+  "extends": "../../../../tsconfig.base.json",
 
   "compilerOptions": {
     "baseUrl": "./",
@@ -13,11 +13,9 @@
   },
   "files": [],
   "references": [
-    { "path": "../web/utils" },
-    { "path": "../models/types"},
-    { "path": "../models/wordbreakers"},
-    { "path": "../web/lm-message-types"},
-    { "path": "../models/templates"},
+    { "path": "../../../../../common/web/utils" },
+    { "path": "../../../../../common/models/types"},
+    { "path": "../../../../../common/web/lm-message-types"},
     { "path": "src/node" },
     { "path": "src/web" }
   ],

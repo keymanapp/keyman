@@ -5,7 +5,6 @@
     { "path": "./common/models/templates/tsconfig.json" },
     { "path": "./common/models/types/tsconfig.json" },
     { "path": "./common/models/wordbreakers/tsconfig.json" },
-    { "path": "./common/predictive-text/tsconfig.all.json" },
     { "path": "./common/tools/hextobin/" },
 
     { "path": "./common/web/gesture-recognizer/tsconfig.json" },
@@ -43,6 +42,7 @@
     { "path": "./resources/build/version/" },
 
     { "path": "./web/src/tsconfig.all.json" },
+    { "path": "./web/src/engine/predictive-text/worker-main/tsconfig.all.json" },
     // { "path": "./web/tools/recorder/tsconfig.json" },
     // { "path": "./web/tools/sourcemap-root/tsconfig.json" },
   ]

@@ -1,5 +1,5 @@
 {
-  "extends": "../../web/tsconfig.kmw-main-base.json",
+  "extends": "../../../../../tsconfig.base.json",
 
   "compilerOptions": {
     "baseUrl": "./",
@@ -8,11 +8,9 @@
     "rootDir": "./"
   },
   "references": [
-    { "path": "../../web/utils" },
-    { "path": "../../models/types"},
-    { "path": "../../models/wordbreakers"},
-    { "path": "../../web/lm-message-types"},
-    { "path": "../../models/templates"}
+    { "path": "../../../../../../common/web/utils" },
+    { "path": "../../../../../../common/models/types"},
+    { "path": "../../../../../../common/web/lm-message-types"}
   ],
   "include" : [ "./*.ts" ],
   "exclude" : [
