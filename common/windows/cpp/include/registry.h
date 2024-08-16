@@ -123,11 +123,7 @@
 
 /* REGSZ_Keyman_Debug DWORD: Use old non-chiral Win32 API RegisterHotkey instead of left-only hotkeys */
 
-#define REGSZ_Flag_UseRegisterHotkey  "Flag_UseRegisterHotkey"
-
-/* REGSZ_Flag_UseCachedHotkeyModifierState DWORD: Use old cached modifier state when checking hotkeys; ignores UseRegisterHotkey if FALSE */
-
-#define REGSZ_Flag_UseCachedHotkeyModifierState "Flag_UseCachedHotkeyModifierState"
+#define REGSZ_Flag_UseRightModifierHotKey  "Flag_UseRightModifierHotKey"
 
 /* DWORD: Enable/disable deep TSF integration, default enabled; 0 = disabled, 1 = enabled, 2 = default */
 

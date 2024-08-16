@@ -379,8 +379,7 @@ const
 
   SRegKey_KeymanEngineDebug_CU = SRegKey_KeymanEngineRoot_CU + '\Debug';
 
-  SRegValue_Flag_UseRegisterHotkey = 'Flag_UseRegisterHotkey';
-  SRegValue_Flag_UseCachedHotkeyModifierState = 'Flag_UseCachedHotkeyModifierState';
+  SRegValue_Flag_UseRightModifierHotKey = 'Flag_UseRightModifierHotKey';
   SRegValue_Flag_ShouldSerializeInput = 'Flag_ShouldSerializeInput';
   SRegValue_Flag_UseAutoStartTask = 'Flag_UseAutoStartTask';
   SRegValue_Flag_SyncLanguagesToCloud = 'Flag_SyncLanguagesToCloud';

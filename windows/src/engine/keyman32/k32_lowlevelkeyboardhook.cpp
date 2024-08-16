@@ -130,26 +130,16 @@ BOOL IsTouchPanelVisible() {
 }
 
 /*
-  Cache UseRegisterHotkey debug flag for this session
+  Cache UseRightModifierHotKey debug flag for this session
 */
-BOOL UseRegisterHotkey() {
-  static BOOL flag_UseRegisterHotkey = FALSE;
+BOOL UseRightModifierHotKey() {
+  static BOOL flag_UseRightModifierHotKey = FALSE;
   static BOOL loaded = FALSE;
   if (!loaded) {
     loaded = TRUE;
-    flag_UseRegisterHotkey = Reg_GetDebugFlag(REGSZ_Flag_UseRegisterHotkey, FALSE);
+    flag_UseRightModifierHotKey = Reg_GetDebugFlag(REGSZ_Flag_UseRightModifierHotKey, FALSE);
   }
-  return flag_UseRegisterHotkey;
-}
-
-BOOL UseCachedHotkeyModifierState() {
-  static BOOL flag_UseCachedHotkeyModifierState = FALSE;
-  static BOOL loaded = FALSE;
-  if (!loaded) {
-    loaded = TRUE;
-    flag_UseCachedHotkeyModifierState = Reg_GetDebugFlag(REGSZ_Flag_UseCachedHotkeyModifierState, FALSE);
-  }
-  return flag_UseCachedHotkeyModifierState;
+  return flag_UseRightModifierHotKey;
 }
 
 LRESULT _kmnLowLevelKeyboardProc(
@@ -171,58 +161,38 @@ LRESULT _kmnLowLevelKeyboardProc(
 
   SendDebugMessageFormat("wparam: %x  lparam: %x [vk:%s scan:%x flags:%x extra:%x]", wParam, lParam, Debug_VirtualKey((WORD) hs->vkCode), hs->scanCode, hs->flags, hs->dwExtraInfo);   // I4674
 
-  DWORD Flag = 0;
-  if (!UseCachedHotkeyModifierState()) {
-    // #5190: Don't cache modifier state because sometimes we won't receive
-    // modifier change events (e.g. on lock screen)
-    FHotkeyShiftState = 0;
-    if (GetKeyState(VK_LCONTROL) < 0) FHotkeyShiftState |= HK_CTRL;
-    if (GetKeyState(VK_RCONTROL) < 0) FHotkeyShiftState |= HK_RCTRL_INVALID;
-    if (GetKeyState(VK_LMENU) < 0) FHotkeyShiftState |= HK_ALT;
-    if (GetKeyState(VK_RMENU) < 0) FHotkeyShiftState |= HK_RALT_INVALID;
-    if (GetKeyState(VK_LSHIFT) < 0) FHotkeyShiftState |= HK_SHIFT;
-    if (GetKeyState(VK_RSHIFT) < 0) FHotkeyShiftState |= HK_RSHIFT_INVALID;
-    //TODO: #8064. Can remove debug message once issue #8064 is resolved
-    SendDebugMessageFormat("!UseCachedHotkeyModifierState [FHotkeyShiftState:%x Flag:%x]", FHotkeyShiftState, Flag);
-  }
-  else if (UseRegisterHotkey()) {
-    // The old RegisterHotkey pattern does not support chiral modifier keys
-    switch (hs->vkCode) {
-      case VK_LCONTROL:
-      case VK_RCONTROL:
-      case VK_CONTROL:  Flag = HK_CTRL; break;
-      case VK_LMENU:
-      case VK_RMENU:
-      case VK_MENU:     Flag = HK_ALT; break;
-      case VK_LSHIFT:
-      case VK_RSHIFT:
-      case VK_SHIFT:    Flag = HK_SHIFT; break;
-
-    }
-    //TODO: #8064. Can remove debug message once issue #8064 is resolved
-    SendDebugMessageFormat("UseRegisterHotkey [FHotkeyShiftState:%x Flag:%x]", FHotkeyShiftState, Flag);
-  }
-  else {
-    // #4619: We differentiate between Left and Right Ctrl/Shift/Alt. The right modifiers are
-    // not used for hotkeys, leaving them available for use as keystroke modifiers within a
-    // Keyman keyboard. But we need to track them anyway, so that a user doesn't press them
-    // and receive a hotkey event when they shouldn't (e.g. RALT+F4 if the hotkey is F4).
-    switch (hs->vkCode) {
-      case VK_LCONTROL: Flag = HK_CTRL; break;
-      case VK_RCONTROL: Flag = HK_RCTRL_INVALID; break;
-      case VK_CONTROL:  Flag = extended ? HK_RCTRL_INVALID : HK_CTRL; break;
-      case VK_LMENU:    Flag = HK_ALT; break;
-      case VK_RMENU:    Flag = HK_RALT_INVALID; break;
-      case VK_MENU:     Flag = extended ? HK_RALT_INVALID : HK_ALT; break;
-      case VK_LSHIFT:   Flag = HK_SHIFT; break;
-      case VK_RSHIFT:   Flag = HK_RSHIFT_INVALID; break;
-      case VK_SHIFT:    Flag = hs->scanCode == SCANCODE_RSHIFT ? HK_RSHIFT_INVALID : HK_SHIFT; break;
-    }
+  if (GetKeyState(VK_LCONTROL) < 0) {
+    FHotkeyShiftState |= HK_CTRL;
   }
 
-  if(Flag != 0) {
-    if(isUp) FHotkeyShiftState &= ~Flag;
-    else FHotkeyShiftState |= Flag;
+  if (GetKeyState(VK_RCONTROL) < 0) {
+    FHotkeyShiftState |= UseRightModifierHotKey() ? HK_CTRL : HK_RCTRL_INVALID;
+  }
+  if (GetKeyState(VK_CONTROL) < 0) {
+    FHotkeyShiftState |= (!UseRightModifierHotKey() && extended) ? HK_RCTRL_INVALID : HK_CTRL;
+  }
+
+  if (GetKeyState(VK_LMENU) < 0) {
+    FHotkeyShiftState |= HK_ALT;
+  }
+
+  if (GetKeyState(VK_RMENU) < 0) {
+    FHotkeyShiftState |= UseRightModifierHotKey() ? HK_ALT : HK_RALT_INVALID;
+  }
+
+  if (GetKeyState(VK_MENU) < 0) {
+    FHotkeyShiftState |= (!UseRightModifierHotKey() && extended) ? HK_RALT_INVALID : HK_ALT;
+  }
+
+  if (GetKeyState(VK_LSHIFT) < 0) {
+    FHotkeyShiftState |= HK_SHIFT;
+  }
+  if (GetKeyState(VK_RSHIFT) < 0) {
+    FHotkeyShiftState |= UseRightModifierHotKey() ? HK_SHIFT : HK_RSHIFT_INVALID;
+  }
+
+  if (GetKeyState(VK_SHIFT) < 0) {
+    FHotkeyShiftState |= (!UseRightModifierHotKey() && extended) ? HK_RSHIFT_INVALID : HK_SHIFT;
   }
 
   // #7337 Post the modifier state ensuring the serialized queue is in sync
@@ -304,7 +274,7 @@ LRESULT _kmnLowLevelKeyboardProc(
 }
 
 BOOL ProcessHotkey(UINT vkCode, BOOL isUp, DWORD ShiftState) {
-  if (UseRegisterHotkey()) {
+  if (UseRightModifierHotKey()) {
     return FALSE;
   }
 
