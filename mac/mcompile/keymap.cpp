@@ -303,7 +303,6 @@ KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode_dk(const UCKeyboardLayout* keyboard_la
  *         or else the keyval obtained from Keycode and shiftstate and caps;
  */
 KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLayout* keyboard_layout, KMX_DWORD kc_underlying, KMX_DWORD vk_ShiftState, PKMX_WCHAR deadKey) {
-  PKMX_WCHAR dky = NULL;
   UInt32 isdk = 0;
   KMX_DWORD keyV;
   int caps = 0;
@@ -315,7 +314,9 @@ KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLa
 
   // if there was a deadkey return 0xFFFF and copy deadkey into dky; else return the keyvalue
   if (isdk != 0) {
-    dky = (PKMX_WCHAR)(std::u16string(1, keyV)).c_str();
+    PKMX_WCHAR dky = NULL;
+    std::u16string keyVS(1, keyV);
+    dky = (PKMX_WCHAR) keyVS.c_str();
     *deadKey = *dky;
     return 0xFFFF;
   }
