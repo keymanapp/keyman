@@ -202,8 +202,8 @@ public class FontManager {
       let familyFonts = UIFont.fontNames(forFamilyName: familyName)
       
       for font in familyFonts {
-        if let index = fontsToFind.firstIndex(where: { $0 == font }) {
-          fontsToFind.remove(at: index)
+        if fontsToFind.contains(font) {
+          fontsToFind.remove(font)
         }
         
         if fontsToFind.count == 0 {
