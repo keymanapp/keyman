@@ -22,6 +22,7 @@ builder_describe \
   ":ext                         Third party components" \
   ":kmcmplib                    Compiler - .kmn compiler" \
   ":kmc-analyze                 Compiler - Analysis Tools" \
+  ":kmc-convert                 Compiler - Keyboard Conversion Tools" \
   ":kmc-keyboard-info           Compiler - .keyboard_info Module" \
   ":kmc-kmn                     Compiler - .kmn to .kmx and .js Keyboard Module" \
   ":kmc-ldml                    Compiler - LDML Keyboard Module" \
