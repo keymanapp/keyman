@@ -1,9 +1,10 @@
 import { EventEmitter } from "eventemitter3";
 
-import { DeviceSpec, KeyboardProperties, ManagedPromise, OutputTarget, physicalKeyDeviceAlias, RuleBehavior, SpacebarText } from "@keymanapp/keyboard-processor";
+import { DeviceSpec, KeyboardProperties, ManagedPromise, physicalKeyDeviceAlias, SpacebarText } from "keyman/engine/keyboard";
+import { OutputTarget, RuleBehavior } from 'keyman/engine/js-processor';
 import { PathConfiguration, PathOptionDefaults, PathOptionSpec } from "keyman/engine/interfaces";
 import { Device } from "keyman/engine/device-detect";
-import { KeyboardStub } from "keyman/engine/package-cache";
+import { KeyboardStub } from "keyman/engine/keyboard-storage";
 
 interface EventMap {
   'spacebartext': (mode: SpacebarText) => void;

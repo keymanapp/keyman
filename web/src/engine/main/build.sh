@@ -14,12 +14,13 @@ SUBPROJECT_NAME=engine/main
 
 builder_describe "Builds the Keyman Engine for Web's common top-level base classes." \
   "@/common/web/keyman-version" \
-  "@/common/web/keyboard-processor" \
-  "@/common/predictive-text" \
+  "@/web/src/engine/keyboard" \
   "@/web/src/engine/interfaces build" \
   "@/web/src/engine/device-detect build" \
-  "@/web/src/engine/package-cache build" \
+  "@/web/src/engine/js-processor build" \
+  "@/web/src/engine/keyboard-storage build" \
   "@/web/src/engine/osk build" \
+  "@/web/src/engine/predictive-text/worker-main" \
   "@/developer/src/kmc-model test" \
   "clean" \
   "configure" \

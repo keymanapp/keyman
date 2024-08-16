@@ -1,6 +1,6 @@
 import { EventEmitter } from 'eventemitter3';
 
-import { DeviceSpec, InternalKeyboardFont } from "@keymanapp/keyboard-processor";
+import { DeviceSpec, InternalKeyboardFont } from "keyman/engine/keyboard";
 import { Input, nestedInstanceOf, wrapElement } from "keyman/engine/element-wrappers";
 import {
   arrayFromNodeList,

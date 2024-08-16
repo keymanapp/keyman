@@ -12,9 +12,9 @@
   "references": [
     { "path": "../../../../../common/web/keyman-version" },
     { "path": "../../../../../common/web/utils" },
-    { "path": "../../../../../common/web/keyboard-processor" },
     { "path": "../../../../../common/web/lm-message-types" },
     { "path": "../../../../../web/src/app/browser" },
     { "path": "../recorder-core" },
+    { "path": "../../../engine/keyboard" },
   ]
 }

@@ -1,7 +1,7 @@
 import { type KeyElement } from '../../../keyElement.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 
-import { ActiveSubKey, ActiveKey, KeyDistribution, ActiveKeyBase } from '@keymanapp/keyboard-processor';
+import { ActiveSubKey, ActiveKey, KeyDistribution, ActiveKeyBase } from 'keyman/engine/keyboard';
 import { GestureSequence, GestureStageReport } from '@keymanapp/gesture-recognizer';
 import { GestureHandler } from '../gestureHandler.js';
 import { distributionFromDistanceMaps } from '../../../corrections.js';

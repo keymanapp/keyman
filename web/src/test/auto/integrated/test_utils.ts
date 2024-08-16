@@ -3,7 +3,7 @@
 import Device from 'keyman/engine/device-detect';
 import * as KMWRecorder from '#recorder';
 import { type BrowserInitOptionSpec, type KeymanEngine } from 'keyman/app/browser';
-import { ErrorStub, type KeyboardAPISpec, type KeyboardStub } from 'keyman/engine/package-cache';
+import { ErrorStub, type KeyboardAPISpec, type KeyboardStub } from 'keyman/engine/keyboard-storage';
 
 type WindowKey = keyof typeof window;
 const keyman_window = 'keyman' as WindowKey;
