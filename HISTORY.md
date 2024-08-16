@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 18.0.91 alpha 2024-08-16
+
+* refactor(web): move `predictive-text` → `worker-main` (#12146)
+* fix(web): restore flick functionality (#12187)
+* refactor(web): move `lm-message-types` → `predictive-text/types` (#12149)
+* fix(developer): enforce presence of kps Info.Description field in info compilers (#12204)
+* fix(developer): enforce presence of Version field when FollowKeyboardVersion is not set, in package compiler (#12205)
+
 ## 18.0.90 alpha 2024-08-15
 
 * refactor(web): move parts of `keyboard-processor` → `js-processor` (#12111)
