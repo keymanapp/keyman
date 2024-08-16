@@ -134,5 +134,15 @@ export class CompilerMessages {
   static ERROR_FileRecordIsMissingName = SevError | 0x001F;
   static Error_FileRecordIsMissingName = (o:{description:string}) => m(this.ERROR_FileRecordIsMissingName,
     `File record in the package with description '${o.description}' is missing a filename.`);
+
+  static ERROR_InvalidAuthorEmail = SevError | 0x0020;
+  static Error_InvalidAuthorEmail = (o:{email:string}) => m(this.ERROR_InvalidAuthorEmail,
+    `Invalid author email: ${def(o.email)}`);
+
+  static ERROR_PackageFileHasEmptyVersion = SevError | 0x0021;
+  static Error_PackageFileHasEmptyVersion = () => m(
+    this.ERROR_PackageFileHasEmptyVersion,
+    `Package version is not following keyboard version, but the package version field is blank.`
+  );
 }
 
