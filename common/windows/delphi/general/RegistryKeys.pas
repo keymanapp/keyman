@@ -178,9 +178,7 @@ const
   SRegValue_AvailableLanguages = 'available languages'; //CU
   SRegValue_CurrentLanguage    = 'current language';    //CU
 
-  SRegValue_Install_Update             = 'install update';
   SRegValue_Update_State               = 'update state';
-  SRegValue_Install_Mode               = 'install mode';
 
   { Privacy }
 
