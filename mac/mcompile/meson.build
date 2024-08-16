@@ -3,7 +3,9 @@ project('mcompile', 'c', 'cpp',
         meson_version: '>=1.0')
 
 # see https://github.com/keymanapp/keyman/pull/11334#issuecomment-2290784399
-add_project_arguments('-O0', language : 'cpp')
+add_project_arguments('-O1', language : 'cpp')
+
+// _S2 was  // add_project_arguments('-O0', language : 'cpp')
 
 carbon =         dependency('Carbon')
 
