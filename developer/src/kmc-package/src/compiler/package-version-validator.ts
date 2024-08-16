@@ -41,6 +41,11 @@ export class PackageVersionValidator {
       if(!this.checkFollowKeyboardVersion(kmp)) {
         return false;
       }
+    } else {
+      if(!kmp.info.version) {
+        this.callbacks.reportMessage(CompilerMessages.Error_PackageFileHasEmptyVersion());
+        return false;
+      }
     }
 
     if(!kmp.keyboards) {
