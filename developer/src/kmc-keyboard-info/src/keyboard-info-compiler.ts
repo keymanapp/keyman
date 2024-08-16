@@ -246,6 +246,9 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
 
     if(kmpJsonData.info.description?.description) {
       keyboard_info.description = kmpJsonData.info.description.description.trim();
+    } else {
+      this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_DescriptionIsMissing({filename:sources.kpsFilename}));
+      return null;
     }
 
     // extract the language identifiers from the language metadata arrays for
