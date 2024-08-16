@@ -10,9 +10,7 @@
   "references": [
     { "path": "../../../../../../common/web/utils" },
     { "path": "../../../../../../common/models/types"},
-    { "path": "../../../../../../common/models/wordbreakers"},
-    { "path": "../../../../../../common/web/lm-message-types"},
-    { "path": "../../../../../../common/models/templates"}
+    { "path": "../../../../../../common/web/lm-message-types"}
   ],
   "include" : [ "./*.ts" ],
   "exclude" : [
