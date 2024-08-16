@@ -1,4 +1,4 @@
-import { ActiveKeyBase, KeyDistribution } from "@keymanapp/keyboard-processor";
+import { ActiveKeyBase, KeyDistribution } from "keyman/engine/keyboard";
 
 export interface GestureHandler {
   /**
