@@ -83,6 +83,7 @@ type
                     fmUpgradeKeyboards, fmOnlineUpdateCheck,// I2548
                     fmOnlineUpdateAdmin, fmTextEditor,
                     fmBackgroundUpdateCheck,
+                    fmBackgroundDownload,
                     fmApplyInstallNow,
                     fmFirstRun, // I2562
                     fmKeyboardWelcome,  // I2569
@@ -254,6 +255,7 @@ begin
       else if s = '-t'   then FMode := fmTextEditor
       else if s = '-ouc' then FMode := fmOnlineUpdateCheck
       else if s = '-buc' then FMode := fmBackgroundUpdateCheck
+      else if s = '-bd' then FMode := fmBackgroundDownload
       else if s = '-an' then FMode := fmApplyInstallNow
       else if s = '-basekeyboard' then FMode := fmBaseKeyboard   // I4169
       else if s = '-nowelcome'   then FNoWelcome := True
@@ -443,9 +445,14 @@ begin
         BUpdateSM.HandleCheck;
         Exit;
       end
+      else if (FMode = fmBackgroundDownload) then
+      begin
+        BUpdateSM.HandleDownload;
+        Exit;
+      end
       else if (FMode = fmApplyInstallNow) then
       begin
-        BUpdateSM.HandleInstall;
+        BUpdateSM.HandleInstallNow;
         Exit;
       end
       else

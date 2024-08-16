@@ -97,7 +97,7 @@ type
     procedure Exit; virtual; abstract;
     procedure HandleCheck; virtual; abstract;
     function  HandleKmShell : Integer; virtual; abstract;
-    procedure HandleInstall; virtual; abstract;
+    procedure HandleDownload; virtual; abstract;
     procedure HandleAbort; virtual; abstract;
     procedure HandleInstallNow; virtual; abstract;
 
@@ -113,19 +113,21 @@ type
     procedure Exit; override;
     procedure HandleCheck; override;
     function  HandleKmShell : Integer; override;
-    procedure HandleInstall; override;
+    procedure HandleDownload; override;
     procedure HandleAbort; override;
     procedure HandleInstallNow; override;
     function StateName: string; override;
   end;
 
   UpdateAvailableState = class(TState)
+  private
+    procedure StartDownloadProcess;
   public
     procedure Enter; override;
     procedure Exit; override;
     procedure HandleCheck; override;
     function  HandleKmShell : Integer; override;
-    procedure HandleInstall; override;
+    procedure HandleDownload; override;
     procedure HandleAbort; override;
     procedure HandleInstallNow; override;
     function StateName: string; override;
@@ -139,7 +141,7 @@ type
     procedure Exit; override;
     procedure HandleCheck; override;
     function  HandleKmShell : Integer; override;
-    procedure HandleInstall; override;
+    procedure HandleDownload; override;
     procedure HandleAbort; override;
     procedure HandleInstallNow; override;
     function StateName: string; override;
@@ -151,7 +153,7 @@ type
     procedure Exit; override;
     procedure HandleCheck; override;
     function  HandleKmShell : Integer; override;
-    procedure HandleInstall; override;
+    procedure HandleDownload; override;
     procedure HandleAbort; override;
     procedure HandleInstallNow; override;
     function StateName: string; override;
@@ -175,7 +177,7 @@ type
     procedure Exit; override;
     procedure HandleCheck; override;
     function  HandleKmShell : Integer; override;
-    procedure HandleInstall; override;
+    procedure HandleDownload; override;
     procedure HandleAbort; override;
     procedure HandleInstallNow; override;
     function StateName: string; override;
@@ -187,7 +189,7 @@ type
     procedure Exit; override;
     procedure HandleCheck; override;
     function  HandleKmShell : Integer; override;
-    procedure HandleInstall; override;
+    procedure HandleDownload; override;
     procedure HandleAbort; override;
     procedure HandleInstallNow; override;
     function StateName: string; override;
@@ -201,7 +203,7 @@ type
     procedure Exit; override;
     procedure HandleCheck; override;
     function  HandleKmShell : Integer; override;
-    procedure HandleInstall; override;
+    procedure HandleDownload; override;
     procedure HandleAbort; override;
     procedure HandleInstallNow; override;
     function StateName: string; override;
@@ -244,7 +246,6 @@ type
     function checkUpdateSchedule : Boolean;
 
     function SetRegistryState (Update : TUpdateState): Boolean;
-    function SetRegistryInstallMode (InstallMode : Boolean): Boolean;
 
   protected
   property State: TStateClass read GetState write SetState;
@@ -255,14 +256,13 @@ type
 
     procedure   HandleCheck;
     function    HandleKmShell : Integer;
-    procedure   HandleInstall;
+    procedure   HandleDownload;
     procedure   HandleAbort;
     procedure   HandleInstallNow;
     function    CurrentStateName: string;
 
     property ShowErrors: Boolean read FShowErrors write FShowErrors;
     function CheckRegistryState : TUpdateState;
-    function CheckRegistryInstallMode : Boolean;
 
   end;
 
@@ -363,16 +363,17 @@ end;
 procedure TUpdateStateMachine.SavePackageUpgradesToDownloadTempPath;
 var
   i: Integer;
+  StringList : TStringList;
 begin
-  with TStringList.Create do
+  StringList := TStringList.Create;
   try
     for i := 0 to High(FParams.Packages) do
       if FParams.Packages[i].NewID <> '' then
-        Add(FParams.Packages[i].NewID+'='+FParams.Packages[i].ID);
-    if Count > 0 then
-      SaveToFile(DownloadTempPath + SPackageUpgradeFileName);
+        StringList.Add(FParams.Packages[i].NewID+'='+FParams.Packages[i].ID);
+    if StringList.Count > 0 then
+      StringList.SaveToFile(DownloadTempPath + SPackageUpgradeFileName);
   finally
-    Free;
+    StringList.Free;
   end;
 end;
 
@@ -430,98 +431,52 @@ begin
 
 end;
 
-function TUpdateStateMachine.CheckRegistryState : TUpdateState;  // I2329
+function TUpdateStateMachine.CheckRegistryState: TUpdateState;  // I2329
 var
-  UpdateState : TUpdateState;
+  UpdateState: TUpdateState;
+  Registry: TRegistryErrorControlled;
 
 begin
   // We will use a registry flag to maintain the state of the background update
 
   // check the registry value
-  with TRegistryErrorControlled.Create do  // I2890
+  Registry := TRegistryErrorControlled.Create;  // I2890
   try
-    RootKey := HKEY_CURRENT_USER;
-    if OpenKeyReadOnly(SRegKey_KeymanEngine_LM) and ValueExists(SRegValue_Update_State) then
-      begin
-        UpdateState := TUpdateState(GetEnumValue(TypeInfo(TUpdateState), ReadString(SRegValue_Update_State)));
-        KL.Log('CheckRegistryState State is:[' + ReadString(SRegValue_Update_State) + ']');
-      end
+    Registry.RootKey := HKEY_CURRENT_USER;
+    if Registry.OpenKeyReadOnly(SRegKey_KeymanEngine_LM) and Registry.ValueExists(SRegValue_Update_State) then
+    begin
+      UpdateState := TUpdateState(GetEnumValue(TypeInfo(TUpdateState), Registry.ReadString(SRegValue_Update_State)));
+      KL.Log('CheckRegistryState State is:[' + Registry.ReadString(SRegValue_Update_State) + ']');
+    end
     else
-      begin
-          UpdateState := usIdle; // do we need a unknown state ?
-          KL.Log('CheckRegistryState State reg value not found default:[' + ReadString(SRegValue_Update_State) + ']');
-      end
-    finally
-      Free;
+    begin
+      UpdateState := usIdle; // do we need a unknown state ?
+      KL.Log('CheckRegistryState State reg value not found default:[' + Registry.ReadString(SRegValue_Update_State) + ']');
+    end;
+  finally
+    Registry.Free;
   end;
+
   Result := UpdateState;
 end;
 
-function TUpdateStateMachine.SetRegistryInstallMode (InstallMode : Boolean): Boolean;
-var
-  InstallModeStr : string;
-begin
-
-  Result := False;
-  with TRegistryErrorControlled.Create do
-  try
-    RootKey := HKEY_CURRENT_USER;
-    KL.Log('SetRegistryState State Entry');
-    if OpenKey(SRegKey_KeymanEngine_LM, True) then
-    begin
-        InstallModeStr := BoolToStr(InstallMode, True);
-        WriteString(SRegValue_Install_Mode, InstallModeStr);
-        KL.Log('SetRegistryInstallMode is:[' + InstallModeStr + ']');
-    end;
-    Result := True;
-  finally
-      Free;
-  end;
-
-end;
-
-function TUpdateStateMachine.CheckRegistryInstallMode : Boolean;
-var
-  InstallMode : Boolean;
-
-begin
-  // We will use a registry flag to maintain the install mode background/foreground
-
-  InstallMode := False;
-  // check the registry value
-  with TRegistryErrorControlled.Create do  // I2890
-  try
-    RootKey := HKEY_CURRENT_USER;
-    if OpenKeyReadOnly(SRegKey_KeymanEngine_LM) and ValueExists(SRegValue_Install_Mode) then
-      begin
-        InstallMode := StrToBool(ReadString(SRegValue_Install_Mode));
-        KL.Log('CheckRegistryState State is:[' + ReadString(SRegValue_Update_State) + ']');
-      end
-    else
-      begin
-          InstallMode := False; // default to background
-          KL.Log('CheckRegistryInstallMode reg value not found default:[ False ]');
-      end
-    finally
-      Free;
-  end;
-  Result := InstallMode;
-end;
-
 function TUpdateStateMachine.CheckUpdateSchedule: Boolean;
+var
+  RegistryErrorControlled :TRegistryErrorControlled;
 begin
   try
     Result := False;
-    with TRegistryErrorControlled.Create do
+    RegistryErrorControlled := TRegistryErrorControlled.Create;
+
     try
-      if OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
+      if RegistryErrorControlled.OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
       begin
-        if ValueExists(SRegValue_CheckForUpdates) and not ReadBool(SRegValue_CheckForUpdates) and not FForce then
+        if RegistryErrorControlled.ValueExists(SRegValue_CheckForUpdates) and not RegistryErrorControlled.ReadBool(SRegValue_CheckForUpdates) and not FForce then
         begin
           Result := False;
           Exit;
         end;
-        if ValueExists(SRegValue_LastUpdateCheckTime) and (Now - ReadDateTime(SRegValue_LastUpdateCheckTime) < 1) and not FForce then
+        if RegistryErrorControlled.ValueExists(SRegValue_LastUpdateCheckTime) and (Now - RegistryErrorControlled.ReadDateTime(SRegValue_LastUpdateCheckTime) < 1) and not FForce then
         begin
           Result := False;
           Exit;
@@ -530,7 +485,7 @@ begin
         Result := True;
       end;
     finally
-      Free;
+      RegistryErrorControlled.Free;
     end;
   except
     { we will not run the check if an error occurs reading the settings }
@@ -626,9 +581,9 @@ begin
   Result := CurrentState.HandleKmShell;
 end;
 
-procedure TUpdateStateMachine.HandleInstall;
+procedure TUpdateStateMachine.HandleDownload;
 begin
-  CurrentState.HandleInstall;
+  CurrentState.HandleDownload;
 end;
 
 procedure TUpdateStateMachine.HandleAbort;
@@ -732,9 +687,9 @@ begin
   Result := kmShellContinue;
 end;
 
-procedure IdleState.HandleInstall;
+procedure IdleState.HandleDownload;
 begin
-
+     // Do Nothing
 end;
 
 procedure IdleState.HandleAbort;
@@ -744,7 +699,6 @@ end;
 
 procedure IdleState.HandleInstallNow;
 begin
-  bucStateContext.SetRegistryInstallMode(True);
   bucStateContext.CurrentState.HandleCheck;
   //  TODO: How do we notify the command line no update available
 end;
@@ -757,13 +711,25 @@ end;
 
 { UpdateAvailableState }
 
+
+procedure UpdateAvailableState.StartDownloadProcess;
+var DownloadResult, FResult : Boolean;
+RootPath: string;
+begin
+  // call seperate process
+  RootPath := ExtractFilePath(ParamStr(0));
+  FResult := TUtilExecute.ShellCurrentUser(0, ParamStr(0), IncludeTrailingPathDelimiter(RootPath), '-bd');
+  if not FResult then
+    KL.Log('TrmfMain: Executing KMshell for download updated Failed');
+end;
+
 procedure UpdateAvailableState.Enter;
 begin
   // Enter UpdateAvailableState
   bucStateContext.SetRegistryState(usUpdateAvailable);
   if bucStateContext.FAuto then
   begin
-    ChangeState(DownloadingState);
+    StartDownloadProcess;
   end;
 end;
 
@@ -781,14 +747,16 @@ function UpdateAvailableState.HandleKmShell;
 begin
   if bucStateContext.FAuto then
   begin
-    ChangeState(DownloadingState);
+    // we will use a new kmshell process to enable
+    // the download as background process.
+    StartDownloadProcess;
   end;
   Result := kmShellContinue;
 end;
 
-procedure UpdateAvailableState.HandleInstall;
+procedure UpdateAvailableState.HandleDownload;
 begin
-
+   ChangeState(DownloadingState);
 end;
 
 procedure UpdateAvailableState.HandleAbort;
@@ -798,7 +766,6 @@ end;
 
 procedure UpdateAvailableState.HandleInstallNow;
 begin
-  bucStateContext.SetRegistryInstallMode(True);
   ChangeState(DownloadingState);
 end;
 
@@ -815,11 +782,28 @@ RootPath: string;
 begin
   // Enter DownloadingState
   bucStateContext.SetRegistryState(usDownloading);
-  // call seperate process
-  RootPath := ExtractFilePath(ParamStr(0));
-  FResult := TUtilExecute.ShellCurrentUser(0, ParamStr(0), IncludeTrailingPathDelimiter(RootPath), '');
-  if not FResult then
-    KL.Log('TrmfMain: Executing KMshell for download updated Failed');
+   {##  for testing log that we would download }
+  KL.Log('DownloadingState.HandleKmshell test code continue');
+  DownloadResult := True;
+  { End testing}
+  //DownloadResult := DownloadUpdatesBackground;
+  // TODO check if keyman is running then send to Waiting Restart
+  if DownloadResult then
+  begin
+    if HasKeymanRun then
+    begin
+      ChangeState(WaitingRestartState);
+    end
+    else
+    begin
+      ChangeState(InstallingState);
+    end;
+  end
+  else
+  begin
+    ChangeState(RetryState);
+  end;
+
 end;
 
 procedure DownloadingState.Exit;
@@ -833,38 +817,17 @@ begin
 end;
 
 function DownloadingState.HandleKmShell;
-var DownloadResult : Boolean;
 begin
-  {##  for testing log that we would download }
-  KL.Log('DownloadingState.HandleKmshell test code continue');
-  DownloadResult := True;
-  { End testing}
-  //DownloadResult := DownloadUpdatesBackground;
-  // TODO check if keyman is running then send to Waiting Restart
-  if DownloadResult then
-  begin
-    if HasKeymanRun then
-    begin
-      ChangeState(WaitingRestartState);
-      Result := kmShellContinue;
-    end
-    else
-    begin
-      ChangeState(InstallingState);
-      Result := kmShellExit;
-    end;
-  end
-  else
-  begin
-    ChangeState(RetryState);
-    Result := kmShellContinue;
-  end;
-
+  // Downloading state, in other process, so continue
+  Result := kmShellContinue;
 end;
 
-procedure DownloadingState.HandleInstall;
+procedure DownloadingState.HandleDownload;
+var DownloadResult, FResult : Boolean;
+RootPath: string;
 begin
-  ChangeState(InstallingState);
+  // Enter Already Downloading
+  KL.Log('DownloadingState.HandleDownload already downloading');
 end;
 
 procedure DownloadingState.HandleAbort;
@@ -873,8 +836,7 @@ end;
 
 procedure DownloadingState.HandleInstallNow;
 begin
-  bucStateContext.SetRegistryInstallMode(True);
-  // Continue downloading
+
 end;
 
 function DownloadingState.StateName;
@@ -962,7 +924,7 @@ begin
   end;
 end;
 
-procedure WaitingRestartState.HandleInstall;
+procedure WaitingRestartState.HandleDownload;
 begin
 
 end;
@@ -974,8 +936,9 @@ end;
 
 procedure WaitingRestartState.HandleInstallNow;
 begin
-  bucStateContext.SetRegistryInstallMode(True);
-  // Notify User to install
+  // TODO: Check if keyman has run, and error trying to install
+  // now when windows needs a restart ask the user if they
+  // want to restart now, if users says no stay in this (waitingrestart) state
   ChangeState(InstallingState);
 end;
 
@@ -1096,7 +1059,7 @@ begin
   Result := kmShellContinue;
 end;
 
-procedure InstallingState.HandleInstall;
+procedure InstallingState.HandleDownload;
 begin
 
 end;
@@ -1139,7 +1102,7 @@ begin
   Result := kmShellContinue
 end;
 
-procedure RetryState.HandleInstall;
+procedure RetryState.HandleDownload;
 begin
 
 end;
@@ -1151,7 +1114,6 @@ end;
 
 procedure RetryState.HandleInstallNow;
 begin
-  bucStateContext.SetRegistryInstallMode(True);
   // TODO: #10038 handle retry counts
   ChangeState(InstallingState);
 end;
@@ -1182,15 +1144,13 @@ end;
 
 function PostInstallState.HandleKmShell;
 begin
-  // TODO: #10210  have a counter if we get called in this state
-  // too many time abort.
   HandleMSIInstallComplete;
   Result := kmShellContinue;
 end;
 
-procedure PostInstallState.HandleInstall;
+procedure PostInstallState.HandleDownload;
 begin
-  // Handle Install
+  // Do Nothing
 end;
 
 procedure PostInstallState.HandleMSIInstallComplete;
