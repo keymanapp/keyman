@@ -23,7 +23,6 @@
 
 typedef void(^PostEventCallback)(CGEventRef eventToPost);
 
-extern NSString *const kKMSelectedKeyboardKey;
 extern NSString *const kKMActiveKeyboardsKey;
 extern NSString *const kKeymanKeyboardDownloadCompletedNotification;
 
@@ -99,7 +98,7 @@ static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX = 0;
 
 - (NSMenu *)menu;
 - (void)saveActiveKeyboards;
-- (void)readPersistedOptions;
+- (void)applyPersistedOptions;
 - (void)writePersistedOptions:(NSString *)storeKey withValue:(NSString* )value;
 - (void)showAboutWindow;
 - (void)showOSK;

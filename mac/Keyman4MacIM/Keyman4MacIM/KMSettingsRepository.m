@@ -17,6 +17,17 @@
 NSString *const kActiveKeyboardsKey = @"KMActiveKeyboardsKey";
 NSString *const kSelectedKeyboardKey = @"KMSelectedKeyboardKey";
 NSString *const kPersistedOptionsKey = @"KMPersistedOptionsKey";
+NSString *const kAlwaysShowOSKKey = @"KMAlwaysShowOSKKey";
+NSString *const kUseVerboseLogging = @"KMUseVerboseLogging";
+
+/**
+ The following constant "KMSavedStoresKey" is left here for documentation
+ though we have abandoned stores written to UserDefaults with this key because
+ they used a less-reliable numeric key prior to integration with Keyman Core.
+ It is replaced by the renamed "KMPersistedOptionsKey" which directly
+ represents what it is saving.
+ */
+NSString *const kKMDeprecatedPersistedOptionsKey = @"KMSavedStoresKey";
 
 //NSString *const kObsoletePathComponent = @"/Documents/";
 NSString *const kObsoletePathComponent = @"/Documents/Keyman-Keyboards";
@@ -58,6 +69,32 @@ NSInteger const kVersionStoreDataInLibraryDirectory = 1;
   return ([[NSUserDefaults standardUserDefaults] objectForKey:kSelectedKeyboardKey] != nil);
 }
 
+- (void)writeOptionForSelectedKeyboard:(NSString *)key withValue:(NSString*)value {
+  NSDictionary *optionsMap = [self readOptionsForSelectedKeyboard];
+  NSDictionary *newOptionsMap = nil;
+  // if we can read an existing options map, then add the specified key-value pair
+  if (optionsMap != nil) {
+    NSMutableDictionary *mutableOptionsMap = [optionsMap mutableCopy];
+    [mutableOptionsMap setObject:value forKey:key];
+    os_log_info([KMLogs dataLog], "writeOptionsForSelectedKeyboard, setting key: %{public}@, value %{public}@", key, value);
+    newOptionsMap = mutableOptionsMap;
+  } else {
+    newOptionsMap = [[NSDictionary alloc] initWithObjectsAndKeys:value, key, nil];
+  }
+
+  // write the fully built dictionary to the dictionary of options
+  NSString *selectedKeyboard = [self readSelectedKeyboard];
+  [self writeKeyboardOptionsMap: selectedKeyboard withOptions:newOptionsMap];
+}
+
+- (void)writeKeyboardOptionsMap:(NSString *)keyboardName withOptions:(NSDictionary*) optionsMap {
+  NSDictionary *fullOptionsMap = [self readOptions];
+  NSMutableDictionary *newFullOptionsMap = [fullOptionsMap mutableCopy];
+  
+  [newFullOptionsMap setObject:optionsMap forKey:keyboardName];
+  [self writeOptions:newFullOptionsMap];
+}
+
 /**
  * For the first numbered version of the data model, the app stores the keyboards under the /Library directory
  * For versions before version 1, the keyboards were stored under the /Documents directory.
@@ -83,11 +120,11 @@ NSInteger const kVersionStoreDataInLibraryDirectory = 1;
   return !(keymanSettingsExist && dataInLibrary);
 }
 
-- (NSString *)selectedKeyboard {
+- (NSString *)readSelectedKeyboard {
   return [[NSUserDefaults standardUserDefaults] objectForKey:kSelectedKeyboardKey];
 }
 
-- (void)saveSelectedKeyboard:(NSString *)selectedKeyboard {
+- (void)writeSelectedKeyboard:(NSString *)selectedKeyboard {
   NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
   [userData setObject:selectedKeyboard forKey:kSelectedKeyboardKey];
 }
@@ -101,52 +138,60 @@ NSInteger const kVersionStoreDataInLibraryDirectory = 1;
   return activeKeyboards;
 }
 
-- (NSDictionary *)persistedOptions {
+/*
+ * returns dictionary of persisted options for the single selected keyboard
+ */
+- (NSDictionary *)readOptionsForSelectedKeyboard {
+  NSDictionary *optionsMap = [self readOptions];
+  NSString *selectedKeyboard = [self readSelectedKeyboard];
+  NSDictionary *selectedOptionsMap = [optionsMap objectForKey: selectedKeyboard];
+  if (selectedOptionsMap == nil) {
+    os_log_info([KMLogs dataLog], "no persisted options found in UserDefaults for keyboard %{public}@ ", selectedKeyboard);
+  } else {
+    for (NSString *key in optionsMap) {
+      NSString *value = [optionsMap objectForKey:key];
+      os_log_info([KMLogs dataLog], "option for keyboard %{public}@ key: %{public}@, value %{public}@", selectedKeyboard, key, value);
+    }
+  }
+  return selectedOptionsMap;
+}
+
+/*
+ * returns dictionary of all persisted options for all keyboards
+ */
+- (NSDictionary *)readOptions {
   NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
   return [userData dictionaryForKey:kPersistedOptionsKey];
 }
 
-- (void)savePersistedOptions:(NSDictionary *) optionsDictionary {
+- (void)writeOptions:(NSDictionary *) optionsDictionary {
   NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
   [userData setObject:optionsDictionary forKey:kPersistedOptionsKey];
 }
 
-- (void)removePersistedOptions {
+- (void)removeAllOptions {
   NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
   return [userData removeObjectForKey:kPersistedOptionsKey];
 }
 
 - (void)convertSettingsForMigration {
+  os_log_debug([KMLogs dataLog], "converting settings in UserDefaults for migration");
   [self convertSelectedKeyboardPathForMigration];
   [self convertActiveKeyboardArrayForMigration];
-  [self convertPersistedOptionsPathsForMigration];
+  [self convertOptionsPathsForMigration];
 }
 
 - (void)convertSelectedKeyboardPathForMigration {
-  NSString *selectedKeyboardPath = [self selectedKeyboard];
+  NSString *selectedKeyboardPath = [self readSelectedKeyboard];
   if (selectedKeyboardPath != nil) {
     NSString *newPathString = [self trimObsoleteKeyboardPath:selectedKeyboardPath];
     
     if ([selectedKeyboardPath isNotEqualTo:newPathString]) {
-      [self saveSelectedKeyboard:newPathString];
+      [self writeSelectedKeyboard:newPathString];
       os_log_debug([KMLogs dataLog], "converted selected keyboard setting from '%{public}@' to '%{public}@'", selectedKeyboardPath, newPathString);
     }
   }
 }
-
-/**
- * Convert the path of the keyboard designating the Documents folder to its new location
- * in the Application Support folder
- */
-/*
-- (NSString *)convertOldKeyboardPath:(NSString *)oldPath {
-  NSString *newPathString = @"";
-  if(oldPath != nil) {
-    newPathString = [oldPath stringByReplacingOccurrencesOfString:kObsoletePathComponent withString:kNewPathComponent];
-  }
-  return newPathString;
-}
-*/
 
 /**
  * To convert the keyboard path for the new location, just trim the parent directory from the path
@@ -190,8 +235,8 @@ NSInteger const kVersionStoreDataInLibraryDirectory = 1;
   }
 }
 
-- (void)convertPersistedOptionsPathsForMigration {
-  NSDictionary * optionsMap = [self persistedOptions];
+- (void)convertOptionsPathsForMigration {
+  NSDictionary * optionsMap = [self readOptions];
   NSMutableDictionary *mutableOptionsMap = nil;
   BOOL optionsChanged = NO;
 
@@ -217,9 +262,29 @@ NSInteger const kVersionStoreDataInLibraryDirectory = 1;
       }
     }
     if (optionsChanged) {
-      [self savePersistedOptions:mutableOptionsMap];
+      [self writeOptions:mutableOptionsMap];
     }
   }
+}
+
+- (BOOL)readAlwaysShowOsk {
+  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
+  return [userData boolForKey:kAlwaysShowOSKKey];
+}
+
+- (void)writeAlwaysShowOsk:(BOOL)alwaysShowOsk {
+  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
+  [userData setBool:alwaysShowOsk forKey:kAlwaysShowOSKKey];
+}
+
+- (BOOL)readUseVerboseLogging {
+  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
+  return [userData boolForKey:kUseVerboseLogging];
+}
+
+- (void)writeUseVerboseLogging:(BOOL)verboseLogging {
+  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
+  [userData setBool:verboseLogging forKey:kUseVerboseLogging];
 }
 
 @end

@@ -17,6 +17,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)dataMigrationNeeded;
 - (void)convertSettingsForMigration;
 - (void)setDataModelVersionIfNecessary;
+- (NSString *)readSelectedKeyboard;
+- (void)writeSelectedKeyboard:(NSString *)selectedKeyboard;
+- (NSDictionary *)readOptionsForSelectedKeyboard;
+- (void)writeOptionForSelectedKeyboard:(NSString *)key withValue:(NSString*)value;
+- (BOOL)readAlwaysShowOsk;
+- (void)writeAlwaysShowOsk:(BOOL)alwaysShowOsk;
+- (BOOL)readUseVerboseLogging;
+- (void)writeUseVerboseLogging:(BOOL)verboseLogging;
 @end
 
 NS_ASSUME_NONNULL_END

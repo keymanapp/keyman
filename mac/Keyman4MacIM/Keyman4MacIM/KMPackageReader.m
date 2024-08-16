@@ -44,9 +44,6 @@ typedef enum {
 
 - (instancetype)init {
   self = [super init];
-  if (self) {
-    _debugMode = NO;
-  }
   return self;
 }
 

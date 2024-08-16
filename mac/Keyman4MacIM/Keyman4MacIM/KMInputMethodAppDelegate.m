@@ -6,15 +6,6 @@
 //  Copyright (c) 2017 SIL International. All rights reserved.
 //
 
-// *** TO INVESTIGATE ***
-// Keyman4MacIM[6245]: IMK Stall detected, *please Report* your user scenario in <rdar://problem/16792073> - (activateServerWithReply:) block performed very slowly (0.00 secs)
-// Keyman4MacIM[6245]: IMK Stall detected, *please Report* your user scenario in <rdar://problem/16792073> - (deactivateServerWithReply:) block performed very slowly (0.00 secs)
-// Keyman4MacIM[6245]: IMK Stall detected, *please Report* your user scenario in <rdar://problem/16792073> - (menusDictionaryWithClientAsync:reply:) block performed very slowly (0.00 secs)
-// Keyman4MacIM[6245]: IMK Stall detected, *please Report* your user scenario in <rdar://problem/16792073> - (modesWithClientAsync:reply:) block performed very slowly (0.00 secs)
-// Keyman4MacIM[6245]: IMK Stall detected, *please Report* your user scenario in <rdar://problem/16792073> - (commitCompositionWithReply:) block performed very slowly (0.00 secs)
-// Keyman4MacIM[6245]: IMK Stall detected, *please Report* your user scenario in <rdar://problem/16792073> - (hidePalettes) block performed very slowly (0.00 secs)
-// Keyman4MacIM[6245]: IMK Stall detected, *please Report* your user scenario in <rdar://problem/16792073> - (sessionFinished) block performed very slowly (0.00 secs)
-
 #import "KMInputMethodAppDelegate.h"
 #import "KMSettingsRepository.h"
 #import "KMDataRepository.h"
@@ -28,20 +19,9 @@
 #import "KMLogs.h"
 @import Sentry;
 
+// TODO: move Active Keyboards UserDefaults code to KMSettingsRepository
 /** NSUserDefaults keys */
-NSString *const kKMSelectedKeyboardKey = @"KMSelectedKeyboardKey";
 NSString *const kKMActiveKeyboardsKey = @"KMActiveKeyboardsKey";
-/**
- The following constant "KMSavedStoresKey" is left here for documentation
- though we have abandoned stores written to UserDefaults with this key because
- they used a less-reliable numeric key prior to integration with Keyman Core.
- It is replaced by the renamed "KMPersistedOptionsKey" which directly
- represents what it is saving.
- */
-NSString *const kKMDeprecatedPersistedOptionsKey = @"KMSavedStoresKey";
-NSString *const kKMPersistedOptionsKey = @"KMPersistedOptionsKey";
-NSString *const kKMAlwaysShowOSKKey = @"KMAlwaysShowOSKKey";
-NSString *const kKMUseVerboseLogging = @"KMUseVerboseLogging";
 
 NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboardDownloadCompletedNotification";
 
@@ -409,7 +389,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 - (KMPackageReader *)packageReader {
   if (_packageReader == nil) {
     _packageReader = [[KMPackageReader alloc] init];
-    [_packageReader setDebugMode:self.debugMode];
   }
   
   return _packageReader;
@@ -440,53 +419,15 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     [_oskWindow.window setTitle:self.oskWindowTitle];
 }
 
-- (void)readPersistedOptions {
-  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-  NSDictionary *allPersistedOptions = [userData dictionaryForKey:kKMPersistedOptionsKey];
-  if (!allPersistedOptions) {
-    return;
-  }
-  NSDictionary *persistedOptionsForSelectedKeyboard = [allPersistedOptions objectForKey:_selectedKeyboard];
-  if (!persistedOptionsForSelectedKeyboard) {
-    os_log_info([KMLogs configLog], "no persisted options found in UserDefaults for keyboard %{public}@ ", _selectedKeyboard);
-    return;
-  }
+- (void)applyPersistedOptions {
+  NSDictionary *selectedPersistedOptions = [[KMSettingsRepository shared] readOptionsForSelectedKeyboard];
   
   // TODO: pass array instead of making repeated calls
-  for (NSString *key in persistedOptionsForSelectedKeyboard) {
-    NSString *value = [persistedOptionsForSelectedKeyboard objectForKey:key];
+  for (NSString *key in selectedPersistedOptions) {
+    NSString *value = [selectedPersistedOptions objectForKey:key];
     os_log_info([KMLogs configLog], "persisted options found in UserDefaults for keyboard %{public}@, key: %{public}@, value: %{public}@", _selectedKeyboard, key, value);
     [self.kme setCoreOptions:key withValue:value];
   }
-}
-
-- (void)writePersistedOptions:(NSString *)storeKey withValue:(NSString* )value {
-  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-  NSDictionary *allPersistedOptions = [userData dictionaryForKey:kKMPersistedOptionsKey];
-  NSDictionary *persistedOptionsForSelectedKeyboard;
-  
-  if (allPersistedOptions) {
-    persistedOptionsForSelectedKeyboard = [allPersistedOptions objectForKey:_selectedKeyboard];
-  }
-  
-  if (persistedOptionsForSelectedKeyboard) {
-    NSMutableDictionary *newSavedStores = [persistedOptionsForSelectedKeyboard mutableCopy];
-    [newSavedStores setObject:value forKey:storeKey];
-    persistedOptionsForSelectedKeyboard = newSavedStores;
-  } else {
-    persistedOptionsForSelectedKeyboard = [[NSDictionary alloc] initWithObjectsAndKeys:value, storeKey, nil];
-  }
-  
-  if (allPersistedOptions) {
-    NSMutableDictionary *newAllSavedStores = [allPersistedOptions mutableCopy];
-    [newAllSavedStores setObject:persistedOptionsForSelectedKeyboard forKey:_selectedKeyboard];
-    allPersistedOptions = newAllSavedStores;
-  } else {
-    allPersistedOptions = [[NSDictionary alloc] initWithObjectsAndKeys:persistedOptionsForSelectedKeyboard, _selectedKeyboard, nil];
-  }
-  
-  [userData setObject:allPersistedOptions forKey:kKMPersistedOptionsKey];
-  [userData synchronize];
 }
 
 - (NSString *)oskWindowTitle {
@@ -498,9 +439,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
 - (void)setAlwaysShowOSK:(BOOL)alwaysShowOSK {
   _alwaysShowOSK = alwaysShowOSK;
-  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-  [userData setBool:alwaysShowOSK forKey:kKMAlwaysShowOSKKey];
-  [userData synchronize];
+  [[KMSettingsRepository shared] writeAlwaysShowOsk:alwaysShowOSK];
 }
 
 - (void)setUseVerboseLogging:(BOOL)useVerboseLogging {
@@ -508,23 +447,17 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   _debugMode = useVerboseLogging;
   if (_kme != nil)
     [_kme setUseVerboseLogging:useVerboseLogging];
-  if (_packageReader != nil) {
-    [_packageReader setDebugMode:useVerboseLogging];
-  }
-  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-  [userData setBool:useVerboseLogging forKey:kKMUseVerboseLogging];
-  [userData synchronize];
+
+  [[KMSettingsRepository shared] writeUseVerboseLogging:useVerboseLogging];
 }
 
 - (BOOL)alwaysShowOSK {
-  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-  _alwaysShowOSK = [userData boolForKey:kKMAlwaysShowOSKKey];
+  _alwaysShowOSK = [[KMSettingsRepository shared] readAlwaysShowOsk];
   return _alwaysShowOSK;
 }
 
 - (BOOL)useVerboseLogging {
-  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-  return [userData boolForKey:kKMUseVerboseLogging];
+  return [[KMSettingsRepository shared] readUseVerboseLogging];
 }
 
 #pragma mark - Keyman Data
@@ -679,8 +612,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
 - (NSString *)selectedKeyboard {
   if (_selectedKeyboard == nil) {
-    NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-    _selectedKeyboard = [userData objectForKey:kKMSelectedKeyboardKey];
+    _selectedKeyboard = [[KMSettingsRepository shared] readSelectedKeyboard];
   }
   os_log_debug([KMLogs dataLog], "selectedKeyboard = %{public}@", _selectedKeyboard);
 
@@ -688,10 +620,8 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (void)setSelectedKeyboard:(NSString *)selectedKeyboard {
+  [[KMSettingsRepository shared] writeSelectedKeyboard:selectedKeyboard];
   _selectedKeyboard = selectedKeyboard;
-  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-  [userData setObject:_selectedKeyboard forKey:kKMSelectedKeyboardKey];
-  [userData synchronize];
 }
 
 - (NSMutableArray *)activeKeyboards {
@@ -903,7 +833,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   [self setKvk:kvk];
   [self setKeyboardName:[kmxInfo objectForKey:kKMKeyboardNameKey]];
   [self setKeyboardIcon:[kmxInfo objectForKey:kKMKeyboardIconKey]];
-  [self readPersistedOptions];
+  [self applyPersistedOptions];
 }
 
 // defaults to the whatever keyboard happens to be first in the list
@@ -964,7 +894,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   [self setKeyboardIcon:[kmxInfo objectForKey:kKMKeyboardIconKey]];
   [self setContextBuffer:nil];
   [self setSelectedKeyboard:path];
-  [self readPersistedOptions];
+  [self applyPersistedOptions];
   if (kvk != nil && self.alwaysShowOSK)
     [self showOSK];
 }

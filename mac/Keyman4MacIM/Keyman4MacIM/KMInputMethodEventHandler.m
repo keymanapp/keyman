@@ -429,7 +429,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
     NSString *value = [options objectForKey:key];
     if(key && value) {
       os_log_debug([KMLogs keyLog], "persistOptions, key: %{public}@, value: %{public}@", key, value);
-      [self.appDelegate writePersistedOptions:key withValue:value];
+      [[KMSettingsRepository shared] writeOptionForSelectedKeyboard:key withValue:value];
     }
     else {
       os_log_debug([KMLogs keyLog], "invalid values in persistOptions, not writing to UserDefaults, key: %{public}@, value: %{public}@", key, value);
