@@ -17,7 +17,6 @@ extension Queries {
       let version: String
       let languages: [String]
       let packageFilename: String
-      let description: String
       let minKeymanVersion: String
 
       enum CodingKeys: String, CodingKey {
@@ -27,7 +26,6 @@ extension Queries {
         case languages
         case packageFilename
         case minKeymanVersion
-        case description
       }
 
       var models: [InstallableLexicalModel] {
