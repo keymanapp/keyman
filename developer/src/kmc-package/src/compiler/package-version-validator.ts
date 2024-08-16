@@ -43,7 +43,7 @@ export class PackageVersionValidator {
       }
     } else {
       if(!kmp.info.version) {
-        this.callbacks.reportMessage(PackageCompilerMessages.Error_PackageFileHasEmptyVersion());
+        this.callbacks.reportMessage(CompilerMessages.Error_PackageFileHasEmptyVersion());
         return false;
       }
     }
