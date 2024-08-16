@@ -199,6 +199,10 @@ public class FontManager {
     var fontsToFind = fontNames
     
     UIFont.familyNames.forEach { familyName in
+      if fontsToFind.count == 0 {
+        return
+      }
+      
       let familyFonts = UIFont.fontNames(forFamilyName: familyName)
       
       for font in familyFonts {
