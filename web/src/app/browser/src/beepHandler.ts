@@ -1,4 +1,4 @@
-import { type KeyboardInterface } from '@keymanapp/keyboard-processor';
+import { type KeyboardInterface } from 'keyman/engine/js-processor';
 import { DesignIFrame, OutputTarget } from 'keyman/engine/element-wrappers';
 
 // Utility object used to handle beep (keyboard error response) operations.
