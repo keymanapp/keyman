@@ -1326,6 +1326,13 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_clearcontext_valid[] = { UC_SENTINEL, CODE_CLEARCONTEXT, 0 };
     EXPECT_EQ(0, u16cmp(tstr_clearcontext_valid, tstr));
+
+    // call, KmnCompilerMessages::ERROR_501FeatureOnly_Call
+    fileKeyboard.version = VERSION_50;
+    u16cpy(str, u"call");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_501FeatureOnly_Call, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // context, KmnCompilerMessages::ERROR_CallInVirtualKeySection *** TODO ***
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
