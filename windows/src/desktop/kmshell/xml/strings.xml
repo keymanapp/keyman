@@ -380,7 +380,7 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 18.0.91 -->
-  <string name="koRightModifierHK" comment="General options - Ctrl+Alt simulates AltGr on computers without AltGr">Simulate AltGr with Ctrl+Alt</string>
+  <string name="koRightModifierHK" comment="General options - Right Ctrl Alt and Shift Work for HotKey">Right Modifier keys work with Hotkeys</string>
 
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->

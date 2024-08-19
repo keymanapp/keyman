@@ -135,9 +135,15 @@ BOOL IsTouchPanelVisible() {
 BOOL UseRightModifierHotKey() {
   static BOOL flag_UseRightModifierHotKey = FALSE;
   static BOOL loaded = FALSE;
+
   if (!loaded) {
-    loaded = TRUE;
-    flag_UseRightModifierHotKey = Reg_GetDebugFlag(REGSZ_Flag_UseRightModifierHotKey, FALSE);
+    RegistryReadOnly reg(HKEY_CURRENT_USER);
+    if (reg.OpenKeyReadOnly(REGSZ_KeymanCU)) {
+      if (reg.ValueExists(REGSZ_UseRightModifierHotKey)) {
+        flag_UseRightModifierHotKey = !!reg.ReadInteger(REGSZ_UseRightModifierHotKey);
+      }
+    }
+    loaded = TRUE; // Set loaded to TRUE whether or not the key exists
   }
   return flag_UseRightModifierHotKey;
 }

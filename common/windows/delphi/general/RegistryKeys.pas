@@ -115,6 +115,7 @@ const
 
   SRegValue_AltGrCtrlAlt                = 'simulate altgr';                         // CU
   SRegValue_KeyboardHotKeysAreToggle    = 'hotkeys are toggles';                    // CU
+  SRegValue_UseRightModifierHotKey      = 'use right modifier for hotkey';          // CU
   SRegValue_ReleaseShiftKeysAfterKeyPress = 'release shift keys after key press';   // CU
   SRegValue_TestKeymanFunctioning       = 'test keyman functioning';                // CU, default true
 
@@ -379,7 +380,6 @@ const
 
   SRegKey_KeymanEngineDebug_CU = SRegKey_KeymanEngineRoot_CU + '\Debug';
 
-  SRegValue_Flag_UseRightModifierHotKey = 'Flag_UseRightModifierHotKey';
   SRegValue_Flag_ShouldSerializeInput = 'Flag_ShouldSerializeInput';
   SRegValue_Flag_UseAutoStartTask = 'Flag_UseAutoStartTask';
   SRegValue_Flag_SyncLanguagesToCloud = 'Flag_SyncLanguagesToCloud';
