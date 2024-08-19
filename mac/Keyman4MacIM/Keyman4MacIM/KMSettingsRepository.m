@@ -72,27 +72,38 @@ NSInteger const kVersionStoreDataInLibraryDirectory = 1;
 - (void)writeOptionForSelectedKeyboard:(NSString *)key withValue:(NSString*)value {
   NSDictionary *optionsMap = [self readOptionsForSelectedKeyboard];
   NSDictionary *newOptionsMap = nil;
+
   // if we can read an existing options map, then add the specified key-value pair
   if (optionsMap != nil) {
     NSMutableDictionary *mutableOptionsMap = [optionsMap mutableCopy];
     [mutableOptionsMap setObject:value forKey:key];
-    os_log_info([KMLogs dataLog], "writeOptionsForSelectedKeyboard, setting key: %{public}@, value %{public}@", key, value);
     newOptionsMap = mutableOptionsMap;
   } else {
+    // if no options map exists, create a new one add the specified key-value pair
     newOptionsMap = [[NSDictionary alloc] initWithObjectsAndKeys:value, key, nil];
   }
 
-  // write the fully built dictionary to the dictionary of options
+  // write the options map for the selected keyboard to the dictionary of options
   NSString *selectedKeyboard = [self readSelectedKeyboard];
+  os_log_info([KMLogs dataLog], "writeOptionForSelectedKeyboard, adding options map: %{public}@, to keyboard %{public}@", newOptionsMap, selectedKeyboard);
   [self writeKeyboardOptionsMap: selectedKeyboard withOptions:newOptionsMap];
 }
 
 - (void)writeKeyboardOptionsMap:(NSString *)keyboardName withOptions:(NSDictionary*) optionsMap {
-  NSDictionary *fullOptionsMap = [self readOptions];
-  NSMutableDictionary *newFullOptionsMap = [fullOptionsMap mutableCopy];
-  
-  [newFullOptionsMap setObject:optionsMap forKey:keyboardName];
-  [self writeOptions:newFullOptionsMap];
+  NSMutableDictionary *newFullOptionsMap = nil;
+  os_log_debug([KMLogs dataLog], "writeKeyboardOptionsMap, adding options map: %{public}@, to keyboard %{public}@", optionsMap, keyboardName);
+
+  NSDictionary *fullOptionsMap = [self readFullOptionsMap];
+  // if we can read the existing full options map, then add for the specified keyboard
+  if (fullOptionsMap != nil) {
+    newFullOptionsMap = [fullOptionsMap mutableCopy];
+    [newFullOptionsMap setObject:optionsMap forKey:keyboardName];
+  } else {
+    // otherwise, create the full options map and add for the specified keyboard
+    newFullOptionsMap = [[NSMutableDictionary alloc] initWithObjectsAndKeys:optionsMap, keyboardName, nil];
+  }
+
+  [self writeFullOptionsMap:newFullOptionsMap];
 }
 
 /**
@@ -142,14 +153,14 @@ NSInteger const kVersionStoreDataInLibraryDirectory = 1;
  * returns dictionary of persisted options for the single selected keyboard
  */
 - (NSDictionary *)readOptionsForSelectedKeyboard {
-  NSDictionary *optionsMap = [self readOptions];
+  NSDictionary *optionsMap = [self readFullOptionsMap];
   NSString *selectedKeyboard = [self readSelectedKeyboard];
   NSDictionary *selectedOptionsMap = [optionsMap objectForKey: selectedKeyboard];
   if (selectedOptionsMap == nil) {
     os_log_info([KMLogs dataLog], "no persisted options found in UserDefaults for keyboard %{public}@ ", selectedKeyboard);
   } else {
-    for (NSString *key in optionsMap) {
-      NSString *value = [optionsMap objectForKey:key];
+    for (NSString *key in selectedOptionsMap) {
+      NSString *value = [selectedOptionsMap objectForKey:key];
       os_log_info([KMLogs dataLog], "option for keyboard %{public}@ key: %{public}@, value %{public}@", selectedKeyboard, key, value);
     }
   }
@@ -158,15 +169,16 @@ NSInteger const kVersionStoreDataInLibraryDirectory = 1;
 
 /*
  * returns dictionary of all persisted options for all keyboards
+ * (options are stored in UserDefaults as a map of maps)
  */
-- (NSDictionary *)readOptions {
+- (NSDictionary *)readFullOptionsMap {
   NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
   return [userData dictionaryForKey:kPersistedOptionsKey];
 }
 
-- (void)writeOptions:(NSDictionary *) optionsDictionary {
+- (void)writeFullOptionsMap:(NSDictionary *) fullOptionsMap {
   NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-  [userData setObject:optionsDictionary forKey:kPersistedOptionsKey];
+  [userData setObject:fullOptionsMap forKey:kPersistedOptionsKey];
 }
 
 - (void)removeAllOptions {
@@ -236,7 +248,7 @@ NSInteger const kVersionStoreDataInLibraryDirectory = 1;
 }
 
 - (void)convertOptionsPathsForMigration {
-  NSDictionary * optionsMap = [self readOptions];
+  NSDictionary * optionsMap = [self readFullOptionsMap];
   NSMutableDictionary *mutableOptionsMap = nil;
   BOOL optionsChanged = NO;
 
@@ -262,7 +274,7 @@ NSInteger const kVersionStoreDataInLibraryDirectory = 1;
       }
     }
     if (optionsChanged) {
-      [self writeOptions:mutableOptionsMap];
+      [self writeFullOptionsMap:mutableOptionsMap];
     }
   }
 }
