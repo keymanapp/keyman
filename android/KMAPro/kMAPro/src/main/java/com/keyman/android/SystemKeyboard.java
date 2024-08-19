@@ -245,9 +245,8 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       if (exText != null)
         exText = null;
     }
-    // Initialize the longpress delay
-    int longpressDelay = KMManager.getLongpressDelay();
-    KMManager.applyLongpressDelay(longpressDelay);
+    // Initialize keyboard options
+    KMManager.sendOptionsToKeyboard();
   }
 
   @Override

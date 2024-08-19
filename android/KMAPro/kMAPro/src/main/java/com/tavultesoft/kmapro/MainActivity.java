@@ -472,7 +472,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   @Override
   public void onKeyboardLoaded(KeyboardType keyboardType) {
-    checkLongpressDelay();
+    // Initialize keyboard options
+    KMManager.sendOptionsToKeyboard();
   }
 
   @Override
@@ -748,12 +749,6 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     SharedPreferences prefs = getSharedPreferences(getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     boolean maySendCrashReport = prefs.getBoolean(KeymanSettingsActivity.sendCrashReport, true);
     KMManager.setMaySendCrashReport(maySendCrashReport);
-  }
-
-  private void checkLongpressDelay() {
-    // Initialize the longpress delay
-    int longpressDelay = KMManager.getLongpressDelay();
-    KMManager.applyLongpressDelay(longpressDelay);
   }
 
   private void checkHapticFeedback() {
