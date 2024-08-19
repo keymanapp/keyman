@@ -56,10 +56,15 @@ public class FontManager {
   /**
    * Iterates across all listed fonts, registering those not yet registered.
    * Checks for, and filters out, any fonts already registered on the system.
+   * Also initializes the registration cache per URL if needed.
    */
   private func registerListedFonts(_ initialFontSet: Set<URL>) {
     // If we are unable to read the font file's properties sufficiently,
-    // skip it.  We also don't need to register anything already registered.
+    // skip it.  We also don't need to register anything already registered or
+    // that cannot be registered due to loading/parsing errors.
+    //
+    // Calls to `cachedFont` after the `.filter` below may be assumed to have
+    // non-nil return values.
     var fontSet = initialFontSet.filter { !(cachedFont(at: $0)?.isRegistered ?? true) }
     
     // The prior line filters out any entries where cachedFont(at: $0) would be nil.
@@ -195,7 +200,6 @@ public class FontManager {
    * Only fonts that could not be found will be returned within the result set.
    */
   private func missingFonts(from fontNames: Set<String>) -> Set<String> {
-    // Arrays are treated 'by value'; it's already a shallow copy.
     var fontsToFind = fontNames
     
     UIFont.familyNames.forEach { familyName in
