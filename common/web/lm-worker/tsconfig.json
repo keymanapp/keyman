@@ -13,7 +13,7 @@
   "references": [
     // types
     { "path": "../../models/types" },
-    { "path": "../lm-message-types" },
+    { "path": "../../../web/src/engine/predictive-text/types" },
     // modules
     { "path": "../keyman-version" },
     { "path": "../utils" },

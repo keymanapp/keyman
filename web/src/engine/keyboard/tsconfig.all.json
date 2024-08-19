@@ -1,0 +1,16 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "../../../build/engine/keyboard/obj/",
+    "tsBuildInfoFile": "../../../build/engine/keyboard/obj/tsconfig.all.tsbuildinfo",
+    "rootDir": "./src/"
+  },
+  "references": [
+    { "path": "./src/keyboards/loaders/tsconfig.dom.json" },
+    { "path": "./src/keyboards/loaders/tsconfig.node.json" },
+  ],
+  // Actual main-body compilation is in tsconfig.json.  This config is just a wrapper
+  // to trigger all three components at once.
+  "include": []
+}

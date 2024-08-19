@@ -2,7 +2,7 @@ import { assert } from 'chai';
 
 import { LanguageProcessor, TranscriptionCache } from 'keyman/engine/main';
 import { SourcemappedWorker as LMWorker } from "@keymanapp/lexical-model-layer/node";
-import { Mock } from '@keymanapp/keyboard-processor';
+import { Mock } from 'keyman/engine/keyboard';
 
 /*
  * Unit tests for the Dummy prediction model.
@@ -43,8 +43,8 @@ describe('LanguageProcessor', function() {
     it('has expected default values after initialization', function () {
       let languageProcessor = new LanguageProcessor(worker, new TranscriptionCache());
 
-      // These checks are lifted from the keyboard-processor init checks found in
-      // common/web/keyboard-processor/tests/cases/basic-init.js.
+      // These checks are lifted from the keyboard init checks found in
+      // web/src/test/auto/headless/engine/js-processor/basic-init.js.
       assert.isDefined(languageProcessor.lmEngine);
       assert.isUndefined(languageProcessor.activeModel);
       assert.isFalse(languageProcessor.isActive);

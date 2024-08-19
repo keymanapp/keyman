@@ -10,10 +10,10 @@
  */
 
 function Keyboard_chirality() {
-  // Refer to $KEYMAN_ROOT/common/web/keyboard-processor/src/text/codes.ts, same method name.
+  // Refer to $KEYMAN_ROOT/web/src/engine/keyboard/src/text/codes.ts, same method name.
   // May be moved within common/web/types at some point in the future.
   var getModifierState = function(layerId) {
-    // Refer to C:\keymanapp\keyman\common\web\keyboard-processor\src\keyboards\keyboardHarness.ts,
+    // Refer to C:\keymanapp\keyman\web\src\engine\keyboard\src\keyboards\keyboardHarness.ts,
     // `MinimalKeyboardHarness`.
     let osk = keyman.osk;  // Codes endpoint, as part of the standard keyboard harness.
 
@@ -86,7 +86,7 @@ function Keyboard_chirality() {
   this.g0 = function (t, e) {
     var k = KeymanWeb, r = 0, m = 0;
 
-    // Refer to C:\keymanapp\keyman\common\web\keyboard-processor\src\keyboards\keyboardHarness.ts,
+    // Refer to C:\keymanapp\keyman\web\src\engine\keyboard\src\keyboards\keyboardHarness.ts,
     // `MinimalKeyboardHarness`.
     var Constants = keyman.osk;  // Holds anchor points for relevant Codes properties.
 
