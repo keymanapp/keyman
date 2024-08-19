@@ -25,7 +25,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
@@ -180,6 +179,19 @@ public final class KMManager {
     }
   }
 
+  // Enum for how the System Keyboard ENTER key is handled for the EditorInfo action
+  // Reference: https://developer.android.com/reference/android/view/inputmethod/EditorInfo#summary
+  public enum EnterModeType {
+    GO,        // Go action
+    SEARCH,    // Search action
+    SEND,      // Send action
+    NEXT,      // Next action
+    DONE,      // Done action
+    PREVIOUS,  // Previous action
+    NEWLINE,   // Send newline character
+    DEFAULT,   // Default ENTER action
+  }
+
   protected static InputMethodService IMService;
 
   private static boolean debugMode = false;
@@ -217,6 +229,9 @@ public final class KMManager {
   // When mayPredictOverride is true, the option {'mayPredict' = false} is set in the lm-layer
   // regardless what the Settings preference is.
   private static boolean mayPredictOverride = false;
+
+  // Determine how system keyboard handles ENTER key
+  public static EnterModeType enterMode = EnterModeType.DEFAULT;
 
   // Boolean for whether a keyboard can send embedded KMW crash reports to Sentry
   // When maySendCrashReport is false, KMW will still attempt to send crash reports, but it
@@ -1249,6 +1264,61 @@ public final class KMManager {
     for (File file : files) {
       file.delete();
     }
+  }
+
+  /**
+   * Sets enterMode which specifies how the System keyboard ENTER key is handled
+   *
+   * @param imeOptions EditorInfo.imeOptions
+   * @param inputType  InputType
+   */
+  public static void setEnterMode(int imeOptions, int inputType) {
+    if ((inputType & InputType.TYPE_TEXT_FLAG_MULTI_LINE) != 0) {
+      enterMode = EnterModeType.NEWLINE;
+      return;
+    }
+
+    int imeActions = imeOptions & EditorInfo.IME_MASK_ACTION;
+    EnterModeType value = EnterModeType.DEFAULT;
+
+    switch (imeActions) {
+      case EditorInfo.IME_ACTION_GO:
+        value = EnterModeType.GO;
+        break;
+
+      case EditorInfo.IME_ACTION_SEARCH:
+        value = EnterModeType.SEARCH;
+        break;
+
+      case EditorInfo.IME_ACTION_SEND:
+        value = EnterModeType.SEND;
+        break;
+
+      case EditorInfo.IME_ACTION_NEXT:
+        value = EnterModeType.NEXT;
+        break;
+
+      case EditorInfo.IME_ACTION_DONE:
+        value = EnterModeType.DONE;
+        break;
+
+      case EditorInfo.IME_ACTION_PREVIOUS:
+        value = EnterModeType.PREVIOUS;
+        break;
+
+      default:
+        value = EnterModeType.DEFAULT;
+    }
+
+    enterMode = value;
+  }
+
+  /**
+   * Get the value of enterMode
+   * @return EnterModeType
+   */
+  public static EnterModeType getEnterMode() {
+    return enterMode;
   }
 
   /**

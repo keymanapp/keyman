@@ -1,5 +1,5 @@
 import { OSKView } from "keyman/engine/osk";
-import { DeviceSpec } from "@keymanapp/keyboard-processor";
+import { DeviceSpec } from "keyman/engine/keyboard";
 import { type EmbeddedGestureConfig } from "keyman/engine/osk";
 
 import { GlobeHint } from './osk/globeHint.js';

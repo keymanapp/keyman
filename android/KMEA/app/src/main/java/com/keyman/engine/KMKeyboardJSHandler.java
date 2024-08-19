@@ -20,6 +20,7 @@ import android.webkit.JavascriptInterface;
 
 import static android.content.Context.VIBRATOR_SERVICE;
 
+import com.keyman.engine.KMManager.EnterModeType;
 import com.keyman.engine.KMManager.KeyboardType;
 import com.keyman.engine.data.Keyboard;
 import com.keyman.engine.util.CharSequenceUtil;
@@ -153,7 +154,53 @@ public class KMKeyboardJSHandler {
         }
 
         if (s.length() > 0 && s.charAt(0) == '\n') {
-          keyDownUp(KeyEvent.KEYCODE_ENTER, 0);
+          if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM) {
+            // Special handling of ENTER key
+            switch (KMManager.enterMode) {
+              // Go action
+              case GO :
+                ic.performEditorAction(EditorInfo.IME_ACTION_GO);
+                break;
+
+              // Search action
+              case SEARCH :
+                ic.performEditorAction(EditorInfo.IME_ACTION_SEARCH);
+                break;
+
+              // Send action
+              case SEND :
+                ic.performEditorAction(EditorInfo.IME_ACTION_SEND);
+                break;
+
+              // Next action
+              case NEXT :
+                ic.performEditorAction(EditorInfo.IME_ACTION_NEXT);
+                break;
+
+              // Done action
+              case DONE :
+                ic.performEditorAction(EditorInfo.IME_ACTION_DONE);
+                break;
+
+              // Previous action
+              case PREVIOUS :
+                ic.performEditorAction(EditorInfo.IME_ACTION_PREVIOUS);
+                break;
+
+              // Messaging apps
+              case NEWLINE :
+                // Send newline and advance cursor
+                ic.commitText("\n", 1);
+                break;
+
+              // Default ENTER action
+              default:
+                keyDownUp(KeyEvent.KEYCODE_ENTER, 0);
+            }
+          } else {
+            // In-app keyboard uses default ENTER action
+            keyDownUp(KeyEvent.KEYCODE_ENTER, 0);
+          }
           ic.endBatchEdit();
           return;
         }

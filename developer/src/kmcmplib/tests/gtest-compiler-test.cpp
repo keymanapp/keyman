@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
+#include <km_u16.h>
 #include "../include/kmcompx.h"
 #include "../include/kmcmplibapi.h"
-#include "../src/kmx_u16.h"
 #include "../src/compfile.h"
 #include "../src/CompilerErrors.h"
 #include "../../common/include/kmn_compiler_errors.h"

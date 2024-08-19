@@ -19,7 +19,6 @@
   },
   "homepage": "https://github.com/keymanapp/keyman#readme",
   "dependencies": {
-    "@keymanapp/keyboard-processor": "*",
     "@keymanapp/models-types": "*",
     "@keymanapp/keyman-version": "*",
     "@keymanapp/web-utils": "*"
