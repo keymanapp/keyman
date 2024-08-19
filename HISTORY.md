@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 18.0.92 alpha 2024-08-19
+
+* chore(deps-dev): bump @75lb/deep-merge from 1.1.1 to 1.1.2 (#12118)
+* chore(deps): bump semver from 7.5.4 to 7.6.0 (#12119)
+* fix(windows): "Keyman" is not localized in UI strings (#12162)
+* feat(android): Enhance how ENTER key is handled in apps (#12125)
+* refactor(web): move `lm-worker` → `worker-thread` (#12150)
+* fix(developer): remove redundant check in LdmlKeyboardCompiler.validate() (#11858)
+
 ## 18.0.91 alpha 2024-08-16
 
 * refactor(web): move `predictive-text` → `worker-main` (#12146)
