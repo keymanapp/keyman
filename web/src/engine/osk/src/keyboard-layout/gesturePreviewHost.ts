@@ -1,4 +1,4 @@
-import { ActiveKeyBase } from "@keymanapp/keyboard-processor";
+import { ActiveKeyBase } from "keyman/engine/keyboard";
 import { EventEmitter } from "eventemitter3";
 
 import { KeyElement } from "../keyElement.js";

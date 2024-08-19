@@ -13,9 +13,9 @@ import {
   StateKeyMap,
   ActiveSubKey,
   timedPromise,
-  ActiveKeyBase,
-  isEmptyTransform
-} from '@keymanapp/keyboard-processor';
+  ActiveKeyBase
+} from 'keyman/engine/keyboard';
+import { isEmptyTransform } from 'keyman/engine/js-processor';
 
 import { buildCorrectiveLayout } from './correctionLayout.js';
 import { distributionFromDistanceMaps, keyTouchDistances } from './corrections.js';
@@ -31,7 +31,7 @@ import {
 
 import { createStyleSheet, StylesheetManager } from 'keyman/engine/dom-utils';
 
-import { KeyEventHandler, KeyEventResultCallback } from 'keyman/engine/events';
+import { KeyEventHandler, KeyEventResultCallback } from './views/keyEventSource.interface.js';
 
 import GlobeHint from './globehint.interface.js';
 import KeyboardView from './components/keyboardView.interface.js';
@@ -151,7 +151,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   /**
    * Tweakable gesture parameters referenced by supported gestures and the gesture engine.
    */
-  get gestureParams(): GestureParams<KeyElement> {
+  get gestureParams(): GestureParams {
     return this.config.gestureParams;
   };
 
@@ -421,11 +421,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       */
       recordingMode: DEBUG_GESTURES,
       historyLength: DEBUG_HISTORY_COUNT
-    };
-
-    this.gestureParams.longpress.permitsFlick = (key) => {
-      const flickSpec = key?.key.spec.flick;
-      return !flickSpec || !(flickSpec.n || flickSpec.nw || flickSpec.ne);
     };
 
     const recognizer = new GestureRecognizer(gestureSetForLayout(this.kbdLayout, this.gestureParams), config);

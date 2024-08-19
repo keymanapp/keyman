@@ -1,8 +1,9 @@
-import { type Keyboard, KeyboardKeymanGlobal, ProcessorInitOptions } from "@keymanapp/keyboard-processor";
-import { DOMKeyboardLoader as KeyboardLoader } from "@keymanapp/keyboard-processor/dom-keyboard-loader";
+import { type KeyEvent, type Keyboard, KeyboardKeymanGlobal } from "keyman/engine/keyboard";
+import { ProcessorInitOptions, RuleBehavior } from 'keyman/engine/js-processor';
+import { DOMKeyboardLoader as KeyboardLoader } from "keyman/engine/keyboard/dom-keyboard-loader";
 import { InputProcessor } from './headless/inputProcessor.js';
 import { OSKView } from "keyman/engine/osk";
-import { KeyboardRequisitioner, ModelCache, toUnprefixedKeyboardId as unprefixed } from "keyman/engine/package-cache";
+import { KeyboardRequisitioner, ModelCache, toUnprefixedKeyboardId as unprefixed } from "keyman/engine/keyboard-storage";
 import { ModelSpec, PredictionContext } from "keyman/engine/interfaces";
 
 import { EngineConfiguration, InitOptionSpec } from "./engineConfiguration.js";
@@ -10,8 +11,8 @@ import KeyboardInterface from "./keyboardInterface.js";
 import { ContextManagerBase } from "./contextManagerBase.js";
 import HardKeyboardBase from "./hardKeyboard.js";
 import { LegacyAPIEvents } from "./legacyAPIEvents.js";
-import { KeyEventHandler, EventNames, EventListener, LegacyEventEmitter } from "keyman/engine/events";
-import DOMCloudRequester from "keyman/engine/package-cache/dom-requester";
+import { EventNames, EventListener, LegacyEventEmitter } from "keyman/engine/events";
+import DOMCloudRequester from "keyman/engine/keyboard-storage/dom-requester";
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
 // From https://stackoverflow.com/a/69328045
@@ -28,6 +29,9 @@ function determineBaseLayout(): string {
     return 'us';
   }
 }
+
+export type KeyEventFullResultCallback = (result: RuleBehavior, error?: Error) => void;
+export type KeyEventFullHandler = (event: KeyEvent, callback?: KeyEventFullResultCallback) => void;
 
 export default class KeymanEngine<
   Configuration extends EngineConfiguration,
@@ -47,7 +51,7 @@ export default class KeymanEngine<
 
   protected keyEventRefocus?: () => void;
 
-  private keyEventListener: KeyEventHandler = (event, callback) => {
+  private keyEventListener: KeyEventFullHandler = (event, callback) => {
     const outputTarget = this.contextManager.activeTarget;
 
     if(!this.contextManager.activeKeyboard || !outputTarget) {
@@ -240,7 +244,7 @@ export default class KeymanEngine<
     this.contextManager.configure({
       resetContext: (target) => {
         // Could reset the target's deadkeys here, but it's really more of a 'core' task.
-        // So we delegate that to keyboard-processor.
+        // So we delegate that to keyboard.
         if(this.osk) {
           this.osk.batchLayoutAfter(() => {
             this.core.resetContext(target);
