@@ -280,9 +280,6 @@ LRESULT _kmnLowLevelKeyboardProc(
 }
 
 BOOL ProcessHotkey(UINT vkCode, BOOL isUp, DWORD ShiftState) {
-  if (UseRightModifierHotKey()) {
-    return FALSE;
-  }
 
   Hotkeys *hotkeys = Hotkeys::Instance();   // I4641
   if (!hotkeys) {
