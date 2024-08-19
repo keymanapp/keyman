@@ -57,9 +57,9 @@ if builder_start_action test:libraries; then
   "$KEYMAN_ROOT/common/models/templates/build.sh" test $TEST_OPTS
   popd
 
-  pushd "$KEYMAN_ROOT/common/web/lm-worker"
+  pushd "$KEYMAN_ROOT/web/src/engine/predictive-text/worker-thread"
   echo
-  echo "### Running ${BUILDER_TERM_START}common/web/lm-worker${BUILDER_TERM_END} tests"
+  echo "### Running ${BUILDER_TERM_START}web/src/engine/predictive-text/worker-thread${BUILDER_TERM_END} tests"
   ./build.sh test $TEST_OPTS
   popd
 
