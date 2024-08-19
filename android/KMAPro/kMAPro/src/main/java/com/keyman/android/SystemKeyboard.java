@@ -175,6 +175,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       }
     }
 
+    // Determine special handling for ENTER key
+    KMManager.setEnterMode(attribute.imeOptions, inputType);
+
     InputConnection ic = getCurrentInputConnection();
     if (ic != null) {
       ExtractedText icText = ic.getExtractedText(new ExtractedTextRequest(), 0);
