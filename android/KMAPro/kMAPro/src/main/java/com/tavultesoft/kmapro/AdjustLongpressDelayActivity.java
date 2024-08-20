@@ -1,5 +1,7 @@
-/**
- * Copyright (C) SIL International. All rights reserved.
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ * 
+ * (Optional description of this file)
  */
 package com.tavultesoft.kmapro;
 
