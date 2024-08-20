@@ -169,25 +169,20 @@ LRESULT _kmnLowLevelKeyboardProc(
 
   if (GetKeyState(VK_LCONTROL) < 0) {
     FHotkeyShiftState |= HK_CTRL;
+    SendDebugMessageFormat("ProcessHotkey VK_LCONTROL [vkCode:%x isUp:%d FHotkeyShiftState:%x useRight:%d", hs->vkCode, isUp, FHotkeyShiftState, UseRightModifierHotKey());
   }
 
   if (GetKeyState(VK_RCONTROL) < 0) {
     FHotkeyShiftState |= UseRightModifierHotKey() ? HK_CTRL : HK_RCTRL_INVALID;
+    SendDebugMessageFormat("ProcessHotkey VK_RCONTROL [vkCode:%x isUp:%d FHotkeyShiftState:%x useRight:%d", hs->vkCode, isUp, FHotkeyShiftState, UseRightModifierHotKey());
   }
-  if (GetKeyState(VK_CONTROL) < 0) {
-    FHotkeyShiftState |= (!UseRightModifierHotKey() && extended) ? HK_RCTRL_INVALID : HK_CTRL;
-  }
-
+  
   if (GetKeyState(VK_LMENU) < 0) {
     FHotkeyShiftState |= HK_ALT;
   }
 
   if (GetKeyState(VK_RMENU) < 0) {
     FHotkeyShiftState |= UseRightModifierHotKey() ? HK_ALT : HK_RALT_INVALID;
-  }
-
-  if (GetKeyState(VK_MENU) < 0) {
-    FHotkeyShiftState |= (!UseRightModifierHotKey() && extended) ? HK_RALT_INVALID : HK_ALT;
   }
 
   if (GetKeyState(VK_LSHIFT) < 0) {
@@ -197,9 +192,9 @@ LRESULT _kmnLowLevelKeyboardProc(
     FHotkeyShiftState |= UseRightModifierHotKey() ? HK_SHIFT : HK_RSHIFT_INVALID;
   }
 
-  if (GetKeyState(VK_SHIFT) < 0) {
-    FHotkeyShiftState |= (!UseRightModifierHotKey() && extended) ? HK_RSHIFT_INVALID : HK_SHIFT;
-  }
+  //if (GetKeyState(VK_SHIFT) < 0) {
+  //  FHotkeyShiftState |= (!UseRightModifierHotKey() && extended) ? HK_RSHIFT_INVALID : HK_SHIFT;
+  //}
 
   // #7337 Post the modifier state ensuring the serialized queue is in sync
   // Note that the modifier key may be posted again with WM_KEYMAN_KEY_EVENT,
