@@ -2106,12 +2106,10 @@ public final class KMManager {
 
   public static void applyKeyboardHeight(Context context, int height) {
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
-      InAppKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height));
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       InAppKeyboard.setLayoutParams(params);
     }
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM)) {
-      SystemKeyboard.loadJavascript(KMString.format("setOskHeight('%s')", height));
       RelativeLayout.LayoutParams params = getKeyboardLayoutParams();
       SystemKeyboard.setLayoutParams(params);
     }
