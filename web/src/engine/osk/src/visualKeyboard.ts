@@ -1267,6 +1267,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     const groupStyle = getComputedStyle(this.layerGroup.element);
 
     const isInDOM = computedStyle.height != '' && computedStyle.height != 'auto';
+    const isGroupInDOM = groupStyle.height != '' && groupStyle.height != 'auto';
 
     if (computedStyle.border) {
       this._borderWidth = new ParsedLengthStyle(computedStyle.borderWidth).val;
@@ -1279,10 +1280,11 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       this._computedHeight = this.height;
     } else if (isInDOM) {
       this._computedWidth = parseInt(computedStyle.width, 10);
-      if (!this._computedWidth) {
-        this._computedWidth = parseInt(groupStyle.width, 10);
-      }
       this._computedHeight = parseInt(computedStyle.height, 10);
+    } else if (isGroupInDOM) {
+      // May occur for documentation-keyboards, which are detached from their VisualKeyboard base.
+      this._computedWidth = parseInt(groupStyle.width, 10);
+      this._computedHeight = parseInt(groupStyle.height, 10);
     } else {
       // Cannot perform layout operations!
       return;
@@ -1618,6 +1620,11 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     // The stylesheet is currently built + constructed in the same code that attaches it to
     // the page.
     kbdObj.appendStyleSheet();
+
+    // Unset the width + height we used thus far; this method's consumer may choose to rescale
+    // the returned element.  If so, we don't want to use our outdated value by mistake.
+    delete kbdObj._width;
+    delete kbdObj._height;
 
     return classWrapper;
   }
