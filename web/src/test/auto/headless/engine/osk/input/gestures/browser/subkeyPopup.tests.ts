@@ -4,7 +4,7 @@ import { JSDOM } from 'jsdom';
 import sinon from 'sinon';
 
 import { GesturePath, GestureSequence, GestureSource, GestureSourceSubview } from '@keymanapp/gesture-recognizer';
-import { ActiveSubKey, DeviceSpec } from '@keymanapp/keyboard-processor';
+import { ActiveSubKey, DeviceSpec } from 'keyman/engine/keyboard';
 import { DEFAULT_GESTURE_PARAMS, KeyElement, VisualKeyboard } from 'keyman/engine/osk';
 import { OSKBaseKey, OSKRow, SubkeyPopup, link } from 'keyman/engine/osk/internals';
 
