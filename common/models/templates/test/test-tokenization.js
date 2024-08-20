@@ -517,6 +517,13 @@ describe('Tokenization functions', function() {
       // Does not address multiple blank-token ('') entries that result from intervening spaces;
       // that would add too much extra complexity to the method... and it can already be
       // handled decently by the predictive-text engine.
+      assert.deepEqual(
+        tokenized.left
+          .filter((entry) => !entry.isWhitespace)
+          .filter((entry) => entry.text != '')
+          .map((entry) => entry.text),
+        ['the', 'quick', 'brown', 'fox', 'jumped', 'over', 'the', 'lazy', 'dog']
+      );
     });
 
     it('properly works with well-formed custom wordbreaker output', function () {
