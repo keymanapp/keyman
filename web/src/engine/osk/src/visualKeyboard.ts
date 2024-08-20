@@ -1608,8 +1608,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
     // Unset the width + height we used thus far; this method's consumer may choose to rescale
     // the returned element.  If so, we don't want to use our outdated value by mistake.
-    delete kbdObj._width;
-    delete kbdObj._height;
+    kbdObj.setSize();
 
     return classWrapper;
   }
