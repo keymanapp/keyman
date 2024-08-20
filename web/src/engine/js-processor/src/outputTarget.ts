@@ -3,6 +3,7 @@
 import { extendString } from "@keymanapp/web-utils";
 import { findCommonSubstringEndIndex } from "./stringDivergence.js";
 import { Mock } from "./mock.js";
+import { OutputTarget as OutputTargetInterface } from 'keyman/engine/keyboard';
 
 extendString();
 
@@ -66,7 +67,7 @@ export class Transcription {
 
 export type Alternate = ProbabilityMass<Transform>;
 
-export default abstract class OutputTarget {
+export default abstract class OutputTarget implements OutputTargetInterface {
   private _dks: DeadkeyTracker;
 
   constructor() {

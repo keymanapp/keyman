@@ -31,6 +31,7 @@ export * from "./defaultRules.js";
 export { default as KeyEvent } from "./keyEvent.js";
 export * from "./keyEvent.js";
 export { default as KeyMapping } from "./keyMapping.js";
+export { OutputTarget } from "./outputTarget.interface.js";
 
 export * from "@keymanapp/web-utils";
 
