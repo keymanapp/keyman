@@ -310,6 +310,9 @@ public final class KMManager {
   public static final String KMDefault_DictionaryVersion = "0.1.4";
   public static final String KMDefault_DictionaryKMP = KMDefault_DictionaryPackageID + FileUtils.MODELPACKAGE;
 
+  // Default KeymanWeb longpress delay in milliseconds
+  public static final int KMDefault_LongpressDelay = 500;
+
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
   protected static final String KMFilename_JSEngine = "keymanweb-webview.js";
@@ -2083,22 +2086,35 @@ public final class KMManager {
   }
 
   /**
-   * Get the long-press delay (in milliseconds)
-   * @param context
-   * @return int - long-press delay in milliseconds
+   * Get the longpress delay (in milliseconds) from stored preference. Defaults to 500ms
+   * @return int - longpress delay in milliseconds
    */
-  public static int getLongpressDelay(Context context) {
-    int defaultDelay = 500; // default longpress delay in KeymanWeb (ms)
-    SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+  public static int getLongpressDelay() {
+    SharedPreferences prefs = appContext.getSharedPreferences(
+      appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
 
-    return prefs.getInt(KMManager.KMKey_LongpressDelay, defaultDelay);
+    return prefs.getInt(KMKey_LongpressDelay, KMDefault_LongpressDelay);
   }
 
   /**
-   * Update KeymanWeb with the long-press delay (in milliseconds)
-   * @param longpressDelay - int long-press delay in milliseconds
+   * Set the longpress delay (in milliseconds) as a stored preference.
+   * @param longpressDelay - int longpress delay in milliseconds
    */
   public static void setLongpressDelay(int longpressDelay) {
+    SharedPreferences prefs = appContext.getSharedPreferences(
+      appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+    editor.putInt(KMKey_LongpressDelay, longpressDelay);
+    editor.commit();
+  }
+
+  /**
+   * Sends options to the KeymanWeb keyboard.
+   * 1. number of milliseconds to trigger a longpress gesture.
+   * This method requires a keyboard to be loaded for the value to take effect.
+   */
+  public static void sendOptionsToKeyboard() {
+    int longpressDelay = getLongpressDelay();
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
       InAppKeyboard.loadJavascript(KMString.format("setLongpressDelay(%d)", longpressDelay));
     }

@@ -27,25 +27,24 @@ import com.keyman.engine.KMManager;
 public class AdjustLongpressDelayActivity extends BaseActivity {
   private static final String TAG = "AdjustLongpressDelay";
   public static final String adjustLongpressDelayKey = "AdjustLongpressDelay";
-  private static SharedPreferences.Editor editor = null;
 
   // Keeps track of the adjusted longpress delay time for saving.
   // Internally use milliseconds, but GUI displays seconds
-  private static int currentDelayTime = 500;  // ms
+  private static int currentDelayTimeMS = KMManager.KMDefault_LongpressDelay;  // ms
   private static int minLongpressTime = 300;   // ms
   private static int maxLongpressTime = 1500;  // ms
   private static int delayTimeIncrement = 200; // ms
 
   /**
-   * Convert currentDelayTime to progress
+   * Convert currentDelayTimeMS to progress
    * @return int
    */
   private int delayTimeToProgress() {
-    return (currentDelayTime / delayTimeIncrement) - 1;
+    return (currentDelayTimeMS / delayTimeIncrement) - 1;
   }
 
   /**
-   * Convert progress to currentDelayTime
+   * Convert progress to currentDelayTimeMS
    * @param progress
    * @return int (milliseconds)
    */
@@ -79,14 +78,12 @@ public class AdjustLongpressDelayActivity extends BaseActivity {
     adjustLongpressDelayActivityTitle.setTextColor(ContextCompat.getColor(this, R.color.ms_white));
     adjustLongpressDelayActivityTitle.setText(titleStr);
 
-    SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    editor = prefs.edit();
-    currentDelayTime = KMManager.getLongpressDelay(this);
+    currentDelayTimeMS = KMManager.getLongpressDelay();
 
     TextView adjustLongpressDelayText = (TextView) findViewById(R.id.delayTimeText);
-    String longpressDelayText = String.format(getString(R.string.longpress_delay_time), (float)(currentDelayTime/1000.0));
+    String longpressDelayTextSeconds = String.format(getString(R.string.longpress_delay_time), (float)(currentDelayTimeMS/1000.0));
     adjustLongpressDelayText.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-    adjustLongpressDelayText.setText(longpressDelayText);
+    adjustLongpressDelayText.setText(longpressDelayTextSeconds);
 
     final SeekBar seekBar = (SeekBar) findViewById(R.id.seekBar);
     seekBar.setProgress(delayTimeToProgress());
@@ -104,20 +101,19 @@ public class AdjustLongpressDelayActivity extends BaseActivity {
 
       @Override
       public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-        currentDelayTime = progressToDelayTime(progress);
-        String longpressDelayText = String.format(getString(R.string.longpress_delay_time), (float)(currentDelayTime/1000.0));
-        adjustLongpressDelayText.setText(longpressDelayText);
-
-        editor.putInt(KMManager.KMKey_LongpressDelay, currentDelayTime);
-        editor.commit();
+        // Update the text field.
+        // The keyboard options will be saved and sent to KeymanWeb when exiting the menu
+        currentDelayTimeMS = progressToDelayTime(progress);
+        String longpressDelayTextSeconds = String.format(getString(R.string.longpress_delay_time), (float)(currentDelayTimeMS/1000.0));
+        adjustLongpressDelayText.setText(longpressDelayTextSeconds);
       }
     });
 
     findViewById(R.id.delayTimeDownButton).setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        if (currentDelayTime > minLongpressTime) {
-          currentDelayTime -= delayTimeIncrement;
+        if (currentDelayTimeMS > minLongpressTime) {
+          currentDelayTimeMS -= delayTimeIncrement;
           seekBar.setProgress(delayTimeToProgress());
         }
       }
@@ -126,8 +122,8 @@ public class AdjustLongpressDelayActivity extends BaseActivity {
     findViewById(R.id.delayTimeUpButton).setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        if (currentDelayTime < maxLongpressTime) {
-          currentDelayTime += delayTimeIncrement;
+        if (currentDelayTimeMS < maxLongpressTime) {
+          currentDelayTimeMS += delayTimeIncrement;
           seekBar.setProgress(delayTimeToProgress());
         }
       }
@@ -136,8 +132,10 @@ public class AdjustLongpressDelayActivity extends BaseActivity {
 
   @Override
   public void onBackPressed() {
-    // Apply the adjusted longpress delay on exit
-    KMManager.setLongpressDelay(currentDelayTime);
+    // Store the longpress delay as a reference
+    // and then update KeymanWeb with the longpress delay
+    KMManager.setLongpressDelay(currentDelayTimeMS);
+    KMManager.sendOptionsToKeyboard();
 
     super.onBackPressed();
   }
