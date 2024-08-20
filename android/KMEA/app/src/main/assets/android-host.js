@@ -112,6 +112,11 @@ function notifyHost(event, params) {
   }, 10);
 }
 
+// Update the KeymanWeb longpress delay
+// delay is in milliseconds
+function setLongpressDelay(delay) {
+}
+
 // Update the KMW banner height
 // h is in dpi (different from iOS)
 function setBannerHeight(h) {

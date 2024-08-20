@@ -263,6 +263,8 @@ public final class KMManager {
   public static final String KMKey_KeyboardHeightPortrait = "keyboardHeightPortrait";
   public static final String KMKey_KeyboardHeightLandscape = "keyboardHeightLandscape";
 
+  public static final String KMKey_LongpressDelay = "longpressDelay";
+
   public static final String KMKey_CustomHelpLink = "CustomHelpLink";
   public static final String KMKey_KMPLink = "kmp";
   public static final String KMKey_UserKeyboardIndex = "UserKeyboardIndex";
@@ -2078,6 +2080,32 @@ public final class KMManager {
       return Configuration.ORIENTATION_LANDSCAPE;
     }
     return Configuration.ORIENTATION_UNDEFINED;
+  }
+
+  /**
+   * Get the long-press delay (in milliseconds)
+   * @param context
+   * @return int - long-press delay in milliseconds
+   */
+  public static int getLongpressDelay(Context context) {
+    int defaultDelay = 500; // default longpress delay in KeymanWeb (ms)
+    SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+
+    return prefs.getInt(KMManager.KMKey_LongpressDelay, defaultDelay);
+  }
+
+  /**
+   * Update KeymanWeb with the long-press delay (in milliseconds)
+   * @param longpressDelay - int long-press delay in milliseconds
+   */
+  public static void setLongpressDelay(int longpressDelay) {
+    if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
+      InAppKeyboard.loadJavascript(KMString.format("setLongpressDelay(%d)", longpressDelay));
+    }
+
+    if (SystemKeyboard != null) {
+      SystemKeyboard.loadJavascript(KMString.format("setLongpressDelay(%d)", longpressDelay));
+    }
   }
 
   public static int getBannerHeight(Context context) {
