@@ -234,6 +234,8 @@ export default class KeymanEngine<
     // Initialize supplementary plane string extensions
     String.kmwEnableSupplementaryPlane(true);
 
+    await this.core.init(config.paths);
+
     // Since we're not sandboxing keyboard loads yet, we just use `window` as the jsGlobal object.
     // All components initialized below require a properly-configured `config.paths` or similar.
     const keyboardLoader = new KeyboardLoader(this.interface, config.applyCacheBusting);

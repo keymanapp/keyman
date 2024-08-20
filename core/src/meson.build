@@ -118,6 +118,7 @@ api_files = files(
   'km_core_state_api.cpp',
   'km_core_debug_api.cpp',
   'km_core_processevent_api.cpp',
+  'wasm.cpp',
 )
 
 core_files = files(
@@ -132,6 +133,23 @@ core_files = files(
 mock_files = files(
   'mock/mock_processor.cpp',
 )
+
+if cpp_compiler.get_id() == 'emscripten'
+  host_links = ['--whole-archive', '-sALLOW_MEMORY_GROWTH=1', '-sMODULARIZE=1', '-sEXPORT_ES6', '-sENVIRONMENT=webview', '--embind-emit-tsd', 'core-interface.d.ts', '-sERROR_ON_UNDEFINED_SYMBOLS=0']
+
+  if cpp_compiler.version().version_compare('>=3.1.44')
+    # emscripten 3.1.44 removes .asm object and so we need to export `wasmExports`
+    # #9375; https://github.com/emscripten-core/emscripten/blob/main/ChangeLog.md#3144---072523
+    links += ['-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\',\'stringToNewUTF8\',\'wasmExports\']']
+  else
+    # emscripten < 3.1.44 does not include `wasmExports`
+    links += ['-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\',\'stringToNewUTF8\']']
+  endif
+
+  links += [
+      # Forcing inclusion of debug symbols
+      '-g', '-Wlimited-postlink-optimizations', '--bind']
+endif
 
 lib = library('keymancore',
   api_files,
@@ -160,3 +178,23 @@ pkg.generate(
     description: 'Keyman processor for KMN keyboards.',
     subdirs: headerdirs,
     libraries: lib)
+
+if cpp_compiler.get_id() == 'emscripten'
+  # Build an executable
+  host = executable('core',
+    cpp_args: defns,
+    include_directories: inc,
+    link_args: links + host_links,
+    objects: lib.extract_all_objects(recursive: false))
+
+  if get_option('buildtype') == 'release'
+    # Split debug symbols into separate wasm file for release builds only
+    # as the release symbols will be uploaded to sentry
+    # custom_target('kmcmplib.wasm',
+    #   depends: host,
+    #   input: host,
+    #   output: 'kmcmplib.wasm',
+    #   command: ['wasm-split', '@OUTDIR@/wasm-host.wasm', '-o', '@OUTPUT@', '--strip', '--debug-out=@OUTDIR@/kmcmplib.debug.wasm'],
+    #   build_by_default: true)
+  endif
+endif

@@ -58,8 +58,16 @@ compile_and_copy() {
   mkdir -p "$KEYMAN_ROOT/web/build/app/resources/osk"
   cp -R "$KEYMAN_ROOT/web/src/resources/osk/." "$KEYMAN_ROOT/web/build/app/resources/osk/"
 
+  # Copy the WASM host
+  cp "${KEYMAN_ROOT}/web/build/engine/core-processor/obj/import/core/"core.{js,wasm} "${KEYMAN_ROOT}/web/build/app/webview/debug/"
+  cp "${KEYMAN_ROOT}/web/build/engine/core-processor/obj/import/core/"core.{js,wasm} "${KEYMAN_ROOT}/web/build/app/webview/release/"
+
   # Clean the sourcemaps of .. and . components
   for script in "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME/debug/"*.js; do
+    if [[ "${script}" == *"/core.js" ]]; then
+      continue
+    fi
+
     sourcemap="$script.map"
     node "$KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js" \
       "$script" "$sourcemap" --clean --inline
@@ -68,6 +76,9 @@ compile_and_copy() {
   # Do NOT inline sourcemaps for release builds - we don't want them to affect
   # load time.
   for script in "$KEYMAN_ROOT/web/build/$SUBPROJECT_NAME/release/"*.js; do
+    if [[ "${script}" == *"/core.js" ]]; then
+      continue
+    fi
     sourcemap="$script.map"
     node "$KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js" \
       "$script" "$sourcemap" --clean

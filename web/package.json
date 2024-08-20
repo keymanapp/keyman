@@ -12,10 +12,10 @@
       "types": "./build/engine/attachment/obj/index.d.ts",
       "import": "./build/engine/attachment/obj/index.js"
     },
-    "./engine/interfaces": {
-      "es6-bundling": "./src/engine/interfaces/src/index.ts",
-      "types": "./build/engine/interfaces/obj/index.d.ts",
-      "import": "./build/engine/interfaces/obj/index.js"
+    "./engine/core-processor": {
+      "es6-bundling": "./src/engine/core-processor/src/index.ts",
+      "types": "./build/engine/core-processor/obj/index.d.ts",
+      "import": "./build/engine/core-processor/obj/index.js"
     },
     "./engine/device-detect": {
       "es6-bundling": "./src/engine/device-detect/src/index.ts",
@@ -36,6 +36,11 @@
       "es6-bundling": "./src/engine/events/src/index.ts",
       "types": "./build/engine/events/obj/index.d.ts",
       "import": "./build/engine/events/obj/index.js"
+    },
+    "./engine/interfaces": {
+      "es6-bundling": "./src/engine/interfaces/src/index.ts",
+      "types": "./build/engine/interfaces/obj/index.d.ts",
+      "import": "./build/engine/interfaces/obj/index.js"
     },
     "./engine/js-processor": {
       "es6-bundling": "./src/engine/js-processor/src/index.ts",
@@ -112,6 +117,7 @@
     "@sentry/cli": "^2.31.0",
     "@zip.js/zip.js": "^2.7.32",
     "c8": "^7.12.0",
+    "express": "^4.19.2",
     "jsdom": "^23.0.1",
     "mocha": "^10.0.0"
   },

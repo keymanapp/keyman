@@ -41,6 +41,11 @@ export default {
       files: ['build/test/dom/cases/browser/**/*.spec.mjs']
     },
     {
+      name: 'engine/core-processor',
+      // Relative, from the containing package.json
+      files: ['build/test/dom/cases/core-processor/**/*.spec.mjs']
+    },
+    {
       name: 'engine/dom-utils',
       // Relative, from the containing package.json
       files: ['build/test/dom/cases/dom-utils/**/*.spec.mjs']
@@ -59,7 +64,7 @@ export default {
       name: 'engine/keyboard-storage',
       // Relative, from the containing package.json
       files: ['build/test/dom/cases/keyboard-storage/**/*.spec.mjs']
-    }
+    },
   ],
   middleware: [
     // Rewrites short-hand paths for test resources, making them fully relative to the repo root.
@@ -68,6 +73,12 @@ export default {
         context.url = '/web/src/test/auto' + context.url;
       }
 
+      return next();
+    },
+    function rewriteWasmContentType(context, next) {
+      if (context.url.endsWith('.wasm')) {
+        context.headers['content-type'] = 'application/wasm';
+      }
       return next();
     }
   ],
