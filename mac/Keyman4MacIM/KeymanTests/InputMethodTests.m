@@ -96,7 +96,6 @@ id testClient = nil;
  */
 - (void)testCheckCompliance_withUnknownApplicationId_createsComplianceObject {
   id client = [[AppleCompliantTestClient alloc] init];
-  //NSString *clientAppId = @"com.compliant.app";
   KMInputMethodEventHandler *eventHandler = [[KMInputMethodEventHandler alloc]initWithClient:nil client:client];
   [eventHandler checkTextApiCompliance:client];
   XCTAssertNotNil(eventHandler.apiCompliance, @"apiCompliance object was not created");
@@ -128,8 +127,5 @@ id testClient = nil;
   [testEventHandler checkTextApiCompliance:testClient];
   XCTAssertNotEqualObjects(originalComplianceObject, testEventHandler.apiCompliance, @"New TextApiCompliance object not created after contextChanged flag set");
 }
-
-
-
 
 @end
