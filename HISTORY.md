@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 18.0.93 alpha 2024-08-20
+
+*  (#12188)
+* fix(web): fix malformed reversion display strings (#12201)
+* feat(android): Add menu to specify long-press delay (#12170)
+* feat(android): Pass longpress delay to KeymanWeb (#12185)
+*  (#12223)
+
 ## 18.0.92 alpha 2024-08-19
 
 * chore(deps-dev): bump @75lb/deep-merge from 1.1.1 to 1.1.2 (#12118)
