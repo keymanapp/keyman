@@ -1623,6 +1623,11 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
     // Unset the width + height we used thus far; this method's consumer may choose to rescale
     // the returned element.  If so, we don't want to use our outdated value by mistake.
+    //
+    // While `kbdObj.setSize()` could be used in theory, it _also_ unsets the element styling.
+    // We actually wish to _leave_ this styling in place - one of our parameters is `height`, and
+    // it should remain in place in the styling on the output element as the default in case
+    // the consumer _doesn't_ add styling afterward.
     delete kbdObj._width;
     delete kbdObj._height;
 
