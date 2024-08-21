@@ -127,22 +127,32 @@ refreshenv
 ```
 
 **Environment variables**:
-* [`KEYMAN_ROOT`](#keyman_root)
+
+If you pull the entire `keyman.git` repo to `c:\keyman`, then the paths by
+default will work without changes. Otherwise, you will need to set an
+environment variable `KEYMAN_ROOT` to the root path of the Keyman repo. For
+example:
 
 ```bat
-SET KEYMAN_ROOT=c:\Projects\keyman\keyman
+SETX KEYMAN_ROOT "c:\Projects\keyman\keyman"
 ```
 
-To check whether environment variables are set, run `SET <variable>` in command
-prompt.
+> [!NOTE]
+> The `SETX` command will set persistent environment variables but they do not 
+> impact the current shell environment. Start a new shell to see the variables.
 
-You can use Windows Settings to add these environment variables permanently:
-
-1. In Windows Search, type "environment" and select "Edit System Environment
-   Variables"
-2. Click `Environment Variables...`
-3. You can add or edit variables in either User or System settings, as you
-   prefer.
+> [!TIP]
+>
+> To check whether environment variables are set, run `SET <variable>` in command
+> prompt.
+>
+> You can use Windows Settings to add these environment variables permanently:
+> 
+> 1. In Windows Search, type "environment" and select "Edit System Environment
+>    Variables"
+> 2. Click `Environment Variables...`
+> 3. You can add or edit variables in either User or System settings, as you
+>    prefer.
 
 ### Web Dependencies
 
@@ -177,11 +187,19 @@ can be found, but always in the upstream\emscripten subdirectory where you
 installed emsdk.
 
 **Environment variables**:
-* `EMSCRIPTEN_BASE`: `<your-emsdk-path>\upstream\emscripten`
+
+```bat
+SETX EMSCRIPTEN_BASE "<your-emsdk-path>\upstream\emscripten"
+```
 
 **Optional environment variables**:
-* `KEYMAN_USE_EMSDK`: `1` to let the Keyman build scripts control the
-  version of Emscripten installed on your computer.
+
+To let the Keyman build scripts control the version of Emscripten 
+installed on your computer:
+
+```bat
+SETX KEYMAN_USE_EMSDK 1
+```
 
 After installing emscripten, you'll need to install node.js and openjdk.
 
@@ -191,14 +209,19 @@ Our recommended way to install node.js is to use
 [nvm-windows](https://github.com/coreybutler/nvm-windows). This makes it
 easy to switch between versions of node.js.
 
-```
+```bat
 nvm install 20.16.0
 nvm use 20.16.0
 ```
 
 **Optional environment variables**:
-* `KEYMAN_USE_NVM`: `1` to let the Keyman build scripts control the
-  version of node.js installed and active on your computer.
+
+To let the Keyman build scripts control the version of node.js installed
+and active on your computer:
+
+```bat
+SETX KEYMAN_USE_NVM 1
+````
 
 See [node.md](node.md) for more information, including automatic selection
 of appropriate node versions during builds.
@@ -252,10 +275,27 @@ of appropriate node versions during builds.
   * Add the C:\Projects\keyman\keyman\windows\lib folder in the Keyman
     repository to your `PATH` environment variable. This is required for
     Keyman's design-time packages to load in Delphi.
-* [`KEYMAN_CEF4DELPHI_ROOT`](#keyman_cef4delphi_root)
+
+### KEYMAN_CEF4DELPHI_ROOT
+
+Keyman and Keyman Developer use Chromium Embedded Framework. The source repo is
+at https://github.com/keymanapp/CEF4Delphi. In order to build the installers, we
+need to source the binary files from the
+https://github.com/keymanapp/CEF4Delphi_binary repo. The
+`KEYMAN_CEF4DELPHI_ROOT` environment variable should be set to the root of this
+repo on your local machine.
+
+The version of CEF in use is determined by CEF_VERSION.md. This maps to a branch
+prefixed with `v` e.g. `v89.0.18` in the CEF4Delphi_binary repository. During a
+release build, the common/windows/cef-checkout.sh script will checkout the correct
+branch of the repository automatically and extract any compressed files found in
+it.
+
+The [`KEYMAN_CEF4DELPHI_ROOT`](#keyman_cef4delphi_root) variable is
+used to specify the path to the CEF4Delphi binaries.
 
 ```bat
-SET KEYMAN_CEF4DELPHI_ROOT=c:\Projects\keyman\CEF4Delphi_Binary
+SETX KEYMAN_CEF4DELPHI_ROOT "c:\Projects\keyman\CEF4Delphi_Binary"
 ```
 
 **Additional requirements for release builds**:
@@ -309,8 +349,11 @@ choco install openjdk
 * Run Android Studio once after installation to install additional components
   such as emulator images and SDK updates.
 
+<!--
+
 **Required environment variables**:
-* [`JAVA_HOME`](#java_home)
+SETX JAVA_HOME`](#java_home)
+-->
 
 ## Certificates
 
@@ -318,38 +361,6 @@ In order to make a release build, you need to sign all the executables. See
 [windows/src/README.md#Certificates](../../windows/src/README.md#Certificates)
 for details on how to create test code signing certificates or specify your own
 certificates for the build.
-
-## Notes on Environment Variables
-
-### KEYMAN_ROOT
-
-If you pull the entire `keyman.git` repo to `c:\keyman`, then the paths by
-default will work without changes. Otherwise, you will need to set an
-environment variable `KEYMAN_ROOT` to the root path of the Keyman repo. For
-example:
-
-```bat
-SET KEYMAN_ROOT=c:\projects\keyman\keyman
-```
-
-### KEYMAN_CEF4DELPHI_ROOT
-
-Keyman and Keyman Developer use Chromium Embedded Framework. The source repo is
-at https://github.com/keymanapp/CEF4Delphi. In order to build the installers, we
-need to source the binary files from the
-https://github.com/keymanapp/CEF4Delphi_binary repo. The
-`KEYMAN_CEF4DELPHI_ROOT` environment variable should be set to the root of this
-repo on your local machine.
-
-The version of CEF in use is determined by CEF_VERSION.md. This maps to a branch
-prefixed with `v` e.g. `v89.0.18` in the CEF4Delphi_binary repository. During a
-release build, the common/windows/cef-checkout.sh script will checkout the correct
-branch of the repository automatically and extract any compressed files found in
-it.
-
-### JAVA_HOME
-
-This environment variable tells Gradle what version of Java to use for building Keyman for Android.
 
 ## Optional Tools
 
