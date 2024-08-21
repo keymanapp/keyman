@@ -1,4 +1,4 @@
-/**
+/*
  * Keyman is copyright (C) SIL International. MIT License.
  *
  * KMResourcesRepository.m
@@ -15,30 +15,39 @@
 #import "KMLogs.h"
 
 @interface KMDataRepository ()
-@property (readonly) NSURL *applicationSupportSubDirectory;   // '~/Library/Application Support'
-@property (readonly) NSURL *documentsSubDirectory;    // '~/Documents'
-@property (readonly) NSURL *obsoleteKeymanKeyboardsDirectory; // '~/Library/Documents/Keyman-Keyboards'
+@property (readonly) NSURL *applicationSupportSubDirectory;
+@property (readonly) NSURL *documentsSubDirectory;
+@property (readonly) NSURL *obsoleteKeymanKeyboardsDirectory;
 @end
 
 @implementation KMDataRepository
-
+/**
+ * Two directory trees are represented by the following properties, one in active use
+ * and one that is obsolete.
+ * The actively used directories, begin with the parent
+ *    applicationSupportSubDirectory: '~/Library/Application Support'
+ *      keymanDataDirectory: '~/Library/Application Support/keyman.inputmethod.Keyman'
+ *        keymanKeyboardsDirectory: '~/Library/Application Support/keyman.inputmethod.Keyman/Keyman-Keyboards'
+ * The obsolete directories, begin with the parent
+ *    documentsSubDirectory: '~/Documents'
+ *      obsoleteKeymanKeyboardsDirectory: '~/Documents/Keyman-Keyboards'
+ */
 @synthesize applicationSupportSubDirectory = _applicationSupportSubDirectory;
-@synthesize documentsSubDirectory = _documentsSubDirectory;
-@synthesize keymanKeyboardsDirectory = _keymanKeyboardsDirectory;
-@synthesize obsoleteKeymanKeyboardsDirectory = _obsoleteKeymanKeyboardsDirectory;
 @synthesize keymanDataDirectory = _keymanDataDirectory;
+@synthesize keymanKeyboardsDirectory = _keymanKeyboardsDirectory;
+@synthesize documentsSubDirectory = _documentsSubDirectory;
+@synthesize obsoleteKeymanKeyboardsDirectory = _obsoleteKeymanKeyboardsDirectory;
 
 NSString *const kKeyboardsDirectoryName = @"Keyman-Keyboards";
 /* 
  The name of the subdirectory within '~/Library/Application Support'.
- The convention is to use bundle identifier.
- (Using the subsystem id, "com.keyman.app", is a poor choice because the API
+ We follow the convention of using the bundle identifier rather than our subsystem id.
+ (Also, using the subsystem id, "com.keyman.app", is a poor choice because the API
  createDirectoryAtPath sees the .app extension and creates an application file.
  */
 NSString *const kKeymanSubdirectoryName = @"keyman.inputmethod.Keyman";
 
-+ (KMDataRepository *)shared
-{
++ (KMDataRepository *)shared {
   static KMDataRepository *shared = nil;
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
@@ -149,7 +158,11 @@ NSString *const kKeymanSubdirectoryName = @"keyman.inputmethod.Keyman";
   }
   return _obsoleteKeymanKeyboardsDirectory;
 }
-
+/**
+ *  Only called from migrateData.
+ *  Causes user to be prompted for permission to access ~/Documents, but they should already have it.
+ *  otherwise we would not be attempting to migrate.
+ */
 - (BOOL)keyboardsExistInObsoleteDirectory {
   NSFileManager *fileManager = [NSFileManager defaultManager];
   BOOL isDir;
@@ -158,7 +171,10 @@ NSString *const kKeymanSubdirectoryName = @"keyman.inputmethod.Keyman";
 }
 
 /**
- * Migrate the keyboards data from the old location in '/Documents' to the new location '/Application Support/keyman.inputmethod.Keyman/'
+ * Migrate the keyboards data from the old location in '~/Documents' to the new location '~/Application Support/keyman.inputmethod.Keyman/'
+ * This should only be called if the Keyman settings written to the UserDefaults indicates that we have data in the old location.
+ * If this is the case, then we expect the user to have already granted permission for Keyman to access the ~/Documents directory.
+ * If that permission has been removed for some reason, then calling this code will cause the user to be asked for permission again.
  */
 - (BOOL)migrateData {
   BOOL didMoveData = NO;

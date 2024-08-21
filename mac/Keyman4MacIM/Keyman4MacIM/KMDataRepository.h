@@ -1,4 +1,4 @@
-/**
+/*
  * Keyman is copyright (C) SIL International. MIT License.
  *
  * KMDataRepository.h
@@ -13,9 +13,9 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface KMDataRepository : NSObject
-@property (readonly) NSURL *keymanDataDirectory;      // '~/Library/Application Support/com.keyman.app'
+@property (readonly) NSURL *keymanDataDirectory;      // '~/Library/Application Support/keyman.inputmethod.Keyman'
 @property (readonly) NSURL *keymanKeyboardsDirectory;
-// keymanKeyboardsDirectory = '~/Library/Application Support/com.keyman.app/Keyman-Keyboards'
+// keymanKeyboardsDirectory = '~/Library/Application Support/keyman.inputmethod.Keyman/Keyman-Keyboards'
 + (KMDataRepository *)shared;
 - (void)createDataDirectoryIfNecessary;
 - (void)createKeyboardsDirectoryIfNecessary;
