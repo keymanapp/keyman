@@ -950,13 +950,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    * @returns
    */
   getSimpleTapCorrectionDistances(input: InputSample<KeyElement, string>, keySpec?: ActiveKey): Map<ActiveKeyBase, number> {
-    // TODO: It'd be nice to optimize by keeping these off when unused, but the wiring
-    //       necessary would get in the way of modularization at the moment.
-    // let keyman = com.keyman.singleton;
-    // if (!keyman.core.languageProcessor.mayCorrect) {
-    //   return null;
-    // }
-
     // Note:  if subkeys are active, they will still be displayed at this time.
     let touchKbdPos = this.getTouchCoordinatesOnKeyboard(input);
     let layerGroup = this.layerGroup.element;  // Always has proper dimensions, unlike kbdDiv itself.

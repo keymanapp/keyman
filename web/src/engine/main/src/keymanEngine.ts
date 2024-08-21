@@ -55,6 +55,10 @@ export default class KeymanEngine<
       return;
     }
 
+    if(!this.core.languageProcessor.mayCorrect) {
+      event.keyDistribution = [];
+    }
+
     if(this.keyEventRefocus) {
       // Do anything needed to guarantee that the outputTarget stays active (`app/browser`: maintains focus).
       // (Interaction with the OSK may have de-focused the element providing active context;
