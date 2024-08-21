@@ -6,13 +6,13 @@ On Windows, you can build the following projects:
 
 * [Keyman for Android](#keyman-for-android)
 * [Keyman for Windows](#keyman-for-windows)
-* [Keyman Developer](#keyman-developer) (together with Keyman for Windows)
+* [Keyman Developer](#keyman-developer)
 * [KeymanWeb](#keymanweb)
 
 The following libraries can also be built:
 
-* Keyman Core (Windows, wasm targets) (aka core)
-* Common/Web
+* Keyman Core (Windows, wasm targets)
+* Common libraries
 
 The following projects **cannot** be built on Windows:
 
@@ -123,7 +123,6 @@ PowerShell.
 # for *much* faster download, hide progress bar (PowerShell/PowerShell#2138)
 $ProgressPreference = 'SilentlyContinue'
 choco install git jq python ninja pandoc meson
-refreshenv
 ```
 
 **Environment variables**:
@@ -146,7 +145,8 @@ SETX KEYMAN_ROOT "c:\Projects\keyman\keyman"
 > To check whether environment variables are set, run `SET <variable>` in command
 > prompt.
 >
-> You can use Windows Settings to add these environment variables permanently:
+> You can alternatively use Windows Settings to add these environment variables
+> permanently:
 > 
 > 1. In Windows Search, type "environment" and select "Edit System Environment
 >    Variables"
@@ -167,24 +167,26 @@ SETX KEYMAN_ROOT "c:\Projects\keyman\keyman"
 
 #### Emscripten
 
-In an appropriate folder, e.g. `/c/Projects/keyman/`, in bash, run the following commands:
+In bash, run the following commands:
 
 ```bash
+cd /c/Projects/keyman
 git clone https://github.com/emscripten-core/emsdk
 cd emsdk
 emsdk install 3.1.58
 emsdk activate 3.1.58
 ```
 
-Note: emscripten very unhelpfully overwrites JAVA_HOME, and adds its own
-versions of Python, Node and Java to the PATH. For best results, restart
-your shell after installing Emscripten so that you don't end up with the
-wrong versions.
+> ![WARNING]
+> Emscripten very unhelpfully overwrites `JAVA_HOME`, and adds its own
+> versions of Python, Node and Java to the `PATH`. For best results, restart
+> your shell after installing Emscripten so that you don't end up with the
+> wrong versions.
 
 There is no need to add emscripten to the path in order to build Keyman.
-However, you should set the EMSCRIPTEN_BASE variable to the path where `emcc`
-can be found, but always in the upstream\emscripten subdirectory where you
-installed emsdk.
+However, you should set the `EMSCRIPTEN_BASE` variable to the path where `emcc`
+can be found, in the `upstream\emscripten` subdirectory of where you installed 
+emsdk.
 
 **Environment variables**:
 
@@ -259,10 +261,12 @@ of appropriate node versions during builds.
   ```ps1
   choco install visualstudio2019community visualstudio2019-workload-nativedesktop visualstudio2019buildtools
   ```
+  
   * Verify required build tools are installed
     * Run `Visual Studio Installer`
     * Check the `Individual components` tab
-    * Verify `MSVC v142 - VS 2019 c++ x64/x86 build tools (Latest)` is installed. If not, install it.
+    * Verify `MSVC v142 - VS 2019 c++ x64/x86 build tools (Latest)` is installed.
+      If not, install it.
 
   Recommended: configure Visual Studio to use two-space tab stops:
   1. Open the options dialog: Tools > Options.
@@ -272,7 +276,7 @@ of appropriate node versions during builds.
 
 **Required environment variables**:
 * `PATH`
-  * Add the C:\Projects\keyman\keyman\windows\lib folder in the Keyman
+  * Add the `C:\Projects\keyman\keyman\windows\lib` folder in the Keyman
     repository to your `PATH` environment variable. This is required for
     Keyman's design-time packages to load in Delphi.
 
@@ -327,7 +331,12 @@ git clone https://github.com/keymanapp/CEF4Delphi_Binary C:\Projects\keyman\CEF4
 
 ```ps1
 # Elevated PowerShell
-choco install android-sdk android-studio ant gradle maven
+choco install android-sdk androidstudio ant gradle maven
+```
+
+Start a new shell to get the new paths and then update Android SDKs:
+
+```ps1
 # optionally install sdk images
 sdkmanager "system-images;android-33;google_apis;armeabi-v7a"
 sdkmanager --update
@@ -348,12 +357,6 @@ choco install openjdk
 
 * Run Android Studio once after installation to install additional components
   such as emulator images and SDK updates.
-
-<!--
-
-**Required environment variables**:
-SETX JAVA_HOME`](#java_home)
--->
 
 ## Certificates
 
