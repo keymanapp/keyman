@@ -1,9 +1,9 @@
 import { KmnCompilerMessages } from "../compiler/kmn-compiler-messages.js";
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageDef as def, CompilerMessageSpec } from "@keymanapp/common-types";
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageDef as def, CompilerMessageSpec } from "@keymanapp/developer-utils";
 import { kmnfile } from "./compiler-globals.js";
 
 const Namespace = CompilerErrorNamespace.KmwCompiler;
-// const SevInfo = CompilerErrorSeverity.Info | Namespace;
+const SevInfo = CompilerErrorSeverity.Info | Namespace;
 const SevHint = CompilerErrorSeverity.Hint | Namespace;
 // const SevWarn = CompilerErrorSeverity.Warn | Namespace;
 const SevError = CompilerErrorSeverity.Error | Namespace;
@@ -30,9 +30,8 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
 
   // Following messages are kmw-compiler only, so use KmwCompiler error namespace
 
-  static ERROR_NotAnyRequiresVersion14 = SevError | 0x0001;
-  static Error_NotAnyRequiresVersion14 = (o:{line: number}) => m(this.ERROR_NotAnyRequiresVersion14,
-    `Statement notany in context() match requires version 14.0+ of KeymanWeb`, o);
+  // 0x0001 - Reserved for removed identifier ERROR_NotAnyRequiresVersion14 =
+  //          SevError | 0x0001, added in 17.0, removed in 18.0
 
   static ERROR_TouchLayoutIdentifierRequires15 = SevError | 0x0002;
   static Error_TouchLayoutIdentifierRequires15 = (o:{keyId:string, platformName:string, layerId:string}) => m(this.ERROR_TouchLayoutIdentifierRequires15,
@@ -49,4 +48,10 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
   static HINT_TouchLayoutUsesUnsupportedGesturesDownlevel = SevHint | 0x0005;
   static Hint_TouchLayoutUsesUnsupportedGesturesDownlevel = (o:{keyId:string}) => m(this.HINT_TouchLayoutUsesUnsupportedGesturesDownlevel,
     `The touch layout uses a flick or multi-tap gesture on key ${def(o.keyId)}, which is only available on version 17.0+ of Keyman`);
+
+  static INFO_MinimumWebEngineVersion = SevInfo | 0x0006;
+  static Info_MinimumWebEngineVersion = (o:{version:string}) => m(
+    this.INFO_MinimumWebEngineVersion,
+    `The compiler has assigned a minimum web engine version of ${o.version} based on features used in this keyboard`
+  );
 };

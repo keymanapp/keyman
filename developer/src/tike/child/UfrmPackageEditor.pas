@@ -1802,7 +1802,7 @@ begin
   cmdKeyboardRemoveLanguage.Enabled := e;
   cmdKeyboardEditLanguage.Enabled := e;
 
-  e := (lbKeyboards.ItemIndex >= 0) and (gridKeyboardLanguages.Row > 0);
+  e := (lbKeyboards.ItemIndex >= 0) and (gridKeyboardExamples.Row > 0);
   gridKeyboardExamples.Enabled := e;
   cmdKeyboardRemoveExample.Enabled := e;
   cmdKeyboardEditExample.Enabled := e;

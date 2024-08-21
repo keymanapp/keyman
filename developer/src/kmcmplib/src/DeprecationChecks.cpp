@@ -6,15 +6,14 @@
 #include "kmcmplib.h"
 #include "DeprecationChecks.h"
 
-KMX_BOOL kmcmp::WarnDeprecatedHeader() {   // I4866
-if( AWarnDeprecatedCode_GLOBAL_LIB){
-  AddWarningBool(CWARN_HeaderStatementIsDeprecated);
+void kmcmp::WarnDeprecatedHeader() {   // I4866
+  if (AWarnDeprecatedCode_GLOBAL_LIB) {
+    ReportCompilerMessage(KmnCompilerMessages::WARN_HeaderStatementIsDeprecated);
   }
-  return TRUE;
 }
 
 /* Flag presence of deprecated features */
-KMX_BOOL kmcmp::CheckForDeprecatedFeatures(PFILE_KEYBOARD fk) {
+void kmcmp::CheckForDeprecatedFeatures(PFILE_KEYBOARD fk) {
   /*
     For Keyman 10, we deprecated:
       // < Keyman 7
@@ -31,7 +30,7 @@ KMX_BOOL kmcmp::CheckForDeprecatedFeatures(PFILE_KEYBOARD fk) {
   PFILE_STORE sp;
 
   if (!AWarnDeprecatedCode_GLOBAL_LIB) {
-    return TRUE;
+    return;
   }
 
   if (fk->version >= VERSION_100) {
@@ -42,12 +41,10 @@ KMX_BOOL kmcmp::CheckForDeprecatedFeatures(PFILE_KEYBOARD fk) {
           sp->dwSystemID == TSS_ETHNOLOGUECODE ||
           sp->dwSystemID == TSS_WINDOWSLANGUAGES) {
         kmcmp::currentLine = sp->line;
-        AddWarningBool(CWARN_LanguageHeadersDeprecatedInKeyman10);
+        ReportCompilerMessage(KmnCompilerMessages::WARN_LanguageHeadersDeprecatedInKeyman10);
       }
     }
   }
 
   kmcmp::currentLine = oldCurrentLine;
-
-  return TRUE;
 }

@@ -73,30 +73,19 @@ function compile_schemas() {
   node tools/schema-bundler.js
 }
 
-function copy_cldr_imports() {
-  # Store CLDR imports
-  # load all versions that have a cldr_info.json
-  for CLDR_INFO_PATH in "$KEYMAN_ROOT/resources/standards-data/ldml-keyboards/"*/cldr_info.json
-  do
-    # TODO-LDML: developer/src/inst/download.in.mak needs these also...
-    CLDR_PATH=$(dirname "$CLDR_INFO_PATH")
-    CLDR_VER=$(basename "$CLDR_PATH")
-    mkdir -p "$THIS_SCRIPT_PATH/build/src/import/$CLDR_VER"
-    # TODO-LDML: When these are copied, the DOCTYPE will break due to the wrong path. We don't use the DTD so it should be OK.
-    cp "$CLDR_INFO_PATH" "$CLDR_PATH/import/"*.xml "$THIS_SCRIPT_PATH/build/src/import/$CLDR_VER/"
-  done
-}
 
 function do_configure() {
   compile_schemas
-  copy_cldr_imports
   verify_npm_setup
 }
 
 function do_test() {
   eslint .
   tsc --build test
-  c8 --skip-full --reporter=lcov --reporter=text mocha "${builder_extra_params[@]}"
+  readonly C8_THRESHOLD=50
+  c8 -skip-full --reporter=lcov --reporter=text --lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD mocha "${builder_extra_params[@]}"
+  builder_echo warning "Coverage thresholds are currently $C8_THRESHOLD%, which is lower than ideal."
+  builder_echo warning "Please increase threshold in build.sh as test coverage improves."
 }
 
 #-------------------------------------------------------------------------------------------------------------------

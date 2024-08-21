@@ -1,7 +1,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import { LayrCompiler } from '../src/compiler/layr.js';
-import { CompilerMessages } from '../src/compiler/messages.js';
+import { LdmlCompilerMessages } from '../src/compiler/ldml-compiler-messages.js';
 import { compilerTestCallbacks, testCompilationCases } from './helpers/index.js';
 import { KMXPlus } from '@keymanapp/common-types';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
@@ -95,7 +95,7 @@ describe('layr', function () {
     {
       subpath: 'sections/keys/invalid-bad-modifier.xml',
       errors: [
-        CompilerMessages.Error_InvalidModifier({
+        LdmlCompilerMessages.Error_InvalidModifier({
           layer: 'base',
           modifiers: 'altR-shift'
         }),
@@ -103,12 +103,12 @@ describe('layr', function () {
     },
     {
       subpath: 'sections/layr/invalid-multi-hardware.xml',
-      errors: [CompilerMessages.Error_ExcessHardware({ formId: 'iso' })],
+      errors: [LdmlCompilerMessages.Error_ExcessHardware({ formId: 'iso' })],
     },
     {
       // missing layer element
       subpath: 'sections/layr/invalid-missing-layer.xml',
-      errors: [CompilerMessages.Error_MustBeAtLeastOneLayerElement()],
+      errors: [LdmlCompilerMessages.Error_MustBeAtLeastOneLayerElement()],
     },
     {
       // keep in sync with similar test in test-keys.ts
@@ -128,6 +128,12 @@ describe('layr', function () {
           ['', constants.keys_mod_ctrl | constants.keys_mod_shift, 'c'],
         ]);
       },
+    },
+    {
+      subpath: 'sections/layr/error-bogus-modifiers.xml',
+      errors: [
+        LdmlCompilerMessages.Error_InvalidModifier({ layer: '', modifiers: 'caps bogus'}),
+      ]
     },
   ]);
 });

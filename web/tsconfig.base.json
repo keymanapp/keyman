@@ -8,10 +8,9 @@
     "allowSyntheticDefaultImports": true,
 
     "lib": ["es6"],
-    "target": "es5",
+    "target": "es6",
 
     // Other settings - declaration files, sourcemapping, and other miscellaneous bits.
-    "allowJs": false,
     "declaration": true,
     "experimentalDecorators": true,
     "importHelpers": true,

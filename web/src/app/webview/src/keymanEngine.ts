@@ -1,8 +1,9 @@
-import { DefaultRules, DeviceSpec, RuleBehavior, Keyboard } from '@keymanapp/keyboard-processor'
+import { DeviceSpec, DefaultRules } from 'keyman/engine/keyboard';
+import { RuleBehavior } from 'keyman/engine/js-processor';
 import { KeymanEngine as KeymanEngineBase, KeyboardInterface } from 'keyman/engine/main';
 import { AnchoredOSKView, ViewConfiguration, StaticActivator } from 'keyman/engine/osk';
 import { getAbsoluteX, getAbsoluteY } from 'keyman/engine/dom-utils';
-import { toPrefixedKeyboardId, toUnprefixedKeyboardId } from 'keyman/engine/package-cache';
+import { toPrefixedKeyboardId, toUnprefixedKeyboardId } from 'keyman/engine/keyboard-storage';
 
 import { WebviewConfiguration, WebviewInitOptionDefaults, WebviewInitOptionSpec } from './configuration.js';
 import ContextManager, { ContextHost } from './contextManager.js';
@@ -71,32 +72,7 @@ export default class KeymanEngine extends KeymanEngineBase<WebviewConfiguration,
     });
 
     this.contextManager.initialize();
-    this.config.finalizeInit();
 
-    // Is triggered by the previous call.
-    // Defer to allow any pending stubs to be registered
-    await this.config.deferForInitialization;
-
-    // Was at least one stub pre-registered?
-    const kbdCache = this.keyboardRequisitioner.cache;
-    const firstStub = kbdCache.defaultStub;
-    let firstKeyboard: Keyboard;
-    if(firstStub) {
-      // If so, the common engine will have automatically started fetching it.
-      // Wait for the keyboard to load in order to avoid the high cost of building
-      // a stand-in we'll automatically replace.
-      try {
-        // Re-uses pre-existing fetch requests and fetched keyboards.
-        firstKeyboard = await kbdCache.fetchKeyboardForStub(firstStub);
-      } catch { /* in case of failed fetch due to network error or bad URI; we must still let the OSK init. */ };
-    }
-
-    const keyboardConfig: ViewConfiguration['keyboardToActivate'] = firstKeyboard ? {
-      keyboard: firstKeyboard,
-      metadata: firstStub
-    } : null;
-
-    // We construct the OSK now to avoid layout reflow thrashing from building a stand-in keyboard if possible.
     const oskConfig: ViewConfiguration = {
       hostDevice: this.config.hostDevice,
       pathConfig: this.config.paths,
@@ -107,13 +83,13 @@ export default class KeymanEngine extends KeymanEngineBase<WebviewConfiguration,
       predictionContextManager: this.contextManager.predictionContext,
       heightOverride: this.getOskHeight,
       widthOverride: this.getOskWidth,
-      isEmbedded: true,
-      keyboardToActivate: keyboardConfig
+      isEmbedded: true
     };
 
-    const osk = new AnchoredOSKView(oskConfig);
-    setupEmbeddedListeners(this, osk);
-    this.osk = osk;
+    this.osk = new AnchoredOSKView(oskConfig);
+    setupEmbeddedListeners(this, this.osk);
+
+    this.config.finalizeInit();
   }
 
   // Functions that the old 'app/webview' equivalent had always provided to the WebView

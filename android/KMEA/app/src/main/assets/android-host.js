@@ -37,11 +37,7 @@ function init() {
   keyman.beepKeyboard = beepKeyboard;
 
   // Readies the keyboard stub for instant loading during the init process.
-  try {
-    KeymanWeb.registerStub(JSON.parse(jsInterface.initialKeyboard()));
-  } catch(error) {
-    console.error(error);
-  }
+  KeymanWeb.registerStub(JSON.parse(jsInterface.initialKeyboard()));
 
   keyman.init({
     'embeddingApp':device,
@@ -116,6 +112,17 @@ function notifyHost(event, params) {
   }, 10);
 }
 
+// Update the KeymanWeb longpress delay
+// delay is in milliseconds
+function setLongpressDelay(delay) {
+  if (keyman.osk) {
+    keyman.osk.gestureParams.longpress.waitLength = delay;
+    console.debug('setLongpressDelay('+delay+')');
+  } else {
+    window.console.log('setLongpressDelay error: keyman.osk undefined');
+  }
+}
+
 // Update the KMW banner height
 // h is in dpi (different from iOS)
 function setBannerHeight(h) {
@@ -145,7 +152,7 @@ function setOskHeight(h) {
 
 function setOskWidth(w) {
   if(w > 0) {
-    oskWidth = w;
+    oskWidth = w / window.devicePixelRatio;
   }
 }
 
@@ -335,6 +342,14 @@ function menuKeyUp() {
   fragmentToggle = (fragmentToggle + 1) % 100;
   var hash = 'globeKeyAction&fragmentToggle=' + fragmentToggle + '&keydown=false';
   window.location.hash = hash;
+}
+
+// The keyboard-picker displayed via Android longpress disrupts Web-side
+// gesture-handling; this function helps force-clear the globe key's highlighting.
+function clearGlobeHighlight() {
+  if(keyman.osk && keyman.osk.vkbd && keyman.osk.vkbd.currentLayer.globeKey) {
+    keyman.osk.vkbd.currentLayer.globeKey.highlight(false)
+  }
 }
 
 function hideKeyboard() {

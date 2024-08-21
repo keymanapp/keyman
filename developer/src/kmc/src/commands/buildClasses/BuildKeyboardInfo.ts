@@ -1,6 +1,8 @@
 import * as fs from 'fs';
+import * as path from 'path';
 import { BuildActivity } from './BuildActivity.js';
-import { CompilerCallbacks, KeymanFileTypes } from '@keymanapp/common-types';
+import { KeymanFileTypes } from '@keymanapp/common-types';
+import { CompilerCallbacks } from '@keymanapp/developer-utils';
 import { KeyboardInfoCompiler } from '@keymanapp/kmc-keyboard-info';
 import { loadProject } from '../../util/projectLoader.js';
 import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
@@ -34,7 +36,8 @@ export class BuildKeyboardInfo extends BuildActivity {
 
     const keyboard = project.files.find(file => file.fileType == KeymanFileTypes.Source.KeymanKeyboard);
     const jsFilename = keyboard ? project.resolveOutputFilePath(keyboard, KeymanFileTypes.Source.KeymanKeyboard, KeymanFileTypes.Binary.WebKeyboard) : null;
-    const lastCommitDate = getLastGitCommitDate(project.projectPath);
+    const historyPath = path.join(project.projectPath, KeymanFileTypes.HISTORY_MD);
+    const lastCommitDate = getLastGitCommitDate(fs.existsSync(historyPath) ? historyPath : project.projectPath);
     const sources = {
       kmpFilename:  project.resolveOutputFilePath(kps, KeymanFileTypes.Source.Package, KeymanFileTypes.Binary.Package),
       kpsFilename: project.resolveInputFilePath(kps),

@@ -114,13 +114,13 @@
 		};
 		E211CCF420B5FE7A00505C36 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 12;
+			buildActionMask = 8;
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
 				E211CCF620B600A500505C36 /* KeymanEngine4Mac.framework.dSYM in CopyFiles */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 		};
 		E27BA9CF202036BA00D273E7 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
@@ -257,6 +257,12 @@
 		29C1E1772800227700759EDE /* pt-PT */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-PT"; path = "pt-PT.lproj/KMKeyboardHelpWindowController.strings"; sourceTree = "<group>"; };
 		29C1E1782800227800759EDE /* pt-PT */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-PT"; path = "pt-PT.lproj/MainMenu.strings"; sourceTree = "<group>"; };
 		29C1E179280025A900759EDE /* pt-PT */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-PT"; path = "pt-PT.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		29D470942C648D5100224B4F /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/KMAboutWindowController.strings; sourceTree = "<group>"; };
+		29D470952C648D5100224B4F /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/preferences.strings; sourceTree = "<group>"; };
+		29D470962C648D5200224B4F /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/KMInfoWindowController.strings; sourceTree = "<group>"; };
+		29D470972C648D5200224B4F /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/KMKeyboardHelpWindowController.strings; sourceTree = "<group>"; };
+		29D470982C648D5200224B4F /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/MainMenu.strings; sourceTree = "<group>"; };
+		29D470992C648D7100224B4F /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/Localizable.strings; sourceTree = "<group>"; };
 		29DD8400276C49E20066A16E /* am */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = am; path = am.lproj/KMAboutWindowController.strings; sourceTree = "<group>"; };
 		29DD8401276C49E20066A16E /* am */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = am; path = am.lproj/preferences.strings; sourceTree = "<group>"; };
 		29DD8402276C49E30066A16E /* am */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = am; path = am.lproj/KMInfoWindowController.strings; sourceTree = "<group>"; };
@@ -795,6 +801,7 @@
 				uk,
 				ru,
 				es,
+				el,
 			);
 			mainGroup = 989C9BFF1A7876DE00A20425;
 			productRefGroup = 989C9C091A7876DE00A20425 /* Products */;
@@ -1053,6 +1060,7 @@
 				298566D42980D47C004ACA95 /* uk */,
 				298566E02980E579004ACA95 /* ru */,
 				CEFFECD82A417FEA00D58C36 /* es */,
+				29D470942C648D5100224B4F /* el */,
 			);
 			name = KMAboutWindowController.xib;
 			sourceTree = "<group>";
@@ -1079,6 +1087,7 @@
 				298566D52980D47D004ACA95 /* uk */,
 				298566E12980E579004ACA95 /* ru */,
 				CEFFECD92A417FEB00D58C36 /* es */,
+				29D470952C648D5100224B4F /* el */,
 			);
 			name = preferences.xib;
 			path = Keyman4MacIM/KMConfiguration;
@@ -1105,6 +1114,7 @@
 				298566D92980D489004ACA95 /* uk */,
 				298566E52980E584004ACA95 /* ru */,
 				CEFFECDD2A4180FD00D58C36 /* es */,
+				29D470992C648D7100224B4F /* el */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1131,6 +1141,7 @@
 				298566D62980D47D004ACA95 /* uk */,
 				298566E22980E57A004ACA95 /* ru */,
 				CEFFECDA2A417FEB00D58C36 /* es */,
+				29D470962C648D5200224B4F /* el */,
 			);
 			name = KMInfoWindowController.xib;
 			path = Keyman4MacIM/KMInfoWindow;
@@ -1158,6 +1169,7 @@
 				298566D72980D47D004ACA95 /* uk */,
 				298566E32980E57A004ACA95 /* ru */,
 				CEFFECDB2A417FEC00D58C36 /* es */,
+				29D470972C648D5200224B4F /* el */,
 			);
 			name = KMKeyboardHelpWindowController.xib;
 			path = Keyman4MacIM/KMKeyboardHelpWindow;
@@ -1185,6 +1197,7 @@
 				298566D82980D47E004ACA95 /* uk */,
 				298566E42980E57A004ACA95 /* ru */,
 				CEFFECDC2A417FEC00D58C36 /* es */,
+				29D470982C648D5200224B4F /* el */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";

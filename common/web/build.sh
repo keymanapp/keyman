@@ -10,7 +10,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 #
 # TODO: future modules may include
-#   :lm-message-types \
 #   :sentry-manager \
 #
 

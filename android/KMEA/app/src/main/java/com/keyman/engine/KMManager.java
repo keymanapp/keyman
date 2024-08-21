@@ -25,7 +25,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
@@ -180,6 +179,19 @@ public final class KMManager {
     }
   }
 
+  // Enum for how the System Keyboard ENTER key is handled for the EditorInfo action
+  // Reference: https://developer.android.com/reference/android/view/inputmethod/EditorInfo#summary
+  public enum EnterModeType {
+    GO,        // Go action
+    SEARCH,    // Search action
+    SEND,      // Send action
+    NEXT,      // Next action
+    DONE,      // Done action
+    PREVIOUS,  // Previous action
+    NEWLINE,   // Send newline character
+    DEFAULT,   // Default ENTER action
+  }
+
   protected static InputMethodService IMService;
 
   private static boolean debugMode = false;
@@ -218,6 +230,9 @@ public final class KMManager {
   // regardless what the Settings preference is.
   private static boolean mayPredictOverride = false;
 
+  // Determine how system keyboard handles ENTER key
+  public static EnterModeType enterMode = EnterModeType.DEFAULT;
+
   // Boolean for whether a keyboard can send embedded KMW crash reports to Sentry
   // When maySendCrashReport is false, KMW will still attempt to send crash reports, but it
   // will be blocked.
@@ -247,6 +262,8 @@ public final class KMManager {
   public static final String KMKey_KeyboardRTL = "rtl";
   public static final String KMKey_KeyboardHeightPortrait = "keyboardHeightPortrait";
   public static final String KMKey_KeyboardHeightLandscape = "keyboardHeightLandscape";
+
+  public static final String KMKey_LongpressDelay = "longpressDelay";
 
   public static final String KMKey_CustomHelpLink = "CustomHelpLink";
   public static final String KMKey_KMPLink = "kmp";
@@ -293,11 +310,12 @@ public final class KMManager {
   public static final String KMDefault_DictionaryVersion = "0.1.4";
   public static final String KMDefault_DictionaryKMP = KMDefault_DictionaryPackageID + FileUtils.MODELPACKAGE;
 
+  // Default KeymanWeb longpress delay in milliseconds
+  public static final int KMDefault_LongpressDelay = 500;
+
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
-  protected static final String KMFilename_KeyboardHtml_Legacy = "keyboard.es5.html";
   protected static final String KMFilename_JSEngine = "keymanweb-webview.js";
-  protected static final String KMFilename_JSLegacyEngine = "keymanweb-webview.es5.js";
   protected static final String KMFilename_JSSentry = "sentry.min.js";
   protected static final String KMFilename_JSSentryInit = "keyman-sentry.js";
   protected static final String KMFilename_AndroidHost = "android-host.js";
@@ -858,25 +876,11 @@ public final class KMManager {
   private static void copyAssets(Context context) {
     AssetManager assetManager = context.getAssets();
 
-    // Will build a temp WebView in order to check Chrome version internally.
-    boolean legacyMode = WebViewUtils.getEngineWebViewVersionStatus(context, null, null) != WebViewUtils.EngineWebViewVersionStatus.FULL;
-
     try {
       // Copy KMW files
-      if(legacyMode) {
-        // Replaces the standard ES6-friendly version of the host page with a legacy one that
-        // includes polyfill requests and that links the legacy, ES5-compatible version of KMW.
-        copyAssetWithRename(context, KMFilename_KeyboardHtml_Legacy, KMFilename_KeyboardHtml, "", true);
+      copyAsset(context, KMFilename_KeyboardHtml, "", true);
 
-        copyAsset(context, KMFilename_JSLegacyEngine, "", true);
-      } else {
-        copyAsset(context, KMFilename_KeyboardHtml, "", true);
-
-        // For versions of Chrome with full ES6 support, we use the ES6 artifact.
-        copyAsset(context, KMFilename_JSEngine, "", true);
-      }
-
-      // Is still built targeting ES5.
+      copyAsset(context, KMFilename_JSEngine, "", true);
       copyAsset(context, KMFilename_JSSentry, "", true);
       copyAsset(context, KMFilename_JSSentryInit, "", true);
       copyAsset(context, KMFilename_AndroidHost, "", true);
@@ -886,12 +890,6 @@ public final class KMManager {
 
       // Copy default keyboard font
       copyAsset(context, KMDefault_KeyboardFont, "", true);
-
-      if(legacyMode) {
-        copyAsset(context, KMFilename_JSPolyfill, "", true);
-        copyAsset(context, KMFilename_JSPolyfill2, "", true);
-        copyAsset(context, KMFilename_JSPolyfill3, "", true);
-      }
 
       // Keyboard packages directory
       File packagesDir = new File(getPackagesDir());
@@ -1274,6 +1272,61 @@ public final class KMManager {
   }
 
   /**
+   * Sets enterMode which specifies how the System keyboard ENTER key is handled
+   *
+   * @param imeOptions EditorInfo.imeOptions
+   * @param inputType  InputType
+   */
+  public static void setEnterMode(int imeOptions, int inputType) {
+    if ((inputType & InputType.TYPE_TEXT_FLAG_MULTI_LINE) != 0) {
+      enterMode = EnterModeType.NEWLINE;
+      return;
+    }
+
+    int imeActions = imeOptions & EditorInfo.IME_MASK_ACTION;
+    EnterModeType value = EnterModeType.DEFAULT;
+
+    switch (imeActions) {
+      case EditorInfo.IME_ACTION_GO:
+        value = EnterModeType.GO;
+        break;
+
+      case EditorInfo.IME_ACTION_SEARCH:
+        value = EnterModeType.SEARCH;
+        break;
+
+      case EditorInfo.IME_ACTION_SEND:
+        value = EnterModeType.SEND;
+        break;
+
+      case EditorInfo.IME_ACTION_NEXT:
+        value = EnterModeType.NEXT;
+        break;
+
+      case EditorInfo.IME_ACTION_DONE:
+        value = EnterModeType.DONE;
+        break;
+
+      case EditorInfo.IME_ACTION_PREVIOUS:
+        value = EnterModeType.PREVIOUS;
+        break;
+
+      default:
+        value = EnterModeType.DEFAULT;
+    }
+
+    enterMode = value;
+  }
+
+  /**
+   * Get the value of enterMode
+   * @return EnterModeType
+   */
+  public static EnterModeType getEnterMode() {
+    return enterMode;
+  }
+
+  /**
    * Sets mayPredictOverride true if the InputType field is a hidden password text field
    * (either TYPE_TEXT_VARIATION_PASSWORD or TYPE_TEXT_VARIATION_WEB_PASSWORD
    * but not TYPE_TEXT_VARIATION_VISIBLE_PASSWORD)
@@ -1638,7 +1691,7 @@ public final class KMManager {
 
   public static boolean isDefaultKey(String key) {
     return (
-      key != null && 
+      key != null &&
       key.equals(KMString.format("%s_%s", KMDefault_LanguageID, KMDefault_KeyboardID)));
   }
 
@@ -2032,6 +2085,45 @@ public final class KMManager {
     return Configuration.ORIENTATION_UNDEFINED;
   }
 
+  /**
+   * Get the longpress delay (in milliseconds) from stored preference. Defaults to 500ms
+   * @return int - longpress delay in milliseconds
+   */
+  public static int getLongpressDelay() {
+    SharedPreferences prefs = appContext.getSharedPreferences(
+      appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+
+    return prefs.getInt(KMKey_LongpressDelay, KMDefault_LongpressDelay);
+  }
+
+  /**
+   * Set the longpress delay (in milliseconds) as a stored preference.
+   * @param longpressDelay - int longpress delay in milliseconds
+   */
+  public static void setLongpressDelay(int longpressDelay) {
+    SharedPreferences prefs = appContext.getSharedPreferences(
+      appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+    editor.putInt(KMKey_LongpressDelay, longpressDelay);
+    editor.commit();
+  }
+
+  /**
+   * Sends options to the KeymanWeb keyboard.
+   * 1. number of milliseconds to trigger a longpress gesture.
+   * This method requires a keyboard to be loaded for the value to take effect.
+   */
+  public static void sendOptionsToKeyboard() {
+    int longpressDelay = getLongpressDelay();
+    if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
+      InAppKeyboard.loadJavascript(KMString.format("setLongpressDelay(%d)", longpressDelay));
+    }
+
+    if (SystemKeyboard != null) {
+      SystemKeyboard.loadJavascript(KMString.format("setLongpressDelay(%d)", longpressDelay));
+    }
+  }
+
   public static int getBannerHeight(Context context) {
     int bannerHeight = 0;
     if (InAppKeyboard != null && InAppKeyboard.getBanner() != BannerType.BLANK) {
@@ -2084,11 +2176,11 @@ public final class KMManager {
       wm.getDefaultDisplay().getSize(size);
       return size;
     }
-    
+
     WindowMetrics windowMetrics = wm.getCurrentWindowMetrics();
     return new Point(
       windowMetrics.getBounds().width(),
-      windowMetrics.getBounds().height());    
+      windowMetrics.getBounds().height());
   }
 
   public static float getWindowDensity(Context context) {

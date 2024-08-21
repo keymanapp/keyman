@@ -2,8 +2,8 @@ import 'mocha';
 import { assert } from 'chai';
 import { KmnCompiler } from '../src/main.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
-import { CompilerMessages } from '../src/compiler/kmn-compiler-messages.js';
-import { compilerErrorFormatCode } from '@keymanapp/common-types';
+import { KmnCompilerMessages } from '../src/compiler/kmn-compiler-messages.js';
+import { compilerErrorFormatCode } from '@keymanapp/developer-utils';
 
 describe('Compiler UnicodeSet function', function() {
   it('should fixup "short" \\u{} escapes', function () {
@@ -101,11 +101,11 @@ describe('Compiler UnicodeSet function', function() {
     assert(compiler.verifyInitialized());
     // map from string to failing error
     const failures = {
-      '[:Adlm:]': CompilerMessages.ERROR_UnicodeSetHasProperties, // what it saye
-      '[acegik]': CompilerMessages.FATAL_UnicodeSetOutOfRange, // 6 ranges, allocated 1
-      '[[\\p{Mn}]&[A-Z]]': CompilerMessages.ERROR_UnicodeSetHasProperties,
-      '[abc{def}]': CompilerMessages.ERROR_UnicodeSetHasStrings,
-      '[[]': CompilerMessages.ERROR_UnicodeSetSyntaxError,
+      '[:Adlm:]': KmnCompilerMessages.ERROR_UnicodeSetHasProperties, // what it saye
+      '[acegik]': KmnCompilerMessages.FATAL_UnicodeSetOutOfRange, // 6 ranges, allocated 1
+      '[[\\p{Mn}]&[A-Z]]': KmnCompilerMessages.ERROR_UnicodeSetHasProperties,
+      '[abc{def}]': KmnCompilerMessages.ERROR_UnicodeSetHasStrings,
+      '[[]': KmnCompilerMessages.ERROR_UnicodeSetSyntaxError,
     };
     for(const [pat, expected] of Object.entries(failures)) {
       {
@@ -118,7 +118,7 @@ describe('Compiler UnicodeSet function', function() {
         assert.equal(code, expected, `${compilerErrorFormatCode(code)}≠${compilerErrorFormatCode(expected)} got ${firstMessage.message} for parsing ${pat}`);
       }
       // skip 'out of range' because that one won't fail during sizing.
-      if (expected !== CompilerMessages.FATAL_UnicodeSetOutOfRange) {
+      if (expected !== KmnCompilerMessages.FATAL_UnicodeSetOutOfRange) {
         // verify fails size
         callbacks.clear();
         assert.equal(compiler.sizeUnicodeSet(pat), -1, `sizing ${pat}`);

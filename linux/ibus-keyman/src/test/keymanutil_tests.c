@@ -10,25 +10,40 @@
 #define TEST_FIXTURE "keymanutil-test"
 
 void
-_delete_tst_options_key(gchar* testname) {
+_delete_tst_keyboard_options_key(const gchar* testname) {
   g_autofree gchar *path = g_strdup_printf("%s%s/%s/", KEYMAN_DCONF_OPTIONS_PATH, TEST_FIXTURE, testname);
   g_autoptr(GSettings) settings = g_settings_new_with_path(KEYMAN_DCONF_OPTIONS_CHILD_NAME, path);
   g_settings_reset(settings, KEYMAN_DCONF_OPTIONS_KEY);
 }
 
 void
-_set_tst_options_key(gchar* testname, gchar** options) {
+_set_tst_keyboard_options_key(const gchar* testname, const gchar* const* options) {
   g_autofree gchar* path = g_strdup_printf("%s%s/%s/", KEYMAN_DCONF_OPTIONS_PATH, TEST_FIXTURE, testname);
   g_autoptr(GSettings) settings = g_settings_new_with_path(KEYMAN_DCONF_OPTIONS_CHILD_NAME, path);
-  g_settings_set_strv(settings, KEYMAN_DCONF_OPTIONS_KEY, (const gchar* const*)options);
+  g_settings_set_strv(settings, KEYMAN_DCONF_OPTIONS_KEY, options);
 }
 
 gchar**
-_get_tst_options_key(gchar* testname) {
+_get_tst_keyboard_options_key(const gchar* testname) {
   g_autofree gchar* path = g_strdup_printf("%s%s/%s/", KEYMAN_DCONF_OPTIONS_PATH, TEST_FIXTURE, testname);
   g_autoptr(GSettings) settings = g_settings_new_with_path(KEYMAN_DCONF_OPTIONS_CHILD_NAME, path);
   gchar** result = g_settings_get_strv(settings, KEYMAN_DCONF_OPTIONS_KEY);
   return result;
+}
+
+void _reset_tst_option(const gchar* key) {
+  g_autoptr(GSettings) settings = g_settings_new(KEYMAN_DCONF_OPTIONS_NAME);
+  g_settings_reset(settings, key);
+}
+
+void _set_tst_option(const gchar* key, gboolean value) {
+  g_autoptr(GSettings) settings = g_settings_new(KEYMAN_DCONF_OPTIONS_NAME);
+  g_settings_set_boolean(settings, key, value);
+}
+
+gboolean _get_tst_option(const gchar* key) {
+  g_autoptr(GSettings) settings = g_settings_new(KEYMAN_DCONF_OPTIONS_NAME);
+  return g_settings_get_boolean(settings, key);
 }
 
 void
@@ -126,58 +141,58 @@ _kmn_assert_cmpstrv(gchar** result, gchar** expected) {
 
 //----------------------------------------------------------------------------------------------
 void
-test_keyman_put_options_todconf__invalid() {
+test_keyman_put_keyboard_options_todconf__invalid() {
   // Initialize
-  gchar* testname = "test_keyman_put_options_todconf__test_keyman_put_options_todconf__invalid";
-  _delete_tst_options_key(testname);
+  const gchar* testname = __FUNCTION__;
+  _delete_tst_keyboard_options_key(testname);
 
   // Execute
-  keyman_put_options_todconf(TEST_FIXTURE, testname, "new_key", NULL);
+  keyman_put_keyboard_options_todconf(TEST_FIXTURE, testname, "new_key", NULL);
 
   // Verify
-  g_auto(GStrv) options = _get_tst_options_key(testname);
+  g_auto(GStrv) options = _get_tst_keyboard_options_key(testname);
   g_assert_nonnull(options);
   g_assert_null(options[0]);
 
   // Cleanup
-  _delete_tst_options_key(testname);
+  _delete_tst_keyboard_options_key(testname);
 }
 
 void
-test_keyman_put_options_todconf__new_key() {
+test_keyman_put_keyboard_options_todconf__new_key() {
   // Initialize
-  gchar* testname = "test_keyman_put_options_todconf__new_key";
-  _delete_tst_options_key(testname);
+  const gchar* testname = __FUNCTION__;
+  _delete_tst_keyboard_options_key(testname);
   g_autofree gchar* value = g_strdup_printf("%d", g_test_rand_int());
 
   // Execute
-  keyman_put_options_todconf(TEST_FIXTURE, testname, "new_key", value);
+  keyman_put_keyboard_options_todconf(TEST_FIXTURE, testname, "new_key", value);
 
   // Verify
-  g_auto(GStrv) options = _get_tst_options_key(testname);
+  g_auto(GStrv) options = _get_tst_keyboard_options_key(testname);
   g_autofree gchar* expected = g_strdup_printf("new_key=%s", value);
   g_assert_nonnull(options);
   g_assert_cmpstr(options[0], ==, expected);
   g_assert_null(options[1]);
 
   // Cleanup
-  _delete_tst_options_key(testname);
+  _delete_tst_keyboard_options_key(testname);
 }
 
 void
-test_keyman_put_options_todconf__other_keys() {
+test_keyman_put_keyboard_options_todconf__other_keys() {
   // Initialize
-  gchar* testname = "test_keyman_put_options_todconf__other_keys";
-  _delete_tst_options_key(testname);
-  gchar* existingKeys[] = {"key1=val1", "key2=val2", NULL};
-  _set_tst_options_key(testname, existingKeys);
+  const gchar* testname = __FUNCTION__;
+  _delete_tst_keyboard_options_key(testname);
+  const gchar* const existingKeys[] = {"key1=val1", "key2=val2", NULL};
+  _set_tst_keyboard_options_key(testname, existingKeys);
   g_autofree gchar* value = g_strdup_printf("%d", g_test_rand_int());
 
   // Execute
-  keyman_put_options_todconf(TEST_FIXTURE, testname, "new_key", value);
+  keyman_put_keyboard_options_todconf(TEST_FIXTURE, testname, "new_key", value);
 
   // Verify
-  g_auto(GStrv) options = _get_tst_options_key(testname);
+  g_auto(GStrv) options = _get_tst_keyboard_options_key(testname);
   g_autofree gchar* expected = g_strdup_printf("new_key=%s", value);
   g_assert_nonnull(options);
   g_assert_cmpstr(options[0], ==, "key1=val1");
@@ -186,23 +201,23 @@ test_keyman_put_options_todconf__other_keys() {
   g_assert_null(options[3]);
 
   // Cleanup
-  _delete_tst_options_key(testname);
+  _delete_tst_keyboard_options_key(testname);
 }
 
 void
-test_keyman_put_options_todconf__existing_key() {
+test_keyman_put_keyboard_options_todconf__existing_key() {
   // Initialize
-  gchar* testname = "test_keyman_put_options_todconf__existing_key";
-  _delete_tst_options_key(testname);
-  gchar* existingKeys[] = {"key1=val1", "new_key=val2", NULL};
-  _set_tst_options_key(testname, existingKeys);
+  const gchar* testname = __FUNCTION__;
+  _delete_tst_keyboard_options_key(testname);
+  const gchar* const existingKeys[] = {"key1=val1", "new_key=val2", NULL};
+  _set_tst_keyboard_options_key(testname, existingKeys);
   g_autofree gchar* value = g_strdup_printf("%d", g_test_rand_int());
 
   // Execute
-  keyman_put_options_todconf(TEST_FIXTURE, testname, "new_key", value);
+  keyman_put_keyboard_options_todconf(TEST_FIXTURE, testname, "new_key", value);
 
   // Verify
-  g_auto(GStrv) options = _get_tst_options_key(testname);
+  g_auto(GStrv) options = _get_tst_keyboard_options_key(testname);
   g_autofree gchar* expected = g_strdup_printf("new_key=%s", value);
   g_assert_nonnull(options);
   g_assert_cmpstr(options[0], ==, "key1=val1");
@@ -210,7 +225,215 @@ test_keyman_put_options_todconf__existing_key() {
   g_assert_null(options[2]);
 
   // Cleanup
-  _delete_tst_options_key(testname);
+  _delete_tst_keyboard_options_key(testname);
+}
+
+//----------------------------------------------------------------------------------------------
+void test_keyman_put_option_todconf__set_to_true() {
+  // Initialize
+  gboolean prevValue = _get_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR);
+
+  // Execute
+  gboolean result = keyman_put_option_todconf(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR, TRUE);
+
+  // Verify
+  g_assert_true(result);
+  g_assert_true(_get_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR));
+
+  // Cleanup
+  _set_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR, prevValue);
+}
+
+void test_keyman_put_option_todconf__set_to_false() {
+  // Initialize
+  gboolean prevValue = _get_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR);
+
+  // Execute
+  gboolean result = keyman_put_option_todconf(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR, FALSE);
+
+  // Verify
+  g_assert_true(result);
+  g_assert_false(_get_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR));
+
+  // Cleanup
+  _set_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR, prevValue);
+}
+
+//----------------------------------------------------------------------------------------------
+void test_keyman_get_option_fromdconf__default() {
+  // Initialize
+  gboolean prevValue = _get_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR);
+  _reset_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR);
+
+  // Execute
+  gboolean result = keyman_get_option_fromdconf(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR);
+
+  // Verify
+  g_assert_false(result);
+
+  // Cleanup
+  _set_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR, prevValue);
+}
+
+//----------------------------------------------------------------------------------------------
+static gint count = 0;
+static gpointer data = NULL;
+
+void on_settings_change(GSettings* settings, gchar* key, gpointer user_data) {
+  count++;
+  data = user_data;
+}
+
+void test_keyman_subscribe_option_changes__create() {
+  // Initialize
+  gboolean prevValue = _get_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR);
+  void* settings     = NULL;
+  count              = 0;
+  data               = NULL;
+  gchar* user_data   = "foo";
+
+  // Execute
+  settings = keyman_subscribe_option_changes(on_settings_change, user_data);
+
+  // Verify
+  g_assert_nonnull(settings);
+
+  // Cleanup
+  keyman_unsubscribe_option_changes(settings, on_settings_change, user_data);
+  _set_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR, prevValue);
+}
+
+void test_keyman_subscribe_option_changes__callback_called_init_false() {
+  // Initialize
+  gboolean prevValue = _get_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR);
+  _set_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR, FALSE);
+  count              = 0;
+  data               = NULL;
+  gchar* user_data   = "foo";
+  void* settings     = keyman_subscribe_option_changes(on_settings_change, user_data);
+
+  // Execute
+  _set_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR, TRUE);
+
+  // Verify
+  g_assert_cmpint(count, ==, 1);
+  g_assert_cmpstr(data, ==, user_data);
+
+  // Cleanup
+  keyman_unsubscribe_option_changes(settings, on_settings_change, user_data);
+  _set_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR, prevValue);
+}
+
+void test_keyman_subscribe_option_changes__callback_called_init_true() {
+  // Initialize
+  gboolean prevValue = _get_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR);
+  _set_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR, TRUE);
+  count              = 0;
+  data               = NULL;
+  void* settings     = keyman_subscribe_option_changes(on_settings_change, NULL);
+
+  // Execute
+  _set_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR, FALSE);
+
+  // Verify
+  g_assert_cmpint(count, ==, 1);
+
+  // Cleanup
+  keyman_unsubscribe_option_changes(settings, on_settings_change, NULL);
+  _set_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR, prevValue);
+}
+
+void test_keyman_subscribe_option_changes__callback_called_toggle() {
+  // Initialize
+  gboolean prevValue = _get_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR);
+  _set_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR, TRUE);
+  count              = 0;
+  data               = NULL;
+  void* settings     = keyman_subscribe_option_changes(on_settings_change, NULL);
+
+  // Execute
+  _set_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR, FALSE);
+  _set_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR, TRUE);
+
+  // Verify
+  g_assert_cmpint(count, ==, 2);
+
+  // Cleanup
+  keyman_unsubscribe_option_changes(settings, on_settings_change, NULL);
+  _set_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR, prevValue);
+}
+
+void test_keyman_subscribe_option_changes__callback_called_no_toggle() {
+  // Initialize
+  gboolean prevValue = _get_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR);
+  _set_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR, TRUE);
+  count              = 0;
+  data               = NULL;
+  void* settings     = keyman_subscribe_option_changes(on_settings_change, NULL);
+
+  // Execute
+  _set_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR, TRUE);
+
+  // Verify
+  g_assert_cmpint(count, ==, 1);
+
+  // Cleanup
+  keyman_unsubscribe_option_changes(settings, on_settings_change, NULL);
+  _set_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR, prevValue);
+}
+
+//----------------------------------------------------------------------------------------------
+void test_keyman_unsubscribe_option_changes__create() {
+  // Initialize
+  gboolean prevValue = _get_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR);
+  count              = 0;
+  data               = NULL;
+  void* settings     = keyman_subscribe_option_changes(on_settings_change, NULL);
+
+  // Execute
+  guint retval = keyman_unsubscribe_option_changes(settings, on_settings_change, NULL);
+
+  // Verify
+  g_assert_cmpint(count, ==, 0);
+  g_assert_cmpint(retval, ==, 1);
+
+  // Cleanup
+  _set_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR, prevValue);
+}
+
+void test_keyman_unsubscribe_option_changes__null_setting() {
+  // Initialize
+  gboolean prevValue = _get_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR);
+  count              = 0;
+  data               = NULL;
+  void* settings     = NULL;
+
+  // Execute
+  guint retval = keyman_unsubscribe_option_changes(settings, on_settings_change, NULL);
+
+  // Verify
+  g_assert_cmpint(retval, ==, 0);
+
+  // Cleanup
+  _set_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR, prevValue);
+}
+
+void test_keyman_unsubscribe_option_changes__null_callback() {
+  // Initialize
+  gboolean prevValue = _get_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR);
+  count              = 0;
+  data               = NULL;
+  void* settings     = keyman_subscribe_option_changes(on_settings_change, NULL);
+
+  // Execute
+  guint retval = keyman_unsubscribe_option_changes(settings, NULL, NULL);
+
+  // Verify
+  g_assert_cmpint(retval, ==, 0);
+
+  // Cleanup
+  keyman_unsubscribe_option_changes(settings, on_settings_change, NULL);
+  _set_tst_option(KEYMAN_DCONF_OPTIONS_SIMULATEALTGR, prevValue);
 }
 
 //----------------------------------------------------------------------------------------------
@@ -1107,10 +1330,25 @@ int main(int argc, char* argv[]) {
   }
 
   // Add tests
-  g_test_add_func("/keymanutil/keyman_put_options_todconf/invalid", test_keyman_put_options_todconf__invalid);
-  g_test_add_func("/keymanutil/keyman_put_options_todconf/new_key", test_keyman_put_options_todconf__new_key);
-  g_test_add_func("/keymanutil/keyman_put_options_todconf/other_keys", test_keyman_put_options_todconf__other_keys);
-  g_test_add_func("/keymanutil/keyman_put_options_todconf/existing_key", test_keyman_put_options_todconf__existing_key);
+  g_test_add_func("/keymanutil/keyman_put_keyboard_options_todconf/invalid", test_keyman_put_keyboard_options_todconf__invalid);
+  g_test_add_func("/keymanutil/keyman_put_keyboard_options_todconf/new_key", test_keyman_put_keyboard_options_todconf__new_key);
+  g_test_add_func("/keymanutil/keyman_put_keyboard_options_todconf/other_keys", test_keyman_put_keyboard_options_todconf__other_keys);
+  g_test_add_func("/keymanutil/keyman_put_keyboard_options_todconf/existing_key", test_keyman_put_keyboard_options_todconf__existing_key);
+
+  g_test_add_func("/keymanutil/keyman_put_option_todconf/set_to_true", test_keyman_put_option_todconf__set_to_true);
+  g_test_add_func("/keymanutil/keyman_put_option_todconf/set_to_false", test_keyman_put_option_todconf__set_to_false);
+
+  g_test_add_func("/keymanutil/keyman_get_option_fromdconf/default", test_keyman_get_option_fromdconf__default);
+
+  g_test_add_func("/keymanutil/keyman_subscribe_option_changes/create", test_keyman_subscribe_option_changes__create);
+  g_test_add_func("/keymanutil/keyman_subscribe_option_changes/callback_called_init_false", test_keyman_subscribe_option_changes__callback_called_init_false);
+  g_test_add_func("/keymanutil/keyman_subscribe_option_changes/callback_called_init_true", test_keyman_subscribe_option_changes__callback_called_init_true);
+  g_test_add_func("/keymanutil/keyman_subscribe_option_changes/callback_called_toggle", test_keyman_subscribe_option_changes__callback_called_toggle);
+  g_test_add_func("/keymanutil/keyman_subscribe_option_changes/callback_called_no_toggle", test_keyman_subscribe_option_changes__callback_called_no_toggle);
+
+  g_test_add_func("/keymanutil/keyman_unsubscribe_option_changes/create", test_keyman_unsubscribe_option_changes__create);
+  g_test_add_func("/keymanutil/keyman_unsubscribe_option_changes/null_setting", test_keyman_unsubscribe_option_changes__null_setting);
+  g_test_add_func("/keymanutil/keyman_unsubscribe_option_changes/null_callback", test_keyman_unsubscribe_option_changes__null_callback);
 
   g_test_add_func("/keymanutil/keyman_get_custom_keyboard_dictionary/values", test_keyman_get_custom_keyboard_dictionary__values);
   g_test_add_func("/keymanutil/keyman_get_custom_keyboard_dictionary/invalid", test_keyman_get_custom_keyboard_dictionary__invalid);

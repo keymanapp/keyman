@@ -1,5 +1,5 @@
-import { type Keyboard, KeyboardScriptError } from '@keymanapp/keyboard-processor';
-import { type KeyboardStub } from 'keyman/engine/package-cache';
+import { type Keyboard, KeyboardScriptError } from 'keyman/engine/keyboard';
+import { type KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { CookieSerializer } from 'keyman/engine/dom-utils';
 import { eventOutputTarget, outputTargetForElement, PageContextAttachment } from 'keyman/engine/attachment';
 import { DomEventTracker, LegacyEventEmitter } from 'keyman/engine/events';
@@ -489,6 +489,12 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
     saveCookie ||= false;
     const originalKeyboardTarget = this.currentKeyboardSrcTarget();
 
+    // If someone tries to activate a keyboard before we've had a chance to load it,
+    // we should defer the activation, just as we'd have deferred the load attempt.
+    if(!this.engineConfig.deferForInitialization.isFulfilled) {
+      await this.engineConfig.deferForInitialization.corePromise;
+    }
+
     // Must do here b/c of fallback behavior stuff defined below.
     // If the default keyboard is requested, load that.  May vary based on form-factor, which is
     // part of what .getFallbackStubKey() handles.
@@ -818,9 +824,7 @@ export default class ContextManager extends ContextManagerBase<BrowserConfigurat
 
     // Sets the default stub (as specified with the `getSavedKeyboard` call) as active.
     if(stub) {
-      return this.activateKeyboard(stub.id, stub.langId);
-    } else {
-      return null;
+      this.activateKeyboard(t[0], t[1]);
     }
   }
 

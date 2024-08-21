@@ -1,4 +1,5 @@
-import { TouchLayout, LDMLKeyboard } from "@keymanapp/common-types";
+import { TouchLayout } from "@keymanapp/common-types";
+import { LDMLKeyboard } from "@keymanapp/developer-utils";
 
 export class TouchLayoutCompiler {
   public compileToJavascript(source: LDMLKeyboard.LDMLKeyboardXMLSourceFile): TouchLayout.TouchLayoutFile {

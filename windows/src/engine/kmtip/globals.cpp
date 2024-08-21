@@ -32,17 +32,3 @@ HINSTANCE g_hInst;
 LONG g_cRefDll = -1; // -1 /w no refs, for win95 InterlockedIncrement/Decrement compat
 
 CRITICAL_SECTION g_cs;
-
-
-/*
-LOGGING
-*/
-
-void Log(WCHAR *fmt, ...) {   // I4379
-	WCHAR outbuf[264];
-	va_list vars;
-	va_start(vars, fmt);
-  wcscpy_s(outbuf, L"kmtip: ");
-	wvsprintfW(wcschr(outbuf,0), fmt, vars);
-  SendDebugMessageFormat(L"%s", outbuf);
-}

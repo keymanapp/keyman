@@ -1,6 +1,7 @@
-import { VisualKeyboard, LDMLKeyboard, CompilerCallbacks } from "@keymanapp/common-types";
+import { VisualKeyboard } from "@keymanapp/common-types";
+import { LDMLKeyboard, CompilerCallbacks } from "@keymanapp/developer-utils";
 import { KeysCompiler } from "./keys.js";
-import { CompilerMessages } from "./messages.js";
+import { LdmlCompilerMessages } from "./ldml-compiler-messages.js";
 
 export class LdmlKeyboardVisualKeyboardCompiler {
   public constructor(private callbacks: CompilerCallbacks) {
@@ -40,7 +41,7 @@ export class LdmlKeyboardVisualKeyboardCompiler {
     const keymap = KeysCompiler.getKeymapFromForms(source.keyboard3?.forms?.form, hardware);
     if (!keymap) {
       this.callbacks.reportMessage(
-        CompilerMessages.Error_InvalidHardware({ formId: hardware })
+        LdmlCompilerMessages.Error_InvalidHardware({ formId: hardware })
       );
       return;
     }
@@ -60,7 +61,7 @@ export class LdmlKeyboardVisualKeyboardCompiler {
 
         if (!keydef) {
           this.callbacks.reportMessage(
-            CompilerMessages.Error_KeyNotFoundInKeyBag({ keyId, layer: layerId, row: y, col: x, form: hardware })
+            LdmlCompilerMessages.Error_KeyNotFoundInKeyBag({ keyId, layer: layerId, row: y, col: x, form: hardware })
           );
         } else {
           vk.keys.push({

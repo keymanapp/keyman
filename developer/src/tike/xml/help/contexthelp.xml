@@ -2,12 +2,313 @@
 <?xml-stylesheet type="text/xsl" href="help.xsl" ?>
 <ContextHelp>
 
+
+  <!-- language/reference -->
+  <LanguageReference Name="store" Title="store()">
+    <p>The store() statement lets you store a string of characters or keys in a buffer for 
+    use elsewhere in the keyboard source file. The store() statement can be used with any() 
+    and index() to reduce sets of similar rules down to a single rule. </p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      store(storeName) value
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="name" Title="&amp;name">
+    <p>The &amp;name store lets you give a more descriptive name to your keyboard than just the 
+    file name. If &amp;name isn't specified in the keyboard file, Keyman will use the filename 
+    of the keyboard, excluding the extension, so the &amp;name statement is optional.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      store(&amp;name) "nameText"
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="version" Title="&amp;version">
+    <p>The &amp;version store allows Keyman to distinguish what version of Keyman the keyboard 
+    was written for and handle it accordingly. The &amp;version store is optional. For most keyboards, 
+    it should be omitted.
+    <br></br><br></br>
+    If the &amp;version store is omitted, the compiler will infer the lowest version that 
+    supports the full set of features used in the keyboard, and assign that version number 
+    value to this store internally. The compiler will also report on the version it infers 
+    in the compile process.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      store(&amp;version) "version"
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="begin" Title="begin rule">
+    <p>The begin rule tells Keyman which groups should be entry points to the keyboard.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      begin [entrypoint] > use(startGroup)
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="use" Title="use() statement">
+    <p>The use() statement tells Keyman to switch processing to a new group; after Keyman 
+    has gone through the new group, and any other nested groups, it will return to the 
+    previous one. The use() statement can be used with the match and nomatch rules; it will 
+    work the same way.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      begin > use(groupName) <br></br>
+      ... > use(groupName)
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="outs" Title="outs()">
+    <p>The outs() statement simply copies the store 'storeName' into the position in which it 
+    has been inserted. This can be used in stores, in the context and the output. If the 
+    store to be emitted is a single character or virtual key, it can also be used in the 
+    key part of the rule.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      store(store1) ... outs(storeName) ... <br></br>
+      ... outs(storeName) ... + ... >  ...  <br></br>
+      ... > ... outs(storeName) ...
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="any" Title="any()">
+    <p>The any() statement will match any character that is in the store 'inputStore'. This 
+    statement is only valid on the left side of a rule; the index() statement is used to match 
+    again or output the character matched by the any() statement in the output. The any() 
+    statement remembers the offset in the store where the match occurred for later use with 
+    the index() statement.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      any(inputStore)
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="index" Title="index()">
+    <p>The index() statement works together with any() to map an array of characters in 
+    'inputStore' to a corresponding array in 'outputStore'. index() can be used in the context 
+    and output sections of a rule. If used in the context section, the offset parameter must 
+    be less than the offset of the index() statement in the context.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      any(inputStore) > index(outputStore,offset)
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="group" Title="group()">
+    <p>The group() statement tells Keyman to start a new set of rules. Keyman supports 
+    three sorts of groups: key processing groups, read-only groups, and context processing 
+    groups.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      group(groupName) <br></br>
+      group(groupName) using keys <br></br>
+      group(groupName) readonly
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="context" Title="context">
+    <p>The context statement reproduces the context stored from the rule match, or a single 
+    character of it, into the output. Use the context statement as much as possible as it is 
+    significantly faster than using the index statement.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      ... > context <br></br>
+      ... > context(offset) <br></br>
+      ... context(offset) > ...
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="beep" Title="beep">
+    <p>The beep statement produces a beep with the system speaker when the rule is matched. 
+    In Keyman Desktop, beep will produce the sound specified by "Asterisk" in Windows Sounds 
+    configuration.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      beep
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="platform" Title="platform() statement">
+    <p>The platform() statement allows rules to match based on the device on which the 
+    Keyman keyboard is running.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      platform("platformConstraint") ... > ... <br></br>
+      if(&amp;platform = "platformConstraint") ... > ...
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="nul" Title="nul">
+    <p>The nul statement has two purposes: in the output of a rule, it signifies deleting 
+    context and keystroke, and at the start of the context it signifies that the context 
+    buffer in the application must be empty (or no longer than the context of the rule) in 
+    order for the rule to match.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      nul [...] [+ key] > output <br></br>
+      [...] [+ key] > nul
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="copyright" Title="&amp;copyright">
+    <p>The &amp;copyright store allows a keyboard author to embed a copyright statement in 
+    a keyboard when it is compiled.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      store(&amp;copyright) "message"
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="message" Title="&amp;message">
+    <p>This is a generic message, such as a shareware notice that you can display when the 
+    keyboard is installed. This statement is optional.The MESSAGE statement is deprecated 
+    and the &amp;message store should be used instead.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      store(&amp;message) "messageText"
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="targets" Title="&amp;targets">
+    <p>The &amp;targets store specifies the target platforms for which a keyboard should be built.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      store(&amp;targets) "target [target ...]"
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="layoutfile" Title="&amp;layoutfile">
+    <p>The &amp;layoutfile store specifies a touch layout .JSON file to incorporate in the Keyman 
+    keyboard. If a touch layout is not specified, then Keyman will build one from the visual 
+    keyboard description file referenced in the &amp;visualkeyboard store. If neither is specified, 
+    then Keyman builds a touch layout based on the US English desktop keyboard layout.
+    </p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      store(&amp;layoutfile) "layoutFilename"
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="keyboardversion" Title="&amp;keyboardversion">
+    <p>The &amp;keyboardversion store documents the version of the keyboard. Keyman uses this on 
+    touch platforms to check for updated versions of the keyboard and update them 
+    automatically.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      store(&amp;keyboardversion) "version"
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="bitmap" Title="&amp;bitmap">
+    <p>The bitmap can be in two different formats: .bmp or .ico. A .bmp file must be a 16x16 
+    image. Keyman supports .ico files with multiple image sizes, and the appropriate size 
+    will be used if available.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      store(&amp;bitmap) "filename"
+    </div>
+  </LanguageReference>
+
+  <LanguageReference Name="visualkeyboard" Title="&amp;visualkeyboard">
+    <p>The &amp;visualkeyboard store specifies a .kvks file to reference in the compiled Keyman 
+    keyboard. The .kvks (XML format) is compiled into a .kvk binary On Screen Keyboard which 
+    needs to be distributed with the .kmx.</p><br></br>
+    <p>Syntax</p>
+    <div class="code">
+      store(&amp;visualkeyboard) "visualkeyboardname"
+    </div>
+  </LanguageReference>
+
+  <!-- Character Map -->
   <Form Name="context/character-map">
     <Control Name="editFilter" Title="Character Map Filter">
-      <p>The Filter allows a user to reduce the number of characters displayed in the character map.  The standard filter options used are by font name or block name.</p>
+      <p>The Filter allows a user to reduce the number of characters displayed in the character map. The standard filter options used are by font name or block name.</p>
     </Control>
+
     <Control Name="grid" Title="Character Map">
       <p>The Character Map Grid displays each character in a square, with a visual representation of the character and the Unicode value displayed at the bottom of the square. Each font group is divided into a block headed by the font name.</p>
+    </Control>
+
+    <Control Name="cmdFilter" Title="Character Map Filter">
+      <p>The Filter allows a user to reduce the number of characters displayed in the
+      character map. The standard filter options used are by font name or block name.</p>
+    </Control>
+
+    <Control Name="rbRange" Title="Character Map Filter">
+      <p>The filter format for a range is: [U+]XXXX-[U+]YYYY, where U+ is optional,
+      XXXX is the starting Unicode value and YYYY is the finishing Unicode value.</p>
+    </Control>
+
+    <Control Name="editRangeStart" Title="Character Map Filter">
+      <p>The filter format for a range is: [U+]XXXX-[U+]YYYY, where U+ is optional,
+      XXXX is the starting Unicode value and YYYY is the finishing Unicode value.</p>
+    </Control>
+
+    <Control Name="editRangeStop" Title="Character Map Filter">
+      <p>The filter format for a range is: [U+]XXXX-[U+]YYYY, where U+ is optional,
+      XXXX is the starting Unicode value and YYYY is the finishing Unicode value.</p>
+    </Control>
+
+    <Control Name="rbName" Title="Character Map Filter">
+      <p>The Filter allows a user to reduce the number of characters displayed in the
+      character map. The standard filter options used are by font name or block name.</p>
+    </Control>
+
+    <Control Name="cmdCharactersInCurrentFontOnly" Title="Character Map Filter">
+      <p> "&gt;" placed at the start of an entry will only show characters in the currently
+      selected Character Map font. This is helpful when trying to determine which characters
+      a given font supports.</p><br></br>
+      <p>Example: &gt;LAO </p><br></br>
+      <p>finds all characters with names starting in "LAO" in the current font</p>
+    </Control>
+
+    <Control Name="cmdBlock" Title="Character Map Filter">
+      <p> "&lt;" placed at the start of an entry will search Unicode block names instead of
+      character names. This is helpful when searching for characters within related
+      blocks</p><br></br>
+      <p>Example:  &lt;Thai </p><br></br>
+      <p>finds the Thai Unicode block</p>
+    </Control>
+
+    <Control Name="cmdStar" Title="Character Map Filter">
+      <p>Using "*" in an entry serves as a wildcard for any number of places in that entry.
+      For example, searching for "greek*alpha" will find characters whose Unicode names begin
+      with the word "Greek" and contain the word "Alpha" any number of places later.
+      This is helpful when searching for characters that share a common element in
+      their names (e.g. capital).</p>
+    </Control>
+
+    <Control Name="cmdQuestionMark" Title="Character Map Filter">
+      <p>Using "?" anywhere in an entry serves as a wildcard for that single place in the entry.
+      For example, searching for "s???e" will return both the SPACE and the SMILE characters,
+      among others.</p><br></br>
+    </Control>
+
+    <Control Name="cmdRange" Title="Character Map Filter">
+      <p>Example: 1000-119F </p><br></br>
+      <p>finds all characters between U+1000 and U+119F (inclusive) -
+      the Myanmar alphabet in this case</p>
+    </Control>
+
+    <Control Name="cmdSet" Title="Character Map Filter">
+      <p>Example: LATIN * LETTER [AEIOU] </p><br></br>
+      <p>finds all all Latin A,E,I,O or U vowel combinations</p>
+    </Control>
+
+    <Control Name="cmdDollar" Title="Character Map Filter">
+      <p>"$" placed at the end of an entry will match from the end of a Unicode character name.
+      This option works best when used with "*" or "?".</p><br></br>
+      <p>Example: LATIN * LETTER A$ </p><br></br>
+      <p>finds only "a" and "A"</p>
+    </Control>
+
+    <Control Name="cmdOK" Title="Character Map Filter">
+      <p>Click OK to save changes and close the dialog.</p>
+    </Control>
+
+    <Control Name="cmdCancel" Title="Character Map Filter">
+      <p>Click Cancel to close the dialog without saving changes.</p>
     </Control>
   </Form>
 
@@ -16,6 +317,18 @@
        ======================================================================== -->
 
   <Form Name="context/keyboard-editor">
+    <Control Name="pages" Title="Keyboard Editor">
+      <p>Keyboard Editor page consists of:
+        <ul>
+          <li>Details</li>
+          <li>Layout</li>
+          <li>Icon</li>
+          <li>On-Screen</li>
+          <li>Touch Layout</li>
+          <li>Build</li>
+        </ul>
+      </p>
+    </Control>
 
     <!-- Details tab -->
     <Control Name="editName" Title="Keyboard Name">
@@ -53,6 +366,24 @@
       <p>This corresponds to the following source line:</p>
       <div class="code">store(&amp;message) 'Here is a message about a keyboard'</div>
     </Control>
+
+    <Control Name="editKeyboardVersion" Title="Keyboard Version">
+    <p>The Keyboard Version documents the version of the keyboard.</p>
+    <p>A keyboard version should be updated whenever there are changes to a keyboard. The good principles to follow are: 
+    <ul>
+      <li> Increment the major version number for a
+      keyboard that has significant new functionality.</li>
+      <li> Increment the minor version number for changes that impact functionality but not 
+      in a significant manner.</li>
+      <li> Optionally, use a third number for bug fixes.</li>
+    </ul>
+    </p>
+    <p>This corresponds to the following source line:</p>
+      <div class="code">store(&amp;keyboardversion) '1.1.2'</div>
+    <p><b>Note:</b> there is a difference between &amp;keyboardversion, which documents the keyboard version, and &amp;version,
+     which determines which version of Keyman a keyboard will run with. </p>
+    </Control>
+
     <Control Name="memoComments" Title="Comments">
       <p>In this field, enter information about the keyboard for your own reference.  These comments will only be visible in the
       source file, and not to users of your keyboard.</p>
@@ -96,6 +427,55 @@
     <Control Name="cmdTestKeymanWeb" Title="Test KeymanWeb Keyboard">
       <p>Tests your KeymanWeb keyboard in an Internet Explorer embedded window</p>
     </Control>
+    <Control Name="pagesTouchLayout" Title="Touch Layout page">
+      <p>Touch Layout tab defines the functionality of the keyboard for mobile devices:
+      <ul>
+        <li>Top bar Controls</li>
+        <li>Keyboard area</li>
+        <li>Middle bar controls</li>
+        <li>Long press area</li>
+      </ul>
+      </p>
+    </Control>
+
+    <Control Name="cmdPackageForDistribution" Title="Package for Distribution">
+      <p>Creates a package (.kps) file to prepare distribution of the keyboard</p>
+    </Control>
+
+    <Control Name="gridFeatures" Title="Features">
+      <p>The Features grid controls which additional file components are included in 
+      the keyboard. Each of the features relates to a system store. Here are the file
+      components:
+      <ul>
+        <li>Embedded JavaScript</li>
+        <li>Embedded CSS</li>
+        <li>Web Help</li>
+        <li>Include Codes</li>
+        <li>Desktop On-Screen Keyboard (auto-included if Targets is any)</li>
+        <li>Touch-Optimised Keyboard (auto-included if Targets is any)</li>
+      </ul>
+      Icon will be automatically included when a new keyboard project is created.
+      </p>
+    </Control>
+    
+    <Control Name="cmdAddFeature" Title="Add feature">
+      <p>This will open a selection dialog allowing you to choose a feature to add to 
+      the keyboard project. Adding a feature will add an extra tab to the editor, 
+      and add the corresponding store to the keyboard source</p>
+    </Control>
+    
+    <Control Name="cmdEditFeature" Title="Edit feature">
+      <p>Depending on what is included in the Feature Grid, you can select a feature from
+      the grid then click on Edit... This will take you to the corresponding tab and 
+      let you make changes.
+      </p>
+    </Control>
+
+    <Control Name="cmdRemoveFeature" Title="Remove feature">
+      <p>Removing a feature will not delete the component file, 
+      but will just remove the store from the keyboard source.
+      </p>
+    </Control>
 
     <!-- Layout tab -->
     <!-- Icon tab -->
@@ -111,8 +491,40 @@
     <Control Name="panEdit" Title="Icon Editor" TopicName="context/keyboard-editor#toc-icon-tab">
       <p>The toolbox allows for the changing of the colours, addition of text and shapes.  It also allows for the moving of the icon around the canvas and also a preview of the icon is displayed.</p>
     </Control>
+    
+    <Control Name="palColours" Title="Colours">
+      <p>Click on a colour from the box to apply the colour onto the Keyboard's 
+      icon. You can see the Foreground Color displays the colour you chose. To deselect 
+      the colour, click on the X mark on the corner left of the colour box, or choose 
+      another colour.
+      </p>
+    </Control>
 
     <!-- On-Screen tab: see context/keyboard-editor#toc-on-screen-tab -->
+    <Control Name="pages" Title="Pages">
+      <p>This tab allows you to edit the visual representation of your keyboard 
+      layout. The content on this tab is stored in the .kvks file associated with 
+      your keyboard. The visual representation is used only in desktop and desktop 
+      web; however if no touch layout is defined, this layout will be synthesized 
+      into a touch layout automatically.
+      </p>
+      <p>An On-Screen keyboard is optional but in most keyboards is recommended. 
+      The On-Screen keyboard may not always match the actual layout identically, 
+      because you may choose to hide some of the details of encoding from the 
+      interface presented to the user.
+      </p>
+      <p>
+      This keyboard layout can also be printed or included in HTML or other documentation. 
+      The editor allows you to export the file to HTML, PNG or BMP formats.
+      </p>
+    </Control>
+      
+    <Control Name="chkFillUnderlyingLayout" Title="Auto-fill underlying layout">
+      <p>If this option is checked, when the Fill from layout button is clicked, 
+      then keys without corresponding rules in the Layout will be filled with the 
+      base layout character.
+      </p>
+    </Control>
     <!-- Touch Layout tab: see context/keyboard-editor#toc-touch-layout-tab -->
     <!-- Source tab -->
     <!-- Compile tab -->
@@ -245,32 +657,184 @@
       <p>The debugger can be used without the debug information by clicking on Test without debugger.</p>
     </Control>
   </Form>
-
+  
+  <!-- New file details -->
   <Form Name="context/new-file-details">
     <Control Name="*" Title="New File">
       <p>Enter the name for your new keyboard. Click on the Browse button to change the location of the new keyboard.</p>
     </Control>
   </Form>
-
+  
+  <!-- Package Editor -->
   <Form Name="context/package-editor">
+    <Control Name="pages" Title="Keyboard Package">
+      <p>A keyboard package is most likely to have 7 tabs:
+        <ul>
+          <li>Files</li>
+          <li>Keyboards</li>
+          <li>Lexical Models</li>
+          <li>Details</li>
+          <li>Shortcuts</li>
+          <li>Source</li>
+          <li>Build</li>
+        </ul>
+      </p>
+    </Control>
+
+    <!-- Keyboard Layouts Tab -->
+    <Control Name="lbKeyboards" Title="Keyboard name">
+      <p>Usually, there is only one keyboard listed in the box, and by clicking on it
+      will show the keyboard information.</p>
+    </Control>
+    <Control Name="cbKeyboardOSKFont" Title="Keyboard font">
+      <p>When font files are added to the package, this dropdown tells the Keyman 
+      apps which font to use when rendering the On Screen Keyboard touch keyboard. 
+      </p>
+    </Control>
+    <Control Name="cbKeyboardDisplayFont" Title="Display font">
+      <p>When font files are added to the package, this dropdown tells the Keyman 
+      apps for iOS and Android which font to use in edit fields. It only applies 
+      within the Keyman app and apps that support this functionality.</p>
+    </Control>
+    <Control Name="gridKeyboardLanguages" Title="Keyboard languages">
+      <p>Each language listed here is a BCP 47 language tag and every keyboard must have a
+      minimum of one language. When Keyman installs the keyboard package, it will associate the 
+      keyboard with the language(s) you select.</p>
+    </Control>
+    <Control Name="cmdKeyboardAddLanguage" Title="Add a language">
+      <p>This button will open up the BCP 47 Tag window to add the keyboard's language tag, script tag,
+       region tag, and language name.</p>
+    </Control>
+    <Control Name="cmdKeyboardRemoveLanguage" Title="Remove a language">
+      <p>Select on a language then click on Remove to delete the language tag.</p>
+    </Control>
+    <Control Name="cmdKeyboardEditLanguage" Title="Edit a language">
+      <p>Click on Edit... then the BCP 47 Tag window will pop up once again with the language information.</p>
+    </Control>
+
+    <!-- Lexical Models Tab -->
+    <Control Name="lbLexicalModels" Title="Lexical Models">
+      <p>This is the location of the Lexical Model (Predictive text) for the keyboard in the keyboard 
+      package.</p>
+    </Control>
+    <Control Name="cmdLexicalModelLanguageAdd" Title="Add a language to the Lexical Model">
+      <p>Add button brings up the “Select BCP 47 Tag” 
+      window, thus allowing the input of a language for the Lexical Model (Predictive text).</p>
+    </Control>
+    <Control Name="chkLexicalModelRTL" Title="Right-to-left Predictive text">
+      <p>By ticking this, it will set the text direction of the Lexical Model (Predictive text) to Right-to-left.</p>
+    </Control>
+    <Control Name="editLexicalModelDescription" Title="Lexical Model Description">
+      <p>A short or long text related to the Lexical Model (Predictive text) is encouraged to be added here but it is optional.</p>
+    </Control>
+
+    <!-- Details Tab -->
+    <Control Name="cbWelcomeFile" Title="Welcome file">
+      <p>Choose from the list to specifies which welcome file is suitable to display when they install the keyboard package.
+      However, this is optional, most keyboard package uses the default option which is (none).</p>
+    </Control>
+    <Control Name="cbLicense" Title="License file">
+      <p>Choose from the list if there is a License file to specified to the keyboard package.
+      However, this is optional, most keyboard package uses the default option which is (none) and we 
+      only accept an open-license keyboard package.</p>
+    </Control>
+    <Control Name="editInfoAuthor" Title="Author's">
+      <p>Enter the name of the author or authors of the keyboard package.</p>
+    </Control>
+    <Control Name="editInfoCopyright" Title="Copyright">
+      <p>Enter the copyright details of the keyboard package This information will be displayed with the version, author and message information when the package is installed.</p>
+    </Control>
+    <Control Name="editInfoEmail" Title="Email address">
+      <p>Enter the contact email address for the keyboard package.</p>
+    </Control>
+    <Control Name="editInfoName" Title="Package Name">
+      <p>Package Name is the name that will be displayed when the package is installed. It should be a descriptive name, in any language, but remember that some applications may use a font that does not include the language you are writing the keyboard name in. Don't include a version number, help information or hotkey in the name.</p>
+    </Control>
+    <Control Name="editInfoVersion" Title="Package Version">
+      <p>The version number allows the user to check whether they have the latest version of the keyboard. The format should be 'major.minor[.subversion]'.  Each number should be an integer, and you should avoid non-integer version strings.  See help for more details.</p>
+    </Control>
+    <Control Name="editInfoWebSite" Title="Website">
+      <p>The website details for the keyboard package if available.</p>
+    </Control>
+    <Control Name="editLexicalModelVersion" Title="Lexical Model version">
+      <p>Specifies an independant version for the Lexical Model.</p>
+    </Control>
+    <Control Name="chkFollowKeyboardVersion" Title="Package and Keyboard version">
+      <p>By ticking this, the Lexical Model (Predictive text) version will receive a version bump alongside 
+      the keyboard, even when the Model does not receive an update.</p>
+    </Control>
+    <Control Name="memoInfoDescription" Title="Description">
+      <p>A keyboard package's description about the language, wonderful community, script, or any related information
+      that would help users once they install the package.</p>
+    </Control>
+    <Control Name="gridRelatedPackages" Title="Related Packages">
+      <p>If a keyboard package is intended to replace an existing keyboard, or if there are related packages, 
+      then the identifiers for these packages should be listed here.</p>
+    </Control>
+    <Control Name="cmdAddRelatedPackage" Title="Add a related package">
+      <p>Add the Package ID and specify Deprecated or Non-deprecated if a keyboard package is intended to 
+      replace an existing keyboard, or if there are related packages.</p>
+    </Control>
+    <Control Name="cmdEditRelatedPackage" Title="Edit a related package">
+      <p>Selects the package and click Edit... to add any changes to the current information.</p>
+    </Control>
+    <Control Name="cmdRemoveRelatedPackage" Title="Remove a related package">
+      <p>A keyboard package's description about the language, community, script, or any related information
+      that would help users when they see once installing the package.</p>
+    </Control>
+
+     <!-- Shortcuts Tab -->
+    <Control Name="editStartMenuPath" Title="Start Menu Path">
+      <p>Enter the path of the start menu to be displayed when the keyboard package is installed.</p>
+    </Control>
+    <Control Name="lbStartMenuEntries" Title="Start menu entries">
+      <p>This is a list of Start menu entries for the keyboard package.</p>
+    </Control>
+    <Control Name="chkStartMenuUninstall" Title="Uninstall">
+      <p>The uninstall shortcut will be added automatically to the shortcut menu list when the package is installed.</p>
+    </Control>
+    <Control Name="chkCreateStartMenu" Title="Start menu">
+      <p>This option will allow you to create a folder on the Start menu when the keyboard package is installed.</p>
+    </Control>
+    <Control Name="cmdNewStartMenuEntry" Title="New">
+      <p>To add a new menu item to the list of shortcuts to be displayed in the Start menu folder created when the keyboard package is installed.</p>
+    </Control>
+    <Control Name="cmdDeleteStartMenuEntry" Title="Delete">
+      <p>To delete the selected shortcut menu item from the Start menu folder.</p>
+    </Control>
+    <Control Name="editStartMenuDescription" Title="Start">
+      <p>The text to be displayed for the selected file as a menu item in the Start up folder that is created when the package is installed.</p>
+    </Control>
+    <Control Name="editStartMenuParameters" Title="Shortcut Parameters" />
+    
+    <Control Name="cbStartMenuProgram" Title="Shortcut Program" />
+
+  <!-- Compile Tab -->
+    <Control Name="cmdStartTestOnline" Title="Test package on web">
+      <p>Starts the Keyman Developer Web Server for the keyboard package. 
+      This will list the various IP addresses and hostnames that Keyman Developer is listening on.</p>
+    </Control>
+    <Control Name="lbDebugHosts" Title="Web addresses">
+      <p>A list of available servers to test the keyboard package.</p>
+    </Control>
+    <Control Name="cmdOpenDebugHost" Title="Open in browser">
+      <p>Starts your default browser with the selected address to allow testing of the keyboard package 
+      directly.</p>
+    </Control>
+    <Control Name="editBootstrapMSI" Title="Keyman MSI">
+      <p>Specifies the location of the Keyman MSI file. As of Keyman Developer 17, bundled executable package 
+      installers for Keyman for Windows can be created using kmc, but cannot be created within the IDE.</p>
+    </Control>
+
     <Control Name="cbImageFile" Title="Image File">
       <p>You can include an image file that will be displayed to the left of the install details when the package is installed. This image should be 140 pixels wide and 250 pixels high.</p>
     </Control>
     <Control Name="cbReadmeFile" Title="Readme file">
       <p>The readme file can be displayed after the installation of the keyboard package, but can also be accessed from the keyboard folder at a later time. The file must be loaded under the Files tab, add option before being able to be selected from the drop down list.</p>
     </Control>
-    <Control Name="cbStartMenuProgram" Title="Shortcut Program" />
-    <Control Name="chkCreateStartMenu" Title="Start menu">
-      <p>This option will allow you to create a folder on the Start menu when the keyboard package is installed.</p>
-    </Control>
-    <Control Name="chkStartMenuUninstall" Title="Uninstall">
-      <p>The uninstall shortcut will be added automatically to the shortcut menu list when the package is installed.</p>
-    </Control>
+    
     <Control Name="cmdAddFile" Title="Add Files">
       <p>This option allows the user to add new files to the package.</p>
-    </Control>
-    <Control Name="cmdDeleteStartMenuEntry" Title="Delete">
-      <p>To delete the selected shortcut menu item from the Start menu folder.</p>
     </Control>
     <Control Name="cmdInsertCopyright" Title="Insert Copyright">
       <p>This allows for the insertion of a copyright symbol if needed.</p>
@@ -288,8 +852,6 @@
       <p>You should try installing your package on your system before distributing it, to ensure that all files are
       installed correctly.  If you can, try installing your package on several different machines.</p>
     </Control>
-
-    <!-- Compile Page -->
 
     <Control Name="editOutPath" Title="Compile">
       <p>Displays the output path and filename of the file when the package is compiled.</p>
@@ -318,9 +880,6 @@
       <p>This option will install the package on the computer. A message will be displayed as to the success of the install.</p>
     </Control>
 
-    <Control Name="cmdNewStartMenuEntry" Title="New">
-      <p>To add a new menu item to the list of shortcuts to be displayed in the Start menu folder created when the keyboard package is installed.</p>
-    </Control>
     <Control Name="cmdOpenContainingFolder" Title="Open Containing Folder">
       <p>Opens the source folder of the selected file.</p>
     </Control>
@@ -346,33 +905,6 @@
       <p>File Type</p>
       <p>Enter the details of the file type being added to the keyboard package.</p>
     </Control>
-    <Control Name="editInfoAuthor" Title="Author's">
-      <p>Enter the name of the author or authors of the keyboard package.</p>
-    </Control>
-    <Control Name="editInfoCopyright" Title="Copyright">
-      <p>Enter the copyright details of the keyboard package This information will be displayed with the version, author and message information when the package is installed.</p>
-    </Control>
-    <Control Name="editInfoEmail" Title="Email address">
-      <p>Enter the contact email address for the keyboard package.</p>
-    </Control>
-    <Control Name="editInfoName" Title="Package Name">
-      <p>Package Name is the name that will be displayed when the package is installed. It should be a descriptive name, in any language, but remember that some applications may use a font that does not include the language you are writing the keyboard name in. Don't include a version number, help information or hotkey in the name.</p>
-    </Control>
-    <Control Name="editInfoVersion" Title="Package Version">
-      <p>The version number allows the user to check whether they have the latest version of the keyboard.  The format should be 'major.minor[.subversion]'.  Each number should be an integer, and you should avoid non-integer version strings.  See help for more details.</p>
-    </Control>
-    <Control Name="editInfoWebSite" Title="Website">
-      <p>The website details for the keyboard package if available.</p>
-    </Control>
-
-    <Control Name="editStartMenuDescription" Title="Start">
-      <p>The text to be displayed for the selected file as a menu item in the Start up folder that is created when the package is installed.</p>
-    </Control>
-    <Control Name="editStartMenuParameters" Title="Shortcut Parameters" />
-    <Control Name="editStartMenuPath" Title="">
-      <p>Start Menu Path</p>
-      <p>Enter the path of the start menu to be displayed when the keyboard package is installed.</p>
-    </Control>
     <Control Name="lbFiles" Title="Package Files">
       <p>This will display all the files that have been added to the keyboard package.  It allows for the addition and removal of files, the entering of file details and the editing of any of the files listed if the appropriate editor is available.</p>
     </Control>
@@ -381,47 +913,195 @@
     </Control>
   </Form>
 
+  <!-- Project -->
   <Form Name="context/project">
     <Control Name="*" Title="Project Manager">
       <p>The Project Manager allows you to manage all the files related to a keyboard layout in a single location.</p>
     </Control>
   </Form>
 
+   <!-- New Lexical Model Project Parameters -->
+  <Form Name="context/new-model-project-parameters">
+    <Control Name="editAuthor" Title="Author Name">
+      <p>The name of the developer of the keyboard. This is either your full name or
+      the organization you're creating a model for.</p>
+    </Control>
+
+    <Control Name="editModelName" Title="Model Name">
+      <p>We recommend the name of the language, dialect, or community that this model is
+      intended for. The name must be written in all the Latin letters or Arabic numerals.</p>
+    </Control>
+
+    <Control Name="editCopyright" Title="Copyright">
+      <p>Who owns the rights to this model and its data? Typically,
+      you can use the automatically generated default value: © 2024 Your Full Name or
+      Your Organization.</p>
+    </Control>
+
+    <Control Name="editFullCopyright" Title="Full copyright">
+      <p></p>
+    </Control>
+
+    <Control Name="editVersion" Title="Version">
+      <p>If this is the first time you've created a lexical model for you language, you should
+      leave the version as 1.0. Otherwise, your version number must conform to the following
+      rules: A version string made of major revision number.minor revision number.</p>
+    </Control>
+
+    <Control Name="gridLanguages" Title="Languages">
+      <p>Specifies the default BCP 47 language tags which will be added to the package
+      metadata and project metadata.</p>
+    </Control>
+
+    <Control Name="cmdAddLanguage" Title="Add...">
+      <p>To add a language tag, click the Add button to bring up the “Select BCP 47 Tag”
+      dialog box.</p>
+    </Control>
+
+    <Control Name="cmdEditLanguage" Title="Edit...">
+      <p>Click the Edit button to bring up the “Select BCP 47 Tag” dialog box again and edit the
+      language tag.</p>
+    </Control>
+
+    <Control Name="cmdRemoveLanguage" Title="Remove">
+      <p>Click the Remove button to delete the language tag.</p>
+    </Control>
+
+    <Control Name="editPath" Title="Path">
+      <p>Specifies the base path where the project folder will be created.</p>
+    </Control>
+
+    <Control Name="cmdBrowse" Title="Browse...">
+      <p>Browse for a folder or create a new folder to save the project to.</p>
+    </Control>
+
+    <Control Name="editAuthorID" Title="Author ID">
+      <p>An Author ID is a unique identifier used to distinguish you from others
+      who have the same or similar names. </p>
+    </Control>
+
+    <Control Name="cbBCP47" Title="Primary Language">
+      <p>Choose your primary language which generated from the “Select BCP 47 Tag” dialog box.</p>
+    </Control>
+
+    <Control Name="editUniq" Title="Unique Name">
+      <p>Enter a unique name of the model. You can use the name of the language, dialect,
+      or community that this model is intended for.</p>
+    </Control>
+
+    <Control Name="editModelID" Title="Model ID">
+      <p>Keyman automatically generates a model ID for you, given all the
+      information already filled out. Model ID helps Keyman sorts and organizes
+      different lexical models.</p>
+    </Control>
+
+    <Control Name="editProjectFilename" Title="Project filename">
+      <p>Specifies the base path where the project filename (.model.kpj) will be created.</p>
+    </Control>
+
+    <Control Name="memoDescription" Title="Description">
+      <p>Enter information about the model.</p>
+    </Control>
+
+    <Control Name="cmdCancel" Title="Cancel">
+      <p>Click Cancel to close the dialog without saving changes.</p>
+    </Control>
+  </Form>
+
+  <!-- Wordlist Editor -->
+  <Form Name="context/wordlist-editor">
+    <Control Name="pages" Title="Wordlist tabs">
+      <p>Wordlist tabs have two views: Design, and Code. Changes to one view are reflected
+      immedaitely in the other view. Wordlist files should be stored in UTF-8 encoding
+      (preferably without BOM), and tab-separated format.</p>
+    </Control>
+
+    <Control Name="gridWordlist" Title="Wordlist tabs">
+      <p>Every line of the tab-separated format file is shown here, and can be edited directly.
+      For most wordlists, it will be more effective to use an external dictionary tool,
+      such as SIL Fieldworks or SIL PrimerPrep to generate the wordlist from a text corpus,
+      and use this tab just to preview the contents of the file.</p>
+    </Control>
+
+    <Control Name="cmdDeleteRow" Title="Wordlist tabs">
+      <p>The Delete row button will delete the selected row in the wordlist.</p>
+    </Control>
+
+    <Control Name="cmdSortByFrequency" Title="Wordlist tabs">
+      <p>The Sort by frequency button has no effect on the functioning of the wordlist,
+      but can help you, the editor, by showing more common words earlier in the list.</p>
+    </Control>
+  </Form>
+
+   <!-- Editor -->
+  <Form Name="context/editor">
+    <Control Name="cefwp" Title="Editor Window">
+      <p>Editor windows in Keyman Developer supports standard Windows editing keystrokes.
+      Many file formats, including .kmn, .kps, .xml, .html, .js and .json, support syntax
+      highlighting. The text editor in Keyman uses the Monaco component from Visual Studio Code,
+      so all the functionality available in that editor is also available here.</p>
+    </Control>
+
+  </Form>
+
+ <!-- Character Identifier -->
+  <Form Name="context/character-identifier">
+    <Control Name="gridFonts" Title="Character Identifier">
+      <p>Attempt to identify the fonts on your system that will support the
+      characters. You can quickly change fonts by clicking on a font name in the grid of
+      identified fonts.</p>
+    </Control>
+
+    <Control Name="sgChars" Title="Character Identifier">
+      <p>Display the Unicode value of the selected character. </p>
+    </Control>
+  </Form>
+
+   <!-- Messages -->
+  <Form Name="context/messages">
+    <Control Name="memoMessage" Title="Message Window">
+      <p>The message window appears at the bottom of the screen, or floating in a toolbar
+      window. It contains a list of error and warning messages returned from a compilation
+      session. You can undock and dock the window by dragging its title bar.</p>
+    </Control>
+  </Form>
+
+   <!-- Debug -->
   <Form Name="context/debug">
     <Control Name="memo" Title="Debugger input window">
-      <p>The debugger input window is used for typing input to test the keyboard. 
-      In the top half of this window, input you type while testing your keyboard will be 
-      displayed, exactly the same as in use, with one exception: deadkeys will be shown 
+      <p>The debugger input window is used for typing input to test the keyboard.
+      In the top half of this window, input you type while testing your keyboard will be
+      displayed, exactly the same as in use, with one exception: deadkeys will be shown
       visually with an OBJ symbol.</p>
     </Control>
 
     <Control Name="sgChars" Title="Debugger input window">
-      <p>The lower half of the window shows a grid of the characters to the virtual left 
-      of the insertion point, or the selected characters if you make a selection. Deadkeys 
-      will be identified in the grid. The grid will show characters in right-to-left scripts 
-      in backing store order, from left to right. If there are more characters in your text 
+      <p>The lower half of the window shows a grid of the characters to the virtual left
+      of the insertion point, or the selected characters if you make a selection. Deadkeys
+      will be identified in the grid. The grid will show characters in right-to-left scripts
+      in backing store order, from left to right. If there are more characters in your text
       than can fit on the screen, then only those that fit will be shown in the grid.</p>
     </Control>
   </Form>
 
   <Form Name="context/debug#toc-regression-testing">
     <Control Name="lbRegTestLog" Title="Regression Testing">
-      <p>The idea in regression testing is to record a sequence of keystrokes and the 
-      output the keyboard produced, in order to test for the same behaviour when you 
+      <p>The idea in regression testing is to record a sequence of keystrokes and the
+      output the keyboard produced, in order to test for the same behaviour when you
       make changes to the keyboard.</p>
     </Control>
 
     <Control Name="cmdRegTestStartStopLog" Title="Regression Testing">
-      <p>Use Start Log/Stop Log to record the input and output. You can then use Start Test 
-      to run the test again, or go the Options menu to clear the log, or save or load a test, 
+      <p>Use Start Log/Stop Log to record the input and output. You can then use Start Test
+      to run the test again, or go the Options menu to clear the log, or save or load a test,
       or use the batch mode to run several tests in a row. </p><br></br>
-      <p>If the output produced while running a test is different to that stored when recording it, 
-      Keyman will halt the test on the line where the failure occurred, and activate 
+      <p>If the output produced while running a test is different to that stored when recording it,
+      Keyman will halt the test on the line where the failure occurred, and activate
       Single Step mode.</p>
     </Control>
 
     <Control Name="cmdRegTestOptions" Title="Regression Testing">
-      <p>In the Options menu, you can clear the log, save or load a test, 
+      <p>In the Options menu, you can clear the log, save or load a test,
       or use the batch mode to run several tests in a row.</p>
     </Control>
   </Form>
@@ -433,43 +1113,45 @@
     </Control>
 
     <Control Name="lbKeystrokeLog" Title="State">
-      <p>This window shows the current keystroke state, and the sequence of 
+      <p>This window shows the current keystroke state, and the sequence of
       keystrokes that were typed to arrive at this state. </p>
     </Control>
   </Form>
 
   <Form Name="context/debug#toc-elements">
     <Control Name="lvElements" Title="Elements">
-      <p>This shows the elements that make up rule currently being processed: the context, 
-      the key, and also what the output will be. If the rule uses stores, the contents of 
+      <p>This shows the elements that make up rule currently being processed: the context,
+      the key, and also what the output will be. If the rule uses stores, the contents of
       the store will be shown in the right-hand column, with the matched letter in red.</p>
     </Control>
   </Form>
 
   <Form Name="context/debug#toc-call-stack">
     <Control Name="lbCallStack" Title="Call Stack">
-      <p>Here all the lines that have been processed to this point are shown in a list. 
-      You can double-click on any entry in the list to display the line in the 
+      <p>Here all the lines that have been processed to this point are shown in a list.
+      You can double-click on any entry in the list to display the line in the
       keyboard source.</p>
     </Control>
   </Form>
 
   <Form Name="context/debug#toc-deadkeys">
     <Control Name="lbDeadkeys" Title="Deadkeys">
-      <p>This lists all the deadkeys that are currently in the context. 
-      You can select one from the list to see it highlighted in the debug input box. 
-      This information can also be seen in the character grid in the lower half of 
+      <p>This lists all the deadkeys that are currently in the context.
+      You can select one from the list to see it highlighted in the debug input box.
+      This information can also be seen in the character grid in the lower half of
       the debugger input window.</p>
     </Control>
   </Form>
 
+   <!-- About tike -->
   <Form Name="context/about-tike">
     <Control Name="cmdOK" Title="About Dialog">
-      <p>The About dialog displays copyright and registration information for Keyman Developer, 
+      <p>The About dialog displays copyright and registration information for Keyman Developer,
       and has a link to the Keyman website.</p>
     </Control>
   </Form>
 
+   <!-- Key test -->
   <Form Name="context/key-test">
     <Control Name="cmdInsert" Title="Virtual Key Identifier">
       <p>This dialog lets you check the virtual key code for any key combination (except Window reserved key combinations such as Alt + Tab). You can then insert the virtual key code into the last active edit window at the current cursor position.</p><br></br>
@@ -484,4 +1166,155 @@
       <p>To close the dialog, click the Close button or press Shift + Esc.</p>
     </Control>
   </Form>
+
+  <!-- Select BCP 47 Language -->
+  <Form Name="context/select-bcp47-language">
+    <Control Name="cbLanguageTag" Title="Language tag">
+      <p>The only required option is the Language tag, which is an ISO 639-1 or ISO 639-3 code.
+      ISO 639-1 tags are a two-letter code. ISO 639-3 tags are a three-letter code. First, try to find your 
+      language on the list of two-letter ISO 639-1 codes.</p>
+      <p>If you can't find a two-letter code, you'll need to find the closest three-letter code. You can use Glottolog 
+      to search for your language, and it will give you an appropriate code.</p>
+      <p>The Language tag is conventionally written in lower case.</p>
+    </Control>
+    <Control Name="cbScriptTag" Title="Script tag">
+      <p>The Script tag allows you to specify the writing system used in your language model or keyboard.
+       If your language only uses one writing system, omit the Script subtag. he Script subtag is conventionally 
+       written in title case - first letter capitalized.</p>
+    </Control>
+    <Control Name="cbRegionTag" Title="Region tag">
+      <p>The Region tag allows you to specify the region your language or 
+      dialect is spoken in. If your language is only spoken in one region, omit the Region subtag.
+      Alphabetic region will show up in upper case once the region tag is selected.</p>
+    </Control>
+    <Control Name="editBCP47Code" Title="BCP 47 Code">
+      <p>This is the BCP 47 Code forms from the language, script, and region tag which were previously
+      selected.</p>
+    </Control>
+    <Control Name="editLanguageName" Title="Language name">
+      <p>If lefts as default, a language name will be assigned automatically. Feel free to change the name
+      if you must.
+      </p>
+    </Control>
+    <Control Name="cmdResetLanguageName" Title="Reset">
+      <p>Reset the Language name to what it was assigned to.</p>
+    </Control>
+    <Control Name="cmdOK" Title="OK">
+      <p>Once everything is set, click OK to confirm.</p>
+    </Control>
+    <Control Name="cmdCancel" Title="Cancel">
+      <p>Exits out of the "Select BCP 47 Tag".</p>
+    </Control>
+    <Control Name="lblLinkToW3C" Title="Learn about BCP 47 Tag">
+      <p>Learn more about the BCP 47 Tag over at w3.org.</p>
+    </Control>
+  </Form>
+
+  <!-- New Project Parameters-->
+  <Form Name="context/new-project-parameters">
+    <Control Name="editKeyboardName" Title="Keyboard name">
+    <p>The descriptive name of the keyboard. This will be set in the <u>&amp;Name</u> store in the keyboard, 
+    in the package name, and where appropriate in documentation and metadata.</p>
+    </Control>
+    <Control Name="memoDescription" Title="Description">
+    <p>A brief or long description about the keyboard's functionality, background, script, language, community,
+    or any information related to showcase to users.</p>
+    </Control>
+    <Control Name="editAuthor" Title="Author">
+    <p>The name of the developer of the keyboard. This is either your full name or 
+      the organization you're creating the keyboard for.</p>
+    </Control>
+    <Control Name="editCopyright" Title="Copyright">
+    <p>This field should contain the word "Copyright", the copyright symbol "©", and the full name of the rights 
+	      owner. Do not put the year of copyright in this field (see Full Copyright). Typically, 
+	      you can use the automatically generated default value: "Copyright © Your Full Name or 
+	      Your Organization".</p>
+    <p>A copyright string for the keyboard. This will be set in the <u>&amp;Copyright</u> store in the keyboard, 
+    in the package metadata, and where appropriate in documentation and metadata.</p>
+    </Control>
+    <Control Name="editFullCopyright" Title="Full Copyright">
+    <p>Who owns the rights to this keyboard? This field should
+	      contain the word "Copyright", the copyright symbol "©", the first year of copyright, 
+	      and the full name of the rights owner. Do include the year of copyright in this field.
+	      Typically, you can use the automatically generated default value: 
+	      "Copyright © Current-Year Your-Full Name or Your Organization".</p>
+    </Control>
+    <Control Name="editVersion" Title="Version">
+    <p>If this is the first time you've created a keyboard for the language, you should 
+      leave the version as 1.0. Otherwise, your version number must conform to the following 
+      rules: A version string made of major revision number.minor revision number.</p>
+    </Control>
+    <Control Name="clbTargets" Title="Targets">
+    <p>
+      Specifies the default deployment targets for the keyboard, set in the <u>&amp;Targets</u> store in the keyboard, 
+      and controls the files added to the package initially. This also is reflected in documentation and metadata.
+    </p>
+    </Control>
+    <Control Name="editPath" Title="Edit Path">
+    <p>
+      Specifies the base path where the project folder will be created. The project folder name will be the keyboard ID. 
+      If the folder already exists, then you will be prompted before Keyman Developer overwrites files inside it.
+    </p>
+    </Control>
+    <Control Name="cmdBrowse" Title="Browse">
+      <p>
+        Specifies a different path to store the project folder.
+      </p>
+    </Control>
+    <Control Name="editKeyboardID" Title="Keyboard ID">
+      <p>
+        The base filename of the keyboard, project and package. This must conform to the Keyman 
+        keyboard identifier rules, using the characters a-z, 0-9 and _ (underscore) only.
+      </p>
+    </Control>
+    <Control Name="editProjectFilename" Title="Keyboard ID">
+      <p>
+        A Keyboard Project (.kpj) file is store inside the base path, this cannot be changed to anywhere else.
+      </p>
+    </Control>
+    <Control Name="cmdKeyboardAddLanguage" Title="Add a Language">
+    <p>This button will open up the BCP 47 Tag window to add the keyboard's language tag, script tag,
+       region tag, and language name.</p>
+    </Control>
+    <Control Name="cmdKeyboardEditLanguage" Title="Edit a Language">
+      <p>
+        Click on Edit... to open up the BCP 47 Tag window with the language information.
+      </p>
+    </Control>
+    <Control Name="cmdKeyboardRemoveLanguage" Title="Remove a Language">
+      <p>
+        Delete the selected language.
+      </p>
+    </Control>
+    <Control Name="cmdOK" Title="OK">
+      <p>
+        Once everything is ready, click OK and enjoy developing the keyboard.
+      </p>
+    </Control>
+    <Control Name="cmdCancel" Title="Cancel">
+      <p>Click Cancel to close the dialog and reset the process entirely.</p>
+    </Control>
+  </Form>
+
+  <!-- New Project -->
+  <Form Name="context/new-project">
+    <Control Name="lvItems" Title="New Project">
+      <p>
+      Creates a new Keyman Keyboard, LDML Keyboard, or a Wordlist Lexical Model, 
+      or by importing from another source. Details are written on individual icons; clicking on
+      them shows a detailed explanation of each keyboard project.
+      </p>
+    </Control>
+    <Control Name="cmdOK" Title="OK with the Selected Project">
+      <p>
+      Once decided on a project to create, click OK will take you to the next step. 
+      </p>
+    </Control>
+    <Control Name="cmdCancel" Title="Cancel Project Creation">
+      <p>
+      Cancels creating a project.
+      </p>
+    </Control>
+  </Form>
+
 </ContextHelp>

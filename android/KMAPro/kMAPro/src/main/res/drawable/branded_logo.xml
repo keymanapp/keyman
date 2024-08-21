@@ -15,7 +15,7 @@
 
     <item>
         <bitmap
-            android:src="@drawable/sil_logo_blue_2017_1"
+            android:src="@drawable/sil_logo_color_tai_heritage_pro"
             android:gravity="center"/>
     </item>
 
