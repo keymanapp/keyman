@@ -135,7 +135,7 @@ mock_files = files(
 )
 
 if cpp_compiler.get_id() == 'emscripten'
-  host_links = ['--whole-archive', '-sALLOW_MEMORY_GROWTH=1', '-sMODULARIZE=1', '-sEXPORT_ES6', '-sENVIRONMENT=webview', '--embind-emit-tsd', 'core-interface.d.ts', '-sERROR_ON_UNDEFINED_SYMBOLS=0']
+  host_links = ['--whole-archive', '-sALLOW_MEMORY_GROWTH=1', '-sMODULARIZE=1', '-sEXPORT_ES6', '-sENVIRONMENT=webview', '--emit-tsd', 'core-interface.d.ts', '-sERROR_ON_UNDEFINED_SYMBOLS=0']
 
   if cpp_compiler.version().version_compare('>=3.1.44')
     # emscripten 3.1.44 removes .asm object and so we need to export `wasmExports`
