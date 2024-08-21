@@ -472,7 +472,8 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
 
   @Override
   public void onKeyboardLoaded(KeyboardType keyboardType) {
-    // Do nothing
+    // Initialize keyboard options
+    KMManager.sendOptionsToKeyboard();
   }
 
   @Override
