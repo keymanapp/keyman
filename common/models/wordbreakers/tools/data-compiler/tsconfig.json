@@ -3,8 +3,8 @@
 
   "compilerOptions": {
     "baseUrl": "./",
-    "outDir": "../../build/obj/data-compiler",
-    "tsBuildInfoFile": "../../build/obj/data-compiler/tsconfig.tsbuildinfo",
+    "outDir": "../../build/data-compiler/obj",
+    "tsBuildInfoFile": "../../build/data-compiler/obj/tsconfig.tsbuildinfo",
     "rootDir": "./",
     "module": "node16",
     "moduleResolution": "node16"

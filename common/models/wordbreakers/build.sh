@@ -23,7 +23,7 @@ builder_describe "Builds the predictive-text wordbreaker implementation module" 
 
 builder_describe_outputs \
   configure          src/main/default/data.inc.ts \
-  build              build/obj/index.js
+  build              build/main/obj/index.js
 
 builder_parse "$@"
 
@@ -34,14 +34,14 @@ function do_configure() {
   # default wordbreaker.  We rarely update the backing data, but it
   # is needed _before_ the `build` action's compilation step.
   tsc -b tools/data-compiler/tsconfig.json
-  node ./build/obj/data-compiler/index.js
+  node ./build/data-compiler/obj/index.js
 }
 
 function do_build() {
   tsc -b ./tsconfig.json
 
   # Declaration bundling.
-  tsc -p ./tsconfig.json --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+  tsc -p ./tsconfig.json --emitDeclarationOnly --outFile ./build/main/lib/index.d.ts
 }
 
 function do_test() {
