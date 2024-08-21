@@ -90,9 +90,16 @@ struct BindingType<std::vector<T, Allocator>> {
     using ValBinding = BindingType<val>;
     using WireType = ValBinding::WireType;
 
+#if __EMSCRIPTEN_major__ == 3 && __EMSCRIPTEN_minor__ == 1 && __EMSCRIPTEN_tiny__ >= 60
+    // emscripten-core/emscripten#21692
+    static WireType toWireType(const std::vector<T, Allocator> &vec, rvp::default_tag) {
+        return ValBinding::toWireType(val::array(vec), rvp::default_tag{});
+    }
+#else
     static WireType toWireType(const std::vector<T, Allocator> &vec) {
         return ValBinding::toWireType(val::array(vec));
     }
+#endif
 
     static std::vector<T, Allocator> fromWireType(WireType value) {
         return vecFromJSArray<T>(ValBinding::fromWireType(value));
