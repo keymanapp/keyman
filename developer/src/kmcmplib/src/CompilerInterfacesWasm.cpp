@@ -75,8 +75,8 @@ struct BindingType<std::vector<T, Allocator>> {
     using ValBinding = BindingType<val>;
     using WireType = ValBinding::WireType;
 
-    static WireType toWireType(const std::vector<T, Allocator> &vec) {
-        return ValBinding::toWireType(val::array(vec));
+    static WireType toWireType(const std::vector<T, Allocator> &vec, rvp::default_tag) {
+        return ValBinding::toWireType(val::array(vec), rvp::default_tag{});
     }
 
     static std::vector<T, Allocator> fromWireType(WireType value) {
