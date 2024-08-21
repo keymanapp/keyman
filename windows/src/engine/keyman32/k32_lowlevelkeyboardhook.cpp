@@ -131,8 +131,10 @@ BOOL IsTouchPanelVisible() {
 
 /*
   Cache UseRightModifierHotKey debug flag for this session
+  when using right modifier for Hotkeys use the Win32 API
+  ResisterHotkey functionality
 */
-BOOL UseRightModifierHotKey() {
+BOOL UseRegisterHotkey() {
   static BOOL flag_UseRightModifierHotKey = FALSE;
   static BOOL loaded = FALSE;
 
@@ -169,31 +171,33 @@ LRESULT _kmnLowLevelKeyboardProc(
 
   if (GetKeyState(VK_LCONTROL) < 0) {
     FHotkeyShiftState |= HK_CTRL;
-    SendDebugMessageFormat("ProcessHotkey VK_LCONTROL [vkCode:%x isUp:%d FHotkeyShiftState:%x useRight:%d", hs->vkCode, isUp, FHotkeyShiftState, UseRightModifierHotKey());
+    // TODO remove
+    SendDebugMessageFormat("ProcessHotkey VK_LCONTROL [vkCode:%x isUp:%d FHotkeyShiftState:%x useRight:%d", hs->vkCode, isUp, FHotkeyShiftState, UseRegisterHotkey());
   }
 
   if (GetKeyState(VK_RCONTROL) < 0) {
-    FHotkeyShiftState |= UseRightModifierHotKey() ? HK_CTRL : HK_RCTRL_INVALID;
-    SendDebugMessageFormat("ProcessHotkey VK_RCONTROL [vkCode:%x isUp:%d FHotkeyShiftState:%x useRight:%d", hs->vkCode, isUp, FHotkeyShiftState, UseRightModifierHotKey());
+    FHotkeyShiftState |= UseRegisterHotkey() ? HK_CTRL : HK_RCTRL_INVALID;
+    // TODO remove
+    SendDebugMessageFormat("ProcessHotkey VK_RCONTROL [vkCode:%x isUp:%d FHotkeyShiftState:%x useRight:%d", hs->vkCode, isUp, FHotkeyShiftState, UseRegisterHotkey());
   }
-  
+
   if (GetKeyState(VK_LMENU) < 0) {
     FHotkeyShiftState |= HK_ALT;
   }
 
   if (GetKeyState(VK_RMENU) < 0) {
-    FHotkeyShiftState |= UseRightModifierHotKey() ? HK_ALT : HK_RALT_INVALID;
+    FHotkeyShiftState |= UseRegisterHotkey() ? HK_ALT : HK_RALT_INVALID;
   }
 
   if (GetKeyState(VK_LSHIFT) < 0) {
     FHotkeyShiftState |= HK_SHIFT;
   }
   if (GetKeyState(VK_RSHIFT) < 0) {
-    FHotkeyShiftState |= UseRightModifierHotKey() ? HK_SHIFT : HK_RSHIFT_INVALID;
+    FHotkeyShiftState |= UseRegisterHotkey() ? HK_SHIFT : HK_RSHIFT_INVALID;
   }
 
   //if (GetKeyState(VK_SHIFT) < 0) {
-  //  FHotkeyShiftState |= (!UseRightModifierHotKey() && extended) ? HK_RSHIFT_INVALID : HK_SHIFT;
+  //  FHotkeyShiftState |= (!UseRegisterHotkey() && extended) ? HK_RSHIFT_INVALID : HK_SHIFT;
   //}
 
   // #7337 Post the modifier state ensuring the serialized queue is in sync
@@ -275,28 +279,35 @@ LRESULT _kmnLowLevelKeyboardProc(
 }
 
 BOOL ProcessHotkey(UINT vkCode, BOOL isUp, DWORD ShiftState) {
-
+  if (UseRegisterHotkey()){
+    return FALSE;
+  }
   Hotkeys *hotkeys = Hotkeys::Instance();   // I4641
   if (!hotkeys) {
+    SendDebugMessageFormat("Failed to get Instance");
     return FALSE;
   }
 
   Hotkey *hotkey = hotkeys->GetHotkey(ShiftState | vkCode);   // I4641
   if (!hotkey) {
+    SendDebugMessageFormat("GetHotkey Null");
     return FALSE;
   }
 
   if (isUp) {
+    SendDebugMessageFormat("Is Up");
     return TRUE;
   }
 
   if (hotkey->HotkeyType == hktInterface) {
+    SendDebugMessageFormat("PostMasterController");
     Globals::PostMasterController(wm_keyman_control, MAKELONG(KMC_INTERFACEHOTKEY, hotkey->Target), 0);
   }
   else {
+    SendDebugMessageFormat("ReportKeyboardChanged");
     ReportKeyboardChanged(PC_HOTKEYCHANGE, hotkey->hkl == 0 ? TF_PROFILETYPE_INPUTPROCESSOR : TF_PROFILETYPE_KEYBOARDLAYOUT, 0, hotkey->hkl, GUID_NULL, hotkey->profileGUID);
   }
-
+  SendDebugMessageFormat("PostDummyKeyEvent");
   /* Generate a dummy keystroke to block menu activations, etc but let the shift key through */
   PostDummyKeyEvent();  // I3301 - this is imperfect because we don't deal with HC_NOREMOVE.  But good enough?   // I3534   // I4844
 

@@ -2049,7 +2049,25 @@ var
   i: Integer;
   language: IKeymanLanguage;
   id: Integer;
+  RegistryErrorControlled: TRegistryErrorControlled;// I2890
+  UseRegisterHotKey: Boolean; // Use Win32 API RegisterHotkey
 begin
+  RegistryErrorControlled := TRegistryErrorControlled.Create;
+  try
+    if RegistryErrorControlled.OpenKeyReadOnly(SRegKey_KeymanEngine_CU) and
+    RegistryErrorControlled.ValueExists(SRegValue_UseRightModifierHotKey) then
+    begin
+      UseRegisterHotKey := RegistryErrorControlled.ReadBool(SRegValue_UseRightModifierHotKey);
+    end
+    else
+    begin
+      UseRegisterHotKey := False;
+    end;
+  finally
+    RegistryErrorControlled.Free;
+  end;
+
+  if not UseRegisterHotKey then Exit;
 
   TDebugLogClient.Instance.WriteMessage('Enter RegisterHotkeys', []);
 
@@ -2102,7 +2120,25 @@ end;
 procedure TfrmKeyman7Main.UnregisterHotkeys;
 var
   i, hk: Integer;
+  RegistryErrorControlled: TRegistryErrorControlled;// I2890
+  UseRegisterHotKey: Boolean; // Use Win32 API RegisterHotkey
 begin
+  RegistryErrorControlled := TRegistryErrorControlled.Create;
+  try
+    if RegistryErrorControlled.OpenKeyReadOnly(SRegKey_KeymanEngine_CU) and
+    RegistryErrorControlled.ValueExists(SRegValue_UseRightModifierHotKey) then
+    begin
+      UseRegisterHotKey := RegistryErrorControlled.ReadBool(SRegValue_UseRightModifierHotKey);
+    end
+    else
+    begin
+      UseRegisterHotKey := False;
+    end;
+  finally
+    RegistryErrorControlled.Free;
+  end;
+
+  if not UseRegisterHotKey then Exit;
 
   TDebugLogClient.Instance.WriteMessage('Enter UnregisterHotkeys', []);
 
