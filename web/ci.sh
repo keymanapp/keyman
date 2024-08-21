@@ -91,7 +91,7 @@ if builder_start_action test; then
 
   # No --reporter option exists yet for the headless modules.
 
-  "$KEYMAN_ROOT/common/web/keyboard-processor/build.sh" test $REMOTABLE_OPTIONS
+  "$KEYMAN_ROOT/web/src/engine/keyboard/build.sh" test $OPTIONS
   "$KEYMAN_ROOT/common/web/gesture-recognizer/test.sh" $OPTIONS
 
   ./test.sh test $REMOTABLE_OPTIONS

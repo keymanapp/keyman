@@ -5,6 +5,7 @@
 import { assert } from 'chai';
 import * as models from "@keymanapp/models-templates";
 import * as wordBreakers from "@keymanapp/models-wordbreakers";
+import { customWordBreakerFormer, customWordBreakerProper } from './custom-breakers.def.js';
 
 function asProcessedToken(text) {
   // default wordbreaker emits these at the end of each context half if ending with whitespace.
@@ -490,6 +491,87 @@ describe('Tokenization functions', function() {
         caretSplitsToken: true
       });
     });
+
+    it('mitigates effects of previously-distributed malformed wordbreaker output', function () {
+      const text = 'the  quick brown fox      jumped over the lazy dog  ';
+      /** @type { Context } */
+      const context = {
+        left: text,
+        right: '',
+        startOfBuffer: true,
+        endOfBuffer: true
+      }
+
+      const tokenized = models.tokenize(customWordBreakerFormer, context);
+
+      // Mitigation aims to prevent the _worst_ side-effects that can result from invalidating the
+      // underlying assumption of a monotonically-increasing index within the context -
+      // assigning repeated or blank entries the text that preceded them!
+      assert.notExists(tokenized.left.find((token) => token.text == text));
+      assert.notExists(tokenized.left.find((token) => token.text.startsWith(text.substring(0, 25))));
+
+      // 'the' appears twice in the context, which should result in two separate 'the' tokens here.
+      // This was improperly handled when we didn't check that assumption.
+      assert.equal(tokenized.left.filter((token) => token.text == 'the').length, 2);
+
+      // Does not address multiple blank-token ('') entries that result from intervening spaces;
+      // that would add too much extra complexity to the method... and it can already be
+      // handled decently by the predictive-text engine.
+      assert.deepEqual(
+        tokenized.left
+          .filter((entry) => !entry.isWhitespace)
+          .filter((entry) => entry.text != '')
+          .map((entry) => entry.text),
+        ['the', 'quick', 'brown', 'fox', 'jumped', 'over', 'the', 'lazy', 'dog']
+      );
+    });
+
+    it('properly works with well-formed custom wordbreaker output', function () {
+      const text = 'the  quick brown fox      jumped over the lazy dog  ';
+      /** @type { Context } */
+      const context = {
+        left: text,
+        right: '',
+        startOfBuffer: true,
+        endOfBuffer: true
+      }
+
+      const tokenized = models.tokenize(customWordBreakerProper, context);
+
+      // Easier-to-parse version
+      assert.deepEqual(
+        tokenized.left
+          .filter((entry) => !entry.isWhitespace)
+          .map((entry) => entry.text),
+        ['the', 'quick', 'brown', 'fox', 'jumped', 'over', 'the', 'lazy', 'dog']
+      );
+
+      // This time, with whitespaces.
+      assert.deepEqual(
+        tokenized.left.map((entry) => entry.text), [
+          'the',
+          '  ',
+          'quick',
+          ' ',
+          'brown',
+          ' ',
+          'fox',
+          '      ',
+          'jumped',
+          ' ',
+          'over',
+          ' ',
+          'the',
+          ' ',
+          'lazy',
+          ' ',
+          'dog',
+          '  '
+        ]
+      );
+    });
+
+    //
   });
 
   describe('getLastPreCaretToken', function() {

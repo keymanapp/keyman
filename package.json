@@ -51,9 +51,9 @@
     "common/test/resources",
     "common/tools/*",
     "common/web/*",
-    "common/predictive-text",
     "common/tools/hextobin",
-    "web"
+    "web",
+    "web/src/engine/predictive-text/*"
   ],
   "dependencies": {
     "@keymanapp/common-types": "file:common/web/types",

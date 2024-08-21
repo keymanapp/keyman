@@ -6,7 +6,7 @@ import { BannerView } from './bannerView.js';
 import { Banner } from './banner.js';
 import { BlankBanner } from './blankBanner.js';
 import { HTMLBanner } from './htmlBanner.js';
-import { Keyboard, KeyboardProperties } from '@keymanapp/keyboard-processor';
+import { Keyboard, KeyboardProperties } from 'keyman/engine/keyboard';
 
 export class BannerController {
   private container: BannerView;
