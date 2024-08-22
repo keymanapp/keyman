@@ -1101,32 +1101,29 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     fileKeyboard.dpStoreArray = file_store;
     u16cpy(str, u"index(b,4)");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_index_comma_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 4, 0 };
-    EXPECT_EQ(0, u16cmp(tstr_index_comma_valid, tstr));
+    const KMX_WCHAR tstr_index_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 4, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_index_valid, tstr));
 
     // index, space before store, comma, valid
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
     u16cpy(str, u"index( b,4)");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_index_initial_space_and_comma_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 4, 0 };
-    EXPECT_EQ(0, u16cmp(tstr_index_initial_space_and_comma_valid, tstr));
+    EXPECT_EQ(0, u16cmp(tstr_index_valid, tstr));
 
     // index, comma and space, valid
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
     u16cpy(str, u"index(b, 4)");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_index_comma_and_space_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 4, 0 };
-    EXPECT_EQ(0, u16cmp(tstr_index_comma_and_space_valid, tstr));
+    EXPECT_EQ(0, u16cmp(tstr_index_valid, tstr));
 
     // index, space, valid ... should not be valid (see issue #11833)
     u16cpy(str, u"index(b 4)");
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_index_space_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 4, 0 };
-    EXPECT_EQ(0, u16cmp(tstr_index_space_valid, tstr));
+    EXPECT_EQ(0, u16cmp(tstr_index_valid, tstr));
 
     // index, two-digit parameter, valid
     u16cpy(str, u"index(b,42)");
