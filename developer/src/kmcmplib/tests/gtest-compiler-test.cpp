@@ -1236,6 +1236,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
     file_store[1].fIsCall = TRUE;
+    file_store[1].dwSystemID = TSS_NONE;
     u16cpy(file_store[0].szName, u"a");
     u16cpy(file_store[1].szName, u"b");
     u16cpy(file_store[2].szName, u"c");
@@ -1276,6 +1277,22 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
     fileKeyboard.version = VERSION_501;
     u16cpy(str, u"call(d )");
     EXPECT_EQ(KmnCompilerMessages::ERROR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // call, KmnCompilerMessages::ERROR_InvalidCall
+    fileKeyboard.version = VERSION_501;
+    file_store[1].dpString = (PKMX_WCHAR)u"*"; // cause IsValidCallStore() to fail
+    u16cpy(str, u"call(b)");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidCall, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // call, valid
+    fileKeyboard.version = VERSION_501;
+    file_store[1].dpString = (PKMX_WCHAR)u"a.dll:A";
+    file_store[1].dwSystemID = TSS_NONE;
+    u16cpy(str, u"call(b)");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_call_valid[] = { UC_SENTINEL, CODE_CALL, 2, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_call_valid, tstr));
+    EXPECT_EQ(TSS_CALLDEFINITION, file_store[1].dwSystemID);
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
