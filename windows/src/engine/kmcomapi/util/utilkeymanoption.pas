@@ -121,12 +121,13 @@ type
     GroupName: string;
   end;
 
-const KeymanOptionInfo: array[0..15] of TKeymanOptionInfo = (  // I3331   // I3620   // I4552
+const KeymanOptionInfo: array[0..16] of TKeymanOptionInfo = (  // I3331   // I3620   // I4552
   // Global options
 
   (opt: koKeyboardHotkeysAreToggle;          RegistryName: SRegValue_KeyboardHotkeysAreToggle;         OptionType: kotBool; BoolValue: False; GroupName: 'kogGeneral'),
   (opt: koSwitchLanguageForAllApplications;  RegistryName: SRegValue_SwitchLanguageForAllApplications; OptionType: kotBool; BoolValue: True;  GroupName: 'kogGeneral'), // I2277   // I4393
   (opt: koAltGrCtrlAlt;                      RegistryName: SRegValue_AltGrCtrlAlt;                     OptionType: kotBool; BoolValue: False; GroupName: 'kogGeneral'),
+  (opt: koRightModifierHK;                   RegistryName: SRegValue_UseRightModifierHotKey;           OptionType: kotBool; BoolValue: False; GroupName: 'kogGeneral'),
   (opt: koShowHints;                         RegistryName: SRegValue_EnableHints;                      OptionType: kotBool; BoolValue: True;  GroupName: 'kogGeneral'),
   (opt: koBaseLayout;                        RegistryName: SRegValue_UnderlyingLayout;                 OptionType: kotLong; IntValue: 0;      GroupName: 'kogGeneral'),
 

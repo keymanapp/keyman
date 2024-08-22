@@ -129,6 +129,27 @@ BOOL IsTouchPanelVisible() {
   return touchPanelVisible;
 }
 
+/*
+  Cache UseRightModifierHotKey debug flag for this session
+*/
+BOOL UseRightModifierHotKey() {
+  static BOOL flag_UseRightModifierHotKey = FALSE;
+  static BOOL loaded = FALSE;
+
+  if (!loaded) {
+    RegistryReadOnly reg(HKEY_CURRENT_USER);
+    if (reg.OpenKeyReadOnly(REGSZ_KeymanCU)) {
+      if (reg.ValueExists(REGSZ_UseRightModifierHotKey)) {
+        flag_UseRightModifierHotKey = !!reg.ReadInteger(REGSZ_UseRightModifierHotKey);
+      }
+    }
+    loaded = TRUE; // Set loaded to TRUE whether or not the key exists
+  }
+  return flag_UseRightModifierHotKey;
+}
+
+
+
 LRESULT _kmnLowLevelKeyboardProc(
   _In_  int nCode,
   _In_  WPARAM wParam,
@@ -157,6 +178,37 @@ LRESULT _kmnLowLevelKeyboardProc(
     if (GetKeyState(VK_RMENU) < 0) FHotkeyShiftState |= HK_RALT_INVALID;
     if (GetKeyState(VK_LSHIFT) < 0) FHotkeyShiftState |= HK_SHIFT;
     if (GetKeyState(VK_RSHIFT) < 0) FHotkeyShiftState |= HK_RSHIFT_INVALID;
+
+    if (GetKeyState(VK_LCONTROL) < 0) {
+    FHotkeyShiftState |= HK_CTRL;
+    // TODO remove
+    SendDebugMessageFormat("ProcessHotkey VK_LCONTROL [vkCode:%x isUp:%d FHotkeyShiftState:%x useRight:%d", hs->vkCode, isUp, FHotkeyShiftState, UseRightModifierHotKey());
+  }
+
+  if (GetKeyState(VK_RCONTROL) < 0) {
+    FHotkeyShiftState |= UseRightModifierHotKey() ? HK_CTRL : HK_RCTRL_INVALID;
+    // TODO remove
+    SendDebugMessageFormat("ProcessHotkey VK_RCONTROL [vkCode:%x isUp:%d FHotkeyShiftState:%x useRight:%d", hs->vkCode, isUp, FHotkeyShiftState, UseRightModifierHotKey());
+  }
+
+  if (GetKeyState(VK_LMENU) < 0) {
+    FHotkeyShiftState |= HK_ALT;
+  }
+
+  if (GetKeyState(VK_RMENU) < 0) {
+    FHotkeyShiftState |= UseRightModifierHotKey() ? HK_ALT : HK_RALT_INVALID;
+  }
+
+  if (GetKeyState(VK_LSHIFT) < 0) {
+    FHotkeyShiftState |= HK_SHIFT;
+  }
+  if (GetKeyState(VK_RSHIFT) < 0) {
+    FHotkeyShiftState |= UseRightModifierHotKey() ? HK_SHIFT : HK_RSHIFT_INVALID;
+  }
+
+
+
+
     //TODO: #8064. Can remove debug message once issue #8064 is resolved
     SendDebugMessageFormat("!UseCachedHotkeyModifierState [FHotkeyShiftState:%x]", FHotkeyShiftState);
 
