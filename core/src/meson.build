@@ -126,7 +126,7 @@ core_files = files(
   'keyboard.cpp',
   'state.cpp',
   'jsonpp.cpp',
-  'utfcodec.cpp',
+  '../../common/cpp/utfcodec.cpp',
 )
 
 mock_files = files(

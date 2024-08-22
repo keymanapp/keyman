@@ -1,6 +1,6 @@
 // Manages the language selection UI for touch-form factors, which is triggered by an OSK key.
 import { getAbsoluteX, landscapeView } from "keyman/engine/dom-utils";
-import { KeyboardStub } from "keyman/engine/package-cache";
+import { KeyboardStub } from "keyman/engine/keyboard-storage";
 
 import KeymanEngine from "./keymanEngine.js";
 import * as util from "./utils/index.js";

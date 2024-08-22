@@ -204,6 +204,9 @@ export class ModelInfoCompiler implements KeymanCompiler {
 
     if(sources.kmpJsonData.info.description?.description) {
       model_info.description = sources.kmpJsonData.info.description.description.trim();
+    } else {
+      this.callbacks.reportMessage(ModelInfoCompilerMessages.Error_DescriptionIsMissing({filename:sources.kpsFilename}));
+      return null;
     }
 
     // isRTL -- this is a little bit of a heuristic from a compiled .js
