@@ -1224,15 +1224,13 @@ TEST_F(CompilerTest, GetXStringImpl_type_o_test) {
     file_store[1].dpString = (PKMX_WCHAR)u"abc";
     u16cpy(str, u"outs( b)");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_outs_space_before_valid[] = { 'a', 'b', 'c', 0 };
-    EXPECT_EQ(0, u16cmp(tstr_outs_space_before_valid, tstr));
+    EXPECT_EQ(0, u16cmp(tstr_outs_valid, tstr));
 
     // outs, space after store, valid (see I11937, #11938)
     file_store[1].dpString = (PKMX_WCHAR)u"abc";
     u16cpy(str, u"outs(b )");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_outs_space_after_valid[] = { 'a', 'b', 'c', 0 };
-    EXPECT_EQ(0, u16cmp(tstr_outs_space_after_valid, tstr));
+    EXPECT_EQ(0, u16cmp(tstr_outs_valid, tstr));
 }
 
 // tests strings starting with 'c'
