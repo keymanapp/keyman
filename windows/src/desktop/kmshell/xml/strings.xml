@@ -379,11 +379,6 @@
 
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
-  <!-- Introduced: 18.0.91 -->
-  <string name="koRightModifierHK" comment="General options - Right Ctrl Alt and Shift Work for HotKey">Right Modifier keys work with Hotkeys</string>
-
-  <!-- Context: Configuration Dialog - Options tab -->
-  <!-- String Type: FormatString -->
   <!-- Introduced: 9.0.480.0 -->
   <string name="koDeadkeyConversion" comment="Advanced options - Base keyboard deadkeys are treated as normal keys">Treat hardware deadkeys as plain keys</string>
 
@@ -797,12 +792,17 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.288.0 -->
-  <string name="S_Splash_Name" comment="Splash major title">Keyman</string>
+  <string name="S_Splash_Name" translatable="false" comment="Splash major title">Keyman</string>
 
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.294.0 -->
   <string name="S_Splash_Start" comment="Start Keyman button">Start Keyman</string>
+
+  <!-- Context: Splash Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0 -->
+  <string name="S_Splash_Start_2" comment="Start {Keyman} button">Start %1$s</string>
 
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
@@ -860,7 +860,7 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKShortApplicationTitle" comment="Product name">Keyman</string>
+  <string name="SKShortApplicationTitle" translatable="false" comment="Product name">Keyman</string>
 
 
 
@@ -1026,7 +1026,7 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKApplicationTitle" comment="Product name used for the title of message boxes and message dialogs">Keyman</string>
+  <string name="SKApplicationTitle" translatable="false" comment="Product name used for the title of message boxes and message dialogs">Keyman</string>
 
   <!-- Parameters: %1$s = Version number string -->
   <!-- Context: Formatted Messages -->

@@ -228,9 +228,6 @@ type
     FActiveHKL: Integer;
     FTrayIcon: TIcon;   // I4359
 
-    FHotkeyWindow: HWND;
-    FHotkeys: TIntegerList;
-
     FInputPane: TFrameworkInputPane;
     FIsInputPaneVisible: Boolean;
 
@@ -295,12 +292,6 @@ type
     procedure UnregisterControllerWindows;   // I4731
     function IsSysTrayWindow(AHandle: THandle): Boolean;
     procedure GetTrayIconHandle;   // I4731
-
-    procedure RegisterHotkeys;
-    procedure UnregisterHotkeys;
-    procedure HotkeyWndProc(var Message: TMessage);
-
-    procedure DoLanguageHotkey(Index: Integer);
   protected
     procedure DoInterfaceHotkey(Target: Integer);
 
@@ -549,8 +540,6 @@ begin
   end;
 
   FreeAndNil(FInputPane);
-
-  UnregisterHotkeys;
 
   with TRegistryErrorControlled.Create do  // I2890
   try
@@ -833,7 +822,6 @@ begin
         end;
         FOSKManuallyClosedThisSession := False;
         FRunningProduct.FLangSwitchConfiguration.Refresh;
-        RegisterHotkeys;
       end;
     KMC_NOTIFYWELCOME:    // I1248 - Redesigned welcome
       begin
@@ -866,23 +854,6 @@ begin
 //TOUCH        if LParam <> 0 then
 //TOUCH          ProcessContextChange(LParam);
 //TOUCH      end;
-  end;
-end;
-
-procedure TfrmKeyman7Main.DoLanguageHotkey(Index: Integer);
-var
-  FKeyboard: TLangSwitchKeyboard;
-begin
-  if (Index >= 0) and (Index < kmcom.Languages.Count) then
-  begin
-    FKeyboard := FLangSwitchManager.FindKeyboard(kmcom.Languages[Index].HKL, kmcom.Languages[Index].ProfileGUID);
-    if not Assigned(FKeyboard) then Exit;
-
-    // Handle toggle hotkey
-    if (FKeyboard = FLangSwitchManager.ActiveKeyboard) and (kmcom.Options['koKeyboardHotkeysAreToggle'].Value) then
-        FKeyboard := FLangSwitchManager.Languages[0].Keyboards[0];
-
-    ActivateKeyboard(FKeyboard);
   end;
 end;
 
@@ -1356,7 +1327,6 @@ begin
 
   StartKeymanX64;
 
-  RegisterHotkeys;
 end;
 
 procedure TfrmKeyman7Main.RequestCurrentActiveKeyboard(Command: WORD);   // I3961
@@ -2023,135 +1993,12 @@ begin
   end;
 end;
 
-procedure TfrmKeyman7Main.HotkeyWndProc(var Message: TMessage);
-begin
-  if Message.Msg = WM_HOTKEY then
-  begin
-    KL.Log('Hotkey %d', [Message.WParam]);
-    if Message.WParam > kh__High
-      then DoLanguageHotkey(Message.WParam - kh__High - 1)
-      else DoInterfaceHotkey(Message.WParam);
-  end;
-  Message.Result := DefWindowProc(FHotkeyWindow, Message.Msg, Message.WParam, Message.LParam);
-end;
-
 function KeymanHotkeyModifiersToWindowsHotkeyModifiers(v: KeymanHotkeyModifiers): Integer;
 begin
   Result := 0;
   if (v and HK_SHIFT) = HK_SHIFT then Result := Result or MOD_SHIFT;
   if (v and HK_CTRL) = HK_CTRL then Result := Result or MOD_CONTROL;
   if (v and HK_ALT) = HK_ALT then Result := Result or MOD_ALT;
-end;
-
-procedure TfrmKeyman7Main.RegisterHotkeys;
-var
-  hk: IKeymanHotkey;
-  i: Integer;
-  language: IKeymanLanguage;
-  id: Integer;
-  RegistryErrorControlled: TRegistryErrorControlled;// I2890
-  UseRegisterHotKey: Boolean; // Use Win32 API RegisterHotkey
-begin
-  RegistryErrorControlled := TRegistryErrorControlled.Create;
-  try
-    if RegistryErrorControlled.OpenKeyReadOnly(SRegKey_KeymanEngine_CU) and
-    RegistryErrorControlled.ValueExists(SRegValue_UseRightModifierHotKey) then
-    begin
-      UseRegisterHotKey := RegistryErrorControlled.ReadBool(SRegValue_UseRightModifierHotKey);
-    end
-    else
-    begin
-      UseRegisterHotKey := False;
-    end;
-  finally
-    RegistryErrorControlled.Free;
-  end;
-
-  if not UseRegisterHotKey then Exit;
-
-  TDebugLogClient.Instance.WriteMessage('Enter RegisterHotkeys', []);
-
-  if FHotkeyWindow = 0 then
-    FHotkeyWindow := AllocateHWnd(HotkeyWndProc);
-
-  if not Assigned(FHotkeys) then
-    FHotkeys := TIntegerList.Create;
-
-  UnregisterHotkeys;
-
-  for i := 0 to kmcom.Hotkeys.Count - 1 do
-  begin
-    hk := kmcom.Hotkeys[i];
-    if not hk.IsEmpty and (hk.VirtualKey <> 0) then
-    begin
-      // Note, if hk.VirtualKey is 0, this indicates a modifier-only hotkey such
-      // as Alt+Left Shift. These are handled in keyman32 k32_lowlevelkeyboardhook
-      // because RegisterHotkey cannot handle modifier-only hotkeys.
-      if RegisterHotkey(FHotkeyWindow, hk.Target, KeymanHotkeyModifiersToWindowsHotkeyModifiers(hk.Modifiers), hk.VirtualKey) then
-      begin
-        TDebugLogClient.Instance.WriteMessage('Added hotkey %d -> %x %x', [hk.Target,
-           KeymanHotkeyModifiersToWindowsHotkeyModifiers(hk.Modifiers), hk.VirtualKey]);
-        FHotkeys.Add(hk.Target)
-      end
-      else
-        TDebugLogClient.Instance.WriteLastError('RegisterHotkeys', 'RegisterHotkey', 'Failed to register hotkey '+IntToStr(hk.Target));
-    end;
-  end;
-
-  for i := 0 to kmcom.Languages.Count - 1 do
-  begin
-    language := kmcom.Languages[i];
-    hk := language.Hotkey;
-    if Assigned(hk) and not hk.IsEmpty and (hk.VirtualKey <> 0) then
-    begin
-      id := kh__High + 1 + i;
-      if RegisterHotkey(FHotkeyWindow, id, KeymanHotkeyModifiersToWindowsHotkeyModifiers(hk.Modifiers), hk.VirtualKey) then
-      begin
-        TDebugLogClient.Instance.WriteMessage('Added hotkey for language %s [%d] -> %x %x', [language.LocaleName, id,
-           KeymanHotkeyModifiersToWindowsHotkeyModifiers(hk.Modifiers), hk.VirtualKey]);
-        FHotkeys.Add(id);
-      end
-      else
-        TDebugLogClient.Instance.WriteLastError('RegisterHotkeys', 'RegisterHotkey', 'Failed to register hotkey '+IntToStr(id));
-    end;
-  end;
-end;
-
-procedure TfrmKeyman7Main.UnregisterHotkeys;
-var
-  i, hk: Integer;
-  RegistryErrorControlled: TRegistryErrorControlled;// I2890
-  UseRegisterHotKey: Boolean; // Use Win32 API RegisterHotkey
-begin
-  RegistryErrorControlled := TRegistryErrorControlled.Create;
-  try
-    if RegistryErrorControlled.OpenKeyReadOnly(SRegKey_KeymanEngine_CU) and
-    RegistryErrorControlled.ValueExists(SRegValue_UseRightModifierHotKey) then
-    begin
-      UseRegisterHotKey := RegistryErrorControlled.ReadBool(SRegValue_UseRightModifierHotKey);
-    end
-    else
-    begin
-      UseRegisterHotKey := False;
-    end;
-  finally
-    RegistryErrorControlled.Free;
-  end;
-
-  if not UseRegisterHotKey then Exit;
-
-  TDebugLogClient.Instance.WriteMessage('Enter UnregisterHotkeys', []);
-
-  if not Assigned(FHotkeys) then
-    Exit;
-
-  for i := 0 to FHotkeys.Count - 1 do
-  begin
-    hk := FHotkeys[i];
-    if not UnregisterHotKey(FHotkeyWindow, hk) then
-      TDebugLogClient.Instance.WriteLastError('UnregisterHotkeys', 'UnregisterHotkey', 'Failed to unregister hotkey '+IntToStr(hk));
-  end;
-  FHotkeys.Clear;
 end;
 
 { TLangSwitchRefreshWatcher }
