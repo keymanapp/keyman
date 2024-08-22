@@ -151,7 +151,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   /**
    * Tweakable gesture parameters referenced by supported gestures and the gesture engine.
    */
-  get gestureParams(): GestureParams<KeyElement> {
+  get gestureParams(): GestureParams {
     return this.config.gestureParams;
   };
 
@@ -421,11 +421,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       */
       recordingMode: DEBUG_GESTURES,
       historyLength: DEBUG_HISTORY_COUNT
-    };
-
-    this.gestureParams.longpress.permitsFlick = (key) => {
-      const flickSpec = key?.key.spec.flick;
-      return !flickSpec || !(flickSpec.n || flickSpec.nw || flickSpec.ne);
     };
 
     const recognizer = new GestureRecognizer(gestureSetForLayout(this.kbdLayout, this.gestureParams), config);
@@ -934,13 +929,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    * @returns
    */
   getSimpleTapCorrectionDistances(input: InputSample<KeyElement, string>, keySpec?: ActiveKey): Map<ActiveKeyBase, number> {
-    // TODO: It'd be nice to optimize by keeping these off when unused, but the wiring
-    //       necessary would get in the way of modularization at the moment.
-    // let keyman = com.keyman.singleton;
-    // if (!keyman.core.languageProcessor.mayCorrect) {
-    //   return null;
-    // }
-
     // Note:  if subkeys are active, they will still be displayed at this time.
     let touchKbdPos = this.getTouchCoordinatesOnKeyboard(input);
     let layerGroup = this.layerGroup.element;  // Always has proper dimensions, unlike kbdDiv itself.

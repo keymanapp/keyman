@@ -13,6 +13,5 @@
 
   "references": [
     { "path": "../keyboard" },
-    { "path": "../js-processor" }
   ]
 }

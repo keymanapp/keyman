@@ -3,7 +3,7 @@ import {
   outputTargetForElement
 } from 'keyman/engine/attachment';
 import { LegacyEventEmitter } from 'keyman/engine/events';
-import { StubAndKeyboardCache, toPrefixedKeyboardId as prefixed } from 'keyman/engine/package-cache';
+import { StubAndKeyboardCache, toPrefixedKeyboardId as prefixed } from 'keyman/engine/keyboard-storage';
 
 import { KeyboardHarness, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
 import { DOMKeyboardLoader } from 'keyman/engine/keyboard/dom-keyboard-loader';

@@ -336,6 +336,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
   public shutdown() {
     this.lmEngine.shutdown();
+    this.removeAllListeners();
   }
 
   public get isActive(): boolean {

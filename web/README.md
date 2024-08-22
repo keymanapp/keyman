@@ -81,18 +81,18 @@ title: Dependency Graph
 %%{init: {"flowchart": {"htmlLabels": false}} }%%
 graph TD;
     OSK["/web/src/engine/osk"];
-    KP["/web/src/engine/keyboard"];
+    KeyboardSpec["/web/src/engine/keyboard"];
     JSProc["/web/src/engine/js-processor"];
-    OSK-->KP;
+    OSK-->KeyboardSpec;
     WebUtils["@keymanapp/web-utils<br>(/common/web/utils)"];
-    KP---->WebUtils;
+    KeyboardSpec---->WebUtils;
     Wordbreakers["@keymanapp/models-wordbreakers<br>(/common/models/wordbreakers)"];
     Models["@keymanapp/models-templates<br>(/common/models/templates)"];
     Models-->WebUtils;
-    LMWorker["@keymanapp/lm-worker<br>(/common/web/lm-worker)"];
+    LMWorker["@keymanapp/lm-worker<br>(/web/src/engine/predictive-text/worker-thread)"];
     LMWorker-->Models;
     LMWorker-->Wordbreakers;
-    LMLayer["@keymanapp/lexical-model-layer<br>(/common/predictive-text)"];
+    LMLayer["@keymanapp/lexical-model-layer<br>(/web/src/engine/predictive-text/worker-main)"];
     LMLayer-->LMWorker;
     Gestures["@keymanapp/gesture-recognizer<br>(/common/web/gesture-recognizer)"];
     Gestures-->WebUtils;
@@ -107,33 +107,32 @@ graph TD;
     subgraph Headless["`**Headless**
     Fully headless components`"]
         direction LR
-        KP;
-        JSProc-->KP;
+        KeyboardSpec;
+        JSProc-->KeyboardSpec;
         WebUtils;
         PredText;
         Gestures;
     end
 
     subgraph ClassicWeb["`**ClassicWeb**
-    Previously unmodularized components`"]
+    Intermediate-level engine modules`"]
         Device["/web/src/engine/device-detect"];
         Device----->WebUtils;
         Elements["/web/src/engine/element-wrappers"];
         Elements-->JSProc;
-        KeyboardCache["/web/src/engine/package-cache"];
-        KeyboardCache-->Interfaces;
+        KeyboardStorage["/web/src/engine/keyboard-storage"];
+        KeyboardStorage-->Interfaces;
         DomUtils["/web/src/engine/dom-utils"];
         DomUtils-->WebUtils;
-        DomUtils-->KP;
+        DomUtils-->KeyboardSpec;
         OSK-->DomUtils;
         OSK-->Gestures;
         Interfaces["/web/src/engine/interfaces"];
-        Interfaces-->KP;
-        Interfaces-->JSProc;
+        Interfaces-->KeyboardSpec;
         OSK-->Interfaces;
         CommonEngine["/web/src/engine/main"];
         CommonEngine-->Device;
-        CommonEngine-->KeyboardCache;
+        CommonEngine-->KeyboardStorage;
         CommonEngine-->OSK;
         Attachment["/web/src/engine/attachment"];
         Attachment-->DomUtils;
