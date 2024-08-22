@@ -912,8 +912,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_b_test) {
     fileKeyboard.dpStoreArray = nullptr;
     u16cpy(str, u"baselayout( beep)");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_baselayout_space_before_valid[] = { UC_SENTINEL, CODE_IFSYSTEMSTORE, TSS_BASELAYOUT+1, 2, 1, 0 };
-    EXPECT_EQ(0, u16cmp(tstr_baselayout_space_before_valid, tstr));
+    EXPECT_EQ(0, u16cmp(tstr_baselayout_valid, tstr));
 
     // baselayout, space after argument, valid (see I11937, #11938)
     fileKeyboard.version = VERSION_90;
@@ -921,8 +920,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_b_test) {
     fileKeyboard.dpStoreArray = nullptr;
     u16cpy(str, u"baselayout(beep )");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_baselayout_space_after_valid[] = { UC_SENTINEL, CODE_IFSYSTEMSTORE, TSS_BASELAYOUT+1, 2, 1, 0 };
-    EXPECT_EQ(0, u16cmp(tstr_baselayout_space_after_valid, tstr));
+    EXPECT_EQ(0, u16cmp(tstr_baselayout_valid, tstr));
 }
 
 // tests strings starting with 'i'
