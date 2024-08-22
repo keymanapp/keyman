@@ -837,15 +837,13 @@ TEST_F(CompilerTest, GetXStringImpl_type_a_test) {
     u16cpy(str, u"any( b)");
     file_store[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_any_space_before_valid[] = { UC_SENTINEL, CODE_ANY, 2, 0 };
-    EXPECT_EQ(0, u16cmp(tstr_any_space_before_valid, tstr));
+    EXPECT_EQ(0, u16cmp(tstr_any_valid, tstr));
 
     // space after store, valid (see I11937, #11938)
     u16cpy(str, u"any(b )");
     file_store[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_any_space_after_valid[] = { UC_SENTINEL, CODE_ANY, 2, 0 };
-    EXPECT_EQ(0, u16cmp(tstr_any_space_after_valid, tstr));
+    EXPECT_EQ(0, u16cmp(tstr_any_valid, tstr));
 }
 
 // tests strings starting with 'b'
