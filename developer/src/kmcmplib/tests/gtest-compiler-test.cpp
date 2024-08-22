@@ -1235,7 +1235,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
     PFILE_STORE file_store = new FILE_STORE[100];
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
-    file_store[1].fIsStore = TRUE;
+    file_store[1].fIsCall = TRUE;
     u16cpy(file_store[0].szName, u"a");
     u16cpy(file_store[1].szName, u"b");
     u16cpy(file_store[2].szName, u"c");
