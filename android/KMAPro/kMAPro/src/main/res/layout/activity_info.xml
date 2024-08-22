@@ -19,11 +19,12 @@
     <ImageButton
       android:id="@+id/back_button"
       style="?android:attr/actionButtonStyle"
+      app:tint="@color/image_button_color"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_gravity="start"
       android:contentDescription="@string/label_back"
-      android:src="@drawable/ic_navigation_back" />
+      android:src="@drawable/ic_action_back" />
 
     <ImageButton
       android:id="@+id/forward_button"
@@ -32,7 +33,7 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:contentDescription="@string/label_forward"
-      android:src="@drawable/ic_navigation_forward" />
+      android:src="@drawable/ic_action_forward" />
 
     <ImageButton
       android:id="@+id/close_button"

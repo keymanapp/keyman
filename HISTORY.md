@@ -1,5 +1,40 @@
 # Keyman Version History
 
+## 18.0.94 alpha 2024-08-21
+
+* fix(core): look for `emcc` instead of `emcc.py` (#12235)
+* fix(web): improve tokenization output when wordbreaker breaks spec for span properties in output (#12229)
+* chore(android): Use RTL-aware alignment and padding for layouts (#12225)
+* fix(web): disable fat-finger data use when mayCorrect = false (#12220)
+* fix(android): Auto-mirror back and forward arrows for RTL support (#12227)
+* feat(android): Add localization for Arabic (#12228)
+* fix(android): Auto-mirror increment and decrement arrows for RTL support (#12230)
+
+## 18.0.93 alpha 2024-08-20
+
+*  (#12188)
+* fix(web): fix malformed reversion display strings (#12201)
+* feat(android): Add menu to specify long-press delay (#12170)
+* feat(android): Pass longpress delay to KeymanWeb (#12185)
+*  (#12223)
+
+## 18.0.92 alpha 2024-08-19
+
+* chore(deps-dev): bump @75lb/deep-merge from 1.1.1 to 1.1.2 (#12118)
+* chore(deps): bump semver from 7.5.4 to 7.6.0 (#12119)
+* fix(windows): "Keyman" is not localized in UI strings (#12162)
+* feat(android): Enhance how ENTER key is handled in apps (#12125)
+* refactor(web): move `lm-worker` → `worker-thread` (#12150)
+* fix(developer): remove redundant check in LdmlKeyboardCompiler.validate() (#11858)
+
+## 18.0.91 alpha 2024-08-16
+
+* refactor(web): move `predictive-text` → `worker-main` (#12146)
+* fix(web): restore flick functionality (#12187)
+* refactor(web): move `lm-message-types` → `predictive-text/types` (#12149)
+* fix(developer): enforce presence of kps Info.Description field in info compilers (#12204)
+* fix(developer): enforce presence of Version field when FollowKeyboardVersion is not set, in package compiler (#12205)
+
 ## 18.0.90 alpha 2024-08-15
 
 * refactor(web): move parts of `keyboard-processor` → `js-processor` (#12111)

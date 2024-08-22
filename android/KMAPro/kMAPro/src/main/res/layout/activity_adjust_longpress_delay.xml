@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include layout="@layout/titlebar" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingBottom="25dp"
+        android:paddingTop="60dp" >
+
+        <ImageButton
+            android:id="@+id/delayTimeDownButton"
+            style="?android:attr/actionButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:contentDescription="@string/ic_delay_time_down"
+            android:src="@drawable/ic_light_dialog_textsize_down" />
+
+        <!-- Seekbar range 0 to 6 corresponds to longpress duration 300 ms to 1500 ms -->
+        <SeekBar
+            android:id="@+id/seekBar"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/ic_longpress_delay_slider"
+            android:progress="1"
+            android:max="6"
+            android:layout_gravity="center" />
+
+        <ImageButton
+            android:id="@+id/delayTimeUpButton"
+            style="?android:attr/actionButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:contentDescription="@string/ic_delay_time_up"
+            android:src="@drawable/ic_light_dialog_textsize_up" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/delayTimeText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/linearLayout"
+        android:gravity="center_horizontal"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:text="@string/longpress_delay_time"
+        android:textSize="@dimen/longpress_delay_label_textsize"
+        />
+
+</RelativeLayout>
