@@ -225,7 +225,7 @@ export class ModelCompositor {
       // Handles display string for reversions triggered by accepting a suggestion mid-token.
       const preCaretToken = postContextTokenization.left[postContextTokenization.left.length - 1];
       revertedPrefix = (preCaretToken && !preCaretToken.isWhitespace) ? preCaretToken.text : '';
-      revertedPrefix += postContextTokenization.caretSplitsToken ? postContextTokenization.right[0] : '';
+      revertedPrefix += postContextTokenization.caretSplitsToken ? postContextTokenization.right[0].text : '';
     } else {
       revertedPrefix = this.wordbreak(postContext);
     }

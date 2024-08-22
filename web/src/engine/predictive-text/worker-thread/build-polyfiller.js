@@ -166,7 +166,7 @@ let fullWorkerConcatenation = concatScriptsAndSourcemaps(sourceFileSet, destFile
 // New stage:  cleaning the sourcemaps
 
 // Sources are being passed into the sourcemap concatenator via our working directory.
-let sourceRoot = '@keymanapp/keyman/common/web/lm-worker/';
+let sourceRoot = '@keymanapp/keyman/web/src/engine/predictive-text/worker-thread/';
 fullWorkerConcatenation.sourcemapJSON.sourceRoot = sourceRoot;
 
 // End "cleaning the sourcemaps"
