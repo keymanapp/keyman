@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.95 alpha 2024-08-22
+
+* chore(common): allow build agents to automatically select emsdk version, and enable support for 3.1.60+ (#12243)
+
 ## 18.0.94 alpha 2024-08-21
 
 * fix(core): look for `emcc` instead of `emcc.py` (#12235)
