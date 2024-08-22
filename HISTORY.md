@@ -1,5 +1,23 @@
 # Keyman Version History
 
+## 18.0.94 alpha 2024-08-21
+
+* fix(core): look for `emcc` instead of `emcc.py` (#12235)
+* fix(web): improve tokenization output when wordbreaker breaks spec for span properties in output (#12229)
+* chore(android): Use RTL-aware alignment and padding for layouts (#12225)
+* fix(web): disable fat-finger data use when mayCorrect = false (#12220)
+* fix(android): Auto-mirror back and forward arrows for RTL support (#12227)
+* feat(android): Add localization for Arabic (#12228)
+* fix(android): Auto-mirror increment and decrement arrows for RTL support (#12230)
+
+## 18.0.93 alpha 2024-08-20
+
+*  (#12188)
+* fix(web): fix malformed reversion display strings (#12201)
+* feat(android): Add menu to specify long-press delay (#12170)
+* feat(android): Pass longpress delay to KeymanWeb (#12185)
+*  (#12223)
+
 ## 18.0.92 alpha 2024-08-19
 
 * chore(deps-dev): bump @75lb/deep-merge from 1.1.1 to 1.1.2 (#12118)
