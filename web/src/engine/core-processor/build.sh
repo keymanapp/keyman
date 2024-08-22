@@ -15,6 +15,7 @@ SUBPROJECT_NAME=engine/core-processor
 
 builder_describe "Keyman Core WASM integration" \
   "@/core:wasm" \
+  "@/common/web/utils" \
   "clean" \
   "configure" \
   "build" \
