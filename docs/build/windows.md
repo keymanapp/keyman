@@ -272,6 +272,10 @@ of appropriate node versions during builds.
   3. Change 'Tab size' to 2 and 'Indent size' to 2.
   4. Select 'Insert spaces'.
 
+* Windows SDK (C++ Desktop Development)
+
+  https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/
+
 **Required environment variables**:
 * `PATH`
   * Add the `C:\Projects\keyman\keyman\windows\lib` folder in the Keyman
