@@ -203,8 +203,6 @@ installed on your computer:
 SETX KEYMAN_USE_EMSDK 1
 ```
 
-After installing emscripten, you'll need to install node.js and openjdk.
-
 #### node.js
 
 Our recommended way to install node.js is to use
@@ -327,32 +325,41 @@ git clone https://github.com/keymanapp/CEF4Delphi_Binary C:\Projects\keyman\CEF4
 * Ant
 * Gradle
 * Maven
-* Optional: OpenJDK 11 (https://learn.microsoft.com/en-us/java/openjdk/download)
+* JDK 11 (Temurin11)
 
-```ps1
-# Elevated PowerShell
-choco install android-sdk androidstudio ant gradle maven
-```
+#### JDK 11
 
-Start a new shell to get the new paths and then update Android SDKs:
-
-```ps1
-# optionally install sdk images
-sdkmanager "system-images;android-33;google_apis;armeabi-v7a"
-sdkmanager --update
-sdkmanager --licenses
-```
-
-#### openjdk
-
-Use Powershell + Chocolatey to install OpenJDK:
+Use Powershell + Chocolatey to install JDK 11:
 
 ```ps1
 # Elevated PowerShell
 
 # for *much* faster download, hide progress bar (PowerShell/PowerShell#2138)
 $ProgressPreference = 'SilentlyContinue'
-choco install openjdk
+choco install temurin11
+```
+
+**Multiple versions of Java:** If you need to build Keyman for Android 16.0 or
+older versions, you can set `JAVA_HOME_11` to the JDK 11 path and
+`JAVA_HOME` to the JDK 8 path. This will build both versions correctly
+from command line. But note that you do need to update your `JAVA_HOME` env
+var to the associated version before opening Android Studio and loading any
+Android projects. `JAVA_HOME_11` is mostly used by CI.
+
+#### Android Studio and friends
+
+```ps1
+# Elevated PowerShell
+choco install androidstudio ant gradle maven android-sdk
+```
+
+Start a new shell to get the new paths and then update Android SDKs:
+
+```ps1
+# optionally install sdk images
+sdkmanager --update
+# sdkmanager "system-images;android-33;google_apis;armeabi-v7a"
+sdkmanager --licenses
 ```
 
 * Run Android Studio once after installation to install additional components
