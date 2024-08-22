@@ -105,7 +105,7 @@ public final class KeyboardSettingsActivity extends AppCompatActivity {
     hashMap = new HashMap<>();
     final String customHelpLink = kbd.getHelpLink();
     // Check if app declared FileProvider
-    icon = String.valueOf(R.drawable.ic_arrow_forward);
+    icon = String.valueOf(R.drawable.ic_action_forward);
     // Don't show help link arrow if File Provider unavailable, or custom help doesn't exist
     if ( (customHelpLink != null && !FileProviderUtils.exists(context)) ||
          (customHelpLink == null && !packageID.equals(KMManager.KMDefault_UndefinedPackageID)) ) {

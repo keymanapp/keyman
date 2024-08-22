@@ -112,6 +112,17 @@ function notifyHost(event, params) {
   }, 10);
 }
 
+// Update the KeymanWeb longpress delay
+// delay is in milliseconds
+function setLongpressDelay(delay) {
+  if (keyman.osk) {
+    keyman.osk.gestureParams.longpress.waitLength = delay;
+    console.debug('setLongpressDelay('+delay+')');
+  } else {
+    window.console.log('setLongpressDelay error: keyman.osk undefined');
+  }
+}
+
 // Update the KMW banner height
 // h is in dpi (different from iOS)
 function setBannerHeight(h) {

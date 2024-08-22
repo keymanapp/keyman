@@ -22,7 +22,7 @@ BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
 builder_describe "Builds the lm-layer module" \
   "@/common/web/keyman-version" \
   "@/common/web/es-bundling" \
-  "@/common/web/lm-worker" \
+  "@/web/src/engine/predictive-text/worker-thread" \
   "clean" \
   "configure" \
   "build" \

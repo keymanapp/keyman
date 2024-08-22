@@ -143,6 +143,9 @@ coverage_action() {
 
 builder_run_child_actions build:engine/device-detect
 builder_run_child_actions build:engine/dom-utils
+
+builder_run_child_actions build:engine/keyboard
+builder_run_child_actions build:engine/js-processor
 builder_run_child_actions build:engine/element-wrappers
 builder_run_child_actions build:engine/events
 builder_run_child_actions build:engine/interfaces

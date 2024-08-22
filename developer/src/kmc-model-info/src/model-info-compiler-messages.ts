@@ -44,5 +44,10 @@ export class ModelInfoCompilerMessages {
   static ERROR_NoLicenseFound = SevError | 0x0009;
   static Error_NoLicenseFound = () => m(this.ERROR_NoLicenseFound,
     `No license for the model was found. MIT license is required for publication to Keyman lexical-models repository.`);
+
+  static ERROR_DescriptionIsMissing = SevError | 0x000A;
+  static Error_DescriptionIsMissing = (o:{filename:string}) => m(
+    this.ERROR_DescriptionIsMissing,
+    `The Info.Description field in the package ${def(o.filename)} is required, but is missing or empty.`);
 }
 
