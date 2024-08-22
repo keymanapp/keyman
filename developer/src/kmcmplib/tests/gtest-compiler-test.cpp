@@ -1263,19 +1263,19 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidCall, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // call, KmnCompilerMessages::ERROR_StoreDoesNotExist
-    // fileKeyboard.version = VERSION_501;
-    // u16cpy(str, u"call(d)");
-    // EXPECT_EQ(KmnCompilerMessages::ERROR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    fileKeyboard.version = VERSION_501;
+    u16cpy(str, u"call(d)");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // call, KmnCompilerMessages::ERROR_StoreDoesNotExist, space before store
-    // fileKeyboard.version = VERSION_501;
-    // u16cpy(str, u"call( d)");
-    // EXPECT_EQ(KmnCompilerMessages::ERROR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    fileKeyboard.version = VERSION_501;
+    u16cpy(str, u"call( d)");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // call, KmnCompilerMessages::ERROR_StoreDoesNotExist, space after store
-    // fileKeyboard.version = VERSION_501;
-    // u16cpy(str, u"call(d )");
-    // EXPECT_EQ(KmnCompilerMessages::ERROR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    fileKeyboard.version = VERSION_501;
+    u16cpy(str, u"call(d )");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
