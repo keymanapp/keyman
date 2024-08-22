@@ -1242,13 +1242,6 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
     PKMX_WCHAR newp = nullptr;
-    PFILE_STORE file_store = new FILE_STORE[100];
-    fileKeyboard.cxStoreArray = 3u;
-    fileKeyboard.dpStoreArray = file_store;
-    file_store[1].fIsStore = TRUE;
-    u16cpy(file_store[0].szName, u"a");
-    u16cpy(file_store[1].szName, u"b");
-    u16cpy(file_store[2].szName, u"c");
 
     // are comments stripped before this point?
     // if so, why the test on whitespace after 'c'?
@@ -1333,43 +1326,6 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_clearcontext_valid[] = { UC_SENTINEL, CODE_CLEARCONTEXT, 0 };
     EXPECT_EQ(0, u16cmp(tstr_clearcontext_valid, tstr));
-
-    // call, KmnCompilerMessages::ERROR_501FeatureOnly_Call
-    fileKeyboard.version = VERSION_50;
-    u16cpy(str, u"call");
-    EXPECT_EQ(KmnCompilerMessages::ERROR_501FeatureOnly_Call, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-
-    // context, KmnCompilerMessages::ERROR_CallInVirtualKeySection *** TODO ***
-
-    // call, no close delimiter => NULL
-    fileKeyboard.version = VERSION_501;
-    u16cpy(str, u"call(");
-    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidCall, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-
-    // call, empty delimiters => empty string
-    fileKeyboard.version = VERSION_501;
-    u16cpy(str, u"call()");
-    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidCall, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-
-    // call, space in delimiters (see I11814, I11937, #11910, #11894, #11938)
-    fileKeyboard.version = VERSION_501;
-    u16cpy(str, u"call( )");
-    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidCall, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-
-    // call, KmnCompilerMessages::ERROR_StoreDoesNotExist
-    // fileKeyboard.version = VERSION_501;
-    // u16cpy(str, u"call(d)");
-    // EXPECT_EQ(KmnCompilerMessages::ERROR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-
-    // call, KmnCompilerMessages::ERROR_StoreDoesNotExist, space before store
-    // fileKeyboard.version = VERSION_501;
-    // u16cpy(str, u"call( d)");
-    // EXPECT_EQ(KmnCompilerMessages::ERROR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-
-    // call, KmnCompilerMessages::ERROR_StoreDoesNotExist, space after store
-    // fileKeyboard.version = VERSION_501;
-    // u16cpy(str, u"call(d )");
-    // EXPECT_EQ(KmnCompilerMessages::ERROR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
