@@ -18,7 +18,7 @@ namespace kmcmp {
     std::wstringstream key;
     key << kp->Key << "," << kp->ShiftFlags << ",";
     if (kp->dpContext) {
-      std::wstring Context_ws = u16fmt((const PKMX_WCHAR) kp->dpContext);
+      std::wstring Context_ws = wstring_from_u16string((const PKMX_WCHAR) kp->dpContext);
       key << Context_ws;
     }
     return key.str();

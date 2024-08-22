@@ -1,4 +1,4 @@
-import { Keyboard, KeyboardProperties } from '@keymanapp/keyboard-processor';
+import { Keyboard, KeyboardProperties } from 'keyman/engine/keyboard';
 import { createUnselectableElement } from 'keyman/engine/dom-utils';
 
 // Base class for a banner above the keyboard in the OSK

@@ -12,10 +12,10 @@
       "types": "./build/engine/attachment/obj/index.d.ts",
       "import": "./build/engine/attachment/obj/index.js"
     },
-    "./engine/paths": {
-      "es6-bundling": "./src/engine/paths/src/index.ts",
-      "types": "./build/engine/paths/obj/index.d.ts",
-      "import": "./build/engine/paths/obj/index.js"
+    "./engine/interfaces": {
+      "es6-bundling": "./src/engine/interfaces/src/index.ts",
+      "types": "./build/engine/interfaces/obj/index.d.ts",
+      "import": "./build/engine/interfaces/obj/index.js"
     },
     "./engine/device-detect": {
       "es6-bundling": "./src/engine/device-detect/src/index.ts",
@@ -37,21 +37,41 @@
       "types": "./build/engine/events/obj/index.d.ts",
       "import": "./build/engine/events/obj/index.js"
     },
-    "./engine/package-cache": {
-      "es6-bundling": "./src/engine/package-cache/src/index.ts",
-      "types": "./build/engine/package-cache/obj/index.d.ts",
-      "import": "./build/engine/package-cache/obj/index.js",
-      "require": "./build/engine/package-cache/obj/index.js"
+    "./engine/js-processor": {
+      "es6-bundling": "./src/engine/js-processor/src/index.ts",
+      "types": "./build/engine/js-processor/obj/index.d.ts",
+      "import": "./build/engine/js-processor/obj/index.js"
     },
-    "./engine/package-cache/dom-requester": {
-      "es6-bundling": "./src/engine/package-cache/src/domCloudRequester.ts",
-      "types": "./build/engine/package-cache/obj/domCloudRequester.d.ts",
-      "import": "./build/engine/package-cache/obj/domCloudRequester.js"
+    "./engine/keyboard": {
+      "es6-bundling": "./src/engine/keyboard/src/index.ts",
+      "types": "./build/engine/keyboard/obj/index.d.ts",
+      "import": "./build/engine/keyboard/obj/index.js"
     },
-    "./engine/package-cache/node-requester": {
-      "es6-bundling": "./src/engine/package-cache/src/nodeCloudRequester.ts",
-      "types": "./build/engine/package-cache/obj/nodeCloudRequester.d.ts",
-      "import": "./build/engine/package-cache/obj/nodeCloudRequester.js"
+    "./engine/keyboard/node-keyboard-loader": {
+      "es6-bundling": "./src/engine/keyboard/src/keyboards/loaders/node-keyboard-loader.ts",
+      "types": "./build/engine/keyboard/obj/keyboards/loaders/node-keyboard-loader.d.ts",
+      "import": "./build/engine/keyboard/obj/keyboards/loaders/node-keyboard-loader.js"
+    },
+    "./engine/keyboard/dom-keyboard-loader": {
+      "es6-bundling": "./src/engine/keyboard/src/keyboards/loaders/dom-keyboard-loader.ts",
+      "types": "./build/engine/keyboard/obj/keyboards/loaders/dom-keyboard-loader.d.ts",
+      "import": "./build/engine/keyboard/obj/keyboards/loaders/dom-keyboard-loader.js"
+    },
+    "./engine/keyboard-storage": {
+      "es6-bundling": "./src/engine/keyboard-storage/src/index.ts",
+      "types": "./build/engine/keyboard-storage/obj/index.d.ts",
+      "import": "./build/engine/keyboard-storage/obj/index.js",
+      "require": "./build/engine/keyboard-storage/obj/index.js"
+    },
+    "./engine/keyboard-storage/dom-requester": {
+      "es6-bundling": "./src/engine/keyboard-storage/src/domCloudRequester.ts",
+      "types": "./build/engine/keyboard-storage/obj/domCloudRequester.d.ts",
+      "import": "./build/engine/keyboard-storage/obj/domCloudRequester.js"
+    },
+    "./engine/keyboard-storage/node-requester": {
+      "es6-bundling": "./src/engine/keyboard-storage/src/nodeCloudRequester.ts",
+      "types": "./build/engine/keyboard-storage/obj/nodeCloudRequester.d.ts",
+      "import": "./build/engine/keyboard-storage/obj/nodeCloudRequester.js"
     },
     "./engine/main": {
       "es6-bundling": "./src/engine/main/src/index.ts",
@@ -99,8 +119,6 @@
     "test": "gosh ./test.sh"
   },
   "dependencies": {
-    "@keymanapp/input-processor": "*",
-    "@keymanapp/keyboard-processor": "*",
     "@keymanapp/keyman-version": "*",
     "@keymanapp/lexical-model-layer": "*",
     "@keymanapp/models-types": "*",

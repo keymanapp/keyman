@@ -209,6 +209,8 @@ describe('KmpCompiler', function () {
       kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
     });
 
+    assert.isNotNull(kmpJson);
+
     await assert.isNull(kmpCompiler.buildKmpFile(kpsPath, kmpJson));
 
     if(debug) callbacks.printMessages();

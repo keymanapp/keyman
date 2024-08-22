@@ -1,14 +1,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { CompilerBaseOptions, CompilerCallbacks, CompilerError, CompilerErrorNamespace, CompilerEvent } from '@keymanapp/common-types';
 import { Command, Option } from 'commander';
+import { escapeMarkdownChar, KeymanUrls, CompilerBaseOptions, CompilerCallbacks, CompilerError, CompilerErrorNamespace, CompilerEvent } from '@keymanapp/developer-utils';
 import { CompilerMessageSource, messageNamespaceKeys, messageSources } from '../messages/messageNamespaces.js';
 import { NodeCompilerCallbacks } from '../util/NodeCompilerCallbacks.js';
 import { exitProcess } from '../util/sysexits.js';
 import { InfrastructureMessages } from '../messages/infrastructureMessages.js';
 import { CompilerMessageDetail, findMessageDetails, findMessagesById, getMessageIdentifiersSorted } from '../util/extendedCompilerOptions.js';
-import { escapeMarkdownChar, KeymanUrls } from '@keymanapp/developer-utils';
 
 type MessageFormat = 'text'|'markdown'|'json';
 
