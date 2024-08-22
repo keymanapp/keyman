@@ -1306,19 +1306,24 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
     u16cpy(str, u"context(1)");
     EXPECT_EQ(KmnCompilerMessages::ERROR_60FeatureOnly_Contextn, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
+    // context, valid
+    fileKeyboard.version = VERSION_60;
+    u16cpy(str, u"context(1)");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_context_valid[] = { UC_SENTINEL, CODE_CONTEXTEX, 1, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_context_valid, tstr));
+
     // context, space before offset, valid
     fileKeyboard.version = VERSION_60;
     u16cpy(str, u"context( 1)");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_context_space_before_offset_valid[] = { UC_SENTINEL, CODE_CONTEXTEX, 1, 0 };
-    EXPECT_EQ(0, u16cmp(tstr_context_space_before_offset_valid, tstr));
+    EXPECT_EQ(0, u16cmp(tstr_context_valid, tstr));
 
     // context, space after offset, valid (see I11937, #11938)
     fileKeyboard.version = VERSION_60;
     u16cpy(str, u"context(1 )");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_context_space_after_offset_valid[] = { UC_SENTINEL, CODE_CONTEXTEX, 1, 0 };
-    EXPECT_EQ(0, u16cmp(tstr_context_space_after_offset_valid, tstr));
+    EXPECT_EQ(0, u16cmp(tstr_context_valid, tstr));
 
     // clearcontext, valid
     fileKeyboard.version = VERSION_60;
