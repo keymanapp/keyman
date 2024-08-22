@@ -4,6 +4,7 @@
 
 package com.keyman.android;
 
+import com.tavultesoft.kmapro.AdjustLongpressDelayActivity;
 import com.tavultesoft.kmapro.BuildConfig;
 import com.tavultesoft.kmapro.DefaultLanguageResource;
 import com.tavultesoft.kmapro.KeymanSettingsActivity;
@@ -247,6 +248,8 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       if (exText != null)
         exText = null;
     }
+    // Initialize keyboard options
+    KMManager.sendOptionsToKeyboard();
   }
 
   @Override
