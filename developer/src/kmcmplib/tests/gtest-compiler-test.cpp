@@ -1022,8 +1022,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     option[1].fIsOption = TRUE;
     u16cpy(str, u"if(b =beep)");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_if_option_space_before_assign_valid[] = { UC_SENTINEL, CODE_IFOPT, 2, 2, 4, 0 };
-    EXPECT_EQ(0, u16cmp(tstr_if_option_space_before_assign_valid, tstr));
+    EXPECT_EQ(0, u16cmp(tstr_if_option_valid, tstr));
 
     // if, option, equal, space before rhs, valid
     fileKeyboard.version = VERSION_80;
@@ -1032,8 +1031,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     option[1].fIsOption = TRUE;
     u16cpy(str, u"if(b= beep)");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_if_option_space_before_rhs_valid[] = { UC_SENTINEL, CODE_IFOPT, 2, 2, 4, 0 };
-    EXPECT_EQ(0, u16cmp(tstr_if_option_space_before_rhs_valid, tstr));
+    EXPECT_EQ(0, u16cmp(tstr_if_option_valid, tstr));
 
     // if, option, equal, space after rhs, valid (see I11937, #11938)
     fileKeyboard.version = VERSION_80;
@@ -1042,8 +1040,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     option[1].fIsOption = TRUE;
     u16cpy(str, u"if(b=beep )");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_if_option_space_after_rhs_valid[] = { UC_SENTINEL, CODE_IFOPT, 2, 2, 4, 0 };
-    EXPECT_EQ(0, u16cmp(tstr_if_option_space_after_rhs_valid, tstr));
+    EXPECT_EQ(0, u16cmp(tstr_if_option_valid, tstr));
 
     delete[] option;
     PFILE_STORE file_store = new FILE_STORE[100];
