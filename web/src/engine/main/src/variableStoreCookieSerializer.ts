@@ -1,4 +1,4 @@
-import { VariableStore, VariableStoreSerializer } from "@keymanapp/keyboard-processor";
+import { VariableStore, VariableStoreSerializer } from 'keyman/engine/js-processor';
 import { CookieSerializer } from "keyman/engine/dom-utils";
 
 // While there's little reason we couldn't store all of a keyboard's store values within
