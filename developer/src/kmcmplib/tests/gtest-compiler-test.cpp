@@ -1293,6 +1293,24 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
     const KMX_WCHAR tstr_call_valid[] = { UC_SENTINEL, CODE_CALL, 2, 0 };
     EXPECT_EQ(0, u16cmp(tstr_call_valid, tstr));
     EXPECT_EQ(TSS_CALLDEFINITION, file_store[1].dwSystemID);
+
+    // call, space before store, valid
+    fileKeyboard.version = VERSION_501;
+    file_store[1].dpString = (PKMX_WCHAR)u"a.dll:A";
+    file_store[1].dwSystemID = TSS_NONE;
+    u16cpy(str, u"call( b)");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(tstr_call_valid, tstr));
+    EXPECT_EQ(TSS_CALLDEFINITION, file_store[1].dwSystemID);
+
+    // call, space after store, valid (see I11937, #11938)
+    fileKeyboard.version = VERSION_501;
+    file_store[1].dpString = (PKMX_WCHAR)u"a.dll:A";
+    file_store[1].dwSystemID = TSS_NONE;
+    u16cpy(str, u"call(b )");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(tstr_call_valid, tstr));
+    EXPECT_EQ(TSS_CALLDEFINITION, file_store[1].dwSystemID);
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
