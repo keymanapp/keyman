@@ -1,4 +1,4 @@
-import { ActiveSubKey } from '@keymanapp/keyboard-processor';
+import { ActiveSubKey } from 'keyman/engine/keyboard';
 import OSKKey from '../../../keyboard-layout/oskKey.js';
 import { KeyData, KeyElement, link } from '../../../keyElement.js';
 import VisualKeyboard from '../../../visualKeyboard.js';

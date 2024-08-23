@@ -1,4 +1,4 @@
-import { type DeviceSpec, Keyboard, ActiveLayout, ButtonClasses } from '@keymanapp/keyboard-processor';
+import { type DeviceSpec, Keyboard, ActiveLayout, ButtonClasses } from 'keyman/engine/keyboard';
 
 import { InputSample } from '@keymanapp/gesture-recognizer';
 
