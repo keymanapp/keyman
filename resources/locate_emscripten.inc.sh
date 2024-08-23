@@ -69,5 +69,6 @@ _select_emscripten_version_with_emsdk() {
   git pull
   ./emsdk install "$KEYMAN_MIN_VERSION_EMSCRIPTEN"
   ./emsdk activate "$KEYMAN_MIN_VERSION_EMSCRIPTEN"
+  npm install
   popd > /dev/null
 }
