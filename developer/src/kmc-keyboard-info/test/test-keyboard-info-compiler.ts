@@ -835,17 +835,4 @@ describe('keyboard-info-compiler', function () {
     const result = await compiler['fontSourceToKeyboardInfoFont'](KHMER_ANGKOR_KPS, kmpJsonData, fonts);
     assert.deepEqual(result, KHMER_ANGKOR_DISPLAY_FONT_INFO);
   });
-
-  it('handles missing info.version in a package file', async function() {
-    const sources = {
-      ...KHMER_ANGKOR_SOURCES,
-      kpsFilename: makePathToFixture('missing-info-version-in-kps-11856', 'khmer_angkor.kps')
-    };
-    const compiler = new KeyboardInfoCompiler();
-    assert.isTrue(await compiler.init(callbacks, {sources}));
-    const kpjFilename = KHMER_ANGKOR_KPJ;
-    const result = await compiler.run(kpjFilename);
-    const actual = JSON.parse(new TextDecoder().decode(result.artifacts.keyboard_info.data));
-    assert.equal(actual.version, '1.0');
-  });
 });

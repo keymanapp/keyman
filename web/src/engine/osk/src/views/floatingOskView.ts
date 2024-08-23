@@ -1,4 +1,4 @@
-import { DeviceSpec, ManagedPromise, Version } from '@keymanapp/keyboard-processor';
+import { DeviceSpec, ManagedPromise, Version } from 'keyman/engine/keyboard';
 import { getAbsoluteX, getAbsoluteY, landscapeView } from 'keyman/engine/dom-utils';
 import { EmitterListenerSpy } from 'keyman/engine/events';
 
