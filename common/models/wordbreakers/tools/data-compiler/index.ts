@@ -19,7 +19,7 @@ const require = createRequire(import.meta.url);
  *
  * For internal use only. Please keep away from children.
  *
- * The generated file is saved to ../src/gen/WordBreakProperty.ts
+ * The generated file is saved to ../../src/main/default/data.inc.ts
  */
 
 const MAX_CODE_POINT = 0x10FFFF;
