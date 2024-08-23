@@ -13,9 +13,9 @@
         <key>NSStringFormatValueTypeKey</key>
         <string>u</string>
         <key>one</key>
-        <string>Τὸ λεξικὸ %u ἐγκατεστάθη</string>
+        <string>Ἐγκατεστάθη %u λεξικό</string>
         <key>other</key>
-        <string>%u λεξικὰ ἐγκατεστάθησαν</string>
+        <string>Ἐγκατεστάθησαν %u λεξικά</string>
       </dict>
     </dict>
     <key>notification-update-failed</key>
@@ -31,7 +31,7 @@
         <key>one</key>
         <string>%u ἐνημέρωση ἀπέτυχε</string>
         <key>other</key>
-        <string>%u ἐνημερώσεις ἀπέτυχαν</string>
+        <string>Ἀπέτυχαν %u ἐνημερώσεις</string>
       </dict>
     </dict>
     <key>notification-update-success</key>

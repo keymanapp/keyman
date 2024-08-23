@@ -1,5 +1,5 @@
-import { type Keyboard, KeyboardScriptError } from '@keymanapp/keyboard-processor';
-import { type KeyboardStub } from 'keyman/engine/package-cache';
+import { type Keyboard, KeyboardScriptError } from 'keyman/engine/keyboard';
+import { type KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { CookieSerializer } from 'keyman/engine/dom-utils';
 import { eventOutputTarget, outputTargetForElement, PageContextAttachment } from 'keyman/engine/attachment';
 import { DomEventTracker, LegacyEventEmitter } from 'keyman/engine/events';

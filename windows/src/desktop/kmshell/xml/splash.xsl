@@ -30,7 +30,13 @@
   <div id="family"></div>
 
   <a href="keyman:start" id="startNow" class="button">
-    <div class="btn btn-blue"><xsl:value-of select="$locale/string[@name='S_Splash_Start']"/></div>
+    <div class="btn btn-blue">
+      <xsl:variable name="originalText" select="$locale/string[@name='S_Splash_Start_2']"/>
+      <xsl:variable name="replacement" select="'Keyman'"/>
+      <xsl:variable name="beforePlaceholder" select="substring-before($originalText, '%0:s')"/>
+      <xsl:variable name="afterPlaceholder" select="substring-after($originalText, '%0:s')"/>
+      <xsl:value-of select="concat($beforePlaceholder, $replacement, $afterPlaceholder)"/>
+    </div>
   </a>
   <a class="button" id="config" href="keyman:config"><div class="btn btn-orange"><xsl:value-of select="$locale/string[@name='S_Splash_Configuration']"/></div></a>
 

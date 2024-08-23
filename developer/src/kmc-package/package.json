@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "@keymanapp/common-types": "*",
+    "@keymanapp/developer-utils": "*",
     "jszip": "^3.7.0",
     "marked": "^7.0.0"
   },

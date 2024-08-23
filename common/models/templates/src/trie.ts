@@ -95,7 +95,7 @@ export class TrieTraversal implements LexiconTraversal {
    * The current traversal node.  Serves as the 'root' of its own sub-Trie,
    * and we cannot navigate back to its parent.
    */
-  readonly root: Node;
+  root: Node;
 
   readonly toKey: Wordform2Key;
 
@@ -113,18 +113,14 @@ export class TrieTraversal implements LexiconTraversal {
   }
 
   child(char: USVString): LexiconTraversal | undefined {
-    /*
-      Note: would otherwise return the current instance if `char == ''`.  If
-      such a call is happening, it's probably indicative of an implementation
-      issue elsewhere - let's signal now in order to catch such stuff early.
-    */
+    // May result for blank tokens resulting immediately after whitespace.
     if(char == '') {
-      return undefined;
+      return this;
     }
 
     // Split into individual code units.
     let steps = char.split('');
-    let traversal: ReturnType<TrieTraversal["_child"]> = this;
+    let traversal: TrieTraversal | undefined = this;
 
     while(steps.length > 0 && traversal) {
       const step: string = steps.shift()!;
@@ -170,6 +166,10 @@ export class TrieTraversal implements LexiconTraversal {
   *children(): Generator<{char: USVString, traversal: () => LexiconTraversal}> {
     const root = this.root;
     const toKey = this.toKey;
+
+    // We refer to the field multiple times in this method, and it doesn't change.
+    // This also assists minification a bit, since we can't minify when re-accessing
+    // through `this.`.
     const totalWeight = this.totalWeight;
 
     // Sorts _just_ the current level, and only if needed.
@@ -247,11 +247,10 @@ export class TrieTraversal implements LexiconTraversal {
 
   get entries() {
     const root = this.root;
-    const totalWeight = this.totalWeight;
-    const entryMapper = function(value: Entry) {
+    const entryMapper = (value: Entry) => {
       return {
         text: value.content,
-        p: value.weight / totalWeight
+        p: value.weight / this.totalWeight
       }
     }
 

@@ -3,30 +3,30 @@
 #
 # @darcywong00 @mcdurdin @ermshiperete @rc-swag @SabineSIL @sgschantz
 
-/android/                     @darcywong00  @sgschantz
+/android/                         @darcywong00  @sgschantz
 
-/common/                      @mcdurdin     @rc-swag
-/core/                        @mcdurdin     @rc-swag
-/common/lexical-model-types/  @jahorton     @mcdurdin
-/common/models/               @jahorton     @mcdurdin
-/common/predictive-text/      @jahorton     @mcdurdin
-/common/schemas/              @mcdurdin     @jahorton
-/common/test/                 @mcdurdin     @ermshiperete
-/common/web/                  @jahorton     @mcdurdin
+/common/                          @mcdurdin     @rc-swag
+/core/                            @mcdurdin     @rc-swag
+/common/lexical-model-types/      @jahorton     @mcdurdin
+/common/models/                   @jahorton     @mcdurdin
+/common/schemas/                  @mcdurdin     @jahorton
+/common/test/                     @mcdurdin     @ermshiperete
+/common/web/                      @jahorton     @mcdurdin
 
-/developer/                   @mcdurdin     @darcywong00
-/docs/                        @mcdurdin     @jahorton
-/ios/                         @sgschantz    @jahorton
-/linux/                       @ermshiperete @darcywong00
-/mac/                         @sgschantz    @SabineSIL
+/developer/                       @mcdurdin     @darcywong00
+/docs/                            @mcdurdin     @jahorton
+/ios/                             @sgschantz    @jahorton
+/linux/                           @ermshiperete @darcywong00
+/mac/                             @sgschantz    @SabineSIL
 
-/oem/firstvoices/android/     @darcywong00  @sgschantz
-/oem/firstvoices/common/      @mcdurdin     @rc-swag
-/oem/firstvoices/ios/         @sgschantz    @jahorton
-/oem/firstvoices/windows/     @rc-swag      @ermshiperete
-/resources/                   @mcdurdin     @jahorton
+/oem/firstvoices/android/         @darcywong00  @sgschantz
+/oem/firstvoices/common/          @mcdurdin     @rc-swag
+/oem/firstvoices/ios/             @sgschantz    @jahorton
+/oem/firstvoices/windows/         @rc-swag      @ermshiperete
+/resources/                       @mcdurdin     @jahorton
 
 # Web is currently shared between Eberhard and Joshua:
-/web/                         @ermshiperete @jahorton
+/web/                             @ermshiperete @jahorton
+/web/src/engine/predictive-text/  @jahorton     @mcdurdin
 
-/windows/                     @rc-swag      @ermshiperete
+/windows/                         @rc-swag      @ermshiperete

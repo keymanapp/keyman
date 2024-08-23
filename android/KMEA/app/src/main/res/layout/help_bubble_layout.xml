@@ -15,8 +15,8 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:paddingBottom="10dp"
-        android:paddingLeft="2dp"
-        android:paddingRight="2dp"
+        android:paddingStart="2dp"
+        android:paddingEnd="2dp"
         android:text="@string/help_bubble_text"
         android:textColor="#404040"
         android:textSize="12sp" />

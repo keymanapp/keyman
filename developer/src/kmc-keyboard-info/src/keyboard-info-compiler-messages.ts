@@ -1,4 +1,4 @@
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, CompilerMessageSpecWithException } from "@keymanapp/common-types";
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, CompilerMessageSpecWithException } from "@keymanapp/developer-utils";
 
 const Namespace = CompilerErrorNamespace.KeyboardInfoCompiler;
 // const SevInfo = CompilerErrorSeverity.Info | Namespace;
@@ -52,8 +52,14 @@ export class KeyboardInfoCompilerMessages {
   static Error_FontFileCannotBeRead = (o:{filename: string}) => m(this.ERROR_FontFileCannotBeRead,
     `Font ${def(o.filename)} could not be parsed to extract a font family.`);
 
-static ERROR_FontFileMetaDataIsInvalid = SevError | 0x000F;
-static Error_FontFileMetaDataIsInvalid = (o:{filename: string,message:string}) => m(this.ERROR_FontFileMetaDataIsInvalid,
+  static ERROR_FontFileMetaDataIsInvalid = SevError | 0x000F;
+  static Error_FontFileMetaDataIsInvalid = (o:{filename: string,message:string}) => m(
+    this.ERROR_FontFileMetaDataIsInvalid,
     `Font ${def(o.filename)} meta data invalid: ${def(o.message)}.`);
+
+  static ERROR_DescriptionIsMissing = SevError | 0x0010;
+  static Error_DescriptionIsMissing = (o:{filename:string}) => m(
+    this.ERROR_DescriptionIsMissing,
+    `The Info.Description field in the package ${def(o.filename)} is required, but is missing or empty.`);
 }
 
