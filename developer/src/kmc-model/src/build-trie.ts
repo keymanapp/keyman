@@ -192,8 +192,6 @@ function* enumerateLines(lines: string[]): Generator<LineNoAndText> {
  * the trie. There should be a function that converts arbitrary strings
  * (queries) and converts them into a standard search key for a given language
  * model.
- *
- * Fun fact: This opaque type has ALREADY saved my bacon and found a bug!
  */
 type SearchKey = string & { _: 'SearchKey'};
 
