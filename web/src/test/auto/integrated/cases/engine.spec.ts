@@ -9,7 +9,7 @@ import {
 import * as KMWRecorder from '#recorder';
 
 import { type KeymanEngine, type KeyboardInterface } from 'keyman/app/browser';
-import { type KeyboardStub } from 'keyman/engine/package-cache';
+import { type KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { type OSKInputEventSpec } from '#recorder';
 
 type WindowKey = keyof typeof window;

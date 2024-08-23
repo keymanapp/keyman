@@ -16,8 +16,8 @@ SUBPROJECT_NAME=tools/testing/recorder
 
 builder_describe "Builds the Keyman Engine for Web's test-sequence recording tool" \
   "@/common/web/keyman-version" \
-  "@/common/web/keyboard-processor" \
-  "@/common/web/recorder" \
+  "@/web/src/engine/keyboard" \
+  "@../recorder-core" \
   "clean" \
   "configure" \
   "build"
