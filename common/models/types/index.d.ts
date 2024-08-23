@@ -77,8 +77,8 @@ declare interface LexiconTraversal {
    * If such a traversal state is not supported, returns `undefined`.
    *
    * Note: traversals navigate and represent the lexicon in its "keyed" state,
-   * as produced by use of the search-term keying function defined for the model.
-   * That is, if a model "keys" `è` to `e`, there will be no `è` child.
+   * as produced by use of the search-term keying function defined for the
+   * model.  That is, if a model "keys" `è` to `e`, there will be no `è` child.
    * @param char
    */
   child(char: USVString): LexiconTraversal | undefined;

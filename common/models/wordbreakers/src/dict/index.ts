@@ -90,7 +90,6 @@ export default function dict(fullText: string, dictRoot: LexiconTraversal): Span
   return allSpans;
 }
 
-// Exposed for testing reasons.
 /**
  * Given a section of text without whitespaces and ZWNJs, uses the active lexical-model's
  * entries to detect optimal word-breaking locations.
@@ -100,10 +99,17 @@ export default function dict(fullText: string, dictRoot: LexiconTraversal): Span
  * @returns An array of `Span`s representing each tokenized word, indexed according to their
  * location in the section's original context.
  */
-export function _dict_break(span: Span, dictRoot: LexiconTraversal): Span[] {
+function _dict_break(span: Span, dictRoot: LexiconTraversal): Span[] {
   if(span.length == 0) {
     return [];
   }
+
+  /*
+    The biggest, most important question:  "What is the cheapest way to have a
+    word-break boundary after this character?"
+    - Most complications arise in the process of moving from an "earlier" answer
+      to a "later" answer.
+   */
 
   const text = span.text;
   const splitIndex = span.start;
@@ -118,18 +124,42 @@ export function _dict_break(span: Span, dictRoot: LexiconTraversal): Span[] {
     cost: 0
   };
 
-  // Optimization TODO:  convert to priority queue?
+
+
+
+  /* Optimization TODO:  convert to priority queue?
+    - cheapest (start point cost) + (current traversal min cost) makes a good A*
+      heuristic.
+      - valid heuristic - traversal min-cost will never overestimate.
+      - min-cost:  higher probability = lower cost
+        - basically... good ol' negative log-likelihood, or at least something
+          proportional
+      - would likely avoid a need to search expensive branches this way.
+        - current correction considers fat-finger prob * correction cost.
+        - lexical probability only factors in 100%-after corrections, as a final
+          step, at present, hence why it's not currently available.
+   */
+
+  /**
+    Keeps a running 'tally' of all Traversals that have valid paths at the
+    current processing stage, noting what their starting points were.
+    - The driving question:  "What prefixes and words are possible to reach
+      given recent possible boundaries?"
+   */
   let activePaths: DictBreakerPath[] = [bestBoundingPath];
 
   // 3. Run the master loop.
   // 3a. For each codepoint in the string...
   for(let i=0; i < codepointArr.length; i++) {
     const codepoint = codepointArr[i];
+    // We rebuild the `activePaths` on each outer-loop iteration.
+    // Essentially, we're "double-buffering".
     let paths: DictBreakerPath[] = [];
 
     // 3b. compute all viable paths to continue words & start new ones.
     for(const path of activePaths) {
       let traversal = path.traversal.child(codepoint);
+      // If a path is no longer valid, drop it from the 'tally' / the 'running'.
       if(!traversal) {
         continue;
       }
@@ -147,7 +177,10 @@ export function _dict_break(span: Span, dictRoot: LexiconTraversal): Span[] {
     // 3c. Find the minimal-cost new path with a word boundary, if any exist.
     // If the traversal has entries, it's a legal path-end; else it isn't.
     const boundingPaths = paths.filter((path) => !!path.traversal.entries.length);
-    // If none exist, this is the fallback.
+
+    // We build a new path starting from this specific path; we're modeling a word-end.
+    // If none exist, this is the fallback... and we penalize with a notably higher cost
+    // for doing so.
     const penaltyParent: DictBreakerPath = {
       boundaryIndex: i-1,  // successor will cover one codepoint
       traversal: dictRoot.child(codepoint), // no `entries`, but... it's fine.
@@ -164,8 +197,6 @@ export function _dict_break(span: Span, dictRoot: LexiconTraversal): Span[] {
     // (The closer to log_2(1) = 0, the better.)
     boundingPaths.sort((a, b) => a.cost - b.cost);
 
-    // We build a new path starting from this specific path; we're modeling a word-end.
-    // If it's the "penalty path", we already built it.
     const bestBound = boundingPaths[0];
     const successorPath: DictBreakerPath = {
       boundaryIndex: i,
@@ -274,36 +305,6 @@ export function _dict_break(span: Span, dictRoot: LexiconTraversal): Span[] {
   return finalSpans;
 
   /*
-    Important questions:
-    - What is the cheapest way to have a word-break boundary after this character?
-      - This is a 100% valid question; the complications arise in moving from an "earlier"
-        answer to a "later" answer.
-
-    - What words are possible to reach given recent possible boundaries?
-      - idea: keep a running 'tally' of all Traversals that have valid paths at the
-        current processing stage, noting what their starting points were.
-        - matches the approach seen above.
-        - Possible optimization: ... instead of 'tally'... 'priority queue'?
-          - cheapest (start point cost) + (current traversal min cost) makes a good
-            A* heuristic.
-            - valid heuristic - traversal min-cost will never overestimate.
-            - would likely avoid a need to search expensive branches this way.
-              - current correction considers fat-finger prob * correction cost.
-              - lexical probability only factors in 100%-after corrections, as a
-                final step, at present, hence why it's not currently available.
-        - if no longer valid, drop it from the 'tally' / the 'running'.
-        - after each codepoint, we always add a newly-started traversal.
-          - worst-case, it comes with a set penalty cost added to the previous
-            codepoint's cost.
-        - if a current traversal has entries, we have a direct candidate for best
-          cost at this location.
-          - if using the priority queue strat, we may need to process just enough entries
-            to where the next node is equal or higher cost to the selected entry.
-            - unless the cost crossed to reach it IS that cost.
-          - If multiple co-located entries, use the best cost of them all.  They all
-            search-key to each other, anyway, so whatever is best is still "valid enough"
-            to trigger a boundary.
-
     So...
 
     O(N), N = length of string:  loop over each codepoint

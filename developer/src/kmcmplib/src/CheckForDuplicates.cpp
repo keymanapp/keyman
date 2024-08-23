@@ -1,11 +1,11 @@
 
 #include "pch.h"
 
+#include <km_u16.h>
 #include "compfile.h"
 #include <kmn_compiler_errors.h>
 #include "kmcmplib.h"
 #include <xstring.h>
-#include "kmx_u16.h"
 #include <kmcompx.h>
 
 #include "CheckForDuplicates.h"
