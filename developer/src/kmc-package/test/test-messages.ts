@@ -236,4 +236,8 @@ describe('PackageCompilerMessages', function () {
       PackageCompilerMessages.ERROR_InvalidAuthorEmail);
   });
 
+  it('should generate ERROR_PackageFileHasEmptyVersion if FollowKeyboardVersion is not present and Version is empty', async function() {
+    await testForMessage(this, ['invalid', 'error_package_file_has_empty_version.kps'],
+      PackageCompilerMessages.ERROR_PackageFileHasEmptyVersion);
+  });
 });

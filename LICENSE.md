@@ -1,6 +1,6 @@
 # License
 
-Copyright (c) 2017-2022 SIL International. All rights reserved.
+Copyright (c) 2017-2024 SIL Global. All rights reserved.
 
 Licensed under the MIT License.
 
@@ -10,7 +10,7 @@ Licensed under the MIT License.
 
 The MIT License
 
-Copyright (c) 2017-2022 SIL International
+Copyright (c) 2017-2024 SIL Global
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

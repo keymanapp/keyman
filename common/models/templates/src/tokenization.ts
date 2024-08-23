@@ -61,20 +61,21 @@ export function tokenize(
   let currentIndex = 0;
   while(leftSpans.length > 0) {
     const nextSpan = leftSpans[0];
-    if(nextSpan.start != currentIndex) {
+    if(Math.max(nextSpan.start, currentIndex) != currentIndex) {
+      const nextIndex = Math.max(currentIndex, nextSpan.start);
       // Implicit whitespace span!
       tokenization.left.push({
-        text: context.left!.substring(currentIndex, nextSpan.start),
+        text: context.left!.substring(currentIndex, nextIndex),
         isWhitespace: true
       });
-      currentIndex = nextSpan.start;
+      currentIndex = nextIndex;
     } else {
       leftSpans.shift();
       // Explicit non-whitespace span.
       tokenization.left.push({
         text: nextSpan.text
       });
-      currentIndex = nextSpan.end;
+      currentIndex = Math.max(currentIndex, nextSpan.end);
     }
   }
 
@@ -84,11 +85,12 @@ export function tokenize(
   // Note:  the default wordbreaker won't need this code, as it emits a `''`
   // after final whitespace.
   if(context.left != null && currentIndex != context.left.length) {
+    const nextIndex = Math.max(currentIndex, context.left!.length);
     tokenization.left.push({
-      text: context.left.substring(currentIndex, context.left!.length),
+      text: context.left.substring(currentIndex, nextIndex),
       isWhitespace: true
     });
-    currentIndex = context.left!.length;
+    currentIndex = nextIndex;
   }
 
   // New step 2: handle any rejoins needed.
@@ -134,13 +136,14 @@ export function tokenize(
   // `caretSplitsToken` check is additional.
   while(rightSpans.length > 0) {
     const nextSpan = rightSpans[0];
-    if(nextSpan.start != currentIndex) {
+    if(Math.max(nextSpan.start, currentIndex) != currentIndex) {
+      const nextIndex = Math.max(currentIndex, nextSpan.start);
       // Implicit whitespace span!
       tokenization.right.push({
-        text: context.right!.substring(currentIndex, nextSpan.start),
+        text: context.right!.substring(currentIndex, nextIndex),
         isWhitespace: true
       });
-      currentIndex = nextSpan.start;
+      currentIndex = nextIndex;
     } else {
       const leftTail = tokenization.left[leftTokenCount-1];
       if(leftTail) {
@@ -159,7 +162,7 @@ export function tokenize(
       tokenization.right.push({
         text: nextSpan.text
       });
-      currentIndex = nextSpan.end;
+      currentIndex = Math.max(currentIndex, nextSpan.end);
     }
 
     // We've always processed the "first right token" after the first iteration.
@@ -176,11 +179,12 @@ export function tokenize(
   // Also note:  is pretty much WET with the similar check after the
   // leftSpan loop.
   if(context.right && currentIndex != context.right.length) {
+    const nextIndex = Math.max(currentIndex, context.right!.length);
     tokenization.right.push({
-      text: context.right.substring(currentIndex, context.right!.length),
+      text: context.right.substring(currentIndex, nextIndex),
       isWhitespace: true
     });
-    currentIndex = context.right!.length;
+    currentIndex = nextIndex;
   }
 
   return tokenization;
