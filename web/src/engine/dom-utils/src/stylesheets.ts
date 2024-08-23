@@ -1,5 +1,5 @@
 import { DeviceSpec, ManagedPromise } from '@keymanapp/web-utils';
-import { type InternalKeyboardFont as KeyboardFont } from '@keymanapp/keyboard-processor';
+import { type InternalKeyboardFont as KeyboardFont } from 'keyman/engine/keyboard';
 
 type FontFamilyStyleMap = {[family: string]: HTMLStyleElement};
 

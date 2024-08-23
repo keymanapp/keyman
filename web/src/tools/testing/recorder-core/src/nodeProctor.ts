@@ -8,8 +8,10 @@ import {
   RecordedSyntheticKeystroke
 } from "./index.js";
 
-import { KeyboardInterface, KeyEvent, KeyEventSpec, KeyboardProcessor, Mock, type OutputTarget, KeyboardHarness } from "@keymanapp/keyboard-processor";
+import { KeyEvent, KeyEventSpec, KeyboardHarness } from "keyman/engine/keyboard";
+import { Mock, type OutputTarget } from "keyman/engine/js-processor";
 import { DeviceSpec } from "@keymanapp/web-utils";
+import { KeyboardInterface, KeyboardProcessor } from 'keyman/engine/js-processor';
 
 export default class NodeProctor extends Proctor {
   private keyboardWithHarness: KeyboardHarness;

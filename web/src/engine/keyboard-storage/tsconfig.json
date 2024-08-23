@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.dom.json",
+
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "../../../build/engine/keyboard-storage/obj/",
+    "tsBuildInfoFile": "../../../build/engine/keyboard-storage/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src"
+  },
+
+  "include": [ "src/**/*.ts" ],
+
+  "references": [
+    { "path": "../interfaces" }
+  ]
+}
