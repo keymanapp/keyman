@@ -5,15 +5,11 @@
     { "path": "./common/models/templates/tsconfig.json" },
     { "path": "./common/models/types/tsconfig.json" },
     { "path": "./common/models/wordbreakers/tsconfig.json" },
-    { "path": "./common/predictive-text/tsconfig.all.json" },
     { "path": "./common/tools/hextobin/" },
 
     { "path": "./common/web/gesture-recognizer/tsconfig.json" },
     { "path": "./common/web/gesture-recognizer/src/tools/unit-test-resources/tsconfig.json" },
-    { "path": "./common/web/keyboard-processor/tsconfig.json" },
     { "path": "./common/web/keyman-version" },
-    { "path": "./common/web/lm-message-types/" },
-    { "path": "./common/web/lm-worker/" },
     { "path": "./common/web/recorder/tsconfig.json" },
     { "path": "./common/web/sentry-manager/src/tsconfig.json" },
     { "path": "./common/web/types/" },
@@ -44,6 +40,9 @@
     { "path": "./resources/build/version/" },
 
     { "path": "./web/src/tsconfig.all.json" },
+    { "path": "./web/src/engine/predictive-text/types/" },
+    { "path": "./web/src/engine/predictive-text/worker-main/tsconfig.all.json" },
+    { "path": "./web/src/engine/predictive-text/worker-thread" },
     // { "path": "./web/tools/recorder/tsconfig.json" },
     // { "path": "./web/tools/sourcemap-root/tsconfig.json" },
   ]

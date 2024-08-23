@@ -16,6 +16,11 @@ builder_describe "Keyman common and resources modules" \
   build \
   test
 
+builder_describe_platform \
+  :linux    linux \
+  :mac      mac \
+  :windows  win
+
 builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------

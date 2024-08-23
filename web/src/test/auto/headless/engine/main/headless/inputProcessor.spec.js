@@ -5,8 +5,8 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 import { InputProcessor } from 'keyman/engine/main';
-import { KeyboardInterface, MinimalKeymanGlobal, Mock } from '@keymanapp/keyboard-processor';
-import { NodeKeyboardLoader } from '@keymanapp/keyboard-processor/node-keyboard-loader';
+import { KeyboardInterface, MinimalKeymanGlobal, Mock } from 'keyman/engine/keyboard';
+import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 import { KeyboardTest } from '@keymanapp/recorder-core';
 
 import { Worker } from '@keymanapp/lexical-model-layer/node';
@@ -48,8 +48,8 @@ describe('InputProcessor', function() {
         assert.isUndefined(core.activeKeyboard); // No keyboard should be loaded yet.
         assert.isUndefined(core.activeModel);    // Same for the model.
 
-        // These checks are lifted from the keyboard-processor init checks found in
-        // common/web/keyboard-processor/tests/cases/basic-init.js.
+        // These checks are lifted from the keyboard init checks found in
+        // web/src/test/auto/headless/engine/js-processor/basic-init.js.
         assert.equal('us', core.keyboardProcessor.baseLayout, 'KeyboardProcessor has unexpected base layout')
         assert.isNotNull(global.KeymanWeb, 'KeymanWeb global was not automatically installed');
         assert.equal('default', core.keyboardProcessor.layerId, 'Default layer is not set to "default"');

@@ -56,9 +56,9 @@ export default {
       files: ['build/test/dom/cases/osk/**/*.spec.mjs']
     },
     {
-      name: 'engine/package-cache',
+      name: 'engine/keyboard-storage',
       // Relative, from the containing package.json
-      files: ['build/test/dom/cases/packages/**/*.spec.mjs']
+      files: ['build/test/dom/cases/keyboard-storage/**/*.spec.mjs']
     }
   ],
   middleware: [
