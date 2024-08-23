@@ -174,7 +174,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     updateActiveLexicalModel();
 
     ImageView imageView = (ImageView) layout.findViewById(R.id.image1);
-    imageView.setImageResource(R.drawable.ic_arrow_forward);
+    imageView.setImageResource(R.drawable.ic_action_forward);
     layout.setEnabled(true);
     layout.setOnClickListener(new View.OnClickListener() {
       @Override
@@ -198,7 +198,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
      * textView = (TextView) layout.findViewById(R.id.text1);
      * textView.setText(getString(R.string.manage_dictionary));
      * imageView = (ImageView) layout.findViewById(R.id.image1);
-     * imageView.setImageResource(R.drawable.ic_arrow_forward);
+     * imageView.setImageResource(R.drawable.ic_action_forward);
      */
 
     listView.setAdapter(adapter);
@@ -346,7 +346,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
       }
 
       holder.text.setText(kbd.getResourceName());
-      holder.img.setImageResource(R.drawable.ic_arrow_forward);
+      holder.img.setImageResource(R.drawable.ic_action_forward);
 
       return convertView;
     }
