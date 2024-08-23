@@ -5,7 +5,9 @@ import logging
 import os
 import sys
 
-from keyman_config import add_standard_arguments, initialize_logging, initialize_sentry, verify_dbus_running
+from keyman_config import (
+  are_requirements_missing, add_standard_arguments, initialize_logging,
+  initialize_sentry, verify_dbus_running)
 from keyman_config.kvk2ldml import parse_kvk_file, print_kvk, convert_ldml, output_ldml
 
 
@@ -24,6 +26,10 @@ def main():
     initialize_logging(args)
     initialize_sentry()
     verify_dbus_running()
+
+    if are_requirements_missing():
+        logging.error('km-kvk2ldml: Missing requirements. Please install python3-fonttools.')
+        sys.exit(1)
 
     name, ext = os.path.splitext(args.kvkfile)
     # Check if input file extension is kvk
@@ -54,7 +60,8 @@ def main():
 
     try:
         with open(outputfile, 'wb') as ldmlfile:
-            ldml = convert_ldml(kvkData)
+            kmpJsonFilename = os.path.join(os.path.dirname(args.kvkfile), 'kmp.json')
+            ldml = convert_ldml(name, kvkData, kmpJsonFilename)
             output_ldml(ldmlfile, ldml)
     except PermissionError:
         logging.error(f'km-kvk2ldml: error, permission denied writing file `{outputfile}`')
