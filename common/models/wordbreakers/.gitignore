@@ -1,2 +1,2 @@
 build/
-**/**.inc.ts
+src/main/default/data.inc.ts
