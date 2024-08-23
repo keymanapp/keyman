@@ -8,4 +8,9 @@
   "include": [
     "src/**/*.ts"
   ],
+  "references": [
+    { "path": "../../../common/web/types" },
+    { "path": "../../../common/models/types" },
+    { "path": "../common/web/utils" },
+  ]
 }

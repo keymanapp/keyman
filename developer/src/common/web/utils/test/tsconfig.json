@@ -15,6 +15,7 @@
       "helpers/*.ts",
   ],
   "references": [
-    { "path": "../" },
-  ],
+      { "path": "../" },
+      { "path": "../../test-helpers/" },
+    ]
 }

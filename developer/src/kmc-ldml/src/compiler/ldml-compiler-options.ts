@@ -1,4 +1,4 @@
-import { CompilerOptions, LDMLKeyboardXMLSourceFileReaderOptions } from "@keymanapp/common-types";
+import { CompilerOptions, LDMLKeyboardXMLSourceFileReaderOptions } from "@keymanapp/developer-utils";
 
 /**
  * @public

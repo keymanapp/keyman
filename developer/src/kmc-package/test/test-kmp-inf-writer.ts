@@ -36,7 +36,7 @@ type InfFile = {[name:string]: Section};
  * which never repeats
  */
 function parseInf(inf: string): InfFile {
-  let items = inf.split('\r\n');
+  let items = inf.replaceAll(/\r\n/g, '\n').split('\n');
   let sections: InfFile = {}, newSection: Section = {};
   sections[0] = newSection;
   for(let item of items) {

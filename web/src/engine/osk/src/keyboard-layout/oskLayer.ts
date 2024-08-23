@@ -1,4 +1,4 @@
-import { ActiveLayer, ActiveLayout } from '@keymanapp/keyboard-processor';
+import { ActiveLayer, ActiveLayout } from 'keyman/engine/keyboard';
 
 import OSKRow from './oskRow.js';
 import OSKBaseKey from './oskBaseKey.js';

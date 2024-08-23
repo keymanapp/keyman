@@ -7,53 +7,57 @@
 
 std::vector<int> error_vec;
 
-int msgproc(int line, uint32_t dwMsgCode, const char* szText, void* context) {
-  error_vec.push_back(dwMsgCode);
+void msgproc(const KMCMP_COMPILER_RESULT_MESSAGE &message, void* context) {
+  error_vec.push_back(message.errorCode);
   const char*t = "unknown";
-  switch(dwMsgCode & 0xF000) {
-    case CERR_HINT:    t="   hint"; break;
-    case CERR_WARNING: t="warning"; break;
-    case CERR_ERROR:   t="  error"; break;
-    case CERR_FATAL:   t="  fatal"; break;
+  switch(message.errorCode & MESSAGE_SEVERITY_MASK) {
+    case CompilerErrorSeverity::Hint:    t=" SevHint"; break;
+    case CompilerErrorSeverity::Warn:    t=" SevWarn"; break;
+    case CompilerErrorSeverity::Error:   t="SevError"; break;
+    case CompilerErrorSeverity::Fatal:   t="SevFatal"; break;
+    case CompilerErrorSeverity::Info:    t=" SevInfo"; break;
   }
-  printf("line %d  %s %4.4x:  %s\n", line, t, (unsigned int)dwMsgCode, szText);
-	return 1;
+  printf("[CompilerMessage] %s(%d): %s | 0x%3.3x (",
+    message.filename.c_str(),
+    message.lineNumber,
+    t,
+    (unsigned int)message.errorCode & MESSAGE_BASEERROR_MASK
+  );
+  for(auto it = message.parameters.begin(); it != message.parameters.end(); it++) {
+    printf("%s'%s'", it == message.parameters.begin() ? "" : ", ", it->c_str());
+  }
+  printf(")\n");
 }
 
-bool loadfileProc(const char* filename, const char* baseFilename, void* data, int* size, void* context) {
+const std::vector<uint8_t> loadfileProc(const std::string& filename, const std::string& baseFilename) {
   std::string resolvedFilename = filename;
-  if(baseFilename && *baseFilename && IsRelativePath(filename)) {
+  if(baseFilename.length() && IsRelativePath(filename.c_str())) {
     char* p;
-    if ((p = strrchr_slash((char*)baseFilename)) != nullptr) {
-      std::string basePath = std::string(baseFilename, (int)(p - baseFilename + 1));
-      resolvedFilename = basePath;
+    const char *base = baseFilename.c_str();
+    if ((p = strrchr_slash((char*)base)) != nullptr) {
+      resolvedFilename = std::string(baseFilename, 0, (int)(p - base + 1));
       resolvedFilename.append(filename);
     }
   }
 
+  std::vector<uint8_t> buf;
+
   FILE* fp = Open_File(resolvedFilename.c_str(), "rb");
   if(!fp) {
-    return false;
+    return buf;
   }
 
-  if(!data) {
-    // return size
-    if(fseek(fp, 0, SEEK_END) != 0) {
-      fclose(fp);
-      return false;
-    }
-    *size = ftell(fp);
-    if(*size == -1L) {
-      fclose(fp);
-      return false;
-    }
-  } else {
-    // return data
-    if(fread(data, 1, *size, fp) != (size_t)(*size)) {
-      fclose(fp);
-      return false;
-    }
+  if(fseek(fp, 0, SEEK_END) != 0) {
+    fclose(fp);
+    return buf;
+  }
+  size_t size = ftell(fp);
+
+  buf.resize(size);
+  fseek(fp, 0, SEEK_SET);
+  if(fread(buf.data(), 1, size, fp) != size) {
+    buf.resize(0);
   }
   fclose(fp);
-  return true;
+  return buf;
 }

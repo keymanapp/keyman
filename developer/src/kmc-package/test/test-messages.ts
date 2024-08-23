@@ -4,7 +4,7 @@ import { TestCompilerCallbacks, verifyCompilerMessagesObject } from '@keymanapp/
 import { PackageCompilerMessages } from '../src/compiler/package-compiler-messages.js';
 import { makePathToFixture } from './helpers/index.js';
 import { KmpCompiler } from '../src/compiler/kmp-compiler.js';
-import { CompilerErrorNamespace, CompilerOptions } from '@keymanapp/common-types';
+import { CompilerErrorNamespace, CompilerOptions } from '@keymanapp/developer-utils';
 
 const debug = false;
 const callbacks = new TestCompilerCallbacks();
@@ -236,4 +236,8 @@ describe('PackageCompilerMessages', function () {
       PackageCompilerMessages.ERROR_InvalidAuthorEmail);
   });
 
+  it('should generate ERROR_PackageFileHasEmptyVersion if FollowKeyboardVersion is not present and Version is empty', async function() {
+    await testForMessage(this, ['invalid', 'error_package_file_has_empty_version.kps'],
+      PackageCompilerMessages.ERROR_PackageFileHasEmptyVersion);
+  });
 });
