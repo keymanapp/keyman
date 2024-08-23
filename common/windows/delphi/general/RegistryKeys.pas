@@ -115,6 +115,7 @@ const
 
   SRegValue_AltGrCtrlAlt                = 'simulate altgr';                         // CU
   SRegValue_KeyboardHotKeysAreToggle    = 'hotkeys are toggles';                    // CU
+  SRegValue_UseRightModifierHotKey      = 'use right modifier for hotkey';          // CU
   SRegValue_ReleaseShiftKeysAfterKeyPress = 'release shift keys after key press';   // CU
   SRegValue_TestKeymanFunctioning       = 'test keyman functioning';                // CU, default true
 
