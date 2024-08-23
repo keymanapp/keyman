@@ -18,14 +18,15 @@ namespace kmcmp {
     std::wstringstream key;
     key << kp->Key << "," << kp->ShiftFlags << ",";
     if (kp->dpContext) {
-      std::wstring Context_ws = u16fmt((const PKMX_WCHAR) kp->dpContext);
+      std::wstring Context_ws = wstring_from_u16string((const PKMX_WCHAR) kp->dpContext);
       key << Context_ws;
     }
     return key.str();
   }
 
 }
-KMX_DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
+
+void VerifyUnreachableRules(PFILE_GROUP gp) {
   PFILE_KEY kp = gp->dpKeyArray;
   KMX_DWORD i;
 
@@ -41,8 +42,9 @@ KMX_DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
       if (kp->Line != k1.Line && reportedLines.count(kp->Line) == 0) {
         reportedLines.insert(kp->Line);
         kmcmp::currentLine = kp->Line;
-        snprintf(ErrExtraLIB, ERR_EXTRA_LIB_LEN, " Overridden by rule on line %d", k1.Line);
-        AddWarning(CHINT_UnreachableRule);
+        ReportCompilerMessage(KmnCompilerMessages::HINT_UnreachableRule, {
+          /* LineNumber */ std::to_string(k1.Line)
+        });
       }
     }
     else {
@@ -51,6 +53,4 @@ KMX_DWORD VerifyUnreachableRules(PFILE_GROUP gp) {
   }
 
   kmcmp::currentLine = oldCurrentLine;
-
-  return CERR_None;
 }

@@ -297,6 +297,11 @@
       android:configChanges="orientation"
       android:label="@string/app_name"
       android:theme="@style/AppTheme.Base" />
+    <activity
+      android:name=".AdjustLongpressDelayActivity"
+      android:configChanges="orientation"
+      android:label="@string/app_name"
+      android:theme="@style/AppTheme.Base" />
 
     <!-- Put other WebViewActivities in a separate process so the Keyboard WebView doesn't lag.
     Ref https://stackoverflow.com/questions/40650643/timed-out-waiting-on-iinputcontextcallback-with-custom-keyboard-on-android -->

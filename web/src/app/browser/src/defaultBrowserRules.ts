@@ -1,9 +1,10 @@
+import { ModifierKeyConstants } from '@keymanapp/common-types';
 import {
   Codes,
   DefaultRules,
-  type KeyEvent,
-  type OutputTarget
-} from '@keymanapp/keyboard-processor';
+  type KeyEvent
+} from 'keyman/engine/keyboard';
+import { type OutputTarget } from 'keyman/engine/js-processor';
 
 import ContextManager from './contextManager.js';
 
@@ -45,7 +46,7 @@ export default class DefaultBrowserRules extends DefaultRules {
       // This method will be handled between `ContextManager` and PageContextAttachment:
       // pageContextAttachment.findNeighboringInput(contextManager.activeTarget.getElement(), <same flag>)
       case Codes.keyCodes['K_TAB']:
-        moveToNext((Lkc.Lmodifiers & Codes.modifierCodes['SHIFT']) != 0);
+        moveToNext((Lkc.Lmodifiers & ModifierKeyConstants.K_SHIFTFLAG) != 0);
         break;
       case Codes.keyCodes['K_TABBACK']:
         moveToNext(true);

@@ -1,0 +1,23 @@
+{
+	"name": "windows-trayicon",
+	"version": "3.0.0",
+	"description": "Create tray icon for windows",
+	"main": "index.js",
+	"os": [
+		"win32"
+	],
+	"scripts": {
+		"install": "node-gyp configure build"
+	},
+	"author": "mce",
+	"license": "MIT",
+	"dependencies": {
+		"node-gyp": "^10.2.0",
+		"bindings": "^1.5.0",
+		"node-addon-api": "^3.1.0"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/mceSystems/node-windows-trayicon"
+	}
+}

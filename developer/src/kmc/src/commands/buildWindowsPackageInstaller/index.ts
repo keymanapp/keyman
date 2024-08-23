@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { CompilerCallbacks, defaultCompilerOptions } from '@keymanapp/common-types';
+import { CompilerCallbacks, defaultCompilerOptions } from '@keymanapp/developer-utils';
 import { NodeCompilerCallbacks } from '../../util/NodeCompilerCallbacks.js';
 import { WindowsPackageInstallerCompiler, WindowsPackageInstallerSources } from '@keymanapp/kmc-package';
 import { CommandLineBaseOptions } from 'src/util/baseOptions.js';

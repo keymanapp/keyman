@@ -6,7 +6,8 @@ import { makePathToFixture } from './helpers/index.js';
 import { KeyboardInfoCompiler, KeyboardInfoCompilerResult, unitTestEndpoints } from '../src/keyboard-info-compiler.js';
 import langtags from "../src/imports/langtags.js";
 import { KmpCompiler, KmpCompilerOptions } from '@keymanapp/kmc-package';
-import { CompilerCallbacks, KMX, KeymanFileTypes, KeymanTargets, KmpJsonFile } from '@keymanapp/common-types';
+import { KMX, KeymanFileTypes, KeymanTargets, KmpJsonFile } from '@keymanapp/common-types';
+import { CompilerCallbacks } from '@keymanapp/developer-utils';
 import { KeyboardInfoFile, KeyboardInfoFileLanguage, KeyboardInfoFilePlatform } from './keyboard-info-file.js';
 
 const callbacks = new TestCompilerCallbacks();
@@ -833,18 +834,5 @@ describe('keyboard-info-compiler', function () {
     const fonts = [KHMER_ANGKOR_DISPLAY_FONT];
     const result = await compiler['fontSourceToKeyboardInfoFont'](KHMER_ANGKOR_KPS, kmpJsonData, fonts);
     assert.deepEqual(result, KHMER_ANGKOR_DISPLAY_FONT_INFO);
-  });
-
-  it('handles missing info.version in a package file', async function() {
-    const sources = {
-      ...KHMER_ANGKOR_SOURCES,
-      kpsFilename: makePathToFixture('missing-info-version-in-kps-11856', 'khmer_angkor.kps')
-    };
-    const compiler = new KeyboardInfoCompiler();
-    assert.isTrue(await compiler.init(callbacks, {sources}));
-    const kpjFilename = KHMER_ANGKOR_KPJ;
-    const result = await compiler.run(kpjFilename);
-    const actual = JSON.parse(new TextDecoder().decode(result.artifacts.keyboard_info.data));
-    assert.equal(actual.version, '1.0');
   });
 });

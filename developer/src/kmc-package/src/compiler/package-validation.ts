@@ -1,7 +1,7 @@
-import { KmpJsonFile, CompilerCallbacks, CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
+import { KmpJsonFile, KeymanFileTypes } from '@keymanapp/common-types';
 import { PackageCompilerMessages } from './package-compiler-messages.js';
 import { keymanEngineForWindowsFiles, keymanForWindowsInstallerFiles, keymanForWindowsRedistFiles } from './redist-files.js';
-import { isValidEmail } from '@keymanapp/developer-utils';
+import { isValidEmail, CompilerCallbacks, CompilerOptions } from '@keymanapp/developer-utils';
 
 // The keyboard ID SHOULD adhere to this pattern:
 const KEYBOARD_ID_PATTERN_PACKAGE = /^[a-z_][a-z0-9_]*\.(kps|kmp)$/;

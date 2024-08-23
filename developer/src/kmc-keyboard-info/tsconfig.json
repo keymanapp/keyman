@@ -16,4 +16,9 @@
     "src/ttfmeta/lib/*.js",
     "src/imports/langtags.js",
   ],
+  "references": [
+    { "path": "../../../common/web/types" },
+    { "path": "../kmc-package/" },
+    { "path": "../common/web/utils/" },
+  ]
 }
