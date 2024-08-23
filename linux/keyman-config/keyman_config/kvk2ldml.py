@@ -349,7 +349,11 @@ def convert_ldml(kvkData):
             else:
                 keymaps["shift"] = (uskey,)
 
-    ldml = etree.Element("keyboard", locale="zzz-keyman")
+    if kvkData.UnicodeFont:
+        font = kvkData.UnicodeFont.name
+    else:
+        font = kvkData.AnsiFont.name
+    ldml = etree.Element("keyboard", locale="zzz-keyman", keymanFacename=font)
     etree.SubElement(ldml, "version", platform="11")
     names = etree.SubElement(ldml, "names")
     names.append(etree.Element("name", value="ZZZ"))
