@@ -1,4 +1,4 @@
-import { ALL_COMPILER_LOG_FORMATS, ALL_COMPILER_LOG_LEVELS, CompilerLogFormat, CompilerLogLevel } from "@keymanapp/common-types";
+import { ALL_COMPILER_LOG_FORMATS, ALL_COMPILER_LOG_LEVELS, CompilerLogFormat, CompilerLogLevel } from "@keymanapp/developer-utils";
 import { Command, Option } from "commander";
 
 /**

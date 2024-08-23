@@ -53,9 +53,13 @@ sudo mk-build-deps --install linux/debian/control
 
 #### Node.js
 
-Node.js v18 is required for Core builds, Web builds, and Developer command line tool builds and usage.
+Node.js is required for Core builds, Web builds, and Developer command line tool builds and usage.
 
-Follow the instructions on the [NodeSource Distributions](https://github.com/nodesource/distributions#table-of-contents) page.
+Our recommended way to install node.js is with
+[nvm](https://github.com/nvm-sh/nvm). This makes it easy to switch between
+versions of node.js.
+
+See [node.md](node.md) for more information.
 
 #### Emscripten
 

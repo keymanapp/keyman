@@ -1,5 +1,5 @@
 import { KmnCompilerMessages } from "../compiler/kmn-compiler-messages.js";
-import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageDef as def, CompilerMessageSpec } from "@keymanapp/common-types";
+import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageDef as def, CompilerMessageSpec } from "@keymanapp/developer-utils";
 import { kmnfile } from "./compiler-globals.js";
 
 const Namespace = CompilerErrorNamespace.KmwCompiler;
@@ -49,7 +49,9 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
   static Hint_TouchLayoutUsesUnsupportedGesturesDownlevel = (o:{keyId:string}) => m(this.HINT_TouchLayoutUsesUnsupportedGesturesDownlevel,
     `The touch layout uses a flick or multi-tap gesture on key ${def(o.keyId)}, which is only available on version 17.0+ of Keyman`);
 
-  static INFO_MinimumEngineVersion = SevInfo | 0x0006;
-  static Info_MinimumEngineVersion = (o:{version:string}) => m(this.INFO_MinimumEngineVersion,
-    `The compiler has assigned a minimum web engine version of ${o.version} based on features used in this keyboard`);
+  static INFO_MinimumWebEngineVersion = SevInfo | 0x0006;
+  static Info_MinimumWebEngineVersion = (o:{version:string}) => m(
+    this.INFO_MinimumWebEngineVersion,
+    `The compiler has assigned a minimum web engine version of ${o.version} based on features used in this keyboard`
+  );
 };

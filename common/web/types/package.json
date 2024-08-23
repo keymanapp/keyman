@@ -31,24 +31,17 @@
   "dependencies": {
     "@keymanapp/ldml-keyboard-constants": "*",
     "@keymanapp/keyman-version": "*",
-    "restructure": "3.0.1",
-    "semver": "^7.5.2",
-    "sax": ">=0.6.0",
-    "xmlbuilder": "~11.0.0"
+    "restructure": "3.0.1"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
-    "@types/git-diff": "^2.0.3",
     "@types/mocha": "^5.2.7",
     "@types/node": "^20.4.1",
-    "@types/semver": "^7.3.12",
-    "@types/xml2js": "^0.4.5",
     "ajv": "^8.12.0",
     "ajv-cli": "^5.0.0",
     "ajv-formats": "^2.1.1",
     "c8": "^7.12.0",
     "chalk": "^2.4.2",
-    "git-diff": "^2.0.6",
     "hexy": "^0.3.4",
     "mocha": "^8.4.0",
     "typescript": "^5.4.5"

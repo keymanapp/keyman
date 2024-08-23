@@ -1,4 +1,4 @@
-import { CompilerCallbacks } from "@keymanapp/common-types";
+import { CompilerCallbacks } from "@keymanapp/developer-utils";
 
 export let callbacks: CompilerCallbacks;
 

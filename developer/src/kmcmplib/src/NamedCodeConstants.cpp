@@ -120,15 +120,14 @@ KMX_BOOL NamedCodeConstants::LoadFile(PFILE_KEYBOARD fk, const KMX_WCHAR *filena
 
   int FileSize;
   KMX_BYTE* Buf;
-  if(!loadfileproc(szNameUtf8.c_str(), fk->extra->kmnFilename.c_str(), nullptr, &FileSize, msgprocContext)) {
+  std::vector<uint8_t> bufvec = loadfileproc(szNameUtf8, fk->extra->kmnFilename);
+  FileSize = static_cast<int>(bufvec.size());
+  if(!FileSize) {
     return FALSE;
   }
 
   Buf = new KMX_BYTE[FileSize+1];
-  if(!loadfileproc(szNameUtf8.c_str(), fk->extra->kmnFilename.c_str(), Buf, &FileSize, msgprocContext)) {
-    delete[] Buf;
-    return FALSE;
-  }
+  std::copy(bufvec.begin(), bufvec.end(), Buf);
   Buf[FileSize] = 0; // zero-terminate for strtok
 
   char* filetok;

@@ -24,11 +24,6 @@
 
 using namespace std;
 
-#define CERR_FATAL                                         0x00008000
-#define CERR_ERROR                                         0x00004000
-#define CERR_WARNING                                       0x00002000
-#define CERR_HINT                                          0x00001000
-
 int main(int argc, char *argv[])
 {
 	if(argc < 4) {
@@ -53,8 +48,7 @@ int main(int argc, char *argv[])
     if(*p == '\\') *p = '/';
   }
 
-  char  first5[6] = "CERR_";
-  char* pfirst5 = first5;
+  const char* first5 = "CERR_";
 
   KMCMP_COMPILER_RESULT result;
   KMCMP_COMPILER_OPTIONS options;
@@ -66,7 +60,7 @@ int main(int argc, char *argv[])
 
   if(kmcmp_CompileKeyboard(kmn_file, options, msgproc, loadfileProc, nullptr, result)) {
     char* testname = strrchr( (char*) kmn_file, '/') + 1;
-    if(strncmp(testname, pfirst5, 5) == 0){
+    if(strncmp(testname, first5, strlen(first5)) == 0){
       return __LINE__;  // exit code: CERR_ in Name + no Error found
     }
 
@@ -99,7 +93,7 @@ int main(int argc, char *argv[])
     char* testname = strrchr( (char*) kmn_file, '/') + 1;
 
     // Does testname contain CERR_  && contains '_' on pos 9 ? ->  Get ErrorValue
-    if ((strncmp(testname, pfirst5, 5) == 0) &&   (testname[9] == '_')) {
+    if ((strncmp(testname, first5, strlen(first5)) == 0) &&   (testname[9] == '_')) {
       char* ErrNr = strchr(testname, '_') +1 ;
       std::istringstream(ErrNr) >> std::hex >> error_val;
 

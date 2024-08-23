@@ -14,7 +14,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe "Builds the Keyman Engine for Web's development & unit-testing tools" \
   "@/common/web/keyman-version" \
-  "@/common/web/keyboard-processor" \
+  "@/web/src/engine/keyboard" \
   "configure" \
   "clean" \
   "build" \

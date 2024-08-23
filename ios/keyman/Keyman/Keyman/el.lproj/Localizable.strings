@@ -24,7 +24,7 @@
 
 /* The name of the iOS Settings menu option for giving the keyboard full access.  (The menu entry
 underneath the app's name within the app-specific keyboard menu.) */
-"ios-settings-allow-full-access" = "Ἐπιστρέψτε πλήρη πρόσβαση";
+"ios-settings-allow-full-access" = "Ἐπιτρέψτε πλήρη πρόσβαση";
 
 /* Short-form used when installing a font in order to display a language properly. */
 "language-for-font" = "Γραμματοσειρά %@";
@@ -60,13 +60,13 @@ underneath the app's name within the app-specific keyboard menu.) */
 "menu-show-browser" = "Φυλλομετρητής";
 
 /* Menu option used to control in-app font size. */
-"menu-text-size" = "Μέγεθος κειμένου";
+"menu-text-size" = "Μέγεθος γραμματοσειρᾶς";
 
 /* Used to describe the current font size */
-"text-size-label" = "Μέγεθος κειμένου: %i";
+"text-size-label" = "Μέγεθος γραμματοσειρᾶς: %i";
 
 /* Text to indicate that a user should set a toggle within iOS Settings to 'active'. */
-"toggle-to-enable" = "Ἐνεργοποιῆστε %@";
+"toggle-to-enable" = "Ἐνεργοποίηση %@";
 
 /* First option on the Get Started tutorial - Add a keyboard for your language */
 "tutorial-add-keyboard" = "Προσθέστε πληκτρολόγιο γιὰ τὴν γλῶσσα σας";
@@ -75,7 +75,7 @@ underneath the app's name within the app-specific keyboard menu.) */
 "tutorial-show-help" = "Περισσότερες πληροφορίες";
 
 /* Second option on the Get Started tutorial - Set up Keyman as system-wide keyboard */
-"tutorial-system-keyboard" = "Ὁρίστε τὸ Κῆμαν ὡς παν-συστημικὸ πληκτρολόγιο";
+"tutorial-system-keyboard" = "Ὁρίστε τὸ Κῆμαν ὡς πληκτρολόγιο ὁλοκλήρου τοῦ συστήματος";
 
 /* Used to display app version (as in \"Version: 1.0.2\" */
 "version-label" = "Ἔκδοση: %@";

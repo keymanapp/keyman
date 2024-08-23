@@ -179,10 +179,6 @@ BOOL AIWin2000Unicode::PostKeys()
       }
 
 		  break;
-	  case QIT_VSHIFTDOWN:
-		  break;
-	  case QIT_VSHIFTUP:
-		  break;
 	  case QIT_CHAR:
       pInputs[i].type = INPUT_KEYBOARD;
       pInputs[i].ki.wVk = 0;

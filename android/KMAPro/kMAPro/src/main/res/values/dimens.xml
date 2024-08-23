@@ -23,4 +23,5 @@
     <dimen name="preference_icon">32dp</dimen>
     <dimen name="update_indicator_size">16dp</dimen>
     <dimen name="update_indicator_bg_margin">0dp</dimen>
+    <dimen name="longpress_delay_label_textsize">24sp</dimen>
 </resources>
