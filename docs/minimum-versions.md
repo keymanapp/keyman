@@ -49,7 +49,6 @@ https://help.keyman.com/developer/engine/android/latest-version/
 |          KEYMAN Variable          |     Value    |
 |-----------------------------------|--------------|
 | KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER | noble |
-| KEYMAN_MAX_VERSION_EMSCRIPTEN | 3.1.58 |
 | KEYMAN_MIN_TARGET_VERSION_ANDROID | 5 |
 | KEYMAN_MIN_TARGET_VERSION_CHROME | 95.0 |
 | KEYMAN_MIN_TARGET_VERSION_IOS | 12.2 |
@@ -58,7 +57,7 @@ https://help.keyman.com/developer/engine/android/latest-version/
 | KEYMAN_MIN_TARGET_VERSION_WINDOWS | 10 |
 | KEYMAN_MIN_VERSION_ANDROID_SDK | 21 |
 | KEYMAN_MIN_VERSION_CPP | 17 |
-| KEYMAN_MIN_VERSION_EMSCRIPTEN | 3.1.44 |
+| KEYMAN_MIN_VERSION_EMSCRIPTEN | 3.1.64 |
 | KEYMAN_MIN_VERSION_MESON | 1.0.0 |
 | KEYMAN_MIN_VERSION_NODE_MAJOR | 20 |
 | KEYMAN_MIN_VERSION_NPM | 10.5.1 |
