@@ -64,7 +64,7 @@ globally trusted. The environment variables `SC_PFX_SHA1` and `SC_PFX_SHA256`
 can be set to custom certificate paths.
 
 The Keyman repo can build test certificates for you.  To build your own, run
-`./build.sh certificates` from **common/windows/delphi/tools/certificates** to
+`./common/windows/delphi/tools/certificates/build.sh certificates` to
 build and install your own local root CA "**KeymanTestCA**" certificates. If you
 specify a password for the certificate, you'll need to set that in the
 environment variable `SC_PWD`.
