@@ -56,7 +56,8 @@ def main():
 
     try:
         with open(outputfile, 'wb') as ldmlfile:
-            ldml = convert_ldml(kvkData)
+            kmpJsonFilename = os.path.join(os.path.dirname(args.kvkfile), 'kmp.json')
+            ldml = convert_ldml(name, kvkData, kmpJsonFilename)
             output_ldml(ldmlfile, ldml)
     except PermissionError:
         logging.error(f'km-kvk2ldml: error, permission denied writing file `{outputfile}`')

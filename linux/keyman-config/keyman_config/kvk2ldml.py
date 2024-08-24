@@ -1,10 +1,13 @@
 #!/usr/bin/python3
 
 import logging
+import os
 import struct
 import sys
 
 from lxml import etree
+
+from keyman_config.kmpmetadata import parsemetadata
 
 # .kvk file format
 # KVK files are variable length files with variable sized structures.
@@ -311,7 +314,7 @@ def _get_modifer(key):
     return modifier
 
 
-def convert_ldml(kvkData):
+def convert_ldml(keyboardName, kvkData, kmpJsonFilename):
     keymaps = {}
 
     for key in kvkData.Keys:
@@ -349,11 +352,16 @@ def convert_ldml(kvkData):
             else:
                 keymaps["shift"] = (uskey,)
 
-    if kvkData.UnicodeFont:
-        font = kvkData.UnicodeFont.name
-    else:
-        font = kvkData.AnsiFont.name
-    ldml = etree.Element("keyboard", locale="zzz-keyman", keymanFacename=font)
+    info, system, options, keyboards, files = parsemetadata(kmpJsonFilename)
+
+    ldml = etree.Element("keyboard", locale="zzz-keyman")
+    for keyboard in keyboards:
+        if keyboard['id'] != keyboardName:
+            continue
+        if 'oskFont' in keyboard:
+            ldml.set('keymanFacename', keyboard['oskFont'])
+        break
+
     etree.SubElement(ldml, "version", platform="11")
     names = etree.SubElement(ldml, "names")
     names.append(etree.Element("name", value="ZZZ"))
@@ -406,6 +414,7 @@ def parse_kvk_file(kvkfile):
     return kvkData
 
 
-def convert_kvk_to_ldml(kvkfile):
+def convert_kvk_to_ldml(name, kvkfile):
     kvkData = parse_kvk_file(kvkfile)
-    return convert_ldml(kvkData)
+    kmpJsonFilename = os.path.join(os.path.dirname(kvkfile), 'kmp.json')
+    return convert_ldml(name, kvkData, kmpJsonFilename)
