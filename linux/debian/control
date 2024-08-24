@@ -26,6 +26,7 @@ Build-Depends:
  pkgconf,
  python3-all (>= 3.5),
  python3-dbus,
+ python3-fonttools,
  python3-gi,
  python3-lxml,
  python3-magic,

@@ -1,4 +1,6 @@
 import os
+import shutil
+import sys
 import tempfile
 import unittest
 
@@ -24,7 +26,7 @@ class Kvk2LdmlTests(unittest.TestCase):
                     "name": "Khmer Angkor",
                     "id": "khmer_angkor",
                     "version": "1.5",
-                    "oskFont": "KbdKhmr.ttf",
+                    "oskFont": "KbdKhmrTest.ttf",
                     "languages": [ {
                         "name": "Central Khmer (Khmer, Cambodia)",
                         "id": "km"
@@ -42,6 +44,8 @@ class Kvk2LdmlTests(unittest.TestCase):
 
         workdir = tempfile.TemporaryDirectory()
         kmpJsonFilename = self._createKmpJson(workdir.name)
+        shutil.copyfile(os.path.join(sys.path[0], '../../../common/resources/fonts/KbdKhmr.ttf'),
+                        os.path.join(workdir.name, 'KbdKhmrTest.ttf'))
 
         # Execute
         ldml = convert_ldml(keyboardName, kvkData, kmpJsonFilename)

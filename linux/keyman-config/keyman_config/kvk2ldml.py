@@ -5,6 +5,7 @@ import os
 import struct
 import sys
 
+from fontTools import ttLib
 from lxml import etree
 
 from keyman_config.kmpmetadata import parsemetadata
@@ -314,6 +315,17 @@ def _get_modifer(key):
     return modifier
 
 
+def _fontFacename(fontFilename):
+    """Get the facename from fontFilename's TTF tables"""
+    # From https://github.com/mcfletch/ttfquery/blob/master/ttfquery/describe.py
+    FONT_SPECIFIER_NAME_ID = 4
+    font = ttLib.TTFont(fontFilename)
+    for record in font['name'].names:
+        if record.nameID == FONT_SPECIFIER_NAME_ID:
+            return record.string
+    return ''
+
+
 def convert_ldml(keyboardName, kvkData, kmpJsonFilename):
     keymaps = {}
 
@@ -359,7 +371,8 @@ def convert_ldml(keyboardName, kvkData, kmpJsonFilename):
         if keyboard['id'] != keyboardName:
             continue
         if 'oskFont' in keyboard:
-            font, ext = os.path.splitext(keyboard['oskFont'])
+            fontFile = os.path.join(os.path.dirname(kmpJsonFilename), keyboard['oskFont'])
+            font = _fontFacename(fontFile)
             ldml.set('keymanFacename', font)
         break
 
