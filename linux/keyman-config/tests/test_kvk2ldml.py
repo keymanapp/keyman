@@ -48,6 +48,6 @@ class Kvk2LdmlTests(unittest.TestCase):
 
         # Verify
         self.assertEqual(ldml.get('locale'), "zzz-keyman")
-        self.assertEqual(ldml.get('keymanFacename'), 'KbdKhmr.ttf')
+        self.assertEqual(ldml.get('keymanFacename'), 'KbdKhmr')
 
         workdir.cleanup()

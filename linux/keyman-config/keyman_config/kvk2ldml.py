@@ -359,7 +359,8 @@ def convert_ldml(keyboardName, kvkData, kmpJsonFilename):
         if keyboard['id'] != keyboardName:
             continue
         if 'oskFont' in keyboard:
-            ldml.set('keymanFacename', keyboard['oskFont'])
+            font, ext = os.path.splitext(keyboard['oskFont'])
+            ldml.set('keymanFacename', font)
         break
 
     etree.SubElement(ldml, "version", platform="11")
