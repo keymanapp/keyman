@@ -26,7 +26,7 @@ class Kvk2LdmlTests(unittest.TestCase):
                     "name": "Khmer Angkor",
                     "id": "khmer_angkor",
                     "version": "1.5",
-                    "oskFont": "KbdKhmrTest.ttf",
+                    "oskFont": "keymanweb-osk.ttf",
                     "languages": [ {
                         "name": "Central Khmer (Khmer, Cambodia)",
                         "id": "km"
@@ -44,14 +44,14 @@ class Kvk2LdmlTests(unittest.TestCase):
 
         workdir = tempfile.TemporaryDirectory()
         kmpJsonFilename = self._createKmpJson(workdir.name)
-        shutil.copyfile(os.path.join(sys.path[0], '../../../common/resources/fonts/KbdKhmr.ttf'),
-                        os.path.join(workdir.name, 'KbdKhmrTest.ttf'))
+        shutil.copy2(os.path.join(sys.path[0], '../../../common/resources/fonts/keymanweb-osk.ttf'),
+                    workdir.name)
 
         # Execute
         ldml = convert_ldml(keyboardName, kvkData, kmpJsonFilename)
 
         # Verify
         self.assertEqual(ldml.get('locale'), "zzz-keyman")
-        self.assertEqual(ldml.get('keymanFacename'), 'KbdKhmr')
+        self.assertEqual(ldml.get('keymanFacename'), 'SymChar')
 
         workdir.cleanup()

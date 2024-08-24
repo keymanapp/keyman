@@ -322,8 +322,8 @@ def _fontFacename(fontFilename):
     font = ttLib.TTFont(fontFilename)
     for record in font['name'].names:
         if record.nameID == FONT_SPECIFIER_NAME_ID:
-            return record.string
-    return ''
+            return record.toUnicode()
+    return None
 
 
 def convert_ldml(keyboardName, kvkData, kmpJsonFilename):
@@ -373,7 +373,8 @@ def convert_ldml(keyboardName, kvkData, kmpJsonFilename):
         if 'oskFont' in keyboard:
             fontFile = os.path.join(os.path.dirname(kmpJsonFilename), keyboard['oskFont'])
             font = _fontFacename(fontFile)
-            ldml.set('keymanFacename', font)
+            if font:
+                ldml.set('keymanFacename', font)
         break
 
     etree.SubElement(ldml, "version", platform="11")
