@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 18.0.97 alpha 2024-08-24
+
+* refactor(linux): cleanup API of kvk2ldml.py (#12276)
+* chore(common): adjust build settings for windows clean builds (#12264)
+* chore(windows): remove remaining unused Makefiles (#12274)
+* docs(developer): update build documentation to refer to build.sh (#12272)
+
 ## 18.0.96 alpha 2024-08-23
 
 * fix(android): Fix navigation arrows in Info Activity for RTL (#12244)
