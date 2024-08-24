@@ -45,8 +45,8 @@ build, you will need to obtain valid code signing certificates. See
 Certificates, below. Official release builds for Keyman are built in the Keyman
 project's CI environment.
 
-1. Start 'Developer Command Prompt for VS 2019'.
-2. Run `nmake release` from the **windows/src** folder.
+1. Start bash
+2. Run `./build.sh :publish` from the **windows/src** folder.
 3. Artifacts from a successful build will be placed in **windows/release**
    folder.
 4. **buildtools/help-keyman-com.sh** will push updated documentation to
@@ -65,7 +65,7 @@ globally trusted. The environment variables `SC_PFX_SHA1` and `SC_PFX_SHA256`
 can be set to custom certificate paths.
 
 The Keyman repo can build test certificates for you.  To build your own, run
-`./build.sh certificates` from **common/windows/delphi/tools/certificates** to
+`./common/windows/delphi/tools/certificates/build.sh certificates` to
 build and install your own local root CA "**KeymanTestCA**" certificates. If you
 specify a password for the certificate, you'll need to set that in the
 environment variable `SC_PWD`.

@@ -63,17 +63,33 @@ See [node.md](node.md) for more information.
 
 #### Emscripten
 
-You'll also have to install `emscripten` (version 3.1.44 is known to work):
+You'll also have to install `emscripten`:
 
 ```shell
 git clone https://github.com/emscripten-core/emsdk.git
 cd emsdk
-./emsdk install 3.1.44
-./emsdk activate 3.1.44
-export EMSCRIPTEN_BASE=$(pwd)/upstream/emscripten
+./emsdk install 3.1.58
+./emsdk activate 3.1.58
+export EMSCRIPTEN_BASE="$(pwd)/upstream/emscripten"
+echo "export EMSCRIPTEN_BASE=\"$EMSCRIPTEN_BASE\"" >> .bashrc
 ```
 
-**NOTE:** Don't put EMSDK on the path, i.e. don't source `emsdk_env.sh`.
+> ![WARNING]
+> Don't put EMSDK on the path, i.e. don't source `emsdk_env.sh`.
+>
+> Emscripten very unhelpfully overwrites `JAVA_HOME`, and adds its own
+> versions of Python, Node and Java to the `PATH`. For best results, restart
+> your shell after installing Emscripten so that you don't end up with the
+> wrong versions.
+
+**Optional environment variables**:
+
+To let the Keyman build scripts control the version of Emscripten installed on
+your computer:
+
+```shell
+export KEYMAN_USE_EMSDK=1
+```
 
 ## Keyman Core
 
