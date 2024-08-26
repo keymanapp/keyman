@@ -86,7 +86,7 @@ if builder_start_action test; then
   # No --reporter option exists yet for the headless modules.
 
   "$KEYMAN_ROOT/web/src/engine/keyboard/build.sh" test $OPTIONS
-  "$KEYMAN_ROOT/web/src/engine/osk/gesture-processor/test.sh" $OPTIONS
+  "$KEYMAN_ROOT/web/src/engine/osk/gesture-processor/build.sh" test $OPTIONS
 
   ./build.sh test $OPTIONS
 
