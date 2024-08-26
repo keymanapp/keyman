@@ -14,9 +14,10 @@ export function splitOnWhitespace(text: string): Span[] {
 
   // Surrogate pairs will never overlap \u0020, so we don't need to be
   // surrogate-pair aware here.
-  for(let index = 0; index < text.length + 1; index++) {
-    let char = (index == text.length ? ' ' : text.charAt(index));
-    if(char.match(/\s/) || char == '\u200c') {
+  text += ' ';
+  for(let index = 0; index < text.length; index++) {
+    const char = text.charAt(index);
+    if(char.match(/\s|\u200c/)) {
       if(start !== undefined) {
         sections.push(new LazySpan(text, start, index));
         start = undefined; // we do not emit whitespace tokens here.
