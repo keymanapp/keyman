@@ -32,7 +32,10 @@ export function createTrieDataStructure(filenames: string[], searchTermToKey?: (
   filenames.forEach(filename => parseWordListFromFilename(wordlist, filename));
 
   let trie = buildTrie(wordlist, searchTermToKey as SearchTermToKey);
-  return `{"data":${JSON.stringify(trie.compress())},"totalWeight":${trie.getTotalWeight()}}`;
+  return JSON.stringify({
+    data: trie.compress(), 
+    totalWeight: trie.getTotalWeight()
+  });
 }
 
 /**
