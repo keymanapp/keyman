@@ -3,7 +3,6 @@ buildscript {
     repositories {
         google()
         //jcenter() deprecated August 2024
-        mavenLocal()
         mavenCentral()
         flatDir {
             dirs "kMAPro/libs/com/stepstone/stepper/material-stepper/4.3.1/"
