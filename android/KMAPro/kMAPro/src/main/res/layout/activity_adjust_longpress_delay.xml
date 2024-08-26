@@ -23,7 +23,7 @@
             android:layout_marginStart="5dp"
             android:layout_marginEnd="5dp"
             android:contentDescription="@string/ic_delay_time_down"
-            android:src="@drawable/ic_light_dialog_textsize_down" />
+            android:src="@drawable/ic_action_decrement" />
 
         <!-- Seekbar range 0 to 6 corresponds to longpress duration 300 ms to 1500 ms -->
         <SeekBar
@@ -43,7 +43,7 @@
             android:layout_marginStart="5dp"
             android:layout_marginEnd="5dp"
             android:contentDescription="@string/ic_delay_time_up"
-            android:src="@drawable/ic_light_dialog_textsize_up" />
+            android:src="@drawable/ic_action_increment" />
 
     </LinearLayout>
 
