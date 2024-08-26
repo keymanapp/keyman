@@ -142,9 +142,9 @@ TEST_F(CompilerTest, ReportCompilerMessage_test) {
     EXPECT_EQ(SevFatal, KmnCompilerMessages::FATAL_CannotCreateTempfile & SevFatal);
     ReportCompilerMessage(KmnCompilerMessages::FATAL_CannotCreateTempfile, params);
     EXPECT_EQ(1, kmcmp::nErrors);
-    EXPECT_EQ(msgproc_errors[0].errorCode, KmnCompilerMessages::FATAL_CannotCreateTempfile);
-    EXPECT_EQ(msgproc_errors[0].lineNumber, kmcmp::currentLine+1);
-    EXPECT_EQ(msgproc_errors[0].columnNumber, kmcmp::ErrChr);
+    EXPECT_EQ(KmnCompilerMessages::FATAL_CannotCreateTempfile, msgproc_errors[0].errorCode);
+    EXPECT_EQ(kmcmp::currentLine+1, msgproc_errors[0].lineNumber);
+    EXPECT_EQ(kmcmp::ErrChr, msgproc_errors[0].columnNumber);
     EXPECT_TRUE(msgproc_errors[0].filename == kmcmp::messageFilename);
     EXPECT_TRUE(msgproc_errors[0].parameters == params);
 
@@ -152,25 +152,25 @@ TEST_F(CompilerTest, ReportCompilerMessage_test) {
     EXPECT_EQ(SevError, KmnCompilerMessages::ERROR_InvalidLayoutLine & SevError);
     ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidLayoutLine);
     EXPECT_EQ(2, kmcmp::nErrors);
-    EXPECT_EQ(msgproc_errors[1].errorCode, KmnCompilerMessages::ERROR_InvalidLayoutLine);
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidLayoutLine, msgproc_errors[1].errorCode);
 
     // SevWarn
     EXPECT_EQ(SevWarn, KmnCompilerMessages::WARN_ReservedCharacter & SevWarn);
     ReportCompilerMessage(KmnCompilerMessages::WARN_ReservedCharacter);
     EXPECT_EQ(2, kmcmp::nErrors);
-    EXPECT_EQ(msgproc_errors[2].errorCode, KmnCompilerMessages::WARN_ReservedCharacter);
+    EXPECT_EQ(KmnCompilerMessages::WARN_ReservedCharacter, msgproc_errors[2].errorCode);
 
     // SevHint
     EXPECT_EQ(SevHint, KmnCompilerMessages::HINT_NonUnicodeFile & SevHint);
     ReportCompilerMessage(KmnCompilerMessages::HINT_NonUnicodeFile);
     EXPECT_EQ(2, kmcmp::nErrors);
-    EXPECT_EQ(msgproc_errors[3].errorCode, KmnCompilerMessages::HINT_NonUnicodeFile);
+    EXPECT_EQ(KmnCompilerMessages::HINT_NonUnicodeFile, msgproc_errors[3].errorCode);
 
     // SevInfo
     EXPECT_EQ(SevInfo, KmnCompilerMessages::INFO_MinimumCoreEngineVersion & SevInfo);
     ReportCompilerMessage(KmnCompilerMessages::INFO_MinimumCoreEngineVersion);
     EXPECT_EQ(2, kmcmp::nErrors);
-    EXPECT_EQ(msgproc_errors[4].errorCode, KmnCompilerMessages::INFO_MinimumCoreEngineVersion);
+    EXPECT_EQ(KmnCompilerMessages::INFO_MinimumCoreEngineVersion, msgproc_errors[4].errorCode);
 };
 
 TEST_F(CompilerTest, ProcessBeginLine_test) {
