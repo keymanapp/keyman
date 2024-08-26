@@ -39,7 +39,8 @@ do_configure() {
   verify_npm_setup
 
   mkdir -p "src/import/core/"
-  # we don't need this file here, but it's nice to have for reference and auto-completion
+  # we don't need this file for release builds, but it's nice to have 
+  # for reference and auto-completion
   cp "${KEYMAN_ROOT}/core/build/wasm/${BUILDER_CONFIGURATION}/src/core-interface.d.ts" "src/import/core/"
 }
 
@@ -60,6 +61,3 @@ do_build () {
 builder_run_action clean      do_clean
 builder_run_action configure  do_configure
 builder_run_action build      do_build
-
-# No headless tests for this child project.  Currently, DOM-based unit &
-# integrated tests are run solely by the top-level $KEYMAN_ROOT/web project.
