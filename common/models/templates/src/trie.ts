@@ -133,13 +133,11 @@ export class TrieTraversal implements LexiconTraversal {
   // Handles one code unit at a time.
   private _child(char: USVString): TrieTraversal | undefined {
     const root = this.root;
-    const toKey = this.toKey;
-    const totalWeight = this.totalWeight;
     const nextPrefix = this.prefix + char;
 
     // Sorts _just_ the current level, and only if needed.
     // We only care about sorting parts that we're actually accessing.
-    sortNode(root, toKey, true);
+    sortNode(root, this.toKey, true);
 
     if(root.type == 'internal') {
       let child = root.children[char];
@@ -147,8 +145,8 @@ export class TrieTraversal implements LexiconTraversal {
         return undefined;
       }
 
-      const childNode = inflateChild(root.children, char, toKey);
-      return new TrieTraversal(childNode, toKey, nextPrefix, totalWeight);
+      const childNode = inflateChild(root.children, char, this.toKey);
+      return new TrieTraversal(childNode, this.toKey, nextPrefix, this.totalWeight);
     } else {
       // root.type == 'leaf';
       const legalChildren = root.entries.filter(function(entry) {
@@ -159,26 +157,20 @@ export class TrieTraversal implements LexiconTraversal {
         return undefined;
       }
 
-      return new TrieTraversal(root, toKey, nextPrefix, totalWeight);
+      return new TrieTraversal(root, this.toKey, nextPrefix, this.totalWeight);
     }
   }
 
   *children(): Generator<{char: USVString, traversal: () => LexiconTraversal}> {
     const root = this.root;
-    const toKey = this.toKey;
-
-    // We refer to the field multiple times in this method, and it doesn't change.
-    // This also assists minification a bit, since we can't minify when re-accessing
-    // through `this.`.
-    const totalWeight = this.totalWeight;
 
     // Sorts _just_ the current level, and only if needed.
     // We only care about sorting parts that we're actually accessing.
-    sortNode(root, toKey, true);
+    sortNode(root, this.toKey, true);
 
     if(root.type == 'internal') {
       for(let entry of root.values) {
-        let entryNode = inflateChild(root.children, entry, toKey);
+        let entryNode = inflateChild(root.children, entry, this.toKey);
 
         // UTF-16 astral plane check.
         if(isHighSurrogate(entry)) {
@@ -193,7 +185,14 @@ export class TrieTraversal implements LexiconTraversal {
               let prefix = this.prefix + entry + lowSurrogate;
               yield {
                 char: entry + lowSurrogate,
-                traversal: function() { return new TrieTraversal(inflateChild(internalNode.children, lowSurrogate, toKey), toKey, prefix, totalWeight) }
+                traversal: () => {
+                  return new TrieTraversal(
+                    inflateChild(internalNode.children, lowSurrogate, this.toKey),
+                    this.toKey,
+                    prefix,
+                    this.totalWeight
+                  );
+                }
               }
             }
           } else {
@@ -204,7 +203,7 @@ export class TrieTraversal implements LexiconTraversal {
 
             yield {
               char: entry,
-              traversal: function () {return new TrieTraversal(entryNode, toKey, prefix, totalWeight)}
+              traversal: () => {return new TrieTraversal(entryNode, this.toKey, prefix, this.totalWeight)}
             }
           }
         } else if(isSentinel(entry)) {
@@ -216,7 +215,7 @@ export class TrieTraversal implements LexiconTraversal {
           let prefix = this.prefix + entry;
           yield {
             char: entry,
-            traversal: function() { return new TrieTraversal(entryNode, toKey, prefix, totalWeight)}
+            traversal: () => { return new TrieTraversal(entryNode, this.toKey, prefix, this.totalWeight)}
           }
         }
       }
@@ -238,7 +237,7 @@ export class TrieTraversal implements LexiconTraversal {
         }
         yield {
           char: nodeKey,
-          traversal: function() { return new TrieTraversal(root, toKey, prefix + nodeKey, totalWeight)}
+          traversal: () => { return new TrieTraversal(root, this.toKey, prefix + nodeKey, this.totalWeight)}
         }
       };
       return;
