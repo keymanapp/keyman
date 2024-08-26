@@ -1440,6 +1440,17 @@ TEST_F(CompilerTest, GetXStringImpl_type_u_test) {
     // unicode, space after, valid
     u16cpy(str, u"u+10330 "); // Gothic A
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(tstr_unicode_valid, tstr));
+
+    // unicode, KmnCompilerMessages::ERROR_InvalidCharacter
+    u16cpy(str, u"u+110000");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidCharacter, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // unicode, n1 only, valid
+    u16cpy(str, u"u+0061"); // a
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_unicode_n1_only_valid[] = { 0x0061, 0 }; // see UTF32ToUTF16
+    EXPECT_EQ(0, u16cmp(tstr_unicode_n1_only_valid, tstr));
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
