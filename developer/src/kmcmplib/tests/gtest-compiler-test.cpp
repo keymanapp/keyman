@@ -1414,6 +1414,34 @@ TEST_F(CompilerTest, GetXStringImpl_type_n_test) {
     EXPECT_EQ(0, u16cmp(tstr_null_valid, tstr));
 }
 
+
+// tests strings starting with 'u'
+TEST_F(CompilerTest, GetXStringImpl_type_u_test) {
+    KMX_WCHAR tstr[128];
+    fileKeyboard.version = VERSION_70;
+    KMX_WCHAR str[LINESIZE];
+    KMX_WCHAR output[GLOBAL_BUFSIZE];
+    PKMX_WCHAR newp = nullptr;
+
+    // KmnCompilerMessages::ERROR_InvalidToken
+    u16cpy(str, u"uvw");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // unicode, n1 and n2, valid
+    u16cpy(str, u"u+10330"); // Gothic A
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_unicode_valid[] = { 0xD800, 0xDF30, 0 }; // see UTF32ToUTF16
+    EXPECT_EQ(0, u16cmp(tstr_unicode_valid, tstr));
+
+    // unicode, ERROR_InvalidValue
+    u16cpy(str, u"u+10330z"); // Gothic A, unexpected character 'z'
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidValue, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // unicode, space after, valid
+    u16cpy(str, u"u+10330 "); // Gothic A
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+}
+
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
 // KMX_DWORD process_platform(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
 // KMX_DWORD process_if_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
