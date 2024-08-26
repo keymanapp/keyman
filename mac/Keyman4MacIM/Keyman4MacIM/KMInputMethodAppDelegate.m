@@ -1119,14 +1119,16 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
  * TODO: this should really be refactored
  */
 
-- (void)alertDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo {
-  NSButton *button = (NSButton *)[alert.buttons objectAtIndex:0];
-  if (button.tag == -1) {
+- (void)downloadComplete:(NSModalResponse) returnCode {
+  os_log_debug([KMLogs uiLog], "downloadComplete, NSModalResponse returnCode: %ld", (long)returnCode);
+  if (returnCode == NSModalResponseCancel) {
+    os_log_debug([KMLogs uiLog], "downloadComplete, returnCode == NSModalResponseCancel");
     [_connection cancel];
   }
-  else if (button.tag == 1) {
-    [_downloadKBWindow close];
+  else if (returnCode == NSModalResponseOK) {
+    os_log_debug([KMLogs uiLog], "downloadComplete, returnCode == NSModalResponseOK");
     if (self.configWindow.window != nil) {
+      os_log_debug([KMLogs uiLog], "downloadComplete, self.configWindow.window != nil");
       [self.configWindow.window makeKeyAndOrderFront:nil];
       if (![[self.configWindow.window childWindows] containsObject:self.infoWindow.window]) {
         [self.configWindow.window addChildWindow:self.infoWindow.window ordered:NSWindowAbove];
@@ -1135,6 +1137,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
       [self.infoWindow.window makeKeyAndOrderFront:nil];
     }
     else {
+      os_log_debug([KMLogs uiLog], "downloadComplete, self.configWindow.window == nil");
       [self.infoWindow.window centerInParent];
       [self.infoWindow.window makeKeyAndOrderFront:nil];
       [self.infoWindow.window setLevel:NSFloatingWindowLevel];
@@ -1152,6 +1155,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (NSAlert *)downloadInfoView {
+  os_log_debug([KMLogs uiLog], "downloadInfoView");
   if (_downloadInfoView == nil) {
     _downloadInfoView = [[NSAlert alloc] init];
     [_downloadInfoView setMessageText:NSLocalizedString(@"message-keyboard-downloading", nil)];
@@ -1165,6 +1169,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (NSProgressIndicator *)progressIndicator {
+  os_log_debug([KMLogs uiLog], "progressIndicator");
   if (_progressIndicator == nil) {
     _progressIndicator = [[NSProgressIndicator alloc] initWithFrame:NSMakeRect(0, 0, 300, 20)];
     [_progressIndicator setIndeterminate:NO];
@@ -1186,36 +1191,39 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
 - (void)downloadKeyboardFromURL:(NSURL *)url {
   NSURL* downloadUrl = url;
-  
+  os_log_debug([KMLogs uiLog], "downloadKeyboardFromURL, url.path: %{public}@", url.path);
+
   if (downloadUrl && _downloadFilename) {
     if (_infoWindow.window != nil)
       [_infoWindow close];
     
     [self.downloadInfoView setInformativeText:self.downloadFilename];
+    
     if (self.configWindow.window != nil) {
+      os_log_debug([KMLogs uiLog], "downloadKeyboardFromURL, self.configWindow.window != nil");
       [self.configWindow.window makeKeyAndOrderFront:nil];
       if (![[self.configWindow.window childWindows] containsObject:self.downloadKBWindow.window]) {
         [self.configWindow.window addChildWindow:self.downloadKBWindow.window ordered:NSWindowAbove];
       }
       [self.downloadKBWindow.window centerInParent];
       [self.downloadKBWindow.window makeKeyAndOrderFront:nil];
-      [self.downloadInfoView beginSheetModalForWindow:self.downloadKBWindow.window
-                                        modalDelegate:self
-                                       didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
-                                          contextInfo:nil];
+      [self.downloadInfoView beginSheetModalForWindow:self.downloadKBWindow.window completionHandler:^(NSModalResponse returnCode)  {
+        [self downloadComplete:returnCode];
+      }];
     }
     else {
+      os_log_debug([KMLogs uiLog], "downloadKeyboardFromURL, self.configWindow.window == nil");
       [self.downloadKBWindow.window centerInParent];
       [self.downloadKBWindow.window makeKeyAndOrderFront:nil];
       [self.downloadKBWindow.window setLevel:NSFloatingWindowLevel];
-      [self.downloadInfoView beginSheetModalForWindow:self.downloadKBWindow.window
-                                        modalDelegate:self
-                                       didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
-                                          contextInfo:nil];
+      [self.downloadInfoView beginSheetModalForWindow:self.downloadKBWindow.window completionHandler:^(NSModalResponse returnCode)  {
+        [self downloadComplete:returnCode];
+      }];
     }
     
     if (_connection == nil) {
-      [_downloadInfoView setMessageText:NSLocalizedString(@"message-keyboard-downloading", nil)];
+      os_log_debug([KMLogs uiLog], "downloadKeyboardFromURL, _connection == nil, set button title cancel downloading, tag = -1");
+     [_downloadInfoView setMessageText:NSLocalizedString(@"message-keyboard-downloading", nil)];
       NSButton *button = (NSButton *)[_downloadInfoView.buttons objectAtIndex:0];
       [button setTitle:NSLocalizedString(@"button-cancel-downloading", nil)];
       [button setTag:-1];
@@ -1257,6 +1265,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+  os_log_debug([KMLogs uiLog], "connectionDidFinishLoading");
   NSString *filePath = [self.keyboardsPath stringByAppendingPathComponent:self.downloadFilename];
   [self.receivedData writeToFile:filePath atomically:YES];
   [self unzipFile:filePath];
@@ -1264,6 +1273,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   
   [_downloadInfoView setMessageText:NSLocalizedString(@"message-keyboard-download-complete", nil)];
   NSButton *button = (NSButton *)[_downloadInfoView.buttons objectAtIndex:0];
+  os_log_debug([KMLogs uiLog], "connectionDidFinishLoading, set button title download complete, tag = 1");
   [button setTitle:NSLocalizedString(@"button-download-complete", nil)];
   [button setTag:1];
   [[NSNotificationCenter defaultCenter] postNotificationName:kKeymanKeyboardDownloadCompletedNotification
