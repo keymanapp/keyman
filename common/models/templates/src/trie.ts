@@ -289,8 +289,7 @@ export class Trie {
   toKey: Wordform2Key;
 
   constructor(trie: Node | string, totalWeight: number, wordform2key: Wordform2Key) {
-    const root = (typeof trie == 'string') ? decompressNode(trie, wordform2key, 0) : trie;
-    this.root = root;
+    this.root = (typeof trie == 'string') ? decompressNode(trie, wordform2key, 0) : trie;
     this.toKey = wordform2key;
     this.totalWeight = totalWeight;
   }
