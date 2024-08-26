@@ -1328,14 +1328,73 @@ TEST_F(CompilerTest, GetXStringImpl_type_n_test) {
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
     PKMX_WCHAR newp = nullptr;
+    PFILE_STORE file_store = new FILE_STORE[100];
+    fileKeyboard.cxStoreArray = 3u;
+    fileKeyboard.dpStoreArray = file_store;
+    u16cpy(file_store[0].szName, u"a");
+    u16cpy(file_store[1].szName, u"b");
+    u16cpy(file_store[2].szName, u"c");
 
     // KmnCompilerMessages::ERROR_InvalidToken
     fileKeyboard.version = VERSION_70;
     u16cpy(str, u"nmo");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // context, KmnCompilerMessages::ERROR_AnyInVirtualKeySection *** TODO ***
+    // notany, KmnCompilerMessages::ERROR_60FeatureOnly_Contextn
+    fileKeyboard.version = VERSION_60;
+    u16cpy(str, u"notany");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_70FeatureOnly, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
+    // notany, KmnCompilerMessages::ERROR_AnyInVirtualKeySection *** TODO ***
+
+    // notany, no close delimiter => NULL
+    fileKeyboard.version = VERSION_70;
+    u16cpy(str, u"notany(");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidAny, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // notany, empty delimiters => empty string
+    fileKeyboard.version = VERSION_70;
+    u16cpy(str, u"notany()");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidAny, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // notany, space in delimiters (see I11814, I11937, #11910, #11894, #11938)
+    fileKeyboard.version = VERSION_70;
+    u16cpy(str, u"notany( )");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidAny, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // KmnCompilerMessages::ERROR_StoreDoesNotExist
+    fileKeyboard.version = VERSION_70;
+    u16cpy(str, u"notany(d)");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // KmnCompilerMessages::ERROR_StoreDoesNotExist, space before store
+    fileKeyboard.version = VERSION_70;
+    u16cpy(str, u"notany( d)");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // KmnCompilerMessages::ERROR_StoreDoesNotExist, space after store
+    fileKeyboard.version = VERSION_70;
+    u16cpy(str, u"notany(d )");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // valid
+    u16cpy(str, u"notany(b)");
+    file_store[1].dpString = (PKMX_WCHAR)u"abc";
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_notany_valid[] = { UC_SENTINEL, CODE_NOTANY, 2, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_notany_valid, tstr));
+
+    // space before store, valid
+    u16cpy(str, u"notany( b)");
+    file_store[1].dpString = (PKMX_WCHAR)u"abc";
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(tstr_notany_valid, tstr));
+
+    // space after store, valid (see I11937, #11938)
+    u16cpy(str, u"notany(b )");
+    file_store[1].dpString = (PKMX_WCHAR)u"abc";
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(tstr_notany_valid, tstr));
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
