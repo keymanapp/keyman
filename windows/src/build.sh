@@ -18,6 +18,7 @@ builder_describe \
   ":engine                 Keyman Engine for Windows" \
   ":desktop                Keyman for Windows" \
   ":components=global/delphi   Delphi components" \
+  ":support                Support tools" \
   ":test=test/unit-tests   Shared unit tests" \
   ":fv=../../oem/firstvoices/windows/src/inst           OEM FirstVoices for Windows app"
 

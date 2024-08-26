@@ -81,11 +81,11 @@ title: Dependency Graph
 %%{init: {"flowchart": {"htmlLabels": false}} }%%
 graph TD;
     OSK["/web/src/engine/osk"];
-    KP["/web/src/engine/keyboard"];
+    KeyboardSpec["/web/src/engine/keyboard"];
     JSProc["/web/src/engine/js-processor"];
-    OSK-->KP;
+    OSK-->KeyboardSpec;
     WebUtils["@keymanapp/web-utils<br>(/common/web/utils)"];
-    KP---->WebUtils;
+    KeyboardSpec---->WebUtils;
     Wordbreakers["@keymanapp/models-wordbreakers<br>(/common/models/wordbreakers)"];
     Models["@keymanapp/models-templates<br>(/common/models/templates)"];
     Models-->WebUtils;
@@ -107,15 +107,15 @@ graph TD;
     subgraph Headless["`**Headless**
     Fully headless components`"]
         direction LR
-        KP;
-        JSProc-->KP;
+        KeyboardSpec;
+        JSProc-->KeyboardSpec;
         WebUtils;
         PredText;
         Gestures;
     end
 
     subgraph ClassicWeb["`**ClassicWeb**
-    Previously unmodularized components`"]
+    Intermediate-level engine modules`"]
         Device["/web/src/engine/device-detect"];
         Device----->WebUtils;
         Elements["/web/src/engine/element-wrappers"];
@@ -124,12 +124,11 @@ graph TD;
         KeyboardStorage-->Interfaces;
         DomUtils["/web/src/engine/dom-utils"];
         DomUtils-->WebUtils;
-        DomUtils-->KP;
+        DomUtils-->KeyboardSpec;
         OSK-->DomUtils;
         OSK-->Gestures;
         Interfaces["/web/src/engine/interfaces"];
-        Interfaces-->KP;
-        Interfaces-->JSProc;
+        Interfaces-->KeyboardSpec;
         OSK-->Interfaces;
         CommonEngine["/web/src/engine/main"];
         CommonEngine-->Device;

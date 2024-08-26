@@ -3,6 +3,23 @@ import { LDMLKeyboard, CompilerCallbacks } from "@keymanapp/developer-utils";
 import { KeysCompiler } from "./keys.js";
 import { LdmlCompilerMessages } from "./ldml-compiler-messages.js";
 
+// This is a partial polyfill for findLast, so not polluting Array.prototype
+// https://medium.com/@stheodorejohn/findlast-method-polyfill-in-javascript-bridging-browser-gaps-c3baf6aabae1
+// TODO: remove and replace with Array.prototype.findLast when it is
+// well-supported
+function findLast(arr: any, callback: any) {
+  if (!arr) {
+    return undefined;
+  }
+  const len = arr.length >>> 0;
+  for (let i = len - 1; i >= 0; i--) {
+    if (callback(arr[i], i, arr)) {
+      return arr[i];
+    }
+  }
+  return undefined;
+}
+
 export class LdmlKeyboardVisualKeyboardCompiler {
   public constructor(private callbacks: CompilerCallbacks) {
   }
@@ -57,7 +74,8 @@ export class LdmlKeyboardVisualKeyboardCompiler {
         const keyId = key;
         x++;
 
-        let keydef = source.keyboard3.keys?.key?.find(x => x.id == key);
+        //@ts-ignore
+        let keydef = findLast(source.keyboard3.keys?.key, x => x.id == key);
 
         if (!keydef) {
           this.callbacks.reportMessage(
