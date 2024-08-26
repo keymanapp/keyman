@@ -1507,28 +1507,38 @@ TEST_F(CompilerTest, GetXStringImpl_type_u_test) {
 
     // unicode, n1 and n2, valid
     u16cpy(str, u"u+10330"); // Gothic A
-    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, TRUE));
     const KMX_WCHAR tstr_unicode_valid[] = { 0xD800, 0xDF30, 0 }; // see UTF32ToUTF16
     EXPECT_EQ(0, u16cmp(tstr_unicode_valid, tstr));
+    EXPECT_EQ(0, msgproc_errors.size());
 
     // unicode, ERROR_InvalidValue
     u16cpy(str, u"u+10330z"); // Gothic A, unexpected character 'z'
-    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidValue, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidValue, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, TRUE));
 
     // unicode, space after, valid
     u16cpy(str, u"u+10330 "); // Gothic A
-    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, TRUE));
     EXPECT_EQ(0, u16cmp(tstr_unicode_valid, tstr));
+    EXPECT_EQ(0, msgproc_errors.size());
 
     // unicode, KmnCompilerMessages::ERROR_InvalidCharacter
     u16cpy(str, u"u+110000");
-    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidCharacter, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidCharacter, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, TRUE));
 
     // unicode, n1 only, valid
     u16cpy(str, u"u+0061"); // a
-    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, TRUE));
     const KMX_WCHAR tstr_unicode_n1_only_valid[] = { 0x0061, 0 }; // see UTF32ToUTF16
     EXPECT_EQ(0, u16cmp(tstr_unicode_n1_only_valid, tstr));
+    EXPECT_EQ(0, msgproc_errors.size());
+
+    // unicode, n1 and n2, valid, KmnCompilerMessages::WARN_UnicodeInANSIGroup
+    u16cpy(str, u"u+10330"); // Gothic A
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(tstr_unicode_valid, tstr));
+    EXPECT_EQ(1, msgproc_errors.size());
+    EXPECT_EQ(KmnCompilerMessages::WARN_UnicodeInANSIGroup, msgproc_errors[0].errorCode);
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
