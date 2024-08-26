@@ -1,5 +1,16 @@
 # Keyman Version History
 
+## 18.0.98 alpha 2024-08-26
+
+* change(ios): defer registration of fonts past initialization (#12190)
+* refactor(ios): optimize font registration (#12210)
+* test(mac): add unit tests to validate first calls to compliance check (#11724)
+* fix(mac): limit short bundle version string to x.y.z format in info.plist (#12233)
+* chore(developer): extend timeouts for lm compiler tests to 5 secs (#12273)
+* fix(developer): find last matching key in LDML key bag when building KVK (#12278)
+* chore(android): Cleanup stray debug statements in console (#12287)
+* fix(developer): ensure call() detects invalid store in kmcmplib compiler (#12263)
+
 ## 18.0.97 alpha 2024-08-24
 
 * refactor(linux): cleanup API of kvk2ldml.py (#12276)
