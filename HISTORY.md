@@ -1,5 +1,25 @@
 # Keyman Version History
 
+## 18.0.97 alpha 2024-08-24
+
+* refactor(linux): cleanup API of kvk2ldml.py (#12276)
+* chore(common): adjust build settings for windows clean builds (#12264)
+* chore(windows): remove remaining unused Makefiles (#12274)
+* docs(developer): update build documentation to refer to build.sh (#12272)
+
+## 18.0.96 alpha 2024-08-23
+
+* fix(android): Fix navigation arrows in Info Activity for RTL (#12244)
+* fix(web): fix documentation-keyboard spacebar-text scaling (#12232)
+* fix(android): Use increment and decrement arrows on longpress delay menu (#12242)
+* fix(android): Add RTL assets for adjusting keyboard height menu (#12261)
+* chore(common): use `npm install` in emsdk update (#12269)
+* docs: refresh windows.md (#12248)
+
+## 18.0.95 alpha 2024-08-22
+
+* chore(common): allow build agents to automatically select emsdk version, and enable support for 3.1.60+ (#12243)
+
 ## 18.0.94 alpha 2024-08-21
 
 * fix(core): look for `emcc` instead of `emcc.py` (#12235)

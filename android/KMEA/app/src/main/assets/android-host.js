@@ -117,7 +117,7 @@ function notifyHost(event, params) {
 function setLongpressDelay(delay) {
   if (keyman.osk) {
     keyman.osk.gestureParams.longpress.waitLength = delay;
-    console.debug('setLongpressDelay('+delay+')');
+    console_debug('setLongpressDelay('+delay+')');
   } else {
     window.console.log('setLongpressDelay error: keyman.osk undefined');
   }
@@ -304,7 +304,7 @@ function updateKMSelectionRange(start, end) {
 
     console_debug('result:\n' + build_context_string(context));
   } else {
-    console.debug('range unchanged');
+    console_debug('range unchanged');
   }
 }
 
