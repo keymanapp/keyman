@@ -1379,20 +1379,26 @@ TEST_F(CompilerTest, GetXStringImpl_type_n_test) {
 
     // valid
     u16cpy(str, u"notany(b)");
-    file_store[1].dpString = (PKMX_WCHAR)u"abc";
+    file_store[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_notany_valid[] = { UC_SENTINEL, CODE_NOTANY, 2, 0 };
     EXPECT_EQ(0, u16cmp(tstr_notany_valid, tstr));
 
+    // valid, empy store
+    u16cpy(str, u"notany(b)");
+    file_store[1].dpString = (PKMX_WCHAR)u""; // empty
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(tstr_notany_valid, tstr));
+
     // space before store, valid
     u16cpy(str, u"notany( b)");
-    file_store[1].dpString = (PKMX_WCHAR)u"abc";
+    file_store[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(tstr_notany_valid, tstr));
 
     // space after store, valid (see I11937, #11938)
     u16cpy(str, u"notany(b )");
-    file_store[1].dpString = (PKMX_WCHAR)u"abc";
+    file_store[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(tstr_notany_valid, tstr));
 }
