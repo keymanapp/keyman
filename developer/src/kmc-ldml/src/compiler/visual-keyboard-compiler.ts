@@ -4,7 +4,7 @@ import { KeysCompiler } from "./keys.js";
 import { LdmlCompilerMessages } from "./ldml-compiler-messages.js";
 
 // This is a partial polyfill for findLast, so not polluting Array.prototype
-//
+// https://medium.com/@stheodorejohn/findlast-method-polyfill-in-javascript-bridging-browser-gaps-c3baf6aabae1
 // TODO: remove and replace with Array.prototype.findLast when it is
 // well-supported
 function findLast(arr: any, callback: any) {
