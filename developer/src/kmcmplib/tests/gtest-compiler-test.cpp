@@ -1453,6 +1453,94 @@ TEST_F(CompilerTest, GetXStringImpl_type_u_test) {
     EXPECT_EQ(0, u16cmp(tstr_unicode_n1_only_valid, tstr));
 }
 
+// tests strings starting with 'c'
+TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
+    KMX_WCHAR tstr[128];
+    fileKeyboard.version = VERSION_60;
+    KMX_WCHAR str[LINESIZE];
+    KMX_WCHAR output[GLOBAL_BUFSIZE];
+    PKMX_WCHAR newp = nullptr;
+    PFILE_STORE file_store = new FILE_STORE[100];
+    fileKeyboard.cxStoreArray = 3u;
+    fileKeyboard.dpStoreArray = file_store;
+    file_store[1].fIsCall = TRUE;
+    file_store[1].dwSystemID = TSS_NONE;
+    u16cpy(file_store[0].szName, u"a");
+    u16cpy(file_store[1].szName, u"b");
+    u16cpy(file_store[2].szName, u"c");
+
+    // call, KmnCompilerMessages::ERROR_501FeatureOnly_Call
+    fileKeyboard.version = VERSION_50;
+    u16cpy(str, u"call");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_501FeatureOnly_Call, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // call, KmnCompilerMessages::ERROR_CallInVirtualKeySection *** TODO ***
+
+    // call, no close delimiter => NULL
+    fileKeyboard.version = VERSION_501;
+    u16cpy(str, u"call(");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidCall, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // call, empty delimiters => empty string
+    fileKeyboard.version = VERSION_501;
+    u16cpy(str, u"call()");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidCall, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // call, space in delimiters (see I11814, I11937, #11910, #11894, #11938)
+    fileKeyboard.version = VERSION_501;
+    u16cpy(str, u"call( )");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidCall, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // call, KmnCompilerMessages::ERROR_StoreDoesNotExist
+    fileKeyboard.version = VERSION_501;
+    u16cpy(str, u"call(d)");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // call, KmnCompilerMessages::ERROR_StoreDoesNotExist, space before store
+    fileKeyboard.version = VERSION_501;
+    u16cpy(str, u"call( d)");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // call, KmnCompilerMessages::ERROR_StoreDoesNotExist, space after store
+    fileKeyboard.version = VERSION_501;
+    u16cpy(str, u"call(d )");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // call, KmnCompilerMessages::ERROR_InvalidCall
+    fileKeyboard.version = VERSION_501;
+    file_store[1].dpString = (PKMX_WCHAR)u"*"; // cause IsValidCallStore() to fail
+    u16cpy(str, u"call(b)");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidCall, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // call, valid
+    fileKeyboard.version = VERSION_501;
+    file_store[1].dpString = (PKMX_WCHAR)u"a.dll:A";
+    file_store[1].dwSystemID = TSS_NONE;
+    u16cpy(str, u"call(b)");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_call_valid[] = { UC_SENTINEL, CODE_CALL, 2, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_call_valid, tstr));
+    EXPECT_EQ(TSS_CALLDEFINITION, file_store[1].dwSystemID);
+
+    // call, space before store, valid
+    fileKeyboard.version = VERSION_501;
+    file_store[1].dpString = (PKMX_WCHAR)u"a.dll:A";
+    file_store[1].dwSystemID = TSS_NONE;
+    u16cpy(str, u"call( b)");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(tstr_call_valid, tstr));
+    EXPECT_EQ(TSS_CALLDEFINITION, file_store[1].dwSystemID);
+
+    // call, space after store, valid (see I11937, #11938)
+    fileKeyboard.version = VERSION_501;
+    file_store[1].dpString = (PKMX_WCHAR)u"a.dll:A";
+    file_store[1].dwSystemID = TSS_NONE;
+    u16cpy(str, u"call(b )");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(tstr_call_valid, tstr));
+    EXPECT_EQ(TSS_CALLDEFINITION, file_store[1].dwSystemID);
+}
+
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
 // KMX_DWORD process_platform(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
 // KMX_DWORD process_if_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
