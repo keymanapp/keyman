@@ -44,11 +44,7 @@ do_clean() {
 }
 
 compile_and_copy() {
-  local COMPILE_FLAGS=
-  if builder_has_option --ci; then
-    COMPILE_FLAGS=--ci
-  fi
-  compile $SUBPROJECT_NAME $COMPILE_FLAGS
+  compile $SUBPROJECT_NAME
 
   BUILD_ROOT="${KEYMAN_ROOT}/web/build/app/browser"
   SRC_ROOT="${KEYMAN_ROOT}/web/src/app/browser/src"
