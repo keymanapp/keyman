@@ -34,7 +34,7 @@ function do_configure() {
   # default wordbreaker.  We rarely update the backing data, but it
   # is needed _before_ the `build` action's compilation step.
   tsc -b tools/data-compiler/tsconfig.json
-  node ./build/data-compiler/obj/index.js
+  node ./build/tools/data-compiler/obj/index.js
 }
 
 function do_build() {
