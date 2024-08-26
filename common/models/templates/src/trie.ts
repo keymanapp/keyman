@@ -255,16 +255,13 @@ export class TrieTraversal implements LexiconTraversal {
     }
 
     if(root.type == 'leaf') {
-      const leaf = root;
-      let prefix = this.prefix;
-      let matches = leaf.entries.filter(function(entry) {
-        return entry.key == prefix;
+      let matches = root.entries.filter((entry) => {
+        return entry.key == this.prefix;
       });
 
       return matches.map(entryMapper);
     } else {
-      const node = root;
-      let matchingLeaf = inflateChild(node.children, SENTINEL_CODE_UNIT, this.toKey);
+      let matchingLeaf = inflateChild(root.children, SENTINEL_CODE_UNIT, this.toKey);
       if(matchingLeaf && matchingLeaf.type == 'leaf') {
         return matchingLeaf.entries.map(entryMapper);
       } else {
