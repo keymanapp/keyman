@@ -23,7 +23,7 @@ unit klog;  // I3309
 
 interface
 
-{$DEFINE KLOGGING}
+{DEFINE KLOGGING}
 
 {$IFDEF KLOGGING}
 uses
