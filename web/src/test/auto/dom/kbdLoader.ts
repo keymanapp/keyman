@@ -1,32 +1,32 @@
 import {
   DOMKeyboardLoader
-} from '@keymanapp/keyboard-processor/dom-keyboard-loader';
+} from 'keyman/engine/keyboard/dom-keyboard-loader';
 
 import {
   Keyboard,
-  KeyboardInterface,
   KeyboardProperties,
   MinimalKeymanGlobal
-} from '@keymanapp/keyboard-processor';
+} from 'keyman/engine/keyboard';
 
-import { KeyboardStub } from 'keyman/engine/package-cache';
+import { KeyboardInterface } from 'keyman/engine/js-processor';
+import { KeyboardStub } from 'keyman/engine/keyboard-storage';
 
 const loader = new DOMKeyboardLoader(new KeyboardInterface(window, MinimalKeymanGlobal));
 
-export function loadKeyboardFromPath(path) {
+export function loadKeyboardFromPath(path: string) {
   return loader.loadKeyboardFromPath(path);
 }
 
-export function loadKeyboardsFromStubs(apiStubs, baseDir) {
+export function loadKeyboardsFromStubs(apiStubs: any, baseDir: string) {
   baseDir = baseDir || './';
-  let keyboards: {
+  const keyboards: {
     [key: string]: {
       keyboard: Keyboard,
       metadata: KeyboardStub
     }
   } = {};
   let priorPromise: Promise<void | Keyboard> = Promise.resolve();
-  for(let stub of apiStubs) {
+  for(const stub of apiStubs) {
     // We are keeping this strictly sequential because we don't have sandboxed
     // loading yet; lack of sandboxing means that all loading keyboards compete
     // for the same harness endpoint when loading.
@@ -34,8 +34,8 @@ export function loadKeyboardsFromStubs(apiStubs, baseDir) {
     // tl;dr: because otherwise, race condition.
     priorPromise = priorPromise.then(() => {
       // Adds closure to capture 'id' for async completion use.
-      let overwriteLoader = (id, path) => {
-        let loader = loadKeyboardFromPath(path);
+      const overwriteLoader = (id: number, path: string) => {
+        const loader = loadKeyboardFromPath(path);
         return loader.then(kbd => {
           keyboards[stub.id].keyboard = kbd;
         });

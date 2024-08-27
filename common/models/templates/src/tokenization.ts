@@ -1,18 +1,23 @@
 // While we _could_ define this within @keymanapp/models-wordbreakers instead, it's probably
 // better to leave that package as _just_ the wordbreakers.
 
+export interface Token {
+  text: string,
+  isWhitespace?: boolean
+}
+
 export interface Tokenization {
   /**
    * An array of tokens to the left of the caret.  If the caret is in the middle of a token,
    * only the part to the left of the caret is included.
    */
-  left: USVString[],
+  left: Token[],
 
   /**
    * An array of tokens to the right of the caret.  If the caret is in the middle of a token,
    * only the part to the right of the caret is included.
    */
-  right: USVString[],
+  right: Token[],
 
   /**
    * A flag indicating whether or not the caret's position in the context caused a token
@@ -22,20 +27,73 @@ export interface Tokenization {
   caretSplitsToken: boolean
 }
 
-export function tokenize(wordBreaker: WordBreakingFunction, context?: Partial<Context>): Tokenization {
+export function tokenize(
+  wordBreaker: WordBreakingFunction,
+  context: Partial<Context>,
+  options?: {
+    /** Characters to rejoin to preceding tokens if found immediately pre-caret. */
+    rejoins?: string[]
+  }
+): Tokenization {
+  // The Unicode word-breaker algorithm looks for places where it's "safe" to
+  // split a word across lines, operating upon _completed_ words.  There are
+  // some cases where, if placed mid-word, it would add a boundary that does not
+  // exist at the end of the word.  The single-quote character is one such
+  // location - it's hard to tell if `can'` is the end of a quote or the prefix
+  // to `can't`.  So, if `'` is immediately pre-caret, we "rejoin" it.
+  const rejoins = options?.rejoins || ["'"];
   context = context || {
     left: undefined,
     startOfBuffer: undefined,
     endOfBuffer: undefined
   };
 
-  let leftSpans  = wordBreaker(context.left || '') || [];
-  let rightSpans = wordBreaker(context.right || '') || [];
+  const leftSpans  = wordBreaker(context.left  || '') || [];
+  const rightSpans = wordBreaker(context.right || '') || [];
 
-  let leftTail: Span;
-  if(leftSpans.length > 0) {
-    leftTail = leftSpans[leftSpans.length - 1];
+  const tokenization: Tokenization = {
+    left: [],
+    right: [],
+    caretSplitsToken: false
   }
+
+  // New step 1:  process left-context.
+  let currentIndex = 0;
+  while(leftSpans.length > 0) {
+    const nextSpan = leftSpans[0];
+    if(Math.max(nextSpan.start, currentIndex) != currentIndex) {
+      const nextIndex = Math.max(currentIndex, nextSpan.start);
+      // Implicit whitespace span!
+      tokenization.left.push({
+        text: context.left!.substring(currentIndex, nextIndex),
+        isWhitespace: true
+      });
+      currentIndex = nextIndex;
+    } else {
+      leftSpans.shift();
+      // Explicit non-whitespace span.
+      tokenization.left.push({
+        text: nextSpan.text
+      });
+      currentIndex = Math.max(currentIndex, nextSpan.end);
+    }
+  }
+
+  // Detect any pre-caret whitespace after the final pre-caret non-whitespace
+  // token
+  //
+  // Note:  the default wordbreaker won't need this code, as it emits a `''`
+  // after final whitespace.
+  if(context.left != null && currentIndex != context.left.length) {
+    const nextIndex = Math.max(currentIndex, context.left!.length);
+    tokenization.left.push({
+      text: context.left.substring(currentIndex, nextIndex),
+      isWhitespace: true
+    });
+    currentIndex = nextIndex;
+  }
+
+  // New step 2: handle any rejoins needed.
 
   // Handle any desired special handling for directly-pre-caret scenarios - where for this
   // _specific_ context, we should not make a token division where one normally would exist otherwise.
@@ -45,62 +103,88 @@ export function tokenize(wordBreaker: WordBreakingFunction, context?: Partial<Co
   // But, if the user is editing text and the caret is directly after a caret, there's a notable
   // chance they may in the middle of typing a contraction. Refer to
   // https://github.com/keymanapp/keyman/issues/6572.
-  if(leftSpans.length > 1) {
-    const leftTailBase = leftSpans[leftSpans.length - 2];
+  let leftTokenCount = tokenization.left.length;
+  if(leftTokenCount > 1) {
+    const leftTailBase = tokenization.left[leftTokenCount - 2];
+    const leftTail = tokenization.left[leftTokenCount - 1];
 
     // If the final two pre-caret spans are adjacent - without intervening whitespace...
-    if(leftTailBase.end == leftTail!.start) {
+    if(!leftTailBase.isWhitespace && !leftTail.isWhitespace) {
       // Ideal:  if(leftTailBase is standard-char-class && leftTail is single-quote-class)
       // But we don't have character class access here; it's all wordbreaker-function internal.
       // Upon inspection of the wordbreaker data definitions... the single-quote-class is ONLY "'".
       // So... we'll just be lazy for now and append the `'`.
-      if(leftTail!.text == "'") {
-        let mergedSpan: Span = {
-          text: leftTailBase.text + leftTail!.text,
-          start: leftTailBase.start,
-          end: leftTail!.end,
-          length: leftTailBase.length + leftTail!.length
-        };
-
-        leftSpans.pop(); // leftTail
-        leftSpans.pop(); // leftTailBase
-        leftSpans.push(mergedSpan);
-        leftTail = mergedSpan; // don't forget to update the `leftTail` Span!
+      if(rejoins.indexOf(leftTail!.text) != -1) {
+        tokenization.left.pop(); // leftTail
+        tokenization.left.pop(); // leftTailBase
+        tokenization.left.push({
+          text: leftTailBase.text + leftTail.text
+        });
+        leftTokenCount--;
       }
     }
   }
 
-  // With any 'detokenization' cases already handled, we may now begin to build the return object.
-  let tokenization: Tokenization = {
-    left: leftSpans.map(span => span.text),
-    right: rightSpans.map(span => span.text),
+  // New step 3: right-context tokenization + token split detection
 
-    // A default initialization of the value.
-    caretSplitsToken: false
-  };
+  // context.right starts from index 0;  it's an 'index reset'.
+  currentIndex = 0;
+  // Set a flag for special "first token" processing.
+  let firstRightToken = true;
 
-  // Now the hard part - determining whether or not the caret caused a token split.
-  if(leftSpans.length > 0 && rightSpans.length > 0) {
-    let rightHead = rightSpans[0];
+  // Note:  is MOSTLY "WET" with the left-span loop, though the
+  // `caretSplitsToken` check is additional.
+  while(rightSpans.length > 0) {
+    const nextSpan = rightSpans[0];
+    if(Math.max(nextSpan.start, currentIndex) != currentIndex) {
+      const nextIndex = Math.max(currentIndex, nextSpan.start);
+      // Implicit whitespace span!
+      tokenization.right.push({
+        text: context.right!.substring(currentIndex, nextIndex),
+        isWhitespace: true
+      });
+      currentIndex = nextIndex;
+    } else {
+      const leftTail = tokenization.left[leftTokenCount-1];
+      if(leftTail) {
+        // If the first non-whitespace token to the right is non-whitespace,
+        // and the last token to the left is non-whitespace, the caret may
+        // be splitting a token.
+        if(firstRightToken && !leftTail.isWhitespace) {
+          if(wordBreaker(leftTail!.text + nextSpan.text).length == 1) {
+            tokenization.caretSplitsToken = true;
+          }
+        }
+      }
 
-    // If tokenization includes all characters on each side of the caret,
-    // we have a good candidate for a caret-splitting scenario.
-    let leftSuffixWordbreak = leftTail!.end != context.left!.length;
-    let rightPrefixWordbreak = rightHead.start != 0;
-
-    if(leftSuffixWordbreak || rightPrefixWordbreak) {
-      // Bypass the final test, as we already know the caret didn't split a token.
-      // (The tokenization process already removed characters between the two.)
-      return tokenization;
+      // Explicit non-whitespace span.
+      rightSpans.shift();
+      tokenization.right.push({
+        text: nextSpan.text
+      });
+      currentIndex = Math.max(currentIndex, nextSpan.end);
     }
 
-    // Worth note - some languages don't use wordbreaking characters.  So, a final check:
-    //
-    // Does the wordbreaker split a merge of the 'two center' tokens?
-    // If not, then the caret is responsible for the split.
-    if(wordBreaker(leftTail!.text + rightHead.text).length == 1) {
-      tokenization.caretSplitsToken = true;
-    }
+    // We've always processed the "first right token" after the first iteration.
+    // Do not run the caret-split check on any future iterations.
+    firstRightToken = false;
+  }
+
+  // Detect any pre-caret whitespace after the final pre-caret non-whitespace
+  // token
+  //
+  // Note:  the default wordbreaker won't need this code, as it emits a `''`
+  // after final whitespace.
+  //
+  // Also note:  is pretty much WET with the similar check after the
+  // leftSpan loop.
+  if(context.right && currentIndex != context.right.length) {
+    const nextIndex = Math.max(currentIndex, context.right!.length);
+    tokenization.right.push({
+      text: context.right.substring(currentIndex, nextIndex),
+      isWhitespace: true
+    });
+    currentIndex = nextIndex;
   }
 
   return tokenization;
@@ -108,12 +192,18 @@ export function tokenize(wordBreaker: WordBreakingFunction, context?: Partial<Co
 
 /**
  * Get the last word of the phrase before the caret or nothing.
+ * If the last 'token' before the caret is whitespace, returns `''`.
  * @param fullLeftContext the entire left context of the string.
  */
 export function getLastPreCaretToken(wordBreaker: WordBreakingFunction, context: Context): string {
   let tokenization = tokenize(wordBreaker, context);
   if (tokenization.left.length > 0) {
-    return tokenization.left.pop() as string;
+    const lastToken = tokenization.left.pop();
+    if(lastToken!.isWhitespace) {
+      return '';
+    } else {
+      return lastToken!.text;
+    }
   }
 
   return '';

@@ -1,4 +1,4 @@
-import { DeviceSpec, ManagedPromise, Version } from '@keymanapp/keyboard-processor';
+import { DeviceSpec, ManagedPromise, Version } from 'keyman/engine/keyboard';
 import { getAbsoluteX, getAbsoluteY, landscapeView } from 'keyman/engine/dom-utils';
 import { EmitterListenerSpy } from 'keyman/engine/events';
 
@@ -31,7 +31,7 @@ export default class FloatingOSKView extends OSKView {
   dfltX: string;
   dfltY: string;
 
-  private layoutSerializer = new FloatingOSKCookieSerializer();
+  layoutSerializer = new FloatingOSKCookieSerializer();
 
   private titleBar: TitleBar;
   private resizeBar: ResizeBar;
@@ -233,15 +233,6 @@ export default class FloatingOSKView extends OSKView {
    *  @return {boolean}
    */
   private loadPersistedLayout(): void {
-    /*
-      If a keyboard is available during OSK construction, it is possible
-      for this field to be `undefined`.  `loadPersistedLayout` will be called
-      later in construction, so it's safe to skip.
-    */
-    if(!this.layoutSerializer) {
-      return;
-    }
-
     let c = this.layoutSerializer.loadWithDefaults({
       visible: 1,
       userSet: 0,

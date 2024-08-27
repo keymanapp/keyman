@@ -3,18 +3,17 @@
 
   "compilerOptions": {
     "baseUrl": "./",
-    "outDir": "build/obj",
-    "tsBuildInfoFile": "build/obj/tsconfig.tsbuildinfo",
-    "rootDir": "./src"
+    "outDir": "./build/main/obj",
+    "tsBuildInfoFile": "./build/main/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src/main"
   },
   "references": [
     { "path": "../types" }
   ],
   "include": [
-	"src/**/*"
+	  "./src/main/**/*"
   ],
   "exclude": [
-	"node_modules",
-	"test/**/*.ts"
+	  "node_modules"
   ]
 }

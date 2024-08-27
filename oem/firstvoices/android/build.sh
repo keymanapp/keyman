@@ -61,13 +61,9 @@ if builder_start_action clean; then
 fi
 
 if builder_start_action configure; then
-  KEYBOARDS_CSV="$KEYMAN_ROOT/oem/firstvoices/keyboards.csv"
-  KEYBOARDS_CSV_TARGET="$KEYMAN_ROOT/oem/firstvoices/android/app/src/main/assets/keyboards.csv"
-
   KEYBOARD_PACKAGE_ID="fv_all"
   KEYBOARDS_TARGET="$KEYMAN_ROOT/oem/firstvoices/android/app/src/main/assets/${KEYBOARD_PACKAGE_ID}.kmp"
 
-  cp "$KEYBOARDS_CSV" "$KEYBOARDS_CSV_TARGET"
   downloadKeyboardPackage "$KEYBOARD_PACKAGE_ID" "$KEYBOARDS_TARGET"
 
   builder_finish_action success configure

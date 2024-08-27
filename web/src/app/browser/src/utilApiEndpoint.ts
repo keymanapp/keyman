@@ -10,7 +10,7 @@ import { DomEventTracker } from "keyman/engine/events";
 import { BrowserConfiguration, BrowserInitOptionSpec } from "./configuration.js";
 import { getStyleValue } from "./utils/getStyleValue.js";
 import { AlertHost } from "./utils/alertHost.js";
-import { PathConfiguration } from 'keyman/engine/paths';
+import { PathConfiguration } from 'keyman/engine/interfaces';
 
 /**
  * Calls document.createElement for the specified node type and also applies

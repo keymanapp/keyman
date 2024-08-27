@@ -27,10 +27,13 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   ":engine/dom-utils         A common subset of function used for DOM calculations, layout, etc" \
   ":engine/events            Specialized classes utilized to support KMW API events" \
   ":engine/element-wrappers  Subset used to integrate with website elements" \
+  ":engine/interfaces        Subset used to configure KMW" \
+  ":engine/js-processor      Build JS processor for KMW" \
+  ":engine/keyboard          Builds KMW's keyboard-loading and caching code" \
+  ":engine/keyboard-storage  Subset used to collate keyboards and request them from the cloud" \
   ":engine/main              Builds all common code used by KMW's app/-level targets" \
   ":engine/osk               Builds the Web OSK module" \
-  ":engine/package-cache     Subset used to collate keyboards and request them from the cloud" \
-  ":engine/paths             Subset used to configure KMW" \
+  ":engine/predictive-text=src/engine/predictive-text/worker-main     Builds KMW's predictive text module" \
   ":samples                  Builds all needed resources for the KMW sample-page set" \
   ":tools                    Builds engine-related development resources" \
   ":test-pages=src/test/manual   Builds resources needed for the KMW manual testing pages" \
@@ -39,10 +42,36 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
 # Possible TODO?
 # "upload-symbols   Uploads build product to Sentry for error report symbolification.  Only defined for $DOC_BUILD_EMBED_WEB" \
 
-builder_describe_outputs \
-  configure                      /node_modules
-
 builder_parse "$@"
+
+config=release
+if builder_is_debug_build; then
+  config=debug
+fi
+
+builder_describe_outputs \
+  configure                     "/node_modules" \
+  build                         "/web/build/test/dom/cases/attachment/outputTargetForElement.spec.html" \
+  build:app/browser             "/web/build/app/browser/lib/index.mjs" \
+  build:app/webview             "/web/build/app/webview/${config}/keymanweb-webview.js" \
+  build:app/ui                  "/web/build/app/ui/${config}/kmwuitoggle.js" \
+  build:engine/attachment       "/web/build/engine/attachment/lib/index.mjs" \
+  build:engine/device-detect    "/web/build/engine/device-detect/lib/index.mjs" \
+  build:engine/dom-utils        "/web/build/engine/dom-utils/obj/index.js" \
+  build:engine/events           "/web/build/engine/events/lib/index.mjs" \
+  build:engine/element-wrappers "/web/build/engine/element-wrappers/lib/index.mjs" \
+  build:engine/interfaces       "/web/build/engine/interfaces/lib/index.mjs" \
+  build:engine/js-processor     "/web/build/engine/js-processor/lib/index.mjs" \
+  build:engine/keyboard         "/web/build/engine/keyboard/lib/index.mjs" \
+  build:engine/keyboard-storage "/web/build/engine/keyboard-storage/lib/index.mjs" \
+  build:engine/main             "/web/build/engine/main/lib/index.mjs" \
+  build:engine/osk              "/web/build/engine/osk/lib/index.mjs" \
+  build:engine/predictive-text  "/web/src/engine/predictive-text/worker-main/build/lib/web/index.mjs" \
+  build:samples                 "/web/src/samples/simplest/keymanweb.js" \
+  build:tools                   "/web/build/tools/building/sourcemap-root/index.js" \
+  build:test-pages              "/web/build/test-resources/sentry-manager.js"
+
+BUNDLE_CMD="node ${KEYMAN_ROOT}/common/web/es-bundling/build/common-bundle.mjs"
 
 #### Build action definitions ####
 
@@ -62,8 +91,36 @@ builder_run_child_actions configure
 
 ## Build actions
 
+precompile() {
+  local DIR
+  DIR="$1"
+
+  builder_echo "Pre-compiling ${DIR}..."
+
+  # pre-compile bundle for use in DOM testing. When running in the browser several
+  # types built-in to Node aren't available, and @web/test-runner doesn't do
+  # treeshaking when loading the imports. We work around by pre-compiling.
+  for f in "${DIR}"/*.js; do
+    ${BUNDLE_CMD}   "${f}" \
+      --out         "${f%.js}".mjs \
+      --format esm
+  done
+}
+
 build_action() {
+  builder_echo "Building auto tests..."
   tsc --project "${KEYMAN_ROOT}/web/src/test/auto/tsconfig.json"
+
+  for dir in \
+    "${KEYMAN_ROOT}/web/build/test/dom/cases"/*/ \
+    "${KEYMAN_ROOT}/web/build/test/integrated/" \
+    "${KEYMAN_ROOT}/web/build/test/integrated/cases/";
+  do
+    precompile "${dir}"
+  done
+
+  cp "${KEYMAN_ROOT}/web/src/test/auto/dom/cases/attachment/outputTargetForElement.spec.html" \
+    "${KEYMAN_ROOT}/web/build/test/dom/cases/attachment/"
 }
 
 test_action() {
@@ -86,23 +143,23 @@ coverage_action() {
 
 builder_run_child_actions build:engine/device-detect
 builder_run_child_actions build:engine/dom-utils
+
+builder_run_child_actions build:engine/keyboard
+builder_run_child_actions build:engine/js-processor
 builder_run_child_actions build:engine/element-wrappers
 builder_run_child_actions build:engine/events
+builder_run_child_actions build:engine/interfaces
 
-# Uses engine/dom-utils
+# Uses engine/dom-utils and engine/interfaces
 builder_run_child_actions build:engine/osk
 
 # Uses engine/element-wrappers
 builder_run_child_actions build:engine/attachment
 
-# Uses engine/osk (due to resource-path config interface)
-builder_run_child_actions build:engine/paths
+# Uses engine/interfaces (due to resource-path config interface)
+builder_run_child_actions build:engine/keyboard-storage
 
-# Uses engine/config (also due to resource-path config interface, but for the
-# more complete version of that interface)
-builder_run_child_actions build:engine/package-cache
-
-# Uses engine/paths, engine/device-detect, engine/package-cache, & engine/osk
+# Uses engine/interfaces, engine/device-detect, engine/keyboard-storage, & engine/osk
 builder_run_child_actions build:engine/main
 
 # Uses all but engine/element-wrappers and engine/attachment

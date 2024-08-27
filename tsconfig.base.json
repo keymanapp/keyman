@@ -26,14 +26,12 @@
 
     "paths": {
       "@keymanapp/common-types": ["./common/web/types/src/main"],
-      "@keymanapp/input-processor": ["./common/web/input-processor/src"],
-      "@keymanapp/keyboard-processor": ["./common/web/keyboard-processor/src"],
       "@keymanapp/keyman": ["./web" ],
       "@keymanapp/models-types": ["./common/models/types"],
       "@keymanapp/models-templates": ["./common/models/templates"],
       "@keymanapp/models-wordbreakers": ["./common/models/wordbreakers"],
       "@keymanapp/web-utils": ["./common/web/utils"],
-      "@keymanapp/lm-message-types": ["./common/web/lm-message-types"],
+      "@keymanapp/lm-message-types": ["./web/src/engine/predictive-text/types"],
       "@keymanapp/keyman-version": ["./common/web/keyman-version"],
       "@keymanapp/ldml-keyboard-constants": [ "./core/include/ldml" ],
     }

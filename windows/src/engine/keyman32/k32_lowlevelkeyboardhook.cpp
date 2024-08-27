@@ -26,6 +26,8 @@
 #include "serialkeyeventserver.h"
 #include "kbd.h"	/* DDK kbdlayout */
 
+// This file is used only in keyman32.dll; it implements our low level keyboard hook
+// in the main keyman.exe process for hotkeys, serial key event server
 #ifndef _WIN64
 
 BOOL ProcessHotkey(UINT vkCode, BOOL isUp, DWORD ShiftState);
@@ -118,7 +120,7 @@ static BOOL touchPanelVisible;
 
 void WINAPI Keyman_UpdateTouchPanelVisibility(BOOL isVisible) {
   touchPanelVisible = isVisible;
-  SendDebugMessageFormat(0, sdmAIDefault, 0, "Keyman_UpdateTouchPanelVisibility: isVisible=%d", touchPanelVisible);
+  SendDebugMessageFormat("isVisible=%d", touchPanelVisible);
 }
 
 BOOL IsTouchPanelVisible() {
@@ -160,13 +162,14 @@ LRESULT _kmnLowLevelKeyboardProc(
     return CallNextHookEx(Globals::get_hhookLowLevelKeyboardProc(), nCode, wParam, lParam);
   }
 
+  SendDebugEntry();
 
   PKBDLLHOOKSTRUCT hs = (PKBDLLHOOKSTRUCT) lParam;
 
   BOOL extended = hs->flags & LLKHF_EXTENDED ? TRUE : FALSE;
   BOOL isUp = hs->flags & LLKHF_UP ? TRUE : FALSE;
 
-  SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: wparam: %x  lparam: %x [vk:%s scan:%x flags:%x extra:%x]", wParam, lParam, Debug_VirtualKey((WORD) hs->vkCode), hs->scanCode, hs->flags, hs->dwExtraInfo);   // I4674
+  SendDebugMessageFormat("wparam: %x  lparam: %x [vk:%s scan:%x flags:%x extra:%x]", wParam, lParam, Debug_VirtualKey((WORD) hs->vkCode), hs->scanCode, hs->flags, hs->dwExtraInfo);   // I4674
 
   DWORD Flag = 0;
   if (!UseCachedHotkeyModifierState()) {
@@ -180,7 +183,7 @@ LRESULT _kmnLowLevelKeyboardProc(
     if (GetKeyState(VK_LSHIFT) < 0) FHotkeyShiftState |= HK_SHIFT;
     if (GetKeyState(VK_RSHIFT) < 0) FHotkeyShiftState |= HK_RSHIFT_INVALID;
     //TODO: #8064. Can remove debug message once issue #8064 is resolved
-     SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: !UseCachedHotkeyModifierState [FHotkeyShiftState:%x Flag:%x]", FHotkeyShiftState, Flag);
+    SendDebugMessageFormat("!UseCachedHotkeyModifierState [FHotkeyShiftState:%x Flag:%x]", FHotkeyShiftState, Flag);
   }
   else if (UseRegisterHotkey()) {
     // The old RegisterHotkey pattern does not support chiral modifier keys
@@ -197,7 +200,7 @@ LRESULT _kmnLowLevelKeyboardProc(
 
     }
     //TODO: #8064. Can remove debug message once issue #8064 is resolved
-    SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: UseRegisterHotkey [FHotkeyShiftState:%x Flag:%x]", FHotkeyShiftState, Flag);
+    SendDebugMessageFormat("UseRegisterHotkey [FHotkeyShiftState:%x Flag:%x]", FHotkeyShiftState, Flag);
   }
   else {
     // #4619: We differentiate between Left and Right Ctrl/Shift/Alt. The right modifiers are
@@ -228,24 +231,28 @@ LRESULT _kmnLowLevelKeyboardProc(
   // message only updates our internal modifier state, and does not do
   // any additional processing or other serialization of the input queue.
   if (isModifierKey(hs->vkCode) && flag_ShouldSerializeInput) {
-      //TODO: #8064. Can remove debug message once issue #8064 is resolved
-      SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: isModifierKey [hs->vkCode:%x isUp:%d]", hs->vkCode, isUp);
-      PostMessage(ISerialKeyEventServer::GetServer()->GetWindow(), WM_KEYMAN_MODIFIER_EVENT, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
+    //TODO: #8064. Can remove debug message once issue #8064 is resolved
+    SendDebugMessageFormat("isModifierKey [hs->vkCode:%x isUp:%d]", hs->vkCode, isUp);
+    PostMessage(ISerialKeyEventServer::GetServer()->GetWindow(), WM_KEYMAN_MODIFIER_EVENT, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
   }
 
   if(IsLanguageSwitchWindowVisible()) {
-    SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: Sending to language switch window %x %x", wParam, lParam);
+    SendDebugMessageFormat("Sending to language switch window %x %x", wParam, lParam);
     SendToLanguageSwitchWindow(hs->vkCode, hs->flags);
-    if (ProcessLanguageSwitchShiftKey(hs->vkCode, isUp) == 1) return 1;
+    if (ProcessLanguageSwitchShiftKey(hs->vkCode, isUp) == 1) {
+      return_SendDebugExit(1);
+    }
   }
   else if (KeyLanguageSwitchPress(hs->vkCode, extended, isUp, FHotkeyShiftState)) {
-    SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: KeyLanguageSwitchPress [vkCode:%x extended:%x isUp:%d FHotkeyShiftState:%x", hs->vkCode, extended, isUp, FHotkeyShiftState);
-    if (ProcessLanguageSwitchShiftKey(hs->vkCode, isUp) == 1) return 1;
+    SendDebugMessageFormat("KeyLanguageSwitchPress [vkCode:%x extended:%x isUp:%d FHotkeyShiftState:%x", hs->vkCode, extended, isUp, FHotkeyShiftState);
+    if (ProcessLanguageSwitchShiftKey(hs->vkCode, isUp) == 1) {
+      return_SendDebugExit(1);
+    }
   }
 
   if (ProcessHotkey(hs->vkCode, isUp, FHotkeyShiftState)) {
-    SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: ProcessHotkey [vkCode:%x isUp:%d FHotkeyShiftState:%x", hs->vkCode, isUp, FHotkeyShiftState);
-    return 1;
+    SendDebugMessageFormat("ProcessHotkey [vkCode:%x isUp:%d FHotkeyShiftState:%x", hs->vkCode, isUp, FHotkeyShiftState);
+    return_SendDebugExit(1);
   }
 
   /*
@@ -263,37 +270,37 @@ LRESULT _kmnLowLevelKeyboardProc(
     // dwExtraInfo is set to 0x4321DCBA by mstsc which does prefiltering. So we ignore for anything where dwExtraInfo!=0 because it
     // probably is not hardware generated and may cause more issues to filter it.
     // We also ignore if a Keyman keyboard is not currently active.
-    SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: Pass through [dwExtraInfo:%x scancode:%x vkCode:%x, isKeymanKeyboardActive:%d", hs->dwExtraInfo, hs->scanCode, hs->vkCode, isKeymanKeyboardActive);
-    return CallNextHookEx(Globals::get_hhookLowLevelKeyboardProc(), nCode, wParam, lParam);
+    SendDebugMessageFormat("Pass through [dwExtraInfo:%x scancode:%x vkCode:%x, isKeymanKeyboardActive:%d", hs->dwExtraInfo, hs->scanCode, hs->vkCode, isKeymanKeyboardActive);
+    return_SendDebugExit(CallNextHookEx(Globals::get_hhookLowLevelKeyboardProc(), nCode, wParam, lParam));
   }
 
   if (IsTouchPanelVisible()) {
     // See #2450. The touch panel will close automatically if we reprocess key events
     // So we don't want to reprocess events when it is visible.
-    SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: touch panel is visible. Not reprocessing keystrokes");
-    return CallNextHookEx(Globals::get_hhookLowLevelKeyboardProc(), nCode, wParam, lParam);
+    SendDebugMessageFormat("touch panel is visible. Not reprocessing keystrokes");
+    return_SendDebugExit(CallNextHookEx(Globals::get_hhookLowLevelKeyboardProc(), nCode, wParam, lParam));
   }
 
   if (flag_ShouldSerializeInput) {
     GUITHREADINFO gui = { 0 };
     gui.cbSize = sizeof(GUITHREADINFO);
     if (GetGUIThreadInfo(NULL, &gui)) {
-      SendDebugMessageFormat(0, sdmGlobal, 0, "LowLevelHook: Active=%x Focus=%x Key=%s flags=%x",
+      SendDebugMessageFormat("Active=%x Focus=%x Key=%s flags=%x",
         gui.hwndActive, gui.hwndFocus, Debug_VirtualKey((WORD)hs->vkCode), LLKHFFlagstoWMKeymanKeyEventFlags(hs));
 
       HWND hwnd = gui.hwndFocus ? gui.hwndFocus : gui.hwndActive;
       if (!IsConsoleWindow(hwnd)) {
         PostMessage(ISerialKeyEventServer::GetServer()->GetWindow(), WM_KEYMAN_KEY_EVENT, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
-        return 1;
+        return_SendDebugExit(1);
       }
-      //else SendDebugMessageFormat(0, sdmGlobal, 0, "LowLevelHook: console window, not serializing"); // too noisy
+      //else SendDebugMessageFormat("console window, not serializing"); // too noisy
     }
     else {
-      SendDebugMessageFormat(0, sdmGlobal, 0, "LowLevelHook: Failed to get Gui thread info with error %d", GetLastError());
+      SendDebugMessageFormat("Failed to get Gui thread info with error %d", GetLastError());
     }
   }
 
-  return CallNextHookEx(Globals::get_hhookLowLevelKeyboardProc(), nCode, wParam, lParam);
+  return_SendDebugExit(CallNextHookEx(Globals::get_hhookLowLevelKeyboardProc(), nCode, wParam, lParam));
 }
 
 BOOL ProcessHotkey(UINT vkCode, BOOL isUp, DWORD ShiftState) {
