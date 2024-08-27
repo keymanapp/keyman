@@ -11,8 +11,8 @@ import { TouchpathTurtle } from '#gesture-tools';
 // Ensures that the resources are resolved relative to this script's source, not
 // to the cwd when the test runner was launched or to its built version.
 const scriptFolder = path.dirname(url.fileURLToPath(import.meta.url))
-  .replace("build/test/auto", "src/test/auto")       // Mac/Linux
-  .replace("build\\test\\auto", "src\\test\\auto");  // Windows
+  .replace("build/test", "src/test/auto")       // Mac/Linux
+  .replace("build\\test", "src\\test\\auto");  // Windows
 const SEGMENT_TEST_JSON_FOLDER = path.resolve(`${scriptFolder}/../../../../resources/json/segmentation`);
 
 describe("GesturePath", function() {
