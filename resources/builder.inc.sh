@@ -1513,7 +1513,7 @@ builder_display_usage() {
   # if you add other, longer, global options (like --verbose, --debug)
   local width=12
 
-  for e in "${!_builder_actions[@]}"; do
+  for e in "${!_builder_params[@]}"; do
     if (( ${#e} > $width )); then
       width=${#e}
     fi
