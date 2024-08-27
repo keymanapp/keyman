@@ -145,7 +145,6 @@ repositories {
         dirs 'libs'
     }
     google()
-    //jcenter()
 }
 
 dependencies {

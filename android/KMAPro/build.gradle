@@ -2,7 +2,6 @@
 buildscript {
     repositories {
         google()
-        //jcenter() deprecated August 2024
         mavenCentral()
         flatDir {
             dirs "kMAPro/libs/com/stepstone/stepper/material-stepper/4.3.1/"
@@ -24,7 +23,6 @@ allprojects {
     repositories {
         maven { url uri("${projectDir}/libs") }
         google()
-        //jcenter() deprecated August 2024
         mavenCentral()
         maven { url "https://jitpack.io" }
     }
