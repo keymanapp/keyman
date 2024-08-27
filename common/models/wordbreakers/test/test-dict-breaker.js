@@ -2,13 +2,34 @@
  * Smoke-test basic components of the dictionary-based wordbreaker.
  *
  * As full testing requires either an implementation or a mock of the
- * `LexiconTraversal` type, which is fairly complex, more rigorous tests
- * [TODO: will] lie within @models-templates testing.
+ * `LexiconTraversal` type, which is fairly complex; this motivates
+ * a unit-testing dependency on @keymanapp/models-templates as a result.
  */
 
 import { assert } from 'chai';
 import { default as dict, splitOnWhitespace } from '@keymanapp/models-wordbreakers/obj/dict/index.js';
 import { fixture as fixture1 } from './fixtures/mocked-traversals/apples-and-ale.js';
+
+import path from 'path';
+
+import { createRequire } from "module";
+import { fileURLToPath } from 'url';
+
+import { TrieModel } from '@keymanapp/models-templates';
+
+/**
+ * Load JSON fixtures from a well-known place.
+ */
+function jsonFixture(name) {
+  // The most straight-forward way... is to use CommonJS-style require to load JSON.
+  // Fortunately, Node provides the tools needed to recreate it.
+  const require = createRequire(import.meta.url);
+
+  // ES-module mode also leaves out `__dirname`, so we rebuild that too.
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  return require(path.join(__dirname, 'fixtures', `${name}.json`));
+}
 
 function assertSpanSplit(text, actualSplitSpans, expectedSplitStr) {
   assert.deepEqual(actualSplitSpans.map((entry) => entry.text), expectedSplitStr);
@@ -34,7 +55,7 @@ describe('dictionary-based wordbreaker', () => {
 
         const actualSplit = splitOnWhitespace(text);
         assertSpanSplit(text, actualSplit, expectedSplit);
-      })
+      });
 
       it('handles simple-space cases', () => {
         const text = "this is a test";
@@ -127,6 +148,45 @@ describe('dictionary-based wordbreaker', () => {
 
         const actualSplit = dict(text, fixture1);
         assertSpanSplit(text, actualSplit, expectedSplit);
+      });
+    });
+
+    describe('breaking with sil.km.gcc 1.0', () => {
+      const fixture = jsonFixture('tries/sil.km.gcc - 1.0');
+
+      // Uses the original lexical-model's backing data, but swaps in the
+      // dictionary-based wordbreaker.
+      const model = new TrieModel(fixture);
+      // Note:  to initialize it as needed for the model at this time... we
+      // need to be able to build this object _before_ the `Trie` is constructed!
+      //
+      // A "hurdle to cross" / we'll "have to cross that bridge when we come to it."
+      const root = model.traverseFromRoot();
+
+      it('text with out-of-dict name and number', () => {
+        const text = 'ខ្ញុំឃ្មោះយុសវេអាយុ៣៨ឆ្នាំហើយ';
+        const expectedResults = [
+          'ខ្ញុំ',
+          'ឃ្មោះ',
+          // So, my name (as transliterated into Khmer) doesn't have anything even CLOSE.
+          // Each letter ended up spun off as its own thing.
+          "យ",
+          "ុ",
+          "ស",
+          "វ",
+          "េ",
+          // And back to normal (for a bit)
+          'អាយុ',
+          // Numbers aren't words in the dictionary.
+          '៣',
+          '៨',
+          // And back to normal.
+          'ឆ្នាំ',
+          'ហើយ'
+        ];
+
+        const actualResults = dict(text, root);
+        assertSpanSplit(text, actualResults, expectedResults);
       });
     });
   });
