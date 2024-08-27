@@ -1,5 +1,7 @@
 import { PriorityQueue } from "@keymanapp/web-utils";
 
+type ChildEdge = { char: string; p: number, traversal: () => LexiconTraversal };
+
 export class CompositedTraversal implements LexiconTraversal {
   private readonly componentTraversals: Distribution<LexiconTraversal>;
 
@@ -16,7 +18,7 @@ export class CompositedTraversal implements LexiconTraversal {
     });
   }
 
-  children(): { char: string; p: number, traversal: () => LexiconTraversal }[] {
+  children(): ChildEdge[] {
     // Easy case:  when there's no source on the current Traversal path, there
     // are no children.
     //
@@ -63,7 +65,7 @@ export class CompositedTraversal implements LexiconTraversal {
     // Now, the tricky part:  actual blending.
 
     // Find sets of traversals that traverse the same char path after the represented prefix.
-    const componentBuckets: Record<string, { component: {char: string, p: number, traversal: () => LexiconTraversal}, weight: number }[]> = {};
+    const componentBuckets: Record<string, { component: ChildEdge, weight: number }[]> = {};
     unblendedComponents.forEach((componentChildren) => {
       componentChildren.sample.forEach((entry) => {
         componentBuckets[entry.char] ??= [];
