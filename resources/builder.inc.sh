@@ -1500,7 +1500,6 @@ _builder_completion_describe() {
   local _builder_opts=()
   for e in "${!_builder_params[@]}"; do
     if [[ $e =~ ^-- ]]; then
-      # _builder_pad $width "  $e" "${_builder_params[$e]}"
       _builder_opts+=(${e%+*})
     fi
   done
