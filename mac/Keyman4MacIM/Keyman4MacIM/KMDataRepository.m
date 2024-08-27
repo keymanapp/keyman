@@ -1,9 +1,6 @@
 /*
  * Keyman is copyright (C) SIL International. MIT License.
  *
- * KMResourcesRepository.m
- * Keyman
- *
  * Created by Shawn Schantz on 2024-07-30.
  *
  * Singleton object which serves as an abstraction for the reading and writing of Keyman data.
@@ -39,11 +36,11 @@
 @synthesize obsoleteKeymanKeyboardsDirectory = _obsoleteKeymanKeyboardsDirectory;
 
 NSString *const kKeyboardsDirectoryName = @"Keyman-Keyboards";
-/* 
- The name of the subdirectory within '~/Library/Application Support'.
- We follow the convention of using the bundle identifier rather than our subsystem id.
- (Also, using the subsystem id, "com.keyman.app", is a poor choice because the API
- createDirectoryAtPath sees the .app extension and creates an application file.
+/**
+ * The name of the subdirectory within '~/Library/Application Support'.
+ * We follow the convention of using the bundle identifier rather than our subsystem id.
+ * (Also, using the subsystem id, "com.keyman.app", is a poor choice because the API
+ * createDirectoryAtPath sees the .app extension and creates an application file.)
  */
 NSString *const kKeymanSubdirectoryName = @"keyman.inputmethod.Keyman";
 
@@ -158,6 +155,7 @@ NSString *const kKeymanSubdirectoryName = @"keyman.inputmethod.Keyman";
   }
   return _obsoleteKeymanKeyboardsDirectory;
 }
+
 /**
  *  Only called from migrateData.
  *  Causes user to be prompted for permission to access ~/Documents, but they should already have it.

@@ -1,9 +1,6 @@
 /*
  * Keyman is copyright (C) SIL International. MIT License.
  *
- * KMSettingsRepository.h
- * Keyman
- *
  * Created by Shawn Schantz on 2024-07-29.
  *
  * Singleton object for reading and writing Keyman application settings.
@@ -61,7 +58,7 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirec
  * For versions before version 1, the keyboards were stored under the ~/Documents directory.
  */
 - (BOOL)dataModelWithKeyboardsInLibrary {
-  // NSUserDefaults returns zero if the key does not exist
+  // [NSUserDefaults integerForKey] returns zero if the key does not exist
   NSInteger dataModelVersion = [[NSUserDefaults standardUserDefaults] integerForKey:kDataModelVersion];
   
   return dataModelVersion >= kVersionStoreDataInLibraryDirectory;
@@ -142,7 +139,6 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirec
  * Convert the path of the keyboard designating the Documents folder to its new location
  * in the Application Support folder
  */
-
 - (NSString *)convertOldKeyboardPath:(NSString *)oldPath {
   NSString *newPathString = @"";
   if(oldPath != nil) {
