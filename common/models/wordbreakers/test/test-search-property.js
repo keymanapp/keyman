@@ -3,8 +3,8 @@
  */
 
 import { assert } from 'chai';
-import { searchForProperty } from '../build/obj/default/searchForProperty.js';
-import { propertyMap } from '../build/obj/default/data.inc.js';
+import { searchForProperty } from '../build/main/obj/default/searchForProperty.js';
+import { propertyMap } from '../build/main/obj/default/data.inc.js';
 
 describe('searchForProperty', () => {
   it('correctly finds character classes for standard ASCII characters', () => {
