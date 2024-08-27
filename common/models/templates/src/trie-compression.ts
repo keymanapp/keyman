@@ -49,7 +49,7 @@ const ENTRY_HEADER_WIDTH = NODE_SIZE_WIDTH + WEIGHT_WIDTH;
 
 // encoded ENTRY:
 // - entryLen: 2 char
-//   - total encoded size of all following bits.
+//   - total encoded size of the entry, including `entryLen`
 //   - as raw, concatenated string data - no JSON.stringify action taken.
 // - weight: 2? chars (with quote-offset on each char?)
 // - contentLen: safe to infer from all other values
@@ -155,12 +155,12 @@ function decompressLeaf(str: string, keyFunction: Wordform2Key, baseIndex: numbe
   // Assumes string-subsection size check has passed.
   const entryCntSrc = decompressNumber(str, baseIndex + NODE_TYPE_INDEX, baseIndex + NODE_TYPE_INDEX + 1);
   // Remove the type-flag bit indicating 'leaf node'.
-  const entryCnt = entryCntSrc & 0x007F;
+  const entryCnt = entryCntSrc & 0x7FFF;
 
   let entries: Entry[] = [];
   baseIndex = baseIndex + NODE_TYPE_INDEX + 1;
   for(let i = 0; i < entryCnt; i++) {
-    const entryWidth = decompressNumber(str, baseIndex, baseIndex+2);
+    const entryWidth = decompressNumber(str, baseIndex, baseIndex+NODE_SIZE_WIDTH);
     const nextIndex = baseIndex + entryWidth;
     entries.push(decompressEntry(str, keyFunction, baseIndex));
     baseIndex = nextIndex;
