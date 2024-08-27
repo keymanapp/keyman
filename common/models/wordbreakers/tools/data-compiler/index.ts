@@ -2,8 +2,6 @@
 
 // Original version found at: https://github.com/eddieantonio/unicode-default-word-boundary/blob/master/libexec/compile-word-break.js
 
-// TODO:  Adapt to produce two string-encoded arrays - one for BMP chars, one for non-BMP chars.
-
 import fs from 'fs';
 import path from 'path';
 
@@ -93,12 +91,53 @@ const categoryMap = new Map<string, number>();
 
 for(let cat of categories) {
   categoryMap.set(cat, catIndexSeed++);
+  if(catIndexSeed == '`'.charCodeAt(0)) {
+    catIndexSeed++; // Skip the back-tick as an encoding symbol.
+                    // Reduces complications, as it's the encoding string start/end char.
+  }
+}
+
+const bmpRanges: typeof ranges = [];
+const nonBmpRanges: typeof ranges = [];
+
+// { start: number, property: number}[]
+for(let range of ranges) { // already sorted
+  if(range.start <= 0xFFFF) {
+    bmpRanges.push(range);
+  } else {
+    if(nonBmpRanges.length == 0) {
+      const finalBmpRange = bmpRanges[bmpRanges.length - 1];
+      bmpRanges.push({
+        start: 0xFFFF,
+        property: finalBmpRange.property,
+        end: undefined
+      });
+
+      if(range.start != 0x10000) {
+        nonBmpRanges.push({
+          start: 0x10000,
+          property: finalBmpRange.property,
+          end: undefined
+        });
+      }
+    }
+
+    nonBmpRanges.push(range);
+  }
 }
 
 //////////////////////// Creating the generated file /////////////////////////
 
 // Save the output in the gen/ directory.
 let stream = fs.createWriteStream(generatedFilename);
+
+function escape(codedChar: string) {
+  if(codedChar == '`' || codedChar == '\\') {
+    return '\\' + codedChar;
+  } else {
+    return codedChar;
+  }
+}
 
 // // Former entry in the original version by Eddie that was never included in our repo:
 // export const extendedPictographic = ${extendedPictographicRegExp};
@@ -116,7 +155,7 @@ stream.write(`// Automatically generated file. DO NOT MODIFY.
 export const enum WordBreakProperty {
 ${ /* Create enum values for each word break property */
   Array.from(categories)
-    .map(x => `  ${x}`)
+    .map(x => `  ${x} = ${categoryMap.get(x)}`)
     .join(',\n')
 }
 };
@@ -133,38 +172,29 @@ ${ /* Enumerate the plain-text names for ease of lookup at runtime */
 }
 ];
 
-/**
- * Constants for indexing values in WORD_BREAK_PROPERTY.
- */
-export const enum I {
-  Start = 0,
-  Value = 1
-}
+export const WORD_BREAK_PROPERTY_BMP: string = \`${
+  // To consider:  emit `\uxxxx` codes instead of the raw char?
+  bmpRanges.map(({start, property}) => {
+    let codedStart = escape(String.fromCodePoint(start));
 
-/**
- * Defines a mapping of all characters to their assigned word-breaking
- * property type.
- *
- * There are implicit buckets starting at the char with specified code \`number\`
- * of an entry up to, but not including, the value in the next entry.  All
- * entries in each bucket share the same property value.
- *
- * Consider the following two consecutive buckets:
- * - [0x0041, WordBreakProperty.ALetter]
- * - [0x005B, WordBreakProperty.Other]
- *
- * For this example, all characters from 0x0041 to 0x005B (that is, 'A'-'Z')
- * have the wordbreaking property \`ALetter\`.
- */
-export const WORD_BREAK_PROPERTY: [number, WordBreakProperty][] = [
-${
-  // TODO:  Two versions:  one that's BMP-encoded, one that's non-BMP encoded.
-    ranges.map(({start, property}) => (`  [` +
-      `/*start*/ 0x${start.toString(16).toUpperCase()}, ` +
-      `WordBreakProperty.${property}],`
-    )).join('\n')
-}
-];
+    // Offset the encoded property value to lie within a friendlier range,
+    // with characters that render naturally within code editors.
+    const codedProp = escape(String.fromCharCode(categoryMap.get(property) + 0x20));
+    return `${codedStart}${codedProp}`;
+  }).join('')
+}\`;
+
+export const WORD_BREAK_PROPERTY_NON_BMP: string = \`${
+  // To consider:  emit `\uxxxx` codes instead of the raw char?
+  nonBmpRanges.map(({start, property}) => {
+    const codedStart = escape(String.fromCodePoint(start));
+
+    // Offset the encoded property value to lie within a friendlier range,
+    // with characters that render naturally within code editors.
+    const codedProp = escape(String.fromCharCode(categoryMap.get(property) + 0x20));
+    return `${codedStart}${codedProp}`;
+  }).join('')
+}\`;
 `);
 
 /**
