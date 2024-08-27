@@ -1,5 +1,4 @@
-import { type PredictionContext } from "@keymanapp/input-processor";
-import { Keyboard, KeyboardProperties } from "@keymanapp/keyboard-processor";
+import { type PredictionContext } from 'keyman/engine/interfaces';
 import type Activator from "../views/activator.js";
 import CommonConfiguration from "./commonConfiguration.js";
 
@@ -41,12 +40,4 @@ export default interface Configuration extends CommonConfiguration {
    * with the active context.
    */
   predictionContextManager?: PredictionContext;
-
-  /**
-   * Can be set and specified during initialization to start with the specified keyboard activated.
-   */
-  keyboardToActivate?: {
-    keyboard: Keyboard,
-    metadata: KeyboardProperties;
-  }
 }

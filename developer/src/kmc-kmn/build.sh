@@ -15,6 +15,7 @@ builder_describe "Keyman Developer Compiler Module for .kmn to .kmx" \
   "@/common/web/keyman-version" \
   "@/common/web/types" \
   "@/developer/src/common/web/test-helpers" \
+  "@/developer/src/common/web/utils" \
   "@/developer/src/kmcmplib:wasm" \
   "configure" \
   "build" \
@@ -69,7 +70,7 @@ if builder_start_action test; then
   copy_deps
   tsc --build test/
   npm run lint
-  readonly C8_THRESHOLD=74
+  readonly C8_THRESHOLD=80
   c8 --reporter=lcov --reporter=text --lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD mocha
   builder_echo warning "Coverage thresholds are currently $C8_THRESHOLD%, which is lower than ideal."
   builder_echo warning "Please increase threshold in build.sh as test coverage improves."

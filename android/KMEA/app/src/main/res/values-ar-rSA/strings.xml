@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Device type  -->
+    <!-- Application name (Keyman Engine for Android) -->
+    <!-- Context: Title for list -->
+    <plurals name="title_keyboards">
+        <item quantity="zero">لوحة مفاتيح</item>
+        <item quantity="one">لوحات مفاتيح</item>
+        <item quantity="two">لوحتا مفاتيح</item>
+        <item quantity="few">لوحات مفاتيح</item>
+        <item quantity="many">لوحة مفاتيح</item>
+        <item quantity="other">لوحة مفاتيح</item>
+    </plurals>
+    <!-- Context: Title for list -->
+    <plurals name="title_other_input_methods">
+        <item quantity="zero">طريقة إداخل أخرى</item>
+        <item quantity="one">طريقة إدخال أخرى</item>
+        <item quantity="two">طريقتا إدخال أخريتان</item>
+        <item quantity="few">طرق إدخال</item>
+        <item quantity="many">طريقة إدخال أخرى</item>
+        <item quantity="other">طريقة إدخال أخرى</item>
+    </plurals>
+    <!-- Context: Title for list -->
+    <string name="title_add_keyboard" comment="Add a new keyboard">إضافة لوحة مفاتيح جديدة</string>
+    <!-- Context: Title for list -->
+    <string name="title_languages_settings" comment="List of installed languages">اللغات المثبتة</string>
+    <!-- Context: Title for list -->
+    <string name="title_language_settings" comment="Keyman Settings for a language">إعدادات %1$s</string>
+    <!-- Context: Button label -->
+    <string name="label_add" comment="Button to add an item">إضافة</string>
+    <!-- Context: Button label -->
+    <string name="label_back" comment="Button to go back">عودة</string>
+    <!-- Context: Button label -->
+    <string name="label_cancel" comment="Button to cancel an action">إلغاء</string>
+    <!-- Context: Button label -->
+    <string name="label_close" comment="Close a dialog">إغلاق</string>
+    <!-- Context: Button label. Removed in Keyman 15 -->
+    <string name="label_close_keyman" comment="Close the Keyman application">إغلاق Keyman</string>
+    <!-- Context: Button label -->
+    <string name="label_forward" comment="Button to go forward">الأمام</string>
+    <!-- Context: Button label -->
+    <string name="label_next_input_method" comment="Switch to next input method (replaces label_close_keyman)">طريقة الإدخال التالية</string>
+    <!-- Context: Button label -->
+    <string name="label_download" comment="Button to confirm downloading an item">تحميل</string>
+    <!-- Context: Button label -->
+    <string name="label_install" comment="Confirmation to install a package">تثبيت</string>
+    <!-- Context: Button label -->
+    <string name="label_later" comment="Do an action at a later time">لاحقًا</string>
+    <!-- Context: Button label -->
+    <string name="label_next" comment="Go to the next screen">التالي</string>
+    <!-- Context: Button label -->
+    <string name="label_ok" comment="Button to acknowledge a dialog">موافق</string>
+    <!-- Context: Button label -->
+    <string name="label_update" comment="Dialog button to update a resource">تحديث</string>
+    <!-- Context: No internet for updates -->
+    <string name="no_internet_connection" comment="Internet connection missing">لا يوجد اتصال بالإنترنت</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="cannot_connect" comment="Error message when network connection fails">لا يمكن الاتصال بخادم Keyman!</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="confirm_delete_keyboard" comment="Confirmation to delete a keyboard">هل ترغب بإزالة لوحة المفاتيح هذه؟</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="confirm_download_keyboard" comment="Confirmation to download a keyboard update">هل ترغب بتحميل آخر إصدار من لوحة المفاتيح هذه؟</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="confirm_update" comment="Confirmation to update several resources">هل ترغب بتحديث لوحات المفاتيح والقواميس الآن؟</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="keyboard_updates_channel">تحديثات الموارد</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="keyboard_updates_available" comment="Notification when resource updates are available">تتوفر تحديثات موارد</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="update_available" comment="Currently installed version of a resource with an available update">%1$s (تحديث متوفر)</string>
+    <!-- Context: Keyboard Updates -->
+    <string name="keyboard_update_message" comment="language name: keyboard name">تحديثات متوفرة للوحة مفاتيح %1$s: %2$s </string>
+    <!-- Context: Keyboard Updates -->
+    <string name="dictionary_update_message">تحديثات متوفرة لقاموس %1$s: %2$s </string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_version" comment="Label for keyboard version">إصدار لوحة المفاتيح</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="help_link" comment="Label for help link">رابط المساعدة</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="uninstall_keyboard" comment="Label for uninstalling keyboard">إزالة تثبيت لوحة المفاتيح</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_picker_new_keyboard" comment="Mark a language name that's newly installed in keyboard list">[new] %1$s</string>
+    <!-- Context: Keyboard Info and Keyboard Settings -->
+    <string name="keyboard_qr_code" comment="QR Code description">امسح هذا الرمز لتحميل \nلوحة المفاتيح هذه على جهاز آخر</string>
+    <!-- Context: Keyboard Help welcome.htm title -->
+    <string name="welcome_package" comment="Title to welcome.htm page (name and version)">أهلًا بك في %1$s</string>
+    <!-- Context: Keyboard app doesn't include FileProvider library needed to view help file -->
+    <string name="fileprovider_undefined" comment="FileProvider library needed to view help file">مكتبة FileProvider مطلوبة لعرض ملفات المساعدة: %1$s</string>
+    <!-- Context: Fatal keyboard error. Will load default keyboard -->
+    <string name="fatal_keyboard_error" comment="Fatal keyboard error (keyboard ID::packageID for language). Will load default keyboard">خطأ كبير في لوحة مفاتيح مع %1$s:%2$s لأجل لغة %3$s. سيتم تحميل لوحة المفاتيح الأساسية.</string>
+    <!-- Context: Fatal keyboard error.  -->
+    <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">خطأ في لوحة مفاتيح %1$s:%2$s لأجل لغة %3$s.</string>
+    <!-- Context: Query for associated dictionary -->
+    <string name="query_associated_model" comment="Check if there's an available dictionary to download">يجري التحقق من قاموس ذي صلة للتحميل</string>
+    <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">      لا يمكن الاتصال بخادم Keyman للتحقق من تنزيل القاموس المرتبط</string>
+    <!-- Context: Model Updates -->
+    <string name="confirm_download_model" comment="Confirmation to download a dictionary update">هل ترغب بتحملي آخر إصدار من هذا القاموس؟</string>
+    <!-- Context: No associated dictionary found -->
+    <string name="no_associated_model" comment="Confirmation there's no available dictionary to download">لا يوجد قاموس لتحميله</string>
+    <!-- Context: Model Updates -->
+    <string name="catalog_unavailable" comment="Notification that the cloud resource catalog can't be updated">كتالوغ المصدر غير متوفر</string>
+    <!-- Context: Background download messages-->
+    <string name="catalog_download_start_in_background" comment="Notification that the resource catalog update will begin">بدء تحديث الكتالوغ في الخلفية</string>
+    <!-- Context: Background download messages-->
+    <string name="catalog_download_is_running_in_background" comment="Notification that the resource catalog update is still downloading">الكتالوغ لا يزال يتم تحميله، يرجى المحاولة مجددًا بعد قليل!</string>
+    <!-- Context: Background download messages-->
+    <string name="progress_message_checking_resource_is_running" comment="Progress notification that the check for a resource is still running ">البحث عن مصدر</string>
+    <!-- Context: Background download messages-->
+    <string name="keyboard_download_start_in_background" comment="Notification that a keyboard download has started">بدء تحميل لوحة المفاتيح في الخلفية</string>
+    <!-- Context: Background download messages-->
+    <string name="keyboard_download_is_running_in_background" comment="Notification that a keyboard download is still running">يجري بالفعل تحميل لوحة المفاتيح المختارة، يرجى المحاولة مجددًا بعد قليل!</string>
+    <!-- Context: Background download messages-->
+    <string name="keyboard_download_finished" comment="Notification that a keyboard download has finished">اكتمل تحميل لوحة المفاتيح!</string>
+    <!-- Context: Background download messages-->
+    <string name="dictionary_download_start_in_background" comment="Notification that a dictionary download has started">بدأ تحميل القاموس في الخلفية</string>
+    <!-- Context: Background download messages-->
+    <string name="dictionary_download_is_running_in_background" comment="Notification that a dictionary download is still running">يجري بالفعل تحميل القاموس، يرجى المحاولة مجددًا بعد قليل!</string>
+    <!-- Context: Background download messages. Removed in Keyman 17-->
+    <string name="dictionary_download_finished" comment="Notification that a dictionary download has finished">اكتمل تحميل القاموس.</string>
+    <!-- Context: Background download messages -->
+    <string name="download_failed" comment="Notification that a download failed">فشل التحميل</string>
+    <!-- Context: Background download messages -->
+    <string name="failed_to_retrieve_file" comment="Failed to retrieve downloaded file">فشل استرجاع الملف المحمل</string>
+    <!-- Context: General Updates -->
+    <string name="update_check_unavailable" comment="Error message when a Keyman server can't be reached">فشل الوصول إلى الخادم!</string>
+    <!-- Context: General Updates -->
+    <string name="update_check_current" comment="Notification that all resources are up to date">"جميع الموارد محدّثة!"</string>
+    <!-- Context: General Updates -->
+    <string name="update_failed" comment="Notification that a resource update failed">فشل تحديث واحد أو أكثر من المصادر!</string>
+    <!-- Context: General Updates. Removed in Keyman 17 -->
+    <string name="update_success" comment="Notification that a resource update successfully updated">تم تحديث الموارد بنجاح!</string>
+    <!-- Context: Model Info -->
+    <string name="model_version" comment="Title for a dictionary version">إصدار القاموس</string>
+    <!-- Context: Model Info -->
+    <string name="uninstall_model" comment="Label to uninstall a dictionary">إزالة تثبيت القاموس</string>
+    <!-- Context: Model Info -->
+    <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">هل ترغب بإزالة هذا القاموس؟</string>
+    <!-- Context: Model Deleted -->
+    <string name="model_deleted" comment="Notification when a dictionary is deleted">تم حذف القاموس</string>
+    <!-- Context: Language Settings Keyboard install strings -->
+    <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">تم تثبيت لوحة مفاتيح %1$s</string>
+    <!-- Context: Language Settings Keyboard uninstall strings -->
+    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">تم حذف لوحة المفاتيح</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="enable_corrections" comment="Enable corrections from the suggestion banner">تفعيل التصحيحات</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="enable_predictions" comment="Enable predictions from the suggestion banner">تفعيل التوقعات</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_label">القاموس</string>
+    <plurals name="model_count">
+        <item quantity="zero">Dictionaries</item>
+        <item quantity="one">Dictionary</item>
+        <item quantity="two">Dictionaries</item>
+        <item quantity="few">Dictionaries</item>
+        <item quantity="many">Dictionaries</item>
+        <item quantity="other">Dictionaries</item>
+    </plurals>
+    <!-- Context: Language Settings menu substring - Check for available dictionary -->
+    <string name="check_available_model" comment="Check for available dictionary">البحث عن قاموس متوفر</string>
+    <string name="check_model_online" comment="Check for dictionaries online">تحقق من وجود قواميس على الإنترنت</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_info_header" comment="Dictionary name">قاموس: %1$s</string>
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_picker_header" comment="Dictionaries for a specified language">قواميس %1$s</string>
+    <!-- Context: Language Settings menu strings -->
+    <!-- Context: Language Settings menu strings -->
+    <string name="model_install_toast" comment="Notification when a dictionary is installed">تم تثبيت القاموس</string>
+    <!-- Context: Language Settings menu strings -->
+    <plurals name="keyboard_count">
+        <item quantity="zero">(%1$d اوحات)</item>
+        <item quantity="one">(لوحة مفاتيح %1$d)</item>
+        <item quantity="two">(لوحتا مفاتيح %1$d)</item>
+        <item quantity="few">(%1$d لوحة مفاتيح)</item>
+        <item quantity="many">(%1$d لوحة مفاتيح)</item>
+        <item quantity="other">(%1$d لوحة مفاتيح)</item>
+    </plurals>
+    <!-- Context: "Change Display Language" menu -->
+    <string name="default_locale" comment="Use the device's current locale">اللغة الأصلية</string>
+    <!-- Context: Content descriptions -->
+    <!-- Context: Content descriptions -->
+    <!-- Context: Popup menu labels -->
+    <string name="label_delete" comment="Confirmation to delete an item">حذف</string>
+    <!-- Context: Shared preferences name -->
+    <!-- Context: Other strings -->
+    <string name="help_bubble_text">اضغط هنا لتغيير لوحة المفاتيح</string>
+    <!-- Context: anywhere -->
+    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">غير قادر على تشغيل متصفح الويب</string>
+</resources>

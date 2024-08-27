@@ -1,4 +1,4 @@
-import { LDMLKeyboard } from "@keymanapp/common-types";
+import { LDMLKeyboard } from "@keymanapp/developer-utils";
 import { constants } from "@keymanapp/ldml-keyboard-constants";
 /**
  * Verifies that value is an item in the enumeration.

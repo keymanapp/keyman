@@ -37,11 +37,7 @@ function init() {
   keyman.beepKeyboard = beepKeyboard;
 
   // Readies the keyboard stub for instant loading during the init process.
-  try {
-    KeymanWeb.registerStub(JSON.parse(jsInterface.initialKeyboard()));
-  } catch(error) {
-    console.error(error);
-  }
+  KeymanWeb.registerStub(JSON.parse(jsInterface.initialKeyboard()));
 
   keyman.init({
     'embeddingApp':device,
@@ -114,6 +110,17 @@ function notifyHost(event, params) {
     params = params ? '+'+params : '';
     window.location.hash = event+'-'+fragmentToggle+params;
   }, 10);
+}
+
+// Update the KeymanWeb longpress delay
+// delay is in milliseconds
+function setLongpressDelay(delay) {
+  if (keyman.osk) {
+    keyman.osk.gestureParams.longpress.waitLength = delay;
+    console.debug('setLongpressDelay('+delay+')');
+  } else {
+    window.console.log('setLongpressDelay error: keyman.osk undefined');
+  }
 }
 
 // Update the KMW banner height

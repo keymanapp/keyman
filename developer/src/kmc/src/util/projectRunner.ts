@@ -1,4 +1,5 @@
-import { CompilerCallbacks, KeymanFileTypes } from "@keymanapp/common-types";
+import { KeymanFileTypes } from '@keymanapp/common-types';
+import { CompilerCallbacks } from '@keymanapp/developer-utils';
 import { isProject, loadProject } from './projectLoader.js';
 
 async function runProject(callbacks: CompilerCallbacks, filename: string, callback: (filename:string)=>Promise<boolean>): Promise<boolean> {

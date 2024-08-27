@@ -30,9 +30,9 @@
   <!-- Context: Text Size dialog -->
   <string name="text_size" comment="Current text size (number)">Μέγεθος κειμένου: %1$d</string>
   <!-- Context: Text Size dialog -->
-  <string name="ic_text_size_up" comment="Make text bigger">Μεγαλῶστε τὸ κείμενο</string>
+  <string name="ic_text_size_up" comment="Make text bigger">Μεγαλῶστε τὴν γραμματοσειρά</string>
   <!-- Context: Text Size dialog -->
-  <string name="ic_text_size_down" comment="Make text smaller">Μεγαλῶστε τὸ κείμενο</string>
+  <string name="ic_text_size_down" comment="Make text smaller">Μικρύνετε τὴν γραμματοσειρά</string>
   <!-- Context: Text Size dialog -->
   <string name="ic_text_size_slider" comment="Adjust text size">Ρύθμιση μεγέθους κειμένου</string>
   <!-- Context: Clear Text dialog -->
@@ -68,7 +68,7 @@
   <!-- Context: Keyman Settings menu -->
   <string name="adjust_keyboard_height" comment="Menu action to adjust keyboard height">Μεταβολὴ ὕψους πληκτρολογίου</string>
   <!-- Context: Keyman Settings menu -->
-  <string name="spacebar_caption" comment="Menu action to set the spacebar caption">Spacebar caption</string>
+  <string name="spacebar_caption" comment="Menu action to set the spacebar caption">Λεζάντα πλήκτρου διαστήματος</string>
   <!-- Context: Keyman Settings menu / Spacebar caption -->
   <string name="spacebar_caption_keyboard" comment="Spacebar caption option - keyboard">Πληκτρολόγιο</string>
   <!-- Context: Keyman Settings menu / Spacebar caption -->
@@ -80,9 +80,9 @@
   <!-- Context: Keyman Settings menu / Spacebar caption hint -->
   <string name="spacebar_caption_hint_keyboard" comment="Spacebar caption hint - keyboard">\'Ονομα πληκτρολογίου στὸ πλῆκτρο διαστήματος</string>
   <!-- Context: Keyman Settings menu / Spacebar caption hint -->
-  <string name="spacebar_caption_hint_language" comment="Spacebar caption hint - language">\'Ονομα γλώσσας στὸ πλῆκτρο διαστήματος</string>
+  <string name="spacebar_caption_hint_language" comment="Spacebar caption hint - language">Ὄνομα γλώσσας στὸ πλῆκτρο διαστήματος</string>
   <!-- Context: Keyman Settings menu / Spacebar caption hint -->
-  <string name="spacebar_caption_hint_language_keyboard" comment="Spacebar caption hint - language + keyboard">\'Ονομα πληκτρολογίου καὶ γλώσσας στὸ πλῆκτρο διαστήματος</string>
+  <string name="spacebar_caption_hint_language_keyboard" comment="Spacebar caption hint - language + keyboard">Ὄνομα πληκτρολογίου καὶ γλώσσας στὸ πλῆκτρο διαστήματος</string>
   <!-- Context: Keyman Settings menu / Spacebar caption hint -->
   <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">Καμμία λεζάντα στὸ πλῆκτρο διαστήματος</string>
   <!-- Context: Keyman Settings menu / Haptic feedback -->
@@ -92,13 +92,13 @@
   <!-- Context: Keyman Settings menu -->
   <string name="show_banner_on" comment="Description when toggle is on">Πρὸς ὑλοποίησιν</string>
   <!-- Context: Keyman Settings menu -->
-  <string name="show_banner_off" comment="Description when toggle is off">Ὅταν εἶναι off, ἐμφανίζεται μόνο ὅταν ἔχει ἐνεργοποιηθεῖ τὸ προγνωστικὸ κείμενο</string>
+  <string name="show_banner_off" comment="Description when toggle is off">OFF: ἐμφάνιση μόνον ὅταν ἔχει ἐνεργοποιηθεῖ ἡ πρόβλεψη κειμένου</string>
   <!-- Context: Keyman Settings menu -->
   <string name="show_send_crash_report" comment="permission for sending crash reports">Ἐπιτρέψτε τὴν ἀποστολὴ ἀναφορῶν κατάρρευσης μέσῳ δικτύου</string>
   <!-- Context: Keyman Settings menu -->
-  <string name="show_send_crash_report_on" comment="Description when toggle is on">Ὅταν εἶναι ΟΝ, θὰ ἀποστέλλονται ἀναφορὲς κατάρρευσης</string>
+  <string name="show_send_crash_report_on" comment="Description when toggle is on">ON: Ἀποστολὴ ἀναφορῶν κατάρρευσης</string>
   <!-- Context: Keyman Settings menu -->
-  <string name="show_send_crash_report_off" comment="Description when toggle is off">Ὅταν εἶναι off, δὲν θὰ ἀποστέλλονται ἀναφορὲς κατάρρευσης</string>
+  <string name="show_send_crash_report_off" comment="Description when toggle is off">OFF: Δὲν ἀποστέλλονται ἀναφορὲς κατάρρευσης</string>
   <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
   <string name="install_from_keyman_dot_com" comment="Install package from Keyman server">Ἐγκατάσταση ἀπὸ τὸ keyman.com</string>
   <!-- Context: Keyman Settings "Install Keyboard or Dictionary" menu -->
@@ -118,9 +118,9 @@
   <!-- Context: Select Package and Select Languages menu -->
   <string name="all_languages_installed" comment="Text when all languages from a keyboard package have been installed">Ὅλες οἱ γλῶσσες ἔχουν ἤδη ἐγκατασταθεῖ</string>
   <!-- Context: Adjust Keyboard Height menu -->
-  <string name="drag_the_keyboard" comment="First line of adjusting keyboard height">Σύρετε τὸ πληκτρολόγιο γιὰ νὰ ἀλλάξετε τὸ ὕψος</string>
+  <string name="drag_the_keyboard" comment="First line of adjusting keyboard height">Σύρετε τὸ πληκτρολόγιο γιὰ νὰ ἀλλάξετε τὸ ὕψος του</string>
   <!-- Context: Adjust Keyboard Height menu -->
-  <string name="rotate_the_device" comment="Second line of adjusting keyboard height">Περιστρέψτε τὴν συσκευὴ γιὰ λειτουργία πορτραίτου καὶ τοπίου</string>
+  <string name="rotate_the_device" comment="Second line of adjusting keyboard height">Περιστρέψτε τὴν συσκευὴ γιὰ προσαρμογὴ τοῦ ὕψους σὲ λειτουργία πορτραίτου καὶ τοπίου</string>
   <!-- Context: Adjust Keyboard Height menu -->
   <string name="reset_to_defaults" comment="Button to reset to default heights">Ἐπαναφέρετε τὶς προεπιλεγμένες ρυθμίσεις</string>
   <!-- Context: Keyman Web Browser -->
@@ -150,9 +150,9 @@
   <!-- Context: KMP Package strings -->
   <string name="no_new_touch_keyboards_to_install" comment="Notification when no touch-optimized keyboards can be installed">Τὸ πακέτο πληκτρολογίου δὲν ἔχει βελτιστοποιημένα πληκτρολόγια ἀφῆς πρὸς ἐγκατάστασιν</string>
   <!-- Context: KMP Package strings -->
-  <string name="no_new_predictive_text_to_install" comment="Notification when no dictionaries can be installed">Δὲν ὑπάρχει νέο προγνωστικό κείμενο πρὸς ἐγκατάστασιν</string>
+  <string name="no_new_predictive_text_to_install" comment="Notification when no dictionaries can be installed">Δὲν ὑπάρχουν προγνώσεις κειμένων πρὸς ἐγκατάστασιν</string>
   <!-- Context: KMP Package strings -->
-  <string name="no_targets_to_install" comment="Notification when a package doesn't contain keyboards or dictionaries">Δὲν ὑπάρχουν πληκτρολόγια ἢ προγνωστικό κείμενο πρὸς ἐγκατάστασιν</string>
+  <string name="no_targets_to_install" comment="Notification when a package doesn't contain keyboards or dictionaries">Δὲν ὑπάρχουν πληκτρολόγια ἢ προγνώσεις κειμένων πρὸς ἐγκατάστασιν</string>
   <!-- Context: KMP Package strings -->
   <string name="no_associated_languages" comment="Notification when a keyboard package doesn't contain languages">Τὸ πακέτο πληκτρολογίου δὲν ἔχει σχετικὲς μὲ αὐτὸ γλῶσσες πρὸς ἐγκατάστασιν</string>
   <!-- Context: KMP Package strings -->

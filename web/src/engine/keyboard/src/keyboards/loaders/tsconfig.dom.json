@@ -1,0 +1,13 @@
+{
+  "extends": "../../../../../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": "../../../",
+    "outDir": "../../../../../../build/engine/keyboard/obj/keyboards/loaders/",
+    "tsBuildInfoFile": "../../../../../../build/engine/keyboard/obj/keyboards/loaders/tsconfig.dom.tsbuildinfo",
+    "rootDir": "."
+  },
+  "references": [
+    { "path": "../../../tsconfig.json" }
+  ],
+  "include": ["dom-keyboard-loader.ts", "domKeyboardLoader.ts"],
+}

@@ -2,8 +2,8 @@ import 'mocha';
 import { assert } from 'chai';
 import { TranCompiler, BkspCompiler } from '../src/compiler/tran.js';
 import { BASIC_DEPENDENCIES, UsetCompiler } from '../src/compiler/empty-compiler.js';
-import { CompilerMessages } from '../src/compiler/messages.js';
-import { CompilerMessages as KmnOtherCompilerMessages } from '@keymanapp/kmc-kmn';
+import { LdmlCompilerMessages } from '../src/compiler/ldml-compiler-messages.js';
+import { KmnCompilerMessages } from '@keymanapp/kmc-kmn';
 import { assertCodePoints, compilerTestCallbacks, testCompilationCases } from './helpers/index.js';
 import { KMXPlus, MarkerParser } from '@keymanapp/common-types';
 
@@ -120,7 +120,7 @@ describe('tran', function () {
           `\u{1f76}${m(1,false)}\u{033c}`);
       },
       warnings: [
-        CompilerMessages.Hint_NormalizationDisabled()
+        LdmlCompilerMessages.Hint_NormalizationDisabled()
       ],
     },    {
       subpath: 'sections/tran/fail-invalid-type.xml',
@@ -129,7 +129,7 @@ describe('tran', function () {
     {
       subpath: 'sections/tran/fail-duplicate-type.xml',
       errors: [
-        CompilerMessages.Error_DuplicateTransformsType({types: ['simple']})
+        LdmlCompilerMessages.Error_DuplicateTransformsType({types: ['simple']})
       ]
     },
     {
@@ -139,13 +139,13 @@ describe('tran', function () {
     {
       subpath: 'sections/tran/fail-mixed.xml',
       errors: [
-        CompilerMessages.Error_MixedTransformGroup(),
+        LdmlCompilerMessages.Error_MixedTransformGroup(),
       ],
     },
     {
       subpath: 'sections/tran/fail-empty.xml',
       errors: [
-        CompilerMessages.Error_EmptyTransformGroup(),
+        LdmlCompilerMessages.Error_EmptyTransformGroup(),
       ],
     },
     // reorder test
@@ -249,44 +249,44 @@ describe('tran', function () {
     {
       subpath: 'sections/tran/tran-warn-range.xml',
       warnings: [
-        CompilerMessages.Warn_CharClassExplicitDenorm({lowestCh: 0xE1}),
+        LdmlCompilerMessages.Warn_CharClassExplicitDenorm({lowestCh: 0xE1}),
       ],
     },
     {
       subpath: 'sections/tran/tran-hint-range.xml',
       warnings: [
-        CompilerMessages.Hint_CharClassImplicitDenorm({lowestCh: 0xc0}),
+        LdmlCompilerMessages.Hint_CharClassImplicitDenorm({lowestCh: 0xc0}),
       ],
     },
     {
       subpath: 'sections/tran/tran-hint-range2.xml',
       warnings: [
-        CompilerMessages.Hint_CharClassImplicitDenorm({lowestCh: 0xC0}),
+        LdmlCompilerMessages.Hint_CharClassImplicitDenorm({lowestCh: 0xC0}),
       ],
     },
     {
       subpath: 'sections/tran/fail-bad-reorder-1.xml',
       errors: [
-        KmnOtherCompilerMessages.Error_UnicodeSetSyntaxError()
+        KmnCompilerMessages.Error_UnicodeSetSyntaxError()
       ],
     },
     {
       subpath: 'sections/tran/fail-bad-reorder-2.xml',
       errors: [
-        CompilerMessages.Error_InvalidQuadEscape({ cp: 0x1a6b }),
+        LdmlCompilerMessages.Error_InvalidQuadEscape({ cp: 0x1a6b }),
       ],
     },
     {
       subpath: 'sections/tran/fail-bad-reorder-3.xml',
       errors: [
-        CompilerMessages.Error_InvalidQuadEscape({ cp: 0x1a60 }),
+        LdmlCompilerMessages.Error_InvalidQuadEscape({ cp: 0x1a60 }),
       ],
     },
     // error due to bad regex
     {
       subpath: `sections/tran/fail-bad-tran-1.xml`,
       errors: [
-        { code: CompilerMessages.ERROR_UnparseableTransformFrom,
+        { code: LdmlCompilerMessages.ERROR_UnparseableTransformFrom,
           matchMessage: /Invalid regular expression.*Unterminated group/,
         }
       ],
@@ -295,43 +295,43 @@ describe('tran', function () {
       // also used in test-compiler-e2e.ts
       subpath: `sections/tran/fail-bad-tran-2.xml`,
       errors: [
-        CompilerMessages.Error_InvalidQuadEscape({ cp: 295 }),
+        LdmlCompilerMessages.Error_InvalidQuadEscape({ cp: 295 }),
       ],
     },
     {
       subpath: `sections/tran/fail-missing-var-1.xml`,
       errors: [
-        CompilerMessages.Error_MissingStringVariable({ id: "missingfrom" }),
+        LdmlCompilerMessages.Error_MissingStringVariable({ id: "missingfrom" }),
       ],
     },
     {
       subpath: `sections/tran/fail-missing-var-2.xml`,
       errors: [
-        CompilerMessages.Error_MissingStringVariable({ id: "missingto" }),
+        LdmlCompilerMessages.Error_MissingStringVariable({ id: "missingto" }),
       ],
     },
     {
       subpath: `sections/tran/fail-missing-var-3.xml`,
       errors: [
-        CompilerMessages.Error_MissingSetVariable({ id: "missingset" }),
+        LdmlCompilerMessages.Error_MissingSetVariable({ id: "missingset" }),
       ],
     },
     {
       subpath: `sections/tran/fail-missing-var-4.xml`,
       errors: [
-        CompilerMessages.Error_MissingSetVariable({ id: "missingset" }),
+        LdmlCompilerMessages.Error_MissingSetVariable({ id: "missingset" }),
       ],
     },
     {
       subpath: `sections/tran/fail-missing-var-5.xml`,
       errors: [
-        CompilerMessages.Error_MissingSetVariable({ id: "missingset" }),
+        LdmlCompilerMessages.Error_MissingSetVariable({ id: "missingset" }),
       ],
     },
     {
       subpath: `sections/tran/fail-missing-var-6.xml`,
       errors: [
-        CompilerMessages.Error_MissingStringVariable({ id: "missingstr" }),
+        LdmlCompilerMessages.Error_MissingStringVariable({ id: "missingstr" }),
       ],
     },
     // cases that share the same error code
@@ -339,7 +339,7 @@ describe('tran', function () {
       subpath: `sections/tran/fail-IllegalTransformDollarsign-${n}.xml`,
       errors: [
         {
-          code: CompilerMessages.ERROR_IllegalTransformDollarsign,
+          code: LdmlCompilerMessages.ERROR_IllegalTransformDollarsign,
           matchMessage: /.*/,
         }
       ],
@@ -348,7 +348,7 @@ describe('tran', function () {
       subpath: `sections/tran/fail-IllegalTransformAsterisk-${n}.xml`,
       errors: [
         {
-          code: CompilerMessages.ERROR_IllegalTransformAsterisk,
+          code: LdmlCompilerMessages.ERROR_IllegalTransformAsterisk,
           matchMessage: /.*/,
         }
       ],
@@ -357,7 +357,7 @@ describe('tran', function () {
       subpath: `sections/tran/fail-IllegalTransformPlus-${n}.xml`,
       errors: [
         {
-          code: CompilerMessages.ERROR_IllegalTransformPlus,
+          code: LdmlCompilerMessages.ERROR_IllegalTransformPlus,
           matchMessage: /.*/,
         }
       ],
@@ -372,7 +372,7 @@ describe('tran', function () {
       subpath: `sections/tran/fail-matches-nothing-${n}.xml`,
       errors: [
         {
-          code: CompilerMessages.ERROR_TransformFromMatchesNothing,
+          code: LdmlCompilerMessages.ERROR_TransformFromMatchesNothing,
           matchMessage: /.*/,
         }
       ],
@@ -411,7 +411,7 @@ describe('bksp', function () {
       subpath: 'sections/vars/fail-markers-badref-0.xml',
       strictErrors: true,
       errors: [
-        CompilerMessages.Error_MissingMarkers({
+        LdmlCompilerMessages.Error_MissingMarkers({
           ids: [
             'doesnt_exist_1',
             'doesnt_exist_2',

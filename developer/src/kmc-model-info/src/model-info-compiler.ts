@@ -5,9 +5,9 @@
 
 import { minKeymanVersion } from "./min-keyman-version.js";
 import { ModelInfoFile } from "./model-info-file.js";
-import { CompilerCallbacks, CompilerOptions, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KmpJsonFile } from "@keymanapp/common-types";
+import { KmpJsonFile } from "@keymanapp/common-types";
 import { ModelInfoCompilerMessages } from "./model-info-compiler-messages.js";
-import { KeymanUrls, isValidEmail, validateMITLicense } from "@keymanapp/developer-utils";
+import { CompilerCallbacks, CompilerOptions, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult,KeymanUrls, isValidEmail, validateMITLicense } from "@keymanapp/developer-utils";
 
 /* c8 ignore start */
 /**
@@ -204,6 +204,9 @@ export class ModelInfoCompiler implements KeymanCompiler {
 
     if(sources.kmpJsonData.info.description?.description) {
       model_info.description = sources.kmpJsonData.info.description.description.trim();
+    } else {
+      this.callbacks.reportMessage(ModelInfoCompilerMessages.Error_DescriptionIsMissing({filename:sources.kpsFilename}));
+      return null;
     }
 
     // isRTL -- this is a little bit of a heuristic from a compiled .js

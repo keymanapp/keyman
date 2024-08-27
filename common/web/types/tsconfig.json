@@ -9,7 +9,6 @@
     "preserveConstEnums": true,
   },
   "include": [
-    "src/deps/xml2js/*.js",
     "src/**/*.ts",
     "src/schemas/*.mjs", // Import the validators
   ],
