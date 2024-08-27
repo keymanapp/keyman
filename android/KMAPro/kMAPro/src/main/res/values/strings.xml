@@ -114,6 +114,9 @@
   <string name="adjust_keyboard_height" comment="Menu action to adjust keyboard height">Adjust keyboard height</string>
 
   <!-- Context: Keyman Settings menu -->
+  <string name="adjust_longpress_delay" comment="Menu action to adjust longpress delay duration">Adjust longpress delay</string>
+
+  <!-- Context: Keyman Settings menu -->
   <string name="spacebar_caption" comment="Menu action to set the spacebar caption">Spacebar caption</string>
 
   <!-- Context: Keyman Settings menu / Spacebar caption -->
@@ -198,6 +201,17 @@
   <!-- Context: Adjust Keyboard Height menu -->
   <string name="reset_to_defaults" comment="Button to reset to default heights">Reset to Defaults</string>
 
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="longpress_delay_time" comment="Current longpress delay time (seconds)">Delay Time: %1$.1f seconds</string>
+
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_delay_time_up" comment="Make longpress delay longer">Delay time longer</string>
+
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_delay_time_down" comment="Make longpress delay shorter">Delay time shorter</string>
+
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_longpress_delay_slider" comment="Adjust longpress delay time">Longpress delay time slider</string>
 
   <!-- Context: Keyman Web Browser -->
   <string name="hint_text" comment="Prompt to type in the browser search bar">Search or type URL</string>

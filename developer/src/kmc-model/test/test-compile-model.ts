@@ -9,6 +9,8 @@ import { KeymanFileTypes } from '@keymanapp/common-types';
 describe('LexicalModelCompiler', function () {
   let callbacks = new TestCompilerCallbacks();
 
+  this.timeout(5000);
+
   // Try to compile ALL of the correct models.
   const MODELS = [
     'example.qaa.sencoten',

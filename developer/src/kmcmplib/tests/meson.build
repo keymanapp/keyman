@@ -168,7 +168,7 @@ gtestcompilertest = executable('gtest-compiler-test', 'gtest-compiler-test.cpp',
 
 test('gtest-compiler-test', gtestcompilertest)
 
-gtestkmx_u16test = executable('gtest-kmx_u16-test', 'gtest-kmx_u16-test.cpp',
+gtest_km_u16_test = executable('gtest-km_u16-test', 'gtest-km_u16-test.cpp',
     cpp_args: defns + flags,
     include_directories: inc,
     name_suffix: name_suffix,
@@ -177,4 +177,4 @@ gtestkmx_u16test = executable('gtest-kmx_u16-test', 'gtest-kmx_u16-test.cpp',
     dependencies: [ icuuc_dep, gtest_dep, gmock_dep ],
   )
 
-test('gtest-kmx_u16-test', gtestkmx_u16test)
+test('gtest-km_u16-test', gtest_km_u16_test)

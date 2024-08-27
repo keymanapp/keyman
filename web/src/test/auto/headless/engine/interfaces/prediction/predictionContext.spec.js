@@ -4,7 +4,8 @@ import sinon from 'sinon';
 import { LanguageProcessor, TranscriptionCache } from 'keyman/engine/main';
 import { PredictionContext } from 'keyman/engine/interfaces';
 import { Worker as LMWorker } from "@keymanapp/lexical-model-layer/node";
-import { DeviceSpec, KeyboardProcessor, Mock } from '@keymanapp/keyboard-processor';
+import { DeviceSpec } from 'keyman/engine/keyboard';
+import { Mock } from 'keyman/engine/js-processor';
 
 function compileDummyModel(suggestionSets) {
   return `
@@ -13,14 +14,6 @@ LMLayerWorker.loadModel(new models.DummyModel({
 }));
 `;
 }
-
-// Common spec used for each test's setup.  It's actually irrelevant for the tests,
-// but KeyboardProcessor needs an instance.
-const deviceSpec = new DeviceSpec(
-  DeviceSpec.Browser.Chrome,
-  DeviceSpec.FormFactor.Desktop,
-  DeviceSpec.OperatingSystem.Windows
-);
 
 const appleDummySuggestionSets = [[
   // Set 1:
@@ -66,6 +59,10 @@ const appleDummyModel = {
   code: compileDummyModel(appleDummySuggestionSets)
 };
 
+function dummiedGetLayer() {
+  return 'default';
+}
+
 describe("PredictionContext", () => {
   let worker;
 
@@ -81,8 +78,7 @@ describe("PredictionContext", () => {
     const langProcessor = new LanguageProcessor(worker, new TranscriptionCache());
     await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
 
-    const kbdProcessor = new KeyboardProcessor(deviceSpec);
-    const predictiveContext = new PredictionContext(langProcessor, kbdProcessor);
+    const predictiveContext = new PredictionContext(langProcessor, dummiedGetLayer);
 
     let updateFake = sinon.fake();
     predictiveContext.on('update', updateFake);
@@ -107,7 +103,7 @@ describe("PredictionContext", () => {
 
     mock.insertTextBeforeCaret('e'); // appl| + e = apple
     let transcription = mock.buildTranscriptionFrom(initialMock, null, true);
-    await langProcessor.predict(transcription, kbdProcessor.layerId);
+    await langProcessor.predict(transcription, dummiedGetLayer());
 
     // First predict call results:  our second set of dummy suggestions, the first of which includes
     // a 'keep' of the original text.
@@ -118,12 +114,69 @@ describe("PredictionContext", () => {
     assert.equal(suggestions.find((obj) => obj.transform.deleteLeft != 0).displayAs, 'apps');
   });
 
+  it('ignores outdated predictions', async function () {
+    const langProcessor = new LanguageProcessor(worker, new TranscriptionCache());
+    await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
+
+    const predictiveContext = new PredictionContext(langProcessor, dummiedGetLayer);
+
+    let updateFake = sinon.fake();
+    predictiveContext.on('update', updateFake);
+
+    let mock = new Mock("appl", 4); // "appl|", with '|' as the caret position.
+    const initialMock = Mock.from(mock);
+    const promise = predictiveContext.setCurrentTarget(mock);
+
+    // Initial predictive state:  no suggestions.  context.initializeState() has not yet been called.
+    assert.equal(updateFake.callCount, 1);
+    assert.isEmpty(updateFake.firstCall.args[0]); // should have no suggestions. (if convenient for testing)
+
+    await promise;
+    let suggestions;
+
+    // Initialization results:  our first set of dummy suggestions.
+    assert.equal(updateFake.callCount, 2);
+    suggestions = updateFake.secondCall.args[0];
+    assert.deepEqual(suggestions.map((obj) => obj.displayAs), ['apple', 'apply', 'apples']);
+    assert.isNotOk(suggestions.find((obj) => obj.tag == 'keep'));
+    assert.isNotOk(suggestions.find((obj) => obj.transform.deleteLeft != 0));
+
+    const baseTranscription = mock.buildTranscriptionFrom(initialMock, null, true);
+
+    // Mocking:  corresponds to the second set of mocked predictions - round 2 of
+    // 'apple', 'apply', 'apples'.
+    const skippedPromise = langProcessor.predict(baseTranscription, dummiedGetLayer());
+
+    mock.insertTextBeforeCaret('e'); // appl| + e = apple
+    const finalTranscription = mock.buildTranscriptionFrom(initialMock, null, true);
+
+    // Mocking:  corresponds to the third set of mocked predictions - 'applied'.
+    const expectedPromise = langProcessor.predict(finalTranscription, dummiedGetLayer());
+
+    await Promise.all([skippedPromise, expectedPromise]);
+    const expected = await expectedPromise;
+
+    // Despite two predict calls, we should only increase the counter by ONE - we ignore
+    // the 'outdated' / 'skipped' round because it could not respond before its followup.
+    assert.equal(updateFake.callCount, 3);
+    suggestions = updateFake.thirdCall.args[0];
+
+    // This does re-use the apply-revert oriented mocking.
+    // Should skip the (second) "apple", "apply", "apps" round, as it became outdated
+    // by its following request before its response could be received.
+    assert.deepEqual(suggestions.map((obj) => obj.displayAs), ['“apple”', 'applied']);
+    assert.equal(suggestions.find((obj) => obj.tag == 'keep').displayAs, '“apple”');
+    assert.equal(suggestions.find((obj) => obj.transform.deleteLeft != 0).displayAs, 'applied');
+    // Our reused mocking doesn't directly provide the 'keep' suggestion; we
+    // need to remove it before testing for set equality.
+    assert.deepEqual(suggestions.splice(1), expected);
+  });
+
   it('sendUpdateState retrieves the most recent suggestion set', async function() {
     const langProcessor = new LanguageProcessor(worker, new TranscriptionCache());
     await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
 
-    const kbdProcessor = new KeyboardProcessor(deviceSpec);
-    const predictiveContext = new PredictionContext(langProcessor, kbdProcessor);
+    const predictiveContext = new PredictionContext(langProcessor, dummiedGetLayer);
 
     let mock = new Mock("appl", 4); // "appl|", with '|' as the caret position.
     const initialSuggestions = await predictiveContext.setCurrentTarget(mock);
@@ -148,8 +201,7 @@ describe("PredictionContext", () => {
     const langProcessor = new LanguageProcessor(worker, new TranscriptionCache());
     await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
 
-    const kbdProcessor = new KeyboardProcessor(deviceSpec);
-    const predictiveContext = new PredictionContext(langProcessor, kbdProcessor);
+    const predictiveContext = new PredictionContext(langProcessor, dummiedGetLayer);
 
     let textState = new Mock("appl", 4); // "appl|", with '|' as the caret position.
 
@@ -163,7 +215,7 @@ describe("PredictionContext", () => {
     let previousTextState = Mock.from(textState);
     textState.insertTextBeforeCaret('e'); // appl| + e = apple
     let transcription = textState.buildTranscriptionFrom(previousTextState, null, true);
-    await langProcessor.predict(transcription, kbdProcessor.layerId);
+    await langProcessor.predict(transcription, dummiedGetLayer());
 
     // Verify setup.
     assert.equal(updateFake.callCount, 1);
@@ -216,8 +268,7 @@ describe("PredictionContext", () => {
     const langProcessor = new LanguageProcessor(worker, new TranscriptionCache());
     await langProcessor.loadModel(appleDummyModel);  // await:  must fully 'configure', load script into worker.
 
-    const kbdProcessor = new KeyboardProcessor(deviceSpec);
-    const predictiveContext = new PredictionContext(langProcessor, kbdProcessor);
+    const predictiveContext = new PredictionContext(langProcessor, dummiedGetLayer);
 
     let textState = new Mock("appl", 4); // "appl|", with '|' as the caret position.
 
@@ -232,7 +283,7 @@ describe("PredictionContext", () => {
 
     let suggestionCaptureFake = sinon.fake();
     predictiveContext.once('update', suggestionCaptureFake);
-    await langProcessor.predict(transcription, kbdProcessor.layerId);
+    await langProcessor.predict(transcription, dummiedGetLayer());
 
     // We need to capture the suggestion we wish to apply.  We could hardcode a forced
     // value, but that might become brittle in the long-term.

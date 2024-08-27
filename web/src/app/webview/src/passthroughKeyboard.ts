@@ -1,4 +1,4 @@
-import { DeviceSpec, Keyboard, KeyEvent, ManagedPromise } from '@keymanapp/keyboard-processor';
+import { DeviceSpec, Keyboard, KeyEvent, ManagedPromise } from 'keyman/engine/keyboard';
 
 import { HardKeyboard, processForMnemonicsAndLegacy } from 'keyman/engine/main';
 

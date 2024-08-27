@@ -1,13 +1,14 @@
 
 #include "pch.h"
 
+#include "km_u16.h"
+#include "../../../../common/windows/cpp/include/vkeys.h"
+
 #include "compfile.h"
 #include "kmn_compiler_errors.h"
-#include "../../../../common/windows/cpp/include/vkeys.h"
 #include "kmcmplib.h"
 
 #include "CharToKeyConversion.h"
-#include "kmx_u16.h"
 #include "xstring.h"
 
 namespace kmcmp {

@@ -102,7 +102,7 @@
 
 #include "UnreachableRules.h"
 #include "CheckForDuplicates.h"
-#include "kmx_u16.h"
+#include "km_u16.h"
 
 /* These macros are adapted from winnt.h and legacy use only */
 #define MAKELANGID(p, s)       ((((uint16_t)(s)) << 10) | (uint16_t)(p))
@@ -580,7 +580,7 @@ KMX_BOOL ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str) {
         //swprintf(tstr, "%d", fk->currentGroup);
         /* Record a system store for the line number of the begin statement */
         //wcscpy(tstr, DEBUGSTORE_MATCH);
-        u16sprintf(tstr, _countof(tstr), L"%ls%d ", u16fmt(DEBUGSTORE_MATCH).c_str(), (int) fk->currentGroup);
+        u16sprintf(tstr, _countof(tstr), L"%ls%d ", DEBUGSTORE_MATCH_L, (int) fk->currentGroup);
         u16ncat(tstr, gp->szName, _countof(tstr));
 
         AddDebugStore(fk, tstr);
@@ -619,7 +619,7 @@ KMX_BOOL ParseLine(PFILE_KEYBOARD fk, PKMX_WCHAR str) {
       {
         KMX_WCHAR tstr[128];
         /* Record a system store for the line number of the begin statement */
-        u16sprintf(tstr, _countof(tstr), L"%ls%d ", u16fmt(DEBUGSTORE_NOMATCH).c_str(), (int) fk->currentGroup);
+        u16sprintf(tstr, _countof(tstr), L"%ls%d ", DEBUGSTORE_NOMATCH_L, (int) fk->currentGroup);
         u16ncat(tstr, gp->szName, _countof(tstr));
         AddDebugStore(fk, tstr);
       }
@@ -683,7 +683,7 @@ KMX_BOOL ProcessGroupLine(PFILE_KEYBOARD fk, PKMX_WCHAR p)
   {
     KMX_WCHAR tstr[128];
     /* Record a system store for the line number of the begin statement */
-    u16sprintf(tstr, _countof(tstr), L"%ls%d ", u16fmt(DEBUGSTORE_GROUP).c_str(), fk->cxGroupArray - 1);
+    u16sprintf(tstr, _countof(tstr), L"%ls%d ", DEBUGSTORE_GROUP_L, fk->cxGroupArray - 1);
     u16ncat(tstr, gp->szName, _countof(tstr));
     AddDebugStore(fk, tstr);
   }
@@ -2310,11 +2310,11 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         {
           if (u16icmp(q, fk->dpStoreArray[i].szName) == 0) break;
         }
+        if (i == fk->cxStoreArray) return KmnCompilerMessages::ERROR_StoreDoesNotExist;
 
         if (!kmcmp::IsValidCallStore(&fk->dpStoreArray[i])) return KmnCompilerMessages::ERROR_InvalidCall;
         kmcmp::CheckStoreUsage(fk, i, FALSE, FALSE, TRUE);
 
-        if (i == fk->cxStoreArray) return KmnCompilerMessages::ERROR_StoreDoesNotExist;
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_CALL;
         tstr[mx++] = (KMX_WCHAR)i + 1;
@@ -3595,7 +3595,7 @@ KMX_DWORD ImportBitmapFile(PFILE_KEYBOARD fk, PKMX_WCHAR szName, PKMX_DWORD File
     return KmnCompilerMessages::ERROR_CannotReadBitmapFile;
   }
 
-  *FileSize = bufvec.size();
+  *FileSize = static_cast<KMX_DWORD>(bufvec.size());
   *Buf = new KMX_BYTE[*FileSize];
   std::copy(bufvec.begin(), bufvec.end(), *Buf);
 
@@ -3761,7 +3761,7 @@ void kmcmp::RecordDeadkeyNames(PFILE_KEYBOARD fk)
   KMX_DWORD i;
   for (i = 0; i < fk->cxDeadKeyArray; i++)
   {
-    u16sprintf(buf, _countof(buf), L"%ls%d ", u16fmt(DEBUGSTORE_DEADKEY).c_str(), (int)i);
+    u16sprintf(buf, _countof(buf), L"%ls%d ", DEBUGSTORE_DEADKEY_L, (int)i);
     u16ncat(buf, fk->dpDeadKeyArray[i].szName, _countof(buf));
 
     AddDebugStore(fk, buf);
@@ -3809,11 +3809,11 @@ bool UTF16TempFromUTF8(KMX_BYTE* infile, int sz, KMX_BYTE** tempfile, int *sz16)
   }
 
   if(hasPreamble(result)) {
-    *sz16 = result.size() * 2 - 2;
+    *sz16 = static_cast<int>(result.size()) * 2 - 2;
     *tempfile = new KMX_BYTE[*sz16];
     memcpy(*tempfile, result.c_str() + 1, *sz16);
   } else {
-    *sz16 = result.size() * 2;
+    *sz16 = static_cast<int>(result.size()) * 2;
     *tempfile = new KMX_BYTE[*sz16];
     memcpy(*tempfile, result.c_str(), *sz16);
   }

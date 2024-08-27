@@ -18,23 +18,27 @@
 #import <os/log.h>
 
 KMInputMethodEventHandler *testEventHandler = nil;
+id testClient = nil;
 
 @interface InputMethodTests : XCTestCase
 @end
 
 @interface KMInputMethodEventHandler (Testing)
-
+@property (nonatomic, retain) TextApiCompliance* apiCompliance;
+@property (nonatomic, retain) NSString* clientApplicationId;
+@property BOOL contextChanged;
 - (instancetype)initWithClient:(NSString *)clientAppId client:(id) sender;
 - (NSRange) calculateInsertRangeForDeletedText:(NSString*)textToDelete selectionRange:(NSRange) selection;
+- (void)checkTextApiCompliance:(id)client;
 
 @end
 
 @implementation InputMethodTests
 
 - (void)setUp {
-  id client = [[AppleCompliantTestClient alloc] init];
+  testClient = [[AppleCompliantTestClient alloc] init];
   NSString *clientAppId = @"com.compliant.app";
-  testEventHandler = [[KMInputMethodEventHandler alloc]initWithClient:clientAppId client:client];
+  testEventHandler = [[KMInputMethodEventHandler alloc]initWithClient:clientAppId client:testClient];
 }
 
 - (void)tearDown {
@@ -86,6 +90,45 @@ KMInputMethodEventHandler *testEventHandler = nil;
   NSRange insertRange = [testEventHandler calculateInsertRangeForDeletedText:@"'" selectionRange:selectionRange];
   BOOL correctResult = (insertRange.location == 1) && (insertRange.length == 2);
   XCTAssertTrue(correctResult, @"insert or replacement range expected to be {1,2}");
+}
+
+/**
+ * test compliance check of a KMInputMethodEventHandler with a nil client application ID
+ * not sure if this can ever happen, but the lifecycle of the input method is not 100% clear,
+ * and we would like this scenario, if it can occur, to not result in a crash
+ */
+- (void)testCheckCompliance_withUnknownApplicationId_createsComplianceObject {
+  id client = [[AppleCompliantTestClient alloc] init];
+  KMInputMethodEventHandler *eventHandler = [[KMInputMethodEventHandler alloc]initWithClient:nil client:client];
+  [eventHandler checkTextApiCompliance:client];
+  XCTAssertNotNil(eventHandler.apiCompliance, @"apiCompliance object was not created");
+}
+
+- (void)testCheckCompliance_withNilComplianceObject_createsComplianceObject {
+  [testEventHandler checkTextApiCompliance:testClient];
+  XCTAssertNotNil(testEventHandler.apiCompliance, @"apiCompliance object was not created");
+}
+
+- (void)testCheckCompliance_withChangedClientApplicationId_createsNewComplianceObject {
+  // first call causes textApiCompliance object to be created
+  [testEventHandler checkTextApiCompliance:testClient];
+  TextApiCompliance *originalComplianceObject = testEventHandler.apiCompliance;
+  
+  testEventHandler.clientApplicationId = @"com.different.app";
+  // second call causes new textApiCompliance object to be created due to stale application ID
+  [testEventHandler checkTextApiCompliance:testClient];
+  XCTAssertNotEqualObjects(originalComplianceObject, testEventHandler.apiCompliance, @"New TextApiCompliance object not created for new client application ID");
+}
+
+- (void)testCheckCompliance_withContextChanged_createsNewComplianceObject {
+  // first call causes textApiCompliance object to be created
+  [testEventHandler checkTextApiCompliance:testClient];
+  TextApiCompliance *originalComplianceObject = testEventHandler.apiCompliance;
+  
+  testEventHandler.contextChanged = YES;
+  // second call causes new textApiCompliance object to be created due to setting contextChanged flag
+  [testEventHandler checkTextApiCompliance:testClient];
+  XCTAssertNotEqualObjects(originalComplianceObject, testEventHandler.apiCompliance, @"New TextApiCompliance object not created after contextChanged flag set");
 }
 
 @end
