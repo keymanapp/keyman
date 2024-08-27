@@ -1,0 +1,32 @@
+{
+  "extends": "../../../../tsconfig.base.json",
+
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "build/obj",
+    "tsBuildInfoFile": "build/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src/main",
+    // To help better support legacy Android devices
+    "downlevelIteration": true,
+    // Facilitates & simplifies stitching together the worker sourcemaps during the polyfill-concatenation step.
+    "inlineSourceMap": true,
+    // May not be set at the same time as the prior setting.
+    "sourceMap": false,
+
+    // As this one is the one that directly interfaces with the worker (from the inside)
+    "lib": ["webworker", "es6"],
+  },
+  "references": [
+    // types
+    { "path": "../../../../../common/models/types" },
+    { "path": "../types" },
+    // modules
+    { "path": "../../../../../common/web/keyman-version" },
+    { "path": "../../../../../common/web/utils" },
+    { "path": "../../../../../common/models/templates" },
+    { "path": "../../../../../common/models/wordbreakers" },
+  ],
+  "include": [
+    "src/main/**/*.ts"
+  ]
+}

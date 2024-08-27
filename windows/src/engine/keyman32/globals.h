@@ -151,7 +151,7 @@ public:
 /* External interface functions */
 
 typedef HRESULT (WINAPI *PKEYMANPROCESSOUTPUTFUNC)(int n, WCHAR *buf, int nbuf);
-typedef HRESULT (WINAPI *PKEYMANGETCONTEXTFUNC)(int n, PWSTR buf);
+typedef HRESULT (WINAPI *PKEYMANGETCONTEXTFUNC)(int n, PWSTR buf, BOOL* isTextSelected);
 typedef BOOL (WINAPI *PTIPCALLBACK)();  // Tells the TIP to update its status (used to be done through 0x88)
 
 typedef BOOL (WINAPI *PKeymanOutputBackspace)(HWND hwnd);
@@ -226,6 +226,7 @@ typedef struct tagKEYMAN64THREADDATA
   HWND CurrenthWnd;
 
   BOOL debug_DebugInit;   // I3951
+  int debug_Depth;
   char debug_buf[64];
 
    // I3617   // I3618

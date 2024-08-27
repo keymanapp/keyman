@@ -1,0 +1,10 @@
+﻿store(&NAME) 'version_auto_chiral_modifiers'
+store(&TARGETS) 'web'
+
+begin Unicode > use(main)
+
+group(main) using keys
+
+c Use of LCTRL should make compiler select version 10
+
++ [LCTRL K_A] > 'a'

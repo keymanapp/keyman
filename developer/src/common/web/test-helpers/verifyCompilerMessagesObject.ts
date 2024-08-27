@@ -1,4 +1,4 @@
-import { CompilerError, CompilerErrorMask } from '@keymanapp/common-types';
+import { CompilerError, CompilerErrorMask } from '@keymanapp/developer-utils';
 import {assert, expect} from 'chai';
 
 //

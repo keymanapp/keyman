@@ -1,6 +1,7 @@
 import { BuildActivity } from './BuildActivity.js';
 import { LexicalModelCompiler } from '@keymanapp/kmc-model';
-import { CompilerCallbacks, CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
+import { KeymanFileTypes } from '@keymanapp/common-types';
+import { CompilerOptions, CompilerCallbacks } from '@keymanapp/developer-utils';
 
 export class BuildModel extends BuildActivity {
   public get name(): string { return 'Lexical model'; }

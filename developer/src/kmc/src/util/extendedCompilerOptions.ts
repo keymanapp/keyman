@@ -1,6 +1,6 @@
-import { CompilerCallbacks, CompilerError, CompilerErrorSeverity, CompilerMessageOverride, CompilerMessageOverrideMap, CompilerOptions } from '@keymanapp/common-types';
+import { CompilerCallbacks, CompilerError, CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageOverride, CompilerMessageOverrideMap, CompilerOptions } from '@keymanapp/developer-utils';
 import { InfrastructureMessages } from '../messages/infrastructureMessages.js';
-import { messageNamespaceKeys, messageSources } from '../messages/messageNamespaces.js';
+import { CompilerMessageSource, messageNamespaceKeys, messageSources } from '../messages/messageNamespaces.js';
 
 export interface ExtendedCompilerOptions extends CompilerOptions {
   /**
@@ -95,6 +95,52 @@ export function findMessageDetails(code: number, callbacks: CompilerCallbacks): 
     return null;
   }
   return {code: m[id], id, module: source.module, class: source.class};
+}
+
+export const getMessageIdentifiersSorted = (cls: any) =>
+  Object.keys(cls)
+  .filter(id => typeof cls[id] == 'number')
+  .sort((a,b) => CompilerError.error(cls[a])-CompilerError.error(cls[b]));
+
+/**
+ * Gets an array of compiler messages matching the search identifier. Substrings
+ * are supported for the id portion of the searchId
+ * @param searchNamespace optional namespace to search in, if omitted, searches
+ *                        all namespaces
+ * @param searchId        a substring to match with optional namespace prefix, e.g.
+ *                        "INFO_"
+ */
+export function findMessagesById(searchNamespace: CompilerErrorNamespace, searchId: string): CompilerMessageDetail[] {
+  searchId = searchId.toLowerCase();
+
+  const messages: CompilerMessageDetail[] = [];
+
+  messageNamespaceKeys.forEach((namespace: CompilerErrorNamespace) => {
+    if(searchNamespace && searchNamespace != namespace) {
+      return;
+    }
+
+    const ms = messageSources[namespace] as CompilerMessageSource;
+
+    const ids = getMessageIdentifiersSorted(ms.class);
+    for(const id of ids) {
+      const code = ms.class[id];
+      const lid = id.toLowerCase();
+      if(typeof code != 'number') {
+        continue;
+      }
+      if(lid.includes(searchId)) {
+        messages.push({
+          code,
+          id,
+          class: ms.class,
+          module: ms.module
+        });
+      }
+    }
+  });
+
+  return messages;
 }
 
 /**

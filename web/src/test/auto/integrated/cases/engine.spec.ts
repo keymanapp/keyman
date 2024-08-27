@@ -9,11 +9,15 @@ import {
 import * as KMWRecorder from '#recorder';
 
 import { type KeymanEngine, type KeyboardInterface } from 'keyman/app/browser';
-import { type KeyboardStub } from 'keyman/engine/package-cache';
+import { type KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { type OSKInputEventSpec } from '#recorder';
 
+type WindowKey = keyof typeof window;
+const keyman_window = 'keyman' as WindowKey;
+const keymanweb_window = 'KeymanWeb' as WindowKey;
+
 /** @type {HTMLInputElement} */
-let inputElem;
+let inputElem: HTMLInputElement;
 
 // The OSK is appended to the body; we need the ability to clear things out without nullifying the OSK.
 const host = document.createElement('div');
@@ -50,15 +54,15 @@ describe('Engine - Browser Interactions', function() {
   describe('RegisterStub', function() {
     it('RegisterStub on same keyboard twice', async function() {
       this.timeout(baseTimeout);
-      const keyman: KeymanEngine = window['keyman'];
-      const KeymanWeb: KeyboardInterface = window['KeymanWeb'];
+      const keyman: KeymanEngine = window[keyman_window];
+      const KeymanWeb: KeyboardInterface = window[keymanweb_window];
 
       await loadKeyboardFromJSON("resources/json/keyboards/lao_2008_basic.json", baseTimeout);
 
       assert.isNotNull(keyman.getKeyboard("lao_2008_basic", "lo"), "Keyboard stub was not registered!");
       assert.equal(keyman.getActiveKeyboard(), "Keyboard_lao_2008_basic", "Keyboard not set automatically!");
 
-      let stub = {
+      const stub = {
         'KI': 'Keyboard_lao_2008_basic',
         'KN': 'Lao 2008 Basic',
         'KLC': 'lo',
@@ -80,25 +84,25 @@ describe('Engine - Browser Interactions', function() {
     });
 
     after(function() {
-      const keyman: KeymanEngine = window['keyman'];
+      const keyman: KeymanEngine = window[keyman_window];
       keyman.removeKeyboards('options_with_save');
     });
 
     it('Backing up and restoring (loadStore/saveStore)', function() {
-      const keyman: KeymanEngine = window['keyman'];
-      const KeymanWeb: KeyboardInterface = window['KeymanWeb'];
+      const keyman: KeymanEngine = window[keyman_window];
+      const KeymanWeb: KeyboardInterface = window[keymanweb_window];
 
       // Keyboard's default value is 0, corresponding to "no foo."
-      var keyboardID = "options_with_save";
-      var prefixedKeyboardID = "Keyboard_" + keyboardID;
-      var storeName = "foo";
+      const keyboardID = "options_with_save";
+      const prefixedKeyboardID = "Keyboard_" + keyboardID;
+      const storeName = "foo";
 
       return keyman.setActiveKeyboard(keyboardID, 'en').then(function() {
         // Alas, saveStore itself requires the keyboard to be active!
         KeymanWeb.saveStore(storeName, '1');
 
         // First, ensure that we get the same thing if we load the value immediately.
-        var value = KeymanWeb.loadStore(prefixedKeyboardID, storeName, '0');
+        const value = KeymanWeb.loadStore(prefixedKeyboardID, storeName, '0');
         assert.equal(value, '1', "loadStore did not see the value saved to initialize the test before resetting keyboard");
 
         // Reload the keyboard so that we can test its loaded value.
@@ -111,7 +115,7 @@ describe('Engine - Browser Interactions', function() {
         return keyman.setActiveKeyboard(keyboardID, 'en');
       }).then(() => {
         // This requires proper storage to a cookie, as we'll be on a new instance of the same keyboard.
-        var value = KeymanWeb.loadStore(prefixedKeyboardID, storeName, '0');
+        const value = KeymanWeb.loadStore(prefixedKeyboardID, storeName, '0');
         assert.equal(value, '1', "Did not properly save and reload variable store setting");
       }).finally(() => {
         KeymanWeb.saveStore(storeName, '0');
@@ -120,11 +124,11 @@ describe('Engine - Browser Interactions', function() {
 
     it("Multiple-sequence check", function() {
       this.timeout(baseTimeout + baseTimeout * 3);
-      const keyman: KeymanEngine = window['keyman'];
-      const KeymanWeb: KeyboardInterface = window['KeymanWeb'];
+      const keyman: KeymanEngine = window[keyman_window];
+      const KeymanWeb: KeyboardInterface = window[keymanweb_window];
 
-      var keyboardID = "options_with_save";
-      var storeName = "foo";
+      const keyboardID = "options_with_save";
+      const storeName = "foo";
 
       return keyman.setActiveKeyboard(keyboardID, 'en').then(async function() {
         KeymanWeb.saveStore(storeName, '1');
@@ -163,13 +167,13 @@ describe('Engine - Browser Interactions', function() {
     });
 
     beforeEach(function() {
-      const keyman: KeymanEngine = window['keyman'];
+      const keyman: KeymanEngine = window[keyman_window];
       keyman.setActiveElement(inputElem);
       inputElem.value = "";
     });
 
     after(function() {
-      const keyman: KeymanEngine = window['keyman'];
+      const keyman: KeymanEngine = window[keyman_window];
       keyman.removeKeyboards('lao_2008_basic');
     });
 
@@ -180,27 +184,27 @@ describe('Engine - Browser Interactions', function() {
      * See #8830.
      */
     it('Simple Keypress', function() {
-      var lao_s_key_json = {"type": "key", "key":"s", "code":"KeyS","keyCode":83,"modifierSet":0,"location":0};
-      var lao_s_event = new KMWRecorder.PhysicalInputEventSpec(lao_s_key_json);
+      const lao_s_key_json = {"type": "key", "key":"s", "code":"KeyS","keyCode":83,"modifierSet":0,"location":0};
+      const lao_s_event = new KMWRecorder.PhysicalInputEventSpec(lao_s_key_json);
 
-      let eventDriver = new KMWRecorder.BrowserDriver(inputElem);
+      const eventDriver = new KMWRecorder.BrowserDriver(inputElem);
       eventDriver.simulateEvent(lao_s_event);
 
-      if(inputElem['base']) {
-        inputElem = inputElem['base'];
+      if (inputElem['base' as keyof HTMLInputElement]) {
+        inputElem = inputElem['base' as keyof HTMLInputElement] as HTMLInputElement;
       }
       assert.equal(inputElem.value, "ຫ");
     });
 
     it('Simple OSK click', async function() {
-      var lao_s_osk_json = {"type": "osk", "keyID": 'shift-K_S'};
-      var lao_s_event = new KMWRecorder.OSKInputEventSpec(lao_s_osk_json as OSKInputEventSpec);
+      const lao_s_osk_json = {"type": "osk", "keyID": 'shift-K_S'};
+      const lao_s_event = new KMWRecorder.OSKInputEventSpec(lao_s_osk_json as OSKInputEventSpec);
 
-      let eventDriver = new KMWRecorder.BrowserDriver(inputElem);
+      const eventDriver = new KMWRecorder.BrowserDriver(inputElem);
       await eventDriver.simulateEvent(lao_s_event);
 
-      if(inputElem['base']) {
-        inputElem = inputElem['base'];
+      if (inputElem['base' as keyof HTMLInputElement]) {
+        inputElem = inputElem['base' as keyof HTMLInputElement] as HTMLInputElement;
       }
       assert.equal(inputElem.value, ";");
     });
@@ -273,8 +277,7 @@ describe('Engine - Browser Interactions', function() {
   describe('Keyboard Loading', function() {
     it('Local', function() {
       this.timeout(baseTimeout);
-      const keyman: KeymanEngine = window['keyman'];
-      const KeymanWeb: KeyboardInterface = window['KeymanWeb'];
+      const keyman: KeymanEngine = window[keyman_window];
 
       return loadKeyboardFromJSON("resources/json/keyboards/lao_2008_basic.json",
                                   baseTimeout).then(async function() {
@@ -289,8 +292,7 @@ describe('Engine - Browser Interactions', function() {
 
     it('Automatically sets first available keyboard', function() {
       this.timeout(2 * baseTimeout);
-      const keyman: KeymanEngine = window['keyman'];
-      const KeymanWeb: KeyboardInterface = window['KeymanWeb'];
+      const keyman: KeymanEngine = window[keyman_window];
 
       return loadKeyboardFromJSON("resources/json/keyboards/lao_2008_basic.json",
                                   baseTimeout,
@@ -302,7 +304,7 @@ describe('Engine - Browser Interactions', function() {
           let hasResolved = false;
           // So, we give KMW the time needed for auto-activation to happen, polling a bit actively so that we don't
           // wait unnecessarily long after it occurs.
-          let absoluteTimer = window.setTimeout(() => {
+          const absoluteTimer = window.setTimeout(() => {
             if(!hasResolved) {
               resolve();
               hasResolved = true;
@@ -311,7 +313,7 @@ describe('Engine - Browser Interactions', function() {
             window.clearTimeout(intervalTimer);
           }, baseTimeout);
 
-          let intervalTimer = window.setInterval(() => {
+          const intervalTimer = window.setInterval(() => {
             if(keyman.getActiveKeyboard() != '') {
               window.clearTimeout(intervalTimer);
               window.clearTimeout(absoluteTimer);

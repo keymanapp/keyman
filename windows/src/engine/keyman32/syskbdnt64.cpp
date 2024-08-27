@@ -157,7 +157,7 @@ BOOL LoadNewLibrary_x64()
 				hKbdLibrary_x64 = LoadLibrary(buf);
 				if(!hKbdLibrary_x64)
 				{
-					SendDebugMessageFormat(GetFocus(), sdmKeyboard, 0, "LoadNewLibrary_x64: Exit -- could not load library");
+					SendDebugMessageFormat("Exit -- could not load library");
 					return FALSE;
 				}
 				PKBDLAYERDESCRIPTORFUNC KbdLayerDescriptorFunc = (PKBDLAYERDESCRIPTORFUNC) GetProcAddress(hKbdLibrary_x64, "KbdLayerDescriptor");
@@ -179,7 +179,7 @@ BOOL LoadNewLibrary_x64()
 	{
 		delete r;
 	}
-	SendDebugMessageFormat(GetFocus(), sdmKeyboard, 0, "LoadNewLibrary_x64: Exit -- failed to find function");
+	SendDebugMessageFormat("Exit -- failed to find function");
 	return FALSE;
 }
 

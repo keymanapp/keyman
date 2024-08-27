@@ -11,7 +11,7 @@ import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
 
 import { KmpCompiler } from '../src/compiler/kmp-compiler.js';
-import { CompilerMessages } from '../src/compiler/package-compiler-messages.js';
+import { PackageCompilerMessages } from '../src/compiler/package-compiler-messages.js';
 
 const debug = false;
 
@@ -209,13 +209,15 @@ describe('KmpCompiler', function () {
       kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
     });
 
+    assert.isNotNull(kmpJson);
+
     await assert.isNull(kmpCompiler.buildKmpFile(kpsPath, kmpJson));
 
     if(debug) callbacks.printMessages();
 
     assert.lengthOf(callbacks.messages, 2);
-    assert.deepEqual(callbacks.messages[0].code, CompilerMessages.WARN_AbsolutePath);
-    assert.deepEqual(callbacks.messages[1].code, CompilerMessages.ERROR_FileDoesNotExist);
+    assert.deepEqual(callbacks.messages[0].code, PackageCompilerMessages.WARN_AbsolutePath);
+    assert.deepEqual(callbacks.messages[1].code, PackageCompilerMessages.ERROR_FileDoesNotExist);
   });
 
   // Testing path normalization
@@ -268,7 +270,7 @@ describe('KmpCompiler', function () {
   it(`should load a package with missing keyboard ID metadata`, function () {
     const kmpJson = kmpCompiler.transformKpsToKmpObject(makePathToFixture('invalid', 'missing_keyboard_id.kps'));
     assert.isNull(kmpJson); // with a missing keyboard_id, the package shouldn't load, but it shouldn't crash either
-    assert.deepEqual(callbacks.messages[0].code, CompilerMessages.ERROR_KeyboardContentFileNotFound);
+    assert.deepEqual(callbacks.messages[0].code, PackageCompilerMessages.ERROR_KeyboardContentFileNotFound);
 
   });
 

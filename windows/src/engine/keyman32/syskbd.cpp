@@ -1,18 +1,18 @@
 /*
   Name:             syskbd
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      22 Jan 2007
 
   Modified Date:    3 Feb 2015
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          22 Jan 2007 - mcdurdin - Don't translate any number pad keys
                     11 Mar 2009 - mcdurdin - I1894 - Fix threading bugs introduced in I1888
                     30 Nov 2009 - mcdurdin - I934 - Prep for x64 - change UINT to WORD for vkeys
@@ -43,15 +43,15 @@ WORD USVkToVkByScanCode[256] = {0};   // I3762
 
 extern BOOL KeyboardGivesCtrlRAltForRAlt_NT();
 
-/************************************************************************/ 
-/* CharFromVK: Return a character code from a virtual key code          */ 
-/************************************************************************/ 
+/************************************************************************/
+/* CharFromVK: Return a character code from a virtual key code          */
+/************************************************************************/
 
 WCHAR CharFromVK(WORD *VKey, UINT ShiftFlags)   // I4582
 {
 	if(*VKey > 255) return 0;
 
-  /* Remap the virtual key to US English if using Positional layout */ 
+  /* Remap the virtual key to US English if using Positional layout */
 
 	*VKey = VKToScanCodeToVK(*VKey);
 	return MapVirtualKeys(*VKey, ShiftFlags);
@@ -72,7 +72,7 @@ BYTE PositionalVKMap[256] = {
   0,0,0,0, 0,0,0,0, 1,1,1,1, 1,1,1,1,     // 80 - 0F  VK_F17 - VK_F24
   1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1,     // 90 - 0F
   1,1,1,1, 1,1,0,0, 0,0,0,0, 0,0,0,0,     // A0 - 0F  VK_BROWSER_*, VK_VOLUME_*
-  0,0,0,0, 0,0,0,0, 1,1,1,1, 1,1,1,1,     // B0 - 0F  VK_MEDIA_*, VK_LAUNCH_* 
+  0,0,0,0, 0,0,0,0, 1,1,1,1, 1,1,1,1,     // B0 - 0F  VK_MEDIA_*, VK_LAUNCH_*
   1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1,     // C0 - 0F
   1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1,     // D0 - 0F
   1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1,     // E0 - 0F
@@ -90,43 +90,43 @@ WORD VKToScanCodeToVK(WORD VKey)
 
   if(!PositionalVKMap[VKey]) return VKey;
 
-	/* Find the appropriate keyboard tables */ 
+	/* Find the appropriate keyboard tables */
 
   HKL hkl = GetKeyboardLayout(0);
 
   if(hkl != ActiveHKL)
 	{
 		memset(VkToVkByScanCode, 0, sizeof(VkToVkByScanCode));
-		ActiveHKL = hkl; 
+		ActiveHKL = hkl;
 	}
 
-	/* Look for the buffer */ 
+	/* Look for the buffer */
 
 	if(VkToVkByScanCode[VKey] != 0) return VkToVkByScanCode[VKey];
 
-	/* Map the virtual key to the US English character: lookup the scancode from the VKey */ 
+	/* Map the virtual key to the US English character: lookup the scancode from the VKey */
 
 	UINT scancode = MapVirtualKeyEx(VKey, 0, hkl);
 
 	if(scancode == 0)
   {
-    //SendDebugMessageFormat(0, sdmGlobal, 0, "VKToScanCodeToVK.  VK=%x  scancode=%x  result=%x", VKey, scancode, VKey);
+    //SendDebugMessageFormat("VK=%x  scancode=%x  result=%x", VKey, scancode, VKey);
     return VkToVkByScanCode[VKey] = VKey;
   }
 
-	/* Lookup the US virtual key from the scancode */ 
+	/* Lookup the US virtual key from the scancode */
 
 	for(WORD i = 0; i < 256; i++)
 		if(USVirtualKeyToScanCode[i] == scancode)
     {
-      //SendDebugMessageFormat(0, sdmGlobal, 0, "VKToScanCodeToVK.  VK=%x  scancode=%x  result=%x", VKey, scancode, i);
+      //SendDebugMessageFormat("VK=%x  scancode=%x  result=%x", VKey, scancode, i);
 			return VkToVkByScanCode[VKey] = i;
     }
 
-  //SendDebugMessageFormat(0, sdmGlobal, 0, "VKToScanCodeToVK.  VK=%x  scancode=%x  result=%x", VKey, scancode, VKey);
+  //SendDebugMessageFormat("VK=%x  scancode=%x  result=%x", VKey, scancode, VKey);
 	return VkToVkByScanCode[VKey] = VKey;
 }
-  
+
 WORD USVKToScanCodeToLayoutVK(WORD VKey)   // I3762
 {
 	static HKL ActiveHKL = 0;
@@ -135,30 +135,30 @@ WORD USVKToScanCodeToLayoutVK(WORD VKey)   // I3762
 
   if(!PositionalVKMap[VKey]) return VKey;
 
-	/* Find the appropriate keyboard tables */ 
+	/* Find the appropriate keyboard tables */
 
   HKL hkl = GetKeyboardLayout(0);
 
   if(hkl != ActiveHKL)
 	{
 		memset(USVkToVkByScanCode, 0, sizeof(USVkToVkByScanCode));
-		ActiveHKL = hkl; 
+		ActiveHKL = hkl;
 	}
 
-	/* Look for the buffer */ 
+	/* Look for the buffer */
 
 	if(USVkToVkByScanCode[VKey] != 0) return USVkToVkByScanCode[VKey];
 
-	/* Map the US virtual key to the scan code: lookup the scancode from the VKey */ 
+	/* Map the US virtual key to the scan code: lookup the scancode from the VKey */
 
   UINT scancode = USVirtualKeyToScanCode[VKey];
 	if(scancode == 0)
   {
-    //SendDebugMessageFormat(0, sdmGlobal, 0, "VKToScanCodeToVK.  VK=%x  scancode=%x  result=%x", VKey, scancode, VKey);
+    //SendDebugMessageFormat("VK=%x  scancode=%x  result=%x", VKey, scancode, VKey);
     return USVkToVkByScanCode[VKey] = VKey;
   }
 
-	/* Lookup the layout virtual key from the scancode */ 
+	/* Lookup the layout virtual key from the scancode */
 
   return USVkToVkByScanCode[VKey] = (WORD) MapVirtualKeyEx(scancode, MAPVK_VSC_TO_VK_EX, hkl);
 }
@@ -182,7 +182,7 @@ WCHAR MapVirtualKeys(WORD keyCode, UINT shiftFlags)
 		n = keyCode - '0';
 		return ((shiftFlags & K_SHIFTFLAG) ? shiftedDigit[n] : keyCode);
 	}
-	
+
 	if(keyCode >= 'A' && keyCode <= 'Z')
 	{
 		Shift = (shiftFlags & K_SHIFTFLAG);
@@ -200,7 +200,7 @@ WCHAR MapVirtualKeys(WORD keyCode, UINT shiftFlags)
 
 	switch(keyCode)
 	{
-	case VK_ACCENT:	
+	case VK_ACCENT:
 		return Shift ? '~' : '`';
 	case VK_HYPHEN:
 		return Shift ? '_' : '-';

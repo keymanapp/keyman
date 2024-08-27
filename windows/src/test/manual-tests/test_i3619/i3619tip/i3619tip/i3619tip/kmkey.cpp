@@ -1,18 +1,18 @@
 /*
   Name:             kmkey
   Copyright:        Copyright (C) SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      19 Jun 2007
 
   Modified Date:    1 Dec 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          19 Jun 2007 - mcdurdin - I890 - Deadkeys not working correctly in TSF
                     19 Jun 2007 - mcdurdin - I822 - TSF Addin not working
                     07 Sep 2009 - mcdurdin - I2095 - TSF addin is not threadsafe
@@ -49,7 +49,7 @@ public:
     STDMETHODIMP DoEditSession(TfEditCookie ec);
 
 	HRESULT WINAPI KeymanProcessOutput(int n, PWSTR buf, int nbuf);   // I3567
-	HRESULT WINAPI KeymanGetContext(int n, PWSTR buf);   // I3567
+	HRESULT WINAPI KeymanGetContext(int n, PWSTR buf, BOOL* isTextSelected);   // I3567
 	HRESULT GetResult() { return _hr; }
 
 private:
@@ -77,7 +77,7 @@ BOOL CKMTipTextService::_KeymanProcessKeystroke(ITfContext *pContext, WPARAM wPa
   }
 	else
 	{
-		if (pContext->RequestEditSession(_tfClientId, pEditSession, 
+		if (pContext->RequestEditSession(_tfClientId, pEditSession,
 			fUpdate ? TF_ES_SYNC | TF_ES_READWRITE : TF_ES_SYNC | TF_ES_READ, &hr) != S_OK)
 		{
 			hr = E_FAIL;

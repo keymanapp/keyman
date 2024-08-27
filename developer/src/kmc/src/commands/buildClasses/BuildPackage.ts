@@ -1,5 +1,6 @@
 import { BuildActivity } from './BuildActivity.js';
-import { CompilerCallbacks, CompilerOptions, KeymanFileTypes } from '@keymanapp/common-types';
+import { KeymanFileTypes } from '@keymanapp/common-types';
+import { CompilerOptions, CompilerCallbacks } from '@keymanapp/developer-utils';
 import { KmpCompiler } from '@keymanapp/kmc-package';
 
 export class BuildPackage extends BuildActivity {

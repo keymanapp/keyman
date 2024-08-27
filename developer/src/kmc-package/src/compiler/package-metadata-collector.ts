@@ -1,6 +1,7 @@
-import { KmpJsonFile, CompilerCallbacks, KmxFileReader, KmxFileReaderError, KMX, KeymanFileTypes } from '@keymanapp/common-types';
+import { KmpJsonFile, KmxFileReader, KmxFileReaderError, KMX, KeymanFileTypes } from '@keymanapp/common-types';
+import { CompilerCallbacks } from "@keymanapp/developer-utils";
 import { getCompiledKmxKeyboardMetadata } from './kmx-keyboard-metadata.js';
-import { CompilerMessages } from './package-compiler-messages.js';
+import { PackageCompilerMessages } from './package-compiler-messages.js';
 import { getCompiledWebKeyboardMetadata, WebKeyboardMetadata } from './web-keyboard-metadata.js';
 
 export type KeyboardMetadata = {
@@ -45,19 +46,19 @@ export class PackageMetadataCollector {
       isJavascript = true;
       file = kmp.files.find(file => this.callbacks.path.basename(file.name ?? '', KeymanFileTypes.Binary.WebKeyboard) == keyboard.id);
       if(!file) {
-        this.callbacks.reportMessage(CompilerMessages.Error_KeyboardContentFileNotFound({id:keyboard.id}));
+        this.callbacks.reportMessage(PackageCompilerMessages.Error_KeyboardContentFileNotFound({id:keyboard.id}));
         return null;
       }
     }
 
     if(!file.name) {
-      this.callbacks.reportMessage(CompilerMessages.Error_FileRecordIsMissingName({description: file.description ?? '(no description)'}));
+      this.callbacks.reportMessage(PackageCompilerMessages.Error_FileRecordIsMissingName({description: file.description ?? '(no description)'}));
       return null;
     }
 
     const filename = this.callbacks.resolveFilename(kpsFilename, file.name);
     if(!this.callbacks.fs.existsSync(filename)) {
-      this.callbacks.reportMessage(CompilerMessages.Error_KeyboardFileNotFound({filename}));
+      this.callbacks.reportMessage(PackageCompilerMessages.Error_KeyboardFileNotFound({filename}));
       return null;
     }
 
@@ -68,7 +69,7 @@ export class PackageMetadataCollector {
     try {
       fileData = this.callbacks.loadFile(filename);
     } catch(e) {
-      this.callbacks.reportMessage(CompilerMessages.Error_FileCouldNotBeRead({filename, e}));
+      this.callbacks.reportMessage(PackageCompilerMessages.Error_FileCouldNotBeRead({filename, e}));
       return null;
     }
 
@@ -83,7 +84,7 @@ export class PackageMetadataCollector {
       } catch(e) {
         if(e instanceof KmxFileReaderError) {
           // The file couldn't be read, it might not be a .kmx file
-          this.callbacks.reportMessage(CompilerMessages.Error_KeyboardFileNotValid({filename, e}));
+          this.callbacks.reportMessage(PackageCompilerMessages.Error_KeyboardFileNotValid({filename, e}));
           return null;
         } else {
           // Unknown error, bubble it up

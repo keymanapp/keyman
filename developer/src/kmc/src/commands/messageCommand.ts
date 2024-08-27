@@ -1,14 +1,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { CompilerBaseOptions, CompilerCallbacks, CompilerError, CompilerErrorNamespace, CompilerEvent } from '@keymanapp/common-types';
 import { Command, Option } from 'commander';
+import { escapeMarkdownChar, KeymanUrls, CompilerBaseOptions, CompilerCallbacks, CompilerError, CompilerErrorNamespace, CompilerEvent } from '@keymanapp/developer-utils';
 import { CompilerMessageSource, messageNamespaceKeys, messageSources } from '../messages/messageNamespaces.js';
 import { NodeCompilerCallbacks } from '../util/NodeCompilerCallbacks.js';
 import { exitProcess } from '../util/sysexits.js';
 import { InfrastructureMessages } from '../messages/infrastructureMessages.js';
-import { CompilerMessageDetail, findMessageDetails } from '../util/extendedCompilerOptions.js';
-import { escapeMarkdownChar, KeymanUrls } from '@keymanapp/developer-utils';
+import { CompilerMessageDetail, findMessageDetails, findMessagesById, getMessageIdentifiersSorted } from '../util/extendedCompilerOptions.js';
 
 type MessageFormat = 'text'|'markdown'|'json';
 
@@ -31,6 +30,10 @@ export function declareMessage(program: Command) {
   program
     .command('message [messages...]')
     .description(`Describe one or more compiler messages. Note: Markdown format is always written to files on disk.`)
+    .addHelpText('after', `
+Message identifiers can be:
+ * numeric, e.g. "KM07006" or "7006", or
+ * [namespace.]id, substring id supported; e.g. "kmc-kmn.INFO_MinimumEngineVersion" or "kmc-kmn." or "INFO_Min"`)
     .addOption(new Option('-f, --format <format>', 'Output format').choices(['text', 'markdown', 'json']).default('text'))
     .option('-o, --out-path <out-path>', 'Output path for Markdown files; output filename for text and json formats')
     .option('-a, --all-messages', 'Emit descriptions for all messages (text, json)')
@@ -57,7 +60,7 @@ async function messageCommand(messages: string[], _options: any, commander: any)
     }
 
     const messageDetails = messages.length
-      ? messages.map(message => translateMessageInputToCode(message, callbacks))
+      ? messages.flatMap(message => translateMessageInputToCode(message, callbacks))
       : allMessageDetails();
 
     if(callbacks.messageCount > 0) {
@@ -96,16 +99,43 @@ async function messageCommand(messages: string[], _options: any, commander: any)
 const helpUrl = (code:any) => KeymanUrls.COMPILER_ERROR_CODE(CompilerError.formatCode(code).toLowerCase());
 const getModuleName = (ms: CompilerMessageSource) => `${ms.module}.${ms.class.name}`;
 
-function translateMessageInputToCode(message: string, callbacks: CompilerCallbacks): CompilerMessageDetail {
+function parseMessageIdentifier(message: string, callbacks: CompilerCallbacks): { namespace?: CompilerErrorNamespace, id?: string } {
+  const parts = message.split('.', 2);
+  if(parts.length == 1) {
+    // searching all namespaces
+    return { id: parts[0] };
+  }
+
+  // searching one namespace
+  const namespace = messageNamespaceKeys.find(ns => messageSources[ns].module == parts[0].toLowerCase());
+  if(!namespace) {
+    return { };
+  }
+  return { namespace, id: parts[1] };
+}
+
+function translateMessageInputToCode(message: string, callbacks: CompilerCallbacks): CompilerMessageDetail[] {
   const pattern = /^(KM)?([0-9a-f]+)$/i;
   const result = message.match(pattern);
   if(!result) {
-    callbacks.reportMessage(InfrastructureMessages.Error_UnrecognizedMessageCode({message}));
-    return null;
+    const { namespace, id } = parseMessageIdentifier(message.toLowerCase(), callbacks);
+    if(!namespace && !id) {
+      callbacks.reportMessage(InfrastructureMessages.Error_MessageNamespaceNameNotFound({message}));
+      return null;
+    }
+
+    // We assume that this is a INFO, HINT, ERROR, etc message, and do a substring search
+    const items = findMessagesById(namespace, id);
+    if(!items.length) {
+      callbacks.reportMessage(InfrastructureMessages.Error_UnrecognizedMessageCode({message}));
+      return null;
+    }
+
+    return items;
   }
 
   const code = Number.parseInt(result[2], 16);
-  return findMessageDetails(code, callbacks);
+  return [findMessageDetails(code, callbacks)];
 }
 
 function initialize(options: any): MessageOptions {
@@ -122,11 +152,6 @@ function initialize(options: any): MessageOptions {
     outPath: options.outPath
   }
 }
-
-const getMessageIdentifiersSorted = (cls: any) =>
-  Object.keys(cls)
-  .filter(id => typeof cls[id] == 'number')
-  .sort((a,b) => CompilerError.error(cls[a])-CompilerError.error(cls[b]));
 
 function allMessageDetails(): CompilerMessageDetail[] {
   let result: CompilerMessageDetail[] = [];
