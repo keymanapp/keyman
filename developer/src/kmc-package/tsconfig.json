@@ -10,6 +10,7 @@
     "src/**/*.ts",
   ],
   "references": [
+    { "path": "../common/web/utils" },
     { "path": "../../../common/web/keyman-version" },
     { "path": "../../../common/web/types" },
   ]

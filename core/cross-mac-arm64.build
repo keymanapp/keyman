@@ -5,9 +5,9 @@ cpu = 'arm64'
 endian = 'little'
 
 [binaries]
-c = ['clang', '-arch', 'arm64']
-objc = ['clang', '-arch', 'arm64']
-cpp = ['clang++', '-arch', 'arm64']
+c = ['clang', '-arch', 'arm64', '-mmacosx-version-min=10.13']
+objc = ['clang', '-arch', 'arm64', '-mmacosx-version-min=10.13']
+cpp = ['clang++', '-arch', 'arm64', '-mmacosx-version-min=10.13']
 ar = 'ar'
 ld = 'ld'
 strip = 'strip'

@@ -12,8 +12,9 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 ################################ Main script ################################
 
+# Note:  the raw text files used for data.inc.ts are found within
+# /resources/standards-data/unicode-character-database.
 builder_describe "Builds the predictive-text wordbreaker implementation module" \
-  "@/resources/standards-data/unicode-character-database configure" \
   "clean" \
   "configure" \
   "build" \
@@ -21,23 +22,26 @@ builder_describe "Builds the predictive-text wordbreaker implementation module" 
   "--ci"
 
 builder_describe_outputs \
-  configure          /node_modules \
-  build              build/obj/index.js
+  configure          src/main/default/data.inc.ts \
+  build              build/main/obj/index.js
 
 builder_parse "$@"
 
 function do_configure() {
   verify_npm_setup
 
-  tsc -b src/data-compiler/tsconfig.json
-  node ./build/obj/data-compiler/index.js
+  # This is a script used to build the data.inc.ts file needed by the
+  # default wordbreaker.  We rarely update the backing data, but it
+  # is needed _before_ the `build` action's compilation step.
+  tsc -b tools/data-compiler/tsconfig.json
+  node ./build/tools/data-compiler/obj/index.js
 }
 
 function do_build() {
   tsc -b ./tsconfig.json
 
   # Declaration bundling.
-  tsc -p ./tsconfig.json --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+  tsc -p ./tsconfig.json --emitDeclarationOnly --outFile ./build/main/lib/index.d.ts
 }
 
 function do_test() {

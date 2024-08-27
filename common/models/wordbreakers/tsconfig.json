@@ -3,8 +3,8 @@
 
   "compilerOptions": {
     "baseUrl": "./",
-    "outDir": "./build/obj",
-    "tsBuildInfoFile": "./build/obj/tsconfig.tsbuildinfo",
+    "outDir": "./build/main/obj",
+    "tsBuildInfoFile": "./build/main/obj/tsconfig.tsbuildinfo",
     "rootDir": "./src/main"
   },
   "references": [

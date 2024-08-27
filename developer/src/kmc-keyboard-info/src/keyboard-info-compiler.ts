@@ -5,10 +5,10 @@
 
 import { minKeymanVersion } from "./min-keyman-version.js";
 import { KeyboardInfoFile, KeyboardInfoFileIncludes, KeyboardInfoFileLanguageFont, KeyboardInfoFilePlatform } from "./keyboard-info-file.js";
-import { KeymanFileTypes, CompilerCallbacks, KmpJsonFile, KmxFileReader, KMX, KeymanTargets, KeymanCompiler, CompilerOptions, KeymanCompilerResult, KeymanCompilerArtifacts, KeymanCompilerArtifact } from "@keymanapp/common-types";
+import { KeymanFileTypes, KmpJsonFile, KmxFileReader, KMX, KeymanTargets } from "@keymanapp/common-types";
 import { KeyboardInfoCompilerMessages } from "./keyboard-info-compiler-messages.js";
 import langtags from "./imports/langtags.js";
-import { KeymanUrls, isValidEmail, validateMITLicense } from "@keymanapp/developer-utils";
+import { CompilerCallbacks, KeymanCompiler, CompilerOptions, KeymanCompilerResult, KeymanCompilerArtifacts, KeymanCompilerArtifact, KeymanUrls, isValidEmail, validateMITLicense } from "@keymanapp/developer-utils";
 import { KmpCompiler } from "@keymanapp/kmc-package";
 
 import { SchemaValidators } from "@keymanapp/common-types";
@@ -251,6 +251,9 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
 
     if(kmpJsonData.info.description?.description) {
       keyboard_info.description = kmpJsonData.info.description.description.trim();
+    } else {
+      this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Error_DescriptionIsMissing({filename:sources.kpsFilename}));
+      return null;
     }
 
     // extract the language identifiers from the language metadata arrays for

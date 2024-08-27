@@ -82,7 +82,7 @@ compile_and_copy() {
   local PROFILE_DEST="$KEYMAN_ROOT/web/build/profiling/"
   mkdir -p "$PROFILE_DEST"
   cp "${BUILD_ROOT}/filesize-profile.log"                               "$PROFILE_DEST/web-engine-filesize.log"
-  cp "$KEYMAN_ROOT/common/web/lm-worker/build/filesize-profile.log"     "$PROFILE_DEST/lm-worker-filesize.log"
+  cp "$KEYMAN_ROOT/web/src/engine/predictive-text/worker-thread/build/filesize-profile.log"     "$PROFILE_DEST/lm-worker-filesize.log"
 }
 
 builder_run_action configure verify_npm_setup
