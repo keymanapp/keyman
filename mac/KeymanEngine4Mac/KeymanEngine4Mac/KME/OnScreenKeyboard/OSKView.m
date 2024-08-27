@@ -32,7 +32,7 @@
 @synthesize tag;
 
 - (id)initWithFrame:(NSRect)frame {
-  os_log_debug([KMELogs oskLog], "OSKView initWithFrame: %{public}@", NSStringFromRect(frame));
+  //os_log_debug([KMELogs oskLog], "OSKView initWithFrame: %{public}@", NSStringFromRect(frame));
   self = [super initWithFrame:frame];
   if (self) {
     // Custom initialization

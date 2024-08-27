@@ -252,6 +252,7 @@ NSString* _keymanDataPath = nil;
     // Storing this ensures that if the deactivation is temporary, resulting from dropping down a menu,
     // the OSK will re-display when that client application re-activates.
     _lastServerWithOSKShowing = lastServer;
+    os_log_debug([KMLogs oskLog], "Hiding OSK with setIsVisible:NO");
     [self.oskWindow.window setIsVisible:NO];
   }
   if (self.lowLevelEventTap) {
@@ -268,6 +269,7 @@ NSString* _keymanDataPath = nil;
   }
   // See note in sleepFollowingDeactivationOfServer.
   if (_kvk != nil && (_alwaysShowOSK || _lastServerWithOSKShowing == newServer)) {
+    os_log_debug([KMLogs oskLog], "show osk for wakeUpWith newServer");
     [self showOSK];
   }
   
@@ -945,6 +947,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   [self setSelectedKeyboard:path];
   [self readPersistedOptions];
   if (kvk != nil && self.alwaysShowOSK)
+    os_log_debug([KMLogs oskLog], "show osk window for selecting keyboard from menu");
     [self showOSK];
 }
 
@@ -992,9 +995,9 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (NSWindowController *)oskWindow {
-  if (!_oskWindow)
+  if (!_oskWindow) {
     _oskWindow = [[OSKWindowController alloc] initWithWindowNibName:@"OSKWindowController"];
-  
+  }
   return _oskWindow;
 }
 
@@ -1010,6 +1013,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (void)showOSK {
+  os_log_debug([KMLogs oskLog], "showing osk window");
   [[self.oskWindow window] makeKeyAndOrderFront:nil];
   [[self.oskWindow window] setLevel:NSStatusWindowLevel];
   [[self.oskWindow window] setTitle:self.oskWindowTitle];

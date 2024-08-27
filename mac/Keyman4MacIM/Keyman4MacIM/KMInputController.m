@@ -29,7 +29,9 @@ NSMutableArray *servers;
   if (self) {
     servers = [[NSMutableArray alloc] initWithCapacity:2];
     self.AppDelegate.inputController = self;
+    
     if (self.AppDelegate.kvk != nil && self.AppDelegate.alwaysShowOSK) {
+      os_log_debug([KMLogs oskLog], "show osk window for initWithServer");
       [self.AppDelegate showOSK];
     }
   }
@@ -165,6 +167,7 @@ NSMutableArray *servers;
     [self showConfigurationWindow:sender];
   }
   else if (itag == OSK_MENUITEM_TAG) {
+    os_log_debug([KMLogs oskLog], "show osk window for menuAction");
     [self.AppDelegate showOSK];
   }
   else if (itag == ABOUT_MENUITEM_TAG) {
