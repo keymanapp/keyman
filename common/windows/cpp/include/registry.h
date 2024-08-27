@@ -110,7 +110,7 @@
 #define REGSZ_KeyboardHotkeysAreToggle "hotkeys are toggles"
 #define REGSZ_DeadkeyConversionMode    "deadkey conversion mode"                // CU   // I4552
 #define REGSZ_ZapVirtualKeyCode        "zap virtual key code"   // LM, defaults to 0x0E (_VK_PREFIX_DEFAULT)
-/* Non-chiral use of hotkeys instead of left-only hotkeys */
+/* Default is to only use left modifier in hotkeys trigger */
 #define REGSZ_UseRightModifierHotKey "use right modifier for hotkey"
 
 

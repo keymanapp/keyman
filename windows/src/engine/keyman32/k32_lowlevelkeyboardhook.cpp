@@ -130,7 +130,7 @@ BOOL IsTouchPanelVisible() {
 }
 
 /*
-  Cache UseRightModifierHotKey debug flag for this session
+  Cache UseRightModifierHotKey for this session
 */
 BOOL UseRightModifierHotKey() {
   static BOOL flag_UseRightModifierHotKey = FALSE;
@@ -147,8 +147,6 @@ BOOL UseRightModifierHotKey() {
   }
   return flag_UseRightModifierHotKey;
 }
-
-
 
 LRESULT _kmnLowLevelKeyboardProc(
   _In_  int nCode,
@@ -169,20 +167,14 @@ LRESULT _kmnLowLevelKeyboardProc(
 
   SendDebugMessageFormat("wparam: %x  lparam: %x [vk:%s scan:%x flags:%x extra:%x]", wParam, lParam, Debug_VirtualKey((WORD) hs->vkCode), hs->scanCode, hs->flags, hs->dwExtraInfo);   // I4674
 
-   // #5190: Don't cache modifier state because sometimes we won't receive
-    // modifier change events (e.g. on lock screen)
     FHotkeyShiftState = 0;
 
-    if (GetKeyState(VK_LCONTROL) < 0) {
+  if (GetKeyState(VK_LCONTROL) < 0) {
     FHotkeyShiftState |= HK_CTRL;
-    // TODO remove
-    SendDebugMessageFormat("ProcessHotkey VK_LCONTROL [vkCode:%x isUp:%d FHotkeyShiftState:%x useRight:%d", hs->vkCode, isUp, FHotkeyShiftState, UseRightModifierHotKey());
   }
 
   if (GetKeyState(VK_RCONTROL) < 0) {
     FHotkeyShiftState |= UseRightModifierHotKey() ? HK_CTRL : HK_RCTRL_INVALID;
-    // TODO remove
-    SendDebugMessageFormat("ProcessHotkey VK_RCONTROL [vkCode:%x isUp:%d FHotkeyShiftState:%x useRight:%d", hs->vkCode, isUp, FHotkeyShiftState, UseRightModifierHotKey());
   }
 
   if (GetKeyState(VK_LMENU) < 0) {
@@ -200,10 +192,8 @@ LRESULT _kmnLowLevelKeyboardProc(
     FHotkeyShiftState |= UseRightModifierHotKey() ? HK_SHIFT : HK_RSHIFT_INVALID;
   }
 
-
-    //TODO: #8064. Can remove debug message once issue #8064 is resolved
-    SendDebugMessageFormat("!UseCachedHotkeyModifierState [FHotkeyShiftState:%x]", FHotkeyShiftState);
-
+  //TODO: #8064. Can remove debug message once issue #8064 is resolved
+  SendDebugMessageFormat("!UseCachedHotkeyModifierState [FHotkeyShiftState:%x]", FHotkeyShiftState);
 
   // #7337 Post the modifier state ensuring the serialized queue is in sync
   // Note that the modifier key may be posted again with WM_KEYMAN_KEY_EVENT,
@@ -287,30 +277,24 @@ BOOL ProcessHotkey(UINT vkCode, BOOL isUp, DWORD ShiftState) {
 
   Hotkeys *hotkeys = Hotkeys::Instance();   // I4641
   if (!hotkeys) {
-    SendDebugMessageFormat("Failed to get Instance");
     return FALSE;
   }
 
   Hotkey *hotkey = hotkeys->GetHotkey(ShiftState | vkCode);   // I4641
   if (!hotkey) {
-    SendDebugMessageFormat("GetHotkey Null");
     return FALSE;
   }
 
   if (isUp) {
-    SendDebugMessageFormat("Is Up");
     return TRUE;
   }
 
   if (hotkey->HotkeyType == hktInterface) {
-    SendDebugMessageFormat("PostMasterController");
     Globals::PostMasterController(wm_keyman_control, MAKELONG(KMC_INTERFACEHOTKEY, hotkey->Target), 0);
   }
   else {
-    SendDebugMessageFormat("ReportKeyboardChanged");
     ReportKeyboardChanged(PC_HOTKEYCHANGE, hotkey->hkl == 0 ? TF_PROFILETYPE_INPUTPROCESSOR : TF_PROFILETYPE_KEYBOARDLAYOUT, 0, hotkey->hkl, GUID_NULL, hotkey->profileGUID);
   }
-  SendDebugMessageFormat("PostDummyKeyEvent");
   /* Generate a dummy keystroke to block menu activations, etc but let the shift key through */
   PostDummyKeyEvent();  // I3301 - this is imperfect because we don't deal with HC_NOREMOVE.  But good enough?   // I3534   // I4844
 

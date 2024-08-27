@@ -379,8 +379,8 @@
 
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
-  <!-- Introduced: 18.0.91 -->
-  <string name="koRightModifierHK" comment="General options - Right Ctrl Alt and Shift Work for HotKey">Right Modifier keys work with Hotkeys</string>
+  <!-- Introduced: 18.0.95 -->
+  <string name="koRightModifierHK" comment="General options - Right Ctrl Alt and Shift trigger hotkey">Right-side modifier keys trigger hotkeys</string>
 
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
