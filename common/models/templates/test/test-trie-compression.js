@@ -70,11 +70,7 @@ TEST_DATA.LEAVES = {
     original: {
       type: 'leaf',
       weight: 8,
-      entries: [{
-        key: 'four',
-        content: 'four',
-        weight: 8
-      }]
+      entries: [TEST_DATA.ENTRIES.four.original]
     }
   }
 }
@@ -94,7 +90,7 @@ TEST_DATA.NODES = {
       type: 'internal',
       weight: 8,
       values: ['r'],
-      children: {r: TEST_DATA.LEAVES.four.decompressed}
+      children: {r: TEST_DATA.LEAVES.four.original}
     }
   }
 }
@@ -134,12 +130,7 @@ describe('Trie compression', function() {
   });
 
   describe('Leaf nodes', () => {
-    it('compresses (mocked Entry)', () => {
-      // Should not attempt to recompress the mock-compressed entry.
-      assert.equal(compressNode(TEST_DATA.LEAVES.four.decompressed), TEST_DATA.LEAVES.four.compressed);
-    });
-
-    it('compresses (unmocked Entry)', () => {
+    it('compresses itself and represented entries', () => {
       assert.equal(compressNode(TEST_DATA.LEAVES.four.original), TEST_DATA.LEAVES.four.compressed);
     });
   });

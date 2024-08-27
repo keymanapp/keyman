@@ -8,8 +8,14 @@ import { Entry, InternalNode, Leaf, Node } from "./trie.js";
 export const ENCODED_NUM_BASE = 0x0020;
 export const SINGLE_CHAR_RANGE = Math.pow(2, 16) - ENCODED_NUM_BASE;
 
-const WEIGHT_WIDTH = 2;
+/**
+ * The number of characters allocated to representing the total length of a node or entry.
+ */
 const NODE_SIZE_WIDTH = 2;
+/**
+ * The number of characters allocated to representing the weight (frequency) of entries.
+ */
+const WEIGHT_WIDTH = 2;
 
 export function decompressNumber(str: string, start: number, end: number) {
   end ??= str.length;
@@ -45,13 +51,18 @@ export function compressNumber(num: number, width?: number) {
   return compressed;
 }
 
+/**
+ * Length of the 'header' section for encoded entries, representing the
+ * total size for the entry + its weight.
+ */
 const ENTRY_HEADER_WIDTH = NODE_SIZE_WIDTH + WEIGHT_WIDTH;
 
 // encoded ENTRY:
 // - entryLen: 2 char
 //   - total encoded size of the entry, including `entryLen`
 //   - as raw, concatenated string data - no JSON.stringify action taken.
-// - weight: 2? chars (with quote-offset on each char?)
+// - weight: 2 chars
+//   - frequency of the entry
 // - contentLen: safe to infer from all other values
 // - content: string: from [header+4] to [header+4 + contentLen - 1]
 //
@@ -89,16 +100,21 @@ export function decompressEntry(str: string, keyFunction: Wordform2Key, baseInde
 }
 
 
-// BOTH node types: totalLen: 2 chars (fixed position, size) - size of the
-// encoded node.  weight: number - could be encoded.
-// - 2^32 ~= 4*10^9, representable in 2 chars... if it weren't for `"`-escaping.
-// - 2^64 ~= 1.8*10^19 - surely far, far more than enough.
+// BOTH node types:
+// - totalLen: 2 chars (fixed position, size) - size of the encoded node.
+// - weight: weight of the highest frequency entry within the node's sub-trie.
+//     - 2^32 ~= 4*10^9, representable in 2 chars... if it weren't for
+//       `"`-escaping.
 //
-// Next char:
-//   indicates BOTH a count of something (entries or direct children) and a
-//   high-bit indicating 'leaf' or 'internal'.
+// Next char: indicates BOTH a count of something (entries or direct children)
+//   and a high-bit indicating 'leaf' or 'internal'.
 // - function of other bits will be indicated by their sections.
 
+/**
+ * Length of the 'header' section for encoded leaf and internal nodes, representing the
+ * total size for their children/entries + the weight of the highest-frequency entry
+ * represented by each node's represented sub-trie.
+ */
 export const NODE_TYPE_INDEX = NODE_SIZE_WIDTH + WEIGHT_WIDTH;
 
 export function compressNode(node: Node) {
@@ -237,7 +253,7 @@ function decompressInternal(str: string, baseIndex: number): Omit<InternalNode, 
 
   let compressedChildren: {[char: string]: string} = {};
   for(let i = 0; i < childCnt; i++) {
-    const childWidth = decompressNumber(str, baseIndex, baseIndex+2);
+    const childWidth = decompressNumber(str, baseIndex, baseIndex+NODE_SIZE_WIDTH);
     nextIndex = baseIndex + childWidth;
     compressedChildren[values[i]] = str.substring(baseIndex, nextIndex);
     baseIndex = nextIndex;
