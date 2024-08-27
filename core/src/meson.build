@@ -118,6 +118,7 @@ api_files = files(
   'km_core_state_api.cpp',
   'km_core_debug_api.cpp',
   'km_core_processevent_api.cpp',
+  'wasm.cpp',
 )
 
 core_files = files(
@@ -132,6 +133,16 @@ core_files = files(
 mock_files = files(
   'mock/mock_processor.cpp',
 )
+
+if cpp_compiler.get_id() == 'emscripten'
+  host_links = ['--whole-archive', '-sALLOW_MEMORY_GROWTH=1', '-sMODULARIZE=1',
+    '-sEXPORT_ES6', '-sENVIRONMENT=webview',
+    '--emit-tsd', 'core-interface.d.ts', '-sERROR_ON_UNDEFINED_SYMBOLS=0']
+
+  links += ['-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\',\'stringToNewUTF8\',\'wasmExports\']',
+      # Forcing inclusion of debug symbols
+      '-g', '-Wlimited-postlink-optimizations', '--bind']
+endif
 
 lib = library('keymancore',
   api_files,
@@ -160,3 +171,24 @@ pkg.generate(
     description: 'Keyman processor for KMN keyboards.',
     subdirs: headerdirs,
     libraries: lib)
+
+if cpp_compiler.get_id() == 'emscripten'
+  # Build an executable
+  host = executable('core',
+    cpp_args: defns,
+    include_directories: inc,
+    link_args: links + host_links,
+    objects: lib.extract_all_objects(recursive: false))
+
+  if get_option('buildtype') == 'release'
+    # TODO: #12888
+    # Split debug symbols into separate wasm file for release builds only
+    # as the release symbols will be uploaded to sentry
+    # custom_target('core.wasm',
+    #   depends: host,
+    #   input: host,
+    #   output: 'core.wasm',
+    #   command: ['wasm-split', '@OUTDIR@/core.wasm', '-o', '@OUTPUT@', '--strip', '--debug-out=@OUTDIR@/core.debug.wasm'],
+    #   build_by_default: true)
+  endif
+endif
