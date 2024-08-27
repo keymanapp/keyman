@@ -40,7 +40,6 @@ _comp_builder() {
   IFS=" " read -r -a targets <<< "$target_str"
   IFS=" " read -r -a options <<< "$option_str"
 
-  # echo "current_token=$current_token"
   local action target
   if [[ $current_token =~ : ]]; then
     IFS=: read -r action target <<< "$current_token"
@@ -49,10 +48,6 @@ _comp_builder() {
     action="$current_token"
     target=
   fi
-
-  # echo ""
-  # echo "\$action=$action"
-  # echo "\$target=$target"
 
   local all=()
   # If there is no $action component, it's a standalone target.
@@ -92,8 +87,6 @@ _comp_builder() {
 
     # Now, complete from that.
     all+="${actiontargets[@]}"
-    # echo
-    # echo "$all"
     COMPREPLY=( $(compgen -W "${all[@]}" -- "${current_token}") )
 
     # bash doesn't handle completion with colons well; we should remove the
