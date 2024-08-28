@@ -92,13 +92,18 @@ export default class TrieModel implements LexicalModel {
 
   readonly applyCasing?: CasingFunction;
 
-  constructor(trieData: {root: Node, totalWeight: number}, options: TrieModelOptions = {}) {
+  constructor(trieData: {root: Node, totalWeight: number}, options?: TrieModelOptions);
+  constructor(trieData: {data: string, totalWeight: number}, options?: TrieModelOptions);
+  constructor(trieData: {root: Node, totalWeight: number} | {data: string, totalWeight: number}, options: TrieModelOptions = {}) {
     this.languageUsesCasing = options.languageUsesCasing;
     this.applyCasing = options.applyCasing;
 
+    // @ts-ignore
+    const trieDataSrc: Node | string = trieData.data || trieData.root;
+
     this._trie = new Trie(
-      trieData['root'],
-      trieData['totalWeight'],
+      trieDataSrc,
+      trieData.totalWeight,
       options.searchTermToKey as Wordform2Key || defaultSearchTermToKey
     );
     this.breakWords = options.wordBreaker || defaultWordBreaker;
