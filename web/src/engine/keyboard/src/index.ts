@@ -33,6 +33,8 @@ export * from "./keyEvent.js";
 export { default as KeyMapping } from "./keyMapping.js";
 export { OutputTarget } from "./outputTarget.interface.js";
 
+export { LazySpan } from "./lazySpan.js";
+
 export * from "@keymanapp/web-utils";
 
 // At the top level, there should be no default export.
