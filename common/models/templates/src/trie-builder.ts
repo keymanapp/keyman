@@ -1,4 +1,5 @@
 import { SENTINEL_CODE_UNIT, Wordform2Key } from "./common.js";
+import { compressNode } from "./trie-compression.js";
 import { Entry, InternalNode, Leaf, Node, Trie, sortNode } from "./trie.js";
 
 export function createRootNode(): Node {
@@ -142,5 +143,9 @@ export class TrieBuilder extends Trie {
 
   getTotalWeight(): number {
     return this.totalWeight;
+  }
+
+  compress(): string {
+    return compressNode(this.root);
   }
 }
