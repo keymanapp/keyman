@@ -18,15 +18,14 @@ NSString *const kAlwaysShowOSKKey = @"KMAlwaysShowOSKKey";
 NSString *const kUseVerboseLogging = @"KMUseVerboseLogging";
 
 /**
- The following constant "KMSavedStoresKey" is left here for documentation
- though we have abandoned stores written to UserDefaults with this key because
- they used a less-reliable numeric key prior to integration with Keyman Core.
- It is replaced by the renamed "KMPersistedOptionsKey" which directly
- represents what it is saving.
+ * The following constant "KMSavedStoresKey" is left here for documentation
+ * though we have abandoned stores written to UserDefaults with this key because
+ * they used a less-reliable numeric key prior to integration with Keyman Core.
+ * It is replaced by the renamed "KMPersistedOptionsKey" which directly
+ * represents what it is saving.
  */
 NSString *const kKMDeprecatedPersistedOptionsKey = @"KMSavedStoresKey";
 
-//NSString *const kObsoletePathComponent = @"/Documents/";
 NSString *const kObsoletePathComponent = @"/Documents/Keyman-Keyboards";
 NSString *const kNewPathComponent = @"/Library/Application Support/keyman.inputmethod.Keyman/";
 
@@ -152,7 +151,7 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirec
   return activeKeyboards;
 }
 
-/*
+/**
  * returns dictionary of persisted options for the single selected keyboard
  */
 - (NSDictionary *)readOptionsForSelectedKeyboard {
@@ -170,7 +169,7 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirec
   return selectedOptionsMap;
 }
 
-/*
+/**
  * returns dictionary of all persisted options for all keyboards
  * (options are stored in UserDefaults as a map of maps)
  */
