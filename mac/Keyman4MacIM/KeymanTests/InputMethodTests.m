@@ -18,23 +18,27 @@
 #import <os/log.h>
 
 KMInputMethodEventHandler *testEventHandler = nil;
+id testClient = nil;
 
 @interface InputMethodTests : XCTestCase
 @end
 
 @interface KMInputMethodEventHandler (Testing)
-
+@property (nonatomic, retain) TextApiCompliance* apiCompliance;
+@property (nonatomic, retain) NSString* clientApplicationId;
+@property BOOL contextChanged;
 - (instancetype)initWithClient:(NSString *)clientAppId client:(id) sender;
 - (NSRange) calculateInsertRangeForDeletedText:(NSString*)textToDelete selectionRange:(NSRange) selection;
+- (void)checkTextApiCompliance:(id)client;
 
 @end
 
 @implementation InputMethodTests
 
 - (void)setUp {
-  id client = [[AppleCompliantTestClient alloc] init];
+  testClient = [[AppleCompliantTestClient alloc] init];
   NSString *clientAppId = @"com.compliant.app";
-  testEventHandler = [[KMInputMethodEventHandler alloc]initWithClient:clientAppId client:client];
+  testEventHandler = [[KMInputMethodEventHandler alloc]initWithClient:clientAppId client:testClient];
 }
 
 - (void)tearDown {
@@ -88,18 +92,43 @@ KMInputMethodEventHandler *testEventHandler = nil;
   XCTAssertTrue(correctResult, @"insert or replacement range expected to be {1,2}");
 }
 
-- (void)testMigrateData_oldDataExists_logsLocations {
-  os_log_t startupLog = os_log_create("com.keyman.app", "data-migration");
-  if ([KMSettingsRepository.shared dataMigrationNeeded]) {
-    os_log_info(startupLog, "data migration needed, calling migrateData");
-    [KMDataRepository.shared migrateData];
-    os_log_info(startupLog, "test: call migrateData again");
-    [KMDataRepository.shared migrateData];
-  } else {
-    os_log_info(startupLog, "data migration not needed");
-  }
+/**
+ * test compliance check of a KMInputMethodEventHandler with a nil client application ID
+ * not sure if this can ever happen, but the lifecycle of the input method is not 100% clear,
+ * and we would like this scenario, if it can occur, to not result in a crash
+ */
+- (void)testCheckCompliance_withUnknownApplicationId_createsComplianceObject {
+  id client = [[AppleCompliantTestClient alloc] init];
+  KMInputMethodEventHandler *eventHandler = [[KMInputMethodEventHandler alloc]initWithClient:nil client:client];
+  [eventHandler checkTextApiCompliance:client];
+  XCTAssertNotNil(eventHandler.apiCompliance, @"apiCompliance object was not created");
+}
 
-  XCTAssertTrue(YES, @"test failed");
+- (void)testCheckCompliance_withNilComplianceObject_createsComplianceObject {
+  [testEventHandler checkTextApiCompliance:testClient];
+  XCTAssertNotNil(testEventHandler.apiCompliance, @"apiCompliance object was not created");
+}
+
+- (void)testCheckCompliance_withChangedClientApplicationId_createsNewComplianceObject {
+  // first call causes textApiCompliance object to be created
+  [testEventHandler checkTextApiCompliance:testClient];
+  TextApiCompliance *originalComplianceObject = testEventHandler.apiCompliance;
+  
+  testEventHandler.clientApplicationId = @"com.different.app";
+  // second call causes new textApiCompliance object to be created due to stale application ID
+  [testEventHandler checkTextApiCompliance:testClient];
+  XCTAssertNotEqualObjects(originalComplianceObject, testEventHandler.apiCompliance, @"New TextApiCompliance object not created for new client application ID");
+}
+
+- (void)testCheckCompliance_withContextChanged_createsNewComplianceObject {
+  // first call causes textApiCompliance object to be created
+  [testEventHandler checkTextApiCompliance:testClient];
+  TextApiCompliance *originalComplianceObject = testEventHandler.apiCompliance;
+  
+  testEventHandler.contextChanged = YES;
+  // second call causes new textApiCompliance object to be created due to setting contextChanged flag
+  [testEventHandler checkTextApiCompliance:testClient];
+  XCTAssertNotEqualObjects(originalComplianceObject, testEventHandler.apiCompliance, @"New TextApiCompliance object not created after contextChanged flag set");
 }
 
 @end

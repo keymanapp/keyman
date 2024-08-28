@@ -866,6 +866,7 @@ builder_describe() {
         IFS="=" read -r -a sub <<< "$value"
         target_path="${sub[@]:1}"
         value="${sub[0]}"
+        original_value="$value"
         if [[ ! -d "$THIS_SCRIPT_PATH/$target_path" ]]; then
           builder_die "Target path '$target_path' for $value does not exist."
         fi

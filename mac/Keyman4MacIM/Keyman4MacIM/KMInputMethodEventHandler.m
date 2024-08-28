@@ -243,17 +243,6 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
       // return NO to pass through to client app
       return NO;
     }
-
-    // TODO: remove test code
-    /*
-    if (event.keyCode == kVK_ANSI_Slash) {
-      if ([KMSettingsRepository.shared keyboardsMigrationNeeded]) {
-        os_log_info([KMLogs startupLog], "keyboards migration needed");
-      } else {
-        os_log_info([KMLogs startupLog], "keyboards migration not needed");
-      }
-    }
-     */
   }
   
   if (event.type == NSEventTypeFlagsChanged) {

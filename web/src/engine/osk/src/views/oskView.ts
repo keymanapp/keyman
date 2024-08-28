@@ -16,16 +16,17 @@ import {
   Keyboard,
   KeyboardProperties,
   ManagedPromise,
-  type MinimalCodesInterface,
-  type MutableSystemStore,
-  type SystemStoreMutationHandler
-} from '@keymanapp/keyboard-processor';
+  type MinimalCodesInterface
+} from 'keyman/engine/keyboard';
 import { createUnselectableElement, getAbsoluteX, getAbsoluteY, StylesheetManager } from 'keyman/engine/dom-utils';
-import { EventListener, KeyEventHandler, KeyEventSourceInterface, LegacyEventEmitter } from 'keyman/engine/events';
+import { EventListener, LegacyEventEmitter } from 'keyman/engine/events';
+import { type MutableSystemStore, type SystemStoreMutationHandler } from 'keyman/engine/js-processor';
 
 import Configuration from '../config/viewConfiguration.js';
 import Activator, { StaticActivator } from './activator.js';
 import TouchEventPromiseMap from './touchEventPromiseMap.js';
+import { KeyEventHandler, KeyEventSourceInterface } from './keyEventSource.interface.js';
+import { DEFAULT_GESTURE_PARAMS, GestureParams } from '../input/gestures/specsForLayout.js';
 
 // These will likely be eliminated from THIS file at some point.\
 
@@ -173,6 +174,18 @@ export default abstract class OSKView
   };
 
   /**
+   * Provides the current parameterization for timings and distances used by
+   * any gesture-supporting keyboards.  Changing properties of its objects will
+   * automatically update keyboards to use the new configuration.
+   *
+   * If `gestureParams` was set in the configuration object passed in at
+   * construction time, this will be the same instance.
+   */
+  get gestureParams(): GestureParams {
+    return this.config.gestureParams;
+  }
+
+  /**
    * The configured width for this OSKManager.  May be `undefined` or `null`
    * to allow automatic width scaling.
    */
@@ -216,6 +229,8 @@ export default abstract class OSKView
 
     // Clone the config; do not allow object references to be altered later.
     this.config = configuration = {...configuration};
+    // If gesture parameters were not provided in advance, initialize them from defaults.
+    this.config.gestureParams ||= DEFAULT_GESTURE_PARAMS;
 
     // `undefined` is falsy, but we want a `true` default behavior for this config property.
     if(this.config.allowHideAnimations === undefined) {
@@ -820,7 +835,8 @@ export default abstract class OSKView
         family: 'SpecialOSK',
         files: [`${resourcePath}/keymanweb-osk.ttf`],
         path: '' // Not actually used.
-      }
+      },
+      gestureParams: this.config.gestureParams
     });
 
     vkbd.on('keyevent', (keyEvent, callback) => this.emit('keyevent', keyEvent, callback));

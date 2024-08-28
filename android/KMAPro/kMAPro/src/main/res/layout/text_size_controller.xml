@@ -15,7 +15,7 @@
         android:layout_marginStart="5dp"
         android:layout_marginEnd="5dp"
         android:contentDescription="@string/ic_text_size_down"
-        android:src="@drawable/ic_light_dialog_textsize_down" />
+        android:src="@drawable/ic_action_decrement" />
 
     <SeekBar
         android:id="@+id/seekBar"
@@ -32,6 +32,6 @@
         android:layout_marginStart="5dp"
         android:layout_marginEnd="5dp"
         android:contentDescription="@string/ic_text_size_up"
-        android:src="@drawable/ic_light_dialog_textsize_up" />
+        android:src="@drawable/ic_action_increment" />
 
 </LinearLayout>

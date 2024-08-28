@@ -1,8 +1,5 @@
-/**
+/*
  * Keyman is copyright (C) SIL International. MIT License.
- *
- * KMSettingsRepository.h
- * Keyman
  *
  * Created by Shawn Schantz on 2024-07-29.
  *
@@ -40,6 +37,7 @@ NSString *const kNewPathComponent = @"/Library/Application Support/keyman.inputm
  */
 NSString *const kDataModelVersion = @"KMDataModelVersion";
 NSInteger const kVersionStoreDataInLibraryDirectory = 1;
+NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirectory;
 
 @implementation KMSettingsRepository
 
@@ -54,7 +52,7 @@ NSInteger const kVersionStoreDataInLibraryDirectory = 1;
 }
 
 - (void)setDataModelVersionIfNecessary {
-  if (![self dataStoredInLibraryDirectory]) {
+  if (![self dataModelWithKeyboardsInLibrary]) {
     [[NSUserDefaults standardUserDefaults] setInteger:kVersionStoreDataInLibraryDirectory forKey:kDataModelVersion];
   }
 }
@@ -107,28 +105,33 @@ NSInteger const kVersionStoreDataInLibraryDirectory = 1;
 }
 
 /**
- * For the first numbered version of the data model, the app stores the keyboards under the /Library directory
- * For versions before version 1, the keyboards were stored under the /Documents directory.
+ * For the first numbered version of the data model, the app stores the keyboards under the ~/Library directory
+ * For versions before version 1, the keyboards were stored under the ~/Documents directory.
  */
-- (BOOL)dataStoredInLibraryDirectory
-{
-  return [[NSUserDefaults standardUserDefaults] integerForKey:kDataModelVersion] == kVersionStoreDataInLibraryDirectory;
+- (BOOL)dataModelWithKeyboardsInLibrary {
+  // [NSUserDefaults integerForKey] returns zero if the key does not exist
+  NSInteger dataModelVersion = [[NSUserDefaults standardUserDefaults] integerForKey:kDataModelVersion];
+  
+  return dataModelVersion >= kVersionStoreDataInLibraryDirectory;
 }
 
 /**
- * Determines whether the keyboard data needs to be moved from the old location in ~/Documents to the new location ~/Library...
+ * Determines whether the keyboard data needs to be moved from the old location to the new location
  * This is true if
  * 1) the UserDefaults exist (indicating that this is not a new installation of Keyman) and
- * 2) the value  for KMStoreKeyboardsInLibraryKey is not set to true
+ * 2) the value for kVersionStoreDataInLibraryDirectory is < 1,
  */
 - (BOOL)dataMigrationNeeded {
   BOOL keymanSettingsExist = [self settingsExist];
-  os_log([KMLogs dataLog], "  keyman settings exist: %{public}@", keymanSettingsExist ? @"YES" : @"NO" );
+  os_log([KMLogs dataLog], "keyman settings exist: %{public}@", keymanSettingsExist ? @"YES" : @"NO" );
   
-  BOOL dataInLibrary = [self dataStoredInLibraryDirectory];
-  os_log([KMLogs dataLog], "  data stored in Library: %{public}@", dataInLibrary ? @"YES" : @"NO" );
+  BOOL keyboardsStoredInLibrary = [self dataModelWithKeyboardsInLibrary];
+  os_log([KMLogs dataLog], "settings indicate that keyboards are stored in ~/Library: %{public}@", keyboardsStoredInLibrary ? @"YES" : @"NO" );
   
-  return !(keymanSettingsExist && dataInLibrary);
+  BOOL migrationNeeded = keymanSettingsExist && !keyboardsStoredInLibrary;
+  os_log([KMLogs dataLog], "dataMigrationNeeded: %{public}@", migrationNeeded ? @"YES" : @"NO" );
+
+  return migrationNeeded;
 }
 
 - (NSString *)readSelectedKeyboard {

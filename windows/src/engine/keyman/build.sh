@@ -8,6 +8,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 builder_describe "Keyman main host process (32-bit)" \
   @/common/include \
   @/common/windows/delphi \
+  @/windows/src/global/delphi \
   clean configure build test publish install debug-manifest
 
 builder_parse "$@"

@@ -164,43 +164,43 @@ VKey_to_Iso = {
 }
 
 
-def bytecheck(value, check):
+def _bytecheck(value, check):
     if bytes([value & check[0]]) == check:
         return True
     else:
         return False
 
 
-def get_nkey(file, fileContent, offset):
+def _get_nkey(file, fileContent, offset):
     nkey = NKey()
     data = struct.unpack_from("<B2H", fileContent, offset)
 
     nkey.flags = data[0]
-    nkey.hasBitmap = bytecheck(data[0], kvkkBitmap)
-    nkey.hasUnicode = bytecheck(data[0], kvkkUnicode)
+    nkey.hasBitmap = _bytecheck(data[0], kvkkBitmap)
+    nkey.hasUnicode = _bytecheck(data[0], kvkkUnicode)
 
     nkey.shiftflags = data[1]
     if data[1] == 0:
         nkey.Normal = True
-    nkey.Shift = bytecheck(data[1], KVKS_SHIFT)
-    nkey.Ctrl = bytecheck(data[1], KVKS_CTRL)
-    nkey.Alt = bytecheck(data[1], KVKS_ALT)
-    nkey.LCtrl = bytecheck(data[1], KVKS_LCTRL)
-    nkey.RCtrl = bytecheck(data[1], KVKS_RCTRL)
-    nkey.LAlt = bytecheck(data[1], KVKS_LALT)
-    nkey.RAlt = bytecheck(data[1], KVKS_RALT)
+    nkey.Shift = _bytecheck(data[1], KVKS_SHIFT)
+    nkey.Ctrl = _bytecheck(data[1], KVKS_CTRL)
+    nkey.Alt = _bytecheck(data[1], KVKS_ALT)
+    nkey.LCtrl = _bytecheck(data[1], KVKS_LCTRL)
+    nkey.RCtrl = _bytecheck(data[1], KVKS_RCTRL)
+    nkey.LAlt = _bytecheck(data[1], KVKS_LALT)
+    nkey.RAlt = _bytecheck(data[1], KVKS_RALT)
 
     nkey.VKey = data[2]
 
-    nkey.text, newoffset = get_nstring(file, fileContent, offset + struct.calcsize("<B2H"))
-    nkey.bitmap, newoffset = get_nbitmap(file, fileContent, newoffset)
+    nkey.text, newoffset = _get_nstring(file, fileContent, offset + struct.calcsize("<B2H"))
+    nkey.bitmap, newoffset = _get_nbitmap(file, fileContent, newoffset)
 
     return nkey, newoffset
 
 
-def get_nfont(file, fileContent, offset):
+def _get_nfont(file, fileContent, offset):
     nfont = NFont()
-    nfont.name, curoffset = get_nstring(file, fileContent, offset)
+    nfont.name, curoffset = _get_nstring(file, fileContent, offset)
     data = struct.unpack_from("<L4B", fileContent, curoffset)
     nfont.resv = data[4]
     nfont.blue = data[1]
@@ -210,7 +210,7 @@ def get_nfont(file, fileContent, offset):
     return nfont, curoffset + struct.calcsize("<L4B")
 
 
-def get_nstring(file, fileContent, offset):
+def _get_nstring(file, fileContent, offset):
     stringlength = struct.unpack_from("<H", fileContent, offset)
     file.seek(offset + 2)
     if stringlength[0] > 256:
@@ -224,7 +224,7 @@ def get_nstring(file, fileContent, offset):
     return stringdata.decode('utf-16'), offset + 2 + (2 * stringlength[0])
 
 
-def get_nbitmap(file, fileContent, offset):
+def _get_nbitmap(file, fileContent, offset):
     bitmap = None
     bitmaplength = struct.unpack_from("<I", fileContent, offset)
     file.seek(offset + struct.calcsize("<I"))
@@ -283,31 +283,31 @@ def print_kvk(kvkData, allkeys=False):
             print("  text:", key.text)
 
 
-def plus_join(modifier, name):
+def _plus_join(modifier, name):
     if modifier:
         modifier = modifier + "+"
     modifier = modifier + name
     return modifier
 
 
-def get_modifer(key):
+def _get_modifer(key):
     modifier = ""
     if key.Normal:
         return "None"
     if key.Shift:
-        modifier = plus_join(modifier, "shift")
+        modifier = _plus_join(modifier, "shift")
     if key.Ctrl:
-        modifier = plus_join(modifier, "ctrl")
+        modifier = _plus_join(modifier, "ctrl")
     if key.Alt:
-        modifier = plus_join(modifier, "alt")
+        modifier = _plus_join(modifier, "alt")
     if key.LCtrl:
-        modifier = plus_join(modifier, "ctrlL")
+        modifier = _plus_join(modifier, "ctrlL")
     if key.RCtrl:
-        modifier = plus_join(modifier, "ctrlR")
+        modifier = _plus_join(modifier, "ctrlR")
     if key.LAlt:
-        modifier = plus_join(modifier, "altL")
+        modifier = _plus_join(modifier, "altL")
     if key.RAlt:
-        modifier = plus_join(modifier, "altR")
+        modifier = _plus_join(modifier, "altR")
     return modifier
 
 
@@ -315,7 +315,7 @@ def convert_ldml(kvkData):
     keymaps = {}
 
     for key in kvkData.Keys:
-        modifier = get_modifer(key)
+        modifier = _get_modifer(key)
         if modifier in keymaps:
             keymaps[modifier] = keymaps[modifier] + (key,)
         else:
@@ -381,20 +381,20 @@ def parse_kvk_file(kvkfile):
             kvkstart = struct.unpack_from("<4s4cc", fileContent, 0)
             kvkData.version = (kvkstart[1], kvkstart[2], kvkstart[3], kvkstart[4])
             kvkData.flags = kvkstart[5]
-            kvkData.key102 = bytecheck(kvkData.flags[0], kvkk102key)
-            kvkData.DisplayUnderlying = bytecheck(kvkData.flags[0], kvkkDisplayUnderlying)
-            kvkData.UseUnderlying = bytecheck(kvkData.flags[0], kvkkUseUnderlying)
-            kvkData.AltGr = bytecheck(kvkData.flags[0], kvkkAltGr)
+            kvkData.key102 = _bytecheck(kvkData.flags[0], kvkk102key)
+            kvkData.DisplayUnderlying = _bytecheck(kvkData.flags[0], kvkkDisplayUnderlying)
+            kvkData.UseUnderlying = _bytecheck(kvkData.flags[0], kvkkUseUnderlying)
+            kvkData.AltGr = _bytecheck(kvkData.flags[0], kvkkAltGr)
 
-            kvkData.AssociatedKeyboard, newoffset = get_nstring(file, fileContent, struct.calcsize("<4s4cc"))
-            kvkData.AnsiFont, newoffset = get_nfont(file, fileContent, newoffset)
-            kvkData.UnicodeFont, newoffset = get_nfont(file, fileContent, newoffset)
+            kvkData.AssociatedKeyboard, newoffset = _get_nstring(file, fileContent, struct.calcsize("<4s4cc"))
+            kvkData.AnsiFont, newoffset = _get_nfont(file, fileContent, newoffset)
+            kvkData.UnicodeFont, newoffset = _get_nfont(file, fileContent, newoffset)
             numkeys = struct.unpack_from("I", fileContent, newoffset)
             kvkData.KeyCount = numkeys[0]
             newoffset = newoffset + struct.calcsize("I")
 
             for num in range(numkeys[0]):
-                nkey, newoffset = get_nkey(file, fileContent, newoffset)
+                nkey, newoffset = _get_nkey(file, fileContent, newoffset)
                 nkey.number = num
                 kvkData.Keys.append(nkey)
     except Exception as e:
