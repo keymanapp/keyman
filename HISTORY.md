@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.100 alpha 2024-08-28
+
+* fix(windows): check IM window will be in a visible location (#11967)
+
 ## 18.0.99 alpha 2024-08-27
 
 * feat(web): import the generator for the pred-text wordbreaker's Unicode-property data-table (#10690)
