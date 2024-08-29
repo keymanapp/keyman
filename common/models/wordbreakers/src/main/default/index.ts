@@ -66,7 +66,7 @@ export default function default_(text: string, options?: DefaultWordBreakerOptio
 /**
  * A span that does not cut out the substring until it absolutely has to!
  */
-class LazySpan implements Span {
+export class LazySpan implements Span {
   private _source: string;
   readonly start: number;
   readonly end: number;
