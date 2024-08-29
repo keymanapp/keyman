@@ -394,7 +394,9 @@ const KMX_WCHAR* u16ltrim(const KMX_WCHAR* p) {
 }
 
 KMX_WCHAR* u16rtrim(KMX_WCHAR *p) {
-  PKMX_WCHAR q = p + u16len(p);
+  if (!p || (u16len(p) == 0)) return p;
+  PKMX_WCHAR q = p + u16len(p) - 1;
+
   if (iswspace(*q)) {
     while (iswspace(*q) && q > p) q--;
     if (!iswspace(*q)) q++;
