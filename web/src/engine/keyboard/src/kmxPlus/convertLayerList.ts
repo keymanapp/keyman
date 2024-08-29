@@ -25,6 +25,10 @@ function nameFromModifier(code: number) {
     }
   }
 
+  if(code == 0) {
+    return 'default';
+  }
+
   return '';
 }
 
