@@ -3,14 +3,14 @@ import sinon from 'sinon';
 
 import * as PromiseStatusModule from 'promise-status-async';
 const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
-import { assertingPromiseStatus as promiseStatus } from '../../../resources/assertingPromiseStatus.js';
+import { assertingPromiseStatus as promiseStatus } from '../../../../../resources/assertingPromiseStatus.js';
 
-import { simulateMultiSourceMatcherInput, simulateSelectorInput } from "../../../resources/simulateMultiSourceInput.js";
+import { simulateMultiSourceMatcherInput, simulateSelectorInput } from "../../../../../resources/simulateMultiSourceInput.js";
 
 import { timedPromise } from '@keymanapp/web-utils';
 import { gestures } from '@keymanapp/gesture-recognizer';
 
-import { TouchpathTurtle } from '#tools';
+import { TouchpathTurtle } from '#gesture-tools';
 
 type MatcherSelection<Type> = gestures.matchers.MatcherSelection<Type>;
 type GestureModel<Type> = gestures.specs.GestureModel<Type>;

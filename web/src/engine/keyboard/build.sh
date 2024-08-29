@@ -66,12 +66,6 @@ function do_build() {
     --format   esm \
     --platform node
 
-  # # Tests
-  # builder_echo "Bundle tests"
-  # ${BUNDLE_CMD} "${BUILD_DIR}/tests/dom/cases/domKeyboardLoader.spec.js" \
-  #   --out       "${BUILD_DIR}/tests/dom/domKeyboardLoader.spec.mjs" \
-  #   --format   esm
-
   # Declaration bundling.
   builder_echo "Declaration bundling"
   tsc --emitDeclarationOnly --outFile "${BUILD_DIR}/lib/index.d.ts"

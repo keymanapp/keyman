@@ -1,5 +1,5 @@
 {
-  "extends": "../tsconfig.kmw-main-base.json",
+  "extends": "../../../../tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": "./",
     "lib": [ "dom", "es6" ],
@@ -8,8 +8,8 @@
     "tsBuildInfoFile": "./build/obj/tsconfig.tsbuildinfo",
   },
   "include": ["./src/engine/**/*.ts"],
-  "exclude": ["./src/test/**/*.ts", "./src/tools/**/*.ts"],
   "references": [
-    { "path": "../utils" }
-  ]
+    { "path": "../../../../../common/web/utils" },
+  ],
+  "exclude": ["./src/test/**/*.ts", "./src/tools/**/*.ts"]
 }

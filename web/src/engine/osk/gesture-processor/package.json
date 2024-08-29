@@ -8,14 +8,12 @@
     "promise-status-async": "^1.2.10",
     "typescript": "^5.4.5"
   },
-  "imports": {
-    "#tools": "./build/tools/obj/index.js"
-  },
   "scripts": {
     "build": "gosh ./build.sh",
-    "test": "gosh ./test.sh"
+    "test": "gosh ./build.sh test"
   },
   "dependencies": {
+    "@keymanapp/web-utils": "*",
     "eventemitter3": "^5.0.0"
   },
   "main": "./build/obj/index.js",
