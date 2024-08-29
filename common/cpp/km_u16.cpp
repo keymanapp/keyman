@@ -5,6 +5,7 @@
  */
 
 #include <stdarg.h>
+#include <wctype.h>
 #include "utfcodec.hpp"
 #include "km_u16.h"
 
