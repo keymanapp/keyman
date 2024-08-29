@@ -1091,34 +1091,45 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     fileKeyboard.dpStoreArray = file_store;
     u16cpy(str, u"index(b,4)");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_index_comma_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 4, 0 };
-    EXPECT_EQ(0, u16cmp(tstr_index_comma_valid, tstr));
+    const KMX_WCHAR tstr_index_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 4, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_index_valid, tstr));
 
     // index, space before store, comma, valid
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
     u16cpy(str, u"index( b,4)");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_index_initial_space_and_comma_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 4, 0 };
-    EXPECT_EQ(0, u16cmp(tstr_index_initial_space_and_comma_valid, tstr));
+    EXPECT_EQ(0, u16cmp(tstr_index_valid, tstr));
+
+    // index, space after store, comma, valid
+    fileKeyboard.cxStoreArray = 3u;
+    fileKeyboard.dpStoreArray = file_store;
+    u16cpy(str, u"index(b ,4)");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(tstr_index_valid, tstr));
 
     // index, comma and space, valid
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
     u16cpy(str, u"index(b, 4)");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_index_comma_and_space_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 4, 0 };
-    EXPECT_EQ(0, u16cmp(tstr_index_comma_and_space_valid, tstr));
+    EXPECT_EQ(0, u16cmp(tstr_index_valid, tstr));
+
+    // index, comma, space after offset, valid
+    fileKeyboard.cxStoreArray = 3u;
+    fileKeyboard.dpStoreArray = file_store;
+    u16cpy(str, u"index(b,4 )");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(tstr_index_valid, tstr));
 
     // index, space, valid ... should not be valid (see issue #11833)
     u16cpy(str, u"index(b 4)");
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_index_space_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 4, 0 };
-    EXPECT_EQ(0, u16cmp(tstr_index_space_valid, tstr));
+    EXPECT_EQ(0, u16cmp(tstr_index_valid, tstr));
 
-    // index, two-digit parameter, valid
+    // index, two-digit offset, valid
     u16cpy(str, u"index(b,42)");
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
@@ -1126,25 +1137,25 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     const KMX_WCHAR tstr_index_two_digit_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 42, 0 };
     EXPECT_EQ(0, u16cmp(tstr_index_two_digit_valid, tstr));
 
-    // index, comma, non-digit parameter, KmnCompilerMessages::ERROR_InvalidIndex
+    // index, comma, non-digit offset, KmnCompilerMessages::ERROR_InvalidIndex
     u16cpy(str, u"index(b,g)");
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // index, comma, no parameter, KmnCompilerMessages::ERROR_InvalidIndex
+    // index, comma, no offset, KmnCompilerMessages::ERROR_InvalidIndex
     u16cpy(str, u"index(b,)");
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // index, space and comma, no parameter, KmnCompilerMessages::ERROR_InvalidIndex
+    // index, space and comma, no offset, KmnCompilerMessages::ERROR_InvalidIndex
     u16cpy(str, u"index(b ,)");
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // index, comma, no parameter but space, KmnCompilerMessages::ERROR_InvalidIndex
+    // index, comma, no offset but space, KmnCompilerMessages::ERROR_InvalidIndex
     u16cpy(str, u"index(b, )");
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
