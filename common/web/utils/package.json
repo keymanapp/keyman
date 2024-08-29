@@ -36,6 +36,10 @@
     "@keymanapp/keyman-version": "*"
   },
   "sideEffects": [
-    "./src/kmwstring.ts", "./build/obj/kmwstring.js"
-  ]
+    "./src/kmwstring.ts",
+    "./build/obj/kmwstring.js"
+  ],
+  "dependencies": {
+    "fast-xml-parser": "^4.4.1"
+  }
 }
