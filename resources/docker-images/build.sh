@@ -9,6 +9,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 ################################ Main script ################################
 
 . "${KEYMAN_ROOT}/resources/build/minimum-versions.inc.sh"
+. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 builder_describe \
   "Build docker images" \
@@ -18,8 +19,6 @@ builder_describe \
   ":linux" \
   ":web" \
   "--ubuntu-version=UBUNTU_VERSION  The Ubuntu version (default: ${KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER})" \
-  "--node=NODE_MAJOR                Node version (default: ${KEYMAN_MIN_VERSION_NODE_MAJOR})" \
-  "--emscripten=EMSCRIPTEN_VERSION  Emscripten version (default: ${KEYMAN_MIN_VERSION_EMSCRIPTEN})" \
   "--no-cache                       Force rebuild of docker images" \
   "build"
 
@@ -49,11 +48,11 @@ _add_build_args() {
 _convert_parameters_to_build_args() {
   build_args=()
   build_version=
+  local required_node_version="$(_print_expected_node_version)"
 
-  _add_build_args UBUNTU_VERSION     KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER  ""
-  _add_build_args JAVA_VERSION       KEYMAN_VERSION_JAVA                      java
-  _add_build_args NODE_MAJOR         KEYMAN_MIN_VERSION_NODE_MAJOR            node
-  _add_build_args EMSCRIPTEN_VERSION KEYMAN_MIN_VERSION_EMSCRIPTEN            emscr
+  _add_build_args UBUNTU_VERSION         KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER  ""
+  _add_build_args JAVA_VERSION           KEYMAN_VERSION_JAVA                      java
+  _add_build_args REQUIRED_NODE_VERSION  required_node_version                    ""
 
   if [[ -n "${BASE_VERSION:-}" ]]; then
     build_args+=(--build-arg="BASE_VERSION=${BASE_VERSION}")
@@ -61,8 +60,7 @@ _convert_parameters_to_build_args() {
 }
 
 _is_default_values() {
-  [[ -z "${UBUNTU_VERSION:-}" ]] && [[ -z "${JAVA_VERSION:-}" ]] && \
-    [[ -z "${NODE_MAJOR:-}" ]] && [[ -z "${EMSCRIPTEN_VERSION:-}" ]]
+  [[ -z "${UBUNTU_VERSION:-}" ]] && [[ -z "${JAVA_VERSION:-}" ]]
 }
 
 build_action() {
@@ -86,14 +84,14 @@ build_action() {
     OPTION_NO_CACHE="--no-cache"
   fi
 
-  cd "${platform}" || true
+  cd "${platform}"
   # shellcheck disable=SC2248
-  docker build ${OPTION_NO_CACHE:-} -t "keymanapp/keyman-${platform}-ci:${build_version}" "${build_args[@]}" .
+  docker build ${OPTION_NO_CACHE:-} --platform amd64 -t "keymanapp/keyman-${platform}-ci:${build_version}" "${build_args[@]}" .
   # If the user didn't specify particular versions we will additionaly create an image
   # with the tag 'default'.
   if _is_default_values; then
     builder_echo debug "Setting default tag for ${platform}"
-    docker build . -t "keymanapp/keyman-${platform}-ci:default" "${build_args[@]}"
+    docker build . --platform amd64 -t "keymanapp/keyman-${platform}-ci:default" "${build_args[@]}"
   fi
   cd - || true
   builder_echo success "Docker image 'keymanapp/keyman-${platform}-ci:${build_version}' built"

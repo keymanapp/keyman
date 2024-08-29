@@ -272,10 +272,14 @@ verify_npm_setup() {
   popd > /dev/null
 }
 
+_print_expected_node_version() {
+"$JQ" -r '.engines.node' "$KEYMAN_ROOT/package.json"
+}
+
 # Use nvm to select a node version according to package.json
 # see /docs/build/node.md
 _select_node_version_with_nvm() {
-  local REQUIRED_NODE_VERSION="$("$JQ" -r '.engines.node' "$KEYMAN_ROOT/package.json")"
+  local REQUIRED_NODE_VERSION="$(_print_expected_node_version)"
 
   if [[ $BUILDER_OS != win ]]; then
     # launch nvm in a sub process, see _builder_nvm.sh for details

@@ -1,36 +1,28 @@
 # Copyright (c) 2024 SIL International. All rights reserved.
+# ARGS used in this file:
+# - ARG BASE_VERSION=default
+# - ARG REQUIRED_NODE_VERSION=18
 
-ARG BASE_VERSION
-FROM --platform=amd64 keymanapp/keyman-base-ci:${BASE_VERSION}
+ARG BASE_VERSION=default
+FROM keymanapp/keyman-base-ci:${BASE_VERSION}
 
 LABEL org.opencontainers.image.authors="SIL International."
 LABEL org.opencontainers.image.url="https://github.com/keymanapp/keyman.git"
 LABEL org.opencontainers.image.title="Keyman for Web Build Image"
 
 USER root
-RUN apt-get install -qy git jq xvfb xserver-xephyr metacity
+RUN apt-get install -qy git jq xvfb xserver-xephyr metacity libevent-2.1-7t64
 
 COPY run-tests.sh /usr/bin/run-tests.sh
 
-# Install node
-ARG NODE_MAJOR
-RUN set -eu; \
-  NODE_VERSION=$(curl -sSL https://unofficial-builds.nodejs.org/download/release/ | cut -d'>' -f2 | cut -d'/' -f1 | grep v${NODE_MAJOR} | sort -V | tail -1) && \
-  echo "Installing node version ${NODE_VERSION}" && \
-  curl -fsSLO --compressed "https://unofficial-builds.nodejs.org/download/release/${NODE_VERSION}/node-${NODE_VERSION}-linux-x64-glibc-217.tar.xz" && \
-  tar -xJf "node-${NODE_VERSION}-linux-x64-glibc-217.tar.xz" -C /usr/local --strip-components=1 --no-same-owner && \
-  ln -s /usr/local/bin/node /usr/local/bin/nodejs
-
-# Install emscripten
-ARG EMSCRIPTEN_VERSION
-RUN echo "Installing emscripten version ${EMSCRIPTEN_VERSION}" && \
-  cd /usr/share && \
-  git clone https://github.com/emscripten-core/emsdk.git && \
-  cd emsdk && \
-  ./emsdk install ${EMSCRIPTEN_VERSION} && \
-  ./emsdk activate ${EMSCRIPTEN_VERSION} && \
-  echo "#!/bin/bash" > /usr/bin/bashwrapper && \
-  echo "export EMSCRIPTEN_BASE=/usr/share/emsdk/upstream/emscripten" >> /usr/bin/bashwrapper
+# Install NVM
+RUN NVM_RELEASE=$(curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest | grep tag_name | cut -d : -f 2 | cut -d '"' -f 2) && \
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_RELEASE}/install.sh | bash
+RUN <<EOF cat >> /usr/bin/bashwrapper
+PATH=/home/build/.keyman/node:\$PATH
+export NVM_DIR="$HOME/.nvm"
+. /home/build/.nvm/nvm.sh
+EOF
 
 # Keyman Web
 RUN curl --output google-chrome-stable_current_amd64.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
@@ -64,6 +56,14 @@ RUN chmod +x /usr/bin/bashwrapper && \
 
 # now, switch to build user
 USER build
+
+# Pre-install node
+ARG REQUIRED_NODE_VERSION=18
+RUN echo "HOME=\${HOME}; REQUIRED_NODE_VERSION=${REQUIRED_NODE_VERSION}" && \
+  export NVM_DIR="/home/build/.nvm" && \
+  . /home/build/.nvm/nvm.sh && \
+  nvm install "${REQUIRED_NODE_VERSION}" && \
+  nvm use "${REQUIRED_NODE_VERSION}"
 
 VOLUME /home/build/build
 WORKDIR /home/build/build

@@ -1,7 +1,7 @@
 # Copyright (c) 2024 SIL International. All rights reserved.
 
 ARG UBUNTU_VERSION=latest
-FROM --platform=amd64 ubuntu:${UBUNTU_VERSION}
+FROM ubuntu:${UBUNTU_VERSION}
 
 LABEL org.opencontainers.image.authors="SIL International."
 LABEL org.opencontainers.image.url="https://github.com/keymanapp/keyman.git"
@@ -28,3 +28,9 @@ RUN apt-get -q -y update &&  \
 
 # Allow build user to use `sudo`
 RUN echo "build ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+RUN <<EOF cat > /usr/bin/bashwrapper
+#!/bin/bash
+export KEYMAN_USE_NVM=1
+export KEYMAN_USE_EMSDK=1
+EOF

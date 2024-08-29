@@ -1,7 +1,7 @@
 # Copyright (c) 2024 SIL International. All rights reserved.
 
-ARG BASE_VERSION
-FROM --platform=amd64 keymanapp/keyman-base-ci:${BASE_VERSION}
+ARG BASE_VERSION=default
+FROM keymanapp/keyman-base-ci:${BASE_VERSION}
 LABEL org.opencontainers.image.authors="SIL International."
 LABEL org.opencontainers.image.url="https://github.com/keymanapp/keyman.git"
 LABEL org.opencontainers.image.title="Keyman Linux Build Image"
@@ -29,7 +29,6 @@ RUN LCOV_VERSION=$(dpkg -s lcov | grep Version | cut -d' ' -f2) && \
 
 RUN mkdir -p /var/run/1000 && \
   chown build:build /var/run/1000 && \
-  echo "#!/bin/bash" > /usr/bin/bashwrapper && \
   echo "export XDG_RUNTIME_DIR=/var/run/1000" >> /usr/bin/bashwrapper
 
 COPY run-tests.sh /usr/bin/run-tests.sh

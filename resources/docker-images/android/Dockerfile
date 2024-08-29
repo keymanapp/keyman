@@ -1,7 +1,7 @@
 # Copyright (c) 2024 SIL International. All rights reserved.
 
-ARG BASE_VERSION=latest
-FROM --platform=amd64 keymanapp/keyman-base-ci:${BASE_VERSION}
+ARG BASE_VERSION=default
+FROM keymanapp/keyman-base-ci:${BASE_VERSION}
 LABEL org.opencontainers.image.authors="SIL International."
 LABEL org.opencontainers.image.url="https://github.com/keymanapp/keyman.git"
 LABEL org.opencontainers.image.title="Keyman Android Build Image"
@@ -25,7 +25,6 @@ RUN <<EOF
   sdkmanager platform-tools
   yes | sdkmanager --licenses
   chown -R build:build $DIR_SDK
-  echo "#!/bin/bash" > /usr/bin/bashwrapper
   echo "export ANDROID_HOME=$DIR_SDK" >> /usr/bin/bashwrapper
   echo "export JAVA_HOME_${JAVA_VERSION}=/usr/lib/jvm/java-${JAVA_VERSION}-openjdk-amd64" >> /usr/bin/bashwrapper
 EOF
