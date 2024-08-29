@@ -13,41 +13,23 @@ import VisualKeyboardKeyFlags = VK.VisualKeyboardKeyFlags;
 import VisualKeyboardLegalShiftStates = VK.VisualKeyboardLegalShiftStates;
 import VisualKeyboardShiftState = VK.VisualKeyboardShiftState;
 import BUILDER_KVK_HEADER_VERSION = KvkFile.BUILDER_KVK_HEADER_VERSION;
-// import KVK_HEADER_IDENTIFIER_BYTES = KvkFile.KVK_HEADER_IDENTIFIER_BYTES;
+import KVK_HEADER_IDENTIFIER_BYTES = KvkFile.KVK_HEADER_IDENTIFIER_BYTES;
 
 
 export default class KVKSFileReader {
   public read(file: Uint8Array): KVKSourceFile {
+    if (file.byteLength > 4 && file.subarray(0, 3).every((v, i) => v == KVK_HEADER_IDENTIFIER_BYTES[i])) {
+      throw new Error('File appears to be a binary .kvk file');
+    }
+
     let source: KVKSourceFile;
 
     const parser = new XMLParser({
       ignoreAttributes: false, // We'd like attributes, please
       attributeNamePrefix: '', // to avoid '@_' prefixes
-        // explicitArray: false,
-      // mergeAttrs: false,
-      // includeWhiteChars: true,
-      // normalize: false,
-      // emptyTag: {} as any
-      // Why "as any"? xml2js is broken:
-      // https://github.com/Leonidas-from-XIV/node-xml2js/issues/648 means
-      // that an old version of `emptyTag` is used which doesn't support
-      // functions, but DefinitelyTyped is requiring use of function or a
-      // string. See also notes at
-      // https://github.com/DefinitelyTyped/DefinitelyTyped/pull/59259#issuecomment-1254405470
-      // An alternative fix would be to pull xml2js directly from github
-      // rather than using the version tagged on npmjs.com.
     });
 
     source = parser.parse(file.toString()) as KVKSourceFile;
-    // parser.parseString(file, (e: unknown, r: unknown) => {
-    //   if(e) {
-    // TODO:
-        // if(file.byteLength > 4 && file.subarray(0,3).every((v,i) => v == KVK_HEADER_IDENTIFIER_BYTES[i])) {
-        //   throw new Error('File appears to be a binary .kvk file', {cause: e});
-        // }
-      //   throw e;
-      // };
-    // });
     if(source) {
       source = this.boxArrays(source);
       this.cleanupFlags(source);
@@ -130,17 +112,17 @@ export default class KVKSFileReader {
     }
 
     for(const encoding of source.visualkeyboard.encoding) {
-      const isUnicode = (encoding.$?.name == 'unicode'),
+      const isUnicode = (encoding.name == 'unicode'),
         font = isUnicode ? result.header.unicodeFont : result.header.ansiFont;
-      font.name = encoding.$?.fontname ?? DEFAULT_KVK_FONT.name;
-      font.size = parseInt(encoding.$?.fontsize ?? DEFAULT_KVK_FONT.size.toString(), 10);
+      font.name = encoding.fontname ?? DEFAULT_KVK_FONT.name;
+      font.size = parseInt(encoding.fontsize ?? DEFAULT_KVK_FONT.size.toString(), 10);
       for(const layer of encoding.layer) {
-        const shift = this.kvksShiftToKvkShift(layer.$?.shift);
+        const shift = this.kvksShiftToKvkShift(layer.shift);
         for(const sourceKey of layer.key) {
-          const vkey = (USVirtualKeyCodes as any)[sourceKey.$?.vkey];
+          const vkey = (USVirtualKeyCodes as any)[sourceKey.vkey];
           if(!vkey) {
             if(typeof invalidVkeys !== 'undefined') {
-              invalidVkeys.push(sourceKey.$?.vkey);
+              invalidVkeys.push(sourceKey.vkey);
             }
             continue;
           }
@@ -149,7 +131,7 @@ export default class KVKSFileReader {
               (isUnicode ? VisualKeyboardKeyFlags.kvkkUnicode : 0) |
               (sourceKey.bitmap ? VisualKeyboardKeyFlags.kvkkBitmap : 0),
             shift: shift,
-            text: sourceKey.bitmap ? '' : (sourceKey._ ?? ''),
+            text: sourceKey.bitmap ? '' : (sourceKey['#text'] ?? ''),
             vkey: vkey
           };
           if(sourceKey.bitmap) {

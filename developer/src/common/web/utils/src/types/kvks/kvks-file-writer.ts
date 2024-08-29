@@ -63,10 +63,9 @@ export default class KVKSFileWriter {
         encodings[encoding] = {
           o: {
             layer: [],
-            $: {name: encoding,
+            name: encoding,
             fontname: encoding == 'ansi' ? vk.header.ansiFont.name : vk.header.unicodeFont.name,
             fontsize: (encoding == 'ansi' ? vk.header.ansiFont.size : vk.header.unicodeFont.size).toString(),
-            },
           },
           l: {}
         };
@@ -76,7 +75,7 @@ export default class KVKSFileWriter {
       if(!e.l[shift]) {
         e.l[shift] = {
           key: [],
-          $: {shift: shift},
+          shift: shift,
         };
         e.o.layer.push(e.l[shift]);
       }
@@ -96,8 +95,8 @@ export default class KVKSFileWriter {
         continue;
       }
       const k: KVKSKey = {
-        $: {vkey: vkeyName},
-        _: key.text,
+        vkey: vkeyName,
+        '#text': key.text,
       }
       if(key.bitmap) {
         k.bitmap = this.arrayToBase64(key.bitmap);

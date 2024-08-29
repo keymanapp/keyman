@@ -256,21 +256,18 @@ export class LDMLKeyboardXMLSourceFileReader {
   }
 
   loadUnboxed(file: Uint8Array): LDMLKeyboardXMLSourceFile {
-    const source = (() => {
-      const parser = new XMLParser({
-        ignoreAttributes: false, // We'd like attributes, please
-        attributeNamePrefix: '', // to avoid '@_' prefixes
-        // TODO: Any others needed?
-        // explicitArray: false,
-        // mergeAttrs: true,
-        // includeWhiteChars: false,
-        // emptyTag: {} as any
-      });
-      const a = parser.parse(file.toString());
-      delete a['?xml']; // fast-xml-parser includes the XML prologue, it's not in the schema so we delete it.
-      return a as LDMLKeyboardXMLSourceFile;
-    })();
-    return source;
+    const parser = new XMLParser({
+      ignoreAttributes: false, // We'd like attributes, please
+      attributeNamePrefix: '', // to avoid '@_' prefixes
+      // TODO: Any others needed?
+      // explicitArray: false,
+      // mergeAttrs: true,
+      // includeWhiteChars: false,
+      // emptyTag: {} as any
+    });
+    const a = parser.parse(file.toString());
+    delete a['?xml']; // fast-xml-parser includes the XML prologue, it's not in the schema so we delete it.
+    return a as LDMLKeyboardXMLSourceFile;
   }
 
   /**

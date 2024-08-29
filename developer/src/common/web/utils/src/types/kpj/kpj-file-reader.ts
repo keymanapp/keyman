@@ -14,14 +14,17 @@ export class KPJFileReader {
     let data: KPJFile;
 
   const parser = new XMLParser({
+    ignoreAttributes: false, // We'd like attributes, please
+    attributeNamePrefix: '', // to avoid '@_' prefixes
       // explicitArray: false,
       // mergeAttrs: false,
       // includeWhiteChars: false,
       // normalize: false,
       // emptyTag: ''
     });
-
-    data = parser.parse(file.toString()) as KPJFile;
+    const raw = parser.parse(file.toString());
+    delete raw['?xml']; // XML prologue
+    data = raw as KPJFile;
     data = this.boxArrays(data);
     if(data.KeymanDeveloperProject?.Files?.File?.length) {
       for(const file of data.KeymanDeveloperProject?.Files?.File) {
