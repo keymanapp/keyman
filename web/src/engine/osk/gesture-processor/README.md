@@ -6,6 +6,6 @@ KeymanWeb, seen within this repo at /web/.
 
 ## Minimum Compilation Requirements
 
-See the repo-level [document for build configuration](../../../docs/build/index.md) for details on how to
+See the repo-level [document for build configuration](../../../../../docs/build/index.md) for details on how to
 configure your build environment.
 - Follow the Keyman Engine for Web (KeymanWeb) requirements where appropriate.

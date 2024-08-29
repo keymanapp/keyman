@@ -3,13 +3,13 @@ import sinon from 'sinon';
 
 import * as PromiseStatusModule from 'promise-status-async';
 const PromiseStatuses     = PromiseStatusModule.PromiseStatuses;
-import { assertingPromiseStatus as promiseStatus } from '../../../resources/assertingPromiseStatus.js';
+import { assertingPromiseStatus as promiseStatus } from '../../../../../resources/assertingPromiseStatus.js';
 
 import { InputSample, gestures, GestureDebugPath } from '@keymanapp/gesture-recognizer';
 
-import { TouchpathTurtle } from '#tools';
+import { TouchpathTurtle } from '#gesture-tools';
 
-import { simulateMultiSourceMatcherInput } from "../../../resources/simulateMultiSourceInput.js";
+import { simulateMultiSourceMatcherInput } from "../../../../../resources/simulateMultiSourceInput.js";
 
 import {
   FlickEndModel,

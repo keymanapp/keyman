@@ -1,6 +1,6 @@
 <html>
   <!-- Note:  this is the host page under src/tools/host-fixture, just with manual
-  imports for the .def.js test suites. -->
+  imports for the .spec.js test suites. -->
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 
@@ -18,9 +18,9 @@
       import { runTests } from '@web/test-runner-mocha';
 
       runTests(async() => {
-        await import('./canary.def.ts');
-        await import('./ignoredInputs.def.ts');
-        await import('./recordedCoordSequences.def.ts');
+        await import('./canary.spec.ts');
+        await import('./ignoredInputs.spec.ts');
+        await import('./recordedCoordSequences.spec.ts');
       });
     </script>
   </head>

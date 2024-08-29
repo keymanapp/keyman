@@ -2,7 +2,7 @@ import { assert } from 'chai'
 import sinon from 'sinon';
 
 import * as PromiseStatusModule from 'promise-status-async';
-import { assertingPromiseStatus as promiseStatus } from '../../../resources/assertingPromiseStatus.js';
+import { assertingPromiseStatus as promiseStatus } from '../../../../../resources/assertingPromiseStatus.js';
 
 import { GestureModelDefs, buildGestureMatchInspector, gestures } from '@keymanapp/gesture-recognizer';
 const { matchers } = gestures;
@@ -16,10 +16,10 @@ type MatcherSelection<Type> = gestures.matchers.MatcherSelection<Type>;
 const getGestureModelSet = gestures.specs.getGestureModelSet;
 const modelSetForAction = gestures.matchers.modelSetForAction;
 
-import { HeadlessInputEngine, TouchpathTurtle } from '#tools';
+import { HeadlessInputEngine, TouchpathTurtle } from '#gesture-tools';
 import { ManagedPromise, timedPromise } from '@keymanapp/web-utils';
 
-import { assertGestureSequence, SequenceAssertion } from "../../../resources/sequenceAssertions.js";
+import { assertGestureSequence, SequenceAssertion } from "../../../../../resources/sequenceAssertions.js";
 
 import {
   LongpressModel,

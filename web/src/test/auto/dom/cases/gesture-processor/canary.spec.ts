@@ -2,10 +2,14 @@ import { assert } from 'chai';
 import sinon from 'sinon';
 
 import {
+  DeviceLayoutClass,
   FixtureLayoutConfiguration,
   HostFixtureLayoutController,
-  InputSequenceSimulator
-} from '#tools';
+  InputSequenceSimulator,
+  ReceiverLayoutClass,
+  RoamingLayoutClass,
+  SafeLayoutClass
+} from '#gesture-tools';
 
 import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
 
@@ -75,11 +79,11 @@ describe("'Canary' checks", function() {
 
     it("InputSequenceSimulator.replayTouchSample", async function() {
       let playbackEngine = new InputSequenceSimulator(this.controller);
-      let layout = new FixtureLayoutConfiguration("screen2", "bounds1", "full", "safe-loose");
+      let layout = new FixtureLayoutConfiguration("screen2" as DeviceLayoutClass, "bounds1" as RoamingLayoutClass, "full" as ReceiverLayoutClass, "safe-loose" as SafeLayoutClass);
       this.controller.layoutConfiguration = layout;
 
       let fireEvent = () => {
-        playbackEngine.replayTouchSamples(/*relative coord:*/ [ { sample: {targetX: 10, targetY: 10}, identifier: 1}],
+        playbackEngine.replayTouchSamples(/*relative coord:*/ [ { sample: {targetX: 10, targetY: 10, t: 0}, identifier: 1}],
                                           /*state:*/         "start",
                                           /*recentTouches:*/  [],
                                         );
@@ -101,11 +105,11 @@ describe("'Canary' checks", function() {
 
     it("InputSequenceSimulator.replayMouseSample", async function() {
       let playbackEngine = new InputSequenceSimulator(this.controller);
-      let layout = new FixtureLayoutConfiguration("screen2", "bounds1", "full", "safe-loose");
+      let layout = new FixtureLayoutConfiguration("screen2" as DeviceLayoutClass, "bounds1" as RoamingLayoutClass, "full" as ReceiverLayoutClass, "safe-loose" as SafeLayoutClass);
       this.controller.layoutConfiguration = layout;
 
       let fireEvent = () => {
-        playbackEngine.replayMouseSample(/*relative coord:*/ {targetX: 15, targetY: 15},
+        playbackEngine.replayMouseSample(/*relative coord:*/ {targetX: 15, targetY: 15, t: 0},
                                           /*state:*/         "start"
                                         );
       }
