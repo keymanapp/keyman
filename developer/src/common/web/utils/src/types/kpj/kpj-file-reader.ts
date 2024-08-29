@@ -1,4 +1,4 @@
-import { xml2js } from '../../index.js';
+import { XMLParser } from 'fast-xml-parser';
 import { KPJFile, KPJFileProject } from './kpj-file.js';
 import { util } from '@keymanapp/common-types';
 import { KeymanDeveloperProject, KeymanDeveloperProjectFile10, KeymanDeveloperProjectType } from './keyman-developer-project.js';
@@ -13,20 +13,15 @@ export class KPJFileReader {
   public read(file: Uint8Array): KPJFile {
     let data: KPJFile;
 
-    const parser = new xml2js.Parser({
-      explicitArray: false,
-      mergeAttrs: false,
-      includeWhiteChars: false,
-      normalize: false,
-      emptyTag: ''
+  const parser = new XMLParser({
+      // explicitArray: false,
+      // mergeAttrs: false,
+      // includeWhiteChars: false,
+      // normalize: false,
+      // emptyTag: ''
     });
 
-    parser.parseString(file, (e: unknown, r: unknown) => {
-      if(e) {
-        throw e;
-      }
-      data = r as KPJFile;
-    });
+    data = parser.parse(file.toString()) as KPJFile;
     data = this.boxArrays(data);
     if(data.KeymanDeveloperProject?.Files?.File?.length) {
       for(const file of data.KeymanDeveloperProject?.Files?.File) {

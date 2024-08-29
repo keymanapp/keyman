@@ -1,5 +1,5 @@
 import { SchemaValidators as SV, KvkFile, util, Constants } from '@keymanapp/common-types';
-import { xml2js } from '../../index.js'
+import { XMLParser } from 'fast-xml-parser'
 import KVKSourceFile from './kvks-file.js';
 const SchemaValidators = SV.default;
 import boxXmlArray = util.boxXmlArray;
@@ -13,19 +13,19 @@ import VisualKeyboardKeyFlags = VK.VisualKeyboardKeyFlags;
 import VisualKeyboardLegalShiftStates = VK.VisualKeyboardLegalShiftStates;
 import VisualKeyboardShiftState = VK.VisualKeyboardShiftState;
 import BUILDER_KVK_HEADER_VERSION = KvkFile.BUILDER_KVK_HEADER_VERSION;
-import KVK_HEADER_IDENTIFIER_BYTES = KvkFile.KVK_HEADER_IDENTIFIER_BYTES;
+// import KVK_HEADER_IDENTIFIER_BYTES = KvkFile.KVK_HEADER_IDENTIFIER_BYTES;
 
 
 export default class KVKSFileReader {
   public read(file: Uint8Array): KVKSourceFile {
     let source: KVKSourceFile;
 
-    const parser = new xml2js.Parser({
-      explicitArray: false,
-      mergeAttrs: false,
-      includeWhiteChars: true,
-      normalize: false,
-      emptyTag: {} as any
+    const parser = new XMLParser({
+      // explicitArray: false,
+      // mergeAttrs: false,
+      // includeWhiteChars: true,
+      // normalize: false,
+      // emptyTag: {} as any
       // Why "as any"? xml2js is broken:
       // https://github.com/Leonidas-from-XIV/node-xml2js/issues/648 means
       // that an old version of `emptyTag` is used which doesn't support
@@ -36,15 +36,16 @@ export default class KVKSFileReader {
       // rather than using the version tagged on npmjs.com.
     });
 
-    parser.parseString(file, (e: unknown, r: unknown) => {
-      if(e) {
-        if(file.byteLength > 4 && file.subarray(0,3).every((v,i) => v == KVK_HEADER_IDENTIFIER_BYTES[i])) {
-          throw new Error('File appears to be a binary .kvk file', {cause: e});
-        }
-        throw e;
-      };
-      source = r as KVKSourceFile;
-    });
+    source = parser.parse(file.toString()) as KVKSourceFile;
+    // parser.parseString(file, (e: unknown, r: unknown) => {
+    //   if(e) {
+    // TODO:
+        // if(file.byteLength > 4 && file.subarray(0,3).every((v,i) => v == KVK_HEADER_IDENTIFIER_BYTES[i])) {
+        //   throw new Error('File appears to be a binary .kvk file', {cause: e});
+        // }
+      //   throw e;
+      // };
+    // });
     if(source) {
       source = this.boxArrays(source);
       this.cleanupFlags(source);
