@@ -1122,12 +1122,11 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(tstr_index_valid, tstr));
 
-    // index, space, valid ... should not be valid (see issue #11833)
-    u16cpy(str, u"index(b 4)");
+    // index, space, KmnCompilerMessages::ERROR_InvalidIndex (see issue #11833)
+    u16cpy(str, u"index(b 4)"); // store name appears to be 'b 4'
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
-    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    EXPECT_EQ(0, u16cmp(tstr_index_valid, tstr));
+    EXPECT_EQ(KmnCompilerMessages::ERROR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // index, two-digit offset, valid
     u16cpy(str, u"index(b,42)");
