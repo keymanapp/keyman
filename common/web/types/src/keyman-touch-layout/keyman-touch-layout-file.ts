@@ -7,9 +7,9 @@
 // writing
 //
 
-/** 
- * On screen keyboard description consisting of specific layouts for tablet, phone, 
- * and desktop. Despite its name, this format is used for both touch layouts and 
+/**
+ * On screen keyboard description consisting of specific layouts for tablet, phone,
+ * and desktop. Despite its name, this format is used for both touch layouts and
  * hardware-style layouts.
  */
 export interface TouchLayoutFile {
@@ -76,8 +76,8 @@ export interface TouchLayoutKey {
   id?: TouchLayoutKeyId;
   /** text to display on key cap */
   text?: string;
-  /** 
-    * the modifier combination (not layer) that should be used in key events, 
+  /**
+    * the modifier combination (not layer) that should be used in key events,
     * for this key, overriding the layer that the key is a part of.
     */
   layer?: TouchLayoutLayerId;
@@ -103,7 +103,7 @@ export interface TouchLayoutKey {
   hint?: string;
 };
 
-/** special keys like framekeys, deadkeys, blank, etc. */
+/** key type like regular key, framekeys, deadkeys, blank, etc. */
 export const enum TouchLayoutKeySp {
   normal=0,
   /** A 'frame' key, such as Shift or Enter, which is styled accordingly; uses
@@ -135,19 +135,22 @@ export type TouchLayoutKeyWidth = number; // 0-100000
 
 /** defines a subkey */
 export interface TouchLayoutSubKey {
-  /** key id: used to find key in VKDictionary */
+  /** key id: used to find key in VKDictionary, or a standard key from the K_ enumeration */
   id: TouchLayoutKeyId;
   /** text to display on key cap */
   text?: string;
-  /** current layer */
+  /**
+    * the modifier combination (not layer) that should be used in key events,
+    * for this key, overriding the layer that the key is a part of.
+    */
   layer?: TouchLayoutLayerId;
-  /** next layer */
+  /** the next layer to switch to after this key is pressed */
   nextlayer?: TouchLayoutLayerId;
   /** font */
   font?: TouchLayoutFont;
   /** fontsize */
   fontsize?: TouchLayoutFontSize;
-  /** special key */
+  /** the type of key */
   sp?: TouchLayoutKeySp;
   /** padding */
   pad?: TouchLayoutKeyPad;
@@ -161,18 +164,18 @@ export interface TouchLayoutSubKey {
 export interface TouchLayoutFlick {
   /** flick up (north) */
   n?: TouchLayoutSubKey;
-  /** flick down */
+  /** flick down (south) */
   s?: TouchLayoutSubKey;
-  /** flick right */
+  /** flick right (east) */
   e?: TouchLayoutSubKey;
-  /** flick left */
+  /** flick left (west) */
   w?: TouchLayoutSubKey;
-  /** flick up-right */
+  /** flick up-right (north-east) */
   ne?: TouchLayoutSubKey;
-  /** flick up-left */
+  /** flick up-left (north-west) */
   nw?: TouchLayoutSubKey;
-  /** flick down-right */
+  /** flick down-right (south-east) */
   se?: TouchLayoutSubKey;
-  /** flick down-left */
+  /** flick down-left (south-west) */
   sw?: TouchLayoutSubKey;
 };
