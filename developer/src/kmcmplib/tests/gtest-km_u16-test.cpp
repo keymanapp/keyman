@@ -200,3 +200,33 @@ TEST(km_u16_Test, u16rtrim) {
   u16cpy(str, u"abc\t");
   EXPECT_TRUE(!u16cmp(u"abc", u16rtrim(str)));
 }
+
+TEST(km_u16_Test, u16trim) {
+  KMX_WCHAR str[LINESIZE];
+
+  EXPECT_TRUE(!u16trim(nullptr));
+  u16cpy(str, u"");
+  EXPECT_TRUE(!u16cmp(u"", u16trim(str)));
+  u16cpy(str, u" ");
+  EXPECT_TRUE(!u16cmp(u"", u16trim(str)));
+  u16cpy(str, u"  ");
+  EXPECT_TRUE(!u16cmp(u"", u16trim(str)));
+  u16cpy(str, u"abc");
+  EXPECT_TRUE(!u16cmp(u"abc", u16trim(str)));
+  u16cpy(str, u"abc ");
+  EXPECT_TRUE(!u16cmp(u"abc", u16trim(str)));
+  u16cpy(str, u"abc  ");
+  EXPECT_TRUE(!u16cmp(u"abc", u16trim(str)));
+  u16cpy(str, u" abc");
+  EXPECT_TRUE(!u16cmp(u"abc", u16trim(str)));
+  u16cpy(str, u"  abc");
+  EXPECT_TRUE(!u16cmp(u"abc", u16trim(str)));
+  u16cpy(str, u" abc ");
+  EXPECT_TRUE(!u16cmp(u"abc", u16trim(str)));
+  u16cpy(str, u"  abc  ");
+  EXPECT_TRUE(!u16cmp(u"abc", u16trim(str)));
+  u16cpy(str, u"abc\t");
+  EXPECT_TRUE(!u16cmp(u"abc", u16trim(str)));
+  u16cpy(str, u"\tabc");
+  EXPECT_TRUE(!u16cmp(u"abc", u16trim(str)));
+}
