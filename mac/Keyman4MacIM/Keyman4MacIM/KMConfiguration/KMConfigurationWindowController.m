@@ -398,8 +398,8 @@
 }
 
 - (void)removeAction:(id)sender {
-  NSButton *removeButton = (NSButton *)sender;
-  NSDictionary *info = [self.tableContents objectAtIndex:removeButton.tag];
+  NSButton *deleteButton = (NSButton *)sender;
+  NSDictionary *info = [self.tableContents objectAtIndex:deleteButton.tag];
   NSString *deleteKeyboardMessage = NSLocalizedString(@"message-confirm-delete-keyboard", nil);
   
   if ([info objectForKey:@"HeaderTitle"] != nil)
@@ -407,10 +407,13 @@
   else
     [self.deleteAlertView setMessageText:[NSString localizedStringWithFormat:deleteKeyboardMessage, [info objectForKey:kKMKeyboardNameKey]]];
   
-  [self.deleteAlertView beginSheetModalForWindow:self.window
-                                   modalDelegate:self
-                                  didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
-                                     contextInfo:(__bridge void *)([NSNumber numberWithInteger:removeButton.tag])];
+  [self.deleteAlertView beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse returnCode)  {
+    if (returnCode == NSAlertFirstButtonReturn) {
+      os_log_debug([KMLogs uiLog], "confirm delete keyboard alert dismissed");
+      [self deleteFileAtIndex:[NSNumber numberWithInteger:deleteButton.tag]];
+      self.deleteAlertView = nil;
+    }
+  }];
 }
 
 - (IBAction)downloadAction:(id)sender {
@@ -438,25 +441,29 @@
 }
 
 - (void)handleRequestToInstallPackage:(KMPackage *) package {
+  os_log_debug([KMLogs dataLog], "handleRequestToInstallPackage");
   NSString *keyboardInfoString = NSLocalizedString(@"info-install-keyboard-filename", nil);
   [self.confirmKmpInstallAlertView setInformativeText:[NSString localizedStringWithFormat:keyboardInfoString, package.getOrigKmpFilename]];
   
   os_log_debug([KMLogs uiLog], "Asking user to confirm installation of %{public}@, KMP - temp file name: %{public}@", package.getOrigKmpFilename, package.getTempKmpFilename);
   
-  [self.confirmKmpInstallAlertView beginSheetModalForWindow:self.window
-                                              modalDelegate:self
-                                             didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
-                                                contextInfo:(__bridge void *)(package)];
+  [self.confirmKmpInstallAlertView beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse returnCode)  {
+    os_log_debug([KMLogs uiLog], "confirm keyboard installation alert dismissed");
+    if (returnCode == NSAlertFirstButtonReturn) {
+      [self installPackageFile: package.getTempKmpFilename];
+      self.confirmKmpInstallAlertView = nil;
+    }
+  }];
 }
 
 - (void)installPackageFile:(NSString *)kmpFile {
   // kmpFile could be a temp file (in fact, it always is!), so don't display the name.
-  
-  os_log_debug([KMLogs dataLog], "KMP - Ready to unzip/install Package File: %{public}@", kmpFile);
+  os_log_debug([KMLogs dataLog], "kmpFile - ready to unzip/install Package File: %{public}@", kmpFile);
   
   BOOL didUnzip = [self.AppDelegate unzipFile:kmpFile];
   
   if (!didUnzip) {
+    os_log_debug([KMLogs dataLog], "kmpFile, unzipFile failed");
     NSAlert *failure = [[NSAlert alloc] init];
     [failure addButtonWithTitle:NSLocalizedString(@"button-keyboard-file-unreadable", @"Alert button")];
     
@@ -465,13 +472,12 @@
     
     [failure setIcon:[[NSBundle mainBundle] imageForResource:@"logo.png"]];
     [failure setAlertStyle:NSAlertStyleWarning];
-    [failure beginSheetModalForWindow:self.window
-                        modalDelegate:self
-                       didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
-                          contextInfo:nil];
+    [failure beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse returnCode)  {
+      os_log_debug([KMLogs uiLog], "kmpFile, keyboard file unreadable alert dismissed with returnCode: %ld", (long)returnCode);
+    }];
   }
   else {
-    os_log_debug([KMLogs dataLog], "Completed installation of KMP file.");
+    os_log_debug([KMLogs dataLog], "kmpFile, completed installation of KMP file");
   }
 }
 
@@ -547,6 +553,7 @@
   return _confirmKmpInstallAlertView;
 }
 
+/*
 - (void)alertDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo {
   os_log_debug([KMLogs uiLog], "User responded to NSAlert");
   if (alert == _deleteAlertView) {
@@ -568,7 +575,7 @@
   }
   // else, just a message - nothing to do.
 }
-
+*/
 - (void)deleteFileAtIndex:(NSNumber *) n {
   NSInteger index = [n integerValue];
   NSString *path2Remove = nil;

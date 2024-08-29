@@ -1340,7 +1340,9 @@ extern const CGKeyCode kProcessPendingBuffer;
   NSError *error = nil;
   NSString *fileName = filePath.lastPathComponent;
   NSString *folderName = [fileName stringByDeletingPathExtension];
-  
+
+  os_log_debug([KMLogs keyboardLog], "unzipFile for filePath: %{public}@", filePath);
+
   // First we unzip into a temp folder, and check kmp.json for the fileVersion
   // before we continue installation. We don't want to overwrite existing
   // package if it is there if the files are not compatible with the installed
