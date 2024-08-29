@@ -9,11 +9,10 @@ uses
 
 type
   TfrmStartInstall = class(TfrmKeymanBase)
-    LabelMessage: TLabel;
-    InstallButton: TButton;
-    CancelButton: TButton;
-    procedure InstallButtonClick(Sender: TObject);
-    procedure CancelButtonClick(Sender: TObject);
+    Install: TButton;
+    Later: TButton;
+    procedure InstallClick(Sender: TObject);
+    procedure LaterClick(Sender: TObject);
   private
   public
   end;
@@ -25,12 +24,12 @@ implementation
 
 {$R *.dfm}
 
-procedure TfrmStartInstall.InstallButtonClick(Sender: TObject);
+procedure TfrmStartInstall.InstallClick(Sender: TObject);
 begin
   ModalResult := mrOk;
 end;
 
-procedure TfrmStartInstall.CancelButtonClick(Sender: TObject);
+procedure TfrmStartInstall.LaterClick(Sender: TObject);
 begin
   ModalResult := mrCancel;
 end;

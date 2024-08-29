@@ -33,6 +33,7 @@ uses
   httpuploader,
   Keyman.System.UpdateCheckResponse,
   Keyman.System.ExecuteHistory,
+  UfrmStartInstall,
   UfrmDownloadProgress;
 
 const
@@ -891,6 +892,7 @@ function WaitingRestartState.HandleKmShell;
 var
   SavedPath : String;
   Filenames : TStringDynArray;
+  frmStartInstall : TfrmStartInstall;
 begin
   KL.Log('WaitingRestartState.HandleKmShell Enter');
   // Still can't go if keyman has run
@@ -918,8 +920,19 @@ begin
     else
     begin
       KL.Log('WaitingRestartState.HandleKmShell is good to install');
-      ChangeState(InstallingState);
-      Result := kmShellExit;
+      // TODO Pop up toast here to ask user if we want to continue
+      frmStartInstall := TfrmStartInstall.Create(nil);
+      try
+        if frmStartInstall.ShowModal = mrOk then
+        begin
+          ChangeState(InstallingState);
+          Result := kmShellExit;
+        end
+        else
+          Result := kmShellContinue;
+      finally
+        frmStartInstall.Free;
+      end;
     end;
   end;
 end;
@@ -994,6 +1007,7 @@ begin
     KL.Log('TUpdateStateMachine.InstallingState.DoInstallKeyman SavePath:"'+ SavePath+'"');
     // switch -au for auto update in silent mode.
     // We will need to add the pop up that says install update now yes/no
+    // This will run the setup executable which will ask for elevated permissions
     FResult := TUtilExecute.Shell(0, SavePath, '', '-au')  // I3349
   end
   else

@@ -13,4 +13,22 @@ object frmStartInstall: TfrmStartInstall
   OldCreateOrder = False
   PixelsPerInch = 96
   TextHeight = 13
+  object Install: TButton
+    Left = 168
+    Top = 240
+    Width = 75
+    Height = 25
+    Caption = 'Install'
+    TabOrder = 0
+    OnClick = InstallClick
+  end
+  object Later: TButton
+    Left = 288
+    Top = 240
+    Width = 75
+    Height = 25
+    Caption = 'Later'
+    TabOrder = 1
+    OnClick = LaterClick
+  end
 end
