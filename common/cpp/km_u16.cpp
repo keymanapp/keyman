@@ -387,3 +387,22 @@ double u16tof(KMX_WCHAR* str16) {
   std::string str = string_from_u16string(str16);
   return strtof(str.c_str(), &pEnd);
 }
+
+const KMX_WCHAR* u16ltrim(const KMX_WCHAR* p) {
+  while(iswspace(*p)) p++;
+  return p;
+}
+
+KMX_WCHAR* u16rtrim(KMX_WCHAR *p) {
+  PKMX_WCHAR q = p + u16len(p);
+  if (iswspace(*q)) {
+    while (iswspace(*q) && q > p) q--;
+    if (!iswspace(*q)) q++;
+    *q = '\0'; // delete first following space
+  }
+  return p;
+}
+
+KMX_WCHAR* u16trim(KMX_WCHAR *p) {
+  return u16rtrim((KMX_WCHAR*)u16ltrim(p));
+}
