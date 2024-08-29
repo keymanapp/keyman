@@ -33,7 +33,8 @@ export * from "./keyEvent.js";
 export { default as KeyMapping } from "./keyMapping.js";
 export { OutputTarget } from "./outputTarget.interface.js";
 
-export { LazySpan } from "./lazySpan.js";
+export { LdmlKeyboardObject } from './kmxPlus/ldmlKeyboardObject.js';
+export { convertLayerList } from './kmxPlus/convertLayerList.js';
 
 export * from "@keymanapp/web-utils";
 
