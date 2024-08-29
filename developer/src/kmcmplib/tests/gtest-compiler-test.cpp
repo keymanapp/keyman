@@ -1118,7 +1118,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(tstr_index_valid, tstr));
 
-    // index, two-digit parameter, valid
+    // index, two-digit offet, valid
     u16cpy(str, u"index(b,42)");
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
@@ -1126,25 +1126,25 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     const KMX_WCHAR tstr_index_two_digit_valid[] = { UC_SENTINEL, CODE_INDEX, 2, 42, 0 };
     EXPECT_EQ(0, u16cmp(tstr_index_two_digit_valid, tstr));
 
-    // index, comma, non-digit parameter, KmnCompilerMessages::ERROR_InvalidIndex
+    // index, comma, non-digit offet, KmnCompilerMessages::ERROR_InvalidIndex
     u16cpy(str, u"index(b,g)");
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // index, comma, no parameter, KmnCompilerMessages::ERROR_InvalidIndex
+    // index, comma, no offet, KmnCompilerMessages::ERROR_InvalidIndex
     u16cpy(str, u"index(b,)");
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // index, space and comma, no parameter, KmnCompilerMessages::ERROR_InvalidIndex
+    // index, space and comma, no offet, KmnCompilerMessages::ERROR_InvalidIndex
     u16cpy(str, u"index(b ,)");
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // index, comma, no parameter but space, KmnCompilerMessages::ERROR_InvalidIndex
+    // index, comma, no offet but space, KmnCompilerMessages::ERROR_InvalidIndex
     u16cpy(str, u"index(b, )");
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = file_store;
