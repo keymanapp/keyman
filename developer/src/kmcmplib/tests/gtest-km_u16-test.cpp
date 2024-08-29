@@ -175,3 +175,7 @@ TEST(km_u16_Test, u16ltrim) {
   EXPECT_TRUE(!u16cmp(u"abc ", u16ltrim(u"abc ")));
   EXPECT_TRUE(!u16cmp(u"abc", u16ltrim(u"\tabc")));
 }
+
+TEST(km_u16_Test, u16rtrim) {
+  EXPECT_TRUE(!u16rtrim(nullptr));
+}
