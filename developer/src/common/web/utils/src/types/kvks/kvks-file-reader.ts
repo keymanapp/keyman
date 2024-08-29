@@ -21,7 +21,9 @@ export default class KVKSFileReader {
     let source: KVKSourceFile;
 
     const parser = new XMLParser({
-      // explicitArray: false,
+      ignoreAttributes: false, // We'd like attributes, please
+      attributeNamePrefix: '', // to avoid '@_' prefixes
+        // explicitArray: false,
       // mergeAttrs: false,
       // includeWhiteChars: true,
       // normalize: false,

@@ -48,12 +48,14 @@ export interface LKTStartContext {
   to?: string;
 };
 
+/** Polymorphic type of test actions */
+export type LKTActionType = "check" | "emit" | "keystroke" | "backspace";
+
 /**
  * Test Actions.
- * The expectation is that each LKTAction object will have exactly one non-falsy field.
  */
 export interface LKTAction {
-  type?: "check" | "emit" | "keystroke" | "backspace";
+  type?: LKTActionType;
 };
 
 export interface LKTCheck extends LKTAction {

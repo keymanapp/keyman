@@ -2,7 +2,9 @@ import { MATCH_HEX_ESCAPE, CONTAINS_QUAD_ESCAPE, MATCH_QUAD_ESCAPE } from './con
 export { MATCH_HEX_ESCAPE, CONTAINS_QUAD_ESCAPE, MATCH_QUAD_ESCAPE };
 
 /**
- * xml2js will not place single-entry objects into arrays. Easiest way to fix
+ * fast-xml-parser will not place single-entry objects into arrays.
+ * We could set a list of items expected to be arrays,
+ * but the easiest way to fix
  * this is to box them ourselves as needed. Ensures that o.x is an array.
  *
  * @param o Object with property to box

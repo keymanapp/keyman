@@ -4,7 +4,7 @@ import { CommonTypesMessages } from '../../common-events.js';
 import { CompilerCallbacks } from '../../compiler-interfaces.js';
 import { LDMLKeyboardXMLSourceFile, LKImport, ImportStatus } from './ldml-keyboard-xml.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
-import { LDMLKeyboardTestDataXMLSourceFile, LKTTest, LKTTests } from './ldml-keyboard-testdata-xml.js';
+import { LDMLKeyboardTestDataXMLSourceFile, LKTActionType, LKTStartContext, LKTTest } from './ldml-keyboard-testdata-xml.js';
 
 import boxXmlArray = util.boxXmlArray;
 
@@ -13,6 +13,11 @@ interface NameAndProps  {
   '#name'?: string; // element name
   '$$'?: any; // children
 };
+
+/** produced by fast-xml-parser */
+interface XMLAttributeMap {
+  ':@'?: Map<string, string>; // attribute values
+}
 
 export class LDMLKeyboardXMLSourceFileReaderOptions {
   importsPath: string;
@@ -253,21 +258,17 @@ export class LDMLKeyboardXMLSourceFileReader {
   loadUnboxed(file: Uint8Array): LDMLKeyboardXMLSourceFile {
     const source = (() => {
       const parser = new XMLParser({
+        ignoreAttributes: false, // We'd like attributes, please
+        attributeNamePrefix: '', // to avoid '@_' prefixes
+        // TODO: Any others needed?
         // explicitArray: false,
         // mergeAttrs: true,
         // includeWhiteChars: false,
         // emptyTag: {} as any
-        // Why "as any"? xml2js is broken:
-        // https://github.com/Leonidas-from-XIV/node-xml2js/issues/648 means
-        // that an old version of `emptyTag` is used which doesn't support
-        // functions, but DefinitelyTyped is requiring use of function or a
-        // string. See also notes at
-        // https://github.com/DefinitelyTyped/DefinitelyTyped/pull/59259#issuecomment-1254405470
-        // An alternative fix would be to pull xml2js directly from github
-        // rather than using the version tagged on npmjs.com.
       });
-      const a = parser.parse(file.toString()) as LDMLKeyboardXMLSourceFile;
-      return a;
+      const a = parser.parse(file.toString());
+      delete a['?xml']; // fast-xml-parser includes the XML prologue, it's not in the schema so we delete it.
+      return a as LDMLKeyboardXMLSourceFile;
     })();
     return source;
   }
@@ -289,27 +290,13 @@ export class LDMLKeyboardXMLSourceFileReader {
   }
 
   loadTestDataUnboxed(file: Uint8Array): any {
-    const source = (() => {
-      const parser = new XMLParser({
-        // explicitArray: false,
-        // preserveChildrenOrder:true, // needed for test data
-        // explicitChildren: true, // needed for test data
-        // mergeAttrs: true,
-        // includeWhiteChars: false,
-        // emptyTag: {} as any
-        // Why "as any"? xml2js is broken:
-        // https://github.com/Leonidas-from-XIV/node-xml2js/issues/648 means
-        // that an old version of `emptyTag` is used which doesn't support
-        // functions, but DefinitelyTyped is requiring use of function or a
-        // string. See also notes at
-        // https://github.com/DefinitelyTyped/DefinitelyTyped/pull/59259#issuecomment-1254405470
-        // An alternative fix would be to pull xml2js directly from github
-        // rather than using the version tagged on npmjs.com.
-      });
-      const a = parser.parse(file.toString())
-      return a; // Why 'any'? Because we need to box up the $'s into proper properties.
-    })();
-    return source;
+    const parser = new XMLParser({
+      ignoreAttributes: false, // We'd like attributes, please
+      attributeNamePrefix: '', // avoid @_
+      preserveOrder: true,     // Gives us a 'special' format - see boxTestDataArrays() below
+    });
+    const a : any = parser.parse(file.toString())
+    return a; // Why 'any'? Because we need to box up the $'s into proper properties.
   }
 
   /**
@@ -349,60 +336,88 @@ export class LDMLKeyboardXMLSourceFileReader {
    */
   static readonly defaultMapper = ((o : NameAndProps, r: LDMLKeyboardXMLSourceFileReader) => o?.$);
 
-  /**
-   *
-   * @param obj target object
-   * @param source array of $/#name strings
-   * @param subtag name to extract
-   * @param mapper custom mapper function
-   */
-  stuffBoxes(obj: any, source: NameAndProps[], subtag: string, asArray?: boolean, mapper?: (v: NameAndProps, r: LDMLKeyboardXMLSourceFileReader) => any) {
-    if (!mapper) {
-      mapper = LDMLKeyboardXMLSourceFileReader.defaultMapper;
-    }
-    if (asArray) {
-      const r = this;
-      obj[subtag] = this.findSubtagArray(source, subtag)?.map((v) => mapper(v, r)); // extract contents only
-    } else {
-      obj[subtag] = mapper(this.findSubtag(source, subtag), this); // run the mapper once
+  /** Apply the attributes to the target */
+  applyTestAttributes(target: any, source: XMLAttributeMap) {
+    if (!source[':@']) return;
+    for (const [k, v] of Object.entries(source[':@'])) {
+      if (target[k]) throw Error(`Internal error: key ${k} applied twice.`);
+      target[k] = v;
     }
   }
 
+
+  /**
+   *
+   * @param obj target object
+   * @param source input data
+   * @param subtag name to extract
+   */
+  stuffBoxes(obj: any, source: any, subtag: string) {
+    // copy any attributes
+    this.applyTestAttributes(obj, source); // apply top level attrs
+    const v = source[subtag]; // e.g.  keyboardTest3: { … }
+    if (!v) return; // no body
+
+    // v is an array of entries.
+    for (const e of v) {
+      const subsubtag = (Object.keys(e).filter(n => n != ':@'))[0];
+      if (!subsubtag) throw Error(`No sub-subtag of ${subtag}`);
+
+      if (subsubtag === 'startContext') {
+        // special handling on this one
+        const t = obj as LKTTest;
+        t.startContext = e[':@'] as LKTStartContext;
+      } else if (subtag === 'test') {
+        // These go under 'actions', special handling.
+        const t = obj as LKTTest;
+        if (t.actions === undefined) t.actions = [];
+        const count = t.actions.length;
+        // set the type for polymorphism
+        t.actions[count] = { type: subsubtag as LKTActionType };
+        // fill with attrs from the test item
+        this.stuffBoxes(t.actions[count], e, subsubtag);
+      } else {
+        if (obj[subsubtag] === undefined) {
+          // initialize the subtag. Handle a couple special cases
+          if (subsubtag === 'test' || subsubtag === 'tests' || subsubtag === 'repertoire') {
+            obj[subsubtag] = [];
+          } else {
+            obj[subsubtag] = {};
+          }
+        }
+        // now, initialize the object
+        if (Array.isArray(obj[subsubtag])) {
+          const count = obj[subsubtag].length;
+          // stuff into next array slot
+          obj[subsubtag][count] = {};
+          this.stuffBoxes(obj[subsubtag][count], e, subsubtag);
+        } else {
+          // overwrite object
+          this.stuffBoxes(obj[subsubtag], e, subsubtag);
+        }
+      } // not a test action
+    }
+  }
+
+  /**
+   * Process the special format provided by `preserveOrder: true` option to the XML parser,
+   * needed to handle the text data with variable interleaved elements.
+   */
   boxTestDataArrays(raw: any) : LDMLKeyboardTestDataXMLSourceFile | null {
     if (!raw) return null;
+
+    // It's less of a boxing and more of a reconstituting.
+    // again see https://github.com/NaturalIntelligence/fast-xml-parser/blob/HEAD/docs/v4/2.XMLparseOptions.md#preserveorder
+
+    // start with an empty document..
     const a : LDMLKeyboardTestDataXMLSourceFile = {
-      keyboardTest3: {
-        conformsTo: raw?.keyboardTest3?.$?.conformsTo,
-      }
+      keyboardTest3: {}
     };
 
-    const $$ : NameAndProps[] = raw?.keyboardTest3?.$$;
+    // skip the XML prologue
+    raw = raw.filter((e: any) => !!e['keyboardTest3'])[0];
 
-    this.stuffBoxes(a.keyboardTest3, $$, 'info');
-    this.stuffBoxes(a.keyboardTest3, $$, 'repertoire', true);
-    this.stuffBoxes(a.keyboardTest3, $$, 'tests', true, (o, r) => {
-      // start with basic unpack
-      const tests : LKTTests = LDMLKeyboardXMLSourceFileReader.defaultMapper(o, r);
-      // add ingredients
-      r.stuffBoxes(tests, o.$$, 'test', true, (o, r) => {
-        // start with basic unpack
-        const test : LKTTest = LDMLKeyboardXMLSourceFileReader.defaultMapper(o, r);
-        // add ingredients
-        const $$ : NameAndProps[] = o.$$;
-        r.stuffBoxes(test, $$, 'startContext'); // singleton
-        // now the actions
-        test.actions = $$.map(v => {
-          const type = v['#name']; // element name
-          if (type === 'startContext') {
-            return null; // handled above
-          }
-          const subv = LDMLKeyboardXMLSourceFileReader.defaultMapper(v, r);
-          return Object.assign({ type }, subv);
-        }).filter(v => v !== null);
-        return test;
-      });
-      return tests;
-    });
+    this.stuffBoxes(a.keyboardTest3, raw, 'keyboardTest3');
 
     return a;
   }
