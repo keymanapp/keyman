@@ -166,3 +166,12 @@ TEST(km_u16_Test, u16tok_str_compare_to_strtok) {
   EXPECT_TRUE(!strcmp("ghi", strtok(nullptr, reverse_delim)));
   EXPECT_EQ(nullptr, strtok(nullptr, reverse_delim));
 }
+
+TEST(km_u16_Test, u16ltrim) {
+  EXPECT_TRUE(!u16ltrim(nullptr));
+  EXPECT_TRUE(!u16cmp(u"abc", u16ltrim(u"abc")));
+  EXPECT_TRUE(!u16cmp(u"abc", u16ltrim(u" abc")));
+  EXPECT_TRUE(!u16cmp(u"abc", u16ltrim(u"  abc")));
+  EXPECT_TRUE(!u16cmp(u"abc ", u16ltrim(u"abc ")));
+  EXPECT_TRUE(!u16cmp(u"abc", u16ltrim(u"\tabc")));
+}

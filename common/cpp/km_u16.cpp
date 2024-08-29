@@ -389,7 +389,7 @@ double u16tof(KMX_WCHAR* str16) {
 }
 
 const KMX_WCHAR* u16ltrim(const KMX_WCHAR* p) {
-  while(iswspace(*p)) p++;
+  while(p && iswspace(*p)) p++;
   return p;
 }
 
