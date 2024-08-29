@@ -94,7 +94,7 @@ graph TD;
     LMWorker-->Wordbreakers;
     LMLayer["@keymanapp/lexical-model-layer<br>(/web/src/engine/predictive-text/worker-main)"];
     LMLayer-->LMWorker;
-    Gestures["@keymanapp/gesture-recognizer<br>(/common/web/gesture-recognizer)"];
+    Gestures["@keymanapp/gesture-recognizer<br>(/web/src/engine/osk/gesture-recognizer)"];
     Gestures-->WebUtils;
 
     subgraph PredText["PredText: WebWorker + its interface"]

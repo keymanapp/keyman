@@ -3,6 +3,7 @@ import esbuild from 'esbuild';
 import { esmConfiguration, forES6, iifeConfiguration } from './configuration.mjs';
 import { prepareTslibTreeshaking } from './tslibTreeshaking.mjs';
 
+let CHARSET = 'ascii';
 let FORMAT = 'iife';
 let MINIFY = false;
 
@@ -28,6 +29,8 @@ Parameters:
 
 Options:
   --help                Shows this script's documentation
+  --charset=<charset>   Sets the charset type for esbuild to emit.  Defaults to 'ascii'
+                        but may also be 'utf8'.
   --format=<format>     Sets the format type to use for the generated bundle.  Should be
                         'iife' or 'esm'.
 
@@ -49,15 +52,28 @@ if(process.argv.length > 2) {
       case '--help':
         doHelp();
         break;
-      case '--format':  // bc TS uses this exact flag.  esbuild... uses sourcemap (in the JS config)
-        let input = process.argv[++i];
-        switch(input) {
-          case 'iife':
-          case 'esm':
-            FORMAT = input;
+      case '--charset':
+        let charsetOption = process.argv[++i];
+        switch(charsetOption) {
+          case 'ascii':
+          case 'utf8':
+            CHARSET = charsetOption;
             break;
           default:
-            console.error(`Invalid bundling format specified: ${input}.  Must be 'iife' or 'esm'.`);
+            console.error(`Invalid bundling format specified: ${charsetOption}.  Must be 'ascii' or 'utf8'.`);
+            doHelp(1);
+            break;
+        }
+        break;
+      case '--format':  // bc TS uses this exact flag.  esbuild... uses sourcemap (in the JS config)
+        let formatOption = process.argv[++i];
+        switch(formatOption) {
+          case 'iife':
+          case 'esm':
+            FORMAT = formatOption;
+            break;
+          default:
+            console.error(`Invalid bundling format specified: ${formatOption}.  Must be 'iife' or 'esm'.`);
             doHelp(1);
             break;
         }
@@ -128,6 +144,7 @@ const baseConfig = FORMAT == 'iife' ? iifeConfiguration : esmConfiguration;
 const config: esbuild.BuildOptions = {
   ...jsVersionTarget == 'es6' ? forES6(baseConfig) : baseConfig,
   entryPoints: [sourceFile],
+  charset: CHARSET as 'ascii' | 'utf8',
   outfile: destFile,
   minify: MINIFY,
   metafile: !!profilePath,

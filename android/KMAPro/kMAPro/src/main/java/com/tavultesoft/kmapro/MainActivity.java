@@ -647,7 +647,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
     final View textSizeController = inflater.inflate(R.layout.text_size_controller, null);
     final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
     dialogBuilder.setIcon(R.drawable.ic_light_action_textsize);
-    dialogBuilder.setTitle(String.format(getString(R.string.text_size), textSize));
+    dialogBuilder.setTitle(getTextSizeString());
     dialogBuilder.setView(textSizeController);
     dialogBuilder.setPositiveButton(getString(R.string.label_ok), new DialogInterface.OnClickListener() {
       @Override
@@ -678,7 +678,7 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
       public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         textSize = progress + minTextSize;
         textView.setTextSize((float) textSize);
-        dialog.setTitle(String.format(getString(R.string.text_size), textSize));
+        dialog.setTitle(getTextSizeString());
       }
     });
 
@@ -701,6 +701,16 @@ public class MainActivity extends BaseActivity implements OnKeyboardEventListene
         }
       }
     });
+  }
+
+  /**
+   * Combine a localized string for "Text Size" plus Arabic numerals
+   * @return String
+   */
+  private String getTextSizeString() {
+    // Instead of formatting the number, will truncate formatting and concat the actual textSize
+    String label = getString(R.string.text_size).replace("%1$d", "");
+    return label + KMString.format(" %d", textSize);
   }
 
   private void showClearTextDialog() {

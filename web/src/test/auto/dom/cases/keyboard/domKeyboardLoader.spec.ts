@@ -30,7 +30,7 @@ describe('Keyboard loading in DOM', function() {
   it('`window`, disabled rule processing', async () => {
     const harness = new KeyboardHarness(window, MinimalKeymanGlobal);
     let keyboardLoader = new DOMKeyboardLoader(harness);
-    let keyboard: Keyboard = await keyboardLoader.loadKeyboardFromPath('/resources/keyboards/khmer_angkor.js');
+    let keyboard: Keyboard = await keyboardLoader.loadKeyboardFromPath('/common/test/resources/keyboards/khmer_angkor.js');
 
     assert.isOk(keyboard);
     assert.equal(keyboard.id, 'Keyboard_khmer_angkor');
@@ -48,7 +48,7 @@ describe('Keyboard loading in DOM', function() {
   it('`window`, enabled rule processing', async () => {
     const harness = new KeyboardInterface(window, MinimalKeymanGlobal);
     const keyboardLoader = new DOMKeyboardLoader(harness);
-    const keyboard: Keyboard = await keyboardLoader.loadKeyboardFromPath('/resources/keyboards/khmer_angkor.js');
+    const keyboard: Keyboard = await keyboardLoader.loadKeyboardFromPath('/common/test/resources/keyboards/khmer_angkor.js');
     harness.activeKeyboard = keyboard;
 
     assert.isOk(keyboard);
@@ -80,14 +80,14 @@ describe('Keyboard loading in DOM', function() {
     let keyboardLoader = new DOMKeyboardLoader(harness);
 
     // Preload a keyboard and make it active.
-    const test_kbd: Keyboard = await keyboardLoader.loadKeyboardFromPath('/resources/keyboards/test_917.js');
+    const test_kbd: Keyboard = await keyboardLoader.loadKeyboardFromPath('/common/test/resources/keyboards/test_917.js');
     harness.activeKeyboard = test_kbd;
     assert.isNotOk(harness.loadedKeyboard);
 
     // With an active keyboard, load three keyboards but activate none of them.
-    const lao_keyboard_promise = keyboardLoader.loadKeyboardFromPath('/resources/keyboards/lao_2008_basic.js');
-    const khmer_keyboard_promise = keyboardLoader.loadKeyboardFromPath('/resources/keyboards/khmer_angkor.js');
-    const chiral_keyboard_promise = keyboardLoader.loadKeyboardFromPath('/resources/keyboards/test_chirality.js');
+    const lao_keyboard_promise = keyboardLoader.loadKeyboardFromPath('/common/test/resources/keyboards/lao_2008_basic.js');
+    const khmer_keyboard_promise = keyboardLoader.loadKeyboardFromPath('/common/test/resources/keyboards/khmer_angkor.js');
+    const chiral_keyboard_promise = keyboardLoader.loadKeyboardFromPath('/common/test/resources/keyboards/test_chirality.js');
 
     // Sure, why not `await` out of order?
     const chiral_keyboard = await chiral_keyboard_promise;

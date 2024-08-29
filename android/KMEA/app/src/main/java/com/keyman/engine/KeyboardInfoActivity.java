@@ -88,7 +88,7 @@ public final class KeyboardInfoActivity extends BaseActivity {
     hashMap = new HashMap<String, String>();
     final String customHelpLink = kbd.getHelpLink();
     // Check if app declared FileProvider
-    String icon = String.valueOf(R.drawable.ic_arrow_forward);
+    String icon = String.valueOf(R.drawable.ic_action_forward);
     // Don't show help link arrow if it's a local help file and File Provider unavailable,
     // or custom help doesn't exist
     if ( (customHelpLink != null && ! KMManager.isTestMode() &&
