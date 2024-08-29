@@ -91,6 +91,7 @@ Depends:
  gir1.2-webkit2-4.1 | gir1.2-webkit2-4.0,
  keyman-engine,
  python3-bs4,
+ python3-fonttools,
  python3-gi,
  python3-packaging,
  python3-sentry-sdk (>= 1.1),
