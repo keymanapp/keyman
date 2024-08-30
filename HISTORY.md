@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.102 alpha 2024-08-30
+
+* docs(web): add documentation comments for touch layout interfaces (#12314)
+* change(mac): store data in Library directory instead of Documents (#12106)
+* change(mac): store partial path in UserDefaults (#12144)
+
 ## 18.0.101 alpha 2024-08-29
 
 * refactor(web): move `gesture-recognizer` → `gesture-processor` (#12194)
