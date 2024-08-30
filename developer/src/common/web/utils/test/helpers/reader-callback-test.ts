@@ -88,6 +88,7 @@ export function testReaderCases(cases : CompilationCase[]) {
       assert.ok(data, `reading ${testcase.subpath}`);
       const source = reader.load(data);
       if (!testcase.loadfail) {
+        assert.deepEqual(callbacks.messages, [], 'expected zero messages');
         assert.ok(source, `loading ${testcase.subpath}`);
       } else {
         assert.notOk(source, `loading ${testcase.subpath} (expected failure)`);
