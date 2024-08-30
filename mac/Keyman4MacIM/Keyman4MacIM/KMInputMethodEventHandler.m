@@ -10,6 +10,7 @@
 #import <Carbon/Carbon.h> /* For kVK_ constants. */
 #import "KeySender.h"
 #import "TextApiCompliance.h"
+#import "KMSettingsRepository.h"
 #import "KMLogs.h"
 @import Sentry;
 
@@ -416,11 +417,11 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   for(NSString *key in options) {
     NSString *value = [options objectForKey:key];
     if(key && value) {
-      os_log_debug([KMLogs keyLog], "applyNonTextualOutput calling writePersistedOptions, key: %{public}@, value: %{public}@", key, value);
+      os_log_debug([KMLogs keyLog], "persistOptions, key: %{public}@, value: %{public}@", key, value);
       [self.appDelegate writePersistedOptions:key withValue:value];
     }
     else {
-      os_log_debug([KMLogs keyLog], "applyNonTextualOutput, invalid values in optionsToPersist, not writing to UserDefaults, key: %{public}@, value: %{public}@", key, value);
+      os_log_debug([KMLogs keyLog], "invalid values in persistOptions, not writing to UserDefaults, key: %{public}@, value: %{public}@", key, value);
     }
   }
 }

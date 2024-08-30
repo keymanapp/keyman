@@ -69,15 +69,6 @@ typedef enum {
   return packageInfo;
 }
 
-- (NSString *)packageNameFromPackageInfo:(NSString *)path {
-  NSString *packageName = nil;
-  
-  KMPackageInfo *packageInfo = [self loadPackageInfo:path];
-  packageName = packageInfo.packageName;
-  
-  return packageName;
-}
-
 /**
  * read JSON file and load it into KMPackageInfo object
  * returns nil if the file does not exist or it cannot be parsed as JSON

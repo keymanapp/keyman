@@ -16,6 +16,8 @@
 // Keyman4MacIM[6245]: IMK Stall detected, *please Report* your user scenario in <rdar://problem/16792073> - (sessionFinished) block performed very slowly (0.00 secs)
 
 #import "KMInputMethodAppDelegate.h"
+#import "KMSettingsRepository.h"
+#import "KMDataRepository.h"
 #import "KMConfigurationWindowController.h"
 #import "KMDownloadKBWindowController.h"
 #import "ZipArchive.h"
@@ -83,7 +85,6 @@ NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboard
 @synthesize alwaysShowOSK = _alwaysShowOSK;
 
 id _lastServerWithOSKShowing = nil;
-NSString* _keymanDataPath = nil;
 
 - (id)init {
   self = [super init];
@@ -170,7 +171,12 @@ NSString* _keymanDataPath = nil;
   [KMLogs reportLogStatus];
   
   [self startSentry];
+
+  [self setDefaultKeymanMenuItems];
+  [self updateKeyboardMenuItems];
+  
   [self setPostLaunchKeymanSentryTags];
+  // [SentrySDK captureMessage:@"Starting Keyman [test message]"];
 }
 
 - (void)startSentry {
@@ -183,7 +189,6 @@ NSString* _keymanDataPath = nil;
     options.environment = keymanVersionInfo.sentryEnvironment;
     //options.debug = YES;
   }];
-  
 }
 
 - (void)setPostLaunchKeymanSentryTags {
@@ -528,34 +533,18 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 #pragma mark - Keyman Data
 
 /**
- * Locate and create the Keyman data path; currently in ~/Documents/Keyman-Keyboards
- */
-- (NSString *)keymanDataPath {
-  if(_keymanDataPath == nil) {
-    NSString *documentDirPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-    _keymanDataPath = [documentDirPath stringByAppendingPathComponent:@"Keyman-Keyboards"];
-    
-    NSFileManager *fm = [NSFileManager defaultManager];
-    if (![fm fileExistsAtPath:_keymanDataPath]) {
-      [fm createDirectoryAtPath:_keymanDataPath withIntermediateDirectories:YES attributes:nil error:nil];
-    }
-  }
-  return _keymanDataPath;
-}
-
-/**
- * Returns the root folder where keyboards are stored; currently the same
- * as the keymanDataPath, but may diverge in future versions (possibly a sub-folder)
+ * Returns the root folder where keyboards are stored
  */
 - (NSString *)keyboardsPath {
   if (_keyboardsPath == nil) {
-    _keyboardsPath = [self keymanDataPath];
+    _keyboardsPath = [KMDataRepository shared].keymanKeyboardsDirectory.path;
   }
   
   return _keyboardsPath;
 }
 
 - (NSArray *)kmxFileList {
+  os_log_debug([KMLogs dataLog], "kmxFileList");
   if (_kmxFileList == nil) {
     NSArray *kmxFiles = [self KMXFiles];
     _kmxFileList = [[NSMutableArray alloc] initWithCapacity:0];
@@ -664,7 +653,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 - (NSString *)packageNameFromPackageInfo:(NSString *)packageFolder {
   NSString *packageName = nil;
   
-  NSString *path = [[self keymanDataPath] stringByAppendingPathComponent:packageFolder];
+  NSString *path = [[self keyboardsPath] stringByAppendingPathComponent:packageFolder];
   KMPackageInfo *packageInfo = [self.packageReader loadPackageInfo:path];
   
   if (packageInfo) {
@@ -675,6 +664,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (NSArray *)keyboardNamesFromFolder:(NSString *)packageFolder {
+  os_log_debug([KMLogs dataLog], "keyboardNamesFromFolder, folder = %{public}@", packageFolder);
   NSMutableArray *kbNames = [[NSMutableArray alloc] initWithCapacity:0];;
   for (NSString *kmxFile in [self KMXFilesAtPath:packageFolder]) {
     NSDictionary * infoDict = [KMXFile keyboardInfoFromKmxFile:kmxFile];
@@ -781,8 +771,23 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (void)awakeFromNib {
-  [self setDefaultKeymanMenuItems];
-  [self updateKeyboardMenuItems];
+  [self prepareStorage];
+}
+
+/**
+ * Prepare the app environment for all the things that need to be persisted:
+ * namely, the keyboard data on disk and the settings in UserDefaults
+ */
+- (void)prepareStorage {
+  [KMDataRepository.shared createDataDirectoryIfNecessary];
+  
+  if ([KMSettingsRepository.shared dataMigrationNeeded]) {
+    BOOL movedData = [KMDataRepository.shared migrateData];
+    [KMSettingsRepository.shared convertSettingsForMigration];
+  }
+  
+  [KMDataRepository.shared createKeyboardsDirectoryIfNecessary];
+  [KMSettingsRepository.shared setDataModelVersionIfNecessary];
 }
 
 - (void)setDefaultKeymanMenuItems {
@@ -953,13 +958,16 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (NSArray *)KMXFilesAtPath:(NSString *)path {
+  os_log_debug([KMLogs dataLog], "Reading KMXFiles at path %{public}@", path);
   NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:path];
   NSMutableArray *kmxFiles = [[NSMutableArray alloc] initWithCapacity:0];
   NSString *filePath;
   while (filePath = (NSString *)[dirEnum nextObject]) {
     NSString *extension = [[filePath pathExtension] lowercaseString];
-    if ([extension isEqualToString:@"kmx"])
+    if ([extension isEqualToString:@"kmx"]) {
       [kmxFiles addObject:[path stringByAppendingPathComponent:filePath]];
+      os_log_debug([KMLogs dataLog], "file = %{public}@", filePath);
+    }
   }
   
   return kmxFiles;
