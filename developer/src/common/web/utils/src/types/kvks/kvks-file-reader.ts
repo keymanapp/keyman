@@ -28,7 +28,7 @@ export default class KVKSFileReader {
       ignoreAttributes: false, // We'd like attributes, please
       attributeNamePrefix: '', // to avoid '@_' prefixes
       numberParseOptions: {
-        skipLike: /(?:)/,
+        skipLike: /(?:)/, // parse numbers as strings
         hex: null,
         leadingZeros: null,
         eNotation: null,

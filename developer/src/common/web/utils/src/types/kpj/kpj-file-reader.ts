@@ -16,12 +16,13 @@ export class KPJFileReader {
   const parser = new XMLParser({
     ignoreAttributes: false, // We'd like attributes, please
     attributeNamePrefix: '', // to avoid '@_' prefixes
-      // explicitArray: false,
-      // mergeAttrs: false,
-      // includeWhiteChars: false,
-      // normalize: false,
-      // emptyTag: ''
-    });
+    numberParseOptions: {
+      skipLike: /(?:)/, // parse numbers as strings
+      hex: null,
+      leadingZeros: null,
+      eNotation: null,
+    },
+  });
     const raw = parser.parse(file.toString());
     delete raw['?xml']; // XML prologue
     data = raw as KPJFile;
