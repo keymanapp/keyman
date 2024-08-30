@@ -1140,6 +1140,51 @@ km_core_keyboard_load(km_core_path_name kb_path,
 
 -------------------------------------------------------------------------------
 
+# km_core_keyboard_load_from_blob()
+
+## Description
+
+Parse and load keyboard from the supplied blob and a pointer to the loaded keyboard
+into the out paramter.
+
+## Specification
+
+```c */
+KMN_API
+km_core_status km_core_keyboard_load_from_blob(void* blob, km_core_keyboard** keyboard);
+
+/*
+```
+
+## Parameters
+
+`blob`
+: a byte array containing the content of a KMX/KMX+ file
+
+`keyboard`
+: A pointer to result variable: A pointer to the opaque keyboard
+  object returned by the Processor. This memory must be freed with a
+  call to [km_core_keyboard_dispose].
+
+## Returns
+
+`KM_CORE_STATUS_OK`
+: On success.
+
+`KM_CORE_STATUS_NO_MEM`
+: In the event an internal memory allocation fails.
+
+`KM_CORE_STATUS_IO_ERROR`
+: In the event the keyboard file is unparseable for any reason
+
+`KM_CORE_STATUS_INVALID_ARGUMENT`
+: In the event `keyboard` is null.
+
+`KM_CORE_STATUS_OS_ERROR`
+: Bit 31 (high bit) set, bits 0-30 are an OS-specific error code.
+
+-------------------------------------------------------------------------------
+
 # km_core_keyboard_dispose()
 
 ## Description
