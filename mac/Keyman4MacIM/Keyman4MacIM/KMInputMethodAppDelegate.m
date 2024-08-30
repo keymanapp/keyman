@@ -19,10 +19,6 @@
 #import "KMLogs.h"
 @import Sentry;
 
-// TODO: move Active Keyboards UserDefaults code to KMSettingsRepository
-/** NSUserDefaults keys */
-NSString *const kKMActiveKeyboardsKey = @"KMActiveKeyboardsKey";
-
 NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboardDownloadCompletedNotification";
 
 @implementation NSString (VersionNumbers)
@@ -627,31 +623,29 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 - (NSMutableArray *)activeKeyboards {
   if (!_activeKeyboards) {
     os_log_debug([KMLogs dataLog], "initializing activeKeyboards");
-    NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-    _activeKeyboards = [[userData arrayForKey:kKMActiveKeyboardsKey] mutableCopy];
-    if (!_activeKeyboards) {
-      os_log_debug([KMLogs dataLog], "KMActiveKeyboardsKey key not found in NSUserDefualts");
-     _activeKeyboards = [[NSMutableArray alloc] initWithCapacity:0];
-    }
+    _activeKeyboards = [[KMSettingsRepository.shared readActiveKeyboards] mutableCopy];
   }
 
   return _activeKeyboards;
 }
 
 - (void)saveActiveKeyboards {
-  os_log_debug([KMLogs dataLog], "saveActiveKeyboards, entering");
-  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-  [userData setObject:_activeKeyboards forKey:kKMActiveKeyboardsKey];
-  [userData synchronize];
+  os_log_debug([KMLogs dataLog], "saveActiveKeyboards");
+  [KMSettingsRepository.shared writeActiveKeyboards:_activeKeyboards];
   [self resetActiveKeyboards];
   [self updateKeyboardMenuItems];
 }
 
 - (void)clearActiveKeyboards {
-  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-  [userData setObject:nil forKey:kKMActiveKeyboardsKey];
-  [userData synchronize];
+  [KMSettingsRepository.shared clearActiveKeyboards];
   [self updateKeyboardMenuItems];
+}
+
+- (void)addActiveKeyboard:(NSString *) partialPath {
+  if (![self.activeKeyboards containsObject:partialPath]) {
+    os_log_debug([KMLogs keyboardLog], "addActiveKeyboard, adding '%{public}@' to list of active keyboards: ", partialPath);
+    [self.activeKeyboards addObject:partialPath];
+  }
 }
 
 - (void)resetActiveKeyboards {
@@ -686,9 +680,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   }
   
   if (found) {
-    NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-    [userData setObject:_activeKeyboards forKey:kKMActiveKeyboardsKey];
-    [userData synchronize];
+    [KMSettingsRepository.shared writeActiveKeyboards:_activeKeyboards];
   }
 }
 
@@ -1356,11 +1348,7 @@ extern const CGKeyCode kProcessPendingBuffer;
   
   for (NSString *kmxFile in [self getKmxFilesAtPath:keyboardFolderPath]) {
     NSString *partialPath = [KMDataRepository.shared buildPartialPathFrom:folderName keyboardFile:[kmxFile lastPathComponent]];
-    // TODO: encapsulate this in KMSettingsRepository, insertIfNotExists
-    if (![self.activeKeyboards containsObject:partialPath]) {
-      os_log_debug([KMLogs keyboardLog], "unzipFile, adding keyboard to list of active keyboards: %{public}@", partialPath);
-      [self.activeKeyboards addObject:partialPath];
-    }
+    [self addActiveKeyboard:partialPath];
   }
   [self saveActiveKeyboards];
   

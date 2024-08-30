@@ -19,6 +19,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setDataModelVersionIfNecessary;
 - (NSString *)readSelectedKeyboard;
 - (void)writeSelectedKeyboard:(NSString *)selectedKeyboard;
+- (NSArray *)readActiveKeyboards;
+- (void)writeActiveKeyboards: (NSArray *) keyboards;
+- (void)clearActiveKeyboards;
 - (NSDictionary *)readOptionsForSelectedKeyboard;
 - (void)writeOptionForSelectedKeyboard:(NSString *)key withValue:(NSString*)value;
 - (BOOL)readAlwaysShowOsk;

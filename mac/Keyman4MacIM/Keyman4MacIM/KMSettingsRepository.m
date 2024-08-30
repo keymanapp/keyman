@@ -151,6 +151,32 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirec
   return activeKeyboards;
 }
 
+- (NSArray *)readActiveKeyboards {
+  os_log_debug([KMLogs dataLog], "KMSettingsRepository readActiveKeyboards");
+  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
+  NSArray *keyboardsArray = [userData arrayForKey:kActiveKeyboardsKey];
+  
+  // if the kActiveKeyboardsKey does not exist, then create an empty array
+  if (!keyboardsArray) {
+    os_log_debug([KMLogs dataLog], "KMActiveKeyboardsKey key not found in NSUserDefualts");
+    keyboardsArray = [[NSArray alloc] init];
+  }
+  return keyboardsArray;
+}
+
+- (void)writeActiveKeyboards: (NSArray *) keyboards {
+  os_log_debug([KMLogs dataLog], "KMSettingsRepository writeActiveKeyboards");
+  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
+  [userData setObject:keyboards forKey:kActiveKeyboardsKey];
+}
+
+- (void)clearActiveKeyboards {
+  os_log_debug([KMLogs dataLog], "KMSettingsRepository clearActiveKeyboards");
+  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
+  [userData setObject:nil forKey:kActiveKeyboardsKey];
+}
+
+
 /**
  * returns dictionary of persisted options for the single selected keyboard
  */
