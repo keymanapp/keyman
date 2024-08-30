@@ -85,7 +85,7 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
       } else {
         str = keyEntry->get_to_string();
       }
-      keys.add((km_core_virtual_key)kmapEntry->vkey, (uint16_t)kmapEntry->mod, str);
+      keys.add((km_core_virtual_key)kmapEntry->vkey, kmapEntry->mod, str);
     }
   } // else: no keys! but still valid. Just, no keys.
 

@@ -17,7 +17,7 @@ vkeys::vkeys() : vkey_to_string() {
 }
 
 void
-vkeys::add(km_core_virtual_key vk, uint16_t modifier_state, std::u16string output) {
+vkeys::add(km_core_virtual_key vk, km_core_ldml_modifier_state modifier_state, std::u16string output) {
   // construct key
   const vkey_id id(vk, modifier_state);
   // assign the string
