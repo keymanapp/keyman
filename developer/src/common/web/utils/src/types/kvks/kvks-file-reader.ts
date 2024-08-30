@@ -27,6 +27,12 @@ export default class KVKSFileReader {
     const parser = new XMLParser({
       ignoreAttributes: false, // We'd like attributes, please
       attributeNamePrefix: '', // to avoid '@_' prefixes
+      numberParseOptions: {
+        skipLike: /(?:)/,
+        hex: null,
+        leadingZeros: null,
+        eNotation: null,
+      },
     });
 
     const raw = parser.parse(file.toString());
