@@ -29,7 +29,9 @@ export default class KVKSFileReader {
       attributeNamePrefix: '', // to avoid '@_' prefixes
     });
 
-    source = parser.parse(file.toString()) as KVKSourceFile;
+    const raw = parser.parse(file.toString());
+    delete raw['?xml']; // XML prologue
+    source = raw as KVKSourceFile;
     if(source) {
       source = this.boxArrays(source);
       this.cleanupFlags(source);
@@ -115,7 +117,8 @@ export default class KVKSFileReader {
       const isUnicode = (encoding.name == 'unicode'),
         font = isUnicode ? result.header.unicodeFont : result.header.ansiFont;
       font.name = encoding.fontname ?? DEFAULT_KVK_FONT.name;
-      font.size = parseInt(encoding.fontsize ?? DEFAULT_KVK_FONT.size.toString(), 10);
+      font.size = encoding.fontsize ?? DEFAULT_KVK_FONT.size;
+
       for(const layer of encoding.layer) {
         const shift = this.kvksShiftToKvkShift(layer.shift);
         for(const sourceKey of layer.key) {
@@ -131,7 +134,7 @@ export default class KVKSFileReader {
               (isUnicode ? VisualKeyboardKeyFlags.kvkkUnicode : 0) |
               (sourceKey.bitmap ? VisualKeyboardKeyFlags.kvkkBitmap : 0),
             shift: shift,
-            text: sourceKey.bitmap ? '' : (sourceKey['#text'] ?? ''),
+            text: sourceKey.bitmap ? '' : (sourceKey['#text'] ?? '').toString(),
             vkey: vkey
           };
           if(sourceKey.bitmap) {
@@ -162,6 +165,7 @@ export default class KVKSFileReader {
   private boxArrays(source: KVKSourceFile) {
     boxXmlArray(source.visualkeyboard, 'encoding');
     for(const encoding of source.visualkeyboard.encoding) {
+      if (typeof encoding.fontsize === 'string') encoding.fontsize = Number.parseInt(encoding.fontsize, 10);
       boxXmlArray(encoding, 'layer');
       for(const layer of encoding.layer) {
         boxXmlArray(layer, 'key');
