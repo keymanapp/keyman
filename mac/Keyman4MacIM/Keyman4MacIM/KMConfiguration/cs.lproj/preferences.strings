@@ -17,7 +17,7 @@
 "JOK-JV-n8w.title" = "Zpět";
 
 /* Keyboards button text */
-"MPN-9N-wWc.label" = "Keyboards";
+"MPN-9N-wWc.label" = "Klávesnice";
 
 /* text to explain verbose Console logging option */
 "MrI-GM-7d6.title" = "Když je zapnuta možnost detailního logování, Keyman zaznamená akce, které mohou pomoci Keymanovi diagnostikovat problém. Program konzole může být použit k zobrazení protokolu zpráv od Keymana. V konzoli filtr zobrazuje všechny zprávy z procesu \"Klíčové\". Tento log může být exportován a v případě potřeby odeslán na podporu klíče.";

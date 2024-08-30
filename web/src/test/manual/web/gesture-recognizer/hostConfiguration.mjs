@@ -1,6 +1,6 @@
 // -- BEGIN:  Code for controlling the layout-simulation elements --
 
-import { GestureRecognizer } from '../../../../../build/engine/gesture-recognizer/lib/index.mjs';
+import { GestureRecognizer } from '../../../../../build/engine/gesture-processor/lib/index.mjs';
 
 function updateConfig() {
   let layout = document.config.screen;
