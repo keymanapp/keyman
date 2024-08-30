@@ -1,0 +1,15 @@
+{
+  "extends": "../../../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "lib": [ "dom", "es6" ],
+    "outDir": "./build/obj/",
+    "rootDir": "./src/engine",
+    "tsBuildInfoFile": "./build/obj/tsconfig.tsbuildinfo",
+  },
+  "include": ["./src/engine/**/*.ts"],
+  "references": [
+    { "path": "../../../../../common/web/utils" },
+  ],
+  "exclude": ["./src/test/**/*.ts", "./src/tools/**/*.ts"]
+}

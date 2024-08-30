@@ -2310,11 +2310,11 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         {
           if (u16icmp(q, fk->dpStoreArray[i].szName) == 0) break;
         }
+        if (i == fk->cxStoreArray) return KmnCompilerMessages::ERROR_StoreDoesNotExist;
 
         if (!kmcmp::IsValidCallStore(&fk->dpStoreArray[i])) return KmnCompilerMessages::ERROR_InvalidCall;
         kmcmp::CheckStoreUsage(fk, i, FALSE, FALSE, TRUE);
 
-        if (i == fk->cxStoreArray) return KmnCompilerMessages::ERROR_StoreDoesNotExist;
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_CALL;
         tstr[mx++] = (KMX_WCHAR)i + 1;

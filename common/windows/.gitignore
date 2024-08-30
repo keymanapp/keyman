@@ -7,3 +7,4 @@ delphi/**/*.~*
 delphi/**/__recovery/
 delphi/**/__history/
 delphi/general/keymanversion_build.inc
+delphi/ext/cef4delphi/packages/CEF4Delphi.res
