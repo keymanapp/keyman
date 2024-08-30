@@ -1,5 +1,43 @@
 # Keyman Version History
 
+## 18.0.101 alpha 2024-08-29
+
+* refactor(web): move `gesture-recognizer` → `gesture-processor` (#12194)
+* docs(core): fix a typo in the KMX+ doc (#12302)
+* chore(web): remove obsolete comment (#12304)
+* chore(android,ios): Update FirstVoices keyboards to fv_all.kmp 12.15 (#12300)
+* fix(developer): make LDML import path consistent for all bundlings of kmc (#12280)
+* fix(core): properly support 'other' modifier state with `uint32_t` type (#12281)
+* chore(windows): fix typo in environment.inc.sh (#12286)
+* fix(android): Check in material-stepper as internal Maven dependency (#12267)
+* docs(core): improve formatting of KMX+ doc (#12303)
+* fix(android): Prioritize certain actions over multi-line for ENTER key (#12315)
+* fix(linux): add `keymanFacename` to .ldml file (#12277)
+* chore(common): Update crowdin strings for Czech (#12316)
+*  (#12313)
+
+## 18.0.100 alpha 2024-08-28
+
+* fix(windows): check IM window will be in a visible location (#11967)
+
+## 18.0.99 alpha 2024-08-27
+
+* feat(web): import the generator for the pred-text wordbreaker's Unicode-property data-table (#10690)
+* feat(web): optimize the wordbreaker data table for filesize and ease of first-load parsing (#10692)
+*  (#12297)
+*  (#12115)
+
+## 18.0.98 alpha 2024-08-26
+
+* change(ios): defer registration of fonts past initialization (#12190)
+* refactor(ios): optimize font registration (#12210)
+* test(mac): add unit tests to validate first calls to compliance check (#11724)
+* fix(mac): limit short bundle version string to x.y.z format in info.plist (#12233)
+* chore(developer): extend timeouts for lm compiler tests to 5 secs (#12273)
+* fix(developer): find last matching key in LDML key bag when building KVK (#12278)
+* chore(android): Cleanup stray debug statements in console (#12287)
+* fix(developer): ensure call() detects invalid store in kmcmplib compiler (#12263)
+
 ## 18.0.97 alpha 2024-08-24
 
 * refactor(linux): cleanup API of kvk2ldml.py (#12276)

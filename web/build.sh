@@ -109,6 +109,11 @@ precompile() {
 
 build_action() {
   builder_echo "Building auto tests..."
+
+  # The currently-bundled declaration file for gesture-processor generates
+  # errors when compiling against it with current tsc versions.
+  rm -f "${KEYMAN_ROOT}/node_modules/promise-status-async/lib/index.d.ts"
+
   tsc --project "${KEYMAN_ROOT}/web/src/test/auto/tsconfig.json"
 
   for dir in \

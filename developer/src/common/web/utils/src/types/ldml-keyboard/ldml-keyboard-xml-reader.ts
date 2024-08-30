@@ -23,7 +23,7 @@ export class LDMLKeyboardXMLSourceFileReader {
   }
 
   static get defaultImportsURL(): [string,string] {
-    return ['../../import/', import.meta.url];
+    return ['../import/', import.meta.url];
   }
 
   readImportFile(version: string, subpath: string): Uint8Array {

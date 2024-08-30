@@ -20,9 +20,16 @@ namespace core {
 namespace ldml {
 
 /**
+ * LDML keyboards have 32-bit modifier flags in order to support
+ * LDML_KEYS_MOD_OTHER (0x10000), unlike the Core APIs which have only 16 bit
+ * modifier flags.
+ */
+typedef uint32_t km_core_ldml_modifier_state;
+
+/**
  * identifier for keybag lookup
  */
-typedef std::pair<km_core_virtual_key, uint16_t> vkey_id;
+typedef std::pair<km_core_virtual_key, km_core_ldml_modifier_state> vkey_id;
 
 /**
  * LDML Class to manage all things key related: vkey remapping and vkey to string
@@ -35,9 +42,9 @@ public:
   vkeys();
 
   /**
-   * add a vkey to the bag
+   * add a vkey to the bag.
    */
-  void add(km_core_virtual_key vk, uint16_t modifier_state, std::u16string output);
+  void add(km_core_virtual_key vk, km_core_ldml_modifier_state ldml_modifier_state, std::u16string output);
 
   /**
    * Lookup a vkey, returns an empty string if not found
