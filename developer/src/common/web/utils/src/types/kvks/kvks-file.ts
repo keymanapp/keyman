@@ -30,7 +30,7 @@ export interface KVKSFlags {
 export interface KVKSEncoding {
   name?: string;
   fontname?: string;
-  fontsize?: number;
+  fontsize?: string;
   layer?: KVKSLayer[];
 };
 

@@ -65,7 +65,7 @@ export default class KVKSFileWriter {
             layer: [],
             name: encoding,
             fontname: encoding == 'ansi' ? vk.header.ansiFont.name : vk.header.unicodeFont.name,
-            fontsize: encoding == 'ansi' ? vk.header.ansiFont.size : vk.header.unicodeFont.size,
+            fontsize: Number(encoding == 'ansi' ? vk.header.ansiFont.size : vk.header.unicodeFont.size).toString(),
           },
           l: {}
         };

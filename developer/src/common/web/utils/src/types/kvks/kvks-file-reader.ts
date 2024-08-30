@@ -123,7 +123,7 @@ export default class KVKSFileReader {
       const isUnicode = (encoding.name == 'unicode'),
         font = isUnicode ? result.header.unicodeFont : result.header.ansiFont;
       font.name = encoding.fontname ?? DEFAULT_KVK_FONT.name;
-      font.size = encoding.fontsize ?? DEFAULT_KVK_FONT.size;
+      font.size = parseInt(encoding.fontsize ?? DEFAULT_KVK_FONT.size.toString(), 10);
 
       for(const layer of encoding.layer) {
         const shift = this.kvksShiftToKvkShift(layer.shift);
@@ -171,7 +171,7 @@ export default class KVKSFileReader {
   private boxArrays(source: KVKSourceFile) {
     boxXmlArray(source.visualkeyboard, 'encoding');
     for(const encoding of source.visualkeyboard.encoding) {
-      if (typeof encoding.fontsize === 'string') encoding.fontsize = Number.parseInt(encoding.fontsize, 10);
+      if (typeof encoding.fontsize === 'number') encoding.fontsize = Number(encoding.fontsize).toString();
       boxXmlArray(encoding, 'layer');
       for(const layer of encoding.layer) {
         boxXmlArray(layer, 'key');

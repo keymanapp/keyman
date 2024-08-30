@@ -13,9 +13,7 @@ describe('kvks-file-reader', function() {
 
     const reader = new KvksFileReader();
     const kvks = reader.read(input);
-    assert.doesNotThrow(() => {
-      reader.validate(kvks);
-    });
+    reader.validate(kvks);
     const invalidVkeys: string[] = [];
     const vk = reader.transform(kvks, invalidVkeys);
     assert.isEmpty(invalidVkeys);

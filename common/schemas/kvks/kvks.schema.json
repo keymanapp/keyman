@@ -75,27 +75,18 @@
             "$ref": "#/definitions/kvk-layer"
           }
         },
-        "$": {
-          "type": "object",
-          "properties": {
-            "name": {
-              "$ref": "#/definitions/kvk-encoding-name"
-            },
-            "fontname": {
-              "type": "string"
-            },
-            "fontsize": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "name"
-          ],
-          "additionalProperties": false
+        "name": {
+          "$ref": "#/definitions/kvk-encoding-name"
+        },
+        "fontname": {
+          "type": "string"
+        },
+        "fontsize": {
+          "type": "string"
         }
       },
       "required": [
-        "$"
+        "name"
       ],
       "additionalProperties": false
     },
@@ -108,21 +99,12 @@
             "$ref": "#/definitions/kvk-key"
           }
         },
-        "$": {
-          "type": "object",
-          "properties": {
-            "shift": {
-              "$ref": "#/definitions/kvk-layer-shift"
-            }
-          },
-          "required": [
-            "shift"
-          ],
-          "additionalProperties": false
+        "shift": {
+          "$ref": "#/definitions/kvk-layer-shift"
         }
       },
       "required": [
-        "$"
+        "shift"
       ],
       "additionalProperties": false
     },
@@ -132,24 +114,15 @@
         "bitmap": {
           "type": "string"
         },
-        "$": {
-          "type": "object",
-          "properties": {
-            "vkey": {
-              "type": "string"
-            }
-          },
-          "required": [
-            "vkey"
-          ],
-          "additionalProperties": false
+        "vkey": {
+          "type": "string"
         },
-        "_": {
+        "#text": {
           "type": "string"
         }
       },
       "required": [
-        "$"
+        "vkey"
       ],
       "additionalProperties": false
     },
