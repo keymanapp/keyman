@@ -2,6 +2,42 @@
 
 This is the current home for Keyman Developer.
 
+## Build Prerequisites
+
+* See [Windows Build Environment Configuration](../../docs/build/windows.md).
+
+## Building Keyman Developer
+
+1. Start 'Git Bash' (part of Git for Windows).
+2. Run `developer/src/build.sh`.
+3. Artifacts from a successful build will be placed in **developer/bin** folder.
+
+*Note*: running `build.sh` will currently reset the packages and path settings
+in your Delphi environment. If you use Delphi for other projects, you should
+consider building Keyman under a login user dedicated to it, or in a VM.
+
+Type `build.sh` to see build targets and actions. Common build actions are:
+
+* `build.sh build`
+: builds Keyman Developer
+
+* `build.sh clean`
+: remove temporary files and build artifacts
+
+* `build.sh publish`
+: makes a release of all Keyman Developer projects
+
+* `build.sh install`
+: install some or all components to Program Files (requires elevated command prompt).
+
+### Building without Delphi
+
+It is possible to build all components that do _not_ require Delphi. Currently a
+few components are Delphi-based (TIKE, setup, a few others), but you may be able
+to get away without building them. In this situation, we recommend copying the
+relevant Delphi-built components into developer/bin folders from a compatible
+installed version of Keyman Developer for testing and debugging purposes.
+
 # Folders
 
 ## common
@@ -111,3 +147,5 @@ testing and packing keyboards for distribution.
 ## tools
 
 Various build-time tools for Keyman Developer.
+
+
