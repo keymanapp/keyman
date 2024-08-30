@@ -4,9 +4,10 @@
 
 import ContextWindow from "./contextWindow.js";
 import { LanguageProcessor }  from "./languageProcessor.js";
-import type { ModelSpec }  from "keyman/engine/interfaces";
+import type { ModelSpec, PathConfiguration }  from "keyman/engine/interfaces";
 import { globalObject, DeviceSpec } from "@keymanapp/web-utils";
 
+import { CoreProcessor } from "keyman/engine/core-processor";
 import { Codes, type Keyboard, type KeyEvent } from "keyman/engine/keyboard";
 import {
   type Alternate,
@@ -35,6 +36,7 @@ export class InputProcessor {
   private contextDevice: DeviceSpec;
   private kbdProcessor: KeyboardProcessor;
   private lngProcessor: LanguageProcessor;
+  private coreProcessor: CoreProcessor;
 
   private readonly contextCache = new TranscriptionCache();
 
@@ -50,6 +52,11 @@ export class InputProcessor {
     this.contextDevice = device;
     this.kbdProcessor = new KeyboardProcessor(device, options);
     this.lngProcessor = new LanguageProcessor(predictiveTextWorker, this.contextCache);
+    this.coreProcessor = new CoreProcessor();
+  }
+
+  public async init(paths: PathConfiguration) {
+    this.coreProcessor.init(paths.basePath);
   }
 
   public get languageProcessor(): LanguageProcessor {
