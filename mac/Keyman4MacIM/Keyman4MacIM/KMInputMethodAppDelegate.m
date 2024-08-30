@@ -983,6 +983,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   return _configWindow;
 }
 
+// TODO: rewrite confusing pattern, multiple methods differing only by underscore
 - (NSWindowController *)aboutWindow_ {
   return _aboutWindow;
 }
@@ -1073,6 +1074,9 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   }
   else if (returnCode == NSModalResponseOK) {
     os_log_debug([KMLogs uiLog], "downloadComplete, returnCode == NSModalResponseOK");
+
+    [_downloadKBWindow close];
+
     if (self.configWindow.window != nil) {
       os_log_debug([KMLogs uiLog], "downloadComplete, self.configWindow.window != nil");
       [self.configWindow.window makeKeyAndOrderFront:nil];
@@ -1135,6 +1139,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   [self downloadKeyboardFromURL:url];
 }
 
+
 - (void)downloadKeyboardFromURL:(NSURL *)url {
   NSURL* downloadUrl = url;
   os_log_debug([KMLogs uiLog], "downloadKeyboardFromURL, url.path: %{public}@", url.path);
@@ -1153,7 +1158,13 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
       }
       [self.downloadKBWindow.window centerInParent];
       [self.downloadKBWindow.window makeKeyAndOrderFront:nil];
-      [self.downloadInfoView beginSheetModalForWindow:self.downloadKBWindow.window completionHandler:^(NSModalResponse returnCode)  {
+      
+      /*
+       Open sheet off of config window, not the download window.
+       This is because, if the download is successful,
+       the download window will be closed by the sheet.
+       */
+      [self.downloadInfoView beginSheetModalForWindow:self.configWindow.window completionHandler:^(NSModalResponse returnCode)  {
         [self downloadComplete:returnCode];
       }];
     }
@@ -1162,7 +1173,10 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
       [self.downloadKBWindow.window centerInParent];
       [self.downloadKBWindow.window makeKeyAndOrderFront:nil];
       [self.downloadKBWindow.window setLevel:NSFloatingWindowLevel];
-      [self.downloadInfoView beginSheetModalForWindow:self.downloadKBWindow.window completionHandler:^(NSModalResponse returnCode)  {
+      /*
+       Open sheet off of config window, same as above.
+       */
+      [self.downloadInfoView beginSheetModalForWindow:self.configWindow.window completionHandler:^(NSModalResponse returnCode)  {
         [self downloadComplete:returnCode];
       }];
     }
@@ -1178,7 +1192,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
       _receivedData = [[NSMutableData alloc] initWithLength:0];
       _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
     }
-    
   }
 }
 
