@@ -58,8 +58,8 @@ export interface KpsFileInfo {
 }
 
 export interface KpsFileInfoItem {
-  _: string;
-  $: { URL: string };
+  '#text': string;
+  URL: string;
 }
 
 export interface KpsFileContentFiles {
@@ -91,8 +91,8 @@ export interface KpsFileLanguages {
 }
 
 export interface KpsFileLanguage {
-  _: string;
-  $: { ID: string }
+  '#text': string;
+  ID: string;
 }
 
 export interface KpsFileRelatedPackages {

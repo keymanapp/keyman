@@ -1,6 +1,6 @@
-import { xml2js } from '@keymanapp/developer-utils';
 import JSZip from 'jszip';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
+import { XMLParser } from 'fast-xml-parser';
 
 import { KmpJsonFile, SchemaValidators, KeymanFileTypes, KvkFile } from '@keymanapp/common-types';
 import { CompilerCallbacks, KpsFile, KeymanCompiler, CompilerOptions, KeymanCompilerResult, KeymanCompilerArtifacts, KeymanCompilerArtifact } from '@keymanapp/developer-utils';
@@ -180,12 +180,21 @@ export class KmpCompiler implements KeymanCompiler {
 
     const kpsPackage = (() => {
         let a: KpsFile.KpsPackage;
-        let parser = new xml2js.Parser({
-          explicitArray: false
+        let parser = new XMLParser({
+          ignoreAttributes: false,
+          attributeNamePrefix: '',
+          numberParseOptions: {
+            skipLike: /(?:)/, // parse numbers as strings
+            hex: null,
+            leadingZeros: null,
+            eNotation: null,
+          },
         });
 
         try {
-          parser.parseString(data, (e: unknown, r: unknown) => { if(e) throw e; a = r as KpsFile.KpsPackage });
+          const r = parser.parse(data);
+          delete r['?xml'];
+          a = r as KpsFile.KpsPackage;
         } catch(e) {
           this.callbacks.reportMessage(PackageCompilerMessages.Error_InvalidPackageFile({e}));
         }
@@ -440,13 +449,13 @@ export class KmpCompiler implements KeymanCompiler {
     for (let [src,dst,isMarkdown] of keys) {
       if (kpsInfo[src]) {
         kmpInfo[dst] = {
-          description: (kpsInfo[src]._ ?? (typeof kpsInfo[src] == 'string' ? kpsInfo[src].toString() : '')).trim()
+          description: (kpsInfo[src]['#text']?? (typeof kpsInfo[src] == 'string' ? kpsInfo[src].toString() : '')).trim()
         };
         if(isMarkdown) {
           kmpInfo[dst].description = markdownToHTML(kmpInfo[dst].description, false).trim();
         }
-        if(kpsInfo[src].$?.URL) {
-          kmpInfo[dst].url = kpsInfo[src].$.URL.trim();
+        if(kpsInfo[src].URL) {
+          kmpInfo[dst].url = kpsInfo[src].URL.trim();
         }
       }
     }
@@ -465,7 +474,7 @@ export class KmpCompiler implements KeymanCompiler {
     if(language.length == 0 || language[0] == undefined) {
       return [];
     }
-    return language.map((element) => { return { name: element._, id: element.$.ID } });
+    return language.map((element) => { return { name: element['#text'], id: element.ID } });
   };
 
   private stripUndefined(o: any) {
