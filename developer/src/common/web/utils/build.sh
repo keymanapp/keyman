@@ -35,9 +35,9 @@ function copy_cldr_imports() {
     # TODO-LDML: developer/src/inst/download.in.mak needs these also...
     CLDR_PATH=$(dirname "$CLDR_INFO_PATH")
     CLDR_VER=$(basename "$CLDR_PATH")
-    mkdir -p "$THIS_SCRIPT_PATH/build/src/import/$CLDR_VER"
+    mkdir -p "$THIS_SCRIPT_PATH/build/src/types/import/$CLDR_VER"
     # TODO-LDML: When these are copied, the DOCTYPE will break due to the wrong path. We don't use the DTD so it should be OK.
-    cp "$CLDR_INFO_PATH" "$CLDR_PATH/import/"*.xml "$THIS_SCRIPT_PATH/build/src/import/$CLDR_VER/"
+    cp "$CLDR_INFO_PATH" "$CLDR_PATH/import/"*.xml "$THIS_SCRIPT_PATH/build/src/types/import/$CLDR_VER/"
   done
 }
 

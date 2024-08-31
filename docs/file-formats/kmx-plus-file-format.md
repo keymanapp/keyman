@@ -456,7 +456,7 @@ For each key:
 |---|------|---------|------------------------------------------|
 |16+|  32  | vkey    | int: vkey ID                             |
 |20+|  32  | mod     | int: modifier key flags                  |
-|24+|  32  | key     | int: index into `key` sibling subtable   |
+|24+|  32  | key     | int: index into `keys` sibling subtable  |
 
 - `vkey`: If this is 0-255, it is the resolved standard/predefined vkey (K_A,
   etc.). It is resolved because the `vkeyMap` from LDML has already been
