@@ -20,7 +20,8 @@ builder_describe \
   ":web" \
   "--ubuntu-version=UBUNTU_VERSION  The Ubuntu version (default: ${KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER})" \
   "--no-cache                       Force rebuild of docker images" \
-  "build"
+  "build" \
+  "test"
 
 builder_parse "$@"
 
@@ -50,9 +51,10 @@ _convert_parameters_to_build_args() {
   build_version=
   local required_node_version="$(_print_expected_node_version)"
 
-  _add_build_args UBUNTU_VERSION         KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER  ""
-  _add_build_args JAVA_VERSION           KEYMAN_VERSION_JAVA                      java
-  _add_build_args REQUIRED_NODE_VERSION  required_node_version                    ""
+  _add_build_args UBUNTU_VERSION               KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER  ""
+  _add_build_args JAVA_VERSION                 KEYMAN_VERSION_JAVA                      java
+  _add_build_args REQUIRED_NODE_VERSION        required_node_version                    node
+  _add_build_args REQUIRED_EMSCRIPTEN_VERSION  KEYMAN_MIN_VERSION_EMSCRIPTEN            emsdk
 
   if [[ -n "${BASE_VERSION:-}" ]]; then
     build_args+=(--build-arg="BASE_VERSION=${BASE_VERSION}")
@@ -97,6 +99,13 @@ build_action() {
   builder_echo success "Docker image 'keymanapp/keyman-${platform}-ci:${build_version}' built"
 }
 
+test_action() {
+  local platform=$1
+
+  builder_echo debug "Testing image for ${platform}"
+  ./run.sh ${platform} -- ./build.sh configure,build,test:${platform}
+}
+
 if builder_has_action build; then
   build_action base
   BASE_VERSION="${build_version}"
@@ -105,3 +114,8 @@ if builder_has_action build; then
   builder_run_action build:linux    build_action linux
   builder_run_action build:web      build_action web
 fi
+
+builder_run_action test:android     test_action android
+builder_run_action test:core        test_action core
+builder_run_action test:linux       test_action linux
+builder_run_action test:web         test_action web

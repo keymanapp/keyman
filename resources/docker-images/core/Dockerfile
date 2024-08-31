@@ -34,6 +34,20 @@ export NVM_DIR="$HOME/.nvm"
 . /home/build/.nvm/nvm.sh
 EOF
 
+# Pre-install emscripten
+USER build
+ARG REQUIRED_EMSCRIPTEN_VERSION=1.0
+RUN echo "Installing emscripten version ${REQUIRED_EMSCRIPTEN_VERSION}" && \
+  export EMSDK_KEEP_DOWNLOADS=1 && \
+  cd /home/build/ && \
+  git clone https://github.com/emscripten-core/emsdk.git && \
+  cd emsdk && \
+  ./emsdk install ${REQUIRED_EMSCRIPTEN_VERSION} && \
+  ./emsdk activate ${REQUIRED_EMSCRIPTEN_VERSION}
+USER root
+RUN echo "export EMSCRIPTEN_BASE=/home/build/emsdk/upstream/emscripten" >> /usr/bin/bashwrapper && \
+  echo "export KEYMAN_USE_EMSDK=1" >> /usr/bin/bashwrapper
+
 # Finish bashwrapper script and adjust permissions
 RUN <<EOF cat >> /usr/bin/bashwrapper
 
@@ -56,7 +70,9 @@ RUN echo "HOME=\${HOME}; REQUIRED_NODE_VERSION=${REQUIRED_NODE_VERSION}" && \
   export NVM_DIR="/home/build/.nvm" && \
   . /home/build/.nvm/nvm.sh && \
   nvm install "${REQUIRED_NODE_VERSION}" && \
-  nvm use "${REQUIRED_NODE_VERSION}"
+  nvm use "${REQUIRED_NODE_VERSION}" && \
+  cd /home/build/emsdk/upstream/emscripten && \
+  npm install
 
 VOLUME /home/build/build
 WORKDIR /home/build/build

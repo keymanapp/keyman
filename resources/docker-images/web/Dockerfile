@@ -11,7 +11,12 @@ LABEL org.opencontainers.image.url="https://github.com/keymanapp/keyman.git"
 LABEL org.opencontainers.image.title="Keyman for Web Build Image"
 
 USER root
-RUN apt-get install -qy git jq xvfb xserver-xephyr metacity libevent-2.1-7t64
+RUN apt-get install -qy git jq xvfb xserver-xephyr metacity
+# For playwright:
+RUN apt-get install -qy  libevent-2.1-7t64 libxslt1.1 libwoff1 libvpx9 \
+  libgstreamer-plugins-bad1.0-0 libwebpdemux2 libharfbuzz-icu0 \
+  libenchant-2-2 libsecret-1-0 libhyphen0 libmanette-0.2-0 libflite1 \
+  gstreamer1.0-libav
 
 COPY run-tests.sh /usr/bin/run-tests.sh
 
@@ -23,6 +28,20 @@ PATH=/home/build/.keyman/node:\$PATH
 export NVM_DIR="$HOME/.nvm"
 . /home/build/.nvm/nvm.sh
 EOF
+
+# Pre-install emscripten
+USER build
+ARG REQUIRED_EMSCRIPTEN_VERSION=1.0
+RUN echo "Installing emscripten version ${REQUIRED_EMSCRIPTEN_VERSION}" && \
+  export EMSDK_KEEP_DOWNLOADS=1 && \
+  cd /home/build/ && \
+  git clone https://github.com/emscripten-core/emsdk.git && \
+  cd emsdk && \
+  ./emsdk install ${REQUIRED_EMSCRIPTEN_VERSION} && \
+  ./emsdk activate ${REQUIRED_EMSCRIPTEN_VERSION}
+USER root
+RUN echo "export EMSCRIPTEN_BASE=/home/build/emsdk/upstream/emscripten" >> /usr/bin/bashwrapper && \
+  echo "export KEYMAN_USE_EMSDK=1" >> /usr/bin/bashwrapper
 
 # Keyman Web
 RUN curl --output google-chrome-stable_current_amd64.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
@@ -63,7 +82,9 @@ RUN echo "HOME=\${HOME}; REQUIRED_NODE_VERSION=${REQUIRED_NODE_VERSION}" && \
   export NVM_DIR="/home/build/.nvm" && \
   . /home/build/.nvm/nvm.sh && \
   nvm install "${REQUIRED_NODE_VERSION}" && \
-  nvm use "${REQUIRED_NODE_VERSION}"
+  nvm use "${REQUIRED_NODE_VERSION}" && \
+  cd /home/build/emsdk/upstream/emscripten && \
+  npm install
 
 VOLUME /home/build/build
 WORKDIR /home/build/build
