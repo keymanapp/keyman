@@ -21,7 +21,7 @@ builder_describe \
   "@/common/web/keyman-version" \
   "@/common/web/es-bundling" \
   "@/common/web/types" \
-  "@/common/web/utils" \
+  "@/web/src/engine/common/web-utils" \
   configure \
   clean \
   build \

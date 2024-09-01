@@ -29,7 +29,7 @@
       "@keymanapp/keyman": ["./web" ],
       "@keymanapp/models-templates": ["./web/src/engine/predictive-text/templates/"],
       "@keymanapp/models-wordbreakers": ["./web/src/engine/predictive-text/wordbreakers"],
-      "@keymanapp/web-utils": ["./common/web/utils"],
+      "@keymanapp/web-utils": ["./web/src/engine/common/web-utils"],
       "@keymanapp/lm-message-types": ["./web/src/engine/predictive-text/types"],
       "@keymanapp/keyman-version": ["./common/web/keyman-version"],
       "@keymanapp/ldml-keyboard-constants": [ "./core/include/ldml" ],

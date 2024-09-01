@@ -5,10 +5,14 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
+. "${KEYMAN_ROOT}/web/common.inc.sh"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
+
+SUBPROJECT_NAME=engine/common/web-utils
+BUILD_DIR="/web/src/engine/common/web-utils/build"
 
 BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
 
@@ -23,21 +27,21 @@ builder_describe \
 
 builder_describe_outputs \
   configure "/node_modules" \
-  build     "/common/web/utils/build/obj/index.js"
+  build     "${BUILD_DIR}/obj/index.js"
 
 builder_parse "$@"
 
 function do_build() {
-  tsc --build "$THIS_SCRIPT_PATH/tsconfig.json"
+  tsc --build $builder_verbose "$THIS_SCRIPT_PATH/tsconfig.json"
 
   # May be useful one day, for building a mass .d.ts for KMW as a whole.
   # So... tsc does declaration-bundling on its own pretty well, at least for local development.
-  tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+  tsc --emitDeclarationOnly --outFile "${KEYMAN_ROOT}/${BUILD_DIR}/lib/index.d.ts"
 
   # One of the functions (timedPromise) is quite helpful for automated testing, even in the DOM.
   # So, to make sure it's easily-accessible for the DOM-based tests...
-  $BUNDLE_CMD    "${KEYMAN_ROOT}/common/web/utils/build/obj/index.js" \
-    --out        "${KEYMAN_ROOT}/common/web/utils/build/lib/index.mjs" \
+  $BUNDLE_CMD    "${KEYMAN_ROOT}/${BUILD_DIR}/obj/index.js" \
+    --out        "${KEYMAN_ROOT}/${BUILD_DIR}/lib/index.mjs" \
     --format esm
 }
 

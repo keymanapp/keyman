@@ -8,7 +8,7 @@
     "rootDir": "./"
   },
   "references": [
-    { "path": "../../../../../../common/web/utils" },
+    { "path": "../../../common/web-utils" },
     { "path": "../../../../../../common/web/types"},
     { "path": "../../types"}
   ],

@@ -84,7 +84,7 @@ graph TD;
     KeyboardSpec["/web/src/engine/keyboard"];
     JSProc["/web/src/engine/js-processor"];
     OSK-->KeyboardSpec;
-    WebUtils["@keymanapp/web-utils<br>(/common/web/utils)"];
+    WebUtils["@keymanapp/web-utils<br>(/web/src/engine/common/web-utils)"];
     KeyboardSpec---->WebUtils;
     Wordbreakers["@keymanapp/models-wordbreakers<br>(/web/src/engine/predictive-text/wordbreakers)"];
     Models["@keymanapp/models-templates<br>(/web/src/engine/predictive-text/templates/)"];
