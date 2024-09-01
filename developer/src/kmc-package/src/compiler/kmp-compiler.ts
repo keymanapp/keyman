@@ -192,7 +192,7 @@ export class KmpCompiler implements KeymanCompiler {
         });
 
         try {
-          const r = parser.parse(data);
+          const r = parser.parse(data, true);
           delete r['?xml'];
           a = r as KpsFile.KpsPackage;
         } catch(e) {
@@ -267,7 +267,7 @@ export class KmpCompiler implements KeymanCompiler {
       // Note: 'relationship' field is required for kmp.json but optional for .kps, only
       // two values are supported -- deprecates or related.
       kmp.relatedPackages = (this.arrayWrap(kps.RelatedPackages.RelatedPackage) as KpsFile.KpsFileRelatedPackage[]).map(p =>
-        ({id: p.$.ID, relationship: p.$.Relationship == 'deprecates' ? 'deprecates' : 'related'})
+        ({id: p.ID, relationship: p.Relationship == 'deprecates' ? 'deprecates' : 'related'})
       );
     }
 
@@ -329,17 +329,17 @@ export class KmpCompiler implements KeymanCompiler {
           [],
         examples: keyboard.Examples ?
           (this.arrayWrap(keyboard.Examples.Example) as KpsFile.KpsFileLanguageExample[]).map(
-            e => ({id: e.$.ID, keys: e.$.Keys, text: e.$.Text, note: e.$.Note})
+            e => ({id: e.ID, keys: e.Keys, text: e.Text, note: e.Note})
           ) as KmpJsonFile.KmpJsonFileExample[] :
           undefined,
         webDisplayFonts: keyboard.WebDisplayFonts ?
           (this.arrayWrap(keyboard.WebDisplayFonts.Font) as KpsFile.KpsFileFont[]).map(
-            e => (this.callbacks.path.basename(this.normalizePath(e.$.Filename)))
+            e => (this.callbacks.path.basename(this.normalizePath(e.Filename)))
           ) :
           undefined,
         webOskFonts: keyboard.WebOSKFonts ?
           (this.arrayWrap(keyboard.WebOSKFonts.Font) as KpsFile.KpsFileFont[]).map(
-            e => (this.callbacks.path.basename(this.normalizePath(e.$.Filename)))
+            e => (this.callbacks.path.basename(this.normalizePath(e.Filename)))
           ) :
           undefined,
       }));
