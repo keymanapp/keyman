@@ -44,9 +44,6 @@ typedef enum {
 
 - (instancetype)init {
   self = [super init];
-  if (self) {
-    _debugMode = NO;
-  }
   return self;
 }
 
@@ -67,15 +64,6 @@ typedef enum {
   }
   
   return packageInfo;
-}
-
-- (NSString *)packageNameFromPackageInfo:(NSString *)path {
-  NSString *packageName = nil;
-  
-  KMPackageInfo *packageInfo = [self loadPackageInfo:path];
-  packageName = packageInfo.packageName;
-  
-  return packageName;
 }
 
 /**
