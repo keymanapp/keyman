@@ -1,4 +1,4 @@
-/**
+/*
  * Keyman is copyright (C) SIL International. MIT License.
  *
  * KMSettingsRepository.h

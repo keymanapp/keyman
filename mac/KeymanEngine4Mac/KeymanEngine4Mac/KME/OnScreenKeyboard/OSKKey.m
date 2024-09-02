@@ -15,7 +15,7 @@
   self = [super init];
   if (self) {
     /*
-     // usually too much, but uncomment for debugging
+     // usually too much logging, uncomment for debugging
      os_log_debug([KMELogs oskLog], "OSKKey initWithKeyCode: 0x%lx, caption: %{public}@, scale: %f", keyCode, caption, scale);
     */
     _keyCode = keyCode;

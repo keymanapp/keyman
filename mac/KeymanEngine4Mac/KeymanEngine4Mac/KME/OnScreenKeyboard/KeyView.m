@@ -42,7 +42,7 @@ static CGFloat const kRelativeModifierLabelHeight = 0.30f;
   self = [super initWithFrame:frame];
   if (self) {
     /*
-     // usually too much, but uncomment for debugging
+     // usually too much logging, uncomment for debugging
      os_log_debug([KMELogs oskLog], "KeyView initWithFrame: %{public}@, bounds: %{public}@, default clipsToBounds %{public}@", NSStringFromRect(frame), NSStringFromRect(self.bounds), self.clipsToBounds?@"YES":@"NO");
     */
     self.clipsToBounds = true;
@@ -74,7 +74,7 @@ static CGFloat const kRelativeModifierLabelHeight = 0.30f;
 
 - (void)drawRect:(NSRect)rect {
   /*
-   // usually too much, but uncomment for debugging
+   // usually too much logging, uncomment for debugging
   os_log_debug([KMELogs uiLog], "KeyView drawRect: %{public}@, bounds: %{public}@, keyCode: 0x%lx, caption: %{public}@, label: %{public}@", NSStringFromRect(rect), NSStringFromRect(self.bounds), self.keyCode, self.caption.stringValue, self.label.stringValue);
   */
   
