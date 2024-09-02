@@ -520,7 +520,7 @@
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 18.0.94.0 -->
-  <string name="S_Support_CopyrightGlobal" comment="Copyright © {SIL Global}. All Rights Reserved.">Copyright © %1$s. All Rights Reserved.</string>
+  <string name="S_Support_CopyrightSILGlobal" comment="Copyright © {SIL Global}. All Rights Reserved.">Copyright © %1$s. All Rights Reserved.</string>
 
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
