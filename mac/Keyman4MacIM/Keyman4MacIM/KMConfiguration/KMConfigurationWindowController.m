@@ -422,8 +422,8 @@
     if (returnCode == NSAlertFirstButtonReturn) {
       os_log_debug([KMLogs uiLog], "confirm delete keyboard alert dismissed");
       [self deleteFileAtIndex:[NSNumber numberWithInteger:deleteButton.tag]];
-      self.deleteAlertView = nil;
     }
+    self.deleteAlertView = nil;
   }];
 }
 
@@ -462,8 +462,9 @@
     os_log_debug([KMLogs uiLog], "confirm keyboard installation alert dismissed");
     if (returnCode == NSAlertFirstButtonReturn) {
       [self installPackageFile: package.getTempKmpFilename];
-      self.confirmKmpInstallAlertView = nil;
     }
+    [package releaseTempKMPFile];
+    self.confirmKmpInstallAlertView = nil;
   }];
 }
 
@@ -564,29 +565,6 @@
   return _confirmKmpInstallAlertView;
 }
 
-/*
-- (void)alertDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo {
-  os_log_debug([KMLogs uiLog], "User responded to NSAlert");
-  if (alert == _deleteAlertView) {
-    if (returnCode == NSAlertFirstButtonReturn) { // Delete
-      [self deleteFileAtIndex:(__bridge NSNumber *)contextInfo];
-    }
-    
-    _deleteAlertView = nil;
-  }
-  else if (alert == _confirmKmpInstallAlertView) {
-    KMPackage *package = (__bridge KMPackage *)contextInfo;
-    os_log_debug([KMLogs uiLog], "KMP - Temp file: %{public}@", package.getTempKmpFilename);
-    if (returnCode == NSAlertFirstButtonReturn) { // Install
-      [self installPackageFile: package.getTempKmpFilename];
-    }
-    
-    [package releaseTempKMPFile];
-    _confirmKmpInstallAlertView = nil;
-  }
-  // else, just a message - nothing to do.
-}
-*/
 - (void)deleteFileAtIndex:(NSNumber *) n {
   NSInteger index = [n integerValue];
   NSString *path2Remove = nil;
