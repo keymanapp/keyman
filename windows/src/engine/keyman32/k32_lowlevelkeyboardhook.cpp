@@ -148,8 +148,8 @@ LRESULT _kmnLowLevelKeyboardProc(
 
   SendDebugMessageFormat("wparam: %x  lparam: %x [vk:%s scan:%x flags:%x extra:%x]", wParam, lParam, Debug_VirtualKey((WORD) hs->vkCode), hs->scanCode, hs->flags, hs->dwExtraInfo);   // I4674
 
-   // #5190: Don't cache modifier state because sometimes we won't receive
-    // modifier change events (e.g. on lock screen)
+  // #5190: Don't cache modifier state because sometimes we won't receive
+  // modifier change events (e.g. on lock screen)
     FHotkeyShiftState = 0;
     if (GetKeyState(VK_LCONTROL) < 0) FHotkeyShiftState |= HK_CTRL;
     if (GetKeyState(VK_RCONTROL) < 0) FHotkeyShiftState |= HK_RCTRL_INVALID;
