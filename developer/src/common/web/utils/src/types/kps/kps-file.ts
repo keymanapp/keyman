@@ -69,11 +69,11 @@ export interface KpsFileContentFiles {
 export interface KpsFileContentFile {
   Name: string;
   /** @deprecated */
-  Description: string;
+  Description?: string;
   /** @deprecated */
-  CopyLocation: string;
+  CopyLocation?: string;
   /** @deprecated */
-  FileType: string;
+  FileType?: string;
 }
 
 export interface KpsFileLexicalModel {
