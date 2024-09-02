@@ -130,22 +130,22 @@ BOOL IsTouchPanelVisible() {
 }
 
 /*
-  Cache UseRightModifierHotKey for this session
+  Cache AllowRightModifierHotKey for this session
 */
-BOOL UseRightModifierHotKey() {
-  static BOOL flag_UseRightModifierHotKey = FALSE;
+BOOL AllowRightModifierHotKey() {
+  static BOOL flag_AllowRightModifierHotKey = FALSE;
   static BOOL loaded = FALSE;
 
   if (!loaded) {
     RegistryReadOnly reg(HKEY_CURRENT_USER);
     if (reg.OpenKeyReadOnly(REGSZ_KeymanCU)) {
       if (reg.ValueExists(REGSZ_AllowRightModifierHotKey)) {
-        flag_UseRightModifierHotKey = !!reg.ReadInteger(REGSZ_AllowRightModifierHotKey);
+        flag_AllowRightModifierHotKey = !!reg.ReadInteger(REGSZ_AllowRightModifierHotKey);
       }
     }
     loaded = TRUE; // Set loaded to TRUE whether or not the key exists
   }
-  return flag_UseRightModifierHotKey;
+  return flag_AllowRightModifierHotKey;
 }
 
 LRESULT _kmnLowLevelKeyboardProc(
@@ -176,7 +176,7 @@ LRESULT _kmnLowLevelKeyboardProc(
   }
 
   if (GetKeyState(VK_RCONTROL) < 0) {
-    FHotkeyShiftState |= UseRightModifierHotKey() ? HK_CTRL : HK_RCTRL_INVALID;
+    FHotkeyShiftState |= AllowRightModifierHotKey() ? HK_CTRL : HK_RCTRL_INVALID;
   }
 
   if (GetKeyState(VK_LMENU) < 0) {
@@ -184,18 +184,18 @@ LRESULT _kmnLowLevelKeyboardProc(
   }
 
   if (GetKeyState(VK_RMENU) < 0) {
-    FHotkeyShiftState |= UseRightModifierHotKey() ? HK_ALT : HK_RALT_INVALID;
+    FHotkeyShiftState |= AllowRightModifierHotKey() ? HK_ALT : HK_RALT_INVALID;
   }
 
   if (GetKeyState(VK_LSHIFT) < 0) {
     FHotkeyShiftState |= HK_SHIFT;
   }
   if (GetKeyState(VK_RSHIFT) < 0) {
-    FHotkeyShiftState |= UseRightModifierHotKey() ? HK_SHIFT : HK_RSHIFT_INVALID;
+    FHotkeyShiftState |= AllowRightModifierHotKey() ? HK_SHIFT : HK_RSHIFT_INVALID;
   }
 
   //TODO: #8064. Can remove debug message once issue #8064 is resolved
-  SendDebugMessageFormat("!UseCachedHotkeyModifierState [FHotkeyShiftState:%x]", FHotkeyShiftState);
+  SendDebugMessageFormat("[FHotkeyShiftState:%x]", FHotkeyShiftState);
 
   // #7337 Post the modifier state ensuring the serialized queue is in sync
   // Note that the modifier key may be posted again with WM_KEYMAN_KEY_EVENT,
