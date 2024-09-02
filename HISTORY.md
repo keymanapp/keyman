@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.103 alpha 2024-09-02
+
+* feat(windows): Remove hotkey related feature flags (#12252)
+* feat(windows): update SIL logo for Windows UI (#12250)
+
 ## 18.0.102 alpha 2024-08-30
 
 * docs(web): add documentation comments for touch layout interfaces (#12314)
