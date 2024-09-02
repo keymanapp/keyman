@@ -139,8 +139,8 @@ BOOL UseRightModifierHotKey() {
   if (!loaded) {
     RegistryReadOnly reg(HKEY_CURRENT_USER);
     if (reg.OpenKeyReadOnly(REGSZ_KeymanCU)) {
-      if (reg.ValueExists(REGSZ_UseRightModifierHotKey)) {
-        flag_UseRightModifierHotKey = !!reg.ReadInteger(REGSZ_UseRightModifierHotKey);
+      if (reg.ValueExists(REGSZ_AllowRightModifierHotKey)) {
+        flag_UseRightModifierHotKey = !!reg.ReadInteger(REGSZ_AllowRightModifierHotKey);
       }
     }
     loaded = TRUE; // Set loaded to TRUE whether or not the key exists
@@ -167,7 +167,9 @@ LRESULT _kmnLowLevelKeyboardProc(
 
   SendDebugMessageFormat("wparam: %x  lparam: %x [vk:%s scan:%x flags:%x extra:%x]", wParam, lParam, Debug_VirtualKey((WORD) hs->vkCode), hs->scanCode, hs->flags, hs->dwExtraInfo);   // I4674
 
-    FHotkeyShiftState = 0;
+  // #5190: Don't cache modifier state because sometimes we won't receive
+  // modifier change events (e.g. on lock screen)
+  FHotkeyShiftState = 0;
 
   if (GetKeyState(VK_LCONTROL) < 0) {
     FHotkeyShiftState |= HK_CTRL;

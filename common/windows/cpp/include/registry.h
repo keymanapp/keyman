@@ -111,7 +111,7 @@
 #define REGSZ_DeadkeyConversionMode    "deadkey conversion mode"                // CU   // I4552
 #define REGSZ_ZapVirtualKeyCode        "zap virtual key code"   // LM, defaults to 0x0E (_VK_PREFIX_DEFAULT)
 /* Default is to only use left modifier in hotkeys trigger */
-#define REGSZ_UseRightModifierHotKey "use right modifier for hotkey"
+#define REGSZ_AllowRightModifierHotKey "allow right modifier for hotkey"
 
 
 /*
