@@ -58,7 +58,6 @@ NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboard
 @synthesize selectedKeyboard = _selectedKeyboard;
 @synthesize activeKeyboards = _activeKeyboards;
 @synthesize contextBuffer = _contextBuffer;
-@synthesize alwaysShowOSK = _alwaysShowOSK;
 
 id _lastServerWithOSKShowing = nil;
 
@@ -245,7 +244,7 @@ id _lastServerWithOSKShowing = nil;
     CGEventTapEnable(self.lowLevelEventTap, YES);
   }
   // See note in sleepFollowingDeactivationOfServer.
-  if (_kvk != nil && (_alwaysShowOSK || _lastServerWithOSKShowing == newServer)) {
+  if (_kvk != nil && (_lastServerWithOSKShowing == newServer) && (self.showOskOnActivation)) {
     [self showOSK];
   }
   
@@ -433,11 +432,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     return [NSString stringWithFormat:@"%@ - Keyman", _keyboardName];
 }
 
-- (void)setAlwaysShowOSK:(BOOL)alwaysShowOSK {
-  _alwaysShowOSK = alwaysShowOSK;
-  [[KMSettingsRepository shared] writeAlwaysShowOsk:alwaysShowOSK];
-}
-
 - (void)setUseVerboseLogging:(BOOL)useVerboseLogging {
   os_log_debug([KMLogs configLog], "Turning verbose logging %{public}@", useVerboseLogging ? @"on." : @"off.");
   _debugMode = useVerboseLogging;
@@ -445,11 +439,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     [_kme setUseVerboseLogging:useVerboseLogging];
 
   [[KMSettingsRepository shared] writeUseVerboseLogging:useVerboseLogging];
-}
-
-- (BOOL)alwaysShowOSK {
-  _alwaysShowOSK = [[KMSettingsRepository shared] readAlwaysShowOsk];
-  return _alwaysShowOSK;
 }
 
 - (BOOL)useVerboseLogging {
@@ -887,8 +876,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   [self setContextBuffer:nil];
   [self setSelectedKeyboard:path];
   [self applyPersistedOptions];
-  if (kvk != nil && self.alwaysShowOSK)
-    [self showOSK];
 }
 
 - (NSArray *)getKmxFilesInKeyboardsDirectory {
@@ -953,6 +940,14 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
 - (void)registerConfigurationWindow:(NSWindowController *)window {
   _configWindow = window;
+}
+
+- (BOOL)showOskOnActivation {
+  return [KMSettingsRepository.shared readShowOsk];
+}
+
+- (void)saveShowOskOnActivation: showOsk {
+  [KMSettingsRepository.shared writeShowOsk:showOsk];
 }
 
 - (void)showOSK {

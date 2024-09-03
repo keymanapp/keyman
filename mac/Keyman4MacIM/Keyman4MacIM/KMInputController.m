@@ -10,6 +10,7 @@
 #import "KMInputMethodEventHandler.h"
 #import "KMOSVersion.h"
 #include <Carbon/Carbon.h> /* For kVK_ constants. */
+#import "KMSettingsRepository.h"
 #import "KMLogs.h"
 
 @implementation KMInputController
@@ -29,7 +30,7 @@ NSMutableArray *servers;
   if (self) {
     servers = [[NSMutableArray alloc] initWithCapacity:2];
     self.AppDelegate.inputController = self;
-    if (self.AppDelegate.kvk != nil && self.AppDelegate.alwaysShowOSK) {
+    if ((self.AppDelegate.kvk != nil) && ([KMSettingsRepository.shared readShowOsk])) {
       [self.AppDelegate showOSK];
     }
   }

@@ -14,7 +14,7 @@
 NSString *const kActiveKeyboardsKey = @"KMActiveKeyboardsKey";
 NSString *const kSelectedKeyboardKey = @"KMSelectedKeyboardKey";
 NSString *const kPersistedOptionsKey = @"KMPersistedOptionsKey";
-NSString *const kAlwaysShowOSKKey = @"KMAlwaysShowOSKKey";
+NSString *const kShowOsk = @"KMShowOsk";
 NSString *const kUseVerboseLogging = @"KMUseVerboseLogging";
 
 /**
@@ -25,6 +25,11 @@ NSString *const kUseVerboseLogging = @"KMUseVerboseLogging";
  * represents what it is saving.
  */
 NSString *const kKMDeprecatedPersistedOptionsKey = @"KMSavedStoresKey";
+/**
+ * The following constant "KMAlwaysShowOSKKey" is left here for documentation
+ * but the related UI has been removed according to issue #12342
+ */
+NSString *const kAlwaysShowOSKKey = @"KMAlwaysShowOSKKey";
 
 NSString *const kObsoletePathComponent = @"/Documents/Keyman-Keyboards";
 NSString *const kNewPathComponent = @"/Library/Application Support/keyman.inputmethod.Keyman/";
@@ -306,14 +311,14 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirec
   }
 }
 
-- (BOOL)readAlwaysShowOsk {
+- (BOOL)readShowOsk {
   NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-  return [userData boolForKey:kAlwaysShowOSKKey];
+  return [userData boolForKey:kShowOsk];
 }
 
-- (void)writeAlwaysShowOsk:(BOOL)alwaysShowOsk {
+- (void)writeShowOsk:(BOOL)show {
   NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-  [userData setBool:alwaysShowOsk forKey:kAlwaysShowOSKKey];
+  [userData setBool:show forKey:kShowOsk];
 }
 
 - (BOOL)readUseVerboseLogging {
