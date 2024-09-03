@@ -19,6 +19,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 CONFIG="release"
 BUILD_FLAGS="build -x lint -x test"                     # Gradle build w/o test
 TEST_FLAGS="-x assembleRelease lintRelease testRelease" # Gradle test w/o build
+PUBLISH_FLAGS="publishReleaseApk"                       # Gradle publish
 DAEMON_FLAG=
 
 builder_describe "Builds Keyman for Android app." \
@@ -118,10 +119,9 @@ if builder_start_action publish; then
   generateReleaseNotes
 
   # Publish Keyman for Android to Play Store
-  BUILD_FLAGS="publishReleaseApk"
-  echo "BUILD_FLAGS $BUILD_FLAGS"
+  echo "PUBLISH_FLAGS $PUBLISH_FLAGS"
   cd "$KEYMAN_ROOT/android/KMAPro/"
-  ./gradlew $DAEMON_FLAG $BUILD_FLAGS
+  ./gradlew $DAEMON_FLAG $PUBLISH_FLAGS
 
   builder_finish_action success publish
 fi
