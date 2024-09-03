@@ -9,7 +9,10 @@ gi.require_version('Gtk', '3.0')
 
 from gi.repository import Gtk
 
-from keyman_config import __versionwithtag__, __pkgversion__, add_standard_arguments, initialize_logging, initialize_sentry, verify_dbus_running
+from keyman_config import (
+  _, __versionwithtag__, __pkgversion__, add_standard_arguments,
+  are_requirements_missing, initialize_logging, initialize_sentry,
+  verify_dbus_running)
 from keyman_config.handle_install import download_and_install_package
 from keyman_config.ibus_util import verify_ibus_daemon
 from keyman_config.view_installed import ViewInstalledWindow
@@ -41,6 +44,18 @@ if __name__ == '__main__':
     initialize_logging(args)
     initialize_sentry()
     verify_dbus_running()
+
+    if are_requirements_missing():
+        if args.install or args.url:
+            logging.error('Missing requirements. Please install python3-fonttools.')
+        else:
+            dialog = Gtk.MessageDialog(
+                None, 0, Gtk.MessageType.ERROR,
+                Gtk.ButtonsType.OK, _("Missing requirements. Please install python3-fonttools."))
+            dialog.run()
+            dialog.destroy()
+        sys.exit(1)
+
 
     logging.info('Keyman version %s %s', __versionwithtag__, __pkgversion__)
 

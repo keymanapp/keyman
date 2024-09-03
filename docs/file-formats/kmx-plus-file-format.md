@@ -368,8 +368,8 @@ For each element:
 
 Either `to` or `id` must be set, not both.
 Entries with an `to` field are sorted in a binary codepoint sort on the `to` field,
-followed by entries with an `id` field set sorted in a binary codepoint sort on the `id` field.
-
+followed by entries with an `id` field set sorted in a binary codepoint sort
+on the `id` field.
 
 ### C7043.2.15 `key2`—Extended keybag
 
@@ -402,7 +402,8 @@ For each key:
 |28+|  32  | multiTap         | list: index into `list` section with multiTap key id list or 0  |
 |32+|  32  | flicks           | int: index into `key2.flicks` subtable                   |
 
-- `id`: The original string id from XML. This may be 0 to save space (i.e. omit the string id).
+- `id`: The original string id from XML. This may be 0 to save space (i.e.
+  omit the string id).
 - `flags`: Flags is a 32-bit bitfield defined as below:
 
 | Bit position | Meaning   |  Description                                |
@@ -412,7 +413,8 @@ For each key:
 
 - `to`: If `extend` is 0, `to` is a UTF-32LE codepoint. If `extend` is 1, `to`
   is a 32 bit index into the `strs` table. The string may be zero-length.
-- `longPress`, `longPressDefault`, and `multiTap` refer to key ids or lists of key ids in this same `key2.keys` subtable.
+- `longPress`, `longPressDefault`, and `multiTap` refer to key ids or lists
+  of key ids in this same `key2.keys` subtable.
 
 #### `key2.flicks` flick list subtable
 
@@ -424,11 +426,14 @@ For each flicks in the flick list:
 |12+|  32  | flick            | int: index into `flick` subtable for first flick element |
 |16+|  32  | id               | str: flick id                                            |
 
-- `id`: The original string id from XML. This may be 0 to save space (i.e. omit the string id).
+- `id`: The original string id from XML. This may be 0 to save space (i.e. omit
+  the string id).
 
 Elements are ordered by the string id.
 
-If this section is present, it must have a 'flicks' in the list at position zero with count=0, index=0 and id=0 meaning 'no flicks'.
+If this section is present, it must have a 'flicks' in the list at position zero
+with count=0, index=0 and id=0 meaning 'no flicks'.
+
 #### `key2.flick` flick element subtable
 
 For each flick element:
@@ -438,7 +443,8 @@ For each flick element:
 | 0+|  32  | directions       | list: index into `list` section with direction list      |
 | 8+|  32  | keyId            | str: id of key                                           |
 
-If this section is present, it must have a 'flick element' at position zero with directions=0, flags=0, and to=0 meaning 'no flick'.
+If this section is present, it must have a 'flick element' at position zero with
+directions=0, flags=0, and to=0 meaning 'no flick'.
 
 There is not a 'null' flick element at the end of each list.
 

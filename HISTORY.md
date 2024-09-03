@@ -1,5 +1,32 @@
 # Keyman Version History
 
+## 18.0.103 alpha 2024-09-02
+
+* feat(windows): Remove hotkey related feature flags (#12252)
+* feat(windows): update SIL logo for Windows UI (#12250)
+
+## 18.0.102 alpha 2024-08-30
+
+* docs(web): add documentation comments for touch layout interfaces (#12314)
+* change(mac): store data in Library directory instead of Documents (#12106)
+* change(mac): store partial path in UserDefaults (#12144)
+
+## 18.0.101 alpha 2024-08-29
+
+* refactor(web): move `gesture-recognizer` → `gesture-processor` (#12194)
+* docs(core): fix a typo in the KMX+ doc (#12302)
+* chore(web): remove obsolete comment (#12304)
+* chore(android,ios): Update FirstVoices keyboards to fv_all.kmp 12.15 (#12300)
+* fix(developer): make LDML import path consistent for all bundlings of kmc (#12280)
+* fix(core): properly support 'other' modifier state with `uint32_t` type (#12281)
+* chore(windows): fix typo in environment.inc.sh (#12286)
+* fix(android): Check in material-stepper as internal Maven dependency (#12267)
+* docs(core): improve formatting of KMX+ doc (#12303)
+* fix(android): Prioritize certain actions over multi-line for ENTER key (#12315)
+* fix(linux): add `keymanFacename` to .ldml file (#12277)
+* chore(common): Update crowdin strings for Czech (#12316)
+*  (#12313)
+
 ## 18.0.100 alpha 2024-08-28
 
 * fix(windows): check IM window will be in a visible location (#11967)
