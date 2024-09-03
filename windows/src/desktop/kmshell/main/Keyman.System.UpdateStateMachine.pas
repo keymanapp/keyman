@@ -32,7 +32,7 @@ uses
 
   httpuploader,
   Keyman.System.UpdateCheckResponse,
-  Keyman.System.ExecuteHistory,
+  Keyman.System.ExecutionHistory,
   UfrmDownloadProgress;
 
 const

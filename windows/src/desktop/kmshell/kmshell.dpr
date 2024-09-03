@@ -183,7 +183,7 @@ uses
   Keyman.System.RemoteUpdateCheck in 'main\Keyman.System.RemoteUpdateCheck.pas',
   Keyman.System.UpdateStateMachine in 'main\Keyman.System.UpdateStateMachine.pas',
   Keyman.System.DownloadUpdate in 'main\Keyman.System.DownloadUpdate.pas',
-  Keyman.System.ExecuteHistory in '..\..\..\..\common\windows\delphi\general\Keyman.System.ExecuteHistory.pas',
+  Keyman.System.ExecutionHistory in '..\..\..\..\common\windows\delphi\general\Keyman.System.ExecutionHistory.pas',
   UfrmStartInstall in 'main\UfrmStartInstall.pas' {Form1};
 
 {$R VERSION.RES}
