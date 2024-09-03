@@ -50,6 +50,11 @@ resources/docker-images/run.sh core -- core/build.sh --debug build
 Note: For Core and Linux we put the generated binaries in a
 container specific directory because they are platform dependent.
 
+If you build both with Docker and directly with the build scripts, it is
+advisable to run a `git clean -dxf` before switching between the two. The
+reason is that the Docker images use a different user, so that paths
+will be different.
+
 ## Running tests locally
 
 To run the tests locally, use the `run.sh` script:

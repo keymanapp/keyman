@@ -115,7 +115,8 @@ if builder_has_action build; then
   builder_run_action build:web      build_action web
 fi
 
-builder_run_action test:android     test_action android
 builder_run_action test:core        test_action core
 builder_run_action test:linux       test_action linux
 builder_run_action test:web         test_action web
+# Android uses artifacts from web, so it has to come after web
+builder_run_action test:android     test_action android
