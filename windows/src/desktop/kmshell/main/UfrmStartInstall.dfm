@@ -1,9 +1,9 @@
 object frmStartInstall: TfrmStartInstall
   Left = 0
   Top = 0
-  Caption = 'frmStartInstall'
-  ClientHeight = 299
-  ClientWidth = 635
+  Caption = 'Keyman Update'
+  ClientHeight = 225
+  ClientWidth = 425
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -13,9 +13,22 @@ object frmStartInstall: TfrmStartInstall
   OldCreateOrder = False
   PixelsPerInch = 96
   TextHeight = 13
+  object InstallUpdate: TLabel
+    Left = 128
+    Top = 96
+    Width = 175
+    Height = 19
+    Caption = 'Keyman update available'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -16
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+  end
   object Install: TButton
-    Left = 168
-    Top = 240
+    Left = 228
+    Top = 184
     Width = 75
     Height = 25
     Caption = 'Install'
@@ -23,11 +36,11 @@ object frmStartInstall: TfrmStartInstall
     OnClick = InstallClick
   end
   object Later: TButton
-    Left = 288
-    Top = 240
+    Left = 336
+    Top = 184
     Width = 75
     Height = 25
-    Caption = 'Later'
+    Caption = 'Close'
     TabOrder = 1
     OnClick = LaterClick
   end
