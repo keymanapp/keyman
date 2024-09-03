@@ -85,8 +85,6 @@
 // TODO: refactor: any reason for this to be HTML? hard to read stringWithFormat applied to template with 16 arguments
 - (NSString *)detailsHtml {
   
-  NSString *errorString = NSLocalizedString(@"message-keyboard-file-unreadable", nil);
-  
   @try {
     NSString *htmlFormat =
     @"<html>"

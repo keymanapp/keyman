@@ -251,7 +251,6 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirec
 }
 
 - (void)convertActiveKeyboardArrayForMigration {
-  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
   NSMutableArray *keyboards = [self activeKeyboards];
   NSMutableArray *convertedActiveKeyboards = [[NSMutableArray alloc] initWithCapacity:0];
   BOOL didConvert = NO;
@@ -269,9 +268,9 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirec
     }
   }
   
-  // only update array in UserDefaults if we actually converted something
+  // only write array to UserDefaults if we actually converted something
   if (didConvert) {
-    [[NSUserDefaults standardUserDefaults] setObject:convertedActiveKeyboards forKey:kActiveKeyboardsKey];
+    [self writeActiveKeyboards:convertedActiveKeyboards];
   }
 }
 
