@@ -49,7 +49,7 @@
     <!-- Context: Button label -->
     <string name="label_update" comment="Dialog button to update a resource">Aktualizovat</string>
     <!-- Context: No internet for updates -->
-    <string name="no_internet_connection" comment="Internet connection missing">No internet connection</string>
+    <string name="no_internet_connection" comment="Internet connection missing">Žádné připojení k internetu</string>
     <!-- Context: Keyboard Updates -->
     <string name="cannot_connect" comment="Error message when network connection fails">Nelze se připojit k Keyman serveru!</string>
     <!-- Context: Keyboard Updates -->
@@ -88,7 +88,7 @@
     <string name="fatal_keyboard_error_short" comment="Error in keyboard (keyboard ID::packageID for language).">      Chyba v klávesnici %1$s:%2$s pro jazyk %3$s.</string>
     <!-- Context: Query for associated dictionary -->
     <string name="query_associated_model" comment="Check if there's an available dictionary to download">Kontroluji související slovník ke stažení</string>
-    <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">      Cannot connect to Keyman server to check for associated dictionary to download</string>
+    <string name="cannot_query_associated_model" comment="Cannot reach server to check if there's an available dictionary to download">     Nelze se připojit ke Keyman serveru a zkontrolovat, zda je možné stáhnout přidružený slovník</string>
     <!-- Context: Model Updates -->
     <string name="confirm_download_model" comment="Confirmation to download a dictionary update">Chcete stáhnout nejnovější verzi tohoto slovníku?</string>
     <!-- Context: No associated dictionary found -->
@@ -111,7 +111,7 @@
     <string name="dictionary_download_start_in_background" comment="Notification that a dictionary download has started">Stahování slovníku začalo na pozadí</string>
     <!-- Context: Background download messages-->
     <string name="dictionary_download_is_running_in_background" comment="Notification that a dictionary download is still running">Vybraný slovník se již stahuje; zkuste to prosím za chvíli znovu!</string>
-    <!-- Context: Background download messages-->
+    <!-- Context: Background download messages. Removed in Keyman 17-->
     <string name="dictionary_download_finished" comment="Notification that a dictionary download has finished">Stahování slovníku je dokončeno.</string>
     <!-- Context: Background download messages -->
     <string name="download_failed" comment="Notification that a download failed">Stahování se nezdařilo</string>
@@ -123,7 +123,7 @@
     <string name="update_check_current" comment="Notification that all resources are up to date">"Všechny zdroje jsou aktuální!"</string>
     <!-- Context: General Updates -->
     <string name="update_failed" comment="Notification that a resource update failed">Aktualizace jednoho nebo více zdrojů selhala!</string>
-    <!-- Context: General Updates -->
+    <!-- Context: General Updates. Removed in Keyman 17 -->
     <string name="update_success" comment="Notification that a resource update successfully updated">Zdroje byly úspěšně aktualizovány!</string>
     <!-- Context: Model Info -->
     <string name="model_version" comment="Title for a dictionary version">Verze slovníku</string>
@@ -132,11 +132,11 @@
     <!-- Context: Model Info -->
     <string name="confirm_delete_model" comment="Confirmation to delete a dictionary">Chcete odstranit tento slovník?</string>
     <!-- Context: Model Deleted -->
-    <string name="model_deleted" comment="Notification when a dictionary is deleted">Dictionary deleted</string>
+    <string name="model_deleted" comment="Notification when a dictionary is deleted">Slovník smazán</string>
     <!-- Context: Language Settings Keyboard install strings -->
     <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">Klávesnice %1$s nainstalována</string>
     <!-- Context: Language Settings Keyboard uninstall strings -->
-    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">Keyboard deleted</string>
+    <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">Klávesnice smazána</string>
     <!-- Context: Language Settings menu strings -->
     <string name="enable_corrections" comment="Enable corrections from the suggestion banner">Povolit opravy</string>
     <!-- Context: Language Settings menu strings -->
@@ -144,14 +144,14 @@
     <!-- Context: Language Settings menu strings -->
     <string name="model_label">Slovník</string>
     <plurals name="model_count">
-        <item quantity="one">Dictionary</item>
-        <item quantity="few">Dictionaries</item>
-        <item quantity="many">Dictionaries</item>
-        <item quantity="other">Dictionaries</item>
+        <item quantity="one">Slovník</item>
+        <item quantity="few">Slovníky</item>
+        <item quantity="many">Slovníků</item>
+        <item quantity="other">Slovníků</item>
     </plurals>
     <!-- Context: Language Settings menu substring - Check for available dictionary -->
     <string name="check_available_model" comment="Check for available dictionary">Zkontrolovat dostupný slovník</string>
-    <string name="check_model_online" comment="Check for dictionaries online">Check for dictionaries online</string>
+    <string name="check_model_online" comment="Check for dictionaries online">Kouknout se na slovníky online</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_info_header" comment="Dictionary name">Slovník: %1$s</string>
     <!-- Context: Language Settings menu strings -->
@@ -176,5 +176,5 @@
     <!-- Context: Other strings -->
     <string name="help_bubble_text">Klepnutím sem změníte klávesnici</string>
     <!-- Context: anywhere -->
-    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Unable to launch web browser</string>
+    <string name="unable_to_open_browser" comment="Notification when a browser activity cannot be launched">Nelze spustit webový prohlížeč</string>
 </resources>

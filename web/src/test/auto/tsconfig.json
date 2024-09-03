@@ -11,6 +11,7 @@
   "include": [
     "dom/**/*.ts",
     "headless/**/*.ts",
-    "integrated/**/*.ts"
+    "integrated/**/*.ts",
+    "resources/**/*.ts"
   ]
 }
