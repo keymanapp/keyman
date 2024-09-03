@@ -25,7 +25,7 @@
 * fix(android): Prioritize certain actions over multi-line for ENTER key (#12315)
 * fix(linux): add `keymanFacename` to .ldml file (#12277)
 * chore(common): Update crowdin strings for Czech (#12316)
-*  (#12313)
+* fix(web): prevent unintuitive space-output blocking for mid-context suggestions (#12313)
 
 ## 18.0.100 alpha 2024-08-28
 
@@ -35,8 +35,8 @@
 
 * feat(web): import the generator for the pred-text wordbreaker's Unicode-property data-table (#10690)
 * feat(web): optimize the wordbreaker data table for filesize and ease of first-load parsing (#10692)
-*  (#12297)
-*  (#12115)
+* fix(web): fixes wordbreaker test import path (#12297)
+* feat(web): enable utf8 charset encoding for the build artifacts (#12115)
 
 ## 18.0.98 alpha 2024-08-26
 
@@ -81,11 +81,11 @@
 
 ## 18.0.93 alpha 2024-08-20
 
-*  (#12188)
+* refactor(web): remove engine/interfaces dependency on engine/js-processor (#12188)
 * fix(web): fix malformed reversion display strings (#12201)
 * feat(android): Add menu to specify long-press delay (#12170)
 * feat(android): Pass longpress delay to KeymanWeb (#12185)
-*  (#12223)
+* fix(core): set mac build version for meson cli build to 10.13 (#12223)
 
 ## 18.0.92 alpha 2024-08-19
 
