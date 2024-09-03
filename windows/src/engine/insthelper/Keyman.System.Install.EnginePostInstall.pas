@@ -36,7 +36,6 @@ begin
 
   Result := False;
   UpdateStr := 'usPostInstall';
-    //KL.Log('SetBackgroundState State Entry');
   if RegOpenKeyEx(HKEY_LOCAL_MACHINE, PChar(SRegKey_KeymanEngine_CU), 0, KEY_ALL_ACCESS, hk) = ERROR_SUCCESS then
   begin
     try
@@ -54,7 +53,7 @@ begin
   end
   else
   begin
-   // couldn't open registry key
+   // TODO: couldn't open registry key
   end;
 end;
 
