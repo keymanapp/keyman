@@ -25,6 +25,7 @@ builder_describe "Builds FirstVoices for Android app." \
   "configure" \
   "build" \
   "test             Runs lint and tests." \
+  "publish          Publishes the APK to the Play Store." \
   "--ci             Don't start the Gradle daemon. For CI"
 
 # parse before describe_outputs to check debug flags
@@ -84,4 +85,14 @@ if builder_start_action test; then
   ./gradlew $DAEMON_FLAG $TEST_FLAGS
 
   builder_finish_action success test
+fi
+
+if builder_start_action publish; then
+  BUILD_FLAGS="publishReleaseApk"
+  echo "BUILD_FLAGS $BUILD_FLAGS"
+
+  cd "$KEYMAN_ROOT/oem/firstvoices/android/"
+  ./gradlew $DAEMON_FLAG $BUILD_FLAGS  
+
+  builder_finish_action success publish
 fi

@@ -10,6 +10,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$KEYMAN_ROOT/resources/build/build-help.inc.sh"
 . "$KEYMAN_ROOT/resources/build/build-download-resources.sh"
 
+. "$KEYMAN_ROOT/android/KMAPro/build-play-store-notes.inc.sh"
+
 # ################################ Main script ################################
 
 # Definition of global compile constants
@@ -25,6 +27,7 @@ builder_describe "Builds Keyman for Android app." \
   "configure" \
   "build" \
   "test             Runs lint and unit tests." \
+  "publish          Publishes the APK to the Play Store." \
   "--ci             Don't start the Gradle daemon. For CI" \
   "--upload-sentry  Upload to sentry"
 
@@ -108,4 +111,17 @@ if builder_start_action test; then
   ./gradlew $DAEMON_FLAG $TEST_FLAGS
 
   builder_finish_action success test
+fi
+
+if builder_start_action publish; then
+  # Copy Release Notes
+  generateReleaseNotes
+
+  # Publish Keyman for Android to Play Store
+  BUILD_FLAGS="publishReleaseApk"
+  echo "BUILD_FLAGS $BUILD_FLAGS"
+  cd "$KEYMAN_ROOT/android/KMAPro/"
+  ./gradlew $DAEMON_FLAG $BUILD_FLAGS
+
+  builder_finish_action success publish
 fi
