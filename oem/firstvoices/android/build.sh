@@ -17,7 +17,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 CONFIG="release"
 BUILD_FLAGS="build -x lint -x test"                     # Gradle build w/o test
 TEST_FLAGS="-x assembleRelease lintRelease testRelease" # Gradle test w/o build
-PUBLISH_FLAGS="publishReleaseApk"                       # Gradle publish
+PUBLISH_FLAGS="publishSentry publishReleaseApk"         # Gradle publish task
 DAEMON_FLAG=
 
 builder_describe "Builds FirstVoices for Android app." \
@@ -26,7 +26,7 @@ builder_describe "Builds FirstVoices for Android app." \
   "configure" \
   "build" \
   "test             Runs lint and tests." \
-  "publish          Publishes the APK to the Play Store." \
+  "publish          Publishes symbols to Sentry and the APK to the Play Store." \
   "--ci             Don't start the Gradle daemon. For CI"
 
 # parse before describe_outputs to check debug flags
@@ -89,8 +89,8 @@ if builder_start_action test; then
 fi
 
 if builder_start_action publish; then
+  # Publish symbols and FirstVoices to Play Store
   echo "PUBLISH_FLAGS $PUBLISH_FLAGS"
-
   cd "$KEYMAN_ROOT/oem/firstvoices/android/"
   ./gradlew $DAEMON_FLAG $PUBLISH_FLAGS  
 
