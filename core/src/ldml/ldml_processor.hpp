@@ -30,13 +30,12 @@ class ldml_event_state;
 class ldml_processor : public abstract_processor {
   public:
     ldml_processor(
-      path const & kb_path,
+      std::u16string const& kb_name,
       const std::vector<uint8_t> & data
     );
 
     static bool is_kmxplus_file(
-      path const & kb_path,
-      std::vector<uint8_t>& data
+      const std::vector<uint8_t> & data
     );
 
     km_core_status

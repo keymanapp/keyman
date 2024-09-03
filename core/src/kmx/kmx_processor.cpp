@@ -38,9 +38,8 @@ km_core_status kmx_processor::validate() const {
   return _valid ? KM_CORE_STATUS_OK : KM_CORE_STATUS_INVALID_KEYBOARD;
 }
 
-kmx_processor::kmx_processor(core::path p) {
-  p.replace_extension(".kmx");
-  _valid = bool(_kmx.Load(p.c_str()));
+kmx_processor::kmx_processor(std::u16string const& kb_name, const std::vector<uint8_t>& data) {
+  _valid = bool(_kmx.Load((PKMX_BYTE)data.data(), data.size()));
 
   if (!_valid)
     return;
@@ -57,8 +56,7 @@ kmx_processor::kmx_processor(core::path p) {
   auto v = _kmx.GetKeyboard()->Keyboard->version;
   auto vs = std::to_string(v >> 16) + "." + std::to_string(v & 0xffff);
 
-  _attributes = keyboard_attributes(static_cast<std::u16string>(p.stem()),
-                  std::u16string(vs.begin(), vs.end()), p.parent(), defaults);
+  _attributes = keyboard_attributes(kb_name, std::u16string(vs.begin(), vs.end()), defaults);
 }
 
 char16_t const *
@@ -413,4 +411,3 @@ km_core_keyboard_imx * kmx_processor::get_imx_list() const  {
   imx_list[fn_idx] =  KM_CORE_KEYBOARD_IMX_END;
   return imx_list;
 }
-

@@ -29,7 +29,7 @@ namespace core
       );
 
   public:
-    kmx_processor(path);
+    kmx_processor(std::u16string const& kb_name, const std::vector<uint8_t>& data);
 
     km_core_status
     process_event(

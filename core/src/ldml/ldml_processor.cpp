@@ -5,7 +5,6 @@
   Authors:      Marc Durdin (MD)
 */
 
-#include <fstream>
 #include <algorithm>
 #include "ldml/ldml_processor.hpp"
 #include "ldml/ldml_transforms.hpp"
@@ -36,19 +35,15 @@ namespace {
 namespace km {
 namespace core {
 
-
-ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> &data)
-: abstract_processor(
-    keyboard_attributes(kb_path.stem(), KM_CORE_LMDL_PROCESSOR_VERSION, kb_path.parent(), {})
-  ), _valid(false), transforms(), bksp_transforms(), keys(), normalization_disabled(false)
-{
-
+ldml_processor::ldml_processor(std::u16string const& kb_name, const std::vector<uint8_t>& data)
+    : abstract_processor(keyboard_attributes(kb_name, KM_CORE_LMDL_PROCESSOR_VERSION, {})),
+      _valid(false), transforms(), bksp_transforms(), keys(), normalization_disabled(false) {
   if(data.size() <= sizeof(kmx::COMP_KEYBOARD_EX)) {
     DebugLog("data.size %zu too small", data.size());
     return;
   }
 
-//   // Locate the structs here, but still retain ptrs to the raw structs.
+  // Locate the structs here, but still retain ptrs to the raw structs.
   kmx::KMX_FileValidator* comp_keyboard = (kmx::KMX_FileValidator*)data.data();
 
   // Perform the standard validation
@@ -116,40 +111,22 @@ ldml_processor::ldml_processor(path const & kb_path, const std::vector<uint8_t> 
   _valid = true;
 }
 
-bool ldml_processor::is_kmxplus_file(path const & kb_path, std::vector<uint8_t>& data) {
-// TODO-LDML: we should refactor all the core components to delegate file loading
-//            to the Engine, which requires an API change, but this makes delivery
-//            of keyboard files more flexible under more WASM.
-
-  std::ifstream file(static_cast<std::string>(kb_path), std::ios::binary | std::ios::ate);
-  if(!file.good()) {
+bool ldml_processor::is_kmxplus_file(const std::vector<uint8_t> & data) {
+  if (data.empty()) {
     return false;
   }
-  const std::streamsize size = file.tellg();
-  if(size >= KMX_MAX_ALLOWED_FILE_SIZE) {
-    return false;
-  }
-
-  file.seekg(0, std::ios::beg);
-
-  data.resize((size_t)size);
-  if(!file.read((char *) data.data(), size)) {
-    return false;
-  }
-
-  file.close();
 
   const kmx::PCOMP_KEYBOARD comp_keyboard = (kmx::PCOMP_KEYBOARD)data.data();
 
-  if(comp_keyboard->dwIdentifier != KMX_DWORD(FILEID_COMPILED)) {
+  if (comp_keyboard->dwIdentifier != KMX_DWORD(FILEID_COMPILED)) {
     return false;
   }
 
-  if(comp_keyboard->dwFileVersion < VERSION_160 || (comp_keyboard->dwFlags & KF_KMXPLUS) == 0) {
+  if (comp_keyboard->dwFileVersion < VERSION_160 || (comp_keyboard->dwFlags & KF_KMXPLUS) == 0) {
     return false;
   }
 
-  // A KMXPlus file is in the buffer (although more validation is required and will
+  // The buffer contains KMXPlus data (although more validation is required and will
   // be done in the constructor)
   return true;
 }

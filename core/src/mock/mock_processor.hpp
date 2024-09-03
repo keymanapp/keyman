@@ -75,7 +75,7 @@ namespace core
   public:
     null_processor(): mock_processor(path())
     {
-      _attributes = keyboard_attributes(u"null", u"0.0", path(), {});
+      _attributes = keyboard_attributes(u"null", u"0.0", {});
     }
 
     km_core_status validate() const override;
