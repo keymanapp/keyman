@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.104 alpha 2024-09-03
+
+* fix(mac): display package info after keyboard installation (#12326)
+
 ## 18.0.103 alpha 2024-09-02
 
 * feat(windows): Remove hotkey related feature flags (#12252)
