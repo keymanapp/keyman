@@ -847,8 +847,6 @@ begin
     KL.Log('TrmfMain: Executing Update_ApplyNow Failed');
 end;
 
-
-
 procedure TfrmMain.TntFormCloseQuery(Sender: TObject; var CanClose: Boolean);
 begin
   inherited;

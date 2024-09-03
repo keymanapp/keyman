@@ -32,8 +32,8 @@ uses
 
   httpuploader,
   Keyman.System.UpdateCheckResponse,
-  Keyman.System.ExecuteHistory,
   UfrmStartInstall,
+  Keyman.System.ExecutionHistory,
   UfrmDownloadProgress;
 
 const

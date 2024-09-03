@@ -1,4 +1,12 @@
-unit Keyman.System.ExecuteHistory;
+unit Keyman.System.ExecutionHistory;
+
+{
+  Copyright:    © SIL International.
+
+  This module provides functionality to track the execution state of the Keyman
+  engine. It uses a global atom to record whether Keyman has started during the
+  current session and checks if it has previously run.
+}
 
 interface
 
@@ -25,7 +33,6 @@ begin
       if GetLastError <> ERROR_FILE_NOT_FOUND then
         RaiseLastOSError;
       atom := GlobalAddAtom(AtomName);
-      KL.Log('RecordKeymanStarted: True');
       Result := True;
       if atom = 0 then
         RaiseLastOSError;
@@ -47,13 +54,10 @@ begin
     begin
       if GetLastError <> ERROR_SUCCESS then
         RaiseLastOSError;
-
-       KL.Log('HasKeymanRun: Keyman Has Run');
       Result := True;
     end
     else
     begin
-      KL.Log('HasKeymanRun: Keyman Has Run');
       Result := False;
     end;
 

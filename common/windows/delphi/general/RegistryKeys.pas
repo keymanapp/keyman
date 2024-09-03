@@ -162,7 +162,6 @@ const
   SRegKey_KeymanDesktop_CU     = SRegKey_KeymanDesktopRoot_CU;
   SRegKey_KeymanDesktop_LM     = SRegKey_KeymanDesktopRoot_LM;
 
-
   { Other Keyman Settings }
 
   SRegValue_DeadkeyConversionMode       = 'deadkey conversion mode';                // CU   // I4552
@@ -299,7 +298,6 @@ const
 
   SRegKey_KeymanDeveloperRoot_LM = SRegKey_KeymanRoot_LM          + '\Keyman Developer';  // LM CU
   SRegKey_KeymanDeveloper_LM     = SRegKey_KeymanDeveloperRoot_LM;               // LM CU
-
 
   SRegKey_IDE_CU                 = SRegKey_KeymanDeveloper_CU     + '\IDE';                // CU
   SRegKey_IDEDock_CU             = SRegKey_IDE_CU                 + '\Dock';              // CU

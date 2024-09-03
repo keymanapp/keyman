@@ -695,6 +695,10 @@ keyboard that you use in Windows.  Keyman keyboards will adapt automatically to 
 
 
 
+  <!-- Context: Online Update Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.230.0 -->
+  <string name="S_Update" comment="Update tab name">Update</string>
 
   <!-- Context: Online Update Dialog -->
   <!-- String Type: PlainText -->
