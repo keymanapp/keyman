@@ -14,7 +14,7 @@
 NSString *const kActiveKeyboardsKey = @"KMActiveKeyboardsKey";
 NSString *const kSelectedKeyboardKey = @"KMSelectedKeyboardKey";
 NSString *const kPersistedOptionsKey = @"KMPersistedOptionsKey";
-NSString *const kShowOsk = @"KMShowOsk";
+NSString *const kShowOskOnActivate = @"KMShowOskOnActivate";
 NSString *const kUseVerboseLogging = @"KMUseVerboseLogging";
 
 /**
@@ -311,14 +311,14 @@ NSInteger const kCurrentDataModelVersionNumber = kVersionStoreDataInLibraryDirec
   }
 }
 
-- (BOOL)readShowOsk {
+- (BOOL)readShowOskOnActivate {
   NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-  return [userData boolForKey:kShowOsk];
+  return [userData boolForKey:kShowOskOnActivate];
 }
 
-- (void)writeShowOsk:(BOOL)show {
+- (void)writeShowOskOnActivate:(BOOL)show {
   NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-  [userData setBool:show forKey:kShowOsk];
+  [userData setBool:show forKey:kShowOskOnActivate];
 }
 
 - (BOOL)readUseVerboseLogging {

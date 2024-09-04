@@ -30,7 +30,8 @@ NSMutableArray *servers;
   if (self) {
     servers = [[NSMutableArray alloc] initWithCapacity:2];
     self.AppDelegate.inputController = self;
-    if ((self.AppDelegate.kvk != nil) && ([KMSettingsRepository.shared readShowOsk])) {
+    if ((self.AppDelegate.kvk != nil) && ([KMSettingsRepository.shared readShowOskOnActivate])) {
+      os_log_debug([KMLogs oskLog], "initWithServer, readShowOskOnActivate= YES, showing OSK");
       [self.AppDelegate showOSK];
     }
   }
@@ -66,7 +67,8 @@ NSMutableArray *servers;
     
     [self.AppDelegate wakeUpWith:sender];
     [servers addObject:sender];
-    
+    os_log_debug([KMLogs lifecycleLog], "activateServer, adding sender to servers array, sender: %{public}@", sender);
+
     if (_eventHandler != nil) {
       [_eventHandler deactivate];
     }
@@ -87,6 +89,7 @@ NSMutableArray *servers;
   @synchronized(servers) {
     for (int i = 0; i < servers.count; i++) {
       if (servers[i] == sender) {
+        os_log_debug([KMLogs lifecycleLog], "deactivateServer, removing sender from servers array, sender: %{public}@", sender);
         [servers removeObjectAtIndex:i];
         break;
       }
@@ -166,6 +169,8 @@ NSMutableArray *servers;
     [self showConfigurationWindow:sender];
   }
   else if (itag == OSK_MENUITEM_TAG) {
+    [KMSettingsRepository.shared writeShowOskOnActivate:YES];
+    os_log_debug([KMLogs oskLog], "menuAction OSK_MENUITEM_TAG, updating settings writeShowOsk to YES");
     [self.AppDelegate showOSK];
   }
   else if (itag == ABOUT_MENUITEM_TAG) {

@@ -244,7 +244,9 @@ id _lastServerWithOSKShowing = nil;
     CGEventTapEnable(self.lowLevelEventTap, YES);
   }
   // See note in sleepFollowingDeactivationOfServer.
-  if (_kvk != nil && (_lastServerWithOSKShowing == newServer) && (self.showOskOnActivation)) {
+  if (_kvk != nil && (_lastServerWithOSKShowing == newServer) &&
+      ([KMSettingsRepository.shared readShowOskOnActivate])) {
+    os_log_debug([KMLogs oskLog], "wakeUpWith, readShowOskOnActivate= YES, showing OSK");
     [self showOSK];
   }
   
@@ -942,13 +944,15 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   _configWindow = window;
 }
 
+/*
 - (BOOL)showOskOnActivation {
   return [KMSettingsRepository.shared readShowOsk];
 }
 
-- (void)saveShowOskOnActivation: showOsk {
+- (void)saveShowOskOnActivation: (BOOL)showOsk {
   [KMSettingsRepository.shared writeShowOsk:showOsk];
 }
+*/
 
 - (void)showOSK {
   [[self.oskWindow window] makeKeyAndOrderFront:nil];

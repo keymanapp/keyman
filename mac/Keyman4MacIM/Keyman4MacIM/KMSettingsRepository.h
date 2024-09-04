@@ -24,8 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)clearActiveKeyboards;
 - (NSDictionary *)readOptionsForSelectedKeyboard;
 - (void)writeOptionForSelectedKeyboard:(NSString *)key withValue:(NSString*)value;
-- (BOOL)readShowOsk;
-- (void)writeShowOsk:(BOOL)show;
+- (BOOL)readShowOskOnActivate;
+- (void)writeShowOskOnActivate:(BOOL)show;
 - (BOOL)readUseVerboseLogging;
 - (void)writeUseVerboseLogging:(BOOL)verboseLogging;
 @end
