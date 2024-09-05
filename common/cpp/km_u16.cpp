@@ -389,6 +389,11 @@ double u16tof(KMX_WCHAR* str16) {
   return strtof(str.c_str(), &pEnd);
 }
 
+/**
+ * @brief Trim whitespace from the start (left) of a string
+ * @param p Pointer to u16string
+ * @return Pointer to the first non-whitespace character in the string
+ */
 const KMX_WCHAR* u16ltrim(const KMX_WCHAR* p) {
   while(p && iswspace(*p)) p++;
   return p;
