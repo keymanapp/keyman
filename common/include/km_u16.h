@@ -81,4 +81,5 @@ const KMX_WCHAR* u16ltrim(const KMX_WCHAR* p);
 /** @brief Trim whitespace from the end (right) of a string */
 KMX_WCHAR* u16rtrim(KMX_WCHAR *p);
 
+/** @brief Trim whitespace from both the start and end of a string */
 KMX_WCHAR* u16trim(KMX_WCHAR *p);
