@@ -399,6 +399,11 @@ const KMX_WCHAR* u16ltrim(const KMX_WCHAR* p) {
   return p;
 }
 
+/**
+ * @brief Trim whitespace from the end (right) of a string
+ * @param p Pointer to u16string
+ * @return Pointer to the string modified to remove trailing whitespace
+ */
 KMX_WCHAR* u16rtrim(KMX_WCHAR *p) {
   if (!p || (u16len(p) == 0)) return p;
   PKMX_WCHAR q = p + u16len(p) - 1;
@@ -406,7 +411,7 @@ KMX_WCHAR* u16rtrim(KMX_WCHAR *p) {
   if (iswspace(*q)) {
     while (iswspace(*q) && q > p) q--;
     if (!iswspace(*q)) q++;
-    *q = '\0'; // delete first following space
+    *q = '\0'; // delete first following whitespace
   }
   return p;
 }
