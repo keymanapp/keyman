@@ -1151,7 +1151,8 @@ into the out paramter.
 
 ```c */
 KMN_API
-km_core_status km_core_keyboard_load_from_blob(void* blob, km_core_keyboard** keyboard);
+km_core_status km_core_keyboard_load_from_blob(void* blob, size_t blob_size,
+                                               km_core_keyboard** keyboard);
 
 /*
 ```
@@ -1160,6 +1161,9 @@ km_core_status km_core_keyboard_load_from_blob(void* blob, km_core_keyboard** ke
 
 `blob`
 : a byte array containing the content of a KMX/KMX+ file
+
+`blob_size`
+: A pointer to a size_t variable with the size of the blob in bytes.
 
 `keyboard`
 : A pointer to result variable: A pointer to the opaque keyboard
