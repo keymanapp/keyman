@@ -177,6 +177,8 @@ TEST(km_u16_Test, u16ltrim) {
   EXPECT_TRUE(!u16cmp(u"abc", u16ltrim(u"  abc")));
   EXPECT_TRUE(!u16cmp(u"abc ", u16ltrim(u"abc ")));
   EXPECT_TRUE(!u16cmp(u"abc", u16ltrim(u"\tabc")));
+  EXPECT_TRUE(!u16cmp(u"abc def", u16ltrim(u"abc def")));
+  EXPECT_TRUE(!u16cmp(u"abc def", u16ltrim(u" abc def")));
 }
 
 TEST(km_u16_Test, u16rtrim) {
@@ -199,6 +201,10 @@ TEST(km_u16_Test, u16rtrim) {
   EXPECT_TRUE(!u16cmp(u" abc", u16rtrim(str)));
   u16cpy(str, u"abc\t");
   EXPECT_TRUE(!u16cmp(u"abc", u16rtrim(str)));
+  u16cpy(str, u"abc def");
+  EXPECT_TRUE(!u16cmp(u"abc def", u16rtrim(str)));
+  u16cpy(str, u"abc def ");
+  EXPECT_TRUE(!u16cmp(u"abc def", u16rtrim(str)));
 }
 
 TEST(km_u16_Test, u16trim) {
@@ -229,4 +235,8 @@ TEST(km_u16_Test, u16trim) {
   EXPECT_TRUE(!u16cmp(u"abc", u16trim(str)));
   u16cpy(str, u"\tabc");
   EXPECT_TRUE(!u16cmp(u"abc", u16trim(str)));
+  u16cpy(str, u"abc def");
+  EXPECT_TRUE(!u16cmp(u"abc def", u16trim(str)));
+  u16cpy(str, u" abc def ");
+  EXPECT_TRUE(!u16cmp(u"abc def", u16trim(str)));
 }
