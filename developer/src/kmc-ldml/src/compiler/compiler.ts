@@ -238,10 +238,10 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
       this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({ errorText: 'Unable to read XML file' }));
       return null;
     }
-    // parse (load) the string into an object tree
+    // parse (load) the string as XML into an object tree
     const source = reader.load(data);
     if (!source) {
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidFile({ errorText: 'Unable to load XML file' }));
+      // reader.load() adds callbacks on XML or import errs.
       return null;
     }
     try {

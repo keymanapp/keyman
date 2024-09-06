@@ -256,18 +256,22 @@ export class LDMLKeyboardXMLSourceFileReader {
   }
 
   loadUnboxed(file: Uint8Array): LDMLKeyboardXMLSourceFile {
-    const parser = new XMLParser({
-      ignoreAttributes: false, // We'd like attributes, please
-      attributeNamePrefix: '', // to avoid '@_' prefixes
-      // TODO: Any others needed?
-      // explicitArray: false,
-      // mergeAttrs: true,
-      // includeWhiteChars: false,
-      // emptyTag: {} as any
-    });
-    const a = parser.parse(file.toString());
-    delete a['?xml']; // fast-xml-parser includes the XML prologue, it's not in the schema so we delete it.
-    return a as LDMLKeyboardXMLSourceFile;
+    try {
+      const parser = new XMLParser({
+        ignoreAttributes: false, // We'd like attributes, please
+        attributeNamePrefix: '', // to avoid '@_' prefixes
+      });
+      const a = parser.parse(file.toString(), true);
+      delete a['?xml']; // fast-xml-parser includes the XML prologue, it's not in the schema so we delete it.
+      return a as LDMLKeyboardXMLSourceFile;
+    } catch (e) {
+      if (e.msg && e.code && e.line) {
+        this.callbacks.reportMessage(CommonTypesMessages.Error_InvalidXML(e));
+      } else {
+        this.callbacks.reportMessage(CommonTypesMessages.Error_InvalidXML({msg: e.toString()}));
+      }
+      return null;
+    }
   }
 
   /**
@@ -279,6 +283,9 @@ export class LDMLKeyboardXMLSourceFileReader {
       return null;
     }
     const source = this.loadUnboxed(file);
+    if (!source) {
+      return null;
+    }
     if(this.boxArrays(source)) {
       return source;
     } else {
