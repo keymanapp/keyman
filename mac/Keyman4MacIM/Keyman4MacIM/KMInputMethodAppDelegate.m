@@ -221,7 +221,7 @@ id _lastServerWithOSKShowing = nil;
   return (KMInputMethodAppDelegate *)[NSApp delegate];
 }
 
--(void) sleepFollowingDeactivationOfServer:(id)lastServer {
+-(void) sleepFollowingInactivityTimeout:(id)lastServer {
   os_log_debug([KMLogs lifecycleLog], "Keyman no longer active IM.");
   self.sleeping = YES;
   if ([self.oskWindow.window isVisible]) {
@@ -238,12 +238,13 @@ id _lastServerWithOSKShowing = nil;
 }
 
 -(void) wakeUpWith:(id)newServer {
+  os_log_debug([KMLogs oskLog], "wakeUpWith, newServer:%{public}@", newServer);
   self.sleeping = NO;
   if (self.lowLevelEventTap && !CGEventTapIsEnabled(self.lowLevelEventTap)) {
     os_log_debug([KMLogs lifecycleLog], "wakeUpWith, Keyman is now the active IM. Re-enabling event tap...");
     CGEventTapEnable(self.lowLevelEventTap, YES);
   }
-  // See note in sleepFollowingDeactivationOfServer.
+  // See note in sleepFollowingInactivityTimeout.
   if (_kvk != nil && (_lastServerWithOSKShowing == newServer) &&
       ([KMSettingsRepository.shared readShowOskOnActivate])) {
     os_log_debug([KMLogs oskLog], "wakeUpWith, readShowOskOnActivate= YES, showing OSK");

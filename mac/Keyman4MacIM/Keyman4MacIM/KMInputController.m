@@ -12,27 +12,32 @@
 #include <Carbon/Carbon.h> /* For kVK_ constants. */
 #import "KMSettingsRepository.h"
 #import "KMLogs.h"
+#import "InputMethodKit/InputMethodKit.h"
+
 
 @implementation KMInputController
+const double inactivityTimeout = 0.7;
 
 KMInputMethodEventHandler* _eventHandler;
-NSMutableArray *servers;
+NSMutableDictionary *textInputClients;
 
-- (KMInputMethodAppDelegate *)AppDelegate {
+- (KMInputMethodAppDelegate *)appDelegate {
   return (KMInputMethodAppDelegate *)[NSApp delegate];
 }
 
 - (id)initWithServer:(IMKServer *)server delegate:(id)delegate client:(id)inputClient
 {
-  os_log_debug([KMLogs lifecycleLog], "Initializing Keyman Input Method for server with bundleID: %{public}@", server.bundle.bundleIdentifier);
-  
+  NSRunningApplication *currApp = [[NSWorkspace sharedWorkspace] frontmostApplication];
+  NSString *clientAppId = [currApp bundleIdentifier];
+  os_log_debug([KMLogs lifecycleLog], "initWithServer, active app: '%{public}@'", clientAppId);
+
   self = [super initWithServer:server delegate:delegate client:inputClient];
   if (self) {
-    servers = [[NSMutableArray alloc] initWithCapacity:2];
-    self.AppDelegate.inputController = self;
-    if ((self.AppDelegate.kvk != nil) && ([KMSettingsRepository.shared readShowOskOnActivate])) {
-      os_log_debug([KMLogs oskLog], "initWithServer, readShowOskOnActivate= YES, showing OSK");
-      [self.AppDelegate showOSK];
+    textInputClients = [[NSMutableDictionary alloc] initWithCapacity:2];
+    self.appDelegate.inputController = self;
+    if ((self.appDelegate.kvk != nil) && ([KMSettingsRepository.shared readShowOskOnActivate])) {
+      os_log_debug([KMLogs oskLog], "   initWithServer, readShowOskOnActivate= YES, showing OSK");
+      [self.appDelegate showOSK];
     }
   }
   
@@ -62,103 +67,75 @@ NSMutableArray *servers;
 }
 
 - (void)activateServer:(id)sender {
-  @synchronized(servers) {
+  @synchronized(textInputClients) {
+    os_log_debug([KMLogs lifecycleLog], "KMInputController activateServer, sender %{public}@", sender);
     [sender overrideKeyboardWithKeyboardNamed:@"com.apple.keylayout.US"];
-    
-    [self.AppDelegate wakeUpWith:sender];
-    [servers addObject:sender];
-    os_log_debug([KMLogs lifecycleLog], "activateServer, adding sender to servers array, sender: %{public}@", sender);
+    NSRunningApplication *currentApp = [[NSWorkspace sharedWorkspace] frontmostApplication];
+    NSString *clientAppId = [currentApp bundleIdentifier];
+    NSUInteger key = ((NSObject*)sender).hash;
+    NSString *keyString = [@(key) stringValue];
+    //NSValue *key = [NSValue valueWithNonretainedObject:sender];
+    os_log_debug([KMLogs lifecycleLog], "  +++adding client application '%{public}@' to textInputClients map, derived key: %{public}@", clientAppId, keyString);
+
+    [textInputClients setObject:clientAppId forKey:keyString];
+    os_log_debug([KMLogs lifecycleLog], "  textInputClients map: %{public}@", textInputClients.description);
+
+    [self.appDelegate wakeUpWith:sender];
 
     if (_eventHandler != nil) {
       [_eventHandler deactivate];
     }
     
-    NSRunningApplication *currApp = [[NSWorkspace sharedWorkspace] frontmostApplication];
-    NSString *clientAppId = [currApp bundleIdentifier];
-    os_log_debug([KMLogs lifecycleLog], "activateServer, new active app: '%{public}@'", clientAppId);
-    
     _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:clientAppId client:sender];
-    
   }
 }
 
 - (void)deactivateServer:(id)sender {
-  if ([self.AppDelegate debugMode]) {
-    os_log_debug([KMLogs lifecycleLog], "deactivateServer, sender %{public}@", sender);
-  }
-  @synchronized(servers) {
-    for (int i = 0; i < servers.count; i++) {
-      if (servers[i] == sender) {
-        os_log_debug([KMLogs lifecycleLog], "deactivateServer, removing sender from servers array, sender: %{public}@", sender);
-        [servers removeObjectAtIndex:i];
-        break;
-      }
+  os_log_debug([KMLogs lifecycleLog], "KMInputController deactivateServer, sender %{public}@", sender);
+  @synchronized(textInputClients) {
+    NSUInteger key = ((NSObject*)sender).hash;
+    NSString *keyString = [@(key) stringValue];
+    //NSValue *key = [NSValue valueWithNonretainedObject:sender];
+    NSString *clientAppId = [textInputClients objectForKey:keyString];
+    
+    if (clientAppId) {
+      os_log_debug([KMLogs lifecycleLog], "  ---removing client application '%{public}@' from textInputClients map, key: %{public}@", clientAppId, keyString);
+      [textInputClients removeObjectForKey:keyString];
+    } else {
+      os_log_debug([KMLogs lifecycleLog], "  key %{public}@ not found in textInputClients map", keyString);
     }
-    if (servers.count == 0) {
-      os_log_debug([KMLogs lifecycleLog], "No known active server for Keyman IM. Starting countdown to sleep...");
-      [self performSelector:@selector(timerAction:) withObject:sender afterDelay:0.7];
+    os_log_debug([KMLogs lifecycleLog], "  textInputClients map: %{public}@", textInputClients.description);
+    if (textInputClients.count == 0) {
+      os_log_debug([KMLogs lifecycleLog], "no text input clients found in textInputClients map; delay for %f seconds and call sleepIfNoClients", inactivityTimeout);
+      [self performSelector:@selector(sleepIfNoClients:) withObject:sender afterDelay:inactivityTimeout];
     }
   }
 }
 
-- (void)timerAction:(id)lastServer {
-  @synchronized(servers) {
-    if (servers.count == 0) {
+- (void)sleepIfNoClients:(id)lastClient {
+  @synchronized(textInputClients) {
+    if (textInputClients.count == 0) {
+      os_log_debug([KMLogs lifecycleLog], "sleepIfNoClients found no clients, time to sleep");
       if (_eventHandler != nil) {
         [_eventHandler deactivate];
         _eventHandler = nil;
       }
-      [self.AppDelegate sleepFollowingDeactivationOfServer:lastServer];
+      [self.appDelegate sleepFollowingInactivityTimeout:lastClient];
+    } else {
+      NSArray*keys=[textInputClients allKeys];
+      NSObject *key = keys[0];
+      NSString *clientAppId = [textInputClients objectForKey:key];
+      os_log_debug([KMLogs lifecycleLog], "sleepIfNoClients found a newly activated client, clientAppId '%{public}@', key: %{public}@", clientAppId, key);
     }
   }
 }
 
-
-/*
- - (NSDictionary *)modes:(id)sender {
- if ([self.AppDelegate debugMode])
- os_log_debug([KMLogs lifecycleLog], "*** Modes ***");
- if (_kmModes == nil) {
- NSDictionary *amhMode = [[NSDictionary alloc] initWithObjectsAndKeys:@"keyman.png", kTSInputModeAlternateMenuIconFileKey,
- [NSNumber numberWithBool:YES], kTSInputModeDefaultStateKey,
- [NSNumber numberWithBool:YES], kTSInputModeIsVisibleKey,
- @"A", kTSInputModeKeyEquivalentKey,
- [NSNumber numberWithInteger:4608], kTSInputModeKeyEquivalentModifiersKey,
- [NSNumber numberWithBool:YES], kTSInputModeDefaultStateKey,
- @"keyman.png", kTSInputModeMenuIconFileKey,
- @"keyman.png", kTSInputModePaletteIconFileKey,
- [NSNumber numberWithBool:YES], kTSInputModePrimaryInScriptKey,
- @"smUnicodeScript", kTSInputModeScriptKey,
- @"amh", @"TISIntendedLanguage", nil];
- 
- NSDictionary *hinMode = [[NSDictionary alloc] initWithObjectsAndKeys:@"keyman.png", kTSInputModeAlternateMenuIconFileKey,
- [NSNumber numberWithBool:YES], kTSInputModeDefaultStateKey,
- [NSNumber numberWithBool:YES], kTSInputModeIsVisibleKey,
- @"H", kTSInputModeKeyEquivalentKey,
- [NSNumber numberWithInteger:4608], kTSInputModeKeyEquivalentModifiersKey,
- [NSNumber numberWithBool:YES], kTSInputModeDefaultStateKey,
- @"keyman.png", kTSInputModeMenuIconFileKey,
- @"keyman.png", kTSInputModePaletteIconFileKey,
- [NSNumber numberWithBool:YES], kTSInputModePrimaryInScriptKey,
- @"smUnicodeScript", kTSInputModeScriptKey,
- @"hin", @"TISIntendedLanguage", nil];
- 
- NSDictionary *modeList = [[NSDictionary alloc] initWithObjectsAndKeys:amhMode, @"com.apple.inputmethod.amh", hinMode, @"com.apple.inputmethod.hin", nil];
- NSArray *modeOrder = [[NSArray alloc] initWithObjects:@"com.apple.inputmethod.amh", @"com.apple.inputmethod.hin", nil];
- _kmModes = [[NSDictionary alloc] initWithObjectsAndKeys:modeList, kTSInputModeListKey,
- modeOrder, kTSVisibleInputModeOrderedArrayKey, nil];
- }
- 
- return _kmModes;
- }
- */
-
 - (NSMenu *)menu {
-  return self.AppDelegate.menu;
+  return self.appDelegate.menu;
 }
 
 - (KMXFile *)kmx {
-  return self.AppDelegate.kmx;
+  return self.appDelegate.kmx;
 }
 
 - (void)menuAction:(id)sender {
@@ -171,13 +148,13 @@ NSMutableArray *servers;
   else if (itag == OSK_MENUITEM_TAG) {
     [KMSettingsRepository.shared writeShowOskOnActivate:YES];
     os_log_debug([KMLogs oskLog], "menuAction OSK_MENUITEM_TAG, updating settings writeShowOsk to YES");
-    [self.AppDelegate showOSK];
+    [self.appDelegate showOSK];
   }
   else if (itag == ABOUT_MENUITEM_TAG) {
-    [self.AppDelegate showAboutWindow];
+    [self.appDelegate showAboutWindow];
   }
   else if (itag >= KEYMAN_FIRST_KEYBOARD_MENUITEM_TAG) {
-    [self.AppDelegate selectKeyboardFromMenu:itag];
+    [self.appDelegate selectKeyboardFromMenu:itag];
   }
 }
 
@@ -189,7 +166,7 @@ NSMutableArray *servers;
   if ([KMOSVersion Version_10_13_1] <= systemVersion && systemVersion <= [KMOSVersion Version_10_13_3]) // between 10.13.1 and 10.13.3 inclusive
   {
     os_log_info([KMLogs uiLog], "Input Menu: calling workaround instead of showPreferences (sys ver %x)", systemVersion);
-    [self.AppDelegate showConfigurationWindow]; // call our workaround
+    [self.appDelegate showConfigurationWindow]; // call our workaround
   }
   else
   {

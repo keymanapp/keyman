@@ -101,7 +101,7 @@ static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX = 0;
 - (void)showOSK;
 - (void)showConfigurationWindow;
 - (void)selectKeyboardFromMenu:(NSInteger)tag;
-- (void)sleepFollowingDeactivationOfServer:(id)lastServer;
+- (void)sleepFollowingInactivityTimeout:(id)lastServer;
 - (void)wakeUpWith:(id)newServer;
 - (void)handleKeyEvent:(NSEvent *)event;
 - (BOOL)unzipFile:(NSString *)filePath;
