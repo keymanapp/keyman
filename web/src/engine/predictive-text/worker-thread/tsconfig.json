@@ -18,7 +18,7 @@
   },
   "references": [
     // types
-    { "path": "../../../../../common/models/types" },
+    { "path": "../../../../../common/web/types" },
     { "path": "../types" },
     // modules
     { "path": "../../../../../common/web/keyman-version" },

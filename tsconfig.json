@@ -3,7 +3,6 @@
     { "path": "./core/include/ldml/tsconfig.json" },
 
     { "path": "./common/models/templates/tsconfig.json" },
-    { "path": "./common/models/types/tsconfig.json" },
     { "path": "./common/models/wordbreakers/tsconfig.json" },
     { "path": "./common/tools/hextobin/" },
 

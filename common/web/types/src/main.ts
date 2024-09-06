@@ -29,3 +29,5 @@ export * as KMXPlus from './kmx/kmx-plus/kmx-plus.js';
 export { UnicodeSetParser, UnicodeSet } from './ldml-keyboard/unicodeset-parser-api.js';
 export { VariableParser, MarkerParser } from './ldml-keyboard/pattern-parser.js';
 export { ElementString } from './kmx/kmx-plus/element-string.js';
+
+export * from './lexical-model-types.js';

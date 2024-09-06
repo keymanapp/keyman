@@ -1,3 +1,5 @@
+import { LexicalModelPunctuation } from '@keymanapp/common-types';
+
 export enum QuoteBehavior {
   noQuotes  = "no-quotes",
   useQuotes = "use-quotes",

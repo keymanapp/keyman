@@ -1,3 +1,5 @@
+import { Transform } from '@keymanapp/common-types';
+
 export default class TransformUtils {
   static isWhitespace(transform: Transform): boolean {
     // Matches a string that is entirely one or more characters with Unicode general property Z* or the following: CR, LF, and Tab.

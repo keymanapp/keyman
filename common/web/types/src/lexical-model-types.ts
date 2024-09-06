@@ -15,14 +15,14 @@
  *
  * See also: https://developer.mozilla.org/en-US/docs/Web/API/USVString
  */
-declare type USVString = string;
+export type USVString = string;
 
-declare type CasingForm = 'lower' | 'initial' | 'upper';
+export type CasingForm = 'lower' | 'initial' | 'upper';
 
 /**
  * Represents one lexical entry and its probability..
  */
-type TextWithProbability = {
+export type TextWithProbability = {
   /**
    * A lexical entry (word) offered by the model.
    *
@@ -42,7 +42,7 @@ type TextWithProbability = {
  * Used to facilitate edit-distance calculations by allowing the LMLayer to
  * efficiently search the model's lexicon in a Trie-like manner.
  */
-declare interface LexiconTraversal {
+export interface LexiconTraversal {
   /**
    * Provides an iterable pattern used to search for words with a 'keyed' prefix matching
    * the current traversal state's prefix when a new character is appended.  Iterating
@@ -116,7 +116,7 @@ declare interface LexiconTraversal {
 /**
  * The model implementation, within the Worker.
  */
-declare interface LexicalModel {
+export interface LexicalModel {
   /**
    * Processes `config` messages, configuring the newly-loaded model based on the host
    * platform's capability restrictions.
@@ -263,7 +263,7 @@ declare interface LexicalModel {
  * first, you delete the specified amount amount from the left
  * and right, then you insert the provided text.
  */
-declare interface Transform {
+export interface Transform {
   /**
    * Facilitates use of unique identifiers for tracking the Transform and
    * any related data from its original source, as the reference cannot be
@@ -298,7 +298,7 @@ declare interface Transform {
 /**
  * A concrete suggestion
  */
-declare interface Suggestion {
+export interface Suggestion {
   /**
    * Indicates the externally-supplied id of the Transform that prompted
    * the Suggestion.  Automatically handled by the LMLayer; models should
@@ -341,11 +341,11 @@ declare interface Suggestion {
   autoAccept?: boolean
 }
 
-interface Reversion extends Suggestion {
+export interface Reversion extends Suggestion {
   tag: 'revert';
 }
 
-interface Keep extends Suggestion {
+export interface Keep extends Suggestion {
   tag: 'keep';
 
   /**
@@ -368,12 +368,12 @@ interface Keep extends Suggestion {
  *
  * If left undefined, the consumers will assume this is a prediction.
  */
-type SuggestionTag = undefined | 'keep' | 'revert' | 'correction' | 'emoji';
+export type SuggestionTag = undefined | 'keep' | 'revert' | 'correction' | 'emoji';
 
 /**
  * The text and environment surrounding the insertion point (text cursor).
  */
-declare interface Context {
+export interface Context {
   /**
    * Up to maxLeftContextCodeUnits code units of Unicode scalar value
    * (i. e., characters) to the left of the insertion point in the
@@ -413,7 +413,7 @@ declare interface Context {
  * from ambiguous text sequences.  Designed for use with fat-finger correction
  * and similar typing ambiguities.
  */
-interface ProbabilityMass<T> {
+export interface ProbabilityMass<T> {
   /**
    * An individual sample from a Distribution over the same type.
    */
@@ -426,12 +426,12 @@ interface ProbabilityMass<T> {
   p: number;
 }
 
-declare type Distribution<T> = ProbabilityMass<T>[];
+export type Distribution<T> = ProbabilityMass<T>[];
 
 /**
  * A type augmented with an optional probability.
  */
-type Outcome<T> = T & {
+export type Outcome<T> = T & {
   /**
    * [optional] probability of this outcome.
    */
@@ -441,7 +441,7 @@ type Outcome<T> = T & {
 /**
  * A type augmented with a probability.
  */
-type WithOutcome<T> = T & {
+export type WithOutcome<T> = T & {
   /**
    * Probability of this outcome.
    */
@@ -458,7 +458,7 @@ type WithOutcome<T> = T & {
  * prediction, as well as what operations the keyboard is allowed to do on the
  * underlying buffer.
  */
-declare interface Capabilities {
+export interface Capabilities {
   /**
    * The maximum amount of UTF-16 code points that the keyboard will provide to
    * the left of the cursor, as an integer.
@@ -482,7 +482,7 @@ declare interface Capabilities {
 /**
  * Configuration of the LMLayer, sent back to the keyboard.
  */
-declare interface Configuration {
+export interface Configuration {
   /**
    * How many UTF-16 code units maximum to send as the context to the
    * left of the cursor ("left" in the Unicode character stream).
@@ -538,14 +538,14 @@ declare interface Configuration {
  * @returns an array of spans from the phrase, in order as they appear in the
  *          phrase, each span which representing a word.
  */
-declare interface WordBreakingFunction {
+export interface WordBreakingFunction {
   // invariant: span[i].end <= span[i + 1].start
   // invariant: for all span[i] and span[i + 1], there does not exist a span[k]
   //            where span[i].end <= span[k].start AND span[k].end <= span[i + 1].start
   (phrase: string): Span[];
 }
 
-declare interface CasingFunction {
+export interface CasingFunction {
   (caseToApply: CasingForm, text: string, defaultApplyCasing?: CasingFunction): string;
 }
 
@@ -553,7 +553,7 @@ declare interface CasingFunction {
  * A span of text in a phrase. This is usually meant to represent words from a
  * pharse.
  */
-declare interface Span {
+export interface Span {
   // invariant: start < end (empty spans not allowed)
   readonly start: number;
   // invariant: end > end (empty spans not allowed)
@@ -572,7 +572,7 @@ declare interface Span {
 /**
  * Options for various punctuation to use in suggestions.
  */
-interface LexicalModelPunctuation {
+export interface LexicalModelPunctuation {
   /**
    * The quotes that appear in "keep" suggestions, e.g., keep what the user
    * typed verbatim.

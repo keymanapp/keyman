@@ -9,7 +9,7 @@
   },
   "references": [
     { "path": "../../../../../../common/web/utils" },
-    { "path": "../../../../../../common/models/types"},
+    { "path": "../../../../../../common/web/types"},
     { "path": "../../types"}
   ],
   "include" : [ "./*.ts" ],
