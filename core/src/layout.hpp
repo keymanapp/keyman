@@ -68,9 +68,9 @@ enum keyboard_layout_key_type {
  */
 struct keyboard_layout_key {
   /** key id */
-  std::u16string id;  // ??? perhaps necessary for special keys, Enter, etc? or can we get that from virtualKey?
+  std::u16string id;  // TODO-WEB-CORE: perhaps necessary for special keys, Enter, etc? or can we get that from virtualKey?
   /** the virtual key code */
-  int virtualKey; // ??? do we need this? both id and virtualKey? Or just one of them?
+  int virtualKey; // TODO-WEB-CORE: do we need this? both id and virtualKey? Or just one of them?
   /** text to display on key cap */
   std::u16string display;
   /** hint e.g. for longpress */
@@ -106,7 +106,7 @@ struct keyboard_layout_key {
  */
 struct keyboard_layout_row {
   /** row id */
-  int id; // ??? do we need this? Web has it (`TouchLayoutRow`)
+  int id; // TODO-WEB-CORE: do we need this? Web has it (`TouchLayoutRow`)
   /** keys in this row */
   std::vector<keyboard_layout_key> keys;
 };
@@ -118,7 +118,7 @@ struct keyboard_layout_layer {
   /** layer id */
   std::u16string id;
   /** layer modifiers */
-  // ??? we added this during our discussion, but Web doesn't have it.
+  // TODO-WEB-CORE: we added this during our discussion, but Web doesn't have it.
   // Should be an enum if it's needed.
   int modifiers;  //? 0 = default, n = shift, etc. -1 = unspecified?
   /** rows in this layer */
@@ -136,7 +136,7 @@ struct keyboard_layout_platform {
   /** layers for this platform */
   std::vector<keyboard_layout_layer> layers;
 
-  // ??? Do we need these:
+  // TODO-WEB-CORE: Do we need these:
   // Web additionally has:
   // - font (should be in CSS; we have it in `keyboard_layout`)
   // - fontsize (should be in CSS; we have it in `keyboard_layout`)
@@ -155,7 +155,7 @@ struct keyboard_layout {
   /** font face name to use for key caps*/
   std::string fontFacename;
   /** font size to use for key caps */
-  int fontSizeEm;  // ??? em? px? something else?
+  int fontSizeEm;  // TODO-WEB-CORE: em? px? something else?
 };
 
 

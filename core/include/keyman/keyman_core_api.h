@@ -1179,13 +1179,10 @@ km_core_status km_core_keyboard_load_from_blob(void* blob, size_t blob_size,
 : In the event an internal memory allocation fails.
 
 `KM_CORE_STATUS_IO_ERROR`
-: In the event the keyboard file is unparseable for any reason
+: In the event the keyboard blob is unparseable for any reason
 
 `KM_CORE_STATUS_INVALID_ARGUMENT`
-: In the event `keyboard` is null.
-
-`KM_CORE_STATUS_OS_ERROR`
-: Bit 31 (high bit) set, bits 0-30 are an OS-specific error code.
+: In the event one of the required parameters is null.
 
 -------------------------------------------------------------------------------
 
