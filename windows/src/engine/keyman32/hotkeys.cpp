@@ -139,8 +139,6 @@ Hotkey *Hotkeys::GetHotkey(DWORD hotkey)
 {
   for (int i = 0; i < m_nHotkeys; i++) {
     if (m_hotkeys[i].HotkeyValue == hotkey) {
-      SendDebugMessageFormat(
-          "LanguageHotkey[%d] = {HotkeyValue: %x, hkl: %x} passed in: %x", i, m_hotkeys[i].HotkeyValue, m_hotkeys[i].hkl, hotkey);
       return &m_hotkeys[i];
     }
   }
