@@ -12,7 +12,7 @@ describe('disp', function () {
 
   it('should compile minimal disp', async function() {
     let disp = await loadSectionFixture(DispCompiler, 'sections/disp/minimal.xml', compilerTestCallbacks) as Disp;
-    assert.equal(compilerTestCallbacks.messages.length, 0);
+    assert.sameDeepMembers(compilerTestCallbacks.messages, []);
 
     assert.ok(disp?.disps);
     assert.equal(disp.disps.length, 0);

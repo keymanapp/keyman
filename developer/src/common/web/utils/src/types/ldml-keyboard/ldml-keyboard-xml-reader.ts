@@ -61,6 +61,12 @@ export class LDMLKeyboardXMLSourceFileReader {
       if (!source.keyboard3.forms.import) {
         source.keyboard3.forms.import = [];
       }
+      if (!source.keyboard3.displays) {
+        source.keyboard3.displays = {
+          display: [],
+          displayOptions: {},
+        };
+      }
     }
     boxXmlArray(source?.keyboard3, 'layers');
     boxXmlArray(source?.keyboard3?.displays, 'display');
