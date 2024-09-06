@@ -3,7 +3,7 @@
   Description:  This is a test implementation of the keyboard processor API to
                 enable testing API clients against a basic keyboard and give
                 them something to link against and load.
-                TODO: Add a mecahnism to trigger output of PERSIST_OPT &
+                TODO: Add a mechanism to trigger output of PERSIST_OPT &
                 RESET_OPT actions items, options support and context matching.
   Create Date:  17 Oct 2018
   Authors:      Tim Eves (TSE)
