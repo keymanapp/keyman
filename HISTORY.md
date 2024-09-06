@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.106 alpha 2024-09-06
+
+* feat(windows): add right modifier included in hotkey optional functionality (#12259)
+* fix(android): Skip language counts for lexical-model packages (#12361)
+* docs(web): fix link to documentation page (#12369)
+
 ## 18.0.105 alpha 2024-09-05
 
 * chore(common): Fix missing entries in HISTORY.md (#12352)
