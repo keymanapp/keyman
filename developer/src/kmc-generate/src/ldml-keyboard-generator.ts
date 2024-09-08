@@ -4,7 +4,8 @@
  * Generate a Keyman LDML keyboard project (.xml source)
  */
 
-import { KeymanCompiler, KeymanFileTypes } from '@keymanapp/common-types';
+import { KeymanFileTypes } from '@keymanapp/common-types';
+import { KeymanCompiler, } from '@keymanapp/developer-utils';
 import { GeneratorArtifacts, GeneratorResult } from './abstract-generator.js';
 import { BasicGenerator } from './basic-generator.js';
 

@@ -4,7 +4,7 @@
  * Base interfaces and classes for generating Keyman Developer source files
  */
 
-import { CompilerCallbacks, CompilerLogLevel, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult } from "@keymanapp/common-types";
+import { CompilerCallbacks, CompilerLogLevel, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult } from "@keymanapp/developer-utils";
 import { GeneratorMessages } from './generator-messages.js';
 
 

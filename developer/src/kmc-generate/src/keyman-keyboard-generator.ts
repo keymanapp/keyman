@@ -4,7 +4,8 @@
  * Generate a Keyman keyboard project (.kmn source)
  */
 
-import { KeymanCompiler, KeymanFileTypes, KeymanTargets } from '@keymanapp/common-types';
+import { KeymanFileTypes, KeymanTargets } from '@keymanapp/common-types';
+import { KeymanCompiler, } from '@keymanapp/developer-utils';
 import { GeneratorArtifacts, GeneratorResult } from './abstract-generator.js';
 import { BasicGenerator } from './basic-generator.js';
 

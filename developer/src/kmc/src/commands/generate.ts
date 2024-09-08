@@ -5,7 +5,7 @@ import { InfrastructureMessages } from '../messages/infrastructureMessages.js';
 import { BaseOptions } from '../util/baseOptions.js';
 import { exitProcess } from '../util/sysexits.js';
 import { GeneratorOptions, KeymanKeyboardGenerator, LdmlKeyboardGenerator, LexicalModelGenerator } from '@keymanapp/kmc-generate';
-import { KeymanCompiler } from '@keymanapp/common-types';
+import { KeymanCompiler } from '@keymanapp/developer-utils';
 
 
 export function declareGenerate(program: Command) {

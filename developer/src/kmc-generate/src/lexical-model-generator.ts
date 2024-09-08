@@ -4,8 +4,8 @@
  * Generate a Keyman lexical model project
  */
 
-import { KeymanCompiler, KeymanFileTypes } from '@keymanapp/common-types';
-import { SourceFilenamePatterns } from '@keymanapp/developer-utils';
+import { KeymanFileTypes } from '@keymanapp/common-types';
+import { KeymanCompiler, SourceFilenamePatterns } from '@keymanapp/developer-utils';
 import { GeneratorArtifacts, GeneratorResult } from './abstract-generator.js';
 import { BasicGenerator } from './basic-generator.js';
 import { GeneratorMessages } from './generator-messages.js';
