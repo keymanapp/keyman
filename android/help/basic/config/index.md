@@ -44,6 +44,11 @@ Click on this to bring up the Android system configuration for setting Keyman as
 
 Click on this to [adjust the keyboard height](adjust-keyboard-height).
 
+## Adjust longpress delay
+![](../../android_images/ic_timelapse.png)
+
+Click on this to adjust the delay time for a longpress gesture.
+
 ## Spacebar Caption
 Click on this to [change the displayed keyboard name](spacebar-caption) on the spacebar.
 
