@@ -113,10 +113,11 @@ const
   SRegValue_ShowWelcome             = 'show welcome';                        // CU
   SRegValue_UseAdvancedInstall      = 'use advanced install';                       // CU
 
-  SRegValue_AltGrCtrlAlt                = 'simulate altgr';                         // CU
-  SRegValue_KeyboardHotKeysAreToggle    = 'hotkeys are toggles';                    // CU
+  SRegValue_AltGrCtrlAlt                  = 'simulate altgr';                       // CU
+  SRegValue_KeyboardHotKeysAreToggle      = 'hotkeys are toggles';                  // CU
+  SRegValue_AllowRightModifierHotKey      = 'allow right modifier for hotkey';      // CU
   SRegValue_ReleaseShiftKeysAfterKeyPress = 'release shift keys after key press';   // CU
-  SRegValue_TestKeymanFunctioning       = 'test keyman functioning';                // CU, default true
+  SRegValue_TestKeymanFunctioning         = 'test keyman functioning';              // CU, default true
 
   SRegValue_CreateStartMenuAsSubfolders = 'create start menu as subfolders';        // CU
   SRegValue_CreateUninstallEntries      = 'create uninstall entries';               // CU

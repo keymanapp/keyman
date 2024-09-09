@@ -379,6 +379,11 @@
 
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
+  <!-- Introduced: 18.0.95 -->
+  <string name="koRightModifierHK" comment="General options - Right Ctrl Alt and Shift trigger hotkey">Allow right modifier for hotkeys</string>
+
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
   <!-- Introduced: 9.0.480.0 -->
   <string name="koDeadkeyConversion" comment="Advanced options - Base keyboard deadkeys are treated as normal keys">Treat hardware deadkeys as plain keys</string>
 
@@ -535,6 +540,16 @@
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Support_Copyright" comment="Support - Product Copyright">Copyright © SIL International. All Rights Reserved.</string>
+
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.94.0 -->
+  <string name="S_Support_CreatedBySILGlobal" comment="Created by {SIL Global} ">Created by %1$s</string>
+
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.94.0 -->
+  <string name="S_Support_CopyrightSILGlobal" comment="Copyright © {SIL Global}. All Rights Reserved.">Copyright © %1$s. All Rights Reserved.</string>
 
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
