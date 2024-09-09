@@ -379,6 +379,11 @@
 
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
+  <!-- Introduced: 18.0.95 -->
+  <string name="koRightModifierHK" comment="General options - Right Ctrl Alt and Shift trigger hotkey">Allow right modifier for hotkeys</string>
+
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
   <!-- Introduced: 9.0.480.0 -->
   <string name="koDeadkeyConversion" comment="Advanced options - Base keyboard deadkeys are treated as normal keys">Treat hardware deadkeys as plain keys</string>
 

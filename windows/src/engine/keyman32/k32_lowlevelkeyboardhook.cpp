@@ -129,6 +129,25 @@ BOOL IsTouchPanelVisible() {
   return touchPanelVisible;
 }
 
+/*
+  Cache AllowRightModifierHotKey for this session
+*/
+BOOL AllowRightModifierHotKey() {
+  static BOOL flag_AllowRightModifierHotKey = FALSE;
+  static BOOL loaded = FALSE;
+
+  if (!loaded) {
+    RegistryReadOnly reg(HKEY_CURRENT_USER);
+    if (reg.OpenKeyReadOnly(REGSZ_KeymanCU)) {
+      if (reg.ValueExists(REGSZ_AllowRightModifierHotKey)) {
+        flag_AllowRightModifierHotKey = !!reg.ReadInteger(REGSZ_AllowRightModifierHotKey);
+      }
+    }
+    loaded = TRUE; // Set loaded to TRUE whether or not the key exists
+  }
+  return flag_AllowRightModifierHotKey;
+}
+
 LRESULT _kmnLowLevelKeyboardProc(
   _In_  int nCode,
   _In_  WPARAM wParam,
@@ -150,16 +169,33 @@ LRESULT _kmnLowLevelKeyboardProc(
 
   // #5190: Don't cache modifier state because sometimes we won't receive
   // modifier change events (e.g. on lock screen)
-    FHotkeyShiftState = 0;
-    if (GetKeyState(VK_LCONTROL) < 0) FHotkeyShiftState |= HK_CTRL;
-    if (GetKeyState(VK_RCONTROL) < 0) FHotkeyShiftState |= HK_RCTRL_INVALID;
-    if (GetKeyState(VK_LMENU) < 0) FHotkeyShiftState |= HK_ALT;
-    if (GetKeyState(VK_RMENU) < 0) FHotkeyShiftState |= HK_RALT_INVALID;
-    if (GetKeyState(VK_LSHIFT) < 0) FHotkeyShiftState |= HK_SHIFT;
-    if (GetKeyState(VK_RSHIFT) < 0) FHotkeyShiftState |= HK_RSHIFT_INVALID;
-    //TODO: #8064. Can remove debug message once issue #8064 is resolved
-    SendDebugMessageFormat("!UseCachedHotkeyModifierState [FHotkeyShiftState:%x]", FHotkeyShiftState);
+  FHotkeyShiftState = 0;
 
+  if (GetKeyState(VK_LCONTROL) < 0) {
+    FHotkeyShiftState |= HK_CTRL;
+  }
+
+  if (GetKeyState(VK_RCONTROL) < 0) {
+    FHotkeyShiftState |= AllowRightModifierHotKey() ? HK_CTRL : HK_RCTRL_INVALID;
+  }
+
+  if (GetKeyState(VK_LMENU) < 0) {
+    FHotkeyShiftState |= HK_ALT;
+  }
+
+  if (GetKeyState(VK_RMENU) < 0) {
+    FHotkeyShiftState |= AllowRightModifierHotKey() ? HK_ALT : HK_RALT_INVALID;
+  }
+
+  if (GetKeyState(VK_LSHIFT) < 0) {
+    FHotkeyShiftState |= HK_SHIFT;
+  }
+  if (GetKeyState(VK_RSHIFT) < 0) {
+    FHotkeyShiftState |= AllowRightModifierHotKey() ? HK_SHIFT : HK_RSHIFT_INVALID;
+  }
+
+  //TODO: #8064. Can remove debug message once issue #8064 is resolved
+  SendDebugMessageFormat("[FHotkeyShiftState:%x]", FHotkeyShiftState);
 
   // #7337 Post the modifier state ensuring the serialized queue is in sync
   // Note that the modifier key may be posted again with WM_KEYMAN_KEY_EVENT,
@@ -243,30 +279,24 @@ BOOL ProcessHotkey(UINT vkCode, BOOL isUp, DWORD ShiftState) {
 
   Hotkeys *hotkeys = Hotkeys::Instance();   // I4641
   if (!hotkeys) {
-    SendDebugMessageFormat("Failed to get Instance");
     return FALSE;
   }
 
   Hotkey *hotkey = hotkeys->GetHotkey(ShiftState | vkCode);   // I4641
   if (!hotkey) {
-    SendDebugMessageFormat("GetHotkey Null");
     return FALSE;
   }
 
   if (isUp) {
-    SendDebugMessageFormat("Is Up");
     return TRUE;
   }
 
   if (hotkey->HotkeyType == hktInterface) {
-    SendDebugMessageFormat("PostMasterController");
     Globals::PostMasterController(wm_keyman_control, MAKELONG(KMC_INTERFACEHOTKEY, hotkey->Target), 0);
   }
   else {
-    SendDebugMessageFormat("ReportKeyboardChanged");
     ReportKeyboardChanged(PC_HOTKEYCHANGE, hotkey->hkl == 0 ? TF_PROFILETYPE_INPUTPROCESSOR : TF_PROFILETYPE_KEYBOARDLAYOUT, 0, hotkey->hkl, GUID_NULL, hotkey->profileGUID);
   }
-  SendDebugMessageFormat("PostDummyKeyEvent");
   /* Generate a dummy keystroke to block menu activations, etc but let the shift key through */
   PostDummyKeyEvent();  // I3301 - this is imperfect because we don't deal with HC_NOREMOVE.  But good enough?   // I3534   // I4844
 

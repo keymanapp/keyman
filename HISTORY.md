@@ -1,5 +1,19 @@
 # Keyman Version History
 
+## 18.0.106 alpha 2024-09-06
+
+* feat(windows): add right modifier included in hotkey optional functionality (#12259)
+* fix(android): Skip language counts for lexical-model packages (#12361)
+* docs(web): fix link to documentation page (#12369)
+
+## 18.0.105 alpha 2024-09-05
+
+* chore(common): Fix missing entries in HISTORY.md (#12352)
+* docs(android): Add in-app help for adjusting longpress delay (#12359)
+* fix(mac): avoid crash on startup with macOS 10.15 (Catalina) (#12354)
+* chore(oem/fv): Update to fv_all 13.0 (#12362)
+* feat(windows): Add two new strings for SIL Global name instead of SIL International (#12327)
+
 ## 18.0.104 alpha 2024-09-03
 
 * fix(mac): display package info after keyboard installation (#12326)
