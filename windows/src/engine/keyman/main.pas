@@ -47,7 +47,7 @@ uses
   UfrmKeyman7Main,
   UserMessages,
   Klog,
-  Keyman.System.ExecuteHistory;
+  Keyman.System.ExecutionHistory;
 
 function ValidateParameters(var FCommand: Integer): Boolean; forward;
 function PassParametersToRunningInstance(FCommand: Integer): Boolean; forward;

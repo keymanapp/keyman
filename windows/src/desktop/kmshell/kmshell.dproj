@@ -360,8 +360,12 @@
         <DCCReference Include="main\Keyman.System.UpdateStateMachine.pas"/>
         <DCCReference Include="main\Keyman.System.DownloadUpdate.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\Keyman.System.ExecutionHistory.pas"/>
+        <DCCReference Include="main\UfrmStartInstallNow.pas">
+            <Form>frmInstallNow</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <DCCReference Include="main\UfrmStartInstall.pas">
-            <Form>Form1</Form>
+            <Form>frmStartInstall</Form>
             <FormType>dfm</FormType>
         </DCCReference>
         <None Include="Profiling\AQtimeModule1.aqt"/>
