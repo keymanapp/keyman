@@ -184,7 +184,8 @@ uses
   Keyman.System.UpdateStateMachine in 'main\Keyman.System.UpdateStateMachine.pas',
   Keyman.System.DownloadUpdate in 'main\Keyman.System.DownloadUpdate.pas',
   Keyman.System.ExecutionHistory in '..\..\..\..\common\windows\delphi\general\Keyman.System.ExecutionHistory.pas',
-  UfrmStartInstall in 'main\UfrmStartInstall.pas' {Form1};
+  UfrmStartInstallNow in 'main\UfrmStartInstallNow.pas',
+  UfrmStartInstall in 'main\UfrmStartInstall.pas';
 
 {$R VERSION.RES}
 {$R manifest.res}

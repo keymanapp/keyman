@@ -414,6 +414,11 @@
 
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
+  <!-- Introduced: 18.0.96.0 -->
+  <string name="koAutomaticUpdate" comment="Automatically download updates ready to install">Automatically download updates ready to install</string>
+
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="koCheckForUpdates" comment="Startup options - check online weekly for updates">Automatically check keyman.com weekly for updates</string>
 

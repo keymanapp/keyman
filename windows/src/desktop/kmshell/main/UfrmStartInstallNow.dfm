@@ -1,4 +1,4 @@
-object frmStartInstall: TfrmStartInstall
+object frmStartInstallNow: TfrmStartInstallNow
   Left = 0
   Top = 0
   Caption = 'Keyman Update'
@@ -14,17 +14,20 @@ object frmStartInstall: TfrmStartInstall
   PixelsPerInch = 96
   TextHeight = 13
   object InstallUpdate: TLabel
-    Left = 128
-    Top = 96
-    Width = 175
-    Height = 19
-    Caption = 'Keyman update available'
+    Left = 69
+    Top = 72
+    Width = 296
+    Height = 38
+    Caption = 
+      'Installing Now will require a Keyman and Windows Restart Continu' +
+      'e?'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -16
     Font.Name = 'Tahoma'
     Font.Style = []
     ParentFont = False
+    WordWrap = True
   end
   object Install: TButton
     Left = 228

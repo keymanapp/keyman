@@ -7,6 +7,7 @@ type
     // General options
     koKeyboardHotkeysAreToggle, koAltGrCtrlAlt, koReleaseShiftKeysAfterKeyPress,
     koShowHints,   // I1256
+    koAutomaticUpdate,
     // Startup options
     koTestKeymanFunctioning,
     koStartWithWindows,

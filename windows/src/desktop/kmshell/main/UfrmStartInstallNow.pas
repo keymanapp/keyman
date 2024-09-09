@@ -1,4 +1,4 @@
-unit UfrmStartInstall;
+unit UfrmStartInstallNow;
 
 interface
 
@@ -8,7 +8,7 @@ uses
   Dialogs, UserMessages, StdCtrls, ExtCtrls, UfrmKeymanBase;
 
 type
-  TfrmStartInstall = class(TfrmKeymanBase)
+  TfrmStartInstallNow = class(TfrmKeymanBase)
     Install: TButton;
     Later: TButton;
     InstallUpdate: TLabel;
@@ -19,18 +19,18 @@ type
   end;
 
 var
-  frmStartInstall: TfrmStartInstall;
+  frmStartInstall: TfrmStartInstallNow;
 
 implementation
 
 {$R *.dfm}
 
-procedure TfrmStartInstall.InstallClick(Sender: TObject);
+procedure TfrmStartInstallNow.InstallClick(Sender: TObject);
 begin
   ModalResult := mrOk;
 end;
 
-procedure TfrmStartInstall.LaterClick(Sender: TObject);
+procedure TfrmStartInstallNow.LaterClick(Sender: TObject);
 begin
   ModalResult := mrCancel;
 end;

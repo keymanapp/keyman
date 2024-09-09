@@ -238,7 +238,7 @@
         <DCCReference Include="..\..\..\..\common\windows\delphi\ext\sentry\sentry.pas"/>
         <DCCReference Include="..\..\..\..\common\windows\delphi\general\Keyman.System.KeymanSentryClient.pas"/>
         <DCCReference Include="..\..\global\delphi\cust\Keyman.System.LocaleStrings.pas"/>
-        <DCCReference Include="..\..\..\..\common\windows\delphi\general\Keyman.System.ExecuteHistory.pas"/>
+        <DCCReference Include="..\..\..\..\common\windows\delphi\general\Keyman.System.ExecutionHistory.pas"/>
         <None Include="Profiling\AQtimeModule1.aqt"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
