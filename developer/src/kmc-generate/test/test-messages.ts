@@ -9,7 +9,7 @@ import { fileURLToPath } from 'url';
 import { assert } from 'chai';
 import { GeneratorMessages } from '../src/generator-messages.js';
 import { TestCompilerCallbacks, verifyCompilerMessagesObject } from '@keymanapp/developer-test-helpers';
-import { CompilerErrorNamespace } from '@keymanapp/common-types';
+import { CompilerErrorNamespace } from '@keymanapp/developer-utils';
 import { AbstractGenerator, GeneratorOptions } from '../src/abstract-generator.js';
 
 describe('GeneratorMessages', function () {
