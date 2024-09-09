@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.107 alpha 2024-09-09
+
+* fix(android): Update Text Size menu icons for RTL support (#12290)
+
 ## 18.0.106 alpha 2024-09-06
 
 * feat(windows): add right modifier included in hotkey optional functionality (#12259)
