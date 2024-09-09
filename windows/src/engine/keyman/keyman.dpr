@@ -113,7 +113,7 @@ uses
   sentry in '..\..\..\..\common\windows\delphi\ext\sentry\sentry.pas',
   Keyman.System.KeymanSentryClient in '..\..\..\..\common\windows\delphi\general\Keyman.System.KeymanSentryClient.pas',
   Keyman.System.LocaleStrings in '..\..\global\delphi\cust\Keyman.System.LocaleStrings.pas',
-  Keyman.System.ExecuteHistory in '..\..\..\..\common\windows\delphi\general\Keyman.System.ExecuteHistory.pas';
+  Keyman.System.ExecutionHistory in '..\..\..\..\common\windows\delphi\general\Keyman.System.ExecutionHistory.pas';
 
 {$R ICONS.RES}
 {$R VERSION.RES}
