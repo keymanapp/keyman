@@ -21,7 +21,6 @@ export class LexicalModelGenerator extends BasicGenerator implements KeymanCompi
   static readonly SFile_ModelTs = `${this.SPath_Source}${this.SFile_Model}.ts`;
   static readonly SFile_WordlistTsv = `${this.SPath_Source}wordlist.tsv`;
   static readonly SFile_Project = `${this.SFile_Model}${KeymanFileTypes.Source.Project}`;
-  static readonly SFile_ModelInfo = `${this.SFile_Model}${KeymanFileTypes.Binary.ModelInfo}`;
   static readonly SFile_Package = `${this.SPath_Source}${this.SFile_Model}${KeymanFileTypes.Source.Package}`;
 
   /**
@@ -39,8 +38,6 @@ export class LexicalModelGenerator extends BasicGenerator implements KeymanCompi
     this.templatePath = 'wordlist-lexical-model';
     this.filenameMap[LexicalModelGenerator.SFile_Project] =
       this.options.id+KeymanFileTypes.Source.Project;
-    this.filenameMap[LexicalModelGenerator.SFile_ModelInfo] =
-      this.options.id+KeymanFileTypes.Binary.ModelInfo;
     this.filenameMap[LexicalModelGenerator.SFile_ModelTs] =
       LexicalModelGenerator.SPath_Source+this.options.id+KeymanFileTypes.Source.Model;
     this.filenameMap[LexicalModelGenerator.SFile_WordlistTsv] =
@@ -53,7 +50,6 @@ export class LexicalModelGenerator extends BasicGenerator implements KeymanCompi
     }
 
     this.filenameMap[LexicalModelGenerator.SFile_Package] = LexicalModelGenerator.SPath_Source+packageFilename;
-    this.tokenMap['$LANGUAGES_MODEL_INFO'] = this.generateLanguageTagListForModelInfo();
 
     if(!this.generate(artifacts)) {
       return null;
@@ -61,7 +57,4 @@ export class LexicalModelGenerator extends BasicGenerator implements KeymanCompi
 
     return {artifacts};
   }
-
-  private readonly generateLanguageTagListForModelInfo = (): string =>
-    this.languageTags.map(tag => (new Intl.Locale(tag)).minimize()).join(', ');
 }
