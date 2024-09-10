@@ -13,13 +13,12 @@
 #import "KMSettingsRepository.h"
 #import "KMLogs.h"
 #import "InputMethodKit/InputMethodKit.h"
+#import "KMInputMethodLifecycle.h"
 
 
 @implementation KMInputController
-const double inactivityTimeout = 0.7;
 
 KMInputMethodEventHandler* _eventHandler;
-NSMutableDictionary *textInputClients;
 
 - (KMInputMethodAppDelegate *)appDelegate {
   return (KMInputMethodAppDelegate *)[NSApp delegate];
@@ -33,14 +32,13 @@ NSMutableDictionary *textInputClients;
 
   self = [super initWithServer:server delegate:delegate client:inputClient];
   if (self) {
-    textInputClients = [[NSMutableDictionary alloc] initWithCapacity:2];
     self.appDelegate.inputController = self;
-    if ((self.appDelegate.kvk != nil) && ([KMSettingsRepository.shared readShowOskOnActivate])) {
-      os_log_debug([KMLogs oskLog], "   initWithServer, readShowOskOnActivate= YES, showing OSK");
-      [self.appDelegate showOSK];
-    }
   }
   
+  // register to receive notifications generated from KMInputMethodLifecycle
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inputMethodDeactivated:) name:kInputMethodDeactivatedNotification object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inputMethodChangedClient:) name:kInputMethodClientChangeNotification object:nil];
+
   return self;
 }
 
@@ -66,68 +64,32 @@ NSMutableDictionary *textInputClients;
   }
 }
 
-- (void)activateServer:(id)sender {
-  @synchronized(textInputClients) {
-    os_log_debug([KMLogs lifecycleLog], "KMInputController activateServer, sender %{public}@", sender);
-    [sender overrideKeyboardWithKeyboardNamed:@"com.apple.keylayout.US"];
-    NSRunningApplication *currentApp = [[NSWorkspace sharedWorkspace] frontmostApplication];
-    NSString *clientAppId = [currentApp bundleIdentifier];
-    NSUInteger key = ((NSObject*)sender).hash;
-    NSString *keyString = [@(key) stringValue];
-    //NSValue *key = [NSValue valueWithNonretainedObject:sender];
-    os_log_debug([KMLogs lifecycleLog], "  +++adding client application '%{public}@' to textInputClients map, derived key: %{public}@", clientAppId, keyString);
-
-    [textInputClients setObject:clientAppId forKey:keyString];
-    os_log_debug([KMLogs lifecycleLog], "  textInputClients map: %{public}@", textInputClients.description);
-
-    [self.appDelegate wakeUpWith:sender];
-
-    if (_eventHandler != nil) {
-      [_eventHandler deactivate];
-    }
-    
-    _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:clientAppId client:sender];
+- (void)inputMethodDeactivated:(NSNotification *)notification {
+  os_log_debug([KMLogs lifecycleLog], "***KMInputController inputMethodDeactivated, deactivating eventHandler");
+  if (_eventHandler != nil) {
+    [_eventHandler deactivate];
   }
+}
+
+- (void)inputMethodChangedClient:(NSNotification *)notification {
+  os_log_debug([KMLogs lifecycleLog], "***KMInputController inputMethodChangedClient, deactivating old eventHandler and activating new one");
+  if (_eventHandler != nil) {
+    [_eventHandler deactivate];
+  }
+  NSRunningApplication *currentApp = [[NSWorkspace sharedWorkspace] frontmostApplication];
+  NSString *clientAppId = [currentApp bundleIdentifier];
+  // TODO: remove client argument
+  _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:clientAppId client:nil];
+}
+
+- (void)activateServer:(id)sender {
+  [sender overrideKeyboardWithKeyboardNamed:@"com.apple.keylayout.US"];
+  [KMInputMethodLifecycle.shared activateClient:sender];
 }
 
 - (void)deactivateServer:(id)sender {
-  os_log_debug([KMLogs lifecycleLog], "KMInputController deactivateServer, sender %{public}@", sender);
-  @synchronized(textInputClients) {
-    NSUInteger key = ((NSObject*)sender).hash;
-    NSString *keyString = [@(key) stringValue];
-    //NSValue *key = [NSValue valueWithNonretainedObject:sender];
-    NSString *clientAppId = [textInputClients objectForKey:keyString];
-    
-    if (clientAppId) {
-      os_log_debug([KMLogs lifecycleLog], "  ---removing client application '%{public}@' from textInputClients map, key: %{public}@", clientAppId, keyString);
-      [textInputClients removeObjectForKey:keyString];
-    } else {
-      os_log_debug([KMLogs lifecycleLog], "  key %{public}@ not found in textInputClients map", keyString);
-    }
-    os_log_debug([KMLogs lifecycleLog], "  textInputClients map: %{public}@", textInputClients.description);
-    if (textInputClients.count == 0) {
-      os_log_debug([KMLogs lifecycleLog], "no text input clients found in textInputClients map; delay for %f seconds and call sleepIfNoClients", inactivityTimeout);
-      [self performSelector:@selector(sleepIfNoClients:) withObject:sender afterDelay:inactivityTimeout];
-    }
-  }
-}
-
-- (void)sleepIfNoClients:(id)lastClient {
-  @synchronized(textInputClients) {
-    if (textInputClients.count == 0) {
-      os_log_debug([KMLogs lifecycleLog], "sleepIfNoClients found no clients, time to sleep");
-      if (_eventHandler != nil) {
-        [_eventHandler deactivate];
-        _eventHandler = nil;
-      }
-      [self.appDelegate sleepFollowingInactivityTimeout:lastClient];
-    } else {
-      NSArray*keys=[textInputClients allKeys];
-      NSObject *key = keys[0];
-      NSString *clientAppId = [textInputClients objectForKey:key];
-      os_log_debug([KMLogs lifecycleLog], "sleepIfNoClients found a newly activated client, clientAppId '%{public}@', key: %{public}@", clientAppId, key);
-    }
-  }
+  [KMInputMethodLifecycle.shared deactivateClient:sender];
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (NSMenu *)menu {
