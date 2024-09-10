@@ -10,7 +10,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
+BUNDLE_CMD="node $KEYMAN_ROOT/common/tools/es-bundling/build/common-bundle.mjs"
 
 builder_describe "Builds the Sentry-reporting module used with Keyman Engine for Web" \
   "@/common/web/keyman-version" \

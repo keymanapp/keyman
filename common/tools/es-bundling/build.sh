@@ -17,7 +17,7 @@ builder_describe "Builds KMW's esbuild-oriented common configuration & tooling" 
 
 builder_describe_outputs \
   configure          /node_modules \
-  build              /common/web/es-bundling/build/index.mjs
+  build              /common/tools/es-bundling/build/index.mjs
 
 builder_parse "$@"
 

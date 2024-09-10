@@ -17,7 +17,7 @@ WORKER_OUTPUT_FILENAME=build/lib/worker-main.js
 INTERMEDIATE=./build/intermediate
 LIB=./build/lib
 
-bundle_cmd="node ${KEYMAN_ROOT}/common/web/es-bundling/build/common-bundle.mjs"
+bundle_cmd="node ${KEYMAN_ROOT}/common/tools/es-bundling/build/common-bundle.mjs"
 
 SRCMAP_CLEANER="node $KEYMAN_ROOT/web/build/tools/building/sourcemap-root/index.js"
 
@@ -27,7 +27,7 @@ builder_describe \
   "Compiles the Language Modeling Layer for common use in predictive text and autocorrective applications." \
   "@/web/src/tools/building/sourcemap-root" \
   "@/common/web/keyman-version" \
-  "@/common/web/es-bundling" \
+  "@/common/tools/es-bundling" \
   "@../wordbreakers" \
   "@../templates/" \
   configure clean build test --ci

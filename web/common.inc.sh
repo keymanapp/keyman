@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 
-BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
+BUNDLE_CMD="node $KEYMAN_ROOT/common/tools/es-bundling/build/common-bundle.mjs"
 
 # Compiles all build products corresponding to the specified target.
 # This should be called from the working directory of a child project's

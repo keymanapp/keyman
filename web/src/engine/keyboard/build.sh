@@ -19,7 +19,7 @@ builder_describe \
   "Compiles the web-oriented utility function module." \
   "@/web/src/tools/testing/recorder-core  test" \
   "@/common/web/keyman-version" \
-  "@/common/web/es-bundling" \
+  "@/common/tools/es-bundling" \
   "@/common/web/types" \
   "@/web/src/engine/common/web-utils" \
   configure \

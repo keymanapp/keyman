@@ -184,3 +184,4 @@ lcov.info
 /keyman*.changes
 /keyman*.tar.?z
 
+build/
