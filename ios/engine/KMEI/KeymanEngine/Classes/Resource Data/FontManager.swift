@@ -26,6 +26,17 @@ public class FontManager {
     fonts[url] = RegisteredFont(name: name, isRegistered: false)
     return name
   }
+  
+  private func cachedFont(at url: URL) -> RegisteredFont? {
+    if let font = fonts[url] {
+      return font
+    }
+    guard let name = readFontName(at: url) else {
+      return nil
+    }
+    fonts[url] = RegisteredFont(name: name, isRegistered: false)
+    return fonts[url]
+  }
 
   /// Registers all new fonts found in the font path. Call this after you have preloaded all your font files
   /// with `preloadFontFile(atPath:shouldOverwrite:)`
@@ -33,8 +44,50 @@ public class FontManager {
     guard let keyboardDirs = Storage.active.keyboardDirs else {
       return
     }
+    
+    var fontSet: Set<URL> = []
     for dir in keyboardDirs {
-      registerFonts(in: dir)
+      fontSet = fontSet.union(listFonts(in: dir))
+    }
+    
+    registerListedFonts(fontSet)
+  }
+  
+  /**
+   * Iterates across all listed fonts, registering those not yet registered.
+   * Checks for, and filters out, any fonts already registered on the system.
+   * Also initializes the registration cache per URL if needed.
+   */
+  private func registerListedFonts(_ initialFontSet: Set<URL>) {
+    // If we are unable to read the font file's properties sufficiently,
+    // skip it.  We also don't need to register anything already registered or
+    // that cannot be registered due to loading/parsing errors.
+    //
+    // Calls to `cachedFont` after the `.filter` below may be assumed to have
+    // non-nil return values.
+    var fontSet = initialFontSet.filter { !(cachedFont(at: $0)?.isRegistered ?? true) }
+    
+    // The prior line filters out any entries where cachedFont(at: $0) would be nil.
+    // Batch-lookups all fonts lacking cache-confirmation of prior registration.
+    var fontNamesToRegister = missingFonts(from: Set(fontSet.map { cachedFont(at: $0)!.name }))
+    
+    for fontUrl in fontSet {
+      let fontName = cachedFont(at: fontUrl)!.name
+      
+      guard fontNamesToRegister.contains(fontName) else {
+        let message = "Did not register font at \(fontUrl) because font name \(fontName) is already registered"
+        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
+        continue
+      }
+      
+      let didRegister = _registerFont(at: fontUrl)
+      fonts[fontUrl] = RegisteredFont(name: fontName, isRegistered: didRegister)
+      
+      // We no longer need to register a font with this name, so drop it from
+      // the set to register.
+      if didRegister {
+        fontNamesToRegister.remove(fontName)
+      }
     }
   }
 
@@ -43,6 +96,8 @@ public class FontManager {
     guard let keyboardDirs = Storage.active.keyboardDirs else {
       return
     }
+    // This doesn't use the expensive looped lookup operation seen in missingFonts,
+    // so there's no need to batch similar operations here.
     for dir in keyboardDirs {
       unregisterFonts(in: dir)
     }
@@ -63,44 +118,29 @@ public class FontManager {
     }
     return name as String
   }
+  
+  private func _registerFont(at url: URL) -> Bool {
+    var errorRef: Unmanaged<CFError>?
+    let fontName = fontName(at: url)!
+    let didRegister = CTFontManagerRegisterFontsForURL(url as CFURL, .none, &errorRef)
+    let error = errorRef?.takeRetainedValue() // Releases errorRef
+    if !didRegister {
+      let message = "Failed to register font \(fontName) at \(url) reason: \(String(describing: error))"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
+    } else {
+      let message = "Registered font \(fontName) at \(url)"
+      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
+    }
+    
+    return didRegister
+  }
 
   /// - Parameters:
   ///   - url: URL of the font to register
   /// - Returns: Font is registered.
   public func registerFont(at url: URL) -> Bool {
-    let fontName: String
-    if let font = fonts[url] {
-      if font.isRegistered {
-        return true
-      }
-      fontName = font.name
-    } else {
-      guard let name = readFontName(at: url) else {
-        return false
-      }
-      fontName = name
-    }
-
-    let didRegister: Bool
-    if !fontExists(fontName) {
-      var errorRef: Unmanaged<CFError>?
-      didRegister = CTFontManagerRegisterFontsForURL(url as CFURL, .none, &errorRef)
-      let error = errorRef?.takeRetainedValue() // Releases errorRef
-      if !didRegister {
-        let message = "Failed to register font \(fontName) at \(url) reason: \(String(describing: error))"
-        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
-      } else {
-        let message = "Registered font \(fontName) at \(url)"
-        os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
-      }
-    } else {
-      didRegister = false
-      let message = "Did not register font at \(url) because font name \(fontName) is already registered"
-      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .info, message)
-    }
-    let font = RegisteredFont(name: fontName, isRegistered: didRegister)
-    fonts[url] = font
-    return didRegister
+    registerListedFonts([url])
+    return fonts[url]?.isRegistered ?? false
   }
 
   /// - Parameters:
@@ -133,32 +173,53 @@ public class FontManager {
 
     return font.isRegistered
   }
-
-  public func registerFonts(in directory: URL) {
+  
+  private func listFonts(in directory: URL) -> [URL] {
     guard let urls = try? FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil) else {
       let message = "Could not list contents of directory \(directory)"
       os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
-      return
+      return []
     }
-    for url in urls where url.lastPathComponent.hasFontExtension {
-      _ = registerFont(at: url)
-    }
+    return urls.filter { $0.lastPathComponent.hasFontExtension }
+  }
+
+  public func registerFonts(in directory: URL) {
+    let fontsToRegister = listFonts(in: directory)
+    registerListedFonts(Set(fontsToRegister))
   }
 
   public func unregisterFonts(in directory: URL, fromSystemOnly: Bool = true) {
-    guard let urls = try? FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil) else {
-      let message = "Could not list contents of directory \(directory)"
-      os_log("%{public}s", log:KeymanEngineLogger.resources, type: .error, message)
-      return
-    }
-    for url in urls where url.lastPathComponent.hasFontExtension {
+    let fontsToUnregister = listFonts(in: directory)
+    for url in fontsToUnregister {
       _ = unregisterFont(at: url, fromSystemOnly: fromSystemOnly)
     }
   }
 
-  private func fontExists(_ fontName: String) -> Bool {
-    return UIFont.familyNames.contains { familyName in
-      UIFont.fontNames(forFamilyName: familyName).contains(fontName)
+  /**
+   * Queries the system for existing registrations for the specified fonts with a single batch run.
+   * Only fonts that could not be found will be returned within the result set.
+   */
+  private func missingFonts(from fontNames: Set<String>) -> Set<String> {
+    var fontsToFind = fontNames
+    
+    UIFont.familyNames.forEach { familyName in
+      if fontsToFind.count == 0 {
+        return
+      }
+      
+      let familyFonts = UIFont.fontNames(forFamilyName: familyName)
+      
+      for font in familyFonts {
+        if fontsToFind.contains(font) {
+          fontsToFind.remove(font)
+        }
+        
+        if fontsToFind.count == 0 {
+          break
+        }
+      }
     }
+    
+    return fontsToFind
   }
 }

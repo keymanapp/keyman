@@ -12,6 +12,8 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 ################################ Main script ################################
 
+# Note:  the raw text files used for data.inc.ts are found within
+# /resources/standards-data/unicode-character-database.
 builder_describe "Builds the predictive-text wordbreaker implementation module" \
   "@/common/models/templates test" \
   "clean" \
@@ -21,16 +23,26 @@ builder_describe "Builds the predictive-text wordbreaker implementation module" 
   "--ci"
 
 builder_describe_outputs \
-  configure          /node_modules \
-  build              build/obj/index.js
+  configure          src/main/default/data.inc.ts \
+  build              build/main/obj/index.js
 
 builder_parse "$@"
 
+function do_configure() {
+  verify_npm_setup
+
+  # This is a script used to build the data.inc.ts file needed by the
+  # default wordbreaker.  We rarely update the backing data, but it
+  # is needed _before_ the `build` action's compilation step.
+  tsc -b tools/data-compiler/tsconfig.json
+  node ./build/tools/data-compiler/obj/index.js
+}
+
 function do_build() {
-  tsc -b
+  tsc -b ./tsconfig.json
 
   # Declaration bundling.
-  tsc --emitDeclarationOnly --outFile ./build/lib/index.d.ts
+  tsc -p ./tsconfig.json --emitDeclarationOnly --outFile ./build/main/lib/index.d.ts
 }
 
 function do_test() {
@@ -41,7 +53,7 @@ function do_test() {
   fi
 }
 
-builder_run_action configure  verify_npm_setup
+builder_run_action configure  do_configure
 builder_run_action clean      rm -rf build/
 builder_run_action build      do_build
 builder_run_action test       do_test

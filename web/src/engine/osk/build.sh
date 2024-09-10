@@ -14,10 +14,10 @@ SUBPROJECT_NAME=engine/osk
 
 builder_describe "Builds the Keyman Engine for Web's On-Screen Keyboard package (OSK)." \
   "@/web/src/engine/keyboard build" \
-  "@/common/web/gesture-recognizer build" \
   "@/web/src/engine/interfaces build" \
   "@/web/src/engine/dom-utils build" \
   "@/web/src/engine/events build" \
+  "@/web/src/engine/osk/gesture-processor" \
   "clean" \
   "configure" \
   "build" \
