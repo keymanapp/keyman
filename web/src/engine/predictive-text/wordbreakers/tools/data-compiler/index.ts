@@ -33,8 +33,8 @@ const generatedFilename = path.join(projectDir, 'src', 'main', 'default', 'data.
 
 // The data files should be in this repository, with names matching the
 // Unicode version.
-const wordBoundaryFilename = path.join(projectDir, `../../../resources/standards-data/unicode-character-database/WordBreakProperty.txt`);
-const emojiDataFilename = path.join(projectDir, `../../../resources/standards-data/unicode-character-database/emoji-data.txt`);
+const wordBoundaryFilename = path.join(projectDir, `../../../../../resources/standards-data/unicode-character-database/WordBreakProperty.txt`);
+const emojiDataFilename = path.join(projectDir, `../../../../../resources/standards-data/unicode-character-database/emoji-data.txt`);
 
 ///////////////////////////// Word_Boundary file /////////////////////////////
 
@@ -144,7 +144,7 @@ function escape(codedChar: string) {
 
 // Generate the file!
 stream.write(`// Automatically generated file. DO NOT MODIFY.
-// The generator script is defined at /common/models/wordbreakers/src/data-compiler/index.ts.
+// The generator script is defined at /web/src/engine/predictive-text/wordbreakers/src/data-compiler/index.ts.
 
 /**
  * Valid values for a word break property.
