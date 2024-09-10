@@ -2225,7 +2225,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
 
           kmcmp::CheckStoreUsage(fk, i, TRUE, FALSE, FALSE);
 
-          r = u16tok(NULL, ',', &context);  // I3481
+          r = context;
           if (!r || !*r ) return KmnCompilerMessages::ERROR_InvalidIndex;
           r = u16trim(r);
           if (!isIntegerWstring(r) || atoiW(r) < 1) return KmnCompilerMessages::ERROR_InvalidIndex;

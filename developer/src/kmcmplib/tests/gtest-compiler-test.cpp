@@ -1128,6 +1128,12 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     fileKeyboard.dpStoreArray = file_store;
     EXPECT_EQ(KmnCompilerMessages::ERROR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
+    // index, two commas and extra parameter, KmnCompilerMessages::ERROR_InvalidIndex
+    u16cpy(str, u"index(b,4,5)");
+    fileKeyboard.cxStoreArray = 3u;
+    fileKeyboard.dpStoreArray = file_store;
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
     // index, two-digit offset, valid
     u16cpy(str, u"index(b,42)");
     fileKeyboard.cxStoreArray = 3u;
