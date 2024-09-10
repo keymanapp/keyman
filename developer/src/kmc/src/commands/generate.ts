@@ -5,8 +5,9 @@ import { InfrastructureMessages } from '../messages/infrastructureMessages.js';
 import { BaseOptions } from '../util/baseOptions.js';
 import { exitProcess } from '../util/sysexits.js';
 import { GeneratorOptions, KeymanKeyboardGenerator, LdmlKeyboardGenerator, LexicalModelGenerator } from '@keymanapp/kmc-generate';
-import { KeymanCompiler } from '@keymanapp/developer-utils';
+import { CompilerCallbacks, KeymanCompiler } from '@keymanapp/developer-utils';
 
+/* c8 ignore start */
 
 export function declareGenerate(program: Command) {
   const command = program.command('generate');
@@ -87,47 +88,59 @@ function commanderOptionsToGeneratorOptions(id: string, options: any): Generator
   return result;
 }
 
-const generateKmnKeyboard = async (ids: string[], _options: any, commander: any) =>
+const generateKmnKeyboard = async (ids: string | string[], _options: any, commander: any) =>
   generate(new KeymanKeyboardGenerator(), ids, commander);
-const generateLdmlKeyboard = async (ids: string[], _options: any, commander: any) =>
+const generateLdmlKeyboard = async (ids: string | string[], _options: any, commander: any) =>
   generate(new LdmlKeyboardGenerator(), ids, commander);
-const generateLexicalModel = async (ids: string[], _options: any, commander: any) =>
+const generateLexicalModel = async (ids: string | string[], _options: any, commander: any) =>
   generate(new LexicalModelGenerator(), ids, commander);
 
-async function generate(
-  generator: KeymanCompiler,
-  ids: string | string[],
-  commander: any
-): Promise<never|void> {
-  if(typeof ids != 'string') {
-    //TODO vvv
-    console.error('only 1 id may be specified');
-    return await exitProcess(1);
-  }
-
-  const id = ids;
+async function generate(generator: KeymanCompiler, ids: string | string[], commander: any): Promise<never|void> {
   const commanderOptions = commander.optsWithGlobals();
-  const options = commanderOptionsToGeneratorOptions(id, commanderOptions);
-  if(!id) {
-    //TODO vvv
-    console.error('id must be specified');
+  const callbacks = new NodeCompilerCallbacks({logLevel: commanderOptions.logLevel ?? 'info'});
+  if(!await doGenerate(callbacks, generator, ids, commanderOptions)) {
     return await exitProcess(1);
   }
+}
 
-  let callbacks = new NodeCompilerCallbacks({logLevel: options.logLevel});
+/* c8 ignore stop */
+
+async function doGenerate(callbacks: CompilerCallbacks, generator: KeymanCompiler, ids: string | string[], commanderOptions: any): Promise<boolean> {
+  const id = ids;
+
+  if(!id || typeof id != 'string') {
+    // Note that commander can pass an array for the ids parameter, so we
+    // constrain here
+    callbacks.reportMessage(InfrastructureMessages.Error_GenerateRequiresId());
+    return false;
+  }
+
+  const options = commanderOptionsToGeneratorOptions(id, commanderOptions);
+
   try {
     if(!await generator.init(callbacks, options)) {
-      return await exitProcess(1);
+      // errors will have been reported by the generator
+      return false;
     }
     const result = await generator.run(id); // note: id is currently ignored here
     if(!result) {
-      return await exitProcess(1);
+      // errors will have been reported by the generator
+      return false;
     }
     if(!await generator.write(result.artifacts)) {
-      return await exitProcess(1);
+      // errors will have been reported by the generator
+      return false;
     }
   } catch(e) {
+    /* c8 ignore next 3 */
     callbacks.reportMessage(InfrastructureMessages.Fatal_UnexpectedException({e}));
-    return await exitProcess(1);
+    return false;
   }
+
+  return true;
+}
+
+/** @internal */
+export const unitTestEndpoints = {
+  doGenerate,
 }

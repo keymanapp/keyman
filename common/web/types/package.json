@@ -34,7 +34,6 @@
     "restructure": "3.0.1"
   },
   "devDependencies": {
-    "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.7",
     "@types/node": "^20.4.1",
     "ajv": "^8.12.0",
