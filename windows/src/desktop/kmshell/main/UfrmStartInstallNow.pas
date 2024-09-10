@@ -1,5 +1,7 @@
 unit UfrmStartInstallNow;
-
+{
+  Copyright:    © SIL Global.
+}
 interface
 
 uses

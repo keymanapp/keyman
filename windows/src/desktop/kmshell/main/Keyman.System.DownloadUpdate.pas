@@ -1,6 +1,6 @@
 (*
   Name:             WebUpdateCheck
-  Copyright:        Copyright (C) SIL International.
+  Copyright:        Copyright (C) SIL Global.
   Documentation:
   Description:
   Create Date:      5 Dec 2023

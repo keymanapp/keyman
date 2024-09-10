@@ -322,7 +322,6 @@ const
 { TUpdateStateMachine }
 
 constructor TUpdateStateMachine.Create(AForce : Boolean);
-// var TSerailsedState : TUpdateState;  // TODO: Remove
 begin
   inherited Create;
   FShowErrors := True;

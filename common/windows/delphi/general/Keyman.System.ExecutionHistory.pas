@@ -1,7 +1,7 @@
 unit Keyman.System.ExecutionHistory;
 
 {
-  Copyright:    © SIL International.
+  Copyright:    © SIL Global.
 
   This module provides functionality to track the execution state of the Keyman
   engine. It uses a global atom to record whether Keyman has started during the

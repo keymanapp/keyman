@@ -844,7 +844,7 @@ begin
   ShellPath := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
   FResult := TUtilExecute.Shell(0, ShellPath, '', '-an');
   if not FResult then
-    KL.Log('TrmfMain: Executing Update_ApplyNow Failed');
+    KL.Log('TrmfMain: Executing Update_ApplyNow Failed'); // TODO: Make error log
 end;
 
 procedure TfrmMain.TntFormCloseQuery(Sender: TObject; var CanClose: Boolean);
