@@ -394,8 +394,11 @@ double u16tof(KMX_WCHAR* str16) {
  * @param p Pointer to u16string
  * @return Pointer to the first non-whitespace character in the string
  */
-const KMX_WCHAR* u16ltrim(const KMX_WCHAR* p) {
-  while(p && iswspace(*p)) p++;
+KMX_WCHAR* u16ltrim(KMX_WCHAR* p) {
+  if (!p || (u16len(p) == 0)) return p;
+  PKMX_WCHAR q = p;
+  while(q && iswspace(*q)) q++;
+  u16cpy(p, q);
   return p;
 }
 

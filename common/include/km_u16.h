@@ -76,7 +76,7 @@ const KMX_WCHAR* u16rchr_slash(KMX_WCHAR const* Name);
 std::string toHex(int num1);
 
 /** @brief Trim whitespace from the start (left) of a string */
-const KMX_WCHAR* u16ltrim(const KMX_WCHAR* p);
+KMX_WCHAR* u16ltrim(KMX_WCHAR* p);
 
 /** @brief Trim whitespace from the end (right) of a string */
 KMX_WCHAR* u16rtrim(KMX_WCHAR *p);

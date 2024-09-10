@@ -168,17 +168,29 @@ TEST(km_u16_Test, u16tok_str_compare_to_strtok) {
 }
 
 TEST(km_u16_Test, u16ltrim) {
+  KMX_WCHAR str[LINESIZE];
+
   EXPECT_TRUE(!u16ltrim(nullptr));
-  EXPECT_TRUE(!u16cmp(u"", u16ltrim(u"")));
-  EXPECT_TRUE(!u16cmp(u"", u16ltrim(u" ")));
-  EXPECT_TRUE(!u16cmp(u"", u16ltrim(u"  ")));
-  EXPECT_TRUE(!u16cmp(u"abc", u16ltrim(u"abc")));
-  EXPECT_TRUE(!u16cmp(u"abc", u16ltrim(u" abc")));
-  EXPECT_TRUE(!u16cmp(u"abc", u16ltrim(u"  abc")));
-  EXPECT_TRUE(!u16cmp(u"abc ", u16ltrim(u"abc ")));
-  EXPECT_TRUE(!u16cmp(u"abc", u16ltrim(u"\tabc")));
-  EXPECT_TRUE(!u16cmp(u"abc def", u16ltrim(u"abc def")));
-  EXPECT_TRUE(!u16cmp(u"abc def", u16ltrim(u" abc def")));
+  u16cpy(str, u"");
+  EXPECT_TRUE(!u16cmp(u"", u16ltrim(str)));
+  u16cpy(str, u" ");
+  EXPECT_TRUE(!u16cmp(u"", u16ltrim(str)));
+  u16cpy(str,u"  ");
+  EXPECT_TRUE(!u16cmp(u"", u16ltrim(str)));
+  u16cpy(str, u"abc");
+  EXPECT_TRUE(!u16cmp(u"abc", u16ltrim(str)));
+  u16cpy(str, u" abc");
+  EXPECT_TRUE(!u16cmp(u"abc", u16ltrim(str)));
+  u16cpy(str, u"  abc");
+  EXPECT_TRUE(!u16cmp(u"abc", u16ltrim(str)));
+  u16cpy(str, u"abc ");
+  EXPECT_TRUE(!u16cmp(u"abc ", u16ltrim(str)));
+  u16cpy(str, u"\tabc");
+  EXPECT_TRUE(!u16cmp(u"abc", u16ltrim(str)));
+  u16cpy(str, u"abc def");
+  EXPECT_TRUE(!u16cmp(u"abc def", u16ltrim(str)));
+  u16cpy(str, u" abc def");
+  EXPECT_TRUE(!u16cmp(u"abc def", u16ltrim(str)));
 }
 
 TEST(km_u16_Test, u16rtrim) {
