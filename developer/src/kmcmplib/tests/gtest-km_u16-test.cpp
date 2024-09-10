@@ -283,34 +283,77 @@ TEST(km_u16_Test, u16rtrim) {
 
 TEST(km_u16_Test, u16trim) {
   KMX_WCHAR str[LINESIZE];
+  PKMX_WCHAR q;
 
   EXPECT_TRUE(!u16trim(nullptr));
+
   u16cpy(str, u"");
-  EXPECT_TRUE(!u16cmp(u"", u16trim(str)));
+  q = u16trim(str);
+  EXPECT_TRUE(!u16cmp(u"", q));
+  EXPECT_EQ(str, q);
+
   u16cpy(str, u" ");
-  EXPECT_TRUE(!u16cmp(u"", u16trim(str)));
+  q = u16trim(str);
+  EXPECT_TRUE(!u16cmp(u"", q));
+  EXPECT_EQ(str, q);
+
   u16cpy(str, u"  ");
-  EXPECT_TRUE(!u16cmp(u"", u16trim(str)));
+  q = u16trim(str);
+  EXPECT_TRUE(!u16cmp(u"", q));
+  EXPECT_EQ(str, q);
+
   u16cpy(str, u"abc");
-  EXPECT_TRUE(!u16cmp(u"abc", u16trim(str)));
+  q = u16trim(str);
+  EXPECT_TRUE(!u16cmp(u"abc", q));
+  EXPECT_EQ(str, q);
+
   u16cpy(str, u"abc ");
-  EXPECT_TRUE(!u16cmp(u"abc", u16trim(str)));
+  q = u16trim(str);
+  EXPECT_TRUE(!u16cmp(u"abc", q));
+  EXPECT_EQ(str, q);
+
   u16cpy(str, u"abc  ");
-  EXPECT_TRUE(!u16cmp(u"abc", u16trim(str)));
+  q = u16trim(str);
+  EXPECT_TRUE(!u16cmp(u"abc", q));
+  EXPECT_EQ(str, q);
+
   u16cpy(str, u" abc");
-  EXPECT_TRUE(!u16cmp(u"abc", u16trim(str)));
+  q = u16trim(str);
+  EXPECT_TRUE(!u16cmp(u"abc", q));
+  EXPECT_EQ(str, q);
+
   u16cpy(str, u"  abc");
-  EXPECT_TRUE(!u16cmp(u"abc", u16trim(str)));
+  q = u16trim(str);
+  EXPECT_TRUE(!u16cmp(u"abc", q));
+  EXPECT_EQ(str, q);
+
   u16cpy(str, u" abc ");
-  EXPECT_TRUE(!u16cmp(u"abc", u16trim(str)));
+  q = u16trim(str);
+  EXPECT_TRUE(!u16cmp(u"abc", q));
+  EXPECT_EQ(str, q);
+
   u16cpy(str, u"  abc  ");
-  EXPECT_TRUE(!u16cmp(u"abc", u16trim(str)));
+  q = u16trim(str);
+  EXPECT_TRUE(!u16cmp(u"abc", q));
+  EXPECT_EQ(str, q);
+
   u16cpy(str, u"abc\t");
-  EXPECT_TRUE(!u16cmp(u"abc", u16trim(str)));
+  q = u16trim(str);
+  EXPECT_TRUE(!u16cmp(u"abc", q));
+  EXPECT_EQ(str, q);
+
   u16cpy(str, u"\tabc");
-  EXPECT_TRUE(!u16cmp(u"abc", u16trim(str)));
+  q = u16trim(str);
+  EXPECT_TRUE(!u16cmp(u"abc", q));
+  EXPECT_EQ(str, q);
+
   u16cpy(str, u"abc def");
-  EXPECT_TRUE(!u16cmp(u"abc def", u16trim(str)));
+  q = u16trim(str);
+  EXPECT_TRUE(!u16cmp(u"abc def", q));
+  EXPECT_EQ(str, q);
+
   u16cpy(str, u" abc def ");
-  EXPECT_TRUE(!u16cmp(u"abc def", u16trim(str)));
+  q = u16trim(str);
+  EXPECT_TRUE(!u16cmp(u"abc def", q));
+  EXPECT_EQ(str, q);
 }
