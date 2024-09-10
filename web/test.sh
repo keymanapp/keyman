@@ -21,7 +21,8 @@ builder_describe "Runs the Keyman Engine for Web unit-testing suites" \
   "test+" \
   ":dom                  Runs DOM-oriented unit tests (reduced footprint, nothing browser-specific)" \
   ":integrated           Runs KMW's integration test suite" \
-  "--ci                  Set to utilize CI-based test configurations & reporting.  May not be set with $(builder_term --debug)."
+  "--ci                  Set to utilize CI-based test configurations & reporting.  May not be set with $(builder_term --debug)." \
+  "--remote              Uses a BrowserStack-based test configuration for legacy devices"
 
 builder_parse "$@"
 
@@ -42,5 +43,9 @@ fi
 # End common configs.
 
 builder_run_action test:dom web-test-runner --config "src/test/auto/dom/web-test-runner${WTR_CONFIG}.config.mjs" ${WTR_DEBUG}
+
+if ! builder_has_option --ci && builder_has_option --remote; then
+  WTR_CONFIG=.remote
+fi
 
 builder_run_action test:integrated web-test-runner --config "src/test/auto/integrated/web-test-runner${WTR_CONFIG}.config.mjs" ${WTR_DEBUG}

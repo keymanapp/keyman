@@ -31,7 +31,8 @@ builder_describe "CI processes for Keyman Engine for Web releases (KMW)." \
   "prepare                      Prepare upload artifacts for specified target(s)" \
   ":s.keyman.com                Builds artifacts for s.keyman.com" \
   ":downloads.keyman.com        Builds artifacts for downloads.keyman.com" \
-  "--s.keyman.com=S_KEYMAN_COM  Sets the root location of a checked-out s.keyman.com repo"
+  "--s.keyman.com=S_KEYMAN_COM  Sets the root location of a checked-out s.keyman.com repo" \
+  "--remote                     Sets $(builder_term test) action to run compatible test scripts via BrowserStack"
 
 builder_parse "$@"
 
@@ -83,12 +84,17 @@ if builder_start_action test; then
     OPTIONS=--ci
   fi
 
+  REMOTABLE_OPTIONS=$OPTIONS
+  if builder_has_option --remote; then
+    REMOTABLE_OPTIONS="${REMOTABLE_OPTIONS} --remote"
+  fi
+
   # No --reporter option exists yet for the headless modules.
 
   "$KEYMAN_ROOT/web/src/engine/keyboard/build.sh" test $OPTIONS
   "$KEYMAN_ROOT/web/src/engine/osk/gesture-processor/build.sh" test $OPTIONS
 
-  ./build.sh test $OPTIONS
+  ./test.sh test $REMOTABLE_OPTIONS
 
   builder_finish_action success test
 fi
