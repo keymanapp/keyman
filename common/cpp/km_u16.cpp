@@ -426,5 +426,5 @@ KMX_WCHAR* u16rtrim(KMX_WCHAR *p) {
  * @return Pointer to the string modified to remove leading and trailing whitespace
  */
 KMX_WCHAR* u16trim(KMX_WCHAR *p) {
-  return u16rtrim((KMX_WCHAR*)u16ltrim(p));
+  return u16rtrim(u16ltrim(p));
 }
