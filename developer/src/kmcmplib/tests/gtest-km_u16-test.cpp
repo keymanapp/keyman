@@ -174,7 +174,7 @@ TEST(km_u16_Test, u16ltrim) {
   EXPECT_TRUE(!u16ltrim(nullptr));
 
   std::map<const KMX_WCHAR*, const KMX_WCHAR*> m{
-    // input     output
+    // input        output
       {u"",         u""       },
       {u" ",        u""       },
       {u"  ",       u""       },
@@ -202,7 +202,7 @@ TEST(km_u16_Test, u16rtrim) {
   EXPECT_TRUE(!u16rtrim(nullptr));
 
   std::map<const KMX_WCHAR*, const KMX_WCHAR*> m{
-    // input     output
+    // input        output
       {u"",         u""       },
       {u" ",        u""       },
       {u"  ",       u""       },
@@ -230,7 +230,7 @@ TEST(km_u16_Test, u16trim) {
   EXPECT_TRUE(!u16trim(nullptr));
 
   std::map<const KMX_WCHAR*, const KMX_WCHAR*> m{
-    // input     output
+    // input        output
       {u"",         u""        },
       {u" ",        u""        },
       {u"  ",       u""        },
