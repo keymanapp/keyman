@@ -27,7 +27,7 @@ builder_describe "Builds Keyman for Android app." \
   "configure" \
   "build" \
   "test             Runs lint and unit tests." \
-  "publish          Publishes the APK to the Play Store." \
+  "publish          Publishes symbols to Sentry and the APK to the Play Store." \
   "--ci             Don't start the Gradle daemon. For CI" \
   "--upload-sentry  Upload to sentry"
 
@@ -117,8 +117,8 @@ if builder_start_action publish; then
   # Copy Release Notes
   generateReleaseNotes
 
-  # Publish Keyman for Android to Play Store
-  ./gradlew $DAEMON_FLAG publishReleaseApk
+  # Publish symbols and Keyman for Android to Play Store
+  ./gradlew $DAEMON_FLAG publishSentry publishReleaseApk
 
   builder_finish_action success publish
 fi
