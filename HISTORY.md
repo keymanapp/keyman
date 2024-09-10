@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 18.0.108 alpha 2024-09-10
+
+* docs(android): Update help docs (#12367)
+* fix(developer): fix building with Ubuntu 24.04 (#12379)
+* refactor(android): Move build-publish.sh to builder script (#12351)
+* fix(android): Separate `publishSentry` Gradle task to publish symbols to Sentry (#12358)
+* refactor(web): move `model/types` to `web/types` (#12370)
+
 ## 18.0.107 alpha 2024-09-09
 
 * fix(android): Update Text Size menu icons for RTL support (#12290)
