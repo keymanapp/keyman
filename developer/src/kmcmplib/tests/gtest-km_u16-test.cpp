@@ -173,55 +173,26 @@ TEST(km_u16_Test, u16ltrim) {
 
   EXPECT_TRUE(!u16ltrim(nullptr));
 
-  u16cpy(str, u"");
-  q = u16ltrim(str);
-  EXPECT_TRUE(!u16cmp(u"", q));
-  EXPECT_EQ(str, q);
+  std::map<const KMX_WCHAR*, const KMX_WCHAR*> m{
+    // input     output
+      {u"",         u""       },
+      {u" ",        u""       },
+      {u"  ",       u""       },
+      {u"abc",      u"abc"    },
+      {u" abc",     u"abc"    },
+      {u"  abc",    u"abc"    },
+      {u"abc ",     u"abc "   },
+      {u"\tabc",    u"abc"    },
+      {u"abc def",  u"abc def"},
+      {u" abc def", u"abc def"},
+    };
 
-  u16cpy(str, u" ");
-  q = u16ltrim(str);
-  EXPECT_TRUE(!u16cmp(u"", q));
-  EXPECT_EQ(str, q);
-
-  u16cpy(str,u"  ");
-  q = u16ltrim(str);
-  EXPECT_TRUE(!u16cmp(u"", q));
-  EXPECT_EQ(str, q);
-
-  u16cpy(str, u"abc");
-  q = u16ltrim(str);
-  EXPECT_TRUE(!u16cmp(u"abc", q));
-  EXPECT_EQ(str, q);
-
-  u16cpy(str, u" abc");
-  q = u16ltrim(str);
-  EXPECT_TRUE(!u16cmp(u"abc", q));
-  EXPECT_EQ(str, q);
-
-  u16cpy(str, u"  abc");
-  q = u16ltrim(str);
-  EXPECT_TRUE(!u16cmp(u"abc", q));
-  EXPECT_EQ(str, q);
-
-  u16cpy(str, u"abc ");
-  q = u16ltrim(str);
-  EXPECT_TRUE(!u16cmp(u"abc ", q));
-  EXPECT_EQ(str, q);
-
-  u16cpy(str, u"\tabc");
-  q = u16ltrim(str);
-  EXPECT_TRUE(!u16cmp(u"abc", q));
-  EXPECT_EQ(str, q);
-
-  u16cpy(str, u"abc def");
-  q = u16ltrim(str);
-  EXPECT_TRUE(!u16cmp(u"abc def", q));
-  EXPECT_EQ(str, q);
-
-  u16cpy(str, u" abc def");
-  q = u16ltrim(str);
-  EXPECT_TRUE(!u16cmp(u"abc def", q));
-  EXPECT_EQ(str, q);
+  for (auto i = m.begin(); i != m.end(); i++) {
+    u16cpy(str, i->first);
+    q = u16ltrim(str);
+    EXPECT_TRUE(!u16cmp(i->second, q));
+    EXPECT_EQ(str, q);
+  }
 }
 
 TEST(km_u16_Test, u16rtrim) {
