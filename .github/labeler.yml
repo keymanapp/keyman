@@ -21,7 +21,7 @@ common/:
   - resources/**
 
 common/models/: common/models/**
-common/models/templates/: common/models/templates/**
+common/models/templates/: web/src/engine/predictive-text/templates/**
 common/models/wordbreakers/: common/models/wordbreakers/**
 
 common/resources/: resources/**

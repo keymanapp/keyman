@@ -2,7 +2,7 @@
   "references": [
     { "path": "./core/include/ldml/tsconfig.json" },
 
-    { "path": "./common/models/templates/tsconfig.json" },
+    { "path": "./cweb/src/engine/predictive-text/templates/tsconfig.json" },
     { "path": "./common/models/wordbreakers/tsconfig.json" },
     { "path": "./common/tools/hextobin/" },
 

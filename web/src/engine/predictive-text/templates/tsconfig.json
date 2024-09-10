@@ -1,5 +1,5 @@
 {
-  "extends": "../tsconfig.kmw-worker-base.json",
+  "extends": "../../../../tsconfig.base.json",
   "compilerOptions": {
     "strict": true,
     "baseUrl": "./",
@@ -8,9 +8,9 @@
     "rootDir": "./src"
   },
   "references": [
-    { "path": "../../web/types" },
-    { "path": "../../web/utils" },
-    { "path": "../../models/wordbreakers" }
+    { "path": "../../../../../common/web/types" },
+    { "path": "../../../../../common/web/utils" },
+    { "path": "../../../../../common/models/wordbreakers" }
   ],
   "include": [
 	"src/**/*.ts"
