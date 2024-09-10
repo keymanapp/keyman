@@ -30,4 +30,4 @@ export { UnicodeSetParser, UnicodeSet } from './ldml-keyboard/unicodeset-parser-
 export { VariableParser, MarkerParser } from './ldml-keyboard/pattern-parser.js';
 export { ElementString } from './kmx/kmx-plus/element-string.js';
 
-export * from './lexical-model-types.js';
+export { USVString, CasingForm, CasingFunction, TextWithProbability, LexiconTraversal, LexicalModel, Transform, Suggestion, Context, Distribution, Outcome, WithOutcome, ProbabilityMass, Configuration, Capabilities, WordBreakingFunction, Span } from './lexical-model-types.js';
