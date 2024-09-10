@@ -843,18 +843,29 @@ end;
 procedure UpdateAvailableState.HandleInstallNow;
 var
   frmStartInstallNow : TfrmStartInstallNow;
+  InstallNow : Boolean;
 begin
-  // If user decides NOT to install now stay in UpdateAvailable State
-  frmStartInstallNow := TfrmStartInstallNow.Create(nil);
-  try
-    if frmStartInstallNow.ShowModal = mrOk then
-    begin
-      bucStateContext.SetApplyNow(True);
-      ChangeState(InstallingState)
-    end
-  finally
-    frmStartInstallNow.Free;
+
+  InstallNow := True;
+  if HasKeymanRun then
+  begin
+    frmStartInstallNow := TfrmStartInstallNow.Create(nil);
+    try
+      if frmStartInstallNow.ShowModal = mrOk then
+        InstallNow := True
+      else
+        InstallNow := False;
+    finally
+      frmStartInstallNow.Free;
+    end;
   end;
+  // If user decides NOT to install now stay in UpdateAvailable State
+  if InstallNow = True then
+  begin
+    bucStateContext.SetApplyNow(True);
+    ChangeState(InstallingState)
+  end;
+
 end;
 
 function UpdateAvailableState.StateName;
@@ -1043,24 +1054,28 @@ begin
 end;
 
 procedure WaitingRestartState.HandleInstallNow;
+// If user decides not to install now stay in WaitingRestart State
 var
   frmStartInstallNow : TfrmStartInstallNow;
+  InstallNow : Boolean;
 begin
-  // TODO: Check if keyman has run, and error trying to install
-  // now when windows needs a restart ask the user if they
-  // want to restart now, if users says no stay in this (waitingrestart) state
-
-
-  // If user decides not to install now stay in WaitingRestart State
-  frmStartInstallNow := TfrmStartInstallNow.Create(nil);
-  try
-    if frmStartInstallNow.ShowModal = mrOk then
-    begin
-      bucStateContext.SetApplyNow(True);
-      ChangeState(InstallingState)
-    end
-  finally
-    frmStartInstallNow.Free;
+  InstallNow := True;
+  if HasKeymanRun then
+  begin
+    frmStartInstallNow := TfrmStartInstallNow.Create(nil);
+    try
+      if frmStartInstallNow.ShowModal = mrOk then
+        InstallNow := True
+      else
+        InstallNow := False;
+    finally
+      frmStartInstallNow.Free;
+    end;
+  end;
+  if InstallNow = True then
+  begin
+    bucStateContext.SetApplyNow(True);
+    ChangeState(InstallingState)
   end;
 end;
 

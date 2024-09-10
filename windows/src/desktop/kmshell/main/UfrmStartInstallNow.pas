@@ -11,7 +11,8 @@ type
   TfrmStartInstallNow = class(TfrmKeymanBase)
     Install: TButton;
     Later: TButton;
-    InstallUpdate: TLabel;
+    UpdateMessage: TLabel;
+    UpdateNow: TLabel;
     procedure InstallClick(Sender: TObject);
     procedure LaterClick(Sender: TObject);
   private
