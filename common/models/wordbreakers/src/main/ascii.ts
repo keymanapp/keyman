@@ -1,4 +1,4 @@
-///<reference types="@keymanapp/models-types" />
+import { Span } from '@keymanapp/common-types';
 
 /**
  * Splits ASCII words.

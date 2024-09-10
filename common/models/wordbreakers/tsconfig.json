@@ -7,9 +7,6 @@
     "tsBuildInfoFile": "./build/main/obj/tsconfig.tsbuildinfo",
     "rootDir": "./src/main"
   },
-  "references": [
-    { "path": "../types" }
-  ],
   "include": [
 	  "./src/main/**/*"
   ],

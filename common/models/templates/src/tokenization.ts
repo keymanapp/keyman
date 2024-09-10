@@ -1,6 +1,8 @@
 // While we _could_ define this within @keymanapp/models-wordbreakers instead, it's probably
 // better to leave that package as _just_ the wordbreakers.
 
+import { WordBreakingFunction, USVString, Context } from '@keymanapp/common-types';
+
 export interface Token {
   text: string,
   isWhitespace?: boolean

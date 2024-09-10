@@ -54,7 +54,7 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "devDependencies": {
-    "@keymanapp/models-types": "*",
+    "@keymanapp/common-types": "*",
     "@keymanapp/resources-gosh": "*",
     "@types/mocha": "^7.0.2",
     "c8": "^7.12.0",

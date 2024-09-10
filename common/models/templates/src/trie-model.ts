@@ -31,6 +31,7 @@ import { default as defaultWordBreaker } from "@keymanapp/models-wordbreakers";
 
 import { applyTransform, isHighSurrogate, isSentinel, SENTINEL_CODE_UNIT, transformToSuggestion } from "./common.js";
 import { getLastPreCaretToken } from "./tokenization.js";
+import { Capabilities, CasingFunction, Configuration, Context, Distribution, LexicalModel, LexicalModelPunctuation, LexiconTraversal, Suggestion, TextWithProbability, Transform, USVString, WithOutcome, WordBreakingFunction } from '@keymanapp/common-types';
 
 extendString();
 

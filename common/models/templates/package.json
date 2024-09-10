@@ -51,7 +51,7 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "devDependencies": {
-    "@keymanapp/models-types": "*",
+    "@keymanapp/common-types": "*",
     "@keymanapp/web-utils": "*",
     "@types/mocha": "^7.0.2",
     "c8": "^7.12.0",
@@ -61,7 +61,7 @@
   },
   "dependencies": {
     "@keymanapp/keyman-version": "*",
-    "@keymanapp/models-types": "*",
+    "@keymanapp/common-types": "*",
     "@keymanapp/models-wordbreakers": "*",
     "@keymanapp/resources-gosh": "*"
   }

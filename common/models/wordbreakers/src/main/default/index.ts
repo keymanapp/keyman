@@ -1,3 +1,4 @@
+import { Span } from '@keymanapp/common-types';
 import { WordBreakProperty, propertyMap } from "./data.inc.js";
 
 import { searchForProperty } from "./searchForProperty.js";

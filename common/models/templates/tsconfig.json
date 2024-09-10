@@ -8,7 +8,7 @@
     "rootDir": "./src"
   },
   "references": [
-    { "path": "../types" },
+    { "path": "../../web/types" },
     { "path": "../../web/utils" },
     { "path": "../../models/wordbreakers" }
   ],

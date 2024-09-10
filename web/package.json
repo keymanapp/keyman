@@ -122,7 +122,7 @@
   "dependencies": {
     "@keymanapp/keyman-version": "*",
     "@keymanapp/lexical-model-layer": "*",
-    "@keymanapp/models-types": "*",
+    "@keymanapp/common-types": "*",
     "@keymanapp/recorder-core": "*",
     "@keymanapp/web-utils": "*",
     "core-js": "^3.34.0",

@@ -1,3 +1,5 @@
+import { Span } from '@keymanapp/common-types';
+
 /**
  * A **VERY** dumb word breaker that simply splits at words. Do not use this
  * word breaker!

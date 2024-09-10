@@ -17,11 +17,10 @@ BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
 
 ################################ Main script ################################
 
-#  "@../models/types" \ # is just a .d.ts, so there's nothing to actually BUILD.
-
 builder_describe "Builds the lm-layer module" \
   "@/common/web/keyman-version" \
   "@/common/web/es-bundling" \
+  "@/common/web/types" \
   "@/web/src/engine/predictive-text/worker-thread" \
   "clean" \
   "configure" \

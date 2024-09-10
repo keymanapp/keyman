@@ -1,4 +1,5 @@
 // Allows the kmwstring bindings to resolve.
+import { CasingForm, Context, Outcome, Suggestion, Transform, WithOutcome } from '@keymanapp/common-types';
 import { extendString } from "@keymanapp/web-utils";
 
 extendString();
