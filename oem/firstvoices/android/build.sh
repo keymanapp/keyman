@@ -17,7 +17,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 CONFIG="release"
 BUILD_FLAGS="build -x lint -x test"                     # Gradle build w/o test
 TEST_FLAGS="-x assembleRelease lintRelease testRelease" # Gradle test w/o build
-PUBLISH_FLAGS="publishSentry publishReleaseApk"         # Gradle publish task
 DAEMON_FLAG=
 
 builder_describe "Builds FirstVoices for Android app." \
@@ -88,11 +87,5 @@ if builder_start_action test; then
   builder_finish_action success test
 fi
 
-if builder_start_action publish; then
-  # Publish symbols and FirstVoices to Play Store
-  echo "PUBLISH_FLAGS $PUBLISH_FLAGS"
-  cd "$KEYMAN_ROOT/oem/firstvoices/android/"
-  ./gradlew $DAEMON_FLAG $PUBLISH_FLAGS  
+builder_run_action publish    ./gradlew $DAEMON_FLAG publishSentry publishReleaseApk
 
-  builder_finish_action success publish
-fi
