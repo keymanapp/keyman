@@ -392,12 +392,12 @@ double u16tof(KMX_WCHAR* str16) {
 /**
  * @brief Trim whitespace from the start (left) of a string
  * @param p Pointer to u16string
- * @return Pointer to the first non-whitespace character in the string
+ * @return Pointer to the string modified to remove leading whitespace
  */
 KMX_WCHAR* u16ltrim(KMX_WCHAR* p) {
   if (p && (u16len(p) > 0)) {
     PKMX_WCHAR q = p;
-    while(q && iswspace(*q)) q++;
+    while(iswspace(*q)) q++;
     u16cpy(p, q);
   }
   return p;
@@ -409,13 +409,13 @@ KMX_WCHAR* u16ltrim(KMX_WCHAR* p) {
  * @return Pointer to the string modified to remove trailing whitespace
  */
 KMX_WCHAR* u16rtrim(KMX_WCHAR *p) {
-  if (!p || (u16len(p) == 0)) return p;
-  PKMX_WCHAR q = p + u16len(p) - 1;
-
-  if (iswspace(*q)) {
-    while (iswspace(*q) && q > p) q--;
-    if (!iswspace(*q)) q++;
-    *q = '\0'; // delete first following whitespace
+  if (p && (u16len(p) > 0)) {
+    PKMX_WCHAR q = p + u16len(p) - 1;
+    if (iswspace(*q)) {
+      while (iswspace(*q) && q > p) q--;
+      if (!iswspace(*q)) q++;
+      *q = '\0'; // delete first following whitespace
+    }
   }
   return p;
 }
