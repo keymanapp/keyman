@@ -54,7 +54,7 @@ if builder_start_action test:libraries; then
   pushd "$KEYMAN_ROOT/web/src/engine/predictive-text/templates/"
   echo
   echo "### Running $(builder_term web/src/engine/predictive-text/templates/) tests"
-  "$KEYMAN_ROOT/web/src/engine/predictive-text/templates//build.sh" test $TEST_OPTS
+  "$KEYMAN_ROOT/web/src/engine/predictive-text/templates/build.sh" test $TEST_OPTS
   popd
 
   pushd "$KEYMAN_ROOT/web/src/engine/predictive-text/worker-thread"
