@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 18.0.109 alpha 2024-09-11
+
+* chore(common): Update history with 17.0.329 stable (#12394)
+* refactor(web): move `model/templates` to `web/src/engine/predictive/text` (#12382)
+* refactor(web): move `common/models` to `web/src/engine/predictive-text` (#12383)
+* refactor(web): move `common/web/utils` to `web/src/engine/common/web-utils/` (#12384)
+
 ## 18.0.108 alpha 2024-09-10
 
 * docs(android): Update help docs (#12367)
