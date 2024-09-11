@@ -1,11 +1,12 @@
+import vm from 'node:vm';
+import { readFile } from 'node:fs/promises';
+
+import { globalObject } from '@keymanapp/web-utils';
+
 import { default as Keyboard } from '../keyboard.js';
 import { KeyboardHarness, MinimalKeymanGlobal } from '../keyboardHarness.js';
-import { default as KeyboardLoaderBase } from '../keyboardLoaderBase.js';
+import { KeyboardLoaderBase } from '../keyboardLoaderBase.js';
 import { KeyboardLoadErrorBuilder } from '../keyboardLoadError.js';
-
-import vm from 'vm';
-import { readFile } from 'fs/promises';
-import { globalObject } from '@keymanapp/web-utils';
 
 export class NodeKeyboardLoader extends KeyboardLoaderBase {
   constructor()
@@ -25,13 +26,18 @@ export class NodeKeyboardLoader extends KeyboardLoaderBase {
     }
   }
 
-  protected async loadKeyboardBlob(uri: string): Promise<Blob> {
+  protected async loadKeyboardBlob(uri: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Blob> {
     // `fs` does not like 'file:///'; it IS "File System" oriented, after all, and wants a path, not a URI.
     if (uri.indexOf('file:///') == 0) {
       uri = uri.substring('file:///'.length);
     }
 
-    const buffer = await readFile(uri);
+    let buffer: Buffer;
+    try {
+      buffer = await readFile(uri);
+    } catch (err) {
+      throw errorBuilder.keyboardDownloadError(`Unable to read keyboard file at ${uri}`, err);
+    }
     return new Blob([buffer]);
   }
 
@@ -40,12 +46,12 @@ export class NodeKeyboardLoader extends KeyboardLoaderBase {
     try {
       script = new vm.Script(scriptSrc);
     } catch (err) {
-      return Promise.reject(errorBuilder.missingError(err));
+      throw errorBuilder.missingError(err);
     }
     try {
       script.runInContext(this.harness._jsGlobal);
     } catch (err) {
-      return Promise.reject(errorBuilder.scriptError(err));
+      throw errorBuilder.scriptError(err);
     }
 
     const keyboard = this.harness.loadedKeyboard;

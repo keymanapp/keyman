@@ -5,7 +5,7 @@ import { KeyboardLoadErrorBuilder, StubBasedErrorBuilder, UriBasedErrorBuilder }
 
 export type KeyboardStub = KeyboardProperties & { filename: string };
 
-export default abstract class KeyboardLoaderBase {
+export abstract class KeyboardLoaderBase {
   private _harness: KeyboardHarness;
 
   public get harness(): KeyboardHarness {
@@ -16,20 +16,38 @@ export default abstract class KeyboardLoaderBase {
     this._harness = harness;
   }
 
+  /**
+   * Load a keyboard from a remote or local URI.
+   *
+   * @param uri  The URI of the keyboard to load.
+   * @returns    A Promise that resolves to the loaded keyboard.
+   */
   public loadKeyboardFromPath(uri: string): Promise<Keyboard> {
     this.harness.install();
     return this.loadKeyboardInternal(uri, new UriBasedErrorBuilder(uri));
   }
 
+  /**
+   * Load a keyboard from keyboard stub.
+   *
+   * @param stub  The stub of the keyboard to load.
+   * @returns     A Promise that resolves to the loaded keyboard.
+   */
   public loadKeyboardFromStub(stub: KeyboardStub) {
     this.harness.install();
     return this.loadKeyboardInternal(stub.filename, new StubBasedErrorBuilder(stub));
   }
 
   private async loadKeyboardInternal(uri: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Keyboard> {
-    const blob = await this.loadKeyboardBlob(uri);
+    const blob = await this.loadKeyboardBlob(uri, errorBuilder);
 
-    const script = await blob.text();
+    let script: string;
+    try {
+      script = await blob.text();
+    } catch (e) {
+      throw errorBuilder.missingKeyboardError('The keyboard has an invalid encoding.', e);
+    }
+
     if (script.startsWith('KXTS', 0)) {
       // KMX or LDML (KMX+) keyboard
       console.error("KMX keyboard loading is not yet implemented!");
@@ -40,7 +58,7 @@ export default abstract class KeyboardLoaderBase {
     return await this.loadKeyboardFromScript(script, errorBuilder);
   }
 
-  protected abstract loadKeyboardBlob(uri: string): Promise<Blob>;
+  protected abstract loadKeyboardBlob(uri: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Blob>;
 
   protected abstract loadKeyboardFromScript(scriptSrc: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Keyboard>;
 }

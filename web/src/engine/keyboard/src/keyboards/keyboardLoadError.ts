@@ -3,6 +3,8 @@ import { type KeyboardStub } from './keyboardLoaderBase.js';
 export interface KeyboardLoadErrorBuilder {
     scriptError(err?: Error): void;
     missingError(err: Error): void;
+    missingKeyboardError(msg: string, err: Error): void;
+    keyboardDownloadError(msg: string, err: Error): void;
 }
 
 export class KeyboardScriptError extends Error {
@@ -23,6 +25,15 @@ export class KeyboardMissingError extends Error {
     }
 }
 
+export class KeyboardDownloadError extends Error {
+    public readonly cause;
+
+    constructor(message: string, cause?: Error) {
+        super(message);
+        this.cause = cause;
+    }
+}
+
 export class UriBasedErrorBuilder implements KeyboardLoadErrorBuilder {
     readonly uri: string;
 
@@ -35,9 +46,17 @@ export class UriBasedErrorBuilder implements KeyboardLoadErrorBuilder {
         return new KeyboardMissingError(msg, err);
     }
 
+    missingKeyboardError(msg: string, err: Error) {
+        return new KeyboardMissingError(msg, err);
+    }
+
     scriptError(err: Error) {
         const msg = `Error registering the keyboard script at ${this.uri}; it may contain an error.`;
         return new KeyboardScriptError(msg, err);
+    }
+
+    keyboardDownloadError(msg: string, err: Error) {
+        return new KeyboardDownloadError(msg, err);
     }
 }
 
@@ -54,10 +73,18 @@ export class StubBasedErrorBuilder implements KeyboardLoadErrorBuilder {
         return new KeyboardMissingError(msg, err);
     }
 
+    missingKeyboardError(msg: string, err: Error) {
+        return new KeyboardMissingError(msg, err);
+    }
+
     scriptError(err: Error) {
         const stub = this.stub;
         const msg = `Error registering the ${stub.name} keyboard for ${stub.langName}; keyboard script at ${stub.filename} may contain an error.`;
         return new KeyboardScriptError(msg, err);
+    }
+
+    keyboardDownloadError(msg: string, err: Error) {
+        return new KeyboardDownloadError(msg, err);
     }
 }
 

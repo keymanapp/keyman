@@ -4,8 +4,8 @@
 
 import { default as Keyboard } from '../keyboard.js';
 import { KeyboardHarness, MinimalKeymanGlobal } from '../keyboardHarness.js';
-import { default as KeyboardLoaderBase } from '../keyboardLoaderBase.js';
-import { KeyboardLoadErrorBuilder, KeyboardMissingError } from '../keyboardLoadError.js';
+import { KeyboardLoaderBase } from '../keyboardLoaderBase.js';
+import { KeyboardLoadErrorBuilder } from '../keyboardLoadError.js';
 
 export class DOMKeyboardLoader extends KeyboardLoaderBase {
   public readonly element: HTMLIFrameElement;
@@ -29,20 +29,35 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
     this.performCacheBusting = cacheBust || false;
   }
 
-  protected async loadKeyboardBlob(uri: string): Promise<Blob> {
+  protected async loadKeyboardBlob(uri: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Blob> {
     if (this.performCacheBusting) {
       uri = this.cacheBust(uri);
     }
 
-    const response = await fetch(uri);
-    if (!response.ok) {
-      throw new KeyboardMissingError(`Cannot find the keyboard at ${uri}.`, new Error(`HTTP ${response.status} ${response.statusText}`));
+    let response: Response;
+    try {
+      response = await fetch(uri);
+    } catch (e) {
+      throw errorBuilder.keyboardDownloadError(`Unable to fetch fetch keyboard at ${uri}`, e);
     }
-    return response.blob();
+
+    if (!response.ok) {
+      throw errorBuilder.missingError(new Error(`HTTP ${response.status} ${response.statusText}`));
+    }
+
+    try {
+      return await response.blob();
+    } catch (e) {
+      throw errorBuilder.keyboardDownloadError(`Unable to retrieve blob from keyboard at ${uri}`, e);
+    }
   }
 
   protected async loadKeyboardFromScript(script: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Keyboard> {
-    this.evalScriptInContext(script, this.harness._jsGlobal);
+    try {
+      this.evalScriptInContext(script, this.harness._jsGlobal);
+    } catch (e) {
+      throw errorBuilder.scriptError(e);
+    }
     const keyboard = this.harness.loadedKeyboard;
     this.harness.loadedKeyboard = null;
     return keyboard;
