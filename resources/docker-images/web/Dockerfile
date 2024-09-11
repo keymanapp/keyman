@@ -61,9 +61,6 @@ else
 fi
 EOF
 
-RUN chmod +x /usr/bin/bashwrapper && \
-  chown -R build:build $HOME
-
 # now, switch to build user
 USER build
 
