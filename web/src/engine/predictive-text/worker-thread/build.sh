@@ -29,7 +29,7 @@ builder_describe \
   "@/common/web/keyman-version" \
   "@/common/tools/es-bundling" \
   "@../wordbreakers" \
-  "@../templates/" \
+  "@../templates" \
   configure clean build test --ci
 
 builder_describe_outputs \
