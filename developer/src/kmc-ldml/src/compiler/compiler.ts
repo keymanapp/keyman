@@ -1,3 +1,8 @@
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Compiles a LDML XML keyboard file into a Keyman KMXPlus file
+ */
 import { KMXPlus, UnicodeSetParser, KvkFileWriter } from '@keymanapp/common-types';
 import {
   CompilerCallbacks, KeymanCompiler, KeymanCompilerResult, KeymanCompilerArtifacts,
@@ -137,6 +142,8 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
       return null;
     }
 
+    outputFilename = outputFilename ?? inputFilename.replace(/\.xml$/, '.kmx');
+
     // In order for the KMX file to be loaded by non-KMXPlus components, it is helpful
     // to duplicate some of the metadata
     KMXPlusMetadataCompiler.addKmxMetadata(kmx.kmxplus, kmx.keyboard, compilerOptions);
@@ -146,7 +153,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
     const kmx_binary = builder.compile();
 
     const vkcompiler = new LdmlKeyboardVisualKeyboardCompiler(this.callbacks);
-    const vk = vkcompiler.compile(source);
+    const vk = vkcompiler.compile(kmx.kmxplus, this.callbacks.path.basename(outputFilename, '.kmx'));
     const writer = new KvkFileWriter();
     const kvk_binary = writer.write(vk);
 
@@ -161,7 +168,6 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
     //KMW17.0: const encoder = new TextEncoder();
     //KMW17.0: const kmw_binary = encoder.encode(kmw_string);
 
-    outputFilename = outputFilename ?? inputFilename.replace(/\.xml$/, '.kmx');
 
     return {
       artifacts: {
