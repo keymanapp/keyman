@@ -116,8 +116,6 @@ graph TD;
 
     subgraph ClassicWeb["`**ClassicWeb**
     Intermediate-level engine modules`"]
-        Device["/web/src/engine/device-detect"];
-        Device----->WebUtils;
         Elements["/web/src/engine/element-wrappers"];
         Elements-->JSProc;
         KeyboardStorage["/web/src/engine/keyboard-storage"];
