@@ -183,5 +183,3 @@ lcov.info
 /keyman*.buildinfo
 /keyman*.changes
 /keyman*.tar.?z
-
-build/

@@ -6,7 +6,7 @@
  */
 
 import esbuild from 'esbuild';
-import { iifeConfiguration, prepareTslibTreeshaking  } from '../../../../common/tools/es-bundling/build/index.mjs';
+import { iifeConfiguration, prepareTslibTreeshaking  } from '../../tools/es-bundling/build/index.mjs';
 
 const commonConfig = {
   ...iifeConfiguration,

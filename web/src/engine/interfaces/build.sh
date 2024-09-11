@@ -13,7 +13,7 @@ SUBPROJECT_NAME=engine/interfaces
 # ################################ Main script ################################
 
 builder_describe "Builds configuration subclasses used by the Keyman Engine for Web (KMW)." \
-  "@/common/tools/es-bundling" \
+  "@/web/src/tools/es-bundling" \
   "@/web/src/engine/keyboard" \
   "@/web/src/engine/js-processor" \
   "clean" \
