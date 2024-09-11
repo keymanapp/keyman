@@ -74,10 +74,6 @@ build_action() {
 
   if [[ "${platform}" == "base" ]]; then
     docker pull --platform "amd64" "ubuntu:${UBUNTU_VERSION:-${KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER}}"
-  ### TMP code
-  elif [[ "${platform}" == "core" ]]; then
-    cp "${KEYMAN_ROOT}/linux/debian/control" "${platform}"
-  ### TMP END
   elif [[ "${platform}" == "linux" ]]; then
     cp "${KEYMAN_ROOT}/linux/debian/control" "${platform}"
   fi

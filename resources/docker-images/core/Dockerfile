@@ -14,17 +14,6 @@ USER root
 RUN apt-get install -qy git jq llvm meson pkgconf \
   xvfb xserver-xephyr metacity
 
-#### TMP until we properly figure out the dependencies needed for Core
-#### We should not need to install /tmp/control
-# Install dependencies
-ADD control /tmp/control
-RUN apt-get install -qy python3 python3-setuptools python3-coverage \
-  devscripts equivs libdatetime-perl meson pkgconf lcov gcovr xvfb \
-  xserver-xephyr metacity mutter dbus-x11 weston xwayland && \
-  (yes | mk-build-deps --install /tmp/control) || true && \
-  rm /tmp/control
-#### TMP END
-
 # Pre-install emscripten
 USER build
 ARG REQUIRED_EMSCRIPTEN_VERSION=1.0
