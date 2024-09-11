@@ -15,7 +15,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 builder_describe "Builds the predictive-text model template implementation module" \
   "@/common/web/keyman-version" \
   "@/common/web/es-bundling" \
-  "@/common/models/wordbreakers" \
+  "@../wordbreakers" \
   "clean" \
   "configure" \
   "build" \

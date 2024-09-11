@@ -2,8 +2,6 @@
   "references": [
     { "path": "./core/include/ldml/tsconfig.json" },
 
-    { "path": "./cweb/src/engine/predictive-text/templates/tsconfig.json" },
-    { "path": "./common/models/wordbreakers/tsconfig.json" },
     { "path": "./common/tools/hextobin/" },
 
     { "path": "./common/web/keyman-version" },
@@ -38,6 +36,8 @@
 
     { "path": "./web/src/tsconfig.all.json" },
     { "path": "./web/src/engine/predictive-text/types/" },
+    { "path": "./web/src/engine/predictive-text/templates" },
+    { "path": "./web/src/engine/predictive-text/wordbreakers" },
     { "path": "./web/src/engine/predictive-text/worker-main/tsconfig.all.json" },
     { "path": "./web/src/engine/predictive-text/worker-thread" },
     { "path": "./web/src/engine/osk/gesture-processor/tsconfig.json" },

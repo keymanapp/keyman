@@ -1,6 +1,5 @@
 {
-  "extends": "../../../tsconfig.kmw-worker-base.json",
-
+  "extends": "../../../../../../tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": "./",
     "outDir": "../../build/tools/data-compiler/obj",
@@ -10,7 +9,7 @@
     "moduleResolution": "node16"
   },
   "references": [
-    { "path": "../../../../web/types" }
+    { "path": "../../../../../../../common/web/types" }
   ],
   "include": [
 	  "./**/*"

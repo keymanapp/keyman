@@ -86,7 +86,7 @@ graph TD;
     OSK-->KeyboardSpec;
     WebUtils["@keymanapp/web-utils<br>(/common/web/utils)"];
     KeyboardSpec---->WebUtils;
-    Wordbreakers["@keymanapp/models-wordbreakers<br>(/common/models/wordbreakers)"];
+    Wordbreakers["@keymanapp/models-wordbreakers<br>(/web/src/engine/predictive-text/wordbreakers)"];
     Models["@keymanapp/models-templates<br>(/web/src/engine/predictive-text/templates/)"];
     Models-->WebUtils;
     LMWorker["@keymanapp/lm-worker<br>(/web/src/engine/predictive-text/worker-thread)"];

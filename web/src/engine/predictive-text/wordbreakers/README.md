@@ -4,13 +4,13 @@ The word breakers bundled in Keyman's modeling layer (common/models).
 
 Includes:
 
- - `default` — a word breaker based on the Unicode default word boundary specification
- - _deprecated_ `ascii` — an example word breaker
- - _deprecated_ `placeholder` — an example word breaker
+- `default` — a word breaker based on the Unicode default word boundary specification
+- _deprecated_ `ascii` — an example word breaker
+- _deprecated_ `placeholder` — an example word breaker
 
 ## Usage
 
-```
+```typescript
 import {wordBreakers} from '@keymanapp/models-wordbreakers';
 const breakWords = wordBreakers['default'];
 

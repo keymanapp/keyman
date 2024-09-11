@@ -1,6 +1,5 @@
 {
-  "extends": "../tsconfig.kmw-worker-base.json",
-
+  "extends": "../../../../tsconfig.base.json",
   "compilerOptions": {
     "baseUrl": "./",
     "outDir": "./build/main/obj",

@@ -24,7 +24,7 @@
     { "path": "../../../../../common/web/keyman-version" },
     { "path": "../../../../../common/web/utils" },
     { "path": "../templates" },
-    { "path": "../../../../../common/models/wordbreakers" },
+    { "path": "../wordbreakers" },
   ],
   "include": [
     "src/main/**/*.ts"

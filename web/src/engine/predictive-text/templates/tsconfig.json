@@ -10,7 +10,7 @@
   "references": [
     { "path": "../../../../../common/web/types" },
     { "path": "../../../../../common/web/utils" },
-    { "path": "../../../../../common/models/wordbreakers" }
+    { "path": "../wordbreakers" }
   ],
   "include": [
 	"src/**/*.ts"
