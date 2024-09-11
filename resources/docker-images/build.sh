@@ -93,7 +93,7 @@ build_action() {
   # with the tag 'default'.
   if _is_default_values; then
     builder_echo debug "Setting default tag for ${platform}"
-    docker build . --platform amd64 -t "keymanapp/keyman-${platform}-ci:default" "${build_args[@]}"
+    docker build --platform amd64 -t "keymanapp/keyman-${platform}-ci:default" "${build_args[@]}" .
   fi
   cd - || true
   builder_echo success "Docker image 'keymanapp/keyman-${platform}-ci:${build_version}' built"

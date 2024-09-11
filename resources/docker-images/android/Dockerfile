@@ -8,6 +8,7 @@ LABEL org.opencontainers.image.title="Keyman Android Build Image"
 
 # Keyman for Android
 SHELL ["/bin/bash", "-c"]
+
 # Starting with Ubuntu 24.04 sdkmanager is no longer available, instead
 # a version dependent package allows to install the cmdline tools
 ARG JAVA_VERSION=11
@@ -50,13 +51,13 @@ WORKDIR /home/build/build
 
 # Pre-install gradle. This will put files in ~/.gradle which will speed up builds.
 RUN mkdir -p $HOME/tmp/gradle/wrapper && \
-  # KMEA uses gradle-7.5.1-bin
+  # KMEA uses gradle-7.6.4-bin
   curl --location --output $HOME/tmp/gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/keymanapp/keyman/master/android/KMEA/gradle/wrapper/gradle-wrapper.jar && \
   curl --location --output $HOME/tmp/gradle/wrapper/gradle-wrapper.properties https://raw.githubusercontent.com/keymanapp/keyman/master/android/KMEA/gradle/wrapper/gradle-wrapper.properties && \
   curl --location --output $HOME/tmp/gradlew https://raw.githubusercontent.com/keymanapp/keyman/master/android/KMEA/gradlew && \
   chmod +x $HOME/tmp/gradlew && \
   $HOME/tmp/gradlew --quiet && \
-  # Some projects use gradle-7.5.1-all, so we pre-install that as well
+  # Some projects use gradle-7.6.4-all, so we pre-install that as well
   curl --location --output $HOME/tmp/gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/keymanapp/keyman/master/android/Samples/KMSample1/gradle/wrapper/gradle-wrapper.jar && \
   curl --location --output $HOME/tmp/gradle/wrapper/gradle-wrapper.properties https://raw.githubusercontent.com/keymanapp/keyman/master/android/Samples/KMSample1/gradle/wrapper/gradle-wrapper.properties && \
   curl --location --output $HOME/tmp/gradlew https://raw.githubusercontent.com/keymanapp/keyman/master/android/Samples/KMSample1/gradlew && \

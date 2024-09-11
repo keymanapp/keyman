@@ -33,3 +33,26 @@ RUN <<EOF cat > /usr/bin/bashwrapper
 #!/bin/bash
 export KEYMAN_USE_NVM=1
 EOF
+
+# Install NVM
+RUN NVM_RELEASE=$(curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest | grep tag_name | cut -d : -f 2 | cut -d '"' -f 2) && \
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_RELEASE}/install.sh | bash
+RUN <<EOF cat >> /usr/bin/bashwrapper
+PATH=/home/build/.keyman/node:\$PATH
+export NVM_DIR="$HOME/.nvm"
+. /home/build/.nvm/nvm.sh
+EOF
+
+RUN chmod +x /usr/bin/bashwrapper && \
+  chown -R build:build $HOME
+
+USER build
+# Pre-install node
+ARG REQUIRED_NODE_VERSION=unset
+RUN echo "HOME=\${HOME}; REQUIRED_NODE_VERSION=${REQUIRED_NODE_VERSION}" && \
+  export NVM_DIR="/home/build/.nvm" && \
+  . /home/build/.nvm/nvm.sh && \
+  nvm install "${REQUIRED_NODE_VERSION}" && \
+  nvm use "${REQUIRED_NODE_VERSION}"
+
+USER root
