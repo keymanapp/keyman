@@ -13,7 +13,7 @@ SUBPROJECT_NAME=engine/keyboard-storage
 # ################################ Main script ################################
 
 builder_describe "Builds Keyman Engine modules for keyboard cloud-querying & caching + model caching." \
-  "@/common/tools/es-bundling" \
+  "@/web/src/tools/es-bundling" \
   "clean" \
   "configure" \
   "build" \
