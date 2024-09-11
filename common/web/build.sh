@@ -16,7 +16,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 builder_describe "Keyman common web modules" \
   :keyman-version \
   :types \
-  :utils \
   clean \
   configure \
   build \

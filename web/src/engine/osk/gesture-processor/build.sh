@@ -19,7 +19,7 @@ BUILD_DIR="/web/src/engine/osk/gesture-processor/build"
 
 builder_describe "Builds the gesture-recognition model for Web-based on-screen keyboards" \
   "@/common/web/es-bundling build" \
-  "@/common/web/utils build" \
+  "@/web/src/engine/common/web-utils build" \
   "clean" \
   "configure" \
   "build" \
