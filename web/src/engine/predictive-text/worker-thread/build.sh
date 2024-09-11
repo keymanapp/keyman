@@ -29,7 +29,7 @@ builder_describe \
   "@/common/web/keyman-version" \
   "@/common/web/es-bundling" \
   "@/common/models/wordbreakers" \
-  "@/common/models/templates" \
+  "@/web/src/engine/predictive-text/templates" \
   configure clean build test --ci
 
 builder_describe_outputs \

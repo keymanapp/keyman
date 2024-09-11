@@ -51,10 +51,10 @@ if builder_start_action test:libraries; then
   echo "### Running $(builder_term common/models/wordbreakers) tests"
   "$KEYMAN_ROOT/common/models/wordbreakers/build.sh" test $TEST_OPTS
 
-  pushd "$KEYMAN_ROOT/common/models/templates"
+  pushd "$KEYMAN_ROOT/web/src/engine/predictive-text/templates/"
   echo
-  echo "### Running $(builder_term common/models/templates) tests"
-  "$KEYMAN_ROOT/common/models/templates/build.sh" test $TEST_OPTS
+  echo "### Running $(builder_term web/src/engine/predictive-text/templates/) tests"
+  "$KEYMAN_ROOT/web/src/engine/predictive-text/templates/build.sh" test $TEST_OPTS
   popd
 
   pushd "$KEYMAN_ROOT/web/src/engine/predictive-text/worker-thread"
