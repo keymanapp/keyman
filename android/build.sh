@@ -25,7 +25,7 @@ builder_describe \
   configure \
   build \
   test \
-  "publish                                  Publishes the APKs to the Play Store." \
+  "publish                                  Publishes symbols to Sentry and the APKs to the Play Store." \
   --ci+ \
   --upload-sentry+ \
   ":engine=KMEA                             Keyman Engine for Android" \
