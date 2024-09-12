@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 18.0.110 alpha 2024-09-12
+
+* chore(common): Update to Unicode 16.0 (#12393)
+* refactor(web): move `common/web/es-bundling` → `web/src/tools/es-bundling` (#12389)
+* refactor(web): move `common/web/eslint` → `common/tools/eslint` (#12390)
+* refactor(web): move sentry-manager → `web/src/engine/sentry-manager` (#12397)
+* refactor(web): merge `device-detect` with `web/src/engine/main` (#12399)
+* chore(web): allow to run unit tests in vscode test explorer (#12400)
+* fix(developer): index() requires comma between parameters in kmcmplib compiler (#12328)
+
 ## 18.0.109 alpha 2024-09-11
 
 * chore(common): Update history with 17.0.329 stable (#12394)
