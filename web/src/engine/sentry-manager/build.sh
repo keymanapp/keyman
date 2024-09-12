@@ -5,12 +5,11 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-
-BUNDLE_CMD="node $KEYMAN_ROOT/web/src/tools/es-bundling/build/common-bundle.mjs"
+. "${KEYMAN_ROOT}/web/common.inc.sh"
+. "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
 
 builder_describe "Builds the Sentry-reporting module used with Keyman Engine for Web" \
   "@/common/web/keyman-version" \
@@ -18,7 +17,7 @@ builder_describe "Builds the Sentry-reporting module used with Keyman Engine for
 
 builder_describe_outputs \
   configure          /node_modules \
-  build              /common/web/sentry-manager/build/lib/index.js
+  build              /web/src/engine/sentry-manager/build/lib/index.js
 
 builder_parse "$@"
 
@@ -39,9 +38,9 @@ fi
 if builder_start_action build; then
   tsc --build "$THIS_SCRIPT_PATH/src/tsconfig.json"
 
-  $BUNDLE_CMD    "${KEYMAN_ROOT}/common/web/sentry-manager/build/obj/index.js" \
-    --out        "${KEYMAN_ROOT}/common/web/sentry-manager/build/lib/index.js" \
-    --sourceRoot "@keymanapp/keyman/common/web/sentry-manager/build/lib/"
+  $BUNDLE_CMD    "${KEYMAN_ROOT}/web/src/engine/sentry-manager/build/obj/index.js" \
+    --out        "${KEYMAN_ROOT}/web/src/engine/sentry-manager/build/lib/index.js" \
+    --sourceRoot "@keymanapp/keyman/web/src/engine/sentry-manager/build/lib/"
 
   builder_finish_action success build
 fi
