@@ -9,7 +9,7 @@
   },
   "include": ["./src/engine/**/*.ts"],
   "references": [
-    { "path": "../../../../../common/web/utils" },
+    { "path": "../../common/web-utils" },
   ],
   "exclude": ["./src/test/**/*.ts", "./src/tools/**/*.ts"]
 }
