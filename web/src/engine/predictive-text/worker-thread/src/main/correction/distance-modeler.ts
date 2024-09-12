@@ -3,6 +3,7 @@ import { QueueComparator as Comparator, PriorityQueue } from '@keymanapp/web-uti
 
 import { ClassicalDistanceCalculation, EditToken } from './classical-calculation.js';
 import { ExecutionTimer, STANDARD_TIME_BETWEEN_DEFERS } from './execution-timer.js';
+import { Distribution, LexicalModel, LexiconTraversal, ProbabilityMass, Transform, USVString } from '@keymanapp/common-types';
 
 type RealizedInput = ProbabilityMass<Transform>[];  // NOT Distribution - they're masses from separate distributions.
 

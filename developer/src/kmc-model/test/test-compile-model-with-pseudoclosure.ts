@@ -4,6 +4,7 @@ import 'mocha';
 
 import { makePathToFixture, compileModelSourceCode } from './helpers/index.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
+import { CasingForm, CasingFunction } from '@keymanapp/common-types';
 
 describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
   const callbacks = new TestCompilerCallbacks();

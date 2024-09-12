@@ -20,7 +20,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/// <reference types="@keymanapp/models-types" />
+import { Configuration, Reversion, Suggestion, USVString } from '@keymanapp/common-types';
 
 /**
  * Tokens are signed 31-bit integers!

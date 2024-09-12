@@ -1,5 +1,4 @@
-import { KeymanEngine as KeymanEngineBase } from 'keyman/engine/main';
-import { Device as DeviceDetector } from 'keyman/engine/device-detect';
+import { KeymanEngine as KeymanEngineBase, DeviceDetector } from 'keyman/engine/main';
 import { getAbsoluteY } from 'keyman/engine/dom-utils';
 import { OutputTarget } from 'keyman/engine/element-wrappers';
 import {

@@ -4,6 +4,7 @@ import {assert} from 'chai';
 import { defaultSearchTermToKey,
          defaultCasedSearchTermToKey,
          defaultApplyCasing } from '../src/model-defaults.js';
+import { CasingForm, CasingFunction } from '@keymanapp/common-types';
 
 
 describe('The default searchTermToKey() function', function () {
