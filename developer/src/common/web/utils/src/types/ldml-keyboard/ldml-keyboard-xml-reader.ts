@@ -281,7 +281,7 @@ export class LDMLKeyboardXMLSourceFileReader {
           // future-proofs us a little in that element values are allowed, just trimmed.
           // if we do need elements in the future, we'd check the preserve-space attribute here.
           return tagValue?.trim();
-      },
+        },
       });
       const a = parser.parse(file.toString(), true);
       delete a['?xml']; // fast-xml-parser includes the XML prologue, it's not in the schema so we delete it.

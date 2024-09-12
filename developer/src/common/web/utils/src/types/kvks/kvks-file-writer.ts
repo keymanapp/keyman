@@ -13,14 +13,8 @@ export default class KVKSFileWriter {
   public write(vk: VisualKeyboard): string {
 
     const builder = new XMLBuilder({
-      // allowSurrogateChars: true,
-      // attrkey: '$',
-      // charkey: '_',
-      // xmldec: {
-      //   version: '1.0',
-      //   encoding: 'UTF-8',
-      //   standalone: true
-      // }
+      attributeNamePrefix: '',
+      ignoreAttributes: false,
     });
 
 

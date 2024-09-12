@@ -33,7 +33,12 @@ export default class KVKSFileReader {
         leadingZeros: null,
         eNotation: null,
       },
-    });
+      trimValues: false, // preserve spaces, but:
+      tagValueProcessor: (tagName, tagValue, jPath, hasAttributes, isLeafNode) => {
+        if (isLeafNode) return null; // don't modify leaf nodes
+        return tagValue?.trim(); // other nodes - trim, probably unnecessary space.
+      },
+  });
 
     const raw = parser.parse(file.toString());
     delete raw['?xml']; // XML prologue
