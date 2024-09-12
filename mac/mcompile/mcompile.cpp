@@ -1,5 +1,5 @@
 /*
-  * Keyman is copyright (C) 2004 - 2024 SIL International. MIT License.
+ * Keyman is copyright (C) SIL International. MIT License.
  *
  * Mnemonic layout support for mac
  *
@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <wchar.h>
+#include <TargetConditionals.h>
 #include "mcompile.h"
 #include "../../common/include/km_u16.h"
 
@@ -20,9 +21,6 @@ KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, int 
 
 /** @brief  Collect the key data, translate it to kmx and append to the existing keyboard */
 bool mac_KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D &all_vector, const UCKeyboardLayout** keyboard_layout, std::vector<KMX_DeadkeyMapping>* KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion);  // I4353   // I4327
-
-/** @brief start of mcompile; load, convert and save keyboard */
-int mac_run(int argc, char* argv[]);
 
 /** @brief  return an array of [usvk, ch_out] pairs: all existing combinations of a deadkey + character for the underlying keyboard */
 int mac_KMX_GetDeadkeys(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& all_vector, KMX_WCHAR deadkey, KMX_DWORD shift_dk, KMX_WORD* outputPairs);  // returns array of [usvk, ch_out] pairs
@@ -37,22 +35,7 @@ std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;  // I4353
  * @param  argv commandline arguments
  * @return 0 on success
  */
-
-  #include <TargetConditionals.h>
-  int main(int argc, char* argv[]) {
-
-  mac_run(argc, argv);
-}
- 
-/**
- * @brief  start of mcompile; load, convert and save keyboard
- * @param  argc number of commandline arguments
- * @param  argv pointer to commandline arguments: executable, inputfile, outputfile
- * @return 0 on success;
- *         1 for wrong usage of calling parameters;
- *         3 if unable to load keyboard
- */
-int mac_run(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
   int bDeadkeyConversion = 0;
 
   if (argc > 1)
@@ -63,12 +46,11 @@ int mac_run(int argc, char* argv[]) {
   if (argc < 3 || argc > 4 || (argc - n) != 2) {  // I4273// I4273
       printf(
           "Usage:  \tmcompile [-d] infile.kmx outfile.kmx\n"
-          "        \tmcompile -u ...  (not available for mac)\n "
           "        \tmcompile converts a Keyman mnemonic layout to\n"
           "        \ta positional one based on the currently used \n"
           "        \tmac keyboard layout\n"
           "        \t(-d convert deadkeys to plain keys) \n \n");  // I4552
-    }
+  }
   
   // -u option is not available for Linux and macOS
 
@@ -84,7 +66,6 @@ int mac_run(int argc, char* argv[]) {
   //    state.  This fixup will transform the char to a vk, which will avoid any issues
   //    with the key.
   //
-  //  --> deadkeys we will attack after the POC
   //
   //  For each deadkey, we need to determine its possible outputs.  Then we generate a VK
   //  rule for that deadkey, e.g. [K_LBRKT] > dk(c101)
@@ -109,23 +90,10 @@ int mac_run(int argc, char* argv[]) {
     return 3;
   }
 
-  #if defined(_WIN32) || defined(_WIN64)  // Windows
-    if (DoConvert(kmxfile, kbid, bDeadkeyConversion)) {  // I4552F
-      KMX_SaveKeyboard(kmxfile, outfile);
-    }
-
-  #elif ((__linux__) || (__unix__))       // LINUX, UNIX
-    if (mac_KMX_DoConvert(kmxfile, bDeadkeyConversion, argc)) {  // I4552F
-      KMX_SaveKeyboard(kmxfile, outfile);
+  if (mac_KMX_DoConvert(kmxfile, bDeadkeyConversion, argc)) {  // I4552F
+    KMX_SaveKeyboard(kmxfile, outfile);
   }
 
-  #elif (__APPLE__ && TARGET_OS_MAC)      // macOS
-    if (mac_KMX_DoConvert(kmxfile, bDeadkeyConversion, argc)) {  // I4552F
-      KMX_SaveKeyboard(kmxfile, outfile);
-  }
-  #endif
-
-  // DeleteReallocatedPointers(kmxfile); :TODO   // _S2 not my TODO :-)
   delete kmxfile;
   return 0;
 }
@@ -247,7 +215,7 @@ void mac_KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, 
     // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
     // We store that as just RALT, and use the option "Simulate RAlt with Ctrl+Alt"
     // to provide an alternate..
-  if ((shift & (LCTRLFLAG | RALTFLAG)) == (LCTRLFLAG | RALTFLAG))  // I4327
+    if ((shift & (LCTRLFLAG | RALTFLAG)) == (LCTRLFLAG | RALTFLAG))  // I4327
       shift &= ~LCTRLFLAG;
 
     if (key->ShiftFlags == 0) {
