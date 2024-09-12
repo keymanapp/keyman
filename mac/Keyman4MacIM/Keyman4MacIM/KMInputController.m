@@ -1,10 +1,9 @@
-//
-//  KMInputController.m
-//  Keyman4MacIM
-//
-//  Created by Serkan Kurt on 29/01/2015.
-//  Copyright (c) 2017 SIL International. All rights reserved.
-//
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Created by Serkan Kurt on 2015-01-29.
+ *
+ */
 
 #import "KMInputController.h"
 #import "KMInputMethodEventHandler.h"
@@ -26,9 +25,7 @@ KMInputMethodEventHandler* _eventHandler;
 
 - (id)initWithServer:(IMKServer *)server delegate:(id)delegate client:(id)inputClient
 {
-  NSRunningApplication *currApp = [[NSWorkspace sharedWorkspace] frontmostApplication];
-  NSString *clientAppId = [currApp bundleIdentifier];
-  os_log_debug([KMLogs lifecycleLog], "initWithServer, active app: '%{public}@'", clientAppId);
+  os_log_debug([KMLogs lifecycleLog], "initWithServer, active app: '%{public}@'", [KMInputMethodLifecycle getClientApplicationId]);
 
   self = [super initWithServer:server delegate:delegate client:inputClient];
   if (self) {
@@ -64,6 +61,9 @@ KMInputMethodEventHandler* _eventHandler;
   }
 }
 
+/**
+ * The Keyman input method is deactivating because the user chose a different input method: notification from KMInputMethodLifecycle
+ */
 - (void)inputMethodDeactivated:(NSNotification *)notification {
   os_log_debug([KMLogs lifecycleLog], "***KMInputController inputMethodDeactivated, deactivating eventHandler");
   if (_eventHandler != nil) {
@@ -71,15 +71,16 @@ KMInputMethodEventHandler* _eventHandler;
   }
 }
 
+/**
+ * The user has switched to a different text input client: notification from KMInputMethodLifecycle
+ */
 - (void)inputMethodChangedClient:(NSNotification *)notification {
   os_log_debug([KMLogs lifecycleLog], "***KMInputController inputMethodChangedClient, deactivating old eventHandler and activating new one");
   if (_eventHandler != nil) {
     [_eventHandler deactivate];
   }
-  NSRunningApplication *currentApp = [[NSWorkspace sharedWorkspace] frontmostApplication];
-  NSString *clientAppId = [currentApp bundleIdentifier];
-  // TODO: remove client argument
-  _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:clientAppId client:nil];
+  _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:[KMInputMethodLifecycle getClientApplicationId] client:self.client];
+
 }
 
 - (void)activateServer:(id)sender {
