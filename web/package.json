@@ -109,7 +109,8 @@
     "@zip.js/zip.js": "^2.7.32",
     "c8": "^7.12.0",
     "jsdom": "^23.0.1",
-    "mocha": "^10.0.0"
+    "mocha": "^10.0.0",
+    "tsx": "^4.19.0"
   },
   "scripts": {
     "test": "gosh ./test.sh"
