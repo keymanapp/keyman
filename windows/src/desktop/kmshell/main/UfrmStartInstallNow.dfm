@@ -13,11 +13,11 @@ object frmStartInstallNow: TfrmStartInstallNow
   OldCreateOrder = False
   PixelsPerInch = 96
   TextHeight = 13
-  object UpdateMessage: TLabel
+  object lblUpdateMessage: TLabel
     Left = 56
     Top = 88
-    Width = 289
-    Height = 38
+    Width = 274
+    Height = 19
     Caption = 'Keyman and Windows will be restarted'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
@@ -27,7 +27,7 @@ object frmStartInstallNow: TfrmStartInstallNow
     ParentFont = False
     WordWrap = True
   end
-  object UpdateNow: TLabel
+  object lblUpdateNow: TLabel
     Left = 56
     Top = 40
     Width = 115
@@ -40,22 +40,22 @@ object frmStartInstallNow: TfrmStartInstallNow
     Font.Style = []
     ParentFont = False
   end
-  object Install: TButton
+  object cmdInstall: TButton
     Left = 228
     Top = 184
     Width = 75
     Height = 25
     Caption = 'Update'
     TabOrder = 0
-    OnClick = InstallClick
+    OnClick = cmdInstallClick
   end
-  object Later: TButton
+  object cmdLater: TButton
     Left = 336
     Top = 184
     Width = 75
     Height = 25
     Caption = 'Close'
     TabOrder = 1
-    OnClick = LaterClick
+    OnClick = cmdLaterClick
   end
 end

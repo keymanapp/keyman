@@ -1,6 +1,7 @@
-unit UfrmStartInstallNow;
+﻿unit UfrmStartInstallNow;
 {
   Copyright:    © SIL Global.
+  // TODO: Localise all the labels and captions.
 }
 interface
 
@@ -11,29 +12,29 @@ uses
 
 type
   TfrmStartInstallNow = class(TfrmKeymanBase)
-    Install: TButton;
-    Later: TButton;
-    UpdateMessage: TLabel;
-    UpdateNow: TLabel;
-    procedure InstallClick(Sender: TObject);
-    procedure LaterClick(Sender: TObject);
+    cmdInstall: TButton;
+    cmdLater: TButton;
+    lblUpdateMessage: TLabel;
+    lblUpdateNow: TLabel;
+    procedure cmdInstallClick(Sender: TObject);
+    procedure cmdLaterClick(Sender: TObject);
   private
   public
   end;
-
-var
-  frmStartInstall: TfrmStartInstallNow;
 
 implementation
 
 {$R *.dfm}
 
-procedure TfrmStartInstallNow.InstallClick(Sender: TObject);
+
+// TODO remove events as they are properties on the buttons
+
+procedure TfrmStartInstallNow.cmdInstallClick(Sender: TObject);
 begin
   ModalResult := mrOk;
 end;
 
-procedure TfrmStartInstallNow.LaterClick(Sender: TObject);
+procedure TfrmStartInstallNow.cmdLaterClick(Sender: TObject);
 begin
   ModalResult := mrCancel;
 end;

@@ -39,6 +39,7 @@ begin
     end;
   except
     on E: Exception do
+      // TODO: #10210 convert to sentry error
       KL.Log(E.ClassName + ': ' + E.Message);
   end;
 end;
@@ -63,6 +64,7 @@ begin
 
   except
     on E: Exception do
+      // TODO: #10210 convert to sentry error
       KL.log(E.ClassName + ': ' + E.Message);
   end;
 

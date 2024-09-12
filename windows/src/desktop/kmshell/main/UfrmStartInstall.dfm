@@ -13,7 +13,7 @@ object frmStartInstall: TfrmStartInstall
   OldCreateOrder = False
   PixelsPerInch = 96
   TextHeight = 13
-  object InstallUpdate: TLabel
+  object lblInstallUpdate: TLabel
     Left = 128
     Top = 96
     Width = 175
@@ -26,22 +26,22 @@ object frmStartInstall: TfrmStartInstall
     Font.Style = []
     ParentFont = False
   end
-  object Install: TButton
+  object cmdInstall: TButton
     Left = 228
     Top = 184
     Width = 75
     Height = 25
     Caption = 'Install'
     TabOrder = 0
-    OnClick = InstallClick
+    OnClick = cmdInstallClick
   end
-  object Later: TButton
+  object cmdLater: TButton
     Left = 336
     Top = 184
     Width = 75
     Height = 25
     Caption = 'Close'
     TabOrder = 1
-    OnClick = LaterClick
+    OnClick = cmdLaterClick
   end
 end

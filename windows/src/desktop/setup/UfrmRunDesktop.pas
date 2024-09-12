@@ -1043,7 +1043,7 @@ begin
         FCheckForUpdates := ValueExists(SRegValue_CheckForUpdates) and ReadBool(SRegValue_CheckForUpdates);
         FStartWithWindows := ValueExists(SRegValue_UpgradeRunKeyman) or
           (OpenKeyReadOnly('\' + SRegKey_WindowsRun_CU) and ValueExists(SRegValue_WindowsRun_Keyman));
-        FAutomaticUpdates := ValueExists(SRegValue_AutomaticUpdates) and ReadBool(SRegValue_AutomaticUpdates);
+        FAutomaticUpdates := not ValueExists(SRegValue_AutomaticUpdates) or ReadBool(SRegValue_AutomaticUpdates);
 
       end
       else if FCanUpgrade10 and OpenKeyReadOnly(SRegKey_KeymanEngine100_ProductOptions_Desktop_CU) then   // I4293

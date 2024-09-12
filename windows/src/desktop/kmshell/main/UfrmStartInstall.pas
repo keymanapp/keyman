@@ -1,38 +1,48 @@
-unit UfrmStartInstall;
+﻿unit UfrmStartInstall;
 {
   Copyright:    © SIL Global.
+  // TODO: Localise all the labels and captions.
 }
 interface
 
 uses
 
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, UserMessages, StdCtrls, ExtCtrls, UfrmKeymanBase;
+  Windows,
+  Messages,
+  SysUtils,
+  Variants,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  Dialogs,
+  UserMessages,
+  StdCtrls,
+  ExtCtrls,
+  UfrmKeymanBase;
 
 type
   TfrmStartInstall = class(TfrmKeymanBase)
-    Install: TButton;
-    Later: TButton;
-    InstallUpdate: TLabel;
-    procedure InstallClick(Sender: TObject);
-    procedure LaterClick(Sender: TObject);
+    cmdInstall: TButton;
+    cmdLater: TButton;
+    lblInstallUpdate: TLabel;
+    procedure cmdInstallClick(Sender: TObject);
+    procedure cmdLaterClick(Sender: TObject);
   private
   public
   end;
 
-var
-  frmStartInstall: TfrmStartInstall;
 
 implementation
 
 {$R *.dfm}
 
-procedure TfrmStartInstall.InstallClick(Sender: TObject);
+procedure TfrmStartInstall.cmdInstallClick(Sender: TObject);
 begin
   ModalResult := mrOk;
 end;
 
-procedure TfrmStartInstall.LaterClick(Sender: TObject);
+procedure TfrmStartInstall.cmdLaterClick(Sender: TObject);
 begin
   ModalResult := mrCancel;
 end;

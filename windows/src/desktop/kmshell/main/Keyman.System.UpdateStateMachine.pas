@@ -248,7 +248,7 @@ type
     function checkUpdateSchedule : Boolean;
 
     function SetRegistryState (Update : TUpdateState): Boolean;
-    function GetAutomaticUpdate: Boolean;
+    function GetAutomaticUpdates: Boolean;
     function SetApplyNow(Value : Boolean): Boolean;
     function GetApplyNow: Boolean;
 
@@ -328,7 +328,7 @@ begin
   FParams.Result := oucUnknown;
 
   FForce := AForce;
-  FAutomaticUpdate := GetAutomaticUpdate;
+  FAutomaticUpdate := GetAutomaticUpdates;
   FIdle := IdleState.Create(Self);
   FUpdateAvailable := UpdateAvailableState.Create(Self);
   FDownloading := DownloadingState.Create(Self);
@@ -338,13 +338,12 @@ begin
   FPostInstall := PostInstallState.Create(Self);
   // Check the Registry setting.
   SetStateOnly(ConvertEnumState(CheckRegistryState));
-  KL.Log('TUpdateStateMachine.Create');
 end;
 
 destructor TUpdateStateMachine.Destroy;
 begin
   if (FErrorMessage <> '') and FShowErrors then
-    KL.Log(FErrorMessage);
+    KL.Log(FErrorMessage); // TODO: #10210 Log to Sentry
 
   if FParams.Result = oucShutDown then
     ShutDown;
@@ -357,8 +356,9 @@ begin
   FRetry.Free;
   FPostInstall.Free;
 
-  KL.Log('TUpdateStateMachine.Destroy: FErrorMessage = '+FErrorMessage);
-  KL.Log('TUpdateStateMachine.Destroy: FParams.Result = '+IntToStr(Ord(FParams.Result)));
+  // TODO: #10210 remove debugging comments
+  //KL.Log('TUpdateStateMachine.Destroy: FErrorMessage = '+FErrorMessage);
+  //KL.Log('TUpdateStateMachine.Destroy: FParams.Result = '+IntToStr(Ord(FParams.Result)));
 
   inherited Destroy;
 end;
@@ -410,9 +410,10 @@ begin
 
   try
     Registry.RootKey := HKEY_CURRENT_USER;
-    KL.Log('SetRegistryState State Entry');
+
     if not Registry.OpenKey(SRegKey_KeymanEngine_CU, True) then
     begin
+      // TODO: #10210 Log to Sentry
       KL.Log('Failed to open registry key: ' + SRegKey_KeymanEngine_CU);
       Exit;
     end;
@@ -420,11 +421,11 @@ begin
     try
       UpdateStr := GetEnumName(TypeInfo(TUpdateState), Ord(Update));
       Registry.WriteString(SRegValue_Update_State, UpdateStr);
-      KL.Log('SetRegistryState State is: [' + UpdateStr + ']');
       Result := True;
     except
       on E: Exception do
       begin
+        // TODO: #10210 Log to Sentry
         KL.Log('Failed to write to registry: ' + E.Message);
       end;
     end;
@@ -450,12 +451,10 @@ begin
     if Registry.OpenKeyReadOnly(SRegKey_KeymanEngine_CU) and Registry.ValueExists(SRegValue_Update_State) then
     begin
       UpdateState := TUpdateState(GetEnumValue(TypeInfo(TUpdateState), Registry.ReadString(SRegValue_Update_State)));
-      KL.Log('CheckRegistryState State is:[' + Registry.ReadString(SRegValue_Update_State) + ']');
     end
     else
     begin
       UpdateState := usIdle; // do we need a unknown state ?
-      KL.Log('CheckRegistryState State reg value not found default:[' + Registry.ReadString(SRegValue_Update_State) + ']');
     end;
   finally
     Registry.Free;
@@ -464,7 +463,7 @@ begin
   Result := UpdateState;
 end;
 
-function TUpdateStateMachine.GetAutomaticUpdate: Boolean;  // I2329
+function TUpdateStateMachine.GetAutomaticUpdates: Boolean;  // I2329
 var
   Registry: TRegistryErrorControlled;
 
@@ -473,14 +472,9 @@ begin
   Registry := TRegistryErrorControlled.Create;  // I2890
   try
     Registry.RootKey := HKEY_CURRENT_USER;
-    if Registry.OpenKeyReadOnly(SRegKey_KeymanEngine_CU) and Registry.ValueExists(SRegValue_AutomaticUpdates) then
-    begin
-      Result := Registry.ReadBool(SRegValue_AutomaticUpdates);
-    end
-    else
-    begin
-      Result := True; // Default
-    end;
+    Result := not Registry.OpenKeyReadOnly(SRegKey_KeymanEngine_CU) or
+      not Registry.ValueExists(SRegValue_AutomaticUpdates) or
+      Registry.ReadBool(SRegValue_AutomaticUpdates);
   finally
     Registry.Free;
   end;
@@ -505,6 +499,7 @@ begin
     except
       on E: Exception do
       begin
+        // TODO: #10210 Log to Sentry 'Failed to write '+SRegValue_ApplyNow+' to registry: ' + E.Message
         KL.Log('Failed to write to registry: ' + E.Message);
       end;
     end;
@@ -521,14 +516,9 @@ begin
   Registry := TRegistryErrorControlled.Create;
   try
     Registry.RootKey := HKEY_CURRENT_USER;
-    if Registry.OpenKeyReadOnly(SRegKey_KeymanEngine_CU) and Registry.ValueExists(SRegValue_ApplyNow) then
-    begin
-      Result := Registry.ReadBool(SRegValue_ApplyNow);
-    end
-    else
-    begin
-      Result := False; // Default
-    end;
+    Result := Registry.OpenKeyReadOnly(SRegKey_KeymanEngine_CU) and
+      Registry.ValueExists(SRegValue_ApplyNow) and
+      Registry.ReadBool(SRegValue_ApplyNow);
   finally
     Registry.Free;
   end;
@@ -684,9 +674,7 @@ end;
 
 procedure TState.ChangeState(NewState: TStateClass);
 begin
-  KL.Log('TUpdateStateMachine.ChangeState old' + bucStateContext.CurrentStateName  );
   bucStateContext.State := NewState;
-  KL.Log('TUpdateStateMachine.ChangeState new' + bucStateContext.CurrentStateName  );
 end;
 
 { IdleState }
@@ -744,7 +732,6 @@ var
 //const CheckPeriod: Integer = 7; // Days between checking for updates
 begin
   // Check if auto updates enable and if scheduled time has expired
-  KL.Log('IdleState.HandleKmShell');
   if ConfigCheckContinue then
   begin
     CheckForUpdates := TRemoteUpdateCheck.Create(True);
@@ -795,6 +782,7 @@ begin
   RootPath := ExtractFilePath(ParamStr(0));
   FResult := TUtilExecute.ShellCurrentUser(0, ParamStr(0), IncludeTrailingPathDelimiter(RootPath), '-bd');
   if not FResult then
+    // TODO: #10210 Log to Sentry
     KL.Log('TrmfMain: Executing KMshell for download updated Failed');
 end;
 
@@ -848,6 +836,9 @@ begin
   InstallNow := True;
   if HasKeymanRun then
   begin
+    // TODO: UI and non-UI units should be split
+    // if the unit launches UI then it should be a .UI. unit
+    //https://github.com/keymanapp/keyman/pull/12375/files#r1751041747
     frmStartInstallNow := TfrmStartInstallNow.Create(nil);
     try
       if frmStartInstallNow.ShowModal = mrOk then
@@ -932,7 +923,6 @@ var DownloadResult, FResult : Boolean;
 RootPath: string;
 begin
   // Enter Already Downloading
-  KL.Log('DownloadingState.HandleDownload already downloading');
 end;
 
 procedure DownloadingState.HandleAbort;
@@ -959,10 +949,8 @@ begin
   DownloadUpdate := TDownloadUpdate.Create;
   try
     DownloadResult := DownloadUpdate.DownloadUpdates;
-    KL.Log('TUpdateStateMachine.DownloadUpdatesBackground: DownloadResult = '+IntToStr(Ord(DownloadResult)));
     Result := DownloadResult;
 // #TODO: #10210 workout when we need to refresh kmcom keyboards
-
 //      if Result in [ wucSuccess] then
 //  begin
 //    kmcom.Keyboards.Refresh;
@@ -979,7 +967,6 @@ end;
 procedure WaitingRestartState.Enter;
 begin
   // Enter WaitingRestartState
-  KL.Log('WaitingRestartState.HandleKmShell Enter');
   bucStateContext.SetRegistryState(usWaitingRestart);
 end;
 
@@ -999,11 +986,9 @@ var
   Filenames : TStringDynArray;
   frmStartInstall : TfrmStartInstall;
 begin
-  KL.Log('WaitingRestartState.HandleKmShell Enter');
   // Still can't go if keyman has run
   if HasKeymanRun then
   begin
-    KL.Log('WaitingRestartState.HandleKmShell Keyman Has Run');
     Result := kmShellContinue;
     // Exit; // Exit is not wokring for some reason.
     // this else is only here because the exit is not working.
@@ -1015,7 +1000,6 @@ begin
     GetFileNamesInDirectory(SavedPath, FileNames);
     if Length(FileNames) = 0 then
     begin
-        KL.Log('WaitingRestartState.HandleKmShell No Files in Download Cache');
         // Return to Idle state and check for Updates state
         ChangeState(IdleState);
         bucStateContext.CurrentState.HandleCheck;  // TODO no event here
@@ -1024,7 +1008,6 @@ begin
     end
     else
     begin
-      KL.Log('WaitingRestartState.HandleKmShell is good to install');
       // TODO Pop up toast here to ask user if we want to continue
       frmStartInstall := TfrmStartInstall.Create(nil);
       try
@@ -1074,7 +1057,7 @@ begin
   if InstallNow = True then
   begin
     bucStateContext.SetApplyNow(True);
-    ChangeState(InstallingState)
+    ChangeState(InstallingState);
   end;
 end;
 
@@ -1127,7 +1110,6 @@ begin
     FResult := TUtilExecute.Shell(0, 'msiexec.exe', '', '/qb /i "'+SavePath+'" AUTOLAUNCHPRODUCT=1')  // I3349
   else if s = '.exe' then
   begin
-    KL.Log('TUpdateStateMachine.InstallingState.DoInstallKeyman SavePath:"'+ SavePath+'"');
     // switch -au for auto update in silent mode.
     // We will need to add the pop up that says install update now yes/no
     // This will run the setup executable which will ask for elevated permissions
@@ -1138,6 +1120,7 @@ begin
 
   if not FResult then
   begin
+     // TODO: #10210 Log to Sentry
      KL.Log('TUpdateStateMachine.InstallingState.DoInstall: Result = '+IntToStr(Ord(FResult)));
      // Log messageShowMessage(SysErrorMessage(GetLastError));
   end;
@@ -1295,9 +1278,7 @@ var SavePath: string;
     FileName: String;
     FileNames: TStringDynArray;
 begin
-      KL.Log('PostInstallState.HandleMSIInstallComplete');
       SavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
-      KL.Log('PostInstallState.HandleMSIInstallComplete remove SavePath:'+ SavePath);
 
       GetFileNamesInDirectory(SavePath, FileNames);
       for FileName in FileNames do
