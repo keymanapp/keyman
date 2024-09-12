@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <version number="1.0.0" />
+
+  <info author="srl295" indicator="🙀" layout="qwerty"  name="TestKbd"/>
+  <variables>
+    <string id="hmaqtugha" value="&#x0127;"/>
+  </variables>
+  <keys>
+    <key id="hmaqtugha" output="${hmaqtugha}" /> <!-- illegal NCR (single char)-->
+  </keys>
+
+  <layers formId="us" minDeviceWidth="123">
+    <layer id="base">
+      <row keys="hmaqtugha" />
+    </layer>
+  </layers>
+</keyboard3>

@@ -182,6 +182,7 @@ export class KmpCompiler implements KeymanCompiler {
         let a: KpsFile.KpsPackage;
         let parser = new XMLParser({
           ignoreAttributes: false,
+          htmlEntities: true,
           attributeNamePrefix: '',
           numberParseOptions: {
             skipLike: /(?:)/, // parse numbers as strings

@@ -26,6 +26,20 @@ describe('strs', function () {
             ]);
         assert.isNull(kmx); // should fail post-validate
     });
+    it('should process XML NCRs properly', async function() {
+        const inputFilename = makePathToFixture('sections/strs/ncr.xml');
+        // Compile the keyboard
+        const kmx = await compileKeyboard(inputFilename, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false },
+            [
+            ],
+            false, // validation should pass
+            [
+            ]);
+        assert.isNotNull(kmx);
+        const h = kmx.kmxplus.vars.strings.find(({id}) => id.value === 'hmaqtugha');
+        assert.ok(h, 'Could not find <string id="hmaqtugha">');
+        assert.equal(h.value.value, '\u0127', 'Check that NCR are de-escaped.'); // not &#x0127;
+    });
     it('should hint on pua chars', async function () {
         const inputFilename = makePathToFixture('sections/strs/hint-pua.xml');
         // Compile the keyboard

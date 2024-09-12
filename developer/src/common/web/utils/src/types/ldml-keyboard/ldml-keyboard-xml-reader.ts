@@ -275,6 +275,7 @@ export class LDMLKeyboardXMLSourceFileReader {
         ignoreAttributes: false, // We'd like attributes, please
         attributeNamePrefix: '', // to avoid '@_' prefixes
         trimValues: false, // preserve spaces, but:
+        htmlEntities: true,
         tagValueProcessor: (tagName, tagValue /*, jPath, hasAttributes, isLeafNode*/) => {
           // since trimValues: false, we need to zap any element values that would be trimmed.
           // currently, the LDML spec doesn't have any element values, but this
@@ -317,6 +318,7 @@ export class LDMLKeyboardXMLSourceFileReader {
 
   loadTestDataUnboxed(file: Uint8Array): any {
     const parser = new XMLParser({
+      htmlEntities: true,
       ignoreAttributes: false, // We'd like attributes, please
       attributeNamePrefix: '', // avoid @_
       preserveOrder: true,     // Gives us a 'special' format - see boxTestDataArrays() below

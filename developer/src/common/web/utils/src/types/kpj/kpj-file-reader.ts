@@ -14,6 +14,7 @@ export class KPJFileReader {
     let data: KPJFile;
 
   const parser = new XMLParser({
+    htmlEntities: true,
     ignoreAttributes: false, // We'd like attributes, please
     attributeNamePrefix: '', // to avoid '@_' prefixes
     numberParseOptions: {
