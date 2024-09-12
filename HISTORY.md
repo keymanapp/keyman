@@ -1,5 +1,24 @@
 # Keyman Version History
 
+## 18.0.109 alpha 2024-09-11
+
+* chore(common): Update history with 17.0.329 stable (#12394)
+* refactor(web): move `model/templates` to `web/src/engine/predictive/text` (#12382)
+* refactor(web): move `common/models` to `web/src/engine/predictive-text` (#12383)
+* refactor(web): move `common/web/utils` to `web/src/engine/common/web-utils/` (#12384)
+
+## 18.0.108 alpha 2024-09-10
+
+* docs(android): Update help docs (#12367)
+* fix(developer): fix building with Ubuntu 24.04 (#12379)
+* refactor(android): Move build-publish.sh to builder script (#12351)
+* fix(android): Separate `publishSentry` Gradle task to publish symbols to Sentry (#12358)
+* refactor(web): move `model/types` to `web/types` (#12370)
+
+## 18.0.107 alpha 2024-09-09
+
+* fix(android): Update Text Size menu icons for RTL support (#12290)
+
 ## 18.0.106 alpha 2024-09-06
 
 * feat(windows): add right modifier included in hotkey optional functionality (#12259)
@@ -758,6 +777,29 @@
 
 * chore(common): move to 18.0 alpha (#10713)
 * chore: move to 18.0 alpha
+
+## 17.0.329 stable 2024-09-09
+
+* chore(android,ios): Add ojibwa ifinal/rdot keyboards to FirstVoices (#12020)
+* change(web): revert #11174, which loads keyboards before initializing the OSK (#12040)
+* fix(web): unrevert #11258, leaving OSK hidden before instructed to display (#12058)
+* chore(common): use `nvm` to select version of node for builds (#12074)
+* fix(developer): ignore scan code if zero in debugger (#12182)
+* fix(developer): enforce presence of Version field when FollowKeyboardVersion is not set, in package compiler (#12206)
+* fix(developer): enforce presence of kps Info.Description field in info compilers (#12207)
+* fix(web): disable fat-finger data use when mayCorrect = false (#12226)
+* chore(common): allow build agents to automatically select emsdk version, and enable support for 3.1.60+ (#12245)
+* fix(web): fix documentation-keyboard spacebar-text scaling (#12240)
+* fix(core): set mac build version for meson cli build to 10.13 (#12246)
+* change(ios): defer registration of fonts past initialization (#12241)
+* chore(android,ios): Update FirstVoices keyboards to 12.15 (#12301)
+* fix(core): properly support 'other' modifier state with `uint32_t` type (#12285)
+* fix(developer): find last matching key in LDML key bag when building KVK (#12284)
+* fix(android): check in material-stepper as internal Maven dependency (#12324)
+* fix(linux): add `keymanFacename` to .ldml file (#12283)
+* chore(oem/fv): Update to fv_all 13.0 (#12363)
+* fix(mac): avoid crash on startup with macOS 10.15 (Catalina) (#12364)
+* fix(android): skip language counts for lexical-model packages (#12368)
 
 ## 17.0.328 stable 2024-07-27
 

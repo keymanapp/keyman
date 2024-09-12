@@ -28,8 +28,8 @@ builder_describe \
   "@/web/src/tools/building/sourcemap-root" \
   "@/common/web/keyman-version" \
   "@/common/web/es-bundling" \
-  "@/common/models/wordbreakers" \
-  "@/common/models/templates" \
+  "@../wordbreakers" \
+  "@../templates" \
   configure clean build test --ci
 
 builder_describe_outputs \

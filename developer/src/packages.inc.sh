@@ -6,7 +6,6 @@
 readonly PACKAGES=(
   common/web/keyman-version
   common/web/types
-  common/models/types
   core/include/ldml
   developer/src/common/web/utils
   developer/src/kmc-analyze

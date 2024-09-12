@@ -8,9 +8,11 @@
     "unicode"
   ],
   "type": "module",
+  "types": "./build/src/main.d.ts",
   "exports": {
     ".": {
       "es6-bundling": "./src/main.ts",
+      "types": "./build/src/main.d.ts",
       "default": "./build/src/main.js"
     }
   },
@@ -67,6 +69,7 @@
       "src/kmx/kmx-plus.ts",
       "src/kmx/kmx-builder.ts",
       "src/kmx/element-string.ts",
+      "src/lexical-model-types.ts",
       "src/kmx/string-list.ts",
       "src/ldml-keyboard/ldml-keyboard-testdata-xml.ts",
       "src/ldml-keyboard/unicodeset-parser-api.ts",

@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@keymanapp/common-types": "*",
-    "@keymanapp/models-types": "*",
+    "@keymanapp/common-types": "*",
     "@keymanapp/developer-utils": "*"
   },
   "devDependencies": {
