@@ -152,7 +152,7 @@ describe('visual-keyboard-compiler', function() {
     assert.equal(vk.keys[1].text, '\u{0e81}');
   });
 
-  it.skip('should read string variables in key.output', async function() {
+  it('should read string variables in key.output', async function() {
     const xml = stripIndent`
       <?xml version="1.0" encoding="UTF-8"?>
       <keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
@@ -164,8 +164,8 @@ describe('visual-keyboard-compiler', function() {
           <layer modifiers="none"><row keys="x" /></layer>
         </layers>
         <variables>
-          <string id="one" value="\${two}" />
           <string id="two" value="2" />
+          <string id="one" value="\${two}" />
         </variables>
       </keyboard3>
     `;
@@ -176,7 +176,7 @@ describe('visual-keyboard-compiler', function() {
     assert.equal(vk.keys[0].text, '2');
   });
 
-  it.skip('should read string variables in display.display', async function() {
+  it('should read string variables in display.display', async function() {
     const xml = stripIndent`
       <?xml version="1.0" encoding="UTF-8"?>
       <keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
@@ -191,8 +191,8 @@ describe('visual-keyboard-compiler', function() {
           <layer modifiers="none"><row keys="x" /></layer>
         </layers>
         <variables>
-          <string id="one" value="\${two}" />
           <string id="two" value="2" />
+          <string id="one" value="\${two}" />
         </variables>
       </keyboard3>
     `;
