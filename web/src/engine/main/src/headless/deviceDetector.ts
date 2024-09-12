@@ -1,9 +1,12 @@
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Detect the user's device.
+ */
 import StyleConstants from './utils/styleConstants.js';
 import { DeviceSpec, Version } from "@keymanapp/web-utils";
 
-// The Device object definition -------------------------------------------------
-
-export class Device {
+export class DeviceDetector {
   // These correspond directly to the properties & parameters for `DeviceSpec`.
   touchable: boolean;
   OS: string;
@@ -203,5 +206,3 @@ export class Device {
     return new DeviceSpec(this.browser, this.formFactor, this.OS, this.touchable);
   }
 }
-
-export default Device;

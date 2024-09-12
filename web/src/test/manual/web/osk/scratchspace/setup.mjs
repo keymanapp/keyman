@@ -1,12 +1,12 @@
 import * as KeymanOSK from '../../../../../../build/engine/osk/lib/index.mjs';
-import Device from '../../../../../../build/engine/device-detect/lib/index.mjs';
+import { DeviceDetector } from '../../../../../../build/engine/main/lib/index.mjs';
 import { loadKeyboardFromPath, loadKeyboardsFromStubs } from '../kbdLoader.mjs';
 
 // NOTE:  we must actually set these in this manner to have accessibility outside of
 //        this script tag!
 window.modules = {
   osk: KeymanOSK,
-  device: Device
+  device: DeviceDetector
 };
 
 let prefix = '../../';
@@ -22,7 +22,7 @@ window.keyboards = loadKeyboardsFromStubs(stubs).then((keyboards) => {
   window.keyboards = keyboards;
 });
 
-let device = new Device();
+let device = new DeviceDetector();
 device.detect();
 
 if(device.formFactor == 'phone') {
