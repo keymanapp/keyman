@@ -1,5 +1,12 @@
-import { VisualKeyboard, LDMLKeyboard, CompilerCallbacks } from "@keymanapp/common-types";
-import { KeysCompiler } from "./keys.js";
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Export LDML data (https://www.unicode.org/reports/tr35/tr35-keyboards.html)
+ * to .kvk format. This is an interim solution until Keyman Core supports
+ * interrogation of the KMX+ data for OSK.
+ */
+import { ModifierKeyConstants, KMXPlus } from "@keymanapp/common-types";
+import { VisualKeyboard, CompilerCallbacks } from "@keymanapp/common-types";
 import { CompilerMessages } from "./messages.js";
 
 // This is a partial polyfill for findLast, so not polluting Array.prototype
@@ -19,25 +26,37 @@ function findLast(arr: any, callback: any) {
   return undefined;
 }
 
+
+const LDML_MODIFIER_TO_KVK_MODIFIER = new Map<number, number>();
+LDML_MODIFIER_TO_KVK_MODIFIER.set(ModifierKeyConstants.LCTRLFLAG,      VisualKeyboard.VisualKeyboardShiftState.KVKS_LCTRL);
+LDML_MODIFIER_TO_KVK_MODIFIER.set(ModifierKeyConstants.RCTRLFLAG,      VisualKeyboard.VisualKeyboardShiftState.KVKS_RCTRL);
+LDML_MODIFIER_TO_KVK_MODIFIER.set(ModifierKeyConstants.LALTFLAG,       VisualKeyboard.VisualKeyboardShiftState.KVKS_LALT);
+LDML_MODIFIER_TO_KVK_MODIFIER.set(ModifierKeyConstants.RALTFLAG,       VisualKeyboard.VisualKeyboardShiftState.KVKS_RALT);
+LDML_MODIFIER_TO_KVK_MODIFIER.set(ModifierKeyConstants.K_SHIFTFLAG,    VisualKeyboard.VisualKeyboardShiftState.KVKS_SHIFT);
+LDML_MODIFIER_TO_KVK_MODIFIER.set(ModifierKeyConstants.K_CTRLFLAG,     VisualKeyboard.VisualKeyboardShiftState.KVKS_CTRL);
+LDML_MODIFIER_TO_KVK_MODIFIER.set(ModifierKeyConstants.K_ALTFLAG,      VisualKeyboard.VisualKeyboardShiftState.KVKS_ALT);
+
 export class LdmlKeyboardVisualKeyboardCompiler {
   public constructor(private callbacks: CompilerCallbacks) {
   }
 
-  public compile(source: LDMLKeyboard.LDMLKeyboardXMLSourceFile): VisualKeyboard.VisualKeyboard {
+  public compile(source: KMXPlus.KMXPlusData, keyboardId: string): VisualKeyboard.VisualKeyboard {
     let result = new VisualKeyboard.VisualKeyboard();
 
     /* TODO-LDML: consider VisualKeyboardHeaderFlags.kvkhUseUnderlying kvkhDisplayUnderlying kvkhAltGr kvkh102 */
     result.header.flags = 0;
     result.header.version = 0x0600;
-
-    /* TODO-LDML: consider associatedKeyboard: this _must_ be set to id (aka basename sans ext) of keyboard .kmx file */
-    result.header.associatedKeyboard = '';
+    result.header.associatedKeyboard = keyboardId;
     result.header.ansiFont = {...VisualKeyboard.DEFAULT_KVK_FONT};
     result.header.unicodeFont = {...VisualKeyboard.DEFAULT_KVK_FONT};
 
-    for(let layers of source.keyboard3.layers) {
-      const { formId } = layers;
-      for(let layer of layers.layer) {
+    for(let layersList of source.layr.lists) {
+      const formId = layersList.hardware.value;
+      if(formId == 'touch') {
+        continue;
+      }
+
+      for(let layer of layersList.layers) {
         this.compileHardwareLayer(source, result, layer, formId);
       }
     }
@@ -45,58 +64,74 @@ export class LdmlKeyboardVisualKeyboardCompiler {
   }
 
   private compileHardwareLayer(
-    source: LDMLKeyboard.LDMLKeyboardXMLSourceFile,
+    source: KMXPlus.KMXPlusData,
     vk: VisualKeyboard.VisualKeyboard,
-    layer: LDMLKeyboard.LKLayer,
+    layer: KMXPlus.LayrEntry,
     hardware: string,
   ) {
-    const layerId = layer.id;
-    if (hardware === 'touch') {
-      hardware = 'us'; // TODO-LDML: US Only. Do something different here?
-    }
-    const keymap = KeysCompiler.getKeymapFromForms(source.keyboard3?.forms?.form, hardware);
-    if (!keymap) {
-      this.callbacks.reportMessage(
-        CompilerMessages.Error_InvalidHardware({ formId: hardware })
-      );
+    const layerId = layer.id.value;
+
+    hardware = 'us'; // TODO-LDML: US Only. We need to clean this up for other hardware forms
+
+    const shift = this.translateLayerModifiersToVisualKeyboardShift(layer.mod);
+    if(shift === null) {
+      // Caps (num, scroll) is not a supported shift state in .kvk
       return;
     }
-    const shift = this.translateLayerIdToVisualKeyboardShift(layer.id);
 
     let y = -1;
-    for(let row of layer.row) {
+    for(let row of layer.rows) {
       y++;
-
-      const keys = row.keys.split(' ');
       let x = -1;
-      for(let key of keys) {
-        const keyId = key;
+      for(let key of row.keys) {
         x++;
 
-        //@ts-ignore
-        let keydef = findLast(source.keyboard3.keys?.key, x => x.id == key);
+        const keydef: KMXPlus.KeysKeys = findLast(source.keys?.keys, (kd: KMXPlus.KeysKeys) => kd.id.value == key.value);
+        const kmap = source.keys.kmap.find(k => k.key == keydef.id.value && k.mod == layer.mod);
+        const text = this.getDisplayFromKey(keydef, source) ?? null;
 
-        if (!keydef) {
+        if (!keydef || !kmap || text === null) {
           this.callbacks.reportMessage(
-            CompilerMessages.Error_KeyNotFoundInKeyBag({ keyId, layer: layerId, row: y, col: x, form: hardware })
+            CompilerMessages.Error_KeyNotFoundInKeyBag({ keyId: key.value, layer: layerId, row: y, col: x, form: hardware })
           );
         } else {
           vk.keys.push({
             flags: VisualKeyboard.VisualKeyboardKeyFlags.kvkkUnicode,
-            shift: shift,
-            text: keydef.output, // TODO-LDML: displays
-            vkey: keymap[y][x],
+            shift,
+            text,
+            vkey: kmap.vkey
           });
         }
       }
     }
   }
 
-  private translateLayerIdToVisualKeyboardShift(id: string) {
-    if(id == 'base') {
-      return 0;
+  private getDisplayFromKey(keydef: KMXPlus.KeysKeys, source: KMXPlus.KMXPlusData) {
+    const display = source.disp?.disps?.find(d => d.id.value == keydef.id.value || d.to.value == keydef.to.value);
+    return display?.display.value ?? keydef.to.value;
+  }
+
+  private translateLayerModifiersToVisualKeyboardShift(modifiers: number): VisualKeyboard.VisualKeyboardShiftState {
+
+    if(modifiers == 0) {
+      return VisualKeyboard.VisualKeyboardShiftState.KVKS_NORMAL;
     }
-    // TODO-LDML: other modifiers
-    return 0;
+
+    if(modifiers &
+      (ModifierKeyConstants.CAPITALFLAG | ModifierKeyConstants.NUMLOCKFLAG | ModifierKeyConstants.SCROLLFLAG)
+    ) {
+      // Caps/Num/Scroll are not supported in .kvk, in combination or alone
+      return null;
+    }
+
+    let shift: VisualKeyboard.VisualKeyboardShiftState = 0;
+
+    for(const mod of LDML_MODIFIER_TO_KVK_MODIFIER.keys()) {
+      if(modifiers & mod) {
+        shift |= LDML_MODIFIER_TO_KVK_MODIFIER.get(mod);
+      }
+    }
+
+    return shift;
   }
 }
