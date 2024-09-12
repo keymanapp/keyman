@@ -1,5 +1,5 @@
 import * as KeymanOSK from 'keyman/engine/osk';
-import Device from 'keyman/engine/device-detect';
+import { DeviceDetector } from 'keyman/engine/main';
 
 import { loadKeyboardsFromStubs } from '../../kbdLoader.js';
 import { timedPromise } from '@keymanapp/web-utils';
@@ -9,7 +9,7 @@ import sinon from 'sinon';
 import { assert } from 'chai';
 import { DEFAULT_BROWSER_TIMEOUT } from '@keymanapp/common-test-resources/test-timeouts.mjs';
 
-const device = new Device();
+const device = new DeviceDetector();
 device.detect();
 
 const TestResources = {

@@ -1,6 +1,7 @@
 {
   "name": "@keymanapp/lm-message-types",
   "description": "Type definitions in used in the lm layer (lexical model/predictive text) component of Keyman.",
+  "type": "module",
   "types": "./message.d.ts",
   "scripts": {
     "test": "tsc test.ts -lib es6"
