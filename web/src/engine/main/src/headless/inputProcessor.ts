@@ -1,7 +1,5 @@
 // Defines a 'polyfill' of sorts for NPM's events module
 
-/// <reference types="@keymanapp/models-types" />
-
 import ContextWindow from "./contextWindow.js";
 import { LanguageProcessor }  from "./languageProcessor.js";
 import type { ModelSpec }  from "keyman/engine/interfaces";
@@ -21,6 +19,7 @@ import {
 } from 'keyman/engine/js-processor';
 
 import { TranscriptionCache } from "./transcriptionCache.js";
+import { Transform } from '@keymanapp/common-types';
 
 export class InputProcessor {
   public static readonly DEFAULT_OPTIONS: ProcessorInitOptions = {

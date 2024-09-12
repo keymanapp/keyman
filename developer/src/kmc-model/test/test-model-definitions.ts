@@ -2,6 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { ModelDefinitions } from '../src/model-definitions.js';
 import { LexicalModelSource } from '../src/lexical-model.js';
+import { CasingForm, CasingFunction } from '@keymanapp/common-types';
 
 describe('Model definition pseudoclosures', function () {
   describe('14.0 defaults', function() {

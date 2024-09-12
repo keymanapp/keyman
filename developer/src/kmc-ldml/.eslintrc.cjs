@@ -6,7 +6,7 @@ module.exports = {
   overrides: [
     {
       files:"src/**/*.ts",
-      extends: ["../../../common/web/eslint/eslintNoNodeImports.js"],
+      extends: ["../../../common/tools/eslint/eslintNoNodeImports.js"],
     }
   ],
   rules: {
