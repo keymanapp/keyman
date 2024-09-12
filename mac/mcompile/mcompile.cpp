@@ -37,21 +37,9 @@ std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;  // I4353
  * @param  argv commandline arguments
  * @return 0 on success
  */
-#if defined(_WIN32) || defined(_WIN64)
-  int wmain(int argc, wchar_t* argv[]) {
-  /**
-  * TODO for cross-platform use: if we want to use wmain instead of main:
-  * inside wmain convert wchar_t* argv[] to char* argv_ch[]
-  * to be able to use mac_run(int argc, char* argv_ch[])
-  */
 
-#elif ((__linux__) || (__unix__))  // LINUX, UNIX
-  int main(int argc, char* argv[]) {
-
-#elif (__APPLE__ && TARGET_OS_MAC)
   #include <TargetConditionals.h>
   int main(int argc, char* argv[]) {
-#endif
 
   mac_run(argc, argv);
 }
@@ -578,7 +566,7 @@ int mac_KMX_GetDeadkeys(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& a
   KMX_WORD* p = outputPairs;
   KMX_DWORD sc_dk = mac_KMX_get_KeyCodeUnderlying_From_KeyValUnderlying(all_vector, deadkey);
 
-  for (int j = 0; j < sizeof(ss_mac) / sizeof(ss_mac[0]); j++) {
+  for (int j = 0; j < sizeof_ss_mac; j++) {
 
     /*
       we start with SPACE (keycode_spacebar=49) because all deadkeys occur in combinations with space.
