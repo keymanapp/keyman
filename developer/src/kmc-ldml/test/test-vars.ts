@@ -190,7 +190,7 @@ describe('vars', function () {
     {
       subpath: 'sections/vars/fail-badref-7.xml',
       errors: [
-        LdmlCompilerMessages.Error_MissingStringVariable({id: 'usedBeforeDefinition'})
+        CompilerMessages.Error_MissingStringVariable({id: 'usedBeforeDefinition'})
       ],
       strictErrors: true
     },

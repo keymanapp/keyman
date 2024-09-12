@@ -72,7 +72,7 @@ export class VarsCompiler extends SectionCompiler {
         for(const ref of stringrefs) {
           if(!allStrings.has(ref)) {
             valid = false;
-            this.callbacks.reportMessage(LdmlCompilerMessages.Error_MissingStringVariable({id: ref}));
+            this.callbacks.reportMessage(CompilerMessages.Error_MissingStringVariable({id: ref}));
             allStrings.add(ref); // avoids multiple reports of same missing variable
           }
         }
