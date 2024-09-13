@@ -28,6 +28,7 @@ import { default as defaultWordBreaker } from "@keymanapp/models-wordbreakers";
 
 import { applyTransform, SearchKey, transformToSuggestion, Wordform2Key } from "./common.js";
 import { getLastPreCaretToken } from "./tokenization.js";
+import { Capabilities, CasingFunction, Configuration, Context, Distribution, LexicalModel, LexicalModelPunctuation, LexiconTraversal, Suggestion, TextWithProbability, Transform, USVString, WithOutcome, WordBreakingFunction } from "@keymanapp/common-types";
 
 extendString();
 

@@ -1,3 +1,4 @@
+import { Distribution, LexiconTraversal, TextWithProbability } from "@keymanapp/common-types";
 import { PriorityQueue } from "@keymanapp/web-utils";
 
 type ChildEdge = { char: string; p: number, traversal: () => LexiconTraversal };

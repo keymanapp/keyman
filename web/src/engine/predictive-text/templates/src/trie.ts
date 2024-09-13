@@ -1,4 +1,5 @@
 import { isHighSurrogate, isSentinel, SearchKey, SENTINEL_CODE_UNIT, Wordform2Key } from "./common.js";
+import { LexiconTraversal, USVString } from "@keymanapp/common-types";
 
 // The following trie implementation has been (heavily) derived from trie-ing
 // by Conrad Irwin.

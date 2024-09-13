@@ -28,9 +28,7 @@
 // Allows the kmwstring bindings to resolve.
 import { extendString } from "@keymanapp/web-utils";
 
-import { applyTransform, isHighSurrogate, isSentinel, SENTINEL_CODE_UNIT, transformToSuggestion } from "./common.js";
-import { getLastPreCaretToken } from "./tokenization.js";
-import { Capabilities, CasingFunction, Configuration, Context, Distribution, LexicalModel, LexicalModelPunctuation, LexiconTraversal, Suggestion, TextWithProbability, Transform, USVString, WithOutcome, WordBreakingFunction } from '@keymanapp/common-types';
+import { CasingFunction, Configuration, LexicalModel, LexicalModelPunctuation, WordBreakingFunction } from '@keymanapp/common-types';
 import { SearchKey, Wordform2Key } from "./common.js";
 import { Node, Trie } from './trie.js';
 import { TraversalModel } from './traversal-model.js';
