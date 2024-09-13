@@ -41,6 +41,7 @@ NSString *const kInputMethodActivatedNotification = @"kInputMethodActivatedNotif
 NSString *const kInputMethodDeactivatedNotification = @"kInputMethodDeactivatedNotification";
 NSString *const kInputMethodClientChangeNotification = @"kInputMethodClientChangeNotification";
 NSString *const keymanInputMethodName = @"keyman.inputmethod.Keyman";
+const double postDeactivateDelay = 0.5;
 
 typedef enum {
   Started,
@@ -151,7 +152,7 @@ typedef enum {
 }
 
 /**
- * Called when IMKInputController receives an activateServer message
+ * Called when IMKInputController receives an activateServer or a deactivateServer message
  */
 - (void)performTransition:(id)client {
   NSString *currentInputSource = [KMInputMethodLifecycle getCurrentInputSourceId];
@@ -193,6 +194,21 @@ typedef enum {
  */
 - (void)deactivateClient:(id)client {
   os_log_debug([KMLogs lifecycleLog], "KMInputMethodLifecycle deactivateClient");
+  [self performTransition:client];
+  
+  /**
+   * Called when IMKInputController receives an deactivateServer message
+   */
+  if (@available(macOS 10.14, *)) {
+    os_log_debug([KMLogs lifecycleLog], "performing additional version check for Sonoma+");
+    [self performSelector:@selector(checkForDelayedDeactivation:) withObject:client afterDelay:postDeactivateDelay];
+  }
+
+
+}
+
+- (void)checkForDeactivation:(id)client {
+  os_log_debug([KMLogs lifecycleLog], "checkForDelayedDeactivation");
   [self performTransition:client];
 }
 
