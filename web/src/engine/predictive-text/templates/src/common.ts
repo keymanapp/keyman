@@ -153,3 +153,19 @@ export function defaultApplyCasing(casing: CasingForm, text: string): string {
       return text.substring(0, headUnitLength).toUpperCase() .concat(text.substring(headUnitLength));
   }
 }
+
+/**
+ * An **opaque** type for a string that is exclusively used as a search key in
+ * the trie. There should be a function that converts arbitrary strings
+ * (queries) and converts them into a standard search key for a given language
+ * model.
+ */
+export type SearchKey = string & { _: 'SearchKey'};
+
+/**
+ * A function that converts a string (word form or query) into a search key
+ * (which, internally, is also a string type).
+ */
+export interface Wordform2Key {
+  (wordform: string): SearchKey;
+}

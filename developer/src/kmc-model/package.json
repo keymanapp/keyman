@@ -32,12 +32,10 @@
   "dependencies": {
     "@keymanapp/common-types": "*",
     "@keymanapp/keyman-version": "*",
-    "@keymanapp/common-types": "*",
     "typescript": "^5.4.5"
   },
   "devDependencies": {
     "@keymanapp/developer-test-helpers": "*",
-    "@keymanapp/models-templates": "*",
     "@types/mocha": "^5.2.7",
     "@types/node": "^20.4.1",
     "c8": "^7.12.0",

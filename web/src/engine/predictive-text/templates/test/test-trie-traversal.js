@@ -174,15 +174,13 @@ describe('Trie traversal abstractions', function() {
                 do {
                   assert.isNotEmpty(leafChildSequence);
 
-                  let iter = curChild.traversal().children();
-                  let curr = iter.next();
-                  curChild = curr.value;
+                  let children = curChild.traversal().children();
+                  assert.equal(children.length, 1);
+                  curChild = children[0];
 
                   // Test generator behavior - there should be one child, then the 'done' state.
                   assert.isDefined(curChild);
                   assert.equal(curChild.char, leafChildSequence[0]);
-                  curr = iter.next();
-                  assert.isTrue(curr.done);
 
                   // Prepare for iteration.
                   leafChildSequence.shift();
@@ -275,15 +273,13 @@ describe('Trie traversal abstractions', function() {
                 do {
                   assert.isNotEmpty(leafChildSequence);
 
-                  let iter = curChild.traversal().children();
-                  let curr = iter.next();
-                  curChild = curr.value;
+                  let children = curChild.traversal().children();
+                  assert.equal(children.length, 1);
+                  curChild = children[0];
 
                   // Test generator behavior - there should be one child, then the 'done' state.
                   assert.isDefined(curChild);
                   assert.equal(curChild.char, leafChildSequence[0]);
-                  curr = iter.next();
-                  assert.isTrue(curr.done);
 
                   // Prepare for iteration.
                   leafChildSequence.shift();
@@ -336,9 +332,6 @@ describe('Trie traversal abstractions', function() {
 
     // Just to be sure our utility function is working right.
     assert.equal(smpA + smpP + 'pl' + smpE, "𝖺𝗉pl𝖾");
-
-    let pKeys = ['p', smpP];
-    let leafChildSequence = ['l', smpE];
 
     const aNode = rootTraversal.child(smpA);
     assert.isOk(aNode);
