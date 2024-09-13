@@ -38,17 +38,17 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
     try {
       response = await fetch(uri);
     } catch (e) {
-      throw errorBuilder.keyboardDownloadError(`Unable to fetch fetch keyboard at ${uri}`, e);
+      throw errorBuilder.keyboardDownloadError(e);
     }
 
     if (!response.ok) {
-      throw errorBuilder.missingError(new Error(`HTTP ${response.status} ${response.statusText}`));
+      throw errorBuilder.keyboardDownloadError(new Error(`HTTP ${response.status} ${response.statusText}`));
     }
 
     try {
       return await response.blob();
     } catch (e) {
-      throw errorBuilder.keyboardDownloadError(`Unable to retrieve blob from keyboard at ${uri}`, e);
+      throw errorBuilder.invalidKeyboard(e);
     }
   }
 

@@ -36,7 +36,7 @@ export class NodeKeyboardLoader extends KeyboardLoaderBase {
     try {
       buffer = await readFile(uri);
     } catch (err) {
-      throw errorBuilder.keyboardDownloadError(`Unable to read keyboard file at ${uri}`, err);
+      throw errorBuilder.keyboardDownloadError(err);
     }
     return new Blob([buffer]);
   }
@@ -46,7 +46,7 @@ export class NodeKeyboardLoader extends KeyboardLoaderBase {
     try {
       script = new vm.Script(scriptSrc);
     } catch (err) {
-      throw errorBuilder.missingError(err);
+      throw errorBuilder.invalidKeyboard(err);
     }
     try {
       script.runInContext(this.harness._jsGlobal);

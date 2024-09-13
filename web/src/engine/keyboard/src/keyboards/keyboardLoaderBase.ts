@@ -22,7 +22,7 @@ export abstract class KeyboardLoaderBase {
    * @param uri  The URI of the keyboard to load.
    * @returns    A Promise that resolves to the loaded keyboard.
    */
-  public loadKeyboardFromPath(uri: string): Promise<Keyboard> {
+  public async loadKeyboardFromPath(uri: string): Promise<Keyboard> {
     this.harness.install();
     return this.loadKeyboardInternal(uri, new UriBasedErrorBuilder(uri));
   }
@@ -33,7 +33,7 @@ export abstract class KeyboardLoaderBase {
    * @param stub  The stub of the keyboard to load.
    * @returns     A Promise that resolves to the loaded keyboard.
    */
-  public loadKeyboardFromStub(stub: KeyboardStub) {
+  public async loadKeyboardFromStub(stub: KeyboardStub): Promise<Keyboard> {
     this.harness.install();
     return this.loadKeyboardInternal(stub.filename, new StubBasedErrorBuilder(stub));
   }
@@ -45,7 +45,7 @@ export abstract class KeyboardLoaderBase {
     try {
       script = await blob.text();
     } catch (e) {
-      throw errorBuilder.missingKeyboardError('The keyboard has an invalid encoding.', e);
+      throw errorBuilder.invalidKeyboard(e);
     }
 
     if (script.startsWith('KXTS', 0)) {

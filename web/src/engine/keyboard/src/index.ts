@@ -4,7 +4,7 @@ export { default as Keyboard } from "./keyboards/keyboard.js";
 export * from "./keyboards/keyboard.js";
 export { KeyboardHarness, KeyboardKeymanGlobal, MinimalCodesInterface, MinimalKeymanGlobal } from "./keyboards/keyboardHarness.js";
 export { KeyboardLoaderBase } from "./keyboards/keyboardLoaderBase.js";
-export { KeyboardLoadErrorBuilder, KeyboardMissingError, KeyboardScriptError, KeyboardDownloadError } from './keyboards/keyboardLoadError.js'
+export { KeyboardLoadErrorBuilder, KeyboardMissingError, KeyboardScriptError, KeyboardDownloadError, InvalidKeyboardError } from './keyboards/keyboardLoadError.js'
 export {
   CloudKeyboardFont,
   internalizeFont,
