@@ -137,9 +137,11 @@ void Hotkeys::Load() {   // I4390
 
 Hotkey *Hotkeys::GetHotkey(DWORD hotkey)
 {
-	for(int i = 0; i < m_nHotkeys; i++)
-		if(m_hotkeys[i].HotkeyValue == hotkey)
-			return &m_hotkeys[i];
+  for (int i = 0; i < m_nHotkeys; i++) {
+    if (m_hotkeys[i].HotkeyValue == hotkey) {
+      return &m_hotkeys[i];
+    }
+  }
 	return NULL;
 }
 

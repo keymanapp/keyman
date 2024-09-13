@@ -5,6 +5,7 @@ import { determineModelTokenizer, determineModelWordbreaker, determinePunctuatio
 import { ContextTracker, TrackedContextState } from './correction/context-tracker.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
 import ModelCompositor from './model-compositor.js';
+import { ProbabilityMass, Suggestion, LexicalModel, Distribution, Outcome, Keep, SuggestionTag, Reversion, Transform, Context } from '@keymanapp/common-types';
 
 /*
  * The functions in this file exist to provide unit-testable stateless components for the

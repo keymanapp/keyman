@@ -1,5 +1,5 @@
 import * as KMWRecorder from '../../../../build/tools/testing/recorder/lib/index.mjs';
-import { Device } from '../../../../build/engine/device-detect/lib/index.mjs';
+import { DeviceDetector } from '../../../../build/engine/main/lib/index.mjs';
 
 import { getResourcePathPrefix } from './recorder_KeyboardScripts.js';
 
@@ -124,7 +124,7 @@ window.errorUpdate = () => {
 
 window.initDevice = () => {
   // From KMW.
-  var device = new Device();
+  var device = new DeviceDetector();
   device.detect();
 
   document.getElementById("activeFormFactor").textContent = device.formFactor;

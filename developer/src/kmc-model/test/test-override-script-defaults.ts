@@ -1,6 +1,7 @@
 import { assert } from "chai";
 import defaultWordBreaker from '@keymanapp/models-wordbreakers';
 import {decorateWithScriptOverrides} from '../src/script-overrides-decorator.js';
+import { Span } from '@keymanapp/common-types';
 
 const THIN_SPACE = "\u2009";
 

@@ -20,10 +20,8 @@ common/:
   - common/**
   - resources/**
 
-common/models/: common/models/**
-common/models/types/: common/models/types/**
-common/models/templates/: common/models/templates/**
-common/models/wordbreakers/: common/models/wordbreakers/**
+common/models/templates/: web/src/engine/predictive-text/templates/**
+common/models/wordbreakers/: web/src/engine/predictive-text/wordbreakers/**
 
 common/resources/: resources/**
 common/web/: common/web/**

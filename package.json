@@ -46,7 +46,6 @@
     "developer/src/kmc-package",
     "developer/src/kmc",
     "developer/src/server",
-    "common/models/*",
     "common/test/resources",
     "common/tools/*",
     "common/web/*",
