@@ -23,9 +23,6 @@ const int MAC_SHIFT = 2;
 const int MAC_OPT = 8;
 const int MAC_SHIFT_OPT = 10;
 
-const int ss_mac[] = {MAC_BASE, MAC_SHIFT, MAC_OPT, MAC_SHIFT_OPT};
-int sizeof_ss_mac = sizeof(ss_mac) / sizeof(ss_mac[0]);
-
 // KeyValues for the US English keyboard: A,  S,  D,  F,  H,  G,  Z,  X, C,  V,  §, B,  Q,  W,  E,  R,  Y,  T, 1, 2, 3, 4, 6, 5, =, 9, 7, -, 8, 0,  ],  O,  U,  [,  I,  P,CR,  L,  J, ',  K, ;,  \, ,, /,  N,  M, .
 const std::vector<int> us_Base  =       {97,115,100,102,104,103,122,120,99,118,167,98,113,119,101,114,121,116,49,50,51,52,54,53,61,57,55,45,56,48, 93,111,117, 91,105,112,13,108,106,39,107,59, 92,44,47,110,109,46};
 const std::vector<int> us_Shift =       {65, 83, 68, 70, 72, 71, 90, 88,67, 86,177,66, 81, 87, 69, 82, 89, 84,33,64,35,36,94,37,43,40,38,95,42,41,125, 79, 85,123, 73, 80,13, 76, 74,34, 75,58,124,60,63, 78, 77,62};

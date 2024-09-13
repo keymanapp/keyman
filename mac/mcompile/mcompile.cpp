@@ -17,7 +17,7 @@
 #include "../../common/include/km_u16.h"
 
 /** @brief  convert mnemonic keyboard layout to positional keyboard layout and translate keyboard */
-KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, int argc);
+KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion);
 
 /** @brief  Collect the key data, translate it to kmx and append to the existing keyboard */
 bool mac_KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D &all_vector, const UCKeyboardLayout** keyboard_layout, std::vector<KMX_DeadkeyMapping>* KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion);  // I4353   // I4327
@@ -90,7 +90,7 @@ int main(int argc, char* argv[]) {
     return 3;
   }
 
-  if (mac_KMX_DoConvert(kmxfile, bDeadkeyConversion, argc)) {  // I4552F
+  if (mac_KMX_DoConvert(kmxfile, bDeadkeyConversion)) {  // I4552F
     KMX_SaveKeyboard(kmxfile, outfile);
   }
 
@@ -448,11 +448,10 @@ KMX_BOOL mac_KMX_SetKeyboardToPositional(LPKMX_KEYBOARD kbd) {
  * @brief  convert mnemonic keyboard layout to positional keyboard layout and translate keyboard
  * @param  kbd                pointer to US keyboard
  * @param  bDeadkeyConversion option for converting a deadkey to a character: 1 = dk conversion; 0 = no dk conversion
- * @param  argc               number of command line arguments
  * @return TRUE if conversion was successful;
  *         FALSE if not
  */
-KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, int argc) {
+KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion) {
   KMX_WCHAR DeadKey = 0;
   if (!mac_KMX_SetKeyboardToPositional(kbd))
     return FALSE;
@@ -534,7 +533,7 @@ int mac_KMX_GetDeadkeys(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& a
   KMX_WORD* p = outputPairs;
   KMX_DWORD sc_dk = mac_KMX_get_KeyCodeUnderlying_From_KeyValUnderlying(all_vector, deadkey);
 
-  for (int j = 0; j < sizeof_ss_mac; j++) {
+  for (int j = 0; j < _countof(ss_mac); j++) {
 
     /*
       we start with SPACE (keycode_spacebar=49) because all deadkeys occur in combinations with space.
@@ -558,7 +557,7 @@ int mac_KMX_GetDeadkeys(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& a
           KMX_WORD vk = mac_KMX_get_KeyVal_From_KeyCode(keyboard_layout, i, ss_mac[1], 0);
 
           // ensure to NOT get key combinations like '^a' but only combined characters like 'â' (exception for '^' + space)
-          if ((unicodeString[0] != deadkey) || (vk == 32)) {
+          if ((unicodeString[0] != deadkey) || (vk == VK_SPACE)) {
             *p++ = vk;
             *p++ = ss_mac[j];
             *p++ = unicodeString[0];

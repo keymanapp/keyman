@@ -72,8 +72,7 @@ extern const int MAC_OPT;
 extern const int MAC_SHIFT_OPT;
 
 extern const KMX_DWORD KMX_VKMap[];
-extern const int ss_mac[];
-extern int sizeof_ss_mac;
+const int ss_mac[] = {MAC_BASE, MAC_SHIFT, MAC_OPT, MAC_SHIFT_OPT};
 
 /** @brief map a shiftstate used on Windows to a shiftstate suitable for UCKeyTranslate() on the mac */
 int mac_convert_Shiftstate_to_MacShiftstate(int shiftState);
