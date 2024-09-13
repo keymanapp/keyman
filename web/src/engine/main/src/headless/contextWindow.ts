@@ -1,3 +1,4 @@
+import { CasingForm, Configuration, Context } from '@keymanapp/common-types';
 import { Mock } from "keyman/engine/js-processor";
 
 export default class ContextWindow implements Context {

@@ -1,5 +1,5 @@
 // Includes KeymanWeb's Device class, as it's quite a useful resource for KMW-related projects.
-import { Device } from 'keyman/engine/device-detect';
+import { DeviceDetector } from 'keyman/engine/main';
 import { type DeviceSpec } from '@keymanapp/web-utils';
 
 import type { KeymanEngine } from 'keyman/app/browser';
@@ -243,7 +243,7 @@ export class BatchRenderer {
 
   fillDeviceNotes() {
     let description = document.createElement('p');
-    let device = new Device();
+    let device = new DeviceDetector();
     device.detect();
 
     description.appendChild(document.createTextNode('Browser: ' + device.browser));
