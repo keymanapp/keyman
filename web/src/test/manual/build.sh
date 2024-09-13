@@ -11,7 +11,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 # ################################ Main script ################################
 
 builder_describe "Builds the Keyman Engine for Web's sample page setups." \
-  "@/common/web/sentry-manager build" \
+  "@/web/src/engine/sentry-manager build" \
   "@/web/src/app/browser build" \
   "@/web/src/app/ui build" \
   "@/web/src/tools build" \
@@ -33,8 +33,8 @@ builder_describe_outputs \
 
 #### Resource paths ####
 
-SENTRY_MANAGER_SRC="$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js"
-SENTRY_MANAGER_MAP="$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js.map"
+SENTRY_MANAGER_SRC="$KEYMAN_ROOT/web/src/engine/sentry-manager/build/lib/index.js"
+SENTRY_MANAGER_MAP="$KEYMAN_ROOT/web/src/engine/sentry-manager/build/lib/index.js.map"
 SENTRY_SRC="$KEYMAN_ROOT/node_modules/@sentry/browser/build/bundle.min.js"
 SENTRY_MAP="$KEYMAN_ROOT/node_modules/@sentry/browser/build/bundle.min.js.map"
 

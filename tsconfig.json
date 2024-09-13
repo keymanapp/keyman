@@ -2,16 +2,10 @@
   "references": [
     { "path": "./core/include/ldml/tsconfig.json" },
 
-    { "path": "./common/models/templates/tsconfig.json" },
-    { "path": "./common/models/types/tsconfig.json" },
-    { "path": "./common/models/wordbreakers/tsconfig.json" },
     { "path": "./common/tools/hextobin/" },
 
     { "path": "./common/web/keyman-version" },
-    { "path": "./common/web/recorder/tsconfig.json" },
-    { "path": "./common/web/sentry-manager/src/tsconfig.json" },
     { "path": "./common/web/types/" },
-    { "path": "./common/web/utils/tsconfig.json" },
 
     { "path": "./developer/src/common/web/test-helpers/tsconfig.json" },
     { "path": "./developer/src/common/web/utils/tsconfig.json" },
@@ -40,11 +34,17 @@
     { "path": "./resources/build/version/" },
 
     { "path": "./web/src/tsconfig.all.json" },
+    { "path": "./web/src/engine/common/web-utils" },
     { "path": "./web/src/engine/predictive-text/types/" },
+    { "path": "./web/src/engine/predictive-text/templates" },
+    { "path": "./web/src/engine/predictive-text/wordbreakers" },
     { "path": "./web/src/engine/predictive-text/worker-main/tsconfig.all.json" },
     { "path": "./web/src/engine/predictive-text/worker-thread" },
     { "path": "./web/src/engine/osk/gesture-processor/tsconfig.json" },
     { "path": "./web/src/engine/osk/gesture-processor/src/tools/unit-test-resources/tsconfig.json" },
+    { "path": "./web/src/engine/sentry-manager" },
+
+    { "path": "./web/src/tools/recorder-recorder" },
     // { "path": "./web/tools/recorder/tsconfig.json" },
     // { "path": "./web/tools/sourcemap-root/tsconfig.json" },
   ]
