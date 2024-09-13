@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.111 alpha 2024-09-13
+
+* chore(common): Update crowdin strings for Italian (#12408)
+* fix(common): correct offsets in KMX+ spec (#12350)
+* fix(android): Add gating to setLongpressDelay() (#12410)
+
 ## 18.0.110 alpha 2024-09-12
 
 * chore(common): Update to Unicode 16.0 (#12393)
