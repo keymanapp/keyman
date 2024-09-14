@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.112 alpha 2024-09-14
+
+* chore(deps): bump express from 4.19.2 to 4.20.0 (#12396)
+
 ## 18.0.111 alpha 2024-09-13
 
 * chore(common): Update crowdin strings for Italian (#12408)
