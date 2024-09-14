@@ -310,8 +310,11 @@ public final class KMManager {
   public static final String KMDefault_DictionaryVersion = "0.1.4";
   public static final String KMDefault_DictionaryKMP = KMDefault_DictionaryPackageID + FileUtils.MODELPACKAGE;
 
-  // Default KeymanWeb longpress delay in milliseconds
+  // Default KeymanWeb longpress delay constants in milliseconds
   public static final int KMDefault_LongpressDelay = 500;
+  public static final int KMMinimum_LongpressDelay = 300;
+  public static final int KMMaximum_LongpressDelay = 1500;
+
 
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
@@ -1274,17 +1277,13 @@ public final class KMManager {
   /**
    * Sets enterMode which specifies how the System keyboard ENTER key is handled
    *
-   * @param imeOptions EditorInfo.imeOptions
-   * @param inputType  InputType
+   * @param imeOptions EditorInfo.imeOptions used to determine the action
+   * @param inputType  InputType used to determine if the text field is multi-line
    */
   public static void setEnterMode(int imeOptions, int inputType) {
-    if ((inputType & InputType.TYPE_TEXT_FLAG_MULTI_LINE) != 0) {
-      enterMode = EnterModeType.NEWLINE;
-      return;
-    }
-
-    int imeActions = imeOptions & EditorInfo.IME_MASK_ACTION;
     EnterModeType value = EnterModeType.DEFAULT;
+    int imeActions = imeOptions & EditorInfo.IME_MASK_ACTION;
+    boolean isMultiLine = (inputType & InputType.TYPE_TEXT_FLAG_MULTI_LINE) != 0;
 
     switch (imeActions) {
       case EditorInfo.IME_ACTION_GO:
@@ -1296,7 +1295,8 @@ public final class KMManager {
         break;
 
       case EditorInfo.IME_ACTION_SEND:
-        value = EnterModeType.SEND;
+        value = isMultiLine ?
+          EnterModeType.NEWLINE :EnterModeType.SEND;
         break;
 
       case EditorInfo.IME_ACTION_NEXT:
@@ -1304,7 +1304,8 @@ public final class KMManager {
         break;
 
       case EditorInfo.IME_ACTION_DONE:
-        value = EnterModeType.DONE;
+        value = isMultiLine ?
+          EnterModeType.NEWLINE : EnterModeType.DONE;
         break;
 
       case EditorInfo.IME_ACTION_PREVIOUS:
@@ -1312,7 +1313,8 @@ public final class KMManager {
         break;
 
       default:
-        value = EnterModeType.DEFAULT;
+        value = isMultiLine ?
+          EnterModeType.NEWLINE : EnterModeType.DEFAULT;
     }
 
     enterMode = value;
@@ -2098,14 +2100,22 @@ public final class KMManager {
 
   /**
    * Set the longpress delay (in milliseconds) as a stored preference.
+   * Valid range is 300 ms to 1500 ms. Returns true if the preference is successfully stored.
    * @param longpressDelay - int longpress delay in milliseconds
+   * @return boolean
    */
-  public static void setLongpressDelay(int longpressDelay) {
+  public static boolean setLongpressDelay(int longpressDelay) {
+    if (longpressDelay < KMMinimum_LongpressDelay || longpressDelay > KMMaximum_LongpressDelay) {
+      return false;
+    }
+
     SharedPreferences prefs = appContext.getSharedPreferences(
       appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
     editor.putInt(KMKey_LongpressDelay, longpressDelay);
     editor.commit();
+
+    return true;
   }
 
   /**

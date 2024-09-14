@@ -105,12 +105,17 @@ android {
 }
 
 // how to configure the sentry android gradle plugin
-sentry {
-    // Disables or enables the automatic configuration of Native symbols
-    uploadNativeSymbols = true
+task publishSentry {
+    doLast {
+        println 'Publishing Keyman symbols to Sentry'
+        sentry {
+            // Disables or enables the automatic configuration of Native symbols
+            uploadNativeSymbols = true
 
-    // Does or doesn't include the source code of native code for Sentry
-    includeNativeSources = true
+            // Does or doesn't include the source code of native code for Sentry
+            includeNativeSources = true
+        }
+    }
 }
 
 String env_keys_json_file = System.getenv("keys_json_file")
@@ -145,7 +150,6 @@ repositories {
         dirs 'libs'
     }
     google()
-    jcenter()
 }
 
 dependencies {

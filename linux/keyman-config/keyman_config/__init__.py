@@ -1,5 +1,6 @@
 import atexit
 import gettext
+import importlib
 import logging
 import os
 import pathlib
@@ -51,6 +52,14 @@ def initialize_logging(args):
 
 def initialize_sentry():
     SentryErrorHandling().initialize_sentry()
+
+
+def are_requirements_missing():
+    try:
+        ttLib = importlib.import_module('fontTools.ttLib')
+    except ImportError:
+        return True
+    return False
 
 
 class FileCleanup():
