@@ -39,4 +39,4 @@ KEYMAN_VERSION_CLDR=45                        # LDML Keyboards version
 KEYMAN_VERSION_ISO639_3=2024-05-22            # Date of last import
 KEYMAN_VERSION_LANGTAGS=2024-05-22            # Date of last import
 KEYMAN_VERSION_LANGTAGS_SUBTAG_REGISTRY=2024-05-16  # Date of last import
-KEYMAN_VERSION_UNICODE=15.1.0                 # UCD + related data
+KEYMAN_VERSION_UNICODE=16.0.0                 # UCD + related data

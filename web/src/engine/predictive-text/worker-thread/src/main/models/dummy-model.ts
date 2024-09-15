@@ -1,5 +1,7 @@
 /// <reference types="@keymanapp/lm-message-types" />
 
+import { Capabilities, CasingForm, Configuration, Context, Distribution, LexicalModel, LexicalModelPunctuation, Outcome, Suggestion, Transform, WordBreakingFunction } from '@keymanapp/common-types';
+
 /*
  * Copyright (c) 2018 National Research Council Canada (author: Eddie A. Santos)
  * Copyright (c) 2018 SIL International

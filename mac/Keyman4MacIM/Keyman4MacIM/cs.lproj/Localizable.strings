@@ -26,10 +26,10 @@
 "message-keyboard-file-unreadable" = "Nelze číst soubor Keymana '%@'.";
 
 /* Message displayed in Configuration window when keyboard cannot be loaded */
-"message-error-loading-keyboard" = "(error loading keyboard)";
+"message-error-loading-keyboard" = "(chyba při načítání klávesnice)";
 
 /* Message displayed in Configuration window when keyboard metadata cannot be loaded */
-"message-error-unknown-metadata" = "unknown";
+"message-error-unknown-metadata" = "neznámé";
 
 /* Button text to acknowledge that .kmp file could not be read  */
 "button-keyboard-file-unreadable" = "OK";
@@ -50,22 +50,25 @@
 "button-download-complete" = "Hotovo";
 
 /* keyboards label in the Package Information window */
-"keyboards-label" = "Keyboards:";
+"keyboards-label" = "Klávesnice:";
 
 /* fonts label in the Package Information window */
-"fonts-label" = "Fonts:";
+"fonts-label" = "Písma:";
 
 /* package version label in the Package Information window */
-"package-version-label" = "Package Version:";
+"package-version-label" = "Verze balíčku:";
 
 /* author label in the Package Information window */
-"author-label" = "Author:";
+"author-label" = "Autor:";
 
 /* website label in the Package Information window */
-"website-label" = "Website:";
+"website-label" = "Webová stránka:";
 
 /* copyright label in the Package Information window */
-"copyright-label" = "Copyright:";
+"copyright-label" = "Autorská práva:";
 
 /* message displayed to alert user to need grant accessibility permission */
-"privacy-alert-text" = "To function properly, Keyman requires accessibility features:\n\nGrant access in System Preferences, Security & Privacy.\nRestart your system.";
+"privacy-alert-text" = "Ke správné funkci vyžaduje Keyman zpřístupnění:\n\nPovolte přístup v Předvolbách systému, Zabezpečení a soukromí.\nRestartujte systém.";
+
+/* Text of menu item in Input Menu when no Keyboards are configured -- include parentheses  */
+"no-keyboard-configured-menu-placeholder" = "(Žádná klávesnice nenastavena)";
