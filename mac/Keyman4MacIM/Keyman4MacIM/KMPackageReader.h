@@ -19,8 +19,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface KMPackageReader : NSObject
 
-@property (assign, nonatomic) BOOL debugMode;
-
 - (instancetype)init;
 - (KMPackageInfo *)loadPackageInfo:(NSString *)path;
 

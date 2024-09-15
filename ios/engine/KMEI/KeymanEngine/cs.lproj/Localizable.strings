@@ -125,7 +125,7 @@
 "kmp-error-missing-resource" = "Tento balíček neobsahuje požadovanou klávesnici ani slovník.";
 
 /* Error installing a Keyman package with a version of Keyman that does not support it */
-"kmp-error-unsupported-keyman-version" = "This package requires a newer version of Keyman.";
+"kmp-error-unsupported-keyman-version" = "Tento balíček vyžaduje novější verzi Keyman.";
 
 /* Error opening a Keyman package - cannot parse contents */
 "kmp-error-no-metadata" = "Tento balíček nebyl správně sestaven - obsah není znám.";

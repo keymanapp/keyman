@@ -14,6 +14,6 @@
 
 	"references": [
     { "path": "../../../app/browser" },
-    { "path": "../../../engine/device-detect" }
+    { "path": "../../../engine/main" }
 	]
 }

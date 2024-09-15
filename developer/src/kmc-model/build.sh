@@ -8,12 +8,12 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
-# TODO:   "@/common/models/types" \
-
 builder_describe "Keyman kmc Lexical Model Compiler module" \
   "@/common/web/keyman-version" \
+  "@/common/web/types" \
   "@/developer/src/common/web/test-helpers" \
-  "@/common/models/templates" \
+  "@/developer/src/common/web/utils" \
+  "@/web/src/engine/predictive-text/templates/" \
   "clean" \
   "configure" \
   "build" \

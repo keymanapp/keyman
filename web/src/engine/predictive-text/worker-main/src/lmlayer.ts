@@ -20,9 +20,10 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+import { Capabilities, Configuration, Context, Distribution, Reversion, Suggestion, Transform, USVString } from '@keymanapp/common-types';
 import PromiseStore from "./promise-store.js";
+import { OutgoingMessage } from '@keymanapp/lm-message-types';
 
-/// <reference types="@keymanapp/lm-message-types" />
 /// <reference types="worker-interface.d.ts" />
 
 /**

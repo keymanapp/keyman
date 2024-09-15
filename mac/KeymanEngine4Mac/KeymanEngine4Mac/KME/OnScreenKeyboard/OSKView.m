@@ -43,7 +43,7 @@
 }
 
 - (void)drawRect:(NSRect)rect {
-  os_log_debug([KMELogs uiLog], "OSKView drawRect: %{public}@", NSStringFromRect(rect));
+  os_log_debug([KMELogs oskLog], "OSKView drawRect: %{public}@", NSStringFromRect(rect));
   
   CGContextRef context = (CGContextRef)[[NSGraphicsContext currentContext] CGContext];
   CGContextSetLineJoin(context, kCGLineJoinRound);
