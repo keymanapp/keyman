@@ -32,6 +32,7 @@
   "dependencies": {
     "@keymanapp/common-types": "*",
     "@keymanapp/keyman-version": "*",
+    "@keymanapp/models-templates": "*",
     "typescript": "^5.4.5"
   },
   "devDependencies": {
