@@ -74,19 +74,19 @@ function upload {
 function upload_keyman_help {
   case $platform in
     android)
-      upload android/help products/android/$VERSION_RELEASE
+      upload android/docs/help products/android/$VERSION_RELEASE
       ;;
     ios)
-      upload ios/help products/iphone-and-ipad/$VERSION_RELEASE
+      upload ios/docs/help products/iphone-and-ipad/$VERSION_RELEASE
       ;;
     linux)
       pushd "$KEYMAN_ROOT/linux/keyman-config" > /dev/null
       ./build.sh build
       popd > /dev/null
-      upload linux/help products/linux/$VERSION_RELEASE
+      upload linux/docs/help products/linux/$VERSION_RELEASE
       ;;
     mac)
-      upload mac/help products/mac/$VERSION_RELEASE
+      upload mac/docs/help products/mac/$VERSION_RELEASE
       ;;
     windows)
       # Note: `/windows/src/desktop/help/build.sh web` must be run first
