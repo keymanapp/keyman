@@ -310,8 +310,11 @@ public final class KMManager {
   public static final String KMDefault_DictionaryVersion = "0.1.4";
   public static final String KMDefault_DictionaryKMP = KMDefault_DictionaryPackageID + FileUtils.MODELPACKAGE;
 
-  // Default KeymanWeb longpress delay in milliseconds
+  // Default KeymanWeb longpress delay constants in milliseconds
   public static final int KMDefault_LongpressDelay = 500;
+  public static final int KMMinimum_LongpressDelay = 300;
+  public static final int KMMaximum_LongpressDelay = 1500;
+
 
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
@@ -2097,14 +2100,22 @@ public final class KMManager {
 
   /**
    * Set the longpress delay (in milliseconds) as a stored preference.
+   * Valid range is 300 ms to 1500 ms. Returns true if the preference is successfully stored.
    * @param longpressDelay - int longpress delay in milliseconds
+   * @return boolean
    */
-  public static void setLongpressDelay(int longpressDelay) {
+  public static boolean setLongpressDelay(int longpressDelay) {
+    if (longpressDelay < KMMinimum_LongpressDelay || longpressDelay > KMMaximum_LongpressDelay) {
+      return false;
+    }
+
     SharedPreferences prefs = appContext.getSharedPreferences(
       appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = prefs.edit();
     editor.putInt(KMKey_LongpressDelay, longpressDelay);
     editor.commit();
+
+    return true;
   }
 
   /**
