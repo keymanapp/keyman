@@ -68,9 +68,16 @@ export class VarsCompiler extends SectionCompiler {
       // Strings
       for (const { id, value } of variables.string) {
         addId(id);
-        allStrings.add(id);
         const stringrefs = VariableParser.allStringReferences(value);
+        for(const ref of stringrefs) {
+          if(!allStrings.has(ref)) {
+            valid = false;
+            this.callbacks.reportMessage(CompilerMessages.Error_MissingStringVariable({id: ref}));
+            allStrings.add(ref); // avoids multiple reports of same missing variable
+          }
+        }
         st.string.add(SubstitutionUse.variable, stringrefs);
+        allStrings.add(id);
       }
       // Sets
       for (const { id, value } of variables.set) {
