@@ -805,7 +805,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_a_test) {
     u16cpy(str, u"any()");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidAny, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // KmnCompilerMessages::ERROR_InvalidAny, space in delimiters (see I11814, I11937, #11910, #11894, #11938)
+    // KmnCompilerMessages::ERROR_InvalidAny, space in delimiters (see #11814, #11937, #11910, #11894, #11938)
     u16cpy(str, u"any( )");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidAny, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
@@ -839,7 +839,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_a_test) {
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(tstr_any_valid, tstr));
 
-    // space after store, valid (see I11937, #11938)
+    // space after store, valid (see #11937, #11938)
     u16cpy(str, u"any(b )");
     file_store[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
@@ -885,7 +885,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_b_test) {
     u16cpy(str, u"baselayout()");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // baselayout, space in delimiters (see I11814, I11937, #11910, #11894, #11938)
+    // baselayout, space in delimiters (see #11814, #11937, #11910, #11894, #11938)
     fileKeyboard.version = VERSION_90;
     u16cpy(str, u"baselayout( )");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
@@ -912,7 +912,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_b_test) {
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(tstr_baselayout_valid, tstr));
 
-    // baselayout, space after argument, valid (see I11937, #11938)
+    // baselayout, space after argument, valid (see #11937, #11938)
     fileKeyboard.version = VERSION_90;
     fileKeyboard.cxStoreArray = 0;
     fileKeyboard.dpStoreArray = nullptr;
@@ -959,7 +959,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     u16cpy(str, u"if()");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidIf, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // if, space in delimiters (see I11814, I11937, #11910, #11894, #11938)
+    // if, space in delimiters (see #11814, #11937, #11910, #11894, #11938)
     fileKeyboard.version = VERSION_80;
     fileKeyboard.dwFlags = 0u;
     u16cpy(str, u"if( )");
@@ -1029,7 +1029,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(tstr_if_option_valid, tstr));
 
-    // if, option, equal, space after rhs, valid (see I11937, #11938)
+    // if, option, equal, space after rhs, valid (see #11937, #11938)
     fileKeyboard.version = VERSION_80;
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = option;
@@ -1057,7 +1057,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     u16cpy(str, u"index()");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // index, space in delimiters (see I11814, I11937, #11910, #11894, #11938)
+    // index, space in delimiters (see #11814, #11937, #11910, #11894, #11938)
     u16cpy(str, u"index( )");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
@@ -1199,7 +1199,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_o_test) {
     u16cpy(str, u"outs()");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidOuts, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // outs, space in delimiters (see I11814, I11937, #11910, #11894, #11938)
+    // outs, space in delimiters (see #11814, #11937, #11910, #11894, #11938)
     u16cpy(str, u"outs( )");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidOuts, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
@@ -1235,7 +1235,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_o_test) {
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(tstr_outs_valid, tstr));
 
-    // outs, space after store, valid (see I11937, #11938)
+    // outs, space after store, valid (see #11937, #11938)
     file_store[1].dpString = (PKMX_WCHAR)u"abc";
     u16cpy(str, u"outs(b )");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
@@ -1364,7 +1364,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
     u16cpy(str, u"call()");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidCall, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // call, space in delimiters (see I11814, I11937, #11910, #11894, #11938)
+    // call, space in delimiters (see #11814, #11937, #11910, #11894, #11938)
     fileKeyboard.version = VERSION_501;
     u16cpy(str, u"call( )");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidCall, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
@@ -1409,7 +1409,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
     EXPECT_EQ(0, u16cmp(tstr_call_valid, tstr));
     EXPECT_EQ(TSS_CALLDEFINITION, file_store[1].dwSystemID);
 
-    // call, space after store, valid (see I11937, #11938)
+    // call, space after store, valid (see #11937, #11938)
     fileKeyboard.version = VERSION_501;
     file_store[1].dpString = (PKMX_WCHAR)u"a.dll:A";
     file_store[1].dwSystemID = TSS_NONE;
@@ -1497,7 +1497,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_n_test) {
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(tstr_notany_valid, tstr));
 
-    // notany, space after store, valid (see I11937, #11938)
+    // notany, space after store, valid (see #11937, #11938)
     fileKeyboard.version = VERSION_70;
     u16cpy(str, u"notany(b )");
     file_store[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
