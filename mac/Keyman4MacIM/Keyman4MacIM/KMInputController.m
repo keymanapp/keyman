@@ -32,7 +32,12 @@ KMInputMethodEventHandler* _eventHandler;
     self.appDelegate.inputController = self;
   }
   
-  // register to receive notifications generated from KMInputMethodLifecycle
+  /**
+   * Register to receive the Deactivated and ChangedClient notification generated from KMInputMethodLifecycle so
+   * that the eventHandler can be changed. There is no need to receive the Activated notification because
+   * the InputController does it all it needs to when it receives the ChangedClient.
+   */
+
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inputMethodDeactivated:) name:kInputMethodDeactivatedNotification object:nil];
   [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inputMethodChangedClient:) name:kInputMethodClientChangeNotification object:nil];
 

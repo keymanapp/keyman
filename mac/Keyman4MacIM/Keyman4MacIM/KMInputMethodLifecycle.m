@@ -41,7 +41,7 @@ NSString *const kInputMethodActivatedNotification = @"kInputMethodActivatedNotif
 NSString *const kInputMethodDeactivatedNotification = @"kInputMethodDeactivatedNotification";
 NSString *const kInputMethodClientChangeNotification = @"kInputMethodClientChangeNotification";
 NSString *const keymanInputMethodName = @"keyman.inputmethod.Keyman";
-const double transitionDelay = 0.2;
+const double transitionDelay = 0.25;
 
 typedef enum {
   Started,
@@ -167,6 +167,11 @@ typedef enum {
      break;
     case Activate:
       os_log_info([KMLogs lifecycleLog], "performTransition: Activate, new InputSourceId: %{public}@, new application ID: %{public}@", currentInputSource, currentClientAppId);
+      /**
+       * Perform two actions when activating the input method. 
+       * Change the client first which prepares the event handler.
+       * Then do the activate which starts the event loop and opens the OSK.
+       */
       [self changeClient];
       [self activateInputMethod];
       break;
