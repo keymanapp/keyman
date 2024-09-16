@@ -1,12 +1,15 @@
 package com.keyman.engine.cloud;
 
 import android.app.DownloadManager;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
+import android.provider.Settings;
 import android.util.Log;
 
 import com.keyman.engine.util.KMLog;
@@ -21,6 +24,7 @@ import java.util.List;
 public class CloudDownloadMgr{
   private static final String TAG = "CloudDownloadMgr";
   private static CloudDownloadMgr instance;
+  private static final String DOWNLOAD_MANAGER = "com.android.providers.downloads";
 
   /**
    *
@@ -48,6 +52,7 @@ public class CloudDownloadMgr{
    * Marks that the download receiver is already appended to the main context.
    */
   boolean isInitialized = false;
+  int state;
 
   private HashMap<Long,String> internalDownloadIdToDownloadIdentifier = new HashMap<>();
   private HashMap<String, CloudApiTypes.CloudDownloadSet> downloadSetByDownloadIdentifier = new HashMap<>();
@@ -75,6 +80,30 @@ public class CloudDownloadMgr{
       String message = "initialize error: ";
       KMLog.LogException(TAG, message, e);
     }
+
+    // Check if DownloadManager is enabled
+    // https://github.com/keymanapp/keyman.com/issues/385
+    state = aContext.getPackageManager().getApplicationEnabledSetting(DOWNLOAD_MANAGER);
+    boolean override = true; // test code
+    if (override) {
+      // DownloadManager disabled
+      KMLog.LogBreadcrumb(TAG, DOWNLOAD_MANAGER + " is disabled", true);
+
+      try {
+        // Attempt to open the DownloadManager Info page
+        // We want the user to enable it
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        intent.setData(Uri.parse("package:" + DOWNLOAD_MANAGER));
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        aContext.startActivity(intent);
+      } catch (ActivityNotFoundException e) {
+        // Open the generic Apps page
+        Intent intent = new Intent(android.provider.Settings.ACTION_MANAGE_APPLICATIONS_SETTINGS);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        aContext.startActivity(intent);
+      }
+    }
+
     isInitialized = true;
     KMLog.LogBreadcrumb("CloudDownloadMgr", ".initialize() call complete", false);
   }
@@ -113,6 +142,19 @@ public class CloudDownloadMgr{
       downloadCompleted(context,id);
     }
   };
+
+  /**
+   * Determine if DownloadManager is enabled at the device level.
+   * Reference: https://stackoverflow.com/questions/30671548/unknown-url-content-downloads-my-downloads
+   * @return boolean - true if the DownloadManager is enabled to access downloads
+   */
+  private boolean downloadManagerEnabled() {
+    return (state == PackageManager.COMPONENT_ENABLED_STATE_DISABLED ||
+      state == PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER ||
+      state == PackageManager.COMPONENT_ENABLED_STATE_DISABLED_UNTIL_USED) ?
+      false :
+      true;
+  }
 
   /**
    * find download set by the android internal download id.
@@ -222,6 +264,10 @@ public class CloudDownloadMgr{
     synchronized (downloadSetByDownloadIdentifier) {
 
       if (alreadyDownloadingData(aDownloadIdentifier) || params == null) {
+        return;
+      }
+
+      if (!downloadManagerEnabled()) {
         return;
       }
 
