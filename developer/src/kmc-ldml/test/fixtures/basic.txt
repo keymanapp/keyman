@@ -1,4 +1,6 @@
 #
+# Keyman is copyright (C) SIL International. MIT License.
+#
 # basic.txt describes the expected output of running kmc against basic.xml. It is used in
 # the end-to-end test test-compiler-e2e.ts.
 #
@@ -402,7 +404,7 @@ block(layr)                         # struct COMP_KMXPLUS_LAYR {
   01 00 00 00 # count
   7B 00 00 00                       #   KMX_DWORD minDeviceWidth; // 123
   # layers 0
-  index(strNull,strBase,2)          #   KMXPLUS_STR id;
+  00 00 00 00                       #   KMXPLUS_STR id;
   00 00 00 00                       #   KMX_DWORD mod
   00 00 00 00                       #   KMX_DWORD row index
   01 00 00 00                       #   KMX_DWORD  count
@@ -502,7 +504,6 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
   diff(strs,strSet)   sizeof(strSet,2)
   diff(strs,strSet2)   sizeof(strSet2,2)
   diff(strs,strTranTo)          sizeof(strTranTo,2)
-  diff(strs,strBase)   sizeof(strBase,2)
   diff(strs,strElemBkspFrom2) sizeof(strElemBkspFrom2,2)
   diff(strs,strGapReserved) sizeof(strGapReserved,2)
   diff(strs,strHmaqtugha) sizeof(strHmaqtugha,2)
@@ -538,7 +539,6 @@ block(strs)                         #  struct COMP_KMXPLUS_STRS {
 #str #0A
   block(strSet2)             61 00 62 00 63 00 block(x) 00 00                           # 'abc'
   block(strTranTo)           61 00 02 03 block(x) 00 00                          # 'â' (U+0061 U+0302)
-  block(strBase)             62 00 61 00 73 00 65 00 block(x) 00 00                     # 'base'
   block(strElemBkspFrom2)    65 00 block(x) 00 00                                       # 'e'
   block(strGapReserved)         67 00 61 00 70 00 20 00 28 00 72 00 65 00 73 00 65 00 72 00 76 00 65 00 64 00 29 00 block(x) 00 00 # 'gap (reserved)'
   block(strHmaqtugha)        68 00 6d 00 61 00 71 00 74 00 75 00 67 00 68 00 61 00 block(x) 00 00   # 'hmaqtugha'

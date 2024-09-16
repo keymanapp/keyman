@@ -20,6 +20,7 @@ export { VariableParser, MarkerParser } from './ldml-keyboard/pattern-parser.js'
 export { LDMLKeyboardXMLSourceFileReader, LDMLKeyboardXMLSourceFileReaderOptions } from './ldml-keyboard/ldml-keyboard-xml-reader.js';
 
 export * as Constants from './consts/virtual-key-constants.js';
+export { ModifierKeyConstants } from './consts/modifier-key-constants.js';
 
 export { defaultCompilerOptions, CompilerBaseOptions, CompilerCallbacks, CompilerOptions, CompilerEvent, CompilerErrorNamespace,
          CompilerErrorSeverity, CompilerPathCallbacks, CompilerFileSystemCallbacks, CompilerCallbackOptions,

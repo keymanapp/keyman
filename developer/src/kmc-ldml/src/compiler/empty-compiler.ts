@@ -5,7 +5,7 @@ import { VarsCompiler } from './vars.js';
 import { CompilerMessages } from './messages.js';
 
 /**
- * Compiler for typrs that don't actually consume input XML
+ * Compiler for types that don't actually consume input XML
  */
 export abstract class EmptyCompiler extends SectionCompiler {
   private _id: SectionIdent;

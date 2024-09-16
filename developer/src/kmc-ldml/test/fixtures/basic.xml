@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Keyman is copyright (C) SIL International. MIT License. -->
 
 <!--
 @@keys: [K_Q][K_W][K_Q]
@@ -23,7 +24,8 @@
   </keys>
 
   <layers formId="us" minDeviceWidth="123">
-    <layer id="base">
+    <!-- TODO-LDML: unit test for <layers formId="us" with <layer id="base" should be illegal -->
+    <layer modifiers="none">
       <row keys="hmaqtugha that" />
     </layer>
   </layers>
