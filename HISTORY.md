@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.113 alpha 2024-09-16
+
+* test(developer): kmcmplib compiler unit tests 3 (#11990)
+
 ## 18.0.112 alpha 2024-09-14
 
 * chore(deps): bump express from 4.19.2 to 4.20.0 (#12396)
