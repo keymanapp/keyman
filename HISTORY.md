@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 17.0.330 stable 2024-09-16
+
+* refactor(android): Move Sentry and APK to publish task (#12392)
+* fix(developer): rewrite ldml visual keyboard compiler (#12406)
+* fix(developer): check vars string usage before definition (#12407)
+
 ## 17.0.329 stable 2024-09-09
 
 * chore(android,ios): Add ojibwa ifinal/rdot keyboards to FirstVoices (#12020)
