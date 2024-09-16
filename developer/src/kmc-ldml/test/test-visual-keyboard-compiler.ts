@@ -6,7 +6,7 @@ import * as path from 'path';
 import {assert} from 'chai';
 import { stripIndent } from 'common-tags';
 
-import { KvkFileWriter, LDMLKeyboardXMLSourceFileReader, VisualKeyboard } from '@keymanapp/common-types';
+import { KMX, KvkFileWriter, LDMLKeyboardXMLSourceFileReader, VisualKeyboard } from '@keymanapp/common-types';
 import hextobin from '@keymanapp/hextobin';
 
 import { checkMessages, compilerTestCallbacks, compilerTestOptions, makePathToFixture } from './helpers/index.js';
@@ -38,9 +38,16 @@ describe('visual-keyboard-compiler', function() {
     let kmx = await k.compile(source);
     assert(kmx, 'k.compile should not have failed');
 
-    const vk = (new LdmlKeyboardVisualKeyboardCompiler(compilerTestCallbacks)).compile(kmx.kmxplus, path.basename(inputFilename, '.xml'));
+    const keyboardId = path.basename(inputFilename, '.xml');
+
+    const vk = (new LdmlKeyboardVisualKeyboardCompiler(compilerTestCallbacks)).compile(kmx.kmxplus, keyboardId);
     checkMessages();
     assert.isNotNull(vk, 'LdmlKeyboardVisualKeyboardCompiler.compile should not have returned null');
+    assert.isNotNull(kmx.keyboard.stores.find(store =>
+      store.dwSystemID == KMX.KMXFile.TSS_VISUALKEYBOARD &&
+      store.dpString == keyboardId + '.kvk'
+    ));
+    assert(typeof vk == 'object');
 
     // Use the builder to generate the binary output file
     const writer = new KvkFileWriter();
@@ -220,6 +227,7 @@ async function loadVisualKeyboardFromXml(xml: string, id: string) {
   assert(kmx, 'k.compile should not have failed');
 
   const vk = (new LdmlKeyboardVisualKeyboardCompiler(compilerTestCallbacks)).compile(kmx.kmxplus, id);
+  assert(typeof vk == 'object');
   assert.isEmpty(compilerTestCallbacks.messages);
   assert.isOk(vk);
 

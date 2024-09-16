@@ -40,7 +40,15 @@ export class LdmlKeyboardVisualKeyboardCompiler {
   public constructor(private callbacks: CompilerCallbacks) {
   }
 
-  public compile(source: KMXPlus.KMXPlusData, keyboardId: string): VisualKeyboard.VisualKeyboard {
+  /**
+   * Generate a visual keyboard
+   * @param source      Compiled KMX+ data; note that this is modified to add
+   *                    &VISUALKEYBOARD system store on success
+   * @param keyboardId  Basename of keyboard, without file extension
+   * @returns           Visual keyboard data on success, null on failure, or
+   *                    false if no VK was generated for this keyboard
+   */
+  public compile(source: KMXPlus.KMXPlusData, keyboardId: string): VisualKeyboard.VisualKeyboard | boolean | null {
     let result = new VisualKeyboard.VisualKeyboard();
 
     /* TODO-LDML: consider VisualKeyboardHeaderFlags.kvkhUseUnderlying kvkhDisplayUnderlying kvkhAltGr kvkh102 */
@@ -50,6 +58,8 @@ export class LdmlKeyboardVisualKeyboardCompiler {
     result.header.ansiFont = {...VisualKeyboard.DEFAULT_KVK_FONT};
     result.header.unicodeFont = {...VisualKeyboard.DEFAULT_KVK_FONT};
 
+    let hasVisualKeyboard = false;
+
     for(let layersList of source.layr.lists) {
       const formId = layersList.hardware.value;
       if(formId == 'touch') {
@@ -57,9 +67,23 @@ export class LdmlKeyboardVisualKeyboardCompiler {
       }
 
       for(let layer of layersList.layers) {
-        this.compileHardwareLayer(source, result, layer, formId);
+        const res = this.compileHardwareLayer(source, result, layer, formId);
+        if(res === false) {
+          // failed to compile the layer
+          return null;
+        }
+        if(res === null) {
+          // not a supported layer type, but not an error
+          continue;
+        }
+        hasVisualKeyboard = true;
       }
     }
+
+    if(!hasVisualKeyboard) {
+      return false;
+    }
+
     return result;
   }
 
@@ -76,9 +100,10 @@ export class LdmlKeyboardVisualKeyboardCompiler {
     const shift = this.translateLayerModifiersToVisualKeyboardShift(layer.mod);
     if(shift === null) {
       // Caps (num, scroll) is not a supported shift state in .kvk
-      return;
+      return null;
     }
 
+    let result = true;
     let y = -1;
     for(let row of layer.rows) {
       y++;
@@ -94,6 +119,7 @@ export class LdmlKeyboardVisualKeyboardCompiler {
           this.callbacks.reportMessage(
             CompilerMessages.Error_KeyNotFoundInKeyBag({ keyId: key.value, layer: layerId, row: y, col: x, form: hardware })
           );
+          result = false;
         } else {
           vk.keys.push({
             flags: VisualKeyboard.VisualKeyboardKeyFlags.kvkkUnicode,
@@ -104,6 +130,7 @@ export class LdmlKeyboardVisualKeyboardCompiler {
         }
       }
     }
+    return result;
   }
 
   private getDisplayFromKey(keydef: KMXPlus.KeysKeys, source: KMXPlus.KMXPlusData) {
