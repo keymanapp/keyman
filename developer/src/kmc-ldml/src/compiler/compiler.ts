@@ -3,7 +3,7 @@
  *
  * Compiles a LDML XML keyboard file into a Keyman KMXPlus file
  */
-import { KMXPlus, UnicodeSetParser, KvkFileWriter } from '@keymanapp/common-types';
+import { KMXPlus, UnicodeSetParser, KvkFileWriter, KMX } from '@keymanapp/common-types';
 import {
   CompilerCallbacks, KeymanCompiler, KeymanCompilerResult, KeymanCompilerArtifacts,
   defaultCompilerOptions, LDMLKeyboardXMLSourceFileReader, LDMLKeyboard,
@@ -149,13 +149,27 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
     KMXPlusMetadataCompiler.addKmxMetadata(kmx.kmxplus, kmx.keyboard, compilerOptions);
 
     // Use the builder to generate the binary output file
-    const builder = new KMXBuilder(kmx, compilerOptions.saveDebug);
-    const kmx_binary = builder.compile();
+    const kmxBuilder = new KMXBuilder(kmx, compilerOptions.saveDebug);
+    const keyboardId = this.callbacks.path.basename(outputFilename, '.kmx');
+    const vkCompiler = new LdmlKeyboardVisualKeyboardCompiler(this.callbacks);
+    const vkCompilerResult = vkCompiler.compile(kmx.kmxplus, keyboardId);
+    if(vkCompilerResult === null) {
+      return null;
+    }
+    const vkData = typeof vkCompilerResult == 'object' ? vkCompilerResult : null;
 
-    const vkcompiler = new LdmlKeyboardVisualKeyboardCompiler(this.callbacks);
-    const vk = vkcompiler.compile(kmx.kmxplus, this.callbacks.path.basename(outputFilename, '.kmx'));
-    const writer = new KvkFileWriter();
-    const kvk_binary = writer.write(vk);
+    if(vkData) {
+      kmx.keyboard.stores.push({
+        dpName: '',
+        dpString: keyboardId + '.kvk',
+        dwSystemID: KMX.KMXFile.TSS_VISUALKEYBOARD
+      });
+    }
+
+    const kmxBinary = kmxBuilder.compile();
+
+    const kvkWriter = new KvkFileWriter();
+    const kvkBinary = vkData ? kvkWriter.write(vkData) : null;
 
     // Note: we could have a step of generating source files here
     // KvksFileWriter()...
@@ -168,11 +182,10 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
     //KMW17.0: const encoder = new TextEncoder();
     //KMW17.0: const kmw_binary = encoder.encode(kmw_string);
 
-
     return {
       artifacts: {
-        kmx: { data: kmx_binary, filename: outputFilename },
-        kvk: { data: kvk_binary, filename: outputFilename.replace(/\.kmx$/, '.kvk') },
+        kmx: { data: kmxBinary, filename: outputFilename },
+        kvk: kvkBinary ? { data: kvkBinary, filename: outputFilename.replace(/\.kmx$/, '.kvk') } : null,
         //KMW17.0: js: { data: kmw_binary, filename: outputFilename.replace(/\.kmx$/, '.js') },
       }
     };
