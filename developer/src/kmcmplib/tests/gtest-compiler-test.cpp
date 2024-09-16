@@ -1455,7 +1455,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_n_test) {
     u16cpy(str, u"notany()");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidAny, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // notany, space in delimiters (see I11814, I11937, #11910, #11894, #11938)
+    // notany, space in delimiters (see #11814, #11937, #11910, #11894, #11938)
     fileKeyboard.version = VERSION_70;
     u16cpy(str, u"notany( )");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidAny, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
