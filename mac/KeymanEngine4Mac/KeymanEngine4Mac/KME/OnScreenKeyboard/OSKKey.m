@@ -14,7 +14,10 @@
 - (id)initWithKeyCode:(NSUInteger)keyCode caption:(NSString *)caption scale:(CGFloat)scale {
   self = [super init];
   if (self) {
-    os_log_debug([KMELogs oskLog], "OSKKey initWithKeyCode: 0x%lx, caption: %{public}@, scale: %f", keyCode, caption, scale);
+    /*
+     // usually too much logging, uncomment for debugging
+     os_log_debug([KMELogs oskLog], "OSKKey initWithKeyCode: 0x%lx, caption: %{public}@, scale: %f", keyCode, caption, scale);
+    */
     _keyCode = keyCode;
     
     if (caption == nil)

@@ -3,7 +3,7 @@ import { EventEmitter } from "eventemitter3";
 import { DeviceSpec, KeyboardProperties, ManagedPromise, physicalKeyDeviceAlias, SpacebarText } from "keyman/engine/keyboard";
 import { OutputTarget, RuleBehavior } from 'keyman/engine/js-processor';
 import { PathConfiguration, PathOptionDefaults, PathOptionSpec } from "keyman/engine/interfaces";
-import { Device } from "keyman/engine/device-detect";
+import { DeviceDetector } from "./headless/deviceDetector.js";
 import { KeyboardStub } from "keyman/engine/keyboard-storage";
 
 interface EventMap {
@@ -31,7 +31,7 @@ export class EngineConfiguration extends EventEmitter<EventMap> {
     super();
 
     if(!device) {
-      const deviceDetector = new Device();
+      const deviceDetector = new DeviceDetector();
       deviceDetector.detect();
 
       device = deviceDetector.coreSpec;

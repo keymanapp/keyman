@@ -17,11 +17,6 @@
       "types": "./build/engine/core-processor/obj/index.d.ts",
       "import": "./build/engine/core-processor/obj/index.js"
     },
-    "./engine/device-detect": {
-      "es6-bundling": "./src/engine/device-detect/src/index.ts",
-      "types": "./build/engine/device-detect/obj/index.d.ts",
-      "import": "./build/engine/device-detect/obj/index.js"
-    },
     "./engine/dom-utils": {
       "es6-bundling": "./src/engine/dom-utils/src/index.ts",
       "types": "./build/engine/dom-utils/obj/index.d.ts",
@@ -120,7 +115,8 @@
     "c8": "^7.12.0",
     "express": "^4.19.2",
     "jsdom": "^23.0.1",
-    "mocha": "^10.0.0"
+    "mocha": "^10.0.0",
+    "tsx": "^4.19.0"
   },
   "scripts": {
     "test": "gosh ./test.sh"
@@ -128,7 +124,7 @@
   "dependencies": {
     "@keymanapp/keyman-version": "*",
     "@keymanapp/lexical-model-layer": "*",
-    "@keymanapp/models-types": "*",
+    "@keymanapp/common-types": "*",
     "@keymanapp/recorder-core": "*",
     "@keymanapp/web-utils": "*",
     "core-js": "^3.34.0",

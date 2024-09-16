@@ -3,6 +3,7 @@ import { Mock, OutputTarget, Transcription, findCommonSubstringEndIndex, isEmpty
 import { KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { ContextManagerBase } from 'keyman/engine/main';
 import { WebviewConfiguration } from './configuration.js';
+import { Transform } from '@keymanapp/common-types';
 
 export type OnInsertTextFunc = (deleteLeft: number, text: string, deleteRight: number) => void;
 

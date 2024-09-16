@@ -4,6 +4,7 @@ import * as correction from './correction/index.js'
 import TransformUtils from './transformUtils.js';
 import { correctAndEnumerate, dedupeSuggestions, finalizeSuggestions, predictionAutoSelect, processSimilarity, toAnnotatedSuggestion, tupleDisplayOrderSort } from './predict-helpers.js';
 import { detectCurrentCasing, determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
+import { CasingForm, Context, Distribution, LexicalModel, LexicalModelPunctuation, Reversion, Suggestion, Transform, USVString } from '@keymanapp/common-types';
 
 export class ModelCompositor {
   private lexicalModel: LexicalModel;

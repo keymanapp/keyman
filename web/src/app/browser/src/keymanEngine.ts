@@ -1,5 +1,4 @@
-import { KeymanEngine as KeymanEngineBase } from 'keyman/engine/main';
-import { Device as DeviceDetector } from 'keyman/engine/device-detect';
+import { KeymanEngine as KeymanEngineBase, DeviceDetector } from 'keyman/engine/main';
 import { getAbsoluteY } from 'keyman/engine/dom-utils';
 import { OutputTarget } from 'keyman/engine/element-wrappers';
 import {
@@ -660,7 +659,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *  @param  {(string)=}  argLayerId    name or index of layer to show, defaulting to 'default'
    *  @return {Object}                          DIV object with filled keyboard layer content
    *
-   * See https://help.keyman.com/developer/engine/web/current-version/reference/osk/BuildVisualKeyboard
+   * See https://help.keyman.com/developer/engine/web/current-version/reference/core/BuildVisualKeyboard
    */
   public BuildVisualKeyboard(
     PInternalName: string,

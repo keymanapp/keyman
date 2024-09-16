@@ -13,6 +13,9 @@
 #import "KMInputMethodEventHandler.h"
 #import "AppleCompliantTestClient.h"
 #import "TextApiCompliance.h"
+#import "KMSettingsRepository.h"
+#import "KMDataRepository.h"
+#import <os/log.h>
 
 KMInputMethodEventHandler *testEventHandler = nil;
 id testClient = nil;
