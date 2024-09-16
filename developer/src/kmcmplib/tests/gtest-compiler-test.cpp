@@ -1334,7 +1334,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(tstr_context_valid, tstr));
 
-    // context, space after offset, valid (see I11937, #11938)
+    // context, space after offset, valid (see #11937, #11938)
     fileKeyboard.version = VERSION_60;
     u16cpy(str, u"context(1 )");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
