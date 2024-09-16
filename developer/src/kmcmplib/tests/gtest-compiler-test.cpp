@@ -1287,7 +1287,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
     const KMX_WCHAR tstr_context_empty_offset_valid[] = { UC_SENTINEL, CODE_CONTEXT, 0 };
     EXPECT_EQ(0, u16cmp(tstr_context_empty_offset_valid, tstr));
 
-    // context, space in delimiters (see I11814, I11937, #11910, #11894, #11938)
+    // context, space in delimiters (see #11814, #11937, #11910, #11894, #11938)
     fileKeyboard.version = VERSION_60;
     u16cpy(str, u"context( )");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
