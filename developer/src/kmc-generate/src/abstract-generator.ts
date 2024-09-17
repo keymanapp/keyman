@@ -139,6 +139,7 @@ export class AbstractGenerator {
   protected static readonly SFile_HistoryMD = 'HISTORY.md';
   protected static readonly SFile_LicenseMD = 'LICENSE.md';
   protected static readonly SFile_ReadmeMD = 'README.md';
+  protected static readonly SFile_GitIgnore = '.gitignore';
 
   protected get callbacks(): CompilerCallbacks { return this._callbacks; }
   private _callbacks: CompilerCallbacks;
@@ -171,6 +172,7 @@ export class AbstractGenerator {
     this.filenameMap[AbstractGenerator.SFile_HistoryMD] = AbstractGenerator.SFile_HistoryMD;
     this.filenameMap[AbstractGenerator.SFile_LicenseMD] = AbstractGenerator.SFile_LicenseMD;
     this.filenameMap[AbstractGenerator.SFile_ReadmeMD] = AbstractGenerator.SFile_ReadmeMD;
+    this.filenameMap[AbstractGenerator.SFile_GitIgnore] = AbstractGenerator.SFile_GitIgnore;
 
     return true;
   }
