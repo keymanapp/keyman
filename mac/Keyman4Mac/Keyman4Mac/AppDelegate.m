@@ -9,8 +9,6 @@
 #import "AppDelegate.h"
 #import <KeymanEngine4Mac/KeymanEngine4Mac.h>
 
-static BOOL debugMode = YES;
-
 BOOL isKeyMapEnabled;
 const unsigned short keyMapSize = 0x80;
 
@@ -116,7 +114,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     NSLog(@"AppDelegate eventTapFunction key down event: %@", event);
     // Key down event
     NSEvent *mEvent = [NSEvent eventWithCGEvent:event];
-    KMEngine *kme = [[KMEngine alloc] initWithKMX:kmx context:contextBuffer verboseLogging:debugMode];
+    KMEngine *kme = [[KMEngine alloc] initWithKMX:kmx context:contextBuffer];
     CoreKeyOutput *coreKeyOutput = [kme processEvent:mEvent];
     if (coreKeyOutput) {
       if (coreKeyOutput.hasTextToInsert) {

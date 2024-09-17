@@ -25,16 +25,11 @@
 
 @implementation KMEngine
 
-NSMutableString* _easterEggForSentry = nil;
-const NSString* kEasterEggText = @"Sentrycrash#KME";
-const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
-
-- (id)initWithKMX:(KMXFile *)kmx context:(NSString *)contextString verboseLogging:(BOOL)enableDebugLogging {
+- (id)initWithKMX:(KMXFile *)kmx context:(NSString *)contextString {
   self = [super init];
   if (self) {
-    self.debugMode = enableDebugLogging;
     _kmx = kmx;
-    _coreHelper = [[CoreHelper alloc] initWithDebugMode:enableDebugLogging];
+    _coreHelper = [[CoreHelper alloc] init];
     
     if (kmx) {
       [self loadCoreWrapperFromKmxFile:self.kmx.filePath];
@@ -63,31 +58,6 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
   }
 }
 
-- (void)setUseVerboseLogging:(BOOL)useVerboseLogging {
-  self.debugMode = useVerboseLogging;
-  
-  if (self.coreHelper) {
-    self.coreHelper.debugMode = useVerboseLogging;
-  }
-  
-  if (useVerboseLogging) {
-    os_log_debug([KMELogs testLog], "KMEngine - Turning verbose logging on");
-    // In Keyman Engine if "debugMode" is turned on (explicitly) with "English plus Spanish" as the current keyboard and you type "Sentrycrash#KME",
-    // it will force a simulated crash to test reporting to sentry.keyman.com.
-    NSString * kmxName = [[_kmx filePath] lastPathComponent];
-    os_log_debug([KMELogs testLog], "Sentry - KME: _kmx name = %{public}@", kmxName);
-    if ([kEasterEggKmxName isEqualToString:kmxName]) {
-      os_log_debug([KMELogs testLog], "Sentry - KME: Preparing to detect Easter egg.");
-      _easterEggForSentry = [[NSMutableString alloc] init];
-    }
-    else
-      _easterEggForSentry = nil;
-  }
-  else {
-    os_log_debug([KMELogs testLog], "KMEngine - Turning verbose logging off");
-  }
-}
-
 - (NSString *)getCoreContextDebug {
   return self.coreWrapper.contextDebug;
 }
@@ -113,43 +83,6 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
     return nil;
   
   return [self.coreWrapper processEvent:event];
-}
-
-- (void) processPossibleEasterEggCharacterFrom:(NSString *)characters {
-  NSUInteger len = [_easterEggForSentry length];
-  os_log_debug([KMELogs keyLog], "Sentry - KME: Processing character(s): %{public}@", characters);
-  if ([characters length] == 1 && [characters characterAtIndex:0] == [kEasterEggText characterAtIndex:len]) {
-    NSString *characterToAdd = [kEasterEggText substringWithRange:NSMakeRange(len, 1)];
-    os_log_debug([KMELogs keyLog], "Sentry - KME: Adding character to Easter Egg code string: %{public}@", characterToAdd);
-    [_easterEggForSentry appendString:characterToAdd];
-    if ([kEasterEggText isEqualToString:_easterEggForSentry]) {
-      os_log_debug([KMELogs keyLog], "Sentry - KME: Forcing crash now!");
-      // Both of the following approaches do throw an exception that causes control to exit this method,
-      // but at least in my debug builds locally, neither one seems to get picked up by Sentry in a
-      // way that results in a new report on sentry.keyman.com
-      
-#ifndef USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE
-      //#1
-      @throw ([NSException exceptionWithName:@"SentryForce" reason:@"Easter egg hit" userInfo:nil]);
-      
-      //#2
-      //    NSDecimalNumber *i = [NSDecimalNumber decimalNumberWithDecimal:[@(1) decimalValue]];
-      //    NSDecimalNumber *o = [NSDecimalNumber decimalNumberWithDecimal:[@(0) decimalValue]];
-      //    // Divide by 0 to throw an exception
-      //    NSDecimalNumber *x = [i decimalNumberByDividingBy:o];
-      
-#else
-      //#3 The following DOES work, but it's really lame because the crash actually gets forced in the IM
-      // via this bogus call to a protocol method implemented in the IM's App Delegate just for the
-      // purpose of enabling the engine to force a crash.
-      [(NSObject <NSAlertDelegate> *)[NSApp delegate] alertShowHelp:[NSAlert alertWithMessageText:@"Forcing an error" defaultButton:nil alternateButton:nil otherButton:nil informativeTextWithFormat:@"Forcing an Easter egg error from KME!"]];
-#endif
-    }
-  }
-  else if (len > 0) {
-    os_log_debug([KMELogs keyLog], "Sentry - KME: Clearing Easter Egg code string.");
-    [_easterEggForSentry setString:@""];
-  }
 }
 
 - (NSString *)getCharsFromKeyCode:(UInt16)keyCode {
