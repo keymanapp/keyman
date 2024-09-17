@@ -1,39 +1,46 @@
-//
-//  KMInputController.m
-//  Keyman4MacIM
-//
-//  Created by Serkan Kurt on 29/01/2015.
-//  Copyright (c) 2017 SIL International. All rights reserved.
-//
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Created by Serkan Kurt on 2015-01-29.
+ *
+ */
 
 #import "KMInputController.h"
 #import "KMInputMethodEventHandler.h"
 #import "KMOSVersion.h"
 #include <Carbon/Carbon.h> /* For kVK_ constants. */
+#import "KMSettingsRepository.h"
 #import "KMLogs.h"
+#import "InputMethodKit/InputMethodKit.h"
+#import "KMInputMethodLifecycle.h"
+
 
 @implementation KMInputController
 
 KMInputMethodEventHandler* _eventHandler;
-NSMutableArray *servers;
 
-- (KMInputMethodAppDelegate *)AppDelegate {
+- (KMInputMethodAppDelegate *)appDelegate {
   return (KMInputMethodAppDelegate *)[NSApp delegate];
 }
 
 - (id)initWithServer:(IMKServer *)server delegate:(id)delegate client:(id)inputClient
 {
-  os_log_debug([KMLogs lifecycleLog], "Initializing Keyman Input Method for server with bundleID: %{public}@", server.bundle.bundleIdentifier);
-  
+  os_log_debug([KMLogs lifecycleLog], "initWithServer, active app: '%{public}@'", [KMInputMethodLifecycle getClientApplicationId]);
+
   self = [super initWithServer:server delegate:delegate client:inputClient];
   if (self) {
-    servers = [[NSMutableArray alloc] initWithCapacity:2];
-    self.AppDelegate.inputController = self;
-    if (self.AppDelegate.kvk != nil && self.AppDelegate.alwaysShowOSK) {
-      [self.AppDelegate showOSK];
-    }
+    self.appDelegate.inputController = self;
   }
   
+  /**
+   * Register to receive the Deactivated and ChangedClient notification generated from KMInputMethodLifecycle so
+   * that the eventHandler can be changed. There is no need to receive the Activated notification because
+   * the InputController does it all it needs to when it receives the ChangedClient.
+   */
+
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inputMethodDeactivated:) name:kInputMethodDeactivatedNotification object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inputMethodChangedClient:) name:kInputMethodClientChangeNotification object:nil];
+
   return self;
 }
 
@@ -59,102 +66,44 @@ NSMutableArray *servers;
   }
 }
 
-- (void)activateServer:(id)sender {
-  @synchronized(servers) {
-    [sender overrideKeyboardWithKeyboardNamed:@"com.apple.keylayout.US"];
-    
-    [self.AppDelegate wakeUpWith:sender];
-    [servers addObject:sender];
-    
-    if (_eventHandler != nil) {
-      [_eventHandler deactivate];
-    }
-    
-    NSRunningApplication *currApp = [[NSWorkspace sharedWorkspace] frontmostApplication];
-    NSString *clientAppId = [currApp bundleIdentifier];
-    os_log_debug([KMLogs lifecycleLog], "activateServer, new active app: '%{public}@'", clientAppId);
-    
-    _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:clientAppId client:sender];
-    
+/**
+ * The Keyman input method is deactivating because the user chose a different input method: notification from KMInputMethodLifecycle
+ */
+- (void)inputMethodDeactivated:(NSNotification *)notification {
+  os_log_debug([KMLogs lifecycleLog], "***KMInputController inputMethodDeactivated, deactivating eventHandler");
+  if (_eventHandler != nil) {
+    [_eventHandler deactivate];
   }
+}
+
+/**
+ * The user has switched to a different text input client: notification from KMInputMethodLifecycle
+ */
+- (void)inputMethodChangedClient:(NSNotification *)notification {
+  os_log_debug([KMLogs lifecycleLog], "***KMInputController inputMethodChangedClient, deactivating old eventHandler and activating new one");
+  if (_eventHandler != nil) {
+    [_eventHandler deactivate];
+  }
+  _eventHandler = [[KMInputMethodEventHandler alloc] initWithClient:[KMInputMethodLifecycle getClientApplicationId] client:self.client];
+
+}
+
+- (void)activateServer:(id)sender {
+  [sender overrideKeyboardWithKeyboardNamed:@"com.apple.keylayout.US"];
+  [KMInputMethodLifecycle.shared activateClient:sender];
 }
 
 - (void)deactivateServer:(id)sender {
-  if ([self.AppDelegate debugMode]) {
-    os_log_debug([KMLogs lifecycleLog], "deactivateServer, sender %{public}@", sender);
-  }
-  @synchronized(servers) {
-    for (int i = 0; i < servers.count; i++) {
-      if (servers[i] == sender) {
-        [servers removeObjectAtIndex:i];
-        break;
-      }
-    }
-    if (servers.count == 0) {
-      os_log_debug([KMLogs lifecycleLog], "No known active server for Keyman IM. Starting countdown to sleep...");
-      [self performSelector:@selector(timerAction:) withObject:sender afterDelay:0.7];
-    }
-  }
+  [KMInputMethodLifecycle.shared deactivateClient:sender];
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
-
-- (void)timerAction:(id)lastServer {
-  @synchronized(servers) {
-    if (servers.count == 0) {
-      if (_eventHandler != nil) {
-        [_eventHandler deactivate];
-        _eventHandler = nil;
-      }
-      [self.AppDelegate sleepFollowingDeactivationOfServer:lastServer];
-    }
-  }
-}
-
-
-/*
- - (NSDictionary *)modes:(id)sender {
- if ([self.AppDelegate debugMode])
- os_log_debug([KMLogs lifecycleLog], "*** Modes ***");
- if (_kmModes == nil) {
- NSDictionary *amhMode = [[NSDictionary alloc] initWithObjectsAndKeys:@"keyman.png", kTSInputModeAlternateMenuIconFileKey,
- [NSNumber numberWithBool:YES], kTSInputModeDefaultStateKey,
- [NSNumber numberWithBool:YES], kTSInputModeIsVisibleKey,
- @"A", kTSInputModeKeyEquivalentKey,
- [NSNumber numberWithInteger:4608], kTSInputModeKeyEquivalentModifiersKey,
- [NSNumber numberWithBool:YES], kTSInputModeDefaultStateKey,
- @"keyman.png", kTSInputModeMenuIconFileKey,
- @"keyman.png", kTSInputModePaletteIconFileKey,
- [NSNumber numberWithBool:YES], kTSInputModePrimaryInScriptKey,
- @"smUnicodeScript", kTSInputModeScriptKey,
- @"amh", @"TISIntendedLanguage", nil];
- 
- NSDictionary *hinMode = [[NSDictionary alloc] initWithObjectsAndKeys:@"keyman.png", kTSInputModeAlternateMenuIconFileKey,
- [NSNumber numberWithBool:YES], kTSInputModeDefaultStateKey,
- [NSNumber numberWithBool:YES], kTSInputModeIsVisibleKey,
- @"H", kTSInputModeKeyEquivalentKey,
- [NSNumber numberWithInteger:4608], kTSInputModeKeyEquivalentModifiersKey,
- [NSNumber numberWithBool:YES], kTSInputModeDefaultStateKey,
- @"keyman.png", kTSInputModeMenuIconFileKey,
- @"keyman.png", kTSInputModePaletteIconFileKey,
- [NSNumber numberWithBool:YES], kTSInputModePrimaryInScriptKey,
- @"smUnicodeScript", kTSInputModeScriptKey,
- @"hin", @"TISIntendedLanguage", nil];
- 
- NSDictionary *modeList = [[NSDictionary alloc] initWithObjectsAndKeys:amhMode, @"com.apple.inputmethod.amh", hinMode, @"com.apple.inputmethod.hin", nil];
- NSArray *modeOrder = [[NSArray alloc] initWithObjects:@"com.apple.inputmethod.amh", @"com.apple.inputmethod.hin", nil];
- _kmModes = [[NSDictionary alloc] initWithObjectsAndKeys:modeList, kTSInputModeListKey,
- modeOrder, kTSVisibleInputModeOrderedArrayKey, nil];
- }
- 
- return _kmModes;
- }
- */
 
 - (NSMenu *)menu {
-  return self.AppDelegate.menu;
+  return self.appDelegate.menu;
 }
 
 - (KMXFile *)kmx {
-  return self.AppDelegate.kmx;
+  return self.appDelegate.kmx;
 }
 
 - (void)menuAction:(id)sender {
@@ -165,13 +114,15 @@ NSMutableArray *servers;
     [self showConfigurationWindow:sender];
   }
   else if (itag == OSK_MENUITEM_TAG) {
-    [self.AppDelegate showOSK];
+    [KMSettingsRepository.shared writeShowOskOnActivate:YES];
+    os_log_debug([KMLogs oskLog], "menuAction OSK_MENUITEM_TAG, updating settings writeShowOsk to YES");
+    [self.appDelegate showOSK];
   }
   else if (itag == ABOUT_MENUITEM_TAG) {
-    [self.AppDelegate showAboutWindow];
+    [self.appDelegate showAboutWindow];
   }
   else if (itag >= KEYMAN_FIRST_KEYBOARD_MENUITEM_TAG) {
-    [self.AppDelegate selectKeyboardFromMenu:itag];
+    [self.appDelegate selectKeyboardFromMenu:itag];
   }
 }
 
@@ -183,7 +134,7 @@ NSMutableArray *servers;
   if ([KMOSVersion Version_10_13_1] <= systemVersion && systemVersion <= [KMOSVersion Version_10_13_3]) // between 10.13.1 and 10.13.3 inclusive
   {
     os_log_info([KMLogs uiLog], "Input Menu: calling workaround instead of showPreferences (sys ver %x)", systemVersion);
-    [self.AppDelegate showConfigurationWindow]; // call our workaround
+    [self.appDelegate showConfigurationWindow]; // call our workaround
   }
   else
   {

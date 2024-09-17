@@ -1,5 +1,25 @@
 # Keyman Version History
 
+## 18.0.114 alpha 2024-09-17
+
+* fix(developer): rewrite ldml visual keyboard compiler (#12402)
+* fix(developer): check vars string usage before definition (#12404)
+* change(mac): remove 'Always show OSK' option (#12355)
+
+## 18.0.113 alpha 2024-09-16
+
+* test(developer): kmcmplib compiler unit tests 3 (#11990)
+
+## 18.0.112 alpha 2024-09-14
+
+* chore(deps): bump express from 4.19.2 to 4.20.0 (#12396)
+
+## 18.0.111 alpha 2024-09-13
+
+* chore(common): Update crowdin strings for Italian (#12408)
+* fix(common): correct offsets in KMX+ spec (#12350)
+* fix(android): Add gating to setLongpressDelay() (#12410)
+
 ## 18.0.110 alpha 2024-09-12
 
 * chore(common): Update to Unicode 16.0 (#12393)

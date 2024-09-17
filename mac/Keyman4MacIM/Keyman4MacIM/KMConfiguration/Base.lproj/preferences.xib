@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="18122" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="18122"/>
-        <plugIn identifier="com.apple.WebKitIBPlugin" version="18122"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22689"/>
+        <plugIn identifier="com.apple.WebKitIBPlugin" version="22689"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="KMConfigurationWindowController">
             <connections>
-                <outlet property="alwaysShowOSKCheckBox" destination="k5c-KF-717" id="EYm-1F-c71"/>
                 <outlet property="supportBack" destination="LX7-yF-rV2" id="ciN-Ia-7ei"/>
                 <outlet property="supportForward" destination="OSG-wW-VHs" id="8dG-cd-ByI"/>
                 <outlet property="supportHome" destination="RUX-eW-d6h" id="i5g-Lo-6zG"/>
@@ -79,7 +78,7 @@
                                                                 </textFieldCell>
                                                                 <prototypeCellViews>
                                                                     <tableCellView id="1fH-kz-di5" customClass="KMConfigColumn1CellView">
-                                                                        <rect key="frame" x="11" y="1" width="62" height="25"/>
+                                                                        <rect key="frame" x="1" y="1" width="62" height="25"/>
                                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                         <subviews>
                                                                             <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mcD-zc-0eI">
@@ -115,7 +114,7 @@
                                                                 </textFieldCell>
                                                                 <prototypeCellViews>
                                                                     <tableCellView id="BtP-6C-zYt">
-                                                                        <rect key="frame" x="76" y="1" width="550" height="25"/>
+                                                                        <rect key="frame" x="66" y="1" width="550" height="25"/>
                                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                         <subviews>
                                                                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YfS-ug-Llz">
@@ -146,7 +145,7 @@
                                                                 </textFieldCell>
                                                                 <prototypeCellViews>
                                                                     <tableCellView id="CGV-al-7wj" customClass="KMConfigColumn3CellView">
-                                                                        <rect key="frame" x="629" y="1" width="88" height="25"/>
+                                                                        <rect key="frame" x="619" y="1" width="88" height="25"/>
                                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                         <subviews>
                                                                             <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="mJA-up-QcJ">
@@ -211,18 +210,7 @@
                                     <rect key="frame" x="10" y="33" width="754" height="538"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <button translatesAutoresizingMaskIntoConstraints="NO" id="k5c-KF-717">
-                                            <rect key="frame" x="15" y="509" width="234" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Always show on-screen keyboard" bezelStyle="regularSquare" imagePosition="left" inset="2" id="4UX-80-0Vo">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="alwaysShowOSKCheckBoxAction:" target="-2" id="TbQ-5n-ODK"/>
-                                            </connections>
-                                        </button>
-                                        <button toolTip="Turn this on if you are having problems with a specific keyboard or with Keyman in general." verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uWx-3J-U0D">
+                                        <button toolTip="Turn this on if you are having problems with a specific keyboard or with Keyman in general." verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uWx-3J-U0D">
                                             <rect key="frame" x="15" y="483" width="200" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <buttonCell key="cell" type="check" title="Use verbose Console logging" bezelStyle="regularSquare" imagePosition="left" inset="2" id="7J6-zy-R20">
@@ -233,7 +221,7 @@
                                                 <action selector="useVerboseLoggingCheckBoxAction:" target="-2" id="DGX-fy-5qP"/>
                                             </connections>
                                         </button>
-                                        <textField hidden="YES" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PiJ-pY-UY7">
+                                        <textField hidden="YES" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PiJ-pY-UY7">
                                             <rect key="frame" x="34" y="414" width="705" height="63"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                                             <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="MrI-GM-7d6">
@@ -254,7 +242,7 @@
                                         <webView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gTQ-rF-m9S">
                                             <rect key="frame" x="17" y="43" width="720" height="492"/>
                                             <autoresizingMask key="autoresizingMask"/>
-                                            <webPreferences key="preferences" defaultFontSize="12" defaultFixedFontSize="12">
+                                            <webPreferences key="preferences" defaultFontSize="12" defaultFixedFontSize="12" javaEnabled="NO">
                                                 <nil key="identifier"/>
                                             </webPreferences>
                                         </webView>
@@ -305,9 +293,9 @@
         </window>
     </objects>
     <resources>
-        <image name="NSActionTemplate" width="15" height="15"/>
+        <image name="NSActionTemplate" width="19" height="19"/>
         <image name="NSInfo" width="32" height="32"/>
-        <image name="NSRemoveTemplate" width="14" height="4"/>
+        <image name="NSRemoveTemplate" width="18" height="4"/>
         <image name="buttonCell:clx-vL-wIY:image" width="1" height="1">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMSAAGGoF8QD05T

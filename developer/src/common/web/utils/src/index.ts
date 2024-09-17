@@ -42,4 +42,4 @@ export { defaultCompilerOptions, CompilerBaseOptions, CompilerCallbacks, Compile
 
   } from './compiler-interfaces.js';
 
-export { CommonTypesMessages } from './common-events.js';
+export { CommonTypesMessages } from './common-messages.js';

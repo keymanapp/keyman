@@ -31,8 +31,6 @@ public class AdjustLongpressDelayActivity extends BaseActivity {
   // Keeps track of the adjusted longpress delay time for saving.
   // Internally use milliseconds, but GUI displays seconds
   private static int currentDelayTimeMS = KMManager.KMDefault_LongpressDelay;  // ms
-  private static int minLongpressTime = 300;   // ms
-  private static int maxLongpressTime = 1500;  // ms
   private static int delayTimeIncrement = 200; // ms
 
   /**
@@ -112,7 +110,7 @@ public class AdjustLongpressDelayActivity extends BaseActivity {
     findViewById(R.id.delayTimeDownButton).setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        if (currentDelayTimeMS > minLongpressTime) {
+        if (currentDelayTimeMS > KMManager.KMMinimum_LongpressDelay) {
           currentDelayTimeMS -= delayTimeIncrement;
           seekBar.setProgress(delayTimeToProgress());
         }
@@ -122,7 +120,7 @@ public class AdjustLongpressDelayActivity extends BaseActivity {
     findViewById(R.id.delayTimeUpButton).setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        if (currentDelayTimeMS < maxLongpressTime) {
+        if (currentDelayTimeMS < KMManager.KMMaximum_LongpressDelay) {
           currentDelayTimeMS += delayTimeIncrement;
           seekBar.setProgress(delayTimeToProgress());
         }

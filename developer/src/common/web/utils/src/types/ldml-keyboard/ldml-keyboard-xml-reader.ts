@@ -1,6 +1,11 @@
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Reads a LDML XML keyboard file into JS object tree and resolves imports
+ */
 import { SchemaValidators, util } from '@keymanapp/common-types';
 import { XMLParser } from 'fast-xml-parser';
-import { CommonTypesMessages } from '../../common-events.js';
+import { CommonTypesMessages } from '../../common-messages.js';
 import { CompilerCallbacks } from '../../compiler-interfaces.js';
 import { LDMLKeyboardXMLSourceFile, LKImport, ImportStatus } from './ldml-keyboard-xml.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
@@ -133,6 +138,7 @@ export class LDMLKeyboardXMLSourceFileReader {
       for (const sub of obj) {
         // retain the same subtag
         if (!this.boxImportsAndSpecials(sub, subtag)) {
+          // resolveImports has already logged a message
           return false;
         }
       }
@@ -145,6 +151,7 @@ export class LDMLKeyboardXMLSourceFileReader {
           boxXmlArray(obj, key);
           // Now, resolve the import
           if (!this.resolveImports(obj, subtag)) {
+            // resolveImports has already logged a message
             return false;
           }
           // now delete the import array we so carefully constructed, the caller does not
@@ -152,6 +159,7 @@ export class LDMLKeyboardXMLSourceFileReader {
           delete obj['import'];
         } else {
           if (!this.boxImportsAndSpecials(obj[key], key)) {
+            // resolveImports has already logged a message
             return false;
           }
         }
@@ -171,6 +179,7 @@ export class LDMLKeyboardXMLSourceFileReader {
     // first, the explicit imports
     for (const asImport of ([...obj['import'] as LKImport[]].reverse())) {
       if (!this.resolveOneImport(obj, subtag, asImport)) {
+        // resolveOneImport has already logged a message
         return false;
       }
     }
@@ -181,6 +190,7 @@ export class LDMLKeyboardXMLSourceFileReader {
         base: constants.cldr_import_base,
         path: constants.cldr_implied_keys_import
       }, true)) {
+        // resolveOneImport has already logged a message
         return false;
       }
     } else if (subtag === 'forms') {
@@ -189,6 +199,7 @@ export class LDMLKeyboardXMLSourceFileReader {
         base: constants.cldr_import_base,
         path: constants.cldr_implied_forms_import
       }, true)) {
+        // resolveOneImport has already logged a message
         return false;
       }
     }
@@ -270,7 +281,6 @@ export class LDMLKeyboardXMLSourceFileReader {
   }
 
   loadUnboxed(file: Uint8Array): LDMLKeyboardXMLSourceFile {
-    try {
       const parser = new XMLParser({
         ignoreAttributes: false, // We'd like attributes, please
         attributeNamePrefix: '', // to avoid '@_' prefixes
@@ -284,17 +294,9 @@ export class LDMLKeyboardXMLSourceFileReader {
           return tagValue?.trim();
         },
       });
-      const a = parser.parse(file.toString(), true);
+      const a = parser.parse(new TextDecoder().decode(file), true);
       delete a['?xml']; // fast-xml-parser includes the XML prologue, it's not in the schema so we delete it.
       return a as LDMLKeyboardXMLSourceFile;
-    } catch (e) {
-      if (e.msg && e.code && e.line) {
-        this.callbacks.reportMessage(CommonTypesMessages.Error_InvalidXML(e));
-      } else {
-        this.callbacks.reportMessage(CommonTypesMessages.Error_InvalidXML({msg: e.toString()}));
-      }
-      return null;
-    }
   }
 
   /**
@@ -303,17 +305,23 @@ export class LDMLKeyboardXMLSourceFileReader {
    */
   public load(file: Uint8Array): LDMLKeyboardXMLSourceFile | null {
     if (!file) {
+      throw new Error(`file parameter must not be null`);
+    }
+
+    let source: LDMLKeyboardXMLSourceFile = null;
+    try {
+      source = this.loadUnboxed(file);
+    } catch(e) {
+      this.callbacks.reportMessage(CommonTypesMessages.Error_InvalidXml({e}));
       return null;
     }
-    const source = this.loadUnboxed(file);
-    if (!source) {
-      return null;
-    }
-    if(this.boxArrays(source)) {
+
+    if (this.boxArrays(source)) {
       return source;
-    } else {
-      return null;
     }
+
+    // boxArrays ... resolveImports has already logged a message
+    return null;
   }
 
   loadTestDataUnboxed(file: Uint8Array): any {

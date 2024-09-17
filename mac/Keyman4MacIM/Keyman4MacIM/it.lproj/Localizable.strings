@@ -26,10 +26,10 @@
 "message-keyboard-file-unreadable" = "Impossibile leggere il file Keyman «%@».";
 
 /* Message displayed in Configuration window when keyboard cannot be loaded */
-"message-error-loading-keyboard" = "(error loading keyboard)";
+"message-error-loading-keyboard" = "(errore caricamento tastiera)";
 
 /* Message displayed in Configuration window when keyboard metadata cannot be loaded */
-"message-error-unknown-metadata" = "unknown";
+"message-error-unknown-metadata" = "sconosciuto";
 
 /* Button text to acknowledge that .kmp file could not be read  */
 "button-keyboard-file-unreadable" = "OK";
@@ -50,22 +50,25 @@
 "button-download-complete" = "Fatto";
 
 /* keyboards label in the Package Information window */
-"keyboards-label" = "Keyboards:";
+"keyboards-label" = "Tastiere:";
 
 /* fonts label in the Package Information window */
-"fonts-label" = "Fonts:";
+"fonts-label" = "Caratteri:";
 
 /* package version label in the Package Information window */
-"package-version-label" = "Package Version:";
+"package-version-label" = "Versione pacchetto:";
 
 /* author label in the Package Information window */
-"author-label" = "Author:";
+"author-label" = "Autore:";
 
 /* website label in the Package Information window */
-"website-label" = "Website:";
+"website-label" = "Sito web:";
 
 /* copyright label in the Package Information window */
 "copyright-label" = "Copyright:";
 
 /* message displayed to alert user to need grant accessibility permission */
-"privacy-alert-text" = "To function properly, Keyman requires accessibility features:\n\nGrant access in System Preferences, Security & Privacy.\nRestart your system.";
+"privacy-alert-text" = "Per funzionare correttamente, Keyman richiede funzionalità di accessibilità:\n\nConsenti l'accesso nelle preferenze di sistema, Sicurezza e Privacy.\nRiavvia il sistema.";
+
+/* Text of menu item in Input Menu when no Keyboards are configured -- include parentheses  */
+"no-keyboard-configured-menu-placeholder" = "(Nessuna tastiera configurata)";

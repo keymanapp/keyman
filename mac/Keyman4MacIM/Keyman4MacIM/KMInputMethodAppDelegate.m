@@ -7,6 +7,7 @@
 //
 
 #import "KMInputMethodAppDelegate.h"
+#import "KMInputMethodLifecycle.h"
 #import "KMSettingsRepository.h"
 #import "KMDataRepository.h"
 #import "KMConfigurationWindowController.h"
@@ -58,7 +59,6 @@ NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboard
 @synthesize selectedKeyboard = _selectedKeyboard;
 @synthesize activeKeyboards = _activeKeyboards;
 @synthesize contextBuffer = _contextBuffer;
-@synthesize alwaysShowOSK = _alwaysShowOSK;
 
 id _lastServerWithOSKShowing = nil;
 
@@ -115,6 +115,45 @@ id _lastServerWithOSKShowing = nil;
   
   if (self.runLoopEventSrc && runLoop) {
     CFRunLoopAddSource(runLoop,  self.runLoopEventSrc, kCFRunLoopDefaultMode);
+  }
+  
+  // register to receive notifications generated from KMInputMethodLifecycle
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inputMethodActivated:) name:kInputMethodActivatedNotification object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(inputMethodDeactivated:) name:kInputMethodDeactivatedNotification object:nil];
+
+  // start Input Method lifecycle
+  [KMInputMethodLifecycle.shared startLifecycle];
+}
+
+/**
+ * When the input method is deactivated, hide the OSK and disable the low-level event tap
+ */
+- (void)inputMethodDeactivated:(NSNotification *)notification {
+  if ([self.oskWindow.window isVisible]) {
+    os_log_debug([KMLogs oskLog], "***KMInputMethodAppDelegate inputMethodDeactivated, hiding OSK");
+    [self.oskWindow.window setIsVisible:NO];
+  } else {
+    os_log_debug([KMLogs oskLog], "***KMInputMethodAppDelegate inputMethodDeactivated, OSK already hidden");
+  }
+
+  if (self.lowLevelEventTap) {
+    os_log_debug([KMLogs lifecycleLog], "***inputMethodDeactivated, disabling event tap");
+    CGEventTapEnable(self.lowLevelEventTap, NO);
+  }
+}
+
+/**
+ * When the input method is activated, show the OSK and enable the low-level event tap
+ */
+- (void)inputMethodActivated:(NSNotification *)notification {
+  if (self.lowLevelEventTap && !CGEventTapIsEnabled(self.lowLevelEventTap)) {
+    os_log_debug([KMLogs lifecycleLog], "***KMInputMethodAppDelegate inputMethodActivated, re-enabling event tap...");
+    CGEventTapEnable(self.lowLevelEventTap, YES);
+  }
+
+  if (_kvk != nil && ([KMInputMethodLifecycle.shared shouldShowOskOnActivate])) {
+    os_log_debug([KMLogs oskLog], "***KMInputMethodAppDelegate inputMethodActivated, showing OSK");
+    [self showOSK];
   }
 }
 
@@ -222,43 +261,12 @@ id _lastServerWithOSKShowing = nil;
   return (KMInputMethodAppDelegate *)[NSApp delegate];
 }
 
--(void) sleepFollowingDeactivationOfServer:(id)lastServer {
-  os_log_debug([KMLogs lifecycleLog], "Keyman no longer active IM.");
-  self.sleeping = YES;
-  if ([self.oskWindow.window isVisible]) {
-    os_log_debug([KMLogs oskLog], "sleepFollowingDeactivationOfServer, Hiding OSK.");
-    // Storing this ensures that if the deactivation is temporary, resulting from dropping down a menu,
-    // the OSK will re-display when that client application re-activates.
-    _lastServerWithOSKShowing = lastServer;
-    [self.oskWindow.window setIsVisible:NO];
-  }
-  if (self.lowLevelEventTap) {
-    os_log_debug([KMLogs lifecycleLog], "sleepFollowingDeactivationOfServer, disabling event tap...");
-    CGEventTapEnable(self.lowLevelEventTap, NO);
-  }
-}
-
--(void) wakeUpWith:(id)newServer {
-  self.sleeping = NO;
-  if (self.lowLevelEventTap && !CGEventTapIsEnabled(self.lowLevelEventTap)) {
-    os_log_debug([KMLogs lifecycleLog], "wakeUpWith, Keyman is now the active IM. Re-enabling event tap...");
-    CGEventTapEnable(self.lowLevelEventTap, YES);
-  }
-  // See note in sleepFollowingDeactivationOfServer.
-  if (_kvk != nil && (_alwaysShowOSK || _lastServerWithOSKShowing == newServer)) {
-    [self showOSK];
-  }
-  
-  _lastServerWithOSKShowing = nil;
-}
-
 CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
   KMInputMethodAppDelegate *appDelegate = [KMInputMethodAppDelegate AppDelegate];
   if (appDelegate != nil) {
     if (type == kCGEventTapDisabledByTimeout || type == kCGEventTapDisabledByUserInput) {
-      // kCGEventTapDisabledByUserInput most likely means we're "sleeping", in which case we want it to stay
-      // disabled until we get the wake-up call.
-      if (!appDelegate.sleeping) {
+      // kCGEventTapDisabledByUserInput most likely means we're "sleeping", in which case we want it to stay disabled until we get the wake-up call.
+      if ([KMInputMethodLifecycle.shared shouldEnableEventTap]) {
         // REVIEW: We might need to consider putting in some kind of counter/flag to ensure that the very next
         // event is not another disable so we don't end up in an endless cycle.
         os_log([KMLogs eventsLog], "Event tap disabled by %{public}@! Attempting to restart...", (type == kCGEventTapDisabledByTimeout ? @"timeout" : @"user"));
@@ -433,11 +441,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     return [NSString stringWithFormat:@"%@ - Keyman", _keyboardName];
 }
 
-- (void)setAlwaysShowOSK:(BOOL)alwaysShowOSK {
-  _alwaysShowOSK = alwaysShowOSK;
-  [[KMSettingsRepository shared] writeAlwaysShowOsk:alwaysShowOSK];
-}
-
 - (void)setUseVerboseLogging:(BOOL)useVerboseLogging {
   os_log_debug([KMLogs configLog], "Turning verbose logging %{public}@", useVerboseLogging ? @"on." : @"off.");
   _debugMode = useVerboseLogging;
@@ -445,11 +448,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     [_kme setUseVerboseLogging:useVerboseLogging];
 
   [[KMSettingsRepository shared] writeUseVerboseLogging:useVerboseLogging];
-}
-
-- (BOOL)alwaysShowOSK {
-  _alwaysShowOSK = [[KMSettingsRepository shared] readAlwaysShowOsk];
-  return _alwaysShowOSK;
 }
 
 - (BOOL)useVerboseLogging {
@@ -711,7 +709,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   [KMDataRepository.shared createDataDirectoryIfNecessary];
   
   if ([KMSettingsRepository.shared dataMigrationNeeded]) {
-    BOOL movedData = [KMDataRepository.shared migrateData];
+    [KMDataRepository.shared migrateData];
     [KMSettingsRepository.shared convertSettingsForMigration];
   }
   
@@ -887,8 +885,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   [self setContextBuffer:nil];
   [self setSelectedKeyboard:path];
   [self applyPersistedOptions];
-  if (kvk != nil && self.alwaysShowOSK)
-    [self showOSK];
 }
 
 - (NSArray *)getKmxFilesInKeyboardsDirectory {

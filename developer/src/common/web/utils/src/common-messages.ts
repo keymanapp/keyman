@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ */
 import { CompilerErrorNamespace, CompilerErrorSeverity,  CompilerMessageDef as def, CompilerMessageSpec as m } from './compiler-interfaces.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 
@@ -44,15 +47,7 @@ export class CommonTypesMessages {
     m(this.ERROR_TestDataUnexpectedArray,
       `Problem reading test data: expected single ${def(o.subtag)} element, found multiple`);
 
-  static ERROR_InvalidXML = SevError | 0x0008;
-  static Error_InvalidXML = (o: { code?: string, msg: string, line?: number, col?: number }) => {
-    // may or may not have extended details
-    if (o.code && o.line && o.msg) {
-      return m(this.ERROR_InvalidXML,
-        `Error reading XML at ${def(o.line)}:${def(o.col)}: ${def(o.code)} ${def(o.msg)}`
-      );
-    } else {
-      return m(this.ERROR_InvalidXML, `Error reading XML: ${def(o.msg)}`);
-    }
-  };
+  static ERROR_InvalidXml = SevError | 0x0008;
+  static Error_InvalidXml = (o:{e: any}) =>
+  m(this.ERROR_InvalidXml, `The XML file could not be read: ${(o.e ?? '').toString()}`);
 };
