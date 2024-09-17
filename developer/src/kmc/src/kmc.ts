@@ -55,9 +55,6 @@ async function run() {
 
   /* Future commands:
   declareClean(program);
-  declareCopy(program);
-  declareRename(program);
-  declareGenerate(program);
   declareImport(program);
   declareTest(program);
   declarePublish(program);
