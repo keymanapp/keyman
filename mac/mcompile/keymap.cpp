@@ -659,7 +659,7 @@ bool mac_InitializeUCHR(const UCKeyboardLayout** keyboard_layout) {
  */
 KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode(const UCKeyboardLayout* keyboard_layout, int keycode, int shiftstate_mac, int caps) {
   UInt32 deadkeystate;
-  UniCharCount maxStringlength    = 5;
+  const UniCharCount maxStringlength    = 5;
   UniCharCount actualStringlength = 0;
   OptionBits keyTranslateOptions  = 0;
   UniChar unicodeString[maxStringlength];
@@ -701,7 +701,7 @@ KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode(const UCKeyboardLayout* keyboard_layou
  * @return the keyval obtained from keycode, shiftstate and caps
  */
 KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode_dk(const UCKeyboardLayout* keyboard_layout, int keycode, int shiftstate_mac, int caps, UInt32& deadkeystate) {
-  UniCharCount maxStringlength    = 5;
+  const UniCharCount maxStringlength    = 5;
   UniCharCount actualStringlength = 0;
   OptionBits keyTranslateOptions  = 0;
   UniChar unicodeString[maxStringlength];
@@ -868,7 +868,7 @@ KMX_DWORD mac_KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode) {
    */
   KMX_DWORD mac_get_CombinedChar_From_DK(const UCKeyboardLayout* keyboard_layout, int vk_dk, KMX_DWORD ss_dk, KMX_DWORD vk_us, KMX_DWORD shiftstate_mac, int caps) {
   UInt32 deadkeystate;
-  UniCharCount maxStringlength    = 5;
+  const UniCharCount maxStringlength    = 5;
   UniCharCount actualStringlength = 0;
   OptionBits keyTranslateOptions  = 0;
   UniChar unicodeString[maxStringlength];

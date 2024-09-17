@@ -214,7 +214,7 @@ void mac_KMX_ReportUnconvertedKeyboardRules(LPKMX_KEYBOARD kbd) {
  * @param  ch      character of the underlying keyboard
  */
 void mac_KMX_TranslateDeadkeyKey(LPKMX_KEY key, KMX_WCHAR deadkey, KMX_WORD vk, KMX_DWORD shift, KMX_WORD ch) {
-   if ((key->ShiftFlags == 0 || key->ShiftFlags & VIRTUALCHARKEY) && key->Key == ch) {
+  if ((key->ShiftFlags == 0 || key->ShiftFlags & VIRTUALCHARKEY) && key->Key == ch) {
     // The weird LCTRL+RALT is Windows' way of mapping the AltGr key.
     // We store that as just RALT, and use the option "Simulate RAlt with Ctrl+Alt"
     // to provide an alternate..
@@ -526,7 +526,7 @@ KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion) {
  */
 int mac_KMX_GetDeadkeys(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& all_vector, KMX_WCHAR deadkey, KMX_DWORD shift_dk, KMX_WORD* outputPairs) {
   UInt32 deadkeystate;
-  UniCharCount maxStringlength    = 5;
+  const UniCharCount maxStringlength    = 5;
   UniCharCount actualStringlength = 0;
   OptionBits keyTranslateOptions  = 0;
   UniChar unicodeString[maxStringlength];
