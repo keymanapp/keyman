@@ -146,5 +146,11 @@ export class InfrastructureMessages {
   static Error_GenerateRequiresId = () => m(
     this.ERROR_GenerateRequiresId,
     `The generate command requires a single 'id' parameter`);
+
+  static ERROR_CopyRequiresSource = SevError | 0x0021;
+  static Error_CopyRequiresSource = () => m(
+    this.ERROR_CopyRequiresSource,
+    `The copy command requires a single 'source' parameter`
+  );
  }
 

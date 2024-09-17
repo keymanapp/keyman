@@ -11,7 +11,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 . "$KEYMAN_ROOT/resources/build/build-utils-ci.inc.sh"
 
-builder_describe "Build Keyman kmc-generate module" \
+builder_describe "Build Keyman kmc-copy module" \
   "@/common/web/keyman-version" \
   "@/common/web/types" \
   "@/developer/src/common/web/test-helpers" \
@@ -22,31 +22,27 @@ builder_describe "Build Keyman kmc-generate module" \
 
 builder_describe_outputs \
   configure     /node_modules \
-  build         /developer/src/kmc-generate/build/src/main.js \
-  api           /developer/build/api/kmc-generate.api.json
+  build         /developer/src/kmc-copy/build/src/main.js \
+  api           /developer/build/api/kmc-copy.api.json
 
 builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
-
-do_build() {
-  tsc --build
-  rm -rf ./build/src/template
-  mkdir -p ./build/src/template
-  cp -R ./src/template/ ./build/src/
-}
 
 do_test() {
   eslint .
   cd test
   tsc --build
   cd ..
-  c8 --reporter=lcov --reporter=text mocha "${builder_extra_params[@]}"
+  readonly C8_THRESHOLD=30
+  c8 -skip-full --reporter=lcov --reporter=text --lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD mocha "${builder_extra_params[@]}"
+  builder_echo warning "Coverage thresholds are currently $C8_THRESHOLD%, which is lower than ideal."
+  builder_echo warning "Please increase threshold in build.sh as test coverage improves."
 }
 
-builder_run_action clean      rm -rf ./build/ ./tsconfig.tsbuildinfo
+builder_run_action clean      rm -rf ./build/
 builder_run_action configure  verify_npm_setup
-builder_run_action build      do_build
+builder_run_action build      tsc --build
 builder_run_action api        api-extractor run --local --verbose
 builder_run_action test       do_test
 builder_run_action publish    builder_publish_npm

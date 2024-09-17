@@ -267,6 +267,10 @@ export enum CompilerErrorNamespace {
    * kmc-generate 0xA000…0xAFFF
    */
   Generator = 0xA000,
+  /**
+   * kmc-copy 0xB000…0xBFFF
+   */
+  Copier = 0xB000,
 };
 
 /**
