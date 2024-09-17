@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.114 alpha 2024-09-17
+
+* fix(developer): rewrite ldml visual keyboard compiler (#12402)
+* fix(developer): check vars string usage before definition (#12404)
+* change(mac): remove 'Always show OSK' option (#12355)
+
 ## 18.0.113 alpha 2024-09-16
 
 * test(developer): kmcmplib compiler unit tests 3 (#11990)
