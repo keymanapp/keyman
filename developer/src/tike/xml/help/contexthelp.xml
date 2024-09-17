@@ -494,12 +494,14 @@
       in a batch file and reference the batch file here.</p>
     </Control>
 
-    <Control Name="cmdBrowseDefaultProjectPath" Title="General tab">
-      <p></p>
+    <Control Name="cmdBrowseDefaultProjectPath" Title="Default Project Folder">
+      <p>You can check the location of your default project folder, where projects like keyboards or 
+        lexical models will be saved automatically. If needed, you can change the folder location 
+        to a more convenient spot.</p>
     </Control>
 
-    <Control Name="cmdResetToolWindows" Title="General tab">
-      <p></p>
+    <Control Name="cmdResetToolWindows" Title="Reset Tool Windows">
+      <p>Reset all tabs to their original locations.</p>
     </Control>
 
     <Control Name="cmdSMTPSettings" Title="SMTP Settings...">
@@ -569,10 +571,6 @@
       <p>If you are debugging a keyboard, make a change to the keyboard, and recompile it, then the debugger needs to be 
         reset in order to get access to the new keyboard. Keyman Developer will normally prompt you to do this, but if you set 
         this option, then it will reset the debugger automatically instead.</p>
-    </Control>
-
-    <Control Name="editWebHostDefaultPort" Title="Debugger tab">
-      <p></p>
     </Control>
 
     <Control Name="chkCharMapAutoLookup" Title="Find character under cursor automatically">
