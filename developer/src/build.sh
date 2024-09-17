@@ -15,11 +15,13 @@ builder_describe \
   configure \
   build \
   test \
+  "@/resources/tools/check-markdown  test:help" \
   "api                          Analyze API and prepare API documentation" \
   "publish                      Prepare files for distribution, publish symbols, publish or pack npm packages, and build installer" \
   "install                      Install built programs locally" \
   ":common                      Developer common files" \
   ":ext                         Third party components" \
+  ":help                        Online documentation" \
   ":kmcmplib                    Compiler - .kmn compiler" \
   ":kmc-analyze                 Compiler - Analysis Tools" \
   ":kmc-keyboard-info           Compiler - .keyboard_info Module" \
@@ -125,6 +127,7 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 builder_run_child_actions  clean configure build test
+builder_run_action         test:help    check-markdown  "$KEYMAN_ROOT/developer/docs/help"
 
 #-------------------------------------------------------------------------------------------------------------------
 

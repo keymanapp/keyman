@@ -10,14 +10,17 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 # Please note that this build script (understandably) assumes that it is running on Mac OS X.
-verify_on_mac
+# verify_on_mac
 
 builder_describe "Builds Keyman Engine and the Keyman app for use on iOS devices - iPhone and iPad." \
   "clean" \
   "configure" \
   "build" \
+  "test" \
+  "@/resources/tools/check-markdown  test:help" \
   ":engine                      Builds KeymanEngine.xcframework, usable by our main app and by third-party apps" \
   ":app=keyman                  Builds the Keyman app for iOS platforms" \
+  ":help                        Online documentation" \
   ":sample1=Samples/KMSample1   Builds the first KeymanEngine sample app" \
   ":sample2=Samples/KMSample2   Builds the second KeymanEngine sample app" \
   ":fv=../oem/firstvoices/ios   Builds OEM FirstVoices for iOS platforms" \
@@ -25,4 +28,5 @@ builder_describe "Builds Keyman Engine and the Keyman app for use on iOS devices
 
 builder_parse "$@"
 
-builder_run_child_actions clean configure build
+builder_run_child_actions clean configure build test
+builder_run_action        test:help    check-markdown  "$KEYMAN_ROOT/ios/docs/help"
