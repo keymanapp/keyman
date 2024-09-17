@@ -541,7 +541,6 @@ int mac_createOneVectorFromBothKeyboards(vec_dword_3D& all_vector, const UCKeybo
  * 				 1 if data of US keyboard was not written;
  */
 int mac_write_US_ToVector(vec_dword_3D& vec_us) {
-
   vec_dword_1D values;
   vec_dword_2D key;
 
@@ -675,10 +674,13 @@ KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode(const UCKeyboardLayout* keyboard_layou
     If CAPS is used: always add 4 e.g. SHIFT = 2; SHIFT+CAPS = 6
   */
   status = UCKeyTranslate(keyboard_layout, keycode, kUCKeyActionDown, (shiftstate_mac + 4 * caps), LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString);
-  // If this was a deadkey (deadkeystate != 0), append a space
-  if (deadkeystate != 0)
-    status = UCKeyTranslate(keyboard_layout, keycode_spacebar, kUCKeyActionDown, (shiftstate_mac + 4 * caps), LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString);
 
+	// If this was a deadkey (deadkeystate != 0), append a space
+  if (deadkeystate != 0) {
+    status = UCKeyTranslate(keyboard_layout, keycode_spacebar, kUCKeyActionDown, (shiftstate_mac + 4 * caps), LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString);
+		if (status != noErr)  			// in case UCKeyTranslate returned an error
+			return 0;
+	}
   // if there is no character assigned to the Key+Shift+CAPS UCKeyTranslate writes 0x01 into unicodeString[0]
   if (unicodeString[0] == 1)  // impossible character
     return 0;
@@ -714,10 +716,15 @@ KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode_dk(const UCKeyboardLayout* keyboard_la
     If CAPS is used: always add 4 e.g. SHIFT = 2; SHIFT+CAPS = 6
   */
   status = UCKeyTranslate(keyboard_layout, keycode, kUCKeyActionDown, (shiftstate_mac + 4 * caps), LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString);
+  if (status != noErr)  			// in case UCKeyTranslate returned an error
+    return 0;
 
   // If this was a deadkey, append a space
-  if (deadkeystate != 0)
+  if (deadkeystate != 0) {
     status = UCKeyTranslate(keyboard_layout, keycode_spacebar, kUCKeyActionDown,(shiftstate_mac + 4 * caps), LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString);
+		if (status != noErr)  			// in case UCKeyTranslate returned an error
+			return 0;
+		}
 
   // if there is no character assigned to the Key+Shift+CAPS UCKeyTranslate writes 0x01 into unicodeString[0]
   if (unicodeString[0] == 1)  // impossible character
@@ -751,7 +758,7 @@ KMX_DWORD mac_KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(const UCKeyboardLa
   if (isdk != 0) {
     PKMX_WCHAR dky = NULL;
     std::u16string keyVS(1, keyV);
-    dky = (PKMX_WCHAR) keyVS.c_str();
+    dky = (PKMX_WCHAR)keyVS.c_str();
     *deadKey = *dky;
     return 0xFFFF;
   }
@@ -873,10 +880,14 @@ KMX_DWORD mac_KMX_get_VKUS_From_KeyCodeUnderlying(KMX_DWORD keycode) {
     If CAPS is used: always add 4 e.g. SHIFT = 2; SHIFT+CAPS = 6
   */
   status = UCKeyTranslate(keyboard_layout, vk_dk, kUCKeyActionDown, ss_dk, LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString);
+  if (status != noErr)  			// in case UCKeyTranslate returned an error
+    return 0;
 
   // If this was a deadkey, append a character
   if (deadkeystate != 0) {
     status = UCKeyTranslate(keyboard_layout, vk_us, kUCKeyActionDown, shiftstate_mac + 4 * caps, LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString);
+		if (status != noErr)  			// in case UCKeyTranslate returned an error
+			return 0;
 
   if (unicodeString[0] == 1)  // impossible character
       return 0;

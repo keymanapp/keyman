@@ -16,6 +16,9 @@
 #include "mcompile.h"
 #include "../../common/include/km_u16.h"
 
+const int nr_DK_pairs = 1000;
+static const int size_DK_array = (nr_DK_pairs + 1) * 3;
+
 /** @brief  convert mnemonic keyboard layout to positional keyboard layout and translate keyboard */
 KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion);
 
@@ -395,7 +398,7 @@ KMX_WCHAR mac_KMX_GetUniqueDeadkeyID(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey) {
  * @param  dk_Table   a vector of all possible deadkey combinations for all Linux keyboards
  */
 void mac_KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk_US, KMX_DWORD shift, KMX_WCHAR deadkey, vec_dword_3D& all_vector, const UCKeyboardLayout* keyboard_layout) {
-  KMX_WORD deadkeys[512] = {0};
+  KMX_WORD deadkeys[size_DK_array] = {0};
   KMX_WORD* pdk;
 
   // Lookup the deadkey table for the deadkey in the physical keyboard
@@ -496,7 +499,7 @@ KMX_BOOL mac_KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion) {
         }
       }
 
-      switch(ch) {
+      switch (ch) {
         case 0x0000: break;
         case 0xFFFF: mac_KMX_ConvertDeadkey(kbd, KMX_VKMap[i], VKShiftState[j], DeadKey, all_vector, keyboard_layout); break;
         default: mac_KMX_TranslateKeyboard(kbd, KMX_VKMap[i], VKShiftState[j], ch);
@@ -531,10 +534,11 @@ int mac_KMX_GetDeadkeys(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& a
   unicodeString[0] = 0;
 
   KMX_WORD* p = outputPairs;
+  int no_dk_counter = 0;
+  int p_counter = 0;
   KMX_DWORD sc_dk = mac_KMX_get_KeyCodeUnderlying_From_KeyValUnderlying(all_vector, deadkey);
 
   for (int j = 0; j < _countof(ss_mac); j++) {
-
     /*
       we start with SPACE (keycode_spacebar=49) because all deadkeys occur in combinations with space.
       Since mcompile finds only the first occurance of a dk combination, this makes sure that we always
@@ -544,13 +548,16 @@ int mac_KMX_GetDeadkeys(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& a
     */
     for (int i = keycode_spacebar; i >= 0; i--) {
       status = UCKeyTranslate(keyboard_layout, sc_dk, kUCKeyActionDown, mac_convert_Shiftstate_to_MacShiftstate(shift_dk), LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString);
-
+      if (status != noErr)  			// in case UCKeyTranslate returned an error
+        return 0;
       /*
         UCKeyTranslate != 0 if a dk was found; then run UCKeyTranslate again with a SPACE (keycode_spacebar) to get the plain dk e.g.'^'.
         If CAPS is used: always add 4 e.g. SHIFT = 2; SHIFT+CAPS = 6
       */
       if (deadkeystate != 0) {
         status = UCKeyTranslate(keyboard_layout, i, kUCKeyActionDown, ss_mac[j], LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString);
+        if (status != noErr)  			// in case UCKeyTranslate returned an error
+          return 0;
 
         // deadkeystate might be changed again therefore a new if-clause
         if (deadkeystate != 0) {
@@ -558,14 +565,27 @@ int mac_KMX_GetDeadkeys(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& a
 
           // ensure to NOT get key combinations like '^a' but only combined characters like 'â' (exception for '^' + space)
           if ((unicodeString[0] != deadkey) || (vk == VK_SPACE)) {
-            *p++ = vk;
-            *p++ = ss_mac[j];
-            *p++ = unicodeString[0];
+
+            // prevent overflow of deadkey-array
+            if (p_counter < size_DK_array - 3) {
+
+              *p++ = vk;
+              *p++ = ss_mac[j];
+              *p++ = unicodeString[0];
+
+              p_counter = p_counter + 3;
+
+            } else {
+              no_dk_counter++;
+            }
           }
         }
       }
     }
   }
+  if (p_counter >= size_DK_array - 3)
+    wprintf(L"    WARNING: %i deadkeys have not been processed.\n", no_dk_counter);
+
   *p = 0;
   return (p - outputPairs);
 }
