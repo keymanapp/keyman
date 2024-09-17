@@ -95,7 +95,10 @@ function do_bundle() {
   # Manually copy over kmcmplib module
   cp ../kmc-kmn/build/src/import/kmcmplib/wasm-host.wasm build/dist/
 
-  cp build/dist/* "$BUILD_PATH"
+  # Manually copy over templates
+  cp -R ../kmc-generate/build/src/template/ build/dist/
+
+  cp -R build/dist/* "$BUILD_PATH"
 
   builder_finish_action success bundle
 }
