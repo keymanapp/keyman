@@ -1,24 +1,24 @@
 /*
- * Keyman is copyright (C) 2004 - 2024 SIL International. MIT License.
+ * Keyman is copyright (C) SIL International. MIT License.
  *
- * Mnemonic layout support for Linux
+ * Mnemonic layout support for mac
  *
  * Defines the entry point for the console application.
  *
  * Note: this program deliberately leaks memory as it has a very short life cycle and managing the memory allocations
  * for the subcomponents of the compiled keyboard is an unnecessary optimisation. Just so you know.
- */
+*/
 
 #include "mcompile.h"
+
+const int nr_DK_pairs = 1000;
+static const int size_DK_array = (nr_DK_pairs + 1) *3;
 
 /** @brief convert mnemonic keyboard layout to positional keyboard layout and translate keyboard */
 KMX_BOOL KMX_DoConvert(LPKMX_KEYBOARD kbd, KMX_BOOL bDeadkeyConversion, gint argc, gchar* argv[]);
 
 /** @brief Collect the key data, translate it to kmx and append to the existing keyboard */
 bool KMX_ImportRules(LPKMX_KEYBOARD kp, vec_dword_3D& all_vector, GdkKeymap** keymap, std::vector<KMX_DeadkeyMapping>* KMX_FDeadkeys, KMX_BOOL bDeadkeyConversion);  // I4353   // I4327
-
-/** @brief  start of mcompile; load, convert and save keyboard */
-int run(int argc, char* argv[]);
 
 /** @brief  return an array of [usvk, ch_out] pairs: all existing combinations of a deadkey + character for the underlying keyboard */
 int KMX_GetDeadkeys(vec_dword_2D& dk_Table, KMX_WORD deadkey, KMX_WORD* outputPairs, GdkKeymap* keymap);
@@ -33,30 +33,9 @@ std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;  // I4353
  * @param  argv pointer to commandline arguments: executable, inputfile, outputfile
  * @return 0 on success
  */
-#if defined(_WIN32) || defined(_WIN64)
-  int wmain(int argc, wchar_t* argv[]) {  
-/**
- * TODO for cross platform use: if we want to use wmain instead of main:
- * inside wmain convert wchar_t* argv[] to char* argv_ch[]
- * to be able to use run(int argc, char* argv[])
- */
-#else  // LINUX
+
   int main(int argc, char* argv[]) {
-#endif
 
-  run(argc, argv);
-}
-
-
-/**
- * @brief  start of mcompile; load, convert and save keyboard
- * @param  argc number of commandline arguments
- * @param  argv pointer to commandline arguments: executable, inputfile, outputfile
- * @return 0 on success,
- *         1 for wrong usage of calling parameters,
- *         3 if unable to load keyboard
- */
-int run(int argc, char* argv[]) {
 
   int bDeadkeyConversion = 0;
 
@@ -68,7 +47,6 @@ int run(int argc, char* argv[]) {
   if (argc < 3 || argc > 4 || (argc - n) != 2) {  // I4273// I4273
     printf(
         "Usage:  \tmcompile [-d] infile.kmx outfile.kmx\n"
-        "        \tmcompile -u ...  (not available for Linux)\n "
         "        \tmcompile converts a Keyman mnemonic layout to\n"
         "        \ta positional one based on the currently used \n"
         "        \tLinux keyboard layout\n"
@@ -91,7 +69,6 @@ int run(int argc, char* argv[]) {
   //    state.  This fixup will transform the char to a vk, which will avoid any issues
   //    with the key.
   //
-  //  --> deadkeys we will attack after the POC
   //
   //  For each deadkey, we need to determine its possible outputs.  Then we generate a VK
   //  rule for that deadkey, e.g. [K_LBRKT] > dk(c101)
@@ -116,18 +93,10 @@ int run(int argc, char* argv[]) {
     return 3;
   }
 
-#if defined(_WIN32) || defined(_WIN64)
-  /*if (DoConvert(kmxfile, kbid, bDeadkeyConversion)) {   // I4552F
-      KMX_SaveKeyboard(kmxfile, outfile);
-  }*/
-
-#else  // LINUX
   if (KMX_DoConvert(kmxfile, bDeadkeyConversion, argc, (gchar**)argv)) {  // I4552F
     KMX_SaveKeyboard(kmxfile, outfile);
   }
 
-#endif
-  // DeleteReallocatedPointers(kmxfile); :TODO   // _S2 not my ToDo :-)
   delete kmxfile;
   return 0;
 }
@@ -430,7 +399,8 @@ KMX_WCHAR KMX_GetUniqueDeadkeyID(LPKMX_KEYBOARD kbd, KMX_WCHAR deadkey) {
  * @param  dk_Table   a vector of all possible deadkey combinations for all Linux keyboards
  */
 void KMX_ConvertDeadkey(LPKMX_KEYBOARD kbd, KMX_WORD vk_US, KMX_DWORD shift, KMX_WCHAR deadkey, vec_dword_3D& all_vector, GdkKeymap* keymap, vec_dword_2D dk_Table) {
-  KMX_WORD deadkeys[512], *pdk;
+  KMX_WORD deadkeys[size_DK_array] = {0};
+  KMX_WORD* pdk;
 
   // Lookup the deadkey table for the deadkey in the physical keyboard
   // Then for each character, go through and map it through
@@ -562,18 +532,31 @@ int KMX_GetDeadkeys(vec_dword_2D& dk_Table, KMX_WORD deadkey, KMX_WORD* outputPa
   KMX_WORD* p = outputPairs;
   KMX_DWORD shift;
   vec_dword_2D dk_SingleTable;
+  int no_dk_counter = 0;
+  int p_counter = 0;
 
   query_dk_combinations_for_specific_dk(dk_Table, deadkey, dk_SingleTable);
   for (int i = 0; i < (int)dk_SingleTable.size(); i++) {
     KMX_WORD vk = KMX_change_keyname_to_capital(dk_SingleTable[i][1], shift, keymap);
     if (vk != 0) {
-      *p++ = vk;
-      *p++ = shift;
-      *p++ = dk_SingleTable[i][2];
+
+      if( p_counter < size_DK_array - 3) {
+
+        *p++ = vk;
+        *p++ = shift;
+        *p++ = dk_SingleTable[i][2];
+
+        p_counter = p_counter+3;
+
+      } else {
+        no_dk_counter++;
+      }
     } else {
       KMX_LogError(L"Warning: complex deadkey not supported.");
     }
   }
+  if(p_counter >= size_DK_array -3)
+    KMX_LogError(L"Warning: %i deadkeys have not been processed.", no_dk_counter);
   *p = 0;
   return (p - outputPairs);
 }
