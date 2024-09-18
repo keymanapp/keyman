@@ -675,6 +675,21 @@ KMX_DWORD mac_KMX_get_KeyVal_From_KeyCode(const UCKeyboardLayout* keyboard_layou
   */
   status = UCKeyTranslate(keyboard_layout, keycode, kUCKeyActionDown, (shiftstate_mac + 4 * caps), LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString);
 
+	/*
+	// here is another possible C++  -O1, -O2, -O3 standard-compilant problem:
+	// The problem occurs when I run with C++ -O1
+	// The problem does not occur when I run it with C++ -O0
+
+	// As soon as I check status != noErr, deadkeys[] will be filled with wrong data. This happens even when I only print out a message
+
+	if (status != noErr)  			// gives wrong output
+		return 0;
+
+	if (status != noErr)  			// gives wrong output
+		wprintf(L"Test status\n");
+	*/
+
+
 	// If this was a deadkey (deadkeystate != 0), append a space
   if (deadkeystate != 0) {
     status = UCKeyTranslate(keyboard_layout, keycode_spacebar, kUCKeyActionDown, (shiftstate_mac + 4 * caps), LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString);
