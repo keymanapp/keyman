@@ -1,7 +1,7 @@
 /*
  * Keyman is copyright (C) SIL International. MIT License.
  *
- * Mnemonic layout support for mac
+ * Mnemonic layout support for linux
  *
  * Defines the entry point for the console application.
  *
@@ -28,7 +28,7 @@ std::vector<KMX_DeadkeyMapping> KMX_FDeadkeys;  // I4353
 #define _countof(a) (sizeof(a) / sizeof(*(a)))
 
 /**
- * @brief  main function for mcompile for Windows, Linux, Mac
+ * @brief  main function for mcompile for Linux
  * @param  argc number of commandline arguments
  * @param  argv pointer to commandline arguments: executable, inputfile, outputfile
  * @return 0 on success
