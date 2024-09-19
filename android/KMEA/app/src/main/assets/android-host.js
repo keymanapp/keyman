@@ -233,7 +233,7 @@ function enableSuggestions(model, mayPredict, maySuggest) {
   // Set the options first so that KMW's ModelManager can properly handle model enablement states
   // the moment we actually register the new model.
   // Use console_debug
-  window.console.log('enableSuggestions(mayPredict='+mayPredict+', maySuggest='+maySuggest+')');
+  console_debug('enableSuggestions(mayPredict='+mayPredict+', maySuggest='+maySuggest+')');
   if (!mayPredict) {
     keyman.core.languageProcessor.mayPredict = false;
     keyman.core.languageProcessor.mayCorrect = false;
