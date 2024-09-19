@@ -45,8 +45,6 @@ NSString *const kKMXFileKey = @"KMXFile";
    NSArray *kvkFiles = [self KVKFiles];
    for (NSString *path in kvkFiles){
    KVKFile *kvkFile = [[KVKFile alloc] initWithFilePath:path];
-   if (debugMode)
-   NSLog(@"%@", kvkFile);
    }*/
 }
 
@@ -225,18 +223,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
       NSLog(@"%d: %@", index, kmStore);
       index++;
     }
-    
-    for (NSObject *gp in kmx.group) {
-      if (debugMode) {
-        NSLog(@"Group %@", gp);
-        //NSLog(@"match = %@", gp.match);
-        //NSLog(@"nomatch = %@", gp.noMatch);
-        /*
-         for (KMCompKey *kmKey in gp.keys) {
-         NSLog(@"\nKey: %@", kmKey);
-         }*/
-      }
-    }
   }
 }
 
@@ -257,9 +243,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     if (!infoDict)
       continue;
     
-    //if (debugMode)
-    //    NSLog(@"%@", infoDict);
-    //NSString *str = [NSString stringWithFormat:@"%@ (%@)", [infoDict objectForKey:kKMKeyboardNameKey], [infoDict objectForKey:kKMKeyboardVersionKey]];
     NSString *str = [infoDict objectForKey:kKMKeyboardNameKey];
     [kmxDesc addObject:str];
   }
