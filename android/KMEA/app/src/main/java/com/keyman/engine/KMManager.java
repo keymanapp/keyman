@@ -192,6 +192,36 @@ public final class KMManager {
     DEFAULT,   // Default ENTER action
   }
 
+  // Enum for whether the suggestion banner allows predictions, corrections, auto-corrections
+  public enum SuggestionType {
+    // Suggestion Disabled - No Predictions, No corrections, No auto-corrections
+    SUGGESTIONS_DISABLED,
+
+    // Suggestions Enabled
+    PREDICTIONS_ONLY,              // Predictions with no corrections
+    PREDICTIONS_WITH_CORRECTIONS,  // Predictions with corrections
+    PREDICTIONS_WITH_AUTO_CORRECT; // Predictions with auto-corrections
+
+    public static SuggestionType fromInt(int mode) {
+      switch (mode) {
+        case 0:
+          return SUGGESTIONS_DISABLED;
+        case 1:
+          return PREDICTIONS_ONLY;
+        case 2:
+          return PREDICTIONS_WITH_CORRECTIONS;
+        case 3:
+          return PREDICTIONS_WITH_AUTO_CORRECT;
+      }
+      return SUGGESTIONS_DISABLED;
+    }
+
+    public int toInt() {
+      int modes[] = { 0, 1, 2, 3 };
+      return modes[this.ordinal()];
+    }
+  }
+
   protected static InputMethodService IMService;
 
   private static boolean debugMode = false;
@@ -220,6 +250,7 @@ public final class KMManager {
 
   public final static String predictionPrefSuffix = ".mayPredict";
   public final static String correctionPrefSuffix = ".mayCorrect";
+  public final static String autoCorrectionPrefSuffix = ".mayAutoCorect";
 
   // Special override for when the keyboard may have haptic feedback when typing.
   // haptic feedback disabled for hardware keystrokes
@@ -315,6 +346,8 @@ public final class KMManager {
   public static final int KMMinimum_LongpressDelay = 300;
   public static final int KMMaximum_LongpressDelay = 1500;
 
+  // Default prediction/correction setting - corresponds to SuggestionType.PREDICTIONS_WITH_CORRECTIONS
+  public static final int KMDefault_Suggestion = 2;
 
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
@@ -705,6 +738,10 @@ public final class KMManager {
 
   public static String getLanguageCorrectionPreferenceKey(String langID) {
     return langID + correctionPrefSuffix;
+  }
+
+  public static String getLanguageAutoCorrectionPreferenceKey(String langID) {
+    return langID + autoCorrectionPrefSuffix;
   }
 
   public static void hideSystemKeyboard() {
@@ -1351,6 +1388,22 @@ public final class KMManager {
   }
 
   /**
+   * Maps radio button index 0..3 to SuggestionType and then store as preference
+   * @param languageID as String
+   * @param suggestType Radio button index 0 to 3
+   */
+  public static void setMaySuggest(String languageID, int suggestType) {
+    if (suggestType < 0 || suggestType > 3) {
+      // Invalid values go to SUGGESTIONS_DISABLED
+      suggestType = 0;
+    }
+    SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+    editor.putInt(KMManager.getLanguageAutoCorrectionPreferenceKey(languageID), suggestType);
+    editor.commit();
+  }
+
+  /**
    * Determines if the InputType field is a numeric field
    * @param inputType
    * @return boolean
@@ -1464,22 +1517,22 @@ public final class KMManager {
 
     // When entering password field, mayPredict should override to false
     SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    int maySuggest = prefs.getInt(getLanguageAutoCorrectionPreferenceKey(languageID), KMDefault_Suggestion);
     boolean mayPredict = (mayPredictOverride) ? false :
-      prefs.getBoolean(getLanguagePredictionPreferenceKey(languageID), true);
-    boolean mayCorrect = prefs.getBoolean(getLanguageCorrectionPreferenceKey(languageID), true);
+      maySuggest > 0;
 
     RelativeLayout.LayoutParams params;
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP) && !InAppKeyboard.shouldIgnoreTextChange() && modelFileExists) {
       params = getKeyboardLayoutParams();
 
       // Do NOT re-layout here; it'll be triggered once the banner loads.
-      InAppKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
+      InAppKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %d)", model, mayPredict, maySuggest));
     }
     if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_SYSTEM) && !SystemKeyboard.shouldIgnoreTextChange() && modelFileExists) {
       params = getKeyboardLayoutParams();
 
       // Do NOT re-layout here; it'll be triggered once the banner loads.
-      SystemKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %s)", model, mayPredict, mayCorrect));
+      SystemKeyboard.loadJavascript(KMString.format("enableSuggestions(%s, %s, %d)", model, mayPredict, maySuggest));
     }
     return true;
   }

@@ -169,8 +169,9 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
       if (kbInfo != null) {
         String langId = kbInfo.getLanguageID();
         SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-        boolean mayPredict = prefs.getBoolean(KMManager.getLanguagePredictionPreferenceKey(langId), true);
-        KMManager.setBannerOptions(mayPredict);
+        int maySuggest = prefs.getInt(KMManager.getLanguageAutoCorrectionPreferenceKey(langId), KMManager.KMDefault_Suggestion);
+        // Enable banner if maySuggest is not SuggestionType.SUGGESTIONS_DISABLED (0)
+        KMManager.setBannerOptions(maySuggest > 0);
       } else {
         KMManager.setBannerOptions(false);
       }
