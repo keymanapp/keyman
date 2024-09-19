@@ -1381,7 +1381,10 @@ KMX_DWORD KMX_get_KeyValUnderlying_From_KeyCodeUnderlying(GdkKeymap* keymap, gui
   g_free(maps);
 
   if ((keyV >= deadkey_min) && (keyV <= deadkey_max)) {                          // deadkey
-    dky = (PKMX_WCHAR)(convert_DeadkeyValues_To_U16str(keyV)).c_str();
+
+    std::u16string keyVS = convert_DeadkeyValues_To_U16str(keyV);
+    dky = (PKMX_WCHAR)keyVS.c_str();
+
     *deadkey = *dky;
     return 0xFFFF;
   } else if ((keyV > deadkey_max) || ((keyV < deadkey_min) && (keyV > 0xFF)))   // out of range

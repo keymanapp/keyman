@@ -1,7 +1,7 @@
 /*
  * Keyman is copyright (C) SIL International. MIT License.
  *
- * Mnemonic layout support for mac
+ * Mnemonic layout support for linux
  */
 
 #ifndef MCOMPILE_H
