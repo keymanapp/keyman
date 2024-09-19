@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 18.0.115 alpha 2024-09-19
+
+* chore(common): detect ssh remotes in git hooks (#12437)
+* fix(common): add proper configure output for hextobin (#12440)
+* fix(core): add missing dependency for core (#12438)
+* chore(developer): remove .js output from LDML compiler (#12432)
+
 ## 18.0.114 alpha 2024-09-17
 
 * fix(developer): rewrite ldml visual keyboard compiler (#12402)
