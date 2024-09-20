@@ -1399,6 +1399,10 @@ _builder_parse_expanded_parameters() {
           # internal reporting function, ignores all other parameters
           _builder_report_dependencies
           ;;
+        --builder_completion_describe)
+          _builder_completion_describe
+          exit 0
+          ;;
         *)
           # script does not recognize anything of action or target form at this point.
           if [[ $key =~ ^: ]]; then
@@ -1486,6 +1490,20 @@ _builder_pad() {
   local text2=$3
   local fmt="%-${count}s%s\n"
   printf $fmt "$text1" "$text2"
+}
+
+_builder_completion_describe() {
+  printf '%s ' "${_builder_actions[@]}"
+  echo -n "; "
+  printf '%s ' "${_builder_targets[@]}"
+  echo -n "; "
+  local _builder_opts=()
+  for e in "${!_builder_params[@]}"; do
+    if [[ $e =~ ^-- ]]; then
+      _builder_opts+=(${e%+*})
+    fi
+  done
+  printf '%s ' "${_builder_opts[@]}"
 }
 
 builder_display_usage() {
