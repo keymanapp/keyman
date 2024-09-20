@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.116 alpha 2024-09-20
+
+* change(mac): remove verbose logging option (#12431)
+* chore(common): Allow to build offline (#12439)
+
 ## 18.0.115 alpha 2024-09-19
 
 * chore(common): detect ssh remotes in git hooks (#12437)
