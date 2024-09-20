@@ -25,6 +25,8 @@
 		29A658C82AF394560038DCFE /* armenian_mnemonic.kmx in Resources */ = {isa = PBXBuildFile; fileRef = 29A658C72AF394560038DCFE /* armenian_mnemonic.kmx */; };
 		29B4A0D82BFAE8A400682049 /* KMELogs.h in Headers */ = {isa = PBXBuildFile; fileRef = 29B4A0D62BFAE8A400682049 /* KMELogs.h */; };
 		29B4A0D92BFAE8A400682049 /* KMELogs.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B4A0D72BFAE8A400682049 /* KMELogs.m */; };
+		29BD27482C9D813D00AE7D1B /* CoreKey.h in Headers */ = {isa = PBXBuildFile; fileRef = 29BE6F022C9D700B00635B1A /* CoreKey.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		29BE6F042C9D700B00635B1A /* CoreKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 29BE6F032C9D700B00635B1A /* CoreKey.m */; };
 		378568D122FCCF0A00B481B5 /* sil_ipa.kmx in Resources */ = {isa = PBXBuildFile; fileRef = 378568D022FCCF0A00B481B5 /* sil_ipa.kmx */; };
 		378568D322FCD93300B481B5 /* indexoffset1892.kmx in Resources */ = {isa = PBXBuildFile; fileRef = 378568D222FCD93300B481B5 /* indexoffset1892.kmx */; };
 		980053351B37C9B50088DDDD /* NFont.h in Headers */ = {isa = PBXBuildFile; fileRef = 980053311B37C9B50088DDDD /* NFont.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -101,6 +103,8 @@
 		29A658C72AF394560038DCFE /* armenian_mnemonic.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = armenian_mnemonic.kmx; sourceTree = "<group>"; };
 		29B4A0D62BFAE8A400682049 /* KMELogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KMELogs.h; sourceTree = "<group>"; };
 		29B4A0D72BFAE8A400682049 /* KMELogs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KMELogs.m; sourceTree = "<group>"; };
+		29BE6F022C9D700B00635B1A /* CoreKey.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CoreKey.h; sourceTree = "<group>"; };
+		29BE6F032C9D700B00635B1A /* CoreKey.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CoreKey.m; sourceTree = "<group>"; };
 		378568D022FCCF0A00B481B5 /* sil_ipa.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = sil_ipa.kmx; sourceTree = "<group>"; };
 		378568D222FCD93300B481B5 /* indexoffset1892.kmx */ = {isa = PBXFileReference; lastKnownFileType = file; path = indexoffset1892.kmx; sourceTree = "<group>"; };
 		980053311B37C9B50088DDDD /* NFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NFont.h; sourceTree = "<group>"; };
@@ -178,6 +182,8 @@
 			children = (
 				2993C32B29B1D92E00FB5E95 /* CoreHelper.h */,
 				2993C32529B1D92E00FB5E95 /* CoreHelper.m */,
+				29BE6F022C9D700B00635B1A /* CoreKey.h */,
+				29BE6F032C9D700B00635B1A /* CoreKey.m */,
 				2993C32829B1D92E00FB5E95 /* CoreWrapper.h */,
 				2993C32429B1D92E00FB5E95 /* CoreWrapper.m */,
 				2993C32A29B1D92E00FB5E95 /* CoreAction.h */,
@@ -346,6 +352,7 @@
 				9818807B1BC1EE9700A1FBA5 /* TimerTarget.h in Headers */,
 				E28C71E520EBBA2D002D959D /* KMkeyViewProtocol.h in Headers */,
 				984C2B191A79CB020023F89D /* WindowsVKCodes.h in Headers */,
+				29BD27482C9D813D00AE7D1B /* CoreKey.h in Headers */,
 				984C2B0C1A79CA4F0023F89D /* KMCompGroup.h in Headers */,
 				984C2B101A79CA4F0023F89D /* KMCompStore.h in Headers */,
 				984C2B0E1A79CA4F0023F89D /* KMCompKey.h in Headers */,
@@ -517,6 +524,7 @@
 				29A1971F2AF091E600512A37 /* CoreKeyOutput.m in Sources */,
 				981880741BC1EA5800A1FBA5 /* KeyView.m in Sources */,
 				981880761BC1EA5800A1FBA5 /* OSKKey.m in Sources */,
+				29BE6F042C9D700B00635B1A /* CoreKey.m in Sources */,
 				2993C32F29B1D92E00FB5E95 /* CoreHelper.m in Sources */,
 				984C2B0D1A79CA4F0023F89D /* KMCompGroup.m in Sources */,
 				984C2B111A79CA4F0023F89D /* KMCompStore.m in Sources */,
