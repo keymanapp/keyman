@@ -64,16 +64,7 @@ id _lastServerWithOSKShowing = nil;
 
 - (id)init {
   self = [super init];
-  if (self) {
-#ifdef DEBUG
-    // If debugging, we'll turn it on by default, regardless of setting. If developer
-    // really wants it off, they can either change this line of code temporarily or
-    // go to the config screen and turn it off explicitly.
-    _debugMode = YES;
-#else
-    _debugMode = self.useVerboseLogging;
-#endif
-    
+  if (self) {    
     // first notify user and request access to Accessibility/PostEvent permissions
     // pass block as completion handler to complete init with initCompletion
     [PrivacyConsent.shared requestPrivacyAccess:^void (void){
@@ -384,7 +375,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
 - (KMEngine *)kme {
   if (_kme == nil) {
-    _kme = [[KMEngine alloc] initWithKMX:nil context:self.contextBuffer verboseLogging:self.debugMode];
+    _kme = [[KMEngine alloc] initWithKMX:nil context:self.contextBuffer];
   }
   
   return _kme;
@@ -439,19 +430,6 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     return [NSString stringWithFormat:@"Keyman"];
   else
     return [NSString stringWithFormat:@"%@ - Keyman", _keyboardName];
-}
-
-- (void)setUseVerboseLogging:(BOOL)useVerboseLogging {
-  os_log_debug([KMLogs configLog], "Turning verbose logging %{public}@", useVerboseLogging ? @"on." : @"off.");
-  _debugMode = useVerboseLogging;
-  if (_kme != nil)
-    [_kme setUseVerboseLogging:useVerboseLogging];
-
-  [[KMSettingsRepository shared] writeUseVerboseLogging:useVerboseLogging];
-}
-
-- (BOOL)useVerboseLogging {
-  return [[KMSettingsRepository shared] readUseVerboseLogging];
 }
 
 #pragma mark - Keyman Data
@@ -769,9 +747,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   NSString *keyboardMenuName = @"";
   int menuItemIndex = KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX;
   
-  if (self.debugMode) {
-    os_log_info([KMLogs configLog], "*** populateKeyboardMenuItems, number of active keyboards=%lu", self.activeKeyboards.count);
-  }
+  os_log_debug([KMLogs configLog], "*** populateKeyboardMenuItems, number of active keyboards=%lu", self.activeKeyboards.count);
   
   // loop through the active keyboards list and add them to the menu
   for (NSString *path in self.activeKeyboards) {
