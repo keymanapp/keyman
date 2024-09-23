@@ -15,7 +15,6 @@
 #import "ZipArchive.h"
 #import "KMPackageReader.h"
 #import "KMPackageInfo.h"
-#import "KMKeyboardInfo.h"
 #import "PrivacyConsent.h"
 #import "KMLogs.h"
 @import Sentry;
@@ -52,6 +51,7 @@ NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboard
 @implementation KMInputMethodAppDelegate
 @synthesize kme = _kme;
 @synthesize kmx = _kmx;
+@synthesize keyboardInfo = _keyboardInfo;
 @synthesize kvk = _kvk;
 @synthesize keyboardName = _keyboardName;
 @synthesize keyboardsPath = _keyboardsPath;
@@ -400,14 +400,13 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
 - (void)setKmx:(KMXFile *)kmx {
   _kmx = kmx;
-  [self.kme setKmx:_kmx];
+  _keyboardInfo = [self.kme loadKeyboardFromKmxFile:kmx];
   
-  NSString *keyboardFileName = [kmx.filePath lastPathComponent];
-   os_log_info([KMLogs keyboardLog], "setKmx to %{public}@", keyboardFileName);
-
+  os_log_info([KMLogs keyboardLog], "setKmx loadKeyboardFromKmxFile %{public}@", self.keyboardInfo.keyboardId);
+  
    // assign custom keyboard tag in Sentry to default keyboard
    [SentrySDK configureScope:^(SentryScope * _Nonnull scope) {
-       [scope setTagValue:keyboardFileName forKey:@"keyboard"];
+       [scope setTagValue:_keyboardInfo.keyboardId forKey:@"keyboard"];
    }];
 }
 

@@ -64,23 +64,33 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   }
 }
 
--(NSArray*)getKeyList {
+-(CoreKeyboardInfo*) getKeyboardInfoForKmxFile:(NSString*)kmxFile {
+  NSArray *keyArray = [self getKeyArray];
+  CoreKeyboardInfo* info = [[CoreKeyboardInfo alloc] init:kmxFile keyArray: keyArray];
+  return info;
+}
+
+/**
+ * Get the list of Keys supported by the keyboard
+ */
+-(NSArray*)getKeyArray {
   NSMutableArray *keyArray = [[NSMutableArray alloc] initWithCapacity:0];
   km_core_keyboard_key *keyList;
 
-  os_log_debug([KMELogs coreLog], "getKeyList called.");
   km_core_status result = km_core_keyboard_get_key_list(self.coreKeyboard, &keyList);
 
   for(km_core_keyboard_key* keyPtr = keyList; (keyPtr->key) != 0; keyPtr++) {
     uint16_t key = keyPtr->key;
     uint32_t modifier_flag = keyPtr->modifier_flag;
-    os_log_debug([KMELogs coreLog], "key %d modifiers %d ", key, modifier_flag);
+    //os_log_debug([KMELogs coreLog], "key %d modifiers %d ", key, modifier_flag);
     
     if(key != 0) {
       CoreKey* coreKey = [[CoreKey alloc] init: key modifiers: modifier_flag];
       [keyArray addObject:coreKey];
     }
   }
+
+  os_log_debug([KMELogs coreLog], "getKeyList returning %lu keys", (unsigned long)keyArray.count);
 
   return keyArray;
 }

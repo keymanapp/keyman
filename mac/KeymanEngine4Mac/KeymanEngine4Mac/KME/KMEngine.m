@@ -52,12 +52,6 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
   @catch (NSException *exception) {
     os_log_error([KMELogs coreLog], "loadCoreWrapperFromKmxFile, failed to create keyboard for path '%{public}@' with exception: %{public}@", kmxFilePath, exception.description);
   }
-
-  /**
-   * Get the list of Keys supported by the keyboard
-   */
-  NSArray* keyList = [_coreWrapper getKeyList];
-  os_log_debug([KMELogs coreLog], "loadCoreWrapperFromKmxFile, keyList: %{public}@", keyList);
 }
 
 -(void)setKmx:(KMXFile*) kmxFile {
@@ -67,6 +61,16 @@ const NSString* kEasterEggKmxName = @"EnglishSpanish.kmx";
       [self loadCoreWrapperFromKmxFile:kmxFile.filePath];
     }
   }
+}
+
+-(CoreKeyboardInfo*)loadKeyboardFromKmxFile:(KMXFile*) kmxFile {
+  [self setKmx:kmxFile];
+
+  // os_log_debug([KMELogs coreLog], "loadKeyboardFromKmxFile, keyList: %{public}@", keyList);
+
+  CoreKeyboardInfo *info = [_coreWrapper getKeyboardInfoForKmxFile:kmxFile.filePath];
+
+  return info;
 }
 
 - (void)setUseVerboseLogging:(BOOL)useVerboseLogging {

@@ -18,6 +18,4 @@
   }
   return self;
 }
-
-
 @end

@@ -62,6 +62,7 @@ static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX = 0;
 
 @property (nonatomic, strong) KMEngine *kme;
 @property (nonatomic, strong) KMXFile *kmx;
+@property (nonatomic, strong) CoreKeyboardInfo *keyboardInfo;
 @property (nonatomic, strong) KVKFile *kvk;
 @property (nonatomic, strong) NSString *keyboardsPath;
 @property (nonatomic, strong) NSString *fontsPath;
