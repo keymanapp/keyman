@@ -1,18 +1,18 @@
 (*
   Name:             KeymanDeveloperDebuggerMemo
   Copyright:        Copyright (C) 2003-2017 SIL International.
-  Documentation:    
-  Description:      
+  Documentation:
+  Description:
   Create Date:      8 Jun 2012
 
   Modified Date:    8 Jun 2012
   Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
+  Related Files:
+  Dependencies:
 
-  Bugs:             
-  Todo:             
-  Notes:            
+  Bugs:
+  Todo:
+  Notes:
   History:          08 Jun 2012 - mcdurdin - I3323 - V9.0 - Extract debug-related code TPlus-Memo into subclass
 *)
 unit KeymanDeveloperDebuggerMemo;  // I3323
@@ -24,6 +24,7 @@ uses
   Winapi.Messages,
   Winapi.Windows,
   Vcl.Controls,
+  Vcl.ComCtrls,
   Vcl.StdCtrls;
 
 type
@@ -34,7 +35,7 @@ type
     Anchor: Integer;
   end;
 
-  TKeymanDeveloperDebuggerMemo = class(TMemo)
+  TKeymanDeveloperDebuggerMemo = class(TRichEdit)
   private
     FOnMessage: TKeymanDeveloperDebuggerMessageEvent;
     FAllowUnicodeInput: Boolean;
@@ -77,6 +78,7 @@ constructor TKeymanDeveloperDebuggerMemo.Create(AOwner: TComponent);
 begin
   FAllowUnicodeInput := True;
   inherited Create(AOwner);
+  PlainText := True;
 end;
 
 procedure TKeymanDeveloperDebuggerMemo.CreateHandle;

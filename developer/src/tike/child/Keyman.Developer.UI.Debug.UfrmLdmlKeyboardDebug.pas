@@ -831,12 +831,22 @@ begin
 end;
 
 procedure TfrmLdmlKeyboardDebug.UpdateCharacterGrid;   // I4808
+var
+  start, len: Integer;
 begin
   if csDestroying in ComponentState then
     Exit;
 
-  TCharacterGridRenderer.Fill(sgChars, memo.Text, FDeadkeys, memo.SelStart,
-    memo.SelLength, memo.Selection.Anchor, True);
+  start := memo.SelStart;
+  len := memo.SelLength;
+  if start + len > Length(memo.Text) then
+  begin
+    // RichEdit has a virtual final character, which is selected when
+    // pressing Ctrl+A, etc.
+    len := Length(memo.Text) - start;
+  end;
+  TCharacterGridRenderer.Fill(sgChars, memo.Text, FDeadkeys, start, len
+    memo.Selection.Anchor, True);
   TCharacterGridRenderer.Size(sgChars, memo.Font);
 end;
 
