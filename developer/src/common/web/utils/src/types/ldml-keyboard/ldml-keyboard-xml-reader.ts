@@ -1,6 +1,11 @@
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Reads a LDML XML keyboard file into JS object tree and resolves imports
+ */
 import { SchemaValidators, util } from '@keymanapp/common-types';
 import { xml2js } from '../../index.js';
-import { CommonTypesMessages } from '../../common-events.js';
+import { CommonTypesMessages } from '../../common-messages.js';
 import { CompilerCallbacks } from '../../compiler-interfaces.js';
 import { LDMLKeyboardXMLSourceFile, LKImport, ImportStatus } from './ldml-keyboard-xml.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
@@ -114,6 +119,7 @@ export class LDMLKeyboardXMLSourceFileReader {
       for (const sub of obj) {
         // retain the same subtag
         if (!this.boxImportsAndSpecials(sub, subtag)) {
+          // resolveImports has already logged a message
           return false;
         }
       }
@@ -126,6 +132,7 @@ export class LDMLKeyboardXMLSourceFileReader {
           boxXmlArray(obj, key);
           // Now, resolve the import
           if (!this.resolveImports(obj, subtag)) {
+            // resolveImports has already logged a message
             return false;
           }
           // now delete the import array we so carefully constructed, the caller does not
@@ -133,6 +140,7 @@ export class LDMLKeyboardXMLSourceFileReader {
           delete obj['import'];
         } else {
           if (!this.boxImportsAndSpecials(obj[key], key)) {
+            // resolveImports has already logged a message
             return false;
           }
         }
@@ -152,6 +160,7 @@ export class LDMLKeyboardXMLSourceFileReader {
     // first, the explicit imports
     for (const asImport of ([...obj['import'] as LKImport[]].reverse())) {
       if (!this.resolveOneImport(obj, subtag, asImport)) {
+        // resolveOneImport has already logged a message
         return false;
       }
     }
@@ -162,6 +171,7 @@ export class LDMLKeyboardXMLSourceFileReader {
         base: constants.cldr_import_base,
         path: constants.cldr_implied_keys_import
       }, true)) {
+        // resolveOneImport has already logged a message
         return false;
       }
     } else if (subtag === 'forms') {
@@ -170,6 +180,7 @@ export class LDMLKeyboardXMLSourceFileReader {
         base: constants.cldr_import_base,
         path: constants.cldr_implied_forms_import
       }, true)) {
+        // resolveOneImport has already logged a message
         return false;
       }
     }
@@ -267,7 +278,8 @@ export class LDMLKeyboardXMLSourceFileReader {
         // An alternative fix would be to pull xml2js directly from github
         // rather than using the version tagged on npmjs.com.
       });
-      parser.parseString(file, (e: unknown, r: unknown) => { a = r as LDMLKeyboardXMLSourceFile }); // TODO-LDML: isn't 'e' the error?
+      const data = new TextDecoder().decode(file);
+      parser.parseString(data, (e: unknown, r: unknown) => { if(e) throw e; a = r as LDMLKeyboardXMLSourceFile }); // TODO-LDML: isn't 'e' the error?
       return a;
     })();
     return source;
@@ -279,14 +291,23 @@ export class LDMLKeyboardXMLSourceFileReader {
    */
   public load(file: Uint8Array): LDMLKeyboardXMLSourceFile | null {
     if (!file) {
+      throw new Error(`file parameter must not be null`);
+    }
+
+    let source: LDMLKeyboardXMLSourceFile = null;
+    try {
+      source = this.loadUnboxed(file);
+    } catch(e) {
+      this.callbacks.reportMessage(CommonTypesMessages.Error_InvalidXml({e}));
       return null;
     }
-    const source = this.loadUnboxed(file);
-    if(this.boxArrays(source)) {
+
+    if (this.boxArrays(source)) {
       return source;
-    } else {
-      return null;
     }
+
+    // boxArrays ... resolveImports has already logged a message
+    return null;
   }
 
   loadTestDataUnboxed(file: Uint8Array): any {

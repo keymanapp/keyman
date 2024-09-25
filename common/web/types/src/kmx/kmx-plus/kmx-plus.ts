@@ -291,7 +291,7 @@ export class Vars extends Section {
     });
   }
   findStringVariableValue(id: string): string {
-    return Vars.findVariable(this.strings, id)?.value?.value; // Unwrap: Variable, StrsItem
+    return Vars.findVariable(this.strings, id)?.value?.value ?? null; // Unwrap: Variable, StrsItem
   }
   substituteSetRegex(str: string, sections: DependencySections): string {
     return str.replaceAll(VariableParser.SET_REFERENCE, (_entire, id) => {
