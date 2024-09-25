@@ -53,6 +53,8 @@ This maps the local directory to the the Docker image.
 For sites that use Composer dependencies, this step also creates a link in the Docker image from /var/www/vendor/ to /var/www/html/vendor.
 The link file also appears locally.
 
+Some sites have assets in `/cdn/dev/` used to generate CDN in `/dev/deploy/`. To avoid confusion during development, you can skip generating CDN with `./build.sh start --debug`.
+
 ##### Port lookup table
 After this, you can access the website at the following ports:
 

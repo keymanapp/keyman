@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL International. MIT License.
+ */
 import { CompilerErrorNamespace, CompilerErrorSeverity,  CompilerMessageDef as def, CompilerMessageSpec as m } from './compiler-interfaces.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 
@@ -43,4 +46,8 @@ export class CommonTypesMessages {
   static Error_TestDataUnexpectedArray = (o: {subtag: string}) =>
     m(this.ERROR_TestDataUnexpectedArray,
       `Problem reading test data: expected single ${def(o.subtag)} element, found multiple`);
+
+  static ERROR_InvalidXml = SevError | 0x0008;
+  static Error_InvalidXml = (o:{e: any}) =>
+  m(this.ERROR_InvalidXml, `The XML file could not be read: ${(o.e ?? '').toString()}`);
 };
