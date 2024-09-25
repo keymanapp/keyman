@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 18.0.117 alpha 2024-09-25
+
+* docs(common): Document how to skip generating CDN on websites (#12446)
+* fix(android): Remove toggle for "Always Show Banner" (#12430)
+* fix(android): Hide suggestion banner on password fields (#12442)
+* fix(developer): prevent invalid string ids (#12465)
+
 ## 18.0.116 alpha 2024-09-20
 
 * change(mac): remove verbose logging option (#12431)
