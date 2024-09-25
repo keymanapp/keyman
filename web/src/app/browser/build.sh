@@ -44,32 +44,20 @@ do_clean() {
 }
 
 compile_and_copy() {
-  local COMPILE_FLAGS=
-  if builder_has_option --ci; then
-    COMPILE_FLAGS=--ci
-  fi
-  compile $SUBPROJECT_NAME $COMPILE_FLAGS
+  compile $SUBPROJECT_NAME
 
   BUILD_ROOT="${KEYMAN_ROOT}/web/build/app/browser"
   SRC_ROOT="${KEYMAN_ROOT}/web/src/app/browser/src"
 
-  $BUNDLE_CMD    "${BUILD_ROOT}/obj/debug-main.js" \
-    --out        "${BUILD_ROOT}/debug/keymanweb.es5.js" \
-    --sourceRoot "@keymanapp/keyman/web/build/app/browser/debug"
-
-  $BUNDLE_CMD    "${BUILD_ROOT}/obj/release-main.js" \
-    --out        "${BUILD_ROOT}/release/keymanweb.es5.js" \
-    --profile    "${BUILD_ROOT}/filesize-profile.es5.log" \
-    --sourceRoot "@keymanapp/keyman/web/build/app/browser/release" \
-    --minify
-
   $BUNDLE_CMD    "${SRC_ROOT}/debug-main.js" \
     --out        "${BUILD_ROOT}/debug/keymanweb.js" \
+    --charset    "utf8" \
     --sourceRoot "@keymanapp/keyman/web/build/app/browser/debug" \
     --target     "es6"
 
   $BUNDLE_CMD    "${SRC_ROOT}/release-main.js" \
     --out        "${BUILD_ROOT}/release/keymanweb.js" \
+    --charset    "utf8" \
     --profile    "${BUILD_ROOT}/filesize-profile.log" \
     --sourceRoot "@keymanapp/keyman/web/build/app/browser/release" \
     --minify \
@@ -77,6 +65,7 @@ compile_and_copy() {
 
   $BUNDLE_CMD    "${BUILD_ROOT}/obj/test-index.js" \
     --out        "${BUILD_ROOT}/lib/index.mjs" \
+    --charset    "utf8" \
     --sourceRoot "@keymanapp/keyman/web/build/app/browser/lib" \
     --format esm
 
@@ -89,9 +78,7 @@ compile_and_copy() {
   local PROFILE_DEST="$KEYMAN_ROOT/web/build/profiling/"
   mkdir -p "$PROFILE_DEST"
   cp "${BUILD_ROOT}/filesize-profile.log"                               "$PROFILE_DEST/web-engine-filesize.log"
-  cp "${BUILD_ROOT}/filesize-profile.es5.log"                           "$PROFILE_DEST/web-engine-filesize.es5.log"
-  cp "$KEYMAN_ROOT/common/web/lm-worker/build/filesize-profile.log"     "$PROFILE_DEST/lm-worker-filesize.log"
-  cp "$KEYMAN_ROOT/common/web/lm-worker/build/filesize-profile.es5.log" "$PROFILE_DEST/lm-worker-filesize.es5.log"
+  cp "$KEYMAN_ROOT/web/src/engine/predictive-text/worker-thread/build/filesize-profile.log"     "$PROFILE_DEST/lm-worker-filesize.log"
 }
 
 builder_run_action configure verify_npm_setup

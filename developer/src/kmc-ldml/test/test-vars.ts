@@ -1,8 +1,8 @@
 import 'mocha';
 import { assert } from 'chai';
 import { VarsCompiler } from '../src/compiler/vars.js';
-import { CompilerMessages } from '../src/compiler/messages.js';
-import { CompilerMessages as KmnCompilerMessages } from '@keymanapp/kmc-kmn';
+import { LdmlCompilerMessages } from '../src/compiler/ldml-compiler-messages.js';
+import { KmnCompilerMessages } from '@keymanapp/kmc-kmn';
 import { testCompilationCases } from './helpers/index.js';
 import { KMXPlus, KMX } from '@keymanapp/common-types';
 import { BASIC_DEPENDENCIES } from '../src/compiler/empty-compiler.js';
@@ -112,13 +112,23 @@ describe('vars', function () {
     {
       subpath: 'sections/vars/dup0.xml',
       errors: [
-        CompilerMessages.Error_DuplicateVariable({ids: 'y'})
+        LdmlCompilerMessages.Error_DuplicateVariable({ids: 'y'})
       ],
     },
     {
       subpath: 'sections/vars/dup1.xml',
       errors: [
-        CompilerMessages.Error_DuplicateVariable({ids: 'upper, y'})
+        LdmlCompilerMessages.Error_DuplicateVariable({ids: 'upper, y'})
+      ],
+    },
+    {
+      subpath: 'sections/vars/fail-invalid-identifiers.xml',
+      errors: [
+        LdmlCompilerMessages.Error_InvalidVariableIdentifer({id: 'invalid-string'}),
+        LdmlCompilerMessages.Error_InvalidVariableIdentifer({id: 'invalid-set'}),
+        LdmlCompilerMessages.Error_InvalidVariableIdentifer({id: 'invalid-uset'}),
+        LdmlCompilerMessages.Error_InvalidVariableIdentifer({id: 'a_marker_name_more_than_32_chars_long'}),
+        LdmlCompilerMessages.Error_InvalidVariableIdentifer({id: '😡'}),
       ],
     },
     {
@@ -148,46 +158,53 @@ describe('vars', function () {
     {
       subpath: 'sections/vars/fail-badref-0.xml',
       errors: [
-        CompilerMessages.Error_MissingStringVariable({id: "yes"}),
+        LdmlCompilerMessages.Error_MissingStringVariable({id: "yes"}),
       ],
     },
     {
       subpath: 'sections/vars/fail-badref-1.xml',
       errors: [
-        CompilerMessages.Error_MissingSetVariable({id: "lower"}),
+        LdmlCompilerMessages.Error_MissingSetVariable({id: "lower"}),
       ],
     },
     {
       subpath: 'sections/vars/fail-badref-2.xml',
       errors: [
-        CompilerMessages.Error_MissingStringVariable({ id: 'doesnotexist' })
+        LdmlCompilerMessages.Error_MissingStringVariable({ id: 'doesnotexist' })
       ],
     },
     {
       subpath: 'sections/vars/fail-badref-3.xml',
       errors: [
-        CompilerMessages.Error_MissingUnicodeSetVariable({id: 'doesnotexist'})
+        LdmlCompilerMessages.Error_MissingUnicodeSetVariable({id: 'doesnotexist'})
       ],
     },
     {
       subpath: 'sections/vars/fail-badref-4.xml',
       errors: [
-        CompilerMessages.Error_NeedSpacesBetweenSetVariables({item: '$[vowels]$[consonants]'})
+        LdmlCompilerMessages.Error_NeedSpacesBetweenSetVariables({item: '$[vowels]$[consonants]'})
       ],
     },
     {
       subpath: 'sections/vars/fail-badref-5.xml',
       errors: [
-        CompilerMessages.Error_CantReferenceSetFromUnicodeSet({id: 'nonUnicodeSet'})
+        LdmlCompilerMessages.Error_CantReferenceSetFromUnicodeSet({id: 'nonUnicodeSet'})
       ],
     },
     {
       subpath: 'sections/vars/fail-badref-6.xml',
       errors: [
-        CompilerMessages.Error_MissingStringVariable({id: 'missingStringInSet'})
+        LdmlCompilerMessages.Error_MissingStringVariable({id: 'missingStringInSet'})
       ],
     },
-  ], varsDependencies);
+    {
+      subpath: 'sections/vars/fail-badref-7.xml',
+      errors: [
+        LdmlCompilerMessages.Error_MissingStringVariable({id: 'usedBeforeDefinition'})
+      ],
+      strictErrors: true
+    },
+], varsDependencies);
   describe('should match some marker constants', () => {
     // neither of these live here, but, common/web/types does not import ldml-keyboard-constants otherwise.
 
@@ -211,7 +228,7 @@ describe('vars', function () {
       {
         subpath: 'sections/vars/fail-markers-badref-0.xml',
         errors: [
-          CompilerMessages.Error_MissingMarkers({
+          LdmlCompilerMessages.Error_MissingMarkers({
             ids: [
               'doesnt_exist_1',
               'doesnt_exist_2',

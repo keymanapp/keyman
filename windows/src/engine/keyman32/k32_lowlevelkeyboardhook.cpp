@@ -26,9 +26,9 @@
 #include "serialkeyeventserver.h"
 #include "kbd.h"	/* DDK kbdlayout */
 
-#ifdef _WIN64
-#error k32_lowlevelkeyboardhook.cpp is not required for win64.
-#endif
+// This file is used only in keyman32.dll; it implements our low level keyboard hook
+// in the main keyman.exe process for hotkeys, serial key event server
+#ifndef _WIN64
 
 BOOL ProcessHotkey(UINT vkCode, BOOL isUp, DWORD ShiftState);
 
@@ -120,7 +120,7 @@ static BOOL touchPanelVisible;
 
 void WINAPI Keyman_UpdateTouchPanelVisibility(BOOL isVisible) {
   touchPanelVisible = isVisible;
-  SendDebugMessageFormat(0, sdmAIDefault, 0, "Keyman_UpdateTouchPanelVisibility: isVisible=%d", touchPanelVisible);
+  SendDebugMessageFormat("isVisible=%d", touchPanelVisible);
 }
 
 BOOL IsTouchPanelVisible() {
@@ -130,26 +130,22 @@ BOOL IsTouchPanelVisible() {
 }
 
 /*
-  Cache UseRegisterHotkey debug flag for this session
+  Cache AllowRightModifierHotKey for this session
 */
-BOOL UseRegisterHotkey() {
-  static BOOL flag_UseRegisterHotkey = FALSE;
+BOOL AllowRightModifierHotKey() {
+  static BOOL flag_AllowRightModifierHotKey = FALSE;
   static BOOL loaded = FALSE;
-  if (!loaded) {
-    loaded = TRUE;
-    flag_UseRegisterHotkey = Reg_GetDebugFlag(REGSZ_Flag_UseRegisterHotkey, FALSE);
-  }
-  return flag_UseRegisterHotkey;
-}
 
-BOOL UseCachedHotkeyModifierState() {
-  static BOOL flag_UseCachedHotkeyModifierState = FALSE;
-  static BOOL loaded = FALSE;
   if (!loaded) {
-    loaded = TRUE;
-    flag_UseCachedHotkeyModifierState = Reg_GetDebugFlag(REGSZ_Flag_UseCachedHotkeyModifierState, FALSE);
+    RegistryReadOnly reg(HKEY_CURRENT_USER);
+    if (reg.OpenKeyReadOnly(REGSZ_KeymanCU)) {
+      if (reg.ValueExists(REGSZ_AllowRightModifierHotKey)) {
+        flag_AllowRightModifierHotKey = !!reg.ReadInteger(REGSZ_AllowRightModifierHotKey);
+      }
+    }
+    loaded = TRUE; // Set loaded to TRUE whether or not the key exists
   }
-  return flag_UseCachedHotkeyModifierState;
+  return flag_AllowRightModifierHotKey;
 }
 
 LRESULT _kmnLowLevelKeyboardProc(
@@ -162,67 +158,44 @@ LRESULT _kmnLowLevelKeyboardProc(
     return CallNextHookEx(Globals::get_hhookLowLevelKeyboardProc(), nCode, wParam, lParam);
   }
 
+  SendDebugEntry();
 
   PKBDLLHOOKSTRUCT hs = (PKBDLLHOOKSTRUCT) lParam;
 
   BOOL extended = hs->flags & LLKHF_EXTENDED ? TRUE : FALSE;
   BOOL isUp = hs->flags & LLKHF_UP ? TRUE : FALSE;
 
-  SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: wparam: %x  lparam: %x [vk:%s scan:%x flags:%x extra:%x]", wParam, lParam, Debug_VirtualKey((WORD) hs->vkCode), hs->scanCode, hs->flags, hs->dwExtraInfo);   // I4674
+  SendDebugMessageFormat("wparam: %x  lparam: %x [vk:%s scan:%x flags:%x extra:%x]", wParam, lParam, Debug_VirtualKey((WORD) hs->vkCode), hs->scanCode, hs->flags, hs->dwExtraInfo);   // I4674
 
-  DWORD Flag = 0;
-  if (!UseCachedHotkeyModifierState()) {
-    // #5190: Don't cache modifier state because sometimes we won't receive
-    // modifier change events (e.g. on lock screen)
-    FHotkeyShiftState = 0;
-    if (GetKeyState(VK_LCONTROL) < 0) FHotkeyShiftState |= HK_CTRL;
-    if (GetKeyState(VK_RCONTROL) < 0) FHotkeyShiftState |= HK_RCTRL_INVALID;
-    if (GetKeyState(VK_LMENU) < 0) FHotkeyShiftState |= HK_ALT;
-    if (GetKeyState(VK_RMENU) < 0) FHotkeyShiftState |= HK_RALT_INVALID;
-    if (GetKeyState(VK_LSHIFT) < 0) FHotkeyShiftState |= HK_SHIFT;
-    if (GetKeyState(VK_RSHIFT) < 0) FHotkeyShiftState |= HK_RSHIFT_INVALID;
-    //TODO: #8064. Can remove debug message once issue #8064 is resolved
-     SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: !UseCachedHotkeyModifierState [FHotkeyShiftState:%x Flag:%x]", FHotkeyShiftState, Flag);
-  }
-  else if (UseRegisterHotkey()) {
-    // The old RegisterHotkey pattern does not support chiral modifier keys
-    switch (hs->vkCode) {
-      case VK_LCONTROL:
-      case VK_RCONTROL:
-      case VK_CONTROL:  Flag = HK_CTRL; break;
-      case VK_LMENU:
-      case VK_RMENU:
-      case VK_MENU:     Flag = HK_ALT; break;
-      case VK_LSHIFT:
-      case VK_RSHIFT:
-      case VK_SHIFT:    Flag = HK_SHIFT; break;
+  // #5190: Don't cache modifier state because sometimes we won't receive
+  // modifier change events (e.g. on lock screen)
+  FHotkeyShiftState = 0;
 
-    }
-    //TODO: #8064. Can remove debug message once issue #8064 is resolved
-    SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: UseRegisterHotkey [FHotkeyShiftState:%x Flag:%x]", FHotkeyShiftState, Flag);
-  }
-  else {
-    // #4619: We differentiate between Left and Right Ctrl/Shift/Alt. The right modifiers are
-    // not used for hotkeys, leaving them available for use as keystroke modifiers within a
-    // Keyman keyboard. But we need to track them anyway, so that a user doesn't press them
-    // and receive a hotkey event when they shouldn't (e.g. RALT+F4 if the hotkey is F4).
-    switch (hs->vkCode) {
-      case VK_LCONTROL: Flag = HK_CTRL; break;
-      case VK_RCONTROL: Flag = HK_RCTRL_INVALID; break;
-      case VK_CONTROL:  Flag = extended ? HK_RCTRL_INVALID : HK_CTRL; break;
-      case VK_LMENU:    Flag = HK_ALT; break;
-      case VK_RMENU:    Flag = HK_RALT_INVALID; break;
-      case VK_MENU:     Flag = extended ? HK_RALT_INVALID : HK_ALT; break;
-      case VK_LSHIFT:   Flag = HK_SHIFT; break;
-      case VK_RSHIFT:   Flag = HK_RSHIFT_INVALID; break;
-      case VK_SHIFT:    Flag = hs->scanCode == SCANCODE_RSHIFT ? HK_RSHIFT_INVALID : HK_SHIFT; break;
-    }
+  if (GetKeyState(VK_LCONTROL) < 0) {
+    FHotkeyShiftState |= HK_CTRL;
   }
 
-  if(Flag != 0) {
-    if(isUp) FHotkeyShiftState &= ~Flag;
-    else FHotkeyShiftState |= Flag;
+  if (GetKeyState(VK_RCONTROL) < 0) {
+    FHotkeyShiftState |= AllowRightModifierHotKey() ? HK_CTRL : HK_RCTRL_INVALID;
   }
+
+  if (GetKeyState(VK_LMENU) < 0) {
+    FHotkeyShiftState |= HK_ALT;
+  }
+
+  if (GetKeyState(VK_RMENU) < 0) {
+    FHotkeyShiftState |= AllowRightModifierHotKey() ? HK_ALT : HK_RALT_INVALID;
+  }
+
+  if (GetKeyState(VK_LSHIFT) < 0) {
+    FHotkeyShiftState |= HK_SHIFT;
+  }
+  if (GetKeyState(VK_RSHIFT) < 0) {
+    FHotkeyShiftState |= AllowRightModifierHotKey() ? HK_SHIFT : HK_RSHIFT_INVALID;
+  }
+
+  //TODO: #8064. Can remove debug message once issue #8064 is resolved
+  SendDebugMessageFormat("[FHotkeyShiftState:%x]", FHotkeyShiftState);
 
   // #7337 Post the modifier state ensuring the serialized queue is in sync
   // Note that the modifier key may be posted again with WM_KEYMAN_KEY_EVENT,
@@ -230,24 +203,28 @@ LRESULT _kmnLowLevelKeyboardProc(
   // message only updates our internal modifier state, and does not do
   // any additional processing or other serialization of the input queue.
   if (isModifierKey(hs->vkCode) && flag_ShouldSerializeInput) {
-      //TODO: #8064. Can remove debug message once issue #8064 is resolved
-      SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: isModifierKey [hs->vkCode:%x isUp:%d]", hs->vkCode, isUp);
-      PostMessage(ISerialKeyEventServer::GetServer()->GetWindow(), WM_KEYMAN_MODIFIER_EVENT, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
+    //TODO: #8064. Can remove debug message once issue #8064 is resolved
+    SendDebugMessageFormat("isModifierKey [hs->vkCode:%x isUp:%d]", hs->vkCode, isUp);
+    PostMessage(ISerialKeyEventServer::GetServer()->GetWindow(), WM_KEYMAN_MODIFIER_EVENT, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
   }
 
   if(IsLanguageSwitchWindowVisible()) {
-    SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: Sending to language switch window %x %x", wParam, lParam);
+    SendDebugMessageFormat("Sending to language switch window %x %x", wParam, lParam);
     SendToLanguageSwitchWindow(hs->vkCode, hs->flags);
-    if (ProcessLanguageSwitchShiftKey(hs->vkCode, isUp) == 1) return 1;
+    if (ProcessLanguageSwitchShiftKey(hs->vkCode, isUp) == 1) {
+      return_SendDebugExit(1);
+    }
   }
   else if (KeyLanguageSwitchPress(hs->vkCode, extended, isUp, FHotkeyShiftState)) {
-    SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: KeyLanguageSwitchPress [vkCode:%x extended:%x isUp:%d FHotkeyShiftState:%x", hs->vkCode, extended, isUp, FHotkeyShiftState);
-    if (ProcessLanguageSwitchShiftKey(hs->vkCode, isUp) == 1) return 1;
+    SendDebugMessageFormat("KeyLanguageSwitchPress [vkCode:%x extended:%x isUp:%d FHotkeyShiftState:%x", hs->vkCode, extended, isUp, FHotkeyShiftState);
+    if (ProcessLanguageSwitchShiftKey(hs->vkCode, isUp) == 1) {
+      return_SendDebugExit(1);
+    }
   }
 
   if (ProcessHotkey(hs->vkCode, isUp, FHotkeyShiftState)) {
-    SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: ProcessHotkey [vkCode:%x isUp:%d FHotkeyShiftState:%x", hs->vkCode, isUp, FHotkeyShiftState);
-    return 1;
+    SendDebugMessageFormat("ProcessHotkey [vkCode:%x isUp:%d FHotkeyShiftState:%x", hs->vkCode, isUp, FHotkeyShiftState);
+    return_SendDebugExit(1);
   }
 
   /*
@@ -265,43 +242,40 @@ LRESULT _kmnLowLevelKeyboardProc(
     // dwExtraInfo is set to 0x4321DCBA by mstsc which does prefiltering. So we ignore for anything where dwExtraInfo!=0 because it
     // probably is not hardware generated and may cause more issues to filter it.
     // We also ignore if a Keyman keyboard is not currently active.
-    SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: Pass through [dwExtraInfo:%x scancode:%x vkCode:%x, isKeymanKeyboardActive:%d", hs->dwExtraInfo, hs->scanCode, hs->vkCode, isKeymanKeyboardActive);
-    return CallNextHookEx(Globals::get_hhookLowLevelKeyboardProc(), nCode, wParam, lParam);
+    SendDebugMessageFormat("Pass through [dwExtraInfo:%x scancode:%x vkCode:%x, isKeymanKeyboardActive:%d", hs->dwExtraInfo, hs->scanCode, hs->vkCode, isKeymanKeyboardActive);
+    return_SendDebugExit(CallNextHookEx(Globals::get_hhookLowLevelKeyboardProc(), nCode, wParam, lParam));
   }
 
   if (IsTouchPanelVisible()) {
     // See #2450. The touch panel will close automatically if we reprocess key events
     // So we don't want to reprocess events when it is visible.
-    SendDebugMessageFormat(0, sdmAIDefault, 0, "kmnLowLevelKeyboardProc: touch panel is visible. Not reprocessing keystrokes");
-    return CallNextHookEx(Globals::get_hhookLowLevelKeyboardProc(), nCode, wParam, lParam);
+    SendDebugMessageFormat("touch panel is visible. Not reprocessing keystrokes");
+    return_SendDebugExit(CallNextHookEx(Globals::get_hhookLowLevelKeyboardProc(), nCode, wParam, lParam));
   }
 
   if (flag_ShouldSerializeInput) {
     GUITHREADINFO gui = { 0 };
     gui.cbSize = sizeof(GUITHREADINFO);
     if (GetGUIThreadInfo(NULL, &gui)) {
-      SendDebugMessageFormat(0, sdmGlobal, 0, "LowLevelHook: Active=%x Focus=%x Key=%s flags=%x",
+      SendDebugMessageFormat("Active=%x Focus=%x Key=%s flags=%x",
         gui.hwndActive, gui.hwndFocus, Debug_VirtualKey((WORD)hs->vkCode), LLKHFFlagstoWMKeymanKeyEventFlags(hs));
 
       HWND hwnd = gui.hwndFocus ? gui.hwndFocus : gui.hwndActive;
       if (!IsConsoleWindow(hwnd)) {
         PostMessage(ISerialKeyEventServer::GetServer()->GetWindow(), WM_KEYMAN_KEY_EVENT, hs->vkCode, LLKHFFlagstoWMKeymanKeyEventFlags(hs));
-        return 1;
+        return_SendDebugExit(1);
       }
-      //else SendDebugMessageFormat(0, sdmGlobal, 0, "LowLevelHook: console window, not serializing"); // too noisy
+      //else SendDebugMessageFormat("console window, not serializing"); // too noisy
     }
     else {
-      SendDebugMessageFormat(0, sdmGlobal, 0, "LowLevelHook: Failed to get Gui thread info with error %d", GetLastError());
+      SendDebugMessageFormat("Failed to get Gui thread info with error %d", GetLastError());
     }
   }
 
-  return CallNextHookEx(Globals::get_hhookLowLevelKeyboardProc(), nCode, wParam, lParam);
+  return_SendDebugExit(CallNextHookEx(Globals::get_hhookLowLevelKeyboardProc(), nCode, wParam, lParam));
 }
 
 BOOL ProcessHotkey(UINT vkCode, BOOL isUp, DWORD ShiftState) {
-  if (UseRegisterHotkey()) {
-    return FALSE;
-  }
 
   Hotkeys *hotkeys = Hotkeys::Instance();   // I4641
   if (!hotkeys) {
@@ -323,9 +297,10 @@ BOOL ProcessHotkey(UINT vkCode, BOOL isUp, DWORD ShiftState) {
   else {
     ReportKeyboardChanged(PC_HOTKEYCHANGE, hotkey->hkl == 0 ? TF_PROFILETYPE_INPUTPROCESSOR : TF_PROFILETYPE_KEYBOARDLAYOUT, 0, hotkey->hkl, GUID_NULL, hotkey->profileGUID);
   }
-
   /* Generate a dummy keystroke to block menu activations, etc but let the shift key through */
   PostDummyKeyEvent();  // I3301 - this is imperfect because we don't deal with HC_NOREMOVE.  But good enough?   // I3534   // I4844
 
   return TRUE;
 }
+
+#endif

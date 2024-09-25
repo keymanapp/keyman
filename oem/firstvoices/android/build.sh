@@ -25,6 +25,7 @@ builder_describe "Builds FirstVoices for Android app." \
   "configure" \
   "build" \
   "test             Runs lint and tests." \
+  "publish          Publishes symbols to Sentry and the APK to the Play Store." \
   "--ci             Don't start the Gradle daemon. For CI"
 
 # parse before describe_outputs to check debug flags
@@ -61,13 +62,9 @@ if builder_start_action clean; then
 fi
 
 if builder_start_action configure; then
-  KEYBOARDS_CSV="$KEYMAN_ROOT/oem/firstvoices/keyboards.csv"
-  KEYBOARDS_CSV_TARGET="$KEYMAN_ROOT/oem/firstvoices/android/app/src/main/assets/keyboards.csv"
-
   KEYBOARD_PACKAGE_ID="fv_all"
   KEYBOARDS_TARGET="$KEYMAN_ROOT/oem/firstvoices/android/app/src/main/assets/${KEYBOARD_PACKAGE_ID}.kmp"
 
-  cp "$KEYBOARDS_CSV" "$KEYBOARDS_CSV_TARGET"
   downloadKeyboardPackage "$KEYBOARD_PACKAGE_ID" "$KEYBOARDS_TARGET"
 
   builder_finish_action success configure
@@ -89,3 +86,6 @@ if builder_start_action test; then
 
   builder_finish_action success test
 fi
+
+builder_run_action publish    ./gradlew $DAEMON_FLAG publishSentry publishReleaseApk
+

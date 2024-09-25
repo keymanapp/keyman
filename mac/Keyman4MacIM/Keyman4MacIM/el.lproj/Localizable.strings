@@ -1,0 +1,74 @@
+/* Message displayed to confirm delete of the Keyman keyboard selected by the user from the keyboard list  */
+"message-confirm-delete-keyboard" = "Εἶσθε βέβαιοι ὅτι θέλετε νὰ διαγράψετε τὸ πληκτρολόγιο '%@';";
+
+/* Delete keyboard confirmation info indicating that the delete action cannot be undone  */
+"info-cannot-undo-delete-keyboard" = "Δὲν μπορεῖτε νὰ ἀναιρέσετε αὐτὴν τὴν ἐνέργεια.";
+
+/* Button text to cancel delete of the specified installed Keyman keyboard  */
+"button-cancel-delete-keyboard" = "Ἀκυρῶστε";
+
+/* Button text to confirm delete of the specified installed Keyman keyboard  */
+"button-delete-keyboard" = "Διαγράψτε";
+
+/* Message displayed to confirm installation of a keyboard from the specifed .kmp file double-clicked by the user  */
+"message-confirm-install-keyboard" = "Θὰ ἐγκαταστήσετε πληκτρολόγιο Keyman;";
+
+/* Message displayed to confirm installation of a keyboard from the specifed .kmp file double-clicked by the user  */
+"info-install-keyboard-filename" = "Θέλετε ἡ ἐφαρμογὴ Keyman νὰ ἐγκαταστήσει τὸ πληκτρολόγιο ἀπὸ τὸ ἀρχεῖο '%@';";
+
+/* Button text to cancel installation of the double-clicked Keyman file  */
+"button-cancel-install-keyboard" = "Ἀκυρῶστε";
+
+/* Button text to confirm installation of the double-clicked Keyman file  */
+"button-install-keyboard" = "Ἐγκαταστῆστε";
+
+/* Message displayed to inform user that .kmp file could not be read/unzipped  */
+"message-keyboard-file-unreadable" = "Δὲν μπορέσαμε νὰ διαβάσομε τὸ ἀρχεῖο Keyman '%@'.";
+
+/* Message displayed in Configuration window when keyboard cannot be loaded */
+"message-error-loading-keyboard" = "(σφάλμα κατὰ τὴν φόρτωση πληκτρολογίου)";
+
+/* Message displayed in Configuration window when keyboard metadata cannot be loaded */
+"message-error-unknown-metadata" = "ἄγνωστο";
+
+/* Button text to acknowledge that .kmp file could not be read  */
+"button-keyboard-file-unreadable" = "OK";
+
+/* label text to identify Keyman version */
+"version-label-text" = "Ἔκδοση: %@";
+
+/* Status text for keyboard downloading  */
+"message-keyboard-downloading" = "Μεταφόρτωση σὲ ἐξέλιξη...";
+
+/* Status text for keyboard download complete  */
+"message-keyboard-download-complete" = "Ὁλοκλήρωση φόρτωσης.";
+
+/* Button text to cancel downloading keyboard  */
+"button-cancel-downloading" = "Ἀκυρῶστε";
+
+/* Button text keyboard download complete  */
+"button-download-complete" = "Ἕτοιμοι";
+
+/* keyboards label in the Package Information window */
+"keyboards-label" = "Πληκτρολόγια:";
+
+/* fonts label in the Package Information window */
+"fonts-label" = "Γραμματοσειρές:";
+
+/* package version label in the Package Information window */
+"package-version-label" = "Ἔκδοση πακέτου:";
+
+/* author label in the Package Information window */
+"author-label" = "Δημιουργός:";
+
+/* website label in the Package Information window */
+"website-label" = "Ἱστότοπος:";
+
+/* copyright label in the Package Information window */
+"copyright-label" = "Πνευματικὰ δικαιώματα:";
+
+/* message displayed to alert user to need grant accessibility permission */
+"privacy-alert-text" = "Τὸ Keyman, γιὰ νὰ λειτουργήσει σωστά, ἀπαιτεῖ ὁρισμένες δυνατότητες προσπέλασης:\n\nἘπιτρέψτε τὴν πρόσβαση στὶς Προτιμήσεις Συστήματος, τὴν Ἀσφάλεια & Ἰδιωτικότητα.\nἘπανεκκινῆστε τὸ σύστημά σας.";
+
+/* Text of menu item in Input Menu when no Keyboards are configured -- include parentheses  */
+"no-keyboard-configured-menu-placeholder" = "(Δὲν ἔχει ἐγκατασταθεῖ πληκτρολόγιο)";

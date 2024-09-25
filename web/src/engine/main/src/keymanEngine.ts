@@ -1,17 +1,18 @@
-import { type Keyboard, KeyboardKeymanGlobal, ProcessorInitOptions } from "@keymanapp/keyboard-processor";
-import { DOMKeyboardLoader as KeyboardLoader } from "@keymanapp/keyboard-processor/dom-keyboard-loader";
-import { InputProcessor, PredictionContext } from "@keymanapp/input-processor";
+import { type KeyEvent, type Keyboard, KeyboardKeymanGlobal } from "keyman/engine/keyboard";
+import { OutputTarget, ProcessorInitOptions, RuleBehavior } from 'keyman/engine/js-processor';
+import { DOMKeyboardLoader as KeyboardLoader } from "keyman/engine/keyboard/dom-keyboard-loader";
+import { InputProcessor } from './headless/inputProcessor.js';
 import { OSKView } from "keyman/engine/osk";
-import { KeyboardRequisitioner, ModelCache, ModelSpec, toUnprefixedKeyboardId as unprefixed } from "keyman/engine/package-cache";
+import { KeyboardRequisitioner, ModelCache, toUnprefixedKeyboardId as unprefixed } from "keyman/engine/keyboard-storage";
+import { ModelSpec, PredictionContext } from "keyman/engine/interfaces";
 
 import { EngineConfiguration, InitOptionSpec } from "./engineConfiguration.js";
 import KeyboardInterface from "./keyboardInterface.js";
 import { ContextManagerBase } from "./contextManagerBase.js";
-import { KeyEventHandler } from 'keyman/engine/events';
 import HardKeyboardBase from "./hardKeyboard.js";
 import { LegacyAPIEvents } from "./legacyAPIEvents.js";
 import { EventNames, EventListener, LegacyEventEmitter } from "keyman/engine/events";
-import DOMCloudRequester from "keyman/engine/package-cache/dom-requester";
+import DOMCloudRequester from "keyman/engine/keyboard-storage/dom-requester";
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
 // From https://stackoverflow.com/a/69328045
@@ -28,6 +29,9 @@ function determineBaseLayout(): string {
     return 'us';
   }
 }
+
+export type KeyEventFullResultCallback = (result: RuleBehavior, error?: Error) => void;
+export type KeyEventFullHandler = (event: KeyEvent, callback?: KeyEventFullResultCallback) => void;
 
 export default class KeymanEngine<
   Configuration extends EngineConfiguration,
@@ -47,7 +51,7 @@ export default class KeymanEngine<
 
   protected keyEventRefocus?: () => void;
 
-  private keyEventListener: KeyEventHandler = (event, callback) => {
+  private keyEventListener: KeyEventFullHandler = (event, callback) => {
     const outputTarget = this.contextManager.activeTarget;
 
     if(!this.contextManager.activeKeyboard || !outputTarget) {
@@ -55,6 +59,10 @@ export default class KeymanEngine<
         callback(null, null);
       }
       return;
+    }
+
+    if(!this.core.languageProcessor.mayCorrect) {
+      event.keyDistribution = [];
     }
 
     if(this.keyEventRefocus) {
@@ -122,8 +130,6 @@ export default class KeymanEngine<
       // so we handle that here.
       this.osk?.bannerController.selectBanner(state);
       this.osk?.refreshLayout();
-
-      // If `this.osk` is not yet initialized, the OSK itself will check if the model is loaded
     });
 
     // The OSK does not possess a direct connection to the KeyboardProcessor's state-key
@@ -239,10 +245,12 @@ export default class KeymanEngine<
     this.modelCache = new ModelCache();
     const kbdCache = this.keyboardRequisitioner.cache;
 
+    const keyboardProcessor = this.core.keyboardProcessor;
+    const predictionContext = new PredictionContext(this.core.languageProcessor, () => keyboardProcessor.layerId);
     this.contextManager.configure({
       resetContext: (target) => {
         // Could reset the target's deadkeys here, but it's really more of a 'core' task.
-        // So we delegate that to keyboard-processor.
+        // So we delegate that to keyboard.
         if(this.osk) {
           this.osk.batchLayoutAfter(() => {
             this.core.resetContext(target);
@@ -251,8 +259,25 @@ export default class KeymanEngine<
           this.core.resetContext(target);
         }
       },
-      predictionContext: new PredictionContext(this.core.languageProcessor, this.core.keyboardProcessor),
+      predictionContext: predictionContext,
       keyboardCache: this.keyboardRequisitioner.cache
+    });
+
+    /*
+     * Handler for post-processing once a suggestion has been applied.
+     *
+     * This is called after the suggestion is applied but _before_ new
+     * predictions are requested based on the resulting context.
+     */
+    this.core.languageProcessor.on('suggestionapplied', () => {
+      // Tell the keyboard that the current layer has not changed
+      keyboardProcessor.newLayerStore.set('');
+      keyboardProcessor.oldLayerStore.set('');
+      // Call the keyboard's entry point.
+      keyboardProcessor.processPostKeystroke(keyboardProcessor.contextDevice, predictionContext.currentTarget as OutputTarget)
+        // If we have a RuleBehavior as a result, run it on the target. This should
+        // only change system store and variable store values.
+        ?.finalize(keyboardProcessor, predictionContext.currentTarget as OutputTarget, true);
     });
 
     // #region Event handler wiring
@@ -349,6 +374,10 @@ export default class KeymanEngine<
       this.core.keyboardProcessor.layerStore.handler = this.osk.layerChangeHandler;
     }
     this._osk = value;
+    // As the `new context` ruleset is designed to facilitate OSK layer-change updates
+    // based on the context being entered, we want the keyboard processor's current
+    // contextDevice to match that of the active OSK.  See #11740.
+    this.core.keyboardProcessor.contextDevice = value?.targetDevice ?? this.config.softDevice;
     if(value) {
       // Don't build an OSK if no keyboard is available yet; avoid the extra flash.
       if(this.contextManager.activeKeyboard) {

@@ -14,6 +14,7 @@ builder_describe "Keyman kmc Keyboard Compiler module" \
   "@/common/web/keyman-version" \
   "@/common/web/types" \
   "@/developer/src/kmc-kmn" \
+  "@/developer/src/common/web/utils" \
   "@/developer/src/common/web/test-helpers" \
   "configure" \
   "build" \

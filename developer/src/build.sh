@@ -42,11 +42,29 @@ builder_describe \
   "--npm-publish+               For publish, do a npm publish, not npm pack (only for CI)" \
   "--dry-run,-n+                Don't actually publish anything to external endpoints, just dry run"
 
+builder_describe_platform \
+  :ext       win,delphi \
+  :kmanalyze win \
+  :kmdbrowserhost win,delphi \
+  :kmdecomp  win \
+  :kmconvert win,delphi \
+  :samples   win \
+  :server    win \
+  :setup     win,delphi \
+  :test      win,delphi \
+  :tike      win,delphi \
+  :inst      win,delphi
+
+# TODO: in future :server could be built on other platforms, potentially, but it
+# has addons that are Windows-specific currently
+
 builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
 
-source "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
+if [[ $BUILDER_OS == win ]]; then
+  source "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
+fi
 
 #
 # We want to do some checks before we head down the long publish path
@@ -133,7 +151,6 @@ function do_publish() {
 
   ../../common/web/keyman-version/build.sh publish $DRY_RUN $NPM_PUBLISH
   ../../common/web/types/build.sh publish $DRY_RUN $NPM_PUBLISH
-  ../../common/models/types/build.sh publish $DRY_RUN $NPM_PUBLISH
   ../../core/include/ldml/build.sh publish $DRY_RUN $NPM_PUBLISH
   # end TODO
   #--------------------------------------------------------

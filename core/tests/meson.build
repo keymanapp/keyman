@@ -10,7 +10,10 @@
 cmpfiles = ['-c', 'import sys; a = open(sys.argv[1], \'r\').read(); b = open(sys.argv[2], \'r\').read(); exit(not (a==b))']
 stnds = join_paths(meson.current_source_dir(), 'standards')
 
-libsrc = include_directories(join_paths('../', 'src'))
+libsrc = include_directories(
+  '../src',
+  '../../common/include'
+)
 
 # kmx_test_source is required for linux builds, so always enable it even when we
 # disable all other tests
@@ -21,7 +24,7 @@ if get_option('keyman_core_tests')
 
   if get_option('default_library') != 'static'
     ctypes_void_p_size = ['-c', 'import ctypes; print(ctypes.sizeof(ctypes.c_void_p))']
-    r = run_command(python, ctypes_void_p_size)
+    r = run_command(python, ctypes_void_p_size, check: true)
     python_ctypes_compatible = r.stdout().to_int() == cpp_compiler.sizeof('void *')
     if not python_ctypes_compatible
       message('Python ctypes is incompatible with built shared object. Disabling some tests.')

@@ -11,10 +11,11 @@
  */
 
 import JSZip from 'jszip';
-import { CompilerCallbacks, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KeymanFileTypes, KmpJsonFile, KpsFile } from "@keymanapp/common-types";
+import { KeymanFileTypes, KmpJsonFile } from "@keymanapp/common-types";
+import { CompilerCallbacks, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KpsFile } from '@keymanapp/developer-utils';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { KmpCompiler, KmpCompilerOptions } from "./kmp-compiler.js";
-import { CompilerMessages } from "./package-compiler-messages.js";
+import { PackageCompilerMessages } from "./package-compiler-messages.js";
 
 const SETUP_INF_FILENAME = 'setup.inf';
 const PRODUCT_NAME = 'Keyman';
@@ -120,7 +121,7 @@ export class WindowsPackageInstallerCompiler implements KeymanCompiler {
     // Check existence of required files
     for(const filename of [sources.licenseFilename, sources.msiFilename, sources.setupExeFilename]) {
       if(!this.callbacks.fs.existsSync(filename)) {
-        this.callbacks.reportMessage(CompilerMessages.Error_FileDoesNotExist({filename}));
+        this.callbacks.reportMessage(PackageCompilerMessages.Error_FileDoesNotExist({filename}));
         return null;
       }
     }
@@ -128,7 +129,7 @@ export class WindowsPackageInstallerCompiler implements KeymanCompiler {
     // Check existence of optional files
     for(const filename of [sources.titleImageFilename]) {
       if(filename && !this.callbacks.fs.existsSync(filename)) {
-        this.callbacks.reportMessage(CompilerMessages.Error_FileDoesNotExist({filename}));
+        this.callbacks.reportMessage(PackageCompilerMessages.Error_FileDoesNotExist({filename}));
         return null;
       }
     }
@@ -175,7 +176,7 @@ export class WindowsPackageInstallerCompiler implements KeymanCompiler {
   private async buildZip(kps: KpsFile.KpsFile, kpsFilename: string, sources: WindowsPackageInstallerSources): Promise<Uint8Array> {
     const kmpJson: KmpJsonFile.KmpJsonFile = this.kmpCompiler.transformKpsFileToKmpObject(kpsFilename, kps);
     if(!kmpJson.info?.name?.description) {
-      this.callbacks.reportMessage(CompilerMessages.Error_PackageNameCannotBeBlank());
+      this.callbacks.reportMessage(PackageCompilerMessages.Error_PackageNameCannotBeBlank());
       return null;
     }
 

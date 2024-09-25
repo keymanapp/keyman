@@ -177,8 +177,8 @@ class InstallKmp():
                 # Special handling to convert kvk into LDML
                 logging.info("Converting %s to LDML and installing both as as keyman file",
                              f['name'])
-                ldml = convert_kvk_to_ldml(fpath)
                 name, ext = os.path.splitext(f['name'])
+                ldml = convert_kvk_to_ldml(name, fpath)
                 ldmlfile = os.path.join(self.packageDir, f"{name}.ldml")
                 output_ldml(ldmlfile, ldml)
             elif ftype == KMFileTypes.KM_ICON:
@@ -307,9 +307,9 @@ def extract_kmp(kmpfile, directory):
         raise InstallError(InstallStatus.Abort, e) from e
 
 
-def process_keyboard_data(keyboardID, packageDir) -> None:
+def process_keyboard_data(keyboardID, packageDir) -> bool:
     if not (kbdata := get_keyboard_data(keyboardID)):
-        return
+        return False
     if not os.path.isdir(packageDir) and os.access(os.path.join(packageDir, os.pardir), os.X_OK | os.W_OK):
         try:
             os.makedirs(packageDir)
@@ -318,11 +318,13 @@ def process_keyboard_data(keyboardID, packageDir) -> None:
 
     if os.access(packageDir, os.X_OK | os.W_OK):
         try:
-            with open(os.path.join(packageDir, f'{keyboardID}.json'), 'w') as outfile:
+            with open(os.path.join(packageDir, f'{keyboardID}.json'), 'w', encoding='utf-8') as outfile:
                 json.dump(kbdata, outfile)
                 logging.info("Installing api data file %s.json as keyman file", keyboardID)
+                return True
         except Exception as e:
             logging.warning('Exception %s writing %s/%s.json %s', type(e), packageDir, keyboardID, e.args)
+    return False
 
 
 def install_kmp(inputfile, sharedarea=False, language=None):

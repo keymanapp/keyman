@@ -1,7 +1,8 @@
-import { CompilerCallbacks, KeymanFileTypes, KvksFile, KvksFileReader, KvksFileWriter, TouchLayoutFileReader, TouchLayoutFileWriter } from "@keymanapp/common-types";
-import { CompilerMessages, Osk } from '@keymanapp/kmc-kmn';
+import { KeymanFileTypes } from "@keymanapp/common-types";
+import { CompilerCallbacks, KvksFile, KvksFileReader, KvksFileWriter, TouchLayoutFileReader, TouchLayoutFileWriter } from '@keymanapp/developer-utils';
+import { KmnCompilerMessages, Osk } from '@keymanapp/kmc-kmn';
 import { getOskFromKmnFile } from "../util/get-osk-from-kmn-file.js";
-import { AnalyzerMessages } from "../messages.js";
+import { AnalyzerMessages } from "../analyzer-messages.js";
 
 /**
  * @public
@@ -106,13 +107,13 @@ export class AnalyzeOskRewritePua {
     try {
       source = reader.read(this.callbacks.loadFile(filename));
     } catch(e) {
-      this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvksFile({filename, e}));
+      this.callbacks.reportMessage(KmnCompilerMessages.Error_InvalidKvksFile({filename, e}));
       return null;
     }
     let invalidKeys: string[] = [];
     const vk = reader.transform(source, invalidKeys);
     if(!vk) {
-      this.callbacks.reportMessage(CompilerMessages.Error_InvalidKvksFile({filename, e:null}));
+      this.callbacks.reportMessage(KmnCompilerMessages.Error_InvalidKvksFile({filename, e:null}));
       return null;
     }
     const dirty = Osk.remapVisualKeyboard(vk, map);

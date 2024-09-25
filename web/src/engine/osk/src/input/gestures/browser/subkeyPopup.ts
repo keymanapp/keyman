@@ -3,10 +3,11 @@ import { type KeyElement } from '../../../keyElement.js';
 import OSKBaseKey from '../../../keyboard-layout/oskBaseKey.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
 
-import { DeviceSpec, ActiveSubKey, KeyDistribution, ActiveKeyBase } from '@keymanapp/keyboard-processor';
+import { DeviceSpec, ActiveSubKey, KeyDistribution, ActiveKeyBase } from 'keyman/engine/keyboard';
 import { ConfigChangeClosure, GestureRecognizerConfiguration, GestureSequence, PaddedZoneSource, RecognitionZoneSource } from '@keymanapp/gesture-recognizer';
 import { GestureHandler } from '../gestureHandler.js';
-import { CorrectionLayout, CorrectionLayoutEntry, distributionFromDistanceMaps, keyTouchDistances } from '@keymanapp/input-processor';
+import { CorrectionLayout, CorrectionLayoutEntry } from '../../../correctionLayout.js';
+import { distributionFromDistanceMaps, keyTouchDistances } from '../../../corrections.js';
 import { GestureParams } from '../specsForLayout.js';
 
 /**

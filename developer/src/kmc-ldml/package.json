@@ -25,22 +25,24 @@
     "url": "https://github.com/keymanapp/keyman/issues"
   },
   "dependencies": {
+    "@keymanapp/developer-utils": "*",
     "@keymanapp/keyman-version": "*",
     "@keymanapp/kmc-kmn": "*",
     "@keymanapp/ldml-keyboard-constants": "*",
-    "semver": "^7.5.2"
+    "semver": "^7.5.4"
   },
   "devDependencies": {
     "@keymanapp/developer-test-helpers": "*",
     "@keymanapp/resources-gosh": "*",
+    "@types/common-tags": "^1.8.4",
     "@types/mocha": "^5.2.7",
     "@types/node": "^20.4.1",
     "@types/semver": "^7.3.12",
     "c8": "^7.12.0",
     "chalk": "^2.4.2",
+    "common-tags": "^1.8.2",
     "mocha": "^8.4.0",
-    "ts-node": "^9.1.1",
-    "typescript": "^4.9.5"
+    "typescript": "^5.4.5"
   },
   "mocha": {
     "spec": "build/test/**/test-*.js",

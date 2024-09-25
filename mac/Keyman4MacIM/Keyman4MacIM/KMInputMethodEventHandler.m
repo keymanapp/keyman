@@ -10,6 +10,7 @@
 #import <Carbon/Carbon.h> /* For kVK_ constants. */
 #import "KeySender.h"
 #import "TextApiCompliance.h"
+#import "KMSettingsRepository.h"
 #import "KMLogs.h"
 @import Sentry;
 
@@ -44,16 +45,23 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   _lowLevelBackspaceCount = 0;
   _queuedText = nil;
   
-  // In Xcode, if Keyman is the active IM and is in "debugMode" and "English plus Spanish" is 
-  // the current keyboard and you type "Sentry force now", it will force a simulated crash to 
+  BOOL forceSentryCrash = [KMSettingsRepository.shared readForceSentryError];
+  
+  // In Xcode, if Keyman is the active IM and the settings include the
+  // forceSentryCrash flag and "English plus Spanish" is the current keyboard
+  // and you type "Sentry force now", it will force a simulated crash to
   // test reporting to sentry.keyman.com
-  if ([self.appDelegate debugMode] && [clientAppId isEqual: @"com.apple.dt.Xcode"]) {
-    os_log_debug([KMLogs testLog], "Sentry - Preparing to detect Easter egg.");
+  if (forceSentryCrash && [clientAppId isEqual: @"com.apple.dt.Xcode"]) {
+    os_log_debug([KMLogs testLog], "initWithClient, preparing to force Sentry crash.");
     _easterEggForSentry = [[NSMutableString alloc] init];
   }
   else
     _easterEggForSentry = nil;
   
+  [SentrySDK configureScope:^(SentryScope * _Nonnull scope) {
+      [scope setTagValue:clientAppId forKey:@"clientAppId"];
+  }];
+
   return self;
 }
 
@@ -61,9 +69,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   if (_generatedBackspaceCount > 0 || (_queuedText != nil && _queuedText.length > 0) ||
       _keyCodeOfOriginalEvent != 0 || _sourceFromOriginalEvent != nil)
   {
-    if ([self.appDelegate debugMode]) {
-      os_log_error([KMLogs lifecycleLog], "ERROR: new app activated before previous app finished processing pending events! _generatedBackspaceCount: %lu, _queuedText: '%{public}@' _keyCodeOfOriginalEvent: %hu", _generatedBackspaceCount, _queuedText == nil ? @"(NIL)" : (NSString*)[self queuedText], _keyCodeOfOriginalEvent);
-    }
+    os_log_error([KMLogs lifecycleLog], "ERROR: new app activated before previous app finished processing pending events! _generatedBackspaceCount: %lu, _queuedText: '%{public}@' _keyCodeOfOriginalEvent: %hu", _generatedBackspaceCount, _queuedText == nil ? @"(NIL)" : (NSString*)[self queuedText], _keyCodeOfOriginalEvent);
     _keyCodeOfOriginalEvent = 0;
     _generatedBackspaceCount = 0;
     _queuedText = nil;
@@ -412,11 +418,11 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   for(NSString *key in options) {
     NSString *value = [options objectForKey:key];
     if(key && value) {
-      os_log_debug([KMLogs keyLog], "applyNonTextualOutput calling writePersistedOptions, key: %{public}@, value: %{public}@", key, value);
-      [self.appDelegate writePersistedOptions:key withValue:value];
+      os_log_debug([KMLogs keyLog], "persistOptions, key: %{public}@, value: %{public}@", key, value);
+      [[KMSettingsRepository shared] writeOptionForSelectedKeyboard:key withValue:value];
     }
     else {
-      os_log_debug([KMLogs keyLog], "applyNonTextualOutput, invalid values in optionsToPersist, not writing to UserDefaults, key: %{public}@, value: %{public}@", key, value);
+      os_log_debug([KMLogs keyLog], "invalid values in persistOptions, not writing to UserDefaults, key: %{public}@, value: %{public}@", key, value);
     }
   }
 }

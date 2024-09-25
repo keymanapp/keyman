@@ -20,7 +20,7 @@ kmcompxtest = executable('kmcompxtest', ['kmcompxtest.cpp','util_filesystem.cpp'
     include_directories: inc,
     name_suffix: name_suffix,
     link_args: links + tests_links,
-    objects: lib.extract_all_objects(),
+    objects: lib.extract_all_objects(recursive: false),
     dependencies: icuuc_dep,
   )
 
@@ -129,7 +129,7 @@ if get_option('full_test')
 
 endif
 
-common_test_files = [ meson.source_root() / '../../../common/include/test_color.cpp' ]
+common_test_files = [ meson.global_source_root() / '../../../common/include/test_color.cpp' ]
 
 # Test the API endpoints
 
@@ -138,7 +138,7 @@ apitest = executable('api-test', ['api-test.cpp','util_filesystem.cpp','util_cal
     include_directories: inc,
     name_suffix: name_suffix,
     link_args: links + tests_links,
-    objects: lib.extract_all_objects(),
+    objects: lib.extract_all_objects(recursive: false),
     dependencies: icuuc_dep
   )
 
@@ -149,8 +149,32 @@ usetapitest = executable('uset-api-test', 'uset-api-test.cpp', common_test_files
     include_directories: inc,
     name_suffix: name_suffix,
     link_args: links + tests_links,
-    objects: lib.extract_all_objects(),
+    objects: lib.extract_all_objects(recursive: false),
     dependencies: icuuc_dep,
   )
 
 test('uset-api-test', usetapitest)
+
+# Google Test
+
+gtestcompilertest = executable('gtest-compiler-test', 'gtest-compiler-test.cpp',
+    cpp_args: defns + flags,
+    include_directories: inc,
+    name_suffix: name_suffix,
+    link_args: links + tests_links,
+    objects: lib.extract_all_objects(),
+    dependencies: [ icuuc_dep, gtest_dep, gmock_dep ],
+  )
+
+test('gtest-compiler-test', gtestcompilertest)
+
+gtest_km_u16_test = executable('gtest-km_u16-test', 'gtest-km_u16-test.cpp',
+    cpp_args: defns + flags,
+    include_directories: inc,
+    name_suffix: name_suffix,
+    link_args: links + tests_links,
+    objects: lib.extract_all_objects(),
+    dependencies: [ icuuc_dep, gtest_dep, gmock_dep ],
+  )
+
+test('gtest-km_u16-test', gtest_km_u16_test)

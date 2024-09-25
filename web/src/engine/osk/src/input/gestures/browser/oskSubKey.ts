@@ -1,4 +1,4 @@
-import { ActiveSubKey } from '@keymanapp/keyboard-processor';
+import { ActiveSubKey } from 'keyman/engine/keyboard';
 import OSKKey from '../../../keyboard-layout/oskKey.js';
 import { KeyData, KeyElement, link } from '../../../keyElement.js';
 import VisualKeyboard from '../../../visualKeyboard.js';
@@ -16,8 +16,7 @@ export default class OSKSubKey extends OSKKey {
   }
 
   getId(): string {
-    // Create (temporarily) unique ID by prefixing 'popup-' to actual key ID
-    return 'popup-'+this.layer+'-'+this.spec['id'];
+    return 'popup-'+this.spec.elementID;
   }
 
   construct(osk: VisualKeyboard, baseKey: KeyElement, width: number, topMargin: boolean): HTMLDivElement {

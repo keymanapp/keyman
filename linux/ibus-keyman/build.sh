@@ -45,6 +45,15 @@ else
   MESON_COVERAGE=
 fi
 
+# Import our standard compiler defines; this is copied from
+# /resources/build/meson/standard.meson.build by build.sh, because meson doesn't
+# allow us to reference a file outside its root. ${THIS_SCRIPT_PATH}/meson.build
+# then includes `resources` as a subdir.
+if builder_has_action configure; then
+  mkdir -p "${THIS_SCRIPT_PATH}/resources"
+  cp "${KEYMAN_ROOT}/resources/build/meson/standard.meson.build" "${THIS_SCRIPT_PATH}/resources/meson.build"
+fi
+
 configure_action() {
   # shellcheck disable=SC2086,SC2154
   meson setup ${MESON_COVERAGE} --werror --buildtype $MESON_TARGET "${builder_extra_params[@]}" "$MESON_PATH"

@@ -43,23 +43,15 @@ compile_and_copy() {
   BUILD_ROOT="${KEYMAN_ROOT}/web/build/app/webview"
   SRC_ROOT="${KEYMAN_ROOT}/web/src/app/webview/src"
 
-  $BUNDLE_CMD    "${BUILD_ROOT}/obj/debug-main.js" \
-    --out        "${BUILD_ROOT}/debug/keymanweb-webview.es5.js" \
-    --sourceRoot "@keymanapp/keyman/web/build/app/webview/debug"
-
-  $BUNDLE_CMD    "${BUILD_ROOT}/obj/release-main.js" \
-    --out        "${BUILD_ROOT}/release/keymanweb-webview.es5.js" \
-    --profile    "${BUILD_ROOT}/filesize-profile.es5.log" \
-    --sourceRoot "@keymanapp/keyman/web/build/app/webview/release" \
-    --minify
-
   $BUNDLE_CMD    "${SRC_ROOT}/debug-main.js" \
     --out        "${BUILD_ROOT}/debug/keymanweb-webview.js" \
+    --charset    "utf8" \
     --sourceRoot "@keymanapp/keyman/web/build/app/webview/debug" \
     --target     "es6"
 
   $BUNDLE_CMD    "${SRC_ROOT}/release-main.js" \
     --out        "${BUILD_ROOT}/release/keymanweb-webview.js" \
+    --charset    "utf8" \
     --profile    "${BUILD_ROOT}/filesize-profile.log" \
     --sourceRoot "@keymanapp/keyman/web/build/app/webview/release" \
     --minify \

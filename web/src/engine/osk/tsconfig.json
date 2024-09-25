@@ -12,8 +12,8 @@
   "include": [ "src/**/*.ts" ],
 
   "references": [
-    { "path": "../../../../common/web/input-processor" },
-    { "path": "../../../../common/web/gesture-recognizer" },
+    { "path": "./gesture-processor" },
+    { "path": "../interfaces" },
     { "path": "../dom-utils" },
     { "path": "../events" }
   ]

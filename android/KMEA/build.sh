@@ -23,7 +23,7 @@ JUNIT_RESULTS="##teamcity[importData type='junit' path='keyman\android\KMEA\app\
 
 builder_describe "Builds Keyman Engine for Android." \
   "@/web/src/app/webview" \
-  "@/common/web/sentry-manager" \
+  "@/web/src/engine/sentry-manager" \
   "clean" \
   "configure" \
   "build" \
@@ -77,8 +77,6 @@ if builder_start_action build:engine; then
   echo "Copying Keyman Web artifacts"
   cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/keymanweb-webview.js" "$ENGINE_ASSETS/keymanweb-webview.js"
   cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/keymanweb-webview.js.map" "$ENGINE_ASSETS/keymanweb-webview.js.map"
-  cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/keymanweb-webview.es5.js" "$ENGINE_ASSETS/keymanweb-webview.es5.js"
-  cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/keymanweb-webview.es5.js.map" "$ENGINE_ASSETS/keymanweb-webview.es5.js.map"
   cp "$KEYMAN_WEB_ROOT/build/app/webview/$CONFIG/map-polyfill.js" "$ENGINE_ASSETS/map-polyfill.js"
   cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/ajax-loader.gif" "$ENGINE_ASSETS/ajax-loader.gif"
   cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/kmwosk.css" "$ENGINE_ASSETS/kmwosk.css"
@@ -86,7 +84,7 @@ if builder_start_action build:engine; then
   cp "$KEYMAN_WEB_ROOT/build/app/resources/osk/keymanweb-osk.ttf" "$ENGINE_ASSETS/keymanweb-osk.ttf"
 
   cp "$KEYMAN_ROOT/node_modules/@sentry/browser/build/bundle.min.js" "$ENGINE_ASSETS/sentry.min.js"
-  cp "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js" "$ENGINE_ASSETS/keyman-sentry.js"
+  cp "$KEYMAN_ROOT/web/src/engine/sentry-manager/build/lib/index.js" "$ENGINE_ASSETS/keyman-sentry.js"
 
   echo "Copying es6-shim polyfill"
   cp "$KEYMAN_ROOT/node_modules/es6-shim/es6-shim.min.js" "$ENGINE_ASSETS/es6-shim.min.js"

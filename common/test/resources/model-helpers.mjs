@@ -113,7 +113,18 @@ export function randomToken() {
 }
 
 export function iGotDistractedByHazel() {
-  return jsonFixture('models/future_suggestions/i_got_distracted_by_hazel');
+  return jsonFixture('models/future_suggestions/i_got_distracted_by_hazel').map((set) => set.map((entry) => {
+    return {
+      ...entry,
+      // Dummy-model predictions all claim probability 1; there's no actual probability stuff
+      // used here.
+      'lexical-p': 1,
+      // We're predicting from a single transform, not a distribution, so probability 1.
+      'correction-p': 1,
+      // Multiply 'em together.
+      p: 1,
+    }
+  }));
 }
 
 export function jsonFixture(name, root, import_root) {

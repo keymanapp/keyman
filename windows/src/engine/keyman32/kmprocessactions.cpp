@@ -30,13 +30,25 @@ static void processAlert(AITIP* app) {
 }
 
 static void
-processBack(AITIP* app, const unsigned int code_points_to_delete, const km_core_usv* delete_context) {
+processBack(
+    AITIP* app,
+    const unsigned int code_points_to_delete,
+    const km_core_usv* delete_context,
+    BOOL* emitKeystroke,
+    WORD vkey) {
   if (app->IsLegacy()) {
     for (unsigned int i = 0; i < code_points_to_delete; i++) {
       app->QueueAction(QIT_BACK, BK_DEFAULT);
     }
   }
   else {
+    // If there is a selection emit the key (backspace)
+    // allowing the application handle clearing selected text in the correct manner.
+    if (app->IsTextSelected() && (vkey == VK_BACK)) {
+      *emitKeystroke = TRUE;
+      return;
+    }
+
     km_core_usv const* delete_context_ptr = delete_context;
     while (*delete_context_ptr) {
       delete_context_ptr++;
@@ -59,7 +71,7 @@ static void
 processPersistOpt(km_core_actions const* actions, LPINTKEYBOARDINFO activeKeyboard
 ) {
   for (auto option = actions->persist_options; option->key; option++) {
-    SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessPersistOpt: Saving option to registry for keyboard [%s].", activeKeyboard->Name);
+    SendDebugMessageFormat("Saving option to registry for keyboard [%s].", activeKeyboard->Name);
     SaveKeyboardOptionCoretoRegistry(
         activeKeyboard, reinterpret_cast<LPCWSTR>(option->key), reinterpret_cast<LPCWSTR>(option->value));
   }
@@ -76,7 +88,7 @@ static void processCapsLock(const km_core_caps_state caps_lock_state, BOOL isUp,
   if (caps_lock_state == KM_CORE_CAPS_ON) {
     // This case would occur for the keyboard system store setting `store(&CapsOnOnly) '1'`
     if (isUp && !IsCapsLockOn()) {  // I267 - 24/11/2006 invert GetKeyState test
-      SendDebugMessageFormat(0, sdmGlobal, 0, "processCapsLock: TURN CAPS ON: FIsUp=%d CapsState=%d", isUp, IsCapsLockOn());
+      SendDebugMessageFormat("TURN CAPS ON: FIsUp=%d CapsState=%d", isUp, IsCapsLockOn());
       keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
       keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
     }
@@ -85,7 +97,7 @@ static void processCapsLock(const km_core_caps_state caps_lock_state, BOOL isUp,
     // A trick is being played here of synthesising a release the CAPSLOCK key event
     // then a depress CAPSLOCK key event
     else if (!isUp && IsCapsLockOn()) {  // I267 - 24/11/2006 invert GetKeyState test
-      SendDebugMessageFormat(0, sdmGlobal, 0, "processCapsLock: TURN CAPS OFF: FIsUp=%d CapsState=%d", isUp, IsCapsLockOn());
+      SendDebugMessageFormat("TURN CAPS OFF: FIsUp=%d CapsState=%d", isUp, IsCapsLockOn());
       keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
       keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
     }
@@ -93,7 +105,7 @@ static void processCapsLock(const km_core_caps_state caps_lock_state, BOOL isUp,
     // This case would occur for the keyboard system store setting `store(&ShiftFreesCaps) '1'`
     // OR selecting a keyboard with CAPs always off rule
     if ((!isUp && IsCapsLockOn()) || (externalEvent && IsCapsLockOn())) {
-      SendDebugMessageFormat(0, sdmGlobal, 0, "processCapsLock: TURN CAPS OFF: FIsUp=%d CapsState=%d", isUp, IsCapsLockOn());
+      SendDebugMessageFormat("TURN CAPS OFF: FIsUp=%d CapsState=%d", isUp, IsCapsLockOn());
       keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, 0, 0);
       keybd_event(VK_CAPITAL, SCAN_FLAG_KEYMAN_KEY_EVENT, KEYEVENTF_KEYUP, 0);
     }
@@ -109,7 +121,7 @@ BOOL ProcessActions(BOOL* emitKeystroke)
 
   _td->CoreProcessEventRun = FALSE;
 
-  processBack(_td->app, core_actions->code_points_to_delete, core_actions->deleted_context);
+  processBack(_td->app, core_actions->code_points_to_delete, core_actions->deleted_context, emitKeystroke, _td->state.vkey);
   processUnicodeChar(_td->app, core_actions->output);
   if (core_actions->persist_options != NULL) {
     processPersistOpt(core_actions, _td->lpActiveKeyboard);
@@ -142,7 +154,7 @@ ProcessActionsNonUpdatableParse(BOOL* emitKeystroke) {
   processCapsLock(core_actions->new_caps_lock_state, !_td->state.isDown, _td->TIPFUpdateable, FALSE);
   if (core_actions->emit_keystroke) {
     *emitKeystroke = TRUE;
-    SendDebugMessageFormat(0, sdmGlobal, 0, "ProcessActionsNonUpdatableParse EMIT_KEYSTROKE");
+    SendDebugMessageFormat("EMIT_KEYSTROKE");
     _td->CoreProcessEventRun  = FALSE;  // If we emit the key stroke on this parse we don't need the second parse
   }
   return TRUE;

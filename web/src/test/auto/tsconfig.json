@@ -8,5 +8,10 @@
     "rootDir": "."
   },
 
-  "include": [ "headless/**/*.ts" ]
+  "include": [
+    "dom/**/*.ts",
+    "headless/**/*.ts",
+    "integrated/**/*.ts",
+    "resources/**/*.ts"
+  ]
 }

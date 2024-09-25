@@ -28,7 +28,7 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
   private static Context context;
 
   private Preference languagesPreference, installKeyboardOrDictionary, displayLanguagePreference,
-    adjustKeyboardHeight;
+    adjustKeyboardHeight, adjustLongpressDelay;
   private ListPreference spacebarTextPreference;
   private CheckBoxPreference setSystemKeyboardPreference;
   private CheckBoxPreference setDefaultKeyboardPreference;
@@ -99,12 +99,20 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     });
 
     setDefaultKeyboardPreference.setOnPreferenceChangeListener(checkBlocker);
+
     adjustKeyboardHeight = new Preference(context);
     adjustKeyboardHeight.setKey(AdjustKeyboardHeightActivity.adjustKeyboardHeightKey);
     adjustKeyboardHeight.setTitle(getString(R.string.adjust_keyboard_height));
     adjustKeyboardHeight.setWidgetLayoutResource(R.layout.preference_height_icon_layout);
     Intent adjustKeyboardHeightIntent = new Intent(context, AdjustKeyboardHeightActivity.class);
     adjustKeyboardHeight.setIntent(adjustKeyboardHeightIntent);
+
+    adjustLongpressDelay = new Preference(context);
+    adjustLongpressDelay.setKey(AdjustLongpressDelayActivity.adjustLongpressDelayKey);
+    adjustLongpressDelay.setTitle(getString(R.string.adjust_longpress_delay));
+    adjustLongpressDelay.setWidgetLayoutResource(R.layout.preference_duration_icon_layout);
+    Intent adjustLongpressDelayIntent = new Intent(context, AdjustLongpressDelayActivity.class);
+    adjustLongpressDelay.setIntent(adjustLongpressDelayIntent);
 
     /* Spacebar Caption Preference */
 
@@ -170,12 +178,6 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
           editor.putBoolean(KeymanSettingsActivity.showBannerKey, isChecked);
       as part of the default onClick() used by SwitchPreference.
      */
-    SwitchPreference bannerPreference = new SwitchPreference(context);
-    bannerPreference.setKey(KeymanSettingsActivity.showBannerKey);
-    bannerPreference.setTitle(getString(R.string.show_banner));
-    bannerPreference.setSummaryOn(getString(R.string.show_banner_on));
-    bannerPreference.setSummaryOff(getString(R.string.show_banner_off));
-
     SwitchPreference getStartedPreference = new SwitchPreference(context);
     getStartedPreference.setKey(GetStartedActivity.showGetStartedKey);
     getStartedPreference.setTitle(String.format(getString(R.string.show_get_started), getString(R.string.get_started)));
@@ -188,8 +190,6 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     sendCrashReportPreference.setSummaryOff(getString(R.string.show_send_crash_report_off));
     sendCrashReportPreference.setDefaultValue(true);
 
-
-
     screen.addPreference(languagesPreference);
     screen.addPreference(installKeyboardOrDictionary);
     screen.addPreference(displayLanguagePreference);
@@ -197,10 +197,10 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     screen.addPreference(setDefaultKeyboardPreference);
 
     screen.addPreference(adjustKeyboardHeight);
+    screen.addPreference(adjustLongpressDelay);
     screen.addPreference(spacebarTextPreference);
 
     screen.addPreference(hapticFeedbackPreference);
-    screen.addPreference(bannerPreference);
     screen.addPreference(getStartedPreference);
     screen.addPreference(sendCrashReportPreference);
 

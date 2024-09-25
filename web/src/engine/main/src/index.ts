@@ -5,3 +5,7 @@ export { default as KeyboardInterface } from './keyboardInterface.js';
 export { default as KeymanEngine } from './keymanEngine.js';
 export { LegacyAPIEvents } from './legacyAPIEvents.js';
 export { VariableStoreCookieSerializer } from './variableStoreCookieSerializer.js';
+export { LanguageProcessor } from './headless/languageProcessor.js';
+export { TranscriptionCache } from './headless/transcriptionCache.js';
+export { InputProcessor } from './headless/inputProcessor.js';
+export { DeviceDetector } from './headless/deviceDetector.js';

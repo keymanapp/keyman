@@ -40,6 +40,7 @@ public class DisplayLanguages {
     DisplayLanguageType[] languages = {
       new DisplayLanguageType(unspecifiedLocale, context.getString(R.string.default_locale)),
       new DisplayLanguageType("am-ET", "አማርኛ (Amharic)"),
+      new DisplayLanguageType("ar-SA", "(Arabic) العربية"),
       new DisplayLanguageType("az-AZ", "Azərbaycanca (Azəricə)"),
       new DisplayLanguageType("bwr-NG", "Bura-Pabir"),
       new DisplayLanguageType("cs-CZ", "čeština (Czech)"),
@@ -62,6 +63,7 @@ public class DisplayLanguages {
       new DisplayLanguageType("nl-NL", "Nederlands (Dutch)"),
       new DisplayLanguageType("ann", "Obolo"),
       new DisplayLanguageType("pl-PL", "Polski (Polish)"),
+      new DisplayLanguageType("el", "Polytonic Greek"),
       new DisplayLanguageType("pt-PT", "Português do Portugal"),
       new DisplayLanguageType("ff-ZA", "Pulaar-Fulfulde"), // or Fulah
       new DisplayLanguageType("ru-RU", "Pyccĸий (Russian)"),

@@ -1,0 +1,59 @@
+{
+  "name": "@keymanapp/lexical-model-layer",
+  "description": "Keyman/Predictive Text integration layer",
+  "main": "build/obj/node/index.js",
+  "exports": {
+    ".": {
+      "es6-bundling": "./src/web/index.ts",
+      "node": {
+        "types": "./build/obj/node/index.d.ts",
+        "import": "./build/obj/index.js"
+      },
+      "default": {
+        "types": "./build/obj/web/index.d.ts",
+        "import": "./build/obj/web/index.js"
+      }
+    },
+    "./node": "./build/obj/node/index.js",
+    "./web": {
+      "es6-bundling": "./src/web/index.ts",
+      "default": "./build/obj/web/index.js"
+    },
+    "./build/obj/node/index.js": "./build/obj/node/index.js",
+    "./build/obj/web/index.js": "./build/obj/web/index.js"
+  },
+  "imports": {
+    "#./*.js": "./build/obj/*.js",
+    "#./node/*.js": "./build/obj/node/*.js",
+    "#./web/*.js": "./build/obj/web/*.js"
+  },
+  "type": "module",
+  "scripts": {
+    "test": "gosh ./unit_tests/test.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymanapp/keyman.git"
+  },
+  "author": "Eddie Antonio Santos <Eddie.Santos@nrc-cnrc.gc.ca>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/keymanapp/keyman/issues"
+  },
+  "homepage": "https://github.com/keymanapp/keyman#readme",
+  "devDependencies": {
+    "@keymanapp/common-types": "*",
+    "@keymanapp/resources-gosh": "*",
+    "mocha": "^10.0.0",
+    "mocha-teamcity-reporter": "^4.0.0",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@keymanapp/models-templates": "*",
+    "@keymanapp/models-wordbreakers": "*",
+    "@keymanapp/keyman-version": "*",
+    "@keymanapp/web-utils": "*",
+    "es6-shim": "^0.35.5",
+    "string.prototype.codepointat": "^0.2.1"
+  }
+}

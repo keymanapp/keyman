@@ -12,15 +12,18 @@
     "@keymanapp/developer-utils": "*",
     "@sentry/node": "^7.57.0",
     "chalk": "^4.1.2",
-    "express": "^4.19.2",
+    "express": "^4.20.0",
     "multer": "^1.4.5-lts.1",
     "ngrok": "^5.0.0-beta.2",
     "open": "^8.4.0",
-    "ws": "^8.3.0"
-  },
+    "restructure": "^3.0.1",
+    "sax": ">=0.6.0",
+    "semver": "^7.5.4",
+    "ws": "^8.17.1",
+    "xmlbuilder": "~11.0.0"
+},
   "optionalDependencies": {
-    "hetrodo-node-hide-console-window-napi": "keymanapp/hetrodo-node-hide-console-window-napi#keyman-15.0",
-    "node-windows-trayicon": "keymanapp/node-windows-trayicon#keyman-16.0"
+    "node-hide-console-window": "^2.2.0"
   },
   "devDependencies": {
     "@keymanapp/keyman-version": "*",
@@ -32,12 +35,8 @@
     "@types/ws": "^8.2.2",
     "copyfiles": "^2.4.1",
     "mocha": "^10.0.0",
-    "ts-node": "^10.9.1",
+    "node-gyp": "^10.2.0",
     "tsc-watch": "^4.5.0",
-    "typescript": "^4.9.5"
-  },
-  "mocha": {
-    "require": "ts-node/register",
-    "spec": "build/**/*.test.js"
+    "typescript": "^5.4.5"
   }
 }

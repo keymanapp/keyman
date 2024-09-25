@@ -9,33 +9,38 @@ configure your build environment.
 
 The following folders contain the distribution for Keyman Engine for Web:
 
-    src                        Source code
-    build/app/resources        OSK + UI resources for inclusion in all build types;
-                               keymanweb-osk.ttf is maintained at https://github.com/silnrsi/font-keymanweb-osk
+```text
+src                        Source code
+build/app/resources        OSK + UI resources for inclusion in all build types;
+                           keymanweb-osk.ttf is maintained at https://github.com/silnrsi/font-keymanweb-osk
 
-    build/app/browser/release  Fully-compiled KeymanWeb modules for release
-    build/app/webview/release  Fully-compiled KMEA/KMEI modules for inclusion in mobile app builds
-    build/app/browser/debug    Fully-compiled but non-minified KeymanWeb modules
-    build/app/webview/debug    Fully-compiled but non-minified KMEA/KMEI modules
+build/app/browser/release  Fully-compiled KeymanWeb modules for release
+build/app/webview/release  Fully-compiled KMEA/KMEI modules for inclusion in
+                           mobile app builds
+build/app/browser/debug    Fully-compiled but non-minified KeymanWeb modules
+build/app/webview/debug    Fully-compiled but non-minified KMEA/KMEI modules
 
-    src/samples                Sample pages demonstrating ways to link with KeymanWeb
-    src/test/manual            Test-case web-pages for various aspects of KeymanWeb functionality
-    src/test/auto              A Node-driven test suite for automated testing of KeymanWeb
+src/samples                Sample pages demonstrating ways to link with KeymanWeb
+src/test/manual            Test-case web-pages for various aspects of KeymanWeb functionality
+src/test/auto              A Node-driven test suite for automated testing of KeymanWeb
+```
 
 **********************************************************************
 
 ## Usage
+
 Open **index.html** or **samples/index.html** in your browser. Be sure to
 compile Keyman Engine for Web before viewing the pages.
 
 Refer to the samples for usage details.
 
 To view pages using compiled Keyman Engine for Web,
+
 1. cd to **keyman/web/**
 2. Run `./build.sh`
    - Use `./build.sh --help` for the script's documentation.
 
-### Unit Testing ###
+### Unit Testing
 
 Before running unit tests on Keyman Engine for Web, first run `./build.sh`
 according to the instructions above.
@@ -45,13 +50,14 @@ on your local machine in-browser. Alternatively, see `test.sh`, which
 the former command executes.
 
 ### Debugging Unit Tests
+
 1. During development, to run a specific unit test, change the `it` to
    `it.only`. You can also run all tests under a specific group with
    `describe.only`.
 2. From this directory, run `./test.sh --debug`. Alternatively, from
    `web/` or any `web/` subdirectory,
 
-   ```
+   ```bash
    npm run test -- --debug
    ```
 
@@ -68,65 +74,73 @@ the former command executes.
 ### Approximate Overall Design
 
 ```mermaid
+---
+title: Dependency Graph
+---
+%% For rendering, use e.g. https://mermaid.live
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
 graph TD;
-    OSK[web/src/engine/osk];
-    KP["common/web/keyboard-processor"];
-    IP["common/web/input-processor"];
-    OSK-->KP;
-    IP-->KP;
-    Utils["common/web/utils"];
-    KP---->Utils;
-    Wordbreakers["common/models/wordbreakers"];
-    Models["common/models/templates"];
-    Models-->Utils;
-    LMWorker["common/web/lm-worker"];
+    OSK["/web/src/engine/osk"];
+    KeyboardSpec["/web/src/engine/keyboard"];
+    JSProc["/web/src/engine/js-processor"];
+    OSK-->KeyboardSpec;
+    WebUtils["@keymanapp/web-utils<br>(/web/src/engine/common/web-utils)"];
+    KeyboardSpec---->WebUtils;
+    Wordbreakers["@keymanapp/models-wordbreakers<br>(/web/src/engine/predictive-text/wordbreakers)"];
+    Models["@keymanapp/models-templates<br>(/web/src/engine/predictive-text/templates/)"];
+    Models-->WebUtils;
+    LMWorker["@keymanapp/lm-worker<br>(/web/src/engine/predictive-text/worker-thread)"];
     LMWorker-->Models;
     LMWorker-->Wordbreakers;
-    LMLayer["common/predictive-text"];
+    LMLayer["@keymanapp/lexical-model-layer<br>(/web/src/engine/predictive-text/worker-main)"];
     LMLayer-->LMWorker;
-    IP-->LMLayer;
+    Gestures["@keymanapp/gesture-recognizer<br>(/web/src/engine/osk/gesture-recognizer)"];
+    Gestures-->WebUtils;
 
-    subgraph PredText["WebWorker + its interface"]
+    subgraph PredText["PredText: WebWorker + its interface"]
         LMLayer;
         LMWorker;
         Models;
         Wordbreakers;
     end
 
-    subgraph Headless["Fully headless components"]
+    subgraph Headless["`**Headless**
+    Fully headless components`"]
         direction LR
-        KP;
-        IP;
-        Utils;
+        KeyboardSpec;
+        JSProc-->KeyboardSpec;
+        WebUtils;
         PredText;
+        Gestures;
     end
 
-    subgraph ClassicWeb["Previously unmodularized components"]
-        Device[web/src/engine/device-detect];
-        Device----->Utils;
-        Elements[web/src/engine/element-wrappers];
-        Elements-->KP;
-        KeyboardCache[web/src/engine/package-cache];
-        KeyboardCache-->IP;
-        DomUtils[web/src/engine/dom-utils];
-        DomUtils-->Utils;
+    subgraph ClassicWeb["`**ClassicWeb**
+    Intermediate-level engine modules`"]
+        Elements["/web/src/engine/element-wrappers"];
+        Elements-->JSProc;
+        KeyboardStorage["/web/src/engine/keyboard-storage"];
+        KeyboardStorage-->Interfaces;
+        DomUtils["/web/src/engine/dom-utils"];
+        DomUtils-->WebUtils;
+        DomUtils-->KeyboardSpec;
         OSK-->DomUtils;
-        OSK---->IP;
-        Configuration[web/src/engine/paths];
-        Configuration-->OSK;
-        CommonEngine[web/src/engine/main];
-        CommonEngine-->Configuration;
+        OSK-->Gestures;
+        Interfaces["/web/src/engine/interfaces"];
+        Interfaces-->KeyboardSpec;
+        OSK-->Interfaces;
+        CommonEngine["/web/src/engine/main"];
         CommonEngine-->Device;
-        CommonEngine-->KeyboardCache;
+        CommonEngine-->KeyboardStorage;
         CommonEngine-->OSK;
-        Attachment[web/src/engine/attachment];
+        Attachment["/web/src/engine/attachment"];
         Attachment-->DomUtils;
         Attachment-->Elements;
     end
 
-    subgraph WebEngine["Keyman Engine for Web (top-level libraries)"]
-        Browser[web/src/app/browser];
-        WebView[web/src/app/webview];
+    subgraph WebEngine["`**WebEngine**
+    Keyman Engine for Web (top-level libraries)`"]
+        Browser["/web/src/app/browser"];
+        WebView["/web/src/app/webview"];
 
         WebView--->CommonEngine;
 

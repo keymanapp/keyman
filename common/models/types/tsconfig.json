@@ -1,9 +1,0 @@
-{
-  "extends": "../tsconfig.kmw-worker-base.json",
-  "compilerOptions": {
-    "declaration": true,
-    "outDir": "build/",
-  },
-  "include": ["./*.ts"],
-  "exclude": ["test.ts"]
-}

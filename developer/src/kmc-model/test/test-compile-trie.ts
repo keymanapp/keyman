@@ -8,6 +8,7 @@ import { createTrieDataStructure } from '../src/build-trie.js';
 import { ModelCompilerError } from '../src/model-compiler-messages.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { TrieModel } from '@keymanapp/models-templates';
+import { Span } from '@keymanapp/common-types';
 
 describe('LexicalModelCompiler', function () {
   const callbacks = new TestCompilerCallbacks();

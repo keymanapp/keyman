@@ -1,5 +1,5 @@
 import { DeviceSpec, ManagedPromise } from '@keymanapp/web-utils';
-import { type InternalKeyboardFont as KeyboardFont } from '@keymanapp/keyboard-processor';
+import { type InternalKeyboardFont as KeyboardFont } from 'keyman/engine/keyboard';
 
 type FontFamilyStyleMap = {[family: string]: HTMLStyleElement};
 
@@ -91,7 +91,7 @@ export class StylesheetManager {
     const fontKey = fd.family;
     let source: string;
 
-    let i, ttf='', woff='', fList=[];
+    let i, ttf='', woff='', fList=[], data='';
 
     // TODO: 22 Aug 2014: check that font path passed from cloud is actually used!
 
@@ -118,6 +118,9 @@ export class StylesheetManager {
     }
 
     for(i=0;i<fList.length;i++) {
+      if(fList[i].toLowerCase().indexOf('data:font') == 0) {
+        data = fList[i];
+      }
       if(fList[i].toLowerCase().indexOf('.otf') > 0) ttf=fList[i];
       if(fList[i].toLowerCase().indexOf('.ttf') > 0) ttf=fList[i];
       if(fList[i].toLowerCase().indexOf('.woff') > 0) woff=fList[i];
@@ -140,7 +143,12 @@ export class StylesheetManager {
     // but return without adding the style sheet if the required font type is unavailable
 
     // Modern browsers: use WOFF, TTF and fallback finally to SVG. Don't provide EOT
-    if(os == DeviceSpec.OperatingSystem.iOS) {
+    if(data) {
+      // For inline-defined fonts:
+      const formatStartIndex = 'data:font/'.length;
+      const format = data.substring(formatStartIndex, data.indexOf(';', formatStartIndex));
+      s +=`src:url('${data}'), format('${format}');`;
+    } else if(os == DeviceSpec.OperatingSystem.iOS) {
       if(ttf != '') {
         if(this.doCacheBusting) {
           ttf = this.cacheBust(ttf);

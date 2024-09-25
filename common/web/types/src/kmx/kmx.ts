@@ -1,4 +1,5 @@
 import * as r from 'restructure';
+import { ModifierKeyConstants } from '../consts/modifier-key-constants.js';
 
 /* Definitions from kmx_file.h. Must be kept in sync */
 
@@ -6,6 +7,25 @@ import * as r from 'restructure';
 
 // In memory representations of KMX structures
 // kmx-builder will transform these to the corresponding COMP_xxxx
+
+export enum KMX_Version {
+  VERSION_30 =  0x00000300,
+  VERSION_31 =  0x00000301,
+  VERSION_32 =  0x00000302,
+  VERSION_40 =  0x00000400,
+  VERSION_50 =  0x00000500,
+  VERSION_501 = 0x00000501,
+  VERSION_60 =  0x00000600,
+  VERSION_70 =  0x00000700,
+  VERSION_80 =  0x00000800,
+  VERSION_90 =  0x00000900,
+  VERSION_100 = 0x00000A00,
+  VERSION_140 = 0x00000E00,
+  VERSION_150 = 0x00000F00,
+  VERSION_160 = 0x00001000,
+  VERSION_170 = 0x00001100
+};
+
 
 export class KEYBOARD {
   fileVersion?: number;  // dwFileVersion (TSS_FILEVERSION)
@@ -129,22 +149,21 @@ export class KMXFile {
   // File version identifiers (COMP_KEYBOARD.dwFileVersion)
   //
 
-  public static readonly VERSION_30 =  0x00000300;
-  public static readonly VERSION_31 =  0x00000301;
-  public static readonly VERSION_32 =  0x00000302;
-  public static readonly VERSION_40 =  0x00000400;
-  public static readonly VERSION_50 =  0x00000500;
-  public static readonly VERSION_501 = 0x00000501;
-  public static readonly VERSION_60 =  0x00000600;
-  public static readonly VERSION_70 =  0x00000700;
-  public static readonly VERSION_80 =  0x00000800;
-  public static readonly VERSION_90 =  0x00000900;
-  public static readonly VERSION_100 = 0x00000A00;
-  public static readonly VERSION_140 = 0x00000E00;
-  public static readonly VERSION_150 = 0x00000F00;
-
-  public static readonly VERSION_160 = 0x00001000;
-  public static readonly VERSION_170 = 0x00001100;
+  public static readonly VERSION_30 =  KMX_Version.VERSION_30;
+  public static readonly VERSION_31 =  KMX_Version.VERSION_31;
+  public static readonly VERSION_32 =  KMX_Version.VERSION_32;
+  public static readonly VERSION_40 =  KMX_Version.VERSION_40;
+  public static readonly VERSION_50 =  KMX_Version.VERSION_50;
+  public static readonly VERSION_501 = KMX_Version.VERSION_501;
+  public static readonly VERSION_60 =  KMX_Version.VERSION_60;
+  public static readonly VERSION_70 =  KMX_Version.VERSION_70;
+  public static readonly VERSION_80 =  KMX_Version.VERSION_80;
+  public static readonly VERSION_90 =  KMX_Version.VERSION_90;
+  public static readonly VERSION_100 = KMX_Version.VERSION_100;
+  public static readonly VERSION_140 = KMX_Version.VERSION_140;
+  public static readonly VERSION_150 = KMX_Version.VERSION_150;
+  public static readonly VERSION_160 = KMX_Version.VERSION_160;
+  public static readonly VERSION_170 = KMX_Version.VERSION_170;
 
   public static readonly VERSION_MIN = this.VERSION_50;
   public static readonly VERSION_MAX = this.VERSION_170;
@@ -325,25 +344,25 @@ export class KMXFile {
   public static readonly HK_CTRL =     0x00020000;
   public static readonly HK_SHIFT =    0x00040000;
 
-  public static readonly LCTRLFLAG =   0x0001;    // Left Control flag
-  public static readonly RCTRLFLAG =   0x0002;    // Right Control flag
-  public static readonly LALTFLAG =    0x0004;    // Left Alt flag
-  public static readonly RALTFLAG =    0x0008;    // Right Alt flag
-  public static readonly K_SHIFTFLAG = 0x0010;    // Either shift flag
-  public static readonly K_CTRLFLAG =  0x0020;    // Either ctrl flag
-  public static readonly K_ALTFLAG =   0x0040;    // Either alt flag
+  public static readonly LCTRLFLAG      = ModifierKeyConstants.LCTRLFLAG;      // Left Control flag
+  public static readonly RCTRLFLAG      = ModifierKeyConstants.RCTRLFLAG;      // Right Control flag
+  public static readonly LALTFLAG       = ModifierKeyConstants.LALTFLAG;       // Left Alt flag
+  public static readonly RALTFLAG       = ModifierKeyConstants.RALTFLAG;       // Right Alt flag
+  public static readonly K_SHIFTFLAG    = ModifierKeyConstants.K_SHIFTFLAG;    // Either shift flag
+  public static readonly K_CTRLFLAG     = ModifierKeyConstants.K_CTRLFLAG;     // Either ctrl flag
+  public static readonly K_ALTFLAG      = ModifierKeyConstants.K_ALTFLAG;      // Either alt flag
   //public static readonly K_METAFLAG =  0x0080;    // Either Meta-key flag (tentative).  Not usable in keyboard rules;
                                   // Used internally (currently, only by KMW) to ensure Meta-key
                                   // shortcuts safely bypass rules
                                   // Meta key = Command key on macOS, Windows key on Windows
-  public static readonly CAPITALFLAG    = 0x0100;    // Caps lock on
-  public static readonly NOTCAPITALFLAG = 0x0200;    // Caps lock NOT on
-  public static readonly NUMLOCKFLAG    = 0x0400;    // Num lock on
-  public static readonly NOTNUMLOCKFLAG = 0x0800;    // Num lock NOT on
-  public static readonly SCROLLFLAG     = 0x1000;    // Scroll lock on
-  public static readonly NOTSCROLLFLAG  = 0x2000;    // Scroll lock NOT on
-  public static readonly ISVIRTUALKEY   = 0x4000;    // It is a Virtual Key Sequence
-  public static readonly VIRTUALCHARKEY = 0x8000;    // Keyman 6.0: Virtual Key Cap Sequence NOT YET
+  public static readonly CAPITALFLAG    = ModifierKeyConstants.CAPITALFLAG;    // Caps lock on
+  public static readonly NOTCAPITALFLAG = ModifierKeyConstants.NOTCAPITALFLAG; // Caps lock NOT on
+  public static readonly NUMLOCKFLAG    = ModifierKeyConstants.NUMLOCKFLAG;    // Num lock on
+  public static readonly NOTNUMLOCKFLAG = ModifierKeyConstants.NOTNUMLOCKFLAG; // Num lock NOT on
+  public static readonly SCROLLFLAG     = ModifierKeyConstants.SCROLLFLAG;     // Scroll lock on
+  public static readonly NOTSCROLLFLAG  = ModifierKeyConstants.NOTSCROLLFLAG;  // Scroll lock NOT on
+  public static readonly ISVIRTUALKEY   = ModifierKeyConstants.ISVIRTUALKEY;   // It is a Virtual Key Sequence
+  public static readonly VIRTUALCHARKEY = ModifierKeyConstants.VIRTUALCHARKEY; // Keyman 6.0: Virtual Key Cap Sequence NOT YET
 
   // Note: OTHER_MODIFIER = 0x10000, used by KMX+ for the
   // other modifier flag in layers, > 16 bit so not available here.

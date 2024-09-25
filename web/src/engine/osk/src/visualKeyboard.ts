@@ -11,14 +11,14 @@ import {
   KeyEvent,
   Layouts,
   StateKeyMap,
-  LayoutKey,
   ActiveSubKey,
   timedPromise,
-  ActiveKeyBase,
-  isEmptyTransform
-} from '@keymanapp/keyboard-processor';
+  ActiveKeyBase
+} from 'keyman/engine/keyboard';
+import { isEmptyTransform } from 'keyman/engine/js-processor';
 
-import { buildCorrectiveLayout, distributionFromDistanceMaps, keyTouchDistances } from '@keymanapp/input-processor';
+import { buildCorrectiveLayout } from './correctionLayout.js';
+import { distributionFromDistanceMaps, keyTouchDistances } from './corrections.js';
 
 import {
   GestureRecognizer,
@@ -31,7 +31,7 @@ import {
 
 import { createStyleSheet, StylesheetManager } from 'keyman/engine/dom-utils';
 
-import { KeyEventHandler, KeyEventResultCallback } from 'keyman/engine/events';
+import { KeyEventHandler, KeyEventResultCallback } from './views/keyEventSource.interface.js';
 
 import GlobeHint from './globehint.interface.js';
 import KeyboardView from './components/keyboardView.interface.js';
@@ -58,7 +58,7 @@ import Modipress from './input/gestures/browser/modipress.js';
 import Flick from './input/gestures/browser/flick.js';
 import { GesturePreviewHost } from './keyboard-layout/gesturePreviewHost.js';
 import OSKBaseKey from './keyboard-layout/oskBaseKey.js';
-import { OSKResourcePathConfiguration } from './index.js';
+import { OSKResourcePathConfiguration } from 'keyman/engine/interfaces';
 import KEYMAN_VERSION from '@keymanapp/keyman-version';
 
 /**
@@ -151,8 +151,8 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
   /**
    * Tweakable gesture parameters referenced by supported gestures and the gesture engine.
    */
-  readonly gestureParams: GestureParams<KeyElement> = {
-    ...DEFAULT_GESTURE_PARAMS,
+  get gestureParams(): GestureParams {
+    return this.config.gestureParams;
   };
 
   // Legacy alias, maintaining a reference for code built against older
@@ -251,7 +251,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
 
   set layerId(value: string) {
     const changedLayer = value != this.layerId;
-    if(!this.layerGroup.layers[value]) {
+    if(!this.layerGroup.getLayer(value)) {
       throw new Error(`Keyboard ${this.layoutKeyboard.id} does not have a layer with id ${value}`);
     } else {
       this.layerGroup.activeLayerId = value;
@@ -306,6 +306,10 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     if (config.isStatic) {
       this.isStatic = config.isStatic;
     }
+
+    this.config.gestureParams ||= {
+      ...DEFAULT_GESTURE_PARAMS,
+    };
 
     this._fixedWidthScaling  = this.device.touchable && !this.isStatic;
     this._fixedHeightScaling = this.device.touchable && !this.isStatic;
@@ -417,11 +421,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       */
       recordingMode: DEBUG_GESTURES,
       historyLength: DEBUG_HISTORY_COUNT
-    };
-
-    this.gestureParams.longpress.permitsFlick = (key) => {
-      const flickSpec = key?.key.spec.flick;
-      return !flickSpec || !(flickSpec.n || flickSpec.nw || flickSpec.ne);
     };
 
     const recognizer = new GestureRecognizer(gestureSetForLayout(this.kbdLayout, this.gestureParams), config);
@@ -629,7 +628,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
           try {
             shouldLockLayer && this.lockLayer(true);
             // Once the best coord to use for fat-finger calculations has been determined:
-            keyResult = this.modelKeyClick(gestureStage.item, coord);
+            keyResult = this.modelKeyClick(gestureStage.item, coord, correctionKeyDistribution);
           } finally {
             shouldLockLayer && this.lockLayer(false);
           }
@@ -908,18 +907,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       }
     }
   }
-
-  /**
-   * Returns the default properties for a key object, used to construct
-   * both a base keyboard key and popup keys
-   *
-   * @return    {Object}    An object that contains default key properties
-   */
-  getDefaultKeyObject(): ActiveKey {
-    const baseKeyObject: LayoutKey = {...ActiveKey.DEFAULT_KEY};
-    ActiveKey.polyfill(baseKeyObject, this.layoutKeyboard, this.kbdLayout, this.layerId);
-    return baseKeyObject as ActiveKey;
-  };
   //#endregion
 
   //#region VisualKeyboard - OSK touch handlers
@@ -942,13 +929,6 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
    * @returns
    */
   getSimpleTapCorrectionDistances(input: InputSample<KeyElement, string>, keySpec?: ActiveKey): Map<ActiveKeyBase, number> {
-    // TODO: It'd be nice to optimize by keeping these off when unused, but the wiring
-    //       necessary would get in the way of modularization at the moment.
-    // let keyman = com.keyman.singleton;
-    // if (!keyman.core.languageProcessor.mayCorrect) {
-    //   return null;
-    // }
-
     // Note:  if subkeys are active, they will still be displayed at this time.
     let touchKbdPos = this.getTouchCoordinatesOnKeyboard(input);
     let layerGroup = this.layerGroup.element;  // Always has proper dimensions, unlike kbdDiv itself.
@@ -1086,7 +1066,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       layerId = this.layerId;
     }
 
-    const layer = this.layerGroup.layers[layerId];
+    const layer = this.layerGroup.getLayer(layerId);
     if (!layer) {
       return;
     }
@@ -1259,6 +1239,7 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     const groupStyle = getComputedStyle(this.layerGroup.element);
 
     const isInDOM = computedStyle.height != '' && computedStyle.height != 'auto';
+    const isGroupInDOM = groupStyle.height != '' && groupStyle.height != 'auto';
 
     if (computedStyle.border) {
       this._borderWidth = new ParsedLengthStyle(computedStyle.borderWidth).val;
@@ -1271,10 +1252,11 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       this._computedHeight = this.height;
     } else if (isInDOM) {
       this._computedWidth = parseInt(computedStyle.width, 10);
-      if (!this._computedWidth) {
-        this._computedWidth = parseInt(groupStyle.width, 10);
-      }
       this._computedHeight = parseInt(computedStyle.height, 10);
+    } else if (isGroupInDOM) {
+      // May occur for documentation-keyboards, which are detached from their VisualKeyboard base.
+      this._computedWidth = parseInt(groupStyle.width, 10);
+      this._computedHeight = parseInt(groupStyle.height, 10);
     } else {
       // Cannot perform layout operations!
       return;
@@ -1329,13 +1311,19 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
       return allottedHeight;
     }
 
-    const layers = this.layerGroup.layers;
+    /*
+      Note:  these may not be fully preprocessed yet!
+
+      However, any "empty row bug" preprocessing has been applied, and that's
+      what we care about here.
+    */
+    const layers = this.layerGroup.spec.layer;
     let oskHeight = 0;
 
     // In case the keyboard's layers have differing row counts, we check them all for the maximum needed oskHeight.
     for (const layerID in layers) {
       const layer = layers[layerID];
-      let nRows = layer.rows.length;
+      let nRows = layer.row.length;
       let rowHeight = Math.floor(allottedHeight / (nRows == 0 ? 1 : nRows));
       let layerHeight = nRows * rowHeight;
 
@@ -1610,6 +1598,16 @@ export default class VisualKeyboard extends EventEmitter<EventMap> implements Ke
     // The stylesheet is currently built + constructed in the same code that attaches it to
     // the page.
     kbdObj.appendStyleSheet();
+
+    // Unset the width + height we used thus far; this method's consumer may choose to rescale
+    // the returned element.  If so, we don't want to use our outdated value by mistake.
+    //
+    // While `kbdObj.setSize()` could be used in theory, it _also_ unsets the element styling.
+    // We actually wish to _leave_ this styling in place - one of our parameters is `height`, and
+    // it should remain in place in the styling on the output element as the default in case
+    // the consumer _doesn't_ add styling afterward.
+    delete kbdObj._width;
+    delete kbdObj._height;
 
     return classWrapper;
   }
