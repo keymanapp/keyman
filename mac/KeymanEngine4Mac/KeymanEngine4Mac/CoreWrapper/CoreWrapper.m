@@ -82,11 +82,12 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   for(km_core_keyboard_key* keyPtr = keyList; (keyPtr->key) != 0; keyPtr++) {
     uint16_t key = keyPtr->key;
     uint32_t modifier_flag = keyPtr->modifier_flag;
-    //os_log_debug([KMELogs coreLog], "key %d modifiers %d ", key, modifier_flag);
     
     if(key != 0) {
       CoreKey* coreKey = [[CoreKey alloc] init: key modifiers: modifier_flag];
       [keyArray addObject:coreKey];
+
+      //os_log_debug([KMELogs coreLog], "key %d modifiers 0x%X coreKey %{public}@", key, modifier_flag, coreKey);
     }
   }
 

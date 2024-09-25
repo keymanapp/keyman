@@ -51,7 +51,7 @@ NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboard
 @implementation KMInputMethodAppDelegate
 @synthesize kme = _kme;
 @synthesize kmx = _kmx;
-@synthesize keyboardInfo = _keyboardInfo;
+@synthesize modifierMapping = _modifierMapping;
 @synthesize kvk = _kvk;
 @synthesize keyboardName = _keyboardName;
 @synthesize keyboardsPath = _keyboardsPath;
@@ -400,13 +400,17 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 
 - (void)setKmx:(KMXFile *)kmx {
   _kmx = kmx;
-  _keyboardInfo = [self.kme loadKeyboardFromKmxFile:kmx];
+  CoreKeyboardInfo *keyboardInfo = [self.kme loadKeyboardFromKmxFile:kmx];
+
+  os_log_info([KMLogs keyboardLog], "setKmx loaded keyboard, keyboard info: %{public}@", keyboardInfo);
   
-  os_log_info([KMLogs keyboardLog], "setKmx loadKeyboardFromKmxFile %{public}@", self.keyboardInfo.keyboardId);
-  
+  _modifierMapping = [[KMModifierMapping alloc] init:keyboardInfo];
+
+  os_log_info([KMLogs keyboardLog], "modifierMapping bothOptionKeysGenerateRightAlt: %d", self.modifierMapping.bothOptionKeysGenerateRightAlt);
+
    // assign custom keyboard tag in Sentry to default keyboard
    [SentrySDK configureScope:^(SentryScope * _Nonnull scope) {
-       [scope setTagValue:_keyboardInfo.keyboardId forKey:@"keyboard"];
+       [scope setTagValue:keyboardInfo.keyboardId forKey:@"keyboard"];
    }];
 }
 

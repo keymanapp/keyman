@@ -12,6 +12,7 @@
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
 #import <KeymanEngine4Mac/KeymanEngine4Mac.h>
+#import "KMModifierMapping.h"
 #import "KMPackageReader.h"
 #import "KMInputController.h"
 #import "KMAboutWindowController.h"
@@ -62,7 +63,7 @@ static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX = 0;
 
 @property (nonatomic, strong) KMEngine *kme;
 @property (nonatomic, strong) KMXFile *kmx;
-@property (nonatomic, strong) CoreKeyboardInfo *keyboardInfo;
+@property (nonatomic, strong) KMModifierMapping *modifierMapping;
 @property (nonatomic, strong) KVKFile *kvk;
 @property (nonatomic, strong) NSString *keyboardsPath;
 @property (nonatomic, strong) NSString *fontsPath;

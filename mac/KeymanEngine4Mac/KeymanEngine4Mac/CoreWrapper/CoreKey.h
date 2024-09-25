@@ -12,6 +12,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSUInteger keyCode;
 @property (nonatomic, readonly) NSUInteger keyModifiers;
 -(instancetype)init:(NSUInteger)code modifiers:(NSUInteger)modifiers;
+-(BOOL)hasLeftAlt;
+-(BOOL)hasRightAlt;
+-(BOOL)hasAlt;
 @end
 
 NS_ASSUME_NONNULL_END

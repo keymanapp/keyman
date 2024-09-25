@@ -12,8 +12,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CoreKeyboardInfo : NSObject
 @property (nonatomic, readonly) NSArray *keyArray;
 @property (nonatomic, readonly) NSString *keyboardId;
-@property (readonly) BOOL containsRightAlt;
+@property (readonly) BOOL containsAlt;
 @property (readonly) BOOL containsLeftAlt;
+@property (readonly) BOOL containsRightAlt;
 -(instancetype)init:(NSString*)id keyArray:(NSArray*) keys;
 @end
 
