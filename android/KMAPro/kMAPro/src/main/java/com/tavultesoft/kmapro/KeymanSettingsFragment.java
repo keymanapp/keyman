@@ -178,12 +178,6 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
           editor.putBoolean(KeymanSettingsActivity.showBannerKey, isChecked);
       as part of the default onClick() used by SwitchPreference.
      */
-    SwitchPreference bannerPreference = new SwitchPreference(context);
-    bannerPreference.setKey(KeymanSettingsActivity.showBannerKey);
-    bannerPreference.setTitle(getString(R.string.show_banner));
-    bannerPreference.setSummaryOn(getString(R.string.show_banner_on));
-    bannerPreference.setSummaryOff(getString(R.string.show_banner_off));
-
     SwitchPreference getStartedPreference = new SwitchPreference(context);
     getStartedPreference.setKey(GetStartedActivity.showGetStartedKey);
     getStartedPreference.setTitle(String.format(getString(R.string.show_get_started), getString(R.string.get_started)));
@@ -207,7 +201,6 @@ public class KeymanSettingsFragment extends PreferenceFragmentCompat {
     screen.addPreference(spacebarTextPreference);
 
     screen.addPreference(hapticFeedbackPreference);
-    screen.addPreference(bannerPreference);
     screen.addPreference(getStartedPreference);
     screen.addPreference(sendCrashReportPreference);
 
