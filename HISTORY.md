@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 18.0.118 alpha 2024-09-26
+
+* chore(developer): add context/options (#11566)
+* chore(deps-dev): bump rollup from 4.16.4 to 4.22.4 (#12462)
+* fix(developer): ignore excess whitespace in `<row keys>` attribute (#12468)
+* refactor(common): move help into common prod/docs/help folders (#12424)
+* fix(developer): publish developer-utils package during build (#12471)
+* fix(linux): ignore additional C++ symbol in API check (#12474)
+
 ## 18.0.117 alpha 2024-09-25
 
 * docs(common): Document how to skip generating CDN on websites (#12446)
