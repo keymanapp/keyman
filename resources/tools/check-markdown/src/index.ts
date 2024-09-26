@@ -8,10 +8,12 @@ import { checkLinks } from './check-link.js';
 import { findFiles } from './find-files.js';
 import { parseFiles } from './parse-files.js';
 
+const color = chalk.default;
+
 const program = new Command();
 const command = program
   .description('Markdown link and sanity checker')
-  .option('-r, --root <path>', 'Root path to check')
+  .requiredOption('-r, --root <path>', 'Root path to check')
   .option('-v, --verbose', 'Report on external links and warnings')
   .action(run);
 
@@ -20,6 +22,7 @@ program.parse(process.argv);
 function run() {
   const root = command.opts().root;
   const verbose = program.opts().verbose;
+
   const files = findFiles(root);
   const links = parseFiles(root, files);
   const result = checkLinks(root, links);
@@ -38,10 +41,10 @@ function reportMessages(root: string, verbose: boolean, file: LinkRef) {
   for(const message of file.messages) {
     if(message.type == 'error' || verbose) {
       process.stdout.write(
-          chalk.cyan(path.join(root, file.file)) + ' - ' +
+          color.cyan(path.join(root, file.file)) + ' - ' +
           severityColors[message.type](message.type) + ': ' +
           message.message +
-          chalk.grey(' [' + message.token.text + '](' + message.token.href + ')') +
+          color.grey(' [' + message.token.text + '](' + message.token.href + ')') +
           '\n'
       );
     }

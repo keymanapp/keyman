@@ -20,7 +20,7 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
-builder_run_action clean      rm -rf build/
+builder_run_action clean      rm -rf build/ tsconfig.tsbuildinfo
 builder_run_action configure  verify_npm_setup
 builder_run_action build      tsc --build
 # builder_run_action test       mocha

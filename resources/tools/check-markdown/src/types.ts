@@ -1,12 +1,14 @@
 import chalk from 'chalk';
 import { Token, Tokens } from 'marked';
 
+const color = chalk.default;
+
 export type MessageType = 'info' | 'warning' | 'error';
 
 export const severityColors: {[value in MessageType]: chalk.Chalk} = {
-  'info': chalk.reset,
-  'warning': chalk.hex('FFA500'), // orange
-  'error': chalk.redBright,
+  'info': color.reset,
+  'warning': color.hex('FFA500'), // orange
+  'error': color.redBright,
 };
 
 export interface LinkRefMessage {
