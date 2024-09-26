@@ -118,12 +118,42 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   return [self applyKeymanCoreActions:output event:event client:sender];
 }
 
+/**
+ * If necessary change the modifier so that it appears that the right option key was pressed instead of the
+ * left option key. This will trigger keyboard rules that are defined for right option because both option keys
+ * generally have the same meaning on the Mac.
+ */
+- (NSEventModifierFlags) determineModifierFlag {
+  const NSEventModifierFlags LEFT_OPTION_MASK = 0x80120;
+  const NSEventModifierFlags RIGHT_OPTION_MASK = 0x80140;
+  
+  NSEventModifierFlags originalModifierFlag = self.appDelegate.currentModifierFlags;
+  NSEventModifierFlags newModifierFlag = originalModifierFlag;
+
+  if (self.appDelegate.modifierMapping.bothOptionKeysGenerateRightAlt) {
+    // if original includes left option key, then replace it with the right option key
+    if ((originalModifierFlag & LEFT_OPTION_MASK) == LEFT_OPTION_MASK) {
+      os_log_debug([KMLogs eventsLog], "determineModifierFlag \n  originalModifierFlag: 0x%lX \n  LEFT_OPTION_MASK: 0x%lx \n  inverse: 0x%lx", (unsigned long)originalModifierFlag, LEFT_OPTION_MASK, ~LEFT_OPTION_MASK);
+      // clear all left option bits
+      newModifierFlag = originalModifierFlag & ~LEFT_OPTION_MASK;
+      os_log_debug([KMLogs eventsLog], "  cleared left option bits: 0x%lX", (unsigned long)newModifierFlag);
+      // set all right option bits
+      newModifierFlag = newModifierFlag | RIGHT_OPTION_MASK;
+      os_log_debug([KMLogs eventsLog], "  set right option bits: 0x%lX", (unsigned long)newModifierFlag);
+    }
+  } else {
+    os_log_debug([KMLogs eventsLog], "determineModifierFlag = originalModifierFlag: 0x%lX", (unsigned long)originalModifierFlag);
+  }
+  return newModifierFlag;
+}
+
 - (CoreKeyOutput*) processEventWithKeymanEngine:(NSEvent *)event in:(id) sender {
   CoreKeyOutput* coreKeyOutput = nil;
   if (self.appDelegate.lowLevelEventTap != nil) {
-    NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:self.appDelegate.currentModifierFlags timestamp:event.timestamp windowNumber:event.windowNumber context:[NSGraphicsContext currentContext] characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
+    NSEventModifierFlags newModifierFlag = [self determineModifierFlag];
+    NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:newModifierFlag timestamp:event.timestamp windowNumber:event.windowNumber context:[NSGraphicsContext currentContext] characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
     coreKeyOutput = [self.kme processEvent:eventWithOriginalModifierFlags];
-    os_log_debug([KMLogs eventsLog], "processEventWithKeymanEngine, using AppDelegate.currentModifierFlags: %lu / 0x%lX, instead of event.modifiers = %lu / 0x%lX", self.appDelegate.currentModifierFlags, self.appDelegate.currentModifierFlags, event.modifierFlags, event.modifierFlags);
+    os_log_debug([KMLogs eventsLog], "processEventWithKeymanEngine, using newModifierFlag 0x%lX, instead of event.modifiers 0x%lX", newModifierFlag, event.modifierFlags);
   }
   else {
     // Depending on the client app and the keyboard, using the passed-in event as it is should work okay.

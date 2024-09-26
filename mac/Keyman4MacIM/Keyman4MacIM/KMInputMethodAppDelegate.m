@@ -292,7 +292,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     
     switch (type) {
       case kCGEventFlagsChanged:
-        os_log_debug([KMLogs eventsLog], "eventTapFunction: system event kCGEventFlagsChanged to: %x", (int) sysEvent.modifierFlags);
+        os_log_debug([KMLogs eventsLog], "eventTapFunction: system event kCGEventFlagsChanged to: 0x%X", (int) sysEvent.modifierFlags);
         appDelegate.currentModifierFlags = sysEvent.modifierFlags;
         if (appDelegate.currentModifierFlags & NSEventModifierFlagCommand) {
           appDelegate.contextChangedByLowLevelEvent = YES;
