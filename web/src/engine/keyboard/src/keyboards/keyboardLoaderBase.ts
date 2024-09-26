@@ -39,26 +39,26 @@ export abstract class KeyboardLoaderBase {
   }
 
   private async loadKeyboardInternal(uri: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Keyboard> {
-    const blob = await this.loadKeyboardBlob(uri, errorBuilder);
+    const byteArray = await this.loadKeyboardBlob(uri, errorBuilder);
 
-    let script: string;
-    try {
-      script = await blob.text();
-    } catch (e) {
-      throw errorBuilder.invalidKeyboard(e);
-    }
-
-    if (script.startsWith('KXTS', 0)) {
+    if (byteArray.slice(0, 4) == Uint8Array.from([0x4b, 0x58, 0x54, 0x53])) { // 'KXTS'
       // KMX or LDML (KMX+) keyboard
       console.error("KMX keyboard loading is not yet implemented!");
       return null;
+    }
+
+    let script: string;
+    try {
+      script = new TextDecoder('utf-8', { fatal: true }).decode(byteArray);
+    } catch (e) {
+      throw errorBuilder.invalidKeyboard(e);
     }
 
     // .js keyboard
     return await this.loadKeyboardFromScript(script, errorBuilder);
   }
 
-  protected abstract loadKeyboardBlob(uri: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Blob>;
+  protected abstract loadKeyboardBlob(uri: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Uint8Array>;
 
   protected abstract loadKeyboardFromScript(scriptSrc: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Keyboard>;
 }

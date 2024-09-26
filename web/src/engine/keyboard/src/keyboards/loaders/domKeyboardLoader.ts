@@ -29,7 +29,7 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
     this.performCacheBusting = cacheBust || false;
   }
 
-  protected async loadKeyboardBlob(uri: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Blob> {
+  protected async loadKeyboardBlob(uri: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Uint8Array> {
     if (this.performCacheBusting) {
       uri = this.cacheBust(uri);
     }
@@ -45,11 +45,13 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
       throw errorBuilder.keyboardDownloadError(new Error(`HTTP ${response.status} ${response.statusText}`));
     }
 
+    let buffer: ArrayBuffer;
     try {
-      return await response.blob();
+      buffer = await response.arrayBuffer();
     } catch (e) {
       throw errorBuilder.invalidKeyboard(e);
     }
+    return new Uint8Array(buffer);
   }
 
   protected async loadKeyboardFromScript(script: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Keyboard> {

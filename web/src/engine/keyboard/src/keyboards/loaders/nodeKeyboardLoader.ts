@@ -26,7 +26,7 @@ export class NodeKeyboardLoader extends KeyboardLoaderBase {
     }
   }
 
-  protected async loadKeyboardBlob(uri: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Blob> {
+  protected async loadKeyboardBlob(uri: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Uint8Array> {
     // `fs` does not like 'file:///'; it IS "File System" oriented, after all, and wants a path, not a URI.
     if (uri.indexOf('file:///') == 0) {
       uri = uri.substring('file:///'.length);
@@ -38,7 +38,7 @@ export class NodeKeyboardLoader extends KeyboardLoaderBase {
     } catch (err) {
       throw errorBuilder.keyboardDownloadError(err);
     }
-    return new Blob([buffer]);
+    return Uint8Array.from(buffer);
   }
 
   protected async loadKeyboardFromScript(scriptSrc: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Keyboard> {
