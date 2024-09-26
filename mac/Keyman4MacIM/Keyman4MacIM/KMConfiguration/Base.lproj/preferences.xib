@@ -2,8 +2,8 @@
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22689"/>
-        <plugIn identifier="com.apple.WebKitIBPlugin" version="22689"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22690"/>
+        <plugIn identifier="com.apple.WebKitIBPlugin" version="22690"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -13,8 +13,6 @@
                 <outlet property="supportForward" destination="OSG-wW-VHs" id="8dG-cd-ByI"/>
                 <outlet property="supportHome" destination="RUX-eW-d6h" id="i5g-Lo-6zG"/>
                 <outlet property="tableView" destination="epz-Md-JOY" id="fHy-6f-hXN"/>
-                <outlet property="useVerboseLoggingCheckBox" destination="uWx-3J-U0D" id="deO-CV-6KJ"/>
-                <outlet property="verboseLoggingInfo" destination="PiJ-pY-UY7" id="o0X-ZY-NKX"/>
                 <outlet property="webView" destination="gTQ-rF-m9S" id="u7r-Sf-QKb"/>
                 <outlet property="window" destination="F0z-JX-Cv5" id="gIp-Ho-8D9"/>
             </connections>
@@ -209,29 +207,6 @@
                                 <view key="view" id="N1x-px-93m">
                                     <rect key="frame" x="10" y="33" width="754" height="538"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <subviews>
-                                        <button toolTip="Turn this on if you are having problems with a specific keyboard or with Keyman in general." verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uWx-3J-U0D">
-                                            <rect key="frame" x="15" y="483" width="200" height="18"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Use verbose Console logging" bezelStyle="regularSquare" imagePosition="left" inset="2" id="7J6-zy-R20">
-                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="system"/>
-                                            </buttonCell>
-                                            <connections>
-                                                <action selector="useVerboseLoggingCheckBoxAction:" target="-2" id="DGX-fy-5qP"/>
-                                            </connections>
-                                        </button>
-                                        <textField hidden="YES" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PiJ-pY-UY7">
-                                            <rect key="frame" x="34" y="414" width="705" height="63"/>
-                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <textFieldCell key="cell" sendsActionOnEndEditing="YES" id="MrI-GM-7d6">
-                                                <font key="font" metaFont="system"/>
-                                                <string key="title">When the verbose logging option is on, Keyman will log actions that might help Keyman Support diagnose a problem. The Console program can be used to see a log of messages from Keyman. In Console, filter to show all messages from the "Keyman" process. This log can be exported and sent to Keyman support if needed.</string>
-                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                    </subviews>
                                 </view>
                             </tabViewItem>
                             <tabViewItem label="Support" identifier="3" id="93O-x6-RLF">

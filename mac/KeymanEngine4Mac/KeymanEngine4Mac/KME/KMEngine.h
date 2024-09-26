@@ -19,9 +19,8 @@
 @interface KMEngine : NSObject
 
 @property (weak, nonatomic) KMXFile *kmx;
-@property (assign, nonatomic) BOOL debugMode;
 
-- (id)initWithKMX:(KMXFile *)kmx context:(NSString *)ctxBuf verboseLogging:(BOOL)enableDebugLogging;
+- (id)initWithKMX:(KMXFile *)kmx context:(NSString *)ctxBuf;
 - (CoreKeyboardInfo*)loadKeyboardFromKmxFile:(KMXFile*) kmxFile;
 - (NSString *)getCoreContextDebug;
 - (void)clearCoreContext;
@@ -29,7 +28,6 @@
 
 - (void)setCoreOptions:(NSString *)key withValue:(NSString *)value;
 - (CoreKeyOutput *)processEvent:(NSEvent *)event;
-- (void)setUseVerboseLogging:(BOOL)useVerboseLogging;
 
 @end
 
