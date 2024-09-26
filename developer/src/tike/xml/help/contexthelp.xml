@@ -920,7 +920,151 @@
     </Control>
   </Form>
 
-   <!-- New Lexical Model Project Parameters -->
+  <Form Name="context/options">
+    <Control Name="pages" Title="Options Dialog">
+      <p>The Options dialog display several tabs such as General, Editor, Debugger, Character Map and Server. 
+      You can configure the environment of Keyman Developer here.</p>
+    </Control>
+
+    <Control Name="chkOpenKeyboardFilesInSourceView" Title="Open keyboard files in source view">
+      <p>Instead of opening a keyboard file in the Details tab, open directly into the Layout tab, Source pane.</p>
+    </Control>
+
+    <Control Name="editExternalEditorPath" Title="External Editor Path">
+      <p>You can open any Keyman source file shown in the project in an external text editor by right-clicking 
+      on the file and selecting "Open in External Editor". The files available for editing externally 
+      are .kmn, .kps, and .kvks. This field configures which editor you wish to use to edit the files. 
+      Note: if you need to pass command line parameters to the editor, you will need to wrap the command 
+      in a batch file and reference the batch file here.</p>
+    </Control>
+
+    <Control Name="cmdBrowseExternalEditor" Title="External Editor Path">
+      <p>You can open any Keyman source file shown in the project in an external text editor by right-clicking 
+      on the file and selecting "Open in External Editor". The files available for editing externally 
+      are .kmn, .kps, and .kvks. This field configures which editor you wish to use to edit the files. 
+      Note: if you need to pass command line parameters to the editor, you will need to wrap the command 
+      in a batch file and reference the batch file here.</p>
+    </Control>
+
+    <Control Name="cmdBrowseDefaultProjectPath" Title="Default Project Folder">
+      <p>You can check the location of your default project folder, where projects like keyboards or 
+        lexical models will be saved automatically. If needed, you can change the folder location 
+        to a more convenient spot.</p>
+    </Control>
+
+    <Control Name="cmdResetToolWindows" Title="Reset Tool Windows">
+      <p>Reset all tabs to their original locations.</p>
+    </Control>
+
+    <Control Name="cmdSMTPSettings" Title="SMTP Settings...">
+      <p>Configure your SMTP server settings for email functionality within Keyman Developer, 
+      such as emailing debug URLs for the touch layout debugger.</p>
+    </Control>
+
+    <Control Name="cmdProxySettings" Title="Proxy Settings...">
+      <p>Configure the HTTP proxy settings for online functionality within Keyman Developer, 
+      such as uploading files to Tavultesoft.</p>
+    </Control>
+
+    <Control Name="cmdCancel" Title="Options Dialog">
+      <p>Click Cancel to close the dialog without saving changes.</p>
+    </Control>
+
+    <Control Name="cmdOK" Title="Options Dialog">
+      <p>Click OK to save changes and close the dialog.</p>
+    </Control>
+
+    <Control Name="chkUseTab" Title="Use tab character">
+      <p>Sets whether to use the Tab character or spaces for indents.</p>
+    </Control>
+
+    <Control Name="editIndentSize" Title="Indent size">
+      <p>The indent size, measured in number of spaces.</p>
+    </Control>
+
+    <Control Name="chkLinkFontSizes" Title="Link quoted font size to primary font size">
+      <p>If checked, the quoted font size will be the same as the default font size.</p>
+    </Control>
+
+    <Control Name="cmdDefaultFont" Title="Default font">
+      <p>Sets the font for ordinary text in the editor.</p>
+    </Control>
+
+    <Control Name="cmdQuotedFont" Title="Quoted font">
+      <p>Sets the font for displaying comments text and strings in Keyman source files in 
+      single or double quotes.</p>
+    </Control>
+
+    <Control Name="cbEditorTheme" Title="Editor theme">
+      <p>Sets the display theme and syntax highlighting options for the editor. A custom 
+      theme can be defined in a JSON file.</p>
+    </Control>
+
+    <Control Name="chkUseOldDebugger" Title="Enable test window (from version 5.0)">
+      <p>Enables the Keyman 5-style Test window instead of the debugger.</p>
+    </Control>
+
+    <Control Name="chkDebuggerBreakWhenExitingLine" Title="Breakpoints fire also when exiting line">
+      <p>Breakpoints will fire when a rule has finished being processed also.</p>
+    </Control>
+
+    <Control Name="chkDebuggerSingleStepAfterBreak" Title="Turn on single step after breakpoint">
+      <p>Activates single-step mode after a breakpoint fires.</p>
+    </Control>
+
+    <Control Name="chkDebuggerShowStoreOffset" Title="Show matched character offsets in stores">
+      <p>Displays numeric indices of characters in stores</p>
+    </Control>
+
+    <Control Name="chkDebuggerAutoRecompile" Title="Automatically recompile if no debug information available">
+      <p>When the debugger starts, rebuild a keyboard without prompting if the keyboard 
+      has no debug symbols included.</p>
+    </Control>
+
+    <Control Name="chkDebuggerAutoResetBeforeCompiling" Title="Automatically reset debugger before recompiling">
+      <p>If you are debugging a keyboard, make a change to the keyboard, and recompile it,
+        then the debugger needs to be reset in order to get access to the new keyboard. 
+        Keyman Developer will normally prompt you to do this, but if you set 
+        this option, then it will reset the debugger automatically instead.</p>
+    </Control>
+
+    <Control Name="chkCharMapAutoLookup" Title="Find character under cursor automatically">
+      <p>The character beneath the cursor in the edit window will be highlighted in the 
+      Character Map. This will intelligently parse the character data under the cursor so that 
+      a character code (e.g. U+1234) will be highlighted correctly.</p>
+    </Control>
+
+    <Control Name="cmdCharMapRebuildDatabase" Title="Update database">
+      <p>Rebuilds the Unicode character database from source unicodedata.txt and blocks.txt. 
+      These files can be downloaded from the Unicode website at http://www.unicode.org/ucd/. 
+      This lets you update the character map with a newer version of Unicode. 
+      Keyman Developer 17.0 was released with Unicode version 15.1 data.</p>
+    </Control>
+
+    <Control Name="editDatabasePath" Title="Update database">
+      <p>Rebuilds the Unicode character database from source unicodedata.txt and blocks.txt. 
+      These files can be downloaded from the Unicode website at http://www.unicode.org/ucd/. 
+      This lets you update the character map with a newer version of Unicode. 
+      Keyman Developer 17.0 was released with Unicode version 15.1 data.</p>
+    </Control>
+
+    <Control Name="cmdConfigureServer" Title="Configure Server...">
+      <p>You can customize the Keyman Developer server for testing the usability of your keyboard. 
+      Features of the Keyman Developer server include:
+        <ul>
+          <li>Seamless integration with the IDE (Start, Stop, Live reload, Recompile...)</li>
+          <li>Port configuration</li>
+          <li>Allow testing cross devices</li>
+          <li>Support for ngrok to allow simple sharing of debug sessions across the Internet</li>
+        </ul>
+      </p>
+    </Control>
+
+    <Control Name="chkListLocalURLs" Title="List local URLs for Server">
+      <p>Below Configure Server, untick the box, and it will quit displaying any local URLs for keyboard testing.</p>
+    </Control>
+  </Form>
+
   <Form Name="context/new-model-project-parameters">
     <Control Name="editAuthor" Title="Author Name">
       <p>The name of the developer of the keyboard. This is either your full name or

@@ -14,14 +14,14 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 SUBPROJECT_NAME=engine/common/web-utils
 BUILD_DIR="/web/src/engine/common/web-utils/build"
 
-BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
+BUNDLE_CMD="node $KEYMAN_ROOT/web/src/tools/es-bundling/build/common-bundle.mjs"
 
 ################################ Main script ################################
 
 builder_describe \
   "Compiles the web-oriented utility function module." \
   "@/common/web/keyman-version" \
-  "@/common/web/es-bundling" \
+  "@/web/src/tools/es-bundling" \
   clean configure build test \
   "--ci    For use with action ${BUILDER_TERM_START}test${BUILDER_TERM_END} - emits CI-friendly test reports"
 

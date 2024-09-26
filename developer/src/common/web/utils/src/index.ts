@@ -42,7 +42,7 @@ export { defaultCompilerOptions, CompilerBaseOptions, CompilerCallbacks, Compile
 
   } from './compiler-interfaces.js';
 
-export { CommonTypesMessages } from './common-events.js';
+export { CommonTypesMessages } from './common-messages.js';
 
 export * as xml2js from './deps/xml2js/xml2js.js';
 

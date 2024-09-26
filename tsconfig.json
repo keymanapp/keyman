@@ -5,8 +5,6 @@
     { "path": "./common/tools/hextobin/" },
 
     { "path": "./common/web/keyman-version" },
-    { "path": "./common/web/recorder/tsconfig.json" },
-    { "path": "./common/web/sentry-manager/src/tsconfig.json" },
     { "path": "./common/web/types/" },
 
     { "path": "./developer/src/common/web/test-helpers/tsconfig.json" },
@@ -44,6 +42,9 @@
     { "path": "./web/src/engine/predictive-text/worker-thread" },
     { "path": "./web/src/engine/osk/gesture-processor/tsconfig.json" },
     { "path": "./web/src/engine/osk/gesture-processor/src/tools/unit-test-resources/tsconfig.json" },
+    { "path": "./web/src/engine/sentry-manager" },
+
+    { "path": "./web/src/tools/recorder-recorder" },
     // { "path": "./web/tools/recorder/tsconfig.json" },
     // { "path": "./web/tools/sourcemap-root/tsconfig.json" },
   ]

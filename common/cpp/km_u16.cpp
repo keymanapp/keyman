@@ -5,6 +5,7 @@
  */
 
 #include <stdarg.h>
+#include <wctype.h>
 #include "utfcodec.hpp"
 #include "km_u16.h"
 
@@ -386,4 +387,44 @@ double u16tof(KMX_WCHAR* str16) {
   char* pEnd;
   std::string str = string_from_u16string(str16);
   return strtof(str.c_str(), &pEnd);
+}
+
+/**
+ * @brief Trim whitespace from the start (left) of a string
+ * @param p Pointer to u16string
+ * @return Pointer to the string modified to remove leading whitespace
+ */
+KMX_WCHAR* u16ltrim(KMX_WCHAR* p) {
+  if (p && (u16len(p) > 0)) {
+    PKMX_WCHAR q = p;
+    while(iswspace(*q)) q++;
+    u16cpy(p, q);
+  }
+  return p;
+}
+
+/**
+ * @brief Trim whitespace from the end (right) of a string
+ * @param p Pointer to u16string
+ * @return Pointer to the string modified to remove trailing whitespace
+ */
+KMX_WCHAR* u16rtrim(KMX_WCHAR *p) {
+  if (p && (u16len(p) > 0)) {
+    PKMX_WCHAR q = p + u16len(p) - 1;
+    if (iswspace(*q)) {
+      while (iswspace(*q) && q > p) q--;
+      if (!iswspace(*q)) q++;
+      *q = '\0'; // delete first following whitespace
+    }
+  }
+  return p;
+}
+
+/**
+ * @brief Trim whitespace from both the start and end of a string
+ * @param p Pointer to u16string
+ * @return Pointer to the string modified to remove leading and trailing whitespace
+ */
+KMX_WCHAR* u16trim(KMX_WCHAR *p) {
+  return u16rtrim(u16ltrim(p));
 }

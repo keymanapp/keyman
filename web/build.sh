@@ -23,7 +23,6 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   ":app/webview              A puppetable version of KMW designed for use in a host app's WebView" \
   ":app/ui                   Builds KMW's desktop form-factor keyboard-selection UI modules" \
   ":engine/attachment        Subset used for detecting valid page contexts for use in text editing " \
-  ":engine/device-detect     Subset used for device-detection " \
   ":engine/dom-utils         A common subset of function used for DOM calculations, layout, etc" \
   ":engine/events            Specialized classes utilized to support KMW API events" \
   ":engine/element-wrappers  Subset used to integrate with website elements" \
@@ -56,7 +55,6 @@ builder_describe_outputs \
   build:app/webview             "/web/build/app/webview/${config}/keymanweb-webview.js" \
   build:app/ui                  "/web/build/app/ui/${config}/kmwuitoggle.js" \
   build:engine/attachment       "/web/build/engine/attachment/lib/index.mjs" \
-  build:engine/device-detect    "/web/build/engine/device-detect/lib/index.mjs" \
   build:engine/dom-utils        "/web/build/engine/dom-utils/obj/index.js" \
   build:engine/events           "/web/build/engine/events/lib/index.mjs" \
   build:engine/element-wrappers "/web/build/engine/element-wrappers/lib/index.mjs" \
@@ -71,7 +69,7 @@ builder_describe_outputs \
   build:tools                   "/web/build/tools/building/sourcemap-root/index.js" \
   build:test-pages              "/web/build/test-resources/sentry-manager.js"
 
-BUNDLE_CMD="node ${KEYMAN_ROOT}/common/web/es-bundling/build/common-bundle.mjs"
+BUNDLE_CMD="node ${KEYMAN_ROOT}/web/src/tools/es-bundling/build/common-bundle.mjs"
 
 #### Build action definitions ####
 
@@ -146,7 +144,6 @@ coverage_action() {
   cd web
 }
 
-builder_run_child_actions build:engine/device-detect
 builder_run_child_actions build:engine/dom-utils
 
 builder_run_child_actions build:engine/keyboard
@@ -164,7 +161,7 @@ builder_run_child_actions build:engine/attachment
 # Uses engine/interfaces (due to resource-path config interface)
 builder_run_child_actions build:engine/keyboard-storage
 
-# Uses engine/interfaces, engine/device-detect, engine/keyboard-storage, & engine/osk
+# Uses engine/interfaces, engine/keyboard-storage, & engine/osk
 builder_run_child_actions build:engine/main
 
 # Uses all but engine/element-wrappers and engine/attachment

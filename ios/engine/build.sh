@@ -15,7 +15,7 @@ verify_on_mac
 
 builder_describe "Builds Keyman Engine for use on iOS devices - iPhone and iPad." \
   "@/web/src/app/webview        build" \
-  "@/common/web/sentry-manager  build" \
+  "@/web/src/engine/sentry-manager  build" \
   "clean" \
   "configure" \
   "build" \
@@ -109,7 +109,7 @@ function update_bundle ( ) {
   cp "$KMW_PRODUCT/keymanweb-webview.js"        "$BUNDLE_PATH/keymanweb-webview.js"
 
   cp "$KEYMAN_ROOT/node_modules/@sentry/browser/build/bundle.min.js" "$BUNDLE_PATH/sentry.min.js"
-  cp "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js"     "$BUNDLE_PATH/keyman-sentry.js"
+  cp "$KEYMAN_ROOT/web/src/engine/sentry-manager/build/lib/index.js"     "$BUNDLE_PATH/keyman-sentry.js"
 }
 
 # First things first - update our dependencies.

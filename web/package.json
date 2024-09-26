@@ -17,11 +17,6 @@
       "types": "./build/engine/interfaces/obj/index.d.ts",
       "import": "./build/engine/interfaces/obj/index.js"
     },
-    "./engine/device-detect": {
-      "es6-bundling": "./src/engine/device-detect/src/index.ts",
-      "types": "./build/engine/device-detect/obj/index.d.ts",
-      "import": "./build/engine/device-detect/obj/index.js"
-    },
     "./engine/dom-utils": {
       "es6-bundling": "./src/engine/dom-utils/src/index.ts",
       "types": "./build/engine/dom-utils/obj/index.d.ts",
@@ -114,7 +109,8 @@
     "@zip.js/zip.js": "^2.7.32",
     "c8": "^7.12.0",
     "jsdom": "^23.0.1",
-    "mocha": "^10.0.0"
+    "mocha": "^10.0.0",
+    "tsx": "^4.19.0"
   },
   "scripts": {
     "test": "gosh ./test.sh"

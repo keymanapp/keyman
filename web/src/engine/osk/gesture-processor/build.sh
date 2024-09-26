@@ -11,14 +11,14 @@ SUBPROJECT_NAME=engine/osk/gesture-processor
 . "${KEYMAN_ROOT}/web/common.inc.sh"
 . "${KEYMAN_ROOT}/resources/shellHelperFunctions.sh"
 
-BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
+BUNDLE_CMD="node $KEYMAN_ROOT/web/src/tools/es-bundling/build/common-bundle.mjs"
 
 BUILD_DIR="/web/src/engine/osk/gesture-processor/build"
 
 ################################ Main script ################################
 
 builder_describe "Builds the gesture-recognition model for Web-based on-screen keyboards" \
-  "@/common/web/es-bundling build" \
+  "@/web/src/tools/es-bundling build" \
   "@/web/src/engine/common/web-utils build" \
   "clean" \
   "configure" \

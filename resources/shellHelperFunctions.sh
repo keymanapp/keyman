@@ -267,7 +267,12 @@ verify_npm_setup() {
 
   pushd "$KEYMAN_ROOT" > /dev/null
 
-  try_multiple_times npm ci
+  offline_param=
+  if builder_try_offline; then
+    builder_echo "Trying offline build"
+    offline_param=--prefer-offline
+  fi
+  try_multiple_times npm ${offline_param} ci
 
   popd > /dev/null
 }

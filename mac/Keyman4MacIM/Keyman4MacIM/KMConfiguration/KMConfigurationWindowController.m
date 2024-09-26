@@ -14,9 +14,6 @@
 @interface KMConfigurationWindowController ()
 @property (nonatomic, weak) IBOutlet NSTableView *tableView;
 @property (nonatomic, weak) IBOutlet WebView *webView;
-@property (nonatomic, weak) IBOutlet NSButton *alwaysShowOSKCheckBox;
-@property (nonatomic, weak) IBOutlet NSButton *useVerboseLoggingCheckBox;
-@property (nonatomic, weak) IBOutlet NSTextField *verboseLoggingInfo;
 @property (nonatomic, weak) IBOutlet NSButton *supportBack;
 @property (nonatomic, weak) IBOutlet NSButton *supportForward;
 @property (nonatomic, weak) IBOutlet NSButton *supportHome;
@@ -69,9 +66,6 @@
   
   NSURL *homeUrl = [[NSBundle mainBundle] URLForResource:@"index" withExtension:@"html" subdirectory:@"Help"];
   [self.webView.mainFrame loadRequest:[NSURLRequest requestWithURL:homeUrl]];
-  
-  [self.alwaysShowOSKCheckBox setState:(self.AppDelegate.alwaysShowOSK ? NSOnState : NSOffState)];
-  [self.useVerboseLoggingCheckBox setState:(self.AppDelegate.useVerboseLogging ? NSOnState : NSOffState)];
 }
 
 - (void)webView:(WebView *)sender decidePolicyForNewWindowAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request newFrameName:(NSString *)frameName decisionListener:(id<WebPolicyDecisionListener>)listener {
@@ -437,18 +431,6 @@
   [self.window addChildWindow:self.AppDelegate.downloadKBWindow.window ordered:NSWindowAbove];
   [self.AppDelegate.downloadKBWindow.window centerInParent];
   [self.AppDelegate.downloadKBWindow.window makeKeyAndOrderFront:nil];
-}
-
-- (IBAction)alwaysShowOSKCheckBoxAction:(id)sender {
-  NSButton *checkBox = (NSButton *)sender;
-  [self.AppDelegate setAlwaysShowOSK:(checkBox.state == NSOnState)];
-}
-
-- (IBAction)useVerboseLoggingCheckBoxAction:(id)sender {
-  NSButton *checkBox = (NSButton *)sender;
-  BOOL verboseLoggingOn = checkBox.state == NSOnState;
-  [self.AppDelegate setUseVerboseLogging:verboseLoggingOn];
-  [self.verboseLoggingInfo setHidden:!verboseLoggingOn];
 }
 
 - (void)handleRequestToInstallPackage:(KMPackage *) package {
