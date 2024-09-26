@@ -59,6 +59,10 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
       throw errorBuilder.scriptError(e);
     }
     const keyboard = this.harness.loadedKeyboard;
+    if (!keyboard) {
+      throw errorBuilder.scriptError();
+    }
+
     this.harness.loadedKeyboard = null;
     return keyboard;
   }
