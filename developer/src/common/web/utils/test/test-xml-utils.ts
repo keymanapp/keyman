@@ -87,8 +87,8 @@ describe(`XML Reader Test ${GEN_XML_FIXTURES && '(update mode!)' || ''}`, () => 
           const xml = readData(xmlPath);
           assert.ok(xml, `Could not read ${xmlPath}`);
 
-          // now, parse
-          const actual = reader.parse(xml);
+          // now, parse. subsitute endings for Win
+          const actual = reader.parse(xml.replace(/\r\n/g, '\n'));
           assert.ok(actual, `Parser failed on ${xmlPath}`);
 
           // get the expected
