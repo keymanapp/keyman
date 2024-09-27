@@ -1,5 +1,79 @@
 # Keyman Version History
 
+## 18.0.110 alpha 2024-09-12
+
+* chore(common): Update to Unicode 16.0 (#12393)
+* refactor(web): move `common/web/es-bundling` → `web/src/tools/es-bundling` (#12389)
+* refactor(web): move `common/web/eslint` → `common/tools/eslint` (#12390)
+* refactor(web): move sentry-manager → `web/src/engine/sentry-manager` (#12397)
+* refactor(web): merge `device-detect` with `web/src/engine/main` (#12399)
+* chore(web): allow to run unit tests in vscode test explorer (#12400)
+* fix(developer): index() requires comma between parameters in kmcmplib compiler (#12328)
+
+## 18.0.109 alpha 2024-09-11
+
+* chore(common): Update history with 17.0.329 stable (#12394)
+* refactor(web): move `model/templates` to `web/src/engine/predictive/text` (#12382)
+* refactor(web): move `common/models` to `web/src/engine/predictive-text` (#12383)
+* refactor(web): move `common/web/utils` to `web/src/engine/common/web-utils/` (#12384)
+
+## 18.0.108 alpha 2024-09-10
+
+* docs(android): Update help docs (#12367)
+* fix(developer): fix building with Ubuntu 24.04 (#12379)
+* refactor(android): Move build-publish.sh to builder script (#12351)
+* fix(android): Separate `publishSentry` Gradle task to publish symbols to Sentry (#12358)
+* refactor(web): move `model/types` to `web/types` (#12370)
+
+## 18.0.107 alpha 2024-09-09
+
+* fix(android): Update Text Size menu icons for RTL support (#12290)
+
+## 18.0.106 alpha 2024-09-06
+
+* feat(windows): add right modifier included in hotkey optional functionality (#12259)
+* fix(android): Skip language counts for lexical-model packages (#12361)
+* docs(web): fix link to documentation page (#12369)
+
+## 18.0.105 alpha 2024-09-05
+
+* chore(common): Fix missing entries in HISTORY.md (#12352)
+* docs(android): Add in-app help for adjusting longpress delay (#12359)
+* fix(mac): avoid crash on startup with macOS 10.15 (Catalina) (#12354)
+* chore(oem/fv): Update to fv_all 13.0 (#12362)
+* feat(windows): Add two new strings for SIL Global name instead of SIL International (#12327)
+
+## 18.0.104 alpha 2024-09-03
+
+* fix(mac): display package info after keyboard installation (#12326)
+
+## 18.0.103 alpha 2024-09-02
+
+* feat(windows): Remove hotkey related feature flags (#12252)
+* feat(windows): update SIL logo for Windows UI (#12250)
+
+## 18.0.102 alpha 2024-08-30
+
+* docs(web): add documentation comments for touch layout interfaces (#12314)
+* change(mac): store data in Library directory instead of Documents (#12106)
+* change(mac): store partial path in UserDefaults (#12144)
+
+## 18.0.101 alpha 2024-08-29
+
+* refactor(web): move `gesture-recognizer` → `gesture-processor` (#12194)
+* docs(core): fix a typo in the KMX+ doc (#12302)
+* chore(web): remove obsolete comment (#12304)
+* chore(android,ios): Update FirstVoices keyboards to fv_all.kmp 12.15 (#12300)
+* fix(developer): make LDML import path consistent for all bundlings of kmc (#12280)
+* fix(core): properly support 'other' modifier state with `uint32_t` type (#12281)
+* chore(windows): fix typo in environment.inc.sh (#12286)
+* fix(android): Check in material-stepper as internal Maven dependency (#12267)
+* docs(core): improve formatting of KMX+ doc (#12303)
+* fix(android): Prioritize certain actions over multi-line for ENTER key (#12315)
+* fix(linux): add `keymanFacename` to .ldml file (#12277)
+* chore(common): Update crowdin strings for Czech (#12316)
+* fix(web): prevent unintuitive space-output blocking for mid-context suggestions (#12313)
+
 ## 18.0.100 alpha 2024-08-28
 
 * fix(windows): check IM window will be in a visible location (#11967)
@@ -8,8 +82,8 @@
 
 * feat(web): import the generator for the pred-text wordbreaker's Unicode-property data-table (#10690)
 * feat(web): optimize the wordbreaker data table for filesize and ease of first-load parsing (#10692)
-*  (#12297)
-*  (#12115)
+* fix(web): fixes wordbreaker test import path (#12297)
+* feat(web): enable utf8 charset encoding for the build artifacts (#12115)
 
 ## 18.0.98 alpha 2024-08-26
 
@@ -54,11 +128,11 @@
 
 ## 18.0.93 alpha 2024-08-20
 
-*  (#12188)
+* refactor(web): remove engine/interfaces dependency on engine/js-processor (#12188)
 * fix(web): fix malformed reversion display strings (#12201)
 * feat(android): Add menu to specify long-press delay (#12170)
 * feat(android): Pass longpress delay to KeymanWeb (#12185)
-*  (#12223)
+* fix(core): set mac build version for meson cli build to 10.13 (#12223)
 
 ## 18.0.92 alpha 2024-08-19
 
@@ -713,6 +787,29 @@
 
 * chore(common): move to 18.0 alpha (#10713)
 * chore: move to 18.0 alpha
+
+## 17.0.329 stable 2024-09-09
+
+* chore(android,ios): Add ojibwa ifinal/rdot keyboards to FirstVoices (#12020)
+* change(web): revert #11174, which loads keyboards before initializing the OSK (#12040)
+* fix(web): unrevert #11258, leaving OSK hidden before instructed to display (#12058)
+* chore(common): use `nvm` to select version of node for builds (#12074)
+* fix(developer): ignore scan code if zero in debugger (#12182)
+* fix(developer): enforce presence of Version field when FollowKeyboardVersion is not set, in package compiler (#12206)
+* fix(developer): enforce presence of kps Info.Description field in info compilers (#12207)
+* fix(web): disable fat-finger data use when mayCorrect = false (#12226)
+* chore(common): allow build agents to automatically select emsdk version, and enable support for 3.1.60+ (#12245)
+* fix(web): fix documentation-keyboard spacebar-text scaling (#12240)
+* fix(core): set mac build version for meson cli build to 10.13 (#12246)
+* change(ios): defer registration of fonts past initialization (#12241)
+* chore(android,ios): Update FirstVoices keyboards to 12.15 (#12301)
+* fix(core): properly support 'other' modifier state with `uint32_t` type (#12285)
+* fix(developer): find last matching key in LDML key bag when building KVK (#12284)
+* fix(android): check in material-stepper as internal Maven dependency (#12324)
+* fix(linux): add `keymanFacename` to .ldml file (#12283)
+* chore(oem/fv): Update to fv_all 13.0 (#12363)
+* fix(mac): avoid crash on startup with macOS 10.15 (Catalina) (#12364)
+* fix(android): skip language counts for lexical-model packages (#12368)
 
 ## 17.0.328 stable 2024-07-27
 

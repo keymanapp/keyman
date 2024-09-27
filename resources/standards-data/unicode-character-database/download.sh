@@ -26,7 +26,7 @@ BLOCKS_SRC_LOCAL="./Blocks.txt"
 UNICODE_DATA_SRC_HREF="https://www.unicode.org/Public/$KEYMAN_VERSION_UNICODE/ucd/UnicodeData.txt"
 UNICODE_DATA_SRC_LOCAL="./UnicodeData.txt"
 
-# Used by common/models/wordbreakers for the default Unicode wordbreaker.
+# Used by web/src/engine/predictive-text/wordbreakers for the default Unicode wordbreaker.
 WORDBREAK_PROP_SRC_HREF="https://www.unicode.org/Public/$KEYMAN_VERSION_UNICODE/ucd/auxiliary/WordBreakProperty.txt"
 WORDBREAK_PROP_SRC_LOCAL="./WordBreakProperty.txt"
 

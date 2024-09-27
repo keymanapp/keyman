@@ -2,7 +2,7 @@
 // We'll let things break after this reports, since this will likely signal a LOT of other failures.
 import { assert } from 'chai';
 
-import Device from 'keyman/engine/device-detect';
+import { DeviceDetector } from 'keyman/engine/main';
 
 /* Note - we still have to prevent errors setting up test resources;
  * Karma will fail to report errors for affected browsers otherwise.
@@ -16,9 +16,9 @@ describe('Test Initialization', function() {
   this.timeout(15000);
 
   it("Detects device without JS errors", function() {
-    let device: Device;
+    let device: DeviceDetector;
     try {
-      device = new Device();
+      device = new DeviceDetector();
       device.detect();
 
       console.log("Detected platform: " + device.browser + " on " + device.OS + " with form factor " + device.formFactor);

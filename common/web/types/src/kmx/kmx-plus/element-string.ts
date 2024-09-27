@@ -1,7 +1,7 @@
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { DependencySections, StrsItem, UsetItem } from './kmx-plus.js';
 import { ElementParser, ElementSegment, ElementType } from '../../ldml-keyboard/pattern-parser.js';
-import { util } from '@keymanapp/common-types';
+import * as util from '../../util/util.js';
 import MATCH_HEX_ESCAPE = util.MATCH_HEX_ESCAPE;
 import unescapeOneQuadString = util.unescapeOneQuadString;
 

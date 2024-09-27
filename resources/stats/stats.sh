@@ -13,7 +13,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 cd "$THIS_SCRIPT_PATH"
 
-platforms=(android/ ios/ linux/ mac/ web/ windows/ developer/ core/ common/models/)
+platforms=(android/ ios/ linux/ mac/ web/ windows/ developer/ core/)
 
 builder_describe "Stats collector for Keyman PRs and issues
 

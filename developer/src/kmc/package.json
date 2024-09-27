@@ -44,7 +44,7 @@
     "@keymanapp/kmc-model": "*",
     "@keymanapp/kmc-model-info": "*",
     "@keymanapp/kmc-package": "*",
-    "@keymanapp/models-types": "*",
+    "@keymanapp/common-types": "*",
     "@sentry/node": "^7.57.0",
     "chalk": "^2.4.2",
     "commander": "^10.0.0",

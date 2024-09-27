@@ -15,7 +15,7 @@ SUBPROJECT_NAME=engine/core-processor
 
 builder_describe "Keyman Core WASM integration" \
   "@/core:wasm" \
-  "@/common/web/utils" \
+  "@/web/src/engine/common/web-utils" \
   "clean" \
   "configure" \
   "build" \
@@ -39,7 +39,7 @@ do_configure() {
   verify_npm_setup
 
   mkdir -p "src/import/core/"
-  # we don't need this file for release builds, but it's nice to have 
+  # we don't need this file for release builds, but it's nice to have
   # for reference and auto-completion
   cp "${KEYMAN_ROOT}/core/build/wasm/${BUILDER_CONFIGURATION}/src/core-interface.d.ts" "src/import/core/"
 }

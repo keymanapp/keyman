@@ -1,4 +1,4 @@
-/// <reference types="@keymanapp/models-types" />
+import { Span, WordBreakingFunction } from '@keymanapp/common-types';
 
 /**
  * Returns a word breaker that joins spans of an existing word breaker.

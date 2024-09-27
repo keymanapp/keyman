@@ -1,3 +1,5 @@
+import { CasingForm, CasingFunction } from '@keymanapp/common-types';
+
 /**
  * Converts wordforms into an indexable form. It does this by
  * normalizing the letter case of characters INDIVIDUALLY (to disregard
