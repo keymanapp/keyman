@@ -82,7 +82,7 @@ describe(`XML Reader Test ${GEN_XML_FIXTURES && '(update mode!)' || ''}`, () => 
       for (const path of paths) {
         const xmlPath = makePathToFixture('xml', `${path}`);
         const jsonPath = makePathToFixture('xml', `${path}.json`);
-        it(`read: ${xmlPath}`, () => {
+        it(`read: xml/${path}`, () => {
           // get the string data
           const xml = readData(xmlPath);
           assert.ok(xml, `Could not read ${xmlPath}`);

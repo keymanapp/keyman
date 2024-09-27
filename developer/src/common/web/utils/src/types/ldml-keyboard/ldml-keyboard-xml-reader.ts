@@ -4,13 +4,12 @@
  * Reads a LDML XML keyboard file into JS object tree and resolves imports
  */
 import { SchemaValidators, util } from '@keymanapp/common-types';
-import { xml2js } from '../../index.js';
 import { CommonTypesMessages } from '../../common-messages.js';
 import { CompilerCallbacks } from '../../compiler-interfaces.js';
 import { LDMLKeyboardXMLSourceFile, LKImport, ImportStatus } from './ldml-keyboard-xml.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { LDMLKeyboardTestDataXMLSourceFile, LKTTest, LKTTests } from './ldml-keyboard-testdata-xml.js';
-
+import { KeymanXMLReader } from '@keymanapp/developer-utils';
 import boxXmlArray = util.boxXmlArray;
 
 interface NameAndProps  {
@@ -262,26 +261,9 @@ export class LDMLKeyboardXMLSourceFileReader {
   }
 
   loadUnboxed(file: Uint8Array): LDMLKeyboardXMLSourceFile {
-    const source = (() => {
-      let a: LDMLKeyboardXMLSourceFile;
-      const parser = new xml2js.Parser({
-        explicitArray: false,
-        mergeAttrs: true,
-        includeWhiteChars: false,
-        emptyTag: {} as any
-        // Why "as any"? xml2js is broken:
-        // https://github.com/Leonidas-from-XIV/node-xml2js/issues/648 means
-        // that an old version of `emptyTag` is used which doesn't support
-        // functions, but DefinitelyTyped is requiring use of function or a
-        // string. See also notes at
-        // https://github.com/DefinitelyTyped/DefinitelyTyped/pull/59259#issuecomment-1254405470
-        // An alternative fix would be to pull xml2js directly from github
-        // rather than using the version tagged on npmjs.com.
-      });
-      const data = new TextDecoder().decode(file);
-      parser.parseString(data, (e: unknown, r: unknown) => { if(e) throw e; a = r as LDMLKeyboardXMLSourceFile }); // TODO-LDML: isn't 'e' the error?
-      return a;
-    })();
+    const data = new TextDecoder().decode(file);
+    const source = new KeymanXMLReader({ type: 'keyboard3' })
+      .parse(data) as LDMLKeyboardXMLSourceFile;
     return source;
   }
 
@@ -311,27 +293,8 @@ export class LDMLKeyboardXMLSourceFileReader {
   }
 
   loadTestDataUnboxed(file: Uint8Array): any {
-    const source = (() => {
-      let a: any;
-      const parser = new xml2js.Parser({
-        // explicitArray: false,
-        preserveChildrenOrder:true, // needed for test data
-        explicitChildren: true, // needed for test data
-        // mergeAttrs: true,
-        // includeWhiteChars: false,
-        // emptyTag: {} as any
-        // Why "as any"? xml2js is broken:
-        // https://github.com/Leonidas-from-XIV/node-xml2js/issues/648 means
-        // that an old version of `emptyTag` is used which doesn't support
-        // functions, but DefinitelyTyped is requiring use of function or a
-        // string. See also notes at
-        // https://github.com/DefinitelyTyped/DefinitelyTyped/pull/59259#issuecomment-1254405470
-        // An alternative fix would be to pull xml2js directly from github
-        // rather than using the version tagged on npmjs.com.
-      });
-      parser.parseString(file, (e: unknown, r: unknown) => { a = r as any }); // TODO-LDML: isn't 'e' the error?
-      return a; // Why 'any'? Because we need to box up the $'s into proper properties.
-    })();
+    const source = new KeymanXMLReader({ type: 'keyboard3-test' })
+      .parse(file.toString()) as any;
     return source;
   }
 

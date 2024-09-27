@@ -14,7 +14,7 @@ export class KeymanXMLReader {
     public constructor(public options: KeymanXMLOptions) {
     }
 
-    public parse(data: string): Object {
+    public parse(data: string): any {
         const parser = this.parser();
         let a: any;
         parser.parseString(data, (e: unknown, r: unknown) => { if (e) throw e; a = r; });
