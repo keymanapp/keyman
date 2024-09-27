@@ -11,6 +11,7 @@ import com.tavultesoft.kmapro.KeymanSettingsActivity;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.KMManager.KeyboardType;
 import com.keyman.engine.KMHardwareKeyboardInterpreter;
+import com.keyman.engine.KMManager.SuggestionType;
 import com.keyman.engine.KeyboardEventHandler.OnKeyboardEventListener;
 import com.keyman.engine.R;
 import com.keyman.engine.data.Keyboard;
@@ -171,7 +172,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
         SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
         int maySuggest = prefs.getInt(KMManager.getLanguageAutoCorrectionPreferenceKey(langId), KMManager.KMDefault_Suggestion);
         // Enable banner if maySuggest is not SuggestionType.SUGGESTIONS_DISABLED (0)
-        KMManager.setBannerOptions(maySuggest > 0);
+        KMManager.setBannerOptions(maySuggest > SuggestionType.SUGGESTIONS_DISABLED.toInt());
       } else {
         KMManager.setBannerOptions(false);
       }

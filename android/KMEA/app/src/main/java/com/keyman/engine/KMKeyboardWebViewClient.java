@@ -16,6 +16,7 @@ import android.widget.RelativeLayout;
 import com.keyman.engine.KeyboardEventHandler.EventType;
 import com.keyman.engine.KMManager;
 import com.keyman.engine.KMManager.KeyboardType;
+import com.keyman.engine.KMManager.SuggestionType;
 import com.keyman.engine.util.KMLog;
 import com.keyman.engine.data.Keyboard;
 
@@ -166,7 +167,8 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
       boolean modelPredictionPref = false;
       if (!KMManager.getMayPredictOverride() && KMManager.currentLexicalModel != null) {
         modelPredictionPref = prefs.getInt(KMManager.getLanguageAutoCorrectionPreferenceKey(
-          KMManager.currentLexicalModel.get(KMManager.KMKey_LanguageID)), KMManager.KMDefault_Suggestion) > 0;
+          KMManager.currentLexicalModel.get(KMManager.KMKey_LanguageID)), KMManager.KMDefault_Suggestion)
+          > SuggestionType.SUGGESTIONS_DISABLED.toInt();
       }
       KMManager.setBannerOptions(modelPredictionPref);
       RelativeLayout.LayoutParams params = KMManager.getKeyboardLayoutParams();

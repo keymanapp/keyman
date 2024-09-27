@@ -233,7 +233,7 @@ function enableSuggestions(model, suggestionType) {
   // Set the options first so that KMW's ModelManager can properly handle model enablement states
   // the moment we actually register the new model.
   // Use console_debug
-  console_debug('enableSuggestions(mayPredict='+mayPredict+', maySuggest='+maySuggest+')');
+  console_debug('enableSuggestions(model, maySuggest='+suggestionType+')');
   const suggestionSettings = [
     // mayPredict, mayCorrect, mayAutoCorrect
     [false, false, false],  // 0 = SuggestionType.SUGGESTIONS_DISABLED

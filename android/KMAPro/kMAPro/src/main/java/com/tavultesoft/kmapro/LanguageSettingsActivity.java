@@ -104,25 +104,16 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
     prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
     int maySuggest =  prefs.getInt(KMManager.getLanguageAutoCorrectionPreferenceKey(lgCode), KMManager.KMDefault_Suggestion);
 
-    // Radio button change listeners
+    // Initialize Radio button group change listeners
     RadioGroup radioGroup = (RadioGroup) findViewById(R.id.suggestion_radio_group);
-    RadioButton radioButton;
-    // Initialize radio button group
-    switch(maySuggest) {
-      case 1:
-        radioButton = (RadioButton) radioGroup.findViewById(R.id.suggestion_radio_1);
-        break;
-      case 2:
-        radioButton = (RadioButton) radioGroup.findViewById(R.id.suggestion_radio_2);
-        break;
-      case 3:
-        radioButton = (RadioButton) radioGroup.findViewById(R.id.suggestion_radio_3);
-        break;
-      case 0:
-      default:
-        radioButton = (RadioButton) radioGroup.findViewById(R.id.suggestion_radio_0);
-    }
     radioGroup.clearCheck();
+
+    int[] RadioButtonArray = {
+      R.id.suggestion_radio_0,
+      R.id.suggestion_radio_1,
+      R.id.suggestion_radio_2,
+      R.id.suggestion_radio_3};
+    RadioButton radioButton = (RadioButton)radioGroup.findViewById(RadioButtonArray[maySuggest]);
     radioButton.setChecked(true);
 
     radioGroup.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -130,9 +121,7 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
       public void onCheckedChanged(RadioGroup group, @IdRes int checkId) {
         RadioButton checkedButton = (RadioButton)radioGroup.findViewById(checkId);
         int index = radioGroup.indexOfChild(checkedButton);
-        int radioButtonID = radioGroup.getCheckedRadioButtonId();
-
-        KMManager.setMaySuggest(lgCode, index);
+        KMManager.setMaySuggest(lgCode, KMManager.SuggestionType.fromInt(index));
 
         // Don't use/apply language modeling settings for languages without models.
         if (associatedLexicalModel.isEmpty()) {
