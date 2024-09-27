@@ -46,4 +46,4 @@ export { CommonTypesMessages } from './common-messages.js';
 
 export * as xml2js from './deps/xml2js/xml2js.js';
 
-export { KeymanXMLParser, KeymanXMLGenerator } from './xml-utils.js';
+export { KeymanXMLOptions, KeymanXMLWriter, KeymanXMLReader } from './xml-utils.js';
