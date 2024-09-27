@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 -(instancetype)init:(CoreKeyboardInfo*)keyboardInfo;
 -(BOOL)optionKeysUnused;
 -(BOOL)bothOptionKeysGenerateRightAlt;
+-(NSEventModifierFlags)adjustModifiers:(NSEventModifierFlags)originalModifiers;
 @end
 
 NS_ASSUME_NONNULL_END
