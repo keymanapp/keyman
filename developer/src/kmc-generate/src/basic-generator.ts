@@ -20,6 +20,7 @@ export class BasicGenerator extends AbstractGenerator {
 
   protected templatePath: string;
   protected languageTags: string[];
+  protected resolvedTargets: KeymanTargets.KeymanTarget[];
 
   protected preGenerate() {
     const dt = new Date();
@@ -27,16 +28,22 @@ export class BasicGenerator extends AbstractGenerator {
     this.languageTags = this.options.languageTags.length
       ? this.options.languageTags.map(tag => new Intl.Locale(tag).minimize().toString())
       : [this.DEFAULT_LOCALE];
+    //TODO-GENERATE: validate targets
+    if(this.options.targets.includes(KeymanTargets.KeymanTarget.any) || this.options.targets.length == 0) {
+      this.resolvedTargets = KeymanTargets.AllKeymanTargets.filter(target => target != KeymanTargets.KeymanTarget.any);
+    } else {
+      this.resolvedTargets = [].concat(this.options.targets);
+    }
 
     this.tokenMap['$NAME'] = this.options.name;
     this.tokenMap['$ID'] = this.options.id;
-    this.tokenMap['$KEYMANVERSION'] = (this.options.keymanVersion ?? KEYMAN_VERSION.VERSION) + '.0';
+    this.tokenMap['$KEYMANVERSION'] = (this.options.keymanVersion || KEYMAN_VERSION.VERSION) + '.0';
     this.tokenMap['$VERSION'] = this.options.version;
     this.tokenMap['$COPYRIGHT'] = '© ' + this.options.copyright;
     this.tokenMap['$FULLCOPYRIGHT'] = '© ' + dt.getFullYear().toString() + ' ' + this.options.copyright;
-    this.tokenMap['$AUTHOR'] = this.options.author ?? '';
-    this.tokenMap['$TARGETS'] = this.options.targets.join(' ') ?? 'any'; //TODO-GENERATE: validate targets
-    this.tokenMap['$DESCRIPTION'] = this.options.description;
+    this.tokenMap['$AUTHOR'] = this.options.author || '';
+    this.tokenMap['$TARGETS'] = this.resolvedTargets.join(' ');
+    this.tokenMap['$DESCRIPTION'] = this.options.description || this.options.name;
     this.tokenMap['$DATE'] =
       dt.getFullYear().toString() + '-' +
       (dt.getMonth()+1).toString().padStart(2, '0') + '-' +
@@ -66,12 +73,8 @@ export class BasicGenerator extends AbstractGenerator {
   }
 
   private getPlatformDotListForReadme() {
-    const t = this.options.targets;
     const result = KeymanTargets.AllKeymanTargets
-      .filter(target =>
-        target != KeymanTargets.KeymanTarget.any &&
-        (t.includes(target) || t.includes(KeymanTargets.KeymanTarget.any))
-      )
+      .filter(target => this.resolvedTargets.includes(target))
       .map(target => ` * ${KeymanTargets.SKeymanTargetNames[target]}`)
       .join('\n');
     return result;

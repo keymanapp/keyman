@@ -6,6 +6,7 @@
 
 import { CompilerCallbacks, CompilerLogLevel, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult } from "@keymanapp/developer-utils";
 import { GeneratorMessages } from './generator-messages.js';
+import { KeymanTargets } from "@keymanapp/common-types";
 
 
 /**
@@ -25,7 +26,7 @@ export interface GeneratorOptions /* not inheriting from CompilerBaseOptions */ 
   /**
    * supported platforms, only used in Keyman keyboard project generator
    */
-  targets?: string[];
+  targets?: KeymanTargets.KeymanTarget[];
   /**
    * output path where project folder will be created
    */

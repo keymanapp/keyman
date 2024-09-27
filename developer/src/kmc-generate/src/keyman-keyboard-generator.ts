@@ -76,6 +76,8 @@ export class KeymanKeyboardGenerator extends BasicGenerator implements KeymanCom
     this.filenameMap[KeymanKeyboardGenerator.SFile_KeyboardKPS] =
       KeymanKeyboardGenerator.SPath_Source+this.options.id+KeymanFileTypes.Source.Package;
 
+      console.dir(this.includedPrefixes);
+
     if(!this.generate(artifacts)) {
       return null;
     }
@@ -90,8 +92,7 @@ export class KeymanKeyboardGenerator extends BasicGenerator implements KeymanCom
   }
 
   private readonly targetIncludes = (targets: KeymanTargets.KeymanTarget[]) => {
-    const tx: string[] = [...targets, KeymanTargets.KeymanTarget.any];
-    return this.options.targets.some(t => tx.includes(t));
+    return this.resolvedTargets.some(t => targets.includes(t));
   }
 
   private readonly hasKVKS        = () => this.targetIncludes(KeymanTargets.KeymanTargetsUsingKVK);
