@@ -93,7 +93,30 @@ export class KeymanXMLReader {
 
 /** wrapper for XML generation support */
 export class KeymanXMLWriter {
+    write(data: any) : string {
+        const builder = this.builder();
+        return builder.buildObject(data);
+    }
     constructor(public options: KeymanXMLOptions) {
+    }
+
+    public builder() {
+        switch(this.options.type) {
+            case 'kvks':
+                return new xml2js.Builder({
+                    allowSurrogateChars: true,
+                    attrkey: '$',
+                    charkey: '_',
+                    xmldec: {
+                    version: '1.0',
+                    encoding: 'UTF-8',
+                    standalone: true
+                    }
+                });
+            default:
+                /* c8 ignore next 1 */
+                throw Error(`Internal error: unhandled XML type ${this.options.type}`);
+        }
     }
 }
 

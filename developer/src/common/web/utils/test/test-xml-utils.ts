@@ -15,7 +15,7 @@ class Case {
   paths: string[];
 };
 
-const read_cases : Case[] = [
+const read_cases: Case[] = [
   {
     options: { type: 'keyboard3' },
     paths: [
@@ -53,19 +53,29 @@ const read_cases : Case[] = [
   },
 ];
 
+const write_cases: Case[] = [
+  {
+    options: { type: 'kvks' },
+    paths: [
+      // kvks
+      'khmer_angkor2.kvks', // similar to the 'read case' with the similar name, except for whitespace differences and the prologue
+    ],
+  },
+];
+
 /** read data, or null */
-function readData(path: string) : string | null {
+function readData(path: string): string | null {
   try {
     return readFileSync(path, 'utf-8');
-  } catch(e) {
+  } catch (e) {
     if (e?.code !== 'ENOENT') console.error(`reading ${path}`, e);
     return null;
   }
 }
 
-function readJson(path: string) : any | null {
+function readJson(path: string): any | null {
   const data = readData(path);
-  if(data === null) return null;
+  if (data === null) return null;
   return JSON.parse(data);
 }
 
@@ -75,7 +85,7 @@ function writeJson(path: string, data: any) {
 
 describe(`XML Reader Test ${GEN_XML_FIXTURES && '(update mode!)' || ''}`, () => {
   for (const c of read_cases) {
-    const {options, paths} = c;
+    const { options, paths } = c;
     describe(`test reading ${JSON.stringify(options)}`, () => {
       const reader = new KeymanXMLReader(options);
       assert.ok(reader);
@@ -106,7 +116,36 @@ describe(`XML Reader Test ${GEN_XML_FIXTURES && '(update mode!)' || ''}`, () => 
   }
 });
 
-describe('XML Writer Test', () => {
-  it('null test', () => assert.ok(new KeymanXMLWriter({type: 'kpj'})));
-});
 
+describe(`XML Writer Test ${GEN_XML_FIXTURES && '(update mode!)' || ''}`, () => {
+  for (const c of write_cases) {
+    const { options, paths } = c;
+    describe(`test writing ${JSON.stringify(options)}`, () => {
+      const writer = new KeymanXMLWriter(options);
+      assert.ok(writer);
+      for (const path of paths) {
+        const jsonPath = makePathToFixture('xml', `${path}.json`);
+        const xmlPath = makePathToFixture('xml', `${path}`);
+        it(`write: xml/${path}`, () => {
+          // get the object data
+          const data = readJson(jsonPath);
+          assert.ok(data, `Could not read input ${jsonPath}`);
+
+          // now, write.
+          const actual = writer.write(data);
+          assert.ok(actual, `Writer failed on ${jsonPath}`);
+
+          if (GEN_XML_FIXTURES) {
+            console.log(`GEN_XML_FIXTURES: writing ${xmlPath} from actual`);
+            writeFileSync(xmlPath, actual);
+          } else {
+            // get the expected data
+            const expect = readData(xmlPath).replace(/\r\n/g, '\n');
+            assert.ok(expect, `Could not read expected output ${xmlPath} - run with env=GEN_XML_FIXTURES=1 to update`);
+            assert.deepEqual(actual.trim(), expect.trim(), `Mismatch of ${xmlPath} vs ${jsonPath}`);
+          }
+        });
+      }
+    });
+  }
+});
