@@ -55,11 +55,6 @@ Click on this to [change the displayed keyboard name](spacebar-caption) on the s
 ## Vibrate When Typing
 When enabled, the Keyman keyboard will provide haptic feedback (vibrate) when the user presses a key and generates output. The default preference is off.
 
-## Always show banner
-This toggle is reserved for future features. When off, the text suggestion banner is only displayed when
-the dictionary is enabled. The language associated with the keyboard must match the language associated with
-the dictionary.
-
 ## Show "Get Started" on startup
 When enabled, the Keyman app will display the 'Get Started' screen on app startup.
 

@@ -22,7 +22,6 @@ typedef void(^PostEventCallback)(CGEventRef eventToPost);
 @property (nonatomic, assign) CFMachPortRef lowLevelEventTap; // Always nil for tests
 @property (nonatomic, assign) BOOL contextChangingEventDetected;
 @property (nonatomic, assign) BOOL useNullChar;
-@property (nonatomic, assign) BOOL debugMode;
 @property (nonatomic, assign) CGKeyCode virtualKeyPosted;
 
 // Helper method

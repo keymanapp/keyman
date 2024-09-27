@@ -26,8 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeOptionForSelectedKeyboard:(NSString *)key withValue:(NSString*)value;
 - (BOOL)readShowOskOnActivate;
 - (void)writeShowOskOnActivate:(BOOL)show;
-- (BOOL)readUseVerboseLogging;
-- (void)writeUseVerboseLogging:(BOOL)verboseLogging;
+- (BOOL)readForceSentryError;
 @end
 
 NS_ASSUME_NONNULL_END

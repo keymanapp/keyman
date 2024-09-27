@@ -89,9 +89,7 @@ static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX = 0;
 @property (nonatomic, strong) NSString *downloadFilename;
 @property (nonatomic, strong) NSMutableData *receivedData;
 @property (nonatomic, assign) NSUInteger expectedBytes;
-@property (nonatomic, assign) BOOL useVerboseLogging;
 @property (nonatomic, assign) BOOL useNullChar;
-@property (nonatomic, assign) BOOL debugMode;
 
 - (NSMenu *)menu;
 - (void)saveActiveKeyboards;
