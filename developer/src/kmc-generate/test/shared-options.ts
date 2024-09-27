@@ -2,6 +2,7 @@
  * Keyman is copyright (C) SIL International. MIT License.
  */
 
+import { KeymanTargets } from "@keymanapp/common-types";
 import { GeneratorOptions } from "../src/abstract-generator.js";
 
 export const options: GeneratorOptions = {
@@ -10,7 +11,7 @@ export const options: GeneratorOptions = {
   languageTags: ['en'],
   name: 'Sample Project',
   outPath: '.',
-  targets: ['windows'],
+  targets: [KeymanTargets.KeymanTarget.windows],
   version: '1.0',
   author: 'Sample Author',
   copyright: 'TheAuthor',

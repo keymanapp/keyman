@@ -76,8 +76,6 @@ export class KeymanKeyboardGenerator extends BasicGenerator implements KeymanCom
     this.filenameMap[KeymanKeyboardGenerator.SFile_KeyboardKPS] =
       KeymanKeyboardGenerator.SPath_Source+this.options.id+KeymanFileTypes.Source.Package;
 
-      console.dir(this.includedPrefixes);
-
     if(!this.generate(artifacts)) {
       return null;
     }

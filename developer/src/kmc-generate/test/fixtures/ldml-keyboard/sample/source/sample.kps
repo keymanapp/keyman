@@ -19,33 +19,18 @@
   <Files>
     <File>
       <Name>..\build\sample.kmx</Name>
-      <Description></Description>
-      <CopyLocation>0</CopyLocation>
-      <FileType>.kmx</FileType>
     </File>
     <File>
       <Name>..\build\sample.kvk</Name>
-      <Description></Description>
-      <CopyLocation>0</CopyLocation>
-      <FileType>.kvk</FileType>
     </File>
     <File>
       <Name>welcome.htm</Name>
-      <Description></Description>
-      <CopyLocation>0</CopyLocation>
-      <FileType>.htm</FileType>
     </File>
     <File>
       <Name>readme.htm</Name>
-      <Description></Description>
-      <CopyLocation>0</CopyLocation>
-      <FileType>.htm</FileType>
     </File>
     <File>
       <Name>..\LICENSE.md</Name>
-      <Description></Description>
-      <CopyLocation>0</CopyLocation>
-      <FileType>.md</FileType>
     </File>
   </Files>
   <Keyboards>

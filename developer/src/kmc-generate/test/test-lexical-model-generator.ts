@@ -12,6 +12,7 @@ import { options } from './shared-options.js';
 import { LexicalModelGenerator } from '../src/lexical-model-generator.js';
 import { makePathToFixture } from './helpers/index.js';
 import { GeneratorOptions } from '../src/abstract-generator.js';
+import { KeymanTargets } from '@keymanapp/common-types';
 
 // Fixture generated with:
 //   kmc generate lexical-model -L en -n 'Sample Project' -v 1.0 -a 'Sample Author' -c 'TheAuthor' --description '# A mighty description' sample.en.sample
@@ -48,7 +49,7 @@ describe('LexicalModelGenerator', function () {
     const callbacks = new TestCompilerCallbacks();
     const opts: GeneratorOptions = {...options};
     opts.id = 'sample.en.sample';
-    opts.targets = ['any'];
+    opts.targets = [KeymanTargets.KeymanTarget.any];
 
     assert(await generator.init(callbacks, opts));
     const result = await generator.run();
