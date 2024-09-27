@@ -11,7 +11,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe "Build hextobin" clean configure build
 builder_describe_outputs \
-  configure /common/tools/hextobin/node_modules/commander \
+  configure /common/tools/hextobin/build/.configured \
   build     /common/tools/hextobin/build/index.js
 
 builder_parse "$@"
