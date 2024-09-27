@@ -229,42 +229,23 @@ function deregisterModel(modelID) {
   keyman.removeModel(modelID);
 }
 
-function enableSuggestions(model, mayPredict, maySuggest) {
+function enableSuggestions(model, suggestionType) {
   // Set the options first so that KMW's ModelManager can properly handle model enablement states
   // the moment we actually register the new model.
   // Use console_debug
   console_debug('enableSuggestions(mayPredict='+mayPredict+', maySuggest='+maySuggest+')');
-  if (!mayPredict) {
-    keyman.core.languageProcessor.mayPredict = false;
-    keyman.core.languageProcessor.mayCorrect = false;
-    // keyman.core.languageProcessor.mayAutoCorrect = false;
-  } else {
-    switch(maySuggest) {
-      case 1 :
-        // SuggestionType.PREDICTIONS_ONLY
-        keyman.core.languageProcessor.mayPredict = true;
-        keyman.core.languageProcessor.mayCorrect = false;
-        //keyman.core.languageProcessor.mayAutoCorrect = false;
-        break;
-      case 2 :
-        // SuggestionType.PREDICTIONS_WITH_CORRECTIONS
-        keyman.core.languageProcessor.mayPredict = true;
-        keyman.core.languageProcessor.mayCorrect = true;
-        //keyman.core.languageProcessor.mayAutoCorrect = false;
-        break;
-      case 3 :
-        // SuggesionType.PREDICTIONS_WITH_AUTO_CORRECT
-        keyman.core.languageProcessor.mayPredict = true;
-        keyman.core.languageProcessor.mayCorrect = true;
-        //keyman.core.languageProcessor.mayAutoCorrect = true;
-        break;
-      case 0 :
-      default :
-        // SuggestionType.SUGGESTIONS_DISABLED
-        keyman.core.languageProcessor.mayPredict = false;
-        keyman.core.languageProcessor.mayCorrect = false;
-        //keyman.core.languageProcessor.mayAutoCorrect = false;
-        break;
+  const suggestionSettings = [
+    // mayPredict, mayCorrect, mayAutoCorrect
+    [false, false, false],  // 0 = SuggestionType.SUGGESTIONS_DISABLED
+    [true, false, false],   // 1 = SuggestionType.PREDICTIONS_ONLY
+    [true, true, false],    // 2 = SuggestionType.PREDICTIONS_WITH_CORRECTIONS
+    [true, true, true],     // 3 = SuggestionType.PREDICTIONS_WITH_AUTO_CORRECT
+  ];
+  const t = suggestionSettings[suggestionType] 
+    ? suggestionSettings[suggestionType] : suggestionSettings[0];
+  keyman.core.languageProcessor.mayPredict = t[0];
+  keyman.core.languageProcessor.maySuggest = t[1];
+  // keyman.core.languageProcessor.mayAutoCorrect = t[2];
     }
   }
 
