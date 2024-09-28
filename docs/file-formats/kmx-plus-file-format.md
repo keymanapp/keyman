@@ -35,10 +35,9 @@ Draft spec PR: <https://github.com/unicode-org/cldr/pull/1847>
 - Other than the `sect` table itself, the rest of the sections follow in binary
   order in the file.  In other words, the binary ordering of the section
   identifiers determines the order of the file layout.
-- All sections other than the `sect` table are optional,
-  however, the `elem` table is required to have as its initial entry
-  the null element string (with offset=0, length=0),
-  so essentially the 'elem' table is required to be present as well
+- All sections other than the `sect` table are optional for the file 
+  format to be valid, however, a valid keyboard will need most or 
+  all of the sections present to be usable.
 
 ### C7043.2.1 `sect`—Section Table of contents
 
