@@ -1151,13 +1151,8 @@ TEST_F(CompilerTest, GetXStringImpl_type_o_test) {
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
     PKMX_WCHAR newp = nullptr;
-    PFILE_STORE file_store = new FILE_STORE[100];
-    fileKeyboard.cxStoreArray = 3u;
-    fileKeyboard.dpStoreArray = file_store;
-    file_store[1].fIsStore = TRUE;
-    u16cpy(file_store[0].szName, u"a");
-    u16cpy(file_store[1].szName, u"b");
-    u16cpy(file_store[2].szName, u"c");
+    initFileStoreArray(fileKeyboard, {u"a", u"b", u"c"});
+    fileKeyboard.dpStoreArray[1].fIsStore = TRUE;
 
     // KmnCompilerMessages::ERROR_InvalidToken
     u16cpy(str, u"opq");
@@ -1191,26 +1186,26 @@ TEST_F(CompilerTest, GetXStringImpl_type_o_test) {
 
     // outs, KmnCompilerMessages::ERROR_OutsTooLong
     PKMX_WCHAR dpString = (PKMX_WCHAR)u"abc";
-    file_store[1].dpString = dpString; // length 4 => max should be > 4, otherwise a ERROR_OutsTooLong is emitted
+    fileKeyboard.dpStoreArray[1].dpString = dpString; // length 4 => max should be > 4, otherwise a ERROR_OutsTooLong is emitted
     int max = u16len(dpString) + 1; // 4, including terminating '\0'
     u16cpy(str, u"outs(b)");
     EXPECT_EQ(KmnCompilerMessages::ERROR_OutsTooLong, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, max, 0, &newp, FALSE)); // max reduced to force error
 
     // outs, valid
-    file_store[1].dpString = (PKMX_WCHAR)u"abc";
+    fileKeyboard.dpStoreArray[1].dpString = (PKMX_WCHAR)u"abc";
     u16cpy(str, u"outs(b)");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_outs_valid[] = { 'a', 'b', 'c', 0 };
     EXPECT_EQ(0, u16cmp(tstr_outs_valid, tstr));
 
     // outs, space before store, valid
-    file_store[1].dpString = (PKMX_WCHAR)u"abc";
+    fileKeyboard.dpStoreArray[1].dpString = (PKMX_WCHAR)u"abc";
     u16cpy(str, u"outs( b)");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(tstr_outs_valid, tstr));
 
     // outs, space after store, valid (see #11937, #11938)
-    file_store[1].dpString = (PKMX_WCHAR)u"abc";
+    fileKeyboard.dpStoreArray[1].dpString = (PKMX_WCHAR)u"abc";
     u16cpy(str, u"outs(b )");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(tstr_outs_valid, tstr));
