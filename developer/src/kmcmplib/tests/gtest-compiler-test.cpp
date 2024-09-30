@@ -91,7 +91,7 @@ class CompilerTest : public testing::Test {
             fk.dpStoreArray = new FILE_STORE[100];
             fk.cxStoreArray = names.size();
 
-            for (int i=0; i<fk.cxStoreArray; i++) {
+            for (unsigned int i=0; i<fk.cxStoreArray; i++) {
                 fk.dpStoreArray[i].dwSystemID  = 0;
                 u16cpy(fk.dpStoreArray[i].szName, names[i]);
                 fk.dpStoreArray[i].dpString    = nullptr;
