@@ -1,3 +1,11 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *
+ * Created by srl on 2024-09-27
+ *
+ * Test for abstraction for XML reading and writing
+ */
+
 import { assert } from 'chai';
 import 'mocha';
 import { env } from 'node:process';
