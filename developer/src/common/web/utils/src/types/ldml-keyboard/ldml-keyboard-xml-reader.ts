@@ -262,7 +262,7 @@ export class LDMLKeyboardXMLSourceFileReader {
 
   loadUnboxed(file: Uint8Array): LDMLKeyboardXMLSourceFile {
     const data = new TextDecoder().decode(file);
-    const source = new KeymanXMLReader({ type: 'keyboard3' })
+    const source = new KeymanXMLReader('keyboard3')
       .parse(data) as LDMLKeyboardXMLSourceFile;
     return source;
   }
@@ -293,7 +293,7 @@ export class LDMLKeyboardXMLSourceFileReader {
   }
 
   loadTestDataUnboxed(file: Uint8Array): any {
-    const source = new KeymanXMLReader({ type: 'keyboard3-test' })
+    const source = new KeymanXMLReader('keyboardTest3')
       .parse(file.toString()) as any;
     return source;
   }

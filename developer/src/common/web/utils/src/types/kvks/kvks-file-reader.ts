@@ -21,7 +21,7 @@ export default class KVKSFileReader {
     let source: KVKSourceFile;
 
     try {
-      source = new KeymanXMLReader({ type: 'kvks' })
+      source = new KeymanXMLReader('kvks')
         .parse(file.toString()) as KVKSourceFile;
     } catch(e) {
       if(file.byteLength > 4 && file.subarray(0,3).every((v,i) => v == KVK_HEADER_IDENTIFIER_BYTES[i])) {

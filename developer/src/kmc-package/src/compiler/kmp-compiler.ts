@@ -182,7 +182,7 @@ export class KmpCompiler implements KeymanCompiler {
         let a: KpsFile.KpsPackage;
 
         try {
-          a = new KeymanXMLReader({ type: 'kps' })
+          a = new KeymanXMLReader('kps')
             .parse(data.toString()) as KpsFile.KpsPackage;
         } catch(e) {
           this.callbacks.reportMessage(PackageCompilerMessages.Error_InvalidPackageFile({e}));

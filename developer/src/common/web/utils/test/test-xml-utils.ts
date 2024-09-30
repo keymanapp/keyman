@@ -12,20 +12,20 @@ import { env } from 'node:process';
 import { readFileSync, writeFileSync } from 'node:fs';
 
 
-import { KeymanXMLOptions, KeymanXMLReader, KeymanXMLWriter } from '../src/xml-utils.js';
+import { KeymanXMLType, KeymanXMLReader, KeymanXMLWriter } from '../src/xml-utils.js';
 import { makePathToFixture } from './helpers/index.js';
 
 // if true, attempt to WRITE the fixtures
 const { GEN_XML_FIXTURES } = env;
 
 class Case {
-  options: KeymanXMLOptions;
+  type: KeymanXMLType;
   paths: string[];
 };
 
 const read_cases: Case[] = [
   {
-    options: { type: 'keyboard3' },
+    type: 'keyboard3',
     paths: [
       // keyboards
       'disp_maximal.xml',
@@ -34,26 +34,26 @@ const read_cases: Case[] = [
       'tran_fail-empty.xml',
     ],
   }, {
-    options: { type: 'keyboard3-test' },
+    type: 'keyboardTest3',
     paths: [
       // keyboard test
       'k_020_fr-test.xml',
     ],
   }, {
-    options: { type: 'kvks' },
+    type: 'kvks',
     paths: [
       // kvks
       'khmer_angkor.kvks',
     ],
   }, {
-    options: { type: 'kps' },
+    type: 'kps',
     paths: [
       // kps
       'test_valid.kps',
       // 'error_invalid_package_file.kps',
     ],
   }, {
-    options: { type: 'kpj' },
+    type: 'kpj',
     paths: [
       // kpj
       'khmer_angkor.kpj',
@@ -63,7 +63,7 @@ const read_cases: Case[] = [
 
 const write_cases: Case[] = [
   {
-    options: { type: 'kvks' },
+    type: 'kvks',
     paths: [
       // kvks
       'khmer_angkor2.kvks', // similar to the 'read case' with the similar name, except for whitespace differences and the prologue
@@ -93,10 +93,8 @@ function writeJson(path: string, data: any) {
 
 describe(`XML Reader Test ${GEN_XML_FIXTURES && '(update mode!)' || ''}`, () => {
   for (const c of read_cases) {
-    const { options, paths } = c;
-    describe(`test reading ${JSON.stringify(options)}`, () => {
-      const reader = new KeymanXMLReader(options);
-      assert.ok(reader);
+    const { type, paths } = c;
+    describe(`test reading ${type}`, () => {
       for (const path of paths) {
         const xmlPath = makePathToFixture('xml', `${path}`);
         const jsonPath = makePathToFixture('xml', `${path}.json`);
@@ -105,12 +103,16 @@ describe(`XML Reader Test ${GEN_XML_FIXTURES && '(update mode!)' || ''}`, () => 
           const xml = readData(xmlPath);
           assert.ok(xml, `Could not read ${xmlPath}`);
 
+          const reader = new KeymanXMLReader(type);
+          assert.ok(reader);
+
           // now, parse. subsitute endings for Win
           const actual = reader.parse(xml.replace(/\r\n/g, '\n'));
           assert.ok(actual, `Parser failed on ${xmlPath}`);
 
           // get the expected
           const expect = readJson(jsonPath);
+
           if (GEN_XML_FIXTURES) {
             console.log(`GEN_XML_FIXTURES: writing ${jsonPath} from actual`);
             writeJson(jsonPath, actual);
@@ -127,9 +129,9 @@ describe(`XML Reader Test ${GEN_XML_FIXTURES && '(update mode!)' || ''}`, () => 
 
 describe(`XML Writer Test ${GEN_XML_FIXTURES && '(update mode!)' || ''}`, () => {
   for (const c of write_cases) {
-    const { options, paths } = c;
-    describe(`test writing ${JSON.stringify(options)}`, () => {
-      const writer = new KeymanXMLWriter(options);
+    const { type, paths } = c;
+    describe(`test writing ${type}`, () => {
+      const writer = new KeymanXMLWriter(type);
       assert.ok(writer);
       for (const path of paths) {
         const jsonPath = makePathToFixture('xml', `${path}.json`);

@@ -13,7 +13,7 @@ export class KPJFileReader {
   public read(file: Uint8Array): KPJFile {
     let data: KPJFile;
 
-    data = new KeymanXMLReader({ type: 'kpj' })
+    data = new KeymanXMLReader('kpj')
       .parse(file.toString());
 
     data = this.boxArrays(data);

@@ -91,7 +91,7 @@ export default class KVKSFileWriter {
       l.key.push(k);
     }
 
-    const result = new KeymanXMLWriter({type: 'kvks'}).write(kvks);
+    const result = new KeymanXMLWriter('kvks').write(kvks);
     return result; //Uint8Array.from(result);
   }
 
