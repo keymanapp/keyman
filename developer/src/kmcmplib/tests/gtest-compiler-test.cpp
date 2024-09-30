@@ -1390,12 +1390,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_n_test) {
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
     PKMX_WCHAR newp = nullptr;
-    PFILE_STORE file_store = new FILE_STORE[100];
-    fileKeyboard.cxStoreArray = 3u;
-    fileKeyboard.dpStoreArray = file_store;
-    u16cpy(file_store[0].szName, u"a");
-    u16cpy(file_store[1].szName, u"b");
-    u16cpy(file_store[2].szName, u"c");
+    initFileStoreArray(fileKeyboard, {u"a", u"b", u"c"});
 
     // KmnCompilerMessages::ERROR_InvalidToken
     fileKeyboard.version = VERSION_70;
@@ -1442,7 +1437,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_n_test) {
     // notany, valid
     fileKeyboard.version = VERSION_70;
     u16cpy(str, u"notany(b)");
-    file_store[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
+    fileKeyboard.dpStoreArray[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_notany_valid[] = { UC_SENTINEL, CODE_NOTANY, 2, 0 };
     EXPECT_EQ(0, u16cmp(tstr_notany_valid, tstr));
@@ -1450,21 +1445,21 @@ TEST_F(CompilerTest, GetXStringImpl_type_n_test) {
     // notany, valid, empy store
     fileKeyboard.version = VERSION_70;
     u16cpy(str, u"notany(b)");
-    file_store[1].dpString = (PKMX_WCHAR)u""; // empty
+    fileKeyboard.dpStoreArray[1].dpString = (PKMX_WCHAR)u""; // empty
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(tstr_notany_valid, tstr));
 
     // notany, space before store, valid
     fileKeyboard.version = VERSION_70;
     u16cpy(str, u"notany( b)");
-    file_store[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
+    fileKeyboard.dpStoreArray[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(tstr_notany_valid, tstr));
 
     // notany, space after store, valid (see #11937, #11938)
     fileKeyboard.version = VERSION_70;
     u16cpy(str, u"notany(b )");
-    file_store[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
+    fileKeyboard.dpStoreArray[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(tstr_notany_valid, tstr));
 
