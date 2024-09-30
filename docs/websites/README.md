@@ -58,14 +58,14 @@ Some sites have assets in `/cdn/dev/` used to generate CDN in `/dev/deploy/`. To
 ##### Port lookup table
 After this, you can access the website at the following ports:
 
-| Website        |          URL          |  with website-local-proxy running |
-|----------------|-----------------------|-----------------------------------|
-| keyman.com     | http://localhost:8053 | http://keyman.com.localhost       |
-| s.keyman.com   | http://localhost:8054 | http://s.keyman.com.localhost     |
-| help.keyman    | http://localhost:8055 | http://help.keyman.com.localhost  |
-| keymanweb.com  | http://localhost:8057 | http://keymanweb.com.localhost    |
-|                                  |                                       | http://web.keyman.com.localhost   |
-| api.keyman.com | http://localhost:8058 | http://api.keyman.com.localhost   |
+| Website        |          URL          |  with website-local-proxy running | Docker Container Name  |
+|----------------|-----------------------|-----------------------------------|------------------------|
+| keyman.com     | http://localhost:8053 | http://keyman.com.localhost       | keyman-website         |
+| s.keyman.com   | http://localhost:8054 | http://s.keyman.com.localhost     | s-keyman-website       |
+| help.keyman    | http://localhost:8055 | http://help.keyman.com.localhost  | help-keyman-website    |
+| keymanweb.com  | http://localhost:8057 | http://keymanweb.com.localhost    | web-keyman-website     |
+|                |                       | http://web.keyman.com.localhost   |                        |
+| api.keyman.com | http://localhost:8058 | http://api.keyman.com.localhost   | api-keyman-com-website |
 
 #### Remove the Docker container and image
 1. Run `./build.sh clean`.
@@ -77,6 +77,16 @@ You might need to install the broken-link-checker first
 
 Checks for broken links
 1. Run `./build.sh test`
+
+#### Troubleshooting Errors
+
+You can access PHP errors with
+
+```bash
+docker logs -f {Docker Container Name}
+```
+
+Refer to **Port lookup table** above for Docker container names
 
 ---------
 
