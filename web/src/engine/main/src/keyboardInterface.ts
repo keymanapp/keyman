@@ -82,7 +82,7 @@ export default class KeyboardInterface<ContextManagerType extends ContextManager
     // Keyman Developer may also use this method directly for its test-host page.
     //
     // It may also be used by documented legacy API:
-    // https://help.keyman.com/DEVELOPER/ENGINE/WEB/2.0/guide/examples/manual-control
+    // https://help.keyman.com/developer/engine/web/2.0/guide/examples/manual-control
     // (See: referenced laokeys_load.js)
     //
     // The mobile apps typically have fully-preconfigured paths, but Developer's
