@@ -13,6 +13,7 @@ builder_describe \
   ":config=keyman-config             keyman-config" \
   ":engine=ibus-keyman               ibus-keyman" \
   ":service=keyman-system-service    keyman-system-service" \
+  ":mcompile=mcompile/keymap         mnemonic layout recompiler for Linux" \
   "clean" \
   "configure" \
   "build" \

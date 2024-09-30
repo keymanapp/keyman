@@ -1,5 +1,3 @@
-/// <reference types="@keymanapp/models-types" />
-
 /**
  * Helpers and utilities for the Mocha tests.
  */

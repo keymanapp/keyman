@@ -19,6 +19,7 @@ import { ParsedLengthStyle } from '../lengthStyle.js';
 import { getFontSizeStyle } from '../fontSizeUtils.js';
 import { getTextMetrics } from '../keyboard-layout/getTextMetrics.js';
 import { BannerScrollState } from './bannerScrollState.js';
+import { Suggestion } from '@keymanapp/common-types';
 
 const TOUCHED_CLASS: string = 'kmw-suggest-touched';
 const BANNER_SCROLLER_CLASS = 'kmw-suggest-banner-scroller';

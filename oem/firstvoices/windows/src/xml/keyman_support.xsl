@@ -32,11 +32,19 @@
         </div>
 
         <div class="support_sil">
-          <xsl:value-of select="$locale/string[@name='S_Support_CreatedBySIL']"/>
+          <xsl:variable name="originalText" select="$locale/string[@name='S_Support_CreatedBySILGlobal']"/>
+          <xsl:variable name="replacement" select="'SIL Global'"/>
+          <xsl:variable name="beforePlaceholder" select="substring-before($originalText, '%0:s')"/>
+          <xsl:variable name="afterPlaceholder" select="substring-after($originalText, '%0:s')"/>
+          <xsl:value-of select="concat($beforePlaceholder, $replacement, $afterPlaceholder)"/>
         </div>
 
         <div class="support_copyright">
-          <xsl:value-of select="$locale/string[@name='S_Support_Copyright']"/>
+          <xsl:variable name="originalText" select="$locale/string[@name='S_Support_CopyrightSILGlobal']"/>
+          <xsl:variable name="replacement" select="'SIL Global'"/>
+          <xsl:variable name="beforePlaceholder" select="substring-before($originalText, '%0:s')"/>
+          <xsl:variable name="afterPlaceholder" select="substring-after($originalText, '%0:s')"/>
+          <xsl:value-of select="concat($beforePlaceholder, $replacement, $afterPlaceholder)"/>
         </div>
 
         <div class="support_links">

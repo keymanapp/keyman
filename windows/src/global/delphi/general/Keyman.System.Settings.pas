@@ -95,7 +95,7 @@ const
       ValueType: kstInteger
   );
 
-  BaseKeymanSettings: array[0..33] of TKeymanSettingBase = (
+  BaseKeymanSettings: array[0..31] of TKeymanSettingBase = (
 
     // TIKE:UTikeDebugMode.TikeDebugMode
     (
@@ -370,14 +370,6 @@ const
     // keyman:TfrmKeyman7Main.RegisterHotkeys,
     // keyman:TfrmKeyman7Main.UnregisterHotkeys
     // keyman32:k32_lowlevelkeyboardhook
-    (
-      ID: 'engine.compatibility.old_hotkey_registration';
-      Name: SRegValue_Flag_UseRegisterHotkey;
-      RootKey: HKCU;
-      Key: SRegKey_KeymanEngineDebug_CU;
-      Description: 'Set to 1 for old RegisterHotkey pathway';
-      ValueType: kstInteger
-    ),
 
     (
       ID: 'engine.compatibility.use_keyman_core';
@@ -388,18 +380,6 @@ const
                    'if compatibility issues are encountered, set to 0 '+
                    'to use the legacy Keyman for Windows core.';
       DefaultInt: 1;
-      ValueType: kstInteger
-    ),
-
-    // keyman32:k32_lowlevelkeyboardhook
-    (
-      ID: 'engine.compatibility.old_cached_hotkey_modifier_state';
-      Name: SRegValue_Flag_UseCachedHotkeyModifierState;
-      RootKey: HKCU;
-      Key: SRegKey_KeymanEngineDebug_CU;
-      Description: 'Set to 1 to use a cached modifer state when checking hotkeys; if '+
-                   'set to 0 then engine.compatibility.old_hotkey_registration may not '+
-                   'work';
       ValueType: kstInteger
     ),
 
