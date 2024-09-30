@@ -1218,14 +1218,9 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
     PKMX_WCHAR newp = nullptr;
-    PFILE_STORE file_store = new FILE_STORE[100];
-    fileKeyboard.cxStoreArray = 3u;
-    fileKeyboard.dpStoreArray = file_store;
-    file_store[1].fIsCall = TRUE;
-    file_store[1].dwSystemID = TSS_NONE;
-    u16cpy(file_store[0].szName, u"a");
-    u16cpy(file_store[1].szName, u"b");
-    u16cpy(file_store[2].szName, u"c");
+    initFileStoreArray(fileKeyboard, {u"a", u"b", u"c"});
+    fileKeyboard.dpStoreArray[1].fIsCall    = TRUE;
+    fileKeyboard.dpStoreArray[1].dwSystemID = TSS_NONE;
 
     // are comments stripped before this point?
     // if so, why the test on whitespace after 'c'?
@@ -1355,37 +1350,37 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
 
     // call, KmnCompilerMessages::ERROR_InvalidCall
     fileKeyboard.version = VERSION_501;
-    file_store[1].dpString = (PKMX_WCHAR)u"*"; // cause IsValidCallStore() to fail
+    fileKeyboard.dpStoreArray[1].dpString = (PKMX_WCHAR)u"*"; // cause IsValidCallStore() to fail
     u16cpy(str, u"call(b)");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidCall, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // call, valid
     fileKeyboard.version = VERSION_501;
-    file_store[1].dpString = (PKMX_WCHAR)u"a.dll:A";
-    file_store[1].dwSystemID = TSS_NONE;
+    fileKeyboard.dpStoreArray[1].dpString   = (PKMX_WCHAR)u"a.dll:A";
+    fileKeyboard.dpStoreArray[1].dwSystemID = TSS_NONE;
     u16cpy(str, u"call(b)");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_call_valid[] = { UC_SENTINEL, CODE_CALL, 2, 0 };
     EXPECT_EQ(0, u16cmp(tstr_call_valid, tstr));
-    EXPECT_EQ(TSS_CALLDEFINITION, file_store[1].dwSystemID);
+    EXPECT_EQ(TSS_CALLDEFINITION, fileKeyboard.dpStoreArray[1].dwSystemID);
 
     // call, space before store, valid
     fileKeyboard.version = VERSION_501;
-    file_store[1].dpString = (PKMX_WCHAR)u"a.dll:A";
-    file_store[1].dwSystemID = TSS_NONE;
+    fileKeyboard.dpStoreArray[1].dpString   = (PKMX_WCHAR)u"a.dll:A";
+    fileKeyboard.dpStoreArray[1].dwSystemID = TSS_NONE;
     u16cpy(str, u"call( b)");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(tstr_call_valid, tstr));
-    EXPECT_EQ(TSS_CALLDEFINITION, file_store[1].dwSystemID);
+    EXPECT_EQ(TSS_CALLDEFINITION, fileKeyboard.dpStoreArray[1].dwSystemID);
 
     // call, space after store, valid (see #11937, #11938)
     fileKeyboard.version = VERSION_501;
-    file_store[1].dpString = (PKMX_WCHAR)u"a.dll:A";
-    file_store[1].dwSystemID = TSS_NONE;
+    fileKeyboard.dpStoreArray[1].dpString = (PKMX_WCHAR)u"a.dll:A";
+    fileKeyboard.dpStoreArray[1].dwSystemID = TSS_NONE;
     u16cpy(str, u"call(b )");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(tstr_call_valid, tstr));
-    EXPECT_EQ(TSS_CALLDEFINITION, file_store[1].dwSystemID);
+    EXPECT_EQ(TSS_CALLDEFINITION, fileKeyboard.dpStoreArray[1].dwSystemID);
 }
 
 // tests strings starting with 'n'
