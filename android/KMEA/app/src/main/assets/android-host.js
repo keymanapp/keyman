@@ -246,8 +246,6 @@ function enableSuggestions(model, suggestionType) {
   keyman.core.languageProcessor.mayPredict = t[0];
   keyman.core.languageProcessor.maySuggest = t[1];
   // keyman.core.languageProcessor.mayAutoCorrect = t[2];
-    }
-  }
 
   registerModel(model);
 }
