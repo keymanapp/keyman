@@ -800,12 +800,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_a_test) {
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
     PKMX_WCHAR newp = nullptr;
-    PFILE_STORE file_store = new FILE_STORE[100];
-    fileKeyboard.cxStoreArray = 3u;
-    fileKeyboard.dpStoreArray = file_store;
-    u16cpy(file_store[0].szName, u"a");
-    u16cpy(file_store[1].szName, u"b");
-    u16cpy(file_store[2].szName, u"c");
+    initFileStoreArray(fileKeyboard, {u"a", u"b", u"c"});
 
     // KmnCompilerMessages::ERROR_InvalidToken
     u16cpy(str, u"abc");
@@ -839,25 +834,25 @@ TEST_F(CompilerTest, GetXStringImpl_type_a_test) {
 
     // KmnCompilerMessages::ERROR_ZeroLengthString
     u16cpy(str, u"any(b)");
-    file_store[1].dpString = (PKMX_WCHAR)u"";
+    fileKeyboard.dpStoreArray[1].dpString = (PKMX_WCHAR)u"";
     EXPECT_EQ(KmnCompilerMessages::ERROR_ZeroLengthString, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // valid
     u16cpy(str, u"any(b)");
-    file_store[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
+    fileKeyboard.dpStoreArray[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     const KMX_WCHAR tstr_any_valid[] = { UC_SENTINEL, CODE_ANY, 2, 0 };
     EXPECT_EQ(0, u16cmp(tstr_any_valid, tstr));
 
     // space before store, valid
     u16cpy(str, u"any( b)");
-    file_store[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
+    fileKeyboard.dpStoreArray[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(tstr_any_valid, tstr));
 
     // space after store, valid (see #11937, #11938)
     u16cpy(str, u"any(b )");
-    file_store[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
+    fileKeyboard.dpStoreArray[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(tstr_any_valid, tstr));
 }
