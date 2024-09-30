@@ -17,6 +17,6 @@
     "hextobin": "build/hextobin.js"
   },
   "scripts": {
-    "postinstall": "node --eval \"const fs =require('fs'); const path = require('path'); var dir = 'build'; if (!fs.existsSync(dir)) { fs.mkdirSync(dir); } fs.writeFileSync(path.join(dir, '.configured'), '');\""
+    "postinstall": "echo configured > .configured"
   }
 }
