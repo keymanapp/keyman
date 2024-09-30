@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 18.0.119 alpha 2024-09-28
+
+* refactor(developer): copy dev 17.0 help into repo (#12427)
+* fix(developer): warn before importing over touch layout (#12478)
+* chore(linux): display branch name with API verification (#12480)
+* docs(core): Update kmx-plus-file-format.md (#12479)
+
 ## 18.0.118 alpha 2024-09-26
 
 * chore(developer): add context/options (#11566)
