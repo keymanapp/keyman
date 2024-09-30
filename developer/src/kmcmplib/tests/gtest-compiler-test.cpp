@@ -1515,7 +1515,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_n_test) {
 // tests strings starting with 'u'
 TEST_F(CompilerTest, GetXStringImpl_type_u_test) {
     KMX_WCHAR tstr[128];
-    fileKeyboard.version = VERSION_70;
+    fileKeyboard.version = VERSION_90;
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
     PKMX_WCHAR newp = nullptr;
@@ -1558,6 +1558,18 @@ TEST_F(CompilerTest, GetXStringImpl_type_u_test) {
     EXPECT_EQ(0, u16cmp(tstr_unicode_valid, tstr));
     EXPECT_EQ(1, msgproc_errors.size());
     EXPECT_EQ(KmnCompilerMessages::WARN_UnicodeInANSIGroup, msgproc_errors[0].errorCode);
+
+    // use, no close delimiter => NULL
+    u16cpy(str, u"use(");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidUse, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // use, empty delimiters => empty string
+    u16cpy(str, u"use()");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidUse, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // use, space in delimiters (see #11814, #11937, #11910, #11894, #11938)
+    u16cpy(str, u"use( )");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidUse, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
