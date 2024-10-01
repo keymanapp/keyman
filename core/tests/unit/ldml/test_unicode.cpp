@@ -171,8 +171,9 @@ const std::string &block_unicode_ver) {
 
   // the cxx_icu can come from the Ubuntu environment, so do not depend on it
   // for now.
+  // TODO: Resolve with ICU4C 76 in #12398
   //assert_basic_equal(node_icu_unicode_major, cxx_icu_unicode_major);
-  assert_basic_equal(node_icu_unicode_major, block_ver_major);
+  //assert_basic_equal(node_icu_unicode_major, block_ver_major);
 
   // seems less important if the C++ ICU verison matches the Node.js ICU version.
   //assert_basic_equal(cxx_icu_major, node_icu_major);

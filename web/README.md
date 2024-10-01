@@ -84,17 +84,17 @@ graph TD;
     KeyboardSpec["/web/src/engine/keyboard"];
     JSProc["/web/src/engine/js-processor"];
     OSK-->KeyboardSpec;
-    WebUtils["@keymanapp/web-utils<br>(/common/web/utils)"];
+    WebUtils["@keymanapp/web-utils<br>(/web/src/engine/common/web-utils)"];
     KeyboardSpec---->WebUtils;
-    Wordbreakers["@keymanapp/models-wordbreakers<br>(/common/models/wordbreakers)"];
-    Models["@keymanapp/models-templates<br>(/common/models/templates)"];
+    Wordbreakers["@keymanapp/models-wordbreakers<br>(/web/src/engine/predictive-text/wordbreakers)"];
+    Models["@keymanapp/models-templates<br>(/web/src/engine/predictive-text/templates/)"];
     Models-->WebUtils;
     LMWorker["@keymanapp/lm-worker<br>(/web/src/engine/predictive-text/worker-thread)"];
     LMWorker-->Models;
     LMWorker-->Wordbreakers;
     LMLayer["@keymanapp/lexical-model-layer<br>(/web/src/engine/predictive-text/worker-main)"];
     LMLayer-->LMWorker;
-    Gestures["@keymanapp/gesture-recognizer<br>(/common/web/gesture-recognizer)"];
+    Gestures["@keymanapp/gesture-recognizer<br>(/web/src/engine/osk/gesture-recognizer)"];
     Gestures-->WebUtils;
 
     subgraph PredText["PredText: WebWorker + its interface"]
@@ -116,8 +116,6 @@ graph TD;
 
     subgraph ClassicWeb["`**ClassicWeb**
     Intermediate-level engine modules`"]
-        Device["/web/src/engine/device-detect"];
-        Device----->WebUtils;
         Elements["/web/src/engine/element-wrappers"];
         Elements-->JSProc;
         KeyboardStorage["/web/src/engine/keyboard-storage"];

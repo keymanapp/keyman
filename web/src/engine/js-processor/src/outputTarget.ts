@@ -1,5 +1,3 @@
-///<reference types="@keymanapp/models-types" />
-
 import { extendString } from "@keymanapp/web-utils";
 import { findCommonSubstringEndIndex } from "./stringDivergence.js";
 import { Mock } from "./mock.js";
@@ -10,6 +8,7 @@ extendString();
 // Defines deadkey management in a manner attachable to each element interface.
 import { type KeyEvent } from 'keyman/engine/keyboard';
 import { Deadkey, DeadkeyTracker } from "./deadkeys.js";
+import { ProbabilityMass, Transform } from '@keymanapp/common-types';
 
 // Also relies on string-extensions provided by the web-utils package.
 

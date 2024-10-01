@@ -23,7 +23,7 @@
     "eslint-plugin-promise": "^6.1.1",
     "mocha": "^10.0.0",
     "mocha-teamcity-reporter": "^4.0.0",
-    "playwright": "^1.43.1",
+    "playwright": "^1.46.1",
     "sinon": "^17.0.1",
     "source-map-support": "^0.5.21",
     "tslib": "^2.5.2",
@@ -46,12 +46,12 @@
     "developer/src/kmc-package",
     "developer/src/kmc",
     "developer/src/server",
-    "common/models/*",
     "common/test/resources",
     "common/tools/*",
     "common/web/*",
     "common/tools/hextobin",
     "web",
+    "web/src/engine/osk/gesture-processor",
     "web/src/engine/predictive-text/*"
   ],
   "dependencies": {

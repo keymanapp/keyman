@@ -28,7 +28,9 @@
 
 /// <reference types="@keymanapp/lm-message-types" />
 
+import { Capabilities, Context, Distribution, LexicalModel, Reversion, Suggestion, Transform } from '@keymanapp/common-types';
 import type ModelCompositor from './model-compositor.js';
+import { Token } from '@keymanapp/models-templates';
 
 /**
  * The signature of self.postMessage(), so that unit tests can mock it.

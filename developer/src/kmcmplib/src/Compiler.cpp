@@ -2213,10 +2213,9 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
 
         {
           KMX_WCHAR *context = NULL;
-          KMX_WCHAR sep_com[3] = u" ,";
-          PKMX_WCHAR p_sep_com = sep_com;
-          r = u16tok(q, p_sep_com, &context);  // I3481
+          r = u16tok(q, ',', &context);
           if (!r) return KmnCompilerMessages::ERROR_InvalidIndex;
+          r = u16trim(r);
 
           for (i = 0; i < fk->cxStoreArray; i++)
           {
@@ -2226,8 +2225,10 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
 
           kmcmp::CheckStoreUsage(fk, i, TRUE, FALSE, FALSE);
 
-          r = u16tok(NULL, p_sep_com, &context);  // I3481
-          if (!r || !*r || !isIntegerWstring(r) || atoiW(r) < 1) return KmnCompilerMessages::ERROR_InvalidIndex;
+          r = context;
+          if (!r || !*r ) return KmnCompilerMessages::ERROR_InvalidIndex;
+          r = u16trim(r);
+          if (!isIntegerWstring(r) || atoiW(r) < 1) return KmnCompilerMessages::ERROR_InvalidIndex;
         }
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_INDEX;
@@ -2310,11 +2311,11 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         {
           if (u16icmp(q, fk->dpStoreArray[i].szName) == 0) break;
         }
+        if (i == fk->cxStoreArray) return KmnCompilerMessages::ERROR_StoreDoesNotExist;
 
         if (!kmcmp::IsValidCallStore(&fk->dpStoreArray[i])) return KmnCompilerMessages::ERROR_InvalidCall;
         kmcmp::CheckStoreUsage(fk, i, FALSE, FALSE, TRUE);
 
-        if (i == fk->cxStoreArray) return KmnCompilerMessages::ERROR_StoreDoesNotExist;
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_CALL;
         tstr[mx++] = (KMX_WCHAR)i + 1;

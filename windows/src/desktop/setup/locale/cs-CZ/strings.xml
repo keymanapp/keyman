@@ -72,9 +72,7 @@ Restartovat nyní?</string>
   <string name="ssDownloadingTitle">Stahování %0:s</string>
   <!-- Parameters: %0:s: filename -->
   <string name="ssDownloadingText">Stahování %0:s</string>
-  <string name="ssOffline">$APPNAME Instalace se nemohla připojit k keyman.com a stáhnout další zdroje.
-
-Zkontrolujte, zda jste online, a povolte $APPNAME nastavení přístupu k Internetu v nastavení firewall.
-
-Kliknutím na tlačítko Zrušit instalaci, zkuste znovu stáhnout zdroje znovu, nebo ignorujte pro pokračování v režimu offline.</string>
+  <string name="ssOffline">$APPNAME Nastavení se nepodařilo připojit ke keyman.com a stáhnout další zdroje.</string>
+  <string name="ssOffline2">Zkontrolujte, zda jste online a zda jste v nastavení brány firewall udělili aplikaci $APPNAME Setup oprávnění k přístupu na internet.</string>
+  <string name="ssOffline3">Kliknutím na Přerušit ukončíte nastavení, kliknutím na Zkusit znovu se pokusíte znovu stáhnout prostředky nebo kliknutím na Ignorovat budete pokračovat v offline režimu.</string>
 </resources>

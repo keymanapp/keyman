@@ -1,6 +1,6 @@
-// // KeymanWeb test suite - processing of the Karma configuration's client.args parameter.
+// KeymanWeb test suite - processing of the Karma configuration's client.args parameter.
 
-import Device from 'keyman/engine/device-detect';
+import { DeviceDetector } from 'keyman/engine/main';
 import * as KMWRecorder from '#recorder';
 import { type BrowserInitOptionSpec, type KeymanEngine } from 'keyman/app/browser';
 import { ErrorStub, type KeyboardAPISpec, type KeyboardStub } from 'keyman/engine/keyboard-storage';
@@ -17,7 +17,7 @@ const domain = `${loc.protocol}/${loc.host}`
 
 // If we've set things up to support Device dection without loading KMW...
 try {
-  const device = new Device();
+  const device = new DeviceDetector();
   device.detect();
 } catch (err) {
   // Sets a warning flag that unit-test files can use to disable themselves.
@@ -233,7 +233,7 @@ export async function runKeyboardTestFromJSON(jsonPath: any, params: any, assert
   const testJSON = await jsonResponse.json();
 
   const testSpec = new KMWRecorder.KeyboardTest(testJSON);
-  const device = new Device();
+  const device = new DeviceDetector();
   device.detect();
 
   // @ts-ignore // Types are a bit messy here.
