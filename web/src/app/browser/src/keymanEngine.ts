@@ -248,7 +248,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    *                activationPending (bool):   KMW being activated
    *                activated         (bool):   KMW active
    *
-   * See https://help.keyman.com/DEVELOPER/ENGINE/WEB/16.0/reference/core/getUIState
+   * See https://help.keyman.com/developer/engine/web/16.0/reference/core/getUIState
    */
   public getUIState(): FocusStateAPIObject {
     return this.contextManager.focusAssistant.getUIState();
@@ -257,7 +257,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
   /**
    * Set or clear the IsActivatingKeymanWebUI flag (exposed function)
    *
-   * See https://help.keyman.com/DEVELOPER/ENGINE/WEB/16.0/reference/core/activatingUI
+   * See https://help.keyman.com/developer/engine/web/16.0/reference/core/activatingUI
    *
    * @param       {(boolean|number)}  state  Activate (true,false)
    */
