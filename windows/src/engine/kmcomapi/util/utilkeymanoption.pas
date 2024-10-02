@@ -121,7 +121,7 @@ type
     GroupName: string;
   end;
 
-const KeymanOptionInfo: array[0..16] of TKeymanOptionInfo = (  // I3331   // I3620   // I4552
+const KeymanOptionInfo: array[0..17] of TKeymanOptionInfo = (  // I3331   // I3620   // I4552
   // Global options
 
   (opt: koKeyboardHotkeysAreToggle;          RegistryName: SRegValue_KeyboardHotkeysAreToggle;         OptionType: kotBool; BoolValue: False; GroupName: 'kogGeneral'),

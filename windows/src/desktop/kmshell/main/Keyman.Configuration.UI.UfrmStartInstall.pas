@@ -1,4 +1,4 @@
-﻿unit UfrmStartInstall;
+﻿unit Keyman.Configuration.UI.UfrmStartInstall;
 {
   Copyright:    © SIL Global.
   // TODO: Localise all the labels and captions.
