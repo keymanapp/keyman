@@ -548,12 +548,10 @@ int mac_KMX_GetDeadkeys(const UCKeyboardLayout* keyboard_layout, vec_dword_3D& a
     */
     for (int i = keycode_spacebar; i >= 0; i--) {
       status = UCKeyTranslate(keyboard_layout, sc_dk, kUCKeyActionDown, mac_convert_Shiftstate_to_MacShiftstate(shift_dk), LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString);
-      if (status != noErr)  			// in case UCKeyTranslate returned an error
+      if ( (deadkeystate == 0) && (status != noErr ))  			// in case UCKeyTranslate returned an error
         return 0;
-      /*
-        UCKeyTranslate != 0 if a dk was found; then run UCKeyTranslate again with a SPACE (keycode_spacebar) to get the plain dk e.g.'^'.
-        If CAPS is used: always add 4 e.g. SHIFT = 2; SHIFT+CAPS = 6
-      */
+
+      // UCKeyTranslate: deadkeystate != 0 if a dk was found; then run UCKeyTranslate again with a SPACE (keycode_spacebar) to get the character e.g.'^'.
       if (deadkeystate != 0) {
         status = UCKeyTranslate(keyboard_layout, i, kUCKeyActionDown, ss_mac[j], LMGetKbdType(), keyTranslateOptions, &deadkeystate, maxStringlength, &actualStringlength, unicodeString);
         if (status != noErr)  			// in case UCKeyTranslate returned an error
