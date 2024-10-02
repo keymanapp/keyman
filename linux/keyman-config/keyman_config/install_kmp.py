@@ -19,7 +19,7 @@ from keyman_config.get_kmp import (InstallLocation, get_keyboard_data,
                                    get_keyman_font_dir)
 from keyman_config.gnome_keyboards_util import (GnomeKeyboardsUtil,
                                                 get_ibus_keyboard_id,
-                                                is_gnome_shell)
+                                                is_gnome_desktop)
 from keyman_config.ibus_util import get_ibus_bus, install_to_ibus, restart_ibus
 from keyman_config.kmpmetadata import KMFileTypes, get_metadata
 from keyman_config.kvk2ldml import convert_kvk_to_ldml, output_ldml
@@ -177,8 +177,8 @@ class InstallKmp():
                 # Special handling to convert kvk into LDML
                 logging.info("Converting %s to LDML and installing both as as keyman file",
                              f['name'])
-                ldml = convert_kvk_to_ldml(fpath)
                 name, ext = os.path.splitext(f['name'])
+                ldml = convert_kvk_to_ldml(name, fpath)
                 ldmlfile = os.path.join(self.packageDir, f"{name}.ldml")
                 output_ldml(ldmlfile, ldml)
             elif ftype == KMFileTypes.KM_ICON:
@@ -261,7 +261,7 @@ class InstallKmp():
             return self._install_keyboards_to_fcitx()
 
         restart_ibus()
-        if is_gnome_shell():
+        if is_gnome_desktop():
             return self._install_keyboards_to_gnome(keyboards, packageDir, language)
         else:
             return self._install_keyboards_to_ibus(keyboards, packageDir, language)
@@ -307,9 +307,9 @@ def extract_kmp(kmpfile, directory):
         raise InstallError(InstallStatus.Abort, e) from e
 
 
-def process_keyboard_data(keyboardID, packageDir) -> None:
+def process_keyboard_data(keyboardID, packageDir) -> bool:
     if not (kbdata := get_keyboard_data(keyboardID)):
-        return
+        return False
     if not os.path.isdir(packageDir) and os.access(os.path.join(packageDir, os.pardir), os.X_OK | os.W_OK):
         try:
             os.makedirs(packageDir)
@@ -318,11 +318,13 @@ def process_keyboard_data(keyboardID, packageDir) -> None:
 
     if os.access(packageDir, os.X_OK | os.W_OK):
         try:
-            with open(os.path.join(packageDir, f'{keyboardID}.json'), 'w') as outfile:
+            with open(os.path.join(packageDir, f'{keyboardID}.json'), 'w', encoding='utf-8') as outfile:
                 json.dump(kbdata, outfile)
                 logging.info("Installing api data file %s.json as keyman file", keyboardID)
+                return True
         except Exception as e:
             logging.warning('Exception %s writing %s/%s.json %s', type(e), packageDir, keyboardID, e.args)
+    return False
 
 
 def install_kmp(inputfile, sharedarea=False, language=None):

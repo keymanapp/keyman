@@ -1,7 +1,9 @@
-import { type Keyboard, Mock, OutputTarget, Transcription, findCommonSubstringEndIndex } from '@keymanapp/keyboard-processor';
-import { KeyboardStub } from 'keyman/engine/package-cache';
-import { ContextManagerBase, ContextManagerConfiguration } from 'keyman/engine/main';
+import { type Keyboard  } from 'keyman/engine/keyboard';
+import { Mock, OutputTarget, Transcription, findCommonSubstringEndIndex, isEmptyTransform, TextTransform } from 'keyman/engine/js-processor';
+import { KeyboardStub } from 'keyman/engine/keyboard-storage';
+import { ContextManagerBase } from 'keyman/engine/main';
 import { WebviewConfiguration } from './configuration.js';
+import { Transform } from '@keymanapp/common-types';
 
 export type OnInsertTextFunc = (deleteLeft: number, text: string, deleteRight: number) => void;
 
@@ -24,7 +26,7 @@ export class ContextHost extends Mock {
     const savedState = this.savedState;
 
     if(this.savedState) {
-      let transform = null;
+      let transform: TextTransform = null;
 
       if(transcription) {
         const preInput = transcription.preInput;
@@ -41,7 +43,9 @@ export class ContextHost extends Mock {
 
       // Signal the necessary text changes to the embedding app, if it exists.
       if(this.oninserttext) {
-        this.oninserttext(transform.deleteLeft, transform.insert, transform.deleteRight);
+        if(!isEmptyTransform(transform) || transform.erasedSelection) {
+          this.oninserttext(transform.deleteLeft, transform.insert, transform.deleteRight);
+        }
       }
     }
 
@@ -153,6 +157,18 @@ export default class ContextManager extends ContextManagerBase<WebviewConfigurat
   }
 
   public async activateKeyboard(keyboardId: string, languageCode?: string, saveCookie?: boolean): Promise<boolean> {
+    /*
+      this.keyboardCache isn't set until partway through KMW initialization.
+      Also, keyboard stubs aren't processed until initialization is complete,
+      so it's best to wait for initialization anyway.
+    */
+    if(!this.engineConfig.deferForInitialization.isFulfilled) {
+      await this.engineConfig.deferForInitialization.corePromise;
+
+      // Our mobile app-engines all register the stub before attempting to set the keyboard,
+      // so the Promise ordering here should work in our favor.
+    }
+
     // If the default keyboard is requested, load that.  May vary based on form-factor, which is
     // part of what .getFallbackStubKey() handles.
     if(!keyboardId) {

@@ -7,9 +7,6 @@
       "outDir": "../build/test",
       "baseUrl": ".",
       "allowSyntheticDefaultImports": true, // for jszip
-      "paths": {
-        "@keymanapp/developer-test-helpers": ["../../common/web/test-helpers/index"],
-      },
     },
   "include": [
       "**/test-*.ts",

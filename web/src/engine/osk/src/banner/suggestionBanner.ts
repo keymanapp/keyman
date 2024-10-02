@@ -1,5 +1,5 @@
 
-import { type PredictionContext } from '@keymanapp/input-processor';
+import { type PredictionContext } from 'keyman/engine/interfaces';
 import { createUnselectableElement } from 'keyman/engine/dom-utils';
 
 import {
@@ -13,16 +13,15 @@ import {
 
 import { BANNER_GESTURE_SET } from './bannerGestureSet.js';
 
-import { DeviceSpec, Keyboard, KeyboardProperties } from '@keymanapp/keyboard-processor';
+import { DeviceSpec, Keyboard, KeyboardProperties, timedPromise } from 'keyman/engine/keyboard';
 import { Banner } from './banner.js';
-import EventEmitter from 'eventemitter3';
 import { ParsedLengthStyle } from '../lengthStyle.js';
 import { getFontSizeStyle } from '../fontSizeUtils.js';
 import { getTextMetrics } from '../keyboard-layout/getTextMetrics.js';
 import { BannerScrollState } from './bannerScrollState.js';
+import { Suggestion } from '@keymanapp/common-types';
 
 const TOUCHED_CLASS: string = 'kmw-suggest-touched';
-const BANNER_CLASS: string = 'kmw-suggest-banner';
 const BANNER_SCROLLER_CLASS = 'kmw-suggest-banner-scroller';
 
 const BANNER_VERT_ROAMING_HEIGHT_RATIO = 0.666;
@@ -81,7 +80,6 @@ export class BannerSuggestion {
   private _minWidth: number;
   private _paddingWidth: number;
 
-  private fontFamily?: string;
   public readonly rtl: boolean;
 
   private _suggestion: Suggestion;
@@ -109,10 +107,11 @@ export class BannerSuggestion {
 
   private constructRoot() {
     // Add OSK suggestion labels
-    let div = this.div = createUnselectableElement('div'), ds=div.style;
+    let div = this.div = createUnselectableElement('div');
     div.className = "kmw-suggest-option";
     div.id = BannerSuggestion.BASE_ID + this.index;
 
+    // @ts-ignore // Tags the element with its backing object.
     this.div['suggestion'] = this;
 
     let container = this.container = document.createElement('div');
@@ -138,7 +137,7 @@ export class BannerSuggestion {
       // Establish base font settings
       let font = keyboardProperties['KFont'];
       if(font && font.family && font.family != '') {
-        div.style.fontFamily = this.fontFamily = font.family;
+        div.style.fontFamily = font.family;
       }
     }
   }
@@ -177,6 +176,7 @@ export class BannerSuggestion {
     }
 
     this.currentWidth = this.collapsedWidth;
+    this.highlight(suggestion?.autoAccept);
     this.updateLayout();
   }
 
@@ -391,8 +391,6 @@ export class SuggestionBanner extends Banner {
 
   private isRTL: boolean = false;
 
-  private hostDevice: DeviceSpec;
-
   /**
    * The banner 'container', which is also the root element for banner scrolling.
    */
@@ -407,7 +405,6 @@ export class SuggestionBanner extends Banner {
 
   constructor(hostDevice: DeviceSpec, height?: number) {
     super(height || Banner.DEFAULT_HEIGHT);
-    this.hostDevice = hostDevice;
 
     this.getDiv().className = this.getDiv().className + ' ' + SuggestionBanner.BANNER_CLASS;
 
@@ -417,6 +414,10 @@ export class SuggestionBanner extends Banner {
     this.buildInternals(false);
 
     this.gestureEngine = this.setupInputHandling();
+  }
+
+  shutdown() {
+    this.gestureEngine.destroy();
   }
 
   buildInternals(rtl: boolean) {
@@ -478,7 +479,7 @@ export class SuggestionBanner extends Banner {
       maxRoamingBounds: safeBounds,
       safeBounds: safeBounds,
       // touchEventRoot:  this.element, // is the default
-      itemIdentifier: (sample, target: HTMLElement) => {
+      itemIdentifier: (sample) => {
         const selBounds = this.selectionBounds.getBoundingClientRect();
 
         // Step 1:  is the coordinate within the range we permit for selecting _anything_?
@@ -554,6 +555,16 @@ export class SuggestionBanner extends Banner {
         return;
       }
 
+      const autoselection = this._predictionContext.selected;
+      this._predictionContext.selected = null;
+      if(autoselection) {
+        this.options.forEach((entry) => {
+          if(entry.suggestion == autoselection) {
+            entry.highlight(false);
+          };
+        });
+      }
+
       this.scrollState = new BannerScrollState(source.currentSample, this.container.scrollLeft);
       const suggestion = source.baseItem;
 
@@ -586,6 +597,31 @@ export class SuggestionBanner extends Banner {
       }
 
       const terminationHandler = () => {
+        const currentSuggestions = this.currentSuggestions;
+        // First, schedule reselection of the autoselected suggestion.
+        // We shouldn't do it synchronously, as suggestion acceptance triggers
+        // _after_ this handler is called.
+        // Delaying via the task queue is enough to get the desired order of events.
+        timedPromise(0).then(async () => {
+          // If the suggestion list instance has changed, our state has changed; do
+          // not reselect.
+          if(currentSuggestions != this.currentSuggestions) {
+            return;
+          }
+
+          // The suggestions are still current?  Then restore the original
+          // auto-correct suggestion and its highlighting.
+          this._predictionContext.selected = autoselection;
+          if(autoselection) {
+            for(let entry of this.options) {
+              if(entry.suggestion == autoselection) {
+                entry.highlight(true);
+                break;
+              };
+            }
+          }
+        });
+
         if(sourceTracker.suggestion) {
           clearSelection(sourceTracker.suggestion);
           sourceTracker.suggestion = null;
@@ -604,7 +640,15 @@ export class SuggestionBanner extends Banner {
       // The actual result comes in via the sequence's `stage` event.
       sequence.once('stage', (result) => {
         const suggestion = result.item; // Should also == sourceTracker.suggestion.
-        if(suggestion && !this.scrollState.hasScrolled) {
+        // 1. A valid suggestion has been selected
+        // 2. The user wasn't scrolling the banner.  (If they were, they likely
+        //    need to lift their finger to select a newly-visible suggestion!)
+        // 3. The suggestions themselves are still valid; avoid suggestion
+        //    double-application or similar.
+        if(suggestion && !this.scrollState.hasScrolled && this.currentSuggestions.length > 0) {
+          // Invalidate the suggestions internally, but don't visually update;
+          // this will avoid banner-flicker.
+          this.currentSuggestions = [];
           this.predictionContext.accept(suggestion.suggestion).then(() => {
             // Reset the scroll state
             this.container.scrollLeft = this.isRTL ? this.container.scrollWidth : 0;

@@ -46,7 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithName:(NSString*)name
                   identifier:(NSString*)identifier
                      version:(NSString*)version
-                      oskFont:(NSString*)oskFont
+                     oskFont:(NSString*)oskFont
                  displayFont:(NSString*)displayFont
                    languages:(NSArray*)languages;
 

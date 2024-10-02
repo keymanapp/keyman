@@ -16,12 +16,14 @@ from gi.repository import GdkPixbuf, Gtk
 
 from keyman_config import _
 from keyman_config.accelerators import bind_accelerator, init_accel
+from keyman_config.convertico import checkandsaveico
 from keyman_config.dbus_util import get_keyman_config_service
 from keyman_config.downloadkeyboard import DownloadKmpWindow
 from keyman_config.fcitx_util import is_fcitx_running
 from keyman_config.get_kmp import (InstallLocation, get_keyboard_dir,
-                                   get_install_area_string)
+                                   get_install_area_string, get_keyman_dir)
 from keyman_config.ibus_util import IbusDaemon, verify_ibus_daemon
+from keyman_config.install_kmp import process_keyboard_data
 from keyman_config.install_window import InstallKmpWindow, find_keyman_image
 from keyman_config.keyboard_layouts_model import create_kbd_layouts_model
 from keyman_config.keyboard_layouts_widget import KeyboardLayoutsWidget
@@ -180,6 +182,23 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
         bbox_hbox.pack_start(bbox_bottom, True, True, 12)
         return bbox_hbox
 
+    def _try_restore_icon_file(self, path, kmpdata):
+        if not os.access(path, os.X_OK | os.W_OK):
+            return ''
+
+        file_name = os.path.join(path, kmpdata['packageID'] + '.bmp')
+        if not os.path.isfile(file_name):
+            file_name = os.path.join(path, kmpdata['packageID'] + '.ico')
+            if not os.path.isfile(file_name):
+                file_name = os.path.join(path, kmpdata['keyboardID'] + '.bmp')
+                if not os.path.isfile(file_name):
+                    file_name = os.path.join(path, kmpdata['keyboardID'] + '.ico')
+                    if not os.path.isfile(file_name):
+                        return ''
+        checkandsaveico(file_name)
+        root, ext = os.path.splitext(file_name)
+        return root + '.bmp.png'
+
     def _addlistitems(self, installed_kmp, store, install_area):
         bmppng = ".bmp.png"  # Icon file extension
 
@@ -198,7 +217,9 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
             if not os.path.isfile(icofile_name):
                 icofile_name = os.path.join(path, kmpdata['keyboardID'] + bmppng)
                 if not os.path.isfile(icofile_name):
-                    icofile_name = find_keyman_image("icon_kmp.png")
+                    icofile_name = self._try_restore_icon_file(path, kmpdata)
+                    if icofile_name == '':
+                        icofile_name = find_keyman_image('icon_kmp.png')
 
             try:
                 icofile = GdkPixbuf.Pixbuf.new_from_file_at_size(icofile_name, 16, 16)
@@ -218,28 +239,28 @@ class ViewInstalledWindow(ViewInstalledWindowBase):
               welcome_file,
               options_file])
 
+    def _try_restore_package_json(self, packageId, area):
+        packageDir = get_keyman_dir(area)
+        if not os.access(packageDir, os.X_OK | os.W_OK):
+            # we don't have write access to packageDir, so we can't restore the .json file
+            return False
+        return process_keyboard_data(packageId, os.path.join(packageDir, packageId))
+
+    def _add_keyboards_from_area(self, area):
+        kmps = get_installed_kmp(area)
+        for kmp in sorted(kmps):
+            kmpdata = kmps[kmp]
+            if not kmpdata['has_kbjson'] and not self._try_restore_package_json(kmpdata['packageID'], area):
+                    self.incomplete_kmp.append(kmpdata)
+        self._addlistitems(kmps, self.store, area)
+
     def refresh_installed_kmp(self):
         logging.debug("Refreshing listview")
         self.store.clear()
         self.incomplete_kmp = []
-        user_kmp = get_installed_kmp(InstallLocation.User)
-        for kmp in sorted(user_kmp):
-            kmpdata = user_kmp[kmp]
-            if kmpdata["has_kbjson"] is False:
-                self.incomplete_kmp.append(kmpdata)
-        self._addlistitems(user_kmp, self.store, InstallLocation.User)
-        shared_kmp = get_installed_kmp(InstallLocation.Shared)
-        for kmp in sorted(shared_kmp):
-            kmpdata = shared_kmp[kmp]
-            if kmpdata["has_kbjson"] is False:
-                self.incomplete_kmp.append(kmpdata)
-        self._addlistitems(shared_kmp, self.store, InstallLocation.Shared)
-        os_kmp = get_installed_kmp(InstallLocation.OS)
-        for kmp in sorted(os_kmp):
-            kmpdata = os_kmp[kmp]
-            if kmpdata["has_kbjson"] is False:
-                self.incomplete_kmp.append(kmpdata)
-        self._addlistitems(os_kmp, self.store, InstallLocation.OS)
+        self._add_keyboards_from_area(InstallLocation.User)
+        self._add_keyboards_from_area(InstallLocation.Shared)
+        self._add_keyboards_from_area(InstallLocation.OS)
 
 
 if __name__ == '__main__':

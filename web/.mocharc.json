@@ -1,7 +1,4 @@
 {
-  "node-option": [
-    "experimental-specifier-resolution=node",
-    "loader=ts-node/esm"
-  ],
-  "global": "window"
+  "$schema": "https://json.schemastore.org/mocharc.json",
+  "require": "tsx"
 }

@@ -1,17 +1,20 @@
-import { ActiveKey, ActiveSubKey, ButtonClass, DeviceSpec, LayoutKey } from '@keymanapp/keyboard-processor';
-import { TouchLayout } from '@keymanapp/common-types';
-import TouchLayoutFlick = TouchLayout.TouchLayoutFlick;
+import { ActiveKey, ActiveSubKey, ButtonClass, ButtonClasses, DeviceSpec } from 'keyman/engine/keyboard';
 
 // At present, we don't use @keymanapp/keyman.  Just `keyman`.  (Refer to <root>/web/package.json.)
-import { getAbsoluteX, getAbsoluteY } from 'keyman/engine/dom-utils';
-
-import { getFontSizeStyle } from '../fontSizeUtils.js';
 import specialChars from '../specialCharacters.js';
 import buttonClassNames from '../buttonClassNames.js';
 
 import { KeyElement } from '../keyElement.js';
 import VisualKeyboard from '../visualKeyboard.js';
 import { getTextMetrics } from './getTextMetrics.js';
+import { ParsedLengthStyle } from '../lengthStyle.js';
+
+export interface KeyLayoutParams {
+  keyWidth: number;
+  keyHeight: number;
+  baseEmFontSize: ParsedLengthStyle;
+  layoutFontSize: ParsedLengthStyle;
+}
 
 /**
  * Replace default key names by special font codes for modifier keys
@@ -39,9 +42,10 @@ export function renameSpecialKey(oldText: string, vkbd: VisualKeyboard): string 
      // do nothing.
  }
 
- let specialCodePUA = 0XE000 + specialChars[oldText];
+ const specialCode = specialChars[oldText as keyof typeof specialChars];
+ let specialCodePUA = 0XE000 + specialCode;
 
- return specialChars[oldText] ?
+ return specialCode ?
    String.fromCharCode(specialCodePUA) :
    oldText;
 }
@@ -58,6 +62,9 @@ export default abstract class OSKKey {
   btn: KeyElement;
   label: HTMLSpanElement;
   square: HTMLDivElement;
+
+  private _fontSize: ParsedLengthStyle;
+  private _fontFamily: string;
 
   /**
    * The layer of the OSK on which the key is displayed.
@@ -81,6 +88,7 @@ export default abstract class OSKKey {
     let btn = this.btn;
 
     var n=0;
+    // @ts-ignore // (Probably) supports legacy KMW keyboards that predate the sp entry
     if(typeof key['dk'] == 'string' && key['dk'] == '1') {
       n=8;
     }
@@ -169,47 +177,47 @@ export default abstract class OSKKey {
 
   /**
    * Calculate the font size required for a key cap, scaling to fit longer text
-   * @param vkbd
    * @param text
-   * @param style     specification for the desired base font size
-   * @param override  if true, don't use the font spec from the button, just use the passed in spec
+   * @param layoutParams   specification for the key
+   * @param scale     additional scaling to apply for the font-size calculation (used by keytips)
    * @returns         font size as a style string
    */
-  getIdealFontSize(vkbd: VisualKeyboard, text: string, style: {height?: string, fontFamily?: string, fontSize: string}, override?: boolean): string {
-    let buttonStyle: typeof style & {width?: string} = getComputedStyle(this.btn);
-    let keyWidth = parseFloat(buttonStyle.width);
-    let emScale = vkbd.getKeyEmFontSize();
+  getIdealFontSize(text: string, layoutParams: KeyLayoutParams, scale?: number): ParsedLengthStyle {
+    // Fallback in case not all style info is currently ready.
+    if(!this._fontFamily) {
+      return new ParsedLengthStyle('1em');
+    }
+
+    scale ??= 1;
+
+    const keyWidth = layoutParams.keyWidth;
+    const keyHeight = layoutParams.keyHeight;
+    const emScale = layoutParams.baseEmFontSize.scaledBy(layoutParams.layoutFontSize.val);
 
     // Among other things, ensures we use SpecialOSK styling for special key text.
     // It's set on the key-span, not on the button.
     //
     // Also helps ensure that the stub's font-family name is used for keys, should
     // that mismatch the font-family name specified within the keyboard's touch layout.
-    const capFont = !this.label ? undefined: getComputedStyle(this.label).fontFamily;
-    if(capFont) {
-      buttonStyle = {
-        fontFamily: capFont,
-        fontSize: buttonStyle.fontSize,
-        height: buttonStyle.height
-      }
+
+    let originalSize = this._fontSize;
+    if(!originalSize.absolute) {
+      originalSize = emScale.scaledBy(originalSize.val);
     }
 
-    const originalSize = getFontSizeStyle(style.fontSize || '1em');
-
-    // Not yet available; it'll be handled in a later layout pass.
-    if(!override) {
-      // When available, just use computedStyle instead.
-      style = buttonStyle;
+    const style = {
+      fontFamily: this._fontFamily,
+      fontSize: originalSize.styleString,
+      height: layoutParams.keyHeight
     }
 
-    let fontSpec = getFontSizeStyle(style.fontSize || '1em');
-    let metrics = getTextMetrics(text, emScale, style);
+    let metrics = getTextMetrics(text, emScale.scaledBy(scale).val, style);
 
     const MAX_X_PROPORTION = 0.90;
     const MAX_Y_PROPORTION = 0.90;
     const X_PADDING = 2;
 
-    var fontHeight: number, keyHeight: number;
+    var fontHeight: number;
     if(metrics.fontBoundingBoxAscent) {
       fontHeight = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent;
     }
@@ -217,10 +225,6 @@ export default abstract class OSKKey {
     // Don't add extra padding to height - multiplying with MAX_Y_PROPORTION already gives
     // padding
     let textHeight = fontHeight ?? 0;
-    if(style.height && style.height.indexOf('px') != -1) {
-      keyHeight = Number.parseFloat(style.height.substring(0, style.height.indexOf('px')));
-    }
-
     let xProportion = (keyWidth * MAX_X_PROPORTION) / (metrics.width + X_PADDING); // How much of the key does the text want to take?
     let yProportion = textHeight && keyHeight ? (keyHeight * MAX_Y_PROPORTION) / textHeight : undefined;
 
@@ -229,28 +233,10 @@ export default abstract class OSKKey {
       proportion = yProportion;
     }
 
-    // Never upscale keys past the default - only downscale them.
+    // Never upscale keys past the default * the specified scale - only downscale them.
     // Proportion < 1:  ratio of key width to (padded [loosely speaking]) text width
     //                  maxProportion determines the 'padding' involved.
-    //
-    if(proportion < 1) {
-      if(originalSize.absolute) {
-        return proportion * fontSpec.val + 'px';
-      } else {
-        return proportion * originalSize.val + 'em';
-      }
-    } else {
-      if(originalSize.absolute) {
-        return fontSpec.val + 'px';
-      } else {
-        return originalSize.val + 'em';
-      }
-    }
-  }
-
-  getKeyWidth(vkbd: VisualKeyboard): number {
-    let key = this.spec as ActiveKey;
-    return key.proportionalWidth * vkbd.width;
+    return ParsedLengthStyle.forScalar(scale * Math.min(proportion, 1));
   }
 
   public get keyText(): string {
@@ -310,25 +296,10 @@ export default abstract class OSKKey {
     }
 
     // Check the key's display width - does the key visualize well?
-    let emScale = vkbd.getKeyEmFontSize();
-    var width: number = getTextMetrics(keyText, emScale, styleSpec).width;
-    if(width == 0 && keyText != '' && keyText != '\xa0') {
-      // Add the Unicode 'empty circle' as a base support for needy diacritics.
-
-      // Disabled by mcdurdin 2020-10-19; dotted circle display is inconsistent on iOS/Safari
-      // at least and doesn't combine with diacritic marks. For consistent display, it may be
-      // necessary to build a custom font that does not depend on renderer choices for base
-      // mark display -- e.g. create marks with custom base included, potentially even on PUA
-      // code points and use those in rendering the OSK. See #3039 for more details.
-      // keyText = '\u25cc' + keyText;
-
-      if(vkbd.isRTL) {
-        // Add the RTL marker to ensure it displays properly.
-        keyText = '\u200f' + keyText;
-      }
+    if(vkbd.isRTL) {
+      // Add the RTL marker to ensure it displays properly.
+      keyText = '\u200f' + keyText;
     }
-
-    ts.fontSize = this.getIdealFontSize(vkbd, keyText, styleSpec);
 
     // Finalize the key's text.
     t.innerText = keyText;
@@ -336,21 +307,69 @@ export default abstract class OSKKey {
     return t;
   }
 
-  public refreshLayout(vkbd: VisualKeyboard) {
+  public resetFontPrecalc() {
+    this._fontFamily = undefined;
+    this._fontSize = undefined;
+    this.label.style.fontSize = '';
+  }
+
+  /**
+   * Any style-caching behavior needed for use in layout manipulation should be
+   * computed within this method, not within refreshLayout.  This is to prevent
+   * unnecessary layout-reflow.
+   * @param layoutParams
+   * @returns
+   */
+  public detectStyles(layoutParams: KeyLayoutParams): void {
+    // Avoid doing any font-size related calculations if there's no text to display.
+    if(this.spec.sp == ButtonClasses.spacer || this.spec.sp == ButtonClasses.blank) {
+      return;
+    }
+
+    // Attempt to detect static but key-specific style properties if they haven't yet
+    // been detected.
+    if(this._fontFamily === undefined) {
+      const lblStyle = getComputedStyle(this.label);
+
+      // Abort if the element is not currently in the DOM; we can't get any info this way.
+      if(!lblStyle.fontFamily) {
+        return;
+      }
+      this._fontFamily = lblStyle.fontFamily;
+
+      // Detect any difference in base (em) font size and that which is computed for the key itself.
+      const computedFontSize = new ParsedLengthStyle(lblStyle.fontSize);
+      const layoutFontSize = layoutParams.layoutFontSize;
+      if(layoutFontSize.absolute) {
+        // rather than just straight-up taking .layoutFontSize
+        this._fontSize = computedFontSize;
+      } else {
+        const baseEmFontSize = layoutParams.baseEmFontSize;
+        const baseFontSize = layoutFontSize.scaledBy(baseEmFontSize.val);
+        const localFontScaling = computedFontSize.val / baseFontSize.val;
+        this._fontSize = ParsedLengthStyle.forScalar(localFontScaling);
+      }
+    }
+  }
+
+  // Avoid any references to getComputedStyle, offset_, or other layout-reflow
+  // dependent values.  Refer to https://gist.github.com/paulirish/5d52fb081b3570c81e3a.
+  public refreshLayout(layoutParams: KeyLayoutParams) {
     // space bar may not define the text span!
     if(this.label) {
       if(!this.label.classList.contains('kmw-spacebar-caption')) {
         // Do not use `this.keyText` - it holds *___* codes for special keys, not the actual glyph!
         const keyCapText = this.label.textContent;
-        this.label.style.fontSize = this.getIdealFontSize(vkbd, keyCapText, this.btn.style);
+        const fontSize = this.getIdealFontSize(keyCapText, layoutParams);
+        this.label.style.fontSize = fontSize.styleString;
       } else {
-        // Remove any custom setting placed on it before recomputing its inherited style info.
-        this.label.style.fontSize = '';
-        const fontSize = this.getIdealFontSize(vkbd, this.label.textContent, this.btn.style);
+        // Spacebar text, on the other hand, is available via this.keyText.
+        // Using this field helps prevent layout reflow during updates.
+        const fontSize = this.getIdealFontSize(this.keyText, layoutParams);
 
         // Since the kmw-spacebar-caption version uses !important, we must specify
         // it directly on the element too; otherwise, scaling gets ignored.
-        this.label.style.setProperty("font-size", fontSize, "important");
+        this.label.style.setProperty("font-size", fontSize.styleString, "important");
       }
     }
   }

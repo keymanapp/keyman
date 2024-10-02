@@ -1,4 +1,4 @@
-import EventEmitter from "eventemitter3";
+import { EventEmitter } from "eventemitter3";
 
 /**
  * The return object documented for
@@ -155,8 +155,8 @@ export class FocusAssistant extends EventEmitter<EventMap> {
   setFocusTimer(): void {
     this.focusing=true;
 
-    this.focusTimer = window.setTimeout(function() {
+    this.focusTimer = window.setTimeout(() => {
       this.focusing=false;
-    }.bind(this), 50)
+    }, 50)
   }
 }

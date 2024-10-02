@@ -1,4 +1,6 @@
-import { Codes, DeviceSpec, KeyEvent, KeyMapping, Keyboard, KeyboardProcessor } from '@keymanapp/keyboard-processor';
+import { Codes, DeviceSpec, KeyEvent, KeyMapping, Keyboard } from 'keyman/engine/keyboard';
+import { KeyboardProcessor } from 'keyman/engine/js-processor';
+import { ModifierKeyConstants } from '@keymanapp/common-types';
 
 import { HardKeyboard, processForMnemonicsAndLegacy } from 'keyman/engine/main';
 import { DomEventTracker } from 'keyman/engine/events';
@@ -96,25 +98,24 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
 
   curModState |= (e.getModifierState("Shift") ? 0x10 : 0);
 
-  let modifierCodes = Codes.modifierCodes;
   if(e.getModifierState("Control")) {
     curModState |= ((e.location != 0 && ctrlEvent) ?
-      (e.location == 1 ? modifierCodes['LCTRL'] : modifierCodes['RCTRL']) : // Condition 1
+      (e.location == 1 ? ModifierKeyConstants.LCTRLFLAG : ModifierKeyConstants.RCTRLFLAG) : // Condition 1
       prevModState & 0x0003);                                                       // Condition 2
   }
   if(e.getModifierState("Alt")) {
     curModState |= ((e.location != 0 && altEvent) ?
-      (e.location == 1 ? modifierCodes['LALT'] : modifierCodes['RALT']) :   // Condition 1
+      (e.location == 1 ? ModifierKeyConstants.LALTFLAG : ModifierKeyConstants.RALTFLAG) :   // Condition 1
       prevModState & 0x000C);                                                       // Condition 2
   }
 
   // Stage 2 - detect state key information.  It can be looked up per keypress with no issue.
   let Lstates = 0;
 
-  Lstates |= e.getModifierState('CapsLock') ? modifierCodes['CAPS'] : modifierCodes['NO_CAPS'];
-  Lstates |= e.getModifierState('NumLock') ? modifierCodes['NUM_LOCK'] : modifierCodes['NO_NUM_LOCK'];
+  Lstates |= e.getModifierState('CapsLock') ? ModifierKeyConstants.CAPITALFLAG : ModifierKeyConstants.NOTCAPITALFLAG;
+  Lstates |= e.getModifierState('NumLock') ? ModifierKeyConstants.NUMLOCKFLAG : ModifierKeyConstants.NOTNUMLOCKFLAG;
   Lstates |= (e.getModifierState('ScrollLock'))
-    ? modifierCodes['SCROLL_LOCK'] : modifierCodes['NO_SCROLL_LOCK'];
+    ? ModifierKeyConstants.SCROLLFLAG : ModifierKeyConstants.NOTSCROLLFLAG;
 
   // We need these states to be tracked as well for proper OSK updates.
   curModState |= Lstates;
@@ -128,14 +129,14 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
   keyboardState.modStateFlags = curModState;
 
   // For European keyboards, not all browsers properly send both key-up events for the AltGr combo.
-  let altGrMask = modifierCodes['RALT'] | modifierCodes['LCTRL'];
+  let altGrMask = ModifierKeyConstants.RALTFLAG | ModifierKeyConstants.LCTRLFLAG;
   if((prevModState & altGrMask) == altGrMask && (curModState & altGrMask) != altGrMask) {
     // We just released AltGr - make sure it's all released.
     curModState &= ~ altGrMask;
   }
   // Perform basic filtering for Windows-based ALT_GR emulation on European keyboards.
-  if(curModState & modifierCodes['RALT']) {
-    curModState &= ~modifierCodes['LCTRL'];
+  if(curModState & ModifierKeyConstants.RALTFLAG) {
+    curModState &= ~ModifierKeyConstants.LCTRLFLAG;
   }
 
   let modifierBitmasks = Codes.modifierBitmasks;
@@ -148,14 +149,14 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
     // Note for future - embedding a kill switch here would facilitate disabling AltGr / Right-alt simulation.
     if(activeKeyboard.emulatesAltGr && (Lmodifiers & modifierBitmasks['ALT_GR_SIM']) == modifierBitmasks['ALT_GR_SIM']) {
       Lmodifiers ^= modifierBitmasks['ALT_GR_SIM'];
-      Lmodifiers |= modifierCodes['RALT'];
+      Lmodifiers |= ModifierKeyConstants.RALTFLAG;
     }
   } else {
     // No need to sim AltGr here; we don't need chiral ALTs.
     Lmodifiers =
       (curModState & 0x10) | // SHIFT
-      ((curModState & (modifierCodes['LCTRL'] | modifierCodes['RCTRL'])) ? 0x20 : 0) |
-      ((curModState & (modifierCodes['LALT'] | modifierCodes['RALT']))   ? 0x40 : 0);
+      ((curModState & (ModifierKeyConstants.LCTRLFLAG | ModifierKeyConstants.RCTRLFLAG)) ? 0x20 : 0) |
+      ((curModState & (ModifierKeyConstants.LALTFLAG | ModifierKeyConstants.RALTFLAG))   ? 0x40 : 0);
   }
 
 
@@ -164,7 +165,7 @@ export function preprocessKeyboardEvent(e: KeyboardEvent, keyboardState: Keyboar
     * because some keyboards specify their own modifierBitmask, which won't include it.
     * We don't currently use that reference in this method, but that may change in the future.
     */
-  Lmodifiers |= (e.metaKey ? modifierCodes['META']: 0);
+  Lmodifiers |= (e.metaKey ? ModifierKeyConstants.K_METAFLAG: 0);
 
   // Physically-typed keys require use of a 'desktop' form factor and thus are based on a virtual "physical" Device.
 
@@ -275,7 +276,7 @@ export default class HardwareEventKeyboard extends HardKeyboard {
 
     // Prevent mapping element is readonly or tagged as kmw-disabled
     const el = target.getElement();
-    if(el?.className?.indexOf('kmw-disabled') >= 0) {
+    if(el?.getAttribute('class')?.indexOf('kmw-disabled') >= 0) {
       return true;
     }
 

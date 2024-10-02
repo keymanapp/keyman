@@ -198,35 +198,37 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
 
     URLProtocol.registerClass(KeymanURLProtocol.self)
 
-    /**
-     * As of 14.0, ResourceFileManager is responsible for handlng resources... including
-     * any necessary "migration" of their internal storage structure & tracked metadata.
-     */
-    ResourceFileManager.shared.runMigrationsIfNeeded()
-
+    if(!Util.isSystemKeyboard) {
+      /**
+       * As of 14.0, ResourceFileManager is responsible for handlng resources... including
+       * any necessary "migration" of their internal storage structure & tracked metadata.
+       */
+      ResourceFileManager.shared.runMigrationsIfNeeded()
+    }
+    
     if Util.isSystemKeyboard || Storage.active.userDefaults.bool(forKey: Key.keyboardPickerDisplayed) {
       isKeymanHelpOn = false
     }
 
-    do {
-      try Storage.active.copyKMWFiles(from: Resources.bundle)
-    } catch {
-      let message = ("Failed to copy KMW files from bundle: \(error)")
-      os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
-      SentryManager.capture(error, message:message)
-    }
-
-    updateUserKeyboards(with: Defaults.keyboard)
-
-    do {
-      try reachability = Reachability(hostname: KeymanHosts.API_KEYMAN_COM.host!)
-    } catch {
-      let message = ("Could not start Reachability object: \(error)")
-      os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
-      SentryManager.capture(error, message:message)
-    }
-
     if(!Util.isSystemKeyboard) {
+      do {
+        try Storage.active.copyKMWFiles(from: Resources.bundle)
+      } catch {
+        let message = ("Failed to copy KMW files from bundle: \(error)")
+        os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
+        SentryManager.capture(error, message:message)
+      }
+      
+      updateUserKeyboards(with: Defaults.keyboard)
+      
+      do {
+        try reachability = Reachability(hostname: KeymanHosts.API_KEYMAN_COM.host!)
+      } catch {
+        let message = ("Could not start Reachability object: \(error)")
+        os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
+        SentryManager.capture(error, message:message)
+      }
+
       NotificationCenter.default.addObserver(self, selector: #selector(self.reachabilityChanged),
                                            name: .reachabilityChanged, object: reachability)
       do {
@@ -829,11 +831,21 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
       shared.copyUserDefaults(to: nonShared, withKeys: keysToCopy, shouldOverwrite: true)
       do {
         try shared.copyFiles(to: nonShared)
-        FontManager.shared.registerCustomFonts()
       } catch {
         let message = ("Failed to copy from shared container: \(error)")
         os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
         SentryManager.capture(error, message:message)
+      }
+      
+      // This operation has a surprisingly high cost and isn't critical
+      // for getting the keyboard loaded and available to the OS.
+      //
+      // We certainly want it done _soon_... but we don't want it to cause
+      // the primary, synchronous initialization call from the OS to run so
+      // long that the keyboard fails to start due to its enforced time
+      // constraints.
+      DispatchQueue.main.async {
+        FontManager.shared.registerCustomFonts()
       }
     }
   }

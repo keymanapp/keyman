@@ -1,4 +1,5 @@
-import { CompilerCallbacks, KMX, KmxFileReader } from "@keymanapp/common-types";
+import { KMX, KmxFileReader } from "@keymanapp/common-types";
+import { CompilerCallbacks } from "@keymanapp/developer-utils";
 import { KmnCompiler } from "@keymanapp/kmc-kmn";
 
 export async function getOskFromKmnFile(callbacks: CompilerCallbacks, filename: string): Promise<{

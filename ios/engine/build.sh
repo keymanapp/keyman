@@ -3,11 +3,8 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
-
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
 
 # Include our resource functions; they're pretty useful!
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
@@ -18,7 +15,7 @@ verify_on_mac
 
 builder_describe "Builds Keyman Engine for use on iOS devices - iPhone and iPad." \
   "@/web/src/app/webview        build" \
-  "@/common/web/sentry-manager  build" \
+  "@/web/src/engine/sentry-manager  build" \
   "clean" \
   "configure" \
   "build" \
@@ -112,7 +109,7 @@ function update_bundle ( ) {
   cp "$KMW_PRODUCT/keymanweb-webview.js"        "$BUNDLE_PATH/keymanweb-webview.js"
 
   cp "$KEYMAN_ROOT/node_modules/@sentry/browser/build/bundle.min.js" "$BUNDLE_PATH/sentry.min.js"
-  cp "$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js"     "$BUNDLE_PATH/keyman-sentry.js"
+  cp "$KEYMAN_ROOT/web/src/engine/sentry-manager/build/lib/index.js"     "$BUNDLE_PATH/keyman-sentry.js"
 }
 
 # First things first - update our dependencies.

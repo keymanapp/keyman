@@ -12,6 +12,7 @@ var bannerHeight = 0;
 var bannerImagePath = '';
 var bannerHTMLContents = '';
 var fragmentToggle = 0;
+var deferredBannerCall;
 
 var sentryManager = new KeymanSentryManager({
   hostPlatform: "android"
@@ -49,6 +50,12 @@ function init() {
 
       // The OSK is not available until initialization is complete.
       keyman.osk.bannerView.activeBannerHeight = bannerHeight;
+
+      if(deferredBannerCall) {
+        deferredBannerCall();
+        deferredBannerCall = null;
+      }
+
       keyman.refreshOskLayout();
     }
   });
@@ -63,10 +70,19 @@ function init() {
 }
 
 function showBanner(flag) {
+  if(!keyman.osk) {
+    deferredBannerCall = function() {
+      showBanner(flag);
+    }
+
+    return;
+  }
+
+  var bc = keyman.osk.bannerController;
+
   console_debug("Setting banner display for dictionaryless keyboards to " + flag);
   console_debug("bannerHTMLContents: " + bannerHTMLContents);
-  var bc = keyman.osk.bannerController;
-  if (bc) {
+  if(bc) {
     if (bannerHTMLContents != '') {
       bc.inactiveBanner = flag ? new bc.HTMLBanner(bannerHTMLContents) : null;
     } else {
@@ -94,6 +110,17 @@ function notifyHost(event, params) {
     params = params ? '+'+params : '';
     window.location.hash = event+'-'+fragmentToggle+params;
   }, 10);
+}
+
+// Update the KeymanWeb longpress delay
+// delay is in milliseconds
+function setLongpressDelay(delay) {
+  if (keyman.osk) {
+    keyman.osk.gestureParams.longpress.waitLength = delay;
+    console_debug('setLongpressDelay('+delay+')');
+  } else {
+    window.console.log('setLongpressDelay error: keyman.osk undefined');
+  }
 }
 
 // Update the KMW banner height
@@ -125,7 +152,7 @@ function setOskHeight(h) {
 
 function setOskWidth(w) {
   if(w > 0) {
-    oskWidth = w;
+    oskWidth = w / window.devicePixelRatio;
   }
 }
 
@@ -172,7 +199,8 @@ function setKeymanLanguage(k) {
 }
 
 function setSpacebarText(mode) {
-  keyman.config.spacebarText = mode;
+  var text = (mode == undefined) || !mode.text ? '' : mode.text;
+  keyman.config.spacebarText = text;
 }
 
 // #6665: we need to know when the user has pressed a hardware key so we don't
@@ -230,10 +258,8 @@ function setNumericLayer() {
   }
 }
 
-function updateKMText(text) {
-  if(text == undefined) {
-      text = '';
-  }
+function updateKMText(k) {
+  var text = (k == undefined) || !k.text ? '' : k.text;
 
   console_debug('updateKMText(text=' + text + ') with: \n' + build_context_string(keyman.context));
 
@@ -278,7 +304,7 @@ function updateKMSelectionRange(start, end) {
 
     console_debug('result:\n' + build_context_string(context));
   } else {
-    console.debug('range unchanged');
+    console_debug('range unchanged');
   }
 }
 
@@ -316,6 +342,14 @@ function menuKeyUp() {
   fragmentToggle = (fragmentToggle + 1) % 100;
   var hash = 'globeKeyAction&fragmentToggle=' + fragmentToggle + '&keydown=false';
   window.location.hash = hash;
+}
+
+// The keyboard-picker displayed via Android longpress disrupts Web-side
+// gesture-handling; this function helps force-clear the globe key's highlighting.
+function clearGlobeHighlight() {
+  if(keyman.osk && keyman.osk.vkbd && keyman.osk.vkbd.currentLayer.globeKey) {
+    keyman.osk.vkbd.currentLayer.globeKey.highlight(false)
+  }
 }
 
 function hideKeyboard() {

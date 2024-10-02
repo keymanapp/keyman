@@ -1,40 +1,39 @@
-# Keyman for Windows and Keyman Developer
+# Keyman for Windows
 
 ## Build Prerequisites
 
 * See [Windows Build Environment Configuration](../../docs/build/windows.md).
 
-## Building Keyman for Windows and Keyman Developer
+## Building Keyman for Windows
 
-1. Start 'Developer Command Prompt for VS 2019'.
-2. Run `nmake build` from the **windows/src** folder.
+1. Start 'Git Bash' (part of Git for Windows).
+2. Run `windows/src/build.sh`.
 3. Artifacts from a successful build will be placed in **windows/bin** folder.
 
-*Note*: running `nmake build` will currently reset the packages and path settings
+*Note*: running `build.sh` will currently reset the packages and path settings
 in your Delphi environment. If you use Delphi for other projects, you should
 consider building Keyman under a login user dedicated to it, or in a VM.
 
-Type `nmake` to see build targets. Common build targets are:
+Type `build.sh` to see build targets and actions. Common build actions are:
 
-* `nmake build`
-: builds Keyman for Windows and Keyman Developer
+* `build.sh build`
+: builds Keyman for Windows
 
-* `nmake clean`
+* `build.sh clean`
 : remove temporary files and build artifacts
 
-* `nmake release`
+* `build.sh publish`
 : makes a release of all Keyman Windows projects
 
-* `nmake install`
+* `build.sh install`
 : install some or all components to Program Files (requires elevated command prompt).
 
 ### Building without Delphi
 
-It is possible to build all components that do _not_ require Delphi by adding
-the environment variable `NODELPHI=1` before starting the build. Currently many
-components are Delphi-based, but if you are working just in Keyman Core, the
-compiler, or Keyman Engine's C++ components, you may be able to get away without
-building them. In this situation, we recommend copying the relevant Delphi-built
+It is possible to build all components that do _not_ require Delphi. Currently
+many components are Delphi-based, but if you are working just in Keyman Core, or
+Keyman Engine's C++ components, you may be able to get away without building
+them. In this situation, we recommend copying the relevant Delphi-built
 components into windows/bin folders from a compatible installed version of
 Keyman for testing and debugging purposes.
 
@@ -45,8 +44,8 @@ build, you will need to obtain valid code signing certificates. See
 Certificates, below. Official release builds for Keyman are built in the Keyman
 project's CI environment.
 
-1. Start 'Developer Command Prompt for VS 2019'.
-2. Run `nmake release` from the **windows/src** folder.
+1. Start 'Git Bash'.
+2. Run `windows/src/build.sh publish`.
 3. Artifacts from a successful build will be placed in **windows/release**
    folder.
 4. **buildtools/help-keyman-com.sh** will push updated documentation to
@@ -64,14 +63,11 @@ You can use your own certificate, or you can use test certificates which are not
 globally trusted. The environment variables `SC_PFX_SHA1` and `SC_PFX_SHA256`
 can be set to custom certificate paths.
 
-The Keyman repo no longer includes test certificates.  To build your own, run
-`nmake test-certificate` from **common/windows/delphi/tools/certificates** to
+The Keyman repo can build test certificates for you.  To build your own, run
+`./common/windows/delphi/tools/certificates/build.sh certificates` to
 build and install your own local root CA "**KeymanTestCA**" certificates. If you
 specify a password for the certificate, you'll need to set that in the
 environment variable `SC_PWD`.
-
-(Note: these `SC_` values can be defined in `UserDefines.mak` instead of as
-environment variables.)
 
 ### Manual certificate installation
 
@@ -79,7 +75,7 @@ You do not need to install the **KeymanTest** certificates, only the
 **KeymanTestCA** certificates.
 
 If you have not already installed the **KeymanTestCA** certificates using the
-`nmake` command above, to manually install the Keyman **KeymanTestCA**
+`build.sh` command above, to manually install the Keyman **KeymanTestCA**
 certificates, do the following in **common/windows/delphi/tools/certificates**:
 
    1. Open the certificate and click 'Install certificate...' to open the

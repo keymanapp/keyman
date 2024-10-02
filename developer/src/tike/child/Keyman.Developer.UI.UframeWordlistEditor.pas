@@ -186,7 +186,15 @@ function TframeWordlistEditor.DoOpenFile: Boolean;
 begin
   if FileExists(FileName) then
   begin
-    FWordlist.LoadFromFile(FileName);
+    try
+      FWordlist.LoadFromFile(FileName);
+    except
+      on E:EEncodingError do
+      begin
+        ShowMessage('Error loading '+FileName+': '+E.Message);
+        Exit(False);
+      end;
+    end;
     FModified := False;
   end;
   UpdateData;

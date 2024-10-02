@@ -1,3 +1,5 @@
+"use strict";
+
 /* Global Variables */
 
 let helpUrl = ''; // Will be updated when we retrieve the server API version
@@ -64,16 +66,24 @@ keyman.init({
 fetch('/api-public/version').
   then(response => response.json()).
   then(value => {
-    const versionMajorRx = /^(\d+\.\d+)/.exec(value.version);
-    versionMajor = versionMajorRx[1];
-    helpUrl = 'https://help.keyman.com/developer/'+versionMajor+'/context/server';
-    document.getElementById('about-version').innerText = value.version;
-    document.getElementById('about-help-link').href = helpUrl;
-    document.getElementById('keyman-developer-logo').title = 'Keyman Developer Server '+value.version;
-    if(!value.isApiAvailable) {
-      document.body.classList.add('disable-upload');
+    const prep = () => {
+      const versionMajorRx = /^(\d+\.\d+)/.exec(value.version);
+      versionMajor = versionMajorRx[1];
+      helpUrl = 'https://help.keyman.com/developer/'+versionMajor+'/context/server';
+      document.getElementById('about-version').innerText = value.version;
+      document.getElementById('about-help-link').href = helpUrl;
+      document.getElementById('keyman-developer-logo').title = 'Keyman Developer Server '+value.version;
+      if(!value.isApiAvailable) {
+        document.body.classList.add('disable-upload');
+      } else {
+        initDropArea();
+      }
+    };
+
+    if (document.readyState === "loading") {
+      document.addEventListener('DOMContentLoaded', prep);
     } else {
-      initDropArea();
+      prep();
     }
   });
 

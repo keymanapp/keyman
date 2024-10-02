@@ -1,5 +1,5 @@
 import { GestureSequence } from "@keymanapp/gesture-recognizer";
-import { KeyDistribution } from "@keymanapp/keyboard-processor";
+import { KeyDistribution } from "keyman/engine/keyboard";
 
 import { KeyElement } from "../../keyElement.js";
 import { GestureHandler } from './gestureHandler.js';

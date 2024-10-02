@@ -904,6 +904,10 @@
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
   <string name="S_OSK_FontHelper_ChooseKeyboard" comment="OSK Font helper choose keyboard">សូម​ជ្រើសរើស​ក្ដារចុច Keyman មួយ​ដើម្បី​រក​ពុម្ព​អក្សរ​ដែល​ពាក់ព័ន្ធ</string>
+  <!-- Context: OSK Font Helper -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 17.0.312.0 -->
+  <string name="S_OSK_FontHelper_NoFonts" comment="OSK Font helper no fonts found for keyboard">មិនឃើញមានពុម្ពអក្សរណាជាសំណូមពរសម្រាប់ក្តារចុច %1$s.</string>
   <!-- Context: Text Editor -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 10.0.836.0 -->

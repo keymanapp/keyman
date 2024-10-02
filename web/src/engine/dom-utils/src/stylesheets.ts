@@ -1,18 +1,21 @@
 import { DeviceSpec, ManagedPromise } from '@keymanapp/web-utils';
-import { type InternalKeyboardFont as KeyboardFont } from '@keymanapp/keyboard-processor';
+import { type InternalKeyboardFont as KeyboardFont } from 'keyman/engine/keyboard';
 
 type FontFamilyStyleMap = {[family: string]: HTMLStyleElement};
 
 export class StylesheetManager {
   private fontStyleDefinitions: { [os: string]: FontFamilyStyleMap} = {};
-  private linkedSheets: HTMLStyleElement[] = [];
-  private fontPromises: Promise<FontFace>[] = [];
+  private linkedSheets: {
+    sheet: HTMLStyleElement,
+    load: ManagedPromise<void>
+  }[] = [];
+  private fontPromises: Promise<FontFace | void>[] = [];
   private doCacheBusting: boolean;
 
   public readonly linkNode: Node;
 
   public get sheets(): readonly HTMLStyleElement[] {
-    return this.linkedSheets;
+    return this.linkedSheets.map((entry) => entry.sheet);
   }
 
   public constructor(linkNode?: Node, doCacheBusting?: boolean) {
@@ -28,12 +31,25 @@ export class StylesheetManager {
     this.doCacheBusting = doCacheBusting || false;
   }
 
-  linkStylesheet(sheet: HTMLStyleElement) {
+  linkStylesheet(sheet: HTMLStyleElement | HTMLLinkElement) {
     if(!(sheet instanceof HTMLLinkElement) && !sheet.innerHTML) {
       return;
     }
 
-    this.linkedSheets.push(sheet);
+    const promise = new ManagedPromise();
+    if(sheet instanceof HTMLLinkElement) {
+      sheet.onload = () => promise.resolve();
+    } else {
+      // If it's an inline sheet, it's essentially already loaded.
+      // The microtask delay this induces (for type compat) also
+      // gives the browser time to apply the inlined-style.
+      promise.resolve();
+    }
+
+    this.linkedSheets.push({
+      sheet: sheet,
+      load: promise
+    });
     this.linkNode.appendChild(sheet);
   }
 
@@ -42,25 +58,7 @@ export class StylesheetManager {
    * Any change to the set of linked sheets after the initial call will be ignored.
    */
   async allLoadedPromise(): Promise<void> {
-    const promises: Promise<void>[] = [];
-
-    for(const sheetElem of this.linkedSheets) {
-      // Based on https://stackoverflow.com/a/21147238
-      if(sheetElem.sheet?.cssRules) {
-        promises.push(Promise.resolve());
-      } else if(sheetElem.innerHTML) {
-        // NOT at the StackOverflow link, but something I found experimentally.
-        // Needed for live-constructed sheets with no corresponding file.
-        promises.push(Promise.resolve());
-      } else {
-        const promise = new ManagedPromise<void>();
-        sheetElem.addEventListener('load', () => promise.resolve());
-        sheetElem.addEventListener('error', () => promise.reject());
-        promises.push(promise.corePromise);
-      }
-    }
-
-    const allPromises = promises.concat(this.fontPromises as Promise<any>[]);
+    const allPromises = this.linkedSheets.map((entry) => entry.load.corePromise);
     if(Promise.allSettled) {
       // allSettled - Chrome 76 / Safari 13
       // Delays for settling (either then OR catch) for ALL promises.
@@ -83,17 +81,17 @@ export class StylesheetManager {
   addStyleSheetForFont(fd: KeyboardFont, fontPathRoot: string, os?: DeviceSpec.OperatingSystem) {
     // Test if a valid font descriptor
     if(!fd) {
-      return;
+      return null;
     }
 
     if(typeof(fd.files) == 'undefined') {
-      return;
+      return null;
     }
 
     const fontKey = fd.family;
     let source: string;
 
-    let i, ttf='', woff='', fList=[];
+    let i, ttf='', woff='', fList=[], data='';
 
     // TODO: 22 Aug 2014: check that font path passed from cloud is actually used!
 
@@ -110,7 +108,7 @@ export class StylesheetManager {
       if(!sheet.parentNode) {
         this.linkStylesheet(sheet);
       }
-      return;
+      return null;
     }
 
     if(typeof(fd.files) == 'string') {
@@ -120,6 +118,9 @@ export class StylesheetManager {
     }
 
     for(i=0;i<fList.length;i++) {
+      if(fList[i].toLowerCase().indexOf('data:font') == 0) {
+        data = fList[i];
+      }
       if(fList[i].toLowerCase().indexOf('.otf') > 0) ttf=fList[i];
       if(fList[i].toLowerCase().indexOf('.ttf') > 0) ttf=fList[i];
       if(fList[i].toLowerCase().indexOf('.woff') > 0) woff=fList[i];
@@ -142,7 +143,12 @@ export class StylesheetManager {
     // but return without adding the style sheet if the required font type is unavailable
 
     // Modern browsers: use WOFF, TTF and fallback finally to SVG. Don't provide EOT
-    if(os == DeviceSpec.OperatingSystem.iOS) {
+    if(data) {
+      // For inline-defined fonts:
+      const formatStartIndex = 'data:font/'.length;
+      const format = data.substring(formatStartIndex, data.indexOf(';', formatStartIndex));
+      s +=`src:url('${data}'), format('${format}');`;
+    } else if(os == DeviceSpec.OperatingSystem.iOS) {
       if(ttf != '') {
         if(this.doCacheBusting) {
           ttf = this.cacheBust(ttf);
@@ -180,9 +186,11 @@ export class StylesheetManager {
      */
     const fontFace = new FontFace(fd.family, source);
 
-    const clearPromise = () => this.fontPromises = this.fontPromises.filter((entry) => entry != loadPromise);
-    const loadPromise = fontFace.load().then(clearPromise).catch(clearPromise);
-    this.fontPromises.push(loadPromise);
+    let loadPromise = fontFace.load();
+    const clearPromise = () => {
+      this.fontPromises = this.fontPromises.filter((entry) => entry != loadPromise);
+    }
+    this.fontPromises.push(loadPromise.then(clearPromise).catch(clearPromise));
 
     this.linkStylesheet(sheet);
 
@@ -222,9 +230,11 @@ export class StylesheetManager {
   }
 
   public unlink(stylesheet: HTMLStyleElement) {
-    const index = this.linkedSheets.indexOf(stylesheet);
+    const index = this.linkedSheets.findIndex((entry) => entry.sheet == stylesheet);
     if(index > -1) {
-      this.linkedSheets.splice(index, 1);
+      const tuple = this.linkedSheets.splice(index, 1);
+      // Ensure we don't leave `await`s that were waiting on the stylesheet hanging.
+      tuple[0].load.resolve();
       stylesheet.parentNode.removeChild(stylesheet);
       return true;
     }
@@ -233,10 +243,13 @@ export class StylesheetManager {
   }
 
   public unlinkAll() {
-    for(let sheet of this.linkedSheets) {
+    for(let tuple of this.linkedSheets) {
+      const sheet = tuple.sheet;
       if(sheet.parentNode) {
         sheet.parentNode.removeChild(sheet);
       }
+      // Clear out any lingering `await`s.
+      tuple.load.resolve();
     }
 
     this.linkedSheets.splice(0, this.linkedSheets.length);

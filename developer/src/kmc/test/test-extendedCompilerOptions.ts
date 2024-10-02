@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import 'mocha';
 import { unitTestEndpoints } from '../src/util/extendedCompilerOptions.js';
 import { InfrastructureMessages } from '../src/messages/infrastructureMessages.js';
-import { CompilerError, CompilerMessageOverride, CompilerErrorSeverity } from '@keymanapp/common-types';
+import { CompilerError, CompilerMessageOverride, CompilerErrorSeverity } from '@keymanapp/developer-utils';
 import { KmnCompilerMessages } from '@keymanapp/kmc-kmn';
 
 interface MessageTest {input: string, result: CompilerMessageOverride};

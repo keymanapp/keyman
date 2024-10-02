@@ -1,3 +1,5 @@
+"use strict";
+
 /* Websocket listening for updated resource notifications */
 
 WebSockHop.disable.mobile = false;

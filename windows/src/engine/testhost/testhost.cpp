@@ -223,8 +223,8 @@ typedef struct
 // QueueAction ItemTypes
 #define QIT_VKEYDOWN	0
 #define QIT_VKEYUP		1
-#define QIT_VSHIFTDOWN	2
-#define QIT_VSHIFTUP	3
+//#define QIT_VSHIFTDOWN	2 // deprecated see #11925
+//#define QIT_VSHIFTUP	3   // deprecated see #11925
 #define QIT_CHAR		4
 #define QIT_DEADKEY		5
 #define QIT_BELL		6
@@ -268,10 +268,6 @@ BOOL WINAPI PostKeyCallback(APPACTIONQUEUEITEM* Queue, int QueueSize) {
         //pInputs[i].ki.dwFlags = KEYEVENTF_KEYUP | ((Queue[n].dwData & QVK_EXTENDED) ? KEYEVENTF_EXTENDEDKEY : 0);  // I3438
       }
       break;
-    case QIT_VSHIFTDOWN:
-      break;
-    case QIT_VSHIFTUP:
-      break;
     case QIT_CHAR:
       // TODO: surrogate pairs
       PostMessage(hWndEdit, WM_CHAR, (WORD)Queue[n].dwData, 0);
@@ -312,8 +308,8 @@ Fail(PCWSTR message) {
 
 #ifdef _WIN64
 #define KEYMAN32 "keyman64.dll"
-#define KEYMAN32_DEBUG "keyman64" / "bin" / "x64" / "Debug" / "keyman64.dll"
-#define KEYMAN32_RELEASE "keyman64" / "bin" / "x64" / "Release" / "keyman64.dll"
+#define KEYMAN32_DEBUG "keyman32" / "bin" / "x64" / "Debug" / "keyman64.dll"
+#define KEYMAN32_RELEASE "keyman32" / "bin" / "x64" / "Release" / "keyman64.dll"
 #else
 #define KEYMAN32 "keyman32.dll"
 #define KEYMAN32_DEBUG "keyman32" / "bin" / "Win32" / "Debug" / "keyman32.dll"

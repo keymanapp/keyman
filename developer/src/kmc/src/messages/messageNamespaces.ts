@@ -1,16 +1,17 @@
-import { CommonTypesMessages, CompilerErrorNamespace } from '@keymanapp/common-types';
+import { CommonTypesMessages, CompilerErrorNamespace } from '@keymanapp/developer-utils';
 import { AnalyzerMessages } from '@keymanapp/kmc-analyze';
 import { KeyboardInfoCompilerMessages } from '@keymanapp/kmc-keyboard-info';
 import { KmnCompilerMessages, KmwCompilerMessages } from '@keymanapp/kmc-kmn';
-import { LdmlKeyboardCompilerMessages } from '@keymanapp/kmc-ldml';
+import { LdmlCompilerMessages } from '@keymanapp/kmc-ldml';
 import { ModelCompilerMessages } from '@keymanapp/kmc-model';
 import { ModelInfoCompilerMessages } from '@keymanapp/kmc-model-info';
 import { PackageCompilerMessages } from '@keymanapp/kmc-package';
 import { InfrastructureMessages } from './infrastructureMessages.js';
+import { ConverterMessages } from '@keymanapp/kmc-convert';
 
 // Maps every compiler error namespace to the corresponding implementation
 const messageNamespaces: Record<CompilerErrorNamespace, any> = {
-  [CompilerErrorNamespace.LdmlKeyboardCompiler]: LdmlKeyboardCompilerMessages,
+  [CompilerErrorNamespace.LdmlKeyboardCompiler]: LdmlCompilerMessages,
   [CompilerErrorNamespace.CommonTypes]: CommonTypesMessages,
   [CompilerErrorNamespace.KmnCompiler]: KmnCompilerMessages,
   [CompilerErrorNamespace.ModelCompiler]: ModelCompilerMessages,
@@ -20,11 +21,12 @@ const messageNamespaces: Record<CompilerErrorNamespace, any> = {
   [CompilerErrorNamespace.KmwCompiler]: KmwCompilerMessages,
   [CompilerErrorNamespace.ModelInfoCompiler]: ModelInfoCompilerMessages,
   [CompilerErrorNamespace.KeyboardInfoCompiler]: KeyboardInfoCompilerMessages,
+  [CompilerErrorNamespace.Converter]: ConverterMessages,
 };
 
 // This works around pain points in enumerating enum members in Typescript
 // ref https://www.totaltypescript.com/iterate-over-object-keys-in-typescript
-export const messageNamespaceKeys = Object.keys(messageNamespaces).map(v => Number.parseInt(v));
+export const messageNamespaceKeys = Object.keys(messageNamespaces).map(v => Number.parseInt(v) as CompilerErrorNamespace);
 
 export type CompilerMessageSource = {
   module: string;
@@ -33,7 +35,7 @@ export type CompilerMessageSource = {
 
 // TODO: consolidate with messageNamespaces above
 export const messageSources: Record<CompilerErrorNamespace, CompilerMessageSource> = {
-  [CompilerErrorNamespace.LdmlKeyboardCompiler]: { module: 'kmc-ldml',          class: LdmlKeyboardCompilerMessages },
+  [CompilerErrorNamespace.LdmlKeyboardCompiler]: { module: 'kmc-ldml',          class: LdmlCompilerMessages },
   [CompilerErrorNamespace.CommonTypes]:          { module: 'common-types',      class: CommonTypesMessages },
   [CompilerErrorNamespace.KmnCompiler]:          { module: 'kmc-kmn',           class: KmnCompilerMessages },
   [CompilerErrorNamespace.ModelCompiler]:        { module: 'kmc-model',         class: ModelCompilerMessages },
@@ -43,4 +45,5 @@ export const messageSources: Record<CompilerErrorNamespace, CompilerMessageSourc
   [CompilerErrorNamespace.KmwCompiler]:          { module: 'kmc-kmn',           class: KmwCompilerMessages },
   [CompilerErrorNamespace.ModelInfoCompiler]:    { module: 'kmc-model-info',    class: ModelInfoCompilerMessages },
   [CompilerErrorNamespace.KeyboardInfoCompiler]: { module: 'kmc-keyboard-info', class: KeyboardInfoCompilerMessages },
+  [CompilerErrorNamespace.Converter]:            { module: 'kmc-convert',       class: ConverterMessages },
 };

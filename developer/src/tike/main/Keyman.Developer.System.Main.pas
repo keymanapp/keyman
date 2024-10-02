@@ -52,7 +52,7 @@ end;
 
 procedure RunWithExceptionsHandled;
 begin
-  FInitializeCEF := TCEFManager.Create;
+  FInitializeCEF := TCEFManager.Create(True);
   try
     if GlobalCEFApp.ProcessType = ptBrowser then
     begin

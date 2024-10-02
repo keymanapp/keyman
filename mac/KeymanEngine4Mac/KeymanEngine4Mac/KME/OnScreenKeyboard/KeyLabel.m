@@ -12,13 +12,13 @@
 @implementation KeyLabel
 
 - (id)initWithFrame:(NSRect)frameRect {
-    [KeyLabel setCellClass:[KeyLabelCell class]];
-    self = [super initWithFrame:frameRect];
-    if (self) {
-        //
-    }
-    
-    return self;
+  [KeyLabel setCellClass:[KeyLabelCell class]];
+  self = [super initWithFrame:frameRect];
+  if (self) {
+    //
+  }
+  
+  return self;
 }
 
 @end

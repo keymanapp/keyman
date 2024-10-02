@@ -1,0 +1,58 @@
+name: build-binary-packages
+description: |
+  Build binary packages
+inputs:
+  dist:
+    description: 'dist to build binary packages for'
+    required: true
+  arch:
+    description: 'the architecture'
+    required: false
+    default: 'amd64'
+  version:
+    description: 'The Keyman version'
+    required: true
+  prerelease_tag:
+    description: 'The prerelease tag'
+    required: true
+  deb_fullname:
+    description: 'The full name used for the packages'
+    required: true
+  deb_email:
+    description: 'The email address used for the packages'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - name: Download Artifacts
+      uses: actions/download-artifact@6b208ae046db98c579e8a3aa621ab581ff575935 # v4.1.1
+      with:
+        name: keyman-srcpkg
+        path: artifacts/keyman-srcpkg
+
+    - name: Build
+      uses: sillsdev/gha-ubuntu-packaging@7b56f50d5d5537e9e9cafd3f6139ec6da69cfcda # v1.1
+      with:
+        dist: "${{ inputs.dist }}"
+        platform: "${{ inputs.arch }}"
+        source_dir: "artifacts/keyman-srcpkg"
+        sourcepackage: "keyman_${{ inputs.version }}-1.dsc"
+        deb_fullname: ${{inputs.deb_fullname}}
+        deb_email: ${{inputs.deb_email}}
+        prerelease_tag: ${{ inputs.prerelease_tag }}
+
+    - name: Output resulting .deb files
+      shell: bash
+      run: |
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        echo "$(find artifacts/ -name \*.deb)" >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+
+    - name: Store binary packages
+      uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 # v4.3.0
+      with:
+        name: keyman-binarypkgs-${{ inputs.dist }}_${{ inputs.arch }}
+        path: |
+          artifacts/*
+          !artifacts/keyman-srcpkg/
+      if: always()

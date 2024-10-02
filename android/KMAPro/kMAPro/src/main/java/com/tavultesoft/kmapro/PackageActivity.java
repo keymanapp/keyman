@@ -112,7 +112,8 @@ public class PackageActivity extends AppCompatActivity implements
 
     // Number of languages associated with the first keyboard in a keyboard package.
     // lexical-model packages will be 0
-    final int languageCount = kmpProcessor.getLanguageCount(pkgInfo, PackageProcessor.PP_KEYBOARDS_KEY, 0);
+    final int languageCount = (keyboardCount > 0) ?
+      kmpProcessor.getLanguageCount(pkgInfo, PackageProcessor.PP_KEYBOARDS_KEY, 0) : 0;
 
     // Sanity check for keyboard packages
     if (pkgTarget.equals(PackageProcessor.PP_TARGET_KEYBOARDS)) {
@@ -180,6 +181,7 @@ public class PackageActivity extends AppCompatActivity implements
 
   @Override
   public void onBackPressed() {
+    super.onBackPressed();
     finish();
     overridePendingTransition(0, android.R.anim.fade_out);
   }

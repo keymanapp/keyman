@@ -7,7 +7,7 @@
       "baseUrl": ".",
     },
   "include": [
-    "index.ts",
     "src/**/*.ts",
+    "src/deps/xml2js/*.js",
   ],
 }

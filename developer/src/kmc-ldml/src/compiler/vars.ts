@@ -1,6 +1,6 @@
 import { SectionIdent, constants } from "@keymanapp/ldml-keyboard-constants";
-import { KMXPlus, LDMLKeyboard, CompilerCallbacks, MarkerParser } from '@keymanapp/common-types';
-import { VariableParser } from '@keymanapp/common-types';
+import { KMXPlus, VariableParser, MarkerParser } from '@keymanapp/common-types';
+import { LDMLKeyboard, CompilerCallbacks } from '@keymanapp/developer-utils';
 import { SectionCompiler } from "./section-compiler.js";
 import Vars = KMXPlus.Vars;
 import StringVarItem = KMXPlus.StringVarItem;
@@ -8,7 +8,7 @@ import SetVarItem = KMXPlus.SetVarItem;
 import UnicodeSetItem = KMXPlus.UnicodeSetItem;
 import DependencySections = KMXPlus.DependencySections;
 import LDMLKeyboardXMLSourceFile = LDMLKeyboard.LDMLKeyboardXMLSourceFile;
-import { CompilerMessages } from "./messages.js";
+import { LdmlCompilerMessages } from "./ldml-compiler-messages.js";
 import { KeysCompiler } from "./keys.js";
 import { TransformCompiler } from "./tran.js";
 import { DispCompiler } from "./disp.js";
@@ -87,7 +87,7 @@ export class VarsCompiler extends SectionCompiler {
           if (setrefs.length > 1) {
             // this is the form $[seta]$[setb]
             valid = false;
-            this.callbacks.reportMessage(CompilerMessages.Error_NeedSpacesBetweenSetVariables({ item }));
+            this.callbacks.reportMessage(LdmlCompilerMessages.Error_NeedSpacesBetweenSetVariables({ item }));
           } else {
             st.set.add(SubstitutionUse.variable, setrefs); // the reference to a 'map'
           }
@@ -106,7 +106,7 @@ export class VarsCompiler extends SectionCompiler {
             valid = false;
             if (allSets.has(id2)) {
               // $[set] in a UnicodeSet must be another UnicodeSet.
-              this.callbacks.reportMessage(CompilerMessages.Error_CantReferenceSetFromUnicodeSet({ id: id2 }));
+              this.callbacks.reportMessage(LdmlCompilerMessages.Error_CantReferenceSetFromUnicodeSet({ id: id2 }));
             } else {
               st.uset.add(SubstitutionUse.variable, [id2]);
             }
@@ -116,7 +116,7 @@ export class VarsCompiler extends SectionCompiler {
     }
     // one report if any dups
     if (dups.size > 0) {
-      this.callbacks.reportMessage(CompilerMessages.Error_DuplicateVariable({
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_DuplicateVariable({
         ids: Array.from(dups.values()).sort().join(', ')
       }));
       valid = false;
@@ -128,19 +128,19 @@ export class VarsCompiler extends SectionCompiler {
       // intended. collisions are handled separately.
       if (!allSets.has(id) && !allUnicodeSets.has(id)) {
         valid = false;
-        this.callbacks.reportMessage(CompilerMessages.Error_MissingSetVariable({ id }));
+        this.callbacks.reportMessage(LdmlCompilerMessages.Error_MissingSetVariable({ id }));
       }
     }
     for (const id of st.string.all) {
       if (!allStrings.has(id)) {
         valid = false;
-        this.callbacks.reportMessage(CompilerMessages.Error_MissingStringVariable({ id }));
+        this.callbacks.reportMessage(LdmlCompilerMessages.Error_MissingStringVariable({ id }));
       }
     }
     for (const id of st.uset.all) {
       if (!allUnicodeSets.has(id)) {
         valid = false;
-        this.callbacks.reportMessage(CompilerMessages.Error_MissingUnicodeSetVariable({ id }));
+        this.callbacks.reportMessage(LdmlCompilerMessages.Error_MissingUnicodeSetVariable({ id }));
       }
     }
 
@@ -179,7 +179,7 @@ export class VarsCompiler extends SectionCompiler {
 
     // report once
     if (matchedNotEmitted.size > 0) {
-      this.callbacks.reportMessage(CompilerMessages.Error_MissingMarkers({ ids: Array.from(matchedNotEmitted.values()).sort() }));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_MissingMarkers({ ids: Array.from(matchedNotEmitted.values()).sort() }));
       valid = false;
     }
 
@@ -192,6 +192,9 @@ export class VarsCompiler extends SectionCompiler {
   validateSubstitutions(keyboard: LDMLKeyboard.LKKeyboard, st : Substitutions) : boolean {
     keyboard?.variables?.string?.forEach(({value}) =>
           st.markers.add(SubstitutionUse.variable, MarkerParser.allReferences(value)));
+    // get markers mentioned in a set
+    keyboard?.variables?.set?.forEach(({ value }) =>
+      VariableParser.setSplitter(value).forEach(v => st.markers.add(SubstitutionUse.match, MarkerParser.allReferences(v))));
     return true;
   }
 
@@ -208,8 +211,6 @@ export class VarsCompiler extends SectionCompiler {
     // first, strings.
     variables?.string?.forEach((e) =>
       this.addString(result, e, sections));
-    variables?.set?.forEach((e) =>
-      this.addSet(result, e, sections));
     variables?.uset?.forEach((e) =>
       this.addUnicodeSet(result, e, sections));
 
@@ -221,6 +222,10 @@ export class VarsCompiler extends SectionCompiler {
     // collect all markers, excluding the match-all
     const allMarkers : string[] = Array.from(mt.all).filter(m => m !== MarkerParser.ANY_MARKER_ID).sort();
     result.markers = sections.list.allocList(allMarkers, {}, sections);
+
+    // sets need to be added late, because they can refer to markers
+    variables?.set?.forEach((e) =>
+      this.addSet(result, e, sections));
 
     return result.valid() ? result : null;
   }
@@ -240,8 +245,13 @@ export class VarsCompiler extends SectionCompiler {
     value = result.substituteStrings(value, sections);
     // OK to do this as a substitute, because we've already validated the set above.
     value = result.substituteSets(value, sections);
-    const items : string[] = VariableParser.setSplitter(value);
-    result.sets.push(new SetVarItem(id, items, sections));
+    // raw items - without marker substitution
+    const rawItems: string[] = VariableParser.setSplitter(value);
+    // cooked items - has substutition of markers
+    // this is not 'forMatch', all variables are to be assumed as string literals, not regex
+    // content.
+    const cookedItems: string[] = rawItems.map(v => result.substituteMarkerString(v, false));
+    result.sets.push(new SetVarItem(id, cookedItems, sections, rawItems));
   }
   addUnicodeSet(result: Vars, e: LDMLKeyboard.LKUSet, sections: DependencySections): void {
     const { id } = e;

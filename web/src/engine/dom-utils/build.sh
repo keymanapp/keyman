@@ -1,19 +1,12 @@
 #!/usr/bin/env bash
-#
-
-# set -x
-set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../../resources/build/build-utils.sh"
+. "${THIS_SCRIPT%/*}/../../../../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
-
-# This script runs from its own folder
-cd "$THIS_SCRIPT_PATH"
 
 # Imports common Web build-script definitions & functions
 SUBPROJECT_NAME=engine/dom-utils
@@ -22,8 +15,8 @@ SUBPROJECT_NAME=engine/dom-utils
 # ################################ Main script ################################
 
 builder_describe "Builds DOM-utility modules used by the Keyman Engine for Web (KMW)." \
-  "@/common/web/utils" \
-  "@/common/web/keyboard-processor" \
+  "@/web/src/engine/common/web-utils" \
+  "@/web/src/engine/keyboard" \
   "clean" \
   "configure" \
   "build" \

@@ -1,12 +1,12 @@
 import { DeviceSpec } from '@keymanapp/web-utils';
-import type { PredictionContext, StateChangeEnum } from '@keymanapp/input-processor';
+import type { PredictionContext, StateChangeEnum } from 'keyman/engine/interfaces';
 import { ImageBanner } from './imageBanner.js';
 import { SuggestionBanner } from './suggestionBanner.js';
 import { BannerView } from './bannerView.js';
 import { Banner } from './banner.js';
 import { BlankBanner } from './blankBanner.js';
 import { HTMLBanner } from './htmlBanner.js';
-import { Keyboard, KeyboardProperties } from '@keymanapp/keyboard-processor';
+import { Keyboard, KeyboardProperties } from 'keyman/engine/keyboard';
 
 export class BannerController {
   private container: BannerView;
@@ -68,8 +68,6 @@ export class BannerController {
    * @param on   Whether prediction is active (`true`) or disabled (`false`).
    */
   public activateBanner(on: boolean) {
-    let banner: Banner;
-
     const oldBanner = this.container.banner;
     if(oldBanner instanceof SuggestionBanner) {
       // Frees all handlers, etc registered previously by the banner.
@@ -79,7 +77,7 @@ export class BannerController {
     if(!on) {
       this.container.banner = this.inactiveBanner;
     } else {
-      let suggestBanner = banner = new SuggestionBanner(this.hostDevice, this.container.activeBannerHeight);
+      let suggestBanner = new SuggestionBanner(this.hostDevice, this.container.activeBannerHeight);
       suggestBanner.predictionContext = this.predictionContext;
 
       // Registers for prediction-engine events & handles its needed connections.

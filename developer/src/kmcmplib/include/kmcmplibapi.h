@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 #include <fstream>
 #include <vector>
 
@@ -53,6 +55,14 @@ struct KMCMP_COMPILER_RESULT_EXTRA_GROUP {
   std::string name;
 };
 
+struct KMCMP_COMPILER_RESULT_MESSAGE {
+  unsigned int errorCode;
+  int lineNumber;
+  int columnNumber;
+  std::string filename;
+  std::vector<std::string> parameters;
+};
+
 #define COMPILETARGETS_KMX     0x01
 #define COMPILETARGETS_JS      0x02
 #define COMPILETARGETS__MASK   0x03
@@ -75,19 +85,8 @@ struct KMCMP_COMPILER_RESULT {
 /**
  * @param szText UTF-8 string
 */
-typedef int (*kmcmp_CompilerMessageProc)(int line, uint32_t dwMsgCode, const char* szText, void* context);
-
-// parameters in UTF-8
-// TODO typical usage:
-// if(!kmcmp_LoadFileProc("filename.ico", "/tmp/filename.kmn", nullptr, &size)) {
-//   return error;
-// }
-// buf = new unsigned char[size];
-// if(!kmcmp_LoadFileProc("filename.ico", "/tmp/filename.kmn", buf, &size)) {
-//   delete[] buf;
-//   return error;
-// }
-typedef bool (*kmcmp_LoadFileProc)(const char* loadFilename, const char* baseFilename, void* buffer, int* bufferSize, void* context);
+typedef void (*kmcmp_CompilerMessageProc)(const KMCMP_COMPILER_RESULT_MESSAGE &message, void* context);
+typedef const std::vector<uint8_t> (*kmcmp_LoadFileProc)(const std::string& loadFilename, const std::string& baseFilename);
 
 /**
  * @param pszInfile  UTF-8 path to file.kmn

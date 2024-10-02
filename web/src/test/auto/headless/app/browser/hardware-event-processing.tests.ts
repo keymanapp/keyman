@@ -1,18 +1,17 @@
 import { assert } from 'chai';
-import sinon from 'sinon';
 
 import { preprocessKeyboardEvent } from 'keyman/app/browser';
 import { processForMnemonicsAndLegacy } from 'keyman/engine/main';
 import { PhysicalInputEventSpec } from '@keymanapp/recorder-core';
 import { DeviceSpec } from '@keymanapp/web-utils';
-import { Codes, Keyboard, KeyEvent } from '@keymanapp/keyboard-processor';
+import { Codes, Keyboard, KeyEvent } from 'keyman/engine/keyboard';
 
 const ModifierCodes = Codes.modifierCodes;
 const KeyCodes = Codes.keyCodes;
 
 const DUMMY_DEVICE = new DeviceSpec('chrome', 'desktop', 'windows', false);
 
-// Compare and contrast the unit tests here with those for keyboard-processor unit testing
+// Compare and contrast the unit tests here with those for keyboard unit testing
 // in the non-positional-rules set; the output objects here should have the same format
 // as the inputs for rules as used there.
 

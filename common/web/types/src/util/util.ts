@@ -1,3 +1,6 @@
+import { MATCH_HEX_ESCAPE, CONTAINS_QUAD_ESCAPE, MATCH_QUAD_ESCAPE } from './consts.js';
+export { MATCH_HEX_ESCAPE, CONTAINS_QUAD_ESCAPE, MATCH_QUAD_ESCAPE };
+
 /**
  * xml2js will not place single-entry objects into arrays. Easiest way to fix
  * this is to box them ourselves as needed. Ensures that o.x is an array.
@@ -15,18 +18,6 @@ export function boxXmlArray(o: any, x: string): void {
     }
   }
 }
-
-// TODO-LDML: #7569 the below regex works, but captures more than it should
-// (it would include \u{fffffffffffffffff } which
-// is overlong and has a space at the end.) The second regex does not work yet.
-export const MATCH_HEX_ESCAPE = /\\u{([0-9a-fA-F ]{1,})}/g;
-// const MATCH_HEX_ESCAPE = /\\u{((?:(?:[0-9a-fA-F]{1,5})|(?:10[0-9a-fA-F]{4})(?: (?!}))?)+)}/g;
-
-/** regex for single quad escape such as \u0127 or \U00000000 */
-export const CONTAINS_QUAD_ESCAPE = /(?:\\u([0-9a-fA-F]{4})|\\U([0-9a-fA-F]{8}))/;
-
-/** regex for single quad escape such as \u0127 */
-export const MATCH_QUAD_ESCAPE = new RegExp(CONTAINS_QUAD_ESCAPE, 'g');
 
 export class UnescapeError extends Error {
 }
@@ -127,7 +118,7 @@ export function escapeRegexChar(ch: string) {
 }
 
 /** chars that must be escaped: syntax, C0 + C1 controls */
-const REGEX_SYNTAX_CHAR = /^[\u0000-\u001F\u007F-\u009F{}\[\]\\?.^$*()/-]$/;
+const REGEX_SYNTAX_CHAR = /^[\u0000-\u001F\u007F-\u009F{}\[\]\\?|.^$*()/+-]$/;
 
 function escapeRegexCharIfSyntax(ch: string) {
   // escape if syntax or not valid
@@ -148,6 +139,13 @@ function regexOne(hex: string): string {
   // re-escape as 16 or 32 bit code units
   return Array.from(unescaped).map(ch => escapeRegexCharIfSyntax(ch)).join('');
 }
+/**
+ * Escape a string (\uxxxx form) if there are any problematic codepoints
+ */
+export function escapeStringForRegex(s: string) : string {
+  return s.split('').map(ch => escapeRegexCharIfSyntax(ch)).join('');
+}
+
 /**
  * Unescapes a string according to UTS#18§1.1, see <https://www.unicode.org/reports/tr18/#Hex_notation>
  * @param s escaped string
@@ -242,14 +240,14 @@ const Uni_PUA_16_END   = 0x10FFFD;
  * @brief True if a lead surrogate
  * \def Uni_IsSurrogate1
  */
-function Uni_IsSurrogate1(ch : number) {
+export function Uni_IsSurrogate1(ch : number) {
   return ((ch) >= Uni_LEAD_SURROGATE_START && (ch) <= Uni_LEAD_SURROGATE_END);
 }
 /**
  * @brief True if a trail surrogate
  * \def Uni_IsSurrogate2
  */
-function Uni_IsSurrogate2(ch : number) {
+export function Uni_IsSurrogate2(ch : number) {
   return ((ch) >= Uni_TRAIL_SURROGATE_START && (ch) <= Uni_TRAIL_SURROGATE_END);
 }
 
@@ -257,7 +255,7 @@ function Uni_IsSurrogate2(ch : number) {
  * @brief True if any surrogate
  * \def UniIsSurrogate
 */
-function Uni_IsSurrogate(ch : number) {
+export function Uni_IsSurrogate(ch : number) {
   return (Uni_IsSurrogate1(ch) || Uni_IsSurrogate2(ch));
 }
 

@@ -23,8 +23,6 @@
 
 typedef void(^PostEventCallback)(CGEventRef eventToPost);
 
-extern NSString *const kKMSelectedKeyboardKey;
-extern NSString *const kKMActiveKeyboardsKey;
 extern NSString *const kKeymanKeyboardDownloadCompletedNotification;
 
 typedef struct {
@@ -97,11 +95,9 @@ static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX = 0;
 @property (nonatomic, assign) BOOL useNullChar;
 @property (nonatomic, assign) BOOL debugMode;
 
-- (void)logDebugMessage:(NSString *)format, ...;
 - (NSMenu *)menu;
 - (void)saveActiveKeyboards;
-- (void)readPersistedOptions;
-- (void)writePersistedOptions:(NSString *)storeKey withValue:(NSString* )value;
+- (void)applyPersistedOptions;
 - (void)showAboutWindow;
 - (void)showOSK;
 - (void)showConfigurationWindow;
@@ -127,7 +123,6 @@ static const int KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX = 0;
 - (NSString *)oskWindowTitle;
 - (void)postKeyboardEventWithSource: (CGEventSourceRef)source code:(CGKeyCode) virtualKey postCallback:(PostEventCallback)postEvent;
 - (KeymanVersionInfo)versionInfo;
-- (NSString *)keymanDataPath;
 - (void)registerConfigurationWindow:(NSWindowController *)window;
 @end
 

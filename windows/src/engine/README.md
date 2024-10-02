@@ -11,6 +11,14 @@ The installation merge module database for the Keyman Engine.
 
 Host application for the Keyman Engine. Shows the Keyman icon, Keyman menu, OSK, and handles language switching etc, as well as running the windows hooks to capture and translate keystrokes.
 
+## keyman32 - keyman32.dll, keyman64.dll
+
+Main keyboard processing library and hook library (x86, x64).
+
+## keymanmc - keymanmc.dll
+
+Message library for Windows events.
+
 ## keymanx64 - keymanx64.exe
 
 64-bit version of keyman.exe. All UI is in keyman.exe, so this is a thin wrapper around the keyman32 build.
@@ -31,6 +39,10 @@ Architecturally it sits between the TSF Manager and Keyman.exe
 ## mcompile - mcompile.exe
 
 A tool to recompile keyboard layouts after install to map to various European Latin script keyboard layouts
+
+## testhost - testhost.exe
+
+Test application to allow simple debugging of keystroke processing (not distributed)
 
 ## tsysinfo - tsysinfo.exe & tsysinfox64.exe
 

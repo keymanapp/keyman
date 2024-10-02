@@ -1,0 +1,19 @@
+{
+  "extends": "../../../../../../tsconfig.base.json",
+  "compilerOptions": {
+    // The Worker class needs access to the `new` keyword, else Node will throw an
+    // error when constructing the Worker for unit tests.  ES6 is sufficient.
+    "target": "ES6",
+    "types": ["node"],
+    "baseUrl": "../",
+    "outDir": "../../build/obj",
+    "tsBuildInfoFile": "../../build/obj/node/tsconfig.tsbuildinfo",
+    "rootDir": "../"
+  },
+  "include": [
+    "*.ts"
+  ],
+  "references": [
+    { "path": "../tsconfig.json" }
+  ]
+}

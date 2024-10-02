@@ -77,16 +77,52 @@ PATH="$HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin:$PATH"
 
 ## KeymanWeb Dependencies
 
-* node.js 18+, emscripten, openjdk 8
+* node.js, emscripten 3.1.46 or later
 
-```shell
-brew install node emscripten openjdk@8
+### node.js
+
+Our recommended way to install node.js is with
+[nvm](https://github.com/nvm-sh/nvm). This makes it easy to switch between
+versions of node.js.
+
+Alternatively, you can install node.js with `brew`.
+
+See [node.md](node.md) for more information.
+
+### emscripten
+
+The recommended way to install emscripten is with the official method, as that
+then allows the build scripts to select the appropriate version automatically.
+
+To install emscripten, `cd` to an appropriate path, and then:
+
+```bash
+git clone https://github.com/emscripten-core/emsdk
+cd emsdk
+emsdk install 3.1.58
+emsdk activate 3.1.58
+export EMSCRIPTEN_BASE="$(pwd)/upstream/emscripten"
+echo "export EMSCRIPTEN_BASE=\"$EMSCRIPTEN_BASE\"" >> .bashrc
 ```
 
-Note: if you install emscripten with brew on macOS, only emscripten binaries are
-added to the path via symlinks. This makes it reasonably safe to have emscripten
-on the path, unlike on other platforms where emscripten also ends up adding its
-versions of node, python, and other binaries to the path.
+You will want to add `EMSCRIPTEN_BASE` to your .bashrc.
+
+> ![WARNING]
+> Don't put EMSDK on the path, i.e. don't source `emsdk_env.sh`.
+>
+> Emscripten very unhelpfully overwrites `JAVA_HOME`, and adds its own
+> versions of Python, Node and Java to the `PATH`. For best results, restart
+> your shell after installing Emscripten so that you don't end up with the
+> wrong versions.
+
+**Optional environment variables**:
+
+To let the Keyman build scripts control the version of Emscripten installed on
+your computer:
+
+```shell
+export KEYMAN_USE_EMSDK=1
+```
 
 ## Keyman for iOS Dependencies
 

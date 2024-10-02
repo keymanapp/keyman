@@ -7,11 +7,11 @@ BOOL SetupCoreEnvironment(km_core_option_item **core_environment) {
 
   items[0].scope = KM_CORE_OPT_ENVIRONMENT;
   items[0].key = KM_CORE_KMX_ENV_BASELAYOUT;
-  items[0].value = reinterpret_cast<km_core_cp*>(Globals::get_BaseKeyboardName());
+  items[0].value = reinterpret_cast<km_core_cu*>(Globals::get_BaseKeyboardName());
 
   items[1].scope = KM_CORE_OPT_ENVIRONMENT;
   items[1].key = KM_CORE_KMX_ENV_BASELAYOUTALT;
-  items[1].value = reinterpret_cast<km_core_cp*>(Globals::get_BaseKeyboardNameAlt());
+  items[1].value = reinterpret_cast<km_core_cu*>(Globals::get_BaseKeyboardNameAlt());
 
   items[2].scope = KM_CORE_OPT_ENVIRONMENT;
   items[2].key = KM_CORE_KMX_ENV_SIMULATEALTGR;

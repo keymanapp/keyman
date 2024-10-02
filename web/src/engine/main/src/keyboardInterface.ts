@@ -1,7 +1,6 @@
-import {
-  KeyboardInterface as KeyboardInterfaceBase,
-} from "@keymanapp/keyboard-processor";
-import { KeyboardStub, RawKeyboardStub, toUnprefixedKeyboardId as unprefixed } from 'keyman/engine/package-cache';
+import { KeyboardObject } from "keyman/engine/keyboard";
+import { KeyboardInterface as KeyboardInterfaceBase } from 'keyman/engine/js-processor';
+import { KeyboardStub, RawKeyboardStub, toUnprefixedKeyboardId as unprefixed } from 'keyman/engine/keyboard-storage';
 
 import { ContextManagerBase } from './contextManagerBase.js';
 import { VariableStoreCookieSerializer } from "./variableStoreCookieSerializer.js";
@@ -46,7 +45,7 @@ export default class KeyboardInterface<ContextManagerType extends ContextManager
     }
   }
 
-  registerKeyboard(Pk): void {
+  registerKeyboard(Pk: KeyboardObject): void {
     // Among other things, sets Pk as a newly-active Keyboard.
     super.registerKeyboard(Pk);
     const registeredKeyboard = this.loadedKeyboard;

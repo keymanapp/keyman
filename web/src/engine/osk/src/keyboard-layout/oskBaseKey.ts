@@ -1,13 +1,11 @@
-import { ActiveKey, Codes, DeviceSpec } from '@keymanapp/keyboard-processor';
-import { landscapeView } from 'keyman/engine/dom-utils';
+import { ActiveKey, Codes } from 'keyman/engine/keyboard';
 
-import OSKKey, { renameSpecialKey } from './oskKey.js';
+import OSKKey, { KeyLayoutParams, renameSpecialKey } from './oskKey.js';
 import { KeyData, KeyElement, link } from '../keyElement.js';
 import OSKRow from './oskRow.js';
 import VisualKeyboard from '../visualKeyboard.js';
 import { ParsedLengthStyle } from '../lengthStyle.js';
 import { GesturePreviewHost } from './gesturePreviewHost.js';
-
 
 export default class OSKBaseKey extends OSKKey {
   private capLabel: HTMLDivElement;
@@ -197,29 +195,16 @@ export default class OSKBaseKey extends OSKKey {
     this.btn.replaceChild(this.preview, oldPreview);
   }
 
-  public refreshLayout(vkbd: VisualKeyboard) {
-    let key = this.spec as ActiveKey;
-    this.square.style.width = vkbd.layoutWidth.scaledBy(key.proportionalWidth).styleString;
-    this.square.style.marginLeft = vkbd.layoutWidth.scaledBy(key.proportionalPad).styleString;
-    this.btn.style.width = vkbd.usesFixedWidthScaling ? this.square.style.width : '100%';
+  public refreshLayout(layoutParams: KeyLayoutParams) {
+    super.refreshLayout(layoutParams);  // key labels in particular.
 
-    if(vkbd.usesFixedHeightScaling) {
-      // Matches its row's height.
-      this.square.style.height = vkbd.internalHeight.scaledBy(this.row.heightFraction).styleString;
-    } else {
-      this.square.style.height = '100%'; // use the full row height
-    }
-
-    super.refreshLayout(vkbd);
-
-    const device = vkbd.device;
-    const resizeLabels = (device.OS == DeviceSpec.OperatingSystem.iOS &&
-                          device.formFactor == DeviceSpec.FormFactor.Phone
-                          && landscapeView());
-
-    // Rescale keycap labels on iPhone (iOS 7)
-    if(resizeLabels && this.capLabel) {
+    const emFont = layoutParams.baseEmFontSize;
+    // Rescale keycap labels on small phones
+    if(emFont.val < 12) {
       this.capLabel.style.fontSize = '6px';
+    } else {
+      // The default value set within kmwosk.css.
+      this.capLabel.style.fontSize = ParsedLengthStyle.forScalar(0.5).styleString;
     }
   }
 

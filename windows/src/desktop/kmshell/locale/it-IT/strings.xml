@@ -46,6 +46,10 @@
   <string name="SKButtonCancel" comment="Cancel button in message boxes">Annulla</string>
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
+  <!-- Introduced: 16.0.47 -->
+  <string name="SKAddremove" comment="Add or Remove languages button opens a dialog window">Aggiungi/rimuovi lingua...</string>
+  <!-- Context: Formatted Messages -->
+  <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.330.0 -->
   <string name="SKBalloonClickToSelectKeyboard" comment="Balloon that shows when Keyman icon is first shown during the tutorial">Fare clic su questa icona per selezionare una tastiera</string>
   <!-- Context: Formatted Messages -->
@@ -64,6 +68,18 @@
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.239.0 -->
   <string name="S_Caption_Help" comment="Configuration dialog link to Help">Aiuto</string>
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47.0 -->
+  <string name="S_Caption_Uninstall" comment="Configuration dialog link to Uninstall Keyboard">Disinstalla</string>
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47.0 -->
+  <string name="S_Caption_Enable" comment="Configuration dialog link to Enable Keyboard">Abilita</string>
+  <!-- Context: Configuration Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47.0 -->
+  <string name="S_Caption_Disable" comment="Configuration dialog link to Disable Keyboard">Disabilita</string>
   <!-- Context: Configuration Dialog - Tab names -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -174,6 +190,10 @@
   <string name="S_Languages_Install" comment="Add language profile">Aggiungi lingua</string>
   <!-- Context: Configuration Dialog - Captions -->
   <!-- String Type: PlainText -->
+  <!-- Introduced: 16.0.47 -->
+  <string name="S_Languages_Addremove" comment="Title for dialog to add or remove languages for keyboard layout">Aggiungi/rimuovi lingua</string>
+  <!-- Context: Configuration Dialog - Captions -->
+  <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Caption_OnScreenKeyboard" comment="Term for the On Screen Keyboard">Tastiera A Schermo:</string>
   <!-- Context: Configuration Dialog - Captions -->
@@ -223,7 +243,7 @@
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.287.0 -->
-  <string name="S_Menu_Options" comment="KL option button submenu - keyboard options">Opzioni tastiera</string>
+  <string name="S_Menu_Options" comment="KL option button submenu - keyboard options">Opzioni tastiera…</string>
   <!-- Context: Configuration Dialog - Keyboard Layouts tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -273,6 +293,10 @@
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="koAltGrCtrlAlt" comment="General options - Ctrl+Alt simulates AltGr on computers without AltGr">Simula AltGr con Ctrl+Alt</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 18.0.95 -->
+  <string name="koRightModifierHK" comment="General options - Right Ctrl Alt and Shift trigger hotkey">Allow right modifier for hotkeys</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 9.0.480.0 -->
@@ -341,7 +365,7 @@
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="S_Hotkey_None" comment="Hotkey - text used when no hotkey set for an option">(nessuno)</string>
+  <string name="S_Hotkey_None" comment="Hotkey - text used when no hotkey set">(Nessun tasto)</string>
   <!-- Context: Configuration Dialog - Hotkeys tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -398,6 +422,14 @@
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Support_Copyright" comment="Support - Product Copyright">Copyright © SIL International. Tutti I Diritti Riservati.</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.94.0 -->
+  <string name="S_Support_CreatedBySILGlobal" comment="Created by {SIL Global} ">Created by %1$s</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.94.0 -->
+  <string name="S_Support_CopyrightSILGlobal" comment="Copyright © {SIL Global}. All Rights Reserved.">Copyright © %1$s. All Rights Reserved.</string>
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -590,11 +622,14 @@ che usi in Windows. Le tastiere Keyman si adatteranno automaticamente al layout 
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.288.0 -->
-  <string name="S_Splash_Name" comment="Splash major title">Keyman</string>
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.294.0 -->
   <string name="S_Splash_Start" comment="Start Keyman button">Avvia Keyman</string>
+  <!-- Context: Splash Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0 -->
+  <string name="S_Splash_Start_2" comment="Start {Keyman} button">Start %1$s</string>
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.294.0 -->
@@ -638,7 +673,6 @@ che usi in Windows. Le tastiere Keyman si adatteranno automaticamente al layout 
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKShortApplicationTitle" comment="Product name">Keyman</string>
   <!-- Context: Hints -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.244.0 -->
@@ -762,7 +796,6 @@ che usi in Windows. Le tastiere Keyman si adatteranno automaticamente al layout 
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKApplicationTitle" comment="Product name used for the title of message boxes and message dialogs">Keyman</string>
   <!-- Parameters: %1$s = Version number string -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->
@@ -885,6 +918,10 @@ che usi in Windows. Le tastiere Keyman si adatteranno automaticamente al layout 
   <!-- String Type: FormatString -->
   <!-- Introduced: 8.0.294.0 -->
   <string name="S_OSK_FontHelper_ChooseKeyboard" comment="OSK Font helper choose keyboard">Seleziona una tastiera Keyman per trovare i caratteri correlati.</string>
+  <!-- Context: OSK Font Helper -->
+  <!-- String Type: FormatString -->
+  <!-- Introduced: 17.0.312.0 -->
+  <string name="S_OSK_FontHelper_NoFonts" comment="OSK Font helper no fonts found for keyboard">Nessun carattere trovato come suggerimento per la tastiera %1$s.</string>
   <!-- Context: Text Editor -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 10.0.836.0 -->

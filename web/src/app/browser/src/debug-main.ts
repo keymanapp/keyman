@@ -12,4 +12,5 @@ import { SourcemappedWorker } from '@keymanapp/lexical-model-layer/web'
  var ss = scripts[scripts.length-1].src;
  var sPath = ss.substr(0,ss.lastIndexOf('/')+1);
 
+// @ts-ignore
 window['keyman'] = new KeymanEngine(SourcemappedWorker.constructInstance(), sPath);

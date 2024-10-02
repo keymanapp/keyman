@@ -1,9 +1,9 @@
-import { isEmptyTransform, RuleBehavior } from "@keymanapp/keyboard-processor";
 import { EngineConfiguration, InitOptionSpec, InitOptionDefaults } from "keyman/engine/main";
 
 import { buildMergedTransform } from '@keymanapp/models-templates';
 
 import { type OnInsertTextFunc } from "./contextManager.js";
+import { Transform } from '@keymanapp/common-types';
 
 export class WebviewConfiguration extends EngineConfiguration {
   private _embeddingApp: string;

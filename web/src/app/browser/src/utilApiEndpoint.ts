@@ -10,6 +10,7 @@ import { DomEventTracker } from "keyman/engine/events";
 import { BrowserConfiguration, BrowserInitOptionSpec } from "./configuration.js";
 import { getStyleValue } from "./utils/getStyleValue.js";
 import { AlertHost } from "./utils/alertHost.js";
+import { PathConfiguration } from 'keyman/engine/interfaces';
 
 /**
  * Calls document.createElement for the specified node type and also applies
@@ -101,7 +102,7 @@ export class UtilApiEndpoint {
    */
   public getOption(optionName: keyof BrowserInitOptionSpec, dflt?:any): any {
     if(optionName in this.config.paths) {
-      return this.config.paths[optionName];
+      return this.config.paths[optionName as keyof PathConfiguration];
     } else if(optionName in this.config.options) {
       return this.config.options[optionName];
     } else if(arguments.length > 1) {
@@ -244,7 +245,7 @@ export class UtilApiEndpoint {
     Phandler: (ev: HTMLElementEventMap[K]) => any,
     PuseCapture?: boolean
   ): void;
-  public attachDOMEvent(Pelem: EventTarget, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
+  public attachDOMEvent(Pelem: EventTarget, Peventname: string, Phandler: (arg0: Object) => boolean, PuseCapture?: boolean): void {
     // TS can't quite track the type inference forwarding here.
     this.domEventTracker.attachDOMEvent(Pelem as any, Peventname as any, Phandler, PuseCapture);
   }
@@ -278,7 +279,7 @@ export class UtilApiEndpoint {
     Phandler: (ev: HTMLElementEventMap[K]) => any,
     PuseCapture?: boolean
   ): void;
-  public detachDOMEvent(Pelem: EventTarget, Peventname: string, Phandler: (Object) => boolean, PuseCapture?: boolean): void {
+  public detachDOMEvent(Pelem: EventTarget, Peventname: string, Phandler: (arg0: Object) => boolean, PuseCapture?: boolean): void {
     // TS can't quite track the type inference forwarding here.
     this.domEventTracker.detachDOMEvent(Pelem as any, Peventname as any, Phandler, PuseCapture);
   }

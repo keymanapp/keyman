@@ -1,0 +1,257 @@
+/* A descriptive message used for errors when the app is already busy downloading */
+"alert-download-error-busy" = "Λήψη ἤδη σὲ ἐξέλιξη.";
+
+/* A descriptive message used when a download fails */
+"alert-download-error-detail" = "Παρουσιάσθηκε σφάλμα κατὰ τὴν λήψη ἢ ἐγκατάσταση.";
+
+/* Title for a "download failed" alert */
+"alert-download-error-title" = "Σφάλμα κατὰ τὴν λήψη";
+
+/* Title for a general alert about errors */
+"alert-error-title" = "Σφάλμα";
+
+/* A descriptive message used when no internet connection is detected */
+"alert-no-connection-detail" = "Ἀδυναμία προσβάσεως στὸν διακομιστὴ Κῆμαν. Παρακαλοῦμε ξαναδοκιμάστε ἀργότερα.";
+
+/* Title for a "no connection" alert */
+"alert-no-connection-title" = "Σφάλμα συνδέσεως";
+
+/* Short text for a 'back' navigational command.  Used to return to the previous screen */
+"command-back" = "Πίσω";
+
+/* Short text for a 'cancel' command.  Used to back out of a menu or install process without making changes */
+"command-cancel" = "Ἀκυρῶστε";
+
+/* Short text for a 'done' command.  Used to back out of settings menus after changes have been made */
+"command-done" = "Ἕτοιμοι";
+
+/* Short text for an 'install' command.  Used to confirm installation of a package. */
+"command-install" = "Ἐγκαταστῆστε";
+
+/* Short text for a 'next' navigational command.  Used to advance to the next screen */
+"command-next" = "Ἑπόμενο";
+
+/* Short text for an 'OK' command.  Used for some error alerts */
+"command-ok" = "OK";
+
+/* Short text for confirmining 'uninstall' commands. */
+"command-uninstall" = "Ἀπεγκαταστῆστε";
+
+/* Text for the command to uninstall a keyboard */
+"command-uninstall-keyboard" = "Ἀπεγκαταστῆστε πληκτρολόγιο";
+
+/* Confirmation text to display before uninstalling a keyboard */
+"command-uninstall-keyboard-confirm" = "Θὰ θέλατε νὰ ἀπεγκαταστήσετε αὐτὸ τὸ πληκτρολόγιο;";
+
+/* Text for the command to uninstall a lexical model */
+"command-uninstall-lexical-model" = "Ἀπεγκαταστῆστε λεξικό";
+
+/* Confirmation text to display before uninstalling a lexical model */
+"command-uninstall-lexical-model-confirm" = "Θὰ θέλατε νὰ ἀπεγκαταστήσετε αὐτὸ τὸ λεξικό;";
+
+/* Text for error when a keyboard cannot load properly */
+"error-loading-keyboard" = "Ἀδυναμία φορτώσεως τοῦ πληκτρολογίου ποὺ ζητήσατε";
+
+/* Text for error when a lexical model cannot load properly */
+"error-loading-lexical-model" = "Ἀδυναμία φορτώσεως τοῦ λεξικοῦ ποὺ ζητήσατε";
+
+/* Text for error when an installed file is unexpectedly missing */
+"error-missing-file" = "Δὲν βρέθηκε κάποιο ἀπαιτούμενο ἀρχεῖο.";
+
+/* Text for error when an installed file is unexpectedly missing */
+"error-missing-file-critical" = "Κάποιο σημαντικὸ ἀρχεῖο δὲν εὑρέθη. Παρακαλοῦμε προσπαθῆστε νὰ ἐγκαταστήσετε ἐκ νέου τὴν ἐφαρμογή.";
+
+/* Text for errors in data received from search queries */
+"error-query-decoding" = "Αὐτὴν τὴν στιγμὴ ὑπάρχουν τεχνικὰ προβλήματα στὸν διακομιστή";
+
+/* A descriptive message used when a download fails */
+"error-query-general" = "Σημειώθηκε σφάλμα κατὰ τὴν ἐπικοινωνία μὲ τὸν διακομιστή";
+
+/* Text for error when a search query is unexpectedly empty */
+"error-query-no-data" = "Ὁ διακομιστὴς δὲν ἀποκρίθηκε";
+
+/* Text for general errors where not much information is known */
+"error-unknown" = "Σημειώθηκε ἀπροσδόκητο σφάλμα";
+
+/* Text for error when updating a resource:  cannot download because no source is available */
+"error-update-no-link" = "Δὲν ὑπάρχει πηγαῖος κώδικας πρὸς ἐνημέρωσιν αὐτοῦ τοῦ πακέτου";
+
+/* Text for error when updating a resource:  Keyman does not know how to update the resource */
+"error-update-not-managed" = "Ἀδυναμία ἐνημερώσεως πόρου μὴ διαχειριζομένου ἀπὸ μηχανὴ Keyman";
+
+/* Text for the command to open the help page of a keyboard, as shown on resource information views */
+"info-command-help-keyboard" = "Βοήθεια γιὰ τὸ πληκτρολόγιο";
+
+/* Text for the command to open the help page of a lexical model, as shown on resource information views */
+"info-command-help-lexical-model" = "Βοήθεια γιὰ τὸ λεξικό";
+
+/* Text label for displaying a keyboard's version, as shown on resource information views */
+"info-label-version-keyboard" = "Ἔκδοση πληκτρολογίου";
+
+/* Text label for displaying a lexical model's version, as shown on resource information views */
+"info-label-version-lexical-model" = "Ἔκδοση λεξικοῦ";
+
+/* Label used for the "package info" / readme tab with the package installation prompt on phones. */
+"installer-label-package-info" = "Πληροφορίες πακέτου";
+
+/* Label used for the language-selection tab with the package installation prompt on phones. */
+"installer-label-select-languages" = "Ἐπιλέξτε γλῶσσα(-ες)";
+
+/* Label used with a package's version, as seen within the package installation prompt.  Example:  "Version: 14.0.0" */
+"installer-label-version" = "Ἔκδοση: %@";
+
+/* Section header for languages supported by a package, as seen within the package installation prompt */
+"installer-section-available-languages" = "Διαθέσιμες γλῶσσες";
+
+/* Text for the help popup for changing keyboards with the globe key */
+"keyboard-help-change" = "Κτυπῆστε ἐδῶ γιὰ νὰ ἀλλάξετε πληκτρολόγιο";
+
+/* Text for the command to exit the Keyman keyboard in favor of other keyboards installed on the system */
+"keyboard-menu-exit" = "Κλεῖστε τὸ %@";
+
+/* Error installing a Keyman package - could not allocate a location to install it */
+"kmp-error-file-system" = "Σφάλμα κατά τὴν ἐγκατάσταση πακέτου - σφάλμα συστήματος ἀρχείων";
+
+/* Error installing a Keyman package - could not copy package files */
+"kmp-error-file-copying" = "Σφάλμα κατά τὴν ἐγκατάσταση πακέτου - ἀδυναμία ἀντιγραφῆς ἀπαραιτήτων ἀρχείων";
+
+/* Error opening a Keyman package - package is not valid */
+"kmp-error-invalid" = "Κατεστραμμένο ἀρχεῖο πακέτου.";
+
+/* Error opening a Keyman package - it does not exist / the specified location is wrong */
+"kmp-error-missing" = "Τὸ πακέτο ποὺ ὁρίσατε δὲν ὑπάρχει.";
+
+/* Error installing a Keyman package - expected resource (keyboard or dictionary) is missing */
+"kmp-error-missing-resource" = "Αὐτὸ τὸ πακέτο δὲν περιέχει τὸ πληκτρολόγιο ἢ λεξικὸ ποὺ ζητήσατε.";
+
+/* Error installing a Keyman package with a version of Keyman that does not support it */
+"kmp-error-unsupported-keyman-version" = "Αὐτὸ τὸ πακέτο ἀπαιτεῖ νεώτερη ἔκδοση τοῦ Κῆμαν.";
+
+/* Error opening a Keyman package - cannot parse contents */
+"kmp-error-no-metadata" = "Αὐτὸ τὸ πακέτο δὲν ἔχει κατασκευασθεῖ σωστά - ὑπάρχουν ἄγνωστα περιεχόμενα.";
+
+/* Error opening a Keyman package - package's contents are for desktop platforms only */
+"kmp-error-unsupported" = "Αὐτὸ τὸ πακέτο δὲν συμπεριλαμβάνει ὑποστήριξη γιὰ τὴν συσκευή σας.";
+
+/* Error opening a Keyman package - package contains unexpected resource (keyboard or dictionary) type */
+"kmp-error-wrong-type" = "Αὐτὸ τὸ πακέτο δὲν περιέχει τὸν ἀναμενόμενο τύπο πόρου.";
+
+/* Title for the Installed Languages menu */
+"menu-installed-languages-title" = "Ἐγκατεστημένες γλῶσσες";
+
+/* Section header for lexical models within a language-specific settings menu */
+"menu-langsettings-label-lexical-models" = "Λεξικά";
+
+/* Section header for keyboards within a language-specific settings menu */
+"menu-langsettings-section-keyboards" = "Πληκτρολόγια";
+
+/* Section header for the settings toggles within a language-specific settings menu */
+"menu-langsettings-section-settings" = "Ρυθμίσεις γλώσσας";
+
+/* Title for the language-specific settings menus */
+"menu-langsettings-title" = "Ρυθμίσεις %@";
+
+/* Label for the toggle that enables corrections that is displayed within a language-specific settings menu */
+"menu-langsettings-toggle-correct" = "Ἐνεργοποιῆστε τὶς διορθώσεις";
+
+/* Label for the toggle that enables predictions that is displayed within a language-specific settings menu */
+"menu-langsettings-toggle-predict" = "Ἐνεργοποιῆστε τὶς προβλέψεις κειμένου";
+
+/* Help message for a prompt that appears for confirming a lexical model download:  language (1): lexical model (dictionary) name (2) */
+"menu-lexical-model-install-message" = "Θὰ θέλατε νὰ ἐγκαταστήσετε αὐτὸ τὸ λεξικό;";
+
+/* Title for a prompt that appears for confirming a lexical model download:  language (1): lexical model (dictionary) name (2) */
+"menu-lexical-model-install-title" = "%1$@: %2$@";
+
+/* Text for an info alert indicating that no lexical models are available */
+"menu-lexical-model-none-message" = "Δὲν ὑπάρχουν διαθέσιμα λεξικά";
+
+/* Title for the lexical model menu, a submenu of the language-specific settings menus */
+"menu-lexical-model-title" = "%@ Λεξικά";
+
+/* Title for the keyboard picker */
+"menu-picker-title" = "Πληκτρολόγια";
+
+/* Primary text for the Settings menu option to report keyboard crashes */
+"menu-settings-error-report" = "Ἐπιτρέψτε ἀναφορὲς σφαλμάτων";
+
+/* Secondary text for the Settings menu option to report keyboard crashes */
+"menu-settings-error-report-description" = "Μπορεῖ νὰ ἀπαιτηθεῖ \"πλήρης πρόσβαση\"";
+
+/* Primary text for the Settings menu local-file package installation option */
+"menu-settings-install-from-file" = "Ἐγκαταστῆστε ἀπὸ ἀρχεῖο";
+
+/* Secondary text for the Settings menu local-file package installation option */
+"menu-settings-install-from-file-description" = "Ψάξτε ἀρχεῖα .kmp";
+
+/* Primary text for the Settings menu option that displays the iOS system menu options for the app's keyboard */
+"menu-settings-system-keyboard-menu" = "Ρυθμίσεις πληκτρολογίου συστήματος";
+
+/* Label for the "Show Banner" toggle on the main settings screen */
+"menu-settings-show-banner" = "Νὰ ἐμφανίζεται Banner";
+
+/* Label for the "Get Started" automatic display toggle seen in the Settings menu */
+"menu-settings-startup-get-started" = "Νὰ ἐμφανίζεται ἡ ἐναρκτήρια ὀθόνη κατὰ τὴν ἐκκίνηση";
+
+/* Title for the main Settings menu */
+"menu-settings-title" = "Ρυθμίσεις Κῆμαν";
+
+/* Secondary text showing current setting for spacebar caption - blank */
+"menu-settings-spacebar-hint-blank" = "Καμμία λεζάντα στὸ πλῆκτρο διαστήματος";
+
+/* Secondary text showing current setting for spacebar caption - keyboard */
+"menu-settings-spacebar-hint-keyboard" = "Ὄνομα πληκτρολογίου στὸ πλῆκτρο διαστήματος";
+
+/* Secondary text showing current setting for spacebar caption - language */
+"menu-settings-spacebar-hint-language" = "Ὄνομα γλώσσας στὸ πλῆκτρο διαστήματος";
+
+/* Secondary text showing current setting for spacebar caption - language + keyboard */
+"menu-settings-spacebar-hint-languageKeyboard" = "Ὄνομα πληκτρολογίου καὶ γλώσσας στὸ πλῆκτρο διαστήματος";
+
+/* Label for the "Spacebar Caption" item on the main settings screen */
+"menu-settings-spacebar-text" = "Λεζάντα Πλήκτρου Διαστήματος";
+
+/* Title for the "Spacebar Caption" settings screen */
+"menu-settings-spacebar-title" = "Λεζάντα Πλήκτρου Διαστήματος";
+
+/* Text showing name of spacebar caption - blank */
+"menu-settings-spacebar-item-blank" = "Κενό";
+
+/* Text showing name of spacebar caption - keyboard */
+"menu-settings-spacebar-item-keyboard" = "Πληκτρολόγιο";
+
+/* Text showing name of spacebar caption - language */
+"menu-settings-spacebar-item-language" = "Γλῶσσα";
+
+/* Text showing name of spacebar caption - language + keyboard */
+"menu-settings-spacebar-item-languageKeyboard" = "Γλῶσσα καὶ πληκτρολόγιο";
+
+/* Short text for notification:  download failure for keyboard */
+"notification-download-failure-keyboard" = "Ἡ μεταφόρτωση τοῦ πληκτρολογίου ἀπέτυχε";
+
+/* Short text for notification:  download failure for lexical model */
+"notification-download-failure-lexical-model" = "Ἡ μεταφόρτωση τοῦ λεξικοῦ ἀπέτυχε";
+
+/* Short text for notification:  download success for keyboard */
+"notification-download-success-keyboard" = "Τὸ πληκτρολόγιο μεταφορτώθηκε ἐπιτυχῶς";
+
+/* Short text for notification:  download success for lexical model */
+"notification-download-success-lexical-model" = "Τὸ λεξιλογικὸ μοντέλλο μεταφορτώθηκε ἐπιτυχῶς";
+
+/* Short text for notification:  downloading a keyboard */
+"notification-downloading-keyboard" = "Μεταφορτώνεται πληκτρολόγιο\U2026";
+
+/* Short text for notification:  downloading a lexical model */
+"notification-downloading-lexical-model" = "Μεταφορτώνεται λεξικό\U2026";
+
+/* Short text for notification:  an update is available */
+"notification-update-available" = "Διαθέσιμη Ἐνημέρωση";
+
+/* Short text for notification:  currently updating */
+"notification-update-processing" = "Ἐνημέρωση σὲ ἐξέλιξη\U2026";
+
+/* Text indicating success at installing new keyboards or dictionaries */
+"success-install" = "Ἐπιτυχὴς ἐγκατάσταση.";
+
+/* A title to use in alerts indicating 'success' at whatever task the user requested */
+"success-title" = "Ἐπιτυχία";

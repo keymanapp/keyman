@@ -45,8 +45,8 @@ void context::push_marker(uint32_t marker) {
 
 // Context helper functions
 
-km_core_cp* get_context_as_string(km_core_context *context);
-km_core_status set_context_from_string(km_core_context *context, km_core_cp const *new_context);
+km_core_cu* get_context_as_string(km_core_context *context);
+km_core_status set_context_from_string(km_core_context *context, km_core_cu const *new_context);
 
 } // namespace core
 } // namespace km
@@ -84,7 +84,31 @@ struct km_core_context : public km::core::context
  *                `km_core_context_items_dispose`.
  */
 km_core_status
-context_items_from_utf16(km_core_cp const *text,
+context_items_from_utf16(km_core_cu const *text,
+                                km_core_context_item **out_ptr);
+
+/**
+ * Convert a UTF32 encoded Unicode string into an array of `km_core_context_item`
+ * structures. Allocates memory as needed.
+ *
+ * @return km_core_status
+ *         * `KM_CORE_STATUS_OK`: On success.
+ *         * `KM_CORE_STATUS_INVALID_ARGUMENT`: If non-optional parameters are
+ *           null.
+ *         * `KM_CORE_STATUS_NO_MEM`: In the event not enough memory can be
+ *           allocated for the output buffer.
+ *         * `KM_CORE_STATUS_INVALID_UTF`: In the event the UTF32 string cannot
+ *           be decoded.
+ *
+ * @param text    a pointer to a null terminated array of utf32 encoded data.
+ * @param out_ptr a pointer to the result variable: A pointer to the start of
+ *                the `km_core_context_item` array containing the representation
+ *                of the input string. Terminated with a type of
+ *                `KM_CORE_CT_END`. Must be disposed of with
+ *                `km_core_context_items_dispose`.
+ */
+km_core_status
+context_items_from_utf32(km_core_usv const *text,
                                 km_core_context_item **out_ptr);
 
 /**
@@ -113,7 +137,7 @@ context_items_from_utf16(km_core_cp const *text,
  */
 km_core_status
 context_items_to_utf16(km_core_context_item const *item,
-                              km_core_cp *buf,
+                              km_core_cu *buf,
                               size_t *buf_size);
 
 /**

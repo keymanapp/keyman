@@ -132,7 +132,7 @@ builder_use_color() {
 # $BUILDER_TERM_END
 #
 function builder_term() {
-  echo "${BUILDER_TERM_START}$*${BUILDER_TERM_END}"
+  echo -e "${BUILDER_TERM_START}$*${BUILDER_TERM_END}"
 }
 
 function builder_die() {
@@ -400,9 +400,19 @@ _builder_execute_child() {
     fi
   done
 
-  "$script" $action \
+  # If the current build is a dependency build, pass the dependency state on to
+  # the child build, so that we don't unnecessarily rebuild children (#11394)
+  local dep_flag= dep_module=
+  if builder_is_dep_build; then
+    dep_flag=--builder-dep-parent
+    dep_module="$builder_dep_parent"
+  fi
+
+  "$script" \
     --builder-child \
     $_builder_build_deps \
+    $dep_flag "$dep_module" \
+    $action \
     ${child_options[@]} \
     $builder_verbose \
     $builder_debug \
@@ -567,7 +577,7 @@ function builder_run_action() {
   local action=$1
   shift
   if builder_start_action $action; then
-    ($@)
+    ("$@")
     builder_finish_action success $action
   fi
   return 0
@@ -824,6 +834,7 @@ builder_describe() {
   _builder_deps=()                    # array of all dependencies for this script
   _builder_options_inheritable=()     # array of all options that should be passed to child scripts
   _builder_default_action=build
+  declare -A -g _builder_targets_excluded_by_platform=()
   declare -A -g _builder_params
   declare -A -g _builder_options_short
   declare -A -g _builder_options_var
@@ -855,6 +866,7 @@ builder_describe() {
         IFS="=" read -r -a sub <<< "$value"
         target_path="${sub[@]:1}"
         value="${sub[0]}"
+        original_value="$value"
         if [[ ! -d "$THIS_SCRIPT_PATH/$target_path" ]]; then
           builder_die "Target path '$target_path' for $value does not exist."
         fi
@@ -1205,7 +1217,6 @@ builder_parse() {
         if [[ $# -eq 0 ]]; then
           _builder_parameter_error "$0" parameter "$key"
         fi
-
         exp+=("$1")
       fi
     else
@@ -1316,7 +1327,14 @@ _builder_parse_expanded_parameters() {
       # apply the selected action to all targets
       if [[ ! -z $target ]]; then
         # A target was specified but is not valid
-        _builder_parameter_error "$0" target "$target"
+        if builder_is_target_excluded_by_platform "$target"; then
+          builder_echo red "$0: Target $target is unavailable because it requires ${_builder_targets_excluded_by_platform[$target]}"
+          echo
+          builder_display_usage
+          exit 64
+        else
+          _builder_parameter_error "$0" target "$target"
+        fi
       fi
 
       for e in "${_builder_targets[@]}"; do
@@ -1335,6 +1353,7 @@ _builder_parse_expanded_parameters() {
       _builder_chosen_options+=("$key")
       if [[ ! -z ${_builder_options_var[$key]+x} ]]; then
         shift
+        n=$((n + 1))
         # Set the variable associated with this option to the next parameter value
         # A little bit of hoop jumping here to avoid issues with cygwin paths being
         # corrupted too early in the game
@@ -1369,9 +1388,12 @@ _builder_parse_expanded_parameters() {
           # internal use parameter for dependency builds - identifier of parent script
           shift
           builder_dep_parent="$1"
+          builder_echo setmark "dependency build, started by $builder_dep_parent"
+          builder_echo grey "$(basename "$0") parameters: <${_params[@]}>"
           ;;
         --builder-child)
           _builder_is_child=0
+          builder_echo setmark "child build, parameters: <${_params[@]}>"
           ;;
         --builder-report-dependencies)
           # internal reporting function, ignores all other parameters
@@ -1379,7 +1401,23 @@ _builder_parse_expanded_parameters() {
           ;;
         *)
           # script does not recognize anything of action or target form at this point.
-          _builder_parameter_error "$0" parameter "$key"
+          if [[ $key =~ ^: ]]; then
+            # This is an unsupported target
+            if builder_is_target_excluded_by_platform "$key"; then
+              builder_echo red "$0: Target $key is unavailable because it requires ${_builder_targets_excluded_by_platform[$key]}"
+              echo
+              builder_display_usage
+              exit 64
+            else
+              _builder_parameter_error "$0" target "$key"
+            fi
+          elif builder_is_child_build; then
+            # For child builds, don't fail the build when pass inheritable
+            # parameters (#11408)
+            builder_echo_debug "Parameter '$key' is not supported, ignoring"
+          else
+            _builder_parameter_error "$0" parameter "$key"
+          fi
       esac
     fi
     shift # past the processed argument
@@ -1409,22 +1447,19 @@ _builder_parse_expanded_parameters() {
   fi
 
   if builder_is_dep_build; then
-    builder_echo setmark "dependency build, started by $builder_dep_parent"
-    builder_echo grey "build.sh parameters: <${_params[@]}>"
     if [[ -z ${_builder_deps_built+x} ]]; then
       builder_die "FATAL ERROR: Expected '_builder_deps_built' variable to be set"
     fi
   elif builder_is_child_build; then
-    builder_echo setmark "child build, parameters: <${_params[@]}>"
     if [[ -z ${_builder_deps_built+x} ]]; then
       builder_die "FATAL ERROR: Expected '_builder_deps_built' variable to be set"
     fi
   else
     # This is a top-level invocation, so we want to track which dependencies
     # have been built, so they don't get built multiple times.
-    builder_echo setmark "build.sh parameters: <${_params[@]}>"
+    builder_echo setmark "$(basename "$0") parameters: <${_params[@]}>"
     if [[ ${#builder_extra_params[@]} -gt 0 ]]; then
-      builder_echo grey "build.sh extra parameters: <${builder_extra_params[@]}>"
+      builder_echo grey "$(basename "$0") extra parameters: <${builder_extra_params[@]}>"
     fi
     export _builder_deps_built=`mktemp`
   fi
@@ -1503,6 +1538,19 @@ builder_display_usage() {
     fi
     _builder_pad $width "  $e" "$description"
   done
+
+  if [[ ${#_builder_targets_excluded_by_platform[@]} -gt 0 ]]; then
+    echo
+    echo "Unavailable Targets: "
+    for e in "${!_builder_targets_excluded_by_platform[@]}"; do
+      if [[ ! -z "${_builder_params[$e]+x}" ]]; then
+        description="${_builder_params[$e]}"
+      else
+        description=$(_builder_get_default_description "$e")
+      fi
+      _builder_pad $width "  $e" "$description (requires ${_builder_targets_excluded_by_platform[$e]})"
+    done
+  fi
 
   echo
   echo "Options: "
@@ -1667,11 +1715,6 @@ _builder_do_build_deps() {
       continue
     fi
 
-    # Only configure and build the dependency once per invocation
-    if builder_has_module_been_built "$dep"; then
-      continue
-    fi
-
     dep_target=
     if [[ ! -z ${_builder_dep_targets[$dep]+x} ]]; then
       # TODO: in the future split _builder_dep_targets into comma-separated
@@ -1679,14 +1722,19 @@ _builder_do_build_deps() {
       dep_target=${_builder_dep_targets[$dep]}
     fi
 
-    builder_set_module_has_been_built "$dep"
+    # Only configure and build the dependency once per invocation
+    if builder_has_module_been_built "$dep$dep_target"; then
+      continue
+    fi
+
+    builder_set_module_has_been_built "$dep$dep_target"
     "$REPO_ROOT/$dep/build.sh" "configure$dep_target" "build$dep_target" \
       $builder_verbose \
       $builder_debug \
       $_builder_build_deps \
       --builder-dep-parent "$THIS_SCRIPT_IDENTIFIER" && (
       if $_builder_debug_internal; then
-        builder_echo success "## Dependency $dep for $_builder_matched_action_name successfully"
+        builder_echo success "## Dependency $dep$dep_target for $_builder_matched_action_name successfully"
       fi
     ) || (
       result=$?
@@ -1876,6 +1924,126 @@ _builder_has_function_been_called() {
   fi
   return 1
 }
+
+################################################################################
+# Platform restrictions
+################################################################################
+
+# Describes the platforms for which a given target will be available, and
+# filters the list of targets accordingly, removing targets that cannot be built
+# on the current platform. Removed targets will be listed in a separate section
+# in the help documentation.
+#
+# Parameters: target platform[s] ...     Target and its list of corresponding
+#                                        platform(s)
+#
+# Multiple targets can be listed. Each target must be followed by a comma
+# separated list of platforms. The currently supported platforms are:
+#
+# Operating System platforms:
+#   win        Windows
+#   mac        macOS
+#   linux      Linux
+#
+# Development tooling platforms:
+#   delphi     Delphi is installed (on Windows only)
+#   android    Android Studio is installed
+#
+builder_describe_platform() {
+
+  local builder_platforms=(linux mac win)
+  local builder_tools=(android-studio delphi)
+
+  # --- Detect platform ---
+
+  # Default value, since it's the most general case/configuration to detect.
+  local builder_platform=linux
+
+  # This is copied from build-utils.sh to avoid creating a dependency on it
+  if [[ $OSTYPE == darwin* ]]; then
+    builder_platform=mac
+  elif [[ $OSTYPE == msys ]]; then
+    builder_platform=win
+  elif [[ $OSTYPE == cygwin ]]; then
+    builder_platform=win
+  fi
+
+  # --- Detect tools ---
+
+  local builder_installed_tools=()
+
+  # Detect delphi compiler (see also delphi_environment.inc.sh)
+  if [[ $builder_platform == win ]]; then
+    local ProgramFilesx86="$(cygpath -w -F 42)"
+    if [[ -x "$(cygpath -u "$ProgramFilesx86\\Embarcadero\\Studio\\20.0\\bin\\dcc32.exe")" ]]; then
+      builder_installed_tools+=(delphi)
+    fi
+  fi
+
+  # Detect Android Studio based on ANDROID_HOME environment variable
+  if [[ ! -z ${ANDROID_HOME+x} ]]; then
+    builder_installed_tools+=(android-studio)
+  fi
+
+  # --- Overrides ---
+
+  # For testing, we can override the current platform
+  if [[ ! -z "${BUILDER_PLATFORM_OVERRIDE+x}" ]]; then
+    builder_warn "BUILDER_PLATFORM_OVERRIDE variable found. Overriding detected platform '$builder_platform' with '$BUILDER_PLATFORM_OVERRIDE'"
+    builder_platform="$BUILDER_PLATFORM_OVERRIDE"
+  fi
+
+  # For testing, we can override the current tools
+  if [[ ! -z "${BUILDER_TOOLS_OVERRIDE+x}" ]]; then
+    builder_warn "BUILDER_TOOLS_OVERRIDE variable found. Overriding detected tools (${builder_installed_tools[@]}) with (${BUILDER_TOOLS_OVERRIDE[@]})"
+    builder_installed_tools=("${BUILDER_TOOLS_OVERRIDE[@]}")
+  fi
+
+  # --- Exclude targets depending on missing tools and platforms
+  while [[ $# -gt 1 ]]; do
+    local target="$1"
+    shift
+    local platforms platform
+    IFS="," read -r -a platforms <<< "$1"
+    shift
+
+    for platform in "${platforms[@]}"; do
+      if _builder_item_in_array "$platform" "${builder_platforms[@]}"; then
+        # Check operating system
+        if [[ "$platform" != "$builder_platform" ]]; then
+          _builder_targets_excluded_by_platform[$target]=$platform
+          _builder_targets=( ${_builder_targets[@]/$target} )
+        fi
+      elif _builder_item_in_array "$platform" "${builder_tools[@]}"; then
+        # Check installed tools
+        if ! _builder_item_in_array "$platform" "${builder_installed_tools[@]}"; then
+          _builder_targets_excluded_by_platform[$target]=$platform
+          _builder_targets=( ${_builder_targets[@]/$target} )
+        fi
+      else
+        builder_warn "Available platforms: ${builder_platforms[@]}"
+        builder_warn "Available tools: ${builder_tools[@]}"
+        builder_die "Invalid platform or tool specified for builder_describe_platforms: $platform"
+      fi
+    done
+  done
+}
+
+# Returns 0 if the specified target is excluded by platform requirements
+#
+# Parameters: target     Target to verify
+#
+builder_is_target_excluded_by_platform() {
+  local target="$1"
+  if [[ ! -z "${_builder_targets_excluded_by_platform[$target]+x}" ]]; then
+    return 0
+  fi
+  return 1
+}
+
+################################################################################
+# Final initialization
+################################################################################
 
 #
 # Initialize builder once all functions are declared

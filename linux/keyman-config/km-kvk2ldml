@@ -5,7 +5,9 @@ import logging
 import os
 import sys
 
-from keyman_config import add_standard_arguments, initialize_logging, initialize_sentry, verify_dbus_running
+from keyman_config import (
+  are_requirements_missing, add_standard_arguments, initialize_logging,
+  initialize_sentry, verify_dbus_running)
 from keyman_config.kvk2ldml import parse_kvk_file, print_kvk, convert_ldml, output_ldml
 
 
@@ -15,8 +17,8 @@ def main():
         'print the details of the kvk file.')
     parser.add_argument('-p', "--print", help='print kvk details', action="store_true")
     parser.add_argument('-k', "--keys", help='if printing also print all keys', action="store_true")
-    parser.add_argument('kvkfile', help='kvk file')
     parser.add_argument('-o', '--output', metavar='LDMLFILE', help='output LDML file location')
+    parser.add_argument('kvkfile', help='kvk file')
     add_standard_arguments(parser)
 
     args = parser.parse_args()
@@ -24,6 +26,10 @@ def main():
     initialize_logging(args)
     initialize_sentry()
     verify_dbus_running()
+
+    if are_requirements_missing():
+        logging.error('km-kvk2ldml: Missing requirements. Please install python3-fonttools.')
+        sys.exit(1)
 
     name, ext = os.path.splitext(args.kvkfile)
     # Check if input file extension is kvk
@@ -46,6 +52,8 @@ def main():
     outputfile = args.output if args.output else f'{name}.ldml'
 
     dirname = os.path.dirname(outputfile)
+    if dirname == '':
+        dirname = '.'
     if not os.path.isdir(dirname):
         if os.path.exists(dirname):
             logging.error(f'km-kvk2ldml: error, `{dirname}` exists but is not a directory')
@@ -54,7 +62,8 @@ def main():
 
     try:
         with open(outputfile, 'wb') as ldmlfile:
-            ldml = convert_ldml(kvkData)
+            kmpJsonFilename = os.path.join(os.path.dirname(args.kvkfile), 'kmp.json')
+            ldml = convert_ldml(name, kvkData, kmpJsonFilename)
             output_ldml(ldmlfile, ldml)
     except PermissionError:
         logging.error(f'km-kvk2ldml: error, permission denied writing file `{outputfile}`')

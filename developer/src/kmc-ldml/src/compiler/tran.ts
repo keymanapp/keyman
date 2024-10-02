@@ -1,5 +1,6 @@
 import { constants, SectionIdent } from "@keymanapp/ldml-keyboard-constants";
-import { KMXPlus, LDMLKeyboard, CompilerCallbacks, VariableParser, MarkerParser, util } from '@keymanapp/common-types';
+import { KMXPlus, VariableParser, MarkerParser, util } from '@keymanapp/common-types';
+import { CompilerCallbacks, LDMLKeyboard } from "@keymanapp/developer-utils";
 import { SectionCompiler } from "./section-compiler.js";
 
 import Bksp = KMXPlus.Bksp;
@@ -14,7 +15,7 @@ import LKReorder = LDMLKeyboard.LKReorder;
 import LKTransform = LDMLKeyboard.LKTransform;
 import LKTransforms = LDMLKeyboard.LKTransforms;
 import { verifyValidAndUnique } from "../util/util.js";
-import { CompilerMessages } from "./messages.js";
+import { LdmlCompilerMessages } from "./ldml-compiler-messages.js";
 import { Substitutions, SubstitutionUse } from "./substitution-tracker.js";
 
 type TransformCompilerType = 'simple' | 'backspace';
@@ -59,9 +60,9 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     if (transforms) {
       const types : string[] = transforms.map(({type}) => type);
       if (!verifyValidAndUnique(types,
-        types => reportMessage(CompilerMessages.Error_DuplicateTransformsType({ types })),
+        types => reportMessage(LdmlCompilerMessages.Error_DuplicateTransformsType({ types })),
         new Set(['simple', 'backspace']),
-        types => reportMessage(CompilerMessages.Error_InvalidTransformsType({ types })))) {
+        types => reportMessage(LdmlCompilerMessages.Error_InvalidTransformsType({ types })))) {
         valid = false;
       }
 
@@ -78,11 +79,11 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       }));
       if (mixed) {
         valid = false;
-        reportMessage(CompilerMessages.Error_MixedTransformGroup()); // report this once
+        reportMessage(LdmlCompilerMessages.Error_MixedTransformGroup()); // report this once
       }
       if (empty) {
         valid = false;
-        reportMessage(CompilerMessages.Error_EmptyTransformGroup()); // report this once
+        reportMessage(LdmlCompilerMessages.Error_EmptyTransformGroup()); // report this once
       }
 
       // TODO-LDML: linting here should check for identical from, but this involves a double-parse which is ugly
@@ -139,24 +140,27 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     let result = new TranTransform();
     let cookedFrom = transform.from;
 
-    cookedFrom = sections.vars.substituteStrings(cookedFrom, sections);
+    // check for incorrect \uXXXX escapes. Do this before substituting markers or sets.
+    cookedFrom = this.checkEscapes(cookedFrom); // check for \uXXXX escapes before normalizing
+
+    cookedFrom = sections.vars.substituteStrings(cookedFrom, sections, true);
     const mapFrom = VariableParser.CAPTURE_SET_REFERENCE.exec(cookedFrom);
     const mapTo = VariableParser.MAPPED_SET_REFERENCE.exec(transform.to || '');
     if (mapFrom && mapTo) { // TODO-LDML: error cases
       result.mapFrom = sections.strs.allocString(mapFrom[1]); // var name
       result.mapTo = sections.strs.allocString(mapTo[1]); // var name
     } else {
-      result.mapFrom = sections.strs.allocString(''); // TODO-LDML
-      result.mapTo = sections.strs.allocString(''); // TODO-LDML
+      result.mapFrom = sections.strs.allocString('');
+      result.mapTo = sections.strs.allocString('');
     }
+
+    if (cookedFrom === null) return null; // error
+
+    // the set substution will not produce raw markers `\m{...}` but they will already be in sentinel form.
     cookedFrom = sections.vars.substituteSetRegex(cookedFrom, sections);
 
     // add in markers. idempotent if no markers.
     cookedFrom = sections.vars.substituteMarkerString(cookedFrom, true);
-
-    // check for incorrect \uXXXX escapes
-    cookedFrom = this.checkEscapes(cookedFrom); // check for \uXXXX escapes before normalizing
-    if (cookedFrom === null) return null; // error
 
     // unescape from \u{} form to plain, or in some cases \uXXXX / \UXXXXXXXX for core
     cookedFrom = util.unescapeStringToRegex(cookedFrom);
@@ -169,12 +173,9 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       cookedFrom = MarkerParser.nfd_markers(cookedFrom, true);
     }
 
-    // Verify that the regex is syntactically valid
-    try {
-      new RegExp(cookedFrom, 'ug');
-    } catch (e) {
-      this.callbacks.reportMessage(CompilerMessages.Error_UnparseableTransformFrom({ from: transform.from, message: e.message }));
-      return null; // error
+    // perform regex validation
+    if (!this.isValidRegex(cookedFrom, transform.from)) {
+      return null;
     }
 
     // cookedFrom is cooked above, since there's some special treatment
@@ -189,6 +190,46 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       nfd: true,
     }, sections);
     return result;
+  }
+
+  /**
+   * Validate the final regex
+   * @param cookedFrom the regex to use, missing the trailing '$'
+   * @param from the original from - for error reporting
+   * @returns true if OK
+   */
+  private isValidRegex(cookedFrom: string, from: string) : boolean {
+    // check for any unescaped dollar sign here
+    if (/(?<!\\)(?:\\\\)*\$/.test(cookedFrom)) {
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalTransformDollarsign({ from }));
+      return false;
+    }
+    if (/(?<!\\)(?:\\\\)*\*/.test(cookedFrom)) {
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalTransformAsterisk({ from }));
+      return false;
+    }
+    if (/(?<!\\)(?:\\\\)*\+/.test(cookedFrom)) {
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalTransformPlus({ from }));
+      return false;
+    }
+    // Verify that the regex is syntactically valid
+    try {
+      const rg = new RegExp(cookedFrom + '$', 'ug');
+      // Tests against the regex:
+
+      // does it match an empty string?
+      if (rg.test('')) {
+        this.callbacks.reportMessage(LdmlCompilerMessages.Error_TransformFromMatchesNothing({ from }));
+        return false;
+      }
+    } catch (e) {
+      // We're exposing the internal regex error message here.
+      // In the future, CLDR plans to expose the EBNF for the transform,
+      // at which point we would have more precise validation prior to getting to this point.
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_UnparseableTransformFrom({ from, message: e.message }));
+      return false;
+    }
+    return true;
   }
 
   private compileReorderTranGroup(sections: DependencySections, reorders: LKReorder[]): TranGroup {
@@ -255,7 +296,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     for (const [, sub] of cookedFrom.matchAll(anyQuad)) {
       const s = util.unescapeOne(sub);
       if (s !== '\uffff' && s !== '\u0008') { // markers
-        this.callbacks.reportMessage(CompilerMessages.Error_InvalidQuadEscape({ cp: s.codePointAt(0) }));
+        this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidQuadEscape({ cp: s.codePointAt(0) }));
         return null; // exit on the first error
       }
     }
@@ -317,13 +358,13 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     let needCooking = false;
     const explicitSet = rangeExplicit.analyze()?.get(util.BadStringType.denormalized);
     if (explicitSet) {
-      this.callbacks.reportMessage(CompilerMessages.Warn_CharClassExplicitDenorm({ lowestCh: explicitSet.values().next().value }));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Warn_CharClassExplicitDenorm({ lowestCh: explicitSet.values().next().value }));
       needCooking = true;
     } else {
       // don't analyze the implicit set of THIS range, if explicit is already problematic
       const implicitSet = rangeImplicit.analyze()?.get(util.BadStringType.denormalized);
       if (implicitSet) {
-        this.callbacks.reportMessage(CompilerMessages.Hint_CharClassImplicitDenorm({ lowestCh: implicitSet.values().next().value }));
+        this.callbacks.reportMessage(LdmlCompilerMessages.Hint_CharClassImplicitDenorm({ lowestCh: implicitSet.values().next().value }));
         needCooking = true;
       }
     }

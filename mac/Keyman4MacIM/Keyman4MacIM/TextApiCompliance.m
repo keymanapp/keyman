@@ -35,6 +35,7 @@
 #import "TextApiCompliance.h"
 #import <InputMethodKit/InputMethodKit.h>
 #import "KMInputMethodAppDelegate.h"
+#import "KMLogs.h"
 
 // this is the user managed list of non-compliant apps persisted in User Defaults
 NSString *const kKMLegacyApps = @"KMLegacyApps";
@@ -64,7 +65,7 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
     
     // if we do not have hard-coded noncompliance, then test the app
     if (![self applyNoncompliantAppLists:appId]) {
-      [self testCompliance:client];
+      [self checkCompliance:client];
     }
   }
   return self;
@@ -72,81 +73,119 @@ NSString *const kKMLegacyApps = @"KMLegacyApps";
 
 -(NSString *)description
 {
-return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelectionApi: %d, canReadText: %d, canReplaceText: %d, mustBackspaceUsingEvents: %d, clientAppId: %@, client: %@", self.complianceUncertain, self.hasCompliantSelectionApi, [self canReadText], [self canReplaceText], [self mustBackspaceUsingEvents], _clientApplicationId, _client];
+  return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelectionApi: %d, canReadText: %d, canReplaceText: %d, mustBackspaceUsingEvents: %d, clientApplicationId: %@, client: %@", self.complianceUncertain, self.hasCompliantSelectionApi, [self canReadText], [self canReplaceText], [self mustBackspaceUsingEvents], _clientApplicationId, _client];
 }
 
 /** test to see if the API selectedRange functions properly for the text input client  */
--(void) testCompliance:(id) client {
-  BOOL selectionApiVerified = NO;
-
+-(void) checkCompliance:(id) client {
   // confirm that the API actually exists (this always seems to return true)
-  selectionApiVerified = [client respondsToSelector:@selector(selectedRange)];
+  self.hasCompliantSelectionApi = [client respondsToSelector:@selector(selectedRange)];
   
-  if (!selectionApiVerified) {
+  if (!self.hasCompliantSelectionApi) {
     self.complianceUncertain = NO;
-    self.hasCompliantSelectionApi = NO;
   }
   else {
     // if API exists, call it and see if it works as expected
-    NSRange selectionRange = [client selectedRange];
-    self.initialSelection = selectionRange;
-    [self.appDelegate logDebugMessage:@"TextApiCompliance testCompliance, location = %lu, length = %lu", selectionRange.location, selectionRange.length];
-    
-    if (selectionRange.location == NSNotFound) {
-      // NSNotFound may just mean that we don't have the focus yet; say NO for
-      // now, but this may toggle back to YES after the first insertText
-      selectionApiVerified = NO;
-      self.complianceUncertain = YES;
-      [self.appDelegate logDebugMessage:@"TextApiCompliance testCompliance not compliant but uncertain, range is NSNotFound"];
-    } else if (selectionRange.location >= 0) {
-      // location greater than or equal to zero may just mean that the client
-      // returns an inaccurate value; say YES for now, but set back to NO if the
-      // first insertText does not cause a change in the selection
-      selectionApiVerified = YES;
-      self.complianceUncertain = YES;
-      [self.appDelegate logDebugMessage:@"TextApiCompliance testCompliance compliant but uncertain, location >= 0"];
-    }
+    self.initialSelection = [client selectedRange];
+    os_log_debug([KMLogs complianceLog], "checkCompliance, location = %lu, length = %lu", self.initialSelection.location, self.initialSelection.length);
+    [self checkComplianceUsingInitialSelection];
   }
-  [self.appDelegate logDebugMessage:@"TextApiCompliance testCompliance workingSelectionApi for app %@: set to %@", self.clientApplicationId, selectionApiVerified?@"yes":@"no"];
-
-  self.hasCompliantSelectionApi = selectionApiVerified;
+  os_log_debug([KMLogs complianceLog], "checkCompliance workingSelectionApi for app %{public}@: set to %{public}@", self.clientApplicationId, self.complianceUncertain?@"YES":@"NO");
 }
 
-/** if complianceUncertain is true, checking the selection after an insert can make it clear  */
--(void) testComplianceAfterInsert:(id) client {
-  if(self.complianceUncertain) {
-    NSRange selectionRange = [client selectedRange];
-    [self.appDelegate logDebugMessage:@"TextApiCompliance testSelectionApiAfterInsert, location = %lu, length = %lu", selectionRange.location, selectionRange.length];
-    
-    if (selectionRange.location == NSNotFound) {
-      // NO for certain, insertText means we have focus, NSNotFound means that the selection API does not work
-      self.hasCompliantSelectionApi = NO;
-      self.complianceUncertain = NO;
-      [self.appDelegate logDebugMessage:@"TextApiCompliance testComplianceAfterInsert certain, non-compliant, range is NSNotFound"];
-    } else if (selectionRange.location == 0) {
-      // NO for certain, after an insertText we cannot be at location 0
-      self.hasCompliantSelectionApi = NO;
-      self.complianceUncertain = NO;
-      [self.appDelegate logDebugMessage:@"TextApiCompliance testComplianceAfterInsert certain, non-compliant, location = 0"];
-    } else if (selectionRange.location > 0) {
-      if (NSEqualRanges(selectionRange, self.initialSelection)) {
-        // NO for certain, when the selection is unchanged after an insert
-        self.hasCompliantSelectionApi = NO;
-        self.complianceUncertain = NO;
-        [self.appDelegate logDebugMessage:@"TextApiCompliance testComplianceAfterInsert certain, non-compliant, selection the same: initial location = %@, new location = %@", NSStringFromRange(self.initialSelection), NSStringFromRange(selectionRange)];
-      } else {
-        // YES for certain, when the selection is changed after an insert
-        self.hasCompliantSelectionApi = YES;
-        self.complianceUncertain = NO;
-        [self.appDelegate logDebugMessage:@"TextApiCompliance testComplianceAfterInsert certain, compliant, selection changed from initial location = %@ to new location = %@", NSStringFromRange(self.initialSelection), NSStringFromRange(selectionRange)];
-      }
-    }
-    
-    [self.appDelegate logDebugMessage:@"TextApiCompliance testComplianceAfterInsert, self.hasWorkingSelectionApi = %@ for app %@", self.hasCompliantSelectionApi?@"yes":@"no", self.clientApplicationId];
-    [self.appDelegate logDebugMessage:@"TextApiCompliance testComplianceAfterInsert TextApiCompliance: %@", self];
- } else {
-   [self.appDelegate logDebugMessage:@"TextApiCompliance testSelectionApiAfterInsert, compliance is already known"];
+-(void) checkComplianceUsingInitialSelection {
+  if (self.initialSelection.location == NSNotFound) {
+    /**
+     * NSNotFound may just mean that we don't have the focus yet; say NO for now
+     * now, but this may toggle back to YES after the first insertText
+     */
+    self.hasCompliantSelectionApi = NO;
+    self.complianceUncertain = YES;
+    os_log_debug([KMLogs complianceLog], "checkComplianceUsingInitialSelection not compliant but uncertain, range is NSNotFound");
+  } else if (self.initialSelection.location >= 0) {
+    /**
+     * location greater than or equal to zero may just mean that the client
+     * returns an inaccurate value; say YES for now, but set back to NO if the
+     * if the selection is not consistent with the first insert
+     */
+    self.hasCompliantSelectionApi = YES;
+    self.complianceUncertain = YES;
+    os_log_debug([KMLogs complianceLog], "checkComplianceUsingInitialSelection compliant but uncertain, location >= 0");
   }
+}
+
+/**
+ * If complianceUncertain is true, checking the location after an insert can confirm whether the app is compliant.
+ * Delete and insert are what core instructed us to do.
+ * Text that was selected in the client when the key was processed is irrelevant as it does not affect the location.
+ */
+-(void) checkComplianceAfterInsert:(id) client delete:(NSString *)textToDelete insert:(NSString *)textToInsert {
+  
+  // return if compliance is already certain
+  if(!self.complianceUncertain) {
+    os_log_debug([KMLogs complianceLog], "checkComplianceAfterInsert, compliance is already known");
+    return;
+  }
+  
+  NSRange selectionRange = [client selectedRange];
+  if ([self validateNewLocation:selectionRange.location delete:textToDelete]) {
+    BOOL changeExpected = [self isLocationChangeExpectedOnInsert:textToDelete insert:textToInsert];
+    BOOL locationChanged = [self hasLocationChanged:selectionRange];
+    [self validateLocationChange:changeExpected hasLocationChanged:locationChanged];
+  }
+  
+  os_log_info([KMLogs complianceLog], "checkComplianceAfterInsert, self.hasWorkingSelectionApi = %{public}@ for app %{public}@", self.hasCompliantSelectionApi?@"YES":@"NO", self.clientApplicationId);
+}
+
+- (BOOL)validateNewLocation:(NSUInteger)location delete:(NSString *)textToDelete  {
+  BOOL validLocation = NO;
+  
+  if (location == NSNotFound) {
+    // invalid location: insertText means we have focus, NSNotFound means selection API not functioning
+    self.hasCompliantSelectionApi = NO;
+    self.complianceUncertain = NO;
+    os_log_debug([KMLogs complianceLog], "validateNewLocation = NO, location is NSNotFound");
+  } else if ((location == 0) && (textToDelete.length > 0)) {
+    // invalid location: cannot have text to delete at location zero
+    self.hasCompliantSelectionApi = NO;
+    self.complianceUncertain = NO;
+    os_log_debug([KMLogs complianceLog], "validateNewLocation = NO, location is zero with textToDelete.length > 0");
+  } else {
+    // location is valid, but do not know if it is compliant yet
+    validLocation = YES;
+    os_log_debug([KMLogs complianceLog], "validateNewLocation = YES, newLocation = %lu, oldLocation = %lu", (unsigned long)location, (unsigned long)self.initialSelection.location);
+  }
+  return validLocation;
+}
+
+- (void) validateLocationChange:(BOOL) changeExpected hasLocationChanged:(BOOL) locationChanged {
+  
+  if (changeExpected == locationChanged) {
+    // YES for certain, the location is where we expect it
+    self.hasCompliantSelectionApi = YES;
+    self.complianceUncertain = NO;
+    os_log_debug([KMLogs complianceLog], "validateLocationChange compliant, locationChanged = %{public}@, changeExpected = %{public}@", locationChanged?@"YES":@"NO", changeExpected?@"YES":@"NO");
+  } else if (changeExpected != locationChanged) {
+    // NO for certain, when the selection is unchanged after an insert
+    self.hasCompliantSelectionApi = NO;
+    self.complianceUncertain = NO;
+    os_log_debug([KMLogs complianceLog], "validateLocationChange non-compliant, locationChanged = %{public}@, changeExpected = %{public}@", locationChanged?@"YES":@"NO", changeExpected?@"YES":@"NO");
+  }
+}
+
+- (BOOL)isLocationChangeExpectedOnInsert:(NSString *)textToDelete insert:(NSString *)textToInsert {
+  BOOL changeExpected = textToInsert.length != textToDelete.length;
+  os_log_debug([KMLogs complianceLog], "isLocationChangeExpected, changeExpected = %{public}@", changeExpected?@"YES":@"NO");
+  
+  return changeExpected;
+}
+
+- (BOOL)hasLocationChanged:(NSRange)newSelection {
+  NSUInteger newLocation = newSelection.location;
+  NSUInteger oldLocation = self.initialSelection.location;
+  BOOL locationChanged = newLocation != oldLocation;
+  os_log_debug([KMLogs complianceLog], "hasLocationChanged: %{public}@, new location: %lu, selection length: %lu", locationChanged?@"YES":@"NO", newSelection.location, newSelection.length);
+  return locationChanged;
 }
 
 /**
@@ -159,7 +198,7 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
     isAppNonCompliant = [self containedInUserManagedNoncompliantAppList:clientAppId];
   }
   
-  [self.appDelegate logDebugMessage:@"containedInNoncompliantAppLists: for app %@: %@", clientAppId, isAppNonCompliant?@"yes":@"no"];
+  os_log_info([KMLogs complianceLog], "applyNoncompliantAppLists: for app %{public}@: %{public}@", clientAppId, isAppNonCompliant?@"YES":@"NO");
   
   if (isAppNonCompliant) {
     self.complianceUncertain = NO;
@@ -170,36 +209,36 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
 }
 
 /** Check this hard-coded list to see if the application ID is among those
-* that are known to not implement selectionRange correctly.
-*  This was formerly called the legacy app list, renamed to improve clarity.
-*/
+ * that are known to not implement selectionRange correctly.
+ *  This was formerly called the legacy app list, renamed to improve clarity.
+ */
 - (BOOL)containedInHardCodedNoncompliantAppList:(NSString *)clientAppId {
-    BOOL isAppNonCompliant = (//[clientAppId isEqual: @"com.github.atom"] ||
-                              // 2023-12-19[sgs] Atom is now automatically detected as non-compliant
-                     [clientAppId isEqual: @"com.collabora.libreoffice-free"] ||
-                     [clientAppId isEqual: @"org.libreoffice.script"] ||
-                     [clientAppId isEqual: @"org.vim.MacVim"] ||
-                     [clientAppId isEqual: @"io.brackets.appshell"] ||
-                     [clientAppId isEqual: @"com.axosoft.gitkraken"] ||
-                     [clientAppId isEqual: @"org.sil.app.builder.scripture.ScriptureAppBuilder"] ||
-                     [clientAppId isEqual: @"org.sil.app.builder.reading.ReadingAppBuilder"] ||
-                     [clientAppId isEqual: @"org.sil.app.builder.dictionary.DictionaryAppBuilder"] ||
-                     //[clientAppId isEqual: @"com.microsoft.Word"] || // 2020-11-24[mcd]: Appears to work well in Word 16.43, disable legacy by default
-                     [clientAppId isEqual: @"org.openoffice.script"] ||
-                     // 2023-12-13[sgs]: Adobe apps automatically detected as non-compliant
-                     //[clientAppId isEqual: @"com.adobe.illustrator"] ||
-                     //[clientAppId isEqual: @"com.adobe.InDesign"] ||
-                     //[clientAppId isEqual: @"com.adobe.Photoshop"] ||
-                     //[clientAppId isEqual: @"com.adobe.AfterEffects"] ||
-                     //[clientAppId isEqual: @"com.microsoft.VSCode"] || // 2023-05-29[sgs]: Works with 1.78.2, disable legacy by default
-                     [clientAppId isEqual: @"com.google.Chrome"] ||
-                              // 2023-12-13[sgs]: must hard-code for Chrome because Google Docs returns relative but incorrect location so no way to auto-detect
-                     [clientAppId hasPrefix: @"net.java"] ||
-                     [clientAppId isEqual: @"com.Keyman.test.legacyInput"]
-                     /*||[clientAppId isEqual: @"ro.sync.exml.Oxygen"] - Oxygen has worse problems */
-                     );
-
-  [self.appDelegate logDebugMessage:@"containedInHardCodedNoncompliantAppList: for app %@: %@", clientAppId, isAppNonCompliant?@"yes":@"no"];
+  BOOL isAppNonCompliant = (//[clientAppId isEqual: @"com.github.atom"] ||
+                            // 2023-12-19[sgs] Atom is now automatically detected as non-compliant
+                            [clientAppId isEqual: @"com.collabora.libreoffice-free"] ||
+                            [clientAppId isEqual: @"org.libreoffice.script"] ||
+                            [clientAppId isEqual: @"org.vim.MacVim"] ||
+                            [clientAppId isEqual: @"io.brackets.appshell"] ||
+                            [clientAppId isEqual: @"com.axosoft.gitkraken"] ||
+                            [clientAppId isEqual: @"org.sil.app.builder.scripture.ScriptureAppBuilder"] ||
+                            [clientAppId isEqual: @"org.sil.app.builder.reading.ReadingAppBuilder"] ||
+                            [clientAppId isEqual: @"org.sil.app.builder.dictionary.DictionaryAppBuilder"] ||
+                            //[clientAppId isEqual: @"com.microsoft.Word"] || // 2020-11-24[mcd]: Appears to work well in Word 16.43, disable legacy by default
+                            [clientAppId isEqual: @"org.openoffice.script"] ||
+                            // 2023-12-13[sgs]: Adobe apps automatically detected as non-compliant
+                            //[clientAppId isEqual: @"com.adobe.illustrator"] ||
+                            //[clientAppId isEqual: @"com.adobe.InDesign"] ||
+                            //[clientAppId isEqual: @"com.adobe.Photoshop"] ||
+                            //[clientAppId isEqual: @"com.adobe.AfterEffects"] ||
+                            //[clientAppId isEqual: @"com.microsoft.VSCode"] || // 2023-05-29[sgs]: Works with 1.78.2, disable legacy by default
+                            [clientAppId isEqual: @"com.google.Chrome"] ||
+                            // 2023-12-13[sgs]: must hard-code for Chrome because Google Docs returns relative but incorrect location so no way to auto-detect
+                            [clientAppId hasPrefix: @"net.java"] ||
+                            [clientAppId isEqual: @"com.Keyman.test.legacyInput"]
+                            /*||[clientAppId isEqual: @"ro.sync.exml.Oxygen"] - Oxygen has worse problems */
+                            );
+  
+  os_log_debug([KMLogs complianceLog], "containedInHardCodedNoncompliantAppList: for app %{public}@: %{public}@", clientAppId, isAppNonCompliant?@"yes":@"no");
   return isAppNonCompliant;
 }
 
@@ -207,21 +246,21 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
  * Returns the list of application IDs for non-compliant apps
  */
 - (NSArray *)noncompliantAppsUserDefaults {
-    NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
-    return [userData arrayForKey:kKMLegacyApps];
+  NSUserDefaults *userData = [NSUserDefaults standardUserDefaults];
+  return [userData arrayForKey:kKMLegacyApps];
 }
 
 /**
-* Check this user-managed list to see if the application ID is among those known to be non-compliant.
-*/
+ * Check this user-managed list to see if the application ID is among those known to be non-compliant.
+ */
 - (BOOL)containedInUserManagedNoncompliantAppList:(NSString *)clientAppId {
   BOOL isAppNonCompliant = NO;
   NSArray *legacyAppsUserDefaults = [self noncompliantAppsUserDefaults];
-
+  
   if(legacyAppsUserDefaults != nil) {
     isAppNonCompliant = [self arrayContainsApplicationId:clientAppId fromArray:legacyAppsUserDefaults];
   }
-  [self.appDelegate logDebugMessage:@"containedInUserManagedNoncompliantAppList: for app %@: %@", clientAppId, isAppNonCompliant?@"yes":@"no"];
+  os_log_debug([KMLogs complianceLog], "containedInUserManagedNoncompliantAppList: for app %{public}@: %{public}@", clientAppId, isAppNonCompliant?@"yes":@"no");
   return isAppNonCompliant;
 }
 
@@ -229,24 +268,24 @@ return [NSString stringWithFormat:@"complianceUncertain: %d, hasCompliantSelecti
  * Checks array for a list of possible regexes to match a client app id
  */
 - (BOOL)arrayContainsApplicationId:(NSString *)applicationId fromArray:(NSArray *)applicationArray {
-    for(id appId in applicationArray) {
-        if(![appId isKindOfClass:[NSString class]]) {
-          // always log this: bad data in UserDefaults
-          NSLog(@"arrayContainsApplicationId:fromArray: LegacyApps user defaults array should contain only strings");
-        } else {
-            NSError *error = nil;
-            NSRange range =  NSMakeRange(0, applicationId.length);
-            
-            NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern: (NSString *) appId options: 0 error: &error];
-            NSArray *matchesArray = [regex matchesInString:applicationId options:0 range:range];
-            if(matchesArray.count>0) {
-              [self.appDelegate logDebugMessage:@"arrayContainsApplicationId: found match for application ID %@: ", applicationId];
-              return YES;
-            }
-        }
+  for(id appId in applicationArray) {
+    if(![appId isKindOfClass:[NSString class]]) {
+      // always log this: bad data in UserDefaults
+      os_log_error([KMLogs complianceLog], "arrayContainsApplicationId:fromArray: LegacyApps user defaults array should contain only strings");
+    } else {
+      NSError *error = nil;
+      NSRange range =  NSMakeRange(0, applicationId.length);
+      
+      NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern: (NSString *) appId options: 0 error: &error];
+      NSArray *matchesArray = [regex matchesInString:applicationId options:0 range:range];
+      if(matchesArray.count>0) {
+        os_log_debug([KMLogs complianceLog], "arrayContainsApplicationId: found match for application ID %{public}@: ", applicationId);
+        return YES;
+      }
     }
-
-    return NO;
+  }
+  
+  return NO;
 }
 
 -(BOOL) isComplianceUncertain {

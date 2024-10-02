@@ -1,4 +1,9 @@
 #!/usr/bin/python3
+'''
+Keyman is copyright (C) SIL International. MIT License.
+
+Implements the Sentry error handling
+'''
 import getpass
 import hashlib
 import importlib
@@ -7,6 +12,7 @@ import os
 import platform
 import sys
 import traceback
+from keyman_config.keyman_option import KeymanOption
 from keyman_config.version import (
   __version__,
   __versionwithtag__,
@@ -26,7 +32,7 @@ from gi.repository import Gio, Gtk
 
 class SentryErrorHandling:
     def __init__(self) -> None:
-        self.settings = Gio.Settings.new('com.keyman.options')
+        self.error_reporting_setting = KeymanOption('error-reporting')
 
     def initialize_sentry(self):
         (enabled, reason) = self.is_sentry_enabled()
@@ -63,8 +69,7 @@ class SentryErrorHandling:
         return self._get_environ_nosentry() or not __uploadsentry__
 
     def bind_checkbutton(self, button: Gtk.CheckButton):
-        self.settings.bind("error-reporting", button, "active", Gio.SettingsBindFlags.NO_SENSITIVITY)
-        self.settings.connect("changed::error-reporting", self._on_sentry_reporting_toggled)
+        self.error_reporting_setting.bind_checkbutton(button, self._on_sentry_reporting_toggled)
 
     def set_enabled(self, enabled):
         assert not self.is_sentry_disabled_by_variable()
@@ -92,13 +97,13 @@ class SentryErrorHandling:
             self._close_sentry()
 
     def _save_setting(self, enabled: bool):
-        self.settings.set_boolean('error-reporting', enabled)
+        self.error_reporting_setting.set(enabled)
 
     def _get_setting(self) -> bool:
-        return self.settings.get_boolean('error-reporting')
+        return self.error_reporting_setting.get()
 
     def _on_sentry_reporting_toggled(self, settings, key):
-        self._handle_enabled(self.settings.get_boolean('error-reporting'))
+        self._handle_enabled(self._get_setting())
 
     def _close_sentry(self):
         from sentry_sdk import Hub
