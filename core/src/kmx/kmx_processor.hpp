@@ -84,6 +84,8 @@ namespace core
     supports_normalization() const override {
       return false;
     }
+
+    static bool is_handled(const std::vector<uint8_t>& buf);
   };
 
 } // namespace core

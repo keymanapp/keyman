@@ -757,7 +757,7 @@ int LdmlJsonTestSourceFactory::load(const km::core::path &compiled, const km::co
 
   // check and load the KMX (yes, once again)
   rawdata = km::tests::load_kmx_file(compiled);
-  if (!km::core::ldml_processor::is_kmxplus_file(rawdata)) {
+  if (!km::core::ldml_processor::is_handled(rawdata)) {
     std::cerr << "Reading KMX for test purposes failed: " << compiled << std::endl;
     return __LINE__;
   }

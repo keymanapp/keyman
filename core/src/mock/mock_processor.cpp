@@ -228,5 +228,23 @@ namespace km {
     km_core_status mock_processor::validate() const { return KM_CORE_STATUS_OK; }
 
     km_core_status null_processor::validate() const { return KM_CORE_STATUS_INVALID_ARGUMENT; }
-  } // namespace core
+
+    /**
+     * Returns true if the data starts with 'MOCK'.
+     *
+     * @param data  the keyboard blob
+     * @return true if the processor can handle the keyboard, otherwise false.
+     */
+    bool mock_processor::is_handled(const std::vector<uint8_t>& data) {
+      if (data.empty()) {
+        return false;
+      }
+
+      if (data.size() < 4) {  // a MOCK file is at least 4 bytes (MOCK)
+        return false;
+      }
+
+      return ((char*)data.data())[0] == 'M' && ((char*)data.data())[1] == 'O' && ((char*)data.data())[2] == 'C' && ((char*)data.data())[3] == 'K';
+    }
+  }  // namespace core
 } // namespace km

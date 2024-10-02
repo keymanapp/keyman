@@ -1008,7 +1008,7 @@ typedef struct {
   km_core_cu const * version_string;
   km_core_cu const * id;
 
-  // TODO-web-core: Deprecate this field
+  // TODO-web-core: Deprecate this field (#12497)
   // KMN_DEPRECATED
   km_core_path_name  folder_path;
 
@@ -1108,7 +1108,7 @@ into the out parameter.
 ## Specification
 
 ```c */
-// TODO-web-core: Deprecate this function
+// TODO-web-core: Deprecate this function (#12497)
 // KMN_DEPRECATED_API
 KMN_API
 km_core_status
@@ -1159,9 +1159,9 @@ into the out paramter.
 
 ```c */
 KMN_API
-km_core_status km_core_keyboard_load_from_blob(km_core_path_name kb_name,
-                                               void* blob,
-                                               size_t blob_size,
+km_core_status km_core_keyboard_load_from_blob(const km_core_path_name kb_name,
+                                               const void* blob,
+                                               const size_t blob_size,
                                                km_core_keyboard** keyboard);
 
 /*
@@ -1176,7 +1176,7 @@ km_core_status km_core_keyboard_load_from_blob(km_core_path_name kb_name,
 : a byte array containing the content of a KMX/KMX+ file.
 
 `blob_size`
-: A pointer to a size_t variable with the size of the blob in bytes.
+: a size_t variable with the size of the blob in bytes.
 
 `keyboard`
 : A pointer to result variable: A pointer to the opaque keyboard

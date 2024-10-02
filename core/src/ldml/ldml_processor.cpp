@@ -14,6 +14,7 @@
 #include "kmx/kmx_plus.h"
 #include "kmx/kmx_xstring.h"
 #include "kmx/kmx_processevent.h"
+#include "kmx/kmx_processor.hpp"
 #include "ldml/keyman_core_ldml.h"
 #include "kmx/kmx_file_validator.hpp"
 #include "debuglog.h"
@@ -111,17 +112,19 @@ ldml_processor::ldml_processor(std::u16string const& kb_name, const std::vector<
   _valid = true;
 }
 
-bool ldml_processor::is_kmxplus_file(const std::vector<uint8_t> & data) {
-  if (data.empty()) {
+/**
+ * Returns true if the data is a KMX+ file.
+ *
+ * @param data  the keyboard blob
+ * @return true if the processor can handle the keyboard, otherwise false.
+ */
+bool ldml_processor::is_handled(const std::vector<uint8_t>& data) {
+  // Check if it's a blob from a KMX file
+  if (!kmx_processor::is_handled(data)) {
     return false;
   }
 
   const kmx::PCOMP_KEYBOARD comp_keyboard = (kmx::PCOMP_KEYBOARD)data.data();
-
-  if (comp_keyboard->dwIdentifier != KMX_DWORD(FILEID_COMPILED)) {
-    return false;
-  }
-
   if (comp_keyboard->dwFileVersion < VERSION_160 || (comp_keyboard->dwFlags & KF_KMXPLUS) == 0) {
     return false;
   }

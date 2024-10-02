@@ -24,38 +24,95 @@ km::core::path test_dir;
 #define DISABLE_WARNING_DEPRECATED_DECLARATIONS
 #endif
 
-TEST(km_core_keyboard_api, load_from_file) {
-  // Setup
+class KmCoreKeyboardApiTests : public testing::Test {
+protected:
   km_core_keyboard* keyboard = nullptr;
+  void TearDown() override {
+    if (this->keyboard) {
+      km_core_keyboard_dispose(this->keyboard);
+      this->keyboard = nullptr;
+    }
+    }
+};
+
+TEST_F(KmCoreKeyboardApiTests, LoadFromFile) {
+  // Setup
   km::core::path kmxfile = km::core::path(test_dir / "kmx/k_020___deadkeys_and_backspace.kmx");
 
   // Execute
   DISABLE_WARNING_PUSH
   DISABLE_WARNING_DEPRECATED_DECLARATIONS
-  auto status = km_core_keyboard_load(kmxfile.c_str(), &keyboard);
+  auto status = km_core_keyboard_load(kmxfile.c_str(), &this->keyboard);
   DISABLE_WARNING_POP
 
   // Verify
   EXPECT_EQ(status, KM_CORE_STATUS_OK);
-  EXPECT_TRUE(keyboard != nullptr);
+  EXPECT_TRUE(this->keyboard != nullptr);
 }
 // END DEPRECATED
 
-TEST(km_core_keyboard_api, load_from_blob) {
+TEST_F(KmCoreKeyboardApiTests, LoadFromBlob) {
   // Setup
-  km_core_keyboard* keyboard = nullptr;
-
   km::core::path kmxfile = km::core::path(test_dir / "kmx/k_020___deadkeys_and_backspace.kmx");
 
   std::vector<uint8_t> data = km::tests::load_kmx_file(kmxfile.native());
-  ASSERT_TRUE(data.size() > 0);
+  ASSERT_GT(data.size(), 0);
 
   // Execute
-  auto status = km_core_keyboard_load_from_blob(kmxfile.stem().c_str(), data.data(), data.size(), &keyboard);
+  auto status = km_core_keyboard_load_from_blob(kmxfile.stem().c_str(), data.data(), data.size(), &this->keyboard);
 
   // Verify
   EXPECT_EQ(status, KM_CORE_STATUS_OK);
-  EXPECT_TRUE(keyboard != nullptr);
+  EXPECT_TRUE(this->keyboard != nullptr);
+}
+
+TEST_F(KmCoreKeyboardApiTests, LoadFromBlobMock) {
+  // Setup
+  km::core::path kmxfile = "mock_keyboard.mock";
+  std::string blob_string = "MOCK";
+
+  std::vector<uint8_t> data = std::vector<uint8_t>(blob_string.begin(), blob_string.end());
+  ASSERT_GT(data.size(), 0);
+
+  // Execute
+  auto status = km_core_keyboard_load_from_blob(kmxfile.stem().c_str(), data.data(), data.size(), &this->keyboard);
+
+  // Verify
+  EXPECT_EQ(status, KM_CORE_STATUS_OK);
+  EXPECT_TRUE(this->keyboard != nullptr);
+}
+
+TEST_F(KmCoreKeyboardApiTests, LoadFromBlobNull) {
+  // Setup
+  km::core::path kmxfile  = "";
+
+  uint8_t data[] = {};
+
+  // Execute
+  auto status = km_core_keyboard_load_from_blob(kmxfile.stem().c_str(), data, 0, &this->keyboard);
+
+  // Verify
+  EXPECT_EQ(status, KM_CORE_STATUS_INVALID_ARGUMENT);
+  EXPECT_TRUE(this->keyboard == nullptr);
+}
+
+TEST_F(KmCoreKeyboardApiTests, LoadFromBlobInvalidKeyboard) {
+  // Setup
+  km::core::path kmxfile  = "invalid_keyboard.kmx";
+  std::string blob_string = "KXTS";
+
+  std::vector<uint8_t> data = std::vector<uint8_t>(blob_string.begin(), blob_string.end());
+  for (auto i = data.size(); i < 64; i++) {
+    data.push_back(0);
+  }
+  ASSERT_GT(data.size(), 0);
+
+  // Execute
+  auto status = km_core_keyboard_load_from_blob(kmxfile.stem().c_str(), data.data(), data.size(), &this->keyboard);
+
+  // Verify
+  EXPECT_EQ(status, KM_CORE_STATUS_INVALID_KEYBOARD);
+  EXPECT_TRUE(this->keyboard == nullptr);
 }
 
 // provide our own `main` so that we can get the path of the exe so that

@@ -24,33 +24,33 @@ using namespace km::core;
 
 namespace
 {
-  abstract_processor* processor_factory(path const & kb_name, std::vector<uint8_t> buf) {
-    if (ldml_processor::is_kmxplus_file(buf)) {
-      abstract_processor* result = new ldml_processor(kb_name, buf);
-      return result;
+  abstract_processor* processor_factory(path const & kb_name, const std::vector<uint8_t> & buf) {
+    if (ldml_processor::is_handled(buf)) {
+      return new ldml_processor(kb_name, buf);
     }
-    return new kmx_processor(kb_name, buf);
+    if (kmx_processor::is_handled(buf)) {
+      return new kmx_processor(kb_name, buf);
+    }
+    if (mock_processor::is_handled(buf)) {
+      return new mock_processor(kb_name);
+    }
+    return new null_processor();
   }
 
 }  // namespace
 
 km_core_status
 km_core_keyboard_load_from_blob_internal(
-  km_core_path_name kb_name,
-  std::vector<uint8_t> buf,
+  const km_core_path_name kb_name,
+  const std::vector<uint8_t> & buf,
   km_core_keyboard** keyboard
 ) {
   assert(keyboard);
-  if (!keyboard)
+  if (!keyboard) {
     return KM_CORE_STATUS_INVALID_ARGUMENT;
-
-  if (buf.size() < 64) { // a KMX file is at least 64 bytes (KMX header)
-    return KM_CORE_STATUS_IO_ERROR;
   }
 
-  if (*PKMX_DWORD((KMX_BYTE*)buf.data()) != KMX_DWORD(FILEID_COMPILED)) {
-    return KM_CORE_STATUS_IO_ERROR;
-  }
+  *keyboard = nullptr;
   try {
     abstract_processor* kp = processor_factory(kb_name, buf);
     km_core_status status  = kp->validate();
@@ -67,14 +67,15 @@ km_core_keyboard_load_from_blob_internal(
 
 km_core_status
 km_core_keyboard_load_from_blob(
-  km_core_path_name kb_name,
-  void* blob,
-  size_t blob_size,
+  const km_core_path_name kb_name,
+  const void* blob,
+  const size_t blob_size,
   km_core_keyboard** keyboard
 ) {
   assert(keyboard);
-  if (!keyboard || !blob)
+  if (!keyboard || !blob) {
     return KM_CORE_STATUS_INVALID_ARGUMENT;
+  }
 
   std::vector<uint8_t> buf((uint8_t*)blob, (uint8_t*)blob + blob_size);
   return km_core_keyboard_load_from_blob_internal(kb_name, buf, keyboard);
@@ -110,8 +111,9 @@ km_core_status
 km_core_keyboard_load(km_core_path_name kb, km_core_keyboard **keyboard)
 {
   assert(keyboard);
-  if (!keyboard || !kb)
+  if (!keyboard || !kb) {
     return KM_CORE_STATUS_INVALID_ARGUMENT;
+  }
 
   path const kb_path(kb);
   try

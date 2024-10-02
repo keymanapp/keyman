@@ -411,3 +411,25 @@ km_core_keyboard_imx * kmx_processor::get_imx_list() const  {
   imx_list[fn_idx] =  KM_CORE_KEYBOARD_IMX_END;
   return imx_list;
 }
+
+/**
+ * Returns true the data is a KMX file, i.e. starts with 'KXTS'.
+ *
+ * @param data  the keyboard blob
+ * @return true if the processor can handle the keyboard, otherwise false.
+ */
+bool kmx_processor::is_handled(const std::vector<uint8_t>& data) {
+  if (data.empty()) {
+    return false;
+  }
+
+  if (data.size() < 64) {  // a KMX file is at least 64 bytes (KMX header)
+    return false;
+  }
+
+  if (data.size() >= KMX_MAX_ALLOWED_FILE_SIZE) {
+    return false;
+  }
+
+  return ((kmx::PCOMP_KEYBOARD)data.data())->dwIdentifier == KMX_DWORD(FILEID_COMPILED);  // 'KXTS'
+}
