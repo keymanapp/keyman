@@ -91,7 +91,7 @@ class CompilerTest : public testing::Test {
             fk.dpStoreArray = new FILE_STORE[100];
             fk.cxStoreArray = names.size();
 
-            for (unsigned int i=0; i<fk.cxStoreArray; i++) {
+            for (KMX_DWORD i=0; i<fk.cxStoreArray; i++) {
                 fk.dpStoreArray[i].dwSystemID  = 0;
                 u16cpy(fk.dpStoreArray[i].szName, names[i]);
                 fk.dpStoreArray[i].dpString    = nullptr;
@@ -103,18 +103,20 @@ class CompilerTest : public testing::Test {
             }
         }
 
-        void initFileGroupArray(FILE_KEYBOARD &fk, KMX_BOOL fUsingKeys) {
-            fk.dpGroupArray = new FILE_GROUP[1];
-            fk.cxGroupArray = 1;
+        void initFileGroupArray(FILE_KEYBOARD &fk, std::vector<const KMX_WCHAR*> names) {
+            fk.dpGroupArray = new FILE_GROUP[100];
+            fk.cxGroupArray = names.size();
 
-            fk.dpGroupArray->szName[0] = 0;
-            fk.dpGroupArray->cxKeyArray = 0;
-            fk.dpGroupArray->dpKeyArray = nullptr;
-            fk.dpGroupArray->dpMatch = nullptr;
-            fk.dpGroupArray->dpNoMatch = nullptr;
-            fk.dpGroupArray->fUsingKeys = fUsingKeys;
-            fk.dpGroupArray->fReadOnly = FALSE;
-            fk.dpGroupArray->Line = 0;
+            for (KMX_DWORD i=0; i<fk.cxGroupArray; i++) {
+                u16cpy(fk.dpGroupArray[i].szName, names[i]);
+                fk.dpGroupArray[i].cxKeyArray = 0;
+                fk.dpGroupArray[i].dpKeyArray = nullptr;
+                fk.dpGroupArray[i].dpMatch    = nullptr;
+                fk.dpGroupArray[i].dpNoMatch  = nullptr;
+                fk.dpGroupArray[i].fUsingKeys = FALSE;
+                fk.dpGroupArray[i].fReadOnly  = FALSE;
+                fk.dpGroupArray[i].Line       = 0;
+            }
         }
 
         void deleteFileKeyboard(FILE_KEYBOARD &fk) {
@@ -291,7 +293,8 @@ TEST_F(CompilerTest, IsValidKeyboardVersion_test) {
 // KMX_DWORD ProcessKeyLine(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnicode)
 
 TEST_F(CompilerTest, ProcessKeyLineImpl_test) {
-    initFileGroupArray(fileKeyboard, TRUE);
+    initFileGroupArray(fileKeyboard, {u"a"});
+    fileKeyboard.dpGroupArray[0].fUsingKeys = TRUE;
 
     PKMX_WCHAR pklIn, pklKey, pklOut;
     KMX_WCHAR str[128];
@@ -1473,6 +1476,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_u_test) {
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
     PKMX_WCHAR newp = nullptr;
+    initFileGroupArray(fileKeyboard, {u"a", u"b", u"c"});
 
     // KmnCompilerMessages::ERROR_InvalidToken
     u16cpy(str, u"uvw");
@@ -1528,6 +1532,18 @@ TEST_F(CompilerTest, GetXStringImpl_type_u_test) {
     // use, space in delimiters (see #11814, #11937, #11910, #11894, #11938)
     u16cpy(str, u"use( )");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidUse, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // use, KmnCompilerMessages::ERROR_GroupDoesNotExist
+    u16cpy(str, u"use(d)");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_GroupDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // use, KmnCompilerMessages::ERROR_GroupDoesNotExist, space before store
+    u16cpy(str, u"use( d)");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_GroupDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // use, KmnCompilerMessages::ERROR_GroupDoesNotExist, space after store
+    u16cpy(str, u"use(d )");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_GroupDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
