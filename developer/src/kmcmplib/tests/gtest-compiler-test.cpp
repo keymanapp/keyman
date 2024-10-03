@@ -1562,6 +1562,19 @@ TEST_F(CompilerTest, GetXStringImpl_type_u_test) {
     EXPECT_EQ(0, u16cmp(tstr_use_valid, tstr));
 }
 
+// tests strings starting with 'r'
+TEST_F(CompilerTest, GetXStringImpl_type_r_test) {
+    KMX_WCHAR tstr[128];
+    fileKeyboard.version = VERSION_90;
+    KMX_WCHAR str[LINESIZE];
+    KMX_WCHAR output[GLOBAL_BUFSIZE];
+    PKMX_WCHAR newp = nullptr;
+
+    // KmnCompilerMessages::ERROR_InvalidToken
+    u16cpy(str, u"rst");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+}
+
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
 // KMX_DWORD process_platform(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
 // KMX_DWORD process_if_synonym(KMX_DWORD dwSystemID, PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
