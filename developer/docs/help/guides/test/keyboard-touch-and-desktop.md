@@ -6,7 +6,7 @@ Keyman Developer includes full touch layout editing tools. In the image
 below I am editing a Khmer Angkor touch layout sample.
 
 [![Touch Editor -
-Khmer](../../../images/testing/touch-editor-khmer-800wi.png "Touch Editor - Khmer")](../../../images/testing/touch-editor-khmer.png)
+Khmer](../../images/testing/touch-editor-khmer-800wi.png "Touch Editor - Khmer")](../../images/testing/touch-editor-khmer.png)
 
 Once you have created your keyboard layout, you need to test it. Your
 keyboard layout may cover desktops as well as touch devices. The
@@ -14,7 +14,7 @@ keyboard layout may cover desktops as well as touch devices. The
 debugging commands for all platforms.
 
 [![Touch Editor - Build
-tab](../../../images/testing/touch-editor-build-800wi.png "Touch Editor - Build tab")](../../../images/testing/touch-editor-build.png)
+tab](../../images/testing/touch-editor-build-800wi.png "Touch Editor - Build tab")](../../images/testing/touch-editor-build.png)
 
 Testing is easy on Windows: press the **Start Debugging** button on the
 **Build** tab to test the rules in your keyboard layout with a [fully
@@ -56,7 +56,7 @@ will need to use different addresses; Keyman Developer leaves that up to
 you! We call the list the **Debug Host List**.
 
 ![KeymanWeb Debug
-Host](../../../images/testing/startdebugging-kd10.png "KeymanWeb Debug Host")
+Host](../../images/testing/startdebugging-kd10.png "KeymanWeb Debug Host")
 
 ## Testing your web keyboard on your desktop
 
@@ -91,12 +91,12 @@ choice, so you can then just click the link in your email on your target
 device.
 
 ![Enter the debug host
-URL](../../../images/testing/frame/android-enter-debug-host.png "Enter the debug host URL")
+URL](../../images/testing/frame/android-enter-debug-host.png "Enter the debug host URL")
 
 All going well, you should be presented with a page like this:
 
 ![Viewing the debug host on
-iPhone](../../../images/testing/frame/android-debug-host.png "Viewing the debug host on iPhone")
+iPhone](../../images/testing/frame/android-debug-host.png "Viewing the debug host on iPhone")
 
 If you get a Host Not Found error, try different addresses from the
 **KeymanWeb Debug Host** list, check your computer's firewall settings,
@@ -109,7 +109,7 @@ F7), and reload on the touch device -- you don't need to click the
 **Test Keyboard on web** button again.
 
 ![Testing a keyboard on
-iPhone](../../../images/testing/frame/android-debug-keyboard.png "Testing a keyboard on iPhone")
+iPhone](../../images/testing/frame/android-debug-keyboard.png "Testing a keyboard on iPhone")
 
 ## Loading your keyboard into the native Keyman apps
 
@@ -123,10 +123,10 @@ to Keyman for Android** button or **Add keyboard to Keyman for iOS**
 button on the test page on your device.
 
 ![Installing the keyboard into native
-app](../../../images/testing/frame/installing-native-keyboard-1.png "Installing the keyboard into native app")
+app](../../images/testing/frame/installing-native-keyboard-1.png "Installing the keyboard into native app")
 
 ![Installing the keyboard into native
-app](../../../images/testing/frame/installing-native-keyboard-2.png "Installing the keyboard into native app")
+app](../../images/testing/frame/installing-native-keyboard-2.png "Installing the keyboard into native app")
 
 Now your keyboard layout is installed and available in the Keyman App,
 and if you have the Keyman version with the system keyboard support
