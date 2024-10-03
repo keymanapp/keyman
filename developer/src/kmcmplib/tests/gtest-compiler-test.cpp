@@ -1426,7 +1426,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_n_test) {
     u16cpy(str, u"nmo");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // notany, KmnCompilerMessages::ERROR_60FeatureOnly_Contextn
+    // notany, KmnCompilerMessages::ERROR_70FeatureOnly
     fileKeyboard.version = VERSION_60;
     u16cpy(str, u"notany");
     EXPECT_EQ(KmnCompilerMessages::ERROR_70FeatureOnly, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
@@ -1601,14 +1601,22 @@ TEST_F(CompilerTest, GetXStringImpl_type_u_test) {
 // tests strings starting with 'r'
 TEST_F(CompilerTest, GetXStringImpl_type_r_test) {
     KMX_WCHAR tstr[128];
-    fileKeyboard.version = VERSION_90;
+    fileKeyboard.version = VERSION_80;
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
     PKMX_WCHAR newp = nullptr;
 
     // KmnCompilerMessages::ERROR_InvalidToken
+    fileKeyboard.version = VERSION_80;
     u16cpy(str, u"rst");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // reset, KmnCompilerMessages::ERROR_80FeatureOnly
+    fileKeyboard.version = VERSION_70;
+    u16cpy(str, u"reset");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_80FeatureOnly, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // reset, KmnCompilerMessages::ERROR_InvalidInVirtualKeySection *** TODO ***
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
