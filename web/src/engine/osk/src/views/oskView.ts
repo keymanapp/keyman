@@ -43,7 +43,7 @@ export type OSKRect = {
 
 /**
  * Definition for OSK events documented at
- * https://help.keyman.com/DEVELOPER/ENGINE/WEB/16.0/reference/events/.
+ * https://help.keyman.com/developer/engine/web/16.0/reference/events/.
  */
 export interface LegacyOSKEventMap {
   'configclick'(obj: {}): void;

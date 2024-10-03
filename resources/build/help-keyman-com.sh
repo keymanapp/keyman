@@ -94,6 +94,7 @@ function upload_keyman_help {
       ;;
     developer)
       # Note: `/developer/build.sh api` must be run first - covers both uploads
+      upload developer/docs/help developer/$VERSION_RELEASE
       upload developer/build/docs developer/$VERSION_RELEASE/reference/api
       upload developer/src/kmc/build/messages developer/$VERSION_RELEASE/reference/messages
       ;;

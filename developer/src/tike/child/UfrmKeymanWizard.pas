@@ -3263,6 +3263,14 @@ begin
     Exit;
   end;
 
+  if MessageDlg(
+    'Importing the Desktop On Screen Keyboard will overwrite all changes in all '+
+    'layers in the touch layout. Continue and overwrite touch layout?', mtWarning,
+    mbOkCancel, 0) = mrCancel then
+  begin
+    Exit;
+  end;
+
   if Self.Modified then   // I4059
   begin
     if not FKeymanDeveloperOptions.OSKAutoSaveBeforeImporting then
