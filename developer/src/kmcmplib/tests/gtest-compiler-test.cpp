@@ -1544,6 +1544,22 @@ TEST_F(CompilerTest, GetXStringImpl_type_u_test) {
     // use, KmnCompilerMessages::ERROR_GroupDoesNotExist, space after store
     u16cpy(str, u"use(d )");
     EXPECT_EQ(KmnCompilerMessages::ERROR_GroupDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // use, valid
+    u16cpy(str, u"use(b)");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_use_valid[] = { UC_SENTINEL, CODE_USE, 2, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_use_valid, tstr));
+
+    // use, space before group, valid
+    u16cpy(str, u"use( b)");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(tstr_use_valid, tstr));
+
+    // use, space after group, valid (see #11937, #11938)
+    u16cpy(str, u"use(b )");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(tstr_use_valid, tstr));
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
