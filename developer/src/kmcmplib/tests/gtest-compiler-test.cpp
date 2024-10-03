@@ -742,6 +742,10 @@ TEST_F(CompilerTest, GetXStringImpl_type_xd_test) {
     u16cpy(str, u"dk(%)");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidDeadkey, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
+    // dk, KmnCompilerMessages::ERROR_InvalidDeadkey, no delimiters => NULL
+    u16cpy(str, u"dk");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidDeadkey, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
     // dk, KmnCompilerMessages::ERROR_InvalidDeadkey, no close delimiter => NULL
     u16cpy(str, u"dk(");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidDeadkey, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
@@ -810,6 +814,10 @@ TEST_F(CompilerTest, GetXStringImpl_type_a_test) {
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // KmnCompilerMessages::ERROR_AnyInVirtualKeySection *** TODO ***
+
+    // KmnCompilerMessages::ERROR_InvalidAny, no delimiters => NULL
+    u16cpy(str, u"any");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidAny, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // KmnCompilerMessages::ERROR_InvalidAny, no close delimiter => NULL
     u16cpy(str, u"any(");
@@ -889,6 +897,11 @@ TEST_F(CompilerTest, GetXStringImpl_type_b_test) {
 
     // baselayout, KmnCompilerMessages::ERROR_InvalidInVirtualKeySection *** TODO ***
 
+    // baselayout, no delimiters => NULL
+    fileKeyboard.version = VERSION_90;
+    u16cpy(str, u"baselayout");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
     // baselayout, no close delimiter => NULL
     fileKeyboard.version = VERSION_90;
     u16cpy(str, u"baselayout(");
@@ -956,6 +969,11 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     fileKeyboard.version = VERSION_80;
 
     // if, KmnCompilerMessages::ERROR_InvalidInVirtualKeySection *** TODO ***
+
+    // if, no delimiters => NULL
+    fileKeyboard.version = VERSION_80;
+    u16cpy(str, u"if");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidIf, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // if, no close delimiter => NULL
     fileKeyboard.version = VERSION_80;
@@ -1048,6 +1066,10 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     fileKeyboard.dpStoreArray[1].fIsStore = TRUE;
 
     // index, KmnCompilerMessages::ERROR_InvalidInVirtualKeySection *** TODO ***
+
+    // index, no delimiters => NULL
+    u16cpy(str, u"index");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // index, no close delimiter => NULL
     u16cpy(str, u"index(");
@@ -1157,6 +1179,10 @@ TEST_F(CompilerTest, GetXStringImpl_type_o_test) {
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // outs, KmnCompilerMessages::ERROR_OutsInVirtualKeySection *** TODO ***
+
+    // outs, no delimiters => NULL
+    u16cpy(str, u"outs");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidOuts, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // outs, no close delimiter => NULL
     u16cpy(str, u"outs(");
@@ -1316,6 +1342,11 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
 
     // call, KmnCompilerMessages::ERROR_CallInVirtualKeySection *** TODO ***
 
+    // call, no delimiters => NULL
+    fileKeyboard.version = VERSION_501;
+    u16cpy(str, u"call");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidCall, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
     // call, no close delimiter => NULL
     fileKeyboard.version = VERSION_501;
     u16cpy(str, u"call(");
@@ -1401,6 +1432,11 @@ TEST_F(CompilerTest, GetXStringImpl_type_n_test) {
     EXPECT_EQ(KmnCompilerMessages::ERROR_70FeatureOnly, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // notany, KmnCompilerMessages::ERROR_AnyInVirtualKeySection *** TODO ***
+
+   // notany, no delimiters => NULL
+    fileKeyboard.version = VERSION_70;
+    u16cpy(str, u"notany");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidAny, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // notany, no close delimiter => NULL
     fileKeyboard.version = VERSION_70;
