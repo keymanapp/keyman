@@ -25,7 +25,7 @@ type KemanXMLOptionsBag = {
 const PARSER_OPTIONS: KemanXMLOptionsBag = {
   'keyboard3': {
     ignoreAttributes: false, // We'd like attributes, please
-    attributeNamePrefix: '', // to avoid '@_' prefixes
+    attributeNamePrefix: '@__', // We'll use this to convert attributes to strings and subobjects to arrays, when empty.
     trimValues: false, // preserve spaces, but:
     htmlEntities: true,
     tagValueProcessor: (tagName: string, tagValue: string /*, jPath, hasAttributes, isLeafNode*/) => {
@@ -133,19 +133,35 @@ export class KeymanXMLReader {
     }
   }
 
-  /** replace any empty string "" with an empty object {} */
+  /**
+   * Requires attribute prefix @__ (double underscore)
+   * For attributes, just remove @__ and continue.
+   * For objects, replace any empty string "" with an empty object {} */
   private static fixupEmptyStringToEmptyObject(data: any) : any {
-    if (data === "") {
-      // this is the core feature here.
-      return {};
-    } else if (typeof data === 'object') {
+    if (typeof data === 'object') {
+      // For arrays of objects, we map "" to {}
+      // "" means an empty object
       if (Array.isArray(data)) {
-        return data.map(v => KeymanXMLReader.fixupEmptyStringToEmptyObject(v));
+        return data.map(v => {
+          if (v === '') {
+            return {};
+          } else {
+            return KeymanXMLReader.fixupEmptyStringToEmptyObject(v);
+          }
+        });
       }
-      // object
-      const e : any = [];
+      // otherwise: remove @__ for attributes, remap objects
+      const e: any = [];
       Object.entries(data).forEach(([k, v]) => {
-        e.push([k, KeymanXMLReader.fixupEmptyStringToEmptyObject(v)]);
+        if (k.startsWith('@__')) {
+          e.push([k.substring(3), KeymanXMLReader.fixupEmptyStringToEmptyObject(v)]);
+        } else {
+          if (v === '') {
+            e.push([k, {}]);
+          } else {
+            e.push([k, KeymanXMLReader.fixupEmptyStringToEmptyObject(v)]);
+          }
+        }
       });
       return Object.fromEntries(e);
     } else {
@@ -217,11 +233,9 @@ export class KeymanXMLReader {
     let result = parser.parse(data, true);
     if (PARSER_OPTIONS[this.type].attributeNamePrefix === '$') {
       result = KeymanXMLReader.fixupDollarAttributes(result);
-    }
-    if (this.type === 'keyboard3') {
+    } else if (PARSER_OPTIONS[this.type].attributeNamePrefix === '@__') {
       result = KeymanXMLReader.fixupEmptyStringToEmptyObject(result);
-    }
-    if (PARSER_OPTIONS[this.type].preserveOrder) {
+    } else if (PARSER_OPTIONS[this.type].preserveOrder) {
       result = KeymanXMLReader.fixupPreserveOrder(result);
     }
     delete result['?xml'];

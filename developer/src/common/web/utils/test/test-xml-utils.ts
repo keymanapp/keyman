@@ -32,6 +32,7 @@ const read_cases: Case[] = [
       'k_020_fr.xml',
       'strs_invalid-illegal.xml',
       'tran_fail-empty.xml',
+      'tran_fail-matches-nothing-1.xml',
     ],
   }, {
     type: 'keyboardTest3',
