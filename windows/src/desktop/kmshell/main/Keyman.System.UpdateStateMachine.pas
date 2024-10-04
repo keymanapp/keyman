@@ -102,6 +102,7 @@ type
     procedure HandleDownload; virtual; abstract;
     procedure HandleAbort; virtual; abstract;
     procedure HandleInstallNow; virtual; abstract;
+    procedure HandleFirstRun; virtual;
 
     // For convenience
     function StateName: string; virtual; abstract;
@@ -182,6 +183,7 @@ type
     procedure HandleDownload; override;
     procedure HandleAbort; override;
     procedure HandleInstallNow; override;
+    procedure HandleFirstRun; override;
     function StateName: string; override;
   end;
 
@@ -198,8 +200,6 @@ type
   end;
 
   PostInstallState = class(TState)
-  private
-      procedure HandleMSIInstallComplete;
   public
     procedure Enter; override;
     procedure Exit; override;
@@ -208,11 +208,12 @@ type
     procedure HandleDownload; override;
     procedure HandleAbort; override;
     procedure HandleInstallNow; override;
+    procedure HandleFirstRun; override;
     function StateName: string; override;
   end;
 
 
-  { This class also controls the state flow see  }
+  { This class also controls the state flow}
   TUpdateStateMachine = class
   private
     FForce: Boolean;
@@ -236,6 +237,7 @@ type
     procedure SetState(const Value: TStateClass);
     procedure SetStateOnly(const Value: TStateClass);
     function ConvertEnumState(const TEnumState: TUpdateState): TStateClass;
+    procedure HandleMSIInstallComplete;
 
     procedure ShutDown;
     {
@@ -264,6 +266,7 @@ type
     procedure   HandleDownload;
     procedure   HandleAbort;
     procedure   HandleInstallNow;
+    procedure   HandleFirstRun;
     function    CurrentStateName: string;
 
     property ShowErrors: Boolean read FShowErrors write FShowErrors;
@@ -636,6 +639,22 @@ begin
   end;
 end;
 
+
+procedure TUpdateStateMachine.HandleMSIInstallComplete;
+var SavePath: string;
+    FileName: String;
+    FileNames: TStringDynArray;
+begin
+      SavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
+
+      GetFileNamesInDirectory(SavePath, FileNames);
+      for FileName in FileNames do
+      begin
+        System.SysUtils.DeleteFile(FileName);
+      end;
+      CurrentState.ChangeState(IdleState);
+end;
+
 procedure TUpdateStateMachine.HandleCheck;
 begin
   CurrentState.HandleCheck;
@@ -661,6 +680,11 @@ begin
   CurrentState.HandleInstallNow;
 end;
 
+procedure TUpdateStateMachine.HandleFirstRun;
+begin
+  CurrentState.HandleFirstRun;
+end;
+
 function TUpdateStateMachine.CurrentStateName: string;
 begin
   Result := CurrentState.StateName;
@@ -675,6 +699,12 @@ end;
 procedure TState.ChangeState(NewState: TStateClass);
 begin
   bucStateContext.State := NewState;
+end;
+
+// base implmentation to be overiden
+procedure TState.HandleFirstRun;
+begin
+
 end;
 
 { IdleState }
@@ -891,7 +921,6 @@ begin
     end
     else
     begin
-      bucStateContext.SetApplyNow(False);
       ChangeState(InstallingState);
     end;
   end
@@ -1194,6 +1223,12 @@ begin
   // Do Nothing. Need the UI to let user know installation in progress OR
 end;
 
+procedure InstallingState.HandleFirstRun;
+begin
+  bucStateContext.HandleMSIInstallComplete;
+  //Result := kmShellContinue;
+end;
+
 function InstallingState.StateName;
 begin
   Result := 'InstallingState';
@@ -1264,28 +1299,13 @@ end;
 
 function PostInstallState.HandleKmShell;
 begin
-  HandleMSIInstallComplete;
+  bucStateContext.HandleMSIInstallComplete;
   Result := kmShellContinue;
 end;
 
 procedure PostInstallState.HandleDownload;
 begin
   // Do Nothing
-end;
-
-procedure PostInstallState.HandleMSIInstallComplete;
-var SavePath: string;
-    FileName: String;
-    FileNames: TStringDynArray;
-begin
-      SavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
-
-      GetFileNamesInDirectory(SavePath, FileNames);
-      for FileName in FileNames do
-      begin
-        System.SysUtils.DeleteFile(FileName);
-      end;
-      ChangeState(IdleState);
 end;
 
 procedure PostInstallState.HandleAbort;
@@ -1296,6 +1316,12 @@ end;
 procedure PostInstallState.HandleInstallNow;
 begin
   // Do nothing as files will be cleaned via HandleKmShell
+end;
+
+procedure PostInstallState.HandleFirstRun;
+begin
+  bucStateContext.HandleMSIInstallComplete;
+  //Result := kmShellContinue;
 end;
 
 function PostInstallState.StateName;

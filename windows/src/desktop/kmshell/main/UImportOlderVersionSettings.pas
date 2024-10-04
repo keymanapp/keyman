@@ -41,6 +41,7 @@ uses
   keymanapi_TLB,
   ErrorControlledRegistry,
   RegistryKeys,
+  Keyman.System.UpdateStateMachine,
   UImportOlderKeyboardUtils;
 
 function FirstRunInstallDefaults(DoDefaults,DoStartWithWindows,DoCheckForUpdates,DoAutomaticUpdates: Boolean; FDisablePackages, FDefaultUILanguage: string; DoAutomaticallyReportUsage: Boolean): Boolean;  // I2753
@@ -48,7 +49,17 @@ var
   n, I: Integer;
   v: Integer;
   p: string;
+  UpdateSM : TUpdateStateMachine;
 begin
+  // send event to statemachine (should result in setting state to idle)
+  UpdateSM := TUpdateStateMachine.Create(False);
+  try
+    UpdateSM.HandleFirstRun;
+    Exit;
+  finally
+    UpdateSM.Free;
+  end;
+
   { Copy over all the user settings and set defaults for version 8.0: http://blog.tavultesoft.com/2011/02/keyman-desktop-80-default-options.html }
 
   if DoDefaults then  // I2753
