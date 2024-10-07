@@ -15,7 +15,9 @@ describe('kpj-file-reader', function () {
     const input = fs.readFileSync(path);
     const reader = new KPJFileReader(callbacks);
     const kpj = reader.read(input);
-    reader.validate(kpj);
+    assert.doesNotThrow(() => {
+      reader.validate(kpj);
+    });
     assert.equal(kpj.KeymanDeveloperProject.Options.BuildPath, '$PROJECTPATH\\build');
     assert.equal(kpj.KeymanDeveloperProject.Options.CheckFilenameConventions, 'False');
     assert.equal(kpj.KeymanDeveloperProject.Options.CompilerWarningsAsErrors, 'True');
