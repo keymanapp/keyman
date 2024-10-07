@@ -40,7 +40,7 @@ namespace
 }  // namespace
 
 km_core_status
-km_core_keyboard_load_from_blob_internal(
+keyboard_load_from_blob_internal(
   const km_core_path_name kb_name,
   const std::vector<uint8_t> & buf,
   km_core_keyboard** keyboard
@@ -78,7 +78,7 @@ km_core_keyboard_load_from_blob(
   }
 
   std::vector<uint8_t> buf((uint8_t*)blob, (uint8_t*)blob + blob_size);
-  return km_core_keyboard_load_from_blob_internal(kb_name, buf, keyboard);
+  return keyboard_load_from_blob_internal(kb_name, buf, keyboard);
 }
 
 // TODO-web-core: Remove this code when we remove the deprecated km_core_keyboard_load method
@@ -123,7 +123,7 @@ km_core_keyboard_load(km_core_path_name kb, km_core_keyboard **keyboard)
     // Some legacy packages may include upper-case file extensions
     if (kb_path.suffix() == ".kmx" || kb_path.suffix() == ".KMX") {
       std::vector<uint8_t> buf = load_kmx_file(kb_path);
-      status = km_core_keyboard_load_from_blob_internal(kb_path.stem().c_str(), buf, (km_core_keyboard**)&kp);
+      status = keyboard_load_from_blob_internal(kb_path.stem().c_str(), buf, (km_core_keyboard**)&kp);
       if (status != KM_CORE_STATUS_OK) {
         return status;
       }

@@ -423,7 +423,7 @@ bool kmx_processor::is_handled(const std::vector<uint8_t>& data) {
     return false;
   }
 
-  if (data.size() < 64) {  // a KMX file is at least 64 bytes (KMX header)
+  if (data.size() < sizeof(COMP_KEYBOARD)) {  // a KMX file is at least 64 bytes (KMX header)
     return false;
   }
 
