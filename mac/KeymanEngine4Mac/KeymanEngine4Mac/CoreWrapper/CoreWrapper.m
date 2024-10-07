@@ -91,6 +91,8 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
     }
   }
 
+  km_core_keyboard_key_list_dispose(keyList);
+  
   os_log_debug([KMELogs coreLog], "getKeyList returning %lu keys", (unsigned long)keyArray.count);
 
   return keyArray;
@@ -103,7 +105,7 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   if (self.coreKeyboard) {
     km_core_keyboard_dispose(self.coreKeyboard);
   }
-  os_log_debug([KMELogs coreLog], "dealloc called.");
+  os_log_debug([KMELogs coreLog], "CoreWrapper dealloc called");
 }
 
 -(void)loadKeyboardUsingCore:(NSString*) path {
