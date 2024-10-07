@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8"?>
 <visualkeyboard>
   <header>
     <version>10.0</version>
@@ -156,7 +156,7 @@
       <key vkey="K_SPACE"/>
       <key vkey="K_1">!</key>
       <key vkey="K_QUOTE"></key>
-      <key vkey="K_3">"</key>
+      <key vkey="K_3">&quot;</key>
       <key vkey="K_4">៛</key>
       <key vkey="K_5">%</key>
       <key vkey="K_7"></key>
