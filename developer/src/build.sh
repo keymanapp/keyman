@@ -152,6 +152,7 @@ function do_publish() {
     DRY_RUN=--dry-run
   fi
 
+  ./common/web/utils/build.sh publish $DRY_RUN $NPM_PUBLISH
   ../../common/web/keyman-version/build.sh publish $DRY_RUN $NPM_PUBLISH
   ../../common/web/types/build.sh publish $DRY_RUN $NPM_PUBLISH
   ../../core/include/ldml/build.sh publish $DRY_RUN $NPM_PUBLISH

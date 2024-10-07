@@ -15,7 +15,6 @@
 #import "ZipArchive.h"
 #import "KMPackageReader.h"
 #import "KMPackageInfo.h"
-#import "KMKeyboardInfo.h"
 #import "PrivacyConsent.h"
 #import "KMLogs.h"
 @import Sentry;
@@ -52,6 +51,7 @@ NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboard
 @implementation KMInputMethodAppDelegate
 @synthesize kme = _kme;
 @synthesize kmx = _kmx;
+@synthesize modifierMapping = _modifierMapping;
 @synthesize kvk = _kvk;
 @synthesize keyboardName = _keyboardName;
 @synthesize keyboardsPath = _keyboardsPath;
@@ -283,9 +283,9 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     
     switch (type) {
       case kCGEventFlagsChanged:
-        os_log_debug([KMLogs eventsLog], "eventTapFunction: system event kCGEventFlagsChanged to: %x", (int) sysEvent.modifierFlags);
-        appDelegate.currentModifierFlags = sysEvent.modifierFlags;
-        if (appDelegate.currentModifierFlags & NSEventModifierFlagCommand) {
+        os_log_debug([KMLogs eventsLog], "eventTapFunction: system event kCGEventFlagsChanged to: 0x%X", (int) sysEvent.modifierFlags);
+        appDelegate.currentModifiers = sysEvent.modifierFlags;
+        if (appDelegate.currentModifiers & NSEventModifierFlagCommand) {
           appDelegate.contextChangedByLowLevelEvent = YES;
         }
         break;
@@ -389,16 +389,24 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   return _packageReader;
 }
 
-- (void)setKmx:(KMXFile *)kmx {
+- (void)resetKmx {
+  _kmx = nil;
+  _modifierMapping = nil;
+}
+
+- (void)loadKeyboardFromKmxFile:(KMXFile *)kmx {
   _kmx = kmx;
-  [self.kme setKmx:_kmx];
+  CoreKeyboardInfo *keyboardInfo = [self.kme loadKeyboardFromKmxFile:kmx];
+
+  os_log_info([KMLogs keyboardLog], "setKmx loaded keyboard, keyboard info: %{public}@", keyboardInfo);
   
-  NSString *keyboardFileName = [kmx.filePath lastPathComponent];
-   os_log_info([KMLogs keyboardLog], "setKmx to %{public}@", keyboardFileName);
+  _modifierMapping = [[KMModifierMapping alloc] init:keyboardInfo];
+
+  os_log_info([KMLogs keyboardLog], "modifierMapping bothOptionKeysGenerateRightAlt: %d", self.modifierMapping.bothOptionKeysGenerateRightAlt);
 
    // assign custom keyboard tag in Sentry to default keyboard
    [SentrySDK configureScope:^(SentryScope * _Nonnull scope) {
-       [scope setTagValue:keyboardFileName forKey:@"keyboard"];
+       [scope setTagValue:keyboardInfo.keyboardId forKey:@"keyboard"];
    }];
 }
 
@@ -787,7 +795,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   os_log_debug([KMLogs dataLog], "setSelectedKeyboard, keyboardName = '%{public}@', full path = '%{public}@'", keyboardName, fullPath);
   [menuItem setState:NSOnState];
   KMXFile *kmx = [[KMXFile alloc] initWithFilePath:fullPath];
-  [self setKmx:kmx];
+  [self loadKeyboardFromKmxFile:kmx];
   NSDictionary *kmxInfo = [KMXFile keyboardInfoFromKmxFile:fullPath];
   NSString *kvkFilename = [kmxInfo objectForKey:kKMVisualKeyboardKey];
   if (kvkFilename != nil) {
@@ -815,7 +823,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   NSString* placeholder = NSLocalizedString(@"no-keyboard-configured-menu-placeholder", nil);
   NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:placeholder action:NULL keyEquivalent:@""];
   [self.menu insertItem:item atIndex:KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX];
-  [self setKmx:nil];
+  [self resetKmx];
   [self setKvk:nil];
   [self setKeyboardName:nil];
   [self setKeyboardIcon:nil];
@@ -844,7 +852,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   os_log_debug([KMLogs dataLog], "setSelectedKeyboard, keyboardName = '%{public}@', full path = '%{public}@'", path, fullPath);
   
   KMXFile *kmx = [[KMXFile alloc] initWithFilePath:fullPath];
-  [self setKmx:kmx];
+  [self loadKeyboardFromKmxFile:kmx];
   KVKFile *kvk = nil;
   NSDictionary *kmxInfo = [KMXFile keyboardInfoFromKmxFile:fullPath];
   NSString *kvkFilename = [kmxInfo objectForKey:kKMVisualKeyboardKey];
@@ -1220,6 +1228,11 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     return;
   
   [_oskWindow.oskView handleKeyEvent:event];
+}
+
+- (NSEventModifierFlags) determineModifiers {
+  NSEventModifierFlags originalModifiers = self.currentModifiers;
+  return [self.modifierMapping adjustModifiers:originalModifiers];
 }
 
 extern const CGKeyCode kProcessPendingBuffer;
