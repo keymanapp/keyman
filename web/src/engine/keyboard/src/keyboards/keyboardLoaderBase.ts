@@ -22,7 +22,7 @@ export abstract class KeyboardLoaderBase {
    * @param uri  The URI of the keyboard to load.
    * @returns    A Promise that resolves to the loaded keyboard.
    */
-  public async loadKeyboardFromPath(uri: string): Promise<Keyboard> {
+  public loadKeyboardFromPath(uri: string): Promise<Keyboard> {
     this.harness.install();
     return this.loadKeyboardInternal(uri, new UriBasedErrorBuilder(uri));
   }
