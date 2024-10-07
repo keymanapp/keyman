@@ -12,6 +12,7 @@
 #import <Foundation/Foundation.h>
 #import "KMXFile.h"
 #import "CoreKeyOutput.h"
+#import "CoreKeyboardInfo.h"
 
 //#define USE_ALERT_SHOW_HELP_TO_FORCE_EASTER_EGG_CRASH_FROM_ENGINE
 
@@ -20,6 +21,7 @@
 @property (weak, nonatomic) KMXFile *kmx;
 
 - (id)initWithKMX:(KMXFile *)kmx context:(NSString *)ctxBuf;
+- (CoreKeyboardInfo*)loadKeyboardFromKmxFile:(KMXFile*) kmxFile;
 - (NSString *)getCoreContextDebug;
 - (void)clearCoreContext;
 - (void)setCoreContextIfNeeded:(NSString *)context;
