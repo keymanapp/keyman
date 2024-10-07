@@ -17,12 +17,12 @@ export type KeymanXMLType =
   ;
 
 /** Bag of options, maximally one for each KeymanXMLType */
-type KemanXMLOptionsBag = {
+type KeymanXMLOptionsBag = {
   [key in KeymanXMLType]?: any
 };
 
 /** map of options for the XML parser */
-const PARSER_OPTIONS: KemanXMLOptionsBag = {
+const PARSER_OPTIONS: KeymanXMLOptionsBag = {
   'keyboard3': {
     ignoreAttributes: false, // We'd like attributes, please
     attributeNamePrefix: '@__', // We'll use this to convert attributes to strings and subobjects to arrays, when empty.
@@ -92,7 +92,7 @@ const PARSER_OPTIONS: KemanXMLOptionsBag = {
   },
 };
 
-const GENERATOR_OPTIONS: KemanXMLOptionsBag = {
+const GENERATOR_OPTIONS: KeymanXMLOptionsBag = {
   kvks: {
     attributeNamePrefix: '$',
     ignoreAttributes: false,
