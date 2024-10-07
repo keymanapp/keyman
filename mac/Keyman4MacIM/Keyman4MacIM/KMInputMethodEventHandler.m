@@ -122,17 +122,19 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
 - (CoreKeyOutput*) processEventWithKeymanEngine:(NSEvent *)event in:(id) sender {
   CoreKeyOutput* coreKeyOutput = nil;
   if (self.appDelegate.lowLevelEventTap != nil) {
-    NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:self.appDelegate.currentModifierFlags timestamp:event.timestamp windowNumber:event.windowNumber context:[NSGraphicsContext currentContext] characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
+    NSEventModifierFlags newModifiers = [self.appDelegate determineModifiers];
+    NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:newModifiers timestamp:event.timestamp windowNumber:event.windowNumber context:[NSGraphicsContext currentContext] characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
     coreKeyOutput = [self.kme processEvent:eventWithOriginalModifierFlags];
-    os_log_debug([KMLogs eventsLog], "processEventWithKeymanEngine, using AppDelegate.currentModifierFlags: %lu / 0x%lX, instead of event.modifiers = %lu / 0x%lX", self.appDelegate.currentModifierFlags, self.appDelegate.currentModifierFlags, event.modifierFlags, event.modifierFlags);
+    os_log_debug([KMLogs eventsLog], "processEventWithKeymanEngine, using newModifierFlag 0x%lX, instead of event.modifiers 0x%lX", newModifiers, event.modifierFlags);
   }
   else {
-    // Depending on the client app and the keyboard, using the passed-in event as it is should work okay.
-    // Keyboards that depend on chirality support will not work. And command-key actions that change the
-    // context might go undetected in some apps, resulting in errant behavior for subsequent typing.
+    /** 
+     * Without the low level event tap, there will be no way to distinguish left and right option keys.
+     * Also command-key actions that should invalidate the context may go undetected.
+     * Have yet to determine which scenarios prevent an event tap from be created
+     */
     coreKeyOutput = [self.kme processEvent:event];
   }
-  //os_log_debug([KMLogs eventsLog], "processEventWithKeymanEngine, coreKeyOutput = %{public}@", coreKeyOutput);
   return coreKeyOutput;
 }
 

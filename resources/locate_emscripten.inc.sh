@@ -41,7 +41,7 @@ locate_emscripten() {
 }
 
 # Ensure that we use correct version of emsdk on build agents.
-# For developers, define KEYMAN_USE_SDK to do this on your
+# For developers, define KEYMAN_USE_EMSDK to do this on your
 # build machine.
 verify_emscripten_version() {
   if [[ "$VERSION_ENVIRONMENT" != local || ! -z "${KEYMAN_USE_EMSDK+x}" ]]; then

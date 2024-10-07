@@ -24,24 +24,24 @@ devices emulated may or not work as well a real device.
 
 1.  Start testing your keyboard with the [original steps on testing
     touch keyboards](keyboard-touch-and-desktop).
-    ![](../../../images/testing/startdebugging-kd10.png "StartDebugging")
+    ![](../../images/testing/startdebugging-kd10.png "StartDebugging")
 2.  Open Chrome, navigate to the debug host page for your keyboard, and
     press F12.
-    ![Chrome1](../../../images/testing/chrome1.png "Chrome1")
+    ![Chrome1](../../images/testing/chrome1.png "Chrome1")
 3.  In the Developer Tools window, click the mobile icon:
-    ![Chrome2](../../../images/testing/chrome2.png "Chrome2")
+    ![Chrome2](../../images/testing/chrome2.png "Chrome2")
 4.  Back in the debug host page, select the appropriate device from the
     mobile emulation toolbar, then press F5 to reload and enable the
     touch mode. Some recommended devices are iPad or iPad Pro for tablet
     testing, and iPhone X or Nexus 6P for mobile testing. Do not select
     "Responsive".
-    ![Chrome3](../../../images/testing/chrome3.png "Chrome3")
+    ![Chrome3](../../images/testing/chrome3.png "Chrome3")
 5.  At this point, you should see a simulation of selected device's
     screen, and KeymanWeb should be presenting its touch keyboard rather
     than the desktop equivalent. You'll also see the mouse cursor has
     turned into a fuzzy circle, to simulate a fingertip instead of a
     precise arrow.
-    ![Chrome4"](../../../images/testing/chrome4.png "Chrome4")
+    ![Chrome4"](../../images/testing/chrome4.png "Chrome4")
 
 You can now test the keyboard layout and get an idea of how it will feel
 on a real touch device. Rotation, or changing device types will require
