@@ -1665,16 +1665,23 @@ TEST_F(CompilerTest, GetXStringImpl_type_r_test) {
     // reset, space before store, valid
     fileKeyboard.version = VERSION_80;
     u16cpy(str, u"reset( b)");
-    fileKeyboard.dpStoreArray[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(tstr_reset_valid, tstr));
 
     // reset, space after store, valid (see #11937, #11938)
     fileKeyboard.version = VERSION_80;
     u16cpy(str, u"reset(b )");
-    fileKeyboard.dpStoreArray[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(tstr_reset_valid, tstr));
+
+    // return, valid
+    u16cpy(str, u"return");
+    u16cpy(output, u"XXXXX");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 4, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_return_valid[]   = { UC_SENTINEL, CODE_RETURN, 0 };
+    const KMX_WCHAR output_return_valid[] = { UC_SENTINEL, CODE_RETURN, 0, 0, 'X' };
+    EXPECT_EQ(0, u16cmp(tstr_return_valid, tstr));
+    EXPECT_EQ(0, u16cmp(output_return_valid, output));
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
