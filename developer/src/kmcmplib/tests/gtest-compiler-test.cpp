@@ -1476,7 +1476,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_n_test) {
     const KMX_WCHAR tstr_notany_valid[] = { UC_SENTINEL, CODE_NOTANY, 2, 0 };
     EXPECT_EQ(0, u16cmp(tstr_notany_valid, tstr));
 
-    // notany, valid, empy store
+    // notany, valid, empty store
     fileKeyboard.version = VERSION_70;
     u16cpy(str, u"notany(b)");
     fileKeyboard.dpStoreArray[1].dpString = (PKMX_WCHAR)u""; // empty
@@ -1605,6 +1605,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_r_test) {
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
     PKMX_WCHAR newp = nullptr;
+    initFileStoreArray(fileKeyboard, {u"a", u"b", u"c"});
 
     // KmnCompilerMessages::ERROR_InvalidToken
     fileKeyboard.version = VERSION_80;
@@ -1617,6 +1618,63 @@ TEST_F(CompilerTest, GetXStringImpl_type_r_test) {
     EXPECT_EQ(KmnCompilerMessages::ERROR_80FeatureOnly, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
     // reset, KmnCompilerMessages::ERROR_InvalidInVirtualKeySection *** TODO ***
+
+    // reset, no delimiters => NULL
+    fileKeyboard.version = VERSION_80;
+    u16cpy(str, u"reset");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidReset, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // reset, no close delimiter => NULL
+    fileKeyboard.version = VERSION_80;
+    u16cpy(str, u"reset(");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidReset, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // reset, empty delimiters => empty string
+    fileKeyboard.version = VERSION_80;
+    u16cpy(str, u"reset()");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidReset, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // reset, space in delimiters (see #11814, #11937, #11910, #11894, #11938)
+    fileKeyboard.version = VERSION_80;
+    u16cpy(str, u"reset( )");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidReset, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // reset, KmnCompilerMessages::ERROR_StoreDoesNotExist
+    fileKeyboard.version = VERSION_80;
+    u16cpy(str, u"reset(d)");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // reset, KmnCompilerMessages::ERROR_StoreDoesNotExist, space before store
+    fileKeyboard.version = VERSION_80;
+    u16cpy(str, u"reset( d)");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // reset, KmnCompilerMessages::ERROR_StoreDoesNotExist, space after store
+    fileKeyboard.version = VERSION_80;
+    u16cpy(str, u"reset(d )");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // reset, valid
+    fileKeyboard.version = VERSION_80;
+    u16cpy(str, u"reset(b)");
+    fileKeyboard.dpStoreArray[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_reset_valid[] = { UC_SENTINEL, CODE_RESETOPT, 2, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_reset_valid, tstr));
+
+    // reset, space before store, valid
+    fileKeyboard.version = VERSION_80;
+    u16cpy(str, u"reset( b)");
+    fileKeyboard.dpStoreArray[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(tstr_reset_valid, tstr));
+
+    // reset, space after store, valid (see #11937, #11938)
+    fileKeyboard.version = VERSION_80;
+    u16cpy(str, u"reset(b )");
+    fileKeyboard.dpStoreArray[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(tstr_reset_valid, tstr));
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
