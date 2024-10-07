@@ -119,6 +119,15 @@ class CompilerTest : public testing::Test {
             }
         }
 
+        void initVKDictionary(FILE_KEYBOARD &fk) {
+            fk.dpVKDictionary = new FILE_VKDICTIONARY[10];
+            fk.cxVKDictionary = 0;
+
+            for (KMX_DWORD i=0; i<10; i++) {
+                fk.dpVKDictionary[i].szName[0] = 0;
+            }
+        }
+
         void deleteFileKeyboard(FILE_KEYBOARD &fk) {
             if (fk.dpStoreArray)   { delete[] fk.dpStoreArray;   }
             if (fk.dpGroupArray)   { delete[] fk.dpGroupArray;   }
@@ -1682,6 +1691,32 @@ TEST_F(CompilerTest, GetXStringImpl_type_r_test) {
     const KMX_WCHAR output_return_valid[] = { UC_SENTINEL, CODE_RETURN, 0, 0, 'X' };
     EXPECT_EQ(0, u16cmp(tstr_return_valid, tstr));
     EXPECT_EQ(0, u16cmp(output_return_valid, output));
+}
+
+// tests strings starting with '['
+TEST_F(CompilerTest, GetXStringImpl_type_osb_test) {
+    KMX_WCHAR tstr[128];
+    fileKeyboard.version = VERSION_90;
+    KMX_WCHAR str[LINESIZE];
+    KMX_WCHAR output[GLOBAL_BUFSIZE];
+    PKMX_WCHAR newp = nullptr;
+    initVKDictionary(fileKeyboard);
+
+    // virtual key, empty, KmnCompilerMessages::ERROR_InvalidToken
+    u16cpy(str, u"[]");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // virtual key, single space, KmnCompilerMessages::ERROR_InvalidToken
+    u16cpy(str, u"[ ]");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // virtual key, in VKeyNames, valid
+    fileKeyboard.version = VERSION_90;
+    u16cpy(str, u"[K_A]");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    KMX_WCHAR sFlag = ISVIRTUALKEY;
+    const KMX_WCHAR tstr_virtual_key_valid[]   = { UC_SENTINEL, CODE_EXTENDED, sFlag, 65, UC_SENTINEL_EXTENDEDEND, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
