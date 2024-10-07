@@ -86,10 +86,10 @@ TEST_F(KmCoreKeyboardApiTests, LoadFromBlobNull) {
   // Setup
   km::core::path kmxfile  = "";
 
-  uint8_t data[] = {};
+  std::unique_ptr<uint8_t> data(new uint8_t[0]);
 
   // Execute
-  auto status = km_core_keyboard_load_from_blob(kmxfile.stem().c_str(), data, 0, &this->keyboard);
+  auto status = km_core_keyboard_load_from_blob(kmxfile.stem().c_str(), data.get(), 0, &this->keyboard);
 
   // Verify
   EXPECT_EQ(status, KM_CORE_STATUS_INVALID_ARGUMENT);
