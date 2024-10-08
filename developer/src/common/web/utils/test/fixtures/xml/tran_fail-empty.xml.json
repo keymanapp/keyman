@@ -1,0 +1,28 @@
+{
+ "keyboard3": {
+  "xmlns": "https://schemas.unicode.org/cldr/45/keyboard3",
+  "locale": "mt",
+  "conformsTo": "45",
+  "info": {
+   "name": "tran-mixed"
+  },
+  "transforms": {
+   "type": "simple",
+   "transformGroup": [
+    {
+     "transform": {
+      "from": "xx",
+      "to": "x"
+     }
+    },
+    {
+     "reorder": {
+      "from": "ខែ្ម",
+      "order": "1 3 4 2"
+     }
+    },
+    {}
+   ]
+  }
+ }
+}

@@ -1,0 +1,538 @@
+{
+ "keyboardTest3": {
+  "$": {
+   "conformsTo": "techpreview"
+  },
+  "#name": "keyboardTest3",
+  "$$": [
+   {
+    "$": {
+     "keyboard": "k_020_fr.xml",
+     "author": "Team Keyboard",
+     "name": "fr-test-updated"
+    },
+    "#name": "info"
+   },
+   {
+    "$": {
+     "name": "simple-repertoire",
+     "chars": "[a b c d e \\u0022]",
+     "type": "simple"
+    },
+    "#name": "repertoire"
+   },
+   {
+    "$": {
+     "name": "chars-repertoire",
+     "chars": "[á é ó]",
+     "type": "gesture"
+    },
+    "#name": "repertoire"
+   },
+   {
+    "$": {
+     "name": "key-tests-updated"
+    },
+    "#name": "tests",
+    "$$": [
+     {
+      "$": {
+       "name": "key-test"
+      },
+      "#name": "test",
+      "$$": [
+       {
+        "$": {
+         "to": "abc\\u0022..."
+        },
+        "#name": "startContext"
+       },
+       {
+        "$": {
+         "key": "s"
+        },
+        "#name": "keystroke"
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...s"
+        },
+        "#name": "check"
+       },
+       {
+        "$": {
+         "key": "t"
+        },
+        "#name": "keystroke"
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...st"
+        },
+        "#name": "check"
+       },
+       {
+        "$": {
+         "key": "u"
+        },
+        "#name": "keystroke"
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...stu"
+        },
+        "#name": "check"
+       },
+       {
+        "$": {
+         "to": "v"
+        },
+        "#name": "emit"
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...stuv"
+        },
+        "#name": "check"
+       }
+      ],
+      "startContext": [
+       {
+        "$": {
+         "to": "abc\\u0022..."
+        }
+       }
+      ],
+      "keystroke": [
+       {
+        "$": {
+         "key": "s"
+        }
+       },
+       {
+        "$": {
+         "key": "t"
+        }
+       },
+       {
+        "$": {
+         "key": "u"
+        }
+       }
+      ],
+      "check": [
+       {
+        "$": {
+         "result": "abc\\u0022...s"
+        }
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...st"
+        }
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...stu"
+        }
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...stuv"
+        }
+       }
+      ],
+      "emit": [
+       {
+        "$": {
+         "to": "v"
+        }
+       }
+      ]
+     }
+    ],
+    "test": [
+     {
+      "$": {
+       "name": "key-test"
+      },
+      "$$": [
+       {
+        "$": {
+         "to": "abc\\u0022..."
+        },
+        "#name": "startContext"
+       },
+       {
+        "$": {
+         "key": "s"
+        },
+        "#name": "keystroke"
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...s"
+        },
+        "#name": "check"
+       },
+       {
+        "$": {
+         "key": "t"
+        },
+        "#name": "keystroke"
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...st"
+        },
+        "#name": "check"
+       },
+       {
+        "$": {
+         "key": "u"
+        },
+        "#name": "keystroke"
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...stu"
+        },
+        "#name": "check"
+       },
+       {
+        "$": {
+         "to": "v"
+        },
+        "#name": "emit"
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...stuv"
+        },
+        "#name": "check"
+       }
+      ],
+      "startContext": [
+       {
+        "$": {
+         "to": "abc\\u0022..."
+        }
+       }
+      ],
+      "keystroke": [
+       {
+        "$": {
+         "key": "s"
+        }
+       },
+       {
+        "$": {
+         "key": "t"
+        }
+       },
+       {
+        "$": {
+         "key": "u"
+        }
+       }
+      ],
+      "check": [
+       {
+        "$": {
+         "result": "abc\\u0022...s"
+        }
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...st"
+        }
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...stu"
+        }
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...stuv"
+        }
+       }
+      ],
+      "emit": [
+       {
+        "$": {
+         "to": "v"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "info": [
+   {
+    "$": {
+     "keyboard": "k_020_fr.xml",
+     "author": "Team Keyboard",
+     "name": "fr-test-updated"
+    }
+   }
+  ],
+  "repertoire": [
+   {
+    "$": {
+     "name": "simple-repertoire",
+     "chars": "[a b c d e \\u0022]",
+     "type": "simple"
+    }
+   },
+   {
+    "$": {
+     "name": "chars-repertoire",
+     "chars": "[á é ó]",
+     "type": "gesture"
+    }
+   }
+  ],
+  "tests": [
+   {
+    "$": {
+     "name": "key-tests-updated"
+    },
+    "$$": [
+     {
+      "$": {
+       "name": "key-test"
+      },
+      "#name": "test",
+      "$$": [
+       {
+        "$": {
+         "to": "abc\\u0022..."
+        },
+        "#name": "startContext"
+       },
+       {
+        "$": {
+         "key": "s"
+        },
+        "#name": "keystroke"
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...s"
+        },
+        "#name": "check"
+       },
+       {
+        "$": {
+         "key": "t"
+        },
+        "#name": "keystroke"
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...st"
+        },
+        "#name": "check"
+       },
+       {
+        "$": {
+         "key": "u"
+        },
+        "#name": "keystroke"
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...stu"
+        },
+        "#name": "check"
+       },
+       {
+        "$": {
+         "to": "v"
+        },
+        "#name": "emit"
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...stuv"
+        },
+        "#name": "check"
+       }
+      ],
+      "startContext": [
+       {
+        "$": {
+         "to": "abc\\u0022..."
+        }
+       }
+      ],
+      "keystroke": [
+       {
+        "$": {
+         "key": "s"
+        }
+       },
+       {
+        "$": {
+         "key": "t"
+        }
+       },
+       {
+        "$": {
+         "key": "u"
+        }
+       }
+      ],
+      "check": [
+       {
+        "$": {
+         "result": "abc\\u0022...s"
+        }
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...st"
+        }
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...stu"
+        }
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...stuv"
+        }
+       }
+      ],
+      "emit": [
+       {
+        "$": {
+         "to": "v"
+        }
+       }
+      ]
+     }
+    ],
+    "test": [
+     {
+      "$": {
+       "name": "key-test"
+      },
+      "$$": [
+       {
+        "$": {
+         "to": "abc\\u0022..."
+        },
+        "#name": "startContext"
+       },
+       {
+        "$": {
+         "key": "s"
+        },
+        "#name": "keystroke"
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...s"
+        },
+        "#name": "check"
+       },
+       {
+        "$": {
+         "key": "t"
+        },
+        "#name": "keystroke"
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...st"
+        },
+        "#name": "check"
+       },
+       {
+        "$": {
+         "key": "u"
+        },
+        "#name": "keystroke"
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...stu"
+        },
+        "#name": "check"
+       },
+       {
+        "$": {
+         "to": "v"
+        },
+        "#name": "emit"
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...stuv"
+        },
+        "#name": "check"
+       }
+      ],
+      "startContext": [
+       {
+        "$": {
+         "to": "abc\\u0022..."
+        }
+       }
+      ],
+      "keystroke": [
+       {
+        "$": {
+         "key": "s"
+        }
+       },
+       {
+        "$": {
+         "key": "t"
+        }
+       },
+       {
+        "$": {
+         "key": "u"
+        }
+       }
+      ],
+      "check": [
+       {
+        "$": {
+         "result": "abc\\u0022...s"
+        }
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...st"
+        }
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...stu"
+        }
+       },
+       {
+        "$": {
+         "result": "abc\\u0022...stuv"
+        }
+       }
+      ],
+      "emit": [
+       {
+        "$": {
+         "to": "v"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

@@ -135,5 +135,30 @@ describe('layr', function () {
         LdmlCompilerMessages.Error_InvalidModifier({ layer: '', modifiers: 'caps bogus'}),
       ]
     },
+    {
+      subpath: 'sections/layr/row-keys-whitespace.xml',
+      callback(sect) {
+        const layr = <Layr> sect;
+        assert.ok(layr);
+        assert.equal(compilerTestCallbacks.messages.length, 0);
+
+        assert.equal(layr.lists?.length, 1);
+        const list0 = layr.lists[0];
+        assert.ok(list0);
+        assert.equal(list0.layers.length, 1);
+        assert.equal(list0.hardware.value, 'us');
+        const layer0 = list0.layers[0];
+        assert.ok(layer0);
+        assert.equal(layer0.rows.length, 2);
+        assert.equal(layer0.id.value, 'base');
+        assert.equal(layer0.mod, constants.keys_mod_none);
+        for(const row of layer0.rows) {
+          assert.ok(row);
+          assert.equal(row.keys.length, 2);
+          assert.equal(row.keys[0]?.value, 'grave');
+          assert.equal(row.keys[1]?.value, 'mistake');
+        }
+      },
+    },
   ]);
 });

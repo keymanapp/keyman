@@ -40,6 +40,14 @@ export class VarsCompiler extends SectionCompiler {
     return valid;
   }
 
+  private validateIdentifier(id: string) {
+    if(!id.match(VariableParser.ID)) { // From <string> DTD
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidVariableIdentifer({id}));
+      return false;
+    }
+    return true;
+  }
+
   private validateVars(st: Substitutions): boolean {
     let valid = true;
     const variables = this.keyboard3?.variables;
@@ -67,13 +75,28 @@ export class VarsCompiler extends SectionCompiler {
     if (variables) {
       // Strings
       for (const { id, value } of variables.string) {
+        if(!this.validateIdentifier(id)) {
+          valid = false;
+          continue;
+        }
         addId(id);
-        allStrings.add(id);
         const stringrefs = VariableParser.allStringReferences(value);
+        for(const ref of stringrefs) {
+          if(!allStrings.has(ref)) {
+            valid = false;
+            this.callbacks.reportMessage(LdmlCompilerMessages.Error_MissingStringVariable({id: ref}));
+            allStrings.add(ref); // avoids multiple reports of same missing variable
+          }
+        }
         st.string.add(SubstitutionUse.variable, stringrefs);
+        allStrings.add(id);
       }
       // Sets
       for (const { id, value } of variables.set) {
+        if(!this.validateIdentifier(id)) {
+          valid = false;
+          continue;
+        }
         addId(id);
         allSets.add(id);
         // check for illegal references, here.
@@ -96,6 +119,10 @@ export class VarsCompiler extends SectionCompiler {
       }
       // UnicodeSets
       for (const { id, value } of variables.uset) {
+        if(!this.validateIdentifier(id)) {
+          valid = false;
+          continue;
+        }
         addId(id);
         allUnicodeSets.add(id);
         const stringrefs = VariableParser.allStringReferences(value);

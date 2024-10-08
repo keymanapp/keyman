@@ -164,7 +164,7 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
       // appContext instead of context?
       SharedPreferences prefs = context.getSharedPreferences(context.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
       boolean modelPredictionPref = false;
-      if (KMManager.currentLexicalModel != null) {
+      if (!KMManager.getMayPredictOverride() && KMManager.currentLexicalModel != null) {
         modelPredictionPref = prefs.getBoolean(KMManager.getLanguagePredictionPreferenceKey(KMManager.currentLexicalModel.get(KMManager.KMKey_LanguageID)), true);
       }
       KMManager.setBannerOptions(modelPredictionPref);

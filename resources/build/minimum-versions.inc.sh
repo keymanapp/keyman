@@ -18,7 +18,7 @@ KEYMAN_MIN_TARGET_VERSION_UBUNTU=20.04        # Ubuntu 20.04 Focal
 KEYMAN_MIN_TARGET_VERSION_CHROME=95.0         # Final version that runs on Android 5.0
 
 # Dependency versions
-KEYMAN_MIN_VERSION_NODE_MAJOR=20              # node version source of truth is /package.json:/engines/node
+KEYMAN_MIN_VERSION_NODE_MAJOR=20              # node version source of truth is /package.json:/engines/node; use KEYMAN_USE_NVM to automatically update
 KEYMAN_MIN_VERSION_NPM=10.5.1                 # 10.5.0 has bug, discussed in #10350
 KEYMAN_MIN_VERSION_EMSCRIPTEN=3.1.64          # Use KEYMAN_USE_EMSDK to automatically update to this version
 KEYMAN_MIN_VERSION_VISUAL_STUDIO=2019

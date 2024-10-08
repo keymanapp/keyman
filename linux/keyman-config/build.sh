@@ -28,7 +28,7 @@ builder_describe_outputs \
 clean_action() {
   rm -rf dist make_deb build ./*.egg-info keyman_config/version.py
   find . \( -name __pycache__ -o -name keyman-config.mo \) -exec rm -rf {} +
-  rm -rf ../help/reference/km-*.md
+  rm -rf ../docs/help/reference/km-*.md
 
   # Don't delete this file during a package build because they are
   # part of the source package. We can't generate it during a package
