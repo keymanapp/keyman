@@ -31,3 +31,6 @@ export { VariableParser, MarkerParser } from './ldml-keyboard/pattern-parser.js'
 export { ElementString } from './kmx/kmx-plus/element-string.js';
 
 export { USVString, CasingForm, CasingFunction, TextWithProbability, LexiconTraversal, LexicalModel, LexicalModelPunctuation, Transform, Suggestion, Reversion, Keep, SuggestionTag, Context, Distribution, Outcome, WithOutcome, ProbabilityMass, Configuration, Capabilities, WordBreakingFunction, Span } from './lexical-model-types.js';
+
+export { CacheTag, ComplexKeyboardStore, EncodedVisualKeyboard, LayoutSpec, KeyboardObject } from './keyboard-object.js';
+export { OutputTarget } from './outputTarget.interface.js';

@@ -4,10 +4,9 @@
  * Implementation of default rules
  */
 
-import { ModifierKeyConstants } from '@keymanapp/common-types';
+import { ModifierKeyConstants, type OutputTarget } from '@keymanapp/common-types';
 import Codes from './codes.js';
 import type KeyEvent from './keyEvent.js';
-import { type OutputTarget }  from './outputTarget.interface.js';
 
 export enum EmulationKeystrokes {
   Enter = '\n',
