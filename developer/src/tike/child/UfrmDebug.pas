@@ -583,10 +583,6 @@ begin
   finally
     FRunning := False;
     EnableUI;
-    UpdateCharacterGrid;
-    // We want to refresh the memo and character grid for rapid typing
-    memo.Update;
-    sgChars.Update;
   end;
 
   if UIStatus <> duiTest then
@@ -802,8 +798,13 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
       Assert(False, AssertionMessage); // Unrecognised backspace type
     end;
 
-    memo.Text := Copy(memo.Text, 1, m) + Copy(memo.Text, n+1, MaxInt);
-    memo.SelStart := m;
+    memo.Lines.BeginUpdate;
+    try
+      memo.Text := Copy(memo.Text, 1, m) + Copy(memo.Text, n+1, MaxInt);
+      memo.SelStart := m;
+    finally
+      memo.Lines.EndUpdate;
+    end;
 
     RealignMemoSelectionState(state);
   end;
@@ -1346,7 +1347,7 @@ begin
     frmKeymanDeveloper.barStatus.Panels[0].Text := 'Debugger Active';
   end;
 
-  if not memo.ReadOnly then
+  if not memo.ReadOnly and not memo.SelectionChanging then
   begin
     FSavedSelection := memo.Selection;
     UpdateCharacterGrid;   // I4808

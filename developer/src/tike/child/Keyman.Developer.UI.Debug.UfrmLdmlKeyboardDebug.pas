@@ -24,6 +24,7 @@ uses
   Vcl.Menus,
   Vcl.StdCtrls,
   Winapi.Messages,
+  Winapi.RichEdit,
   Winapi.Windows,
 
   CaptionPanel,
@@ -524,6 +525,11 @@ procedure TfrmLdmlKeyboardDebug.Run(vkey: Word);
     end;
   end;
 
+type
+  TSetTextEx = record
+    flags: DWord;
+    codepage: UINT;
+  end;
 var
   actions: pkm_core_actions;
   context_items: pkm_core_context_item;
@@ -535,6 +541,8 @@ var
   context_items_length: Integer;
   state: TMemoSelectionState;
   Adjustment: Integer;
+  ste: TSetTextEx;
+  str: string;
 begin
   FIgnoreNextUIKey := True;
 
@@ -618,11 +626,20 @@ begin
       // Merge left of context, context, and right of context and update memo
       // insertion point position
 
-      memo.Text := lhs + output + rhs;
-      selection.Start := lhs.Length + output.Length;
-      selection.Finish := selection.Start;
-      selection.Anchor := selection.Start;
-      memo.Selection := selection;
+      memo.Lines.BeginUpdate;
+      try
+        // Setting text directly for improved performance
+        ste.flags := $01 {ST_KEEPUNDO} or $04 {ST_NEWCHARS} or $08 {ST_UNICODE} or $20 {ST_PLAINTEXTONLY};
+        ste.codepage := 1200 {Unicode};
+        str := lhs + output + rhs;
+        SendMessage(memo.Handle, (WM_USER + 97) {EM_SETTEXTEX}, NativeUint(@ste), NativeUInt(PChar(str)));
+        selection.Start := lhs.Length + output.Length;
+        selection.Finish := selection.Start;
+        selection.Anchor := selection.Start;
+        memo.Selection := selection;
+      finally
+        memo.Lines.EndUpdate;
+      end;
     end;
 
     // actions.persist_options are not currently supported by LDML
@@ -639,12 +656,6 @@ begin
 
   finally
     km_core_context_items_dispose(context_items);
-
-    UpdateCharacterGrid;
-
-    // We want to refresh the memo and character grid for rapid typing
-    memo.Update;
-    sgChars.Update;
   end;
 end;
 
@@ -824,7 +835,7 @@ begin
     frmKeymanDeveloper.barStatus.Panels[0].Text := 'Debugger Active';
   end;
 
-  if not memo.ReadOnly then
+  if not memo.ReadOnly and not memo.SelectionChanging then
   begin
     UpdateCharacterGrid;   // I4808
   end;
@@ -845,7 +856,7 @@ begin
     // pressing Ctrl+A, etc.
     len := Length(memo.Text) - start;
   end;
-  TCharacterGridRenderer.Fill(sgChars, memo.Text, FDeadkeys, start, len
+  TCharacterGridRenderer.Fill(sgChars, memo.Text, FDeadkeys, start, len,
     memo.Selection.Anchor, True);
   TCharacterGridRenderer.Size(sgChars, memo.Font);
 end;
