@@ -43,7 +43,8 @@ function checkLink(root: string, file: string, token: Tokens.Link | Tokens.Image
       fullPath = path.join(fullPath, 'index.md');
     } else if(fullPath.endsWith('.md')) {
       messages.push({token, type:'warning', message: 'Link should not have a .md extension'});
-    } else {
+    } else if(!fs.existsSync(fullPath)) {
+      // TODO: consider testing other file extensions in future?
       fullPath = fullPath + '.md';
     }
   }
