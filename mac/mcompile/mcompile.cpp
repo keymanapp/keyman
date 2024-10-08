@@ -91,7 +91,10 @@ int main(int argc, char* argv[]) {
   }
 
   if (mac_KMX_DoConvert(kmxfile, bDeadkeyConversion)) {  // I4552F
-    KMX_SaveKeyboard(kmxfile, outfile);
+    if(!KMX_SaveKeyboard(kmxfile, outfile)) {
+      mac_KMX_LogError(L"Failed to save keyboard (%d)\n", errno);
+      return 3;
+    }
   } else {
     mac_KMX_LogError(L"Failed to convert keyboard (%d)\n", errno);
     return 3;
