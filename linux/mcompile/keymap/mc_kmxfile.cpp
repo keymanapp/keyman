@@ -289,6 +289,9 @@ LPKMX_KEYBOARD CopyKeyboard(PKMX_BYTE bufp, PKMX_BYTE base) {
   kbp->dwFlags = ckbp->dwFlags;
   kbp->dwHotKey = ckbp->dwHotKey;
 
+  kbp->dpBitmapOffset = ckbp->dpBitmapOffset;
+  kbp->dwBitmapSize = ckbp->dwBitmapSize;
+
   kbp->dpStoreArray = (LPKMX_STORE)bufp;
   bufp += sizeof(KMX_STORE) * kbp->cxStoreArray;
 

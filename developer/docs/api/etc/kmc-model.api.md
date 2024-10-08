@@ -4,7 +4,7 @@
 
 ```ts
 
-/// <reference types="@keymanapp/models-types" />
+/// <reference types="@keymanapp/common-types" />
 
 import { CompilerCallbacks } from '@keymanapp/common-types';
 import { CompilerEvent } from '@keymanapp/common-types';

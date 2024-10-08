@@ -17,11 +17,11 @@ SUBPROJECT_NAME=engine/keyboard
 
 builder_describe \
   "Compiles the web-oriented utility function module." \
-  "@/web/src/tools/testing/recorder-core  test" \
   "@/common/web/keyman-version" \
-  "@/common/web/es-bundling" \
   "@/common/web/types" \
-  "@/common/web/utils" \
+  "@/web/src/tools/testing/recorder-core  test" \
+  "@/web/src/tools/es-bundling" \
+  "@/web/src/engine/common/web-utils" \
   configure \
   clean \
   build \
@@ -65,12 +65,6 @@ function do_build() {
     --out        "${BUILD_DIR}/lib/node-keyboard-loader.mjs" \
     --format   esm \
     --platform node
-
-  # # Tests
-  # builder_echo "Bundle tests"
-  # ${BUNDLE_CMD} "${BUILD_DIR}/tests/dom/cases/domKeyboardLoader.spec.js" \
-  #   --out       "${BUILD_DIR}/tests/dom/domKeyboardLoader.spec.mjs" \
-  #   --format   esm
 
   # Declaration bundling.
   builder_echo "Declaration bundling"

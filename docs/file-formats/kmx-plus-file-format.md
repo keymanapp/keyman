@@ -173,8 +173,8 @@ Then for each string:
 
 | ∆ | Bits | Name          | Description                                   |
 |---|------|---------------|-----------------------------------------------|
-|16+|  32  | offset        | off: Offset to string                         |
-|20+|  32  | length        | int: Length of string in UTF-16LE code units  |
+|12+|  32  | offset        | off: Offset to string                         |
+|16+|  32  | length        | int: Length of string in UTF-16LE code units  |
 
 After the string offset table comes the actual UTF-16LE data. There is a null
 (\u0000) after each string, which is _not_ included in the string length.
@@ -362,14 +362,14 @@ For each element:
 
 | ∆ | Bits | Name    | Description                              |
 |---|------|---------|------------------------------------------|
-|32+|  32  | to      | str: to string                           |
-|36+|  32  | id      | str: id string                           |
-|40+|  32  | display | str: output display string               |
+|16+|  32  | to      | str: to string                           |
+|20+|  32  | id      | str: id string                           |
+|24+|  32  | display | str: output display string               |
 
 Either `to` or `id` must be set, not both.
 Entries with an `to` field are sorted in a binary codepoint sort on the `to` field,
-followed by entries with an `id` field set sorted in a binary codepoint sort on the `id` field.
-
+followed by entries with an `id` field set sorted in a binary codepoint sort
+on the `id` field.
 
 ### C7043.2.15 `key2`—Extended keybag
 
@@ -402,7 +402,8 @@ For each key:
 |28+|  32  | multiTap         | list: index into `list` section with multiTap key id list or 0  |
 |32+|  32  | flicks           | int: index into `key2.flicks` subtable                   |
 
-- `id`: The original string id from XML. This may be 0 to save space (i.e. omit the string id).
+- `id`: The original string id from XML. This may be 0 to save space (i.e.
+  omit the string id).
 - `flags`: Flags is a 32-bit bitfield defined as below:
 
 | Bit position | Meaning   |  Description                                |
@@ -412,7 +413,8 @@ For each key:
 
 - `to`: If `extend` is 0, `to` is a UTF-32LE codepoint. If `extend` is 1, `to`
   is a 32 bit index into the `strs` table. The string may be zero-length.
-- `longPress`, `longPressDefault`, and `multiTap` refer to key ids or lists of key ids in this same `key2.keys` subtable.
+- `longPress`, `longPressDefault`, and `multiTap` refer to key ids or lists
+  of key ids in this same `key2.keys` subtable.
 
 #### `key2.flicks` flick list subtable
 
@@ -421,24 +423,28 @@ For each flicks in the flick list:
 | ∆ | Bits | Name             | Description                                              |
 |---|------|----------------  |----------------------------------------------------------|
 | 0+|  32  | count            | int: number of flick elements in this flick              |
-|12+|  32  | flick            | int: index into `flick` subtable for first flick element |
-|16+|  32  | id               | str: flick id                                            |
+| 4+|  32  | flick            | int: index into `flick` subtable for first flick element |
+| 8+|  32  | id               | str: flick id                                            |
 
-- `id`: The original string id from XML. This may be 0 to save space (i.e. omit the string id).
+- `id`: The original string id from XML. This may be 0 to save space (i.e. omit
+  the string id).
 
 Elements are ordered by the string id.
 
-If this section is present, it must have a 'flicks' in the list at position zero with count=0, index=0 and id=0 meaning 'no flicks'.
+If this section is present, it must have a 'flicks' in the list at position zero
+with count=0, index=0 and id=0 meaning 'no flicks'.
+
 #### `key2.flick` flick element subtable
 
 For each flick element:
 
 | ∆ | Bits | Name             | Description                                              |
 |---|------|----------------  |----------------------------------------------------------|
-| 0+|  32  | directions       | list: index into `list` section with direction list      |
-| 8+|  32  | keyId            | str: id of key                                           |
+| 0+|  32  | directions       | list: index into `list` section with direction sequence  |
+| 4+|  32  | keyId            | str: id of key                                           |
 
-If this section is present, it must have a 'flick element' at position zero with directions=0, flags=0, and to=0 meaning 'no flick'.
+If this section is present, it must have a 'flick element' at position zero with
+directions=0, flags=0, and to=0 meaning 'no flick'.
 
 There is not a 'null' flick element at the end of each list.
 
@@ -456,7 +462,7 @@ For each key:
 |---|------|---------|------------------------------------------|
 |16+|  32  | vkey    | int: vkey ID                             |
 |20+|  32  | mod     | int: modifier key flags                  |
-|24+|  32  | key     | int: index into `key` sibling subtable   |
+|24+|  32  | key     | int: index into `keys` sibling subtable  |
 
 - `vkey`: If this is 0-255, it is the resolved standard/predefined vkey (K_A,
   etc.). It is resolved because the `vkeyMap` from LDML has already been

@@ -15,7 +15,7 @@ SUBPROJECT_NAME=engine/dom-utils
 # ################################ Main script ################################
 
 builder_describe "Builds DOM-utility modules used by the Keyman Engine for Web (KMW)." \
-  "@/common/web/utils" \
+  "@/web/src/engine/common/web-utils" \
   "@/web/src/engine/keyboard" \
   "clean" \
   "configure" \

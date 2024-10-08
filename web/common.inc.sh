@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 
-BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
+BUNDLE_CMD="node $KEYMAN_ROOT/web/src/tools/es-bundling/build/common-bundle.mjs"
 
 # Compiles all build products corresponding to the specified target.
 # This should be called from the working directory of a child project's
@@ -10,6 +10,8 @@ BUNDLE_CMD="node $KEYMAN_ROOT/common/web/es-bundling/build/common-bundle.mjs"
 # ### Parameters
 #
 # * 1: `product`    the product's source path under src/
+# * 2: `src_dir`    the source directory. Optional. Default: ${KEYMAN_ROOT}/web/src
+# * 3: `build_dir`  the build directory. Optional. Default: ${KEYMAN_ROOT}/web/build
 #
 # ### Example
 #
@@ -22,11 +24,13 @@ function compile() {
   fi
 
   local COMPILE_TARGET="$1"
+  local SRC_DIR=${2:-"${KEYMAN_ROOT}/web/src"}
+  local BUILD_DIR=${3:-"${KEYMAN_ROOT}/web/build"}
 
-  tsc -b "${KEYMAN_ROOT}/web/src/$COMPILE_TARGET"
+  tsc -b "${SRC_DIR}/$COMPILE_TARGET"
 
   # So... tsc does declaration-bundling on its own pretty well, at least for local development.
-  tsc --emitDeclarationOnly --outFile "${KEYMAN_ROOT}/web/build/$COMPILE_TARGET/lib/index.d.ts" -p "${KEYMAN_ROOT}/web/src/$COMPILE_TARGET"
+  tsc --emitDeclarationOnly --outFile "${BUILD_DIR}/$COMPILE_TARGET/lib/index.d.ts" -p "${SRC_DIR}/$COMPILE_TARGET"
 }
 
 function _copy_dir_if_exists() {

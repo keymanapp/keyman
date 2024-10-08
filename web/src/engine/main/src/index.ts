@@ -8,3 +8,4 @@ export { VariableStoreCookieSerializer } from './variableStoreCookieSerializer.j
 export { LanguageProcessor } from './headless/languageProcessor.js';
 export { TranscriptionCache } from './headless/transcriptionCache.js';
 export { InputProcessor } from './headless/inputProcessor.js';
+export { DeviceDetector } from './headless/deviceDetector.js';

@@ -19,7 +19,7 @@ source "$KEYMAN_ROOT/resources/build/win/environment.inc.sh"
 WIN32_TARGET="$WIN32_TARGET_PATH/tike.exe"
 
 builder_describe_outputs \
-  configure:project    /resources/build/win/delphi_environment_generated.inc.sh \
+  configure:project    /developer/src/tike/xml/layoutbuilder/keymanweb-osk.ttf \
   build:project        /developer/src/tike/$WIN32_TARGET
 
 #-------------------------------------------------------------------------------------------------------------------
@@ -31,6 +31,7 @@ function do_configure() {
   mkdir -p "$DEVELOPER_PROGRAM"
   cp "$KEYMAN_ROOT/common/schemas/kps/kps.xsd" "$DEVELOPER_PROGRAM"
   cp "$KEYMAN_ROOT/common/resources/fonts/keymanweb-osk.ttf" "$DEVELOPER_ROOT/src/tike/xml/layoutbuilder/keymanweb-osk.ttf"
+  run_in_vs_env rc icons.rc
 }
 
 function do_monaco_copy() {
@@ -52,8 +53,6 @@ function do_monaco_copy() {
   pushd "$DEVELOPER_ROOT/src/tike/xml/app/lib/sentry"
   replaceVersionStrings_Mkver init.js.in init.js
   popd
-
-  run_in_vs_env rc icons.rc
 }
 
 KEYMANCORE_DLL=keymancore-2.dll

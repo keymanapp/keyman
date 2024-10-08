@@ -8,7 +8,6 @@
 /common/                          @mcdurdin     @rc-swag
 /core/                            @mcdurdin     @rc-swag
 /common/lexical-model-types/      @jahorton     @mcdurdin
-/common/models/                   @jahorton     @mcdurdin
 /common/schemas/                  @mcdurdin     @jahorton
 /common/test/                     @mcdurdin     @ermshiperete
 /common/web/                      @jahorton     @mcdurdin

@@ -4,6 +4,7 @@ import { OutputTarget, Transcription, Mock } from "keyman/engine/js-processor";
 import { LanguageProcessorEventMap, ModelSpec, StateChangeEnum, ReadySuggestions } from 'keyman/engine/interfaces';
 import ContextWindow from "./contextWindow.js";
 import { TranscriptionCache } from "./transcriptionCache.js";
+import { Capabilities, Configuration, Reversion, Suggestion } from '@keymanapp/common-types';
 
 /* Is more like the model configuration engine */
 export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
@@ -336,6 +337,7 @@ export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {
 
   public shutdown() {
     this.lmEngine.shutdown();
+    this.removeAllListeners();
   }
 
   public get isActive(): boolean {
