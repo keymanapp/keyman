@@ -1,4 +1,5 @@
 name: "API Verification"
+run-name: "API Verification for ${{ github.ref_name }}"
 on:
  workflow_run:
     workflows: [Ubuntu packaging]
