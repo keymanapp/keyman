@@ -1,4 +1,4 @@
-import { KeyboardObject } from '@keymanapp/common-types';
+import { KeymanWebKeyboard } from '@keymanapp/common-types';
 import { KeymanEngine as KeymanEngineBase, DeviceDetector } from 'keyman/engine/main';
 import { getAbsoluteY } from 'keyman/engine/dom-utils';
 import { OutputTarget } from 'keyman/engine/element-wrappers';
@@ -8,6 +8,7 @@ import {
 } from 'keyman/engine/osk';
 import { ErrorStub, KeyboardStub, CloudQueryResult, toPrefixedKeyboardId as prefixed } from 'keyman/engine/keyboard-storage';
 import { DeviceSpec, Keyboard } from "keyman/engine/keyboard";
+import KeyboardObject = KeymanWebKeyboard.KeyboardObject;
 
 import * as views from './viewsAnchorpoint.js';
 import { BrowserConfiguration, BrowserInitOptionDefaults, BrowserInitOptionSpec } from './configuration.js';

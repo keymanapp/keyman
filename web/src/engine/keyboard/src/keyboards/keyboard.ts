@@ -2,8 +2,13 @@ import Codes from "../codes.js";
 import { Layouts } from "./defaultLayouts.js";
 import { ActiveKey, ActiveLayout, ActiveSubKey } from "./activeLayout.js";
 import KeyEvent from "../keyEvent.js";
-import { type OutputTarget } from '../outputTarget.interface.js';
-import { ComplexKeyboardStore, KeyboardObject, LayoutSpec, ModifierKeyConstants, TouchLayout } from "@keymanapp/common-types";
+import { type OutputTarget } from "../outputTarget.interface.js";
+import { KeymanWebKeyboard, ModifierKeyConstants, TouchLayout } from "@keymanapp/common-types";
+
+import ComplexKeyboardStore = KeymanWebKeyboard.ComplexKeyboardStore;
+import KeyboardObject = KeymanWebKeyboard.KeyboardObject;
+import LayoutSpec = KeymanWebKeyboard.LayoutSpec;
+
 type TouchLayoutSpec = TouchLayout.TouchLayoutPlatform & { isDefault?: boolean};
 
 import { Version, DeviceSpec } from "@keymanapp/web-utils";

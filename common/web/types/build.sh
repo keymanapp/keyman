@@ -86,12 +86,8 @@ function do_test() {
   readonly C8_THRESHOLD=60
 
   # Excludes are defined in .c8rc.json
-  c8 --skip-full --reporter=lcov --reporter=text --lines "${C8_THRESHOLD}" \
-    --statements "${C8_THRESHOLD}" --branches "${C8_THRESHOLD}" \
-    --functions "${C8_THRESHOLD}" \
-    mocha "${builder_extra_params[@]}"
-
-  builder_echo warning "Coverage thresholds are currently ${C8_THRESHOLD}%, which is lower than ideal."
+  c8 -skip-full --reporter=lcov --reporter=text --lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD mocha "${builder_extra_params[@]}"
+  builder_echo warning "Coverage thresholds are currently $C8_THRESHOLD%, which is lower than ideal."
   builder_echo warning "Please increase threshold in build.sh as test coverage improves."
 }
 

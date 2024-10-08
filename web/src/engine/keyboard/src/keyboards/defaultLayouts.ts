@@ -4,7 +4,10 @@
 ***/
 
 import { Version, deepCopy } from "@keymanapp/web-utils";
-import { EncodedVisualKeyboard, LayoutSpec, ModifierKeyConstants, TouchLayout } from "@keymanapp/common-types";
+import { KeymanWebKeyboard, ModifierKeyConstants, TouchLayout } from "@keymanapp/common-types";
+
+import EncodedVisualKeyboard = KeymanWebKeyboard.EncodedVisualKeyboard;
+import LayoutSpec = KeymanWebKeyboard.LayoutSpec;
 
 import LayoutFormFactorSpec = TouchLayout.TouchLayoutPlatform;
 import LayoutLayerBase = TouchLayout.TouchLayoutLayer;
