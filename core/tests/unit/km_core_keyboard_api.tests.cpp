@@ -56,7 +56,7 @@ TEST_F(KmCoreKeyboardApiTests, LoadFromBlob) {
   km::core::path kmxfile = km::core::path(test_dir / "kmx/k_020___deadkeys_and_backspace.kmx");
 
   std::vector<uint8_t> data = km::tests::load_kmx_file(kmxfile.native());
-  ASSERT_GT(data.size(), 0);
+  ASSERT_GT(data.size(), (size_t)0);
 
   // Execute
   auto status = km_core_keyboard_load_from_blob(kmxfile.stem().c_str(), data.data(), data.size(), &this->keyboard);
@@ -72,7 +72,7 @@ TEST_F(KmCoreKeyboardApiTests, LoadFromBlobMock) {
   std::string blob_string = "MOCK";
 
   std::vector<uint8_t> data = std::vector<uint8_t>(blob_string.begin(), blob_string.end());
-  ASSERT_GT(data.size(), 0);
+  ASSERT_GT(data.size(), (size_t)0);
 
   // Execute
   auto status = km_core_keyboard_load_from_blob(kmxfile.stem().c_str(), data.data(), data.size(), &this->keyboard);
@@ -105,7 +105,7 @@ TEST_F(KmCoreKeyboardApiTests, LoadFromBlobInvalidKeyboard) {
   for (auto i = data.size(); i < 64; i++) {
     data.push_back(0);
   }
-  ASSERT_GT(data.size(), 0);
+  ASSERT_GT(data.size(), (size_t)0);
 
   // Execute
   auto status = km_core_keyboard_load_from_blob(kmxfile.stem().c_str(), data.data(), data.size(), &this->keyboard);
