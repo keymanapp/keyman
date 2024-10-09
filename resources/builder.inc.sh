@@ -1488,7 +1488,10 @@ _builder_parse_expanded_parameters() {
   # Note:  if an error occurs within a script's function in a `set -e` script, it becomes an exit
   # instead for the function's caller.  So, we need both `err` and `exit` here.
   # See https://medium.com/@dirk.avery/the-bash-trap-trap-ce6083f36700.
-  trap _builder_failure_trap err exit
+  if [[ -z "$(trap -p DEBUG)" ]]; then
+    # not running in bashdb
+    trap _builder_failure_trap err exit
+  fi
 }
 
 _builder_pad() {
