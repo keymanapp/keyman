@@ -1,6 +1,7 @@
 import { EventEmitter } from "eventemitter3";
-import { Keep, type OutputTarget, Reversion, Suggestion } from '@keymanapp/common-types';
-import { type LanguageProcessorSpec , ReadySuggestions, type InvalidateSourceEnum, StateChangeHandler } from './languageProcessor.interface.js';
+import { Keep, Reversion, Suggestion } from '@keymanapp/common-types';
+import { type LanguageProcessorSpec, ReadySuggestions, type InvalidateSourceEnum, StateChangeHandler } from './languageProcessor.interface.js';
+import { type OutputTarget } from 'keyman/engine/keyboard';
 
 interface PredictionContextEventMap {
   update: (suggestions: Suggestion[]) => void;

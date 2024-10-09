@@ -1,5 +1,6 @@
-import { OutputTarget, Suggestion, Reversion } from '@keymanapp/common-types';
+import { Suggestion, Reversion } from '@keymanapp/common-types';
 import { EventEmitter } from "eventemitter3";
+import { OutputTarget } from 'keyman/engine/keyboard';
 
 export class ReadySuggestions {
   suggestions: Suggestion[];

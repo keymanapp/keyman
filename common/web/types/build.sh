@@ -84,21 +84,11 @@ function do_test() {
   tsc --build test
 
   readonly C8_THRESHOLD=60
-  # Exclude files from coverage analysis that only define types:
-  exclude=(\
-    src/keyboard-object.ts \
-    src/lexical-model-types.ts \
-    src/outputTarget.interface.ts \
-    src/*.d.ts \
-    src/main.ts \
-    src/schemas/* \
-    src/schema-validators.ts \
-    src/schemas.ts \
-  )
-  # shellcheck disable=SC2068
+
+  # Excludes are defined in .c8rc.json
   c8 --skip-full --reporter=lcov --reporter=text --lines "${C8_THRESHOLD}" \
     --statements "${C8_THRESHOLD}" --branches "${C8_THRESHOLD}" \
-    --functions "${C8_THRESHOLD}" ${exclude[@]/#/--exclude } \
+    --functions "${C8_THRESHOLD}" \
     mocha "${builder_extra_params[@]}"
 
   builder_echo warning "Coverage thresholds are currently ${C8_THRESHOLD}%, which is lower than ideal."

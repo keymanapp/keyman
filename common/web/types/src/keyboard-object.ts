@@ -1,23 +1,15 @@
 /*
  * Keyman is copyright (C) SIL Global. MIT License.
  */
-import { OutputTarget } from './outputTarget.interface.js';
 import { TouchLayoutPlatform as LayoutFormFactorSpec } from './keyman-touch-layout/keyman-touch-layout-file.js';
 
 export type ComplexKeyboardStore = (string | { t: 'd', d: number } | { ['t']: 'b' })[];
 
-type KeyEvent = {};
+// A stub for KeyEvent which is properly defined in KeymanWeb
+type KeyEventStub = {};
 
-/**
- * Stores preprocessed properties of a keyboard for quick retrieval later.
- */
-export class CacheTag {
-  stores: { [storeName: string]: ComplexKeyboardStore };
-
-  constructor() {
-    this.stores = {};
-  }
-}
+// A stub for OutputTarget which is properly defined in KeymanWeb
+type OutputTargetStub = {};
 
 export interface EncodedVisualKeyboard {
   /** Represents CSS font styling to use for VisualKeyboard text */
@@ -48,11 +40,6 @@ export type LayoutSpec = {
 
 export type KeyboardObject = {
   /**
-   * Used internally by Keyman Engine for Web to hold preprocessed stores.
-   */
-  _kmw?: CacheTag;
-
-  /**
    * group-start:  the function triggering processing for the keyboard's
    * "Unicode" start group, corresponding to `begin Unicode > use(_____)` in
    * Keyman keyboard language.
@@ -60,7 +47,7 @@ export type KeyboardObject = {
    * @param keystroke     The full, pre-processed keystroke triggering
    * keyboard-rule application.
    */
-  gs(outputTarget: OutputTarget, keystroke: KeyEvent): boolean;
+  gs(outputTarget: OutputTargetStub, keystroke: KeyEventStub): boolean;
 
   /**
    * group-newcontext:  the function triggering processing for the keyboard's
@@ -69,7 +56,7 @@ export type KeyboardObject = {
    * @param outputTarget  The new context to be used with future keystrokes
    * @param keystroke     A 'null' `KeyEvent` providing current modifier + state information.
    */
-  gn?(outputTarget: OutputTarget, keystroke: KeyEvent): boolean;
+  gn?(outputTarget: OutputTargetStub, keystroke: KeyEventStub): boolean;
 
   /**
    * group-postkeystroke:  the function triggering processing for the keyboard's
@@ -80,7 +67,7 @@ export type KeyboardObject = {
    * applied.
    * @param keystroke     A 'null' `KeyEvent` providing current modifier + state information.
    */
-  gpk?(outputTarget: OutputTarget, keystroke: KeyEvent): boolean;
+  gpk?(outputTarget: OutputTargetStub, keystroke: KeyEventStub): boolean;
 
   /**
    * Keyboard ID:  the uniquely-identifying name for this keyboard.  Includes the standard
@@ -170,11 +157,6 @@ export type KeyboardObject = {
    */
   KDU?: number;
   /**
-   * Virtual Key Dictionary: the engine pre-processed, unminified dictionary.  This is built within
-   * Keyman Engine for Web at runtime as needed based on the definitions in `KVKD`.
-   */
-  VKDictionary?: Record<string, number>,
-  /**
    * Keyboard Help File: Embedded JS script designed for use with a keyboard's
    * HTML help text.  Always defined within the file referenced by &kmw_embedjs
    * in a keyboard's source, though that file may also contain _other_ script
@@ -193,6 +175,6 @@ export type KeyboardObject = {
    * @param       {number}    _PData        1 or 0
    * @returns
    */
-  KNS?: (_PCommand: number, _PTarget: OutputTarget, _PData: number) => void;
+  KNS?: (_PCommand: number, _PTarget: OutputTargetStub, _PData: number) => void;
 } & Record<`s${number}`, string>
 

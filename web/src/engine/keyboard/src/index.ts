@@ -31,11 +31,12 @@ export * from "./defaultRules.js";
 export { default as KeyEvent } from "./keyEvent.js";
 export * from "./keyEvent.js";
 export { default as KeyMapping } from "./keyMapping.js";
+export { OutputTarget } from "./outputTarget.interface.js";
 
 export * from "@keymanapp/web-utils";
 
 // At the top level, there should be no default export.
 
-// Without the line below... KeyMapping would likely be aliased there, as it's
+// Without the line below... OutputTarget would likely be aliased there, as it's
 // the last `export { default as _ }` => `export * from` pairing seen above.
 export default undefined;

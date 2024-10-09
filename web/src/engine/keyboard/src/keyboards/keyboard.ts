@@ -2,11 +2,23 @@ import Codes from "../codes.js";
 import { Layouts } from "./defaultLayouts.js";
 import { ActiveKey, ActiveLayout, ActiveSubKey } from "./activeLayout.js";
 import KeyEvent from "../keyEvent.js";
-import { CacheTag, ComplexKeyboardStore, KeyboardObject, LayoutSpec, ModifierKeyConstants, type OutputTarget, TouchLayout } from "@keymanapp/common-types";
+import { type OutputTarget } from '../outputTarget.interface.js';
+import { ComplexKeyboardStore, KeyboardObject, LayoutSpec, ModifierKeyConstants, TouchLayout } from "@keymanapp/common-types";
 type TouchLayoutSpec = TouchLayout.TouchLayoutPlatform & { isDefault?: boolean};
 
 import { Version, DeviceSpec } from "@keymanapp/web-utils";
 import StateKeyMap from "./stateKeyMap.js";
+
+/**
+ * Stores preprocessed properties of a keyboard for quick retrieval later.
+ */
+class CacheTag {
+  stores: { [storeName: string]: ComplexKeyboardStore };
+
+  constructor() {
+    this.stores = {};
+  }
+}
 
 export enum LayoutState {
   NOT_LOADED = undefined,
@@ -18,13 +30,25 @@ export interface VariableStoreDictionary {
   [name: string]: string;
 };
 
+type KmwKeyboardObject = KeyboardObject & {
+  /**
+   * Used internally by Keyman Engine for Web to hold preprocessed stores.
+   */
+  _kmw?: CacheTag;
+  /**
+   * Virtual Key Dictionary: the engine pre-processed, unminified dictionary.  This is built within
+   * Keyman Engine for Web at runtime as needed based on the definitions in `KVKD`.
+   */
+  VKDictionary?: Record<string, number>,
+};
+
 /**
  * Acts as a wrapper class for Keyman keyboards compiled to JS, providing type information
  * and keyboard-centered functionality in an object-oriented way without modifying the
  * wrapped keyboard itself.
  */
 export default class Keyboard {
-  public static DEFAULT_SCRIPT_OBJECT: KeyboardObject = {
+  public static DEFAULT_SCRIPT_OBJECT: KmwKeyboardObject = {
     'gs': function(outputTarget: OutputTarget, keystroke: KeyEvent) { return false; }, // no matching rules; rely on defaultRuleOutput entirely
     'KI': '', // The currently-existing default keyboard ID; we already have checks that focus against this.
     'KN': '',
@@ -38,7 +62,7 @@ export default class Keyboard {
    *
    * TODO:  Make this private instead.  But there are a LOT of references that must be rooted out first.
    */
-  public readonly scriptObject: KeyboardObject;
+  public readonly scriptObject: KmwKeyboardObject;
   private layoutStates: {[layout: string]: LayoutState};
 
   constructor(keyboardScript: any) {
@@ -544,7 +568,7 @@ export default class Keyboard {
    * @return      {number}                key code > 255 on success, or 0 if not found
    */
   getVKDictionaryCode(keyName: string) {
-    const dict = this.scriptObject['VKDictionary'] || {} as KeyboardObject['VKDictionary'];
+    const dict = this.scriptObject['VKDictionary'] || {} as KmwKeyboardObject['VKDictionary'];
     if(!this.scriptObject['VKDictionary']) {
       if(typeof this.scriptObject['KVKD'] == 'string') {
         // Build the VK dictionary
