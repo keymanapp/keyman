@@ -172,7 +172,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
         SharedPreferences prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
         int maySuggest = prefs.getInt(KMManager.getLanguageAutoCorrectionPreferenceKey(langId), KMManager.KMDefault_Suggestion);
         // Enable banner if maySuggest is not SuggestionType.SUGGESTIONS_DISABLED (0)
-        KMManager.setBannerOptions(maySuggest > SuggestionType.SUGGESTIONS_DISABLED.toInt());
+        KMManager.setBannerOptions(maySuggest != SuggestionType.SUGGESTIONS_DISABLED.toInt());
       } else {
         KMManager.setBannerOptions(false);
       }

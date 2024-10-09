@@ -168,7 +168,7 @@ public final class KMKeyboardWebViewClient extends WebViewClient {
       if (!KMManager.getMayPredictOverride() && KMManager.currentLexicalModel != null) {
         modelPredictionPref = prefs.getInt(KMManager.getLanguageAutoCorrectionPreferenceKey(
           KMManager.currentLexicalModel.get(KMManager.KMKey_LanguageID)), KMManager.KMDefault_Suggestion)
-          > SuggestionType.SUGGESTIONS_DISABLED.toInt();
+          != SuggestionType.SUGGESTIONS_DISABLED.toInt();
       }
       KMManager.setBannerOptions(modelPredictionPref);
       RelativeLayout.LayoutParams params = KMManager.getKeyboardLayoutParams();

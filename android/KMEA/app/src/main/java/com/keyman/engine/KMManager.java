@@ -217,8 +217,7 @@ public final class KMManager {
     }
 
     public int toInt() {
-      int modes[] = { 0, 1, 2, 3 };
-      return modes[this.ordinal()];
+      return this.ordinal();
     }
   }
 
@@ -346,8 +345,8 @@ public final class KMManager {
   public static final int KMMinimum_LongpressDelay = 300;
   public static final int KMMaximum_LongpressDelay = 1500;
 
-  // Default prediction/correction setting - corresponds to SuggestionType.PREDICTIONS_WITH_CORRECTIONS
-  public static final int KMDefault_Suggestion = 2;
+  // Default prediction/correction setting
+  public static final int KMDefault_Suggestion = SuggestionType.PREDICTIONS_WITH_CORRECTIONS.toInt();
 
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
