@@ -82,6 +82,10 @@ output_error() {
 }
 
 check_api_not_changed() {
+  if [[ -z "${BIN_PKG:-}" ]]; then
+    output_warning "Skipping check for API change because binary Debian package not specified"
+    return
+  fi
   # Checks that the API did not change compared to what's documented in the .symbols file
   tmpDir=$(mktemp -d)
   # shellcheck disable=SC2064
