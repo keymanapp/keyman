@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -eu
 
 ## START STANDARD BUILD SCRIPT INCLUDE
@@ -7,93 +7,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../../../resources/build/build-utils.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-mockDebPkgTools() {
-  echo "#!/bin/bash
-  " > "${tmpDir}/dpkg"
-  chmod +x "${tmpDir}/dpkg"
-  cp "${tmpDir}/dpkg" "${tmpDir}/dpkg-gensymbols"
-  PATH=${tmpDir}:${PATH}
-}
-
-createBase() {
-  TIER=$1
-  remoteDir=$(mktemp -d)
-  cd "${remoteDir}"
-  git init --bare --initial-branch=master .
-
-  workDir=$(mktemp -d)
-  cd "${workDir}"
-  git init --initial-branch=master .
-  git remote add origin "${remoteDir}"
-  mkdir -p linux/debian
-  echo "libkeymancore.so.1 libkeymancore1 #MINVER#
-* Build-Depends-Package: libkeymancore-dev
-
- km_core_actions_dispose@Base 17.0.197
- km_core_context_clear@Base 17.0.195
- km_core_context_get@Base 17.0.195
- km_core_context_item_list_size@Base 17.0.195
- km_core_context_items_dispose@Base 17.0.195
-" > linux/debian/libkeymancore1.symbols
-  git add linux/debian/libkeymancore1.symbols
-
-  mkdir -p core
-  echo "1.0.0" > core/CORE_API_VERSION.md
-  git add core/CORE_API_VERSION.md
-
-  echo "16.0.145" > VERSION.md
-  git add VERSION.md
-
-  echo "stable" > TIER.md
-  git add TIER.md
-
-  mkdir -p linux/scripts
-  cp -r "${REPO_ROOT}"/linux/scripts/* linux/scripts
-  git add linux/scripts
-
-  mkdir -p resources/build
-  cp -r "${REPO_ROOT}"/resources/build/* resources/build
-  cp "${REPO_ROOT}"/resources/builder.inc.sh resources/
-  git add resources
-
-  git commit -m "Initial"
-  git push origin master
-
-  git branch -c stable-16.0
-  git push origin stable-16.0
-  git tag -m "16.0.145" release-16.0.145
-  git push origin release-16.0.145
-
-  echo "${TIER}" > TIER.md
-  git add TIER.md
-
-  echo "17.0.255" > VERSION.md
-  git add VERSION.md
-  git commit -m "Commit for Alpha"
-  git push origin master
-
-  git checkout -b chore
-
-  BINPKG_NAME=${tmpDir}/libkeymancore1_17.0.257-1+noble1_amd64.deb
-  touch "${BINPKG_NAME}"
-}
-
-setup() {
-  OLDPATH=${PATH}
-  tmpDir=$(mktemp -d)
-  mockDebPkgTools
-}
-
-teardown() {
-  PATH=${OLDPATH}
-  rm -rf ${tmpDir}
-}
-
-run_test() {
-  setup
-  $1 > /tmp/$1.log 2>&1 && echo -e "${COLOR_GREEN}$1: OK${COLOR_RESET}" || echo -e "${COLOR_RED}$1: FAILED${COLOR_RESET}"
-  teardown
-}
+. "${THIS_SCRIPT%/*}/test.inc.sh"
 
 test_check_updated_version_number__NoChange_OK() {
   createBase alpha
@@ -120,6 +34,7 @@ test_check_updated_version_number__LineAdded_OK() {
 }
 
 test_check_updated_version_number__LineAddedWithoutVerUpd_ERROR() {
+  local output
   createBase alpha
 
   sed -i 's/ km_core_actions_dispose@Base 17.0.197/ km_core_actions_dispose@Base 17.0.197\n km_core_added@Base 17.0.197/' linux/debian/libkeymancore1.symbols
@@ -150,6 +65,7 @@ test_check_updated_version_number__LineRemovedWithAPIUpd_OK() {
 }
 
 test_check_updated_version_number__LineRemoved_OnlyCoreApiUpd_ERROR() {
+  local output
   createBase alpha
   echo "2.0.0" > core/CORE_API_VERSION.md
   git add core/CORE_API_VERSION.md
@@ -165,6 +81,7 @@ test_check_updated_version_number__LineRemoved_OnlyCoreApiUpd_ERROR() {
 }
 
 test_check_updated_version_number__LineRemoved_OnlySymbolsFileUpd_ERROR() {
+  local output
   createBase alpha
   git mv linux/debian/libkeymancore{1,2}.symbols
   sed -i 's/libkeymancore1/libkeymancore2/' linux/debian/libkeymancore2.symbols
@@ -181,6 +98,7 @@ test_check_updated_version_number__LineRemoved_OnlySymbolsFileUpd_ERROR() {
 }
 
 test_check_updated_version_number__LineRemovedWithAPIUpd_NotMetadataUpd_ERROR() {
+  local output
   createBase alpha
   echo "2.0.0" > core/CORE_API_VERSION.md
   git add core/CORE_API_VERSION.md
@@ -247,6 +165,7 @@ test_check_updated_version_number__LineRemoved_InAlpha_FileMissingInStable_ApiVe
 }
 
 test_check_updated_version_number__LineRemoved_InAlpha_FileMissingInStable_ApiVerUnchanged_ERROR() {
+  local output
   createBase alpha
   git checkout master
   # simulate a commit that renamed the .symbols file
@@ -271,6 +190,7 @@ test_check_updated_version_number__LineRemoved_InAlpha_FileMissingInStable_ApiVe
 }
 
 test_check_updated_version_number__LineRemoved_InAlpha_ChangeFromStable_ERROR() {
+  local output
   createBase alpha
 
   sed -i '6d' linux/debian/libkeymancore1.symbols
@@ -285,6 +205,7 @@ test_check_updated_version_number__LineRemoved_InAlpha_ChangeFromStable_ERROR() 
 }
 
 test_check_updated_version_number__LineRemoved_InBeta_ApiVerUnchanged_ERROR() {
+  local output
   createBase beta
 
   # simulate a commit that already introduced an API version change in Beta
@@ -340,6 +261,7 @@ test_check_updated_version_number__LineRemoved_InBeta_ApiVerChanged_OK() {
 }
 
 test_check_updated_version_number__LineRemoved_InBeta_FileMissingInStable_ApiVerUnchanged_ERROR() {
+  local output
   createBase alpha
   git checkout -b beta
   # simulate a commit that renamed the .symbols file
@@ -363,6 +285,34 @@ test_check_updated_version_number__LineRemoved_InBeta_FileMissingInStable_ApiVer
   [[ "${output[*]}" == *" ERROR: Major API change without updating API version number in libfoo1.symbols file"* ]]
 }
 
+test_check_updated_version_number__LineInsertedInBranch_OK() {
+  createBase alpha
+
+  local base_sha=$(git rev-parse master)
+
+  # Add a line in chore branch
+  echo " km_core_foo@Base 17.0.200" >> linux/debian/libkeymancore1.symbols
+  git add linux/debian/libkeymancore1.symbols
+  git commit -m "API method added in chore branch"
+
+  # Add a line in master branch
+  git checkout master
+  echo " km_core_foo@Base 17.0.205" >> linux/debian/libkeymancore1.symbols
+  git add linux/debian/libkeymancore1.symbols
+  git commit -m "API method changed in master branch"
+  echo "readme" > README.md
+  git add README.md
+  git commit -m "Some change on master"
+  git checkout chore
+
+  # merge master into chore
+  git merge --strategy-option=ours master
+
+  echo "## Calling API verification"
+  pwd
+  linux/scripts/deb-packaging.sh --bin-pkg "${BINPKG_NAME}" --git-sha "$(git rev-parse HEAD)" --git-base "${base_sha}" verify
+}
+
 echo "(test logs are in /tmp/<testname>.log)"
 run_test test_check_updated_version_number__NoChange_OK
 run_test test_check_updated_version_number__LineAdded_OK
@@ -378,5 +328,6 @@ run_test test_check_updated_version_number__LineRemoved_InAlpha_ChangeFromStable
 run_test test_check_updated_version_number__LineRemoved_InBeta_ApiVerUnchanged_ERROR
 run_test test_check_updated_version_number__LineRemoved_InBeta_ApiVerChanged_OK
 run_test test_check_updated_version_number__LineRemoved_InBeta_FileMissingInStable_ApiVerUnchanged_ERROR
+run_test test_check_updated_version_number__LineInsertedInBranch_OK
 
 # TODO: still some test cases missing for the different checks

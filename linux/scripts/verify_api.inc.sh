@@ -79,15 +79,68 @@ check_updated_version_number() {
         # If only lines got removed we basically skip this test. A later check will
         # test that the API version got updated.
         output_ok "${PKG_NAME}.symbols file did change but only removed lines"
-    elif ! git log -p -1 -- "debian/${PKG_NAME}.symbols" | grep -q "${VERSION}"; then
-      output_error "${PKG_NAME}.symbols file got changed without changing the package version number of the symbol"
-      EXIT_CODE=1
     else
-      output_ok "${PKG_NAME}.symbols file got updated with package version number"
+      local version_base version_head
+      version_head=$(get_highest_version_in_symbols_file "${GIT_SHA}")
+      version_base=$(get_highest_version_in_symbols_file "${GIT_BASE}")
+      if (( $(compare_versions "${version_head}" "${version_base}") > 0 )); then
+        output_ok "${PKG_NAME}.symbols file got updated with package version number"
+      else
+        output_error "${PKG_NAME}.symbols file got changed without changing the package version number of the symbol"
+        EXIT_CODE=1
+      fi
     fi
   else
     output_ok "${PKG_NAME}.symbols file didn't change"
   fi
+}
+
+compare_versions() {
+  local first_parts second_parts
+  IFS='.' read -r -a first_parts <<< "$1"
+  IFS='.' read -r -a second_parts <<< "$2"
+  if (( first_parts[0] < second_parts[0] )); then
+    echo -1
+  elif (( first_parts[0] > second_parts[0] )); then
+    echo 1
+  elif (( first_parts[1] < second_parts[1] )); then
+    echo -1
+  elif (( first_parts[1] > second_parts[1] )); then
+    echo 1
+  elif (( first_parts[2] < second_parts[2] )); then
+    echo -1
+  elif (( first_parts[2] > second_parts[2] )); then
+    echo 1
+  else
+    echo 0
+  fi
+}
+
+get_highest_version_in_symbols_file() {
+  local sha="$1"
+  local symbol_lines line line_version
+  local max_version=0
+
+  tmpfile=$(mktemp)
+  if ! git cat-file blob "${sha}:linux/debian/${PKG_NAME}.symbols" > "${tmpfile}" 2>/dev/null; then
+    rm "${tmpfile}"
+    return 1
+  fi
+
+  # Start with fourth line which is where symbols start
+  mapfile -s 3 symbol_lines < "${tmpfile}"
+  for line in "${symbol_lines[@]}"; do
+    #  km_core_actions_dispose@Base 17.0.197
+    line_version=${line##* }
+    if (( $(compare_versions "${line_version}" "${max_version}") > 0 )); then
+      max_version="${line_version}"
+    fi
+  done
+
+  echo "${max_version}"
+
+  rm "${tmpfile}"
+  return 0
 }
 
 get_api_version_in_symbols_file() {
