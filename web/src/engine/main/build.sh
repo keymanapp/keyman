@@ -17,7 +17,6 @@ builder_describe "Builds the Keyman Engine for Web's common top-level base class
   "@/web/src/engine/core-processor" \
   "@/web/src/engine/keyboard" \
   "@/web/src/engine/interfaces build" \
-  "@/web/src/engine/device-detect build" \
   "@/web/src/engine/js-processor build" \
   "@/web/src/engine/keyboard-storage build" \
   "@/web/src/engine/osk build" \

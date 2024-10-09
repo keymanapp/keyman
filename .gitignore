@@ -184,3 +184,5 @@ lcov.info
 /keyman*.changes
 /keyman*.tar.?z
 
+# flag file for build script
+.configured

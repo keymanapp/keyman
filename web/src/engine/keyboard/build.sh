@@ -17,11 +17,11 @@ SUBPROJECT_NAME=engine/keyboard
 
 builder_describe \
   "Compiles the web-oriented utility function module." \
-  "@/web/src/tools/testing/recorder-core  test" \
   "@/common/web/keyman-version" \
-  "@/common/web/es-bundling" \
   "@/common/web/types" \
-  "@/common/web/utils" \
+  "@/web/src/tools/testing/recorder-core  test" \
+  "@/web/src/tools/es-bundling" \
+  "@/web/src/engine/common/web-utils" \
   configure \
   clean \
   build \

@@ -67,6 +67,8 @@ describe('Headless keyboard loading', function() {
       assert.equal(keyboard.id, "Keyboard_sil_ipa");
     });
 
+    // TODO-WEB-CORE: figure out what the purpose of this test is
+    // TODO-WEB-CORE: move to kbdInterface.tests.ts
     it('cannot evaluate rules', async function() {
       // -- START: Standard Recorder-based unit test loading boilerplate --
       const harness = new KeyboardHarness({}, MinimalKeymanGlobal);

@@ -166,3 +166,91 @@ TEST(km_u16_Test, u16tok_str_compare_to_strtok) {
   EXPECT_TRUE(!strcmp("ghi", strtok(nullptr, reverse_delim)));
   EXPECT_EQ(nullptr, strtok(nullptr, reverse_delim));
 }
+
+TEST(km_u16_Test, u16ltrim) {
+  KMX_WCHAR str[LINESIZE];
+  PKMX_WCHAR q;
+
+  EXPECT_TRUE(!u16ltrim(nullptr));
+
+  std::map<const KMX_WCHAR*, const KMX_WCHAR*> m{
+    // input        output
+      {u"",         u""       },
+      {u" ",        u""       },
+      {u"  ",       u""       },
+      {u"abc",      u"abc"    },
+      {u" abc",     u"abc"    },
+      {u"  abc",    u"abc"    },
+      {u"abc ",     u"abc "   },
+      {u"\tabc",    u"abc"    },
+      {u"abc def",  u"abc def"},
+      {u" abc def", u"abc def"},
+    };
+
+  for (auto i = m.begin(); i != m.end(); i++) {
+    u16cpy(str, i->first);
+    q = u16ltrim(str);
+    EXPECT_TRUE(!u16cmp(i->second, q));
+    EXPECT_EQ(str, q);
+  }
+}
+
+TEST(km_u16_Test, u16rtrim) {
+  KMX_WCHAR str[LINESIZE];
+  PKMX_WCHAR q;
+
+  EXPECT_TRUE(!u16rtrim(nullptr));
+
+  std::map<const KMX_WCHAR*, const KMX_WCHAR*> m{
+    // input        output
+      {u"",         u""       },
+      {u" ",        u""       },
+      {u"  ",       u""       },
+      {u"abc",      u"abc"    },
+      {u"abc ",     u"abc"    },
+      {u"abc  ",    u"abc"    },
+      {u" abc",     u" abc"   },
+      {u"abc\t",    u"abc"    },
+      {u"abc def",  u"abc def"},
+      {u"abc def ", u"abc def"},
+    };
+
+  for (auto i = m.begin(); i != m.end(); i++) {
+    u16cpy(str, i->first);
+    q = u16rtrim(str);
+    EXPECT_TRUE(!u16cmp(i->second, q));
+    EXPECT_EQ(str, q);
+  }
+}
+
+TEST(km_u16_Test, u16trim) {
+  KMX_WCHAR str[LINESIZE];
+  PKMX_WCHAR q;
+
+  EXPECT_TRUE(!u16trim(nullptr));
+
+  std::map<const KMX_WCHAR*, const KMX_WCHAR*> m{
+    // input        output
+      {u"",         u""        },
+      {u" ",        u""        },
+      {u"  ",       u""        },
+      {u"abc",      u"abc"     },
+      {u"abc ",     u"abc"     },
+      {u"abc  ",    u"abc"     },
+      {u" abc",     u"abc"     },
+      {u"  abc",    u"abc"     },
+      {u" abc ",    u"abc"     },
+      {u"  abc  ",  u"abc"     },
+      {u"abc\t",    u"abc"     },
+      {u"\tabc",    u"abc"     },
+      {u"abc def",  u"abc def" },
+      {u" abc def ", u"abc def"},
+    };
+
+  for (auto i = m.begin(); i != m.end(); i++) {
+    u16cpy(str, i->first);
+    q = u16trim(str);
+    EXPECT_TRUE(!u16cmp(i->second, q));
+    EXPECT_EQ(str, q);
+  }
+}

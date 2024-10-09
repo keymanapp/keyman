@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 
 import { DEVICE_DETECT_FAILURE, setupKMW, teardownKMW } from "../test_utils.js";
-import { Device } from "keyman/engine/device-detect";
+import { DeviceDetector } from "keyman/engine/main";
 import { KeymanEngine } from "keyman/app/browser";
 
 const baseTimeout = 5000;
@@ -49,7 +49,7 @@ describe('Basic KeymanWeb', function() {
   });
 });
 
-const device = new Device();
+const device = new DeviceDetector();
 device.detect();
 if(!device.touchable) {
   describe('Basic Toggle UI', function() {

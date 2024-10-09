@@ -8,14 +8,12 @@
 
 #import "KMConfigurationWindowController.h"
 #import "KMDownloadKBWindowController.h"
+#import "KMDataRepository.h"
 #import "KMLogs.h"
 
 @interface KMConfigurationWindowController ()
 @property (nonatomic, weak) IBOutlet NSTableView *tableView;
 @property (nonatomic, weak) IBOutlet WebView *webView;
-@property (nonatomic, weak) IBOutlet NSButton *alwaysShowOSKCheckBox;
-@property (nonatomic, weak) IBOutlet NSButton *useVerboseLoggingCheckBox;
-@property (nonatomic, weak) IBOutlet NSTextField *verboseLoggingInfo;
 @property (nonatomic, weak) IBOutlet NSButton *supportBack;
 @property (nonatomic, weak) IBOutlet NSButton *supportForward;
 @property (nonatomic, weak) IBOutlet NSButton *supportHome;
@@ -68,9 +66,6 @@
   
   NSURL *homeUrl = [[NSBundle mainBundle] URLForResource:@"index" withExtension:@"html" subdirectory:@"Help"];
   [self.webView.mainFrame loadRequest:[NSURLRequest requestWithURL:homeUrl]];
-  
-  [self.alwaysShowOSKCheckBox setState:(self.AppDelegate.alwaysShowOSK ? NSOnState : NSOffState)];
-  [self.useVerboseLoggingCheckBox setState:(self.AppDelegate.useVerboseLogging ? NSOnState : NSOffState)];
 }
 
 - (void)webView:(WebView *)sender decidePolicyForNewWindowAction:(NSDictionary *)actionInformation request:(NSURLRequest *)request newFrameName:(NSString *)frameName decisionListener:(id<WebPolicyDecisionListener>)listener {
@@ -134,8 +129,10 @@
         NSArray *pArray = (NSArray *)obj;
         NSString *packageFolder = [self packageFolderFromPath:[pArray objectAtIndex:0]];
         NSString *packageName = [self.AppDelegate packageNameFromPackageInfo:packageFolder];
+        os_log_debug([KMLogs uiLog], "tableContents, packageFolder: %{public}@, packageName: %{public}@", packageFolder, packageName);
         [_tableContents addObject:[NSDictionary dictionaryWithObjectsAndKeys:packageName, @"HeaderTitle", nil]];
         for (NSString *path in pArray) {
+          os_log_debug([KMLogs uiLog], "tableContents, path = '%{public}@'", path);
           NSDictionary *info = [KMXFile keyboardInfoFromKmxFile:path];
           if (!info) {
             info = [[NSDictionary alloc] initWithObjectsAndKeys:
@@ -150,6 +147,7 @@
       }
       else {
         NSString *path = (NSString *)obj;
+        os_log_debug([KMLogs uiLog], "tableContents, path = '%{public}@'", path);
         NSDictionary *info = [KMXFile keyboardInfoFromKmxFile:path];
         if (!info) {
           info = [[NSDictionary alloc] initWithObjectsAndKeys:
@@ -241,22 +239,27 @@
   BOOL isHeader = (headerTitle != nil);
   BOOL isOthers = NO;
   NSString *kmxFilePath = [self kmxFilePathAtIndex:row];
-  if (kmxFilePath != nil)
+  if (kmxFilePath != nil) {
     isOthers = [[self packageFolderFromPath:kmxFilePath] isEqualToString:@"Others"];
-  else if (isHeader && [headerTitle isEqualToString:@"Others"])
+  }
+  else if (isHeader && [headerTitle isEqualToString:@"Others"]) {
     isOthers = YES;
-  
+  }
   if ([identifier isEqualToString:@"Column1"]) {
     KMConfigColumn1CellView *cellView = [tableView makeViewWithIdentifier:identifier owner:self];
     
-    if (isHeader)
+    if (isHeader) {
       [cellView setHidden:YES];
+    }
     else {
       [cellView setHidden:NO];
       cellView.imageView.objectValue = [info objectForKey:kKMKeyboardIconKey];
       [cellView.checkBox setTag:row];
       [cellView.checkBox setAction:@selector(checkBoxAction:)];
-      [cellView.checkBox setState:([self.activeKeyboards containsObject:[self kmxFilePathAtIndex:row]])?NSOnState:NSOffState];
+      NSString *kmxFilePath = [self kmxFilePathAtIndex:row];
+      NSString *partialPath = [KMDataRepository.shared trimToPartialPath:kmxFilePath];
+      os_log_debug([KMLogs uiLog], "tableView:viewForTableColumn, kmxFilePath = %{public}@ for row %li, partialPath = %{public}@", kmxFilePath, (long)row, partialPath);
+      [cellView.checkBox setState:([self.activeKeyboards containsObject:partialPath])?NSOnState:NSOffState];
     }
     
     return cellView;
@@ -357,14 +360,16 @@
 - (void)checkBoxAction:(id)sender {
   NSButton *checkBox = (NSButton *)sender;
   NSString *kmxFilePath = [self kmxFilePathAtIndex:checkBox.tag];
+  NSString *partialPath = [KMDataRepository.shared trimToPartialPath:kmxFilePath];
+  os_log_debug([KMLogs uiLog], "checkBoxAction, kmxFilePath = %{public}@ for checkBox.tag %li, partialPath = %{public}@", kmxFilePath, checkBox.tag, partialPath);
   if (checkBox.state == NSOnState) {
     os_log_debug([KMLogs uiLog], "Adding active keyboard: %{public}@", kmxFilePath);
-    [self.activeKeyboards addObject:kmxFilePath];
+    [self.activeKeyboards addObject:partialPath];
     [self saveActiveKeyboards];
   }
   else if (checkBox.state == NSOffState) {
     os_log_debug([KMLogs uiLog], "Disabling active keyboard: %{public}@", kmxFilePath);
-    [self.activeKeyboards removeObject:kmxFilePath];
+    [self.activeKeyboards removeObject:partialPath];
     [self saveActiveKeyboards];
   }
 }
@@ -398,8 +403,8 @@
 }
 
 - (void)removeAction:(id)sender {
-  NSButton *removeButton = (NSButton *)sender;
-  NSDictionary *info = [self.tableContents objectAtIndex:removeButton.tag];
+  NSButton *deleteButton = (NSButton *)sender;
+  NSDictionary *info = [self.tableContents objectAtIndex:deleteButton.tag];
   NSString *deleteKeyboardMessage = NSLocalizedString(@"message-confirm-delete-keyboard", nil);
   
   if ([info objectForKey:@"HeaderTitle"] != nil)
@@ -407,10 +412,13 @@
   else
     [self.deleteAlertView setMessageText:[NSString localizedStringWithFormat:deleteKeyboardMessage, [info objectForKey:kKMKeyboardNameKey]]];
   
-  [self.deleteAlertView beginSheetModalForWindow:self.window
-                                   modalDelegate:self
-                                  didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
-                                     contextInfo:(__bridge void *)([NSNumber numberWithInteger:removeButton.tag])];
+  [self.deleteAlertView beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse returnCode)  {
+    if (returnCode == NSAlertFirstButtonReturn) {
+      os_log_debug([KMLogs uiLog], "confirm delete keyboard alert dismissed");
+      [self deleteFileAtIndex:[NSNumber numberWithInteger:deleteButton.tag]];
+    }
+    self.deleteAlertView = nil;
+  }];
 }
 
 - (IBAction)downloadAction:(id)sender {
@@ -425,38 +433,31 @@
   [self.AppDelegate.downloadKBWindow.window makeKeyAndOrderFront:nil];
 }
 
-- (IBAction)alwaysShowOSKCheckBoxAction:(id)sender {
-  NSButton *checkBox = (NSButton *)sender;
-  [self.AppDelegate setAlwaysShowOSK:(checkBox.state == NSOnState)];
-}
-
-- (IBAction)useVerboseLoggingCheckBoxAction:(id)sender {
-  NSButton *checkBox = (NSButton *)sender;
-  BOOL verboseLoggingOn = checkBox.state == NSOnState;
-  [self.AppDelegate setUseVerboseLogging:verboseLoggingOn];
-  [self.verboseLoggingInfo setHidden:!verboseLoggingOn];
-}
-
 - (void)handleRequestToInstallPackage:(KMPackage *) package {
+  os_log_debug([KMLogs dataLog], "handleRequestToInstallPackage");
   NSString *keyboardInfoString = NSLocalizedString(@"info-install-keyboard-filename", nil);
   [self.confirmKmpInstallAlertView setInformativeText:[NSString localizedStringWithFormat:keyboardInfoString, package.getOrigKmpFilename]];
   
   os_log_debug([KMLogs uiLog], "Asking user to confirm installation of %{public}@, KMP - temp file name: %{public}@", package.getOrigKmpFilename, package.getTempKmpFilename);
   
-  [self.confirmKmpInstallAlertView beginSheetModalForWindow:self.window
-                                              modalDelegate:self
-                                             didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
-                                                contextInfo:(__bridge void *)(package)];
+  [self.confirmKmpInstallAlertView beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse returnCode)  {
+    os_log_debug([KMLogs uiLog], "confirm keyboard installation alert dismissed");
+    if (returnCode == NSAlertFirstButtonReturn) {
+      [self installPackageFile: package.getTempKmpFilename];
+    }
+    [package releaseTempKMPFile];
+    self.confirmKmpInstallAlertView = nil;
+  }];
 }
 
 - (void)installPackageFile:(NSString *)kmpFile {
   // kmpFile could be a temp file (in fact, it always is!), so don't display the name.
-  
-  os_log_debug([KMLogs dataLog], "KMP - Ready to unzip/install Package File: %{public}@", kmpFile);
+  os_log_debug([KMLogs dataLog], "kmpFile - ready to unzip/install Package File: %{public}@", kmpFile);
   
   BOOL didUnzip = [self.AppDelegate unzipFile:kmpFile];
   
   if (!didUnzip) {
+    os_log_debug([KMLogs dataLog], "kmpFile, unzipFile failed");
     NSAlert *failure = [[NSAlert alloc] init];
     [failure addButtonWithTitle:NSLocalizedString(@"button-keyboard-file-unreadable", @"Alert button")];
     
@@ -465,13 +466,12 @@
     
     [failure setIcon:[[NSBundle mainBundle] imageForResource:@"logo.png"]];
     [failure setAlertStyle:NSAlertStyleWarning];
-    [failure beginSheetModalForWindow:self.window
-                        modalDelegate:self
-                       didEndSelector:@selector(alertDidEnd:returnCode:contextInfo:)
-                          contextInfo:nil];
+    [failure beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse returnCode)  {
+      os_log_debug([KMLogs uiLog], "kmpFile, keyboard file unreadable alert dismissed with returnCode: %ld", (long)returnCode);
+    }];
   }
   else {
-    os_log_debug([KMLogs dataLog], "Completed installation of KMP file.");
+    os_log_debug([KMLogs dataLog], "kmpFile, completed installation of KMP file");
   }
 }
 
@@ -545,28 +545,6 @@
   }
   
   return _confirmKmpInstallAlertView;
-}
-
-- (void)alertDidEnd:(NSAlert *)alert returnCode:(NSInteger)returnCode contextInfo:(void *)contextInfo {
-  os_log_debug([KMLogs uiLog], "User responded to NSAlert");
-  if (alert == _deleteAlertView) {
-    if (returnCode == NSAlertFirstButtonReturn) { // Delete
-      [self deleteFileAtIndex:(__bridge NSNumber *)contextInfo];
-    }
-    
-    _deleteAlertView = nil;
-  }
-  else if (alert == _confirmKmpInstallAlertView) {
-    KMPackage *package = (__bridge KMPackage *)contextInfo;
-    os_log_debug([KMLogs uiLog], "KMP - Temp file: %{public}@", package.getTempKmpFilename);
-    if (returnCode == NSAlertFirstButtonReturn) { // Install
-      [self installPackageFile: package.getTempKmpFilename];
-    }
-    
-    [package releaseTempKMPFile];
-    _confirmKmpInstallAlertView = nil;
-  }
-  // else, just a message - nothing to do.
 }
 
 - (void)deleteFileAtIndex:(NSNumber *) n {

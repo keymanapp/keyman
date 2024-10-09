@@ -10,6 +10,7 @@
 #import <Carbon/Carbon.h> /* For kVK_ constants. */
 #import "KeySender.h"
 #import "TextApiCompliance.h"
+#import "KMSettingsRepository.h"
 #import "KMLogs.h"
 @import Sentry;
 
@@ -44,11 +45,14 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   _lowLevelBackspaceCount = 0;
   _queuedText = nil;
   
-  // In Xcode, if Keyman is the active IM and is in "debugMode" and "English plus Spanish" is 
-  // the current keyboard and you type "Sentry force now", it will force a simulated crash to 
+  BOOL forceSentryCrash = [KMSettingsRepository.shared readForceSentryError];
+  
+  // In Xcode, if Keyman is the active IM and the settings include the
+  // forceSentryCrash flag and "English plus Spanish" is the current keyboard
+  // and you type "Sentry force now", it will force a simulated crash to
   // test reporting to sentry.keyman.com
-  if ([self.appDelegate debugMode] && [clientAppId isEqual: @"com.apple.dt.Xcode"]) {
-    os_log_debug([KMLogs testLog], "Sentry - Preparing to detect Easter egg.");
+  if (forceSentryCrash && [clientAppId isEqual: @"com.apple.dt.Xcode"]) {
+    os_log_debug([KMLogs testLog], "initWithClient, preparing to force Sentry crash.");
     _easterEggForSentry = [[NSMutableString alloc] init];
   }
   else
@@ -65,9 +69,7 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   if (_generatedBackspaceCount > 0 || (_queuedText != nil && _queuedText.length > 0) ||
       _keyCodeOfOriginalEvent != 0 || _sourceFromOriginalEvent != nil)
   {
-    if ([self.appDelegate debugMode]) {
-      os_log_error([KMLogs lifecycleLog], "ERROR: new app activated before previous app finished processing pending events! _generatedBackspaceCount: %lu, _queuedText: '%{public}@' _keyCodeOfOriginalEvent: %hu", _generatedBackspaceCount, _queuedText == nil ? @"(NIL)" : (NSString*)[self queuedText], _keyCodeOfOriginalEvent);
-    }
+    os_log_error([KMLogs lifecycleLog], "ERROR: new app activated before previous app finished processing pending events! _generatedBackspaceCount: %lu, _queuedText: '%{public}@' _keyCodeOfOriginalEvent: %hu", _generatedBackspaceCount, _queuedText == nil ? @"(NIL)" : (NSString*)[self queuedText], _keyCodeOfOriginalEvent);
     _keyCodeOfOriginalEvent = 0;
     _generatedBackspaceCount = 0;
     _queuedText = nil;
@@ -120,17 +122,19 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
 - (CoreKeyOutput*) processEventWithKeymanEngine:(NSEvent *)event in:(id) sender {
   CoreKeyOutput* coreKeyOutput = nil;
   if (self.appDelegate.lowLevelEventTap != nil) {
-    NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:self.appDelegate.currentModifierFlags timestamp:event.timestamp windowNumber:event.windowNumber context:[NSGraphicsContext currentContext] characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
+    NSEventModifierFlags newModifiers = [self.appDelegate determineModifiers];
+    NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:newModifiers timestamp:event.timestamp windowNumber:event.windowNumber context:[NSGraphicsContext currentContext] characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
     coreKeyOutput = [self.kme processEvent:eventWithOriginalModifierFlags];
-    os_log_debug([KMLogs eventsLog], "processEventWithKeymanEngine, using AppDelegate.currentModifierFlags: %lu / 0x%lX, instead of event.modifiers = %lu / 0x%lX", self.appDelegate.currentModifierFlags, self.appDelegate.currentModifierFlags, event.modifierFlags, event.modifierFlags);
+    os_log_debug([KMLogs eventsLog], "processEventWithKeymanEngine, using newModifierFlag 0x%lX, instead of event.modifiers 0x%lX", newModifiers, event.modifierFlags);
   }
   else {
-    // Depending on the client app and the keyboard, using the passed-in event as it is should work okay.
-    // Keyboards that depend on chirality support will not work. And command-key actions that change the
-    // context might go undetected in some apps, resulting in errant behavior for subsequent typing.
+    /** 
+     * Without the low level event tap, there will be no way to distinguish left and right option keys.
+     * Also command-key actions that should invalidate the context may go undetected.
+     * Have yet to determine which scenarios prevent an event tap from be created
+     */
     coreKeyOutput = [self.kme processEvent:event];
   }
-  //os_log_debug([KMLogs eventsLog], "processEventWithKeymanEngine, coreKeyOutput = %{public}@", coreKeyOutput);
   return coreKeyOutput;
 }
 
@@ -416,11 +420,11 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
   for(NSString *key in options) {
     NSString *value = [options objectForKey:key];
     if(key && value) {
-      os_log_debug([KMLogs keyLog], "applyNonTextualOutput calling writePersistedOptions, key: %{public}@, value: %{public}@", key, value);
-      [self.appDelegate writePersistedOptions:key withValue:value];
+      os_log_debug([KMLogs keyLog], "persistOptions, key: %{public}@, value: %{public}@", key, value);
+      [[KMSettingsRepository shared] writeOptionForSelectedKeyboard:key withValue:value];
     }
     else {
-      os_log_debug([KMLogs keyLog], "applyNonTextualOutput, invalid values in optionsToPersist, not writing to UserDefaults, key: %{public}@, value: %{public}@", key, value);
+      os_log_debug([KMLogs keyLog], "invalid values in persistOptions, not writing to UserDefaults, key: %{public}@, value: %{public}@", key, value);
     }
   }
 }

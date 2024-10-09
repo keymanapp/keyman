@@ -1,10 +1,9 @@
-///<reference types="@keymanapp/models-types" />
-
 import KeyboardProcessor from "./keyboardProcessor.js";
 import { VariableStoreDictionary } from "keyman/engine/keyboard";
 import OutputTarget, { type Transcription } from './outputTarget.js';
 import { Mock } from "./mock.js";
 import { type VariableStore } from "./systemStores.js";
+import { Suggestion } from '@keymanapp/common-types';
 
 /**
  * Represents the commands and state changes that result from a matched keyboard rule.
