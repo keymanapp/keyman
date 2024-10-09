@@ -11,11 +11,11 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe \
   "Keyman Developer" \
+  "@/resources/tools/check-markdown  test:help" \
   clean \
   configure \
   build \
   test \
-  "@/resources/tools/check-markdown  test:help" \
   "api                          Analyze API and prepare API documentation" \
   "publish                      Prepare files for distribution, publish symbols, publish or pack npm packages, and build installer" \
   "install                      Install built programs locally" \

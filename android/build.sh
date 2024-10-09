@@ -14,11 +14,11 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe \
   "Build Keyman Engine for Android, Keyman for Android, and FirstVoices Android app." \
+  "@/resources/tools/check-markdown  test:help" \
   clean \
   configure \
   build \
   test \
-  "@/resources/tools/check-markdown  test:help" \
   "publish                                  Publishes symbols to Sentry and the APKs to the Play Store." \
   --ci+ \
   --upload-sentry+ \

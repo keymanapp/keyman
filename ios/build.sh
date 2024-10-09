@@ -1,23 +1,18 @@
 #!/usr/bin/env bash
-
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-# Include our resource functions; they're pretty useful!
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
-# Please note that this build script (understandably) assumes that it is running on Mac OS X.
-# verify_on_mac
-
 builder_describe "Builds Keyman Engine and the Keyman app for use on iOS devices - iPhone and iPad." \
+  "@/resources/tools/check-markdown  test:help" \
   "clean" \
   "configure" \
   "build" \
   "test" \
-  "@/resources/tools/check-markdown  test:help" \
   ":engine                      Builds KeymanEngine.xcframework, usable by our main app and by third-party apps" \
   ":app=keyman                  Builds the Keyman app for iOS platforms" \
   ":help                        Online documentation" \

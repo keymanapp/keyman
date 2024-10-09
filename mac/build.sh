@@ -5,7 +5,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 . "${THIS_SCRIPT%/*}/../resources/build/builder.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
 
-# Include our resource functions; they're pretty useful!
 . "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 . "$KEYMAN_ROOT/resources/build/build-help.inc.sh"
 . "$KEYMAN_ROOT/mac/mac-utils.inc.sh"
@@ -24,9 +23,6 @@ builder_describe "Builds Keyman for macOS." \
   ":help       Online documentation" \
   ":testapp    Keyman4Mac (test harness)" \
   "--quick,-q  Bypasses notarization for $(builder_term install)"
-
-# Please note that this build script (understandably) assumes that it is running on Mac OS X.
-# verify_on_mac
 
 builder_parse "$@"
 

@@ -25,15 +25,15 @@ function run() {
 
   const files = findFiles(root);
   const links = parseFiles(root, files);
-  const result = checkLinks(root, links);
+  const checkLinksSucceeded = checkLinks(root, links);
 
   for(const file of links) {
     if(file.messages.length) {
-      reportMessages(root, result && verbose /* only give verbose output if no errors */, file);
+      reportMessages(root, checkLinksSucceeded && verbose /* only give verbose output if no errors */, file);
     }
   }
 
-  process.exit(result ? 0 : 1);
+  process.exit(checkLinksSucceeded ? 0 : 1);
 }{
 
 }
