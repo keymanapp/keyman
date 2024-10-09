@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.124 alpha 2024-10-09
+
+* chore(common): fix links in minimum-versions.md (#12507)
+* fix(developer): use richedit in debug memo to support Egyptian cartouches (#12464)
+* feat(android): Add controls for auto-correct (#12443)
+
 ## 18.0.123 alpha 2024-10-08
 
 * chore(developer,common): deps: replace xml2js with fast-xml-parser (#12502)
