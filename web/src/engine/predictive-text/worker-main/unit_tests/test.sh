@@ -48,18 +48,18 @@ if builder_start_action test:libraries; then
   # So, for now, we add a text header to clarify what is running at each stage, in
   # addition to fair bit of `pushd` and `popd`.
   echo
-  echo "### Running $(builder_term common/models/wordbreakers) tests"
-  "$KEYMAN_ROOT/common/models/wordbreakers/build.sh" test $TEST_OPTS
+  echo "### Running $(builder_term web/src/engine/predictive-text/wordbreakers) tests"
+  "$KEYMAN_ROOT/web/src/engine/predictive-text/wordbreakers/build.sh" test $TEST_OPTS
 
-  pushd "$KEYMAN_ROOT/common/models/templates"
+  pushd "$KEYMAN_ROOT/web/src/engine/predictive-text/templates/"
   echo
-  echo "### Running $(builder_term common/models/templates) tests"
-  "$KEYMAN_ROOT/common/models/templates/build.sh" test $TEST_OPTS
+  echo "### Running $(builder_term web/src/engine/predictive-text/templates/) tests"
+  "$KEYMAN_ROOT/web/src/engine/predictive-text/templates/build.sh" test $TEST_OPTS
   popd
 
-  pushd "$KEYMAN_ROOT/common/web/lm-worker"
+  pushd "$KEYMAN_ROOT/web/src/engine/predictive-text/worker-thread"
   echo
-  echo "### Running ${BUILDER_TERM_START}common/web/lm-worker${BUILDER_TERM_END} tests"
+  echo "### Running ${BUILDER_TERM_START}web/src/engine/predictive-text/worker-thread${BUILDER_TERM_END} tests"
   ./build.sh test $TEST_OPTS
   popd
 

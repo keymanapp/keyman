@@ -1,21 +1,8 @@
 /*
-  Name:             mcompile
-  Copyright:        Copyright (C) 2003-2017 SIL International.
-  Documentation:
-  Description:
-  Create Date:      3 Aug 2014
-
-  Modified Date:    3 Aug 2014
-  Authors:          mcdurdin
-  Related Files:
-  Dependencies:
-
-  Bugs:
-  Todo:
-  Notes:
-  History:          03 Aug 2014 - mcdurdin - I4353 - V9.0 - mnemonic layout recompiler mixes up deadkey rules
-
-*/
+ * Keyman is copyright (C) SIL International. MIT License.
+ *
+ * Mnemonic layout support for linux
+ */
 
 #ifndef MCOMPILE_H
 #define MCOMPILE_H

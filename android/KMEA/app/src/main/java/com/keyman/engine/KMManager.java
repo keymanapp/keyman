@@ -25,7 +25,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.inputmethodservice.InputMethodService;
@@ -180,6 +179,19 @@ public final class KMManager {
     }
   }
 
+  // Enum for how the System Keyboard ENTER key is handled for the EditorInfo action
+  // Reference: https://developer.android.com/reference/android/view/inputmethod/EditorInfo#summary
+  public enum EnterModeType {
+    GO,        // Go action
+    SEARCH,    // Search action
+    SEND,      // Send action
+    NEXT,      // Next action
+    DONE,      // Done action
+    PREVIOUS,  // Previous action
+    NEWLINE,   // Send newline character
+    DEFAULT,   // Default ENTER action
+  }
+
   protected static InputMethodService IMService;
 
   private static boolean debugMode = false;
@@ -218,6 +230,9 @@ public final class KMManager {
   // regardless what the Settings preference is.
   private static boolean mayPredictOverride = false;
 
+  // Determine how system keyboard handles ENTER key
+  public static EnterModeType enterMode = EnterModeType.DEFAULT;
+
   // Boolean for whether a keyboard can send embedded KMW crash reports to Sentry
   // When maySendCrashReport is false, KMW will still attempt to send crash reports, but it
   // will be blocked.
@@ -247,6 +262,8 @@ public final class KMManager {
   public static final String KMKey_KeyboardRTL = "rtl";
   public static final String KMKey_KeyboardHeightPortrait = "keyboardHeightPortrait";
   public static final String KMKey_KeyboardHeightLandscape = "keyboardHeightLandscape";
+
+  public static final String KMKey_LongpressDelay = "longpressDelay";
 
   public static final String KMKey_CustomHelpLink = "CustomHelpLink";
   public static final String KMKey_KMPLink = "kmp";
@@ -292,6 +309,12 @@ public final class KMManager {
   public static final String KMDefault_DictionaryModelName = "English dictionary (MTNT)";
   public static final String KMDefault_DictionaryVersion = "0.1.4";
   public static final String KMDefault_DictionaryKMP = KMDefault_DictionaryPackageID + FileUtils.MODELPACKAGE;
+
+  // Default KeymanWeb longpress delay constants in milliseconds
+  public static final int KMDefault_LongpressDelay = 500;
+  public static final int KMMinimum_LongpressDelay = 300;
+  public static final int KMMaximum_LongpressDelay = 1500;
+
 
   // Keyman files
   protected static final String KMFilename_KeyboardHtml = "keyboard.html";
@@ -1252,6 +1275,60 @@ public final class KMManager {
   }
 
   /**
+   * Sets enterMode which specifies how the System keyboard ENTER key is handled
+   *
+   * @param imeOptions EditorInfo.imeOptions used to determine the action
+   * @param inputType  InputType used to determine if the text field is multi-line
+   */
+  public static void setEnterMode(int imeOptions, int inputType) {
+    EnterModeType value = EnterModeType.DEFAULT;
+    int imeActions = imeOptions & EditorInfo.IME_MASK_ACTION;
+    boolean isMultiLine = (inputType & InputType.TYPE_TEXT_FLAG_MULTI_LINE) != 0;
+
+    switch (imeActions) {
+      case EditorInfo.IME_ACTION_GO:
+        value = EnterModeType.GO;
+        break;
+
+      case EditorInfo.IME_ACTION_SEARCH:
+        value = EnterModeType.SEARCH;
+        break;
+
+      case EditorInfo.IME_ACTION_SEND:
+        value = isMultiLine ?
+          EnterModeType.NEWLINE :EnterModeType.SEND;
+        break;
+
+      case EditorInfo.IME_ACTION_NEXT:
+        value = EnterModeType.NEXT;
+        break;
+
+      case EditorInfo.IME_ACTION_DONE:
+        value = isMultiLine ?
+          EnterModeType.NEWLINE : EnterModeType.DONE;
+        break;
+
+      case EditorInfo.IME_ACTION_PREVIOUS:
+        value = EnterModeType.PREVIOUS;
+        break;
+
+      default:
+        value = isMultiLine ?
+          EnterModeType.NEWLINE : EnterModeType.DEFAULT;
+    }
+
+    enterMode = value;
+  }
+
+  /**
+   * Get the value of enterMode
+   * @return EnterModeType
+   */
+  public static EnterModeType getEnterMode() {
+    return enterMode;
+  }
+
+  /**
    * Sets mayPredictOverride true if the InputType field is a hidden password text field
    * (either TYPE_TEXT_VARIATION_PASSWORD or TYPE_TEXT_VARIATION_WEB_PASSWORD
    * but not TYPE_TEXT_VARIATION_VISIBLE_PASSWORD)
@@ -2008,6 +2085,53 @@ public final class KMManager {
       return Configuration.ORIENTATION_LANDSCAPE;
     }
     return Configuration.ORIENTATION_UNDEFINED;
+  }
+
+  /**
+   * Get the longpress delay (in milliseconds) from stored preference. Defaults to 500ms
+   * @return int - longpress delay in milliseconds
+   */
+  public static int getLongpressDelay() {
+    SharedPreferences prefs = appContext.getSharedPreferences(
+      appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+
+    return prefs.getInt(KMKey_LongpressDelay, KMDefault_LongpressDelay);
+  }
+
+  /**
+   * Set the longpress delay (in milliseconds) as a stored preference.
+   * Valid range is 300 ms to 1500 ms. Returns true if the preference is successfully stored.
+   * @param longpressDelay - int longpress delay in milliseconds
+   * @return boolean
+   */
+  public static boolean setLongpressDelay(int longpressDelay) {
+    if (longpressDelay < KMMinimum_LongpressDelay || longpressDelay > KMMaximum_LongpressDelay) {
+      return false;
+    }
+
+    SharedPreferences prefs = appContext.getSharedPreferences(
+      appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = prefs.edit();
+    editor.putInt(KMKey_LongpressDelay, longpressDelay);
+    editor.commit();
+
+    return true;
+  }
+
+  /**
+   * Sends options to the KeymanWeb keyboard.
+   * 1. number of milliseconds to trigger a longpress gesture.
+   * This method requires a keyboard to be loaded for the value to take effect.
+   */
+  public static void sendOptionsToKeyboard() {
+    int longpressDelay = getLongpressDelay();
+    if (isKeyboardLoaded(KeyboardType.KEYBOARD_TYPE_INAPP)) {
+      InAppKeyboard.loadJavascript(KMString.format("setLongpressDelay(%d)", longpressDelay));
+    }
+
+    if (SystemKeyboard != null) {
+      SystemKeyboard.loadJavascript(KMString.format("setLongpressDelay(%d)", longpressDelay));
+    }
   }
 
   public static int getBannerHeight(Context context) {

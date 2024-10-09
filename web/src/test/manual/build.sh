@@ -11,7 +11,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 # ################################ Main script ################################
 
 builder_describe "Builds the Keyman Engine for Web's sample page setups." \
-  "@/common/web/sentry-manager build" \
+  "@/web/src/engine/sentry-manager build" \
   "@/web/src/app/browser build" \
   "@/web/src/app/ui build" \
   "@/web/src/tools build" \
@@ -33,8 +33,8 @@ builder_describe_outputs \
 
 #### Resource paths ####
 
-SENTRY_MANAGER_SRC="$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js"
-SENTRY_MANAGER_MAP="$KEYMAN_ROOT/common/web/sentry-manager/build/lib/index.js.map"
+SENTRY_MANAGER_SRC="$KEYMAN_ROOT/web/src/engine/sentry-manager/build/lib/index.js"
+SENTRY_MANAGER_MAP="$KEYMAN_ROOT/web/src/engine/sentry-manager/build/lib/index.js.map"
 SENTRY_SRC="$KEYMAN_ROOT/node_modules/@sentry/browser/build/bundle.min.js"
 SENTRY_MAP="$KEYMAN_ROOT/node_modules/@sentry/browser/build/bundle.min.js.map"
 
@@ -49,11 +49,11 @@ function do_copy() {
   cp "$SENTRY_SRC"          "$KEYMAN_ROOT/$DEST/sentry-bundle.min.js"
   cp "$SENTRY_MAP"          "$KEYMAN_ROOT/$DEST/sentry-bundle.min.js.map"
 
-  GESTURE_RECOGNIZER_BUILD="$KEYMAN_ROOT/common/web/gesture-recognizer/build/lib/."
-  GESTURE_RECOGNIZER_TARGET="$KEYMAN_ROOT/web/build/engine/gesture-recognizer/lib/"
+  GESTURE_PROCESSOR_BUILD="$KEYMAN_ROOT/web/src/engine/osk/gesture-processor/build/lib/."
+  GESTURE_PROCESSOR_TARGET="$KEYMAN_ROOT/web/build/engine/gesture-processor/lib/"
 
-  mkdir -p "$GESTURE_RECOGNIZER_TARGET"
-  cp -a "$GESTURE_RECOGNIZER_BUILD" "$GESTURE_RECOGNIZER_TARGET"
+  mkdir -p "$GESTURE_PROCESSOR_TARGET"
+  cp -a "$GESTURE_PROCESSOR_BUILD" "$GESTURE_PROCESSOR_TARGET"
 }
 
 builder_run_action clean rm -rf "$KEYMAN_ROOT/$DEST"

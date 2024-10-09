@@ -22,6 +22,8 @@
 
 /// <reference types="@keymanapp/lm-message-types" />
 
+import { Token } from '@keymanapp/lm-message-types';
+
 type Resolve<T> = (value?: T | PromiseLike<T>) => void;
 type Reject = (reason?: any) => void;
 interface PromiseCallbacks<T> {

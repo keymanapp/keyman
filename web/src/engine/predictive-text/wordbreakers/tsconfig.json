@@ -1,0 +1,15 @@
+{
+  "extends": "../../../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "./build/main/obj",
+    "tsBuildInfoFile": "./build/main/obj/tsconfig.tsbuildinfo",
+    "rootDir": "./src/main"
+  },
+  "include": [
+	  "./src/main/**/*"
+  ],
+  "exclude": [
+	  "node_modules"
+  ]
+}
