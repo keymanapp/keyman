@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 18.0.123 alpha 2024-10-08
+
+* chore(developer,common): deps: replace xml2js with fast-xml-parser (#12502)
+* chore(ios): renew certificate (#12512)
+
+## 18.0.122 alpha 2024-10-07
+
+* feat(mac): both option keys generate right alt if no left alt mapping (#12458)
+* chore(common): improve configuration detection for hextobin (#12481)
+
 ## 18.0.121 alpha 2024-10-03
 
 * docs(developer): Fix image links in help (#12488)
