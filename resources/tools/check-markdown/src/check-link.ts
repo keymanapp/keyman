@@ -24,8 +24,8 @@ function checkLink(root: string, file: string, token: Tokens.Link | Tokens.Image
   if(href.startsWith('https:') || href.startsWith('http:')) {
     messages.push({token, type:'info', message: 'External link'});
     return true;
-
   }
+
   if(href.startsWith('/')) {
     messages.push({token, type:'info', message: 'Absolute path'});
     return true;
