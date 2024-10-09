@@ -74,7 +74,7 @@ export default {
     {
       name: 'engine/keyboard',
       // Relative, from the containing package.json
-      files: ['build/test/dom/cases/keyboard/**/*.spec.mjs']
+      files: ['build/test/dom/cases/keyboard/**/*.tests.mjs']
     },
     {
       name: 'engine/keyboard-storage',

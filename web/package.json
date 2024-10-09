@@ -86,6 +86,10 @@
     "./engine/osk/internals": {
       "types": "./build/engine/osk/obj/test-index.d.ts",
       "import": "./build/engine/osk/obj/test-index.js"
+    },
+    "./tools/testing/test-utils": {
+      "types": "./build/tools/testing/test-utils/obj/index.d.ts",
+      "import": "./build/tools/testing/test-utils/obj/index.js"
     }
   },
   "imports": {
