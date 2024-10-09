@@ -224,10 +224,10 @@ test_check_updated_version_number__LineRemoved_InAlpha_FileMissingInStable_ApiVe
   git checkout master
   # simulate a commit that renamed the .symbols file and updated the API version
   git mv linux/debian/libkeymancore1.symbols linux/debian/libfoo2.symbols
-  sed -i 's/libkeymancore/libfoo/' linux/scripts/deb-packaging.sh
+  sed -i 's/libkeymancore/libfoo/' linux/scripts/verify_api.inc.sh
   # shellcheck disable=2016 # single quotes are intentional here
-  sed -i 's/${SONAME}/2/' linux/scripts/deb-packaging.sh
-  git add  linux/scripts/deb-packaging.sh
+  sed -i 's/${SONAME}/2/' linux/scripts/verify_api.inc.sh
+  git add  linux/scripts/verify_api.inc.sh
   echo "2.0.0" > core/CORE_API_VERSION.md
   git add core/CORE_API_VERSION.md
   sed -i 's/libkeymancore1/libfoo2/' linux/debian/libfoo2.symbols
@@ -251,8 +251,8 @@ test_check_updated_version_number__LineRemoved_InAlpha_FileMissingInStable_ApiVe
   git checkout master
   # simulate a commit that renamed the .symbols file
   git mv linux/debian/libkeymancore1.symbols linux/debian/libfoo1.symbols
-  sed -i 's/libkeymancore/libfoo/' linux/scripts/deb-packaging.sh
-  git add linux/scripts/deb-packaging.sh
+  sed -i 's/libkeymancore/libfoo/' linux/scripts/verify_api.inc.sh
+  git add linux/scripts/verify_api.inc.sh
   sed -i 's/libkeymancore/libfoo/' linux/debian/libfoo1.symbols
   git add linux/debian/libfoo1.symbols
   git commit -m "renamed library"
@@ -344,8 +344,8 @@ test_check_updated_version_number__LineRemoved_InBeta_FileMissingInStable_ApiVer
   git checkout -b beta
   # simulate a commit that renamed the .symbols file
   git mv linux/debian/libkeymancore1.symbols linux/debian/libfoo1.symbols
-  sed -i 's/libkeymancore/libfoo/' linux/scripts/deb-packaging.sh
-  git add linux/scripts/deb-packaging.sh
+  sed -i 's/libkeymancore/libfoo/' linux/scripts/verify_api.inc.sh
+  git add linux/scripts/verify_api.inc.sh
   sed -i 's/libkeymancore/libfoo/' linux/debian/libfoo1.symbols
   git add linux/debian/libfoo1.symbols
   git commit -m "renamed library"
