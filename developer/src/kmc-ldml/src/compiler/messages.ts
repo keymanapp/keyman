@@ -174,7 +174,13 @@ export class CompilerMessages {
   static Error_UnparseableReorderSet = (o: { from: string, set: string }) =>
   m(this.ERROR_UnparseableReorderSet, `Illegal UnicodeSet "${def(o.set)}" in reorder "${def(o.from)}`);
 
-  // Available: 0x029
+  static ERROR_InvalidVariableIdentifer = SevError | 0x0029;
+  static Error_InvalidVariableIdentifer = (o: { id: string }) => m(
+    this.ERROR_InvalidVariableIdentifer,
+    `Invalid variable identifier "\\u${def(o.id)}". Identifiers must be between 1 and 32 characters, and can use A-Z, a-z, 0-9, and _.`,
+  );
+
+  // Available: 0x02A-0x2F
 
   static ERROR_InvalidQuadEscape = SevError | 0x0030;
   static Error_InvalidQuadEscape = (o: { cp: number }) =>
@@ -189,9 +195,12 @@ export class CompilerMessages {
   m(this.ERROR_UnparseableTransformFrom,    `Invalid transform from="${def(o.from)}": "${def(o.message)}"`);
 
   static ERROR_IllegalTransformDollarsign = SevErrorTransform | 0x01;
-  static Error_IllegalTransformDollarsign = (o: { from: string }) =>
-  m(this.ERROR_IllegalTransformDollarsign,  `Invalid transform from="${def(o.from)}": Unescaped dollar-sign ($) is not valid transform syntax.`,
-                                            '**Hint**: Use `\\$` to match a literal dollar-sign.');
+  static Error_IllegalTransformDollarsign = (o: { from: string }) => m(
+    this.ERROR_IllegalTransformDollarsign,
+    `Invalid transform from="${def(o.from)}": Unescaped dollar-sign ($) is not valid transform syntax.`,
+    `**Hint**: Use \`\\$\` to match a literal dollar-sign. If this precedes a variable name, `+
+    `the variable name may not be valid (A-Z, a-z, 0-9, _, 32 character maximum).`
+  );
 
   static ERROR_TransformFromMatchesNothing = SevErrorTransform | 0x02;
   static Error_TransformFromMatchesNothing = (o: { from: string }) =>
