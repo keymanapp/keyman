@@ -1,6 +1,8 @@
-import { KeyboardObject } from "keyman/engine/keyboard";
+import { KeymanWebKeyboard } from '@keymanapp/common-types';
 import { KeyboardInterface as KeyboardInterfaceBase } from 'keyman/engine/js-processor';
 import { KeyboardStub, RawKeyboardStub, toUnprefixedKeyboardId as unprefixed } from 'keyman/engine/keyboard-storage';
+
+import KeyboardObject = KeymanWebKeyboard.KeyboardObject;
 
 import { ContextManagerBase } from './contextManagerBase.js';
 import { VariableStoreCookieSerializer } from "./variableStoreCookieSerializer.js";
