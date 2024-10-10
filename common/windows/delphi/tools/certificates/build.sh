@@ -21,6 +21,8 @@ builder_describe_outputs \
 function do_certificates() {
   rm -f KeymanTestCA-sha1.* KeymanTest-sha1.* KeymanTest-sha256.* KeymanTestCA-sha256.*
 
+  source "$KEYMAN_ROOT/resources/build/win/visualstudio_environment.inc.sh"
+
   makecert -r -pe -n "CN=Keyman Test CA SHA1" -ss CA -sr CurrentUser -a sha1 -cy authority -sky signature -sv KeymanTestCA-sha1.pvk KeymanTestCA-sha1.cer
   certutil -user -addstore Root KeymanTestCA-sha1.cer
   makecert -pe -n "CN=Keyman Test Certificate SHA1" -a sha1 -cy end -sky signature -ic KeymanTestCA-sha1.cer -iv KeymanTestCA-sha1.pvk -sv KeymanTest-sha1.pvk KeymanTest-sha1.cer

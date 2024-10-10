@@ -1,0 +1,11 @@
+{
+  "extends": "../../../../tsconfig.base.json",
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": "./",
+    "outDir": "build/",
+    "tsBuildInfoFile": "build/tsconfig.tsbuildinfo",
+    "rootDir": "./src"
+  },
+  "include": ["./src/**/*.mts"]
+}

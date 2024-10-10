@@ -56,7 +56,7 @@ void refine_alDead(KMX_WCHAR dk, std::vector<DeadKey*>& dkVec, std::vector<DeadK
  *         false if not
 */
 bool found_dk_inVector(KMX_WCHAR dk, std::vector<DeadKey*>& dkVec) {
-  for (int i = 0; i < dkVec.size(); i++) {
+  for (int i = 0; i < (int)dkVec.size(); i++) {
     if (dk == dkVec[i]->KMX_GetDeadCharacter())
       return true;
   }

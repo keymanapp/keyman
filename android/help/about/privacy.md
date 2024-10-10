@@ -19,7 +19,7 @@ Keyman does not use user accounts, so we are unable to identify which crash repo
 
 ### Developer Information
 
-Keyman is developed and published by SIL International.
+Keyman is developed and published by SIL Global.
 
 You can contact SIL or provide any feedback using the app store.
 

@@ -110,6 +110,10 @@
 #define REGSZ_KeyboardHotkeysAreToggle "hotkeys are toggles"
 #define REGSZ_DeadkeyConversionMode    "deadkey conversion mode"                // CU   // I4552
 #define REGSZ_ZapVirtualKeyCode        "zap virtual key code"   // LM, defaults to 0x0E (_VK_PREFIX_DEFAULT)
+/* Default is to only use left modifier in hotkeys trigger */
+#define REGSZ_AllowRightModifierHotKey "allow right modifier for hotkey"
+
+
 /*
   Debug flags
   These are all stored in HKCU\Software\Keyman\Debug
@@ -121,13 +125,7 @@
 
 #define REGSZ_Flag_ShouldSerializeInput "Flag_ShouldSerializeInput"
 
-/* REGSZ_Keyman_Debug DWORD: Use old non-chiral Win32 API RegisterHotkey instead of left-only hotkeys */
 
-#define REGSZ_Flag_UseRegisterHotkey  "Flag_UseRegisterHotkey"
-
-/* REGSZ_Flag_UseCachedHotkeyModifierState DWORD: Use old cached modifier state when checking hotkeys; ignores UseRegisterHotkey if FALSE */
-
-#define REGSZ_Flag_UseCachedHotkeyModifierState "Flag_UseCachedHotkeyModifierState"
 
 /* DWORD: Enable/disable deep TSF integration, default enabled; 0 = disabled, 1 = enabled, 2 = default */
 

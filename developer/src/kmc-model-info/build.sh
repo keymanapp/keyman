@@ -9,7 +9,6 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe "Build Keyman kmc Lexical Model model-info Compiler module" \
   "@/common/web/types" \
-  "@/common/models/types" \
   "clean" \
   "configure" \
   "build" \

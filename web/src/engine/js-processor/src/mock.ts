@@ -1,7 +1,5 @@
 import OutputTarget from './outputTarget.js';
 
-// Due to some interesting requirements on compile ordering in TS,
-// this needs to be in the same file as OutputTarget now.
 export class Mock extends OutputTarget {
   text: string;
 
