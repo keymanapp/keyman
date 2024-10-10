@@ -27,7 +27,7 @@ builder_describe_outputs \
 
 TARGET_PATH="$THIS_SCRIPT_PATH/build"
 
-builder_run_action clean do_clean
-builder_run_action configure do_configure
-builder_run_action build do_build
-builder_run_action test do_test
+builder_run_action clean do_meson_clean
+builder_run_action configure do_meson_configure
+builder_run_action build do_meson_build
+builder_run_action test do_meson_test

@@ -7,7 +7,7 @@
 # clean
 # ----------------------------------------------------------------------------
 
-do_clean() {
+do_meson_clean() {
   rm -rf "$THIS_SCRIPT_PATH/resources"
   rm -rf "$TARGET_PATH"
 }
@@ -16,7 +16,7 @@ do_clean() {
 # configure
 # ----------------------------------------------------------------------------
 
-do_configure() {
+do_meson_configure() {
   # Import our standard compiler defines; this is copied from
   # /resources/build/meson/standard.meson.build by build.sh, because meson doesn't
   # allow us to reference a file outside its root
@@ -34,7 +34,7 @@ do_configure() {
 # build
 # ----------------------------------------------------------------------------
 
-do_build() {
+do_meson_build() {
   pushd "$TARGET_PATH" > /dev/null
   ninja
   popd > /dev/null
@@ -44,7 +44,7 @@ do_build() {
 # test
 # ----------------------------------------------------------------------------
 
-do_test() {
+do_meson_test() {
   pushd "$TARGET_PATH" > /dev/null
   meson test "${builder_extra_params[@]}"
   popd > /dev/null
