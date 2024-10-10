@@ -1760,6 +1760,36 @@ TEST_F(CompilerTest, GetXStringImpl_type_osb_test) {
         EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
         EXPECT_EQ(KmnCompilerMessages::WARN_MixingLeftAndRightModifiers, msgproc_errors.back().errorCode);
     }
+    msgproc_errors.clear();
+
+    // virtual key, in VKeyNames, with modifiers, chiral modifiers version bump
+    std::map<const KMX_WCHAR*, const KMX_WCHAR> m_chiral{
+    //   str             sFlag
+        {u"[LCTRL K_A]", ISVIRTUALKEY | LCTRLFLAG },
+        {u"[LALT K_A]",  ISVIRTUALKEY | LALTFLAG },
+        {u"[RCTRL K_A]", ISVIRTUALKEY | RCTRLFLAG },
+        {u"[RALT K_A]",  ISVIRTUALKEY | RALTFLAG },
+        {u"[CAPS K_A]",  ISVIRTUALKEY | CAPITALFLAG },
+        {u"[NCAPS K_A]", ISVIRTUALKEY | NOTCAPITALFLAG },
+    };
+
+    std::cerr << "start debug" << std::endl;
+
+    kmcmp::CompileTarget = CKF_KEYMANWEB;
+    fileKeyboard.dwFlags = KF_AUTOMATICVERSION;
+    for (auto i = m_chiral.begin(); i != m_chiral.end(); i++) {
+        fileKeyboard.version = VERSION_90;
+        u16cpy(str, i->first);
+        EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+        tstr_virtual_key_valid[2] = i->second;
+        EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
+        EXPECT_EQ(VERSION_100, fileKeyboard.version);
+        EXPECT_EQ(0, msgproc_errors.size());
+    }
+    kmcmp::CompileTarget = CKF_KEYMAN;
+    fileKeyboard.dwFlags = 0;
+
+    std::cerr << "end debug" << std::endl;
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
