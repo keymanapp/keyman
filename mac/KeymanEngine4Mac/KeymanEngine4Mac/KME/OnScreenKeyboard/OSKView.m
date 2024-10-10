@@ -411,7 +411,7 @@
 - (void)keyAction:(id)sender {
   KeyView *keyView = (KeyView *)sender;
   NSUInteger keyCode = [keyView.key keyCode];
-  os_log_debug([KMELogs oskLog], "OSKView keyAction keyCode: 0x%lx", keyCode);
+  os_log_debug([KMELogs oskLog], "OSKView keyAction keyView: %{public}@", keyView);
   if (keyCode < 0x100) {
     NSRunningApplication *app = NSWorkspace.sharedWorkspace.frontmostApplication;
     pid_t processId = app.processIdentifier;
@@ -467,6 +467,7 @@
 }
 
 - (void)setKeyLabels:(BOOL)shift alt:(BOOL)alt ctrl:(BOOL)ctrl {
+  os_log_debug([KMELogs keyLog], "OSKView setKeyLabels, shift: %d, alt: %d, ctrl: %d", shift, alt, ctrl);
   [self resetKeyLabels];
   NSMutableArray *mKeys = [[self keyTags] mutableCopy];
   NSArray *nkeys = [self.kvk keys];
@@ -487,6 +488,7 @@
   for (NKey *nkey in nkeys) {
     if (nkey.shift == flags) {
       keyCode = [self MacKeyCode:nkey.vkey];
+      os_log_debug([KMELogs keyLog], "keyCode: %d, %x for key: %{public}@", keyCode, keyCode, nkey);
       if (keyCode < USHRT_MAX) {
         NSView *view = [self viewWithTag:keyCode|0x1000];
         if (view == nil || ![view isKindOfClass:[KeyView class]])
@@ -496,6 +498,9 @@
         [keyView setLabelFont:ansiFont];
         if (nkey.flags & KVKK_UNICODE) {
           [keyView setLabelText:nkey.text];
+          NSString* label = nkey.text;
+          NSData* data = [label dataUsingEncoding:NSUTF8StringEncoding];
+          os_log_debug([KMELogs keyLog], "setLabelText to %{public}@, utf8data %{public}@", label, data);
           [keyView setLabelFont:unicodeFont];
           [mKeys removeObject:[NSNumber numberWithInteger:(keyCode|0x1000)]];
         }
