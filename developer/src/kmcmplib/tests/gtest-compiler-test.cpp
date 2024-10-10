@@ -1715,8 +1715,31 @@ TEST_F(CompilerTest, GetXStringImpl_type_osb_test) {
     u16cpy(str, u"[K_A]");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     KMX_WCHAR sFlag = ISVIRTUALKEY;
-    const KMX_WCHAR tstr_virtual_key_valid[]   = { UC_SENTINEL, CODE_EXTENDED, sFlag, 65, UC_SENTINEL_EXTENDEDEND, 0 };
+    KMX_WCHAR tstr_virtual_key_valid[] = { UC_SENTINEL, CODE_EXTENDED, sFlag, 65, UC_SENTINEL_EXTENDEDEND, 0 };
     EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
+
+    // virtual key, in VKeyNames, valid with qualifiers
+    std::map<const KMX_WCHAR*, const KMX_WCHAR> m{
+    // str                  sFlag
+        {u"[NCAPS K_A]",    ISVIRTUALKEY | NOTCAPITALFLAG },
+        {u"[LALT K_A]",     ISVIRTUALKEY | LALTFLAG },
+        {u"[LCTRL K_A]",    ISVIRTUALKEY | LCTRLFLAG },
+        {u"[RALT K_A]",     ISVIRTUALKEY | RALTFLAG },
+        {u"[RCTRL K_A]",    ISVIRTUALKEY | RCTRLFLAG },
+        {u"[ALT K_A]",      ISVIRTUALKEY | K_ALTFLAG },
+        {u"[CTRL K_A]",     ISVIRTUALKEY | K_CTRLFLAG },
+        {u"[CAPS K_A]",     ISVIRTUALKEY | CAPITALFLAG },
+        {u"[SHIFT K_A]",    ISVIRTUALKEY | K_SHIFTFLAG },
+        {u"[CTRL ALT K_A]", ISVIRTUALKEY | K_CTRLFLAG | K_ALTFLAG },
+    };
+
+    fileKeyboard.version = VERSION_90;
+    for (auto i = m.begin(); i != m.end(); i++) {
+        u16cpy(str, i->first);
+        EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+        tstr_virtual_key_valid[2] = i->second;
+        EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
+    }
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
