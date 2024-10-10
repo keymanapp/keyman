@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 18.0.125 alpha 2024-10-10
+
+* chore(common): allow to run `build.sh` scripts in `bashdb` debugger (#12518)
+* chore(linux): Improve output of API Verification (#12522)
+* chore(linux): allow to skip API change (#12519)
+* fix(linux): fix problem with API checks with merge commits (#12520)
+* refactor(web): move `KeyboardObject` type to `common/web/types` (#12514)
+
 ## 18.0.124 alpha 2024-10-09
 
 * chore(common): fix links in minimum-versions.md (#12507)
