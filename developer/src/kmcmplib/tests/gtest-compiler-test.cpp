@@ -1695,6 +1695,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_r_test) {
 
 // tests strings starting with '['
 TEST_F(CompilerTest, GetXStringImpl_type_osb_test) {
+    kmcmp::msgproc = msgproc_collect;
     KMX_WCHAR tstr[128];
     fileKeyboard.version = VERSION_90;
     KMX_WCHAR str[LINESIZE];
@@ -1718,27 +1719,46 @@ TEST_F(CompilerTest, GetXStringImpl_type_osb_test) {
     KMX_WCHAR tstr_virtual_key_valid[] = { UC_SENTINEL, CODE_EXTENDED, sFlag, 65, UC_SENTINEL_EXTENDEDEND, 0 };
     EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
 
-    // virtual key, in VKeyNames, valid with qualifiers
-    std::map<const KMX_WCHAR*, const KMX_WCHAR> m{
-    // str                  sFlag
-        {u"[NCAPS K_A]",    ISVIRTUALKEY | NOTCAPITALFLAG },
-        {u"[LALT K_A]",     ISVIRTUALKEY | LALTFLAG },
-        {u"[LCTRL K_A]",    ISVIRTUALKEY | LCTRLFLAG },
-        {u"[RALT K_A]",     ISVIRTUALKEY | RALTFLAG },
-        {u"[RCTRL K_A]",    ISVIRTUALKEY | RCTRLFLAG },
-        {u"[ALT K_A]",      ISVIRTUALKEY | K_ALTFLAG },
-        {u"[CTRL K_A]",     ISVIRTUALKEY | K_CTRLFLAG },
-        {u"[CAPS K_A]",     ISVIRTUALKEY | CAPITALFLAG },
-        {u"[SHIFT K_A]",    ISVIRTUALKEY | K_SHIFTFLAG },
-        {u"[CTRL ALT K_A]", ISVIRTUALKEY | K_CTRLFLAG | K_ALTFLAG },
+    // virtual key, in VKeyNames, valid with modifiers
+    std::map<const KMX_WCHAR*, const KMX_WCHAR> m_mod{
+    //   str                  sFlag
+        {u"[NCAPS K_A]",      ISVIRTUALKEY | NOTCAPITALFLAG },
+        {u"[LALT K_A]",       ISVIRTUALKEY | LALTFLAG },
+        {u"[LCTRL K_A]",      ISVIRTUALKEY | LCTRLFLAG },
+        {u"[RALT K_A]",       ISVIRTUALKEY | RALTFLAG },
+        {u"[RCTRL K_A]",      ISVIRTUALKEY | RCTRLFLAG },
+        {u"[ALT K_A]",        ISVIRTUALKEY | K_ALTFLAG },
+        {u"[CTRL K_A]",       ISVIRTUALKEY | K_CTRLFLAG },
+        {u"[CAPS K_A]",       ISVIRTUALKEY | CAPITALFLAG },
+        {u"[SHIFT K_A]",      ISVIRTUALKEY | K_SHIFTFLAG },
+        {u"[CTRL ALT K_A]",   ISVIRTUALKEY | K_CTRLFLAG | K_ALTFLAG },
+        {u"[LCTRL LALT K_A]", ISVIRTUALKEY | LCTRLFLAG | LALTFLAG }, // no mixed modifiers warning
+        {u"[RCTRL RALT K_A]", ISVIRTUALKEY | RCTRLFLAG | RALTFLAG }, // no mixed modifiers warning
     };
 
     fileKeyboard.version = VERSION_90;
-    for (auto i = m.begin(); i != m.end(); i++) {
+    for (auto i = m_mod.begin(); i != m_mod.end(); i++) {
         u16cpy(str, i->first);
         EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
         tstr_virtual_key_valid[2] = i->second;
         EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
+        EXPECT_EQ(0, msgproc_errors.size());
+    }
+
+    // virtual key, in VKeyNames, with modifiers, KmnCompilerMessages::WARN_MixingLeftAndRightModifiers
+    std::map<const KMX_WCHAR*, const KMX_WCHAR> m_mixed{
+    //   str                  sFlag
+        {u"[LCTRL RALT K_A]", ISVIRTUALKEY | LCTRLFLAG | RALTFLAG },
+        {u"[RCTRL LALT K_A]", ISVIRTUALKEY | RCTRLFLAG | LALTFLAG },
+    };
+
+    fileKeyboard.version = VERSION_90;
+    for (auto i = m_mixed.begin(); i != m_mixed.end(); i++) {
+        u16cpy(str, i->first);
+        EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+        tstr_virtual_key_valid[2] = i->second;
+        EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
+        EXPECT_EQ(KmnCompilerMessages::WARN_MixingLeftAndRightModifiers, msgproc_errors.back().errorCode);
     }
 }
 
