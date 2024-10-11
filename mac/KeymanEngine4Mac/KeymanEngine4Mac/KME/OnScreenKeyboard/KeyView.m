@@ -72,6 +72,12 @@ static CGFloat const kRelativeModifierLabelHeight = 0.30f;
   return self;
 }
 
+- (NSString *)description {
+  NSString *format = @"<keyCode: 0x%lx hasKeyCaption:%d isModifierKey:%d isSpecialKey:%d isCharacterKey:%d label:%@ caption %@>";
+  NSString *str = [NSString stringWithFormat:format, _keyCode, _hasKeyCaption, _isModifierKey, _isSpecialKey, _isCharacterKey, _label.stringValue, _caption.stringValue];
+  return str;
+}
+
 - (void)drawRect:(NSRect)rect {
   /*
    // usually too much logging, uncomment for debugging

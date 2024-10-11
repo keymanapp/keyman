@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 export interface OutputTarget {
   /**
    * Signifies that this OutputTarget has no default key processing behaviors.  This should be false
