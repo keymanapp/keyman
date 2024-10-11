@@ -32,6 +32,7 @@
   "scripts": {},
   "workspaces": [
     "resources/gosh",
+    "resources/tools/check-markdown",
     "resources/tools/strip-emoji",
     "resources/build/version",
     "core/include/ldml",

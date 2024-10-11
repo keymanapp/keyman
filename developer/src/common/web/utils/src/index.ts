@@ -43,7 +43,5 @@ export { defaultCompilerOptions, CompilerBaseOptions, CompilerCallbacks, Compile
   } from './compiler-interfaces.js';
 
 export { CommonTypesMessages } from './common-messages.js';
-
-export * as xml2js from './deps/xml2js/xml2js.js';
-
 export * as SourceFilenamePatterns from './source-filename-patterns.js';
+export { KeymanXMLType, KeymanXMLWriter, KeymanXMLReader } from './xml-utils.js';

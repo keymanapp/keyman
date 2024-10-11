@@ -1,5 +1,58 @@
 # Keyman Version History
 
+## 18.0.125 alpha 2024-10-10
+
+* chore(common): allow to run `build.sh` scripts in `bashdb` debugger (#12518)
+* chore(linux): Improve output of API Verification (#12522)
+* chore(linux): allow to skip API change (#12519)
+* fix(linux): fix problem with API checks with merge commits (#12520)
+* refactor(web): move `KeyboardObject` type to `common/web/types` (#12514)
+
+## 18.0.124 alpha 2024-10-09
+
+* chore(common): fix links in minimum-versions.md (#12507)
+* fix(developer): use richedit in debug memo to support Egyptian cartouches (#12464)
+* feat(android): Add controls for auto-correct (#12443)
+
+## 18.0.123 alpha 2024-10-08
+
+* chore(developer,common): deps: replace xml2js with fast-xml-parser (#12502)
+* chore(ios): renew certificate (#12512)
+
+## 18.0.122 alpha 2024-10-07
+
+* feat(mac): both option keys generate right alt if no left alt mapping (#12458)
+* chore(common): improve configuration detection for hextobin (#12481)
+
+## 18.0.121 alpha 2024-10-03
+
+* docs(developer): Fix image links in help (#12488)
+* fix(oem/fv): Update keyboard versions and names for fv_all.kmp 13.1 (#12486)
+* feat(common): unified XML parser/writer (#12482)
+
+## 18.0.120 alpha 2024-10-02
+
+* chore(common): Add note on troubleshooting website errors (#12487)
+* docs(common): mention `KEYMAN_USE_NVM` in minimum versions doc (#12490)
+* docs(web): fix paths to several help pages (#12491)
+* docs(web): fix structure of test document (#12492)
+
+## 18.0.119 alpha 2024-09-28
+
+* refactor(developer): copy dev 17.0 help into repo (#12427)
+* fix(developer): warn before importing over touch layout (#12478)
+* chore(linux): display branch name with API verification (#12480)
+* docs(core): Update kmx-plus-file-format.md (#12479)
+
+## 18.0.118 alpha 2024-09-26
+
+* chore(developer): add context/options (#11566)
+* chore(deps-dev): bump rollup from 4.16.4 to 4.22.4 (#12462)
+* fix(developer): ignore excess whitespace in `<row keys>` attribute (#12468)
+* refactor(common): move help into common prod/docs/help folders (#12424)
+* fix(developer): publish developer-utils package during build (#12471)
+* fix(linux): ignore additional C++ symbol in API check (#12474)
+
 ## 18.0.117 alpha 2024-09-25
 
 * docs(common): Document how to skip generating CDN on websites (#12446)
