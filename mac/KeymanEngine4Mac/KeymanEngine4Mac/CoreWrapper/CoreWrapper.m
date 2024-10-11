@@ -1,8 +1,5 @@
-/**
+/*
  * Keyman is copyright (C) SIL International. MIT License.
- *
- * CoreWrapper.m
- * Keyman
  *
  * Created by Shawn Schantz on 2022-12-12.
  *
@@ -67,6 +64,40 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   }
 }
 
+-(CoreKeyboardInfo*) getKeyboardInfoForKmxFile:(NSString*)kmxFile {
+  NSArray *keyArray = [self getKeyArray];
+  CoreKeyboardInfo* info = [[CoreKeyboardInfo alloc] init:kmxFile keyArray: keyArray];
+  return info;
+}
+
+/**
+ * Get the list of Keys supported by the keyboard
+ */
+-(NSArray*)getKeyArray {
+  NSMutableArray *keyArray = [[NSMutableArray alloc] initWithCapacity:0];
+  km_core_keyboard_key *keyList;
+
+  km_core_status result = km_core_keyboard_get_key_list(self.coreKeyboard, &keyList);
+
+  for(km_core_keyboard_key* keyPtr = keyList; (keyPtr->key) != 0; keyPtr++) {
+    uint16_t key = keyPtr->key;
+    uint32_t modifier_flag = keyPtr->modifier_flag;
+    
+    if(key != 0) {
+      CoreKey* coreKey = [[CoreKey alloc] init: key modifiers: modifier_flag];
+      [keyArray addObject:coreKey];
+
+      //os_log_debug([KMELogs coreLog], "key %d modifiers 0x%X coreKey %{public}@", key, modifier_flag, coreKey);
+    }
+  }
+
+  km_core_keyboard_key_list_dispose(keyList);
+  
+  os_log_debug([KMELogs coreLog], "getKeyList returning %lu keys", (unsigned long)keyArray.count);
+
+  return keyArray;
+}
+
 -(void) dealloc{
   if (self.coreState) {
     km_core_state_dispose(self.coreState);
@@ -74,7 +105,7 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   if (self.coreKeyboard) {
     km_core_keyboard_dispose(self.coreKeyboard);
   }
-  os_log_debug([KMELogs coreLog], "dealloc called.");
+  os_log_debug([KMELogs coreLog], "CoreWrapper dealloc called");
 }
 
 -(void)loadKeyboardUsingCore:(NSString*) path {

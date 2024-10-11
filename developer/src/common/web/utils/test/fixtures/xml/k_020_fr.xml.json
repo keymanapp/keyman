@@ -1,0 +1,509 @@
+{
+ "keyboard3": {
+  "xmlns": "https://schemas.unicode.org/cldr/45/keyboard3",
+  "locale": "fr-t-k0-azerty",
+  "conformsTo": "45",
+  "locales": {
+   "locale": {
+    "id": "br"
+   }
+  },
+  "version": {
+   "number": "1.0.1"
+  },
+  "info": {
+   "author": "Team Keyboard",
+   "layout": "AZERTY",
+   "indicator": "FR",
+   "name": "French Test Updated"
+  },
+  "displays": {
+   "display": {
+    "output": "\\u{0300}",
+    "display": "\\u{02CB}"
+   },
+   "displayOptions": {
+    "baseCharacter": "x"
+   }
+  },
+  "keys": {
+   "import": [
+    {
+     "base": "cldr",
+     "path": "45/keys-Zyyy-punctuation.xml"
+    },
+    {
+     "base": "cldr",
+     "path": "45/keys-Zyyy-currency.xml"
+    }
+   ],
+   "key": [
+    {
+     "id": "shift",
+     "layerId": "shift"
+    },
+    {
+     "id": "numeric",
+     "layerId": "numeric"
+    },
+    {
+     "id": "symbol",
+     "layerId": "symbol"
+    },
+    {
+     "id": "base",
+     "layerId": "base"
+    },
+    {
+     "id": "bksp",
+     "gap": "true"
+    },
+    {
+     "id": "extra",
+     "gap": "true"
+    },
+    {
+     "id": "enter",
+     "output": "\\u{000A}"
+    },
+    {
+     "id": "u-grave",
+     "output": "ü"
+    },
+    {
+     "id": "e-grave",
+     "output": "é"
+    },
+    {
+     "id": "e-acute",
+     "output": "è"
+    },
+    {
+     "id": "c-cedilla",
+     "output": "ç"
+    },
+    {
+     "id": "a-grave",
+     "output": "à"
+    },
+    {
+     "id": "a-acute",
+     "output": "á"
+    },
+    {
+     "id": "a-caret",
+     "output": "â"
+    },
+    {
+     "id": "a-umlaut",
+     "output": "ä"
+    },
+    {
+     "id": "a-tilde",
+     "output": "ã"
+    },
+    {
+     "id": "a-ring",
+     "output": "å"
+    },
+    {
+     "id": "a-caron",
+     "output": "ā"
+    },
+    {
+     "id": "A-grave",
+     "output": "À"
+    },
+    {
+     "id": "A-acute",
+     "output": "Á"
+    },
+    {
+     "id": "A-caret",
+     "output": "Â"
+    },
+    {
+     "id": "A-umlaut",
+     "output": "Ä"
+    },
+    {
+     "id": "A-tilde",
+     "output": "Ã"
+    },
+    {
+     "id": "A-ring",
+     "output": "Å"
+    },
+    {
+     "id": "A-caron",
+     "output": "Ā"
+    },
+    {
+     "id": "bullet",
+     "output": "•"
+    },
+    {
+     "id": "umlaut",
+     "output": "¨"
+    },
+    {
+     "id": "sub-2",
+     "output": "₂"
+    },
+    {
+     "id": "super-2",
+     "output": "²",
+     "longPressKeyIds": "sub-2"
+    },
+    {
+     "id": "a",
+     "flickId": "a",
+     "output": "a",
+     "longPressKeyIds": "a-grave a-caret a-acute a-umlaut a-tilde a-ring a-caron",
+     "longPressDefaultKeyId": "a-caret"
+    },
+    {
+     "id": "A",
+     "flickId": "b",
+     "output": "A",
+     "longPressKeyIds": "A-grave A-caret A-acute A-umlaut a-tilde A-ring A-caron",
+     "longPressDefaultKeyId": "A-caret"
+    }
+   ]
+  },
+  "flicks": {
+   "flick": [
+    {
+     "id": "b",
+     "flickSegment": [
+      {
+       "directions": "nw",
+       "keyId": "A-grave"
+      },
+      {
+       "directions": "nw se",
+       "keyId": "A-acute"
+      },
+      {
+       "directions": "e",
+       "keyId": "A-caron"
+      },
+      {
+       "directions": "s",
+       "keyId": "numeric"
+      }
+     ]
+    },
+    {
+     "id": "a",
+     "flickSegment": [
+      {
+       "directions": "nw",
+       "keyId": "a-grave"
+      },
+      {
+       "directions": "nw se",
+       "keyId": "a-acute"
+      },
+      {
+       "directions": "e",
+       "keyId": "a-caron"
+      }
+     ]
+    }
+   ]
+  },
+  "layers": [
+   {
+    "formId": "iso",
+    "layer": [
+     {
+      "modifiers": "none",
+      "row": [
+       {
+        "keys": "super-2 amp e-grave double-quote apos open-paren hyphen e-acute underscore c-cedilla a-acute close-paren equal"
+       },
+       {
+        "keys": "a z e r t y u i o p caret dollar"
+       },
+       {
+        "keys": "q s d f g h j k l m u-grave asterisk"
+       },
+       {
+        "keys": "open-angle w x c v b n comma semi-colon colon bang"
+       },
+       {
+        "keys": "space"
+       }
+      ]
+     },
+     {
+      "modifiers": "shift",
+      "row": [
+       {
+        "keys": "1 2 3 4 5 6 7 8 9 0 degree plus"
+       },
+       {
+        "keys": "A Z E R T Y U I O P umlaut pound"
+       },
+       {
+        "keys": "Q S D F G H J K L M percent micro"
+       },
+       {
+        "keys": "close-angle W X C V B N question period slash section"
+       },
+       {
+        "keys": "space"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "formId": "touch",
+    "minDeviceWidth": "150",
+    "layer": [
+     {
+      "id": "base",
+      "row": [
+       {
+        "keys": "a z e r t y u i o p"
+       },
+       {
+        "keys": "q s d f g h j k l m"
+       },
+       {
+        "keys": "shift gap w x c v b n gap"
+       },
+       {
+        "keys": "numeric extra space enter"
+       }
+      ]
+     },
+     {
+      "id": "shift",
+      "row": [
+       {
+        "keys": "A Z E R T Y U I O P"
+       },
+       {
+        "keys": "Q S D F G H J K L M"
+       },
+       {
+        "keys": "base W X C V B N"
+       },
+       {
+        "keys": "numeric extra space enter"
+       }
+      ]
+     },
+     {
+      "id": "numeric",
+      "row": [
+       {
+        "keys": "1 2 3 4 5 6 7 8 9 0"
+       },
+       {
+        "keys": "hyphen slash colon semi-colon open-paren close-paren dollar amp at double-quote"
+       },
+       {
+        "keys": "symbol period comma question bang double-quote"
+       },
+       {
+        "keys": "base extra space enter"
+       }
+      ]
+     },
+     {
+      "id": "symbol",
+      "row": [
+       {
+        "keys": "open-square close-square open-curly close-curly hash percent caret asterisk plus equal"
+       },
+       {
+        "keys": "underscore backslash pipe tilde open-angle close-angle euro pound yen bullet"
+       },
+       {
+        "keys": "numeric period comma question bang double-quote"
+       },
+       {
+        "keys": "base extra space enter"
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "transforms": {
+   "type": "simple",
+   "transformGroup": {
+    "transform": [
+     {
+      "from": "` ",
+      "to": "`"
+     },
+     {
+      "from": "`a",
+      "to": "à"
+     },
+     {
+      "from": "`A",
+      "to": "À"
+     },
+     {
+      "from": "`e",
+      "to": "è"
+     },
+     {
+      "from": "`E",
+      "to": "È"
+     },
+     {
+      "from": "`i",
+      "to": "ì"
+     },
+     {
+      "from": "`I",
+      "to": "Ì"
+     },
+     {
+      "from": "`o",
+      "to": "ò"
+     },
+     {
+      "from": "`O",
+      "to": "Ò"
+     },
+     {
+      "from": "`u",
+      "to": "ù"
+     },
+     {
+      "from": "`U",
+      "to": "Ù"
+     },
+     {
+      "from": "^ ",
+      "to": "^"
+     },
+     {
+      "from": "^a",
+      "to": "â"
+     },
+     {
+      "from": "^A",
+      "to": " "
+     },
+     {
+      "from": "^e",
+      "to": "ê"
+     },
+     {
+      "from": "^E",
+      "to": "Ê"
+     },
+     {
+      "from": "^i",
+      "to": "î"
+     },
+     {
+      "from": "^I",
+      "to": "Î"
+     },
+     {
+      "from": "^o",
+      "to": "ô"
+     },
+     {
+      "from": "^O",
+      "to": "Ô"
+     },
+     {
+      "from": "^u",
+      "to": "û"
+     },
+     {
+      "from": "^U",
+      "to": "Û"
+     },
+     {
+      "from": "¨ ",
+      "to": "¨"
+     },
+     {
+      "from": "¨a",
+      "to": "ä"
+     },
+     {
+      "from": "¨A",
+      "to": "Ä"
+     },
+     {
+      "from": "¨e",
+      "to": "ë"
+     },
+     {
+      "from": "¨E",
+      "to": "Ë"
+     },
+     {
+      "from": "¨i",
+      "to": "ï"
+     },
+     {
+      "from": "¨I",
+      "to": "Ï"
+     },
+     {
+      "from": "¨o",
+      "to": "ö"
+     },
+     {
+      "from": "¨O",
+      "to": "Ö"
+     },
+     {
+      "from": "¨u",
+      "to": "ü"
+     },
+     {
+      "from": "¨U",
+      "to": "Ü"
+     },
+     {
+      "from": "¨y",
+      "to": "ÿ"
+     },
+     {
+      "from": "~ ",
+      "to": "~"
+     },
+     {
+      "from": "~a",
+      "to": "ã"
+     },
+     {
+      "from": "~A",
+      "to": "Ã"
+     },
+     {
+      "from": "~n",
+      "to": "ñ"
+     },
+     {
+      "from": "~N",
+      "to": "Ñ"
+     },
+     {
+      "from": "~o",
+      "to": "õ"
+     },
+     {
+      "from": "~O",
+      "to": "Õ"
+     }
+    ]
+   }
+  }
+ }
+}

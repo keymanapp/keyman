@@ -327,6 +327,8 @@ The following parameters are pre-defined and should not be overridden:
 * `--no-color`: forces off ANSI color output for the script
 * `--verbose`, `-v`: verbose mode, sets the [`$builder_verbose`] variable
 * `--debug`, `-d`: debug build; see [`builder_is_debug_build`] for more detail
+* `--offline`: allow to build while offline. This might fail if not all
+  dependencies are cached.
 
 --------------------------------------------------------------------------------
 

@@ -67,6 +67,8 @@ jobs:
 
     - name: "Verify API for libkeymancore*.so (${{ steps.environment_step.outputs.GIT_BRANCH }}, branch ${{ steps.environment_step.outputs.GIT_BASE_BRANCH }}, by ${{ steps.environment_step.outputs.GIT_USER }})"
       run: |
+        echo "Verify API for libkeymancore*.so (${{ steps.environment_step.outputs.GIT_BRANCH }}, branch ${{ steps.environment_step.outputs.GIT_BASE_BRANCH }}, by ${{ steps.environment_step.outputs.GIT_USER }})" >> $GITHUB_STEP_SUMMARY
+
         BIN_PACKAGE=$(ls "${GITHUB_WORKSPACE}/artifacts/" | grep "${PKG_NAME}[0-9]*_${{ steps.environment_step.outputs.VERSION }}-1${{ steps.environment_step.outputs.PRERELEASE_TAG }}+$(lsb_release -c -s)1_amd64.deb")
         cd ${{ github.workspace }}/keyman/linux
         ./scripts/deb-packaging.sh \
@@ -93,19 +95,19 @@ jobs:
       if: needs.api_verification.result == 'success'
       run: |
         echo "RESULT=success" >> $GITHUB_ENV
-        echo "MSG=Package build succeeded" >> $GITHUB_ENV
+        echo "MSG=API verification succeeded" >> $GITHUB_ENV
 
     - name: Set cancelled
       if: needs.api_verification.result == 'cancelled'
       run: |
         echo "RESULT=error" >> $GITHUB_ENV
-        echo "MSG=Package build cancelled" >> $GITHUB_ENV
+        echo "MSG=API verification cancelled" >> $GITHUB_ENV
 
     - name: Set failure
       if: needs.api_verification.result == 'failure'
       run: |
         echo "RESULT=failure" >> $GITHUB_ENV
-        echo "MSG=Package build failed" >> $GITHUB_ENV
+        echo "MSG=API verification failed" >> $GITHUB_ENV
 
     - name: Set final status
       run: |

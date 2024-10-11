@@ -1,6 +1,6 @@
 import { VisualKeyboard as VK, Constants } from '@keymanapp/common-types';
 import KVKSourceFile, { KVKSEncoding, KVKSFlags, KVKSKey, KVKSLayer } from './kvks-file.js';
-import { xml2js } from '../../index.js';
+import { KeymanXMLWriter } from '../../index.js';
 
 import USVirtualKeyCodes = Constants.USVirtualKeyCodes;
 import VisualKeyboard = VK.VisualKeyboard;
@@ -11,18 +11,6 @@ import VisualKeyboardShiftState = VK.VisualKeyboardShiftState;
 
 export default class KVKSFileWriter {
   public write(vk: VisualKeyboard): string {
-
-    const builder = new xml2js.Builder({
-      allowSurrogateChars: true,
-      attrkey: '$',
-      charkey: '_',
-      xmldec: {
-        version: '1.0',
-        encoding: 'UTF-8',
-        standalone: true
-      }
-    })
-
     const flags: KVKSFlags = {};
     if(vk.header.flags & VisualKeyboardHeaderFlags.kvkhDisplayUnderlying) {
       flags.displayunderlying = '';
@@ -36,8 +24,6 @@ export default class KVKSFileWriter {
     if(vk.header.flags & VisualKeyboardHeaderFlags.kvkhUseUnderlying) {
       flags.useunderlying = '';
     }
-
-
 
     const kvks: KVKSourceFile = {
       visualkeyboard: {
@@ -105,7 +91,7 @@ export default class KVKSFileWriter {
       l.key.push(k);
     }
 
-    const result = builder.buildObject(kvks);
+    const result = new KeymanXMLWriter('kvks').write(kvks);
     return result; //Uint8Array.from(result);
   }
 
