@@ -22,7 +22,7 @@ export default class KVKSFileReader {
 
     try {
       source = new KeymanXMLReader('kvks')
-        .parse(file.toString()) as KVKSourceFile;
+        .parse(new TextDecoder().decode(file)) as KVKSourceFile;
     } catch(e) {
       if(file.byteLength > 4 && file.subarray(0,3).every((v,i) => v == KVK_HEADER_IDENTIFIER_BYTES[i])) {
         throw new Error('File appears to be a binary .kvk file', {cause: e});
