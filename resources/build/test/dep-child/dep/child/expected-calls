@@ -1,0 +1,1 @@
+--builder-child --deps --builder-dep-parent resources/build/test/dep-child build
