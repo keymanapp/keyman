@@ -3,16 +3,14 @@
 ## START STANDARD BUILD SCRIPT INCLUDE
 # adjust relative paths as necessary
 THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
-. "${THIS_SCRIPT%/*}/../../../resources/build/builder.inc.sh"
-. "${THIS_SCRIPT%/*}/../../../resources/build/meson-utils.inc.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/builder.inc.sh"
+. "${THIS_SCRIPT%/*}/../../resources/build/meson-utils.inc.sh"
 ## END STANDARD BUILD SCRIPT INCLUDE
-
-#. "$KEYMAN_ROOT/resources/shellHelperFunctions.sh"
 
 ################################ Main script ################################
 
 builder_describe \
-  "Mnemonic layout recompiler for Linux" \
+  "Mnemonic layout recompiler for macOS" \
   "@/common/include" \
   "clean" \
   "configure" \
