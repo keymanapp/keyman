@@ -8,6 +8,8 @@
 
 #import "OSKWindowController.h"
 #import "KMInputMethodAppDelegate.h"
+#import "KMInputMethodLifecycle.h"
+#import "KMSettingsRepository.h"
 #import "KMLogs.h"
 
 @interface OSKWindowController ()
@@ -25,7 +27,6 @@
 }
 
 - (void)dealloc {
-  [[NSNotificationCenter defaultCenter] removeObserver:self];
   [self stopTimer];
 }
 
@@ -55,7 +56,6 @@
 - (void)windowDidLoad {
   os_log_debug([KMLogs oskLog], "OSKWindowController windowDidLoad");
   [super windowDidLoad];
-  [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(windowDidResize:) name:NSWindowDidResizeNotification object:self.window];
   [self.oskView setKvk:[self.AppDelegate kvk]];
   [self startTimerWithTimeInterval:0.1];
   // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
@@ -64,6 +64,11 @@
 - (void)windowDidResize:(NSNotification *)notification {
   os_log_debug([KMLogs oskLog], "OSKWindowController windowDidResize");
   [self.oskView resizeOSKLayout];
+}
+
+- (void)windowWillClose:(NSNotification *)notification {
+  [KMSettingsRepository.shared writeShowOskOnActivate:NO];
+  os_log_debug([KMLogs oskLog], "OSKWindowController windowWillClose, updating settings writeShowOsk to NO");
 }
 
 - (void)helpAction:(id)sender {

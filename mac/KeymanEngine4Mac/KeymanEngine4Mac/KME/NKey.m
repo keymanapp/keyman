@@ -20,8 +20,8 @@
 }
 
 - (NSString *)description {
-  NSString *format = @"<%@:%p F:%d S:%d VK:%d TXT:%@ BMP:%@>";
-  NSString *str = [NSString stringWithFormat:format, self.className, self, self.flags, self.shift, self.vkey, self.text, self.bitmap];
+  NSString *format = @"<%@:%p flags:%d shift:%d virtualkey:%d text:%@ utf8:%@ bmp:%@>";
+  NSString *str = [NSString stringWithFormat:format, self.className, self, self.flags, self.shift, self.vkey, self.text, [self.text dataUsingEncoding:NSUTF8StringEncoding], self.bitmap];
   return str;
 }
 

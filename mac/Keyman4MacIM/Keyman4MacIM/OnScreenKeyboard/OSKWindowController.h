@@ -9,7 +9,7 @@
 #import <Cocoa/Cocoa.h>
 #import <KeymanEngine4Mac/KeymanEngine4Mac.h>
 
-@interface OSKWindowController : NSWindowController
+@interface OSKWindowController : NSWindowController <NSWindowDelegate>
 
 @property (nonatomic, weak) IBOutlet OSKView *oskView;
 
