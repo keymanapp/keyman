@@ -1,6 +1,8 @@
 import { ModelCompilerError, ModelCompilerMessageContext, ModelCompilerMessages } from "./model-compiler-messages.js";
 import { callbacks } from "./compiler-callbacks.js";
 
+import { TrieBuilder } from '@keymanapp/models-templates';
+
 // Supports LF or CRLF line terminators.
 const NEWLINE_SEPARATOR = /\u000d?\u000a/;
 
@@ -29,8 +31,11 @@ export function createTrieDataStructure(filenames: string[], searchTermToKey?: (
   let wordlist: WordList = {};
   filenames.forEach(filename => parseWordListFromFilename(wordlist, filename));
 
-  let trie = Trie.buildTrie(wordlist, searchTermToKey as Trie.SearchTermToKey);
-  return JSON.stringify(trie);
+  let trie = buildTrie(wordlist, searchTermToKey as SearchTermToKey);
+  return JSON.stringify({
+    data: trie.compress(), 
+    totalWeight: trie.getTotalWeight()
+  });
 }
 
 /**
@@ -185,302 +190,46 @@ function* enumerateLines(lines: string[]): Generator<LineNoAndText> {
     }
 }
 
-namespace Trie {
-  /**
-   * An **opaque** type for a string that is exclusively used as a search key in
-   * the trie. There should be a function that converts arbitrary strings
-   * (queries) and converts them into a standard search key for a given language
-   * model.
-   *
-   * Fun fact: This opaque type has ALREADY saved my bacon and found a bug!
-   */
-  type SearchKey = string & { _: 'SearchKey'};
+/**
+ * An **opaque** type for a string that is exclusively used as a search key in
+ * the trie. There should be a function that converts arbitrary strings
+ * (queries) and converts them into a standard search key for a given language
+ * model.
+ */
+type SearchKey = string & { _: 'SearchKey'};
 
-  /**
-   * A function that converts a string (word form or query) into a search key
-   * (secretly, this is also a string).
-   */
-  export interface SearchTermToKey {
-    (wordform: string): SearchKey;
+/**
+ * A function that converts a string (word form or query) into a search key
+ * (secretly, this is also a string).
+ */
+export interface SearchTermToKey {
+  (wordform: string): SearchKey;
+}
+
+/**
+ * Builds a trie from a word list.
+ *
+ * @param wordlist    The wordlist with non-negative weights.
+ * @param keyFunction Function that converts word forms into indexed search keys
+ * @returns A JSON-serialiable object that can be given to the TrieModel constructor.
+ */
+export function buildTrie(wordlist: WordList, keyFunction: SearchTermToKey): TrieBuilder {
+  let collater = new TrieBuilder(keyFunction);
+
+  buildFromWordList(collater, wordlist);
+  return collater;
+}
+
+/**
+ * Populates the trie with the contents of an entire wordlist.
+ * @param words a list of word and count pairs.
+ */
+function buildFromWordList(trieCollator: TrieBuilder, words: WordList): TrieBuilder {
+  for (let [wordform, weight] of Object.entries(words)) {
+    trieCollator.addEntry(wordform, weight);
   }
-
-  // The following trie implementation has been (heavily) derived from trie-ing
-  // by Conrad Irwin.
-  //
-  // trie-ing is distributed under the terms of the MIT license, reproduced here:
-  //
-  //   The MIT License
-  //   Copyright (c) 2015-2017 Conrad Irwin <conrad.irwin@gmail.com>
-  //   Copyright (c) 2011 Marc Campbell <marc.e.campbell@gmail.com>
-  //
-  //   Permission is hereby granted, free of charge, to any person obtaining a copy
-  //   of this software and associated documentation files (the "Software"), to deal
-  //   in the Software without restriction, including without limitation the rights
-  //   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-  //   copies of the Software, and to permit persons to whom the Software is
-  //   furnished to do so, subject to the following conditions:
-  //
-  //   The above copyright notice and this permission notice shall be included in
-  //   all copies or substantial portions of the Software.
-  //
-  //   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-  //   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-  //   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-  //   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-  //   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-  //   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-  //   THE SOFTWARE.
-  //
-  // See: https://github.com/ConradIrwin/trie-ing/blob/df55d7af7068d357829db9e0a7faa8a38add1d1d/LICENSE
-
-  /**
-   * An entry in the prefix trie. The matched word is "content".
-   */
-  interface Entry {
-    content: string;
-    key: SearchKey;
-    weight: number;
-  }
-
-  /**
-   * The trie is made up of nodes. A node can be EITHER an internal node (whose
-   * only children are other nodes) OR a leaf, which actually contains the word
-   * form entries.
-   */
-  type Node = InternalNode | Leaf;
-
-  /**
-   * An internal node.
-   */
-  interface InternalNode {
-    type: 'internal';
-    weight: number;
-    // TODO: As an optimization, "values" can be a single string!
-    values: string[];
-    children: { [codeunit: string]: Node };
-    unsorted?: true;
-  }
-
-  /**
-   * A leaf node.
-   */
-  interface Leaf {
-    type: 'leaf';
-    weight: number;
-    entries: Entry[];
-    unsorted?: true;
-  }
-
-  /**
-   * A sentinel value for when an internal node has contents and requires an
-   * "internal" leaf. That is, this internal node has content. Instead of placing
-   * entries as children in an internal node, a "fake" leaf is created, and its
-   * key is this special internal value.
-   *
-   * The value is a valid Unicode BMP code point, but it is a "non-character".
-   * Unicode will never assign semantics to these characters, as they are
-   * intended to be used internally as sentinel values.
-   */
-  const INTERNAL_VALUE = '\uFDD0';
-
-  /**
-   * Builds a trie from a word list.
-   *
-   * @param wordlist    The wordlist with non-negative weights.
-   * @param keyFunction Function that converts word forms into indexed search keys
-   * @returns A JSON-serialiable object that can be given to the TrieModel constructor.
-   */
-  export function buildTrie(wordlist: WordList, keyFunction: SearchTermToKey): object {
-    let root = new Trie(keyFunction).buildFromWordList(wordlist).root;
-    return {
-      totalWeight: sumWeights(root),
-      root: root
-    }
-  }
-
-  /**
-   * Wrapper class for the trie and its nodes and wordform to search
-   */
-  class Trie {
-    readonly root = createRootNode();
-    toKey: SearchTermToKey;
-    constructor(wordform2key: SearchTermToKey) {
-      this.toKey = wordform2key;
-    }
-
-    /**
-     * Populates the trie with the contents of an entire wordlist.
-     * @param words a list of word and count pairs.
-     */
-    buildFromWordList(words: WordList): Trie {
-      for (let [wordform, weight] of Object.entries(words)) {
-        let key = this.toKey(wordform);
-        addUnsorted(this.root, { key, weight, content: wordform }, 0);
-      }
-      sortTrie(this.root);
-      return this;
-    }
-  }
-
-  // "Constructors"
-  function createRootNode(): Node {
-    return {
-      type: 'leaf',
-      weight: 0,
-      entries: []
-    };
-  }
-
-  // Implement Trie creation.
-
-  /**
-   * Adds an entry to the trie.
-   *
-   * Note that the trie will likely be unsorted after the add occurs. Before
-   * performing a lookup on the trie, use call sortTrie() on the root note!
-   *
-   * @param node Which node should the entry be added to?
-   * @param entry the wordform/weight/key to add to the trie
-   * @param index the index in the key and also the trie depth. Should be set to
-   *              zero when adding onto the root node of the trie.
-   */
-  function addUnsorted(node: Node, entry: Entry, index: number = 0) {
-    // Each node stores the MAXIMUM weight out of all of its decesdents, to
-    // enable a greedy search through the trie.
-    node.weight = Math.max(node.weight, entry.weight);
-
-    // When should a leaf become an interior node?
-    // When it already has a value, but the key of the current value is longer
-    // than the prefix.
-    if (node.type === 'leaf' && index < entry.key.length && node.entries.length >= 1) {
-      convertLeafToInternalNode(node, index);
-    }
-
-    if (node.type === 'leaf') {
-      // The key matches this leaf node, so add yet another entry.
-      addItemToLeaf(node, entry);
-    } else {
-      // Push the node down to a lower node.
-      addItemToInternalNode(node, entry, index);
-    }
-
-    node.unsorted = true;
-  }
-
-  /**
-   * Adds an item to the internal node at a given depth.
-   * @param item
-   * @param index
-   */
-  function addItemToInternalNode(node: InternalNode, item: Entry, index: number) {
-    let char = item.key[index];
-    // If an internal node is the proper site for item, it belongs under the
-    // corresponding (sentinel, internal-use) child node signifying this.
-    if(char == undefined) {
-      char = INTERNAL_VALUE;
-    }
-    if (!node.children[char]) {
-      node.children[char] = createRootNode();
-      node.values.push(char);
-    }
-    addUnsorted(node.children[char], item, index + 1);
-  }
-
-  function addItemToLeaf(leaf: Leaf, item: Entry) {
-    leaf.entries.push(item);
-  }
-
-  /**
-   * Mutates the given Leaf to turn it into an InternalNode.
-   *
-   * NOTE: the node passed in will be DESTRUCTIVELY CHANGED into a different
-   * type when passed into this function!
-   *
-   * @param depth depth of the trie at this level.
-   */
-  function convertLeafToInternalNode(leaf: Leaf, depth: number): void {
-    let entries = leaf.entries;
-
-    // Alias the current node, as the desired type.
-    let internal = (<unknown> leaf) as InternalNode;
-    internal.type = 'internal';
-
-    delete leaf.entries;
-    internal.values = [];
-    internal.children = {};
-
-    // Convert the old values array into the format for interior nodes.
-    for (let item of entries) {
-      let char: string;
-      if (depth < item.key.length) {
-        char = item.key[depth];
-      } else {
-        char = INTERNAL_VALUE;
-      }
-
-      if (!internal.children[char]) {
-        internal.children[char] = createRootNode();
-        internal.values.push(char);
-      }
-      addUnsorted(internal.children[char], item, depth + 1);
-    }
-
-    internal.unsorted = true;
-  }
-
-  /**
-   * Recursively sort the trie, in descending order of weight.
-   * @param node any node in the trie
-   */
-  function sortTrie(node: Node) {
-    if (node.type === 'leaf') {
-      if (!node.unsorted) {
-        return;
-      }
-
-      node.entries.sort(function (a, b) { return b.weight - a.weight; });
-    } else {
-      // We MUST recurse and sort children before returning.
-      for (let char of node.values) {
-        sortTrie(node.children[char]);
-      }
-
-      if (!node.unsorted) {
-        return;
-      }
-
-      node.values.sort((a, b) => {
-        return node.children[b].weight - node.children[a].weight;
-      });
-    }
-
-    delete node.unsorted;
-  }
-
-  /**
-   * O(n) recursive traversal to sum the total weight of all leaves in the
-   * trie, starting at the provided node.
-   *
-   * @param node The node to start summing weights.
-   */
-  function sumWeights(node: Node): number {
-    let val: number;
-    if (node.type === 'leaf') {
-      val = node.entries
-        .map(entry => entry.weight)
-        //.map(entry => isNaN(entry.weight) ? 1 : entry.weight)
-        .reduce((acc, count) => acc + count, 0);
-    } else {
-      val = Object.keys(node.children)
-        .map((key) => sumWeights(node.children[key]))
-        .reduce((acc, count) => acc + count, 0);
-    }
-
-    if(isNaN(val)) {
-      throw new Error("Unexpected NaN has appeared!");
-    }
-    return val;
-  }
+  trieCollator.sort();
+  return trieCollator;
 }
 
 /**
