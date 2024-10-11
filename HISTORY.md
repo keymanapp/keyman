@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.126 alpha 2024-10-11
+
+* test(common): add markdown link check test for product documentation (#12472)
+* chore(linux): improve output if `dpkg-gensymbols` fails and run other tests (#12527)
+
 ## 18.0.125 alpha 2024-10-10
 
 * chore(common): allow to run `build.sh` scripts in `bashdb` debugger (#12518)
