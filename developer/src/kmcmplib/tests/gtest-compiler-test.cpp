@@ -26,7 +26,9 @@ KMX_DWORD ProcessKeyLineImpl(PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX_BOOL IsUnico
 
 namespace kmcmp {
     extern int nErrors;
+    extern int currentLine;
     extern int ErrChr;
+    extern std::string messageFilename;
     extern int BeginLine[4];
     extern int CompileTarget;
 }
@@ -49,7 +51,9 @@ class CompilerTest : public testing::Test {
             kmcmp::msgproc = msgproc_collect;
             msgproc_errors.clear();
             kmcmp::nErrors = 0;
+            kmcmp::currentLine = 0;
             kmcmp::ErrChr = 0;
+            kmcmp::messageFilename = "";
             kmcmp::BeginLine[BEGIN_ANSI] = -1;
             kmcmp::BeginLine[BEGIN_UNICODE] = -1;
             kmcmp::BeginLine[BEGIN_NEWCONTEXT] = -1;
@@ -126,42 +130,48 @@ TEST_F(CompilerTest, wstrtostr_test) {
     EXPECT_EQ(0, strcmp("", wstrtostr((PKMX_WCHAR)u"")));
 };
 
-// TEST_F(CompilerTest, ReportCompilerMessage_test) {
-//     msgproc = msgproc_true_stub;
-//     kmcmp::ErrChr = 0;
+TEST_F(CompilerTest, ReportCompilerMessage_test) {
+    kmcmp::msgproc = msgproc_collect;
+    kmcmp::currentLine = 42;
+    std::vector<std::string> params{"parameter"};
+    kmcmp::messageFilename = "filename";
+    kmcmp::ErrChr = 0;
 
-//     // SevFatal
-//     EXPECT_EQ(0, kmcmp::nErrors);
-//     EXPECT_EQ(SevFatal, KmnCompilerMessages::FATAL_CannotCreateTempfile & SevFatal);
-//     EXPECT_TRUE(ReportCompilerMessage(KmnCompilerMessages::FATAL_CannotCreateTempfile));
-//     EXPECT_EQ(1, kmcmp::nErrors);
+    // SevFatal
+    EXPECT_EQ(0, kmcmp::nErrors);
+    EXPECT_EQ(SevFatal, KmnCompilerMessages::FATAL_CannotCreateTempfile & SevFatal);
+    ReportCompilerMessage(KmnCompilerMessages::FATAL_CannotCreateTempfile, params);
+    EXPECT_EQ(1, kmcmp::nErrors);
+    EXPECT_EQ(KmnCompilerMessages::FATAL_CannotCreateTempfile, msgproc_errors[0].errorCode);
+    EXPECT_EQ(kmcmp::currentLine+1, msgproc_errors[0].lineNumber);
+    EXPECT_EQ(kmcmp::ErrChr, msgproc_errors[0].columnNumber);
+    EXPECT_TRUE(msgproc_errors[0].filename == kmcmp::messageFilename);
+    EXPECT_TRUE(msgproc_errors[0].parameters == params);
 
-//     // SevError
-//     EXPECT_EQ(SevError, KmnCompilerMessages::ERROR_InvalidLayoutLine & SevError);
-//     EXPECT_FALSE(ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidLayoutLine));
-//     EXPECT_EQ(2, kmcmp::nErrors);
+    // SevError
+    EXPECT_EQ(SevError, KmnCompilerMessages::ERROR_InvalidLayoutLine & SevError);
+    ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidLayoutLine);
+    EXPECT_EQ(2, kmcmp::nErrors);
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidLayoutLine, msgproc_errors[1].errorCode);
 
-//     // Unknown
-//     const KMX_DWORD UNKNOWN_ERROR = 0x00004FFF; // top of range ERROR
-//     EXPECT_EQ(SevError, UNKNOWN_ERROR & SevError);
-//     EXPECT_FALSE(ReportCompilerMessage(UNKNOWN_ERROR));
-//     sprintf(expected, "Unknown error %x", UNKNOWN_ERROR);
-//     EXPECT_EQ(3, kmcmp::nErrors);
+    // SevWarn
+    EXPECT_EQ(SevWarn, KmnCompilerMessages::WARN_ReservedCharacter & SevWarn);
+    ReportCompilerMessage(KmnCompilerMessages::WARN_ReservedCharacter);
+    EXPECT_EQ(2, kmcmp::nErrors);
+    EXPECT_EQ(KmnCompilerMessages::WARN_ReservedCharacter, msgproc_errors[2].errorCode);
 
-//     // ErrChr
-//     const int ERROR_CHAR_INDEX = 42;
-//     kmcmp::ErrChr = ERROR_CHAR_INDEX ;
-//     EXPECT_EQ(SevError, KmnCompilerMessages::ERROR_InvalidLayoutLine & SevError);
-//     EXPECT_FALSE(ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidLayoutLine));
-//     kmcmp::ErrChr = 0;
-//     EXPECT_EQ(4, kmcmp::nErrors);
+    // SevHint
+    EXPECT_EQ(SevHint, KmnCompilerMessages::HINT_NonUnicodeFile & SevHint);
+    ReportCompilerMessage(KmnCompilerMessages::HINT_NonUnicodeFile);
+    EXPECT_EQ(2, kmcmp::nErrors);
+    EXPECT_EQ(KmnCompilerMessages::HINT_NonUnicodeFile, msgproc_errors[3].errorCode);
 
-//     // msgproc returns FALSE
-//     msgproc = msgproc_false_stub;
-//     EXPECT_EQ(SevError, KmnCompilerMessages::ERROR_InvalidLayoutLine & SevError);
-//     EXPECT_TRUE(ReportCompilerMessage(KmnCompilerMessages::ERROR_InvalidLayoutLine));
-//     EXPECT_EQ(6, kmcmp::nErrors);
-// };
+    // SevInfo
+    EXPECT_EQ(SevInfo, KmnCompilerMessages::INFO_MinimumCoreEngineVersion & SevInfo);
+    ReportCompilerMessage(KmnCompilerMessages::INFO_MinimumCoreEngineVersion);
+    EXPECT_EQ(2, kmcmp::nErrors);
+    EXPECT_EQ(KmnCompilerMessages::INFO_MinimumCoreEngineVersion, msgproc_errors[4].errorCode);
+};
 
 TEST_F(CompilerTest, ProcessBeginLine_test) {
     KMX_WCHAR str[LINESIZE];
@@ -795,7 +805,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_a_test) {
     u16cpy(str, u"any()");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidAny, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // KmnCompilerMessages::ERROR_InvalidAny, space in delimiters (see I11814, I11937, #11910, #11894, #11938)
+    // KmnCompilerMessages::ERROR_InvalidAny, space in delimiters (see #11814, #11937, #11910, #11894, #11938)
     u16cpy(str, u"any( )");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidAny, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
@@ -827,15 +837,13 @@ TEST_F(CompilerTest, GetXStringImpl_type_a_test) {
     u16cpy(str, u"any( b)");
     file_store[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_any_space_before_valid[] = { UC_SENTINEL, CODE_ANY, 2, 0 };
-    EXPECT_EQ(0, u16cmp(tstr_any_space_before_valid, tstr));
+    EXPECT_EQ(0, u16cmp(tstr_any_valid, tstr));
 
-    // space after store, valid (see I11937, #11938)
+    // space after store, valid (see #11937, #11938)
     u16cpy(str, u"any(b )");
     file_store[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_any_space_after_valid[] = { UC_SENTINEL, CODE_ANY, 2, 0 };
-    EXPECT_EQ(0, u16cmp(tstr_any_space_after_valid, tstr));
+    EXPECT_EQ(0, u16cmp(tstr_any_valid, tstr));
 }
 
 // tests strings starting with 'b'
@@ -877,7 +885,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_b_test) {
     u16cpy(str, u"baselayout()");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // baselayout, space in delimiters (see I11814, I11937, #11910, #11894, #11938)
+    // baselayout, space in delimiters (see #11814, #11937, #11910, #11894, #11938)
     fileKeyboard.version = VERSION_90;
     u16cpy(str, u"baselayout( )");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
@@ -902,17 +910,15 @@ TEST_F(CompilerTest, GetXStringImpl_type_b_test) {
     fileKeyboard.dpStoreArray = nullptr;
     u16cpy(str, u"baselayout( beep)");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_baselayout_space_before_valid[] = { UC_SENTINEL, CODE_IFSYSTEMSTORE, TSS_BASELAYOUT+1, 2, 1, 0 };
-    EXPECT_EQ(0, u16cmp(tstr_baselayout_space_before_valid, tstr));
+    EXPECT_EQ(0, u16cmp(tstr_baselayout_valid, tstr));
 
-    // baselayout, space after argument, valid (see I11937, #11938)
+    // baselayout, space after argument, valid (see #11937, #11938)
     fileKeyboard.version = VERSION_90;
     fileKeyboard.cxStoreArray = 0;
     fileKeyboard.dpStoreArray = nullptr;
     u16cpy(str, u"baselayout(beep )");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_baselayout_space_after_valid[] = { UC_SENTINEL, CODE_IFSYSTEMSTORE, TSS_BASELAYOUT+1, 2, 1, 0 };
-    EXPECT_EQ(0, u16cmp(tstr_baselayout_space_after_valid, tstr));
+    EXPECT_EQ(0, u16cmp(tstr_baselayout_valid, tstr));
 }
 
 // tests strings starting with 'i'
@@ -953,7 +959,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     u16cpy(str, u"if()");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidIf, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // if, space in delimiters (see I11814, I11937, #11910, #11894, #11938)
+    // if, space in delimiters (see #11814, #11937, #11910, #11894, #11938)
     fileKeyboard.version = VERSION_80;
     fileKeyboard.dwFlags = 0u;
     u16cpy(str, u"if( )");
@@ -1012,8 +1018,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     option[1].fIsOption = TRUE;
     u16cpy(str, u"if(b =beep)");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_if_option_space_before_assign_valid[] = { UC_SENTINEL, CODE_IFOPT, 2, 2, 4, 0 };
-    EXPECT_EQ(0, u16cmp(tstr_if_option_space_before_assign_valid, tstr));
+    EXPECT_EQ(0, u16cmp(tstr_if_option_valid, tstr));
 
     // if, option, equal, space before rhs, valid
     fileKeyboard.version = VERSION_80;
@@ -1022,18 +1027,16 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     option[1].fIsOption = TRUE;
     u16cpy(str, u"if(b= beep)");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_if_option_space_before_rhs_valid[] = { UC_SENTINEL, CODE_IFOPT, 2, 2, 4, 0 };
-    EXPECT_EQ(0, u16cmp(tstr_if_option_space_before_rhs_valid, tstr));
+    EXPECT_EQ(0, u16cmp(tstr_if_option_valid, tstr));
 
-    // if, option, equal, space after rhs, valid (see I11937, #11938)
+    // if, option, equal, space after rhs, valid (see #11937, #11938)
     fileKeyboard.version = VERSION_80;
     fileKeyboard.cxStoreArray = 3u;
     fileKeyboard.dpStoreArray = option;
     option[1].fIsOption = TRUE;
     u16cpy(str, u"if(b=beep )");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_if_option_space_after_rhs_valid[] = { UC_SENTINEL, CODE_IFOPT, 2, 2, 4, 0 };
-    EXPECT_EQ(0, u16cmp(tstr_if_option_space_after_rhs_valid, tstr));
+    EXPECT_EQ(0, u16cmp(tstr_if_option_valid, tstr));
 
     delete[] option;
     PFILE_STORE file_store = new FILE_STORE[100];
@@ -1054,7 +1057,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     u16cpy(str, u"index()");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // index, space in delimiters (see I11814, I11937, #11910, #11894, #11938)
+    // index, space in delimiters (see #11814, #11937, #11910, #11894, #11938)
     u16cpy(str, u"index( )");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidIndex, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
@@ -1196,7 +1199,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_o_test) {
     u16cpy(str, u"outs()");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidOuts, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // outs, space in delimiters (see I11814, I11937, #11910, #11894, #11938)
+    // outs, space in delimiters (see #11814, #11937, #11910, #11894, #11938)
     u16cpy(str, u"outs( )");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidOuts, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
@@ -1230,15 +1233,13 @@ TEST_F(CompilerTest, GetXStringImpl_type_o_test) {
     file_store[1].dpString = (PKMX_WCHAR)u"abc";
     u16cpy(str, u"outs( b)");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_outs_space_before_valid[] = { 'a', 'b', 'c', 0 };
-    EXPECT_EQ(0, u16cmp(tstr_outs_space_before_valid, tstr));
+    EXPECT_EQ(0, u16cmp(tstr_outs_valid, tstr));
 
-    // outs, space after store, valid (see I11937, #11938)
+    // outs, space after store, valid (see #11937, #11938)
     file_store[1].dpString = (PKMX_WCHAR)u"abc";
     u16cpy(str, u"outs(b )");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
-    const KMX_WCHAR tstr_outs_space_after_valid[] = { 'a', 'b', 'c', 0 };
-    EXPECT_EQ(0, u16cmp(tstr_outs_space_after_valid, tstr));
+    EXPECT_EQ(0, u16cmp(tstr_outs_valid, tstr));
 }
 
 // tests strings starting with 'c'
@@ -1257,6 +1258,95 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
     u16cpy(file_store[1].szName, u"b");
     u16cpy(file_store[2].szName, u"c");
 
+    // are comments stripped before this point?
+    // if so, why the test on whitespace after 'c'?
+
+    // KmnCompilerMessages::ERROR_InvalidToken
+    fileKeyboard.version = VERSION_60;
+    u16cpy(str, u"cde");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // context, KmnCompilerMessages::ERROR_ContextInVirtualKeySection *** TODO ***
+
+    // context, no offset, valid
+    fileKeyboard.version = VERSION_60;
+    u16cpy(str, u"context");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_context_no_offset_valid[] = { UC_SENTINEL, CODE_CONTEXT, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_context_no_offset_valid, tstr));
+
+    // context, KmnCompilerMessages::ERROR_InvalidToken, no close delimiter => NULL
+    fileKeyboard.version = VERSION_60;
+    u16cpy(str, u"context(");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // context, empty delimiters => empty string, valid
+    fileKeyboard.version = VERSION_60;
+    u16cpy(str, u"context()");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_context_empty_offset_valid[] = { UC_SENTINEL, CODE_CONTEXT, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_context_empty_offset_valid, tstr));
+
+    // context, space in delimiters (see #11814, #11937, #11910, #11894, #11938)
+    fileKeyboard.version = VERSION_60;
+    u16cpy(str, u"context( )");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // context, offset, valid
+    fileKeyboard.version = VERSION_60;
+    u16cpy(str, u"context(1)");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_context_offset_valid[] = { UC_SENTINEL, CODE_CONTEXTEX, 1, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_context_offset_valid, tstr));
+
+    // context, CERR_InvalidToke, offset < 1
+    fileKeyboard.version = VERSION_60;
+    u16cpy(str, u"context(0)");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // context, large offset < 0xF000, valid
+    fileKeyboard.version = VERSION_60;
+    u16cpy(str, u"context(61439)"); //0xF000 - 1
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_context_large_offset_valid[] = { UC_SENTINEL, CODE_CONTEXTEX, 61439, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_context_large_offset_valid, tstr));
+
+    // context, KmnCompilerMessages::ERROR_InvalidToken, too large offset == 0xF000
+    fileKeyboard.version = VERSION_60;
+    u16cpy(str, u"context(61440)"); //0xF000
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // context, KmnCompilerMessages::ERROR_60FeatureOnly_Contextn
+    fileKeyboard.version = VERSION_50;
+    u16cpy(str, u"context(1)");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_60FeatureOnly_Contextn, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // context, valid
+    fileKeyboard.version = VERSION_60;
+    u16cpy(str, u"context(1)");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_context_valid[] = { UC_SENTINEL, CODE_CONTEXTEX, 1, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_context_valid, tstr));
+
+    // context, space before offset, valid
+    fileKeyboard.version = VERSION_60;
+    u16cpy(str, u"context( 1)");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(tstr_context_valid, tstr));
+
+    // context, space after offset, valid (see #11937, #11938)
+    fileKeyboard.version = VERSION_60;
+    u16cpy(str, u"context(1 )");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(tstr_context_valid, tstr));
+
+    // clearcontext, valid
+    fileKeyboard.version = VERSION_60;
+    u16cpy(str, u"clearcontext");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_clearcontext_valid[] = { UC_SENTINEL, CODE_CLEARCONTEXT, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_clearcontext_valid, tstr));
+
     // call, KmnCompilerMessages::ERROR_501FeatureOnly_Call
     fileKeyboard.version = VERSION_50;
     u16cpy(str, u"call");
@@ -1274,7 +1364,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
     u16cpy(str, u"call()");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidCall, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // call, space in delimiters (see I11814, I11937, #11910, #11894, #11938)
+    // call, space in delimiters (see #11814, #11937, #11910, #11894, #11938)
     fileKeyboard.version = VERSION_501;
     u16cpy(str, u"call( )");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidCall, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
@@ -1319,7 +1409,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
     EXPECT_EQ(0, u16cmp(tstr_call_valid, tstr));
     EXPECT_EQ(TSS_CALLDEFINITION, file_store[1].dwSystemID);
 
-    // call, space after store, valid (see I11937, #11938)
+    // call, space after store, valid (see #11937, #11938)
     fileKeyboard.version = VERSION_501;
     file_store[1].dpString = (PKMX_WCHAR)u"a.dll:A";
     file_store[1].dwSystemID = TSS_NONE;
@@ -1327,6 +1417,147 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     EXPECT_EQ(0, u16cmp(tstr_call_valid, tstr));
     EXPECT_EQ(TSS_CALLDEFINITION, file_store[1].dwSystemID);
+}
+
+// tests strings starting with 'n'
+TEST_F(CompilerTest, GetXStringImpl_type_n_test) {
+    KMX_WCHAR tstr[128];
+    fileKeyboard.version = VERSION_70;
+    KMX_WCHAR str[LINESIZE];
+    KMX_WCHAR output[GLOBAL_BUFSIZE];
+    PKMX_WCHAR newp = nullptr;
+    PFILE_STORE file_store = new FILE_STORE[100];
+    fileKeyboard.cxStoreArray = 3u;
+    fileKeyboard.dpStoreArray = file_store;
+    u16cpy(file_store[0].szName, u"a");
+    u16cpy(file_store[1].szName, u"b");
+    u16cpy(file_store[2].szName, u"c");
+
+    // KmnCompilerMessages::ERROR_InvalidToken
+    fileKeyboard.version = VERSION_70;
+    u16cpy(str, u"nmo");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // notany, KmnCompilerMessages::ERROR_60FeatureOnly_Contextn
+    fileKeyboard.version = VERSION_60;
+    u16cpy(str, u"notany");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_70FeatureOnly, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // notany, KmnCompilerMessages::ERROR_AnyInVirtualKeySection *** TODO ***
+
+    // notany, no close delimiter => NULL
+    fileKeyboard.version = VERSION_70;
+    u16cpy(str, u"notany(");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidAny, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // notany, empty delimiters => empty string
+    fileKeyboard.version = VERSION_70;
+    u16cpy(str, u"notany()");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidAny, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // notany, space in delimiters (see #11814, #11937, #11910, #11894, #11938)
+    fileKeyboard.version = VERSION_70;
+    u16cpy(str, u"notany( )");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidAny, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // notany, KmnCompilerMessages::ERROR_StoreDoesNotExist
+    fileKeyboard.version = VERSION_70;
+    u16cpy(str, u"notany(d)");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // notany, KmnCompilerMessages::ERROR_StoreDoesNotExist, space before store
+    fileKeyboard.version = VERSION_70;
+    u16cpy(str, u"notany( d)");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // notany, KmnCompilerMessages::ERROR_StoreDoesNotExist, space after store
+    fileKeyboard.version = VERSION_70;
+    u16cpy(str, u"notany(d )");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_StoreDoesNotExist, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // notany, valid
+    fileKeyboard.version = VERSION_70;
+    u16cpy(str, u"notany(b)");
+    file_store[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_notany_valid[] = { UC_SENTINEL, CODE_NOTANY, 2, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_notany_valid, tstr));
+
+    // notany, valid, empy store
+    fileKeyboard.version = VERSION_70;
+    u16cpy(str, u"notany(b)");
+    file_store[1].dpString = (PKMX_WCHAR)u""; // empty
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(tstr_notany_valid, tstr));
+
+    // notany, space before store, valid
+    fileKeyboard.version = VERSION_70;
+    u16cpy(str, u"notany( b)");
+    file_store[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(tstr_notany_valid, tstr));
+
+    // notany, space after store, valid (see #11937, #11938)
+    fileKeyboard.version = VERSION_70;
+    u16cpy(str, u"notany(b )");
+    file_store[1].dpString = (PKMX_WCHAR)u"abc"; // non-empty
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(tstr_notany_valid, tstr));
+
+    // null
+    fileKeyboard.version = VERSION_70;
+    u16cpy(str, u"nul");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    const KMX_WCHAR tstr_null_valid[] = { UC_SENTINEL, CODE_NUL, 0 };
+    EXPECT_EQ(0, u16cmp(tstr_null_valid, tstr));
+}
+
+// tests strings starting with 'u'
+TEST_F(CompilerTest, GetXStringImpl_type_u_test) {
+    KMX_WCHAR tstr[128];
+    fileKeyboard.version = VERSION_70;
+    KMX_WCHAR str[LINESIZE];
+    KMX_WCHAR output[GLOBAL_BUFSIZE];
+    PKMX_WCHAR newp = nullptr;
+
+    // KmnCompilerMessages::ERROR_InvalidToken
+    u16cpy(str, u"uvw");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // unicode, n1 and n2, valid
+    u16cpy(str, u"u+10330"); // Gothic A
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, TRUE));
+    const KMX_WCHAR tstr_unicode_valid[] = { 0xD800, 0xDF30, 0 }; // see UTF32ToUTF16
+    EXPECT_EQ(0, u16cmp(tstr_unicode_valid, tstr));
+    EXPECT_EQ(0, msgproc_errors.size());
+
+    // unicode, ERROR_InvalidValue
+    u16cpy(str, u"u+10330z"); // Gothic A, unexpected character 'z'
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidValue, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, TRUE));
+
+    // unicode, space after, valid
+    u16cpy(str, u"u+10330 "); // Gothic A
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, TRUE));
+    EXPECT_EQ(0, u16cmp(tstr_unicode_valid, tstr));
+    EXPECT_EQ(0, msgproc_errors.size());
+
+    // unicode, KmnCompilerMessages::ERROR_InvalidCharacter
+    u16cpy(str, u"u+110000");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidCharacter, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, TRUE));
+
+    // unicode, n1 only, valid
+    u16cpy(str, u"u+0061"); // a
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, TRUE));
+    const KMX_WCHAR tstr_unicode_n1_only_valid[] = { 0x0061, 0 }; // see UTF32ToUTF16
+    EXPECT_EQ(0, u16cmp(tstr_unicode_n1_only_valid, tstr));
+    EXPECT_EQ(0, msgproc_errors.size());
+
+    // unicode, n1 and n2, valid, KmnCompilerMessages::WARN_UnicodeInANSIGroup
+    u16cpy(str, u"u+10330"); // Gothic A
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(tstr_unicode_valid, tstr));
+    EXPECT_EQ(1, msgproc_errors.size());
+    EXPECT_EQ(KmnCompilerMessages::WARN_UnicodeInANSIGroup, msgproc_errors[0].errorCode);
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
