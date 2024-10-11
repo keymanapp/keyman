@@ -16,7 +16,7 @@
 
 - (KMEngine *)kme {
   if (_kme == nil) {
-    _kme = [[KMEngine alloc] initWithKMX:nil context:self.contextBuffer verboseLogging:self.debugMode];
+    _kme = [[KMEngine alloc] initWithKMX:nil context:self.contextBuffer];
   }
   
   return _kme;
@@ -24,7 +24,7 @@
 
 - (void)setKmx:(KMXFile *)kmx {
   _kmx = kmx;
-  [self.kme setKmx:_kmx];
+  [self.kme loadKeyboardFromKmxFile:_kmx];
 }
 
 - (NSMutableString *)contextBuffer {
@@ -40,10 +40,6 @@
   if (_contextBuffer.length)
     [_contextBuffer replaceOccurrencesOfString:@"\0" withString:[NSString nullChar] options:0 range:NSMakeRange(0, 1)];
   [self.kme setCoreContextIfNeeded:self.contextBuffer];
-}
-
-- (BOOL)debugMode {
-  return YES;
 }
 
 -(NSEvent *)keyStrokeEventForCharacter:(NSString *)character keyCode:(unsigned short) keyCode {
