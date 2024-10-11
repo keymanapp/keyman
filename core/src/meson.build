@@ -32,8 +32,6 @@ else
 endif
 
 if cpp_compiler.get_id() == 'emscripten'
-  # TODO: why do we need this defn here?
-  defns += ['-DKM_CORE_LIBRARY']
   icu_if_not_on_wasm = []
 else
   # only include this if NOT on wasm.
@@ -54,19 +52,21 @@ if cpp_compiler.get_id() == 'emscripten'
     '-g', '-Wlimited-postlink-optimizations',
     '-lembind'
   ]
+  util_normalize_table_generator = executable(
+    'util_normalize_table_generator',
+    ['util_normalize_table_generator.cpp'],
+    cpp_args: defns + warns,
+    include_directories: [inc],
+    link_args: links,
+    dependencies: [icu_uc, icu_i18n],
+  )
 
-  util_normalize_table_generator = executable('util_normalize_table_generator',
-      ['util_normalize_table_generator.cpp'],
-      cpp_args: defns + warns,
-      include_directories: [inc],
-      link_args: links,
-      dependencies: [icu_uc, icu_i18n],
-      )
-
-  util_normalize_table_h = custom_target('util_normalize_table.h',
-                      output: 'util_normalize_table.h',
-                      command: [util_normalize_table_generator],
-                      capture:true)
+  util_normalize_table_h = custom_target(
+    'util_normalize_table.h',
+    output: 'util_normalize_table.h',
+    command: [util_normalize_table_generator],
+    capture:true
+  )
 
   generated_headers += util_normalize_table_h
 endif
@@ -139,13 +139,21 @@ mock_files = files(
 )
 
 if cpp_compiler.get_id() == 'emscripten'
-  host_links = ['--whole-archive', '-sALLOW_MEMORY_GROWTH=1', '-sMODULARIZE=1',
-    '-sEXPORT_ES6', '-sENVIRONMENT=web,webview',
-    '--emit-tsd', 'km-core-interface.d.ts', '-sERROR_ON_UNDEFINED_SYMBOLS=0']
-
-  links += ['-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\',\'stringToNewUTF8\',\'wasmExports\']',
-      # Forcing inclusion of debug symbols
-      '-g', '-Wlimited-postlink-optimizations', '--bind']
+  links += [
+    '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\',\'stringToNewUTF8\',\'wasmExports\']',
+    # Forcing inclusion of debug symbols
+    '-g', '-Wlimited-postlink-optimizations',
+    '-lembind'
+  ]
+  host_links = [
+    '--whole-archive',
+    '-sALLOW_MEMORY_GROWTH=1',
+    '-sMODULARIZE=1', '-sEXPORT_NAME=createCoreProcessor',
+    '-sEXPORT_ES6',
+    '-sENVIRONMENT=web,webview',
+    '--emit-tsd', 'km-core-interface.d.ts',
+    # '-sERROR_ON_UNDEFINED_SYMBOLS=0'
+  ]
 endif
 
 lib = library('keymancore',
