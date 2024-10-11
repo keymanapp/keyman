@@ -51,7 +51,7 @@ fi
 
 GIT_ORIGIN="$(git remote get-url origin)"
 
-if [[ ! "$GIT_ORIGIN" =~ github\.com/keymanapp ]]; then
+if [[ ! "$GIT_ORIGIN" =~ github\.com(/|:)keymanapp ]]; then
   # Not a Keyman repository. We have no opinion.
   # echo "DEBUG: Not a Keyman repository. We don't care"
   exit 0
@@ -107,14 +107,18 @@ function print_error() {
   echo -e "----------------------------------------------------------${t_end}"
   echo -e "Valid types: ${t_grn}${types[@]}${t_end}"
   echo -e "Valid scopes: ${t_grn}${scopes[@]}${t_end}"
-  echo -e "Max length (first line): ${t_grn}$max_length${t_end}"
+  echo -e ""
   echo -e "Min length (first line): ${t_grn}$min_length${t_end}"
+  echo -e "Max length (first line): ${t_grn}$max_length${t_end}"
+  echo -e ""
   echo -e "If possible, append git trailers:"
   echo -e " * ${t_grn}Fixes: #1234${t_end}"
   echo -e " * ${t_grn}Fixes: KEYMAN-MODULE-XYZ${t_end}"
   echo -e " * ${t_grn}Cherry-pick-of: #2468${t_end}"
   echo -e " * ${t_grn}Co-authored-by: Firstname Lastname <email@keyman.com>${t_end}"
+  echo -e ""
   echo -e "${t_cyn}Example:${t_end} fix(windows): Re-attach the widget plug which had fallen out"
+  echo -e ""
   echo -e "${t_cyn}Reference${t_end}: https://github.com/keymanapp/keyman/wiki/Pull-Request-and-Commit-workflow-notes"
   echo -e ""
   echo -e "Tips: "

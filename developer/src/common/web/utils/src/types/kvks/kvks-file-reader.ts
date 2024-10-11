@@ -1,5 +1,5 @@
 import { SchemaValidators as SV, KvkFile, util, Constants } from '@keymanapp/common-types';
-import { xml2js } from '../../index.js'
+import { KeymanXMLReader } from '../../index.js'
 import KVKSourceFile from './kvks-file.js';
 const SchemaValidators = SV.default;
 import boxXmlArray = util.boxXmlArray;
@@ -20,31 +20,15 @@ export default class KVKSFileReader {
   public read(file: Uint8Array): KVKSourceFile {
     let source: KVKSourceFile;
 
-    const parser = new xml2js.Parser({
-      explicitArray: false,
-      mergeAttrs: false,
-      includeWhiteChars: true,
-      normalize: false,
-      emptyTag: {} as any
-      // Why "as any"? xml2js is broken:
-      // https://github.com/Leonidas-from-XIV/node-xml2js/issues/648 means
-      // that an old version of `emptyTag` is used which doesn't support
-      // functions, but DefinitelyTyped is requiring use of function or a
-      // string. See also notes at
-      // https://github.com/DefinitelyTyped/DefinitelyTyped/pull/59259#issuecomment-1254405470
-      // An alternative fix would be to pull xml2js directly from github
-      // rather than using the version tagged on npmjs.com.
-    });
-
-    parser.parseString(file, (e: unknown, r: unknown) => {
-      if(e) {
-        if(file.byteLength > 4 && file.subarray(0,3).every((v,i) => v == KVK_HEADER_IDENTIFIER_BYTES[i])) {
-          throw new Error('File appears to be a binary .kvk file', {cause: e});
-        }
-        throw e;
-      };
-      source = r as KVKSourceFile;
-    });
+    try {
+      source = new KeymanXMLReader('kvks')
+        .parse(file.toString()) as KVKSourceFile;
+    } catch(e) {
+      if(file.byteLength > 4 && file.subarray(0,3).every((v,i) => v == KVK_HEADER_IDENTIFIER_BYTES[i])) {
+        throw new Error('File appears to be a binary .kvk file', {cause: e});
+      }
+      throw e;
+    }
     if(source) {
       source = this.boxArrays(source);
       this.cleanupFlags(source);
