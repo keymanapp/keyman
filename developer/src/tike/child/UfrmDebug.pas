@@ -583,10 +583,6 @@ begin
   finally
     FRunning := False;
     EnableUI;
-    UpdateCharacterGrid;
-    // We want to refresh the memo and character grid for rapid typing
-    memo.Update;
-    sgChars.Update;
   end;
 
   if UIStatus <> duiTest then
@@ -802,8 +798,13 @@ procedure TfrmDebug.ExecuteEventAction(n: Integer);
       Assert(False, AssertionMessage); // Unrecognised backspace type
     end;
 
-    memo.Text := Copy(memo.Text, 1, m) + Copy(memo.Text, n+1, MaxInt);
-    memo.SelStart := m;
+    memo.Lines.BeginUpdate;
+    try
+      memo.Text := Copy(memo.Text, 1, m) + Copy(memo.Text, n+1, MaxInt);
+      memo.SelStart := m;
+    finally
+      memo.Lines.EndUpdate;
+    end;
 
     RealignMemoSelectionState(state);
   end;
@@ -1346,7 +1347,7 @@ begin
     frmKeymanDeveloper.barStatus.Panels[0].Text := 'Debugger Active';
   end;
 
-  if not memo.ReadOnly then
+  if not memo.ReadOnly and not memo.SelectionChanging then
   begin
     FSavedSelection := memo.Selection;
     UpdateCharacterGrid;   // I4808
@@ -1354,11 +1355,22 @@ begin
 end;
 
 procedure TfrmDebug.UpdateCharacterGrid;   // I4808
+var
+  start, len: Integer;
 begin
   if csDestroying in ComponentState then
     Exit;
 
-  TCharacterGridRenderer.Fill(sgChars, memo.Text, FDeadkeys, memo.SelStart, memo.SelLength, memo.Selection.Anchor);
+  start := memo.SelStart;
+  len := memo.SelLength;
+  if start + len > Length(memo.Text) then
+  begin
+    // RichEdit has a virtual final character, which is selected when
+    // pressing Ctrl+A, etc.
+    len := Length(memo.Text) - start;
+  end;
+
+  TCharacterGridRenderer.Fill(sgChars, memo.Text, FDeadkeys, start, len, memo.Selection.Anchor);
   TCharacterGridRenderer.Size(sgChars, memo.Font);
 end;
 
