@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.127 alpha 2024-10-12
+
+* fix(developer): use TextDecoder to convert Uint8Array to string (#12537)
+
 ## 18.0.126 alpha 2024-10-11
 
 * test(common): add markdown link check test for product documentation (#12472)
