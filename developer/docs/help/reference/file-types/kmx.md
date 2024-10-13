@@ -3,7 +3,7 @@ title: KMX files
 ---
 
 Used by:
-:   <span class="application">Keyman Desktop</span>,
+:   Keyman Core in <span class="application">Keyman for Windows</span>,
     <span class="application">Keyman for macOS</span>, and
     <span class="application">Keyman for Linux</span>.
 
@@ -16,6 +16,8 @@ Details:
     for the keyboard (.ICO/.BMP). Note that .KMX files are not used for
     <span class="application">Keyman for Android</span> and
     <span class="application">Keyman for iPhone and iPad</span>.
+:   .KMX file format has registered MIME type
+    [`application/vnd.keyman.kmx`](https://www.iana.org/assignments/media-types/application/vnd.keyman.kmx).
 
 Distributed with keyboard:
 :   This is the keyboard file. It must be distributed with your package
