@@ -40,6 +40,12 @@ function _builder_init() {
   else
     builder_use_color false
   fi
+
+  # Set shared Meson package cache (works with Meson >= 1.3)
+  if [[ -z ${MESON_PACKAGE_CACHE_DIR:-} ]]; then
+    export MESON_PACKAGE_CACHE_DIR="${XDG_CACHE_HOME:-${HOME}/.cache}/keyman/builder"
+    mkdir -p "${MESON_PACKAGE_CACHE_DIR}"
+  fi
 }
 
 function _builder_findRepoRoot() {
@@ -416,6 +422,7 @@ _builder_execute_child() {
     ${child_options[@]} \
     $builder_verbose \
     $builder_debug \
+    $_builder_offline \
   && (
     if $_builder_debug_internal; then
       builder_echo success "## $action$target completed successfully"
@@ -1267,6 +1274,7 @@ _builder_parse_expanded_parameters() {
   _builder_chosen_options=()
   _builder_current_action=
   _builder_is_child=1
+  _builder_offline=
 
   local n=0
 
@@ -1399,6 +1407,9 @@ _builder_parse_expanded_parameters() {
           # internal reporting function, ignores all other parameters
           _builder_report_dependencies
           ;;
+        --offline)
+          _builder_offline=--offline
+          ;;
         *)
           # script does not recognize anything of action or target form at this point.
           if [[ $key =~ ^: ]]; then
@@ -1477,7 +1488,10 @@ _builder_parse_expanded_parameters() {
   # Note:  if an error occurs within a script's function in a `set -e` script, it becomes an exit
   # instead for the function's caller.  So, we need both `err` and `exit` here.
   # See https://medium.com/@dirk.avery/the-bash-trap-trap-ce6083f36700.
-  trap _builder_failure_trap err exit
+  if [[ -z "$(trap -p DEBUG)" ]]; then
+    # not running in bashdb
+    trap _builder_failure_trap err exit
+  fi
 }
 
 _builder_pad() {
@@ -1565,6 +1579,7 @@ builder_display_usage() {
   _builder_pad $width "  --debug, -d"    "Debug build"
   _builder_pad $width "  --color"        "Force colorized output"
   _builder_pad $width "  --no-color"     "Never use colorized output"
+  _builder_pad $width "  --offline"      "Try to build while being offline"
   if builder_has_dependencies; then
     _builder_pad $width "  --deps"         "Build dependencies if required (default)"
     _builder_pad $width "  --no-deps"      "Skip build of dependencies"
@@ -1731,6 +1746,7 @@ _builder_do_build_deps() {
     "$REPO_ROOT/$dep/build.sh" "configure$dep_target" "build$dep_target" \
       $builder_verbose \
       $builder_debug \
+      $_builder_offline \
       $_builder_build_deps \
       --builder-dep-parent "$THIS_SCRIPT_IDENTIFIER" && (
       if $_builder_debug_internal; then
@@ -1759,6 +1775,18 @@ builder_is_dep_build() {
 #
 builder_is_child_build() {
   return $_builder_is_child
+}
+
+#
+# return `1` for a regular build, `0` to try to build while being offline.
+# The offline build might fail if not all dependencies are cached.
+#
+builder_try_offline() {
+  if [[ "${_builder_offline}" == "--offline" ]]; then
+    return 0
+  else
+    return 1
+  fi
 }
 
 #

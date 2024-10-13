@@ -4,7 +4,10 @@
 ***/
 
 import { Version, deepCopy } from "@keymanapp/web-utils";
-import { ModifierKeyConstants, TouchLayout } from "@keymanapp/common-types";
+import { KeymanWebKeyboard, ModifierKeyConstants, TouchLayout } from "@keymanapp/common-types";
+
+import EncodedVisualKeyboard = KeymanWebKeyboard.EncodedVisualKeyboard;
+import LayoutSpec = KeymanWebKeyboard.LayoutSpec;
 
 import LayoutFormFactorSpec = TouchLayout.TouchLayoutPlatform;
 import LayoutLayerBase = TouchLayout.TouchLayoutLayer;
@@ -18,27 +21,6 @@ export { ButtonClasses };
 
 import Codes from "../codes.js";
 import type Keyboard from "./keyboard.js";
-
-export interface EncodedVisualKeyboard {
-  /** Represents CSS font styling to use for VisualKeyboard text */
-  F: string;
-  /** Should there be a 102nd key? */
-  K102?: boolean,
-  /**
-   * Keyboard Layer Specification: an object-based map of layer name to the keycaps for its
-   * 65 keys.  The 65 keys are ordered from left to right, then top to bottom.
-   *
-   * The key ID corresponding to each index of the array is specified within `Codes.dfltCodes`.
-   * Entries corresponding to `K_*` in `Codes.dfltCodes` are reserved for future use.
-   */
-  KLS?: {[layerName: string]: string[]},
-  /**
-   * @deprecated
-   * The older form for data in KLS - defines keycaps for 'default' keys, then 'shift' keys,
-   * in a single concatenated array.
-   */
-  BK?: string[];
-}
 
 // The following types provide type definitions for the full JSON format we use for visual keyboard definitions.
 export type ButtonClass       =  0 | 1 | 2 | 3 | 4 | /*5 | 6 | 7 |*/ 8 | 9 | 10;
@@ -56,12 +38,6 @@ export interface LayoutFormFactor extends LayoutFormFactorSpec {
   // To facilitate those post-processing elements.
   layer: LayoutLayer[]
 };
-
-export type LayoutSpec = {
-  "desktop"?: LayoutFormFactorSpec,
-  "phone"?: LayoutFormFactorSpec,
-  "tablet"?: LayoutFormFactorSpec
-}
 
 const KEY_102_WIDTH = 200;
 

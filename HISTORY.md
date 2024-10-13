@@ -1,5 +1,122 @@
 # Keyman Version History
 
+## 18.0.125 alpha 2024-10-10
+
+* chore(common): allow to run `build.sh` scripts in `bashdb` debugger (#12518)
+* chore(linux): Improve output of API Verification (#12522)
+* chore(linux): allow to skip API change (#12519)
+* fix(linux): fix problem with API checks with merge commits (#12520)
+* refactor(web): move `KeyboardObject` type to `common/web/types` (#12514)
+
+## 18.0.124 alpha 2024-10-09
+
+* chore(common): fix links in minimum-versions.md (#12507)
+* fix(developer): use richedit in debug memo to support Egyptian cartouches (#12464)
+* feat(android): Add controls for auto-correct (#12443)
+
+## 18.0.123 alpha 2024-10-08
+
+* chore(developer,common): deps: replace xml2js with fast-xml-parser (#12502)
+* chore(ios): renew certificate (#12512)
+
+## 18.0.122 alpha 2024-10-07
+
+* feat(mac): both option keys generate right alt if no left alt mapping (#12458)
+* chore(common): improve configuration detection for hextobin (#12481)
+
+## 18.0.121 alpha 2024-10-03
+
+* docs(developer): Fix image links in help (#12488)
+* fix(oem/fv): Update keyboard versions and names for fv_all.kmp 13.1 (#12486)
+* feat(common): unified XML parser/writer (#12482)
+
+## 18.0.120 alpha 2024-10-02
+
+* chore(common): Add note on troubleshooting website errors (#12487)
+* docs(common): mention `KEYMAN_USE_NVM` in minimum versions doc (#12490)
+* docs(web): fix paths to several help pages (#12491)
+* docs(web): fix structure of test document (#12492)
+
+## 18.0.119 alpha 2024-09-28
+
+* refactor(developer): copy dev 17.0 help into repo (#12427)
+* fix(developer): warn before importing over touch layout (#12478)
+* chore(linux): display branch name with API verification (#12480)
+* docs(core): Update kmx-plus-file-format.md (#12479)
+
+## 18.0.118 alpha 2024-09-26
+
+* chore(developer): add context/options (#11566)
+* chore(deps-dev): bump rollup from 4.16.4 to 4.22.4 (#12462)
+* fix(developer): ignore excess whitespace in `<row keys>` attribute (#12468)
+* refactor(common): move help into common prod/docs/help folders (#12424)
+* fix(developer): publish developer-utils package during build (#12471)
+* fix(linux): ignore additional C++ symbol in API check (#12474)
+
+## 18.0.117 alpha 2024-09-25
+
+* docs(common): Document how to skip generating CDN on websites (#12446)
+* fix(android): Remove toggle for "Always Show Banner" (#12430)
+* fix(android): Hide suggestion banner on password fields (#12442)
+* fix(developer): prevent invalid string ids (#12465)
+
+## 18.0.116 alpha 2024-09-20
+
+* change(mac): remove verbose logging option (#12431)
+* chore(common): Allow to build offline (#12439)
+
+## 18.0.115 alpha 2024-09-19
+
+* chore(common): detect ssh remotes in git hooks (#12437)
+* fix(common): add proper configure output for hextobin (#12440)
+* fix(core): add missing dependency for core (#12438)
+* chore(developer): remove .js output from LDML compiler (#12432)
+
+## 18.0.114 alpha 2024-09-17
+
+* fix(developer): rewrite ldml visual keyboard compiler (#12402)
+* fix(developer): check vars string usage before definition (#12404)
+* change(mac): remove 'Always show OSK' option (#12355)
+
+## 18.0.113 alpha 2024-09-16
+
+* test(developer): kmcmplib compiler unit tests 3 (#11990)
+
+## 18.0.112 alpha 2024-09-14
+
+* chore(deps): bump express from 4.19.2 to 4.20.0 (#12396)
+
+## 18.0.111 alpha 2024-09-13
+
+* chore(common): Update crowdin strings for Italian (#12408)
+* fix(common): correct offsets in KMX+ spec (#12350)
+* fix(android): Add gating to setLongpressDelay() (#12410)
+
+## 18.0.110 alpha 2024-09-12
+
+* chore(common): Update to Unicode 16.0 (#12393)
+* refactor(web): move `common/web/es-bundling` → `web/src/tools/es-bundling` (#12389)
+* refactor(web): move `common/web/eslint` → `common/tools/eslint` (#12390)
+* refactor(web): move sentry-manager → `web/src/engine/sentry-manager` (#12397)
+* refactor(web): merge `device-detect` with `web/src/engine/main` (#12399)
+* chore(web): allow to run unit tests in vscode test explorer (#12400)
+* fix(developer): index() requires comma between parameters in kmcmplib compiler (#12328)
+
+## 18.0.109 alpha 2024-09-11
+
+* chore(common): Update history with 17.0.329 stable (#12394)
+* refactor(web): move `model/templates` to `web/src/engine/predictive/text` (#12382)
+* refactor(web): move `common/models` to `web/src/engine/predictive-text` (#12383)
+* refactor(web): move `common/web/utils` to `web/src/engine/common/web-utils/` (#12384)
+
+## 18.0.108 alpha 2024-09-10
+
+* docs(android): Update help docs (#12367)
+* fix(developer): fix building with Ubuntu 24.04 (#12379)
+* refactor(android): Move build-publish.sh to builder script (#12351)
+* fix(android): Separate `publishSentry` Gradle task to publish symbols to Sentry (#12358)
+* refactor(web): move `model/types` to `web/types` (#12370)
+
 ## 18.0.107 alpha 2024-09-09
 
 * fix(android): Update Text Size menu icons for RTL support (#12290)
@@ -762,6 +879,29 @@
 
 * chore(common): move to 18.0 alpha (#10713)
 * chore: move to 18.0 alpha
+
+## 17.0.329 stable 2024-09-09
+
+* chore(android,ios): Add ojibwa ifinal/rdot keyboards to FirstVoices (#12020)
+* change(web): revert #11174, which loads keyboards before initializing the OSK (#12040)
+* fix(web): unrevert #11258, leaving OSK hidden before instructed to display (#12058)
+* chore(common): use `nvm` to select version of node for builds (#12074)
+* fix(developer): ignore scan code if zero in debugger (#12182)
+* fix(developer): enforce presence of Version field when FollowKeyboardVersion is not set, in package compiler (#12206)
+* fix(developer): enforce presence of kps Info.Description field in info compilers (#12207)
+* fix(web): disable fat-finger data use when mayCorrect = false (#12226)
+* chore(common): allow build agents to automatically select emsdk version, and enable support for 3.1.60+ (#12245)
+* fix(web): fix documentation-keyboard spacebar-text scaling (#12240)
+* fix(core): set mac build version for meson cli build to 10.13 (#12246)
+* change(ios): defer registration of fonts past initialization (#12241)
+* chore(android,ios): Update FirstVoices keyboards to 12.15 (#12301)
+* fix(core): properly support 'other' modifier state with `uint32_t` type (#12285)
+* fix(developer): find last matching key in LDML key bag when building KVK (#12284)
+* fix(android): check in material-stepper as internal Maven dependency (#12324)
+* fix(linux): add `keymanFacename` to .ldml file (#12283)
+* chore(oem/fv): Update to fv_all 13.0 (#12363)
+* fix(mac): avoid crash on startup with macOS 10.15 (Catalina) (#12364)
+* fix(android): skip language counts for lexical-model packages (#12368)
 
 ## 17.0.328 stable 2024-07-27
 

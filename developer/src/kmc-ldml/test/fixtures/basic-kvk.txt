@@ -1,4 +1,6 @@
 #
+# Keyman is copyright (C) SIL International. MIT License.
+#
 # basic-kvk.txt describes the expected output of running kmc against basic.xml to generate
 # a .kvk file. It is used in the end-to-end test test-visual-keyboard-compiler-e2e.ts.
 #
@@ -10,8 +12,8 @@ block(kvkheader)
   00 06 00 00      # version 0x0600
   00               # flags
 block(associated_keyboard)
-  01 00            # string len in UTF-16 code units incl zterm
-  00 00            # '\0'
+  06 00            # string len in UTF-16 code units incl zterm
+  62 00 61 00 73 00 69 00 63 00 00 00           # 'basic\0'
 
 block(ansi_font)
   06 00            # string len in UTF-16 code units incl zterm

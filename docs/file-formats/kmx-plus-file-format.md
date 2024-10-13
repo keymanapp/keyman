@@ -35,7 +35,9 @@ Draft spec PR: <https://github.com/unicode-org/cldr/pull/1847>
 - Other than the `sect` table itself, the rest of the sections follow in binary
   order in the file.  In other words, the binary ordering of the section
   identifiers determines the order of the file layout.
-- All sections other than the `sect` table are optional
+- All sections other than the `sect` table are optional for the file 
+  format to be valid, however, a valid keyboard will need most or 
+  all of the sections present to be usable.
 
 ### C7043.2.1 `sect`—Section Table of contents
 
@@ -173,8 +175,8 @@ Then for each string:
 
 | ∆ | Bits | Name          | Description                                   |
 |---|------|---------------|-----------------------------------------------|
-|16+|  32  | offset        | off: Offset to string                         |
-|20+|  32  | length        | int: Length of string in UTF-16LE code units  |
+|12+|  32  | offset        | off: Offset to string                         |
+|16+|  32  | length        | int: Length of string in UTF-16LE code units  |
 
 After the string offset table comes the actual UTF-16LE data. There is a null
 (\u0000) after each string, which is _not_ included in the string length.
@@ -362,9 +364,9 @@ For each element:
 
 | ∆ | Bits | Name    | Description                              |
 |---|------|---------|------------------------------------------|
-|32+|  32  | to      | str: to string                           |
-|36+|  32  | id      | str: id string                           |
-|40+|  32  | display | str: output display string               |
+|16+|  32  | to      | str: to string                           |
+|20+|  32  | id      | str: id string                           |
+|24+|  32  | display | str: output display string               |
 
 Either `to` or `id` must be set, not both.
 Entries with an `to` field are sorted in a binary codepoint sort on the `to` field,
@@ -423,8 +425,8 @@ For each flicks in the flick list:
 | ∆ | Bits | Name             | Description                                              |
 |---|------|----------------  |----------------------------------------------------------|
 | 0+|  32  | count            | int: number of flick elements in this flick              |
-|12+|  32  | flick            | int: index into `flick` subtable for first flick element |
-|16+|  32  | id               | str: flick id                                            |
+| 4+|  32  | flick            | int: index into `flick` subtable for first flick element |
+| 8+|  32  | id               | str: flick id                                            |
 
 - `id`: The original string id from XML. This may be 0 to save space (i.e. omit
   the string id).
@@ -440,8 +442,8 @@ For each flick element:
 
 | ∆ | Bits | Name             | Description                                              |
 |---|------|----------------  |----------------------------------------------------------|
-| 0+|  32  | directions       | list: index into `list` section with direction list      |
-| 8+|  32  | keyId            | str: id of key                                           |
+| 0+|  32  | directions       | list: index into `list` section with direction sequence  |
+| 4+|  32  | keyId            | str: id of key                                           |
 
 If this section is present, it must have a 'flick element' at position zero with
 directions=0, flags=0, and to=0 meaning 'no flick'.
