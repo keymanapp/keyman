@@ -60,17 +60,44 @@
             android:layout_height="2dp"
             android:background="?attr/colorAccent" />
 
-        <include
-            android:id="@+id/predictions_toggle"
-            layout="@layout/list_row_layout4"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+        <!-- Predictions and corrections controls replaced by radio button group
+             Sadly can't use LinearLayouts of list_row_layout4 because
+             it breaks selections in RadioGroup -->
+        <RadioGroup
+            android:id="@+id/suggestion_radio_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-        <include
-            android:id="@+id/corrections_toggle"
-            layout="@layout/list_row_layout4"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/suggestion_radio_0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/suggestions_radio_0" />
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/suggestion_radio_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/suggestions_radio_1" />
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/suggestion_radio_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/suggestions_radio_2" />
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/suggestion_radio_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="@string/suggestions_radio_3" />
+
+        </RadioGroup>
 
         <include
             android:id="@+id/model_picker"
@@ -78,10 +105,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </LinearLayout>
-
-    <!-- Enable corrections toggle -->
-
-    <!-- Enable predictions toggle -->
 
     <!-- Model picker -->
 

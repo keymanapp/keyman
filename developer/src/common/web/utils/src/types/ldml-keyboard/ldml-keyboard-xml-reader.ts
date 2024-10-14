@@ -97,6 +97,14 @@ export class LDMLKeyboardXMLSourceFileReader {
     if(source?.keyboard3?.transforms) {
       for(const transforms of source.keyboard3.transforms)  {
         boxXmlArray(transforms, 'transformGroup');
+        // need to see if there's an empty ('') element.
+        // the schema allows an empty object, but the spec doesn't.
+        for (let i=0; i<transforms.transformGroup.length; i++) {
+          if (transforms.transformGroup[i] === '') {
+            // substitute empty object. the compiler will complain about it.
+            transforms.transformGroup[i] = { };
+          }
+        }
         for (const transformGroup of transforms.transformGroup) {
           boxXmlArray(transformGroup, 'transform');
           boxXmlArray(transformGroup, 'reorder');
@@ -294,7 +302,7 @@ export class LDMLKeyboardXMLSourceFileReader {
 
   loadTestDataUnboxed(file: Uint8Array): any {
     const source = new KeymanXMLReader('keyboardTest3')
-      .parse(file.toString()) as any;
+      .parse(new TextDecoder().decode(file)) as any;
     return source;
   }
 
