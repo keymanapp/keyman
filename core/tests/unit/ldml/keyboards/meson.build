@@ -7,8 +7,16 @@
 
 # keyboards in resources/standards-data/ldml-keyboards/45/3.0/
 # tests     in resources/standards-data/ldml-keyboards/45/test/
-tests_from_cldr = [
+tests_from_cldr_45 = [
   'ja-Latn',
+  # 'pt-t-k0-abnt2',
+  # 'fr-t-k0-test',
+  # 'pcm',
+  # 'bn',
+]
+
+tests_from_cldr_46 = [
+  # 'ja-Latn',
   'pt-t-k0-abnt2',
   'fr-t-k0-test',
   'pcm',
@@ -52,14 +60,18 @@ tests =  tests_without_testdata
 tests += tests_with_testdata
 tests_needing_copy = tests # not including cldr
 
-tests += tests_from_cldr
+tests += tests_from_cldr_46
+tests += tests_from_cldr_45
 
 # Setup kmc
 
 kmc_root = meson.global_source_root() / '../developer/src/kmc'
-ldml_root = meson.global_source_root() / '../resources/standards-data/ldml-keyboards/45'
-ldml_data = join_paths(ldml_root, '3.0')
-ldml_testdata = join_paths(ldml_root, 'test')
+ldml_root_45 = meson.global_source_root() / '../resources/standards-data/ldml-keyboards/45'
+ldml_data_45 = join_paths(ldml_root_45, '3.0')
+ldml_testdata_45 = join_paths(ldml_root_45, 'test')
+ldml_root_46 = meson.global_source_root() / '../resources/standards-data/ldml-keyboards/46'
+ldml_data_46 = join_paths(ldml_root_46, '3.0')
+ldml_testdata_46 = join_paths(ldml_root_46, 'test')
 kmc_cmd = [node, '--enable-source-maps', kmc_root]
 
 # Build all keyboards in output folder
@@ -87,20 +99,38 @@ foreach kbd : tests_with_testdata
 endforeach
 
 
-foreach kbd : tests_from_cldr
+foreach kbd : tests_from_cldr_45
   configure_file(
     copy: true,
-    input: ldml_data / kbd + '.xml',
+    input: ldml_data_45 / kbd + '.xml',
     output: kbd + '.xml'
   )
   configure_file(
     command: kmc_cmd + ['build', '@INPUT@', '--out-file', '@OUTPUT@'],
-    input: join_paths(ldml_data, kbd + '.xml'),
+    input: join_paths(ldml_data_45, kbd + '.xml'),
     output: kbd + '.kmx',
   )
   configure_file(
     command: kmc_cmd + ['build', 'ldml-test-data', '@INPUT@', '--out-file', '@OUTPUT@'],
-    input: join_paths(ldml_testdata, kbd + '-test.xml'),
+    input: join_paths(ldml_testdata_45, kbd + '-test.xml'),
+    output: kbd + '-test.json',
+  )
+endforeach
+
+foreach kbd : tests_from_cldr_46
+  configure_file(
+    copy: true,
+    input: ldml_data_46 / kbd + '.xml',
+    output: kbd + '.xml'
+  )
+  configure_file(
+    command: kmc_cmd + ['build', '@INPUT@', '--out-file', '@OUTPUT@'],
+    input: join_paths(ldml_data_46, kbd + '.xml'),
+    output: kbd + '.kmx',
+  )
+  configure_file(
+    command: kmc_cmd + ['build', 'ldml-test-data', '@INPUT@', '--out-file', '@OUTPUT@'],
+    input: join_paths(ldml_testdata_46, kbd + '-test.xml'),
     output: kbd + '-test.json',
   )
 endforeach
