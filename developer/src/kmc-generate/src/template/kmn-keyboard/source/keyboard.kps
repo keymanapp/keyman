@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>$KEYMANVERSION</KeymanDeveloperVersion>
+    <FileVersion>7.0</FileVersion>
+  </System>
+  <Options>
+    <ReadMeFile>readme.htm</ReadMeFile>
+    <LicenseFile>..\LICENSE.md</LicenseFile>
+    <WelcomeFile>welcome.htm</WelcomeFile>
+    <FollowKeyboardVersion/>
+  </Options>
+  <Info>
+    <Name URL="">$NAME</Name>
+    <Copyright URL="">$COPYRIGHT</Copyright>
+    <Author URL="">$AUTHOR</Author>
+    <Description URL="">$DESCRIPTION</Description>
+  </Info>
+  <Files>
+$KMX:    <File>
+$KMX:      <Name>..\build\$ID.kmx</Name>
+$KMX:    </File>
+$Web:    <File>
+$Web:      <Name>..\build\$ID.js</Name>
+$Web:    </File>
+$KVKS:    <File>
+$KVKS:      <Name>..\build\$ID.kvk</Name>
+$KVKS:    </File>
+    <File>
+      <Name>welcome.htm</Name>
+    </File>
+    <File>
+      <Name>readme.htm</Name>
+    </File>
+    <File>
+      <Name>..\LICENSE.md</Name>
+    </File>
+  </Files>
+  <Keyboards>
+    <Keyboard>
+      <Name>$NAME</Name>
+      <ID>$ID</ID>
+      <Version>$VERSION</Version>
+$PACKAGE_LANGUAGES
+    </Keyboard>
+  </Keyboards>
+</Package>

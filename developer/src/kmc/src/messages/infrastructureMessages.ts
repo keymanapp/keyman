@@ -141,5 +141,10 @@ export class InfrastructureMessages {
   static Error_MessageNamespaceNameNotFound = (o:{message: string}) => m(
     this.ERROR_MessageNamespaceNameNotFound,
     `Invalid parameter: --message ${def(o.message)} does not have a recognized namespace`);
+
+  static ERROR_GenerateRequiresId = SevError | 0x0020;
+  static Error_GenerateRequiresId = () => m(
+    this.ERROR_GenerateRequiresId,
+    `The generate command requires a single 'id' parameter`);
  }
 
