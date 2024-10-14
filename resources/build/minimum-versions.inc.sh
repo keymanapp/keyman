@@ -24,7 +24,8 @@ KEYMAN_MIN_VERSION_EMSCRIPTEN=3.1.58          # Use KEYMAN_USE_EMSDK to automati
 KEYMAN_MIN_VERSION_VISUAL_STUDIO=2019
 KEYMAN_MIN_VERSION_MESON=1.0.0
 
-KEYMAN_VERSION_ICU=73.1                   # See /core/subprojects/icu-minimal.wrap
+KEYMAN_VERSION_GRADLE=7.6.4                   # See /android/KMEA/gradle/wrapper/gradle-wrapper.properties
+KEYMAN_VERSION_ICU=73.1                       # See /core/subprojects/icu-minimal.wrap
 
 # Language and runtime versions
 KEYMAN_VERSION_JAVA=11                        # We're using Java/OpenJDK 11
