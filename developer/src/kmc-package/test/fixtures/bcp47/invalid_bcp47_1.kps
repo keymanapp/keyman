@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>10.0.700.0</KeymanDeveloperVersion>
+    <FileVersion>7.0</FileVersion>
+  </System>
+  <Info>
+    <Version>1.0</Version>
+    <Name>valid_bcp47</Name>
+  </Info>
+  <Files>
+    <File>
+      <Name>test.kmx</Name>
+    </File>
+  </Files>
+  <Keyboards>
+    <Keyboard>
+      <Name>Invalid BCP 47</Name>
+      <ID>test</ID>
+      <Version>1.0</Version>
+      <Languages>
+        <Language ID="km-mm-mm">Not a language tag</Language>
+      </Languages>
+    </Keyboard>
+  </Keyboards>
+  <Strings/>
+</Package>

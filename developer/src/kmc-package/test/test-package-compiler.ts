@@ -12,6 +12,7 @@ import { makePathToFixture } from './helpers/index.js';
 
 import { KmpCompiler } from '../src/compiler/kmp-compiler.js';
 import { PackageCompilerMessages } from '../src/compiler/package-compiler-messages.js';
+import { PackageValidation } from '../src/compiler/package-validation.js';
 
 const debug = false;
 
@@ -27,6 +28,13 @@ describe('KmpCompiler', function () {
     callbacks.clear();
     kmpCompiler = new KmpCompiler();
     assert.isTrue(await kmpCompiler.init(callbacks, null));
+  });
+
+  this.afterEach(function() {
+    if(this.currentTest?.isFailed()) {
+      callbacks.printMessages();
+    }
+    callbacks.clear();
   });
 
   for (let modelID of MODELS) {
@@ -282,6 +290,22 @@ describe('KmpCompiler', function () {
   it(`should load a package with missing keyboard version metadata`, function () {
     const kmpJson = kmpCompiler.transformKpsToKmpObject(makePathToFixture('invalid', 'missing_keyboard_version.kps'));
     assert.equal(kmpJson.keyboards[0].version, '4.0');  // picks up example.kmx's version
+  });
+
+  it(`should handle a range of valid BCP47 tags`, function () {
+    const inputFilename = makePathToFixture('bcp47', 'valid_bcp47.kps');
+    const kmpJson = kmpCompiler.transformKpsToKmpObject(inputFilename);
+    assert.isNotNull(kmpJson);
+    const validation = new PackageValidation(callbacks, {});
+    assert.isTrue(validation.validate(inputFilename, kmpJson));
+  });
+
+  it(`should reject an invalid BCP47 tag`, function () {
+    const inputFilename = makePathToFixture('bcp47', 'invalid_bcp47_1.kps');
+    const kmpJson = kmpCompiler.transformKpsToKmpObject(inputFilename);
+    assert.isNotNull(kmpJson);
+    const validation = new PackageValidation(callbacks, {});
+    assert.isFalse(validation.validate(inputFilename, kmpJson));
   });
 
 });
