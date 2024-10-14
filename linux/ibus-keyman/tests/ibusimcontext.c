@@ -23,25 +23,12 @@
  */
 
 // This file is based on https://github.com/ibus/ibus/blob/master/client/gtk2/ibusimcontext.c
-// commit 506ac9993d5166196b7c4e9bfa9fb0f9d3792ffa plus our two prefilter commits.
+// commit 506ac9993d5166196b7c4e9bfa9fb0f9d3792ffa.
 // It simulates the GTK2 client, leaving out code for GTK3 and GTK4 and
 // simplyfying the code a bit by replacing async calls with direct synchronous
 // method calls.
 
 #include <config.h>
-
-#ifndef IBUS_HAS_PREFILTER
-#ifdef KEYMAN_PKG_BUILD
-// When building packages on Ubuntu and Debian servers we probably don't have
-// a patched ibus available and additionally treat warnings as errors, but
-// still want to build packages.
-#pragma message "Compiling against ibus version that does not include prefilter mask patch\n(https://github.com/ibus/ibus/pull/2440). Output ordering guarantees will be disabled."
-#else
-#warning Compiling against ibus version that does not include prefilter mask patch (https://github.com/ibus/ibus/pull/2440). Output ordering guarantees will be disabled.
-#endif
-
-#define IBUS_PREFILTER_MASK (1 << 23)
-#endif
 
 #include "ibusimcontext.h"
 #include <gdk/gdkkeysyms.h>
@@ -249,7 +236,6 @@ _process_key_event_done(GObject *object, GAsyncResult *res, gpointer user_data) 
 
   if (retval == FALSE) {
     ((GdkEventKey *)event)->state |= IBUS_IGNORED_MASK;
-    ((GdkEventKey *)event)->state &= ~IBUS_PREFILTER_MASK;
     gdk_event_put(event);
   }
   gdk_event_free(event);
@@ -401,10 +387,6 @@ ibus_im_context_init(GObject *obj) {
     ibusimcontext->caps |= IBUS_CAP_SURROUNDING_TEXT;
   }
 
-#ifdef IBUS_HAS_PREFILTER
-  ibusimcontext->caps |= IBUS_CAP_PREFILTER;
-#endif
-
   ibusimcontext->events_queue = g_queue_new();
 
   if (ibus_bus_is_connected(_bus)) {
@@ -463,7 +445,7 @@ ibus_im_context_filter_keypress(GtkIMContext *context, GdkEventKey *event) {
   /* Do not call gtk_im_context_filter_keypress() because
    * gtk_im_context_simple_filter_keypress() binds Ctrl-Shift-u
    */
-  if (event->state & IBUS_IGNORED_MASK && !(event->state & IBUS_PREFILTER_MASK))
+  if (event->state & IBUS_IGNORED_MASK)
     return ibus_im_context_commit_event(ibusimcontext, event);
 
   /* XXX it is a workaround for some applications do not set client
@@ -956,10 +938,6 @@ _ibus_context_forward_key_event_cb(
     /* _create_gdk_event() will add 8 to keycode. */
     if (keycode != 0)
       keycode -= 8;
-  } else if (state & IBUS_PREFILTER_MASK) {
-    // _create_gdk_event() will add 8 to keycode
-    if (keycode != 0)
-      keycode -= 8;
   }
 
   GdkEventKey *event = _create_gdk_event(ibusimcontext, keyval, keycode, state);
@@ -983,8 +961,6 @@ _ibus_context_forward_key_event_cb(
       }
     } while (index >= 0);
     g_string_erase(ibusimcontext->text, index, len);
-  } else if (state & IBUS_PREFILTER_MASK) {
-    gtk_im_context_filter_keypress((GtkIMContext *)ibusimcontext, event);
   } else {
     gdk_event_put((GdkEvent *)event);
   }
