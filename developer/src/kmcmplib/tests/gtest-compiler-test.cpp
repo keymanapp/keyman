@@ -31,6 +31,7 @@ namespace kmcmp {
     extern std::string messageFilename;
     extern int BeginLine[4];
     extern int CompileTarget;
+    extern KMX_BOOL FMnemonicLayout = FALSE;
 }
 
 class CompilerTest : public testing::Test {
@@ -1719,6 +1720,18 @@ TEST_F(CompilerTest, GetXStringImpl_type_osb_test) {
     KMX_WCHAR tstr_virtual_key_valid[] = { UC_SENTINEL, CODE_EXTENDED, sFlag, 65, UC_SENTINEL_EXTENDEDEND, 0 };
     EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
 
+    // virtual key, space before, in VKeyNames, valid
+    fileKeyboard.version = VERSION_90;
+    u16cpy(str, u"[ K_A]");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
+
+    // virtual key, space after, in VKeyNames, valid
+    fileKeyboard.version = VERSION_90;
+    u16cpy(str, u"[K_A ]");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
+
     // virtual key, in VKeyNames, valid with modifiers
     std::map<const KMX_WCHAR*, const KMX_WCHAR> m_mod{
     //   str                  sFlag
@@ -1792,50 +1805,125 @@ TEST_F(CompilerTest, GetXStringImpl_type_osb_test) {
     u16cpy(str, u"[CTRL ALT]");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // virtual key, single quote, ERROR_60FeatureOnly_VirtualCharKey
-    fileKeyboard.version = VERSION_50;
+    // virtual key, in VKeyNames, no space between modifier and key portion, ERROR_InvalidToken
+    // fileKeyboard.version = VERSION_90;
+    // u16cpy(str, u"[CTRLK_A]");
+    // EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // virtual key, in VKeyNames, no space between modifiers, ERROR_InvalidToken
+    // fileKeyboard.version = VERSION_90;
+    // u16cpy(str, u"[CTRLALT K_A]");
+    // EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // virtual key, '_' bewteen modifier and key portion'
+    // fileKeyboard.version = VERSION_90;
+    // u16cpy(str, u"[CTRL_K_A]");
+    // EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    // tstr_virtual_key_valid[2] = ISVIRTUALKEY | K_CTRLFLAG;
+    // tstr_virtual_key_valid[3] = 256; //VK_MAX + 1
+    // std::cerr << "tstr_virtual_key_valid: ";
+    // for (int i=0; i<6; i++)
+    //     std::cerr << (int)tstr_virtual_key_valid[i] << ' ';
+    // std::cerr << std::endl;
+    // std::cerr << "tstr                  : ";
+    // for (int i=0; i<6; i++)
+    //     std::cerr << (int)tstr[i] << ' ';
+    // std::cerr << std::endl;
+    // EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
+    // EXPECT_EQ(0, msgproc_errors.size());
+    // tstr_virtual_key_valid[3] = 65;
+
+    // virtual char key, single quote, ERROR_60FeatureOnly_VirtualCharKey
+    fileKeyboard.version   = VERSION_50;
+    kmcmp::FMnemonicLayout = TRUE;
     u16cpy(str, u"[']");
     EXPECT_EQ(KmnCompilerMessages::ERROR_60FeatureOnly_VirtualCharKey, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // virtual key, double quote, ERROR_60FeatureOnly_VirtualCharKey
-    fileKeyboard.version = VERSION_50;
+    // virtual char key, double quote, ERROR_60FeatureOnly_VirtualCharKey
+    fileKeyboard.version   = VERSION_50;
+    kmcmp::FMnemonicLayout = TRUE;
     u16cpy(str, u"[\"]");
     EXPECT_EQ(KmnCompilerMessages::ERROR_60FeatureOnly_VirtualCharKey, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // virtual key, unmatched single quote, ERROR_InvalidToken
-    fileKeyboard.version = VERSION_60;
+    // virtual char key, unmatched single quote, ERROR_InvalidToken
+    fileKeyboard.version   = VERSION_60;
+    kmcmp::FMnemonicLayout = TRUE;
     u16cpy(str, u"['");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // virtual key, unmatched single quote, ERROR_InvalidToken
-    fileKeyboard.version = VERSION_60;
+    // virtual char key, unmatched single quote, ERROR_InvalidToken
+    fileKeyboard.version   = VERSION_60;
+    kmcmp::FMnemonicLayout = TRUE;
     u16cpy(str, u"[']");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // virtual key, unmatched double quote, ERROR_InvalidToken
-    fileKeyboard.version = VERSION_60;
+    // virtual char key, unmatched double quote, ERROR_InvalidToken
+    fileKeyboard.version   = VERSION_60;
+    kmcmp::FMnemonicLayout = TRUE;
     u16cpy(str, u"[\"");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // virtual key, unmatched double quote, ERROR_InvalidToken
-    fileKeyboard.version = VERSION_60;
+    // virtual char key, unmatched double quote, ERROR_InvalidToken
+    fileKeyboard.version   = VERSION_60;
+    kmcmp::FMnemonicLayout = TRUE;
     u16cpy(str, u"[\"]");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // virtual key, unmatched single quote ('\n'), ERROR_InvalidToken
-    fileKeyboard.version = VERSION_60;
+    // virtual char key, unmatched single quote ('\n'), ERROR_InvalidToken
+    fileKeyboard.version   = VERSION_60;
+    kmcmp::FMnemonicLayout = TRUE;
     u16cpy(str, u"['\n");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // virtual key, empty single quotes, ERROR_InvalidToken
-    fileKeyboard.version = VERSION_60;
+    // virtual char key, empty single quotes, ERROR_InvalidToken
+    fileKeyboard.version   = VERSION_60;
+    kmcmp::FMnemonicLayout = TRUE;
     u16cpy(str, u"['']");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // virtual key, empty double quotes, ERROR_InvalidToken
-    fileKeyboard.version = VERSION_60;
+    // virtual char key, empty double quotes, ERROR_InvalidToken
+    fileKeyboard.version   = VERSION_60;
+    kmcmp::FMnemonicLayout = TRUE;
     u16cpy(str, u"[\"\"]");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // virtual char key, valid
+    fileKeyboard.version   = VERSION_60;
+    kmcmp::FMnemonicLayout = TRUE;
+    u16cpy(str, u"['A']");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    tstr_virtual_key_valid[2] = ISVIRTUALKEY | VIRTUALCHARKEY;
+    EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
+    EXPECT_EQ(0, msgproc_errors.size());
+
+    // virtual char key, space before, valid
+    fileKeyboard.version   = VERSION_60;
+    kmcmp::FMnemonicLayout = TRUE;
+    u16cpy(str, u"[ 'A']");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    tstr_virtual_key_valid[2] = ISVIRTUALKEY | VIRTUALCHARKEY;
+    EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
+    EXPECT_EQ(0, msgproc_errors.size());
+
+    // virtual char key, space after, valid
+    fileKeyboard.version   = VERSION_60;
+    kmcmp::FMnemonicLayout = TRUE;
+    u16cpy(str, u"['A' ]");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    tstr_virtual_key_valid[2] = ISVIRTUALKEY | VIRTUALCHARKEY;
+    EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
+    EXPECT_EQ(0, msgproc_errors.size());
+
+    // virtual char key, FMnemonicLayout not set, WARN_VirtualCharKeyWithPositionalLayout
+    fileKeyboard.version   = VERSION_60;
+    kmcmp::FMnemonicLayout = FALSE;
+    u16cpy(str, u"['A']");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    tstr_virtual_key_valid[2] = ISVIRTUALKEY | VIRTUALCHARKEY;
+    EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
+    EXPECT_EQ(1, msgproc_errors.size());
+    EXPECT_EQ(KmnCompilerMessages::WARN_VirtualCharKeyWithPositionalLayout, msgproc_errors[0].errorCode);
+    msgproc_errors.clear();
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
