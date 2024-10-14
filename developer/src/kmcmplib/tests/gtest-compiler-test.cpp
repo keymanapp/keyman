@@ -1773,8 +1773,6 @@ TEST_F(CompilerTest, GetXStringImpl_type_osb_test) {
         {u"[NCAPS K_A]", ISVIRTUALKEY | NOTCAPITALFLAG },
     };
 
-    std::cerr << "start debug" << std::endl;
-
     kmcmp::CompileTarget = CKF_KEYMANWEB;
     fileKeyboard.dwFlags = KF_AUTOMATICVERSION;
     for (auto i = m_chiral.begin(); i != m_chiral.end(); i++) {
@@ -1789,7 +1787,55 @@ TEST_F(CompilerTest, GetXStringImpl_type_osb_test) {
     kmcmp::CompileTarget = CKF_KEYMAN;
     fileKeyboard.dwFlags = 0;
 
-    std::cerr << "end debug" << std::endl;
+    // virtual key, modifiers only (no key portion), KmnCompilerMessages::ERROR_InvalidToken
+    fileKeyboard.version = VERSION_90;
+    u16cpy(str, u"[CTRL ALT]");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // virtual key, single quote, ERROR_60FeatureOnly_VirtualCharKey
+    fileKeyboard.version = VERSION_50;
+    u16cpy(str, u"[']");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_60FeatureOnly_VirtualCharKey, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // virtual key, double quote, ERROR_60FeatureOnly_VirtualCharKey
+    fileKeyboard.version = VERSION_50;
+    u16cpy(str, u"[\"]");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_60FeatureOnly_VirtualCharKey, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // virtual key, unmatched single quote, ERROR_InvalidToken
+    fileKeyboard.version = VERSION_60;
+    u16cpy(str, u"['");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // virtual key, unmatched single quote, ERROR_InvalidToken
+    fileKeyboard.version = VERSION_60;
+    u16cpy(str, u"[']");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // virtual key, unmatched double quote, ERROR_InvalidToken
+    fileKeyboard.version = VERSION_60;
+    u16cpy(str, u"[\"");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // virtual key, unmatched double quote, ERROR_InvalidToken
+    fileKeyboard.version = VERSION_60;
+    u16cpy(str, u"[\"]");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // virtual key, unmatched single quote ('\n'), ERROR_InvalidToken
+    fileKeyboard.version = VERSION_60;
+    u16cpy(str, u"['\n");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // virtual key, empty single quotes, ERROR_InvalidToken
+    fileKeyboard.version = VERSION_60;
+    u16cpy(str, u"['']");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // virtual key, empty double quotes, ERROR_InvalidToken
+    fileKeyboard.version = VERSION_60;
+    u16cpy(str, u"[\"\"]");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
