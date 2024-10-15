@@ -1,21 +1,6 @@
 (*
-  Name:             WebUpdateCheck
-  Copyright:        Copyright (C) SIL Global.
-  Documentation:
-  Description:
-  Create Date:      5 Dec 2023
-
-  Modified Date:
-  Authors:          rcruickshank
-  Related Files:
-  Dependencies:
-
-  Bugs:
-  Todo:
-  Notes:
-  History:
-*)
-
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *)
 unit Keyman.System.DownloadUpdate;
 
 interface
@@ -28,7 +13,7 @@ uses
   OnlineUpdateCheck;
 
 const
-  CheckPeriod: Integer = 7; // Days between checking for updates
+  DaysBetweenCheckingForUpdates: Integer = 7; // Days between checking for updates
 
 type
   TDownloadUpdateParams = record
@@ -88,7 +73,7 @@ uses
   System.Types,
   System.StrUtils;
 
- // temp wrapper for converting showmessage to logs don't know where
+ // TODO-WINDOWS-UPDATES: temp wrapper for converting showmessage to logs don't know where
  // if not using klog
  procedure LogMessage(LogMessage: string);
  begin
@@ -142,9 +127,10 @@ var
             Result := True;
           end
           else // I2742
+          begin
             // If it fails we set to false but will try the other files
-            Result := False;
-            Exit;
+            Exit(False);
+          end;
         finally
           http.Free;
         end;
@@ -181,20 +167,20 @@ begin
   // Keyboard Packages
   FDownload.StartPosition := 0;
   for i := 0 to High(Params.Packages) do
+  begin
+    if not DownloadFile(Params.Packages[i].DownloadURL, Params.Packages[i].SavePath) then // I2742
     begin
-      if not DownloadFile(Params.Packages[i].DownloadURL, Params.Packages[i].SavePath) then // I2742
-      begin
-        Params.Packages[i].Install := False; // Download failed but install other files
-      end
-      else
-        Inc(downloadCount);
-      FDownload.StartPosition := FDownload.StartPosition + Params.Packages[i].DownloadSize;
-    end;
+      Params.Packages[i].Install := False; // Download failed but install other files
+    end
+    else
+      Inc(downloadCount);
+    FDownload.StartPosition := FDownload.StartPosition + Params.Packages[i].DownloadSize;
+  end;
 
   // Keyman Installer
   if not DownloadFile(Params.InstallURL, SavePath + Params.FileName) then  // I2742
   begin
-    // TODO: #10210  convert to error log.
+    // TODO-WINDOWS-UPDATES: #10210  convert to error log.
     LogMessage('DoDownloadUpdates Failed to download' + Params.InstallURL);
   end
   else
@@ -249,23 +235,21 @@ begin
     begin
       Inc(VerifyDownloads.TotalDownloads);
       Inc(VerifyDownloads.TotalSize, Params.Packages[i].DownloadSize);
-      if Not MatchStr(Params.Packages[i].FileName, FileNames) then
-        begin
-          Result := False;
-          Exit;
-        end;
+      if not MatchStr(Params.Packages[i].FileName, FileNames) then
+      begin
+        Exit(False);
+      end;
       Params.Packages[i].SavePath := SavedPath + Params.Packages[i].FileName;
     end;
     // Add the Keyman installer
     Inc(FDownload.TotalDownloads);
     Inc(FDownload.TotalSize, Params.InstallSize);
     // Check if  the Keyman installer downloaded
-    if Not MatchStr(Params.FileName, FileNames) then
-      begin
-        Result := False;
-        Exit;
-      end;
-    // TODO verify filesizes match so we know we don't have partial downloades.
+    if not MatchStr(Params.FileName, FileNames) then
+    begin
+      Exit(False);
+    end;
+    // TODO-WINDOWS-UPDATES: verify filesizes match so we know we don't have partial downloades.
     Result := True;
   end
   else

@@ -231,18 +231,12 @@ begin
       begin
         if registry.ValueExists(SRegValue_CheckForUpdates) and not registry.ReadBool(SRegValue_CheckForUpdates) then
         begin
-          Result := False;
           Exit;
         end;
         if registry.ValueExists(SRegValue_LastUpdateCheckTime) and (Now - registry.ReadDateTime(SRegValue_LastUpdateCheckTime) > CheckPeriod) then
         begin
           Result := True;
-        end
-        else
-        begin
-          Result := False;
         end;
-        Exit;
       end;
     finally
       registry.Free;
@@ -253,7 +247,6 @@ begin
     begin
       Result := False;
       LogMessage(E.Message);
-      Exit;
     end;
   end;
 end;

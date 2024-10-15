@@ -94,7 +94,7 @@ begin
       end;
 
       Result := ERROR_SUCCESS;
-      // TODO better error checking on the registry key update
+      // TODO-WINDOWS-UPDATES: better error checking on the registry key update
       UpdateState;
 
     finally

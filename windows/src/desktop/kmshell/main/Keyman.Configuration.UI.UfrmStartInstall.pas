@@ -7,20 +7,19 @@ unit Keyman.Configuration.UI.UfrmStartInstall;
 interface
 
 uses
-
-  Windows,
-  Messages,
-  SysUtils,
-  Variants,
-  Classes,
-  Graphics,
-  Controls,
-  Forms,
-  Dialogs,
-  UserMessages,
-  StdCtrls,
-  ExtCtrls,
-  UfrmKeymanBase;
+  System.Classes,
+  System.SysUtils,
+  System.Variants,
+  Vcl.Controls,
+  Vcl.Dialogs,
+  Vcl.ExtCtrls,
+  Vcl.Forms,
+  Vcl.Graphics,
+  Vcl.StdCtrls,
+  Winapi.Messages,
+  Winapi.Windows,
+  UfrmKeymanBase,
+  UserMessages;
 
 type
   TfrmStartInstall = class(TfrmKeymanBase)
