@@ -7,7 +7,6 @@
 unit Keyman.System.RemoteUpdateCheck;  // I3306
 
 interface
-
 uses
   System.Classes,
   System.SysUtils,
@@ -15,6 +14,9 @@ uses
   httpuploader,
   Keyman.System.UpdateCheckResponse,
   OnlineUpdateCheck;
+
+const
+  CheckPeriod: Integer = 7; // Days between checking for updates
 
 type
   ERemoteUpdateCheck = class(Exception);
@@ -31,25 +33,32 @@ type
   private
     FForce: Boolean;
     FRemoteResult: TRemoteUpdateCheckResult;
-
     FErrorMessage: string;
-
     FShowErrors: Boolean;
-    FDownload: TRemoteUpdateCheckDownloadParams;
-    FCheckOnly: Boolean;
+    {
+      Performs an online update check, including package retrieval and version
+      query.
 
-    function DownloadUpdates(Params: TUpdateCheckResponse) : Boolean;
-    procedure DoDownloadUpdates(SavePath: string; Params: TUpdateCheckResponse;  var Result: Boolean);
+      This function checks if a week has passed since the last update check. It
+      utilizes the kmcom API to retrieve the current packages. The function then
+      performs an HTTP request to query the remote versions of these packages.
+      The resulting information is stored in the FParams variable. Additionally,
+      the function handles the main Keyman install package.
+
+      @returns  A TBackgroundUpdateResult indicating the result of the update
+      check.
+    }
     function DoRun: TRemoteUpdateCheckResult;
   public
 
-    constructor Create(AForce : Boolean; ACheckOnly: Boolean = False);
+    constructor Create(AForce : Boolean);
     destructor Destroy; override;
     function Run: TRemoteUpdateCheckResult;
     property ShowErrors: Boolean read FShowErrors write FShowErrors;
   end;
 
 procedure LogMessage(LogMessage: string);
+function ConfigCheckContinue: Boolean;
 
 implementation
 
@@ -72,7 +81,7 @@ uses
 
 { TRemoteUpdateCheck }
 
-constructor TRemoteUpdateCheck.Create(AForce, ACheckOnly: Boolean);
+constructor TRemoteUpdateCheck.Create(AForce: Boolean);
 begin
   inherited Create;
 
@@ -80,7 +89,6 @@ begin
   FRemoteResult := wucUnknown;
 
   FForce := AForce;
-  FCheckOnly := ACheckOnly;
 
   KL.Log('TRemoteUpdateCheck.Create');
 end;
@@ -99,124 +107,7 @@ end;
 function TRemoteUpdateCheck.Run: TRemoteUpdateCheckResult;
 begin
   Result := DoRun;
-
-  if Result in [ wucSuccess] then
-  begin
-    kmcom.Keyboards.Refresh;
-    kmcom.Keyboards.Apply;
-    kmcom.Packages.Refresh;
-  end;
-
   FRemoteResult := Result;
-end;
-
-
-procedure TRemoteUpdateCheck.DoDownloadUpdates(SavePath: string; Params: TUpdateCheckResponse; var Result: Boolean);
-var
-  i, downloadCount: Integer;
-  http: THttpUploader;
-  fs: TFileStream;
-
-    function DownloadFile(const url, savepath: string): Boolean;
-    begin
-      try
-        http := THttpUploader.Create(nil);
-        try
-          http.Proxy.Server := GetProxySettings.Server;
-          http.Proxy.Port := GetProxySettings.Port;
-          http.Proxy.Username := GetProxySettings.Username;
-          http.Proxy.Password := GetProxySettings.Password;
-          http.Request.Agent := API_UserAgent;
-
-          http.Request.SetURL(url);
-          http.Upload;
-          if http.Response.StatusCode = 200 then
-          begin
-            fs := TFileStream.Create(savepath, fmCreate);
-            try
-              fs.Write(http.Response.PMessageBody^, http.Response.MessageBodyLength);
-            finally
-              fs.Free;
-            end;
-            Result := True;
-          end
-          else // I2742
-            // If it fails we set to false but will try the other files
-            Result := False;
-            Exit;
-        finally
-          http.Free;
-        end;
-      except
-        on E:EHTTPUploader do
-        begin
-          if (E.ErrorCode = 12007) or (E.ErrorCode = 12029)
-            then LogMessage(S_OnlineUpdate_UnableToContact)
-            else LogMessage(WideFormat(S_OnlineUpdate_UnableToContact_Error, [E.Message]));
-          Result := False;
-        end;
-      end;
-    end;
-
-begin
-  Result := False;
-
-  FDownload.TotalSize := 0;
-  FDownload.TotalDownloads := 0;
-  downloadCount := 0;
-
-  // Keyboard Packages
-  for i := 0 to High(Params.Packages) do
-  begin
-    Inc(FDownload.TotalDownloads);
-    Inc(FDownload.TotalSize, Params.Packages[i].DownloadSize);
-    Params.Packages[i].SavePath := SavePath + Params.Packages[i].FileName;
-  end;
-
-  // Add the Keyman installer
-  Inc(FDownload.TotalDownloads);
-  Inc(FDownload.TotalSize, Params.InstallSize);
-
-  // Keyboard Packages
-  FDownload.StartPosition := 0;
-  for i := 0 to High(Params.Packages) do
-    begin
-      if not DownloadFile(Params.Packages[i].DownloadURL, Params.Packages[i].SavePath) then // I2742
-      begin
-        Params.Packages[i].Install := False; // Download failed but install other files
-      end
-      else
-        Inc(downloadCount);
-      FDownload.StartPosition := FDownload.StartPosition + Params.Packages[i].DownloadSize;
-    end;
-
-  // Keyman Installer
-  if not DownloadFile(Params.InstallURL, SavePath + Params.FileName) then  // I2742
-  begin
-    // TODO: #10210record fail? and log  // Download failed but user wants to install other files
-  end
-  else
-  begin
-    Inc(downloadCount)
-  end;
-
-  // There needs to be at least one file successfully downloaded to return
-  // True that files were downloaded
-  if downloadCount > 0 then
-    Result := True;
-end;
-
-function TRemoteUpdateCheck.DownloadUpdates(Params: TUpdateCheckResponse): Boolean;
-var
-  DownloadBackGroundSavePath : String;
-  DownloadResult : Boolean;
-begin
-  DownloadBackGroundSavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
-
-  DoDownloadUpdates(DownloadBackGroundSavePath, Params, DownloadResult);
-  KL.Log('TRemoteUpdateCheck.DownloadUpdatesBackground: DownloadResult = '+IntToStr(Ord(DownloadResult)));
-  Result := DownloadResult;
-
 end;
 
 function TRemoteUpdateCheck.DoRun: TRemoteUpdateCheckResult;
@@ -225,9 +116,9 @@ var
   i: Integer;
   ucr: TUpdateCheckResponse;
   pkg: IKeymanPackage;
-  downloadResult: boolean;
   registry: TRegistryErrorControlled;
   http: THttpUploader;
+  proceed : boolean;
 begin
   {FProxyHost := '';
   FProxyPort := 0;}
@@ -239,44 +130,13 @@ begin
     Exit;
   end;
 
-  { Verify that it has been at least 7 days since last update check }
-  try
-    registry := TRegistryErrorControlled.Create;  // I2890
-    try
-      if registry.OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
-      begin
-        if registry.ValueExists(SRegValue_CheckForUpdates) and not registry.ReadBool(SRegValue_CheckForUpdates) and not FForce then
-        begin
-          Result := wucNoUpdates;
-          Exit;
-        end;
-        if registry.ValueExists(SRegValue_LastUpdateCheckTime) and (Now - registry.ReadDateTime(SRegValue_LastUpdateCheckTime) < 7) and not FForce then
-        begin
-          Result := wucNoUpdates;
-          // TODO: #10210 This exit is just to remove the time check for testing.
-          //Exit;
-        end;
-
-        {if ValueExists(SRegValue_UpdateCheck_UseProxy) and ReadBool(SRegValue_UpdateCheck_UseProxy) then
-        begin
-          FProxyHost := ReadString(SRegValue_UpdateCheck_ProxyHost);
-          FProxyPort := StrToIntDef(ReadString(SRegValue_UpdateCheck_ProxyPort), 80);
-        end;}
-      end;
-    finally
-      registry.Free;
-    end;
-  except
-    { we will not run the check if an error occurs reading the settings }
-    on E:Exception do
+  proceed := ConfigCheckContinue;
+  if not proceed and not FForce then
     begin
-      Result := wucFailure;
-      FErrorMessage := E.Message;
+      Result :=  wucNoUpdates;
       Exit;
     end;
-  end;
 
-  Result := wucNoUpdates;
 
   try
     http := THTTPUploader.Create(nil);
@@ -313,25 +173,8 @@ begin
       begin
         if ucr.Parse(http.Response.MessageBodyAsString, 'bundle', CKeymanVersionInfo.Version) then
         begin
-          //ResponseToParams(ucr);
-
-          if FCheckOnly then
-          begin
-            TUpdateCheckStorage.SaveUpdateCacheData(ucr);
-            Result := FRemoteResult;
-          end
-          // TODO: ##10210
-          // Integerate into state machine. in the download state
-          // the process can call LoadUpdateCacheData if needed to get the
-          // response result.
-          else if (Length(ucr.Packages) > 0) or (ucr.InstallURL <> '') then
-          begin
-            downloadResult := DownloadUpdates(ucr);
-            if DownloadResult then
-            begin
-              Result := wucSuccess;
-            end;
-          end;
+          TUpdateCheckStorage.SaveUpdateCacheData(ucr);
+          Result := wucSuccess;
         end
         else
         begin
@@ -374,5 +217,38 @@ end;
  begin
    KL.Log(LogMessage);
  end;
+
+function ConfigCheckContinue: Boolean;
+var
+  registry: TRegistryErrorControlled;
+begin
+{ Verify that it has been at least CheckPeriod days since last update check }
+  Result := False;
+  try
+    registry := TRegistryErrorControlled.Create;   // I2890
+    try
+      if registry.OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
+      begin
+        if registry.ValueExists(SRegValue_CheckForUpdates) and not registry.ReadBool(SRegValue_CheckForUpdates) then
+        begin
+          Exit;
+        end;
+        if registry.ValueExists(SRegValue_LastUpdateCheckTime) and (Now - registry.ReadDateTime(SRegValue_LastUpdateCheckTime) > CheckPeriod) then
+        begin
+          Result := True;
+        end;
+      end;
+    finally
+      registry.Free;
+    end;
+  except
+    { we will not run the check if an error occurs reading the settings }
+    on E:Exception do
+    begin
+      Result := False;
+      LogMessage(E.Message);
+    end;
+  end;
+end;
 
 end.

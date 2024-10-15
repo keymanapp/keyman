@@ -113,6 +113,7 @@ type
     FCanUpgrade9: Boolean;
     FCanUpgrade10: Boolean;
     FCheckForUpdates: Boolean;
+    FAutomaticUpdates: Boolean;
     FStartAfterInstall: Boolean;
     FStartWithWindows: Boolean;
     FAutomaticallyReportUsage: Boolean;
@@ -523,7 +524,7 @@ begin
     SetupMSI; // I2644
 
     if GetRunTools.DoInstall(Handle, FStartAfterInstall, FStartWithWindows, FCheckForUpdates,
-      FInstallInfo.StartDisabled, FInstallInfo.StartWithConfiguration, FInstallDefaults,
+      FAutomaticUpdates, FInstallInfo.StartDisabled, FInstallInfo.StartWithConfiguration, FInstallDefaults,
       FAutomaticallyReportUsage, FContinueSetup) then
     begin
       if not Silent and not FStartAfterInstall then   // I2610
@@ -1032,6 +1033,7 @@ procedure TfrmRunDesktop.GetDefaultSettings; // I2651
 begin
   FStartWithWindows := True; // I2607
   FCheckForUpdates := True;  // I2609
+  FAutomaticUpdates := True;
 
   try
     with CreateHKCURegistry do  // I2749
@@ -1041,6 +1043,8 @@ begin
         FCheckForUpdates := ValueExists(SRegValue_CheckForUpdates) and ReadBool(SRegValue_CheckForUpdates);
         FStartWithWindows := ValueExists(SRegValue_UpgradeRunKeyman) or
           (OpenKeyReadOnly('\' + SRegKey_WindowsRun_CU) and ValueExists(SRegValue_WindowsRun_Keyman));
+        FAutomaticUpdates := not ValueExists(SRegValue_AutomaticUpdates) or ReadBool(SRegValue_AutomaticUpdates);
+
       end
       else if FCanUpgrade10 and OpenKeyReadOnly(SRegKey_KeymanEngine100_ProductOptions_Desktop_CU) then   // I4293
       begin
