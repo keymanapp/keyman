@@ -1,20 +1,8 @@
-(*
-  Name:             UpdateStateMachine
-  Copyright:        Copyright (C) SIL International.
-  Documentation:
-  Description:
-  Create Date:      2 Nov 2023
-
-  Modified Date:    2 Nov 2023
-  Authors:          rcruickshank
-  Related Files:
-  Dependencies:
-
-  Bugs:
-  Todo:
+{
+  Keyman is copyright (C) SIL Global. MIT License.
+  
   Notes: For the state diagram in mermaid ../BackgroundUpdateStateDiagram.md
-  History:
-*)
+}
 unit Keyman.System.UpdateStateMachine;
 
 interface
@@ -25,17 +13,17 @@ uses
   System.UITypes,
   System.IOUtils,
   System.Types,
+  System.TypInfo,
   Vcl.Forms,
-  TypInfo,
-  KeymanPaths,
-  utilkmshell,
 
   httpuploader,
+  KeymanPaths,
   Keyman.System.UpdateCheckResponse,
   Keyman.Configuration.UI.UfrmStartInstall,
   Keyman.Configuration.UI.UfrmStartInstallNow,
   Keyman.System.ExecutionHistory,
-  UfrmDownloadProgress;
+  UfrmDownloadProgress,
+  utilkmshell;
 
 const
   CheckPeriod: Integer = 7; // Days between checking for updates
@@ -82,11 +70,12 @@ type
     StartPosition: Integer;
   end;
 
-   // Forward declaration
-   TUpdateStateMachine = class;
-    { State Classes Update }
+  // Forward declaration
+  TUpdateStateMachine = class;
 
-   TStateClass = class of TState;
+  { State Classes Update }
+
+  TStateClass = class of TState;
 
   TState = class abstract
   private
@@ -282,9 +271,11 @@ type
   public
     constructor Create(AParams: TUpdateStateMachineParams);
     function Params: TUpdateStateMachineParams;
-  end;
-  // Private Utility functions
-  function ConfigCheckContinue: Boolean;
+end;
+
+// Private Utility functions
+function ConfigCheckContinue: Boolean;
+  
 implementation
 
 uses
@@ -305,7 +296,7 @@ uses
   Upload_Settings,
   utildir,
   utilexecute,
-  OnlineUpdateCheckMessages,    // todo create own messages
+  OnlineUpdateCheckMessages,    // TODO-WINDOWS-UPDATES: create own messages
   UfrmOnlineUpdateIcon,
   UfrmOnlineUpdateNewVersion,
   utilsystem,
@@ -372,10 +363,16 @@ begin
   StringList := TStringList.Create;
   try
     for i := 0 to High(FParams.Packages) do
+    begin
       if FParams.Packages[i].NewID <> '' then
+      begin
         StringList.Add(FParams.Packages[i].NewID+'='+FParams.Packages[i].ID);
+      end;
+    end;
     if StringList.Count > 0 then
+    begin
       StringList.SaveToFile(DownloadTempPath + SPackageUpgradeFileName);
+    end;
   finally
     StringList.Free;
   end;
@@ -538,12 +535,10 @@ begin
       begin
         if RegistryErrorControlled.ValueExists(SRegValue_CheckForUpdates) and not RegistryErrorControlled.ReadBool(SRegValue_CheckForUpdates) and not FForce then
         begin
-          Result := False;
           Exit;
         end;
         if RegistryErrorControlled.ValueExists(SRegValue_LastUpdateCheckTime) and (Now - RegistryErrorControlled.ReadDateTime(SRegValue_LastUpdateCheckTime) < 1) and not FForce then
         begin
-          Result := False;
           Exit;
         end;
         // Else Time to check for updates
@@ -1318,7 +1313,6 @@ begin
       begin
         if registry.ValueExists(SRegValue_CheckForUpdates) and not registry.ReadBool(SRegValue_CheckForUpdates) then
         begin
-          Result := False;
           Exit;
         end;
         if registry.ValueExists(SRegValue_LastUpdateCheckTime) and (Now - registry.ReadDateTime(SRegValue_LastUpdateCheckTime) > CheckPeriod) then

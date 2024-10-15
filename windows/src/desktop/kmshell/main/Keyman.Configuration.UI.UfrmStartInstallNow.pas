@@ -1,8 +1,9 @@
-﻿unit Keyman.Configuration.UI.UfrmStartInstallNow;
 {
-  Copyright:    © SIL Global.
-  // TODO: Localise all the labels and captions.
+  Keyman is copyright (C) SIL Global. MIT License.
+  
+  // TODO-WINDOWS-UPDATES: Localise all the labels and captions.
 }
+unit Keyman.Configuration.UI.UfrmStartInstallNow;
 interface
 
 uses
@@ -27,7 +28,7 @@ implementation
 {$R *.dfm}
 
 
-// TODO remove events as they are properties on the buttons
+// TODO-WINDOWS-UPDATES: remove events as they are properties on the buttons
 
 procedure TfrmStartInstallNow.cmdInstallClick(Sender: TObject);
 begin

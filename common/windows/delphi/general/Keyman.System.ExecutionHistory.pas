@@ -1,12 +1,12 @@
-unit Keyman.System.ExecutionHistory;
-
 {
-  Copyright:    © SIL Global.
+  Keyman is copyright (C) SIL Global. MIT License.
 
   This module provides functionality to track the execution state of the Keyman
   engine. It uses a global atom to record whether Keyman has started during the
   current session and checks if it has previously run.
 }
+unit Keyman.System.ExecutionHistory;
+
 
 interface
 
@@ -17,9 +17,11 @@ function RecordKeymanStarted : Boolean;
 function HasKeymanRun : Boolean;
 
 implementation
+
 uses
-  System.SysUtils,KLog,
-  Winapi.Windows;
+  System.SysUtils,
+  Winapi.Windows,
+  KLog;
 
 function RecordKeymanStarted : Boolean;
 var
