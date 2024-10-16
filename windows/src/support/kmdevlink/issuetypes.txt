@@ -1,0 +1,7 @@
+1=Bug (A functionality failure of any kind)
+2=Develop (Missing functionality)
+3=Edition (Functionality in wrong product edition)
+4=Polish (Minor change not impacting functionality)
+5=Question (Clarification required)
+6=Tweak (Minor change impacting functionality)
+7=Verify/Test (Verify that functionality is working as intended)
