@@ -9,5 +9,5 @@
     "rootDir": "./src"
   },
 
-  "include": [ "**/*.ts", "src/import/core/core.js" ],
+  "include": [ "**/*.ts", "src/import/core/km-core.js" ],
 }
