@@ -1,3 +1,7 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
+
 import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerMessageSpec as m, CompilerMessageDef as def, CompilerMessageSpecWithException } from "@keymanapp/developer-utils";
 
 const Namespace = CompilerErrorNamespace.PackageCompiler;
@@ -127,9 +131,7 @@ export class PackageCompilerMessages {
   static Hint_PackageContainsSourceFile = (o:{filename:string}) => m(this.HINT_PackageContainsSourceFile,
     `The source file ${def(o.filename)} should not be included in the package; instead include the compiled result.`);
 
-  static ERROR_InvalidPackageFile = SevError | 0x001E;
-  static Error_InvalidPackageFile = (o:{e:any}) => m(this.ERROR_InvalidPackageFile,
-    `Package source file is invalid: ${(o.e ?? 'unknown error').toString()}`);
+  // 0x001E was ERROR_InvalidPackageFile, now CommonTypesMessages.Error_InvalidPackageFile
 
   static ERROR_FileRecordIsMissingName = SevError | 0x001F;
   static Error_FileRecordIsMissingName = (o:{description:string}) => m(this.ERROR_FileRecordIsMissingName,
