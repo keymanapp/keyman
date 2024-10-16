@@ -107,6 +107,13 @@ const GENERATOR_OPTIONS: KeymanXMLOptionsBag = {
     textNodeName: '_',
     suppressEmptyNode: true,
   },
+  kps: {
+    attributeNamePrefix: '$',
+    ignoreAttributes: false,
+    format: true,
+    textNodeName: '_',
+    suppressEmptyNode: true,
+  },
 };
 
 /** wrapper for XML parsing support */

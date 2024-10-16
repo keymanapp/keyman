@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>15.0.266.0</KeymanDeveloperVersion>
+    <FileVersion>7.0</FileVersion>
+  </System>
+  <Options>
+    <ExecuteProgram></ExecuteProgram>
+    <ReadMeFile>readme.htm</ReadMeFile>
+    <GraphicFile>splash.gif</GraphicFile>
+    <WelcomeFile>welcome.htm</WelcomeFile>
+    <MSIFileName></MSIFileName>
+    <MSIOptions></MSIOptions>
+    <FollowKeyboardVersion/>
+  </Options>
+  <StartMenu>
+    <Folder></Folder>
+    <Items/>
+  </StartMenu>
+  <Info>
+    <Name URL="">Khmer Angkor</Name>
+    <Copyright URL="">© 2015-2022 SIL International</Copyright>
+    <Author URL="mailto:makara_sok@sil.org">Makara Sok</Author>
+    <Version URL=""></Version>
+    <WebSite URL="https://keyman.com/keyboards/khmer_angkor">https://keyman.com/keyboards/khmer_angkor</WebSite>
+  </Info>
+  <Files>
+    <File>
+      <Name>..\build\khmer_angkor.js</Name>
+      <Description>File khmer_angkor.js</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.js</FileType>
+    </File>
+    <File>
+      <Name>..\build\khmer_angkor.kvk</Name>
+      <Description>File khmer_angkor.kvk</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kvk</FileType>
+    </File>
+    <File>
+      <Name>..\build\khmer_angkor.kmx</Name>
+      <Description>Keyboard Khmer Angkor</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kmx</FileType>
+    </File>
+    <File>
+      <Name>welcome\keyboard_layout.png</Name>
+      <Description>File keyboard_layout.png</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.png</FileType>
+    </File>
+    <File>
+      <Name>welcome\welcome.htm</Name>
+      <Description>File welcome.htm</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.htm</FileType>
+    </File>
+    <File>
+      <Name>..\shared\fonts\khmer\mondulkiri\FONTLOG.txt</Name>
+      <Description>File FONTLOG.txt</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.txt</FileType>
+    </File>
+    <File>
+      <Name>..\shared\fonts\khmer\mondulkiri\Mondulkiri-R.ttf</Name>
+      <Description>Font Khmer Mondulkiri</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.ttf</FileType>
+    </File>
+    <File>
+      <Name>..\shared\fonts\khmer\mondulkiri\OFL.txt</Name>
+      <Description>File OFL.txt</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.txt</FileType>
+    </File>
+    <File>
+      <Name>..\shared\fonts\khmer\mondulkiri\OFL-FAQ.txt</Name>
+      <Description>File OFL-FAQ.txt</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.txt</FileType>
+    </File>
+    <File>
+      <Name>welcome\KAK_Documentation_EN.pdf</Name>
+      <Description>File KAK_Documentation_EN.pdf</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.pdf</FileType>
+    </File>
+    <File>
+      <Name>welcome\KAK_Documentation_KH.pdf</Name>
+      <Description>File KAK_Documentation_KH.pdf</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.pdf</FileType>
+    </File>
+    <File>
+      <Name>readme.htm</Name>
+      <Description>File readme.htm</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.htm</FileType>
+    </File>
+    <File>
+      <Name>welcome\image002.png</Name>
+      <Description>File image002.png</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.png</FileType>
+    </File>
+    <File>
+      <Name>..\shared\fonts\khmer\busrakbd\khmer_busra_kbd.ttf</Name>
+      <Description>Font KhmerBusraKbd</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.ttf</FileType>
+    </File>
+    <File>
+      <Name>splash.gif</Name>
+      <Description>File splash.gif</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.gif</FileType>
+    </File>
+  </Files>
+  <Keyboards>
+    <Keyboard>
+      <Name>Khmer Angkor</Name>
+      <ID>khmer_angkor</ID>
+      <Version>1.3</Version>
+      <OSKFont>..\shared\fonts\khmer\busrakbd\khmer_busra_kbd.ttf</OSKFont>
+      <DisplayFont>..\shared\fonts\khmer\mondulkiri\Mondulkiri-R.ttf</DisplayFont>
+      <Languages>
+        <Language ID="km">Central Khmer (Khmer, Cambodia)</Language>
+      </Languages>
+    </Keyboard>
+  </Keyboards>
+  <Strings/>
+</Package>
