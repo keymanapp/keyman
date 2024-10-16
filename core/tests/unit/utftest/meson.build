@@ -6,5 +6,5 @@
 
 e = executable('utftest', 'utftest.cpp',
                objects: lib.extract_objects('../../common/cpp/utfcodec.cpp'),
-               include_directories: [libsrc])
+               include_directories: [inc, libsrc])
 test('utftest', e)
