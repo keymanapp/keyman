@@ -136,7 +136,7 @@ mock_files = files(
 
 if cpp_compiler.get_id() == 'emscripten'
   host_links = ['--whole-archive', '-sALLOW_MEMORY_GROWTH=1', '-sMODULARIZE=1',
-    '-sEXPORT_ES6', '-sENVIRONMENT=webview',
+    '-sEXPORT_ES6', '-sENVIRONMENT=web,webview',
     '--emit-tsd', 'core-interface.d.ts', '-sERROR_ON_UNDEFINED_SYMBOLS=0']
 
   links += ['-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\',\'stringToNewUTF8\',\'wasmExports\']',
