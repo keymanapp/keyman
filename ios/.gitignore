@@ -3,6 +3,7 @@ DerivedData
 project.xcworkspace
 xcuserdata
 *.xcscheme
+!engine/KMEI/KeymanEngineCarthage.xcodeproj/xcshareddata/xcschemes/KeymanEngine.xcscheme
 build
 keyman/Keyman/KeymanEngine.framework
 samples/KMSample1/KeymanEngine.framework
