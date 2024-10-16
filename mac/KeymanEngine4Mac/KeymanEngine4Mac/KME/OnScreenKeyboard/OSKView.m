@@ -42,6 +42,12 @@
   return self;
 }
 
+- (NSString *)description {
+  NSString *format = @"<shiftState:%d oskShiftState:%d altState:%d oskAltState:%d ctrlState:%d oskCtrlState:%d>";
+  NSString *str = [NSString stringWithFormat:format, _shiftState, _oskShiftState, _altState, _oskAltState, _ctrlState, _oskCtrlState];
+  return str;
+}
+
 - (void)drawRect:(NSRect)rect {
   os_log_debug([KMELogs oskLog], "OSKView drawRect: %{public}@", NSStringFromRect(rect));
   
@@ -411,30 +417,38 @@
 - (void)keyAction:(id)sender {
   KeyView *keyView = (KeyView *)sender;
   NSUInteger keyCode = [keyView.key keyCode];
-  os_log_debug([KMELogs oskLog], "OSKView keyAction keyView: %{public}@", keyView);
+  os_log_debug([KMELogs oskLog], "OSKView keyAction, self: %{public}@, keyView: %{public}@", self, keyView);
   if (keyCode < 0x100) {
     NSRunningApplication *app = NSWorkspace.sharedWorkspace.frontmostApplication;
     pid_t processId = app.processIdentifier;
     CGEventSourceRef source = CGEventSourceCreate(kCGEventSourceStatePrivate);
     CGEventRef keyDownEvent = CGEventCreateKeyboardEvent(source, (CGKeyCode)keyCode, true);
     CGEventRef keyUpEvent = CGEventCreateKeyboardEvent(source, (CGKeyCode)keyCode, false);
+
+    // define user data as originating from the OSK
+    const int64_t OSK_EVENT_FLAG = 0x8000000000000000;
+    int64_t oskEventData = OSK_EVENT_FLAG;
+    
     if (self.shiftState || self.oskShiftState) {
-      CGEventSetFlags(keyDownEvent, CGEventGetFlags(keyDownEvent) | kCGEventFlagMaskShift);
-      CGEventSetFlags(keyUpEvent, CGEventGetFlags(keyUpEvent) | kCGEventFlagMaskShift);
+      oskEventData = oskEventData | kCGEventFlagMaskShift;
     }
     if (self.altState || self.oskAltState) {
-      CGEventSetFlags(keyDownEvent, CGEventGetFlags(keyDownEvent) | kCGEventFlagMaskAlternate);
-      CGEventSetFlags(keyUpEvent, CGEventGetFlags(keyUpEvent) | kCGEventFlagMaskAlternate);
+      oskEventData = oskEventData | MK_RIGHT_ALT_MASK;
     }
     if (self.ctrlState || self.oskCtrlState) {
-      CGEventSetFlags(keyDownEvent, CGEventGetFlags(keyDownEvent) | kCGEventFlagMaskControl);
-      CGEventSetFlags(keyUpEvent, CGEventGetFlags(keyUpEvent) | kCGEventFlagMaskControl);
+      oskEventData = oskEventData | kCGEventFlagMaskControl;
     }
+
+    CGEventSetIntegerValueField(keyDownEvent, kCGEventSourceUserData, oskEventData);
+
+    os_log_debug([KMELogs oskLog], "OSKView keyAction, keyDownEvent: %{public}@, modifier flags: 0x%llX", keyDownEvent, CGEventGetFlags(keyDownEvent));
+
     CGEventPostToPid(processId, keyDownEvent);
     CGEventPostToPid(processId, keyUpEvent);
-    CFRelease(source);
     CFRelease(keyDownEvent);
     CFRelease(keyUpEvent);
+    
+    CFRelease(source);
   }
   else {
     if (keyCode == MVK_LEFT_SHIFT || keyCode == MVK_RIGHT_SHIFT) {
@@ -448,6 +462,61 @@
     }
   }
 }
+
+/*
+- (void)sendModifierKeyDownEvents:(CGEventSourceRef)eventSource pid:(pid_t)processId {
+  os_log_debug([KMELogs oskLog], "OSKView sendModifierKeyDownEvents, self: %{public}@", self);
+  if (self.oskShiftState && !self.shiftState) {
+    os_log_debug([KMELogs oskLog], "OSKView, send Shift key down");
+    CGEventRef keyDownEvent = CGEventCreateKeyboardEvent(eventSource, (CGKeyCode)MVK_RIGHT_SHIFT, true);
+    CGEventPostToPid(processId, keyDownEvent);
+    CFRelease(keyDownEvent);
+  }
+  if (self.oskAltState && !self.altState) {
+    os_log_debug([KMELogs oskLog], "OSKView, send Alt key down");
+    CGEventRef keyDownEvent = CGEventCreateKeyboardEvent(eventSource, (CGKeyCode)MVK_RIGHT_ALT, true);
+    CGEventPostToPid(processId, keyDownEvent);
+    CFRelease(keyDownEvent);
+  }
+  if (self.oskCtrlState && !self.ctrlState) {
+    os_log_debug([KMELogs oskLog], "OSKView, send Ctrl key down");
+    CGEventRef keyDownEvent = CGEventCreateKeyboardEvent(eventSource, (CGKeyCode)MVK_RIGHT_CTRL, true);
+    CGEventPostToPid(processId, keyDownEvent);
+    CFRelease(keyDownEvent);
+  }
+}
+
+- (void)sendKeyEvents:(CGKeyCode)keyCode source:(CGEventSourceRef)eventSource pid:(pid_t)processId {
+  os_log_debug([KMELogs oskLog], "OSKView, sendKeyEvents");
+  CGEventRef keyDownEvent = CGEventCreateKeyboardEvent(eventSource, keyCode, true);
+  CGEventRef keyUpEvent = CGEventCreateKeyboardEvent(eventSource, keyCode, false);
+  CGEventPostToPid(processId, keyDownEvent);
+  CGEventPostToPid(processId, keyUpEvent);
+  CFRelease(keyDownEvent);
+  CFRelease(keyUpEvent);
+}
+
+- (void)sendModifierKeyUpEvents:(CGEventSourceRef)eventSource pid:(pid_t)processId {
+  if (self.oskShiftState && !self.shiftState) {
+    os_log_debug([KMELogs oskLog], "OSKView, send Shift key up");
+    CGEventRef keyUpEvent = CGEventCreateKeyboardEvent(eventSource, (CGKeyCode)MVK_RIGHT_SHIFT, false);
+    CGEventPostToPid(processId, keyUpEvent);
+    CFRelease(keyUpEvent);
+  }
+  if (self.oskAltState && !self.altState) {
+    os_log_debug([KMELogs oskLog], "OSKView, send Alt key up");
+    CGEventRef keyUpEvent = CGEventCreateKeyboardEvent(eventSource, (CGKeyCode)MVK_RIGHT_ALT, false);
+    CGEventPostToPid(processId, keyUpEvent);
+    CFRelease(keyUpEvent);
+  }
+  if (self.oskCtrlState && !self.ctrlState) {
+    os_log_debug([KMELogs oskLog], "OSKView, send Ctrl key up");
+    CGEventRef keyUpEvent = CGEventCreateKeyboardEvent(eventSource, (CGKeyCode)MVK_RIGHT_CTRL, false);
+    CGEventPostToPid(processId, keyUpEvent);
+    CFRelease(keyUpEvent);
+  }
+}
+*/
 
 - (void)handleKeyEvent:(NSEvent *)event {
   os_log_debug([KMELogs oskLog], "OSKView handleKeyEvent event.type: %lu", event.type);
@@ -467,7 +536,7 @@
 }
 
 - (void)setKeyLabels:(BOOL)shift alt:(BOOL)alt ctrl:(BOOL)ctrl {
-  os_log_debug([KMELogs keyLog], "OSKView setKeyLabels, shift: %d, alt: %d, ctrl: %d", shift, alt, ctrl);
+  os_log_debug([KMELogs oskLog], "OSKView setKeyLabels, shift: %d, alt: %d, ctrl: %d", shift, alt, ctrl);
   [self resetKeyLabels];
   NSMutableArray *mKeys = [[self keyTags] mutableCopy];
   NSArray *nkeys = [self.kvk keys];
