@@ -1,3 +1,7 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
+
 export { validateMITLicense } from './utils/validate-mit-license.js';
 export { KeymanSentry, SentryNodeOptions } from './utils/KeymanSentry.js';
 export { getOption, loadOptions, clearOptions } from './utils/options.js';
@@ -10,6 +14,8 @@ export { KeymanDeveloperProject, KeymanDeveloperProjectFile, KeymanDeveloperProj
 export { isValidEmail } from './is-valid-email.js';
 
 export * as KpsFile from './types/kps/kps-file.js';
+export { KpsFileReader } from './types/kps/kps-file-reader.js';
+export { KpsFileWriter } from './types/kps/kps-file-writer.js';
 
 export { default as KvksFileReader } from './types/kvks/kvks-file-reader.js';
 export { default as KvksFileWriter } from './types/kvks/kvks-file-writer.js';

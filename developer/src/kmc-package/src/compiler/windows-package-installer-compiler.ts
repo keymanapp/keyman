@@ -1,3 +1,7 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
+
 /**
  * Create a .exe installer that bundles one or more .kmp files, together with
  * setup.exe, keymandesktop.msi, and generates and includes a setup.inf also.
@@ -12,7 +16,7 @@
 
 import JSZip from 'jszip';
 import { KeymanFileTypes, KmpJsonFile } from "@keymanapp/common-types";
-import { CompilerCallbacks, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KpsFile } from '@keymanapp/developer-utils';
+import { CompilerCallbacks, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KpsFile, KpsFileReader } from '@keymanapp/developer-utils';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 import { KmpCompiler, KmpCompilerOptions } from "./kmp-compiler.js";
 import { PackageCompilerMessages } from "./package-compiler-messages.js";
@@ -112,9 +116,16 @@ export class WindowsPackageInstallerCompiler implements KeymanCompiler {
    */
   public async run(inputFilename: string, outputFilename?: string): Promise<WindowsPackageInstallerCompilerResult> {
     const sources = this.options.sources;
-    const kps = this.kmpCompiler.loadKpsFile(inputFilename);
+    const reader = new KpsFileReader(this.callbacks);
+    const data = this.callbacks.loadFile(inputFilename);
+    if(!data) {
+      this.callbacks.reportMessage(PackageCompilerMessages.Error_FileDoesNotExist({filename: inputFilename}));
+      return null;
+    }
+
+    const kps = reader.read(data);
     if(!kps) {
-      // errors will already have been reported by loadKpsFile
+      // errors will already have been reported by KpsFileReader
       return null;
     }
 
@@ -138,7 +149,7 @@ export class WindowsPackageInstallerCompiler implements KeymanCompiler {
     // Nor do we use the MSIOptions field.
 
     // Build the zip
-    const zipBuffer = await this.buildZip(kps, inputFilename, sources);
+    const zipBuffer = await this.buildZip(kps.Package, inputFilename, sources);
     if(!zipBuffer) {
       // Error messages already reported by buildZip
       return null;
