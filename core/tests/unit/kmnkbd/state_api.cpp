@@ -14,6 +14,7 @@
 #include "path.hpp"
 #include "state.hpp"
 #include "action_items.hpp"
+#include "mock/mock_processor.hpp"
 
 #include <test_assert.h>
 
@@ -52,7 +53,6 @@ constexpr char const *doc1_expected = u8"\
     \"$schema\" : \"keyman/core/doc/introspection.schema\",\n\
     \"keyboard\" : {\n\
         \"id\" : \"dummy\",\n\
-        \"folder\" : \"\",\n\
         \"version\" : \"3.145\",\n\
         \"rules\" : []\n\
     },\n\
@@ -78,7 +78,6 @@ constexpr char const *doc2_expected = u8"\
     \"$schema\" : \"keyman/core/doc/introspection.schema\",\n\
     \"keyboard\" : {\n\
         \"id\" : \"dummy\",\n\
-        \"folder\" : \"\",\n\
         \"version\" : \"3.145\",\n\
         \"rules\" : []\n\
     },\n\
@@ -112,7 +111,7 @@ int main(int argc, char * argv[])
   km_core_keyboard * test_kb = nullptr;
   km_core_state * test_state = nullptr,
                * test_clone = nullptr;
-  try_status(km_core_keyboard_load(km::core::path("dummy.mock").c_str(), &test_kb));
+  test_kb = (km_core_keyboard *)new km::core::mock_processor(km::core::path("dummy.mock"));
 
   // Simple sanity tests.
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));

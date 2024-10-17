@@ -2,9 +2,10 @@
 
 ///<reference lib="dom" />
 
-import { Keyboard, KeyboardHarness, KeyboardLoaderBase, KeyboardLoadErrorBuilder, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-
-import { ManagedPromise } from '@keymanapp/web-utils';
+import { default as Keyboard } from '../keyboard.js';
+import { KeyboardHarness, MinimalKeymanGlobal } from '../keyboardHarness.js';
+import { KeyboardLoaderBase } from '../keyboardLoaderBase.js';
+import { KeyboardLoadErrorBuilder } from '../keyboardLoadError.js';
 
 export class DOMKeyboardLoader extends KeyboardLoaderBase {
   public readonly element: HTMLIFrameElement;
@@ -28,54 +29,44 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
     this.performCacheBusting = cacheBust || false;
   }
 
-  protected loadKeyboardInternal(
-    uri: string,
-    errorBuilder: KeyboardLoadErrorBuilder,
-    id?: string
-  ): Promise<Keyboard> {
-    const promise = new ManagedPromise<Keyboard>();
-
-    if(this.performCacheBusting) {
+  protected async loadKeyboardBlob(uri: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Uint8Array> {
+    if (this.performCacheBusting) {
       uri = this.cacheBust(uri);
     }
 
+    let response: Response;
     try {
-      const document = this.harness._jsGlobal.document;
-      const script = document.createElement('script');
-      if(id) {
-        script.id = id;
-      }
-      document.head.appendChild(script);
-      script.onerror = (err: any) => {
-        promise.reject(errorBuilder.missingError(err));
-      }
-      script.onload = () => {
-        if(this.harness.loadedKeyboard) {
-          const keyboard = this.harness.loadedKeyboard;
-          this.harness.loadedKeyboard = null;
-          promise.resolve(keyboard);
-        } else {
-          promise.reject(errorBuilder.scriptError());
-        }
-      }
-
-      // On the oldest mobile devices we support, Promise.finally may not actually exist.
-      // Fortunately... it's not that hard of an issue to work around.
-      // Note:  es6-shim doesn't polyfill Promise.finally!
-      promise.then(() => {
-        // It is safe to remove the script once it has been run (https://stackoverflow.com/a/37393041)
-        script.remove();
-      }).catch(() => {
-        script.remove();
-      });
-
-      // Now that EVERYTHING ELSE is ready, establish the link to the keyboard's script.
-      script.src = uri;
-    } catch (err) {
-      return Promise.reject(err);
+      response = await fetch(uri);
+    } catch (e) {
+      throw errorBuilder.keyboardDownloadError(e);
     }
 
-    return promise.corePromise;
+    if (!response.ok) {
+      throw errorBuilder.keyboardDownloadError(new Error(`HTTP ${response.status} ${response.statusText}`));
+    }
+
+    let buffer: ArrayBuffer;
+    try {
+      buffer = await response.arrayBuffer();
+    } catch (e) {
+      throw errorBuilder.invalidKeyboard(e);
+    }
+    return new Uint8Array(buffer);
+  }
+
+  protected async loadKeyboardFromScript(script: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Keyboard> {
+    try {
+      this.evalScriptInContext(script, this.harness._jsGlobal);
+    } catch (e) {
+      throw errorBuilder.scriptError(e);
+    }
+    const keyboard = this.harness.loadedKeyboard;
+    if (!keyboard) {
+      throw errorBuilder.scriptError();
+    }
+
+    this.harness.loadedKeyboard = null;
+    return keyboard;
   }
 
   private cacheBust(uri: string) {
@@ -84,4 +75,14 @@ export class DOMKeyboardLoader extends KeyboardLoaderBase {
     // being ignored.
     return uri + "?v=" + (new Date()).getTime(); /*cache buster*/
   }
+
+  private evalScriptInContext(script: string, context: any) {
+    const f = function (s: string) {
+      // use indirect eval (eval?.() notation doesn't work because of esbuild bundling)
+      const evalFunc = eval;
+      return evalFunc(s);
+    }
+    f.call(context, script);
+  }
+
 }

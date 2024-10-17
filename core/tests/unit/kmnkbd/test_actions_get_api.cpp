@@ -15,6 +15,7 @@
 
 #include <test_assert.h>
 #include "../emscripten_filesystem.h"
+#include "../load_kmx_file.hpp"
 
 km_core_option_item test_env_opts[] =
 {
@@ -48,7 +49,8 @@ void setup(const km_core_cu *app_context, const km_core_cu *cached_context, int 
   teardown();
 
   km::core::path path = km::core::path::join(arg_path, "..", "ldml", "keyboards", "k_001_tiny.kmx");
-  try_status(km_core_keyboard_load(path.native().c_str(), &test_kb));
+  auto blob = km::tests::load_kmx_file(path.native().c_str());
+  try_status(km_core_keyboard_load_from_blob(path.stem().c_str(), blob.data(), blob.size(), &test_kb));
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
 
   try_status(set_context_from_string(km_core_state_context(test_state), cached_context));

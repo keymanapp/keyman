@@ -14,6 +14,7 @@
 
 #include <test_assert.h>
 #include "../emscripten_filesystem.h"
+#include "../load_kmx_file.hpp"
 
 const km_core_action_item alert_action_item();
 const km_core_action_item bksp_action_item(uint8_t type, uintptr_t value);
@@ -57,7 +58,9 @@ void setup(const char *keyboard, const km_core_cu* context) {
   teardown();
 
   km::core::path path = km::core::path::join(arg_path, keyboard);
-  try_status(km_core_keyboard_load(path.native().c_str(), &test_kb));
+
+  auto blob = km::tests::load_kmx_file(path.native().c_str());
+  try_status(km_core_keyboard_load_from_blob(path.stem().c_str(), blob.data(), blob.size(), &test_kb));
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
   try_status(context_items_from_utf16(context, &citems));
   try_status(km_core_context_set(km_core_state_context(test_state), citems));

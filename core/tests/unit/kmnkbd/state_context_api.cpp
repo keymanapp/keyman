@@ -5,8 +5,10 @@
 
 #include "context.hpp"
 #include "path.hpp"
+#include "mock/mock_processor.hpp"
 
 #include "../emscripten_filesystem.h"
+#include "../load_kmx_file.hpp"
 #include <test_assert.h>
 
 //-------------------------------------------------------------------------------------
@@ -41,7 +43,14 @@ setup(const char *keyboard, const km_core_cu *context, bool setup_app_context = 
   teardown();
 
   km::core::path path = km::core::path::join(arg_path, keyboard);
-  try_status(km_core_keyboard_load(path.native().c_str(), &test_kb));
+  auto blob = km::tests::load_kmx_file(path.native().c_str());
+  const auto mock_extension = ".mock";
+  if (strlen(keyboard) > strlen(mock_extension) && strcmp(keyboard + strlen(keyboard) - strlen(mock_extension), mock_extension) == 0) {
+    km::core::abstract_processor* kp = new km::core::mock_processor(keyboard);
+    test_kb = static_cast<km_core_keyboard*>(kp);
+  } else {
+    try_status(km_core_keyboard_load_from_blob(path.stem().c_str(), blob.data(), blob.size(), &test_kb));
+  }
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
   try_status(context_items_from_utf16(context, &citems));
   try_status(km_core_context_set(km_core_state_context(test_state), citems));

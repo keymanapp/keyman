@@ -54,7 +54,7 @@ private:
   KMX_DWORD m_modifiers = 0;
 
   /* File loading */
-  KMX_BOOL LoadKeyboard(km_core_path_name fileName, LPKEYBOARD *lpKeyboard);
+  KMX_BOOL LoadKeyboardFromBlob(PKMX_BYTE buf, size_t sz, LPKEYBOARD* lpKeyboard);
   KMX_BOOL VerifyKeyboard(PKMX_BYTE filebase, size_t sz);
   KMX_BOOL VerifyChecksum(PKMX_BYTE buf,  size_t sz);
 #ifdef KMX_64BIT
@@ -96,7 +96,7 @@ public:
   KMX_ProcessEvent();
   ~KMX_ProcessEvent();
 
-  KMX_BOOL Load(km_core_path_name keyboardName);
+  KMX_BOOL Load(PKMX_BYTE buf, size_t sz);
   KMX_BOOL ProcessEvent(km_core_state *state, KMX_UINT vkey, KMX_DWORD modifiers, KMX_BOOL isKeyDown);  // returns FALSE on error or key not matched
 
   KMX_Actions *GetActions();

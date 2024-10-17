@@ -22,7 +22,8 @@ builder_describe "Builds the Keyman Engine for Web's development & unit-testing 
   "--ci         Does nothing for this script" \
   ":bulk_rendering=testing/bulk_rendering   Builds the bulk-rendering tool used to validate changes to OSK display code" \
   ":recorder=testing/recorder               Builds the KMW recorder tool used for development of unit-test resources" \
-  ":sourcemap-root=building/sourcemap-root  Builds the sourcemap-cleaning tool used during minification of app/ builds"
+  ":sourcemap-root=building/sourcemap-root  Builds the sourcemap-cleaning tool used during minification of app/ builds" \
+  ":test-utils=testing/test-utils           Builds the test-utils module"
 
 builder_parse "$@"
 

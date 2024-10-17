@@ -14,6 +14,7 @@
 #include <test_assert.h>
 #include <test_color.h>
 #include "../emscripten_filesystem.h"
+#include "../load_kmx_file.hpp"
 #include "utfcodec.hpp"
 
 #include <map>
@@ -164,7 +165,8 @@ void test_imx_list(const km::core::path &source_file){
 
   km::core::path full_path = source_file;
 
-  try_status(km_core_keyboard_load(full_path.native().c_str(), &test_kb));
+  auto blob = km::tests::load_kmx_file(full_path.native().c_str());
+  try_status(km_core_keyboard_load_from_blob(full_path.stem().c_str(), blob.data(), blob.size(), &test_kb));
 
   // Setup state, environment
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
@@ -211,7 +213,8 @@ void test_queue_actions (const km::core::path &source_keyboard) {
 
   km::core::path full_path = source_keyboard;
 
-  try_status(km_core_keyboard_load(full_path.native().c_str(), &test_kb));
+  auto blob = km::tests::load_kmx_file(full_path.native().c_str());
+  try_status(km_core_keyboard_load_from_blob(full_path.stem().c_str(), blob.data(), blob.size(), &test_kb));
 
   // Setup state, environment
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
