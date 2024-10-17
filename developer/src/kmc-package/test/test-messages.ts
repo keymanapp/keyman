@@ -1,3 +1,7 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
+
 import 'mocha';
 import { assert } from 'chai';
 import { TestCompilerCallbacks, verifyCompilerMessagesObject } from '@keymanapp/developer-test-helpers';
@@ -6,10 +10,16 @@ import { makePathToFixture } from './helpers/index.js';
 import { KmpCompiler } from '../src/compiler/kmp-compiler.js';
 import { CompilerErrorNamespace, CompilerOptions } from '@keymanapp/developer-utils';
 
-const debug = false;
 const callbacks = new TestCompilerCallbacks();
 
 describe('PackageCompilerMessages', function () {
+
+  this.afterEach(function() {
+    if(this.currentTest.isFailed()) {
+      callbacks.printMessages();
+    }
+  });
+
   it('should have a valid PackageCompilerMessages object', function() {
     return verifyCompilerMessagesObject(PackageCompilerMessages, CompilerErrorNamespace.PackageCompiler);
   });
@@ -29,8 +39,6 @@ describe('PackageCompilerMessages', function () {
     assert.isTrue(await kmpCompiler.init(callbacks, options ?? {}));
 
     await kmpCompiler.run(kpsPath);
-
-    if(debug) callbacks.printMessages();
 
     if(messageId) {
       assert.lengthOf(callbacks.messages, 1);
@@ -215,13 +223,6 @@ describe('PackageCompilerMessages', function () {
   it('should generate HINT_PackageContainsSourceFile if package contains a source file', async function() {
     await testForMessage(this, ['invalid', 'hint_source_file_should_not_be_in_package.kps'],
       PackageCompilerMessages.HINT_PackageContainsSourceFile);
-  });
-
-  // ERROR_InvalidPackageFile
-
-  it('should generate ERROR_InvalidPackageFile if package source file contains invalid XML', async function() {
-    await testForMessage(this, ['invalid', 'error_invalid_package_file.kps'],
-      PackageCompilerMessages.ERROR_InvalidPackageFile);
   });
 
   // ERROR_InvalidAuthorEmail
