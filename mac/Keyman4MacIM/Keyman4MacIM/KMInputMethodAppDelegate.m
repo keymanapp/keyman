@@ -46,6 +46,8 @@ NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboard
 
 @interface KMInputMethodAppDelegate ()
 @property (nonatomic, strong) KMPackageReader *packageReader;
+@property BOOL receivedKeyDownFromOsk;
+@property NSEventModifierFlags oskEventModifiers;
 @end
 
 @implementation KMInputMethodAppDelegate
@@ -299,7 +301,8 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         break;
         
       case kCGEventKeyDown:
-        os_log_debug([KMLogs eventsLog], "Event tap keydown event, keyCode: %hu", sysEvent.keyCode);
+        appDelegate.receivedKeyDownFromOsk = NO;
+        os_log_debug([KMLogs eventsLog], "Event tap keydown event, keyCode: 0x%X (%d)", sysEvent.keyCode, sysEvent.keyCode);
         // Pass back low-level backspace events to the input method event handler
         // because some non-compliant apps do not allow us to see backspace events
         // that we have generated (and we need to see them, for serialization
@@ -313,7 +316,12 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         if(sysEvent.keyCode == 255) {
           os_log_debug([KMLogs eventsLog], "*** kKeymanEventKeyCode = 0xFF");
         } else {
-          os_log_debug([KMLogs eventsLog], "*** other: %d(%x)", (char) sysEvent.keyCode, sysEvent.keyCode);
+          if ([OSKView isOskKeyDownEvent:event]) {
+            NSEventModifierFlags oskEventModifiers = [OSKView extractModifierFlagsFromOskEvent:event];
+            appDelegate.receivedKeyDownFromOsk = YES;
+            appDelegate.oskEventModifiers = oskEventModifiers;
+            os_log_debug([KMLogs eventsLog], "*** keydown event received from OSK, modifiers: 0x%lX",(unsigned long)oskEventModifiers);
+          }
         }
         
         switch(sysEvent.keyCode) {
@@ -1231,8 +1239,19 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
 }
 
 - (NSEventModifierFlags) determineModifiers {
-  NSEventModifierFlags originalModifiers = self.currentModifiers;
-  return [self.modifierMapping adjustModifiers:originalModifiers];
+  NSEventModifierFlags modifierFlags = 0;
+  
+  if (self.receivedKeyDownFromOsk) {
+    modifierFlags = self.oskEventModifiers;
+    os_log_debug([KMLogs eventsLog], "--- use modifiers from OSK, oskEventModifiers: 0x%lX", (unsigned long)modifierFlags);
+    self.oskEventModifiers = 0;
+  } else {
+    NSEventModifierFlags originalModifiers = self.currentModifiers;
+    modifierFlags = [self.modifierMapping adjustModifiers:originalModifiers];
+    os_log_debug([KMLogs eventsLog], "--- use adjusted modifiers from current state: 0x%lX", (unsigned long)modifierFlags);
+  }
+  
+  return modifierFlags;
 }
 
 extern const CGKeyCode kProcessPendingBuffer;
