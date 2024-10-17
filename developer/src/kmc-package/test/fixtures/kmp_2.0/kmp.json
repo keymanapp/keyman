@@ -32,75 +32,75 @@
   "files": [
     {
       "name": "khmer_angkor.js",
-      "description": "File khmer_angkor.js"
+      "description": ""
     },
     {
       "name": "khmer_angkor.kvk",
-      "description": "File khmer_angkor.kvk"
+      "description": ""
     },
     {
       "name": "khmer_angkor.kmx",
-      "description": "Keyboard Khmer Angkor"
+      "description": ""
     },
     {
       "name": "keyboard_layout.png",
-      "description": "File keyboard_layout.png"
+      "description": ""
     },
     {
       "name": "welcome.htm",
-      "description": "File welcome.htm"
+      "description": ""
     },
     {
       "name": "FONTLOG.txt",
-      "description": "File FONTLOG.txt"
+      "description": ""
     },
     {
       "name": "Mondulkiri-R.ttf",
-      "description": "Font Khmer Mondulkiri"
+      "description": ""
     },
     {
       "name": "OFL.txt",
-      "description": "File OFL.txt"
+      "description": ""
     },
     {
       "name": "OFL-FAQ.txt",
-      "description": "File OFL-FAQ.txt"
+      "description": ""
     },
     {
       "name": "KAK_Documentation_EN.pdf",
-      "description": "File KAK_Documentation_EN.pdf"
+      "description": ""
     },
     {
       "name": "KAK_Documentation_KH.pdf",
-      "description": "File KAK_Documentation_KH.pdf"
+      "description": ""
     },
     {
       "name": "readme.htm",
-      "description": "File readme.htm"
+      "description": ""
     },
     {
       "name": "image002.png",
-      "description": "File image002.png"
+      "description": ""
     },
     {
       "name": "khmer_busra_kbd.ttf",
-      "description": "Font KhmerBusraKbd"
+      "description": ""
     },
     {
-      "description": "Font DejaVuSans",
+      "description": "",
       "name": "DejaVuSans.ttf"
     },
     {
       "name": "splash.gif",
-      "description": "File splash.gif"
+      "description": ""
     },
     {
       "name": "kmp.inf",
-      "description": "Package information"
+      "description": ""
     },
     {
       "name": "kmp.json",
-      "description": "Package information (JSON)"
+      "description": ""
     }
   ],
   "keyboards": [

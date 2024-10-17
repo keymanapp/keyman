@@ -31,11 +31,13 @@
   "dependencies": {
     "@keymanapp/common-types": "*",
     "@keymanapp/developer-utils": "*",
+    "follow-redirects": "^1.15.6",
     "jszip": "^3.7.0",
     "marked": "^7.0.0"
   },
   "devDependencies": {
     "@keymanapp/developer-test-helpers": "*",
+    "@types/follow-redirects": "^1.14.4",
     "@types/mocha": "^5.2.7",
     "@types/node": "^20.4.1",
     "c8": "^7.12.0",

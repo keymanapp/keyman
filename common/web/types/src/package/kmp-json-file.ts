@@ -44,7 +44,7 @@ export interface KmpJsonFileInfoItem {
 
 export interface KmpJsonFileContentFile {
   name: string;
-  description: string;
+  description?: string;
   copyLocation?: number;
 }
 
