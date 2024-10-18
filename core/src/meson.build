@@ -137,7 +137,7 @@ mock_files = files(
 if cpp_compiler.get_id() == 'emscripten'
   host_links = ['--whole-archive', '-sALLOW_MEMORY_GROWTH=1', '-sMODULARIZE=1',
     '-sEXPORT_ES6', '-sENVIRONMENT=web,webview',
-    '--emit-tsd', 'core-interface.d.ts', '-sERROR_ON_UNDEFINED_SYMBOLS=0']
+    '--emit-tsd', 'km-core-interface.d.ts', '-sERROR_ON_UNDEFINED_SYMBOLS=0']
 
   links += ['-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\',\'stringToNewUTF8\',\'wasmExports\']',
       # Forcing inclusion of debug symbols
@@ -174,7 +174,7 @@ pkg.generate(
 
 if cpp_compiler.get_id() == 'emscripten'
   # Build an executable
-  host = executable('core',
+  host = executable('km-core',
     cpp_args: defns,
     include_directories: inc,
     link_args: links + host_links,
