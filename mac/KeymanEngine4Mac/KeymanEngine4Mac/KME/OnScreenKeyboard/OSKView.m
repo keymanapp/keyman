@@ -532,12 +532,19 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
     nkeys = self.oskDefaultNKeys;
   
   WORD flags = 0;
-  if (shift)
+  if (shift) {
     flags |= KVKS_SHIFT;
-  if (alt)
-    flags |= KVKS_RALT;
-  if (ctrl)
+  }
+  if (alt) {
+    if (self.kvk.containsRightAltKeys) {
+      flags |= KVKS_RALT;
+    } else if (self.kvk.containsAltKeys) {
+      flags |= KVKS_ALT;
+    }
+  }
+  if (ctrl) {
     flags |= KVKS_RCTRL;
+  }
   
   NSString *ansiFont = [self ansiFont];
   NSString *unicodeFont = [self unicodeFont];

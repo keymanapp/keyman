@@ -52,14 +52,31 @@
     size = sizeof(keyCount);
     dataBuffer = [file readDataOfLength:size];
     [dataBuffer getBytes:&keyCount length:size];
-    
+  
+    _containsAltKeys = NO;
+    _containsLeftAltKeys = NO;
+    _containsRightAltKeys = NO;
+
     NSMutableArray *mKeys = [[NSMutableArray alloc] initWithCapacity:keyCount];
     for (int i = 0; i < keyCount; i++) {
-      [mKeys addObject:[KVKFile NKeyFromFile:file]];
+      NKey *key = [KVKFile NKeyFromFile:file];
+      if(key.shift & KVKS_ALT) {
+        _containsAltKeys = YES;
+      }
+      if(key.shift & KVKS_LALT) {
+        _containsLeftAltKeys = YES;
+      }
+      if(key.shift & KVKS_RALT) {
+        _containsRightAltKeys = YES;
+      }
+      [mKeys addObject:key];
     }
+
+    os_log_debug([KMELogs testLog], "KVKFile initWithFilePath, containsAltKeys:%d containsLeftAltKeys:%d containsRightAltKeys:%d", _containsAltKeys, _containsLeftAltKeys, _containsRightAltKeys);
     
     _keys = [NSArray arrayWithArray:mKeys];
     
+
     [file closeFile];
   }
   
@@ -146,7 +163,9 @@
     nkey.bitmap = [[NSImage alloc] initWithCGImage:imageRef size:NSMakeSize(CGImageGetWidth(imageRep.CGImage), CGImageGetHeight(imageRep.CGImage))];
     CGImageRelease(imageRef);
   }
-  
+ 
+  os_log_debug([KMELogs testLog], "KVKFile NKeyFromFile: %{public}@", nkey);
+
   return nkey;
 }
 
