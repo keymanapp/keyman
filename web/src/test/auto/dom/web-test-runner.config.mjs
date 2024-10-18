@@ -33,7 +33,7 @@ export default {
   nodeResolve: true,
   // Top-level, implicit 'default' group
   files: [
-    'src/test/auto/dom/test_init_check.spec.ts',
+    'web/src/test/auto/dom/test_init_check.spec.ts',
     // '**/*.spec.html'
   ],
   groups: [
@@ -41,50 +41,50 @@ export default {
       name: 'engine/attachment',
       // Relative, from the containing package.json
       files: [
-        'build/test/dom/cases/attachment/**/*.spec.html',
-        'build/test/dom/cases/attachment/**/*.spec.mjs'
+        'web/build/test/dom/cases/attachment/**/*.spec.html',
+        'web/build/test/dom/cases/attachment/**/*.spec.mjs'
       ]
     },
     {
       name: 'app/browser',
       // Relative, from the containing package.json
-      files: ['build/test/dom/cases/browser/**/*.spec.mjs']
+      files: ['web/build/test/dom/cases/browser/**/*.spec.mjs']
     },
     {
       name: 'engine/core-processor',
       // Relative, from the containing package.json
-      files: ['build/test/dom/cases/core-processor/**/*.spec.mjs']
+      files: ['web/src/test/auto/dom/cases/core-processor/*.spec.ts']
     },
     {
       name: 'engine/dom-utils',
       // Relative, from the containing package.json
-      files: ['build/test/dom/cases/dom-utils/**/*.spec.mjs']
+      files: ['web/build/test/dom/cases/dom-utils/**/*.spec.mjs']
     },
     {
       name: 'engine/element-wrappers',
       // Relative, from the containing package.json
-      files: ['build/test/dom/cases/element-wrappers/**/*.spec.mjs']
+      files: ['web/build/test/dom/cases/element-wrappers/**/*.spec.mjs']
     },
     {
       name: 'engine/gesture-processor',
       // Relative, from the containing package.json
       // Note: here we use the .spec.html file in the src directory!
-      files: ['src/test/auto/dom/cases/gesture-processor/**/*.spec.html']
+      files: ['web/src/test/auto/dom/cases/gesture-processor/**/*.spec.html']
     },
     {
       name: 'engine/keyboard',
       // Relative, from the containing package.json
-      files: ['build/test/dom/cases/keyboard/**/*.tests.mjs']
+      files: ['web/build/test/dom/cases/keyboard/**/*.tests.mjs']
     },
     {
       name: 'engine/keyboard-storage',
       // Relative, from the containing package.json
-      files: ['build/test/dom/cases/keyboard-storage/**/*.spec.mjs']
+      files: ['web/build/test/dom/cases/keyboard-storage/**/*.spec.mjs']
     },
     {
       name: 'engine/osk',
       // Relative, from the containing package.json
-      files: ['build/test/dom/cases/osk/**/*.spec.mjs']
+      files: ['web/build/test/dom/cases/osk/**/*.spec.mjs']
     }
   ],
   middleware: [
