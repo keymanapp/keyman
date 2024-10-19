@@ -1,0 +1,99 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<!DOCTYPE keyboard SYSTEM "file://localhost/System/Library/DTDs/KeyboardLayout.dtd">
+<!--Created by Ukelele version 396 on 2024-10-09 at 09:51 (CEST)-->
+<!--Last edited by Ukelele version 396 on 2024-10-09 at 10:10 (CEST)-->
+<keyboard group="126" id="-10249" name="Untitled" maxout="1">
+    <layouts>
+        <layout first="0" last="17" mapSet="ANSI" modifiers="Modifiers"/>
+        <layout first="18" last="18" mapSet="JIS" modifiers="Modifiers"/>
+        <layout first="20" last="23" mapSet="JIS" modifiers="Modifiers"/>
+        <layout first="30" last="30" mapSet="JIS" modifiers="Modifiers"/>
+        <layout first="33" last="33" mapSet="JIS" modifiers="Modifiers"/>
+        <layout first="36" last="36" mapSet="JIS" modifiers="Modifiers"/>
+        <layout first="194" last="194" mapSet="JIS" modifiers="Modifiers"/>
+        <layout first="197" last="197" mapSet="JIS" modifiers="Modifiers"/>
+        <layout first="200" last="201" mapSet="JIS" modifiers="Modifiers"/>
+        <layout first="206" last="207" mapSet="JIS" modifiers="Modifiers"/>
+    </layouts>
+    <modifierMap id="Modifiers" defaultIndex="0">
+        <keyMapSelect mapIndex="0">
+            <modifier keys=""/>
+        </keyMapSelect>
+        <keyMapSelect mapIndex="1">
+            <modifier keys="anyShift"/>
+        </keyMapSelect>
+        <keyMapSelect mapIndex="2">
+            <modifier keys="anyOption"/>
+        </keyMapSelect>
+        <keyMapSelect mapIndex="3">
+            <modifier keys="caps"/>
+        </keyMapSelect>
+        <keyMapSelect mapIndex="4">
+            <modifier keys="anyShift caps? anyOption"/>
+        </keyMapSelect>
+    </modifierMap>
+    <keyMapSet id="ANSI">
+        <!--BASE-->
+        <keyMap index="0">
+            <key code="0" output="a"/>
+            <key code="6" output="y"/>
+            <key code="8" output="c"/>
+            <key code="11" output="b"/>
+            <key code="12" output="q"/>
+            <key code="20" output="3"/>
+            <key code="27" output="ß"/>
+            <key code="47" output="."/>
+            <key code="126" output="&#x001E;"/>
+        </keyMap>
+        <!--SHIFT-->
+        <keyMap index="1">
+            <key code="0" output="A"/>
+            <key code="6" output="Y"/>
+            <key code="8" output="C"/>
+            <key code="11" output="B"/>
+            <key code="12" output="Q"/>
+            <key code="20" output="§"/>
+            <key code="27" output="?"/>
+            <key code="47" output=":"/>
+            <key code="126" output="&#x001E;"/>
+        </keyMap>
+        <!--OPT-->
+        <keyMap index="2">
+            <key code="0" output="☺"/>
+            <key code="6" output="›"/>
+            <key code="8" output=" "/>
+            <key code="11" output="‹"/>
+            <key code="12" output="@"/>
+            <key code="0" output="³"/>
+            <key code="27" output="\"/>          
+	        <key code="47" output="·"/>
+            <key code="126" output="&#x001E;"/>
+        </keyMap>
+        <!--CAPS-->
+        <keyMap index="3">
+            <key code="0" output="A"/>
+            <key code="6" output="Y"/>
+            <key code="8" output="C"/>
+            <key code="11" output="B"/>
+            <key code="12" output="Q"/>
+            <key code="20" output="3"/>
+            <key code="27" output="ß"/>
+            <key code="47" output=""/>
+            <key code="126" output="&#x001E;"/>
+        </keyMap>
+    </keyMapSet>
+    <keyMapSet id="JIS">
+        <keyMap index="0" baseMapSet="ANSI" baseIndex="0">
+            <key code="512" output=""/>
+        </keyMap>
+        <keyMap index="1" baseMapSet="ANSI" baseIndex="1">
+            <key code="512" output=""/>
+        </keyMap>
+        <keyMap index="2" baseMapSet="ANSI" baseIndex="2">
+            <key code="512" output=""/>
+        </keyMap>
+        <keyMap index="3" baseMapSet="ANSI" baseIndex="3">
+            <key code="512" output=""/>
+        </keyMap>
+    </keyMapSet>
+</keyboard>
