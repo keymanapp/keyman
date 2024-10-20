@@ -43,7 +43,6 @@
             <key code="20" output="3"/>
             <key code="27" output="ß"/>
             <key code="47" output="."/>
-            <key code="126" output="&#x001E;"/>
         </keyMap>
         <!--SHIFT-->
         <keyMap index="1">
@@ -55,7 +54,6 @@
             <key code="20" output="§"/>
             <key code="27" output="?"/>
             <key code="47" output=":"/>
-            <key code="126" output="&#x001E;"/>
         </keyMap>
         <!--OPT-->
         <keyMap index="2">
@@ -64,10 +62,9 @@
             <key code="8" output=" "/>
             <key code="11" output="‹"/>
             <key code="12" output="@"/>
-            <key code="0" output="³"/>
+            <key code="20" output="³"/>
             <key code="27" output="\"/>          
 	        <key code="47" output="·"/>
-            <key code="126" output="&#x001E;"/>
         </keyMap>
         <!--CAPS-->
         <keyMap index="3">
@@ -79,7 +76,6 @@
             <key code="20" output="3"/>
             <key code="27" output="ß"/>
             <key code="47" output=""/>
-            <key code="126" output="&#x001E;"/>
         </keyMap>
     </keyMapSet>
     <keyMapSet id="JIS">

@@ -29,11 +29,12 @@ describe('KeylayoutToKmnConverter', function() {
     });
 
 
-    // _S2 My tests...
+    // _S2 My tests... // later throws on NOT all elements loaded
     it('should throw on all elements loaded', async function () {
 
-      console.log('        ..................................................................................')
+      // some keys, no deadkeys
       const inputFilename  = makePathToFixture('../data/Mysample.keylayout');
+      // all keys, some deadkeys
       //const inputFilename  = makePathToFixture('../data/My_dk_Keyboard.keylayout');
 
       const outputFilename = makePathToFixture('../data/MyResult.kmn');
