@@ -31,7 +31,7 @@ namespace kmcmp {
     extern std::string messageFilename;
     extern int BeginLine[4];
     extern int CompileTarget;
-    extern KMX_BOOL FMnemonicLayout = FALSE;
+    extern KMX_BOOL FMnemonicLayout;
 }
 
 class CompilerTest : public testing::Test {
@@ -60,6 +60,7 @@ class CompilerTest : public testing::Test {
             kmcmp::BeginLine[BEGIN_NEWCONTEXT] = -1;
             kmcmp::BeginLine[BEGIN_POSTKEYSTROKE] = -1;
             kmcmp::CompileTarget = CKF_KEYMAN;
+            kmcmp::FMnemonicLayout = FALSE;
         }
 
         void initFileKeyboard(FILE_KEYBOARD &fk) {
