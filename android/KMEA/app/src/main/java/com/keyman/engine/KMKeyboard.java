@@ -366,9 +366,8 @@ final class KMKeyboard extends WebView {
 
   public void callJavascriptAfterLoad() {
     if(this.javascriptAfterLoad.size() > 0) {
-      // Don't call this WebView method on just ANY thread - run it on the main UI thread.
-      // https://stackoverflow.com/a/22611010
-      this.postDelayed(new Runnable() {
+      Handler handler = new Handler();
+      handler.postDelayed(new Runnable() {
         @Override
         public void run() {
           StringBuilder allCalls = new StringBuilder();
