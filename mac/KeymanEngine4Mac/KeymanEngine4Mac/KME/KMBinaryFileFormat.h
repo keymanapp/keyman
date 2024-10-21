@@ -209,7 +209,7 @@ struct COMP_KEY {
 #define KVKK_BITMAP             0x01
 #define KVKK_UNICODE            0x02
 
-// KVK shift flags
+// KVK modifier flags
 #define KVKS_NORMAL             0x00
 #define KVKS_SHIFT              0x01
 #define KVKS_CTRL               0x02

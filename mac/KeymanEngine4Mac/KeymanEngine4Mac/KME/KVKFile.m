@@ -52,14 +52,31 @@
     size = sizeof(keyCount);
     dataBuffer = [file readDataOfLength:size];
     [dataBuffer getBytes:&keyCount length:size];
-    
+  
+    _containsAltKeys = NO;
+    _containsLeftAltKeys = NO;
+    _containsRightAltKeys = NO;
+
     NSMutableArray *mKeys = [[NSMutableArray alloc] initWithCapacity:keyCount];
     for (int i = 0; i < keyCount; i++) {
-      [mKeys addObject:[KVKFile NKeyFromFile:file]];
+      NKey *key = [KVKFile NKeyFromFile:file];
+      if(key.modifierFlags & KVKS_ALT) {
+        _containsAltKeys = YES;
+      }
+      if(key.modifierFlags & KVKS_LALT) {
+        _containsLeftAltKeys = YES;
+      }
+      if(key.modifierFlags & KVKS_RALT) {
+        _containsRightAltKeys = YES;
+      }
+      [mKeys addObject:key];
     }
+
+    os_log_debug([KMELogs oskLog], "KVKFile initWithFilePath, containsAltKeys:%d containsLeftAltKeys:%d containsRightAltKeys:%d", _containsAltKeys, _containsLeftAltKeys, _containsRightAltKeys);
     
     _keys = [NSArray arrayWithArray:mKeys];
     
+
     [file closeFile];
   }
   
@@ -114,23 +131,23 @@
 + (NKey *)NKeyFromFile:(NSFileHandle *)file {
   NKey *nkey = [[NKey alloc] init];
   
-  Byte flags;
-  size_t size = sizeof(flags);
+  Byte typeFlags;
+  size_t size = sizeof(typeFlags);
   NSData *dataBuffer = [file readDataOfLength:size];
-  [dataBuffer getBytes:&flags length:size];
-  nkey.flags = flags;
+  [dataBuffer getBytes:&typeFlags length:size];
+  nkey.typeFlags = typeFlags;
   
-  WORD shift;
-  size = sizeof(shift);
+  WORD modifierFlags;
+  size = sizeof(modifierFlags);
   dataBuffer = [file readDataOfLength:size];
-  [dataBuffer getBytes:&shift length:size];
-  nkey.shift = shift;
+  [dataBuffer getBytes:&modifierFlags length:size];
+  nkey.modifierFlags = modifierFlags;
   
-  WORD vkey;
-  size = sizeof(vkey);
+  WORD keyCode;
+  size = sizeof(keyCode);
   dataBuffer = [file readDataOfLength:size];
-  [dataBuffer getBytes:&vkey length:size];
-  nkey.vkey = vkey;
+  [dataBuffer getBytes:&keyCode length:size];
+  nkey.keyCode = keyCode;
   
   nkey.text = [KVKFile NStringFromFile:file];
   
@@ -146,7 +163,9 @@
     nkey.bitmap = [[NSImage alloc] initWithCGImage:imageRef size:NSMakeSize(CGImageGetWidth(imageRep.CGImage), CGImageGetHeight(imageRep.CGImage))];
     CGImageRelease(imageRef);
   }
-  
+ 
+  os_log_debug([KMELogs oskLog], "KVKFile NKeyFromFile: %{public}@", nkey);
+
   return nkey;
 }
 
