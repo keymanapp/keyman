@@ -56,6 +56,10 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
     return fs.statSync(filename).size;
   }
 
+  isDirectory(filename: string): boolean {
+    return fs.statSync(filename)?.isDirectory();
+  }
+
   reportMessage(event: CompilerEvent): void {
     // console.log(event.message);
     this.messages.push(event);

@@ -71,7 +71,7 @@ export class KeymanDeveloperProject {
     return p.replace('$PROJECTPATH', this.projectPath);
   }
 
-  getOutputFilePath(type: KeymanFileTypes.Binary) {
+  resolveBuildPath(): string {
     // Roughly corresponds to Delphi TProject.GetTargetFileName
     let p = this.options.version == '1.0' ?
       this.options.buildPath || '$SOURCEPATH' :
@@ -86,6 +86,11 @@ export class KeymanDeveloperProject {
 
     p = this.resolveProjectPath(p);
 
+    return p;
+  }
+
+  getOutputFilePath(type: KeymanFileTypes.Binary) {
+    const p = this.resolveBuildPath();
     const f = this.callbacks.path.basename(this._projectFilename, KeymanFileTypes.Source.Project) + type;
     return this.callbacks.path.normalize(this.callbacks.path.join(p, f));
   }
