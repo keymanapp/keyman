@@ -12,6 +12,7 @@ import { TestKeymanSentry } from './util/TestKeymanSentry.js';
 import { exitProcess } from './util/sysexits.js';
 import { declareMessage } from './commands/messageCommand.js';
 import { kmcSentryOptions } from './util/kmcSentryOptions.js';
+import { declareConvert } from './commands/convert.js';
 
 await TestKeymanSentry.runTestIfCLRequested(kmcSentryOptions);
 if(KeymanSentry.isEnabled()) {
@@ -49,6 +50,7 @@ async function run() {
 
   declareBuild(program);
   declareAnalyze(program);
+  declareConvert(program);
   declareMessage(program);
 
   /* Future commands:
