@@ -30,11 +30,12 @@ builder_parse "$@"
 #-------------------------------------------------------------------------------------------------------------------
 
 do_test() {
+  # note: `export TEST_SAVE_ARTIFACTS=1` to save a copy of artifacts to temp path
   eslint .
   cd test
   tsc --build
   cd ..
-  readonly C8_THRESHOLD=30
+  readonly C8_THRESHOLD=70
   c8 -skip-full --reporter=lcov --reporter=text --lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD mocha "${builder_extra_params[@]}"
   builder_echo warning "Coverage thresholds are currently $C8_THRESHOLD%, which is lower than ideal."
   builder_echo warning "Please increase threshold in build.sh as test coverage improves."

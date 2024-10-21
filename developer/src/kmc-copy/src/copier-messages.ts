@@ -68,5 +68,43 @@ export class CopierMessages {
   static Info_WritingFile = (o:{filename: string}) => m(
     this.INFO_WritingFile,
     `Writing file ${def(o.filename)}`
-    );
+  );
+
+  static ERROR_CannotFindInputProject = SevError | 0x0009;
+  static Error_CannotFindInputProject = (o:{project:string}) => m(
+    this.ERROR_CannotFindInputProject,
+    `Could not find project file '${def(o.project)}'`
+  );
+
+  static WARN_FileNotFound = SevWarn | 0x000A;
+  static Warn_FileNotFound = (o:{filename: string, newFilename: string}) => m(
+    this.WARN_FileNotFound,
+    `The file '${def(o.filename)}' could not be found, skipping file copy. Any references have been updated to '${def(o.newFilename)}'.`
+  );
+
+  static WARN_NoWordlistsFound = SevWarn | 0x000B;
+  static Warn_NoWordlistsFound = (o:{filename: string}) => m(
+    this.WARN_NoWordlistsFound,
+    `No wordlists could be found in the lexical model source file '${def(o.filename)}'. The file may be too complex for kmc-copy to parse.`
+  );
+
+  static ERROR_PackageFileCouldNotBeRead = SevError | 0x000C;
+  static Error_PackageFileCouldNotBeRead = (o:{filename: string}) => m(
+    this.ERROR_PackageFileCouldNotBeRead,
+    `The package source file '${def(o.filename)}' could not be loaded. The file may have an invalid format.`
+  );
+
+  static ERROR_UnsupportedProjectVersion = SevError | 0x000D;
+  static Error_UnsupportedProjectVersion = (o:{filename: string, version: string}) => m(this.ERROR_UnsupportedProjectVersion,
+    `Project version ${def(o.version)} for '${def(o.filename)}' is not supported by this version of Keyman Developer.`);
+
+  static ERROR_InvalidProjectFile = SevError | 0x000E;
+  static Error_InvalidProjectFile = (o:{filename: string, message: string}) => m(
+    this.ERROR_InvalidProjectFile,
+    `Project file '${def(o.filename)}' is not valid: ${def(o.message)}`);
+
+  static ERROR_ProjectFileCouldNotBeRead = SevError | 0x000F;
+  static Error_ProjectFileCouldNotBeRead = (o:{filename: string}) => m(
+    this.ERROR_ProjectFileCouldNotBeRead,
+    `Project file '${def(o.filename)}' could not be read`);
 };
