@@ -14,6 +14,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe \
   "Build Keyman Engine for Android, Keyman for Android, and FirstVoices Android app." \
+  "@/resources/tools/check-markdown  test:help" \
   clean \
   configure \
   build \
@@ -23,6 +24,7 @@ builder_describe \
   --upload-sentry+ \
   ":engine=KMEA                             Keyman Engine for Android" \
   ":app=KMAPro                              Keyman for Android" \
+  ":help                                    Online documentation" \
   ":sample1=Samples/KMSample1               Sample app: KMSample1" \
   ":sample2=Samples/KMSample2               Sample app: KMSample2" \
   ":keyboardharness=Tests/KeyboardHarness   Test app: KeyboardHarness" \
@@ -42,4 +44,7 @@ if builder_start_action clean; then
   builder_finish_action success clean
 fi
 
-builder_run_child_actions configure build test publish
+builder_run_child_actions configure build test
+builder_run_action        test:help    check-markdown  "$KEYMAN_ROOT/android/docs/help"
+
+builder_run_child_actions publish

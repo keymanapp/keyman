@@ -14,7 +14,7 @@ export class KPJFileReader {
     let data: KPJFile;
 
     data = new KeymanXMLReader('kpj')
-      .parse(file.toString());
+      .parse(new TextDecoder().decode(file));
 
     data = this.boxArrays(data);
     if(data.KeymanDeveloperProject?.Files?.File?.length) {
