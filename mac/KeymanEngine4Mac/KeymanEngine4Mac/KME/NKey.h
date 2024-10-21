@@ -16,7 +16,7 @@
 
 @property (assign, nonatomic) Byte typeFlags;
 @property (assign, nonatomic) WORD modifierFlags;
-@property (assign, nonatomic) WORD vkey;
+@property (assign, nonatomic) WORD keyCode;
 @property (strong, nonatomic) NSString *text;
 @property (strong, nonatomic) NSImage *bitmap;
 
