@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.128 alpha 2024-10-14
+
+* docs(developer): add refs to Keyman MIME types (#12540)
+
 ## 18.0.127 alpha 2024-10-12
 
 * fix(developer): use TextDecoder to convert Uint8Array to string (#12537)
