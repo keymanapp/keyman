@@ -1816,20 +1816,12 @@ TEST_F(CompilerTest, GetXStringImpl_type_osb_test) {
     // u16cpy(str, u"[CTRLALT K_A]");
     // EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // virtual key, '_' bewteen modifier and key portion'
+    // virtual key, '_' between modifier and key portion', ERROR_InvalidToken
     // fileKeyboard.version = VERSION_90;
     // u16cpy(str, u"[CTRL_K_A]");
     // EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     // tstr_virtual_key_valid[2] = ISVIRTUALKEY | K_CTRLFLAG;
     // tstr_virtual_key_valid[3] = 256; //VK_MAX + 1
-    // std::cerr << "tstr_virtual_key_valid: ";
-    // for (int i=0; i<6; i++)
-    //     std::cerr << (int)tstr_virtual_key_valid[i] << ' ';
-    // std::cerr << std::endl;
-    // std::cerr << "tstr                  : ";
-    // for (int i=0; i<6; i++)
-    //     std::cerr << (int)tstr[i] << ' ';
-    // std::cerr << std::endl;
     // EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
     // EXPECT_EQ(0, msgproc_errors.size());
     // tstr_virtual_key_valid[3] = 65;
@@ -1925,6 +1917,27 @@ TEST_F(CompilerTest, GetXStringImpl_type_osb_test) {
     EXPECT_EQ(1, msgproc_errors.size());
     EXPECT_EQ(KmnCompilerMessages::WARN_VirtualCharKeyWithPositionalLayout, msgproc_errors[0].errorCode);
     msgproc_errors.clear();
+
+    // virtual key, not in VKeyNames, long, but not too long name, valid
+    fileKeyboard.version = VERSION_90;
+    u16cpy(str, u"[XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX]"); // SZMAX_VKDICTIONARYNAME - 1
+    EXPECT_EQ(SZMAX_VKDICTIONARYNAME - 1 + 2, u16len(str));
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    tstr_virtual_key_valid[2] = ISVIRTUALKEY;
+    tstr_virtual_key_valid[3] = 256; //VK_MAX + 1
+    EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
+    EXPECT_EQ(0, msgproc_errors.size());
+    tstr_virtual_key_valid[3] = 65;
+    fileKeyboard.cxVKDictionary = 0;
+    delete[] fileKeyboard.dpVKDictionary;
+    fileKeyboard.dpVKDictionary = nullptr;
+
+    // virtual key, not in VKeyNames, name too long, ERROR_InvalidToken
+    fileKeyboard.version = VERSION_90;
+    u16cpy(str, u"[XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX]"); // SZMAX_VKDICTIONARYNAME
+    EXPECT_EQ(SZMAX_VKDICTIONARYNAME + 2, u16len(str));
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
