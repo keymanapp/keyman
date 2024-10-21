@@ -60,13 +60,13 @@
     NSMutableArray *mKeys = [[NSMutableArray alloc] initWithCapacity:keyCount];
     for (int i = 0; i < keyCount; i++) {
       NKey *key = [KVKFile NKeyFromFile:file];
-      if(key.shift & KVKS_ALT) {
+      if(key.modifierFlags & KVKS_ALT) {
         _containsAltKeys = YES;
       }
-      if(key.shift & KVKS_LALT) {
+      if(key.modifierFlags & KVKS_LALT) {
         _containsLeftAltKeys = YES;
       }
-      if(key.shift & KVKS_RALT) {
+      if(key.modifierFlags & KVKS_RALT) {
         _containsRightAltKeys = YES;
       }
       [mKeys addObject:key];
@@ -135,13 +135,13 @@
   size_t size = sizeof(flags);
   NSData *dataBuffer = [file readDataOfLength:size];
   [dataBuffer getBytes:&flags length:size];
-  nkey.flags = flags;
+  nkey.typeFlags = flags;
   
   WORD shift;
   size = sizeof(shift);
   dataBuffer = [file readDataOfLength:size];
   [dataBuffer getBytes:&shift length:size];
-  nkey.shift = shift;
+  nkey.modifierFlags = shift;
   
   WORD vkey;
   size = sizeof(vkey);

@@ -14,8 +14,8 @@
 
 @interface NKey : NSObject
 
-@property (assign, nonatomic) Byte flags;
-@property (assign, nonatomic) WORD shift;
+@property (assign, nonatomic) Byte typeFlags;
+@property (assign, nonatomic) WORD modifierFlags;
 @property (assign, nonatomic) WORD vkey;
 @property (strong, nonatomic) NSString *text;
 @property (strong, nonatomic) NSImage *bitmap;
