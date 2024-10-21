@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.129 alpha 2024-10-21
+
+* chore(mac): support Xcode 16 build (#12554)
+
 ## 18.0.128 alpha 2024-10-14
 
 * docs(developer): add refs to Keyman MIME types (#12540)
