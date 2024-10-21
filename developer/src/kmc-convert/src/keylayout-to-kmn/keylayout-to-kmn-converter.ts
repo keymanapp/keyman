@@ -58,7 +58,7 @@ export class KeylayoutToKmnConverter {
   public read(filename: string):Uint8Array[] {
 /*
 -    // _S2 TODO and what about deadkeys???
--    // _S2 TODO use output ?  + [K_A] > 'a'   or    + [K_A] > U+0061
+-    // _S2 TODO which format to use in output ?  + [K_A] > 'a' (character code)  or    + [K_A] > U+0061 (virt Keycode)
 -    // _S2 which stores?
 -    // _S2 how to use names of shiftstates*/
 
@@ -121,7 +121,6 @@ public convert(inArray: any[]):any[] {
     outkeys_in_Layer[29] =  inArray[j][5];
     outkeys_in_Layer[38] =  inArray[j][6];
     outkeys_in_Layer[46] =  inArray[j][7];
-    outkeys_in_Layer[49] =  inArray[j][0];
 
     outArray[j] = outkeys_in_Layer
   }
