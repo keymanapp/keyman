@@ -1926,11 +1926,9 @@ TEST_F(CompilerTest, GetXStringImpl_type_osb_test) {
     tstr_virtual_key_valid[2] = ISVIRTUALKEY;
     tstr_virtual_key_valid[3] = 256; //VK_MAX + 1
     EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
-    EXPECT_EQ(0, msgproc_errors.size());
     tstr_virtual_key_valid[3] = 65;
     fileKeyboard.cxVKDictionary = 0;
-    delete[] fileKeyboard.dpVKDictionary;
-    fileKeyboard.dpVKDictionary = nullptr;
+    fileKeyboard.dpVKDictionary[0].szName[0] = 0;
 
     // virtual key, not in VKeyNames, name too long, ERROR_InvalidToken
     fileKeyboard.version = VERSION_90;
@@ -1938,6 +1936,39 @@ TEST_F(CompilerTest, GetXStringImpl_type_osb_test) {
     EXPECT_EQ(SZMAX_VKDICTIONARYNAME + 2, u16len(str));
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
+    // virtual key, not in VKeyNames, version too low, ERROR_InvalidToken (this should be ERROR_90FeatureOnlyVirtualKeyDictionary)
+    fileKeyboard.version = VERSION_80;
+    u16cpy(str, u"[abc]");
+    EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+
+    // virtual key, not in VKeyNames, valid
+    fileKeyboard.version = VERSION_90;
+    u16cpy(str, u"[abc]");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    tstr_virtual_key_valid[2] = ISVIRTUALKEY;
+    tstr_virtual_key_valid[3] = 256; //VK_MAX + 1
+    EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
+    EXPECT_EQ(0, u16cmp(u"abc", fileKeyboard.dpVKDictionary[0].szName));
+    tstr_virtual_key_valid[3] = 65;
+    fileKeyboard.cxVKDictionary = 0;
+    fileKeyboard.dpVKDictionary[0].szName[0] = 0;
+
+    // virtual key, not in VKeyNames, pre-existing name, valid
+    fileKeyboard.version = VERSION_90;
+    fileKeyboard.cxVKDictionary = 3;
+    u16cpy(fileKeyboard.dpVKDictionary[0].szName, u"abc");
+    u16cpy(fileKeyboard.dpVKDictionary[1].szName, u"def");
+    u16cpy(fileKeyboard.dpVKDictionary[2].szName, u"ghi");
+    u16cpy(str, u"[def]");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    tstr_virtual_key_valid[2] = ISVIRTUALKEY;
+    tstr_virtual_key_valid[3] = 257; //VK_MAX + 2
+    EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
+    tstr_virtual_key_valid[3] = 65;
+    fileKeyboard.cxVKDictionary = 0;
+    fileKeyboard.dpVKDictionary[0].szName[0] = 0;
+    fileKeyboard.dpVKDictionary[1].szName[0] = 0;
+    fileKeyboard.dpVKDictionary[2].szName[0] = 0;
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
