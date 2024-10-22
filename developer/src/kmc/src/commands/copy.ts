@@ -10,7 +10,6 @@ import { InfrastructureMessages } from '../messages/infrastructureMessages.js';
 import { BaseOptions } from '../util/baseOptions.js';
 import { exitProcess } from '../util/sysexits.js';
 import { CopierOptions, KeymanProjectCopier } from '@keymanapp/kmc-copy';
-import { CompilerCallbacks } from '@keymanapp/developer-utils';
 
 /* c8 ignore start */
 
@@ -20,28 +19,30 @@ export function declareCopy(program: Command) {
   command
     .description('Copy a Keyman keyboard or lexical model project')
     .option('-o, --out-path <path>', 'New name and path for project')
-    .option('-r, --rename', 'Rename instead of copying project')
+    // TODO-COPY .option('-r, --rename', 'Rename instead of copying project')
     .option('-n, --dry-run', 'Show what would happen, without making changes')
     .action(copyProject)
     .addHelpText('before', `
       <project> can be:
-      * a local folder (with a .kpj file in it), e.g. ./keyboards/khmer_angkor
       * a .kpj file, e.g. ./keyboards/khmer_angkor/khmer_angkor.kpj
-      * a cloud keyboard, e.g. cloud:release/k/khmer_angkor
-      * a GitHub repository, e.g. github:keyman-keyboards/khmer_angkor
+      * a local folder (with a .kpj file in it), e.g. ./keyboards/khmer_angkor
     `);
-}
+// TODO-COPY * a cloud keyboard, e.g. cloud:khmer_angkor
+// TODO-COPY * a GitHub repository, e.g. github:keyman-keyboards/khmer_angkor
+  }
 
 function commanderOptionsToCopierOptions(options: any): CopierOptions {
   const result: CopierOptions = {
     outPath: options.outPath,
-    rename: options.rename ?? false,
+    // TODO-COPY rename: options.rename ?? false,
     dryRun: options.dryRun ?? false,
   };
   return result;
 }
 
-async function copyProject(ids: string | string[], commander: any): Promise<never|void> {
+const MaxDryRunCopyLogMessages = 10000;
+
+async function copyProject(ids: string | string[], _options: any, commander: any): Promise<never|void> {
   const commanderOptions = commander.optsWithGlobals();
   const callbacks = new NodeCompilerCallbacks({logLevel: commanderOptions.logLevel ?? 'info'});
   if(!await doCopy(callbacks, ids, commanderOptions)) {
@@ -51,7 +52,7 @@ async function copyProject(ids: string | string[], commander: any): Promise<neve
 
 /* c8 ignore stop */
 
-async function doCopy(callbacks: CompilerCallbacks, sources: string | string[], commanderOptions: any): Promise<boolean> {
+async function doCopy(callbacks: NodeCompilerCallbacks, sources: string | string[], commanderOptions: any): Promise<boolean> {
   const source = sources;
 
   if(!source || typeof source != 'string') {
@@ -62,6 +63,17 @@ async function doCopy(callbacks: CompilerCallbacks, sources: string | string[], 
   }
 
   const options = commanderOptionsToCopierOptions(commanderOptions);
+
+  if(options.dryRun) {
+    // For dry run, we may need a lot of log messages, to show
+    // where all the files are copied to
+    callbacks.maxLogMessages = MaxDryRunCopyLogMessages;
+  }
+
+  if(!options.outPath) {
+    callbacks.reportMessage(InfrastructureMessages.Error_CopyRequiresOutPath());
+    return false;
+  }
 
   const copier = new KeymanProjectCopier();
   try {

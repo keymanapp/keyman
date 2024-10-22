@@ -249,7 +249,7 @@ describe('KeymanProjectCopier', function() {
       assert.isTrue(await copier.init(callbacks, {
         dryRun: false,
         outPath,
-        rename: false,
+        // TODO-COPY rename: false,
       }));
 
       const result = await copier.run(source + test.old_project);

@@ -152,5 +152,11 @@ export class InfrastructureMessages {
     this.ERROR_CopyRequiresSource,
     `The copy command requires a single 'source' parameter`
   );
+
+  static ERROR_CopyRequiresOutPath = SevError | 0x0022;
+  static Error_CopyRequiresOutPath = () => m(
+    this.ERROR_CopyRequiresOutPath,
+    `The copy command requires the --out-path, -o parameter`
+  );
  }
 

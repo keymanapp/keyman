@@ -37,6 +37,7 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
   messages: CompilerEvent[] = [];
   messageCount = 0;
   messageFilename: string = '';
+  maxLogMessages = MaxMessagesDefault;
 
   constructor(private options: CompilerCallbackOptions) {
     color.enabled = this.options.color ?? (supportsColor.stdout ? supportsColor.stdout.hasBasic : false);
@@ -161,17 +162,17 @@ export class NodeCompilerCallbacks implements CompilerCallbacks {
     // message emitted.
 
     this.messageCount++;
-    if(this.messageCount > MaxMessagesDefault) {
+    if(this.messageCount > this.maxLogMessages) {
       return;
     }
 
-    if(this.messageCount == MaxMessagesDefault) {
+    if(this.messageCount == this.maxLogMessages) {
       // We've hit our event limit so we'll suppress further messages, and emit
       // our little informational message so users know what's going on. Note
       // that this message will not be included in the this.messages array, and
       // that will continue to collect all messages; this only affects the
       // console emission of messages.
-      event = InfrastructureMessages.Info_TooManyMessages({count: MaxMessagesDefault});
+      event = InfrastructureMessages.Info_TooManyMessages({count: this.maxLogMessages});
       event.filename = this.messageFilename;
     }
 

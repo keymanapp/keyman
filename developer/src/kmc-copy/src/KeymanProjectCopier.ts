@@ -2,7 +2,6 @@
  * Keyman is copyright (C) SIL International. MIT License.
  *
  * Copy a keyboard or lexical model project
- * TODO-COPY: Rename in-place (no folder changes)
  */
 
 import { CompilerCallbacks, CompilerLogLevel, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KeymanDeveloperProject, KeymanDeveloperProjectOptions, KPJFileReader, KPJFileWriter, KpsFileReader, KpsFileWriter } from "@keymanapp/developer-utils";
@@ -10,78 +9,6 @@ import { KeymanFileTypes } from "@keymanapp/common-types";
 
 import { CopierMessages } from "./copier-messages.js";
 
-// TODO-COPY: implement kmc frontend: copy release/k/khmer_angkor -o release/m/marc_khmer
-
-
-// TODO-COPY: cleanup the docs below
-  /*
-
-     Files and file locations
-     ------------------------
-
-     Project folder is the one that contains .kpj file. It and subfolders are
-     considered 'special'.
-
-     * All source-type files explicitly referenced in .kpj will be copied to new
-       folder /source, and added to reference
-       - source-type files: kmn, kps, model.ts, xml (LDML)
-     * All subfiles referenced by .kmn, .model.ts will be copied to new folder
-       /source
-     * All other files in the project tree, if not already referenced, will be
-       copied to new folder
-     * All referenced files in .kmn, .kpj, .model.ts will be renamed /
-       moved as appropriate
-     * .kps references to other files will _not_ be modified. .kps references
-       to .kmx, .model.js, .js with corresponding .kmn, .xml, or .model.ts, will be
-       updated to point to build/
-     * .kpj options will be updated to use fixed source/ and build/ folders.
-
-  */
-
-    // TODO-COPY: watch out for file collisions when copying project files -- after renames
-
-    // ldml project
-    // .kpj {update .xml, .kps}
-    // .xml
-    // .kps {update .kmx, .kvk, Keyboards}
-
-    // all remaining files in the folder
-    // don't copy .kpj.user
-    // don't copy output path (per project)
-
-    // model project
-    // .kpj {update .model.ts, .model.kps}
-    // .model.ts
-    // .model.kps {update .model.js, Models}
-
-    // all remaining files in the folder
-    // don't copy .kpj.user
-    // don't copy output path (per project)
-
-    // phase 1: copy all files, unmodified, but with filenames transformed
-
-    // keyman project - any type
-    // .kpj {update .kps, .kmn}
-    // .kmn {update .kvks, .keyman-touch-layout, .ico?, kmwhelp, ...}
-    // .xml {no update required}
-    // .kvks {update kmn back-link?}
-    // .keyman-touch-layout
-    // .kps {update .kmx, .kvk, .js, .ico?, Keyboards}
-    // .ico {if matching id}
-    // .kpj {update .model.ts, .model.kps}
-    // .model.ts
-    // .model.kps {update .model.js, Models}
-
-    // all remaining files in the project (no unreferenced files?)
-    // don't copy .kpj.user
-    // don't copy output path (per project)
-
-
-    // When copying a project, we want to consider:
-    // a. 'source' file with matching ID in source/ subfolder --> rename, copy to source/ in target
-    // b. 'source' file with matching ID outside project tree --> copy to source/ in target
-    // c. other file in source/ subfolder --> keep in same location in target
-    // d. other file outside project tree --> move to source/ in target? (except fonts + related?)
 
 /**
  * @public
@@ -97,10 +24,11 @@ export interface CopierOptions /* not inheriting from CompilerBaseOptions */ {
    * output path where project folder will be created
    */
   outPath: string;
-  /**
-   * rename: rename existing files rather than copy
-   */
+  /*
+   * TODO-COPY rename: rename existing files rather than copy
+
   rename: boolean;
+  */
   /**
    * dryRun: show what would happen
    */
@@ -144,10 +72,57 @@ export class KeymanProjectCopier implements KeymanCompiler {
   outputId: string;
   outPath: string;
 
-  async init(callbacks: CompilerCallbacks, options: CopierOptions): Promise<boolean> {
+  public async init(callbacks: CompilerCallbacks, options: CopierOptions): Promise<boolean> {
     this.callbacks = callbacks;
     this.options = options;
     return true;
+  }
+
+  /**
+   * Copy a Keyman project. Returns an object containing binary
+   * artifacts on success. The files are passed in by name, and the compiler
+   * will use callbacks as passed to the {@link KeymanProjectCopier.init}
+   * function to read any input files by disk.
+   * @param   source  Source file or folder to copy. Can be a local file or folder, github:repo, or cloud:path/id
+   * @returns         Binary artifacts on success, null on failure.
+   */
+  public async run(source: string): Promise<CopierResult> {
+
+    if(!this.verifyOutputPath()) {
+      return null;
+    }
+
+    const { temp, projectSource } = await this.getSourceProject(source);
+    if(!projectSource) {
+      // error will have been raised in getSourceProject
+      return null;
+    }
+
+    // TODO-COPY: validate outputId is valid for the project type?
+    this.outputId = this.callbacks.path.basename(this.outPath);
+    this.sourceId = this.callbacks.path.basename(projectSource, '.kpj');
+
+    // copy project file
+    const project = this.loadProjectFromFile(projectSource);
+    if(!project) {
+      // loadProjectFromFile already reported errors
+      // TODO-COPY: cleanup temp
+      return null;
+    }
+
+    const result: CopierResult = { artifacts: {
+      'kmc-copy:outputPath': {
+        data: null,
+        filename: this.outPath
+      }
+    } };
+    const success = this.copyProjectFile(project, projectSource, this.outPath, projectSource, result);
+
+    if(temp) {
+      // TODO-COPY: this.cleanupTemp(temp);
+    }
+
+    return success ? result : null;
   }
 
   /**
@@ -155,7 +130,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
    * @param source
    * @returns   temp - path to temporary folder to be removed on success or failure, projectSource - path to kpj
    */
-  async getSourceProject(source: string): Promise<{temp: string, projectSource: string}> {
+  private async getSourceProject(source: string): Promise<{temp: string, projectSource: string}> {
     let temp: string = null, projectSource: string = null;
 
     if(source.startsWith('github:')) {
@@ -197,54 +172,11 @@ export class KeymanProjectCopier implements KeymanCompiler {
     return true;
   }
 
-  /**
-   * Copy a Keyman project. Returns an object containing binary
-   * artifacts on success. The files are passed in by name, and the compiler
-   * will use callbacks as passed to the {@link KeymanProjectCopier.init}
-   * function to read any input files by disk.
-   * @param   source  Source file or folder to copy. Can be a local file or folder, github:repo, or cloud:path/id
-   * @returns         Binary artifacts on success, null on failure.
-   */
-  async run(source: string): Promise<CopierResult> {
-
-    if(!this.verifyOutputPath()) {
-      return null;
-    }
-
-    const { temp, projectSource } = await this.getSourceProject(source);
-    if(!projectSource) {
-      // error will have been raised in getSourceProject
-      return null;
-    }
-
-    // TODO-COPY: validate outputId is valid for the project type?
-    this.outputId = this.callbacks.path.basename(this.outPath);
-    this.sourceId = this.callbacks.path.basename(projectSource, '.kpj');
-
-    // copy project file
-    const project = this.loadProjectFromFile(projectSource);
-    if(!project) {
-      // loadProjectFromFile already reported errors
-      // TODO-COPY: cleanup temp
-      return null;
-    }
-
-    const result: CopierResult = { artifacts: {
-      'kmc-copy:outputPath': {
-        data: null,
-        filename: this.outPath
-      }
-    } };
-    const success = this.copyProjectFile(project, projectSource, this.outPath, projectSource, result);
-
-    if(temp) {
-      // TODO-COPY: this.cleanupTemp(temp);
-    }
-
-    return success ? result : null;
-  }
-
-  copiers: {[index in KeymanFileTypes.Source]: (project: KeymanDeveloperProject, filename: string, outputPath: string, source: string, result: CopierResult) => boolean} = {
+  private copiers: {
+    [index in KeymanFileTypes.Source]: (
+      project: KeymanDeveloperProject, filename: string, outputPath: string, source: string, result: CopierResult
+    ) => boolean
+  } = {
     ".kpj": this.copyProjectFile.bind(this),
     ".kmn": this.copyKmnSourceFile.bind(this),
     ".kps": this.copyKpsSourceFile.bind(this),
@@ -254,7 +186,8 @@ export class KeymanProjectCopier implements KeymanCompiler {
     ".model.ts": this.copyModelTsSourceFile.bind(this),
   };
 
-  copyFolder(inputPath: string, outputPath: string, ignores: (string | RegExp)[], result: CopierResult) {
+  private copyFolder(inputPath: string, outputPath: string, ignores: (string | RegExp)[], result: CopierResult) {
+    // TODO-COPY: watch out for file collisions when copying project files -- after renames
     const files = this.callbacks.fs.readdirSync(inputPath);
     for(const file of files) {
       const fullPath = this.normalizePath(this.callbacks.path.join(inputPath, file));
@@ -275,7 +208,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
     }
   }
 
-  copyProjectFile(project: KeymanDeveloperProject, filename: string, outputPath: string, source: string, result: CopierResult): boolean {
+  private copyProjectFile(project: KeymanDeveloperProject, filename: string, outputPath: string, source: string, result: CopierResult): boolean {
     for(const file of project.files) {
       const copier = this.copiers[<KeymanFileTypes.Source> file.fileType] ?? this.copyGenericFile.bind(this);
 
@@ -306,7 +239,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
     return true;
   }
 
-  copyGenericFile(project: KeymanDeveloperProject, filename: string, outputPath: string, source: string, result: CopierResult): boolean {
+  private copyGenericFile(project: KeymanDeveloperProject, filename: string, outputPath: string, source: string, result: CopierResult): boolean {
     if(result.artifacts[filename]) {
       return true;
     }
@@ -337,11 +270,11 @@ export class KeymanProjectCopier implements KeymanCompiler {
     return true;
   }
 
-  copySourceFile(project: KeymanDeveloperProject, filename: string, outputPath: string, source: string, result: CopierResult): boolean {
+  private copySourceFile(project: KeymanDeveloperProject, filename: string, outputPath: string, source: string, result: CopierResult): boolean {
     return this.copyGenericFile(project, filename, this.callbacks.path.join(this.outPath, 'source'), source, result);
   }
 
-  copyModelTsSourceFile(project: KeymanDeveloperProject, filename: string, outputPath: string, source: string, result: CopierResult): boolean {
+  private copyModelTsSourceFile(project: KeymanDeveloperProject, filename: string, outputPath: string, source: string, result: CopierResult): boolean {
     if(!this.copySourceFile(project, filename, outputPath, source, result)) {
       return false;
     }
@@ -376,7 +309,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
     return true;
   }
 
-  copyKmnSourceFile(project: KeymanDeveloperProject, filename: string, outputPath: string, source: string, result: CopierResult): boolean {
+  private copyKmnSourceFile(project: KeymanDeveloperProject, filename: string, outputPath: string, source: string, result: CopierResult): boolean {
     if(!this.copySourceFile(project, filename, outputPath, source, result)) {
       return false;
     }
@@ -404,7 +337,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
     return true;
   }
 
-  copyKpsSourceFile(project: KeymanDeveloperProject, filename: string, outputPath: string, source: string, result: CopierResult): boolean {
+  private copyKpsSourceFile(project: KeymanDeveloperProject, filename: string, outputPath: string, source: string, result: CopierResult): boolean {
     if(!this.copySourceFile(project, filename, outputPath, source, result)) {
       return false;
     }
@@ -582,6 +515,12 @@ export class KeymanProjectCopier implements KeymanCompiler {
       return false;
     }
 
+    const pathsCreated: string[] = [];
+
+    if(this.options.dryRun) {
+      this.callbacks.reportMessage(CopierMessages.Info_DryRun({outPath: this.outPath}));
+    }
+
     for(const key of Object.keys(artifacts)) {
       const a = artifacts[key];
       if(a.data == null) {
@@ -593,8 +532,12 @@ export class KeymanProjectCopier implements KeymanCompiler {
       }
       const path = this.callbacks.path.dirname(a.filename);
       try {
-        this.callbacks.reportMessage(CopierMessages.Info_CreatingFolder({path}));
-        if(!this.options.dryRun) {
+        if(this.options.dryRun) {
+          if(!pathsCreated.includes(path)) {
+            this.callbacks.reportMessage(CopierMessages.Info_DryRunCreatingFolder({path}));
+            pathsCreated.push(path);
+          }
+        } else {
           this.callbacks.fs.mkdirSync(path, {recursive: true});
         }
       /* c8 ignore next 4 */
@@ -603,8 +546,9 @@ export class KeymanProjectCopier implements KeymanCompiler {
         return false;
       }
       try {
-        this.callbacks.reportMessage(CopierMessages.Info_WritingFile({filename:a.filename}));
-        if(!this.options.dryRun) {
+        if(this.options.dryRun) {
+          this.callbacks.reportMessage(CopierMessages.Info_DryRunWritingFile({filename:a.filename}));
+        } else {
           this.callbacks.fs.writeFileSync(a.filename, a.data);
         }
       } catch(e) {
