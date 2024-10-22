@@ -26,8 +26,6 @@ type
     cmdInstall: TButton;
     cmdLater: TButton;
     lblInstallUpdate: TLabel;
-    procedure cmdInstallClick(Sender: TObject);
-    procedure cmdLaterClick(Sender: TObject);
   private
   public
   end;
@@ -37,14 +35,5 @@ implementation
 
 {$R *.dfm}
 
-procedure TfrmStartInstall.cmdInstallClick(Sender: TObject);
-begin
-  ModalResult := mrOk;
-end;
-
-procedure TfrmStartInstall.cmdLaterClick(Sender: TObject);
-begin
-  ModalResult := mrCancel;
-end;
 
 end.

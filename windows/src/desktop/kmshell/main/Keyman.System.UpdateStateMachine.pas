@@ -1,6 +1,6 @@
 {
   Keyman is copyright (C) SIL Global. MIT License.
-  
+
   Notes: For the state diagram in mermaid ../BackgroundUpdateStateDiagram.md
 }
 unit Keyman.System.UpdateStateMachine;
@@ -24,9 +24,6 @@ uses
   Keyman.System.ExecutionHistory,
   UfrmDownloadProgress,
   utilkmshell;
-
-const
-  CheckPeriod: Integer = 7; // Days between checking for updates
 
 type
   EUpdateStateMachine = class(Exception);
@@ -234,7 +231,6 @@ type
       tempPath.
     }
     procedure SavePackageUpgradesToDownloadTempPath;
-    function checkUpdateSchedule : Boolean;
 
     function SetRegistryState (Update : TUpdateState): Boolean;
     function GetAutomaticUpdates: Boolean;
@@ -273,9 +269,6 @@ type
     function Params: TUpdateStateMachineParams;
 end;
 
-// Private Utility functions
-function ConfigCheckContinue: Boolean;
-  
 implementation
 
 uses
@@ -521,43 +514,6 @@ begin
   end;
 end;
 
-
-function TUpdateStateMachine.CheckUpdateSchedule: Boolean;
-var
-  RegistryErrorControlled :TRegistryErrorControlled;
-begin
-  try
-    Result := False;
-    RegistryErrorControlled := TRegistryErrorControlled.Create;
-
-    try
-      if RegistryErrorControlled.OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
-      begin
-        if RegistryErrorControlled.ValueExists(SRegValue_CheckForUpdates) and not RegistryErrorControlled.ReadBool(SRegValue_CheckForUpdates) and not FForce then
-        begin
-          Exit;
-        end;
-        if RegistryErrorControlled.ValueExists(SRegValue_LastUpdateCheckTime) and (Now - RegistryErrorControlled.ReadDateTime(SRegValue_LastUpdateCheckTime) < 1) and not FForce then
-        begin
-          Exit;
-        end;
-        // Else Time to check for updates
-        Result := True;
-      end;
-    finally
-      RegistryErrorControlled.Free;
-    end;
-  except
-    { we will not run the check if an error occurs reading the settings }
-    on E:Exception do
-    begin
-      Result := False;
-      FErrorMessage := E.Message;
-      Exit;
-    end;
-  end;
-end;
-
 function TUpdateStateMachine.GetState: TStateClass;
 begin
   Result := TStateClass(CurrentState.ClassType);
@@ -724,22 +680,20 @@ function IdleState.HandleKmShell;
 var
  CheckForUpdates: TRemoteUpdateCheck;
  UpdateCheckResult : TRemoteUpdateCheckResult;
-//const CheckPeriod: Integer = 7; // Days between checking for updates
 begin
-  // Check if auto updates enable and if scheduled time has expired
-  if ConfigCheckContinue then
+  // Remote manages the last check time therfore
+  // we will allow it to return early if it hasn't reached
+  // the configured time between checks.
+  CheckForUpdates := TRemoteUpdateCheck.Create(False);
+  try
+    UpdateCheckResult:= CheckForUpdates.Run;
+  finally
+    CheckForUpdates.Free;
+  end;
+  { Response OK and Update is available }
+  if UpdateCheckResult = wucSuccess then
   begin
-    CheckForUpdates := TRemoteUpdateCheck.Create(True);
-    try
-       UpdateCheckResult:= CheckForUpdates.Run;
-    finally
-      CheckForUpdates.Free;
-    end;
-    { Response OK and Update is available }
-    if UpdateCheckResult = wucSuccess then
-    begin
-      ChangeState(UpdateAvailableState);
-    end;
+    ChangeState(UpdateAvailableState);
   end;
   Result := kmShellContinue;
 end;
@@ -1297,46 +1251,6 @@ function PostInstallState.StateName;
 begin
 
   Result := 'PostInstallState';
-end;
-
-// Private Functions:
-function ConfigCheckContinue: Boolean;
-var
-  registry: TRegistryErrorControlled;
-begin
-{ Verify that it has been at least CheckPeriod days since last update check }
-  Result := False;
-  try
-    registry := TRegistryErrorControlled.Create;   // I2890
-    try
-      if registry.OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
-      begin
-        if registry.ValueExists(SRegValue_CheckForUpdates) and not registry.ReadBool(SRegValue_CheckForUpdates) then
-        begin
-          Exit;
-        end;
-        if registry.ValueExists(SRegValue_LastUpdateCheckTime) and (Now - registry.ReadDateTime(SRegValue_LastUpdateCheckTime) > CheckPeriod) then
-        begin
-          Result := True;
-        end
-        else
-        begin
-          Result := False;
-        end;
-        Exit;
-      end;
-    finally
-      registry.Free;
-    end;
-  except
-    { we will not run the check if an error occurs reading the settings }
-    on E:Exception do
-    begin
-      Result := False;
-      LogMessage(E.Message);
-      Exit;
-    end;
-  end;
 end;
 
 end.

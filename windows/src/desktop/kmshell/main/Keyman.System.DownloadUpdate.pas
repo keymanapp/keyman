@@ -7,9 +7,9 @@ interface
 uses
   System.Classes,
   System.SysUtils,
-  KeymanPaths,
   httpuploader,
   Keyman.System.UpdateCheckResponse,
+  KeymanPaths,
   OnlineUpdateCheck;
 
 const
@@ -59,19 +59,19 @@ implementation
 
 
 uses
+  System.StrUtils,
+  System.Types,
+  ErrorControlledRegistry,
   GlobalProxySettings,
-  KLog,
   keymanapi_TLB,
   KeymanVersion,
   Keyman.System.UpdateCheckStorage,
+  KLog,
   kmint,
-  ErrorControlledRegistry,
+  OnlineUpdateCheckMessages,
   RegistryKeys,
   Upload_Settings,
-  OnlineUpdateCheckMessages,
-  utilkmshell,
-  System.Types,
-  System.StrUtils;
+  utilkmshell;
 
  // TODO-WINDOWS-UPDATES: temp wrapper for converting showmessage to logs don't know where
  // if not using klog

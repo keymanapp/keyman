@@ -36,7 +36,8 @@ begin
 
   Result := False;
   UpdateStr := 'usPostInstall';
-  if RegOpenKeyEx(HKEY_LOCAL_MACHINE, PChar(SRegKey_KeymanEngine_CU), 0, KEY_ALL_ACCESS, hk) = ERROR_SUCCESS then
+
+  if RegCreateKeyEx(HKEY_CURRENT_USER, PChar(SRegKey_KeymanEngine_CU), 0, NULL, KEY_ALL_ACCESS, NULL, &hk, NULL) = ERROR_SUCCESS then
   begin
     try
       if RegSetValueEx(hk, PChar(SRegValue_Update_State), 0, REG_SZ, PWideChar(UpdateStr), Length(UpdateStr) * SizeOf(Char)) = ERROR_SUCCESS then
@@ -45,7 +46,7 @@ begin
       end
       else
       begin
-      // error log
+      // TODO-WINDOWS-UPDATES: error log
       end;
     finally
       RegCloseKey(hk);
@@ -53,7 +54,7 @@ begin
   end
   else
   begin
-   // TODO: couldn't open registry key
+   // TODO-WINDOWS-UPDATES: error log creating key
   end;
 end;
 
