@@ -13,13 +13,24 @@ import { CompilerErrorNamespace } from '@keymanapp/developer-utils';
 import { AbstractGenerator, GeneratorOptions } from '../src/abstract-generator.js';
 
 describe('GeneratorMessages', function () {
+  const callbacks = new TestCompilerCallbacks();
+
+  this.beforeEach(function() {
+    callbacks.clear();
+  });
+
+  this.afterEach(function() {
+    if(this.currentTest.isFailed()) {
+      callbacks.printMessages();
+    }
+  });
+
   it('should have a valid GeneratorMessages object', function() {
     return verifyCompilerMessagesObject(GeneratorMessages, CompilerErrorNamespace.Generator);
   });
 
   it('should generate ERROR_OutputPathAlreadyExists if output path already exists', async function () {
     const ag = new AbstractGenerator();
-    const callbacks = new TestCompilerCallbacks();
     const options: GeneratorOptions = {
       id: 'ERROR_OutputPathAlreadyExists',
       outPath: path.dirname(fileURLToPath(import.meta.url)),
@@ -28,7 +39,9 @@ describe('GeneratorMessages', function () {
     const dir = path.join(path.dirname(fileURLToPath(import.meta.url)), 'ERROR_OutputPathAlreadyExists');
     if(!fs.existsSync(dir))
       fs.mkdirSync(dir);
-    assert.isFalse(await ag.write({}));
+    assert.isFalse(await ag.write({
+      "kmc-generate:outputPath": {filename: dir, data: null}
+    }));
     assert.isTrue(callbacks.hasMessage(GeneratorMessages.ERROR_OutputPathAlreadyExists),
       `messageId ERROR_OutputPathAlreadyExists not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
 
@@ -37,13 +50,13 @@ describe('GeneratorMessages', function () {
 
   it('should generate ERROR_CannotWriteOutputFile if it cannot create a folder, e.g. invalid filename', async function () {
     const ag = new AbstractGenerator();
-    const callbacks = new TestCompilerCallbacks();
     const options: GeneratorOptions = {
       id: 'ERROR_CannotWriteOutputFile',
       outPath: path.dirname(fileURLToPath(import.meta.url)),
     };
     assert(await ag.init(callbacks, options));
     assert.isFalse(await ag.write({
+      "kmc-generate:outputPath": {filename: "", data: null},
       '.': {filename: '.', data: new Uint8Array([1,2,3])}
     }));
     assert.isTrue(callbacks.hasMessage(GeneratorMessages.ERROR_CannotWriteOutputFile),

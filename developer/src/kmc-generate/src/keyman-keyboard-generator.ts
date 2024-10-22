@@ -41,7 +41,7 @@ export class KeymanKeyboardGenerator extends BasicGenerator implements KeymanCom
   async run(): Promise<GeneratorResult> {
     this.preGenerate();
 
-    const artifacts: GeneratorArtifacts = {};
+    const artifacts: GeneratorArtifacts = this.defaultArtifacts();
 
     this.templatePath = 'kmn-keyboard';
 
