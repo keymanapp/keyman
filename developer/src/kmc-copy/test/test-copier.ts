@@ -16,6 +16,10 @@ import { makePathToFixture } from './helpers/index.js';
 const { TEST_SAVE_ARTIFACTS } = env;
 let outputRoot: string = '/an/imaginary/root/';
 
+function normalizeNewLine(s: string): string {
+  return s.replaceAll(/\r\n/g, '\n');
+}
+
 describe('KeymanProjectCopier', function() {
   const callbacks = new TestCompilerCallbacks();
 
@@ -135,14 +139,14 @@ describe('KeymanProjectCopier', function() {
         // vary depending on the file location
         const expected = fs.readFileSync(makePathToFixture('expected/khmer_angkor/khmer_angkor_2024.kmn'), 'utf-8');
         actual = actual.replace(/store\(&DISPLAYMAP\) '.+KbdKhmr.json'/, "store(&DISPLAYMAP) '.../KbdKhmr.json'");
-        assert.equal(actual, expected);
+        assert.equal(normalizeNewLine(actual), normalizeNewLine(expected));
       },
       'source/khmer_angkor.kps': (actual: string) => {
         // We need to strip out ../../.../kmc-copy/... generated path because it will
         // vary depending on the file location
         const expected = fs.readFileSync(makePathToFixture('expected/khmer_angkor/khmer_angkor_2024.kps'), 'utf-8');
         actual = actual.replace(/>.+kmc-copy\/test\/(.+)<\//g, '>.../$1</');
-        assert.equal(actual, expected);
+        assert.equal(normalizeNewLine(actual), normalizeNewLine(expected));
       },
     }
   },
@@ -287,7 +291,7 @@ describe('KeymanProjectCopier', function() {
           (<any>test.fixtures)[fixture](actual);
         } else {
           const expected = fs.readFileSync(makePathToFixture((<any>test.fixtures)[fixture]), 'utf-8');
-          assert.equal(expected, actual);
+          assert.equal(normalizeNewLine(expected), normalizeNewLine(actual));
         }
       }
     });
