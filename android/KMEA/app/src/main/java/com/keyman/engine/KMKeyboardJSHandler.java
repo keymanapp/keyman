@@ -211,7 +211,13 @@ public class KMKeyboardJSHandler {
             k.setShouldIgnoreTextChange(true);
             k.setShouldIgnoreSelectionChange(true);
           }
-          performLeftDeletions(ic, deleteLeft);
+          if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM &&
+              icText != null && icText.text != null && icText.text.length() == 0) {
+            // If no context left to delete, let the app handle the BACKSPACE
+            keyDownUp(KeyEvent.KEYCODE_DEL, 0);
+          } else {
+            performLeftDeletions(ic, deleteLeft);
+          }
         }
 
         // Perform right-deletions
