@@ -77,6 +77,17 @@
             <key code="27" output="ß"/>
             <key code="47" output=""/>
         </keyMap>
+        <!--anyShift caps? anyOption-->
+        <keyMap index="3">
+            <key code="0" output="A"/>
+            <key code="6" output="Y"/>
+            <key code="8" output="C"/>
+            <key code="11" output="B"/>
+            <key code="12" output="Q"/>
+            <key code="20" output="3"/>
+            <key code="27" output="ß"/>
+            <key code="47" output=""/>
+        </keyMap>
     </keyMapSet>
     <keyMapSet id="JIS">
         <keyMap index="0" baseMapSet="ANSI" baseIndex="0">
