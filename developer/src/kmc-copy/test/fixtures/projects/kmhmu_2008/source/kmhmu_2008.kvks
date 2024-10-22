@@ -1,0 +1,197 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<visualkeyboard>
+  <header>
+    <version>10.0</version>
+    <kbdname>kmhmu_2008</kbdname>
+    <flags>
+      <displayunderlying/>
+      <usealtgr/>
+    </flags>
+  </header>
+  <encoding name="unicode" fontname="Kmhmu MX" fontsize="12">
+    <layer shift="S">
+      <key vkey="K_SPACE"></key>
+      <key vkey="K_1">1</key>
+      <key vkey="K_QUOTE">=</key>
+      <key vkey="K_3">3</key>
+      <key vkey="K_4">4</key>
+      <key vkey="K_5">໌ </key>
+      <key vkey="K_7">5</key>
+      <key vkey="K_9">7</key>
+      <key vkey="K_0">8</key>
+      <key vkey="K_8">6</key>
+      <key vkey="K_EQUAL">ໍ່</key>
+      <key vkey="K_COLON">%</key>
+      <key vkey="K_COMMA">ໝ</key>
+      <key vkey="K_PERIOD">$</key>
+      <key vkey="K_SLASH">)</key>
+      <key vkey="K_2">2</key>
+      <key vkey="K_A">ັ້</key>
+      <key vkey="K_B">ຶ້</key>
+      <key vkey="K_C">ຯ</key>
+      <key vkey="K_D">.</key>
+      <key vkey="K_E">້ຳ</key>
+      <key vkey="K_F">,</key>
+      <key vkey="K_G">:</key>
+      <key vkey="K_H">໊</key>
+      <key vkey="K_I">ຮ</key>
+      <key vkey="K_J">໋</key>
+      <key vkey="K_K">!</key>
+      <key vkey="K_L">?</key>
+      <key vkey="K_M">ໆ</key>
+      <key vkey="K_N">ື້</key>
+      <key vkey="K_O">ໜ</key>
+      <key vkey="K_P">ຽ</key>
+      <key vkey="K_Q">ົ້</key>
+      <key vkey="K_R">_</key>
+      <key vkey="K_S">;</key>
+      <key vkey="K_T">+</key>
+      <key vkey="K_U">ຍ໌ </key>
+      <key vkey="K_V">x</key>
+      <key vkey="K_W">0</key>
+      <key vkey="K_X">(</key>
+      <key vkey="K_Y">ກ໌ </key>
+      <key vkey="K_Z">"</key>
+      <key vkey="K_6">ຼ </key>
+      <key vkey="K_HYPHEN">9</key>
+      <key vkey="K_LBRKT">-</key>
+      <key vkey="K_RBRKT">ຫຼ</key>
+      <key vkey="K_BKQUOTE">/</key>
+      <key vkey="K_BKSLASH">
+        <bitmap>Qk02DgAAAAAAADYAAAAoAAAAIAAAABwAAAABACAAAAAAAAAOAAAAAAAAAAAAAAAAAAAAAAAA////
+AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A
+////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD/
+//8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//
+/wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////
+AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A
+////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD/
+//8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//
+/wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////
+AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A
+////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD/
+//8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//
+/wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////
+AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A
+////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD/
+//8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//
+/wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////
+AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A
+////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD/
+//8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//
+/wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////
+AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A
+////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD/
+//8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//
+/wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////
+AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A
+////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD/
+//8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//
+/wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////
+AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A
+////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD/
+//8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//
+/wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////
+AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A
+////AP///wD///8A////AP///wD///8A////AP///wD///8AAAAAAP///wD///8A////AP///wCw
+sLAAAAAAAP///wD///8AAAAAAAAAAAAAAAAAAAAAABQUFAB0dHQA/Pz8AP///wD///8ApKSkACgo
+KAAAAAAAGBgYAIiIiAD///8A////AAAAAAD///8A////AP///wD///8A////AP///wAAAAAA////
+AP///wD///8A////ADQ0NAAAAAAA////AP///wAAAAAA////AP///wD///8A7OzsAFBQUACIiIgA
+////ALi4uAB4eHgA3NzcAP///wDk5OQAZGRkAIyMjAD///8AAAAAAP///wD///8A////AP///wD/
+//8A////AAAAAAD///8A////AP///wC4uLgAYGBgAAAAAAD///8A////AAAAAAD///8A////AP//
+/wD///8A3NzcACwsLAD///8APDw8AOjo6AD///8A////AP///wD09PQAICAgAP///wAAAAAA////
+AP///wD///8A////AP///wD///8AAAAAAP///wD///8A////AEBAQADQ0NAAAAAAAP///wD///8A
+AAAAAP///wD///8A////AP///wD///8AAAAAAP///wAICAgA////AP///wD///8A////AP///wAA
+AAAA////AAAAAAD///8A////AP///wD///8A////AP///wAAAAAA////AP///wDAwMAAUFBQAP//
+/wAAAAAA////AP///wAAAAAA////AP///wD///8A////APj4+AAEBAQA////AP///wD///8A////
+AP///wD///8AtLS0ACwsLAD///8AAAAAAP///wD///8A////AP///wD///8A////AAAAAAD///8A
+////AERERADQ0NAA////AAAAAAD///8A////AAAAAAD///8A////AP///wD09PQAjIyMADQ0NAD/
+//8A////AP///wDQ0NAAkJCQADw8PAAAAAAArKysAP///wAAAAAAAAAAAAAAAAAAAAAAGBgYAHR0
+dAD8/PwAAAAAAP///wDQ0NAAREREAP///wD///8AAAAAAP///wD///8AAAAAAAAAAAAAAAAAAAAA
+AAAAAAAEBAQAuLi4AP///wD///8AZGRkABwcHAB0dHQAsLCwAMTExAD///8A////AAAAAAD///8A
+////AP///wD09PQAfHx8AICAgAAAAAAA////AFBQUADAwMAA////AP///wAAAAAA////AP///wAA
+AAAA////AP///wD///8A8PDwAGhoaACAgIAA////AIyMjABgYGAA/Pz8AP///wD///8A////AP//
+/wD///8AAAAAAP///wD///8A////AP///wDw8PAAICAgAAAAAADQ0NAAQEBAAP///wD///8A////
+AAAAAAD///8A////AAAAAAD///8A////AP///wD///8A9PT0ABgYGAD///8ACAgIANzc3AD///8A
+////AP///wD///8A////AP///wAAAAAA////AP///wD///8A////AP///wAAAAAAAAAAAGBgYAC4
+uLgA////AP///wD///8AAAAAAP///wD///8AAAAAAP///wD///8A////AP///wD09PQABAQEAP//
+/wAUFBQA+Pj4AP///wD///8A////AOzs7AAQEBAA////AAAAAAD///8A////AP///wD///8A////
+ABgYGAAAAAAANDQ0AP///wD///8A////AP///wAAAAAA////AP///wAAAAAA////AP///wD///8A
+7OzsAGhoaABUVFQA////AHh4eACAgIAA8PDwAP///wDw8PAAeHh4AHR0dAD///8AAAAAAP///wD/
+//8A////APT09ACQkJAAcHBwAAAAAACwsLAA////AP///wD///8A////AAAAAAD///8A////AAAA
+AAAAAAAAAAAAAAAAAAAMDAwAWFhYAOjo6AD///8A/Pz8AHh4eAAYGBgAAAAAACAgIAB8fHwA/Pz8
+AP///wAAAAAAAAAAAAAAAAAAAAAADAwMAFhYWAD09PQA////AP///wD///8A////AP///wD///8A
+////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD/
+//8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wA=</bitmap>
+      </key>
+    </layer>
+    <layer shift="LC">
+      <key vkey="K_SPACE"> </key>
+    </layer>
+    <layer shift="RC">
+      <key vkey="K_SPACE"> </key>
+    </layer>
+    <layer shift="">
+      <key vkey="K_QUOTE">ງ</key>
+      <key vkey="K_COMMA">ມ</key>
+      <key vkey="K_HYPHEN">ຊ</key>
+      <key vkey="K_PERIOD">ໃ</key>
+      <key vkey="K_SLASH">ຝ</key>
+      <key vkey="K_0">ຂ</key>
+      <key vkey="K_1">ຢ</key>
+      <key vkey="K_2">ຟ</key>
+      <key vkey="K_3">ໂ</key>
+      <key vkey="K_4">ຖ</key>
+      <key vkey="K_5">ຸ</key>
+      <key vkey="K_6">ູ</key>
+      <key vkey="K_7">ຄ</key>
+      <key vkey="K_8">ຕ</key>
+      <key vkey="K_9">ຈ</key>
+      <key vkey="K_COLON">ວ</key>
+      <key vkey="K_EQUAL">ໍ</key>
+      <key vkey="K_LBRKT">ບ</key>
+      <key vkey="K_RBRKT">ລ</key>
+      <key vkey="K_BKQUOTE">*</key>
+      <key vkey="K_A">ັ</key>
+      <key vkey="K_B">ຶ</key>
+      <key vkey="K_C">ແ</key>
+      <key vkey="K_D">ກ</key>
+      <key vkey="K_E">ຳ</key>
+      <key vkey="K_F">ດ</key>
+      <key vkey="K_G">ເ</key>
+      <key vkey="K_H">້</key>
+      <key vkey="K_I">ຣ</key>
+      <key vkey="K_J">່</key>
+      <key vkey="K_K">າ</key>
+      <key vkey="K_L">ສ</key>
+      <key vkey="K_M">ທ</key>
+      <key vkey="K_N">ື</key>
+      <key vkey="K_O">ນ</key>
+      <key vkey="K_P">ຍ</key>
+      <key vkey="K_Q">ົ</key>
+      <key vkey="K_R">ພ</key>
+      <key vkey="K_S">ຫ</key>
+      <key vkey="K_T">ະ</key>
+      <key vkey="K_U">ີ</key>
+      <key vkey="K_V">ອ</key>
+      <key vkey="K_W">ໄ</key>
+      <key vkey="K_X">ປ</key>
+      <key vkey="K_Y">ິ</key>
+      <key vkey="K_Z">ຜ</key>
+      <key vkey="K_BKSLASH">\</key>
+    </layer>
+    <layer shift="RA">
+      <key vkey="K_0">໘</key>
+      <key vkey="K_1">໑</key>
+      <key vkey="K_2">໒</key>
+      <key vkey="K_3">໓</key>
+      <key vkey="K_4">໔</key>
+      <key vkey="K_7">໕</key>
+      <key vkey="K_8">໖</key>
+      <key vkey="K_9">໗</key>
+      <key vkey="K_W">໐</key>
+      <key vkey="K_HYPHEN">໙</key>
+      <key vkey="K_LBRKT">[</key>
+      <key vkey="K_RBRKT">]</key>
+    </layer>
+  </encoding>
+</visualkeyboard>

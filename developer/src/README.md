@@ -90,6 +90,10 @@ node-based next generation compiler, hosts kmc, (and legacy kmlmc, kmlmp)
 
 File analysis tools for Keyman files.
 
+### kmc-copy - Project copying and renaming tools
+
+Tools to copy and rename Keyman keyboard files and projects
+
 ### kmc-generate - Generation tools
 
 Project generation tools for Keyman.

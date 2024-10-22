@@ -15,6 +15,7 @@ builder_describe "Build Keyman kmc-generate module" \
   "@/common/web/keyman-version" \
   "@/common/web/types" \
   "@/developer/src/common/web/test-helpers" \
+  "@/developer/src/common/web/utils" \
   clean configure build api test publish \
   "--npm-publish+            For publish, do a npm publish, not npm pack (only for CI)" \
   "--dry-run,-n              don't actually publish, just dry run"

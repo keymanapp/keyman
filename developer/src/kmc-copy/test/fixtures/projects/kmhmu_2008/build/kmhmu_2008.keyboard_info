@@ -1,0 +1,51 @@
+{
+  "id": "kmhmu_2008",
+  "name": "Kmhmu 2008",
+  "license": "mit",
+  "description": "<p>Lao-script Kmhmu language keyboard</p>",
+  "languages": {
+    "kjg-Laoo": {
+      "examples": [],
+      "font": {
+        "family": "Kmhmu_MX.TTF",
+        "source": [
+          "Kmhmu_MX.TTF"
+        ]
+      },
+      "oskFont": {
+        "family": "Kmhmu_MX.TTF",
+        "source": [
+          "Kmhmu_MX.TTF"
+        ]
+      },
+      "languageName": "Khmu",
+      "scriptName": "Lao",
+      "displayName": "Khmu (Lao)"
+    }
+  },
+  "lastModifiedDate": "2018-05-21T12:25:52.000Z",
+  "packageFilename": "kmhmu_2008.kmp",
+  "packageFileSize": 147757,
+  "packageIncludes": [
+    "visualKeyboard",
+    "documentation",
+    "welcome"
+  ],
+  "version": "1.1",
+  "encodings": [
+    "unicode"
+  ],
+  "platformSupport": {
+    "linux": "full",
+    "macos": "full",
+    "windows": "full"
+  },
+  "minKeymanVersion": "9.0",
+  "sourcePath": "release/k/kmhmu_2008",
+  "helpLink": "https://help.keyman.com/keyboard/kmhmu_2008",
+  "related": {
+    "kmhmu": {
+      "deprecates": true
+    }
+  }
+}

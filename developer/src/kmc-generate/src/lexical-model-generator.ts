@@ -33,7 +33,7 @@ export class LexicalModelGenerator extends BasicGenerator implements KeymanCompi
   async run(): Promise<GeneratorResult> {
     this.preGenerate();
 
-    const artifacts: GeneratorArtifacts = {};
+    const artifacts: GeneratorArtifacts = this.defaultArtifacts();
 
     this.templatePath = 'wordlist-lexical-model';
     this.filenameMap[LexicalModelGenerator.SFile_Project] =

@@ -1,0 +1,100 @@
+﻿c Lao-script Kmhmu language keyboard for Tavultesoft Keyman 9.0
+
+store(&VERSION ) '9.0'
+store(&NAME) 'Kmhmu 2008'
+store(&LANGUAGE) 'x0454'
+store(&HOTKEY) '[CTRL SHIFT K_K]'
+store(&VISUALKEYBOARD) 'kmhmu_2008.kvks'
+store(&BITMAP) 'kmhmu_2008.ico'
+store(&ETHNOLOGUECODE) 'kjg'
+store(&capsalwaysoff) "1"
+store(&WINDOWSLANGUAGES) 'x0454'
+store(&COPYRIGHT) '© 2008-2018 John Durdin'
+store(&KEYBOARDVERSION) '1.1'
+store(&TARGETS) 'desktop'
+
+begin Unicode > use(Start)
+
+c Define sets of characters for matching and filtering: basic consonant sets
+c (Composites and extra characters will be handled by specific rules)
+store(Consonant)  "ກຂຄງຈສຊຍດຕຖທນບປຜຝພຟມຢຣລວຫອຮໝໜ" U+0EBC
+store(ConsonantKey) "d07'9l-pf84mo[xz/r2,1i];svI<O^"
+
+c Basic vowel character sets
+store(Vowel) "ເແໂໄໃ" "ະຽາ" U+0ECD U+0EB3 U+0EB1 U+0EBB U+0EB4 \
+         U+0EB5 U+0EB6 U+0EB7 U+0EB8 U+0EB9
+store(VowelKey) "gc3w." "tPk" "=eaqyubn56"
+
+c Tone marks
+store(Tone) U+0EC8 U+0EC9 U+0ECA U+0ECB U+0ECC
+store(ToneKey) "jhHJ%"
+
+c Lao characters that will normally be followed by a thin space (5/08) in Kmhmu
+store(LaoCharacter) outs(Consonant) outs(Vowel) outs(Tone)
+
+c Special (abbreviation), numeric,and punctuation characters and keyboard equivalents
+store(Sign)  "ໆຯ"
+store(SignKey) "MC"
+
+store(Numeral) "1234567890/*-+."
+store(NumeralKey) "!@#$&*()_W"
+store(NumberPadKey) [K_NP1] [K_NP2] [K_NP3] [K_NP4] [K_NP5] \
+           [K_NP6] [K_NP7] [K_NP8] [K_NP9] [K_NP0] \
+           [K_NPSLASH] [K_NPSTAR] [K_NPMINUS] [K_NPPLUS] [K_NPDOT]
+
+store(LaoNumeral) "໑໒໓໔໕໖໗໘໙໐"
+store(LaoNumeralKey) [RALT K_1][RALT K_2][RALT K_3][RALT K_4][RALT K_7] \
+                     [RALT K_8][RALT K_9][RALT K_0][RALT K_HYPHEN][RALT K_W]
+
+store(Punctuation)  "*_+;.,:!?%" '=' '"' "(x)$-/"
+store(PunctuationKey) "`RTSDFGKL:" '"' "Z" "XV?>{~"
+
+c Number pad virtual key conversions - always return digits or mathematical symbols - modified keys must be processed first
+group(Start) using keys
+ + any(NumberPadKey) > index(Numeral,1)
+ + any(LaoNumeralKey) > index(LaoNumeral,1)
+ + [RALT K_LBRKT] > '['
+ + [RALT K_RBRKT] > ']'
+
+c Specials word space insertion for Kmhmu   (processed first, as virtual key match fails if in Main group)
+ any(LaoCharacter) + [K_SPACE] > context U+2009 U+200B c Space inserts thin space plus ZWSP when pressed once (5/08)
+ U+2009 U+200B + [K_SPACE] > U+0020          c Special handling of double space - remove preceding thin space (5/08)
+ + [SHIFT K_SPACE] > U+0020  c Force a normal space (5/08)
+ + [LCTRL K_SPACE] > U+2009
+ + [RCTRL K_SPACE] > U+2009
+
+match > return
+nomatch > use(Main)
+
+c Mapping rules - basic lookup conversions
+group(Main) using keys
+
++ any(ConsonantKey) > index(Consonant,1)
++ any(VowelKey) > index(Vowel,1)
++ any(ToneKey) > index(Tone,1)
++ any(SignKey) > index(Sign,1)
++ any(PunctuationKey) > index(Punctuation,1)
++ any(NumeralKey) > index(Numeral,1)
+
+c Composites (multiple character equivalents - not required for Kmhmu, but may be in Lao loan words)
++ "}" > U+0EAB U+0EBC
++ "Q" > U+0EBB U+0EC9
++ "E" > U+0EC9 U+0EB3
+c + "Y" > U+0EB4 U+0EC9
+c + "U" > U+0EB5 U+0EC9
++ "A" > U+0EB1 U+0EC9
++ "B" > U+0EB6 U+0EC9
++ "N" > U+0EB7 U+0EC9
++ "+" > U+0ECD U+0EC8
+
++ "|" > U+200B			c ZWSP insertion
+U+200B + '|' > '|'
+
+c Specials for Kmhmu - adapted May 08
+any(LaoCharacter) + [K_SPACE] > context U+2009 U+200B c Space inserts thin space plus ZWSP when pressed once (5/08)
+U+2009 U+200B + [K_SPACE] > U+0020          c Special handling of double space - remove preceding thin space (5/08)
++ [SHIFT K_SPACE] > U+0020  c Force a normal space (5/08)
++ [LCTRL K_SPACE] > U+2009
++ [RCTRL K_SPACE] > U+2009
++ "Y" > U+0E81 U+0ECC
++ "U" > U+0E8D U+0ECC

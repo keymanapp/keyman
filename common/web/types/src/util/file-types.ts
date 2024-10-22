@@ -75,6 +75,11 @@ export const HISTORY_MD = 'HISTORY.md';
 export const README_MD = 'README.md';
 
 /**
+ * Standard project file name - LICENSE in Markdown format
+ */
+export const LICENSE_MD = 'LICENSE.md';
+
+/**
  * Gets the file type based on extension, dealing with multi-part file
  * extensions. Does not sniff contents of file or assume file existence. Does
  * transform upper-cased file extensions to lower-case.
@@ -89,6 +94,16 @@ export function fromFilename(filename: string): Binary | Source | Any {
     filename.match(/\.[^\.]+$/)?.[0] ??
     "";
   return result;
+}
+
+/**
+ * Removes the file extension, include known .model.* patterns, from a filename
+ * @param filename
+ * @returns
+ */
+export function removeExtension(filename: string): string {
+  const ext = fromFilename(filename);
+  return filename.substring(0, filename.length - ext.length);
 }
 
 /**

@@ -53,9 +53,14 @@ describe('KeymanKeyboardGenerator', function () {
     const samplePath = makePathToFixture('keyman-keyboard');
     const files = getFilenames(samplePath);
 
+    assert.isOk(result.artifacts['kmc-generate:outputPath']);
+    assert.isNull(result.artifacts['kmc-generate:outputPath'].data);
+
     // Verify that there are no unexpected artifacts
     for(const artifact of Object.keys(result.artifacts)) {
-      assert.include(files, artifact);
+      if(artifact != 'kmc-generate:outputPath') {
+        assert.include(files, artifact);
+      }
     }
 
     // Compare each file content as a UTF-8 string

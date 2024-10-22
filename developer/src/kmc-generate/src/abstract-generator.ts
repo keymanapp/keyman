@@ -74,6 +74,12 @@ export interface GeneratorOptions /* not inheriting from CompilerBaseOptions */ 
  */
 export interface GeneratorArtifacts extends KeymanCompilerArtifacts {
   /**
+   * The target path for the generation, equal to the normalized output path.
+   * This folder must not exist before `write()`. This pattern is used to avoid
+   * name collisions with other artifacts
+   */
+  ['kmc-generate:outputPath']: KeymanCompilerArtifact;
+  /**
    * Generated project files to be written to disk
    */
   [name:string]: KeymanCompilerArtifact;
@@ -187,17 +193,17 @@ export class AbstractGenerator {
    * @returns true on success
    */
   public async write(artifacts: GeneratorArtifacts): Promise<boolean> {
-    // TODO-GENERATE: this is a little poor because it is carrying state over from the
-    // previous 'run' call, rather than figuring out the target path from the
-    // artifacts. Probably should be looking at highest common folder, and then
-    // failing if that path exists
-    if(this.targetPathExists()) {
-      this.callbacks.reportMessage(GeneratorMessages.Error_OutputPathAlreadyExists({outPath: this.targetPath()}));
+    if(this.callbacks.fs.existsSync(artifacts["kmc-generate:outputPath"].filename)) {
+      this.callbacks.reportMessage(GeneratorMessages.Error_OutputPathAlreadyExists({outPath: artifacts["kmc-generate:outputPath"].filename}));
       return false;
     }
 
     for(const key of Object.keys(artifacts)) {
       const a = artifacts[key];
+      if(key == "kmc-generate:outputPath") {
+        // metadata, skip this
+        continue;
+      }
       const path = this.callbacks.path.dirname(a.filename);
       try {
         this.callbacks.fs.mkdirSync(path, {recursive: true});
@@ -216,15 +222,19 @@ export class AbstractGenerator {
     return true;
   }
 
-  protected readonly targetPath = () => this.callbacks.path.join(this.options.outPath,this.options.id);
-  private readonly targetPathExists = () => this.callbacks.fs.existsSync(this.targetPath());
-
   /**
-   * @internal
+   * Fills in the artifact outputPath used by all generators
+   * @returns
    */
-  public readonly unitTestEndpoints = {
-    targetPath: this.targetPath
+  protected defaultArtifacts(): GeneratorArtifacts {
+    return {
+      "kmc-generate:outputPath": {
+        data: null,
+        filename: this.callbacks.path.join(this.options.outPath,this.options.id)
+      }
+    }
   }
+
   /**
    * @internal
    */

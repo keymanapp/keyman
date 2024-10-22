@@ -267,6 +267,10 @@ export enum CompilerErrorNamespace {
    * kmc-generate 0xA000…0xAFFF
    */
   Generator = 0xA000,
+  /**
+   * kmc-copy 0xB000…0xBFFF
+   */
+  Copier = 0xB000,
 };
 
 /**
@@ -281,6 +285,7 @@ export interface CompilerPathCallbacks {
   isAbsolute(name: string): boolean;
   join(...paths: string[]): string;
   normalize(p: string): string;
+  relative(from: string, to: string): string;
 }
 
 /**
@@ -366,6 +371,11 @@ export interface CompilerCallbacks {
    * Get file size, returns undefined if not found
    */
   fileSize(filename: string): number;
+
+  /**
+   * Returns true if file is a directory, undefined if not found
+   */
+  isDirectory(filename: string): boolean;
 
   get path(): CompilerPathCallbacks;
   get fs(): CompilerFileSystemCallbacks;
@@ -453,6 +463,10 @@ export class CompilerFileCallbacks implements CompilerCallbacks {
 
   fileSize(filename: string): number {
     return this.parent.fileSize(filename);
+  }
+
+  isDirectory(filename: string): boolean {
+    return this.parent.isDirectory(filename);
   }
 
   get path(): CompilerPathCallbacks {
