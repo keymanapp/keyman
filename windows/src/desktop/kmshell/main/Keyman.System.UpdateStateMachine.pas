@@ -211,17 +211,13 @@ type
 
     CurrentState: TState;
     // State object for performance (could lazy create?)
-    FIdle: IdleState;
-    FUpdateAvailable: UpdateAvailableState;
-    FDownloading: DownloadingState;
-    FWaitingRestart: WaitingRestartState;
-    FInstalling: InstallingState;
-    FRetry: RetryState;
-    FPostInstall: PostInstallState;
+
+    FStateInstance: array[TUpdateState] of TState;
+
     function GetState: TStateClass;
     procedure SetState(const Value: TStateClass);
-    procedure SetStateOnly(const Value: TStateClass);
-    function ConvertEnumState(const TEnumState: TUpdateState): TStateClass;
+    procedure SetStateOnly(const enumState: TUpdateState);
+    function ConvertStateToEnum(const StateClass: TStateClass): TUpdateState;
 
     procedure ShutDown;
     {
@@ -313,18 +309,22 @@ begin
 
   FForce := AForce;
   FAutomaticUpdate := GetAutomaticUpdates;
-  FIdle := IdleState.Create(Self);
-  FUpdateAvailable := UpdateAvailableState.Create(Self);
-  FDownloading := DownloadingState.Create(Self);
-  FWaitingRestart := WaitingRestartState.Create(Self);
-  FInstalling := InstallingState.Create(Self);
-  FRetry := RetryState.Create(Self);
-  FPostInstall := PostInstallState.Create(Self);
+
+  FStateInstance[usIdle] := IdleState.Create(Self);
+  FStateInstance[usUpdateAvailable] := UpdateAvailableState.Create(Self);
+  FStateInstance[usDownloading] := DownloadingState.Create(Self);
+  FStateInstance[usWaitingRestart] := WaitingRestartState.Create(Self);
+  FStateInstance[usInstalling] := InstallingState.Create(Self);
+  FStateInstance[usRetry] := RetryState.Create(Self);
+  FStateInstance[usPostInstall] := PostInstallState.Create(Self);
+
   // Check the Registry setting.
-  SetStateOnly(ConvertEnumState(CheckRegistryState));
+  SetStateOnly(CheckRegistryState);
 end;
 
 destructor TUpdateStateMachine.Destroy;
+var
+  lpState: TUpdateState;
 begin
   if (FErrorMessage <> '') and FShowErrors then
     KL.Log(FErrorMessage); // TODO: #10210 Log to Sentry
@@ -332,13 +332,10 @@ begin
   if FParams.Result = oucShutDown then
     ShutDown;
 
-  FIdle.Free;
-  FUpdateAvailable.Free;
-  FDownloading.Free;
-  FWaitingRestart.Free;
-  FInstalling.Free;
-  FRetry.Free;
-  FPostInstall.Free;
+  for lpState := Low(TUpdateState) to High(TUpdateState) do
+  begin
+    FStateInstance[lpState].Free;
+  end;
 
   // TODO: #10210 remove debugging comments
   //KL.Log('TUpdateStateMachine.Destroy: FErrorMessage = '+FErrorMessage);
@@ -440,11 +437,12 @@ begin
     Registry.RootKey := HKEY_CURRENT_USER;
     if Registry.OpenKeyReadOnly(SRegKey_KeymanEngine_CU) and Registry.ValueExists(SRegValue_Update_State) then
     begin
+      // TODO-WINDOWS-UPDATES Check if value in register is valid
       UpdateState := TUpdateState(GetEnumValue(TypeInfo(TUpdateState), Registry.ReadString(SRegValue_Update_State)));
     end
     else
     begin
-      UpdateState := usIdle; // do we need a unknown state ?
+      UpdateState := usIdle;
     end;
   finally
     Registry.Free;
@@ -526,7 +524,7 @@ begin
     CurrentState.Exit;
   end;
 
-  SetStateOnly(Value);
+  SetStateOnly(ConvertStateToEnum(Value));
 
   if Assigned(CurrentState) then
   begin
@@ -539,52 +537,29 @@ begin
 
 end;
 
-procedure TUpdateStateMachine.SetStateOnly(const Value: TStateClass);
+procedure TUpdateStateMachine.SetStateOnly(const enumState: TUpdateState);
 begin
-  if Value = IdleState then
-  begin
-    CurrentState := FIdle;
-  end
-  else if Value = UpdateAvailableState then
-  begin
-    CurrentState := FUpdateAvailable;
-  end
-  else if Value = DownloadingState then
-  begin
-    CurrentState := FDownloading;
-  end
-  else if Value = WaitingRestartState then
-  begin
-    CurrentState := FWaitingRestart;
-  end
-  else if Value = InstallingState then
-  begin
-    CurrentState := FInstalling;
-  end
-  else if Value = RetryState then
-  begin
-    CurrentState := FRetry;
-  end
-  else if Value = PostInstallState then
-  begin
-    CurrentState := FPostInstall;
-  end;
+  CurrentState := FStateInstance[enumState];
 end;
 
-function TUpdateStateMachine.ConvertEnumState(const TEnumState: TUpdateState) : TStateClass;
+function TUpdateStateMachine.ConvertStateToEnum(const StateClass: TStateClass): TUpdateState;
 begin
-  case  TEnumState of
-    usIdle: Result := IdleState;
-    usUpdateAvailable: Result := UpdateAvailableState;
-    usDownloading: Result := DownloadingState;
-    usWaitingRestart: Result := WaitingRestartState;
-    usInstalling: Result := InstallingState;
-    usRetry: Result := RetryState;
-    usPostInstall: Result := PostInstallState;
+  if StateClass = IdleState then
+    Result := usIdle
+  else if StateClass = UpdateAvailableState then
+    Result := usUpdateAvailable
+  else if StateClass = DownloadingState then
+    Result := usDownloading
+  else if StateClass = WaitingRestartState then
+    Result := usWaitingRestart
+  else if StateClass = InstallingState then
+    Result := usInstalling
+  else if StateClass = RetryState then
+    Result := usRetry
+  else if StateClass = PostInstallState then
+    Result := usPostInstall
   else
-    // TODO: #10210 Log error unknown state setting to idle
-    Result := IdleState;
-  end;
+    KL.Log('Unknown StateClass');  // TODO-WINDOWS-UPDATES
 end;
 
 procedure TUpdateStateMachine.HandleCheck;
