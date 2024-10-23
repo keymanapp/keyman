@@ -178,19 +178,28 @@ export class KeylayoutToKmnConverter {
     data += "group(main) using keys\n"
     data += "\n"
 
+    // check if caps is used from .keylayout-file
+    let isCAPSused = false
+    for (let i= 0 ; i < kmn_array[kmn_array.length-1].length; i++) {
+      if (kmn_array[kmn_array.length-1][i] === "caps")  {
+        isCAPSused = true
+      }
+    }
+
     for (let i = 0; i < kmn_array.length-1; i++) {
       for (let j = 0; j < kmn_array[0].length; j++) {
 
         // get the modifier for the layer
-        const label_modifier = this.create_modifier(kmn_array[kmn_array.length-1][i])
+        const label_modifier = this.create_modifier(kmn_array[kmn_array.length-1][i], isCAPSused)
+
         // get the character that will be written as result in kmn-file
         const resulting_character = new TextDecoder().decode(kmn_array[i][j])
 
         // remove if-stmt  later, only here for better visability
           if (resulting_character !== '')
           data += `+ [` + label_modifier + ' ' + kmn_Key_Name[j] + `] > \'` + resulting_character +'\'\n'
-
       }
+
       data += '\n'
     }
 
@@ -222,9 +231,10 @@ export class KeylayoutToKmnConverter {
  * @param  keylayout_modifier the modifier value used in the .keylayout-file
  * @return kmn_modifier the modifier value used in the .kmn-file
  */
-  public create_modifier(keylayout_modifier:any):string {
+  public create_modifier(keylayout_modifier:any, isCAPSused:boolean):string {
     let add_modifier = ""
     let kmn_modifier = ""
+    let kmn_ncaps = ""
 
     // copy each modifier into element of array modifier_state
     const modifier_state: string[] = keylayout_modifier.split(" ");
@@ -236,7 +246,12 @@ export class KeylayoutToKmnConverter {
 
     for (let i = 0; i < modifier_state.length; i++) {
 
-      if      ( String(modifier_state[i]) === "anyOption")   add_modifier = "OPT "
+      // marker used for adding NCAPS when CAPS is used somewhere in kmn
+      if ( isCAPSused && String(modifier_state[i]) !== "caps")
+        kmn_ncaps = " NCAPS "
+
+      // TODO go over, find more conditions & simplify
+      if      ( String(modifier_state[i]) === "anyOption")   add_modifier = "RALT "
       else if ( String(modifier_state[i]) === "anyShift")    add_modifier = "SHIFT "
       else if ( String(modifier_state[i]) === "anyControl")  add_modifier = "CTRL "
 
@@ -256,14 +271,28 @@ export class KeylayoutToKmnConverter {
       else if( (String(modifier_state[i]) === "ctrl?" )   && this.isInArray('lControl',modifier_state))                                         add_modifier = "LCTRL "
       else if( (String(modifier_state[i]) === "ctrl?" )   && this.isInArray('rControl',modifier_state) &&  this.isInArray('lControl',modifier_state)) add_modifier = "CTRL "
 
-      else if( String(modifier_state[i]) === "caps?")        add_modifier = ""  // capital letters or not?
-      else if( String(modifier_state[i]) === "shift?")       add_modifier = ""
-      else if( String(modifier_state[i]) === "ctrl?")        add_modifier = ""
+      // remove if modifier contains ? e.g. caps?, ctrl?, ...
+      else if( String(modifier_state[i]).charAt(modifier_state[i].length-1) === "?")        add_modifier = ""
 
-      else add_modifier = String(modifier_state[i])
+      else add_modifier = String(modifier_state[i]) + " "
 
-      kmn_modifier += add_modifier
+      kmn_modifier += kmn_ncaps + add_modifier
     }
-    return kmn_modifier.trim().toUpperCase()
+
+    // replace duplicate entries with ""
+    const unique_Modifier: string[] = kmn_modifier.split(" ")
+
+    for(let i = 0; i < unique_Modifier.length; i++) {
+      const modi = unique_Modifier[i]
+
+      for(let j = i + 1; j < unique_Modifier.length; j++) {
+        const modi_next = unique_Modifier[j]
+        if (modi_next === modi)
+          unique_Modifier[j] = ""
+      }
+    }
+
+  // remove duplicate whitespace, whitespace before & after, change to uppercase
+  return unique_Modifier.join(" ").replace(/\s+/g, " ").trim().toUpperCase()
   }
 }
