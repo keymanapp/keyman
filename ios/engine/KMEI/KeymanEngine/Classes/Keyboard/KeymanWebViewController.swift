@@ -768,7 +768,7 @@ extension KeymanWebViewController {
     // the first time.
     setOskWidth(Int(kbSize.width))
     setOskHeight(Int(kbSize.height))
-    os_log("KeymanWebViewController resizeKeyboard to kbSize %{public}d", log:KeymanEngineLogger.ui, type: .default, NSCoder.string(for:kbSize))
+    os_log("KeymanWebViewController resizeKeyboard to kbSize %{public}s", log:KeymanEngineLogger.ui, type: .debug, NSCoder.string(for:kbSize))
   }
 
   func resetKeyboardState() {
