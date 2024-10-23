@@ -25,6 +25,40 @@ begin
   Result := code;
 end;
 
+
+function UpdateState: Boolean;
+var
+  UpdateStr : UnicodeString;
+  UpdatePBytes : PByte;
+  hk: Winapi.Windows.HKEY;
+  updateData: Cardinal;
+begin
+
+  Result := False;
+  UpdateStr := 'usPostInstall';
+
+  if RegCreateKeyEx(HKEY_CURRENT_USER, PChar(SRegKey_KeymanEngine_CU), 0, NULL, KEY_ALL_ACCESS, NULL, &hk, NULL) = ERROR_SUCCESS then
+  begin
+    try
+      if RegSetValueEx(hk, PChar(SRegValue_Update_State), 0, REG_SZ, PWideChar(UpdateStr), Length(UpdateStr) * SizeOf(Char)) = ERROR_SUCCESS then
+      begin
+        Result := True;
+      end
+      else
+      begin
+      // TODO-WINDOWS-UPDATES: error log
+      end;
+    finally
+      RegCloseKey(hk);
+    end;
+  end
+  else
+  begin
+   // TODO-WINDOWS-UPDATES: error log creating key
+  end;
+end;
+
+
 {
   Add permission for ALL APPLICATION PACKAGES to read %ProgramData%\Keyman folder
 }
@@ -61,6 +95,8 @@ begin
       end;
 
       Result := ERROR_SUCCESS;
+      // TODO-WINDOWS-UPDATES: better error checking on the registry key update
+      UpdateState;
 
     finally
       if not CloseHandle(hFile) then

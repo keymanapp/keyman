@@ -178,6 +178,8 @@ const
   SRegValue_AvailableLanguages = 'available languages'; //CU
   SRegValue_CurrentLanguage    = 'current language';    //CU
 
+  SRegValue_Update_State               = 'update state';
+
   { Privacy }
 
   SRegValue_AutomaticallyReportErrors = 'automatically report errors';              // CU, SRegKey_IDEOptions and SRegKey_KeymanEngine_CU
@@ -312,8 +314,10 @@ const
   SRegValue_ActiveProject_Filename = 'project filename';
   SRegValue_ActiveProject_SourcePath = 'source path';
 
+  SRegValue_AutomaticUpdates  = 'automatic updates';  //CU
   SRegValue_CheckForUpdates   = 'check for updates'; // CU
   SRegValue_LastUpdateCheckTime = 'last update check time'; // CU
+  SRegValue_ApplyNow = 'apply now';  // CU    Start the install now even though it will require an update
 
   SRegValue_UpdateCheck_UseProxy = 'update check use proxy'; // CU
   SRegValue_UpdateCheck_ProxyHost = 'update check proxy host'; // CU
