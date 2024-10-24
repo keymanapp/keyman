@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { loadFile, resolveFilename } from './helpers/index.js';
 import { CompilerCallbacks, CompilerError, CompilerEvent, CompilerFileSystemCallbacks, CompilerPathCallbacks } from '../src/compiler-interfaces.js';
+import { fileURLToPath } from 'url';
 
 // This is related to developer/src/common/web/test-helpers/index.ts but has a slightly different API surface
 // as this runs at a lower level than the compiler.
@@ -32,6 +33,10 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
 
   resolveFilename(baseFilename: string, filename: string): string {
     return resolveFilename(baseFilename, filename);
+  }
+
+  fileURLToPath(url: string | URL): string {
+    return fileURLToPath(url);
   }
 
   loadFile(filename: string): Uint8Array {

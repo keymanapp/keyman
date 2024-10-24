@@ -24,6 +24,7 @@ builder_describe \
   ":help                        Online documentation" \
   ":kmcmplib                    Compiler - .kmn compiler" \
   ":kmc-analyze                 Compiler - Analysis Tools" \
+  ":kmc-generate                Compiler - Generation Tools" \
   ":kmc-keyboard-info           Compiler - .keyboard_info Module" \
   ":kmc-kmn                     Compiler - .kmn to .kmx and .js Keyboard Module" \
   ":kmc-ldml                    Compiler - LDML Keyboard Module" \

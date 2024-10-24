@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { CompilerEvent, CompilerCallbacks, CompilerPathCallbacks, CompilerFileSystemCallbacks, CompilerError } from '@keymanapp/developer-utils';
+import { fileURLToPath } from 'url';
 export { verifyCompilerMessagesObject } from './verifyCompilerMessagesObject.js';
 
 /**
@@ -23,6 +24,10 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
 
   hasMessage(code: number): boolean {
     return this.messages.find((item) => item.code == code) === undefined ? false : true;
+  }
+
+  fileURLToPath(url: string | URL): string {
+    return fileURLToPath(url);
   }
 
   /** true of at least one error */
