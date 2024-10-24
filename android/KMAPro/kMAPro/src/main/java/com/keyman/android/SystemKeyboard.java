@@ -134,6 +134,7 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   public void onUpdateSelection(int oldSelStart, int oldSelEnd, int newSelStart, int newSelEnd, int candidatesStart, int candidatesEnd) {
     super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd, candidatesStart, candidatesEnd);
     KMManager.updateSelectionRange(KMManager.KeyboardType.KEYBOARD_TYPE_SYSTEM);
+    Log.d(TAG, "backspace: onUpdateSelection");
   }
 
   /**
@@ -207,11 +208,13 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
   public void onStartInputView(EditorInfo attribute, boolean restarting) {
     super.onStartInputView(attribute, restarting);
     setInputView(onCreateInputView());
+    Log.d(TAG, "backspace: onStartInputView, restarting: " + restarting);
   }
 
   @Override
   public void onUpdateExtractingVisibility(EditorInfo ei) {
     super.onUpdateExtractingVisibility(ei);
+    Log.d(TAG, "backspace: onUpdateExtractingVisibility");
   }
 
   @Override

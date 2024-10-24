@@ -215,6 +215,12 @@ public class KMKeyboardJSHandler {
               icText != null && icText.selectionStart == 0 && icText.selectionEnd == 0) {
             // If cursor at the start of a line, let the app handle the BACKSPACE
             keyDownUp(KeyEvent.KEYCODE_DEL, 0);
+
+            // Update KeymanWeb context so it doesn't keep deleting characters
+            boolean status = KMManager.updateSelectionRange(KeyboardType.KEYBOARD_TYPE_SYSTEM);
+            if (!status) {
+              Log.d(TAG, "backspace: updateSelectionRange() returned false");
+            }
           } else {
             performLeftDeletions(ic, deleteLeft);
           }

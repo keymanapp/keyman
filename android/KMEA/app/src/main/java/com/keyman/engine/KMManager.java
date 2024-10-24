@@ -2383,6 +2383,7 @@ public final class KMManager {
         SystemKeyboard.loadJavascript("resetContext()");
       }
     }
+    Log.d(TAG, "backspace: resetContext with " + kbType);
   }
 
   public static int getCurrentKeyboardIndex(Context context) {
