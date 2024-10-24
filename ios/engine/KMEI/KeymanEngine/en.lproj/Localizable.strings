@@ -226,6 +226,9 @@
 /* Text showing name of spacebar caption - language + keyboard */
 "menu-settings-spacebar-item-languageKeyboard" = "Language and keyboard";
 
+/* Label for the "Adjust Keyboard Height" item on the main settings screen */
+"menu-settings-adjust-keyboard-height" = "Adjust Keyboard Height";
+
 /* Short text for notification:  download failure for keyboard */
 "notification-download-failure-keyboard" = "Keyboard download failed";
 
