@@ -16,6 +16,8 @@
 
 @property (weak, nonatomic) KVKFile *kvk;
 
++ (BOOL)isOskKeyDownEvent:(CGEventRef)event;
++ (NSEventModifierFlags)extractModifierFlagsFromOskEvent:(CGEventRef)event;
 - (void)handleKeyEvent:(NSEvent *)event;
 - (void)setShiftState:(BOOL)shiftState;
 - (void)setOskShiftState:(BOOL)oskShiftState;
@@ -25,6 +27,7 @@
 - (void)setOskCtrlState:(BOOL)oskCtrlState;
 - (void)resetOSK;
 - (void)resizeOSKLayout;
+- (int64_t)createOskEventUserData;
 
 @end
 
