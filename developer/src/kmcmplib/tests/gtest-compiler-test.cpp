@@ -1918,7 +1918,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_osb_test) {
     EXPECT_EQ(KmnCompilerMessages::WARN_VirtualCharKeyWithPositionalLayout, msgproc_errors[0].errorCode);
     msgproc_errors.clear();
 
-    // virtual key, not in VKeyNames, long, but not too long name, valid
+    // virtual key, custom name, long, but not too long name, valid
     fileKeyboard.version = VERSION_90;
     u16cpy(str, u"[XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX]"); // SZMAX_VKDICTIONARYNAME - 1
     EXPECT_EQ(SZMAX_VKDICTIONARYNAME - 1 + 2, u16len(str));
@@ -1930,18 +1930,18 @@ TEST_F(CompilerTest, GetXStringImpl_type_osb_test) {
     fileKeyboard.cxVKDictionary = 3;
     fileKeyboard.dpVKDictionary[3].szName[0] = 0;
 
-    // virtual key, not in VKeyNames, name too long, ERROR_InvalidToken
+    // virtual key, custom name, name too long, ERROR_InvalidToken
     fileKeyboard.version = VERSION_90;
     u16cpy(str, u"[XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX]"); // SZMAX_VKDICTIONARYNAME
     EXPECT_EQ(SZMAX_VKDICTIONARYNAME + 2, u16len(str));
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // virtual key, not in VKeyNames, version too low, ERROR_InvalidToken (this should be ERROR_90FeatureOnlyVirtualKeyDictionary)
+    // virtual key, custom name, version too low, ERROR_InvalidToken (this should be ERROR_90FeatureOnlyVirtualKeyDictionary)
     fileKeyboard.version = VERSION_80;
     u16cpy(str, u"[abc]");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // virtual key, not in VKeyNames, valid
+    // virtual key, custom name, valid
     fileKeyboard.version = VERSION_90;
     u16cpy(str, u"[jkl]");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
@@ -1953,7 +1953,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_osb_test) {
     fileKeyboard.cxVKDictionary = 3;
     fileKeyboard.dpVKDictionary[3].szName[0] = 0;
 
-    // virtual key, not in VKeyNames, pre-existing name, valid
+    // virtual key, custom name, pre-existing name, valid
     fileKeyboard.version = VERSION_90;
     u16cpy(str, u"[def]");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
