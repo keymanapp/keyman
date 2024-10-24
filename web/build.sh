@@ -17,12 +17,14 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   "clean" \
   "configure" \
   "build" \
+  "start                     Starts the test server" \
   "test" \
   "coverage                  Create an HTML page with code coverage" \
   ":app/browser              The form of Keyman Engine for Web for use on websites" \
   ":app/webview              A puppetable version of KMW designed for use in a host app's WebView" \
   ":app/ui                   Builds KMW's desktop form-factor keyboard-selection UI modules" \
   ":engine/attachment        Subset used for detecting valid page contexts for use in text editing " \
+  ":engine/core-processor    Keyman Core WASM integration" \
   ":engine/dom-utils         A common subset of function used for DOM calculations, layout, etc" \
   ":engine/events            Specialized classes utilized to support KMW API events" \
   ":engine/element-wrappers  Subset used to integrate with website elements" \
@@ -55,6 +57,7 @@ builder_describe_outputs \
   build:app/webview             "/web/build/app/webview/${config}/keymanweb-webview.js" \
   build:app/ui                  "/web/build/app/ui/${config}/kmwuitoggle.js" \
   build:engine/attachment       "/web/build/engine/attachment/lib/index.mjs" \
+  build:engine/core-processor   "/web/build/engine/core-processor/lib/index.mjs" \
   build:engine/dom-utils        "/web/build/engine/dom-utils/obj/index.js" \
   build:engine/events           "/web/build/engine/events/lib/index.mjs" \
   build:engine/element-wrappers "/web/build/engine/element-wrappers/lib/index.mjs" \
@@ -161,6 +164,8 @@ builder_run_child_actions build:engine/attachment
 # Uses engine/interfaces (due to resource-path config interface)
 builder_run_child_actions build:engine/keyboard-storage
 
+builder_run_child_actions build:engine/core-processor
+
 # Uses engine/interfaces, engine/keyboard-storage, & engine/osk
 builder_run_child_actions build:engine/main
 
@@ -190,3 +195,6 @@ builder_run_action test test_action
 
 # Create coverage report
 builder_run_action coverage coverage_action
+
+# Start the test server
+builder_run_action start node src/tools/testing/test-server/index.cjs

@@ -13,9 +13,9 @@ using namespace kmx;
 #include <share.h>
 #endif
 
-KMX_BOOL KMX_ProcessEvent::Load(km_core_path_name KeyboardName)
-{
-  if(!LoadKeyboard(KeyboardName, &m_keyboard.Keyboard)) return FALSE;   // I5136
+KMX_BOOL KMX_ProcessEvent::Load(PKMX_BYTE buf, size_t sz) {
+  if(!LoadKeyboardFromBlob(buf, sz, &m_keyboard.Keyboard))
+    return FALSE;   // I5136
 
   return TRUE;
 }
@@ -51,50 +51,22 @@ const int km::core::kmx::CODE__SIZE[] = {
 // Ensure that all CODE_### sizes are defined
 static_assert(sizeof(CODE__SIZE) / sizeof(CODE__SIZE[0]) == (CODE_LASTCODE + 1), "Size of array CODE__SIZE not correct");
 
-
-
-KMX_BOOL KMX_ProcessEvent::LoadKeyboard(km_core_path_name fileName, LPKEYBOARD *lpKeyboard)
-{
-  PKMX_BYTE buf;
-  FILE *fp;
+KMX_BOOL KMX_ProcessEvent::LoadKeyboardFromBlob(
+  PKMX_BYTE original_buf,
+  size_t sz,
+  LPKEYBOARD* lpKeyboard
+) {
   LPKEYBOARD kbp;
+  PKMX_BYTE buf;
   PKMX_BYTE filebase;
 
-  DebugLog("Loading file '%s'", fileName);
-  if(!fileName || !lpKeyboard)
-  {
-    DebugLog("Bad Filename");
+
+  if (!lpKeyboard || !original_buf) {
+    DebugLog("Invalid parameter");
     return FALSE;
   }
 
-#if defined(_WIN32) || defined(_WIN64)
-  fp = _wfsopen(fileName, L"rb", _SH_DENYWR);
-#else
-  fp = fopen(fileName, "rb");
-#endif
-  if(fp == NULL)
-  {
-    DebugLog("Could not open file");
-    return FALSE;
-  }
-
-  if (fseek(fp, 0, SEEK_END) != 0) {
-    fclose(fp);
-    DebugLog("Could not fseek file");
-    return FALSE;
-  }
-
-  auto sz = ftell(fp);
-  if (sz < 0) {
-    fclose(fp);
-    return FALSE;
-  }
-
-  if (fseek(fp, 0, SEEK_SET) != 0) {
-    fclose(fp);
-    DebugLog("Could not fseek(set) file");
-    return FALSE;
-  }
+  *lpKeyboard = NULL;
 
 #ifdef KMX_64BIT
   // allocate enough memory for expanded data structure + original data.
@@ -108,34 +80,28 @@ KMX_BOOL KMX_ProcessEvent::LoadKeyboard(km_core_path_name fileName, LPKEYBOARD *
   buf = new KMX_BYTE[sz];
 #endif
 
-  if(!buf)
-  {
-    fclose(fp);
+  if (!buf) {
     DebugLog("Not allocmem");
     return FALSE;
   }
 #ifdef KMX_64BIT
-  filebase = buf + sz*2;
+  filebase = buf + sz * 2;
 #else
   filebase = buf;
 #endif
+  memcpy(filebase, original_buf, sz);
 
-  if (fread(filebase, 1, sz, fp) < (size_t) sz) {
-    fclose(fp);
-    DebugLog("Could not read file");
+  if (*PKMX_DWORD(filebase) != KMX_DWORD(FILEID_COMPILED)) {
+    DebugLog("Invalid keyboard - signature is invalid");
+    delete[] buf;
     return FALSE;
   }
 
-  fclose(fp);
-
-  if(*PKMX_DWORD(filebase) != KMX_DWORD(FILEID_COMPILED))
-  {
-    delete [] buf;
-    DebugLog("Invalid file - signature is invalid");
+  if (!VerifyKeyboard(filebase, sz)) {
+    DebugLog("Verify keyboard failed");
+    delete[] buf;
     return FALSE;
   }
-
-  if(!VerifyKeyboard(filebase, sz)) return FALSE;
 
 #ifdef KMX_64BIT
   kbp = CopyKeyboard(buf, filebase);
@@ -143,22 +109,26 @@ KMX_BOOL KMX_ProcessEvent::LoadKeyboard(km_core_path_name fileName, LPKEYBOARD *
   kbp = FixupKeyboard(buf, filebase);
 #endif
 
-  if(!kbp) return FALSE;
+  if (!kbp) {
+    DebugLog("Can't copy/fixup keyboard");
+    delete[] buf;
+    return FALSE;
+  }
 
-  if(kbp->dwIdentifier != FILEID_COMPILED) {
-    delete [] buf;
+  if (kbp->dwIdentifier != FILEID_COMPILED) {
     DebugLog("errNotFileID");
+    delete[] buf;
     return FALSE;
   }
 
   *lpKeyboard = kbp;
-
   return TRUE;
 }
 
 PKMX_WCHAR KMX_ProcessEvent::StringOffset(PKMX_BYTE base, KMX_DWORD offset)
 {
-  if(offset == 0) return NULL;
+  if(offset == 0)
+    return NULL;
   return (PKMX_WCHAR)(base + offset);
 }
 

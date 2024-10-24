@@ -8,8 +8,7 @@
 
 #include "keyman_core.h"
 #include "path.hpp"
-
-//#include "keyboard.hpp"
+#include "mock/mock_processor.hpp"
 
 namespace
 {
@@ -26,13 +25,10 @@ int main(int, char *[])
   km_core_keyboard_key * kb_key_list = nullptr;
   km_core_keyboard_imx * kb_imx_list = nullptr;
 
-  try_status(km_core_keyboard_load(test_kb_path.c_str(), &test_kb));
+  test_kb = (km_core_keyboard *)new km::core::mock_processor(test_kb_path);
   try_status(km_core_keyboard_get_attrs(test_kb, &kb_attrs));
   try_status(km_core_keyboard_get_key_list(test_kb,&kb_key_list));
   try_status(km_core_keyboard_get_imx_list(test_kb,&kb_imx_list));
-
-  if (kb_attrs->folder_path != test_kb_path.parent())
-    return __LINE__;
 
   km_core_keyboard_dispose(test_kb);
   km_core_keyboard_key_list_dispose(kb_key_list);

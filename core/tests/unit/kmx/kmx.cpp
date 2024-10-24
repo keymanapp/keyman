@@ -29,6 +29,7 @@
 #include <test_assert.h>
 #include <test_color.h>
 #include "../emscripten_filesystem.h"
+#include "../load_kmx_file.hpp"
 
 #include "kmx_test_source.hpp"
 
@@ -191,7 +192,8 @@ run_test(const km::core::path &source, const km::core::path &compiled) {
   km_core_keyboard * test_kb = nullptr;
   km_core_state * test_state = nullptr;
 
-  try_status(km_core_keyboard_load(compiled.c_str(), &test_kb));
+  auto blob = km::tests::load_kmx_file(compiled.native().c_str());
+  try_status(km_core_keyboard_load_from_blob(compiled.stem().c_str(), blob.data(), blob.size(), &test_kb));
 
   // Setup state, environment
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));

@@ -22,6 +22,7 @@
 
 #include <test_assert.h>
 #include "../emscripten_filesystem.h"
+#include "../load_kmx_file.hpp"
 
 using namespace km::core::kmx;
 
@@ -54,8 +55,8 @@ void setup(const char *keyboard) {
   teardown();
 
   km::core::path path = km::core::path::join(arg_path, keyboard);
-
-  try_status(km_core_keyboard_load(path.native().c_str(), &test_kb));
+  auto blob = km::tests::load_kmx_file(path.native().c_str());
+  try_status(km_core_keyboard_load_from_blob(path.stem().c_str(), blob.data(), blob.size(), &test_kb));
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
   try_status(context_items_from_utf16(u"Hello 😁", &citems));
 

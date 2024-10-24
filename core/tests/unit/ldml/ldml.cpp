@@ -35,6 +35,7 @@
 #include "ldml/ldml_markers.hpp"
 
 #include "processor.hpp"
+#include "../load_kmx_file.hpp"
 
 namespace {
 
@@ -273,7 +274,8 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
   km_core_state * test_state = nullptr;
 
   const km_core_status expect_load_status = test_source.get_expected_load_status();
-  assert_equal(km_core_keyboard_load(compiled.c_str(), &test_kb), expect_load_status);
+  auto blob = km::tests::load_kmx_file(compiled.native().c_str());
+  assert_equal(km_core_keyboard_load_from_blob(compiled.stem().c_str(), blob.data(), blob.size(), &test_kb), expect_load_status);
 
   if (expect_load_status != KM_CORE_STATUS_OK) {
     std::cout << "Keyboard was expected to be invalid, so exiting " << std::endl;

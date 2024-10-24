@@ -15,6 +15,7 @@
 
 #include <test_assert.h>
 #include "../emscripten_filesystem.h"
+#include "../load_kmx_file.hpp"
 
 void compare_context(km_core_context *app_context, const km_core_cu* expected_final_app_context);
 
@@ -46,7 +47,8 @@ void setup(const km_core_cu *app_context, const km_core_cu *cached_context_strin
   teardown();
 
   km::core::path path = km::core::path::join(arg_path, "..", "ldml", "keyboards", "k_001_tiny.kmx");
-  try_status(km_core_keyboard_load(path.native().c_str(), &test_kb));
+  auto blob = km::tests::load_kmx_file(path.native().c_str());
+  try_status(km_core_keyboard_load_from_blob(path.stem().c_str(), blob.data(), blob.size(), &test_kb));
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
 
   if(cached_context_string) {
