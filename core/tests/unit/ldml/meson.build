@@ -162,6 +162,19 @@ foreach kbd : tests
   test(kbd, ldml, args: [kbd_src, kbd_obj], suite: 'ldml-keyboards')
 endforeach
 
+foreach kbd : tests_from_cldr_45
+  kbd_src = test_path / kbd + '.xml'
+  kbd_obj = test_path / kbd + '.kmx'
+  test(kbd, ldml, args: [kbd_src, kbd_obj], suite: 'ldml-keyboards')
+endforeach
+
+foreach kbd : tests_from_cldr_46
+  kbd_src = test_path / kbd + '.xml'
+  kbd_obj = test_path / kbd + '.kmx'
+  test(kbd, ldml, args: [kbd_src, kbd_obj], suite: 'ldml-keyboards')
+endforeach
+
+
 # Run tests on all invalid keyboards (`invalid_tests` defined in invalid-keyboards/meson.build)
 
 foreach kbd : invalid_tests
