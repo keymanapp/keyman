@@ -53,7 +53,8 @@ open class SettingsViewController: UITableViewController {
   public init(/*storage: Storage*/) {
 //    self.storage = storage
     super.init(nibName: nil, bundle: nil)
-    
+    os_log("init settings", log:KeymanEngineLogger.settings, type: .default)
+
     itemsArray = [[String: String]]()
     itemsArray.append([
       "title": NSLocalizedString("menu-installed-languages-title", bundle: engineBundle, comment: ""),
@@ -77,6 +78,12 @@ open class SettingsViewController: UITableViewController {
       "title": NSLocalizedString("menu-settings-spacebar-text", bundle: engineBundle, comment: ""),
       "subtitle": "",
       "reuseid": "spacebartext"
+      ])
+    
+    itemsArray.append([
+      "title": NSLocalizedString("menu-settings-adjust-keyboard-height", bundle: engineBundle, comment: ""),
+      "subtitle": "",
+      "reuseid": "adjustkeyboardheight"
       ])
     
     if let _ = URL(string: UIApplication.openSettingsURLString) {
@@ -176,7 +183,7 @@ open class SettingsViewController: UITableViewController {
         enableReportingSwitch.rightAnchor.constraint(equalTo: cell.layoutMarginsGuide.rightAnchor).isActive = true
         enableReportingSwitch.centerYAnchor.constraint(equalTo: cell.layoutMarginsGuide.centerYAnchor).isActive = true
         
-      case "systemkeyboardsettings", "installfile", "forcederror", "spacebartext":
+      case "systemkeyboardsettings", "installfile", "forcederror", "spacebartext", "adjustkeyboardheight":
         break
       default:
         let message = "unknown cellIdentifier(\"\(cellIdentifier ?? "EMPTY")\")"
@@ -233,6 +240,10 @@ open class SettingsViewController: UITableViewController {
         cell.detailTextLabel?.text = NSLocalizedString("menu-settings-spacebar-hint-"+Manager.shared.spacebarText.rawValue, bundle: engineBundle, comment: "")
         cell.detailTextLabel?.isEnabled = true
         break
+      case "adjustkeyboardheight":
+        cell.accessoryType = .disclosureIndicator
+        cell.detailTextLabel?.isEnabled = false
+        break
       case "showbanner", "showgetstarted":
         cell.detailTextLabel?.isEnabled = false
       default:
@@ -280,6 +291,8 @@ open class SettingsViewController: UITableViewController {
           SentryManager.forceError()
         case "spacebartext":
           showSpacebarText()
+        case "adjustkeyboardheight":
+          showAdjustKeyboardHeight()
         default:
           break
       }
@@ -429,4 +442,7 @@ open class SettingsViewController: UITableViewController {
     }
   }
   
+  func showAdjustKeyboardHeight() {
+    os_log("selected Adjust Keyboard Height", log:KeymanEngineLogger.settings, type: .default)
+  }
 }
