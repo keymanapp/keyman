@@ -67,6 +67,8 @@
   <!-- Context: Keyman Settings menu -->
   <string name="adjust_keyboard_height" comment="Menu action to adjust keyboard height">កែកម្ពស់ក្ដារចុច</string>
   <!-- Context: Keyman Settings menu -->
+  <string name="adjust_longpress_delay" comment="Menu action to adjust longpress delay duration">កែសម្រួលការពន្យារពេលរបស់ longpress</string>
+  <!-- Context: Keyman Settings menu -->
   <string name="spacebar_caption" comment="Menu action to set the spacebar caption">ពាក្យលើគ្រាប់ចុចដកឃ្លា</string>
   <!-- Context: Keyman Settings menu / Spacebar caption -->
   <string name="spacebar_caption_keyboard" comment="Spacebar caption option - keyboard">ក្តារចុច</string>
@@ -86,11 +88,11 @@
   <string name="spacebar_caption_hint_blank" comment="Spacebar caption hint - blank">កុំបង្ហាញពាក្យនៅលើគ្រាប់ចុចដកឃ្លា</string>
   <!-- Context: Keyman Settings menu / Haptic feedback -->
   <string name="haptic_feedback" comment="haptic feedback on key press">ញ័រពេលវាយអក្សរ​</string>
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner" comment="text suggestions banner">បង្ហាញ​បដា​ជានិច្ច</string>
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner_on" comment="Description when toggle is on">ត្រូវ​អនុវត្ត</string>
-  <!-- Context: Keyman Settings menu -->
+  <!-- Context: Keyman Settings menu. Removed in Keyman 18 -->
   <string name="show_banner_off" comment="Description when toggle is off">បើ​បិទ បដា​នឹង​បង្ហាញ​តែ​នៅ​ពេលបើក​ការណែនាំ​ពាក្យស្វ័យប្រវត្តិប៉ុណ្ណោះ</string>
   <!-- Context: Keyman Settings menu -->
   <string name="show_send_crash_report" comment="permission for sending crash reports">អនុញ្ញាត​ឱ្យ​ផ្ញើ​របាយការណ៍​អំពី​ការគាំង​តាម​បណ្ដាញ</string>
@@ -122,6 +124,14 @@
   <string name="rotate_the_device" comment="Second line of adjusting keyboard height">បង្វិលឧបករណ៍ដើម្បីកែបញ្ឈ និងផ្ដេក</string>
   <!-- Context: Adjust Keyboard Height menu -->
   <string name="reset_to_defaults" comment="Button to reset to default heights">ប្ដូរ​កំណត់​ទៅលំនាំដើម</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="longpress_delay_time" comment="Current longpress delay time (seconds)">រយៈពេលពន្យារ: %1$.1f វិនាទី</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_delay_time_up" comment="Make longpress delay longer">ពន្យារពេលយូរជាងមុន</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_delay_time_down" comment="Make longpress delay shorter">ពន្យារពេលតិចជាងមុន</string>
+  <!-- Context: Adjust Longpress Delay Time menu -->
+  <string name="ic_longpress_delay_slider" comment="Adjust longpress delay time">របារំកិលពន្យារពេល longpress</string>
   <!-- Context: Keyman Web Browser -->
   <string name="hint_text" comment="Prompt to type in the browser search bar">ស្វែងរក ឬវាយ​បញ្ចូល URL</string>
   <!-- Context: Keyman Web Browser -->
