@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.130 alpha 2024-10-24
+
+* fix(android/engine): Increase robustness when checking package kmp.json languages (#12567)
+* chore(ios): support xcode 16 build (#12570)
+
 ## 18.0.129 alpha 2024-10-21
 
 * chore(mac): support Xcode 16 build (#12554)
