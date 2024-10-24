@@ -212,8 +212,8 @@ public class KMKeyboardJSHandler {
             k.setShouldIgnoreSelectionChange(true);
           }
           if (k.keyboardType == KeyboardType.KEYBOARD_TYPE_SYSTEM &&
-              icText != null && icText.text != null && icText.text.length() == 0) {
-            // If no context left to delete, let the app handle the BACKSPACE
+              icText != null && icText.selectionStart == 0 && icText.selectionEnd == 0) {
+            // If cursor at the start of a line, let the app handle the BACKSPACE
             keyDownUp(KeyEvent.KEYCODE_DEL, 0);
           } else {
             performLeftDeletions(ic, deleteLeft);
