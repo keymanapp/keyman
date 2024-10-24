@@ -121,12 +121,12 @@ class CompilerTest : public testing::Test {
             }
         }
 
-        void initVKDictionary(FILE_KEYBOARD &fk) {
+        void initVKDictionary(FILE_KEYBOARD &fk, std::vector<const KMX_WCHAR*> names) {
             fk.dpVKDictionary = new FILE_VKDICTIONARY[10];
-            fk.cxVKDictionary = 0;
+            fk.cxVKDictionary = names.size();
 
-            for (KMX_DWORD i=0; i<10; i++) {
-                fk.dpVKDictionary[i].szName[0] = 0;
+            for (KMX_DWORD i=0; i<fk.cxVKDictionary; i++) {
+                u16cpy(fk.dpVKDictionary[i].szName, names[i]);
             }
         }
 
@@ -1703,7 +1703,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_osb_test) {
     KMX_WCHAR str[LINESIZE];
     KMX_WCHAR output[GLOBAL_BUFSIZE];
     PKMX_WCHAR newp = nullptr;
-    initVKDictionary(fileKeyboard);
+    initVKDictionary(fileKeyboard, {u"abc", u"def", u"ghi"});
 
     // virtual key, empty, KmnCompilerMessages::ERROR_InvalidToken
     u16cpy(str, u"[]");
@@ -1821,7 +1821,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_osb_test) {
     // u16cpy(str, u"[CTRL_K_A]");
     // EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     // tstr_virtual_key_valid[2] = ISVIRTUALKEY | K_CTRLFLAG;
-    // tstr_virtual_key_valid[3] = 256; //VK_MAX + 1
+    // tstr_virtual_key_valid[3] = 259; //VK_MAX + 4
     // EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
     // EXPECT_EQ(0, msgproc_errors.size());
     // tstr_virtual_key_valid[3] = 65;
@@ -1924,11 +1924,11 @@ TEST_F(CompilerTest, GetXStringImpl_type_osb_test) {
     EXPECT_EQ(SZMAX_VKDICTIONARYNAME - 1 + 2, u16len(str));
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     tstr_virtual_key_valid[2] = ISVIRTUALKEY;
-    tstr_virtual_key_valid[3] = 256; //VK_MAX + 1
+    tstr_virtual_key_valid[3] = 259; //VK_MAX + 4
     EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
     tstr_virtual_key_valid[3] = 65;
-    fileKeyboard.cxVKDictionary = 0;
-    fileKeyboard.dpVKDictionary[0].szName[0] = 0;
+    fileKeyboard.cxVKDictionary = 3;
+    fileKeyboard.dpVKDictionary[3].szName[0] = 0;
 
     // virtual key, not in VKeyNames, name too long, ERROR_InvalidToken
     fileKeyboard.version = VERSION_90;
@@ -1943,32 +1943,24 @@ TEST_F(CompilerTest, GetXStringImpl_type_osb_test) {
 
     // virtual key, not in VKeyNames, valid
     fileKeyboard.version = VERSION_90;
-    u16cpy(str, u"[abc]");
+    u16cpy(str, u"[jkl]");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     tstr_virtual_key_valid[2] = ISVIRTUALKEY;
-    tstr_virtual_key_valid[3] = 256; //VK_MAX + 1
+    tstr_virtual_key_valid[3] = 259; //VK_MAX + 4
     EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
-    EXPECT_EQ(0, u16cmp(u"abc", fileKeyboard.dpVKDictionary[0].szName));
+    EXPECT_EQ(0, u16cmp(u"jkl", fileKeyboard.dpVKDictionary[3].szName));
     tstr_virtual_key_valid[3] = 65;
-    fileKeyboard.cxVKDictionary = 0;
-    fileKeyboard.dpVKDictionary[0].szName[0] = 0;
+    fileKeyboard.cxVKDictionary = 3;
+    fileKeyboard.dpVKDictionary[3].szName[0] = 0;
 
     // virtual key, not in VKeyNames, pre-existing name, valid
     fileKeyboard.version = VERSION_90;
-    fileKeyboard.cxVKDictionary = 3;
-    u16cpy(fileKeyboard.dpVKDictionary[0].szName, u"abc");
-    u16cpy(fileKeyboard.dpVKDictionary[1].szName, u"def");
-    u16cpy(fileKeyboard.dpVKDictionary[2].szName, u"ghi");
     u16cpy(str, u"[def]");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     tstr_virtual_key_valid[2] = ISVIRTUALKEY;
     tstr_virtual_key_valid[3] = 257; //VK_MAX + 2
     EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
     tstr_virtual_key_valid[3] = 65;
-    fileKeyboard.cxVKDictionary = 0;
-    fileKeyboard.dpVKDictionary[0].szName[0] = 0;
-    fileKeyboard.dpVKDictionary[1].szName[0] = 0;
-    fileKeyboard.dpVKDictionary[2].szName[0] = 0;
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
