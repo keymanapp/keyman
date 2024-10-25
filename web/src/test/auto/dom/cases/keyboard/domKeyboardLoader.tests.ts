@@ -1,8 +1,9 @@
 import { assert } from 'chai';
 
 import { DOMKeyboardLoader } from 'keyman/engine/keyboard/dom-keyboard-loader';
-import { extendString, KeyboardHarness, Keyboard, MinimalKeymanGlobal, DeviceSpec, KeyboardKeymanGlobal } from 'keyman/engine/keyboard';
+import { extendString, KeyboardHarness, Keyboard, MinimalKeymanGlobal, DeviceSpec, KeyboardKeymanGlobal, KeyboardDownloadError, KeyboardScriptError } from 'keyman/engine/keyboard';
 import { KeyboardInterface, Mock } from 'keyman/engine/js-processor';
+import { assertThrowsAsync } from 'keyman/tools/testing/test-utils';
 
 declare let window: typeof globalThis;
 // KeymanEngine from the web/ folder... when available.
@@ -26,6 +27,24 @@ describe('Keyboard loading in DOM', function() {
       KeymanWeb.uninstall();
     }
   })
+
+  it('throws error when keyboard does not exist', async () => {
+    const harness = new KeyboardInterface(window, MinimalKeymanGlobal);
+    const keyboardLoader = new DOMKeyboardLoader(harness);
+    const nonExisting = '/does/not/exist.js';
+
+    await assertThrowsAsync(async () => await keyboardLoader.loadKeyboardFromPath(nonExisting),
+      KeyboardDownloadError, `Unable to download keyboard at ${nonExisting}`);
+  });
+
+  it('throws error when keyboard is invalid', async () => {
+    const harness = new KeyboardInterface(window, MinimalKeymanGlobal);
+    const keyboardLoader = new DOMKeyboardLoader(harness);
+    const nonKeyboardPath = '/common/test/resources/index.mjs';
+
+    await assertThrowsAsync(async () => await keyboardLoader.loadKeyboardFromPath(nonKeyboardPath),
+      KeyboardScriptError, `Error registering the keyboard script at ${nonKeyboardPath}; it may contain an error.`);
+  });
 
   it('`window`, disabled rule processing', async () => {
     const harness = new KeyboardHarness(window, MinimalKeymanGlobal);

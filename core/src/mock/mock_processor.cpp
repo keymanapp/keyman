@@ -3,7 +3,7 @@
   Description:  This is a test implementation of the keyboard processor API to
                 enable testing API clients against a basic keyboard and give
                 them something to link against and load.
-                TODO: Add a mecahnism to trigger output of PERSIST_OPT &
+                TODO: Add a mechanism to trigger output of PERSIST_OPT &
                 RESET_OPT actions items, options support and context matching.
   Create Date:  17 Oct 2018
   Authors:      Tim Eves (TSE)
@@ -74,7 +74,7 @@ namespace km {
   {
     mock_processor::mock_processor(core::path const & path)
     : abstract_processor(
-        keyboard_attributes(path.stem(), u"3.145", path.parent(), {
+        keyboard_attributes(path.stem(), u"3.145", {
           option{KM_CORE_OPT_KEYBOARD, u"__test_point", u"not tiggered"},
         })),
       _options({
@@ -228,5 +228,23 @@ namespace km {
     km_core_status mock_processor::validate() const { return KM_CORE_STATUS_OK; }
 
     km_core_status null_processor::validate() const { return KM_CORE_STATUS_INVALID_ARGUMENT; }
-  } // namespace core
+
+    /**
+     * Returns true if the data starts with 'MOCK'.
+     *
+     * @param data  the keyboard blob
+     * @return true if the processor can handle the keyboard, otherwise false.
+     */
+    bool mock_processor::is_handled(const std::vector<uint8_t>& data) {
+      if (data.empty()) {
+        return false;
+      }
+
+      if (data.size() < 4) {  // a MOCK file is at least 4 bytes (MOCK)
+        return false;
+      }
+
+      return ((char*)data.data())[0] == 'M' && ((char*)data.data())[1] == 'O' && ((char*)data.data())[2] == 'C' && ((char*)data.data())[3] == 'K';
+    }
+  }  // namespace core
 } // namespace km
