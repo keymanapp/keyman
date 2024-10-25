@@ -21,6 +21,7 @@ builder_describe "Builds Keyman for macOS." \
   ":engine     KeymanEngine4Mac" \
   ":app        Keyman4MacIM" \
   ":help       Online documentation" \
+  ":mcompile   mnemonic layout recompiler- mac" \
   ":testapp    Keyman4Mac (test harness)" \
   "--quick,-q  Bypasses notarization for $(builder_term install)"
 
