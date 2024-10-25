@@ -301,3 +301,7 @@ _select_node_version_with_nvm() {
     builder_die "Attempted to select node.js version $REQUIRED_NODE_VERSION but found $CURRENT_NODE_VERSION instead"
   fi
 }
+
+check-markdown() {
+  node "$KEYMAN_ROOT/resources/tools/check-markdown" --root "$1"
+}

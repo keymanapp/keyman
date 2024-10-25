@@ -21,6 +21,8 @@ Details:
     Developer will also include a [metadata](metadata) file in the
     package. Lexical model packages contain one lexical model instead of
     keyboards.
+:   .kmp file format has registered MIME type
+    [`application/vnd.keyman.kmp+zip`](https://www.iana.org/assignments/media-types/application/vnd.keyman.kmp+zip).
 
 Distributed with keyboard:
 :   A Keyman keyboard Package file (.KMP) can include keyboard files
