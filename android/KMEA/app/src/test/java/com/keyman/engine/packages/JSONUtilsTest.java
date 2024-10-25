@@ -19,6 +19,7 @@ import java.io.File;
 @RunWith(RobolectricTestRunner.class)
 public class JSONUtilsTest {
   private static final File TEST_RESOURCE_ROOT = new File("test_resources", "packages");
+  private static final File TEST_INVALID_RESOURCE_ROOT = new File("test_resources", "invalid_packages");
   private static final String TAG = "JSONUtilsTest";
 
   @Before
@@ -50,6 +51,18 @@ public class JSONUtilsTest {
     } catch (JSONException e) {
       Log.e(TAG, "test_getLanguages error: " + e);
     }
+  }
+
+  /**
+   * Test parsing null_languages/kmp.json which has no languages
+   */
+  @Test
+  public void test_invalid_getLanguages() {
+    JSONUtils.initialize(TEST_INVALID_RESOURCE_ROOT);
+    JSONArray result = JSONUtils.getLanguages();
+    final int EXPECTED_NUM_LANGUAGES = 0;
+
+    Assert.assertEquals(EXPECTED_NUM_LANGUAGES, result.length());
   }
 
   @Test
