@@ -67,7 +67,7 @@ jobs:
 
     - name: "Verify API for libkeymancore*.so (${{ steps.environment_step.outputs.GIT_BRANCH }}, branch ${{ steps.environment_step.outputs.GIT_BASE_BRANCH }}, by ${{ steps.environment_step.outputs.GIT_USER }})"
       run: |
-        echo "Verify API for libkeymancore*.so (${{ steps.environment_step.outputs.GIT_BRANCH }}, branch ${{ steps.environment_step.outputs.GIT_BASE_BRANCH }}, by ${{ steps.environment_step.outputs.GIT_USER }})" >> $GITHUB_STEP_SUMMARY
+        echo "Verify API for libkeymancore*.so (${{ steps.environment_step.outputs.GIT_BRANCH }}, branch ${{ steps.environment_step.outputs.GIT_BASE_BRANCH }}, by ${{ steps.environment_step.outputs.GIT_USER }}):" >> $GITHUB_STEP_SUMMARY
 
         BIN_PACKAGE=$(ls "${GITHUB_WORKSPACE}/artifacts/" | grep "${PKG_NAME}[0-9]*_${{ steps.environment_step.outputs.VERSION }}-1${{ steps.environment_step.outputs.PRERELEASE_TAG }}+$(lsb_release -c -s)1_amd64.deb")
         cd ${{ github.workspace }}/keyman/linux

@@ -1,5 +1,27 @@
 # Keyman Version History
 
+## 18.0.130 alpha 2024-10-24
+
+* fix(android/engine): Increase robustness when checking package kmp.json languages (#12567)
+* chore(ios): support xcode 16 build (#12570)
+
+## 18.0.129 alpha 2024-10-21
+
+* chore(mac): support Xcode 16 build (#12554)
+
+## 18.0.128 alpha 2024-10-14
+
+* docs(developer): add refs to Keyman MIME types (#12540)
+
+## 18.0.127 alpha 2024-10-12
+
+* fix(developer): use TextDecoder to convert Uint8Array to string (#12537)
+
+## 18.0.126 alpha 2024-10-11
+
+* test(common): add markdown link check test for product documentation (#12472)
+* chore(linux): improve output if `dpkg-gensymbols` fails and run other tests (#12527)
+
 ## 18.0.125 alpha 2024-10-10
 
 * chore(common): allow to run `build.sh` scripts in `bashdb` debugger (#12518)
