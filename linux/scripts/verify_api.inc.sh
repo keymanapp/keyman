@@ -32,8 +32,12 @@ check_api_not_changed() {
   trap "rm -rf \"${tmpDir}\"" ERR
   dpkg -x "${BIN_PKG}" "${tmpDir}"
   mkdir -p debian/tmp/DEBIAN
-  dpkg-gensymbols -v"${VERSION}" -p"${PKG_NAME}" -e"${tmpDir}"/usr/lib/x86_64-linux-gnu/"${LIB_NAME}".so* -c4
-  output_ok "${LIB_NAME} API didn't change"
+  if dpkg-gensymbols -v"${VERSION}" -p"${PKG_NAME}" -e"${tmpDir}"/usr/lib/x86_64-linux-gnu/"${LIB_NAME}".so* -c4; then
+    output_ok "${LIB_NAME} API didn't change"
+  else
+    output_error "${LIB_NAME} API changed"
+    EXIT_CODE=4
+  fi
   cd "${REPO_ROOT}/linux"
   rm -rf "${tmpDir}"
   trap ERR
