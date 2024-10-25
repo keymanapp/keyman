@@ -102,6 +102,7 @@ class KeymanWebViewController: UIViewController {
     // after it has been replaced by KMW's OSK resizing operation.)
 
     keyboardSize = view.bounds.size
+    os_log("KeymanWebViewController viewWillLayoutSubviews to keyboardSize %{public}s", log:KeymanEngineLogger.ui, type: .debug, NSCoder.string(for:keyboardSize))
   }
 
   open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -704,7 +705,18 @@ extension KeymanWebViewController {
   }
 
   func constraintTargetHeight(isPortrait: Bool) -> CGFloat {
-    return KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: isPortrait)?.keyboardHeight ?? 216 // default for ancient devices
+    var kbHeight = KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: isPortrait)?.keyboardHeight ?? 216 // default for ancient devices
+    os_log("constraintTargetHeight, keyboard height before: %f", log:KeymanEngineLogger.ui, type: .default, kbHeight)
+
+    if (isPortrait) {
+      kbHeight+=100;
+    } else {
+      kbHeight-=50;
+    }
+
+    os_log("constraintTargetHeight, keyboard height after: %f", log:KeymanEngineLogger.ui, type: .default, kbHeight)
+
+    return kbHeight;
   }
 
   var keyboardWidth: CGFloat {
@@ -723,6 +735,7 @@ extension KeymanWebViewController {
     }
 
     keyboardSize = CGSize(width: width, height: height)
+    os_log("KeymanWebViewController initKeyboardSize %{public}s", log:KeymanEngineLogger.ui, type: .default, NSCoder.string(for:keyboardSize))
   }
 
   var keyboardSize: CGSize {
