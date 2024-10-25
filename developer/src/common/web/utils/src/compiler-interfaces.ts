@@ -263,6 +263,10 @@ export enum CompilerErrorNamespace {
    * kmc-keyboard-info 0x9000…0x9FFF
    */
   KeyboardInfoCompiler = 0x9000,
+  /**
+   * kmc-convert 0xA000…0xAFFF
+   */
+  Converter = 0xA000,
 };
 
 /**
