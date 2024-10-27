@@ -21,7 +21,7 @@ describe('KeylayoutToKmnConverter', function() {
       // note, could use 'chai as promised' library to make this more fluent:
       let threw = false;
       try {
-        await converter.run(null, null, null);
+        await converter.run(null, null);
       } catch {
         threw = true;
       }
@@ -38,18 +38,16 @@ describe('KeylayoutToKmnConverter', function() {
       //const inputFilename  = makePathToFixture('../data/My_dk_Keyboard.keylayout');
 
       const outputFilename = makePathToFixture('../data/MyResult.kmn');
-      const  data = new Uint8Array([1, 2, 3, 4]);       // _S2 just to have sth in an array
 
       console.log('        inputFilename', inputFilename)
       console.log('        outputFilename', outputFilename)
-      console.log('        data', data)
 
       // _S2 create obj of derived class-> use derived functions
       const converter = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
 
       let threw = false;
       try {
-        await converter.run(inputFilename, outputFilename, data);
+        await converter.run(inputFilename, outputFilename);
       } catch {
         threw = true;
       }

@@ -11,7 +11,6 @@ import { XMLParser } from 'fast-xml-parser';  // for reading a file
 import { readFileSync } from 'fs';
 import { writeFileSync } from "fs";           // for writing a file
 
-
 export class KeylayoutToKmnConverter {
   static readonly INPUT_FILE_EXTENSION = '.keylayout';
   static readonly OUTPUT_FILE_EXTENSION = '.kmn';
@@ -28,9 +27,9 @@ export class KeylayoutToKmnConverter {
  * @param  binaryData ... _S2
  * @return
  */
-  async run(inputFilename: string, outputFilename: string, binaryData: Uint8Array): Promise<ConverterToKmnArtifacts> {
+  async run(inputFilename: string, outputFilename: string): Promise<ConverterToKmnArtifacts> {
 
-    if(!inputFilename || !outputFilename || !binaryData) {
+    if(!inputFilename || !outputFilename) {
       throw new Error('Invalid parameters');
     }
 
@@ -126,14 +125,18 @@ export class KeylayoutToKmnConverter {
       const keys_singleLayer :Uint8Array[] = []
 
       // now convert & sort
-      keys_singleLayer[0]  =  data_ukelele[j][0];
-      keys_singleLayer[24] =  data_ukelele[j][1];
-      keys_singleLayer[2]  =  data_ukelele[j][2];
-      keys_singleLayer[1]  =  data_ukelele[j][3];
-      keys_singleLayer[16] =  data_ukelele[j][4];
-      keys_singleLayer[29] =  data_ukelele[j][5];
-      keys_singleLayer[38] =  data_ukelele[j][6];
-      keys_singleLayer[46] =  data_ukelele[j][7];
+      // a-b-c                a-s-d-f-h
+      keys_singleLayer[0]  =  data_ukelele[j][0];   // a in a spec keyboard keylayoutfile -> code 0
+      keys_singleLayer[24] =  data_ukelele[j][1];   // y -> code 6
+      keys_singleLayer[2]  =  data_ukelele[j][2];   // c -> code 8     --> keyman K_..[3]
+      keys_singleLayer[1]  =  data_ukelele[j][3];   // b -> code 11    --> keyman K_..[2]  no! USVirtualKeyCodes should be [35] USVirtualKeyCodes.K_B
+      keys_singleLayer[16] =  data_ukelele[j][4];   // q -> code 12
+      keys_singleLayer[29] =  data_ukelele[j][5];   // 3 -> code 20
+      keys_singleLayer[38] =  data_ukelele[j][6];   // ß -> code 27
+      keys_singleLayer[46] =  data_ukelele[j][7];   //   -> code 47
+
+      // keyman K_A...      code ukelele
+      // keyman VK-code     == mac VK
       // later more here...
 
       data_kmn[j] = keys_singleLayer
@@ -141,8 +144,7 @@ export class KeylayoutToKmnConverter {
 
     //copy the modifier states
     data_kmn[data_ukelele.length - 1] = data_ukelele[data_ukelele.length - 1]
-    console.log(" _S2 convert finished\n", data_kmn
-    )
+    //console.log(" _S2 convert finished\n", data_kmn)
 
     return (data_kmn.length === data_ukelele.length ) ? data_kmn : null
   }
@@ -178,10 +180,10 @@ export class KeylayoutToKmnConverter {
     data += "group(main) using keys\n"
     data += "\n"
 
-    // check if caps is used from .keylayout-file
+    // if caps is used we need to add NCAPS in kmn-file
     let isCAPSused = false
     for (let i= 0 ; i < kmn_array[kmn_array.length-1].length; i++) {
-      if (kmn_array[kmn_array.length-1][i] === "caps")  {
+      if( String((kmn_array[kmn_array.length-1][i]).indexOf("caps") !== -1  ) ) {
         isCAPSused = true
       }
     }
@@ -236,7 +238,7 @@ export class KeylayoutToKmnConverter {
     let kmn_modifier = ""
     let kmn_ncaps = ""
 
-    // copy each modifier into element of array modifier_state
+    // copy each modifier seperate element
     const modifier_state: string[] = keylayout_modifier.split(" ");
 
     // TODO review these conditions-> what else do I need? 
@@ -246,33 +248,35 @@ export class KeylayoutToKmnConverter {
 
     for (let i = 0; i < modifier_state.length; i++) {
 
-      // marker used for adding NCAPS when CAPS is used somewhere in kmn
-      if ( isCAPSused && String(modifier_state[i]) !== "caps")
+      if ( isCAPSused && (String(keylayout_modifier).indexOf("caps") === -1))
         kmn_ncaps = " NCAPS "
 
       // TODO go over, find more conditions & simplify
-      if      ( String(modifier_state[i]) === "anyOption")   add_modifier = "RALT "
-      else if ( String(modifier_state[i]) === "anyShift")    add_modifier = "SHIFT "
-      else if ( String(modifier_state[i]) === "anyControl")  add_modifier = "CTRL "
+      if      ( String(modifier_state[i]) === "anyOption")    add_modifier = "RALT "
+      else if ( String(modifier_state[i]) === "anyShift")     add_modifier = "SHIFT "
+      else if ( String(modifier_state[i]) === "anyControl")   add_modifier = "CTRL "
 
-      else if ( String(modifier_state[i]) === "anyOption?")  add_modifier = ""    // does anyOption?... happen?
-      else if ( String(modifier_state[i]) === "anyShift?")   add_modifier =  ""
-      else if ( String(modifier_state[i]) === "anyControl?") add_modifier = ""
+      else if ( String(modifier_state[i]) === "anyOption?")   add_modifier = ""    // does anyOption?... happen?
+      else if ( String(modifier_state[i]) === "anyShift?")    add_modifier = ""
+      else if ( String(modifier_state[i]) === "anyControl?")  add_modifier = ""
 
-      else if( (String(modifier_state[i]) === "shift?" ) &&  this.isInArray('rshift',modifier_state))                                           add_modifier = "RSHIFT "
-      else if( (String(modifier_state[i]) === "shift?" ) &&  this.isInArray('lshift',modifier_state))                                           add_modifier = "LSHIFT "
-      else if( (String(modifier_state[i]) === "shift?" ) &&  this.isInArray('rshift',modifier_state) &&  this.isInArray('lshift',modifier_state))     add_modifier =  "SHIFT "
+      // RSHIFT, rshift, Rshift,...?
+      else if ( (String(modifier_state[i]) === "shift?" ) &&  this.isInArray('rshift',modifier_state))                                           add_modifier = "RSHIFT "
+      else if ( (String(modifier_state[i]) === "shift?" ) &&  this.isInArray('lshift',modifier_state))                                           add_modifier = "LSHIFT "
+      else if ( (String(modifier_state[i]) === "shift?" ) &&  this.isInArray('rshift',modifier_state) &&  this.isInArray('lshift',modifier_state))     add_modifier =  "SHIFT "
 
-      else if( (String(modifier_state[i]) === "option?" ) && this.isInArray('rOption',modifier_state))                                          add_modifier = "ROPT "
-      else if( (String(modifier_state[i]) === "option?" ) && this.isInArray('lOption',modifier_state))                                          add_modifier = "LOPT "
-      else if( (String(modifier_state[i]) === "option?" ) && this.isInArray('rOption',modifier_state) &&  this.isInArray('lOption',modifier_state))   add_modifier =  "OPT "
+      else if ( (String(modifier_state[i]) === "option?" ) && this.isInArray('rOption',modifier_state))                                          add_modifier = "ROPT "
+      else if ( (String(modifier_state[i]) === "option?" ) && this.isInArray('lOption',modifier_state))                                          add_modifier = "LOPT "
+      else if ( (String(modifier_state[i]) === "option?" ) && this.isInArray('rOption',modifier_state) &&  this.isInArray('lOption',modifier_state))   add_modifier =  "OPT "
 
-      else if( (String(modifier_state[i]) === "ctrl?" )   && this.isInArray('rControl',modifier_state))                                         add_modifier = "RCTRL "
-      else if( (String(modifier_state[i]) === "ctrl?" )   && this.isInArray('lControl',modifier_state))                                         add_modifier = "LCTRL "
-      else if( (String(modifier_state[i]) === "ctrl?" )   && this.isInArray('rControl',modifier_state) &&  this.isInArray('lControl',modifier_state)) add_modifier = "CTRL "
+      else if ( (String(modifier_state[i]) === "ctrl?" )   && this.isInArray('rControl',modifier_state))                                         add_modifier = "RCTRL "
+      else if ( (String(modifier_state[i]) === "ctrl?" )   && this.isInArray('lControl',modifier_state))                                         add_modifier = "LCTRL "
+      else if ( (String(modifier_state[i]) === "ctrl?" )   && this.isInArray('rControl',modifier_state) &&  this.isInArray('lControl',modifier_state)) add_modifier = "CTRL "
 
-      // remove if modifier contains ? e.g. caps?, ctrl?, ...
-      else if( String(modifier_state[i]).charAt(modifier_state[i].length-1) === "?")        add_modifier = ""
+      // remove if modifier contains '?' except for 'caps?'  e.g. 'shift?', 'ctrl?', ...
+      // is this correct: caps? => caps is not neccessary. If its not neccessary we need to write NCAPS. Correct?
+      else if ( String(modifier_state[i]) === "caps?" )                                 add_modifier = "NCAPS "
+      else if ( String(modifier_state[i]).charAt(modifier_state[i].length-1) === "?")   add_modifier = ""
 
       else add_modifier = String(modifier_state[i]) + " "
 
@@ -281,18 +285,14 @@ export class KeylayoutToKmnConverter {
 
     // replace duplicate entries with ""
     const unique_Modifier: string[] = kmn_modifier.split(" ")
-
     for(let i = 0; i < unique_Modifier.length; i++) {
       const modi = unique_Modifier[i]
-
       for(let j = i + 1; j < unique_Modifier.length; j++) {
         const modi_next = unique_Modifier[j]
         if (modi_next === modi)
           unique_Modifier[j] = ""
       }
     }
-
-  // remove duplicate whitespace, whitespace before & after, change to uppercase
-  return unique_Modifier.join(" ").replace(/\s+/g, " ").trim().toUpperCase()
+    return unique_Modifier.join(" ").replace(/\s+/g, " ").trim().toUpperCase()
   }
 }

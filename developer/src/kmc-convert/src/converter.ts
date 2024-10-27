@@ -91,7 +91,7 @@ console.log('use run of converter.ts')
     }
 
     const converter = new ConverterClass(this.callbacks, converterOptions);
-    const artifacts = await converter.run(inputFilename, outputFilename, binaryData);
+    const artifacts = await converter.run(inputFilename, outputFilename);
     // Note: any subsequent errors in conversion will have been reported by the converter
     return artifacts ? { artifacts } : null;
   }
