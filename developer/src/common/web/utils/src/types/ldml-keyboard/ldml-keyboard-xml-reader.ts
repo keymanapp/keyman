@@ -302,7 +302,7 @@ export class LDMLKeyboardXMLSourceFileReader {
 
   loadTestDataUnboxed(file: Uint8Array): any {
     const source = new KeymanXMLReader('keyboardTest3')
-      .parse(file.toString()) as any;
+      .parse(new TextDecoder().decode(file)) as any;
     return source;
   }
 
