@@ -10,14 +10,14 @@ import { KeymanDeveloperProjectOptions } from '../../src/types/kpj/keyman-develo
 const callbacks = new TestCompilerCallbacks();
 
 describe('kpj-file-writer', function () {
-  it('kpj-file-writer should write a valid v1.0 file', function() {
+  it('kpj-file-writer should write a valid v1.0 file', async function() {
     const kpjPath = 'khmer_angkor.kpj';
     const path = makePathToFixture('kpj', kpjPath);
     const input = fs.readFileSync(path);
     const reader = new KPJFileReader(callbacks);
     const inputKpj = reader.read(input);
     reader.validate(inputKpj);
-    const project = reader.transform(kpjPath, inputKpj);
+    const project = await reader.transform(kpjPath, inputKpj);
 
     const writer = new KPJFileWriter();
     const output = writer.write(project);
@@ -49,14 +49,14 @@ describe('kpj-file-writer', function () {
     ]);
   });
 
-  it('kpj-file-writer should write a valid v2.0 file', function() {
+  it('kpj-file-writer should write a valid v2.0 file', async function() {
     const kpjPath = 'khmer_angkor.kpj';
     const path = makePathToFixture('kpj', kpjPath);
     const input = fs.readFileSync(path);
     const reader = new KPJFileReader(callbacks);
     const inputKpj = reader.read(input);
     reader.validate(inputKpj);
-    const project = reader.transform(kpjPath, inputKpj);
+    const project = await reader.transform(kpjPath, inputKpj);
     project.options = new KeymanDeveloperProjectOptions('2.0');
 
     const writer = new KPJFileWriter();

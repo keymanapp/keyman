@@ -9,7 +9,7 @@ import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 const callbacks = new TestCompilerCallbacks();
 
 describe('kpj-file-reader', function () {
-  it('kpj-file-reader should read a valid file', function() {
+  it('kpj-file-reader should read a valid file', async function() {
     const kpjPath = 'khmer_angkor.kpj';
     const path = makePathToFixture('kpj', kpjPath);
     const input = fs.readFileSync(path);
@@ -65,7 +65,7 @@ describe('kpj-file-reader', function () {
 
     // Test transform of .kpj into a KeymanDeveloperProject
 
-    const project = reader.transform(kpjPath, kpj);
+    const project = await reader.transform(kpjPath, kpj);
 
     assert.equal(project.options.buildPath, '$PROJECTPATH/build');
     assert.isFalse(project.options.checkFilenameConventions);
@@ -122,7 +122,7 @@ describe('kpj-file-reader', function () {
     assert.lengthOf(f.childFiles, 0);
   });
 
-  it('should load a v1.0 keyboard project with missing <File>', function() {
+  it('should load a v1.0 keyboard project with missing <File>', async function() {
     const path = makePathToFixture('kpj', 'project-missing-file', 'project_missing_file.kpj');
     const input = fs.readFileSync(path);
     const reader = new KPJFileReader(callbacks);
@@ -133,12 +133,12 @@ describe('kpj-file-reader', function () {
     }
     assert.equal(callbacks.messages.length, 0);
     assert.lengthOf(kpj.KeymanDeveloperProject.Files.File, 0);
-    const project = reader.transform(path, kpj);
+    const project = await reader.transform(path, kpj);
     assert.equal(callbacks.messages.length, 0);
     assert.isNotNull(project);
   });
 
-  it('should load a v1.0 keyboard project with missing <Files>', function() {
+  it('should load a v1.0 keyboard project with missing <Files>', async function() {
     const path = makePathToFixture('kpj', 'project-missing-file', 'project_missing_files.kpj');
     const input = fs.readFileSync(path);
     const reader = new KPJFileReader(callbacks);
@@ -146,7 +146,7 @@ describe('kpj-file-reader', function () {
     reader.validate(kpj);
     assert.equal(callbacks.messages.length, 0);
     assert.lengthOf(kpj.KeymanDeveloperProject.Files.File, 0);
-    const project = reader.transform(path, kpj);
+    const project = await reader.transform(path, kpj);
     assert.equal(callbacks.messages.length, 0);
     assert.isNotNull(project);
   });

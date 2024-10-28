@@ -59,30 +59,6 @@ Automatically corrects many common keying errors.</Description>
       <FileType>.htm</FileType>
     </File>
     <File>
-      <Name>..\..\..\shared\fonts\khmer\mondulkiri\FONTLOG.txt</Name>
-      <Description>File FONTLOG.txt</Description>
-      <CopyLocation>0</CopyLocation>
-      <FileType>.txt</FileType>
-    </File>
-    <File>
-      <Name>..\..\..\shared\fonts\khmer\mondulkiri\Mondulkiri-B.ttf</Name>
-      <Description>Font Khmer Mondulkiri Bold</Description>
-      <CopyLocation>0</CopyLocation>
-      <FileType>.ttf</FileType>
-    </File>
-    <File>
-      <Name>..\..\..\shared\fonts\khmer\mondulkiri\Mondulkiri-BI.ttf</Name>
-      <Description>Font Khmer Mondulkiri Bold Italic</Description>
-      <CopyLocation>0</CopyLocation>
-      <FileType>.ttf</FileType>
-    </File>
-    <File>
-      <Name>..\..\..\shared\fonts\khmer\mondulkiri\Mondulkiri-I.ttf</Name>
-      <Description>Font Khmer Mondulkiri Italic</Description>
-      <CopyLocation>0</CopyLocation>
-      <FileType>.ttf</FileType>
-    </File>
-    <File>
       <Name>..\..\..\shared\fonts\khmer\mondulkiri\Mondulkiri-R.ttf</Name>
       <Description>Font Khmer Mondulkiri</Description>
       <CopyLocation>0</CopyLocation>

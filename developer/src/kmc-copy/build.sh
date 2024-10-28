@@ -31,6 +31,7 @@ builder_parse "$@"
 
 do_test() {
   # note: `export TEST_SAVE_ARTIFACTS=1` to save a copy of artifacts to temp path
+  # note: `export TEST_SAVE_FIXTURES=1` to get a copy of cloud-based fixtures saved to online/
   eslint .
   cd test
   tsc --build

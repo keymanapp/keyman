@@ -8,7 +8,12 @@ import { CompilerCallbacks, CompilerLogLevel, KeymanCompiler, KeymanCompilerArti
 import { KeymanFileTypes } from "@keymanapp/common-types";
 
 import { CopierMessages } from "./copier-messages.js";
+import { CopierAsyncCallbacks } from "./copier-async-callbacks.js";
+import { GitHubRef, KeymanCloudSource } from "./cloud.js";
 
+type CopierFunction = (
+  project: KeymanDeveloperProject, filename: string, outputPath: string, source: string, result: CopierResult
+) => Promise<boolean>;
 
 /**
  * @public
@@ -67,14 +72,23 @@ export interface CopierResult extends KeymanCompilerResult {
 export class KeymanProjectCopier implements KeymanCompiler {
   options: CopierOptions;
   callbacks: CompilerCallbacks;
+  asyncCallbacks: CopierAsyncCallbacks;
 
   sourceId: string;
   outputId: string;
   outPath: string;
 
+  githubRef: GitHubRef;
+  cloudSource: KeymanCloudSource;
+  isLocalOrigin(): boolean {
+    return this.githubRef == undefined;
+  }
+  relocateExternalFiles: boolean = false; // TODO-COPY: support
+
   public async init(callbacks: CompilerCallbacks, options: CopierOptions): Promise<boolean> {
     this.callbacks = callbacks;
     this.options = options;
+    this.cloudSource = new KeymanCloudSource(this.callbacks);
     return true;
   }
 
@@ -83,7 +97,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
    * artifacts on success. The files are passed in by name, and the compiler
    * will use callbacks as passed to the {@link KeymanProjectCopier.init}
    * function to read any input files by disk.
-   * @param   source  Source file or folder to copy. Can be a local file or folder, github:repo, or cloud:path/id
+   * @param   source  Source file or folder to copy. Can be a local file or folder, github:repo[:path], or cloud:id
    * @returns         Binary artifacts on success, null on failure.
    */
   public async run(source: string): Promise<CopierResult> {
@@ -92,21 +106,30 @@ export class KeymanProjectCopier implements KeymanCompiler {
       return null;
     }
 
-    const { temp, projectSource } = await this.getSourceProject(source);
-    if(!projectSource) {
+    let projectSource: string;
+    const projectSourceOrRef = await this.getSourceProject(source);
+    if(!projectSourceOrRef) {
       // error will have been raised in getSourceProject
       return null;
     }
 
+    if(typeof projectSourceOrRef == 'string') {
+      projectSource = projectSourceOrRef;
+    } else {
+      projectSource = projectSourceOrRef.path;
+      this.githubRef = projectSourceOrRef;
+    }
+
+    this.asyncCallbacks = new CopierAsyncCallbacks(this.callbacks, this.githubRef);
+
     // TODO-COPY: validate outputId is valid for the project type?
     this.outputId = this.callbacks.path.basename(this.outPath);
-    this.sourceId = this.callbacks.path.basename(projectSource, '.kpj');
+    this.sourceId = this.callbacks.path.basename(projectSource, KeymanFileTypes.Source.Project);
 
     // copy project file
-    const project = this.loadProjectFromFile(projectSource);
+    const project = await this.loadProjectFromFile(projectSource);
     if(!project) {
       // loadProjectFromFile already reported errors
-      // TODO-COPY: cleanup temp
       return null;
     }
 
@@ -116,41 +139,127 @@ export class KeymanProjectCopier implements KeymanCompiler {
         filename: this.outPath
       }
     } };
-    const success = this.copyProjectFile(project, projectSource, this.outPath, projectSource, result);
-
-    if(temp) {
-      // TODO-COPY: this.cleanupTemp(temp);
-    }
+    const success = await this.copyProjectFile(project, projectSource, this.outPath, projectSource, result);
 
     return success ? result : null;
   }
 
   /**
-   *
+   * Resolve the source project file to either a local filesystem file,
+   * or a reference on GitHub
    * @param source
-   * @returns   temp - path to temporary folder to be removed on success or failure, projectSource - path to kpj
+   * @returns  path to .kpj (either local or remote)
    */
-  private async getSourceProject(source: string): Promise<{temp: string, projectSource: string}> {
-    let temp: string = null, projectSource: string = null;
-
+  private async getSourceProject(source: string): Promise<string | GitHubRef> {
     if(source.startsWith('github:')) {
-      // TODO-COPY: temp = downloadFromGithub(source);
-      projectSource = temp; // TODO-COPY: +.kpj
+      // `github:owner/repo:path/to/kpj`, referencing a .kpj file
+      return await this.getGitHubSourceProject(source);
     } else if(source.startsWith('cloud:')) {
-      // TODO-COPY: temp = downloadFromKeymanCloud(source);
-      projectSource = temp; // TODO-COPY: +.kpj
-    } else if(this.callbacks.fs.existsSync(source) && source.endsWith('.kpj')) {
-      // already the project file
-      projectSource = this.normalizePath(source);
+      // `cloud:id`, referencing a Keyman Cloud keyboard
+      return await this.getCloudSourceProject(source);
+    } else if(this.callbacks.fs.existsSync(source) && source.endsWith(KeymanFileTypes.Source.Project) && !this.callbacks.isDirectory(source)) {
+      // referencing a local filesystem project file
+      return this.getLocalFileProject(source)
     } else {
-      source = this.normalizePath(source);
-      projectSource = this.normalizePath(this.callbacks.path.join(source, this.callbacks.path.basename(source) + '.kpj'));
-      if(!this.callbacks.fs.existsSync(projectSource)) {
-        this.callbacks.reportMessage(CopierMessages.Error_CannotFindInputProject({project: source}));
-        projectSource = null;
-      }
+      // Referencing a folder, or a missing local file
+      return this.getLocalFolderProject(source);
     }
-    return { temp, projectSource };
+  }
+
+  /**
+   * Resolve source path to the contained project file; the project
+   * file must have the same basename as the folder in this case
+   * @param source
+   * @returns
+   */
+  private getLocalFolderProject(source: string): string {
+    source = this.normalizePath(source);
+    const projectSource = this.normalizePath(this.callbacks.path.join(source, this.callbacks.path.basename(source) + KeymanFileTypes.Source.Project));
+    if(!this.callbacks.fs.existsSync(projectSource)) {
+      this.callbacks.reportMessage(CopierMessages.Error_CannotFindInputProject({project: source}));
+      return null;
+    }
+    return projectSource;
+  }
+
+  /**
+   * Resolve source path to the input .kpj filename, folder name
+   * is not relevant when .kpj filename is passed in
+   * @param source
+   * @returns
+   */
+  private getLocalFileProject(source: string): string {
+    return this.normalizePath(source);
+  }
+
+  /**
+   * Resolve path to GitHub source, which must be in the following format:
+   *   `github:owner/repo[:branch]:path/to/kpj`
+   * The path must be fully qualified, referencing the .kpj file; it
+   * cannot just be the folder where the .kpj is found
+   * @param source
+   * @returns a promise: GitHub reference to the source for the keyboard, or null on failure
+   */
+  private async getGitHubSourceProject(source: string): Promise<GitHubRef> {
+    const parts = source.split(':');
+    if(parts.length < 3 || parts.length > 4 || !parts[1].match(/^[a-z0-9-]+\/[a-z0-9._-]+$/i)) {
+      // https://stackoverflow.com/questions/59081778/rules-for-special-characters-in-github-repository-name
+      this.callbacks.reportMessage(CopierMessages.Error_InvalidGitHubSource({source}));
+      return null;
+    }
+
+    const origin = parts[1].split('/');
+
+    const ref: GitHubRef = new GitHubRef({
+      owner: origin[0],
+      repo: origin[1],
+      branch: null,
+      path: null
+    });
+
+    if(parts.length == 4) {
+      ref.branch = parts[2];
+      ref.path = parts[3];
+    } else {
+      ref.branch = await this.cloudSource.getDefaultBranchFromGitHub(ref);
+      if(!ref.branch) {
+        this.callbacks.reportMessage(CopierMessages.Error_CouldNotFindDefaultBranchOnGitHub({ref: ref.toString()}));
+        return null;
+      }
+      ref.path = parts[2];
+
+    }
+    if(!ref.path.startsWith('/')) {
+      ref.path = '/' + ref.path;
+    }
+
+    return ref;
+  }
+
+  /**
+   * Resolve path to Keyman Cloud source (which is on GitHub), which must be in
+   * the following format:
+   *   `cloud:keyboard_id|model_id`
+   * The `keyboard_id` parameter should be a valid id (a-z0-9_), as found at
+   * https://keyman.com/keyboards; alternativel if it is a model_id, it should
+   * have the format author.bcp47.uniq
+   * @param source
+   * @returns a promise: GitHub reference to the source for the keyboard, or null on failure
+   */
+  private async getCloudSourceProject(source: string): Promise<GitHubRef> {
+    const parts = source.split(':');
+    const id = parts[1];
+
+    const isModel = /^[^.]+\.[^.]+\.[^.]+$/.test(id);
+
+    const remote = await this.cloudSource.getSourceFromKeymanCloud(id, isModel);
+    if(!remote) {
+      return null;
+    }
+
+    // append project filename .kpj
+    remote.path += '/' + this.callbacks.path.basename(remote.path) + KeymanFileTypes.Source.Project;
+    return remote;
   }
 
   private normalizePath(path: string): string {
@@ -173,9 +282,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
   }
 
   private copiers: {
-    [index in KeymanFileTypes.Source]: (
-      project: KeymanDeveloperProject, filename: string, outputPath: string, source: string, result: CopierResult
-    ) => boolean
+    [index in KeymanFileTypes.Source]: CopierFunction
   } = {
     ".kpj": this.copyProjectFile.bind(this),
     ".kmn": this.copyKmnSourceFile.bind(this),
@@ -186,43 +293,54 @@ export class KeymanProjectCopier implements KeymanCompiler {
     ".model.ts": this.copyModelTsSourceFile.bind(this),
   };
 
-  private copyFolder(inputPath: string, outputPath: string, ignores: (string | RegExp)[], result: CopierResult) {
+  private async copyFolder(inputPath: string, outputPath: string, ignorePatterns: (string | RegExp)[], result: CopierResult) {
     // TODO-COPY: watch out for file collisions when copying project files -- after renames
-    const files = this.callbacks.fs.readdirSync(inputPath);
-    for(const file of files) {
-      const fullPath = this.normalizePath(this.callbacks.path.join(inputPath, file));
-      const isIgnored = ignores.find(
-        i => (typeof i == 'string' && i == fullPath) || (fullPath.match(i))
-      );
-      if(isIgnored) {
+    const files = await this.asyncCallbacks.fsAsync.readdir(inputPath);
+    for(const {filename,type} of files) {
+      const fullPath = this.normalizePath(this.callbacks.path.join(inputPath, filename));
+      if(ignorePatterns.find( pattern => (typeof pattern == 'string' && pattern == fullPath) || (fullPath.match(pattern)) )) {
         continue;
       }
-      if(this.callbacks.isDirectory(fullPath)) {
-        this.copyFolder(fullPath, this.callbacks.path.join(outputPath, file), ignores, result);
+      if(type == 'dir') {
+        await this.copyFolder(fullPath, this.callbacks.path.join(outputPath, filename), ignorePatterns, result);
       } else if(!result.artifacts[fullPath]) {
         result.artifacts[fullPath] = {
-          data: this.callbacks.loadFile(fullPath),
+          data: await this.asyncCallbacks.fsAsync.readFile(fullPath),
           filename: this.generateNewFilename(fullPath, outputPath)
         }
       }
     }
   }
 
-  private copyProjectFile(project: KeymanDeveloperProject, filename: string, outputPath: string, source: string, result: CopierResult): boolean {
+  private resolveFilename(base: string, filename: string) {
+    if(this.isLocalOrigin()) {
+      return this.callbacks.resolveFilename(base, filename);
+    }
+
+    // GitHub resolveFilename
+    if(filename.startsWith('/')) {
+      return filename;
+    }
+
+    let result = this.normalizePath(this.callbacks.path.normalize(this.callbacks.path.join(this.callbacks.path.dirname(base), filename)));
+    if(!result.startsWith('/')) result = '/' + result;
+    return result;
+  }
+
+  private async copyProjectFile(project: KeymanDeveloperProject, filename: string, outputPath: string, source: string, result: CopierResult): Promise<boolean> {
     for(const file of project.files) {
+      const normalizedFilePath = this.normalizePath(file.filePath);
+      const subOutputPath = this.normalizePath(this.calculateNewFilePath(normalizedFilePath));
+      const subFilename = this.normalizePath(this.resolveFilename(project.projectFilename, normalizedFilePath));
       const copier = this.copiers[<KeymanFileTypes.Source> file.fileType] ?? this.copyGenericFile.bind(this);
-
-      const subOutputPath = this.normalizePath(this.calculateNewFilePath(project.projectPath, file.filePath));
-      const subFilename = this.normalizePath(project.resolveInputFilePath(file));
-
       // Ignore errors because we will continue to do a best effort
-      copier(project, subFilename, subOutputPath, source, result);
+      await copier(project, subFilename, subOutputPath, source, result);
     }
 
     if(project.options.version == "2.0") {
       // For version 2.0 projects, we also copy every file in the folder
       // except for project.buildpath and .kpj.user
-      this.copyFolder(project.projectPath, outputPath, [/\.kpj\.user/, project.resolveBuildPath()], result);
+      await this.copyFolder(project.projectPath, outputPath, [/\.kpj\.user$/, project.resolveBuildPath()], result);
     }
 
     // Rewrite the project
@@ -239,12 +357,12 @@ export class KeymanProjectCopier implements KeymanCompiler {
     return true;
   }
 
-  private copyGenericFile(project: KeymanDeveloperProject, filename: string, outputPath: string, source: string, result: CopierResult): boolean {
+  private async copyGenericFile(_project: KeymanDeveloperProject, filename: string, outputPath: string, _source: string, result: CopierResult): Promise<boolean> {
     if(result.artifacts[filename]) {
       return true;
     }
 
-    const data = this.callbacks.loadFile(filename);
+    const data = await this.asyncCallbacks.fsAsync.readFile(filename);
     if(!data) {
       // We'll add an null artifact and do a best effort, rather
       // than fail the process altogether.
@@ -270,12 +388,12 @@ export class KeymanProjectCopier implements KeymanCompiler {
     return true;
   }
 
-  private copySourceFile(project: KeymanDeveloperProject, filename: string, outputPath: string, source: string, result: CopierResult): boolean {
-    return this.copyGenericFile(project, filename, this.callbacks.path.join(this.outPath, 'source'), source, result);
+  private async copySourceFile(project: KeymanDeveloperProject, filename: string, _outputPath: string, source: string, result: CopierResult): Promise<boolean> {
+    return await this.copyGenericFile(project, filename, this.callbacks.path.join(this.outPath, 'source'), source, result);
   }
 
-  private copyModelTsSourceFile(project: KeymanDeveloperProject, filename: string, outputPath: string, source: string, result: CopierResult): boolean {
-    if(!this.copySourceFile(project, filename, outputPath, source, result)) {
+  private async copyModelTsSourceFile(project: KeymanDeveloperProject, filename: string, outputPath: string, source: string, result: CopierResult): Promise<boolean> {
+    if(!await this.copySourceFile(project, filename, outputPath, source, result)) {
       return false;
     }
 
@@ -296,7 +414,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
     let out: string = '';
     for(const wordlist of wordlists) {
       const wordlistFilename = wordlist[2];
-      const newRelativePath = this.copySubFileAndGetRelativePath(project, filename, wordlistFilename, outputPath, source, result);
+      const newRelativePath = await this.copySubFileAndGetRelativePath(project, filename, wordlistFilename, outputPath, source, result);
 
       out += wordlistString.substring(index, wordlist.index) + wordlist[1] + newRelativePath + wordlist[3];
       index = wordlist.index + wordlist[0].length;
@@ -309,8 +427,8 @@ export class KeymanProjectCopier implements KeymanCompiler {
     return true;
   }
 
-  private copyKmnSourceFile(project: KeymanDeveloperProject, filename: string, outputPath: string, source: string, result: CopierResult): boolean {
-    if(!this.copySourceFile(project, filename, outputPath, source, result)) {
+  private async copyKmnSourceFile(project: KeymanDeveloperProject, filename: string, outputPath: string, source: string, result: CopierResult): Promise<boolean> {
+    if(!await this.copySourceFile(project, filename, outputPath, source, result)) {
       return false;
     }
 
@@ -325,7 +443,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
       for(const r of storeRegexes) {
         const m = line.match(r.re);
         if(m) {
-          const newRelativePath = this.copySubFileAndGetRelativePath(project, filename, m[2], outputPath, source, result);
+          const newRelativePath = await this.copySubFileAndGetRelativePath(project, filename, m[2], outputPath, source, result);
           lines[i] = line.replace(replacementRegex, `$1${newRelativePath}$4`);
         }
       }
@@ -337,8 +455,8 @@ export class KeymanProjectCopier implements KeymanCompiler {
     return true;
   }
 
-  private copyKpsSourceFile(project: KeymanDeveloperProject, filename: string, outputPath: string, source: string, result: CopierResult): boolean {
-    if(!this.copySourceFile(project, filename, outputPath, source, result)) {
+  private async copyKpsSourceFile(project: KeymanDeveloperProject, filename: string, outputPath: string, source: string, result: CopierResult): Promise<boolean> {
+    if(!await this.copySourceFile(project, filename, outputPath, source, result)) {
       return false;
     }
 
@@ -351,8 +469,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
 
     if(kps.Package?.Files?.File.length) {
       for(const file of kps.Package.Files.File) {
-        // const subFilename = this.callbacks.resolveFilename(filename, file.Name);
-        const newRelativePath = this.copySubFileAndGetRelativePath(project, filename, file.Name, outputPath, source, result);
+        const newRelativePath = await this.copySubFileAndGetRelativePath(project, filename, file.Name, outputPath, source, result);
 
         const remap = (ref?: string) => ref == file.Name ? newRelativePath : ref;
 
@@ -407,23 +524,32 @@ export class KeymanProjectCopier implements KeymanCompiler {
     return true;
   }
 
-  private copySubFileAndGetRelativePath(project: KeymanDeveloperProject, parentFilename: string, originalSubfilename: string, outputPath: string, source: string, result: CopierResult): string {
+  private async copySubFileAndGetRelativePath(project: KeymanDeveloperProject, parentFilename: string, originalSubfilename: string, outputPath: string, source: string, result: CopierResult): Promise<string> {
     originalSubfilename = this.normalizePath(originalSubfilename);
-    const subFilename = this.normalizePath(this.callbacks.resolveFilename(parentFilename, originalSubfilename));
-    const subFilenameAbsolute = this.normalizePath(this.callbacks.resolveFilename(project.projectPath, subFilename));
+    const subFilename = this.normalizePath(this.resolveFilename(parentFilename, originalSubfilename));
+    const subFilenameAbsolute = this.normalizePath(this.resolveFilename(project.projectPath, subFilename));
     const subFilenameRelative = this.normalizePath(this.callbacks.path.relative(project.projectPath, subFilenameAbsolute));
 
+    let subOutputPath: string;
     if(this.callbacks.path.isAbsolute(subFilenameRelative) || subFilenameRelative.startsWith('..')) {
-      // Reference outside the project structure, do not attempt to normalize or copy,
-      // but we do need to update references for the new output path
-      return this.normalizePath(this.callbacks.path.relative(result.artifacts[parentFilename].filename, subFilenameAbsolute));
+      if(this.isLocalOrigin() && !this.relocateExternalFiles) {
+        // Reference outside the project structure, do not attempt to normalize or copy,
+        // but we do need to update references for the new output path
+        return this.normalizePath(this.callbacks.path.relative(result.artifacts[parentFilename].filename, subFilenameAbsolute));
+      } else {
+        // Reference outside the project structure, we will copy into a subfolder of the project;
+        // should be relative to root of remote repo, e.g. release/k/khmer_angkor references release/shared/fonts/...,
+        // so should go external/release/shared/fonts/...
+        subOutputPath = this.normalizePath(this.callbacks.path.join(this.options.outPath, 'external', this.callbacks.path.dirname(subFilenameAbsolute)));
+      }
     } else {
-      const subOutputPath = this.normalizePath(this.callbacks.path.join(outputPath, this.callbacks.path.dirname(originalSubfilename)));
-      this.copyGenericFile(project, subFilename, subOutputPath, source, result);
-
-      // Even if the subfile is missing, we'll still continue the overall copy
-      return this.normalizePath(this.callbacks.path.relative(this.callbacks.path.dirname(result.artifacts[parentFilename].filename), result.artifacts[subFilename].filename));
+      subOutputPath = this.normalizePath(this.callbacks.path.join(outputPath, this.callbacks.path.dirname(originalSubfilename)));
     }
+
+    await this.copyGenericFile(project, subFilename, subOutputPath, source, result);
+
+    // Even if the subfile is missing, we'll still continue the overall copy
+    return this.normalizePath(this.callbacks.path.relative(this.callbacks.path.dirname(result.artifacts[parentFilename].filename), result.artifacts[subFilename].filename));
   }
 
   private splitFilename(filename: string): {ext: string, path: string, base: string} {
@@ -451,7 +577,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
     return this.normalizePath(newFilename);
   }
 
-  private calculateNewFilePath(oldProjectFilename: string, oldFilePath: string) {
+  private calculateNewFilePath(oldFilePath: string) {
     // Do not change filename here, just its path
 
     const {ext, base} = this.splitFilename(oldFilePath);
@@ -477,9 +603,9 @@ export class KeymanProjectCopier implements KeymanCompiler {
     return this.callbacks.path.join(this.outPath, 'source');
   }
 
-  private loadProjectFromFile(filename: string): KeymanDeveloperProject {
-    const kpjData = this.callbacks.loadFile(filename);
-    const reader = new KPJFileReader(this.callbacks);
+  private async loadProjectFromFile(filename: string): Promise<KeymanDeveloperProject> {
+    const kpjData = await this.asyncCallbacks.fsAsync.readFile(filename);
+    const reader = new KPJFileReader(this.asyncCallbacks);
     let kpj = null;
     try {
       kpj = reader.read(kpjData);
@@ -497,7 +623,8 @@ export class KeymanProjectCopier implements KeymanCompiler {
       this.callbacks.reportMessage(CopierMessages.Error_InvalidProjectFile({filename, message: (e ?? '').toString()}));
       return null;
     }
-    const project = reader.transform(filename, kpj);
+    const project = await reader.transform(filename, kpj);
+
     return project;
   }
 
@@ -509,6 +636,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
    * @param artifacts - object containing artifact binary data to write out
    * @returns true on success
    */
+  /* c8 ignore start */
   public async write(artifacts: CopierArtifacts): Promise<boolean> {
     if(this.callbacks.fs.existsSync(artifacts["kmc-copy:outputPath"].filename)) {
       this.callbacks.reportMessage(CopierMessages.Error_OutputPathAlreadyExists({outPath: this.outPath}));
@@ -558,4 +686,5 @@ export class KeymanProjectCopier implements KeymanCompiler {
     }
     return true;
   }
+  /* c8 ignore stop */
 }
