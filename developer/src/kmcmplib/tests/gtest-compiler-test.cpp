@@ -1807,17 +1807,17 @@ TEST_F(CompilerTest, GetXStringImpl_type_osb_test) {
     u16cpy(str, u"[CTRL ALT]");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // virtual key, in VKeyNames, no space between modifier and key portion, ERROR_InvalidToken
+    // virtual key, in VKeyNames, no space between modifier and key portion, ERROR_InvalidToken (see #12307)
     // fileKeyboard.version = VERSION_90;
     // u16cpy(str, u"[CTRLK_A]");
     // EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // virtual key, in VKeyNames, no space between modifiers, ERROR_InvalidToken
+    // virtual key, in VKeyNames, no space between modifiers, ERROR_InvalidToken (see #12307)
     // fileKeyboard.version = VERSION_90;
     // u16cpy(str, u"[CTRLALT K_A]");
     // EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // virtual key, '_' between modifier and key portion', ERROR_InvalidToken
+    // virtual key, '_' between modifier and key portion', ERROR_InvalidToken (see #12307)
     // fileKeyboard.version = VERSION_90;
     // u16cpy(str, u"[CTRL_K_A]");
     // EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
@@ -2028,6 +2028,14 @@ TEST_F(CompilerTest, GetXStringImpl_type_osb_test) {
     EXPECT_EQ(1, msgproc_errors.size());
     EXPECT_EQ(KmnCompilerMessages::WARN_VirtualKeyWithMnemonicLayout, msgproc_errors[0].errorCode);
     msgproc_errors.clear();
+
+    // virtual key, in VKeyNames, multiple keys, valid (see #12307)
+    // fileKeyboard.version = VERSION_90;
+    // u16cpy(str, u"[K_A K_B K_C]");
+    // EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    // sFlag = ISVIRTUALKEY;
+    // KMX_WCHAR tstr_virtual_key_multi_valid[] = { UC_SENTINEL, CODE_EXTENDED, sFlag, 65, 66, 67, UC_SENTINEL_EXTENDEDEND, 0 };
+    // EXPECT_EQ(0, u16cmp(tstr_virtual_key_multi_valid, tstr));
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
