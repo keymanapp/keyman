@@ -4,6 +4,7 @@
 #include "../include/kmcmplibapi.h"
 #include "../src/compfile.h"
 #include "../src/CompilerErrors.h"
+#include "../src/virtualcharkeys.h"
 #include "../../common/include/kmn_compiler_errors.h"
 #include "../../../../common/include/km_types.h"
 #include "../../../../common/include/kmx_file.h"
@@ -1821,7 +1822,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_osb_test) {
     // u16cpy(str, u"[CTRL_K_A]");
     // EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     // tstr_virtual_key_valid[2] = ISVIRTUALKEY | K_CTRLFLAG;
-    // tstr_virtual_key_valid[3] = 259; //VK_MAX + 4
+    // tstr_virtual_key_valid[3] = 259; // VK__MAX + 4
     // EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
     // EXPECT_EQ(0, msgproc_errors.size());
     // tstr_virtual_key_valid[3] = 65;
@@ -1924,7 +1925,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_osb_test) {
     EXPECT_EQ(SZMAX_VKDICTIONARYNAME - 1 + 2, u16len(str));
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     tstr_virtual_key_valid[2] = ISVIRTUALKEY;
-    tstr_virtual_key_valid[3] = 259; //VK_MAX + 4
+    tstr_virtual_key_valid[3] = 259; // VK__MAX + 4
     EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
     tstr_virtual_key_valid[3] = 65;
     fileKeyboard.cxVKDictionary = 3;
@@ -1946,7 +1947,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_osb_test) {
     u16cpy(str, u"[jkl]");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     tstr_virtual_key_valid[2] = ISVIRTUALKEY;
-    tstr_virtual_key_valid[3] = 259; //VK_MAX + 4
+    tstr_virtual_key_valid[3] = 259; // VK__MAX + 4
     EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
     EXPECT_EQ(0, u16cmp(u"jkl", fileKeyboard.dpVKDictionary[3].szName));
     tstr_virtual_key_valid[3] = 65;
@@ -1958,9 +1959,33 @@ TEST_F(CompilerTest, GetXStringImpl_type_osb_test) {
     u16cpy(str, u"[def]");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     tstr_virtual_key_valid[2] = ISVIRTUALKEY;
-    tstr_virtual_key_valid[3] = 257; //VK_MAX + 2
+    tstr_virtual_key_valid[3] = 257; // VK__MAX + 2
     EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
     tstr_virtual_key_valid[3] = 65;
+
+    // virtual key, in VKeyNames, kmcmp::FMnemonicLayout true, VKeyMayBeVCKey false, valid
+    fileKeyboard.version = VERSION_90;
+    kmcmp::FMnemonicLayout = TRUE;
+    EXPECT_EQ(FALSE, VKeyMayBeVCKey[9]); // K_TAB
+    u16cpy(str, u"[K_TAB]");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    tstr_virtual_key_valid[2] = ISVIRTUALKEY;
+    tstr_virtual_key_valid[3] = 9; // K_TAB
+    EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
+    EXPECT_EQ(0, msgproc_errors.size());
+    tstr_virtual_key_valid[3] = 65;
+
+    // virtual key, in VKeyNames, kmcmp::FMnemonicLayout true, VKeyMayBeVCKey true, KmnCompilerMessages::WARN_VirtualKeyWithMnemonicLayout
+    fileKeyboard.version = VERSION_90;
+    kmcmp::FMnemonicLayout = TRUE;
+    EXPECT_EQ(TRUE, VKeyMayBeVCKey[65]); // K_A
+    u16cpy(str, u"[K_A]");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    tstr_virtual_key_valid[2] = ISVIRTUALKEY;
+    EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
+    EXPECT_EQ(1, msgproc_errors.size());
+    EXPECT_EQ(KmnCompilerMessages::WARN_VirtualKeyWithMnemonicLayout, msgproc_errors[0].errorCode);
+    msgproc_errors.clear();
 }
 
 // KMX_DWORD process_baselayout(PFILE_KEYBOARD fk, PKMX_WCHAR q, PKMX_WCHAR tstr, int *mx)
