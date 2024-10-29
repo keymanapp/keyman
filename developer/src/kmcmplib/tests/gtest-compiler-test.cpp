@@ -1954,9 +1954,51 @@ TEST_F(CompilerTest, GetXStringImpl_type_osb_test) {
     fileKeyboard.cxVKDictionary = 3;
     fileKeyboard.dpVKDictionary[3].szName[0] = 0;
 
+    // virtual key, custom name, space before, valid
+    fileKeyboard.version = VERSION_90;
+    u16cpy(str, u"[ jkl]");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    tstr_virtual_key_valid[2] = ISVIRTUALKEY;
+    tstr_virtual_key_valid[3] = 259; // VK__MAX + 4
+    EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
+    EXPECT_EQ(0, u16cmp(u"jkl", fileKeyboard.dpVKDictionary[3].szName));
+    tstr_virtual_key_valid[3] = 65;
+    fileKeyboard.cxVKDictionary = 3;
+    fileKeyboard.dpVKDictionary[3].szName[0] = 0;
+
+    // virtual key, custom name, space after, valid
+    fileKeyboard.version = VERSION_90;
+    u16cpy(str, u"[jkl ]");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    tstr_virtual_key_valid[2] = ISVIRTUALKEY;
+    tstr_virtual_key_valid[3] = 259; // VK__MAX + 4
+    EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
+    EXPECT_EQ(0, u16cmp(u"jkl", fileKeyboard.dpVKDictionary[3].szName));
+    tstr_virtual_key_valid[3] = 65;
+    fileKeyboard.cxVKDictionary = 3;
+    fileKeyboard.dpVKDictionary[3].szName[0] = 0;
+
     // virtual key, custom name, pre-existing name, valid
     fileKeyboard.version = VERSION_90;
     u16cpy(str, u"[def]");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    tstr_virtual_key_valid[2] = ISVIRTUALKEY;
+    tstr_virtual_key_valid[3] = 257; // VK__MAX + 2
+    EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
+    tstr_virtual_key_valid[3] = 65;
+
+    // virtual key, custom name, pre-existing name, space before, valid
+    fileKeyboard.version = VERSION_90;
+    u16cpy(str, u"[ def]");
+    EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
+    tstr_virtual_key_valid[2] = ISVIRTUALKEY;
+    tstr_virtual_key_valid[3] = 257; // VK__MAX + 2
+    EXPECT_EQ(0, u16cmp(tstr_virtual_key_valid, tstr));
+    tstr_virtual_key_valid[3] = 65;
+
+    // virtual key, custom name, pre-existing name, space after, valid
+    fileKeyboard.version = VERSION_90;
+    u16cpy(str, u"[def ]");
     EXPECT_EQ(STATUS_Success, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     tstr_virtual_key_valid[2] = ISVIRTUALKEY;
     tstr_virtual_key_valid[3] = 257; // VK__MAX + 2
