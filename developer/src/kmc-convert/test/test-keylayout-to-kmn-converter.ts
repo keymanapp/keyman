@@ -33,9 +33,9 @@ describe('KeylayoutToKmnConverter', function() {
     it('should throw on all elements loaded', async function () {
 
       // some keys, no deadkeys
-      const inputFilename  = makePathToFixture('../data/Mysample.keylayout');
+      //const inputFilename  = makePathToFixture('../data/Mysample.keylayout');
       // all keys, some deadkeys
-      //const inputFilename  = makePathToFixture('../data/My_dk_Keyboard.keylayout');
+      const inputFilename  = makePathToFixture('../data/My_dk_Keyboard.keylayout');
 
       const outputFilename = makePathToFixture('../data/MyResult.kmn');
 
