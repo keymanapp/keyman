@@ -1,5 +1,21 @@
 # Keyman Version History
 
+## 18.0.131 alpha 2024-10-25
+
+* chore(android,windows): Update Crowdin strings for Khmer (#12574)
+* refactor(developer): add kps-file-reader and kps-file-writer (#12545)
+* fix(mac): make modifiers operational in OSK (#12556)
+* fix(mac): support missing alt layers in OSK (#12565)
+
+## 18.0.130 alpha 2024-10-24
+
+* fix(android/engine): Increase robustness when checking package kmp.json languages (#12567)
+* chore(ios): support xcode 16 build (#12570)
+
+## 18.0.129 alpha 2024-10-21
+
+* chore(mac): support Xcode 16 build (#12554)
+
 ## 18.0.128 alpha 2024-10-14
 
 * docs(developer): add refs to Keyman MIME types (#12540)
