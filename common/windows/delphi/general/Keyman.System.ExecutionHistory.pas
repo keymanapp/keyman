@@ -27,49 +27,26 @@ function RecordKeymanStarted : Boolean;
 var
   atom: WORD;
 begin
- Result := False;
-  try
-    atom := GlobalFindAtom(AtomName);
-    if atom = 0 then
-    begin
-      if GetLastError <> ERROR_FILE_NOT_FOUND then
-        RaiseLastOSError;
-      atom := GlobalAddAtom(AtomName);
-      Result := True;
-      if atom = 0 then
-        RaiseLastOSError;
-    end;
-  except
-    on E: Exception do
-      // TODO: #10210 convert to sentry error
-      KL.Log(E.ClassName + ': ' + E.Message);
-  end;
+  atom := GlobalAddAtom(AtomName);
+  if atom = 0 then
+  begin
+    // TODO-WINDOWS-UPDATES: #10210 log to sentry
+    Result := False;
+  end
+  else
+    Result := True;
 end;
 
 function HasKeymanRun : Boolean;
-var
-  atom: WORD;
 begin
-  Result := False;
-  try
-    atom := GlobalFindAtom(AtomName);
-    if atom <> 0 then
+  Result := GlobalFindAtom(AtomName) <> 0;
+  if not Result then
+  begin
+    if GetLastError <> ERROR_FILE_NOT_FOUND then
     begin
-      if GetLastError <> ERROR_SUCCESS then
-        RaiseLastOSError;
-      Result := True;
-    end
-    else
-    begin
-      Result := False;
+      // TODO-WINDOWS-UPDATES: log to Sentry
     end;
-
-  except
-    on E: Exception do
-      // TODO: #10210 convert to sentry error
-      KL.log(E.ClassName + ': ' + E.Message);
   end;
-
 end;
 
 end.
