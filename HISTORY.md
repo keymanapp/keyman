@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.132 alpha 2024-10-30
+
+* feat(windows): kmdevlink app (#12552)
+
 ## 18.0.131 alpha 2024-10-25
 
 * chore(android,windows): Update Crowdin strings for Khmer (#12574)
