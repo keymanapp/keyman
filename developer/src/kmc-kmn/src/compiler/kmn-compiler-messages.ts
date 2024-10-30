@@ -1,3 +1,4 @@
+import { KeyAddress } from "src/kmw-compiler/validate-layout-file.js";
 import { kmnfile } from "../kmw-compiler/compiler-globals.js";
 import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageSpec as m, CompilerMessageDef as def, CompilerMessageSpecWithException, KeymanUrls } from "@keymanapp/developer-utils";
 
@@ -24,6 +25,17 @@ export const enum KmnCompilerMessageRanges {
   RANGE_LEXICAL_MODEL_MAX   = 0x8FF, // from kmn_compiler_errors.h, deprecated -- this range will not be used in future versions
   RANGE_CompilerMessage_Min = 0x900, // All compiler messages listed here must be >= this value
   RANGE_CompilerMessage_Max = 0xFFF, // Highest available error code for kmc-kmn
+}
+
+export function keyAddress(address: KeyAddress): string {
+  if(!address) {
+    return '<param>';
+  }
+  return `row:${address.rowIndex} col:${address.keyIndex}` +
+    (address.direction ? ` flick:${address.direction}` :
+    (address.subKeyIndex ? ` longPress:${address.subKeyIndex}` :
+    (address.multitapIndex ? ` multitap:${address.multitapIndex}` :
+    '')));
 }
 
 type KmcmpLibMessageParameters = {p:string[]};
@@ -451,7 +463,7 @@ export class KmnCompilerMessages {
     `Touch layout file ${def(o.filename)} is not valid`);
 
   static ERROR_TouchLayoutInvalidIdentifier                   = SevError | 0x05A;
-  static Error_TouchLayoutInvalidIdentifier = (o:{keyId:string, platformName: string, layerId:string}) => mw(this.ERROR_TouchLayoutInvalidIdentifier,
+  static Error_TouchLayoutInvalidIdentifier = (o:{keyId:string, platformName: string, layerId:string, address:KeyAddress}) => mw(this.ERROR_TouchLayoutInvalidIdentifier,
     `Key "${def(o.keyId)}" on "${def(o.platformName)}", layer "${def(o.layerId)}" has an invalid identifier.`);
 
   static ERROR_InvalidKeyCode                                 = SevError | 0x05B;
@@ -619,14 +631,13 @@ export class KmnCompilerMessages {
   static WARN_PunctuationInEthnologueCode                     = SevWarn | 0x090;
   static Warn_PunctuationInEthnologueCode                     = () => m(this.WARN_PunctuationInEthnologueCode, `Punctuation should not be used to separate Ethnologue codes; instead use spaces`);
 
-
   static WARN_TouchLayoutMissingLayer                         = SevWarn | 0x091;
-  static Warn_TouchLayoutMissingLayer = (o:{keyId:string, platformName:string, layerId:string, nextLayer:string}) => mw(this.WARN_TouchLayoutMissingLayer,
-    `Key "${def(o.keyId)}" on platform "${def(o.platformName)}", layer "${def(o.layerId)}", references a missing layer "${def(o.nextLayer)}"`);
+  static Warn_TouchLayoutMissingLayer = (o:{keyId:string, platformName:string, layerId:string, nextLayer:string, address:KeyAddress}) => mw(this.WARN_TouchLayoutMissingLayer,
+    `Key "${def(o.keyId)}" on platform "${def(o.platformName)}", layer "${def(o.layerId)}" (${keyAddress(o.address)}), references a missing layer "${def(o.nextLayer)}"`);
 
   static WARN_TouchLayoutCustomKeyNotDefined                  = SevWarn | 0x092;
-  static Warn_TouchLayoutCustomKeyNotDefined = (o:{keyId:string, platformName:string, layerId:string}) => mw(this.WARN_TouchLayoutCustomKeyNotDefined,
-    `Key "${def(o.keyId)}" on platform "${def(o.platformName)}", layer "${def(o.layerId)}", is a custom key but has no corresponding rule in the source.`);
+  static Warn_TouchLayoutCustomKeyNotDefined = (o:{keyId:string, platformName:string, layerId:string, address:KeyAddress}) => mw(this.WARN_TouchLayoutCustomKeyNotDefined,
+    `Key "${def(o.keyId)}" on platform "${def(o.platformName)}", layer "${def(o.layerId)}"  (${keyAddress(o.address)}), is a custom key but has no corresponding rule in the source.`);
 
   static WARN_TouchLayoutMissingRequiredKeys                  = SevWarn | 0x093;
   static Warn_TouchLayoutMissingRequiredKeys = (o:{layerId:string, platformName:string, missingKeys:string}) => mw(this.WARN_TouchLayoutMissingRequiredKeys,
@@ -648,8 +659,8 @@ export class KmnCompilerMessages {
     `Extended shift flags ${def(o.flags)} are not supported in KeymanWeb`, o);
 
   static WARN_TouchLayoutUnidentifiedKey                      = SevWarn | 0x099;
-  static Warn_TouchLayoutUnidentifiedKey = (o:{layerId:string}) => mw(this.WARN_TouchLayoutUnidentifiedKey,
-    `A key on layer "${def(o.layerId)}" has no identifier.`);
+  static Warn_TouchLayoutUnidentifiedKey = (o:{layerId:string, address:KeyAddress}) => mw(this.WARN_TouchLayoutUnidentifiedKey,
+    `A key (${keyAddress(o.address)}) on layer "${def(o.layerId)}" has no identifier.`);
 
   static HINT_UnreachableKeyCode                              = SevHint | 0x09A;
   static Hint_UnreachableKeyCode = (o:{line:number,key:string}) => mw(this.HINT_UnreachableKeyCode,
@@ -696,9 +707,9 @@ export class KmnCompilerMessages {
   static Warn_HotkeyHasInvalidModifier                        = () => m(this.WARN_HotkeyHasInvalidModifier, `Hotkey has modifiers that are not supported. Use only SHIFT, CTRL and ALT`);
 
   static WARN_TouchLayoutSpecialLabelOnNormalKey              = SevWarn | 0x0A9;
-  static Warn_TouchLayoutSpecialLabelOnNormalKey = (o:{keyId:string, platformName:string, layerId:string, label:string}) =>
+  static Warn_TouchLayoutSpecialLabelOnNormalKey = (o:{keyId:string, platformName:string, layerId:string, label:string, address:KeyAddress}) =>
     mw(this.WARN_TouchLayoutSpecialLabelOnNormalKey,
-    `Key "${def(o.keyId)}" on platform "${def(o.platformName)}", layer "${def(o.layerId)}" does not have `+
+    `Key "${def(o.keyId)}" on platform "${def(o.platformName)}", layer "${def(o.layerId)}"  (${keyAddress(o.address)}) does not have `+
     `the key type "Special" or "Special (active)" but has the label "${def(o.label)}". This feature is only supported in Keyman 14 or later`);
 
   static WARN_OptionStoreNameInvalid                          = SevWarn | 0x0AA;
