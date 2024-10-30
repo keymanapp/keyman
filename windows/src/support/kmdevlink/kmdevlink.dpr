@@ -13,7 +13,8 @@ uses
   UserMessages in '..\..\..\..\common\windows\delphi\general\UserMessages.pas',
   ErrorControlledRegistry in '..\..\..\..\common\windows\delphi\vcl\ErrorControlledRegistry.pas',
   Unicode in '..\..\..\..\common\windows\delphi\general\Unicode.pas',
-  utilexecute in '..\..\..\..\common\windows\delphi\general\utilexecute.pas';
+  utilexecute in '..\..\..\..\common\windows\delphi\general\utilexecute.pas',
+  UfrmCharacterIdentifier in 'UfrmCharacterIdentifier.pas' {frmCharacterIdentifier};
 
 {$R *.RES}
 
@@ -24,5 +25,7 @@ begin
   Application.Run;
   frmMain.Free;
   frmMain := nil;
+  frmCharacterIdentifier.Free;
+  frmCharacterIdentifier := nil;
 end.
 

@@ -11,6 +11,7 @@ object frmCharacterIdentifier: TfrmCharacterIdentifier
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnClose = FormClose
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
@@ -40,6 +41,7 @@ object frmCharacterIdentifier: TfrmCharacterIdentifier
     Height = 105
     Align = alClient
     ColCount = 1
+    DefaultDrawing = False
     FixedCols = 0
     RowCount = 2
     FixedRows = 0

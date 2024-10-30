@@ -1,6 +1,8 @@
+#include "../../../../common/windows/cpp/include/keymanversion.h"
+
 1 VERSIONINFO
-  FILEVERSION		9,0,526,1
-  PRODUCTVERSION	9,0,526,1
+  FILEVERSION		KV_FILEVERSION
+  PRODUCTVERSION	KV_PRODUCTVERSION
   FILEFLAGSMASK		0x3fL
   FILEFLAGS		0x0L
   FILEOS		0x4L
@@ -11,15 +13,15 @@
     BEGIN
       BLOCK "0C0904E4"
       BEGIN
-        VALUE "CompanyName", "Tavultesoft\0"
-        VALUE "FileDescription", "TSCRMLINK\0"
-        VALUE "FileVersion", "9.0.526.1\0"
-        VALUE "InternalName", "TSCRMLINK\0"
-        VALUE "LegalCopyright", "© 2014 Tavultesoft Pty Ltd\0"
-        VALUE "LegalTrademarks", "\0"
-        VALUE "OriginalFilename", "TSCRMLINK.EXE\0"
-        VALUE "ProductName", "Tavultesoft Keyman Online Tools\0"
-        VALUE "ProductVersion", "9.0.526.1\0"
+        VALUE "CompanyName", KV_COMPANY_NAME
+        VALUE "FileDescription", "Keyman Devlink\0"
+        VALUE "FileVersion", KV_VERSION_STRING
+        VALUE "InternalName", "Keyman Devlink\0"
+        VALUE "LegalCopyright", KV_LEGAL_COPYRIGHT
+        VALUE "LegalTrademarks", KV_LEGAL_TRADEMARKS
+        VALUE "OriginalFilename", "KMDEVLINK.EXE\0"
+        VALUE "ProductName", "Keyman Devlink\0"
+        VALUE "ProductVersion", KV_VERSION_STRING
         VALUE "Comments", "\0"
       END
     END

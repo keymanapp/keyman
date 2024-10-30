@@ -1,23 +1,6 @@
 (*
-  Name:             UfrmCharacterIdentifier
-  Copyright:        Copyright (C) 2005 Tavultesoft Pty Ltd.
-  Documentation:    
-  Description:      
-  Create Date:      16 Jan 2009
-
-  Modified Date:    18 May 2012
-  Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
-
-  Bugs:             
-  Todo:             
-  Notes:            
-  History:          16 Jan 2009 - mcdurdin - Initial version
-                    30 Nov 2009 - mcdurdin - Add font lookup
-                    18 May 2012 - mcdurdin - I3306 - V9.0 - Remove TntControls + Win9x support
-                    18 May 2012 - mcdurdin - I3323 - V9.0 - Change from PlusMemoU to PlusMemo
-*)
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *)
 unit UfrmCharacterIdentifier;  // I3323  // I3306
 
 interface
@@ -43,10 +26,12 @@ type
       State: TGridDrawState);
     procedure FormCreate(Sender: TObject);
     procedure gridFontsClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     FFont: TFont;
     FNewChars: WideString;
     FCheckFontsThread: TCheckFontsThread;
+    LastText: string;
     procedure FillGrid;
     procedure UpdateFont;
     procedure FillFontList(Chars: WideString);
@@ -104,27 +89,32 @@ end;
 procedure TfrmCharacterIdentifier.UpdateFont;
 begin
   pmChars.Font := dlgFont.Font;
+  pmChars.Font.Style := [];
   sgChars.Font := dlgFont.Font;
-  with sgChars.Canvas do
-  begin
-    Font := sgChars.Font;
-    sgChars.RowHeights[0] := TextHeight('A') + 4;
-    Font := FFont;
-    sgChars.RowHeights[1] := TextHeight('A') + 4;
-  end;
+  sgChars.Font.Style := [];
+  sgChars.Canvas.Font := sgChars.Font;
+  sgChars.RowHeights[0] := sgChars.Canvas.TextHeight('A') + 4;
+  sgChars.Canvas.Font := FFont;
+  sgChars.RowHeights[1] := sgChars.Canvas.TextHeight('A') + 4;
 end;
 
 procedure TfrmCharacterIdentifier.pmCharsChange(Sender: TObject);
 begin
-  FillGrid;
-  FillFontList(pmChars.Text);
+  if pmChars.Text <> LastText then
+  begin
+    FillGrid;
+    FillFontList(pmChars.Text);
+    LastText := pmChars.Text;
+  end;
 end;
 
 procedure TfrmCharacterIdentifier.sgCharsDrawCell(Sender: TObject; ACol, ARow: Integer;
   Rect: TRect; State: TGridDrawState);
 begin
   if ARow = 1 then
-    sgChars.Canvas.Font := FFont;
+    sgChars.Canvas.Font := FFont
+  else
+    sgChars.Canvas.Font := sgChars.Font;
   sgChars.Canvas.TextRect(Rect,
     (Rect.Right + Rect.Left - sgChars.Canvas.TextWidth(sgChars.Cells[ACol, ARow])) div 2,
     (Rect.Top + Rect.Bottom - sgChars.Canvas.TextHeight(sgChars.Cells[ACol, ARow])) div 2,
@@ -171,12 +161,18 @@ begin
     sgChars.Cells[0,0] := '';
     sgChars.Cells[0,1] := '';
   end;
-  
+
   for I := 1 to Length(s) do
   begin
     sgChars.Cells[I-1, 0] := s[I];
     sgChars.Cells[I-1, 1] := 'U+'+IntToHex(Ord(s[i]), 4);
   end;
+end;
+
+procedure TfrmCharacterIdentifier.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  Action := caHide;
 end;
 
 procedure TfrmCharacterIdentifier.FormCreate(Sender: TObject);

@@ -1,53 +1,18 @@
 (*
-  Name:             UfrmMain
-  Copyright:        Copyright (C) 2005 Tavultesoft Pty Ltd.
-  Documentation:    
-  Description:      Office tool for checking status of CRM
-  Create Date:      14 Oct 2005
-
-  Modified Date:    8 Jun 2012
-  Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
-
-  Bugs:             
-  Todo:             
-  Notes:            
-  History:          14 Oct 2005 - mcdurdin - Initial Header
-                    17 Mar 2006 - mcdurdin - Refresh avoid loading from cache
-                    21 Jun 2006 - mcdurdin - URLs now open in new window instead of just loading main page
-                    15 Jan 2007 - mcdurdin - Moved to D2006, added hotkeys, shutdown with windows
-                    19 Mar 2007 - mcdurdin - Add Open Issue hotkey and menu
-                    16 May 2007 - mcdurdin - Add "Add Issue" dialog, hotkey amd menu
-                    13 Jul 2007 - mcdurdin - Hide password from edit control
-                    13 Jul 2007 - mcdurdin - Add Manual Activation function
-                    13 Jul 2007 - mcdurdin - Start Work Log function
-                    23 Aug 2007 - mcdurdin - Add Open Invoice menu
-                    27 Mar 2008 - mcdurdin - Add Open Invoice
-                    16 Jan 2009 - mcdurdin - Add link to character identifier
-                    16 Jan 2009 - mcdurdin - Rework Open ... functions
-                    16 Jan 2009 - mcdurdin - Add debug and support tools
-                    03 May 2011 - mcdurdin - I2890 - Record diagnostic data when encountering registry errors
-                    18 May 2012 - mcdurdin - I3306 - V9.0 - Remove TntControls + Win9x support
-                    18 May 2012 - mcdurdin - I3321 - V9.0 - Fixup paths in Delphi source for v9.0
-                    18 May 2012 - mcdurdin - I3310 - V9.0 - Unicode in Delphi fixes
-                    08 Jun 2012 - mcdurdin - I3349 - V9.0 - Consolidate all process creation into TUtilExecute
-
-                    02 Feb 2012 - mcdurdin - I2975 - VistaAltFixUnit causes exception on shutdown
-*)
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *)
 unit UfrmMain;  // I3306
 
 interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms, Dialogs,
-  ImgList, ExtCtrls, StdCtrls, ComCtrls, Grids, OleCtrls, SHDocVw,
-  Menus, XPMan, KeymanTrayIcon, System.ImageList;
+  ImgList, ExtCtrls, StdCtrls, ComCtrls, Grids, Menus,
+  KeymanTrayIcon, System.ImageList, Vcl.XPMan;
 
 const
   SStatusSiteURL = 'https://status.keyman.com';
-  SSearchURL = 'https://github.com/keymanapp/%s/issues/%s';// + SHost + '/corp/searchcustomer.php';
-
+  SSearchURL = 'https://github.com/keymanapp/%s/issues/%s';
   SAddIssueURL = 'https://github.com/keymanapp/keyman/issues/new';
 
 type
@@ -95,7 +60,6 @@ type
     procedure hkFieldEnter(Sender: TObject);
     procedure hkFieldExit(Sender: TObject);
     procedure mnuAddIssueClick(Sender: TObject);
-    procedure cmdWorkLogClick(Sender: TObject);
     procedure mnuOpenCharIdentClick(Sender: TObject);
   private
     CustomerText: string;
@@ -221,19 +185,10 @@ begin
   end;
 end;
 
-procedure TfrmMain.cmdWorkLogClick(Sender: TObject);
-begin
-  {with TfrmWorkLog.Create(Self) do
-  try
-    ShowModal;
-  finally
-    Free;
-  end;}
-end;
-
 procedure TfrmMain.FormDestroy(Sender: TObject);
 begin
   FreeAndNil(FIcon);
+  FreeAndNil(tiCRM);
   DisableHotkeys;
 end;
 
@@ -310,7 +265,9 @@ end;
 
 procedure TfrmMain.mnuOpenCharIdentClick(Sender: TObject);
 begin
-  with TfrmCharacterIdentifier.Create(nil) do Show;
+  if not Assigned(frmCharacterIdentifier) then
+    frmCharacterIdentifier := TfrmCharacterIdentifier.Create(nil);
+  frmCharacterIdentifier.Show;
 end;
 
 procedure TfrmMain.hkFieldEnter(Sender: TObject);

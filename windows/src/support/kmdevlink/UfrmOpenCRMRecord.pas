@@ -1,21 +1,6 @@
 (*
-  Name:             UfrmOpenCRMRecord
-  Copyright:        Copyright (C) 2005 Tavultesoft Pty Ltd.
-  Documentation:    
-  Description:      
-  Create Date:      16 Jan 2009
-
-  Modified Date:    18 May 2012
-  Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
-
-  Bugs:             
-  Todo:             
-  Notes:            
-  History:          16 Jan 2009 - mcdurdin - Initial version
-                    18 May 2012 - mcdurdin - I3306 - V9.0 - Remove TntControls + Win9x support
-*)
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *)
 unit UfrmOpenCRMRecord;  // I3306
 
 interface
@@ -125,7 +110,7 @@ end;
 
 function TfrmOpenCRMRecord.GetSearchText: WideString;
 begin
-  Result := editSearchFor.Text; 
+  Result := editSearchFor.Text;
 end;
 
 procedure TfrmOpenCRMRecord.cbRepositoryClick(Sender: TObject);

@@ -1,20 +1,6 @@
 (*
-  Name:             utilcheckfontchars
-  Copyright:        Copyright (C) 2005 Tavultesoft Pty Ltd.
-  Documentation:    
-  Description:      
-  Create Date:      11 Dec 2009
-
-  Modified Date:    11 Dec 2009
-  Authors:          mcdurdin
-  Related Files:    
-  Dependencies:     
-
-  Bugs:             
-  Todo:             
-  Notes:            
-  History:          11 Dec 2009 - mcdurdin - Add character check to font checker
-*)
+ * Keyman is copyright (C) SIL Global. MIT License.
+ *)
 unit utilcheckfontchars;
 
 interface
