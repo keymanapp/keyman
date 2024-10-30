@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 17.0.331 stable 2024-10-30
+
+* fix(android): Hide suggestion banner on password fields (#12466)
+* fix(common): declare dep on @keymanapp/ldml-keyboard-constants (#12475)
+* fix(oem/fv): Update keyboard versions and names for fv_all.kmp (#12504)
+* chore(ios): renew certificate (#12513)
+* fix(developer): prevent invalid string ids (#12524)
+* fix(developer): ignore excess whitespace in `<row keys>` attribute (#12523)
+
 ## 17.0.330 stable 2024-09-16
 
 * refactor(android): Move Sentry and APK to publish task (#12392)
