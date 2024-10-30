@@ -55,6 +55,7 @@ export class KeylayoutToKmnConverter {
       return null;
     }
 
+    console.log(';;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; FINISHED OK ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;');
     throw new Error('Not finished yet');
   }
 
@@ -77,6 +78,7 @@ export class KeylayoutToKmnConverter {
 
   //const xmlFile = readFileSync(`${process.cwd()}/data/MySample.keylayout`, 'utf8');
   const xmlFile = readFileSync(`${process.cwd()}/data/My_dk_Keyboard.keylayout`, 'utf8');
+
   const parser = new XMLParser(options);
   const jsonObj =  parser.parse(xmlFile); // get plain Object
 
@@ -170,25 +172,43 @@ export class KeylayoutToKmnConverter {
       console.log('deadkeyables per modifier state: ', deadkeyables)
       console.log('********************************************************')
 
-  // .........................................................
-  // create deadkeys-array
-  // .........................................................
+      console.log('keys_action_all_Layers ', keys_action_all_Layers)
+
+    // .........................................................
+    // loop through all dk, key-actions and find @_action
+    // find this value in <actions><action id=...>
+    // in their 'when' find output for dk
+
     // for all 'dk'
-    for ( let k=0; k<dk_vec2d.length;k++) {
+    for ( let i=0; i<dk_vec2d.length;i++) {
       const deadkeys_One_dk :any[] = []
-      // for all 'action'
-      for (let jj= 0; jj< jsonObj.keyboard.actions.action.length; jj++ ) {
-        // for all 'when'
-          for (let ii= 0; ii< jsonObj.keyboard.actions.action[jj].when.length; ii++ ) {
-            if (jsonObj.keyboard.actions.action[jj].when[ii]['@_state']  === dk_vec2d[k][0] ) {
-              deadkeys_One_dk.push(jsonObj.keyboard.actions.action[jj].when[ii]['@_output'])
+      // for all 'action' at keys paragraph
+      for (let j= 0; j< keys_action_all_Layers.length; j++ ) {
+        // find  in action e.g.  <action id="o">
+        for (let k= 0; k< keys_action_all_Layers[j].length; k++ ) {
+          const toFind =  new TextDecoder().decode(keys_action_all_Layers[j][k])
+
+          if( toFind !== "") {
+            // find the same id (e.g.  <action id="o">) in actions
+            for (let l= 0; l< jsonObj.keyboard.actions.action.length; l++ ) {
+              if (jsonObj.keyboard.actions.action[l]['@_id'] === toFind ) {
+                // loop through when until dk name (e.g. dk s0)
+                  for (let m= 0; m< jsonObj.keyboard.actions.action[l].when.length; m++ ) {
+                    // get their @_output
+                    if (jsonObj.keyboard.actions.action[l].when[m]['@_state']  === dk_vec2d[i][0] ) {
+                      deadkeys_One_dk.push(jsonObj.keyboard.actions.action[l].when[m]['@_output'])
+                  }
+                }
+              }
             }
           }
         }
-        deadkeys_all_Layers.push(deadkeys_One_dk)
       }
-      console.log('deadkeys per modifier state: ', deadkeys_all_Layers )
-      console.log('********************************************************')
+       deadkeys_all_Layers.push(deadkeys_One_dk)
+    }
+
+    console.log('deadkeys per modifier state: ', deadkeys_all_Layers )
+    console.log('********************************************************')
 
     // is there a better way??
     data_all_Layers[nrOfStates] = modifier_array    // add all normal key data
@@ -223,12 +243,12 @@ export class KeylayoutToKmnConverter {
       keys_singleLayer[0]  =  data_ukelele[j][0];   // a in a spec keyboard keylayoutfile -> code 0
       keys_singleLayer[24] =  data_ukelele[j][1];   // y -> code 6
       keys_singleLayer[2]  =  data_ukelele[j][2];   // c -> code 8     --> keyman K_..[3]
-      keys_singleLayer[1]  =  data_ukelele[j][3];   // b -> code 11    --> keyman K_..[2]  no! USVirtualKeyCodes should be [35] USVirtualKeyCodes.K_B
+      keys_singleLayer[52] =  data_ukelele[j][3];   // b -> code 11    --> keyman K_..[2]  no! USVirtualKeyCodes should be [35] USVirtualKeyCodes.K_B
       keys_singleLayer[16] =  data_ukelele[j][4];   // q -> code 12
       keys_singleLayer[29] =  data_ukelele[j][5];   // 3 -> code 20
       keys_singleLayer[38] =  data_ukelele[j][6];   // ß -> code 27
       keys_singleLayer[46] =  data_ukelele[j][7];   //   -> code 47
-
+      keys_singleLayer[27] =  data_ukelele[j][9];   //   -> code 47
       // keyman K_A...      code ukelele
       // keyman VK-code     == mac VK
       // later more here...
@@ -324,10 +344,26 @@ export class KeylayoutToKmnConverter {
     + [K_EQUAL] > dk(00b4)
     + [SHIFT K_EQUAL] > dk(0060)*/
 
+
+    for  ( let i=0; i<kmn_array[kmn_array.length-3].length; i++ ) {
+      data += "[TODO] > dk(" + this.createHexFromChar(kmn_array[kmn_array.length-3][i]) + ")\n"
+    }
+
+
+
+
+    data += "\n"
     data += "match > use(deadkeys)\n\n"
     data += "group(deadkeys)\n"
-    data += "store(" + ".....)\n"
-    data += '\n'
+    data += "\n"
+
+    for ( let i=0; i < (kmn_array[kmn_array.length-2]).length ; i++) {
+      if(kmn_array[kmn_array.length-1][i] !== undefined ) {
+        data += "store(dkf"+ this.createHexFromChar(kmn_array[kmn_array.length-4][i][1]) +") " + ( "\'" + String(kmn_array[kmn_array.length-2])).replace(/\,+/g, "' '").slice(0, -1) + "\n"
+        data += "store(dkt"+ this.createHexFromChar(kmn_array[kmn_array.length-4][i][1]) +") " + ( "\'" + String(kmn_array[kmn_array.length-1][i])).replace(/\,+/g, "' '") + "'\n"
+        data += '\n'
+      }
+    }
 
     writeFileSync("data/MyResult.kmn", data, { flag: "w"})
     console.log(" _S2 write finished\n")
@@ -337,6 +373,14 @@ export class KeylayoutToKmnConverter {
     else
       return false
   }
+
+
+
+    public createHexFromChar(character :string ):string  {
+      return '00' + character.charCodeAt(0).toString(16).slice(-4).toLowerCase()
+    }
+
+
 
 /** 
  * @brief check if search_modifier is available in modifier_array
