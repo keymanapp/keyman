@@ -5,6 +5,7 @@
  */
 import { CompilerCallbacks } from "@keymanapp/developer-utils";
 import { CopierMessages } from "./copier-messages.js";
+import { KeymanFileTypes } from "@keymanapp/common-types";
 
 export class GitHubRef {
   public owner: string;
@@ -90,7 +91,12 @@ export class KeymanCloudSource {
     try {
       return await this.callbacks.net.fetchBlob(url);
     } catch(e) {
-      this.callbacks.reportMessage(CopierMessages.Error_CannotDownloadFileFromGitHub({ref: ref.toString(), message: e?.message, cause: e?.cause?.message}));
+      if(KeymanFileTypes.binaryTypeFromFilename(this.callbacks.path.extname(ref.path)) != null) {
+        // We don't really expect .kmx, .js, etc to be in the repo, so just give informational message
+        this.callbacks.reportMessage(CopierMessages.Info_CannotDownloadBinaryFileFromGitHub({ref: ref.toString(), message: e?.message, cause: e?.cause?.message}));
+      } else {
+        this.callbacks.reportMessage(CopierMessages.Warn_CannotDownloadFileFromGitHub({ref: ref.toString(), message: e?.message, cause: e?.cause?.message}));
+      }
       return null;
     }
   }

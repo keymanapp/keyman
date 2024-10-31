@@ -146,11 +146,11 @@ export class CopierMessages {
     before trying again.`
   );
 
-  static ERROR_CannotDownloadFileFromGitHub = SevError | 0x0014;
-  static Error_CannotDownloadFileFromGitHub = (o:{ref: string, message?: string, cause?: string}) => m(
-    this.ERROR_CannotDownloadFileFromGitHub,
+  static WARN_CannotDownloadFileFromGitHub = SevWarn | 0x0014;
+  static Warn_CannotDownloadFileFromGitHub = (o:{ref: string, message?: string, cause?: string}) => m(
+    this.WARN_CannotDownloadFileFromGitHub,
     `The file '${def(o.ref)}' could not be downloaded: ${def(o.message)} ${def(o.cause)}`,
-    `An error was encountered attempting to download a file from GitHub raw files. Check the
+    `An error was encountered attempting to download a file from GitHub. Check the
     provided error details for the cause.`
   );
 
@@ -200,5 +200,13 @@ export class CopierMessages {
     `The repository may be private, or you may have a typo in the owner or repository name.`
   );
 
+  static INFO_CannotDownloadBinaryFileFromGitHub = SevInfo | 0x001B;
+  static Info_CannotDownloadBinaryFileFromGitHub = (o:{ref: string, message?: string, cause?: string}) => m(
+    this.INFO_CannotDownloadBinaryFileFromGitHub,
+    `The Keyman binary file '${def(o.ref)}' could not be downloaded: ${def(o.message)} ${def(o.cause)}. This is not normally a problem`,
+    `In most repositories, Keyman binary files such as .kmx, .kmp, .js are not included.
+    This is not normally a problem, as the files can be built from the source. Check
+    the provided error details for more details.`
+  );
 
 };
