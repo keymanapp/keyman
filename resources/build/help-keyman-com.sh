@@ -79,6 +79,7 @@ function upload_keyman_help {
       ;;
     ios)
       upload ios/docs/help products/iphone-and-ipad/$VERSION_RELEASE
+      upload ios/docs/engine developer/engine/iphone-and-ipad/$VERSION_RELEASE
       ;;
     linux)
       pushd "$KEYMAN_ROOT/linux/keyman-config" > /dev/null
