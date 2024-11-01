@@ -129,6 +129,7 @@ describe('vars', function () {
         LdmlCompilerMessages.Error_InvalidVariableIdentifer({id: 'invalid-uset'}),
         LdmlCompilerMessages.Error_InvalidVariableIdentifer({id: 'a_marker_name_more_than_32_chars_long'}),
         LdmlCompilerMessages.Error_InvalidVariableIdentifer({id: '😡'}),
+        LdmlCompilerMessages.Error_InvalidVariableIdentifer({id: ''}),
       ],
     },
     {

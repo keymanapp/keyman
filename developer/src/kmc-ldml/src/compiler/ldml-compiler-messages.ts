@@ -190,7 +190,7 @@ export class LdmlCompilerMessages {
   static ERROR_InvalidVariableIdentifer = SevError | 0x0029;
   static Error_InvalidVariableIdentifer = (o: { id: string }) => m(
     this.ERROR_InvalidVariableIdentifer,
-    `Invalid variable identifier "\\u${def(o.id)}". Identifiers must be between 1 and 32 characters, and can use A-Z, a-z, 0-9, and _.`,
+    `Invalid variable identifier "${def(o.id)}". Identifiers must be between 1 and 32 characters, and can use A-Z, a-z, 0-9, and _.`,
   );
 
   // Available: 0x02A-0x2F
