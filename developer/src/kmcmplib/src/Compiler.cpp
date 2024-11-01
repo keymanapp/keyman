@@ -2498,27 +2498,22 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         return KmnCompilerMessages::ERROR_InvalidToken; // I3137 - key portion of VK is missing e.g. "[CTRL ALT]", this generates invalid kmx file that can crash Keyman or compiler later on   // I3511
       }
 
-      while (*q != ']')
-      {
-        if (*q == '\'' || *q == '"')
-        {
-          if(!VerifyKeyboardVersion(fk, VERSION_60)) {
-            return KmnCompilerMessages::ERROR_60FeatureOnly_VirtualCharKey;
-          }
-          if (!kmcmp::FMnemonicLayout) {
-            ReportCompilerMessage(KmnCompilerMessages::WARN_VirtualCharKeyWithPositionalLayout);
-          }
-          KMX_WCHAR chQuote = *q;
-          q++; if (*q == chQuote || *q == '\n' || *q == 0) return KmnCompilerMessages::ERROR_InvalidToken;
-          tstr[mx - 1] |= VIRTUALCHARKEY;
-          tstr[mx++] = *q;
-          q++; if (*q != chQuote) return KmnCompilerMessages::ERROR_InvalidToken;
-          q++;
-          while (iswspace(*q)) q++;
-          if (*q != ']') return KmnCompilerMessages::ERROR_InvalidToken;
-          break; /* out of while loop */
+      if (*q == '\'' || *q == '"') {
+        if(!VerifyKeyboardVersion(fk, VERSION_60)) {
+          return KmnCompilerMessages::ERROR_60FeatureOnly_VirtualCharKey;
         }
-
+        if (!kmcmp::FMnemonicLayout) {
+          ReportCompilerMessage(KmnCompilerMessages::WARN_VirtualCharKeyWithPositionalLayout);
+        }
+        KMX_WCHAR chQuote = *q;
+        q++; if (*q == chQuote || *q == '\n' || *q == 0) return KmnCompilerMessages::ERROR_InvalidToken;
+        tstr[mx - 1] |= VIRTUALCHARKEY;
+        tstr[mx++] = *q;
+        q++; if (*q != chQuote) return KmnCompilerMessages::ERROR_InvalidToken;
+        q++;
+        while (iswspace(*q)) q++;
+        if (*q != ']') return KmnCompilerMessages::ERROR_InvalidToken;
+      } else {
         for (j = 0; !iswspace(*q) && *q != ']' && *q != 0; q++, j++);
 
         if (*q == 0) return KmnCompilerMessages::ERROR_InvalidToken;
@@ -2532,17 +2527,14 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
 
         if (u16icmp(vkname, u"K_NPENTER") == 0)
           i = 5;  // I649 - K_NPENTER hack
-        else
-        {
-          for (i = 0; i <= VK__MAX; i++)
-          {
+        else {
+          for (i = 0; i <= VK__MAX; i++) {
             if (u16icmp(vkname, VKeyNames[i]) == 0 || u16icmp(vkname, VKeyISO9995Names[i]) == 0)
               break;
           }
         }
 
-        if (i == VK__MAX + 1)
-        {
+        if (i == VK__MAX + 1) {
           if(!VerifyKeyboardVersion(fk, VERSION_90)) {
             return KmnCompilerMessages::ERROR_InvalidToken;
           }
@@ -2552,8 +2544,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
             return KmnCompilerMessages::ERROR_InvalidToken;
         }
 
-        p = q;
-
         tstr[mx++] = (int)i;
 
         if (kmcmp::FMnemonicLayout && (i <= VK__MAX) && VKeyMayBeVCKey[i]) {
@@ -2562,8 +2552,8 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
 
         while (iswspace(*q)) q++;
         if (*q != ']') return KmnCompilerMessages::ERROR_InvalidToken;
-        break; /* out of while loop */
       }
+
       tstr[mx++] = UC_SENTINEL_EXTENDEDEND;
       tstr[mx] = 0;
       //printf("--EXTENDEDEND--\n");
