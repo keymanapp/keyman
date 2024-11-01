@@ -2034,6 +2034,7 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
   int type, mx = 0, n, n1, n2, tokenFound = FALSE, z, sFlag = 0, j;
   KMX_DWORD i;
   KMX_BOOL finished = FALSE;
+  KMX_BOOL wsRequired = FALSE;
   KMX_WCHAR c;
 
   *tstr = 0;
@@ -2412,50 +2413,53 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       }
       continue;
     case 11:
-      p++; sFlag = ISVIRTUALKEY /* 0 */; finished = FALSE;
+      p++; sFlag = ISVIRTUALKEY /* 0 */; finished = FALSE; wsRequired = FALSE;
 
       //printf("--EXTENDEDSTRING--\n");
 
       do
       {
+        if (wsRequired && !iswspace(*p))
+          return KmnCompilerMessages::ERROR_InvalidToken; // #12307
+
         while (iswspace(*p)) p++;
 
         switch (towupper(*p))
         {
         case 'N':
           if (u16nicmp(p, u"NCAPS", 5) == 0)
-            sFlag |= NOTCAPITALFLAG, p += 5;
+            sFlag |= NOTCAPITALFLAG, wsRequired = TRUE, p += 5;
           else finished = TRUE;
           break;
         case 'L':
           if (u16nicmp(p, u"LALT", 4) == 0)
-            sFlag |= LALTFLAG, p += 4;
+            sFlag |= LALTFLAG, wsRequired = TRUE, p += 4;
           else if (u16nicmp(p, u"LCTRL", 5) == 0)
-            sFlag |= LCTRLFLAG, p += 5;
+            sFlag |= LCTRLFLAG, wsRequired = TRUE, p += 5;
           else finished = TRUE;
           break;
         case 'R':
           if (u16nicmp(p, u"RALT", 4) == 0)
-            sFlag |= RALTFLAG, p += 4;
+            sFlag |= RALTFLAG, wsRequired = TRUE, p += 4;
           else if (u16nicmp(p, u"RCTRL", 5) == 0)
-            sFlag |= RCTRLFLAG, p += 5;
+            sFlag |= RCTRLFLAG, wsRequired = TRUE, p += 5;
           else finished = TRUE;
           break;
         case 'A':
           if (u16nicmp(p, u"ALT", 3) == 0)
-            sFlag |= K_ALTFLAG, p += 3;
+            sFlag |= K_ALTFLAG, wsRequired = TRUE, p += 3;
           else finished = TRUE;
           break;
         case 'C':
           if (u16nicmp(p, u"CTRL", 4) == 0)
-            sFlag |= K_CTRLFLAG, p += 4;
+            sFlag |= K_CTRLFLAG, wsRequired = TRUE, p += 4;
           else if (u16nicmp(p, u"CAPS", 4) == 0)
-            sFlag |= CAPITALFLAG, p += 4;
+            sFlag |= CAPITALFLAG, wsRequired = TRUE, p += 4;
           else finished = TRUE;
           break;
         case 'S':
           if (u16nicmp(p, u"SHIFT", 5) == 0)
-            sFlag |= K_SHIFTFLAG, p += 5;
+            sFlag |= K_SHIFTFLAG, wsRequired = TRUE, p += 5;
           else finished = TRUE;
           break;
         default:
@@ -2489,12 +2493,9 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       tstr[mx++] = CODE_EXTENDED;
       tstr[mx++] = sFlag;
 
-      while (iswspace(*p)) p++;
-
       q = p;
 
-      if (*q == ']')
-      {
+      if (*q == ']') {
         return KmnCompilerMessages::ERROR_InvalidToken; // I3137 - key portion of VK is missing e.g. "[CTRL ALT]", this generates invalid kmx file that can crash Keyman or compiler later on   // I3511
       }
 
@@ -2509,7 +2510,9 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
 
         KMX_WCHAR chQuote = *q;
 
-        q++; if (*q == chQuote || *q == '\n' || *q == 0) return KmnCompilerMessages::ERROR_InvalidToken;
+        q++; // skip quote
+        if (*q == chQuote || *q == '\n' || *q == 0)
+          return KmnCompilerMessages::ERROR_InvalidToken;
 
         tstr[mx - 1] |= VIRTUALCHARKEY;
         tstr[mx++] = *q;
