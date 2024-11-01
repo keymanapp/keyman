@@ -2561,6 +2561,8 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         }
 
         while (iswspace(*q)) q++;
+        if (*q != ']') return KmnCompilerMessages::ERROR_InvalidToken;
+        break; /* out of while loop */
       }
       tstr[mx++] = UC_SENTINEL_EXTENDEDEND;
       tstr[mx] = 0;
