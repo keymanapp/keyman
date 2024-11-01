@@ -31,7 +31,7 @@ class KeyboardHeightViewController: UIViewController {
 
     let kbHeight = keyboardScale?.keyboardHeight ?? 216 // default for ancient devices
 
-    let message = "KeyboardHeightViewController viewDidLoad,  boundsRect: \(self.view.bounds) keyboardHeight from scale: \(kbHeight)"
+    let message = "   viewDidLoad,  boundsRect: \(self.view.bounds) keyboardHeight from scale: \(kbHeight)"
     os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
 
     //title = NSLocalizedString("menu-settings-spacebar-title", bundle: engineBundle, comment: "")
@@ -42,20 +42,25 @@ class KeyboardHeightViewController: UIViewController {
     navigationController?.toolbar?.barTintColor = Colors.statusToolbar
 
     let contentView = UIView(frame: self.view.bounds)
-    contentView.backgroundColor = UIColor.systemBlue
+    contentView.backgroundColor = UIColor.lightGray
+    contentView.alpha = 0.5
     view.addSubview(contentView)
     
-    label.frame = CGRectMake(10, 50, 180, 100)
+    label.frame = CGRectMake(10, 50, contentView.bounds.width-20, 100)
     label.backgroundColor=UIColor.white
     label.textAlignment = NSTextAlignment.center
     label.text = "Drag the top edge of the keyboard to adjust its height./nSeparate values are saved for portrait and landscape keyboard height."
+    label.numberOfLines = 0
     //label.isHidden=true
     contentView.addSubview(label)
     
     // calculate frame for keyboard image
     let keyboardFrame = CGRectMake(0, self.view.frame.height-kbHeight, self.view.frame.width, kbHeight)
+    let kbFrameMessage = "   viewDidLoad,  keyboardFrame: \(keyboardFrame)"
+    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, kbFrameMessage)
     keyboardImage.frame = keyboardFrame
     keyboardImage.contentMode = UIView.ContentMode.scaleToFill
+    keyboardImage.backgroundColor=UIColor.white
     keyboardImage.image = UIImage(named:"portrait-osk")
     contentView.addSubview(keyboardImage)
   }
