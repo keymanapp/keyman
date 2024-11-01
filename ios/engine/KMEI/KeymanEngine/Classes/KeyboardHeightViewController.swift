@@ -13,7 +13,8 @@ import os.log
 class KeyboardHeightViewController: UIViewController {
   var label: UILabel = UILabel()
   var keyboardImage: UIImageView = UIImageView()
-
+  var contentView: UIView = UIView()
+  
   public init() {
     super.init(nibName: nil, bundle: nil)
     _ = view
@@ -41,27 +42,43 @@ class KeyboardHeightViewController: UIViewController {
 
     navigationController?.toolbar?.barTintColor = Colors.statusToolbar
 
-    let contentView = UIView(frame: self.view.bounds)
-    contentView.backgroundColor = UIColor.lightGray
-    contentView.alpha = 0.5
+    contentView.frame = self.view.bounds
+    contentView.translatesAutoresizingMaskIntoConstraints = false
+    contentView.backgroundColor = .green
+    //contentView.alpha = 0.5
     view.addSubview(contentView)
-    
+
+    let margins = view.layoutMarginsGuide
+    NSLayoutConstraint.activate([
+      contentView.leadingAnchor.constraint(equalTo: margins.leadingAnchor),
+      contentView.trailingAnchor.constraint(equalTo: margins.trailingAnchor)
+    ])
+
+    let safeAreaGuide = view.safeAreaLayoutGuide
+    NSLayoutConstraint.activate([
+      contentView.topAnchor.constraint(equalToSystemSpacingBelow: safeAreaGuide.topAnchor, multiplier: 1.0),
+      safeAreaGuide.bottomAnchor.constraint(equalToSystemSpacingBelow: contentView.bottomAnchor, multiplier: 1.0)
+     ])
+
     label.frame = CGRectMake(10, 50, contentView.bounds.width-20, 100)
     label.backgroundColor=UIColor.white
-    label.textAlignment = NSTextAlignment.center
+    label.textAlignment = NSTextAlignment.left
     label.text = "Drag the top edge of the keyboard to adjust its height./nSeparate values are saved for portrait and landscape keyboard height."
     label.numberOfLines = 0
     //label.isHidden=true
     contentView.addSubview(label)
     
     // calculate frame for keyboard image
-    let keyboardFrame = CGRectMake(0, self.view.frame.height-kbHeight, self.view.frame.width, kbHeight)
-    let kbFrameMessage = "   viewDidLoad,  keyboardFrame: \(keyboardFrame)"
-    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, kbFrameMessage)
+    let keyboardFrame = CGRectMake(0, contentView.frame.height-kbHeight, contentView.frame.width, kbHeight)
     keyboardImage.frame = keyboardFrame
     keyboardImage.contentMode = UIView.ContentMode.scaleToFill
-    keyboardImage.backgroundColor=UIColor.white
-    keyboardImage.image = UIImage(named:"portrait-osk")
+    keyboardImage.backgroundColor=UIColor.cyan
+    
+    let kbImage = UIImage(named:"portrait-osk")
+    let kbImageMessage = "   viewDidLoad,  keyboardFrame: \(keyboardFrame) kbImage: \(kbImage)"
+    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, kbImageMessage)
+
+    keyboardImage.image = kbImage
     contentView.addSubview(keyboardImage)
   }
   
