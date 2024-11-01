@@ -2502,17 +2502,22 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         if(!VerifyKeyboardVersion(fk, VERSION_60)) {
           return KmnCompilerMessages::ERROR_60FeatureOnly_VirtualCharKey;
         }
+
         if (!kmcmp::FMnemonicLayout) {
           ReportCompilerMessage(KmnCompilerMessages::WARN_VirtualCharKeyWithPositionalLayout);
         }
+
         KMX_WCHAR chQuote = *q;
+
         q++; if (*q == chQuote || *q == '\n' || *q == 0) return KmnCompilerMessages::ERROR_InvalidToken;
+
         tstr[mx - 1] |= VIRTUALCHARKEY;
         tstr[mx++] = *q;
-        q++; if (*q != chQuote) return KmnCompilerMessages::ERROR_InvalidToken;
-        q++;
-        while (iswspace(*q)) q++;
-        if (*q != ']') return KmnCompilerMessages::ERROR_InvalidToken;
+
+        q++; // skip key
+        if (*q != chQuote)
+          return KmnCompilerMessages::ERROR_InvalidToken;
+        q++; // skip quote
       } else {
         for (j = 0; !iswspace(*q) && *q != ']' && *q != 0; q++, j++);
 
@@ -2549,10 +2554,12 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         if (kmcmp::FMnemonicLayout && (i <= VK__MAX) && VKeyMayBeVCKey[i]) {
           ReportCompilerMessage(KmnCompilerMessages::WARN_VirtualKeyWithMnemonicLayout);  // I3438
         }
-
-        while (iswspace(*q)) q++;
-        if (*q != ']') return KmnCompilerMessages::ERROR_InvalidToken;
       }
+
+      while (iswspace(*q)) q++;
+
+      if (*q != ']')
+        return KmnCompilerMessages::ERROR_InvalidToken;
 
       tstr[mx++] = UC_SENTINEL_EXTENDEDEND;
       tstr[mx] = 0;
