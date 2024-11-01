@@ -81,7 +81,12 @@ export class MarkerParser {
   /**
    * Pattern for matching a marker reference, OR the special marker \m{.}
    */
-  public static readonly REFERENCE = /\\m{([0-9A-Za-z_]{1,32}|\.)}/g;
+  public static readonly REFERENCE = /(?<!\\)(?:\\\\)*\\m{([0-9A-Za-z_]{1,32}|\.)}/g;
+
+  /**
+   * Pattern for matching a broken marker reference (assuming REFERENCE was not matched)
+   */
+  public static readonly BROKEN_REFERENCE = /(?<!\\)(?:\\\\)*\\m{([^}\\{}]*)/g;
 
   /**
    * parse a string into marker references
@@ -94,6 +99,21 @@ export class MarkerParser {
     }
     return matchArray(str, MarkerParser.REFERENCE);
   }
+
+  /**
+   * parse a string for broken marker references
+   * @param str input string such as "\m{a} … \m{.}"
+   * @returns `[]` or an array of all broken markers referenced
+   */
+  public static allBrokenReferences(str: string): string[] {
+    if (!str) {
+      return [];
+    }
+    // exclude valid markers
+    str = str.replaceAll(this.REFERENCE, '');
+    return matchArray(str, MarkerParser.BROKEN_REFERENCE);
+  }
+
 
   private static markerCodeToString(n: number, forMatch?: boolean): string {
     if (!forMatch) {
