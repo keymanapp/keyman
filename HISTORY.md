@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.133 alpha 2024-11-01
+
+* test(developer): kmcmplib compiler unit tests 4 (#12489)
+
 ## 18.0.132 alpha 2024-10-30
 
 * feat(windows): kmdevlink app (#12552)
