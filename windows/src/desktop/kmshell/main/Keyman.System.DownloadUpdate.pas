@@ -26,31 +26,32 @@ type
   private
     FShowErrors: Boolean;
     FDownload: TDownloadUpdateParams;
-    FErrorMessage: string;
-    {
-      Performs updates download in the background, without displaying a GUI
-      progress bar.
-      @params  SavePath  The path where the downloaded files will be saved.
-               Result    A Boolean value indicating the overall result of the
-               download process.
-    }
+    (**
+     *
+     * Performs updates download in the background, without displaying a GUI
+     * progress bar.
+     * @params  SavePath  The path where the downloaded files will be saved.
+     *          Result    A Boolean value indicating the overall result of the
+     *          download process.
+     *)
     procedure DoDownloadUpdates(SavePath: string; Params: TUpdateCheckResponse;  var Result: Boolean);
 
   public
 
     constructor Create;
     destructor Destroy; override;
-    {
-      Performs updates download in the background, without displaying a GUI
-      progress bar. This function is similar to DownloadUpdates, but it runs in
-      the background.
+    (**
+     * Performs updates download in the background, without displaying a GUI
+     * progress bar. This function is similar to DownloadUpdates, but it runs in
+     * the background.
 
-      @returns  True  if all updates were successfully downloaded, False if any
-      download failed.
-    }
+     * @returns  True  if all updates were successfully downloaded, False if any
+     * download failed.
+     *)
 
     function DownloadUpdates : Boolean;
-    function CheckAllFilesDownloaded : Boolean;
+    // TODO-WINDOWS-UPDATES: verify filesizes match the ucr metadata so we know we don't have partial downloades.
+    //function VerifyAllFilesDownloaded : Boolean;
     property ShowErrors: Boolean read FShowErrors write FShowErrors;
 
   end;
@@ -90,18 +91,15 @@ end;
 
 destructor TDownloadUpdate.Destroy;
 begin
-  if (FErrorMessage <> '') and FShowErrors then
-    LogMessage(FErrorMessage);
-
-  KL.Log('TDownloadUpdate.Destroy: FErrorMessage = '+FErrorMessage);
   inherited Destroy;
 end;
 
 procedure TDownloadUpdate.DoDownloadUpdates(SavePath: string; Params: TUpdateCheckResponse; var Result: Boolean);
 var
-  i, downloadCount: Integer;
+  i : Integer;
   http: THttpUploader;
   fs: TFileStream;
+  InstallerDownloaded: Boolean;
 
     function DownloadFile(const url, savepath: string): Boolean;
     begin
@@ -150,47 +148,38 @@ begin
 
   FDownload.TotalSize := 0;
   FDownload.TotalDownloads := 0;
-  downloadCount := 0;
-
-  // Keyboard Packages
-  for i := 0 to High(Params.Packages) do
-  begin
-    Inc(FDownload.TotalDownloads);
-    Inc(FDownload.TotalSize, Params.Packages[i].DownloadSize);
-    Params.Packages[i].SavePath := SavePath + Params.Packages[i].FileName;
-  end;
-
-  // Add the Keyman installer
-  Inc(FDownload.TotalDownloads);
-  Inc(FDownload.TotalSize, Params.InstallSize);
 
   // Keyboard Packages
   FDownload.StartPosition := 0;
   for i := 0 to High(Params.Packages) do
   begin
+    Inc(FDownload.TotalDownloads);
+    Inc(FDownload.TotalSize, Params.Packages[i].DownloadSize);
+    Params.Packages[i].SavePath := SavePath + Params.Packages[i].FileName;
     if not DownloadFile(Params.Packages[i].DownloadURL, Params.Packages[i].SavePath) then // I2742
     begin
       Params.Packages[i].Install := False; // Download failed but install other files
-    end
-    else
-      Inc(downloadCount);
+    end;
     FDownload.StartPosition := FDownload.StartPosition + Params.Packages[i].DownloadSize;
   end;
 
   // Keyman Installer
+  Inc(FDownload.TotalDownloads);
+  Inc(FDownload.TotalSize, Params.InstallSize);
   if not DownloadFile(Params.InstallURL, SavePath + Params.FileName) then  // I2742
   begin
     // TODO-WINDOWS-UPDATES: #10210  convert to error log.
     LogMessage('DoDownloadUpdates Failed to download' + Params.InstallURL);
+    InstallerDownloaded := False;
   end
   else
   begin
-    Inc(downloadCount)
+    InstallerDownloaded := True;
   end;
 
-  // There needs to be at least one file successfully downloaded to return
-  // True that files were downloaded
-  if downloadCount > 0 then
+  // If installer has downloaded that is success even
+  // if zero packages where downloaded.
+  if InstallerDownloaded then
     Result := True;
 end;
 
@@ -209,54 +198,6 @@ begin
   end
   else
     Result := False;
-end;
-
-function TDownloadUpdate.CheckAllFilesDownloaded: Boolean;
-var
-  i : Integer;
-  SavedPath : String;
-  DownloadResult : Boolean;
-  Params: TUpdateCheckResponse;
-  VerifyDownloads : TDownloadUpdateParams;
-  FileNames : TStringDynArray;
-
-begin
-  SavedPath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
-  GetFileNamesInDirectory(SavedPath, FileNames);
-  if Length(FileNames) = 0 then
-  begin
-    Result := False;
-    Exit;
-  end;
-
-  if TUpdateCheckStorage.LoadUpdateCacheData(Params) then
-  begin
-    for i := 0 to High(Params.Packages) do
-    begin
-      Inc(VerifyDownloads.TotalDownloads);
-      Inc(VerifyDownloads.TotalSize, Params.Packages[i].DownloadSize);
-      if not MatchStr(Params.Packages[i].FileName, FileNames) then
-      begin
-        Exit(False);
-      end;
-      Params.Packages[i].SavePath := SavedPath + Params.Packages[i].FileName;
-    end;
-    // Add the Keyman installer
-    Inc(FDownload.TotalDownloads);
-    Inc(FDownload.TotalSize, Params.InstallSize);
-    // Check if  the Keyman installer downloaded
-    if not MatchStr(Params.FileName, FileNames) then
-    begin
-      Exit(False);
-    end;
-    // TODO-WINDOWS-UPDATES: verify filesizes match so we know we don't have partial downloades.
-    Result := True;
-  end
-  else
-  begin
-    Result := False;
-  end;
-
 end;
 
 end.
