@@ -229,4 +229,11 @@ export class LdmlCompilerMessages {
   m(this.ERROR_IllegalTransformAsterisk,  `Invalid transform from="${def(o.from)}": Unescaped asterisk (*) is not valid transform syntax.`,
                                             '**Hint**: Use `\\*` to match a literal asterisk.');
 
+  static ERROR_IllegalTransformToUset = SevErrorTransform | 0x05;
+  static Error_IllegalTransformToUset = (o: { to: string }) => m(
+    this.ERROR_IllegalTransformToUset,
+    `Invalid transform to="${def(o.to)}": Set variable (\\$[…]) cannot be used in 'to=' unless part of a map.`,
+    '**Hint**: If a map was meant, must use the form `<transform from="($[fromSet])" to="$[1:toSet]"/>`.'
+  );
+
 }
