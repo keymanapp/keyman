@@ -25,6 +25,7 @@
 		1645D5952036C6FF0076C51B /* KeymanPackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1645D5942036C6FF0076C51B /* KeymanPackage.swift */; };
 		1645D5972036C9F80076C51B /* KMPKeyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1645D5962036C9F80076C51B /* KMPKeyboard.swift */; };
 		165EB3A12098993900040A69 /* KeyboardError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 165EB3A02098993900040A69 /* KeyboardError.swift */; };
+		29084CAB2CD48B5D004070E7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 29084CAA2CD48B5D004070E7 /* Images.xcassets */; };
 		296EF2C72AFA26C700E3E384 /* ZIPFoundation.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 296EF2C62AFA26C700E3E384 /* ZIPFoundation.xcframework */; };
 		29B30C232B564F9900C342A4 /* KeymanEngineLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29B30C222B564F9900C342A4 /* KeymanEngineLogger.swift */; };
 		29E202BD2CCB7541008B4740 /* KeyboardHeightViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29E202BC2CCB7541008B4740 /* KeyboardHeightViewController.swift */; };
@@ -299,6 +300,7 @@
 		1645D5942036C6FF0076C51B /* KeymanPackage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeymanPackage.swift; sourceTree = "<group>"; };
 		1645D5962036C9F80076C51B /* KMPKeyboard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KMPKeyboard.swift; sourceTree = "<group>"; };
 		165EB3A02098993900040A69 /* KeyboardError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardError.swift; sourceTree = "<group>"; };
+		29084CAA2CD48B5D004070E7 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		293EA3DB2705955300545EED /* ha */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ha; path = ha.lproj/ResourceInfoView.strings; sourceTree = "<group>"; };
 		293EA3DC2705964200545EED /* ha */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ha; path = ha.lproj/Localizable.strings; sourceTree = "<group>"; };
 		293EA3DD270596B700545EED /* ha */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = ha; path = ha.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
@@ -763,6 +765,7 @@
 				CEA1486F2407808F00C6ECD2 /* Localizable.strings */,
 				CE96E42D24D1229A005B8E5A /* Localizable.stringsdict */,
 				CE7A26D023CEE5790005955C /* Keyboard Colors.xcassets */,
+				29084CAA2CD48B5D004070E7 /* Images.xcassets */,
 				C06D372E1F81F4E100F61AE0 /* Info.plist */,
 				F273AB9615641D9300A47CEE /* Classes */,
 			);
@@ -1263,6 +1266,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C06D37601F82095200F61AE0 /* Keyman.bundle in Resources */,
+				29084CAB2CD48B5D004070E7 /* Images.xcassets in Resources */,
 				CEA1486C2407808F00C6ECD2 /* Localizable.strings in Resources */,
 				9ADC459F22E1895D004C78C6 /* LanguageLMDetailViewController.xib in Resources */,
 				CEA14870240780E100C6ECD2 /* ResourceInfoView.xib in Resources */,
