@@ -2524,13 +2524,15 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       } else {
         for (j = 0; !iswspace(*q) && *q != ']' && *q != 0; q++, j++);
 
-        if (*q == 0) return KmnCompilerMessages::ERROR_InvalidToken;
+        if (*q == 0)
+          return KmnCompilerMessages::ERROR_InvalidToken;
 
         KMX_WCHAR vkname[SZMAX_VKDICTIONARYNAME];  // I3438
 
-        if (j >= SZMAX_VKDICTIONARYNAME) return KmnCompilerMessages::ERROR_InvalidToken;
+        if (j >= SZMAX_VKDICTIONARYNAME)
+          return KmnCompilerMessages::ERROR_InvalidToken;
 
-        u16ncpy(vkname,  p, j);  // I3481
+        u16ncpy(vkname, p, j);  // I3481
         vkname[j] = 0;
 
         if (u16icmp(vkname, u"K_NPENTER") == 0)
