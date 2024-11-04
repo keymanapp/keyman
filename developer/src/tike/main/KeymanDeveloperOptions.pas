@@ -83,6 +83,7 @@ type
     procedure optWriteInt(const nm: string; value: Integer);
     procedure WriteServerConfigurationJson;
     class function Get_Initial_DefaultProjectPath: string; static;
+    function BackOffAndSaveJson(const Filename: string; const JSON: TJSONObject): Boolean;
   public
     procedure Read;
     procedure Write;
@@ -406,8 +407,6 @@ begin
 end;
 
 procedure TKeymanDeveloperOptions.Write;
-var
-  count: Integer;
 begin
   // If the output file does not exist, this creates it. Note that we load
   // from the existing file before writing out our set of options, which is
@@ -464,33 +463,7 @@ begin
     ForceDirectories(TKeymanDeveloperPaths.OptionsPath);
 
     try
-      count := 0;
-      repeat
-        try
-          SaveJSONToFile(TKeymanDeveloperPaths.OptionsPath + TKeymanDeveloperPaths.S_OptionsJson, json);
-          Break;
-        except
-          on E:EOSError do
-          begin
-            if E.ErrorCode = ERROR_ACCESS_DENIED then
-            begin
-              // Back off and retry 0.5 sec later, it's probably another
-              // instance happening to read or write the settings file
-              Inc(count);
-              Sleep(500);
-            end
-            else
-              raise;
-          end
-          else
-            raise;
-        end;
-      until count >= Max_Retries;
-      if count >= Max_Retries then
-      begin
-        if TKeymanSentryClient.Instance <> nil then
-          TKeymanSentryClient.Instance.ReportMessage('TKeymanDeveloperOptions: Failed to write settings after 5 tries');
-      end;
+      BackOffAndSaveJson(TKeymanDeveloperPaths.OptionsPath + TKeymanDeveloperPaths.S_OptionsJson, json);
     except
       on E:Exception do
       begin
@@ -507,6 +480,39 @@ begin
   WriteServerConfigurationJson;
 end;
 
+function TKeymanDeveloperOptions.BackOffAndSaveJson(const Filename: string; const JSON: TJSONObject): Boolean;
+var
+  count: Integer;
+begin
+  count := 0;
+  repeat
+    try
+      SaveJSONToFile(Filename, JSON);
+      Exit(True);
+    except
+      on E:EOSError do
+      begin
+        if E.ErrorCode = ERROR_ACCESS_DENIED then
+        begin
+          // Back off and retry 0.5 sec later, it's probably another
+          // instance happening to read or write the settings file
+          Inc(count);
+          Sleep(500);
+        end
+        else
+          raise;
+      end
+      else
+        raise;
+    end;
+  until count >= Max_Retries;
+
+  if TKeymanSentryClient.Instance <> nil then
+    TKeymanSentryClient.Instance.ReportMessage('TKeymanDeveloperOptions: Failed to write '+Filename+' after 5 tries');
+
+  Result := False;
+end;
+
 procedure TKeymanDeveloperOptions.WriteServerConfigurationJson;
 var
   o: TJSONObject;
@@ -517,7 +523,8 @@ begin
     o.AddPair('ngrokToken', FServerNgrokToken);
     o.AddPair('useNgrok', TJSONBool.Create(FServerUseNgrok));
     o.AddPair('ngrokVisible', TJSONBool.Create(FServerServerShowConsoleWindow));
-    SaveJSONToFile(TKeymanDeveloperPaths.ServerDataPath + TKeymanDeveloperPaths.S_ServerConfigJson, o);
+    ForceDirectories(TKeymanDeveloperPaths.ServerDataPath);
+    BackOffAndSaveJSON(TKeymanDeveloperPaths.ServerDataPath + TKeymanDeveloperPaths.S_ServerConfigJson, o);
   finally
     o.Free;
   end;
