@@ -13,6 +13,10 @@
     <set id="a_marker_name_more_than_32_chars_long" value="Y E S" /> <!-- ERROR_InvalidVariableIdentifer -->
     <string id="😡" value="UPPERCASE" /> <!-- ERROR_InvalidVariableIdentifer -->
     <string id="" value="empty id" /> <!-- ERROR_InvalidVariableIdentifer -->
+
+    <!-- bad marker id -->
+    <string id="badmarker1" value="bad\m{my-marker}marker" /> <!-- ERROR_InvalidMarkerIdentifier -->
+    <string id="badmarker2" value="bad\m{oopsForgotTo close it" /> <!-- ERROR_InvalidMarkerIdentifier -->
   </variables>
 
 </keyboard3>

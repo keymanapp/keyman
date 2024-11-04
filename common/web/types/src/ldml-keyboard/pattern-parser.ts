@@ -110,8 +110,8 @@ export class MarkerParser {
       return [];
     }
     // exclude valid markers
-    str = str.replaceAll(this.REFERENCE, '');
-    return matchArray(str, MarkerParser.BROKEN_REFERENCE);
+    const strMinusGoodMarkers = str.replaceAll(this.REFERENCE, '');
+    return matchArray(strMinusGoodMarkers, MarkerParser.BROKEN_REFERENCE);
   }
 
 
