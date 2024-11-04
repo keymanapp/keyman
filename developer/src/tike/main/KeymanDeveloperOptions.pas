@@ -508,7 +508,7 @@ begin
   until count >= Max_Retries;
 
   if TKeymanSentryClient.Instance <> nil then
-    TKeymanSentryClient.Instance.ReportMessage('TKeymanDeveloperOptions: Failed to write '+Filename+' after 5 tries');
+    TKeymanSentryClient.Instance.ReportMessage('TKeymanDeveloperOptions: Failed to write '+Filename+' after '+IntToStr(Max_Retries)+' tries');
 
   Result := False;
 end;
