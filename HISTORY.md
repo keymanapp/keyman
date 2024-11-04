@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.134 alpha 2024-11-04
+
+*  (#12606)
+
 ## 18.0.133 alpha 2024-11-01
 
 * test(developer): kmcmplib compiler unit tests 4 (#12489)
