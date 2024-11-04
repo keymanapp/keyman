@@ -787,7 +787,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_double_quote_test) {
     u16cpy(str, u"\"abc\"");
     EXPECT_EQ(KmnCompilerMessages::ERROR_ExtendedStringTooLong, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 2, 0, &newp, FALSE)); // max reduced to force error
 
-    // KmnCompilerMessages::ERROR_StringInVirtualKeySection *** TODO ***
+    // KmnCompilerMessages::ERROR_StringInVirtualKeySection (code cannot be reached)
 }
 
 // tests strings starting with single quote
@@ -810,7 +810,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_single_quote_test) {
     u16cpy(str, u"\'abc\'");
     EXPECT_EQ(KmnCompilerMessages::ERROR_ExtendedStringTooLong, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 2, 0, &newp, FALSE)); // max reduced to force error
 
-    // KmnCompilerMessages::ERROR_StringInVirtualKeySection *** TODO ***
+    // KmnCompilerMessages::ERROR_StringInVirtualKeySection (code cannot be reached)
 }
 
 // tests strings starting with 'a'
@@ -825,7 +825,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_a_test) {
     u16cpy(str, u"abc");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // KmnCompilerMessages::ERROR_AnyInVirtualKeySection *** TODO ***
+    // KmnCompilerMessages::ERROR_AnyInVirtualKeySection (code cannot be reached)
 
     // KmnCompilerMessages::ERROR_InvalidAny, no delimiters => NULL
     u16cpy(str, u"any");
@@ -892,7 +892,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_b_test) {
     u16cpy(str, u"bcd");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // beep, KmnCompilerMessages::ERROR_BeepInVirtualKeySection *** TODO ***
+    // beep, KmnCompilerMessages::ERROR_BeepInVirtualKeySection (code cannot be reached)
 
     // beep, valid
     u16cpy(str, u"beep");
@@ -907,7 +907,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_b_test) {
     EXPECT_EQ(KmnCompilerMessages::ERROR_90FeatureOnly_IfSystemStores, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     fileKeyboard.version = VERSION_90;
 
-    // baselayout, KmnCompilerMessages::ERROR_InvalidInVirtualKeySection *** TODO ***
+    // baselayout, KmnCompilerMessages::ERROR_InvalidInVirtualKeySection (code cannot be reached)
 
     // baselayout, no delimiters => NULL
     fileKeyboard.version = VERSION_90;
@@ -980,7 +980,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     EXPECT_EQ(KmnCompilerMessages::ERROR_80FeatureOnly, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
     fileKeyboard.version = VERSION_80;
 
-    // if, KmnCompilerMessages::ERROR_InvalidInVirtualKeySection *** TODO ***
+    // if, KmnCompilerMessages::ERROR_InvalidInVirtualKeySection (code cannot be reached)
 
     // if, no delimiters => NULL
     fileKeyboard.version = VERSION_80;
@@ -1077,7 +1077,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_i_test) {
     initFileStoreArray(fileKeyboard, {u"a", u"b", u"c"});
     fileKeyboard.dpStoreArray[1].fIsStore = TRUE;
 
-    // index, KmnCompilerMessages::ERROR_InvalidInVirtualKeySection *** TODO ***
+    // index, KmnCompilerMessages::ERROR_InvalidInVirtualKeySection (code cannot be reached)
 
     // index, no delimiters => NULL
     u16cpy(str, u"index");
@@ -1190,7 +1190,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_o_test) {
     u16cpy(str, u"opq");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // outs, KmnCompilerMessages::ERROR_OutsInVirtualKeySection *** TODO ***
+    // outs, KmnCompilerMessages::ERROR_OutsInVirtualKeySection (code cannot be reached)
 
     // outs, no delimiters => NULL
     u16cpy(str, u"outs");
@@ -1266,7 +1266,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
     u16cpy(str, u"cde");
     EXPECT_EQ(KmnCompilerMessages::ERROR_InvalidToken, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // context, KmnCompilerMessages::ERROR_ContextInVirtualKeySection *** TODO ***
+    // context, KmnCompilerMessages::ERROR_ContextInVirtualKeySection (code cannot be reached)
 
     // context, no offset, valid
     fileKeyboard.version = VERSION_60;
@@ -1352,7 +1352,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_c_test) {
     u16cpy(str, u"call");
     EXPECT_EQ(KmnCompilerMessages::ERROR_501FeatureOnly_Call, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // call, KmnCompilerMessages::ERROR_CallInVirtualKeySection *** TODO ***
+    // call, KmnCompilerMessages::ERROR_CallInVirtualKeySection (code cannot be reached)
 
     // call, no delimiters => NULL
     fileKeyboard.version = VERSION_501;
@@ -1443,7 +1443,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_n_test) {
     u16cpy(str, u"notany");
     EXPECT_EQ(KmnCompilerMessages::ERROR_70FeatureOnly, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // notany, KmnCompilerMessages::ERROR_AnyInVirtualKeySection *** TODO ***
+    // notany, KmnCompilerMessages::ERROR_AnyInVirtualKeySection (code cannot be reached)
 
    // notany, no delimiters => NULL
     fileKeyboard.version = VERSION_70;
@@ -1629,7 +1629,7 @@ TEST_F(CompilerTest, GetXStringImpl_type_r_test) {
     u16cpy(str, u"reset");
     EXPECT_EQ(KmnCompilerMessages::ERROR_80FeatureOnly, GetXStringImpl(tstr, &fileKeyboard, str, u"", output, 80, 0, &newp, FALSE));
 
-    // reset, KmnCompilerMessages::ERROR_InvalidInVirtualKeySection *** TODO ***
+    // reset, KmnCompilerMessages::ERROR_InvalidInVirtualKeySection (code cannot be reached)
 
     // reset, no delimiters => NULL
     fileKeyboard.version = VERSION_80;
