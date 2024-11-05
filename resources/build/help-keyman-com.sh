@@ -75,6 +75,7 @@ function upload_keyman_help {
   case $platform in
     android)
       upload android/docs/help products/android/$VERSION_RELEASE
+      upload android/docs/engine developer/engine/android/$VERSION_RELEASE
       ;;
     ios)
       upload ios/docs/help products/iphone-and-ipad/$VERSION_RELEASE
