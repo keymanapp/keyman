@@ -12,9 +12,6 @@ uses
   KeymanPaths,
   OnlineUpdateCheck;
 
-const
-  DaysBetweenCheckingForUpdates: Integer = 7; // Days between checking for updates
-
 type
   TDownloadUpdateParams = record
     TotalSize: Integer;
@@ -170,17 +167,13 @@ begin
   begin
     // TODO-WINDOWS-UPDATES: #10210  convert to error log.
     LogMessage('DoDownloadUpdates Failed to download' + Params.InstallURL);
-    InstallerDownloaded := False;
   end
   else
   begin
-    InstallerDownloaded := True;
-  end;
-
-  // If installer has downloaded that is success even
-  // if zero packages where downloaded.
-  if InstallerDownloaded then
+    // If installer has downloaded that is success even
+    // if zero packages were downloaded.
     Result := True;
+  end;
 end;
 
 function TDownloadUpdate.DownloadUpdates: Boolean;

@@ -40,7 +40,7 @@ begin
   if RegCreateKeyEx(HKEY_CURRENT_USER, PChar(SRegKey_KeymanEngine_CU), 0, NULL, KEY_ALL_ACCESS, NULL, &hk, NULL) = ERROR_SUCCESS then
   begin
     try
-      if RegSetValueEx(hk, PChar(SRegValue_Update_State), 0, REG_SZ, PWideChar(UpdateStr), Length(UpdateStr) * SizeOf(Char)) = ERROR_SUCCESS then
+      if RegSetValueEx(hk, PChar(SRegValue_Update_State), 0, REG_SZ, PChar(UpdateStr), (Length(UpdateStr)+1) * SizeOf(Char)) = ERROR_SUCCESS then
       begin
         Result := True;
       end
