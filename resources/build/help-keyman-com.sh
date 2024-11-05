@@ -93,6 +93,7 @@ function upload_keyman_help {
     windows)
       # Note: `/windows/src/desktop/help/build.sh web` must be run first
       upload windows/bin/help/md/desktop products/windows/$VERSION_RELEASE
+      upload windows/help/engine developer/engine/windows/$VERSION_RELEASE
       ;;
     developer)
       # Note: `/developer/build.sh api` must be run first - covers both uploads
