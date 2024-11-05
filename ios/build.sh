@@ -24,4 +24,10 @@ builder_describe "Builds Keyman Engine and the Keyman app for use on iOS devices
 builder_parse "$@"
 
 builder_run_child_actions clean configure build test
-builder_run_action        test:help    check-markdown  "$KEYMAN_ROOT/ios/docs/help"
+
+function do_test_help() {
+  check-markdown  "$KEYMAN_ROOT/ios/docs/help"
+  check-markdown  "$KEYMAN_ROOT/ios/docs/engine"
+}
+
+builder_run_action        test:help    do_test_help
