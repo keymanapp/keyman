@@ -438,8 +438,7 @@ begin
     ShowMessage(MsgFromId(SKOSNotSupported));
     Exit;
   end;
-  // TODO: #10038  Will add this as part of the background update state machine
-  // for now just verifing the download happens via -buc switch.
+
   BUpdateSM := TUpdateStateMachine.Create(False);
     try
       if (FMode = fmBackgroundUpdateCheck) then

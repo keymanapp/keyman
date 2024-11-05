@@ -25,26 +25,19 @@ type
     FDownload: TDownloadUpdateParams;
     (**
      *
-     * Performs updates download in the background, without displaying a GUI
-     * progress bar.
+     * Performs updates download in the background.
      * @params  SavePath  The path where the downloaded files will be saved.
-     *          Result    A Boolean value indicating the overall result of the
+     *
+     *@returns  A Boolean value indicating the overall result of the
      *          download process.
      *)
-    procedure DoDownloadUpdates(SavePath: string; Params: TUpdateCheckResponse;  var Result: Boolean);
+    function DoDownloadUpdates(SavePath: string; Params: TUpdateCheckResponse): Boolean;
 
   public
 
     constructor Create;
     destructor Destroy; override;
-    (**
-     * Performs updates download in the background, without displaying a GUI
-     * progress bar. This function is similar to DownloadUpdates, but it runs in
-     * the background.
 
-     * @returns  True  if all updates were successfully downloaded, False if any
-     * download failed.
-     *)
 
     function DownloadUpdates : Boolean;
     // TODO-WINDOWS-UPDATES: verify filesizes match the ucr metadata so we know we don't have partial downloades.
@@ -91,12 +84,11 @@ begin
   inherited Destroy;
 end;
 
-procedure TDownloadUpdate.DoDownloadUpdates(SavePath: string; Params: TUpdateCheckResponse; var Result: Boolean);
+function TDownloadUpdate.DoDownloadUpdates(SavePath: string; Params: TUpdateCheckResponse): Boolean;
 var
   i : Integer;
   http: THttpUploader;
   fs: TFileStream;
-  InstallerDownloaded: Boolean;
 
     function DownloadFile(const url, savepath: string): Boolean;
     begin
@@ -179,15 +171,13 @@ end;
 function TDownloadUpdate.DownloadUpdates: Boolean;
 var
   DownloadBackGroundSavePath : String;
-  DownloadResult : Boolean;
   ucr: TUpdateCheckResponse;
 begin
   DownloadBackGroundSavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
   if TUpdateCheckStorage.LoadUpdateCacheData(ucr) then
   begin
-    DoDownloadUpdates(DownloadBackGroundSavePath, ucr, DownloadResult);
-    KL.Log('DownloadUpdates.DownloadUpdatesBackground: DownloadResult = '+IntToStr(Ord(DownloadResult)));
-    Result := DownloadResult;
+    Result := DoDownloadUpdates(DownloadBackGroundSavePath, ucr);
+    KL.Log('DownloadUpdates.DownloadUpdates: DownloadResult = '+IntToStr(Ord(Result)));
   end
   else
     Result := False;

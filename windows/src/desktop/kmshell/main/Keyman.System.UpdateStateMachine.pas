@@ -99,6 +99,7 @@ implementation
 
 uses
 
+  System.Win.Registry,
   Winapi.Windows,
   Winapi.WinINet,
   ErrorControlledRegistry,
@@ -119,6 +120,7 @@ const
 
 constructor TState.Create(Context: TUpdateStateMachine);
 begin
+  inherited Create;
   bucStateContext := Context;
 end;
 
@@ -256,7 +258,7 @@ begin
 
   for lpState := Low(TUpdateState) to High(TUpdateState) do
   begin
-    FStateInstance[lpState].Free;
+    FreeAndNil(FStateInstance[lpState]);
   end;
 
   // TODO: #10210 remove debugging comments
@@ -289,7 +291,7 @@ begin
       Registry.WriteString(SRegValue_Update_State, UpdateStr);
       Result := True;
     except
-      on E: Exception do
+      on E: ERegistryException do
       begin
         // TODO: #10210 Log to Sentry
         KL.Log('Failed to write to registry: ' + E.Message);
@@ -328,7 +330,7 @@ begin
         else
           UpdateState := usIdle; // Default if out of bounds
       except
-        on E: Exception do
+        on E: ERegistryException do
         begin
           // TODO: #10210 Log to Sentry
           KL.Log('Failed to write to registry: ' + E.Message);
@@ -357,7 +359,7 @@ begin
         not Registry.ValueExists(SRegValue_AutomaticUpdates) or
         Registry.ReadBool(SRegValue_AutomaticUpdates);
       except
-        on E: Exception do
+        on E: ERegistryException do
         begin
           // TODO: #10210 Log to Sentry
           KL.Log('Failed to read registery: ' + E.Message);
@@ -386,7 +388,7 @@ begin
       Registry.WriteBool(SRegValue_ApplyNow, Value);
       Result := True;
     except
-      on E: Exception do
+      on E: ERegistryException do
       begin
         // TODO: #10210 Log to Sentry 'Failed to write '+SRegValue_ApplyNow+' to registry: ' + E.Message
         KL.Log('Failed to write to registry: ' + E.Message);
@@ -410,7 +412,7 @@ begin
         Registry.ValueExists(SRegValue_ApplyNow) and
         Registry.ReadBool(SRegValue_ApplyNow);
     except
-    on E: Exception do
+    on E: ERegistryException do
       begin
         KL.Log('Failed to read registry: ' + E.Message);
         Result := False;
@@ -556,29 +558,28 @@ var
 begin
 
   { ##### For Testing only just advancing to downloading #### }
-  ChangeState(UpdateAvailableState);
+  //ChangeState(UpdateAvailableState);
+  // will keep here as there are more PR's #12621
   { #### End of Testing ### };
 
-  { Make a HTTP request out and see if updates are available for now do
-    this all in the Idle HandleCheck message. But could be broken into an
-    seperate state of WaitngCheck RESP }
+  { // // TODO-WINDOWS-UPDATES Check how long a check takes then determine
+    if it needs to be broken into a seperate state of WaitngCheck RESP }
   { if Response not OK stay in the idle state and return }
 
 
-  // If handle check event force check
-  //  CheckForUpdates := TRemoteUpdateCheck.Create(True);
-  //  try
-  //    Result:= CheckForUpdates.Run;
-  //  finally
-  //   CheckForUpdates.Free;
-  //  end;
+  // Handle_check event force check
+  CheckForUpdates := TRemoteUpdateCheck.Create(True);
+  try
+    Result:= CheckForUpdates.Run;
+  finally
+     CheckForUpdates.Free;
+  end;
 
   { Response OK and Update is available }
-  // if Result = wucSuccess then
-  // begin
-  // ChangeState(UpdateAvailableState);
-  // end;
-
+  if Result = wucSuccess then
+  begin
+    ChangeState(UpdateAvailableState);
+  end;
   // else staty in idle state
 end;
 
@@ -786,13 +787,6 @@ begin
   try
     DownloadResult := DownloadUpdate.DownloadUpdates;
     Result := DownloadResult;
-    // #TODO: #10210 workout when we need to refresh kmcom keyboards
-    // if Result in [ wucSuccess] then
-    // begin
-    // kmcom.Keyboards.Refresh;
-    // kmcom.Keyboards.Apply;
-    // kmcom.Packages.Refresh;
-    // end;
   finally
     DownloadUpdate.Free;
   end;
@@ -845,7 +839,6 @@ begin
     end
     else
     begin
-      // TODO Pop up toast here to ask user if we want to continue
       frmStartInstall := TfrmStartInstall.Create(nil);
       try
         if frmStartInstall.ShowModal = mrOk then
