@@ -90,6 +90,9 @@ function upload_keyman_help {
     mac)
       upload mac/docs/help products/mac/$VERSION_RELEASE
       ;;
+    web)
+      upload web/docs/engine developer/engine/web/$VERSION_RELEASE
+      ;;
     windows)
       # Note: `/windows/src/desktop/help/build.sh web` must be run first
       upload windows/bin/help/md/desktop products/windows/$VERSION_RELEASE
@@ -120,7 +123,7 @@ while [[ $# -gt 0 ]] ; do
       display_usage
       exit 0
       ;;
-    android | ios | linux | mac | windows | developer)
+    android | ios | linux | mac | windows | developer | web)
       platform=$key
       ;;
     *)

@@ -14,6 +14,9 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_set_child_base src
 builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
+  \
+  "@/resources/tools/check-markdown  test:help" \
+  \
   "clean" \
   "configure" \
   "build" \
@@ -33,9 +36,11 @@ builder_describe "Builds engine modules for Keyman Engine for Web (KMW)." \
   ":engine/main              Builds all common code used by KMW's app/-level targets" \
   ":engine/osk               Builds the Web OSK module" \
   ":engine/predictive-text=src/engine/predictive-text/worker-main     Builds KMW's predictive text module" \
+  ":help                     Online documentation" \
   ":samples                  Builds all needed resources for the KMW sample-page set" \
   ":tools                    Builds engine-related development resources" \
   ":test-pages=src/test/manual   Builds resources needed for the KMW manual testing pages" \
+  ":_all                     (Meta build target used when targets are not specified)" \
   "--ci+                     Set to utilize CI-based test configurations & reporting."
 
 # Possible TODO?
@@ -182,11 +187,17 @@ builder_run_child_actions build:tools
 builder_run_child_actions build:test-pages
 
 # Build tests
-builder_run_action build build_action
+builder_run_action build:_all build_action
 
 # Run tests
-builder_run_child_actions test
-builder_run_action test test_action
+# builder_run_child_actions test
+builder_run_action test:_all test_action
+
+function do_test_help() {
+  check-markdown  "$KEYMAN_ROOT/web/docs/engine"
+}
+
+builder_run_action test:help do_test_help
 
 # Create coverage report
-builder_run_action coverage coverage_action
+builder_run_action coverage:_all coverage_action
