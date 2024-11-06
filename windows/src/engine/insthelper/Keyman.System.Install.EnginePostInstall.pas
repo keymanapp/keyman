@@ -29,15 +29,13 @@ end;
 function UpdateState: Boolean;
 var
   UpdateStr : UnicodeString;
-  UpdatePBytes : PByte;
   hk: Winapi.Windows.HKEY;
-  updateData: Cardinal;
 begin
 
   Result := False;
   UpdateStr := 'usPostInstall';
 
-  if RegCreateKeyEx(HKEY_CURRENT_USER, PChar(SRegKey_KeymanEngine_CU), 0, NULL, KEY_ALL_ACCESS, NULL, &hk, NULL) = ERROR_SUCCESS then
+  if RegCreateKeyEx(HKEY_CURRENT_USER, PChar(SRegKey_KeymanEngine_CU), 0, nil, 0, KEY_ALL_ACCESS, nil, &hk, nil) = ERROR_SUCCESS then
   begin
     try
       if RegSetValueEx(hk, PChar(SRegValue_Update_State), 0, REG_SZ, PChar(UpdateStr), (Length(UpdateStr)+1) * SizeOf(Char)) = ERROR_SUCCESS then
@@ -54,7 +52,7 @@ begin
   end
   else
   begin
-   // TODO-WINDOWS-UPDATES: error log creating key
+    //TODO-WINDOWS-UPDATES: error log creating key
   end;
 end;
 
