@@ -9,7 +9,7 @@ export const expectedGitDateFormat = /^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d\d\
  * @returns string, in RFC3339, 'YYYY-MM-DDThh:nn:ss.SSSZ'
  */
 export function getLastGitCommitDate(path: string): string {
-  // TZ=UTC0 git log -1 --no-merges --date=format:%Y-%m-%dT%H:%M:%SZ --format=%ad
+  // git log -1 --no-merges --format=%at
   let result = callGitLog([
     'log',                                // git log
     '-1',                                 // one commit only
