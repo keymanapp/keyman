@@ -14,6 +14,8 @@ EXTERN bool kmcmp_CompileKeyboard(
   KMCMP_COMPILER_RESULT& result
 ) {
 
+  std::setlocale(LC_ALL, "C.UTF-8");
+
   FILE_KEYBOARD fk;
   fk.extra = new KMCMP_COMPILER_RESULT_EXTRA;
   fk.extra->kmnFilename = pszInfile;
