@@ -1,4 +1,5 @@
 #include "pch.h"
+#include <clocale>
 #include <kmcmplibapi.h>
 #include <kmn_compiler_errors.h>
 #include "kmcmplib.h"
