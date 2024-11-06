@@ -9,5 +9,6 @@
 set -eu
 find "$1" -name '*.kmn' | \
   grep -E '(release|experimental)/([a-z0-9_]+)/([a-z0-9_]+)/source/\3\.kmn$' | \
-  grep -v masaram_gondi
+  grep -vE 'masaram_gondi|anii|sil_kmhmu'
 # #12623: exclude masaram_gondi due to #11806
+# #12630: exclude anii, sil_kmhmu as ico references have mismatching case
