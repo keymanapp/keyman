@@ -1,5 +1,4 @@
 #include "pch.h"
-#include <clocale>
 #include <kmcmplibapi.h>
 #include <kmn_compiler_errors.h>
 #include "kmcmplib.h"
@@ -14,9 +13,6 @@ EXTERN bool kmcmp_CompileKeyboard(
   const void* procContext,
   KMCMP_COMPILER_RESULT& result
 ) {
-
-  std::setlocale(LC_ALL, "C.UTF-8");
-
   FILE_KEYBOARD fk;
   fk.extra = new KMCMP_COMPILER_RESULT_EXTRA;
   fk.extra->kmnFilename = pszInfile;
