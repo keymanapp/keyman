@@ -4,6 +4,7 @@
 
 @@keys: [SHIFT K_BKQUOTE][K_1][K_BKQUOTE]
 @@expected: \u0037\u1790\u17B6\u0127
+@@keylist: [SHIFT K_BKQUOTE][SHIFT K_1][K_BKQUOTE][K_1]
 
 -->
 <keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">

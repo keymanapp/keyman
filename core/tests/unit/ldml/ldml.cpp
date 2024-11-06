@@ -16,6 +16,7 @@
 #include <sstream>
 #include <string>
 #include <type_traits>
+#include <set>
 
 #include "path.hpp"
 #include "state.hpp"
@@ -267,6 +268,44 @@ verify_context(std::u16string &text_store, km_core_state *&test_state, std::vect
   delete[] buf;
 }
 
+
+bool
+verify_key_list(std::set<km::tests::key_event> &actual, std::set<km::tests::key_event> &expected) {
+  bool equals = true;
+  for(const auto &akey : actual) {
+    if (expected.count(akey) == 0) {
+      equals = false;
+      std::u16string dump = convert<char, char16_t>(akey.dump());  // akey.dump()
+      std::wcout << console_color::fg(console_color::BRIGHT_RED) << "- FAIL - key_map had extra key " << dump << console_color::reset() << std::endl;
+    }
+  }
+  for(const auto &ekey : expected) {
+    if (actual.count(ekey) == 0) {
+      equals = false;
+      std::u16string dump = convert<char, char16_t>(ekey.dump());  // akey.dump()
+      std::wcout << console_color::fg(console_color::BRIGHT_RED) << "- FAIL - key_map had missing key " << dump << console_color::reset() << std::endl;
+    }
+  }
+  return equals;
+}
+
+bool
+verify_key_list(const km_core_keyboard_key *actual_list, const std::u16string &expected_list) {
+  std::set<km::tests::key_event> actual, expected;
+  std::string expected_str = convert<char16_t, char>(expected_list);
+  // convert actual list
+  while (actual_list != nullptr && actual_list->key != 0 && actual_list->modifier_flag != 0) {
+    actual.emplace(actual_list->key, (uint16_t)actual_list->modifier_flag);
+    actual_list++; // advance pointer
+  }
+  // parse expected_str
+  while (!expected_str.empty()) {
+    km::tests::key_event event = km::tests::LdmlEmbeddedTestSource::parse_next_key(expected_str);
+    expected.insert(event);
+  }
+  return verify_key_list(actual, expected);
+}
+
 int
 run_test(const km::core::path &source, const km::core::path &compiled, km::tests::LdmlTestSource& test_source) {
   km_core_keyboard * test_kb = nullptr;
@@ -370,6 +409,16 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
       // Compare internal context with expected result
       if (text_store != action.string) {
         errorLine = __LINE__;
+      }
+    } break;
+    case km::tests::LDML_ACTION_CHECK_KEYLIST: {
+      std::cout << "- checking keylist " << action.string << std::endl;
+      // get keylist from kbd
+      const km_core_keyboard_key* actual_list = test_kb->get_key_list();
+      if (!verify_key_list(actual_list, action.string)) {
+        errorLine = __LINE__;
+      } else {
+        std::cout << " .. matches." << std::endl;
       }
     } break;
     case km::tests::LDML_ACTION_FAIL: {

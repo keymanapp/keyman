@@ -269,6 +269,7 @@ LdmlEmbeddedTestSource::load_source( const km::core::path &path ) {
   const std::string s_context = "@@context: ";
   const std::string s_capsLock = "@@capsLock: ";
   const std::string s_expecterror = "@@expect-error: ";
+  const std::string s_keylist = "@@keylist: ";
 
   // Parse out the header statements in file.kmn that tell us (a) environment, (b) key sequence, (c) start context, (d) expected
   // result
@@ -300,6 +301,10 @@ LdmlEmbeddedTestSource::load_source( const km::core::path &path ) {
       context = parse_source_string(line);
     } else if (is_token(s_capsLock, line)) {
       set_caps_lock_on(parse_source_string(line).compare(u"1") == 0);
+    } else if (is_token(s_keylist, line)) {
+      set_keylist(line);
+    } else if (line[0] == '@') {
+      std::cerr << path << " warning, unknown @-command " << line << std::endl;
     }
   }
 
@@ -356,13 +361,19 @@ LdmlTestSource::char_to_event(char ch) {
 }
 
 uint16_t
-LdmlTestSource::get_modifier(std::string const m) {
+LdmlTestSource::get_modifier(std::string const &m) {
   for (int i = 0; km::core::kmx::s_modifier_names[i].name; i++) {
     if (m == km::core::kmx::s_modifier_names[i].name) {
       return km::core::kmx::s_modifier_names[i].modifier;
     }
   }
   return 0;
+}
+
+std::string key_event::dump() const {
+  std::stringstream f;
+  f  << "Key: {" << km::core::kmx::Debug_VirtualKey(vk) << ", " << km::core::kmx::Debug_ModifierName(modifier_state) << "}";
+  return f.str();
 }
 
 key_event
@@ -400,34 +411,37 @@ LdmlEmbeddedTestSource::vkey_to_event(std::string const &vk_event) {
 
 void
 LdmlEmbeddedTestSource::next_action(ldml_action &fillin) {
-  if (is_done || keys.empty()) {
-    // We were already done. return done.
-    fillin.type = LDML_ACTION_DONE;
-    return;
+  if (keys.empty()) {
+    // #3 we are almost done, let's run the key check if needed
+    if (!check_keylist.empty()) {
+      fillin.type = LDML_ACTION_CHECK_KEYLIST;
+      fillin.string = check_keylist;
+      check_keylist.clear();
+    } else {
+      fillin.type = LDML_ACTION_DONE;
+    }
   } else if(keys[0].empty()) {
+    // #2. Then, when we finish a key set, we check the 'expected' at the end of it.
     // Got to the end of a key set. time to check
     fillin.type = LDML_ACTION_CHECK_EXPECTED;
     fillin.string = expected[0]; // copy expected
     expected.pop_front();
     keys.pop_front();
-    if (keys.empty()) {
-      is_done = true; // so we get DONE next time
-    }
   } else {
+    // #1 First, we process each key
     fillin.type = LDML_ACTION_KEY_EVENT;
     fillin.k = next_key();
   }
 }
 
-
 key_event
 LdmlEmbeddedTestSource::next_key() {
   // mutate this->keys
-  return next_key(keys[0]);
+  return parse_next_key(keys[0]);
 }
 
 key_event
-LdmlEmbeddedTestSource::next_key(std::string &keys) {
+LdmlEmbeddedTestSource::parse_next_key(std::string &keys) {
   // Parse the next element of the string, chop it off, and return it
   // mutates keys
   if (keys.length() == 0)
