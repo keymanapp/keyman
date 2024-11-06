@@ -78,7 +78,7 @@ do_action() {
   done
 }
 
-if builder_has_option --full-test; then
+if should_do_full_test; then
   locate_keyboards_repo
 fi
 
@@ -101,7 +101,7 @@ if builder_start_action configure; then
   # We have to checkout the keyboards repo in a 'configure' action because
   # otherwise meson will not get the right list of keyboard source files,
   # even though we only use it in the 'test' action
-  if builder_has_option --full-test; then
+  if should_do_full_test; then
     checkout_keyboards
   fi
 
