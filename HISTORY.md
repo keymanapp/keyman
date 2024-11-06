@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.136 alpha 2024-11-06
+
+* fix(developer): handle merge commits when checking git log date (#12627)
+
 ## 18.0.135 alpha 2024-11-05
 
 * fix(developer): handle paste of TSV into Wordlist grid (#12594)
