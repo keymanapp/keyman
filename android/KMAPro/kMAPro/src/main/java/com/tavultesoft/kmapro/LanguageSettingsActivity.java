@@ -16,9 +16,13 @@ import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -54,50 +58,6 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
   private SharedPreferences prefs;
 
   private final static String TAG = "LanguageSettingsAct";
-
-  private class PreferenceToggleListener implements View.OnClickListener {
-    String prefsKey;
-    String lgCode;
-
-    public PreferenceToggleListener(String prefsKey, String lgCode) {
-      this.prefsKey = prefsKey;
-      this.lgCode = lgCode;
-    }
-
-    @Override
-    public void onClick(View v) {
-      // For predictions/corrections toggle
-      SwitchCompat toggle = (SwitchCompat) v;
-
-      SharedPreferences.Editor prefEditor = prefs.edit();
-
-      // predictionsToggle overrides correctionToggle and correctionsTextView
-      if (prefsKey.endsWith(KMManager.predictionPrefSuffix)) {
-        boolean override = toggle.isChecked();
-        overrideCorrectionsToggle(override);
-      }
-
-      // This will allow preemptively making settings for languages without models.
-      // Seems more trouble than it's worth to block this.
-      prefEditor.putBoolean(prefsKey, toggle.isChecked());
-      prefEditor.apply();
-
-      // Don't use/apply language modeling settings for languages without models.
-      if (associatedLexicalModel.isEmpty()) {
-        return;
-      }
-
-      Keyboard kbInfo = KMManager.getCurrentKeyboardInfo(context);
-      if(kbInfo != null) {
-        // If the active keyboard is for this language, immediately enact the new pref setting.
-        String kbdLgCode = kbInfo.getLanguageID();
-        if (kbdLgCode.equals(lgCode)) {
-          // Not only registers the model but also applies our modeling preferences.
-          KMManager.registerAssociatedLexicalModel(lgCode);
-        }
-      }
-    }
-  }
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -139,33 +99,48 @@ public final class LanguageSettingsActivity extends AppCompatActivity {
 
     FilteredKeyboardsAdapter adapter = new FilteredKeyboardsAdapter(context, KeyboardPickerActivity.getInstalledDataset(context), lgCode);
 
-    // The following two layouts/toggles will need to link with these objects.
+    // The following radio group will need to link with these objects.
     Context appContext = this.getApplicationContext();
     prefs = appContext.getSharedPreferences(appContext.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    boolean mayPredict = prefs.getBoolean(KMManager.getLanguagePredictionPreferenceKey(lgCode), true);
-    boolean mayCorrect = prefs.getBoolean(KMManager.getLanguageCorrectionPreferenceKey(lgCode), true);
+    int maySuggest =  prefs.getInt(KMManager.getLanguageAutoCorrectionPreferenceKey(lgCode), KMManager.KMDefault_Suggestion);
 
-    RelativeLayout layout = (RelativeLayout)findViewById(R.id.corrections_toggle);
+    // Initialize Radio button group change listeners
+    RadioGroup radioGroup = (RadioGroup) findViewById(R.id.suggestion_radio_group);
+    radioGroup.clearCheck();
 
-    correctionsTextView = (TextView) layout.findViewById(R.id.text1);
-    correctionsTextView.setText(getString(R.string.enable_corrections));
-    correctionsToggle = layout.findViewById(R.id.toggle);
-    correctionsToggle.setChecked(mayCorrect); // Link to persistent option storage!  Also needs handler.
-    String prefsKey = KMManager.getLanguageCorrectionPreferenceKey(lgCode);
-    correctionsToggle.setOnClickListener(new PreferenceToggleListener(prefsKey, lgCode));
+    int[] RadioButtonArray = {
+      R.id.suggestion_radio_0,
+      R.id.suggestion_radio_1,
+      R.id.suggestion_radio_2,
+      R.id.suggestion_radio_3};
+    RadioButton radioButton = (RadioButton)radioGroup.findViewById(RadioButtonArray[maySuggest]);
+    radioButton.setChecked(true);
 
-    layout = (RelativeLayout)findViewById(R.id.predictions_toggle);
+    radioGroup.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+      @Override
+      public void onCheckedChanged(RadioGroup group, @IdRes int checkId) {
+        RadioButton checkedButton = (RadioButton)radioGroup.findViewById(checkId);
+        int index = radioGroup.indexOfChild(checkedButton);
+        KMManager.setMaySuggest(lgCode, KMManager.SuggestionType.fromInt(index));
 
-    textView = (TextView) layout.findViewById(R.id.text1);
-    textView.setText(getString(R.string.enable_predictions));
-    SwitchCompat predictionsToggle = layout.findViewById(R.id.toggle);
-    predictionsToggle.setChecked(mayPredict); // Link to persistent option storage!  Also needs handler.
-    prefsKey = KMManager.getLanguagePredictionPreferenceKey(lgCode);
-    predictionsToggle.setOnClickListener(new PreferenceToggleListener(prefsKey, lgCode));
+        // Don't use/apply language modeling settings for languages without models.
+        if (associatedLexicalModel.isEmpty()) {
+          return;
+        }
 
-    overrideCorrectionsToggle(mayPredict);
+        Keyboard kbInfo = KMManager.getCurrentKeyboardInfo(context);
+        if(kbInfo != null) {
+          // If the active keyboard is for this language, immediately enact the new pref setting.
+          String kbdLgCode = kbInfo.getLanguageID();
+          if (kbdLgCode.equals(lgCode)) {
+            // Not only registers the model but also applies our modeling preferences.
+            KMManager.registerAssociatedLexicalModel(lgCode);
+          }
+        }
+      }
+    });
 
-    layout = (RelativeLayout)findViewById(R.id.model_picker);
+    RelativeLayout layout = (RelativeLayout)findViewById(R.id.model_picker);
     textView = (TextView) layout.findViewById(R.id.text1);
     textView.setText(getString(R.string.model_label));
 
