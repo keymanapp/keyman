@@ -797,7 +797,7 @@ begin
     Free;
   end;
 end;
-// TODO: #10210 Remove Update
+// TODO-WINDOWS-UPDATES: #10210 Remove Update
 procedure TfrmMain.Support_UpdateCheck;
 begin
   with TOnlineUpdateCheck.Create(Self, True, False) do
@@ -838,7 +838,7 @@ end;
 
 procedure TfrmMain.Update_ApplyNow;
 var
-  ShellPath, s: WideString;
+  ShellPath, s: string;
   FResult: Boolean;
 begin
   ShellPath := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);

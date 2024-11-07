@@ -1,4 +1,4 @@
-import { xml2js } from '@keymanapp/developer-utils';
+import { KeymanXMLReader } from '@keymanapp/developer-utils';
 import JSZip from 'jszip';
 import KEYMAN_VERSION from "@keymanapp/keyman-version";
 
@@ -180,12 +180,10 @@ export class KmpCompiler implements KeymanCompiler {
 
     const kpsPackage = (() => {
         let a: KpsFile.KpsPackage;
-        let parser = new xml2js.Parser({
-          explicitArray: false
-        });
 
         try {
-          parser.parseString(data, (e: unknown, r: unknown) => { if(e) throw e; a = r as KpsFile.KpsPackage });
+          a = new KeymanXMLReader('kps')
+            .parse(data) as KpsFile.KpsPackage;
         } catch(e) {
           this.callbacks.reportMessage(PackageCompilerMessages.Error_InvalidPackageFile({e}));
         }

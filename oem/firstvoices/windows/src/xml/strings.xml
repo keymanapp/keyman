@@ -391,7 +391,7 @@
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 18.0.96.0 -->
-  <string name="koAutomaticUpdate" comment="Automatically download updates ready to install">Automatically download updates ready to install</string>
+  <string name="koAutomaticUpdate" comment="Automatically download updates in the background, for installation later">Automatically download updates in the background, for installation later</string>
 
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->

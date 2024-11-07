@@ -29,23 +29,22 @@ end;
 function UpdateState: Boolean;
 var
   UpdateStr : UnicodeString;
-  UpdatePBytes : PByte;
   hk: Winapi.Windows.HKEY;
-  updateData: Cardinal;
 begin
 
   Result := False;
   UpdateStr := 'usPostInstall';
-  if RegOpenKeyEx(HKEY_LOCAL_MACHINE, PChar(SRegKey_KeymanEngine_CU), 0, KEY_ALL_ACCESS, hk) = ERROR_SUCCESS then
+
+  if RegCreateKeyEx(HKEY_CURRENT_USER, PChar(SRegKey_KeymanEngine_CU), 0, nil, 0, KEY_ALL_ACCESS, nil, &hk, nil) = ERROR_SUCCESS then
   begin
     try
-      if RegSetValueEx(hk, PChar(SRegValue_Update_State), 0, REG_SZ, PWideChar(UpdateStr), Length(UpdateStr) * SizeOf(Char)) = ERROR_SUCCESS then
+      if RegSetValueEx(hk, PChar(SRegValue_Update_State), 0, REG_SZ, PChar(UpdateStr), (Length(UpdateStr)+1) * SizeOf(Char)) = ERROR_SUCCESS then
       begin
         Result := True;
       end
       else
       begin
-      // error log
+      // TODO-WINDOWS-UPDATES: error log
       end;
     finally
       RegCloseKey(hk);
@@ -53,7 +52,7 @@ begin
   end
   else
   begin
-   // TODO: couldn't open registry key
+    //TODO-WINDOWS-UPDATES: error log creating key
   end;
 end;
 
@@ -94,7 +93,7 @@ begin
       end;
 
       Result := ERROR_SUCCESS;
-      // TODO better error checking on the registry key update
+      // TODO-WINDOWS-UPDATES: better error checking on the registry key update
       UpdateState;
 
     finally

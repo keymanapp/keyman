@@ -253,7 +253,7 @@ begin
       else if s = '-?'   then FMode := fmHelpKMShell
       else if s = '-h'   then FMode := fmHelp
       else if s = '-t'   then FMode := fmTextEditor
-      //TODO: will remove -ouc not used
+      //TODO-WINDOWS-UPDATES: will remove -ouc not used
       // -buc uses the Statemachine can be used for external scripts to force a check
       else if s = '-ouc' then FMode := fmOnlineUpdateCheck
       else if s = '-buc' then FMode := fmBackgroundUpdateCheck
@@ -438,8 +438,7 @@ begin
     ShowMessage(MsgFromId(SKOSNotSupported));
     Exit;
   end;
-  // TODO: #10038  Will add this as part of the background update state machine
-  // for now just verifing the download happens via -buc switch.
+
   BUpdateSM := TUpdateStateMachine.Create(False);
     try
       if (FMode = fmBackgroundUpdateCheck) then

@@ -46,8 +46,8 @@ object frmStartInstallNow: TfrmStartInstallNow
     Width = 75
     Height = 25
     Caption = 'Update'
+    ModalResult = 1
     TabOrder = 0
-    OnClick = cmdInstallClick
   end
   object cmdLater: TButton
     Left = 336
@@ -55,7 +55,7 @@ object frmStartInstallNow: TfrmStartInstallNow
     Width = 75
     Height = 25
     Caption = 'Close'
+    ModalResult = 8
     TabOrder = 1
-    OnClick = cmdLaterClick
   end
 end
