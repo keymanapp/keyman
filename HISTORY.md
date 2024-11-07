@@ -1,5 +1,13 @@
 # Keyman Version History
 
+## 18.0.137 alpha 2024-11-07
+
+* fix(windows): correct engine help source path for upload (#12625)
+* fix(developer): use 'N' for nomatch store debug strings (regression in #12107) (#12629)
+* chore(developer): skip masaram_gondi in kmcmplib full test (#12630)
+* feat(developer): analyze osk-char-use merge with existing mapping file (#12622)
+* feat(developer): Report key 'address' in validation failures in layout compiler (#12588)
+
 ## 18.0.136 alpha 2024-11-06
 
 * fix(developer): handle merge commits when checking git log date (#12627)
