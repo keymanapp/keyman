@@ -464,7 +464,7 @@ export class KmnCompilerMessages {
 
   static ERROR_TouchLayoutInvalidIdentifier                   = SevError | 0x05A;
   static Error_TouchLayoutInvalidIdentifier = (o:{keyId:string, platformName: string, layerId:string, address:KeyAddress}) => mw(this.ERROR_TouchLayoutInvalidIdentifier,
-    `Key "${def(o.keyId)}" on "${def(o.platformName)}", layer "${def(o.layerId)}" has an invalid identifier.`);
+    `Key "${def(o.keyId)}" on "${def(o.platformName)}", layer "${def(o.layerId)}" (${keyAddress(o.address)}) has an invalid identifier.`);
 
   static ERROR_InvalidKeyCode                                 = SevError | 0x05B;
   static Error_InvalidKeyCode = (o:{keyId: string}) => mw(this.ERROR_InvalidKeyCode,
