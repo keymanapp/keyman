@@ -19,6 +19,7 @@ interface AnalysisActivityOptions /* not inheriting from CompilerBaseOptions */ 
   stripDottedCircle?: boolean;
   includeCounts?: boolean;
   mappingFile?: string;
+  inputMappingFile?: string;
 };
 
 export function declareAnalyze(program: Command) {
@@ -35,6 +36,7 @@ function declareOskCharUse(command: Command) {
     .option('-b, --base', 'First PUA codepoint to use, in hexadecimal (default F100)', 'F100')
     .option('--include-counts', 'Include number of times each character is referenced', false)
     .option('--strip-dotted-circle', 'Strip U+25CC (dotted circle base) from results', false)
+    .option('-i, --input-mapping-file <filename>', 'Merge result file with existing mapping file')
     .addOption(new Option('-m, --mapping-file <filename>', 'Result file to write to (.json, .md, or .txt)').makeOptionMandatory())
     .action(async (filenames: string[], _options: any, commander: any): Promise<never|void> => {
       const options = commander.optsWithGlobals();
@@ -95,6 +97,7 @@ async function analyzeOskCharUse(callbacks: CompilerCallbacks, filenames: string
     puaBase: parseInt(options.base, 16),
     stripDottedCircle: options.stripDottedCircle,
     includeCounts: options.includeCounts,
+    mergeMapFile: options.inputMappingFile
   });
 
   if(!await runOnFiles(callbacks, filenames, analyzer.analyze.bind(analyzer))) {

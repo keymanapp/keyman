@@ -75,9 +75,11 @@ function upload_keyman_help {
   case $platform in
     android)
       upload android/docs/help products/android/$VERSION_RELEASE
+      upload android/docs/engine developer/engine/android/$VERSION_RELEASE
       ;;
     ios)
       upload ios/docs/help products/iphone-and-ipad/$VERSION_RELEASE
+      upload ios/docs/engine developer/engine/iphone-and-ipad/$VERSION_RELEASE
       ;;
     linux)
       pushd "$KEYMAN_ROOT/linux/keyman-config" > /dev/null
@@ -88,9 +90,13 @@ function upload_keyman_help {
     mac)
       upload mac/docs/help products/mac/$VERSION_RELEASE
       ;;
+    web)
+      upload web/docs/engine developer/engine/web/$VERSION_RELEASE
+      ;;
     windows)
       # Note: `/windows/src/desktop/help/build.sh web` must be run first
       upload windows/bin/help/md/desktop products/windows/$VERSION_RELEASE
+      upload windows/docs/engine developer/engine/windows/$VERSION_RELEASE
       ;;
     developer)
       # Note: `/developer/build.sh api` must be run first - covers both uploads
@@ -117,7 +123,7 @@ while [[ $# -gt 0 ]] ; do
       display_usage
       exit 0
       ;;
-    android | ios | linux | mac | windows | developer)
+    android | ios | linux | mac | windows | developer | web)
       platform=$key
       ;;
     *)

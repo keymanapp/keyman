@@ -152,6 +152,11 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     } else {
       result.mapFrom = sections.strs.allocString('');
       result.mapTo = sections.strs.allocString('');
+
+      // validate 'to' here
+      if (!this.isValidTo(transform.to || '')) {
+        return null;
+      }
     }
 
     if (cookedFrom === null) return null; // error
@@ -190,6 +195,19 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       nfd: true,
     }, sections);
     return result;
+  }
+
+  /**
+   * Validate the 'to' string.
+   * We have already checked that it's not a mapTo,
+   * so there should not be any illegal substitutions.
+   */
+  private isValidTo(to: string) : boolean {
+    if (/(?<!\\)(?:\\\\)*\$\[/.test(to)) {
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalTransformToUset({ to }));
+      return false;
+    }
+    return true;
   }
 
   /**

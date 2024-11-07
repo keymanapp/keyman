@@ -1,5 +1,32 @@
 # Keyman Version History
 
+## 18.0.136 alpha 2024-11-06
+
+* fix(developer): handle merge commits when checking git log date (#12627)
+
+## 18.0.135 alpha 2024-11-05
+
+* fix(developer): handle paste of TSV into Wordlist grid (#12594)
+* fix(developer): handle missing files in kmc-kmn (#12595)
+* fix(developer): handle missing files in kmc-model (#12596)
+* refactor(android): move Android Engine help in-repo (#12598)
+* refactor(ios): move ios Engine help in-repo (#12599)
+* refactor(windows): move windows Engine help in-repo (#12600)
+* refactor(web): move web engine help to app repo (#12601)
+* docs: Update websites readme with debug info (#12602)
+* fix(developer): create Server config directory before options save (#12608)
+* chore(linux): add support for Ubuntu 25.04 Plucky Puffin (#12614)
+* fix(linux): properly check for missing dependencies (#12615)
+* fix(linux): set environment variable for rendering of downloads dialog (#12616)
+
+## 18.0.134 alpha 2024-11-04
+
+*  (#12606)
+
+## 18.0.133 alpha 2024-11-01
+
+* test(developer): kmcmplib compiler unit tests 4 (#12489)
+
 ## 18.0.132 alpha 2024-10-30
 
 * feat(windows): kmdevlink app (#12552)

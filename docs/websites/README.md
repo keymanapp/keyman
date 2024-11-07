@@ -46,14 +46,16 @@ This downloads and builds the Docker images needed for the site.
 This step typically downloads _common/ website files from [shared-sites](https://github.com/keymanapp/shared-sites/tree/main/_common).
 
 #### Start the Docker container
-1. Run `./build.sh start`
+1. Run `./build.sh start --debug`
 
 This maps the local directory to the the Docker image.
 
+The `--debug` flag will, among other things:
+* Skip generation of CDN assets (so changes appear without a rebuild) (Some sites have assets in `/cdn/dev/` used to generate CDN in `/dev/deploy/`.)
+* Cause any PHP errors to be displayed to the user (rather than logging them back-end)
+
 For sites that use Composer dependencies, this step also creates a link in the Docker image from /var/www/vendor/ to /var/www/html/vendor.
 The link file also appears locally.
-
-Some sites have assets in `/cdn/dev/` used to generate CDN in `/dev/deploy/`. To avoid confusion during development, you can skip generating CDN with `./build.sh start --debug`.
 
 ##### Port lookup table
 After this, you can access the website at the following ports:
