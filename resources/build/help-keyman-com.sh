@@ -103,6 +103,9 @@ function upload_keyman_help {
       upload developer/docs/help developer/$VERSION_RELEASE
       upload developer/build/docs developer/$VERSION_RELEASE/reference/api
       upload developer/src/kmc/build/messages developer/$VERSION_RELEASE/reference/messages
+      # Note: we publish the core help alongside developer because we don't have
+      # a core CI release build
+      upload core/docs/api developer/core/$VERSION_RELEASE
       ;;
     *)
       display_usage
