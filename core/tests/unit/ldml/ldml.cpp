@@ -294,8 +294,9 @@ verify_key_list(const km_core_keyboard_key *actual_list, const std::u16string &e
   std::set<km::tests::key_event> actual, expected;
   std::string expected_str = convert<char16_t, char>(expected_list);
   // convert actual list
-  while (actual_list != nullptr && actual_list->key != 0 && actual_list->modifier_flag != 0) {
-    actual.emplace(actual_list->key, (uint16_t)actual_list->modifier_flag);
+  while (actual_list != nullptr && !(actual_list->key == 0 && actual_list->modifier_flag == 0)) {
+    km::tests::key_event k(actual_list->key, (uint16_t)actual_list->modifier_flag);
+    actual.insert(k);
     actual_list++; // advance pointer
   }
   // parse expected_str
@@ -420,6 +421,7 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
       } else {
         std::cout << " .. matches." << std::endl;
       }
+      delete [] actual_list;
     } break;
     case km::tests::LDML_ACTION_FAIL: {
       // test requested failure
