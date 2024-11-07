@@ -49,7 +49,7 @@ https://help.keyman.com/developer/engine/android/latest-version/
 |          KEYMAN Variable          |     Value    |
 |-----------------------------------|--------------|
 | KEYMAN_DEFAULT_VERSION_UBUNTU_CONTAINER | noble |
-| KEYMAN_MIN_TARGET_VERSION_ANDROID | 5 |
+| KEYMAN_MIN_TARGET_VERSION_ANDROID | 5.0 |
 | KEYMAN_MIN_TARGET_VERSION_ANDROID_CHROME | 53.0 |
 | KEYMAN_MIN_TARGET_VERSION_IOS | 12.2 |
 | KEYMAN_MIN_TARGET_VERSION_MAC | 10.13 |
