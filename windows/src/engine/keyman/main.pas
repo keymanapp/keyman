@@ -40,14 +40,14 @@ uses
   System.Win.Registry,
 
   GetOsVersion,
+  Keyman.System.ExecutionHistory,
   Keyman.System.Security,
   Keyman.Winapi.VersionHelpers,
   KeymanVersion,
+  Klog,
   RegistryKeys,
   UfrmKeyman7Main,
-  UserMessages,
-  Klog,
-  Keyman.System.ExecutionHistory;
+  UserMessages;
 
 function ValidateParameters(var FCommand: Integer): Boolean; forward;
 function PassParametersToRunningInstance(FCommand: Integer): Boolean; forward;

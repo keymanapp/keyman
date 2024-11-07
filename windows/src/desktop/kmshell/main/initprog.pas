@@ -253,7 +253,7 @@ begin
       else if s = '-?'   then FMode := fmHelpKMShell
       else if s = '-h'   then FMode := fmHelp
       else if s = '-t'   then FMode := fmTextEditor
-      //TODO: will remove -ouc not used
+      //TODO-WINDOWS-UPDATES: will remove -ouc not used
       // -buc uses the Statemachine can be used for external scripts to force a check
       else if s = '-ouc' then FMode := fmOnlineUpdateCheck
       else if s = '-buc' then FMode := fmBackgroundUpdateCheck
