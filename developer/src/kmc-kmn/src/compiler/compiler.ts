@@ -310,7 +310,7 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
       },
       loadFile: function(filename: string, baseFilename: string): number[] {
         const data: Uint8Array = compiler.callbacks.loadFile(compiler.callbacks.resolveFilename(baseFilename, filename));
-        return data ? Array.from(data) : null;
+        return data ? Array.from(data) : [];
       }
     });
 

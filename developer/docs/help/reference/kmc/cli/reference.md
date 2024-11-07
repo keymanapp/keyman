@@ -280,6 +280,14 @@ Note: paths shown above may vary.
 
 : Result file to write to (.json, .md, or .txt)
 
+`-i, --input-mapping-file <filename>`
+
+: Merge result file with existing mapping file. If supplied, existing
+  codepoint mappings will be kept, to ensure that updated fonts are
+  backwardly compatible with deployed keyboards. The
+  `--include-counts` flag will be set according to the format of
+  the input mapping file.
+
 For more information on the purpose of `analyze osk-char-use` and
 `analyze rewrite-osk-from-char-use`, see
 [`&displayMap`](/developer/language/reference/displaymap).
