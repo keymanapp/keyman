@@ -1,8 +1,12 @@
-import { Keyboard, KeyboardHarness, KeyboardLoaderBase, KeyboardLoadErrorBuilder, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
+import vm from 'node:vm';
+import { readFile } from 'node:fs/promises';
 
-import vm from 'vm';
-import fs from 'fs';
 import { globalObject } from '@keymanapp/web-utils';
+
+import { default as Keyboard } from '../keyboard.js';
+import { KeyboardHarness, MinimalKeymanGlobal } from '../keyboardHarness.js';
+import { KeyboardLoaderBase } from '../keyboardLoaderBase.js';
+import { KeyboardLoadErrorBuilder } from '../keyboardLoadError.js';
 
 export class NodeKeyboardLoader extends KeyboardLoaderBase {
   constructor()
@@ -22,22 +26,32 @@ export class NodeKeyboardLoader extends KeyboardLoaderBase {
     }
   }
 
-  protected loadKeyboardInternal(uri: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Keyboard> {
+  protected async loadKeyboardBlob(uri: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Uint8Array> {
     // `fs` does not like 'file:///'; it IS "File System" oriented, after all, and wants a path, not a URI.
-    if(uri.indexOf('file:///') == 0) {
+    if (uri.indexOf('file:///') == 0) {
       uri = uri.substring('file:///'.length);
     }
 
+    let buffer: Buffer;
+    try {
+      buffer = await readFile(uri);
+    } catch (err) {
+      throw errorBuilder.keyboardDownloadError(err);
+    }
+    return Uint8Array.from(buffer);
+  }
+
+  protected async loadKeyboardFromScript(scriptSrc: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Keyboard> {
     let script;
     try {
-      script = new vm.Script(fs.readFileSync(uri).toString());
+      script = new vm.Script(scriptSrc);
     } catch (err) {
-      return Promise.reject(errorBuilder.missingError(err));
+      throw errorBuilder.invalidKeyboard(err);
     }
     try {
       script.runInContext(this.harness._jsGlobal);
     } catch (err) {
-      return Promise.reject(errorBuilder.scriptError(err));
+      throw errorBuilder.scriptError(err);
     }
 
     const keyboard = this.harness.loadedKeyboard;
