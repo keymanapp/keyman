@@ -17,6 +17,7 @@ builder_describe \
   ":engine=ibus-keyman               ibus-keyman" \
   ":help                             Online documentation" \
   ":service=keyman-system-service    keyman-system-service" \
+  ":mcompile=mcompile/keymap         mnemonic layout recompiler for Linux" \
   "clean" \
   "configure" \
   "build" \
