@@ -1,5 +1,15 @@
 # Keyman Version History
 
+## 18.0.138 alpha 2024-11-08
+
+* fix(common): check for invalid markers (#12613)
+* chore: update minimum versions (#12632)
+* fix(windows): correct path to output file in publish step for fv keyboards (#12637)
+* chore(core): move API docs from help.keyman.com (#12642)
+* feat(developer): kmc generate (#11014)
+* feat(developer): kmc-copy (#12555)
+* feat(developer): add GitHub and Cloud support to kmc-copy (#12586)
+
 ## 18.0.137 alpha 2024-11-07
 
 * fix(windows): correct engine help source path for upload (#12625)
