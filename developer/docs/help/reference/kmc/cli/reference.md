@@ -308,16 +308,24 @@ For more information on the purpose of `analyze osk-char-use` and
 
 ## `kmc copy` options
 
-The input parameter should be one of the following:
+Copies a keyboard or lexical model project, renaming files matching the original
+project ID according to the output filename. Can copy projects from the
+following sources:
 
-* A .kpj file, e.g. `./keyboards/khmer_angkor/khmer_angkor.kpj`
-* A local folder containing a .kpj file with the same base nam, e.g.
-  `./keyboards/khmer_angkor`
-<!--
-* A cloud keyboard, e.g. `cloud:khmer_angkor`
-* A GitHub repository that matches the Keyman keyboard/model repository
-  layout, e.g. `github:keyman-keyboards/khmer_angkor`
--->
+* A .kpj file, e.g. `./keyboards/khmer_angkor/khmer_angkor.kpj`, or `./sil.km.cnd.kpj`
+* A local folder containing a .kpj file with a matching base name, e.g.
+  `./keyboards/khmer_angkor` (which contains `khmer_angkor.kpj`), or
+  `./models/sil.km.cnd/` (which contains `sil.km.cnd.kpj`)
+* A cloud keyboard, or cloud lexical model, e.g. `cloud:khmer_angkor`. This
+  retrieves the current source from the Keyman Cloud, which is in the GitHub
+  repository keymanapp/keyboards or keymanapp/lexical-models. The project type
+  will be determined by the id pattern -- either a lexical model
+  `author.bcp47.uniq` id pattern, or a keyboard id pattern (where period `.` is
+  not permitted)
+* A GitHub repository or subfolder within a repository that matches the Keyman
+  keyboard/model repository layout. The branch name is optional, and will use
+  the default branch from the repository if omitted. For example,
+  `github:keyman-keyboards/khmer_angkor:main:/khmer_angkor.kpj`
 
 `-o, --out-path <filename>`
 

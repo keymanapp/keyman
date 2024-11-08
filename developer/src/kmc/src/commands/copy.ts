@@ -26,9 +26,10 @@ export function declareCopy(program: Command) {
       <project> can be:
       * a .kpj file, e.g. ./keyboards/khmer_angkor/khmer_angkor.kpj
       * a local folder (with a .kpj file in it), e.g. ./keyboards/khmer_angkor
+      * a cloud keyboard or lexical model, cloud:id, e.g. cloud:khmer_angkor
+      * a GitHub repository, optional branch, and path, github:owner/repo[:branch]:path
+        e.g. github:keyman-keyboards/khmer_angkor:main:/khmer_angkor.kpj
     `);
-// TODO-COPY * a cloud keyboard, e.g. cloud:khmer_angkor
-// TODO-COPY * a GitHub repository, e.g. github:keyman-keyboards/khmer_angkor
   }
 
 function commanderOptionsToCopierOptions(options: any): CopierOptions {

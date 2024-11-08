@@ -96,20 +96,117 @@ export class CopierMessages {
 
   static ERROR_UnsupportedProjectVersion = SevError | 0x000D;
   static Error_UnsupportedProjectVersion = (o:{filename: string, version: string}) => m(this.ERROR_UnsupportedProjectVersion,
-    `Project version ${def(o.version)} for '${def(o.filename)}' is not supported by this version of Keyman Developer`);
+    `Project version ${def(o.version)} for '${def(o.filename)}' is not supported by this version of Keyman Developer`
+  );
 
   static ERROR_InvalidProjectFile = SevError | 0x000E;
   static Error_InvalidProjectFile = (o:{filename: string, message: string}) => m(
     this.ERROR_InvalidProjectFile,
-    `Project file '${def(o.filename)}' is not valid: ${def(o.message)}`);
+    `Project file '${def(o.filename)}' is not valid: ${def(o.message)}`
+  );
 
   static ERROR_ProjectFileCouldNotBeRead = SevError | 0x000F;
   static Error_ProjectFileCouldNotBeRead = (o:{filename: string}) => m(
     this.ERROR_ProjectFileCouldNotBeRead,
-    `Project file '${def(o.filename)}' could not be read`);
+    `Project file '${def(o.filename)}' could not be read`
+  );
 
   static INFO_DryRun = SevInfo | 0x0010;
   static Info_DryRun = (o:{outPath: string}) => m(
     this.INFO_DryRun,
-    `Dry run requested. No changes have been saved`);
+    `Dry run requested. No changes have been saved`
+  );
+
+  static ERROR_InvalidGitHubSource = SevError | 0x0011;
+  static Error_InvalidGitHubSource = (o:{source: string}) => m(
+    this.ERROR_InvalidGitHubSource,
+    `Source project specification '${def(o.source)}' is not a valid GitHub reference`,
+    `The source project specification for GitHub sources must match the pattern:
+        github:\\<owner/repo>[:\\<branch>]:\\<path>
+    The path must include the .kpj filename and may optionally begin with a forward slash.
+    The following are valid examples:
+        github:keymanapp/keyboards:master:release/k/khmer_angkor/khmer_angkor.kpj
+        github:keymanapp/keyboards:release/k/khmer_angkor/khmer_angkor.kpj
+        github:keymanapp/keyboards:/release/k/khmer_angkor/khmer_angkor.kpj`
+  );
+
+  static ERROR_CannotDownloadFolderFromGitHub = SevError | 0x0012;
+  static Error_CannotDownloadFolderFromGitHub = (o:{ref: string, message?: string, cause?: string}) => m(
+    this.ERROR_CannotDownloadFolderFromGitHub,
+    `The folder '${def(o.ref)}' could not be downloaded: ${def(o.message)} ${def(o.cause)}`,
+    `An error was encountered attempting to download a folder from GitHub API. Check the
+    provided error details for the cause.`
+  );
+
+  static ERROR_FolderDownloadedFromGitHubIsNotAValidFolder = SevError | 0x0013;
+  static Error_FolderDownloadedFromGitHubIsNotAValidFolder = (o:{ref: string}) => m(
+    this.ERROR_FolderDownloadedFromGitHubIsNotAValidFolder,
+    `The path '${def(o.ref)}' does not appear to be a folder on GitHub`,
+    `The provided path may be a file or may not exist. Check the reference
+    before trying again.`
+  );
+
+  static WARN_CannotDownloadFileFromGitHub = SevWarn | 0x0014;
+  static Warn_CannotDownloadFileFromGitHub = (o:{ref: string, message?: string, cause?: string}) => m(
+    this.WARN_CannotDownloadFileFromGitHub,
+    `The file '${def(o.ref)}' could not be downloaded: ${def(o.message)} ${def(o.cause)}`,
+    `An error was encountered attempting to download a file from GitHub. Check the
+    provided error details for the cause.`
+  );
+
+  static ERROR_InvalidCloudKeyboardId = SevError | 0x0015;
+  static Error_InvalidCloudKeyboardId = (o:{id: string}) => m(
+    this.ERROR_InvalidCloudKeyboardId,
+    `The keyboard identifier '${def(o.id)}' is not a valid keyboard identifier`,
+    `Keyboard identifiers on Keyman Cloud can only use the characters a-z, 0-9, and _.`
+  );
+
+  static ERROR_CouldNotRetrieveFromCloud = SevError | 0x0016;
+  static Error_CouldNotRetrieveFromCloud = (o:{id: string, message?: string, cause?: string}) => m(
+    this.ERROR_CouldNotRetrieveFromCloud,
+    `Details for keyboard or model identified by '${def(o.id)}' could not be downloaded: ${def(o.message)} ${def(o.cause)}`,
+    `An error was encountered attempting to retrieve keyboard or model details from Keyman Cloud API. Check the
+    provided error details for the cause.`
+  );
+
+  static ERROR_KeymanCloudReturnedInvalidData = SevError | 0x0017;
+  static Error_KeymanCloudReturnedInvalidData = (o:{id: string}) => m(
+    this.ERROR_KeymanCloudReturnedInvalidData,
+    `Keyman Cloud API returned invalid data for keyboard or model identified by '${def(o.id)}'`,
+    `There may be a network error or a server error. Retry your request later or contact
+    Keyman Support for assistance.`
+  );
+
+  static ERROR_CloudDoesNotHaveSource = SevError | 0x0018;
+  static Error_CloudDoesNotHaveSource = (o:{id: string}) => m(
+    this.ERROR_CloudDoesNotHaveSource,
+    `The keyboard or model identified by '${def(o.id)}' does not have source available`,
+    `Legacy keyboards in Keyman Cloud do not have source available. Check the Keyman keyboard catalog
+    at keyman.com for further details. Some new keyboards or models may be available as binary-only.`
+  );
+
+  static ERROR_CannotDownloadRepoFromGitHub = SevError | 0x0019 ;
+  static Error_CannotDownloadRepoFromGitHub = (o:{ref: string, message?: string, cause?: string}) => m(
+    this.ERROR_CannotDownloadRepoFromGitHub,
+    `The repository at '${def(o.ref)}' could not be accessed: ${def(o.message)} ${def(o.cause)}`,
+    `An error was encountered attempting to download details about a repository from GitHub API.
+    Check the provided error details for the cause.`
+  );
+
+  static ERROR_CouldNotFindDefaultBranchOnGitHub = SevError | 0x001A;
+  static Error_CouldNotFindDefaultBranchOnGitHub = (o:{ref: string}) => m(
+    this.ERROR_CouldNotFindDefaultBranchOnGitHub,
+    `The default branch could not be found for the GitHub repository '${def(o.ref)}'`,
+    `The repository may be private, or you may have a typo in the owner or repository name.`
+  );
+
+  static INFO_CannotDownloadBinaryFileFromGitHub = SevInfo | 0x001B;
+  static Info_CannotDownloadBinaryFileFromGitHub = (o:{ref: string, message?: string, cause?: string}) => m(
+    this.INFO_CannotDownloadBinaryFileFromGitHub,
+    `The Keyman binary file '${def(o.ref)}' could not be downloaded: ${def(o.message)} ${def(o.cause)}. This is not normally a problem`,
+    `In most repositories, Keyman binary files such as .kmx, .kmp, .js are not included.
+    This is not normally a problem, as the files can be built from the source. Check
+    the provided error details for more details.`
+  );
+
 };

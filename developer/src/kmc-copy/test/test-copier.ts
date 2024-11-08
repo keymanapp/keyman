@@ -13,7 +13,7 @@ import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { KeymanProjectCopier } from '../src/KeymanProjectCopier.js';
 import { makePathToFixture } from './helpers/index.js';
 
-const { TEST_SAVE_ARTIFACTS } = env;
+const { TEST_SAVE_ARTIFACTS, TEST_SAVE_FIXTURES } = env;
 let outputRoot: string = '/an/imaginary/root/';
 
 function normalizeNewLine(s: string): string {
@@ -21,7 +21,7 @@ function normalizeNewLine(s: string): string {
 }
 
 describe('KeymanProjectCopier', function() {
-  const callbacks = new TestCompilerCallbacks();
+  const callbacks = new TestCompilerCallbacks(makePathToFixture('online'));
 
   this.beforeAll(function() {
     if(TEST_SAVE_ARTIFACTS) {
@@ -242,12 +242,64 @@ describe('KeymanProjectCopier', function() {
       'source/burushos.bsk.burushaski.model.kps': 'expected/burushos.bsk.burushaski/sil.bsk.my_version.model.kps',
     }
   },
+
+  //
+  // jawa
+  //
+  {
+    title: 'should copy a v1.0 keyboard from Keyman Cloud',
+    new: 'my_jawa',
+    old: 'cloud:jawa',
+    cloud_path: '', ///release/j/jawa',
+    old_project: 'jawa.kpj',
+    expected_artifacts: {
+      "/release/j/jawa/LICENSE.md": "LICENSE.md",
+      "/release/j/jawa/jawa.kpj": "my_jawa.kpj",
+      "/release/j/jawa/build/jawa.js": "build/my_jawa.js",
+      "/release/j/jawa/build/jawa.kmx": "build/my_jawa.kmx",
+      "/release/j/jawa/build/jawa.kvk": "build/my_jawa.kvk",
+      // note: .kmp is missing because not referenced, this is okay (will be built)
+      "/release/j/jawa/source/jawa-help.htm": "source/jawa-help.htm",
+      "/release/j/jawa/source/jawa.ico": "source/my_jawa.ico",
+      "/release/j/jawa/source/jawa.keyman-touch-layout": "source/my_jawa.keyman-touch-layout",
+      "/release/j/jawa/source/jawa.kmn": "source/my_jawa.kmn",
+      "/release/j/jawa/source/jawa.kps": "source/my_jawa.kps",
+      "/release/j/jawa/source/jawa.kvks": "source/my_jawa.kvks",
+      "/release/j/jawa/source/jawa2.bmp": "source/jawa2.bmp",
+      "/release/j/jawa/source/readme.htm": "source/readme.htm",
+      "/release/j/jawa/source/welcome/welcome.htm": "source/welcome/welcome.htm",
+      "/release/shared/fonts/noto/Java/NotoSansJavanese-Bold.ttf": "external/release/shared/fonts/noto/Java/NotoSansJavanese-Bold.ttf",
+      "/release/shared/fonts/noto/Java/NotoSansJavanese-Regular.ttf": "external/release/shared/fonts/noto/Java/NotoSansJavanese-Regular.ttf",
+      // NOTE: the following files are not included because this is a 1.0
+      // project and they are not referenced by any files:
+      // * HISTORY.md
+      // * README.md
+      // * build/jawa.kmp
+    },
+    fixtures: {
+      // TODO-COPY
+    }
+  },
+
+
 ];
 
   for(const test of tests) {
     it(test.title, async function() {
+      if(TEST_SAVE_FIXTURES) {
+        this.timeout(120000);
+      }
+
       const outPath = path.join(outputRoot, test.new).replaceAll(/\\/g, '/');
-      const source = makePathToFixture('projects', test.old).replaceAll(/\\/g, '/') + '/';
+      const source = test.old.includes(':')
+        ? test.old
+        : makePathToFixture('projects', test.old).replaceAll(/\\/g, '/') + '/';
+      const fullSource = test.old.includes(':')
+        ? test.old
+        : source + test.old_project;
+      const artifactSource = test.old.includes(':')
+        ? test.cloud_path!
+        : source;
 
       const copier = new KeymanProjectCopier();
       assert.isTrue(await copier.init(callbacks, {
@@ -256,9 +308,12 @@ describe('KeymanProjectCopier', function() {
         // TODO-COPY rename: false,
       }));
 
-      const result = await copier.run(source + test.old_project);
+      const result = await copier.run(fullSource);
 
-      // We should have no messages and a successful result
+      //
+      // Verify that we have no messages and a successful result
+      //
+
       assert.isOk(result);
       assert.isEmpty(callbacks.messages);
 
@@ -266,15 +321,19 @@ describe('KeymanProjectCopier', function() {
         assert.isTrue(await copier.write(result.artifacts));
       }
 
+      //
       // Verify that the special outputPath folder artifact is present
+      //
 
       assert.isNull(result.artifacts['kmc-copy:outputPath'].data);
 
+      //
       // Verify that the files are going into the right places
+      //
 
       // add paths in for comparison
       const expectedArtifacts = Object.keys(test.expected_artifacts).reduce(
-        (obj,key) => { obj[source + key] = outPath + '/' + (<any>test.expected_artifacts)[key]; return obj},
+        (obj,key) => { obj[path.posix.join(artifactSource, key)] = outPath + '/' + (<any>test.expected_artifacts)[key]; return obj},
         <any>{ "kmc-copy:outputPath": outPath }
       );
 
@@ -283,9 +342,12 @@ describe('KeymanProjectCopier', function() {
 
       assert.deepEqual(actualArtifacts, expectedArtifacts);
 
+      //
       // Verify that rewritten files are correct
+      //
+
       for(const fixture of Object.keys(test.fixtures)) {
-        const actual = new TextDecoder().decode(result.artifacts[source + fixture].data);
+        const actual = new TextDecoder().decode(result.artifacts[path.posix.join(artifactSource, fixture)].data);
 
         if(typeof (<any>test.fixtures)[fixture] == 'function') {
           (<any>test.fixtures)[fixture](actual);
@@ -297,6 +359,64 @@ describe('KeymanProjectCopier', function() {
     });
   }
 
+  it('should copy a project from GitHub', async function() {
+    if(TEST_SAVE_FIXTURES) {
+      this.timeout(120000);
+    }
+    const outPath = path.join(outputRoot, 'my_ipa').replaceAll(/\\/g, '/');
+
+    const copier = new KeymanProjectCopier();
+    assert.isTrue(await copier.init(callbacks, {
+      dryRun: false,
+      outPath,
+      // TODO-COPY rename: false,
+    }));
+
+    // armenian_mnemonic selected because (a) small, and (b) has v2.0 project, so
+    // that exercises the folder retrieval as well
+    const result = await copier.run('github:keymanapp/keyboards:release/a/armenian_mnemonic/armenian_mnemonic.kpj');
+
+    // We should have no messages and a successful result
+    assert.isOk(result);
+    assert.isEmpty(callbacks.messages);
+
+    // TODO-COPY: verify outcome using pattern above
+
+    if(TEST_SAVE_ARTIFACTS) {
+      assert.isTrue(await copier.write(result.artifacts));
+    }
+  });
+
+  ['jawa', 'nrc.str.sencoten'].forEach(function(id: string) {
+    it(`should copy project ${id} from Keyman Cloud`, async function() {
+      if(TEST_SAVE_FIXTURES) {
+        this.timeout(120000);
+      }
+
+      const outPath = path.join(outputRoot, 'my_'+id).replaceAll(/\\/g, '/');
+
+      const copier = new KeymanProjectCopier();
+      assert.isTrue(await copier.init(callbacks, {
+        dryRun: false,
+        outPath,
+        // TODO-COPY rename: false,
+      }));
+
+      const result = await copier.run('cloud:'+id);
+
+      // We should have no messages and a successful result
+      assert.isOk(result);
+      assert.isEmpty(callbacks.messages);
+
+      // TODO-COPY: verify outcome using pattern above
+
+      if(TEST_SAVE_ARTIFACTS) {
+        assert.isTrue(await copier.write(result.artifacts));
+      }
+    });
+  });
+
+  // TODO-COPY: additional tests
   it.skip('should copy a disorganized project into current structure', async function() {});
   it.skip('should copy a standalone .kmn into a new project', async function() {});
   it.skip('should copy a standalone .kmn and .kps into a new project', async function() {});
