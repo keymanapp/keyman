@@ -263,6 +263,10 @@ export enum CompilerErrorNamespace {
    * kmc-keyboard-info 0x9000…0x9FFF
    */
   KeyboardInfoCompiler = 0x9000,
+  /**
+   * kmc-generate 0xA000…0xAFFF
+   */
+  Generator = 0xA000,
 };
 
 /**
@@ -290,6 +294,7 @@ export interface CompilerFileSystemCallbacks {
   readFileSync(path: string, options: { encoding: string; flag?: string; } | string): string;
   readFileSync(path: string, options?: { encoding?: string | null; flag?: string; } | string | null): string | Uint8Array;
   writeFileSync(path: string, data: Uint8Array): void;
+  mkdirSync(path: string, options?: {recursive?: boolean}): string;
 
   existsSync(name: string): boolean;
 }
@@ -375,6 +380,8 @@ export interface CompilerCallbacks {
   reportMessage(event: CompilerEvent): void;
 
   debug(msg: string): void;
+
+  fileURLToPath(url: string | URL): string;
 };
 
 /**
@@ -470,6 +477,10 @@ export class CompilerFileCallbacks implements CompilerCallbacks {
 
   debug(msg: string): void {
     return this.parent.debug(msg);
+  }
+
+  fileURLToPath(url: string | URL): string {
+    return this.parent.fileURLToPath(url);
   }
 }
 
