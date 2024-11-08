@@ -1,4 +1,4 @@
-(*
+﻿(*
   Name:             UfrmVisualKeyboard
   Copyright:        Copyright (C) SIL International.
   Documentation:
@@ -1546,7 +1546,12 @@ end;
 
 procedure TfrmVisualKeyboard.BtnHelpClick(Sender: TObject);
 begin
-  TKeymanDesktopShell.OpenHelpJump('context/toolbox-onscreenkeyboard', frmKeyman7Main.ActiveKeyboard);
+  case ActivePage of
+    apKeyboard: TKeymanDesktopShell.OpenHelpJump('context/toolbox-onscreenkeyboard', frmKeyman7Main.ActiveKeyboard);
+    apCharacterMap: TKeymanDesktopShell.OpenHelpJump('context/toolbox-charactermap', frmKeyman7Main.ActiveKeyboard);
+    apFontHelper: TKeymanDesktopShell.OpenHelpJump('context/toolbox-_fonthelper', frmKeyman7Main.ActiveKeyboard);
+    apEntryHelper: TKeymanDesktopShell.OpenHelpJump('index', frmKeyman7Main.ActiveKeyboard);
+  end;
 end;
 
 procedure TfrmVisualKeyboard.BtnHideHint(Sender: TObject);
