@@ -10,7 +10,8 @@ export { KeymanUrls } from './utils/keyman-urls.js';
 
 export * as KPJ from './types/kpj/kpj-file.js';
 export { KPJFileReader } from './types/kpj/kpj-file-reader.js';
-export { KeymanDeveloperProject, KeymanDeveloperProjectFile, KeymanDeveloperProjectType, } from './types/kpj/keyman-developer-project.js';
+export { KPJFileWriter } from './types/kpj/kpj-file-writer.js';
+export { KeymanDeveloperProject, KeymanDeveloperProjectFile, KeymanDeveloperProjectType, KeymanDeveloperProjectOptions } from './types/kpj/keyman-developer-project.js';
 export { isValidEmail } from './is-valid-email.js';
 
 export * as KpsFile from './types/kps/kps-file.js';

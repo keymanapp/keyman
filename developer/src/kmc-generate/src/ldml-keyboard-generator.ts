@@ -30,7 +30,7 @@ export class LdmlKeyboardGenerator extends BasicGenerator implements KeymanCompi
   async run(): Promise<GeneratorResult> {
     this.preGenerate();
 
-    const artifacts: GeneratorArtifacts = {};
+    const artifacts: GeneratorArtifacts = this.defaultArtifacts();
     this.templatePath = 'ldml-keyboard';
     this.filenameMap[LdmlKeyboardGenerator.SFile_Project] =
       this.options.id+KeymanFileTypes.Source.Project;
