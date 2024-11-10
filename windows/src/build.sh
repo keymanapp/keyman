@@ -30,5 +30,11 @@ builder_describe \
 builder_parse "$@"
 
 builder_run_child_actions  clean configure build test
-builder_run_action         test:help      check-markdown  "$KEYMAN_ROOT/windows/docs/help"
+
+function do_test_help() {
+  check-markdown  "$KEYMAN_ROOT/windows/docs/help"
+  check-markdown  "$KEYMAN_ROOT/windows/docs/engine"
+}
+
+builder_run_action         test:help      do_test_help
 builder_run_child_actions  publish install

@@ -171,6 +171,9 @@ class WordListFromFilename {
 
   *lines() {
     const data = callbacks.loadFile(this.name);
+    if(!data) {
+      throw new ModelCompilerError(ModelCompilerMessages.Error_WordlistFileNotFound({filename:this.name}));
+    }
     const contents = new TextDecoder(detectEncoding(data)).decode(data);
     yield *enumerateLines(contents.split(NEWLINE_SEPARATOR));
   }

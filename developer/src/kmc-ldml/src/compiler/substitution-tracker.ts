@@ -90,10 +90,17 @@ export class Substitutions {
   /** add a string that's just markers */
   addMarkers(verb: SubstitutionUse, str?: string) {
     this.markers.add(verb, MarkerParser.allReferences(str));
+    MarkerParser.allBrokenReferences(str).forEach(m => this.badMarkers.add(m));
   }
+  // all valid markers
   markers: SubstitutionTracker;
+  // all invalid markers
+  badMarkers: Set<string>;
+  // all valid set ids
   set: SubstitutionTracker;
+  // all valid string ids
   string: SubstitutionTracker;
+  // all valid uset ids
   uset: SubstitutionTracker;
 
   constructor() {
@@ -101,5 +108,6 @@ export class Substitutions {
     this.set = new SubstitutionTracker();
     this.string = new SubstitutionTracker();
     this.uset = new SubstitutionTracker();
+    this.badMarkers = new Set<string>();
   }
 }

@@ -5,7 +5,7 @@
  */
 import { SchemaValidators, util } from '@keymanapp/common-types';
 import { CommonTypesMessages } from '../../common-messages.js';
-import { CompilerCallbacks } from '../../compiler-interfaces.js';
+import { CompilerCallbacks } from "../../compiler-callbacks.js";
 import { LDMLKeyboardXMLSourceFile, LKImport, ImportStatus } from './ldml-keyboard-xml.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { LDMLKeyboardTestDataXMLSourceFile, LKTTest, LKTTests } from './ldml-keyboard-testdata-xml.js';

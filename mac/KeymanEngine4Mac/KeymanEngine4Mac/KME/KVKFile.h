@@ -24,6 +24,9 @@
 @property (strong, nonatomic, readonly) NFont *unicodeFont;
 @property (strong, nonatomic, readonly) NSArray *keys;
 @property (strong, nonatomic, readonly) NSString *filePath;
+@property (readonly) BOOL containsAltKeys;
+@property (readonly) BOOL containsLeftAltKeys;
+@property (readonly) BOOL containsRightAltKeys;
 
 - (id)initWithFilePath:(NSString *)path;
 

@@ -1,5 +1,51 @@
 # Keyman Version History
 
+## 18.0.137 alpha 2024-11-07
+
+* fix(windows): correct engine help source path for upload (#12625)
+* fix(developer): use 'N' for nomatch store debug strings (regression in #12107) (#12629)
+* chore(developer): skip masaram_gondi in kmcmplib full test (#12630)
+* feat(developer): analyze osk-char-use merge with existing mapping file (#12622)
+* feat(developer): Report key 'address' in validation failures in layout compiler (#12588)
+
+## 18.0.136 alpha 2024-11-06
+
+* fix(developer): handle merge commits when checking git log date (#12627)
+
+## 18.0.135 alpha 2024-11-05
+
+* fix(developer): handle paste of TSV into Wordlist grid (#12594)
+* fix(developer): handle missing files in kmc-kmn (#12595)
+* fix(developer): handle missing files in kmc-model (#12596)
+* refactor(android): move Android Engine help in-repo (#12598)
+* refactor(ios): move ios Engine help in-repo (#12599)
+* refactor(windows): move windows Engine help in-repo (#12600)
+* refactor(web): move web engine help to app repo (#12601)
+* docs: Update websites readme with debug info (#12602)
+* fix(developer): create Server config directory before options save (#12608)
+* chore(linux): add support for Ubuntu 25.04 Plucky Puffin (#12614)
+* fix(linux): properly check for missing dependencies (#12615)
+* fix(linux): set environment variable for rendering of downloads dialog (#12616)
+
+## 18.0.134 alpha 2024-11-04
+
+*  (#12606)
+
+## 18.0.133 alpha 2024-11-01
+
+* test(developer): kmcmplib compiler unit tests 4 (#12489)
+
+## 18.0.132 alpha 2024-10-30
+
+* feat(windows): kmdevlink app (#12552)
+
+## 18.0.131 alpha 2024-10-25
+
+* chore(android,windows): Update Crowdin strings for Khmer (#12574)
+* refactor(developer): add kps-file-reader and kps-file-writer (#12545)
+* fix(mac): make modifiers operational in OSK (#12556)
+* fix(mac): support missing alt layers in OSK (#12565)
+
 ## 18.0.130 alpha 2024-10-24
 
 * fix(android/engine): Increase robustness when checking package kmp.json languages (#12567)

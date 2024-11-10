@@ -175,6 +175,12 @@ describe('KmnCompilerMessages', function () {
     await testForMessage(this, ['invalid-keyboards', 'error_character_range_too_long.kmn'], KmnCompilerMessages.ERROR_CharacterRangeTooLong);
   });
 
+  // ERROR_CannotReadBitmapFile
+
+  it('should generate ERROR_CannotReadBitmapFile if the bitmap file is missing', async function() {
+    await testForMessage(this, ['invalid-keyboards', 'error_cannot_read_bitmap_file.kmn'], KmnCompilerMessages.ERROR_CannotReadBitmapFile);
+  });
+
   // WARN_IndexStoreShort
 
   it('should generate WARN_IndexStoreShort if a store referenced in index() is shorter than the corresponding any() store', async function() {

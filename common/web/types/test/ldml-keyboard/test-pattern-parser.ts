@@ -33,7 +33,7 @@ describe('Test of Pattern Parsers', () => {
     // indirectly tests REFERENCE
     it('should match reference strings', () => {
       const cases: string[][] = [
-        ['\\m{acute}', 'acute'],
+        ['\\m{acute} but not \\\\m{chronic}', 'acute'], // second marker is escaped
         ['\\m{acute}≈\\m{acute}', 'acute acute'], // not deduped
         ['\\m{grave}≠\\m{acute}', 'grave acute'],
         [MarkerParser.ANY_MARKER, MarkerParser.ANY_MARKER_ID],
@@ -53,6 +53,19 @@ describe('Test of Pattern Parsers', () => {
         // 'This is: \\m{escaped}', // need a backreference
       ]) {
         assert.deepEqual(MarkerParser.allReferences(str), [], `expected no markers: ${str}`);
+      }
+    });
+    it('should match broken reference strings', () => {
+      const cases: string[][] = [
+        // hyphenated marker id - illegal
+        ['\\m{chronic} \\m{a-cute} \\\\m{a-choo}', 'a-cute'], // \\m{a-choo} is literal
+        // marker through end of line
+        ['\\m{chronic} \\m{oopsIforGot to terminate it', 'oopsIforGot to terminate it'],
+        // marker terminated by other valid marker
+        ['\\m{chronic} \\m{what \\m{does} \\m{this button do?', 'what  ', 'this button do?'],
+      ];
+      for (const [str, ...reflist] of cases) {
+        assert.sameDeepMembers(MarkerParser.allBrokenReferences(str), reflist, `for ${str}`);
       }
     });
     it('should be able to emit sentinel values', () => {
