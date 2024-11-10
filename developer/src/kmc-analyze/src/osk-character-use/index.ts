@@ -1,3 +1,6 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ */
 import { KeymanFileTypes, TouchLayout } from "@keymanapp/common-types";
 import { KmnCompilerMessages, Osk } from '@keymanapp/kmc-kmn';
 import { CompilerCallbacks, escapeMarkdownChar, KvksFile, KvksFileReader, TouchLayoutFileReader } from '@keymanapp/developer-utils';
@@ -26,6 +29,10 @@ export interface AnalyzeOskCharacterUseOptions {
    * source file
    */
   includeCounts?: boolean;
+  /**
+   * Filename of an existing mapping file to merge the results into
+   */
+  mergeMapFile?: string;
 }
 
 const defaultOptions: AnalyzeOskCharacterUseOptions = {
@@ -233,17 +240,45 @@ export class AnalyzeOskCharacterUse {
   // Results reporting
   //
 
-  private prepareResults(strings: StringRefUsageMap): Osk.StringResult[] {
-    let result: Osk.StringResult[] = [];
-    let pua = this.options.puaBase;
+  private prepareResults(previousMap: Osk.StringResult[], strings: StringRefUsageMap): Osk.StringResult[] {
+
+    // https://stackoverflow.com/a/1584377/1836776 - because we need to compare
+    // objects, we can't use Set
+    const mergeArrays = (a: any, b: any, predicate = (a:any, b:any) => a === b) => {
+      const c = [...a]; // copy to avoid side effects
+      // add all items from B to copy C if they're not already present
+      b.forEach((bItem: any) => (c.some((cItem) => predicate(bItem, cItem)) ? null : c.push(bItem)))
+      return c;
+    }
+
+    if(!previousMap) {
+      previousMap = [];
+    }
+
+    let result: Osk.StringResult[] = [...previousMap];
+
+    // Note: we are assuming same base as previous runs
+    let pua = Math.max(this.options.puaBase, ...previousMap.map(item => parseInt(item.pua,16) + 1));
+
     for(let str of Object.keys(strings)) {
-      result.push({
-        pua: pua.toString(16).toUpperCase(),
-        str,
-        unicode: AnalyzeOskCharacterUse.stringToUnicodeSequence(str, false),
-        usages: this.options.includeCounts ? strings[str] : strings[str].map(item => item.filename)
-      });
-      pua++;
+      const r = result.find(item => item.str == str);
+      if(!r) {
+        result.push({
+          pua: pua.toString(16).toUpperCase(),
+          str,
+          unicode: AnalyzeOskCharacterUse.stringToUnicodeSequence(str, false),
+          usages: this.options.includeCounts ? strings[str] : strings[str].map(item => item.filename)
+        });
+        pua++;
+      } else {
+        if(this.options.includeCounts) {
+          // merge StringUsageRefs
+          r.usages = mergeArrays(r.usages, strings[str], (a: Osk.StringRefUsage, b: Osk.StringRefUsage) => a.filename === b.filename);
+        } else {
+          // merge strings
+          r.usages = mergeArrays(r.usages, strings[str].map(item => item.filename));
+        }
+      }
     }
     return result;
   }
@@ -273,7 +308,8 @@ export class AnalyzeOskCharacterUse {
    *           parameter.
    */
   public getStrings(format?: '.txt'|'.md'|'.json'): string[] {
-    const final = this.prepareResults(this._strings);
+    const previousMap = this.loadPreviousMap(this.options.mergeMapFile);
+    const final = this.prepareResults(previousMap, this._strings);
     switch(format) {
       case '.md':
         return AnalyzeOskCharacterUse.getStringsAsMarkdown(final);
@@ -282,6 +318,49 @@ export class AnalyzeOskCharacterUse {
       }
     return AnalyzeOskCharacterUse.getStringsAsText(final);
   }
+
+  /**
+   * Load a JSON-format result file to merge from
+   * @param filename
+   * @returns
+   */
+  private loadPreviousMap(filename: string): Osk.StringResult[] {
+    if(!filename) {
+      return null;
+    }
+
+    const data = this.callbacks.loadFile(filename);
+    if(!data) {
+      this.callbacks.reportMessage(AnalyzerMessages.Warn_PreviousMapFileCouldNotBeLoaded({filename}));
+      return null;
+    }
+    let json: any;
+    try {
+      json = JSON.parse(new TextDecoder().decode(data));
+      if(!json || typeof json != 'object' || !Array.isArray(json.map)) {
+        this.callbacks.reportMessage(AnalyzerMessages.Warn_PreviousMapFileCouldNotBeLoaded({filename}));
+        return null;
+      }
+    } catch(e) {
+      this.callbacks.reportMessage(AnalyzerMessages.Warn_PreviousMapFileCouldNotBeLoadedDueToError({filename, e}));
+      return null;
+    }
+
+    const map: Osk.StringResult[] = json.map;
+    const usages = map.find(item => item?.usages?.length).usages;
+    if(usages) {
+      if(typeof usages[0] == 'string' && this.options.includeCounts) {
+        this.callbacks.reportMessage(AnalyzerMessages.Warn_PreviousMapDidNotIncludeCounts({filename}));
+        this.options.includeCounts = false;
+      } else if(typeof usages[0] != 'string' && !this.options.includeCounts) {
+        this.callbacks.reportMessage(AnalyzerMessages.Warn_PreviousMapDidIncludeCounts({filename}));
+        this.options.includeCounts = true;
+      }
+    }
+
+    return map;
+  }
+
 
   // Following functions are static so that we can keep them pure
   // and potentially refactor into separate reporting class later

@@ -362,8 +362,17 @@ describe('tran', function () {
         }
       ],
     })),
-    // successful compile
     ...[1].map(n => ({
+      subpath: `sections/tran/fail-IllegalTransformUsetRHS-${n}.xml`,
+      errors: [
+        {
+          code: LdmlCompilerMessages.ERROR_IllegalTransformToUset,
+          matchMessage: /.*/,
+        }
+      ],
+    })),
+    // successful compile
+    ...[1, 2].map(n => ({
       subpath: `sections/tran/ok-${n}.xml`,
       errors: false,
     })),
