@@ -45,6 +45,12 @@ if builder_start_action clean; then
 fi
 
 builder_run_child_actions configure build test
-builder_run_action        test:help    check-markdown  "$KEYMAN_ROOT/android/docs/help"
+
+function do_test_help() {
+  check-markdown  "$KEYMAN_ROOT/android/docs/help"
+  check-markdown  "$KEYMAN_ROOT/android/docs/engine"
+}
+
+builder_run_action        test:help    do_test_help
 
 builder_run_child_actions publish

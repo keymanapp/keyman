@@ -7,4 +7,7 @@
 # script directly.
 #
 set -eu
-find "$1" -name '*.kmn' | grep -E '(release|experimental)/([a-z0-9_]+)/([a-z0-9_]+)/source/\3\.kmn$'
+find "$1" -name '*.kmn' | \
+  grep -E '(release|experimental)/([a-z0-9_]+)/([a-z0-9_]+)/source/\3\.kmn$' | \
+  grep -v masaram_gondi
+# #12623: exclude masaram_gondi due to #11806

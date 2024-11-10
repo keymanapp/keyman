@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>17.0.329.0</KeymanDeveloperVersion>
+    <FileVersion>7.0</FileVersion>
+  </System>
+  <Options>
+    <ExecuteProgram></ExecuteProgram>
+    <ReadMeFile>readme.htm</ReadMeFile>
+    <GraphicFile>splash.png</GraphicFile>
+    <LicenseFile>..\LICENSE.md</LicenseFile>
+    <WelcomeFile>welcome\welcome.htm</WelcomeFile>
+    <MSIFileName></MSIFileName>
+    <MSIOptions></MSIOptions>
+    <FollowKeyboardVersion/>
+  </Options>
+  <StartMenu>
+    <Folder></Folder>
+    <Items/>
+  </StartMenu>
+  <Info>
+    <Version URL=""></Version>
+    <Name URL="">Armenian Mnemonic</Name>
+    <Copyright URL="">© Dotland</Copyright>
+    <Author URL="mailto:tisarukhan@gmail.com">Tigran Sarukhanyan</Author>
+    <WebSite URL="https://github.com/dotland/mnemonic-kb-hy/blob/main/README.md">https://github.com/dotland/mnemonic-kb-hy/blob/main/README.md</WebSite>
+    <Description URL="">Armenian Mnemonic keyboard layout</Description>
+  </Info>
+  <Files>
+    <File>
+      <Name>..\build\armenian_mnemonic.js</Name>
+      <Description>File armenian_mnemonic.js</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.js</FileType>
+    </File>
+    <File>
+      <Name>..\build\armenian_mnemonic.kvk</Name>
+      <Description>File armenian_mnemonic.kvk</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kvk</FileType>
+    </File>
+    <File>
+      <Name>..\build\armenian_mnemonic.kmx</Name>
+      <Description>Keyboard Armenian Mnemonic</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kmx</FileType>
+    </File>
+    <File>
+      <Name>armenian_mnemonic.ico</Name>
+      <Description>File armenian_mnemonic.ico</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.ico</FileType>
+    </File>
+    <File>
+      <Name>options.htm</Name>
+      <Description>File options.htm</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.htm</FileType>
+    </File>
+    <File>
+      <Name>readme.htm</Name>
+      <Description>File readme.htm</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.htm</FileType>
+    </File>
+    <File>
+      <Name>splash.png</Name>
+      <Description>File splash.png</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.png</FileType>
+    </File>
+    <File>
+      <Name>welcome\HYM.png</Name>
+      <Description>File HYM.png</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.png</FileType>
+    </File>
+    <File>
+      <Name>welcome\HYM-altgr.png</Name>
+      <Description>File HYM-altgr.png</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.png</FileType>
+    </File>
+    <File>
+      <Name>welcome\HYM-altgr-shift.png</Name>
+      <Description>File HYM-altgr-shift.png</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.png</FileType>
+    </File>
+    <File>
+      <Name>welcome\HYM-caps-lock.png</Name>
+      <Description>File HYM-caps-lock.png</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.png</FileType>
+    </File>
+    <File>
+      <Name>welcome\HYM-shift.png</Name>
+      <Description>File HYM-shift.png</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.png</FileType>
+    </File>
+    <File>
+      <Name>welcome\touch-HYM.jpg</Name>
+      <Description>File touch-HYM.jpg</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.jpg</FileType>
+    </File>
+    <File>
+      <Name>welcome\touch-HYM-num1.jpg</Name>
+      <Description>File touch-HYM-num1.jpg</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.jpg</FileType>
+    </File>
+    <File>
+      <Name>welcome\touch-HYM-num2.jpg</Name>
+      <Description>File touch-HYM-num2.jpg</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.jpg</FileType>
+    </File>
+    <File>
+      <Name>welcome\touch-HYM-shift.jpg</Name>
+      <Description>File touch-HYM-shift.jpg</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.jpg</FileType>
+    </File>
+    <File>
+      <Name>welcome\touch-HYM-shift-twice.jpg</Name>
+      <Description>File touch-HYM-shift-twice.jpg</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.jpg</FileType>
+    </File>
+    <File>
+      <Name>welcome\welcome.htm</Name>
+      <Description>File welcome.htm</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.htm</FileType>
+    </File>
+    <File>
+      <Name>..\LICENSE.md</Name>
+      <Description>File LICENSE.md</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.md</FileType>
+    </File>
+    <File>
+      <Name>welcome\HYM-options.png</Name>
+      <Description>File HYM-options.png</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.png</FileType>
+    </File>
+  </Files>
+  <Keyboards>
+    <Keyboard>
+      <Name>Armenian Mnemonic</Name>
+      <ID>armenian_mnemonic</ID>
+      <Version></Version>
+      <Languages>
+        <Language ID="hy">Armenian</Language>
+      </Languages>
+      <Examples>
+        <Example ID="hy" Keys="H a y u c space space l e z u w" Text="Հայոց լեզու" Note="Name of language"/>
+      </Examples>
+    </Keyboard>
+  </Keyboards>
+  <RelatedPackages>
+    <RelatedPackage ID="armenian_mnemonic_r" Relationship="deprecates"/>
+  </RelatedPackages>
+  <Strings/>
+</Package>
