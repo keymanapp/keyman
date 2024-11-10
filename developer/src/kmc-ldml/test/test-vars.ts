@@ -124,11 +124,15 @@ describe('vars', function () {
     {
       subpath: 'sections/vars/fail-invalid-identifiers.xml',
       errors: [
-        LdmlCompilerMessages.Error_InvalidVariableIdentifer({id: 'invalid-string'}),
-        LdmlCompilerMessages.Error_InvalidVariableIdentifer({id: 'invalid-set'}),
-        LdmlCompilerMessages.Error_InvalidVariableIdentifer({id: 'invalid-uset'}),
-        LdmlCompilerMessages.Error_InvalidVariableIdentifer({id: 'a_marker_name_more_than_32_chars_long'}),
-        LdmlCompilerMessages.Error_InvalidVariableIdentifer({id: '😡'}),
+        LdmlCompilerMessages.Error_InvalidVariableIdentifier({id: 'invalid-string'}),
+        LdmlCompilerMessages.Error_InvalidVariableIdentifier({id: 'invalid-set'}),
+        LdmlCompilerMessages.Error_InvalidVariableIdentifier({id: 'invalid-uset'}),
+        LdmlCompilerMessages.Error_InvalidVariableIdentifier({id: 'a_marker_name_more_than_32_chars_long'}),
+        LdmlCompilerMessages.Error_InvalidVariableIdentifier({id: '😡'}),
+        LdmlCompilerMessages.Error_InvalidVariableIdentifier({id: ''}),
+
+        LdmlCompilerMessages.Error_InvalidMarkerIdentifier({id: 'my-marker'}),
+        LdmlCompilerMessages.Error_InvalidMarkerIdentifier({id: 'oopsForgotTo close it'}),
       ],
     },
     {

@@ -64,6 +64,7 @@ type
     procedure CharCodeFontChanged(Sender: TObject);
     procedure CharFontChanged;
     procedure CodeFontChanged;
+    function PasteClipboardIntoGrid: Boolean;
   protected
     function GetHelpTopic: string; override;
     function DoOpenFile: Boolean;
@@ -72,6 +73,7 @@ type
     procedure FindError(const Filename: string; s: string; line: Integer);   // I4081
     function LoadFromFile(const Filename: string): Boolean;
     function SaveToFile(const Filename: string): Boolean;
+    function ExecuteAction(Action: TBasicAction): Boolean; override;
     property Filename: string read FFilename;
     property Modified: Boolean read FModified write SetModified;
     property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
@@ -85,6 +87,10 @@ implementation
 {$R *.dfm}
 
 uses
+  System.UITypes,
+  Vcl.Clipbrd,
+
+  dmActionsMain,
   Keyman.Developer.System.HelpTopics,
   TextFileFormat,
   UfrmMain,
@@ -215,6 +221,48 @@ begin
   e := gridWordlist.Row < gridWordlist.RowCount - 1;
   cmdDeleteRow.Enabled := e;
   cmdSortByFrequency.Enabled := e;
+end;
+
+function TframeWordlistEditor.ExecuteAction(Action: TBasicAction): Boolean;
+begin
+  if Assigned(modActionsMain) and (Action = modActionsMain.actEditPaste) then
+  begin
+    Result := PasteClipboardIntoGrid;
+  end
+  else
+    Result := False;
+end;
+
+function TframeWordlistEditor.PasteClipboardIntoGrid: Boolean;
+var
+  Value: string;
+begin
+  if FSetup > 0 then
+    Exit(False);
+
+  Inc(FSetup);
+  try
+    try
+      Value := Clipboard.AsText;
+    except
+      on E:EClipboardException do
+        Exit(False);
+    end;
+
+    if not Value.Contains(#9) and not Value.Contains(#13) then
+      Exit(False); // allow paste into grid cell
+
+    if MessageDlg('The value you are pasting includes multiple words. Do you want to add them as separate rows?',
+        mtConfirmation, mbYesNoCancel, 0) <> mrYes then
+      Exit(True); // suppress paste
+
+    FWordlist.Text := FWordlist.Text + Value;
+    FillGrid;
+    Modified := True;
+    Result := True; // suppress paste, but we've added rows
+  finally
+    Dec(FSetup);
+  end;
 end;
 
 procedure TframeWordlistEditor.FindError(const Filename: string; s: string; line: Integer);

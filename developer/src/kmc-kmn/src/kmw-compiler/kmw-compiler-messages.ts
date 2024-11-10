@@ -1,6 +1,7 @@
-import { KmnCompilerMessages } from "../compiler/kmn-compiler-messages.js";
+import { keyAddress, KmnCompilerMessages } from "../compiler/kmn-compiler-messages.js";
 import { CompilerErrorNamespace, CompilerErrorSeverity, CompilerEvent, CompilerMessageDef as def, CompilerMessageSpec } from "@keymanapp/developer-utils";
 import { kmnfile } from "./compiler-globals.js";
+import { KeyAddress } from "./validate-layout-file.js";
 
 const Namespace = CompilerErrorNamespace.KmwCompiler;
 const SevInfo = CompilerErrorSeverity.Info | Namespace;
@@ -34,8 +35,8 @@ export class KmwCompilerMessages extends KmnCompilerMessages {
   //          SevError | 0x0001, added in 17.0, removed in 18.0
 
   static ERROR_TouchLayoutIdentifierRequires15 = SevError | 0x0002;
-  static Error_TouchLayoutIdentifierRequires15 = (o:{keyId:string, platformName:string, layerId:string}) => m(this.ERROR_TouchLayoutIdentifierRequires15,
-    `Key "${def(o.keyId)}" on "${def(o.platformName)}", layer "${def(o.layerId)}" has a multi-part identifier which requires version 15.0 or newer.`);
+  static Error_TouchLayoutIdentifierRequires15 = (o:{keyId:string, platformName:string, layerId:string, address:KeyAddress}) => m(this.ERROR_TouchLayoutIdentifierRequires15,
+    `Key "${def(o.keyId)}" on "${def(o.platformName)}", layer "${def(o.layerId)}" (${keyAddress(o.address)}) has a multi-part identifier which requires version 15.0 or newer.`);
 
   static ERROR_InvalidTouchLayoutFileFormat = SevError | 0x0003;
   static Error_InvalidTouchLayoutFileFormat = (o:{msg: string}) => m(this.ERROR_InvalidTouchLayoutFileFormat,

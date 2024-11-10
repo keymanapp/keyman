@@ -19,6 +19,8 @@ builder_describe "Build Keyman Keyboard Compiler kmc" \
   "@/core/include/ldml" \
   "@/developer/src/common/web/utils" \
   "@/developer/src/kmc-analyze" \
+  "@/developer/src/kmc-copy" \
+  "@/developer/src/kmc-generate" \
   "@/developer/src/kmc-keyboard-info" \
   "@/developer/src/kmc-kmn" \
   "@/developer/src/kmc-ldml" \
@@ -95,7 +97,10 @@ function do_bundle() {
   # Manually copy over kmcmplib module
   cp ../kmc-kmn/build/src/import/kmcmplib/wasm-host.wasm build/dist/
 
-  cp build/dist/* "$BUILD_PATH"
+  # Manually copy over templates
+  cp -R ../kmc-generate/build/src/template/ build/dist/
+
+  cp -R build/dist/* "$BUILD_PATH"
 
   builder_finish_action success bundle
 }

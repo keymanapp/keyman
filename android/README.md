@@ -27,8 +27,8 @@ yes | ~/Library/Android/sdk/tools/bin/sdkmanager --licenses
 
 ### Crash Reporting
 
-Keyman for Android uses [Sentry](https://sentry.io) for crash reporting. The 
-analytics for Debug are associated with an App Bundle ID 
+Keyman for Android uses [Sentry](https://sentry.io) for crash reporting. The
+analytics for Debug are associated with an App Bundle ID
 `com.tavultesoft.kmapro.debug`.
 
 ### Compiling From Command Line
@@ -79,7 +79,7 @@ analytics for Debug are associated with an App Bundle ID
       Replace `SERIAL` with the device serial number listed in step 2.
 
 ### Compiling the app's offline help
-Keyman for Android help is maintained in the Markdown files in android/help/.
+Keyman for Android help is maintained in the Markdown files in android/docs/.
 The script `/resources/build/build-help.inc.sh` uses the `pandoc` tool to convert the Markdown files into html.
 
 ```bash

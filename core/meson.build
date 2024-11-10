@@ -40,7 +40,7 @@ if cpp_compiler.get_id() == 'emscripten'
   wasm_exported_runtime_methods = '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\',\'stringToNewUTF8\']'
 endif
 
-subdir('doc')
+subdir('docs/internal')
 subdir('include')
 subdir('src')
 subdir('tests')
