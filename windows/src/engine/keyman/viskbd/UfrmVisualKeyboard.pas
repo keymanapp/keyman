@@ -640,7 +640,7 @@ begin
     case ActivePage of
       apKeyboard: TKeymanDesktopShell.OpenHelp('context/toolbox-onscreenkeyboard');
       apCharacterMap: TKeymanDesktopShell.OpenHelp('context/toolbox-charactermap');
-      apFontHelper: TKeymanDesktopShell.OpenHelp('context/toolbox-_fonthelper');
+      apFontHelper: TKeymanDesktopShell.OpenHelp('context/toolbox-fonthelper');
       apEntryHelper: TKeymanDesktopShell.OpenHelp('index');
     end;
   end;
@@ -1549,7 +1549,7 @@ begin
   case ActivePage of
     apKeyboard: TKeymanDesktopShell.OpenHelpJump('context/toolbox-onscreenkeyboard', frmKeyman7Main.ActiveKeyboard);
     apCharacterMap: TKeymanDesktopShell.OpenHelpJump('context/toolbox-charactermap', frmKeyman7Main.ActiveKeyboard);
-    apFontHelper: TKeymanDesktopShell.OpenHelpJump('context/toolbox-_fonthelper', frmKeyman7Main.ActiveKeyboard);
+    apFontHelper: TKeymanDesktopShell.OpenHelpJump('context/toolbox-fonthelper', frmKeyman7Main.ActiveKeyboard);
     apEntryHelper: TKeymanDesktopShell.OpenHelpJump('index', frmKeyman7Main.ActiveKeyboard);
   end;
 end;
