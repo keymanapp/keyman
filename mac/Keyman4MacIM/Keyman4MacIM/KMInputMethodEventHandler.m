@@ -122,10 +122,11 @@ NSString* const kEasterEggKmxName = @"EnglishSpanish.kmx";
 - (CoreKeyOutput*) processEventWithKeymanEngine:(NSEvent *)event in:(id) sender {
   CoreKeyOutput* coreKeyOutput = nil;
   if (self.appDelegate.lowLevelEventTap != nil) {
-    NSEventModifierFlags newModifiers = [self.appDelegate determineModifiers];
-    NSEvent *eventWithOriginalModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:newModifiers timestamp:event.timestamp windowNumber:event.windowNumber context:[NSGraphicsContext currentContext] characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
-    coreKeyOutput = [self.kme processEvent:eventWithOriginalModifierFlags];
-    os_log_debug([KMLogs eventsLog], "processEventWithKeymanEngine, using newModifierFlag 0x%lX, instead of event.modifiers 0x%lX", newModifiers, event.modifierFlags);
+    NSEventModifierFlags modifierFlags = [self.appDelegate determineModifiers];
+    os_log_debug([KMLogs eventsLog], "processEventWithKeymanEngine, using modifierFlags 0x%lX, instead of event.modifiers 0x%lX", modifierFlags, event.modifierFlags);
+
+    NSEvent *eventWithAppropriateModifierFlags = [NSEvent keyEventWithType:event.type location:event.locationInWindow modifierFlags:modifierFlags timestamp:event.timestamp windowNumber:event.windowNumber context:[NSGraphicsContext currentContext] characters:event.characters charactersIgnoringModifiers:event.charactersIgnoringModifiers isARepeat:event.isARepeat keyCode:event.keyCode];
+    coreKeyOutput = [self.kme processEvent:eventWithAppropriateModifierFlags];
   }
   else {
     /** 

@@ -49,7 +49,7 @@ namespace
 
 constexpr char const *doc1_expected = u8"\
 {\n\
-    \"$schema\" : \"keyman/core/doc/introspection.schema\",\n\
+    \"$schema\" : \"keyman/core/docs/introspection.schema\",\n\
     \"keyboard\" : {\n\
         \"id\" : \"dummy\",\n\
         \"folder\" : \"\",\n\
@@ -75,7 +75,7 @@ constexpr char const *doc1_expected = u8"\
 
 constexpr char const *doc2_expected = u8"\
 {\n\
-    \"$schema\" : \"keyman/core/doc/introspection.schema\",\n\
+    \"$schema\" : \"keyman/core/docs/introspection.schema\",\n\
     \"keyboard\" : {\n\
         \"id\" : \"dummy\",\n\
         \"folder\" : \"\",\n\

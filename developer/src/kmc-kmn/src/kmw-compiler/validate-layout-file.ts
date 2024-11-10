@@ -11,6 +11,14 @@ import { KeymanWebTouchStandardKeyNames, KMWAdditionalKeyNames, VKeyNames } from
 import { KmwCompilerMessages } from "./kmw-compiler-messages.js";
 import * as Osk from '../compiler/osk.js';
 
+export interface KeyAddress {
+  rowIndex: number;
+  keyIndex: number;
+  subKeyIndex?: number;
+  direction?: string;
+  multitapIndex?: number
+};
+
 interface VLFOutput {
   output: string;
   result: boolean;
@@ -72,7 +80,8 @@ function CheckKey(
   FNextLayer: string,
   FKeyType: TouchLayout.TouchLayoutKeySp,
   FRequiredKeys: TRequiredKey[],
-  FDictionary: string[]
+  FDictionary: string[],
+  address: KeyAddress
 ): boolean {   // I4119
   //
   // Coerce missing ID and Text to empty strings for additional tests
@@ -104,7 +113,8 @@ function CheckKey(
         keyId: FId,
         layerId: layer.id,
         nextLayer: FNextLayer,
-        platformName: platformId
+        platformName: platformId,
+        address
       }));
     }
   }
@@ -115,7 +125,7 @@ function CheckKey(
 
   if(FId.trim() == '') {
     if(!([TouchLayout.TouchLayoutKeySp.blank, TouchLayout.TouchLayoutKeySp.spacer].includes(FKeyType))) {
-      callbacks.reportMessage(KmwCompilerMessages.Warn_TouchLayoutUnidentifiedKey({layerId: layer.id}));
+      callbacks.reportMessage(KmwCompilerMessages.Warn_TouchLayoutUnidentifiedKey({layerId: layer.id, address}));
     }
     return true;
   }
@@ -123,11 +133,11 @@ function CheckKey(
   let FValid = KeyIdType(FId);
 
   if(FValid == TKeyIdType.Key_Invalid) {
-    callbacks.reportMessage(KmwCompilerMessages.Error_TouchLayoutInvalidIdentifier({keyId: FId, platformName: platformId, layerId: layer.id}));
+    callbacks.reportMessage(KmwCompilerMessages.Error_TouchLayoutInvalidIdentifier({keyId: FId, platformName: platformId, layerId: layer.id, address}));
     return false;
   }
   else if (FValid == TKeyIdType.Key_Unicode_Multi && !verifyAndSetMinimumRequiredKeymanVersion15()) {
-    callbacks.reportMessage(KmwCompilerMessages.Error_TouchLayoutIdentifierRequires15({keyId: FId, platformName: platformId, layerId: layer.id}));
+    callbacks.reportMessage(KmwCompilerMessages.Error_TouchLayoutIdentifierRequires15({keyId: FId, platformName: platformId, layerId: layer.id, address}));
     return false;
   }
 
@@ -138,7 +148,7 @@ function CheckKey(
   if (FValid == TKeyIdType.Key_Touch && FNextLayer == '' && [TouchLayout.TouchLayoutKeySp.normal, TouchLayout.TouchLayoutKeySp.deadkey].includes(FKeyType)) {
     // Search for the key in the key dictionary - ignore K_LOPT, K_ROPT...
     if(FDictionary.indexOf(FId) < 0) {
-      callbacks.reportMessage(KmwCompilerMessages.Warn_TouchLayoutCustomKeyNotDefined({keyId: FId, platformName: platformId, layerId: layer.id}));
+      callbacks.reportMessage(KmwCompilerMessages.Warn_TouchLayoutCustomKeyNotDefined({keyId: FId, platformName: platformId, layerId: layer.id, address}));
     }
   }
 
@@ -158,7 +168,8 @@ function CheckKey(
         keyId: FId,
         platformName: platformId,
         layerId: layer.id,
-        label: FText
+        label: FText,
+        address
       }));
     }
   }
@@ -269,12 +280,19 @@ export function ValidateLayoutFile(fk: KMX.KEYBOARD, FDebug: boolean, sLayoutFil
     // Test that all required keys are present
     for(let layer of platform.layer) {
       let FRequiredKeys: TRequiredKey[] = [];
+      let rowIndex = 0;
       for(let row of layer.row) {
+        rowIndex++;
+        let keyIndex = 0;
         for(let key of row.key) {
-          result = CheckKey(pid, platform, layer, key.id, key.text, key.nextlayer, key.sp, FRequiredKeys, FDictionary) && result;   // I4119
+          keyIndex++;
+          result = CheckKey(pid, platform, layer, key.id, key.text, key.nextlayer, key.sp, FRequiredKeys, FDictionary, {rowIndex, keyIndex}) && result;   // I4119
           if(key.sk) {
+            let subKeyIndex = 0;
             for(let subkey of key.sk) {
-              result = CheckKey(pid, platform, layer, subkey.id, subkey.text, subkey.nextlayer, subkey.sp, FRequiredKeys, FDictionary) && result;
+              subKeyIndex++;
+              result = CheckKey(pid, platform, layer, subkey.id, subkey.text, subkey.nextlayer, subkey.sp, FRequiredKeys, FDictionary,
+                {rowIndex, keyIndex, subKeyIndex}) && result;
             }
           }
           let direction: keyof TouchLayout.TouchLayoutFlick;
@@ -282,14 +300,17 @@ export function ValidateLayoutFile(fk: KMX.KEYBOARD, FDebug: boolean, sLayoutFil
             for(direction in key.flick) {
               warnGesturesIfNeeded(key.id);
               result = CheckKey(pid, platform, layer, key.flick[direction].id, key.flick[direction].text,
-                key.flick[direction].nextlayer, key.flick[direction].sp, FRequiredKeys, FDictionary) && result;
+                key.flick[direction].nextlayer, key.flick[direction].sp, FRequiredKeys, FDictionary, {rowIndex, keyIndex, direction}) && result;
             }
           }
 
           if(key.multitap) {
+            let multitapIndex = 0;
             for(let subkey of key.multitap) {
+              multitapIndex++;
               warnGesturesIfNeeded(key.id);
-              result = CheckKey(pid, platform, layer, subkey.id, subkey.text, subkey.nextlayer, subkey.sp, FRequiredKeys, FDictionary) && result;
+              result = CheckKey(pid, platform, layer, subkey.id, subkey.text, subkey.nextlayer, subkey.sp, FRequiredKeys, FDictionary,
+                {rowIndex, keyIndex, multitapIndex}) && result;
             }
           }
         }
