@@ -94,6 +94,14 @@ File analysis tools for Keyman files.
 
 Tools for converting keyboard source files between various formats.
 
+### kmc-copy - Project copying and renaming tools
+
+Tools to copy and rename Keyman keyboard files and projects
+
+### kmc-generate - Generation tools
+
+Project generation tools for Keyman.
+
 ### kmc-keyboard-info - Keyboard Info Compiler
 
 Builds .keyboard_info files for use on the Keyman Cloud keyboard repository

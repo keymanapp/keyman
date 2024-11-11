@@ -12,6 +12,8 @@ import { TestKeymanSentry } from './util/TestKeymanSentry.js';
 import { exitProcess } from './util/sysexits.js';
 import { declareMessage } from './commands/messageCommand.js';
 import { kmcSentryOptions } from './util/kmcSentryOptions.js';
+import { declareGenerate } from './commands/generate.js';
+import { declareCopy } from './commands/copy.js';
 import { declareConvert } from './commands/convert.js';
 
 await TestKeymanSentry.runTestIfCLRequested(kmcSentryOptions);
@@ -52,12 +54,11 @@ async function run() {
   declareAnalyze(program);
   declareConvert(program);
   declareMessage(program);
+  declareGenerate(program);
+  declareCopy(program);
 
   /* Future commands:
   declareClean(program);
-  declareCopy(program);
-  declareRename(program);
-  declareGenerate(program);
   declareImport(program);
   declareTest(program);
   declarePublish(program);

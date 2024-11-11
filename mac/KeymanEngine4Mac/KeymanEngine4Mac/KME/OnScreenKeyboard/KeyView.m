@@ -294,6 +294,7 @@ static CGFloat const kRelativeModifierLabelHeight = 0.30f;
 }
 
 -(void)processKeyClick {
+  os_log_debug([KMELogs oskLog], "KeyView processKeyClick");
   [self.target keyAction:self];
 }
 

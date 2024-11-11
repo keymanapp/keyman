@@ -27,10 +27,11 @@ builder_parse "$@"
 
 function do_test() {
   eslint .
-  # TODO: enable tests
-  #     cd test && tsc --build && cd .. && mocha
-  # TODO: enable c8 (disabled because no coverage at present)
-  #     c8 --reporter=lcov --reporter=text --exclude-after-remap mocha
+  cd test
+  tsc --build
+  cd ..
+  readonly C8_THRESHOLD=70
+  c8 --reporter=lcov --reporter=text --lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD mocha
 }
 
 builder_run_action clean      rm -rf ./build/

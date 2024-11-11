@@ -131,10 +131,15 @@
     <string name="keyboard_install_toast" comment="Notification when a keyboard is installed">បានដំឡើង​ក្ដារចុច %1$s</string>
     <!-- Context: Language Settings Keyboard uninstall strings -->
     <string name="keyboard_deleted_toast" comment="Notification when a keyboard is deleted">ក្ដារចុចត្រូវបានលុប</string>
-    <!-- Context: Language Settings menu strings -->
+    <!-- Context: Language Settings menu strings. Removed in Keyman 18 -->
     <string name="enable_corrections" comment="Enable corrections from the suggestion banner">បើក​ការកែពាក្យ</string>
-    <!-- Context: Language Settings menu strings -->
+    <!-- Context: Language Settings menu strings. Removed in Keyman 18 -->
     <string name="enable_predictions" comment="Enable predictions from the suggestion banner">បើក​ការណែនាំពាក្យ​ស្វ័យប្រវត្តិ</string>
+    <!-- Context: Language Settings menu strings - radio buttons -->
+    <string name="suggestions_radio_0" comment="Predictions and corrections disabled">បិទការព្យាករណ៍ពាក្យ</string>
+    <string name="suggestions_radio_1" comment="Suggestions Enabled: Predictions with no corrections">អនុញ្ញាតតែមុខងារព្យាករណ៍ពាក្យ</string>
+    <string name="suggestions_radio_2" comment="Suggestions Enabled: Predictions with corrections">អនុញ្ញាតមុខងារព្យាករណ៍ពាក្យ និងកែពាក្យ</string>
+    <string name="suggestions_radio_3" comment="Suggestions Enabled: Predictions with auto-corrections">អនុញ្ញាតមុខងារព្យាករណ៍ពាក្យ និងកែពាក្យដោយស្វ័យប្រវត្តិ</string>
     <!-- Context: Language Settings menu strings -->
     <string name="model_label">បញ្ជី​ពាក្យ</string>
     <plurals name="model_count">
