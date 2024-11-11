@@ -12,21 +12,32 @@ import { makePathToFixture } from './helpers/index.js';
 
 import { KmpCompiler } from '../src/compiler/kmp-compiler.js';
 import { PackageCompilerMessages } from '../src/compiler/package-compiler-messages.js';
+import { unitTestEndpoints as getFileDataEndpoints } from '../src/compiler/get-file-data.js';
+import { env } from 'process';
 
-const debug = false;
+const { TEST_SAVE_FIXTURES } = env;
 
 describe('KmpCompiler', function () {
   const MODELS : string[] = [
     'example.qaa.sencoten',
     'withfolders.qaa.sencoten',
   ];
-  const callbacks = new TestCompilerCallbacks();
+  const callbacks = new TestCompilerCallbacks(makePathToFixture('online'));
   let kmpCompiler: KmpCompiler = null;
 
   this.beforeAll(async function() {
-    callbacks.clear();
     kmpCompiler = new KmpCompiler();
     assert.isTrue(await kmpCompiler.init(callbacks, null));
+  });
+
+  this.beforeEach(function() {
+    callbacks.clear();
+  });
+
+  this.afterEach(function() {
+    if(this.currentTest.state == 'failed') {
+      callbacks.printMessages();
+    }
   });
 
   for (let modelID of MODELS) {
@@ -102,12 +113,10 @@ describe('KmpCompiler', function () {
     // We override the fixture version so that we can compare with the compiler output
     kmpJsonFixture.system.keymanDeveloperVersion = KEYMAN_VERSION.VERSION;
 
-    let kmpJson = null;
-    assert.doesNotThrow(() => {
-      kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
-    });
-
+    const kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath)
+    assert.isNotNull(kmpJson);
     const kmpData = await kmpCompiler.buildKmpFile(kpsPath, kmpJson);
+    assert.isNotNull(kmpData);
 
     const zip = JSZip();
 
@@ -136,8 +145,6 @@ describe('KmpCompiler', function () {
    */
 
   it(`should transform a .kps file for a keyboard package to a correct kmp.json`, function () {
-    callbacks.clear();
-
     const kpsPath = makePathToFixture('kmp.json', 'ahom_star.kps');
     const kmpJsonRefPath = makePathToFixture('kmp.json', 'kmp.json');
 
@@ -163,12 +170,8 @@ describe('KmpCompiler', function () {
   });
 
   it(`should support .kps 17.0 metadata correctly`, function () {
-    callbacks.clear();
-
     const kpsPath = makePathToFixture('kmp_2.0', 'khmer_angkor.kps');
     const kmpJsonRefPath = makePathToFixture('kmp_2.0', 'kmp.json');
-
-    debugger;
 
     let kmpJsonActual = kmpCompiler.transformKpsToKmpObject(kpsPath);
     if(kmpJsonActual == null) {
@@ -197,23 +200,14 @@ describe('KmpCompiler', function () {
   it('should warn on absolute paths', async function() {
     this.timeout(10000); // building a zip file can sometimes be slow
 
-    callbacks.clear();
-
     const kpsPath = makePathToFixture('absolute_path', 'source', 'absolute_path.kps');
     const kmpCompiler = new KmpCompiler();
     assert.isTrue(await kmpCompiler.init(callbacks, null));
 
-    let kmpJson: KmpJsonFile.KmpJsonFile = null;
-
-    assert.doesNotThrow(() => {
-      kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
-    });
-
+    const kmpJson = kmpCompiler.transformKpsToKmpObject(kpsPath);
     assert.isNotNull(kmpJson);
 
-    await assert.isNull(kmpCompiler.buildKmpFile(kpsPath, kmpJson));
-
-    if(debug) callbacks.printMessages();
+    assert.isNull(await kmpCompiler.buildKmpFile(kpsPath, kmpJson));
 
     assert.lengthOf(callbacks.messages, 2);
     assert.deepEqual(callbacks.messages[0].code, PackageCompilerMessages.WARN_AbsolutePath);
@@ -223,9 +217,6 @@ describe('KmpCompiler', function () {
   // Testing path normalization
 
   it('should normalize DOS pathnames from \\ to /', async function() {
-    // this.timeout(10000); // building a zip file can sometimes be slow
-
-    callbacks.clear();
 
     const kpsPath = makePathToFixture('normalize_paths', 'source', 'khmer_angkor.kps');
     const kmpCompiler = new KmpCompiler();
@@ -282,6 +273,61 @@ describe('KmpCompiler', function () {
   it(`should load a package with missing keyboard version metadata`, function () {
     const kmpJson = kmpCompiler.transformKpsToKmpObject(makePathToFixture('invalid', 'missing_keyboard_version.kps'));
     assert.equal(kmpJson.keyboards[0].version, '4.0');  // picks up example.kmx's version
+  });
+
+  it(`should download a file from a GitHub raw url`, async function () {
+    if(TEST_SAVE_FIXTURES) {
+      this.timeout(10000);
+    }
+
+    // https://github.com/silnrsi/fonts/raw/b88c7af5d16681bd137156929ff8baec82526560/fonts/sil/alkalami/Alkalami-Regular.ttf
+    const source = 'github:silnrsi/fonts/raw/b88c7af5d16681bd137156929ff8baec82526560/fonts/sil/alkalami/Alkalami-Regular.ttf';
+    const matches = getFileDataEndpoints.GITHUB_SOURCE.exec(source);
+    assert.isNotNull(matches);
+    assert.equal(matches.groups.name, 'silnrsi');
+    assert.equal(matches.groups.repo, 'fonts');
+    assert.equal(matches.groups.hash, 'b88c7af5d16681bd137156929ff8baec82526560');
+    assert.equal(matches.groups.path, 'fonts/sil/alkalami/Alkalami-Regular.ttf');
+    const res = await getFileDataEndpoints.getFileDataFromGitHub(callbacks, '', '', matches);
+    assert.isNotNull(res);
+    assert.isNotNull(res.data);
+    assert.equal(res.basename, 'Alkalami-Regular.ttf');
+    // TODO: should we check file validity as a real TTF?
+    assert.equal(res.data.length, 145540); // size of Alkalami-Regular.ttf (for that hash)
+  });
+
+  it(`should download a file from fonts.languagetechnology.org, using flourl`, async function () {
+    if(TEST_SAVE_FIXTURES) {
+      this.timeout(10000);
+    }
+
+    // https://fonts.languagetechnology.org/families.json / andika
+    const source = 'flo:andika';
+    const matches = getFileDataEndpoints.FLO_SOURCE.exec(source);
+    assert.isNotNull(matches);
+    assert.equal(matches.groups.family, 'andika');
+    const res = await getFileDataEndpoints.getFileDataFromFlo(callbacks, '', '', matches);
+    assert.isNotNull(res);
+    assert.isNotNull(res.data);
+    assert.equal(res.basename, 'Andika-Regular.ttf');
+    // TODO: should we check file validity as a real TTF?
+  });
+
+  it(`should download a file from fonts.languagetechnology.org, using url`, async function () {
+    if(TEST_SAVE_FIXTURES) {
+      this.timeout(10000);
+    }
+
+    // https://fonts.languagetechnology.org/families.json / notonaskharabicui
+    const source = 'flo:notonaskharabicui';
+    const matches = getFileDataEndpoints.FLO_SOURCE.exec(source);
+    assert.isNotNull(matches);
+    assert.equal(matches.groups.family, 'notonaskharabicui');
+    const res = await getFileDataEndpoints.getFileDataFromFlo(callbacks, '', '', matches);
+    assert.isNotNull(res);
+    assert.isNotNull(res.data);
+    assert.equal(res.basename, 'NotoNaskhArabicUI-Regular.ttf');
+    // TODO: should we check file validity as a real TTF?
   });
 
 });

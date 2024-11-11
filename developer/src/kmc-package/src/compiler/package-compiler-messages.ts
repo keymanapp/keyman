@@ -146,5 +146,53 @@ export class PackageCompilerMessages {
     this.ERROR_PackageFileHasEmptyVersion,
     `Package version is not following keyboard version, but the package version field is blank.`
   );
+
+  static ERROR_FloDataCouldNotBeRead = SevError | 0x0022;
+  static Error_FloDataCouldNotBeRead = (o:{url: string, e?: any}) => m(
+    this.ERROR_FloDataCouldNotBeRead,
+    `SIL Fonts Server ${def(o.url)} did not return a valid response: ${(o.e ?? 'unknown error').toString()}`,
+  );
+
+  static ERROR_FloDataIsInvalidFormat = SevError | 0x0023;
+  static Error_FloDataIsInvalidFormat = (o:{url: string}) => m(
+    this.ERROR_FloDataIsInvalidFormat,
+    `SIL Fonts Server ${def(o.url)} should have returned a JSON object but instead returned invalid data`,
+  );
+
+  static ERROR_FontNotFoundInFlo = SevError | 0x0024;
+  static Error_FontNotFoundInFlo = (o:{family: string, filename: string}) => m(
+    this.ERROR_FontNotFoundInFlo,
+    `Font family '${def(o.family)}' was not found on SIL Fonts Server fonts.languagetechnology.org for ${def(o.filename)}`,
+  );
+
+  static WARN_FontFromFloIsNotFreelyDistributable = SevWarn | 0x0025;
+  static Warn_FontFromFloIsNotFreelyDistributable = (o:{family: string, filename: string}) => m(
+    this.WARN_FontFromFloIsNotFreelyDistributable,
+    `Font family '${def(o.family)}' is not marked as freely distributable on fonts.languagetechnology.org for ${def(o.filename)}`,
+  );
+
+  static ERROR_FontInFloDoesNotHaveDefaultTtf = SevError | 0x0026;
+  static Error_FontInFloDoesNotHaveDefaultTtf = (o:{family: string, filename: string}) => m(
+    this.ERROR_FontInFloDoesNotHaveDefaultTtf,
+    `Font family '${def(o.family)}' in fonts.languagetechnology.org does not have a default .ttf, font for ${def(o.filename)}`,
+  );
+
+  static ERROR_FontInFloHasBrokenDefaultTtf = SevError | 0x0027;
+  static Error_FontInFloHasBrokenDefaultTtf = (o:{family: string, filename: string}) => m(
+    this.ERROR_FontInFloHasBrokenDefaultTtf,
+    `Font family '${def(o.family)}' has an invalid default .ttf font entry. Please report this to fonts.languagetechnology.org for ${def(o.filename)}`,
+  );
+
+  static ERROR_FontInFloHasNoDownloadAvailable = SevError | 0x0028;
+  static Error_FontInFloHasNoDownloadAvailable = (o:{family: string, filename: string}) => m(
+    this.ERROR_FontInFloHasNoDownloadAvailable,
+    `Font family '${def(o.family)}' does not have URLs to download .ttf font for ${def(o.filename)}`,
+  );
+
+  static ERROR_FontFileCouldNotBeDownloaded = SevError | 0x0029;
+  static Error_FontFileCouldNotBeDownloaded = (o:{url: string, filename: string, e?: any}) => m(
+    this.ERROR_FontFileCouldNotBeDownloaded,
+    `Font file at '${def(o.url)}' was not successfully downloaded for ${def(o.filename)}: ${(o.e ?? 'unknown error').toString()}`,
+  );
 }
 
