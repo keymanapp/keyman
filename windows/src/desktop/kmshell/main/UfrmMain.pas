@@ -149,6 +149,7 @@ type
     procedure DoApply;
     procedure DoRefresh;
     procedure Update_CheckNow;
+    procedure Update_ApplyNow;
 
   protected
     procedure FireCommand(const command: WideString; params: TStringList); override;
@@ -185,6 +186,7 @@ uses
   LanguagesXMLRenderer,
   MessageIdentifierConsts,
   MessageIdentifiers,
+  Keyman.System.RemoteUpdateCheck,
   OnlineUpdateCheck,
   OptionsXMLRenderer,
   Keyman.Configuration.System.UmodWebHttpServer,
@@ -209,7 +211,8 @@ uses
   utilkmshell,
   utilhttp,
   utiluac,
-  utilxml;
+  utilxml,
+  KeymanPaths;
 
 type
   PHKL = ^HKL;
@@ -349,6 +352,7 @@ begin
   else if command = 'support_proxyconfig' then Support_ProxyConfig
 
   else if command = 'update_checknow' then Update_CheckNow
+  else if command = 'update_applynow' then Update_ApplyNow
 
   else if command = 'contact_support' then Support_ContactSupport(params)   // I4390
 
@@ -793,7 +797,7 @@ begin
     Free;
   end;
 end;
-
+// TODO-WINDOWS-UPDATES: #10210 Remove Update
 procedure TfrmMain.Support_UpdateCheck;
 begin
   with TOnlineUpdateCheck.Create(Self, True, False) do
@@ -821,14 +825,26 @@ begin
 end;
 
 procedure TfrmMain.Update_CheckNow;
+var UpdateCheck : TRemoteUpdateCheck;
 begin
-  with TOnlineUpdateCheck.Create(Self, True, True, True) do
+  UpdateCheck := TRemoteUpdateCheck.Create(True);
   try
-    Run;
+    UpdateCheck.Run;
   finally
-    Free;
+    UpdateCheck.Free;
   end;
   DoRefresh;
+end;
+
+procedure TfrmMain.Update_ApplyNow;
+var
+  ShellPath, s: string;
+  FResult: Boolean;
+begin
+  ShellPath := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
+  FResult := TUtilExecute.Shell(0, ShellPath, '', '-an');
+  if not FResult then
+    KL.Log('TrmfMain: Executing Update_ApplyNow Failed'); // TODO: Make error log
 end;
 
 procedure TfrmMain.TntFormCloseQuery(Sender: TObject; var CanClose: Boolean);

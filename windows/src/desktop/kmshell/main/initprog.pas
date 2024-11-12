@@ -83,6 +83,8 @@ type
                     fmUpgradeKeyboards, fmOnlineUpdateCheck,// I2548
                     fmOnlineUpdateAdmin, fmTextEditor,
                     fmBackgroundUpdateCheck,
+                    fmBackgroundDownload,
+                    fmApplyInstallNow,
                     fmFirstRun, // I2562
                     fmKeyboardWelcome,  // I2569
                     fmKeyboardPrint,  // I2329
@@ -143,6 +145,7 @@ uses
   UpgradeMnemonicLayout,
   utilfocusappwnd,
   utilkmshell,
+  Keyman.System.UpdateStateMachine,
 
   KeyboardTIPCheck,
 
@@ -250,8 +253,12 @@ begin
       else if s = '-?'   then FMode := fmHelpKMShell
       else if s = '-h'   then FMode := fmHelp
       else if s = '-t'   then FMode := fmTextEditor
+      //TODO-WINDOWS-UPDATES: will remove -ouc not used
+      // -buc uses the Statemachine can be used for external scripts to force a check
       else if s = '-ouc' then FMode := fmOnlineUpdateCheck
       else if s = '-buc' then FMode := fmBackgroundUpdateCheck
+      else if s = '-bd' then FMode := fmBackgroundDownload
+      else if s = '-an' then FMode := fmApplyInstallNow
       else if s = '-basekeyboard' then FMode := fmBaseKeyboard   // I4169
       else if s = '-nowelcome'   then FNoWelcome := True
       else if s = '-kw' then FMode := fmKeyboardWelcome  // I2569
@@ -384,7 +391,7 @@ var
   kdl: IKeymanDefaultLanguage;
   FIcon: string;
   FMutex: TKeymanMutex;  // I2720
-  RemoteUpdateCheck: TRemoteUpdateCheck;
+  BUpdateSM : TUpdateStateMachine;
     function FirstKeyboardFileName: WideString;
     begin
       if KeyboardFileNames.Count = 0
@@ -431,17 +438,31 @@ begin
     ShowMessage(MsgFromId(SKOSNotSupported));
     Exit;
   end;
-  // TODO: #10038  Will add this as part of the background update state machine
-  // for now just verifing the download happens via -buc switch.
-  RemoteUpdateCheck := TRemoteUpdateCheck.Create(False, False);
+
+  BUpdateSM := TUpdateStateMachine.Create(False);
     try
       if (FMode = fmBackgroundUpdateCheck) then
       begin
-        RemoteUpdateCheck.Run;
+        BUpdateSM.HandleCheck;
         Exit;
       end
+      else if (FMode = fmBackgroundDownload) then
+      begin
+        BUpdateSM.HandleDownload;
+        Exit;
+      end
+      else if (FMode = fmApplyInstallNow) then
+      begin
+        BUpdateSM.HandleInstallNow;
+        Exit;
+      end
+      else
+      begin
+        if BUpdateSM.HandleKmShell = 1 then
+          Exit;
+      end;
     finally
-      RemoteUpdateCheck.Free;
+      BUpdateSM.Free;
     end;
 
 
@@ -636,6 +657,7 @@ begin
       Pos('installdefaults', FQuery) > 0,
       Pos('startwithwindows', FQuery) > 0,
       Pos('checkforupdates', FQuery) > 0,
+      Pos('automaticupdates', FQuery) > 0,
       FDisablePackages,
       FDefaultUILanguage,
       Pos('automaticallyreportusage', FQuery) > 0);  // I2651, I2753
