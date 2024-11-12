@@ -958,6 +958,27 @@
 * chore(common): move to 18.0 alpha (#10713)
 * chore: move to 18.0 alpha
 
+## 17.0.332 stable 2024-11-06
+
+* fix(developer): create Server config directory before options save (#12609)
+* fix(developer): handle merge commits when checking git log date (#12628)
+* fix(linux): set environment variable for rendering of downloads dialog (#12617)
+
+## 17.0.331 stable 2024-10-30
+
+* fix(android): Hide suggestion banner on password fields (#12466)
+* fix(common): declare dep on @keymanapp/ldml-keyboard-constants (#12475)
+* fix(oem/fv): Update keyboard versions and names for fv_all.kmp (#12504)
+* chore(ios): renew certificate (#12513)
+* fix(developer): prevent invalid string ids (#12524)
+* fix(developer): ignore excess whitespace in `<row keys>` attribute (#12523)
+
+## 17.0.330 stable 2024-09-16
+
+* refactor(android): Move Sentry and APK to publish task (#12392)
+* fix(developer): rewrite ldml visual keyboard compiler (#12406)
+* fix(developer): check vars string usage before definition (#12407)
+
 ## 17.0.329 stable 2024-09-09
 
 * chore(android,ios): Add ojibwa ifinal/rdot keyboards to FirstVoices (#12020)
