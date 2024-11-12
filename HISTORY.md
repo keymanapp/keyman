@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.139 alpha 2024-11-12
+
+* fix(windows): help links updated (#12646)
+
 ## 18.0.138 alpha 2024-11-08
 
 * fix(common): check for invalid markers (#12613)
