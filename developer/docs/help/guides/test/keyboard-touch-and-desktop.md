@@ -70,9 +70,7 @@ able to select your keyboard from the list and start using it.
 To start testing on your mobile device, your device needs to be on the
 same network as your PC. Then open your web browser on the device. Which
 browser? On iOS, use Safari.  On Android devices, we recommend using
-Chrome. We don't recommend the Android Browser, because its capabilities
-vary dramatically depending on the Android version and the brand of your
-device.
+Chrome.
 
 Then you will need to pick an address from the debug host list in Keyman
 Developer that your device can find. An IP address on the same network

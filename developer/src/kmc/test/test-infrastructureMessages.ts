@@ -85,7 +85,7 @@ describe('InfrastructureMessages', function () {
   it('should generate ERROR_NotAProjectFile if a project file is not the correct type', async function() {
     const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
     const projectPath = makePathToFixture('invalid-projects', 'error_not_a_project_file.xxx')
-    loadProject(projectPath, ncb);
+    await loadProject(projectPath, ncb);
     assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_NotAProjectFile),
     'ERROR_NotAProjectFile not generated, instead got: '+JSON.stringify(ncb.messages,null,2));
   });
@@ -141,7 +141,7 @@ describe('InfrastructureMessages', function () {
   it('should generate ERROR_InvalidProjectFolder if there is no source folder when generating a default project file', async function() {
     const projectPath = makePathToFixture('no-source-folder', 'error_invalid_project_folder.kpj')
     const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
-    loadProject(projectPath, ncb);
+    await loadProject(projectPath, ncb);
     assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_InvalidProjectFolder),
       'ERROR_InvalidProjectFolder not generated, instead got: '+JSON.stringify(ncb.messages,null,2));
   });
@@ -151,7 +151,7 @@ describe('InfrastructureMessages', function () {
   it('should generate ERROR_InvalidProjectFolder if there are no valid file types in the source folder when generating a default project file', async function() {
     const projectPath = makePathToFixture('invalid-source-folder', 'error_invalid_project_folder.kpj')
     const ncb = new NodeCompilerCallbacks({logLevel: 'silent'});
-    loadProject(projectPath, ncb);
+    await loadProject(projectPath, ncb);
     assert.isTrue(ncb.hasMessage(InfrastructureMessages.ERROR_InvalidProjectFolder),
       'ERROR_InvalidProjectFolder not generated, instead got: '+JSON.stringify(ncb.messages,null,2));
   });

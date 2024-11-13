@@ -42,7 +42,7 @@ export class VarsCompiler extends SectionCompiler {
 
   private validateIdentifier(id: string) {
     if(!id.match(VariableParser.ID)) { // From <string> DTD
-      this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidVariableIdentifer({id}));
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidVariableIdentifier({id}));
       return false;
     }
     return true;
@@ -90,6 +90,7 @@ export class VarsCompiler extends SectionCompiler {
         }
         st.string.add(SubstitutionUse.variable, stringrefs);
         allStrings.add(id);
+        st.addMarkers(SubstitutionUse.variable, value);
       }
       // Sets
       for (const { id, value } of variables.set) {
@@ -212,6 +213,12 @@ export class VarsCompiler extends SectionCompiler {
 
     // now, validate the variables.
     valid = this.validateVars(st) && valid;
+
+    if (!!st.badMarkers.size) {
+      valid = false;
+      st.badMarkers.forEach(id =>
+        this.callbacks.reportMessage(LdmlCompilerMessages.Error_InvalidMarkerIdentifier({ id })));
+    }
 
     return valid;
   }

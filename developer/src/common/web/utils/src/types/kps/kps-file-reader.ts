@@ -10,7 +10,7 @@ import { util } from '@keymanapp/common-types';
 import boxXmlArray = util.boxXmlArray;
 
 import { CommonTypesMessages } from "../../common-messages.js";
-import { CompilerCallbacks } from "../../compiler-interfaces.js";
+import { CompilerCallbacks } from "../../compiler-callbacks.js";
 import { KeymanXMLReader } from "../../xml-utils.js";
 import { KpsPackage } from "./kps-file.js";
 

@@ -1,0 +1,18 @@
+{
+    "project_name": "@project_name@",
+    "project_version": "@project_version@",
+    "sitemap": "@doc_dir@/sitemap.txt",
+    "index": "@doc_dir@/markdown_files/index.md",
+    "c_sources": [
+      "@include_dir@/keyman/keyman_core_api.h"
+    ],
+    "c_include_directories": [
+      "@include_dir@",
+      "@doc_dir@/../../common/include"
+    ],
+    "c_smart_index" : true,
+    "output": ".",
+    "extra_assets": [
+        "../../assets"
+    ]
+}

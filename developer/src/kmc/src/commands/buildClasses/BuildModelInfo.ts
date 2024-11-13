@@ -9,7 +9,7 @@ import { loadProject } from '../../util/projectLoader.js';
 import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
 import { calculateSourcePath } from '../../util/calculateSourcePath.js';
 import { getLastGitCommitDate } from '../../util/getLastGitCommitDate.js';
-import { ExtendedCompilerOptions } from 'src/util/extendedCompilerOptions.js';
+import { ExtendedCompilerOptions } from '../../util/extendedCompilerOptions.js';
 
 export class BuildModelInfo extends BuildActivity {
   public get name(): string { return 'Lexical model metadata'; }
@@ -34,7 +34,7 @@ export class BuildModelInfo extends BuildActivity {
       throw new Error(`BuildModelInfo called with unexpected file type ${infile}`);
     }
 
-    const project = loadProject(infile, callbacks);
+    const project = await loadProject(infile, callbacks);
     if(!project) {
       // Error messages will be reported by loadProject
       return false;
