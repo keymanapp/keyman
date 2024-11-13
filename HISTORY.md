@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.140 alpha 2024-11-13
+
+* chore(common): Add 17.0.330 - 17.0.332 to version history (#12663)
+* fix(developer): reconnect `--full-test` in kmcmplib build and enable for CI (#12631)
+* docs(developer): kmc-generate (#12647)
+
 ## 18.0.139 alpha 2024-11-12
 
 * fix(windows): help links updated (#12646)
