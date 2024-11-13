@@ -18,6 +18,7 @@ import { PackageKeyboardTargetValidator } from './package-keyboard-target-valida
 import { PackageMetadataUpdater } from './package-metadata-updater.js';
 import { markdownToHTML } from './markdown.js';
 import { PackageValidation } from './package-validation.js';
+import { EXTERNAL_FILE_DATA_SOURCES, KmpCompilerFileDataResult } from './get-file-data.js';
 
 const KMP_JSON_FILENAME = 'kmp.json';
 const KMP_INF_FILENAME = 'kmp.inf';
@@ -245,40 +246,27 @@ export class KmpCompiler implements KeymanCompiler {
 
     if(kps.Files?.File?.length) {
       kmp.files = kps.Files.File.map((file: KpsFile.KpsFileContentFile) => {
+        const name = this.isLocalFile(file.Name) ?
+          this.normalizePath(file.Name) :
+          file.Name;
+        if(!name) {
+          // as the filename field is missing or blank, we'll try with the description instead
+          this.callbacks.reportMessage(PackageCompilerMessages.Error_FileRecordIsMissingName({description: file.Description ?? '(no description)'}));
+        }
         return {
-          name: this.normalizePath(file.Name),
+          name,
           description: '',  // kmp.json still requires description, but we ignore the input Description field
           // note: we no longer emit copyLocation as of 18.0; it was always optional
           // note: we don't emit fileType as that is not permitted in kmp.json
         };
       });
-      if(!kmp.files.reduce((result: boolean, file) => {
-        if(!file.name) {
-          // as the filename field is missing or blank, we'll try with the description instead
-          this.callbacks.reportMessage(PackageCompilerMessages.Error_FileRecordIsMissingName({description: file.description ?? '(no description)'}));
-          return false;
-        }
-        return result;
-      }, true)) {
+
+      if(kmp.files.find(file => !file.name)) {
+        // error reported above
         return null;
       }
     }
     kmp.files = kmp.files ?? [];
-
-    // Keyboard packages also include a legacy kmp.inf file (this will be removed,
-    // one day)
-    if(kps.Keyboards && kps.Keyboards.Keyboard) {
-      kmp.files.push({
-        name: KMP_INF_FILENAME,
-        description: ""
-      });
-    }
-
-    // Add the standard kmp.json self-referential to match existing implementations
-    kmp.files.push({
-      name: KMP_JSON_FILENAME,
-      description: ""
-    });
 
     //
     // Add keyboard metadata
@@ -335,6 +323,7 @@ export class KmpCompiler implements KeymanCompiler {
     const collector = new PackageMetadataCollector(this.callbacks);
     const metadata = collector.collectKeyboardMetadata(kpsFilename, kmp);
     if(metadata == null) {
+      // error reported in collectKeyboardMetadata
       return null;
     }
 
@@ -344,6 +333,7 @@ export class KmpCompiler implements KeymanCompiler {
 
     const versionValidator = new PackageVersionValidator(this.callbacks);
     if(!versionValidator.validateAndUpdateVersions(kps, kmp, metadata)) {
+      // error reported in validateAndUpdateVersions
       return null;
     }
 
@@ -352,6 +342,23 @@ export class KmpCompiler implements KeymanCompiler {
     } else {
       kmp.system.fileVersion = MIN_LM_FILEVERSION_KMP_JSON;
     }
+
+    // TODO: if targeting 18.0, drop 'description' File field entirely from kmp.json
+    // TODO: ONLY ADD kmp.inf if fileVersion < MIN_LM_FILEVERSION_KMP_JSON (+UNIT TEST)
+    // Keyboard packages also include a legacy kmp.inf file, if targeting an old
+    // version of Keyman
+    if(kps.Keyboards && kps.Keyboards.Keyboard) {
+      kmp.files.push({
+        name: KMP_INF_FILENAME,
+        description: ""
+      });
+    }
+
+    // Add the standard kmp.json self-referential to match existing implementations
+    kmp.files.push({
+      name: KMP_JSON_FILENAME,
+      description: ""
+    });
 
     //
     // Verify that packages that target mobile devices include a .js file
@@ -456,9 +463,8 @@ export class KmpCompiler implements KeymanCompiler {
    * @param kpsFilename - Filename of the kps, not read, used only for calculating relative paths
    * @param kmpJsonData - The kmp.json Object
    */
-  public buildKmpFile(kpsFilename: string, kmpJsonData: KmpJsonFile.KmpJsonFile): Promise<Uint8Array> {
+  public async buildKmpFile(kpsFilename: string, kmpJsonData: KmpJsonFile.KmpJsonFile): Promise<Uint8Array> {
     const zip = JSZip();
-
 
     // Make a copy of kmpJsonData, as we mutate paths for writing
     const data: KmpJsonFile.KmpJsonFile = JSON.parse(JSON.stringify(kmpJsonData));
@@ -468,49 +474,25 @@ export class KmpCompiler implements KeymanCompiler {
 
     const hasKmpInf = !!data.files.find(file => file.name == KMP_INF_FILENAME);
 
-    let failed = false;
-    data.files.forEach((value) => {
+    for(const value of data.files) {
       // Get the path of the file
       let filename = value.name;
-
       // We add this separately after zipping all other files
       if(filename == KMP_JSON_FILENAME || filename == KMP_INF_FILENAME) {
-        return;
+        continue;
       }
 
-      if(this.callbacks.path.isAbsolute(filename)) {
-        // absolute paths are not portable to other computers
-        this.callbacks.reportMessage(PackageCompilerMessages.Warn_AbsolutePath({filename: filename}));
+      const memberFileData = await this.getFileData(kpsFilename, filename);
+      if(!memberFileData) {
+        return null;
       }
 
-      filename = this.callbacks.resolveFilename(kpsFilename, filename);
-      const basename = this.callbacks.path.basename(filename);
+      this.warnIfKvkFileIsNotBinary(filename, memberFileData.data);
 
-      if(!this.callbacks.fs.existsSync(filename)) {
-        this.callbacks.reportMessage(PackageCompilerMessages.Error_FileDoesNotExist({filename: filename}));
-        failed = true;
-        return;
-      }
-
-      let memberFileData;
-      try {
-        memberFileData = this.callbacks.loadFile(filename);
-      } catch(e) {
-        this.callbacks.reportMessage(PackageCompilerMessages.Error_FileCouldNotBeRead({filename: filename, e: e}));
-        failed = true;
-        return;
-      }
-
-      this.warnIfKvkFileIsNotBinary(filename, memberFileData);
-
-      zip.file(basename, memberFileData);
+      zip.file(memberFileData.basename, memberFileData.data);
 
       // Remove path data from files before JSON save
-      value.name = basename;
-    });
-
-    if(failed) {
-      return null;
+      value.name = memberFileData.basename;
     }
 
     // TODO #9477: transform .md to .htm
@@ -555,6 +537,44 @@ export class KmpCompiler implements KeymanCompiler {
     const writer = new KmpInfWriter(data);
     const s = writer.write();
     return transcodeToCP1252(s);
+  }
+
+  private isLocalFile(inputFilename: string) {
+    return !EXTERNAL_FILE_DATA_SOURCES.find(source => source.regex.test(inputFilename));
+  }
+
+  private async getFileData(kpsFilename: string, inputFilename: string): Promise<KmpCompilerFileDataResult> {
+    for(const source of EXTERNAL_FILE_DATA_SOURCES) {
+      const match = source.regex.exec(inputFilename);
+      if(match) {
+        return await source.proc(this.callbacks, kpsFilename, inputFilename, match);
+      }
+    }
+
+    return this.getFileDataLocal(kpsFilename, inputFilename);
+  }
+
+  private getFileDataLocal(kpsFilename: string, inputFilename: string): KmpCompilerFileDataResult {
+    if(this.callbacks.path.isAbsolute(inputFilename)) {
+      // absolute paths are not portable to other computers
+      this.callbacks.reportMessage(PackageCompilerMessages.Warn_AbsolutePath({filename: inputFilename}));
+    }
+
+    const filename = this.callbacks.resolveFilename(kpsFilename, inputFilename);
+
+    if(!this.callbacks.fs.existsSync(filename)) {
+      this.callbacks.reportMessage(PackageCompilerMessages.Error_FileDoesNotExist({filename: filename}));
+      return null;
+    }
+
+    try {
+      const basename = this.callbacks.path.basename(filename);
+      const data = this.callbacks.loadFile(filename);
+      return { data, basename };
+    } catch(e) {
+      this.callbacks.reportMessage(PackageCompilerMessages.Error_FileCouldNotBeRead({filename: filename, e: e}));
+      return null;
+    }
   }
 
   /**
