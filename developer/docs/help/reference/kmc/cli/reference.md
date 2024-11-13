@@ -389,7 +389,8 @@ and the files in that folder will follow the
 `-n, --name <name>`
 
 : Keyboard descriptive name, referenced in the keyboard `<info name` attribute
-  (default: the ID of the project)
+  (default: the ID of the project). Do not include generic terms such as
+  'keyboard', 'unicode', or a version number in the name.
 
 `-c, --copyright <copyright-name>`
 
@@ -461,7 +462,7 @@ folder, and the files in that folder will follow the
 
 `-d, --description <description>`
 
-: A short description of the project, in Markdown. (default: keyboard name)
+: A short description of the project, in Markdown. (default: lexical model name)
 
 ## `kmc message` options
 
