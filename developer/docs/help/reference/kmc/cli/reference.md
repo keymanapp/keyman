@@ -71,6 +71,10 @@ The following parameters are available:
 
 : Generate a wordlist lexical model project
 
+`kmc copy origin -o target`
+
+: Copy and rename a keyboard project
+
 `kmc message [message...]`
 
 : Describes one or more compiler messages in greater detail
@@ -292,6 +296,14 @@ Note: paths shown above may vary.
 
 : Result file to write to (.json, .md, or .txt)
 
+`-i, --input-mapping-file <filename>`
+
+: Merge result file with existing mapping file. If supplied, existing
+  codepoint mappings will be kept, to ensure that updated fonts are
+  backwardly compatible with deployed keyboards. The
+  `--include-counts` flag will be set according to the format of
+  the input mapping file.
+
 For more information on the purpose of `analyze osk-char-use` and
 `analyze rewrite-osk-from-char-use`, see
 [`&displayMap`](/developer/language/reference/displaymap).
@@ -463,6 +475,78 @@ folder, and the files in that folder will follow the
 `-d, --description <description>`
 
 : A short description of the project, in Markdown. (default: lexical model name)
+
+## `kmc copy` options
+
+Copies a keyboard or lexical model project, renaming files matching the original
+project ID according to the output filename. Can copy projects from the
+following sources:
+
+* A .kpj file, e.g. `./keyboards/khmer_angkor/khmer_angkor.kpj`, or `./sil.km.cnd.kpj`
+* A local folder containing a .kpj file with a matching base name, e.g.
+  `./keyboards/khmer_angkor` (which contains `khmer_angkor.kpj`), or
+  `./models/sil.km.cnd/` (which contains `sil.km.cnd.kpj`)
+* A cloud keyboard, or cloud lexical model, e.g. `cloud:khmer_angkor`. This
+  retrieves the current source from the Keyman Cloud, which is in the GitHub
+  repository keymanapp/keyboards or keymanapp/lexical-models. The project type
+  will be determined by the id pattern -- either a lexical model
+  `author.bcp47.uniq` id pattern, or a keyboard id pattern (where period `.` is
+  not permitted)
+* A GitHub repository or subfolder within a repository that matches the Keyman
+  keyboard/model repository layout. The branch name is optional, and will use
+  the default branch from the repository if omitted. For example,
+  `github:keyman-keyboards/khmer_angkor:main:/khmer_angkor.kpj`
+
+`-o, --out-path <filename>`
+
+: The target folder to write the copied project. The folder must not exist.
+  The folder basename will become the ID of the new project, so the .kpj,
+  .kps, .kmn and similar files will be renamed to match that ID.
+
+`-n, --dry-run`
+
+: Show what would happen, without making changes
+
+### File copying, renaming, and structure rules
+
+The **origin** project folder is the one that contains the .kpj file.  When a
+project is copied, referenced files are reorganized into the
+[recommended Keyman project folder structure](../../file-layout). (Note the
+difference between **origin** and `/source`: `/source` is a normal subfolder
+in the recommended Keyman project folder structure).
+
+The destination project is called the **target**.
+
+* The **id** of the project and files can be updated during the copy. The
+  **origin id** is the basename of the **origin** project file. The
+  **target id** is supplied as the `-o` parameter, and becomes both the name of
+  the output folder, and its basename becomes the basename of the **target**
+  project. If other files use the same basename, they will also be updated.
+* All source-type files explicitly referenced in **origin** .kpj will be copied
+  to **target** `/source`, and references will be updated if the filename
+  changes. These are the source-type files:
+  * .kmn keyboard source
+  * .xml LDML keyboard source
+  * .kps package source
+  * .model.ts model source
+* Files referenced by source-type files will be copied to **target** folder
+  structure, if they are also in the **origin** project folder. If the files are
+  outside the **origin** folder, then relative references will be updated.
+* File references in .html and other files are not tracked.
+* For version 1.0 projects, only files explicitly referenced in the project or
+  the source-type files are copied.
+* For version 2.0 projects, all other files in the **origin** folder and
+  subfolders will also be copied to **target**, in the same relative location as
+  they were found in the **origin**. Files which have a **origin id** basename
+  will also be renamed to use the **target id** basename (be aware that this
+  could break untracked references).
+* If a referenced file does not exist, for example the compiled files referenced
+  in a .kps file may not be present, the references will still be updated
+  following the rules above.
+* Unreferenced files in the **origin** project's `build/` folder will not be
+  copied.
+* .kpj.user files will not be copied.
+* .kpj options will be updated to use fixed `source/` and `build/` folders.
 
 ## `kmc message` options
 

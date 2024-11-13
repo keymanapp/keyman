@@ -1,7 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { loadFile, resolveFilename } from './helpers/index.js';
-import { CompilerCallbacks, CompilerError, CompilerEvent, CompilerFileSystemCallbacks, CompilerPathCallbacks } from '../src/compiler-interfaces.js';
+import { CompilerCallbacks, CompilerFileSystemAsyncCallbacks, CompilerFileSystemCallbacks, CompilerNetAsyncCallbacks, CompilerPathCallbacks } from '../src/compiler-callbacks.js';
+import { CompilerError, CompilerEvent } from '../src/compiler-interfaces.js';
 import { fileURLToPath } from 'url';
 
 // This is related to developer/src/common/web/test-helpers/index.ts but has a slightly different API surface
@@ -31,6 +32,14 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
     return fs;
   }
 
+  get fsAsync(): CompilerFileSystemAsyncCallbacks {
+    return null; // Note: not currently used
+  }
+
+  get net(): CompilerNetAsyncCallbacks {
+    return null; // Note: not currently used
+  }
+
   resolveFilename(baseFilename: string, filename: string): string {
     return resolveFilename(baseFilename, filename);
   }
@@ -54,6 +63,10 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
 
   fileSize(filename: string): number {
     return fs.statSync(filename).size;
+  }
+
+  isDirectory(filename: string): boolean {
+    return fs.statSync(filename)?.isDirectory();
   }
 
   reportMessage(event: CompilerEvent): void {

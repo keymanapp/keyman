@@ -7,4 +7,10 @@
 # script directly.
 #
 set -eu
-find "$1" -name '*.kmn' | grep -E '(release|experimental)/([a-z0-9_]+)/([a-z0-9_]+)/source/\3\.kmn$'
+find "$1" -name '*.kmn' | \
+  grep -E '(release|experimental)/([a-z0-9_]+)/([a-z0-9_]+)/source/\3\.kmn$' | \
+  grep -vE 'masaram_gondi|anii|sil_kmhmu|fv_statimcets|fv_nuucaanul'
+# #12623: exclude masaram_gondi due to #11806
+# #12631: exclude anii, sil_kmhmu as ico references have mismatching case
+# #12631: exclude fv_statimcets, fv_nuucaanul as these include U+2002 which is not
+#         treated as whitespace on mac arch
