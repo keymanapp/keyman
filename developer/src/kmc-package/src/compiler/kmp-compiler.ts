@@ -415,9 +415,9 @@ export class KmpCompiler implements KeymanCompiler {
     ];
 
     for (let [src,dst,isMarkdown] of keys) {
-      if (kpsInfo[src]) {
+      if (kpsInfo[src]?._ && (kpsInfo[src]._.trim() || kpsInfo[src].$?.URL)) {
         kmpInfo[dst] = {
-          description: (kpsInfo[src]._ ?? (typeof kpsInfo[src] == 'string' ? kpsInfo[src].toString() : '')).trim()
+          description: (kpsInfo[src]._ ?? '').trim()
         };
         if(isMarkdown) {
           kmpInfo[dst].description = markdownToHTML(kmpInfo[dst].description, false).trim();
