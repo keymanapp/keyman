@@ -447,7 +447,7 @@ open class SettingsViewController: UITableViewController {
     let vc = KeyboardHeightViewController()
     if let nc = navigationController {
       nc.pushViewController(vc, animated: true)
-      setIsDoneButtonEnabled(nc, true)
+       setIsDoneButtonEnabled(nc, true)
     } else {
       let message = ("No navigation controller for showing keyboard height view")
       os_log("%{public}s", log:KeymanEngineLogger.settings, type: .error, message)
