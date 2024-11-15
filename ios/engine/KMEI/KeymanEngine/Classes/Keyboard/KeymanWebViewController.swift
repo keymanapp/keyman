@@ -713,20 +713,20 @@ extension KeymanWebViewController {
       if (Storage.active.userDefaults.object(forKey: Key.portraitKeyboardHeight) != nil) {
         let portraitHeight = Storage.active.userDefaults.portraitKeyboardHeight
         let message = "constraintTargetHeight, from UserDefaults loaded portrait value \(portraitHeight)"
-        os_log("%{public}s", log:KeymanEngineLogger.migration, type: .info, message)
+        os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
      } else {
         let message = "constraintTargetHeight, portraitHeight not found in UserDefaults, using default value \(defaultHeight)"
-        os_log("%{public}s", log:KeymanEngineLogger.migration, type: .info, message)
+        os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
         keyboardHeight = defaultHeight
       }
     } else {
       if (Storage.active.userDefaults.object(forKey: Key.portraitKeyboardHeight) != nil) {
         let landscapeHeight = Storage.active.userDefaults.landscapeKeyboardHeight
         let message = "constraintTargetHeight, from UserDefaults loaded landscape value \(landscapeHeight)"
-        os_log("%{public}s", log:KeymanEngineLogger.migration, type: .info, message)
+        os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
       } else {
         let message = "constraintTargetHeight, landscapeHeight not found in UserDefaults, using default value \(defaultHeight)"
-        os_log("%{public}s", log:KeymanEngineLogger.migration, type: .info, message)
+        os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
         keyboardHeight = defaultHeight
       }
     }

@@ -81,21 +81,21 @@ class KeyboardHeightViewController: UIViewController {
       if (Storage.active.userDefaults.object(forKey: Key.portraitKeyboardHeight) != nil) {
         self.keyboardHeight = Storage.active.userDefaults.portraitKeyboardHeight
         let message = "applyKeyboardHeight, from UserDefaults loaded portrait value \(self.keyboardHeight)"
-        os_log("%{public}s", log:KeymanEngineLogger.migration, type: .info, message)
+        os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
       } else {
         self.keyboardHeight = self.defaultPortraitHeight
         let message = "applyKeyboardHeight, portraitHeight not found in UserDefaults, using default value \(self.keyboardHeight)"
-        os_log("%{public}s", log:KeymanEngineLogger.migration, type: .info, message)
+        os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
       }
     } else {
       if (Storage.active.userDefaults.object(forKey: Key.portraitKeyboardHeight) != nil) {
         self.keyboardHeight = Storage.active.userDefaults.landscapeKeyboardHeight
         let message = "applyKeyboardHeight, from UserDefaults loaded landscape value \(self.keyboardHeight)"
-        os_log("%{public}s", log:KeymanEngineLogger.migration, type: .info, message)
+        os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
       } else {
         self.keyboardHeight = self.defaultLandscapeHeight
         let message = "applyKeyboardHeight, landscapeHeight not found in UserDefaults, using default value \(self.keyboardHeight)"
-        os_log("%{public}s", log:KeymanEngineLogger.migration, type: .info, message)
+        os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
       }
     }
   }
@@ -232,11 +232,12 @@ class KeyboardHeightViewController: UIViewController {
     self.updateKeyboardConstraints()
     //self.view.setNeedsLayout()
     
-    // TODO: persist
-    let messageTwo = "changeKeyboardHeight, persist newHeight :\(newHeight) isPortrait:  \(self.isPortrait)"
-    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, messageTwo)
     if (isPortrait) {
+      Storage.active.userDefaults.portraitKeyboardHeight = newHeight
     } else {
+      Storage.active.userDefaults.landscapeKeyboardHeight = newHeight
+      let messageTwo = "changeKeyboardHeight, persist newHeight :\(newHeight) isPortrait:  \(self.isPortrait)"
+      os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, messageTwo)
     }
   }
   
