@@ -36,8 +36,8 @@ class KeyboardHeightViewController: UIViewController {
     os_log("KeyboardHeightViewController viewDidLoad", log:KeymanEngineLogger.ui, type: .info)
 
     self.determineOrientation(screenSize: UIScreen.main.bounds.size)
+    self.loadDefaultKeyboardHeights()
     self.applyKeyboardHeight()
-    self.calculateKeyboardHeightLimits()
     
     //title = NSLocalizedString("menu-settings-spacebar-title", bundle: engineBundle, comment: "")
     title = "Adjust Height"
@@ -58,6 +58,7 @@ class KeyboardHeightViewController: UIViewController {
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
  
+    self.calculateKeyboardHeightLimits()
   }
   
   private func determineOrientation(screenSize: CGSize) {
@@ -66,22 +67,36 @@ class KeyboardHeightViewController: UIViewController {
     os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
   }
   
-  private func applyKeyboardHeight() {
+  private func loadDefaultKeyboardHeights() {
+    // if no KeyboardScaleMap found for device, then default to 216.0
     let portraitKeyboardScale = KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: true)
+    self.defaultPortraitHeight = Double(portraitKeyboardScale?.keyboardHeight ?? 216.0)
+
     let landscapeKeyboardScale = KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: false)
-
-    /*
-    self.portraitKeyboardHeight = KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: isPortrait)?.keyboardHeight ?? 216 // default for ancient devices
-     */
-
-    self.defaultPortraitHeight = Double(portraitKeyboardScale!.keyboardHeight)
-    self.defaultLandscapeHeight = Double(landscapeKeyboardScale!.keyboardHeight)
-
-    // TODO: first attempt read from UserDefaults
+    self.defaultLandscapeHeight = Double(landscapeKeyboardScale?.keyboardHeight ?? 216.0)
+  }
+  
+  private func applyKeyboardHeight() {
     if (self.isPortrait) {
-      self.keyboardHeight = self.defaultPortraitHeight
+      if let portraitHeight = Storage.active.userDefaults.portraitKeyboardHeight as Double? {
+        self.keyboardHeight = portraitHeight
+        let message = "applyKeyboardHeight, from UserDefaults loaded portrait value \(portraitHeight)"
+        os_log("%{public}s", log:KeymanEngineLogger.migration, type: .info, message)
+      } else {
+        self.keyboardHeight = self.defaultPortraitHeight
+        let message = "applyKeyboardHeight, portraitHeight not found in UserDefaults, using default value \(self.keyboardHeight)"
+        os_log("%{public}s", log:KeymanEngineLogger.migration, type: .info, message)
+      }
     } else {
-      self.keyboardHeight = self.defaultLandscapeHeight
+      if let landscapeHeight = Storage.active.userDefaults.landscapeKeyboardHeight as Double? {
+        self.keyboardHeight = landscapeHeight
+        let message = "applyKeyboardHeight, from UserDefaults loaded landscape value \(landscapeHeight)"
+        os_log("%{public}s", log:KeymanEngineLogger.migration, type: .info, message)
+      } else {
+        self.keyboardHeight = self.defaultLandscapeHeight
+        let message = "applyKeyboardHeight, landscapeHeight not found in UserDefaults, using default value \(self.keyboardHeight)"
+        os_log("%{public}s", log:KeymanEngineLogger.migration, type: .info, message)
+      }
     }
   }
 
@@ -94,8 +109,12 @@ class KeyboardHeightViewController: UIViewController {
       defaultHeight = self.defaultLandscapeHeight
     }
     
-    self.minKeyboardHeight = defaultHeight/1.85
-    self.maxKeyboardHeight = defaultHeight*1.9
+    // absolute minimum height is half of the default height
+    self.minKeyboardHeight = defaultHeight/2
+    
+    // absolute maximum height is the lesser of double the default height and contentview height - 50
+    self.maxKeyboardHeight = min(defaultHeight*2, contentView.frame.height - 50.0)
+    
     let messageBegan = "minKeyboardHeight: \(minKeyboardHeight) maxKeyboardHeight: \(maxKeyboardHeight)"
     os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, messageBegan)
   }
@@ -263,7 +282,7 @@ class KeyboardHeightViewController: UIViewController {
   }
   
   func configureDefaultHeightButton() {
-    defaultButton.titleLabel?.font = UIFont.boldSystemFont(ofSize: 16)
+    defaultButton.titleLabel?.font = .systemFont(ofSize: 20, weight: .bold)
     defaultButton.setTitle("Reset to Default Keyboard Height", for: .normal)
     defaultButton.sizeToFit()
     defaultButton.layer.cornerRadius = 8.0
@@ -372,9 +391,9 @@ class KeyboardHeightViewController: UIViewController {
   func updateKeyboardImage() {
     var kbImage: UIImage? = nil
     if (self.isPortrait) {
-      kbImage = UIImage(named:"portrait-osk")
+      kbImage = UIImage(named:"osk.portrait")
     } else {
-      kbImage = UIImage(named:"landscape-osk")
+      kbImage = UIImage(named:"osk.landscape")
     }
     keyboardImage.image = kbImage
 

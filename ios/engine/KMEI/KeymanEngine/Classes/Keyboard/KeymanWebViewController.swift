@@ -705,18 +705,33 @@ extension KeymanWebViewController {
   }
 
   func constraintTargetHeight(isPortrait: Bool) -> CGFloat {
-    var kbHeight = KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: isPortrait)?.keyboardHeight ?? 216 // default for ancient devices
-    os_log("constraintTargetHeight, keyboard height before: %f", log:KeymanEngineLogger.ui, type: .default, kbHeight)
+    var keyboardHeight = 0.0
+
+    var defaultHeight = KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: isPortrait)?.keyboardHeight ?? 216 // default for ancient devices
 
     if (isPortrait) {
-      kbHeight+=100;
+      if let portraitHeight = Storage.active.userDefaults.portraitKeyboardHeight as Double? {
+        keyboardHeight = portraitHeight
+        let message = "constraintTargetHeight, from UserDefaults loaded portrait value \(portraitHeight)"
+        os_log("%{public}s", log:KeymanEngineLogger.migration, type: .info, message)
+     } else {
+        let message = "constraintTargetHeight, portraitHeight not found in UserDefaults, using default value \(defaultHeight)"
+        os_log("%{public}s", log:KeymanEngineLogger.migration, type: .info, message)
+        keyboardHeight = defaultHeight
+      }
     } else {
-      kbHeight-=50;
+      if let landscapeHeight = Storage.active.userDefaults.landscapeKeyboardHeight as Double? {
+        keyboardHeight = landscapeHeight
+        let message = "constraintTargetHeight, from UserDefaults loaded landscape value \(landscapeHeight)"
+        os_log("%{public}s", log:KeymanEngineLogger.migration, type: .info, message)
+      } else {
+        let message = "constraintTargetHeight, landscapeHeight not found in UserDefaults, using default value \(defaultHeight)"
+        os_log("%{public}s", log:KeymanEngineLogger.migration, type: .info, message)
+        keyboardHeight = defaultHeight
+      }
     }
 
-    os_log("constraintTargetHeight, keyboard height after: %f", log:KeymanEngineLogger.ui, type: .default, kbHeight)
-
-    return kbHeight;
+    return keyboardHeight;
   }
 
   var keyboardWidth: CGFloat {

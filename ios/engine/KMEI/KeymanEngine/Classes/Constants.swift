@@ -41,6 +41,8 @@ public enum Key {
   static let synchronizeSWLexicalModel = "KeymanSynchronizeSWLexicalModel"
 
   static let migrationLevel = "KeymanEngineMigrationLevel"
+  static let portraitKeyboardHeight = "PortraitKeyboardHeight"
+  static let landscapeKeyboardHeight = "LandscapeKeyboardHeight"
 
   // JSON keys for language REST calls
   static let options = "options"
