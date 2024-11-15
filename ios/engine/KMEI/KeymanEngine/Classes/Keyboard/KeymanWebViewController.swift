@@ -711,8 +711,8 @@ extension KeymanWebViewController {
 
     if (isPortrait) {
       if (Storage.active.userDefaults.object(forKey: Key.portraitKeyboardHeight) != nil) {
-        let portraitHeight = Storage.active.userDefaults.portraitKeyboardHeight
-        let message = "constraintTargetHeight, from UserDefaults loaded portrait value \(portraitHeight)"
+        keyboardHeight = Storage.active.userDefaults.portraitKeyboardHeight
+        let message = "constraintTargetHeight, from UserDefaults loaded portrait value \(keyboardHeight)"
         os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
      } else {
         let message = "constraintTargetHeight, portraitHeight not found in UserDefaults, using default value \(defaultHeight)"
@@ -721,8 +721,8 @@ extension KeymanWebViewController {
       }
     } else {
       if (Storage.active.userDefaults.object(forKey: Key.portraitKeyboardHeight) != nil) {
-        let landscapeHeight = Storage.active.userDefaults.landscapeKeyboardHeight
-        let message = "constraintTargetHeight, from UserDefaults loaded landscape value \(landscapeHeight)"
+        keyboardHeight = Storage.active.userDefaults.landscapeKeyboardHeight
+        let message = "constraintTargetHeight, from UserDefaults loaded landscape value \(keyboardHeight)"
         os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
       } else {
         let message = "constraintTargetHeight, landscapeHeight not found in UserDefaults, using default value \(defaultHeight)"

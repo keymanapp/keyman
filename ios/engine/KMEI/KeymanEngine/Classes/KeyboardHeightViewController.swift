@@ -234,10 +234,12 @@ class KeyboardHeightViewController: UIViewController {
     
     if (isPortrait) {
       Storage.active.userDefaults.portraitKeyboardHeight = newHeight
+      let persistMessage = "changeKeyboardHeight, persist portraitKeyboardHeight :\(newHeight)"
+      os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, persistMessage)
     } else {
       Storage.active.userDefaults.landscapeKeyboardHeight = newHeight
-      let messageTwo = "changeKeyboardHeight, persist newHeight :\(newHeight) isPortrait:  \(self.isPortrait)"
-      os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, messageTwo)
+      let persistMessage = "changeKeyboardHeight, persist landscapeKeyboardHeight :\(newHeight)"
+      os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, persistMessage)
     }
   }
   
