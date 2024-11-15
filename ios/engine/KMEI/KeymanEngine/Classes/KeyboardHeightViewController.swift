@@ -78,9 +78,9 @@ class KeyboardHeightViewController: UIViewController {
   
   private func applyKeyboardHeight() {
     if (self.isPortrait) {
-      if let portraitHeight = Storage.active.userDefaults.portraitKeyboardHeight as Double? {
-        self.keyboardHeight = portraitHeight
-        let message = "applyKeyboardHeight, from UserDefaults loaded portrait value \(portraitHeight)"
+      if (Storage.active.userDefaults.object(forKey: Key.portraitKeyboardHeight) != nil) {
+        self.keyboardHeight = Storage.active.userDefaults.portraitKeyboardHeight
+        let message = "applyKeyboardHeight, from UserDefaults loaded portrait value \(self.keyboardHeight)"
         os_log("%{public}s", log:KeymanEngineLogger.migration, type: .info, message)
       } else {
         self.keyboardHeight = self.defaultPortraitHeight
@@ -88,9 +88,9 @@ class KeyboardHeightViewController: UIViewController {
         os_log("%{public}s", log:KeymanEngineLogger.migration, type: .info, message)
       }
     } else {
-      if let landscapeHeight = Storage.active.userDefaults.landscapeKeyboardHeight as Double? {
-        self.keyboardHeight = landscapeHeight
-        let message = "applyKeyboardHeight, from UserDefaults loaded landscape value \(landscapeHeight)"
+      if (Storage.active.userDefaults.object(forKey: Key.portraitKeyboardHeight) != nil) {
+        self.keyboardHeight = Storage.active.userDefaults.landscapeKeyboardHeight
+        let message = "applyKeyboardHeight, from UserDefaults loaded landscape value \(self.keyboardHeight)"
         os_log("%{public}s", log:KeymanEngineLogger.migration, type: .info, message)
       } else {
         self.keyboardHeight = self.defaultLandscapeHeight

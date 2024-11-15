@@ -710,8 +710,8 @@ extension KeymanWebViewController {
     var defaultHeight = KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: isPortrait)?.keyboardHeight ?? 216 // default for ancient devices
 
     if (isPortrait) {
-      if let portraitHeight = Storage.active.userDefaults.portraitKeyboardHeight as Double? {
-        keyboardHeight = portraitHeight
+      if (Storage.active.userDefaults.object(forKey: Key.portraitKeyboardHeight) != nil) {
+        let portraitHeight = Storage.active.userDefaults.portraitKeyboardHeight
         let message = "constraintTargetHeight, from UserDefaults loaded portrait value \(portraitHeight)"
         os_log("%{public}s", log:KeymanEngineLogger.migration, type: .info, message)
      } else {
@@ -720,8 +720,8 @@ extension KeymanWebViewController {
         keyboardHeight = defaultHeight
       }
     } else {
-      if let landscapeHeight = Storage.active.userDefaults.landscapeKeyboardHeight as Double? {
-        keyboardHeight = landscapeHeight
+      if (Storage.active.userDefaults.object(forKey: Key.portraitKeyboardHeight) != nil) {
+        let landscapeHeight = Storage.active.userDefaults.landscapeKeyboardHeight
         let message = "constraintTargetHeight, from UserDefaults loaded landscape value \(landscapeHeight)"
         os_log("%{public}s", log:KeymanEngineLogger.migration, type: .info, message)
       } else {
