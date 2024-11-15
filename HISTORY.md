@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.141 alpha 2024-11-15
+
+* chore(linux): add support for Ubuntu 25.04 Plucky Puffin (#12675)
+
 ## 18.0.140 alpha 2024-11-13
 
 * chore(common): Add 17.0.330 - 17.0.332 to version history (#12663)
