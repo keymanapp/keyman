@@ -122,6 +122,9 @@ build_action() {
 
   tsc --project "${KEYMAN_ROOT}/web/src/test/auto/tsconfig.json"
 
+  mkdir -p "${KEYMAN_ROOT}/web/build/test/dom/cases/core-processor/import/core/"
+  cp "${KEYMAN_ROOT}/web/src/engine/core-processor/src/import/core/keymancore.d.ts" "${KEYMAN_ROOT}/web/build/test/dom/cases/core-processor/import/core/"
+
   for dir in \
     "${KEYMAN_ROOT}/web/build/test/dom/cases"/*/ \
     "${KEYMAN_ROOT}/web/build/test/integrated/" \
