@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.142 alpha 2024-11-20
+
+* chore(common): Update CODEOWNERS (#12680)
+
 ## 18.0.141 alpha 2024-11-15
 
 * chore(linux): add support for Ubuntu 25.04 Plucky Puffin (#12675)
