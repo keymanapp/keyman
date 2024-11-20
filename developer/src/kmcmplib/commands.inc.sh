@@ -33,12 +33,19 @@ do_configure() {
     STANDARD_MESON_ARGS="--cross-file wasm.defs.build --cross-file wasm.build --default-library static"
   fi
 
+  local FULL_TEST=
+  local FULL_TEST_WIN=
+  if should_do_full_test; then
+    FULL_TEST="-D full_test=true"
+    FULL_TEST_WIN=--full-test
+  fi
+
   if [[ $target =~ ^(x86|x64)$ ]]; then
-    cmd //C build.bat $target $BUILDER_CONFIGURATION configure "${builder_extra_params[@]}"
+    cmd //C build.bat $target $BUILDER_CONFIGURATION configure $FULL_TEST_WIN "${builder_extra_params[@]}"
   else
     pushd "$THIS_SCRIPT_PATH" > /dev/null
     # Additional arguments are used by Linux build, e.g. -Dprefix=${INSTALLDIR}
-    meson setup "$MESON_PATH" --werror --buildtype $BUILDER_CONFIGURATION $STANDARD_MESON_ARGS "${builder_extra_params[@]}"
+    meson setup "$MESON_PATH" --werror --buildtype $BUILDER_CONFIGURATION $STANDARD_MESON_ARGS $FULL_TEST "${builder_extra_params[@]}"
     popd > /dev/null
   fi
   builder_finish_action success configure:$target
@@ -78,7 +85,7 @@ do_test() {
   # Works on a local clone of keyboards repository, to avoid clobbering
   # user's existing keyboards repo, if present
 
-  if builder_has_option --full-test; then
+  if should_do_full_test; then
     checkout_keyboards
   fi
 
@@ -125,4 +132,12 @@ build_meson_cross_file_for_wasm() {
     local R=$(echo $EMSCRIPTEN_BASE | sed 's_/_\\/_g')
   fi
   sed -e "s/\$EMSCRIPTEN_BASE/$R/g" wasm.build.$BUILDER_OS.in > wasm.build
+}
+
+should_do_full_test() {
+  if builder_has_option --full-test || builder_is_ci_test_build; then
+    return 0
+  fi
+
+  return 1
 }
