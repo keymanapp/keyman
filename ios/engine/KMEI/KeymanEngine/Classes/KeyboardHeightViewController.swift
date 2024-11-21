@@ -101,19 +101,19 @@ class KeyboardHeightViewController: UIViewController {
   }
 
   private func calculateKeyboardHeightLimits() {
-    var defaultHeight = 0.0
+//    var defaultHeight = 0.0
+//    
+//    if (self.isPortrait) {
+//      defaultHeight = self.defaultPortraitHeight
+//    } else {
+//      defaultHeight = self.defaultLandscapeHeight
+//    }
     
-    if (self.isPortrait) {
-      defaultHeight = self.defaultPortraitHeight
-    } else {
-      defaultHeight = self.defaultLandscapeHeight
-    }
+    // minimum height
+    self.minKeyboardHeight = 70.0
     
-    // absolute minimum height is half of the default height
-    self.minKeyboardHeight = defaultHeight/2
-    
-    // absolute maximum height is the lesser of double the default height and contentview height - 50
-    self.maxKeyboardHeight = min(defaultHeight*2, contentView.frame.height - 50.0)
+    // keyboard height must be 70 pts smaller than the contentView height
+    self.maxKeyboardHeight = contentView.frame.height - 70.0
     
     let messageBegan = "minKeyboardHeight: \(minKeyboardHeight) maxKeyboardHeight: \(maxKeyboardHeight)"
     os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, messageBegan)
@@ -384,9 +384,9 @@ class KeyboardHeightViewController: UIViewController {
     // add new restraints using the current value of the keyboard height
     resizerConstraintsArray = [
       keyboardResizer.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-      keyboardResizer.topAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -keyboardHeight-22),
-      keyboardResizer.heightAnchor.constraint(equalToConstant: 44),
-      keyboardResizer.widthAnchor.constraint(equalToConstant: 44)
+      keyboardResizer.topAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -keyboardHeight-30),
+      keyboardResizer.heightAnchor.constraint(equalToConstant: 60),
+      keyboardResizer.widthAnchor.constraint(equalToConstant: 60)
     ]
     NSLayoutConstraint.activate(resizerConstraintsArray)
   }
@@ -396,7 +396,10 @@ class KeyboardHeightViewController: UIViewController {
     if (self.isPortrait) {
       kbImage = UIImage(named:"osk.portrait")
     } else {
-      kbImage = UIImage(named:"osk.landscape")
+      kbImage = UIImage(named: "landscape-dark-keyboard.png",
+                                    in: Bundle.main,
+                                    compatibleWith: nil)
+      //kbImage = UIImage(named:"osk.landscape")
     }
     keyboardImage.image = kbImage
 
