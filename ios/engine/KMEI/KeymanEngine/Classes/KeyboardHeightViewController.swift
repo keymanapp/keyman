@@ -397,9 +397,14 @@ class KeyboardHeightViewController: UIViewController {
       kbImage = UIImage(named:"osk.portrait")
     } else {
       kbImage = UIImage(named: "landscape-dark-keyboard.png",
+                                    in: Resources.bundle,
+                                    compatibleWith: nil)
+      /*
+      kbImage = UIImage(named: "landscape-dark-keyboard.png",
                                     in: Bundle.main,
                                     compatibleWith: nil)
       //kbImage = UIImage(named:"osk.landscape")
+       */
     }
     keyboardImage.image = kbImage
 
