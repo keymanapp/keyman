@@ -21,6 +21,7 @@
  *
  */
 
+#include <errno.h>
 #include <ibus.h>
 #include <string.h>
 #include <stdio.h>
@@ -518,21 +519,30 @@ ibus_keyman_engine_constructor(
 
     FILE* kmx_file = fopen(abs_kmx_path, "rb");
     if (!kmx_file) {
-      g_warning("%s: problem opening kmx_file %s.", __FUNCTION__, abs_kmx_path);
+      g_warning("%s: problem opening kmx_file %s. (error: %s).", __FUNCTION__, abs_kmx_path, strerror(errno));
       return NULL;
     }
 
-    fseek(kmx_file, 0, SEEK_END);
+    if (fseek(kmx_file, 0, SEEK_END) < 0) {
+      g_warning("%s: problem seeking to end of kmx_file %s (error: %s).", __FUNCTION__, abs_kmx_path, strerror(errno));
+      fclose(kmx_file);
+      return NULL;
+    }
     long length = ftell(kmx_file);
-    fseek(kmx_file, 0, SEEK_SET);
+    if (length < 0) {
+      g_warning("%s: problem determining length of kmx_file %s (error: %s).", __FUNCTION__, abs_kmx_path, strerror(errno));
+      fclose(kmx_file);
+      return NULL;
+    }
+    rewind(kmx_file);
     void* buffer = malloc(length);
     if (!buffer) {
-      g_warning("%s: problem allocating buffer for reading kmx_file %s.", __FUNCTION__, abs_kmx_path);
+      g_warning("%s: problem allocating buffer for reading kmx_file %s (error: %s).", __FUNCTION__, abs_kmx_path, strerror(errno));
       fclose(kmx_file);
       return NULL;
     }
     if (fread(buffer, 1, length, kmx_file) != length) {
-      g_warning("%s: problem reading entire kmx_file %s.", __FUNCTION__, abs_kmx_path);
+      g_warning("%s: problem reading entire kmx_file %s (error: %s).", __FUNCTION__, abs_kmx_path, strerror(errno));
       fclose(kmx_file);
       free(buffer);
       return NULL;
