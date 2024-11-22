@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.143 alpha 2024-11-22
+
+* chore(deps): bump cross-spawn from 7.0.3 to 7.0.6 (#12685)
+
 ## 18.0.142 alpha 2024-11-20
 
 * chore(common): Update CODEOWNERS (#12680)
