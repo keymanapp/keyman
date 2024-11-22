@@ -498,10 +498,10 @@ ibus_keyman_engine_constructor(
 
     g_strfreev(split_name);
 
-    g_autofree gchar *kmx_file = g_path_get_basename(abs_kmx_path);
-    p = rindex(kmx_file, '.'); // get id to use as dbus service name
+    g_autofree gchar *kmx_filename = g_path_get_basename(abs_kmx_path);
+    p = rindex(kmx_filename, '.'); // get id to use as dbus service name
     if (p) {
-        keyman->kb_name = g_strndup(kmx_file, p-kmx_file);
+        keyman->kb_name = g_strndup(kmx_filename, p-kmx_filename);
         p = rindex(abs_kmx_path, '.');
         if (p)
         {
@@ -516,7 +516,28 @@ ibus_keyman_engine_constructor(
 
     km_core_status status;
 
-    status = km_core_keyboard_load(abs_kmx_path, &(keyman->keyboard));
+    FILE* kmx_file = fopen(abs_kmx_path, "rb");
+    if (!kmx_file) {
+      g_warning("%s: problem loading kmx_file %s.", __FUNCTION__, abs_kmx_path);
+      return NULL;
+    }
+
+    fseek(kmx_file, 0, SEEK_END);
+    long length = ftell(kmx_file);
+    fseek(kmx_file, 0, SEEK_SET);
+    void* buffer = malloc(length);
+    if (buffer) {
+      if (fread(buffer, 1, length, kmx_file) != length) {
+        g_warning("%s: problem reading entire kmx_file %s.", __FUNCTION__, abs_kmx_path);
+        return NULL;
+      }
+    }
+    fclose(kmx_file);
+
+    status = km_core_keyboard_load_from_blob(abs_kmx_path, buffer, length,
+      &(keyman->keyboard));
+
+    free(buffer);
 
     if (status != KM_CORE_STATUS_OK) {
       g_warning("%s: problem loading km_core_keyboard %s. Status is %u.", __FUNCTION__, abs_kmx_path, status);
