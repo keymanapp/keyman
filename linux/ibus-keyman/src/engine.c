@@ -518,7 +518,7 @@ ibus_keyman_engine_constructor(
 
     FILE* kmx_file = fopen(abs_kmx_path, "rb");
     if (!kmx_file) {
-      g_warning("%s: problem loading kmx_file %s.", __FUNCTION__, abs_kmx_path);
+      g_warning("%s: problem opening kmx_file %s.", __FUNCTION__, abs_kmx_path);
       return NULL;
     }
 
@@ -526,11 +526,16 @@ ibus_keyman_engine_constructor(
     long length = ftell(kmx_file);
     fseek(kmx_file, 0, SEEK_SET);
     void* buffer = malloc(length);
-    if (buffer) {
-      if (fread(buffer, 1, length, kmx_file) != length) {
-        g_warning("%s: problem reading entire kmx_file %s.", __FUNCTION__, abs_kmx_path);
-        return NULL;
-      }
+    if (!buffer) {
+      g_warning("%s: problem allocating buffer for reading kmx_file %s.", __FUNCTION__, abs_kmx_path);
+      fclose(kmx_file);
+      return NULL;
+    }
+    if (fread(buffer, 1, length, kmx_file) != length) {
+      g_warning("%s: problem reading entire kmx_file %s.", __FUNCTION__, abs_kmx_path);
+      fclose(kmx_file);
+      free(buffer);
+      return NULL;
     }
     fclose(kmx_file);
 
