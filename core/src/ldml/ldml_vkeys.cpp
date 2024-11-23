@@ -22,10 +22,8 @@ vkeys::add(km_core_virtual_key vk, km_core_ldml_modifier_state modifier_state, s
   const vkey_id id(vk, modifier_state);
   // assign the string
   vkey_to_string[id] = output;
-  if (!output.empty()) {
-    // empty string = gap key, etc.
-    all_vkeys.insert(id);
-  }
+  // includes all keys - including gaps.
+  all_vkeys.insert(id);
 }
 
 km_core_keyboard_key  *
