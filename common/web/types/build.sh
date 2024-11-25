@@ -93,7 +93,7 @@ function do_test() {
 
 #-------------------------------------------------------------------------------------------------------------------
 
-builder_run_action clean      rm -rf ./build/ ./tsconfig.tsbuildinfo
+builder_run_action clean      rm -rf ./build/ ./tsconfig.tsbuildinfo ./src/schemas/ ./node_modules/ ./obj/
 builder_run_action configure  do_configure
 builder_run_action build      tsc --build
 builder_run_action test       do_test

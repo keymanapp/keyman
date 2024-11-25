@@ -1,5 +1,23 @@
 # Keyman Version History
 
+## 18.0.143 alpha 2024-11-22
+
+* chore(deps): bump cross-spawn from 7.0.3 to 7.0.6 (#12685)
+
+## 18.0.142 alpha 2024-11-20
+
+* chore(common): Update CODEOWNERS (#12680)
+
+## 18.0.141 alpha 2024-11-15
+
+* chore(linux): add support for Ubuntu 25.04 Plucky Puffin (#12675)
+
+## 18.0.140 alpha 2024-11-13
+
+* chore(common): Add 17.0.330 - 17.0.332 to version history (#12663)
+* fix(developer): reconnect `--full-test` in kmcmplib build and enable for CI (#12631)
+* docs(developer): kmc-generate (#12647)
+
 ## 18.0.139 alpha 2024-11-12
 
 * fix(windows): help links updated (#12646)
