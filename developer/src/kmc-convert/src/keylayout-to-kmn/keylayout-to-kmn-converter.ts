@@ -11,6 +11,7 @@ import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 // write read, convert, write
 // tests for 3 functions read write convert
 // add data to object
+// Use filter functions
 // action/output:use filter etc to shorten func
 // deadkeyables:use filter etc to shorten func
 // dk-> for all action:use filter etc to shorten func
@@ -18,8 +19,8 @@ import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 // rename symbols
 // remove part using kmn_key_Name1
 // remove unnecceaasry map_UkeleleKC_To_kmn_Key_Name_Array_Position_n etc
-// loop throught ANSI, JIS- art moment only use [0]
-// remove func at teh end
+// loop throught ANSI, JIS- art moment only use [keyMapSet_count] (keyMapSet_count=0)
+// remove funcs at teh end
 // import { makePathToFixture } from '../../test/helpers/index.js';       // _S2 my imports
 // Mapping 0->30  or 0->K_A-> missing entries in mapping 
 // Replace any-types
@@ -28,13 +29,13 @@ import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 // Return conditions
 // Use callbacks as for writeFileSync
 // Tests throws
-// Use filter functions
 // Conditions NCAPS,OPT;...
 // Which stores
 // TODO move func outside of class
 // Functions as object methods? 
 // objects contain only used stuff READ in: -- out: only read arrays / CONVERT in: only read arrays out: return only to write arrays
 // Use catch blocks for file read
+
 // use
 
 
@@ -43,6 +44,8 @@ import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 import { XMLParser } from 'fast-xml-parser';  // for reading a file
 import { readFileSync } from 'fs';
 import { writeFileSync } from "fs";           // for writing a file
+import * as fs from 'fs';   // what is this/do I need it? -  either import all or seperately like above
+
 
 export class KeylayoutToKmnConverter {
   static readonly INPUT_FILE_EXTENSION = '.keylayout';
@@ -50,7 +53,7 @@ export class KeylayoutToKmnConverter {
 
   // TODO use callbacks
   //constructor(/*private*/ _callbacks: CompilerCallbacks, /*private*/ _options: CompilerOptions) {
-  constructor(/*private*/ _callbacks: CompilerCallbacks, /*private*/ _options: CompilerOptions) {
+  constructor(private callbacks: CompilerCallbacks, /*private*/ _options: CompilerOptions) {
     // TODO: if these are needed, uncomment /*private*/ and remove _, and they will then
     // be available as class properties
   }
@@ -102,7 +105,6 @@ export class KeylayoutToKmnConverter {
     /*
     // _S2 answer :  + [K_A] > 'a'  is OK / TODO which format to use in output ?  + [K_A] > 'a' (character code)  or    + [K_A] > U+0061 (virt Keycode)
     // _S2 TODO which stores?
-    // _S2 use var a = document.getElementById("target");
  */
     console.log("inputFilename read", filename)
     const options = {
@@ -112,23 +114,32 @@ export class KeylayoutToKmnConverter {
 
     //const xmlFile = readFileSync(`${process.cwd()}/data/MySample.keylayout`, 'utf8')
     const xmlFile = readFileSync((process.cwd() + "\\data" + filename.substring(filename.lastIndexOf("\\"))).replace(" ", ""), 'utf8');
+
+    // we don`t need file-read with uint8array return
+    const fullPath = (process.cwd() + "\\data" + filename.substring(filename.lastIndexOf("\\"))).replace(" ", "")
+    const xmlFile1 = this.callbacks.loadFile(fullPath)
+    console.log("xmlFile1",xmlFile1)
+    //console.log("xmlFile",xmlFile)
+
     const parser = new XMLParser(options);
     const jsonObj = parser.parse(xmlFile); // get plain Object
 
-    const nrOfStates = jsonObj.keyboard.keyMapSet[0].keyMap.length
-    const nrOfKeys_inLayer = jsonObj.keyboard.keyMapSet[0].keyMap[0].key.length   // will they all have the same length later ?
+    const keyMapSet_count =0
+    const nrOfStates = jsonObj.keyboard.keyMapSet[keyMapSet_count].keyMap.length
+    const nrOfKeys_inLayer = jsonObj.keyboard.keyMapSet[keyMapSet_count].keyMap[0].key.length   // will they all have the same length later ?
 
+    // ToDo naming
     // TODO array-> object
+    const duplicate_layouts_array: any[] = []
     const modifier_array: any[] = []                    // array holding all MODIFIER strings e.g. "anyShift caps anyOption"  -why not put modifiers into Uint8Array along with values of keys of layer
     const data_output_all_Layers: any[] = []
     const keys_action_all_Layers: any[] = []            // array holding all values with ACTION attribute (needed for finding deadkeys)
-    const deadkeyedChars_all_Layers: any[] = []               // array holding all DEADKEYS for each mod state â, ê, ,....
-    const terminators_all_Layers: any[] = []               // array holding all DEADKEYS for each mod state â, ê, ,....
+    const deadkeyedChars_all_Layers: any[] = []         // array holding all DEADKEYS for each mod state â, ê, ,....
+    const terminators_all_Layers: any[] = []            // array holding all DEADKEYS for each mod state â, ê, ,....
 
     // .........................................................
     // LAYOUTS: get all groups like ANSI JIS
     // .........................................................
-    const duplicate_layouts_array: any[] = []
 
     for (let i = 0; i < jsonObj.keyboard.layouts.layout.length; i++) {
       duplicate_layouts_array[i] = jsonObj.keyboard.layouts.layout[i]['@_mapSet']
@@ -154,18 +165,18 @@ export class KeylayoutToKmnConverter {
       // .........................................................
       // KEYMAP: get all keys for attribute "output" ( y,c,b,...)  - TODO can i use shorter function?
       // .........................................................
-      for (let i = 0; i < jsonObj.keyboard.keyMapSet[0].keyMap[j].key.length; i++) {
-        if (jsonObj.keyboard.keyMapSet[0].keyMap[j].key[i]['@_output'] !== "\0") {
+      for (let i = 0; i < jsonObj.keyboard.keyMapSet[keyMapSet_count].keyMap[j].key.length; i++) {
+        if (jsonObj.keyboard.keyMapSet[keyMapSet_count].keyMap[j].key[i]['@_output'] !== "\0") {
           // textencoder converts string -> bytes  ( 'A' -> [ 65 ],   '☺' -> [ 226, 152, 186 ])
           // textencoder is of Uint8Array(1) for A and Uint8Array(3) for ☺
-          keys_output_One_Layer[i] = new TextEncoder().encode(jsonObj.keyboard.keyMapSet[0].keyMap[j].key[i]['@_output']);
+          keys_output_One_Layer[i] = new TextEncoder().encode(jsonObj.keyboard.keyMapSet[keyMapSet_count].keyMap[j].key[i]['@_output']);
         }
 
         // .........................................................
         // KEYMAP: get all keys for attribute "action" ( ^,a,e,i,...)  - TODO can i use shorter function?
         // .........................................................
-        if (jsonObj.keyboard.keyMapSet[0].keyMap[j].key[i]['@_action'] !== "\0") {
-          keys_action_One_Layer[i] = new TextEncoder().encode(jsonObj.keyboard.keyMapSet[0].keyMap[j].key[i]['@_action']);
+        if (jsonObj.keyboard.keyMapSet[keyMapSet_count].keyMap[j].key[i]['@_action'] !== "\0") {
+          keys_action_One_Layer[i] = new TextEncoder().encode(jsonObj.keyboard.keyMapSet[keyMapSet_count].keyMap[j].key[i]['@_action']);
         }
       }
       // .........................................................
@@ -200,9 +211,9 @@ export class KeylayoutToKmnConverter {
     // ACTION: create array of "deadkeyables_all_Layers"  - TODO can i use shorter function?
     // .........................................................
     const deadkeyables_all_Layers: string[][] = []
-    for (let j = 0; j < jsonObj.keyboard.keyMapSet[0].keyMap.length; j++) {
+    for (let j = 0; j < jsonObj.keyboard.keyMapSet[keyMapSet_count].keyMap.length; j++) {
       const deadkeyables_one: string[] = []
-      for (let i = 0; i < jsonObj.keyboard.keyMapSet[0].keyMap[0].key.length; i++) {
+      for (let i = 0; i < jsonObj.keyboard.keyMapSet[keyMapSet_count].keyMap[0].key.length; i++) {
         const resulting_character = new TextDecoder().decode(keys_action_all_Layers[j][i])
         if (resulting_character !== "")
           deadkeyables_one.push(resulting_character)
@@ -261,7 +272,7 @@ export class KeylayoutToKmnConverter {
       ArrayOf_Ukelele_output: data_output_all_Layers,
       ArrayOf_Ukelele_action: keys_action_all_Layers,
       ArrayOf_Modifiers: modifier_array,
-      ArrayOf_VK_US: "",
+      //ArrayOf_VK_US: "",
       ArrayOf_SC_MacWin: "",
       ArrayOf_dk: dk_pairs_all_Layers,                  // add dk-mapping ( dk1 <-> '^' )
       ArrayOf_Dk: dk,                                   // add plain dk ( '^', '´','`')
@@ -309,34 +320,27 @@ export class KeylayoutToKmnConverter {
       'K_PERIOD', 'K_SLASH', 'K_BKQUOTE', 'K_LBRKT', 'K_RBRKT',    //104
     ]
 
-    const data_VKUS: any[][] = [];
-    const data_kmn: any[][] = [];
     const data_mac_Win: any[][] = [];
-    //const keys_singleLayer: Uint8Array[] = []
 
     // use UkeleleKeyCodeToScanCodes !!!
     for (let i = 0; i < data_ukelele.ArrayOf_Ukelele_output[0].length; i++) {
-      const data_VKUS_pos_pair: any[] = [];
       const data_mac_US_pair: any[] = [];
-      const data_kmn_pair: any[] = [];
       const keyName = kmn_Key_Name1[this.map_UkeleleKC_To_kmn_Key_Name_Array_Position_n(i)]
-      data_kmn_pair.push(i)
-      data_kmn_pair.push(this.map_UkeleleKC_To_kmn_Key_Name_Array_Position_n(i))
-      data_VKUS_pos_pair.push(this.map_UkeleleKC_To_kmn_Key_Name_Array_Position_n(i))
-      data_VKUS_pos_pair.push(keyName)
+      /*const secondName= UkeleleScanToUSVirtualKeyCodes(i)
+const kS = Constants.CLDRScanToUSVirtualKeyCodes
+
+Constants.UkeleleScanToUSVirtualKeyCodes
+      console.log("secondName",secondName)*/
       data_mac_US_pair.push(i)
-      // data_mac_US_pair.push(this.map_UkeleleKC_To_Win_KC(i))
       data_mac_US_pair.push(keyName)
 
-      data_VKUS.push(data_VKUS_pos_pair)
-      data_kmn.push(data_kmn_pair)
+
+      // data_mac_US_pair.push(this.map_UkeleleKC_To_Win_KC(i))
       data_mac_Win.push(data_mac_US_pair)
     }
 
-    data_ukelele.ArrayOf_VK_US = data_VKUS
-    data_ukelele.ArrayOf_Kmn = data_kmn
+    //data_ukelele.ArrayOf_Kmn = data_kmn
     data_ukelele.ArrayOf_SC_MacWin = data_mac_Win
-    console.log("data_ukelele.ArrayOf_VK_US", data_ukelele.ArrayOf_VK_US)
     console.log("data_ukelele.ArrayOf_SC_MacWin", data_ukelele.ArrayOf_SC_MacWin)
 
     return data_ukelele
@@ -511,6 +515,8 @@ console.log("§§§§§§§§§§§§§§§§§§§§§§§§", vk_label_test,"-
 
     // Todo use writefile from elsewhere
     writeFileSync("data/MyResult.kmn", data, { flag: "w" })
+    fs.writeFileSync("data/MyResult_fs.kmn", data, { flag: "w" })
+    //this.callbacks.fs.writeFileSync("data/MyResult_callb_fs.kmn", data) // not usable here since it takes UInt8array data
 
     // ToDo conditions?
     if (data.length > 0)
@@ -523,14 +529,14 @@ console.log("§§§§§§§§§§§§§§§§§§§§§§§§", vk_label_test,"-
 
 
   // 34->"K_A"
-  public find_VK_X_in_ArrayOf_VK_US(vk_in: any, data: any): any {
+  /*public find_VK_X_in_ArrayOf_VK_US(vk_in: any, data: any): any {
     for (let i = 0; i < data.ArrayOf_VK_US.length; i++) {
       if (data.ArrayOf_VK_US[i][0] === vk_in) {
         return data.ArrayOf_VK_US[i][1]
       }
     }
     return
-  }
+  }*/
 
   //   TODO move outside of class?
   /**
