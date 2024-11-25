@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 18.0.144 alpha 2024-11-25
+
+* chore(deps): bump cross-spawn from 7.0.3 to 7.0.6 in /developer/src/server/src/win32/trayicon/addon-src (#12687)
+* chore(developer): make package subfile description fully optional (#12665)
+* fix(developer): box package compiler info fields (#12666)
+* fix(developer): correct whitespace handling in virtual keys and remove partially implemented virtual key series in kmcmplib compiler (#12604)
+
 ## 18.0.143 alpha 2024-11-22
 
 * chore(deps): bump cross-spawn from 7.0.3 to 7.0.6 (#12685)
