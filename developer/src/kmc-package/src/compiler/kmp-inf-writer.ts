@@ -44,7 +44,7 @@ export class KmpInfWriter {
 
     for(let i = 0; i < this.data.files.length; i++) {
       const file = this.data.files[i];
-      this.addString(i.toString(), `"${file.description}","${file.name}",${file.copyLocation??0}`);
+      this.addString(i.toString(), `"${file.description??''}","${file.name}",${file.copyLocation??0}`);
     }
   }
 

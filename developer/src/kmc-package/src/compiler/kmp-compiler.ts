@@ -247,8 +247,8 @@ export class KmpCompiler implements KeymanCompiler {
       kmp.files = kps.Files.File.map((file: KpsFile.KpsFileContentFile) => {
         return {
           name: this.normalizePath(file.Name),
-          description: (file.Description ?? '').trim(),
-          copyLocation: parseInt(file.CopyLocation, 10) || undefined
+          description: '',  // kmp.json still requires description, but we ignore the input Description field
+          // note: we no longer emit copyLocation as of 18.0; it was always optional
           // note: we don't emit fileType as that is not permitted in kmp.json
         };
       });
@@ -270,14 +270,14 @@ export class KmpCompiler implements KeymanCompiler {
     if(kps.Keyboards && kps.Keyboards.Keyboard) {
       kmp.files.push({
         name: KMP_INF_FILENAME,
-        description: "Package information"
+        description: ""
       });
     }
 
     // Add the standard kmp.json self-referential to match existing implementations
     kmp.files.push({
       name: KMP_JSON_FILENAME,
-      description: "Package information (JSON)"
+      description: ""
     });
 
     //
