@@ -126,6 +126,112 @@ bool LdmlTestSource::get_expected_beep() const {
   return false;
 }
 
+int LdmlTestSource::load_kmx_plus(const km::core::path &compiled) {
+    // check and load the KMX (yes, once again)
+  if(!km::core::ldml_processor::is_kmxplus_file(compiled, rawdata)) {
+    std::cerr << "Reading KMX for test purposes failed: " << compiled << std::endl;
+    return __LINE__;
+  }
+
+  auto comp_keyboard = (const km::core::kmx::COMP_KEYBOARD*)rawdata.data();
+  // initialize the kmxplus object with our copy
+  kmxplus.reset(new km::core::kmx::kmx_plus(comp_keyboard, rawdata.size()));
+
+  if (!kmxplus->is_valid()) {
+    std::cerr << "kmx_plus invalid" << std::endl;
+    return __LINE__;
+  }
+
+  if (!kmxplus->key2Helper.valid()) {
+    std::cerr << "kmx_plus invalid" << std::endl;
+    return __LINE__;
+  }
+
+  return 0; // success
+}
+
+bool LdmlTestSource::get_vkey_table(std::vector<km_core_virtual_key> &fillin, uint16_t modifier) const {
+  if (!kmxplus || !kmxplus->is_valid()) {
+    return false; // fail
+  }
+
+  // find the 'touch' id so we can avoid it
+  const std::string hardwareTouchStr(LDML_LAYR_LIST_HARDWARE_TOUCH);
+  const std::u16string hardwareTouch(convert<char, char16_t>(hardwareTouchStr));
+
+  // find the string 'touch' - it may not exist if there's no touch layer.
+  // in which case the ID here will be 0. Otherwise it's a string id.
+  const KMX_DWORD hardwareTouchId = kmxplus->strs->find(hardwareTouch);
+
+  // find the hardware list
+  const km::core::kmx::COMP_KMXPLUS_LAYR_LIST* hwList = nullptr;
+  for (KMX_DWORD listIdx = 0; listIdx < kmxplus->layr->listCount; listIdx++) {
+    const km::core::kmx::COMP_KMXPLUS_LAYR_LIST* list = kmxplus->layrHelper.getList(listIdx);
+    if (list == nullptr) {
+      return false; // hit a bad list
+    }
+
+    if (hardwareTouchId != 0 && list->hardware == hardwareTouchId) {
+      continue; // skip this list, it's the touch list.
+      // (there may not be a touch list.)
+    }
+    hwList = list;
+    break; // found it
+  }
+  if (hwList == nullptr) {
+    return false; // no list available
+  }
+  // now, look for the modifier set.
+  const km::core::kmx::COMP_KMXPLUS_LAYR_ENTRY *entry = nullptr;
+  for (KMX_DWORD layrIdx = 0; layrIdx < hwList->count; layrIdx++) {
+    const km::core::kmx::COMP_KMXPLUS_LAYR_ENTRY *e = kmxplus->layrHelper.getEntry(hwList->layer + layrIdx);
+    if (e != nullptr && e->mod == modifier) {
+      entry = e;
+      break;
+    }
+  }
+  if(entry == nullptr) {
+    return false; // mod not found
+  }
+
+  // now we have the layer with this mod, now get all rows and populate vkeys
+  for (KMX_DWORD rowIdx = 0; rowIdx < entry->count; rowIdx++) {
+    const km::core::kmx::COMP_KMXPLUS_LAYR_ROW *row = kmxplus->layrHelper.getRow(entry->row + rowIdx);
+    if (row == nullptr) {
+      return false;
+    }
+    for (KMX_DWORD keyIdx = 0; keyIdx < row->count; keyIdx++) {
+      const km::core::kmx::COMP_KMXPLUS_LAYR_KEY *rowKey = kmxplus->layrHelper.getKey(row->key + keyIdx);
+      if (rowKey == nullptr) {
+        return false;
+      }
+      // we may not actually need the key but just its ID, but we get it in case
+      KMX_DWORD keyId = 0;
+      const km::core::kmx::COMP_KMXPLUS_KEYS_KEY *key = kmxplus->key2Helper.findKeyByStringId(rowKey->key, keyId);
+      if (key == nullptr) {
+        return false;
+      }
+      // Now, linear search the kmap table looking for the key
+      bool found_kmap = false;
+      for (KMX_DWORD kmapIdx = 0; kmapIdx < kmxplus->key2->kmapCount; kmapIdx++) {
+        const km::core::kmx::COMP_KMXPLUS_KEYS_KMAP *kmap = kmxplus->key2Helper.getKmap(kmapIdx);
+        if (kmap == nullptr) {
+          return false;
+        }
+        if (kmap->key == keyId) {
+          fillin.emplace_back(kmap->vkey);
+          found_kmap = true;
+          break;
+        }
+      }
+      if (!found_kmap) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 // String trim functions from https://stackoverflow.com/a/217605/1836776
 // trim from start (in place)
 static inline void
@@ -263,7 +369,7 @@ LdmlEmbeddedTestSource::is_token(const std::string token, std::string &line) {
 }
 
 int
-LdmlEmbeddedTestSource::load_source( const km::core::path &path ) {
+LdmlEmbeddedTestSource::load_source( const km::core::path &path, const km::core::path &compiled ) {
   const std::string s_keys = "@@keys: ";
   const std::string s_expected = "@@expected: ";
   const std::string s_context = "@@context: ";
@@ -320,7 +426,13 @@ LdmlEmbeddedTestSource::load_source( const km::core::path &path ) {
     return __LINE__;
   }
 
-  return 0;
+  // and load KMX+ for keylist
+  if (!expected_error) {
+    // don't attempt to load KMX+ on expected error
+    return load_kmx_plus(compiled);
+  } else {
+    return 0;
+  }
 }
 
 km_core_status
@@ -466,10 +578,10 @@ LdmlEmbeddedTestSource::parse_next_key(std::string &keys) {
 
 class LdmlJsonTestSource : public LdmlTestSource {
 public:
-  LdmlJsonTestSource(const std::string &path, km::core::kmx::kmx_plus *kmxplus);
+  LdmlJsonTestSource(const std::string &path);
   virtual ~LdmlJsonTestSource();
   virtual const std::u16string &get_context();
-  int load(const nlohmann::json &test);
+  int load(const nlohmann::json &test, const km::core::path &compiled);
   virtual void next_action(ldml_action &fillin);
 private:
   std::string path;
@@ -480,14 +592,13 @@ private:
    * Which action are we on?
   */
   std::size_t action_index = -1;
-  const km::core::kmx::kmx_plus *kmxplus;
   /** @return false if not found */
   bool set_key_from_id(key_event& k, const std::u16string& id);
   bool loaded_context = false;
 };
 
-LdmlJsonTestSource::LdmlJsonTestSource(const std::string &path, km::core::kmx::kmx_plus *k)
-:path(path), kmxplus(k) {
+LdmlJsonTestSource::LdmlJsonTestSource(const std::string &path)
+:path(path) {
 
 }
 
@@ -599,19 +710,21 @@ LdmlJsonTestSource::get_context() {
   return context;
 }
 
-int LdmlJsonTestSource::load(const nlohmann::json &data) {
+int LdmlJsonTestSource::load(const nlohmann::json &data, const km::core::path &compiled) {
   this->data        = data;
-  // TODO-LDML: validate here?
-  return 0;
+  // TODO-LDML: validate JSON here?
+
+  // load up the kmx_plus
+  return load_kmx_plus(compiled);
 }
 
 #if defined(HAVE_ICU4C)
 class LdmlJsonRepertoireTestSource : public LdmlTestSource {
 public:
-  LdmlJsonRepertoireTestSource(const std::string &path, km::core::kmx::kmx_plus *kmxplus);
+  LdmlJsonRepertoireTestSource(const std::string &path );
   virtual ~LdmlJsonRepertoireTestSource();
   virtual const std::u16string &get_context();
-  int load(const nlohmann::json &test);
+  int load(const nlohmann::json &test, const km::core::path &compiled);
   virtual void next_action(ldml_action &fillin);
 private:
   std::string path;
@@ -623,11 +736,10 @@ private:
   std::unique_ptr<icu::UnicodeSet> uset;
   std::unique_ptr<icu::UnicodeSetIterator> iterator;
   bool need_check = false; // set this after each char
-  const km::core::kmx::kmx_plus *kmxplus;
 };
 
-LdmlJsonRepertoireTestSource::LdmlJsonRepertoireTestSource(const std::string &path, km::core::kmx::kmx_plus *k)
-:path(path), kmxplus(k){
+LdmlJsonRepertoireTestSource::LdmlJsonRepertoireTestSource(const std::string &path)
+:path(path) {
 
 }
 
@@ -715,7 +827,7 @@ LdmlJsonRepertoireTestSource::get_context() {
   return context; // no context needed
 }
 
-int LdmlJsonRepertoireTestSource::load(const nlohmann::json &data) {
+int LdmlJsonRepertoireTestSource::load(const nlohmann::json &data, const km::core::path &compiled) {
   this->data = data;  // TODO-LDML
   // Need an update to json.hpp to use contains()
   // if (data.contains("/type"_json_pointer)) {
@@ -746,7 +858,7 @@ int LdmlJsonRepertoireTestSource::load(const nlohmann::json &data) {
   // }
   // #endif
   iterator = std::unique_ptr<icu::UnicodeSetIterator>(new icu::UnicodeSetIterator(*uset));
-  return 0;
+  return load_kmx_plus(compiled);
 }
 #endif // HAVE_ICU4C
 
@@ -770,25 +882,6 @@ int LdmlJsonTestSourceFactory::load(const km::core::path &compiled, const km::co
     return __LINE__; // empty
   }
 
-  // check and load the KMX (yes, once again)
-  if(!km::core::ldml_processor::is_kmxplus_file(compiled, rawdata)) {
-    std::cerr << "Reading KMX for test purposes failed: " << compiled << std::endl;
-    return __LINE__;
-  }
-
-  auto comp_keyboard = (const km::core::kmx::COMP_KEYBOARD*)rawdata.data();
-  // initialize the kmxplus object with our copy
-  kmxplus.reset(new km::core::kmx::kmx_plus(comp_keyboard, rawdata.size()));
-
-  if (!kmxplus->is_valid()) {
-    std::cerr << "kmx_plus invalid" << std::endl;
-    return __LINE__;
-  }
-
-  if (!kmxplus->key2Helper.valid()) {
-    std::cerr << "kmx_plus invalid" << std::endl;
-    return __LINE__;
-  }
 
   auto conformsTo = data["/keyboardTest3/conformsTo"_json_pointer].get<std::string>();
   assert_or_return(std::string(LDML_CLDR_TEST_VERSION_LATEST) == conformsTo);
@@ -811,8 +904,8 @@ int LdmlJsonTestSourceFactory::load(const km::core::path &compiled, const km::co
       test_path.append(info_name).append("/tests/").append(tests_name).append("/").append(test_name);
       // std::cout << "JSON: reading " << info_name << "/" << test_path << std::endl;
 
-      std::unique_ptr<LdmlJsonTestSource> subtest(new LdmlJsonTestSource(test_path, kmxplus.get()));
-      assert_or_return(subtest->load(test) == 0);
+      std::unique_ptr<LdmlJsonTestSource> subtest(new LdmlJsonTestSource(test_path));
+      assert_or_return(subtest->load(test, compiled) == 0);
       test_map[test_path] = std::unique_ptr<LdmlTestSource>(subtest.release());
     }
   }
@@ -827,8 +920,8 @@ int LdmlJsonTestSourceFactory::load(const km::core::path &compiled, const km::co
     std::string test_path;
     test_path.append(info_name).append("/repertoire/").append(rep_name);
 
-    std::unique_ptr<LdmlJsonRepertoireTestSource> reptest(new LdmlJsonRepertoireTestSource(test_path, kmxplus.get()));
-    assert_or_return(reptest->load(rep) == 0);
+    std::unique_ptr<LdmlJsonRepertoireTestSource> reptest(new LdmlJsonRepertoireTestSource(test_path));
+    assert_or_return(reptest->load(rep, compiled) == 0);
     test_map[test_path] = std::unique_ptr<LdmlTestSource>(reptest.release());
   }
 

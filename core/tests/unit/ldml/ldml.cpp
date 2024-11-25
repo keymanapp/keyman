@@ -290,7 +290,7 @@ verify_key_list(std::set<km::tests::key_event> &actual, std::set<km::tests::key_
 }
 
 bool
-verify_key_list(const km_core_keyboard_key *actual_list, const std::u16string &expected_list) {
+verify_key_list(const km_core_keyboard_key *actual_list, const std::u16string &expected_list, const km::tests::LdmlTestSource &test) {
   std::set<km::tests::key_event> actual, expected;
   std::string expected_str = convert<char16_t, char>(expected_list);
   // convert actual list
@@ -301,8 +301,17 @@ verify_key_list(const km_core_keyboard_key *actual_list, const std::u16string &e
   }
   // parse expected_str
   while (!expected_str.empty()) {
+    // we ignore the vkey here, just need modifier state
     km::tests::key_event event = km::tests::LdmlEmbeddedTestSource::parse_next_key(expected_str);
-    expected.insert(event);
+    auto modifier = event.modifier_state;
+
+    // now, fetch the keylist from KMX+
+    std::vector<km_core_virtual_key> keys;
+    assert(test.get_vkey_table(keys, modifier));
+    for(const km_core_virtual_key vkey : keys) {
+      // list of vkeys -> list of events
+      expected.emplace(vkey, modifier);
+    }
   }
   return verify_key_list(actual, expected);
 }
@@ -416,7 +425,7 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
       std::cout << "- checking keylist " << action.string << std::endl;
       // get keylist from kbd
       const km_core_keyboard_key* actual_list = test_kb->get_key_list();
-      if (!verify_key_list(actual_list, action.string)) {
+      if (!verify_key_list(actual_list, action.string, test_source)) {
         errorLine = __LINE__;
       } else {
         std::cout << " .. matches." << std::endl;
@@ -473,7 +482,7 @@ int run_all_tests(const km::core::path &source, const km::core::path &compiled, 
 
   std::vector<std::string> failures; // track failures for summary
 
-  int embedded_result = embedded_test_source.load_source(source);
+  int embedded_result = embedded_test_source.load_source(source, compiled);
 
   if (!filter.empty()) {
     // Always skip the embedded test if there's a filter.

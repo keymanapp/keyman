@@ -109,6 +109,13 @@ public:
   virtual km_core_status get_expected_load_status();
   virtual const std::u16string &get_context() = 0;
   virtual bool get_expected_beep() const;
+  /**
+   * fillin a list
+   * @param fillin key list to be filled in with all vkeys in the hardware map.
+   * @param modifier modifier to load key list for
+   * @returns false on load fail, true on OK
+   */
+  bool get_vkey_table(std::vector<km_core_virtual_key> &fillin, uint16_t modifier) const;
 
   // helper functions
   static key_event char_to_event(char ch);
@@ -134,6 +141,12 @@ private:
 
 private:
   bool _caps_lock_on = false;
+protected:
+  /** populate rawdata and kmxplus */
+  int load_kmx_plus(const km::core::path &compiled);
+  // copy of the kbd data, for lookups
+  std::vector<uint8_t> rawdata;
+  std::unique_ptr<km::core::kmx::kmx_plus> kmxplus;
 };
 
 typedef std::map<std::string, std::unique_ptr<km::tests::LdmlTestSource>> JsonTestMap;
@@ -152,9 +165,6 @@ class LdmlJsonTestSourceFactory {
     const JsonTestMap& get_tests() const;
   private:
     JsonTestMap test_map;
-    // copy of the kbd data, for lookups
-    std::vector<uint8_t> rawdata;
-    std::unique_ptr<km::core::kmx::kmx_plus> kmxplus;
 };
 
 
@@ -166,7 +176,7 @@ public:
   /**
    * Load the test_source from comments in the .xml source
    */
-  int load_source(const km::core::path &path);
+  int load_source(const km::core::path &path, const km::core::path &compiled);
 
   virtual km_core_status get_expected_load_status();
   virtual const std::u16string &get_context();
