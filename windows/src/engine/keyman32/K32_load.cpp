@@ -89,8 +89,8 @@ BOOL LoadlpKeyboard(int i)
   void* buffer = nullptr;
   errno_t status = fopen_s(&kmx_file, kmx_filename, "rb");
 
-  if (!status) {
-    SendDebugMessageFormat("Problem reading opening kmx_file %s status [%d].", kmx_filename, status);
+  if (status) {
+    SendDebugMessageFormat("Problem opening kmx_file %s status [%d].", kmx_filename, status);
     return_SendDebugExit(FALSE);
   }
 
