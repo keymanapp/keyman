@@ -2127,7 +2127,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       q = (PKMX_WCHAR) u16chr(p + 1, '\"');
       if (!q) return KmnCompilerMessages::ERROR_UnterminatedString;
       if ((int)(q - p) - 1 + mx > max) return KmnCompilerMessages::ERROR_ExtendedStringTooLong;
-      if (sFlag) return KmnCompilerMessages::ERROR_StringInVirtualKeySection;
       u16ncat(tstr,  p + 1, (int)(q - p) - 1);  // I3481
       mx += (int)(q - p) - 1;
       tstr[mx] = 0;
@@ -2137,7 +2136,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       q = (PKMX_WCHAR) u16chr(p + 1, '\'');
       if (!q) return KmnCompilerMessages::ERROR_UnterminatedString;
       if ((int)(q - p) - 1 + mx > max) return KmnCompilerMessages::ERROR_ExtendedStringTooLong;
-      if (sFlag) return KmnCompilerMessages::ERROR_StringInVirtualKeySection;
       u16ncat(tstr,  p + 1, (int)(q - p) - 1);  // I3481
       mx += (int)(q - p) - 1;
       tstr[mx] = 0;
@@ -2145,7 +2143,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       continue;
     case 3:
       if (u16nicmp(p, u"any", 3) != 0) return KmnCompilerMessages::ERROR_InvalidToken;
-      if (sFlag) return KmnCompilerMessages::ERROR_AnyInVirtualKeySection;
       p += 3;
       q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
       if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidAny;
@@ -2167,7 +2164,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     case 4:
       if (u16nicmp(p, u"beep", 4) == 0)
       {
-        if (sFlag) return KmnCompilerMessages::ERROR_BeepInVirtualKeySection;
         p += 4;
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_BEEP;
@@ -2178,7 +2174,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         if(!VerifyKeyboardVersion(fk, VERSION_90)) {
           return KmnCompilerMessages::ERROR_90FeatureOnly_IfSystemStores;
         }
-        if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
         p += 10;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
         if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidToken;
@@ -2195,7 +2190,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         if(!VerifyKeyboardVersion(fk, VERSION_80)) {
           return KmnCompilerMessages::ERROR_80FeatureOnly;
         }
-        if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
         p += 2;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
         if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidIf;
@@ -2206,7 +2200,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       else
       {
         if (u16nicmp(p, u"index", 5) != 0) return KmnCompilerMessages::ERROR_InvalidToken;
-        if (sFlag) return KmnCompilerMessages::ERROR_IndexInVirtualKeySection;
         p += 5;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
 
@@ -2241,7 +2234,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       continue;
     case 6:
       if (u16nicmp(p, u"outs", 4) != 0) return KmnCompilerMessages::ERROR_InvalidToken;
-      if (sFlag) return KmnCompilerMessages::ERROR_OutsInVirtualKeySection;
       p += 4;
       q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
       if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidOuts;
@@ -2267,7 +2259,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       if (iswspace(*(p + 1))) break;		// is a comment -- pre-stripped - so why this test?
       if (u16nicmp(p, u"context", 7) == 0)
       {
-        if (sFlag) return KmnCompilerMessages::ERROR_ContextInVirtualKeySection;
         p += 7;
 
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -2303,7 +2294,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         if(!VerifyKeyboardVersion(fk, VERSION_501)) {
           return KmnCompilerMessages::ERROR_501FeatureOnly_Call;
         }
-        if (sFlag) return KmnCompilerMessages::ERROR_CallInVirtualKeySection;
         p += 4;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
         if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidCall;
@@ -2333,7 +2323,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         if(!VerifyKeyboardVersion(fk, VERSION_70)) {
           return KmnCompilerMessages::ERROR_70FeatureOnly;
         }
-        if (sFlag) return KmnCompilerMessages::ERROR_AnyInVirtualKeySection;
         p += 6;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
         if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidAny;
@@ -2391,7 +2380,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         if(!VerifyKeyboardVersion(fk, VERSION_80)) {
           return KmnCompilerMessages::ERROR_80FeatureOnly;
         }
-        if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
         p += 5;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
         if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidReset;
@@ -2649,7 +2637,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       if(!VerifyKeyboardVersion(fk, VERSION_90)) {
         return KmnCompilerMessages::ERROR_90FeatureOnly_IfSystemStores;
       }
-      if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
       p += 8;
       q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
       if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidToken;
@@ -2661,7 +2648,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       if(!VerifyKeyboardVersion(fk, VERSION_90)) {
         return KmnCompilerMessages::ERROR_90FeatureOnly_SetSystemStores;
       }
-      if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
       p += 5;
       q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
       if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidToken;
@@ -2670,7 +2656,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       continue;
     case 19:  // #2241
       if (*(p + 1) != '.') return KmnCompilerMessages::ERROR_InvalidToken;
-      if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
       p += 2;
       err = process_expansion(fk, p, tstr, &mx, max);
       if (err != STATUS_Success) return err;
