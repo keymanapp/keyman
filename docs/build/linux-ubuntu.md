@@ -70,8 +70,21 @@ git clone https://github.com/emscripten-core/emsdk.git
 cd emsdk
 ./emsdk install 3.1.58
 ./emsdk activate 3.1.58
+cd upstream/emscripten
+npm install
 export EMSCRIPTEN_BASE="$(pwd)/upstream/emscripten"
 echo "export EMSCRIPTEN_BASE=\"$EMSCRIPTEN_BASE\"" >> .bashrc
+```
+
+If you are updating an existing install of Emscripten:
+
+```bash
+cd emsdk
+git pull
+./emsdk install 3.1.58
+./emsdk activate 3.1.58
+cd upstream/emscripten
+npm install
 ```
 
 > ![WARNING]
