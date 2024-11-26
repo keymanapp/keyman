@@ -7,7 +7,8 @@ import { CompilerCallbacks, CompilerOptions } from "@keymanapp/developer-utils";
 import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 
 // TODO keylayout->kmn
-
+//modifiers: The identifier of the <modifierMap> element to use for this range of hardware keyboard types.
+//defaultIndex: The table number to use for modifier key combinations which are not explicitly specified by any <modifier> element within the <modifierMap>.
 // write read, convert, write
 // tests for 3 functions read write convert
 // add data to object
@@ -52,8 +53,8 @@ export class KeylayoutToKmnConverter {
   static readonly OUTPUT_FILE_EXTENSION = '.kmn';
 
   // TODO use callbacks
-  //constructor(/*private*/ _callbacks: CompilerCallbacks, /*private*/ _options: CompilerOptions) {
-  constructor(private callbacks: CompilerCallbacks, /*private*/ _options: CompilerOptions) {
+  constructor(/*private*/ _callbacks: CompilerCallbacks, /*private*/ _options: CompilerOptions) {
+ // constructor(private callbacks: CompilerCallbacks, /*private*/ _options: CompilerOptions) {
     // TODO: if these are needed, uncomment /*private*/ and remove _, and they will then
     // be available as class properties
   }
@@ -116,9 +117,9 @@ export class KeylayoutToKmnConverter {
     const xmlFile = readFileSync((process.cwd() + "\\data" + filename.substring(filename.lastIndexOf("\\"))).replace(" ", ""), 'utf8');
 
     // we don`t need file-read with uint8array return
-    const fullPath = (process.cwd() + "\\data" + filename.substring(filename.lastIndexOf("\\"))).replace(" ", "")
+    /*const fullPath = (process.cwd() + "\\data" + filename.substring(filename.lastIndexOf("\\"))).replace(" ", "")
     const xmlFile1 = this.callbacks.loadFile(fullPath)
-    console.log("xmlFile1",xmlFile1)
+    console.log("xmlFile1",xmlFile1)*/
     //console.log("xmlFile",xmlFile)
 
     const parser = new XMLParser(options);
@@ -274,13 +275,14 @@ export class KeylayoutToKmnConverter {
       ArrayOf_Modifiers: modifier_array,
       //ArrayOf_VK_US: "",
       ArrayOf_SC_MacWin: "",
+      ArrayOf_VK_DirectFromUku: "",
       ArrayOf_dk: dk_pairs_all_Layers,                  // add dk-mapping ( dk1 <-> '^' )
       ArrayOf_Dk: dk,                                   // add plain dk ( '^', '´','`')
       ArrayOf_deadkeyables: deadkeyables_all_Layers,               // add char that can be modified with dk ( a,e,i,o,u)
       ArrayOf_deadkeyedChar: deadkeyedChars_all_Layers,  // add modified keys ( â,ê,î,ô,û)
       ArrayOf_Terminators: terminators_all_Layers  // add terminators ( ^,´,`)
     };
-    console.log("DataObject", DataObject)
+    //console.log("DataObject", DataObject)
     // TODO review condition
     return DataObject
     return ((data_output_all_Layers.length === nrOfStates + 5) && data_output_all_Layers[0].length === nrOfKeys_inLayer) ? data_output_all_Layers : null;
@@ -294,7 +296,7 @@ export class KeylayoutToKmnConverter {
   public convert(data_ukelele: any): any {
 
     // TODO remove
-    const kmn_Key_Name1 = [
+   /* const kmn_Key_Name1 = [
       'K_BKSP', 'K_TAB', 'K_ENTER', 'K_SHIFT', 'K_CONTROL', 'K_ALT', 'K_PAUSE', 'K_CAPS',  //7
       'K_ESC', 'K_SPACE', 'K_PGUP', 'K_PGDN', 'K_END', 'K_HOME', 'K_LEFT', 'K_UP', 'K_RIGHT', //16
       'K_DOWN', 'K_SEL', 'K_PRINT', 'K_EXEC', 'K_INS', 'K_DEL', 'K_HELP',   //23
@@ -317,31 +319,64 @@ export class KeylayoutToKmnConverter {
       'K_LALT', 'K_RALT',     //95
 
       'K_COLON', 'K_EQUAL', 'K_COMMA', 'K_HYPHEN',    //99
-      'K_PERIOD', 'K_SLASH', 'K_BKQUOTE', 'K_LBRKT', 'K_RBRKT',    //104
-    ]
+      'K_PERIOD', 'K_SLASH', 'K_BKQUOTE', 'K_LBRKT', 'K_RBRKT',  K_QUOTE  //105
+    ]*/
+
+    const data_VKUS: any[][] = [];
+    const data_kmn: any[][] = [];
+
+    /*const data_kmn_pair: any[] = [];
+    const data_VKUS_pos_pair: any[] = [];*/
+
+   /* const data_VK_US_K_pair: any[] = [];
+    const data_VK_US_K_: any[][] = [];*/
 
     const data_mac_Win: any[][] = [];
+    const data_vk_directfromUku: any[][] = [];
 
+    
     // use UkeleleKeyCodeToScanCodes !!!
     for (let i = 0; i < data_ukelele.ArrayOf_Ukelele_output[0].length; i++) {
+
       const data_mac_US_pair: any[] = [];
-      const keyName = kmn_Key_Name1[this.map_UkeleleKC_To_kmn_Key_Name_Array_Position_n(i)]
-      /*const secondName= UkeleleScanToUSVirtualKeyCodes(i)
-const kS = Constants.CLDRScanToUSVirtualKeyCodes
+      const data_vk_directfromUku_pair: any[] = [];
 
-Constants.UkeleleScanToUSVirtualKeyCodes
-      console.log("secondName",secondName)*/
-      data_mac_US_pair.push(i)
-      data_mac_US_pair.push(keyName)
+    const Name_Array_Pos = this.map_UkeleleKC_To_kmn_Key_Name_Array_Position_n(i)
+    const keyName1 = this.map_UkeleleKC_To_kmn_Key_Name_Array_Position_new(Name_Array_Pos)
 
-
+    const nr_Win = this.map_UkeleleKC_To_Win_KC(i)
+    const keyName2 = this.map_UkeleleKC_To_kmn_Key_Name_Array_Position_new_2(nr_Win)
+   // const keyName = this.map_UkeleleKC_To_kmn_Key_Name_Array_Position_new(nr_Win)
+     // console.log("i",i,"nr_Win",nr_Win,"keyName",keyName)
       // data_mac_US_pair.push(this.map_UkeleleKC_To_Win_KC(i))
+
+    console.log("i",i, " -- nr_Win",nr_Win, " -- keyName","-",keyName1, Name_Array_Pos, "!!!",i, keyName2 )
+      data_mac_US_pair.push(nr_Win)
+      data_mac_US_pair.push(keyName1)  // this gives the part: K_A
       data_mac_Win.push(data_mac_US_pair)
+
+
+      const vk_from_Ukelele = this.map_UkeleleKC_To_VK(i)
+      data_vk_directfromUku_pair.push(i)
+      data_vk_directfromUku_pair.push(vk_from_Ukelele)
+      data_vk_directfromUku.push(data_vk_directfromUku_pair)
+
+
+      // write    0 - K_A
+      /*  data_VK_US_K_pair.push(i)
+      data_VK_US_K_pair.push(keyName)
+      data_VK_US_K_.push(data_VK_US_K_pair)
+    //console.log("data_VK_US_K_pair",data_VK_US_K_pair)*/
     }
 
-    //data_ukelele.ArrayOf_Kmn = data_kmn
+    console.log("data_vk_directfromUku",data_vk_directfromUku)
+    //  console.log(".....data_mac_Win",data_mac_Win)
+    data_ukelele.ArrayOf_VK_US = data_VKUS
+    data_ukelele.ArrayOf_Kmn = data_kmn
     data_ukelele.ArrayOf_SC_MacWin = data_mac_Win
-    console.log("data_ukelele.ArrayOf_SC_MacWin", data_ukelele.ArrayOf_SC_MacWin)
+    data_ukelele.ArrayOf_VK_DirectFromUku = data_vk_directfromUku
+
+  //  console.log("data_ukelele.ArrayOf_SC_MacWin", data_ukelele.ArrayOf_SC_MacWin)
 
     return data_ukelele
   }
@@ -379,6 +414,8 @@ Constants.UkeleleScanToUSVirtualKeyCodes
       'K_COLON', 'K_EQUAL', 'K_COMMA', 'K_HYPHEN',    //97
       'K_PERIOD', 'K_SLASH', 'K_BKQUOTE', 'K_LBRKT',    //101
     ]*/
+
+      console.log("ArrayOf_VK_DirectFromUku",kmn_array.ArrayOf_VK_DirectFromUku )
 
     //  *************************************************************
     //  **** write stores *******************************************
@@ -441,11 +478,10 @@ console.log("§§§§§§§§§§§§§§§§§§§§§§§§", vk_label_test,"-
     if (filteredModifiers.indexOf("caps") >= 0)
       isCAPSused = true
 
-
     // TODO good explanation
     // find all modifiers used per modifier combination
     // find resulting character from
-
+  // todo magic 50
     // loop through keys
     //for (let j = 0; j <kmn_array.ArrayOf_Ukelele_output[0].length; j++) {
     for (let j = 0; j < 50; j++) {
@@ -458,11 +494,15 @@ console.log("§§§§§§§§§§§§§§§§§§§§§§§§", vk_label_test,"-
         const label_modifier = this.create_modifier(kmn_array.ArrayOf_Modifiers[i], isCAPSused)
 
         // get the character from keymap-section of .keylayout-file that will be written as result in kmn-file
-        const resulting_character = new TextDecoder().decode(kmn_array.ArrayOf_Ukelele_output[i][j])
 
+        const resulting_character = new TextDecoder().decode(kmn_array.ArrayOf_Ukelele_output[i][j])
+        //const resulting_character = new TextDecoder().decode(kmn_array.ArrayOf_VK_DirectFromUku[i][j])
+//console.log("j",j,"-",i,"resulting_character",resulting_character )
         // get the VK_ - label
-        const VK: number[][] = kmn_array.ArrayOf_SC_MacWin
-        const vk_label = VK.filter(item => item[0] === kmn_array.ArrayOf_SC_MacWin[j][0])
+       // const VK: number[][] = kmn_array.ArrayOf_SC_MacWin
+       // const vk_label = VK.filter(item => item[0] === kmn_array.ArrayOf_SC_MacWin[j][0])
+        const VK: number[][] = kmn_array.ArrayOf_VK_DirectFromUku
+        const vk_label = VK.filter(item => item[0] === kmn_array.ArrayOf_VK_DirectFromUku[j][0])
 
         // TODO remove j
         if (resulting_character !== '')
@@ -660,18 +700,37 @@ console.log("§§§§§§§§§§§§§§§§§§§§§§§§", vk_label_test,"-
     if (pos === 26) return 31   //  7
     if (pos === 28) return 32   //  8
     if (pos === 25) return 33   //  9
-    if (pos === 29) return 34   //  0
+    if (pos === 29) return 24   //  0
     if (pos === 24) return 97   //  ´ EQUAL
     if (pos === 10) return 102   // ^ BKQUOTE
     if (pos === 33) return 103   // [ LBKT
-    if (pos === 30) return 104   // ] RBKT
+    if (pos === 50) return 104   // \ BKSLASH
+    if (pos === 30) return 105   // ] RBKT
+    if (pos === 44) return 101    // / SLASH
+    if (pos === 43) return 98    // , COMMA
+    if (pos === 27) return 99    // ß HYPHEN
+    if (pos === 36) return 2     // , SPACE  K_ENTER
+    if (pos === 39) return 106    // , QUOTE
+    if (pos === 41) return 96    // : COLON
+    if (pos === 47) return 100    // : PERIOD
 
 
     /*if (pos === 187) return 100   //  ^
     if (pos === 192) return 95   //  ´*/
 
 
-    return
+    return 999
+  }
+  public map_UkeleleKC_To_kmn_Key_Name_Array_Position_new(pos: any): any {
+    const firstKey = Object.keys(k)[pos]
+    //console.log("pos",pos, firstKey)
+    return firstKey
+  }
+
+  public map_UkeleleKC_To_kmn_Key_Name_Array_Position_new_2(pos: any): any {
+    const firstKey = Object.keys(kk)[pos]
+    console.log("pos",pos, firstKey)
+    return firstKey
   }
 
   /**
@@ -683,39 +742,71 @@ console.log("§§§§§§§§§§§§§§§§§§§§§§§§", vk_label_test,"-
   public map_UkeleleKC_To_Win_KC(pos: any): any {
     // ukelele KC  -->  // kmn win KC
 
-    if (pos === 0x06) return 0x2D   /* z,        /*   */
-    if (pos === 0x07) return 0x2E   /* X,        /*   */
-    if (pos === 0x08) return 0x2E   /* C,        /*   */
-    if (pos === 0x09) return 0x2F   /* V,        /*   */
-    if (pos === 0x0B) return 0x30   /* B,        /*   */
-    if (pos === 0x2D) return 0x31   /* N,        /*   */
-    if (pos === 0x2E) return 0x32   /* M,        /*   */
+    if (pos === 0x0A) return 0x29   /* ^,        /*--*/
+    if (pos === 0x12) return 0x02   /* 1,        /*--*/
+    if (pos === 0x13) return 0x03   /* 2,        /*--*/
+    if (pos === 0x14) return 0x04   /* 3,        /*--*/
+    if (pos === 0x15) return 0x05   /* 4,        /*--*/
+    if (pos === 0x17) return 0x06   /* 5,        /*--*/
+    if (pos === 0x16) return 0x07   /* 6,        /*--*/
+    if (pos === 0x1A) return 0x08   /* 7,        /*  */
+    if (pos === 0x1C) return 0x09   /* 8,        /* 28 */
+    if (pos === 0x19) return 0x0A   /* 9,        /* 25 */
+    if (pos === 0x1D) return 11   /* 0,        /*   29*/
+    if (pos === 0x1B) return 12   /* ß,        /*27 HYPHEN   */
+    if (pos === 0x18) return 0x0D   /* ´,        / *EQUAL   */
 
+    if (pos === 0x0C) return 0x10   /* Q,        /* 12  */
+    if (pos === 0x0D) return 0x11   /* W,        /* 13  */
+    if (pos === 0x0E) return 0x12   /* E,        /* 14  */
+    if (pos === 0x0F) return 0x13   /* R,        /* 15  */
+    if (pos === 0x11) return 0x14   /* T,        /* 17  */
+    if (pos === 0x10) return 0x15   /* Y,        /* 16  */
+    if (pos === 0x20) return 0x16   /* U,        /* 32  */
+    if (pos === 0x22) return 0x17   /* I,        /*  4  */
+    if (pos === 0x1F) return 0x18   /* O,        /* 31  */
+    if (pos === 0x23) return 0x19   /* P,        /* 35  */
+    if (pos === 0x21) return 0x1A   /* Ü,        /* LBRKT  */
+    if (pos === 0x1E) return 0x1B   /* +,        /* RBRKT  */
+    if (pos === 0x32) return 0x2B   /* +,        /* BKSLASH  */
 
-    if (pos === 0x00) return 0x1E   /* A,        /*   */
-    if (pos === 0x01) return 0x1F   /* S,        /*   */
-    if (pos === 0x02) return 0x20   /* D,        /*   */
-    if (pos === 0x03) return 0x21   /* F,        /*   */
-    if (pos === 0x05) return 0x22   /* G,        /*   */
-    if (pos === 0x04) return 0x23   /* H,        /*   */
+    if (pos === 0x00) return 0x1E   /* A,        /*--*/
+    if (pos === 0x01) return 0x1F   /* S,        /*--*/
+    if (pos === 0x02) return 0x20   /* D,        /*--*/
+    if (pos === 0x03) return 0x21   /* F,        /*--*/
+    if (pos === 0x05) return 0x22   /* G,        /*--*/
+    if (pos === 0x04) return 0x23   /* H,        /*--*/
     if (pos === 0x26) return 0x24   /* J,        /*  */
     if (pos === 0x28) return 0x25   /* K,        /*  */
     if (pos === 0x25) return 0x26   /* L,        /*  */
+    if (pos === 0x29) return 0x27   /* Ö,        /* COLON  */
+    if (pos === 0x27) return 40   /* Ä,        /* QUOTE  */
+
+    if (pos === 0x23) return 0x19   /* Ü,        /* OE2  */
+    if (pos === 0x06) return 0x2C   /* Z,        /*--*/
+    if (pos === 0x07) return 0x2D   /* X,        /*--*/
+    if (pos === 0x08) return 0x2E   /* C,        /*--*/
+    if (pos === 0x09) return 0x2F   /* V,        /*--*/
+    if (pos === 0x0B) return 0x30   /* B,        /*--*/
+    if (pos === 0x2D) return 0x31   /* N,        /*--*/
+    if (pos === 0x2E) return 0x32   /* M,        /*--*/
+    if (pos === 36) return  28   /* ENTER,*/
+
+    if (pos === 47) return  52   /*  ,*/
+    if (pos === 35) return 25   /* +,        /* PERIOD  */
+    if (pos === 43) return 51   /* Ü,        /* COMMA  */
+    if (pos === 44) return 53   /* Ü,        /* SLASH  */
+    if (pos === 49) return  57   /* SPACE,*/
+
+     // if (pos === 0x23) return 0x19   /* +,        /* KC01  */
+
+
     /* 0x29) return  0x   /* COLON,
      if (pos === 0x27) return  0x   /* QUOTE,
      if (pos === 0x2A) return  0x   /* BKQUOTE,          /* 192  */  // changed
     /*
       if (pos === 0x32) return  0x   /* BKSLASH,    /* ???*/
-    if (pos === 0x0C) return 0x10    /*   Q,        /* 12  */
-    if (pos === 0x0D) return 0x11    /*   W,        /* 13  */
-    if (pos === 0x0E) return 0x12    /*   E,        /* 14  */
-    if (pos === 0x0F) return 0x13    /*   R,        /* 15  */
-    if (pos === 0x11) return 0x14    /*   T,        /* 17  */
-    if (pos === 0x10) return 0x15    /*   Y,        /* 16  */
-    if (pos === 0x20) return 0x16    /*   U,        /* 32  */
-    if (pos === 0x22) return 0x17    /*   I,        /* 4  */
-    if (pos === 0x1F) return 0x18    /*   O,        /* 31  */
-    if (pos === 0x23) return 0x19    /*   P,        /* 35  */
+
     /* if (pos === 0x21) return  k.K_LBRKT,
      if (pos === 0x1E) return  k.K_RBRKT,/*
 
@@ -724,13 +815,71 @@ console.log("§§§§§§§§§§§§§§§§§§§§§§§§", vk_label_test,"-
      if (pos === 0x2F) return  0x   /* PERIOD,
      if (pos === 0x2C) return  0x   /* SLASH,
 
-     if (pos === 0x31) return  0x   /* SPACE,
 
      if (pos === 0x56) return  0x   /* oE2, // 86 << Same as 0x7D; found on iso, abnt2
      if (pos === 0x73) return  0x   /* oC1,
      if (pos === 0x7D) return  0x   /* oE2, // << Same as 0x56; found on jis
    */
 
+  }
+  // TODO finish all entries
+  public map_UkeleleKC_To_VK(pos: any): any {
+    // ukelele KC  -->  // VK_US
+
+    if (pos === 0x0A) return "K_BKQUOTE"   /* ^,        /*--*/
+    if (pos === 0x12) return "K_1"   /* 1,        /*--*/
+    if (pos === 0x13) return "K_2"   /* 2,        /*--*/
+    if (pos === 0x14) return "K_3"   /* 3,        /*--*/
+    if (pos === 0x15) return "K_4"   /* 4,        /*--*/
+    if (pos === 0x17) return "K_5"   /* 5,        /*--*/
+    if (pos === 0x16) return "K_6"   /* 6,        /*--*/
+    if (pos === 0x1A) return "K_7"   /* 7,     "   /*  */
+    if (pos === 0x1C) return "K_8"   /* 8,     "   /* 28 */
+    if (pos === 0x19) return "K_9"   /* 9,     "   /* 25 */
+    if (pos === 0x1D) return "K_0"   /* 0,     "   /*   29*/
+    if (pos === 0x1B) return "K_HYPHEN"   /* ß,        /*27 HYPHEN   */
+    if (pos === 0x18) return "K_EQUAL"   /* ´,        / *EQUAL   */
+
+    if (pos === 0x0C) return "K_Q"   /* Q,     "   /* 12  */
+    if (pos === 0x0D) return "K_W"   /* W,     "   /* 13  */
+    if (pos === 0x0E) return "K_E"   /* E,     "   /* 14  */
+    if (pos === 0x0F) return "K_R"   /* R,     "   /* 15  */
+    if (pos === 0x11) return "K_T"   /* T,     "   /* 17  */
+    if (pos === 0x10) return "K_Y"   /* Y,     "   /* 16  */
+    if (pos === 0x20) return "K_U"   /* U,     "   /* 32  */
+    if (pos === 0x22) return "K_I"   /* I,     "   /*  4  */
+    if (pos === 0x1F) return "K_O"   /* O,     "   /* 31  */
+    if (pos === 0x23) return "K_P"   /* P,     "   /* 35  */
+    if (pos === 0x21) return "K_LBRKT"   /* Ü,     "   /* LBRKT  */
+    if (pos === 0x1E) return "K_RBRKT"   /* +,     "   /* RBRKT  */
+    if (pos === 0x32) return "K_BKSLASH"   /* +,     "   /* BKSLASH  */
+
+    if (pos === 0x00) return "K_A"   /* A,        /*--*/
+    if (pos === 0x01) return "K_S"   /* S,        /*--*/
+    if (pos === 0x02) return "K_D"   /* D,        /*--*/
+    if (pos === 0x03) return "K_F"   /* F,        /*--*/
+    if (pos === 0x05) return "K_G"   /* G,        /*--*/
+    if (pos === 0x04) return "K_H"   /* H,        /*--*/
+    if (pos === 0x26) return "K_J"   /* J,     "   /*  */
+    if (pos === 0x28) return "K_K"   /* K,     "   /*  */
+    if (pos === 0x25) return "K_L"   /* L,     "   /*  */
+    if (pos === 0x29) return "K_COLON"   /* Ö,     "   /* COLON  */
+    if (pos === 0x27) return "K_QUOTE"   /* Ä,     "   /* QUOTE  */
+
+    if (pos === 0x23) return "K_oE2"   /* |,     "   /* OE2  */
+    if (pos === 0x06) return "K_Z"   /* Z,        /*--*/
+    if (pos === 0x07) return "K_X"   /* X,        /*--*/
+    if (pos === 0x08) return "K_C"   /* C,        /*--*/
+    if (pos === 0x09) return "K_V"   /* V,        /*--*/
+    if (pos === 0x0B) return "K_B"   /* B,        /*--*/
+    if (pos === 0x2D) return "K_N"   /* N,        /*--*/
+    if (pos === 0x2E) return "K_M"   /* M,        /*--*/
+    if (pos === 43) return "K_COMMA"   /* Ü,     "   /* COMMA  */
+    if (pos === 47) return "K_PERIOD"   /*  ,*/
+    if (pos === 44) return "K_SLASH"   /* Ü,     "   /* SLASH  */
+
+    if (pos === 36) return "K_ENTER"   /* ENTER,*/
+    if (pos === 49) return "K_SPACE"   /* SPACE,*/
   }
 
   // _S2 can probably go
@@ -1096,6 +1245,7 @@ export const UkeleleScanToUSVirtualKeyCodes = {
 
 };
 
+const kk = UkeleleScanToUSVirtualKeyCodes;
 // _S2 can probably go
 /*
 export const UkeleleKeyCodeToScanCodes = {
