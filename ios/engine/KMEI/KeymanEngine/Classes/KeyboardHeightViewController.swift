@@ -394,21 +394,13 @@ class KeyboardHeightViewController: UIViewController {
   func updateKeyboardImage() {
     var kbImage: UIImage? = nil
     if (self.isPortrait) {
-      kbImage = UIImage(named:"osk.portrait")
+      kbImage = UIImage(named:"keyboard.compact", in:Resources.bundle, compatibleWith:nil)
     } else {
-      kbImage = UIImage(named: "landscape-dark-keyboard.png",
-                                    in: Resources.bundle,
-                                    compatibleWith: nil)
-      /*
-      kbImage = UIImage(named: "landscape-dark-keyboard.png",
-                                    in: Bundle.main,
-                                    compatibleWith: nil)
-      //kbImage = UIImage(named:"osk.landscape")
-       */
+      kbImage = UIImage(named:"keyboard.regular", in:Resources.bundle, compatibleWith:nil)
     }
     keyboardImage.image = kbImage
 
-    let kbImageMessage = "   viewDidLoad,  kbImage: \(String(describing: kbImage))"
+    let kbImageMessage = "updateKeyboardImage,  kbImage: \(String(describing: kbImage))"
     os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, kbImageMessage)
   }
 
@@ -431,6 +423,15 @@ class KeyboardHeightViewController: UIViewController {
     }
     self.view.setNeedsLayout()
   }
+
+  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+       super.traitCollectionDidChange(previousTraitCollection)
+       if (traitCollection.userInterfaceStyle == .dark) {
+         os_log("keyboardHeight traitCollectionDidChange to .dark", log:KeymanEngineLogger.ui, type: .info)
+       } else {
+         os_log("keyboardHeight traitCollectionDidChange to .light", log:KeymanEngineLogger.ui, type: .info)
+       }
+   }
 
   required public init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
