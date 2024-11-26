@@ -22,10 +22,10 @@
   "files": [
     {
       "name": "example.qaa.sencoten.model.js",
-      "description": "Lexical model example.qaa.sencoten.model.js"
+      "description": ""
     },
     {
-      "description": "Package information (JSON)",
+      "description": "",
       "name": "kmp.json"
     }
   ],

@@ -1,5 +1,7 @@
 # Contributing to Keyman
 
+(Keyman team members, see also the [onboarding](https://docs.google.com/document/d/1i6fBi9K38-LitcJZiRfAvRu1-7H0iQ_op5kxDMdhSec/edit?usp=sharing) doc)
+
 ⭐ Thank you for your contribution! ⭐
 
 The following is a set of guidelines for contributing to Keyman, Keyman
