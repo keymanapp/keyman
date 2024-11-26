@@ -72,7 +72,7 @@ cd emsdk
 ./emsdk activate 3.1.58
 cd upstream/emscripten
 npm install
-export EMSCRIPTEN_BASE="$(pwd)/upstream/emscripten"
+export EMSCRIPTEN_BASE="$(pwd)"
 echo "export EMSCRIPTEN_BASE=\"$EMSCRIPTEN_BASE\"" >> .bashrc
 ```
 
