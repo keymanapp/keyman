@@ -10,7 +10,6 @@
     "allowSyntheticDefaultImports": true
   },
   "include": [
-    "**/test-*.ts",
     "**/*.tests.ts",
     "./helpers/*.ts",
   ],
