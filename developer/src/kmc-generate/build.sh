@@ -37,11 +37,18 @@ do_build() {
 }
 
 do_test() {
+  local MOCHA_FLAGS=
+
+  if [[ "${TEAMCITY_GIT_PATH:-}" != "" ]]; then
+    # we're running in TeamCity
+    MOCHA_FLAGS="-reporter mocha-teamcity-reporter"
+  fi
+
   eslint .
   cd test
   tsc --build
   cd ..
-  c8 --reporter=lcov --reporter=text mocha "${builder_extra_params[@]}"
+  c8 --reporter=lcov --reporter=text mocha ${MOCHA_FLAGS} "${builder_extra_params[@]}"
 }
 
 builder_run_action clean      rm -rf ./build/ ./tsconfig.tsbuildinfo
