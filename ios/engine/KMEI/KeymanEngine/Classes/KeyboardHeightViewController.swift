@@ -394,9 +394,9 @@ class KeyboardHeightViewController: UIViewController {
   func updateKeyboardImage() {
     var kbImage: UIImage? = nil
     if (self.isPortrait) {
-      kbImage = UIImage(named:"keyboard.compact", in:Resources.bundle, compatibleWith:nil)
+      kbImage = UIImage(named:"keyboard.compact", in:engineBundle, compatibleWith:nil)
     } else {
-      kbImage = UIImage(named:"keyboard.regular", in:Resources.bundle, compatibleWith:nil)
+      kbImage = UIImage(named:"keyboard.regular", in:engineBundle, compatibleWith:nil)
     }
     keyboardImage.image = kbImage
 
