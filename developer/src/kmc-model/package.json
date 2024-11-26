@@ -46,7 +46,7 @@
     "mocha": "^10.0.0"
   },
   "mocha": {
-    "spec": "build/test/**/test-*.js",
+    "spec": "build/test/**/*.tests.js",
     "require": [
       "source-map-support/register"
     ]
