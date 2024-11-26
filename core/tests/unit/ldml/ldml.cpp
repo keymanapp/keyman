@@ -286,33 +286,22 @@ verify_key_list(std::set<km::tests::key_event> &actual, std::set<km::tests::key_
       std::wcout << console_color::fg(console_color::BRIGHT_RED) << "- FAIL - key_map had missing key " << dump << console_color::reset() << std::endl;
     }
   }
+  if (equals) {
+      std::wcout << console_color::fg(console_color::GREEN) << " " << actual.size() << " vkeys OK " << console_color::reset() << std::endl;
+  }
   return equals;
 }
 
 bool
-verify_key_list(const km_core_keyboard_key *actual_list, const std::u16string &expected_list, const km::tests::LdmlTestSource &test) {
+verify_key_list(const km_core_keyboard_key *actual_list, const km::tests::LdmlTestSource &test) {
   std::set<km::tests::key_event> actual, expected;
-  std::string expected_str = convert<char16_t, char>(expected_list);
   // convert actual list
   while (actual_list != nullptr && !(actual_list->key == 0 && actual_list->modifier_flag == 0)) {
     km::tests::key_event k(actual_list->key, (uint16_t)actual_list->modifier_flag);
     actual.insert(k);
     actual_list++; // advance pointer
   }
-  // parse expected_str
-  while (!expected_str.empty()) {
-    // we ignore the vkey here, just need modifier state
-    km::tests::key_event event = km::tests::LdmlEmbeddedTestSource::parse_next_key(expected_str);
-    auto modifier = event.modifier_state;
-
-    // now, fetch the keylist from KMX+
-    std::vector<km_core_virtual_key> keys;
-    assert(test.get_vkey_table(keys, modifier));
-    for(const km_core_virtual_key vkey : keys) {
-      // list of vkeys -> list of events
-      expected.emplace(vkey, modifier);
-    }
-  }
+  assert(test.get_vkey_table(expected));
   return verify_key_list(actual, expected);
 }
 
@@ -422,10 +411,10 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
       }
     } break;
     case km::tests::LDML_ACTION_CHECK_KEYLIST: {
-      std::cout << "- checking keylist " << action.string << std::endl;
+      std::cout << "- checking keylist" << std::endl;
       // get keylist from kbd
       const km_core_keyboard_key* actual_list = test_kb->get_key_list();
-      if (!verify_key_list(actual_list, action.string, test_source)) {
+      if (!verify_key_list(actual_list, test_source)) {
         errorLine = __LINE__;
       } else {
         std::cout << " .. matches." << std::endl;

@@ -150,84 +150,21 @@ int LdmlTestSource::load_kmx_plus(const km::core::path &compiled) {
   return 0; // success
 }
 
-bool LdmlTestSource::get_vkey_table(std::vector<km_core_virtual_key> &fillin, uint16_t modifier) const {
+bool LdmlTestSource::get_vkey_table(std::set<key_event> &fillin) const {
   if (!kmxplus || !kmxplus->is_valid()) {
     return false; // fail
   }
 
-  // find the 'touch' id so we can avoid it
-  const std::string hardwareTouchStr(LDML_LAYR_LIST_HARDWARE_TOUCH);
-  const std::u16string hardwareTouch(convert<char, char16_t>(hardwareTouchStr));
-
-  // find the string 'touch' - it may not exist if there's no touch layer.
-  // in which case the ID here will be 0. Otherwise it's a string id.
-  const KMX_DWORD hardwareTouchId = kmxplus->strs->find(hardwareTouch);
-
-  // find the hardware list
-  const km::core::kmx::COMP_KMXPLUS_LAYR_LIST* hwList = nullptr;
-  for (KMX_DWORD listIdx = 0; listIdx < kmxplus->layr->listCount; listIdx++) {
-    const km::core::kmx::COMP_KMXPLUS_LAYR_LIST* list = kmxplus->layrHelper.getList(listIdx);
-    if (list == nullptr) {
-      return false; // hit a bad list
-    }
-
-    if (hardwareTouchId != 0 && list->hardware == hardwareTouchId) {
-      continue; // skip this list, it's the touch list.
-      // (there may not be a touch list.)
-    }
-    hwList = list;
-    break; // found it
-  }
-  if (hwList == nullptr) {
-    return false; // no list available
-  }
-  // now, look for the modifier set.
-  const km::core::kmx::COMP_KMXPLUS_LAYR_ENTRY *entry = nullptr;
-  for (KMX_DWORD layrIdx = 0; layrIdx < hwList->count; layrIdx++) {
-    const km::core::kmx::COMP_KMXPLUS_LAYR_ENTRY *e = kmxplus->layrHelper.getEntry(hwList->layer + layrIdx);
-    if (e != nullptr && e->mod == modifier) {
-      entry = e;
-      break;
-    }
-  }
-  if(entry == nullptr) {
-    return false; // mod not found
-  }
-
-  // now we have the layer with this mod, now get all rows and populate vkeys
-  for (KMX_DWORD rowIdx = 0; rowIdx < entry->count; rowIdx++) {
-    const km::core::kmx::COMP_KMXPLUS_LAYR_ROW *row = kmxplus->layrHelper.getRow(entry->row + rowIdx);
-    if (row == nullptr) {
+  // just dump the kmap table
+  for (KMX_DWORD kmapIdx = 0; kmapIdx < kmxplus->key2->kmapCount; kmapIdx++) {
+    const km::core::kmx::COMP_KMXPLUS_KEYS_KMAP *kmap = kmxplus->key2Helper.getKmap(kmapIdx);
+    if (kmap == nullptr) {
       return false;
     }
-    for (KMX_DWORD keyIdx = 0; keyIdx < row->count; keyIdx++) {
-      const km::core::kmx::COMP_KMXPLUS_LAYR_KEY *rowKey = kmxplus->layrHelper.getKey(row->key + keyIdx);
-      if (rowKey == nullptr) {
-        return false;
-      }
-      // we may not actually need the key but just its ID, but we get it in case
-      KMX_DWORD keyId = 0;
-      const km::core::kmx::COMP_KMXPLUS_KEYS_KEY *key = kmxplus->key2Helper.findKeyByStringId(rowKey->key, keyId);
-      if (key == nullptr) {
-        return false;
-      }
-      // Now, linear search the kmap table looking for the key
-      bool found_kmap = false;
-      for (KMX_DWORD kmapIdx = 0; kmapIdx < kmxplus->key2->kmapCount; kmapIdx++) {
-        const km::core::kmx::COMP_KMXPLUS_KEYS_KMAP *kmap = kmxplus->key2Helper.getKmap(kmapIdx);
-        if (kmap == nullptr) {
-          return false;
-        }
-        if (kmap->key == keyId) {
-          fillin.emplace_back(kmap->vkey);
-          found_kmap = true;
-          break;
-        }
-      }
-      if (!found_kmap) {
-        return false;
-      }
+    if (kmap->vkey > 0xFF) {
+      continue; // synthetic key- skip
     }
+    fillin.insert(key_event(kmap->vkey, kmap->mod));
   }
   return true;
 }
@@ -375,7 +312,6 @@ LdmlEmbeddedTestSource::load_source( const km::core::path &path, const km::core:
   const std::string s_context = "@@context: ";
   const std::string s_capsLock = "@@capsLock: ";
   const std::string s_expecterror = "@@expect-error: ";
-  const std::string s_keylist = "@@keylist: ";
 
   // Parse out the header statements in file.kmn that tell us (a) environment, (b) key sequence, (c) start context, (d) expected
   // result
@@ -407,8 +343,6 @@ LdmlEmbeddedTestSource::load_source( const km::core::path &path, const km::core:
       context = parse_source_string(line);
     } else if (is_token(s_capsLock, line)) {
       set_caps_lock_on(parse_source_string(line).compare(u"1") == 0);
-    } else if (is_token(s_keylist, line)) {
-      set_keylist(line);
     } else if (line[0] == '@') {
       std::cerr << path << " warning, unknown @-command " << line << std::endl;
     }
@@ -525,10 +459,10 @@ void
 LdmlEmbeddedTestSource::next_action(ldml_action &fillin) {
   if (keys.empty()) {
     // #3 we are almost done, let's run the key check if needed
-    if (!check_keylist.empty()) {
+    if (check_keylist) {
       fillin.type = LDML_ACTION_CHECK_KEYLIST;
-      fillin.string = check_keylist;
-      check_keylist.clear();
+      // no params
+      check_keylist = false;
     } else {
       fillin.type = LDML_ACTION_DONE;
     }

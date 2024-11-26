@@ -4,6 +4,7 @@
 #include "path.hpp"
 
 #include <map>
+#include <set>
 #include <memory>
 
 #include "kmx/kmx_plus.h"
@@ -115,7 +116,7 @@ public:
    * @param modifier modifier to load key list for
    * @returns false on load fail, true on OK
    */
-  bool get_vkey_table(std::vector<km_core_virtual_key> &fillin, uint16_t modifier) const;
+  bool get_vkey_table(std::set<key_event> &fillin) const;
 
   // helper functions
   static key_event char_to_event(char ch);
@@ -187,17 +188,14 @@ public:
 private:
   key_event next_key();
 
-  void set_keylist(std::string const &s) {
-    check_keylist = parse_source_string(s);
-  }
-
-  std::u16string check_keylist;
   std::deque<std::string> keys;
   std::deque<std::u16string> expected;
   std::u16string context = u"";
   bool expected_beep = false;
   bool expected_error = false;
   bool is_done = false;
+  /** did we check the keylist yet? */
+  bool check_keylist = true;
 
   /** returns false on fail and updates the message */
   bool handle_check_keylist(std::string &message) const;
