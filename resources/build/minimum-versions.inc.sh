@@ -10,12 +10,19 @@
 # shellcheck shell=bash disable=SC2034 # SC2034: X appears unused.
 
 # Target operating system and platform versions
-KEYMAN_MIN_TARGET_VERSION_ANDROID=5           # Lollipop
+KEYMAN_MIN_TARGET_VERSION_ANDROID=5.0         # Lollipop
 KEYMAN_MIN_TARGET_VERSION_IOS=12.2            # iOS 12.2
 KEYMAN_MIN_TARGET_VERSION_WINDOWS=10          # Windows 10
 KEYMAN_MIN_TARGET_VERSION_MAC=10.13           # MacOS 10.13 (High Sierra)
 KEYMAN_MIN_TARGET_VERSION_UBUNTU=20.04        # Ubuntu 20.04 Focal
-KEYMAN_MIN_TARGET_VERSION_CHROME=95.0         # Final version that runs on Android 5.0
+KEYMAN_MIN_TARGET_VERSION_ANDROID_CHROME=53.0 # min version of Chrome for Keyman for Android
+
+# Target web browsers for KeymanWeb -- we do not have polyfills for
+# earlier versions, YMMV
+KEYMAN_MIN_TARGET_VERSION_WEB_CHROME=95.0     # Note: 95.0 is final version that runs on Android 5.0
+KEYMAN_MIN_TARGET_VERSION_WEB_FIREFOX=79.0    # TBD
+KEYMAN_MIN_TARGET_VERSION_WEB_OPERA=47.0      # TBD
+KEYMAN_MIN_TARGET_VERSION_WEB_SAFARI=13.0     # iOS 13.0, macOS 10.13.6+
 
 # Dependency versions
 KEYMAN_MIN_VERSION_NODE_MAJOR=20              # node version source of truth is /package.json:/engines/node; use KEYMAN_USE_NVM to automatically update

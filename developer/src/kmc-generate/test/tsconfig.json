@@ -1,0 +1,28 @@
+{
+  "extends": "../../kmc/tsconfig.kmc-base.json",
+
+  "compilerOptions": {
+      "rootDir": ".",
+      "rootDirs": ["./", "../src/"],
+      "outDir": "../build/test",
+      "baseUrl": ".",
+      "strictNullChecks": false,
+      "paths": {
+        // "@keymanapp/keyman-version": ["../../../common/web/keyman-version/keyman-version.mts"],
+        "@keymanapp/common-types": ["../../../../common/web/types/src/main"],
+        "@keymanapp/developer-test-helpers": ["../../common/web/test-helpers/index"],
+        // "@keymanapp/": ["core/include/ldml/ldml-keyboard-constants"],
+      },
+    },
+  "include": [
+      "**/test-*.ts",
+      "./shared-options.ts",
+      "./helpers/index.ts"
+  ],
+  "references": [
+      { "path": "../../../../common/web/keyman-version" },
+      { "path": "../../../../common/web/types/" },
+      { "path": "../../common/web/test-helpers/" },
+      { "path": "../" }
+    ]
+}

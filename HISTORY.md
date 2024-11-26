@@ -1,5 +1,75 @@
 # Keyman Version History
 
+## 18.0.144 alpha 2024-11-25
+
+* chore(deps): bump cross-spawn from 7.0.3 to 7.0.6 in /developer/src/server/src/win32/trayicon/addon-src (#12687)
+* chore(developer): make package subfile description fully optional (#12665)
+* fix(developer): box package compiler info fields (#12666)
+* fix(developer): correct whitespace handling in virtual keys and remove partially implemented virtual key series in kmcmplib compiler (#12604)
+
+## 18.0.143 alpha 2024-11-22
+
+* chore(deps): bump cross-spawn from 7.0.3 to 7.0.6 (#12685)
+
+## 18.0.142 alpha 2024-11-20
+
+* chore(common): Update CODEOWNERS (#12680)
+
+## 18.0.141 alpha 2024-11-15
+
+* chore(linux): add support for Ubuntu 25.04 Plucky Puffin (#12675)
+
+## 18.0.140 alpha 2024-11-13
+
+* chore(common): Add 17.0.330 - 17.0.332 to version history (#12663)
+* fix(developer): reconnect `--full-test` in kmcmplib build and enable for CI (#12631)
+* docs(developer): kmc-generate (#12647)
+
+## 18.0.139 alpha 2024-11-12
+
+* fix(windows): help links updated (#12646)
+
+## 18.0.138 alpha 2024-11-08
+
+* fix(common): check for invalid markers (#12613)
+* chore: update minimum versions (#12632)
+* fix(windows): correct path to output file in publish step for fv keyboards (#12637)
+* chore(core): move API docs from help.keyman.com (#12642)
+* feat(developer): kmc generate (#11014)
+* feat(developer): kmc-copy (#12555)
+* feat(developer): add GitHub and Cloud support to kmc-copy (#12586)
+
+## 18.0.137 alpha 2024-11-07
+
+* fix(windows): correct engine help source path for upload (#12625)
+* fix(developer): use 'N' for nomatch store debug strings (regression in #12107) (#12629)
+* chore(developer): skip masaram_gondi in kmcmplib full test (#12630)
+* feat(developer): analyze osk-char-use merge with existing mapping file (#12622)
+* feat(developer): Report key 'address' in validation failures in layout compiler (#12588)
+
+## 18.0.136 alpha 2024-11-06
+
+* fix(developer): handle merge commits when checking git log date (#12627)
+
+## 18.0.135 alpha 2024-11-05
+
+* fix(developer): handle paste of TSV into Wordlist grid (#12594)
+* fix(developer): handle missing files in kmc-kmn (#12595)
+* fix(developer): handle missing files in kmc-model (#12596)
+* refactor(android): move Android Engine help in-repo (#12598)
+* refactor(ios): move ios Engine help in-repo (#12599)
+* refactor(windows): move windows Engine help in-repo (#12600)
+* refactor(web): move web engine help to app repo (#12601)
+* docs: Update websites readme with debug info (#12602)
+* fix(developer): create Server config directory before options save (#12608)
+* chore(linux): add support for Ubuntu 25.04 Plucky Puffin (#12614)
+* fix(linux): properly check for missing dependencies (#12615)
+* fix(linux): set environment variable for rendering of downloads dialog (#12616)
+
+## 18.0.134 alpha 2024-11-04
+
+*  (#12606)
+
 ## 18.0.133 alpha 2024-11-01
 
 * test(developer): kmcmplib compiler unit tests 4 (#12489)
@@ -916,6 +986,27 @@
 
 * chore(common): move to 18.0 alpha (#10713)
 * chore: move to 18.0 alpha
+
+## 17.0.332 stable 2024-11-06
+
+* fix(developer): create Server config directory before options save (#12609)
+* fix(developer): handle merge commits when checking git log date (#12628)
+* fix(linux): set environment variable for rendering of downloads dialog (#12617)
+
+## 17.0.331 stable 2024-10-30
+
+* fix(android): Hide suggestion banner on password fields (#12466)
+* fix(common): declare dep on @keymanapp/ldml-keyboard-constants (#12475)
+* fix(oem/fv): Update keyboard versions and names for fv_all.kmp (#12504)
+* chore(ios): renew certificate (#12513)
+* fix(developer): prevent invalid string ids (#12524)
+* fix(developer): ignore excess whitespace in `<row keys>` attribute (#12523)
+
+## 17.0.330 stable 2024-09-16
+
+* refactor(android): Move Sentry and APK to publish task (#12392)
+* fix(developer): rewrite ldml visual keyboard compiler (#12406)
+* fix(developer): check vars string usage before definition (#12407)
 
 ## 17.0.329 stable 2024-09-09
 

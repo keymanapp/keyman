@@ -8,7 +8,7 @@ import { loadProject } from '../../util/projectLoader.js';
 import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
 import { calculateSourcePath } from '../../util/calculateSourcePath.js';
 import { getLastGitCommitDate } from '../../util/getLastGitCommitDate.js';
-import { ExtendedCompilerOptions } from 'src/util/extendedCompilerOptions.js';
+import { ExtendedCompilerOptions } from '../../util/extendedCompilerOptions.js';
 
 export class BuildKeyboardInfo extends BuildActivity {
   public get name(): string { return 'Keyboard metadata'; }
@@ -22,7 +22,7 @@ export class BuildKeyboardInfo extends BuildActivity {
       throw new Error(`BuildKeyboardInfo called with unexpected file type ${infile}`);
     }
 
-    const project = loadProject(infile, callbacks);
+    const project = await loadProject(infile, callbacks);
     if(!project) {
       // Error messages written by loadProject
       return false;

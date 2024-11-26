@@ -7,12 +7,14 @@
     "baseUrl": ".",
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
   ],
   "references": [
     { "path": "../../../common/web/keyman-version" },
     { "path": "../../../common/web/types" },
     { "path": "../kmc-analyze" },
+    { "path": "../kmc-copy" },
+    { "path": "../kmc-generate" },
     { "path": "../kmc-keyboard-info" },
     { "path": "../kmc-kmn" },
     { "path": "../kmc-ldml" },
