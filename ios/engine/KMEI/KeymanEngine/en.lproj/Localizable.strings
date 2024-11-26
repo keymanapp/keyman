@@ -229,6 +229,18 @@
 /* Label for the "Adjust Keyboard Height" item on the main settings screen */
 "menu-settings-adjust-keyboard-height" = "Adjust Keyboard Height";
 
+/* Label for "Reset to Default Keyboard Height" button on the adjust height screen */
+"button-label-reset-default-keyboard-height" = "Reset to Default Keyboard Height";
+
+/* Instruction text to drag keyboard to resize */
+"keyboard-drag-instructions" = "Drag arrow control to adjust keyboard height.";
+
+/* Instruction to rotate to adjust landscape keyboard height (displayed when device is portrait) */
+"portrait-keyboard-rotate-instructions" = "Rotate device to adjust for portrait.";
+
+/* Instruction to rotate to adjust portrait keyboard height (displayed when device is landscape) */
+"landscape-keyboard-rotate-instructions" = "Rotate device to adjust for landscape.";
+
 /* Short text for notification:  download failure for keyboard */
 "notification-download-failure-keyboard" = "Keyboard download failed";
 

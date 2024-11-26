@@ -64,7 +64,7 @@ class KeyboardHeightViewController: UIViewController {
   private func determineOrientation(screenSize: CGSize) {
     self.isPortrait = UIScreen.main.bounds.height > UIScreen.main.bounds.width
     let message = "determineOrientation, isPortrait: \(self.isPortrait)"
-    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
+    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, message)
   }
   
   private func loadDefaultKeyboardHeights() {
@@ -101,29 +101,19 @@ class KeyboardHeightViewController: UIViewController {
   }
 
   private func calculateKeyboardHeightLimits() {
-//    var defaultHeight = 0.0
-//    
-//    if (self.isPortrait) {
-//      defaultHeight = self.defaultPortraitHeight
-//    } else {
-//      defaultHeight = self.defaultLandscapeHeight
-//    }
-    
     // minimum height
-    self.minKeyboardHeight = 70.0
+    self.minKeyboardHeight = 100.0
     
-    // keyboard height must be 70 pts smaller than the contentView height
-    self.maxKeyboardHeight = contentView.frame.height - 70.0
+    // set maxKeyboardHeight to 100 pts smaller than the contentView height
+    self.maxKeyboardHeight = contentView.frame.height - 100.0
     
     let messageBegan = "minKeyboardHeight: \(minKeyboardHeight) maxKeyboardHeight: \(maxKeyboardHeight)"
     os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, messageBegan)
   }
   
   /**
-   * Given a vertical translation in points based on the user dragging the keyboard resizer view,
-   * return the amount that the user is allowed to grow or shrink the keyboard.
-   * If the attemptedTranslation amount does cause the keyboard to exceed its size limits,
-   * then the same value will be returned.
+   * Given the vertical attemptedTranslation in points due to the user dragging the keyboard resizer view,
+   * return the amount that the user is allowed to grow or shrink the keyboard without exceeding its size limits.
    */
   private func applyKeyboardSizeLimits(attemptedTranslation: Double) -> Double {
     guard attemptedTranslation != 0 else {
@@ -167,7 +157,7 @@ class KeyboardHeightViewController: UIViewController {
     }
     
     let messageBegan = "approvedTranslation: \(approvedTranslation)"
-    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, messageBegan)
+    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, messageBegan)
     return approvedTranslation
   }
   
@@ -201,13 +191,13 @@ class KeyboardHeightViewController: UIViewController {
     let verticalTranslation = drag.translation(in: self.contentView).y
 
     let messageBegan = "verticalTranslation: \(verticalTranslation)"
-    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, messageBegan)
+    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, messageBegan)
 
     // enforce keyboard size limits on translation
     let approvedTranslation = self.applyKeyboardSizeLimits(attemptedTranslation: verticalTranslation)
     
     if (approvedTranslation == 0) {
-      os_log("reached keyboard size limit", log:KeymanEngineLogger.ui, type: .info)
+      os_log("reached keyboard size limit", log:KeymanEngineLogger.ui, type: .debug)
     } else if (approvedTranslation != 0) {
       let keyboardTranslation = CGAffineTransform(translationX: 0, y: approvedTranslation)
       self.keyboardResizer.transform = keyboardTranslation
@@ -286,13 +276,11 @@ class KeyboardHeightViewController: UIViewController {
   
   func configureDefaultHeightButton() {
     defaultButton.titleLabel?.font = .systemFont(ofSize: 20, weight: .bold)
-    defaultButton.setTitle("Reset to Default Keyboard Height", for: .normal)
+    let buttonTitle = NSLocalizedString("button-label-reset-default-keyboard-height", bundle: engineBundle, comment: "")
+    defaultButton.setTitle(buttonTitle, for: .normal)
     defaultButton.sizeToFit()
     defaultButton.layer.cornerRadius = 8.0
-    //defaultButton.backgroundColor=UIColor.systemBlue
-    //defaultButton.titleLabel?.textColor = UIColor.white
     defaultButton.addTarget(self, action: #selector(self.restoreDefaultKeyboardHeight), for: .touchUpInside)
-    //defaultButton.sizeToFit()
     contentView.addSubview(defaultButton)
 
     defaultButton.translatesAutoresizingMaskIntoConstraints = false
@@ -319,7 +307,8 @@ class KeyboardHeightViewController: UIViewController {
   }
   
   func configureLabel() {
-    label.backgroundColor=UIColor.white
+    label.backgroundColor = .white
+    label.textColor = .black
     label.textAlignment = NSTextAlignment.left
     label.font = UIFont.systemFont(ofSize: 16.0)
     self.setLabelTextForOrientation()
@@ -336,10 +325,16 @@ class KeyboardHeightViewController: UIViewController {
   }
 
   func setLabelTextForOrientation() {
-    let portraitText = "portrait"
-    let landscapeText = "landscape"
-    let otherOrientationText = (self.isPortrait) ? landscapeText : portraitText
-    label.text = "Drag arrow control to adjust keyboard height.\nRotate device to adjust for \(otherOrientationText)."
+    let dragText = NSLocalizedString("keyboard-drag-instructions", bundle: engineBundle, comment: "")
+    var rotateText: String? = nil;
+    
+    if (self.isPortrait) {
+      rotateText = NSLocalizedString("portrait-keyboard-rotate-instructions", bundle: engineBundle, comment: "")
+    } else {
+      rotateText = NSLocalizedString("landscape-keyboard-rotate-instructions", bundle: engineBundle, comment: "")
+    }
+    
+    label.text = "\(dragText)\n\(rotateText!)."
   }
 
   func configureKeyboardImage() {
@@ -354,15 +349,16 @@ class KeyboardHeightViewController: UIViewController {
   func configureKeyboardResizer() {
     var arrowSymbolImage: UIImage? = nil
     keyboardResizer.isUserInteractionEnabled = true
-    //let arrowSymbolImage = UIImage(systemName: "arrow.up.and.down.square.fill")
-    //let arrowConfiguration = UIImage.SymbolConfiguration(scale: .large)
+    
+    // if using iOS earlier than 13.0, use bitmap image of arrow and non-dynamic gray
     if #available(iOSApplicationExtension 13.0, *) {
       arrowSymbolImage = UIImage(systemName: "arrow.up.and.down.square.fill")
+      keyboardResizer.backgroundColor = UIColor.systemGray3 // adapts for light/dark mode
     } else {
-      arrowSymbolImage = UIImage(named: "arrow.up.and.down")
+      arrowSymbolImage = UIImage(named:"arrow.up.and.down", in:engineBundle, compatibleWith:nil)
+      keyboardResizer.backgroundColor = UIColor.systemGray
     }
     keyboardResizer.image = arrowSymbolImage
-    keyboardResizer.backgroundColor = UIColor.systemGray
     keyboardResizer.layer.cornerRadius = 5
     contentView.addSubview(keyboardResizer)
     keyboardResizer.translatesAutoresizingMaskIntoConstraints = false
@@ -381,7 +377,7 @@ class KeyboardHeightViewController: UIViewController {
       NSLayoutConstraint.deactivate(resizerConstraintsArray)
     }
 
-    // add new restraints using the current value of the keyboard height
+    // add new constraints using the current value of the keyboard height
     resizerConstraintsArray = [
       keyboardResizer.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
       keyboardResizer.topAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -keyboardHeight-30),
@@ -427,9 +423,9 @@ class KeyboardHeightViewController: UIViewController {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
        super.traitCollectionDidChange(previousTraitCollection)
        if (traitCollection.userInterfaceStyle == .dark) {
-         os_log("keyboardHeight traitCollectionDidChange to .dark", log:KeymanEngineLogger.ui, type: .info)
+         os_log("keyboardHeight traitCollectionDidChange to .dark", log:KeymanEngineLogger.ui, type: .debug)
        } else {
-         os_log("keyboardHeight traitCollectionDidChange to .light", log:KeymanEngineLogger.ui, type: .info)
+         os_log("keyboardHeight traitCollectionDidChange to .light", log:KeymanEngineLogger.ui, type: .debug)
        }
    }
 
