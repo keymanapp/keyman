@@ -2,7 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { KeysCompiler } from '../src/compiler/keys.js';
 import { assertCodePoints, compilerTestCallbacks, loadSectionFixture, testCompilationCases } from './helpers/index.js';
-import { KMXPlus, Constants, MarkerParser } from '@keymanapp/common-types';
+import { KMXPlus, Constants, LdmlKeyboardTypes } from '@keymanapp/common-types';
 import { LdmlCompilerMessages } from '../src/compiler/ldml-compiler-messages.js';
 import { constants } from '@keymanapp/ldml-keyboard-constants';
 import { MetaCompiler } from '../src/compiler/meta.js';
@@ -69,7 +69,7 @@ describe('keys', function () {
 
         // normalization w markers
         const [amarker] = keys.keys.filter(({ id }) => id.value === 'amarker');
-        assertCodePoints(amarker.to.value, `a${MarkerParser.markerOutput(1, false)}\u{0320}\u{0301}`);
+        assertCodePoints(amarker.to.value, `a${LdmlKeyboardTypes.MarkerParser.markerOutput(1, false)}\u{0320}\u{0301}`);
 
         // normalization
         const [aacute] = keys.keys.filter(({ id }) => id.value === 'a-acute');
@@ -112,7 +112,7 @@ describe('keys', function () {
 
         // normalization w markers
         const [amarker] = keys.keys.filter(({ id }) => id.value === 'amarker');
-        assertCodePoints(amarker.to.value, `á${MarkerParser.markerOutput(1, false)}\u{0320}`);
+        assertCodePoints(amarker.to.value, `á${LdmlKeyboardTypes.MarkerParser.markerOutput(1, false)}\u{0320}`);
 
         // normalization
         const [aacute] = keys.keys.filter(({ id }) => id.value === 'a-acute');
@@ -189,7 +189,7 @@ describe('keys', function () {
 
         const ww = keys.keys.find(({ id }) => id.value === 'ww');
         assert.ok(ww);
-        const MARKER_5 = MarkerParser.markerOutput(5);
+        const MARKER_5 = LdmlKeyboardTypes.MarkerParser.markerOutput(5);
         assert.equal(ww.to.value, MARKER_5);
         assert.equal(ww.longPressDefault.value, 'bb');
         assert.equal(ww.longPress[0].value.value, 'aa');

@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.145 alpha 2024-11-26
+
+* docs(windows): update emscripten bash setup (#12700)
+* chore(common): Add link to onboarding doc to `CONTRIBUTING.md` (#12697)
+
 ## 18.0.144 alpha 2024-11-25
 
 * chore(deps): bump cross-spawn from 7.0.3 to 7.0.6 in /developer/src/server/src/win32/trayicon/addon-src (#12687)

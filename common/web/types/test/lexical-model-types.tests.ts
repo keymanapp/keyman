@@ -5,21 +5,21 @@
  * imported and compiled without any compiler errors.
  */
 
-import { USVString, Transform, Suggestion, SuggestionTag, Context, Capabilities, Configuration, Distribution, WordBreakingFunction, Span, LexicalModelPunctuation, ElementString, KMXPlus } from '@keymanapp/common-types';
+import { KMXPlus, LdmlKeyboardTypes, LexicalModelTypes } from "@keymanapp/common-types";
 
-export let u: USVString;
-export let l: Transform
-export let s: Suggestion;
-export let st: SuggestionTag;
-export let c: Context;
-export let cap: Capabilities;
-export let conf: Configuration;
-export let d: Distribution<Suggestion>;
-export let wbf: WordBreakingFunction;
-export let sp: Span;
-export let lmp: LexicalModelPunctuation;
+export let u: LexicalModelTypes.USVString;
+export let l: LexicalModelTypes.Transform;
+export let s: LexicalModelTypes.Suggestion;
+export let st: LexicalModelTypes.SuggestionTag;
+export let c: LexicalModelTypes.Context;
+export let cap: LexicalModelTypes.Capabilities;
+export let conf: LexicalModelTypes.Configuration;
+export let d: LexicalModelTypes.Distribution<LexicalModelTypes.Suggestion>;
+export let wbf: LexicalModelTypes.WordBreakingFunction;
+export let sp: LexicalModelTypes.Span;
+export let lmp: LexicalModelTypes.LexicalModelPunctuation;
 
 
 // try some of the other types - that should still work
-export let elemString: ElementString;
+export let elemString: LdmlKeyboardTypes.ElementString;
 export let section: KMXPlus.Section;

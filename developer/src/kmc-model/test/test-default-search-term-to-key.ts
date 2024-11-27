@@ -4,7 +4,7 @@ import {assert} from 'chai';
 import { defaultSearchTermToKey,
          defaultCasedSearchTermToKey,
          defaultApplyCasing } from '../src/model-defaults.js';
-import { CasingForm, CasingFunction } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
 
 describe('The default searchTermToKey() function', function () {
@@ -102,9 +102,9 @@ describe('The default searchTermToKey() function', function () {
     // as U+0130's default handling is... not ideal in Turkish.
     //
     // Instead, we can get a simple-enough test with inverted casing.
-    let customCasing = function(caseToApply: CasingForm,
+    let customCasing = function(caseToApply: LexicalModelTypes.CasingForm,
                                 text: string,
-                                defaultApplyCasing: CasingFunction): string {
+                                defaultApplyCasing: LexicalModelTypes.CasingFunction): string {
       switch(caseToApply) {
         case 'lower':
             return text.toUpperCase();
@@ -117,13 +117,13 @@ describe('The default searchTermToKey() function', function () {
         }
     }
 
-    let customCasingClosure = function(caseToApply: CasingForm, text: string): string {
+    let customCasingClosure = function(caseToApply: LexicalModelTypes.CasingForm, text: string): string {
       return customCasing(caseToApply, text, defaultApplyCasing);
     }
 
     for (let [input, expected] of testCases) {
       it(`should normalize '${input}' to '${expected}'`, function() {
-        assert.equal(defaultCasedSearchTermToKey(input, customCasingClosure as CasingFunction), expected);
+        assert.equal(defaultCasedSearchTermToKey(input, customCasingClosure as LexicalModelTypes.CasingFunction), expected);
       });
     }
   });

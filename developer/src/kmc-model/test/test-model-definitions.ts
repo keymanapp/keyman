@@ -2,7 +2,7 @@ import 'mocha';
 import { assert } from 'chai';
 import { ModelDefinitions } from '../src/model-definitions.js';
 import { LexicalModelSource } from '../src/lexical-model.js';
-import { CasingForm, CasingFunction } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
 describe('Model definition pseudoclosures', function () {
   describe('14.0 defaults', function() {
@@ -139,7 +139,7 @@ describe('Model definition pseudoclosures', function () {
   describe('Model-defined applyCasing + (dependent) searchTermToKey', function() {
     // Note:  this test only implements enough Turkish-related stuff to facilitate
     // a functional test.  Not guaranteed to be sufficient for actual Turkish use.
-    let turkishCasing = function(form: CasingForm, text: string, defaultApplyCasing: (form: CasingForm, text: string) => string): string {
+    let turkishCasing = function(form: LexicalModelTypes.CasingForm, text: string, defaultApplyCasing: (form: LexicalModelTypes.CasingForm, text: string) => string): string {
       switch(form) {
       case 'lower':
         return defaultApplyCasing(form, text
@@ -159,7 +159,7 @@ describe('Model definition pseudoclosures', function () {
     let modelSource: LexicalModelSource = {
       languageUsesCasing: true,
       applyCasing: turkishCasing,
-      searchTermToKey: function(wordform: string, applyCasing: CasingFunction): string {
+      searchTermToKey: function(wordform: string, applyCasing: LexicalModelTypes.CasingFunction): string {
         return Array.from(wordform
           .normalize('NFC')  // Mostly to avoid decomposing 'İ'
         ) // end of `Array.from`

@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import defaultWordBreaker from '@keymanapp/models-wordbreakers';
 import {decorateWithScriptOverrides} from '../src/script-overrides-decorator.js';
-import { Span } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
 const THIN_SPACE = "\u2009";
 
@@ -28,7 +28,7 @@ describe('The script overrides word breaker decorator', function () {
     assert.deepEqual(actualResult.map(grabText), phraseSpans);
   });
 
-  function grabText(span: Span) {
+  function grabText(span: LexicalModelTypes.Span) {
     return span.text;
   }
 });
