@@ -24,7 +24,7 @@ import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 // OK  remove funcs at teh end
 //     import { makePathToFixture } from '../../test/helpers/index.js';
 // OK  Mapping 0->30  or 0->K_A-> missing entries in mapping 
-//     Replace any-types
+// OK  Replace any-types
 //     Several steps action-> action-> action->character ( not only  action->character)
 //     TODO waht about using actions twice in a row???
 //     Usable for all keylayout files
@@ -52,8 +52,8 @@ import * as fs from 'fs';   // what is this/do I need it? -  either import all o
 export interface convert_object {
   name: string,                               // needed?? remove
   ArrayOf_Layouts: string[],                     // needed?? I think no
-    ArrayOf_Ukelele_output: any[],
-    ArrayOf_Ukelele_action: any[],
+    ArrayOf_Ukelele_output: Uint8Array[][],
+    ArrayOf_Ukelele_action: Uint8Array[][],
   ArrayOf_Modifiers: string[],
   ArrayOf_VK_from_keylayout: (string | number)[][],
   ArrayOf_dk: string[][],                          // add dk-mapping ( dk1 <-> '^' )
@@ -141,7 +141,7 @@ export class KeylayoutToKmnConverter {
     // TODO array-> object
     const modifierMap_array: string[] = []                 // array holding all MODIFIER strings e.g. "anyShift caps anyOption"  -why not put modifiers into Uint8Array along with values of keys of layer
     const keys_output_all_Layers: Uint8Array[][] = []
-    const keys_action_all_Layers: any[] = []            // array holding all values with ACTION attribute (needed for finding deadkeys)
+    const keys_action_all_Layers: Uint8Array[][] = []            // array holding all values with ACTION attribute (needed for finding deadkeys)
     const deadkeyedChars_all_Layers: string[][] = []         // array holding all DEADKEYS for each mod state â, ê, ,....
     const terminators_all_Layers: Uint8Array[] = []            // array holding all DEADKEYS for each mod state â, ê, ,....
     const duplicate_layouts_array: string[] = []           // array holding the layouts e.g. ANSI or JIS // needed?? I think no
@@ -307,8 +307,8 @@ export class KeylayoutToKmnConverter {
       }
       deadkeyedChars_all_Layers.push(deadkeys_One_dk)
     }
-    
-    const vk: any[] = [""]
+
+    const vk:  (string | number)[][] = []
     // TODO remove unneccassary elements
     const DataObject: convert_object = {
       name: "Ukelele-kmn",                                // needed?? remove
