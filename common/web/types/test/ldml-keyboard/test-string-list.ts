@@ -1,6 +1,6 @@
 import 'mocha';
 import { assert } from 'chai';
-import { StrsItem } from '../../src/kmx/kmx-plus/kmx-plus.js';
+import { StrsItem, StrsOptions, DependencySections, Strs } from '../../src/kmx/kmx-plus/kmx-plus.js';
 import { ListIndex, ListItem } from '../../src/ldml-keyboard/string-list.js';
 
 describe('Test of String-List', () => {
@@ -44,10 +44,23 @@ describe('Test of String-List', () => {
     });
   });
   describe('should test ListItem', () => {
-    it('fromStrings returns an empty ListItem if source is null', () => {
+    it('fromStrings should return an empty ListItem if source is null', () => {
       const actual   = ListItem.fromStrings(null, null, null);
       const expected = new ListItem();
       assert.deepEqual(actual, expected);
     });
+    it('fromStrings should return a valid ListItem from a single source string', () => {
+      const source = ["abc"];
+      const sections = { strs: new Strs };
+      sections.strs.allocString = stubSectionsStrsAllocString;
+      const actual   = ListItem.fromStrings(source, null, sections);
+      const expected = new ListItem();
+      expected.push(new ListIndex(new StrsItem("abc")));
+      assert.deepEqual(actual, expected);
+    });
   });
 });
+
+function stubSectionsStrsAllocString(s?: string, opts?: StrsOptions, sections?: DependencySections): StrsItem {
+  return new StrsItem(s);
+}
