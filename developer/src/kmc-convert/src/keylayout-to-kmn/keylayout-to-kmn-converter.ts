@@ -50,7 +50,6 @@ import * as fs from 'fs';   // what is this/do I need it? -  either import all o
 
 
 export interface convert_object {
-  instrument: string
   name: string,                               // needed?? remove
   ArrayOf_Layouts: any[],                     // needed?? I think no
   ArrayOf_Ukelele_output: any[],
@@ -63,6 +62,11 @@ export interface convert_object {
   ArrayOf_deadkeyedChar: any[],               // add modified keys ( â,ê,î,ô,û)
   ArrayOf_Terminators: any[]                  // add terminators ( ^,´,`)
 };
+
+export interface deadkey_all_object {
+  deadkeyedChars_all_Layers: string[][],                     // needed?? I think no
+};
+
 
 export class KeylayoutToKmnConverter {
   static readonly INPUT_FILE_EXTENSION = '.keylayout';
@@ -88,7 +92,7 @@ export class KeylayoutToKmnConverter {
     }
 
     console.log(' _S2 first READ file ........................................in:', inputFilename);
-    const inArray: object = this.read(inputFilename)
+    const inArray: convert_object = this.read(inputFilename)
 
     if (!inArray) {
       return null;
@@ -117,7 +121,7 @@ export class KeylayoutToKmnConverter {
    * @param  filename the ukelele .keylayout-file to be converted
    * @return in case of success Uint8Array keys_all_Layers; else null
    */
-  public read(filename: string): object {
+  public read(filename: string): convert_object {
 
     console.log("inputFilename read", filename)
     const options = {
@@ -187,7 +191,7 @@ export class KeylayoutToKmnConverter {
     // -----
 
     const nrOfStates = jsonObj.keyboard.keyMapSet[keyMapSet_count].keyMap.length
-    const nrOfKeys_inLayer = jsonObj.keyboard.keyMapSet[keyMapSet_count].keyMap[0].key.length   // will they all have the same length later ?
+    //const nrOfKeys_inLayer = jsonObj.keyboard.keyMapSet[keyMapSet_count].keyMap[0].key.length   // will they all have the same length later ?
 
 
     // .........................................................
@@ -286,7 +290,7 @@ export class KeylayoutToKmnConverter {
     // in their 'when' find output for dk
     // for all 'action' at keys paragraph
     for (let j = 0; j < dk_pairs_all_Layers.length; j++) {
-      const deadkeys_One_dk: any[] = []
+      const deadkeys_One_dk: string[] = []
       // find  in action e.g.  <action id="o">
       for (let k = 0; k < keys_action_all_Layers[j].length; k++) {
         const action_from_keys_prargraph = new TextDecoder().decode(keys_action_all_Layers[j][k])
@@ -310,16 +314,17 @@ export class KeylayoutToKmnConverter {
         }
       }
       deadkeyedChars_all_Layers.push(deadkeys_One_dk)
+                  console.log("typeof(deadkeyedChars_all_Layers)", typeof(deadkeyedChars_all_Layers),deadkeyedChars_all_Layers)
     }
-
+const vk : any[] =[""]
     // TODO remove unneccassary elements
-    const DataObject = {
+    const DataObject: convert_object = {
       name: "Ukelele-kmn",                                // needed?? remove
       ArrayOf_Layouts: layouts_array,                     // needed?? I think no
       ArrayOf_Ukelele_output: keys_output_all_Layers,
       ArrayOf_Ukelele_action: keys_action_all_Layers,
       ArrayOf_Modifiers: modifierMap_array,
-      ArrayOf_VK_from_keylayout: "",
+      ArrayOf_VK_from_keylayout: vk,
       ArrayOf_dk: dk_pairs_all_Layers,                    // add dk-mapping ( dk1 <-> '^' )
       ArrayOf_Dk: dk,                                     // add plain dk ( '^', '´','`')
       ArrayOf_deadkeyables: deadkeyables_all_Layers,      // add char that can be modified with dk ( a,e,i,o,u)
@@ -329,7 +334,7 @@ export class KeylayoutToKmnConverter {
 
     // TODO review condition
     return DataObject
-    return ((keys_output_all_Layers.length === nrOfStates + 5) && keys_output_all_Layers[0].length === nrOfKeys_inLayer) ? keys_output_all_Layers : null;
+    //return ((keys_output_all_Layers.length === nrOfStates + 5) && keys_output_all_Layers[0].length === nrOfKeys_inLayer) ? keys_output_all_Layers : null;
   }
 
   /**
@@ -337,7 +342,7 @@ export class KeylayoutToKmnConverter {
    * @param  data_ukelele (Uint8Array) data of the ukelele .keylayout-file
    * @return outArray Uint8Array keys_all_Layers, the converted data for kmn-files if all layers have been converted; else null
    */
-  public convert(data_ukelele: any): any {
+  public convert(data_ukelele: any): convert_object {
     const data_VK_from_keylayout: any[][] = [];
 
     for (let i = 0; i < data_ukelele.ArrayOf_Ukelele_output[0].length; i++) {
