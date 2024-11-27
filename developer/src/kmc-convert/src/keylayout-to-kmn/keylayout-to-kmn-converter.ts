@@ -6,39 +6,38 @@
 import { CompilerCallbacks, CompilerOptions } from "@keymanapp/developer-utils";
 import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 
-// TODO keylayout->kmn
-//modifiers: The identifier of the <modifierMap> element to use for this range of hardware keyboard types.
-//defaultIndex: The table number to use for modifier key combinations which are not explicitly specified by any <modifier> element within the <modifierMap>.
-// write read, convert, write
-// tests for 3 functions read write convert
-// add data to object
-// Use filter functions
-// action/output:use filter etc to shorten func
-// deadkeyables:use filter etc to shorten func
-// dk-> for all action:use filter etc to shorten func
-// remove unneccessa´ry data from dataObject
-// rename symbols
-// remove part using kmn_key_Name1
-// remove unnecceaasry map_UkeleleKC_To_kmn_Key_Name_Array_Position_n etc
-// loop throught ANSI, JIS- art moment only use [keyMapSet_count] (keyMapSet_count=0)
-// remove funcs at teh end
-// import { makePathToFixture } from '../../test/helpers/index.js';       // _S2 my imports
-// Mapping 0->30  or 0->K_A-> missing entries in mapping 
-// Replace any-types
-// Several steps action-> action-> action->character ( not only  action->character)
-// Usable for all keylayout files
-// Return conditions
-// Use callbacks as for writeFileSync
-// Tests throws
-// Conditions NCAPS,OPT;...
-// Which stores
-// TODO move func outside of class
-// Functions as object methods? 
-// objects contain only used stuff READ in: -- out: only read arrays / CONVERT in: only read arrays out: return only to write arrays
-// Use catch blocks for file read
-// TODO waht about using actions twice in a row???
-// read:  _S2 answer :  + [K_A] > 'a'  is OK / TODO which format to use in output ?  + [K_A] > 'a' (character code)  or    + [K_A] > U+0061 (virt Keycode)
-// read     // _S2 TODO which stores?
+//     TODO keylayout->kmn
+//     modifiers: The identifier of the <modifierMap> element to use for this range of hardware keyboard types.
+//     defaultIndex: The table number to use for modifier key combinations which are not explicitly specified by any <modifier> element within the <modifierMap>.
+//     write read, convert, write
+//     tests for 3 functions read write convert
+//     add data to object
+//     Use filter functions
+//     action/output:use filter etc to shorten func
+//     deadkeyables:use filter etc to shorten func
+//     dk-> for all action:use filter etc to shorten func
+//     remove unneccessary data from dataObject
+//     rename symbols
+// OK  remove part using kmn_key_Name1
+// OK  remove unnecceaasry map_UkeleleKC_To_kmn_Key_Name_Array_Position_n etc
+// OK  loop throught ANSI, JIS- at moment only use [keyMapSet_count] (keyMapSet_count=0)
+// OK  remove funcs at teh end
+//     import { makePathToFixture } from '../../test/helpers/index.js';
+// OK  Mapping 0->30  or 0->K_A-> missing entries in mapping 
+//     Replace any-types
+//     Several steps action-> action-> action->character ( not only  action->character)
+//     TODO waht about using actions twice in a row???
+//     Usable for all keylayout files
+//     Return conditions
+//     Use callbacks as for writeFileSync
+//     Tests throws
+//     Conditions NCAPS,OPT;...
+//     TODO move func outside of class
+//     Functions as object methods? 
+//     objects contain only used stuff READ in: -- out: only read arrays / CONVERT in: only read arrays out: return only to write arrays
+//     Use catch blocks for file read
+//     read:  answer :  + [K_A] > 'a'  is OK / TODO which format to use in output ?  + [K_A] > 'a' (character code)  or    + [K_A] > U+0061 (virt Keycode)
+//     read   TODO which stores?
 
 // _S2 imports Sabine
 import { XMLParser } from 'fast-xml-parser';  // for reading a file
@@ -46,6 +45,24 @@ import { readFileSync } from 'fs';
 import { writeFileSync } from "fs";           // for writing a file
 import * as fs from 'fs';   // what is this/do I need it? -  either import all or seperately like above
 
+
+
+
+
+export interface convert_object {
+  instrument: string
+  name: string,                               // needed?? remove
+  ArrayOf_Layouts: any[],                     // needed?? I think no
+  ArrayOf_Ukelele_output: any[],
+  ArrayOf_Ukelele_action: any[],
+  ArrayOf_Modifiers: any[],
+  ArrayOf_VK_from_keylayout: any[],
+  ArrayOf_dk: any[],                          // add dk-mapping ( dk1 <-> '^' )
+  ArrayOf_Dk: any[],                                     // add plain dk ( '^', '´','`')
+  ArrayOf_deadkeyables: any[],                // add char that can be modified with dk ( a,e,i,o,u)
+  ArrayOf_deadkeyedChar: any[],               // add modified keys ( â,ê,î,ô,û)
+  ArrayOf_Terminators: any[]                  // add terminators ( ^,´,`)
+};
 
 export class KeylayoutToKmnConverter {
   static readonly INPUT_FILE_EXTENSION = '.keylayout';
@@ -78,7 +95,7 @@ export class KeylayoutToKmnConverter {
     }
 
     console.log(' _S2 then CONVERT ........................................');
-    const outArray: any = await this.convert(inArray);
+    const outArray: convert_object = await this.convert(inArray);
 
     if (!outArray) {
       return null;
@@ -117,33 +134,61 @@ export class KeylayoutToKmnConverter {
     console.log("xmlFile1",xmlFile1)*/
     //console.log("xmlFile",xmlFile)
 
+    console.log("layouts_array read ")
     const parser = new XMLParser(options);
     const jsonObj = parser.parse(xmlFile); // get plain Object
 
-    const keyMapSet_count = 0
-    const nrOfStates = jsonObj.keyboard.keyMapSet[keyMapSet_count].keyMap.length
-    const nrOfKeys_inLayer = jsonObj.keyboard.keyMapSet[keyMapSet_count].keyMap[0].key.length   // will they all have the same length later ?
-
     // ToDo naming
     // TODO array-> object
-    const duplicate_layouts_array: any[] = []           // array holding the layouts e.g. ANSI or JIS
     const modifierMap_array: any[] = []                 // array holding all MODIFIER strings e.g. "anyShift caps anyOption"  -why not put modifiers into Uint8Array along with values of keys of layer
     const keys_output_all_Layers: any[] = []
     const keys_action_all_Layers: any[] = []            // array holding all values with ACTION attribute (needed for finding deadkeys)
     const deadkeyedChars_all_Layers: any[] = []         // array holding all DEADKEYS for each mod state â, ê, ,....
     const terminators_all_Layers: any[] = []            // array holding all DEADKEYS for each mod state â, ê, ,....
+    const duplicate_layouts_array: any[] = []           // array holding the layouts e.g. ANSI or JIS // needed?? I think no
 
+    // TODO call: get only ANSI
+    // Do I need to care or is there always ANSI which is always keyMapSet[0]
+    // if so code can be shortened
     // .........................................................
-    // LAYOUTS: get all groups like ANSI JIS
+    // LAYOUTS: get all groups like ANSI JIS, remove JIS
     // .........................................................
 
-    for (let i = 0; i < jsonObj.keyboard.layouts.layout.length; i++) {
+    /*   in case we need to find ANSI
+     for (let i = 0; i < jsonObj.keyboard.layouts.layout.length; i++) {
       duplicate_layouts_array[i] = jsonObj.keyboard.layouts.layout[i]['@_mapSet']
     }
+
     // remove duplicates
     const layouts_array: any[] = duplicate_layouts_array.filter(function (item, pos, self) {
       return self.indexOf(item) == pos;
     })
+
+    // remove JIS (if keyMap contains baseMapSet it`s JIS)
+    for (let i = 0; i < layouts_array.length; i++) {
+      if(jsonObj.keyboard.keyMapSet[i].keyMap[0]['@_baseMapSet'])
+         layouts_array.splice(i, 1);
+    }
+
+    // TODO implement error & do what?
+    if(layouts_array.length > 1 )
+      console.log("ERROR! too many layouts")
+    if(layouts_array.length < 1 )
+      console.log("One layouts")
+
+      // Todo better way ??
+    const keyMapSet_count = layouts_array.length-1
+*/
+
+    // in case there always ANSI which is always keyMapSet[0]
+    const layouts_array: any[] = duplicate_layouts_array
+    const keyMapSet_count = 0
+
+    // -----
+
+    const nrOfStates = jsonObj.keyboard.keyMapSet[keyMapSet_count].keyMap.length
+    const nrOfKeys_inLayer = jsonObj.keyboard.keyMapSet[keyMapSet_count].keyMap[0].key.length   // will they all have the same length later ?
+
 
     // .........................................................
     // KEYMAP: get all keys for attribute "output" and "action"  - TODO can i use shorter function?
@@ -233,6 +278,9 @@ export class KeylayoutToKmnConverter {
     // .........................................................
     // TODO can i use shorter function?  -> yes use terminators, filter, map or reduce
 
+    // this addresses state+output and none+output
+    // but not state+next or none+next
+
     // loop through all dk, key-actions and find @_action
     // find this value in <actions><action id=...>
     // in their 'when' find output for dk
@@ -250,7 +298,11 @@ export class KeylayoutToKmnConverter {
               for (let m = 0; m < jsonObj.keyboard.actions.action[l].when.length; m++) {
                 // and get their @_output
                 if (jsonObj.keyboard.actions.action[l].when[m]['@_state'] === dk_pairs_all_Layers[j][0]) {
+                  // todo push only if @output is found. if next is found: get value from terminators
+                  //if (typeof jsonObj.keyboard.actions.action[l].when[m]['@_output'].property !== 'undefined')
                   deadkeys_One_dk.push(jsonObj.keyboard.actions.action[l].when[m]['@_output'])
+                  //else
+                  //console.log(deadkeys_One_dk, "§§§§§§ PROP UNDEFINED", j, "-", k, "-", l, "-", m, "-", dk_pairs_all_Layers[j][0], jsonObj.keyboard.actions.action[l].when[m].property)
                 }
               }
             }
@@ -262,8 +314,8 @@ export class KeylayoutToKmnConverter {
 
     // TODO remove unneccassary elements
     const DataObject = {
-      name: "Ukelele-kmn",
-      ArrayOf_Layouts: layouts_array,
+      name: "Ukelele-kmn",                                // needed?? remove
+      ArrayOf_Layouts: layouts_array,                     // needed?? I think no
       ArrayOf_Ukelele_output: keys_output_all_Layers,
       ArrayOf_Ukelele_action: keys_action_all_Layers,
       ArrayOf_Modifiers: modifierMap_array,
@@ -307,7 +359,7 @@ export class KeylayoutToKmnConverter {
    * @return true if data has been written; false if not
    */
   //TODO need to use export const USVirtualKeyCodes here
-  public write(kmn_array: any): boolean {
+  public write(kmn_array: convert_object): boolean {
 
     //  *************************************************************
     //  **** write stores *******************************************
