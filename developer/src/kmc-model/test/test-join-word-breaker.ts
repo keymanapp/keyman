@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import defaultWordBreaker from '@keymanapp/models-wordbreakers';
 import {decorateWithJoin} from '../src/join-word-breaker-decorator.js';
-import { Span } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
 describe('The join word breaker decorator', function () {
   it('should decorate an existing word breaker', function () {
@@ -92,7 +92,7 @@ describe('The join word breaker decorator', function () {
   /**
    * Get just the text from a span.
    */
-  function onlyText(span: Span) {
+  function onlyText(span: LexicalModelTypes.Span) {
     return span.text;
   }
 });

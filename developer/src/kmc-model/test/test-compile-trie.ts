@@ -8,7 +8,7 @@ import { createTrieDataStructure } from '../src/build-trie.js';
 import { ModelCompilerError } from '../src/model-compiler-messages.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { TrieModel } from '@keymanapp/models-templates';
-import { Span } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
 describe('LexicalModelCompiler', function () {
   const callbacks = new TestCompilerCallbacks();
@@ -73,7 +73,7 @@ describe('LexicalModelCompiler', function () {
       format: 'trie-1.0',
       sources: ['wordlist.tsv'],
       // This is a possible word breaking function:
-      wordBreaker(phrase: string): Span[] {
+      wordBreaker(phrase: string): LexicalModelTypes.Span[] {
         return [];
       }
     }, PATH) as string;
