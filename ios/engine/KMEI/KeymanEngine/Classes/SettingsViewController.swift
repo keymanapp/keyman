@@ -12,6 +12,8 @@ import os.log
 open class SettingsViewController: UITableViewController {
   private var itemsArray = [[String: String]]()
   private var userLanguages: [String: Language] = [:]
+  private var previousPortraitKeyboardHeight: Double = 0.0
+  private var previousLandscapeKeyboardHeight: Double = 0.0
 
   override open func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
@@ -32,9 +34,16 @@ open class SettingsViewController: UITableViewController {
   }
   
   @objc func doneClicked(_ sender: Any) {
-    // While the called method might should be renamed, it does the job well enough.
     // This resets KMW so that any new and/or updated resources can be properly loaded.
+    os_log("SettingsViewController doneClicked", log:KeymanEngineLogger.settings, type: .info)
     Manager.shared.dismissKeyboardPicker(self)
+    
+    let newPortraitHeight = Storage.active.userDefaults.portraitKeyboardHeight
+    let newLandscapeHeight = Storage.active.userDefaults.landscapeKeyboardHeight
+
+    if ((previousPortraitKeyboardHeight != newPortraitHeight) || (previousLandscapeKeyboardHeight != newLandscapeHeight)) {
+      Manager.shared.keyboardHeightChanged()
+    }
   }
   
   open func launchSettings(launchingVC: UIViewController, sender: Any?) -> Void {
@@ -443,9 +452,14 @@ open class SettingsViewController: UITableViewController {
   }
   
   func showAdjustKeyboardHeight() {
-    os_log("selected Adjust Keyboard Height", log:KeymanEngineLogger.settings, type: .default)
     let vc = KeyboardHeightViewController()
     if let nc = navigationController {
+      self.previousPortraitKeyboardHeight = Storage.active.userDefaults.portraitKeyboardHeight
+      self.previousLandscapeKeyboardHeight = Storage.active.userDefaults.landscapeKeyboardHeight
+      
+      let message = "selected Adjust Keyboard Height, previousPortraitKeyboardHeight: \(previousPortraitKeyboardHeight), previousLandscapeKeyboardHeight: \(previousLandscapeKeyboardHeight)"
+      os_log("%{public}s", log:KeymanEngineLogger.settings, type: .default, message)
+      
       nc.pushViewController(vc, animated: true)
        setIsDoneButtonEnabled(nc, true)
     } else {

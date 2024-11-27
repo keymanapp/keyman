@@ -40,6 +40,7 @@ class KeyboardHeightViewController: UIViewController {
     self.applyKeyboardHeight()
     
     //title = NSLocalizedString("menu-settings-spacebar-title", bundle: engineBundle, comment: "")
+    title = NSLocalizedString("button-label-reset-default-keyboard-height", bundle: engineBundle, comment: "")
     title = "Adjust Height"
     navigationItem.setHidesBackButton(false, animated: true)
     navigationItem.leftBarButtonItem?.isEnabled = true
@@ -156,6 +157,8 @@ class KeyboardHeightViewController: UIViewController {
       }
     }
     
+    // round to nearest whole number
+    approvedTranslation = approvedTranslation.rounded(.toNearestOrAwayFromZero)
     let messageBegan = "approvedTranslation: \(approvedTranslation)"
     os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, messageBegan)
     return approvedTranslation
@@ -260,7 +263,7 @@ class KeyboardHeightViewController: UIViewController {
     self.updateKeyboardResizerConstraints()
   }
   
-  func configureContentView() {
+  private func configureContentView() {
     contentView.isUserInteractionEnabled = true
     contentView.backgroundColor = .white
     view.addSubview(contentView)
@@ -290,7 +293,7 @@ class KeyboardHeightViewController: UIViewController {
     ])
   }
 
-  @objc func restoreDefaultKeyboardHeight() {
+  @objc private func restoreDefaultKeyboardHeight() {
     os_log("restored to default", log:KeymanEngineLogger.ui, type: .info)
     let defaultHeight = self.isPortrait ? self.defaultPortraitHeight : self.defaultLandscapeHeight
     
@@ -300,7 +303,7 @@ class KeyboardHeightViewController: UIViewController {
       }, completion: nil)
   }
   
-  func configureLabel() {
+  private func configureLabel() {
     label.backgroundColor = .white
     label.textColor = .black
     label.textAlignment = NSTextAlignment.left
@@ -318,7 +321,7 @@ class KeyboardHeightViewController: UIViewController {
     ])
   }
 
-  func setLabelTextForOrientation() {
+  private func setLabelTextForOrientation() {
     let dragText = NSLocalizedString("keyboard-drag-instructions", bundle: engineBundle, comment: "")
     var rotateText: String? = nil;
     
@@ -328,10 +331,10 @@ class KeyboardHeightViewController: UIViewController {
       rotateText = NSLocalizedString("landscape-keyboard-rotate-instructions", bundle: engineBundle, comment: "")
     }
     
-    label.text = "\(dragText)\n\(rotateText!)."
+    label.text = "\(dragText)\n\(rotateText!)"
   }
 
-  func configureKeyboardImage() {
+  private func configureKeyboardImage() {
     keyboardImage.isUserInteractionEnabled = true
     keyboardImage.contentMode = UIView.ContentMode.scaleToFill
     keyboardImage.backgroundColor=UIColor.cyan
@@ -340,7 +343,7 @@ class KeyboardHeightViewController: UIViewController {
     keyboardImage.translatesAutoresizingMaskIntoConstraints = false
   }
 
-  func configureKeyboardResizer() {
+  private func configureKeyboardResizer() {
     var arrowSymbolImage: UIImage? = nil
     keyboardResizer.isUserInteractionEnabled = true
     
@@ -365,7 +368,7 @@ class KeyboardHeightViewController: UIViewController {
     keyboardResizer.addGestureRecognizer(drag)
   }
   
-  func updateKeyboardResizerConstraints() {
+  private func updateKeyboardResizerConstraints() {
     // first, clear existing constraints
     if (!resizerConstraintsArray.isEmpty) {
       NSLayoutConstraint.deactivate(resizerConstraintsArray)
@@ -381,7 +384,7 @@ class KeyboardHeightViewController: UIViewController {
     NSLayoutConstraint.activate(resizerConstraintsArray)
   }
 
-  func updateKeyboardImage() {
+  private func updateKeyboardImage() {
     var kbImage: UIImage? = nil
     if (self.isPortrait) {
       kbImage = UIImage(named:"keyboard.compact", in:engineBundle, compatibleWith:nil)
@@ -405,23 +408,12 @@ class KeyboardHeightViewController: UIViewController {
     self.determineOrientation(screenSize: size)
   
     coordinator.animate(alongsideTransition: { _ in
-    //UIView.animate(withDuration: 1, delay: 0, options: .layoutSubviews, animations: {
       self.applyKeyboardHeight()
       self.calculateKeyboardHeightLimits()
       self.setLabelTextForOrientation()
       self.updateKeyboardImage()
       self.updateKeyboardConstraints()
-      //self.view.setNeedsLayout()
     }, completion: nil)
-
-//    coordinator.animate(alongsideTransition: nil) { _ in
-//      self.applyKeyboardHeight()
-//      self.calculateKeyboardHeightLimits()
-//      self.setLabelTextForOrientation()
-//      self.updateKeyboardImage()
-//      self.updateKeyboardConstraints()
-//    }
-//    self.view.setNeedsLayout()
   }
 
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
