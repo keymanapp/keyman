@@ -62,7 +62,7 @@
       "request": "launch",
       "name": "Launch ibus-keyman unit tests",
       "target": "./keymanutil_tests",
-      "cwd": "${workspaceFolder}/linux/build/x86_64/debug/src/test",
+      "cwd": "${workspaceFolder}/linux/build/x86_64/debug/src/tests",
       "valuesFormatting": "parseText",
       "internalConsoleOptions": "openOnSessionStart",
       "env": {
