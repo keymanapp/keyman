@@ -94,6 +94,11 @@ describe('Test of String-List', () => {
       const listItemTwo = initListItem(["abc", "def", "ghi"]);
       assert.isTrue(listItemOne.isEqual(listItemTwo));
     });
+    it('isEqual should return false for different ListItems', () => {
+      const listItemOne = initListItem(["abc", "def", "ghi"]);
+      const listItemTwo = initListItem(["abd", "def", "ghi"]);
+      assert.isFalse(listItemOne.isEqual(listItemTwo));
+    });
     it('isEqual should return false for different length ListItems', () => {
       const listItemOne = initListItem(["abc", "def"]);
       const listItemTwo = initListItem(["abc", "def", "ghi"]);
@@ -115,6 +120,10 @@ describe('Test of String-List', () => {
   it('isEqual should return true for identical ListItem and string[]', () => {
     const listItem = initListItem(["abc", "def", "ghi"]);
     assert.isTrue(listItem.isEqual(["abc", "def", "ghi"]));
+  });
+  it('isEqual should return false for different ListItem and string[]', () => {
+    const listItem = initListItem(["abc", "def", "ghi"]);
+    assert.isFalse(listItem.isEqual(["abd", "def", "ghi"]));
   });
   it('isEqual should return false for different length ListItem and string[]', () => {
     const listItem = initListItem(["abc", "def"]);
@@ -159,10 +168,18 @@ describe('Test of String-List', () => {
     const listItem = initListItem(["abc", "def", "ghi"]);
     assert.deepEqual(listItem.toString(), "abc def ghi");
   });
+  it('toString should return correct string for empty ListItem', () => {
+    const listItem = new ListItem;
+    assert.deepEqual(listItem.toString(), "");
+  });
   it('toStringArray should return correct string[]', () => {
     const source   = ["abc", "def", "ghi"];
     const listItem = initListItem(source);
     assert.deepEqual(listItem.toStringArray(), source);
+  });
+  it('toStringArray should return correct string[] for empty ListItem', () => {
+    const listItem = new ListItem;
+    assert.deepEqual(listItem.toStringArray(), []);
   });
 });
 
