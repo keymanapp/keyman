@@ -120,6 +120,41 @@ describe('Test of String-List', () => {
     const listItem = initListItem(["abc", "def"]);
     assert.isFalse(listItem.isEqual(["abc", "def", "ghi"]));
   });
+  it('compareTo should return 0 for identical ListItems', () => {
+    const listItemOne = initListItem(["abc", "def", "ghi"]);
+    const listItemTwo = initListItem(["abc", "def", "ghi"]);
+    assert.equal(listItemOne.compareTo(listItemTwo), 0);
+  });
+  it('compareTo should return -1 for ListItems with different first items (smallest first)', () => {
+    const listItemOne = initListItem(["abc", "def", "ghi"]);
+    const listItemTwo = initListItem(["abd", "def", "ghi"]);
+    assert.equal(listItemOne.compareTo(listItemTwo), -1);
+  });
+  it('compareTo should return 1 for ListItems with different first items (smallest second)', () => {
+    const listItemOne = initListItem(["abd", "def", "ghi"]);
+    const listItemTwo = initListItem(["abc", "def", "ghi"]);
+    assert.equal(listItemOne.compareTo(listItemTwo), 1);
+  });
+  it('compareTo should return -1 for ListItems with different later items (smallest first)', () => {
+    const listItemOne = initListItem(["abc", "def", "ghi"]);
+    const listItemTwo = initListItem(["abc", "def", "ghj"]);
+    assert.equal(listItemOne.compareTo(listItemTwo), -1);
+  });
+  it('compareTo should return 1 for ListItems with different later items (smallest second)', () => {
+    const listItemOne = initListItem(["abc", "def", "ghj"]);
+    const listItemTwo = initListItem(["abc", "def", "ghi"]);
+    assert.equal(listItemOne.compareTo(listItemTwo), 1);
+  });
+  it('compareTo should return -1 for identical ListItems, except shorter first', () => {
+    const listItemOne = initListItem(["abc", "def", "ghi"]);
+    const listItemTwo = initListItem(["abc", "def", "ghi", "jkl"]);
+    assert.equal(listItemOne.compareTo(listItemTwo), -1);
+  });
+  it('compareTo should return 1 for identical ListItems, except longer first', () => {
+    const listItemOne = initListItem(["abc", "def", "ghi", "jkl"]);
+    const listItemTwo = initListItem(["abc", "def", "ghi"]);
+    assert.equal(listItemOne.compareTo(listItemTwo), 1);
+  });
 });
 
 function stubSectionsStrsAllocString(s?: string, opts?: StrsOptions, sections?: DependencySections): StrsItem {
