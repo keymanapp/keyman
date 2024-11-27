@@ -4,7 +4,7 @@ import 'mocha';
 
 import { makePathToFixture, compileModelSourceCode } from './helpers/index.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
-import { CasingForm, CasingFunction } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
 describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
   const callbacks = new TestCompilerCallbacks();
@@ -13,7 +13,7 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
   const PATH = makePathToFixture(MODEL_ID);
 
   describe('specifying custom methods: applyCasing and searchTermToKey', function () {
-    let casingWithPrependedSymbols: CasingFunction = function(casingName: CasingForm, text: string, defaultApplyCasing: CasingFunction) {
+    let casingWithPrependedSymbols: LexicalModelTypes.CasingFunction = function(casingName: LexicalModelTypes.CasingForm, text: string, defaultApplyCasing: LexicalModelTypes.CasingFunction) {
       switch(casingName) {
         // Use of symbols, and of the `casingName` name, exist to serve as regex targets.
         case 'lower':
@@ -36,7 +36,7 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
         languageUsesCasing: true, // applyCasing won't appear without this!
         applyCasing: casingWithPrependedSymbols,
         // Parameter name `rawSearchTerm` selected for uniqueness, regex matching test target.
-        searchTermToKey: function(rawSearchTerm: string, applyCasing: CasingFunction) {
+        searchTermToKey: function(rawSearchTerm: string, applyCasing: LexicalModelTypes.CasingFunction) {
           // Strips any applyCasing symbols ('-', '+', '^') out of the compiled Trie.
           // We should be able to test that they do _not_ occur within internal nodes of the Trie.
           return applyCasing('lower', rawSearchTerm)
@@ -91,7 +91,7 @@ describe('LexicalModelCompiler - pseudoclosure compilation + use', function () {
         languageUsesCasing: true, // applyCasing won't appear without this!
         applyCasing: casingWithPrependedSymbols,
         // Parameter name `rawSearchTerm` selected for uniqueness, regex matching test target.
-        searchTermToKey: function(rawSearchTerm: string, applyCasing: CasingFunction) {
+        searchTermToKey: function(rawSearchTerm: string, applyCasing: LexicalModelTypes.CasingFunction) {
           // Strips any applyCasing symbols ('-', '+', '^') out of the compiled Trie.
           // We should be able to test that they do _not_ occur within internal nodes of the Trie.
           return applyCasing('lower', rawSearchTerm);
