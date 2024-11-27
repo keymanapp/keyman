@@ -11,28 +11,22 @@ describe('Test of String-List', () => {
       assert.deepEqual(actual.value, strsItem);
     });
     it('can check two ListIndex for equality', () => {
-      const strsItemOne = new StrsItem("abc");
-      const strsItemTwo = new StrsItem("abc");
-      const listItemOne = new ListIndex(strsItemOne);
-      const listItemTwo = new ListIndex(strsItemTwo);
+      const listItemOne = new ListIndex(new StrsItem("abc"));
+      const listItemTwo = new ListIndex(new StrsItem("abc"));
       assert.isTrue(listItemOne.isEqual(listItemTwo));
     });
     it('can check two different ListIndex are not equal', () => {
-      const strsItemOne = new StrsItem("abc");
-      const strsItemTwo = new StrsItem("def");
-      const listItemOne = new ListIndex(strsItemOne);
-      const listItemTwo = new ListIndex(strsItemTwo);
+      const listItemOne = new ListIndex(new StrsItem("abc"));
+      const listItemTwo = new ListIndex(new StrsItem("def"));
       assert.isFalse(listItemOne.isEqual(listItemTwo));
     });
     it('can check a ListIndex and string for equality', () => {
-      const strsItem = new StrsItem("abc");
-      const listItem = new ListIndex(strsItem);
+      const listItem = new ListIndex(new StrsItem("abc"));
       const aString = "abc";
       assert.isTrue(listItem.isEqual(aString));
     });
     it('can check a ListIndex and string for inequality', () => {
-      const strsItem = new StrsItem("abc");
-      const listItem = new ListIndex(strsItem);
+      const listItem = new ListIndex(new StrsItem("abc"));
       const aString = "def";
       assert.isFalse(listItem.isEqual(aString));
     });
@@ -54,8 +48,7 @@ describe('Test of String-List', () => {
       const sections = { strs: new Strs };
       sections.strs.allocString = stubSectionsStrsAllocString;
       const actual   = ListItem.fromStrings(source, null, sections);
-      const expected = new ListItem();
-      expected.push(new ListIndex(new StrsItem("abc")));
+      const expected = initListItem(source);
       assert.deepEqual(actual, expected);
     });
     it('fromStrings should return a valid ListItem from a longer source', () => {
@@ -63,35 +56,54 @@ describe('Test of String-List', () => {
       const sections = { strs: new Strs };
       sections.strs.allocString = stubSectionsStrsAllocString;
       const actual   = ListItem.fromStrings(source, null, sections);
-      const expected = new ListItem();
-      for (const s of source)
-        expected.push(new ListIndex(new StrsItem(s)));
+      const expected = initListItem(source);
       assert.deepEqual(actual, expected);
     });
     it('getItemOrder should return a valid index for the first item', () => {
-      const listItem = new ListItem();
-      for (const s of ["abc", "def", "ghi"])
-        listItem.push(new ListIndex(new StrsItem(s)));
+      const listItem = initListItem(["abc", "def", "ghi"]);
       const index = listItem.getItemOrder("abc");
       assert.equal(index, 0);
     });
     it('getItemOrder should return a valid index for a later item', () => {
-      const listItem = new ListItem();
-      for (const s of ["abc", "def", "ghi"])
-        listItem.push(new ListIndex(new StrsItem(s)));
+      const listItem = initListItem(["abc", "def", "ghi"]);
       const index = listItem.getItemOrder("ghi");
       assert.equal(index, 2);
     });
     it('getItemOrder should return -1 for a missing item', () => {
-      const listItem = new ListItem();
-      for (const s of ["abc", "def", "ghi"])
-        listItem.push(new ListIndex(new StrsItem(s)));
-      const index = listItem.getItemOrder("jkl");
+      const listItem = initListItem(["abc", "def", "ghi"]);
+      const index    = listItem.getItemOrder("jkl");
       assert.equal(index, -1);
+    });
+    it('isEqual should return true for two empty ListItems', () => {
+      const listItemOne = new ListItem();
+      const listItemTwo = new ListItem();
+      assert.isTrue(listItemOne.isEqual(listItemTwo));
+    });
+    it('isEqual should return false for empty and non-empty ListItems', () => {
+      const listItemOne = new ListItem();
+      const listItemTwo = initListItem(["abc"]);
+      assert.isFalse(listItemOne.isEqual(listItemTwo));
+    });
+    it('isEqual should return true for identical ListItems', () => {
+      const listItemOne = initListItem(["abc", "def", "ghi"]);
+      const listItemTwo = initListItem(["abc", "def", "ghi"]);
+      assert.isTrue(listItemOne.isEqual(listItemTwo));
+    });
+    it('isEqual should return false for different length ListItems', () => {
+      const listItemOne = initListItem(["abc", "def"]);
+      const listItemTwo = initListItem(["abc", "def", "ghi"]);
+      assert.isFalse(listItemOne.isEqual(listItemTwo));
     });
   });
 });
 
 function stubSectionsStrsAllocString(s?: string, opts?: StrsOptions, sections?: DependencySections): StrsItem {
   return new StrsItem(s);
+}
+
+function initListItem(source: Array<string>): ListItem {
+  const listItem = new ListItem();
+  for (const s of source)
+    listItem.push(new ListIndex(new StrsItem(s)));
+  return listItem;
 }
