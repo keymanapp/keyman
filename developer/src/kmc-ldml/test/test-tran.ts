@@ -5,7 +5,7 @@ import { BASIC_DEPENDENCIES, UsetCompiler } from '../src/compiler/empty-compiler
 import { LdmlCompilerMessages } from '../src/compiler/ldml-compiler-messages.js';
 import { KmnCompilerMessages } from '@keymanapp/kmc-kmn';
 import { assertCodePoints, compilerTestCallbacks, testCompilationCases } from './helpers/index.js';
-import { KMXPlus, MarkerParser } from '@keymanapp/common-types';
+import { KMXPlus, LdmlKeyboardTypes } from '@keymanapp/common-types';
 
 import Tran = KMXPlus.Tran;// for tests…
 import Bksp = KMXPlus.Bksp;// for tests…
@@ -43,7 +43,7 @@ describe('tran', function () {
     {
       subpath: 'sections/tran/tran-vars.xml',
       callback(sect) {
-        const m = MarkerParser.markerOutput;
+        const m = LdmlKeyboardTypes.MarkerParser.markerOutput;
         const tran = <Tran> sect;
         assert.ok(tran);
         assert.lengthOf(compilerTestCallbacks.messages, 0);
@@ -75,7 +75,7 @@ describe('tran', function () {
           `\u{03b9}\u{0313}\u{301}`);
 
         assertCodePoints(g0t5.from.value,
-          `\u{03b9}${MarkerParser.ANY_MARKER_MATCH}\u{033c}\u{0301}`);
+          `\u{03b9}${LdmlKeyboardTypes.MarkerParser.ANY_MARKER_MATCH}\u{033c}\u{0301}`);
         assertCodePoints(g0t5.to.value,
           `\u{03b9}${m(1,false)}\u{033c}\u{0300}`);
       }
@@ -83,7 +83,7 @@ describe('tran', function () {
     {
       subpath: 'sections/tran/tran-vars-nfc.xml',
       callback(sect) {
-        const m = MarkerParser.markerOutput;
+        const m = LdmlKeyboardTypes.MarkerParser.markerOutput;
         const tran = <Tran> sect;
         assert.ok(tran);
         assert.lengthOf(compilerTestCallbacks.messages, 0);
@@ -115,7 +115,7 @@ describe('tran', function () {
           `\u{1f34}`);
 
         assertCodePoints(g0t5.from.value,
-          `\u{03af}${MarkerParser.ANY_MARKER_MATCH}\u{033c}`);
+          `\u{03af}${LdmlKeyboardTypes.MarkerParser.ANY_MARKER_MATCH}\u{033c}`);
         assertCodePoints(g0t5.to.value,
           `\u{1f76}${m(1,false)}\u{033c}`);
       },
