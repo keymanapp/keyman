@@ -4,7 +4,11 @@ import { OutputTarget, Transcription, Mock } from "keyman/engine/js-processor";
 import { LanguageProcessorEventMap, ModelSpec, StateChangeEnum, ReadySuggestions } from 'keyman/engine/interfaces';
 import ContextWindow from "./contextWindow.js";
 import { TranscriptionCache } from "./transcriptionCache.js";
-import { Capabilities, Configuration, Reversion, Suggestion } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import Capabilities = LexicalModelTypes.Capabilities;
+import Configuration = LexicalModelTypes.Configuration;
+import Reversion = LexicalModelTypes.Reversion;
+import Suggestion = LexicalModelTypes.Suggestion;
 
 /* Is more like the model configuration engine */
 export class LanguageProcessor extends EventEmitter<LanguageProcessorEventMap> {

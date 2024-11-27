@@ -1,5 +1,8 @@
 import { EventEmitter } from "eventemitter3";
-import { Keep, Reversion, Suggestion } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import Keep = LexicalModelTypes.Keep;
+import Reversion = LexicalModelTypes.Reversion;
+import Suggestion = LexicalModelTypes.Suggestion;
 import { type LanguageProcessorSpec , ReadySuggestions, type InvalidateSourceEnum, StateChangeHandler } from './languageProcessor.interface.js';
 import { type OutputTarget } from "keyman/engine/keyboard";
 
