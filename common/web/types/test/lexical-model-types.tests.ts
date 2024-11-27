@@ -5,7 +5,7 @@
  * imported and compiled without any compiler errors.
  */
 
-import { KMXPlus, ElementString, LexicalModelTypes } from "@keymanapp/common-types";
+import { KMXPlus, LdmlKeyboardTypes, LexicalModelTypes } from "@keymanapp/common-types";
 
 export let u: LexicalModelTypes.USVString;
 export let l: LexicalModelTypes.Transform;
@@ -21,5 +21,5 @@ export let lmp: LexicalModelTypes.LexicalModelPunctuation;
 
 
 // try some of the other types - that should still work
-export let elemString: ElementString;
+export let elemString: LdmlKeyboardTypes.ElementString;
 export let section: KMXPlus.Section;
