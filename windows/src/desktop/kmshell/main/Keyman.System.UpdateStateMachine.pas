@@ -733,7 +733,7 @@ begin
   if InstallNow = True then
   begin
     bucStateContext.SetApplyNow(True);
-    ChangeState(InstallingState)
+    ChangeState(InstallingState); // TODO: Aeroplane bug find this should start download first? "StartDownloadProcess;"
   end;
 
 end;
