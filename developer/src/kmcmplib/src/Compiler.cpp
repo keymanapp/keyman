@@ -2031,10 +2031,8 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
 ) {
   KMX_DWORD err;
   PKMX_WCHAR p = str, q, r;
-  int type, mx = 0, n, n1, n2, tokenFound = FALSE, z, sFlag = 0, j;
+  int type, mx = 0, n, n1, n2, tokenFound = FALSE, z, j;
   KMX_DWORD i;
-  KMX_BOOL finished = FALSE;
-  KMX_BOOL wsRequired = FALSE;
   KMX_WCHAR c;
 
   *tstr = 0;
@@ -2127,7 +2125,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       q = (PKMX_WCHAR) u16chr(p + 1, '\"');
       if (!q) return KmnCompilerMessages::ERROR_UnterminatedString;
       if ((int)(q - p) - 1 + mx > max) return KmnCompilerMessages::ERROR_ExtendedStringTooLong;
-      if (sFlag) return KmnCompilerMessages::ERROR_StringInVirtualKeySection;
       u16ncat(tstr,  p + 1, (int)(q - p) - 1);  // I3481
       mx += (int)(q - p) - 1;
       tstr[mx] = 0;
@@ -2137,7 +2134,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       q = (PKMX_WCHAR) u16chr(p + 1, '\'');
       if (!q) return KmnCompilerMessages::ERROR_UnterminatedString;
       if ((int)(q - p) - 1 + mx > max) return KmnCompilerMessages::ERROR_ExtendedStringTooLong;
-      if (sFlag) return KmnCompilerMessages::ERROR_StringInVirtualKeySection;
       u16ncat(tstr,  p + 1, (int)(q - p) - 1);  // I3481
       mx += (int)(q - p) - 1;
       tstr[mx] = 0;
@@ -2145,7 +2141,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       continue;
     case 3:
       if (u16nicmp(p, u"any", 3) != 0) return KmnCompilerMessages::ERROR_InvalidToken;
-      if (sFlag) return KmnCompilerMessages::ERROR_AnyInVirtualKeySection;
       p += 3;
       q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
       if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidAny;
@@ -2167,7 +2162,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
     case 4:
       if (u16nicmp(p, u"beep", 4) == 0)
       {
-        if (sFlag) return KmnCompilerMessages::ERROR_BeepInVirtualKeySection;
         p += 4;
         tstr[mx++] = UC_SENTINEL;
         tstr[mx++] = CODE_BEEP;
@@ -2178,7 +2172,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         if(!VerifyKeyboardVersion(fk, VERSION_90)) {
           return KmnCompilerMessages::ERROR_90FeatureOnly_IfSystemStores;
         }
-        if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
         p += 10;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
         if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidToken;
@@ -2195,7 +2188,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         if(!VerifyKeyboardVersion(fk, VERSION_80)) {
           return KmnCompilerMessages::ERROR_80FeatureOnly;
         }
-        if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
         p += 2;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
         if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidIf;
@@ -2206,7 +2198,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       else
       {
         if (u16nicmp(p, u"index", 5) != 0) return KmnCompilerMessages::ERROR_InvalidToken;
-        if (sFlag) return KmnCompilerMessages::ERROR_IndexInVirtualKeySection;
         p += 5;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
 
@@ -2241,7 +2232,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       continue;
     case 6:
       if (u16nicmp(p, u"outs", 4) != 0) return KmnCompilerMessages::ERROR_InvalidToken;
-      if (sFlag) return KmnCompilerMessages::ERROR_OutsInVirtualKeySection;
       p += 4;
       q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
       if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidOuts;
@@ -2267,7 +2257,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       if (iswspace(*(p + 1))) break;		// is a comment -- pre-stripped - so why this test?
       if (u16nicmp(p, u"context", 7) == 0)
       {
-        if (sFlag) return KmnCompilerMessages::ERROR_ContextInVirtualKeySection;
         p += 7;
 
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
@@ -2303,7 +2292,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         if(!VerifyKeyboardVersion(fk, VERSION_501)) {
           return KmnCompilerMessages::ERROR_501FeatureOnly_Call;
         }
-        if (sFlag) return KmnCompilerMessages::ERROR_CallInVirtualKeySection;
         p += 4;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
         if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidCall;
@@ -2333,7 +2321,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         if(!VerifyKeyboardVersion(fk, VERSION_70)) {
           return KmnCompilerMessages::ERROR_70FeatureOnly;
         }
-        if (sFlag) return KmnCompilerMessages::ERROR_AnyInVirtualKeySection;
         p += 6;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
         if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidAny;
@@ -2391,7 +2378,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         if(!VerifyKeyboardVersion(fk, VERSION_80)) {
           return KmnCompilerMessages::ERROR_80FeatureOnly;
         }
-        if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
         p += 5;
         q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
         if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidReset;
@@ -2413,166 +2399,170 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       }
       continue;
     case 11:
-      p++; sFlag = ISVIRTUALKEY /* 0 */; finished = FALSE; wsRequired = FALSE;
-
-      //printf("--EXTENDEDSTRING--\n");
-
-      do
       {
-        if (wsRequired && !iswspace(*p))
-          return KmnCompilerMessages::ERROR_InvalidToken; // #12307
+        int sFlag = ISVIRTUALKEY /* 0 */;
+        KMX_BOOL finished = FALSE;
+        KMX_BOOL wsRequired = FALSE;
 
-        while (iswspace(*p)) p++;
+        p++;
 
-        switch (towupper(*p))
+        //printf("--EXTENDEDSTRING--\n");
+
+        do
         {
-        case 'N':
-          if (u16nicmp(p, u"NCAPS", 5) == 0)
-            sFlag |= NOTCAPITALFLAG, wsRequired = TRUE, p += 5;
-          else finished = TRUE;
-          break;
-        case 'L':
-          if (u16nicmp(p, u"LALT", 4) == 0)
-            sFlag |= LALTFLAG, wsRequired = TRUE, p += 4;
-          else if (u16nicmp(p, u"LCTRL", 5) == 0)
-            sFlag |= LCTRLFLAG, wsRequired = TRUE, p += 5;
-          else finished = TRUE;
-          break;
-        case 'R':
-          if (u16nicmp(p, u"RALT", 4) == 0)
-            sFlag |= RALTFLAG, wsRequired = TRUE, p += 4;
-          else if (u16nicmp(p, u"RCTRL", 5) == 0)
-            sFlag |= RCTRLFLAG, wsRequired = TRUE, p += 5;
-          else finished = TRUE;
-          break;
-        case 'A':
-          if (u16nicmp(p, u"ALT", 3) == 0)
-            sFlag |= K_ALTFLAG, wsRequired = TRUE, p += 3;
-          else finished = TRUE;
-          break;
-        case 'C':
-          if (u16nicmp(p, u"CTRL", 4) == 0)
-            sFlag |= K_CTRLFLAG, wsRequired = TRUE, p += 4;
-          else if (u16nicmp(p, u"CAPS", 4) == 0)
-            sFlag |= CAPITALFLAG, wsRequired = TRUE, p += 4;
-          else finished = TRUE;
-          break;
-        case 'S':
-          if (u16nicmp(p, u"SHIFT", 5) == 0)
-            sFlag |= K_SHIFTFLAG, wsRequired = TRUE, p += 5;
-          else finished = TRUE;
-          break;
-        default:
-          finished = TRUE;
-          break;
-        }
-      } while (!finished);
+          if (wsRequired && !iswspace(*p))
+            return KmnCompilerMessages::ERROR_InvalidToken; // #12307
 
-      if ((sFlag & (LCTRLFLAG | LALTFLAG)) && (sFlag & (RCTRLFLAG | RALTFLAG))) {
-        ReportCompilerMessage(KmnCompilerMessages::WARN_MixingLeftAndRightModifiers);
-      }
+          while (iswspace(*p)) p++;
 
-      // If we use chiral modifiers, or we use state keys, and we target web in
-      // the keyboard, and we don't manually specify a keyboard version, bump
-      // the minimum version to 10.0. This makes an assumption that if we are
-      // using these features in a keyboard and it has no version specified,
-      // that we want to use the features in the web target platform, even if
-      // there are platform() rules excluding this possibility. In that (rare)
-      // situation, the keyboard developer should simply specify the &version to
-      // be 9.0 or whatever to avoid this behaviour.
-      if (sFlag & (LCTRLFLAG | LALTFLAG | RCTRLFLAG | RALTFLAG | CAPITALFLAG | NOTCAPITALFLAG | NUMLOCKFLAG | NOTNUMLOCKFLAG | SCROLLFLAG | NOTSCROLLFLAG) &&
-        kmcmp::CompileTarget == CKF_KEYMANWEB &&
-        fk->dwFlags & KF_AUTOMATICVERSION) {
-        if(!VerifyKeyboardVersion(fk, VERSION_100)) {
-          return STATUS_Success;
-        }
-      }
-      //printf("sFlag: %x\n", sFlag);
+          switch (towupper(*p))
+          {
+          case 'N':
+            if (u16nicmp(p, u"NCAPS", 5) == 0)
+              sFlag |= NOTCAPITALFLAG, wsRequired = TRUE, p += 5;
+            else finished = TRUE;
+            break;
+          case 'L':
+            if (u16nicmp(p, u"LALT", 4) == 0)
+              sFlag |= LALTFLAG, wsRequired = TRUE, p += 4;
+            else if (u16nicmp(p, u"LCTRL", 5) == 0)
+              sFlag |= LCTRLFLAG, wsRequired = TRUE, p += 5;
+            else finished = TRUE;
+            break;
+          case 'R':
+            if (u16nicmp(p, u"RALT", 4) == 0)
+              sFlag |= RALTFLAG, wsRequired = TRUE, p += 4;
+            else if (u16nicmp(p, u"RCTRL", 5) == 0)
+              sFlag |= RCTRLFLAG, wsRequired = TRUE, p += 5;
+            else finished = TRUE;
+            break;
+          case 'A':
+            if (u16nicmp(p, u"ALT", 3) == 0)
+              sFlag |= K_ALTFLAG, wsRequired = TRUE, p += 3;
+            else finished = TRUE;
+            break;
+          case 'C':
+            if (u16nicmp(p, u"CTRL", 4) == 0)
+              sFlag |= K_CTRLFLAG, wsRequired = TRUE, p += 4;
+            else if (u16nicmp(p, u"CAPS", 4) == 0)
+              sFlag |= CAPITALFLAG, wsRequired = TRUE, p += 4;
+            else finished = TRUE;
+            break;
+          case 'S':
+            if (u16nicmp(p, u"SHIFT", 5) == 0)
+              sFlag |= K_SHIFTFLAG, wsRequired = TRUE, p += 5;
+            else finished = TRUE;
+            break;
+          default:
+            finished = TRUE;
+            break;
+          }
+        } while (!finished);
 
-      tstr[mx++] = UC_SENTINEL;
-      tstr[mx++] = CODE_EXTENDED;
-      tstr[mx++] = sFlag;
-
-      q = p;
-
-      if (*q == ']') {
-        return KmnCompilerMessages::ERROR_InvalidToken; // I3137 - key portion of VK is missing e.g. "[CTRL ALT]", this generates invalid kmx file that can crash Keyman or compiler later on   // I3511
-      }
-
-      if (*q == '\'' || *q == '"') {
-        if(!VerifyKeyboardVersion(fk, VERSION_60)) {
-          return KmnCompilerMessages::ERROR_60FeatureOnly_VirtualCharKey;
+        if ((sFlag & (LCTRLFLAG | LALTFLAG)) && (sFlag & (RCTRLFLAG | RALTFLAG))) {
+          ReportCompilerMessage(KmnCompilerMessages::WARN_MixingLeftAndRightModifiers);
         }
 
-        if (!kmcmp::FMnemonicLayout) {
-          ReportCompilerMessage(KmnCompilerMessages::WARN_VirtualCharKeyWithPositionalLayout);
+        // If we use chiral modifiers, or we use state keys, and we target web in
+        // the keyboard, and we don't manually specify a keyboard version, bump
+        // the minimum version to 10.0. This makes an assumption that if we are
+        // using these features in a keyboard and it has no version specified,
+        // that we want to use the features in the web target platform, even if
+        // there are platform() rules excluding this possibility. In that (rare)
+        // situation, the keyboard developer should simply specify the &version to
+        // be 9.0 or whatever to avoid this behaviour.
+        if (sFlag & (LCTRLFLAG | LALTFLAG | RCTRLFLAG | RALTFLAG | CAPITALFLAG | NOTCAPITALFLAG | NUMLOCKFLAG | NOTNUMLOCKFLAG | SCROLLFLAG | NOTSCROLLFLAG) &&
+          kmcmp::CompileTarget == CKF_KEYMANWEB &&
+          fk->dwFlags & KF_AUTOMATICVERSION) {
+          if(!VerifyKeyboardVersion(fk, VERSION_100)) {
+            return STATUS_Success;
+          }
+        }
+        //printf("sFlag: %x\n", sFlag);
+
+        tstr[mx++] = UC_SENTINEL;
+        tstr[mx++] = CODE_EXTENDED;
+        tstr[mx++] = sFlag;
+
+        q = p;
+
+        if (*q == ']') {
+          return KmnCompilerMessages::ERROR_InvalidToken; // I3137 - key portion of VK is missing e.g. "[CTRL ALT]", this generates invalid kmx file that can crash Keyman or compiler later on   // I3511
         }
 
-        KMX_WCHAR chQuote = *q;
+        if (*q == '\'' || *q == '"') {
+          if(!VerifyKeyboardVersion(fk, VERSION_60)) {
+            return KmnCompilerMessages::ERROR_60FeatureOnly_VirtualCharKey;
+          }
 
-        q++; // skip quote
-        if (*q == chQuote || *q == '\n' || *q == 0)
-          return KmnCompilerMessages::ERROR_InvalidToken;
+          if (!kmcmp::FMnemonicLayout) {
+            ReportCompilerMessage(KmnCompilerMessages::WARN_VirtualCharKeyWithPositionalLayout);
+          }
 
-        tstr[mx - 1] |= VIRTUALCHARKEY;
-        tstr[mx++] = *q;
+          KMX_WCHAR chQuote = *q;
 
-        q++; // skip key
-        if (*q != chQuote)
-          return KmnCompilerMessages::ERROR_InvalidToken;
-        q++; // skip quote
-      } else {
-        for (j = 0; !iswspace(*q) && *q != ']' && *q != 0; q++, j++);
+          q++; // skip quote
+          if (*q == chQuote || *q == '\n' || *q == 0)
+            return KmnCompilerMessages::ERROR_InvalidToken;
 
-        if (*q == 0)
-          return KmnCompilerMessages::ERROR_InvalidToken;
+          tstr[mx - 1] |= VIRTUALCHARKEY;
+          tstr[mx++] = *q;
 
-        KMX_WCHAR vkname[SZMAX_VKDICTIONARYNAME];  // I3438
+          q++; // skip key
+          if (*q != chQuote)
+            return KmnCompilerMessages::ERROR_InvalidToken;
+          q++; // skip quote
+        } else {
+          for (j = 0; !iswspace(*q) && *q != ']' && *q != 0; q++, j++);
 
-        if (j >= SZMAX_VKDICTIONARYNAME)
-          return KmnCompilerMessages::ERROR_InvalidToken;
+          if (*q == 0)
+            return KmnCompilerMessages::ERROR_InvalidToken;
 
-        u16ncpy(vkname, p, j);  // I3481
-        vkname[j] = 0;
+          KMX_WCHAR vkname[SZMAX_VKDICTIONARYNAME];  // I3438
 
-        if (u16icmp(vkname, u"K_NPENTER") == 0)
-          i = 5;  // I649 - K_NPENTER hack
-        else {
-          for (i = 0; i <= VK__MAX; i++) {
-            if (u16icmp(vkname, VKeyNames[i]) == 0 || u16icmp(vkname, VKeyISO9995Names[i]) == 0)
-              break;
+          if (j >= SZMAX_VKDICTIONARYNAME)
+            return KmnCompilerMessages::ERROR_InvalidToken;
+
+          u16ncpy(vkname, p, j);  // I3481
+          vkname[j] = 0;
+
+          if (u16icmp(vkname, u"K_NPENTER") == 0)
+            i = 5;  // I649 - K_NPENTER hack
+          else {
+            for (i = 0; i <= VK__MAX; i++) {
+              if (u16icmp(vkname, VKeyNames[i]) == 0 || u16icmp(vkname, VKeyISO9995Names[i]) == 0)
+                break;
+            }
+          }
+
+          if (i == VK__MAX + 1) {
+            if(!VerifyKeyboardVersion(fk, VERSION_90)) {
+              return KmnCompilerMessages::ERROR_InvalidToken;
+            }
+
+            i = GetVKCode(fk, vkname);  // I3438
+            if (i == 0)
+              return KmnCompilerMessages::ERROR_InvalidToken;
+          }
+
+          tstr[mx++] = (int)i;
+
+          if (kmcmp::FMnemonicLayout && (i <= VK__MAX) && VKeyMayBeVCKey[i]) {
+            ReportCompilerMessage(KmnCompilerMessages::WARN_VirtualKeyWithMnemonicLayout);  // I3438
           }
         }
 
-        if (i == VK__MAX + 1) {
-          if(!VerifyKeyboardVersion(fk, VERSION_90)) {
-            return KmnCompilerMessages::ERROR_InvalidToken;
-          }
+        while (iswspace(*q)) q++;
 
-          i = GetVKCode(fk, vkname);  // I3438
-          if (i == 0)
-            return KmnCompilerMessages::ERROR_InvalidToken;
-        }
+        if (*q != ']')
+          return KmnCompilerMessages::ERROR_InvalidToken;
 
-        tstr[mx++] = (int)i;
+        tstr[mx++] = UC_SENTINEL_EXTENDEDEND;
+        tstr[mx] = 0;
+        //printf("--EXTENDEDEND--\n");
 
-        if (kmcmp::FMnemonicLayout && (i <= VK__MAX) && VKeyMayBeVCKey[i]) {
-          ReportCompilerMessage(KmnCompilerMessages::WARN_VirtualKeyWithMnemonicLayout);  // I3438
-        }
+        p = q + 1;
       }
-
-      while (iswspace(*q)) q++;
-
-      if (*q != ']')
-        return KmnCompilerMessages::ERROR_InvalidToken;
-
-      tstr[mx++] = UC_SENTINEL_EXTENDEDEND;
-      tstr[mx] = 0;
-      //printf("--EXTENDEDEND--\n");
-
-      p = q + 1;
-
-      sFlag = 0;
 
       continue;
     case 14:
@@ -2649,7 +2639,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       if(!VerifyKeyboardVersion(fk, VERSION_90)) {
         return KmnCompilerMessages::ERROR_90FeatureOnly_IfSystemStores;
       }
-      if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
       p += 8;
       q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
       if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidToken;
@@ -2661,7 +2650,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       if(!VerifyKeyboardVersion(fk, VERSION_90)) {
         return KmnCompilerMessages::ERROR_90FeatureOnly_SetSystemStores;
       }
-      if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
       p += 5;
       q = GetDelimitedString(&p, u"()", GDS_CUTLEAD | GDS_CUTFOLL);
       if (!q || !*q) return KmnCompilerMessages::ERROR_InvalidToken;
@@ -2670,7 +2658,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
       continue;
     case 19:  // #2241
       if (*(p + 1) != '.') return KmnCompilerMessages::ERROR_InvalidToken;
-      if (sFlag) return KmnCompilerMessages::ERROR_InvalidInVirtualKeySection;
       p += 2;
       err = process_expansion(fk, p, tstr, &mx, max);
       if (err != STATUS_Success) return err;
