@@ -155,6 +155,15 @@ describe('Test of String-List', () => {
     const listItemTwo = initListItem(["abc", "def", "ghi"]);
     assert.equal(listItemOne.compareTo(listItemTwo), 1);
   });
+  it('toString should return correct string', () => {
+    const listItem = initListItem(["abc", "def", "ghi"]);
+    assert.deepEqual(listItem.toString(), "abc def ghi");
+  });
+  it('toStringArray should return correct string[]', () => {
+    const source   = ["abc", "def", "ghi"];
+    const listItem = initListItem(source);
+    assert.deepEqual(listItem.toStringArray(), source);
+  });
 });
 
 function stubSectionsStrsAllocString(s?: string, opts?: StrsOptions, sections?: DependencySections): StrsItem {
