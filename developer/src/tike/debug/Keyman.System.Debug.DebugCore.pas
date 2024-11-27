@@ -37,6 +37,8 @@ type
 implementation
 
 uses
+  System.Classes,
+
   KeymanPaths;
 
 { TDebugCore }
@@ -44,6 +46,9 @@ uses
 constructor TDebugCore.Create(const Filename: string; EnableDebug: Boolean);
 var
   status: km_core_status;
+  fs: TFileStream;
+  Buffer: Pointer;
+  BufferSize: NativeInt;
 begin
   inherited Create;
 
@@ -52,7 +57,23 @@ begin
   FKeyboard := nil;
   FState := nil;
 
-  status := km_core_keyboard_load(PChar(FileName), FKeyboard);
+  buffer := nil;
+  try
+    fs := TFileStream.Create(Filename, fmOpenRead or fmShareDenyWrite);
+    try
+      BufferSize := fs.Size;
+      Buffer := AllocMem(BufferSize);
+      if fs.Read(Buffer^, BufferSize) <> BufferSize then
+        raise EDebugCore.Create('Unable to start debugger -- failed to read file from disk');
+    finally
+      fs.Free;
+    end;
+
+    status := km_core_keyboard_load_from_blob(PChar(FileName), Buffer, BufferSize, FKeyboard);
+  finally
+    FreeMem(Buffer);
+  end;
+
   if status <> KM_CORE_STATUS_OK then
     raise EDebugCore.CreateFmt('Unable to start debugger -- keyboard load failed with error %x', [Ord(status)]);
 
