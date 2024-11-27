@@ -68,6 +68,27 @@ describe('Test of String-List', () => {
         expected.push(new ListIndex(new StrsItem(s)));
       assert.deepEqual(actual, expected);
     });
+    it('getItemOrder should return a valid index for the first item', () => {
+      const listItem = new ListItem();
+      for (const s of ["abc", "def", "ghi"])
+        listItem.push(new ListIndex(new StrsItem(s)));
+      const index = listItem.getItemOrder("abc");
+      assert.equal(index, 0);
+    });
+    it('getItemOrder should return a valid index for a later item', () => {
+      const listItem = new ListItem();
+      for (const s of ["abc", "def", "ghi"])
+        listItem.push(new ListIndex(new StrsItem(s)));
+      const index = listItem.getItemOrder("ghi");
+      assert.equal(index, 2);
+    });
+    it('getItemOrder should return -1 for a missing item', () => {
+      const listItem = new ListItem();
+      for (const s of ["abc", "def", "ghi"])
+        listItem.push(new ListIndex(new StrsItem(s)));
+      const index = listItem.getItemOrder("jkl");
+      assert.equal(index, -1);
+    });
   });
 });
 
