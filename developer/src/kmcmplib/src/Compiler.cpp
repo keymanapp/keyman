@@ -2562,8 +2562,6 @@ KMX_DWORD GetXStringImpl(PKMX_WCHAR tstr, PFILE_KEYBOARD fk, PKMX_WCHAR str, KMX
         //printf("--EXTENDEDEND--\n");
 
         p = q + 1;
-
-        sFlag = 0;
       }
 
       continue;
