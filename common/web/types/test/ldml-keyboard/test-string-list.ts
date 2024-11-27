@@ -58,6 +58,16 @@ describe('Test of String-List', () => {
       expected.push(new ListIndex(new StrsItem("abc")));
       assert.deepEqual(actual, expected);
     });
+    it('fromStrings should return a valid ListItem from a longer source', () => {
+      const source = ["abc", "def", "ghi"];
+      const sections = { strs: new Strs };
+      sections.strs.allocString = stubSectionsStrsAllocString;
+      const actual   = ListItem.fromStrings(source, null, sections);
+      const expected = new ListItem();
+      for (const s of source)
+        expected.push(new ListIndex(new StrsItem(s)));
+      assert.deepEqual(actual, expected);
+    });
   });
 });
 
