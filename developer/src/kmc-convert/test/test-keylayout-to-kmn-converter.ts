@@ -38,7 +38,7 @@ describe('KeylayoutToKmnConverter', function() {
       const inputFilename  = makePathToFixture('../data/My_dk_Keyboard.keylayout');
       //const inputFilename  = makePathToFixture('../data/US_complete.keylayout');
       //const inputFilename  = makePathToFixture('../data/Italian_copy.keylayout');
-
+      
       const outputFilename = makePathToFixture('../data/MyResult.kmn');
 // TODO check filename if correct
       console.log('        inputFilename', inputFilename)
