@@ -108,7 +108,6 @@ BOOL LoadlpKeyboard(int i)
   }
 
   rewind(kmx_file);
-
   buffer = malloc(length);
 
   if (!buffer) {
