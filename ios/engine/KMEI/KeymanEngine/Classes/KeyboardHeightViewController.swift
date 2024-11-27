@@ -292,18 +292,12 @@ class KeyboardHeightViewController: UIViewController {
 
   @objc func restoreDefaultKeyboardHeight() {
     os_log("restored to default", log:KeymanEngineLogger.ui, type: .info)
-    let animationOptions: UIView.AnimationOptions = [.curveEaseInOut]
-    if (self.isPortrait) {
-      UIView.animate(withDuration: 0.7, delay: 0.0, options:animationOptions, animations: {
-        self.changeKeyboardHeight(newHeight: self.defaultPortraitHeight)
+    let defaultHeight = self.isPortrait ? self.defaultPortraitHeight : self.defaultLandscapeHeight
+    
+    UIView.animate(withDuration: 1.1, delay: 0.1, usingSpringWithDamping: 0.35, initialSpringVelocity: 4.5, options: .curveEaseOut, animations: {
+        self.changeKeyboardHeight(newHeight: defaultHeight)
         self.view.layoutIfNeeded()
       }, completion: nil)
-    } else {
-      UIView.animate(withDuration: 0.7, delay: 0.0, options:animationOptions, animations: {
-        self.changeKeyboardHeight(newHeight: self.defaultLandscapeHeight)
-        self.view.layoutIfNeeded()
-      }, completion: nil)
-    }
   }
   
   func configureLabel() {
@@ -409,15 +403,25 @@ class KeyboardHeightViewController: UIViewController {
      using the specified size, determine which orientation the device is moving to and adjust content as necessary
      */
     self.determineOrientation(screenSize: size)
-    
-    coordinator.animate(alongsideTransition: nil) { _ in
+  
+    coordinator.animate(alongsideTransition: { _ in
+    //UIView.animate(withDuration: 1, delay: 0, options: .layoutSubviews, animations: {
       self.applyKeyboardHeight()
       self.calculateKeyboardHeightLimits()
       self.setLabelTextForOrientation()
       self.updateKeyboardImage()
       self.updateKeyboardConstraints()
-    }
-    self.view.setNeedsLayout()
+      //self.view.setNeedsLayout()
+    }, completion: nil)
+
+//    coordinator.animate(alongsideTransition: nil) { _ in
+//      self.applyKeyboardHeight()
+//      self.calculateKeyboardHeightLimits()
+//      self.setLabelTextForOrientation()
+//      self.updateKeyboardImage()
+//      self.updateKeyboardConstraints()
+//    }
+//    self.view.setNeedsLayout()
   }
 
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
