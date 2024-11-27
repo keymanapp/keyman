@@ -84,6 +84,11 @@ describe('Test of String-List', () => {
       const listItemTwo = initListItem(["abc"]);
       assert.isFalse(listItemOne.isEqual(listItemTwo));
     });
+    it('isEqual should return false for non-empty and empty ListItems', () => {
+      const listItemOne = initListItem(["abc"]);
+      const listItemTwo = new ListItem();
+      assert.isFalse(listItemOne.isEqual(listItemTwo));
+    });
     it('isEqual should return true for identical ListItems', () => {
       const listItemOne = initListItem(["abc", "def", "ghi"]);
       const listItemTwo = initListItem(["abc", "def", "ghi"]);
@@ -94,6 +99,26 @@ describe('Test of String-List', () => {
       const listItemTwo = initListItem(["abc", "def", "ghi"]);
       assert.isFalse(listItemOne.isEqual(listItemTwo));
     });
+  });
+  it('isEqual should return true for empty ListItem and string[]', () => {
+    const listItem = new ListItem();
+    assert.isTrue(listItem.isEqual([]));
+  });
+  it('isEqual should return false for empty ListItem and non-empty string[]', () => {
+    const listItem = new ListItem();
+    assert.isFalse(listItem.isEqual(["abc"]));
+  });
+  it('isEqual should return false for non-empty ListItem and empty string[]', () => {
+    const listItem = initListItem(["abc"]);;
+    assert.isFalse(listItem.isEqual([]));
+  });
+  it('isEqual should return true for identical ListItem and string[]', () => {
+    const listItem = initListItem(["abc", "def", "ghi"]);
+    assert.isTrue(listItem.isEqual(["abc", "def", "ghi"]));
+  });
+  it('isEqual should return false for different length ListItem and string[]', () => {
+    const listItem = initListItem(["abc", "def"]);
+    assert.isFalse(listItem.isEqual(["abc", "def", "ghi"]));
   });
 });
 
