@@ -57,7 +57,7 @@ begin
   FKeyboard := nil;
   FState := nil;
 
-  buffer := nil;
+  Buffer := nil;
   try
     fs := TFileStream.Create(Filename, fmOpenRead or fmShareDenyWrite);
     try
