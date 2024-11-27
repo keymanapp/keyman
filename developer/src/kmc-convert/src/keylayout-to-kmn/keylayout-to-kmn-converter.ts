@@ -7,8 +7,8 @@ import { CompilerCallbacks, CompilerOptions } from "@keymanapp/developer-utils";
 import { ConverterToKmnArtifacts } from "../converter-artifacts.js";
 
 //     TODO keylayout->kmn
-//     modifiers: The identifier of the <modifierMap> element to use for this range of hardware keyboard types.
-//     defaultIndex: The table number to use for modifier key combinations which are not explicitly specified by any <modifier> element within the <modifierMap>.
+// OK  modifiers: The identifier of the <modifierMap> element to use for this range of hardware keyboard types.
+// OK  defaultIndex: The table number to use for modifier key combinations which are not explicitly specified by any <modifier> element within the <modifierMap>.
 //     write read, convert, write
 //     tests for 3 functions read write convert
 //     add data to object
@@ -51,20 +51,15 @@ import * as fs from 'fs';   // what is this/do I need it? -  either import all o
 
 export interface convert_object {
   name: string,                               // needed?? remove
-  ArrayOf_Layouts: any[],                     // needed?? I think no
-  ArrayOf_Ukelele_output: any[],
-  ArrayOf_Ukelele_action: any[],
-  ArrayOf_Modifiers: any[],
-  ArrayOf_VK_from_keylayout: any[],
-  ArrayOf_dk: any[],                          // add dk-mapping ( dk1 <-> '^' )
-  ArrayOf_Dk: any[],                                     // add plain dk ( '^', '´','`')
-  ArrayOf_deadkeyables: any[],                // add char that can be modified with dk ( a,e,i,o,u)
-  ArrayOf_deadkeyedChar: any[],               // add modified keys ( â,ê,î,ô,û)
-  ArrayOf_Terminators: any[]                  // add terminators ( ^,´,`)
-};
-
-export interface deadkey_all_object {
-  deadkeyedChars_all_Layers: string[][],                     // needed?? I think no
+  ArrayOf_Layouts: string[],                     // needed?? I think no
+    ArrayOf_Ukelele_output: any[],
+    ArrayOf_Ukelele_action: any[],
+  ArrayOf_Modifiers: string[],
+  ArrayOf_VK_from_keylayout: (string | number)[][],
+  ArrayOf_dk: string[][],                          // add dk-mapping ( dk1 <-> '^' )
+  ArrayOf_deadkeyables: string[][],                // add char that can be modified with dk ( a,e,i,o,u)
+  ArrayOf_deadkeyedChar: string[][],               // add modified keys ( â,ê,î,ô,û)
+  ArrayOf_Terminators: Uint8Array[]                  // add terminators ( ^,´,`)
 };
 
 
@@ -144,12 +139,12 @@ export class KeylayoutToKmnConverter {
 
     // ToDo naming
     // TODO array-> object
-    const modifierMap_array: any[] = []                 // array holding all MODIFIER strings e.g. "anyShift caps anyOption"  -why not put modifiers into Uint8Array along with values of keys of layer
-    const keys_output_all_Layers: any[] = []
+    const modifierMap_array: string[] = []                 // array holding all MODIFIER strings e.g. "anyShift caps anyOption"  -why not put modifiers into Uint8Array along with values of keys of layer
+    const keys_output_all_Layers: Uint8Array[][] = []
     const keys_action_all_Layers: any[] = []            // array holding all values with ACTION attribute (needed for finding deadkeys)
-    const deadkeyedChars_all_Layers: any[] = []         // array holding all DEADKEYS for each mod state â, ê, ,....
-    const terminators_all_Layers: any[] = []            // array holding all DEADKEYS for each mod state â, ê, ,....
-    const duplicate_layouts_array: any[] = []           // array holding the layouts e.g. ANSI or JIS // needed?? I think no
+    const deadkeyedChars_all_Layers: string[][] = []         // array holding all DEADKEYS for each mod state â, ê, ,....
+    const terminators_all_Layers: Uint8Array[] = []            // array holding all DEADKEYS for each mod state â, ê, ,....
+    const duplicate_layouts_array: string[] = []           // array holding the layouts e.g. ANSI or JIS // needed?? I think no
 
     // TODO call: get only ANSI
     // Do I need to care or is there always ANSI which is always keyMapSet[0]
@@ -185,7 +180,7 @@ export class KeylayoutToKmnConverter {
 */
 
     // in case there always ANSI which is always keyMapSet[0]
-    const layouts_array: any[] = duplicate_layouts_array
+    const layouts_array: string[] = duplicate_layouts_array
     const keyMapSet_count = 0
 
     // -----
@@ -244,14 +239,6 @@ export class KeylayoutToKmnConverter {
     }
 
     // .........................................................
-    // ACTION: create array of deadkey base ^ ´ ` // TODO needed to add and distribute?
-    // .........................................................
-    const dk: string[] = [];
-    for (let k = 0; k < dk_pairs_all_Layers.length; k++) {
-      dk.push(dk_pairs_all_Layers[k][1])
-    }
-
-    // .........................................................
     // ACTION: create array of "deadkeyables_all_Layers"  - TODO can i use shorter function?
     // .........................................................
     const deadkeyables_all_Layers: string[][] = []
@@ -261,6 +248,11 @@ export class KeylayoutToKmnConverter {
         const resulting_character = new TextDecoder().decode(keys_action_all_Layers[j][i])
         if (resulting_character !== "")
           deadkeyables_one.push(resulting_character)
+      }
+
+      const dk: string[] = [];
+      for (let k = 0; k < dk_pairs_all_Layers.length; k++) {
+        dk.push(dk_pairs_all_Layers[k][1])
       }
 
       if (deadkeyables_one.length !== 0) {
@@ -314,9 +306,9 @@ export class KeylayoutToKmnConverter {
         }
       }
       deadkeyedChars_all_Layers.push(deadkeys_One_dk)
-                  console.log("typeof(deadkeyedChars_all_Layers)", typeof(deadkeyedChars_all_Layers),deadkeyedChars_all_Layers)
     }
-const vk : any[] =[""]
+    
+    const vk: any[] = [""]
     // TODO remove unneccassary elements
     const DataObject: convert_object = {
       name: "Ukelele-kmn",                                // needed?? remove
@@ -326,7 +318,6 @@ const vk : any[] =[""]
       ArrayOf_Modifiers: modifierMap_array,
       ArrayOf_VK_from_keylayout: vk,
       ArrayOf_dk: dk_pairs_all_Layers,                    // add dk-mapping ( dk1 <-> '^' )
-      ArrayOf_Dk: dk,                                     // add plain dk ( '^', '´','`')
       ArrayOf_deadkeyables: deadkeyables_all_Layers,      // add char that can be modified with dk ( a,e,i,o,u)
       ArrayOf_deadkeyedChar: deadkeyedChars_all_Layers,   // add modified keys ( â,ê,î,ô,û)
       ArrayOf_Terminators: terminators_all_Layers         // add terminators ( ^,´,`)
@@ -342,12 +333,12 @@ const vk : any[] =[""]
    * @param  data_ukelele (Uint8Array) data of the ukelele .keylayout-file
    * @return outArray Uint8Array keys_all_Layers, the converted data for kmn-files if all layers have been converted; else null
    */
-  public convert(data_ukelele: any): convert_object {
-    const data_VK_from_keylayout: any[][] = [];
+  public convert(data_ukelele: convert_object): convert_object {
+    const data_VK_from_keylayout: (string | number)[][] = [];
 
     for (let i = 0; i < data_ukelele.ArrayOf_Ukelele_output[0].length; i++) {
-      const data_VK_from_keylayout_pair: any[] = [];
-      const vk_from_Ukelele = this.map_UkeleleKC_To_VK(i)
+      const data_VK_from_keylayout_pair: (string | number)[] = [];
+      const vk_from_Ukelele: string = this.map_UkeleleKC_To_VK(i)
       data_VK_from_keylayout_pair.push(i)
       data_VK_from_keylayout_pair.push(vk_from_Ukelele)
       data_VK_from_keylayout.push(data_VK_from_keylayout_pair)
@@ -417,7 +408,7 @@ const vk : any[] =[""]
 
         // get the character from keymap-section of .keylayout-file that will be written as result in kmn-file
         const resulting_character = new TextDecoder().decode(kmn_array.ArrayOf_Ukelele_output[i][j])
-        const VK: number[][] = kmn_array.ArrayOf_VK_from_keylayout
+        const VK: (string | number)[][] = kmn_array.ArrayOf_VK_from_keylayout
         const vk_label = VK.filter(item => item[0] === kmn_array.ArrayOf_VK_from_keylayout[j][0])
 
         // TODO remove j
@@ -443,7 +434,7 @@ const vk : any[] =[""]
         const resulting_character = new TextDecoder().decode(kmn_array.ArrayOf_Ukelele_action[j][i])
 
         if (resulting_character !== "") {
-          const VK: number[][] = kmn_array.ArrayOf_VK_from_keylayout
+          const VK: (string | number)[][] = kmn_array.ArrayOf_VK_from_keylayout
           const vk_label = VK.filter(item => item[0] === kmn_array.ArrayOf_VK_from_keylayout[i][0])
 
           for (let k = 0; k < kmn_array.ArrayOf_dk.length; k++) {
@@ -497,7 +488,7 @@ const vk : any[] =[""]
    * @param  keylayout_modifier the modifier value used in the .keylayout-file
    * @return kmn_modifier the modifier value used in the .kmn-file
    */
-  public create_modifier(keylayout_modifier: any, isCAPSused: boolean): string {
+  public create_modifier(keylayout_modifier: string, isCAPSused: boolean): string {
     let add_modifier = ""
     let kmn_modifier = ""
     let kmn_ncaps = ""
@@ -563,7 +554,7 @@ const vk : any[] =[""]
  * @return keycode on Win Keyboard
  */
   // TODO finish all entries
-  public map_UkeleleKC_To_VK(pos: any): any {
+  public map_UkeleleKC_To_VK(pos: number): string {
     // ukelele KC  -->  // VK_US
 
     if (pos === 0x0A) return "K_BKQUOTE"    /* ^ */
@@ -592,7 +583,9 @@ const vk : any[] =[""]
     if (pos === 0x23) return "K_P"          /* P */
     if (pos === 0x21) return "K_LBRKT"      /* [ */
     if (pos === 0x1E) return "K_RBRKT"      /* ] */
-    if (pos === 0x32) return "K_BKSLASH"    /* \ */
+    //if (pos === 0x32) return "K_BKSLASH"    /* \ */
+    if (pos === 0x30) return "K_BKSLASH"    /* \ */   // for ANSI  correct??
+    if (pos === 0x2A) return "K_BKSLASH"    /* \ */   // for ISO  correct??
 
     if (pos === 0x00) return "K_A"          /* A */
     if (pos === 0x01) return "K_S"          /* S */
@@ -620,6 +613,7 @@ const vk : any[] =[""]
 
     if (pos === 36) return "K_ENTER"
     if (pos === 49) return "K_SPACE"
+    else return ""
   }
 }
 
