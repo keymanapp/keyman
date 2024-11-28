@@ -1,3 +1,11 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ * 
+ * Created by Dr Mark C. Sinclair on 2024-11-28
+ * 
+ * Test code for file-types.ts
+ */
+
 import 'mocha';
 import { assert } from 'chai';
 import { removeExtension } from '../../src/util/file-types.js';
