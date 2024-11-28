@@ -13,6 +13,7 @@ import {
   ALL_SOURCE,
   ALL_BINARY,
   Binary,
+  fromFilename,
   removeExtension,
   sourceOrBinaryTypeFromFilename,
   sourceTypeFromFilename,
@@ -22,6 +23,41 @@ import {
 } from '../../src/util/file-types.js';
 
 describe('Test of File-Types', () => {
+  describe('Test of fromFilename()', () => {
+    it('can extract Source file extension', () => {
+      ALL_SOURCE.forEach((ext) => {
+        const filename = `file${ext}`;
+        const actual   = fromFilename(filename);
+        assert.deepEqual(actual, ext);
+      });
+    });
+    it('can extract Binary file extension', () => {
+      ALL_BINARY.forEach((ext) => {
+        const filename = `file${ext}`;
+        const actual   = fromFilename(filename);
+        assert.deepEqual(actual, ext);
+      });
+    });
+    it('can extract unmatched file extension', () => {
+      const ext = ".cpp";
+      assert.isFalse((Object.values(ALL_SOURCE) as string[]).includes(ext));
+      const filename = `file${ext}`;
+      const actual   = fromFilename(filename);
+      assert.deepEqual(actual, ext);
+    });
+    it('returns empty string for no file extension', () => {
+      const filename = `file`;
+      const actual   = fromFilename(filename);
+      assert.deepEqual(actual, "");
+    });
+    it('can extract upper case file extension', () => {
+      const ext          = ALL_SOURCE[0];
+      const upperCaseExt = ext.toUpperCase();
+      const filename     = `file${upperCaseExt}`;
+      const actual       = fromFilename(filename);
+      assert.deepEqual(actual, ext);
+    });
+  });
   describe('Test of removeExtension()', () => {
     it('can remove Source file extension', () => {
       ALL_SOURCE.forEach((ext) => {
