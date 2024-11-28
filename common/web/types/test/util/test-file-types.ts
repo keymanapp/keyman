@@ -12,10 +12,12 @@ import {
   ALL,
   ALL_SOURCE,
   ALL_BINARY,
+  Binary,
   removeExtension,
   sourceOrBinaryTypeFromFilename,
   sourceTypeFromFilename,
   binaryTypeFromFilename,
+  filenameIs,
 } from '../../src/util/file-types.js';
 
 describe('Test of File-Types', () => {
@@ -127,6 +129,33 @@ describe('Test of File-Types', () => {
       const filename     = `file${upperCaseExt}`;
       const actual       = binaryTypeFromFilename(filename);
       assert.deepEqual(actual, ext);
+    });
+  });
+  describe('Test of filenameIs()', () => {
+    it('can identify Source file extension', () => {
+      ALL_SOURCE.forEach((ext) => {
+        const filename = `file${ext}`;
+        const actual   = filenameIs(filename, ext);
+        assert.isTrue(actual);
+      });
+    });
+    it('can identify Binary file extension', () => {
+      ALL_BINARY.forEach((ext) => {
+        const filename = `file${ext}`;
+        if (ext == Binary.Model) { // Special case for .model.js
+          const actual = filenameIs(filename, Binary.WebKeyboard);
+          assert.isFalse(actual);
+        }
+        const actual = filenameIs(filename, ext);
+        assert.isTrue(actual);
+      });
+    });
+    it('can identify upper case file extension', () => {
+      const ext          = ALL[0];
+      const upperCaseExt = ext.toUpperCase();
+      const filename     = `file${upperCaseExt}`;
+      const actual       = filenameIs(filename, ext);
+      assert.isTrue(actual);
     });
   });
 });
