@@ -29,7 +29,7 @@ test_include_dirs = [
 
 test_exe = executable(
   'ibus-keyman-tests',
-  test_files, util_files, common_test_files
+  test_files, util_files, common_test_files,
   dependencies: test_deps,
   include_directories: test_include_dirs,
 )
