@@ -125,7 +125,11 @@ export class LexicalModelCompiler implements KeymanCompiler {
    */
   public loadFromFilename(filename: string): LexicalModelSource {
 
-    let sourceCode = new TextDecoder().decode(callbacks.loadFile(filename));
+    const data = callbacks.loadFile(filename);
+    if(!data) {
+      throw new ModelCompilerError(ModelCompilerMessages.Error_ModelFileNotFound({filename}));
+    }
+    let sourceCode = new TextDecoder().decode(data);
     // Compile the module to JavaScript code.
     // NOTE: transpile module does a very simple TS to JS compilation.
     // It DOES NOT check for types!

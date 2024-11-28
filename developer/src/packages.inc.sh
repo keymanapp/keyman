@@ -9,6 +9,8 @@ readonly PACKAGES=(
   core/include/ldml
   developer/src/common/web/utils
   developer/src/kmc-analyze
+  developer/src/kmc-copy
+  developer/src/kmc-generate
   developer/src/kmc-keyboard-info
   developer/src/kmc-kmn
   developer/src/kmc-ldml

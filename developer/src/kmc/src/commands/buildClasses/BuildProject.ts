@@ -7,7 +7,7 @@ import { BuildActivity } from './BuildActivity.js';
 import { buildActivities, buildKeyboardInfoActivity, buildModelInfoActivity } from './buildActivities.js';
 import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
 import { loadProject } from '../../util/projectLoader.js';
-import { ExtendedCompilerOptions } from 'src/util/extendedCompilerOptions.js';
+import { ExtendedCompilerOptions } from '../../util/extendedCompilerOptions.js';
 import { getOption } from '@keymanapp/developer-utils';
 
 export class BuildProject extends BuildActivity {
@@ -39,7 +39,7 @@ class ProjectBuilder {
   }
 
   async run(): Promise<boolean> {
-    this.project = loadProject(this.infile, this.callbacks);
+    this.project = await loadProject(this.infile, this.callbacks);
     if(!this.project) {
       return false;
     }
