@@ -56,8 +56,10 @@ void add_back_markers(std::u32string &str, const std::u32string &src, marker_map
   str.clear();
   // iterator over the marker map
   auto marki = map2.rbegin();
+#ifndef NDEBUG
   // number of markers left to processnfd
   size_t max_markers = count_markers(map);
+#endif
   size_t processed_markers = 0;
 
   // add any end-of-text markers
