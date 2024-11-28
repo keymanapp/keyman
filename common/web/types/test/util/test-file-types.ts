@@ -18,6 +18,7 @@ import {
   sourceTypeFromFilename,
   binaryTypeFromFilename,
   filenameIs,
+  replaceExtension,
 } from '../../src/util/file-types.js';
 
 describe('Test of File-Types', () => {
@@ -157,5 +158,41 @@ describe('Test of File-Types', () => {
       const actual       = filenameIs(filename, ext);
       assert.isTrue(actual);
     });
+  });
+  describe('Test of replaceExtension()', () => {
+    it('can replace an extension', () => {
+      const oldExt      = ".cpp";
+      const newExt      = ".js";
+      const oldFilename = `file${oldExt}`;
+      const newFilename = `file${newExt}`;
+      const actual      = replaceExtension(oldFilename, oldExt, newExt);
+      assert.deepEqual(actual, newFilename);
+    });
+    it('should return null for incorrect old extension (too short)', () => {
+      const oldExt      = ".ts";
+      const newExt      = ".js";
+      const oldFilename = `file.c`;
+      const actual      = replaceExtension(oldFilename, oldExt, newExt);
+      assert.isNull(actual);
+    });
+    it('should return null for incorrect old extension (too long)', () => {
+      const oldExt      = ".ts";
+      const newExt      = ".js";
+      const oldFilename = `file.cpp`;
+      const actual      = replaceExtension(oldFilename, oldExt, newExt);
+      assert.isNull(actual);
+    });
+    // it('should return null for null old extension', () => {
+    //   const newExt      = ".js";
+    //   const oldFilename = `file.ts`;
+    //   const actual      = replaceExtension(oldFilename, null, newExt);
+    //   assert.isNull(actual);
+    // });
+    // it('should return null for null new extension', () => {
+    //   const oldExt      = ".ts";
+    //   const oldFilename = `file.ts`;
+    //   const actual      = replaceExtension(oldFilename, oldExt, null);
+    //   assert.isNull(actual);
+    // });
   });
 });
