@@ -32,8 +32,10 @@ int main(int argc, const char *argv[]) {
     km_core_cu_dispose(nullptr);
 
     status = km_core_process_event(nullptr, 0, 0, 0, 0);
-    /* NOTREACHED - assertion fails above. */
-    test_assert(status == KM_CORE_STATUS_INVALID_ARGUMENT);
+    /* Note: an assertion fails in km_core_process_event on debug builds,
+       but we will fail on the line below on release builds (as assertions
+       are disabled); actual return value is KM_CORE_STATUS_INVALID_ARGUMENT */
+    test_assert(status == KM_CORE_STATUS_OK);
 
     return 0;
 }
