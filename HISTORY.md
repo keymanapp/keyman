@@ -1,5 +1,14 @@
 # Keyman Version History
 
+## 18.0.146 alpha 2024-11-27
+
+* test(developer): kmcmplib compiler unit tests 5 (#12612)
+* refactor(common): move all lexical model types into `LexicalModelTypes` container (#12712)
+* refactor(common): move remaining LDML keyboard types into `LdmlKeyboardTypes` (#12713)
+* chore(web): rename test files and folders (#12704)
+* chore(core): rename test files (#12705)
+* chore(linux): rename test files (#12706)
+
 ## 18.0.145 alpha 2024-11-26
 
 * docs(windows): update emscripten bash setup (#12700)

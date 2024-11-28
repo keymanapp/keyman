@@ -6,7 +6,7 @@
     "src/deviceSpec.ts",
     "src/globalObject.ts",
     "node_modules/*",
-    "src/test"
+    "src/tests/*"
   ],
   "exclude-after-remap": true,
   "reporter": ["text", "text-summary"],
