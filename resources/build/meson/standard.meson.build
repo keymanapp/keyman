@@ -72,12 +72,6 @@ if cpp_compiler.get_id() == 'msvc'
     '-D_SCL_SECURE_NO_WARNINGS',
     '-D_CRT_SECURE_NO_WARNINGS'
   ]
-  if get_option('buildtype') != 'debug'
-    # Disable assertions on release builds
-    defns += [
-      '-DNDEBUG'
-    ]
-  endif
 endif
 
 if cpp_compiler.get_id() == 'emscripten'
@@ -89,4 +83,11 @@ if cpp_compiler.get_id() == 'emscripten'
     flags += ['-O2']
     links += ['-O2']
   endif
+endif
+
+# Disable assertions on release builds
+if get_option('buildtype') != 'debug'
+  defns += [
+    '-DNDEBUG'
+  ]
 endif
