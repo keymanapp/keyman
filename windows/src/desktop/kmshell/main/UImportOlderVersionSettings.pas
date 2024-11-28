@@ -55,7 +55,6 @@ begin
   UpdateSM := TUpdateStateMachine.Create(False);
   try
     UpdateSM.HandleFirstRun;
-    Exit;
   finally
     UpdateSM.Free;
   end;

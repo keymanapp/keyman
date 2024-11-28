@@ -26,7 +26,7 @@ type
   EUpdateStateMachine = class(Exception);
 
   TUpdateState = (usIdle, usUpdateAvailable, usDownloading, usWaitingRestart,
-    usInstalling, usRetry, usPostInstall);
+    usInstalling);
 
   // Forward declaration
   TUpdateStateMachine = class;
@@ -74,6 +74,8 @@ type
     procedure HandleMSIInstallComplete;
 
     function SetRegistryState(Update: TUpdateState): Boolean;
+    //function SetIncRegistryCount: Boolean;
+    //function ClearRegistryCount: Boolean;
     function GetAutomaticUpdates: Boolean;
     function SetApplyNow(Value: Boolean): Boolean;
     function GetApplyNow: Boolean;
@@ -207,29 +209,6 @@ type
     procedure HandleFirstRun; override;
   end;
 
-  RetryState = class(TState)
-  public
-    procedure Enter; override;
-    procedure Exit; override;
-    procedure HandleCheck; override;
-    function  HandleKmShell: Integer; override;
-    procedure HandleDownload; override;
-    procedure HandleAbort; override;
-    procedure HandleInstallNow; override;
-  end;
-
-  PostInstallState = class(TState)
-  public
-    procedure Enter; override;
-    procedure Exit; override;
-    procedure HandleCheck; override;
-    function  HandleKmShell: Integer; override;
-    procedure HandleDownload; override;
-    procedure HandleAbort; override;
-    procedure HandleInstallNow; override;
-    procedure HandleFirstRun; override;
-  end;
-
   { TUpdateStateMachine }
 
 constructor TUpdateStateMachine.Create(AForce: Boolean);
@@ -245,8 +224,6 @@ begin
   FStateInstance[usDownloading] := DownloadingState.Create(Self);
   FStateInstance[usWaitingRestart] := WaitingRestartState.Create(Self);
   FStateInstance[usInstalling] := InstallingState.Create(Self);
-  FStateInstance[usRetry] := RetryState.Create(Self);
-  FStateInstance[usPostInstall] := PostInstallState.Create(Self);
 
   // Check the Registry setting.
   SetStateOnly(CheckRegistryState);
@@ -475,10 +452,6 @@ begin
     Result := usWaitingRestart
   else if StateClass = InstallingState then
     Result := usInstalling
-  else if StateClass = RetryState then
-    Result := usRetry
-  else if StateClass = PostInstallState then
-    Result := usPostInstall
   else
   begin
     // TODO: #10210 Log to Sentry
@@ -565,7 +538,9 @@ end;
 // base implmentation to be overiden
 procedure TState.HandleFirstRun;
 begin
-
+  // If Handle First run hits base implementation
+  // something is wrong log sentry error
+  bucStateContext.HandleMSIInstallComplete;
 end;
 
 { IdleState }
@@ -662,8 +637,11 @@ begin
   RootPath := ExtractFilePath(ParamStr(0));
   FResult := TUtilExecute.ShellCurrentUser(0, ParamStr(0), IncludeTrailingPathDelimiter(RootPath), '-bd');
   if not FResult then
+  begin
     // TODO: #10210 Log to Sentry
     KL.Log('TrmfMain: Executing KMshell for download updated Failed');
+    ChangeState(IdleState);
+  end;
 end;
 
 procedure UpdateAvailableState.Enter;
@@ -743,6 +721,7 @@ end;
 procedure DownloadingState.Enter;
 var
   DownloadResult: Boolean;
+  RetryCount: Integer;
 begin
   // Enter DownloadingState
   bucStateContext.SetRegistryState(usDownloading);
@@ -750,9 +729,26 @@ begin
   KL.Log('DownloadingState.HandleKmshell test code continue');
   //DownloadResult := True;
   { End testing }
-  DownloadResult := DownloadUpdatesBackground;
-  // TODO check if keyman is running then send to Waiting Restart
-  if DownloadResult then
+  RetryCount := 0;
+  DownloadResult := False;
+
+  while (not DownloadResult) and (RetryCount < 3) do
+  begin
+    DownloadResult := DownloadUpdatesBackground;
+    if not DownloadResult then
+      Inc(RetryCount);
+  end;
+
+  if (not DownloadResult) then
+  begin
+    // Failed three times in this process return to the
+    // IdleState to wait 7 days before trying again
+    ChangeState(IdleState);
+    // TODO: Future could go to a RetryState which serialized the a retry count
+    // to disk. Then it could try launch the download again on the next
+    // kmshell start event.
+  end
+  else
   begin
     if HasKeymanRun then
     begin
@@ -769,10 +765,6 @@ begin
       ChangeState(InstallingState);
     end;
   end
-  else
-  begin
-    ChangeState(RetryState);
-  end;
 
 end;
 
@@ -1023,89 +1015,6 @@ begin
   //Result := kmShellContinue;
 end;
 
-{ RetryState }
-
-procedure RetryState.Enter;
-begin
-  bucStateContext.SetRegistryState(usRetry);
-end;
-
-procedure RetryState.Exit;
-begin
-
-end;
-
-procedure RetryState.HandleCheck;
-begin
-
-end;
-
-function RetryState.HandleKmShell;
-begin
-  // #TODO: #10210 Implement retry
-  Result := kmShellContinue
-end;
-
-procedure RetryState.HandleDownload;
-begin
-
-end;
-
-procedure RetryState.HandleAbort;
-begin
-
-end;
-
-procedure RetryState.HandleInstallNow;
-begin
-  // TODO: #10038 handle retry counts
-  ChangeState(InstallingState);
-end;
-
-{ PostInstallState }
-
-procedure PostInstallState.Enter;
-begin
-  // Enter downloading state
-  bucStateContext.SetRegistryState(usPostInstall);
-end;
-
-procedure PostInstallState.Exit;
-begin
-
-end;
-
-procedure PostInstallState.HandleCheck;
-begin
-  // Handle Check
-end;
-
-function PostInstallState.HandleKmShell;
-begin
-  bucStateContext.HandleMSIInstallComplete;
-  Result := kmShellContinue;
-end;
-
-procedure PostInstallState.HandleDownload;
-begin
-  // Do Nothing
-end;
-
-procedure PostInstallState.HandleAbort;
-begin
-  // Handle Abort
-end;
-
-procedure PostInstallState.HandleInstallNow;
-begin
-  // Do nothing as files will be cleaned via HandleKmShell
-end;
-
-procedure PostInstallState.HandleFirstRun;
-begin
-  bucStateContext.HandleMSIInstallComplete;
-  //Result := kmShellContinue;
-end;
 
 // Private Functions:
 function ConfigCheckContinue: Boolean;
