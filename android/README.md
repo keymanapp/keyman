@@ -34,7 +34,7 @@ analytics for Debug are associated with an App Bundle ID
 ### Compiling From Command Line
 
 1. Launch a command prompt and cd to the directory **keyman/android**
-2. Run the top level build script `./build.sh configure build --debug` which will:
+2. Run the top level build script `./build.sh configure build:engine build:app --debug` which will:
     * Compile KMEA (and its KMW dependency)
     * Download default keyboard and dictionary resources as needed
     * Compile KMAPro
@@ -79,7 +79,7 @@ analytics for Debug are associated with an App Bundle ID
       Replace `SERIAL` with the device serial number listed in step 2.
 
 ### Compiling the app's offline help
-Keyman for Android help is maintained in the Markdown files in android/docs/.
+Keyman for Android help is maintained in the Markdown files in android/docs/help.
 The script `/resources/build/build-help.inc.sh` uses the `pandoc` tool to convert the Markdown files into html.
 
 ```bash
@@ -121,7 +121,7 @@ Building these projects follow the same steps as KMAPro:
 
 ## How to Build Keyman Engine for Android
 1. Open a terminal or Git Bash prompt and go to the Android project folder (e.g. `cd ~/keyman/android/`)
-2. Run `./build.sh --debug`
+2. Run `./build.sh build:engine --debug`
 
 Keyman Engine for Android library (**keyman-engine.aar**) is now ready to be imported in any project.
 
@@ -167,3 +167,10 @@ dependencies {
 
 ````
 5. include `import com.keyman.engine.*;` to use Keyman Engine in a class.
+
+### Keyman Engine for Android help content
+Keyman Engine for Android help is maintained in the Markdown files in android/docs/engine/.
+
+## Design Documentation
+
+Internal design documents about features pertaining to Keyman for Android and Keyman Engine for Android are maintained in the Markdown files in android/docs/internal/.
