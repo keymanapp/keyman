@@ -18,9 +18,9 @@
       import { runTests } from '@web/test-runner-mocha';
 
       runTests(async() => {
-        await import('./canary.spec.ts');
-        await import('./ignoredInputs.spec.ts');
-        await import('./recordedCoordSequences.spec.ts');
+        await import('./canary.tests.ts');
+        await import('./ignoredInputs.tests.ts');
+        await import('./recordedCoordSequences.tests.ts');
       });
     </script>
   </head>

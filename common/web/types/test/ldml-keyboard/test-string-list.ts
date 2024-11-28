@@ -1,3 +1,11 @@
+/*
+ * Keyman is copyright (C) SIL Global. MIT License.
+ * 
+ * Created by Dr Mark C. Sinclair on 2024-11-28
+ * 
+ * Test code for string-lists.ts
+ */
+
 import 'mocha';
 import { assert } from 'chai';
 import { StrsItem, StrsOptions, DependencySections, Strs } from '../../src/kmx/kmx-plus/kmx-plus.js';
@@ -201,7 +209,8 @@ function stubSectionsStrsAllocString(s?: string, opts?: StrsOptions, sections?: 
 
 function initListItem(source: Array<string>): ListItem {
   const listItem = new ListItem();
-  for (const s of source)
+  for (const s of source) {
     listItem.push(new ListIndex(new StrsItem(s)));
+  }
   return listItem;
 }
