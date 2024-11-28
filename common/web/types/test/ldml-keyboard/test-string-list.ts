@@ -209,7 +209,8 @@ function stubSectionsStrsAllocString(s?: string, opts?: StrsOptions, sections?: 
 
 function initListItem(source: Array<string>): ListItem {
   const listItem = new ListItem();
-  for (const s of source)
+  for (const s of source) {
     listItem.push(new ListIndex(new StrsItem(s)));
+  }
   return listItem;
 }
