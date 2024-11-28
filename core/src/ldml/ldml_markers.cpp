@@ -59,14 +59,16 @@ void add_back_markers(std::u32string &str, const std::u32string &src, marker_map
 #ifndef NDEBUG
   // number of markers left to processnfd
   size_t max_markers = count_markers(map);
-#endif
   size_t processed_markers = 0;
+#endif
 
   // add any end-of-text markers
   while(marki != map2.rend() && marki->ch == MARKER_BEFORE_EOT) {
     if (!marki->end) {
       prepend_marker(str, marki->marker, encoding);
+#ifndef NDEBUG
       processed_markers++;
+#endif
     }
     marki->processed = true;  // mark as done
     marki++;
@@ -90,7 +92,9 @@ void add_back_markers(std::u32string &str, const std::u32string &src, marker_map
           break;
         } else {
           prepend_marker(str, i->marker, encoding);
+#ifndef NDEBUG
           processed_markers++;
+#endif
         }
       }
     }
