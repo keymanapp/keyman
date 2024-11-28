@@ -35,19 +35,19 @@ void test_two_backspaces() {
   };
 
   km_core_actions actions;
-  assert(km::core::action_item_list_to_actions_object(action_items, &actions));
+  test_assert(km::core::action_item_list_to_actions_object(action_items, &actions));
 
-  assert(actions.code_points_to_delete == 1);
-  assert(std::u32string(actions.output) == U"");
-  assert(actions.persist_options != nullptr);
-  assert(actions.persist_options[0].key == nullptr);
-  assert(actions.persist_options[0].value == nullptr);
-  assert(actions.persist_options[0].scope == KM_CORE_OPT_UNKNOWN);
+  test_assert(actions.code_points_to_delete == 1);
+  test_assert(std::u32string(actions.output) == U"");
+  test_assert(actions.persist_options != nullptr);
+  test_assert(actions.persist_options[0].key == nullptr);
+  test_assert(actions.persist_options[0].value == nullptr);
+  test_assert(actions.persist_options[0].scope == KM_CORE_OPT_UNKNOWN);
 
-  assert(actions.do_alert == false);
-  assert(actions.emit_keystroke == false);
-  assert(actions.new_caps_lock_state == -1);
-  assert(actions.deleted_context == nullptr);
+  test_assert(actions.do_alert == false);
+  test_assert(actions.emit_keystroke == false);
+  test_assert(actions.new_caps_lock_state == -1);
+  test_assert(actions.deleted_context == nullptr);
 
   km::core::actions_dispose(actions);
 }
@@ -68,18 +68,18 @@ void test_marker_text_interleaved() {
   };
 
   km_core_actions actions;
-  assert(km::core::action_item_list_to_actions_object(action_items, &actions));
+  test_assert(km::core::action_item_list_to_actions_object(action_items, &actions));
 
-  assert(actions.code_points_to_delete == 0);
-  assert(std::u32string(actions.output) == U"ABD");
-  assert(actions.persist_options != nullptr);
-  assert(actions.persist_options[0].key == nullptr);
-  assert(actions.persist_options[0].value == nullptr);
-  assert(actions.persist_options[0].scope == KM_CORE_OPT_UNKNOWN);
-  assert(actions.do_alert == false);
-  assert(actions.emit_keystroke == false);
-  assert(actions.new_caps_lock_state == -1);
-  assert(actions.deleted_context == nullptr);
+  test_assert(actions.code_points_to_delete == 0);
+  test_assert(std::u32string(actions.output) == U"ABD");
+  test_assert(actions.persist_options != nullptr);
+  test_assert(actions.persist_options[0].key == nullptr);
+  test_assert(actions.persist_options[0].value == nullptr);
+  test_assert(actions.persist_options[0].scope == KM_CORE_OPT_UNKNOWN);
+  test_assert(actions.do_alert == false);
+  test_assert(actions.emit_keystroke == false);
+  test_assert(actions.new_caps_lock_state == -1);
+  test_assert(actions.deleted_context == nullptr);
 
   km::core::actions_dispose(actions);
 }
@@ -93,18 +93,18 @@ void test_alert() {
   };
 
   km_core_actions actions;
-  assert(km::core::action_item_list_to_actions_object(action_items, &actions));
+  test_assert(km::core::action_item_list_to_actions_object(action_items, &actions));
 
-  assert(actions.code_points_to_delete == 0);
-  assert(std::u32string(actions.output) == U"");
-  assert(actions.persist_options != nullptr);
-  assert(actions.persist_options[0].key == nullptr);
-  assert(actions.persist_options[0].value == nullptr);
-  assert(actions.persist_options[0].scope == KM_CORE_OPT_UNKNOWN);
-  assert(actions.do_alert == KM_CORE_TRUE);
-  assert(actions.emit_keystroke == KM_CORE_FALSE);
-  assert(actions.new_caps_lock_state == KM_CORE_CAPS_UNCHANGED);
-  assert(actions.deleted_context == nullptr);
+  test_assert(actions.code_points_to_delete == 0);
+  test_assert(std::u32string(actions.output) == U"");
+  test_assert(actions.persist_options != nullptr);
+  test_assert(actions.persist_options[0].key == nullptr);
+  test_assert(actions.persist_options[0].value == nullptr);
+  test_assert(actions.persist_options[0].scope == KM_CORE_OPT_UNKNOWN);
+  test_assert(actions.do_alert == KM_CORE_TRUE);
+  test_assert(actions.emit_keystroke == KM_CORE_FALSE);
+  test_assert(actions.new_caps_lock_state == KM_CORE_CAPS_UNCHANGED);
+  test_assert(actions.deleted_context == nullptr);
 
   km::core::actions_dispose(actions);
 }
@@ -118,18 +118,18 @@ void test_emit_keystroke() {
   };
 
   km_core_actions actions;
-  assert(km::core::action_item_list_to_actions_object(action_items, &actions));
+  test_assert(km::core::action_item_list_to_actions_object(action_items, &actions));
 
-  assert(actions.code_points_to_delete == 0);
-  assert(std::u32string(actions.output) == U"");
-  assert(actions.persist_options != nullptr);
-  assert(actions.persist_options[0].key == nullptr);
-  assert(actions.persist_options[0].value == nullptr);
-  assert(actions.persist_options[0].scope == KM_CORE_OPT_UNKNOWN);
-  assert(actions.do_alert == KM_CORE_FALSE);
-  assert(actions.emit_keystroke == KM_CORE_TRUE);
-  assert(actions.new_caps_lock_state == KM_CORE_CAPS_UNCHANGED);
-  assert(actions.deleted_context == nullptr);
+  test_assert(actions.code_points_to_delete == 0);
+  test_assert(std::u32string(actions.output) == U"");
+  test_assert(actions.persist_options != nullptr);
+  test_assert(actions.persist_options[0].key == nullptr);
+  test_assert(actions.persist_options[0].value == nullptr);
+  test_assert(actions.persist_options[0].scope == KM_CORE_OPT_UNKNOWN);
+  test_assert(actions.do_alert == KM_CORE_FALSE);
+  test_assert(actions.emit_keystroke == KM_CORE_TRUE);
+  test_assert(actions.new_caps_lock_state == KM_CORE_CAPS_UNCHANGED);
+  test_assert(actions.deleted_context == nullptr);
 
   km::core::actions_dispose(actions);
 }
@@ -144,18 +144,18 @@ void test_invalidate_context() {
   };
 
   km_core_actions actions;
-  assert(km::core::action_item_list_to_actions_object(action_items, &actions));
+  test_assert(km::core::action_item_list_to_actions_object(action_items, &actions));
 
-  assert(actions.code_points_to_delete == 0);
-  assert(std::u32string(actions.output) == U"");
-  assert(actions.persist_options != nullptr);
-  assert(actions.persist_options[0].key == nullptr);
-  assert(actions.persist_options[0].value == nullptr);
-  assert(actions.persist_options[0].scope == KM_CORE_OPT_UNKNOWN);
-  assert(actions.do_alert == KM_CORE_FALSE);
-  assert(actions.emit_keystroke == KM_CORE_FALSE);
-  assert(actions.new_caps_lock_state == KM_CORE_CAPS_UNCHANGED);
-  assert(actions.deleted_context == nullptr);
+  test_assert(actions.code_points_to_delete == 0);
+  test_assert(std::u32string(actions.output) == U"");
+  test_assert(actions.persist_options != nullptr);
+  test_assert(actions.persist_options[0].key == nullptr);
+  test_assert(actions.persist_options[0].value == nullptr);
+  test_assert(actions.persist_options[0].scope == KM_CORE_OPT_UNKNOWN);
+  test_assert(actions.do_alert == KM_CORE_FALSE);
+  test_assert(actions.emit_keystroke == KM_CORE_FALSE);
+  test_assert(actions.new_caps_lock_state == KM_CORE_CAPS_UNCHANGED);
+  test_assert(actions.deleted_context == nullptr);
 
   km::core::actions_dispose(actions);
 }
@@ -175,28 +175,28 @@ void test_persist_opt() {
   };
 
   km_core_actions actions;
-  assert(km::core::action_item_list_to_actions_object(action_items, &actions));
+  test_assert(km::core::action_item_list_to_actions_object(action_items, &actions));
 
-  assert(actions.code_points_to_delete == 0);
-  assert(std::u32string(actions.output) == U"");
-  assert(actions.persist_options != nullptr);
-  assert(std::u16string(actions.persist_options[0].key) == u"key");
-  assert(std::u16string(actions.persist_options[0].value) == u"value");
-  assert(actions.persist_options[0].scope == KM_CORE_OPT_KEYBOARD);
+  test_assert(actions.code_points_to_delete == 0);
+  test_assert(std::u32string(actions.output) == U"");
+  test_assert(actions.persist_options != nullptr);
+  test_assert(std::u16string(actions.persist_options[0].key) == u"key");
+  test_assert(std::u16string(actions.persist_options[0].value) == u"value");
+  test_assert(actions.persist_options[0].scope == KM_CORE_OPT_KEYBOARD);
 
   // verify that data is copied
-  assert(actions.persist_options[0].key != option.key);
-  assert(actions.persist_options[0].value != option.value);
+  test_assert(actions.persist_options[0].key != option.key);
+  test_assert(actions.persist_options[0].value != option.value);
 
   // verify that we have a KM_CORE_OPTIONS_END term
-  assert(actions.persist_options[1].key == nullptr);
-  assert(actions.persist_options[1].value == nullptr);
-  assert(actions.persist_options[1].scope == KM_CORE_OPT_UNKNOWN);
+  test_assert(actions.persist_options[1].key == nullptr);
+  test_assert(actions.persist_options[1].value == nullptr);
+  test_assert(actions.persist_options[1].scope == KM_CORE_OPT_UNKNOWN);
 
-  assert(actions.do_alert == KM_CORE_FALSE);
-  assert(actions.emit_keystroke == KM_CORE_FALSE);
-  assert(actions.new_caps_lock_state == KM_CORE_CAPS_UNCHANGED);
-  assert(actions.deleted_context == nullptr);
+  test_assert(actions.do_alert == KM_CORE_FALSE);
+  test_assert(actions.emit_keystroke == KM_CORE_FALSE);
+  test_assert(actions.new_caps_lock_state == KM_CORE_CAPS_UNCHANGED);
+  test_assert(actions.deleted_context == nullptr);
 
   km::core::actions_dispose(actions);
 }

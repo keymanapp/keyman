@@ -6,6 +6,8 @@
 
 fs = import('fs')
 
+common_test_files = [ meson.global_source_root() / '../../../common/include/test_color.cpp' ]
+
 tests_links = []
 
 if cpp_compiler.get_id() == 'emscripten'
@@ -15,7 +17,7 @@ endif
 input_path = meson.current_source_dir() / '../../../../common/test/keyboards/baseline'
 output_path = meson.current_build_dir()
 
-kmcompxtest = executable('kmcompxtest', ['kmcompxtest.cpp','util_filesystem.cpp','util_callbacks.cpp'],
+kmcompxtest = executable('kmcompxtest', ['kmcompxtest.cpp','util_filesystem.cpp','util_callbacks.cpp',common_test_files],
     cpp_args: defns + flags,
     include_directories: inc,
     name_suffix: name_suffix,
@@ -128,8 +130,6 @@ if get_option('full_test')
   endforeach
 
 endif
-
-common_test_files = [ meson.global_source_root() / '../../../common/include/test_color.cpp' ]
 
 # Test the API endpoints
 

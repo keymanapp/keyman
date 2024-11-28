@@ -70,7 +70,7 @@ apply_action(
     ) {
   switch (act.type) {
   case KM_CORE_IT_END:
-    assert(false);
+    test_assert(false);
     break;
   case KM_CORE_IT_ALERT:
     g_beep_found = true;
@@ -109,11 +109,11 @@ apply_action(
     // in a table. Or, if Keyman has a cached context, then there may be
     // additional text in the text store that Keyman can't see.
     if (act.backspace.expected_type == KM_CORE_BT_MARKER) {
-      assert(!context.empty());
-      assert(context.back().type == KM_CORE_CT_MARKER);
+      test_assert(!context.empty());
+      test_assert(context.back().type == KM_CORE_CT_MARKER);
       context.pop_back();
     } else if (text_store.length() > 0) {
-      assert(!context.empty() && !text_store.empty());
+      test_assert(!context.empty() && !text_store.empty());
       km_core_usv ch = text_store.back();
       text_store.pop_back();
       if (text_store.length() > 0 && Uni_IsSurrogate2(ch)) {
@@ -125,10 +125,10 @@ apply_action(
           text_store.pop_back();
         }
       }
-      assert(ch == act.backspace.expected_value);
+      test_assert(ch == act.backspace.expected_value);
 
-      assert(context.back().type == KM_CORE_CT_CHAR);
-      assert(context.back().character == ch);
+      test_assert(context.back().type == KM_CORE_CT_CHAR);
+      test_assert(context.back().character == ch);
       context.pop_back();
     }
     break;
@@ -163,7 +163,7 @@ apply_action(
     test_source.set_caps_lock_on(act.capsLock);
     break;
   default:
-    assert(false);  // NOT SUPPORTED
+    test_assert(false);  // NOT SUPPORTED
     break;
   }
 }
@@ -253,15 +253,15 @@ run_test(const km::core::path &source, const km::core::path &compiled) {
     // not diverged
     auto ci = citems;
     for(auto test_ci = test_context.begin(); ci->type != KM_CORE_CT_END || test_ci != test_context.end(); ci++, test_ci++) {
-      assert(ci->type != KM_CORE_CT_END && test_ci != test_context.end()); // Verify that both lists are same length
-      assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
+      test_assert(ci->type != KM_CORE_CT_END && test_ci != test_context.end()); // Verify that both lists are same length
+      test_assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
     }
     km_core_context_items_dispose(citems);
     if ((!context_invalidated) && (text_store != core_context_str)) {
       std::cerr << "text store has unexpectedly diverged from core_context" << std::endl;
       std::cerr << "text store  : " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
       std::cerr << "core context: " << string_to_hex(core_context_str) << " [" << core_context_str << "]" << std::endl;
-     assert(false);
+     test_assert(false);
     }
   }
 
@@ -280,8 +280,8 @@ run_test(const km::core::path &source, const km::core::path &compiled) {
   // not diverged
   auto ci = citems;
   for(auto test_ci = test_context.begin(); ci->type != KM_CORE_CT_END || test_ci != test_context.end(); ci++, test_ci++) {
-    assert(ci->type != KM_CORE_CT_END && test_ci != test_context.end()); // Verify that both lists are same length
-    assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
+    test_assert(ci->type != KM_CORE_CT_END && test_ci != test_context.end()); // Verify that both lists are same length
+    test_assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
   }
 
   km_core_context_items_dispose(citems);

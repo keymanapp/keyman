@@ -75,14 +75,14 @@ void test_key_list(const km::core::path &source_file){
     map_key_list[std::make_pair(key_rule_it->key, key_rule_it->modifier_flag)] = key_rule_it->modifier_flag;
     ++n;
   }
-  assert(n==7);
+  test_assert(n==7);
 
   std::map<std::pair<km_core_virtual_key,uint32_t>, uint32_t>::iterator it_expected;
   std::map<std::pair<km_core_virtual_key,uint32_t>, uint32_t>::iterator it_key_list = map_key_list.begin();
   while (it_key_list != map_key_list.end()){
 
     it_expected = kb_key_expected_key_list.find(it_key_list->first);
-    assert (it_expected != kb_key_expected_key_list.end());
+    test_assert (it_expected != kb_key_expected_key_list.end());
     it_key_list++;
   }
 

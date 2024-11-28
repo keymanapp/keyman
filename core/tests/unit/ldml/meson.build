@@ -83,7 +83,8 @@ ldml = executable('ldml',
     )
 
 core_ldml_min = executable('core_ldml_min',
-    ['core_ldml_min.cpp'],
+    ['core_ldml_min.cpp',
+    common_test_files],
     cpp_args: defns + warns,
     include_directories: [inc, libsrc],
     link_args: links,

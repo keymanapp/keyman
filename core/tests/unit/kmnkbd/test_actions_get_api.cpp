@@ -137,17 +137,17 @@ void test(
   }
   std::cout << std::endl;
 
-  assert(expected_delete == actual_actions->code_points_to_delete);
-  assert(expected_output == actual_actions->output);
-  assert(expected_deleted_context == actual_actions->deleted_context);
+  test_assert(expected_delete == actual_actions->code_points_to_delete);
+  test_assert(expected_output == actual_actions->output);
+  test_assert(expected_deleted_context == actual_actions->deleted_context);
 
-  // assert(expected_deleted_context == actual_actions->deleted_context);
+  // test_assert(expected_deleted_context == actual_actions->deleted_context);
 
   auto actual_final_app_context = get_context_as_string(km_core_state_app_context(test_state));
   auto actual_final_app_context_string = std::u16string(actual_final_app_context);
   auto expected_final_app_context_string = std::u16string(expected_final_app_context);
   std::cout << " final app context: actual: |" << actual_final_app_context_string << "| expected: |" << expected_final_app_context_string << "|" << std::endl;
-  assert(actual_final_app_context_string == expected_final_app_context_string);
+  test_assert(actual_final_app_context_string == expected_final_app_context_string);
   delete [] actual_final_app_context;
 
   teardown();

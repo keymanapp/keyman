@@ -81,9 +81,9 @@ bool is_identical_context(km_core_cu const *cached_context, km_core_debug_contex
 void test_context_normalization_already_nfd() {
   km_core_cu const *app_context_nfd = u"A\u0300";
   setup("k_001_tiny.kmx");
-  assert(km_core_state_context_set_if_needed(test_state, app_context_nfd) == KM_CORE_CONTEXT_STATUS_UPDATED);
-  assert(is_identical_context(app_context_nfd, KM_CORE_DEBUG_CONTEXT_APP));
-  assert(is_identical_context(app_context_nfd, KM_CORE_DEBUG_CONTEXT_CACHED));
+  test_assert(km_core_state_context_set_if_needed(test_state, app_context_nfd) == KM_CORE_CONTEXT_STATUS_UPDATED);
+  test_assert(is_identical_context(app_context_nfd, KM_CORE_DEBUG_CONTEXT_APP));
+  test_assert(is_identical_context(app_context_nfd, KM_CORE_DEBUG_CONTEXT_CACHED));
   teardown();
 }
 
@@ -91,9 +91,9 @@ void test_context_normalization_basic() {
   km_core_cu const *application_context = u"This is a test À";
   km_core_cu const *cached_context =      u"This is a test A\u0300";
   setup("k_001_tiny.kmx");
-  assert(km_core_state_context_set_if_needed(test_state, application_context) == KM_CORE_CONTEXT_STATUS_UPDATED);
-  assert(is_identical_context(application_context, KM_CORE_DEBUG_CONTEXT_APP));
-  assert(is_identical_context(cached_context, KM_CORE_DEBUG_CONTEXT_CACHED));
+  test_assert(km_core_state_context_set_if_needed(test_state, application_context) == KM_CORE_CONTEXT_STATUS_UPDATED);
+  test_assert(is_identical_context(application_context, KM_CORE_DEBUG_CONTEXT_APP));
+  test_assert(is_identical_context(cached_context, KM_CORE_DEBUG_CONTEXT_CACHED));
   teardown();
 }
 
@@ -102,9 +102,9 @@ void test_context_normalization_hefty() {
   km_core_cu const *application_context = u"À"       u"é̖"             u"\u1e69"              u"\u212b"           u"\U000114BC";
   km_core_cu const *cached_context =      u"A\u0300" u"e\u0316\u0301" u"\u0073\u0323\u0307"  u"\u0041\u030a"     u"\U000114B9\U000114B0";
   setup("k_001_tiny.kmx");
-  assert(km_core_state_context_set_if_needed(test_state, application_context) == KM_CORE_CONTEXT_STATUS_UPDATED);
-  assert(is_identical_context(application_context, KM_CORE_DEBUG_CONTEXT_APP));
-  assert(is_identical_context(cached_context, KM_CORE_DEBUG_CONTEXT_CACHED));
+  test_assert(km_core_state_context_set_if_needed(test_state, application_context) == KM_CORE_CONTEXT_STATUS_UPDATED);
+  test_assert(is_identical_context(application_context, KM_CORE_DEBUG_CONTEXT_APP));
+  test_assert(is_identical_context(cached_context, KM_CORE_DEBUG_CONTEXT_CACHED));
   teardown();
 }
 
@@ -113,9 +113,9 @@ void test_context_normalization_invalid_unicode() {
   km_core_cu const application_context[] = { 0xDC01, 0x0020, 0x0020, 0xFFFF, 0x0000 };
   km_core_cu const cached_context[] =      { 0xDC01, 0x0020, 0x0020, 0xFFFF, 0x0000 };
   setup("k_001_tiny.kmx");
-  assert(km_core_state_context_set_if_needed(test_state, application_context) == KM_CORE_CONTEXT_STATUS_UPDATED);
-  assert(is_identical_context(application_context, KM_CORE_DEBUG_CONTEXT_APP));
-  assert(is_identical_context(cached_context, KM_CORE_DEBUG_CONTEXT_CACHED));
+  test_assert(km_core_state_context_set_if_needed(test_state, application_context) == KM_CORE_CONTEXT_STATUS_UPDATED);
+  test_assert(is_identical_context(application_context, KM_CORE_DEBUG_CONTEXT_APP));
+  test_assert(is_identical_context(cached_context, KM_CORE_DEBUG_CONTEXT_CACHED));
   teardown();
 }
 
@@ -124,9 +124,9 @@ void test_context_normalization_lone_trailing_surrogate() {
   km_core_cu const application_context[] = { 0xDC01, 0x0020, 0x0020, 0x0000 };
   km_core_cu const cached_context[] = /* skipped*/ { 0x0020, 0x0020, 0x0000 };
   setup("k_001_tiny.kmx");
-  assert(km_core_state_context_set_if_needed(test_state, application_context) == KM_CORE_CONTEXT_STATUS_UPDATED);
-  assert(is_identical_context(application_context+1, KM_CORE_DEBUG_CONTEXT_APP)); // first code unit is skipped
-  assert(is_identical_context(cached_context, KM_CORE_DEBUG_CONTEXT_CACHED));
+  test_assert(km_core_state_context_set_if_needed(test_state, application_context) == KM_CORE_CONTEXT_STATUS_UPDATED);
+  test_assert(is_identical_context(application_context+1, KM_CORE_DEBUG_CONTEXT_APP)); // first code unit is skipped
+  test_assert(is_identical_context(cached_context, KM_CORE_DEBUG_CONTEXT_CACHED));
   teardown();
 }
 

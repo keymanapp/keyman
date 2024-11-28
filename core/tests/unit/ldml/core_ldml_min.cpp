@@ -11,7 +11,7 @@
 */
 
 #include <iostream>
-#include <assert.h>
+#include <test_assert.h>
 
 #include "keyman_core.h"
 
@@ -25,15 +25,15 @@ int main(int argc, const char *argv[]) {
     status = km_core_keyboard_load(nowhere, &test_kb);
 
     std::cerr << "null km_core_keyboard_load = " << status << std::endl;
-    assert(status == KM_CORE_STATUS_INVALID_ARGUMENT);
-    assert(test_kb == nullptr);
+    test_assert(status == KM_CORE_STATUS_INVALID_ARGUMENT);
+    test_assert(test_kb == nullptr);
     km_core_keyboard_dispose(test_kb);
     km_core_state_dispose(nullptr);
     km_core_cu_dispose(nullptr);
 
     status = km_core_process_event(nullptr, 0, 0, 0, 0);
     /* NOTREACHED - assertion fails above. */
-    assert(status == KM_CORE_STATUS_INVALID_ARGUMENT);
+    test_assert(status == KM_CORE_STATUS_INVALID_ARGUMENT);
 
     return 0;
 }
