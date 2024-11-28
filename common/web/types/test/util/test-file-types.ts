@@ -15,6 +15,7 @@ import {
   removeExtension,
   sourceOrBinaryTypeFromFilename,
   sourceTypeFromFilename,
+  binaryTypeFromFilename,
 } from '../../src/util/file-types.js';
 
 describe('Test of File-Types', () => {
@@ -85,7 +86,7 @@ describe('Test of File-Types', () => {
     });
     it('returns null for unmatched file extension', () => {
       const ext = ".cpp";
-      assert.isFalse((Object.values(ALL) as string[]).includes(ext));
+      assert.isFalse((Object.values(ALL_SOURCE) as string[]).includes(ext));
       const filename = `file${ext}`;
       const actual   = sourceTypeFromFilename(filename);
       assert.isNull(actual);
@@ -95,6 +96,36 @@ describe('Test of File-Types', () => {
       const upperCaseExt = ext.toUpperCase();
       const filename     = `file${upperCaseExt}`;
       const actual       = sourceTypeFromFilename(filename);
+      assert.deepEqual(actual, ext);
+    });
+  });
+  describe('Test of binaryTypeFromFilename()', () => {
+    it('returns null for a Source file extension', () => {
+      ALL_SOURCE.forEach((ext) => {
+        const filename = `file${ext}`;
+        const actual   = binaryTypeFromFilename(filename);
+        assert.isNull(actual);
+      });
+    });
+    it('can extract Binary file extension', () => {
+      ALL_BINARY.forEach((ext) => {
+        const filename = `file${ext}`;
+        const actual   = binaryTypeFromFilename(filename);
+        assert.deepEqual(actual, ext);
+      });
+    });
+    it('returns null for unmatched file extension', () => {
+      const ext = ".cpp";
+      assert.isFalse((Object.values(ALL_BINARY) as string[]).includes(ext));
+      const filename = `file${ext}`;
+      const actual   = binaryTypeFromFilename(filename);
+      assert.isNull(actual);
+    });
+    it('can extract upper case file extension', () => {
+      const ext          = ALL_BINARY[0];
+      const upperCaseExt = ext.toUpperCase();
+      const filename     = `file${upperCaseExt}`;
+      const actual       = binaryTypeFromFilename(filename);
       assert.deepEqual(actual, ext);
     });
   });
