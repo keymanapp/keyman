@@ -430,8 +430,10 @@ ldml_event_state::remove_text(std::u32string &str, size_t length) {
   /** track how many context items have been removed, via push_backspace() */
   size_t contextRemoved = 0;
   for (auto c = state->context().rbegin(); length > 0 && c != state->context().rend(); c++, contextRemoved++) {
+#ifndef NDEBUG
     /** last char of context */
     km_core_usv lastCtx = str.back();
+#endif
     uint8_t type        = c->type;
     assert(type == KM_CORE_BT_CHAR || type == KM_CORE_BT_MARKER);
     if (type == KM_CORE_BT_CHAR) {
