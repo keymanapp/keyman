@@ -2,8 +2,8 @@
 
 <!--
 
-@@keys: [SHIFT K_BKQUOTE][K_1][K_BKQUOTE]
-@@expected: \u0037\u1790\u17B6\u0127
+@@keys: [SHIFT K_BKQUOTE][K_1][K_BKQUOTE][LCTRL K_BKQUOTE][RALT K_BKQUOTE]
+@@expected: \u0037\u1790\u17B6\u0127\u1790\u17B6\u0065
 
 -->
 <keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
@@ -22,6 +22,12 @@
     </layer>
     <layer id="shift" modifiers="shift">
       <row keys="seven eee" /> <!-- number row -->
+    </layer>
+    <layer id="control" modifiers="ctrl">
+      <row keys="that gap" /> <!-- number row -->
+    </layer>
+    <layer id="catchall" modifiers="other">
+      <row keys="eee gap" /> <!-- number row -->
     </layer>
   </layers>
 </keyboard3>
