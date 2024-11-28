@@ -13,6 +13,7 @@ uses
   System.IOUtils,
   System.Types,
   System.TypInfo,
+  Sentry.Client,
 
   httpuploader,
   KeymanPaths,
@@ -110,6 +111,7 @@ uses
   ErrorControlledRegistry,
 
   GlobalProxySettings,
+  Keyman.System.KeymanSentryClient,
   Keyman.System.DownloadUpdate,
   Keyman.System.RemoteUpdateCheck,
   KLog,
@@ -234,7 +236,7 @@ var
   lpState: TUpdateState;
 begin
   if (FErrorMessage <> '') and FShowErrors then
-    KL.Log(FErrorMessage); // TODO: #10210 Log to Sentry
+    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR, '"+FErrorMessage+"');
 
   for lpState := Low(TUpdateState) to High(TUpdateState) do
   begin
@@ -261,8 +263,7 @@ begin
 
     if not Registry.OpenKey(SRegKey_KeymanEngine_CU, True) then
     begin
-      // TODO: #10210 Log to Sentry
-      KL.Log('Failed to open registry key: ' + SRegKey_KeymanEngine_CU);
+      TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR, 'Failed to open registry key: "'+SRegKey_KeymanEngine_CU+'"');
       Exit;
     end;
 
@@ -273,8 +274,7 @@ begin
     except
       on E: ERegistryException do
       begin
-        // TODO: #10210 Log to Sentry
-        KL.Log('Failed to write to registry: ' + E.Message);
+        TKeymanSentryClient.ReportHandledException(E, 'Failed to write install state machine state');
       end;
     end;
 
@@ -312,8 +312,7 @@ begin
       except
         on E: ERegistryException do
         begin
-          // TODO: #10210 Log to Sentry
-          KL.Log('Failed to write to registry: ' + E.Message);
+          TKeymanSentryClient.ReportHandledException(E, 'Failed to read install state machine state');
           UpdateState := usIdle;
         end;
       end;
@@ -341,8 +340,7 @@ begin
       except
         on E: ERegistryException do
         begin
-          // TODO: #10210 Log to Sentry
-          KL.Log('Failed to read registery: ' + E.Message);
+          TKeymanSentryClient.ReportHandledException(E, 'Failed to read automatic updates');
           Result := False;
         end;
       end;
@@ -370,8 +368,7 @@ begin
     except
       on E: ERegistryException do
       begin
-        // TODO: #10210 Log to Sentry 'Failed to write '+SRegValue_ApplyNow+' to registry: ' + E.Message
-        KL.Log('Failed to write to registry: ' + E.Message);
+        TKeymanSentryClient.ReportHandledException(E, 'Failed to write apply now');
       end;
     end;
   finally
@@ -409,8 +406,7 @@ begin
     Result := TStateClass(CurrentState.ClassType)
   else
   begin
-    // TODO: #10210 Log to Sentry
-    KL.Log('Error CurrentState was uninitiallised: ' );
+    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR, 'Error CurrentState was uninitiallised');
     Result := nil;
   end;
 end;
@@ -454,9 +450,8 @@ begin
     Result := usInstalling
   else
   begin
-    // TODO: #10210 Log to Sentry
     Result := usIdle;
-    KL.Log('Unknown StateClass'); // TODO-WINDOWS-UPDATES
+    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR, 'Unknown State Machine class');
   end;
 end;
 
@@ -466,8 +461,7 @@ begin
     Result := True
   else
   begin
-    // TODO: #10210 Log to Sentry
-    KL.Log('Unexpected Error: Current state is not assigned.');
+    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR, 'Error CurrentState was uninitiallised');
     Result := False;
   end;
 end;
@@ -539,7 +533,8 @@ end;
 procedure TState.HandleFirstRun;
 begin
   // If Handle First run hits base implementation
-  // something is wrong log sentry error
+  // something is wrong.
+  TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR, 'Handle first run called in state:"'+Self.ClassName+'"');
   bucStateContext.HandleMSIInstallComplete;
 end;
 
@@ -638,8 +633,7 @@ begin
   FResult := TUtilExecute.ShellCurrentUser(0, ParamStr(0), IncludeTrailingPathDelimiter(RootPath), '-bd');
   if not FResult then
   begin
-    // TODO: #10210 Log to Sentry
-    KL.Log('TrmfMain: Executing KMshell for download updated Failed');
+    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR, 'Executing kmshell process to download updated Failed');
     ChangeState(IdleState);
   end;
 end;
@@ -933,10 +927,7 @@ begin
 
   if not FResult then
   begin
-    // TODO: #10210 Log to Sentry
-    KL.Log('TUpdateStateMachine.InstallingState.DoInstall: Result = ' +
-      IntToStr(Ord(FResult)));
-    // Log message ShowMessage(SysErrorMessage(GetLastError));
+    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR, 'Executing kmshell process to install failed:"'+IntToStr(Ord(FResult))+'"');
   end;
 
   Result := FResult;
