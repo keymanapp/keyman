@@ -38,7 +38,7 @@ export interface LKImport {
   /**
    * import base, currently `cldr` is supported
    */
-  base: string;
+  base?: string;
   /**
    * path to imported resource, of the form `45/*.xml`
    */
@@ -199,6 +199,8 @@ export class ImportStatus {
   static impliedImport = Symbol('LDML implied import');
   /** item came in via import */
   static import = Symbol('LDML import');
+  /** item came in via local (not CLDR) import */
+  static localImport = Symbol('LDML local import');
 
   /** @returns true if the object was loaded through an implied import */
   static isImpliedImport(o : any) : boolean {
@@ -207,6 +209,10 @@ export class ImportStatus {
   /** @returns true if the object was loaded through an explicit import */
   static isImport(o : any) : boolean {
     return o && !!o[ImportStatus.import];
+  }
+  /** @returns true if the object was loaded through an explicit import */
+  static isLocalImport(o : any) : boolean {
+    return o && !!o[ImportStatus.localImport];
   }
 };
 

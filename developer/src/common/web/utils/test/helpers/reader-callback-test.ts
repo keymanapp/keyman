@@ -7,9 +7,11 @@ import { LDMLKeyboardXMLSourceFile } from '../../src/types/ldml-keyboard/ldml-ke
 import { LDMLKeyboardTestDataXMLSourceFile } from '../../src/types/ldml-keyboard/ldml-keyboard-testdata-xml.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { fileURLToPath } from 'url';
+import { dirname, sep } from 'node:path';
 
 const readerOptions: LDMLKeyboardXMLSourceFileReaderOptions = {
-  importsPath: fileURLToPath(new URL(...LDMLKeyboardXMLSourceFileReader.defaultImportsURL))
+  importsPath: fileURLToPath(new URL(...LDMLKeyboardXMLSourceFileReader.defaultImportsURL)),
+  localImportsPaths: [],
 };
 
 export interface CompilationCase {
@@ -76,18 +78,29 @@ export interface TestDataCase {
 export function testReaderCases(cases : CompilationCase[]) {
   // we need our own callbacks rather than using the global so messages don't get mixed
   const callbacks = new TestCompilerCallbacks();
-  const reader = new LDMLKeyboardXMLSourceFileReader(readerOptions, callbacks);
   for (const testcase of cases) {
     const expectFailure = testcase.throws || !!(testcase.errors); // if true, we expect this to fail
     const testHeading = expectFailure ? `should fail to load: ${testcase.subpath}`:
                                         `should load: ${testcase.subpath}`;
     it(testHeading, function () {
       callbacks.clear();
-
-      const data = loadFile(makePathToFixture('ldml-keyboard', testcase.subpath));
+      const path = makePathToFixture('ldml-keyboard', testcase.subpath);
+      // update readerOptions to point to the source dir. Need a trailing separator.
+      readerOptions.localImportsPaths = [ dirname(path) + sep ];
+      const reader = new LDMLKeyboardXMLSourceFileReader(readerOptions, callbacks);
+      const data = loadFile(path);
       assert.ok(data, `reading ${testcase.subpath}`);
       const source = reader.load(data);
       if (!testcase.loadfail) {
+        if (!source) {
+          // print any loading errs here
+          if (testcase.warnings) {
+            assert.includeDeepMembers(callbacks.messages, testcase.warnings, 'expected warnings to be included');
+          } else if (!expectFailure) {
+            // no warnings, so expect zero messages
+            assert.deepEqual(callbacks.messages, [], 'expected zero messages');
+          }
+        }
         assert.ok(source, `loading ${testcase.subpath}`);
       } else {
         assert.notOk(source, `loading ${testcase.subpath} (expected failure)`);

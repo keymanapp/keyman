@@ -20,17 +20,19 @@ export class CommonTypesMessages {
   static ERROR_ImportInvalidBase = SevError | 0x0002;
   static Error_ImportInvalidBase = (o: { base: string, path: string, subtag: string }) =>
     m(this.ERROR_ImportInvalidBase,
-      `Import element with base ${def(o.base)} is unsupported. Only ${constants.cldr_import_base} is supported.`);
+      `Import element with base ${def(o.base)} is unsupported. Only ${constants.cldr_import_base} or empty (for local) is supported.`);
 
   static ERROR_ImportInvalidPath = SevError | 0x0003;
   static Error_ImportInvalidPath = (o: { base: string, path: string, subtag: string }) =>
     m(this.ERROR_ImportInvalidPath,
-      `Import element with invalid path ${def(o.path)}: expected the form '${constants.cldr_version_latest}/*.xml`);
+      `Import element with invalid path ${def(o.path)}: expected the form '${constants.cldr_version_latest}/*.xml'`);
 
   static ERROR_ImportReadFail = SevError | 0x0004;
   static Error_ImportReadFail = (o: { base: string, path: string, subtag: string }) =>
     m(this.ERROR_ImportReadFail,
-      `Import could not read data with path ${def(o.path)}: expected the form '${constants.cldr_version_latest}/*.xml'`);
+      `Import could not read data with path ${def(o.path)}`,
+      // for CLDR, give guidance on the suggested path
+      (o.base === constants.cldr_import_base) ? `expected the form '${constants.cldr_version_latest}/*.xml' for ${o.base}` : undefined);
 
   static ERROR_ImportWrongRoot = SevError | 0x0005;
   static Error_ImportWrongRoot = (o: { base: string, path: string, subtag: string }) =>
