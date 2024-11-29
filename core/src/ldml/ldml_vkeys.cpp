@@ -8,6 +8,8 @@
 #include "ldml_vkeys.hpp"
 #include "kmx_file.h"
 #include <ldml/keyman_core_ldml.h>
+#include <set>
+#include <assert.h>
 
 namespace km {
 namespace core {
@@ -28,13 +30,108 @@ vkeys::add(km_core_virtual_key vk, km_core_ldml_modifier_state modifier_state, s
 
 km_core_keyboard_key  *
 vkeys::get_key_list() const {
-  km_core_keyboard_key *list = new km_core_keyboard_key[all_vkeys.size() + 1];
+  // prescan to find out which modifier flags are used
+
+  std::size_t other_key_count = 0;        // number of 'OTHER' keys, which will need to expand to all of the other_state set ( so other_state.size())
+  std::size_t both_alt_key_count = 0;     // number of 'ALT' keys,   which will need to expand to LALT+RALT   (so 2)
+  std::size_t both_ctrl_key_count = 0;    // number of 'CTRL' keys,  which will need to expand to LCTRL+RCTRL (so 2)
+
+  std::set<km::core::ldml::km_core_ldml_modifier_state> all_modifiers;
+  for (const auto &k : all_vkeys) {
+    const auto mod = k.second;
+    if (mod == LDML_KEYS_MOD_OTHER) {
+      other_key_count++;
+    } else if (mod == LDML_KEYS_MOD_ALT) {
+      both_alt_key_count++;
+    } else if (mod == LDML_KEYS_MOD_CTRL) {
+      both_ctrl_key_count++;
+    }
+    all_modifiers.insert(mod);
+  }
+  std::set<km_core_modifier_state> other_state;
+
+  // Alt
+  if (all_modifiers.count(LDML_KEYS_MOD_ALT) == 0 && all_modifiers.count(LDML_KEYS_MOD_ALTL) == 0 && all_modifiers.count(LDML_KEYS_MOD_ALTR) == 0) {
+    // no ALT keys were seen, so OTHER includes ALT
+    other_state.insert(KM_CORE_MODIFIER_LALT);
+    other_state.insert(KM_CORE_MODIFIER_RALT);
+  } else if(all_modifiers.count(LDML_KEYS_MOD_ALTL) == 0) {
+    other_state.insert(KM_CORE_MODIFIER_RALT);
+  } else if(all_modifiers.count(LDML_KEYS_MOD_ALTR) == 0) {
+    other_state.insert(KM_CORE_MODIFIER_LALT);
+  }
+
+  // ctrl
+  if (all_modifiers.count(LDML_KEYS_MOD_CTRL) == 0 && all_modifiers.count(LDML_KEYS_MOD_CTRLL) == 0 && all_modifiers.count(LDML_KEYS_MOD_CTRLR) == 0) {
+    // no CTRL keys were seen, so OTHER includes CTRL
+    other_state.insert(KM_CORE_MODIFIER_LCTRL);
+    other_state.insert(KM_CORE_MODIFIER_RCTRL);
+  } else if(all_modifiers.count(LDML_KEYS_MOD_CTRLL) == 0) {
+    other_state.insert(KM_CORE_MODIFIER_RCTRL);
+  } else if(all_modifiers.count(LDML_KEYS_MOD_CTRLR) == 0) {
+    other_state.insert(KM_CORE_MODIFIER_LCTRL);
+  }
+
+  // shift
+  if (all_modifiers.count(LDML_KEYS_MOD_SHIFT) == 0) {
+    other_state.insert(KM_CORE_MODIFIER_SHIFT);
+  }
+
+  // caps
+  if (all_modifiers.count(LDML_KEYS_MOD_CAPS) == 0) {
+    other_state.insert(KM_CORE_MODIFIER_CAPS);
+  }
+
+  // none- it's possible there is no 'none' layer
+  if (all_modifiers.count(LDML_KEYS_MOD_NONE) == 0) {
+    other_state.insert(KM_CORE_MODIFIER_NONE);
+  }
+
+  const std::size_t new_list_size = all_vkeys.size() // original size
+    + (other_key_count * (other_state.size() - 1))
+    + (both_alt_key_count * 1)
+    + (both_ctrl_key_count * 1)
+    + 1; // terminator
+  km_core_keyboard_key *list = new km_core_keyboard_key[new_list_size];
   std::size_t n = 0;
   for (const auto &k : all_vkeys) {
-    list[n  ].key           = k.first;
-    list[n++].modifier_flag = k.second;
+    const auto vkey = k.first;
+    const auto mod  = k.second;
+
+    if (mod == LDML_KEYS_MOD_OTHER) {
+      // expand to all of other_state
+      for (const auto expanded_mod : other_state) {
+        list[n].key             = vkey;
+        list[n++].modifier_flag = expanded_mod;
+        assert(n <= new_list_size);
+      }
+    } else if (mod == LDML_KEYS_MOD_ALT) {
+      // expand to 'both'
+      list[n].key             = vkey;
+      list[n++].modifier_flag = KM_CORE_MODIFIER_LALT;
+      assert(n <= new_list_size);
+
+      list[n].key             = vkey;
+      list[n++].modifier_flag = KM_CORE_MODIFIER_RALT;
+      assert(n <= new_list_size);
+    } else if (mod == LDML_KEYS_MOD_CTRL) {
+      // expand to 'both'
+      list[n].key             = vkey;
+      list[n++].modifier_flag = KM_CORE_MODIFIER_LCTRL;
+      assert(n <= new_list_size);
+
+      list[n].key             = vkey;
+      list[n++].modifier_flag = KM_CORE_MODIFIER_RCTRL;
+      assert(n <= new_list_size);
+    } else {
+      assert(mod <= KM_CORE_MODIFIER_MASK_ALL); // that no LDMLisms escape
+      list[n].key             = vkey;
+      list[n++].modifier_flag = mod;
+      assert(n <= new_list_size);
+    }
   }
   list[n++] = KM_CORE_KEYBOARD_KEY_LIST_END;
+  assert(n == new_list_size);
   return list;
 }
 
