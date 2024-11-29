@@ -50,13 +50,20 @@ builder_run_action api        api-extractor run --local --verbose
 
 #-------------------------------------------------------------------------------------------------------------------
 
-if builder_start_action test; then
+function do_test() {
+  local MOCHA_FLAGS=
+
+  if [[ "${TEAMCITY_GIT_PATH:-}" != "" ]]; then
+    # we're running in TeamCity
+    MOCHA_FLAGS="-reporter mocha-teamcity-reporter"
+  fi
   eslint .
   tsc --build test
-  c8 --reporter=lcov --reporter=text --exclude-after-remap --lines 80 mocha
+  c8 --reporter=lcov --reporter=text --exclude-after-remap --check-coverage=false --lines 80 mocha ${MOCHA_FLAGS}
   # TODO: remove --lines 80 and improve coverage
-  builder_finish_action success test
-fi
+}
+
+builder_run_action test    do_test
 
 #-------------------------------------------------------------------------------------------------------------------
 
