@@ -174,12 +174,7 @@ export class Strs extends Section {
    */
   allocString(s?: string, opts?: StrsOptions, sections?: DependencySections): StrsItem {
     // Run the string processing pipeline
-    s = Strs.processString(s, opts, sections);
-
-    // add to the set, for testing
-    if (s) {
-      this.allProcessedStrings.add(s);
-    }
+    s = this.processString(s, opts, sections);
 
     // if it's a single char, don't push it into the strs table
     if (opts?.singleOk && isOneChar(s)) {
@@ -197,7 +192,7 @@ export class Strs extends Section {
   }
 
   /** process everything according to opts */
-  static processString(s: string, opts: StrsOptions, sections: DependencySections) {
+  processString(s: string, opts: StrsOptions, sections: DependencySections) {
     s = s ?? '';
     // type check everything else
     if (typeof s !== 'string') {
@@ -215,6 +210,12 @@ export class Strs extends Section {
     if (opts?.unescape) {
       s = unescapeString(s);
     }
+
+    if (s) {
+      // add all processed strings here, so that we catch denormalized strings in the input
+      this.allProcessedStrings.add(s);
+    }
+
     // nfd
     if (opts?.nfd) {
       if (!sections?.meta?.normalizationDisabled) {

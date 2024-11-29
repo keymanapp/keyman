@@ -71,4 +71,24 @@ describe('strs', function () {
             ]);
         assert.isNull(kmx); // should fail post-validate
     });
+    describe('should warn on denorm strings', async function () {
+      for (const num of [1, 2, 3, 4]) {
+        const path = `sections/strs/warn-denorm-${num}.xml`;
+        it(path, async function () {
+          const inputFilename = makePathToFixture(path);
+          // Compile the keyboard
+          const kmx = await compileKeyboard(inputFilename, { ...compilerTestOptions, saveDebug: true, shouldAddCompilerVersion: false },
+            [
+              // validation messages
+              LdmlCompilerMessages.Warn_StringDenorm(),
+            ],
+            false, // validation should pass
+            [
+              // same messages
+              LdmlCompilerMessages.Warn_StringDenorm(),
+            ]);
+          assert.isNotNull(kmx); // not failing
+        });
+      }
+    });
 });

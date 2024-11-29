@@ -34,9 +34,12 @@ export class StrsCompiler extends EmptyCompiler {
     const strs = <KMXPlus.Strs>section;
 
     if (strs) {
+      let hadDenormalized = false;
       const badStringAnalyzer = new util.BadStringAnalyzer();
       const CONTAINS_MARKER_REGEX = new RegExp(LdmlKeyboardTypes.MarkerParser.ANY_MARKER_MATCH);
       for (let s of strs.allProcessedStrings.values()) {
+        // stop at the first denormalized string
+        hadDenormalized = hadDenormalized || util.isDenormalized(s);
         // replace all \\uXXXX with the actual code point.
         // this lets us analyze whether there are PUA, unassigned, etc.
         // the results might not be valid regex of course.
@@ -71,6 +74,10 @@ export class StrsCompiler extends EmptyCompiler {
           this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalCharacters({ count, lowestCh }))
           return false;
         }
+      }
+      if (hadDenormalized) {
+        // warn once
+        this.callbacks.reportMessage(LdmlCompilerMessages.Warn_StringDenorm());
       }
     }
     return true;

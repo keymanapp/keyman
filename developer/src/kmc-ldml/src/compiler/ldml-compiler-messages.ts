@@ -199,7 +199,11 @@ export class LdmlCompilerMessages {
     `Invalid marker identifier "\m{${def(o.id)}}". Identifiers must be between 1 and 32 characters, and can use A-Z, a-z, 0-9, and _.`,
   );
 
-  // Available: 0x02B-0x2F
+  static WARN_StringDenorm = SevWarn | 0x002B;
+  static Warn_StringDenorm = () =>
+  m(this.WARN_StringDenorm, `File contains text that is neither NFC nor NFD.`);
+
+  // Available: 0x02C-0x2F
 
   static ERROR_InvalidQuadEscape = SevError | 0x0030;
   static Error_InvalidQuadEscape = (o: { cp: number }) =>
