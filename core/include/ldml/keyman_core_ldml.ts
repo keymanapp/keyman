@@ -57,9 +57,9 @@ class Constants {
    */
   readonly version = '1.0';
   /**
-   * The current CLDR version
+   * The latest CLDR version
    */
-  readonly cldr_version_latest = '45';
+  readonly cldr_version_latest = '46';
   /**
    * The version for testdata files
    */

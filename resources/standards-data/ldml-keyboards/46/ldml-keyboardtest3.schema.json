@@ -1,0 +1,225 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "additionalProperties": false,
+  "definitions": {
+    "any": {
+      "type": "string"
+    },
+    "backspace": {
+      "type": "string"
+    },
+    "check": {
+      "additionalProperties": false,
+      "properties": {
+        "result": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "result"
+      ],
+      "type": "object"
+    },
+    "emit": {
+      "additionalProperties": false,
+      "properties": {
+        "to": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "to"
+      ],
+      "type": "object"
+    },
+    "info": {
+      "additionalProperties": false,
+      "properties": {
+        "author": {
+          "type": "string"
+        },
+        "keyboard": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "keyboard",
+        "name"
+      ],
+      "type": "object"
+    },
+    "keystroke": {
+      "additionalProperties": false,
+      "properties": {
+        "flick": {
+          "type": "string"
+        },
+        "key": {
+          "type": "string"
+        },
+        "longPress": {
+          "type": "string"
+        },
+        "tapCount": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "key"
+      ],
+      "type": "object"
+    },
+    "repertoire": {
+      "additionalProperties": false,
+      "properties": {
+        "chars": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "default",
+            "simple",
+            "gesture",
+            "flick",
+            "longPress",
+            "multiTap",
+            "hardware"
+          ],
+          "type": "string"
+        }
+      },
+      "required": [
+        "chars",
+        "name"
+      ],
+      "type": "object"
+    },
+    "special": {
+      "$ref": "#/definitions/any"
+    },
+    "startContext": {
+      "additionalProperties": false,
+      "properties": {
+        "to": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "to"
+      ],
+      "type": "object"
+    },
+    "test": {
+      "additionalProperties": false,
+      "properties": {
+        "backspace": {
+          "$ref": "#/definitions/backspace"
+        },
+        "check": {
+          "$ref": "#/definitions/check"
+        },
+        "emit": {
+          "$ref": "#/definitions/emit"
+        },
+        "keystroke": {
+          "$ref": "#/definitions/keystroke"
+        },
+        "name": {
+          "type": "string"
+        },
+        "special": {
+          "items": {
+            "$ref": "#/definitions/special"
+          },
+          "type": "array"
+        },
+        "startContext": {
+          "$ref": "#/definitions/startContext"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "type": "object"
+    },
+    "tests": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "special": {
+          "items": {
+            "$ref": "#/definitions/special"
+          },
+          "type": "array"
+        },
+        "test": {
+          "items": {
+            "$ref": "#/definitions/test"
+          },
+          "minItems": 1,
+          "type": "array"
+        }
+      },
+      "required": [
+        "test",
+        "name"
+      ],
+      "type": "object"
+    }
+  },
+  "properties": {
+    "keyboardTest3": {
+      "additionalProperties": false,
+      "properties": {
+        "conformsTo": {
+          "enum": [
+            "techpreview"
+          ],
+          "type": "string"
+        },
+        "info": {
+          "$ref": "#/definitions/info"
+        },
+        "repertoire": {
+          "items": {
+            "$ref": "#/definitions/repertoire"
+          },
+          "type": "array"
+        },
+        "special": {
+          "items": {
+            "$ref": "#/definitions/special"
+          },
+          "type": "array"
+        },
+        "tests": {
+          "items": {
+            "$ref": "#/definitions/tests"
+          },
+          "type": "array"
+        },
+        "xmlns": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "info",
+        "conformsTo"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "keyboardTest3"
+  ],
+  "title": "46/dtd/ldmlKeyboardTest3.xsd",
+  "type": "object"
+}
