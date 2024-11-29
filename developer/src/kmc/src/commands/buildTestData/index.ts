@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url';
 import { CommandLineBaseOptions } from 'src/util/baseOptions.js';
 import { exitProcess } from '../../util/sysexits.js';
 import { InfrastructureMessages } from '../../messages/infrastructureMessages.js';
+import { dirname, sep } from 'node:path';
 
 export async function buildTestData(infile: string, _options: any, commander: any): Promise<void> {
   const options: CommandLineBaseOptions = commander.optsWithGlobals();
@@ -17,7 +18,8 @@ export async function buildTestData(infile: string, _options: any, commander: an
     saveDebug: false,
     shouldAddCompilerVersion: false,
     readerOptions: {
-      importsPath: fileURLToPath(new URL(...LDMLKeyboardXMLSourceFileReader.defaultImportsURL))
+      importsPath: fileURLToPath(new URL(...LDMLKeyboardXMLSourceFileReader.defaultImportsURL)),
+      localImportsPaths: [ dirname(infile) + sep ], // local dir
     }
   };
 
