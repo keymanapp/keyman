@@ -15,6 +15,7 @@ import { BUILDER_KVK_FILE,
          BUILDER_KVK_STRING,
          BUILDER_KVK_HEADER_IDENTIFIER,
          BUILDER_KVK_HEADER_VERSION,
+         BUILDER_KVK_KEY,
          BUILDER_KVK_KEY_FLAGS,
          BUILDER_KVK_SHIFT_STATE,
 } from '../../src/kvk/kvk-file.js';
@@ -57,14 +58,9 @@ describe('Test of KVK-File-Writer', () => {
         size: vk.header.unicodeFont.size,
         name: { len: vk.header.ansiFont.name.length + 1, str: vk.header.ansiFont.name },
       });
-      vk.keys.forEach((vkk, idx) => {
-        assert.equal(binary.keys[idx].flags, vkk.flags);
-        assert.equal(binary.keys[idx].shift, vkk.shift);
-        assert.equal(binary.keys[idx].vkey,  vkk.vkey);
-        assert.deepEqual(binary.keys[idx].text.str, vkk.text);
-        assert.equal(binary.keys[idx].bitmapSize, vkk.bitmap.byteLength);
-        assert.deepEqual(Array.from(vkk.bitmap), [idx]);
-      });
+      for (let idx=0; idx<binary.keys.length; idx++) {
+        checkVisualKeyboardKey(binary.keys[idx], vk.keys[idx])
+      }
     });
   });
   describe('Test of setString()', () => {
@@ -104,4 +100,13 @@ function initVisualKeyboardKey(
     bitmap: new Uint8Array([index]),
   };
   return vkk;
+}
+
+function checkVisualKeyboardKey(target: BUILDER_KVK_KEY, source: VisualKeyboardKey) {
+  assert.equal(target.flags, source.flags);
+  assert.equal(target.shift, source.shift);
+  assert.equal(target.vkey,  source.vkey);
+  assert.deepEqual(target.text.str, source.text);
+  assert.equal(target.bitmapSize, source.bitmap.byteLength);
+  assert.deepEqual(target.bitmapData, Array.from(source.bitmap));
 }
