@@ -23,12 +23,12 @@ const VISUAL_KEYBOARD_TEXT_COLOR = 0xFF000008;
 
 describe('Test of KVK-File-Writer', () => {
   describe('Test of write()', () => {
-    // it('can create a visual keyboard', () => {
-    //   const writer = new KvkFileWriter;
-    //   const vk     = initVisualKeyboard();
-    //   const file   = writer.write(vk);
-    //   assert.isNotNull(file);
-    // });
+    it('can create a visual keyboard', () => {
+      const writer = new KvkFileWriter;
+      const vk     = initVisualKeyboard();
+      const file   = writer.write(vk);
+      assert.isNotNull(file);
+    });
   });
   describe('Test of build()', () => {
     it('can build a BUILDER_KVK_FILE', () => {
