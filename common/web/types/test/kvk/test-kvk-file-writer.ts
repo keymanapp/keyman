@@ -44,23 +44,7 @@ describe('Test of KVK-File-Writer', () => {
       ]);
       const writer = new KvkFileWriter;
       const binary: BUILDER_KVK_FILE = writer['build'](vk);
-      assert.equal(binary.header.identifier, BUILDER_KVK_HEADER_IDENTIFIER);
-      assert.equal(binary.header.version, BUILDER_KVK_HEADER_VERSION);
-      assert.deepEqual(binary.header.associatedKeyboard.str, vk.header.associatedKeyboard);
-      assert.equal(binary.header.flags, BUILDER_KVK_HEADER_FLAGS.kvkhNone);
-      assert.deepEqual(binary.header.ansiFont, {
-        color: VISUAL_KEYBOARD_TEXT_COLOR,
-        size: vk.header.ansiFont.size,
-        name: { len: vk.header.ansiFont.name.length + 1, str: vk.header.ansiFont.name },
-      });
-      assert.deepEqual(binary.header.unicodeFont, {
-        color: VISUAL_KEYBOARD_TEXT_COLOR,
-        size: vk.header.unicodeFont.size,
-        name: { len: vk.header.ansiFont.name.length + 1, str: vk.header.ansiFont.name },
-      });
-      for (let idx=0; idx<binary.keys.length; idx++) {
-        checkVisualKeyboardKey(binary.keys[idx], vk.keys[idx])
-      }
+      checkBuilderKvkFile(binary, vk);
     });
   });
   describe('Test of setString()', () => {
@@ -102,7 +86,27 @@ function initVisualKeyboardKey(
   return vkk;
 }
 
-function checkVisualKeyboardKey(target: BUILDER_KVK_KEY, source: VisualKeyboardKey) {
+function checkBuilderKvkFile(binary: BUILDER_KVK_FILE, vk: VisualKeyboard) {
+  assert.equal(binary.header.identifier, BUILDER_KVK_HEADER_IDENTIFIER);
+  assert.equal(binary.header.version, BUILDER_KVK_HEADER_VERSION);
+  assert.deepEqual(binary.header.associatedKeyboard.str, vk.header.associatedKeyboard);
+  assert.equal(binary.header.flags, vk.header.flags);
+  assert.deepEqual(binary.header.ansiFont, {
+    color: VISUAL_KEYBOARD_TEXT_COLOR,
+    size: vk.header.ansiFont.size,
+    name: { len: vk.header.ansiFont.name.length + 1, str: vk.header.ansiFont.name },
+  });
+  assert.deepEqual(binary.header.unicodeFont, {
+    color: VISUAL_KEYBOARD_TEXT_COLOR,
+    size: vk.header.unicodeFont.size,
+    name: { len: vk.header.ansiFont.name.length + 1, str: vk.header.ansiFont.name },
+  });
+  for (let idx=0; idx<binary.keys.length; idx++) {
+    checkBuilderKvkKey(binary.keys[idx], vk.keys[idx])
+  }
+}
+
+function checkBuilderKvkKey(target: BUILDER_KVK_KEY, source: VisualKeyboardKey) {
   assert.equal(target.flags, source.flags);
   assert.equal(target.shift, source.shift);
   assert.equal(target.vkey,  source.vkey);
