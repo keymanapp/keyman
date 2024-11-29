@@ -15,6 +15,8 @@ import { BUILDER_KVK_FILE,
          BUILDER_KVK_STRING,
          BUILDER_KVK_HEADER_IDENTIFIER,
          BUILDER_KVK_HEADER_VERSION,
+         BUILDER_KVK_KEY_FLAGS,
+         BUILDER_KVK_SHIFT_STATE,
 } from '../../src/kvk/kvk-file.js';
 
 const VISUAL_KEYBOARD_TEXT_COLOR = 0xFF000008;
@@ -47,6 +49,14 @@ describe('Test of KVK-File-Writer', () => {
         size: vk.header.unicodeFont.size,
         name: { len: vk.header.ansiFont.name.length + 1, str: vk.header.ansiFont.name },
       });
+      vk.keys.forEach((vkk, idx) => {
+        assert.equal(binary.keys[idx].flags, vkk.flags);
+        assert.equal(binary.keys[idx].shift, vkk.shift);
+        assert.equal(binary.keys[idx].vkey,  vkk.vkey);
+        assert.deepEqual(binary.keys[idx].text.str, vkk.text);
+        assert.equal(binary.keys[idx].bitmapSize, vkk.bitmap.byteLength);
+        assert.deepEqual(Array.from(vkk.bitmap), [idx]);
+      });
     });
   });
   describe('Test of setString()', () => {
@@ -70,8 +80,23 @@ function initVisualKeyboard(): VisualKeyboard {
     unicodeFont: DEFAULT_KVK_FONT,
     // underlyingLayout?: string,
   };
+
   const vkks: VisualKeyboardKey[] = [];
+  for (let i=0; i<3; i++) {
+    initVisualKeyboardKey(i);
+  }
+
   const vk: VisualKeyboard = { header: vkh, keys: vkks };
   return vk;
 };
 
+function initVisualKeyboardKey(index: number): VisualKeyboardKey {
+  const vkk: VisualKeyboardKey = {
+    flags: BUILDER_KVK_KEY_FLAGS.kvkkBitmap,
+    shift: BUILDER_KVK_SHIFT_STATE.KVKS_NORMAL,
+    vkey: index,
+    text: "text",
+    bitmap: new Uint8Array([index]),
+  };
+  return vkk;
+}
