@@ -9,7 +9,11 @@
 import 'mocha';
 import { assert } from 'chai';
 import { KvkFileWriter } from '../../src/main.js';
-import { VisualKeyboard, VisualKeyboardKey, DEFAULT_KVK_FONT } from '../../src/kvk/visual-keyboard.js';
+import { VisualKeyboard,
+         VisualKeyboardKey,
+         VisualKeyboardFont,
+         DEFAULT_KVK_FONT
+} from '../../src/kvk/visual-keyboard.js';
 import { BUILDER_KVK_FILE,
          BUILDER_KVK_HEADER_FLAGS,
          BUILDER_KVK_STRING,
@@ -59,13 +63,19 @@ describe('Test of KVK-File-Writer', () => {
   });
 });
 
-function initVisualKeyboard(vkks: VisualKeyboardKey[]): VisualKeyboard {
+function initVisualKeyboard(
+  vkks: VisualKeyboardKey[],
+  flags: BUILDER_KVK_HEADER_FLAGS = BUILDER_KVK_HEADER_FLAGS.kvkhNone,
+  associatedKeyboard: string = "associatedKeyboard",
+  ansiFont: VisualKeyboardFont = DEFAULT_KVK_FONT,
+  unicodeFont: VisualKeyboardFont = DEFAULT_KVK_FONT,
+): VisualKeyboard {
   const vkh = {
     // version?: number,
-    flags: BUILDER_KVK_HEADER_FLAGS.kvkhNone,
-    associatedKeyboard: "associatedKeyboard",
-    ansiFont: DEFAULT_KVK_FONT,
-    unicodeFont: DEFAULT_KVK_FONT,
+    flags: flags,
+    associatedKeyboard: associatedKeyboard,
+    ansiFont: ansiFont,
+    unicodeFont: unicodeFont,
     // underlyingLayout?: string,
   };
   return { header: vkh, keys: vkks };
