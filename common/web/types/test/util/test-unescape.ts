@@ -1,6 +1,6 @@
 import 'mocha';
 import {assert} from 'chai';
-import {unescapeString, UnescapeError, isOneChar, toOneChar, unescapeOneQuadString, BadStringAnalyzer, isValidUnicode, describeCodepoint, isPUA, BadStringType, unescapeStringToRegex, unescapeQuadString, NFDAnalyzer} from '../../src/util/util.js';
+import {unescapeString, UnescapeError, isOneChar, toOneChar, unescapeOneQuadString, BadStringAnalyzer, isValidUnicode, describeCodepoint, isPUA, BadStringType, unescapeStringToRegex, unescapeQuadString, NFDAnalyzer, isDenormalized} from '../../src/util/util.js';
 
 describe('test UTF32 functions()', function() {
   it('should properly categorize strings', () => {
@@ -185,6 +185,24 @@ describe('test bad char functions', () => {
       const ch = s.codePointAt(0);
       assert.isTrue(isPUA(ch), describeCodepoint(ch));
     }
+  });
+  describe('test isDenormalized()', () => {
+    it('should correctly categorize strings', () => {
+      [
+        undefined,
+        null,
+        '',
+        'ABC',
+        'fa\u1E69cinating', // NFC
+        'fas\u0323\u0307cinating', // NFD
+        'd\u0323\u0307', // NFD
+        '\u1e0d\u0307', // NFC
+      ].map(s => assert.isFalse(isDenormalized(s), `for string ${s}`));
+      [
+        'd\u0307\u0323', // NFD but reversed marks
+        'fas\u0307\u0323cinating', // not-NFD
+      ].map(s => assert.isTrue(isDenormalized(s), `for string ${s}`));
+    });
   });
 });
 
