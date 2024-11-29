@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+@@keys: [K_1][K_BKQUOTE]
+@@expected: \u203d\u0040
+       <interrobang> <snail>
+-->
+
+<keyboard3 xmlns="https://schemas.unicode.org/cldr/45/keyboard3" locale="mt" conformsTo="45">
+  <info name="keys-minimal"/>
+
+  <keys>
+    <import base="" path="keys-Zyyy-morepunctuation.xml"/>
+  </keys>
+
+  <layers formId="us">
+    <layer id="base">
+      <row keys="snail interrobang" />
+    </layer>
+  </layers>
+
+</keyboard3>
