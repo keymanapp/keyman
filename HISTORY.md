@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 18.0.148 alpha 2024-11-29
+
+* test(common/web/types): unit tests for unicodeset-parser-api (#12714)
+* chore(developer): rename test files (#12707)
+* feat(core,linux,developer,windows): implement loading KMX from blob (#12721)
+* chore(common): add offline support for emscripten (#12740)
+
 ## 18.0.147 alpha 2024-11-28
 
 * docs(android): Add android/docs/internal/README (#12717)
