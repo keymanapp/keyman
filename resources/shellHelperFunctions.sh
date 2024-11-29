@@ -306,6 +306,18 @@ check-markdown() {
   node "$KEYMAN_ROOT/resources/tools/check-markdown" --root "$1"
 }
 
+# 
+# Runs eslint, builds tests, and then runs tests with mocha + c8 (coverage)
+# 
+# Usage:
+#   builder_run_action  test    builder_do_typescript_tests [coverage_threshold]
+# Parameters:
+#   1: coverage_threshold   optional, minimum coverage for c8 to pass tests, 
+#                           defaults to 90 (percent)
+#
+# Todo:
+#   Move to builder.typescript.inc.sh when this is established
+#
 builder_do_typescript_tests() {
   local MOCHA_FLAGS=
 
