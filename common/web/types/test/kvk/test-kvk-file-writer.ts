@@ -60,6 +60,19 @@ describe('Test of KVK-File-Writer', () => {
       assert.equal(bks.len, str.length + 1);
       assert.deepEqual(bks.str, str);
     });
+    it('throws TypeError for a null BUILDER_KVK_STRING', () => {
+      assert.throws(() => {
+        const writer = new KvkFileWriter;
+        writer['setString'](null, "");
+      }, TypeError);
+    });
+    it('throws TypeError for a null value', () => {
+      assert.throws(() => {
+        const bks: BUILDER_KVK_STRING = { len: 0, str: null };
+        const writer = new KvkFileWriter;
+        writer['setString'](bks, null);
+      }, TypeError);
+    });
   });
 });
 
