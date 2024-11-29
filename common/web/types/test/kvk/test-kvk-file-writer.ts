@@ -91,16 +91,12 @@ function checkBuilderKvkFile(binary: BUILDER_KVK_FILE, vk: VisualKeyboard) {
   assert.equal(binary.header.version, BUILDER_KVK_HEADER_VERSION);
   assert.deepEqual(binary.header.associatedKeyboard.str, vk.header.associatedKeyboard);
   assert.equal(binary.header.flags, vk.header.flags);
-  assert.deepEqual(binary.header.ansiFont, {
-    color: VISUAL_KEYBOARD_TEXT_COLOR,
-    size: vk.header.ansiFont.size,
-    name: { len: vk.header.ansiFont.name.length + 1, str: vk.header.ansiFont.name },
-  });
-  assert.deepEqual(binary.header.unicodeFont, {
-    color: VISUAL_KEYBOARD_TEXT_COLOR,
-    size: vk.header.unicodeFont.size,
-    name: { len: vk.header.ansiFont.name.length + 1, str: vk.header.ansiFont.name },
-  });
+  assert.equal(binary.header.ansiFont.color, VISUAL_KEYBOARD_TEXT_COLOR);
+  assert.equal(binary.header.ansiFont.size, vk.header.ansiFont.size);
+  assert.deepEqual(binary.header.ansiFont.name.str, vk.header.ansiFont.name);
+  assert.equal(binary.header.unicodeFont.color, VISUAL_KEYBOARD_TEXT_COLOR);
+  assert.equal(binary.header.unicodeFont.size, vk.header.unicodeFont.size);
+  assert.deepEqual(binary.header.unicodeFont.name.str, vk.header.unicodeFont.name);
   for (let idx=0; idx<binary.keys.length; idx++) {
     checkBuilderKvkKey(binary.keys[idx], vk.keys[idx])
   }
