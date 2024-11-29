@@ -127,7 +127,7 @@ bool LdmlTestSource::get_expected_beep() const {
 
 int LdmlTestSource::load_kmx_plus(const km::core::path &compiled) {
     // check and load the KMX (yes, once again)
-  if(!km::core::ldml_processor::is_kmxplus_file(compiled, rawdata)) {
+  if(!km::core::ldml_processor::is_kmxplus_file(rawdata)) {
     std::cerr << "Reading KMX for test purposes failed: " << compiled << std::endl;
     return __LINE__;
   }
