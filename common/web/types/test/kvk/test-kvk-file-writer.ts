@@ -25,14 +25,22 @@ describe('Test of KVK-File-Writer', () => {
   describe('Test of write()', () => {
     it('can create a visual keyboard', () => {
       const writer = new KvkFileWriter;
-      const vk     = initVisualKeyboard();
-      const file   = writer.write(vk);
+      const vk = initVisualKeyboard([
+        initVisualKeyboardKey(0),
+        initVisualKeyboardKey(1),
+        initVisualKeyboardKey(2),
+      ]);
+      const file = writer.write(vk);
       assert.isNotNull(file);
     });
   });
   describe('Test of build()', () => {
     it('can build a BUILDER_KVK_FILE', () => {
-      const vk     = initVisualKeyboard();
+      const vk = initVisualKeyboard([
+        initVisualKeyboardKey(0),
+        initVisualKeyboardKey(1),
+        initVisualKeyboardKey(2),
+      ]);
       const writer = new KvkFileWriter;
       const binary: BUILDER_KVK_FILE = writer['build'](vk);
       assert.equal(binary.header.identifier, BUILDER_KVK_HEADER_IDENTIFIER);
@@ -71,7 +79,7 @@ describe('Test of KVK-File-Writer', () => {
   });
 });
 
-function initVisualKeyboard(): VisualKeyboard {
+function initVisualKeyboard(vkks: VisualKeyboardKey[]): VisualKeyboard {
   const vkh = {
     // version?: number,
     flags: BUILDER_KVK_HEADER_FLAGS.kvkhNone,
@@ -80,20 +88,17 @@ function initVisualKeyboard(): VisualKeyboard {
     unicodeFont: DEFAULT_KVK_FONT,
     // underlyingLayout?: string,
   };
-
-  const vkks: VisualKeyboardKey[] = [];
-  for (let i=0; i<3; i++) {
-    initVisualKeyboardKey(i);
-  }
-
-  const vk: VisualKeyboard = { header: vkh, keys: vkks };
-  return vk;
+  return { header: vkh, keys: vkks };
 };
 
-function initVisualKeyboardKey(index: number): VisualKeyboardKey {
+function initVisualKeyboardKey(
+  index: number,
+  flags: BUILDER_KVK_KEY_FLAGS   = BUILDER_KVK_KEY_FLAGS.kvkkBitmap,
+  shift: BUILDER_KVK_SHIFT_STATE = BUILDER_KVK_SHIFT_STATE.KVKS_NORMAL,
+): VisualKeyboardKey {
   const vkk: VisualKeyboardKey = {
-    flags: BUILDER_KVK_KEY_FLAGS.kvkkBitmap,
-    shift: BUILDER_KVK_SHIFT_STATE.KVKS_NORMAL,
+    flags: flags,
+    shift: shift,
     vkey: index,
     text: "text",
     bitmap: new Uint8Array([index]),
