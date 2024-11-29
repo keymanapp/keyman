@@ -56,27 +56,31 @@ function copy_deps() {
   cp ../kmcmplib/build/wasm/$BUILDER_CONFIGURATION/src/wasm-host.wasm ./build/src/import/kmcmplib/wasm-host.wasm
 }
 
-if builder_start_action build; then
+function do_build() {
   copy_deps
   tsc --build
-  builder_finish_action success build
-fi
+}
 
-builder_run_action api        api-extractor run --local --verbose
+function do_test() {
+  local MOCHA_FLAGS=
 
-#-------------------------------------------------------------------------------------------------------------------
+  if [[ "${TEAMCITY_GIT_PATH:-}" != "" ]]; then
+    # we're running in TeamCity
+    MOCHA_FLAGS="-reporter mocha-teamcity-reporter"
+  fi
 
-if builder_start_action test; then
   copy_deps
   tsc --build test/
   npm run lint
   readonly C8_THRESHOLD=80
-  c8 --reporter=lcov --reporter=text --lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD mocha
+  c8 --reporter=lcov --reporter=text --lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD mocha ${MOCHA_FLAGS}
   builder_echo warning "Coverage thresholds are currently $C8_THRESHOLD%, which is lower than ideal."
   builder_echo warning "Please increase threshold in build.sh as test coverage improves."
+}
 
-  builder_finish_action success test
-fi
+builder_run_action build      do_build
+builder_run_action api        api-extractor run --local --verbose
+builder_run_action test       do_test
 
 #-------------------------------------------------------------------------------------------------------------------
 
