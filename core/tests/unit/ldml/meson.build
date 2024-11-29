@@ -83,7 +83,10 @@ ldml = executable('ldml',
     )
 
 core_ldml_min = executable('core_ldml_min_tests',
-    ['core_ldml_min.tests.cpp'],
+    [
+      'core_ldml_min.tests.cpp',
+      meson.current_source_dir() / '../load_kmx_file.cpp',
+    ],
     cpp_args: defns + warns,
     include_directories: [inc, libsrc],
     link_args: links,

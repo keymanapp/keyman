@@ -40,6 +40,7 @@
 #include "unicode/uniset.h"
 #include "unicode/usetiter.h"
 
+#include "../load_kmx_file.hpp"
 #include <test_color.h>
 
 #define assert_or_return(expr) if(!(expr)) { \
@@ -54,8 +55,6 @@
 #define TEST_JSON_SUFFIX "-test.json"
 namespace km {
 namespace tests {
-
-
 
 
 /** string munging */

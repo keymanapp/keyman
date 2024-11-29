@@ -1,5 +1,33 @@
 # Keyman Version History
 
+## 18.0.148 alpha 2024-11-29
+
+* test(common/web/types): unit tests for unicodeset-parser-api (#12714)
+* chore(developer): rename test files (#12707)
+* feat(core,linux,developer,windows): implement loading KMX from blob (#12721)
+* chore(common): add offline support for emscripten (#12740)
+
+## 18.0.147 alpha 2024-11-28
+
+* docs(android): Add android/docs/internal/README (#12717)
+* test(common/web/types): unit tests for string-list (#12702)
+* docs(common): linux and macOS emscripten setup (#12701)
+* refactor(developer): output number of tests when running on TC (#12710)
+* refactor(common): output number of tests when running on TC (#12719)
+* chore(web): rename file missed in #12704 (#12720)
+* fix(core): permanently disable logging (#12724)
+* fix(linux): disable assertions in release builds of ibus-keyman (#12725)
+* chore(common): improve offline builds (#12739)
+
+## 18.0.146 alpha 2024-11-27
+
+* test(developer): kmcmplib compiler unit tests 5 (#12612)
+* refactor(common): move all lexical model types into `LexicalModelTypes` container (#12712)
+* refactor(common): move remaining LDML keyboard types into `LdmlKeyboardTypes` (#12713)
+* chore(web): rename test files and folders (#12704)
+* chore(core): rename test files (#12705)
+* chore(linux): rename test files (#12706)
+
 ## 18.0.145 alpha 2024-11-26
 
 * docs(windows): update emscripten bash setup (#12700)
