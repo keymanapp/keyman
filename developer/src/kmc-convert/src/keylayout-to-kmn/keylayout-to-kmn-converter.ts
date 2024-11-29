@@ -51,31 +51,31 @@ import { readFileSync } from 'fs';
 
 
 
-/*function boxXmlArray_S(o: any, x: string): void {
-  if(typeof o == 'object' && !Array.isArray(o[x])) {
-    if(o[x] === null || o[x] === undefined) {
+function boxXmlArray_S(o: any, x: string): void {
+  if (typeof o == 'object' && !Array.isArray(o[x])) {
+    if (o[x] === null || o[x] === undefined) {
       o[x] = [];
     }
     else {
       o[x] = [o[x]];
     }
   }
-}*/
+}
 /*
 // example: 
   <AAA>
-		<BBB id="b">
-			<CCC directions="nw" keyId="A-grave" />
-			<CCC directions="nw se" keyId="A-acute" />
-			<CCC directions="e" keyId="A-caron" />
-			<CCC directions="s" keyId="numeric" /> <!-- layer shifting B-->
-		</BBB>
-		<BBB id="a">
-			<CCC directions="nw" keyId="a-grave" />
-			<CCC directions="nw se" keyId="a-acute" />
-			<CCC directions="e" keyId="a-caron" />
-		</BBB>
-	</AAA>
+    <BBB id="b">
+      <CCC directions="nw" keyId="A-grave" />
+      <CCC directions="nw se" keyId="A-acute" />
+      <CCC directions="e" keyId="A-caron" />
+      <CCC directions="s" keyId="numeric" /> <!-- layer shifting B-->
+    </BBB>
+    <BBB id="a">
+      <CCC directions="nw" keyId="a-grave" />
+      <CCC directions="nw se" keyId="a-acute" />
+      <CCC directions="e" keyId="a-caron" />
+    </BBB>
+  </AAA>
 
 then write: 
 if(source?.keyboard3?.AAA) {
@@ -90,23 +90,29 @@ if(source?.keyboard3?.AAA) {
 
 // need to specify all elements!!!
 // source = jsonObj.keyboard
-/*function boxArrays_S(source: any) {
-  
+function boxArrays_S(source: any) {
+
+  //console.log("source... before boxing",typeof(source.layoutsX),source.layoutsX)
+  console.log("source... before boxing", typeof (source.terminators), source.terminators)
   //             parent tag              child-tag
   // boxXmlArray(source.visualkeyboard, 'encoding');
-  boxXmlArray_S(source.layoutsX, 'layoutX');
+  //boxXmlArray_S(source.layoutsX, 'layoutX');
+  boxXmlArray_S(source.layouts, 'layout');
+  boxXmlArray_S(source.modifierMap, 'keyMapSelect');
+  boxXmlArray_S(source.terminators, 'when');
 
- /* if(source?.keyboard3?.modifierMap) {
-    boxXmlArray_S(source?.keyboard3?.modifierMap, 'keyMapSelect');
-    for(const keyMapSelect_Var of source?.keyboard3?.modifierMap?.keyMapSelect) {
-      boxXmlArray_S(keyMapSelect_Var, 'modifier');
-    }
-  }*/
+  /* if(source?.keyboard3?.modifierMap) {
+     boxXmlArray_S(source?.keyboard3?.modifierMap, 'keyMapSelect');
+     for(const keyMapSelect_Var of source?.keyboard3?.modifierMap?.keyMapSelect) {
+       boxXmlArray_S(keyMapSelect_Var, 'modifier');
+     }
+   }*/
 
 
-  //console.log("source",source)
-/*  return source;
-}*/
+  //console.log("source... after boxing",typeof(source.layoutsX),source.layoutsX)
+  console.log("source... after boxing", typeof (source.terminators), source.terminators)
+  return source;
+}
 
 
 
@@ -130,7 +136,7 @@ export class KeylayoutToKmnConverter {
 
   // TODO use callbacks
   //constructor(/*private*/ _callbacks: CompilerCallbacks, /*private*/ _options: CompilerOptions) {
-     constructor(private callbacks: CompilerCallbacks,  options: CompilerOptions) {
+  constructor(private callbacks: CompilerCallbacks, options: CompilerOptions) {
     // TODO: if these are needed, uncomment /*private*/ and remove _, and they will then
     // be available as class properties
   }
@@ -195,10 +201,10 @@ export class KeylayoutToKmnConverter {
         if (stringOptions.includes(tagName)) return true;
         else return false;
       }*/
-   
+
     };
 
-    
+
 
     //const xmlFile = readFileSync(`${process.cwd()}/data/MySample.keylayout`, 'utf8')
     const xmlFile = readFileSync((process.cwd() + "\\data" + filename.substring(filename.lastIndexOf("\\"))).replace(" ", ""), 'utf8');
@@ -220,7 +226,7 @@ export class KeylayoutToKmnConverter {
     const duplicate_layouts_array: string[] = []                  // array holding the layouts e.g. ANSI or JIS // needed?? I think no
     const deadkeyedChars_all_Layers: string[][] = []              // array holding all DEADKEYS for each mod state â, ê, ,....
 
-   // boxArrays_S(jsonObj.keyboard);
+    boxArrays_S(jsonObj.keyboard);
     // TODO call: get only ANSI
     // Do I need to care or is there always ANSI which is always keyMapSet[0]
     // if so code can be shortened
@@ -228,8 +234,8 @@ export class KeylayoutToKmnConverter {
     // LAYOUTS: get all groups like ANSI JIS, remove JIS
     // .........................................................
 
-   //   in case we need to find ANSI
-     for (let i = 0; i < jsonObj.keyboard.layouts.layout.length; i++) {
+    //   in case we need to find ANSI
+    for (let i = 0; i < jsonObj.keyboard.layouts.layout.length; i++) {
       duplicate_layouts_array[i] = jsonObj.keyboard.layouts.layout[i]['@_mapSet']
     }
 
@@ -240,10 +246,10 @@ export class KeylayoutToKmnConverter {
 
     // remove JIS (if keyMap contains baseMapSet it`s JIS)
     for (let i = 0; i < layouts_array.length; i++) {
-      if(jsonObj.keyboard.keyMapSet[i].keyMap[0]['@_baseMapSet'])
-         layouts_array.splice(i, 1);
+      if (jsonObj.keyboard.keyMapSet[i].keyMap[0]['@_baseMapSet'])
+        layouts_array.splice(i, 1);
     }
-
+    
     // in case there always ANSI which is always keyMapSet[0]
     //const layouts_array: string[] = duplicate_layouts_array
     const keyMapSet_count = 0
@@ -261,10 +267,9 @@ export class KeylayoutToKmnConverter {
     // .........................................................
 
     // loop through all ss-combin
+    console.log("nrOfStates", nrOfStates)
     for (let j = 0; j < nrOfStates; j++) {
-      // get modifier list e.g. "anyshift caps? anyOption"
       modifierMap_all_Layers[j] = jsonObj.keyboard.modifierMap.keyMapSelect[j].modifier['@_keys']
-
       // create a new array of keys_in_Layer (type Uint8tarray)
       const keys_output_One_Layer: Uint8Array[] = []
       const keys_action_One_Layer: Uint8Array[] = []
@@ -380,7 +385,7 @@ export class KeylayoutToKmnConverter {
       deadkeyedChars_all_Layers.push(deadkeys_One_dk)
     }
 
-    const vk:  (string | number)[][] = []
+    const vk: (string | number)[][] = []
 
     // TODO remove unneccassary elements
     const DataObject: convert_object = {
@@ -396,6 +401,41 @@ export class KeylayoutToKmnConverter {
       ArrayOf_processed_deadkeyedChar: deadkeyedChars_all_Layers  // add modified keys ( â,ê,î,ô,û)
     };
 
+    console.log("-----\nTypeOf:")
+    console.log("\n"
+      , "\n    jsonObj.keyboard: ", typeof (jsonObj.keyboard)
+      , "\n    jsonObj.keyboard.layouts: ", typeof (jsonObj.keyboard.layouts)
+      , "\n    jsonObj.keyboard.layouts.layout: ", typeof (jsonObj.keyboard.layouts.layout)
+      , "\n    jsonObj.keyboard.modifierMap: ", typeof (jsonObj.keyboard.modifierMap)
+      , "\n    jsonObj.keyboard.modifierMap.keyMapSelect: ", typeof (jsonObj.keyboard.modifierMap.keyMapSelect)
+      , "\n    jsonObj.keyboard.modifierMap.keyMapSelect[0].modifier: ", typeof (jsonObj.keyboard.modifierMap.keyMapSelect[0].modifier)
+      , "\n    jsonObj.keyboard.keyMapSet: ", typeof (jsonObj.keyboard.keyMapSet)
+      , "\n    jsonObj.keyboard.keyMapSet[0].keyMap: ", typeof (jsonObj.keyboard.keyMapSet[0].keyMap)
+      , "\n    jsonObj.keyboard.keyMapSet[0].keyMap[0].key: ", typeof (jsonObj.keyboard.keyMapSet[0].keyMap[0].key)
+      , "\n    jsonObj.keyboard.actions : ", typeof (jsonObj.keyboard.actions)
+      , "\n    jsonObj.keyboard.actions.action[0] : ", typeof (jsonObj.keyboard.actions.action[0])
+      , "\n    jsonObj.keyboard.terminators: ", typeof (jsonObj.keyboard.terminators)
+      , "\n    jsonObj.keyboard.terminators.when: ", typeof (jsonObj.keyboard.terminators.when)
+      , "\n    jsonObj.keyboard.actions.action[0].when: ", typeof (jsonObj.keyboard.actions.action[0].when)
+    )
+
+    console.log("-----\nplus:")
+    console.log("Address loke\n"
+      , "\n    jsonObj.keyboard: ", (jsonObj.keyboard)
+      , "\n    jsonObj.keyboard.layouts: ", (jsonObj.keyboard.layouts)
+      , "\n    jsonObj.keyboard.layouts.layout: ", (jsonObj.keyboard.layouts.layout)
+      , "\n    jsonObj.keyboard.modifierMap: ", (jsonObj.keyboard.modifierMap)
+      , "\n    jsonObj.keyboard.modifierMap.keyMapSelect: ", (jsonObj.keyboard.modifierMap.keyMapSelect)
+      , "\n    jsonObj.keyboard.modifierMap.keyMapSelect[0].modifier: ", (jsonObj.keyboard.modifierMap.keyMapSelect[0].modifier)
+      , "\n    jsonObj.keyboard.keyMapSet: ", (jsonObj.keyboard.keyMapSet)
+      , "\n    jsonObj.keyboard.keyMapSet[0].keyMap: ", (jsonObj.keyboard.keyMapSet[0].keyMap)
+      , "\n    jsonObj.keyboard.keyMapSet[0].keyMap[0].key: ", (jsonObj.keyboard.keyMapSet[0].keyMap[0].key)
+      , "\n    jsonObj.keyboard.actions : ", (jsonObj.keyboard.actions)
+      , "\n    jsonObj.keyboard.actions.action[0] : ", (jsonObj.keyboard.actions.action[0])
+      , "\n    jsonObj.keyboard.actions.action[0].when: ", (jsonObj.keyboard.actions.action[0].when)
+      , "\n    jsonObj.keyboard.terminators: ", (jsonObj.keyboard.terminators)
+      , "\n    jsonObj.keyboard.terminators.when: ", (jsonObj.keyboard.terminators.when)
+    )
     // TODO review condition
     return DataObject
     //return ((keys_output_all_Layers.length === nrOfStates + 5) && keys_output_all_Layers[0].length === nrOfKeys_inLayer) ? keys_output_all_Layers : null;
