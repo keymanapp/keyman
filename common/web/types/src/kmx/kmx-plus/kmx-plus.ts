@@ -191,8 +191,8 @@ export class Strs extends Section {
     return result;
   }
 
-  /** process everything according to opts */
-  processString(s: string, opts: StrsOptions, sections: DependencySections) {
+  /** process everything according to opts, and add the string to this.allProcessedStrings */
+  private processString(s: string, opts: StrsOptions, sections: DependencySections) {
     s = s ?? '';
     // type check everything else
     if (typeof s !== 'string') {
