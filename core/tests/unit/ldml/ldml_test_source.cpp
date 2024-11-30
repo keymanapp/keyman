@@ -312,6 +312,7 @@ LdmlEmbeddedTestSource::load_source( const km::core::path &path, const km::core:
   const std::string s_context = "@@context: ";
   const std::string s_capsLock = "@@capsLock: ";
   const std::string s_expecterror = "@@expect-error: ";
+  const std::string s_keylist = "@@keylist: ";
 
   // Parse out the header statements in file.kmn that tell us (a) environment, (b) key sequence, (c) start context, (d) expected
   // result
@@ -343,6 +344,8 @@ LdmlEmbeddedTestSource::load_source( const km::core::path &path, const km::core:
       context = parse_source_string(line);
     } else if (is_token(s_capsLock, line)) {
       set_caps_lock_on(parse_source_string(line).compare(u"1") == 0);
+    } else if (is_token(s_keylist, line)) {
+      set_keylist(line);
     } else if (line[0] == '@') {
       std::cerr << path << " warning, unknown @-command " << line << std::endl;
     }
@@ -458,10 +461,10 @@ LdmlEmbeddedTestSource::vkey_to_event(std::string const &vk_event) {
 void
 LdmlEmbeddedTestSource::next_action(ldml_action &fillin) {
   if (keys.empty()) {
-    // #3 we are almost done, let's run the key check if needed
+    // #3 we are almost done, let's run the key check
     if (check_keylist) {
       fillin.type = LDML_ACTION_CHECK_KEYLIST;
-      // no params
+      fillin.string = expected_keylist; // could be empty
       check_keylist = false;
     } else {
       fillin.type = LDML_ACTION_DONE;
@@ -529,6 +532,7 @@ private:
   /** @return false if not found */
   bool set_key_from_id(key_event& k, const std::u16string& id);
   bool loaded_context = false;
+  bool check_keys = true;
 };
 
 LdmlJsonTestSource::LdmlJsonTestSource(const std::string &path)
@@ -577,6 +581,13 @@ bool LdmlJsonTestSource::set_key_from_id(key_event& k, const std::u16string& id)
 void
 LdmlJsonTestSource::next_action(ldml_action &fillin) {
   if ((action_index+1) >= data["/actions"_json_pointer].size()) {
+    // add check keylist
+    if (check_keys) {
+      fillin.type = LDML_ACTION_CHECK_KEYLIST;
+      fillin.string.clear();
+      check_keys = false;
+      return;
+    }
     // at end, done
     fillin.type = LDML_ACTION_DONE;
     return;

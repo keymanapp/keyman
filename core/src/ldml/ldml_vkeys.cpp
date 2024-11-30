@@ -33,18 +33,12 @@ vkeys::get_key_list() const {
   // prescan to find out which modifier flags are used
 
   std::size_t other_key_count = 0;        // number of 'OTHER' keys, which will need to expand to all of the other_state set ( so other_state.size())
-  std::size_t both_alt_key_count = 0;     // number of 'ALT' keys,   which will need to expand to LALT+RALT   (so 2)
-  std::size_t both_ctrl_key_count = 0;    // number of 'CTRL' keys,  which will need to expand to LCTRL+RCTRL (so 2)
 
   std::set<km::core::ldml::km_core_ldml_modifier_state> all_modifiers;
   for (const auto &k : all_vkeys) {
     const auto mod = k.second;
     if (mod == LDML_KEYS_MOD_OTHER) {
       other_key_count++;
-    } else if (mod == LDML_KEYS_MOD_ALT) {
-      both_alt_key_count++;
-    } else if (mod == LDML_KEYS_MOD_CTRL) {
-      both_ctrl_key_count++;
     }
     all_modifiers.insert(mod);
   }
@@ -89,8 +83,6 @@ vkeys::get_key_list() const {
 
   const std::size_t new_list_size = all_vkeys.size() // original size
     + (other_key_count * (other_state.size() - 1))
-    + (both_alt_key_count * 1)
-    + (both_ctrl_key_count * 1)
     + 1; // terminator
   km_core_keyboard_key *list = new km_core_keyboard_key[new_list_size];
   std::size_t n = 0;
@@ -105,26 +97,8 @@ vkeys::get_key_list() const {
         list[n++].modifier_flag = expanded_mod;
         assert(n <= new_list_size);
       }
-    } else if (mod == LDML_KEYS_MOD_ALT) {
-      // expand to 'both'
-      list[n].key             = vkey;
-      list[n++].modifier_flag = KM_CORE_MODIFIER_LALT;
-      assert(n <= new_list_size);
-
-      list[n].key             = vkey;
-      list[n++].modifier_flag = KM_CORE_MODIFIER_RALT;
-      assert(n <= new_list_size);
-    } else if (mod == LDML_KEYS_MOD_CTRL) {
-      // expand to 'both'
-      list[n].key             = vkey;
-      list[n++].modifier_flag = KM_CORE_MODIFIER_LCTRL;
-      assert(n <= new_list_size);
-
-      list[n].key             = vkey;
-      list[n++].modifier_flag = KM_CORE_MODIFIER_RCTRL;
-      assert(n <= new_list_size);
     } else {
-      assert(mod <= KM_CORE_MODIFIER_MASK_ALL); // that no LDMLisms escape
+      assert(mod <= KM_CORE_MODIFIER_CAPS); // that no LDMLisms escape
       list[n].key             = vkey;
       list[n++].modifier_flag = mod;
       assert(n <= new_list_size);

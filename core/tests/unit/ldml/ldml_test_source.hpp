@@ -196,6 +196,12 @@ private:
   bool is_done = false;
   /** did we check the keylist yet? */
   bool check_keylist = true;
+  /** set the expected keys in the keylist */
+  void set_keylist(std::string const& s) {
+    expected_keylist = parse_source_string(s);
+  }
+
+  std::u16string expected_keylist;
 
   /** returns false on fail and updates the message */
   bool handle_check_keylist(std::string &message) const;
