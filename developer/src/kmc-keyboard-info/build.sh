@@ -34,26 +34,13 @@ function do_configure() {
   cat "$KEYMAN_ROOT/resources/standards-data/langtags/langtags.json" >> src/imports/langtags.js
 }
 
-function do_test() {
-  local MOCHA_FLAGS=
-
-  if [[ "${TEAMCITY_GIT_PATH:-}" != "" ]]; then
-    # we're running in TeamCity
-    MOCHA_FLAGS="-reporter mocha-teamcity-reporter"
-  fi
-
-  eslint .
-  tsc --build test
-  c8 --reporter=lcov --reporter=text --exclude-after-remap --check-coverage=false mocha ${MOCHA_FLAGS}
-}
-
 #-------------------------------------------------------------------------------------------------------------------
 
 builder_run_action clean       rm -rf ./build/ ./tsconfig.tsbuildinfo
 builder_run_action configure   do_configure
 builder_run_action build       tsc --build
 builder_run_action api         api-extractor run --local --verbose
-builder_run_action test        do_test
+builder_run_action test        builder_do_typescript_tests
 
 #-------------------------------------------------------------------------------------------------------------------
 
