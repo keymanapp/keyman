@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.149 alpha 2024-12-01
+
+* refactor(developer): unify test action (#12736)
+
 ## 18.0.148 alpha 2024-11-29
 
 * test(common/web/types): unit tests for unicodeset-parser-api (#12714)
