@@ -10,10 +10,6 @@ import { KeyboardInfoFile } from '../src/keyboard-info-file.js';
 
 const callbacks = new TestCompilerCallbacks();
 
-beforeEach(function() {
-  callbacks.clear();
-});
-
 const KHMER_ANGKOR_JS  = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
 const KHMER_ANGKOR_KPS = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
 const KHMER_ANGKOR_KMP = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.kmp');
@@ -27,6 +23,17 @@ const KHMER_ANGKOR_SOURCES = {
 };
 
 describe('KeyboardInfoCompilerMessages', function () {
+
+  this.beforeEach(function() {
+    callbacks.clear();
+  });
+
+  this.afterEach(function() {
+    if(this.currentTest?.isFailed()) {
+      callbacks.printMessages();
+    }
+  })
+
   it('should have a valid KeyboardInfoCompilerMessages object', function() {
     return verifyCompilerMessagesObject(KeyboardInfoCompilerMessages, CompilerErrorNamespace.KeyboardInfoCompiler);
   });

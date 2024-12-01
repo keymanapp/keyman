@@ -13,10 +13,6 @@ import { KmpTransformResult } from '../../kmc-package/src/compiler/kmp-compiler.
 
 const callbacks = new TestCompilerCallbacks();
 
-beforeEach(function() {
-  callbacks.clear();
-});
-
 const KHMER_ANGKOR_KPJ = makePathToFixture('khmer_angkor', 'khmer_angkor.kpj');
 const KHMER_ANGKOR_JS  = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
 const KHMER_ANGKOR_KPS = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
@@ -82,6 +78,17 @@ const JAVA_DISPLAY_FONT_INFO = { family: "Java", source: [ JAVA_DISPLAY_FONT ] }
 const JAVA_OSK_FONT_INFO = { family: "Java Kbd", source: [ JAVA_OSK_FONT ] };
 
 describe('keyboard-info-compiler', function () {
+
+  this.beforeEach(function() {
+    callbacks.clear();
+  });
+
+  this.afterEach(function() {
+    if(this.currentTest?.isFailed()) {
+      callbacks.printMessages();
+    }
+  })
+
   it('compile a .keyboard_info file correctly', async function() {
     const kpjFilename = KHMER_ANGKOR_KPJ;
     const buildKeyboardInfoFilename = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.keyboard_info');
@@ -824,7 +831,7 @@ describe('keyboard-info-compiler', function () {
       system: { fileVersion: '', keymanDeveloperVersion: '' },
       options: null,
       files: [{
-        name: "..\\shared\\fonts\\khmer\\mondulkiri\\" + KHMER_ANGKOR_DISPLAY_FONT, // backslashes
+        name: "..\\..\\shared\\fonts\\khmer\\mondulkiri\\" + KHMER_ANGKOR_DISPLAY_FONT, // backslashes
         description: "Font Khmer Mondulkiri",
       }],
     };
