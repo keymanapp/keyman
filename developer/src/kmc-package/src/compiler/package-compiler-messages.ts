@@ -81,9 +81,9 @@ export class PackageCompilerMessages {
   static Error_PackageNameCannotBeBlank = () => m(this.ERROR_PackageNameCannotBeBlank,
     `Package name cannot be an empty string.`);
 
-  static ERROR_KeyboardFileNotFound = SevError | 0x0011;
-  static Error_KeyboardFileNotFound = (o:{filename:string}) => m(this.ERROR_KeyboardFileNotFound,
-    `Keyboard file ${def(o.filename)} was not found. Has it been compiled?`);
+    static ERROR_KeyboardFileNotFound = SevError | 0x0011;
+    static Error_KeyboardFileNotFound = (o:{filename:string}) => m(this.ERROR_KeyboardFileNotFound,
+      `Keyboard file ${def(o.filename)} was not found. Has it been compiled?`);
 
   static WARN_KeyboardVersionsDoNotMatch = SevWarn | 0x0012;
   static Warn_KeyboardVersionsDoNotMatch = (o: {keyboard:string, version:string, firstKeyboard:string, firstVersion:string}) => m(this.WARN_KeyboardVersionsDoNotMatch,
@@ -147,21 +147,21 @@ export class PackageCompilerMessages {
     `Package version is not following keyboard version, but the package version field is blank.`
   );
 
-  static ERROR_FloDataCouldNotBeRead = SevError | 0x0022;
-  static Error_FloDataCouldNotBeRead = (o:{url: string, e?: any}) => m(
-    this.ERROR_FloDataCouldNotBeRead,
+  static WARN_FloDataCouldNotBeRead = SevWarn | 0x0022;
+  static Warn_FloDataCouldNotBeRead = (o:{url: string, e?: any}) => m(
+    this.WARN_FloDataCouldNotBeRead,
     `SIL Fonts Server ${def(o.url)} did not return a valid response: ${(o.e ?? 'unknown error').toString()}`,
   );
 
-  static ERROR_FloDataIsInvalidFormat = SevError | 0x0023;
-  static Error_FloDataIsInvalidFormat = (o:{url: string}) => m(
-    this.ERROR_FloDataIsInvalidFormat,
+  static WARN_FloDataIsInvalidFormat = SevWarn | 0x0023;
+  static Warn_FloDataIsInvalidFormat = (o:{url: string}) => m(
+    this.WARN_FloDataIsInvalidFormat,
     `SIL Fonts Server ${def(o.url)} should have returned a JSON object but instead returned invalid data`,
   );
 
-  static ERROR_FontNotFoundInFlo = SevError | 0x0024;
-  static Error_FontNotFoundInFlo = (o:{family: string, filename: string}) => m(
-    this.ERROR_FontNotFoundInFlo,
+  static WARN_FontNotFoundInFlo = SevWarn | 0x0024;
+  static Warn_FontNotFoundInFlo = (o:{family: string, filename: string}) => m(
+    this.WARN_FontNotFoundInFlo,
     `Font family '${def(o.family)}' was not found on SIL Fonts Server fonts.languagetechnology.org for ${def(o.filename)}`,
   );
 
@@ -171,21 +171,21 @@ export class PackageCompilerMessages {
     `Font family '${def(o.family)}' is not marked as freely distributable on fonts.languagetechnology.org for ${def(o.filename)}`,
   );
 
-  static ERROR_FontInFloDoesNotHaveDefaultTtf = SevError | 0x0026;
-  static Error_FontInFloDoesNotHaveDefaultTtf = (o:{family: string, filename: string}) => m(
-    this.ERROR_FontInFloDoesNotHaveDefaultTtf,
+  static WARN_FontInFloDoesNotHaveDefaultTtf = SevWarn | 0x0026;
+  static Warn_FontInFloDoesNotHaveDefaultTtf = (o:{family: string, filename: string}) => m(
+    this.WARN_FontInFloDoesNotHaveDefaultTtf,
     `Font family '${def(o.family)}' in fonts.languagetechnology.org does not have a default .ttf, font for ${def(o.filename)}`,
   );
 
-  static ERROR_FontInFloHasBrokenDefaultTtf = SevError | 0x0027;
-  static Error_FontInFloHasBrokenDefaultTtf = (o:{family: string, filename: string}) => m(
-    this.ERROR_FontInFloHasBrokenDefaultTtf,
+  static WARN_FontInFloHasBrokenDefaultTtf = SevWarn | 0x0027;
+  static Warn_FontInFloHasBrokenDefaultTtf = (o:{family: string, filename: string}) => m(
+    this.WARN_FontInFloHasBrokenDefaultTtf,
     `Font family '${def(o.family)}' has an invalid default .ttf font entry. Please report this to fonts.languagetechnology.org for ${def(o.filename)}`,
   );
 
-  static ERROR_FontInFloHasNoDownloadAvailable = SevError | 0x0028;
-  static Error_FontInFloHasNoDownloadAvailable = (o:{family: string, filename: string}) => m(
-    this.ERROR_FontInFloHasNoDownloadAvailable,
+  static WARN_FontInFloHasNoDownloadAvailable = SevWarn | 0x0028;
+  static Warn_FontInFloHasNoDownloadAvailable = (o:{family: string, filename: string}) => m(
+    this.WARN_FontInFloHasNoDownloadAvailable,
     `Font family '${def(o.family)}' does not have URLs to download .ttf font for ${def(o.filename)}`,
   );
 
@@ -193,6 +193,73 @@ export class PackageCompilerMessages {
   static Error_FontFileCouldNotBeDownloaded = (o:{url: string, filename: string, e?: any}) => m(
     this.ERROR_FontFileCouldNotBeDownloaded,
     `Font file at '${def(o.url)}' was not successfully downloaded for ${def(o.filename)}: ${(o.e ?? 'unknown error').toString()}`,
+  );
+
+  static HINT_SourceFileHasChanged = SevHint | 0x002A;
+  static Hint_SourceFileHasChanged = (o:{source: string, name: string}) => m(
+    this.HINT_SourceFileHasChanged,
+    `The file source '${def(o.source)}' has changed since it was added to this package. It may need to be updated`,
+  );
+
+  static ERROR_InvalidSourceFileReference = SevError | 0x002B;
+  static Error_InvalidSourceFileReference = (o:{source: string, name: string}) => m(
+    this.ERROR_InvalidSourceFileReference,
+    `The file source '${def(o.source)}' for '${def(o.name)}' is not in a recognized format`,
+    `The supported format is one of:
+    * \`flo:{id}\`
+    * \`https://github.com/{name}/{repo}/raw/{branch|commit|tag}/{path}\`
+    * \`https://github.com/{name}/{repo}/raw/refs/heads/{branch}/{path}\`
+    * \`https://github.com/{name}/{repo}/raw/refs/tags/{tag}/{path}\`
+    * \`https://raw.githubusercontent.com/{name}/{repo}/{branch|commit|tag}/{path}\`
+    * \`https://raw.githubusercontent.com/{name}/{repo}/refs/heads/{branch}/{path}\`
+    * \`https://raw.githubusercontent.com/{name}/{repo}/refs/tags/{tag}/{path}\`
+    `
+  );
+
+  static ERROR_FontInFloDoesNotHaveARecognizedGitHubUri = SevError | 0x002C;
+  static Error_FontInFloDoesNotHaveARecognizedGitHubUri = (o:{filename: string, url: string}) => m(
+    this.ERROR_FontInFloDoesNotHaveARecognizedGitHubUri,
+    `The URL for font '${def(o.filename)}' from fonts.languagetechnology.org, '${def(o.url)}', was not a recognized GitHub URL format`,
+    `The supported format is one of:
+    * \`https://github.com/{name}/{repo}/raw/{branch|commit|tag}/{path}\`
+    * \`https://github.com/{name}/{repo}/raw/refs/heads/{branch}/{path}\`
+    * \`https://github.com/{name}/{repo}/raw/refs/tags/{tag}/{path}\`
+    * \`https://raw.githubusercontent.com/{name}/{repo}/{branch|commit|tag}/{path}\`
+    * \`https://raw.githubusercontent.com/{name}/{repo}/refs/heads/{branch}/{path}\`
+    * \`https://raw.githubusercontent.com/{name}/{repo}/refs/tags/{tag}/{path}\`
+    `
+  );
+
+  static ERROR_UriIsNotARecognizedGitHubUri = SevError | 0x002D;
+  static Error_UriIsNotARecognizedGitHubUri = (o:{url: string}) => m(
+    this.ERROR_UriIsNotARecognizedGitHubUri,
+    `The URL '${def(o.url)}' was not a recognized GitHub URL format`,
+    `The supported format is one of:
+    * \`https://github.com/{name}/{repo}/raw/{branch|commit|tag}/{path}\`
+    * \`https://github.com/{name}/{repo}/raw/refs/heads/{branch}/{path}\`
+    * \`https://github.com/{name}/{repo}/raw/refs/tags/{tag}/{path}\`
+    * \`https://raw.githubusercontent.com/{name}/{repo}/{branch|commit|tag}/{path}\`
+    * \`https://raw.githubusercontent.com/{name}/{repo}/refs/heads/{branch}/{path}\`
+    * \`https://raw.githubusercontent.com/{name}/{repo}/refs/tags/{tag}/{path}\`
+    `
+  );
+
+  static ERROR_CouldNotRetrieveStableUriFromGitHub = SevError | 0x002E;
+  static Error_CouldNotRetrieveStableUriFromGitHub = (o:{url: string, e?: any}) => m(
+    this.ERROR_CouldNotRetrieveStableUriFromGitHub,
+    `The URL '${def(o.url)}' was not successfully retrieved from GitHub API: ${(o.e ?? 'unknown error').toString()}`,
+  );
+
+  static ERROR_UriIsNotARecognizedStableGitHubUri = SevError | 0x002F;
+  static Error_UriIsNotARecognizedStableGitHubUri = (o:{url: string}) => m(
+    this.ERROR_UriIsNotARecognizedStableGitHubUri,
+    `The URL '${def(o.url)}' is not a recognized stable GitHub URL`,
+  );
+
+  static ERROR_SourceCannotBeSetForLocalFiles = SevError | 0x0030;
+  static Error_SourceCannotBeSetForLocalFiles = (o:{filename: string, sourceFilename: string}) => m(
+    this.ERROR_SourceCannotBeSetForLocalFiles,
+    `The '<Source>' element cannot be set for local file ${o.filename}`,
   );
 }
 

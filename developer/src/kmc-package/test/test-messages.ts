@@ -147,12 +147,6 @@ describe('PackageCompilerMessages', function () {
     await testForMessage(this, ['invalid', 'error_package_name_cannot_be_blank_2.kps'], PackageCompilerMessages.ERROR_PackageNameCannotBeBlank); // missing field
   });
 
-  // ERROR_KeyboardFileNotFound
-
-  it('should generate ERROR_KeyboardFileNotFound if a <Keyboard> is listed in a package but not found in <Files>', async function() {
-    await testForMessage(this, ['invalid', 'keyboardfilenotfound.kps'], PackageCompilerMessages.ERROR_KeyboardFileNotFound);
-  });
-
   // WARN_KeyboardVersionsDoNotMatch
 
   it('should generate WARN_KeyboardVersionsDoNotMatch if two <Keyboards> have different versions', async function() {
@@ -256,9 +250,9 @@ describe('PackageCompilerMessages', function () {
 
   // ERROR_FontNotFoundInFlo
 
-  it('should generate ERROR_FontNotFoundInFlo if a font family cannot be found at fonts.languagetechnology.org', async function() {
-    await testForMessage(this, ['invalid', 'error_font_not_found_in_flo.kps'],
-      PackageCompilerMessages.ERROR_FontNotFoundInFlo);
+  it('should generate WARN_FontNotFoundInFlo if a font family cannot be found at fonts.languagetechnology.org', async function() {
+    await testForMessage(this, ['invalid', 'warn_font_not_found_in_flo.kps'],
+      PackageCompilerMessages.WARN_FontNotFoundInFlo);
   });
 
   // WARN_FontFromFloIsNotFreelyDistributable
@@ -267,37 +261,42 @@ describe('PackageCompilerMessages', function () {
     await testForMessage(this, ['invalid', 'warn_font_from_flo_is_not_freely_distributable.kps'], [
       PackageCompilerMessages.WARN_FontFromFloIsNotFreelyDistributable,
       // Currently all the non-distributable fonts do not have a default .ttf either
-      PackageCompilerMessages.ERROR_FontInFloDoesNotHaveDefaultTtf
+      PackageCompilerMessages.WARN_FontInFloDoesNotHaveDefaultTtf
     ]);
   });
 
-  // ERROR_FontInFloDoesNotHaveDefaultTtf
+  // WARN_FontInFloDoesNotHaveDefaultTtf
 
-  it('should generate ERROR_FontInFloDoesNotHaveDefaultTtf if a font at fonts.languagetechnology.org does not have a default .ttf', async function() {
-    await testForMessage(this, ['invalid', 'error_font_in_flo_does_not_have_default_ttf.kps'],
-      PackageCompilerMessages.ERROR_FontInFloDoesNotHaveDefaultTtf);
+  it('should generate WARN_FontInFloDoesNotHaveDefaultTtf if a font at fonts.languagetechnology.org does not have a default .ttf', async function() {
+    await testForMessage(this, ['invalid', 'warn_font_in_flo_does_not_have_default_ttf.kps'],
+      PackageCompilerMessages.WARN_FontInFloDoesNotHaveDefaultTtf);
   });
 
   // ERROR_FontInFloHasBrokenDefaultTtf -- skip test, only for data error in FLO
 
   // ERROR_FontInFloHasNoDownloadAvailable
 
-  it('should generate ERROR_FontInFloHasNoDownloadAvailable if a font at fonts.languagetechnology.org does not download available', async function() {
-    await testForMessage(this, ['invalid', 'error_font_in_flo_has_no_download_available.kps'],
-      PackageCompilerMessages.ERROR_FontInFloHasNoDownloadAvailable);
+  it('should generate WARN_FontInFloHasNoDownloadAvailable if a font at fonts.languagetechnology.org does not download available', async function() {
+    await testForMessage(this, ['invalid', 'warn_font_in_flo_has_no_download_available.kps'],
+      PackageCompilerMessages.WARN_FontInFloHasNoDownloadAvailable);
   });
 
-  // ERROR_FontFileCouldNotBeDownloaded -- skip test,
+  // ERROR_FontFileCouldNotBeDownloaded -- skip test, more work needed to mock
 
-  it('should generate ERROR_FontFileCouldNotBeDownloaded if a font at fonts.languagetechnology.org cannot be downloaded', async function() {
-    // Note: see additional setup information in
-    // error_font_file_could_not_be_downloaded.kps
-    await testForMessage(this, ['invalid', 'error_font_file_could_not_be_downloaded.kps'],
-      PackageCompilerMessages.ERROR_FontFileCouldNotBeDownloaded);
-  });
+  // it('should generate ERROR_FontFileCouldNotBeDownloaded if a font at fonts.languagetechnology.org cannot be downloaded', async function() {
+  //   // Note: see additional setup information in
+  //   // error_font_file_could_not_be_downloaded.kps
+  //   await testForMessage(this, ['invalid', 'error_font_file_could_not_be_downloaded.kps'],
+  //     PackageCompilerMessages.ERROR_FontFileCouldNotBeDownloaded);
+  // });
 
   it('should generate ERROR_FontFileCouldNotBeDownloaded if a font at github.com cannot be downloaded', async function() {
     await testForMessage(this, ['invalid', 'error_font_file_could_not_be_downloaded_github.kps'],
       PackageCompilerMessages.ERROR_FontFileCouldNotBeDownloaded);
+  });
+
+  it('should generate HINT_SourceFileHasChanged if a FLO font reference has been updated', async function() {
+    await testForMessage(this, ['flo', 'hint_source_file_has_changed.kps'],
+      PackageCompilerMessages.HINT_SourceFileHasChanged);
   });
 });

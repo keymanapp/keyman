@@ -17,9 +17,12 @@
       <CopyLocation>0</CopyLocation>
       <FileType>.kmx</FileType>
     </File>
-    <!-- warn_font_from_flo_is_not_freely_distributable -->
+    <!-- warn_font_from_flo_is_not_freely_distributable: this uses a mismatching font, but
+         we won't get that far. This handles the scenario where a font is not freely
+         distributable but is listed in the repo -->
     <File>
-      <Name>flo:angsananew</Name>
+      <Name>https://github.com/silnrsi/fonts/raw/b88c7af5d16681bd137156929ff8baec82526560/fonts/sil/alkalami/Alkalami-Regular.ttf</Name>
+      <Source>flo:angsananew</Source>
     </File>
   </Files>
   <Keyboards>

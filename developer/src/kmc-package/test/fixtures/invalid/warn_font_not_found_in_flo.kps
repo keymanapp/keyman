@@ -5,7 +5,7 @@
     <FileVersion>7.0</FileVersion>
   </System>
   <Info>
-    <Name URL="">error_font_file_could_not_be_downloaded (github)</Name>
+    <Name URL="">error_font_not_found_in_flo</Name>
     <Copyright URL="">© 2019 National Research Council Canada</Copyright>
     <Author URL="mailto:Eddie.Santos@nrc-cnrc.gc.ca">Eddie Antonio Santos</Author>
     <Version>1.0</Version>
@@ -17,9 +17,12 @@
       <CopyLocation>0</CopyLocation>
       <FileType>.kmx</FileType>
     </File>
-    <!-- error_font_file_could_not_be_downloaded (github) -->
+    <!-- warn_font_not_found_in_flo: this uses a mismatching font, but
+         we won't get that far. This handles the scenario where a font
+         is not listed in FLO -->
     <File>
-      <Name>https://github.com/keymanapp/keyman/raw/0000000000000000000000000000000000000000/missing_font.ttf</Name>
+      <Name>https://github.com/silnrsi/fonts/raw/b88c7af5d16681bd137156929ff8baec82526560/fonts/sil/alkalami/Alkalami-Regular.ttf</Name>
+      <Source>flo:garbage</Source>
     </File>
   </Files>
   <Keyboards>

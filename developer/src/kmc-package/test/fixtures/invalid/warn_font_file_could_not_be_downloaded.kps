@@ -5,7 +5,7 @@
     <FileVersion>7.0</FileVersion>
   </System>
   <Info>
-    <Name URL="">error_font_not_found_in_flo</Name>
+    <Name URL="">error_font_file_could_not_be_downloaded</Name>
     <Copyright URL="">© 2019 National Research Council Canada</Copyright>
     <Author URL="mailto:Eddie.Santos@nrc-cnrc.gc.ca">Eddie Antonio Santos</Author>
     <Version>1.0</Version>
@@ -17,9 +17,17 @@
       <CopyLocation>0</CopyLocation>
       <FileType>.kmx</FileType>
     </File>
-    <!-- error_font_not_found_in_flo -->
+    <!-- warn_font_file_could_not_be_downloaded -->
     <File>
-      <Name>flo:garbage</Name>
+      <!--
+        NOTE: this is a completely valid FLO URL. We have intentionally not kept
+        a copy of the fixture in online/ so this will cause the error message to
+        be triggered. If TEST_SAVE_FIXTURES is used to downloaded updated
+        fixtures for all the online-related tests, it will store a copy of the
+        AbyssinicaSIL-Regular.ttf font, which will need to be manually deleted
+        again in order for this test to pass.
+      -->
+      <Name>flo:abyssinicasil</Name>
     </File>
   </Files>
   <Keyboards>

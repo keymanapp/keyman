@@ -17,9 +17,12 @@
       <CopyLocation>0</CopyLocation>
       <FileType>.kmx</FileType>
     </File>
-    <!-- error_font_in_flo_has_no_download_available -->
+    <!-- warn_font_in_flo_has_no_download_available: this uses a mismatching font, but
+         we won't get that far. This handles the scenario where FLO previously listed a font
+         but the font url is no longer available -->
     <File>
-      <Name>flo:charissilamarea</Name>
+      <Name>https://github.com/silnrsi/fonts/raw/b88c7af5d16681bd137156929ff8baec82526560/fonts/sil/alkalami/Alkalami-Regular.ttf</Name>
+      <Source>flo:charissilamarea</Source>
     </File>
   </Files>
   <Keyboards>

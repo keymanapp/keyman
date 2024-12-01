@@ -3,7 +3,6 @@ import { assert } from 'chai';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { makePathToFixture } from './helpers/index.js';
 import { KmpCompiler } from '../src/compiler/kmp-compiler.js';
-import { KmpJsonFile } from '@keymanapp/common-types';
 
 // This unit test was translated from a Delphi test
 // Keyman.Test.System.CompilePackageVersioningTest, but note the difference in
@@ -37,8 +36,8 @@ describe('package versioning', function () {
       assert.isTrue(await kmpCompiler.init(callbacks, null));
 
       const kpsPath = makePathToFixture('versioning', filename);
-      const kmpJson: KmpJsonFile.KmpJsonFile = kmpCompiler.transformKpsToKmpObject(kpsPath);
-      assert.isTrue(kmpJson !== null);
+      const { kmpJsonData } = await kmpCompiler.transformKpsToKmpObject(kpsPath) ?? {};
+      assert.isTrue(kmpJsonData !== null);
     });
   }
 });

@@ -77,6 +77,8 @@ export interface KpsFileContentFile {
   CopyLocation?: string;
   /** @deprecated */
   FileType?: string;
+  /** Source location, e.g. flo:<id>, URL */
+  Source?: string;
 }
 
 export interface KpsFileLexicalModel {

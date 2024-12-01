@@ -4,8 +4,18 @@ import { KeyboardMetadataCollection } from './package-metadata-collector.js';
 import { KpsFile, CompilerCallbacks } from '@keymanapp/developer-utils';
 
 export const DEFAULT_KEYBOARD_VERSION = '1.0';
-export const MIN_LM_FILEVERSION_KMP_JSON = '12.0';
+
+/** minimum FileVersion for keyboard packages */
 export const MIN_KBD_FILEVERSION_KMP_JSON = '7.0';
+
+/** minimum FileVersion for lexical model packages */
+export const MIN_LM_FILEVERSION_KMP_JSON = '12.0';
+
+/**
+ * minimum FileVersion when `Files/File/Source` element is used
+ * and/or `Files/File/Name` is a remote URL
+ */
+export const MIN_FILEVERSION_SOURCE_ELEMENT_KMP_JSON = '18.0';
 
 export class PackageVersionValidator {
 

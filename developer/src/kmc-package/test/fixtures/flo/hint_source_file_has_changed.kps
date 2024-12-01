@@ -5,7 +5,7 @@
     <FileVersion>7.0</FileVersion>
   </System>
   <Info>
-    <Name URL="">error_font_in_flo_does_not_have_default_ttf</Name>
+    <Name URL="">error_font_file_could_not_be_downloaded</Name>
     <Copyright URL="">© 2019 National Research Council Canada</Copyright>
     <Author URL="mailto:Eddie.Santos@nrc-cnrc.gc.ca">Eddie Antonio Santos</Author>
     <Version>1.0</Version>
@@ -17,9 +17,11 @@
       <CopyLocation>0</CopyLocation>
       <FileType>.kmx</FileType>
     </File>
-    <!-- error_font_in_flo_does_not_have_default_ttf -->
+    <!-- hint_source_file_has_changed: we've got a fake hash here, so the FLO data
+         will show the real hash of b88c7af5d16681bd137156929ff8baec82526560 -->
     <File>
-      <Name>flo:andikaviet</Name>
+      <Name>https://github.com/silnrsi/fonts/raw/0000000000000000000000000000000000000000/fonts/sil/abyssinicasil/AbyssinicaSIL-Regular.ttf</Name>
+      <Source>flo:abyssinicasil</Source>
     </File>
   </Files>
   <Keyboards>

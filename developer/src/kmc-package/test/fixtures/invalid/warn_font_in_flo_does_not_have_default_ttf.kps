@@ -5,7 +5,7 @@
     <FileVersion>7.0</FileVersion>
   </System>
   <Info>
-    <Name URL="">error_font_file_could_not_be_downloaded</Name>
+    <Name URL="">error_font_in_flo_does_not_have_default_ttf</Name>
     <Copyright URL="">© 2019 National Research Council Canada</Copyright>
     <Author URL="mailto:Eddie.Santos@nrc-cnrc.gc.ca">Eddie Antonio Santos</Author>
     <Version>1.0</Version>
@@ -17,17 +17,12 @@
       <CopyLocation>0</CopyLocation>
       <FileType>.kmx</FileType>
     </File>
-    <!-- error_font_file_could_not_be_downloaded -->
+    <!-- warn_font_in_flo_does_not_have_default_ttf: this uses a mismatching font, but
+         we won't get that far. This handles the scenario where FLO previously lists a font
+         but no ttf is available -->
     <File>
-      <!--
-        NOTE: this is a completely valid FLO URL. We have intentionally not kept
-        a copy of the fixture in online/ so this will cause the error message to
-        be triggered. If TEST_SAVE_FIXTURES is used to downloaded updated
-        fixtures for all the online-related tests, it will store a copy of the
-        AbyssinicaSIL-Regular.ttf font, which will need to be manually deleted
-        again in order for this test to pass.
-      -->
-      <Name>flo:abyssinicasil</Name>
+      <Name>https://github.com/silnrsi/fonts/raw/b88c7af5d16681bd137156929ff8baec82526560/fonts/sil/alkalami/Alkalami-Regular.ttf</Name>
+      <Source>flo:andikaviet</Source>
     </File>
   </Files>
   <Keyboards>
