@@ -1,5 +1,19 @@
 # Keyman Version History
 
+## 18.0.141 alpha 2024-11-15
+
+* chore(linux): add support for Ubuntu 25.04 Plucky Puffin (#12675)
+
+## 18.0.140 alpha 2024-11-13
+
+* chore(common): Add 17.0.330 - 17.0.332 to version history (#12663)
+* fix(developer): reconnect `--full-test` in kmcmplib build and enable for CI (#12631)
+* docs(developer): kmc-generate (#12647)
+
+## 18.0.139 alpha 2024-11-12
+
+* fix(windows): help links updated (#12646)
+
 ## 18.0.138 alpha 2024-11-08
 
 * fix(common): check for invalid markers (#12613)
@@ -957,6 +971,27 @@
 
 * chore(common): move to 18.0 alpha (#10713)
 * chore: move to 18.0 alpha
+
+## 17.0.332 stable 2024-11-06
+
+* fix(developer): create Server config directory before options save (#12609)
+* fix(developer): handle merge commits when checking git log date (#12628)
+* fix(linux): set environment variable for rendering of downloads dialog (#12617)
+
+## 17.0.331 stable 2024-10-30
+
+* fix(android): Hide suggestion banner on password fields (#12466)
+* fix(common): declare dep on @keymanapp/ldml-keyboard-constants (#12475)
+* fix(oem/fv): Update keyboard versions and names for fv_all.kmp (#12504)
+* chore(ios): renew certificate (#12513)
+* fix(developer): prevent invalid string ids (#12524)
+* fix(developer): ignore excess whitespace in `<row keys>` attribute (#12523)
+
+## 17.0.330 stable 2024-09-16
+
+* refactor(android): Move Sentry and APK to publish task (#12392)
+* fix(developer): rewrite ldml visual keyboard compiler (#12406)
+* fix(developer): check vars string usage before definition (#12407)
 
 ## 17.0.329 stable 2024-09-09
 
