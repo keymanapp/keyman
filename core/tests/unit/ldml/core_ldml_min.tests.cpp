@@ -14,6 +14,7 @@
 #include <test_assert.h>
 
 #include "keyman_core.h"
+#include "../load_kmx_file.hpp"
 
 int main(int argc, const char *argv[]) {
 
@@ -22,7 +23,8 @@ int main(int argc, const char *argv[]) {
 
     km_core_status status;
     km_core_path_name nowhere = {0}; // this is a narrow or wide char string
-    status = km_core_keyboard_load(nowhere, &test_kb);
+    auto blob = km::tests::load_kmx_file(nowhere);
+    status = km_core_keyboard_load_from_blob(nowhere, blob.data(), blob.size(), &test_kb);
 
     std::cerr << "null km_core_keyboard_load = " << status << std::endl;
     test_assert(status == KM_CORE_STATUS_INVALID_ARGUMENT);

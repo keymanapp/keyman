@@ -29,6 +29,7 @@
 */
 
 #include "pch.h"
+#include <stdio.h>
 
 BOOL GetKeyboardFileName(LPSTR kbname, LPSTR buf, int nbuf)
 {
@@ -78,17 +79,56 @@ BOOL LoadlpKeyboard(int i)
     _td->lpKeyboards[i].lpCoreKeyboardState = NULL;
   }
 
-  char buf[256];
-  if (!GetKeyboardFileName(_td->lpKeyboards[i].Name, buf, 255)) {
+  char kmx_filename[256];
+  if (!GetKeyboardFileName(_td->lpKeyboards[i].Name, kmx_filename, 255)) {
     return_SendDebugExit(FALSE);
   }
 
-  PWCHAR keyboardPath = strtowstr(buf);
-  km_core_status err_status = km_core_keyboard_load(keyboardPath, &_td->lpKeyboards[i].lpCoreKeyboard);
+  FILE* kmx_file = nullptr;
+  PWCHAR keyboardPath = nullptr;
+  void* buffer = nullptr;
+  errno_t status = fopen_s(&kmx_file, kmx_filename, "rb");
+
+  if (status) {
+    SendDebugMessageFormat("Problem opening kmx_file %s status [%d].", kmx_filename, status);
+    return_SendDebugExit(FALSE);
+  }
+
+  if (fseek(kmx_file, 0, SEEK_END) < 0 ) {
+    SendDebugMessageFormat("Problem seeking to end of kmx_file %s.", kmx_filename);
+    goto ExitError;
+  }
+
+  size_t length = ftell(kmx_file);
+
+  if (length < 0)
+  {
+    SendDebugMessageFormat("Problem determining length of kmx_file %s.", kmx_filename);
+    goto ExitError;
+  }
+
+  rewind(kmx_file);
+  buffer = malloc(length);
+
+  if (!buffer) {
+    SendDebugMessageFormat("Problem allocating buffer for reading kmx_file %s.", kmx_filename);
+    goto ExitError;
+  }
+
+  if (fread(buffer, 1, length, kmx_file) != length) {
+    SendDebugMessageFormat("Problem reading entire kmx_file %s.", kmx_filename);
+    goto ExitError;
+  }
+
+  fclose(kmx_file);
+  keyboardPath = strtowstr(kmx_filename);
+  km_core_status err_status = km_core_keyboard_load_from_blob(keyboardPath, buffer, length, &_td->lpKeyboards[i].lpCoreKeyboard);
+
+  free(buffer);
+
   if (err_status != KM_CORE_STATUS_OK) {
     SendDebugMessageFormat("km_core_keyboard_load failed for %ls with error status [%d]", keyboardPath, err_status);
-    delete[] keyboardPath;
-    return_SendDebugExit(FALSE);
+    goto ExitError;
   }
   delete[] keyboardPath;
 
@@ -105,22 +145,30 @@ BOOL LoadlpKeyboard(int i)
 
   if (err_status != KM_CORE_STATUS_OK) {
     SendDebugMessageFormat("km_core_state_create failed with error status [%d]", err_status);
-    // Dispose of the keyboard to leave us in a consistent state
-    ReleaseKeyboardMemoryCore(&_td->lpKeyboards[i].lpCoreKeyboard);
-    return_SendDebugExit(FALSE);
+    goto ExitError;
   }
   // Register callback?
   err_status = km_core_keyboard_get_imx_list(_td->lpKeyboards[i].lpCoreKeyboard, &_td->lpKeyboards[i].lpIMXList);
   if (err_status != KM_CORE_STATUS_OK) {
     SendDebugMessageFormat("km_core_keyboard_get_imx_list failed with error status [%d]", err_status);
-    // Dispose of the keyboard to leave us in a consistent state
-    ReleaseKeyboardMemoryCore(&_td->lpKeyboards[i].lpCoreKeyboard);
-    return_SendDebugExit(FALSE);
+    goto ExitError;
   }
 
   LoadDLLs(&_td->lpKeyboards[i]);
-
   LoadKeyboardOptionsRegistrytoCore(&_td->lpKeyboards[i], _td->lpKeyboards[i].lpCoreKeyboardState);
 
   return_SendDebugExit(TRUE);
+ExitError:
+  if (kmx_file) {
+    fclose(kmx_file);
+  }
+  if (buffer) {
+    free(buffer);
+  }
+  if (keyboardPath != nullptr) {
+    delete[] keyboardPath;
+  }
+  // Dispose of the keyboard to leave us in a consistent state
+  ReleaseKeyboardMemoryCore(&_td->lpKeyboards[i].lpCoreKeyboard);
+  return_SendDebugExit(FALSE);
 }

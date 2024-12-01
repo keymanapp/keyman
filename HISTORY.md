@@ -1,5 +1,24 @@
 # Keyman Version History
 
+## 18.0.148 alpha 2024-11-29
+
+* test(common/web/types): unit tests for unicodeset-parser-api (#12714)
+* chore(developer): rename test files (#12707)
+* feat(core,linux,developer,windows): implement loading KMX from blob (#12721)
+* chore(common): add offline support for emscripten (#12740)
+
+## 18.0.147 alpha 2024-11-28
+
+* docs(android): Add android/docs/internal/README (#12717)
+* test(common/web/types): unit tests for string-list (#12702)
+* docs(common): linux and macOS emscripten setup (#12701)
+* refactor(developer): output number of tests when running on TC (#12710)
+* refactor(common): output number of tests when running on TC (#12719)
+* chore(web): rename file missed in #12704 (#12720)
+* fix(core): permanently disable logging (#12724)
+* fix(linux): disable assertions in release builds of ibus-keyman (#12725)
+* chore(common): improve offline builds (#12739)
+
 ## 18.0.146 alpha 2024-11-27
 
 * test(developer): kmcmplib compiler unit tests 5 (#12612)
