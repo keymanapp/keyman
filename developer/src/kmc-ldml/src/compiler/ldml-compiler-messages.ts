@@ -200,8 +200,8 @@ export class LdmlCompilerMessages {
   );
 
   static WARN_StringDenorm = SevWarn | 0x002B;
-  static Warn_StringDenorm = () =>
-  m(this.WARN_StringDenorm, `File contains text that is neither NFC nor NFD.`);
+  static Warn_StringDenorm = (o: { s: string }) =>
+  m(this.WARN_StringDenorm, `File contains string "${def(o.s)}" that is neither NFC nor NFD.`);
 
   // Available: 0x02C-0x2F
 

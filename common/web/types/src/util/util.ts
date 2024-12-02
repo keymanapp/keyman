@@ -305,13 +305,13 @@ export function isPUA(ch: number) {
     (ch >= Uni_PUA_16_START && ch <= Uni_PUA_16_END));
 }
 
-/** @returns true if s is NEITHER NFC nor NFD */
-export function isDenormalized(s: string) : boolean {
-  if(!s) return false; // empty or null
+/** @returns false if s is NEITHER NFC nor NFD. (Returns true for falsy) */
+export function isNormalized(s: string) : boolean {
+  if(!s) return true; // empty or null
   const nfc = s.normalize("NFC");
   const nfd = s.normalize("NFD");
-  if (s !== nfc && s !== nfd) return true;
-  return false;
+  if (s !== nfc && s !== nfd) return false;
+  return true;
 }
 
 class BadStringMap extends Map<BadStringType, Set<number>> {
