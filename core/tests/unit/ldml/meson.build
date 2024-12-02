@@ -4,16 +4,6 @@
 # Authors:      Marc Durdin
 #
 
-# TODO -- why are these differing from the standard.meson.build flags?
-if cpp_compiler.get_id() == 'gcc' or cpp_compiler.get_id() == 'clang' or cpp_compiler.get_id() == 'emscripten'
-  warns = [
-     '-Wno-missing-field-initializers',
-     '-Wno-unused-parameter'
-  ]
-else
-  warns = []
-endif
-
 # Build all keyboards in output folder; these are defined here and used in the
 # keyboards subdir
 
@@ -86,7 +76,6 @@ core_ldml_min = executable('core_ldml_min_tests',
     [
       'core_ldml_min.tests.cpp',
       common_test_files,
-      meson.current_source_dir() / '../load_kmx_file.cpp',
     ],
     cpp_args: defns + warns,
     include_directories: [inc, libsrc],
