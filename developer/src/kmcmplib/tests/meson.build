@@ -15,7 +15,7 @@ endif
 input_path = meson.current_source_dir() / '../../../../common/test/keyboards/baseline'
 output_path = meson.current_build_dir()
 
-kmcompxtest = executable('kmcompxtest', ['kmcompxtest.cpp','util_filesystem.cpp','util_callbacks.cpp'],
+kmcompxtest = executable('kmcompxtests', ['kmcompx.tests.cpp','util_filesystem.cpp','util_callbacks.cpp'],
     cpp_args: defns + flags,
     include_directories: inc,
     name_suffix: name_suffix,
@@ -133,7 +133,7 @@ common_test_files = [ meson.global_source_root() / '../../../common/include/test
 
 # Test the API endpoints
 
-apitest = executable('api-test', ['api-test.cpp','util_filesystem.cpp','util_callbacks.cpp', common_test_files],
+apitest = executable('api-tests', ['api.tests.cpp','util_filesystem.cpp','util_callbacks.cpp', common_test_files],
     cpp_args: defns + flags,
     include_directories: inc,
     name_suffix: name_suffix,
@@ -142,9 +142,9 @@ apitest = executable('api-test', ['api-test.cpp','util_filesystem.cpp','util_cal
     dependencies: icuuc_dep
   )
 
-test('api-test', apitest, args: [output_path / 'blank_keyboard.kmx'])
+test('api-tests', apitest, args: [output_path / 'blank_keyboard.kmx'])
 
-usetapitest = executable('uset-api-test', 'uset-api-test.cpp', common_test_files,
+usetapitest = executable('uset-api-tests', 'uset-api.tests.cpp', common_test_files,
     cpp_args: defns + flags,
     include_directories: inc,
     name_suffix: name_suffix,
@@ -153,11 +153,11 @@ usetapitest = executable('uset-api-test', 'uset-api-test.cpp', common_test_files
     dependencies: icuuc_dep,
   )
 
-test('uset-api-test', usetapitest)
+test('uset-api-tests', usetapitest)
 
 # Google Test
 
-gtestcompilertest = executable('gtest-compiler-test', 'gtest-compiler-test.cpp',
+gtestcompilertest = executable('gtest-compiler-tests', 'gtest-compiler.tests.cpp',
     cpp_args: defns + flags,
     include_directories: inc,
     name_suffix: name_suffix,
@@ -166,9 +166,9 @@ gtestcompilertest = executable('gtest-compiler-test', 'gtest-compiler-test.cpp',
     dependencies: [ icuuc_dep, gtest_dep, gmock_dep ],
   )
 
-test('gtest-compiler-test', gtestcompilertest)
+test('gtest-compiler-tests', gtestcompilertest)
 
-gtest_km_u16_test = executable('gtest-km_u16-test', 'gtest-km_u16-test.cpp',
+gtest_km_u16_test = executable('gtest-km_u16-tests', 'gtest-km_u16.tests.cpp',
     cpp_args: defns + flags,
     include_directories: inc,
     name_suffix: name_suffix,
@@ -177,4 +177,4 @@ gtest_km_u16_test = executable('gtest-km_u16-test', 'gtest-km_u16-test.cpp',
     dependencies: [ icuuc_dep, gtest_dep, gmock_dep ],
   )
 
-test('gtest-km_u16-test', gtest_km_u16_test)
+test('gtest-km_u16-tests', gtest_km_u16_test)

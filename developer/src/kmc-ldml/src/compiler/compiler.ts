@@ -3,7 +3,7 @@
  *
  * Compiles a LDML XML keyboard file into a Keyman KMXPlus file
  */
-import { KMXPlus, UnicodeSetParser, KvkFileWriter, KMX } from '@keymanapp/common-types';
+import { KMXPlus, LdmlKeyboardTypes, KvkFileWriter, KMX } from '@keymanapp/common-types';
 import {
   CompilerCallbacks, KeymanCompiler, KeymanCompilerResult, KeymanCompilerArtifacts,
   defaultCompilerOptions, LDMLKeyboardXMLSourceFileReader, LDMLKeyboard,
@@ -93,7 +93,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
   private options: LdmlCompilerOptions;
 
   // uset parser
-  private usetparser?: UnicodeSetParser = undefined;
+  private usetparser?: LdmlKeyboardTypes.UnicodeSetParser = undefined;
 
   /**
    * Initialize the compiler, including loading the WASM host for uset parsing.
@@ -211,7 +211,7 @@ export class LdmlKeyboardCompiler implements KeymanCompiler {
    * Construct or return a UnicodeSetParser, aka KmnCompiler
    * @returns the held UnicodeSetParser
    */
-  async getUsetParser(): Promise<UnicodeSetParser> {
+  async getUsetParser(): Promise<LdmlKeyboardTypes.UnicodeSetParser> {
     if (this.usetparser === undefined) {
       // initialize
       const compiler = new KmnCompiler();

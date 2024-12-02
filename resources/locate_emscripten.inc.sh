@@ -66,10 +66,20 @@ _select_emscripten_version_with_emsdk() {
   fi
 
   export EMSDK_KEEP_DOWNLOADS=1
-  git pull
-  ./emsdk install "$KEYMAN_MIN_VERSION_EMSCRIPTEN"
-  ./emsdk activate "$KEYMAN_MIN_VERSION_EMSCRIPTEN"
-  cd upstream/emscripten
-  npm install
+  if builder_try_offline; then
+    if [[ ! -f ./emsdk_env.sh ]]; then
+      builder_die "emsdk_env.sh not found - emsdk not installed?"
+    fi
+    . ./emsdk_env.sh
+    if ! emcc --version | grep -q "$KEYMAN_MIN_VERSION_EMSCRIPTEN"; then
+      builder_die "Wrong emsdk version installed"
+    fi
+  else
+    git pull
+    ./emsdk install "$KEYMAN_MIN_VERSION_EMSCRIPTEN"
+    ./emsdk activate "$KEYMAN_MIN_VERSION_EMSCRIPTEN"
+    cd upstream/emscripten
+    npm install
+  fi
   popd > /dev/null
 }
