@@ -35,7 +35,7 @@ class KeyboardHeightViewController: UIViewController {
 
     os_log("KeyboardHeightViewController viewDidLoad", log:KeymanEngineLogger.ui, type: .info)
 
-    self.determineOrientation(screenSize: UIScreen.main.bounds.size)
+    self.determineOrientation()
     self.loadDefaultKeyboardHeights()
     self.applyKeyboardHeight()
     
@@ -62,8 +62,8 @@ class KeyboardHeightViewController: UIViewController {
     self.calculateKeyboardHeightLimits()
   }
   
-  private func determineOrientation(screenSize: CGSize) {
-    self.isPortrait = screenSize.height > screenSize.width
+  private func determineOrientation() {
+    self.isPortrait = UIScreen.main.bounds.height > UIScreen.main.bounds.width
     let message = "determineOrientation, isPortrait: \(self.isPortrait)"
     os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, message)
   }
@@ -405,9 +405,9 @@ class KeyboardHeightViewController: UIViewController {
     super.viewWillTransition(to: size, with: coordinator)
 
     /**
-     using the specified size, determine which orientation the device is moving to and adjust content as necessary
+     determine which orientation the device had rotated to and adjust content as necessary
      */
-    self.determineOrientation(screenSize: size)
+    self.determineOrientation()
   
     coordinator.animate(alongsideTransition: { _ in
       self.applyKeyboardHeight()
