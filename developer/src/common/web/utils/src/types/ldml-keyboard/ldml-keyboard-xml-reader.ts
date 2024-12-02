@@ -20,7 +20,7 @@ interface NameAndProps  {
 
 export class LDMLKeyboardXMLSourceFileReaderOptions {
   /** path to the CLDR imports */
-  importsPath: string;
+  cldrImportsPath: string;
   /** ordered list of paths for local imports */
   localImportsPaths: string[];
 };
@@ -34,14 +34,14 @@ export class LDMLKeyboardXMLSourceFileReader {
   }
 
   readImportFile(version: string, subpath: string): Uint8Array {
-    const importPath = this.callbacks.resolveFilename(this.options.importsPath, `${version}/${subpath}`);
+    const importPath = this.callbacks.resolveFilename(this.options.cldrImportsPath, `${version}/${subpath}`);
     return this.callbacks.loadFile(importPath);
   }
 
   readLocalImportFile(path: string): Uint8Array {
     // try each of the local imports paths
     for (const localPath of this.options.localImportsPaths) {
-      const importPath = this.callbacks.resolveFilename(localPath, path);
+      const importPath = this.callbacks.path.join(localPath, path);
       if(this.callbacks.fs.existsSync(importPath)) {
         return this.callbacks.loadFile(importPath);
       }

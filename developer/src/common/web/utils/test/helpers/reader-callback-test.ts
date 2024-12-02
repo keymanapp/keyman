@@ -7,10 +7,10 @@ import { LDMLKeyboardXMLSourceFile } from '../../src/types/ldml-keyboard/ldml-ke
 import { LDMLKeyboardTestDataXMLSourceFile } from '../../src/types/ldml-keyboard/ldml-keyboard-testdata-xml.js';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { fileURLToPath } from 'url';
-import { dirname, sep } from 'node:path';
+import { dirname } from 'node:path';
 
 const readerOptions: LDMLKeyboardXMLSourceFileReaderOptions = {
-  importsPath: fileURLToPath(new URL(...LDMLKeyboardXMLSourceFileReader.defaultImportsURL)),
+  cldrImportsPath: fileURLToPath(new URL(...LDMLKeyboardXMLSourceFileReader.defaultImportsURL)),
   localImportsPaths: [],
 };
 
@@ -85,8 +85,8 @@ export function testReaderCases(cases : CompilationCase[]) {
     it(testHeading, function () {
       callbacks.clear();
       const path = makePathToFixture('ldml-keyboard', testcase.subpath);
-      // update readerOptions to point to the source dir. Need a trailing separator.
-      readerOptions.localImportsPaths = [ dirname(path) + sep ];
+      // update readerOptions to point to the source dir.
+      readerOptions.localImportsPaths = [ dirname(path) ];
       const reader = new LDMLKeyboardXMLSourceFileReader(readerOptions, callbacks);
       const data = loadFile(path);
       assert.ok(data, `reading ${testcase.subpath}`);
