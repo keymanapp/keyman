@@ -4,6 +4,17 @@ gtest = subproject('gtest')
 gtest_dep = gtest.get_variable('gtest_dep')
 gmock_dep = gtest.get_variable('gmock_dep')
 
+# TODO -- why are these differing from the standard.meson.build flags?
+# -Wno-unused-parameter --> test_color.h
+if cpp_compiler.get_id() == 'gcc' or cpp_compiler.get_id() == 'clang' or cpp_compiler.get_id() == 'emscripten'
+  warns = [
+     '-Wno-missing-field-initializers',
+     '-Wno-unused-parameter'
+  ]
+else
+  warns = []
+endif
+
 test_util_files = [
   meson.current_source_dir() / 'emscripten_filesystem.cpp',
   meson.current_source_dir() / 'load_kmx_file.cpp',
@@ -26,9 +37,10 @@ endif
 kmcorekeyboardapitests = executable('km_core_keyboard_api.tests',
   [
     'km_core_keyboard_api.tests.cpp',
-    test_util_files,
+    common_test_files,
   ],
   include_directories: [inc, libsrc],
+  cpp_args: defns + warns,
   link_args: [ links, extra_link_args ],
   dependencies: [icu_uc, icu_i18n, gtest_dep, gmock_dep],
   objects: lib.extract_all_objects(recursive: false),

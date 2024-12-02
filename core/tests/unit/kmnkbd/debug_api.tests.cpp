@@ -61,10 +61,10 @@ void setup(const char *keyboard) {
   try_status(context_items_from_utf16(u"Hello 😁", &citems));
 
   // Pre-test sanity: ensure debugging is disabled
-  assert(km_core_state_debug_get(test_state) == 0);
+  test_assert(km_core_state_debug_get(test_state) == 0);
 
   // Ensure the pre-run debug item state is not empty
-  assert(debug_items(test_state, {
+  test_assert(debug_items(test_state, {
     km_core_state_debug_item{KM_CORE_DEBUG_END, {}, {}, {}}
   }));
 
@@ -79,11 +79,11 @@ void test_debugging_disabled() {
   setup("k_000___null_keyboard.kmx");
   try_status(km_core_state_debug_set(test_state, 0));
   try_status(km_core_process_event(test_state, KM_CORE_VKEY_S, KM_CORE_MODIFIER_SHIFT, 1, KM_CORE_EVENT_FLAG_DEFAULT));
-  assert(debug_items(test_state, {
+  test_assert(debug_items(test_state, {
     km_core_state_debug_item{KM_CORE_DEBUG_END}
   }));
 
-  assert(action_items(test_state, {
+  test_assert(action_items(test_state, {
     {KM_CORE_IT_CHAR, {0,}, {km_core_usv('S')}},
     {KM_CORE_IT_END}
   }));
@@ -97,14 +97,14 @@ void test_debugging_no_rule_match() {
   DEBUG_GROUP gp = {u"Main"};
   try_status(km_core_state_debug_set(test_state, 1));
   try_status(km_core_process_event(test_state, KM_CORE_VKEY_S, KM_CORE_MODIFIER_SHIFT, 1, KM_CORE_EVENT_FLAG_DEFAULT));
-  assert(debug_items(test_state, {
+  test_assert(debug_items(test_state, {
     km_core_state_debug_item{KM_CORE_DEBUG_BEGIN, KM_CORE_DEBUG_FLAG_UNICODE, {KM_CORE_VKEY_S, KM_CORE_MODIFIER_SHIFT, 'S'}},
     km_core_state_debug_item{KM_CORE_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
     km_core_state_debug_item{KM_CORE_DEBUG_GROUP_EXIT, KM_CORE_DEBUG_FLAG_NOMATCH, {}, {u"", &gp, nullptr, {}, 1}},
     km_core_state_debug_item{KM_CORE_DEBUG_END, 0, {}, {u"", nullptr, nullptr, {}, 1}}
   }));
 
-  assert(action_items(test_state, {
+  test_assert(action_items(test_state, {
     {KM_CORE_IT_CHAR, {0,}, {km_core_usv('S')}},
     {KM_CORE_IT_END}
   }));
@@ -118,14 +118,14 @@ void test_debugging_function_key() {
   DEBUG_GROUP gp = {u"Main"};
   try_status(km_core_state_debug_set(test_state, 1));
   try_status(km_core_process_event(test_state, KM_CORE_VKEY_F1, 0, 1, KM_CORE_EVENT_FLAG_DEFAULT));
-  assert(debug_items(test_state, {
+  test_assert(debug_items(test_state, {
     km_core_state_debug_item{KM_CORE_DEBUG_BEGIN, KM_CORE_DEBUG_FLAG_UNICODE, {KM_CORE_VKEY_F1, 0, 0}},
     km_core_state_debug_item{KM_CORE_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
     km_core_state_debug_item{KM_CORE_DEBUG_GROUP_EXIT, KM_CORE_DEBUG_FLAG_NOMATCH, {}, {u"", &gp, nullptr, {}, 0}},
     km_core_state_debug_item{KM_CORE_DEBUG_END, KM_CORE_DEBUG_FLAG_OUTPUTKEYSTROKE, {}, {u"", nullptr, nullptr, {}, 0}}
   }));
 
-  assert(action_items(test_state, {
+  test_assert(action_items(test_state, {
     {KM_CORE_IT_INVALIDATE_CONTEXT}, // It's a non character key that is not a modifier, so this is a hint that context may no longer be valid
     {KM_CORE_IT_EMIT_KEYSTROKE},
     {KM_CORE_IT_END}
@@ -144,33 +144,33 @@ void test_basic_rule_matches() {
   // 'DE' + 'F' > U+0E04 U+0E05 U+0E06
 
   try_status(km_core_process_event(test_state, KM_CORE_VKEY_D, KM_CORE_MODIFIER_SHIFT, 1, KM_CORE_EVENT_FLAG_DEFAULT));
-  assert(debug_items(test_state, {
+  test_assert(debug_items(test_state, {
     km_core_state_debug_item{KM_CORE_DEBUG_BEGIN, KM_CORE_DEBUG_FLAG_UNICODE, {KM_CORE_VKEY_D, KM_CORE_MODIFIER_SHIFT, 'D'}},
     km_core_state_debug_item{KM_CORE_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
     km_core_state_debug_item{KM_CORE_DEBUG_GROUP_EXIT, KM_CORE_DEBUG_FLAG_NOMATCH, {}, {u"", &gp, nullptr, {}, 1}},
     km_core_state_debug_item{KM_CORE_DEBUG_END, 0, {}, {u"", nullptr, nullptr, {}, 1}}, // action item will emit a default 'D'
   }));
 
-  assert(action_items(test_state, {
+  test_assert(action_items(test_state, {
     {KM_CORE_IT_CHAR, {0,}, {km_core_usv('D')}},
     {KM_CORE_IT_END}
   }));
 
   try_status(km_core_process_event(test_state, KM_CORE_VKEY_E, KM_CORE_MODIFIER_SHIFT, 1, KM_CORE_EVENT_FLAG_DEFAULT));
-  assert(debug_items(test_state, {
+  test_assert(debug_items(test_state, {
     km_core_state_debug_item{KM_CORE_DEBUG_BEGIN, KM_CORE_DEBUG_FLAG_UNICODE, {KM_CORE_VKEY_E, KM_CORE_MODIFIER_SHIFT, 'E'}},
     km_core_state_debug_item{KM_CORE_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
     km_core_state_debug_item{KM_CORE_DEBUG_GROUP_EXIT, KM_CORE_DEBUG_FLAG_NOMATCH, {}, {u"", &gp, nullptr, {}, 1}},
     km_core_state_debug_item{KM_CORE_DEBUG_END, 0, {}, {u"", nullptr, nullptr, {}, 1}}, // action item will emit a default 'E'
   }));
 
-  assert(action_items(test_state, {
+  test_assert(action_items(test_state, {
     {KM_CORE_IT_CHAR, {0,}, {km_core_usv('E')}},
     {KM_CORE_IT_END}
   }));
 
   try_status(km_core_process_event(test_state, KM_CORE_VKEY_F, KM_CORE_MODIFIER_SHIFT, 1, KM_CORE_EVENT_FLAG_DEFAULT));
-  assert(debug_items(test_state, {
+  test_assert(debug_items(test_state, {
     km_core_state_debug_item{KM_CORE_DEBUG_BEGIN, KM_CORE_DEBUG_FLAG_UNICODE, {KM_CORE_VKEY_F, KM_CORE_MODIFIER_SHIFT, 'F'}},
     km_core_state_debug_item{KM_CORE_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
       km_core_state_debug_item{KM_CORE_DEBUG_RULE_ENTER, 0, {}, {u"DE", &gp, &kp, {0xFFFF}}},
@@ -187,7 +187,7 @@ void test_basic_rule_matches() {
   bksp_e.backspace.expected_type = KM_CORE_BT_CHAR;
   bksp_e.backspace.expected_value = 'E';
 
-  assert(action_items(test_state, {
+  test_assert(action_items(test_state, {
     bksp_e,
     bksp_d,
     {KM_CORE_IT_CHAR, {0,}, {km_core_usv(u'\u0E04')}},
@@ -214,7 +214,7 @@ void test_multiple_groups() {
   // '12' -> 'abc'
 
   try_status(km_core_process_event(test_state, KM_CORE_VKEY_1, 0, 1, KM_CORE_EVENT_FLAG_DEFAULT));
-  assert(debug_items(test_state, {
+  test_assert(debug_items(test_state, {
     km_core_state_debug_item{KM_CORE_DEBUG_BEGIN, KM_CORE_DEBUG_FLAG_UNICODE, {KM_CORE_VKEY_1, 0, '1'}},
     km_core_state_debug_item{KM_CORE_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
 
@@ -236,7 +236,7 @@ void test_multiple_groups() {
   bksp_a.backspace.expected_type = KM_CORE_BT_CHAR;
   bksp_a.backspace.expected_value = 'a';
 
-  assert(action_items(test_state, {
+  test_assert(action_items(test_state, {
     {KM_CORE_IT_CHAR, {0,}, {km_core_usv('a')}},
     bksp_a,
     {KM_CORE_IT_CHAR, {0,}, {km_core_usv('b')}},
@@ -244,7 +244,7 @@ void test_multiple_groups() {
   }));
 
   try_status(km_core_process_event(test_state, KM_CORE_VKEY_2, 0, 1, KM_CORE_EVENT_FLAG_DEFAULT));
-  assert(debug_items(test_state, {
+  test_assert(debug_items(test_state, {
     km_core_state_debug_item{KM_CORE_DEBUG_BEGIN, KM_CORE_DEBUG_FLAG_UNICODE, {KM_CORE_VKEY_2, 0, '2'}},
     km_core_state_debug_item{KM_CORE_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
 
@@ -269,7 +269,7 @@ void test_multiple_groups() {
   bksp_b.backspace.expected_type = KM_CORE_BT_CHAR;
   bksp_b.backspace.expected_value = 'b';
 
-  assert(action_items(test_state, {
+  test_assert(action_items(test_state, {
     bksp_b,
     {KM_CORE_IT_CHAR, {0,}, {km_core_usv('a')}},
     {KM_CORE_IT_CHAR, {0,}, {km_core_usv('b')}},
@@ -293,7 +293,7 @@ void test_store_offsets() {
   // 'ab' -> 'ex'
 
   try_status(km_core_process_event(test_state, KM_CORE_VKEY_A, 0, 1, KM_CORE_EVENT_FLAG_DEFAULT));
-  assert(debug_items(test_state, {
+  test_assert(debug_items(test_state, {
     km_core_state_debug_item{KM_CORE_DEBUG_BEGIN, KM_CORE_DEBUG_FLAG_UNICODE, {KM_CORE_VKEY_A, 0, 'a'}},
     km_core_state_debug_item{KM_CORE_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
 
@@ -304,7 +304,7 @@ void test_store_offsets() {
     km_core_state_debug_item{KM_CORE_DEBUG_END, 0, {}, {u"", nullptr, nullptr, {}, 4}}, // action item will emit a 'exay'
   }));
 
-  assert(action_items(test_state, {
+  test_assert(action_items(test_state, {
     {KM_CORE_IT_CHAR, {0,}, {km_core_usv('e')}},
     {KM_CORE_IT_CHAR, {0,}, {km_core_usv('x')}},
     {KM_CORE_IT_CHAR, {0,}, {km_core_usv('a')}},
@@ -313,7 +313,7 @@ void test_store_offsets() {
   }));
 
   try_status(km_core_process_event(test_state, KM_CORE_VKEY_B, 0, 1, KM_CORE_EVENT_FLAG_DEFAULT));
-  assert(debug_items(test_state, {
+  test_assert(debug_items(test_state, {
     km_core_state_debug_item{KM_CORE_DEBUG_BEGIN, KM_CORE_DEBUG_FLAG_UNICODE, {KM_CORE_VKEY_B, 0, 'b'}},
     km_core_state_debug_item{KM_CORE_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
 
@@ -342,7 +342,7 @@ void test_store_offsets() {
   bksp[2].backspace.expected_value = 'x';
   bksp[3].backspace.expected_value = 'e';
 
-  assert(action_items(test_state, {
+  test_assert(action_items(test_state, {
     bksp[0],
     bksp[1],
     bksp[2],
@@ -367,7 +367,7 @@ void test_set_option() {
   // '1' -> set_option
 
   try_status(km_core_process_event(test_state, KM_CORE_VKEY_1, 0, 1, KM_CORE_EVENT_FLAG_DEFAULT));
-  assert(debug_items(test_state, {
+  test_assert(debug_items(test_state, {
     km_core_state_debug_item{KM_CORE_DEBUG_BEGIN, KM_CORE_DEBUG_FLAG_UNICODE, {KM_CORE_VKEY_1, 0, '1'}},
     km_core_state_debug_item{KM_CORE_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
 
@@ -395,7 +395,7 @@ void test_save_option() {
   // '2' -> save_option
 
   try_status(km_core_process_event(test_state, KM_CORE_VKEY_2, 0, 1, KM_CORE_EVENT_FLAG_DEFAULT));
-  assert(debug_items(test_state, {
+  test_assert(debug_items(test_state, {
     km_core_state_debug_item{KM_CORE_DEBUG_BEGIN, KM_CORE_DEBUG_FLAG_UNICODE, {KM_CORE_VKEY_2, 0, '2'}},
     km_core_state_debug_item{KM_CORE_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
 
@@ -409,7 +409,7 @@ void test_save_option() {
   km_core_action_item action = {KM_CORE_IT_PERSIST_OPT, {0,}, };
   action.option = &opt;
 
-  assert(action_items(test_state, {
+  test_assert(action_items(test_state, {
     action,
     {KM_CORE_IT_END}
   }));
@@ -437,7 +437,7 @@ void test_backspace_markers() {
   try_status(km_core_state_debug_set(test_state, 1));
 
   try_status(km_core_process_event(test_state, KM_CORE_VKEY_BKSP, 0, 1, KM_CORE_EVENT_FLAG_DEFAULT));
-  assert(debug_items(test_state, {
+  test_assert(debug_items(test_state, {
     km_core_state_debug_item{KM_CORE_DEBUG_BEGIN, KM_CORE_DEBUG_FLAG_UNICODE, {KM_CORE_VKEY_BKSP, 0, 0}},
     km_core_state_debug_item{KM_CORE_DEBUG_GROUP_ENTER, 0, {}, {u"", &gp}},
     km_core_state_debug_item{KM_CORE_DEBUG_GROUP_EXIT, 2, {}, {u"", &gp, nullptr, {}, 2}},
@@ -448,7 +448,7 @@ void test_backspace_markers() {
   bksp.backspace.expected_type = KM_CORE_BT_MARKER;
   bksp.backspace.expected_value = 1;
 
-  assert(action_items(test_state, {
+  test_assert(action_items(test_state, {
     bksp,
     bksp,
     {KM_CORE_IT_INVALIDATE_CONTEXT},

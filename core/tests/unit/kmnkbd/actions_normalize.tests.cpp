@@ -121,7 +121,7 @@ void test_actions_normalize(
 
   setup(initial_app_context, final_cached_context_string, final_cached_context_items, actions_code_points_to_delete, actions_output);
 
-  assert(km::core::actions_normalize(km_core_state_context(test_state), km_core_state_app_context(test_state), test_actions));
+  test_assert(km::core::actions_normalize(km_core_state_context(test_state), km_core_state_app_context(test_state), test_actions));
 
   std::cout << "test_actions_normalize: (" << name << "): delete: " << test_actions.code_points_to_delete << " output: |" << std::u32string(test_actions.output) << "|" << std::endl;
   std::u32string o(test_actions.output);
@@ -130,8 +130,8 @@ void test_actions_normalize(
   }
   std::cout << std::endl;
 
-  assert(expected_delete == test_actions.code_points_to_delete);
-  assert(expected_output == test_actions.output);
+  test_assert(expected_delete == test_actions.code_points_to_delete);
+  test_assert(expected_output == test_actions.output);
 
   auto debug = km_core_state_context_debug(test_state, KM_CORE_DEBUG_CONTEXT_APP);
   std::cout << " final app context: " << debug << std::endl;
@@ -195,7 +195,7 @@ void test_actions_update_app_context_nfu(
 
   setup(initial_app_context, final_cached_context_string, final_cached_context_items, actions_code_points_to_delete, actions_output);
 
-  assert(km::core::actions_update_app_context_nfu(km_core_state_context(test_state), km_core_state_app_context(test_state)));
+  test_assert(km::core::actions_update_app_context_nfu(km_core_state_context(test_state), km_core_state_app_context(test_state)));
 
   std::cout << "test_actions_update_app_context_nfu: (" << name << "): delete: " << expected_delete << " output: |" << std::u32string(test_actions.output) << "|" << std::endl;
   std::u32string o(test_actions.output);
@@ -204,8 +204,8 @@ void test_actions_update_app_context_nfu(
   }
   std::cout << std::endl;
 
-  assert(expected_delete == test_actions.code_points_to_delete);
-  assert(expected_output == test_actions.output);
+  test_assert(expected_delete == test_actions.code_points_to_delete);
+  test_assert(expected_output == test_actions.output);
 
   auto debug = km_core_state_context_debug(test_state, KM_CORE_DEBUG_CONTEXT_APP);
   std::cout << " final app context: " << debug << std::endl;
@@ -627,7 +627,7 @@ void compare_context(km_core_context *app_context, const km_core_cu* expected_fi
   try_status(context_items_from_utf16(expected_final_app_context, &expected_final_app_context_items));
 
   for(int i = 0; actual_final_app_context_items[i].type != KM_CORE_CT_END || expected_final_app_context_items[i].type != KM_CORE_CT_END; i++) {
-    assert(
+    test_assert(
       actual_final_app_context_items[i].type == expected_final_app_context_items[i].type &&
       // union so testing character is sufficient to do both char + marker types
       actual_final_app_context_items[i].character == expected_final_app_context_items[i].character
