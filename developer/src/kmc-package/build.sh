@@ -30,25 +30,11 @@ builder_describe_outputs \
 
 builder_parse "$@"
 
-function do_test() {
-  local MOCHA_FLAGS=
-
-  if [[ "${TEAMCITY_GIT_PATH:-}" != "" ]]; then
-    # we're running in TeamCity
-    MOCHA_FLAGS="-reporter mocha-teamcity-reporter"
-  fi
-  eslint .
-  cd test
-  tsc --build
-  cd ..
-  c8 --reporter=lcov --reporter=text mocha ${MOCHA_FLAGS}
-}
-
 #-------------------------------------------------------------------------------------------------------------------
 
 builder_run_action clean      rm -rf ./build/ ./tsconfig.tsbuildinfo
 builder_run_action configure  verify_npm_setup
 builder_run_action build      tsc --build
 builder_run_action api        api-extractor run --local --verbose
-builder_run_action test       do_test
+builder_run_action test       builder_do_typescript_tests
 builder_run_action publish     builder_publish_npm
