@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.150 alpha 2024-12-02
+
+* fix(core,developer): use `NDEBUG` flag to disable assertions in release build (#12715)
+
 ## 18.0.149 alpha 2024-12-01
 
 * refactor(developer): unify test action (#12736)
