@@ -16,6 +16,21 @@
 // * Strings element is not yet checked to be correct
 //
 
+/** minimum supported file version, for keyboard packages */
+export const KPS_FILE_MINIMUM_VERSION_KEYBOARD_SUPPORT = '7.0';
+
+/** minimum version for lexical model packages */
+export const KPS_FILE_MINIMUM_VERSION_LEXICAL_MODEL_SUPPORT = '12.0';
+
+/** minimum version that supports remote references */
+export const KPS_FILE_MINIMUM_VERSION_REMOTE_SUPPORT = '18.0';
+
+export const KPS_FILE_VERSIONS = [
+  KPS_FILE_MINIMUM_VERSION_KEYBOARD_SUPPORT,
+  KPS_FILE_MINIMUM_VERSION_LEXICAL_MODEL_SUPPORT,
+  KPS_FILE_MINIMUM_VERSION_REMOTE_SUPPORT,
+];
+
 export interface KpsPackage {
   /**
    * <Package> -- the root element.

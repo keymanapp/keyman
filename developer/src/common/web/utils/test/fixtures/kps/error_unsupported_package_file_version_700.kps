@@ -2,10 +2,11 @@
 <Package>
   <System>
     <KeymanDeveloperVersion>15.0.266.0</KeymanDeveloperVersion>
-    <FileVersion>18.0</FileVersion>
+    <!-- ERROR_UnsupportedPackageFileVersion -->
+    <FileVersion>7.0.0</FileVersion>
   </System>
   <Info>
-    <Name URL="">error_font_file_could_not_be_downloaded (github)</Name>
+    <Name URL="">SENĆOŦEN (Saanich Dialect) Keyboard</Name>
     <Copyright URL="">© 2019 National Research Council Canada</Copyright>
     <Author URL="mailto:Eddie.Santos@nrc-cnrc.gc.ca">Eddie Antonio Santos</Author>
     <Version>1.0</Version>
@@ -17,10 +18,6 @@
       <CopyLocation>0</CopyLocation>
       <FileType>.kmx</FileType>
     </File>
-    <!-- error_font_file_could_not_be_downloaded (github) -->
-    <File>
-      <Name>https://github.com/keymanapp/keyman/raw/0000000000000000000000000000000000000000/missing_font.ttf</Name>
-    </File>
   </Files>
   <Keyboards>
     <Keyboard>
@@ -28,7 +25,7 @@
       <ID>basic</ID>
       <Version>1.0</Version>
       <Languages>
-        <Language ID="km">Central Khmer (Khmer, Cambodia)</Language>
+        <Language ID="KM">Khmer</Language>
       </Languages>
     </Keyboard>
   </Keyboards>

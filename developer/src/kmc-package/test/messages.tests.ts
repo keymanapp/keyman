@@ -295,8 +295,17 @@ describe('PackageCompilerMessages', function () {
       PackageCompilerMessages.ERROR_FontFileCouldNotBeDownloaded);
   });
 
+  // HINT_SourceFileHasChanged
+
   it('should generate HINT_SourceFileHasChanged if a FLO font reference has been updated', async function() {
     await testForMessage(this, ['flo', 'hint_source_file_has_changed.kps'],
       PackageCompilerMessages.HINT_SourceFileHasChanged);
+  });
+
+  // HINT_RemoteReferencesShouldBeVersion18Plus
+
+  it('should generate HINT_RemoteReferencesShouldBeVersion18Plus if the package source file is not v18.0', async function() {
+    await testForMessage(this, ['invalid', 'hint_remote_references_should_be_version18_plus.kps'],
+      PackageCompilerMessages.HINT_RemoteReferencesShouldBeVersion18Plus);
   });
 });

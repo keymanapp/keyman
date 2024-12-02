@@ -261,5 +261,11 @@ export class PackageCompilerMessages {
     this.ERROR_SourceCannotBeSetForLocalFiles,
     `The '<Source>' element cannot be set for local file ${o.filename}`,
   );
+
+  static HINT_RemoteReferencesShouldBeVersion18Plus = SevHint | 0x0031;
+  static Hint_RemoteReferencesShouldBeVersion18Plus = (o:{filename: string, kpsVersion: string}) => m(
+    this.HINT_RemoteReferencesShouldBeVersion18Plus,
+    `The source package includes a reference to URL '${def(o.filename)}', and the package source version is '${def(o.kpsVersion)}'; the package source version should be at least '18.0'`,
+  );
 }
 

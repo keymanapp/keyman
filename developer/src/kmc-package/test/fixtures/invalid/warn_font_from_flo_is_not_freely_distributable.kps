@@ -2,7 +2,7 @@
 <Package>
   <System>
     <KeymanDeveloperVersion>15.0.266.0</KeymanDeveloperVersion>
-    <FileVersion>7.0</FileVersion>
+    <FileVersion>18.0</FileVersion>
   </System>
   <Info>
     <Name URL="">warn_font_from_flo_is_not_freely_distributable</Name>

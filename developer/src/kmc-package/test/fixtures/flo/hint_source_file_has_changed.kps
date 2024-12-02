@@ -2,7 +2,7 @@
 <Package>
   <System>
     <KeymanDeveloperVersion>15.0.266.0</KeymanDeveloperVersion>
-    <FileVersion>7.0</FileVersion>
+    <FileVersion>18.0</FileVersion>
   </System>
   <Info>
     <Name URL="">error_font_file_could_not_be_downloaded</Name>

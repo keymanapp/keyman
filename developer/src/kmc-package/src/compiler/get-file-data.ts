@@ -222,7 +222,6 @@ async function checkSourceFile(callbacks: CompilerCallbacks, inputFilename: stri
 
 /** @internal */
 export const unitTestEndpoints = {
-  GITHUB_SOURCE: GITHUB_URI,
   GITHUB_STABLE_SOURCE,
   getFileDataFromGitHub,
   FLO_SOURCE,
@@ -230,5 +229,4 @@ export const unitTestEndpoints = {
   getFileStableRefFromGitHub,
   getFileDataFromRemote,
   checkSourceFile,
-  // getFileDataFromFlo,
 };

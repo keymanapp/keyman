@@ -258,11 +258,13 @@ export class KmpCompiler implements KeymanCompiler {
 
     const fileData: KmpFileData = {fileData: {}};
 
+    const supportsRemotes = parseFloat(kps.System.FileVersion) >= parseFloat(KpsFile.KPS_FILE_MINIMUM_VERSION_REMOTE_SUPPORT);
+
     if(kps.Files?.File?.length) {
       // TODO: we have to cache the file data now because we use it for example
       // for metadata collection
 
-      kmp.files = await this.locateFiles(kpsFilename, kps.Files.File, fileData);
+      kmp.files = await this.locateFiles(supportsRemotes, kps.System.FileVersion, kpsFilename, kps.Files.File, fileData);
       if(!kmp.files) {
         // error reported in locateFiles
         return FAILED_TRANSFORM_RESULT;
@@ -541,12 +543,15 @@ export class KmpCompiler implements KeymanCompiler {
     return transcodeToCP1252(s);
   }
 
-  private async locateFiles(kpsFilename: string, kpsFiles: KpsFile.KpsFileContentFile[], fileData: KmpFileData) {
+  private async locateFiles(supportsRemotes: boolean, kpsVersion: string, kpsFilename: string, kpsFiles: KpsFile.KpsFileContentFile[], fileData: KmpFileData) {
     let result = true;
     const files: KmpJsonFileContentFile[] = [];
 
     for(const file of kpsFiles) {
       const isLocal = isLocalFile(file.Name);
+      if(!isLocal && !supportsRemotes) {
+        this.callbacks.reportMessage(PackageCompilerMessages.Hint_RemoteReferencesShouldBeVersion18Plus({filename:file.Name, kpsVersion}));
+      }
       const name = isLocal ?
         this.normalizePath(file.Name) :
         file.Name;
