@@ -493,9 +493,8 @@ following sources:
   `author.bcp47.uniq` id pattern, or a keyboard id pattern (where period `.` is
   not permitted)
 * A GitHub repository or subfolder within a repository that matches the Keyman
-  keyboard/model repository layout. The branch name is optional, and will use
-  the default branch from the repository if omitted. For example,
-  `github:keyman-keyboards/khmer_angkor:main:/khmer_angkor.kpj`
+  keyboard/model repository layout. For example,
+  `https://github.com/keyman-keyboards/khmer_angkor/tree/main/khmer_angkor.kpj`
 
 `-o, --out-path <filename>`
 

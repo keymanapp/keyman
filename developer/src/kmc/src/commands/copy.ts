@@ -27,8 +27,9 @@ export function declareCopy(program: Command) {
       * a .kpj file, e.g. ./keyboards/khmer_angkor/khmer_angkor.kpj
       * a local folder (with a .kpj file in it), e.g. ./keyboards/khmer_angkor
       * a cloud keyboard or lexical model, cloud:id, e.g. cloud:khmer_angkor
-      * a GitHub repository, optional branch, and path, github:owner/repo[:branch]:path
-        e.g. github:keyman-keyboards/khmer_angkor:main:/khmer_angkor.kpj
+      * a GitHub repository, branch, and path, [https://]github.com/owner/repo/tree/branch/path
+        e.g. https://github.com/keyman-keyboards/khmer_angkor/tree/main/khmer_angkor.kpj or
+             github.com/keymanapp/keyboards/tree/master/release/k/khmer_angkor
     `);
   }
 
