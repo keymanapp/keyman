@@ -1,6 +1,6 @@
 import 'mocha';
 import {assert} from 'chai';
-import {unescapeString, UnescapeError, isOneChar, toOneChar, unescapeOneQuadString, BadStringAnalyzer, isValidUnicode, describeCodepoint, isPUA, BadStringType, unescapeStringToRegex, unescapeQuadString, NFDAnalyzer, isDenormalized} from '../../src/util/util.js';
+import {unescapeString, UnescapeError, isOneChar, toOneChar, unescapeOneQuadString, BadStringAnalyzer, isValidUnicode, describeCodepoint, isPUA, BadStringType, unescapeStringToRegex, unescapeQuadString, NFDAnalyzer, isNormalized} from '../../src/util/util.js';
 
 describe('test UTF32 functions()', function() {
   it('should properly categorize strings', () => {
@@ -197,11 +197,11 @@ describe('test bad char functions', () => {
         'fas\u0323\u0307cinating', // NFD
         'd\u0323\u0307', // NFD
         '\u1e0d\u0307', // NFC
-      ].map(s => assert.isFalse(isDenormalized(s), `for string ${s}`));
+      ].map(s => assert.isTrue(isNormalized(s), `for string ${s}`));
       [
         'd\u0307\u0323', // NFD but reversed marks
         'fas\u0307\u0323cinating', // not-NFD
-      ].map(s => assert.isTrue(isDenormalized(s), `for string ${s}`));
+      ].map(s => assert.isFalse(isNormalized(s), `for string ${s}`));
     });
   });
 });
