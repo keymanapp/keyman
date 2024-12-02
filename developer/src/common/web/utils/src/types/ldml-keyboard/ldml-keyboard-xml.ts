@@ -38,7 +38,7 @@ export interface LKImport {
   /**
    * import base, currently `cldr` is supported
    */
-  base?: string;
+  base?: 'cldr';
   /**
    * path to imported resource, of the form `45/*.xml`
    */

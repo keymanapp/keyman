@@ -42,8 +42,9 @@ export class LDMLKeyboardXMLSourceFileReader {
     // try each of the local imports paths
     for (const localPath of this.options.localImportsPaths) {
       const importPath = this.callbacks.resolveFilename(localPath, path);
-      const data = this.callbacks.loadFile(importPath);
-      if (data) return data;
+      if(this.callbacks.fs.existsSync(importPath)) {
+        return this.callbacks.loadFile(importPath);
+      }
     }
     return null; // was not able to load from any of the paths
   }
@@ -216,6 +217,7 @@ export class LDMLKeyboardXMLSourceFileReader {
    */
   private resolveOneImport(obj: any, subtag: string, asImport: LKImport, implied? : boolean) : boolean {
     const { base, path } = asImport;
+    // If base is not an empty string (or null/undefined), then it must be 'cldr'
     if (base && base !== constants.cldr_import_base) {
       this.callbacks.reportMessage(CommonTypesMessages.Error_ImportInvalidBase({base, path, subtag}));
       return false;
@@ -262,7 +264,7 @@ export class LDMLKeyboardXMLSourceFileReader {
         // mark all children as an implied import
         subsubval.forEach(o => o[ImportStatus.impliedImport] = basePath);
       }
-      if (!base) {
+      if (base !== constants.cldr_import_base) {
         subsubval.forEach(o => o[ImportStatus.localImport] = path);
       }
 

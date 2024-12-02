@@ -20,7 +20,7 @@ export class CommonTypesMessages {
   static ERROR_ImportInvalidBase = SevError | 0x0002;
   static Error_ImportInvalidBase = (o: { base: string, path: string, subtag: string }) =>
     m(this.ERROR_ImportInvalidBase,
-      `Import element with base ${def(o.base)} is unsupported. Only ${constants.cldr_import_base} or empty (for local) is supported.`);
+      `Import element with base ${def(o.base)} is unsupported. Only ${constants.cldr_import_base} or empty (for local) are supported.`);
 
   static ERROR_ImportInvalidPath = SevError | 0x0003;
   static Error_ImportInvalidPath = (o: { base: string, path: string, subtag: string }) =>
