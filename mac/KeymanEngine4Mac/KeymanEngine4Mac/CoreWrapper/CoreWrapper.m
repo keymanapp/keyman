@@ -110,11 +110,22 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
 
 -(void)loadKeyboardUsingCore:(NSString*) path {
   km_core_path_name keyboardPath = [path UTF8String];
-  km_core_status result = km_core_keyboard_load(keyboardPath, &_coreKeyboard);
+  NSError* dataError = nil;
+  NSData *data = [NSData dataWithContentsOfFile:path options:0 error:&dataError];
   
-  if (result != KM_CORE_STATUS_OK) {
-    NSString *message = [NSString stringWithFormat:@"Unexpected Keyman Core result: %u", result];
-    [NSException raise:@"LoadKeyboardException" format:@"%@", message];
+  if (dataError != nil) {
+    os_log_error([KMELogs coreLog], "loadKeyboardUsingCore, path: %{public}@\n dataError: %{public}@", path, dataError);
+  } else {
+    NSUInteger dataLength = data.length;
+    os_log_info([KMELogs coreLog], "loadKeyboardUsingCore, path: %{public}@\n dataLength: %lu", path, dataLength);
+    
+    km_core_status result = km_core_keyboard_load_from_blob(keyboardPath,
+                                                   data.bytes, dataLength, &_coreKeyboard);
+    if (result != KM_CORE_STATUS_OK) {
+      NSString *message = [NSString stringWithFormat:@"Unexpected Keyman Core result: %u", result];
+      os_log_error([KMELogs coreLog], "loadKeyboardUsingCore, path: %{public}@\n core result: %{public}@", path, message);
+      [NSException raise:@"LoadKeyboardException" format:@"%@", message];
+    }
   }
 }
 
@@ -126,7 +137,7 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
     if (result==KM_CORE_STATUS_OK) {
       _keyboardVersion = [self.coreHelper createNSStringFromUnicharString:keyboardAttributes->version_string];
       _keyboardId = [self.coreHelper createNSStringFromUnicharString:keyboardAttributes->id];
-      os_log_debug([KMELogs coreLog], "readKeyboardAttributesUsingCore, keyboardVersion: %{public}@\n, keyboardId: %{public}@\n", _keyboardVersion, _keyboardId);
+      os_log_debug([KMELogs coreLog], "readKeyboardAttributesUsingCore, keyboardVersion: %{public}@, keyboardId: %{public}@\n", _keyboardVersion, _keyboardId);
     } else {
       os_log_error([KMELogs coreLog], "km_core_keyboard_get_attrs() failed with result = %u\n", result);
     }
