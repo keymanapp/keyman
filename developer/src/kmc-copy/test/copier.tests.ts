@@ -12,6 +12,7 @@ import { assert } from 'chai';
 import { TestCompilerCallbacks } from '@keymanapp/developer-test-helpers';
 import { KeymanProjectCopier } from '../src/KeymanProjectCopier.js';
 import { makePathToFixture } from './helpers/index.js';
+import { GitHubRef } from './cloud.js';
 
 const { TEST_SAVE_ARTIFACTS, TEST_SAVE_FIXTURES } = env;
 let outputRoot: string = '/an/imaginary/root/';
@@ -374,7 +375,7 @@ describe('KeymanProjectCopier', function() {
 
     // armenian_mnemonic selected because (a) small, and (b) has v2.0 project, so
     // that exercises the folder retrieval as well
-    const result = await copier.run('github:keymanapp/keyboards:release/a/armenian_mnemonic/armenian_mnemonic.kpj');
+    const result = await copier.run('github.com/keymanapp/keyboards/tree/master/release/a/armenian_mnemonic/armenian_mnemonic.kpj');
 
     // We should have no messages and a successful result
     assert.isOk(result);
@@ -415,6 +416,81 @@ describe('KeymanProjectCopier', function() {
       }
     });
   });
+
+  // Keyman Cloud patterns
+
+  const cloud_khmer_angkor: GitHubRef = { branch: 'master', owner: 'keymanapp', repo: 'keyboards', path: '/release/k/khmer_angkor/khmer_angkor.kpj' };
+  const cloud_nrc_en_mtnt: GitHubRef = { branch: 'master', owner: 'keymanapp', repo: 'lexical-models', path: '/release/nrc/nrc.en.mtnt/nrc.en.mtnt.kpj' };
+  const cloud_urls: [string,GitHubRef][] = [
+    ['cloud:khmer_angkor', cloud_khmer_angkor],
+    ['https://keyman.com/keyboards/khmer_angkor', cloud_khmer_angkor],
+    ['https://keyman.com/keyboards/khmer_angkor/', cloud_khmer_angkor],
+    ['keyman.com/keyboards/khmer_angkor/', cloud_khmer_angkor],
+    ['http://keyman.com/keyboards/khmer_angkor#abc', cloud_khmer_angkor],
+    ['cloud:nrc.en.mtnt', cloud_nrc_en_mtnt],
+  ];
+
+  cloud_urls.forEach(url => {
+    it(`should parse URL '${url[0]}' and figure out the .kpj`, async function() {
+      // url -->
+      const copier = new KeymanProjectCopier();
+      assert.isTrue(await copier.init(callbacks, {
+        dryRun: false,
+        outPath: ''
+      }));
+
+      const ref = await copier.unitTestEndPoints.getCloudSourceProject(url[0]);
+      assert.isNotNull(ref);
+      assert.deepEqual(ref, url[1]);
+    });
+  })
+
+
+  // GitHub patterns that should match as inputs for kmc-copy source
+
+  const armenian_mnemonic_urls = [ {
+    branch: 'master', urls: [
+    'github.com/keymanapp/keyboards/tree/master/release/a/armenian_mnemonic',
+    'http://github.com/keymanapp/keyboards/tree/master/release/a/armenian_mnemonic',
+    'https://github.com/keymanapp/keyboards/tree/master/release/a/armenian_mnemonic',
+    'https://github.com/keymanapp/keyboards/tree/master/release/a/armenian_mnemonic/',
+    'https://github.com/keymanapp/keyboards/tree/refs/heads/master/release/a/armenian_mnemonic',
+    'https://github.com/keymanapp/keyboards/tree/refs/heads/master/release/a/armenian_mnemonic/',
+    'https://github.com/keymanapp/keyboards/raw/refs/heads/master/release/a/armenian_mnemonic/armenian_mnemonic.kpj',
+    'https://github.com/keymanapp/keyboards/raw/master/release/a/armenian_mnemonic/armenian_mnemonic.kpj',
+    'https://github.com/keymanapp/keyboards/blob/refs/heads/master/release/a/armenian_mnemonic/armenian_mnemonic.kpj',
+    'https://github.com/keymanapp/keyboards/blob/master/release/a/armenian_mnemonic/armenian_mnemonic.kpj',
+
+    // And similar patterns for raw.githubusercontent.com
+
+    'https://raw.githubusercontent.com/keymanapp/keyboards/refs/heads/master/release/a/armenian_mnemonic/armenian_mnemonic.kpj',
+    'https://raw.githubusercontent.com/keymanapp/keyboards/master/release/a/armenian_mnemonic/armenian_mnemonic.kpj',
+  ]}, {
+    branch: '78b6f98e5db4a249cc4231f8744f5fe4e5fd29f2', urls: [
+    'https://github.com/keymanapp/keyboards/blob/78b6f98e5db4a249cc4231f8744f5fe4e5fd29f2/release/a/armenian_mnemonic/armenian_mnemonic.kpj',
+    'https://github.com/keymanapp/keyboards/tree/78b6f98e5db4a249cc4231f8744f5fe4e5fd29f2/release/a/armenian_mnemonic',
+    'https://github.com/keymanapp/keyboards/tree/78b6f98e5db4a249cc4231f8744f5fe4e5fd29f2/release/a/armenian_mnemonic/',
+    'https://raw.githubusercontent.com/keymanapp/keyboards/78b6f98e5db4a249cc4231f8744f5fe4e5fd29f2/release/a/armenian_mnemonic/armenian_mnemonic.kpj',
+  ]}];
+
+  armenian_mnemonic_urls.forEach(({branch,urls}) => urls.forEach(url => {
+    it(`should parse URL '${url}' and figure out the .kpj`, async function() {
+      // url -->
+      const copier = new KeymanProjectCopier();
+      assert.isTrue(await copier.init(callbacks, {
+        dryRun: false,
+        outPath: ''
+      }));
+
+      const ref = await copier.unitTestEndPoints.getGithubSourceProject(url);
+      assert.deepEqual(ref, {
+        branch,
+        owner: 'keymanapp',
+        repo: 'keyboards',
+        path: '/release/a/armenian_mnemonic/armenian_mnemonic.kpj'
+      });
+    });
+  }));
 
   // TODO-COPY: additional tests
   it.skip('should copy a disorganized project into current structure', async function() {});

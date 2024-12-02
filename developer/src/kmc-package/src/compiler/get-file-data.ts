@@ -3,7 +3,7 @@
  *
  * Created by mcdurdin on 2024-11-11
  */
-import { CompilerCallbacks } from '@keymanapp/developer-utils';
+import { CompilerCallbacks, GitHubUrls } from '@keymanapp/developer-utils';
 import { PackageCompilerMessages } from './package-compiler-messages.js';
 
 /**
@@ -15,24 +15,6 @@ const URL_SOURCE = /^http(?:s)?:\/\/(.+)$/;
  * Matches a fonts.languagetechnology.org reference `flo:{id}`
  */
 const FLO_SOURCE = /^flo:(?<family>[a-z0-9_-]+)$/;
-
-/**
- * Matches only a GitHub permanent raw URI with a commit hash, without any other
- * components
- */
-const GITHUB_STABLE_SOURCE = /^https:\/\/github\.com\/(?<name>[a-zA-Z0-9-]+)\/(?<repo>[\w\.-]+)\/raw\/(?<hash>[a-f0-9]{40})\/(?<path>.+)$/;
-
-/**
- * Matches any GitHub git resource raw 'user content' URI which can be
- * translated to a permanent URI with a commit hash
- */
-const GITHUB_RAW_URI = /^https:\/\/raw\.githubusercontent\.com\/(?<name>[a-zA-Z0-9-]+)\/(?<repo>[\w\.-]+)\/(?:refs\/(?:heads|tags)\/)?(?<branch>[^/]+)\/(?<path>.+)$/;
-
-/**
- * Matches any GitHub git resource raw URI which can be translated to a
- * permanent URI with a commit hash
- */
-const GITHUB_URI = /^https:\/\/github\.com\/(?<name>[a-zA-Z0-9-].+)\/(?<repo>[\w\.-]+)\/(?:raw|blob|tree)\/(?:refs\/(?:heads|tags)\/)?(?<branch>[^/]+)\/(?<path>.+)$/;
 
 export interface KmpCompilerFileDataResult {
   data: Uint8Array;
@@ -116,7 +98,7 @@ async function getFileStableRefFromFlo(callbacks: CompilerCallbacks, floSource: 
 
   // we don't use flourl at this time, becase we want a GitHub reference that
   // can be resolved to a stable URI
-  const ghmatches = GITHUB_URI.exec(file.url) ?? GITHUB_RAW_URI.exec(file.url);
+  const ghmatches: GitHubUrls.GitHubRegexMatchArray = GitHubUrls.GITHUB_URI.exec(file.url) ?? GitHubUrls.GITHUB_RAW_URI.exec(file.url);
   /* c8 ignore next 4 */
   if(!ghmatches) {
     callbacks.reportMessage(PackageCompilerMessages.Error_FontInFloDoesNotHaveARecognizedGitHubUri({filename: floSource, url: file.url}));
@@ -127,7 +109,7 @@ async function getFileStableRefFromFlo(callbacks: CompilerCallbacks, floSource: 
 }
 
 async function getFileStableRefFromGitHub(callbacks: CompilerCallbacks, source: string): Promise<string> {
-  const matches = GITHUB_URI.exec(source) ?? GITHUB_RAW_URI.exec(source);
+  const matches: GitHubUrls.GitHubRegexMatchArray = GitHubUrls.GITHUB_URI.exec(source) ?? GitHubUrls.GITHUB_RAW_URI.exec(source);
   if(!matches) {
     callbacks.reportMessage(PackageCompilerMessages.Error_UriIsNotARecognizedGitHubUri({url: source}));
     return null;
@@ -135,10 +117,10 @@ async function getFileStableRefFromGitHub(callbacks: CompilerCallbacks, source: 
   return await resolveGitHubToStableRef(callbacks, matches);
 }
 
-async function resolveGitHubToStableRef(callbacks: CompilerCallbacks, matches: RegExpExecArray): Promise<string> {
+async function resolveGitHubToStableRef(callbacks: CompilerCallbacks, matches: GitHubUrls.GitHubRegexMatchArray): Promise<string> {
   let commit: any = null;
 
-  const url = `https://api.github.com/repos/${matches.groups.name}/${matches.groups.repo}/commits/${matches.groups.branch}?path=${matches.groups.path}`;
+  const url = `https://api.github.com/repos/${matches.groups.owner}/${matches.groups.repo}/commits/${matches.groups.branch}?path=${matches.groups.path}`;
   try {
     commit = await callbacks.net.fetchJSON(url);
     /* c8 ignore next 8 */
@@ -151,12 +133,12 @@ async function resolveGitHubToStableRef(callbacks: CompilerCallbacks, matches: R
     throw e;
   }
 
-  return `https://github.com/${matches.groups.name}/${matches.groups.repo}/raw/${commit.sha}/${matches.groups.path}`;
+  return `https://github.com/${matches.groups.owner}/${matches.groups.repo}/raw/${commit.sha}/${matches.groups.path}`;
 }
 
-async function getFileDataFromGitHub(callbacks: CompilerCallbacks, inputFilename: string, matches: RegExpExecArray): Promise<KmpCompilerFileDataResult> {
-  // /^github:(?<name>[a-zA-Z0-9-].+)\/(?<repo>[\w\.-]+)\/raw\/(?<hash>[a-f0-9]{40})\/(?<path>.+)$/
-  const githubUrl = `https://github.com/${matches.groups.name}/${matches.groups.repo}/raw/${matches.groups.hash}/${matches.groups.path}`;
+async function getFileDataFromGitHub(callbacks: CompilerCallbacks, inputFilename: string, matches: GitHubUrls.GitHubRegexMatchArray): Promise<KmpCompilerFileDataResult> {
+  // /^github:(?<name>[a-zA-Z0-9-].+)\/(?<repo>[\w\.-]+)\/raw\/(?<branch>[a-f0-9]{40})\/(?<path>.+)$/
+  const githubUrl = `https://github.com/${matches.groups.owner}/${matches.groups.repo}/raw/${matches.groups.branch}/${matches.groups.path}`;
   try {
     const res = await callbacks.net.fetchBlob(githubUrl);
     if(!res) {
@@ -172,7 +154,7 @@ async function getFileDataFromGitHub(callbacks: CompilerCallbacks, inputFilename
 }
 
 export async function getFileDataFromRemote(callbacks: CompilerCallbacks, inputFilename: string, sourceFilename: string): Promise<KmpCompilerFileDataResult> {
-  const matches = GITHUB_STABLE_SOURCE.exec(inputFilename);
+  const matches: GitHubUrls.GitHubRegexMatchArray = GitHubUrls.GITHUB_STABLE_SOURCE.exec(inputFilename);
   if(!matches) {
     callbacks.reportMessage(PackageCompilerMessages.Error_UriIsNotARecognizedStableGitHubUri({url: inputFilename}));
     return null;
@@ -199,9 +181,9 @@ async function checkSourceFile(callbacks: CompilerCallbacks, inputFilename: stri
   let stableUrl: string;
   if(FLO_SOURCE.test(sourceFilename)) {
     stableUrl = await getFileStableRefFromFlo(callbacks, sourceFilename);
-  } else if(GITHUB_URI.test(sourceFilename)) {
+  } else if(GitHubUrls.GITHUB_URI.test(sourceFilename)) {
     stableUrl = await getFileStableRefFromGitHub(callbacks, sourceFilename);
-  } else if(GITHUB_RAW_URI.test(sourceFilename)) {
+  } else if(GitHubUrls.GITHUB_RAW_URI.test(sourceFilename)) {
     stableUrl = await getFileStableRefFromGitHub(callbacks, sourceFilename);
   } else {
     callbacks.reportMessage(PackageCompilerMessages.Error_InvalidSourceFileReference({source: sourceFilename, name: inputFilename}));
@@ -219,6 +201,8 @@ async function checkSourceFile(callbacks: CompilerCallbacks, inputFilename: stri
 
   return true;
 }
+
+const GITHUB_STABLE_SOURCE = GitHubUrls.GITHUB_STABLE_SOURCE;
 
 /** @internal */
 export const unitTestEndpoints = {

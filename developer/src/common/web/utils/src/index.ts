@@ -66,3 +66,5 @@ export { UrlSubpathCompilerCallback } from './utils/UrlSubpathCompilerCallback.j
 export { CommonTypesMessages } from './common-messages.js';
 export * as SourceFilenamePatterns from './source-filename-patterns.js';
 export { KeymanXMLType, KeymanXMLWriter, KeymanXMLReader } from './xml-utils.js';
+
+export * as GitHubUrls from './github-urls.js';
