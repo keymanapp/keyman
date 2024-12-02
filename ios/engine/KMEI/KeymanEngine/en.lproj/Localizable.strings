@@ -239,10 +239,10 @@
 "keyboard-drag-instructions" = "Drag arrow control to adjust keyboard height.";
 
 /* Instruction to rotate to adjust landscape keyboard height (displayed when device is portrait) */
-"portrait-keyboard-rotate-instructions" = "Rotate device to adjust for portrait.";
+"portrait-keyboard-rotate-instructions" = "Rotate device to adjust for landscape.";
 
 /* Instruction to rotate to adjust portrait keyboard height (displayed when device is landscape) */
-"landscape-keyboard-rotate-instructions" = "Rotate device to adjust for landscape.";
+"landscape-keyboard-rotate-instructions" = "Rotate device to adjust for portrait.";
 
 /* Short text for notification:  download failure for keyboard */
 "notification-download-failure-keyboard" = "Keyboard download failed";

@@ -63,7 +63,7 @@ class KeyboardHeightViewController: UIViewController {
   }
   
   private func determineOrientation(screenSize: CGSize) {
-    self.isPortrait = UIScreen.main.bounds.height > UIScreen.main.bounds.width
+    self.isPortrait = screenSize.height > screenSize.width
     let message = "determineOrientation, isPortrait: \(self.isPortrait)"
     os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, message)
   }
@@ -78,6 +78,8 @@ class KeyboardHeightViewController: UIViewController {
   }
   
   private func applyKeyboardHeight() {
+    let introMessage = "applyKeyboardHeight, with self.isPortrait: \(self.isPortrait)"
+    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, introMessage)
     if (self.isPortrait) {
       if (Storage.active.userDefaults.object(forKey: Key.portraitKeyboardHeight) != nil) {
         self.keyboardHeight = Storage.active.userDefaults.portraitKeyboardHeight
@@ -255,8 +257,8 @@ class KeyboardHeightViewController: UIViewController {
     self.keyboardConstraintsArray = [
       keyboardImage.leftAnchor.constraint(equalTo: contentView.leftAnchor),
       keyboardImage.rightAnchor.constraint(equalTo: contentView.rightAnchor),
-      keyboardImage.topAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -keyboardHeight),
-      keyboardImage.heightAnchor.constraint(equalToConstant: keyboardHeight)
+      keyboardImage.topAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -self.keyboardHeight),
+      keyboardImage.heightAnchor.constraint(equalToConstant: self.keyboardHeight)
     ]
     NSLayoutConstraint.activate(self.keyboardConstraintsArray)
     
@@ -398,9 +400,9 @@ class KeyboardHeightViewController: UIViewController {
   }
 
   override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-    super.viewWillTransition(to: size, with: coordinator)
-    let rotateMessage = "viewWillTransition called"
+    let rotateMessage = "viewWillTransition to size \(size) with current UIScreen.main.bounds.size size = \(UIScreen.main.bounds.size)"
     os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, rotateMessage)
+    super.viewWillTransition(to: size, with: coordinator)
 
     /**
      using the specified size, determine which orientation the device is moving to and adjust content as necessary

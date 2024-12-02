@@ -929,8 +929,8 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   func keyboardHeightChanged() {
     let message = "keyboardHeightChanged)"
     os_log("%{public}s", log:KeymanEngineLogger.settings, type: .default, message)
-    currentResponder?.dismissKeyboard()
-    self.inputViewController.resetKeyboardState()
+    //currentResponder?.dismissKeyboard()
+    //self.inputViewController.resetKeyboardState()
   }
 
   var vibrationSupportLevel: VibrationSupport {
