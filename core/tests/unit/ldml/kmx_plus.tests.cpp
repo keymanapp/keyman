@@ -34,27 +34,27 @@ int test_COMP_KMXPLUS_KEYS_KEY() {
           0x00000000   // flags: CHAR
       }};
   std::u16string s0 = e[0].get_to_string();
-  assert_equal(s0.length(), 1);
-  assert_equal(s0.at(0), 0x0127);
-  assert(s0 == std::u16string(u"ħ"));
+  test_assert_equal(s0.length(), 1);
+  test_assert_equal(s0.at(0), 0x0127);
+  test_assert(s0 == std::u16string(u"ħ"));
 
   std::u16string s1 = e[1].get_to_string();
-  assert_equal(s1.length(), 2);
-  assert_equal(s1.at(0), 0xD83D);
-  assert_equal(s1.at(1), 0xDE40);
-  assert(s1 == std::u16string(u"🙀"));
+  test_assert_equal(s1.length(), 2);
+  test_assert_equal(s1.at(0), 0xD83D);
+  test_assert_equal(s1.at(1), 0xDE40);
+  test_assert(s1 == std::u16string(u"🙀"));
 
   // now, elems. Parallel.
   std::u16string es0 = elems[0].get_element_string();
-  assert_equal(es0.length(), 1);
-  assert_equal(es0.at(0), 0x0127);
-  assert(es0 == std::u16string(u"ħ"));
+  test_assert_equal(es0.length(), 1);
+  test_assert_equal(es0.at(0), 0x0127);
+  test_assert(es0 == std::u16string(u"ħ"));
 
   std::u16string es1 = elems[1].get_element_string();
-  assert_equal(es1.length(), 2);
-  assert_equal(es1.at(0), 0xD83D);
-  assert_equal(es1.at(1), 0xDE40);
-  assert(es1 == std::u16string(u"🙀"));
+  test_assert_equal(es1.length(), 2);
+  test_assert_equal(es1.at(0), 0xD83D);
+  test_assert_equal(es1.at(1), 0xDE40);
+  test_assert(es1 == std::u16string(u"🙀"));
 
   return EXIT_SUCCESS;
 }
@@ -89,67 +89,67 @@ int test_ldml_vkeys() {
   vk.add(km::tests::get_vk("K_F"), 0, u""); // K_F as a 'gap' key
 
   bool found = false;
-  assert_equal(vk.lookup(km::tests::get_vk(
+  test_assert_equal(vk.lookup(km::tests::get_vk(
     "K_F"), 0, found), u"");
-  assert_equal(found, true); // K_F found, but empty string (gap)
-  assert_equal(vk.lookup(km::tests::get_vk(
+  test_assert_equal(found, true); // K_F found, but empty string (gap)
+  test_assert_equal(vk.lookup(km::tests::get_vk(
     "K_ENTER"), 0, found), u"");
-  assert_equal(found, false); // K_ENTER not found, empty string
-  assert_equal(vk.lookup(km::tests::get_vk(
+  test_assert_equal(found, false); // K_ENTER not found, empty string
+  test_assert_equal(vk.lookup(km::tests::get_vk(
     "K_A"), 0, found), u"K_A-0");
-  assert_equal(found, true); // expect
-  assert_equal(vk.lookup(km::tests::get_vk(
+  test_assert_equal(found, true); // expect
+  test_assert_equal(vk.lookup(km::tests::get_vk(
     "K_A"), LCTRLFLAG, found), u"K_A-LCTRLFLAG");
-  assert_equal(vk.lookup(km::tests::get_vk(
+  test_assert_equal(vk.lookup(km::tests::get_vk(
     "K_A"), RCTRLFLAG, found), u"K_A-RCTRLFLAG");
-  assert_equal(vk.lookup(km::tests::get_vk(
+  test_assert_equal(vk.lookup(km::tests::get_vk(
     "K_A"), LALTFLAG, found), u"K_A-LALTFLAG");
-  assert_equal(vk.lookup(km::tests::get_vk(
+  test_assert_equal(vk.lookup(km::tests::get_vk(
     "K_A"), RALTFLAG, found), u"K_A-RALTFLAG");
 
   // now try either-side keys :should get the same result with either or both
-  assert_equal(vk.lookup(km::tests::get_vk(
+  test_assert_equal(vk.lookup(km::tests::get_vk(
     "K_B"), LCTRLFLAG, found), u"K_B-K_CTRLFLAG");
-  assert_equal(vk.lookup(km::tests::get_vk(
+  test_assert_equal(vk.lookup(km::tests::get_vk(
     "K_B"), RCTRLFLAG, found), u"K_B-K_CTRLFLAG");
-  assert_equal(vk.lookup(km::tests::get_vk(
+  test_assert_equal(vk.lookup(km::tests::get_vk(
     "K_B"), LCTRLFLAG|RCTRLFLAG, found), u"K_B-K_CTRLFLAG");
 
-  assert_equal(vk.lookup(km::tests::get_vk(
+  test_assert_equal(vk.lookup(km::tests::get_vk(
     "K_B"), LALTFLAG, found), u"K_B-K_ALTFLAG");
-  assert_equal(vk.lookup(km::tests::get_vk(
+  test_assert_equal(vk.lookup(km::tests::get_vk(
     "K_B"), RALTFLAG, found), u"K_B-K_ALTFLAG");
-  assert_equal(vk.lookup(km::tests::get_vk(
+  test_assert_equal(vk.lookup(km::tests::get_vk(
     "K_B"), LALTFLAG|RALTFLAG, found), u"K_B-K_ALTFLAG");
 
   // OOOkay now try BOTH side
-  assert_equal(vk.lookup(km::tests::get_vk(
+  test_assert_equal(vk.lookup(km::tests::get_vk(
     "K_C"), LCTRLFLAG|LALTFLAG, found), u"K_C-K_ALTFLAG|K_CTRLFLAG");
-  assert_equal(vk.lookup(km::tests::get_vk(
+  test_assert_equal(vk.lookup(km::tests::get_vk(
     "K_C"), LCTRLFLAG|RALTFLAG, found), u"K_C-K_ALTFLAG|K_CTRLFLAG");
-  assert_equal(vk.lookup(km::tests::get_vk(
+  test_assert_equal(vk.lookup(km::tests::get_vk(
     "K_C"), RCTRLFLAG|LALTFLAG, found), u"K_C-K_ALTFLAG|K_CTRLFLAG");
-  assert_equal(vk.lookup(km::tests::get_vk(
+  test_assert_equal(vk.lookup(km::tests::get_vk(
     "K_C"), RCTRLFLAG|RALTFLAG, found), u"K_C-K_ALTFLAG|K_CTRLFLAG");
 
   // OOOkay now try either alt
-  assert_equal(vk.lookup(km::tests::get_vk(
+  test_assert_equal(vk.lookup(km::tests::get_vk(
     "K_D"), LCTRLFLAG|LALTFLAG, found), u"K_D-LALTFLAG|K_CTRLFLAG");
-  assert_equal(vk.lookup(km::tests::get_vk(
+  test_assert_equal(vk.lookup(km::tests::get_vk(
     "K_D"), LCTRLFLAG|RALTFLAG, found), u"K_D-RALTFLAG|K_CTRLFLAG");
-  assert_equal(vk.lookup(km::tests::get_vk(
+  test_assert_equal(vk.lookup(km::tests::get_vk(
     "K_D"), RCTRLFLAG|LALTFLAG, found), u"K_D-LALTFLAG|K_CTRLFLAG");
-  assert_equal(vk.lookup(km::tests::get_vk(
+  test_assert_equal(vk.lookup(km::tests::get_vk(
     "K_D"), RCTRLFLAG|RALTFLAG, found), u"K_D-RALTFLAG|K_CTRLFLAG");
 
   // OOOkay now try either ctrl
-  assert_equal(vk.lookup(km::tests::get_vk(
+  test_assert_equal(vk.lookup(km::tests::get_vk(
     "K_E"), LCTRLFLAG|LALTFLAG, found), u"K_E-K_ALTFLAG|LCTRLFLAG");
-  assert_equal(vk.lookup(km::tests::get_vk(
+  test_assert_equal(vk.lookup(km::tests::get_vk(
     "K_E"), LCTRLFLAG|RALTFLAG, found), u"K_E-K_ALTFLAG|LCTRLFLAG");
-  assert_equal(vk.lookup(km::tests::get_vk(
+  test_assert_equal(vk.lookup(km::tests::get_vk(
     "K_E"), RCTRLFLAG|LALTFLAG, found), u"K_E-K_ALTFLAG|RCTRLFLAG");
-  assert_equal(vk.lookup(km::tests::get_vk(
+  test_assert_equal(vk.lookup(km::tests::get_vk(
     "K_E"), RCTRLFLAG|RALTFLAG, found), u"K_E-K_ALTFLAG|RCTRLFLAG");
 
   return EXIT_SUCCESS;
@@ -164,13 +164,13 @@ int test_uset() {
   };
 
   SimpleUSet u0(&r[0], 2);
-  assert_equal(u0.contains(0x62), true); // b
-  assert_equal(u0.contains(0x41), false); // A
-  assert_equal(u0.contains(0x127), true); // ħ
+  test_assert_equal(u0.contains(0x62), true); // b
+  test_assert_equal(u0.contains(0x41), false); // A
+  test_assert_equal(u0.contains(0x127), true); // ħ
 
   SimpleUSet uempty;
-  assert_equal(uempty.contains(0x62), false);
-  assert_equal(uempty.contains(0x127), false);
+  test_assert_equal(uempty.contains(0x62), false);
+  test_assert_equal(uempty.contains(0x127), false);
 
   return EXIT_SUCCESS;
 }
