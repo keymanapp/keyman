@@ -95,6 +95,38 @@ describe('Test of KVK-File-Writer', () => {
     //   const binary: BUILDER_KVK_FILE = writer['build'](vk);
     //   checkBuilderKvkFile(binary, vk);
     // });
+    it('can handle a null key text', () => {
+      const vk = initVisualKeyboard([
+        initVisualKeyboardKey(
+          0,
+          BUILDER_KVK_KEY_FLAGS.kvkkBitmap,
+          BUILDER_KVK_SHIFT_STATE.KVKS_NORMAL,
+          null,
+          null,
+        ),
+        initVisualKeyboardKey(1),
+        initVisualKeyboardKey(2),
+      ]);
+      const writer = new KvkFileWriter;
+      const binary: BUILDER_KVK_FILE = writer['build'](vk);
+      checkBuilderKvkFile(binary, vk);
+    });
+    it('can handle a non-null key bitmap', () => {
+      const vk = initVisualKeyboard([
+        initVisualKeyboardKey(
+          0,
+          BUILDER_KVK_KEY_FLAGS.kvkkBitmap,
+          BUILDER_KVK_SHIFT_STATE.KVKS_NORMAL,
+          "text",
+          [0],
+        ),
+        initVisualKeyboardKey(1),
+        initVisualKeyboardKey(2),
+      ]);
+      const writer = new KvkFileWriter;
+      const binary: BUILDER_KVK_FILE = writer['build'](vk);
+      checkBuilderKvkFile(binary, vk);
+    });
   });
   describe('Test of setString()', () => {
     it('can set a BUILDER_KVK_STRING', () => {
