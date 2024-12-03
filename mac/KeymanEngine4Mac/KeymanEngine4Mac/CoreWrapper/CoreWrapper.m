@@ -115,6 +115,7 @@ const int CORE_ENVIRONMENT_ARRAY_LENGTH = 6;
   
   if (dataError != nil) {
     os_log_error([KMELogs coreLog], "loadKeyboardUsingCore, path: %{public}@\n dataError: %{public}@", path, dataError);
+    [NSException raise:@"LoadKeyboardException" format:@"%@", dataError];
   } else {
     NSUInteger dataLength = data.length;
     os_log_info([KMELogs coreLog], "loadKeyboardUsingCore, path: %{public}@\n dataLength: %lu", path, dataLength);
