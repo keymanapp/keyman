@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.151 alpha 2024-12-03
+
+* feat(android): Enhance how ENTER key is handled for FV and KMSample2 (#12745)
+* feat(developer): report on mismatching lang tag scripts when building keyboard-info (#12753)
+
 ## 18.0.150 alpha 2024-12-02
 
 * fix(core,developer): use `NDEBUG` flag to disable assertions in release build (#12715)
