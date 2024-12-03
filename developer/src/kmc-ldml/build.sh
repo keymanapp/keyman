@@ -56,27 +56,12 @@ function do_build_fixtures() {
   node ../../../common/tools/hextobin/build/hextobin.js ./test/fixtures/basic.txt ./build/test/fixtures/basic-txt.kmx
 }
 
-function do_test() {
-  local MOCHA_FLAGS=
-
-  if [[ "${TEAMCITY_GIT_PATH:-}" != "" ]]; then
-    # we're running in TeamCity
-    MOCHA_FLAGS="-reporter mocha-teamcity-reporter"
-  fi
-
-  eslint .
-  cd test
-  tsc -b
-  cd ..
-  c8 --reporter=lcov --reporter=text mocha ${MOCHA_FLAGS} "${builder_extra_params[@]}"
-}
-
 builder_run_action clean           do_clean
 builder_run_action configure       do_configure
 builder_run_action build           do_build
 builder_run_action build-fixtures  do_build_fixtures
 builder_run_action api             api-extractor run --local --verbose
-builder_run_action test            do_test
+builder_run_action test            builder_do_typescript_tests
 
 #-------------------------------------------------------------------------------------------------------------------
 

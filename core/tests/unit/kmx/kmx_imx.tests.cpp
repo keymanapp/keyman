@@ -14,6 +14,7 @@
 #include <test_assert.h>
 #include <test_color.h>
 #include "../emscripten_filesystem.h"
+#include "../load_kmx_file.hpp"
 #include "utfcodec.hpp"
 
 #include <map>
@@ -164,7 +165,8 @@ void test_imx_list(const km::core::path &source_file){
 
   km::core::path full_path = source_file;
 
-  try_status(km_core_keyboard_load(full_path.native().c_str(), &test_kb));
+  auto blob = km::tests::load_kmx_file(full_path.native().c_str());
+  try_status(km_core_keyboard_load_from_blob(full_path.stem().c_str(), blob.data(), blob.size(), &test_kb));
 
   // Setup state, environment
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
@@ -179,14 +181,14 @@ void test_imx_list(const km::core::path &source_file){
     str.append(u":");
     str.append(imx_rule_it->function_name);
     auto extracted_library_function = convert<km_core_cu,char>(str);
-    assert(extracted_library_function == expected_imx_map[imx_rule_it->imx_id] );
+    test_assert(extracted_library_function == expected_imx_map[imx_rule_it->imx_id] );
     g_extract_imx_map[imx_rule_it->imx_id] = extracted_library_function;
     ++x;
   }
 
   std::cout << " X Value is " << x << std::endl;
 
-  assert(x==4);
+  test_assert(x==4);
   km_core_keyboard_imx_list_dispose(kb_imx_list);
 
   km_core_state_dispose(test_state);
@@ -211,7 +213,8 @@ void test_queue_actions (const km::core::path &source_keyboard) {
 
   km::core::path full_path = source_keyboard;
 
-  try_status(km_core_keyboard_load(full_path.native().c_str(), &test_kb));
+  auto blob = km::tests::load_kmx_file(full_path.native().c_str());
+  try_status(km_core_keyboard_load_from_blob(full_path.stem().c_str(), blob.data(), blob.size(), &test_kb));
 
   // Setup state, environment
   try_status(km_core_state_create(test_kb, test_env_opts, &test_state));
@@ -220,13 +223,13 @@ void test_queue_actions (const km::core::path &source_keyboard) {
 
   // Key Press that doesn't trigger a call back
   try_status(km_core_process_event(test_state, KM_CORE_VKEY_S,KM_CORE_MODIFIER_SHIFT, 1, KM_CORE_EVENT_FLAG_DEFAULT));
-  assert(action_items(test_state, {{KM_CORE_IT_CHAR, {0,}, {km_core_usv('S')}}, {KM_CORE_IT_END}}));
+  test_assert(action_items(test_state, {{KM_CORE_IT_CHAR, {0,}, {km_core_usv('S')}}, {KM_CORE_IT_END}}));
 
   try_status(km_core_process_event(test_state, KM_CORE_VKEY_BKSP, 0, 1, KM_CORE_EVENT_FLAG_DEFAULT));
-  assert(action_items(test_state, {{KM_CORE_IT_CHAR, {0,}, {km_core_usv('X')}}, {KM_CORE_IT_ALERT, {0,}, {0}}, {KM_CORE_IT_END}}));
+  test_assert(action_items(test_state, {{KM_CORE_IT_CHAR, {0,}, {km_core_usv('X')}}, {KM_CORE_IT_ALERT, {0,}, {0}}, {KM_CORE_IT_END}}));
 
   try_status(km_core_process_event(test_state, KM_CORE_VKEY_ESC, 0, 1, KM_CORE_EVENT_FLAG_DEFAULT));
-  assert(action_items(test_state, { {KM_CORE_IT_CHAR, {0,}, {km_core_usv('Y')}},
+  test_assert(action_items(test_state, { {KM_CORE_IT_CHAR, {0,}, {km_core_usv('Y')}},
                                     {KM_CORE_IT_MARKER, {0,}, {1}},
                                     {KM_CORE_IT_CHAR, {0,}, {km_core_usv('A')}},
                                     {KM_CORE_IT_END}}));
@@ -236,10 +239,10 @@ void test_queue_actions (const km::core::path &source_keyboard) {
   km_core_action_item bksp_a = {KM_CORE_IT_BACK};
   bksp_a.backspace.expected_type = KM_CORE_BT_CHAR;
   bksp_a.backspace.expected_value = 'A';
-  assert(action_items(test_state, {bksp_a,{KM_CORE_IT_CHAR, {0,}, {km_core_usv('Z')}}, {KM_CORE_IT_END}}));
+  test_assert(action_items(test_state, {bksp_a,{KM_CORE_IT_CHAR, {0,}, {km_core_usv('Z')}}, {KM_CORE_IT_END}}));
 
   try_status(km_core_process_event(test_state, KM_CORE_VKEY_2, 0, 1, KM_CORE_EVENT_FLAG_DEFAULT));
-  assert(action_items(test_state, {{KM_CORE_IT_INVALIDATE_CONTEXT, {0,}, {0}}, {KM_CORE_IT_END}}));
+  test_assert(action_items(test_state, {{KM_CORE_IT_INVALIDATE_CONTEXT, {0,}, {0}}, {KM_CORE_IT_END}}));
 
   km_core_state_imx_deregister_callback(test_state);
   km_core_keyboard_imx_list_dispose(kb_imx_list);
