@@ -50,6 +50,51 @@ describe('Test of KVK-File-Writer', () => {
       const binary: BUILDER_KVK_FILE = writer['build'](vk);
       checkBuilderKvkFile(binary, vk);
     });
+    // it('can handle a null associatedKeyboard', () => {
+    //   const vk = initVisualKeyboard([
+    //     initVisualKeyboardKey(0),
+    //     initVisualKeyboardKey(1),
+    //     initVisualKeyboardKey(2),
+    //   ],
+    //   BUILDER_KVK_HEADER_FLAGS.kvkhNone,
+    //   null,
+    //   DEFAULT_KVK_FONT,
+    //   DEFAULT_KVK_FONT,
+    // );
+    //   const writer = new KvkFileWriter;
+    //   const binary: BUILDER_KVK_FILE = writer['build'](vk);
+    //   checkBuilderKvkFile(binary, vk);
+    // });
+    // it('can handle a null ansiFont name', () => {
+    //   const vk = initVisualKeyboard([
+    //     initVisualKeyboardKey(0),
+    //     initVisualKeyboardKey(1),
+    //     initVisualKeyboardKey(2),
+    //   ],
+    //   BUILDER_KVK_HEADER_FLAGS.kvkhNone,
+    //   "associatedKeyboard",
+    //   { name: null, size: -12 },
+    //   DEFAULT_KVK_FONT,
+    // );
+    //   const writer = new KvkFileWriter;
+    //   const binary: BUILDER_KVK_FILE = writer['build'](vk);
+    //   checkBuilderKvkFile(binary, vk);
+    // });
+    // it('can handle a null unicodeFont name', () => {
+    //   const vk = initVisualKeyboard([
+    //     initVisualKeyboardKey(0),
+    //     initVisualKeyboardKey(1),
+    //     initVisualKeyboardKey(2),
+    //   ],
+    //   BUILDER_KVK_HEADER_FLAGS.kvkhNone,
+    //   "associatedKeyboard",
+    //   DEFAULT_KVK_FONT,
+    //   { name: null, size: -12 },
+    // );
+    //   const writer = new KvkFileWriter;
+    //   const binary: BUILDER_KVK_FILE = writer['build'](vk);
+    //   checkBuilderKvkFile(binary, vk);
+    // });
   });
   describe('Test of setString()', () => {
     it('can set a BUILDER_KVK_STRING', () => {
@@ -112,14 +157,26 @@ function initVisualKeyboardKey(
 function checkBuilderKvkFile(binary: BUILDER_KVK_FILE, vk: VisualKeyboard) {
   assert.equal(binary.header.identifier, BUILDER_KVK_HEADER_IDENTIFIER);
   assert.equal(binary.header.version, BUILDER_KVK_HEADER_VERSION);
-  assert.deepEqual(binary.header.associatedKeyboard.str, vk.header.associatedKeyboard);
+  if (vk.header.associatedKeyboard != null) {
+    assert.deepEqual(binary.header.associatedKeyboard.str, vk.header.associatedKeyboard);
+  } else {
+    assert.deepEqual(binary.header.associatedKeyboard.str, '');
+  }
   assert.equal(binary.header.flags, vk.header.flags);
   assert.equal(binary.header.ansiFont.color, VISUAL_KEYBOARD_TEXT_COLOR);
   assert.equal(binary.header.ansiFont.size, vk.header.ansiFont.size);
-  assert.deepEqual(binary.header.ansiFont.name.str, vk.header.ansiFont.name);
+  if (vk.header.ansiFont.name != null) {
+    assert.deepEqual(binary.header.ansiFont.name.str, vk.header.ansiFont.name);
+  } else {
+    assert.deepEqual(binary.header.ansiFont.name.str, '');
+  }
   assert.equal(binary.header.unicodeFont.color, VISUAL_KEYBOARD_TEXT_COLOR);
   assert.equal(binary.header.unicodeFont.size, vk.header.unicodeFont.size);
-  assert.deepEqual(binary.header.unicodeFont.name.str, vk.header.unicodeFont.name);
+  if (vk.header.unicodeFont.name != null) {
+    assert.deepEqual(binary.header.unicodeFont.name.str, vk.header.unicodeFont.name);
+  } else {
+    assert.deepEqual(binary.header.unicodeFont.name.str, '');
+  }
   for (let idx=0; idx<binary.keys.length; idx++) {
     checkBuilderKvkKey(binary.keys[idx], vk.keys[idx])
   }
