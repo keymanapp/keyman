@@ -141,15 +141,17 @@ function initVisualKeyboard(
 
 function initVisualKeyboardKey(
   index: number,
-  flags: BUILDER_KVK_KEY_FLAGS   = BUILDER_KVK_KEY_FLAGS.kvkkBitmap,
+  flags: BUILDER_KVK_KEY_FLAGS = BUILDER_KVK_KEY_FLAGS.kvkkBitmap,
   shift: BUILDER_KVK_SHIFT_STATE = BUILDER_KVK_SHIFT_STATE.KVKS_NORMAL,
+  text:  string = "text",
+  bitmap: number[] = null,
 ): VisualKeyboardKey {
   const vkk: VisualKeyboardKey = {
     flags: flags,
     shift: shift,
     vkey: index,
-    text: "text",
-    bitmap: new Uint8Array([index]),
+    text: text,
+    bitmap: bitmap ? new Uint8Array(bitmap) : null,
   };
   return vkk;
 }
@@ -186,7 +188,16 @@ function checkBuilderKvkKey(target: BUILDER_KVK_KEY, source: VisualKeyboardKey) 
   assert.equal(target.flags, source.flags);
   assert.equal(target.shift, source.shift);
   assert.equal(target.vkey,  source.vkey);
-  assert.deepEqual(target.text.str, source.text);
-  assert.equal(target.bitmapSize, source.bitmap.byteLength);
-  assert.deepEqual(target.bitmapData, Array.from(source.bitmap));
+  if (source.text != null) {
+    assert.deepEqual(target.text.str, source.text);
+  } else {
+    assert.deepEqual(target.text.str, '');
+  }
+  if (source.bitmap != null) {
+    assert.equal(target.bitmapSize, source.bitmap.byteLength);
+    assert.deepEqual(target.bitmapData, Array.from(source.bitmap));
+  } else {
+    assert.equal(target.bitmapSize, 0);
+    assert.deepEqual(target.bitmapData, []);
+  }
 }
