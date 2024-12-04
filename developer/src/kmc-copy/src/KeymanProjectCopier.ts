@@ -4,7 +4,7 @@
  * Copy a keyboard or lexical model project
  */
 
-import { GitHubUrls, CompilerCallbacks, CompilerLogLevel, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KeymanDeveloperProject, KeymanDeveloperProjectOptions, KPJFileReader, KPJFileWriter, KpsFileReader, KpsFileWriter } from "@keymanapp/developer-utils";
+import { CloudUrls, GitHubUrls, CompilerCallbacks, CompilerLogLevel, KeymanCompiler, KeymanCompilerArtifact, KeymanCompilerArtifacts, KeymanCompilerResult, KeymanDeveloperProject, KeymanDeveloperProjectOptions, KPJFileReader, KPJFileWriter, KpsFileReader, KpsFileWriter } from "@keymanapp/developer-utils";
 import { KeymanFileTypes } from "@keymanapp/common-types";
 
 import { CopierMessages } from "./copier-messages.js";
@@ -14,9 +14,6 @@ import { GitHubRef, KeymanCloudSource } from "./cloud.js";
 type CopierFunction = (
   project: KeymanDeveloperProject, filename: string, outputPath: string, source: string, result: CopierResult
 ) => Promise<boolean>;
-
-const KEYMANCOM_CLOUD_URI = /^(?:http(?:s)?:\/\/)?keyman\.com\/keyboards\/(?<id>[a-z0-9_.-]+)/i;
-const CLOUD_URI = /^cloud:(?<id>.+)$/i;
 
 /**
  * @public
@@ -160,7 +157,7 @@ export class KeymanProjectCopier implements KeymanCompiler {
     if(source.match(GitHubUrls.GITHUB_URI_OPTIONAL_PROTOCOL) || source.match(GitHubUrls.GITHUB_RAW_URI)) {
       // `[https://]github.com/owner/repo/[tree|blob|raw]/[refs/...]/branch/path/to/kpj`, referencing a .kpj file
       return await this.getGitHubSourceProject(source);
-    } else if(source.match(CLOUD_URI) || source.match(KEYMANCOM_CLOUD_URI)) {
+    } else if(source.match(CloudUrls.CLOUD_URI) || source.match(CloudUrls.KEYMANCOM_CLOUD_URI)) {
       // `cloud:id`, referencing a Keyman Cloud keyboard
       return await this.getCloudSourceProject(source);
     } else if(this.callbacks.fs.existsSync(source) && source.endsWith(KeymanFileTypes.Source.Project) && !this.callbacks.isDirectory(source)) {
@@ -224,8 +221,8 @@ export class KeymanProjectCopier implements KeymanCompiler {
       }
     }
     if(!ref.path) {
-      ref.path = '/'
-    };
+      ref.path = '/';
+    }
     if(!ref.path.startsWith('/')) {
       ref.path = '/' + ref.path;
     }
@@ -256,11 +253,13 @@ export class KeymanProjectCopier implements KeymanCompiler {
    * @returns a promise: GitHub reference to the source for the keyboard, or null on failure
    */
   private async getCloudSourceProject(source: string): Promise<GitHubRef> {
-    const parts = CLOUD_URI.exec(source) ?? KEYMANCOM_CLOUD_URI.exec(source);
+    const parts = CloudUrls.CLOUD_URI.exec(source) ?? CloudUrls.KEYMANCOM_CLOUD_URI.exec(source);
+    if(!parts) {
+      throw new Error('Expected CLOUD_URI or KEYMANCOM_CLOUD_URI to match');
+    }
+
     const id: string = parts.groups.id;
-
     const isModel = /^[^.]+\.[^.]+\.[^.]+$/.test(id);
-
     const remote = await this.cloudSource.getSourceFromKeymanCloud(id, isModel);
     if(!remote) {
       return null;
