@@ -5,14 +5,10 @@ import { TestCompilerCallbacks, verifyCompilerMessagesObject } from '@keymanapp/
 import { KmpJsonFile, KeymanFileTypes } from '@keymanapp/common-types';
 import { CompilerErrorNamespace } from '@keymanapp/developer-utils';
 import { makePathToFixture } from './helpers/index.js';
-import { KeyboardInfoCompiler, KeyboardInfoCompilerResult } from '../src/keyboard-info-compiler.js';
+import { KeyboardInfoCompiler } from '../src/keyboard-info-compiler.js';
 import { KeyboardInfoFile } from '../src/keyboard-info-file.js';
 
 const callbacks = new TestCompilerCallbacks();
-
-beforeEach(function() {
-  callbacks.clear();
-});
 
 const KHMER_ANGKOR_JS  = makePathToFixture('khmer_angkor', 'build', 'khmer_angkor.js');
 const KHMER_ANGKOR_KPS = makePathToFixture('khmer_angkor', 'source', 'khmer_angkor.kps');
@@ -27,6 +23,17 @@ const KHMER_ANGKOR_SOURCES = {
 };
 
 describe('KeyboardInfoCompilerMessages', function () {
+
+  this.beforeEach(function() {
+    callbacks.clear();
+  });
+
+  this.afterEach(function() {
+    if(this.currentTest?.isFailed()) {
+      callbacks.printMessages();
+    }
+  })
+
   it('should have a valid KeyboardInfoCompilerMessages object', function() {
     return verifyCompilerMessagesObject(KeyboardInfoCompilerMessages, CompilerErrorNamespace.KeyboardInfoCompiler);
   });
@@ -43,13 +50,7 @@ describe('KeyboardInfoCompilerMessages', function () {
 
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
-    let result: KeyboardInfoCompilerResult = null;
-    try {
-      result = await compiler.run(KHMER_ANGKOR_KMP, null);
-    } catch(e) {
-      callbacks.printMessages();
-      throw e;
-    }
+    const result = await compiler.run(KHMER_ANGKOR_KMP, null);
     assert.isNull(result);
 
     assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.ERROR_FileDoesNotExist),
@@ -77,13 +78,7 @@ describe('KeyboardInfoCompilerMessages', function () {
     assert.isTrue(await compiler.init(callbacks, {sources}));
     // stubbing fillLanguages internal function to avoid pulling in font resources in fixture
     compiler['fillLanguages'] = async (_kpsFilename: string, _keyboard_info: KeyboardInfoFile, _kmpJsonData:  KmpJsonFile.KmpJsonFile): Promise<boolean> => true;
-    let result: KeyboardInfoCompilerResult = null;
-    try {
-      result = await compiler.run(kmpFilename, null);
-    } catch(e) {
-      callbacks.printMessages();
-      throw e;
-    }
+    const result = await compiler.run(kmpFilename, null);
     assert.isNull(result);
 
     assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.ERROR_FileDoesNotExist),
@@ -216,13 +211,7 @@ describe('KeyboardInfoCompilerMessages', function () {
 
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
-    let result: KeyboardInfoCompilerResult = null;
-    try {
-      result = await compiler.run(kmpFilename, null);
-    } catch(e) {
-      callbacks.printMessages();
-      throw e;
-    }
+    const result = await compiler.run(kmpFilename, null);
     assert.isNull(result);
 
     assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.ERROR_CannotBuildWithoutKmpFile),
@@ -246,13 +235,7 @@ describe('KeyboardInfoCompilerMessages', function () {
 
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
-    let result: KeyboardInfoCompilerResult = null;
-    try {
-      result = await compiler.run(kmpFilename, null);
-    } catch(e) {
-      callbacks.printMessages();
-      throw e;
-    }
+    const result = await compiler.run(kmpFilename, null);
     assert.isNull(result);
 
     assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.ERROR_NoLicenseFound),
@@ -305,19 +288,35 @@ describe('KeyboardInfoCompilerMessages', function () {
 
     const compiler = new KeyboardInfoCompiler();
     assert.isTrue(await compiler.init(callbacks, {sources}));
-    let result: KeyboardInfoCompilerResult = null;
-    try {
-      result = await compiler.run(kmpFilename, null);
-    } catch(e) {
-      callbacks.printMessages();
-      throw e;
-    }
+    const result = await compiler.run(kmpFilename, null);
     assert.isNull(result);
 
     assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.ERROR_InvalidAuthorEmail),
       `ERROR_InvalidAuthorEmail not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
   });
 
+  // HINT_ScriptDoesNotMatch
+
+  it('should generate HINT_ScriptDoesNotMatch if there is a mismatching language script in .kps', async function() {
+    const jsFilename = makePathToFixture('hint_script_does_not_match', 'build', 'khmer_angkor.js');
+    const kpsFilename = makePathToFixture('hint_script_does_not_match', 'source', 'khmer_angkor.kps');
+    const kmpFilename = makePathToFixture('hint_script_does_not_match', 'build', 'khmer_angkor.kmp');
+
+    const sources = {
+      kmpFilename,
+      sourcePath: 'release/h/hint_script_does_not_match',
+      kpsFilename,
+      jsFilename: jsFilename,
+      forPublishing: true,
+    };
+
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    const result = await compiler.run(kmpFilename, null);
+    assert.isNotNull(result);
+
+    assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.HINT_ScriptDoesNotMatch));
+  });
 });
 
 function nodeCompilerMessage(ncb: TestCompilerCallbacks, code: number): string {
