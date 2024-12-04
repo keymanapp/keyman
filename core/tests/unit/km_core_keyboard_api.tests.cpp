@@ -10,18 +10,6 @@
 
 km::core::path test_dir;
 
-// #if defined(__GNUC__) || defined(__clang__)
-// #define PRAGMA(X) _Pragma(#X)
-// #define DISABLE_WARNING_PUSH PRAGMA(GCC diagnostic push)
-// #define DISABLE_WARNING_POP PRAGMA(GCC diagnostic pop)
-// #define DISABLE_WARNING(W) PRAGMA(GCC diagnostic ignored #W)
-// #define DISABLE_WARNING_DEPRECATED_DECLARATIONS DISABLE_WARNING(-Wdeprecated-declarations)
-// #else
-// #define DISABLE_WARNING_PUSH
-// #define DISABLE_WARNING_POP
-// #define DISABLE_WARNING_DEPRECATED_DECLARATIONS
-// #endif
-
 class KmCoreKeyboardApiTests : public testing::Test {
 protected:
   km_core_keyboard* keyboard = nullptr;

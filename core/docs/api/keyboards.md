@@ -106,8 +106,8 @@ typedef struct {
 
 ## Description
 
-Parse and load keyboard from the supplied blob and size and a pointer to the
-loaded keyboard into the out paramter.
+Parse and load a keyboard from the supplied blob and return a pointer to the
+loaded keyboard in the out parameter.
 
 ## Specification
 
