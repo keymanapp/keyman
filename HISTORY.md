@@ -1,5 +1,12 @@
 # Keyman Version History
 
+## 18.0.152 alpha 2024-12-04
+
+* refactor(mac): pass kmx data blob to keyman core instead of file path (#12760)
+* fix(developer): honour provided script when checking for matching scripts (#12768)
+* chore(common): rename test files (#12709)
+* fix(common): rename test file (#12770)
+
 ## 18.0.151 alpha 2024-12-03
 
 * feat(android): Enhance how ENTER key is handled for FV and KMSample2 (#12745)
