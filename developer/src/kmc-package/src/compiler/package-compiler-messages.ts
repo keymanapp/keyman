@@ -81,9 +81,11 @@ export class PackageCompilerMessages {
   static Error_PackageNameCannotBeBlank = () => m(this.ERROR_PackageNameCannotBeBlank,
     `Package name cannot be an empty string.`);
 
-    static ERROR_KeyboardFileNotFound = SevError | 0x0011;
-    static Error_KeyboardFileNotFound = (o:{filename:string}) => m(this.ERROR_KeyboardFileNotFound,
-      `Keyboard file ${def(o.filename)} was not found. Has it been compiled?`);
+  static ERROR_KeyboardFileNotFound = SevError | 0x0011;
+  static Error_KeyboardFileNotFound = (o:{filename:string}) => m(
+    this.ERROR_KeyboardFileNotFound,
+    `Keyboard file ${def(o.filename)} was not found. Has it been compiled?`
+  );
 
   static WARN_KeyboardVersionsDoNotMatch = SevWarn | 0x0012;
   static Warn_KeyboardVersionsDoNotMatch = (o: {keyboard:string, version:string, firstKeyboard:string, firstVersion:string}) => m(this.WARN_KeyboardVersionsDoNotMatch,
