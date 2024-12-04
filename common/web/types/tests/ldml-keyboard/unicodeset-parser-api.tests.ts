@@ -1,8 +1,8 @@
 /*
  * Keyman is copyright (C) SIL Global. MIT License.
- * 
+ *
  * Created by Dr Mark C. Sinclair on 2024-11-29
- * 
+ *
  * Test code for unicodeset-parser-api.ts
  */
 
