@@ -58,7 +58,7 @@ void test_external_event(const km::core::path &source_file){
 
   try_status(km_core_event(test_state, event, nullptr));
   // The action to turn capslock off must be in the actions list.
-  assert(action_items(test_state, {{KM_CORE_IT_CAPSLOCK, {0,}, {0}}, {KM_CORE_IT_END}}));
+  test_assert(action_items(test_state, {{KM_CORE_IT_CAPSLOCK, {0,}, {0}}, {KM_CORE_IT_END}}));
 
   km_core_state_dispose(test_state);
   km_core_keyboard_dispose(test_kb);

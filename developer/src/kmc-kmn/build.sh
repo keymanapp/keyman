@@ -62,20 +62,8 @@ function do_build() {
 }
 
 function do_test() {
-  local MOCHA_FLAGS=
-
-  if [[ "${TEAMCITY_GIT_PATH:-}" != "" ]]; then
-    # we're running in TeamCity
-    MOCHA_FLAGS="-reporter mocha-teamcity-reporter"
-  fi
-
   copy_deps
-  tsc --build test/
-  npm run lint
-  readonly C8_THRESHOLD=80
-  c8 --reporter=lcov --reporter=text --lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD mocha ${MOCHA_FLAGS}
-  builder_echo warning "Coverage thresholds are currently $C8_THRESHOLD%, which is lower than ideal."
-  builder_echo warning "Please increase threshold in build.sh as test coverage improves."
+  builder_do_typescript_tests 80
 }
 
 builder_run_action build      do_build

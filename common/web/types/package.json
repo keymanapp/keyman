@@ -23,7 +23,7 @@
     "build": "tsc -b",
     "build:schema": "ajv compile",
     "lint": "eslint .",
-    "test": "npm run lint && cd test && tsc -b && cd .. && c8 --skip-full --reporter=lcov --reporter=text mocha"
+    "test": "npm run lint && cd tests && tsc -b && cd .. && c8 --skip-full --reporter=lcov --reporter=text mocha"
   },
   "author": "Marc Durdin <marc@keyman.com> (https://github.com/mcdurdin)",
   "license": "MIT",
@@ -48,7 +48,7 @@
     "typescript": "^5.4.5"
   },
   "mocha": {
-    "spec": "build/test/**/test-*.js",
+    "spec": "build/tests/**/*.tests.js",
     "require": [
       "source-map-support/register"
     ]
@@ -76,7 +76,7 @@
       "src/keyman-touch-layout/keyman-touch-layout-file-writer.ts",
       "src/osk/osk.ts",
       "src/schemas/*",
-      "test/"
+      "tests/"
     ]
   },
   "sideEffects": false

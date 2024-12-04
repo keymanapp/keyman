@@ -27,43 +27,11 @@ builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
 
-if builder_start_action clean; then
-  rm -rf ./build/ ./tsconfig.tsbuildinfo
-  builder_finish_action success clean
-fi
-
-#-------------------------------------------------------------------------------------------------------------------
-
-if builder_start_action configure; then
-  verify_npm_setup
-  builder_finish_action success configure
-fi
-
-#-------------------------------------------------------------------------------------------------------------------
-
-if builder_start_action build; then
-  npm run build
-  builder_finish_action success build
-fi
-
-builder_run_action api        api-extractor run --local --verbose
-
-#-------------------------------------------------------------------------------------------------------------------
-
-function do_test() {
-  local MOCHA_FLAGS=
-
-  if [[ "${TEAMCITY_GIT_PATH:-}" != "" ]]; then
-    # we're running in TeamCity
-    MOCHA_FLAGS="-reporter mocha-teamcity-reporter"
-  fi
-  eslint .
-  tsc --build test
-  c8 --reporter=lcov --reporter=text --exclude-after-remap --check-coverage=false --lines 80 mocha ${MOCHA_FLAGS}
-  # TODO: remove --lines 80 and improve coverage
-}
-
-builder_run_action test    do_test
+builder_run_action clean        rm -rf ./build/ ./tsconfig.tsbuildinfo
+builder_run_action configure    verify_npm_setup
+builder_run_action build        tsc --build
+builder_run_action api          api-extractor run --local --verbose
+builder_run_action test         builder_do_typescript_tests 80
 
 #-------------------------------------------------------------------------------------------------------------------
 

@@ -37,14 +37,14 @@ void test_kmcmp_parseUnicodeSet() {
     uint32_t buf[bufsiz];
     uintptr_t buf_ = reinterpret_cast<uintptr_t>(buf);
     int rc = kmcmp_parseUnicodeSet(u8"[]", buf_, bufsiz);
-    assert(rc == KMCMP_USET_OK);
+    test_assert(rc == KMCMP_USET_OK);
   }
   {
     // preflight null test
     const auto bufsiz = 0;
     uintptr_t buf_ = 0L;
     int rc = kmcmp_parseUnicodeSet(u8"[]", buf_, bufsiz);
-    assert(rc == KMCMP_USET_OK); // == 0
+    test_assert(rc == KMCMP_USET_OK); // == 0
   }
   {
     // basic test
@@ -52,17 +52,17 @@ void test_kmcmp_parseUnicodeSet() {
     uint32_t buf[bufsiz];
     uintptr_t buf_ = reinterpret_cast<uintptr_t>(buf);
     int rc = kmcmp_parseUnicodeSet(u8"[x A-C]", buf_, bufsiz);
-    assert(rc == 2);
-    assert(buf[0] == 0x41);
-    assert(buf[1] == 0x43);
-    assert(buf[2] == 0x78);
-    assert(buf[3] == 0x78);
+    test_assert(rc == 2);
+    test_assert(buf[0] == 0x41);
+    test_assert(buf[1] == 0x43);
+    test_assert(buf[2] == 0x78);
+    test_assert(buf[3] == 0x78);
   }
   {
     uintptr_t buf_ = 0L;
     const auto bufsiz = 0;
     int rc = kmcmp_parseUnicodeSet(u8"[x A-C]", buf_, bufsiz); // preflight
-    assert(rc == 2); // 2 ranges
+    test_assert(rc == 2); // 2 ranges
   }
   {
     // bigger test
@@ -70,11 +70,11 @@ void test_kmcmp_parseUnicodeSet() {
     uint32_t buf[bufsiz];
     uintptr_t buf_ = reinterpret_cast<uintptr_t>(buf);
     int rc = kmcmp_parseUnicodeSet(u8"[[🙀A-C]-[CB]]", buf_, bufsiz);
-    assert(rc == 2);
-    assert(buf[0] == 0x41);
-    assert(buf[1] == 0x41);
-    assert(buf[2] == 0x1F640);
-    assert(buf[3] == 0x1F640);
+    test_assert(rc == 2);
+    test_assert(buf[0] == 0x41);
+    test_assert(buf[1] == 0x41);
+    test_assert(buf[2] == 0x1F640);
+    test_assert(buf[3] == 0x1F640);
   }
   {
     // overflow test
@@ -82,7 +82,7 @@ void test_kmcmp_parseUnicodeSet() {
     uint32_t buf[bufsiz];
     uintptr_t buf_ = reinterpret_cast<uintptr_t>(buf);
     int rc = kmcmp_parseUnicodeSet(u8"[x A-C]", buf_, bufsiz);
-    assert(rc == KMCMP_FATAL_OUT_OF_RANGE);
+    test_assert(rc == KMCMP_FATAL_OUT_OF_RANGE);
   }
   {
     // err test
@@ -90,7 +90,7 @@ void test_kmcmp_parseUnicodeSet() {
     uint32_t buf[bufsiz];
     uintptr_t buf_ = reinterpret_cast<uintptr_t>(buf);
     int rc = kmcmp_parseUnicodeSet(u8"[:Adlm:]", buf_, bufsiz);
-    assert(rc == KMCMP_ERROR_UNSUPPORTED_PROPERTY);
+    test_assert(rc == KMCMP_ERROR_UNSUPPORTED_PROPERTY);
   }
   {
     // err test
@@ -98,7 +98,7 @@ void test_kmcmp_parseUnicodeSet() {
     uint32_t buf[bufsiz];
     uintptr_t buf_ = reinterpret_cast<uintptr_t>(buf);
     int rc = kmcmp_parseUnicodeSet(u8"[[\\p{Mn}]&[A-Z]]", buf_, bufsiz);
-    assert(rc == KMCMP_ERROR_UNSUPPORTED_PROPERTY);
+    test_assert(rc == KMCMP_ERROR_UNSUPPORTED_PROPERTY);
   }
   {
     // err test
@@ -106,7 +106,7 @@ void test_kmcmp_parseUnicodeSet() {
     uint32_t buf[bufsiz];
     uintptr_t buf_ = reinterpret_cast<uintptr_t>(buf);
     int rc = kmcmp_parseUnicodeSet(u8"[abc{def}]", buf_, bufsiz);
-    assert(rc == KMCMP_ERROR_HAS_STRINGS);
+    test_assert(rc == KMCMP_ERROR_HAS_STRINGS);
   }
   {
     // err test
@@ -114,34 +114,34 @@ void test_kmcmp_parseUnicodeSet() {
     uint32_t buf[bufsiz];
     uintptr_t buf_ = reinterpret_cast<uintptr_t>(buf);
     int rc = kmcmp_parseUnicodeSet(u8"[[]", buf_, bufsiz);
-    assert(rc == KMCMP_ERROR_SYNTAX_ERR);
+    test_assert(rc == KMCMP_ERROR_SYNTAX_ERR);
   }
   {
     // preflight err test
     const auto bufsiz = 0; // preflight
     uintptr_t buf_ = 0L;
     int rc = kmcmp_parseUnicodeSet(u8"[:Adlm:]", buf_, bufsiz);
-    assert(rc == KMCMP_ERROR_UNSUPPORTED_PROPERTY);
+    test_assert(rc == KMCMP_ERROR_UNSUPPORTED_PROPERTY);
   }
   {
     // preflight err test
     const auto bufsiz = 0; // preflight
     uintptr_t buf_ = 0L;
     int rc = kmcmp_parseUnicodeSet(u8"[[\\p{Mn}]&[A-Z]]", buf_, bufsiz);
-    assert(rc == KMCMP_ERROR_UNSUPPORTED_PROPERTY);
+    test_assert(rc == KMCMP_ERROR_UNSUPPORTED_PROPERTY);
   }
   {
     // preflight err test
     const auto bufsiz = 0; // preflight
     uintptr_t buf_ = 0L;
     int rc = kmcmp_parseUnicodeSet(u8"[abc{def}]", buf_, bufsiz);
-    assert(rc == KMCMP_ERROR_HAS_STRINGS);
+    test_assert(rc == KMCMP_ERROR_HAS_STRINGS);
   }
   {
     // preflight err test
     const auto bufsiz = 0; // preflight
     uintptr_t buf_ = 0L;
     int rc = kmcmp_parseUnicodeSet(u8"[[]", buf_, bufsiz);
-    assert(rc == KMCMP_ERROR_SYNTAX_ERR);
+    test_assert(rc == KMCMP_ERROR_SYNTAX_ERR);
   }
 }
