@@ -7,7 +7,7 @@ import {
   VisualKeyboard
 } from 'keyman/engine/osk';
 import { ErrorStub, KeyboardStub, CloudQueryResult, toPrefixedKeyboardId as prefixed } from 'keyman/engine/keyboard-storage';
-import { DeviceSpec, JSKeyboard } from "keyman/engine/keyboard";
+import { DeviceSpec, JSKeyboard, Keyboard } from "keyman/engine/keyboard";
 import KeyboardObject = KeymanWebKeyboard.KeyboardObject;
 
 import * as views from './viewsAnchorpoint.js';
@@ -425,7 +425,7 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
    * See https://help.keyman.com/developer/engine/web/current-version/reference/core/isCJK
    */
   public isCJK(k0?: KeyboardObject | ReturnType<KeymanEngine['_GetKeyboardDetail']> /* [b/c Toolbar UI]*/) {
-    let kbd: JSKeyboard;
+    let kbd: Keyboard;
     if(k0) {
       let kbdDetail = k0 as ReturnType<KeymanEngine['_GetKeyboardDetail']>;
       if(kbdDetail.KeyboardID){
@@ -437,7 +437,8 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
       kbd = this.core.activeKeyboard;
     }
 
-    return kbd && kbd.isCJK;
+    // TODO-web-core: implement for KMX keyboards if needed
+    return kbd && kbd instanceof JSKeyboard && kbd.isCJK;
   }
 
   /**
@@ -453,7 +454,12 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     const stub = this.keyboardRequisitioner.cache.getStub(PInternalName, PlgCode);
     const keyboard = this.keyboardRequisitioner.cache.getKeyboardForStub(stub);
 
-    return stub && this._GetKeyboardDetail(stub, keyboard);
+    if (keyboard instanceof JSKeyboard) {
+      return stub && this._GetKeyboardDetail(stub, keyboard);
+    } else {
+      // TODO-web-core: implement for KMX keyboards if needed
+      return null;
+    }
   }
 
   /**
@@ -478,8 +484,12 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
       // In Chrome, (including on Android), Array.prototype.find() requires Chrome 45.
       // This is a later version than the default on our oldest-supported Android devices.
       const Lkbd = cache.getKeyboardForStub(Lstub);
-      const Lrn = this._GetKeyboardDetail(Lstub, Lkbd);  // I2078 - Full keyboard detail
-      Lr.push(Lrn);
+      if (Lkbd instanceof JSKeyboard) {
+        const Lrn = this._GetKeyboardDetail(Lstub, Lkbd);  // I2078 - Full keyboard detail
+        Lr.push(Lrn);
+      } else {
+        // TODO-web-core: implement for KMX keyboards if needed
+      }
     }
     return Lr;
   }
@@ -669,13 +679,17 @@ export default class KeymanEngine extends KeymanEngineBase<BrowserConfiguration,
     argFormFactor?: DeviceSpec.FormFactor,
     argLayerId?: string
   ): HTMLElement {
-    let PKbd: JSKeyboard = null;
+    let PKbd: Keyboard = null;
 
     if(PInternalName != null) {
       PKbd = this.keyboardRequisitioner.cache.getKeyboard(PInternalName);
     }
 
     PKbd = PKbd || this.core.activeKeyboard;
+    if (!(PKbd instanceof JSKeyboard)) {
+      // TODO-web-core: implement for KMX keyboards if needed
+      return null;
+    }
     let Pstub = this.keyboardRequisitioner.cache.getStub(PKbd);
 
     // help.keyman.com will set this function in place to specify the desired

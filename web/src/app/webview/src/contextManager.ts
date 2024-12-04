@@ -1,4 +1,4 @@
-import { type JSKeyboard  } from 'keyman/engine/keyboard';
+import { JSKeyboard, Keyboard  } from 'keyman/engine/keyboard';
 import { Mock, OutputTarget, Transcription, findCommonSubstringEndIndex, isEmptyTransform, TextTransform } from 'keyman/engine/js-processor';
 import { KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { ContextManagerBase } from 'keyman/engine/main';
@@ -192,7 +192,7 @@ export default class ContextManager extends ContextManagerBase<WebviewConfigurat
   protected prepareKeyboardForActivation(
     keyboardId: string,
     languageCode?: string
-  ): {keyboard: Promise<JSKeyboard>, metadata: KeyboardStub} {
+  ): {keyboard: Promise<Keyboard>, metadata: KeyboardStub} {
     const originalKeyboard = this.activeKeyboard;
     const activatingKeyboard = super.prepareKeyboardForActivation(keyboardId, languageCode);
 
@@ -203,7 +203,10 @@ export default class ContextManager extends ContextManagerBase<WebviewConfigurat
     // That said, it's best to keep it around for now and verify later.
     if(originalKeyboard?.metadata?.id == activatingKeyboard?.metadata?.id) {
       activatingKeyboard.keyboard = activatingKeyboard.keyboard.then((kbd) => {
-        kbd.refreshLayouts()
+        // TODO-web-core: Do we need to refresh layouts for KMX keyboards also?
+        if (kbd instanceof JSKeyboard) {
+          kbd.refreshLayouts();
+        }
         return kbd;
       });
     }

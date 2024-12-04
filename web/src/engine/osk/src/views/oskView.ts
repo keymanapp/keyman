@@ -59,6 +59,11 @@ export interface LegacyOSKEventMap {
   }): void;
 }
 
+export class JSKeyboardData {
+  keyboard: JSKeyboard;
+  metadata: KeyboardProperties;
+};
+
 /**
  * For now, these will serve as undocumented, internal events.  We need a proper
  * design round and discussion before we consider promoting them to long-term,
@@ -168,10 +173,7 @@ export default abstract class OSKView
   private _boxBaseTouchStart:       (e: TouchEvent) => boolean;
   private _boxBaseTouchEventCancel: (e: TouchEvent) => boolean;
 
-  private keyboardData: {
-    keyboard: JSKeyboard,
-    metadata: KeyboardProperties
-  };
+  private keyboardData: JSKeyboardData;
 
   /**
    * Provides the current parameterization for timings and distances used by
@@ -532,17 +534,11 @@ export default abstract class OSKView
     }
   }
 
-  public get activeKeyboard(): {
-    keyboard: JSKeyboard,
-    metadata: KeyboardProperties
-  } {
+  public get activeKeyboard(): JSKeyboardData {
     return this.keyboardData;
   }
 
-  public set activeKeyboard(keyboardData: {
-    keyboard: JSKeyboard,
-    metadata: KeyboardProperties
-  }) {
+  public set activeKeyboard(keyboardData: JSKeyboardData) {
     this.keyboardData = keyboardData;
     this.loadActiveKeyboard();
 

@@ -37,7 +37,12 @@ export function loadKeyboardsFromStubs(apiStubs: any, baseDir: string) {
       const overwriteLoader = (id: number, path: string) => {
         const loader = loadKeyboardFromPath(path);
         return loader.then(kbd => {
-          keyboards[stub.id].keyboard = kbd;
+          if (kbd instanceof JSKeyboard) {
+            keyboards[stub.id].keyboard = kbd;
+          } else {
+            // TODO-web-core: implement for KMX keyboards if needed
+            keyboards[stub.id].keyboard = null;
+          }
         });
       }
       keyboards[stub.id] = {

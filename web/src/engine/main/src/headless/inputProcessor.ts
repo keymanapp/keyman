@@ -7,11 +7,10 @@ import { globalObject, DeviceSpec } from "@keymanapp/web-utils";
 
 import { CoreFactory, MainModule as KmCoreModule } from 'keyman/engine/core-processor';
 
-import { Codes, type JSKeyboard, type KeyEvent } from "keyman/engine/keyboard";
+import { Codes, JSKeyboard, KeyboardMinimalInterface, type Keyboard, type KeyEvent } from "keyman/engine/keyboard";
 import {
   type Alternate,
   isEmptyTransform,
-  JSKeyboardInterface,
   JSKeyboardProcessor,
   Mock,
   type OutputTarget,
@@ -66,7 +65,7 @@ export class InputProcessor {
     return this.kbdProcessor;
   }
 
-  public get keyboardInterface(): JSKeyboardInterface {
+  public get keyboardInterface(): KeyboardMinimalInterface {
     return this.keyboardProcessor.keyboardInterface;
   }
 
@@ -74,11 +73,11 @@ export class InputProcessor {
     return this.km_core;
   }
 
-  public get activeKeyboard(): JSKeyboard {
+  public get activeKeyboard(): Keyboard {
     return this.keyboardInterface.activeKeyboard;
   }
 
-  public set activeKeyboard(keyboard: JSKeyboard) {
+  public set activeKeyboard(keyboard: Keyboard) {
     this.keyboardInterface.activeKeyboard = keyboard;
 
     // All old deadkeys and keyboard-specific cache should immediately be invalidated
@@ -156,7 +155,7 @@ export class InputProcessor {
 
     // The default OSK layout for desktop devices does not include nextlayer info, relying on modifier detection here.
     // It's the OSK equivalent to doModifierPress on 'desktop' form factors.
-    if((formFactor == DeviceSpec.FormFactor.Desktop || !this.activeKeyboard || this.activeKeyboard.usesDesktopLayoutOnDevice(keyEvent.device)) && fromOSK) {
+    if((formFactor == DeviceSpec.FormFactor.Desktop || !this.activeKeyboard || (this.activeKeyboard instanceof JSKeyboard && this.activeKeyboard.usesDesktopLayoutOnDevice(keyEvent.device))) && fromOSK) {
       // If it's a desktop OSK style and this triggers a layer change,
       // a modifier key was clicked.  No output expected, so it's safe to instantly exit.
       if(this.keyboardProcessor.selectLayer(keyEvent)) {

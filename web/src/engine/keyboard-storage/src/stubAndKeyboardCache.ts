@@ -1,4 +1,4 @@
-import { JSKeyboard, KeyboardLoaderBase as KeyboardLoader } from "keyman/engine/keyboard";
+import { type Keyboard, JSKeyboard, KeyboardLoaderBase as KeyboardLoader } from "keyman/engine/keyboard";
 import { EventEmitter } from "eventemitter3";
 
 import KeyboardStub from "./keyboardStub.js";
@@ -38,12 +38,12 @@ interface EventMap {
   /**
    * Indicates that the specified Keyboard has just been added to the cache.
    */
-  keyboardadded: (keyboard: JSKeyboard) => void;
+  keyboardadded: (keyboard: Keyboard) => void;
 }
 
 export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
   private stubSetTable: Record<string, Record<string, KeyboardStub>> = {};
-  private keyboardTable: Record<string, JSKeyboard | Promise<JSKeyboard>> = {};
+  private keyboardTable: Record<string, Keyboard | Promise<Keyboard>> = {};
 
   private readonly keyboardLoader: KeyboardLoader;
 
@@ -52,11 +52,11 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
     this.keyboardLoader = keyboardLoader;
   }
 
-  getKeyboardForStub(stub: KeyboardStub): JSKeyboard {
+  getKeyboardForStub(stub: KeyboardStub): Keyboard {
     return stub ? this.getKeyboard(stub.KI) : null;
   }
 
-  getKeyboard(keyboardID: string): JSKeyboard {
+  getKeyboard(keyboardID: string): Keyboard {
     if(!keyboardID) {
       return null;
     }
@@ -112,14 +112,14 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
     }
   }
 
-  addKeyboard(keyboard: JSKeyboard) {
+  addKeyboard(keyboard: Keyboard) {
     const keyboardID = prefixed(keyboard.id);
     this.keyboardTable[keyboardID] = keyboard;
 
     this.emit('keyboardadded', keyboard);
   }
 
-  fetchKeyboardForStub(stub: KeyboardStub) : Promise<JSKeyboard> {
+  fetchKeyboardForStub(stub: KeyboardStub) : Promise<Keyboard> {
     return this.fetchKeyboard(stub.KI);
   }
 
@@ -134,7 +134,7 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
     return cachedEntry instanceof Promise;
   }
 
-  fetchKeyboard(keyboardID: string): Promise<JSKeyboard> {
+  fetchKeyboard(keyboardID: string): Promise<Keyboard> {
     if(!keyboardID) {
       throw new Error("Keyboard ID must be specified");
     }
@@ -166,7 +166,9 @@ export default class StubAndKeyboardCache extends EventEmitter<EventMap> {
 
     promise.then((kbd) => {
       // Overrides the built-in ID in case of keyboard namespacing.
-      kbd.scriptObject["KI"] = keyboardID;
+      if (kbd instanceof JSKeyboard) {
+        kbd.scriptObject["KI"] = keyboardID;
+      }
       this.addKeyboard(kbd);
     }).catch((err) => {
       delete this.keyboardTable[keyboardID];

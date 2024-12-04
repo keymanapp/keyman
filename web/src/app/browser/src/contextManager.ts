@@ -1,4 +1,4 @@
-import { type JSKeyboard, KeyboardScriptError } from 'keyman/engine/keyboard';
+import { JSKeyboard, type Keyboard, KeyboardScriptError } from 'keyman/engine/keyboard';
 import { type KeyboardStub } from 'keyman/engine/keyboard-storage';
 import { CookieSerializer } from 'keyman/engine/dom-utils';
 import { eventOutputTarget, outputTargetForElement, PageContextAttachment } from 'keyman/engine/attachment';
@@ -23,10 +23,12 @@ export interface KeyboardCookie {
  * has the same directionality, text runs will be re-ordered which is confusing and causes
  * incorrect caret positioning
  *
- * @param       {Object}      Ptarg      Target element
+ * @param       {Object}      Ptarg           Target element
+ * @param       {Keyboard}    activeKeyboard  The active keyboard
  */
-function _SetTargDir(Ptarg: HTMLElement, activeKeyboard: JSKeyboard) {
-  const elDir = activeKeyboard?.isRTL ? 'rtl' : 'ltr';
+function _SetTargDir(Ptarg: HTMLElement, activeKeyboard: Keyboard) {
+  // TODO-web-core: do we need to support RTL in Core?
+  const elDir = activeKeyboard instanceof JSKeyboard && activeKeyboard?.isRTL ? 'rtl' : 'ltr';
 
   if(Ptarg) {
     if(Ptarg instanceof Ptarg.ownerDocument.defaultView.HTMLInputElement

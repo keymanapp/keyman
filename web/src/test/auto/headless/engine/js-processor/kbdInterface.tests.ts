@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
-import { DeviceSpec, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
+import { DeviceSpec, JSKeyboard, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
 import { JSKeyboardInterface, Mock } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 
@@ -24,10 +24,10 @@ describe('Headless keyboard loading', function () {
   describe('Full harness loading', () => {
     it('successfully loads', async function () {
       // -- START: Standard Recorder-based unit test loading boilerplate --
-      const harness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
-      const keyboardLoader = new NodeKeyboardLoader(harness);
+      const jsHarness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
+      const keyboardLoader = new NodeKeyboardLoader(jsHarness);
       const keyboard = await keyboardLoader.loadKeyboardFromPath(laoPath);
-      harness.activeKeyboard = keyboard;
+      jsHarness.activeKeyboard = keyboard as JSKeyboard;
       // --  END:  Standard Recorder-based unit test loading boilerplate --
 
       // This part provides assurance that the keyboard properly loaded.
@@ -39,11 +39,11 @@ describe('Headless keyboard loading', function () {
       const harness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
       const keyboardLoader = new NodeKeyboardLoader(harness);
       const keyboard = await keyboardLoader.loadKeyboardFromPath(laoPath);
-      harness.activeKeyboard = keyboard;
+      harness.activeKeyboard = keyboard as JSKeyboard;
       // --  END:  Standard Recorder-based unit test loading boilerplate --
 
       // Runs a blank KeyEvent through the keyboard's rule processing.
-      harness.processKeystroke(new Mock(), keyboard.constructNullKeyEvent(device));
+      harness.processKeystroke(new Mock(), (keyboard as JSKeyboard).constructNullKeyEvent(device));
     });
 
     it('does not change the active kehboard', async function () {
@@ -56,7 +56,7 @@ describe('Headless keyboard loading', function () {
       // This part provides assurance that the keyboard properly loaded.
       assert.equal(lao_keyboard.id, "Keyboard_lao_2008_basic");
 
-      harness.activeKeyboard = lao_keyboard;
+      harness.activeKeyboard = lao_keyboard as JSKeyboard;
 
       const khmer_keyboard = await keyboardLoader.loadKeyboardFromPath(khmerPath);
       assert.strictEqual(lao_keyboard, harness.activeKeyboard);
