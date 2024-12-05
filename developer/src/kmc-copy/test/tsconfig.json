@@ -15,7 +15,7 @@
       },
     },
   "include": [
-      "**/test-*.ts",
+      "**/*.tests.ts",
       "./shared-options.ts",
       "./helpers/index.ts"
   ],

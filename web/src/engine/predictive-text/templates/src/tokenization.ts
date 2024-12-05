@@ -1,7 +1,7 @@
 // While we _could_ define this within @keymanapp/models-wordbreakers instead, it's probably
 // better to leave that package as _just_ the wordbreakers.
 
-import { WordBreakingFunction, USVString, Context } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
 export interface Token {
   text: string,
@@ -30,8 +30,8 @@ export interface Tokenization {
 }
 
 export function tokenize(
-  wordBreaker: WordBreakingFunction,
-  context: Partial<Context>,
+  wordBreaker: LexicalModelTypes.WordBreakingFunction,
+  context: Partial<LexicalModelTypes.Context>,
   options?: {
     /** Characters to rejoin to preceding tokens if found immediately pre-caret. */
     rejoins?: string[]
@@ -197,7 +197,7 @@ export function tokenize(
  * If the last 'token' before the caret is whitespace, returns `''`.
  * @param fullLeftContext the entire left context of the string.
  */
-export function getLastPreCaretToken(wordBreaker: WordBreakingFunction, context: Context): string {
+export function getLastPreCaretToken(wordBreaker: LexicalModelTypes.WordBreakingFunction, context: LexicalModelTypes.Context): string {
   let tokenization = tokenize(wordBreaker, context);
   if (tokenization.left.length > 0) {
     const lastToken = tokenization.left.pop();
@@ -214,6 +214,6 @@ export function getLastPreCaretToken(wordBreaker: WordBreakingFunction, context:
 // While it is currently identical to getLastWord, this may change in the future.
 // It's best not to write ourselves into a corner on this one, as disambiguating later
 // would likely be pretty painful.
-export function wordbreak(wordBreaker: WordBreakingFunction, context: Context): USVString {
+export function wordbreak(wordBreaker: LexicalModelTypes.WordBreakingFunction, context: LexicalModelTypes.Context): LexicalModelTypes.USVString {
   return getLastPreCaretToken(wordBreaker, context);
 }
