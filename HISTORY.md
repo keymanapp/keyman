@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.153 alpha 2024-12-05
+
+* feat(developer,common): verify normalization of strings (#12748)
+* chore(core): Add link to Keyman Glossary (#12774)
+* test(common/web/types): unit tests for file-types (#12716)
+
 ## 18.0.152 alpha 2024-12-04
 
 * refactor(mac): pass kmx data blob to keyman core instead of file path (#12760)
