@@ -1,4 +1,4 @@
-import { Codes, DeviceSpec, KeyEvent, KeyMapping, Keyboard } from 'keyman/engine/keyboard';
+import { Codes, DeviceSpec, KeyEvent, KeyMapping, JSKeyboard } from 'keyman/engine/keyboard';
 import { KeyboardProcessor } from 'keyman/engine/js-processor';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 
@@ -10,7 +10,7 @@ import { eventOutputTarget, outputTargetForElement } from 'keyman/engine/attachm
 import ContextManager from './contextManager.js';
 
 type KeyboardState = {
-  activeKeyboard: Keyboard,
+  activeKeyboard: JSKeyboard,
   modStateFlags: number,
   baseLayout: string
 }

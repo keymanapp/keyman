@@ -1,6 +1,6 @@
 export * from "./keyboards/activeLayout.js";
 export * from "./keyboards/defaultLayouts.js";
-export { default as Keyboard } from "./keyboards/keyboard.js";
+export { default as JSKeyboard } from "./keyboards/keyboard.js";
 export * from "./keyboards/keyboard.js";
 export { KeyboardHarness, KeyboardKeymanGlobal, MinimalCodesInterface, MinimalKeymanGlobal } from "./keyboards/keyboardHarness.js";
 export { KeyboardLoaderBase } from "./keyboards/keyboardLoaderBase.js";

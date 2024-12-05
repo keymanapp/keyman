@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 
 import { globalObject } from '@keymanapp/web-utils';
 
-import { default as Keyboard } from '../keyboard.js';
+import { default as JSKeyboard } from '../keyboard.js';
 import { KeyboardHarness, MinimalKeymanGlobal } from '../keyboardHarness.js';
 import { KeyboardLoaderBase } from '../keyboardLoaderBase.js';
 import { KeyboardLoadErrorBuilder } from '../keyboardLoadError.js';
@@ -41,7 +41,7 @@ export class NodeKeyboardLoader extends KeyboardLoaderBase {
     return Uint8Array.from(buffer);
   }
 
-  protected async loadKeyboardFromScript(scriptSrc: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<Keyboard> {
+  protected async loadKeyboardFromScript(scriptSrc: string, errorBuilder: KeyboardLoadErrorBuilder): Promise<JSKeyboard> {
     let script;
     try {
       script = new vm.Script(scriptSrc);

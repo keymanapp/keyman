@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 
-import { Keyboard } from 'keyman/engine/keyboard';
+import { JSKeyboard } from 'keyman/engine/keyboard';
 import { KeyboardProcessor } from 'keyman/engine/js-processor';
 import { extendString } from '@keymanapp/web-utils';
 
@@ -24,7 +24,7 @@ describe('Engine - Stores', function() {
     let processor = new KeyboardProcessor(device);
     // A 'hollow' Keyboard that only follows default rules.  That said, we need a Keyboard
     // instance to host cache data for our exploded store tests.
-    processor.activeKeyboard = new Keyboard();
+    processor.activeKeyboard = new JSKeyboard();
 
     // Function defined at top of file; creates supplementary pairs for extended Unicode codepoints.
     var u = toSupplementaryPairString;

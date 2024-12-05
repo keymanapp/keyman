@@ -9,7 +9,7 @@
 import { EventEmitter } from 'eventemitter3';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 import {
-  Codes, type Keyboard, MinimalKeymanGlobal, KeyEvent, Layouts,
+  Codes, type JSKeyboard, MinimalKeymanGlobal, KeyEvent, Layouts,
   DefaultRules, EmulationKeystrokes
 } from "keyman/engine/keyboard";
 import { Mock } from "./mock.js";
@@ -87,11 +87,11 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
     this.defaultRules = options.defaultOutputRules || KeyboardProcessor.DEFAULT_OPTIONS.defaultOutputRules;
   }
 
-  public get activeKeyboard(): Keyboard {
+  public get activeKeyboard(): JSKeyboard {
     return this.keyboardInterface.activeKeyboard;
   }
 
-  public set activeKeyboard(keyboard: Keyboard) {
+  public set activeKeyboard(keyboard: JSKeyboard) {
     this.keyboardInterface.activeKeyboard = keyboard;
 
     // All old deadkeys and keyboard-specific cache should immediately be invalidated

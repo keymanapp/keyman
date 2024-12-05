@@ -7,7 +7,7 @@
 
 import { type DeviceSpec } from "@keymanapp/web-utils";
 import { ModifierKeyConstants } from '@keymanapp/common-types';
-import { Codes, type KeyEvent, KeyMapping, Keyboard, KeyboardHarness, KeyboardKeymanGlobal, VariableStoreDictionary } from "keyman/engine/keyboard";
+import { Codes, type KeyEvent, KeyMapping, JSKeyboard, KeyboardHarness, KeyboardKeymanGlobal, VariableStoreDictionary } from "keyman/engine/keyboard";
 import type OutputTarget from './outputTarget.js';
 import { type Deadkey } from './deadkeys.js';
 import { Mock } from "./mock.js";
@@ -180,7 +180,7 @@ export default class KeyboardInterface extends KeyboardHarness {
   _AnyIndices:  number[] = [];    // AnyIndex - array of any/index match indices
 
   // Must be accessible to some of the keyboard API methods.
-  activeKeyboard: Keyboard;
+  activeKeyboard: JSKeyboard;
   activeDevice: DeviceSpec;
 
   variableStoreSerializer?: VariableStoreSerializer;
@@ -222,7 +222,7 @@ export default class KeyboardInterface extends KeyboardHarness {
   /**
    * Function     registerKeyboard  KR
    * Scope        Public
-   * @param       {Object}      Pk      Keyboard  object
+   * @param       {Object}      Pk      JSKeyboard  object
    * Description  Registers a keyboard with KeymanWeb once its script has fully loaded.
    *
    *              In web-core, this also activates the keyboard; in other modules, this method
@@ -231,7 +231,7 @@ export default class KeyboardInterface extends KeyboardHarness {
   registerKeyboard(Pk: any): void {
     // NOTE:  This implementation is web-core specific and is intentionally replaced, whole-sale,
     //        by DOM-aware code.
-    let keyboard = new Keyboard(Pk);
+    let keyboard = new JSKeyboard(Pk);
     this.loadedKeyboard = keyboard;
   }
 

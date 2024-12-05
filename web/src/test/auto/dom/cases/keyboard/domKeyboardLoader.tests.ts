@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 
 import { DOMKeyboardLoader } from 'keyman/engine/keyboard/dom-keyboard-loader';
-import { extendString, KeyboardHarness, Keyboard, MinimalKeymanGlobal, DeviceSpec, KeyboardKeymanGlobal, KeyboardDownloadError, KeyboardScriptError } from 'keyman/engine/keyboard';
+import { extendString, KeyboardHarness, JSKeyboard, MinimalKeymanGlobal, DeviceSpec, KeyboardKeymanGlobal, KeyboardDownloadError, KeyboardScriptError } from 'keyman/engine/keyboard';
 import { KeyboardInterface, Mock } from 'keyman/engine/js-processor';
 import { assertThrowsAsync } from 'keyman/tools/testing/test-utils';
 
@@ -49,7 +49,7 @@ describe('Keyboard loading in DOM', function() {
   it('`window`, disabled rule processing', async () => {
     const harness = new KeyboardHarness(window, MinimalKeymanGlobal);
     let keyboardLoader = new DOMKeyboardLoader(harness);
-    let keyboard: Keyboard = await keyboardLoader.loadKeyboardFromPath('/common/test/resources/keyboards/khmer_angkor.js');
+    let keyboard: JSKeyboard = await keyboardLoader.loadKeyboardFromPath('/common/test/resources/keyboards/khmer_angkor.js');
 
     assert.isOk(keyboard);
     assert.equal(keyboard.id, 'Keyboard_khmer_angkor');
@@ -67,7 +67,7 @@ describe('Keyboard loading in DOM', function() {
   it('`window`, enabled rule processing', async () => {
     const harness = new KeyboardInterface(window, MinimalKeymanGlobal);
     const keyboardLoader = new DOMKeyboardLoader(harness);
-    const keyboard: Keyboard = await keyboardLoader.loadKeyboardFromPath('/common/test/resources/keyboards/khmer_angkor.js');
+    const keyboard: JSKeyboard = await keyboardLoader.loadKeyboardFromPath('/common/test/resources/keyboards/khmer_angkor.js');
     harness.activeKeyboard = keyboard;
 
     assert.isOk(keyboard);
@@ -99,7 +99,7 @@ describe('Keyboard loading in DOM', function() {
     let keyboardLoader = new DOMKeyboardLoader(harness);
 
     // Preload a keyboard and make it active.
-    const test_kbd: Keyboard = await keyboardLoader.loadKeyboardFromPath('/common/test/resources/keyboards/test_917.js');
+    const test_kbd: JSKeyboard = await keyboardLoader.loadKeyboardFromPath('/common/test/resources/keyboards/test_917.js');
     harness.activeKeyboard = test_kbd;
     assert.isNotOk(harness.loadedKeyboard);
 

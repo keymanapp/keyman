@@ -20,7 +20,7 @@ import ButtonClasses = TouchLayout.TouchLayoutKeySp;
 export { ButtonClasses };
 
 import Codes from "../codes.js";
-import type Keyboard from "./keyboard.js";
+import type JSKeyboard from "./keyboard.js";
 
 // The following types provide type definitions for the full JSON format we use for visual keyboard definitions.
 export type ButtonClass       =  0 | 1 | 2 | 3 | 4 | /*5 | 6 | 7 |*/ 8 | 9 | 10;
@@ -87,11 +87,11 @@ export class Layouts {
   * Build a default layout for keyboards with no explicit layout
   *
   * @param   {Object}  PVK         raw specifications
-  * @param   {Keyboard} keyboard   keyboard object (as loaded)
+  * @param   {JSKeyboard} keyboard   keyboard object (as loaded)
   * @param   {string} formFactor   (really utils.FormFactor)
   * @return  {LayoutFormFactor}
   */
-  static buildDefaultLayout(PVK: EncodedVisualKeyboard, keyboard: Keyboard, formFactor: string): LayoutFormFactor {
+  static buildDefaultLayout(PVK: EncodedVisualKeyboard, keyboard: JSKeyboard, formFactor: string): LayoutFormFactor {
     // Build a layout using the default for the device
     let layoutType = formFactor as keyof TouchLayout.TouchLayoutFile;
 

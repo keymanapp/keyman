@@ -7,7 +7,7 @@ import { globalObject, DeviceSpec } from "@keymanapp/web-utils";
 
 import { CoreFactory, MainModule as KmCoreModule } from 'keyman/engine/core-processor';
 
-import { Codes, type Keyboard, type KeyEvent } from "keyman/engine/keyboard";
+import { Codes, type JSKeyboard, type KeyEvent } from "keyman/engine/keyboard";
 import {
   type Alternate,
   isEmptyTransform,
@@ -74,11 +74,11 @@ export class InputProcessor {
     return this.km_core;
   }
 
-  public get activeKeyboard(): Keyboard {
+  public get activeKeyboard(): JSKeyboard {
     return this.keyboardInterface.activeKeyboard;
   }
 
-  public set activeKeyboard(keyboard: Keyboard) {
+  public set activeKeyboard(keyboard: JSKeyboard) {
     this.keyboardInterface.activeKeyboard = keyboard;
 
     // All old deadkeys and keyboard-specific cache should immediately be invalidated
