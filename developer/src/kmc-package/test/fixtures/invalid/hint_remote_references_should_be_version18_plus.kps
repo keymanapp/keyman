@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>15.0.266.0</KeymanDeveloperVersion>
+    <FileVersion>7.0</FileVersion>
+  </System>
+  <Info>
+    <Name URL="">SENĆOŦEN (Saanich Dialect) Keyboard</Name>
+    <Copyright URL="">© 2019 National Research Council Canada</Copyright>
+    <Author URL="mailto:Eddie.Santos@nrc-cnrc.gc.ca">Eddie Antonio Santos</Author>
+    <Version>1.0</Version>
+  </Info>
+  <Files>
+    <File>
+      <Name>basic.kmx</Name>
+      <Description>Keyboard Basic</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kmx</FileType>
+    </File>
+    <!-- hint_remote_references_should_be_version18_plus -->
+    <File>
+      <Name>https://github.com/silnrsi/fonts/raw/b88c7af5d16681bd137156929ff8baec82526560/fonts/sil/alkalami/Alkalami-Regular.ttf</Name>
+    </File>
+  </Files>
+  <Keyboards>
+    <Keyboard>
+      <Name>Basic</Name>
+      <ID>basic</ID>
+      <Version>1.0</Version>
+      <Languages>
+        <Language ID="KM">Khmer</Language>
+      </Languages>
+    </Keyboard>
+  </Keyboards>
+</Package>
