@@ -4,13 +4,12 @@
   "compilerOptions": {
     "rootDir": ".",
     "rootDirs": ["./", "../src/"],
-    "outDir": "../build/test",
+    "outDir": "../build/tests",
     "baseUrl": ".",
     "strictNullChecks": false, // TODO: get rid of this as some point
     "allowSyntheticDefaultImports": true
   },
   "include": [
-    "**/test-*.ts",
     "**/*.tests.ts",
     "./helpers/*.ts",
   ],

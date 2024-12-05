@@ -575,11 +575,12 @@ export class KeyboardInfoCompiler implements KeymanCompiler {
         ''
       );
 
+      const resolvedScript = locale.script ?? langtagsByTag[bcp47]?.script ?? langtagsByTag[locale.language]?.script ?? undefined;
       if(commonScript === null) {
-        commonScript = tag?.script ?? undefined;
+        commonScript = resolvedScript;
       } else {
-        if(tag?.script !== commonScript) {
-          this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Hint_ScriptDoesNotMatch({commonScript, bcp47, script: tag?.script}))
+        if(resolvedScript !== commonScript) {
+          this.callbacks.reportMessage(KeyboardInfoCompilerMessages.Hint_ScriptDoesNotMatch({commonScript, bcp47, script: resolvedScript}))
         }
       }
     }
