@@ -25,7 +25,10 @@ export class TestCompilerCallbacks implements CompilerCallbacks {
   messages: CompilerEvent[] = [];
 
   get path(): CompilerPathCallbacks {
-    return path;
+    return {
+      ...path,
+      isAbsolute: path.win32.isAbsolute
+    };
   }
 
   get fs(): CompilerFileSystemCallbacks {
