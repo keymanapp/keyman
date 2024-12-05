@@ -49,6 +49,72 @@ export function isLocalFile(inputFilename: string) {
   return !URL_SOURCE.test(inputFilename) && !FLO_SOURCE.test(inputFilename);
 }
 
+export async function getFileDataFromRemote(callbacks: CompilerCallbacks, inputFilename: string, sourceFilename: string): Promise<KmpCompilerFileDataResult> {
+  const matches = GITHUB_STABLE_SOURCE.exec(inputFilename);
+  if(!matches) {
+    callbacks.reportMessage(PackageCompilerMessages.Error_UriIsNotARecognizedStableGitHubUri({url: inputFilename}));
+    return null;
+  }
+
+  const result = await getFileDataFromGitHub(callbacks, inputFilename, matches);
+  if(!result) {
+    // error reported in getFileDataFromGitHub
+    return null;
+  }
+
+  if(sourceFilename) {
+    if(!await checkSourceFile(callbacks, inputFilename, sourceFilename)) {
+      /* c8 ignore next 3 */
+      // error reported in checkSourceFile
+      return null;
+    }
+  }
+
+  return result;
+}
+
+async function getFileDataFromGitHub(callbacks: CompilerCallbacks, inputFilename: string, matches: RegExpExecArray): Promise<KmpCompilerFileDataResult> {
+  // /^github:(?<name>[a-zA-Z0-9-].+)\/(?<repo>[\w\.-]+)\/raw\/(?<hash>[a-f0-9]{40})\/(?<path>.+)$/
+  const githubUrl = `https://github.com/${matches.groups.name}/${matches.groups.repo}/raw/${matches.groups.hash}/${matches.groups.path}`;
+  try {
+    const res = await callbacks.net.fetchBlob(githubUrl);
+    if(!res) {
+      callbacks.reportMessage(PackageCompilerMessages.Error_FontFileCouldNotBeDownloaded({filename: inputFilename, url: githubUrl}));
+      return null;
+    }
+    return { data: res, basename: callbacks.path.basename(matches.groups.path) };
+    /* c8 ignore next 4 */
+  } catch(e) {
+    callbacks.reportMessage(PackageCompilerMessages.Error_FontFileCouldNotBeDownloaded({filename: inputFilename, url: githubUrl, e}));
+    return null;
+  }
+}
+
+async function checkSourceFile(callbacks: CompilerCallbacks, inputFilename: string, sourceFilename: string): Promise<boolean> {
+  let stableUrl: string;
+  if(FLO_SOURCE.test(sourceFilename)) {
+    stableUrl = await getFileStableRefFromFlo(callbacks, sourceFilename);
+  } else if(GITHUB_URI.test(sourceFilename)) {
+    stableUrl = await getFileStableRefFromGitHub(callbacks, sourceFilename);
+  } else if(GITHUB_RAW_URI.test(sourceFilename)) {
+    stableUrl = await getFileStableRefFromGitHub(callbacks, sourceFilename);
+  } else {
+    callbacks.reportMessage(PackageCompilerMessages.Error_InvalidSourceFileReference({source: sourceFilename, name: inputFilename}));
+    return false;
+  }
+
+  if(!stableUrl) {
+    // getFileStableUrlFromFlo/GitHub return at most a warning, so don't bail
+    return true;
+  }
+
+  if(stableUrl != inputFilename) {
+    callbacks.reportMessage(PackageCompilerMessages.Hint_SourceFileHasChanged({source: sourceFilename, name: inputFilename}));
+  }
+
+  return true;
+}
+
 let floFamiliesCache: any = undefined; // set to null on error, otherwise an object from JSON
 
 const FLO_FAMILIES_URL = 'https://fonts.languagetechnology.org/families.json';
@@ -152,72 +218,6 @@ async function resolveGitHubToStableRef(callbacks: CompilerCallbacks, matches: R
   }
 
   return `https://github.com/${matches.groups.name}/${matches.groups.repo}/raw/${commit.sha}/${matches.groups.path}`;
-}
-
-async function getFileDataFromGitHub(callbacks: CompilerCallbacks, inputFilename: string, matches: RegExpExecArray): Promise<KmpCompilerFileDataResult> {
-  // /^github:(?<name>[a-zA-Z0-9-].+)\/(?<repo>[\w\.-]+)\/raw\/(?<hash>[a-f0-9]{40})\/(?<path>.+)$/
-  const githubUrl = `https://github.com/${matches.groups.name}/${matches.groups.repo}/raw/${matches.groups.hash}/${matches.groups.path}`;
-  try {
-    const res = await callbacks.net.fetchBlob(githubUrl);
-    if(!res) {
-      callbacks.reportMessage(PackageCompilerMessages.Error_FontFileCouldNotBeDownloaded({filename: inputFilename, url: githubUrl}));
-      return null;
-    }
-    return { data: res, basename: callbacks.path.basename(matches.groups.path) };
-    /* c8 ignore next 4 */
-  } catch(e) {
-    callbacks.reportMessage(PackageCompilerMessages.Error_FontFileCouldNotBeDownloaded({filename: inputFilename, url: githubUrl, e}));
-    return null;
-  }
-}
-
-export async function getFileDataFromRemote(callbacks: CompilerCallbacks, inputFilename: string, sourceFilename: string): Promise<KmpCompilerFileDataResult> {
-  const matches = GITHUB_STABLE_SOURCE.exec(inputFilename);
-  if(!matches) {
-    callbacks.reportMessage(PackageCompilerMessages.Error_UriIsNotARecognizedStableGitHubUri({url: inputFilename}));
-    return null;
-  }
-
-  const result = await getFileDataFromGitHub(callbacks, inputFilename, matches);
-  if(!result) {
-    // error reported in getFileDataFromGitHub
-    return null;
-  }
-
-  if(sourceFilename) {
-    if(!await checkSourceFile(callbacks, inputFilename, sourceFilename)) {
-      /* c8 ignore next 3 */
-      // error reported in checkSourceFile
-      return null;
-    }
-  }
-
-  return result;
-}
-
-async function checkSourceFile(callbacks: CompilerCallbacks, inputFilename: string, sourceFilename: string): Promise<boolean> {
-  let stableUrl: string;
-  if(FLO_SOURCE.test(sourceFilename)) {
-    stableUrl = await getFileStableRefFromFlo(callbacks, sourceFilename);
-  } else if(GITHUB_URI.test(sourceFilename)) {
-    stableUrl = await getFileStableRefFromGitHub(callbacks, sourceFilename);
-  } else if(GITHUB_RAW_URI.test(sourceFilename)) {
-    stableUrl = await getFileStableRefFromGitHub(callbacks, sourceFilename);
-  } else {
-    callbacks.reportMessage(PackageCompilerMessages.Error_InvalidSourceFileReference({source: sourceFilename, name: inputFilename}));
-    return false;
-  }
-
-  if(!stableUrl) {
-    // getFileStableUrlFromFlo/GitHub return at most a warning, so don't bail
-    return true;
-  }
-
-  if(stableUrl != inputFilename) {
-    callbacks.reportMessage(PackageCompilerMessages.Hint_SourceFileHasChanged({source: sourceFilename, name: inputFilename}));
-  }
-
-  return true;
 }
 
 /** @internal */

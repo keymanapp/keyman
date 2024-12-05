@@ -33,7 +33,7 @@ You can add your own strings for a given package which are used when
 compiling as a bundled installer.
 
 
-## File.Source
+## File.Name
 
 The `Name` element may be either a local filename, or a GitHub raw permanent
 URL, conforming to the pattern:
@@ -42,25 +42,38 @@ URL, conforming to the pattern:
 <Name>https://github.com/{owner}/{repo}/raw/{commit}/[path/]{filename}</Name>
 ```
 
-We will add a `Source` element to .kps `Package.Files.File`. We would support
-several sources:
-* local - local file system
+## File.Source
+
+The `<Source>` element documents the original source of the file, from
+one of several supported sources:
 * flo - fonts.languagetechnology.org
 * github
 * noto - in the future
 
-## local: `<Source>` element is omitted
+While the `<Name>` element must refer to either a local file or to a permanent
+GitHub file (as recognized by the presence of a commit hash), the `<Source>`
+element typically will refer to a file which may change over time.
 
-This is the same as previous versions. `<Name>` references a file on the local
-filesystem. Note that `<Source>` is optional for other sources as well; the
-absence of the element does not mean local -- that is determined by pattern
-match.
+The `<Source>` element is supported in version 18.0 and later of .kps
+format.
+
+### Local file system
+
+The `<Source>` element must not be included for files sourced from the local
+file system, where `<Name>` references a file on the local filesystem.
+
+Note: the `<Source>` element is optional for other sources as well; the absence
+of the element does not mean that the `<Name>` element is necessarily
+referencing a local file -- that is determined by pattern match.
 
 ```xml
 <File>
   <Name>[relative-or-absolute-path/]{filename}</Name>
 </File>
 ```
+
+Note: absolute paths are not recommended because they are not portable to
+other computers.
 
 #### Example
 
@@ -79,7 +92,7 @@ match.
 ### fonts.languagetechnology.org `flo:<id>`
 
 References a font by ID from fonts.languagetechnology.org. The resource must be
-resolved to a permanent URL. If the `<Name>` field is omitted, the compiler will
+resolved to a permanent URL. If the `<Name>` field is missing, the compiler will
 return an error, reporting the URL it discovers, so the author should be able to
 paste that URL in.
 
@@ -106,8 +119,8 @@ this may be scripted on the keyboards repository in the future.
 
 ### GitHub
 
-A reference to a resource located on GitHub. The resource must be resolved to a
-permanent URL. If the `<Name>` field is omitted, the compiler will return an
+A reference to a resource located on GitHub. The resource must be resolvable to
+a permanent URL. If the `<Name>` field is missing, the compiler will return an
 error, reporting the URL it discovers, so the author should be able to paste
 that URL in.
 
@@ -126,16 +139,7 @@ future.
 
 #### Examples
 
-A GitHub raw reference, from a commit, resolves identically.
-
-```xml
-<File>
-  <Name>https://github.com/silnrsi/fonts/raw/b88c7af5d16681bd137156929ff8baec82526560/fonts/sil/alkalami/Alkalami-Regular.ttf</Name>
-  <Source>https://github.com/silnrsi/fonts/raw/b88c7af5d16681bd137156929ff8baec82526560/fonts/sil/alkalami/Alkalami-Regular.ttf</Source>
-</File>
-```
-
-A GitHub raw reference, from a branch, with refs/heads/ excluded:
+A GitHub raw reference, from a branch:
 
 ```xml
 <File>
@@ -144,7 +148,7 @@ A GitHub raw reference, from a branch, with refs/heads/ excluded:
 </File>
 ```
 
-A GitHub raw reference, from a branch, with refs/heads/ included:
+Including `/refs/heads/` is also acceptable (as often found in GitHub UI):
 
 ```xml
 <File>
@@ -162,11 +166,23 @@ A GitHub blob reference, as copied from a URL in GitHub:
 </File>
 ```
 
+A GitHub raw reference, from a commit, resolves identically. Note that as the
+`<Source>` element includes a commit hash, the referenced file can never change
+and so there is no real benefit in including it:
+
+```xml
+<File>
+  <Name>https://github.com/silnrsi/fonts/raw/b88c7af5d16681bd137156929ff8baec82526560/fonts/sil/alkalami/Alkalami-Regular.ttf</Name>
+  <Source>https://github.com/silnrsi/fonts/raw/b88c7af5d16681bd137156929ff8baec82526560/fonts/sil/alkalami/Alkalami-Regular.ttf</Source>
+</File>
+```
+
 ### noto
 
 In a future version.
 
 ## Additional file format notes
 
-At the same time `CopyLocation`, `Description`, and `FileType` elements should
-be deprecated and totally ignored by the compiler. They are busydata.
+The `CopyLocation`, `Description`, and `FileType` elements are deprecated as of
+v18.0 and totally ignored by the compiler and end-user apps.
+
