@@ -88,7 +88,7 @@ function do_test() {
   fi
 
   eslint .
-  tsc --build test
+  tsc --build tests
 
   readonly C8_THRESHOLD=60
 

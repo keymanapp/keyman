@@ -9,5 +9,5 @@ import { fileURLToPath } from "url";
  * @param components One or more path components.
  */
 export function makePathToFixture(...components: string[]): string {
-  return fileURLToPath(new URL(path.join('..', '..', '..', 'test', 'fixtures', ...components), import.meta.url));
+  return fileURLToPath(new URL(path.join('..', '..', '..', 'tests', 'fixtures', ...components), import.meta.url));
 }
