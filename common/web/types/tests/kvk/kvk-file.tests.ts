@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import 'mocha';
 import { makePathToFixture } from '../helpers/index.js';
 import KvkFileReader from "../../src/kvk/kvk-file-reader.js";
-import { verify_balochi_inpage, verify_khmer_angkor } from './test-kvk-utils.js';
+import { verify_balochi_inpage, verify_khmer_angkor } from './kvk-utils.tests.js';
 
 describe('kvk-file-reader', function () {
   it('kvk-file-reader should read a valid file', function() {
