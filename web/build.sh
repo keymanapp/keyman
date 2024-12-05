@@ -57,7 +57,7 @@ fi
 
 builder_describe_outputs \
   configure                     "/node_modules" \
-  build                         "/web/build/test/dom/cases/attachment/outputTargetForElement.spec.html" \
+  build                         "/web/build/test/dom/cases/attachment/outputTargetForElement.tests.html" \
   build:app/browser             "/web/build/app/browser/lib/index.mjs" \
   build:app/webview             "/web/build/app/webview/${config}/keymanweb-webview.js" \
   build:app/ui                  "/web/build/app/ui/${config}/kmwuitoggle.js" \
@@ -130,7 +130,7 @@ build_action() {
     precompile "${dir}"
   done
 
-  cp "${KEYMAN_ROOT}/web/src/test/auto/dom/cases/attachment/outputTargetForElement.spec.html" \
+  cp "${KEYMAN_ROOT}/web/src/test/auto/dom/cases/attachment/outputTargetForElement.tests.html" \
     "${KEYMAN_ROOT}/web/build/test/dom/cases/attachment/"
 }
 

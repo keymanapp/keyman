@@ -1,10 +1,8 @@
-
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #include <emscripten/bind.h>
 #endif
 
-#include <cassert>
 #include <algorithm>
 #include <iostream>
 #include "util_filesystem.h"
@@ -14,6 +12,8 @@
 #else
 #include <unistd.h>
 #endif
+
+#include <test_assert.h>
 
 //#define _DEBUG_FOPEN  1
 
@@ -26,13 +26,13 @@ const std::string get_wasm_file_path(const std::string& filename) {
   std::cout << "get_wasm_file_path ENTER (" << filename << ")" << std::endl;
 #endif
 
-  assert(
+  test_assert(
     (filename.length() > 0 && filename.at(0) == '/') ||
     (filename.length() > 1 && filename.at(1) == ':')
   );
 
 #if _DEBUG_FOPEN
-  std::cout << "get_wasm_file_path assert passed " << std::endl;
+  std::cout << "get_wasm_file_path test_assert passed " << std::endl;
 #endif
 
   EM_ASM_({

@@ -40,7 +40,9 @@ import * as wordBreakers from '@keymanapp/models-wordbreakers';
 
 import ModelCompositor from './model-compositor.js';
 import { ImportScripts, IncomingMessage, LMLayerWorkerState, LoadMessage, ModelEval, ModelFile, ModelSourceSpec, PostMessage } from './worker-interfaces.js';
-import { Capabilities, LexicalModel } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import Capabilities = LexicalModelTypes.Capabilities;
+import LexicalModel = LexicalModelTypes.LexicalModel;
 import { OutgoingMessageKind } from '@keymanapp/lm-message-types';
 
 /**

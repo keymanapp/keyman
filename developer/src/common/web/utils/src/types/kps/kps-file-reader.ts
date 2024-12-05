@@ -66,6 +66,17 @@ export class KpsFileReader {
     boxXmlArray(data.Package?.StartMenu?.Items, 'Item');
     boxXmlArray(data.Package?.Strings, 'String');
 
+    if(data.Package?.Info) {
+      // If no properties are defined on an <Info> subitem, then it will be a
+      // string, and needs to be boxed into a KpsInfoItem object
+      const info: any = data.Package.Info;
+      for(const k of Object.keys(info)) {
+        if(typeof info[k] == 'string') {
+          info[k] = { _: info[k], $: { URL: '' } };
+        }
+      }
+    }
+
     return data;
   }
 };

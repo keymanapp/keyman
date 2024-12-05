@@ -34,7 +34,7 @@
   },
   "directories": {
     "lib": "lib",
-    "test": "test"
+    "test": "tests"
   },
   "files": [
     "lib"

@@ -49,15 +49,5 @@ function do_build() {
 builder_run_action clean       rm -rf ./build/
 builder_run_action configure   verify_npm_setup
 builder_run_action build       do_build
-
-if builder_start_action test; then
-  eslint .
-  tsc --build test
-  readonly C8_THRESHOLD=50
-  c8 --reporter=lcov --reporter=text --exclude-after-remap --lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD mocha
-  builder_echo warning "Coverage thresholds are currently $C8_THRESHOLD%, which is lower than ideal."
-  builder_echo warning "Please increase threshold in build.sh as test coverage improves."
-  builder_finish_action success test
-fi
-
-builder_run_action publish    builder_publish_npm
+builder_run_action test        builder_do_typescript_tests 50
+builder_run_action publish     builder_publish_npm

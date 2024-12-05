@@ -83,7 +83,7 @@ apply_action(
     std::vector<km_core_context_item> &test_context) {
   switch (act.type) {
   case KM_CORE_IT_END:
-    assert(false);
+    test_assert(false);
     break;
   case KM_CORE_IT_ALERT:
     g_beep_found = true;
@@ -120,8 +120,8 @@ apply_action(
     km_core_usv ch = 0;
     bool matched_text = false;
     // assume the backspace came from set_action() and there's no further info.
-    assert(act.backspace.expected_type == KM_CORE_BT_CHAR);
-    assert(act.backspace.expected_value == 0);
+    test_assert(act.backspace.expected_type == KM_CORE_BT_CHAR);
+    test_assert(act.backspace.expected_value == 0);
     // It is valid for a backspace to be received with an empty text store
     // as the user can press backspace with no text in the store and Keyman
     // will pass that back to the client, as the client may do additional
@@ -130,7 +130,7 @@ apply_action(
     // additional text in the text store that Keyman can't see.
     // If there's anything in the text store, pop it off.  Two if a pair.
     if (text_store.length() > 0) {
-      assert(!context.empty() && !text_store.empty());
+      test_assert(!context.empty() && !text_store.empty());
       const auto ch1 = text_store.back();
       text_store.pop_back();
       if (text_store.length() > 0 && Uni_IsSurrogate2(ch1)) {
@@ -153,16 +153,16 @@ apply_action(
       auto end = context.rbegin();
       while (end != context.rend()) {
         if (end->type == KM_CORE_CT_CHAR) {
-          assert(!matched_text);
-          assert_equal(end->character, ch); // expect popped char to be same as what's in context
+          test_assert(!matched_text);
+          test_assert_equal(end->character, ch); // expect popped char to be same as what's in context
           matched_text = true;
           context.pop_back();
           break;  // exit on first real char
         }
-        assert(end->type != KM_CORE_CT_END);  // inappropriate here.
+        test_assert(end->type != KM_CORE_CT_END);  // inappropriate here.
         context.pop_back();
       }
-      assert(matched_text);
+      test_assert(matched_text);
     }
     break;
   case KM_CORE_IT_PERSIST_OPT:
@@ -175,7 +175,7 @@ apply_action(
       km_core_context_item* new_context_items = nullptr;
       // We replace the cached context with the current application context
       km_core_status status = context_items_from_utf16(text_store.c_str(), &new_context_items);
-      assert(status == KM_CORE_STATUS_OK);
+      test_assert(status == KM_CORE_STATUS_OK);
       copy_context_items_to_vector(new_context_items, context);
       // also update the test context
       copy_context_items_to_vector(new_context_items, test_context);
@@ -193,7 +193,7 @@ apply_action(
     test_source.set_caps_lock_on(act.capsLock);
     break;
   default:
-    assert(false);  // NOT SUPPORTED
+    test_assert(false);  // NOT SUPPORTED
     break;
   }
 }
@@ -254,16 +254,16 @@ verify_context(std::u16string &text_store, km_core_state *&test_state, std::vect
       break;  // success
     }
     // fail if only ONE is at end
-    assert(ci->type != KM_CORE_CT_END && test_ci != test_context.end());
+    test_assert(ci->type != KM_CORE_CT_END && test_ci != test_context.end());
     // fail if type and marker don't match.
-    assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
+    test_assert(test_ci->type == ci->type && test_ci->marker == ci->marker);
   }
 
   km_core_context_items_dispose(citems);
   if (text_store != buf) {
     std::cerr << "text store has diverged from buf" << std::endl;
     std::cerr << "text store: " << string_to_hex(text_store) << " [" << text_store << "]" << std::endl;
-    assert(false);
+    test_assert(false);
   }
   delete[] buf;
 }
@@ -275,7 +275,7 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
 
   const km_core_status expect_load_status = test_source.get_expected_load_status();
   auto blob = km::tests::load_kmx_file(compiled.native().c_str());
-  assert_equal(km_core_keyboard_load_from_blob(compiled.stem().c_str(), blob.data(), blob.size(), &test_kb), expect_load_status);
+  test_assert_equal(km_core_keyboard_load_from_blob(compiled.stem().c_str(), blob.data(), blob.size(), &test_kb), expect_load_status);
 
   if (expect_load_status != KM_CORE_STATUS_OK) {
     std::cout << "Keyboard was expected to be invalid, so exiting " << std::endl;
@@ -364,7 +364,7 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
     } break;
     case km::tests::LDML_ACTION_CHECK_EXPECTED: {
       if (!normalization_disabled) {
-        assert(km::core::util::normalize_nfd(action.string));  // TODO-LDML: should be NFC
+        test_assert(km::core::util::normalize_nfd(action.string));  // TODO-LDML: should be NFC
       }
       std::cout << "- check expected" << std::endl;
       std::cout << "expected  : " << string_to_hex(action.string) << " [" << action.string << "]" << std::endl;
@@ -453,7 +453,7 @@ int run_all_tests(const km::core::path &source, const km::core::path &compiled, 
     const km::tests::JsonTestMap& json_tests = json_factory.get_tests();
 
     size_t skip_count = 0;
-    assert(json_tests.size() > 0);
+    test_assert(json_tests.size() > 0);
     // Loop over all tests
     for (const auto& n : json_tests) {
       const auto test_name = n.first;
