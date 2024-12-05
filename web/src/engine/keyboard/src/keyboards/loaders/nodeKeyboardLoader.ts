@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 
 import { globalObject } from '@keymanapp/web-utils';
 
-import { default as JSKeyboard } from '../keyboard.js';
+import { JSKeyboard } from '../keyboard.js';
 import { KeyboardHarness, MinimalKeymanGlobal } from '../keyboardHarness.js';
 import { KeyboardLoaderBase } from '../keyboardLoaderBase.js';
 import { KeyboardLoadErrorBuilder } from '../keyboardLoadError.js';

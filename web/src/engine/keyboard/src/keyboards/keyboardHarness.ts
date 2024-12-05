@@ -1,4 +1,4 @@
-import JSKeyboard from "./keyboard.js";
+import { JSKeyboard } from "./keyboard.js";
 import Codes from "../codes.js";
 import { DeviceSpec } from '@keymanapp/web-utils';
 

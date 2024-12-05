@@ -2,7 +2,7 @@
 
 ///<reference lib="dom" />
 
-import { default as JSKeyboard } from '../keyboard.js';
+import { JSKeyboard } from '../keyboard.js';
 import { KeyboardHarness, MinimalKeymanGlobal } from '../keyboardHarness.js';
 import { KeyboardLoaderBase } from '../keyboardLoaderBase.js';
 import { KeyboardLoadErrorBuilder } from '../keyboardLoadError.js';

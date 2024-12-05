@@ -20,7 +20,7 @@ import ButtonClasses = TouchLayout.TouchLayoutKeySp;
 export { ButtonClasses };
 
 import Codes from "../codes.js";
-import type JSKeyboard from "./keyboard.js";
+import { type JSKeyboard } from "./keyboard.js";
 
 // The following types provide type definitions for the full JSON format we use for visual keyboard definitions.
 export type ButtonClass       =  0 | 1 | 2 | 3 | 4 | /*5 | 6 | 7 |*/ 8 | 9 | 10;

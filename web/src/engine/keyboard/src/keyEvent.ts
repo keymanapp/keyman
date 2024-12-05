@@ -6,7 +6,7 @@
 // a key event.  The most straightforward way to integrate Web OSK events on other platforms is to have
 // other platforms recognize and utilize this type.
 
-import type JSKeyboard from "./keyboards/keyboard.js";
+import { type JSKeyboard } from "./keyboards/keyboard.js";
 import { type DeviceSpec } from "@keymanapp/web-utils";
 
 import Codes from './codes.js';
