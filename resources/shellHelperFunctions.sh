@@ -290,7 +290,7 @@ _select_node_version_with_nvm() {
     CURRENT_NODE_VERSION="$(node --version)"
     if [[ "$CURRENT_NODE_VERSION" != "v$REQUIRED_NODE_VERSION" ]]; then
       nvm install "$REQUIRED_NODE_VERSION"
-      nvm use "$REQUIRED_NODE_VERSION"
+      start /wait nvm use "$REQUIRED_NODE_VERSION"
     fi
   fi
 
