@@ -1,4 +1,4 @@
-import { JSKeyboard } from "./keyboard.js";
+import { JSKeyboard } from "./jsKeyboard.js";
 import { KeyboardHarness } from "./keyboardHarness.js";
 import KeyboardProperties from "./keyboardProperties.js";
 import { KeyboardLoadErrorBuilder, StubBasedErrorBuilder, UriBasedErrorBuilder } from './keyboardLoadError.js';

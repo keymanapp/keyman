@@ -1,7 +1,7 @@
 export * from "./keyboards/activeLayout.js";
 export * from "./keyboards/defaultLayouts.js";
-export { JSKeyboard } from "./keyboards/keyboard.js";
-export * from "./keyboards/keyboard.js";
+export { JSKeyboard } from "./keyboards/jsKeyboard.js";
+export * from "./keyboards/jsKeyboard.js";
 export { KeyboardHarness, KeyboardKeymanGlobal, MinimalCodesInterface, MinimalKeymanGlobal } from "./keyboards/keyboardHarness.js";
 export { KeyboardLoaderBase } from "./keyboards/keyboardLoaderBase.js";
 export { KeyboardLoadErrorBuilder, KeyboardMissingError, KeyboardScriptError, KeyboardDownloadError, InvalidKeyboardError } from './keyboards/keyboardLoadError.js'
