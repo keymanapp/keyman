@@ -24,7 +24,7 @@ export default {
   concurrency: 10,
   nodeResolve: true,
   files: [
-    'build/test/integrated//**/*.tests.mjs',
+    'web/build/test/integrated//**/*.tests.mjs',
     // '**/*.tests.html'
   ],
   middleware: [
