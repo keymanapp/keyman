@@ -1,7 +1,6 @@
-export * from "./keyboards/activeLayout.js";
-export * from "./keyboards/defaultLayouts.js";
-export { JSKeyboard } from "./keyboards/jsKeyboard.js";
-export * from "./keyboards/jsKeyboard.js";
+export { ActiveKeyBase, ActiveKey, ActiveSubKey, ActiveRow, ActiveLayer, ActiveLayout } from "./keyboards/activeLayout.js";
+export { ButtonClass, ButtonClasses, LayoutLayer, LayoutFormFactor, LayoutRow, LayoutKey, LayoutSubKey, Layouts } from "./keyboards/defaultLayouts.js";
+export { JSKeyboard, LayoutState, VariableStoreDictionary } from "./keyboards/jsKeyboard.js";
 export { KeyboardHarness, KeyboardKeymanGlobal, MinimalCodesInterface, MinimalKeymanGlobal } from "./keyboards/keyboardHarness.js";
 export { KeyboardLoaderBase } from "./keyboards/keyboardLoaderBase.js";
 export { KeyboardLoadErrorBuilder, KeyboardMissingError, KeyboardScriptError, KeyboardDownloadError, InvalidKeyboardError } from './keyboards/keyboardLoadError.js'
