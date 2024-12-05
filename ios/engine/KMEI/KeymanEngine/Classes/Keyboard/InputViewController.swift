@@ -123,7 +123,7 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
       landscapeConstraint?.isActive = true
     }
     
-    self.layoutIfNeeded()
+    self.setNeedsLayout()
   }
   
   private func buildKeyboardHeightConstraints(bannerHeight: CGFloat) {
