@@ -277,9 +277,9 @@ describe('KmpCompiler', function () {
     const source = 'https://github.com/silnrsi/fonts/raw/b88c7af5d16681bd137156929ff8baec82526560/fonts/sil/alkalami/Alkalami-Regular.ttf';
     const matches = getFileDataEndpoints.GITHUB_STABLE_SOURCE.exec(source);
     assert.isNotNull(matches);
-    assert.equal(matches.groups.name, 'silnrsi');
+    assert.equal(matches.groups.owner, 'silnrsi');
     assert.equal(matches.groups.repo, 'fonts');
-    assert.equal(matches.groups.hash, 'b88c7af5d16681bd137156929ff8baec82526560');
+    assert.equal(matches.groups.branch, 'b88c7af5d16681bd137156929ff8baec82526560');
     assert.equal(matches.groups.path, 'fonts/sil/alkalami/Alkalami-Regular.ttf');
     const res = await getFileDataEndpoints.getFileDataFromGitHub(callbacks, '', matches);
     assert.isNotNull(res);
