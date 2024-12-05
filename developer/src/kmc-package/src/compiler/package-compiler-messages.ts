@@ -81,9 +81,11 @@ export class PackageCompilerMessages {
   static Error_PackageNameCannotBeBlank = () => m(this.ERROR_PackageNameCannotBeBlank,
     `Package name cannot be an empty string.`);
 
-    static ERROR_KeyboardFileNotFound = SevError | 0x0011;
-    static Error_KeyboardFileNotFound = (o:{filename:string}) => m(this.ERROR_KeyboardFileNotFound,
-      `Keyboard file ${def(o.filename)} was not found. Has it been compiled?`);
+  static ERROR_KeyboardFileNotFound = SevError | 0x0011;
+  static Error_KeyboardFileNotFound = (o:{filename:string}) => m(
+    this.ERROR_KeyboardFileNotFound,
+    `Keyboard file ${def(o.filename)} was not found. Has it been compiled?`
+  );
 
   static WARN_KeyboardVersionsDoNotMatch = SevWarn | 0x0012;
   static Warn_KeyboardVersionsDoNotMatch = (o: {keyboard:string, version:string, firstKeyboard:string, firstVersion:string}) => m(this.WARN_KeyboardVersionsDoNotMatch,
@@ -265,7 +267,7 @@ export class PackageCompilerMessages {
   static HINT_RemoteReferencesShouldBeVersion18Plus = SevHint | 0x0031;
   static Hint_RemoteReferencesShouldBeVersion18Plus = (o:{filename: string, kpsVersion: string}) => m(
     this.HINT_RemoteReferencesShouldBeVersion18Plus,
-    `The source package includes a reference to URL '${def(o.filename)}', and the package source version is '${def(o.kpsVersion)}'; the package source version should be at least '18.0'`,
+    `The source package includes a reference to URL '${def(o.filename)}' but the package source version is '${def(o.kpsVersion)}'; the package source version should be at least '18.0'`,
   );
 }
 

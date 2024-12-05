@@ -5,7 +5,7 @@
     <FileVersion>18.0</FileVersion>
   </System>
   <Info>
-    <Name URL="">error_font_file_could_not_be_downloaded</Name>
+    <Name URL="">hint_source_file_has_changed</Name>
     <Copyright URL="">© 2019 National Research Council Canada</Copyright>
     <Author URL="mailto:Eddie.Santos@nrc-cnrc.gc.ca">Eddie Antonio Santos</Author>
     <Version>1.0</Version>

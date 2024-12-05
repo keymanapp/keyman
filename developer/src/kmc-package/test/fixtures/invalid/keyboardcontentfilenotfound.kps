@@ -17,7 +17,7 @@
     <Items/>
   </StartMenu>
   <Info>
-    <Name URL="">Khmer Angkor</Name>
+    <Name URL="">error_keyboard_content_file_not_found</Name>
     <Copyright URL="">© 2015-2022 SIL International</Copyright>
     <Author URL="mailto:makara_sok@sil.org">Makara Sok</Author>
     <Version URL=""></Version>
@@ -27,6 +27,7 @@
   </Files>
   <Keyboards>
     <Keyboard>
+      <!-- ERROR_KeyboardContentFileNotFound -->
       <Name>Khmer Angkor</Name>
       <ID>khmer_angkor</ID>
       <Version>1.3</Version>
