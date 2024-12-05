@@ -30,19 +30,21 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -b ./",
+    "compile": "tsc -b ./ && npm run build",
     "watch": "tsc -watch -b ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
     "test": "echo use 'ui-test' to run the test - TODO-LDML-EDITOR",
-    "ui-test": "vscode-test"
+    "ui-test": "vscode-test",
+    "build": "parcel build --target=default --cache-dir=.parcel-cache --no-content-hash"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.0",
     "@types/node": "20.4.1",
     "@types/vscode": "^1.93.0",
     "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1"
+    "@vscode/test-electron": "^2.4.1",
+    "parcel": "^2.13.2"
   },
   "license": "MIT",
   "dependencies": {
@@ -50,6 +52,15 @@
     "@keymanapp/developer-utils": "*",
     "@keymanapp/kmc-kmn": "*",
     "@keymanapp/kmc-ldml": "*",
-    "@keymanapp/kmc-package": "*"
+    "@keymanapp/kmc-package": "*",
+    "process": "^0.11.10",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "targets": {
+    "default": {
+      "source": "app/index.html",
+      "distDir": "./build"
+    }
   }
 }
