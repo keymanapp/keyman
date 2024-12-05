@@ -7,7 +7,7 @@ import 'mocha';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { SectionCompiler, SectionCompilerNew } from '../../src/compiler/section-compiler.js';
-import { util, KMXPlus, UnicodeSetParser } from '@keymanapp/common-types';
+import { util, KMXPlus, LdmlKeyboardTypes } from '@keymanapp/common-types';
 import { CompilerEvent, compilerEventFormat, CompilerCallbacks, LDMLKeyboardXMLSourceFileReader, LDMLKeyboardTestDataXMLSourceFile, LDMLKeyboard, } from "@keymanapp/developer-utils";
 import { LdmlKeyboardCompiler } from '../../src/main.js'; // make sure main.js compiles
 import { assert } from 'chai';
@@ -297,7 +297,7 @@ export function testCompilationCases(compiler: SectionCompilerNew, cases : Compi
     });
   }
 }
-async function getTestUnicodeSetParser(callbacks: CompilerCallbacks): Promise<UnicodeSetParser> {
+async function getTestUnicodeSetParser(callbacks: CompilerCallbacks): Promise<LdmlKeyboardTypes.UnicodeSetParser> {
   // for tests, just create a new one
   // see LdmlKeyboardCompiler.getUsetParser()
   const compiler = new KmnCompiler();

@@ -107,9 +107,9 @@ function do_test() {
     WTR_DEBUG=" --manual"
   fi
 
-  c8 mocha --recursive $MOCHA_FLAGS ./src/test/mocha/cases/
+  c8 mocha --recursive $MOCHA_FLAGS ./src/tests/mocha/cases/
 
-  web-test-runner --config ./src/test/test-runner/web-test-runner${WTR_CONFIG}.config.mjs ${WTR_DEBUG}
+  web-test-runner --config ./src/tests/test-runner/web-test-runner${WTR_CONFIG}.config.mjs ${WTR_DEBUG}
 }
 
 builder_run_action configure  do_configure

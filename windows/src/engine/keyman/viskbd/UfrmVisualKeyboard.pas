@@ -1,4 +1,4 @@
-(*
+﻿(*
   Name:             UfrmVisualKeyboard
   Copyright:        Copyright (C) SIL International.
   Documentation:
@@ -638,10 +638,10 @@ begin
   if Command in [HELP_CONTEXT, HELP_CONTEXTPOPUP, HELP_INDEX, HELP_CONTENTS] then
   begin
     case ActivePage of
-      apKeyboard: TKeymanDesktopShell.OpenHelp('context_onscreenkeyboard');
-      apCharacterMap: TKeymanDesktopShell.OpenHelp('context_charactermap');
-      apFontHelper: TKeymanDesktopShell.OpenHelp('context_fonthelper');
-      apEntryHelper: TKeymanDesktopShell.OpenHelp('context_entryhelper');
+      apKeyboard: TKeymanDesktopShell.OpenHelp('context/toolbox-onscreenkeyboard');
+      apCharacterMap: TKeymanDesktopShell.OpenHelp('context/toolbox-charactermap');
+      apFontHelper: TKeymanDesktopShell.OpenHelp('context/toolbox-fonthelper');
+      apEntryHelper: TKeymanDesktopShell.OpenHelp('index');
     end;
   end;
 end;
@@ -1546,7 +1546,12 @@ end;
 
 procedure TfrmVisualKeyboard.BtnHelpClick(Sender: TObject);
 begin
-  TKeymanDesktopShell.OpenHelpJump('context_onscreenkeyboard', frmKeyman7Main.ActiveKeyboard);
+  case ActivePage of
+    apKeyboard: TKeymanDesktopShell.OpenHelpJump('context/toolbox-onscreenkeyboard', frmKeyman7Main.ActiveKeyboard);
+    apCharacterMap: TKeymanDesktopShell.OpenHelpJump('context/toolbox-charactermap', frmKeyman7Main.ActiveKeyboard);
+    apFontHelper: TKeymanDesktopShell.OpenHelpJump('context/toolbox-fonthelper', frmKeyman7Main.ActiveKeyboard);
+    apEntryHelper: TKeymanDesktopShell.OpenHelpJump('index', frmKeyman7Main.ActiveKeyboard);
+  end;
 end;
 
 procedure TfrmVisualKeyboard.BtnHideHint(Sender: TObject);

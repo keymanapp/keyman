@@ -274,11 +274,11 @@ export class KmnCompilerMessages {
   static ERROR_UnterminatedString                             = SevError | 0x019;
   static Error_UnterminatedString                             = () => m(this.ERROR_UnterminatedString, `Unterminated string in line`);
 
-  static ERROR_StringInVirtualKeySection                      = SevError | 0x01A;
-  static Error_StringInVirtualKeySection                      = () => m(this.ERROR_StringInVirtualKeySection, `extend string illegal in virtual key section`);
+  // static ERROR_StringInVirtualKeySection                      = SevError | 0x01A; // no longer used, see #12612
+  // static Error_StringInVirtualKeySection                      = () => m(this.ERROR_StringInVirtualKeySection, `extend string illegal in virtual key section`);
 
-  static ERROR_AnyInVirtualKeySection                         = SevError | 0x01B;
-  static Error_AnyInVirtualKeySection                         = () => m(this.ERROR_AnyInVirtualKeySection, `'any' command is illegal in virtual key section`);
+  // static ERROR_AnyInVirtualKeySection                         = SevError | 0x01B; // no longer used, see #12612
+  // static Error_AnyInVirtualKeySection                         = () => m(this.ERROR_AnyInVirtualKeySection, `'any' command is illegal in virtual key section`);
 
   static ERROR_InvalidAny                                     = SevError | 0x01C;
   static Error_InvalidAny                                     = () => m(this.ERROR_InvalidAny, `Invalid 'any' command`);
@@ -286,23 +286,23 @@ export class KmnCompilerMessages {
   static ERROR_StoreDoesNotExist                              = SevError | 0x01D;
   static Error_StoreDoesNotExist                              = () => m(this.ERROR_StoreDoesNotExist, `Store referenced does not exist`);
 
-  static ERROR_BeepInVirtualKeySection                        = SevError | 0x01E;
-  static Error_BeepInVirtualKeySection                        = () => m(this.ERROR_BeepInVirtualKeySection, `'beep' command is illegal in virtual key section`);
+  // static ERROR_BeepInVirtualKeySection                        = SevError | 0x01E; // no longer used, see #12612
+  // static Error_BeepInVirtualKeySection                        = () => m(this.ERROR_BeepInVirtualKeySection, `'beep' command is illegal in virtual key section`);
 
-  static ERROR_IndexInVirtualKeySection                       = SevError | 0x01F;
-  static Error_IndexInVirtualKeySection                       = () => m(this.ERROR_IndexInVirtualKeySection, `'index' command is illegal in virtual key section`);
+  // static ERROR_IndexInVirtualKeySection                       = SevError | 0x01F; // no longer used, see #12612
+  // static Error_IndexInVirtualKeySection                       = () => m(this.ERROR_IndexInVirtualKeySection, `'index' command is illegal in virtual key section`);
 
   static ERROR_InvalidIndex                                   = SevError | 0x020;
   static Error_InvalidIndex                                   = () => m(this.ERROR_InvalidIndex, `Invalid 'index' command`);
 
-  static ERROR_OutsInVirtualKeySection                        = SevError | 0x021;
-  static Error_OutsInVirtualKeySection                        = () => m(this.ERROR_OutsInVirtualKeySection, `'outs' command is illegal in virtual key section`);
+  // static ERROR_OutsInVirtualKeySection                        = SevError | 0x021; // no longer used, see #12612
+  // static Error_OutsInVirtualKeySection                        = () => m(this.ERROR_OutsInVirtualKeySection, `'outs' command is illegal in virtual key section`);
 
   static ERROR_InvalidOuts                                    = SevError | 0x022;
   static Error_InvalidOuts                                    = () => m(this.ERROR_InvalidOuts, `Invalid 'outs' command`);
 
-  static ERROR_ContextInVirtualKeySection                     = SevError | 0x024;
-  static Error_ContextInVirtualKeySection                     = () => m(this.ERROR_ContextInVirtualKeySection, `'context' command is illegal in virtual key section`);
+  // static ERROR_ContextInVirtualKeySection                     = SevError | 0x024; // no longer used, see #12612
+  // static Error_ContextInVirtualKeySection                     = () => m(this.ERROR_ContextInVirtualKeySection, `'context' command is illegal in virtual key section`);
 
   static ERROR_InvalidUse                                     = SevError | 0x025;
   static Error_InvalidUse                                     = () => m(this.ERROR_InvalidUse, `Invalid 'use' command`);
@@ -355,8 +355,8 @@ export class KmnCompilerMessages {
   static ERROR_InvalidCall                                    = SevError | 0x035;
   static Error_InvalidCall                                    = () => m(this.ERROR_InvalidCall, `The 'call' command is invalid`);
 
-  static ERROR_CallInVirtualKeySection                        = SevError | 0x036;
-  static Error_CallInVirtualKeySection                        = () => m(this.ERROR_CallInVirtualKeySection, `'call' command is illegal in virtual key section`);
+  // static ERROR_CallInVirtualKeySection                        = SevError | 0x036; // no longer used, see #12612
+  // static Error_CallInVirtualKeySection                        = () => m(this.ERROR_CallInVirtualKeySection, `'call' command is illegal in virtual key section`);
 
   static ERROR_CodeInvalidInKeyStore                          = SevError | 0x037;
   static Error_CodeInvalidInKeyStore                          = () => m(this.ERROR_CodeInvalidInKeyStore, `The command is invalid inside a store that is used in a key part of the rule`);
@@ -401,8 +401,8 @@ export class KmnCompilerMessages {
   static ERROR_80FeatureOnly                                  = SevError | 0x047;
   static Error_80FeatureOnly                                  = () => m(this.ERROR_80FeatureOnly, `This feature requires store(version) '8.0' or higher`);
 
-  static ERROR_InvalidInVirtualKeySection                     = SevError | 0x048;
-  static Error_InvalidInVirtualKeySection                     = () => m(this.ERROR_InvalidInVirtualKeySection, `This statement is not valid in a virtual key section`);
+  // static ERROR_InvalidInVirtualKeySection                     = SevError | 0x048; // no longer used, see #12612
+  // static Error_InvalidInVirtualKeySection                     = () => m(this.ERROR_InvalidInVirtualKeySection, `This statement is not valid in a virtual key section`);
 
   static ERROR_InvalidIf                                      = SevError | 0x049;
   static Error_InvalidIf                                      = () => m(this.ERROR_InvalidIf, `The if() statement is not valid`);

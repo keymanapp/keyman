@@ -80,20 +80,27 @@ function do_configure() {
 }
 
 function do_test() {
+  local MOCHA_FLAGS=
+
+  if [[ "${TEAMCITY_GIT_PATH:-}" != "" ]]; then
+    # we're running in TeamCity
+    MOCHA_FLAGS="-reporter mocha-teamcity-reporter"
+  fi
+
   eslint .
-  tsc --build test
+  tsc --build tests
 
   readonly C8_THRESHOLD=60
 
   # Excludes are defined in .c8rc.json
-  c8 -skip-full --reporter=lcov --reporter=text --lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD mocha "${builder_extra_params[@]}"
+  c8 -skip-full --reporter=lcov --reporter=text --lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD mocha ${MOCHA_FLAGS} "${builder_extra_params[@]}"
   builder_echo warning "Coverage thresholds are currently $C8_THRESHOLD%, which is lower than ideal."
   builder_echo warning "Please increase threshold in build.sh as test coverage improves."
 }
 
 #-------------------------------------------------------------------------------------------------------------------
 
-builder_run_action clean      rm -rf ./build/ ./tsconfig.tsbuildinfo
+builder_run_action clean      rm -rf ./build/ ./tsconfig.tsbuildinfo ./src/schemas/ ./node_modules/ ./obj/
 builder_run_action configure  do_configure
 builder_run_action build      tsc --build
 builder_run_action test       do_test
