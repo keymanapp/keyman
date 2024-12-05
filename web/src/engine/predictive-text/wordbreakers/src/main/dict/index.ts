@@ -1,5 +1,7 @@
 import { LazySpan } from "../default/index.js";
-import { Span, LexiconTraversal } from "@keymanapp/common-types";
+import { LexicalModelTypes } from "@keymanapp/common-types";
+import Span = LexicalModelTypes.Span;
+import LexiconTraversal = LexicalModelTypes.LexiconTraversal;
 
 // Based on the MIN_KEYSTROKE_PROBABILITY penalty used by the lm-worker.
 const CHAR_SKIP_PENALTY = -Math.log2(.0001);
