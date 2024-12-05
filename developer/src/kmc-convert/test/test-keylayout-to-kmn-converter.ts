@@ -33,14 +33,16 @@ describe('KeylayoutToKmnConverter', function() {
     it('should throw on all elements loaded', async function () {
 
       // some keys, no deadkeys
-      //const inputFilename  = makePathToFixture('../data/Mysample.keylayout');
+       //const inputFilename  = makePathToFixture('../data/Mysample.keylayout');
       // all keys, some deadkeys
-      const inputFilename  = makePathToFixture('../data/My_dk_Keyboard.keylayout');
       //const inputFilename  = makePathToFixture('../data/US_complete.keylayout');
+
       //const inputFilename  = makePathToFixture('../data/Italian_copy.keylayout');
-      
+      const inputFilename  = makePathToFixture('../data/My_dk_Keyboard.keylayout');
+
       const outputFilename = makePathToFixture('../data/MyResult.kmn');
-// TODO check filename if correct
+      
+      // TODO check filename if correct
       console.log('        inputFilename', inputFilename)
       console.log('        outputFilename', outputFilename)
 

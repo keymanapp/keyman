@@ -42,6 +42,11 @@ import boxXmlArray = util.boxXmlArray;*/
 //     read:  answer :  + [K_A] > 'a'  is OK / TODO which format to use in output ?  + [K_A] > 'a' (character code)  or    + [K_A] > U+0061 (virt Keycode)
 //     read   TODO which stores?
 //     one entry vs several entry in tags
+//     false arrangement of tags
+//     no added NCAPS when first modifier in modifierMap does not contain "caps" or"caps?"
+//     use length to clear array instead of defining evetry time new (modifierMap_ONE_InKeymapSelect.length=0
+//     naming of for-loop var i,j,k?...
+
 
 
 import { XMLParser } from 'fast-xml-parser';  // for reading a file
@@ -91,26 +96,21 @@ if(source?.keyboard3?.AAA) {
 // need to specify all elements!!!
 // source = jsonObj.keyboard
 function boxArrays_S(source: any) {
-
-  //console.log("source... before boxing",typeof(source.layoutsX),source.layoutsX)
-  console.log("source... before boxing", typeof (source.terminators), source.terminators)
-  //             parent tag              child-tag
-  // boxXmlArray(source.visualkeyboard, 'encoding');
-  //boxXmlArray_S(source.layoutsX, 'layoutX');
+  //             parent tag     child-tag
   boxXmlArray_S(source.layouts, 'layout');
-  boxXmlArray_S(source.modifierMap, 'keyMapSelect');
   boxXmlArray_S(source.terminators, 'when');
+  boxXmlArray_S(source, 'keyMapSet');
+  boxXmlArray_S(source.keyMapSet, 'keyMap');
+  boxXmlArray_S(source.action, 'actions');
 
-  /* if(source?.keyboard3?.modifierMap) {
-     boxXmlArray_S(source?.keyboard3?.modifierMap, 'keyMapSelect');
-     for(const keyMapSelect_Var of source?.keyboard3?.modifierMap?.keyMapSelect) {
-       boxXmlArray_S(keyMapSelect_Var, 'modifier');
-     }
-   }*/
-
-
-  //console.log("source... after boxing",typeof(source.layoutsX),source.layoutsX)
-  console.log("source... after boxing", typeof (source.terminators), source.terminators)
+  boxXmlArray_S(source?.modifierMap, 'keyMapSelect');
+  for (const keyMapSelect of source?.modifierMap?.keyMapSelect) {
+    boxXmlArray_S(keyMapSelect, 'modifier');
+  }
+  boxXmlArray_S(source?.actions, 'action');
+  for (const action of source?.actions?.action) {
+    boxXmlArray_S(action, 'when');
+  }
   return source;
 }
 
@@ -121,7 +121,8 @@ export interface convert_object {
   ArrayOf_Element_Layouts: string[],                            // needed?? I think no
   ArrayOf_Element_KeyOutput: Uint8Array[][],
   ArrayOf_Element_KeyAction: Uint8Array[][],
-  ArrayOf_Element_ModifierMaps: string[],
+  ArrayOf_Element_ALL_ModifierMaps: string[],
+  ArrayOf_Element_ModifierMaps_ALLKeyMapSelect: string[][],
   ArrayOf_Element_Terminators: Uint8Array[]                     // add terminators ( ^,´,`)
   ArrayOf_processed_VK_from_keylayout: (string | number)[][],
   ArrayOf_processed_dk: string[][],                             // add dk-mapping ( dk1 <-> '^' )
@@ -168,6 +169,7 @@ export class KeylayoutToKmnConverter {
     }
 
     console.log(' _S2 then WRITE to kmn .....................................');
+
     const out = this.write(outArray)
     if (!out) {
       return null;
@@ -186,26 +188,14 @@ export class KeylayoutToKmnConverter {
    */
   public read(filename: string): convert_object {
 
-    /*const stringOptions = [
-      'layoutX', 'layoutsX', 'layout', 'layouts'
-    ]*/
-
     console.log("inputFilename read", filename)
     const options = {
       ignoreAttributes: false,
       attributeNamePrefix: '@_'    // to access the attribute
-      // ,arrayMode:  true         // create one single ele as array
-      // arrayMode:  /layoutsX/
-      // ,transformTagName: (layoutsX:any) => layoutsX.toLowerCase()
-      /*,isArray: (tagName: any) => {
-        if (stringOptions.includes(tagName)) return true;
-        else return false;
-      }*/
-
     };
 
 
-
+    console.log("xmlFile_name", (process.cwd() + "\\data" + filename.substring(filename.lastIndexOf("\\"))).replace(" ", ""))
     //const xmlFile = readFileSync(`${process.cwd()}/data/MySample.keylayout`, 'utf8')
     const xmlFile = readFileSync((process.cwd() + "\\data" + filename.substring(filename.lastIndexOf("\\"))).replace(" ", ""), 'utf8');
 
@@ -213,12 +203,12 @@ export class KeylayoutToKmnConverter {
     /*const fullPath = (process.cwd() + "\\data" + filename.substring(filename.lastIndexOf("\\"))).replace(" ", "")
     const xmlFile1 = this.callbacks.loadFile(fullPath)
     console.log("xmlFile1",xmlFile1)*/
-    //console.log("xmlFile",xmlFile)
+
 
     console.log("layouts_array read ")
     const parser = new XMLParser(options);
     const jsonObj = parser.parse(xmlFile); // get plain Object
-
+    const modifierMap_ALL_KeyMapSelects: string[][] = []            // modifier for each keymapselect
     const modifierMap_all_Layers: string[] = []                   // array holding all MODIFIER strings e.g. "anyShift caps anyOption"  -why not put modifiers into Uint8Array along with values of keys of layer
     const keys_output_all_Layers: Uint8Array[][] = []
     const keys_action_all_Layers: Uint8Array[][] = []             // array holding all values with ACTION attribute (needed for finding deadkeys)
@@ -226,7 +216,11 @@ export class KeylayoutToKmnConverter {
     const duplicate_layouts_array: string[] = []                  // array holding the layouts e.g. ANSI or JIS // needed?? I think no
     const deadkeyedChars_all_Layers: string[][] = []              // array holding all DEADKEYS for each mod state â, ê, ,....
 
+    let dk_pairs_all_Layers: string[][] = []                   // add dk-mapping ( dk1 <-> '^' )
+
     boxArrays_S(jsonObj.keyboard);
+
+    // fill arrays
     // TODO call: get only ANSI
     // Do I need to care or is there always ANSI which is always keyMapSet[0]
     // if so code can be shortened
@@ -243,36 +237,31 @@ export class KeylayoutToKmnConverter {
     const layouts_array: any[] = duplicate_layouts_array.filter(function (item, pos, self) {
       return self.indexOf(item) == pos;
     })
-
     // remove JIS (if keyMap contains baseMapSet it`s JIS)
     for (let i = 0; i < layouts_array.length; i++) {
       if (jsonObj.keyboard.keyMapSet[i].keyMap[0]['@_baseMapSet'])
         layouts_array.splice(i, 1);
     }
-    
     // in case there always ANSI which is always keyMapSet[0]
     //const layouts_array: string[] = duplicate_layouts_array
     const keyMapSet_count = 0
 
-    //console.log("layouts_array",layouts_array)
-    // -----
+    //#### end layouts ###############################################################################################################################################
 
-    const nrOfStates = jsonObj.keyboard.keyMapSet[keyMapSet_count].keyMap.length
-    //const nrOfKeys_inLayer = jsonObj.keyboard.keyMapSet[keyMapSet_count].keyMap[0].key.length   // will they all have the same length later ?
+    for (let j = 0; j < jsonObj.keyboard.modifierMap.keyMapSelect.length; j++) {
+      const modifierMap_ONE_InKeymapSelect: string[] = []
 
+      for (let k = 0; k < jsonObj.keyboard.modifierMap.keyMapSelect[j].modifier.length; k++) {
+        modifierMap_all_Layers.push(jsonObj.keyboard.modifierMap.keyMapSelect[j].modifier[k]['@_keys'])
+        modifierMap_ONE_InKeymapSelect.push(jsonObj.keyboard.modifierMap.keyMapSelect[j].modifier[k]['@_keys'])
+      }
+      modifierMap_ALL_KeyMapSelects.push(modifierMap_ONE_InKeymapSelect)
 
-    // .........................................................
-    // KEYMAP: get all keys for attribute "modifiers"  - TODO can i use shorter function?
-    // modifiers type string
-    // .........................................................
-
-    // loop through all ss-combin
-    console.log("nrOfStates", nrOfStates)
-    for (let j = 0; j < nrOfStates; j++) {
-      modifierMap_all_Layers[j] = jsonObj.keyboard.modifierMap.keyMapSelect[j].modifier['@_keys']
       // create a new array of keys_in_Layer (type Uint8tarray)
       const keys_output_One_Layer: Uint8Array[] = []
       const keys_action_One_Layer: Uint8Array[] = []
+
+      //#### end modifierMap ###############################################################################################################################################
 
       // .........................................................
       // KEYMAP: get all keys for attribute "output" ( y,c,b,...)  - TODO can i use shorter function?
@@ -284,7 +273,7 @@ export class KeylayoutToKmnConverter {
           // textencoder is of Uint8Array(1) for A and Uint8Array(3) for ☺
           keys_output_One_Layer[i] = new TextEncoder().encode(jsonObj.keyboard.keyMapSet[keyMapSet_count].keyMap[j].key[i]['@_output']);
         }
-
+        // ToDo do I need empty fields in keys_output_all_Layers, keys_action_all_Layers
         // .........................................................
         // KEYMAP: get all keys for attribute "action" ( ^,a,e,i,...)  - TODO can i use shorter function?
         // action type Uint8Array -> string
@@ -293,53 +282,118 @@ export class KeylayoutToKmnConverter {
           keys_action_One_Layer[i] = new TextEncoder().encode(jsonObj.keyboard.keyMapSet[keyMapSet_count].keyMap[j].key[i]['@_action']);
         }
       }
+
       // .........................................................
       // create array of "action" and array of "output"
       keys_output_all_Layers.push(keys_output_One_Layer)        // save all @output data ( will be used for conversion, write...)
       keys_action_all_Layers.push(keys_action_One_Layer)        // save all @action data ( will be used for deadkeys)
+
+
+      //#### end output+action ###############################################################################################################################################
     }
+
     // .........................................................
     // ACTION: create array of "deadkey" /  "deadkey names"  - TODO can i use shorter function?
     // action type string[] -> string[][]
     // .........................................................
-    const dk_pairs_all_Layers: string[][] = []
+    const dk_pairs_all_Layers_max: string[][] = []
+
+    // C3 state none + next Nr => deadkeys
+    console.log("--------------------------------")
+
+    // loop through actions and get the value of attribute "next" (which indicates this is a deadkey)
     for (let jj = 0; jj < jsonObj.keyboard.actions.action.length; jj++) {
-      // if there is a "next" attribute-> it is a dk
-      if (jsonObj.keyboard.actions.action[jj].when['@_next'] !== undefined) {
-        const vec1d: string[] = []
-        vec1d.push(jsonObj.keyboard.actions.action[jj].when['@_next'])
-        vec1d.push(jsonObj.keyboard.actions.action[jj]['@_id'])
-        dk_pairs_all_Layers.push(vec1d)
+      for (let kk = 0; kk < jsonObj.keyboard.actions.action[jj].when.length; kk++) {
+
+        if (jsonObj.keyboard.actions.action[jj].when[kk]['@_next'] !== undefined) {
+          const vec1d: string[] = []
+          let dk_to_print
+
+          const text_attribute_next = jsonObj.keyboard.actions.action[jj].when[kk]['@_next']
+
+          // loop through terminators and get output of that next state
+          for (let n = 0; n < jsonObj.keyboard.terminators.when.length; n++) {
+            if (jsonObj.keyboard.terminators.when[n]['@_state'] === text_attribute_next)
+              dk_to_print = jsonObj.keyboard.terminators.when[n]['@_output']
+          }
+
+          vec1d.push(text_attribute_next)
+          vec1d.push(dk_to_print)
+          vec1d.push(jsonObj.keyboard.actions.action[jj]['@_id'])   // todo remove later
+          dk_pairs_all_Layers_max.push(vec1d)
+        }
       }
     }
+    dk_pairs_all_Layers = dk_pairs_all_Layers_max.filter(function (item, pos, self) {
+      return self.indexOf(item) == pos;
+    })
+
+    const dk: string[] = [];
 
     // .........................................................
     // ACTION: create array of "deadkeyables_all_Layers"  - TODO can i use shorter function?
     // deadkeyables_one type Uint8Array -> string[][]
     // .........................................................
     const deadkeyables_all_Layers: string[][] = []
+    // needed? we just want ANSI = the first one
     for (let j = 0; j < jsonObj.keyboard.keyMapSet[keyMapSet_count].keyMap.length; j++) {
       const deadkeyables_one: string[] = []
+      // loop through all keys of ANSI
       for (let i = 0; i < jsonObj.keyboard.keyMapSet[keyMapSet_count].keyMap[0].key.length; i++) {
-        const resulting_character = new TextDecoder().decode(keys_action_all_Layers[j][i])
+
+        // find output in action id
+        let dk_char
+        for (let jj = 0; jj < jsonObj.keyboard.actions.action.length; jj++) {
+
+          // find the action ID which was specified in keymap->key->action e.g. a19
+          const action_name = new TextDecoder().decode(keys_action_all_Layers[j][i])
+
+          if (action_name !== "") {
+
+            // find action id in actions->action e.g. a19
+            if (jsonObj.keyboard.actions.action[jj]['@_id'] === action_name) {
+
+              //a85
+
+              // 4 cases:
+              //    C1 state none + output  =>
+              //    C2 state Nr   + output  =>
+              // OK C3 state none + next Nr => deadkeys see above
+              //    C4 state Nr   + next Nr => loop deadkeyables
+
+              if (jsonObj.keyboard.actions.action[jj].when[0]['@_state'] === "none") {
+                dk_char = jsonObj.keyboard.actions.action[jj].when[0]['@_output']
+              }
+            }
+          }
+        }
+
+
+
+        //const resulting_character = new TextDecoder().decode(keys_action_all_Layers[j][i])
+        const resulting_character = dk_char
+
         if (resulting_character !== "")
           deadkeyables_one.push(resulting_character)
       }
 
-      const dk: string[] = [];
       for (let k = 0; k < dk_pairs_all_Layers.length; k++) {
         dk.push(dk_pairs_all_Layers[k][1])
       }
 
       if (deadkeyables_one.length !== 0) {
         deadkeyables_all_Layers.push(deadkeyables_one)
-        // filter out dk -> plain deadkeyables_all_Layers ( a,^, e,i,´,u   => a,e,i,u)
-        // return all that don`t find ^,´, `
-        deadkeyables_all_Layers[j] = deadkeyables_all_Layers[j].filter(function (el) {
-          return dk.indexOf(el) < 0;
-        });
       }
     }
+
+    for (let j = 0; j < deadkeyables_all_Layers.length; j++) {
+      // filter out dk -> plain deadkeyables_all_Layers ( a,^, e,i,´,u   => a,e,i,u)
+      // return all that don`t find ^,´, `
+      deadkeyables_all_Layers[j] = deadkeyables_all_Layers[j].filter(function (el) {
+        return dk.indexOf(el) < 0;
+      });
+    }
+
     // .........................................................
     // TERMINATOR: create array of "terminators"  - TODO can i use shorter function? what element of terminators do i need
     // terminators when state type Uint8Array[]
@@ -358,17 +412,27 @@ export class KeylayoutToKmnConverter {
     // find this value in <actions><action id=...>
     // in their 'when' find output for dk
     // for all 'action' at keys paragraph
+
+
     for (let j = 0; j < dk_pairs_all_Layers.length; j++) {
+
+      //console.log("bis hier j", j)
       const deadkeys_One_dk: string[] = []
       // find  in action e.g.  <action id="o">
       for (let k = 0; k < keys_action_all_Layers[j].length; k++) {
+
+        //console.log("bis hier k", k)
         const action_from_keys_prargraph = new TextDecoder().decode(keys_action_all_Layers[j][k])
         if (action_from_keys_prargraph !== "") {
           // find the same id (e.g.  <action id="o">) in the actions-paragraph
           for (let l = 0; l < jsonObj.keyboard.actions.action.length; l++) {
+
+            //console.log("bis hier l", l)
             if (jsonObj.keyboard.actions.action[l]['@_id'] === action_from_keys_prargraph) {
               // loop through when until dk name (e.g. dk s0)
               for (let m = 0; m < jsonObj.keyboard.actions.action[l].when.length; m++) {
+
+                // console.log("bis hier m", m)
                 // and get their @_output
                 if (jsonObj.keyboard.actions.action[l].when[m]['@_state'] === dk_pairs_all_Layers[j][0]) {
                   // todo push only if @output is found. if next is found: get value from terminators
@@ -385,6 +449,7 @@ export class KeylayoutToKmnConverter {
       deadkeyedChars_all_Layers.push(deadkeys_One_dk)
     }
 
+
     const vk: (string | number)[][] = []
 
     // TODO remove unneccassary elements
@@ -393,49 +458,16 @@ export class KeylayoutToKmnConverter {
       ArrayOf_Element_Layouts: layouts_array,                     // needed?? I think no
       ArrayOf_Element_KeyOutput: keys_output_all_Layers,
       ArrayOf_Element_KeyAction: keys_action_all_Layers,
-      ArrayOf_Element_ModifierMaps: modifierMap_all_Layers,
+      ArrayOf_Element_ALL_ModifierMaps: modifierMap_all_Layers,                   // all 18 modifiers in 1 array
+      ArrayOf_Element_ModifierMaps_ALLKeyMapSelect: modifierMap_ALL_KeyMapSelects,   // 18 modifiers in 8 KeyMapSelect(behaviors)
       ArrayOf_Element_Terminators: terminators_all_Layers,        // add terminators ( ^,´,`)
       ArrayOf_processed_VK_from_keylayout: vk,
       ArrayOf_processed_dk: dk_pairs_all_Layers,                  // add dk-mapping ( dk1 <-> '^' )
+
       ArrayOf_processed_deadkeyables: deadkeyables_all_Layers,    // add char that can be modified with dk ( a,e,i,o,u)
       ArrayOf_processed_deadkeyedChar: deadkeyedChars_all_Layers  // add modified keys ( â,ê,î,ô,û)
     };
 
-    console.log("-----\nTypeOf:")
-    console.log("\n"
-      , "\n    jsonObj.keyboard: ", typeof (jsonObj.keyboard)
-      , "\n    jsonObj.keyboard.layouts: ", typeof (jsonObj.keyboard.layouts)
-      , "\n    jsonObj.keyboard.layouts.layout: ", typeof (jsonObj.keyboard.layouts.layout)
-      , "\n    jsonObj.keyboard.modifierMap: ", typeof (jsonObj.keyboard.modifierMap)
-      , "\n    jsonObj.keyboard.modifierMap.keyMapSelect: ", typeof (jsonObj.keyboard.modifierMap.keyMapSelect)
-      , "\n    jsonObj.keyboard.modifierMap.keyMapSelect[0].modifier: ", typeof (jsonObj.keyboard.modifierMap.keyMapSelect[0].modifier)
-      , "\n    jsonObj.keyboard.keyMapSet: ", typeof (jsonObj.keyboard.keyMapSet)
-      , "\n    jsonObj.keyboard.keyMapSet[0].keyMap: ", typeof (jsonObj.keyboard.keyMapSet[0].keyMap)
-      , "\n    jsonObj.keyboard.keyMapSet[0].keyMap[0].key: ", typeof (jsonObj.keyboard.keyMapSet[0].keyMap[0].key)
-      , "\n    jsonObj.keyboard.actions : ", typeof (jsonObj.keyboard.actions)
-      , "\n    jsonObj.keyboard.actions.action[0] : ", typeof (jsonObj.keyboard.actions.action[0])
-      , "\n    jsonObj.keyboard.terminators: ", typeof (jsonObj.keyboard.terminators)
-      , "\n    jsonObj.keyboard.terminators.when: ", typeof (jsonObj.keyboard.terminators.when)
-      , "\n    jsonObj.keyboard.actions.action[0].when: ", typeof (jsonObj.keyboard.actions.action[0].when)
-    )
-
-    console.log("-----\nplus:")
-    console.log("Address loke\n"
-      , "\n    jsonObj.keyboard: ", (jsonObj.keyboard)
-      , "\n    jsonObj.keyboard.layouts: ", (jsonObj.keyboard.layouts)
-      , "\n    jsonObj.keyboard.layouts.layout: ", (jsonObj.keyboard.layouts.layout)
-      , "\n    jsonObj.keyboard.modifierMap: ", (jsonObj.keyboard.modifierMap)
-      , "\n    jsonObj.keyboard.modifierMap.keyMapSelect: ", (jsonObj.keyboard.modifierMap.keyMapSelect)
-      , "\n    jsonObj.keyboard.modifierMap.keyMapSelect[0].modifier: ", (jsonObj.keyboard.modifierMap.keyMapSelect[0].modifier)
-      , "\n    jsonObj.keyboard.keyMapSet: ", (jsonObj.keyboard.keyMapSet)
-      , "\n    jsonObj.keyboard.keyMapSet[0].keyMap: ", (jsonObj.keyboard.keyMapSet[0].keyMap)
-      , "\n    jsonObj.keyboard.keyMapSet[0].keyMap[0].key: ", (jsonObj.keyboard.keyMapSet[0].keyMap[0].key)
-      , "\n    jsonObj.keyboard.actions : ", (jsonObj.keyboard.actions)
-      , "\n    jsonObj.keyboard.actions.action[0] : ", (jsonObj.keyboard.actions.action[0])
-      , "\n    jsonObj.keyboard.actions.action[0].when: ", (jsonObj.keyboard.actions.action[0].when)
-      , "\n    jsonObj.keyboard.terminators: ", (jsonObj.keyboard.terminators)
-      , "\n    jsonObj.keyboard.terminators.when: ", (jsonObj.keyboard.terminators.when)
-    )
     // TODO review condition
     return DataObject
     //return ((keys_output_all_Layers.length === nrOfStates + 5) && keys_output_all_Layers[0].length === nrOfKeys_inLayer) ? keys_output_all_Layers : null;
@@ -471,6 +503,21 @@ export class KeylayoutToKmnConverter {
    */
   //TODO need to use export const USVirtualKeyCodes here
   public write(data_ukelele: convert_object): boolean {
+    console.log("start write")
+    console.log("SizeOf elements: "
+      , "\n ArrayOf_Element_Layouts", data_ukelele.ArrayOf_Element_Layouts.length
+      , "\n ArrayOf_ALL_Element_ModifierMaps", data_ukelele.ArrayOf_Element_ALL_ModifierMaps.length
+      , "\n ArrayOf_Element_KeyAction", data_ukelele.ArrayOf_Element_KeyAction.length
+      , "\n ArrayOf_Element_KeyOutput", data_ukelele.ArrayOf_Element_KeyOutput.length
+      , "\n ArrayOf_Element_Terminators", data_ukelele.ArrayOf_Element_Terminators.length
+      , "\n ArrayOf_Element_ModifierMaps_ALLKeyMapSelect", data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect.length
+      , "\n ArrayOf_Element_ModifierMaps_ALLKeyMapSelect[1]", data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect[1].length
+
+      , "\n ArrayOf_processed_VK_from_keylayout", data_ukelele.ArrayOf_processed_VK_from_keylayout.length
+      , "\n ArrayOf_processed_deadkeyables", data_ukelele.ArrayOf_processed_deadkeyables.length
+      , "\n ArrayOf_processed_deadkeyedChar", data_ukelele.ArrayOf_processed_deadkeyedChar.length
+      , "\n ArrayOf_processed_dk", data_ukelele.ArrayOf_processed_dk.length
+    )
 
     //  *************************************************************
     //  **** write stores *******************************************
@@ -497,10 +544,12 @@ export class KeylayoutToKmnConverter {
     //  **** write rules ********************************************
     //  *************************************************************^
 
+    console.log("start write 1")
     // if caps is used in .keylayout-file we need to add NCAPS in kmn-file
     let isCAPSused = false
     const used_Keys_count = 50  // do we need more than 50 keys??
-    const modi: string[] = data_ukelele.ArrayOf_Element_ModifierMaps;
+    const modi: string[] = data_ukelele.ArrayOf_Element_ALL_ModifierMaps;
+    // const modi: string[] = data_ukelele.ArrayOf_Element_ALL_ModifierMaps;   // Todo check 2darray of modifiuers
     const filteredModifiers: string[] = modi.filter((mod) => (String(mod) === ("caps")))
     if (filteredModifiers.indexOf("caps") >= 0)
       isCAPSused = true
@@ -509,75 +558,127 @@ export class KeylayoutToKmnConverter {
     // find all modifiers used per modifier combination
     // find resulting character from
 
+   // console.log("start write 2, ", "data_ukelele.ArrayOf_ALL_Element_ModifierMaps.length", data_ukelele.ArrayOf_Element_ALL_ModifierMaps.length)
     // loop through keys
     //for (let j = 0; j <kmn_array.ArrayOf_Ukelele_output[0].length; j++) {
     for (let j = 0; j < used_Keys_count; j++) {
 
       data += '\n'
 
-      // loop through modifiers
-      for (let i = 0; i < data_ukelele.ArrayOf_Element_ModifierMaps.length; i++) {
+      // loop through keyMapSelect (8)
+      for (let ii = 0; ii < data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect.length; ii++) {
 
-        // get the modifier for the layer e.g. "CAPS SHIFT"
-        const label_modifier = this.create_kmn_modifier(data_ukelele.ArrayOf_Element_ModifierMaps[i], isCAPSused)
+        // loop through keyMapSelect[ii] (2,4,1,1,...)
+        for (let i = 0; i < data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect[ii].length; i++) {
 
-        // get Key name e.g. K_A
-        const VK: (string | number)[][] = data_ukelele.ArrayOf_processed_VK_from_keylayout
-        const vk_label = VK.filter(item => item[0] === data_ukelele.ArrayOf_processed_VK_from_keylayout[j][0])
+          // get the modifier for the layer e.g. "CAPS SHIFT" -  keyMapSelect[ii][i] = "CAPS SHIFT"
+          const label_modifier = this.create_kmn_modifier(data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect[ii][i], isCAPSused)
 
-        // get the character from keymap-section of .keylayout-file that will be written as result in kmn-file
-        const resulting_character = new TextDecoder().decode(data_ukelele.ArrayOf_Element_KeyOutput[i][j])
+          // get Key name e.g. K_A, K_SLASH
+          const VK: (string | number)[][] = data_ukelele.ArrayOf_processed_VK_from_keylayout
+          const vk_label = VK.filter(item => item[0] === data_ukelele.ArrayOf_processed_VK_from_keylayout[j][0])
+          console.log("---", "vk_label", vk_label)
 
-        // TODO remove j
-        if (resulting_character !== '') {
-          //   e.g.      [     NCAPS                  K_J                       ] >  '    j                       '
-          data += j + `+ [` + (label_modifier + ' ' + vk_label[0][1]).trim() + `] > \'` + resulting_character + '\'\n'
+          console.log("start write 2C-", j, i)
+          //console.log("start write 2C-", j, i, data_ukelele.ArrayOf_Element_KeyOutput[i][j])
+          // get the character from keymap-section of .keylayout-file that will be written as result in kmn-file
+          const resulting_character = new TextDecoder().decode(data_ukelele.ArrayOf_Element_KeyOutput[ii][j])
+
+          console.log("start write 2D")
+          // TODO remove j +"(modif:" + i + `)
+          if (resulting_character !== '') {
+            console.log("start write 2E")
+            //   e.g.      [     NCAPS                  K_J                       ] >  '    j                       '
+            data += j + "-(modif:" + ii + "-" + i + `) + [` + (label_modifier + ' ' + vk_label[0][1]).trim() + `] > \'` + resulting_character + '\'\n'
+          }
+          console.log("start write 2F")
         }
       }
+      console.log("start write 2G")
     }
 
+    console.log("start write 3")
     data += '\n'
 
     //  *************************************************************
     //  **** write deadkeys *****************************************
     //  *************************************************************
 
+
+    // all 109 keys with action a9
     for (let i = 0; i < data_ukelele.ArrayOf_Element_KeyAction[0].length; i++) {
-      // loop through modifiers
-      for (let j = 0; j < data_ukelele.ArrayOf_Element_ModifierMaps.length; j++) {
+      // loop through keyMapSelect (8)
+      for (let ii = 0; ii <  data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect.length; ii++) {
+      //for (let ii = 0; ii < 8; ii++) {
+        // loop through modifiers
+        //for (let j = 0; j < data_ukelele.ArrayOf_Element_KeyAction.length; j++) {
+        // 8 behaviors
+        for (let j = 0; j < data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect.length; j++) {
+          //console.log("start write 3A")
 
-        // get the modifier for the layer
-        const label_modifier = this.create_kmn_modifier(data_ukelele.ArrayOf_Element_ModifierMaps[j], isCAPSused)
+          // get the modifier for the layer
+          //const label_modifier = this.create_kmn_modifier(data_ukelele.ArrayOf_Element_ALL_ModifierMaps[j], isCAPSused)
+          const label_modifier = this.create_kmn_modifier(data_ukelele.ArrayOf_Element_ALL_ModifierMaps[j], isCAPSused)
 
-        // get the character from keymap-section of .keylayout-file that will be written as result in kmn-file
-        const resulting_character = new TextDecoder().decode(data_ukelele.ArrayOf_Element_KeyAction[j][i])
+          // get the character from keymap-section of .keylayout-file that will be written as result in kmn-file
+          //const resulting_character = new TextDecoder().decode(data_ukelele.ArrayOf_Element_KeyAction[j][i])
+          // wrong since it attempts to convert a9 and not 4 ( the termínator id )
+          const resulting_character = new TextDecoder().decode(data_ukelele.ArrayOf_Element_KeyAction[ii][i])
 
-        if (resulting_character !== "") {
-          const VK: (string | number)[][] = data_ukelele.ArrayOf_processed_VK_from_keylayout
-          const vk_label = VK.filter(item => item[0] === data_ukelele.ArrayOf_processed_VK_from_keylayout[i][0])
+          // therefore get character from ~ <- 4 <- a9
+    //const realChar = this.getCharacterFromActionName(data_ukelele, data_ukelele.ArrayOf_Element_KeyAction[ii][i])
+    //console.log("realChar", realChar,i,ii,j )
+          // console.log("data_ukelele.ArrayOf_Element_KeyAction[ii][i],",
+          //  data_ukelele.ArrayOf_Element_KeyAction[ii][i],
+          //   realChar)
 
-          for (let k = 0; k < data_ukelele.ArrayOf_processed_dk.length; k++) {
-            if ((resulting_character !== "") && (resulting_character === data_ukelele.ArrayOf_processed_dk[k][1])) {
-              data += '[' + (label_modifier + ' ' + vk_label[0][1]).trim() + '] ' + "> dk(" + this.getHexFromChar(data_ukelele.ArrayOf_processed_dk[k][1]) + ") " + '\n'
+          if (resulting_character !== "") {
+            //  console.log("start write 3B+3C", i, ii, j, label_modifier, "---", resulting_character)
+
+            const VK: (string | number)[][] = data_ukelele.ArrayOf_processed_VK_from_keylayout
+            const vk_label = VK.filter(item => item[0] === data_ukelele.ArrayOf_processed_VK_from_keylayout[i][0])
+            //  console.log("VK", VK, "vk_label", vk_label)
+
+            //  console.log("start write 3D,data_ukelele.ArrayOf_processed_dk", data_ukelele.ArrayOf_processed_dk)
+            for (let k = 0; k < data_ukelele.ArrayOf_processed_dk.length; k++) {
+              /*    console.log("start write 3E")
+                  console.log("resulting_character", resulting_character, "data_ukelele.ArrayOf_processed_dk[k][1]", data_ukelele.ArrayOf_processed_dk[k][1])
+              console.log("data_ukelele.ArrayOf_processed_dk is",data_ukelele.ArrayOf_processed_dk)
+              console.log("resulting_characte, data_ukelele.ArrayOf_processed_dk is",resulting_character, data_ukelele.ArrayOf_processed_dk[k][2])*/
+              if ((resulting_character !== "") && (resulting_character === data_ukelele.ArrayOf_processed_dk[k][2])) {
+                data += '[' + (label_modifier + ' ' + vk_label[0][1]).trim() + '] ' + "> dk(" + this.getHexFromChar(data_ukelele.ArrayOf_processed_dk[k][1]) + ") " + '\n'
+              }
             }
           }
         }
+
       }
     }
 
+    // console.log("start write 4")
     data += "\n"
     data += "match > use(deadkeys)\n\n"
     data += "group(deadkeys)\n"
     data += "\n"
+console.log("data_ukelele.ArrayOf_processed_deadkeyables.length", data_ukelele.ArrayOf_processed_deadkeyables.length)
+console.log("data_ukelele.String(data_ukelele.ArrayOf_processed_deadkeyables[i])).length", String(data_ukelele.ArrayOf_processed_deadkeyables[0]))
+console.log("data_ukelele.String(data_ukelele.ArrayOf_processed_deadkeyables[i])).length--","\'", String(data_ukelele.ArrayOf_processed_deadkeyables[0]).trim().replace(/\,+/g, "' '"), )
+
+const char ="\'" + String(data_ukelele.ArrayOf_processed_deadkeyables[0]).trim().replace(/\,+/g, "' '")
+console.log("char",char)
+
+const char1 =char.slice(0,-1)
+console.log("char1",char1)
 
     for (let i = 0; i < data_ukelele.ArrayOf_processed_deadkeyables.length; i++) {
       if (data_ukelele.ArrayOf_processed_deadkeyedChar[i] !== undefined) {
-        data += "store(dkf" + this.getHexFromChar(data_ukelele.ArrayOf_processed_dk[i][1]) + ") " + ("\'" + String(data_ukelele.ArrayOf_processed_deadkeyables[i])).replace(/\,+/g, "' '") + "'\n"
-        data += "store(dkt" + this.getHexFromChar(data_ukelele.ArrayOf_processed_dk[i][1]) + ") " + ("\'" + String(data_ukelele.ArrayOf_processed_deadkeyedChar[i])).replace(/\,+/g, "' '") + "'\n"
+        data += "store(dkf" + this.getHexFromChar(data_ukelele.ArrayOf_processed_dk[i][1]) + ") " + ("\'" + String(data_ukelele.ArrayOf_processed_deadkeyables[i])).replace(/\,+/g, "' '").slice(0,-1).trim() + "\n"
+        data += "store(dkt" + this.getHexFromChar(data_ukelele.ArrayOf_processed_dk[i][1]) + ") " + ("\'" + String(data_ukelele.ArrayOf_processed_deadkeyedChar[i])).replace(/\,+/g, "' '")+ "'\n"
         data += '\n'
       }
     }
 
+    // console.log("start write 5")
     /*writeFileSync("data/MyResult.kmn", data, { flag: "w" })*/
     const data_encoded = new TextEncoder().encode(data)
     this.callbacks.fs.writeFileSync("data/MyResult.kmn", data_encoded) // not usable here since it takes UInt8array data
@@ -592,6 +693,35 @@ export class KeylayoutToKmnConverter {
   //... helpers .............................................................................................
 
   //   TODO move outside of class?
+
+
+  public getCharacterFromActionName(data_ukelele: convert_object, ArrayOf_Element_KeyActionElement: Uint8Array): any {
+    //get character from ~ <- 4 <- a9
+    //in: [ 97, 49 ] (a9)
+    // out: ~
+
+    //[ 97, 49 ]-> (a9)
+    console.log("ArrayOf_Element_KeyActionElement",ArrayOf_Element_KeyActionElement)
+    const ArrayOf_Element_KeyActionElement_string = new TextDecoder().decode(ArrayOf_Element_KeyActionElement)
+
+
+    if (ArrayOf_Element_KeyActionElement_string !== "") {
+      console.log("ArrayOf_Element_KeyActionElement_string in func", ArrayOf_Element_KeyActionElement_string)
+
+      for (let jj = 0; jj < data_ukelele.ArrayOf_processed_dk.length; jj++) {
+        console.log(data_ukelele.ArrayOf_processed_dk[jj][2], "===?", ArrayOf_Element_KeyActionElement_string)
+        if (data_ukelele.ArrayOf_processed_dk[jj][2] === ArrayOf_Element_KeyActionElement_string) {
+          console.log("FOUND", data_ukelele.ArrayOf_processed_dk[jj][2])
+          return data_ukelele.ArrayOf_processed_dk[jj][1]
+        }
+
+      }
+
+      return ""
+    }
+
+  }
+
   /**
    * @brief  member function to return the unicode value of a character
    * @param  character the value that will converted
@@ -601,6 +731,7 @@ export class KeylayoutToKmnConverter {
     return '00' + character.charCodeAt(0).toString(16).slice(-4).toLowerCase()
   }
 
+  // TODO if the first in the list does not contain caps but later entries do contain caps-> no NCAPS is added(Todo check if caps/NCAPS are there after all entries are completed)
   /** 
    * @brief  member function to create a string of modifiers in kmn-style from the modifierMap section of .keylayout-file
    * @param  keylayout_modifier the modifier value used in the .keylayout-file
