@@ -66,7 +66,7 @@ nlohmann::json load_json(const km::core::path &jsonpath) {
   std::ifstream json_file(jsonpath.native());
   if (!json_file) {
     std::cerr << "ERROR Could not load: " << jsonpath << std::endl;
-    assert (json_file);
+    test_assert (json_file);
   }
   nlohmann::json data = nlohmann::json::parse(json_file);
   return data;
@@ -74,7 +74,7 @@ nlohmann::json load_json(const km::core::path &jsonpath) {
 
 /** @returns the major version of 'ver', skipping initial '^'. empty on err */
 std::string get_major(const std::string& ver) {
-  assert(!ver.empty());
+  test_assert(!ver.empty());
   auto start = 0;
   // skip leading '^'
   if (ver[start] == '^') {
@@ -82,7 +82,7 @@ std::string get_major(const std::string& ver) {
   }
   // find first '.'
   auto end = ver.find('.', start);
-  assert(end != std::string::npos);
+  test_assert(end != std::string::npos);
   return ver.substr(start, end - start);
 }
 
@@ -94,9 +94,9 @@ std::string get_block_unicode_ver(const char *blocks_path) {
   // open Blocks.txt
   std::ifstream blocks_file(
       km::core::path(blocks_path).native());
-  assert(blocks_file.good());
+  test_assert(blocks_file.good());
   std::string block_line;
-  assert(std::getline(blocks_file, block_line));  // first line
+  test_assert(std::getline(blocks_file, block_line));  // first line
 
   // The first line is something such as '# Blocks-15.1.0.txt'
   // We skip the prefix, and then stop before the suffix
@@ -105,12 +105,12 @@ std::string get_block_unicode_ver(const char *blocks_path) {
   const std::string txt_suffix = ".txt";
 
   // find and skip the prefix - "15.1.0.txt"
-  assert(block_line.length() > prefix.length());
+  test_assert(block_line.length() > prefix.length());
   std::string result = block_line.substr(prefix.length()); // "15.1.0"
 
   // find and trim before the suffix
   auto txt_pos = result.find(txt_suffix, 0);
-  assert(txt_pos != std::string::npos);
+  test_assert(txt_pos != std::string::npos);
   result.resize(txt_pos);
 
   return result;
@@ -167,7 +167,7 @@ const std::string &block_unicode_ver) {
   // allow the Node.js version to be >= required
   auto node_engine_num = std::atoi(node_engine_major.c_str());
   auto node_num        = std::atoi(node_major.c_str());
-  assert(node_num >= node_engine_num);
+  test_assert(node_num >= node_engine_num);
 
   // the cxx_icu can come from the Ubuntu environment, so do not depend on it
   // for now.
@@ -213,7 +213,7 @@ void test_has_boundary_before() {
       std::cerr << "Error: util_normalize_table.h said " << boolstr(km_hbb) << " but ICU said " << boolstr(icu_hbb) << " for "
                 << "has_nfd_boundary_before(0x" << std::hex << cp << std::dec << ")" << std::endl;
     }
-    assert(km_hbb == icu_hbb);
+    test_assert(km_hbb == icu_hbb);
   }
   std::cout << "All OK!" << std::endl;
 }
@@ -224,11 +224,11 @@ int test_all(const char *jsonpath, const char *packagepath, const char *blockspa
 
   // load the dump of node's process.versions which the meson.build file generated
   auto versions = load_json(km::core::path(jsonpath));
-  assert(!versions.empty());
+  test_assert(!versions.empty());
 
   // load our top level package.json
   auto package = load_json(km::core::path(packagepath));
-  assert(!package.empty());
+  test_assert(!package.empty());
 
   const auto block_unicode_ver = get_block_unicode_ver(blockspath);
 

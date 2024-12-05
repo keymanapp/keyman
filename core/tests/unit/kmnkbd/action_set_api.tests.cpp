@@ -74,20 +74,20 @@ void run_test(km_core_action_item const * action_items, const km_core_actions &a
 
   int n = 0;
   for(auto act = set_actions.begin(); act != set_actions.end(); act++, n++) {
-    assert(act->type == action_items[n].type);
+    test_assert(act->type == action_items[n].type);
     // TODO: all other fields
     switch(act->type) {
       case KM_CORE_IT_ALERT:
         break;
       case KM_CORE_IT_BACK:
-        assert(act->backspace.expected_type == action_items[n].backspace.expected_type);
-        assert(act->backspace.expected_value == action_items[n].backspace.expected_value);
+        test_assert(act->backspace.expected_type == action_items[n].backspace.expected_type);
+        test_assert(act->backspace.expected_value == action_items[n].backspace.expected_value);
         break;
       case KM_CORE_IT_CAPSLOCK:
-        assert(act->capsLock == action_items[n].capsLock);
+        test_assert(act->capsLock == action_items[n].capsLock);
         break;
       case KM_CORE_IT_CHAR:
-        assert(act->character == action_items[n].character);
+        test_assert(act->character == action_items[n].character);
         break;
       case KM_CORE_IT_EMIT_KEYSTROKE:
         break;
@@ -96,16 +96,16 @@ void run_test(km_core_action_item const * action_items, const km_core_actions &a
       case KM_CORE_IT_INVALIDATE_CONTEXT:
         break;
       case KM_CORE_IT_MARKER:
-        assert(act->marker == action_items[n].marker);
+        test_assert(act->marker == action_items[n].marker);
         break;
       case KM_CORE_IT_PERSIST_OPT:
-        assert(act->option->scope == action_items[n].option->scope);
-        assert(std::u16string(act->option->key) == action_items[n].option->key);
-        assert(std::u16string(act->option->value) == action_items[n].option->value);
+        test_assert(act->option->scope == action_items[n].option->scope);
+        test_assert(std::u16string(act->option->key) == action_items[n].option->key);
+        test_assert(std::u16string(act->option->value) == action_items[n].option->value);
         break;
       default:
         // Invalid action type
-        assert(false);
+        test_assert(false);
     }
   }
 }
