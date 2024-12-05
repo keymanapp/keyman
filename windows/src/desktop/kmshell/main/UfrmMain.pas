@@ -148,6 +148,8 @@ type
     procedure OpenSite(params: TStringList);
     procedure DoApply;
     procedure DoRefresh;
+    procedure Update_CheckNow;
+    procedure Update_ApplyNow;
 
   protected
     procedure FireCommand(const command: WideString; params: TStringList); override;
@@ -184,6 +186,7 @@ uses
   LanguagesXMLRenderer,
   MessageIdentifierConsts,
   MessageIdentifiers,
+  Keyman.System.RemoteUpdateCheck,
   OnlineUpdateCheck,
   OptionsXMLRenderer,
   Keyman.Configuration.System.UmodWebHttpServer,
@@ -202,12 +205,14 @@ uses
   UfrmTextEditor,
   uninstall,
   Upload_Settings,
+  UpdateXMLRenderer,
   utildir,
   utilexecute,
   utilkmshell,
   utilhttp,
   utiluac,
-  utilxml;
+  utilxml,
+  KeymanPaths;
 
 type
   PHKL = ^HKL;
@@ -301,6 +306,7 @@ begin
     FXMLRenderers.Add(TOptionsXMLRenderer.Create(FXMLRenderers));
     FXMLRenderers.Add(TLanguagesXMLRenderer.Create(FXMLRenderers));
     FXMLRenderers.Add(TSupportXMLRenderer.Create(FXMLRenderers));
+    FXMLRenderers.Add(TUpdateXMLRenderer.Create(FXMLRenderers));
 
     xml := FXMLRenderers.RenderToString(s);
     sharedData.Init(
@@ -344,6 +350,9 @@ begin
   else if command = 'support_online' then Support_Online
   else if command = 'support_updatecheck' then Support_UpdateCheck
   else if command = 'support_proxyconfig' then Support_ProxyConfig
+
+  else if command = 'update_checknow' then Update_CheckNow
+  else if command = 'update_applynow' then Update_ApplyNow
 
   else if command = 'contact_support' then Support_ContactSupport(params)   // I4390
 
@@ -788,7 +797,7 @@ begin
     Free;
   end;
 end;
-
+// TODO-WINDOWS-UPDATES: #10210 Remove Update
 procedure TfrmMain.Support_UpdateCheck;
 begin
   with TOnlineUpdateCheck.Create(Self, True, False) do
@@ -813,6 +822,29 @@ begin
   finally
     Free;
   end;
+end;
+
+procedure TfrmMain.Update_CheckNow;
+var UpdateCheck : TRemoteUpdateCheck;
+begin
+  UpdateCheck := TRemoteUpdateCheck.Create(True);
+  try
+    UpdateCheck.Run;
+  finally
+    UpdateCheck.Free;
+  end;
+  DoRefresh;
+end;
+
+procedure TfrmMain.Update_ApplyNow;
+var
+  ShellPath, s: string;
+  FResult: Boolean;
+begin
+  ShellPath := TKeymanPaths.KeymanDesktopInstallPath(TKeymanPaths.S_KMShell);
+  FResult := TUtilExecute.Shell(0, ShellPath, '', '-an');
+  if not FResult then
+    KL.Log('TrmfMain: Executing Update_ApplyNow Failed'); // TODO: Make error log
 end;
 
 procedure TfrmMain.TntFormCloseQuery(Sender: TObject; var CanClose: Boolean);

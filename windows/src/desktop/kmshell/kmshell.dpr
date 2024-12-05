@@ -177,7 +177,15 @@ uses
   Keyman.Configuration.System.HttpServer.App.TextEditorFonts in 'startup\help\Keyman.Configuration.System.HttpServer.App.TextEditorFonts.pas',
   Keyman.Configuration.System.HttpServer.App.Locale in 'web\Keyman.Configuration.System.HttpServer.App.Locale.pas',
   Keyman.System.AndroidStringToKeymanLocaleString in '..\..\..\..\common\windows\delphi\general\Keyman.System.AndroidStringToKeymanLocaleString.pas',
-  Keyman.Configuration.System.Main in 'main\Keyman.Configuration.System.Main.pas';
+  Keyman.Configuration.System.Main in 'main\Keyman.Configuration.System.Main.pas',
+  UpdateXMLRenderer in 'render\UpdateXMLRenderer.pas',
+  Keyman.System.UpdateCheckStorage in 'main\Keyman.System.UpdateCheckStorage.pas',
+  Keyman.System.RemoteUpdateCheck in 'main\Keyman.System.RemoteUpdateCheck.pas',
+  Keyman.System.UpdateStateMachine in 'main\Keyman.System.UpdateStateMachine.pas',
+  Keyman.System.DownloadUpdate in 'main\Keyman.System.DownloadUpdate.pas',
+  Keyman.System.ExecutionHistory in '..\..\..\..\common\windows\delphi\general\Keyman.System.ExecutionHistory.pas',
+  Keyman.Configuration.UI.UfrmStartInstallNow in 'main\Keyman.Configuration.UI.UfrmStartInstallNow.pas' {frmInstallNow},
+  Keyman.Configuration.UI.UfrmStartInstall in 'main\Keyman.Configuration.UI.UfrmStartInstall.pas' {frmStartInstall};
 
 {$R VERSION.RES}
 {$R manifest.res}
