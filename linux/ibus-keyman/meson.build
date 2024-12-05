@@ -8,6 +8,11 @@ project('ibus-keyman', 'c', 'cpp',
 # meson doesn't allow us to reference a file outside its root
 subdir('resources')
 
+if get_option('buildtype') != 'debug'
+  # Disable assertions on release builds
+  defns += ['-DG_DISABLE_ASSERT']
+endif
+
 conf = configuration_data()
 
 ibus =           dependency('ibus-1.0',             version: '>= 1.2.0')

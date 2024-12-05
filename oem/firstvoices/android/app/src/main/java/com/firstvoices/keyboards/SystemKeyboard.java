@@ -150,6 +150,10 @@ public class SystemKeyboard extends InputMethodService implements OnKeyboardEven
             KMManager.setBannerOptions(mayPredict);
           }
         }
+
+        // Determine special handling for ENTER key
+        KMManager.setEnterMode(attribute.imeOptions, inputType);
+
         // User switched to a new input field so we should extract the text from input field
         // and pass it to Keyman Engine together with selection range
         InputConnection ic = getCurrentInputConnection();

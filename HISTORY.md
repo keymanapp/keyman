@@ -1,5 +1,97 @@
 # Keyman Version History
 
+## 18.0.152 alpha 2024-12-04
+
+* refactor(mac): pass kmx data blob to keyman core instead of file path (#12760)
+* fix(developer): honour provided script when checking for matching scripts (#12768)
+* chore(common): rename test files (#12709)
+* fix(common): rename test file (#12770)
+
+## 18.0.151 alpha 2024-12-03
+
+* feat(android): Enhance how ENTER key is handled for FV and KMSample2 (#12745)
+* feat(developer): report on mismatching lang tag scripts when building keyboard-info (#12753)
+
+## 18.0.150 alpha 2024-12-02
+
+* fix(core,developer): use `NDEBUG` flag to disable assertions in release build (#12715)
+
+## 18.0.149 alpha 2024-12-01
+
+* refactor(developer): unify test action (#12736)
+
+## 18.0.148 alpha 2024-11-29
+
+* test(common/web/types): unit tests for unicodeset-parser-api (#12714)
+* chore(developer): rename test files (#12707)
+* feat(core,linux,developer,windows): implement loading KMX from blob (#12721)
+* chore(common): add offline support for emscripten (#12740)
+
+## 18.0.147 alpha 2024-11-28
+
+* docs(android): Add android/docs/internal/README (#12717)
+* test(common/web/types): unit tests for string-list (#12702)
+* docs(common): linux and macOS emscripten setup (#12701)
+* refactor(developer): output number of tests when running on TC (#12710)
+* refactor(common): output number of tests when running on TC (#12719)
+* chore(web): rename file missed in #12704 (#12720)
+* fix(core): permanently disable logging (#12724)
+* fix(linux): disable assertions in release builds of ibus-keyman (#12725)
+* chore(common): improve offline builds (#12739)
+
+## 18.0.146 alpha 2024-11-27
+
+* test(developer): kmcmplib compiler unit tests 5 (#12612)
+* refactor(common): move all lexical model types into `LexicalModelTypes` container (#12712)
+* refactor(common): move remaining LDML keyboard types into `LdmlKeyboardTypes` (#12713)
+* chore(web): rename test files and folders (#12704)
+* chore(core): rename test files (#12705)
+* chore(linux): rename test files (#12706)
+
+## 18.0.145 alpha 2024-11-26
+
+* docs(windows): update emscripten bash setup (#12700)
+* chore(common): Add link to onboarding doc to `CONTRIBUTING.md` (#12697)
+
+## 18.0.144 alpha 2024-11-25
+
+* chore(deps): bump cross-spawn from 7.0.3 to 7.0.6 in /developer/src/server/src/win32/trayicon/addon-src (#12687)
+* chore(developer): make package subfile description fully optional (#12665)
+* fix(developer): box package compiler info fields (#12666)
+* fix(developer): correct whitespace handling in virtual keys and remove partially implemented virtual key series in kmcmplib compiler (#12604)
+
+## 18.0.143 alpha 2024-11-22
+
+* chore(deps): bump cross-spawn from 7.0.3 to 7.0.6 (#12685)
+
+## 18.0.142 alpha 2024-11-20
+
+* chore(common): Update CODEOWNERS (#12680)
+
+## 18.0.141 alpha 2024-11-15
+
+* chore(linux): add support for Ubuntu 25.04 Plucky Puffin (#12675)
+
+## 18.0.140 alpha 2024-11-13
+
+* chore(common): Add 17.0.330 - 17.0.332 to version history (#12663)
+* fix(developer): reconnect `--full-test` in kmcmplib build and enable for CI (#12631)
+* docs(developer): kmc-generate (#12647)
+
+## 18.0.139 alpha 2024-11-12
+
+* fix(windows): help links updated (#12646)
+
+## 18.0.138 alpha 2024-11-08
+
+* fix(common): check for invalid markers (#12613)
+* chore: update minimum versions (#12632)
+* fix(windows): correct path to output file in publish step for fv keyboards (#12637)
+* chore(core): move API docs from help.keyman.com (#12642)
+* feat(developer): kmc generate (#11014)
+* feat(developer): kmc-copy (#12555)
+* feat(developer): add GitHub and Cloud support to kmc-copy (#12586)
+
 ## 18.0.137 alpha 2024-11-07
 
 * fix(windows): correct engine help source path for upload (#12625)
@@ -947,6 +1039,27 @@
 
 * chore(common): move to 18.0 alpha (#10713)
 * chore: move to 18.0 alpha
+
+## 17.0.332 stable 2024-11-06
+
+* fix(developer): create Server config directory before options save (#12609)
+* fix(developer): handle merge commits when checking git log date (#12628)
+* fix(linux): set environment variable for rendering of downloads dialog (#12617)
+
+## 17.0.331 stable 2024-10-30
+
+* fix(android): Hide suggestion banner on password fields (#12466)
+* fix(common): declare dep on @keymanapp/ldml-keyboard-constants (#12475)
+* fix(oem/fv): Update keyboard versions and names for fv_all.kmp (#12504)
+* chore(ios): renew certificate (#12513)
+* fix(developer): prevent invalid string ids (#12524)
+* fix(developer): ignore excess whitespace in `<row keys>` attribute (#12523)
+
+## 17.0.330 stable 2024-09-16
+
+* refactor(android): Move Sentry and APK to publish task (#12392)
+* fix(developer): rewrite ldml visual keyboard compiler (#12406)
+* fix(developer): check vars string usage before definition (#12407)
 
 ## 17.0.329 stable 2024-09-09
 
