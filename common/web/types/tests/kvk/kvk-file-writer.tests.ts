@@ -1,7 +1,7 @@
 /*
  * Keyman is copyright (C) SIL Global. MIT License.
  * 
- * Created by Dr Mark C. Sinclair on 2024-11-28
+ * Created by Dr Mark C. Sinclair on 2024-12-05
  * 
  * Test code for kvk-file-writer.ts
  */
@@ -50,51 +50,122 @@ describe('Test of KVK-File-Writer', () => {
       const binary: BUILDER_KVK_FILE = writer['build'](vk);
       checkBuilderKvkFile(binary, vk);
     });
+    it('does not take account of the VisualKeyboard version', () => {
+      const vk = initVisualKeyboard([
+          initVisualKeyboardKey(0),
+          initVisualKeyboardKey(1),
+          initVisualKeyboardKey(2),
+        ],
+        (BUILDER_KVK_HEADER_VERSION + 0x0100),
+        BUILDER_KVK_HEADER_FLAGS.kvkhNone,
+        "associatedKeyboard",
+        DEFAULT_KVK_FONT,
+        DEFAULT_KVK_FONT,
+        undefined,
+      );
+      const writer = new KvkFileWriter;
+      const binary: BUILDER_KVK_FILE = writer['build'](vk);
+      checkBuilderKvkFile(binary, vk);
+    });
     // it('can handle a null associatedKeyboard', () => {
     //   const vk = initVisualKeyboard([
-    //     initVisualKeyboardKey(0),
-    //     initVisualKeyboardKey(1),
-    //     initVisualKeyboardKey(2),
-    //   ],
-    //   BUILDER_KVK_HEADER_FLAGS.kvkhNone,
-    //   null,
-    //   DEFAULT_KVK_FONT,
-    //   DEFAULT_KVK_FONT,
-    // );
+    //       initVisualKeyboardKey(0),
+    //       initVisualKeyboardKey(1),
+    //       initVisualKeyboardKey(2),
+    //     ],
+    //     undefined,
+    //     BUILDER_KVK_HEADER_FLAGS.kvkhNone,
+    //     null,
+    //     DEFAULT_KVK_FONT,
+    //     DEFAULT_KVK_FONT,
+    //     undefined,
+    //   );
     //   const writer = new KvkFileWriter;
     //   const binary: BUILDER_KVK_FILE = writer['build'](vk);
     //   checkBuilderKvkFile(binary, vk);
     // });
     // it('can handle a null ansiFont name', () => {
     //   const vk = initVisualKeyboard([
-    //     initVisualKeyboardKey(0),
-    //     initVisualKeyboardKey(1),
-    //     initVisualKeyboardKey(2),
-    //   ],
-    //   BUILDER_KVK_HEADER_FLAGS.kvkhNone,
-    //   "associatedKeyboard",
-    //   { name: null, size: -12 },
-    //   DEFAULT_KVK_FONT,
-    // );
+    //       initVisualKeyboardKey(0),
+    //       initVisualKeyboardKey(1),
+    //       initVisualKeyboardKey(2),
+    //     ],
+    //     undefined,
+    //     BUILDER_KVK_HEADER_FLAGS.kvkhNone,
+    //     "associatedKeyboard",
+    //     { name: null, size: -12 },
+    //     DEFAULT_KVK_FONT,
+    //     undefined,
+    //   );
     //   const writer = new KvkFileWriter;
     //   const binary: BUILDER_KVK_FILE = writer['build'](vk);
     //   checkBuilderKvkFile(binary, vk);
     // });
     // it('can handle a null unicodeFont name', () => {
     //   const vk = initVisualKeyboard([
-    //     initVisualKeyboardKey(0),
-    //     initVisualKeyboardKey(1),
-    //     initVisualKeyboardKey(2),
-    //   ],
-    //   BUILDER_KVK_HEADER_FLAGS.kvkhNone,
-    //   "associatedKeyboard",
-    //   DEFAULT_KVK_FONT,
-    //   { name: null, size: -12 },
-    // );
+    //       initVisualKeyboardKey(0),
+    //       initVisualKeyboardKey(1),
+    //       initVisualKeyboardKey(2),
+    //     ],
+    //     undefined,
+    //     BUILDER_KVK_HEADER_FLAGS.kvkhNone,
+    //     "associatedKeyboard",
+    //     DEFAULT_KVK_FONT,
+    //     { name: null, size: -12 },
+    //     undefined,
+    //   );
     //   const writer = new KvkFileWriter;
     //   const binary: BUILDER_KVK_FILE = writer['build'](vk);
     //   checkBuilderKvkFile(binary, vk);
     // });
+    it('can handle a null vkey', () => {
+      const vk = initVisualKeyboard([
+        initVisualKeyboardKey(
+          null,
+          BUILDER_KVK_KEY_FLAGS.kvkkBitmap,
+          BUILDER_KVK_SHIFT_STATE.KVKS_NORMAL,
+          "text",
+          null,
+        ),
+        initVisualKeyboardKey(1),
+        initVisualKeyboardKey(2),
+      ]);
+      const writer = new KvkFileWriter;
+      const binary: BUILDER_KVK_FILE = writer['build'](vk);
+      checkBuilderKvkFile(binary, vk);
+    });
+    it('can handle a null key flags', () => {
+      const vk = initVisualKeyboard([
+        initVisualKeyboardKey(
+          0,
+          null,
+          BUILDER_KVK_SHIFT_STATE.KVKS_NORMAL,
+          "text",
+          null,
+        ),
+        initVisualKeyboardKey(1),
+        initVisualKeyboardKey(2),
+      ]);
+      const writer = new KvkFileWriter;
+      const binary: BUILDER_KVK_FILE = writer['build'](vk);
+      checkBuilderKvkFile(binary, vk);
+    });
+    it('can handle a null key shift', () => {
+      const vk = initVisualKeyboard([
+        initVisualKeyboardKey(
+          0,
+          BUILDER_KVK_KEY_FLAGS.kvkkBitmap,
+          null,
+          "text",
+          null,
+        ),
+        initVisualKeyboardKey(1),
+        initVisualKeyboardKey(2),
+      ]);
+      const writer = new KvkFileWriter;
+      const binary: BUILDER_KVK_FILE = writer['build'](vk);
+      checkBuilderKvkFile(binary, vk);
+    });
     it('can handle a null key text', () => {
       const vk = initVisualKeyboard([
         initVisualKeyboardKey(
@@ -163,33 +234,35 @@ describe('Test of KVK-File-Writer', () => {
 
 function initVisualKeyboard(
   vkks: VisualKeyboardKey[],
+  version: number = undefined,
   flags: BUILDER_KVK_HEADER_FLAGS = BUILDER_KVK_HEADER_FLAGS.kvkhNone,
   associatedKeyboard: string = "associatedKeyboard",
   ansiFont: VisualKeyboardFont = DEFAULT_KVK_FONT,
   unicodeFont: VisualKeyboardFont = DEFAULT_KVK_FONT,
+  underlyingLayout: string = undefined,
 ): VisualKeyboard {
   const vkh = {
-    // version?: number,
+    version: version,
     flags: flags,
     associatedKeyboard: associatedKeyboard,
     ansiFont: ansiFont,
     unicodeFont: unicodeFont,
-    // underlyingLayout?: string,
+    underlyingLayout: underlyingLayout,
   };
   return { header: vkh, keys: vkks };
 };
 
 function initVisualKeyboardKey(
-  index: number,
+  vkey: number,
   flags: BUILDER_KVK_KEY_FLAGS = BUILDER_KVK_KEY_FLAGS.kvkkBitmap,
   shift: BUILDER_KVK_SHIFT_STATE = BUILDER_KVK_SHIFT_STATE.KVKS_NORMAL,
   text:  string = "text",
   bitmap: number[] = null,
 ): VisualKeyboardKey {
   const vkk: VisualKeyboardKey = {
+    vkey: vkey,
     flags: flags,
     shift: shift,
-    vkey: index,
     text: text,
     bitmap: bitmap ? new Uint8Array(bitmap) : null,
   };
