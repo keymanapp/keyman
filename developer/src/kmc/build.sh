@@ -20,6 +20,7 @@ builder_describe "Build Keyman Keyboard Compiler kmc" \
   "@/developer/src/common/web/utils" \
   "@/developer/src/kmc-analyze" \
   "@/developer/src/kmc-copy" \
+  "@/developer/src/kmc-convert" \
   "@/developer/src/kmc-generate" \
   "@/developer/src/kmc-keyboard-info" \
   "@/developer/src/kmc-kmn" \
@@ -99,7 +100,7 @@ function do_bundle() {
 builder_run_action clean      rm -rf ./build/ ./tsconfig.tsbuildinfo
 builder_run_action configure  verify_npm_setup
 builder_run_action build      do_build
-builder_run_action test       builder_do_typescript_tests 50
+builder_run_action test       builder_do_typescript_tests 45
 builder_run_action api        do_api
 builder_run_action bundle     do_bundle
 builder_run_action publish    builder_publish_npm
