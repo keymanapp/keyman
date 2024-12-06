@@ -1,4 +1,6 @@
-import { LexiconTraversal, USVString } from "@keymanapp/common-types";
+import { LexicalModelTypes } from "@keymanapp/common-types";
+import LexiconTraversal = LexicalModelTypes.LexiconTraversal;
+import USVString = LexicalModelTypes.USVString;
 import { isHighSurrogate, isSentinel, SearchKey, SENTINEL_CODE_UNIT, Wordform2Key } from "./common.js";
 import { decompressNode, inflateChild } from "./trie-compression.js";
 

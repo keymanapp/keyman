@@ -17,7 +17,6 @@
 
 #include "core_icu.h"
 
-#include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>

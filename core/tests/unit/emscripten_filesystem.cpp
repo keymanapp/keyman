@@ -4,7 +4,7 @@
 
 #include <emscripten.h>
 #include <iostream>
-#include <cassert>
+#include <test_assert.h>
 
 const std::string get_wasm_file_path(const std::string& filename) {
   // Verify that we are passing a fully-qualified path
@@ -13,13 +13,13 @@ const std::string get_wasm_file_path(const std::string& filename) {
   std::cout << "get_wasm_file_path ENTER (" << filename << ")" << std::endl;
 #endif
 
-  assert(
+  test_assert(
     (filename.length() > 0 && filename.at(0) == '/') ||
     (filename.length() > 1 && filename.at(1) == ':')
   );
 
 #if _DEBUG_FOPEN
-  std::cout << "get_wasm_file_path assert passed " << std::endl;
+  std::cout << "get_wasm_file_path test_assert passed " << std::endl;
 #endif
 
   EM_ASM_({
