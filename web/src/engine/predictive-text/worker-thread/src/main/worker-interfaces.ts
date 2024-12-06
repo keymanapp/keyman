@@ -28,7 +28,14 @@
 
 /// <reference types="@keymanapp/lm-message-types" />
 
-import { Capabilities, Context, Distribution, LexicalModel, Reversion, Suggestion, Transform } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import Capabilities = LexicalModelTypes.Capabilities;
+import Context = LexicalModelTypes.Context;
+import Distribution = LexicalModelTypes.Distribution;
+import LexicalModel = LexicalModelTypes.LexicalModel;
+import Reversion = LexicalModelTypes.Reversion;
+import Suggestion = LexicalModelTypes.Suggestion;
+import Transform = LexicalModelTypes.Transform;
 import type ModelCompositor from './model-compositor.js';
 import { Token } from '@keymanapp/models-templates';
 

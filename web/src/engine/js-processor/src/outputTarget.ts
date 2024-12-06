@@ -8,18 +8,18 @@ extendString();
 // Defines deadkey management in a manner attachable to each element interface.
 import { type KeyEvent } from 'keyman/engine/keyboard';
 import { Deadkey, DeadkeyTracker } from "./deadkeys.js";
-import { ProbabilityMass, Transform } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
 
 // Also relies on string-extensions provided by the web-utils package.
 
-export function isEmptyTransform(transform: Transform) {
+export function isEmptyTransform(transform: LexicalModelTypes.Transform) {
   if(!transform) {
     return true;
   }
   return transform.insert === '' && transform.deleteLeft === 0 && (transform.deleteRight ?? 0) === 0;
 }
 
-export class TextTransform implements Transform {
+export class TextTransform implements LexicalModelTypes.Transform {
   readonly insert: string;
   readonly deleteLeft: number;
   readonly deleteRight: number;
@@ -64,7 +64,7 @@ export class Transcription {
   }
 }
 
-export type Alternate = ProbabilityMass<Transform>;
+export type Alternate = LexicalModelTypes.ProbabilityMass<LexicalModelTypes.Transform>;
 
 export default abstract class OutputTarget implements OutputTargetInterface {
   private _dks: DeadkeyTracker;
@@ -173,7 +173,7 @@ export default abstract class OutputTarget implements OutputTargetInterface {
     this._dks = original._dks.clone();
   }
 
-  apply(transform: Transform) {
+  apply(transform: LexicalModelTypes.Transform) {
     // Selected text should disappear on any text edit; application of a transform
     // certainly qualifies.
     this.clearSelection();

@@ -46,11 +46,13 @@ function do_build() {
 }
 
 function do_test() {
+  local FLAGS=
+
   if builder_has_option --ci; then
-    c8 mocha -reporter mocha-teamcity-reporter
-  else
-    c8 mocha
+    FLAGS="-reporter mocha-teamcity-reporter"
   fi
+
+  c8 mocha ${FLAGS} tests
 }
 
 builder_run_action configure  do_configure

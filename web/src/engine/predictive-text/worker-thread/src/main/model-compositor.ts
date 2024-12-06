@@ -4,7 +4,16 @@ import * as correction from './correction/index.js'
 import TransformUtils from './transformUtils.js';
 import { correctAndEnumerate, dedupeSuggestions, finalizeSuggestions, predictionAutoSelect, processSimilarity, toAnnotatedSuggestion, tupleDisplayOrderSort } from './predict-helpers.js';
 import { detectCurrentCasing, determineModelTokenizer, determineModelWordbreaker, determinePunctuationFromModel } from './model-helpers.js';
-import { CasingForm, Context, Distribution, LexicalModel, LexicalModelPunctuation, Reversion, Suggestion, Transform, USVString } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import CasingForm = LexicalModelTypes.CasingForm;
+import Context = LexicalModelTypes.Context;
+import Distribution = LexicalModelTypes.Distribution;
+import LexicalModel = LexicalModelTypes.LexicalModel;
+import LexicalModelPunctuation = LexicalModelTypes.LexicalModelPunctuation;
+import Reversion = LexicalModelTypes.Reversion;
+import Suggestion = LexicalModelTypes.Suggestion;
+import Transform = LexicalModelTypes.Transform;
+import USVString = LexicalModelTypes.USVString;
 
 export class ModelCompositor {
   private lexicalModel: LexicalModel;

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string>
+#include <algorithm>
 #include <kmcmplibapi.h>
 #include "util_filesystem.h"
 #include "../src/compfile.h"
@@ -29,6 +30,14 @@ void msgproc(const KMCMP_COMPILER_RESULT_MESSAGE &message, void* context) {
   printf(")\n");
 }
 
+void normalizeSlashes(std::string& s) {
+#ifdef _WIN32
+  std::replace(s.begin(), s.end(), '/', '\\');
+#else
+  std::replace(s.begin(), s.end(), '\\', '/');
+#endif
+}
+
 const std::vector<uint8_t> loadfileProc(const std::string& filename, const std::string& baseFilename) {
   std::string resolvedFilename = filename;
   if(baseFilename.length() && IsRelativePath(filename.c_str())) {
@@ -39,6 +48,8 @@ const std::vector<uint8_t> loadfileProc(const std::string& filename, const std::
       resolvedFilename.append(filename);
     }
   }
+
+  normalizeSlashes(resolvedFilename);
 
   std::vector<uint8_t> buf;
 
