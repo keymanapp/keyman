@@ -22,7 +22,8 @@
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
-    "test": "vscode-test"
+    "test": "echo use 'ui-test' to run the test - TODO-LDML-EDITOR",
+    "ui-test": "vscode-test"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.0",
