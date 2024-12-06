@@ -90,20 +90,6 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
 
     let bannerHeight = InputViewController.topBarHeight
     self.buildKeyboardHeightConstraints(bannerHeight: InputViewController.topBarHeight)
-
-    /*
-    // Cannot be met by the in-app keyboard, but helps to 'force' height for the system keyboard.
-    let portraitHeight = innerView.heightAnchor.constraint(equalToConstant: bannerHeight +  keymanWeb.constraintTargetHeight(isPortrait: true))
-    portraitHeight.identifier = "Height constraint for portrait mode"
-    portraitHeight.priority = .defaultHigh
-    let landscapeHeight = innerView.heightAnchor.constraint(equalToConstant: bannerHeight + keymanWeb.constraintTargetHeight(isPortrait: false))
-    landscapeHeight.identifier = "Height constraint for landscape mode"
-    landscapeHeight.priority = .defaultHigh
-
-    portraitConstraint = portraitHeight
-    landscapeConstraint = landscapeHeight
-    // .isActive will be set according to the current portrait/landscape perspective.
-     */
   }
 
   func keyboardHeightChanged() {

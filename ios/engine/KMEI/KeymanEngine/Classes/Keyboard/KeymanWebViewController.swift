@@ -707,7 +707,7 @@ extension KeymanWebViewController {
   func constraintTargetHeight(isPortrait: Bool) -> CGFloat {
     var keyboardHeight = 0.0
 
-    var defaultHeight = KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: isPortrait)?.keyboardHeight ?? 216 // default for ancient devices
+    let defaultHeight = KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: isPortrait)?.keyboardHeight ?? 216 // default for ancient devices
 
     if (isPortrait) {
       if (Storage.active.userDefaults.object(forKey: Key.portraitKeyboardHeight) != nil) {
@@ -745,8 +745,12 @@ extension KeymanWebViewController {
 
     if Util.isSystemKeyboard {
       height = constraintTargetHeight(isPortrait: InputViewController.isPortrait)
+      let message = "initKeyboardSize(), for system keyboard, keyboardHeight: \(keyboardHeight)"
+      os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, message)
     } else {
       height = constraintTargetHeight(isPortrait: UIDevice.current.orientation.isPortrait)
+      let message = "initKeyboardSize(), for in-app keyboard, keyboardHeight: \(keyboardHeight)"
+      os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, message)
     }
 
     keyboardSize = CGSize(width: width, height: height)

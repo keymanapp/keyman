@@ -927,8 +927,7 @@ public class Manager: NSObject, UIGestureRecognizerDelegate {
   }
   
   func keyboardHeightChanged() {
-    let message = "Manager keyboardHeightChanged)"
-    os_log("%{public}s", log:KeymanEngineLogger.settings, type: .default, message)
+    os_log("Manager keyboardHeightChanged", log:KeymanEngineLogger.settings, type: .default)
     self.inputViewController.keyboardHeightChanged()
   }
 
