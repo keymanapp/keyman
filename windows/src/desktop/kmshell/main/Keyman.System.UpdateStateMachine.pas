@@ -50,6 +50,7 @@ type
     procedure HandleDownload; virtual; abstract;
     procedure HandleAbort; virtual; abstract;
     procedure HandleInstallNow; virtual; abstract;
+    procedure HandleInstallPackages; virtual;
     procedure HandleFirstRun; virtual;
   end;
 
@@ -93,6 +94,7 @@ type
     procedure HandleDownload;
     procedure HandleAbort;
     procedure HandleInstallNow;
+    procedure HandleInstallPackages;
     procedure HandleFirstRun;
     function CurrentStateName: string;
 
@@ -111,12 +113,16 @@ uses
   ErrorControlledRegistry,
 
   GlobalProxySettings,
+  kmint,
+  keymanapi_TLB,
   Keyman.System.KeymanSentryClient,
   Keyman.System.DownloadUpdate,
   Keyman.System.RemoteUpdateCheck,
+  Keyman.System.UpdateCheckStorage,
   KLog,
   RegistryKeys,
-  utilexecute;
+  utilexecute,
+  utiluac;
 
 const
   SPackageUpgradeFilename = 'upgrade_packages.inf';
@@ -165,7 +171,6 @@ type
 
   DownloadingState = class(TState)
   private
-
     function DownloadUpdatesBackground: Boolean;
     procedure Enter; override;
     procedure Exit; override;
@@ -198,7 +203,19 @@ type
    * @returns True  if the installation is successful, False otherwise.
    *)
 
-  function DoInstallKeyman(SavePath: string): Boolean; overload;
+  function DoInstallKeyman: Boolean; overload;
+
+    (**
+   * Installs the Keyman Keyboard files using separate shell.
+   *
+   * @params  SavePath  The path to the downloaded files.
+   *
+   * @returns True  if the installation is successful, False otherwise.
+   *)
+
+  function DoInstallPackages(Params: TUpdateCheckResponse): Boolean;
+  function DoInstallPackage(PackageFileName: String): Boolean;
+  procedure CheckInstallPackageElevation;
 
   public
     procedure Enter; override;
@@ -208,6 +225,7 @@ type
     procedure HandleDownload; override;
     procedure HandleAbort; override;
     procedure HandleInstallNow; override;
+    procedure HandleInstallPackages; override;
     procedure HandleFirstRun; override;
   end;
 
@@ -517,10 +535,16 @@ begin
   CurrentState.HandleInstallNow;
 end;
 
+procedure TUpdateStateMachine.HandleInstallPackages;
+begin
+  CurrentState.HandleInstallPackages;
+end;
+
 procedure TUpdateStateMachine.HandleFirstRun;
 begin
   CurrentState.HandleFirstRun;
 end;
+
 
 function TUpdateStateMachine.CurrentStateName: string;
 begin
@@ -530,6 +554,12 @@ begin
 end;
 
 // base implmentation to be overiden
+
+procedure TState.HandleInstallPackages;
+begin
+  // Do Nothing
+end;
+
 procedure TState.HandleFirstRun;
 begin
   // If Handle First run hits base implementation
@@ -720,11 +750,11 @@ begin
   // Enter DownloadingState
   bucStateContext.SetRegistryState(usDownloading);
   { ##  for testing log that we would download }
-  KL.Log('DownloadingState.HandleKmshell test code continue');
-  //DownloadResult := True;
+  KL.Log('DownloadingState.Enter test code continue');
+  DownloadResult := True;
   { End testing }
   RetryCount := 0;
-  DownloadResult := False;
+  //DownloadResult := False;
 
   while (not DownloadResult) and (RetryCount < 3) do
   begin
@@ -906,32 +936,129 @@ begin
   end;
 end;
 
-function InstallingState.DoInstallKeyman(SavePath: string): Boolean;
+
+
+// Installing packages needs to be elevated
+procedure InstallingState.CheckInstallPackageElevation;
 var
-  s: string;
-  FResult: Boolean;
+  SavePath: String;
+  fileExt: String;
+  fileName: String;
+  Filenames: TStringDynArray;
+  executeResult: Boolean;
+  ucr: TUpdateCheckResponse;
+  hasPackages, hasKeymanInstall, requiresAdmin : Boolean;
 begin
-  s := LowerCase(ExtractFileExt(SavePath));
-  if s = '.msi' then
-    FResult := TUtilExecute.Shell(0, 'msiexec.exe', '', '/qb /i "' + SavePath +
-      '" AUTOLAUNCHPRODUCT=1') // I3349
-  else if s = '.exe' then
+  if not kmcom.SystemInfo.IsAdministrator then
   begin
-    // switch -au for auto update in silent mode.
-    // We will need to add the pop up that says install update now yes/no
-    // This will run the setup executable which will ask for  elevated permissions
-    FResult := TUtilExecute.Shell(0, SavePath, '', '-au') // I3349
+    if CanElevate then
+    begin
+      executeResult := WaitForElevatedConfiguration(0, '-ou') <> 0;
+      if executeResult then
+      begin
+        TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR, 'Executing kmshell process to install keyboard packages failed:"'+IntToStr(Ord(executeResult))+'"');
+        // even though package install failed still install Keyman
+        DoInstallKeyman;
+      end;
+    end
+    else
+    begin
+    // TODO: How do we alert the user that package requires a user with admin rights
+    //ShowMessage('Some of these updates require an Administrator to complete installation.  Please login as an Administrator and re-run the update.');
+    end;
   end
+  else
+  begin
+    HandleInstallPackages; // we can install packages straight away
+  end;
+end;
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+function InstallingState.DoInstallKeyman: Boolean;
+var
+  FResult: Boolean;
+  SavePath: String;
+  fileExt: String;
+  fileName: String;
+  Filenames: TStringDynArray;
+  ucr: TUpdateCheckResponse;
+  found : Boolean;
+begin
+
+  SavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
+  GetFileNamesInDirectory(SavePath, Filenames);
+  found := False;
+  for fileName in Filenames do
+  begin
+    fileExt := LowerCase(ExtractFileExt(fileName));
+    if fileExt = '.exe' then
+    begin
+      found := True;
+      break;
+    end;
+  end;
+
+  // switch -au for auto update in silent mode.
+  // We will need to add the pop up that says install update now yes/no
+  // This will run the setup executable which will ask for  elevated permissions
+  if found then
+    FResult := TUtilExecute.Shell(0, SavePath + ExtractFileName(fileName), '', '-au')
   else
     FResult := False;
 
   if not FResult then
   begin
+    bucStateContext.HandleMSIInstallComplete;
+    KL.Log('TUpdateStateMachine.InstallingState.Enter: DoInstall fail');
+    ChangeState(IdleState);
     TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR, 'Executing kmshell process to install failed:"'+IntToStr(Ord(FResult))+'"');
   end;
 
   Result := FResult;
 end;
+
+
+function InstallingState.DoInstallPackage(PackageFileName: String): Boolean;
+var
+  FPackage: IKeymanPackageFile2;
+begin
+  Result := True;
+
+  FPackage := kmcom.Packages.GetPackageFromFile(PackageFileName) as IKeymanPackageFile2;
+  FPackage.Install2(True);  // Force overwrites existing package and leaves most settings for it intact
+  FPackage := nil;
+
+  kmcom.Refresh;
+  kmcom.Apply;
+  System.SysUtils.DeleteFile(PackageFileName);
+
+end;
+
+function InstallingState.DoInstallPackages(Params: TUpdateCheckResponse): Boolean;
+var
+  i : Integer;
+  SavePath: String;
+  PackageFullPath: String;
+begin
+  SavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
+  for i := 0 to High(Params.Packages) do
+  begin
+    PackageFullPath := SavePath + Params.Packages[i].FileName;
+    if not DoInstallPackage(PackageFullPath) then // I2742
+    begin
+      // Package did install log or error
+      KL.Log('Installing Package failed'+ PackageFullPath);
+    end;
+  end;
+  Result := True;
+end;
+
+
+
+
 
 procedure InstallingState.Enter;
 var
@@ -939,32 +1066,33 @@ var
   fileExt: String;
   fileName: String;
   Filenames: TStringDynArray;
+  ucr: TUpdateCheckResponse;
+  hasPackages, hasKeymanInstall : Boolean;
 begin
 
   bucStateContext.SetRegistryState(usInstalling);
   SavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
-
   GetFileNamesInDirectory(SavePath, Filenames);
-  // for now we only want the exe although excute install can
-  // handle msi
-  for fileName in Filenames do
+  // TODO: epic-update-windows
+  // Check if there are also packages to install if so
+  if (TUpdateCheckStorage.LoadUpdateCacheData(ucr)) then
   begin
-    fileExt := LowerCase(ExtractFileExt(fileName));
-    if fileExt = '.exe' then
-      break;
+    hasPackages := TUpdateCheckStorage.HasKeyboardPackages(ucr);
+    hasKeymanInstall := TUpdateCheckStorage.HasKeymanInstallFile(ucr);
   end;
 
-  if DoInstallKeyman(SavePath + ExtractFileName(fileName)) then
+  if hasPackages then
   begin
-    KL.Log('TUpdateStateMachine.InstallingState.Enter: DoInstall OK');
-  end
-  else
+    CheckInstallPackageElevation;
+    Exit;
+  end;
+  // only reach here if
+  if hasKeymanInstall then
   begin
-    // TODO: #10210 clean failed download
-    // TODO: #10210 Do we do a retry on install? probably not
-    KL.Log('TUpdateStateMachine.InstallingState.Enter: DoInstall fail');
-    ChangeState(IdleState);
-  end
+    DoInstallKeyman;
+    Exit;
+  end;
+
 end;
 
 procedure InstallingState.Exit;
@@ -1000,12 +1128,44 @@ begin
   // Do Nothing. Need the UI to let user know installation in progress OR
 end;
 
-procedure InstallingState.HandleFirstRun;
+procedure InstallingState.HandleInstallPackages;
+var
+  SavePath: String;
+  fileExt: String;
+  fileName: String;
+  Filenames: TStringDynArray;
+  ucr: TUpdateCheckResponse;
+  hasPackages, hasKeymanInstall : Boolean;
 begin
-  bucStateContext.HandleMSIInstallComplete;
-  //Result := kmShellContinue;
+  // This event should only be reached in elevated process if not then
+  // move on to just installing Keyman packages.
+  if not kmcom.SystemInfo.IsAdministrator then
+  begin
+    DoInstallKeyman;
+    Exit;
+  end;
+  // TODO: epic-update-windows
+  // Check if there are also packages to install if so
+  if (TUpdateCheckStorage.LoadUpdateCacheData(ucr)) then
+    DoInstallPackages(ucr);
+
+  DoInstallKeyman;
 end;
 
+
+procedure InstallingState.HandleFirstRun;
+begin
+
+  bucStateContext.HandleMSIInstallComplete;
+  // TODO: epic-windows-updates
+  // clean up MSI install files only, don't change state to idle
+  // if packages to install and keyman hasn't started
+  // goto packages ready to install
+  // then kmShellContinue
+
+
+  //Result := kmShellContinue;
+end;
 
 // Private Functions:
 function ConfigCheckContinue: Boolean;
