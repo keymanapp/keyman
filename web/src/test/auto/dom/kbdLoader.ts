@@ -8,10 +8,10 @@ import {
   MinimalKeymanGlobal
 } from 'keyman/engine/keyboard';
 
-import { KeyboardInterface } from 'keyman/engine/js-processor';
+import { JSKeyboardInterface } from 'keyman/engine/js-processor';
 import { KeyboardStub } from 'keyman/engine/keyboard-storage';
 
-const loader = new DOMKeyboardLoader(new KeyboardInterface(window, MinimalKeymanGlobal));
+const loader = new DOMKeyboardLoader(new JSKeyboardInterface(window, MinimalKeymanGlobal));
 
 export function loadKeyboardFromPath(path: string) {
   return loader.loadKeyboardFromPath(path);

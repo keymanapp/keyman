@@ -15,7 +15,7 @@ import {
 import { Mock } from "./mock.js";
 import type OutputTarget from "./outputTarget.js";
 import RuleBehavior from "./ruleBehavior.js";
-import KeyboardInterface from './kbdInterface.js';
+import { JSKeyboardInterface }  from './jsKeyboardInterface.js';
 import { DeviceSpec, globalObject } from "@keymanapp/web-utils";
 import { type MutableSystemStore, SystemStoreIDs } from "./systemStores.js";
 
@@ -28,7 +28,7 @@ export type LogMessageHandler = (str: string) => void;
 
 export interface ProcessorInitOptions {
   baseLayout?: string;
-  keyboardInterface?: KeyboardInterface;
+  keyboardInterface?: JSKeyboardInterface;
   defaultOutputRules?: DefaultRules; // Takes the class def object, not an instance thereof.
 }
 
@@ -55,7 +55,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
   // Needed for AltGr simulation.
   modStateFlags: number = 0;
 
-  keyboardInterface: KeyboardInterface;
+  keyboardInterface: JSKeyboardInterface;
 
   /**
    * Indicates the device (platform) to be used for non-keystroke events,
@@ -83,7 +83,7 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
     this.contextDevice = device;
 
     this.baseLayout = options.baseLayout || KeyboardProcessor.DEFAULT_OPTIONS.baseLayout;
-    this.keyboardInterface = options.keyboardInterface || new KeyboardInterface(globalObject(), MinimalKeymanGlobal);
+    this.keyboardInterface = options.keyboardInterface || new JSKeyboardInterface(globalObject(), MinimalKeymanGlobal);
     this.defaultRules = options.defaultOutputRules || KeyboardProcessor.DEFAULT_OPTIONS.defaultOutputRules;
   }
 

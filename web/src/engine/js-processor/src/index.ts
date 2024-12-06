@@ -1,8 +1,8 @@
 export { default as KeyboardProcessor } from "./keyboardProcessor.js";
 export * from "./keyboardProcessor.js";
 export { default as RuleBehavior } from "./ruleBehavior.js";
-export * from './kbdInterface.js';
-export { default as KeyboardInterface } from "./kbdInterface.js";
+export * from './jsKeyboardInterface.js';
+export { JSKeyboardInterface } from "./jsKeyboardInterface.js";
 export * from "./systemStores.js";
 export * from "./deadkeys.js";
 export { default as OutputTarget } from "./outputTarget.js";

@@ -165,7 +165,7 @@ class CachedContextEx {
 
 //#endregion
 
-export default class KeyboardInterface extends KeyboardHarness {
+export class JSKeyboardInterface extends KeyboardHarness {
   static readonly GLOBAL_NAME = 'KeymanWeb';
 
   cachedContext: CachedContext = new CachedContext();
@@ -571,7 +571,7 @@ export default class KeyboardInterface extends KeyboardHarness {
     var modifierBitmask = bitmask & Codes.modifierBitmasks["ALL"];
     var stateBitmask = bitmask & Codes.stateBitmasks["ALL"];
 
-    const eventModifiers = KeyboardInterface.matchModifiersToRuleChirality(e.Lmodifiers, Lruleshift);
+    const eventModifiers = JSKeyboardInterface.matchModifiersToRuleChirality(e.Lmodifiers, Lruleshift);
 
     if(e.vkCode > 255) {
       keyCode = e.vkCode; // added to support extended (touch-hold) keys for mnemonic layouts
@@ -1101,7 +1101,7 @@ export default class KeyboardInterface extends KeyboardHarness {
   }
 
   /**
-   * Publishes the KeyboardInterface's shorthand API names.  As this assigns the current functions
+   * Publishes the JSKeyboardInterface's shorthand API names.  As this assigns the current functions
    * held by the longform versions, note that this should be called after replacing any of them via
    * JS method extension.
    *
@@ -1112,7 +1112,7 @@ export default class KeyboardInterface extends KeyboardHarness {
     // Keyboard callbacks
     let prototype = this.prototype;
 
-    var exportKBCallback = function(miniName: string, longName: keyof KeyboardInterface) {
+    var exportKBCallback = function(miniName: string, longName: keyof JSKeyboardInterface) {
       if(prototype[longName]) {
         // @ts-ignore
         prototype[miniName] = prototype[longName];
@@ -1151,5 +1151,5 @@ export default class KeyboardInterface extends KeyboardHarness {
 
 (function() {
   // This will be the only call within the keyboard module.
-  KeyboardInterface.__publishShorthandAPI();
+  JSKeyboardInterface.__publishShorthandAPI();
 }());

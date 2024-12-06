@@ -5,7 +5,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 import { Codes, KeyEvent, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { KeyboardInterface, KeyboardProcessor, Mock } from 'keyman/engine/js-processor';
+import { JSKeyboardInterface, KeyboardProcessor, Mock } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 
@@ -80,7 +80,7 @@ describe('Engine - specialized backspace handling', function() {
 
   before(async () => {
     // -- START: Standard keyboard unit test loading boilerplate --
-    let harness = new KeyboardInterface({}, MinimalKeymanGlobal);
+    let harness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
     let keyboardLoader = new NodeKeyboardLoader(harness);
     let keyboard = await keyboardLoader.loadKeyboardFromPath(ipaPath);
     // --  END:  Standard keyboard unit test loading boilerplate --
@@ -94,7 +94,7 @@ describe('Engine - specialized backspace handling', function() {
     // --------------
 
     // -- START: Standard keyboard unit test loading boilerplate --
-    harness = new KeyboardInterface({}, MinimalKeymanGlobal);
+    harness = new JSKeyboardInterface({}, MinimalKeymanGlobal);
     keyboardLoader = new NodeKeyboardLoader(harness);
     keyboard = await keyboardLoader.loadKeyboardFromPath(angkorPath);
     // --  END:  Standard keyboard unit test loading boilerplate --
@@ -107,7 +107,7 @@ describe('Engine - specialized backspace handling', function() {
 
     // --------------
 
-    harness = new KeyboardInterface(globalThis, MinimalKeymanGlobal);
+    harness = new JSKeyboardInterface(globalThis, MinimalKeymanGlobal);
     harness.install();
     // Sets the keyboard as the harness's "loaded" keyboard, but not "active".
     harness.KR(new DUMMIED_KEYS_KEYBOARD_SCRIPT());
@@ -117,7 +117,7 @@ describe('Engine - specialized backspace handling', function() {
 
     // --------------
 
-    harness = new KeyboardInterface(globalThis, MinimalKeymanGlobal);
+    harness = new JSKeyboardInterface(globalThis, MinimalKeymanGlobal);
     harness.install();
     // Sets the keyboard as the harness's "loaded" keyboard, but not "active".
     harness.KR(new DOUBLED_BKSP_KEYBOARD_SCRIPT());

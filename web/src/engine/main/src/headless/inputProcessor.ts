@@ -11,7 +11,7 @@ import { Codes, type JSKeyboard, type KeyEvent } from "keyman/engine/keyboard";
 import {
   type Alternate,
   isEmptyTransform,
-  KeyboardInterface,
+  JSKeyboardInterface,
   KeyboardProcessor,
   Mock,
   type OutputTarget,
@@ -66,7 +66,7 @@ export class InputProcessor {
     return this.kbdProcessor;
   }
 
-  public get keyboardInterface(): KeyboardInterface {
+  public get keyboardInterface(): JSKeyboardInterface {
     return this.keyboardProcessor.keyboardInterface;
   }
 

@@ -2,14 +2,14 @@ import { assert } from 'chai';
 
 import { DOMKeyboardLoader } from 'keyman/engine/keyboard/dom-keyboard-loader';
 import { extendString, KeyboardHarness, JSKeyboard, MinimalKeymanGlobal, DeviceSpec, KeyboardKeymanGlobal, KeyboardDownloadError, KeyboardScriptError } from 'keyman/engine/keyboard';
-import { KeyboardInterface, Mock } from 'keyman/engine/js-processor';
+import { JSKeyboardInterface, Mock } from 'keyman/engine/js-processor';
 import { assertThrowsAsync } from 'keyman/tools/testing/test-utils';
 
 declare let window: typeof globalThis;
 // KeymanEngine from the web/ folder... when available.
 // At this level, though... we just mock it.
 declare let keyman: KeyboardKeymanGlobal;
-declare let KeymanWeb: KeyboardInterface;
+declare let KeymanWeb: JSKeyboardInterface;
 
 // Note:  rule processing tests will fail if string extensions are not established beforehand.
 extendString();
@@ -29,7 +29,7 @@ describe('Keyboard loading in DOM', function() {
   })
 
   it('throws error when keyboard does not exist', async () => {
-    const harness = new KeyboardInterface(window, MinimalKeymanGlobal);
+    const harness = new JSKeyboardInterface(window, MinimalKeymanGlobal);
     const keyboardLoader = new DOMKeyboardLoader(harness);
     const nonExisting = '/does/not/exist.js';
 
@@ -38,7 +38,7 @@ describe('Keyboard loading in DOM', function() {
   });
 
   it('throws error when keyboard is invalid', async () => {
-    const harness = new KeyboardInterface(window, MinimalKeymanGlobal);
+    const harness = new JSKeyboardInterface(window, MinimalKeymanGlobal);
     const keyboardLoader = new DOMKeyboardLoader(harness);
     const nonKeyboardPath = '/common/test/resources/index.mjs';
 
@@ -65,7 +65,7 @@ describe('Keyboard loading in DOM', function() {
   });
 
   it('`window`, enabled rule processing', async () => {
-    const harness = new KeyboardInterface(window, MinimalKeymanGlobal);
+    const harness = new JSKeyboardInterface(window, MinimalKeymanGlobal);
     const keyboardLoader = new DOMKeyboardLoader(harness);
     const keyboard: JSKeyboard = await keyboardLoader.loadKeyboardFromPath('/common/test/resources/keyboards/khmer_angkor.js');
     harness.activeKeyboard = keyboard;
@@ -95,7 +95,7 @@ describe('Keyboard loading in DOM', function() {
   });
 
   it('load keyboards successfully in parallel without side effects', async () => {
-    let harness = new KeyboardInterface(window, MinimalKeymanGlobal);
+    let harness = new JSKeyboardInterface(window, MinimalKeymanGlobal);
     let keyboardLoader = new DOMKeyboardLoader(harness);
 
     // Preload a keyboard and make it active.
