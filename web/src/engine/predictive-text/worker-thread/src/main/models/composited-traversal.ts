@@ -1,4 +1,7 @@
-import { Distribution, LexiconTraversal, TextWithProbability } from "@keymanapp/common-types";
+import { LexicalModelTypes } from "@keymanapp/common-types";
+import Distribution = LexicalModelTypes.Distribution;
+import LexiconTraversal = LexicalModelTypes.LexiconTraversal;
+import TextWithProbability = LexicalModelTypes.TextWithProbability;
 import { PriorityQueue } from "@keymanapp/web-utils";
 
 type ChildEdge = { char: string; p: number, traversal: () => LexiconTraversal };

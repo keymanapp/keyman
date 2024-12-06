@@ -5,7 +5,17 @@ import { determineModelTokenizer, determineModelWordbreaker, determinePunctuatio
 import { ContextTracker, TrackedContextState } from './correction/context-tracker.js';
 import { ExecutionTimer } from './correction/execution-timer.js';
 import ModelCompositor from './model-compositor.js';
-import { ProbabilityMass, Suggestion, LexicalModel, Distribution, Outcome, Keep, SuggestionTag, Reversion, Transform, Context } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import Context = LexicalModelTypes.Context;
+import Distribution = LexicalModelTypes.Distribution;
+import Keep = LexicalModelTypes.Keep;
+import LexicalModel = LexicalModelTypes.LexicalModel;
+import Outcome = LexicalModelTypes.Outcome;
+import ProbabilityMass = LexicalModelTypes.ProbabilityMass;
+import Reversion = LexicalModelTypes.Reversion;
+import Suggestion = LexicalModelTypes.Suggestion;
+import SuggestionTag = LexicalModelTypes.SuggestionTag;
+import Transform = LexicalModelTypes.Transform;
 
 /*
  * The functions in this file exist to provide unit-testable stateless components for the

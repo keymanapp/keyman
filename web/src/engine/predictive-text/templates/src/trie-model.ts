@@ -27,8 +27,12 @@
 
 // Allows the kmwstring bindings to resolve.
 import { extendString } from "@keymanapp/web-utils";
-
-import { CasingFunction, Configuration, LexicalModel, LexicalModelPunctuation, WordBreakingFunction } from '@keymanapp/common-types';
+import { LexicalModelTypes } from "@keymanapp/common-types";
+import CasingFunction = LexicalModelTypes.CasingFunction;
+import Configuration = LexicalModelTypes.Configuration;
+import LexicalModel = LexicalModelTypes.LexicalModel;
+import LexicalModelPunctuation = LexicalModelTypes.LexicalModelPunctuation;
+import WordBreakingFunction = LexicalModelTypes.WordBreakingFunction;
 import { SearchKey, Wordform2Key } from "./common.js";
 import { Node, Trie } from './trie.js';
 import { TraversalModel } from './traversal-model.js';

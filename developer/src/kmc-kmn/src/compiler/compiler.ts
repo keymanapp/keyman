@@ -6,7 +6,7 @@ TODO: implement additional interfaces:
 */
 
 // TODO: rename wasm-host?
-import { VisualKeyboard, KvkFileReader, UnicodeSetParser, UnicodeSet, KeymanFileTypes, KvkFileWriter } from '@keymanapp/common-types';
+import { VisualKeyboard, KvkFileReader, LdmlKeyboardTypes, KeymanFileTypes, KvkFileWriter } from '@keymanapp/common-types';
 import {
   CompilerCallbacks, CompilerEvent, CompilerOptions, KeymanCompiler, KeymanCompilerArtifacts,
   KeymanCompilerArtifactOptional, KeymanCompilerResult, KeymanCompilerArtifact, KvksFileReader
@@ -140,7 +140,7 @@ let
  * or write from filesystem or network directly, but relies on callbacks for all
  * external IO.
  */
-export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
+export class KmnCompiler implements KeymanCompiler, LdmlKeyboardTypes.UnicodeSetParser {
   private callbacks: CompilerCallbacks;
   private wasmExports: MallocAndFree;
   private options: KmnCompilerOptions;
@@ -529,7 +529,7 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
    * @param rangeCount - number of ranges to allocate
    * @returns            UnicodeSet accessor object, or null on failure
    */
-  public parseUnicodeSet(pattern: string, rangeCount: number) : UnicodeSet | null {
+  public parseUnicodeSet(pattern: string, rangeCount: number) : LdmlKeyboardTypes.UnicodeSet | null {
     if(!this.verifyInitialized()) {
       /* c8 ignore next 2 */
       // verifyInitialized will set a callback if needed
@@ -557,7 +557,7 @@ export class KmnCompiler implements KeymanCompiler, UnicodeSetParser {
         ranges.push([start, end]);
       }
       this.wasmExports.free(buf);
-      return new UnicodeSet(pattern, ranges);
+      return new LdmlKeyboardTypes.UnicodeSet(pattern, ranges);
     } else {
       // rc is negative: it's an error code.
       this.wasmExports.free(buf);
