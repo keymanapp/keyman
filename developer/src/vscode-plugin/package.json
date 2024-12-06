@@ -1,0 +1,42 @@
+{
+  "name": "@keymanapp/developer-vscode",
+  "displayName": "Keyman Developer for VSCode",
+  "description": "Plugin for compiling Keyman projects in VSCode",
+  "engines": {
+    "vscode": "^1.93.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/keymanapp/keyman.git"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.0",
+    "@types/node": "20.4.1",
+    "@types/vscode": "^1.93.0",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@keymanapp/common-types": "*",
+    "@keymanapp/developer-utils": "*",
+    "@keymanapp/kmc-kmn": "*",
+    "@keymanapp/kmc-ldml": "*",
+    "@keymanapp/kmc-package": "*"
+  }
+}
