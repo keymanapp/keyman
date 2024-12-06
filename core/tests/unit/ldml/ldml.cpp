@@ -280,7 +280,7 @@ verify_key_list(std::set<km::tests::key_event> &actual, std::set<km::tests::key_
   bool equals = true;
   // error if any bad modifier keys
   for(const auto &akey : actual) {
-    if (akey.modifier_state > KM_CORE_MODIFIER_CAPS) {
+    if (akey.modifier_state > KM_CORE_MODIFIER_MASK_CAPS) {
       equals = false;
       std::u16string dump = convert<char, char16_t>(akey.dump());  // akey.dump()
       std::wcout << console_color::fg(console_color::BRIGHT_RED) << "- FAIL - key_map had key with bad modifier " << akey.modifier_state << ": " << dump << console_color::reset() << std::endl;

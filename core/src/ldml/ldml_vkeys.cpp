@@ -47,8 +47,7 @@ vkeys::get_key_list() const {
   // Alt
   if (all_modifiers.count(LDML_KEYS_MOD_ALT) == 0 && all_modifiers.count(LDML_KEYS_MOD_ALTL) == 0 && all_modifiers.count(LDML_KEYS_MOD_ALTR) == 0) {
     // no ALT keys were seen, so OTHER includes ALT
-    other_state.insert(KM_CORE_MODIFIER_LALT);
-    other_state.insert(KM_CORE_MODIFIER_RALT);
+    other_state.insert(KM_CORE_MODIFIER_ALT);
   } else if(all_modifiers.count(LDML_KEYS_MOD_ALTL) == 0) {
     other_state.insert(KM_CORE_MODIFIER_RALT);
   } else if(all_modifiers.count(LDML_KEYS_MOD_ALTR) == 0) {
@@ -58,8 +57,7 @@ vkeys::get_key_list() const {
   // ctrl
   if (all_modifiers.count(LDML_KEYS_MOD_CTRL) == 0 && all_modifiers.count(LDML_KEYS_MOD_CTRLL) == 0 && all_modifiers.count(LDML_KEYS_MOD_CTRLR) == 0) {
     // no CTRL keys were seen, so OTHER includes CTRL
-    other_state.insert(KM_CORE_MODIFIER_LCTRL);
-    other_state.insert(KM_CORE_MODIFIER_RCTRL);
+    other_state.insert(KM_CORE_MODIFIER_CTRL);
   } else if(all_modifiers.count(LDML_KEYS_MOD_CTRLL) == 0) {
     other_state.insert(KM_CORE_MODIFIER_RCTRL);
   } else if(all_modifiers.count(LDML_KEYS_MOD_CTRLR) == 0) {
@@ -81,9 +79,35 @@ vkeys::get_key_list() const {
     other_state.insert(KM_CORE_MODIFIER_NONE);
   }
 
-  const std::size_t new_list_size = all_vkeys.size() // original size
-    + (other_key_count * (other_state.size() - 1))
-    + 1; // terminator
+  // We need ALL combinations of the other_state, except for 'all off'.
+  // The number of additions will be (2**(other_state.size())-1
+  // Also, since the LDML_KEYS_MOD_OTHER modifier is excluded, we
+  // will need to subtract 1 when calculating new_list_size
+  const std::size_t other_expanded_count = (1 << other_state.size()) - 1;
+
+  std::vector<uint32_t> other_expanded_mods(other_expanded_count);
+
+  // populate the expanded list.
+  // we start at 1 because 0 is "all bits off" (00000b)
+  for (std::size_t expansion = 1; expansion <= other_expanded_count; expansion++) {
+    uint32_t &expanded_mod = other_expanded_mods.at(expansion-1) = KM_CORE_MODIFIER_NONE;
+    std::size_t bit_mask = 1;
+    for (const auto mod : other_state) {
+      // Check if this modifier is on in this iteration of the expansion
+      // bit_mask will be 2^0 … 2^(other_state().size()-1)
+      if (bit_mask & expansion) {
+        // do we include this entry? check if this bit is on
+        expanded_mod |= mod;
+      }
+      // shift the bitmask over
+      assert(expanded_mod <= KM_CORE_MODIFIER_MASK_CAPS);
+      bit_mask <<= 1;
+    }
+  }
+
+  const std::size_t new_list_size = all_vkeys.size()                                // original size
+                                    + (other_key_count * (other_expanded_count - 1))// number of additional entries needed
+                                    + 1;                                            // terminator
   km_core_keyboard_key *list = new km_core_keyboard_key[new_list_size];
   std::size_t n = 0;
   for (const auto &k : all_vkeys) {
@@ -92,18 +116,19 @@ vkeys::get_key_list() const {
 
     if (mod == LDML_KEYS_MOD_OTHER) {
       // expand to all of other_state
-      for (const auto expanded_mod : other_state) {
+      for (const auto expanded_mod : other_expanded_mods) {
         list[n].key             = vkey;
         list[n++].modifier_flag = expanded_mod;
         assert(n <= new_list_size);
       }
     } else {
-      assert(mod <= KM_CORE_MODIFIER_CAPS); // that no LDMLisms escape
+      assert(mod <= KM_CORE_MODIFIER_MASK_CAPS); // that no LDMLisms escape
       list[n].key             = vkey;
       list[n++].modifier_flag = mod;
       assert(n <= new_list_size);
     }
   }
+  // add the list terminator
   list[n++] = KM_CORE_KEYBOARD_KEY_LIST_END;
   assert(n == new_list_size);
   return list;
