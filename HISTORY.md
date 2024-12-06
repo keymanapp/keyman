@@ -1,5 +1,17 @@
 # Keyman Version History
 
+## 18.0.154 alpha 2024-12-06
+
+* feat(developer,core): local imports (#12750)
+* chore(core): remove `km_core_keyboard_load` API (#12769)
+* chore: rename TestCompilerCallbacks.ts (#12775)
+* chore(mac): update to SIL logo with glyph in About window (#12766)
+* chore(android,windows): Update crowdin for Italian (#12793)
+* change(developer): use full github url in kmc copy parameters (#12773)
+* chore(developer): add baseline tests for bcp47 codes to kmc-package (#12506)
+* chore(core): only install node on Windows if not available (#12772)
+* chore(android): Disable auto-correct UI controls (#12791)
+
 ## 18.0.153 alpha 2024-12-05
 
 * feat(developer,common): verify normalization of strings (#12748)
