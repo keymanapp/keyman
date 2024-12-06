@@ -72,6 +72,7 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
   }
 
   func setConstraints() {
+    os_log("CustomInputView setConstraints", log: KeymanEngineLogger.ui, type: .info)
     let innerView = keymanWeb.view!
     let guide = self.safeAreaLayoutGuide
 
@@ -93,7 +94,7 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
   }
 
   func keyboardHeightChanged() {
-    os_log("CustomInputView keyboardHeightChanged", log: KeymanEngineLogger.ui, type: .debug)
+    os_log("CustomInputView keyboardHeightChanged", log: KeymanEngineLogger.ui, type: .info)
     
     // deactivate constraints for both orientations (though one should already be inactive)
     landscapeConstraint?.isActive = false
@@ -113,7 +114,7 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
   }
   
   private func buildKeyboardHeightConstraints(bannerHeight: CGFloat) {
-    os_log("CustomInputView buildKeyboardHeightConstraints", log: KeymanEngineLogger.ui, type: .debug)
+    os_log("CustomInputView buildKeyboardHeightConstraints", log: KeymanEngineLogger.ui, type: .info)
     let innerView = keymanWeb.view!
     
     // Cannot be met by the in-app keyboard, but helps to 'force' height for the system keyboard.
@@ -170,6 +171,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   open class var topBarHeight: CGFloat {
+    os_log("topBarHeight", log:KeymanEngineLogger.ui, type: .info)
     let scaling = KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: self.isPortrait)
 
     return scaling?.bannerHeight ?? 38 // default for iPhone SE, older/smaller devices

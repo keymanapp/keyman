@@ -705,6 +705,7 @@ extension KeymanWebViewController {
   }
 
   func constraintTargetHeight(isPortrait: Bool) -> CGFloat {
+    os_log("constraintTargetHeight", log:KeymanEngineLogger.ui, type: .info)
     var keyboardHeight = 0.0
 
     let defaultHeight = KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: isPortrait)?.keyboardHeight ?? 216 // default for ancient devices
@@ -719,8 +720,8 @@ extension KeymanWebViewController {
         os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
         keyboardHeight = defaultHeight
       }
-    } else {
-      if (Storage.active.userDefaults.object(forKey: Key.portraitKeyboardHeight) != nil) {
+    } else { // landscape
+      if (Storage.active.userDefaults.object(forKey: Key.landscapeKeyboardHeight) != nil) {
         keyboardHeight = Storage.active.userDefaults.landscapeKeyboardHeight
         let message = "constraintTargetHeight, from UserDefaults loaded landscape value \(keyboardHeight)"
         os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
@@ -742,15 +743,16 @@ extension KeymanWebViewController {
     var width: CGFloat
     var height: CGFloat
     width = UIScreen.main.bounds.width
+    os_log("initKeyboardSize()", log:KeymanEngineLogger.ui, type: .info)
 
     if Util.isSystemKeyboard {
       height = constraintTargetHeight(isPortrait: InputViewController.isPortrait)
       let message = "initKeyboardSize(), for system keyboard, keyboardHeight: \(keyboardHeight)"
-      os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, message)
+      os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
     } else {
       height = constraintTargetHeight(isPortrait: UIDevice.current.orientation.isPortrait)
       let message = "initKeyboardSize(), for in-app keyboard, keyboardHeight: \(keyboardHeight)"
-      os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, message)
+      os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
     }
 
     keyboardSize = CGSize(width: width, height: height)

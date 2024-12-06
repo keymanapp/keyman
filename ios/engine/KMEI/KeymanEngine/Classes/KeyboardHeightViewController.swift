@@ -69,6 +69,7 @@ class KeyboardHeightViewController: UIViewController {
   }
   
   private func loadDefaultKeyboardHeights() {
+    os_log("loadDefaultKeyboardHeights", log:KeymanEngineLogger.ui, type: .info)
     // if no KeyboardScaleMap found for device, then default to 216.0
     let portraitKeyboardScale = KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: true)
     self.defaultPortraitHeight = Double(portraitKeyboardScale?.keyboardHeight ?? 216.0)
