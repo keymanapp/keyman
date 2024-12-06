@@ -5,7 +5,7 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 import { Codes, KeyEvent, MinimalKeymanGlobal } from 'keyman/engine/keyboard';
-import { JSKeyboardInterface, KeyboardProcessor, Mock } from 'keyman/engine/js-processor';
+import { JSKeyboardInterface, JSKeyboardProcessor, Mock } from 'keyman/engine/js-processor';
 import { NodeKeyboardLoader } from 'keyman/engine/keyboard/node-keyboard-loader';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 
@@ -138,7 +138,7 @@ describe('Engine - specialized backspace handling', function() {
       device: device
     });
 
-    const processor = new KeyboardProcessor(TEST_DEVICE, {
+    const processor = new JSKeyboardProcessor(TEST_DEVICE, {
       keyboardInterface: angkorWithHarness
     });
     const result = processor.processKeystroke(event, contextSource);
@@ -169,7 +169,7 @@ describe('Engine - specialized backspace handling', function() {
     // A specialized test keyboard that handles keys without emitting any content.
     // We want to ensure error cases without output, on null context, don't act
     // like backspaces.
-    const processor = new KeyboardProcessor(TEST_DEVICE, {
+    const processor = new JSKeyboardProcessor(TEST_DEVICE, {
       keyboardInterface: dummiedWithHarness
     });
     const result = processor.processKeystroke(event, contextSource);
@@ -201,7 +201,7 @@ describe('Engine - specialized backspace handling', function() {
       device: device
     });
 
-    const processor = new KeyboardProcessor(TEST_DEVICE, {
+    const processor = new JSKeyboardProcessor(TEST_DEVICE, {
       keyboardInterface: angkorWithHarness
     });
     const result = processor.processKeystroke(event, contextSource);
@@ -236,7 +236,7 @@ describe('Engine - specialized backspace handling', function() {
       device: device
     });
 
-    const processor = new KeyboardProcessor(TEST_DEVICE, {
+    const processor = new JSKeyboardProcessor(TEST_DEVICE, {
       keyboardInterface: angkorWithHarness
     });
     const result = processor.processKeystroke(event, contextSource);
@@ -264,7 +264,7 @@ describe('Engine - specialized backspace handling', function() {
       device: device
     });
 
-    const processor = new KeyboardProcessor(TEST_DEVICE, {
+    const processor = new JSKeyboardProcessor(TEST_DEVICE, {
       keyboardInterface: ipaWithHarness
     });
     const result = processor.processKeystroke(event, contextSource);
@@ -295,7 +295,7 @@ describe('Engine - specialized backspace handling', function() {
     // A specialized test keyboard that duplicates backspaces when sufficient
     // context exists.
 
-    const processor = new KeyboardProcessor(TEST_DEVICE, {
+    const processor = new JSKeyboardProcessor(TEST_DEVICE, {
       keyboardInterface: bksp2xWithHarness
     });
     const result = processor.processKeystroke(event, contextSource);
@@ -330,7 +330,7 @@ describe('Engine - specialized backspace handling', function() {
     // A specialized test keyboard that handles keys without emitting any content.
     // We want to ensure error cases without output, on null context, don't act
     // like backspaces.
-    const processor = new KeyboardProcessor(TEST_DEVICE, {
+    const processor = new JSKeyboardProcessor(TEST_DEVICE, {
       keyboardInterface: dummiedWithHarness
     });
     const result = processor.processKeystroke(event, contextSource);

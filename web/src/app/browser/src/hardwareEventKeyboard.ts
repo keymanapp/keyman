@@ -1,5 +1,5 @@
 import { Codes, DeviceSpec, KeyEvent, KeyMapping, JSKeyboard } from 'keyman/engine/keyboard';
-import { KeyboardProcessor } from 'keyman/engine/js-processor';
+import { JSKeyboardProcessor } from 'keyman/engine/js-processor';
 import { ModifierKeyConstants } from '@keymanapp/common-types';
 
 import { HardKeyboard, processForMnemonicsAndLegacy } from 'keyman/engine/main';
@@ -209,13 +209,13 @@ export default class HardwareEventKeyboard extends HardKeyboard {
   // - `modStateFlags`
   // - `baseLayout`
   // - `doModifierPress()` - for modifier updates on key-up.
-  private readonly processor: KeyboardProcessor;
+  private readonly processor: JSKeyboardProcessor;
   private readonly contextManager: ContextManager;
   private domEventTracker = new DomEventTracker();
 
   private swallowKeypress: boolean = false;
 
-  constructor(hardDevice: DeviceSpec, processor: KeyboardProcessor, contextManager: ContextManager) {
+  constructor(hardDevice: DeviceSpec, processor: JSKeyboardProcessor, contextManager: ContextManager) {
     super();
     this.hardDevice = hardDevice;
     this.contextManager = contextManager;

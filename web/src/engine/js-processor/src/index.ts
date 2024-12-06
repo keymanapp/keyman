@@ -1,5 +1,5 @@
-export { default as KeyboardProcessor } from "./keyboardProcessor.js";
-export * from "./keyboardProcessor.js";
+export { JSKeyboardProcessor } from "./jsKeyboardProcessor.js";
+export * from "./jsKeyboardProcessor.js";
 export { default as RuleBehavior } from "./ruleBehavior.js";
 export * from './jsKeyboardInterface.js';
 export { JSKeyboardInterface } from "./jsKeyboardInterface.js";

@@ -33,10 +33,10 @@ export interface ProcessorInitOptions {
 }
 
 interface EventMap {
-  statekeychange: (stateKeys: typeof KeyboardProcessor.prototype.stateKeys) => void;
+  statekeychange: (stateKeys: typeof JSKeyboardProcessor.prototype.stateKeys) => void;
 }
 
-export default class KeyboardProcessor extends EventEmitter<EventMap> {
+export class JSKeyboardProcessor extends EventEmitter<EventMap> {
   public static readonly DEFAULT_OPTIONS: ProcessorInitOptions = {
     baseLayout: 'us',
     defaultOutputRules: new DefaultRules()
@@ -77,14 +77,14 @@ export default class KeyboardProcessor extends EventEmitter<EventMap> {
     super();
 
     if(!options) {
-      options = KeyboardProcessor.DEFAULT_OPTIONS;
+      options = JSKeyboardProcessor.DEFAULT_OPTIONS;
     }
 
     this.contextDevice = device;
 
-    this.baseLayout = options.baseLayout || KeyboardProcessor.DEFAULT_OPTIONS.baseLayout;
+    this.baseLayout = options.baseLayout || JSKeyboardProcessor.DEFAULT_OPTIONS.baseLayout;
     this.keyboardInterface = options.keyboardInterface || new JSKeyboardInterface(globalObject(), MinimalKeymanGlobal);
-    this.defaultRules = options.defaultOutputRules || KeyboardProcessor.DEFAULT_OPTIONS.defaultOutputRules;
+    this.defaultRules = options.defaultOutputRules || JSKeyboardProcessor.DEFAULT_OPTIONS.defaultOutputRules;
   }
 
   public get activeKeyboard(): JSKeyboard {
