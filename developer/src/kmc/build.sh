@@ -19,6 +19,8 @@ builder_describe "Build Keyman Keyboard Compiler kmc" \
   "@/core/include/ldml" \
   "@/developer/src/common/web/utils" \
   "@/developer/src/kmc-analyze" \
+  "@/developer/src/kmc-copy" \
+  "@/developer/src/kmc-generate" \
   "@/developer/src/kmc-keyboard-info" \
   "@/developer/src/kmc-kmn" \
   "@/developer/src/kmc-ldml" \
@@ -59,17 +61,6 @@ function do_api() {
 
 #-------------------------------------------------------------------------------------------------------------------
 
-function do_test() {
-  eslint .
-  tsc --build test/
-  readonly C8_THRESHOLD=50
-  c8 --reporter=lcov --reporter=text --lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD mocha
-  builder_echo warning "Coverage thresholds are currently $C8_THRESHOLD%, which is lower than ideal."
-  builder_echo warning "Please increase threshold in build.sh as test coverage improves."
-}
-
-#-------------------------------------------------------------------------------------------------------------------
-
 function do_bundle() {
   SOURCEMAP_PATHS=( "${PACKAGES[@]}" )
   SOURCEMAP_PATHS=( "${SOURCEMAP_PATHS[@]/%//build}" )
@@ -95,7 +86,10 @@ function do_bundle() {
   # Manually copy over kmcmplib module
   cp ../kmc-kmn/build/src/import/kmcmplib/wasm-host.wasm build/dist/
 
-  cp build/dist/* "$BUILD_PATH"
+  # Manually copy over templates
+  cp -R ../kmc-generate/build/src/template/ build/dist/
+
+  cp -R build/dist/* "$BUILD_PATH"
 
   builder_finish_action success bundle
 }
@@ -105,7 +99,7 @@ function do_bundle() {
 builder_run_action clean      rm -rf ./build/ ./tsconfig.tsbuildinfo
 builder_run_action configure  verify_npm_setup
 builder_run_action build      do_build
-builder_run_action test       do_test
+builder_run_action test       builder_do_typescript_tests 50
 builder_run_action api        do_api
 builder_run_action bundle     do_bundle
 builder_run_action publish    builder_publish_npm

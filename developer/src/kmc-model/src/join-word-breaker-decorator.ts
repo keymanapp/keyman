@@ -1,4 +1,6 @@
-import { Span, WordBreakingFunction } from '@keymanapp/common-types';
+import { LexicalModelTypes } from '@keymanapp/common-types';
+import Span = LexicalModelTypes.Span;
+import WordBreakingFunction = LexicalModelTypes.WordBreakingFunction;
 
 /**
  * Returns a word breaker that joins spans of an existing word breaker.

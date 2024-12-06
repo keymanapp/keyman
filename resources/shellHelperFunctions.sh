@@ -301,3 +301,45 @@ _select_node_version_with_nvm() {
     builder_die "Attempted to select node.js version $REQUIRED_NODE_VERSION but found $CURRENT_NODE_VERSION instead"
   fi
 }
+
+check-markdown() {
+  node "$KEYMAN_ROOT/resources/tools/check-markdown" --root "$1"
+}
+
+# 
+# Runs eslint, builds tests, and then runs tests with mocha + c8 (coverage)
+# 
+# Usage:
+#   builder_run_action  test    builder_do_typescript_tests [coverage_threshold]
+# Parameters:
+#   1: coverage_threshold   optional, minimum coverage for c8 to pass tests, 
+#                           defaults to 90 (percent)
+#
+# Todo:
+#   Move to builder.typescript.inc.sh when this is established
+#
+builder_do_typescript_tests() {
+  local MOCHA_FLAGS=
+
+  if [[ "${TEAMCITY_GIT_PATH:-}" != "" ]]; then
+    # we're running in TeamCity
+    MOCHA_FLAGS="-reporter mocha-teamcity-reporter"
+  fi
+
+  eslint .
+  tsc --build test/
+
+  local THRESHOLD_PARAMS=
+  local C8_THRESHOLD=
+  if [[ $# -gt 0 ]]; then
+    C8_THRESHOLD=$1
+    THRESHOLD_PARAMS="--lines $C8_THRESHOLD --statements $C8_THRESHOLD --branches $C8_THRESHOLD --functions $C8_THRESHOLD"
+  fi
+
+  c8 --reporter=lcov --reporter=text --exclude-after-remap --check-coverage=false $THRESHOLD_PARAMS mocha ${MOCHA_FLAGS} "${builder_extra_params[@]}"
+
+  if [[ ! -z "$C8_THRESHOLD" ]]; then
+    builder_echo warning "Coverage thresholds are currently $C8_THRESHOLD%, which is lower than ideal."
+    builder_echo warning "Please increase threshold in build.sh as test coverage improves."
+  fi
+}

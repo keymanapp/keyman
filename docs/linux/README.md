@@ -64,6 +64,10 @@ To just run the unit tests without integration tests, add the
 It's also possible to only run the tests for one of the subprojects. You
 can use `build.sh` in the subdirectory for that.
 
+Unit tests should be named after the file/class they are testing and
+follow the pattern `*.tests.<ext>` (e.g. `keymanutil.tests.c`) or
+for Python `*_tests.py`.
+
 ### ibus-keyman
 
 If you want to run the ibus-keyman tests with Wayland, you'll have to

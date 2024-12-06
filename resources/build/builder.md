@@ -1055,6 +1055,26 @@ fi
 
 --------------------------------------------------------------------------------
 
+## `builder_do_typescript_tests` function
+
+Runs eslint, builds tests, and then runs tests with mocha + c8 (coverage)
+
+**Note:** this is currently hosted in shellHelperFunctions.sh, but will
+be moved to builder.typescript.inc.sh in the future.
+
+### Usage
+
+```bash
+builder_run_action  test    builder_do_typescript_tests [coverage_threshold]
+```
+
+### Parameters
+
+* **coverage_threshold** optional, minimum coverage for c8 to pass tests, 
+  defaults to 90 (percent)
+
+--------------------------------------------------------------------------------
+
 ## Formatting variables
 
 These helper variables define ANSI color escapes when running in color mode, and

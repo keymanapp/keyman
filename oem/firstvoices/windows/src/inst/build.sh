@@ -16,7 +16,7 @@ builder_describe "Installation files for FirstVoices Keyboards" \
 # after all other builds complete
 
 builder_describe_outputs \
-  publish       /oem/firstvoices/windows/src/inst/firstvoices-${VERSION}.exe
+  publish       /windows/release/${VERSION}/firstvoices-${VERSION}.exe
 
 builder_parse "$@"
 

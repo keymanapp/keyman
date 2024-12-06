@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE regressiontest SYSTEM "https://api.keyman.com/schemas/regtest/regtest.dtd">
+<regressiontest>
+  <info>
+    <version>6.0</version>
+    <systemkeyboard>00000409</systemkeyboard>
+    <keyboard>C:\keyman\keyboards\keyboards\release\k\khmer_angkor\build\khmer_angkor.kmx</keyboard>
+    <beginmode>Unicode</beginmode>
+  </info>
+  <events>
+    <event>
+       <key><vkey>K_H</vkey></key>
+       <postcontext><text xml:space="preserve">ហ</text></postcontext>
+    </event>
+    <event>
+       <key><vkey>K_J</vkey></key>
+       <postcontext><text xml:space="preserve">ហ្</text></postcontext>
+    </event>
+    <event>
+       <key><vkey>K_V</vkey></key>
+       <postcontext><text xml:space="preserve">ហ្វ</text></postcontext>
+    </event>
+    <event>
+       <key><vkey>K_U</vkey></key>
+       <postcontext><text xml:space="preserve">ហ្វុ</text></postcontext>
+    </event>
+    <event>
+       <key><shiftstate><shift/></shiftstate><vkey>K_I</vkey></key>
+       <postcontext><text xml:space="preserve">ហ្វ៊ី</text></postcontext>
+    </event>
+  </events></regressiontest>

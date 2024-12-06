@@ -7,7 +7,7 @@ import 'mocha';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { SectionCompiler, SectionCompilerNew } from '../../src/compiler/section-compiler.js';
-import { util, KMXPlus, UnicodeSetParser } from '@keymanapp/common-types';
+import { util, KMXPlus, LdmlKeyboardTypes } from '@keymanapp/common-types';
 import { CompilerEvent, compilerEventFormat, CompilerCallbacks, LDMLKeyboardXMLSourceFileReader, LDMLKeyboardTestDataXMLSourceFile, LDMLKeyboard, } from "@keymanapp/developer-utils";
 import { LdmlKeyboardCompiler } from '../../src/main.js'; // make sure main.js compiles
 import { assert } from 'chai';
@@ -38,7 +38,8 @@ export const compilerTestCallbacks = new TestCompilerCallbacks();
 
 export const compilerTestOptions: LdmlCompilerOptions = {
   readerOptions: {
-    importsPath: fileURLToPath(new URL(...LDMLKeyboardXMLSourceFileReader.defaultImportsURL))
+    cldrImportsPath: fileURLToPath(new URL(...LDMLKeyboardXMLSourceFileReader.defaultImportsURL)),
+    localImportsPaths: [], // will be fixed up in loadSectionFixture
   }
 };
 
@@ -59,8 +60,14 @@ export async function loadSectionFixture(compilerClass: SectionCompilerNew, file
   const data = callbacks.loadFile(inputFilename);
   assert.isNotNull(data, `Failed to read file ${inputFilename}`);
 
+  compilerTestOptions.readerOptions.localImportsPaths =  [ path.dirname(inputFilename) ];
+
   const reader = new LDMLKeyboardXMLSourceFileReader(compilerTestOptions.readerOptions, callbacks);
   const source = reader.load(data);
+  if (!source) {
+    // print any callbacks here
+    assert.sameDeepMembers(callbacks.messages, [], `Errors loading ${inputFilename}`);
+  }
   assert.isNotNull(source, `Failed to load XML from ${inputFilename}`);
 
   if (!reader.validate(source)) {
@@ -297,7 +304,7 @@ export function testCompilationCases(compiler: SectionCompilerNew, cases : Compi
     });
   }
 }
-async function getTestUnicodeSetParser(callbacks: CompilerCallbacks): Promise<UnicodeSetParser> {
+async function getTestUnicodeSetParser(callbacks: CompilerCallbacks): Promise<LdmlKeyboardTypes.UnicodeSetParser> {
   // for tests, just create a new one
   // see LdmlKeyboardCompiler.getUsetParser()
   const compiler = new KmnCompiler();

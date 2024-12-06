@@ -295,6 +295,10 @@
   <string name="koAltGrCtrlAlt" comment="General options - Ctrl+Alt simulates AltGr on computers without AltGr">ប្រើ Ctrl+Alt ដូច AltGr</string>
   <!-- Context: Configuration Dialog - Options tab -->
   <!-- String Type: FormatString -->
+  <!-- Introduced: 18.0.95 -->
+  <string name="koRightModifierHK" comment="General options - Right Ctrl Alt and Shift trigger hotkey">អនុញ្ញាតឱ្យផ្នែកស្តាំនៃគ្រាប់ចុចផ្លាស់ប្តូរការកំណត់ទៅជាគ្រាប់​ចុច​ផ្លូវកាត់</string>
+  <!-- Context: Configuration Dialog - Options tab -->
+  <!-- String Type: FormatString -->
   <!-- Introduced: 9.0.480.0 -->
   <string name="koDeadkeyConversion" comment="Advanced options - Base keyboard deadkeys are treated as normal keys">ចាត់​ទុក​គ្រាប់​ចុច Deadkey ជា​គ្រាប់ចុច​ទទេ</string>
   <!-- Context: Configuration Dialog - Options tab -->
@@ -418,6 +422,14 @@
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
   <string name="S_Support_Copyright" comment="Support - Product Copyright">រក្សា​សិទ្ធិ © SIL International។ រក្សា​សិទ្ធិ​គ្រប់​យ៉ាង។</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.94.0 -->
+  <string name="S_Support_CreatedBySILGlobal" comment="Created by {SIL Global} ">បង្កើតដោយ %1$s</string>
+  <!-- Context: Configuration Dialog - Support tab -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0.94.0 -->
+  <string name="S_Support_CopyrightSILGlobal" comment="Copyright © {SIL Global}. All Rights Reserved.">រក្សាសិទ្ធិ © %1$s។ រក្សា​សិទ្ធិ​គ្រប់​យ៉ាង។</string>
   <!-- Context: Configuration Dialog - Support tab -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.230.0 -->
@@ -609,11 +621,14 @@
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.288.0 -->
-  <string name="S_Splash_Name" comment="Splash major title">Keyman</string>
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.294.0 -->
   <string name="S_Splash_Start" comment="Start Keyman button">ចាប់ផ្ដើម Keyman</string>
+  <!-- Context: Splash Dialog -->
+  <!-- String Type: PlainText -->
+  <!-- Introduced: 18.0 -->
+  <string name="S_Splash_Start_2" comment="Start {Keyman} button">ចាប់ផ្ដើម %1$s</string>
   <!-- Context: Splash Dialog -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 8.0.294.0 -->
@@ -657,7 +672,6 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKShortApplicationTitle" comment="Product name">Keyman</string>
   <!-- Context: Hints -->
   <!-- String Type: PlainText -->
   <!-- Introduced: 7.0.244.0 -->
@@ -781,7 +795,6 @@
   <!-- Context: Formatted Messages -->
   <!-- String Type: FormatString -->
   <!-- Introduced: 7.0.230.0 -->
-  <string name="SKApplicationTitle" comment="Product name used for the title of message boxes and message dialogs">Keyman</string>
   <!-- Parameters: %1$s = Version number string -->
   <!-- Context: Formatted Messages -->
   <!-- Introduced: 7.0.230.0 -->

@@ -1,32 +1,20 @@
-import { xml2js } from '../../index.js';
+import { KeymanXMLReader } from '../../index.js';
 import { KPJFile, KPJFileProject } from './kpj-file.js';
 import { util } from '@keymanapp/common-types';
 import { KeymanDeveloperProject, KeymanDeveloperProjectFile10, KeymanDeveloperProjectType } from './keyman-developer-project.js';
 import { SchemaValidators } from '@keymanapp/common-types';
-import { CompilerCallbacks } from '../../compiler-interfaces.js';
+import { CompilerAsyncCallbacks } from "../../compiler-callbacks.js";
 
 export class KPJFileReader {
-  constructor(private callbacks: CompilerCallbacks) {
-
+  constructor(private callbacks: CompilerAsyncCallbacks) {
   }
 
   public read(file: Uint8Array): KPJFile {
     let data: KPJFile;
 
-    const parser = new xml2js.Parser({
-      explicitArray: false,
-      mergeAttrs: false,
-      includeWhiteChars: false,
-      normalize: false,
-      emptyTag: ''
-    });
+    data = new KeymanXMLReader('kpj')
+      .parse(new TextDecoder().decode(file));
 
-    parser.parseString(file, (e: unknown, r: unknown) => {
-      if(e) {
-        throw e;
-      }
-      data = r as KPJFile;
-    });
     data = this.boxArrays(data);
     if(data.KeymanDeveloperProject?.Files?.File?.length) {
       for(const file of data.KeymanDeveloperProject?.Files?.File) {
@@ -56,7 +44,7 @@ export class KPJFileReader {
     return def;
   }
 
-  public transform(projectFilename: string, source: KPJFile): KeymanDeveloperProject {
+  public async transform(projectFilename: string, source: KPJFile): Promise<KeymanDeveloperProject> {
     // NOTE: at this point, the xml should have been validated
     // and matched the schema result so we can assume the source
     // is a valid shape
@@ -81,7 +69,7 @@ export class KPJFileReader {
     if(result.options.version == '1.0') {
       this.transformFilesVersion10(project, result);
     } else {
-      result.populateFiles();
+      await result.populateFiles();
     }
 
     return result;
@@ -94,7 +82,7 @@ export class KPJFileReader {
         sourceFile.ID || '',
         (sourceFile.Filepath || '').replace(/\\/g, '/'),
         sourceFile.FileVersion || '',
-        this.callbacks
+        this.callbacks.path
       );
       if (sourceFile.Details) {
         file.details.copyright = sourceFile.Details.Copyright;

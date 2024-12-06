@@ -15,7 +15,6 @@
 #import "ZipArchive.h"
 #import "KMPackageReader.h"
 #import "KMPackageInfo.h"
-#import "KMKeyboardInfo.h"
 #import "PrivacyConsent.h"
 #import "KMLogs.h"
 @import Sentry;
@@ -47,11 +46,14 @@ NSString *const kKeymanKeyboardDownloadCompletedNotification = @"kKeymanKeyboard
 
 @interface KMInputMethodAppDelegate ()
 @property (nonatomic, strong) KMPackageReader *packageReader;
+@property BOOL receivedKeyDownFromOsk;
+@property NSEventModifierFlags oskEventModifiers;
 @end
 
 @implementation KMInputMethodAppDelegate
 @synthesize kme = _kme;
 @synthesize kmx = _kmx;
+@synthesize modifierMapping = _modifierMapping;
 @synthesize kvk = _kvk;
 @synthesize keyboardName = _keyboardName;
 @synthesize keyboardsPath = _keyboardsPath;
@@ -283,9 +285,9 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     
     switch (type) {
       case kCGEventFlagsChanged:
-        os_log_debug([KMLogs eventsLog], "eventTapFunction: system event kCGEventFlagsChanged to: %x", (int) sysEvent.modifierFlags);
-        appDelegate.currentModifierFlags = sysEvent.modifierFlags;
-        if (appDelegate.currentModifierFlags & NSEventModifierFlagCommand) {
+        os_log_debug([KMLogs eventsLog], "eventTapFunction: system event kCGEventFlagsChanged to: 0x%X", (int) sysEvent.modifierFlags);
+        appDelegate.currentModifiers = sysEvent.modifierFlags;
+        if (appDelegate.currentModifiers & NSEventModifierFlagCommand) {
           appDelegate.contextChangedByLowLevelEvent = YES;
         }
         break;
@@ -299,7 +301,8 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         break;
         
       case kCGEventKeyDown:
-        os_log_debug([KMLogs eventsLog], "Event tap keydown event, keyCode: %hu", sysEvent.keyCode);
+        appDelegate.receivedKeyDownFromOsk = NO;
+        os_log_debug([KMLogs eventsLog], "Event tap keydown event, keyCode: 0x%X (%d)", sysEvent.keyCode, sysEvent.keyCode);
         // Pass back low-level backspace events to the input method event handler
         // because some non-compliant apps do not allow us to see backspace events
         // that we have generated (and we need to see them, for serialization
@@ -313,7 +316,12 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
         if(sysEvent.keyCode == 255) {
           os_log_debug([KMLogs eventsLog], "*** kKeymanEventKeyCode = 0xFF");
         } else {
-          os_log_debug([KMLogs eventsLog], "*** other: %d(%x)", (char) sysEvent.keyCode, sysEvent.keyCode);
+          if ([OSKView isOskKeyDownEvent:event]) {
+            NSEventModifierFlags oskEventModifiers = [OSKView extractModifierFlagsFromOskEvent:event];
+            appDelegate.receivedKeyDownFromOsk = YES;
+            appDelegate.oskEventModifiers = oskEventModifiers;
+            os_log_debug([KMLogs eventsLog], "*** keydown event received from OSK, modifiers: 0x%lX",(unsigned long)oskEventModifiers);
+          }
         }
         
         switch(sysEvent.keyCode) {
@@ -389,16 +397,24 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   return _packageReader;
 }
 
-- (void)setKmx:(KMXFile *)kmx {
+- (void)resetKmx {
+  _kmx = nil;
+  _modifierMapping = nil;
+}
+
+- (void)loadKeyboardFromKmxFile:(KMXFile *)kmx {
   _kmx = kmx;
-  [self.kme setKmx:_kmx];
+  CoreKeyboardInfo *keyboardInfo = [self.kme loadKeyboardFromKmxFile:kmx];
+
+  os_log_info([KMLogs keyboardLog], "setKmx loaded keyboard, keyboard info: %{public}@", keyboardInfo);
   
-  NSString *keyboardFileName = [kmx.filePath lastPathComponent];
-   os_log_info([KMLogs keyboardLog], "setKmx to %{public}@", keyboardFileName);
+  _modifierMapping = [[KMModifierMapping alloc] init:keyboardInfo];
+
+  os_log_info([KMLogs keyboardLog], "modifierMapping bothOptionKeysGenerateRightAlt: %d", self.modifierMapping.bothOptionKeysGenerateRightAlt);
 
    // assign custom keyboard tag in Sentry to default keyboard
    [SentrySDK configureScope:^(SentryScope * _Nonnull scope) {
-       [scope setTagValue:keyboardFileName forKey:@"keyboard"];
+       [scope setTagValue:keyboardInfo.keyboardId forKey:@"keyboard"];
    }];
 }
 
@@ -787,7 +803,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   os_log_debug([KMLogs dataLog], "setSelectedKeyboard, keyboardName = '%{public}@', full path = '%{public}@'", keyboardName, fullPath);
   [menuItem setState:NSOnState];
   KMXFile *kmx = [[KMXFile alloc] initWithFilePath:fullPath];
-  [self setKmx:kmx];
+  [self loadKeyboardFromKmxFile:kmx];
   NSDictionary *kmxInfo = [KMXFile keyboardInfoFromKmxFile:fullPath];
   NSString *kvkFilename = [kmxInfo objectForKey:kKMVisualKeyboardKey];
   if (kvkFilename != nil) {
@@ -815,7 +831,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   NSString* placeholder = NSLocalizedString(@"no-keyboard-configured-menu-placeholder", nil);
   NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:placeholder action:NULL keyEquivalent:@""];
   [self.menu insertItem:item atIndex:KEYMAN_FIRST_KEYBOARD_MENUITEM_INDEX];
-  [self setKmx:nil];
+  [self resetKmx];
   [self setKvk:nil];
   [self setKeyboardName:nil];
   [self setKeyboardIcon:nil];
@@ -844,7 +860,7 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
   os_log_debug([KMLogs dataLog], "setSelectedKeyboard, keyboardName = '%{public}@', full path = '%{public}@'", path, fullPath);
   
   KMXFile *kmx = [[KMXFile alloc] initWithFilePath:fullPath];
-  [self setKmx:kmx];
+  [self loadKeyboardFromKmxFile:kmx];
   KVKFile *kvk = nil;
   NSDictionary *kmxInfo = [KMXFile keyboardInfoFromKmxFile:fullPath];
   NSString *kvkFilename = [kmxInfo objectForKey:kKMVisualKeyboardKey];
@@ -1220,6 +1236,22 @@ CGEventRef eventTapFunction(CGEventTapProxy proxy, CGEventType type, CGEventRef 
     return;
   
   [_oskWindow.oskView handleKeyEvent:event];
+}
+
+- (NSEventModifierFlags) determineModifiers {
+  NSEventModifierFlags modifierFlags = 0;
+  
+  if (self.receivedKeyDownFromOsk) {
+    modifierFlags = self.oskEventModifiers;
+    os_log_debug([KMLogs eventsLog], "--- use modifiers from OSK, oskEventModifiers: 0x%lX", (unsigned long)modifierFlags);
+    self.oskEventModifiers = 0;
+  } else {
+    NSEventModifierFlags originalModifiers = self.currentModifiers;
+    modifierFlags = [self.modifierMapping adjustModifiers:originalModifiers];
+    os_log_debug([KMLogs eventsLog], "--- use adjusted modifiers from current state: 0x%lX", (unsigned long)modifierFlags);
+  }
+  
+  return modifierFlags;
 }
 
 extern const CGKeyCode kProcessPendingBuffer;

@@ -24,7 +24,7 @@
 
 - (void)setKmx:(KMXFile *)kmx {
   _kmx = kmx;
-  [self.kme setKmx:_kmx];
+  [self.kme loadKeyboardFromKmxFile:_kmx];
 }
 
 - (NSMutableString *)contextBuffer {

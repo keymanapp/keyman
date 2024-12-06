@@ -121,20 +121,20 @@ bool operator==(
       case KM_CORE_DEBUG_MATCH_EXIT:
       case KM_CORE_DEBUG_NOMATCH_ENTER:
       case KM_CORE_DEBUG_NOMATCH_EXIT:
-        assert(lgp != nullptr);
-        assert(rgp != nullptr);
-        assert(lgp->dpName != nullptr);
-        assert(rgp->dpName != nullptr);
+        test_assert(lgp != nullptr);
+        test_assert(rgp != nullptr);
+        test_assert(lgp->dpName != nullptr);
+        test_assert(rgp->dpName != nullptr);
         result = u16cmp(lgp->dpName, rgp->dpName) == 0;
         break;
       case KM_CORE_DEBUG_RULE_ENTER:
       case KM_CORE_DEBUG_RULE_EXIT:
-        assert(lgp != nullptr);
-        assert(rgp != nullptr);
-        assert(lgp->dpName != nullptr);
-        assert(rgp->dpName != nullptr);
-        assert(lrule != nullptr);
-        assert(rrule != nullptr);
+        test_assert(lgp != nullptr);
+        test_assert(rgp != nullptr);
+        test_assert(lgp->dpName != nullptr);
+        test_assert(rgp->dpName != nullptr);
+        test_assert(lrule != nullptr);
+        test_assert(rrule != nullptr);
         result = u16cmp(lgp->dpName, rgp->dpName) == 0 &&
           lrule->Line == rrule->Line &&
           lrule->Key == rrule->Key &&
@@ -143,13 +143,13 @@ bool operator==(
           are_store_offsets_equal(lhs.kmx_info.store_offsets, rhs.kmx_info.store_offsets);
         break;
       case KM_CORE_DEBUG_SET_OPTION:
-        assert(loption_store != nullptr && roption_store != nullptr);
+        test_assert(loption_store != nullptr && roption_store != nullptr);
         result =
           u16cmp(loption_store->dpName, roption_store->dpName) == 0 &&
           u16cmp(lhs.kmx_info.option.value, rhs.kmx_info.option.value) == 0;
         break;
       default:
-        assert(false);
+        test_assert(false);
         result = false;
     }
   }

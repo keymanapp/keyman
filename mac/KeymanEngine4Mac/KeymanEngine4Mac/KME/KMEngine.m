@@ -58,6 +58,17 @@
   }
 }
 
+-(CoreKeyboardInfo*)loadKeyboardFromKmxFile:(KMXFile*) kmxFile {
+  [self setKmx:kmxFile];
+
+  // os_log_debug([KMELogs coreLog], "loadKeyboardFromKmxFile, keyList: %{public}@", keyList);
+
+  CoreKeyboardInfo *info = [_coreWrapper getKeyboardInfoForKmxFile:kmxFile.filePath];
+  os_log_debug([KMELogs coreLog], "loadKeyboardFromKmxFile, keyboardInfo: %{public}@", info);
+
+  return info;
+}
+
 - (NSString *)getCoreContextDebug {
   return self.coreWrapper.contextDebug;
 }

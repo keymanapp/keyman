@@ -1,5 +1,5 @@
 import { constants, SectionIdent } from "@keymanapp/ldml-keyboard-constants";
-import { KMXPlus, VariableParser, MarkerParser, util } from '@keymanapp/common-types';
+import { KMXPlus, LdmlKeyboardTypes, util } from '@keymanapp/common-types';
 import { CompilerCallbacks, LDMLKeyboard } from "@keymanapp/developer-utils";
 import { SectionCompiler } from "./section-compiler.js";
 
@@ -28,8 +28,8 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
         transformGroup.transform?.forEach(({ to, from }) => {
           st.addSetAndStringSubtitution(SubstitutionUse.consume, from);
           st.addSetAndStringSubtitution(SubstitutionUse.emit, to);
-          const mapFrom = VariableParser.CAPTURE_SET_REFERENCE.exec(from);
-          const mapTo = VariableParser.MAPPED_SET_REFERENCE.exec(to || '');
+          const mapFrom = LdmlKeyboardTypes.VariableParser.CAPTURE_SET_REFERENCE.exec(from);
+          const mapTo = LdmlKeyboardTypes.VariableParser.MAPPED_SET_REFERENCE.exec(to || '');
           if (mapFrom) {
             // add the 'from' as a match
             st.set.add(SubstitutionUse.consume, [mapFrom[1]]);
@@ -144,14 +144,19 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
     cookedFrom = this.checkEscapes(cookedFrom); // check for \uXXXX escapes before normalizing
 
     cookedFrom = sections.vars.substituteStrings(cookedFrom, sections, true);
-    const mapFrom = VariableParser.CAPTURE_SET_REFERENCE.exec(cookedFrom);
-    const mapTo = VariableParser.MAPPED_SET_REFERENCE.exec(transform.to || '');
+    const mapFrom = LdmlKeyboardTypes.VariableParser.CAPTURE_SET_REFERENCE.exec(cookedFrom);
+    const mapTo = LdmlKeyboardTypes.VariableParser.MAPPED_SET_REFERENCE.exec(transform.to || '');
     if (mapFrom && mapTo) { // TODO-LDML: error cases
       result.mapFrom = sections.strs.allocString(mapFrom[1]); // var name
       result.mapTo = sections.strs.allocString(mapTo[1]); // var name
     } else {
       result.mapFrom = sections.strs.allocString('');
       result.mapTo = sections.strs.allocString('');
+
+      // validate 'to' here
+      if (!this.isValidTo(transform.to || '')) {
+        return null;
+      }
     }
 
     if (cookedFrom === null) return null; // error
@@ -170,7 +175,7 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
 
     if (!sections?.meta?.normalizationDisabled) {
       // nfd here.
-      cookedFrom = MarkerParser.nfd_markers(cookedFrom, true);
+      cookedFrom = LdmlKeyboardTypes.MarkerParser.nfd_markers(cookedFrom, true);
     }
 
     // perform regex validation
@@ -190,6 +195,19 @@ export abstract class TransformCompiler<T extends TransformCompilerType, TranBas
       nfd: true,
     }, sections);
     return result;
+  }
+
+  /**
+   * Validate the 'to' string.
+   * We have already checked that it's not a mapTo,
+   * so there should not be any illegal substitutions.
+   */
+  private isValidTo(to: string) : boolean {
+    if (/(?<!\\)(?:\\\\)*\$\[/.test(to)) {
+      this.callbacks.reportMessage(LdmlCompilerMessages.Error_IllegalTransformToUset({ to }));
+      return false;
+    }
+    return true;
   }
 
   /**
