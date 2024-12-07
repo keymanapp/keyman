@@ -89,7 +89,6 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
     kbdWidthConstraint.priority = .defaultHigh
     kbdWidthConstraint.isActive = true
 
-    let bannerHeight = InputViewController.topBarHeight
     self.buildKeyboardHeightConstraints(bannerHeight: InputViewController.topBarHeight)
   }
 
@@ -182,7 +181,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   var expandedHeight: CGFloat {
-    return keymanWeb.keyboardHeight + InputViewController.topBarHeight
+    return keymanWeb.keyboardSize.height   + InputViewController.topBarHeight
   }
 
   public convenience init() {
@@ -533,7 +532,7 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   public var kmwHeight: CGFloat {
-    return keymanWeb.keyboardHeight
+    return keymanWeb.keyboardSize.height
   }
 
   func clearModel() {

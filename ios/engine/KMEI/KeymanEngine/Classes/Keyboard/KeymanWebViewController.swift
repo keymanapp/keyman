@@ -696,9 +696,9 @@ extension KeymanWebViewController: KeymanWebDelegate {
 // MARK: - Manage views
 extension KeymanWebViewController {
   // MARK: - Sizing
-  public var keyboardHeight: CGFloat {
-    return keyboardSize.height
-  }
+//  public var keyboardHeight: CGFloat {
+//    return keyboardSize.height
+//  }
   
   @objc func menuKeyHeld(_ keymanWeb: KeymanWebViewController) {
     self.delegate?.menuKeyHeld(self)
@@ -735,9 +735,9 @@ extension KeymanWebViewController {
     return keyboardHeight;
   }
 
-  var keyboardWidth: CGFloat {
-    return keyboardSize.width
-  }
+//  var keyboardWidth: CGFloat {
+//    return keyboardSize.width
+//  }
 
   func initKeyboardSize() {
     var width: CGFloat
@@ -747,11 +747,11 @@ extension KeymanWebViewController {
 
     if Util.isSystemKeyboard {
       height = constraintTargetHeight(isPortrait: InputViewController.isPortrait)
-      let message = "initKeyboardSize(), for system keyboard, keyboardHeight: \(keyboardHeight)"
+      let message = "initKeyboardSize(), for system keyboard, height: \(height)"
       os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
     } else {
       height = constraintTargetHeight(isPortrait: UIDevice.current.orientation.isPortrait)
-      let message = "initKeyboardSize(), for in-app keyboard, keyboardHeight: \(keyboardHeight)"
+      let message = "initKeyboardSize(), for in-app keyboard, height: \(height)"
       os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
     }
 
@@ -784,6 +784,7 @@ extension KeymanWebViewController {
     }
   }
 
+  /*
   @objc func resizeDelay() {
     // + 1000 to work around iOS bug with resizing on landscape orientation. Technically we only
     // need this for landscape but it doesn't hurt to do it with both. 1000 is a big number that
@@ -792,7 +793,8 @@ extension KeymanWebViewController {
     let kbHeight = keyboardHeight
     view.frame = CGRect(x: 0.0, y: 0.0, width: kbWidth, height: kbHeight + 1000)
   }
-
+*/
+  
   // Keyman interaction
   func resizeKeyboard() {
     fixLayout()
