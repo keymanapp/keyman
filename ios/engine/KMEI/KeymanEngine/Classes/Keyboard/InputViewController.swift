@@ -117,11 +117,11 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
     let innerView = keymanWeb.view!
     
     // Cannot be met by the in-app keyboard, but helps to 'force' height for the system keyboard.
-    let portraitHeightConstraint = innerView.heightAnchor.constraint(equalToConstant: bannerHeight +  keymanWeb.constraintTargetHeight(isPortrait: true))
+    let portraitHeightConstraint = innerView.heightAnchor.constraint(equalToConstant: bannerHeight +  keymanWeb.readKeyboardHeight(isPortrait: true)!)
     portraitHeightConstraint.identifier = "Height constraint for portrait mode"
     portraitHeightConstraint.priority = .defaultHigh
     
-    let landscapeHeightConstraint = innerView.heightAnchor.constraint(equalToConstant: bannerHeight + keymanWeb.constraintTargetHeight(isPortrait: false))
+    let landscapeHeightConstraint = innerView.heightAnchor.constraint(equalToConstant: bannerHeight + keymanWeb.readKeyboardHeight(isPortrait: false)!)
     landscapeHeightConstraint.identifier = "Height constraint for landscape mode"
     landscapeHeightConstraint.priority = .defaultHigh
     
