@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.155 alpha 2024-12-07
+
+* chore(android,windows): Update crowdin for Czech (#12792)
+
 ## 18.0.154 alpha 2024-12-06
 
 * feat(developer,core): local imports (#12750)
