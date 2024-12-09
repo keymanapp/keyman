@@ -1,8 +1,8 @@
 (*
- * Keyman is copyright (C) SIL Global. MIT License.
- *
- * Notes: For the state diagram in mermaid ../BackgroundUpdateStateDiagram.md
- *)
+  * Keyman is copyright (C) SIL Global. MIT License.
+  *
+  * Notes: For the state diagram in mermaid ../BackgroundUpdateStateDiagram.md
+*)
 unit Keyman.System.UpdateStateMachine;
 
 interface
@@ -76,8 +76,6 @@ type
     procedure HandleMSIInstallComplete;
 
     function SetRegistryState(Update: TUpdateState): Boolean;
-    //function SetIncRegistryCount: Boolean;
-    //function ClearRegistryCount: Boolean;
     function GetAutomaticUpdates: Boolean;
     function SetApplyNow(Value: Boolean): Boolean;
     function GetApplyNow: Boolean;
@@ -144,7 +142,7 @@ end;
 
 type
 
-// Derived classes for each state
+  // Derived classes for each state
   IdleState = class(TState)
   public
     procedure Enter; override;
@@ -254,7 +252,8 @@ var
   lpState: TUpdateState;
 begin
   if (FErrorMessage <> '') and FShowErrors then
-    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR, '"+FErrorMessage+"');
+    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
+      '"+FErrorMessage+"');
 
   for lpState := Low(TUpdateState) to High(TUpdateState) do
   begin
@@ -281,7 +280,8 @@ begin
 
     if not Registry.OpenKey(SRegKey_KeymanEngine_CU, True) then
     begin
-      TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR, 'Failed to open registry key: "'+SRegKey_KeymanEngine_CU+'"');
+      TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
+        'Failed to open registry key: "' + SRegKey_KeymanEngine_CU + '"');
       Exit;
     end;
 
@@ -292,7 +292,8 @@ begin
     except
       on E: ERegistryException do
       begin
-        TKeymanSentryClient.ReportHandledException(E, 'Failed to write install state machine state');
+        TKeymanSentryClient.ReportHandledException(E,
+          'Failed to write install state machine state');
       end;
     end;
 
@@ -316,21 +317,23 @@ begin
   try
     Registry.RootKey := HKEY_CURRENT_USER;
     if Registry.OpenKeyReadOnly(SRegKey_KeymanEngine_CU) and
-       Registry.ValueExists(SRegValue_Update_State) then
+      Registry.ValueExists(SRegValue_Update_State) then
     begin
       try
         StateValue := Registry.ReadString(SRegValue_Update_State);
         EnumValue := GetEnumValue(TypeInfo(TUpdateState), StateValue);
 
         // Bounds Check EnumValue against TUpdateState
-        if (EnumValue >= Ord(Low(TUpdateState))) and (EnumValue <= Ord(High(TUpdateState))) then
+        if (EnumValue >= Ord(Low(TUpdateState))) and
+          (EnumValue <= Ord(High(TUpdateState))) then
           UpdateState := TUpdateState(EnumValue)
         else
           UpdateState := usIdle; // Default if out of bounds
       except
         on E: ERegistryException do
         begin
-          TKeymanSentryClient.ReportHandledException(E, 'Failed to read install state machine state');
+          TKeymanSentryClient.ReportHandledException(E,
+            'Failed to read install state machine state');
           UpdateState := usIdle;
         end;
       end;
@@ -355,13 +358,14 @@ begin
       Result := not Registry.OpenKeyReadOnly(SRegKey_KeymanEngine_CU) or
         not Registry.ValueExists(SRegValue_AutomaticUpdates) or
         Registry.ReadBool(SRegValue_AutomaticUpdates);
-      except
-        on E: ERegistryException do
-        begin
-          TKeymanSentryClient.ReportHandledException(E, 'Failed to read automatic updates');
-          Result := False;
-        end;
+    except
+      on E: ERegistryException do
+      begin
+        TKeymanSentryClient.ReportHandledException(E,
+          'Failed to read automatic updates');
+        Result := False;
       end;
+    end;
   finally
     Registry.Free;
   end;
@@ -386,7 +390,8 @@ begin
     except
       on E: ERegistryException do
       begin
-        TKeymanSentryClient.ReportHandledException(E, 'Failed to write apply now');
+        TKeymanSentryClient.ReportHandledException(E,
+          'Failed to write apply now');
       end;
     end;
   finally
@@ -407,7 +412,7 @@ begin
         Registry.ValueExists(SRegValue_ApplyNow) and
         Registry.ReadBool(SRegValue_ApplyNow);
     except
-    on E: ERegistryException do
+      on E: ERegistryException do
       begin
         KL.Log('Failed to read registry: ' + E.Message);
         Result := False;
@@ -424,7 +429,8 @@ begin
     Result := TStateClass(CurrentState.ClassType)
   else
   begin
-    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR, 'Error CurrentState was uninitiallised');
+    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
+      'Error CurrentState was uninitiallised');
     Result := nil;
   end;
 end;
@@ -454,7 +460,8 @@ begin
   CurrentState := FStateInstance[enumState];
 end;
 
-function TUpdateStateMachine.ConvertStateToEnum(const StateClass: TStateClass) : TUpdateState;
+function TUpdateStateMachine.ConvertStateToEnum(const StateClass: TStateClass)
+  : TUpdateState;
 begin
   if StateClass = IdleState then
     Result := usIdle
@@ -469,7 +476,8 @@ begin
   else
   begin
     Result := usIdle;
-    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR, 'Unknown State Machine class');
+    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
+      'Unknown State Machine class');
   end;
 end;
 
@@ -479,25 +487,26 @@ begin
     Result := True
   else
   begin
-    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR, 'Error CurrentState was uninitiallised');
+    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
+      'Error CurrentState was uninitiallised');
     Result := False;
   end;
 end;
 
-
 procedure TUpdateStateMachine.HandleMSIInstallComplete;
-var SavePath: string;
-    FileName: String;
-    FileNames: TStringDynArray;
+var
+  SavePath: string;
+  FileName: String;
+  FileNames: TStringDynArray;
 begin
-      SavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
+  SavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
 
-      GetFileNamesInDirectory(SavePath, FileNames);
-      for FileName in FileNames do
-      begin
-        System.SysUtils.DeleteFile(FileName);
-      end;
-      CurrentState.ChangeState(IdleState);
+  GetFileNamesInDirectory(SavePath, FileNames);
+  for FileName in FileNames do
+  begin
+    System.SysUtils.DeleteFile(FileName);
+  end;
+  CurrentState.ChangeState(IdleState);
 end;
 
 procedure TUpdateStateMachine.HandleCheck;
@@ -545,7 +554,6 @@ begin
   CurrentState.HandleFirstRun;
 end;
 
-
 function TUpdateStateMachine.CurrentStateName: string;
 begin
   if not IsCurrentStateAssigned then
@@ -564,7 +572,8 @@ procedure TState.HandleFirstRun;
 begin
   // If Handle First run hits base implementation
   // something is wrong.
-  TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR, 'Handle first run called in state:"'+Self.ClassName+'"');
+  TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
+    'Handle first run called in state:"' + Self.ClassName + '"');
   bucStateContext.HandleMSIInstallComplete;
 end;
 
@@ -584,11 +593,11 @@ end;
 procedure IdleState.HandleCheck;
 var
   CheckForUpdates: TRemoteUpdateCheck;
-  Result : TRemoteUpdateCheckResult;
+  Result: TRemoteUpdateCheckResult;
 begin
 
   { ##### For Testing only just advancing to downloading #### }
-  //ChangeState(UpdateAvailableState);
+  // ChangeState(UpdateAvailableState);
   // will keep here as there are more PR's #12621
   { #### End of Testing ### };
 
@@ -596,13 +605,12 @@ begin
     if it needs to be broken into a seperate state of WaitngCheck RESP }
   { if Response not OK stay in the idle state and return }
 
-
   // Handle_check event force check
   CheckForUpdates := TRemoteUpdateCheck.Create(True);
   try
-    Result:= CheckForUpdates.Run;
+    Result := CheckForUpdates.Run;
   finally
-     CheckForUpdates.Free;
+    CheckForUpdates.Free;
   end;
 
   { Response OK and Update is available }
@@ -660,10 +668,12 @@ var
 begin
   // call seperate process
   RootPath := ExtractFilePath(ParamStr(0));
-  FResult := TUtilExecute.ShellCurrentUser(0, ParamStr(0), IncludeTrailingPathDelimiter(RootPath), '-bd');
+  FResult := TUtilExecute.ShellCurrentUser(0, ParamStr(0),
+    IncludeTrailingPathDelimiter(RootPath), '-bd');
   if not FResult then
   begin
-    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR, 'Executing kmshell process to download updated Failed');
+    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
+      'Executing kmshell process to download updated Failed');
     ChangeState(IdleState);
   end;
 end;
@@ -735,7 +745,8 @@ begin
   if InstallNow = True then
   begin
     bucStateContext.SetApplyNow(True);
-    ChangeState(InstallingState); // TODO: Aeroplane bug find this should start download first? "StartDownloadProcess;"
+    ChangeState(DownloadingState);
+    // TODO: Aeroplane bug find this should start download first? "StartDownloadProcess;"
   end;
 
 end;
@@ -858,7 +869,7 @@ end;
 function WaitingRestartState.HandleKmShell;
 var
   SavedPath: String;
-  Filenames: TStringDynArray;
+  FileNames: TStringDynArray;
   frmStartInstall: TfrmStartInstall;
 begin
   // Still can't go if keyman has run
@@ -873,8 +884,8 @@ begin
     // Check downloaded cache if available then
     SavedPath := IncludeTrailingPathDelimiter
       (TKeymanPaths.KeymanUpdateCachePath);
-    GetFileNamesInDirectory(SavedPath, Filenames);
-    if Length(Filenames) = 0 then
+    GetFileNamesInDirectory(SavedPath, FileNames);
+    if Length(FileNames) = 0 then
     begin
       // Return to Idle state and check for Updates state
       ChangeState(IdleState);
@@ -936,35 +947,29 @@ begin
   end;
 end;
 
-
-
 // Installing packages needs to be elevated
 procedure InstallingState.CheckInstallPackageElevation;
 var
-  SavePath: String;
-  fileExt: String;
-  fileName: String;
-  Filenames: TStringDynArray;
-  executeResult: Boolean;
-  ucr: TUpdateCheckResponse;
-  hasPackages, hasKeymanInstall, requiresAdmin : Boolean;
+  executeResult: Cardinal;
 begin
   if not kmcom.SystemInfo.IsAdministrator then
   begin
     if CanElevate then
     begin
-      executeResult := WaitForElevatedConfiguration(0, '-ou') <> 0;
-      if executeResult then
+      executeResult := WaitForElevatedConfiguration(0, '-ikp');
+      if (executeResult <> 0) then
       begin
-        TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR, 'Executing kmshell process to install keyboard packages failed:"'+IntToStr(Ord(executeResult))+'"');
-        // even though package install failed still install Keyman
+        TKeymanSentryClient.Client.MessageEvent
+          (Sentry.Client.SENTRY_LEVEL_ERROR,
+          'Executing kmshell process to install keyboard packages failed:"' +
+          IntToStr(Ord(executeResult)) + '"');
         DoInstallKeyman;
       end;
     end
     else
     begin
-    // TODO: How do we alert the user that package requires a user with admin rights
-    //ShowMessage('Some of these updates require an Administrator to complete installation.  Please login as an Administrator and re-run the update.');
+      // TODO: How do we alert the user that package requires a user with admin rights
+      // ShowMessage('Some of these updates require an Administrator to complete installation.  Please login as an Administrator and re-run the update.');
     end;
   end
   else
@@ -973,27 +978,22 @@ begin
   end;
 end;
 
-
-
-///////////////////////////////////////////////////////////////////////////////
-
 function InstallingState.DoInstallKeyman: Boolean;
 var
   FResult: Boolean;
   SavePath: String;
   fileExt: String;
-  fileName: String;
-  Filenames: TStringDynArray;
-  ucr: TUpdateCheckResponse;
-  found : Boolean;
+  FileName: String;
+  FileNames: TStringDynArray;
+  found: Boolean;
 begin
 
   SavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
-  GetFileNamesInDirectory(SavePath, Filenames);
+  GetFileNamesInDirectory(SavePath, FileNames);
   found := False;
-  for fileName in Filenames do
+  for FileName in FileNames do
   begin
-    fileExt := LowerCase(ExtractFileExt(fileName));
+    fileExt := LowerCase(ExtractFileExt(FileName));
     if fileExt = '.exe' then
     begin
       found := True;
@@ -1005,7 +1005,8 @@ begin
   // We will need to add the pop up that says install update now yes/no
   // This will run the setup executable which will ask for  elevated permissions
   if found then
-    FResult := TUtilExecute.Shell(0, SavePath + ExtractFileName(fileName), '', '-au')
+    FResult := TUtilExecute.Shell(0, SavePath + ExtractFileName(FileName),
+      '', '-au')
   else
     FResult := False;
 
@@ -1014,12 +1015,13 @@ begin
     bucStateContext.HandleMSIInstallComplete;
     KL.Log('TUpdateStateMachine.InstallingState.Enter: DoInstall fail');
     ChangeState(IdleState);
-    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR, 'Executing kmshell process to install failed:"'+IntToStr(Ord(FResult))+'"');
+    TKeymanSentryClient.Client.MessageEvent(Sentry.Client.SENTRY_LEVEL_ERROR,
+      'Executing kmshell process to install failed:"' +
+      IntToStr(Ord(FResult)) + '"');
   end;
 
   Result := FResult;
 end;
-
 
 function InstallingState.DoInstallPackage(PackageFileName: String): Boolean;
 var
@@ -1027,8 +1029,10 @@ var
 begin
   Result := True;
 
-  FPackage := kmcom.Packages.GetPackageFromFile(PackageFileName) as IKeymanPackageFile2;
-  FPackage.Install2(True);  // Force overwrites existing package and leaves most settings for it intact
+  FPackage := kmcom.Packages.GetPackageFromFile(PackageFileName)
+    as IKeymanPackageFile2;
+  FPackage.Install2(True);
+  // Force overwrites existing package and leaves most settings for it intact
   FPackage := nil;
 
   kmcom.Refresh;
@@ -1037,9 +1041,10 @@ begin
 
 end;
 
-function InstallingState.DoInstallPackages(Params: TUpdateCheckResponse): Boolean;
+function InstallingState.DoInstallPackages
+  (Params: TUpdateCheckResponse): Boolean;
 var
-  i : Integer;
+  i: Integer;
   SavePath: String;
   PackageFullPath: String;
 begin
@@ -1050,29 +1055,25 @@ begin
     if not DoInstallPackage(PackageFullPath) then // I2742
     begin
       // Package did install log or error
-      KL.Log('Installing Package failed'+ PackageFullPath);
+      KL.Log('Installing Package failed' + PackageFullPath);
     end;
   end;
   Result := True;
 end;
 
-
-
-
-
 procedure InstallingState.Enter;
 var
   SavePath: String;
-  fileExt: String;
-  fileName: String;
-  Filenames: TStringDynArray;
+  FileNames: TStringDynArray;
   ucr: TUpdateCheckResponse;
-  hasPackages, hasKeymanInstall : Boolean;
+  hasPackages, hasKeymanInstall: Boolean;
 begin
 
+  hasPackages := False;
+  hasKeymanInstall := False;
   bucStateContext.SetRegistryState(usInstalling);
   SavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
-  GetFileNamesInDirectory(SavePath, Filenames);
+  GetFileNamesInDirectory(SavePath, FileNames);
   // TODO: epic-update-windows
   // Check if there are also packages to install if so
   if (TUpdateCheckStorage.LoadUpdateCacheData(ucr)) then
@@ -1130,12 +1131,7 @@ end;
 
 procedure InstallingState.HandleInstallPackages;
 var
-  SavePath: String;
-  fileExt: String;
-  fileName: String;
-  Filenames: TStringDynArray;
   ucr: TUpdateCheckResponse;
-  hasPackages, hasKeymanInstall : Boolean;
 begin
   // This event should only be reached in elevated process if not then
   // move on to just installing Keyman packages.
@@ -1151,7 +1147,6 @@ begin
 
   DoInstallKeyman;
 end;
-
 
 procedure InstallingState.HandleFirstRun;
 begin
@@ -1170,21 +1165,24 @@ end;
 // Private Functions:
 function ConfigCheckContinue: Boolean;
 var
-  registry: TRegistryErrorControlled;
+  Registry: TRegistryErrorControlled;
 begin
-{ Verify that it has been at least CheckPeriod days since last update check }
+  { Verify that it has been at least CheckPeriod days since last update check }
   Result := False;
   try
-    registry := TRegistryErrorControlled.Create;   // I2890
+    Registry := TRegistryErrorControlled.Create; // I2890
     try
-      if registry.OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
+      if Registry.OpenKeyReadOnly(SRegKey_KeymanDesktop_CU) then
       begin
-        if registry.ValueExists(SRegValue_CheckForUpdates) and not registry.ReadBool(SRegValue_CheckForUpdates) then
+        if Registry.ValueExists(SRegValue_CheckForUpdates) and
+          not Registry.ReadBool(SRegValue_CheckForUpdates) then
         begin
           Result := False;
           Exit;
         end;
-        if registry.ValueExists(SRegValue_LastUpdateCheckTime) and (Now - registry.ReadDateTime(SRegValue_LastUpdateCheckTime) > CheckPeriod) then
+        if Registry.ValueExists(SRegValue_LastUpdateCheckTime) and
+          (Now - Registry.ReadDateTime(SRegValue_LastUpdateCheckTime) >
+          CheckPeriod) then
         begin
           Result := True;
         end
@@ -1195,11 +1193,11 @@ begin
         Exit;
       end;
     finally
-      registry.Free;
+      Registry.Free;
     end;
   except
     { we will not run the check if an error occurs reading the settings }
-    on E:Exception do
+    on E: Exception do
     begin
       Result := False;
       LogMessage(E.Message);
