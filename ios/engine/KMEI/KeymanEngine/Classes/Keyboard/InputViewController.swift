@@ -92,6 +92,10 @@ private class CustomInputView: UIInputView, UIInputViewAudioFeedback {
     self.buildKeyboardHeightConstraints(bannerHeight: InputViewController.topBarHeight)
   }
 
+  /**
+   * Due to new custom keyboard height as chosen by the user.
+   * The value for the new keyboard height originates from KeyboardHeightViewController.
+   */
   func keyboardHeightChanged() {
     os_log("CustomInputView keyboardHeightChanged", log: KeymanEngineLogger.ui, type: .info)
     
@@ -547,6 +551,10 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
     fixLayout()
   }
 
+  /**
+   * Due to new custom keyboard height as chosen by the user.
+   * The value for the new keyboard height originates from KeyboardHeightViewController.
+   */
   func keyboardHeightChanged() {
     os_log("InputViewController keyboardHeightChanged", log: KeymanEngineLogger.ui, type: .debug)
     if let customInputView = self.inputView as? CustomInputView {

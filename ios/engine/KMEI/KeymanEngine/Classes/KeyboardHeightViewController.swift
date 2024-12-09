@@ -36,12 +36,10 @@ class KeyboardHeightViewController: UIViewController {
     os_log("KeyboardHeightViewController viewDidLoad", log:KeymanEngineLogger.ui, type: .info)
 
     self.determineOrientation()
-    self.loadDefaultKeyboardHeights()
+    self.determineDefaultKeyboardHeights()
     self.applyKeyboardHeight()
     
-    //title = NSLocalizedString("menu-settings-spacebar-title", bundle: engineBundle, comment: "")
-    title = NSLocalizedString("button-label-reset-default-keyboard-height", bundle: engineBundle, comment: "")
-    title = "Adjust Height"
+    title = NSLocalizedString("adjust-keyboard-height-title", bundle: engineBundle, comment: "")
     navigationItem.setHidesBackButton(false, animated: true)
     navigationItem.leftBarButtonItem?.isEnabled = true
 
@@ -68,8 +66,7 @@ class KeyboardHeightViewController: UIViewController {
     os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, message)
   }
   
-  private func loadDefaultKeyboardHeights() {
-    os_log("loadDefaultKeyboardHeights", log:KeymanEngineLogger.ui, type: .info)
+  private func determineDefaultKeyboardHeights() {
     // if no KeyboardScaleMap found for device, then default to 216.0
     let portraitKeyboardScale = KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: true)
     self.defaultPortraitHeight = Double(portraitKeyboardScale?.keyboardHeight ?? 216.0)
@@ -78,32 +75,39 @@ class KeyboardHeightViewController: UIViewController {
     self.defaultLandscapeHeight = Double(landscapeKeyboardScale?.keyboardHeight ?? 216.0)
   }
   
+  /**
+   * Read the previously set keyboard heights from UserDefaults.
+   * Running the first time, these values would be defaults set in KeymanWebviewController.initKeyboardSize()
+   * These values should be set prior to now; if not, log an error and use  default values
+   */
   private func applyKeyboardHeight() {
-    let introMessage = "applyKeyboardHeight, with self.isPortrait: \(self.isPortrait)"
-    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, introMessage)
     if (self.isPortrait) {
       if (Storage.active.userDefaults.object(forKey: Key.portraitKeyboardHeight) != nil) {
         self.keyboardHeight = Storage.active.userDefaults.portraitKeyboardHeight
         let message = "applyKeyboardHeight, from UserDefaults loaded portrait value \(self.keyboardHeight)"
-        os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
+        os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, message)
       } else {
         self.keyboardHeight = self.defaultPortraitHeight
         let message = "applyKeyboardHeight, portraitHeight not found in UserDefaults, using default value \(self.keyboardHeight)"
-        os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
+        os_log("%{public}s", log:KeymanEngineLogger.ui, type: .error, message)
       }
     } else {
       if (Storage.active.userDefaults.object(forKey: Key.portraitKeyboardHeight) != nil) {
         self.keyboardHeight = Storage.active.userDefaults.landscapeKeyboardHeight
         let message = "applyKeyboardHeight, from UserDefaults loaded landscape value \(self.keyboardHeight)"
-        os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
+        os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, message)
       } else {
         self.keyboardHeight = self.defaultLandscapeHeight
         let message = "applyKeyboardHeight, landscapeHeight not found in UserDefaults, using default value \(self.keyboardHeight)"
-        os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
+        os_log("%{public}s", log:KeymanEngineLogger.ui, type: .error, message)
       }
     }
   }
 
+  
+  /**
+   * Set some reasonable limits on how small or large a keyboard can be set to during resizing.
+   */
   private func calculateKeyboardHeightLimits() {
     // minimum height
     self.minKeyboardHeight = 100.0
@@ -111,8 +115,8 @@ class KeyboardHeightViewController: UIViewController {
     // set maxKeyboardHeight to 100 pts smaller than the contentView height
     self.maxKeyboardHeight = contentView.frame.height - 100.0
     
-    let messageBegan = "minKeyboardHeight: \(minKeyboardHeight) maxKeyboardHeight: \(maxKeyboardHeight)"
-    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, messageBegan)
+    let message = "minKeyboardHeight: \(minKeyboardHeight) maxKeyboardHeight: \(maxKeyboardHeight)"
+    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, message)
   }
   
   /**
@@ -167,6 +171,9 @@ class KeyboardHeightViewController: UIViewController {
     return approvedTranslation
   }
   
+  /**
+   * Called when the keyboardResizer view is being moved to adjust the keyboard height.
+   */
   @objc func handleDrag(_ dragRecognizer: UIPanGestureRecognizer) {
     switch dragRecognizer.state {
     case .began:
@@ -184,7 +191,7 @@ class KeyboardHeightViewController: UIViewController {
       let approvedTranslation = self.applyKeyboardSizeLimits(attemptedTranslation: verticalTranslation)
       if (approvedTranslation != 0) {
         let newKeyboardHeight = keyboardHeight - approvedTranslation;
-        self.changeKeyboardHeight(newHeight: newKeyboardHeight)
+        self.writeNewKeyboardHeight(newHeight: newKeyboardHeight)
       } else {
         os_log("handleDrag .ended with no resizing", log:KeymanEngineLogger.ui, type: .info)
       }
@@ -192,19 +199,17 @@ class KeyboardHeightViewController: UIViewController {
     }
   }
   
+  /**
+   * Stretch the keyboard image and move the keyboardResizier object as it is being resized.
+   */
   private func provideResizeFeedback(drag: UIPanGestureRecognizer) {
     // how much did we drag vertically
     let verticalTranslation = drag.translation(in: self.contentView).y
 
-    let messageBegan = "verticalTranslation: \(verticalTranslation)"
-    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, messageBegan)
-
     // enforce keyboard size limits on translation
     let approvedTranslation = self.applyKeyboardSizeLimits(attemptedTranslation: verticalTranslation)
     
-    if (approvedTranslation == 0) {
-      os_log("reached keyboard size limit", log:KeymanEngineLogger.ui, type: .debug)
-    } else if (approvedTranslation != 0) {
+    if (approvedTranslation != 0) {
       let keyboardTranslation = CGAffineTransform(translationX: 0, y: approvedTranslation)
       self.keyboardResizer.transform = keyboardTranslation
        
@@ -220,22 +225,20 @@ class KeyboardHeightViewController: UIViewController {
     }
   }
   
-  private func changeKeyboardHeight (newHeight: Double) {
-    let messageOne = "changeKeyboardHeight, newHeight :\(newHeight) isPortrait:  \(isPortrait)"
-    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, messageOne)
+  /**
+   * Write the new height of the keyboard to to UserDefaults.
+   */
+  private func writeNewKeyboardHeight (newHeight: Double) {
+    let message = "writeNewKeyboardHeight, newHeight :\(newHeight) isPortrait:  \(isPortrait)"
+    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, message)
     
     keyboardHeight = newHeight
     self.updateKeyboardConstraints()
-    //self.view.setNeedsLayout()
     
     if (isPortrait) {
       Storage.active.userDefaults.portraitKeyboardHeight = newHeight
-      let persistMessage = "changeKeyboardHeight, persist portraitKeyboardHeight :\(newHeight)"
-      os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, persistMessage)
     } else {
       Storage.active.userDefaults.landscapeKeyboardHeight = newHeight
-      let persistMessage = "changeKeyboardHeight, persist landscapeKeyboardHeight :\(newHeight)"
-      os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, persistMessage)
     }
   }
   
@@ -250,7 +253,9 @@ class KeyboardHeightViewController: UIViewController {
     NSLayoutConstraint.activate(self.keyboardConstraintsArray)
   }
 
-  // recalculate constraints for new portrait keyboard height
+  /**
+   * recalculate constraints for new portrait keyboard height
+   */
   private func updateKeyboardConstraints() {
     if (!self.keyboardConstraintsArray.isEmpty) {
       NSLayoutConstraint.deactivate(self.keyboardConstraintsArray)
@@ -301,7 +306,7 @@ class KeyboardHeightViewController: UIViewController {
     let defaultHeight = self.isPortrait ? self.defaultPortraitHeight : self.defaultLandscapeHeight
     
     UIView.animate(withDuration: 1.1, delay: 0.1, usingSpringWithDamping: 0.35, initialSpringVelocity: 4.5, options: .curveEaseOut, animations: {
-        self.changeKeyboardHeight(newHeight: defaultHeight)
+        self.writeNewKeyboardHeight(newHeight: defaultHeight)
         self.view.layoutIfNeeded()
       }, completion: nil)
   }
@@ -397,7 +402,7 @@ class KeyboardHeightViewController: UIViewController {
     keyboardImage.image = kbImage
 
     let kbImageMessage = "updateKeyboardImage,  kbImage: \(String(describing: kbImage))"
-    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, kbImageMessage)
+    os_log("%{public}s", log:KeymanEngineLogger.ui, type: .debug, kbImageMessage)
   }
 
   override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {

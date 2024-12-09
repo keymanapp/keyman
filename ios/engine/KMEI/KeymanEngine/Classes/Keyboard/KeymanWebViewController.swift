@@ -701,8 +701,8 @@ extension KeymanWebViewController {
     self.delegate?.menuKeyHeld(self)
   }
 
-  func constraintTargetHeight(isPortrait: Bool) -> CGFloat {
-    os_log("constraintTargetHeight", log:KeymanEngineLogger.ui, type: .info)
+  func determineDefaultKeyboardHeight(isPortrait: Bool) -> CGFloat {
+    os_log("determineDefaultKeyboardHeight", log:KeymanEngineLogger.ui, type: .info)
 
     let keyboardHeight = KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: isPortrait)?.keyboardHeight ?? 216 // default for ancient devices
 
@@ -714,27 +714,27 @@ extension KeymanWebViewController {
     width = UIScreen.main.bounds.width
     var height: CGFloat
     
-    os_log("initKeyboardSize()", log:KeymanEngineLogger.ui, type: .info)
-
-    // get orientation for system or in-app
+    // get orientation differently if system or in-app keyboard
     let portrait = Util.isSystemKeyboard ? InputViewController.isPortrait : UIDevice.current.orientation.isPortrait
     
-    // if keyboard height has been saved, then use it
+    /**
+     * If keyboard height is saved in UserDefaults, then use it
+     */
     if let savedHeight = self.readKeyboardHeight(isPortrait: portrait) {
       height = savedHeight
-    } else { // find default keyboard height
-      height = self.constraintTargetHeight(isPortrait: portrait)
-      
+    } else {
       /**
-       * The keyboard height is not yet saved to UserDefaults, so save the default values for this orientation
+       * Otherwise,  get default keyboard height for this orientation and write to UserDefaults
        */
+      height = self.determineDefaultKeyboardHeight(isPortrait: portrait)
       self.writeKeyboardHeightIfDoesNotExist(isPortrait: portrait, height: height)
       
       /**
-       * If we have not saved a keyboard height for one orientation yet, then we do not
-       * expect that the other has been saved yet either. Do so now if necessary.
+       * If we need to write out the keyboard height for one orientation, then we
+       * expect that the other must be written also. 
+       * Write it out now, but only if a value for keyboard height does not already exist.
        */
-      height = self.constraintTargetHeight(isPortrait: !portrait)
+      height = self.determineDefaultKeyboardHeight(isPortrait: !portrait)
       self.writeKeyboardHeightIfDoesNotExist(isPortrait: !portrait, height: height)
     }
     
@@ -769,6 +769,11 @@ extension KeymanWebViewController {
     return height;
   }
   
+  /**
+   * Write out the keyboard height to the UserDefaults but only if it does not exist there yet.
+   * If it exists, then we assume it was configured by the user and do not want to
+   * overwrite that value with a default value derived for this device.
+   */
   func writeKeyboardHeightIfDoesNotExist(isPortrait: Bool, height: CGFloat) {
     let writeMessage = "writeKeyboardHeight, isPortrait: \(isPortrait) height: \(height)"
     os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, writeMessage)

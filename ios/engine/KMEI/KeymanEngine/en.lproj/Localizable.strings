@@ -229,8 +229,8 @@
 /* Label for the "Adjust Keyboard Height" item on the main settings screen */
 "menu-settings-adjust-keyboard-height" = "Adjust Keyboard Height";
 
-/* Title for the "Adjust Keyboard Height" item on the main settings screen */
-"menu-settings-adjust-keyboard-height" = "Adjust Keyboard Height";
+/* Title for the "Adjust Keyboard Height" settings child screen */
+"adjust-keyboard-height-title" = "Adjust Keyboard";
 
 /* Label for "Reset to Default Keyboard Height" button on the adjust height screen */
 "button-label-reset-default-keyboard-height" = "Reset to Default Keyboard Height";
