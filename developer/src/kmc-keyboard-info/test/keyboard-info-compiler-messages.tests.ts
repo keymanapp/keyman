@@ -38,6 +38,31 @@ describe('KeyboardInfoCompilerMessages', function () {
     return verifyCompilerMessagesObject(KeyboardInfoCompilerMessages, CompilerErrorNamespace.KeyboardInfoCompiler);
   });
 
+  async function testMessage(message: number, folderName: string, shouldPass: boolean) {
+    const jsFilename = makePathToFixture(folderName, 'build', 'khmer_angkor.js');
+    const kpsFilename = makePathToFixture(folderName, 'source', 'khmer_angkor.kps');
+    const kmpFilename = makePathToFixture(folderName, 'build', 'khmer_angkor.kmp');
+
+    const sources = {
+      kmpFilename,
+      sourcePath: 'release/t/test',
+      kpsFilename,
+      jsFilename,
+      forPublishing: true,
+    };
+
+    const compiler = new KeyboardInfoCompiler();
+    assert.isTrue(await compiler.init(callbacks, {sources}));
+    const result = await compiler.run(kmpFilename, null);
+    if(shouldPass) {
+      assert.isNotNull(result);
+    } else {
+      assert.isNull(result);
+    }
+
+    assert.isTrue(callbacks.hasMessage(message));
+  }
+
   // ERROR_FileDoesNotExist (loadJsFile)
 
   it('should generate ERROR_FileDoesNotExist error if .js file does not exist', async function() {
@@ -202,7 +227,7 @@ describe('KeyboardInfoCompilerMessages', function () {
     const kmpFilename = makePathToFixture('no-kmp', 'build', 'khmer_angkor.kmp');
 
     const sources = {
-      kmpFilename: '',
+      kmpFilename: '',  // divergence from testMessage
       sourcePath: 'release/k/no-kmp',
       kpsFilename,
       jsFilename: jsFilename,
@@ -221,25 +246,7 @@ describe('KeyboardInfoCompilerMessages', function () {
   // ERROR_NoLicenseFound
 
   it('should generate ERROR_NoLicenseFound error if licence file is not in .kps options', async function() {
-    const jsFilename = makePathToFixture('no-license-in-kps-sources', 'build', 'khmer_angkor.js');
-    const kpsFilename = makePathToFixture('no-license-in-kps-sources', 'source', 'khmer_angkor.kps');
-    const kmpFilename = makePathToFixture('no-license-in-kps-sources', 'build', 'khmer_angkor.kmp');
-
-    const sources = {
-      kmpFilename,
-      sourcePath: 'release/k/no-license-in-kps-sources',
-      kpsFilename,
-      jsFilename: jsFilename,
-      forPublishing: true,
-    };
-
-    const compiler = new KeyboardInfoCompiler();
-    assert.isTrue(await compiler.init(callbacks, {sources}));
-    const result = await compiler.run(kmpFilename, null);
-    assert.isNull(result);
-
-    assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.ERROR_NoLicenseFound),
-      `ERROR_NoLicenseFound not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
+    await testMessage(KeyboardInfoCompilerMessages.ERROR_NoLicenseFound, 'no-license-in-kps-sources', false);
   });
 
   // ERROR_FontFileMetaDataIsInvalid
@@ -267,55 +274,27 @@ describe('KeyboardInfoCompilerMessages', function () {
     assert.isNull(result);
     assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.ERROR_FontFileMetaDataIsInvalid),
       `ERROR_FontFileMetaDataIsInvalid not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
-    assert.isTrue(nodeCompilerMessage(callbacks, KeyboardInfoCompilerMessages.ERROR_FontFileMetaDataIsInvalid).includes(kmpJsonData.files[0].name),
-      kmpJsonData.files[0].name+' not found in the message');
+    assert.isTrue(nodeCompilerMessage(callbacks, KeyboardInfoCompilerMessages.ERROR_FontFileMetaDataIsInvalid)
+      .includes("../shared/fonts/khmer/mondulkiri/font-meta-data-is-invalid.ttf"),
+      '../shared/fonts/khmer/mondulkiri/font-meta-data-is-invalid.ttf not found in the message');
   });
 
   // ERROR_InvalidAuthorEmail
 
   it('should generate ERROR_InvalidAuthorEmail error if multiple email addresses are listed in .kps', async function() {
-    const jsFilename = makePathToFixture('multiple-email-addresses', 'build', 'khmer_angkor.js');
-    const kpsFilename = makePathToFixture('multiple-email-addresses', 'source', 'khmer_angkor.kps');
-    const kmpFilename = makePathToFixture('multiple-email-addresses', 'build', 'khmer_angkor.kmp');
-
-    const sources = {
-      kmpFilename,
-      sourcePath: 'release/k/multiple-email-addresses',
-      kpsFilename,
-      jsFilename: jsFilename,
-      forPublishing: true,
-    };
-
-    const compiler = new KeyboardInfoCompiler();
-    assert.isTrue(await compiler.init(callbacks, {sources}));
-    const result = await compiler.run(kmpFilename, null);
-    assert.isNull(result);
-
-    assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.ERROR_InvalidAuthorEmail),
-      `ERROR_InvalidAuthorEmail not generated, instead got: `+JSON.stringify(callbacks.messages,null,2));
+    await testMessage(KeyboardInfoCompilerMessages.ERROR_InvalidAuthorEmail, 'multiple-email-addresses', false);
   });
 
   // HINT_ScriptDoesNotMatch
 
   it('should generate HINT_ScriptDoesNotMatch if there is a mismatching language script in .kps', async function() {
-    const jsFilename = makePathToFixture('hint_script_does_not_match', 'build', 'khmer_angkor.js');
-    const kpsFilename = makePathToFixture('hint_script_does_not_match', 'source', 'khmer_angkor.kps');
-    const kmpFilename = makePathToFixture('hint_script_does_not_match', 'build', 'khmer_angkor.kmp');
+    await testMessage(KeyboardInfoCompilerMessages.HINT_ScriptDoesNotMatch, 'hint_script_does_not_match', true);
+  });
 
-    const sources = {
-      kmpFilename,
-      sourcePath: 'release/h/hint_script_does_not_match',
-      kpsFilename,
-      jsFilename: jsFilename,
-      forPublishing: true,
-    };
+  // ERROR_DescriptionIsMissing
 
-    const compiler = new KeyboardInfoCompiler();
-    assert.isTrue(await compiler.init(callbacks, {sources}));
-    const result = await compiler.run(kmpFilename, null);
-    assert.isNotNull(result);
-
-    assert.isTrue(callbacks.hasMessage(KeyboardInfoCompilerMessages.HINT_ScriptDoesNotMatch));
+  it('should generate ERROR_DescriptionIsMissing if there is no description in .kps', async function() {
+    await testMessage(KeyboardInfoCompilerMessages.ERROR_DescriptionIsMissing,'error_description_is_missing', false);
   });
 });
 
