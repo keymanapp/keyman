@@ -11,37 +11,217 @@ begin Unicode > use(main)
 
 group(main) using keys
 
-+ [K_A] > 'a'
-+ [K_B] > 'b'
-+ [K_C] > 'c'
-+ [K_Q] > 'q'
-+ [K_Y] > 'y'
-+ [K_3] > '3'
-+ [K_HYPHEN] > 'ß'
-+ [K_PERIOD] > '.'
+Tipp: if K_? is replaced by undefined-> no enry in kmn_Key_Name=> add K_? there and it will be shown here
+Tipp: keys that are marked with sction do not aoear in ukelele_Array_output->do not appear in kmn
 
-+ [K_A] > 'A'
-+ [K_B] > 'B'
-+ [K_C] > 'C'
-+ [K_Q] > 'Q'
-+ [K_Y] > 'Y'
-+ [K_3] > '§'
-+ [K_HYPHEN] > '?'
-+ [K_PERIOD] > ':'
 
-+ [K_A] > ':'
-+ [K_B] > '9'
-+ [K_Q] > '@'
-+ [K_Y] > ':'
-+ [K_3] > '³'
-+ [K_HYPHEN] > '\'
-+ [K_PERIOD] > '·'
+0-(modif:4-0) + [SHIFT NCAPS RALT K_A] > 'A'
 
-+ [K_A] > 'A'
-+ [K_B] > 'B'
-+ [K_C] > 'C'
-+ [K_Q] > 'Q'
-+ [K_Y] > 'Y'
-+ [K_3] > '3'
-+ [K_HYPHEN] > 'ß'
+1-(modif:0-0) + [NCAPS K_S] > 's'
+1-(modif:1-0) + [NCAPS SHIFT K_S] > 'S'
+1-(modif:2-0) + [NCAPS RALT K_S] > 'S'
+1-(modif:4-0) + [SHIFT NCAPS RALT K_S] > 'S'
+
+2-(modif:0-0) + [NCAPS K_D] > 'd'
+2-(modif:1-0) + [NCAPS SHIFT K_D] > 'D'
+2-(modif:2-0) + [NCAPS RALT K_D] > 'D'
+
+3-(modif:0-0) + [NCAPS K_F] > 'f'
+3-(modif:1-0) + [NCAPS SHIFT K_F] > 'F'
+3-(modif:2-0) + [NCAPS RALT K_F] > 'F'
+
+4-(modif:0-0) + [NCAPS K_H] > 'h'
+4-(modif:1-0) + [NCAPS SHIFT K_H] > 'H'
+4-(modif:2-0) + [NCAPS RALT K_H] > 'H'
+
+5-(modif:0-0) + [NCAPS K_G] > 'g'
+5-(modif:1-0) + [NCAPS SHIFT K_G] > 'G'
+5-(modif:2-0) + [NCAPS RALT K_G] > 'G'
+
+6-(modif:0-0) + [NCAPS K_Z] > 'y'
+6-(modif:1-0) + [NCAPS SHIFT K_Z] > 'Y'
+6-(modif:2-0) + [NCAPS RALT K_Z] > 'Y'
+
+7-(modif:0-0) + [NCAPS K_X] > 'x'
+7-(modif:1-0) + [NCAPS SHIFT K_X] > 'X'
+7-(modif:2-0) + [NCAPS RALT K_X] > 'X'
+
+8-(modif:0-0) + [NCAPS K_C] > 'c'
+8-(modif:1-0) + [NCAPS SHIFT K_C] > 'C'
+8-(modif:2-0) + [NCAPS RALT K_C] > 'C'
+
+9-(modif:0-0) + [NCAPS K_V] > 'v'
+9-(modif:1-0) + [NCAPS SHIFT K_V] > 'V'
+9-(modif:2-0) + [NCAPS RALT K_V] > 'V'
+
+10-(modif:1-0) + [NCAPS SHIFT K_BKQUOTE] > '±'
+10-(modif:2-0) + [NCAPS RALT K_BKQUOTE] > '³'
+
+11-(modif:0-0) + [NCAPS K_B] > 'b'
+11-(modif:1-0) + [NCAPS SHIFT K_B] > 'B'
+11-(modif:2-0) + [NCAPS RALT K_B] > 'B'
+
+12-(modif:0-0) + [NCAPS K_Q] > 'q'
+12-(modif:1-0) + [NCAPS SHIFT K_Q] > 'Q'
+12-(modif:2-0) + [NCAPS RALT K_Q] > '@'
+
+13-(modif:0-0) + [NCAPS K_W] > 'w'
+13-(modif:1-0) + [NCAPS SHIFT K_W] > 'W'
+13-(modif:2-0) + [NCAPS RALT K_W] > 'W'
+
+
+15-(modif:0-0) + [NCAPS K_R] > 'r'
+15-(modif:1-0) + [NCAPS SHIFT K_R] > 'R'
+15-(modif:2-0) + [NCAPS RALT K_R] > 'R'
+
+16-(modif:0-0) + [NCAPS K_Y] > 'z'
+16-(modif:1-0) + [NCAPS SHIFT K_Y] > 'Z'
+16-(modif:2-0) + [NCAPS RALT K_Y] > 'Z'
+
+17-(modif:0-0) + [NCAPS K_T] > 't'
+17-(modif:1-0) + [NCAPS SHIFT K_T] > 'T'
+17-(modif:2-0) + [NCAPS RALT K_T] > 'T'
+
+18-(modif:0-0) + [NCAPS K_1] > '1'
+18-(modif:1-0) + [NCAPS SHIFT K_1] > '!'
+18-(modif:2-0) + [NCAPS RALT K_1] > '1'
+
+19-(modif:0-0) + [NCAPS K_2] > '2'
+19-(modif:1-0) + [NCAPS SHIFT K_2] > '@'
+19-(modif:2-0) + [NCAPS RALT K_2] > '2'
+
+20-(modif:0-0) + [NCAPS K_3] > '3'
+20-(modif:1-0) + [NCAPS SHIFT K_3] > '#'
+20-(modif:2-0) + [NCAPS RALT K_3] > '3'
+
+21-(modif:0-0) + [NCAPS K_4] > '4'
+21-(modif:1-0) + [NCAPS SHIFT K_4] > '$'
+21-(modif:2-0) + [NCAPS RALT K_4] > '4'
+
+22-(modif:0-0) + [NCAPS K_6] > '6'
+22-(modif:1-0) + [NCAPS SHIFT K_6] > '^'
+22-(modif:2-0) + [NCAPS RALT K_6] > '6'
+
+23-(modif:0-0) + [NCAPS K_5] > '5'
+23-(modif:1-0) + [NCAPS SHIFT K_5] > '%'
+23-(modif:2-0) + [NCAPS RALT K_5] > '5'
+
+
+25-(modif:0-0) + [NCAPS K_9] > '9'
+25-(modif:1-0) + [NCAPS SHIFT K_9] > '('
+25-(modif:2-0) + [NCAPS RALT K_9] > '9'
+
+26-(modif:0-0) + [NCAPS K_7] > '7'
+26-(modif:1-0) + [NCAPS SHIFT K_7] > '&#x0026;'
+26-(modif:2-0) + [NCAPS RALT K_7] > '7'
+
+27-(modif:0-0) + [NCAPS K_HYPHEN] > '-'
+27-(modif:1-0) + [NCAPS SHIFT K_HYPHEN] > '_'
+27-(modif:2-0) + [NCAPS RALT K_HYPHEN] > '-'
+
+28-(modif:0-0) + [NCAPS K_8] > '8'
+28-(modif:1-0) + [NCAPS SHIFT K_8] > '*'
+28-(modif:2-0) + [NCAPS RALT K_8] > '8'
+
+29-(modif:0-0) + [NCAPS K_0] > '0'
+29-(modif:1-0) + [NCAPS SHIFT K_0] > ')'
+29-(modif:2-0) + [NCAPS RALT K_0] > '0'
+
+30-(modif:0-0) + [NCAPS K_RBRKT] > ']'
+30-(modif:1-0) + [NCAPS SHIFT K_RBRKT] > '}'
+30-(modif:2-0) + [NCAPS RALT K_RBRKT] > ']'
+
+31-(modif:2-0) + [NCAPS RALT K_O] > 'o'
+
+
+33-(modif:0-0) + [NCAPS K_LBRKT] > 'ሴ'
+33-(modif:1-0) + [NCAPS SHIFT K_LBRKT] > '{'
+33-(modif:2-0) + [NCAPS RALT K_LBRKT] > '['
+
+
+35-(modif:0-0) + [NCAPS K_P] > 'p'
+35-(modif:1-0) + [NCAPS SHIFT K_P] > 'P'
+35-(modif:2-0) + [NCAPS RALT K_P] > 'P'
+
+36-(modif:0-0) + [NCAPS K_ENTER] > '&#x000D;'
+36-(modif:1-0) + [NCAPS SHIFT K_ENTER] > '&#x000D;'
+36-(modif:2-0) + [NCAPS RALT K_ENTER] > '&#x000D;'
+
+37-(modif:0-0) + [NCAPS K_L] > 'l'
+37-(modif:1-0) + [NCAPS SHIFT K_L] > 'L'
+37-(modif:2-0) + [NCAPS RALT K_L] > 'L'
+
+38-(modif:0-0) + [NCAPS K_J] > 'j'
+38-(modif:1-0) + [NCAPS SHIFT K_J] > 'J'
+38-(modif:2-0) + [NCAPS RALT K_J] > 'J'
+
+39-(modif:0-0) + [NCAPS K_QUOTE] > '&#x0027;'
+39-(modif:1-0) + [NCAPS SHIFT K_QUOTE] > '&#x0022;'
+39-(modif:2-0) + [NCAPS RALT K_QUOTE] > '&#x0027;'
+
+40-(modif:0-0) + [NCAPS K_K] > 'k'
+40-(modif:1-0) + [NCAPS SHIFT K_K] > 'K'
+40-(modif:2-0) + [NCAPS RALT K_K] > 'K'
+
+41-(modif:0-0) + [NCAPS K_COLON] > ';'
+41-(modif:1-0) + [NCAPS SHIFT K_COLON] > ':'
+41-(modif:2-0) + [NCAPS RALT K_COLON] > ';'
+
+42-(modif:0-0) + [NCAPS K_BKSLASH] > '\'
+42-(modif:1-0) + [NCAPS SHIFT K_BKSLASH] > '|'
+42-(modif:2-0) + [NCAPS RALT K_BKSLASH] > '\'
+
+43-(modif:0-0) + [NCAPS K_COMMA] > ','
+43-(modif:1-0) + [NCAPS SHIFT K_COMMA] > '&#x003C;'
+43-(modif:2-0) + [NCAPS RALT K_COMMA] > ','
+
+44-(modif:0-0) + [NCAPS K_SLASH] > '/'
+44-(modif:1-0) + [NCAPS SHIFT K_SLASH] > '?'
+44-(modif:2-0) + [NCAPS RALT K_SLASH] > '/'
+
+45-(modif:0-0) + [NCAPS K_N] > 'n'
+45-(modif:1-0) + [NCAPS SHIFT K_N] > 'N'
+45-(modif:2-0) + [NCAPS RALT K_N] > 'N'
+
+46-(modif:0-0) + [NCAPS K_M] > 'm'
+46-(modif:1-0) + [NCAPS SHIFT K_M] > 'M'
+46-(modif:2-0) + [NCAPS RALT K_M] > 'M'
+
+47-(modif:0-0) + [NCAPS K_PERIOD] > '.'
+47-(modif:1-0) + [NCAPS SHIFT K_PERIOD] > '&#x003E;'
+47-(modif:2-0) + [NCAPS RALT K_PERIOD] > '.'
+
+48-(modif:0-0) + [NCAPS K_BKSLASH] > '&#x0009;'
+48-(modif:1-0) + [NCAPS SHIFT K_BKSLASH] > '&#x0009;'
+48-(modif:2-0) + [NCAPS RALT K_BKSLASH] > '&#x0009;'
+
+
+[NCAPS K_BKQUOTE] > dk(005e) 
+[NCAPS SHIFT K_BKQUOTE] > dk(005e) 
+[NCAPS RALT K_BKQUOTE] > dk(005e) 
+[CAPS K_BKQUOTE] > dk(005e) 
+[SHIFT NCAPS RALT K_BKQUOTE] > dk(005e) 
+[NCAPS K_EQUAL] > dk(00b4) 
+[NCAPS SHIFT K_EQUAL] > dk(00b4) 
+[NCAPS RALT K_EQUAL] > dk(00b4) 
+[CAPS K_EQUAL] > dk(00b4) 
+[SHIFT NCAPS RALT K_EQUAL] > dk(00b4) 
+[NCAPS K_EQUAL] > dk(0060) 
+[NCAPS SHIFT K_EQUAL] > dk(0060) 
+[NCAPS RALT K_EQUAL] > dk(0060) 
+[CAPS K_EQUAL] > dk(0060) 
+[SHIFT NCAPS RALT K_EQUAL] > dk(0060) 
+
+match > use(deadkeys)
+
+group(deadkeys)
+
+store(dkf005e) 'a' 'e' 'o' 'u' 'i'
+store(dkt005e) 'â' 'ê' 'ô' 'û' 'î'
+
+store(dkf0060) 'a' 'e' 'o' 'u' 'i'
+store(dkt0060) 'à' 'è' 'ò' 'ù' 'ì'
+
+store(dkf00b4) 'a' 'e' 'u' 'i'
+store(dkt00b4) 'á' 'á' 'ú' 'í'
 

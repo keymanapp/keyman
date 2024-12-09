@@ -1,6 +1,11 @@
 /*
  * Keyman is copyright (C) SIL International. MIT License.
  */
+/*run with 
+cd developer/src/kmc-convert/
+./build_disp.sh test*/
+
+
 import 'mocha';
 import {assert} from 'chai';
 import {compilerTestCallbacks, compilerTestOptions} from './helpers/index.js';
@@ -37,8 +42,8 @@ describe('KeylayoutToKmnConverter', function() {
       // all keys, some deadkeys
       //const inputFilename  = makePathToFixture('../data/US_complete.keylayout');
 
-      //const inputFilename  = makePathToFixture('../data/Italian_copy.keylayout');
-      const inputFilename  = makePathToFixture('../data/My_dk_Keyboard.keylayout');
+      const inputFilename  = makePathToFixture('../data/Italian_copy.keylayout');
+      //const inputFilename  = makePathToFixture('../data/My_dk_Keyboard.keylayout');
 
       const outputFilename = makePathToFixture('../data/MyResult.kmn');
       
