@@ -263,7 +263,7 @@ km_core_state_options_to_json(km_core_state const *state,
 [km_core_keyboard_attrs]: keyboards#km_core_keyboard_attrs "km_core_keyboard_attrs struct"
 [km_core_keyboard_key]: keyboards#km_core_keyboard_key "km_core_keyboard_key struct"
 [km_core_keyboard_imx]: keyboards#km_core_keyboard_imx "km_core_keyboard_imx struct"
-[km_core_keyboard_load]: keyboards#km_core_keyboard_load "km_core_keyboard_load function"
+[km_core_keyboard_load_from_blob]: keyboards#km_core_keyboard_load_from_blob "km_core_keyboard_load_from_blob function"
 [km_core_keyboard_dispose]: keyboards#km_core_keyboard_dispose "km_core_keyboard_dispose function"
 [km_core_keyboard_get_attrs]: keyboards#km_core_keyboard_get_attrs "km_core_keyboard_get_attrs function"
 [km_core_keyboard_get_key_list]: keyboards#km_core_keyboard_get_key_list "km_core_keyboard_get_key_list function"

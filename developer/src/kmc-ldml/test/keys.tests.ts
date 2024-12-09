@@ -199,6 +199,19 @@ describe('keys', function () {
         assert.equal(flickw.flicks[0].keyId.value, 'dd');
       },
     },
+    {
+      subpath: 'sections/keys/import-local.xml',
+      callback: (keys, subpath, callbacks) => {
+        assert.isNotNull(keys);
+        assert.equal((<Keys>keys).keys.length, 2 + KeysCompiler.reserved_count);
+        const [snail] = (<Keys>keys).keys.filter(({ id }) => id.value === 'snail');
+        assert.ok(snail,`Missing the snail`);
+        assert.equal(snail.to.value, `@`, `Snail's value`);
+        const [interrobang] = (<Keys>keys).keys.filter(({ id }) => id.value === 'interrobang');
+        assert.ok(interrobang,`Missing the interrobang`);
+        assert.equal(interrobang.to.value, `‽`, `Interrobang's value`);
+      },
+    },
   ], keysDependencies);
 });
 

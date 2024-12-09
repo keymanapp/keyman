@@ -127,7 +127,7 @@ BOOL LoadlpKeyboard(int i)
   free(buffer);
 
   if (err_status != KM_CORE_STATUS_OK) {
-    SendDebugMessageFormat("km_core_keyboard_load failed for %ls with error status [%d]", keyboardPath, err_status);
+    SendDebugMessageFormat("km_core_keyboard_load_from_blob failed for %ls with error status [%d]", keyboardPath, err_status);
     goto ExitError;
   }
   delete[] keyboardPath;
