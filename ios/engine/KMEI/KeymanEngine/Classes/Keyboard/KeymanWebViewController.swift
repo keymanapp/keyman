@@ -775,15 +775,17 @@ extension KeymanWebViewController {
    * overwrite that value with a default value derived for this device.
    */
   func writeKeyboardHeightIfDoesNotExist(isPortrait: Bool, height: CGFloat) {
-    let writeMessage = "writeKeyboardHeight, isPortrait: \(isPortrait) height: \(height)"
+    let writeMessage = "writeKeyboardHeightIfDoesNotExist, isPortrait: \(isPortrait) height: \(height)"
     os_log("%{public}s", log:KeymanEngineLogger.ui, type: .info, writeMessage)
     if (isPortrait) {
-      if (Storage.active.userDefaults.object(forKey: Key.portraitKeyboardHeight) != nil) {
+      if (Storage.active.userDefaults.object(forKey: Key.portraitKeyboardHeight) == nil) {
         Storage.active.userDefaults.portraitKeyboardHeight = height
+        os_log("portrait keyboardHeight default value written", log:KeymanEngineLogger.ui, type: .info, writeMessage)
       }
     } else {
-      if (Storage.active.userDefaults.object(forKey: Key.landscapeKeyboardHeight) != nil) {
+      if (Storage.active.userDefaults.object(forKey: Key.landscapeKeyboardHeight) == nil) {
         Storage.active.userDefaults.landscapeKeyboardHeight = height
+        os_log("landscape keyboardHeight default value written", log:KeymanEngineLogger.ui, type: .info, writeMessage)
       }
     }
   }

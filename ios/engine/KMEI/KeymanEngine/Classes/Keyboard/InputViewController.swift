@@ -174,7 +174,6 @@ open class InputViewController: UIInputViewController, KeymanWebDelegate {
   }
 
   open class var topBarHeight: CGFloat {
-    os_log("topBarHeight", log:KeymanEngineLogger.ui, type: .info)
     let scaling = KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: self.isPortrait)
 
     return scaling?.bannerHeight ?? 38 // default for iPhone SE, older/smaller devices
