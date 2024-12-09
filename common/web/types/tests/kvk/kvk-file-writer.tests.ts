@@ -51,12 +51,13 @@ describe('Test of KVK-File-Writer', () => {
       checkBuilderKvkFile(binary, vk);
     });
     it('does not take account of the VisualKeyboard version', () => {
+      const vk_version = (BUILDER_KVK_HEADER_VERSION + 0x0100);
       const vk = initVisualKeyboard([
           initVisualKeyboardKey(0),
           initVisualKeyboardKey(1),
           initVisualKeyboardKey(2),
         ],
-        (BUILDER_KVK_HEADER_VERSION + 0x0100),
+        vk_version,
         BUILDER_KVK_HEADER_FLAGS.kvkhNone,
         "associatedKeyboard",
         DEFAULT_KVK_FONT,
@@ -68,6 +69,7 @@ describe('Test of KVK-File-Writer', () => {
       checkBuilderKvkFile(binary, vk);
     });
     // it('can handle a null associatedKeyboard', () => {
+    //   const vk_associatedKeyboard: string = null;
     //   const vk = initVisualKeyboard([
     //       initVisualKeyboardKey(0),
     //       initVisualKeyboardKey(1),
@@ -75,7 +77,7 @@ describe('Test of KVK-File-Writer', () => {
     //     ],
     //     undefined,
     //     BUILDER_KVK_HEADER_FLAGS.kvkhNone,
-    //     null,
+    //     vk_associatedKeyboard,
     //     DEFAULT_KVK_FONT,
     //     DEFAULT_KVK_FONT,
     //     undefined,
@@ -85,6 +87,7 @@ describe('Test of KVK-File-Writer', () => {
     //   checkBuilderKvkFile(binary, vk);
     // });
     // it('can handle a null ansiFont name', () => {
+    //   const vk_ansiFont_name: string = null;
     //   const vk = initVisualKeyboard([
     //       initVisualKeyboardKey(0),
     //       initVisualKeyboardKey(1),
@@ -93,7 +96,7 @@ describe('Test of KVK-File-Writer', () => {
     //     undefined,
     //     BUILDER_KVK_HEADER_FLAGS.kvkhNone,
     //     "associatedKeyboard",
-    //     { name: null, size: -12 },
+    //     { name: vk_ansiFont_name, size: -12 },
     //     DEFAULT_KVK_FONT,
     //     undefined,
     //   );
@@ -102,6 +105,7 @@ describe('Test of KVK-File-Writer', () => {
     //   checkBuilderKvkFile(binary, vk);
     // });
     // it('can handle a null unicodeFont name', () => {
+    //   const vk_unicodeFont_name: string = null;
     //   const vk = initVisualKeyboard([
     //       initVisualKeyboardKey(0),
     //       initVisualKeyboardKey(1),
@@ -111,7 +115,7 @@ describe('Test of KVK-File-Writer', () => {
     //     BUILDER_KVK_HEADER_FLAGS.kvkhNone,
     //     "associatedKeyboard",
     //     DEFAULT_KVK_FONT,
-    //     { name: null, size: -12 },
+    //     { name: vk_unicodeFont_name, size: -12 },
     //     undefined,
     //   );
     //   const writer = new KvkFileWriter;
@@ -119,9 +123,10 @@ describe('Test of KVK-File-Writer', () => {
     //   checkBuilderKvkFile(binary, vk);
     // });
     it('can handle a null vkey', () => {
+      const vkk_vkey: number = null;
       const vk = initVisualKeyboard([
         initVisualKeyboardKey(
-          null,
+          vkk_vkey,
           BUILDER_KVK_KEY_FLAGS.kvkkBitmap,
           BUILDER_KVK_SHIFT_STATE.KVKS_NORMAL,
           "text",
@@ -135,10 +140,11 @@ describe('Test of KVK-File-Writer', () => {
       checkBuilderKvkFile(binary, vk);
     });
     it('can handle a null key flags', () => {
+      const vkk_flags: BUILDER_KVK_KEY_FLAGS = null;
       const vk = initVisualKeyboard([
         initVisualKeyboardKey(
           0,
-          null,
+          vkk_flags,
           BUILDER_KVK_SHIFT_STATE.KVKS_NORMAL,
           "text",
           null,
@@ -151,11 +157,12 @@ describe('Test of KVK-File-Writer', () => {
       checkBuilderKvkFile(binary, vk);
     });
     it('can handle a null key shift', () => {
+      const vkk_shift: BUILDER_KVK_SHIFT_STATE = null;
       const vk = initVisualKeyboard([
         initVisualKeyboardKey(
           0,
           BUILDER_KVK_KEY_FLAGS.kvkkBitmap,
-          null,
+          vkk_shift,
           "text",
           null,
         ),
@@ -167,12 +174,13 @@ describe('Test of KVK-File-Writer', () => {
       checkBuilderKvkFile(binary, vk);
     });
     it('can handle a null key text', () => {
+      const vkk_text: string = null;
       const vk = initVisualKeyboard([
         initVisualKeyboardKey(
           0,
           BUILDER_KVK_KEY_FLAGS.kvkkBitmap,
           BUILDER_KVK_SHIFT_STATE.KVKS_NORMAL,
-          null,
+          vkk_text,
           null,
         ),
         initVisualKeyboardKey(1),
@@ -183,13 +191,14 @@ describe('Test of KVK-File-Writer', () => {
       checkBuilderKvkFile(binary, vk);
     });
     it('can handle a non-null key bitmap', () => {
+      const vkk_bitmap: number[] = [0];
       const vk = initVisualKeyboard([
         initVisualKeyboardKey(
           0,
           BUILDER_KVK_KEY_FLAGS.kvkkBitmap,
           BUILDER_KVK_SHIFT_STATE.KVKS_NORMAL,
           "text",
-          [0],
+          vkk_bitmap,
         ),
         initVisualKeyboardKey(1),
         initVisualKeyboardKey(2),
