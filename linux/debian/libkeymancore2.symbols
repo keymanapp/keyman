@@ -18,7 +18,6 @@ libkeymancore.so.2 libkeymancore2 #MINVER#
  km_core_keyboard_get_key_list@Base 17.0.195
  km_core_keyboard_imx_list_dispose@Base 17.0.195
  km_core_keyboard_key_list_dispose@Base 17.0.195
- km_core_keyboard_load@Base 17.0.195
  km_core_keyboard_load_from_blob@Base 18.0.101
  km_core_options_list_size@Base 17.0.195
  km_core_process_event@Base 17.0.195

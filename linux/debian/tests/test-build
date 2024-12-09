@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
   km_core_option_item opts[] = {KM_CORE_OPTIONS_END};
   km_core_keyboard *kb = NULL;
   km_core_state *state = NULL;
-  km_core_keyboard_load(NULL, &kb);
+  km_core_keyboard_load_from_blob(NULL, NULL, 0, &kb);
   km_core_state_create(kb, opts, &state);
   km_core_actions const *a = km_core_state_get_actions(state);
 }
@@ -62,7 +62,7 @@ echo "build 3: OK"
 #   km_core_option_item opts[] = {KM_CORE_OPTIONS_END};
 #   km_core_keyboard *kb = NULL;
 #   km_core_state *state = NULL;
-#   km_core_keyboard_load(NULL, &kb);
+#   km_core_keyboard_load_from_blob(NULL, NULL, 0, &kb);
 #   km_core_state_create(kb, opts, &state);
 #   km_core_actions const *a = km_core_state_get_actions(state);
 # }
