@@ -1,4 +1,9 @@
 #!/usr/bin/python3
+'''
+Keyman is copyright (C) SIL Global. MIT License.
+
+Implements the Sentry error handling
+'''
 import getpass
 import hashlib
 import importlib
