@@ -68,60 +68,60 @@ describe('Test of KVK-File-Writer', () => {
       const binary: BUILDER_KVK_FILE = writer['build'](vk);
       checkBuilderKvkFile(binary, vk);
     });
-    // it('can handle a null associatedKeyboard', () => {
-    //   const vk_associatedKeyboard: string = null;
-    //   const vk = initVisualKeyboard([
-    //       initVisualKeyboardKey(0),
-    //       initVisualKeyboardKey(1),
-    //       initVisualKeyboardKey(2),
-    //     ],
-    //     undefined,
-    //     BUILDER_KVK_HEADER_FLAGS.kvkhNone,
-    //     vk_associatedKeyboard,
-    //     DEFAULT_KVK_FONT,
-    //     DEFAULT_KVK_FONT,
-    //     undefined,
-    //   );
-    //   const writer = new KvkFileWriter;
-    //   const binary: BUILDER_KVK_FILE = writer['build'](vk);
-    //   checkBuilderKvkFile(binary, vk);
-    // });
-    // it('can handle a null ansiFont name', () => {
-    //   const vk_ansiFont_name: string = null;
-    //   const vk = initVisualKeyboard([
-    //       initVisualKeyboardKey(0),
-    //       initVisualKeyboardKey(1),
-    //       initVisualKeyboardKey(2),
-    //     ],
-    //     undefined,
-    //     BUILDER_KVK_HEADER_FLAGS.kvkhNone,
-    //     "associatedKeyboard",
-    //     { name: vk_ansiFont_name, size: -12 },
-    //     DEFAULT_KVK_FONT,
-    //     undefined,
-    //   );
-    //   const writer = new KvkFileWriter;
-    //   const binary: BUILDER_KVK_FILE = writer['build'](vk);
-    //   checkBuilderKvkFile(binary, vk);
-    // });
-    // it('can handle a null unicodeFont name', () => {
-    //   const vk_unicodeFont_name: string = null;
-    //   const vk = initVisualKeyboard([
-    //       initVisualKeyboardKey(0),
-    //       initVisualKeyboardKey(1),
-    //       initVisualKeyboardKey(2),
-    //     ],
-    //     undefined,
-    //     BUILDER_KVK_HEADER_FLAGS.kvkhNone,
-    //     "associatedKeyboard",
-    //     DEFAULT_KVK_FONT,
-    //     { name: vk_unicodeFont_name, size: -12 },
-    //     undefined,
-    //   );
-    //   const writer = new KvkFileWriter;
-    //   const binary: BUILDER_KVK_FILE = writer['build'](vk);
-    //   checkBuilderKvkFile(binary, vk);
-    // });
+    it.skip('can handle a null associatedKeyboard', () => {
+      const vk_associatedKeyboard: string = null;
+      const vk = initVisualKeyboard([
+          initVisualKeyboardKey(0),
+          initVisualKeyboardKey(1),
+          initVisualKeyboardKey(2),
+        ],
+        undefined,
+        BUILDER_KVK_HEADER_FLAGS.kvkhNone,
+        vk_associatedKeyboard,
+        DEFAULT_KVK_FONT,
+        DEFAULT_KVK_FONT,
+        undefined,
+      );
+      const writer = new KvkFileWriter;
+      const binary: BUILDER_KVK_FILE = writer['build'](vk);
+      checkBuilderKvkFile(binary, vk);
+    });
+    it.skip('can handle a null ansiFont name', () => {
+      const vk_ansiFont_name: string = null;
+      const vk = initVisualKeyboard([
+          initVisualKeyboardKey(0),
+          initVisualKeyboardKey(1),
+          initVisualKeyboardKey(2),
+        ],
+        undefined,
+        BUILDER_KVK_HEADER_FLAGS.kvkhNone,
+        "associatedKeyboard",
+        { name: vk_ansiFont_name, size: -12 },
+        DEFAULT_KVK_FONT,
+        undefined,
+      );
+      const writer = new KvkFileWriter;
+      const binary: BUILDER_KVK_FILE = writer['build'](vk);
+      checkBuilderKvkFile(binary, vk);
+    });
+    it.skip('can handle a null unicodeFont name', () => {
+      const vk_unicodeFont_name: string = null;
+      const vk = initVisualKeyboard([
+          initVisualKeyboardKey(0),
+          initVisualKeyboardKey(1),
+          initVisualKeyboardKey(2),
+        ],
+        undefined,
+        BUILDER_KVK_HEADER_FLAGS.kvkhNone,
+        "associatedKeyboard",
+        DEFAULT_KVK_FONT,
+        { name: vk_unicodeFont_name, size: -12 },
+        undefined,
+      );
+      const writer = new KvkFileWriter;
+      const binary: BUILDER_KVK_FILE = writer['build'](vk);
+      checkBuilderKvkFile(binary, vk);
+    });
     it('can handle a null vkey', () => {
       const vkk_vkey: number = null;
       const vk = initVisualKeyboard([
