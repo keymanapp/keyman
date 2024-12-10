@@ -269,10 +269,10 @@ function initVisualKeyboardKey(
   bitmap: number[] = null,
 ): VisualKeyboardKey {
   const vkk: VisualKeyboardKey = {
-    vkey: vkey,
-    flags: flags,
-    shift: shift,
-    text: text,
+    vkey,
+    flags,
+    shift,
+    text,
     bitmap: bitmap ? new Uint8Array(bitmap) : null,
   };
   return vkk;
