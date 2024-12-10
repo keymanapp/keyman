@@ -1,5 +1,5 @@
 {
-  "name": "@keymanapp/developer-vscode",
+  "name": "@keymanapp/keyman-developer-vscode",
   "displayName": "Keyman Developer for VSCode",
   "description": "Plugin for compiling Keyman projects in VSCode",
   "engines": {
