@@ -100,7 +100,7 @@ function push_to_github_and_create_pr() {
   local pr_number
 
   if [[ -n "${PUSH}" ]]; then
-      ${NOOP} git push --force-with-lease origin "${BRANCH}"
+      ${NOOP} git push --force origin "${BRANCH}"
       pr_number=$(gh pr list --draft --search "${COMMIT_MSG}" --base "${BASE}" --json number --jq '.[].number')
       if [[ -n ${pr_number} ]]; then
         builder_echo "PR #${pr_number} already exists"
