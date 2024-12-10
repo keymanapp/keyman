@@ -1377,11 +1377,13 @@ export class KeylayoutToKmnConverter {
           // in keys at top for code 1 (K_S) take output ("s") [italian copy]
           // get modifiers [modifer of Keymap index 0]
           // write [modifer of Keymap index 0] + K_S > s  
-
           output_count++
+
+
+
           if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'] !== "")
-            console.log("### Key Nr", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
-              "[ + C0 modifiers]", "+", "K_?", " (key Code", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'], ")   >  ",
+            console.log("### Key Nr  ", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
+              "[ + C0 modifiers]", "+", this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])), "\t\t (key Code", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'], ")   >  ",
               jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'])
         }
 
@@ -1411,8 +1413,8 @@ export class KeylayoutToKmnConverter {
           const resultC1 = this.lookup_6_ActionNone__To__ActionOutput(jsonObj, action_id)
 
           if (resultC1 !== undefined)
-            console.log("### Key Nr", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
-              "[ + C1 modifiers]", "+", "K_?", " (keycode", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'], ")   >  ", resultC1)
+            console.log("### Key Nr  ", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
+              "[ + C1 modifiers]", "+", this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']))," (\t\t keycode", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'], ")   >  ", resultC1)
           //Todo write into array
 
           // ......................................................................................................
@@ -1439,8 +1441,6 @@ export class KeylayoutToKmnConverter {
           //°° id a16 ->id nr 8
           const indexInActions = this.lookup_10_ActionId__To__ActioIndex(jsonObj, action_id)
 
-
-
           // loop through all actionh/when find state and get action id
           //   <action id="a16">
           //      <when state="none" next="4"/>
@@ -1450,7 +1450,6 @@ export class KeylayoutToKmnConverter {
             // °°get state 3  <- <when state="3" next="1"/>
             const stateVal = jsonObj.keyboard.actions.action[indexInActions].when[jj]['@_state']   // a09 ->3
 
-
             if (stateVal !== undefined) {
               // get output  Â needed here?? CAse none-next (C3)
               outputval = jsonObj.keyboard.actions.action[indexInActions].when[jj]['@_output']
@@ -1458,26 +1457,15 @@ export class KeylayoutToKmnConverter {
               nextvalArray = this.lookup_5_ActionState__To__ActionNext_none(jsonObj, stateVal)
             }
 
-            // console.log("nextvalArray",nextvalArray, outputval)
             for (let k = 0; k < nextvalArray.length; k++) {
-
               if (outputval !== undefined) {
                 console.log("  ### Key Nr", j, "[ + C2 modifiers]", "+", "+ stateV ", stateVal, jsonObj.keyboard.keyMapSet[0].keyMap[i].key[jj]['@_code'],
-
-                  nextvalArray[k] +
-                  "-K_? +",
-                  jsonObj.keyboard.keyMapSet[0].keyMap[i].key[jj]['@_code'],
-                  "  > ",
-                  outputval, "-", nextvalArray, "-----", stateVal,
+                  nextvalArray[k] ,"\t",  this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])),"\t\t", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[jj]['@_code'], "  > ", outputval, "-", nextvalArray, "-----", stateVal,
                   "### Key Nr", j, "+modixx2 +key nr", this.lookup_11_KeyMapAction__To__KeyMapCode(jsonObj, nextvalArray[k]), " +keymapindex of this",
                   this.lookup_11_KeyMapAction__To__KeyIndex(jsonObj, nextvalArray[k]), ">", outputval, "(", nextvalArray[k], ")-----", i, j, k, jj, stateVal, outputval, nextvalArray, jsonObj.keyboard.keyMapSet[0].keyMap[i].key[jj]['@_code'])
               }
             }
-
-
-
           }
-
 
           // ......................................................................................................
           // case C3: action + state Nr + Next ........................4............................................
@@ -1523,18 +1511,14 @@ export class KeylayoutToKmnConverter {
           const resultC3 = this.lookup_9_TerminatorState__To__TerminatorOutput_str(jsonObj, thatnext)
 
           if (the_ContextKeyNr !== undefined)
-            console.log("  ### Key Nr", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
-              "[ + C3 modifiers]",
-              "+ K_?-", "(key Code", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
-              ") +", "K_?-", "(keyCode", the_ContextKeyNr, ")",
-              "  >  ", resultC3,
+            console.log("  ### Key Nr", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'], "[ + C3 modifiers]",   "+",this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])),"\t\t ", "(key Code", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'], ") +", "-",this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])), "\t\t(keyCode", the_ContextKeyNr, ")", "  >  ", resultC3,
             )
 
           // ......................................................................................................
-          // case C4: action + state none + Next .......................................3.....................DONE .
+          // case C4: action + state none + Next ............................................................DONE .
           // ...............e. g. <when state="none" next="4"/> ...................................................
           // a key is mapped to an action and then to a terminator ................................................
-          // code->action->action(none)->action(next)->terminator(output) ........................................
+          // code->action->action(none)->action(next)->terminator(output) .........................................
           // ......................................................................................................
           // in keys for code 32 (K_U) at top find actions id a16   [italian copy]
           // get modifiers [modifer of Keymap index 3]
@@ -1549,8 +1533,8 @@ export class KeylayoutToKmnConverter {
           const resultC4 = this.lookup_9_TerminatorState__To__TerminatorOutput_str(jsonObj, next_id)
 
           if (resultC4 !== "")
-            console.log("### Key Nr", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
-              "[ + C4 modifiers]", "+ K_?-", "(key Code", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'], ")   >  ", resultC4, "[", action_id, next_id, "]")
+            console.log("### Key Nr  ", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
+              "[ + C4 modifiers]", "+ ", this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']))," \t\t","(key Code", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'], ")   >  ", resultC4, "[", action_id, next_id, "]")
         }
         else
           console.log("ERROR : some entries are not available")
@@ -1566,7 +1550,7 @@ export class KeylayoutToKmnConverter {
       }
     }
    }*/
-  public lookup_2_KeyMapAction__To__ActionAction() { }
+ // public lookup_2_KeyMapAction__To__ActionAction() { }
   public lookup_3_ActionNone__To__ActionNext(data: any, search: string): string {
     for (let jj = 0; jj < data.keyboard.actions.action.length; jj++) {
       if (data.keyboard.actions.action[jj]['@_id'] === search) {
@@ -1578,7 +1562,7 @@ export class KeylayoutToKmnConverter {
     }
     return ""
   }
-  public lookup_4_ActionNext__To__ActionState() { }
+  //public lookup_4_ActionNext__To__ActionState() { }
   public lookup_5_ActionState__To__ActionNext(data: any, action_idName: string): string[] {
     const returnarray: string[] = []
     // e.g. action_idName = 3 
@@ -1612,10 +1596,9 @@ export class KeylayoutToKmnConverter {
     }
     return returnarray
   }
-
   public lookup_6_ActionNone__To__ActionOutput(data: any, search: any): any {
     //  a16-> id ==a16 ->4
-    //todo what if douplicate value??
+    //todo what if duplicate value??
     let OutputValue = ""
     for (let jj = 0; jj < data.keyboard.actions.action.length; jj++) {
       if (data.keyboard.actions.action[jj]['@_id'] === search) {
@@ -1628,9 +1611,8 @@ export class KeylayoutToKmnConverter {
     }
     return OutputValue
   }
-  public lookup_7_ActionState__To__ActionOutput() { }
-  public lookup_8_ActionNext__To__TerminatorState() {
-  }
+  //public lookup_7_ActionState__To__ActionOutput() { }
+  //public lookup_8_ActionNext__To__TerminatorState() { }
 
   public lookup_9_TerminatorState__To__TerminatorOutput_ui8(data: any, search: string): Uint8Array {
     for (let jj = 0; jj < data.keyboard.terminators.when.length; jj++) {
@@ -1657,32 +1639,20 @@ export class KeylayoutToKmnConverter {
     return 0
 
   }
-
-
   public lookup_11_KeyMapAction__To__KeyMapCode(data: any, search: string): number {
     for (let kk = 0; kk < data.keyboard.keyMapSet[0].keyMap.length; kk++) {
       for (let jj = 0; jj < data.keyboard.keyMapSet[0].keyMap[kk].key.length; jj++) {
-
-        // console.log(   "A action_id-search",kk,jj, search, data.keyboard.keyMapSet[0].keyMap[kk].key[jj]['@_action'])
         if (data.keyboard.keyMapSet[0].keyMap[kk].key[jj]['@_action'] === search) {
-
-          //console.log(   "FOUND action_id-search",kk,jj, search, data.keyboard.keyMapSet[0].keyMap[kk].key[jj]['@_action'] )
           return data.keyboard.keyMapSet[0].keyMap[kk].key[jj]['@_code']
         }
       }
     }
     return 999
   }
-
-
   public lookup_11_KeyMapAction__To__KeyIndex(data: any, search: string): number {
     for (let kk = 0; kk < data.keyboard.keyMapSet[0].keyMap.length; kk++) {
       for (let jj = 0; jj < data.keyboard.keyMapSet[0].keyMap[kk].key.length; jj++) {
-
-        // console.log(   "A action_id-search",kk,jj, search, data.keyboard.keyMapSet[0].keyMap[kk].key[jj]['@_action'])
         if (data.keyboard.keyMapSet[0].keyMap[kk].key[jj]['@_action'] === search) {
-
-          //console.log(   "FOUND action_id-search",kk,jj, search, data.keyboard.keyMapSet[0].keyMap[kk].key[jj]['@_action'] )
           return data.keyboard.keyMapSet[0].keyMap[kk]['@_index']
         }
       }
@@ -1946,11 +1916,7 @@ export class KeylayoutToKmnConverter {
      }
      return ""
    }*/
-
-
-
-
-  public getCharacterFromActionName(data_ukelele: convert_object, ArrayOf_Element_KeyActionElement: Uint8Array): any {
+  /*public getCharacterFromActionName(data_ukelele: convert_object, ArrayOf_Element_KeyActionElement: Uint8Array): any {
     //get character from ~ <- 4 <- a9
     //in: [ 97, 49 ] (a9)
     // out: ~
@@ -1976,6 +1942,7 @@ export class KeylayoutToKmnConverter {
     }
 
   }
+*/
 
   /**
    * @brief  member function to return the unicode value of a character
