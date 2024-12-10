@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2023 SIL International. All rights reserved.
+# Copyright (c) 2022-2023 SIL Global. All rights reserved.
 #
 # builder image for a linux build
 # see ../docs/build/linux-ubuntu.md
@@ -7,7 +7,7 @@ ARG OS_VERSION=latest
 ARG OS_PLATFORM=amd64
 
 FROM --platform=${OS_PLATFORM} ubuntu:${OS_VERSION}
-LABEL org.opencontainers.image.authors="SIL International."
+LABEL org.opencontainers.image.authors="SIL Global."
 LABEL org.opencontainers.image.url="https://github.com/keymanapp/keyman.git"
 LABEL org.opencontainers.image.title="Keyman Linux Build Image"
 
