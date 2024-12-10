@@ -1,5 +1,9 @@
 # Keyman Version History
 
+## 18.0.157 alpha 2024-12-10
+
+* test(common/web): unit tests for kvk-file-writer (#12734)
+
 ## 18.0.156 alpha 2024-12-09
 
 * fix(developer): remove platforms from kmc-generate LM readme (#12803)
