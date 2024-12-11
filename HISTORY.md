@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.158 alpha 2024-12-11
+
+* fix(linux): pushing of updated changelog branch (#12818)
+* fix(linux): work around Lintian errors (#12815)
+
 ## 18.0.157 alpha 2024-12-10
 
 * test(common/web): unit tests for kvk-file-writer (#12734)
