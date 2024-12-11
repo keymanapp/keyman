@@ -22,12 +22,6 @@ keyman (17.0.279-1) unstable; urgency=medium
 
  -- Eberhard Beilharz <eb1@sil.org>  Thu, 29 Feb 2024 19:17:08 +0100
 
-keyman (17.0.274-2) UNRELEASED; urgency=medium
-
-  * Add libicu-dev dependency to libkeymancore-dev (closes: #1064915)
-
- -- Eberhard Beilharz <eb1@sil.org>  Wed, 28 Feb 2024 17:54:58 +0100
-
 keyman (17.0.274-1) unstable; urgency=medium
 
   * Fix autopkg tests
