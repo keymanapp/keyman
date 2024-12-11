@@ -4,6 +4,7 @@
 #include "path.hpp"
 
 #include <map>
+#include <set>
 #include <memory>
 
 #include "kmx/kmx_plus.h"
@@ -14,6 +15,34 @@ namespace tests {
 struct key_event {
   km_core_virtual_key vk;
   uint16_t modifier_state;
+  public:
+    key_event() : vk(0), modifier_state(0) {
+    }
+    key_event(km_core_virtual_key k, uint16_t m) :vk(k), modifier_state(m) {
+    }
+    std::string dump() const;
+  int compare(const key_event &other) const {
+    if (vk < other.vk) return -1;
+    if (vk > other.vk) return 1;
+    if (modifier_state < other.modifier_state) return -1;
+    if (modifier_state > other.modifier_state) return 1;
+    return 0;
+  }
+
+  bool operator<(const key_event &other) const {
+    return compare(other) < 0;
+  }
+  bool operator>(const key_event &other) const {
+    return compare(other) > 0;
+  }
+  bool operator==(const key_event &other) const {
+    return compare(other) == 0;
+  }
+  /** true if unset (null) key */
+  bool empty() const {
+    return vk == 0 && modifier_state == 0;
+  }
+
 };
 
 enum ldml_action_type {
@@ -37,6 +66,10 @@ enum ldml_action_type {
    * expected text
   */
   LDML_ACTION_CHECK_EXPECTED,
+  /**
+   * string - keylist to check
+   */
+  LDML_ACTION_CHECK_KEYLIST,
   // TODO-LDML: gestures, etc? Depends on touch.
 
   /**
@@ -77,10 +110,17 @@ public:
   virtual km_core_status get_expected_load_status();
   virtual const std::u16string &get_context() = 0;
   virtual bool get_expected_beep() const;
+  /**
+   * fillin a list
+   * @param fillin key list to be filled in with all vkeys in the hardware map.
+   * @param modifier modifier to load key list for
+   * @returns false on load fail, true on OK
+   */
+  bool get_vkey_table(std::set<key_event> &fillin) const;
 
   // helper functions
   static key_event char_to_event(char ch);
-  static uint16_t get_modifier(std::string const m);
+  static uint16_t get_modifier(std::string const &m);
   static std::u16string parse_source_string(std::string const &s);
   static std::u16string parse_u8_source_string(std::string const &s);
 
@@ -102,6 +142,12 @@ private:
 
 private:
   bool _caps_lock_on = false;
+protected:
+  /** populate rawdata and kmxplus */
+  int load_kmx_plus(const km::core::path &compiled);
+  // copy of the kbd data, for lookups
+  std::vector<uint8_t> rawdata;
+  std::unique_ptr<km::core::kmx::kmx_plus> kmxplus;
 };
 
 typedef std::map<std::string, std::unique_ptr<km::tests::LdmlTestSource>> JsonTestMap;
@@ -120,9 +166,6 @@ class LdmlJsonTestSourceFactory {
     const JsonTestMap& get_tests() const;
   private:
     JsonTestMap test_map;
-    // copy of the kbd data, for lookups
-    std::vector<uint8_t> rawdata;
-    std::unique_ptr<km::core::kmx::kmx_plus> kmxplus;
 };
 
 
@@ -134,7 +177,7 @@ public:
   /**
    * Load the test_source from comments in the .xml source
    */
-  int load_source(const km::core::path &path);
+  int load_source(const km::core::path &path, const km::core::path &compiled);
 
   virtual km_core_status get_expected_load_status();
   virtual const std::u16string &get_context();
@@ -143,10 +186,6 @@ public:
   virtual void next_action(ldml_action &fillin);
 
 private:
-
-  bool is_token(const std::string token, std::string &line);
-  key_event vkey_to_event(std::string const &vk_event);
-  key_event next_key(std::string &keys);
   key_event next_key();
 
   std::deque<std::string> keys;
@@ -155,6 +194,24 @@ private:
   bool expected_beep = false;
   bool expected_error = false;
   bool is_done = false;
+  /** did we check the keylist yet? */
+  bool check_keylist = true;
+  /** set the expected keys in the keylist */
+  void set_keylist(std::string const& s) {
+    expected_keylist = parse_source_string(s);
+  }
+
+  std::u16string expected_keylist;
+
+  /** returns false on fail and updates the message */
+  bool handle_check_keylist(std::string &message) const;
+
+// utility
+  static key_event vkey_to_event(std::string const &vk_event);
+  static bool is_token(const std::string token, std::string &line);
+
+public:
+  static key_event parse_next_key(std::string &keys);
 };
 
 }  // namespace tests

@@ -16,6 +16,7 @@
 #include <sstream>
 #include <string>
 #include <type_traits>
+#include <set>
 
 #include "path.hpp"
 #include "state.hpp"
@@ -266,6 +267,63 @@ verify_context(std::u16string &text_store, km_core_state *&test_state, std::vect
   delete[] buf;
 }
 
+
+/**
+ * @param actual the list from get_key_list()
+ * @param expected optional list with keys to check, can be empty - not exhaistive
+ * @returns true if passing
+ */
+bool
+verify_key_list(std::set<km::tests::key_event> &actual, std::set<km::tests::key_event> &expected) {
+  bool equals = true;
+  // error if any bad modifier keys
+  for(const auto &akey : actual) {
+    if (akey.modifier_state > KM_CORE_MODIFIER_MASK_CAPS) {
+      equals = false;
+      std::u16string dump = convert<char, char16_t>(akey.dump());  // akey.dump()
+      std::wcout << console_color::fg(console_color::BRIGHT_RED) << "- FAIL - key_map had key with bad modifier " << akey.modifier_state << ": " << dump << console_color::reset() << std::endl;
+    }
+  }
+  // error if any expected keys missing (note expected may be empty)
+  for(const auto &ekey : expected) {
+    if (actual.count(ekey) == 0) {
+      equals = false;
+      std::u16string dump = convert<char, char16_t>(ekey.dump());  // akey.dump()
+      std::wcout << console_color::fg(console_color::BRIGHT_RED) << "- FAIL - key_map had missing key " << dump << console_color::reset() << std::endl;
+    }
+  }
+  if (equals) {
+      std::wcout << console_color::fg(console_color::GREEN) << " " << actual.size() << " vkeys OK, verified  " << expected.size() << console_color::reset() << std::endl;
+  }
+  return equals;
+}
+
+/**
+ * @param actual_list the list from get_key_list()
+ * @param keylist optional string with keys to check, can be empty
+ * @param test the LDML test source, for additional data
+ * @returns true if passing
+ */
+bool
+verify_key_list(const km_core_keyboard_key *actual_list, const std::u16string &expected_list, const km::tests::LdmlTestSource &test) {
+  std::set<km::tests::key_event> actual, expected;
+  // convert actual list
+  while (actual_list != nullptr && !(actual_list->key == 0 && actual_list->modifier_flag == 0)) {
+    km::tests::key_event k(actual_list->key, (uint16_t)actual_list->modifier_flag);
+    actual.insert(k);
+    actual_list++; // advance pointer
+  }
+  // parse the expected list
+  std::string keylist = convert<char16_t, char>(expected_list);
+  while (!keylist.empty() && keylist[0] == '[') {
+    const km::tests::key_event k = km::tests::LdmlEmbeddedTestSource::parse_next_key(keylist);
+    if (!k.empty()) {
+      expected.emplace(k);
+    }
+  }
+  return verify_key_list(actual, expected);
+}
+
 int
 run_test(const km::core::path &source, const km::core::path &compiled, km::tests::LdmlTestSource& test_source) {
   km_core_keyboard * test_kb = nullptr;
@@ -371,6 +429,17 @@ run_test(const km::core::path &source, const km::core::path &compiled, km::tests
         errorLine = __LINE__;
       }
     } break;
+    case km::tests::LDML_ACTION_CHECK_KEYLIST: {
+      std::cout << "- checking keylist" << std::endl;
+      // get keylist from kbd
+      const km_core_keyboard_key* actual_list = test_kb->get_key_list();
+      if (!verify_key_list(actual_list, action.string, test_source)) {
+        errorLine = __LINE__;
+      } else {
+        std::cout << " .. passes." << std::endl;
+      }
+      delete [] actual_list;
+    } break;
     case km::tests::LDML_ACTION_FAIL: {
       // test requested failure
       std::wcout << console_color::fg(console_color::BRIGHT_RED) << "- FAIL: " << action.string << console_color::reset()
@@ -421,7 +490,7 @@ int run_all_tests(const km::core::path &source, const km::core::path &compiled, 
 
   std::vector<std::string> failures; // track failures for summary
 
-  int embedded_result = embedded_test_source.load_source(source);
+  int embedded_result = embedded_test_source.load_source(source, compiled);
 
   if (!filter.empty()) {
     // Always skip the embedded test if there's a filter.
