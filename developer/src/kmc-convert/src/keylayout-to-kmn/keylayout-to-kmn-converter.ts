@@ -1351,17 +1351,21 @@ export class KeylayoutToKmnConverter {
     console.log("stringArray", stringArray)
     // end
 
-
+    
     console.log("json", jsonObj.keyboard.terminators)
     console.log("jsonObj.keyboard.keyMapSet.le", jsonObj.keyboard.keyMapSet[0].keyMap.length)
     let action_id
-    for (let i = 0; i < jsonObj.keyboard.keyMapSet[0].keyMap.length; i++) {
-      let output_count = 0
-      let action_count = 0
-      let all_count = 0
 
-      // loop keys
-      for (let j = 0; j < jsonObj.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
+    const isCapsused = this.checkIfCapsUsed(data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect)
+
+    // loop keys
+    //for (let j = 0; j < jsonObj.keyboard.keyMapSet[0].keyMap[i].key.length; j++) {
+    for (let j = 0; j < 52; j++) {
+      for (let i = 0; i < jsonObj.keyboard.keyMapSet[0].keyMap.length; i++) {
+        let output_count = 0
+        let action_count = 0
+        let all_count = 0
+
         // ......................................................................................................
         // case C0: code + output ...............................................................................       
         // ......................................................................................................
@@ -1378,13 +1382,23 @@ export class KeylayoutToKmnConverter {
           // get modifiers [modifer of Keymap index 0]
           // write [modifer of Keymap index 0] + K_S > s  
           output_count++
+          for (let l = 0; l < data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect[i].length; l++) {
+            const modifier_C0 = this.create_kmn_modifier(data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect[i][l], isCapsused)
+            if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'] !== "")
 
+              console.log("### Key Nr  ",
+                jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
+                "[ + C0 modifiers->", i, modifier_C0.padEnd(25, " "), "] ",
+                this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])).padEnd(8, " "),
+                ">  ",
+                jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'])
 
-
-          if (jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'] !== "")
-            console.log("### Key Nr  ", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
-              "[ + C0 modifiers]", "+", this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])), "\t\t (key Code", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'], ")   >  ",
-              jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'])
+                
+                DataArraySingleState.push(modifier_C0)
+                DataArraySingleState.push(this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])))
+                DataArraySingleState.push(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_output'])
+          }
+          DataArray.push(DataArraySingleState)
         }
 
 
@@ -1411,10 +1425,18 @@ export class KeylayoutToKmnConverter {
           // write  [modifer of Keymap index 0] + K_A > a  
           action_id = jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_action']
           const resultC1 = this.lookup_6_ActionNone__To__ActionOutput(jsonObj, action_id)
+          for (let l = 0; l < data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect[i].length; l++) {
+            const modifier_C1 = this.create_kmn_modifier(data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect[i][l], isCapsused)
 
-          if (resultC1 !== undefined)
-            console.log("### Key Nr  ", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
-              "[ + C1 modifiers]", "+", this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']))," (\t\t keycode", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'], ")   >  ", resultC1)
+            if (resultC1 !== undefined)
+              console.log(
+                "### Key Nr  ",
+                jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
+                "[ + C1 modifiers->", i, modifier_C1.padEnd(25, " "), "] ",
+                this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])).padEnd(8, " "),
+                ">  ",
+                resultC1)
+          }
           //Todo write into array
 
           // ......................................................................................................
@@ -1456,13 +1478,33 @@ export class KeylayoutToKmnConverter {
               // get all that result in state 3
               nextvalArray = this.lookup_5_ActionState__To__ActionNext_none(jsonObj, stateVal)
             }
+            for (let l = 0; l < data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect[i].length; l++) {
+              const modifier_C2 = this.create_kmn_modifier(data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect[i][l], isCapsused)
 
-            for (let k = 0; k < nextvalArray.length; k++) {
-              if (outputval !== undefined) {
-                console.log("  ### Key Nr", j, "[ + C2 modifiers]", "+", "+ stateV ", stateVal, jsonObj.keyboard.keyMapSet[0].keyMap[i].key[jj]['@_code'],
-                  nextvalArray[k] ,"\t",  this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])),"\t\t", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[jj]['@_code'], "  > ", outputval, "-", nextvalArray, "-----", stateVal,
-                  "### Key Nr", j, "+modixx2 +key nr", this.lookup_11_KeyMapAction__To__KeyMapCode(jsonObj, nextvalArray[k]), " +keymapindex of this",
-                  this.lookup_11_KeyMapAction__To__KeyIndex(jsonObj, nextvalArray[k]), ">", outputval, "(", nextvalArray[k], ")-----", i, j, k, jj, stateVal, outputval, nextvalArray, jsonObj.keyboard.keyMapSet[0].keyMap[i].key[jj]['@_code'])
+              for (let k = 0; k < nextvalArray.length; k++) {
+                if (outputval !== undefined) {
+                  console.log(
+                    "  ### Key Nr",
+                    "nextvalArray.length",nextvalArray.length,
+                    j,
+                    "[ + C2 modifiers->", i, modifier_C2.padEnd(25, " "), "] ",
+                    this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])).padEnd(8, " "),
+                    ">  ",
+                    outputval,
+                    "\t  stateV ->", stateVal,
+                    jsonObj.keyboard.keyMapSet[0].keyMap[i].key[jj]['@_code'],
+                    nextvalArray[k],
+
+                    "-",
+                    nextvalArray,
+                    "-----",
+                    "### Key Nr",
+                    "+modixx2 +key nr",
+                    this.lookup_11_KeyMapAction__To__KeyMapCode(jsonObj, nextvalArray[k]),
+                    " +keymapindex of this",
+                    this.lookup_11_KeyMapAction__To__KeyIndex(jsonObj, nextvalArray[k])
+                  )
+                }
               }
             }
           }
@@ -1509,11 +1551,26 @@ export class KeylayoutToKmnConverter {
             }
           }
           const resultC3 = this.lookup_9_TerminatorState__To__TerminatorOutput_str(jsonObj, thatnext)
+          for (let l = 0; l < data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect[i].length; l++) {
+            const modifier_C3 = this.create_kmn_modifier(data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect[i][l], isCapsused)
 
-          if (the_ContextKeyNr !== undefined)
-            console.log("  ### Key Nr", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'], "[ + C3 modifiers]",   "+",this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])),"\t\t ", "(key Code", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'], ") +", "-",this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])), "\t\t(keyCode", the_ContextKeyNr, ")", "  >  ", resultC3,
-            )
-
+            if (the_ContextKeyNr !== undefined)
+              console.log(
+                "  ### Key Nr",
+                jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
+                "[ + C3 modifiers->", i, modifier_C3.padEnd(25, " "), "] ",
+                this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])).padEnd(8, " "),
+                "\t ",
+                "(key Code", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
+                ") + ",
+                this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])),
+                "\t\t(keyCode",
+                the_ContextKeyNr,
+                ")",
+                ">  ",
+                resultC3,
+              )
+          }
           // ......................................................................................................
           // case C4: action + state none + Next ............................................................DONE .
           // ...............e. g. <when state="none" next="4"/> ...................................................
@@ -1531,11 +1588,24 @@ export class KeylayoutToKmnConverter {
 
           const next_id = this.lookup_3_ActionNone__To__ActionNext(jsonObj, action_id)
           const resultC4 = this.lookup_9_TerminatorState__To__TerminatorOutput_str(jsonObj, next_id)
+          for (let l = 0; l < data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect[i].length; l++) {
+            const modifier_C4 = this.create_kmn_modifier(data_ukelele.ArrayOf_Element_ModifierMaps_ALLKeyMapSelect[i][l], isCapsused)
 
-          if (resultC4 !== "")
-            console.log("### Key Nr  ", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
-              "[ + C4 modifiers]", "+ ", this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code']))," \t\t","(key Code", jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'], ")   >  ", resultC4, "[", action_id, next_id, "]")
+            if (resultC4 !== "")
+              console.log(
+                "### Key Nr  ",
+                jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'],
+                "[ + C4 modifiers->", i, modifier_C4.padEnd(25, " "), "] ",
+                this.map_UkeleleKC_To_VK(Number(jsonObj.keyboard.keyMapSet[0].keyMap[i].key[j]['@_code'])).padEnd(8, " "),
+                ">  ",
+                resultC4,
+                "   [",
+                action_id,
+                next_id,
+                "]")
+          }
         }
+
         else
           console.log("ERROR : some entries are not available")
       }
@@ -1550,7 +1620,7 @@ export class KeylayoutToKmnConverter {
       }
     }
    }*/
- // public lookup_2_KeyMapAction__To__ActionAction() { }
+  // public lookup_2_KeyMapAction__To__ActionAction() { }
   public lookup_3_ActionNone__To__ActionNext(data: any, search: string): string {
     for (let jj = 0; jj < data.keyboard.actions.action.length; jj++) {
       if (data.keyboard.actions.action[jj]['@_id'] === search) {
@@ -1973,6 +2043,8 @@ export class KeylayoutToKmnConverter {
     // opt?+ LOPT?+ ROPT? -> what will be result??
 
     for (let i = 0; i < modifier_state.length; i++) {
+      /*if (String(modifier_state[i]) === "Command")
+        continue*/
 
       if (isCAPSused && (String(keylayout_modifier).indexOf("caps") === -1))
         kmn_ncaps = " NCAPS "
@@ -2018,6 +2090,18 @@ export class KeylayoutToKmnConverter {
     return unique_Modifier.join(" ").replace(/\s+/g, " ").trim().toUpperCase()
   }
 
+  public checkIfCapsUsed(keylayout_modifier: string[][]): boolean {
+    for (let i = 0; i < keylayout_modifier.length; i++) {
+      for (let j = 0; j < keylayout_modifier[i].length; j++) {
+        const modifier_state: string[] = keylayout_modifier[i][j].split(" ");
+        for (let k = 0; k < modifier_state.length; k++) {
+          if ((modifier_state[k].indexOf("caps") !== -1) && (modifier_state[k].indexOf("caps?") === -1))
+            return true
+        }
+      }
+    }
+    return false
+  }
 
   /**
  * @brief  member function to map Ukelele keycodes to a Windows Keycodes
