@@ -37,7 +37,7 @@ endif
 
 # shared with a number of subdirs
 if cpp_compiler.get_id() == 'emscripten'
-  wasm_exported_runtime_methods = '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\',\'stringToNewUTF8\']'
+  wasm_exported_runtime_methods = '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\',\'stringToNewUTF8\',\'wasmExports\']'
 endif
 
 subdir('docs/internal')

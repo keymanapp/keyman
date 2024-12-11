@@ -138,11 +138,14 @@ mock_files = files(
   'mock/mock_processor.cpp',
 )
 
+extra_defns = []
+extra_links = []
 if cpp_compiler.get_id() == 'emscripten'
-  links += [
-    '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\',\'stringToNewUTF8\',\'wasmExports\']',
+  extra_defns += ['-g']
+  extra_links += ['-sSAFE_HEAP=1', wasm_exported_runtime_methods,
     # Forcing inclusion of debug symbols
     '-g', '-Wlimited-postlink-optimizations',
+    '--emit-tsd', 'keymancore.d.ts',
     '-lembind'
   ]
   host_links = [
@@ -163,8 +166,8 @@ lib = library('keymancore',
   mock_files,
   version_res,
   generated_headers,
-  cpp_args: defns + warns + flags,
-  link_args: links,
+  cpp_args: defns + extra_defns + warns + flags,
+  link_args: links + extra_links,
   version: lib_version,
   include_directories: inc,
   pic: true,
@@ -187,9 +190,9 @@ pkg.generate(
 if cpp_compiler.get_id() == 'emscripten'
   # Build an executable
   host = executable('km-core',
-    cpp_args: defns,
+    cpp_args: defns + extra_defns,
     include_directories: inc,
-    link_args: links + host_links,
+    link_args: links + host_links + extra_links,
     objects: lib.extract_all_objects(recursive: false))
 
   if get_option('buildtype') == 'release'
