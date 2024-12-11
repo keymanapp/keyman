@@ -92,13 +92,18 @@ function get_latest_stable_branch_name() {
   echo "${stable_branch##* }"
 }
 
+# Push the changelog changes to GitHub and create a PR. Returns the PR#
+# in the environment variable PR_NUMBER.
 function push_to_github_and_create_pr() {
-  local BRANCH=$1
-  local BASE=$2
-  local PR_TITLE=$3
-  local PR_BODY=$4
+  local BRANCH=$1           # `chore/linux/changelog` or `chore/linux/cherry-pick/changelog`
+  local BASE=$2             # stable branch, `beta` or `master`
+  local PR_TITLE=$3         # `Update debian changelog`
+  local PR_BODY=$4          # `@keymanapp-test-bot skip`
 
   if [[ -n "${PUSH}" ]]; then
+    # Push to origin. We force push to reset the branch the commit we just made.
+    # There shouldn't be any other commits on ${BRANCH} except the one we want to replace
+    # (if any).
     ${NOOP} git push --force origin "${BRANCH}"
     PR_NUMBER=$(gh pr list --draft --search "${PR_TITLE}" --base "${BASE}" --json number --jq '.[].number')
     if [[ -n ${PR_NUMBER} ]]; then
