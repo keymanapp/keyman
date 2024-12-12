@@ -1,5 +1,8 @@
 test_files = [
+  'DbusTestHelper.cpp',
+  'EventSource.cpp',
   'ibusimcontext.c',
+  'KeyHandling.cpp',
   'testfixture.cpp',
   'testmodule.c',
   '../src/KeymanSystemServiceClient.cpp',
@@ -34,24 +37,7 @@ test_exe = executable(
   include_directories: test_include_dirs,
 )
 
-system_service_dir = meson.current_source_dir() / '../../keyman-system-service/build' / build_machine.cpu_family() / get_option('buildtype') / 'tests/services'
-
-dbus_test_server = executable(
-  'km-dbus-test-server',
-  'KmDbusTestServer.cpp',
-  dependencies: dbus_deps,
-  include_directories: ['..'],
-  cpp_args: [
-  '-DKEYMAN_TEST_SERVICE_PATH="' + system_service_dir + '"'
- ]
-)
-
-stop_test_server = executable(
-  'stop-test-server',
-  'StopTestServer.cpp',
-  dependencies: dbus_deps,
-  include_directories: ['..'],
-)
+subdir('dbus-test-server')
 
 env_file = '/tmp/env.txt'
 cleanup_file = '/tmp/ibus-keyman-test-pids'

@@ -140,12 +140,12 @@ function _setup_test_dbus_server() {
   CLEANUP_FILE=$2
 
   # Start test dbus server. This will create `/tmp/km-test-server.env`.
-  "${TOP_BINDIR}/tests/km-dbus-test-server" &> /tmp/km-test-server.log &
+  "${TOP_BINDIR}/tests/dbus-test-server/km-dbus-test-server" &> /tmp/km-test-server.log &
   sleep 1
 
   cat /tmp/km-test-server.env >> "$ENV_FILE"
   cat /tmp/km-test-server.env >> "$CLEANUP_FILE"
-  echo "${TOP_BINDIR}/tests/stop-test-server" >> "$CLEANUP_FILE"
+  echo "${TOP_BINDIR}/tests/dbus-test-server/stop-test-server" >> "$CLEANUP_FILE"
 
   source /tmp/km-test-server.env
   echo "# DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS"
