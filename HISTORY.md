@@ -1,5 +1,10 @@
 # Keyman Version History
 
+## 18.0.159 alpha 2024-12-13
+
+* chore(core): remove meson warnings for wasm builds (#12827)
+* chore(linux): Update debian changelog (#12023)
+
 ## 18.0.158 alpha 2024-12-11
 
 * fix(linux): pushing of updated changelog branch (#12818)
