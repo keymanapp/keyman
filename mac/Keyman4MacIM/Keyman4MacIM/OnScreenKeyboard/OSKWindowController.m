@@ -123,42 +123,6 @@
  */
 - (void)timerAction:(NSTimer *)timer {
   UInt32 modifiers = GetCurrentKeyModifiers();
-  if ((modifiers & shiftKey) == shiftKey) {
-    [self.oskView setPhysicalShiftState:YES];
-    self.previousShiftState = YES;
-  }
-  else {
-    [self.oskView setPhysicalShiftState:NO];
-    if (self.previousShiftState)
-      [self.oskView setOskShiftState:NO];
-    self.previousShiftState = NO;
-  }
-  if ((modifiers & optionKey) == optionKey) {
-    [self.oskView setPhysicalOptionState:YES];
-    self.previousOptionState = YES;
-  }
-  else {
-    [self.oskView setPhysicalOptionState:NO];
-    if (self.previousOptionState)
-      [self.oskView setOskOptionState:NO];
-    self.previousOptionState = NO;
-  }
-  
-  if ((modifiers & controlKey) == controlKey) {
-    [self.oskView setPhysicalControlState:YES];
-    self.previousControlState = YES;
-  }
-  else {
-    [self.oskView setPhysicalControlState:NO];
-    if (self.previousControlState)
-      [self.oskView setOskControlState:NO];
-    self.previousControlState = NO;
-  }
-}
-
-/*
-- (void)trackPhysicalModifierKeyState:(NSTimer *)timer {
-  UInt32 modifiers = GetCurrentKeyModifiers();
   
   [self trackPhysicalShiftKeyState: modifiers];
   [self trackPhysicalOptionKeyState: modifiers];
@@ -206,7 +170,6 @@
     self.previousControlState = NO;
   }
 }
-*/
 
 - (BOOL)hasHelpDocumentation {
   NSString *kvkPath = [self AppDelegate].kvk.filePath;
