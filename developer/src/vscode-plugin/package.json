@@ -1,5 +1,6 @@
 {
-  "name": "@keymanapp/keyman-developer-vscode",
+  "name": "keyman-developer-vscode",
+  "version": "18.0.0-PREALPHA",
   "displayName": "Keyman Developer for VSCode",
   "description": "Plugin for compiling Keyman projects in VSCode",
   "engines": {
@@ -17,13 +18,14 @@
   "contributes": {
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
+    "vscode:prepublish": "npm run compile && cp ../../../LICENSE.md .",
     "compile": "tsc -b ./",
     "watch": "tsc -watch -b ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
     "test": "echo use 'ui-test' to run the test - TODO-LDML-EDITOR",
-    "ui-test": "vscode-test"
+    "ui-test": "vscode-test",
+    "vscode:package": "npx '@vscode/vsce' package"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.0",
@@ -39,5 +41,6 @@
     "@keymanapp/kmc-kmn": "*",
     "@keymanapp/kmc-ldml": "*",
     "@keymanapp/kmc-package": "*"
-  }
+  },
+  "private": "true"
 }

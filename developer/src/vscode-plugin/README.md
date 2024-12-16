@@ -26,6 +26,12 @@ There is also a `build.sh` which works the usual way.
 
 - You can use the **Developer: Reload Window** command to reload the `[extension development]` window with a new version of the plugin.
 
+## Packaging .vsix
+
+- `npm run vscode:package`
+
+(Doesn't work yet.)
+
 ## License
 
 Copyright (c) SIL Global.
