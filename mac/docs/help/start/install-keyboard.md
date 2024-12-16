@@ -8,7 +8,7 @@ You must have a Keyman keyboard installed to type with Keyman for macOS in your 
 
 Here's how to download and install a Keyman keyboard within Keyman for macOS:
 
-[![](../mac_images/video.png) Watch Video](https://youtu.be/VirHygx8iqg) for installing the Khmer Angkor keyboard for Keyman for macOS:
+![](../mac_images/video.png) Watch this video for installing the Khmer Angkor keyboard for Keyman for macOS (0:51)
 
 :<img class="video-thumbnail" data-video="https://www.youtube.com/embed/VirHygx8iqg" src="https://img.youtube.com/vi/VirHygx8iqg/maxresdefault.jpg" width="600px" alt="Tutorial: Install Khmer Angkor Keyboard on Keyman for macOS">
 
