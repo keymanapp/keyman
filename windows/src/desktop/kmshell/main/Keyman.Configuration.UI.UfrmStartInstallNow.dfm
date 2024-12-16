@@ -1,9 +1,11 @@
 object frmStartInstallNow: TfrmStartInstallNow
   Left = 0
   Top = 0
+  BorderIcons = [biSystemMenu]
+  BorderStyle = bsDialog
   Caption = 'Keyman Update'
-  ClientHeight = 225
-  ClientWidth = 425
+  ClientHeight = 164
+  ClientWidth = 354
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -11,14 +13,15 @@ object frmStartInstallNow: TfrmStartInstallNow
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  Position = poScreenCenter
   PixelsPerInch = 96
   TextHeight = 13
   object lblUpdateMessage: TLabel
-    Left = 56
-    Top = 88
-    Width = 274
-    Height = 19
-    Caption = 'Keyman and Windows will be restarted'
+    Left = 32
+    Top = 48
+    Width = 290
+    Height = 41
+    Caption = 'Your computer will be restarted if you update now.'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -16
@@ -27,31 +30,18 @@ object frmStartInstallNow: TfrmStartInstallNow
     ParentFont = False
     WordWrap = True
   end
-  object lblUpdateNow: TLabel
-    Left = 56
-    Top = 40
-    Width = 115
-    Height = 25
-    Caption = 'Update Now'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -21
-    Font.Name = 'Tahoma'
-    Font.Style = []
-    ParentFont = False
-  end
   object cmdInstall: TButton
-    Left = 228
-    Top = 184
+    Left = 147
+    Top = 120
     Width = 75
     Height = 25
-    Caption = 'Update'
+    Caption = 'Update now'
     ModalResult = 1
     TabOrder = 0
   end
   object cmdLater: TButton
-    Left = 336
-    Top = 184
+    Left = 247
+    Top = 120
     Width = 75
     Height = 25
     Caption = 'Close'

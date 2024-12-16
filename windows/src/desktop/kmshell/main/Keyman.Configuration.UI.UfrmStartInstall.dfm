@@ -1,9 +1,11 @@
 object frmStartInstall: TfrmStartInstall
   Left = 0
   Top = 0
+  BorderIcons = [biSystemMenu]
+  BorderStyle = bsDialog
   Caption = 'Keyman Update'
-  ClientHeight = 225
-  ClientWidth = 425
+  ClientHeight = 142
+  ClientWidth = 322
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -11,14 +13,15 @@ object frmStartInstall: TfrmStartInstall
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  Position = poScreenCenter
   PixelsPerInch = 96
   TextHeight = 13
   object lblInstallUpdate: TLabel
-    Left = 128
-    Top = 96
-    Width = 175
+    Left = 72
+    Top = 48
+    Width = 180
     Height = 19
-    Caption = 'Keyman update available'
+    Caption = 'Keyman update available.'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -16
@@ -27,8 +30,8 @@ object frmStartInstall: TfrmStartInstall
     ParentFont = False
   end
   object cmdInstall: TButton
-    Left = 228
-    Top = 184
+    Left = 140
+    Top = 104
     Width = 75
     Height = 25
     Caption = 'Install'
@@ -36,8 +39,8 @@ object frmStartInstall: TfrmStartInstall
     TabOrder = 0
   end
   object cmdLater: TButton
-    Left = 336
-    Top = 184
+    Left = 234
+    Top = 104
     Width = 75
     Height = 25
     Caption = 'Close'
