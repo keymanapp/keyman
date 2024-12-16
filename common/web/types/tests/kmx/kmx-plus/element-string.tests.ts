@@ -8,7 +8,7 @@
 
 import 'mocha';
 import { assert } from 'chai';
-import { ElemElementFlags, ElemElement } from '../../../src/kmx/kmx-plus/element-string.js';
+import { ElemElementFlags, ElemElement, ElementString } from '../../../src/kmx/kmx-plus/element-string.js';
 import { StrsItem, UsetItem } from '../../../src/kmx/kmx-plus/kmx-plus.js';
 import { UnicodeSet } from '../../../src/ldml-keyboard/unicodeset-parser-api.js';
 
@@ -56,6 +56,14 @@ describe('Test of ElementString', () => {
         const one = initElemElement(GOTHIC_A, GOTHIC_SET);
         const two = initElemElement(GOTHIC_A, UGARITIC_SET);
         assert.isTrue(one.isEqual(two));
+      });
+    });
+  });
+  describe('Test of ElementString', () => {
+    describe('Test of fromStrings()', () => {
+      it('returns an empty El;ementString if source is null', () => {
+        const es = ElementString.fromStrings({}, null);
+        assert.deepEqual(es, new ElementString());
       });
     });
   });
