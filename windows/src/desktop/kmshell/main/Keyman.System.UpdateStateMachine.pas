@@ -75,8 +75,6 @@ type
     procedure HandleMSIInstallComplete;
 
     function SetRegistryState(Update: TUpdateState): Boolean;
-    //function SetIncRegistryCount: Boolean;
-    //function ClearRegistryCount: Boolean;
     function GetAutomaticUpdates: Boolean;
     function SetApplyNow(Value: Boolean): Boolean;
     function GetApplyNow: Boolean;
@@ -751,9 +749,6 @@ begin
     // Failed three times in this process return to the
     // IdleState to wait 7 days before trying again
     ChangeState(IdleState);
-    // TODO: Future could go to a RetryState which serialized the a retry count
-    // to disk. Then it could try launch the download again on the next
-    // kmshell start event.
   end
   else
   begin
