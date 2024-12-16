@@ -13,9 +13,15 @@ import { StrsItem, UsetItem } from '../../../src/kmx/kmx-plus/kmx-plus.js';
 import { UnicodeSet } from '../../../src/ldml-keyboard/unicodeset-parser-api.js';
 
 const GOTHIC_A = new StrsItem("𐌰", 0x10330);
-const GOTHIC_A_SET = new UsetItem(
+const GOTHIC_B = new StrsItem("𐌱", 0x10331);
+const UGARITIC_A = new StrsItem("𐎀", 0x10380);
+const GOTHIC_SET = new UsetItem(
   new UnicodeSet("[𐌰-𐍊]", [[0x10330,0x1034A]]),
   GOTHIC_A
+);
+const UGARITIC_SET = new UsetItem(
+  new UnicodeSet("[𐎀-𐎟]", [[0x10380,0x1039F]]),
+  UGARITIC_A
 );
 
 describe('Test of ElementString', () => {
@@ -26,13 +32,38 @@ describe('Test of ElementString', () => {
         const two = initElemElement()
         assert.isTrue(one.isEqual(two));
       });
+      it('returns false when value differs', () => {
+        const one = initElemElement(GOTHIC_A);
+        const two = initElemElement(GOTHIC_B);
+        assert.isFalse(one.isEqual(two));
+      });
+      it('returns false when order differs', () => {
+        const one = initElemElement(GOTHIC_A, GOTHIC_SET, 0);
+        const two = initElemElement(GOTHIC_A, GOTHIC_SET, 1);
+        assert.isFalse(one.isEqual(two));
+      });
+      it('returns false when tertiary differs', () => {
+        const one = initElemElement(GOTHIC_A, GOTHIC_SET, 0, 1);
+        const two = initElemElement(GOTHIC_A, GOTHIC_SET, 0, 2);
+        assert.isFalse(one.isEqual(two));
+      });
+      it('returns false when flags differs', () => {
+        const one = initElemElement(GOTHIC_A, GOTHIC_SET, 0, 1, ElemElementFlags.none);
+        const two = initElemElement(GOTHIC_A, GOTHIC_SET, 0, 1, ElemElementFlags.type);
+        assert.isFalse(one.isEqual(two));
+      });
+      it('returns true even though uset differs', () => {
+        const one = initElemElement(GOTHIC_A, GOTHIC_SET);
+        const two = initElemElement(GOTHIC_A, UGARITIC_SET);
+        assert.isTrue(one.isEqual(two));
+      });
     });
   });
 });
 
 function initElemElement(
   value: StrsItem = GOTHIC_A,
-  uset: UsetItem = GOTHIC_A_SET,
+  uset: UsetItem = GOTHIC_SET,
   order: number = 0,
   tertiary: number = 1,
   flags: ElemElementFlags = ElemElementFlags.none,
