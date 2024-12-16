@@ -59,6 +59,22 @@ The following parameters are available:
 
 : Rewrites On Screen Keyboard files from source mapping
 
+`kmc generate keyman-keyboard [options] <id>`
+
+: Generate a .kmn keyboard project
+
+`kmc generate ldml-keyboard [options] <id>`
+
+: Generate an LDML .xml keyboard project
+
+`kmc generate lexical-model [options] <id>`
+
+: Generate a wordlist lexical model project
+
+`kmc copy origin -o target`
+
+: Copy and rename a keyboard project
+
 `kmc message [message...]`
 
 : Describes one or more compiler messages in greater detail
@@ -280,6 +296,14 @@ Note: paths shown above may vary.
 
 : Result file to write to (.json, .md, or .txt)
 
+`-i, --input-mapping-file <filename>`
+
+: Merge result file with existing mapping file. If supplied, existing
+  codepoint mappings will be kept, to ensure that updated fonts are
+  backwardly compatible with deployed keyboards. The
+  `--include-counts` flag will be set according to the format of
+  the input mapping file.
+
 For more information on the purpose of `analyze osk-char-use` and
 `analyze rewrite-osk-from-char-use`, see
 [`&displayMap`](/developer/language/reference/displaymap).
@@ -293,6 +317,235 @@ For more information on the purpose of `analyze osk-char-use` and
 For more information on the purpose of `analyze osk-char-use` and
 `analyze rewrite-osk-from-char-use`, see
 [`&displayMap`](/developer/language/reference/displaymap).
+
+## `kmc generate keyman-keyboard` options
+
+Generates a new keyboard project with .kmn format keyboard. An ID must be
+specified for the output of the project, and an output folder (`-o`). A new
+folder with the keyboard ID as its name will be created under the output folder,
+and the files in that folder will follow the
+[standard file layout](../../file-layout).
+
+`-t, --target <target>`
+
+: Target platforms for the project. Use the values from
+  [`&targets`](/developer/language/reference/targets). Multiple targets may be
+  specified, each prefixed with `-t`, or space-separated, surrounded by
+  quotation marks (e.g. `-t windows -t linux` or `-t "windows linux"`) (default:
+  `any`)
+
+`-o, --out-path <path>`
+
+: Specifies the parent folder for the project; the folder may already exist. The
+  project will be generated in a new folder named with the ID of the project
+  under this path, and that project folder must not exist.
+
+`-n, --name <name>`
+
+: Keyboard descriptive name, used in the
+  [`&name` store](/developer/language/reference/name) (default: the ID of the
+  project)
+
+`-c, --copyright <copyright-name>`
+
+: [`&copyright`](/developer/language/reference/copyright) holder for the
+  project. Do not include the '(C)' or '&copy;' prefixes (default: the author
+  of the keyboard)
+
+`-v, --version <version-string>`
+
+: [`&version`](/developer/language/reference/version) of the keyboard, (default:
+  "1.0").
+
+`-L, --language-tag <bcp-47 tag>`
+
+: A BCP-47 language tag with which the keyboard is associated. More than one
+  tag may be specified, with each tag prefixed with `-L` (default: no languages).
+  The tags are referenced in the package metadata.
+
+`-a, --author <author-name>`
+
+: The name of keyboard author (default: blank)
+
+`-i, --icon`
+
+: Include a generated icon. The icon will be a 16x16 pixel box with the first
+  letters of the first language tag (default: true, include an icon)
+
+`-d, --description <description>`
+
+: A short description of the project, in Markdown. (default: keyboard name)
+
+## `kmc generate ldml-keyboard` options
+
+Generates a new keyboard project with LDML .xml format keyboard. An ID must be
+specified for the output of the project, and an output folder (`-o`). A new
+folder with the keyboard ID as its name will be created under the output folder,
+and the files in that folder will follow the
+[standard file layout](../../file-layout).
+
+`-t, --target <target>`
+
+: Target platforms for the project. Use the values from
+  [`&targets`](/developer/language/reference/targets). Multiple targets may be
+  specified, each prefixed with `-t`, or space-separated, surrounded by
+  quotation marks (e.g. `-t windows -t linux` or `-t "windows linux"`) (default:
+  `any`)
+
+`-o, --out-path <path>`
+
+: Specifies the parent folder for the project; the folder may already exist. The
+  project will be generated in a new folder named with the ID of the project
+  under this path, and that project folder must not exist.
+
+`-n, --name <name>`
+
+: Keyboard descriptive name, referenced in the keyboard `<info name` attribute
+  (default: the ID of the project). Do not include generic terms such as
+  'keyboard', 'unicode', or a version number in the name.
+
+`-c, --copyright <copyright-name>`
+
+: Copyright holder for the project. Do not include the '(C)' or '&copy;'
+  prefixes (default: the author of the keyboard)
+
+`-v, --version <version-string>`
+
+: Version of the keyboard, referenced in the keyboard `<version number`
+  attribute, should be in major.minor.patch format (note: full semantic version
+  is not currently supported in Keyman) (defaults to "1.0.0")
+
+`-L, --language-tag <bcp-47 tag>`
+
+: A BCP-47 language tag with which the keyboard is associated. More than one
+  tag may be specified, with each tag prefixed with `-L` (default: no languages).
+  The first tag is referenced in the keyboard `<keyboard3 locale` attribute,
+  with subsequent tags referenced in `<locale id` attributes. The tags are
+  also referenced in the package metadata.
+
+`-a, --author <author-name>`
+
+: The name of keyboard author, referenced in `<info author` attribute (default:
+  blank)
+
+`-d, --description <description>`
+
+: A short description of the project, in Markdown. (default: keyboard name)
+
+## `kmc generate lexical-model` options
+
+Generates a new lexical model project with a TSV wordlist. An ID must be
+specified for the output of the project, and an output folder (`-o`). The ID
+must match the [`author.bcp47.uniq`](/developer/lexical-models) naming pattern.
+A new folder with the model ID as its name will be created under the output
+folder, and the files in that folder will follow the
+[standard file layout](../../file-layout).
+
+`-o, --out-path <path>`
+
+: Specifies the parent folder for the project; the folder may already exist. The
+  project will be generated in a new folder named with the ID of the project
+  under this path, and that project folder must not exist.
+
+`-n, --name <name>`
+
+: Lexical model descriptive name, referenced in the package metadata (default:
+  the ID of the project)
+
+`-c, --copyright <copyright-name>`
+
+: Copyright holder for the project. Do not include the '(C)' or '&copy;'
+  prefixes (default: the author of the model)
+
+`-v, --version <version-string>`
+
+: Version of the lexical model, referenced in the package metadata (defaults to
+  "1.0")
+
+`-L, --language-tag <bcp-47 tag>`
+
+: A BCP-47 language tag with which the model is associated. More than one
+  tag may be specified, with each tag prefixed with `-L` (default: no languages).
+  The tags are referenced in the package metadata.
+
+`-a, --author <author-name>`
+
+: The name of model author, referenced in package metadata (default: blank)
+
+`-d, --description <description>`
+
+: A short description of the project, in Markdown. (default: lexical model name)
+
+## `kmc copy` options
+
+Copies a keyboard or lexical model project, renaming files matching the original
+project ID according to the output filename. Can copy projects from the
+following sources:
+
+* A .kpj file, e.g. `./keyboards/khmer_angkor/khmer_angkor.kpj`, or `./sil.km.cnd.kpj`
+* A local folder containing a .kpj file with a matching base name, e.g.
+  `./keyboards/khmer_angkor` (which contains `khmer_angkor.kpj`), or
+  `./models/sil.km.cnd/` (which contains `sil.km.cnd.kpj`)
+* A cloud keyboard, or cloud lexical model, e.g. `cloud:khmer_angkor`. This
+  retrieves the current source from the Keyman Cloud, which is in the GitHub
+  repository keymanapp/keyboards or keymanapp/lexical-models. The project type
+  will be determined by the id pattern -- either a lexical model
+  `author.bcp47.uniq` id pattern, or a keyboard id pattern (where period `.` is
+  not permitted)
+* A GitHub repository or subfolder within a repository that matches the Keyman
+  keyboard/model repository layout. For example,
+  `https://github.com/keyman-keyboards/khmer_angkor/tree/main/khmer_angkor.kpj`
+
+`-o, --out-path <filename>`
+
+: The target folder to write the copied project. The folder must not exist.
+  The folder basename will become the ID of the new project, so the .kpj,
+  .kps, .kmn and similar files will be renamed to match that ID.
+
+`-n, --dry-run`
+
+: Show what would happen, without making changes
+
+### File copying, renaming, and structure rules
+
+The **origin** project folder is the one that contains the .kpj file.  When a
+project is copied, referenced files are reorganized into the
+[recommended Keyman project folder structure](../../file-layout). (Note the
+difference between **origin** and `/source`: `/source` is a normal subfolder
+in the recommended Keyman project folder structure).
+
+The destination project is called the **target**.
+
+* The **id** of the project and files can be updated during the copy. The
+  **origin id** is the basename of the **origin** project file. The
+  **target id** is supplied as the `-o` parameter, and becomes both the name of
+  the output folder, and its basename becomes the basename of the **target**
+  project. If other files use the same basename, they will also be updated.
+* All source-type files explicitly referenced in **origin** .kpj will be copied
+  to **target** `/source`, and references will be updated if the filename
+  changes. These are the source-type files:
+  * .kmn keyboard source
+  * .xml LDML keyboard source
+  * .kps package source
+  * .model.ts model source
+* Files referenced by source-type files will be copied to **target** folder
+  structure, if they are also in the **origin** project folder. If the files are
+  outside the **origin** folder, then relative references will be updated.
+* File references in .html and other files are not tracked.
+* For version 1.0 projects, only files explicitly referenced in the project or
+  the source-type files are copied.
+* For version 2.0 projects, all other files in the **origin** folder and
+  subfolders will also be copied to **target**, in the same relative location as
+  they were found in the **origin**. Files which have a **origin id** basename
+  will also be renamed to use the **target id** basename (be aware that this
+  could break untracked references).
+* If a referenced file does not exist, for example the compiled files referenced
+  in a .kps file may not be present, the references will still be updated
+  following the rules above.
+* Unreferenced files in the **origin** project's `build/` folder will not be
+  copied.
+* .kpj.user files will not be copied.
+* .kpj options will be updated to use fixed `source/` and `build/` folders.
 
 ## `kmc message` options
 

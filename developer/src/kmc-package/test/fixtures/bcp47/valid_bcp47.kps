@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>10.0.700.0</KeymanDeveloperVersion>
+    <FileVersion>7.0</FileVersion>
+  </System>
+  <Options>
+    <ExecuteProgram></ExecuteProgram>
+    <MSIFileName></MSIFileName>
+    <MSIOptions></MSIOptions>
+  </Options>
+  <StartMenu>
+    <Folder></Folder>
+    <Items/>
+  </StartMenu>
+  <Info>
+    <Version URL="">1.0</Version>
+    <Name URL="">valid_bcp47</Name>
+  </Info>
+  <Files>
+    <File>
+      <Name>test.kmx</Name>
+    </File>
+  </Files>
+  <Keyboards>
+    <Keyboard>
+      <Name>Valid BCP 47</Name>
+      <ID>test</ID>
+      <Version>1.0</Version>
+      <Languages>
+        <Language ID="km">Central Khmer (Khmer, Cambodia)</Language>
+        <Language ID="str-x-sencoten">SENCOTEN</Language>
+        <Language ID="str-sencoten">Unregistered variant of Straits Salish</Language>
+        <Language ID="km-Khmr-KM-x-boran">Private variant of "Old" Khmer</Language>
+      </Languages>
+    </Keyboard>
+  </Keyboards>
+  <Strings/>
+</Package>

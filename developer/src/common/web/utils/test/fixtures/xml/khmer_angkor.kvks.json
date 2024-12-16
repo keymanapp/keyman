@@ -1,17 +1,17 @@
 {
  "visualkeyboard": {
-  "_": "\n  \n  \n",
+
   "header": {
-   "_": "\n    \n    \n    \n  ",
+
    "version": "10.0",
    "kbdname": "khmer_angkor",
    "flags": {
-    "_": "\n      \n    ",
+
     "usealtgr": ""
    }
   },
   "encoding": {
-   "_": "\n    \n    \n    \n    \n  ",
+
    "$": {
     "name": "unicode",
     "fontname": "Khmer Busra Kbd",
@@ -19,7 +19,7 @@
    },
    "layer": [
     {
-     "_": "\n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n    ",
+
      "$": {
       "shift": "RA"
      },
@@ -315,7 +315,7 @@
      ]
     },
     {
-     "_": "\n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n    ",
+
      "$": {
       "shift": "SRA"
      },
@@ -575,7 +575,7 @@
      ]
     },
     {
-     "_": "\n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n    ",
+
      "$": {
       "shift": ""
      },
@@ -871,13 +871,12 @@
      ]
     },
     {
-     "_": "\n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n      \n    ",
+
      "$": {
       "shift": "S"
      },
      "key": [
       {
-       "_": "",
        "$": {
         "vkey": "K_SPACE"
        }

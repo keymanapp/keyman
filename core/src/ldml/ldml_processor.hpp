@@ -30,13 +30,8 @@ class ldml_event_state;
 class ldml_processor : public abstract_processor {
   public:
     ldml_processor(
-      path const & kb_path,
+      std::u16string const& kb_name,
       const std::vector<uint8_t> & data
-    );
-
-    static bool is_kmxplus_file(
-      path const & kb_path,
-      std::vector<uint8_t>& data
     );
 
     km_core_status
@@ -86,9 +81,11 @@ class ldml_processor : public abstract_processor {
       return !normalization_disabled;
     }
 
+    static bool is_handled(const std::vector<uint8_t> & buf);
+
   private:
     /** process a key-up */
-    void process_key_up(ldml_event_state &ldml_state) const;
+    void process_key_up(ldml_event_state& ldml_state) const;
 
     /** process a key-down (if it wasn't handled exceptionally) */
     void process_key_down(ldml_event_state &ldml_state) const;

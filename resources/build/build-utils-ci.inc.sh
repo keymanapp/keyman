@@ -8,6 +8,38 @@
 . "$KEYMAN_ROOT/resources/build/jq.inc.sh"
 
 #
+# Returns 0 if current build is running in CI, as a pull request test, or as a
+# mainline branch test, or as a release build
+#
+builder_is_ci_build() {
+  if builder_is_ci_release_build || builder_is_ci_test_build; then
+    return 0
+  fi
+  return 1
+}
+
+#
+# Returns 0 if current build is running as a release build in CI
+#
+builder_is_ci_release_build() {
+  if [[ "$VERSION_ENVIRONMENT" =~ ^alpha|beta|stable$ ]]; then
+    return 0
+  fi
+  return 1
+}
+
+#
+# Returns 0 if current build is running in CI, as a pull request test, or as a
+# mainline branch test
+#
+builder_is_ci_test_build() {
+  if [[ "$VERSION_ENVIRONMENT" == test ]]; then
+    return 0
+  fi
+  return 1
+}
+
+#
 # Returns 0 if current build is in CI and triggered from a pull request. If it
 # returns 0, then a call is made to GitHub to get pull request details, and the
 # PR details are added to $builder_pull_title, $builder_pull_number, and

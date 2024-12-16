@@ -17,15 +17,15 @@ export default {
     new LauncherWrapper(playwrightLauncher({ product: 'firefox' })),
     // Setting it higher makes things faster... but Webkit experiences stability
     // issues for some of the tests if this is set higher than 1.  Notably,
-    // engine.spec.mjs, events.spec.mjs, and text_selection.spec.mjs.  All the
+    // engine.tests.mjs, events.tests.mjs, and text_selection.tests.mjs.  All the
     // text-simulation ones.
     new LauncherWrapper(playwrightLauncher({ product: 'webkit', concurrency: 1}))
   ],
   concurrency: 10,
   nodeResolve: true,
   files: [
-    'build/test/integrated//**/*.spec.mjs',
-    // '**/*.spec.html'
+    'build/test/integrated//**/*.tests.mjs',
+    // '**/*.tests.html'
   ],
   middleware: [
     // Rewrites short-hand paths for test resources, making them fully relative to the repo root.

@@ -31,7 +31,7 @@ debianpackage/
 *.tar.xz
 *.tar.gz
 *.dsc
-help/reference/
+docs/help/reference/
 
 # Cached/auto-compiled Python bytecode
 *.pyc

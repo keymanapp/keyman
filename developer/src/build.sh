@@ -11,6 +11,7 @@ THIS_SCRIPT="$(readlink -f "${BASH_SOURCE[0]}")"
 
 builder_describe \
   "Keyman Developer" \
+  "@/resources/tools/check-markdown  test:help" \
   clean \
   configure \
   build \
@@ -20,8 +21,11 @@ builder_describe \
   "install                      Install built programs locally" \
   ":common                      Developer common files" \
   ":ext                         Third party components" \
+  ":help                        Online documentation" \
   ":kmcmplib                    Compiler - .kmn compiler" \
   ":kmc-analyze                 Compiler - Analysis Tools" \
+  ":kmc-copy                    Compiler - Project Copying and Renaming Tools" \
+  ":kmc-generate                Compiler - Generation Tools" \
   ":kmc-keyboard-info           Compiler - .keyboard_info Module" \
   ":kmc-kmn                     Compiler - .kmn to .kmx and .js Keyboard Module" \
   ":kmc-ldml                    Compiler - LDML Keyboard Module" \
@@ -125,6 +129,7 @@ fi
 #-------------------------------------------------------------------------------------------------------------------
 
 builder_run_child_actions  clean configure build test
+builder_run_action         test:help    check-markdown  "$KEYMAN_ROOT/developer/docs/help"
 
 #-------------------------------------------------------------------------------------------------------------------
 

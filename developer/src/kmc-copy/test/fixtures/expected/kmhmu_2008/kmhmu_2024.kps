@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package>
+  <System>
+    <KeymanDeveloperVersion>10.0.1091.0</KeymanDeveloperVersion>
+    <FileVersion>7.0</FileVersion>
+  </System>
+  <Options>
+    <ExecuteProgram/>
+    <ReadMeFile>readme.htm</ReadMeFile>
+    <MSIFileName/>
+    <MSIOptions/>
+    <FollowKeyboardVersion/>
+    <LicenseFile>../LICENSE.md</LicenseFile>
+  </Options>
+  <StartMenu>
+    <Folder/>
+    <Items/>
+  </StartMenu>
+  <Info>
+    <Version URL=""/>
+    <Name URL="">Kmhmu 2008</Name>
+    <Copyright URL="">© 2008-2018 John Durdin</Copyright>
+    <Description URL="">Lao-script Kmhmu language keyboard</Description>
+  </Info>
+  <Files>
+    <File>
+      <Name>../build/kmhmu_2024.kvk</Name>
+      <Description>File kmhmu_2008.kvk</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kvk</FileType>
+    </File>
+    <File>
+      <Name>../build/kmhmu_2024.kmx</Name>
+      <Description>Keyboard Kmhmu 2008</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.kmx</FileType>
+    </File>
+    <File>
+      <Name>readme.htm</Name>
+      <Description>File readme.htm</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.htm</FileType>
+    </File>
+    <File>
+      <Name>welcome/kmhmu_2008U_.png</Name>
+      <Description>File kmhmu_2008U_.png</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.png</FileType>
+    </File>
+    <File>
+      <Name>welcome/kmhmu_2008U_RA.png</Name>
+      <Description>File kmhmu_2008U_RA.png</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.png</FileType>
+    </File>
+    <File>
+      <Name>welcome/kmhmu_2008U_S.png</Name>
+      <Description>File kmhmu_2008U_S.png</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.png</FileType>
+    </File>
+    <File>
+      <Name>welcome/welcome.htm</Name>
+      <Description>File welcome.htm</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.htm</FileType>
+    </File>
+    <File>
+      <Name>../assets/Kmhmu_MX.TTF</Name>
+      <Description>Font Kmhmu MX</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.TTF</FileType>
+    </File>
+    <File>
+      <Name>../assets/KmhmuMX_README.txt</Name>
+      <Description>File KmhmuMX_README.txt</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.txt</FileType>
+    </File>
+    <File>
+      <Name>../assets/OFL.txt</Name>
+      <Description>File OFL.txt</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.txt</FileType>
+    </File>
+    <File>
+      <Name>../assets/OFL-FAQ.txt</Name>
+      <Description>File OFL-FAQ.txt</Description>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.txt</FileType>
+    </File>
+    <File>
+      <Name>../LICENSE.md</Name>
+      <Description/>
+      <CopyLocation>0</CopyLocation>
+      <FileType>.md</FileType>
+    </File>
+  </Files>
+  <Keyboards>
+    <Keyboard>
+      <Name>Kmhmu 2008</Name>
+      <ID>kmhmu_2024</ID>
+      <Version/>
+      <OSKFont>../assets/Kmhmu_MX.TTF</OSKFont>
+      <DisplayFont>../assets/Kmhmu_MX.TTF</DisplayFont>
+      <Languages>
+        <Language ID="kjg-Laoo">Khmu (Lao)</Language>
+      </Languages>
+    </Keyboard>
+  </Keyboards>
+  <Strings/>
+  <RelatedPackages>
+    <RelatedPackage ID="kmhmu" Relationship="deprecates"/>
+  </RelatedPackages>
+</Package>

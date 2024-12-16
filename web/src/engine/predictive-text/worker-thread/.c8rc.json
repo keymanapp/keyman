@@ -2,7 +2,7 @@
   "check-coverage": false,
   "clean": true,
   "exclude": [
-    "src/test/**",
+    "src/tests/**",
     "node_modules/*"
   ],
   "exclude-after-remap": true,

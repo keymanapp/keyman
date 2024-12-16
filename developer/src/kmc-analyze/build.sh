@@ -25,17 +25,9 @@ builder_parse "$@"
 
 #-------------------------------------------------------------------------------------------------------------------
 
-function do_test() {
-  eslint .
-  # TODO: enable tests
-  #     cd test && tsc --build && cd .. && mocha
-  # TODO: enable c8 (disabled because no coverage at present)
-  #     c8 --reporter=lcov --reporter=text --exclude-after-remap mocha
-}
-
 builder_run_action clean      rm -rf ./build/
 builder_run_action configure  verify_npm_setup
 builder_run_action build      tsc --build
 builder_run_action api        api-extractor run --local --verbose
-builder_run_action test       do_test
+builder_run_action test       builder_do_typescript_tests 70
 builder_run_action publish    builder_publish_npm
