@@ -57,14 +57,9 @@ km_core_keyboard_load_from_blob_wasm(
   std::string kb_name,
   const emscripten::val& blob_val
 ) {
-  std::vector<uint8_t> blob;
+  std::vector<uint8_t> blob = emscripten::convertJSArrayToNumberVector<uint8_t>(blob_val);
   km_core_keyboard* keyboard_ptr = nullptr;
 
-  const auto length = blob_val["length"].as<unsigned>();
-  blob.resize(length);
-
-  emscripten::val memoryView{emscripten::typed_memory_view(length, blob.data())};
-  memoryView.call<void>("set", blob_val);
   km_core_status retVal = ::keyboard_load_from_blob_internal(kb_name.c_str(), blob, &keyboard_ptr);
   return new CoreReturn<km_core_keyboard>(retVal, keyboard_ptr);
 }
