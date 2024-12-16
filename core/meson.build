@@ -38,6 +38,9 @@ endif
 # shared with a number of subdirs
 if cpp_compiler.get_id() == 'emscripten'
   wasm_exported_runtime_methods = '-sEXPORTED_RUNTIME_METHODS=[\'UTF8ToString\',\'stringToNewUTF8\',\'wasmExports\']'
+
+  # For Google Test
+  add_global_arguments('-pthread', language: [ 'cpp', 'c' ] )
 endif
 
 subdir('docs/internal')
