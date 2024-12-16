@@ -9,11 +9,12 @@
 import 'mocha';
 import { assert } from 'chai';
 import { ElemElementFlags, ElemElement, ElementString } from '../../../src/kmx/kmx-plus/element-string.js';
-import { StrsItem, UsetItem } from '../../../src/kmx/kmx-plus/kmx-plus.js';
+import { StrsItem, UsetItem, DependencySections, Strs } from '../../../src/kmx/kmx-plus/kmx-plus.js';
 import { UnicodeSet } from '../../../src/ldml-keyboard/unicodeset-parser-api.js';
 
 const GOTHIC_A = new StrsItem("𐌰", 0x10330);
 const GOTHIC_B = new StrsItem("𐌱", 0x10331);
+const GOTHIC_C = new StrsItem("𐌲", 0x10332);
 const UGARITIC_A = new StrsItem("𐎀", 0x10380);
 const GOTHIC_SET = new UsetItem(
   new UnicodeSet("[𐌰-𐍊]", [[0x10330,0x1034A]]),
@@ -43,13 +44,13 @@ describe('Test of ElementString', () => {
         assert.isFalse(one.isEqual(two));
       });
       it('returns false when tertiary differs', () => {
-        const one = initElemElement(GOTHIC_A, GOTHIC_SET, 0, 1);
-        const two = initElemElement(GOTHIC_A, GOTHIC_SET, 0, 2);
+        const one = initElemElement(GOTHIC_A, GOTHIC_SET, 0, 0);
+        const two = initElemElement(GOTHIC_A, GOTHIC_SET, 0, 1);
         assert.isFalse(one.isEqual(two));
       });
       it('returns false when flags differs', () => {
-        const one = initElemElement(GOTHIC_A, GOTHIC_SET, 0, 1, ElemElementFlags.none);
-        const two = initElemElement(GOTHIC_A, GOTHIC_SET, 0, 1, ElemElementFlags.type);
+        const one = initElemElement(GOTHIC_A, GOTHIC_SET, 0, 0, ElemElementFlags.none);
+        const two = initElemElement(GOTHIC_A, GOTHIC_SET, 0, 0, ElemElementFlags.type);
         assert.isFalse(one.isEqual(two));
       });
       it('returns true even though uset differs', () => {
@@ -61,9 +62,20 @@ describe('Test of ElementString', () => {
   });
   describe('Test of ElementString', () => {
     describe('Test of fromStrings()', () => {
-      it('returns an empty El;ementString if source is null', () => {
+      it('returns an empty ElementString if source is null', () => {
         const es = ElementString.fromStrings({}, null);
         assert.deepEqual(es, new ElementString());
+      });
+      it('can create an ElementString from a string array', () => {
+        const strs: Strs = new Strs();
+        const sections: DependencySections = { strs: strs };
+        const actual = ElementString.fromStrings(sections, ["𐌰", "𐌱", "𐌲"]);
+        const expected = [
+          initElemElement(GOTHIC_A),
+          initElemElement(GOTHIC_B),
+          initElemElement(GOTHIC_C),
+        ];
+        assert.deepEqual(actual, expected);
       });
     });
   });
@@ -71,9 +83,9 @@ describe('Test of ElementString', () => {
 
 function initElemElement(
   value: StrsItem = GOTHIC_A,
-  uset: UsetItem = GOTHIC_SET,
+  uset: UsetItem = undefined,
   order: number = 0,
-  tertiary: number = 1,
+  tertiary: number = 0,
   flags: ElemElementFlags = ElemElementFlags.none,
 ): ElemElement {
   const ee  = new ElemElement();
