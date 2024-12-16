@@ -213,7 +213,7 @@ type
 
   function DoInstallPackages(Params: TUpdateCheckResponse): Boolean;
   function DoInstallPackage(PackageFileName: String): Boolean;
-  procedure CheckInstallPackageElevation;
+  procedure LaunchInstallPackageProcess;
 
   public
     procedure Enter; override;
@@ -728,7 +728,7 @@ begin
   InstallNow := True;
   if HasKeymanRun then
   begin
-    // TODO: UI and non-UI units should be split
+    // TODO: epic-update-windows UI and non-UI units should be split
     // if the unit launches UI then it should be a .UI. unit
     // https://github.com/keymanapp/keyman/pull/12375/files#r1751041747
     frmStartInstallNow := TfrmStartInstallNow.Create(nil);
@@ -746,7 +746,6 @@ begin
   begin
     bucStateContext.SetApplyNow(True);
     ChangeState(DownloadingState);
-    // TODO: Aeroplane bug find this should start download first? "StartDownloadProcess;"
   end;
 
 end;
@@ -948,16 +947,16 @@ begin
 end;
 
 // Installing packages needs to be elevated
-procedure InstallingState.CheckInstallPackageElevation;
+procedure InstallingState.LaunchInstallPackageProcess;
 var
   executeResult: Cardinal;
 begin
   if not kmcom.SystemInfo.IsAdministrator then
   begin
-    KL.Log('InstallingState.CheckInstallPackageElevation not IsAdmin');
+    KL.Log('InstallingState.LaunchInstallPackageProcess not IsAdmin');
     if CanElevate then
     begin
-      KL.Log('InstallingState.CheckInstallPackageElevation CanElevate');
+      KL.Log('InstallingState.LaunchInstallPackageProcess CanElevate');
       executeResult := WaitForElevatedConfiguration(0, '-ikp');
       if (executeResult <> 0) then
       begin
@@ -965,20 +964,20 @@ begin
           (Sentry.Client.SENTRY_LEVEL_ERROR,
           'Executing kmshell process to install keyboard packages failed:"' +
           IntToStr(Ord(executeResult)) + '"');
-        KL.Log('InstallingState.CheckInstallPackageElevation Error elevating');
+        KL.Log('InstallingState.LaunchInstallPackageProcess Error elevating');
         ChangeState(IdleState);
       end;
     end
     else
     begin
-      KL.Log('InstallingState.CheckInstallPackageElevation require user with admin');
-      // TODO: How do we alert the user that package requires a user with admin rights
+      KL.Log('InstallingState.LaunchInstallPackageProcess require user with admin');
+      // TODO: epic-windows-updates How do we alert the user that package requires a user with admin rights
       // ShowMessage('Some of these updates require an Administrator to complete installation.  Please login as an Administrator and re-run the update.');
     end;
   end
   else
   begin
-    KL.Log('InstallingState.CheckInstallPackageElevation HandlePackages straight away');
+    KL.Log('InstallingState.LaunchInstallPackageProcess HandlePackages straight away');
     HandleInstallPackages; // we can install packages straight away
   end;
 end;
@@ -1091,7 +1090,7 @@ begin
   if hasPackages then
   begin
     KL.Log('InstallingState.Enter hasPackages');
-    CheckInstallPackageElevation;
+    LaunchInstallPackageProcess;
     Exit;
   end;
   // only reach here if no has packages otherwise it will
@@ -1149,8 +1148,6 @@ begin
     DoInstallKeyman;
     Exit;
   end;
-  // TODO: epic-update-windows
-  // Check if there are also packages to install if so
   if (TUpdateCheckStorage.LoadUpdateCacheData(ucr)) then
   begin
     KL.Log('InstallingState.HandleInstallPackages about to call do install packages');
@@ -1162,16 +1159,7 @@ end;
 
 procedure InstallingState.HandleFirstRun;
 begin
-
   bucStateContext.HandleMSIInstallComplete;
-  // TODO: epic-windows-updates
-  // clean up MSI install files only, don't change state to idle
-  // if packages to install and keyman hasn't started
-  // goto packages ready to install
-  // then kmShellContinue
-
-
-  //Result := kmShellContinue;
 end;
 
 // Private Functions:
