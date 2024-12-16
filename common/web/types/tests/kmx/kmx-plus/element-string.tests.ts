@@ -96,6 +96,60 @@ describe('Test of ElementString', () => {
       ];
       assert.deepEqual(actual, expected);
     });
+    it('can apply order string', () => {
+      const actual = ElementString.fromStrings(
+        { strs: new Strs() },
+        "𐌰𐌱𐌲",
+        "1 2 3",
+      );
+      const expected = [
+        initElemElement(GOTHIC_A, undefined, 1),
+        initElemElement(GOTHIC_B, undefined, 2),
+        initElemElement(GOTHIC_C, undefined, 3),
+      ];
+      assert.deepEqual(actual, expected);
+    });
+    it('can apply single order to all', () => {
+      const actual = ElementString.fromStrings(
+        { strs: new Strs() },
+        "𐌰𐌱𐌲",
+        "1",
+      );
+      const expected = [
+        initElemElement(GOTHIC_A, undefined, 1),
+        initElemElement(GOTHIC_B, undefined, 1),
+        initElemElement(GOTHIC_C, undefined, 1),
+      ];
+      assert.deepEqual(actual, expected);
+    });
+    it('can apply tertiary string', () => {
+      const actual = ElementString.fromStrings(
+        { strs: new Strs() },
+        "𐌰𐌱𐌲",
+        null,
+        "1 2 3",
+      );
+      const expected = [
+        initElemElement(GOTHIC_A, undefined, 0, 1),
+        initElemElement(GOTHIC_B, undefined, 0, 2),
+        initElemElement(GOTHIC_C, undefined, 0, 3),
+      ];
+      assert.deepEqual(actual, expected);
+    });
+    it('can apply single tertiary to all', () => {
+      const actual = ElementString.fromStrings(
+        { strs: new Strs() },
+        "𐌰𐌱𐌲",
+        null,
+        "1",
+      );
+      const expected = [
+        initElemElement(GOTHIC_A, undefined, 0, 1),
+        initElemElement(GOTHIC_B, undefined, 0, 1),
+        initElemElement(GOTHIC_C, undefined, 0, 1),
+      ];
+      assert.deepEqual(actual, expected);
+    });
   });
 });
 
