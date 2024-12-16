@@ -95,6 +95,9 @@ public enum Defaults {
   public static let lexicalModel: InstallableLexicalModel = {
     return lexicalModelPackage.findResource(withID: lexicalModelID)!
   }()
+  
+  // default for ancient/unrecognized devices
+  static let unknownDeviceKeyboardHeight: CGFloat = 216.0
 }
 
 public enum Resources {

@@ -704,7 +704,7 @@ extension KeymanWebViewController {
   func determineDefaultKeyboardHeight(isPortrait: Bool) -> CGFloat {
     os_log("determineDefaultKeyboardHeight", log:KeymanEngineLogger.ui, type: .info)
 
-    let keyboardHeight = KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: isPortrait)?.keyboardHeight ?? 216 // default for ancient devices
+    let keyboardHeight = KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: isPortrait)?.keyboardHeight ?? Defaults.unknownDeviceKeyboardHeight
 
     return keyboardHeight;
   }

@@ -67,12 +67,12 @@ class KeyboardHeightViewController: UIViewController {
   }
   
   private func determineDefaultKeyboardHeights() {
-    // if no KeyboardScaleMap found for device, then default to 216.0
+    // if no KeyboardScaleMap found for device, then default to Defaults.defaultUnknownKeyboardHeight
     let portraitKeyboardScale = KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: true)
-    self.defaultPortraitHeight = Double(portraitKeyboardScale?.keyboardHeight ?? 216.0)
+    self.defaultPortraitHeight = Double(portraitKeyboardScale?.keyboardHeight ?? Defaults.unknownDeviceKeyboardHeight)
 
     let landscapeKeyboardScale = KeyboardScaleMap.getDeviceDefaultKeyboardScale(forPortrait: false)
-    self.defaultLandscapeHeight = Double(landscapeKeyboardScale?.keyboardHeight ?? 216.0)
+    self.defaultLandscapeHeight = Double(landscapeKeyboardScale?.keyboardHeight ?? Defaults.unknownDeviceKeyboardHeight)
   }
   
   /**
