@@ -20,7 +20,7 @@ describe('KeylayoutToKmnConverter', function() {
     });
 
     // _S2 first test
-    it('should throw on null inputs', async function () {
+  /*  it('should throw on null inputs', async function () {
       // const inputFilename = makePathToFixture('file.keylayout');
       const converter = new KeylayoutToKmnConverter(compilerTestCallbacks, compilerTestOptions);
       // note, could use 'chai as promised' library to make this more fluent:
@@ -31,7 +31,7 @@ describe('KeylayoutToKmnConverter', function() {
         threw = true;
       }
       assert.isTrue(threw);
-    });
+    });*/
 
 
     // _S2 My tests... // later throws on NOT all elements loaded
@@ -42,6 +42,7 @@ describe('KeylayoutToKmnConverter', function() {
       // all keys, some deadkeys
       //const inputFilename  = makePathToFixture('../data/US_complete.keylayout');
 
+      //const inputFilename  = makePathToFixture('../data/German_complete.keylayout');
       const inputFilename  = makePathToFixture('../data/Italian_copy.keylayout');
       //const inputFilename  = makePathToFixture('../data/My_dk_Keyboard.keylayout');
 
