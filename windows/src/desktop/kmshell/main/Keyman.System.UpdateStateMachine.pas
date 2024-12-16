@@ -260,7 +260,7 @@ begin
     FreeAndNil(FStateInstance[lpState]);
   end;
 
-  // TODO: #10210 remove debugging comments
+  // TODO: #10210 TODO: epic-windows-update remove debugging comments throughout this Unit.
   // KL.Log('TUpdateStateMachine.Destroy: FErrorMessage = '+FErrorMessage);
   // KL.Log('TUpdateStateMachine.Destroy: FParams.Result = '+IntToStr(Ord(FParams.Result)));
 
