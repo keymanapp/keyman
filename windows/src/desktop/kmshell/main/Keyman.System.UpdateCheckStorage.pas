@@ -21,6 +21,7 @@ implementation
 
 uses
   System.SysUtils,
+  System.RegularExpressions,
 
   KeymanPaths,
   KeymanVersion;
@@ -55,15 +56,15 @@ class function TUpdateCheckStorage.HasKeyboardPackages(const data: TUpdateCheckR
 var
   i : Integer;
   fileName : string;
-  f: TSearchRec;
+  KeyboardRegex: TRegEx;
 begin
   Result := False;
+  KeyboardRegex := TRegEx.Create('\.k..$');
   for i := 0 to High(data.Packages) do
   begin
     fileName := data.Packages[i].FileName;
-    if FindFirst(fileName + '*.k??', 0, f) = 0 then
+    if KeyboardRegex.IsMatch(fileName) then
       Result := True;
-    System.SysUtils.FindClose(f);
   end;
 end;
 

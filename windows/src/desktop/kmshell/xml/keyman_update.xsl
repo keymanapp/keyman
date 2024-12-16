@@ -3,12 +3,6 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <xsl:template name="content_update">
 
-    <script>
-      window['menuframe_activate_update'] = function() {
-        document.getElementById('update_frame').src = '<xsl:value-of select='/Keyman/keyman-com' />/go/windows/<xsl:value-of select="/Keyman/version-info/@versionRelease" />/keep-in-touch?embed=1';
-      }
-    </script>
-
     <div class="header">
       <xsl:call-template name="header_helplinks" />
       <xsl:value-of select="$locale/string[@name='S_Update']"/>

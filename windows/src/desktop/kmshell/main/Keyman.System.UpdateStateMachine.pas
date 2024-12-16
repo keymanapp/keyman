@@ -500,7 +500,7 @@ var
   FileNames: TStringDynArray;
 begin
   SavePath := IncludeTrailingPathDelimiter(TKeymanPaths.KeymanUpdateCachePath);
-
+  KL.Log('ITUpdateStateMachine.HandleMSIInstallComplete');
   GetFileNamesInDirectory(SavePath, FileNames);
   for FileName in FileNames do
   begin
@@ -954,8 +954,10 @@ var
 begin
   if not kmcom.SystemInfo.IsAdministrator then
   begin
+    KL.Log('InstallingState.CheckInstallPackageElevation not IsAdmin');
     if CanElevate then
     begin
+      KL.Log('InstallingState.CheckInstallPackageElevation CanElevate');
       executeResult := WaitForElevatedConfiguration(0, '-ikp');
       if (executeResult <> 0) then
       begin
@@ -963,17 +965,20 @@ begin
           (Sentry.Client.SENTRY_LEVEL_ERROR,
           'Executing kmshell process to install keyboard packages failed:"' +
           IntToStr(Ord(executeResult)) + '"');
-        DoInstallKeyman;
+        KL.Log('InstallingState.CheckInstallPackageElevation Error elevating');
+        ChangeState(IdleState);
       end;
     end
     else
     begin
+      KL.Log('InstallingState.CheckInstallPackageElevation require user with admin');
       // TODO: How do we alert the user that package requires a user with admin rights
       // ShowMessage('Some of these updates require an Administrator to complete installation.  Please login as an Administrator and re-run the update.');
     end;
   end
   else
   begin
+    KL.Log('InstallingState.CheckInstallPackageElevation HandlePackages straight away');
     HandleInstallPackages; // we can install packages straight away
   end;
 end;
@@ -1028,7 +1033,7 @@ var
   FPackage: IKeymanPackageFile2;
 begin
   Result := True;
-
+  KL.Log('InstallingState.DoInstallPackage Entry' + PackageFileName);
   FPackage := kmcom.Packages.GetPackageFromFile(PackageFileName)
     as IKeymanPackageFile2;
   FPackage.Install2(True);
@@ -1037,6 +1042,7 @@ begin
 
   kmcom.Refresh;
   kmcom.Apply;
+  KL.Log('InstallingState.DoInstallPackage about to delete');
   System.SysUtils.DeleteFile(PackageFileName);
 
 end;
@@ -1081,13 +1087,14 @@ begin
     hasPackages := TUpdateCheckStorage.HasKeyboardPackages(ucr);
     hasKeymanInstall := TUpdateCheckStorage.HasKeymanInstallFile(ucr);
   end;
-
+  KL.Log('InstallingState.Enter before hasPackages');
   if hasPackages then
   begin
+    KL.Log('InstallingState.Enter hasPackages');
     CheckInstallPackageElevation;
     Exit;
   end;
-  // only reach here if
+  // only reach here if no has packages otherwise it will
   if hasKeymanInstall then
   begin
     DoInstallKeyman;
@@ -1133,17 +1140,22 @@ procedure InstallingState.HandleInstallPackages;
 var
   ucr: TUpdateCheckResponse;
 begin
+  KL.Log('InstallingState.HandleInstallPackages');
   // This event should only be reached in elevated process if not then
-  // move on to just installing Keyman packages.
+  // move on to just installing Keyman packages
   if not kmcom.SystemInfo.IsAdministrator then
   begin
+    KL.Log('InstallingState.HandleInstallPackages Not Admin');
     DoInstallKeyman;
     Exit;
   end;
   // TODO: epic-update-windows
   // Check if there are also packages to install if so
   if (TUpdateCheckStorage.LoadUpdateCacheData(ucr)) then
+  begin
+    KL.Log('InstallingState.HandleInstallPackages about to call do install packages');
     DoInstallPackages(ucr);
+  end;
 
   DoInstallKeyman;
 end;
