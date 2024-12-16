@@ -9,7 +9,7 @@
 import 'mocha';
 import { assert } from 'chai';
 import { ElemElementFlags, ElemElement, ElementString } from '../../../src/kmx/kmx-plus/element-string.js';
-import { StrsItem, UsetItem, DependencySections, Strs } from '../../../src/kmx/kmx-plus/kmx-plus.js';
+import { StrsItem, UsetItem, Strs } from '../../../src/kmx/kmx-plus/kmx-plus.js';
 import { UnicodeSet } from '../../../src/ldml-keyboard/unicodeset-parser-api.js';
 import { ElementParser, ElementSegment, ElementType } from '../../../src/ldml-keyboard/pattern-parser.js';
 
@@ -78,9 +78,7 @@ describe('Test of ElementString', () => {
         assert.deepEqual(es, new ElementString());
       });
       it('can create an ElementString from a string array', () => {
-        const strs: Strs = new Strs();
-        const sections: DependencySections = { strs: strs };
-        const actual = ElementString.fromStrings(sections, ["𐌰", "𐌱", "𐌲"]);
+        const actual = ElementString.fromStrings({ strs: new Strs() }, ["𐌰", "𐌱", "𐌲"]);
         const expected = [
           initElemElement(GOTHIC_A),
           initElemElement(GOTHIC_B),
@@ -90,9 +88,7 @@ describe('Test of ElementString', () => {
       });
     });
     it('can create an ElementString from a string', () => {
-      const strs: Strs = new Strs();
-      const sections: DependencySections = { strs: strs };
-      const actual = ElementString.fromStrings(sections, "𐌰𐌱𐌲");
+      const actual = ElementString.fromStrings({ strs: new Strs() }, "𐌰𐌱𐌲");
       const expected = [
         initElemElement(GOTHIC_A),
         initElemElement(GOTHIC_B),
