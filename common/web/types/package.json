@@ -76,7 +76,13 @@
       "src/keyman-touch-layout/keyman-touch-layout-file-writer.ts",
       "src/osk/osk.ts",
       "src/schemas/*",
-      "tests/"
+      "tests/",
+      "src/keyboard-object.ts",
+      "src/outputTarget.interface.ts",
+      "src/*.d.ts",
+      "src/main.ts",
+      "src/schema-validators.ts",
+      "src/schemas.ts"
     ]
   },
   "sideEffects": false
