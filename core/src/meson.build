@@ -154,7 +154,6 @@ if cpp_compiler.get_id() == 'emscripten'
     '-sMODULARIZE=1', '-sEXPORT_NAME=createCoreProcessor',
     '-sEXPORT_ES6',
     '-sENVIRONMENT=web,webview',
-    '--emit-tsd', 'km-core-interface.d.ts',
     # '-sERROR_ON_UNDEFINED_SYMBOLS=0'
   ]
 endif
