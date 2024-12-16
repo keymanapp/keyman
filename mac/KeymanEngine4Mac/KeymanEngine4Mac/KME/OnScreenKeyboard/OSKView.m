@@ -528,7 +528,7 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
  * The layer shown depends on both the physical modifier state and the osk modifier state.
  */
 - (void)displayKeyLabelsForLayer {
-  os_log_debug([KMELogs oskLog], "OSKView setKeyLabels, phsyical modifiers [shift: %d, option: %d, control: %d]\nosk modifiers [shift: %d, option: %d, control: %d]", self.physicalShiftState, self.physicalOptionState, self.physicalControlState, self.oskShiftState, self.oskOptionState, self.oskControlState);
+  os_log_debug([KMELogs oskLog], "OSKView displayKeyLabelsForLayer, phsyical modifiers [shift: %d, option: %d, control: %d]\nosk modifiers [shift: %d, option: %d, control: %d]", self.physicalShiftState, self.physicalOptionState, self.physicalControlState, self.oskShiftState, self.oskOptionState, self.oskControlState);
   
   BOOL shift = self.physicalShiftState | self.oskShiftState;
   BOOL option = self.physicalOptionState | self.oskOptionState;
