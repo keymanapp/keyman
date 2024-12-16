@@ -31,7 +31,7 @@
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -b ./ && npm run build",
-    "watch": "tsc -watch -b ./",
+    "watch": "tsc -b ./ --watch",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
     "test": "echo use 'ui-test' to run the test - TODO-LDML-EDITOR",

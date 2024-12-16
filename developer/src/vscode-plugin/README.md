@@ -21,8 +21,7 @@ There is also a `build.sh` which works the usual way.
 
 - Open this directory (`vscode-plugin`) in VSCode
 - From the Run and Debug toolbar, click Run Extension
-- A terminal will automatically open with `npm run watch` recompiling the project.
-- Choose a directory containing a .kpj file, and choose the **Terminal > Run Task…** menu item, or the **Tasks: Run Task** command.   Select "kpj" and the name, and the compilation should occur in a terminal window.
+- Choose a directory containing an .xml LDML file
 
 - You can use the **Developer: Reload Window** command to reload the `[extension development]` window with a new version of the plugin.
 
