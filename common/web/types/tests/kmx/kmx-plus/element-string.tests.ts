@@ -11,6 +11,7 @@ import { assert } from 'chai';
 import { ElemElementFlags, ElemElement, ElementString } from '../../../src/kmx/kmx-plus/element-string.js';
 import { StrsItem, UsetItem, DependencySections, Strs } from '../../../src/kmx/kmx-plus/kmx-plus.js';
 import { UnicodeSet } from '../../../src/ldml-keyboard/unicodeset-parser-api.js';
+import { ElementParser, ElementSegment, ElementType } from '../../../src/ldml-keyboard/pattern-parser.js';
 
 const GOTHIC_A = new StrsItem("𐌰", 0x10330);
 const GOTHIC_B = new StrsItem("𐌱", 0x10331);
@@ -24,6 +25,8 @@ const UGARITIC_SET = new UsetItem(
   new UnicodeSet("[𐎀-𐎟]", [[0x10380,0x1039F]]),
   UGARITIC_A
 );
+
+let origElementParserSegment = ElementParser.segment;
 
 describe('Test of ElementString', () => {
   describe('Test of ElemElement', () => {
@@ -62,6 +65,14 @@ describe('Test of ElementString', () => {
   });
   describe('Test of ElementString', () => {
     describe('Test of fromStrings()', () => {
+      beforeEach(() => {
+        ElementParser.segment = (str: string): ElementSegment[] => {
+          return [...str].map(s => new ElementSegment(s, ElementType.codepoint));
+        }
+      });
+      afterEach(() => {
+        ElementParser.segment = origElementParserSegment;
+      });
       it('returns an empty ElementString if source is null', () => {
         const es = ElementString.fromStrings({}, null);
         assert.deepEqual(es, new ElementString());
@@ -77,6 +88,17 @@ describe('Test of ElementString', () => {
         ];
         assert.deepEqual(actual, expected);
       });
+    });
+    it('can create an ElementString from a string', () => {
+      const strs: Strs = new Strs();
+      const sections: DependencySections = { strs: strs };
+      const actual = ElementString.fromStrings(sections, "𐌰𐌱𐌲");
+      const expected = [
+        initElemElement(GOTHIC_A),
+        initElemElement(GOTHIC_B),
+        initElemElement(GOTHIC_C),
+      ];
+      assert.deepEqual(actual, expected);
     });
   });
 });
