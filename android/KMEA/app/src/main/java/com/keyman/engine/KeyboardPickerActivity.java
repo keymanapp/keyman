@@ -254,11 +254,16 @@ public final class KeyboardPickerActivity extends BaseActivity {
     }
 
 
-    SharedPreferences prefs = this.getSharedPreferences(this.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
-    String currentKeyboard = KMKeyboard.currentKeyboard();
-    int curKbPos = (currentKeyboard == null) ? prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0) :
-      KeyboardController.getInstance().getKeyboardIndex(KMKeyboard.currentKeyboard());
-    setSelection(curKbPos);
+    // Determine the index to the current keyboard position to highlight as the selected keyboard
+    int currentKeyboardIndex; 
+    String currentKeyboardKey = KMKeyboard.currentKeyboard();
+    if (currentKeyboardKey == null) {
+      SharedPreferences prefs = this.getSharedPreferences(this.getString(R.string.kma_prefs_name), Context.MODE_PRIVATE);
+      currentKeyboardIndex = prefs.getInt(KMManager.KMKey_UserKeyboardIndex, 0);
+    } else {
+      currentKeyboardIndex = KeyboardController.getInstance().getKeyboardIndex(currentKeyboardKey);
+    }     
+    setSelection(currentKeyboardIndex);
 
     imeList = getIMEList(this);
     BaseAdapter imeAdapter = (BaseAdapter)imeListAdapter;
