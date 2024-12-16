@@ -150,6 +150,68 @@ describe('Test of ElementString', () => {
       ];
       assert.deepEqual(actual, expected);
     });
+    it('can apply tertiary_base string', () => {
+      const actual = ElementString.fromStrings(
+        { strs: new Strs() },
+        "𐌰𐌱𐌲",
+        null,
+        null,
+        "1 0 1",
+      );
+      const expected = [
+        initElemElement(GOTHIC_A, undefined, 0, 0, ElemElementFlags.tertiary_base),
+        initElemElement(GOTHIC_B, undefined, 0, 0, ElemElementFlags.none),
+        initElemElement(GOTHIC_C, undefined, 0, 0, ElemElementFlags.tertiary_base),
+      ];
+      assert.deepEqual(actual, expected);
+    });
+    it('can apply single tertiary_base to all', () => {
+      const actual = ElementString.fromStrings(
+        { strs: new Strs() },
+        "𐌰𐌱𐌲",
+        null,
+        null,
+        "1",
+      );
+      const expected = [
+        initElemElement(GOTHIC_A, undefined, 0, 0, ElemElementFlags.tertiary_base),
+        initElemElement(GOTHIC_B, undefined, 0, 0, ElemElementFlags.tertiary_base),
+        initElemElement(GOTHIC_C, undefined, 0, 0, ElemElementFlags.tertiary_base),
+      ];
+      assert.deepEqual(actual, expected);
+    });
+    it('can apply prebase string', () => {
+      const actual = ElementString.fromStrings(
+        { strs: new Strs() },
+        "𐌰𐌱𐌲",
+        null,
+        null,
+        null,
+        "1 0 1",
+      );
+      const expected = [
+        initElemElement(GOTHIC_A, undefined, 0, 0, ElemElementFlags.prebase),
+        initElemElement(GOTHIC_B, undefined, 0, 0, ElemElementFlags.none),
+        initElemElement(GOTHIC_C, undefined, 0, 0, ElemElementFlags.prebase),
+      ];
+      assert.deepEqual(actual, expected);
+    });
+    it('can apply single prebase to all', () => {
+      const actual = ElementString.fromStrings(
+        { strs: new Strs() },
+        "𐌰𐌱𐌲",
+        null,
+        null,
+        null,
+        "1",
+      );
+      const expected = [
+        initElemElement(GOTHIC_A, undefined, 0, 0, ElemElementFlags.prebase),
+        initElemElement(GOTHIC_B, undefined, 0, 0, ElemElementFlags.prebase),
+        initElemElement(GOTHIC_C, undefined, 0, 0, ElemElementFlags.prebase),
+      ];
+      assert.deepEqual(actual, expected);
+    });
   });
 });
 
