@@ -1,5 +1,11 @@
 # Keyman Version History
 
+## 18.0.160 alpha 2024-12-16
+
+* feat(ios): configurable keyboard height (#12571)
+* chore(common/web): remove .c8rc.json from types and merge exclusions into package.json (#12813)
+* fix(android/engine): Initialize index when resuming KeyboardPicker (#12832)
+
 ## 18.0.159 alpha 2024-12-13
 
 * chore(core): remove meson warnings for wasm builds (#12827)
