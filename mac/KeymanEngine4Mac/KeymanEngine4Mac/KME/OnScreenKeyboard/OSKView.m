@@ -427,6 +427,17 @@ const int64_t OSK_EVENT_MODIFIER_MASK = 0x00000000FFFFFFFF;
   return _oskDefaultNKeys;
 }
 
+/**
+ * called when closing the OSK
+ * when the OSK is not visible then modifier state is determined solely by the physical keyboard
+ */
+- (void)clearOskModifiers {
+  _oskShiftState = NO;
+  _oskOptionState = NO;
+  _oskControlState = NO;
+  [self displayKeyLabelsForLayer];
+}
+
 - (void)resetOSK {
   [self setOskShiftState:NO];
   [self setOskOptionState:NO];

@@ -67,8 +67,11 @@
 }
 
 - (void)windowWillClose:(NSNotification *)notification {
+  os_log_debug([KMLogs oskLog], "OSKWindowController windowWillClose");
   [KMSettingsRepository.shared writeShowOskOnActivate:NO];
-  os_log_debug([KMLogs oskLog], "OSKWindowController windowWillClose, updating settings writeShowOsk to NO");
+  
+  // whenever the OSK is closed clear all of its modifier keys
+  [self.oskView clearOskModifiers];
 }
 
 - (void)helpAction:(id)sender {
